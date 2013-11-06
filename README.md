@@ -27,7 +27,7 @@ Forums
 --------------------------------------
 
 Discussion regarding POV-Ray is traditionally done via our forums at http://news.povray.org/.
-These are also available via [NNTP](nntp://news.povray.org/) for those preferring that.
+These are also available via [NNTP](news://news.povray.org/) for those preferring that.
 
 Please note that the POV-Ray developers do not monitor all forums regularly. The ones we
 tend to check most frequently are povray.general, povray.windows and povray.unix.
