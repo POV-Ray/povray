@@ -1,0 +1,12 @@
+
+#include "shapesq.inc"
+object{ Folium             //--------------------------------
+        sturm
+        texture { pigment{ color White}  
+                  finish { phong 1}
+                } // end of texture 
+        rotate<0,-105,0>
+        translate <0, 1,0>
+      } // ------------------------------------ end of object
+
+

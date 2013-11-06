@@ -1,0 +1,6 @@
+//needs: #include "transforms.inc" 
+
+      // Matrix_Trans(A, B, C, D) : 
+      // x axis points to A, y points to B, z points to C + additional translation by D
+      Matrix_Trans(<2,0.5,0>, <0,0.5,0>, <0,0.5,0.5>, <-0.5,0,0>)   
+

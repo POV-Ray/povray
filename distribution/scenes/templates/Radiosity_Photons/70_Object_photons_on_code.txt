@@ -1,0 +1,8 @@
+// photon block for an object
+  photons{
+    target 1.0          // spacing multiplier for photons hitting the object
+    refraction on
+    reflection on
+    //collect off       // ignore photons
+    //pass_through      // do not influence photons
+  }

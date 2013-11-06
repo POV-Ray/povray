@@ -1,0 +1,8 @@
+        texture{ pigment{ color rgb<0.7,0.4,0.4>}
+                 normal { pigment_pattern{ gradient y sine_wave 
+                                           color_map{ [0, rgb 0.2]
+                                                      [1, rgb 0.8] }
+                                           scale 0.117  }
+                          1  translate<0,-0.25,0>}
+                 finish { phong 1 phong_size 10 reflection{ 0.1 } }
+               }  // end of texture --------------------------- 

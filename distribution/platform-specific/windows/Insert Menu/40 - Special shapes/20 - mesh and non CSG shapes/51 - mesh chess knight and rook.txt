@@ -1,0 +1,10 @@
+union {
+  #include "..\scenes\objects\chess.inc"
+  translate<0,6.2,0>  
+  scale <1,1,-1>*0.10
+  texture{ pigment{ color rgb< 1, 1, 1> } 
+           finish { phong 1 }
+         } // end of texture 
+  rotate< 0,0,0>
+  translate <0, 0, 0>
+}

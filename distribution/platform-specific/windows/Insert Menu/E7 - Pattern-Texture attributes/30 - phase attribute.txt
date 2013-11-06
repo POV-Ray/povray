@@ -1,0 +1,4 @@
+// pigment/normal/density attribute
+// change the phase of ripples, etc.
+// Animation note:  As phase DECREASES, ripples move OUTWARD.
+  phase 0.5

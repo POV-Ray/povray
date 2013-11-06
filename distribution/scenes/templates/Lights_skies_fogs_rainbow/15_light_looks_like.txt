@@ -1,0 +1,11 @@
+light_source{ <0.8, 0.8, 0.9> 
+              color White
+              looks_like{ sphere{ <0,0,0>,0.5 
+                                  texture{ pigment{ color White }
+                                           finish { ambient 0.8   
+                                                    diffuse 0.2
+                                                    phong 1     }
+                                         } // end of texture
+                                } // end of sphere
+                        } //end of looks_like
+            } //end of light_source

@@ -1,0 +1,10 @@
+// flat disc (non-CSG shape!), center hole cutout optional
+// disc{ center, normal vector, outer radius, hole radius (optional!) }
+disc{ <0, 0, 0>, <0, 1, 0>,     1.0,          0.4         
+      texture{ pigment{ color rgb< 0.75, 1.0, 0.0> } //  color YellowGreen
+            // normal { bumps 0.5 scale 0.05 }
+               finish { phong 1}
+             } // end of texture 
+       scale <1,1,1> rotate< 0,0,0> translate<0,0.01,0>         
+     } // end of disc -----------------------------------------------------
+

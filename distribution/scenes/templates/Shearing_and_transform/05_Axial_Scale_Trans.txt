@@ -1,0 +1,4 @@
+//needs: #include "transforms.inc" 
+
+      // Axial_Scale_Trans(Axis, Amount)
+      Axial_Scale_Trans(  <2,0,2>, 0.5)   

@@ -1,0 +1,2 @@
+// used in global_settings, sets the maximum ray tracing bounce depth (1 or more) [5]
+global_settings{ max_trace_level 5 } 

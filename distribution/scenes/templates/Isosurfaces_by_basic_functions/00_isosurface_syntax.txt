@@ -1,0 +1,25 @@
+// create a isosurface object - the equipotential surface
+// of a 3D math function f(x, y, z)
+#declare fn_X = function(x,y,z) { x*x + y*y - 1 }  // cylinder function
+isosurface {
+  function { x*x + y*y - 1 }          // function (can also contain declared functions
+  //function { fn_X(x, y, z) }        // alternative declared function
+  contained_by { box { -1.2, 1.2 } }  // container shape
+  //threshold 0.0                     // optional threshold value for isosurface [0.0]
+  accuracy 0.001                      // accuracy of calculation [0.001]
+  max_gradient 4                      // maximum gradient the function can have [1.1]
+  //evaluate 5, 1.2, 0.95             // evaluate the maximum gradient
+  //max_trace 1                       // maybe increase for use in CSG [1]
+  //all_intersections                 // alternative to 'max_trace'
+  //open                              // remove visible container surface
+
+  
+  texture {
+            pigment{ color rgb<1,1.0,0.95>*1.1}
+            finish { phong 1}
+	  } // end texture
+
+  scale 0.5
+  rotate<0,45,0>
+  translate <0,0.5,0>  
+} // end isosurface

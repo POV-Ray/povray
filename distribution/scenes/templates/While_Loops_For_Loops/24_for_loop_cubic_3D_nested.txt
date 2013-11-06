@@ -1,0 +1,21 @@
+union{ //-----------------------------------
+
+//#for(Identifier, Start, End [, Step]) 
+ #for (NrX, 0, 4, 1) 
+  #for (NrY, 0, 4, 1) 
+   #for (NrZ, 0, 4, 1) 
+    
+     sphere{ <0,0,0>,0.4
+             translate< NrX*1, NrY*1, NrZ*1> 
+  
+             texture{ pigment{ color rgb<1.0,0.1,0.20>*1}
+                      finish { phong 1 reflection { 0.4 metallic 0.5} }
+                    }
+    } 
+   #end // --------------- end z of #for loop 
+  #end // --------------- end y of #for loop 
+ #end // --------------- end x of #for loop 
+
+rotate<0,0,0> 
+translate<0,0,0>
+} // end of union --------------------------

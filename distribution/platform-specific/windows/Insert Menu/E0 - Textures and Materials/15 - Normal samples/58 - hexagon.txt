@@ -1,0 +1,8 @@
+       texture{ Chrome_Metal  
+                normal { hexagon 
+                         normal { gradient x  scale .2 },
+                         normal { ripples 5   scale .2 },
+                         normal { crackle 4   scale .2 }
+                         scale 0.15 }
+                finish { phong 1 reflection{ 0.0} }
+              } // end of texture ------------------------

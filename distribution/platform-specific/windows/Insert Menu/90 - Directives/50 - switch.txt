@@ -1,0 +1,7 @@
+#switch (expr)
+  #case (expr)
+  #break
+  #range (expr,expr)
+  #break
+  #else
+#end

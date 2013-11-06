@@ -1,0 +1,142 @@
+// POV-Ray 3.7 include file "Chair.inc"
+// Author: Friedrich A, Lohmueller, Dec-2010
+// Demo of an macro object include file
+// Save this file in the same director like "Chair_Use.pov"
+// or in any of your POV-Ray library paths (i.e. "user/documents/POV-Ray/v3.7/include/")
+//---------------------------------------------------------------------------------------
+#ifndef( Chair_Inc_Temp)
+#declare Chair_Inc_Temp = version;
+#version 3.7;
+//---------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------
+#ifndef(  Colors_Inc_Temp)
+#include "colors.inc"                                             
+#end
+/*
+#ifndef(  Textures_Inc_Temp)
+#include "textures.inc"                                             
+#end
+*/
+#ifndef(  Shapes_Inc_Temp)
+#include "shapes.inc"                                             
+#end
+#ifndef(  Shapes2_Inc_Temp)
+#include "shapes2.inc"                                             
+#end
+
+
+//--------------------------------------------------------------------///////////////////   
+//-------------------------------------------------------------------------- macro Chair 
+#macro Chair( SH, // seat height,
+              CW, // chair width in x and z
+              CH,  // backrest height
+              FD, // feet diameter                               
+           ) //-------------------------------------------------------------------------- 
+//--------------------------------------------------------------------------------------- 
+//---------------------------------------------------------
+#ifndef (Seat_Texture)
+#declare Seat_Texture = 
+         texture { pigment{ color rgb< 0.8, 0.60, 0.45>*0.7  } 
+                // normal { bumps 0.5 scale 0.05 }
+                   finish { phong 1 }
+                 } // end of texture 
+#end 
+#ifndef (Chair_Texture)
+#declare Chair_Texture = 
+         texture { pigment{ color rgb< 0.75, 0.5, 0.30>*0.30 } 
+                // normal { bumps 0.5 scale 0.05 }
+                   finish { phong 1 }
+                 } // end of texture 
+#end 
+//---------------------------------------------------------------------------------------
+#local D = 0.00001;  // a little bit
+#local BR = 0.007; // border radius 
+#local Seat_D = 0.025; // seat thickness
+#local Connect_H = 0.07; // height of the connections of the feet
+#local Connetion = 
+  object{ Round_Box(<-FD*0.75,-Connect_H,-CW/2+D>,<-FD*0.25,0,CW/2-D>, BR, 0)  
+          translate< CW/2,SH-Seat_D, 0>  
+        }
+//------------------------------------------------------------------------
+// final
+union{ // final
+
+ union{ // feets
+  // feet front
+  object{ Round_Box(<-FD,0,0>,<0,SH-Seat_D,FD>, BR, 0) // Round_Box(A, B, WireRadius, UseMerge ) 
+          translate< CW/2,0,-CW/2>
+        } // --------------------------------------------------------
+  object{ Round_Box(<-FD,0,0>,<0,SH-Seat_D,FD>, BR, 0)  
+          translate< CW/2,0,-CW/2> scale<-1,1,1>
+        } // --------------------------------------------------------
+  // feet backrest
+  object{ Round_Box(<-FD,0,0>,<0,CH,-FD>, BR, 0)   
+          translate< CW/2,0, CW/2>
+        } // --------------------------------------------------------
+  object{ Round_Box(<-FD,0,0>,<0,CH,-FD>, BR, 0)  
+          translate< CW/2,0, CW/2> scale<-1,1,1>
+        } // --------------------------------------------------------
+  //feet connections 
+  object{ Connetion rotate<0,0*90,0>} 
+  object{ Connetion rotate<0,1*90,0>} 
+  object{ Connetion rotate<0,2*90,0>} 
+  object{ Connetion rotate<0,3*90,0>} 
+
+
+
+ texture{ Chair_Texture }
+ }// end feets
+ 
+ union{ // seat and backrest 
+  object{ Round_Box(<-CW/2,-Seat_D,-CW/2>,<CW/2,0,CW/2>, BR, 0)  
+          translate<0,SH,0>
+        } // --------------------------------------------------------
+  object{ Round_Box(<-CW/2,-(CH-SH)/2,-Seat_D>,<CW/2,0,0>, BR, 0)  
+          translate<0,CH, CW/2-FD>
+        } // --------------------------------------------------------
+ texture{ Seat_Texture }
+ }// end  seat and backrest       
+
+}// end of final union
+// --------------------------------------------------------------------------------------
+#end// of macro ------------------------------------------------------///// end of macro
+//--------------------------------------------------------------------///////////////////  
+
+
+
+
+//---------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------
+// example: 
+/*
+//-------------------------------------------------------------------- optional textures
+#declare Seat_Texture = 
+         texture { pigment{ color rgb< 0.8, 0.60, 0.45>*0.7  } 
+                // normal { bumps 0.5 scale 0.05 }
+                   finish { phong 1 }
+                 } // end of texture 
+#declare Chair_Texture = 
+         texture { pigment{ color rgb< 0.75, 0.5, 0.30>*0.30 } 
+                // normal { bumps 0.5 scale 0.05 }
+                   finish { phong 1 }
+                 } // end of texture 
+//-------------------------------------------------------------------------------------//
+#include "Chair.inc" // use here your according path!
+//-------------------------------------------------------------------------------------// 
+object{ Chair( 0.45, // seat height,
+               0.45, // chair width in x and z
+               0.90, // backrest height
+               0.04, // feet diameter                               
+             ) //----------
+        rotate<0,0,0>
+        translate<0,0,0>
+      }  
+//-------------------------------------------------------------------------------------//
+//---------------------------------------------------------------------------------------
+*/
+
+#version Chair_Inc_Temp;
+#end
+//------------------------------------------------------------------- end of include file
+

@@ -1,0 +1,25 @@
+isosurface { //-------------------------------------------------------------
+  function{
+     f_helix2(
+        x,y,z,
+        0,    // not used,
+        12,    // period,      turns on the length of 2*pi 
+        0.38, // minor radius,
+        0.50, // major radius,
+        0,    // not used, 
+        0.5,  // cross section type, (0.0 to 1.0 = square ... rounded to circle
+              //                 over 2.0 to 3.0 = rounded to diamond and concave diamond
+        0     // cross section rotation angle
+      )
+  }          
+ contained_by {box {<-1,-1,-1>,<1,1,1>}}
+ max_gradient 8
+ 
+ texture{ pigment{ color rgb <1,1,1>*1.1} 
+          finish { specular 0.4 phong 0.7 }
+        }
+
+ scale 0.9
+ rotate<0,0,0>
+ translate< 0,1.2,0>
+} // end of isosurface -------------------------------------------------------

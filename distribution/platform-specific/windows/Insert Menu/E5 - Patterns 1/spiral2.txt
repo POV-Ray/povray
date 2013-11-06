@@ -1,0 +1,3 @@
+// pattern for use in texture/pigment/normal/density
+  spiral2 5,         // double spiral that winds around the y-axis
+  //spiral2 5, 0.5   // for use with normal{} (0...1 or more)

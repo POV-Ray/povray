@@ -1,0 +1,87 @@
+//---------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------
+//------------------------------------------------------
+#declare Spline_1 = spline{ //yellow
+   cubic_spline
+   -1/3, < 0.0,   0,-1>
+    0.0, < 1.0,   0, 0>  //first point
+    1/3, < 0.0,   0, 1>
+    2/3, <-1.0, 0.3, 0>
+    3/3, <-0.8, 0.4,-0.6>  //last point
+    4/3, <-0.8, 0.5,-1.1>
+}
+
+#declare Spline_2 = spline{ // red
+   linear_spline    
+   -1/4, < 0.0, 1.0, 0>
+    0.0, < 1.0, 0.0, 0>  //first point
+    1/4, < 1.8, 0.8, 0>
+    2/4, < 1.0, 1.5, 0>
+    3/4, < 0.5, 1.0, 0>
+    4/4, < 1.0, 0.0, 0>  //last point
+    5/4, < 2.0, 1.0, 0>
+}
+//------------------------------------
+// Show Splines ----------------------
+#declare I = 0;
+#while( I <= 1 )
+   sphere{
+      Spline_1(I),0.05
+      no_shadow
+      pigment{rgb <1,0.95,0.15>} 
+   }
+   sphere{
+      Spline_2(I),0.02
+      no_shadow
+      pigment{rgb <0.8,0,0>} 
+   }
+
+   #declare I = I + 0.005;
+#end
+//-----------------------------------
+//---------------------------------------------------------------------------------------------------
+#include "meshmaker.inc"
+//---------------------------------------------------------------------------------------------------
+object { // Prism1 (Base_Spline, ResSpl, Profile_Spline, PRes, FileName) extrudes a spline along the y-axis a mesh2 object. 
+         // In every step the spline is scaled by the 'relative' distance from the y-axis of the second Profile_Spline 
+   Prism1(
+       Spline_1,// Name of Base_Spline, evaluated from t=0 to t=1.  
+                // For the normal calculation, it is required that the input spline, 
+                // also if a linear_spline have one extra point before t=0 and after t=1. 
+             50,// amount of triangles to be used along the spline. 
+       Spline_2,// Profile_Spline that determines by what amount the extrusion is scaled in each step. 
+                // The scaling is based on the relative distance from the y-axis. 
+                // That is, at t=0 the scale is always 1, so that the start of the shape is identical to the Base_Spline.
+                // Profile_Spline also sets the height of the resulting shape (its y-value at t=1).
+                // This spline is evaluated from t=0 to t=1. For the normal calculation, it is required that the input spline, 
+                // also if a linear_spline have one extra point before t=0 and after t=1. 
+             50,// amount of triangles to be used in the height. 
+             "" // FileName: ""= non, "NAME.obj'= Wavefront objectfile, "NAME.pcm" compressed mesh file 
+                // "NAME.arr" include file with arrays to build a mesh2 from, 
+                //  others: includefile with a mesh2 object 
+        ) // ----------------------------------------------------------------------------------------
+   texture{           // inside texture
+     uv_mapping
+     pigment {checker color rgb <1.0,0.25,0.2> rgb <1,1,1> scale <0.025,0.025,1>}
+     finish{specular 0.5}
+   } // 
+   interior_texture{   // outside texture
+     uv_mapping
+     pigment {checker color rgb <0.0,0,0.0> rgb <1,0.9,0.9> scale <0.025,0.025,1>}
+     finish{specular 0.5}
+   } // 
+
+rotate< 0,0,0 > 
+} // end of  mesh2 object{ Prism1(...) }
+//---------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,7 @@
+// solid pattern for use in texture/pigment/normal(/density)
+  // brick pattern generates a brick wall like structure
+  brick      
+  color Gray,          // color of mortar
+  color Red            // color of brick
+  brick_size <2,1,1>   // size of brick    (optional)
+  mortar     0.2       // width of mortar  (optional)

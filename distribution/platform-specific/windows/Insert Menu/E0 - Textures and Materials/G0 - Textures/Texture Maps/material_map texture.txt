@@ -1,0 +1,13 @@
+// texture attribute
+// create a texture that maps different textures onto different color indexes
+// image maps into X-Y plane from <0,0,0> to <1,1,0>
+material_map {
+  png "plasma3.png" // the file to read (iff/tga/gif/png/jpeg/tiff/sys)
+  map_type 0        // 0=planar, 1=spherical, 2=cylindrical, 5=torus
+  interpolate 2     // 0=none, 1=linear, 2=bilinear, 4=normalized distance
+  // once           // for no repetitive tiling
+  texture { pigment {wood} }     // texture for color index # 0
+  texture { pigment {granite} }  // texture for color index # 1
+  texture { pigment {agate} }    // texture for color index # 2
+  // etc...
+} // material_map

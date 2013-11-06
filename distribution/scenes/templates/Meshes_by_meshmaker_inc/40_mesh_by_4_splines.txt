@@ -1,0 +1,139 @@
+//--------------------------------------------------------------------------
+//--------------------------------------------------------------------------
+#ifndef(CLOCK)
+   #if(clock_on=0)
+      #declare CLOCK=clock;
+   #else
+      #declare CLOCK= 0.25;
+   #end
+#end
+//-------------------------------------------------------------
+#declare Point1=vrotate(<1.2, 0,0>,<0,0,-CLOCK*360>)+< 1,0,0>;
+#declare Point2=vrotate(<0.0,-1,0>,<0,0, CLOCK*720>)+<-1,0,0>;
+//-------------------------------------------------------------
+#declare Spline_888=spline {
+   linear_spline
+  -1.00    ,<-2.0, 0.0,-1>
+   0.0     ,<-1.0, 0.0,-1>   //first point = last point Spl4
+   0.25    ,<-0.5,-1.0,-1>
+   0.50    ,< 0.0,-0.5,-1>
+   0.75    ,< 0.5,-1.0,-1>
+   1.00    ,< 1.0, 0.0,-1>   //last point = first point Spl2
+   2.00    ,< 2.0, 0.0,-1>
+}
+#declare Spline_2=spline {
+   natural_spline
+  -1.0     ,<1, 0,-2>
+   0.000001,<1, 0,-1>       //first point = last point Spl1
+   0.5     ,Point1
+   1.0     ,<1, 0, 1>       //last point = first point Spl3
+   2.0     ,<1, 0, 2>       
+}
+#declare Spline_3=spline {
+   cubic_spline
+  -1.00    ,< 2.00, 0.0, 1.0>
+   0.000001,< 1.00, 0.0, 1.0>    //first point = last point Spl2
+   0.25    ,< 0.50, 0.0, 1.0>
+   0.40    ,< 0.20, 1.0, 0.5>
+   0.50    ,< 0.00, 0.8, 0.0>
+   0.60    ,<-0.20, 1.0, 0.5>
+   0.75    ,<-0.50, 0.0, 1.0>
+   1.00    ,<-1.00, 0.0, 1.0>    //last point = first point Spl4
+   2.00    ,<-2.00, 0.0, 1.0>
+}
+#declare Spline_4=spline {
+   quadratic_spline
+  -1.0     ,<-1, 0, 2>       
+   0.000001,<-1, 0, 1>           //first point = last point Spl3
+   0.5     ,Point2
+   1.0     ,<-1, 0,-1>           //last point = first point Spl1
+   2.0     ,<-1, 0,-2>
+}
+//-------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
+#include "meshmaker.inc"
+//-------------------------------------------------------------------------------------------------
+object { // Coons(Spl1, Spl2, Spl3, Spl4, Iter_U, Iter_V, FileName) 
+         // Generates a "coons surface". The surface is defined by four splines, 
+         // all attached head to tail to the previous / next one. 
+         // The uv_coordinates for texturing the surface come from the square <0,0> to <1,1>. 
+   Coons( Spline_888, // The four spline that define the surface.
+          Spline_2  , // The splines are evaluated from t=0 to t=1. 
+          Spline_3  , //
+          Spline_4  , // 
+          50,  // The resolution for the splines 1 and 3.
+          50,  // The resolution for the splines 2 and 4. 
+          ""  // FileName: ""= non, "NAME.obj'= Wavefront objectfile, "NAME.pcm" compressed mesh file 
+              // "NAME.arr" include file with arrays to build a mesh2 from, 
+              //  others: includefile with a mesh2 object 
+        ) //-------------------------------------------------------------------------------------
+/*
+   texture {
+   uv_mapping
+      pigment {
+         marble
+         turbulence <0.3,0,0>
+         translate <-0.5,0,0>
+         scale <0.05,1,1>
+         rotate <0,0,45>
+         warp {repeat 0.5*x flip x}
+         warp {repeat 0.5*y flip y}
+         color_map {
+            [0, rgbf 0]
+            [1, rgbf <1,1,1,0.6>]
+         } // end color_map
+      } // end pigment
+      finish {
+         specular 0.4
+         roughness 0.05
+         irid {
+            0.3
+            thickness 0.2
+            turbulence 0.1
+         } // end irid
+      } // end finish
+   } // end texture
+*/
+   texture{           // outside texture
+     uv_mapping
+     pigment {checker color rgb <0.0,0,0.0> rgb <1,0.9,0.9> scale <0.025,0.03,1>}
+     finish{ phong 0.3 } // specular 0.25}
+   } // 
+   interior_texture{   // inside texture
+     uv_mapping
+     pigment {checker color rgb <0.0,0.1,0.4> rgb <1,0.95,0.9> scale <0.025,0.03,1>}
+     finish{specular 0.25}
+   } // 
+
+} // end of object
+//-------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
+
+
+//Show the Splines -----------------------
+#declare I=0;
+#while(I <= 1 )
+   sphere{
+      Spline_888(I),0.02
+      no_shadow
+      pigment{rgb <0.5,1,0>} 
+   }
+   sphere{
+      Spline_2(I),0.02
+      no_shadow
+      pigment{rgb <1,0.2,0.5>} 
+   }
+   sphere{
+      Spline_3(I),0.02
+      no_shadow
+      pigment{rgb <0,1,0.8>} 
+   }
+   sphere{
+      Spline_4(I),0.025
+      no_shadow
+      pigment{rgb <1,1,0>} 
+   }
+   #declare I=I+0.004;
+#end
+//----------------------------------------
+

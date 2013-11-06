@@ -1,0 +1,5 @@
+       texture{ pigment{ Bright_Blue_Sky }   
+                finish { diffuse 0.9 phong 1 } 
+                rotate<0,0,0> scale 1 translate<0,0,0>
+              } // end of texture 
+

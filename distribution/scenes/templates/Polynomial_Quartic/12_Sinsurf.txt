@@ -1,0 +1,14 @@
+
+#include "shapesq.inc"
+object{ Sinsurf         //------------------------------------
+        sturm                           
+        texture { pigment{ color  rgb<1,0.95,0.9>} 
+                  finish { phong 1}
+                } // end of texture 
+        rotate <0,-90,0>
+        scale<-1,1,1>
+        rotate <0,0,0>
+        translate <1,0,20>
+      } // ------------------------------------ end of object
+
+

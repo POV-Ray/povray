@@ -1,0 +1,24 @@
+isosurface { //-------------------------------------------------------------
+
+  function{ 
+    y 
+    + f_spikes_2d(
+      x,y,z,
+      2,   // height of central spike,
+      12,  // frequency of spikes in the x direction,
+      12,  // frequency of spikes in the z direction,
+      0.75 // rate at which the spikes reduce as you move away from the center
+    )
+  }          
+  contained_by {box {<-1,0,-1>*2,<1,2,1>*2}}
+  threshold 1.55//1.25
+  max_gradient 8
+ 
+  texture{ pigment{ color rgb <1,0.15,0.30>} 
+           // normal { bumps 0.15 scale 0.015}
+           finish { specular 0.2 phong 0.7 reflection 0.2}
+         }
+  rotate<-40,10,0>
+  scale 0.65
+  translate< 0,1.1,0>
+} // end of isosurface -------------------------------------------------------

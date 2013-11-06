@@ -1,0 +1,18 @@
+
+#include "shapesq.inc"
+intersection{ //----------------------------------------------
+ object{ Cubic_Cylinder     //--------------------------------  
+         sturm
+         scale <1,1,1> rotate<0,0,0> translate<0,0,0> 
+       } // end of Cubic_Cylinder ----------------------------
+ box { <-1.00,-1.00, -1.00>*3,< 1.00, 1.00, 1.00>*3   
+       scale <1,1,1> rotate<0,0,0> translate<0,0,0> 
+     } // end of box -----------------------------------------
+
+    texture { pigment{ color rgb<1,1,1> } 
+              finish { phong 1}
+            } // end of texture 
+    rotate< 0,180,90>
+    translate <0,1,0>
+} // ------------------------------------ end of object
+

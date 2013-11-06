@@ -1,0 +1,12 @@
+// various macros for debugging scene files
+#include "debug.inc"
+
+ Set_Debug(Bool)
+
+ Debug_Message(Str)
+
+ Debug(Condition, Message)
+
+ Warning(Condition, Message)
+
+ Error(Condition, Message)

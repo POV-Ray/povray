@@ -1,0 +1,4 @@
+        texture{ pigment{ color rgb <0.95,0.750,0.05> }
+                 normal { wood 2.5 scale 0.15 }
+                 finish { phong 1  reflection{ 0.25 } }
+               }  // end of texture ---------------------------

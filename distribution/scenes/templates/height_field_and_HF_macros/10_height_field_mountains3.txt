@@ -1,0 +1,14 @@
+//---------------------------------------------------------------------
+height_field{ png "plasma3.png" smooth double_illuminate
+              // file types: 
+              // gif | tga | pot | png | pgm | ppm | jpeg | tiff | sys
+              // [water_level N] // truncate/clip below N (0.0 ... 1.0)
+              translate<-0.5, -1,0>
+              scale<6,-3, 6> 
+              texture{ pigment { color rgb <0.85,0.6,0.4>}
+                       normal  { bumps 0.75 scale 0.025  }
+                     } // end of texture
+              rotate<0,0,0>
+              translate<0,-1,0>
+            } // end of height_field ----------------------------------
+//---------------------------------------------------------------------

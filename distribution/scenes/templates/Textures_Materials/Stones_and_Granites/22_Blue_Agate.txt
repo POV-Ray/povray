@@ -1,0 +1,5 @@
+         texture { pigment{ Blue_Agate } 
+                   // normal { bumps 0.5 scale 0.05}
+                   finish { phong 1 } 
+                   scale 0.5
+                 } // end of texture 

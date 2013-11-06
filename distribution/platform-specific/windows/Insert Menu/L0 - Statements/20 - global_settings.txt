@@ -1,0 +1,5 @@
+// place all settings of globally influenced features here
+global_settings {
+// [GLOBAL ITEM(S)]
+}
+

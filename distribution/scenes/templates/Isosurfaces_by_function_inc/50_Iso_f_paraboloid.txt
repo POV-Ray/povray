@@ -1,0 +1,14 @@
+isosurface { //-------------------------------------------------------------
+
+  function {  f_paraboloid(x,-y,z, -1)
+           }
+  contained_by { box { -2, 2 } }
+  accuracy 0.002
+  max_gradient 4
+
+  texture{ pigment{ color rgb<0.5,1,0.1>}
+           finish { phong 1}}
+  scale 1
+  rotate<0,30,0>
+  translate <0,2.2,0> 
+} // end of isosurface -------------------------------------------------------

@@ -1,0 +1,4 @@
+         texture { T_Copper_2A
+                   //normal { bumps 0.5 scale 0.15} 
+                   finish { phong 1}
+                 } // end of texture 

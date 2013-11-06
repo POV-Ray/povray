@@ -1,0 +1,3 @@
+// rotate shape or texture around <0 0 0>, relative to current orientation
+// example: rotate 30*x
+rotate <45, 45, 0> // <dX, dY, dZ> (in degrees)

@@ -1,0 +1,8 @@
+text { ttf "cyrvetic.ttf", "POV-Ray", 100, 0.12 // thickness, offset
+       texture{ pigment{ color rgb<1,0.75,0>} 
+                normal { bumps 0.5 scale 0.01}
+                finish { specular 1 reflection 0.25}
+              } // end of texture
+       scale<1,1.5,1> 
+       translate<-2.3,0.1,0.3>
+      } // end of text object ---------------------------------------------

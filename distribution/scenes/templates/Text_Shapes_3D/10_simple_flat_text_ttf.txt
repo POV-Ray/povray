@@ -1,0 +1,33 @@
+// true type fonts ASCII : crystal.ttf   cyrvetic.ttf   timrom.ttf
+text { ttf "crystal.ttf", "Simple Text!", 0.02, 0.0 // thickness, offset
+
+       texture{ pigment{ color rgb<1,1,1>*1.3 } 
+              //normal { bumps 0.5  scale 0.01 }
+                finish { phong 0.1 }
+              } // end of texture
+
+       scale<1,1.25,1>*0.75
+       translate<-2.10,0.10,0.00 >
+      } // end of text object ---------------------------------------------
+
+text { ttf "cyrvetic.ttf", "Simple Text!", 0.02, 0.0 // thickness, offset
+
+       texture{ pigment{ color rgb<1,1,1>*0.1 } 
+              //normal { bumps 0.5  scale 0.01 }
+                finish { phong 0.1 }
+              } // end of texture
+
+       scale<1,1.25,1>*0.75
+       translate<-2.10,1.00,0.00 >
+      } // end of text object ---------------------------------------------
+
+text { ttf "timrom.ttf", "Simple Text!", 0.02, 0.0 // thickness, offset
+
+       texture{ pigment{ color rgb<1,1,1>*1.3 } 
+              //normal { bumps 0.5  scale 0.01 }
+                finish { phong 0.1 }
+              } // end of texture
+
+       scale<1,1.25,1>*0.75
+       translate<-2.10,1.90,0.00 >
+      } // end of text object ---------------------------------------------

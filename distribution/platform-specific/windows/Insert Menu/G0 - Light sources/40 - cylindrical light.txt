@@ -1,0 +1,12 @@
+// create a point "spotlight" (cylindrical directed) light source
+light_source {
+  0*x                     // light's position (translated below)
+  color rgb <1,1,1>       // light's color
+  spotlight               // this kind of light source
+  cylinder                // this variation
+  translate <40, 80, -40> // <x y z> position of light
+  point_at <0, 0, 0>      // direction of spotlight
+  radius 5                // hotspot (inner, in degrees)
+  tightness 50            // tightness of falloff (1...100) lower is softer, higher is tighter
+  falloff 8               // intensity falloff radius (outer, in degrees)
+}

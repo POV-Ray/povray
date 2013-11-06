@@ -1,0 +1,9 @@
+  #if (High_Quality)
+    // This section is parsed if High_Quality is true
+  #end // End of conditional part
+// or you can use the else clause too
+  #if (clock > 2)
+    // This section is parsed if clock is > 2
+  #else
+    // This section is parsed if clock is <= 2
+  #end // End of conditional part

@@ -1,0 +1,18 @@
+//--------------------------------------------------------------------------
+#declare fn_A = function { sqrt(y*y + z*z) - 0.8 }
+#declare fn_B = function { abs(x)+abs(y)-1 }
+
+isosurface { //-------------------------------------------------------------
+
+  function {  min(fn_A(x, y, z), fn_B(x, y, z)) }
+
+  contained_by { box { -3.5, 3.5 } }
+  accuracy 0.003
+  max_gradient 5
+
+  texture{ pigment{ color rgb<1,0.7,0.5>*0.35}
+           finish { phong 1}}
+  scale 0.5
+  rotate<0,30,0>rotate<-35,0,0>
+  translate <0, 1.4, 0.2>
+} // end of isosurface ----------------------------------------------------- 

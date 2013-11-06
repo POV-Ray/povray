@@ -1,0 +1,12 @@
+// material {} is a wrapper for interior and texture
+// you can declare it like texture and interior too
+// Note that it has nothing to do with material_map
+material {
+  texture {
+    pigment { color rgbt <0.5, 0.5, 0.7, 0.5> }
+    finish { diffuse 0.2 specular 0.6 }
+  }
+  interior {
+    ior 1.5
+  }
+}

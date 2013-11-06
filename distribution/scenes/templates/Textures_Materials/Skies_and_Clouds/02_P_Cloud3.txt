@@ -1,0 +1,7 @@
+#include "skies.inc" // <------------------------------!!!
+
+
+         texture{ pigment{ P_Cloud3 }
+                  finish { phong 1 }
+                  scale 0.25  
+                } // end of texture ---------------------- 

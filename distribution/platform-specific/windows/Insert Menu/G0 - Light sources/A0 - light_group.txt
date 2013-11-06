@@ -1,0 +1,14 @@
+// a light group makes certain light sources only
+// influencing certain objects
+light_group {
+  light_source {          // light sourc(es) of this group
+    <100, 100, 100>
+    color rgb y
+  }
+  sphere {                // objects illuminated by those light sources
+    <0, -1, 0>,0.5
+    pigment { color White }
+  }
+  //global_lights         // add this to make all global lights
+                          // also illuminating this light group
+}

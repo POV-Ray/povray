@@ -1,0 +1,4 @@
+       texture{ pigment{ hexagon color White color Gray color Black }   
+                finish { diffuse 0.9 phong 1 } 
+                rotate<90,0,0> scale 0.25 translate<0,0,0>
+              } // end of texture 

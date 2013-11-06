@@ -1,0 +1,20 @@
+// --------------------------------------- parametric surface -------------- 
+parametric{ 
+  function{ u*v*sin(15*v) }
+  function{ v }   
+  function{ u*v*cos(15*v) }
+  <0,-1>,<1,1>
+  contained_by {box {<-1,-1,-1>, < 1, 1, 1>}}
+  max_gradient 5
+  accuracy 0.0035
+  precompute 18 x,y,z
+
+
+  texture {
+            pigment{ color rgb<1,1,1>}
+            finish {  phong 0.5  }
+	  }
+  scale <0.5,0.5,0.5>
+  rotate <0, 0, 0>
+  translate < 0, 0.5, 0>
+} // end of parametric ----------------------------------------------------- 

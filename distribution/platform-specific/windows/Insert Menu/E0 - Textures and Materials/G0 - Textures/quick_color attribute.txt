@@ -1,0 +1,2 @@
+// texture pigment attribute
+quick_color green 1 // low-quality quick-render color

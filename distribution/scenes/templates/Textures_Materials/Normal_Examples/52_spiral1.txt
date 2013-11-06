@@ -1,0 +1,11 @@
+       texture{ pigment{ color rgb<0.10,1.00,1.00> }
+                normal { pigment_pattern{ spiral1 10  
+                                          sine_wave frequency 1 scale 0.15
+                                          rotate<90,0,00>
+                                          color_map {[0, rgb 0.2]
+                                                     [1, rgb 0.8]}
+                                        }
+                          1.5  
+                        }
+                 finish { phong 1  phong_size 5 reflection{ 0.25 } }
+               }  // end of texture ----------------------------------------  

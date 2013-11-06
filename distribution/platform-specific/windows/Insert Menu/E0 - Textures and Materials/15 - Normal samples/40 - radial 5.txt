@@ -1,0 +1,12 @@
+        texture{ pigment{ color rgb<0.05,0.55,0.40> }
+                 normal { pigment_pattern{ radial 
+                                           scallop_wave  frequency 15 
+                                           scale  0.17  turbulence 0.0 
+                                           color_map {[0, rgb 0.5]
+                                                      [1, rgb 0.9]}
+                                         }
+                          1.5  
+                        }
+                 finish { phong 1 phong_size 20 reflection 0.2}
+                 rotate<90,0,0>
+               } // end of texture ---------------------------

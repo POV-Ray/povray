@@ -1,0 +1,15 @@
+//-----------------------------------------------------------------------------------------------------------
+#include "shapes.inc" 
+//-----------------------------------------------------------------------------------------------------------
+object{  // Justification: either Align_Left, Align_Right, or Align_Center           
+/* Circle_Text( Font,          Text, LetterSize, LetterSpacing, Deepth, Radius, Inverted,  Justification, Angle )*/     
+   Circle_Text("arialbd.ttf","POV-Ray",      0.75 ,         0.025,  15.00, 1.15,   1,          Align_Left,   175 ) 
+        texture{ Polished_Chrome   
+                 normal { bumps 0.5 scale 0.005}
+                 finish { specular 1 reflection 0.25}
+               } // end of texture
+        rotate<0,0, 0>
+        scale<1,1,1>*0.75 
+        translate<0.20,1.7,-1.2>
+      } // end of Circle_Text object -------------------------------------------
+//-----------------------------------------------------------------------------------------------------------

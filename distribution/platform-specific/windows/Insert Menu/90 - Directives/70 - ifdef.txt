@@ -1,0 +1,7 @@
+#ifdef ( Identifier )
+  // true stuff happens here
+#else // optional
+  // false stuff happens here
+#elseif ( Cond ) // optional
+  ... // do this only if Identifier is not defined and Cond true
+#end

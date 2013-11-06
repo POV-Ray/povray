@@ -1,0 +1,6 @@
+// several different gold colors, finishes and textures
+#include "golds.inc"
+
+// various metal colors, finishes and textures
+// brass, copper, chrome, silver
+#include "metals.inc"

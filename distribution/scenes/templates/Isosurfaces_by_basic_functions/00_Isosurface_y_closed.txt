@@ -1,0 +1,14 @@
+isosurface { //-------------------------------------------------------------
+  function { y }
+
+  threshold 0
+  contained_by {box {<-1,-1,-1>, < 1, 1, 1>}}
+  //open
+  texture {
+            pigment{ color rgb<1,1.0,0.95>*1.1}
+            finish { phong 1}
+	  }
+  scale 1.0
+  rotate <-32, 25, 0>
+  translate <0, 1.2, 0>
+} // end of isosurface ----------------------------------------------------- 

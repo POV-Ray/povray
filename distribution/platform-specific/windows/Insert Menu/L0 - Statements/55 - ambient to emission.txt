@@ -1,0 +1,4 @@
+// In POV-Ray version 3.7, with radiosity emission is replaces by ambient. 
+// ambient is 0 with radiosity on. For 3.7 scenes that work also in 3.6 use i.e.: 
+#if (version < 3.7) ambient 1 #else emission 1 #end 
+                          

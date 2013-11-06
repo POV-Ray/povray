@@ -1,0 +1,20 @@
+// soft light (areal_light) ---------  An area light (creates soft shadows)
+// WARNING: This special light can significantly slow down rendering times!
+light_source { <0,0,0>          
+               color rgb <1,1,1>     // light's color 
+               area_light            // kind of light source (Art der Lichtquelle)
+               <12, 0, 0> <0, 0, 12> // lights spread out across this distance (x * z)
+               4, 4                // total number of lights in grid (4x*4z = 16 lights)
+               adaptive 0          // 0,1,2,3...
+               jitter              // adds random softening of light
+               translate <10, 20, -10>   // <x,y,z> position of light
+             } //---------------- end of area_light 
+
+
+// just a sphere to demonstrate the shadow casting
+sphere { <0,0,0>, 0.5 
+         texture { pigment{ color Flesh}
+                   finish { phong 1}
+                 } // end of texture
+          scale<1,1,1>  rotate<0,0,0>  translate<0,0.75,0>  
+       }  // end of sphere ----------------------------------- 

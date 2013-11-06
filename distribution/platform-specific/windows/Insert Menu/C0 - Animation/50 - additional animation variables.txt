@@ -1,0 +1,8 @@
+// additional animation variables
+#declare X=clock_delta;       // clock step between frames
+#declare X=initial_clock;     // clock value of first rendered frame (+KIn.n)
+#declare X=final_clock;       // clock value of last rendered frame (+KFn.n)
+#declare X=initial_frame;     // initial frame number (+KFIn).
+#declare X=final_frame;       // final frame number (+KFIn).
+#declare X=clock_on;          // true if scene is rendered as an animation
+

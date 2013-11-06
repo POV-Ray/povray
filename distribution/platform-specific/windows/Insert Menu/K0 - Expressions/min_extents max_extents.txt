@@ -1,0 +1,5 @@
+// Bounds extents functions
+// give the extent of the object's bounding box
+#declare Obj = sphere { 0, 1 }
+#declare Min = min_extent (Obj);
+#declare Max = max_extent (Obj);

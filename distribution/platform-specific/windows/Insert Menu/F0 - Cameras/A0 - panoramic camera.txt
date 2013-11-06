@@ -1,0 +1,8 @@
+// panoramic lens for wide field of view with less distortion
+camera {
+  panoramic
+  location <0, 0, -1>                  // position
+  look_at  <0, 0,  0>                  // view
+  right    x*image_width/image_height  // aspect
+  // angle    180                      // field (constant 180 degrees!!)
+}

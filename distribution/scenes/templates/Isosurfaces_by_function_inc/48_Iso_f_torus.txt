@@ -1,0 +1,18 @@
+isosurface { //-------------------------------------------------------------
+
+  function{ f_torus( x,y,z, 0.75, 0.25)  // major radius, minor radius
+          }          
+
+  contained_by {box {<-1,-1,-1>*1,<1,1,1>*1}}
+  threshold 0.00 
+  max_gradient 5
+ 
+  texture{ 
+           pigment{ color rgb <0.2,0.45,1.00>} 
+           // normal { bumps 0.15 scale 0.015}
+           finish { specular 0.2 phong 0.7 reflection 0.1}
+         }
+  rotate<-40,20,0>
+  scale 1.5
+  translate< 0,1.1,0>
+} // end of isosurface -------------------------------------------------------

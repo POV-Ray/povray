@@ -1,0 +1,23 @@
+#declare Random_1 = seed (33053); // Use: "rand(Random_1)" 
+
+union{
+ #local Nr = -8;   // start
+ #local EndNr = 8; // end
+ #while (Nr< EndNr+1) 
+
+ cylinder{ <0,0,0>,<0,2*rand(Random_1),0>,0.125 
+	 texture{ pigment{ color rgb<1,0.2,0.5>}
+                  finish { phong 1}
+                } // end of texture
+
+         translate< Nr*0.25, 0 ,0>
+
+       } // end of sphere ----------------------
+
+
+ #local Nr = Nr + 1;  // next Nr
+ #end // --------------- end of loop 
+
+rotate<0,0,0> 
+translate<0,0,0>
+} // end of union

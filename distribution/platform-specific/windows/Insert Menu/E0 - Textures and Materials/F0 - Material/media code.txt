@@ -1,0 +1,38 @@
+// general media statement
+// put in interior or in scene file for atmospheric media
+media {
+  // (---general values---)
+  intervals 10           // number of intervals used for sampling [10]
+  samples 1,1            // minimum and maximum number of samples taken per interval [1,1]
+  confidence 0.9         // statistic parameter higher->better quality [0.9]
+  variance 1.0/128       // statistic parameter lower->better quality [1.0/128]
+  ratio 0.9              // distribution between lit and unlit areas [0.9]
+  // (---media types---)
+  absorption rgb<0,1,0>  // absorbing media, block light of specified color
+  //emission rgb<0,1,0>  // emitting media, emit light of specified color
+  /*
+  scattering {           // scattering media
+    1,                   // scattering type 1=isotropic; 2=Mie haze; 3=Mie murky
+                         // 4=Rayleigh; 5=Henyey-Greenstein
+    rgb<0,1,0>           // color
+    //eccentricity 0.25  // eccentricity for type 5 [0.0]
+    //extinction 1.0     // for balancing amount of absorption [1.0]
+  }*/
+  // (---method---)
+  //method 1             // old Povray 3.1 method
+  //method 2             // new method with even distribution
+  method 3               // adaptive sampling
+  //aa_threshold 0.1     // accuracy threshold for method 3 [0.1]
+  //aa_level 4           // maximum recursion depth for method 3 [4]
+  //jitter 0.5           // randomness for method 2&3
+  // (---density---)
+  /*
+  density {
+    spherical            // any pattern
+    color_map {...}      // color_map
+    //density_map {...}  // or alternatively density_map
+  }*/
+
+  // translate etc.
+}
+

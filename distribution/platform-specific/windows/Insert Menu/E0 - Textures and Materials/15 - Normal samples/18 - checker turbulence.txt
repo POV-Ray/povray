@@ -1,0 +1,8 @@
+       texture{ pigment{ color rgb<1.00,0.60,0.15>  }
+                normal { pigment_pattern { 
+                               checker color rgb 0.2, color rgb 0.8 
+                               scale 0.27 turbulence 0.5
+                             } // end pigment_pattern
+                        1 } // end normal
+                 finish { phong 1 reflection{ 0.10 } }
+               } // end of texture

@@ -1,0 +1,57 @@
+global_settings { charset utf8 }
+text{
+   ttf "arial.ttf",
+   concat(  chr(195),chr(227),chr(197),chr(229),chr(192),chr(224),chr(193),chr(225),chr(194),chr(226)
+         ) 0.01, 0 
+   texture{
+     pigment{ color rgb<0.1,1.0,0>*0.5}
+     finish { phong 1 }
+          }
+   
+  scale <1,1,1> rotate< 0,0,0> translate<0,4,-0.05>         
+} // end of text ----------------------------------------------------------
+text{
+   ttf "arial.ttf",
+   concat( chr(196),chr(228),chr(198) ,chr(230),chr(199),chr(231)
+         ) 0.01, 0 
+   texture{
+     pigment{ color rgb<0.65,1,0>*0.75}
+     finish { phong 1 }
+          }
+   
+  scale <1,1,1> rotate< 0,0,0> translate<0,3,-0.05>         
+} // end of text ----------------------------------------------------------
+global_settings { charset utf8 }
+text{
+   ttf "arial.ttf",
+   concat(  chr(200),chr(232),chr(201),chr(233),chr(202),chr(234),chr(203),chr(235),chr(241),chr(191)
+         ) 0.01, 0 
+   texture{
+     pigment{ color rgb<0.1,1.0,0>*0.5}
+     finish { phong 1 }
+          }
+   
+  scale <1,1,1> rotate< 0,0,0> translate<0,2,-0.05>         
+} // end of text ----------------------------------------------------------
+
+text{
+   ttf "arial.ttf",
+   concat( chr(213),chr(245),chr(210), chr(242),chr(211),chr(243),chr(214),chr(246),chr(212),chr(244)       
+         ) 0.01, 0 
+   texture{
+     pigment{ color rgb<0.65,1,0>*0.75}
+     finish { phong 1 }
+          }
+   
+  scale <1,1,1> rotate< 0,0,0> translate<0,1,-0.05>         
+} // end of text ----------------------------------------------------------
+text{
+   ttf "arial.ttf",
+   concat( chr(213),chr(245),chr(216),chr(248),chr(217),chr(249),chr(218),chr(250)chr(220),chr(252)) 0.01, 0 
+   texture{
+     pigment{ color rgb<0.1,1.0,0>*0.5}
+     finish { phong 1 }
+          }
+   
+  scale <1,1,1> rotate< 0,0,0> translate<0,-0.0,-0.05>         
+} // end of text ----------------------------------------------------------

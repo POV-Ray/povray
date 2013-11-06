@@ -1,0 +1,15 @@
+         texture{ // ----------------------------------------   
+            pigment{ wood turbulence 0.02 octaves 4 lambda 3
+                     scale 0.175 rotate <2, 3, 0> 
+                     color_map {
+                       [0.0 color rgb <1.30, 0.99, 0.64>]
+                       [0.5 color rgb <0.75, 0.39, 0.17>]
+                       [0.7 color rgb <0.75, 0.39, 0.17>]
+                       [1.0 color rgb <1.30, 0.99, 0.64>]
+                     }// end of color_map
+                   } // end of pigment
+            // normal { agate 0.5 scale 0.25} 
+            finish { phong 1 } 
+            rotate <0,0, 0>  scale 1  translate <0,0,0>
+        } // end of texture ---------------------------------
+

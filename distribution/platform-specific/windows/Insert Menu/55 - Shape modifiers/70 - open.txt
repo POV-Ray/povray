@@ -1,0 +1,2 @@
+// some objects (cylinder, cone, prism, etc.) can have their ends open
+  open

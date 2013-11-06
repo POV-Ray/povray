@@ -1,0 +1,7 @@
+      texture{ pigment{ color rgb<1,0.75,0.1> }
+               normal { pigment_pattern{ 
+                             brick color rgb 0.2, color rgb 0.8 
+                             scale 0.05 } // end pigment_pattern
+                        1 } // end normal
+               finish { phong 1 reflection{ 0.4 }}
+             } // end of texture

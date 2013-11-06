@@ -1,0 +1,24 @@
+isosurface { //-------------------------------------------------------------
+  function{
+    f_mesh1(
+       x,y,z,
+       0.45, // distance between neighboring threads in the x direction,
+       0.30, // distance between neighboring threads in the z direction,
+       0.15, // relative thickness in the x and z directions,
+       0.05, // amplitude of the weaving effect,
+       0.25  // relative thickness in the y direction
+    )
+  }          
+ contained_by {box {<-1,-1,-1>,<1,1,1>}}
+ threshold 0.01
+ max_gradient 8
+ 
+ texture{ pigment{ color rgb <0.65,0.45,0.25>} 
+          normal { bumps 0.15 scale 0.015}
+          finish { specular 0.2 phong 0.7 }
+           }
+ rotate<-45,0,0>
+ scale 1.25
+ translate< 0,1.5,0>
+} // end of isosurface -------------------------------------------------------
+  

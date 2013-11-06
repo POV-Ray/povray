@@ -1,0 +1,35 @@
+// The official POV-Ray Logo
+// Designed by Chris Colefax
+// Winner of the POV-Ray Logo Contest 2000
+
+
+//--------------------------------------------------------------------------
+#version 3.7;
+#default{ finish{ ambient 0.1 diffuse 0.9 }} 
+//--------------------------------------------------------------------------
+#include "colors.inc"
+#include "textures.inc"
+//--------------------------------------------------------------------------
+camera{ angle 75  
+        location  <0.0 , 1.0 ,-3.0>
+        right     x*image_width/image_height
+        look_at   <0.0 , 1.0 , 0.0>
+      }
+
+light_source{<1500,2500,-2500> color White}
+
+sky_sphere{ pigment{  color rgb<0.24,0.34,0.56>*0.7} } 
+  
+//---------------------------------------------------------------------
+#include "logo.inc"
+
+object{ Povray_Logo  
+ 
+        texture{ //Polished_Chrome
+                 pigment{ color rgb< 1.0, 0.65, 0.0> } //  deep yellow 
+                 finish { phong 1 }
+               } // end of texture 
+        scale 1.5
+        rotate<0,0,0>
+        translate<0,1,0>
+      } //-------------------------------------------------------------  

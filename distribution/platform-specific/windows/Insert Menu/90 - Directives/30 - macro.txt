@@ -1,0 +1,8 @@
+// macros can have parameters and are useful for 'programming' scenes
+#macro Spheres(A, B, C)
+  sphere { A, C }
+  sphere { B, C }
+#end
+
+// this macro can be called for example with
+union { Spheres(x, 2*x, 0.5) }

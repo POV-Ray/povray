@@ -1,0 +1,12 @@
+
+#include "shapesq.inc"
+object{ Twin_Glob       //------------------------------------
+        sturm 
+        rotate <0,0,0>
+        translate<0,1,0> 
+        texture { pigment{ color  rgb<1,0.95,0.9>} 
+                  finish { phong 1}
+                } // end of texture 
+       } // ------------------------------------ end of object
+
+

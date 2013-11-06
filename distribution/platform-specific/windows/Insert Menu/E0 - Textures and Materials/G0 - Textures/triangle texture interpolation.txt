@@ -1,0 +1,12 @@
+// interpolate the triangle's texture between 3
+// specified textures for the 3 vertices
+mesh {
+  triangle {
+    <-1,  0, -1>, < 1,  0, -1>, < 0,  0,  1>    // vertices
+    texture_list {
+      Texture_01           // 3 previously declared textures
+      Texture_02
+      Texture_03
+    }
+  }
+}

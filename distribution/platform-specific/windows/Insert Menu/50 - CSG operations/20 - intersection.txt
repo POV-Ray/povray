@@ -1,0 +1,6 @@
+// CSG intersection, the common space where all the shapes meet
+intersection {
+  Shape1 {...}
+  Shape2 {...}
+  ShapeN {...}
+}

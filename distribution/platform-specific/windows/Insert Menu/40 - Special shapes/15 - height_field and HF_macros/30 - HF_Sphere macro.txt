@@ -1,0 +1,27 @@
+ // ----------------- HF_Sphere macro ----------------------
+#declare Fn_1 =
+ function(x, y, z)
+  {1+f_snoise3d(x*7,y*7,z*7)*0.75 }
+//----------------------------------------------------------
+object{ HF_Sphere( Fn_1, //Function,
+                     0, // UseUVheight:  0 or 1
+                     1, // UseUVtexture: 0 or 1
+               <50,50>, // Resolution,
+                     1, // Smooth,// 0 or 1
+                    "", // FileName,
+               <0,0,0>, // Center
+                   2.5 ,// Radius
+                  -0.5  // Depth
+                     ) //-----------------------------------
+  texture{ pigment{ checker
+                    color rgb<0.8,0,0.05>
+                    color rgb<1,1,1>
+                    scale <1,1.25,1>*0.025}
+           finish { phong 0.3}
+           scale 2
+         } // end of texture
+  scale<1,1,1>*1
+  rotate<0,0,0>
+  translate<0,0.00,0>
+} // end of HF_Sphere -------------------------------------- 
+

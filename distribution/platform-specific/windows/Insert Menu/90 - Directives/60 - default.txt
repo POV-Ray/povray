@@ -1,0 +1,4 @@
+// sets the default texture that objects get when they have no texture specified
+#default {
+  texture { pigment {color red 1} finish{ambient 0.2} }
+}

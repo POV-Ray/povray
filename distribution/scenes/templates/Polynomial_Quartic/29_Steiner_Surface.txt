@@ -1,0 +1,13 @@
+
+#include "shapesq.inc"
+object{ Steiner_Surface      // -----------------------------
+        sturm
+        texture{ pigment{ color White }  
+                 finish { phong 1 }
+               } // end of texture 
+        scale 2
+        rotate <-10,1, 50>
+        translate <0,1,0>
+ } // ----------------------------------------- end of object
+
+

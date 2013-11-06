@@ -1,0 +1,6 @@
+torus { 0.35,0.15 
+        texture { pigment{ color rgb<1,1,1>*0.15 }
+                  finish { phong 0.4 }
+                } // end of texture
+        scale <1,1,1> rotate<90,0,0> translate<0,0.50,0>
+      } // end of torus  -------------------------------              

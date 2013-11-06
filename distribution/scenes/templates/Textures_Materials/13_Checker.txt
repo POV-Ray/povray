@@ -1,0 +1,4 @@
+       texture{ pigment{ checker color White color Black }   
+                finish { phong 1 } 
+                rotate<0,0,0> scale 0.25 translate<0,0,0>
+              } // end of texture 

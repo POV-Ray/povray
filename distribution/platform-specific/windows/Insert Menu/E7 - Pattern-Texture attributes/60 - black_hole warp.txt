@@ -1,0 +1,10 @@
+// pattern modifier
+  // (---black_hole warp---)
+  // local deformation of the pattern
+  warp {
+    black_hole <0.5, 0.5, 0>, 0.25   // position and radius
+    //strength 3                     // strength of deformation
+    //inverse                        // invert effect
+    //repeat <1.5, 1, 0>             // repeat black hole
+    //turbulence <0.1, 0.4, 0>       // turbulate repeat position
+  }

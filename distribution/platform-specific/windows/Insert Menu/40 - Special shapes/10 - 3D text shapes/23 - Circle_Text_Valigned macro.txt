@@ -1,0 +1,21 @@
+//-----------------------------------------------------------------------------------------------------------
+#include "shapes.inc" 
+//-----------------------------------------------------------------------------------------------------------
+object{Circle_Text_Valigned(
+          "arial.ttf", "POV-Ray", // Font, Text, 
+           0.35,  0.0005, 0.15,  // Letter_Size, Letter_Spacing, Deepth,
+           1.00,     1,         // Radius, Inverted,
+           Align_Left, // Justification: either Align_Left, Align_Right, or Align_Center  
+           50,        // Circle angle
+          -90 )      // Valign:  Rotates vertical objects. -90 = right side up, 90 = upside-down, 0 = horzontal.
+                      
+        texture{ pigment{ color rgb<0.87,0.75,1.0>  }
+                 // normal { bumps 0.5 scale 0.005}
+                 finish { specular 1 reflection { 0.10 metallic 0.10} }
+               } // end of texture
+        rotate<90,135,0>
+        scale<1,2.0,1>*1  
+        translate<0.0,0.2,0>
+      } // end of "Circle_Text_Valigned" object  ------------------------------------------------------------
+//-----------------------------------------------------------------------------------------------------------
+

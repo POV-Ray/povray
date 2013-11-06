@@ -1,0 +1,683 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Core source">
+      <UniqueIdentifier>{3eaf32fb-a3d5-430c-8e3b-c85e687cb593}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core Headers">
+      <UniqueIdentifier>{a90a16a1-de23-4452-8391-ad80d58f9134}</UniqueIdentifier>
+      <Extensions>
+      </Extensions>
+    </Filter>
+    <Filter Include="Backend Source">
+      <UniqueIdentifier>{37dcbdbc-965f-456a-88ef-94e719c9e899}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Backend Source\Bounding">
+      <UniqueIdentifier>{3ea739c5-294f-471c-a68b-70a28d905b60}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Backend Source\Colour">
+      <UniqueIdentifier>{925d90dc-061b-49d0-a019-392625146379}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Backend Source\Control">
+      <UniqueIdentifier>{b22c9c92-48f1-4112-980c-e207ccad1c32}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Backend Source\Interior">
+      <UniqueIdentifier>{ef568cfa-d7d6-405f-b685-bc1082bbb6ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Backend Source\Math">
+      <UniqueIdentifier>{bbe704ec-896e-49c8-aac5-66f87fe033a1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Backend Source\Parser">
+      <UniqueIdentifier>{2bb11f2b-4a0f-44c8-ae3e-cbea2924892d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Backend Source\Pattern">
+      <UniqueIdentifier>{02d1f320-8476-430b-b670-abadac2dd15b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Backend Source\Render">
+      <UniqueIdentifier>{4597a4bd-79eb-455a-9067-ef35ac278ec1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Backend Source\Scene">
+      <UniqueIdentifier>{97a33130-22df-4bd3-b88a-ed2b3622e70e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Backend Source\Shape">
+      <UniqueIdentifier>{e547ca70-b426-4b88-93d6-e98542f29360}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Backend Source\Support">
+      <UniqueIdentifier>{4eb01538-921e-45c5-80f5-523ea4298683}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Backend Source\Texture">
+      <UniqueIdentifier>{dd691957-04bc-4331-81d0-d7e714750fb1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Backend Source\VM">
+      <UniqueIdentifier>{c12878d9-42f7-4dc0-82c4-0c3ffa9524ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Backend Source\Lighting">
+      <UniqueIdentifier>{efe26d90-2df7-4436-9c9c-c96b2a613976}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Backend Headers">
+      <UniqueIdentifier>{62ce9b25-12bf-42da-a54c-71a5f67023f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Backend Headers\Bounding">
+      <UniqueIdentifier>{00f8c35e-011c-4355-9c1d-da3cb3dd702d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Backend Headers\Colour">
+      <UniqueIdentifier>{0bdf61a0-a573-4bee-8f05-eab1024f1fdc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Backend Headers\Control">
+      <UniqueIdentifier>{b69d0461-17ec-477a-a1d2-2113a27f1922}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Backend Headers\Interior">
+      <UniqueIdentifier>{ee7c48d2-3d8b-4990-9be4-4fa4ce8b19ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Backend Headers\Math">
+      <UniqueIdentifier>{027db344-63f5-4471-97d3-9ea921b9e56c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Backend Headers\Parser">
+      <UniqueIdentifier>{ef10e793-77fb-49f7-b568-9a3fab091b6f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Backend Headers\Pattern">
+      <UniqueIdentifier>{f45f3252-4135-4335-803f-f56acec22852}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Backend Headers\Render">
+      <UniqueIdentifier>{84996b87-deae-4ae5-a01a-de129397d353}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Backend Headers\Scene">
+      <UniqueIdentifier>{f05be98c-12a6-41c3-8edf-4807d99ccebd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Backend Headers\Shape">
+      <UniqueIdentifier>{f6c405cb-d370-4828-b175-a4f911c6ce5a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Backend Headers\Support">
+      <UniqueIdentifier>{819550ea-076f-4b0b-b5e9-ff574bdb9261}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Backend Headers\Texture">
+      <UniqueIdentifier>{39577e8f-4ca6-413f-acaa-51e665721520}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Backend Headers\VM">
+      <UniqueIdentifier>{e952c9e4-a8f8-422c-94b5-8a3c8bb6a30f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Backend Headers\Lighting">
+      <UniqueIdentifier>{7d2e4c81-3e0a-4c87-8ea2-1eb7ff86db26}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\source\lightgrp.cpp">
+      <Filter>Core source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\optout.cpp">
+      <Filter>Core source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\pov_mem.cpp">
+      <Filter>Core source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\povray.cpp">
+      <Filter>Backend Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\bounding\bbox.cpp">
+      <Filter>Backend Source\Bounding</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\bounding\bcyl.cpp">
+      <Filter>Backend Source\Bounding</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\bounding\boundingtask.cpp">
+      <Filter>Backend Source\Bounding</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\bounding\bsphere.cpp">
+      <Filter>Backend Source\Bounding</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\colour\colour.cpp">
+      <Filter>Backend Source\Colour</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\colour\colutils.cpp">
+      <Filter>Backend Source\Colour</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\colour\spectral.cpp">
+      <Filter>Backend Source\Colour</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\control\benchmark.cpp">
+      <Filter>Backend Source\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\control\messagefactory.cpp">
+      <Filter>Backend Source\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\control\renderbackend.cpp">
+      <Filter>Backend Source\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\interior\interior.cpp">
+      <Filter>Backend Source\Interior</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\interior\media.cpp">
+      <Filter>Backend Source\Interior</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\math\chi2.cpp">
+      <Filter>Backend Source\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\math\hcmplx.cpp">
+      <Filter>Backend Source\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\math\mathutil.cpp">
+      <Filter>Backend Source\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\math\matrices.cpp">
+      <Filter>Backend Source\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\math\polysolv.cpp">
+      <Filter>Backend Source\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\math\quatern.cpp">
+      <Filter>Backend Source\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\math\splines.cpp">
+      <Filter>Backend Source\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\parser\express.cpp">
+      <Filter>Backend Source\Parser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\parser\fnsyntax.cpp">
+      <Filter>Backend Source\Parser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\parser\function.cpp">
+      <Filter>Backend Source\Parser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\parser\parse.cpp">
+      <Filter>Backend Source\Parser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\parser\parsestr.cpp">
+      <Filter>Backend Source\Parser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\parser\parstxtr.cpp">
+      <Filter>Backend Source\Parser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\parser\reswords.cpp">
+      <Filter>Backend Source\Parser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\parser\tokenize.cpp">
+      <Filter>Backend Source\Parser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\pattern\pattern.cpp">
+      <Filter>Backend Source\Pattern</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\pattern\warps.cpp">
+      <Filter>Backend Source\Pattern</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\render\radiositytask.cpp">
+      <Filter>Backend Source\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\render\ray.cpp">
+      <Filter>Backend Source\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\render\rendertask.cpp">
+      <Filter>Backend Source\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\render\trace.cpp">
+      <Filter>Backend Source\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\render\tracepixel.cpp">
+      <Filter>Backend Source\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\render\tracetask.cpp">
+      <Filter>Backend Source\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\scene\atmosph.cpp">
+      <Filter>Backend Source\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\scene\camera.cpp">
+      <Filter>Backend Source\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\scene\objects.cpp">
+      <Filter>Backend Source\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\scene\scene.cpp">
+      <Filter>Backend Source\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\scene\threaddata.cpp">
+      <Filter>Backend Source\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\scene\view.cpp">
+      <Filter>Backend Source\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\shape\bezier.cpp">
+      <Filter>Backend Source\Shape</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\shape\blob.cpp">
+      <Filter>Backend Source\Shape</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\shape\boxes.cpp">
+      <Filter>Backend Source\Shape</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\shape\cones.cpp">
+      <Filter>Backend Source\Shape</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\shape\csg.cpp">
+      <Filter>Backend Source\Shape</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\shape\discs.cpp">
+      <Filter>Backend Source\Shape</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\shape\fpmetric.cpp">
+      <Filter>Backend Source\Shape</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\shape\fractal.cpp">
+      <Filter>Backend Source\Shape</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\shape\hfield.cpp">
+      <Filter>Backend Source\Shape</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\shape\isosurf.cpp">
+      <Filter>Backend Source\Shape</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\shape\lathe.cpp">
+      <Filter>Backend Source\Shape</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\shape\mesh.cpp">
+      <Filter>Backend Source\Shape</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\shape\ovus.cpp">
+      <Filter>Backend Source\Shape</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\shape\planes.cpp">
+      <Filter>Backend Source\Shape</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\shape\poly.cpp">
+      <Filter>Backend Source\Shape</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\shape\polygon.cpp">
+      <Filter>Backend Source\Shape</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\shape\prism.cpp">
+      <Filter>Backend Source\Shape</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\shape\quadrics.cpp">
+      <Filter>Backend Source\Shape</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\shape\sor.cpp">
+      <Filter>Backend Source\Shape</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\shape\spheres.cpp">
+      <Filter>Backend Source\Shape</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\shape\sphsweep.cpp">
+      <Filter>Backend Source\Shape</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\shape\super.cpp">
+      <Filter>Backend Source\Shape</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\shape\torus.cpp">
+      <Filter>Backend Source\Shape</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\shape\triangle.cpp">
+      <Filter>Backend Source\Shape</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\shape\truetype.cpp">
+      <Filter>Backend Source\Shape</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\support\bsptree.cpp">
+      <Filter>Backend Source\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\support\fileutil.cpp">
+      <Filter>Backend Source\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\support\imageutil.cpp">
+      <Filter>Backend Source\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\support\jitter.cpp">
+      <Filter>Backend Source\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\support\msgutil.cpp">
+      <Filter>Backend Source\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\support\octree.cpp">
+      <Filter>Backend Source\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\support\randomsequences.cpp">
+      <Filter>Backend Source\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\support\statistics.cpp">
+      <Filter>Backend Source\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\support\task.cpp">
+      <Filter>Backend Source\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\support\taskqueue.cpp">
+      <Filter>Backend Source\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\texture\normal.cpp">
+      <Filter>Backend Source\Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\texture\pigment.cpp">
+      <Filter>Backend Source\Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\texture\texture.cpp">
+      <Filter>Backend Source\Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\vm\fncode.cpp">
+      <Filter>Backend Source\VM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\vm\fnintern.cpp">
+      <Filter>Backend Source\VM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\vm\fnpovfpu.cpp">
+      <Filter>Backend Source\VM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\lighting\photonestimationtask.cpp">
+      <Filter>Backend Source\Lighting</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\lighting\photons.cpp">
+      <Filter>Backend Source\Lighting</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\lighting\photonshootingstrategy.cpp">
+      <Filter>Backend Source\Lighting</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\lighting\photonshootingtask.cpp">
+      <Filter>Backend Source\Lighting</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\lighting\photonsortingtask.cpp">
+      <Filter>Backend Source\Lighting</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\lighting\photonstrategytask.cpp">
+      <Filter>Backend Source\Lighting</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\lighting\point.cpp">
+      <Filter>Backend Source\Lighting</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\lighting\rad_data.cpp">
+      <Filter>Backend Source\Lighting</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\lighting\radiosity.cpp">
+      <Filter>Backend Source\Lighting</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\lighting\subsurface.cpp">
+      <Filter>Backend Source\Lighting</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\precomp.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\source\lightgrp.h">
+      <Filter>Core Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\pov_mem.h">
+      <Filter>Core Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\statspov.h">
+      <Filter>Core Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\configbackend.h">
+      <Filter>Backend Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\frame.h">
+      <Filter>Backend Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\povray.h">
+      <Filter>Backend Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\bounding\bbox.h">
+      <Filter>Backend Headers\Bounding</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\bounding\bcyl.h">
+      <Filter>Backend Headers\Bounding</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\bounding\boundingtask.h">
+      <Filter>Backend Headers\Bounding</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\bounding\bsphere.h">
+      <Filter>Backend Headers\Bounding</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\colour\colour.h">
+      <Filter>Backend Headers\Colour</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\colour\colutils.h">
+      <Filter>Backend Headers\Colour</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\colour\spectral.h">
+      <Filter>Backend Headers\Colour</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\control\benchmark.h">
+      <Filter>Backend Headers\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\control\messagefactory.h">
+      <Filter>Backend Headers\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\control\renderbackend.h">
+      <Filter>Backend Headers\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\interior\interior.h">
+      <Filter>Backend Headers\Interior</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\interior\media.h">
+      <Filter>Backend Headers\Interior</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\math\chi2.h">
+      <Filter>Backend Headers\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\math\hcmplx.h">
+      <Filter>Backend Headers\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\math\mathutil.h">
+      <Filter>Backend Headers\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\math\matrices.h">
+      <Filter>Backend Headers\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\math\polysolv.h">
+      <Filter>Backend Headers\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\math\quatern.h">
+      <Filter>Backend Headers\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\math\splines.h">
+      <Filter>Backend Headers\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\math\vector.h">
+      <Filter>Backend Headers\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\parser\parse.h">
+      <Filter>Backend Headers\Parser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\parser\reswords.h">
+      <Filter>Backend Headers\Parser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\pattern\pattern.h">
+      <Filter>Backend Headers\Pattern</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\pattern\warps.h">
+      <Filter>Backend Headers\Pattern</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\render\radiositytask.h">
+      <Filter>Backend Headers\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\render\ray.h">
+      <Filter>Backend Headers\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\render\rendertask.h">
+      <Filter>Backend Headers\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\render\trace.h">
+      <Filter>Backend Headers\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\render\tracepixel.h">
+      <Filter>Backend Headers\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\render\tracetask.h">
+      <Filter>Backend Headers\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\scene\atmosph.h">
+      <Filter>Backend Headers\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\scene\camera.h">
+      <Filter>Backend Headers\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\scene\objects.h">
+      <Filter>Backend Headers\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\scene\scene.h">
+      <Filter>Backend Headers\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\scene\threaddata.h">
+      <Filter>Backend Headers\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\scene\view.h">
+      <Filter>Backend Headers\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\shape\bezier.h">
+      <Filter>Backend Headers\Shape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\shape\blob.h">
+      <Filter>Backend Headers\Shape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\shape\boxes.h">
+      <Filter>Backend Headers\Shape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\shape\cones.h">
+      <Filter>Backend Headers\Shape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\shape\csg.h">
+      <Filter>Backend Headers\Shape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\shape\discs.h">
+      <Filter>Backend Headers\Shape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\shape\fpmetric.h">
+      <Filter>Backend Headers\Shape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\shape\fractal.h">
+      <Filter>Backend Headers\Shape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\shape\hfield.h">
+      <Filter>Backend Headers\Shape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\shape\isosurf.h">
+      <Filter>Backend Headers\Shape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\shape\lathe.h">
+      <Filter>Backend Headers\Shape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\shape\mesh.h">
+      <Filter>Backend Headers\Shape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\shape\ovus.h">
+      <Filter>Backend Headers\Shape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\shape\planes.h">
+      <Filter>Backend Headers\Shape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\shape\poly.h">
+      <Filter>Backend Headers\Shape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\shape\polygon.h">
+      <Filter>Backend Headers\Shape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\shape\prism.h">
+      <Filter>Backend Headers\Shape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\shape\quadrics.h">
+      <Filter>Backend Headers\Shape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\shape\sor.h">
+      <Filter>Backend Headers\Shape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\shape\spheres.h">
+      <Filter>Backend Headers\Shape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\shape\sphsweep.h">
+      <Filter>Backend Headers\Shape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\shape\super.h">
+      <Filter>Backend Headers\Shape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\shape\torus.h">
+      <Filter>Backend Headers\Shape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\shape\triangle.h">
+      <Filter>Backend Headers\Shape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\shape\truetype.h">
+      <Filter>Backend Headers\Shape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\support\bsptree.h">
+      <Filter>Backend Headers\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\support\fileutil.h">
+      <Filter>Backend Headers\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\support\fixedallocator.h">
+      <Filter>Backend Headers\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\support\imageutil.h">
+      <Filter>Backend Headers\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\support\jitter.h">
+      <Filter>Backend Headers\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\support\msgutil.h">
+      <Filter>Backend Headers\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\support\octree.h">
+      <Filter>Backend Headers\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\support\randomsequences.h">
+      <Filter>Backend Headers\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\support\simplevector.h">
+      <Filter>Backend Headers\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\support\statistics.h">
+      <Filter>Backend Headers\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\support\task.h">
+      <Filter>Backend Headers\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\support\taskqueue.h">
+      <Filter>Backend Headers\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\texture\normal.h">
+      <Filter>Backend Headers\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\texture\pigment.h">
+      <Filter>Backend Headers\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\texture\texture.h">
+      <Filter>Backend Headers\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\vm\fncode.h">
+      <Filter>Backend Headers\VM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\vm\fnintern.h">
+      <Filter>Backend Headers\VM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\vm\fnpovfpu.h">
+      <Filter>Backend Headers\VM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\lighting\photonestimationtask.h">
+      <Filter>Backend Headers\Lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\lighting\photons.h">
+      <Filter>Backend Headers\Lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\lighting\photonshootingstrategy.h">
+      <Filter>Backend Headers\Lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\lighting\photonshootingtask.h">
+      <Filter>Backend Headers\Lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\lighting\photonsortingtask.h">
+      <Filter>Backend Headers\Lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\lighting\photonstrategytask.h">
+      <Filter>Backend Headers\Lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\lighting\point.h">
+      <Filter>Backend Headers\Lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\lighting\radiosity.h">
+      <Filter>Backend Headers\Lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\lighting\subsurface.h">
+      <Filter>Backend Headers\Lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\povrayold.h" />
+    <ClInclude Include="..\..\source\precomp.h" />
+    <ClInclude Include="..\..\source\backend\texture\avxfma4check.h">
+      <Filter>Backend Headers\Texture</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

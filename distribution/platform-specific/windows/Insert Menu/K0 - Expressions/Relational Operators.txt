@@ -1,0 +1,5 @@
+// Relationals must be within parentheses
+// Return arithmetic value 0 for false or 1 for true
+//   <  <=  =  !=  >=  >
+
+#declare BallColor = pigment { red (clock > 0.5) } // black or red

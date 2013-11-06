@@ -1,0 +1,9 @@
+// perspective (default, not required) camera
+camera {
+  perspective
+  location  <0, 0, -1>
+  look_at   <0, 0,  0>
+  right     x*image_width/image_height  // aspect
+  // direction z                        // direction and zoom
+  // angle 67                           // field (overides direction zoom)
+}

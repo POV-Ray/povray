@@ -1,0 +1,13 @@
+isosurface { //-------------------------------------------------------------
+
+  function { x }
+  contained_by { box { -2, 2 } }
+  accuracy 0.003
+  max_gradient 5
+
+  texture{ pigment{ color rgb<1,0.7,0.15>}
+           finish { specular 0.2 phong 1}}
+  scale 0.5
+  rotate<0,20,0>
+  translate <0, 1, 0>
+} // end of isosurface ----------------------------------------------------- 

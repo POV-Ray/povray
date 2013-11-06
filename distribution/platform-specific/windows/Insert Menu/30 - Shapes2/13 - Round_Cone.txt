@@ -1,0 +1,10 @@
+object{//Round_Cone( point A, radius A, point B, radius B, rounding radius, merge on) 
+         Round_Cone( <0,0,0>, 0.70    , <0,1.20,0>, 0.40 , 0.15, 0)  
+         
+         texture{ pigment{ color rgb<0.75,0.35,1> }
+                //normal { radial sine_wave frequency 30}
+                  finish { phong 1 }
+                  scale 0.25 
+                } // end of texture
+         scale<1,1,1>  rotate<0,0,0> translate<0,0.0,0>
+       } // ----------------------------------------------------------- end Round_Cone 

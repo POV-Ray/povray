@@ -1,0 +1,13 @@
+
+#include "shapesq.inc"
+object{ Helix              //--------------------------------
+        sturm
+        texture { pigment{ color White}  
+                  finish { phong 1}
+                } // end of texture 
+        scale 1
+        rotate< 0, 0,0>
+        translate <0, 0, 0>
+      } // ------------------------------------ end of object
+
+

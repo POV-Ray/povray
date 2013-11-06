@@ -1,0 +1,15 @@
+// orthographic projection using parallel camera rays
+// Could be used to render a planar image map, for example
+camera {
+  orthographic
+  location <0,0,-1>    // position & direction of view
+  look_at  <0,0,0>
+  right 1*x            // horizontal size of view
+  up 1*y               // vertical size of view
+}
+/*
+box {                  // this box fits exactly in view
+  <-0.5, -0.5, 0>, <0.5, 0.5, 0>
+  texture { pigment { rgb <1, 0, 1> } }
+}*/
+

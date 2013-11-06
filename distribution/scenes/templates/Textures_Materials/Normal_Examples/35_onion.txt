@@ -1,0 +1,10 @@
+       texture{ pigment{ color rgb<1,0.95,0.69> }
+                normal { pigment_pattern{ onion  
+                                          ramp_wave frequency 1/2 scale 0.1
+                                          color_map {[0, rgb 0.1]
+                                                     [1, rgb 0.9]}
+                                        }
+                          1.5  
+                        }
+                 finish { phong 1  phong_size 50 reflection{ 0.15 } }
+               } // end of texture ------------------------------------------- 

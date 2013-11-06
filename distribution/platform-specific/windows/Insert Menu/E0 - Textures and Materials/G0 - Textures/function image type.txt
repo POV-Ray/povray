@@ -1,0 +1,8 @@
+// use this for example in a heightfield or an image_map
+  function
+  50, 50 {            // resolution of generated image
+    pattern {         // user defined function
+      agate            
+    }
+  }
+

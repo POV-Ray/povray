@@ -1,0 +1,8 @@
+object{ Dodecahedron 
+        scale <1,1,1>
+        texture { pigment{ color rgb<1,0.67,0.15>}
+                  normal { crackle 1.75 scale 0.25 turbulence 0.2}
+                  finish { phong 0.3 reflection{ 0.35 metallic 0.5 } }
+                }
+        scale <1,1,1>*0.75  rotate<25,25,0> translate<0,0,0>
+       } // end of object

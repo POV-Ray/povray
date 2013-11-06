@@ -1,0 +1,5 @@
+       texture{ pigment{ Y_Gradient }   
+                finish { phong 1 } 
+                rotate<0,0,0> scale 1 translate<0,0,0>
+              } // end of texture 
+

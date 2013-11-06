@@ -1,0 +1,86 @@
+// PoV-Ray 3.6 / 3.7 Scene File "Radiosity scene.pov"
+// Radiosity sample for POV-Ray version 3.6 / 3.7
+// by Friedrich A. Lohmueller, May 2010
+//
+//--------------------------------------------------------------------------
+#version 3.7;
+global_settings{ assumed_gamma 1.0 }  
+//#default{ finish{ ambient 0.1 diffuse 0.9 }} 
+//--------------------------------------------------------------------------
+#default{ finish{ ambient 0 diffuse 1 }} 
+//------------------------------------------
+#include "shapes.inc"
+#include "colors.inc"
+#include "textures.inc"
+//------------------------------------------
+#declare Radiosity_ON = 1; 
+#if (Radiosity_ON = 1 )
+global_settings{
+  ambient_light 1
+  radiosity {
+         // pretrace_start 1
+         // pretrace_end 1
+          adc_bailout 2
+          error_bound 0.6
+          count 30
+          brightness 0.75
+          gray_threshold 0.5
+         // media on
+         // normal on
+          recursion_limit 2
+       } // --------------
+ }// end global_settings
+#end
+// ----------------------------------------
+//  point light source
+light_source { <500,1000,-1000> color rgb <1,1,1>*0.75}
+//----------------------------------------------------
+
+sky_sphere{ pigment { color rgb <1,1,1>*0.8} }
+//----------------------------------------------------
+
+camera{ location  <-10, 15, -20>
+        right   x*image_width/image_height  
+        look_at   <-0.65,3.2,0>
+        angle 33
+      }
+//----------------------------------------------------
+plane{ <0,1,0>,0 // floor
+  texture{
+    pigment{ color rgb <1,1,1> }
+    finish { specular 0.4 roughness 0.01 }
+  }
+}
+//----------------------------------------------------
+//----------------------------------------------------
+#declare Tex_1 =  // sphere
+texture{ pigment{color rgb<1,1,1>*1} // rgb<1,0,0>}
+         finish {phong 1 diffuse 0.8 } 
+       }
+#declare Tex_2 =  // box 
+texture{ pigment{color rgb<1,1,1>*0.8} // rgb<1,0.65,0>}
+         finish {phong 1 diffuse 0.9} 
+       }
+#declare Tex_3 =  // cylinders
+texture{ pigment{color rgb<1,1,1>*1} // rgb<0.5,1,0> }
+         finish {phong 1 diffuse 1 } 
+       }
+//----------------------------------------------------
+#declare MyObject = 
+intersection{ 
+box{<-0.5,-0.5,-0.5>,<0.5,0.5,0.5> texture{ Tex_2 } }
+sphere{<0,0,0>,0.66                texture{ Tex_1 } }
+cylinder{<0,0,-1>,<0,0,1>,0.3 inverse texture{ Tex_3 }}
+cylinder{<0,-1,0>,<0,1,0>,0.3 inverse texture{ Tex_3 }}
+cylinder{<-1,0,0>,<1,0,0>,0.3 inverse texture{ Tex_3 }}
+} //----------------------------------------------------
+
+
+// -----------------------------------------
+object{ MyObject scale 7 
+        rotate<0, 0,0> 
+        translate<0,3.5,0> 
+      }
+// -----------------------------------------
+ 
+

@@ -1,0 +1,6 @@
+// CSG union, add all of shapes 1...N
+union {
+  Shape1 {...}
+  Shape2 {...}
+  ShapeN {...}
+}

@@ -1,0 +1,4 @@
+       texture{ pigment{ color rgb<0.76,0.65,1>} 
+                normal { bozo 8.5 scale 0.050 }
+                finish { phong 1 reflection{ 0.05 } }
+              } // end of texture

@@ -1,0 +1,4 @@
+        texture{ Chrome_Metal pigment {color rgb<1,0.65,0> } 
+                 normal { facets coords 1.5 scale 1.75}
+                 finish { phong 1 reflection{ 0.1 } }
+               } // end of texture ------------------------------------ 

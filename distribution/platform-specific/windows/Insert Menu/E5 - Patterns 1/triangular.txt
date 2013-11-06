@@ -1,0 +1,9 @@
+  // new in POV-Ray 3.7
+  triangular //max.6 colors/textures 
+  color Red,
+  color rgb<1.0, 0.4, 0.0>,
+  color rgb<1.0, 0.9, 0.0>,
+  color rgb<0.5, 1.0, 0.0>,
+  color rgb<0.5, 0.5, 1.0>,
+  color rgb<0.5, 0.0, 1.0> 
+  // rotate<-90,0,0>  

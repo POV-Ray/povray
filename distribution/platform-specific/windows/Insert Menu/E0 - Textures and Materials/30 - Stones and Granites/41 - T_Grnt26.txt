@@ -1,0 +1,5 @@
+         texture { T_Grnt26 
+                   //normal { agate 0.15 scale 0.15}
+                   finish { phong 0.5 } 
+                   scale 1 
+                 } // end of texture 

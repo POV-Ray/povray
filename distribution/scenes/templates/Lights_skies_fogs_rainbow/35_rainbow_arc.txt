@@ -1,0 +1,39 @@
+// filter and transparency base ------------------------------- start rainbow arc
+#declare Filter = 0.5; // <= ~0.80;
+#declare T_Base = 0.3; // <= ~0.70; (0~1 less/more intensive)
+// the rainbow colors -----------------------------------------------------------
+#declare Rainbow_Color_1  = color rgbf<1.0, 0.5, 1.0, Filter+0.15>; // Violet_End
+#declare Rainbow_Color_2 = color rgbf<1.0, 0.5, 1.0, Filter>;  // Violet_Start
+#declare Rainbow_Color_3 = color rgbf<0.5, 0.5, 1.0, Filter>;  // Violet_Blue
+#declare Rainbow_Color_4 = color rgbf<0.2, 0.2, 1.0, Filter>; // Blue
+#declare Rainbow_Color_5 = color rgbf<0.2, 1.0, 1.0, Filter>; // Cyan
+#declare Rainbow_Color_6 = color rgbf<0.2, 1.0, 0.2, Filter>; // Green
+#declare Rainbow_Color_7 = color rgbf<1.0, 1.0, 0.2, Filter>; // Yellow
+#declare Rainbow_Color_8 = color rgbf<1.0, 0.5, 0.2, Filter>; // Orange
+#declare Rainbow_Color_9 = color rgbf<1.0, 0.2, 0.2, Filter>;   // Red_Start
+#declare Rainbow_Color_10= color rgbf<1.0, 0.2, 0.2, Filter+0.15>; // Red_End
+
+// the rainbow arc //------------------------------------------------------------
+rainbow {
+  angle 40         // 30~50 apparture against center in degrees
+  width  6         // width in degrees
+  distance 1500     // 
+  direction < 0.05,-0.27,1> //direction to the center of the rainbow arc   
+  arc_angle 150    // length of arc in degrees
+  falloff_angle 10 // in degrees, must be smaller than arc_angle 
+  // up <0.6,1,0>  // 
+  // jitter 0.01   // don't use this with animations
+
+  color_map {
+    [0.000  color Rainbow_Color_1  transmit T_Base+0.08]
+    [0.100  color Rainbow_Color_2  transmit T_Base+0.06]
+    [0.214  color Rainbow_Color_3  transmit T_Base+0.04]
+    [0.328  color Rainbow_Color_4  transmit T_Base+0.02]
+    [0.442  color Rainbow_Color_5  transmit T_Base+0.00]
+    [0.556  color Rainbow_Color_6  transmit T_Base+0.02]
+    [0.670  color Rainbow_Color_7  transmit T_Base+0.04]
+    [0.784  color Rainbow_Color_8  transmit T_Base+0.06]
+    [0.900  color Rainbow_Color_9  transmit T_Base+0.08]
+    [1.000  color Rainbow_Color_10 transmit T_Base+0.09]
+  }// end of color_map
+}// -------------------------------------------- end of rainbow arc  -----------

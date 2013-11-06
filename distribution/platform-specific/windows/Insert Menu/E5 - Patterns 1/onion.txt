@@ -1,0 +1,3 @@
+// pattern for use in texture/pigment/normal/density
+  onion          // create an onion-like concentric circle texture
+  //onion 0.5    // for use with normal{} (0...1 or more)

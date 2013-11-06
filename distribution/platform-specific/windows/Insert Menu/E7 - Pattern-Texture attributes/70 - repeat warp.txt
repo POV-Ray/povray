@@ -1,0 +1,8 @@
+// pattern modifier
+  // (---repeat warp---)
+  // repeats a section of the pattern
+  warp {
+    repeat x*2           // repeat direction
+    //flip y             // flip when repeating
+    //offset z*0.25      // translate when repeating
+  }

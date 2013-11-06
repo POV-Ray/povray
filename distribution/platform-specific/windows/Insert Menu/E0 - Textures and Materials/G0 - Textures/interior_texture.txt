@@ -1,0 +1,7 @@
+// with interior_texture you can give the interior surface
+// of an object a different texture
+object {
+  sphere { 0, 1 }
+  texture { pigment { color Red } }
+  interior_texture { pigment { color Blue } }
+}

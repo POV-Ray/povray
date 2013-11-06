@@ -1,0 +1,16 @@
+// set global atmospheric fog effect in the scene.
+// at the fog distance, there will be 63% visibility
+fog {
+  fog_type 1               // 1=constant, 2=ground_fog
+  distance 10
+  color Gray               // can also have 'filter' and 'transmit'
+  // (---turbulence---)
+  //turbulence <0.5, 0.5, 1.0>
+  //turb_depth 0.5
+  //omega 0.5
+  //lambda 2.0
+  //octaves 6
+  // (---ground fog---)
+  //fog_offset 0.5         // height of constant fog
+  //fog_alt 0.5            // at fog_offset+fog_alt: density=25%
+}

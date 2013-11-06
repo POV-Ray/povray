@@ -1,0 +1,17 @@
+sphere_sweep {
+    b_spline
+    6,
+    < 0.50, 1.00, 0>, 0.35,
+    <-0.50, 1.00, 0>, 0.25,
+    <-0.50, 0.00, 0>, 0.15,
+    < 0.50, 0.00, 0>, 0.25,
+    < 0.50, 1.00, 0>, 0.15,
+    <-0.50, 1.00, 0>, 0.10
+    tolerance 0.1
+
+    texture{ pigment{ color rgb<0.69,0.99,0.15>}
+             finish { phong 1 }
+           } // end of texture
+    
+    scale<1,1,1>   rotate<0,0,0>  translate<0,0.5,0>  
+   }  // end of sphere_sweep ---------------------------- 

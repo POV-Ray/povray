@@ -1,0 +1,16 @@
+isosurface { //-------------------------------------------------------------
+
+  function{ sqrt(x*x + y*y + z*z) - 1
+          }
+
+  threshold 0
+  contained_by {box {<-1,-1,-1>, < 1, 1, 1>}}
+  open
+
+  texture { pigment{ color rgb<1.0,0.7,0.3>}
+            finish { specular 0.3 phong 1}
+	  }
+  scale 1
+  rotate <-32, 25, 0>
+  translate < 0, 1, 0>
+} // end of isosurface ----------------------------------------------------- 

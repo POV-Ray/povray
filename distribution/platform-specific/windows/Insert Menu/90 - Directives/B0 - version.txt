@@ -1,0 +1,4 @@
+#declare Temp_Vers = version    // Save original value of #version
+#version 3.0;                   // Change to 3.0 mode
+// Version 3.0 stuff goes here ...
+#version Temp_Vers              // Restore original #version value

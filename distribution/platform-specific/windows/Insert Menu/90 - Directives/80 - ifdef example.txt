@@ -1,0 +1,6 @@
+  #ifdef (SphereFlake_Shape)
+    // This section is  parsed if SphereFlake_Shape is declared
+  #else // optional
+    // This section is  parsed if SphereFlake_Shape is NOT declared
+    #declare SphereFlake_Shape = sphere {0,1} // make a default shape
+  #end // End of conditional part

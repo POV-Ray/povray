@@ -1,0 +1,2 @@
+// used in global_settings, sets image gamma in relation to display gamma
+global_settings{ assumed_gamma 1.0 }

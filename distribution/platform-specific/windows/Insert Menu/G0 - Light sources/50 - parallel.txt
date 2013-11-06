@@ -1,0 +1,5 @@
+// light_source { ...
+  // put this inside a light_source to make it parallel
+  parallel
+  point_at <1, 0, 0>
+

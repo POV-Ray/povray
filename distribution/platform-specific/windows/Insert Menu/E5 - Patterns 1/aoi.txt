@@ -1,0 +1,17 @@
+// pattern for use in texture/pigment/normal
+// new in 3.7:
+/* Implemented AOI pattern (thanks to Grimbert Jerome for most of the code); 
+      the syntax is as follows:
+	
+        pigment { aoi pigment_map { ... } }
+        normal { aoi normal_map { ... } }
+        texture { aoi texture_map { ... } }
+	
+      The pattern gives a value proportional to the angle between the ray and the 
+      surface; for consistency with the slope pattern, values range from 0.5 where 
+      ray is tangent to the suftace, to 1.0 where perpendicular; in practice, 
+      values below 0.5 may occur in conjunction with smooth triangles or meshes.
+	
+      (Note that this differs from the current MegaPOV implementation, where the values
+      range from 0.5 down to 0.0 instead.)
+*/

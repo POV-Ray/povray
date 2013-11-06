@@ -1,0 +1,4 @@
+         texture { pigment{ color rgb<  0.75, 0.5, 1.0>*1.25 } // very light violet  
+                // normal { bumps 0.5 scale 0.05 }
+                   finish { reflection 0.00}
+                 } // end of texture 

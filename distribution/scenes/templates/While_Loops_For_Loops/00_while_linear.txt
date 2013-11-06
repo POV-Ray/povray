@@ -1,0 +1,23 @@
+
+#declare Ball = 
+ sphere{ <0,0,0>,0.5 
+         scale <1,1,1> rotate<0,0,0> translate<0,0,0>
+	 texture{ pigment{ color rgb<1,0,0>}
+                  finish { phong 1}
+                }
+       } //---------------------------------
+
+union{ //-----------------------------------
+ #local Nr = 0;     // start
+ #local EndNr = 10; // end
+ #while (Nr< EndNr) 
+
+   object{ Ball translate<0,0,Nr*1.5>} 
+
+ #local Nr = Nr + 1;  // next Nr
+ #end // --------------- end of loop 
+
+rotate<0,0,0> 
+translate<0,0,0>
+} // end of union --------------------------
+

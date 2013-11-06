@@ -1,0 +1,23 @@
+# $File: //depot/public/povray/3.x/distribution/platform-specific/windows/Ini/user-keywords.txt $
+# $Revision: #1 $
+# $Change: 6069 $
+# $DateTime: 2013/11/06 11:59:40 $
+# $Author: chrisc $
+#
+# user-defined keywords may be placed in this file
+# these keywords do not affect parsing or SDL; they are only used by the editor
+# for syntax highlighting and keyword completion (i.e. ctl-space or tab)
+#
+# the syntax is one keyword per line. spaces are not permitted within keywords
+# (leading or trailing spaces are allowed but will be stripped). any line containing
+# more than one token will be ignored, as well any line starting with a '#'.
+
+input_file_name
+image_width
+image_height
+clock_delta
+final_clock
+final_frame
+frame_number
+initial_clock
+initial_frame

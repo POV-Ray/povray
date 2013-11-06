@@ -1,0 +1,53 @@
+//--------------------------------------------------------------------------
+#declare Ball = //---------------------------------------------------------- 
+
+sphere{ <0,0,0>, 0.07
+
+        texture { pigment{ color rgb<1.00, 0.35, 0.00>*0.9 }
+                  finish { phong 1.0 reflection{ 0.10 metallic 0.5} }
+                } // end of texture
+
+        scale<1,1,1>  rotate<0,0,0>  translate<0,0,0>
+      } // end of sphere ---------------------------------------------------
+//--------------------------------------------------------------------------
+
+//-------------------------------------
+#declare Ball =
+ sphere{<0,0,0>,0.55
+      }
+#declare Radius0 = 3.0; //Grundradius
+#declare NR = 18;//n. of revolutions
+#declare NpR= 700;//n. of elements p.r.
+#declare Scale=0.83;//n.per revolution
+#declare HpR  =0.83;//difference in y p.r.
+//-------------------------------------
+#local Hd       = HpR/NpR;
+#local Scale_p  = pow(Scale,1/360);
+#local Scale_pE = pow(Scale_p,360/NpR);
+#local Old_S = Scale_pE;
+#local Old_H = Hd;
+
+
+union{
+#declare Nr = 0;         // start
+#declare EndNr = NR*NpR; // end
+#while (Nr< EndNr)
+ object{Ball
+        translate<Radius0,0,0>
+        scale Old_S
+        translate<0,Old_H,0>
+        rotate<0,Nr * 360/NpR ,0>}
+ #declare Nr = Nr + 1;  // next Nr
+ #declare Old_S = Scale_pE*Old_S;
+ #declare Old_H = Old_H+Hd*Old_S;
+#end // ------------ end of loop ----
+
+      texture{ T_Stone7 scale 0.55
+               normal{ bumps 0.25 scale 0.25}
+               finish{ phong 1 reflection{ 0.03 metallic 0.5} }}
+
+  scale<1,1,1>
+  rotate<0,0,0>
+
+  translate<0,0.5,0>
+} // end of snail -------------------

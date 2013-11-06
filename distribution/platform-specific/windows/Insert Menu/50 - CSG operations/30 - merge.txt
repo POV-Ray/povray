@@ -1,0 +1,7 @@
+// CSG merge, merge all of shapes 1...N
+// like 'union', but melted together so no overlap seam lines inside
+merge {
+  Shape1 {...}
+  Shape2 {...}
+  ShapeN {...}
+}

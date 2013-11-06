@@ -1,0 +1,27 @@
+// Set some common radiosity settings
+// These settings are extremely general and are intended for
+// ease of use, and don't necessarily give the best results.
+
+
+#include "rad_def.inc"
+
+// global_settings {
+//   radiosity {
+//     Rad_Settings(Radiosity_Default, off, off)
+//   }
+// }
+
+/*
+#declare Radiosity_Default = 0;
+#declare Radiosity_Debug = 1;
+#declare Radiosity_Fast = 2;
+#declare Radiosity_Normal = 3;
+#declare Radiosity_2Bounce = 4;
+#declare Radiosity_Final = 5;
+
+#declare Radiosity_OutdoorLQ = 6;
+#declare Radiosity_OutdoorHQ = 7;
+#declare Radiosity_OutdoorLight = 8;
+#declare Radiosity_IndoorLQ = 9;
+#declare Radiosity_IndoorHQ = 10;
+*/  

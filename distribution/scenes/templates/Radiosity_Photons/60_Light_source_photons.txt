@@ -1,0 +1,6 @@
+// photon block for a light source
+  photons {
+    refraction on
+    reflection on
+    //area_light
+  }

@@ -1,0 +1,13 @@
+
+#include "shapesq.inc"
+object{ Parabolic_Torus_40_12  //----------------------------
+        sturm
+        texture { pigment{ color White }  
+                  finish { phong 1 } 
+                } // end of texture 
+        scale 0.1
+        rotate<  30, 180,0>
+        translate < 0, 1, 0>
+ } // ----------------------------------------- end of object
+
+

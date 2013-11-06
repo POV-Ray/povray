@@ -1,0 +1,22 @@
+isosurface { //-------------------------------------------
+
+  function{
+   f_rounded_box(x,y,z,0.3,1.5,1.5,1.5)
+   -(f_leopard(x*6,y*6,z*6)*0.5)
+   }
+  threshold 0
+  contained_by {box {<-2,-2,-2>,<2,2,2>}}
+  max_gradient 2.449
+  accuracy 0.0001
+  //evaluate 1,20,0.99
+
+  texture { pigment{ color rgb<1,0.75,0.0>}
+            //normal { bumps 0.5 scale 0.05}
+            finish { specular 0.4 
+                     phong 0.3 reflection 0.1}
+	  }
+  scale 0.55
+  rotate <0,-40,90>
+  rotate <0,35,0>  
+  translate < 0, 1.4, 0.0>
+} // end of isosurface -----------------------------------

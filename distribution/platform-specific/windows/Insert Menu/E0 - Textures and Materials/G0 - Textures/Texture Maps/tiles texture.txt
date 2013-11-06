@@ -1,0 +1,13 @@
+// texture component
+// create a tiled texture, alternates between 2 full textures
+tiles {
+  texture {   // full texture of tile #1
+    pigment { agate scale 0.3 }
+    finish { ambient 0.2 }
+  }
+  tile2
+  texture {   // full texture of tile #2
+    pigment { granite }
+    finish { specular 0.3 reflection 0.2 }
+  }
+}

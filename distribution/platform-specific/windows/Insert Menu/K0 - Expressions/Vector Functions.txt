@@ -1,0 +1,10 @@
+// vector functions
+/*
+#declare X=vaxis_rotate(A,B,F); // rotate A about B by F
+#declare X=vcross(A,B);         // cross product of A and B
+#declare X=vdot(A,B);           // dot product of A and B
+#declare X=vrotate(A,B);        // rotate A about origin by B
+#declare X=vnormalize(A);       // normalize vector A
+#declare X=vturbulence(Lambda,Omega,Octaves, A);
+                                // X+A gives a turbulated version of A
+*/

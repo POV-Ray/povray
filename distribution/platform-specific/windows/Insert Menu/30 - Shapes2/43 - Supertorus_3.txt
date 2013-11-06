@@ -1,0 +1,11 @@
+object{ Supertorus( 1.00, 0.25, // Radius_Major, Radius_Minor, 
+                    1.00, 0.45, // Major_Control, Minor_Control,
+                   0.001, 1.50) // Accuracy, Max_Gradient)
+        
+        texture{ pigment{ color rgb<0.65,1,0.0>}
+                 finish { phong 1 } 
+               } // end of texture
+        scale <1,1,1> 
+        rotate<0,0,0> 
+        translate<0,0,0>
+      } //---------------------------------------------------- 

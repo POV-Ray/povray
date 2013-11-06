@@ -1,0 +1,13 @@
+         texture{ pigment{ crackle scale 1.5 turbulence 0.1 
+                           color_map{[0.04 color Black] 
+                                     [0.09 color Black] 
+                                     [0.12 color rgb<1,0.65,0>] 
+                                     [1.00 color rgb<1,0.65,0>]
+                                    } // end of color_map
+                           scale 0.2
+                         } // end of pigment
+             
+                  normal { bumps 0.75 scale 0.02 }
+                  finish { phong 1 } 
+                  rotate<0,0,0>  translate<0.01, 0.04, 0.00>
+                } // end of texture  --------------------------

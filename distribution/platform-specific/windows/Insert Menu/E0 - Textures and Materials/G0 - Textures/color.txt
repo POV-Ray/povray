@@ -1,0 +1,6 @@
+// texture pigment attribute
+// RGB values can range from 0.0 (dark) to 1.0 (saturated)
+  color red 0.5 green 0.5 blue 0.5 // filter 0.8
+// (---alternative form---)
+  //color rgb <0.5, 0.5, 0.5>
+  //color rgbf <0.5, 0.5, 0.5, 0.8>

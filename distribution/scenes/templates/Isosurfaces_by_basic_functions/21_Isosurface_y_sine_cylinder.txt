@@ -1,0 +1,18 @@
+isosurface { //-------------------------------------------------------------
+
+  function { sin( 4 *y*2*pi ) /15
+             + sqrt(x*x*4 + z*z*4) - 0.5 }
+  threshold 0
+  contained_by {box {<-1,0,-1>, < 1, 1, 1>}}
+  max_gradient 10
+  accuracy 0.005
+  open  // optional
+
+  texture {
+            pigment{ color rgb<1,1,1>}
+            finish { phong 0.51 reflection 0.2}
+	  }
+  scale 1
+  rotate <0, 0, 0>
+  translate < 0, 0, 0>
+} // end of isosurface ----------------------------------------------------- 

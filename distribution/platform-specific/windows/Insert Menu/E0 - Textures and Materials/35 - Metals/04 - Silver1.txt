@@ -1,0 +1,3 @@
+         texture{ Silver1
+                  finish { phong 1  }
+                } // end of texture ---------------------------  

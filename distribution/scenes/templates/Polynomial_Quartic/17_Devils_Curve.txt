@@ -1,0 +1,13 @@
+
+#include "shapesq.inc"
+object{ Devils_Curve       //--------------------------------
+        sturm
+        texture { pigment{ color White}  
+                  finish { phong 1}
+                } // end of texture 
+        scale 3
+        rotate<0,0,0>
+        translate <0, 1,5>
+      } // ------------------------------------ end of object
+
+

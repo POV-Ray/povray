@@ -1,0 +1,11 @@
+object{ Supercone(<0.00,0.00,0.00>, 0.5, 1.0, // point A, axis Ax, axis Az, 
+                  <0.00,1.70,0.00>, 0.7, 0.3) // point B, axis Bx, axis Bz) 
+
+        texture{ pigment{ color rgb<0.6,1.00,0.1>}
+                 finish { phong 0.5 }
+               } // end texture ------------------
+
+        scale<1,1,1> 
+        rotate<0,0,0> 
+        translate<0,0,0>
+      } // ----------------------------------------------------------------

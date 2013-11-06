@@ -1,0 +1,7 @@
+// pattern modifier
+  // (---turbulence warp---)
+  // turbulates similar to 'turbulence'
+  warp {
+    turbulence 0.4*x     // amount of turbulence
+    //octaves 2          // optional turbulence modifiers
+  }

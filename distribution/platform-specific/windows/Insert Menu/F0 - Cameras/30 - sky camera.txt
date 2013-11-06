@@ -1,0 +1,7 @@
+// sky (tilt) camera
+camera {
+  location  <0.0, 2.0, -5.0>
+  sky       <1.0, 0.5,  0.0>        // direction of the camera "sky"
+  look_at   <0.0, 0.0,  0.0>
+  right     x*image_width/image_height
+}

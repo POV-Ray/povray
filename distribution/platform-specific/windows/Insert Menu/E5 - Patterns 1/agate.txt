@@ -1,0 +1,4 @@
+// pattern for use in texture/pigment/normal/density
+  agate            // use an agate-like texture
+  //agate 0.5      // for use with normal{} (0...1 or more)
+  agate_turb 0.3   // can alter turbulence [1.0]

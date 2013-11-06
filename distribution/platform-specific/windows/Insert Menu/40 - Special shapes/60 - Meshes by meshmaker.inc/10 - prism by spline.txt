@@ -1,0 +1,67 @@
+//---------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------
+#declare Spline_1 = spline{
+   //linear_spline // natural_spline 
+   cubic_spline
+  -0.25, <-1,-0.0,-0.5>
+   0.00, < 1, 0.0,-0.5>  //first point
+   0.25, < 1, 0.0, 1>
+   0.50, <-1, 0.25, 1>
+   0.63, <-0.75, 0.00, 0.25>
+   0.75, <-1,-0.0,-0.5>
+   1.00, < 1, 0.0,-0.5>  //last point
+   1.25, < 1, 0.0, 1>
+} // end of spline 
+//------------------------------------
+//Show Spline ------------------------
+#declare I = 0;
+#while( I <= 1 )
+   sphere{
+      Spline_1(I),0.025
+      no_shadow
+      pigment{rgb <1,0.45,0.85>} 
+   }
+   #declare I = I + 0.005;
+#end
+//-----------------------------------
+//---------------------------------------------------------------------------------------------------
+#include "meshmaker.inc"
+//---------------------------------------------------------------------------------------------------
+object { // Prism( ) extrudes a spline along the y-axis a mesh2 object. 
+         // The spline curve does not need to be restraint to the xz-plane.
+         // The uv_coordinates for texturing the surface come from the square <0,0> - <1,1>.
+   Prism( Spline_1, // Name of spline, evaluated from t=0 to t=1.  
+                    // For the normal calculation, it is required that the input spline, 
+                    // also if a linear_spline have one extra point before t=0 and after t=1. 
+          100, // amount of triangles to be used along the spline
+          1.0, // amount of POV-units along the y-axis to extrude the shape.
+          100, // amount of triangles to be used in the height. 
+           ""  // FileName: ""= non, "NAME.obj'= Wavefront objectfile, "NAME.pcm" compressed mesh file 
+               // "NAME.arr" include file with arrays to build a mesh2 from,
+               //  others: includefile with a mesh2 object 
+        ) // ----------------------------------------------------------------------------------------
+   texture{           // inside texture
+     uv_mapping
+     pigment {checker color rgb <0.0,0.2,0.5> rgb <1,1,1> scale <0.015,0.1,1>}
+     finish{specular 0.5}
+   } // 
+   interior_texture{   // outside texture
+     uv_mapping
+     pigment {checker color rgb <0.0,0,0.0> rgb <1,0.7,0.7> scale <0.015,0.1,1>}
+     finish{specular 0.5}
+   } // 
+
+rotate< 0,0,0 > 
+} // end of  mesh2 object{ Prism(...) }
+//---------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,3 @@
+         material{ texture { Green_Glass } // end of texture 
+                   interior{ I_Glass} // end of interior
+                 } // end of material -------------------

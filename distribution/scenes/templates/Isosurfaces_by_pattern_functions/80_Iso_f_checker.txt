@@ -1,0 +1,19 @@
+isosurface { //-------------------------------------------
+
+  function{ 
+    (f_checker(x*1.2,y*1.19,z*1.2)*0.08)
+  }
+  threshold 0.05
+  contained_by {box {<-2,-3,-2>,<2,3.0,2>}}
+  max_gradient 200
+           
+  texture{ pigment{ color rgb<1,1,1>*1.2 }
+           //normal { bumps 0.5 scale 0.05}
+           finish { specular 0.4 
+                    phong 1 reflection 0.1}
+	 }
+  scale <0.5,0.25,0.5>*0.8
+  rotate <0,-55,0>
+  rotate <-30,0,0>  
+  translate < 0, 1.4, -0.5>
+} // end of isosurface -----------------------------------

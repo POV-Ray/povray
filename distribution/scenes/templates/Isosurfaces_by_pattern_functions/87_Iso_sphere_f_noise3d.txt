@@ -1,0 +1,18 @@
+isosurface { //----------------------------------------------------
+  
+  function{ 
+   sqrt( x*x + y*y + z*z) - 1 
+   - f_noise3d( x*1.5, y*1.5, z*1.5 )*0.65
+  }
+  contained_by { box { -2.5, 2.5 } }
+  accuracy 0.002
+  max_gradient 4
+
+  texture{ T_Stone3
+           normal { crackle 3 scale <0.25,0.5,0.25> turbulence 0.3}
+           finish { specular 0.3 phong 0.5}}
+  scale 0.8
+  rotate<0,0,0> 
+  translate <0,1.2,0> 
+} //---------------------------------------------------------------
+

@@ -1,0 +1,15 @@
+//----------------------------------------------------------------------------------
+#include "shapes3.inc"
+//----------------------------------------------------------------------------------
+object{ Facetted_Sphere( 5, 100 )//( Quarter_Meridian_Segments, Equatorial_Segments)
+        texture{ pigment{ color rgb<1,1,1>  }
+                 // normal { bumps 0.1  scale 0.155}
+                 finish { specular 0.1  reflection{ 0.15 } }   
+               } // end of texture
+         
+        scale <1,1,1>*1
+        rotate <0,0,0>
+        translate< 0,0,0>
+      } // end of object  //-------------------------------------------------------- 
+//----------------------------------------------------------------------------------
+  

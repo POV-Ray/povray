@@ -1,0 +1,15 @@
+// trace function tests for intersection with a specified object
+
+#declare Obj = sphere { 0, 1 }
+#declare Norm = <0, 0, 0>;
+#declare Start = <0.5, 0.5, 1>;
+#declare Pos = trace (
+                  Obj,             // object to test
+                  Start,           // starting point
+                  -z,              // direction
+                  Norm );          // normal
+
+// if intersection is found, normal differs from 0
+#if (Norm.x != 0 | Norm.y != 0 | Norm.z != 0)
+ //...
+#end

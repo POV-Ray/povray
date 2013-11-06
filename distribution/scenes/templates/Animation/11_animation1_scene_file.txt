@@ -1,0 +1,48 @@
+// PoVRay 3.6 / 3.7 Scene File "animation1.pov"
+// animation scene sample file
+// rotating sphere
+// author: Friedrich A. Lohmüller, Dec 2010
+//--------------------------------------------------------------------------
+#version 3.7;
+global_settings{ assumed_gamma 1.0 }
+#default{ finish{ ambient 0.1 diffuse 0.9 }} 
+//--------------------------------------------------------------------------
+#include "colors.inc"
+#include "textures.inc"
+//--------------------------------------------------------------------------
+// camera ------------------------------------------------------------------
+#declare Camera_0 = camera { /*ultra_wide_angle*/ angle 65     // front view
+                            location  <0.0 , 1.0 ,-2.7>
+                            right     x*image_width/image_height
+                            look_at   <0.0 , 1.0 , 0.0>}
+camera{Camera_0}
+// sun ---------------------------------------------------------------------
+light_source{< 1500,2500,-  1500> color White}
+// sky ---------------------------------------------------------------------
+sky_sphere{ pigment { gradient <0,1,0>
+                      color_map { [0.00 rgb <1.0,1.0,1.0>]
+                                  [0.30 rgb <1,1,1.0>]
+                                  [0.70 rgb <1,1,1.0>]
+                                  [1.00 rgb <1.0,1.0,1.0>] 
+                                } 
+                      scale 2         
+                    } // end of pigment
+          } //end of skysphere
+// fog ---------------------------------------------------------------------
+fog{ fog_type   2
+     distance   50
+     color      White
+     fog_offset 0.1
+     fog_alt    2.0
+     turbulence 0.8}
+//--------------------------------------------------------------------------
+//---------------------------- objects in scene ----------------------------
+//--------------------------------------------------------------------------
+sphere{ <0,0,0>, 0.25 
+        texture { pigment{ color Red } // rgb< 1, 0.0, 0.0>}
+                  finish { phong 1}
+                } // end of texture 
+        scale<1,1,1> 
+        translate<1,0.75,0>
+        rotate<0,360*(clock+0.00),0>    
+      } // end of sphere ----------------------------------- 

@@ -1,0 +1,488 @@
+===============================================================================
+POV-Ray 3.7 for UNIX/Linux - INSTALL file
+
+Compiling and installing POV-Ray for Unix from sources.
+
+Please report bugs via our bugtracker at http://bugs.povray.org/ or to our
+forum at news://news.povray.org/povray.unix/ or http://news.povray.org/povray.unix/
+
+-------------------------------------------------------------------------------
+$File: //depot/public/povray/3.x/unix/install.txt $
+$Revision: #1 $
+$Change: 6069 $
+$DateTime: 2013/11/06 11:59:40 $
+$Author: chrisc $
+===============================================================================
+
+Table of contents
+  1. Quick start
+  2. Software requirements
+  3. Configuring, building, and (un)installing POV-Ray
+  4. Additional configure options
+  5. Reporting bugs
+
+
+==============
+1. Quick start 
+==============
+
+This document gives basic and detailed instructions on how to compile and
+install the source distribution of POV-Ray for UNIX/Linux.  It is intended to
+those already familiar with compiling and installing programs on UNIX
+platforms using the GNU build system.
+
+Compiling and installing POV-Ray from sources is achieved by running the
+usual 'configure' and 'make' commands.  For a system-wide installation:
+
+  ./configure COMPILED_BY="your name <email@address or website>" [options]
+  make check
+  sudo make install
+
+The COMPILED_BY argument to 'configure' is mandatory and must be filled
+with your name and/or organization so that the generated binary can be
+differentiated from official POV-Ray builds.
+
+Additional configure options are described in section 4 of this document.
+
+The 'make' command builds the program once it is configured.  The optional
+'check' argument allows to run a short test render after POV-Ray is compiled
+and before it is installed with 'make install' (see below).  Other options
+are listed in section 3.
+
+The last command in the example above installs POV-Ray under system-wide
+directories and needs root privileges.  Installing as non-privileged user is
+also possible; see section 3.1.  By default (i.e. as root), 'make install'
+installs the following components:
+  povray binary (executable)              in /usr/local/bin
+  data files (e.g. includes, scene files) in /usr/local/share/povray-3.7
+  documentation (text and html)           in /usr/local/share/doc/povray-3.7
+  configuration files (e.g. povray.conf)  in /usr/local/etc/povray/3.7
+
+The configuration files are also copied under the $HOME/.povray/3.7 directory
+of the user (or root) who is doing the installation.  For further details
+regarding those files, please read the instructions in README.unix and in
+chapter 1 of the documentation.
+
+
+========================
+2. Software requirements
+========================
+
+Building POV-Ray on a UNIX platform requires a relatively modern C++ compiler,
+the 'make' utility, a Bourne-compatible shell (e.g. bash), and several support
+libraries.
+
+
+2.1 Environment
+    ===========
+
+The build system must have:
+
+- a modern C++ compiler which supports C++ templates and follows the ISO C++
+  standard as much as possible; for instance, the GNU GCC 4.x series and the
+  Intel C++ compiler version 9.x or above.  They are available at:
+  http://www.gnu.org/software/gcc
+  http://www.intel.com/software/products/compilers
+
+- a working 'make' utility.  We strongly recommand to use GNU Make version 3.79
+  or above.  Most GNU/Linux distribution should come with it.  Other platforms
+  should install it before running configure.  GNU make can be found at:
+  http://www.gnu.org/software/make
+
+- in the unlikely case you don't have a Bourne-compatible shell installed
+  on your system or that the shell fails running POV-Ray's configure, it is
+  recommanded to install GNU bash first.  Download it at:
+  http://www.gnu.org/software/bash
+
+
+2.2 Required support libraries
+    ==========================
+
+The following external libraries are required to build a fully-featured
+POV-Ray executable.  The Boost libraries are in general not installed on
+most systems; several Linux distributions offer Boost through their package
+repositeries -- please check out there first.  The image libraries are
+relatively standard and should be automatically detected at least on most
+Linux-based systems.  Be sure to have not only the run-time libraries but also
+the development packages (header files in particular).
+
+- Boost version 1.37 or above
+  http://www.boost.org
+
+- Zlib version 1.2.1 or above
+  http://www.zlib.net
+
+- LibPNG version 1.2.5 or above
+  http://www.libpng.org
+
+- LibJPEG version 6b or above
+  http://www.ijg.org
+
+- LibTIFF version 3.6.1 or above
+  http://www.libtiff.org
+
+
+2.3 Optional libraries
+    ==================
+
+These additional libraries are not mandatory to build POV-Ray but are
+recommanded to generate a fully-featured POV-Ray executable.
+
+- OpenEXR version 1.2 or above
+  http://www.openexr.com
+
+- SDL version 1.2 or above (used for the display preview)
+  http://www.libsdl.org
+
+
+====================================================
+3. Configuring, building, and (un)installing POV-Ray
+====================================================
+
+Configuring POV-Ray prepares the source package to generate an executable
+for your particular machine and environment, and allows to change the default
+paths where the program and its accompanying documentation and data files
+are installed.  Using default installation directories requires to install
+POV-Ray as root; this is the recommanded method if you have the choice.
+Otherwise, POV-Ray can be installed anywhere one has write access to.
+
+
+3.1 Building and installing
+    =======================
+
+3.1.1 As root
+      -------
+
+Configure POV-Ray for building and installing in standard directories:
+
+  ./configure COMPILED_BY="your name <email@address or website>"
+  make check         # build the program (binary) and run a test render
+  sudo make install  # install everything in the /usr/local hierarchy
+
+Here, these commands are run in the source directory of POV-Ray (but this is
+not required, see section 3.1.3 below).  Note that the COMPILED_BY argument
+is mandatory.  The 'check' target for 'make' may be omitted (no test render
+is performed) in particular when building POV-Ray in batch.
+
+The top Makefile generated by configure supports the following targets:
+
+  make                   # build the program
+  make check             # (build and) perform of short test render
+  make clean             # clean all object files created by make
+  make dist              # create distributions in .tar.gz & .tar.bz2 formats
+  make dist-bzip2        # create distribution in .tar.bz2 format only
+  make dist-gzip         # create distribution in .tar.gz format only
+  make distcheck         # create and check (build) a distribution
+  make distclean         # clean all files created by configure and make
+  make install           # (build and) install the program, data, and docs
+  make maintainer-clean  # caution: maintainers only (see Appendix A)
+  make uninstall         # uninstall the program, data, and docs
+
+
+3.1.2 As non-privileged user
+      ----------------------
+
+Without root priviledges, POV-Ray may be configured for installation under an
+alternate hierarchy (e.g. /some/path) where one has write access to:
+
+  ./configure --prefix=/some/path COMPILED_BY="your name <email@address>"
+  make check install
+
+The compilation, test render, and installation are invoqued using a single
+'make' command.  All make targets listed in the section above are supported
+when building POV-Ray as a regular user.  The test render may be skipped by
+invoquing 'make install' instead.
+
+For test purposes, POV-Ray may also be compiled without installing:
+
+  ./configure COMPILED_BY="your name <email@address>"
+  make check  # or 'make' to skip the test render
+
+The povray executable is then located under the unix/ directory of the build
+tree.  The program will keep searching for its configuration files under the
+/usr/local hierarchy.  Note that compiling POV-Ray without installing is NOT
+the recommanded way as it complicates the normal usage of the program (e.g.
+to access POV-Ray's standard include files).
+
+
+3.1.3 Building in-place or elsewhere
+      ------------------------------
+
+As presented above, the configure command is run from the source directory
+of POV-Ray.  This is commonly referred to as building the package "in-place".
+It is also possible (and often recommanded) to build the platform-specific
+object files and executable in a different location.  The source tree thus
+remains unchanged; this is useful especially in the case of read-only
+distribution media (such as CDs).
+
+For instance:
+
+  mkdir -p /tmp/build/povray && cd /tmp/build/povray
+  /path/to/configure COMPILED_BY="your name <email@address or website>" [options]
+  make check install
+
+Doing so creates a mirror of the POV-Ray source hierarchy (the build tree)
+under the /tmp/build/povray directory.  All Makefiles and platform-specific
+object files as well as the povray executable are created therein.
+
+
+3.1.4 Cross-compiling POV-Ray
+      -----------------------
+
+Cross-compiling is the procedure by which a compiler running on one system
+produces executables for another system.  Cross-compiling is important in
+particular when the target system doesn't have a native set of compilation
+tools.  Such a situation can happen for instance with embedded systems.
+
+While the configure script for POV-Ray has been written with this concept
+in mind, it has not been much tested in a cross-compiling environment.  Thus,
+it is likely that the configure script will fail in this particular context.
+If you have any experience in setting up a cross-compiling toolchain and
+are able to test POV-Ray's configure with it, you are welcome to report
+any success or patches via http://news.povray.org/povray.unix.
+
+
+3.2 Uninstalling POV-Ray
+    ====================
+
+Regardless of the way POV-Ray was installed (as root or as non-privileged
+user), the program, documentation, configuration and data files may be
+uninstalled by running:
+
+  make uninstall
+
+in the main source directory of POV-Ray (or in the build directory where
+the package has been configured, see section 4.1.3).  Only those files and
+directories that were created by the installation procedure are removed.
+
+Note that the uninstall procedure will only work when:
+(a) you have write access to the directory where POV-Ray is installed, and
+(b) POV-Ray has not been re-configured in between the 'make install' and
+    'make uninstall' commands using another --prefix path.
+
+
+
+===============================
+4. Additional configure options
+===============================
+
+More options can be passed to POV-Ray's configure in order to tweak the
+configuration process to specific needs.  The full list of supported options
+is displayed with:
+
+  ./configure --help
+
+A shorter list is displayed with:
+
+  ./configure --help=short
+
+
+4.1 Generic configure options
+    =========================
+
+The list below describes the generic configure options that might be the most
+relevant when building POV-Ray from sources:
+
+--prefix=PREFIX
+    allows to install the package under PREFIX.  You must have write access
+    to the PREFIX directory.  The package is installed under the PREFIX/bin,
+    PREFIX/etc, PREFIX/man, and PREFIX/share directories.
+
+--with-x (default) or --without-x
+    requests to use the X Window System (when possible) or not.  The
+    X Window System allows to display the image POV-Ray is rendering in a
+    seperate graphics window.  In order to use the X Window System, the
+    POV-Ray binary is linked with the X11 library installed on your system.
+
+CXX="C++ compiler (path)name"
+CXXFLAGS="C++ compiler flags"
+LDFLAGS="linker flags"
+LIBS="additional libraries to link with"
+    allows to specify which C++ compiler to use and the corresponding
+    compiler and linker flags, instead of those detected by configure.
+    For instance, if one wants to use the Intel C++ compiler instead of GCC
+    and a safe optimization mode, one can type (the COMPILED_BY argument is
+    omitted for clarity):
+
+    % ./configure CXX=icpc CXXFLAGS="-O2"
+
+    Here, the -O2 compiler option will not override the list of optimization
+    options that configure will detect, but will be appended to this list
+    (effectively replacing any -O option set previously).  In case no other
+    optimization flags are wanted, use the --disable-optimiz option described
+    in the next section.
+
+    The LDFLAGS are meant to be used for the linker only.  Using this option
+    should be useful in only very rare cases (if any).
+
+    LIBS can be used to specify extra libraries for POV-Ray to link with,
+    for example: LIBS=-ljunk or LIBS=/usr/local/lib/libjunk.a .  Using this
+    option is usually not necessary, but might be useful in some very
+    specific cases (see e.g. the --enable-static option below).
+
+
+4.2 POV-Ray specific configure options
+    ==================================
+
+Additional POV-Ray specific options are:
+
+--with-boost=DIR
+    requests to find the Boost library in the DIR directory.  Boost 1.36 or
+    above is mandatory to build POV-Ray.
+
+--with-boost-thread=special-lib
+    requests to find the Boost thread library under the special-lib name, for
+    instance --with-boost-thread=boost_thread-gcc-mt if the thread library is
+    libboost_thread-gcc-mt.a (static form) or libboost_thread-gcc-mt.so*
+    (shared form) under the DIR directory specified by the option above.
+
+--with-zlib=DIR or --without-zlib
+    requests to find the ZLIB library in the DIR directory, where DIR is
+    for instance /path/lib if ZLIB is /path/lib/libz.a (static form) or
+    /path/lib/libz.so* (shared form).  On 64-bit systems, one may have to
+    specify e.g. /path/lib64 instead.  The library headers are assumed to be
+    located under the DIR/../include directory.  The --without-zlib option
+    must be used together with NON_REDISTRIBUTABLE_BUILD (described below)
+    in order to disable all POV-Ray features requiring this library.
+
+--with-libpng=DIR or --without-libpng
+    requests to find the PNG library in the DIR directory.  Further details
+    are given in the related --with-zlib option above.
+
+--with-libjpeg=DIR or --without-libjpeg
+    requests to find the JPEG library in the DIR directory.  Further details
+    are given in the related --with-zlib option above.
+
+--with-libtiff=DIR or --without-libtiff 
+    requests to find the TIFF library in the DIR directory.  Further details
+    are given in the related --with-zlib option above.
+
+--with-openexr=DIR or --without-openexr
+    requests to find the OpenEXR library in the DIR directory, or to disable
+    all POV-Ray features requiring this library.  DIR is e.g. /path/lib or
+    /path/lib64.  The library headers are assumed to be located under the
+    DIR/../include directory.
+
+--with-libsdl=DIR or --without-libsdl
+    requests to find the SDL library in the DIR directory, or to disable the
+    preview display that uses this library.  DIR is for instance /path/lib
+    or /path/lib64.  The library headers are assumed to be located under the
+    DIR/../include directory.
+    BETA: support for libSDL is required for the preview display but will
+    become optional in the final source release.
+
+--with-libmkl=DIR or --without-libmkl
+    requests to use the Intel(R) Math Kernel Library (in directory DIR).
+    BETA: this option is not properly working yet.
+
+--with-cygwin-dll (default) or --without-cygwin-dll
+    on the Cygwin platform, requests to link with the Cygwin DLL or not.
+    The --without-cygwin-dll option allows to build an executable that
+    should work on any Cygwin release.  It requires having the MinGW tools
+    (Minimalist GNU for Windows, http://www.mingw.org) installed on your
+    machine.  You might also use the --disable-shared option with it; see
+    below.
+    BETA: support for the cygwin environment hasn't been tested much.
+
+--enable-watch-cursor
+    enables the mouse pointer to show up as a watch cursor over the X Window
+    display while rendering the image.
+
+--enable-debug
+    enables compiler debugging mode, i.e. ask the compiler to insert debug
+    information within the executable that is useful for a debugger such as
+    GDB (http://www.gnu.org/software/gdb).  The debugging mode dramatically
+    increases the size of the generated executable and may also make it run
+    slower.  It is therefore only meant for developers who want to experiment
+    with the source code.  For best results, it is often recommended to
+    disable all compiler optimizations; see below.
+
+--enable-profile
+    enables execution profiling, i.e. ask the compiler to generate run-time
+    information that details in which parts of the code the program spends
+    most of the CPU time.  This mode is targeted at developers who are willing
+    to experiment with the code.  Using this mode requires debug information
+    in the binary, so configure automatically turns on --enable-debug when
+    --enable-profile is used.
+
+--enable-static or --disable-shared
+    disables linking with shared libraries, i.e. the POV-Ray executable will
+    include all the machine code corresponding to its own source as well as
+    that of the libraries it uses.  This option thus allows to generate a
+    "static" binary that has no dependency to any system-specific library.
+    Obviously, the size of the executable increases dramatically.  Using this
+    option is preferred to redefining LDFLAGS, as configure will try to guess
+    and test what option the linker really needs to link with the static
+    (rather than the shared) libraries.
+
+    Note: Some platforms (e.g. several GNU/Linux distributions, Solaris) can
+    not statically link the X11 library with POV-Ray for various reasons, and
+    might either disable support for the X Window display or cause a linkage
+    error.  In the first situation, it might be required to pass additional
+    libraries to the linker, e.g. LIBS=-ldl (the exact libraries can be
+    guessed by inspecting the config.log file).  In the second situation,
+    specify --without-x or do not use the present option.
+
+--disable-optimiz
+    disables all compiler optimizations, i.e. configure will not try to set
+    any optimization flags suitable for your system.  This option is useful
+    in particular together with specifying CXXFLAGS.
+
+--disable-optimiz-arch
+    disables only the architecture-specific compiler optimizations.  Generic
+    optimization flags such as "-O3" are still detected and used.
+
+--disable-pipe
+    disables the use of pipes for communication between the various stages
+    of compilation, and use temporary files instead.  This is slower, but on
+    some systems pipes cannot work properly.
+
+--disable-strip
+    disables the compiler to strip all symbols from the object files, which
+    results in a much larger executable.  This option is only useful when
+    specifying the debugging and/or profiling mode described above.
+
+--disable-io-restrictions
+    disables all file input/output restrictions, meaning that POV-Ray will
+    never try to check whether it is allowed or not to perform file and/or
+    shellout operations.  For more details about I/O restrictions, please
+    refer to chapter 1 of the documentation.  Use this option at your own
+    risk.
+
+COMPILED_BY="your name <email@address>"
+    this option is required when configuring the source package.  Please
+    provide with a valid contact information that will be included in the
+    executable and displayed whenever POV-Ray (or a modified version) is
+    started.
+
+NON_REDISTRIBUTABLE_BUILD=yes
+    this option must be used in case one needs to build POV-Ray without
+    support for a particular image library, i.e. together with any of the
+    --without-zlib, --without-libpng, --without-libjpeg or --without-libtiff
+    options.  Using this option means you acknowledge that the generated
+    POV-Ray executable must *not* be redistributed.
+
+C99_COMPATIBLE_RADIOSITY={1,2,3,4}
+    adapts the POV-Ray radiosity code to use non-IEEE 754 floating point
+    on machines that do not support this standard.  You must specify one
+    of the possible values given above (e.g. C99_COMPATIBLE_RADIOSITY=2).
+    Each value corresponds to the C function 'logbf', 'ilogbf', 'logb',
+    and 'ilogb', respectively, to be used with the C function 'copysign'.
+    This option requires having an ISO C99 compiler and its accompanying
+    C library installed on your machine.  More details are given near the
+    top of the octree.cpp source file.  On platforms where integer ('int')
+    and single-precision floating-point ('float') numbers are not 32-bit,
+    configure will try to determine automatically which function to use.
+
+
+=================
+5. Reporting bugs
+=================
+
+In case POV-Ray's configure or any part of the compilation/installation fails
+on your system, please report the problem via http://news.povray.org/povray.unix.
+Please try to be as specific as possible in describing the problem.
+
+If POV-Ray was otherwise built but fails to run for some reason, please report
+the output of the "povray --version" command (without quotes) along with the
+description of the problem.

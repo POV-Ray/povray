@@ -1,0 +1,9 @@
+// pattern for use in texture/pigment/normal/density
+// takes the color of an image file to calculate the pattern value
+  image_pattern {
+    png "plasma3.png"   // image file to read (iff/tga/gif/png/jpeg/tiff/sys)
+    //use_color         // use pixel color gray scale (default)
+    //use_alpha         // use alpha value
+    //use_index         // use palette index
+  }
+

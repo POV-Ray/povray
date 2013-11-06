@@ -1,0 +1,23 @@
+
+#include "shapesq.inc"
+intersection{          //----------------------------------
+  
+  cylinder{ <0,-1,0>,< 0,1,0>,1 
+             } // end of cylinder
+
+  object{ Monkey_Saddle
+          sturm
+          scale 0.25
+          rotate< 0,180,0>
+          rotate<-90,0,0>
+        }
+
+  scale <2,1,2>
+  rotate<   0,10,0>
+  rotate<  -30, 0,0>
+  translate < 0,1.5,1>
+  texture { pigment{ color White}  
+            finish { phong 1}
+          } // end of texture 
+
+ } // end of intersection  -------------------- end of object

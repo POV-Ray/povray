@@ -1,0 +1,8 @@
+// ultra_wide_angle lens for wide, rectangular field of view
+camera {
+  ultra_wide_angle
+  location <0, 1, -5>               // position
+  look_at  <0, 0, 0>                // view
+  right x*image_width/image_height  // aspect
+  angle 90                          // field
+}

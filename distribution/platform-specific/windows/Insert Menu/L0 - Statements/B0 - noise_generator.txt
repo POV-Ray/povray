@@ -1,0 +1,7 @@
+// used in global_settings, sets the type of noise computation
+// there are 3 available noise generators
+// they can be used for single pigments, etc. too by adding
+// noise_generator x to the definition
+  //noise_generator 1 // old 3.1g plateaud noise
+  //noise_generator 2 // fixed version of 3.1 noise
+global_settings{ noise_generator 3 }  // New 3.5 perlin noise

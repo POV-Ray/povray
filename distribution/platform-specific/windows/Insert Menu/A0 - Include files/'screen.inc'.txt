@@ -1,0 +1,7 @@
+// Screen.inc will enable you to place objects and textures right in front
+// of a perspective camera
+
+#include "screen.inc"
+
+// read the original include file for details 
+// and the sample in 'scenes\screen.pov.' 

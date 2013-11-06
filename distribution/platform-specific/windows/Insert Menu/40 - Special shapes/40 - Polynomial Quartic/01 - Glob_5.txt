@@ -1,0 +1,13 @@
+
+#include "shapesq.inc"
+object{ Glob_5             //-------------------------------
+        sturm
+        texture { pigment{ color White}
+                  finish { phong 1}
+                }
+        rotate <0,0,-90> 
+        scale<1,1,1> 
+        rotate <-20,0,0>
+        translate<0,1,0> 
+       } // ---------------------------------- end of object
+

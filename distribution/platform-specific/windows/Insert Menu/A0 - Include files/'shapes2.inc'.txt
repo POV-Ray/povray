@@ -1,0 +1,17 @@
+// some not built in basic shapes
+//
+#include "shapes2.inc"
+
+object {
+  Tetrahedron         // CSG-able tetrahedron shape
+  //Octahedron        // CSG-able octahedron shape
+  //Dodecahedron      // CSG-able dodecahedron shape
+  //Icosahedron       // CSG-able icosahedron shape
+  //Hexagon           // Hexagon extending along x-axis
+  //Rhomboid          // 4-Sided Diamond
+  //Pyramid           // non-CSG four-sided pyramid
+  //Pyramid2          // CSG-able four-sided pyramid
+  //Square_X          // square from <-1, -1> to <1, 1> in y-z-plane
+  //Square_Y          // square from <-1, -1> to <1, 1> in x-z-plane
+  //Square_Z          // square from <-1, -1> to <1, 1> in x-y-plane
+}

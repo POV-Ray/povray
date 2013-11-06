@@ -1,0 +1,4 @@
+        texture{ pigment{ color rgb<1,0.6,0.1>*0.8 }
+                 normal { ripples 3.75  scale 0.075  translate<0,1.6,0>}
+                 finish { phong 1 phong_size 10 reflection{ 0.0 } } 
+               } // end of texture ----------------------------------------   

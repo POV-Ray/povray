@@ -1,0 +1,18 @@
+isosurface{ // ------------------------------------------------------------
+  function{  
+            sqrt( x*x + y*y + z*z ) - 0.9
+            + sin( 12*atan2(x, z) )*0.1
+          }
+  threshold 0
+  accuracy 0.0001
+  max_gradient 5
+  contained_by {box {<-1,-1,-1>, < 1, 1, 1>}}
+  //open
+
+  texture{ pigment{ color rgb<1,0.9,0.0>}
+           finish { phong 1}
+	  }
+  scale 0.85
+  rotate <-25, 25, 0>
+  translate <-0, 1.2, 0>
+} // end of isosurface ----------------------------------------------------- 

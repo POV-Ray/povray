@@ -1,0 +1,76 @@
+// PoVRay 3.6 / 3.7 Scene File "animation2.pov"
+// animation scene sample file
+// rotating sphere
+// author: Friedrich A. Lohmüller, Dec 2010
+//--------------------------------------------------------------------------
+#version 3.7;
+global_settings{ assumed_gamma 1.0 }
+#default{ finish{ ambient 0.1 diffuse 0.9 }} 
+//--------------------------------------------------------------------------
+#include "colors.inc"
+#include "textures.inc"
+//--------------------------------------------------------------------------
+// camera ------------------------------------------------------------------
+#declare Camera_0 = camera { /*ultra_wide_angle*/ angle 65     // front view
+                            location  <0.0 , 1.0 ,-3.5>
+                            right     x*image_width/image_height
+                            look_at   <0.0 , 1.0 , 0.0>}
+camera{Camera_0}
+// sun ---------------------------------------------------------------------
+light_source{<1500,2500,-2500> color White}
+// sky ---------------------------------------------------------------------
+plane{ <0,1,0>,1 hollow  
+       texture{ pigment{ bozo turbulence 0.76
+                         color_map { [0.5 rgb <0.20, 0.20, 1.0>]
+                                     [0.6 rgb <1,1,1>]
+                                     [1.0 rgb <0.5,0.5,0.5>]}
+                       }
+                finish {ambient 1 diffuse 0} }      
+       scale 10000}
+// fog ---------------------------------------------------------------------
+fog{ fog_type   2
+     distance   50
+     color      White
+     fog_offset 0.1
+     fog_alt    2.0
+     turbulence 0.8}
+// ground ------------------------------------------------------------------
+plane{ <0,1,0>, 0 
+       texture{ pigment{ color rgb<0.35,0.65,0.0>}
+	        normal { bumps 0.75 scale 0.015}
+              } // end of texture
+     } // end of plane
+//--------------------------------------------------------------------------
+//---------------------------- objects in scene ----------------------------
+//--------------------------------------------------------------------------
+
+#declare Spline_1 = //------------------------------ spline --
+  spline {
+    natural_spline
+    
+   -0.25, < 0, 2.1, 0.5>, // two point before end
+   -0.15, <-1, 0.5, 0.0>, // one point before end
+   
+    0.00, <-1, 0.1,-1.0>, // start
+    0.25, < 0, 0.1,-0.5>,
+    0.35, < 1, 0.1,-1.0>,
+    0.50, < 1, 0.5, 1.0>,
+    0.75, < 0, 2.1, 0.5>,
+    0.85, <-1, 0.5, 0.0>,
+    1.00, <-1, 0.2,-1.0>  // end = start
+   
+    1.25, < 0, 0.1, 0.0>  // one point after start
+    1.35, < 1, 0.1,-1.0>, // two point after start
+  } //--------------------------------------------------------
+
+
+sphere { <0,0,0>, 0.25 
+         texture { pigment{ color Red } // rgb< 1, 0.0, 0.0>}
+                   finish { phong 1}
+                 } // end of texture 
+         scale<1,1,1> 
+         translate Spline_1(clock+0.25)+<0,0.15,0>
+            
+       }  // end of sphere ----------------------------------- 
+
+

@@ -1,0 +1,7 @@
+// set an outer proposed boundary for parent object(s)
+// allows the ray-tracer to do a quick check on the Bounding Shape,
+// and if outside, it skips checking this object, which can speed
+// up overall rendering of complex shapes.  Note that this
+// is not a 100% guaranteed clipping shape... use the
+// clipped_by statement for that.
+bounded_by { box { <-1,-1,-1>, <1,1,1> }

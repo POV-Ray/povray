@@ -1,0 +1,10 @@
+// use slower but more accurate root solver.
+// can be applied to:
+//    -blob
+//    -cubic
+//    -lathe (only with quadratic splines)
+//    -poly
+//    -prism (only with cubic splines)
+//    -quartic
+//    -sor
+  sturm

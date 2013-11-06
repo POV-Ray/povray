@@ -1,0 +1,5 @@
+// POV-Ray 3.6: 
+// used in global_settings, sets the maximum ray tracing intersection depth (1 or more) [64]
+global_settings{ max_intersections 64 } 
+// POV-Ray 3.7: 
+// 'max_intersections' is no longer needed and has no effect in POV-Ray 3.7 ! 

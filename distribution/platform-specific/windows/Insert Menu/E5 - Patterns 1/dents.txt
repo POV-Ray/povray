@@ -1,0 +1,4 @@
+// pattern for use in texture/pigment/normal/density
+// especially suited for normal {}
+  dents 0.6    // dented surface (0...1 or more)
+  //dents      // for use with pigment{}

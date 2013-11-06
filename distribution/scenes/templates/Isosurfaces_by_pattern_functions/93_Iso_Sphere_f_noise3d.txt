@@ -1,0 +1,18 @@
+isosurface {   // ----------------------------------------------------
+  
+  function{ 
+  sqrt(  0.5*x*x + y*y + z*z) - 0.85 
+  - f_noise3d( x*12, y*12, z*12 )
+  }
+   
+  contained_by { box { -2.5, 2.5 } }
+  accuracy 0.002
+  max_gradient 4
+
+    texture{ pigment{ color rgb<0.45,0.9,0.0.1>}
+             finish { phong 1 reflection 0.1}}
+  scale 0.75
+  rotate<0,0,0> 
+  translate <0,1.4,0> 
+}
+ // end of isosurface -------------------------------------------------

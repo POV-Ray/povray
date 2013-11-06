@@ -1,0 +1,9 @@
+// the rand() function creates a reproducible sequence 
+// of pseudo-random numbers between 0.0 and 1.0
+
+#declare R1 = seed(0);      // initialize random number streams
+#declare R2 = seed(12345);
+
+// place sphere with random radius at random position
+// use different random number streams for position and radius
+sphere { <rand(R1), rand(R1), rand(R1)>, rand(R2) }

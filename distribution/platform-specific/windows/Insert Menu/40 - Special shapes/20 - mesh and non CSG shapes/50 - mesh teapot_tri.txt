@@ -1,0 +1,11 @@
+mesh {
+  // Utah teapot with (non-smoothed) triangles
+  #include "..\scenes\advanced\teapot\teapot_tri.inc"
+  rotate<-90,0,0>
+  scale 0.35
+  
+  texture{ pigment{ color rgb< 1, 1, 1> } 
+           finish { phong 1 }
+         } // end of texture 
+  translate <0, 0, 0>
+}

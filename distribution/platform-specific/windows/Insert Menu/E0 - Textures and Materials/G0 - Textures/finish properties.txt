@@ -1,0 +1,35 @@
+// control an object's surface finish
+  finish {
+    ambient 0.1          // ambient surface reflection color [0.1]
+    // (---diffuse lighting---)
+    diffuse 0.6          // amount [0.6]
+    brilliance 1.0       // tightness of diffuse illumination [1.0]
+    // (---phong highlight---)
+    //phong 0.5          // amount [0.0]
+    //phong_size 40      // (1.0..250+) (dull->highly polished) [40]
+    // (---specular highlight---)
+    //specular 0.5       // amount [0.0]
+    //roughness 0.05     // (~1.0..0.0005) (dull->highly polished) [0.05]
+    // (---phong and specular---)
+    //metallic [Amount]  // give highlight color of surface
+    // (---reflection---)
+    /*
+    reflection {
+      //0.0                      // minimal reflection value (for variable reflection)
+      1.0                        // reflection amount (maximum for variable reflection)
+      //fresnel on               // realistic variable reflection
+      //falloff 1.0              // falloff exponent for variable reflection
+      //exponent 1.0             // influence surface reflection characteristic
+      //metallic 1.0             // tint reflection in surface color
+    }*/
+    //conserve_energy            // more realistic
+    // (---others---)
+    //crand 0.2                  // randomly speckle the surface [0.0]
+    /*
+    irid {               // Iridescence (Newton's thin film interference)
+      0.25               // intensity
+      //thickness 0.0    // film's thickness [0.0]
+      //turbulence 0.3   // film's thickness turbulence
+    }*/
+  } // finish
+

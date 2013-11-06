@@ -1,0 +1,14 @@
+//---------------------------------------------------------------------
+height_field{ png "Mount2.png" smooth double_illuminate
+              // file types: 
+              // gif | tga | pot | png | pgm | ppm | jpeg | tiff | sys
+              // [water_level N] // truncate/clip below N (0.0 ... 1.0)
+              translate<-0.5,-0.0,-0.5>
+              scale<9, 1.5, 9>*2 
+              texture{ pigment { color rgb <0.82,0.6,0.4>}
+                       normal  { bumps 0.75 scale 0.025  }
+                     } // end of texture
+              rotate<0,-110,0>
+              translate<1,0,11>
+            } // end of height_field ----------------------------------
+//---------------------------------------------------------------------

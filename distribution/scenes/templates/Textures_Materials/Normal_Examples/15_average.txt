@@ -1,0 +1,10 @@
+       texture{ pigment{ color rgb<1,1,1> }
+                normal { pigment_pattern{
+                            average pigment_map{[1, gradient z sine_wave]
+                                                [1, gradient y scallop_wave]
+                                                [3, bumps  ]}
+                                         translate 0.02 scale 0.5}
+                                         2 
+                         rotate< 0,0,0> scale 0.15 } // end normal
+                finish { phong 1 reflection{ 0.2 } }
+              } // end of texture ------------------------------------------

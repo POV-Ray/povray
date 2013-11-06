@@ -1,0 +1,10 @@
+intersection{
+
+  box{ <-2.5,-2.0,-2.5>,<2.5, 2.00,2.5> } 
+  object{ Hyperboloid_Y }
+   
+  texture { pigment{ color rgb<1.0, 1.0, 0.0> }
+            finish { phong 0.1 }
+          }
+  scale <1,1,1>*0.5 rotate<0,0,0> translate<0,0.00,0.0>
+} // end of intersection  -----------------------------

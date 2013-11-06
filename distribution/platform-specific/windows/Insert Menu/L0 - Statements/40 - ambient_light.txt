@@ -1,0 +1,2 @@
+// used in global_settings, sets an overall brightness/ambient light level in the scene
+global_settings{ ambient_light color rgb <1,1,1> } 

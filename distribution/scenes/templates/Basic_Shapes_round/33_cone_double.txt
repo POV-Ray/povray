@@ -1,0 +1,8 @@
+cone { <0,0,0>,-0.5,<0,1.00,0>, 1.0 
+       open
+       texture { pigment{ color rgbf<0.75,0.70,0.65, 0.915> }
+                 finish { phong 1 reflection{ 0.20 metallic 0.00} } 
+               } // end of texture
+
+       scale <1,1,1> rotate<0,0,0> translate<0,0,0>         
+     } // end of cone ------------------------------------------

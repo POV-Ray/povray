@@ -1,0 +1,3 @@
+// macros for generating and manipulating text strings
+// 
+#include "strings.inc"

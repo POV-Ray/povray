@@ -1,0 +1,19 @@
+// linear prism in z-direction: from ,to ,number of points (first = last)
+prism { -1.00 ,1.00 , 6
+       <-1.00, 0.00>,  // first point
+       < 1.00, 0.00>, 
+       < 1.00, 1.00>, 
+       < 0.00, 1.50>, 
+       <-1.00, 1.00>, 
+       <-1.00, 0.00>   // last point = first point!!!!
+       rotate<-90,0,0> scale<1,1,-1> //turns prism in z direction! Don't change this line! 
+
+       texture { pigment{ color White} 
+                 finish { phong 1.0} 
+               } // end of texture
+
+       scale <1.00,1.00,1.00>       
+       rotate <0,0,0> 
+       translate <0.00,0.00,0.00> 
+     } // end of prism --------------------------------------------------------
+

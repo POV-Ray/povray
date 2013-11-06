@@ -1,0 +1,6 @@
+// pattern for use in texture/pigment/normal/density
+// create a concentric cylindrical wood-like texture,
+// grain along Z axis
+  wood
+  //wood 0.5         // for use with normal{} (0...1 or more)
+  //turbulence 0.1   // should have some!

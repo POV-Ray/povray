@@ -1,0 +1,9 @@
+cylinder{ <0,0.0,0>,<0,0.75,0>, 1.00
+          open
+          texture { pigment{ color rgb<1.0,1.0,1.0>*1.1}
+                    normal { ripples 3.5 scale 0.05  translate<0,-1.0,0> }
+                    finish { phong 0.4 reflection{ 0.05 metallic 0.10} } 
+                  } // end of texture
+
+          scale <1,1,1> rotate<0,0,0> translate<0,0,0>         
+        } // end of cylinder -------------------------------------

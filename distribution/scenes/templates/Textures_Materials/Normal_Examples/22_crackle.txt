@@ -1,0 +1,9 @@
+       texture{ Polished_Chrome 
+                pigment{ color rgb<1,0.9,0.3>*0.8 }
+                normal { pigment_pattern{ crackle  
+                                          colour_map {[0, rgb 0]
+                                                      [1, rgb 1]} 
+                                          scale 0.2 }// end pigment_pattern{
+                          2 } // end normal
+                finish { phong 1 }
+              } // end of texture

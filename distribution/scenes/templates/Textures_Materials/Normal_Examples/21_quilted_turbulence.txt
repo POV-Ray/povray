@@ -1,0 +1,4 @@
+       texture{ pigment{ color rgb<0.95,0.75,0.25>*0.8}
+                normal { quilted 1.00 scale 0.2  turbulence 0.4}
+                finish { phong 1  phong_size 100 reflection{ 0.0} }
+              }  

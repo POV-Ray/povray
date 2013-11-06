@@ -1,0 +1,12 @@
+object{ Icosahedron 
+        scale <1,1,1>
+        material{   //-----------------------------------------------------------
+         texture { pigment{ color rgbf<0.6,0.95,0.7,0.75>}
+                   //  normal { bumps 1 scale 0.85}
+                   finish { phong 1 reflection 0.4 specular 0.9 roughness 0.001 phong 1 phong_size 400}
+                 }
+         interior{ I_Glass  caustics 0.2}
+        } // end of material ----------------------------------------------------
+             scale <1,1,1>*0.75  rotate< 0,0,0> translate<0,0,0>
+       } // end of object  ------------------------------------------------------
+ 

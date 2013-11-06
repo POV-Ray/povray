@@ -1,0 +1,4 @@
+// The standard collection of textures
+
+#include "textures.inc"
+

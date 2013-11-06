@@ -1,0 +1,19 @@
+//---------------------------------------------------------------------------- 
+#include "shapes3.inc"
+//----------------------------------------------------------------------------
+object { Half_Hollowed_Rounded_Cylinder1( //  
+                                3.2,//  Len_total, // total_Lenght from end to end
+                                0.9,// outer radius 
+                                0.2,// border radius
+                                1, //  border scale y ( >0 ), 0 = no rounded borders!
+                                1  //  Merge_On , // 0 = union, 1 = merge !  
+                              ) //--------------------------------------------
+         texture{ pigment{ color rgb< 1,1,1> }  
+                //normal { bumps 0.5 scale 0.015 }
+                  finish { phong 0.6 reflection{ 0.25 } }
+                } // end texture
+         scale<1,1,1>  
+         translate<0,1.0,0> 
+         rotate<0,0,0>
+       }  // end of object ---------------------------------------------------
+//---------------------------------------------------------------------------- 

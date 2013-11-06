@@ -1,0 +1,3 @@
+// "resize" an object or texture relative to its current size
+// example: scale 2.0
+scale <1.0,  2.0,  1.0> // <dX, dY, dZ>

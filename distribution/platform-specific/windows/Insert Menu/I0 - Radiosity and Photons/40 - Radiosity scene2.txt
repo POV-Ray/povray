@@ -1,0 +1,86 @@
+// PoVRay 3.7 Scene File " ... .pov"
+// created by   ...  
+// Date:   ...
+//--------------------------------------------------------------------------
+#version 3.7;
+#default{ finish{ ambient 0 diffuse 1 }} 
+//--------------------------------------------------------------------------
+
+global_settings {
+    radiosity {
+      pretrace_start 0.08
+      pretrace_end   0.01
+      count 500
+
+      nearest_count 10
+      error_bound 0.02
+      recursion_limit 1
+
+      low_error_factor 0.2
+      gray_threshold 0.0
+      minimum_reuse 0.015
+      brightness 1
+
+      adc_bailout 0.01/2
+    }
+  }
+//--------------------------------------------------------------------------
+#include "colors.inc"
+#include "textures.inc"
+#include "glass.inc"
+#include "metals.inc"
+#include "golds.inc"
+#include "stones.inc"
+#include "woods.inc"
+#include "shapes.inc"
+#include "shapes2.inc"
+//--------------------------------------------------------------------------
+// camera ------------------------------------------------------------------
+#declare Camera0 = camera {ultra_wide_angle angle 75           // front view
+                           location  <0.0 , 1.0 ,-3.5>
+                           right     x*image_width/image_height
+                           look_at   <0.0 , 1.0 , 0.0>}
+#declare Camera1 = camera {ultra_wide_angle angle 90        // diagonal view
+                           location  <2.0 , 2.5 ,-3.0>
+                           right     x*image_width/image_height
+                           look_at   <0.0 , 1.0 , 0.0>}
+#declare Camera2 = camera {ultra_wide_angle angle 90       //right side view
+                           location  <3.0 , 1.0 , 0.0>
+                           right     x*image_width/image_height
+                           look_at   <0.0 , 1.0 , 0.0>}
+#declare Camera3 = camera {ultra_wide_angle angle 90             // top view
+                           location  <0.0 , 3.0 ,-0.001>
+                           right     x*image_width/image_height
+                           look_at   <0.0 , 1.0 , 0.0>}
+camera{Camera0}
+// sun ---------------------------------------------------------------------
+light_source{< 3000,3000,-3000> color White}
+// sky ---------------------------------------------------------------------
+sky_sphere { pigment { gradient <0,1,0>
+                       color_map { [0.00 rgb <0.6,0.7,1.0>]
+                                   [0.35 rgb <0.0,0.1,0.8>]
+                                   [0.65 rgb <0.0,0.1,0.8>]
+                                   [1.00 rgb <0.6,0.7,1.0>] 
+                                 } 
+                       scale 2         
+                     } // end of pigment
+           } //end of skysphere
+// ground ------------------------------------------------------------------
+plane{ <0,1,0>, 0 
+       texture{ pigment{color rgb <0.7,0.5,0.3>}
+              //normal {bumps 0.75 scale 0.025}
+                finish {ambient 0.1 diffuse 0.8}
+              } // end of texture
+     } // end of plane
+//--------------------------------------------------------------------------
+//---------------------------   scenery objects  ---------------------------
+//--------------------------------------------------------------------------
+
+sphere{<0,0,0>, 1 
+  texture { Candy_Cane scale 0.5 
+            finish {ambient 0.0 diffuse 0.75 phong 1}
+          } // end of texture
+  scale<1,1,1> 
+  rotate<0,0,0> 
+  translate<0,1.2,0>
+ } // -------------------------------- end of sphere

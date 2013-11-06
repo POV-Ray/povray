@@ -1,0 +1,11 @@
+// typical sun light ----------------------
+light_source{<1500,2500,-2500> color White}
+
+// just a sphere to demonstrate the shadow casting
+sphere { <0,0,0>, 0.5 
+         texture { pigment{ color Flesh}
+                   finish { phong 1}
+                 } // end of texture
+          scale<1,1,1>  rotate<0,0,0>  translate<0,0.75,0>  
+       }  // end of sphere ----------------------------------- 
+

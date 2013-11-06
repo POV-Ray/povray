@@ -1,0 +1,32 @@
+#declare Flower=function { //--------------------------
+   pigment {
+      wood
+      scale 0.5
+      turbulence 0.3
+      octaves 7
+      lambda 0.5
+      omega 0.5
+      color_map {
+          [0, rgb 0]
+          [1, rgb 1]
+       }
+    }
+ } // end of function "Flower(x,y,z)"-------------------
+
+isosurface { //-----------------------------------------
+    function{
+       f_sphere(x*0.75,y,z,1)-(Flower(x,y,z).hf)*0.5
+     }
+    contained_by {sphere {0,2.5}}
+    max_gradient 8.607
+
+    texture{
+       pigment{ color rgb <0.85,1,0>} 
+       finish { specular 0.1 
+                roughness 0.5 phong 0.5 reflection 0.2}
+           } // end of texture
+
+    scale 0.85 
+    rotate<0,0,0>
+    translate< 0,1.3,0>
+}// end of isosurface ----------------------------------

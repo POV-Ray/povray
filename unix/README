@@ -1,0 +1,46 @@
+===============================================================================
+POV-Ray 3.7 for UNIX/Linux - README file
+
+For the generic source distribution for UNIX/Linux
+===============================================================================
+
+This is the README file for the generic UNIX/Linux distribution of the
+POV-Ray 3.7 source code.
+
+
+===================
+Source code package
+===================
+
+This package contains the complete source code of POV-Ray for UNIX
+as well as its accompanying HTML documentation and supporting files.
+The package substructure is organized as follows:
+
+  source/     Platform-independent source code (POV-Ray core code).
+  unix/       UNIX-specific source code, including X Window and SVGA support.
+  config/     UNIX-specific configuration and installation scripts.
+  doc/        UNIX-specific and generic HTML documentation, POV-Ray license.
+  icons/      UNIX-specific color icons for the KDE window manager.
+  scripts/    UNIX-specific render scripts (portfolio, stills, animations).
+  include/    Standard POV-Ray include files.
+  ini/        Standard POV-Ray INI files.
+  scenes/     Standard POV-Ray sample scene files.
+
+
+========================
+Compiling and installing
+========================
+
+Basic and detailed instructions to compile and install the generic POV-Ray
+source code on UNIX-based systems are given in the INSTALL file.
+
+In a nutshell: the package installation is based on a configure script
+which detects your environment automatically and adapts the compilation
+and installation process accordingly.  Simply run:
+
+% ./configure COMPILED_BY="your name <email@address>"  # configure the package
+% make                                                 # build the program
+% su                                                   # log as root
+$ make install                                         # install program + data
+
+See the INSTALL file for more detailed information.

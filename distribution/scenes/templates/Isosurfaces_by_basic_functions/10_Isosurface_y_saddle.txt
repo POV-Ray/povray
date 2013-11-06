@@ -1,0 +1,17 @@
+isosurface { //-------------------------------------------------------------
+
+  function { y - x*x + z*z  }
+
+  threshold 0
+  accuracy 0.0001
+  max_gradient 5
+  contained_by {box {<-1,-1,-1.5>, < 1, 1, 1.5>}}
+  //open
+  texture { pigment{ color rgb<0.5,1,0.7>}
+            normal { bumps 0.5 scale 0.025}
+            finish { phong 1}
+	  }
+  scale 1.0
+  rotate <-20, 25, 0>
+  translate <-0, 1.4, 0>
+} // end of isosurface ----------------------------------------------------- 

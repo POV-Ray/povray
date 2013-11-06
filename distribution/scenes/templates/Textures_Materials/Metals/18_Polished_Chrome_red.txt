@@ -1,0 +1,5 @@
+         texture { Polished_Chrome
+                   pigment{ color rgb<0.8,0,0.05> } 
+                   normal { bumps 0.5 scale 0.05 } 
+                   // finish { phong 1}
+                 } // end of texture 

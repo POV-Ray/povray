@@ -1,0 +1,12 @@
+
+#include "shapesq.inc"
+object{ Cubic_Saddle_1     //--------------------------------
+        sturm
+        texture { pigment{ color White } 
+                  finish { phong 1}
+                } // end of texture 
+        rotate<90,35,0>
+        translate <0,1,5>
+      } // ------------------------------------ end of object
+
+

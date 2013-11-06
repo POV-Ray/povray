@@ -1,0 +1,116 @@
+// PoV-Ray 3.6 / 3.7 Scene File " ... .pov"
+// Author:   ...  
+// Date:   ...
+//--------------------------------------------------------------------------
+//--------------------------------------------------------------------------
+#version 3.7;
+global_settings{ assumed_gamma 1.0 }  
+//--------------------------------------------------------------------------
+
+#declare Radiosity_ON = 1; 
+
+#if (Radiosity_ON = 1 )
+
+#default{ finish{ ambient 0 diffuse 1 }} 
+global_settings {
+    
+    radiosity {
+      pretrace_start 0.08
+      pretrace_end   0.01
+      count 500
+
+      nearest_count 10
+      error_bound 0.02
+      recursion_limit 1
+
+      low_error_factor 0.2
+      gray_threshold 0.0
+      minimum_reuse 0.015
+      brightness 0.4
+
+      adc_bailout 0.01
+    }
+  } // end global_settings
+#else
+#default{ finish{ ambient 0.1 diffuse 0.8 }} 
+
+#end // of 'Radiosity_ON = 1'
+//--------------------------------------------------------------------------
+#include "colors.inc"
+#include "textures.inc"
+#include "glass.inc"
+#include "metals.inc"
+#include "golds.inc"
+#include "stones.inc"
+#include "woods.inc"
+#include "shapes.inc"
+#include "shapes2.inc"
+//--------------------------------------------------------------------------
+// camera ------------------------------------------------------------------
+#declare Camera0 = camera {ultra_wide_angle angle 75           // front view
+                           location  <0.0 , 1.0 ,-3.5>
+                           right     x*image_width/image_height
+                           look_at   <0.0 , 1.0 , 0.0>}
+#declare Camera1 = camera {ultra_wide_angle angle 90        // diagonal view
+                           location  <2.0 , 2.5 ,-3.0>
+                           right     x*image_width/image_height
+                           look_at   <0.0 , 1.0 , 0.0>}
+#declare Camera2 = camera {ultra_wide_angle angle 90       //right side view
+                           location  <3.0 , 1.0 , 0.0>
+                           right     x*image_width/image_height
+                           look_at   <0.0 , 1.0 , 0.0>}
+#declare Camera3 = camera {ultra_wide_angle angle 90             // top view
+                           location  <0.0 , 3.0 ,-0.001>
+                           right     x*image_width/image_height
+                           look_at   <0.0 , 1.0 , 0.0>}
+camera{Camera0}
+// sun ---------------------------------------------------------------------
+light_source{< 3000,3000,-3000> color White}
+// sky ---------------------------------------------------------------------
+sky_sphere { pigment { gradient <0,1,0>
+                       color_map { [0.00 rgb <0.6,0.7,1.0>]
+                                   [0.35 rgb <0.1,0.15,0.7>]
+                                   [0.65 rgb <0.1,0.15,0.7>]
+                                   [1.00 rgb <0.6,0.7,1.0>] 
+                                 } 
+                       scale 2         
+                     } // end of pigment
+           } //end of skysphere
+// fog ---------------------------------------------------------------------
+fog{fog_type   2
+    distance   50
+    color      White
+    fog_offset 0.1
+    fog_alt    2.0
+    turbulence 0.8}
+// ground ------------------------------------------------------------------
+plane{ <0,1,0>, 0 
+       texture{ pigment{ color rgb <1.00,0.95,0.8>}
+                normal { bumps 0.75 scale 0.025  }
+                finish { phong 0.1 } 
+              } // end of texture
+     } // end of plane
+//--------------------------------------------------------------------------
+//---------------------------- objects in scene ----------------------------
+//--------------------------------------------------------------------------
+//--------------------------------------------------------------------------
+
+sphere{ <0,0,0>, 1 
+        texture{ pigment{ spiral1 5 rotate<90,0,0>
+                          color_map{
+                           [ 0.0 color rgb<1,1,1> ]
+                           [ 0.5 color rgb<1,1,1> ]
+                           [ 0.5 color rgb<1,0,0> ]
+                           [ 1.0 color rgb<1,0,0> ]
+                          } // end color_map
+                          scale 0.75
+                        } // end pigment
+                 //normal  { bumps 0.5 scale  0.005 }
+                 finish  { phong 1 reflection 0.00 }
+               } // end of texture ------------------
+  scale<1,1,1> 
+  rotate<-45,0,0> 
+  translate<0.5,1.1,-0.7>
+} //-------------------------------------------------
+//--------------------------------------------------------------------------
+

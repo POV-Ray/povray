@@ -1,0 +1,14 @@
+julia_fractal{ <-0.083,0.0,-0.83,-0.025>
+   quaternion  // quaternion hypercomplex
+   sqr         // types: sqr cube
+   max_iteration 8
+   precision 20       // 10...500
+
+   texture{
+     pigment{ color rgb<0.85,0.1,0.3>}
+     finish { phong 1}
+   } // end of texture
+   scale<1,1,1>
+   rotate<0,0,0>
+   translate<0,0,0>
+} // end of julia_fractal ---------- 

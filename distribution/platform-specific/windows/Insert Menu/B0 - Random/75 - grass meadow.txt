@@ -1,0 +1,52 @@
+// -----------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------------------------
+#declare Random_1 = seed (23484);
+#declare Random_2 = seed (35271);
+#declare Blade_Radius = 0.003;
+#declare Blade_Height = 0.40;
+//-------------------------------------------------------------
+#declare objectPatch =
+union{ //------------------------------------------------------
+ #local Nr = 0;   // start
+ #local End = 20; // end
+ #while (Nr< End) 
+     cone{ <0,0,0>,Blade_Radius,
+           <0,Blade_Height*(1+0.15*rand(Random_1)),0>,0.001
+           texture { pigment{ color rgb< 0.5, 1.0, 0.0>*0.5 }
+                     normal { bumps 0.5 scale 0.05 }
+                     finish { phong 1 reflection 0.00}
+                   } // end of texture 
+           translate<-0.15*rand(Random_2),0,0> 
+           rotate<0,0,Nr*10/End> 
+           rotate<0,Nr * 360/End+360*rand(Random_2),0>
+         } //---------------------------
+ #local Nr = Nr + 1;    // next Nr
+ #end // ---------------  end of loop 
+rotate<0,0,0>
+translate<0,0,0>
+} // end of union ---------------------------------------------
+//-------------------------------------------------------------
+//-------------------------------------------------------------
+// -----------------------------------------------------------------------------------------------
+#include "makegrass.inc"
+// -----------------------------------------------------------------------------------------------
+// Prairie parameters
+#declare lPatch=0.5;               // size of patch
+#declare nxPrairie=12;             // number of patches for the first line
+#declare addPatches=1.5;            // number of patches to add at each line
+#declare nzPrairie=35;             // number of lines of patches
+#declare rd=seed(779);            // random seed
+#declare stdscale=1.5;              // stddev of scale
+#declare stdrotate=30;             // stddev of rotation
+#declare doTest=0;//false;/true; or 0;/1; // replaces the patch with a sphere
+// -----------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------------------------
+// Create the prairie
+object{MakePrairie(lPatch,nxPrairie,addPatches,nzPrairie,objectPatch,rd,stdscale,stdrotate,doTest)
+// or optional: show Single Patch  
+// object{  objectPatch
+ scale 1 
+ translate<0,0,-2>
+}  
+// -----------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------------------------

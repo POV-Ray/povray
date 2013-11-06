@@ -1,0 +1,9 @@
+// you can specify a waveform if patterns are used with blend maps.
+// Especially useful for normals
+// Note most patterns have default waveform ramp_wave
+  ramp_wave         // linear raising from 0 to 1 and returning abrupt return
+  //triangle_wave   // linear upwards and downwards
+  //sine_wave       // sine waveform
+  //scallop_wave    // absolute value of sine wave
+  //cubic_wave      // cubic curve from 0.0 to 1.0
+  //poly_wave 0.5   // exponential function

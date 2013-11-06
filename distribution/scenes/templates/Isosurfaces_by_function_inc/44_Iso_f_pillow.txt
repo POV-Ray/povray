@@ -1,0 +1,18 @@
+isosurface { //-------------------------------------------------------------
+
+  function{ f_pillow( x,y,z, 0.26 ) // field strength
+          }          
+
+  contained_by {box {<-1,-1,-1>*1.5,<1,1,1>*1.5}}
+  threshold 0
+  max_gradient 18
+  
+  texture{ 
+     pigment{ color rgb <0.9,0.45,0.7>} 
+     //normal { bumps 0.15 scale 0.015}
+     finish { specular 0.2 phong 0.7 }
+         }
+  rotate<0,25,0>
+  scale 0.65
+  translate< 0,1.35,0>
+} // end of isosurface -------------------------------------------------------

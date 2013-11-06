@@ -1,0 +1,4 @@
+        texture{ pigment{ color rgb<1,0.42,0.2>*0.5 }
+                 normal { dents 6.5 scale 0.1  }
+                 finish { specular 0.6 reflection{ 0.00 } }
+               } // end of texture

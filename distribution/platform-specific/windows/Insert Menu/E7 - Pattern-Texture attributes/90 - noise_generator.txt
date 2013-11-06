@@ -1,0 +1,6 @@
+// there are 3 available noise generators
+// you can select one by adding this as a pattern modifier
+  //noise_generator 1 // old 3.1g plateaud noise
+  //noise_generator 2 // fixed version of 3.1 noise
+global_settings{ noise_generator 3 }  // New 3.5 perlin noise
+

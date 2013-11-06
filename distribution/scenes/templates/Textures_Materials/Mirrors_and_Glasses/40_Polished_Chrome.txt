@@ -1,0 +1,4 @@
+         texture { Polished_Chrome
+                   // pigment{ color rgb<1,0,0>} 
+                   finish { diffuse 0.85  phong 1}
+                 } // end of texture 

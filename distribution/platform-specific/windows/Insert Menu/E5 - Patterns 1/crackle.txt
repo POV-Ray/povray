@@ -1,0 +1,8 @@
+// pattern for use in texture/pigment/normal/density
+   crackle          // crackled pattern
+   //crackle 0.5    // for use with normal{} (0...1 or more)
+   // (---additional parameters---)
+   //form <-1,1,0>
+   //metric 2
+   //offset 0.0
+   //solid

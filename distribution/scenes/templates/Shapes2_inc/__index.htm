@@ -1,0 +1,333 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="language" content="en">
+<meta name="Author" content="Friedrich A. Lohmueller for POV-Ray, 2013">
+<meta name="Description" content="POV-Ray Templates - HTML version">
+<title>POV-Ray Templates - HTML version</title>
+<link rel="stylesheet" type="text/css" href="../povray_style.css">
+</head>
+<body bgcolor="#d8d8d0" text="#505030" link="#006677" vlink="#445566" alink="#cc0055">
+
+<table width="100%" border="0"><tr><td>
+ <div align="center"><font size="+2"><b>'shapes2.inc' etc.</b></font></div>
+ </td>
+</tr></table>
+<a name="start"></a>
+<hr size="3">
+<table border="0" width="100%" cellspacing="5">  <!--- global table -->
+<tr><td valign="top"> <!-- Index - Content - 1st column -->
+<font size="2">
+ <a href="../../index.htm">Demo scene files Index</b></a><br>
+<br>
+ <font size="+1"><a href="../_index.htm">POV-Ray Templates</b></a></font>
+ <br>
+ &nbsp; &nbsp; <a href="../Basic_Scenes/__index.htm">Ready-made Basic Scenes</b></a><br>
+ &nbsp; &nbsp; <a href="../Basic_Shapes_round/__index.htm">Basic Shapes round</b></a><br>
+ &nbsp; &nbsp; <a href="../Basic_Shapes_angular/__index.htm">Basic Shapes angular</b></a><br>
+ &nbsp;<b>&gt;</b> <!--a href="../Shapes2_inc/__index.htm"--><b>Shapes 2</b></a><br>
+ &nbsp; &nbsp; <a href="../Shapes3_inc/__index.htm">Shapes 3</b></a><br>
+ &nbsp; &nbsp; <a href="../blob_fractal/__index.htm">Blob and Fractal</b></a><br>
+ &nbsp; &nbsp; <a href="../Text_Shapes_3D/__index.htm">3D text shapes</b></a><br>
+ &nbsp; &nbsp; <a href="../height_field_and_HF_macros/__index.htm">height_field, HF_macros</b></a><br>
+ &nbsp; &nbsp; <a href="../Non_CSG_shapes/__index.htm">Mesh and non-CSG shapes</b></a><br>
+ &nbsp; &nbsp; <a href="../Isosurfaces_by_basic_functions/__index.htm">Isosurfaces basic functions</b></a><br>
+ &nbsp; &nbsp; <a href="../Isosurfaces_by_function.inc/__index.htm">Isosurfaces function.inc</b></a><br>
+ &nbsp; &nbsp; <a href="../Isosurfaces_by_pattern_functions/__index.htm">Isosurfaces by patterns</b></a><br>
+ &nbsp; &nbsp; <a href="../Polynomial_Quartic/__index.htm">Polynomial and Quartic</b></a><br>
+ &nbsp; &nbsp; <a href="../Parametric_Surfaces/__index.htm">Parametric Surfaces</b></a><br>
+ &nbsp; &nbsp; <a href="../Meshes_by_meshmaker_inc/__index.htm">Meshes by meshmaker.inc</b></a><br>
+ &nbsp; &nbsp; <a href="../While_Loops_For_Loops/__index.htm">While Loops, For Loops</b></a><br>
+<nobr> &nbsp; &nbsp; <a href="../Sphere_sweep_Spline_curves/__index.htm">sphere_sweep, Spline curves</b></a></nobr><br>
+ &nbsp; &nbsp; <a href="../Random/__index.htm">Random</b></a><br>
+ &nbsp; &nbsp; <a href="../Shearing_and_transform/__index.htm">Shearing and transform</b></a><br>
+ &nbsp; &nbsp; <a href="../Colors_in_textures/__index.htm">Colors in textures</b></a><br>
+ &nbsp; &nbsp; <a href="../Textures_Materials/__index.htm">Textures and Materials</b></a><br>
+ &nbsp; &nbsp; <a href="../Lights_skies_fogs_rainbow/__index.htm">Lights, skies, fogs, rainbow</b></a><br>
+ &nbsp; &nbsp; <a href="../Radiosity_Photons/__index.htm">Radiosity and Photons</b></a><br>
+ &nbsp; &nbsp; <a href="../Include/__index.htm">Own include files</b></a><br>
+ &nbsp; &nbsp; <a href="../Math_functions/__index.htm">Math functions</b></a><br>
+ &nbsp; &nbsp; <a href="../General_statements/__index.htm">General statements</b></a><br>
+ &nbsp; &nbsp; <a href="../Animation/__index.htm">Animation</b></a><br>
+
+ &nbsp; &nbsp; ___________________<br>
+ &nbsp; &nbsp; &nbsp;  <br>
+
+ <nobr> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </nobr>
+</font>
+
+
+</td><td valign="top" rowspan="2"> <!-- Content - 2nd column -->
+
+<a name="Top"></a>
+<table width="95%" align="center" border="0"
+     bordercolor="#C0C0C0" bordercolorlight="#FFFFFF" bordercolordark="#808080"><tr><td> <!-- global-->
+<tr>
+<td valign="top" width="50%">
+
+<table border="0" cellpadding="1" cellspacing="0" width="85%"  bgcolor="#d8d8d0"
+     bordercolor="#C0C0C0" bordercolorlight="#FFFFFF" bordercolordark="#808080">
+<tr>
+ <td width="200"><div align="center">
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080">
+   <tr><td><a href="20_Hexagon.txt" target="_new">
+          <img src="20_Hexagon.jpg" width="160" height="120" border="0"></a></td>
+   </tr></table><font size="1">Hexagon</font></div>
+ </td>
+ <td width="200"><div align="center">
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080">
+   <tr><td><a href="21_Rhomboid.txt" target="_new">
+          <img src="21_Rhomboid.jpg" width="160" height="120" border="0"></a></td>
+   </tr></table><font size="1">Rhomboid</font></div>
+ </td>
+ <td width="200"><div align="center">
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080">
+   <tr><td><a href="22_Pyrmid.txt" target="_new">
+          <img src="22_Pyrmid.jpg" width="160" height="120" border="0"></a></td>
+   </tr></table><font size="1">Pyrmid</font></div>
+ </td>
+ <td width="200"><div align="center">
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080">
+   <tr><td><a href="23_Pyrmid2.txt" target="_new">
+          <img src="23_Pyrmid2.jpg" width="160" height="120" border="0"></a></td>
+   </tr></table><font size="1">Pyrmid2</font></div>
+ </td>
+</tr></table>
+
+
+<table border="0" cellpadding="1" cellspacing="0" width="85%"  bgcolor="#d8d8d0"
+     bordercolor="#C0C0C0" bordercolorlight="#FFFFFF" bordercolordark="#808080">
+<tr>
+ <td width="200"><div align="center">
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080">
+   <tr><td><a href="24_Tetrahedron.txt" target="_new">
+          <img src="24_Tetrahedron.jpg" width="160" height="120" border="0"></a></td>
+   </tr></table><font size="1">Tetrahedron</font></div>
+ </td>
+ <td width="200"><div align="center">
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080">
+   <tr><td><a href="25_Octahedron.txt" target="_new">
+          <img src="25_Octahedron.jpg" width="160" height="120" border="0"></a></td>
+   </tr></table><font size="1">Octahedron</font></div>
+ </td>
+ <td width="200"><div align="center">
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080">
+   <tr><td><a href="26_Dodecahedron.txt" target="_new">
+          <img src="26_Dodecahedron.jpg" width="160" height="120" border="0"></a></td>
+   </tr></table><font size="1">Dodecahedron</font></div>
+ </td>
+ <td width="200"><div align="center">
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080">
+   <tr><td><a href="27_Icosahedron.txt" target="_new">
+          <img src="27_Icosahedron.jpg" width="160" height="120" border="0"></a></td>
+   </tr></table><font size="1">Icosahedron</font></div>
+ </td>
+ </td>
+</tr></table>
+
+
+
+<table border="0" cellpadding="1" cellspacing="0" width="85%"  bgcolor="#d8d8d0"
+     bordercolor="#C0C0C0" bordercolorlight="#FFFFFF" bordercolordark="#808080">
+<tr>
+ <td width="200"><div align="center">
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080">
+   <tr><td><a href="40_Wire_Box.txt" target="_new">
+          <img src="40_Wire_Box.jpg" width="160" height="120" border="0"></a></td>
+   </tr></table><font size="1">Wire_Box</font></div>
+ </td>
+ <td width="200"><div align="center">
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080">
+   <tr><td><a href="41_Round_Box.txt" target="_new">
+          <img src="41_Round_Box.jpg" width="160" height="120" border="0"></a></td>
+   </tr></table><font size="1">Round_Box</font></div>
+ </td>
+ <td width="200"><div align="center">
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080">
+   <tr><td><a href="42_Round_Cylinder.txt" target="_new">
+          <img src="42_Round_Cylinder.jpg" width="160" height="120" border="0"></a></td>
+   </tr></table><font size="1">Round_Cylinder</font></div>
+ </td>
+ <td width="200"><div align="center">
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080">
+   <tr><td><a href="47_Spheroid.txt" target="_new">
+          <img src="47_Spheroid.jpg" width="160" height="120" border="0"></a></td>
+   </tr></table><font size="1">Spheroid</font></div>
+ </td>
+</tr></table>
+
+
+
+<table border="0" cellpadding="1" cellspacing="0" width="85%"  bgcolor="#d8d8d0"
+     bordercolor="#C0C0C0" bordercolorlight="#FFFFFF" bordercolordark="#808080">
+<tr>
+ <td width="200"><div align="center">
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080">
+   <tr><td><a href="43_Round_Cone.txt" target="_new">
+          <img src="43_Round_Cone.jpg" width="160" height="200" border="0"></a></td>
+   </tr></table><font size="1">Round_Cone</font></div>
+ </td>
+ <td width="200"><div align="center">
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080">
+   <tr><td><a href="44_Round_Cone2.txt" target="_new">
+          <img src="44_Round_Cone2.jpg" width="160" height="200" border="0"></a></td>
+   </tr></table><font size="1">Round_Cone2</font></div>
+ </td>
+ <td width="200"><div align="center">
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080">
+   <tr><td><a href="45_Round_Cone3.txt" target="_new">
+          <img src="45_Round_Cone3.jpg" width="160" height="200" border="0"></a></td>
+   </tr></table><font size="1">Round_Cone3</font></div>
+ </td>
+ <td width="200"><div align="center">
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080">
+   <tr><td><a href="51_Supercone.txt" target="_new">
+          <img src="51_Supercone.jpg" width="160" height="120" border="0"></a></td>
+   </tr></table><font size="1">Supercone</font></div>
+ </td>
+</tr></table>
+
+<table border="0" cellpadding="1" cellspacing="0" width="85%"  bgcolor="#d8d8d0"
+     bordercolor="#C0C0C0" bordercolorlight="#FFFFFF" bordercolordark="#808080">
+<tr>
+ <td width="200" align="left">
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080">
+   <tr><td><a href="46_superellipsoid_examples.txt" target="_new">
+          <img src="46_superellipsoid_examples.jpg" width="160" height="120" border="0"></a></td>
+   </tr></table><font size="1">superellipsoid_examples</font></div>
+ </td>
+ <td width="200"><div align="center">
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080">
+   <tr><td><a href="46_superellipsoid_0.txt" target="_new">
+          <img src="46_superellipsoid_0.jpg" width="160" height="120" border="0"></a></td>
+   </tr></table><font size="1">superellipsoid 1</font></div>
+ </td>
+ <td width="200"><div align="center">
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080">
+   <tr><td><a href="46_superellipsoid_1.txt" target="_new">
+          <img src="46_superellipsoid_1.jpg" width="160" height="120" border="0"></a></td>
+   </tr></table><font size="1">superellipsoid 2</font></div>
+ </td>
+ <td width="200"><div align="center">
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080">
+   <tr><td><a href="46_superellipsoid_2.txt" target="_new">
+          <img src="46_superellipsoid_2.jpg" width="160" height="120" border="0"></a></td>
+   </tr></table><font size="1">superellipsoid 3</font></div>
+ </td>
+</tr></table>
+
+
+<table border="0" cellpadding="1" cellspacing="0" width="85%"  bgcolor="#d8d8d0"
+     bordercolor="#C0C0C0" bordercolorlight="#FFFFFF" bordercolordark="#808080">
+<tr>
+ <td width="200"><div align="center">
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080">
+   <tr><td><a href="46_superellipsoid_3.txt" target="_new">
+          <img src="46_superellipsoid_3.jpg" width="160" height="120" border="0"></a></td>
+   </tr></table><font size="1">superellipsoid 4</font></div>
+ </td>
+ <td width="200" align="left">
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080">
+   <tr><td><a href="46_superellipsoid_5.txt" target="_new">
+          <img src="46_superellipsoid_5.jpg" width="160" height="120" border="0"></a></td>
+   </tr></table><font size="1">superellipsoid 5</font></div>
+ </td>
+ <td width="200"><div align="center">
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080">
+   <tr><td><a href="52_Supertorus_1.txt" target="_new">
+          <img src="52_Supertorus_1.jpg" width="160" height="120" border="0"></a></td>
+   </tr></table><font size="1">Supertorus 1</font></div>
+ </td>
+ <td width="200"><div align="center">
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080">
+   <tr><td><a href="52_Supertorus_2.txt" target="_new">
+          <img src="52_Supertorus_2.jpg" width="160" height="120" border="0"></a></td>
+   </tr></table><font size="1">Supertorus 2</font></div>
+ </td>
+</tr></table>
+
+
+<table border="0" cellpadding="1" cellspacing="0" width="85%"  bgcolor="#d8d8d0"
+     bordercolor="#C0C0C0" bordercolorlight="#FFFFFF" bordercolordark="#808080">
+<tr>
+ <td width="200"><div align="center">
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080">
+   <tr><td><a href="52_Supertorus_3.txt" target="_new">
+          <img src="52_Supertorus_3.jpg" width="160" height="120" border="0"></a></td>
+   </tr></table><font size="1">Supertorus 3</font></div>
+ </td>
+ <td width="200"><div align="center">
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080">
+   <tr><td><a href="52_Supertorus_4.txt" target="_new">
+          <img src="52_Supertorus_4.jpg" width="160" height="120" border="0"></a></td>
+   </tr></table><font size="1">Supertorus 4</font></div>
+ </td>
+ <td width="200"><div align="center">
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080">
+   <tr><td><a href="70_Paraboloid_X.txt" target="_new">
+          <img src="70_Paraboloid_X.jpg" width="160" height="120" border="0"></a></td>
+   </tr></table><font size="1">Paraboloid X</font></div>
+ </td>
+ <td width="200" align="left">
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080">
+   <tr><td><a href="71_Paraboloid_Y.txt" target="_new">
+          <img src="71_Paraboloid_Y.jpg" width="160" height="120" border="0"></a></td>
+   </tr></table><font size="1">Paraboloid Y</font></div>
+ </td>
+
+</tr></table>
+
+<table border="0" cellpadding="1" cellspacing="0" width="85%"  bgcolor="#d8d8d0"
+     bordercolor="#C0C0C0" bordercolorlight="#FFFFFF" bordercolordark="#808080">
+<tr>
+ <td width="200" align="left">
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080">
+   <tr><td><a href="72_Paraboloid_Z.txt" target="_new">
+          <img src="72_Paraboloid_Z.jpg" width="160" height="120" border="0"></a></td>
+   </tr></table><font size="1">Paraboloid Z</font></div>
+ </td>
+ <td width="200" align="left">
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080">
+   <tr><td><a href="75_Hyperboloid.txt" target="_new">
+          <img src="75_Hyperboloid.jpg" width="160" height="120" border="0"></a></td>
+   </tr></table><font size="1">Hyperboloid X</font></div>
+ </td>
+ <td width="200" align="left">
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080">
+   <tr><td><a href="76_Hyperboloid_Y.txt" target="_new">
+          <img src="76_Hyperboloid_Y.jpg" width="160" height="120" border="0"></a></td>
+   </tr></table><font size="1">Hyperboloid_Y</font></div>
+ </td>
+ <td width="200" align="left">
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080">
+   <tr><td><a href="77_Hyperboloid_Z.txt" target="_new">
+          <img src="77_Hyperboloid_Z.jpg" width="160" height="120" border="0"></a></td>
+   </tr></table><font size="1">Hyperboloid Z</font></div>
+ </td>
+</tr></table>
+</div>
+
+</td>
+</tr>
+</table>
+</td></tr>
+<tr>
+<td valign="middle" align="center"><a href="#top">top</a>
+</td></tr></table>
+
+</div>
+
+<!-- footer -->
+<hr size="3">
+<table width="95%" align="center">
+<tr>
+ <td><i><font size="1">&copy; Persistence of Vision Ray Tracer, 2013<br>
+ <a href="http://www.povray.org"><nobr>http://www.povray.org</nobr></font></i></a>
+ </td>
+ <td>&nbsp;</td>
+ <td>&nbsp;</td>
+</tr></table><!-- end footer -->
+</body>
+</html>

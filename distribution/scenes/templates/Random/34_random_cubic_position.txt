@@ -1,0 +1,42 @@
+#declare Random_1 = seed (52053); // Use: "rand(Random_1)" 
+#declare Random_2 = seed ( 1953); // Use: "rand(Random_2)"
+#declare Random_3 = seed (  153); // Use: "rand(Random_3)"
+
+
+union{
+ // outer loop
+ #local NrX = 0;    // start x
+ #local EndNrX = 5; // end   x
+ #while (NrX< EndNrX) 
+    // more inner loop
+    #local NrY = 0;    // start y 
+    #local EndNrY = 5; // end   y
+    #while (NrY< EndNrY) 
+       // innerst loop
+       #local NrZ = 0;    // start z
+       #local EndNrZ = 8; // end   z
+       #while (NrZ< EndNrZ) 
+     
+       sphere{ <0,0,0>,0.15
+               texture { pigment{ color rgb< 1.0, 0.5, 0.0> }  
+                         finish { diffuse 0.9 phong 1}
+                       } // end of texture 
+        
+        //    translate<NrX*0.5 NrY*0.5 NrZ*0.5>} 
+              translate<  NrX*0.5 + 0.35*(-0.5+rand(Random_1)) , 
+                          NrY*0.5 + 0.35*(-0.5+rand(Random_2)) , 
+                          NrZ*0.5 + 0.35*(-0.5+rand(Random_3)) 
+                        >
+            } // end of sphere  
+
+       #local NrZ = NrZ + 1;  // next Nr z
+       #end // --------------- end of loop z
+       // end innerst loop
+    #local NrY = NrY + 1;  // next Nr y
+    #end // --------------- end of loop y
+    // end more inner loop
+ #local NrX = NrX + 1;  // next Nr x
+ #end // --------------- end of loop x
+ // end of outer loop
+rotate<0,-30,0> 
+translate<0,0.2,-0.5>} // end of union

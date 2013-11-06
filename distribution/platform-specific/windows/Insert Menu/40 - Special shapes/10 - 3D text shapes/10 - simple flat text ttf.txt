@@ -1,0 +1,10 @@
+text { ttf "arial.ttf", "Simple Text!", 0.02, 0.0 // thickness, offset
+
+       texture{ pigment{ color rgb<1,1,1>*1.3 } 
+              //normal { bumps 0.5  scale 0.01 }
+                finish { phong 0.1 }
+              } // end of texture
+
+       scale<1,1.25,1>*0.8
+       translate<-2.10,0.10,0.00 >
+      } // end of text object ---------------------------------------------

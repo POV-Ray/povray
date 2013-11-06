@@ -1,0 +1,15 @@
+//----------------------------------------------------------------------------
+#include "shapes3.inc"
+//----------------------------------------------------------------------------
+object{ Egg_Shape( 1.60, 0.65  ) // (Lower_Scale, Upper_Scale) 
+        texture{ pigment{ color rgb<1,1,1> }
+                 normal { bumps 0.5 scale 0.0125}
+                 finish { phong 1 reflection{ 0.15 } }
+               } // end of texture
+         
+        scale <1,1,1>*0.9
+        rotate <0,0,0>
+        translate< 0, 0, 0>
+      } // end of object
+//----------------------------------------------------------------------------
+ 

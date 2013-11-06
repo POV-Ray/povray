@@ -1,0 +1,6 @@
+       texture{ T_Wood1     
+                normal { wood 0.5 scale 0.05}
+                finish { phong 1 } 
+                rotate<0,0, 0> scale 0.5
+              } // end of texture ------------------------
+

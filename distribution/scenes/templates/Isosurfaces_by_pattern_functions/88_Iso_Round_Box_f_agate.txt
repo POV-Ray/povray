@@ -1,0 +1,24 @@
+isosurface { //--------------------------------------
+
+  function{
+   f_rounded_box( x, y, z,
+                  0.3, //  radius of curvature
+                  1.4,0.9,0.9) // scale<x,y,z>
+     -(f_agate(x/2,y/4,z/4)*0.35)
+                               
+   }
+
+  threshold 0
+  contained_by {box {<-2,-1,-1>*1.2,<2,1,1>*1.5}}
+  max_gradient 3.2
+  accuracy 0.0001
+
+  texture { pigment{ color rgb<1,0.75,0.55>*0.7}
+            normal { bumps 0.5 scale 0.05}
+            finish { phong 0.3}
+	  }
+  scale 0.900
+  rotate <0,0,0>
+  rotate <-20,0,0>  
+  translate < 0, 1.3, 0>
+} // end of isosurface ------------------------------

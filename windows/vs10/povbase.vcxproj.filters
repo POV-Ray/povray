@@ -1,0 +1,242 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Base source">
+      <UniqueIdentifier>{b19486af-dfce-4a06-90c9-32e3785708c0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Base source\Image">
+      <UniqueIdentifier>{acc09c16-b1ed-4852-adc4-c5d9ee866257}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Base source\Animation">
+      <UniqueIdentifier>{3299ca4f-6080-43f0-87c9-6a9d10390c15}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Base Headers">
+      <UniqueIdentifier>{b61a7a32-c167-4948-9568-4fadf771f1bd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Base Headers\Image">
+      <UniqueIdentifier>{ddfe4b58-8acd-4025-bfaf-18bf81359f9b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Base Headers\Animation">
+      <UniqueIdentifier>{d5a32d03-c8d0-4ef2-af6b-b1c14e818dec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Base Headers\Font">
+      <UniqueIdentifier>{9342c598-21d7-47b7-ae5a-013c3680a3bc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Base source\Font">
+      <UniqueIdentifier>{9f44d3c5-81d8-4017-a1b7-5a6f9a139e28}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\source\base\fileinputoutput.cpp">
+      <Filter>Base source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\base\path.cpp">
+      <Filter>Base source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\base\pov_err.cpp">
+      <Filter>Base source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\base\povms.cpp">
+      <Filter>Base source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\base\povmscpp.cpp">
+      <Filter>Base source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\base\processoptions.cpp">
+      <Filter>Base source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\base\stringutilities.cpp">
+      <Filter>Base source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\base\textstream.cpp">
+      <Filter>Base source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\base\textstreambuffer.cpp">
+      <Filter>Base source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\base\timer.cpp">
+      <Filter>Base source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\base\image\bmp.cpp">
+      <Filter>Base source\Image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\base\image\colourspace.cpp">
+      <Filter>Base source\Image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\base\image\encoding.cpp">
+      <Filter>Base source\Image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\base\image\gif.cpp">
+      <Filter>Base source\Image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\base\image\gifdecod.cpp">
+      <Filter>Base source\Image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\base\image\hdr.cpp">
+      <Filter>Base source\Image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\base\image\iff.cpp">
+      <Filter>Base source\Image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\base\image\image.cpp">
+      <Filter>Base source\Image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\base\image\jpeg.cpp">
+      <Filter>Base source\Image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\base\image\openexr.cpp">
+      <Filter>Base source\Image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\base\image\pgm.cpp">
+      <Filter>Base source\Image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\base\image\png.cpp">
+      <Filter>Base source\Image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\base\image\ppm.cpp">
+      <Filter>Base source\Image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\base\image\targa.cpp">
+      <Filter>Base source\Image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\base\image\tiff.cpp">
+      <Filter>Base source\Image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\base\animation\animation.cpp">
+      <Filter>Base source\Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\base\animation\moov.cpp">
+      <Filter>Base source\Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\precomp.cpp" />
+    <ClCompile Include="..\..\source\base\font\crystal.cpp">
+      <Filter>Base source\Font</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\base\font\cyrvetic.cpp">
+      <Filter>Base source\Font</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\base\font\povlogo.cpp">
+      <Filter>Base source\Font</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\base\font\timrom.cpp">
+      <Filter>Base source\Font</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\source\base\configbase.h">
+      <Filter>Base Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\base\fileinputoutput.h">
+      <Filter>Base Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\base\path.h">
+      <Filter>Base Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\base\platformbase.h">
+      <Filter>Base Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\base\pointer.h">
+      <Filter>Base Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\base\pov_err.h">
+      <Filter>Base Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\base\povdebug.h">
+      <Filter>Base Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\base\povms.h">
+      <Filter>Base Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\base\povmscpp.h">
+      <Filter>Base Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\base\povmsgid.h">
+      <Filter>Base Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\base\processoptions.h">
+      <Filter>Base Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\base\stringutilities.h">
+      <Filter>Base Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\base\textstream.h">
+      <Filter>Base Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\base\textstreambuffer.h">
+      <Filter>Base Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\base\timer.h">
+      <Filter>Base Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\base\types.h">
+      <Filter>Base Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\base\image\bmp.h">
+      <Filter>Base Headers\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\base\image\colourspace.h">
+      <Filter>Base Headers\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\base\image\encoding.h">
+      <Filter>Base Headers\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\base\image\gif.h">
+      <Filter>Base Headers\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\base\image\hdr.h">
+      <Filter>Base Headers\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\base\image\iff.h">
+      <Filter>Base Headers\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\base\image\image.h">
+      <Filter>Base Headers\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\base\image\jpeg_pov.h">
+      <Filter>Base Headers\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\base\image\metadata.h">
+      <Filter>Base Headers\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\base\image\openexr.h">
+      <Filter>Base Headers\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\base\image\pgm.h">
+      <Filter>Base Headers\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\base\image\png_pov.h">
+      <Filter>Base Headers\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\base\image\ppm.h">
+      <Filter>Base Headers\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\base\image\targa.h">
+      <Filter>Base Headers\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\base\image\tiff_pov.h">
+      <Filter>Base Headers\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\base\animation\animation.h">
+      <Filter>Base Headers\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\base\animation\moov.h">
+      <Filter>Base Headers\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\precomp.h" />
+    <ClInclude Include="..\..\source\base\safemath.h">
+      <Filter>Base Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\base\font\crystal.h">
+      <Filter>Base Headers\Font</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\base\font\cyrvetic.h">
+      <Filter>Base Headers\Font</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\base\font\povlogo.h">
+      <Filter>Base Headers\Font</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\base\font\timrom.h">
+      <Filter>Base Headers\Font</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

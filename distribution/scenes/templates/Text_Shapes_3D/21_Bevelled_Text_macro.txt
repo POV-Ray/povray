@@ -1,0 +1,11 @@
+//Bevelled_Text(Font, String, Cuts, BevelAng, BevelDepth, Depth, Offset, UseMerge)
+object{ 
+        Bevelled_Text("cyrvetic.ttf", "POV-Ray", 10 , 35, 0.045, 1, 0.00, 0)
+        texture{ pigment{ color rgb<1,0.8,0.0>} 
+                 normal { bumps 0.5 scale 0.005}
+                 finish { specular 1 reflection 0.2}
+               } // end of texture
+        rotate<0,0,0>
+        scale<0.75,1.0,1>*1 
+        translate<0, 0.2,0>
+      } // end of Bevelled_Text object -------------------------------------------

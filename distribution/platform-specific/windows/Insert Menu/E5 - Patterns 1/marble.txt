@@ -1,0 +1,6 @@
+// pattern for use in texture/pigment/normal/density
+// similar to gradient, gives a nice marble with turbulence
+  marble           // create a marble-like texture
+  //marble 0.5     // for use with normal{} (0...1 or more)
+  //turbulence 1.0 // should have some!
+

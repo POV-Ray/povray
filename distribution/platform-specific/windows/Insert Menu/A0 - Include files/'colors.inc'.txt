@@ -1,0 +1,3 @@
+// Standard pre-defined colors
+//
+#include "colors.inc"

@@ -1,0 +1,21 @@
+// --------------------------------------- parametric surface ------------- 
+#declare a = 1.0;                       // conical spiral
+#declare b = 8;
+#declare c = 0.2;
+#declare n = 5;
+parametric{
+ function { a*(1-0.5*v/pi)*sin(n*v+0.5*pi)*(1-cos(u))
+            + c*sin(n*v+0.5*pi) }
+ function { b*0.5*v/pi + a*(1-0.5*v/pi)*sin(u) }
+ function { a*(1-0.5*v/pi)*cos(n*v+0.5*pi)*(1-cos(u))
+            + c*cos(n*v+0.5*pi) }
+  <0,0>,<2*pi,2*pi>  // start, end of (u,v)
+  contained_by {box {<-1,-1,-1>*2*pi,v1,b/3,1>*2*pi}}
+  max_gradient 10
+  accuracy 0.0035
+  precompute 18 x,y,z
+  texture{ pigment{ color rgb<1,1,1>}
+           finish { phong 0.5}}
+  scale 0.125
+  rotate <0, 90, 0>
+} // end of parametric ----------------------------------------------------  

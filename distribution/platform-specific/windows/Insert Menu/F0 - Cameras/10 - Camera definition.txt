@@ -1,0 +1,31 @@
+// set viewer's position in the scene
+camera {
+// (---camera types---)
+//  perspective (default) | orthographic | fisheye |
+//  ultra_wide_angle | omnimax | panoramic | cylinder 1 | spherical
+
+  location  <0.0, 1.0, -6.0>   // position of camera <X,Y,Z>
+  direction 2.0*z              // which way are we looking <X,Y,Z> & zoom
+//  sky       y                // for tilting the camera
+  up        y                  // which way is +up <X,Y,Z> (aspect ratio with x)
+  right x*image_width/image_height
+                               // which way is +right <X,Y,Z> (aspect ratio with y)
+  look_at   <0.0, 0.0,  0.0>   // point center of view at this point <X,Y,Z>
+
+//  angle 67                   // overrides "direction" with specific angle
+//  normal { ripples 0.2 }     // perturb the camera lens with a pattern
+
+// (---focal blur extras---)
+// aperture 0.2                // [0...N] larger is narrower depth of field (blurrier)
+// blur_samples 4              // number of rays per pixel for sampling
+// focal_point <0,0,0>         // point that is in focus <X,Y,Z>
+// confidence 0.9              // [0...1] when to move on while sampling (smaller is less accurate)
+// variance 1/128              // [0...1] how precise to calculate (smaller is more accurate)
+
+// (---spherical camera---)
+// angle 360                   // horizontal field of view (in degrees and...)
+//       180                   // vertical field of view (...are aspect ratios)
+}
+
+
+

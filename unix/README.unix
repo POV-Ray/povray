@@ -1,0 +1,266 @@
+                     Persistence of Vision Ray Tracer
+                               Version 3.6
+                        UNIX Specific Documentation
+
+
+   This file contains generic information for running POV-Ray on UNIX
+   systems.  It briefly describes the UNIX-specific features of POV-Ray
+   from configuration and command-line perspectives.  As such, it is not
+   a replacement for the HTML user documentation located in the doc/html
+   directory (chapter 1 in particular).  This document also does not cover
+   the program installation which is described in either the INSTALL file
+   (for the generic UNIX source distribution) or in the README file (for
+   the PC-Linux binary distribution).
+
+
+Executables
+
+   Official executables of POV-Ray for UNIX are only provided for the
+   x86 (and compatible) platform running the GNU/Linux operating system.
+   Due to the very large variety of UNIX platforms, the POV-Team cannot
+   provide official binaries for all of them.  However, since POV-Ray
+   is also available as a source package, recompiling the source for
+   your target system shouldn't cause a problem.  Note that if you want
+   to distribute an executable created by yourself, you must comply with
+   the POV-Ray License Agreement (povlegal.doc).
+
+   The official GNU/Linux (a free UNIX variant) version is available as
+   povlinux-3.6.tgz (or povlinux-3.6.tar.gz).  The generic UNIX source
+   distribution is available as povray-3.6.tgz (or povray-3.6.tar.gz).
+   Both binary and source packages can be found at the following sites:
+
+     - The POV-Ray website, www.povray.org in the Download section.
+     - The POV-Ray FTP site, ftp.povray.org in /pub/povray/Official/Linux.
+     - There are many sites around the world that mirror the povray.org
+       website.  These are listed in /pub/povray/README.MIRRORS at
+       ftp.povray.org .  You should try to use the closest site for
+       faster downloads.
+
+   povlinux-3.6.tgz contains a very generic povray executable that should
+   run on most GNU/Linux distributions with a 2.2 kernel or above.  It is
+   a fully static binary that should not depend on any installed library.
+   The povray executable includes support for X Window and SVGA display
+   (see below).  It comes with an install script that installs POV-Ray
+   into the /usr/local prefix or any directory you have write access to.
+   Vendor-specific package formats such as RedHat RPM or Debian DEB are
+   not available at the moment.
+
+
+File locations
+
+   The default location for installing POV-Ray for UNIX is under
+   /usr/local/share/povray-3.6 for all INI, scene, and include files,
+   and /usr/local/bin for the povray binary itself.  The POV-Ray man page
+   is by default installed into /usr/local/man/man1 .  The system-level
+   povray.ini and povray.conf files, which store default settings for
+   POV-Ray, are installed in the /usr/local/etc/povray/3.6 directory.  
+   The default installation location can be changed from /usr/local
+   to another directory when installing the PC-Linux binary or when
+   configuring the source package of POV-Ray.  See the relevant install
+   documentation for further details.  When installing POV-Ray (binary
+   and source distributions) the povray.ini and povray.conf files are
+   also placed under the $HOME/.povray/3.6 directory.  Refer to the
+   user documentation for INI and I/O restriction settings.
+
+
+INI files
+
+   POV-Ray allows the use of INI files to store common configuration
+   settings, such as the output format, image size, and library paths.
+   Upon startup, the UNIX version of POV-Ray will use the environment
+   variable POVINI to determine custom configuration information if
+   that environment variable is set.  Otherwise, it will look for the 
+   file "povray.ini" in the current directory.  If neither of these works,
+   then POV-Ray will try to read the user "povray.ini" file (located under
+   $HOME/.povray/3.6) or, otherwise, the system-level "povray.ini" (by
+   default in /usr/local/etc/povray/3.6).  If none of these work, for
+   backward compatibility with version 3.5 and earlier, POV-Ray finally
+   searches for INI files as "$HOME/.povrayrc" or otherwise a "povray.ini"
+   file in PREFIX/etc (where PREFIX is /usr/local by default).
+
+   The other INI files found under the ini/ directory, such as zipfli.ini
+   and tgaflc.ini are of limited use under UNIX but are included as examples
+   of how to automate operations from within POV-Ray.  They can be customized
+   to use whatever programs you have installed.
+
+
+CONF files
+
+   POV-Ray 3.5 has introduced the I/O Restriction feature as an attempt
+   to at least partially protect a machine running the program to perform
+   forbidden file operation and/or run external programs.  I/O Restriction
+   settings are specified in a "povray.conf" configuration file.  There are
+   two configuration levels within POV-Ray for UNIX: a system and a user-
+   level configuration.  The system-level povray.conf file (by default in
+   /usr/local/etc/povray/3.6) is intended for system administrators to
+   setup minimal restrictions for the system on which POV-Ray will run.
+   The user $HOME/.povray/3.6/povray.conf file allows further restrictions
+   to be set.  For obvious security reasons, the user's settings can only
+   be more (or equally) restrictive than the system-level settings.  See
+   chapter 1 of the documentation for details.  In POV-Ray 3.6 the format
+   of the configuration file has changed and is not backward compatible
+   with POV-Ray 3.5.  Note that I/O Restrictions are still subject to the
+   operating system permissions.  Also the feature is not mature enough,
+   especially since it has been completely reworked in the UNIX version
+   of POV-Ray 3.6.
+
+
+Display Formats
+
+   There are two different methods of displaying images as they are
+   rendered with POV-Ray on most UNIX systems, and an additional display
+   method on GNU/Linux systems.  The first way is the text format,
+   which can output a crude 75x24 ASCII version of the image, to give
+   an idea of what POV-Ray is doing.  This doesn't work very well if you
+   are also using the Verbose (+v) status output.  It also isn't very
+   satisfying for the output of a ray tracer, but may be useful in some
+   cases.  The second way requires the X Window System to be installed
+   on your machine, which should be the case on most UNIX systems.  The
+   X Window System allows full-color display of any image size, and at
+   any screen resolution and color depth.  Some limited user interactions
+   with the display are also allowed.  The third way is specific to
+   GNU/Linux systems and allows to display the rendered image directly
+   on the console screen using the SVGA library.  Both X Window and SVGA
+   displays are discussed in more detail below.
+
+
+X Window Display
+
+   Using the X Window display allows you to preview the image using any
+   kind of visual, at any depth, and even remotely if desired.  During
+   rendering, the window will be updated after every scanline has been
+   rendered, or sooner if the rendering is taking a long time.  To
+   update it sooner you can click any mouse button in the window or
+   press (almost) any key.  Pressing <CTRL-R> or <CTRL-L> during
+   rendering will refresh the whole screen.  If you have the Exit_Enable
+   or +X flag set, pressing 'q' or 'Q' at any time during the rendering
+   will stop POV-Ray rendering and exit.  The rendering will pause when
+   complete if the Pause_When_Done (or +P) flag is set.  To exit at
+   this point, press the 'q' or 'Q' key or click any mouse button in
+   the window.
+
+   Depending on your window manager (e.g. KDE, Gnome, fvwm), POV-Ray may
+   use a color icon for the window (in the title bar) and its corresponding
+   button in the task bar.  The use of a color icon also depends on whether
+   the POV-Ray executable has been linked with the Xpm library.  The latter
+   is usually shipped with the X Window System.  In case the Xpm library
+   cannot be used, a built-in monochrome icon is used instead.  Some
+   window managers also need to be configured in order to use the color
+   icon.  The "xpovicon.xpm" file can be used in this case, but the exact
+   procedure depends on the window manager.  The following shows how to
+   make the fvwm window manager use this icon.  First, copy the icon file
+   to one of the directories listed by PixmapPath (or ImagePath) in your
+   $HOME/.fvwmrc configuration file.  Second, edit the latter to add the
+   following line:
+
+     Style "Povray" Icon xpovicon.xpm
+
+   Third, restart the X server (e.g. by typing 'startx' on the console).
+   Restarting fvwm alone will not be enough.
+
+   In POV-Ray 3.6 the X Window display comes with a gray/white checkered
+   background by default, instead of the black color implemented in the
+   earlier versions.  The new default background is particularly useful
+   when rendering images using the alpha channel (+UA option).  In case
+   you don't feel comfortable with this default background, you can make
+   POV-Ray for UNIX use a custom background image instead.  The user-
+   supplied background image must be placed under the $HOME/.povray/3.6
+   directory as "background.ext" (where "ext" is either "jpg", "jpeg",
+   "png", "ppm", "tga" or "gif"); for instance "background.png".  The
+   filename must be all lowercase.  POV-Ray will detect the image format
+   depending on the filename extension (so this is different from the
+   other image-related features in the POV-Ray scene description language).
+   In case you place several background.* files under $HOME/.povray/3.6
+   the first file matching the list of extensions given above will be used.
+   For instance, POV-Ray will use "background.jpg" if both "background.jpg"
+   and "background.tga" are present.  Note there is not support for the
+   TIFF format at the moment, since TIFF support is still an experimental
+   feature in POV-Ray 3.6.  Also the background image is NOT output to
+   the rendered image file, so you cannot use it as e.g. an image map.
+   IMPORTANT NOTE: the user-supplied background image is an EXPERIMENTAL
+   feature and is specific to the X Window display of POV-Ray for UNIX.
+   No provision is made that this new feature will be available in future
+   releases of POV-Ray.
+
+   When POV-Ray is compiled with support for the X Window display, the
+   program also understands the standard X Window command-line options
+   in addition to those given in the generic POV-Ray documentation.  See
+   the X(1) man page for further explanation of these options.
+
+   -display <display name>           Preview on the specified display
+   -geometry <WIDTHxHEIGHT+XXX+YYY>  Start with the given size/position
+   -visual <visual type>             Use specified visual if available
+   -title <title>                    Use the given title for the window
+   -icon                             Start iconified
+   -owncmap                          Force POV-Ray to use a private colormap
+   -borderwidth <width>              Use a border of the given width
+   -help                             Output these X Window specific options
+
+
+SVGAlib display
+
+   For GNU/Linux systems that don't have the X Window System installed,
+   it is possible to use the SVGA library (SVGAlib) to display directly
+   to the screen.  The POV-Ray binary using SVGAlib must be installed as
+   a setuid root executable to be able to run properly.  If it doesn't
+   work (usually complaining about being unable to get I/O permissions)
+   first try (as root):
+
+     chown root.root povray
+     chmod 4755 povray
+
+   IMPORTANT NOTE: doing this may have serious security implications.
+   Running POV-Ray as root or through 'sudo' might be a better idea.
+
+   If it still doesn't work then make sure SVGAlib is installed on your
+   machine and works properly ('sdoom' is a good way of doing this :-).
+   Anything that can at least use the 320x200x256 mode (ie regular VGA)
+   should be fine, although modes up to 1280x1024x16M are possible.  If
+   you do not have root priviledges or can't have your system admin
+   install POV-Ray for you, then you should rather use the X Window or
+   text-only display, which do not require any special system priviledges
+   to run.  If you are using a display resolution that is lower than what
+   you are rendering, the display will be scaled to fit as much of the
+   viewing window as possible.
+
+
+Interrupting POV-Ray
+
+   To interrupt a rendering in progress, you can use CTRL-C (SIGINT),
+   which will allow POV-Ray to finish writing out any rendered data
+   before it quits.  When using a rendering display, you can also press
+   the 'q' or 'Q' keys in the rendering preview window to interrupt the
+   trace if the Test_Abort (or +X) flag is set.
+
+
+Post-processing Images
+
+   For UNIX systems, the PBM utilities (PBMPLUS, NetPBM) and ImageMagick
+   are an excellent choice for post-processing tools, especially if you
+   only have a command-line interface to UNIX:
+     http://www.acme.com/software/pbmplus
+     http://netpbm.sourceforge.net
+     http://www.imagemagick.org
+
+   POV-Ray can also pipe its output directly into a post-processor.
+   For example:
+
+     povray +iscene.pov -fp +o- | cjpeg > scene.jpg
+
+   will create a JPEG output file, since specifing the '-' output filename
+   (+o option) tells POV-Ray to send the output image data to stdout, which
+   is piped through cjpeg in this example.
+
+
+Questions and problems with POV-Ray for UNIX should be posted on the
+news.povray.org news server under the povray.unix newsgroup.  This news
+server also has a web interface at http://news.povray.org/groups/ .
+Please make sure you have consulted with a local UNIX person first if 
+you think the problem is likely to be on your end.  If you are installing 
+POV-Ray in a publicly accessible location, you must read and comply with 
+the 'Online or Remote Execution' conditions in povlegal.doc .
+
+Mark Gordon
+Internet:   mtgordon@povray.org
+
+Revised for POV-Ray 3.6 by Nicolas Calimet <pov4grasp@free.fr>

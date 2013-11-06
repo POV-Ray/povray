@@ -1,0 +1,7 @@
+// fisheye lens for wide round field of view (up to 360 degrees)
+camera {
+  fisheye
+  location <0,0,-1>     // position
+  look_at  <0,0,0>      // view
+  angle 180             // field
+}

@@ -1,0 +1,22 @@
+//---------------------------------------------------------------------------- 
+#include "shapes3.inc"
+//----------------------------------------------------------------------------
+object{ Round_N_Tube_Polygon ( // A round polygon tube ring with N corners 
+                            8, // number of corners must be >= 3 !!!
+                            0.125+0.05,// tube radius < base width
+                            0.9,      // base width (center to edge middle)
+                            0.25,    // corner torus segment major radius
+                            0, // 1 = filled, 0 = ring
+                            0 // 0 uses union; 1 uses merge for transparent
+                          ) //------------------------------------------------ 
+ 
+      texture{ Polished_Chrome
+               pigment{ color rgbf<1,0,0,0>}
+               finish { phong 1}
+             } // end of texture
+  
+      rotate<0,0,0>
+      translate< 0,0,0>
+} // end of object -----------------------------------------------------------
+//----------------------------------------------------------------------------
+ 

@@ -1,0 +1,37 @@
+// Various float functions
+/*
+// (---general---)
+#declare X=div(A,B);            // A/B (integer)
+#declare X=mod(A,B);            // A modulo B
+#declare X=sqrt(A);             // square root of A
+#declare X=exp(A);              // e^A
+#declare X=log(A);              // Natural logarithm of A
+#declare X=pow(A,B);            // A^B
+#declare X=max(A,B,C, ...);     // Maximum of A, B, C, ...
+#declare X=min(A,B,C, ...);     // Minimum of A, B, C, ...
+#declare X=int(A);              // truncate A to integer part
+#declare X=abs(A);              // Absolute value of A
+#declare X=ceil(A);             // ceiling of A (smallest larger integer)
+#declare X=floor(A);            // floor of A (largest smaller integer)
+#declare X=defined(A);          // true if A is a defined identifier
+// (---trigonometric---)
+#declare X=cos(A);              // cosine of A
+#declare X=cosh(A);             // hyperbolic cosine of A
+#declare X=sin(A);              // sine of A
+#declare X=sinh(A);             // hyperbolic sine of A
+#declare X=tan(A);              // tangent of A
+#declare X=tanh(A);             // hyperbolic tangent of A
+#declare X=acos(A);             // arc-cosine of A
+#declare X=acosh(A);            // hyperbolic Arc-cosine of A
+#declare X=asin(A);             // arc-sine of A
+#declare X=asinh(A);            // hyperbolic Arc-sines of A
+#declare X=atan(A);             // arc-tangent of A
+#declare X=atanh(A);            // hyperbolic Arc-tangent of A
+#declare X=atan2(A,B);          // arc-tangent of (A/B)
+#declare X=degrees(A);          // convert radians to degrees
+#declare X=radians(A);          // convert degrees to radians
+// (---arrays---)
+#declare X=dimensions(A);       // Number of dimensions of Array A
+#declare X=dimension_size(A,B); // Size of Array A in dimension B
+For more functions see  "math.inc".
+*/

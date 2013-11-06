@@ -1,0 +1,21 @@
+// pattern modifier
+  // (---cylindrical warp---)
+  warp {
+    cylindrical
+    orientation z    // mapping orientation
+    //dist_exp 0.0   // optional [0.0]
+  }
+  // (---spherical warp---)
+  warp {
+    spherical
+    orientation z    // mapping orientation
+    //dist_exp 0.0   // optional [0.0]
+  }
+  // (---toroidal warp---)
+  warp {
+    toroidal
+    orientation z    // mapping orientation
+    //dist_exp 0.0   // optional [0.0]
+    major_radius 1   // major radius of torus
+  }
+

@@ -1,0 +1,8 @@
+object{ Pyramid2  
+        scale<1,1,1>*2.1
+        texture{ pigment{ color rgb<0.8,0.65,0.5>}
+                 normal { granite 0.5 scale <1,0.15,1> }
+                 finish { phong 1}
+               }
+        scale<1,1,1>   rotate<0,0,0> translate<0, 0.5, 0>
+       } // end of object --------------------------------- 

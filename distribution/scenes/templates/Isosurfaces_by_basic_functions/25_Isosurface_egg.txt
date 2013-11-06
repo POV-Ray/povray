@@ -1,0 +1,20 @@
+isosurface{ // ------------------------------------------------------------
+
+  function { sqrt(x*x + y*y + z*z) - 0.8
+             + sin(0.5*sin(y*4))*0.1
+           }
+
+  threshold 0
+  accuracy 0.0001
+  max_gradient 5
+  contained_by {box {<-1,-1,-1>, < 1, 1, 1>}}
+
+  texture { T_Stone8
+            //pigment{ color rgb<1,0.85,0.45>}
+            finish { specular 0.2 phong 0.4 }
+	  }
+  scale <0.80,1.00,0.80>*1.4
+  rotate <0,0, 0>
+  translate <-0, 1.2, 0>
+} // end of isosurface ----------------------------------------------------- 
+  

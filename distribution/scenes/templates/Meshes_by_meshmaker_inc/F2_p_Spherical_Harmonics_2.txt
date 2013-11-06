@@ -1,0 +1,56 @@
+//-------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
+//info: http://paulbourke.net/geometry/
+//lots of examples:    http://www.lifesmith.com/spharmin.html
+
+//#declare M=array[8]{1,1,4,4,1,1,1,1}
+#declare M=array[8]{1,1,4,4,1,9,2,5}
+//#declare M=array[8]{1,3,4,4,1,4,4,1}
+//#declare M=array[8]{1,2,3,7,7,0,3,3}
+//#declare M=array[8]{5,3,5,3,5,3,5,3}
+//#declare M=array[8]{3,4,3,2,6,3,0,1}
+//#declare M=array[8]{0,4,3,1,0,1,3,2}
+//#declare M=array[8]{0,1,2,2,2,4,1,2}
+
+#declare R=function(phi,theta){
+    (pow(sin(M[0]*phi),  M[1])
+    +pow(cos(M[2]*phi),  M[3])
+    +pow(sin(M[4]*theta),M[5])
+    +pow(cos(M[6]*theta),M[7]))
+}
+
+#declare F1= function(phi,theta){(1+R(phi,theta)) * sin(phi) * cos(theta)}
+#declare F2= function(phi,theta){(1+R(phi,theta)) * cos(phi)}
+#declare F3= function(phi,theta){(1+R(phi,theta)) * sin(phi) * sin(theta)}
+//-------------------------------------------------------------------------------------------------
+#include "meshmaker.inc"
+//-------------------------------------------------------------------------------------------------
+object{ // Parametric(Fx,Fy, Fz, <UVmin>, <UVmax>, Iter_U, Iter_V, FileName)
+   Parametric( // Builds a parametric surface out of three given functions. 
+               // The uv_coordinates for texturing the surface come from the square <0,0> - <1,1>. 
+      F1, F2, F3, //three functions
+     <0, FromV(0)>, <pi, 2*pi>,// range within to calculate surface: <u min, v min>,<u max, v max>. 
+      50,100, // resolution of the mesh in the u range and v range.
+      "" // FileName: ""= non, "NAME.obj'= Wavefront objectfile, "NAME.pcm" compressed mesh file 
+         // "NAME.arr" = include file with arrays to build a mesh2 from, 
+         //  others: includefile with a mesh2 object 
+   ) //---------------------------------------------------------------------------------------------
+ /*
+   texture {  // inside texture
+     uv_mapping
+     pigment{ checker color rgb <0.5,0.0,0.1> rgb <1,1,1> scale <0.025,0.0035,0.01>}
+     finish { specular 0.25}
+   } // 
+  */
+   texture{            //  outside (interior_texture)
+     uv_mapping
+     pigment{ checker color rgb <0.0,0,0.0> rgb <1,0.9,0.9>  scale <0.01 ,0.0077,1>}
+     finish { phong 0.5 }
+   } // 
+   
+   rotate<0,0,0>
+   scale< 1,1,1>*0.45
+   translate< 0, 0, 0 >
+} // end of object 
+//---------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------

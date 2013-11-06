@@ -1,0 +1,28 @@
+// general light definition
+light_source {
+  <10, 10, 10>      // position of the light source
+  color rgb 1.0     // color of the light
+  // spotlight
+  // cylinder
+  // parallel
+  // area_light <AXIS1>, <AXIS2>, SIZE1, SIZE2
+  // (---for spotlight/cylinder---)
+  // radius FLOAT
+  // falloff FLOAT
+  // tightness FLOAT
+  // point_at <VECTOR>   // for spotlight/cylinder/parallel
+  // (---for area_light---)
+  // adaptive FLOAT
+  // jitter FLOAT
+  // circular
+  // orient
+  // (---other modifiers---)
+  // looks_like { OBJECT }
+  // fade_distance FLOAT
+  // fade_power FLOAT
+  // media_attenuation BOOL
+  // media_interaction BOOL
+  // shadowless
+}
+
+

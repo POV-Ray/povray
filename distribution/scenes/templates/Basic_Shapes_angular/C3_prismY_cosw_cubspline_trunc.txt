@@ -1,0 +1,38 @@
+// linear prism in y-direction: from .. ,to ..,number of points (first = last)
+prism { linear_sweep
+        cubic_spline
+        0.50 ,1.00 , 6
+        <-0.50, 0.00>, < 0.50,  0.00>, < 0.00,-0.75>, <-0.50, 0.00>,
+        < 0.50, 0.00>, < 0.00, -0.75>
+        texture {pigment{ color White} 
+                 finish { phong 1.0}}
+        rotate<0,0,0> 
+        translate<-1.0,0,0> 
+      } // end of prism --------------------------------------------------------
+
+// linear prism in y-direction: from .. ,to ..,number of points (first = last)
+prism { conic_sweep
+        cubic_spline
+        0.50 ,1.00 , 6
+        <-0.50, 0.00>, < 0.50,  0.00>, < 0.00,-0.75>, <-0.50, 0.00>,
+        < 0.50, 0.00>, < 0.00, -0.75>
+        texture {pigment{ color White} 
+                 finish { phong 1.0}}
+        //scale <1,-1,1> translate<0,2.00,0>    // turn arround !!!
+        rotate<0,0,0>
+        translate<0.2,0,0> 
+      } // end of prism --------------------------------------------------------
+
+
+// linear prism in y-direction: from .. ,to ..,number of points (first = last)
+prism { conic_sweep
+        cubic_spline
+        0.50 ,1.00 , 6
+        <-0.50, 0.00>, < 0.50,  0.00>, < 0.00,-0.75>, <-0.50, 0.00>,
+        < 0.50, 0.00>, < 0.00, -0.75>
+        texture {pigment{ color White} 
+                 finish { phong 1.0}}
+        scale <1,-1,1> translate<0,1.00,0>    // turn arround !!!
+        rotate<0,0,0>
+        translate<1.0,0,0> 
+      } // end of prism --------------------------------------------------------

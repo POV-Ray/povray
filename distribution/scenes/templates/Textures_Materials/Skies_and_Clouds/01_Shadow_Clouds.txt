@@ -1,0 +1,4 @@
+         texture { Shadow_Clouds 
+                   finish { phong 1 } 
+                   scale 0.25 
+                 } // end of texture 

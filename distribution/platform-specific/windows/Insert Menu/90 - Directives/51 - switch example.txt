@@ -1,0 +1,27 @@
+// Let's make some constant names
+#declare CS_Medium = 1;
+#declare CS_Hard = 3;
+#declare CS_Easy = 5;
+
+// Let the user choose the method to use
+#declare Complexity_Switch = CS_Medium; // or CS_Easy or CS_Hard
+
+// Do something dependent on the user's choice
+#switch (Complexity_Switch)
+
+  #case (CS_Easy)
+    // This statement is done if Complexity_Switch is CS_Easy
+    #declare MyShape = box { -<1, 1, 1>, <1, 1, 1> }
+  #break // End of this case section
+
+  #range (CS_Medium, CS_Hard)
+    // This statement is done if Complexity_Switch is CS_Medium
+    // or CS_Hard or anything in between
+    #declare MyShape = torus { 1, 0.5 }
+  #break // End of this range section
+
+  #else
+    // This statement is done if none of the above match
+    #declare MyShape = sphere { <0, 0, 0>, 1 }
+
+#end // End of switch statement

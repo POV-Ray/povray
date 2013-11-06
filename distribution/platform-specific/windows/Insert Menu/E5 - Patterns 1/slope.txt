@@ -1,0 +1,22 @@
+// pattern for use in texture/pigment
+// this pattern can only be used when applied to an object
+// value is influenced by the slope of the object
+  slope
+    y,              // direction vector for slope
+    //y,            // optional: dependency from altitude
+    //<0.5,1.0>,    // optional: range of slope values
+    //<0.75,1.0>    // optional: range of altitude values
+
+
+// alternativly (new in 3.7): 
+/* 
+slope { point_at <ReferencePoint> [, Lo_Slope, Hi_Slope] }
+  
+  (Note that this variant currently does *not* allow for the "altitude" keyword to be used.)
+	
+      The functionality is similar to MegaPOV's "aoi <ReferencePoint>" pattern, 
+      except that the values are reversed, i.e. range from 0.0 for surfaces 
+      facing away from the point in question, to 1.0 for surfaces facing towards 
+      that point; thus, "slope { <Vector> }" and "slope { point_at 
+      <Vector>*VeryLargeNumber }" have virtually the same effect.
+*/

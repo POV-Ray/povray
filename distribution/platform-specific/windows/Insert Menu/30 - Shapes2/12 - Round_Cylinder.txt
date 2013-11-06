@@ -1,0 +1,9 @@
+object { //Round_Cylinder(point A, point B, Radius, EdgeRadius, UseMerge)
+         Round_Cylinder(<0,0,0>, <0,1.5,0>, 0.50 ,       0.20,   0)  
+         
+         texture{ pigment{ color rgb<1,0.2,0.35> }
+                //normal { radial sine_wave frequency 30 scale 0.25 }
+                  finish { phong 1 }
+                }
+         scale<1,1,1>  rotate<0, 0,0> translate<0,0.00,0>
+       } // ---------------------------------------------------------

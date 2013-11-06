@@ -1,0 +1,12 @@
+//------------------------------------------------------------- 
+ texture{ pigment{ color rgb< 1, 0.80, 0.55>*0.8}
+          normal { pigment_pattern{ crackle turbulence 0.2
+                                    colour_map {[0.00, rgb 0]
+                                                [0.25, rgb 1]
+                                                [0.95, rgb 1]
+                                                [1.00, rgb 0]}
+                                    scale 0.15} 1}
+
+           finish  { phong 1 reflection 0.05 }
+         }// end of texture ----------------
+//------------------------------------------------------------ 

@@ -1,0 +1,10 @@
+// a point "spotlight" (conical directed) light source
+light_source { <3, 10, 0>          // position of the light 
+               color rgb<1,1,1>    // color of the light
+               spotlight           // kind of light source 
+               point_at <1,0,1>    // direction of spotlight
+               radius 8            // hotspot (inner, in degrees)
+               tightness 150       // tightness of falloff (1...100) 
+                                   // lower is softer, higher is tighter
+               falloff 15          // intensity falloff radius (outer, in degrees)
+             } //-------------- end of spotlight --------------------------------------

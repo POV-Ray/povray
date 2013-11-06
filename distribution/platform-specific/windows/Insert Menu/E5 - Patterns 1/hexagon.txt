@@ -1,0 +1,7 @@
+// solid pattern for use in texture/pigment/normal(/density)
+// create a hexagonal pattern texture with 3 colors
+// hexagons are in the X-Z plane, extending infinitely in Y plane
+  hexagon
+    color blue 1,
+    color red 1,
+    color green 1

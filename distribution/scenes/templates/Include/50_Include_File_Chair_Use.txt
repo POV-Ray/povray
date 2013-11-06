@@ -1,0 +1,131 @@
+// POV-Ray 3.7 Scene File "Include_File_Chair_Use.pov"
+// Author: Friedrich A, Lohmueller, March-2010
+// Demo of an macro object include file
+// Save this file as "Chair_Use.pov" in the same director like "Chair.inc"
+// if "Chair.inc" is not in any of your POV-Ray library paths
+//  (i.e. "user/documents/POV-Ray/v3.7/include/")
+//------------------------------------------------------------------------
+#version 3.7;
+global_settings{ assumed_gamma 1.0 }
+#default{ finish{ ambient 0.1 diffuse 0.9 }}
+//------------------------------------------------------------------------
+#include "colors.inc"
+#include "textures.inc"
+#include "glass.inc"
+#include "metals.inc"
+#include "golds.inc"
+#include "stones.inc"
+#include "woods.inc"
+#include "shapes.inc"
+#include "shapes2.inc"
+#include "functions.inc"
+#include "math.inc"
+#include "transforms.inc"
+//------------------------------------------------------------------------
+#declare Camera_0 = camera {/*ultra_wide_angle*/ angle 15      // front view
+                            location  <0.0 , 1.0 ,-40.0>
+                            right     x*image_width/image_height
+                            look_at   <0.0 , 1.0 , 0.0>}
+#declare Camera_1 = camera {/*ultra_wide_angle*/ angle 10   // diagonal view
+                            location  <10.0 , 10.0 ,-10.0>
+                            right     x*image_width/image_height
+                            look_at   <0.0 , 0.5 , 0.0>}
+#declare Camera_2 = camera {/*ultra_wide_angle*/ angle 90  //right side view
+                            location  <3.0 , 1.0 , 0.0>
+                            right     x*image_width/image_height
+                            look_at   <0.0 , 1.0 , 0.0>}
+#declare Camera_3 = camera {/*ultra_wide_angle*/ angle 90        // top view
+                            location  <0.0 , 3.0 ,-0.001>
+                            right     x*image_width/image_height
+                            look_at   <0.0 , 1.0 , 0.0>}
+camera{Camera_1}
+//------------------------------------------------------------------------
+// sun -------------------------------------------------------------------
+light_source{<500,2500,-2500> color White}
+// sky -------------------------------------------------------------------
+sky_sphere{ pigment{ gradient <0,1,0>
+                     color_map{ [0   color rgb<1,1,1>         ]//White
+                                [0.4 color rgb<0.14,0.14,0.56>]//~Navy
+                                [0.6 color rgb<0.14,0.14,0.56>]//~Navy
+                                [1.0 color rgb<1,1,1>         ]//White
+                              }
+                     scale 2 }
+           } // end of sky_sphere
+//------------------------------------------------------------------------
+
+// ground -----------------------------------------------------------------
+//---------------------------------<<< settings of squared plane dimensions
+#declare RasterScale = 0.3;
+#declare RasterHalfLine  = 0.035;
+#declare RasterHalfLineZ = 0.035;
+//-------------------------------------------------------------------------
+#macro Raster(RScale, HLine)
+       pigment{ gradient x scale RScale
+                color_map{[0.000   color rgbt<1,1,1,0>*0.3]
+                          [0+HLine color rgbt<1,1,1,0>*0.3]
+                          [0+HLine color rgbt<1,1,1,1>]
+                          [1-HLine color rgbt<1,1,1,1>]
+                          [1-HLine color rgbt<1,1,1,0>*0.3]
+                          [1.000   color rgbt<1,1,1,0>*0.3]} }
+ #end// of Raster(RScale, HLine)-macro
+//-------------------------------------------------------------------------
+
+
+box { <-2,-0.1,-1.5>,<1.5,0,2>     // plane with layered textures
+        texture { pigment{color White*1.1}}
+        texture { Raster(RasterScale,RasterHalfLine ) rotate<0,0,0> }
+        texture { Raster(RasterScale,RasterHalfLineZ) rotate<0,90,0>}
+        rotate<0,0,0>
+      }
+//------------------------------------------------ end of squared plane XZ
+
+//--------------------------------------------------------------------------
+//---------------------------- objects in scene ----------------------------
+//--------------------------------------------------------------------------
+//-------------------------------------------------------------------- optional textures
+/*
+#declare Seat_Texture =
+         texture { pigment{ color rgb< 0.8, 0.60, 0.45>*0.7  }
+                // normal { bumps 0.5 scale 0.05 }
+                   finish { phong 1 }
+                 } // end of texture
+#declare Chair_Texture =
+         texture { pigment{ color rgb< 0.75, 0.5, 0.30>*0.30 }
+                // normal { bumps 0.5 scale 0.05 }
+                   finish { phong 1 }
+                 } // end of texture
+*/
+// path/name of include file "Chair.inc"
+#include "Chair.inc" // if this include file is in the same directory like this scene file!
+
+      //Chair( seat h, chair width, backrest h, feet d)
+object{ Chair( 0.45, 0.45, 0.90, 0.04 )
+        rotate<0,-70,0>
+        translate<-1,0, 0.1>
+      }
+object{ Chair( 0.45, 0.45, 0.90, 0.04 )
+        rotate<0,-20,0>
+        translate<-0.5,0, 0.8>
+      }
+// redefine textures:
+#declare Seat_Texture =
+         texture { pigment{ color rgb< 0.75, 0.5, 0.30>*0.30 }
+                // normal { bumps 0.5 scale 0.05 }
+                   finish { phong 1 }
+                 } // end of texture
+#declare Chair_Texture =
+         texture { pigment{ color rgb< 0.8, 0.60, 0.45>*0.7  }
+                // normal { bumps 0.5 scale 0.05 }
+                   finish { phong 1 }
+                 } // end of texture
+
+object{ Chair( 0.45, 0.45, 0.90, 0.04 )
+        rotate<0, 20,0>
+        translate<0.75,0, 0.2>
+      }
+
+object{ Chair( 0.45, 0.45, 0.90, 0.04 )
+        rotate<0, -160,0>
+        translate<-0.45,0,-1.0>
+      }
+//--------------------------------------------------------------------------

@@ -1,0 +1,2 @@
+// used in global_settings, sets how many instances of waves/ripples to use
+global_settings{ number_of_waves 10 } 

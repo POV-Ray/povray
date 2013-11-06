@@ -1,0 +1,23 @@
+lathe{  // rotates a 2-D outline of points around the Y axis to create a 3-D shape
+  cubic_spline // linear_spline | quadratic_spline | cubic_spline   
+  9,           // number of points,
+  <0.870,0.571>,  // list of <x,y> points,
+  <1.325,0.623>,
+  <1.579,0.404>,
+  <1.412,0.069>,
+  <0.709,0.011>,
+  <0.593,0.236>,
+  <0.853,0.357>,
+  <1.124,0.184>,
+  <1.274,0.149>
+
+  rotate <0,0, 0>
+  // sturm
+  texture { Brass_Metal
+            pigment{ color rgb<0.98,0.86,0.4>} 
+             finish { phong 1 reflection 0.2}
+          } // end of texture
+  scale<1,1,1>*0.20
+  rotate<0,0,0> 
+  translate<0,0,0>
+ } // ----------------------------------------------- end of lathe object

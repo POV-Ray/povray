@@ -1,0 +1,30 @@
+/* various string operations
+asc(S1)          // Convert 1st character of S1 to ASCII value
+chr(A)           // Convert extended ASCII value A to a 1 character string
+concat(S1,S2)    // combine S1 and S2 into one long string
+file_exists(S1)  // Search current and include directories for existence of file S1 (0 or 1)
+str(A,L,P)       // Convert float A to string, at least L characters long,
+                 // with P digits after the decimal point (if P is -1, make max)
+strcmp(S1,S2)    // compare S1 to S2, return -1, 0, or +1 if S2 is <, =, > than S1
+strlen(S1)       // Returns # of characters in string S1
+strlwr(S1)       // Lower case of S1
+substr(S1,P,L)   // Sub-string from S1, start at position P for length L
+strupr(S1)       // Upper case of S1
+val(S1)          // Convert string S1 to float
+file_exists(S1)  // returns 1 if file S1 is found in library path
+*/
+/*
+// some special control characters that can be used within strings
+  "\a" Bell or alarm, 0x07
+  "\b" Backspace, 0x08
+  "\f" Form feed, 0x0C
+  "\n" New line (line feed) 0x0A
+  "\r" Carriage return 0x0D
+  "\t" Horizontal tab 0x09
+  "\uNNNN"  Unicode character code NNNN  0xNNNN  
+  "\v" Vertical tab 0x0B
+  "\0" Null 0x00
+  "\\" Backslash 0x5C
+  "\'" Single quote 0x27
+  "\""  Double quote  0x22  
+*/

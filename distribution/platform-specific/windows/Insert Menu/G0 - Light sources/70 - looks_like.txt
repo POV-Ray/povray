@@ -1,0 +1,3 @@
+// light_source { ...
+  // put this inside a light_source to give it a visible appearance
+  looks_like { sphere { 0*x, 5 pigment { Yellow } } }

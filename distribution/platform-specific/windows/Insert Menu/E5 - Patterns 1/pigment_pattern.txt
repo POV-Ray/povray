@@ -1,0 +1,5 @@
+// pattern for use in texture/pigment/normal/density
+// takes the color of an pigment to calculate the pattern value
+   pigment_pattern {
+     checker White, Black   // can use any pigment here
+   }

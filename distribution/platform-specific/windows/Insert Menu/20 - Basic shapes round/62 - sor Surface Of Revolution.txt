@@ -1,0 +1,19 @@
+///sor Surface of Revolution 
+sor{
+  7,
+  <0.306,-0.140>,
+  <0.605,-0.030>,
+  <0.688, 0.341>,
+  <0.313, 0.547>,
+  <0.165, 0.894>,
+  <0.265, 1.000>,
+  <0.748, 1.215>
+
+  //  sturm  // optional!
+     texture { pigment{ color rgb<0.6,0.5,1>}
+               // normal { bumps 0.75 scale 0.010}
+               finish { phong 1}
+             } // end of texture 
+     scale 1.0  rotate<0,0,0> translate<0,0,0>
+   } // end of sor ---------------------------------- 
+

@@ -1,0 +1,7 @@
+fog{ fog_type   2
+     distance   10
+     color      White *0.8 
+     fog_offset 0.1
+     fog_alt    1.5
+     turbulence 1.8
+   } //----------------

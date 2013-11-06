@@ -1,0 +1,434 @@
+<html>
+<head>
+<title>Building the POV-Ray for Windows source</title>
+<style type="text/css">
+  body { background-color: #ffffee; }
+  p { font-family: Helvetica, Arial, sans-serif ; margin-top: 0.5em ; margin-bottom: 0.3em; text-align: justify; padding-left: 10px; }
+  pre { font-family: Lucida Console, Monaco, Courier, monospace ; padding-left: 10px; }
+  code { color: #0000a0; font-size: 0.9em; }
+  h1,h2,h3,h4,h5,h6 { font-family: Helvetica, Arial, sans-serif ; margin-top: 0.5em ; margin-bottom: 0.5em; color: #2040c0 }
+  h2 { background: #c6d4df; color: black; text-align: center; font-size: 1.25em; color: #103080; border: 1px solid; }
+  h3 { background: #d6e4ef; color: black; font-weight: bold; padding:0px 10px; }
+  h4 { padding-left: 10px; }
+  ul,ol,dl { font-family: Helvetica, Arial, sans-serif ; margin-top: 0.1em ; margin-bottom: 0.1em }
+  .Highlighted { background: #ffff00; }
+  .Main { width: 800px; }
+  .Note { font-size: 0.8em; font-family: "Lucida Console,Lucida Sans Typewriter" ;color: #000000 ; background-color: #d6f4e0 ; border: 1px solid ; border-color: #cfdbe5 ; padding: 3pt; margin-top: 5px; margin-bottom: 5px; margin-left: 10px; text-align: justify; }
+  .Quick { background-color: #d6f4e0 ; border: 1px solid ; border-color: #cfdbe5 ; padding: 3pt; margin-top: 5px; margin-bottom: 5px; margin-left: 10px; text-align: justify; }
+  .Header { width: 800px; background: white; color: black; text-align: left; border: 1px solid; }
+  .Header p { padding-right: 1em }
+</style>
+</head>
+<body>
+
+<div class="Header">
+<p>
+Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.<br>
+Copyright 1991-2013 Persistence of Vision Raytracer Pty. Ltd.
+</p>
+
+<p>
+POV-Ray is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+</p>
+ 
+<p>
+POV-Ray is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+</p>
+
+<p>
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>
+</p>
+</div>
+<br>
+<div class="Header">
+<pre><code>$File: //depot/public/povray/3.x/windows/readme.html $
+$Revision: #1 $
+$Change: 6069 $
+$DateTime: 2013/11/06 11:59:40 $
+$Author: chrisc $
+</code></pre>
+</div>
+
+<div class="Main">
+
+<h2>Building the POV-Ray for Windows source</h2>
+
+
+<h3>About this document</h3>
+
+<p>
+This document does not attempt to explain how POV-Ray works or how to make 
+modifications to it. Some of the internals of POV-Ray are highly complex; if 
+you wish to gain a better understanding of that topic, please follow the link 
+provided on the source code page mentioned below. This document is intended 
+only to assist you in getting the POV-Ray source code built using an 
+officially supported compiler on Win32 or Win64. Furthermore, no attempt is 
+made to cover advanced subjects such as profile-guided optimization (though we 
+will point out that the latter is definitely worthwhile, if you have the time 
+and patience).
+</p>
+
+<h3>Assistance</h3>
+
+<p>
+Please use our support groups at <a href="http://news.povray.org/" target="new">http://news.povray.org/</a> or
+<a href="news://news.povray.org/" target="new">news://news.povray.org/</a>. These groups provide the best means for support with 
+relation to this subject.
+</p>
+
+<h2>Compilers</h2>
+
+<h3>Visual Studio 2010 and 2012</h3>
+
+<p>
+Currently the only officially supported means of building the Windows version
+of POV-Ray is via the provided Visual Studio 2010 project (you can also use it
+with VS 2012) with a full version of Visual Studio and the compilers provided
+with it or with the platform SDK.
+</p>
+<p>
+The Visual Studio 2010 project is located in the "windows/vs10" subdirectory.
+</p>
+
+<h3>Earlier Versions of Visual Studio</h3>
+
+<p>
+Note that versions of Visual Studio prior to 8.0 (VS 2005) are not supported at 
+all and furthermore <b>will not work</b>. The code in POV-Ray 3.7 requires a
+reasonably up-to-date C++ compiler and STL, and earlier versions of VC++ are
+not compatible. VS 2005 <i>may</i> work but as it is not used or tested against
+we do not recommend it. VS2008 <i>should</i> work as it was used for a portion
+of the development process of POV 3.7. In either case you will need to generate
+suitable project files, which is not as simple as just dropping all the source
+files into a new project and hitting F7. Please closely study the options applied
+to each project in the VS2010 solution if you wish to try to backport the projects.
+</p>
+
+<h3>Visual Studio Express</h3>
+
+<p>
+The express editions have been reported to work in building 32-bit executables
+but this is not officially supported by us. The following information relates to
+building with an express edition as of the last time we looked into it; things may have
+changed with later releases (e.g. VS2012) so please take this into account when
+reading the below.
+</p>
+
+<p>
+At the minimum, you will need to download and install the Platform SDK as this
+is not supplied with VS Express. It has also been reported that to obtain the
+shlwapi.h header file (which provides functions such as <code>GetDLLVersion</code> etc), you
+will need to allow the SDK setup to install the "Microsoft Web Workshop Build
+Environment".
+</p>
+
+<p>
+That said, we will - time permitting - endeavour to assist express edition users
+in building 32-bit versions of POV-Ray, but make no promises. We do not recommend
+that express edition users attempt to build a 64-bit executable as the requisite
+compilers are not supplied with VSE (at least, not as of VS2010).
+</p>
+
+<h2>Including the Editor Support DLL (cmedit) in the Build</h2>
+
+<p class="Note">
+It is not necessary to build the editor support DLL (cmedit), as it is loaded via
+<code>LoadLibrary()</code> and thus no import library is required. You can just
+use the DLL's included with the official version 3.7 binary distribution. If
+however you do wish to build it, either enable it in the configuration manager
+or initiate a build of that specific project manually.
+</p>
+
+<p>
+cmedit acts as an interface between POVWIN and the full editor DLL (povcmax),
+which is supplied as a binary with the official POV-Ray for Windows distribution.
+The source code for povcmax is based on the codemax code editor and is not part
+of the AGPL3 POV-Ray source distribution. If you wish to know more about the
+editors, please refer to the "about the editor DLL's" section below.
+</p>
+
+<p>
+<b>Note:</b> The editor DLL's are <i>not</i> required for POVWIN to work. If
+they are not present or cannot be loaded, POVWIN is designed to be able to
+function quite happily without them. The editor and its related functions
+will simply not be present.
+</p>
+
+<h2>Build Steps</h2>
+
+<ol>
+<li>
+<p>
+Make sure you have a working copy of the appropriate release binary
+installed. This ensures that the appropriate registry settings and
+support files are present. If you don't do this, your compiled code will
+probably not work on your machine.
+</p>
+</li>
+
+<a name="build">
+<li>
+<p>
+Open <code>windows\vs10\povray.sln</code> in Visual Studio 2010/2012. Set 'Windows
+Targets &gt; GUI' as the start-up project if it is not already selected.
+Then,  select the 'Generic POV-Ray &gt; povbackend' project and expand
+'Backend Headers', then open the file <code>'povray.h'</code> listed within it. Please
+set <code>DISTRIBUTION_MESSAGE_2</code> to your real name to make
+unofficial versions distinguishable from each other. Remove the <code>#error</code>
+directive afterwards to proceed with the build. Note that if you do not 
+do this you will get compile errors.
+</p>
+
+<p>
+By default, the GUI project is built, and the Console project is excluded. If you
+wish to generate a simple console version of POV-Ray, please modify the configuration
+as needed, edit vfe\win\syspovconfig.h to enable the definition of _CONSOLE as noted
+therein, and build.
+</p>
+
+<p class="note">
+<b>Note:</b> The windows console project is intended to be a simple example of
+how to use the VFE library to make a console version of POV-Ray with <i>minimal code</i>.
+It is <b><i>not</i></b> intended to be a fully-featured console build of POV. If
+you wish to make a more comprehensive console version that runs on windows, please
+use the unix version as a guide - it uses the same principles (as it is also linked
+with VFE) but has more features.
+</p>
+</li>
+
+<li>
+<p>
+Once you have taken whatever steps are needed as set out above, select
+your  desired build (e.g. Win32 release - anything except SSE2|x64), hit
+F7, and wait. We recommend that you read the rest of this document while
+you are waiting.
+</p>
+
+<p>
+If all goes well, you should end up with the POV-Ray for Windows
+executable. All 32-bit  binaries should end up in <code>windows\vs10\bin32</code>, and
+the 64-bit ones should be in <code>windows\vs10\bin64</code>.
+</p>
+
+<p>
+Note: if you are building a DEBUG version of POV-Ray, be aware that the 
+executable will attempt to load the debug version of POV-Ray's editor
+DLLs. In this case, if you want the editor to be available in the GUI,
+copy the standard editor DLLs that come with the official POV-Ray 3.7
+distribution to their debug equivalent names (e.g. copy <code>cmedit32.dll</code> to
+<code>cmedit32d.dll</code>, etc).
+</p>
+
+<p>
+Note that the copied <code>cmedit32.dll</code> will still attempt to load
+<code>povcmax32.dll</code> (i.e. the non-debug version), so it's not necessary to
+copy <code>povcmax32.dll</code> to its debug equivalent. The same goes for
+<code>povcmax64.dll</code>.
+</p>
+</li>
+</ol>
+
+<p>
+NB you should never attempt to build the 'x64 SSE2' configuration (if it
+is present): apart from  the fact that this is by default excluded from
+the build in the configuration  manager, it simply won't work. The only
+reason it is there at all is that Visual Studio insists on cloning the
+Win32 SSE2 project every time it updates the solution file, no matter how 
+hard we try to get rid of it. SSE2 is always enabled for x64 targets (it
+can't be turned off as it's a standard feature of all x64 CPU's) and thus
+the x64 release project is all that is needed.
+</p>
+
+<p>
+Please read the rest of this document while you're waiting for your
+compile to finish, particularly the 'other things you may want to keep in mind'
+at the end.
+</p>
+
+<h2>About the Editor DLL's</h2>
+
+<p>
+You really don't need to worry about any of the following section unless you 
+want to do editor hacking ; the DLL's provided with the POV-Ray for Windows 
+binaries are sufficient, and therefore you don't need to compile them at all
+if you don't want to.
+</p>
+
+<p>
+The editor used in POV-Ray for Windows is based around a custom control called 
+CodeMax, supplied courtesy of Barry Allyn. Our implementation consists of two
+DLL's: <code>cmedit32.dll</code> and <code>povcmax32.dll</code> (in this case, as for the rest of the 
+instructions, we will refer to the 32-bit versions; if building for Win64 then 
+just replace the '32' with '64'). If you are building debug versions, the DLL's 
+will be suffixed with a 'd' (for example, <code>'cmedit32d.dll'</code>).
+</p>
+
+<p>
+The editor control itself is <code>povcmax32.dll</code>. The source for povcmax
+is not distributed with the AGPL3 version of POV-Ray. If you do wish to obtain
+this source it may be found in prior releases (such as the version 3.7 release
+candidates, which were not AGPL licensed). Please note however that codemax is
+NOT AGPL and was only included with POV-Ray under the terms of the former
+POV-Ray license.
+</p>
+
+<p>
+The other DLL, <code>cmedit32</code>, consists of support code that wraps and
+enhances povcmax, and provides services such as file I/O, menus, state storage/restore,
+and many other things. This DLL is built by the 'cmedit' project (which is by default
+disabled via configuration manager).
+</p>
+
+<p>
+For reference, while most of the POV-Ray-specific customization is done within 
+cmedit, there are some POV-Ray specific modifications made to codemax itself, 
+particularly with respect to the code completion support. However, for the most
+part, if you are intending to modify some aspect of the POV-Ray interface to
+the editor, you will find you will want to modify the contents of the cmedit 
+project (or, possibly, pvedit.cpp in the windows directory - this implements 
+the API between the POV-Ray executable and <code>cmedit32.dll</code>). Note that if you
+alter this API at all, you must change the editor version (<code>EDITDLLVERSION</code> in
+<code>windows\pvedit.h</code>).
+</p>
+
+<p>
+By default, POV-Ray 3.7 will attempt to load the editor DLL's from the directory in
+which the EXE resides first. (The previous strategy was to look in the current working
+directory first; POV-Ray no longer checks the CWD, though you can force that behaviour
+if you wish by using the switch mentioned below).
+</p>
+
+<p>
+If a DLL with the right name is found with the EXE it will be used; otherwise,
+the default binary directory is used. If you are not sure where it's looking,
+create the directory <code>c:\temp</code> if it does not already exist and then
+run <code>pvengine</code> with the <code>/debug</code> switch. Once it has loaded
+have a look at <code>c:\temp\povdebug.txt</code>, which will list the search paths attempted.
+</p>
+
+<p>
+There is a switch available on the command-line which can alter the search 
+path. If you specify <code>/EDITDLLPATH</code> on the command-line and follow it with a 
+path, that path will be the only one checked. To force POV-Ray to look in the 
+current directory (i.e. the one the EXE is launched from, which may not be the 
+one the EXE is stored in), you can pass <code>"."</code> as the edit DLL path.
+</p>
+
+<p>
+<b>Note       :</b> currently POV-Ray for Windows has no way of differentiating the official 
+editor DLL's from custom ones. We may at a future point provide a means for 
+unofficial DLL's to be loaded by the official PVENGINE binary. In the meantime,
+if you want to make absolutely sure that your unofficial binary doesn't load 
+the official DLL's, and vice-versa, you can rename the DLL's. Doing this 
+requires you to tell the EXE of course - to do this, open <code>windows\pvengine.h</code> 
+and look for where <code>EDITDLLNAME</code> is defined. Just change that to suit, re-compile,
+and rename the DLL's manually (or change the project to output different names).
+</p>
+
+<h2>Other Things you May Want to Keep in Mind</h2>
+
+<h3>Other Compilers</h3>
+
+<p>
+If porting POV-Ray for Windows to another compiler, or even if you're just 
+writing a makefile for the Visual Studio version, be aware that there is 
+some special configuration in the project settings. The most critical one to 
+replicate is the entry point - POVWIN uses a custom entry point, and unless you 
+adjust the code, it is essential this is called prior to the C run-time library 
+startup code. It's also highly likely that you will need to change the code 
+that calls the RTL from within POV-Ray as well, unless you are using the 
+Microsoft RTL (or a compatible one).
+</p>
+
+<h3>Custom Entry Point</h3>
+
+<p>
+Currently, the entry point is <code>POVWINStartup</code>, which is declared in <code>pvmem.cpp</code>.
+We use this to set up a private heap prior to any memory allocation occurring
+(including even allocations done to construct any global or static classes).
+If <code>WIN_MEM_TRACKING</code> is defined (which it is by default), <code>pvmem.cpp</code> replaces
+the standard <code>new</code>, <code>new[]</code>, <code>delete</code>, and <code>delete[]</code> operators with its own ones.
+</p>
+
+<h3>Memory Tracking and Debugging</h3>
+
+<p>
+Apart from tracking the amount of memory used and freed, the above tracking 
+code, when <code>_DEBUG</code> is defined, will also provide a custom wrapper around each 
+memory block which records where the new or malloc occurred. By default, <code>_DEBUG</code> 
+also causes <code>EXTRA_VALIDATION</code> to be defined. When this is present, each block 
+allocated has, in addition to the standard extra fields added to the start,
+a single field of length <code>sizeof(ptrdiff_t)</code> added to the <i>end</i> of the block.
+This is then initialized with a simple hash made up from various aspects of
+the block, including its address, length, and the source line it was allocated
+from. This is able to be checked at any time using the <code>Validate()</code> method to see 
+if it has been altered since the block was allocated (e.g. by an overrun).
+</p>
+
+<p>
+Additionally, while it has not yet been implemented, the memory hooks give 
+us the opportunity to provide access to a low-fragmentation heap or other useful 
+memory allocation techniques (e.g. handling allocations differently during 
+renders, if we want) for the purpose of improving performance.
+</p>
+
+<h2>The VFE Library</h2>
+
+<p>
+The VFE library included with the source acts as a wrapper for the communications
+system ('POVMS') that connects the POV-Ray front and backend code (which are logically
+separate, and may even be on separate computers). POVMS is a message-passing system
+that is platform-neutral, thus allowing the backend to run on a different architecture
+than the frontend.
+</p>
+
+<p>
+VFE provides a worker thread and various abstractions that handle most of the work
+of hooking a frontend up to the backend, even to the point where a frontend may be
+transient or stateless (i.e. HTTP, hence the term 'virtual'). The Windows and Unix
+versions of POV-Ray use VFE to connect the frontend to the backend.
+</p>
+
+<p>
+If you wish to integrate POV-Ray into your own software (subject of course to the
+terms of the AGPL3), it is strongly recommended that you first study the source
+of povconsole.cpp, which implements a minimal example of how to setup and run a
+render. A more comprehensive example of console integration is in the unix support
+code, and for a GUI version, the windows support code should be read.
+</p>
+
+<p>
+In either case, be sure to read through <a href="../vfe/vfesession.h">vfesession.h</a>; it is heavily
+commented and is intended to be the primary reference to the API.
+</p>
+
+<p>
+If you have issues with getting VFE to work with your own custom frontend,
+please visit our support forums and ask about it: if there are any bugs or
+shortcomings we would like to fix them. We will also try to offer general
+assistance where possible, subject to time limitations.
+</p>
+
+<p>
+If your project is commercial and you wish to have dedicated support, some of
+the POV-Ray developers may be available for contract work, depending on the
+circumstance. Please contact us for more information.
+</p>
+
+<h2>Thanks</h2>
+
+<p>
+The POV-Team would like to thank all those who have assisted in bringing
+POV-Ray 3.7 and its predecessors to the public - you know who you are, and we 
+salute you.
+</p>
+</div>
+</body>
+</html>

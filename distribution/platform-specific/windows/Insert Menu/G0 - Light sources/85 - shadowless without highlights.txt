@@ -1,0 +1,3 @@
+// light_source { ...
+  // put this inside a light_source to make a shadowless light without highlights
+  shadowless

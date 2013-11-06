@@ -1,0 +1,16 @@
+// object/texture/etc. transformation
+// do a predeclared translate/rotate/scale combo
+// e.g.:
+#declare Leaf_Orientation =
+transform {
+  scale 4.0
+  rotate 30*z
+  translate 2*y
+}
+
+transform {
+  Leaf_Orientation    // transform an object
+  //scale 0.5
+  //rotate 45*x
+  //transform {...}   // optional further transforms
+}

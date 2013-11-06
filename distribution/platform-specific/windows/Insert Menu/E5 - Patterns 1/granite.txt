@@ -1,0 +1,3 @@
+// pattern for use in texture/pigment/normal/density
+  granite        // create a granite-like texture
+  //granite 0.5  // for use with normal{} (0...1 or more)

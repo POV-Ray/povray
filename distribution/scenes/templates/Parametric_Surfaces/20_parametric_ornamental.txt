@@ -1,0 +1,20 @@
+// Parametric in a kind of ornamental shape
+
+parametric {
+// (4) or maybe... ?? (can be very slow and inaccurate)
+  function{ sin(v)*sin(u)*pow(cos(v), 3) },     // x-axis
+  function{ cos(u)*pow(sin(v), 2) },            // y-axis
+  function{ sin(v)*cos(u)*pow(cos(v), 3) }      // z-axis
+  <0,0>, <5,5>
+  contained_by { box { <-0.5,-1,-0.5>, <0.5,1,0.5> } }
+ // max_gradient 2
+  accuracy 0.01 // 0.001 default, lower slower but better
+  precompute 10 x,y,z // precompute normally gives faster rendering (<=20) but longer parsing
+
+  scale 1.5 rotate -90*x
+  texture{ pigment{ color rgb<1,1,1> } 
+            
+         } 
+  translate<0,0,0>
+}
+

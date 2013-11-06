@@ -1,0 +1,17 @@
+#declare Strength = 1.0; //(+ or -) strength of component's radiating density
+#declare Radius1  = 0.25; //(0 < Radius) outer sphere of influence on other components
+blob{
+  threshold 0.6 // threshold (0.0 < threshold <= Strength) surface falloff threshold #
+  cylinder{<-1.00, 0.00, 0.00>,< 1.00, 0.00, 0.00>, Radius1, Strength}
+  cylinder{< 0.00,-1.00, 0.00>,< 0.00, 1.00, 0.00>, Radius1, Strength}
+  cylinder{< 0.00, 0.00,-1.50>,< 0.00, 0.00, 1.50>, Radius1, Strength}
+  //sphere{< 1.35, 0.00, 0.00>, Radius1*2, Strength}
+  // sturm 
+  scale 1
+  rotate<-45,45,0>
+  translate<0,1.20,0>
+  texture{ pigment{ color Red }
+           finish { phong 1 } 
+
+         }
+ } //------------------------------------------------------ end of blob object             

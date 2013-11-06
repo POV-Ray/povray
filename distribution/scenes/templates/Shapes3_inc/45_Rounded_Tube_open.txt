@@ -1,0 +1,18 @@
+//---------------------------------------------------------------------------- 
+#include "shapes3.inc"
+//----------------------------------------------------------------------------
+object{ Rounded_Tube( 1.50, // tube radius outside
+                      0.80, // tube inner radius 
+                      0.10, // border radius 
+                      0.70, // tube high
+                      0, // 0 = union, 1 = merge for transparent materials 
+                    ) //------------------------------------------------------  
+        texture{ pigment{ color rgbt<1 ,1,1,0.5> } 
+              // normal { bumps 0.5 scale 0.005 } 
+                 finish { phong 1}                               
+               } // end texture
+        scale <1,1,1> 
+        rotate<0,0,0> 
+        translate<0,0,0>
+      } // end of object -----------------------------------------------------
+//----------------------------------------------------------------------------

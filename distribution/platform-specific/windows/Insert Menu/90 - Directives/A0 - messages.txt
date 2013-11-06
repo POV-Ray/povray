@@ -1,0 +1,4 @@
+// display user defined messages in the Povray output
+  #debug      "During scene parsing, general info message"
+  #warning    "During scene parsing"
+

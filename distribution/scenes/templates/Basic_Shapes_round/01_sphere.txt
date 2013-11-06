@@ -1,0 +1,8 @@
+sphere{ <0,0,0>, 0.50 
+
+        texture { pigment{ color rgb<1.00, 0.55, 0.00>}
+                  finish { phong 1.0 reflection 0.00}
+                } // end of texture
+
+        scale<1,1,1>  rotate<0,0,0>  translate<0,0,0>  
+      } // end of sphere ----------------------------------- 

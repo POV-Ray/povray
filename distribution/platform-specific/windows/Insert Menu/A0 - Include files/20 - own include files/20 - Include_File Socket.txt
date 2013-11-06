@@ -1,0 +1,96 @@
+// POV-Ray 3.7 include file "Socket.inc"
+// author, date:  Friedrich A. Lohmueller, May-2010
+//---------------------------------------------------------------------------------------
+//#ifndef( Socket_Inc_Temp)
+//#declare Socket_Inc_Temp = version;
+//#version 3.7;
+// commented out = 
+// allowed to be re-declared with other textures by reloading this include file!
+//---------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------
+#ifndef(  Colors_Inc_Temp)
+#include "colors.inc"
+#end
+#ifndef(  Textures_Inc_Temp)
+#include "textures.inc"
+#end
+//----------------------------------------------------
+//----------------------------------------------------
+#ifndef( Socket_Tex_1 )
+#declare Socket_Tex_1 =  // sphere
+//texture{ pigment{color rgb<1,0,0>}
+texture{ Chrome_Metal  
+         normal { bumps 0.85 scale 0.01 } 
+         finish { phong 0.5 } 
+       }
+#end 
+#ifndef( Socket_Tex_2 )
+#declare Socket_Tex_2 =  // box 
+//texture{ pigment{color rgb<1,0.65,0>}
+texture{ pigment{color rgb<1,1,1>*0.7}
+         finish { phong 1 } 
+       }
+#end 
+#ifndef( Socket_Tex_3 )
+// texture{ pigment{color rgb<0.5,1,0> }
+#declare Socket_Tex_3 =  // cylinders
+texture{ Chrome_Metal
+         finish { phong 1 } 
+       }
+#end 
+//----------------------------------------------------
+//--------------------------------------------------------------------///////////////////
+//------------------------------------------------------------------------- object Socket
+#declare Socket = 
+
+intersection{ 
+
+ box{<-0.5,-0.5,-0.5>,<0.5,0.5,0.5> texture{ Socket_Tex_2 } }
+ sphere{<0,0,0>,0.66                texture{ Socket_Tex_1 } }
+
+ cylinder{<0,0,-1>,<0,0,1>,0.3 inverse texture{ Socket_Tex_3 }}
+ cylinder{<0,-1,0>,<0,1,0>,0.3 inverse texture{ Socket_Tex_3 }}
+ cylinder{<-1,0,0>,<1,0,0>,0.3 inverse texture{ Socket_Tex_3 }}
+
+} // end intersection ---------------------------------------------- end of object Socket
+//--------------------------------------------------------------------///////////////////
+
+
+
+
+//---------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------
+// example:
+/*
+//------------------------------------------------------------------- optional textures
+#declare Socket_Tex_1 =  // sphere
+texture{ Chrome_Metal  
+         finish { phong 0.5 } 
+       }
+#declare Socket_Tex_2 =  // box 
+//texture{ pigment{color rgb<1,0.65,0>}
+texture{ Polished_Chrome pigment{color rgb<1,0.80,0.30>}
+         finish { phong 1 } 
+       }
+#declare Socket_Tex_3 =  // cylinders
+texture{ Polished_Chrome
+         finish { phong 1 } 
+       }
+//-------------------------------------------------------------------------------------//
+#include "Socket.inc"
+//-------------------------------------------------------------------------------------//
+object{ Socket 
+        scale <1,1,1>*1
+        rotate<0,0,0>
+        translate<0.00,0.00, 0.00>
+      } //------------------------
+//-------------------------------------------------------------------------------------//
+//---------------------------------------------------------------------------------------
+*/
+
+//#version Socket_Inc_Temp;
+//#end
+// commented out = 
+// allowed to be re-declared with other textures by reloading this include file!
+//------------------------------------------------------------------- end of include file

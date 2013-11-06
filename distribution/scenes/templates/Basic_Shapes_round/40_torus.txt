@@ -1,0 +1,6 @@
+torus { 1.0,0.25  rotate<0,0,0>
+        texture { pigment{ color rgbt<1,1,1,0.7>}
+                  finish { phong 1 reflection{ 0.00 metallic 0.00} } 
+                } // end of texture
+        scale <1,1,1> rotate<0,0,0> // translate<0,0.25,0>
+      } // end of torus  -------------------------------              

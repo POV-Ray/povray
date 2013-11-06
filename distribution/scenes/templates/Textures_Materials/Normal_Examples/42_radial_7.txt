@@ -1,0 +1,6 @@
+        texture{ pigment{ color rgb<0.40,0.30,0.85> }
+                 normal { radial sine_wave  frequency 18 scale 1.5
+                           turbulence 0.1}
+                 finish { phong 1 phong_size 10 reflection{ 0.1 }}
+                 rotate<90,0,0>
+               } // end of texture ---------------------------

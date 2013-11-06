@@ -1,0 +1,4 @@
+        texture{ pigment{ color rgb<1,0.4,0.0> }
+                 normal { bumps 0.45 scale 0.1 }
+                 finish { phong 1 phong_size 20 reflection{ 0.05 } }
+               } // end of texture

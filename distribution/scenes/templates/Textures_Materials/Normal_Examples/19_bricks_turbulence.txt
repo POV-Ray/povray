@@ -1,0 +1,8 @@
+       texture{ pigment{ color rgb<0.9,0.55,0.45> }
+                normal { pigment_pattern{
+                             brick color rgb 0.2, color rgb 0.8 
+                             scale 0.09  turbulence 0.9
+                           } // end pigment_pattern
+                         1} // end normal 
+               finish { specular 0.3 reflection{ 0.00 } }
+               } // end of texture

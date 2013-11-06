@@ -1,0 +1,18 @@
+isosurface { //-------------------------------------------------------------
+
+  function { f_heart( x,y,z,  -0.15 )
+           }
+
+  threshold 0.0
+  accuracy 0.0001
+  max_gradient 100
+  contained_by {box {<-1.1,-1.5,-1.1>,< 1.1,1.22,1.5>}}
+  //open
+  texture { pigment{ color rgb<1,0.7,0.1>}
+            //normal {bumps 0.5 scale 0.05}
+            finish { phong 1 specular 0.3 }
+	  }
+  scale 1.00
+  rotate <-90, 90, 0>
+  translate <-0, 1.1, 0>
+} // end of isosurface -------------------------------------------------------

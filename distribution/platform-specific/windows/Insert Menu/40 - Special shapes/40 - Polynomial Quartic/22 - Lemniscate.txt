@@ -1,0 +1,13 @@
+
+#include "shapesq.inc"
+object{ Lemniscate       //----------------------------------
+        sturm
+        texture { pigment{ color White}  
+                  finish { phong 1}
+                } // end of texture 
+        scale 1.5
+        rotate<0,20,0>
+        translate <0,1,0>
+      } // ------------------------------------ end of object
+
+

@@ -1,0 +1,28 @@
+//--------------------------------------------------------- 
+//---------------------------------------------------------
+//------------------ random functions standard include file
+#include "rand.inc"
+#declare Random_1 = seed (12433);
+//---------------------------------------------------------
+
+union{
+ #local Nr = 0;     // start
+ #local EndNr = 200; // end
+ #while (Nr< EndNr)
+
+   cone{ <0,0,0>,0.02, // starting point, start radius
+         VRand_In_Sphere(Random_1), 0 // end point, end radius
+
+           //--------------------------------------
+           texture{ pigment{ color rgb< 0.75, 1.0, 0.0> } //  yellow lemon
+                    finish { phong 1 reflection{ 0.00 metallic 0.25} }
+                  } // end of texture
+        } // end of object
+
+ #local Nr = Nr + 1;  // next Nr
+ #end // --------------- end of loop
+
+rotate<0,0,0>
+translate<0,0,0>} // end of union
+//---------------------------------------------------------
+//---------------------------------------------------------

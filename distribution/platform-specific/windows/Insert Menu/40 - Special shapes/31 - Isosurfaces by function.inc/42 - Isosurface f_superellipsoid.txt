@@ -1,0 +1,18 @@
+isosurface { //-------------------------------------------------------------
+
+  function {  
+    f_rounded_box(x,y,z,0,1,1,1 )
+    - f_superellipsoid( x,y,z, 1.0, 0.45)// exponents east-west, north-south 
+  }          
+  contained_by {box {<-1,-1,-1>*1,<1,1,1>*1}}
+  threshold 0.00 
+  max_gradient 5
+ 
+  texture{ pigment{ color rgb <0.3,0.15,1.00>} 
+           // normal { bumps 0.15 scale 0.015}
+           finish { specular 0.2 phong 0.7 reflection 0.1}
+         }
+  rotate<-20,50,0>
+  scale 1.00
+  translate< 0,1.1,0>
+} // end of isosurface -------------------------------------------------------

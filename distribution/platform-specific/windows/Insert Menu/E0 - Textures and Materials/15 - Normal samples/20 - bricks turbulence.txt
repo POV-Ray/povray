@@ -1,0 +1,8 @@
+       texture{ pigment{ color rgb<0.55,0.35,0.75> }
+                normal { pigment_pattern{ 
+                             brick color rgb 0.2, color rgb 0.8 
+                             scale 0.065  turbulence 0.14
+                           } // end pigment_pattern
+                         1} // end normal
+                finish { phong 0.1  phong_size 500 reflection{ 0.45 } }
+              }  

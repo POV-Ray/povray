@@ -1,0 +1,33 @@
+//---------------------------------------------------------------------------- 
+#include "shapes3.inc"
+//----------------------------------------------------------------------------
+//global_settings { max_trace_level 30 } // for transparent materials
+//----------------------------------------------------------------------------
+object{ Round_N_Tube_Polygon ( // A round polygon tube ring with N corners 
+                            6, // number of corners must be >= 3 !!!
+                            0.100,// tube radius < base width
+                            0.850,     // base width (center to edge middle)
+                            0.250,      // corner torus segment major radius
+                            1, // 1 = filled, 0 = ring
+                            1 // 0 uses union; 1 uses merge for transparent
+                          ) //-------------------------------------------------
+  /*
+      material{   //-----------------------------------------------------------
+        texture { pigment{ rgbf <0.98, 0.98, 0.98, 0.9> }
+                  finish { diffuse 0.1 reflection 0.2
+                          specular 0.8 roughness 0.0003 phong 1 phong_size 400}
+                } // end of texture -------------------------------------------
+        interior{ ior 1.35 caustics 0.5
+                } // end of interior ------------------------------------------
+      } // end of material ----------------------------------------------------
+   */
+  
+      texture{ pigment{ color rgb<1,1,1>}
+               finish { phong 1}
+             } // end of texture
+  
+   // rotate<90,0,0>
+      translate< 0,0,0>
+} // end of object -----------------------------------------------------------
+//----------------------------------------------------------------------------
+ 

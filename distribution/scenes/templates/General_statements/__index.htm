@@ -1,0 +1,203 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="language" content="en">
+<meta name="Author" content="Friedrich A. Lohmueller for POV-Ray, 2013">
+<meta name="Description" content="POV-Ray Templates - HTML version">
+<title>POV-Ray Templates - HTML version</title>
+<link rel="stylesheet" type="text/css" href="../povray_style.css">
+</head>
+<body bgcolor="#d8d8d0" text="#505030" link="#006677" vlink="#445566" alink="#cc0055">
+
+<table width="100%" border="0"><tr><td>
+ <div align="center"><font size="+2"><b>General Statements</b></font></div>
+ </td>
+</tr></table>
+<a name="start"></a>
+<hr size="3">
+<table border="0" width="100%" cellspacing="5">  <!--- global table -->
+<tr><td valign="top"> <!-- Index - Content - 1st column -->
+<font size="2">
+ <a href="../../index.htm">Demo scene files Index</b></a><br>
+<br>
+ <font size="+1"><a href="../_index.htm">POV-Ray Templates</b></a></font>
+ <br>
+ &nbsp; &nbsp; <a href="../Basic_Scenes/__index.htm">Ready-made Basic Scenes</b></a><br>
+ &nbsp; &nbsp; <a href="../Basic_Shapes_round/__index.htm">Basic Shapes round</b></a><br>
+ &nbsp; &nbsp; <a href="../Basic_Shapes_angular/__index.htm">Basic Shapes angular</b></a><br>
+ &nbsp; &nbsp; <a href="../Shapes2_inc/__index.htm">Shapes 2</b></a><br>
+ &nbsp; &nbsp; <a href="../Shapes3_inc/__index.htm">Shapes 3</b></a><br>
+ &nbsp; &nbsp; <a href="../blob_fractal/__index.htm">Blob and Fractal</b></a><br>
+ &nbsp; &nbsp; <a href="../Text_Shapes_3D/__index.htm">3D text shapes</b></a><br>
+ &nbsp; &nbsp; <a href="../height_field_and_HF_macros/__index.htm">height_field, HF_macros</b></a><br>
+ &nbsp; &nbsp; <a href="../Non_CSG_shapes/__index.htm">Mesh and non-CSG shapes</b></a><br>
+ &nbsp; &nbsp; <a href="../Isosurfaces_by_basic_functions/__index.htm">Isosurfaces basic functions</b></a><br>
+ &nbsp; &nbsp; <a href="../Isosurfaces_by_function_inc/__index.htm">Isosurfaces function.inc</b></a><br>
+ &nbsp; &nbsp; <a href="../Isosurfaces_by_pattern_functions/__index.htm">Isosurfaces by patterns</b></a><br>
+ &nbsp; &nbsp; <a href="../Polynomial_Quartic/__index.htm">Polynomial and Quartic</b></a><br>
+ &nbsp; &nbsp; <a href="../Parametric_Surfaces/__index.htm">Parametric Surfaces</b></a><br>
+ &nbsp; &nbsp; <a href="../Meshes_by_meshmaker_inc/__index.htm">Meshes by meshmaker.inc</b></a><br>
+ &nbsp; &nbsp; <a href="../While_Loops_For_Loops/__index.htm">While Loops, For Loops</b></a><br>
+<nobr> &nbsp; &nbsp; <a href="../Sphere_sweep_Spline_curves/__index.htm">sphere_sweep, Spline curves</b></a></nobr><br>
+ &nbsp; &nbsp; <a href="../Random/__index.htm">Random</b></a><br>
+ &nbsp; &nbsp; <a href="../Shearing_and_transform/__index.htm">Shearing and transform</b></a><br>
+ &nbsp; &nbsp; <a href="../Colors_in_textures/__index.htm">Colors in textures</b></a><br>
+ &nbsp; &nbsp; <a href="../Textures_Materials/__index.htm">Textures and Materials</b></a><br>
+ &nbsp; &nbsp; <a href="../Lights_skies_fogs_rainbow/__index.htm">Lights, skies, fogs, rainbow</b></a><br>
+ &nbsp; &nbsp; <a href="../Radiosity_Photons/__index.htm">Radiosity and Photons</b></a><br>
+ &nbsp; &nbsp; <a href="../Include/__index.htm">Own include files</b></a><br>
+ &nbsp; &nbsp; <a href="../Math_functions/__index.htm">Math functions</b></a><br>
+ &nbsp;<b>&gt;</b> <!--a href="../General_statements/__index.htm"--><b>General statements</b></a><br>
+ &nbsp; &nbsp; <a href="../Animation/__index.htm">Animation</b></a><br>
+
+ &nbsp; &nbsp; ___________________<br>
+ &nbsp; &nbsp; &nbsp;  <br>
+
+ <nobr> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </nobr>
+</font>
+
+
+</td><td valign="top" rowspan="2"> <!-- Content - 2nd column -->
+
+<a name="Top"></a>
+<table width="95%" align="center" border="0"
+     bordercolor="#C0C0C0" bordercolorlight="#FFFFFF" bordercolordark="#808080"><tr><td> <!-- global-->
+<tr>
+<td valign="top" width="50%">
+
+<table border="0" cellpadding="1" cellspacing="0" width="85%"  bgcolor="#d8d8d0"
+     bordercolor="#C0C0C0" bordercolorlight="#FFFFFF" bordercolordark="#808080">
+<tr>
+ <td><br>
+ <b>default finish:</b><br>
+
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080"  bgcolor="#ffffff">
+   <tr><td><pre><b>#default{ finish{ ambient 0.1 diffuse 0.9 }} &nbsp;</b></td></pre>
+   </tr></table><font size="1">default finish</font></div>
+ </td>
+</tr>
+<tr>
+ <td> <font size="-1"><b>In POV-Ray version 3.7</font> with radiosity ambient is replaces by emission</b>. <br>
+      <font size="-1">With radiosity on ambient is 0. For 3.7 scenes that work also in 3.6 use i.e.:</font><br>
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080"  bgcolor="#ffffff">
+   <tr><td><pre><b>#if (version &lt; 3.7) ambient 1 #else emission 1 #end  </b></td></pre>
+   </tr></table><font size="1">ambient &lt;-&gt; emission</font></div>
+ </td>
+</tr>
+<tr>
+ <td>
+ <b>default gamma setting: (3.6/3.7)</b><br>
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080"  bgcolor="#ffffff">
+   <tr><td><pre><b>global_settings{ assumed_gamma 1.0 }
+#default{ finish{ ambient 0.1 diffuse 0.9 }}  &nbsp;</b></td></pre>
+   </tr></table><font size="1">default finish and gamma setting versions 3.6.2 / 3.7</font></div>
+ </td>
+</tr>
+<tr>
+ <td><b>max_trace_level:</b><br>
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080"  bgcolor="#ffffff">
+   <tr><td><pre><b>global_settings { max_trace_level 10 }//(1...256) [default = 5]  &nbsp;</b></td></pre>
+   </tr></table><font size="1">max_trace_level 10</font></div>
+ </td>
+</tr>
+<tr>
+ <td><b>charset:</b><br>
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080"  bgcolor="#ffffff">
+   <tr><td>
+<pre><b>global_settings{ charset utf8 }  // unicode &nbsp;
+<b>global_settings{ charset ascii } // ascii (only 0 to 127 are valid)
+<b>global_settings{ charset sys }   // system specific charset &nbsp;</b></td></pre>
+   </tr></table><font size="1">charset - specifies the assumed character set of all text strings</font></div>
+ </td>
+</tr>
+<tr>
+ <td><b>Noise generators:</b><br>
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080"  bgcolor="#ffffff">
+   <tr><td><pre><b>global_settings {  noise_generator 1 }  &nbsp;</b></td></pre>
+   </tr></table><font size="1">noise_generator 1</font></div>
+ </td>
+</tr>
+<tr>
+ <td>
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080"  bgcolor="#ffffff">
+   <tr><td><pre><b>global_settings {  noise_generator 2 }  &nbsp;</b></td></pre>
+   </tr></table><font size="1">noise_generator 2</font></div>
+ </td>
+</tr>
+<tr>
+ <td>
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080"  bgcolor="#ffffff">
+   <tr><td><pre><b>global_settings {  noise_generator 1 } &nbsp;&nbsp;</b></td></pre>
+   </tr></table><font size="1">noise_generator 3</font></div>
+ </td>
+</tr>
+<tr>
+ <td><b>adc_bailout</b><br>
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080"  bgcolor="#ffffff">
+   <tr><td><pre><b>global_settings{ adc_bailout 0.0039 }  &nbsp;&nbsp;</b></td></pre>
+   </tr></table><font size="1">adc_bailout - sets cutoff point of ray computation (1/255 default)</font></div>
+ </td>
+</tr>
+<tr>
+ <td><b>number_of_waves</b><br>
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080"  bgcolor="#ffffff">
+   <tr><td><pre><b>global_settings{ number_of_waves 10 }  &nbsp;&nbsp;</b></td></pre>
+   </tr></table><font size="1">number_of_waves - sets how many instances of waves/ripples to use</font></div>
+ </td>
+</tr>
+<tr>
+ <td><b>irid_wavelength</b><br>
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080"  bgcolor="#ffffff">
+   <tr><td><pre><b>global_settings{ irid_wavelength &lt;0.25, 0.18, 0.14&gt; } &nbsp;</b></td></pre>
+   </tr></table><font size="1">irid_wavelength - sets the color shifts for iridescence (irid {})</font></div>
+ </td>
+</tr>
+<tr>
+ <td><b>hf_gray_16</b><br>
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080"  bgcolor="#ffffff">
+   <tr><td><pre><b>global_settings{ hf_gray_16 on } // [on/off] &nbsp;</b></td></pre>
+   </tr></table><font size="1">hf_gray_16 - sets image output to use grayscale only (TGA, PNG)</font></div>
+ </td>
+</tr>
+<tr>
+ <td><b>max_intersections: // don't use it with POV-Ray version 3.7 !!!!</b><br>
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080"  bgcolor="#ffffff">
+   <tr><td><pre><b>global_settings { max_intersections 200 } //(1...200) [default = 64]  &nbsp;</b></td></pre>
+   </tr></table><font size="1">max_intersections 200</font></div>
+ </td>
+</tr>
+
+</table>
+
+
+
+
+
+
+
+</div>
+
+</td>
+</tr>
+</table>
+</td></tr>
+<tr>
+<td valign="middle" align="center"><a href="#top">top</a>
+</td></tr></table>
+
+</div>
+
+<!-- footer -->
+<hr size="3">
+<table width="95%" align="center">
+<tr>
+ <td><i><font size="1">&copy; Persistence of Vision Ray Tracer, 2013<br>
+ <a href="http://www.povray.org"><nobr>http://www.povray.org</nobr></font></i></a>
+ </td>
+ <td>&nbsp;</td>
+ <td>&nbsp;</td>
+</tr></table><!-- end footer -->
+</body>
+</html>

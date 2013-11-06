@@ -1,0 +1,28 @@
+
+#declare MyObject = // ---------------------
+box{ <0,0,0>,<1,1,1>*0.7 
+
+     texture{ pigment{ color rgb<0.9,0.84,0.80>*1}
+              finish { phong 1 reflection { 0.2 metallic 0.5} }
+            }
+} // --------------------------------------- 
+//------------------------------------------
+
+
+union{ //-----------------------------------
+
+//#for(Identifier, Start, End [, Step]) 
+ #for (NrX, 0, 6, 1) 
+ 
+   #for (NrZ, 0, 6, 1) 
+    
+     object{ MyObject
+             translate<  NrX*1, 0, NrZ*1>} 
+  
+   #end // --------------- end z of #for loop 
+
+ #end // --------------- end x of #for loop 
+
+rotate<0,0,0> 
+translate<0,0,0>
+} // end of union --------------------------

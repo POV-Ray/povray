@@ -1,0 +1,101 @@
+// Persistence of Vision Ray Tracer Scene Description File
+// File: ?.pov
+// Vers: 3.6
+// Desc: Radiosity Scene Template
+// Date: mm/dd/yy
+// Auth: ?
+//
+
+//--------------------------------------------------------------------------
+#version 3.7;
+#default{ finish{ ambient 0 diffuse 1 }} 
+//--------------------------------------------------------------------------
+
+#declare Radiosity=on;
+
+global_settings {
+  //max_trace_level 25
+  #if (Radiosity)
+    radiosity {
+      pretrace_start 0.08           // start pretrace at this size
+      pretrace_end   0.04           // end pretrace at this size
+      count 35                      // higher -> higher quality (1..1600) [35]
+      nearest_count 5               // higher -> higher quality (1..10) [5]
+      error_bound 1.8               // higher -> smoother, less accurate [1.8]
+      recursion_limit 3             // how much interreflections are calculated (1..5+) [3]
+      low_error_factor .5           // reduce error_bound during last pretrace step
+      gray_threshold 0.0            // increase for weakening colors (0..1) [0]
+      minimum_reuse 0.015           // reuse of old radiosity samples [0.015]
+      brightness 1                  // brightness of radiosity effects (0..1) [1]
+
+      adc_bailout 0.01/2
+      //normal on                   // take surface normals into account [off]
+      //media on                    // take media into account [off]
+      //save_file "file_name"       // save radiosity data
+      //load_file "file_name"       // load saved radiosity data
+      //always_sample off           // turn sampling in final trace off [on]
+      //max_sample 1.0              // maximum brightness of samples
+    }
+  #end
+}
+
+#default {
+  texture {
+    pigment {rgb 1}
+    #if (Radiosity)
+      finish {
+        ambient 0.0
+        diffuse 0.6
+        specular 0.3
+      }
+    #else
+      finish {
+        ambient 0.1
+        diffuse 0.6
+        specular 0.3
+      }
+    #end
+  }
+}
+
+// ----------------------------------------
+
+camera {
+  right x*image_width/image_height
+  location  <0,1.5,-4>
+  look_at   <0,1,0>
+}
+
+light_source {
+  <500,500,-500>       // light's position
+  color rgb <1, 1, 1>  // light's color
+}
+
+sky_sphere {
+  pigment {
+    gradient y
+    color_map {
+      [0.0 rgb <0.6,0.7,1.0>]
+      [0.7 rgb <0.0,0.1,0.8>]
+    }
+  }
+}
+
+// ----------------------------------------
+
+plane {
+  y, 0
+  texture {
+    pigment {
+      checker
+      color rgb <1.0, 0.8, 0.6>
+      color rgb <1.0, 0.0, 0.0>
+      scale 0.5
+    }
+  }
+}
+
+sphere {
+  <0,1,0>, 1
+}
+

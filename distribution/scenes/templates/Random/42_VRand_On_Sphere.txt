@@ -1,0 +1,40 @@
+//--------------------------------------------------------- 
+//---------------------------------------------------------
+//------------------ random functions standard include file
+#include "rand.inc"
+#declare Random_1 = seed (12433);
+//---------------------------------------------------------
+
+//---------------------------------------------------------
+
+blob{ threshold 1
+ #local Nr = 0;     // start
+ #local EndNr = 300; // end
+ #while (Nr< EndNr)
+   sphere{ <0,0,0>, 0.175 , 1.5
+           translate VRand_On_Sphere(Random_1)
+           texture{ Polished_Chrome
+                    pigment{ color rgb< 1.0, 0.25, 0.0> }
+                    //finish { phong 1 reflection{ 0.55 metallic 0.75} }
+                  } // end of texture
+         } // end of object
+
+ #local Nr = Nr + 1;  // next Nr
+ #end // --------------- end of loop
+
+rotate<0,120,0>
+translate<0,0,0>} // end of union
+//---------------------------------------------------------
+
+sphere { <0,0,0>, 1
+
+         texture{ pigment{ color rgbt< 1, 0.15, 0.30, 0.86>}
+                  normal { bumps 1.25 scale 0.02 }
+                  finish { phong 0.75  }
+                } // end of texture
+
+          scale<1,1,1>  rotate<0,0,0>  translate <0,0,0>
+       }  // end of sphere --------------------------------
+
+//---------------------------------------------------------
+//---------------------------------------------------------

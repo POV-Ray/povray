@@ -1,0 +1,22 @@
+isosurface { //-------------------------------------------------------------
+
+  function{
+    f_dupin_cyclid(
+       x,y,z,
+       -0.05, // field strength,
+       1,     // major radius of torus,
+       0.25,  // minor radius of torus,
+       0.25,  // x displacement of torus,
+       0.0,   // y displacement of torus,
+       0.75   // radius of inversion
+     ) 
+  }
+  contained_by {sphere {0,1.25}}
+ 
+  texture{ pigment{ color rgb <0.6,0.5,1>} 
+           finish { specular 0.1 roughness 0.1 phong 0.2 }
+           }
+  scale 1.2
+  rotate<90,0,0>
+  translate< 0,1.3,0>
+} // end of isosurface -----------------------------------------------------

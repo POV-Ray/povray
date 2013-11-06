@@ -1,0 +1,2 @@
+// allow atmosphere inside shape
+  hollow

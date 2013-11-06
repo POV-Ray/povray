@@ -1,0 +1,32 @@
+//------------------------------------------------------------- 
+//------------------------------------------------------------- 
+#declare Random_1 = seed (23484);
+#declare Random_2 = seed (35271);
+#declare Blade_Radius = 0.01;
+#declare Blade_Height = 1.00; 
+
+//-------------------------------------------------------------
+union{ //------------------------------------------------------
+
+ #local Nr = 0;   // start
+ #local End = 70; // end
+ #while (Nr< End) 
+     cone{ <0,0,0>,Blade_Radius,
+           <0,Blade_Height+0.50*rand(Random_1),0>,0.00
+           texture { pigment{ color rgb< 0.5, 1.0, 0.0> } 
+                     normal { bumps 0.5 scale 0.05 }
+                     finish { phong 1 reflection 0.00}
+                   } // end of texture 
+           rotate<0,0,Nr*70/End> 
+           translate<0,0,0> 
+           rotate<0,Nr * 360/End+360*rand(Random_2),0>
+         } //---------------------------
+
+ #local Nr = Nr + 1;    // next Nr
+ #end // ---------------  end of loop 
+
+rotate<0,0,0>
+translate<0,0,0>
+} // end of union ---------------------------------------------
+//------------------------------------------------------------- 
+//------------------------------------------------------------- 

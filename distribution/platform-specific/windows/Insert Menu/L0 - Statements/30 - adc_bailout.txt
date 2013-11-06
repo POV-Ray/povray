@@ -1,0 +1,2 @@
+// used in global_settings, sets cutoff point of ray computation (1/255 default)
+global_settings{ adc_bailout 0.0039 } 

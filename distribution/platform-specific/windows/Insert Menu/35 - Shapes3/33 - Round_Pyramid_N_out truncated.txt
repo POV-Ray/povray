@@ -1,0 +1,20 @@
+//---------------------------------------------------------------------------------------------- 
+#include "shapes3.inc"
+//---------------------------------------------------------------------------------------------- 
+object{ Round_Pyramid_N_out( // definded by circumcircle radii
+                             8 , // number of side faces 
+                             <-0.25,0.35,-0.8>, 0.40, <1,1.1,0>, 0.70, // A, radius A, B, radius_B, 
+                             0.08, // wire radius or border radius 
+                             1,  // 1 = filled, 0 = wireframe
+                             0  // 0 = union, 1 = merge for transparent materials               
+                           ) //------------------------------------------------------------------
+        texture{ pigment{ rgb<1,1,1> }    
+                 finish { phong 1 } 
+               } // end of texture --------
+
+        scale <1,1,1>*1 
+        rotate <0,0,0>
+        translate< 0, 0, 0>
+      } // end of object    
+//---------------------------------------------------------------------------------------------- 
+

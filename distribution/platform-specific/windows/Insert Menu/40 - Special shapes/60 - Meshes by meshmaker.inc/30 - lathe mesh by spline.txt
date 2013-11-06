@@ -1,0 +1,60 @@
+//--------------------------------------------------------------------------
+//--------------------------------------------------------------------------
+#declare Spline_1 =
+spline{
+   cubic_spline
+  -0.1, <-1.50,0,0>
+   0.0, < 0.00, 0.00,0>  // first point
+   0.1, < 0.90, 0.00, 0>
+   0.2, < 1.00, 0.00, 1>
+   0.3, < 0.80, 0.05, 0>
+   0.4, < 0.30, 0.10, 0>
+   0.5, < 0.15, 0.70, 0>
+   0.6, < 0.25, 1.00, 0>
+   0.7, < 0.70, 1.50, 0>
+   0.8, < 1.50, 1.80, 0>
+   0.9, < 0.90, 2.70, -0.3>
+   1.0, < 0.00, 3.00, 0> // last point
+   1.1, <-0.01, 3.00, 0>
+}
+/* //Show Spline ------------------------
+#declare I = 0;
+#while( I <= 1 )
+   sphere{
+      Spline_1(I),0.025
+      no_shadow
+      pigment{rgb <1,0.45,0.85>} 
+   }
+   #declare I = I + 0.005;
+#end
+*/ //-----------------------------------
+//-------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
+#include "meshmaker.inc"
+//-------------------------------------------------------------------------------------------------
+object { // Lathe(Spl, ResSpl, Rot, ResRot, FileName)  Like POV-Ray lathe object, but as mesh2.
+         // The Lathe macro generates an object by rotating a curve about the y-axis.
+         // This curve does not need to be restraint to the xy-plane. The result is a mesh2 object.
+         // The uv_coordinates for texturing the surface come from the square <0,0> - <1,1>. 
+   Lathe( Spline_1, // spline to be rotated. The spline is evaluated from t=0 to t=1. 
+                    // For the normal calculation, it is required that all splines, 
+                    // also linear_splines, have one extra point before t=0 and after t=1. 
+               100, // amount of triangles to be used along the spline
+              -280, // angle, in degrees, the spline has to be rotated around the y-axis. 
+                50, // amount of triangles to be used in the circumference. 
+                ""  // FileName: ""= non, "NAME.obj'= Wavefront objectfile, "NAME.pcm" compressed mesh file 
+                    // "NAME.arr" include file with arrays to build a mesh2 from, others: includefile with a mesh2 object 
+         ) // -------------------------------------------------------------------------------------
+   texture{           // outside texture
+     uv_mapping
+     pigment {checker color rgb <0.0,0.1,0.6> rgb <1,0.7,0.7> scale <0.05,0.03,1>}
+     finish{specular 0.5}
+   } // 
+   interior_texture{   // inside texture
+     uv_mapping
+     pigment {checker color rgb <0.0,0,0.0> rgb <1,0.7,0.7> scale <0.05,0.03,1>}
+     finish{specular 0.5}
+   } // 
+}
+//-------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------

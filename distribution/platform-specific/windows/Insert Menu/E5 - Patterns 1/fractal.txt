@@ -1,0 +1,20 @@
+// pattern for use in texture/pigment/normal/density
+// various types of fractals
+  // (---mandelbrot---)
+  mandel 50               // number of iterations
+         //2,             // optional exponent (2..4) [2]
+  // (---julia---)
+  julia <0.5,0.8>,        // complex number (2d vector)
+        50                // number of iterations
+        //2,              // optional exponent (2..4) [2]
+  // (---magnet mandel---)
+  magnet 1                // type (1 or 2)
+   mandel 50              // number of iterations
+  // (---magnet julia---)
+  magnet 1                // type (1 or 2)
+   julia <0.5,0.8>,       // complex number (2d vector)
+         50               // number of iterations
+
+  //exterior 1, 1         // optional: special handling of exterior
+  //interior 0, 1         // optional: special handling of interior
+

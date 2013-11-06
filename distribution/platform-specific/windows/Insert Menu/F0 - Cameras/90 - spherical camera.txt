@@ -1,0 +1,8 @@
+// spherical lens for sphere field of view (mappable to a sphere)
+camera {
+  spherical
+  location <0,0,0>      // position
+  look_at  <0,0,1>      // view
+  angle 360             // horizontal degrees
+        180             // vertical degrees
+}

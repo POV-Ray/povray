@@ -1,0 +1,7 @@
+// The conditional expression returns a value depending
+// on whether an expression is true or false.
+// In this case: if X is larger than Y, A is returned, otherwise B
+
+#declare Value=((X>Y)?A:B);
+
+

@@ -1,0 +1,2 @@
+// used in global_settings, sets the color shifts for iridescence (irid {})
+global_settings{ irid_wavelength <0.25, 0.18, 0.14> } 

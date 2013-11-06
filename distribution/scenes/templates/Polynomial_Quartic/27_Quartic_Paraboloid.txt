@@ -1,0 +1,16 @@
+
+#include "shapesq.inc"
+object{ Quartic_Paraboloid   // -----------------------------
+        sturm
+        texture{ pigment{ color White }  
+                 finish { phong 1 }
+               } // end of texture 
+        rotate<-90,0,0>
+        clipped_by {sphere { <0,0, 5>,7 }}
+
+        rotate< 0, 0,0>
+        scale 0.2
+        translate <0,1,0>
+ } // ----------------------------------------- end of object
+
+

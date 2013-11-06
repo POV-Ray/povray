@@ -1,0 +1,9 @@
+superellipsoid{ <2.50,2.50> 
+
+     texture{ pigment{ color rgb<1,0.2,0.35>}
+              finish { phong 1 }
+     } // end of texture
+     scale <1,1,1> 
+     rotate<0,0,0> 
+     translate<0,0,0>
+   } // ------------- end superellipsoid

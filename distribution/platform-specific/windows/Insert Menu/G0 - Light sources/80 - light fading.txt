@@ -1,0 +1,4 @@
+// light_source { ...
+  // put this inside a light_source to add light fading
+  fade_distance 10
+  fade_power 2

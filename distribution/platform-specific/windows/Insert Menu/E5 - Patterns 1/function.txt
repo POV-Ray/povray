@@ -1,0 +1,6 @@
+// pattern for use in texture/pigment/normal/density
+// function pattern using a user defined function
+  #declare fn_X = function(x,y,z) { z + x*x + y*y }  // parabolid function
+  function { fn_X(x, y, z) }
+  //function { fn_X(x, y, z) } 0.5  // for use with normal{} (0...1 or more)
+

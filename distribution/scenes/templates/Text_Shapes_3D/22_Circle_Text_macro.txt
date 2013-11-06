@@ -1,0 +1,11 @@
+object{  // Justification: either Align_Left, Align_Right, or Align_Center           
+/* Circle_Text( Font,          Text, LetterSize, LetterSpacing, Deepth, Radius, Inverted, Justification, Angle )*/     
+   Circle_Text("cyrvetic.ttf","POV-Ray",  0.95 ,         0.01,   0.50,   1.15,        1,     Align_Left,   175 ) 
+        texture{ pigment{ color rgb<1,1,1> }
+                 normal { bumps 0.5 scale 0.005}
+                 finish { specular 1 reflection 0.25}
+               } // end of texture
+        rotate<0,0, 0>
+        scale<1,1,1>*0.75 
+        translate<0.20,0,-0.5>
+      } // end of Circle_Text object -------------------------------------------

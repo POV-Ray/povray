@@ -1,0 +1,19 @@
+#declare Ball = 
+ sphere{<0,0,0>,0.075 scale <1,1,1> rotate<0,0,0> translate<0,0,0>
+	texture{pigment{ color rgb<0.8,1,0>}
+                finish { phong 1}}}
+
+union{ //-------------------------------------------------------
+ #local Nr = 0;            // start
+ #local N_per_Rev = 300;   // number of elements per revolutions
+ #local N_of_Rev  = 4.00;  // total number of revolutions 
+ #while (Nr < N_per_Rev*N_of_Rev) 
+   object{Ball translate<Nr * 0.25/N_per_Rev,0,0>
+               rotate<0,Nr * 360/N_per_Rev,0>} 
+
+ #local Nr = Nr + 1;    // next Nr
+ #end // ---------------  end of loop 
+
+rotate<-90,0,0>
+translate<0,1,-0.5>
+} // end of union ----------------------------------------------

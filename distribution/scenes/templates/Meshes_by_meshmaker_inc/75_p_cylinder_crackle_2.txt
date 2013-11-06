@@ -1,0 +1,60 @@
+//---------------------------------------------------------------------------------------------------
+#declare Pigment_1 = 
+  pigment {
+    crackle 
+    color_map{
+      [0.00, rgb <1,0.60,0.60> ]
+      [0.15, rgb <1,1,1>*0.8 ]
+      [1.00, rgb <1,1,1>*0.78 ]
+    }
+ scale 0.5
+ } // end pigment
+
+#declare Crack= function {
+  pigment {    
+     Pigment_1
+  } // end pigment
+}
+#declare R= function(u,v) {
+  -Crack(u,v,0).gray
+}
+
+#declare F1= function(u,v){R(u,v)*cos(u)} 
+#declare F2= function(u,v){R(u,v)*sin(u)} 
+#declare F3= function(u,v){v}
+//---------------------------------------------------------------------------------------------------
+#include "meshmaker.inc"
+//---------------------------------------------------------------------------------------------------
+object{ //-------------------------------------------------------------------------------------------
+   Parametric( //(Fx,Fy, Fz, <UVmin>, <UVmax>, Iter_U, Iter_V, FileName)
+               // Builds a parametric surface out of three given functions. 
+               // The uv_coordinates for texturing the surface come from the square <0,0> - <1,1>. 
+      F1, F2, F3, //three functions from which the object will be generated. 
+        // Following 2 vectors are the range within which the surface is calculated: 
+      <-3, -3>, // 2-D vector that gives the lower boundaries of the uv-rectangle, <u min, v min>. 
+      < 3,  3>, // 2-D vector that gives the upper boundaries of the uv-rectangle. 
+      250, // 
+      250, //
+       ""  // FileName: ""= non, "NAME.obj'= Wavefront objectfile, "NAME.pcm" compressed mesh file 
+           // "NAME.arr" = include file with arrays to build a mesh2 from, 
+           //  others: includefile with a mesh2 object 
+   ) //----------------------------------------------------------------------------------------------
+   texture{           //  outside texture
+   uv_mapping
+     pigment{ color rgb<1,1,1> }
+     //pigment {checker color rgb <0.0,0.2,0.5> rgb <1,1,1> scale <0.02,0.05,1>}
+     finish{specular 0.5}
+   } // 
+   interior_texture{   // inside texture
+     uv_mapping
+     pigment{color rgb<0.8,0.7,1> }
+     //pigment {checker color rgb <0.0,0,0.0> rgb <1,0.7,0.7> scale <0.02,0.05,1>}
+     finish{specular 0.5}
+   } // 
+
+   rotate <90,0,0>
+   scale<2,1,2>
+   translate< 0,1,0>
+} // end of object 
+//---------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------

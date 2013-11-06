@@ -1,0 +1,11 @@
+        texture{ pigment{ color rgb<0.85,0.35,0.05> }
+                 normal { pigment_pattern{ wood frequency 5 
+                                           sine_wave turbulence 0.05
+                                           color_map {[0.0, rgb 0]
+                                                      [0.2, rgb 0.5]
+                                                      [0.8, rgb 0.5]
+                                                      [1.0, rgb 0]}
+                                           rotate< 90,0,0> scale 0.5}
+                          0.15 }
+                 finish { phong 1 reflection 0.2}
+               } // end of texture ------------------------------------- 

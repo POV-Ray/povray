@@ -1,0 +1,6 @@
+// pattern for use in texture/pigment/normal/density
+// especially suited for normal {}
+  ripples 0.5    // make surface ripply (0...1 or more)
+  //ripples      // for use with pigment{}
+
+

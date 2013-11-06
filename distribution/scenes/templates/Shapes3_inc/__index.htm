@@ -1,0 +1,356 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="language" content="en">
+<meta name="Author" content="Friedrich A. Lohmueller for POV-Ray, 2013">
+<meta name="Description" content="POV-Ray Templates_HTML version">
+<title>POV-Ray Templates_HTML version</title>
+<link rel="stylesheet" type="text/css" href="../povray_style.css">
+</head>
+<body bgcolor="#d8d8d0" text="#505030" link="#006677" vlink="#445566" alink="#cc0055">
+
+<table width="100%" border="0"><tr><td>
+ <div align="center"><font size="+2"><b>shapes3.inc</b> &nbsp;<font size="-1"> These objects need: #include "shapes3.inc"</font></font></div>
+ </td>
+</tr></table>
+<a name="start"></a>
+<hr size="3">
+<table border="0" width="100%" cellspacing="5">  <!--- global table -->
+<tr><td valign="top"> <!-- Index_Content_1st column -->
+<font size="2">
+ <a href="../../index.htm">Demo scene files Index</b></a><br>
+<br>
+ <font size="+1"><a href="../_index.htm">POV-Ray Templates</b></a></font>
+ <br>
+ &nbsp; &nbsp; <a href="../Basic_Scenes/__index.htm">Ready-made Basic Scenes</b></a><br>
+ &nbsp; &nbsp; <a href="../Basic_Shapes_round/__index.htm">Basic Shapes round</b></a><br>
+ &nbsp; &nbsp; <a href="../Basic_Shapes_angular/__index.htm">Basic Shapes angular</b></a><br>
+ &nbsp; &nbsp; <a href="../Shapes2_inc/__index.htm">Shapes 2</b></a><br>
+ &nbsp;<b>&gt;</b> <!--a href="../Shapes3_inc/__index.htm"--><b>Shapes 3</b></a><br>
+ &nbsp; &nbsp; <a href="../blob_fractal/__index.htm">Blob and Fractal</b></a><br>
+ &nbsp; &nbsp; <a href="../Text_Shapes_3D/__index.htm">3D text shapes</b></a><br>
+ &nbsp; &nbsp; <a href="../height_field_and_HF_macros/__index.htm">height_field, HF_macros</b></a><br>
+ &nbsp; &nbsp; <a href="../Non_CSG_shapes/__index.htm">Mesh and non-CSG shapes</b></a><br>
+ &nbsp; &nbsp; <a href="../Isosurfaces_by_basic_functions/__index.htm">Isosurfaces basic functions</b></a><br>
+ &nbsp; &nbsp; <a href="../Isosurfaces_by_function.inc/__index.htm">Isosurfaces function.inc</b></a><br>
+ &nbsp; &nbsp; <a href="../Isosurfaces_by_pattern_functions/__index.htm">Isosurfaces by patterns</b></a><br>
+ &nbsp; &nbsp; <a href="../Polynomial_Quartic/__index.htm">Polynomial and Quartic</b></a><br>
+ &nbsp; &nbsp; <a href="../Parametric_Surfaces/__index.htm">Parametric Surfaces</b></a><br>
+ &nbsp; &nbsp; <a href="../Meshes_by_meshmaker_inc/__index.htm">Meshes by meshmaker.inc</b></a><br>
+ &nbsp; &nbsp; <a href="../While_Loops_For_Loops/__index.htm">While Loops, For Loops</b></a><br>
+<nobr> &nbsp; &nbsp; <a href="../Sphere_sweep_Spline_curves/__index.htm">sphere_sweep, Spline curves</b></a></nobr><br>
+ &nbsp; &nbsp; <a href="../Random/__index.htm">Random</b></a><br>
+ &nbsp; &nbsp; <a href="../Shearing_and_transform/__index.htm">Shearing and transform</b></a><br>
+ &nbsp; &nbsp; <a href="../Colors_in_textures/__index.htm">Colors in textures</b></a><br>
+ &nbsp; &nbsp; <a href="../Textures_Materials/__index.htm">Textures and Materials</b></a><br>
+ &nbsp; &nbsp; <a href="../Lights_skies_fogs_rainbow/__index.htm">Lights, skies, fogs, rainbow</b></a><br>
+ &nbsp; &nbsp; <a href="../Radiosity_Photons/__index.htm">Radiosity and Photons</b></a><br>
+ &nbsp; &nbsp; <a href="../Include/__index.htm">Own include files</b></a><br>
+ &nbsp; &nbsp; <a href="../Math_functions/__index.htm">Math functions</b></a><br>
+ &nbsp; &nbsp; <a href="../General_statements/__index.htm">General statements</b></a><br>
+ &nbsp; &nbsp; <a href="../Animation/__index.htm">Animation</b></a><br>
+
+ &nbsp; &nbsp; ___________________<br>
+ &nbsp; &nbsp; &nbsp;  <br>
+
+ <nobr> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </nobr>
+</font>
+
+
+</td><td valign="top" rowspan="2"> <!-- Content_2nd column -->
+
+<a name="Top"></a>
+<table width="95%" align="center" border="0"
+     bordercolor="#C0C0C0" bordercolorlight="#FFFFFF" bordercolordark="#808080"><tr><td> <!-- global-->
+<tr>
+<td valign="top" width="50%">
+
+<table border="0" cellpadding="1" cellspacing="0" width="85%"  bgcolor="#d8d8d0"
+     bordercolor="#C0C0C0" bordercolorlight="#FFFFFF" bordercolordark="#808080">
+<tr>
+ <td width="200"><div align="center">
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080">
+   <tr><td><a href="01_Segment_of_Torus.txt" target="_new">
+          <img src="01_Segment_of_Torus.jpg" width="160" height="120" border="0"></a></td>
+   </tr></table><font size="1">Segment_of_Torus</font></div>
+ </td>
+ <td width="200"><div align="center">
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080">
+   <tr><td><a href="03_Segment_of_CylinderRing.txt" target="_new">
+          <img src="03_Segment_of_CylinderRing.jpg" width="160" height="120" border="0"></a></td>
+   </tr></table><font size="1">Segment_of_CylinderRing</font></div>
+ </td>
+ <td width="200"><div align="center">
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080">
+   <tr><td><a href="05_Segment_of_Object.txt" target="_new">
+          <img src="05_Segment_of_Object.jpg" width="160" height="120" border="0"></a></td>
+   </tr></table><font size="1">Segment_of_Object</font></div>
+ </td>
+ <td width="200"><div align="center">
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080">
+   <tr><td><a href="18_Ring_Sphere_2.txt" target="_new">
+          <img src="18_Ring_Sphere_2.jpg" width="160" height="120" border="0"></a></td>
+   </tr></table><font size="1">Egg_Shape</font></div>
+ </td>
+</tr>
+<!-- row2 -->
+<tr>
+ <td width="200"><div align="center">
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080">
+   <tr><td><a href="12_Egg.txt" target="_new">
+          <img src="12_Egg.jpg" width="160" height="120" border="0"></a></td>
+   </tr></table><font size="1">Egg</font></div>
+ </td>
+ <td width="200"><div align="center">
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080">
+   <tr><td><a href="14_Egg_Shape.txt" target="_new">
+          <img src="14_Egg_Shape.jpg" width="160" height="120" border="0"></a></td>
+   </tr></table><font size="1">Egg_Shape</font></div>
+ </td>
+ <td width="200"><div align="center">
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080">
+   <tr><td><a href="15_Facetted_Egg.txt" target="_new">
+          <img src="15_Facetted_Egg.jpg" width="160" height="120" border="0"></a></td>
+   </tr></table><font size="1">Facetted_Egg</font></div>
+ </td>
+ <td width="200"><div align="center">
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080">
+   <tr><td><a href="16_Facetted_Egg_Shape.txt" target="_new">
+          <img src="16_Facetted_Egg_Shape.jpg" width="160" height="120" border="0"></a></td>
+   </tr></table><font size="1">Facetted_Egg_Shape</font></div>
+ </td>
+</tr>
+<!-- row3 -->
+<tr>
+ <td width="200"><div align="center">
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080">
+   <tr><td><a href="17_Facetted_Sphere.txt" target="_new">
+          <img src="17_Facetted_Sphere.jpg" width="160" height="120" border="0"></a></td>
+   </tr></table><font size="1">Facetted_Sphere</font></div>
+ </td>
+ <td width="200"><div align="center">
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080">
+   <tr><td><a href="18_Facetted_Sphere_2.txt" target="_new">
+          <img src="18_Facetted_Sphere_2.jpg" width="160" height="120" border="0"></a></td>
+   </tr></table><font size="1">Facetted_Sphere 2</font></div>
+ </td>
+ <td width="200"><div align="center">
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080">
+   <tr><td><a href="18_Facetted_Sphere_3.txt" target="_new">
+          <img src="18_Facetted_Sphere_3.jpg" width="160" height="120" border="0"></a></td>
+   </tr></table><font size="1">Facetted_Sphere 3</font></div>
+ </td>
+ <td width="200"><div align="center">
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080">
+   <tr><td><a href="18_Facetted_Sphere_4.txt" target="_new">
+          <img src="18_Facetted_Sphere_4.jpg" width="160" height="120" border="0"></a></td>
+   </tr></table><font size="1">Facetted_Sphere 4</font></div>
+ </td>
+</tr>
+<!-- row4 -->
+<tr>
+ <td width="200"><div align="center">
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080">
+   <tr><td><a href="20_Column_N.txt" target="_new">
+          <img src="20_Column_N.jpg" width="160" height="120" border="0"></a></td>
+   </tr></table><font size="1">Column_N</font></div>
+ </td>
+ <td width="200"><div align="center">
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080">
+   <tr><td><a href="23_Column_N_AB.txt" target="_new">
+          <img src="23_Column_N_AB.jpg" width="160" height="120" border="0"></a></td>
+   </tr></table><font size="1">Column_N_AB</font></div>
+ </td>
+ <td width="200"><div align="center">
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080">
+   <tr><td><a href="24_Pyramid_N_AB.txt" target="_new">
+          <img src="24_Pyramid_N_AB.jpg" width="160" height="120" border="0"></a></td>
+   </tr></table><font size="1">Pyramid_N_AB</font></div>
+ </td>
+ <td width="200"><div align="center">
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080">
+   <tr><td><a href="25_Pyramid_N.txt" target="_new">
+          <img src="25_Pyramid_N.jpg" width="160" height="120" border="0"></a></td>
+   </tr></table><font size="1">Pyramid_N</font></div>
+ </td>
+</tr>
+<!-- row5 -->
+<tr>
+ <td width="200"><div align="center">
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080">
+   <tr><td><a href="26_Pyramid_N_truncated.txt" target="_new">
+          <img src="26_Pyramid_N_truncated.jpg" width="160" height="120" border="0"></a></td>
+   </tr></table><font size="1">Pyramid_N truncated</font></div>
+ </td>
+ <td width="200"><div align="center">
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080">
+   <tr><td><a href="30_Round_Pyramid_N_in_truncated.txt" target="_new">
+          <img src="30_Round_Pyramid_N_in_truncated.jpg" width="160" height="120" border="0"></a></td>
+   </tr></table><font size="1">Round_Pyramid_N_in truncated</font></div>
+ </td>
+ <td width="200"><div align="center">
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080">
+   <tr><td><a href="33_Round_Pyramid_N_out_truncated.txt" target="_new">
+          <img src="33_Round_Pyramid_N_out_truncated.jpg" width="160" height="120" border="0"></a></td>
+   </tr></table><font size="1">Round_Pyramid_N_out truncated</font></div>
+ </td>
+ <td width="200"><div align="center">
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080">
+   <tr><td><a href="34_Round_Pyramid_N_in_columnar.txt" target="_new">
+          <img src="34_Round_Pyramid_N_in_columnar.jpg" width="160" height="120" border="0"></a></td>
+   </tr></table><font size="1">Round_Pyramid_N_in columnar</font></div>
+ </td>
+</tr>
+<!-- row4 -->
+<tr>
+ <td width="200"><div align="center">
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080">
+   <tr><td><a href="35_Round_Pyramid_N_out.txt" target="_new">
+          <img src="35_Round_Pyramid_N_out.jpg" width="160" height="120" border="0"></a></td>
+   </tr></table><font size="1">Round_Pyramid_N_out</font></div>
+ </td>
+ <td width="200"><div align="center">
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080">
+   <tr><td><a href="38_Round_Pyramid_N_out_transparent.txt" target="_new">
+          <img src="38_Round_Pyramid_N_out_transparent.jpg" width="160" height="120" border="0"></a></td>
+   </tr></table><font size="1">Round_Pyramid_N_out transparent</font></div>
+ </td>
+ <td width="200"><div align="center">
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080">
+   <tr><td><a href="31_Round_Pyramid_N_in_truncated.txt" target="_new">
+          <img src="31_Round_Pyramid_N_in_truncated.jpg" width="160" height="120" border="0"></a></td>
+   </tr></table><font size="1">Round_Pyramid_N_in truncated</font></div>
+ </td>
+ <td width="200"><div align="center">
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080">
+   <tr><td><a href="32_Round_Pyramid_N_out_truncated.txt" target="_new">
+          <img src="32_Round_Pyramid_N_out_truncated.jpg" width="160" height="120" border="0"></a></td>
+   </tr></table><font size="1">Round_Pyramid_N_out truncated</font></div>
+ </td>
+</tr>
+<!-- row5 -->
+<tr>
+ <td width="200"><div align="center">
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080">
+   <tr><td><a href="36_Round_Pyramid_N_in_wireframe.txt" target="_new">
+          <img src="36_Round_Pyramid_N_in_wireframe.jpg" width="160" height="120" border="0"></a></td>
+   </tr></table><font size="1">Round_Pyramid_N_in wireframe</font></div>
+ </td>
+ <td width="200"><div align="center">
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080">
+   <tr><td><a href="37_Round_Pyramid_N_out_wireframe.txt" target="_new">
+          <img src="37_Round_Pyramid_N_out_wireframe.jpg" width="160" height="120" border="0"></a></td>
+   </tr></table><font size="1">Round_Pyramid_N_out wireframe</font></div>
+ </td>
+ <td width="200"><div align="center">
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080">
+   <tr><td><a href="71_Half_Hollowed_Rounded_Cylinder1.txt" target="_new">
+          <img src="71_Half_Hollowed_Rounded_Cylinder1.jpg" width="160" height="120" border="0"></a></td>
+   </tr></table><font size="1">Half_Hollowed_Rounded_Cylinder1</font></div>
+ </td>
+ <td width="200"><div align="center">
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080">
+   <tr><td><a href="72_Half_Hollowed_Rounded_Cylinder2.txt" target="_new">
+          <img src="72_Half_Hollowed_Rounded_Cylinder2.jpg" width="160" height="120" border="0"></a></td>
+   </tr></table><font size="1">Half_Hollowed_Rounded_Cylinder2</font></div>
+ </td>
+</tr>
+<!-- row6 -->
+<tr>
+ <td width="200"><div align="center">
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080">
+   <tr><td><a href="40_Round_Cylinder_Tube_open.txt" target="_new">
+          <img src="40_Round_Cylinder_Tube_open.jpg" width="160" height="120" border="0"></a></td>
+   </tr></table><font size="1">Round_Cylinder_Tube open</font></div>
+ </td>
+ <td width="200"><div align="center">
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080">
+   <tr><td><a href="42_Round_Cylinder_Tube_filled.txt" target="_new">
+          <img src="42_Round_Cylinder_Tube_filled.jpg" width="160" height="120" border="0"></a></td>
+   </tr></table><font size="1">Round_Cylinder_Tube filled</font></div>
+ </td>
+ <td width="200"><div align="center">
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080">
+   <tr><td><a href="45_Rounded_Tube_open.txt" target="_new">
+          <img src="45_Rounded_Tube_open.jpg" width="160" height="120" border="0"></a></td>
+   </tr></table><font size="1">Rounded_Tube open</font></div>
+ </td>
+ <td width="200"><div align="center">
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080">
+   <tr><td><a href="47_Rounded_Tube_AB.txt" target="_new">
+          <img src="47_Rounded_Tube_AB.jpg" width="160" height="120" border="0"></a></td>
+   </tr></table><font size="1">Rounded_Tube_AB</font></div>
+ </td>
+</tr>
+<!-- row7 -->
+<tr>
+ <td width="200"><div align="center">
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080">
+   <tr><td><a href="55_Round_N_Tube_Polygon_octagonal.txt" target="_new">
+          <img src="55_Round_N_Tube_Polygon_octagonal.jpg" width="160" height="120" border="0"></a></td>
+   </tr></table><font size="1">Round_N_Tube_Polygon octagonal</font></div>
+ </td>
+ <td width="200"><div align="center">
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080">
+   <tr><td><a href="56_Round_N_Tube_Polygon_hexagonal.txt" target="_new">
+          <img src="56_Round_N_Tube_Polygon_hexagonal.jpg" width="160" height="120" border="0"></a></td>
+   </tr></table><font size="1">Round_N_Tube_Polygon_hexagonal</font></div>
+ </td>
+ <td width="200"><div align="center">
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080">
+   <tr><td><a href="57_Round_N_Tube_Polygon_transparent.txt" target="_new">
+          <img src="57_Round_N_Tube_Polygon_transparent.jpg" width="160" height="120" border="0"></a></td>
+   </tr></table><font size="1">Round_N_Tube_Polygon_transparent</font></div>
+ </td>
+ <td width="200">&nbsp;</td>
+</tr>
+<!-- row8 -->
+<tr>
+ <td width="200"><div align="center">
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080">
+   <tr><td><a href="60_Round_Conic_Torus_transparent.txt" target="_new">
+          <img src="60_Round_Conic_Torus_transparent.jpg" width="160" height="120" border="0"></a></td>
+   </tr></table><font size="1">Round_Conic_Torus transparent</font></div>
+ </td>
+ <td width="200"><div align="center">
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080">
+   <tr><td><a href="61_Round_Conic_Torus.txt" target="_new">
+          <img src="61_Round_Conic_Torus.jpg" width="160" height="120" border="0"></a></td>
+   </tr></table><font size="1">Round_Conic_Torus</font></div>
+ </td>
+ <td width="200"><div align="center">
+   <table border="2" bordercolor="#C0C0C0" bordercolordark="#FFFFFF" bordercolorlight="#808080">
+   <tr><td><a href="65_Round_Conic_Prism.txt" target="_new">
+          <img src="65_Round_Conic_Prism.jpg" width="160" height="120" border="0"></a></td>
+   </tr></table><font size="1">Round_Conic_Prism</font></div>
+ </td>
+ <td width="200">&nbsp;</td>
+</tr>
+</table>
+
+</div>
+
+</td>
+</tr>
+</table>
+</td></tr>
+<tr>
+<td valign="middle" align="center"><a href="#top">top</a>
+</td></tr></table>
+
+</div>
+
+<!-- footer -->
+<hr size="3">
+<table width="95%" align="center">
+<tr>
+ <td><i><font size="1">&copy; Persistence of Vision Ray Tracer, 2013<br>
+ <a href="http://www.povray.org"><nobr>http://www.povray.org</nobr></font></i></a>
+ </td>
+ <td>&nbsp;</td>
+ <td>&nbsp;</td>
+</tr></table><!-- end footer -->
+</body>
+</html>

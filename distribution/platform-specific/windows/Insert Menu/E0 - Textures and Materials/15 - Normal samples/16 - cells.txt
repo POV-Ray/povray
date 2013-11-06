@@ -1,0 +1,10 @@
+       texture{ Polished_Chrome 
+                pigment { color rgb<0.5,0,0> }   //Chrome_Metal  
+                normal { pigment_pattern{ 
+                            cells color_map {[0, rgb 0]
+                                             [1, rgb 1]} // end color_map 
+                            scale 0.2 } // end pigment_pattern
+                         3 } // end normal
+                
+                finish {  phong 1 }
+              } // end of texture

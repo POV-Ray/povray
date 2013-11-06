@@ -1,0 +1,109 @@
+// -----------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------- Grass texture
+#declare Tan1 = rgb< 0.76,0.58,0.34>;
+//#declare Green1=rgb<0.80,0.67,0.20>;
+//#declare Green2=rgb<0.36,0.63,0.03>;
+#declare Green1=rgb<0.4,0.7,0.15>*0.1;
+#declare Green2=rgb<0.27,0.63,0.12>*0.6;
+//----------------------------------
+#declare P_Spotted =pigment {
+spotted
+    color_map {
+        [0.0  color Tan1*0.1 ]
+        [0.4  color Tan1*0.4 ]
+        [0.6  color Green1*0.9 ]
+        [1.01 color Green1*1.1 ]
+    }
+}//---------------------------------
+#declare P_Earth =pigment {
+    spotted
+    color_map {
+        [0 color Tan*0.3]
+        [0.6 color Tan*0.3]
+        [0.6 color Green1*0.4]
+        [1   color Green1*0.6]
+    }
+}//---------------------------------
+#declare P_Green=pigment{Green2*1.3}
+//#declare P_Spotted=pigment{Red}
+//#declare P_Earth=pigment{Blue}
+#declare T_Grass=texture {                  
+    pigment {
+        gradient y
+        turbulence 0.2
+        pigment_map {                                
+            [0.0 P_Earth]
+            [0.1 P_Green]
+            [0.9 P_Spotted]
+            [1.00 P_Earth]
+        }
+    }
+    finish{ specular 0.5 roughness 0.035}
+    scale <0.001,1,0.001>
+} //---------------------------------------------------------------------------- end Grass texture
+// -----------------------------------------------------------------------------------------------
+
+
+// -----------------------------------------------------------------------------------------------
+#include "makegrass.inc"
+// -----------------------------------------------------------------------------------------------
+// Patch parameters  // ! Final number of triangles = nBlade * nBlade * segBlade * 2 (or 4 if dofold = true)
+#declare lPatch=50;               // size of patch
+#declare nBlade=15;                // number of blades per line (there will be nBlade * nBlade blades)
+//#declare nBlade=4;                // number of blades per line (there will be nBlade * nBlade blades)
+#declare ryBlade = 0;            // initial y rotation of blade
+#declare segBlade= 10;            // number of blade segments
+#declare lBlade = 10;             // length of blade
+#declare wBlade = 1.0;            // width of blade at start
+#declare wBladeEnd = 0.1;         // width of blade at the end
+#declare doSmooth= 1;          // true makes smooth triangles
+#declare startBend = <0,1,0.3>;   // bending of blade at start (<0,1,0>=no bending)
+#declare vBend = <0,1,2>;         // force bending the blade (<0,1,1> = 45°)
+#declare pwBend =4;              // bending power (how slowly the curve bends)
+#declare rd = 5153;                // seed
+#declare stdposBlade = 1;         // standard deviation of blade position 0..1
+#declare stdrotBlade = 360;       // standard deviation of rotation
+#declare stdBlade = 1.2;           // standard deviation of blade scale
+#declare stdBend = 10;            // standard deviation of blade bending
+#declare dofold = 1;//false;/true; or 0;/1; // true creates a central fold in the blade (twice more triangles)
+#declare dofile = 0;//false;/true; or 0;/1; // true creates a mesh file
+#declare fname = "fgrass2.inc"     // name of the mesh file to create
+// -----------------------------------------------------------------------------------------------
+// Prairie parameters
+#declare nxPrairie=12;             // number of patches for the first line
+#declare addPatches=1.5;            // number of patches to add at each line
+#declare nzPrairie=35;             // number of lines of patches
+#declare rd=seed(179);            // random seed
+#declare stdscale=1;              // stddev of scale
+#declare stdrotate=1;             // stddev of rotation
+#declare doTest=0;//false;/true; or 0;/1; // replaces the patch with a sphere
+// -----------------------------------------------------------------------------------------------
+// Create the patch 
+#if (dofile=true) // if the patch is already created, turn off the next line
+   MakeGrassPatch(lPatch,nBlade,ryBlade,segBlade,lBlade,wBlade,wBladeEnd,doSmooth,startBend,vBend,pwBend,rd,stdposBlade,stdrotBlade,stdBlade,stdBend,dofold,dofile,fname)
+   #declare objectPatch=#include fname
+#else        
+   #declare objectPatch=object{MakeGrassPatch(lPatch,nBlade,ryBlade,segBlade,lBlade,wBlade,wBladeEnd,doSmooth,startBend,vBend,pwBend,rd,stdposBlade,stdrotBlade,stdBlade,stdBend,dofold,dofile,fname)}
+#end        
+// -----------------------------------------------------------------------------------------------
+// Create the prairie
+object{MakePrairie(lPatch,nxPrairie,addPatches,nzPrairie,objectPatch,rd,stdscale,stdrotate,doTest)
+// or optional: show Single Patch  
+// object{  ObjectPatch
+    scale 1/40
+    texture{T_Grass }
+   /* size ~ 1.00 !!! */
+ scale 1.5     // -> size ~  1 units high
+ //scale 0.5 // -> size ~0.5 units high
+ translate<0,0,-0.75>
+}  
+// -----------------------------------------------------------------------------------------------
+//cylinder{0,y*0.01,5 texture{T_Grass scale 40}}
+
+
+// Test pole 1 unit high ------------------------------------
+cylinder { <0,0,0>,<0,1.00,0>, 0.05  
+           pigment { color rgb<1,1,1> }
+           scale <1,1,1> rotate<0,0,0> translate<0,0,0>
+         } // end of cylinder -------------------------------
+//-----------------------------------------------------------

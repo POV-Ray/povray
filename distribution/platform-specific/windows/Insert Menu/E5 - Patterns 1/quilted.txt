@@ -1,0 +1,5 @@
+// pattern for use in texture/pigment/normal/density
+// creates a pattern like a quilt
+  quilted 0.4 // amount
+  control0 -1 // lower curvature (-1...1)
+  control1 1  // upper curvature (-1...1)

@@ -1,0 +1,21 @@
+// parametric object
+// not yet worked out
+parametric {
+  function { u*v*sin (15*v) },            // x-axis
+  function { v },                         // y-axis
+  function { u*v*cos (15*v) }             // z-axis
+  <0,0>, <1,1>
+  //contained_by { sphere { 0,1 } } // texturing problem, use box instead to see!
+  contained_by { box { <-1,-1,-1>, <1,1,1> } }
+  // max_gradient 2
+  accuracy 0.005        // 0.001 default, lower slower but better
+  precompute 15 x,y,z   // precompute [x,y,z] normally gives faster rendering (<=20)
+
+  rotate 180*x
+  scale 1
+  texture{ pigment{ color rgb<1,1,1> } 
+            
+         } 
+  translate<0,1,0>
+}
+

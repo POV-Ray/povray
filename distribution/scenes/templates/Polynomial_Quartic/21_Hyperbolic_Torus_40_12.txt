@@ -1,0 +1,13 @@
+
+#include "shapesq.inc"
+object{ Hyperbolic_Torus_40_12  //---------------------------
+        sturm
+        texture { pigment{ color White}  
+                  finish { phong 1}
+                } // end of texture 
+        scale 1
+        rotate< 0, 0,0>
+        translate <0, 10, 35>
+      } // ------------------------------------ end of object
+
+

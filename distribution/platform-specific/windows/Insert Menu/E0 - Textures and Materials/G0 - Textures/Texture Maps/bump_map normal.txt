@@ -1,0 +1,11 @@
+// texture normal {} attribute
+// create a texture that has a bumpiness corresponding to color index
+// image maps into X-Y plane from <0,0,0> to <1,1,0>
+bump_map { // uses image color or index as bumpiness
+  png "plasma3.png" // the file to read (iff/tga/gif/png/jpeg/tiff/sys)
+  map_type 0        // 0=planar, 1=spherical, 2=cylindrical, 5=torus
+  interpolate 2     // 0=none, 1=linear, 2=bilinear, 4=normalized distance
+  // once           // for no repetitive tiling
+  // [use_color | use_index]
+  bump_size 0.5     // 0...3
+} // bump_map

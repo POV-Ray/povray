@@ -1,0 +1,25 @@
+isosurface { //-------------------------------------------------------------
+  function{
+     f_helix1(
+        x,y,z,
+        8,    // number of helixes, (1 = single helix, 2 = double helix etc.)
+        4,    // period,      turns on the length of 2*pi 
+        0.07, // minor radius,
+        0.80, // major radius,
+        0.75, // shape parameter, 
+        2.0,  // cross section type, (0.0 to 1.0 = square ... rounded to circle
+              //                 over 2.0 to 3.0 = rounded to diamond and concave diamond
+        0     // cross section rotation angle
+      )
+  }          
+ contained_by {box {<-1,-1,-1>,<1,1,1>}}
+ max_gradient 8
+ 
+ texture{ Chrome_Metal
+          //pigment{ color rgb <1,0.8,0.3>} 
+          finish { phong 0.2 }
+        }
+ rotate<0,0,0>
+ scale 0.9
+ translate< 0,1.2,0>
+} // end of isosurface -------------------------------------------------------

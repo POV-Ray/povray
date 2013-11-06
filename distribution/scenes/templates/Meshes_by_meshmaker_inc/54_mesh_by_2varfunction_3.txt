@@ -1,0 +1,55 @@
+//-------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
+#declare SF =
+ function {
+   pigment {
+   boxed // spherical  
+     color_map {
+       [0.0, color 0.0 ]
+       [0.5, color 0.5 ]
+       [1.0, color 1.0 ]
+     } // end color_map
+    scale <0.5,1,0.5>
+    //translate<0.5,0,0.5>
+    rotate<-90,0,0>
+   } // end pigment
+ } // end function
+
+#declare HF   =
+ function(u, v )
+  {  f_snoise3d(x*0.5,y*0.5,z*0.5 )*6   //*
+    *1*SF(x/12,y/12,z/12).gray}
+
+//#declare F1=function{pattern{wood sine_wave turbulence 0.2}}
+//#declare F2=function(u,v){F1(u/3,v/3,0) * SF(x,y,z).gray*0.5}
+//-------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
+#include "meshmaker.inc"
+//-------------------------------------------------------------------------------------------------
+object { // TwoVarSurf( __Fuv, Urange, Vrange, Iter_U, Iter_V, FileName )
+         // Builds a mesh2 surface of a function with two variables (u,v). 
+         // The uv_coordinates for texturing the surface come from the square <0,0> - <1,1> 
+
+   TwoVarSurf(     HF, // The function to be turned into a mesh2 object.
+                       // the ranges within which the surface is calculated: 
+               <-6,6>, // 2-D vector that gives the boundaries of u. 
+               <-6,6>, // 2-D vector that gives the boundaries of v.
+                 200, //  resolution of the mesh in the u range 
+                 200, //  resolution of the mesh in the v range. 
+                ""  // FileName: ""= non, "NAME.obj'= Wavefront objectfile, "NAME.pcm" compressed mesh file 
+                    // "NAME.arr" include file with arrays to build a mesh2 from,
+                    //  others: includefile with a mesh2 object 
+             ) // ---------------------------------------------------------------------------------
+ texture{ 
+   uv_mapping
+   pigment{checker color rgb <0,0,0.1> color rgb <1,0.85,0.85> scale 1/24}
+   finish{specular 0.4}
+ } // 
+
+ scale <1,1,1>*1
+ rotate <90,0,0>
+ translate<0,0,0>
+} // end of object
+//-------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
+

@@ -1,0 +1,20 @@
+//--------------------------------------------------------------------------
+// #include "math.inc"  
+#declare R= 1;      // radius (of the middle of waveline)
+#declare D= 0.075;  // half dent heigth 
+#declare Z= 0.2;    // thickness in +z direction               
+#declare Ridges=21; // number of dents or waves
+
+isosurface { //---------------------------------- cylinder with wavy outline
+  function{ sqrt(x*x+y*y)-R   -  cos(atan2(y,x)*Ridges)*D  }
+  threshold 0
+  max_gradient 2
+  contained_by {box{<-1-D,-1-D,-Z>, <1+D,1+D,Z>}}
+  texture { T_Silver_3A
+            normal { bumps 0.5 scale 0.0015} 
+            finish { phong 1}
+          } // end of texture 
+  scale 1
+  rotate <0, -30, 0>
+  translate <0, 1.0, 0>
+} // end of isosurface ----------------------------------------------------- 

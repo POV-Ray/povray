@@ -1,0 +1,1 @@
+ no_reflection no_shadow

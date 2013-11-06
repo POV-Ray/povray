@@ -1,0 +1,104 @@
+// PoVRay 3.6/3.7 Scene File "'chars'.txt"
+// Demo for "chars.inc"
+//--------------------------------------------------------------------------
+#if ( version < 3.7 ) global_settings{ assumed_gamma 1.0 } #end
+#default{ finish{ ambient 0.1 diffuse 0.9 }} 
+//--------------------------------------------------------------------------
+#include "colors.inc"
+#include "textures.inc"
+//--------------------------------------------------------------------------
+camera{ angle 75  
+        location  <0.0 , 1.0 ,-3.0>
+        right     x*image_width/image_height
+        look_at   <0.0 , 1.0 , 0.0>
+      }
+
+light_source{<1500,2500,-2500> color White}
+
+
+sky_sphere{ pigment{  color rgb<0.24,0.34,0.56>*0.7} } 
+  
+//------------------------------------------------------------------
+ 
+
+
+#include "chars.inc" // 26 upper-case, size of all characters is 4 * 5 * 1
+#declare Char_Scale = 0.1;
+#declare Char_Distance = 4.5;     
+#declare Char_H = 6.5;     
+
+union{ 
+ union{ 
+  object{ char_A translate<0*Char_Distance,0,0>  }
+  object{ char_B translate<1*Char_Distance,0,0>  }
+  object{ char_C translate<2*Char_Distance,0,0>  }
+  object{ char_D translate<3*Char_Distance,0,0>  }
+  object{ char_E translate<4*Char_Distance,0,0>  }
+  object{ char_F translate<5*Char_Distance,0,0>  }
+  object{ char_G translate<6*Char_Distance,0,0>  }
+  object{ char_H translate<7*Char_Distance,0,0>  }
+  object{ char_I translate<8*Char_Distance,0,0>  }
+  object{ char_J translate<9*Char_Distance,0,0>  }
+  object{ char_K translate<10*Char_Distance,0,0>  }
+  translate<0,1*Char_H,0>
+ }
+ union{ 
+  object{ char_L translate<0*Char_Distance,0,0>  }
+  object{ char_M translate<1*Char_Distance,0,0>  }
+  object{ char_N translate<2*Char_Distance,0,0>  }
+  object{ char_O translate<3*Char_Distance,0,0>  }
+  object{ char_P translate<4*Char_Distance,0,0>  }
+  object{ char_Q translate<5*Char_Distance,0,0>  }
+  object{ char_R translate<6*Char_Distance,0,0>  }
+  object{ char_S translate<7*Char_Distance,0,0>  }
+  object{ char_T translate<8*Char_Distance,0,0>  }
+  object{ char_U translate<9*Char_Distance,0,0>  }
+  object{ char_V translate<10*Char_Distance,0,0>  }
+  translate<0,0*Char_H,0>
+ }
+ union{ 
+  object{ char_W translate<0*Char_Distance,0,0>  }
+  object{ char_X translate<1*Char_Distance,0,0>  }
+  object{ char_Y translate<2*Char_Distance,0,0>  }
+  object{ char_Z translate<3*Char_Distance,0,0>  }
+  object{ char_AtSign translate<5*Char_Distance,0,0>  }
+  object{ char_Num    translate<6*Char_Distance,0,0>  }
+  object{ char_Dol    translate<7*Char_Distance,0,0>  }
+  object{ char_Perc   translate<8*Char_Distance,0,0>  }
+  object{ char_Hat    translate<9*Char_Distance,0,0>  }
+  object{ char_Amps   translate<10*Char_Distance,0,0>  }
+  translate<0,-1*Char_H,0>
+ }
+ union{ 
+  object{ char_1 translate<0*Char_Distance,0,0>  }
+  object{ char_2 translate<1*Char_Distance,0,0>  }
+  object{ char_3 translate<2*Char_Distance,0,0>  }
+  object{ char_4 translate<3*Char_Distance,0,0>  }
+  object{ char_5 translate<4*Char_Distance,0,0>  }
+  object{ char_6 translate<5*Char_Distance,0,0>  }
+  object{ char_7 translate<6*Char_Distance,0,0>  }
+  object{ char_8 translate<7*Char_Distance,0,0>  }
+  object{ char_9 translate<8*Char_Distance,0,0>  }
+  object{ char_Plus translate<9*Char_Distance,0,0>  }
+  object{ char_Dash translate<10*Char_Distance,0,0>  }
+  translate<0,-2*Char_H,0>
+ }
+ union{ 
+  object{ char_LPar translate<4*Char_Distance,0,0>  }
+  object{ char_RPar translate<5*Char_Distance,0,0>  }
+  object{ char_LSqu translate<6*Char_Distance,0,0>  }
+  object{ char_RSqu translate<7*Char_Distance,0,0>  }
+  translate<0,-3*Char_H,0>
+ }
+ scale Char_Scale
+ translate<-2.0,1.35,0.5>
+ rotate<0,-10,0>
+ 
+ pigment{ color White*1.2}
+}
+
+
+
+
+
+

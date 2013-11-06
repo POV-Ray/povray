@@ -1,0 +1,5 @@
+//needs: #include "transforms.inc" 
+
+      // Shear_Trans(New_X, New_Y, New_Z): 
+      // x axis points to New_X, y points to New_Y, z points to New_Z.
+      Shear_Trans(<2,0.5,0>, <0,0.5,0>, <0,0.5,0.5>)   

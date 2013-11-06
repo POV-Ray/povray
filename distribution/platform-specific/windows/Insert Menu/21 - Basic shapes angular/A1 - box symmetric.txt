@@ -1,0 +1,8 @@
+box { <-1.00, 0.00, -1.00>,< 1.00, 2.00, 1.00>   
+
+      texture { pigment{ color rgb<1.00, 1.00, 1.00>}  
+                finish { phong 1 reflection{ 0.00 metallic 0.00} } 
+              } // end of texture
+
+      scale <1,1,1> rotate<0,0,0> translate<0,0,0> 
+    } // end of box --------------------------------------

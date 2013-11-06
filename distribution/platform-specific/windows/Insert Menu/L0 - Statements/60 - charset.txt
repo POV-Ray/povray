@@ -1,0 +1,5 @@
+// used in global_settings, specify the assumed character set of all text strings
+  //charset ascii       // standard ascii (only 0 to 127 are valid)
+global_settings{ charset utf8 }      // unicode
+  //charset sys       // system specific charset
+

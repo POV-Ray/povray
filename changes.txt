@@ -1,0 +1,3163 @@
+#----------------------------------------------------------------------------
+# Note: To view an original flyspray bug report (FS#xxx), replace the leading
+# FS# of the bug ID with the URL http://bugs.povray.org/.
+# For example, to read FS#270, visit http://bugs.povray.org/270.
+# To view a referenced newsgroup posting (<xxxxx@news.povray.org>), prefix
+# the message ID with the URL http://news.povray.org/.
+# For example, to read <42765ef3$1@news.povray.org>, visit:
+# http://news.povray.org/<42765ef3$1@news.povray.org>.
+# The '<' and '>' are optional (if using a shell you may want to omit them).
+#----------------------------------------------------------------------------
+
+----------------------------------------------------------------------------
+Changelog information is available in the file revision.txt, which should be
+located in the same directory as this file is.
+----------------------------------------------------------------------------
+
+---------------------------------
+Changes between 3.7.RC7 and 3.7.0
+---------------------------------
+
+   - This is the version 3.7.0 release, and mostly things are in order,
+     however a few minor bugs have been addressed. Continued efforts towards
+     addressing static code analysis issue's resulted in the inclusion of
+     several high profile fixes into this release. The scene files included
+     with the distribution have been reviewed as well. This includes
+     version branding, deleting some older irrelevent files, and a few new
+     additions. The windows version insert menu files were also updated and
+     expanded. Additionally the insert menu templates are now also available
+     in HTML for convenient use with 'cut and paste'. The distribution package
+     has been branded with a different (AGPL3) license.
+
+   - For technical reasons the Macintosh OS graphical user interface was not
+     ready at the time of this release. However, the source code will be made
+     available to users so they can build there own binary if the wish.
+
+Windows Related:
+----------------
+
+   - moved codemax source and removed dependence on codemax header files
+   - relocated cmedit source files
+   - updated help file
+   - updated keywords used for context-sensitive help
+   - minor setup tweak
+   - fix unquoted path in shell extension registration and added registry key
+     backups for uninstall
+   - updated source code readme.html
+   - updated about box image
+   - some tweaks related to console project and remove codemax project
+   - removed vs8 and vs9 solutions
+   - fixed issue with editor selection due to off-by-one line numbers.
+     make use of SetCaretPos consistent
+   - update about bitmap to remove explicit URL's and add support to about
+     window code to make some areas act as hyperlinks
+   - remove old 4BPP toolbar icons as 16-color mode support isn't really
+     relevant anymore
+   - rename a few files in bitmaps directory whose names were upper-case
+   
+
+Static Code Analysis:
+---------------------
+
+   - CID 967264: Non-array delete for scalars
+   - CID 967298: Resource Leak
+   - CID 967299: Resource Leak
+   - CID 967300: Resource Leak
+   - CID 967301: Resource Leak
+   - CID 967302: Resource Leak
+   - CID 967303: Resource Leak
+   - CID 967363: Uninitialized scalar variable
+   - CID 967364: Uninitialized scalar variable 
+   - CID 967365: Uninitialized pointer read
+
+   - Several fixes were rolled back, pending further investigation. They have
+     been tabled for inclusion in a future release.
+
+Fixed or mitigated the following bug reports:
+---------------------------------------------
+
+   - http://bugs.povray.org/task/262  linux sources being compiled twice
+   - http://bugs.povray.org/task/271  filter affects object's own brightness
+   - http://bugs.povray.org/task/274  light source fading and subsurface
+   - http://bugs.povray.org/task/294  splines are not thread safe
+   - http://bugs.povray.org/task/304  for loop fails to perform last iteration
+   - http://bugs.povray.org/task/308  heightfield computation has a regression 
+
+Other Noteworthy:
+-----------------
+
+   - assigned licences to individual source files in the distribution tree
+   - minor but effective changes to octree code for improved performance
+     in radiosity-heavy scenes
+   - minor fix to radiosity statistics (octree samples/node)
+   - cleaned up our jpeg code to use the proper constants for the jpeglib's
+     custom "boolean" type (we erroneously passed standard C++ bool constants
+     instead, which could lead to compile errors on some systems)
+   - suppressed duplicate version message and flipped version to 3.7.0
+   - moved some code (previously a temp fix) to the frontend where it belongs
+   - added new include files: shapes3.inc, meshmaker.inc and makegrass.inc
+   - a couple of (unix specific) developer and user contributed fixes
+   - remove outdated support header files for borland, mingw and watcom
+     compilers
+   - add warranty disclaimer to console output
+   - updates to unix man page
+
+-----------------------------------
+Changes between 3.7.RC6 and 3.7.RC7
+-----------------------------------
+
+   - This is the FINAL release candidate. It features continued refinements to
+     the Windows user interface as well as the setup/install process, fixes
+     found by static code analysis, and various other bug fixes.
+
+Windows Installer:
+------------------
+
+   - POVWIN now assigns .pov file association to when installing.
+   - Improved cloning of v3.6 INI and provide better defaults.
+   - Various fixes/improvements to the way Windows INSTALL works and how the
+     documents path is auto-detected if not specified.
+   - Additional setup tweaks.
+
+Windows Crash Reports:
+----------------------
+
+   - Fix to handle filenames with a comma in them: crash report #419.
+
+Static Code Analysis:
+---------------------
+
+   - CID 967356: Uninitialized scalar variable
+     uninit_use: Using uninitialized value "r". See also FS#267
+
+   - CID 967224: Truncated stdio return value
+     char_io: Assigning the return value of "pov_base::ITextStream::getchar()"
+     to char "chr" truncated its value
+
+   - CID 967248: Copy-paste error
+     copy_paste_error: "t1" in "t1 < 1e+07." looks like a copy-paste error.
+     Should it says "t2" instead
+
+   - CID 967249  Resource leak in object
+     1. alloc_new: Allocating memory by calling
+        "new double[camera.Blur_Samples]"
+     2. var_assign: Assigning: "this->Sample_Threshold" =
+        "new double[camera.Blur_Samples]"
+     3. ctor_dtor_leak: The constructor allocates field "Sample_Threshold" of
+        "pov::TracePixel::FocalBlurData" but the destructor and whatever
+        functions it calls do not free it
+ 
+   - CID 967420: Non-virtual destructor
+     Nonvirtual_dtor: Class pov::RadiosityTask::RadiosityBlockInfo has a
+     destructor and a pointer to it is upcast to class pov::ViewData::BlockInfo
+     which doesn't have a virtual destructor 
+
+Fixed or mitigated the following bug reports:
+---------------------------------------------
+
+   - http://bugs.povray.org/task/270  render abort-continue (+C) skips blocks
+   - http://bugs.povray.org/task/267  bug in "sor" primitive causes artifacts
+   - http://bugs.povray.org/task/266  improper quoted strings handling
+   - http://bugs.povray.org/task/265  supress clang compilation warnings
+   - http://bugs.povray.org/task/257  Input file resuming animation render
+   - http://bugs.povray.org/task/249  UTF-8 files with BOM read error
+   - http://bugs.povray.org/task/247  set no_radiosity in Screen_Object()
+   - http://bugs.povray.org/task/238  error during #read leaves file open
+   - http://bugs.povray.org/task/234  allows GD flag to work correctly
+   - http://bugs.povray.org/task/233  picture index out of range
+   - http://bugs.povray.org/task/232  illegal map_type usage reporting
+   - http://bugs.povray.org/task/224  syntax highlighting/auto-comp (windows)
+   - http://bugs.povray.org/task/153  determine I/O permission for output file
+   - http://bugs.povray.org/task/150  improves POVWIN shell "open with" option
+   - http://bugs.povray.org/task/135  editor tab right-click menu additions
+   - http://bugs.povray.org/task/109  frame-by-frame debug data handling
+
+Other Noteworthy:
+-----------------
+
+    - Several updates to #5678 (FS#233): workaround for fmod() apparently not
+      conforming to C++ standard on some linux machines.
+    - Fixed radiosity issues with "diffuse albedo" syntax.
+    - Fix for benchmark thread vs CPU count (windows version).
+    - Fix to get rid of a shape/poly.cpp compile warning on Linux variants
+    - Added (re-enabled) crand support.
+    - Couple of fixes for an issue caused by a "boost" change.
+    - Build-in benchmark can now render without external distribution files.
+    - Fixed a bug in file-backed image container.
+    - Bump benchmark version to 2.01
+    - Various windows user interface refinements
+    - Added new option to prevent the system (windows) from sleeping whilst a
+      render is in progress. by default this is selected.
+    - Fix a long-standing bug where pressing 'pause' during a parse or render
+      could sometimes put the frontend/backend sync into an unrecoverable state
+    - Updated copyright information for some 3rd party libraries.
+    - A few signedness fixes in image handling code.
+    - Continued code cleanup including getting rid of unused code & parameters.
+    - Updated VS project libraries: zlib, libpng, libjpeg
+    - Added Append_File +GP option, which allows users to append streamed
+      console to existing console stream output file(s).
+
+----------------------------------------
+Changes between 3.7.beta.RC5 and 3.7.RC6
+----------------------------------------
+
+   - This release candidate features continued refinements to the Windows
+     installer, VS10 code (and other) cleanup and a few bug fixes.
+
+Windows Installer:
+------------------
+
+   - Several updates and improvements that address user feedback.
+   - Fixed an issue with the XP64 installer.
+
+Windows Source Build:
+---------------------
+
+   - Fixed ALL tiff project targets to build tiff config headers.
+   - Fixed Debug/x64 target to build OpenEXR to Float.
+
+Windows Crash Reports:
+----------------------
+
+   - Fix for divide-by-zero in stats code when radiosity query count is 0
+     crash report #384, dump file #342
+   - Fix merge issue from change #5387 which re-introduced a bug fixed earlier
+     crash report #385, dump file #343
+   - Potential fixes for a number of crash reports related to the editor
+     (particularly drag&drop actions)
+   - Fix for numeric overflow issues in image handling; eg: VERY large images
+
+
+Fixed or mitigated the following reports:
+-----------------------------------------
+
+http://bugs.povray.org/task/241    FS#241    (Photons not working correctly)
+
+Other Noteworthy
+----------------
+
+   - Insert menu (windows version) update from Friedrich Lohmller.
+   - Fixed problems with colored transparent backgrounds.
+   - Fixed the Windows help file searchable index.
+   - Some general code housekeeping (comments and whitespace).
+   - A minor fix for radiosity adc_bailout handling.
+   - Corrected a formatting issue with radiosity statistics reporting.
+ 
+----------------------------------------
+Changes between 3.7.beta.RC4 and 3.7.RC5
+----------------------------------------
+
+   - This release candidate primarily addresses the crash dump report #357
+     triggered by non-closed SSLT-enabled mesh inside CSG. This fix also
+     addressed several issue's with another outstanding bug report.
+
+   - The Windows installer and crash dump submitter have been improved.
+
+   - Changes to the post processing of the Windows help file corrected the
+     broken searchable index.
+
+   - A couple of bug reports have been addressed.
+
+Fixed or mitigated the following reports:
+-----------------------------------------
+
+http://bugs.povray.org/task/12    FS#12    (facets pattern in normal map)
+http://bugs.povray.org/task/196   FS#196   (More SSLT Caveats)
+http://bugs.povray.org/task/46    FS#239   (improper uid/gid handling)
+
+----------------------------------------
+Changes between 3.7.beta.RC3 and 3.7.RC4
+----------------------------------------
+
+   - This release candidate primarily improves upon the SSLT code, but there
+     are also some other noteworthy enhancements and/or additions.
+     
+     They are listed below:
+
+     - a keyword addition "albedo" it's a new finish attribute
+     - the iridescence feature has been overhauled
+     - support was added for tuning brightness of image-mapped sky spheres
+     - three new tiling patterns were added
+
+   - Building from the windows source distribution has also been simplified
+   - Introduced a new windows installer
+   - Added AMD optimizations for noise
+   - A Windows Editor crash fix
+   - Over two dozen bug reports have addressed
+   - A few scene file fixes and/or additions
+   - Updated the Windows help file
+
+Subsurface Light Transport
+--------------------------
+
+  bugfixes and improvements to SSLT code;
+
+  syntax for material definition has changed as follows:
+
+  material {
+    texture {
+      pigment { PIGMENT }
+      finish { ...
+        subsurface { translucency COLOR }
+        }
+      }
+    interior { ior FLOAT }
+    }
+
+  The pigment determines the SSLT material's overall appearance when applied
+  to an object with sufficiently large structures. The translucency color
+  (which can alternatively be a float) determines the strength of the
+  subsurface light transport effect (note that the values may be >1.0; also
+  note that the effect doesn't scale with the object; instead, to adjust
+  materials to the dimensions of your scene, use the global mm_per_unit
+  setting). The material's index of refraction also affects the appearance of
+  the material, and is mandatory for SSLT materials.
+
+  SSLT is now enabled only when a global_settings subsurface block is present;
+  to enable SSLT but use the default settings, specify an empty block,
+  i.e. "subsurface{}"
+
+  Due to the experimental status of SSLT, there are currently some caveats:
+  - Incorrect use may result in hard crashes instead of parse warnings.
+  - Pigments having any zero color components currently don't play nice with
+  SSLT; for example instead of "rgb 1" you should use something like
+  "rgb <1,0.05,0.05>".
+  - A Diffuse finish attribute of zero can cause the program to have an
+  assertion failure.
+  - changes to improve robustness regarding low translucency and/or high
+  mm_per_unit settings for objects in general and blobs in particular
+  added support for CSG (caveat: unions of overlapping components will cause
+  unexpected results; use merge instead)
+
+  Further Subsurface scattering improvements include:
+
+  - added syntax to global subsurface block:
+
+  global_settings { subsurface { radiosity BOOL } }
+
+  specifies whether subsurface light transport effects should be applied to
+  incoming radiosity-based diffuse illumination; if this setting is
+  off (default), subsurface light transport effects will only be applied to
+  direct illumination from classic light sources. Setting this to on will
+  improve realism especially for materials with high translucency, but at a
+  significant cost in rendering time.
+
+  - added syntax to global radiosity block:
+
+  global_settings {  radiosity { subsurface BOOL } }
+
+  specifies whether radiosity sampling should honor subsurface light transport;
+  if this setting is off (default), radiosity-based diffuse illumination is
+  computed as if the surrounding objects had subsurface light transport turned
+  off. Setting this to on may improve realism especially in the presence of
+  materials with high translucency, but at some cost in rendering time.
+
+  - Subsurface scattering is disabled in all quality levels except +Q9
+    or higher.
+  - More thorough fix to complement change #5425.
+  - Minor changes to reduce intensity of patterned noise artifacts on
+    subsurface textures.
+
+Other Noteworthy
+----------------
+
+  - Added new "albedo" keyword, that can be used right after "diffuse",
+    "phong" or "specular" to specify that the parameter is to be taken as the
+    total diffuse/specular reflectance, rather than peak reflectance. E.g.:
+
+    diffuse albedo 0.5 brilliance 2
+    specular albedo 0.05 roughness 0.001
+    phong albedo 0.02 phong_size 1000
+
+    Note that for brilliance = 1, the "albedo" keyword has no effect on the
+    diffuse parameter.
+
+  - A major overhaul of iridescence feature, which used to be seriously flawed;
+    syntax remains unchanged, except that both thickness and amount are now
+    supposed to be specified in microns. The new irid_wavelength default value
+    is now <0.70, 0.52, 0.48>, so iridescence effects will vary from previous
+    versions.
+
+  - Added support for tuning brightness of image-mapped sky spheres:
+    Added "emission COLOUR" parameter to sky_sphere, defaulting to [rgb] 1.
+    Higher values increase the sky sphere brightness accordingly, while lower
+    values decrease it. While primarily intended for easy tuning of light probe
+    skies, the parameter also works with procedural sky pigments.
+
+  - Added three new "tiling" patterns:
+    - pattern 25 type (N=6) produces a Penrose P1 tile
+    - pattern 26 type (N=2) produces a Penrose P2 tile
+    - pattern 27 type (N=2) produces a Penrose P3 tile
+
+  - Added AMD optimizations for noise. Note that these are currently disabled.
+
+Windows Source Build:
+---------------------
+
+  A subset of the Boost 1.45.0 and openEXR 1.6.1 libraries have been added to
+  the windows source distribution so that users can easily build thier own
+  statically linked binary from scratch. Added "Console" and "Console-SSE2"
+  configurations to VS10 solution, but needs to be back-ported to VS8/9 as
+  there is no debug configuration yet. Extensive testing still required ...
+  expect shellout to be still dysfunctional.
+
+Windows Crash Reports:
+----------------------
+
+  - The crash reporter tool has been reworked to always generate both full and
+    mini dumps because often insufficient information was available to resolve
+    the crash, consequently compression support was also added. 
+  - A windows editor fix for a problem that was reported in crashdump #111
+
+Windows Installer:
+------------------
+
+  Introduced a new windows version NSIS based installer, further improvements
+  pending. Currently there are a few caveats:
+
+  - It won't ask you to uninstall the old beta (don't use MSI anymore)
+  - It won't object if you try to re-install over the top of an existing install.
+  - It also requires elevation on Vista and Windows 7 as it allows installation
+  to the program files directory (the default now).
+
+Fixed or mitigated the following reports:
+-----------------------------------------
+
+http://bugs.povray.org/task/9     FS#9     (sky_sphere brightness tuning)
+http://bugs.povray.org/task/46    FS#46    (area_illumination enhancement)
+http://bugs.povray.org/task/156   FS#156   (crash reading empty DF3 file)
+http://bugs.povray.org/task/165   FS#165   (projected image_map is clipped)
+http://bugs.povray.org/task/166   FS#166   (quick_color does not work)
+http://bugs.povray.org/task/169   FS#169   (photon memory leak)
+http://bugs.povray.org/task/185   FS#185   (wrong image resolution reported)
+http://bugs.povray.org/task/190   FS#190   (photon message reporting)
+http://bugs.povray.org/task/191   FS#191   (interpolated image_map artifacts)
+http://bugs.povray.org/task/194   FS#194   (command line option change)
+http://bugs.povray.org/task/196   FS#196   (subsurface seqmentation faults)
+http://bugs.povray.org/task/197   FS#197   (-J option was a no-op)
+http://bugs.povray.org/task/198   FS#198   (missing braces in funtion)
+http://bugs.povray.org/task/199   FS#199   (scene file typos)
+http://bugs.povray.org/task/200   FS#200   (Calibri TrueType font garbled)
+http://bugs.povray.org/task/203   FS#203   (radiosity artifacts)
+http://bugs.povray.org/task/204   FS#204   (--V is not Verbose=off on Unix)
+http://bugs.povray.org/task/206   FS#206   (cannot open file error)
+http://bugs.povray.org/task/208   FS#208   (use-after-free when returning)
+http://bugs.povray.org/task/209   FS#209   (weighted texture of CSG)
+http://bugs.povray.org/task/210   FS#210   (UV mapping broken for parametric)
+http://bugs.povray.org/task/213   FS#213   (add check for ios failbit/badbit)
+http://bugs.povray.org/task/214   FS#214   (failed to parse command-line)
+http://bugs.povray.org/task/215   FS#215   (double error reporting)
+http://bugs.povray.org/task/216   FS#216   (obsolete option in raddem.ini file)
+http://bugs.povray.org/task/221   FS#221   (crash undefinded looks_like object)
+http://bugs.povray.org/task/225   FS#225   (looks_like texture translate fix)
+http://bugs.povray.org/task/235   FS#235   (unix segmentation fault)
+
+Scene file updates and additions:
+---------------------------------
+
+Updated the tiling pattern scene file:
+  ~scenes/textures/patterns/tiling.pov
+
+Updated the SSLT scene file:
+  ~scenes/subsurface/subsurface.pov
+
+Added these mesh_camera scene files:
+  ~scenes/camera/mesh_camea/ess/ess-ortho-camera.pov
+  ~scenes/camera/mesh_camea/ess/ess-persp-camera.pov
+  ~scenes/camera/mesh_camea/ess/ortho-camera.pov
+  ~scenes/camera/mesh_camea/ess/persp-camera.pov
+
+Added a missing scene file:
+  ~scenes/bsp/Tango.pov
+
+Added a new tiling pattern scene file:
+  ~scenes/textures/patterns/tiling.pov
+
+Fixed two macros in ~includes/shapes.inc:
+  - HFCreate_ : output formatting
+  - Bevelled_Text : suppress "bound_by" warnings
+
+Removed an obsolete directive that aborted the render:
+  ~scenes/animations/raddem/raddem.ini
+
+Removed obsolete comments (Library_Path limitation) from povray.ini
+
+----------------------------------------
+Changes between 3.7.beta.RC2 and 3.7.RC3
+----------------------------------------
+
+This release candidate is primarily to correct a bug in media that was causing
+crashes. It also improves a performance issue related to output file caching.
+
+Output File Caching
+-------------------
+
+The efficiency of the code for caching output files on disk has been improved.
+In addition, the point at which an output file is cached has been changed from
+a compiled-in number of pixels to a user-defined number of megabytes.
+
+When rendering an image that has output to file turned on, POV-Ray will cache
+the image in two places: firstly, a .pov-state file, which is always on disk.
+This is not technically an image file but a record of the communication
+between the internal frontend and backend, which also contains the image pixels.
+This file is only ever needed if you wish to re-start a render using the +c
+option. It is deleted upon successful completion of a render.
+
+The second place an image is cached is in an image buffer, which contains only
+the image pixels. This buffer is what is used to create the final output image
+once a render completes. The buffer is stored in a neutral format (i.e. not in
+any way related to the selected output file type), and may either be in RAM or
+on disk.
+
+Storing it on disk reduces performance slightly since POV-Ray has to perform
+disk access to write it during render, then to read it when converting to the
+final output format.
+
+Storing it in memory removes the above performance penalty, but may add a worse
+one if you are rendering at a very high resolution and the size of the resulting
+memory buffer causes parts of the parsed POV-Ray scene to be swapped to a page
+file by the operating system. This can slow down a render by several orders of
+magnitude, depending on the circumstance.
+
+The point at which POV-Ray will change from an in-memory buffer to a disk buffer
+is controlled by the new Max_Image_Buffer_Memory INI parameter (+IM if specified
+via the command-line). If not supplied, POV-Ray will default to 128mb. If supplied,
+the number represents the approximate number of megabytes (1,048,576 bytes) that
+POV-Ray will allow the internal image buffer to occupy. If an image exceeds this
+size, the image buffer will be placed in a temporary file on disk instead. Note
+that this decision is made upon the start of the render - the buffer does not grow
+during render, but is pre-allocated to the size required to hold all the pixels.
+
+As a guide, you can expect POV-Ray to use 20 bytes per pixel to store the image
+during render. Thus, the default 128mb size allows an image of up to about 6.7
+million pixels to be stored in RAM (approximately 2600 x 2600 pixels).
+
+You should definitely consider reducing this default if your system is memory-
+constrained or you are rendering a scene that generates a particularly large
+dataset.
+
+The value supplied to Max_Image_Buffer_Memory should be an integer greater than 0,
+and represents megabytes (not bytes). If 0 is supplied, POV-Ray will never use
+file-backing for the image buffer.
+
+The windows version of POV-Ray has a small memory monitor in the statusbar. It
+updates several times per second with an estimation of the amount of memory being
+used by the application. You can use this as a guide to determine the amount of
+RAM in use.
+  
+---------------------------------------
+Changes between 3.7.beta.41 and 3.7.RC2
+---------------------------------------
+
+-----------------------------------------
+Fixed or mitigated the following reports:
+-----------------------------------------
+
+  http://bugs.povray.org/task/185   FS#185   (wrong message about image resolution)
+  http://bugs.povray.org/task/186   FS#186   (sub-polygon end points)
+  http://bugs.povray.org/task/187   FS#187   (unix signal handling issue)
+  http://bugs.povray.org/task/188   FS#188   (no_reflection broken)
+
+  fixed crash found by crashdump #77 (platform base can be NULL before the image 
+  class gets destroyed in the case of unusual shutdown).
+
+  fixed crash in editor where FormatMessage() fails (refer crashdump #76).
+
+  using "color srgb" (or similar) before assumed_gamma was defined resulted in 
+  a hard crash; fixed by generating a proper parse error instead.
+
+  fixed memory leak.
+
+------------
+Misc Changes
+------------
+  
+  disable full memory allocation tracking on windows in favor of rougher 
+  estimate based on samples of peak memory usage from windows API.
+
+  make windows status pane a bit wider and add process memory usage slot in 
+  status bar.
+
+  go back to using the current version as the default language version and 
+  modify the warning messages associated with a missing or late #version.
+
+  added updated windows help file.
+
+  added very basic support for running shell-outs on unix.
+
+  removed beta status, moving to RC. no more timeouts.
+
+  benchmark results on windows are now copied to the clipboard.
+
+  some photon fixes.
+
+-----------
+SDL Changes
+-----------
+  
+  Gamma Handling:
+	
+    The assumed_gamma keyword is no longer deprecated; to the contrary, it is 
+    now considered mandatory if a #version 3.7 or higher is specified, and its 
+    absence will raise a "possible error" in this case, with a value of 1.0 being 
+    presumed. (Note that #version, too, is now mandatory, and its absence will 
+    raise a warning as well).
+	
+    The assumed_gamma value is now presumed to denote the "working color 
+    space", in which classic color literals are specified and color 
+    computations to be performed. Note however that this will give unrealistic 
+    results for any value other than 1.0.
+	
+    Colors specified using "srgb" & co. will be converted from sRGB to the 
+    working color space.
+	
+    image_map input files for which definitive implicit or explicit gamma 
+    information is available (either by file format specification like the HDRI 
+    formats, header information like PNG with sRGB or gAMA chunk, or a user 
+    override via the "gamma" keyword) will be converted to the working color 
+    space. If no definitive information is available, the respective files will 
+    be presumed to match assumed_gamma if #version is < 3.7 or unspecified, or 
+    any official recommendation if #version >= 3.7 is specified.
+	
+    height_field, bump_map and image_pattern input files will not be subject to 
+    gamma-adjustment, unless the user explicitly specifies an override via the 
+    "gamma" keyword; in that case, the file is presumed to match the gamma 
+    value specified, and converted to linear values, irrespective of 
+    assumed_gamma.
+	
+  Concerning anti-aliasing, for the decision whether to anti-alias the color 
+  values will be converted from the working color space to that specified by 
+  the Assumed_Gamma INI setting; the averaging of the samples however will be 
+  performed in the working color space.
+	
+    For render preview, the generated image will be converted from the working 
+    color space to that specified by the Display_Gamma setting. If 
+    Display_Gamma is not specified, a platform-specific default will be 
+    presumed.
+	
+    For file output, the generated image will be converted from the working 
+    color space to whatever the file format mandates (this applies to OpenEXR 
+    and Radiance HDR); if no such mandatory color space exists, the image will 
+    be converted into that specified by the File_Gamma setting. If File_Gamma 
+    is not specified either, the image will be converted into whatever is 
+    officially recommended for that file format, or the de-facto standard; if 
+    even that doesn't exist, no gamma adjustment is performed. In any case, if 
+    the file format provides a means to specify a gamma in the image header 
+    (this applies to PNG), the respective data is set according to whatever 
+    gamma the image is converted to, regardless of the working color space.
+	
+    If assumed_gamma is not specified, and #version is set to pre-3.7 or 
+    undefined, no gamma handling is performed at all.
+	
+	In terms of backward compatibility, this translates as follows:
+	
+    If assumed_gamma is not specified, and #version is set to pre-3.7 or 
+    undefined, full compatibility with 3.6 and earlier is maintaned.
+	
+    If assumed_gamma is specified and #version is set to pre-3.7 or undefined, 
+    compatibility with 3.6 is subject to the following restrictions: (a) full 
+    output file handling compatibility requires File_Gamma to be set to the 
+    same value as Display_Gamma (or left undefined if Display_Gamma is 
+    undefined), and (b) input file handling is not backward compatible in case 
+    of PNG files.
+	
+    If assumed_gamma is not specified and #version is set to 3.7 or higher, 
+    compatibility with 3.6 or earlier is not maintained.
+	
+--------------------------------------------
+Changes between 3.7.beta.40 and 3.7.beta.41
+--------------------------------------------
+
+-----------------------------------------
+Fixed or mitigated the following reports:
+-----------------------------------------
+
+  http://bugs.povray.org/task/179  FS#179  (unix version segfaults when $HOME not set)
+  http://bugs.povray.org/task/182  FS#182  (multi-textured blobs in intersections / differences broken)
+
+------------
+Misc Changes
+------------
+  
+  Raised max order of Poly object from 15 to 35.
+
+  Deprecated histogram output options.
+
+  Added new include file, "ior.inc", defining ior & dispersion constants for a 
+  lot of materials.
+
+  Added new sample/test scene, "scenes/gamma/gamma_showcase.pov" (used in new 
+  gamma section in the docs)
+
+  Several bug fixes for windows and generic core code.
+
+-----------------
+Dithering Support
+-----------------
+  
+  Add support for output file dithering; dithering is controlled by the INI 
+  file settings "Dither=BOOL" and "Dither_Method=xx" as well as the command 
+  line option "+/-THxx", where xx is one of:
+	
+    "B2".."B4": Bayer pattern dithering using 2x2, 3x3 or 4x4 patterns, respectively
+    "D1": simple 1-dimensional error diffusion dithering
+    "D2": simple 2-dimensional error diffusion dithering (needs extra memory for 2 pixel rows)
+    "FS": Floyd-Steinberg error diffusion dithering (needs extra memory for 2 pixel rows)
+	
+  The default is "-THfs", i.e. dithering is off, with Floyd-Steinberg being the 
+  default if only "+TH" is specified.
+	
+  Dithering works for all file formats except JPEG and OpenEXR (no intention to 
+  implement) as well as Radiance HDR (non-straightforward to implement); these 
+  file formats simply ignore the setting.
+	
+  Added dithering to reder preview, using 4x4 Bayer dithering.
+	
+  Display_Gamma now supports the "sRGB" option just as File_Gamma already did; 
+  besides "sRGB", "srgb" and "SRGB", any combination of upper-/lowercase 
+  letters is now recognized.
+	
+-----------
+SDL Changes
+-----------
+  
+  Added new way to describe a polynomial equation (the old way is still valid):
+	
+    polynomial { <order>, [xyz(<a>,<b>,<c>):<value>,]* [remaining as usual for poly]}
+	
+	Default value for all coefficient is 0.0;
+	each xyz(): set the coefficient to <value> for x^a.y^b.z^c;
+	(constant is xyz(0,0,0)). Ordering of xyz is irrelevant (but identical index keep only the last one)
+	a sphere (radius 1...  x^2 + y^2 + z^2 -1 =0)
+	polynomial{ 2, xyz(2,0,0):1, xyz(0,2,0):1, xyz(0,0,2):1, xyz(0,0,0):-1 }
+
+  Updated colour syntax for gamma pre-corrected colours; dropped the "gamma" keyword
+  there (it remains enabled for image input files) in favor of the following syntax:
+	
+	    colour srgb <Rp,Gp,Bp>
+	    colour srgbt <Rp,Gp,Bp,T>
+	    colour srgbf <Rp,Gp,Bp,F>
+	    colour srgbft <Rp,Gp,Bp,F,T>
+	
+  where Rp,Gp,Bp are colour component values pre-corrected for a display 
+  conforming to the sRGB colour space, and F,T are linear colour component 
+  values.
+
+  Implemented requirement for "#version 3.7" to be provided to obtain full v3.7
+  functionality. Prior to a #version statement appearing, the version defaults
+  to 3.62. Additionally, if the first #version appears after any other declaration,
+  or #version does not appear at all, a post-parse warning is issued.
+
+  Changed the mechanism to retrieve & format the current time from SDL; new 
+  syntax is as follows:
+
+    - The keyword "now" evaluates to the time elapsed since 2000-01-01, 00:00:00 
+      GMT in days, with a precision of seconds or better.
+  
+    - The function "datetime(FLOAT [,STRING])" interprets the FLOAT as days 
+      since 2001-01-01, 00:00:00 GMT, and the STRING as a formatting string (same 
+      format and default as was previously taken by "now([STRING])").
+  
+  Consequently, "datetime(now)" does what previously "now()" did, and 
+  "datetime(now,STRING)" does what previously "now(STRING)" did.
+
+  Disabled #default { image_map { gamma ... } } statement.
+
+--------------------------------------------
+Changes between 3.7.beta.39 and 3.7.beta.40
+--------------------------------------------
+
+-----------------------------------------
+Fixed or mitigated the following reports:
+-----------------------------------------
+
+  http://bugs.povray.org/task/56   FS#56   (Crackle pattern memory allocation)
+  http://bugs.povray.org/task/64   FS#64   (Add "POV-Ray" metatags to images)
+  http://bugs.povray.org/task/80   FS#80   (Bad behavior for missing image file)
+  http://bugs.povray.org/task/105  FS#105  (Output options not displayed)
+  http://bugs.povray.org/task/134  FS#134  (INI option to add information to output images)
+  http://bugs.povray.org/task/154  FS#154  (Installation on linux set wrong owner)
+  http://bugs.povray.org/task/167  FS#167  (Core dump when rendering to huge dimensions)
+  http://bugs.povray.org/task/168  FS#168  (noise_generator default broken)
+
+------------
+New Features
+------------
+
+  --------------------------
+  Pavement & Tiling patterns
+  --------------------------
+  
+  Tiling # (#: 1 to 24) provide 24 classical tiling pattern with 1 or more kind 
+  of tiles. The full map is used when rendering a tiling. All centers of tile 
+  is at i/num, border at (i+1)/num) (for i from 0 to num-1). The gradient on 
+  each tile is the same for every tiles on the same tiling. When more than one 
+  kind of tile is used (#), the border are at 1/#, 2/#, ... #-1/# 
+	
+  Pavement: (using polymino paving the plane)
+
+   * number_of_sides (3,4,6) : the basic tile is a triangle, a square or an 
+     hexagon
+   
+   * number_of_tiles (1 to 5 or 6): the number of basic tiles to combine together
+     to make one real tile
+   
+   * pattern (depend on side & tile) (1 to ...): how the basic are combined 
+     together
+	
+	 * exterior (1 to 3, irrelevant for hexagon)
+   
+   * interior (1 to 3)
+   
+   * form (1 to 3, or 1 to 4 for square)
+	
+  Variations on type of corner. 0 is plain, 1 is a straight cut, 2 is a curved cut.
+	All complet sets are covered.
+
+  ------------------------------
+  Square and Triangular patterns
+  ------------------------------
+  
+  Added square & triangular pattern (2D, in xz plane, 4 & 6 area in shape of 
+  squares and triangles)
+
+  --------------
+  Ovus Primitive
+  --------------
+
+  Added the ovus shape.
+
+  It's like a torus, but in egg shape ...
+  
+    ovus { base_radius, top_radius }
+  
+  (top_radius < 2.0*base_radius or else it's just a sphere).
+
+  ----------------------
+  Fractal pattern update
+  ----------------------
+
+  Experimental, add exterior type 7 & 8 for fractal pattern, using the number 
+  of actual iteration to get out (=e) and the factor (=n). 7 gives back 
+  mod(e,n)/n (covering 0 to n-1/n), while 8 covers 0 to 1 with mod(e,n+1)/n. 
+
+  ----------------------------
+  New windows priority setting
+  ----------------------------
+
+  Add new option to set render priority to background (only available on Vista 
+  or later).
+
+  --------------------
+  New animation option
+  --------------------
+
+  Added +STP / Frame_Step= animation option inspired from megapov with two 
+  restrictions: only positive step value are supported (forward, no backward 
+  rendering) and the value is not available in the SDL.
+
+  -----------------------------------
+  New render pattern and step options
+  -----------------------------------
+
+  Added new render_pattern (-RP<N>) option, where N may be:
+
+    0: Left to right, top to bottom (default).
+
+    1: Top to bottom, then left to right
+
+    2: Closing from left & right to center, top & bottom alternatively 
+       to middle
+  
+    3: Starting at center-middle, going left & right, then to top & bottom.
+  
+    4: Closing top & bottom to middle, alternatively left & right to centre.
+  
+    5: Opposite of -4 (starting at middle-center).
+  
+  Added new render_block_step (-RS<N>), option.
+
+    The block step is used to work out what block to render next, as an offset
+    from the current block number (blocks are numbered from 0, which is the
+    top-left of the image). The block size is determined by the existing
+    render_block_size option, which defaults to 32x32 pixels. Blocks are
+    allocated to render threads in the order specified by the combination
+    of the render_pattern option and this option.
+
+    With N > 0, it's about 1 square every N (N might get reduced to allow clock 
+    arithmetic to cover the whole picture). N must be pseudo-prime; at worst it 
+    is shrunk to 1).
+  
+  --------------
+  Image Metadata
+  --------------
+
+  Most image formats now include metadata (BMP is a notable exception). This
+  metadata contains the POV-Ray version, render date/time (GMT), platform
+  (e.g. x86_64-pc-win), and compiler used to build the POV-Ray executable.
+
+----------------
+SDL Improvements
+----------------
+  
+  Adding bitwise operation (bitwise_and(), bitwise_or(), bitwise_xor()),
+  similar to max(). Not limited to 2 parameters.
+
+  Add pre-declared variable "input_file_name", a token replaced by a string 
+  which is the name of the input file of the scene.
+  
+  Add new function now(), which can have a string parameter (but can also be 
+  used without; the parenthesis are mandatory in either case). When provided 
+  with a string, the value is used for formatting the time. Formatting
+  documentation is the one of strftime() C function. Without a parameter, the 
+  format is "%Y-%m-%d %H:%M:%SZ". The time base is GMT.
+	
+-------------
+Gamma Changes
+-------------
+  
+  Removed file_gamma keyword. Input image file default can now be set via
+	
+	    default { image_map { gamma FLOAT } }
+	
+	or
+	
+	    default { image_map { gamma srgb } }
+	
+  For backward compatibility with legacy scenes, POV-Ray 3.7 will now mimick 
+  all the gamma handling of POV-Ray 3.6 if the scene has a #version statement 
+  specifying a version of 3.6x or earlier, and/or specifies an assumed_gamma, 
+  with the following exceptions:
+
+    * If the scene overrides the default input file gamma, POV-Ray will fall 
+      back to the new gamma handling model.
+  
+    * If the scene is rendered using the File_Gamma INI file setting, or using 
+      an INI file setting or command-line option to specify a version of 3.7 or 
+      later, input file gamma handling will still mimick 3.6 behaviour, but 
+      output file gamma handling will use the new model.
+  
+    * PNG input file handling is not fully backward compatible.
+	
+  Due to architectural changes, bug fixes and improvements, backward 
+  compatibility for PNG input files is subject to the following exceptions:
+  
+    * For palette-based PNG files (an uncommon flavour of PNG), backward 
+      compatibility is provided only if assumed_gamma is not specified. (This is 
+      due to a POV-Ray 3.6 bug not mimicked by POV-Ray 3.7.)
+
+    * For non-palette-based PNG files, backward compatibility is provided only 
+      if assumed_gamma is specified. (This is due to an architectural change that 
+      makes this overly difficult to mimick.)
+  
+    * For PNG files carrying both an sRGB chunk and a fitting gAMA chunk, 
+      results will slightly differ. (This is due to POV-Ray 3.7 recognizing sRGB 
+      chunks, which POV-Ray 3.6 did not do.)
+  
+    * For PNG files carrying an sRGB chunk but no gAMA chunk (or a wrong one), 
+      backward compatibility is not provided. (Again this is due to POV-Ray 3.7 
+      recognizing sRGB chunks.)
+
+------------------
+Misc Fixes/Changes
+------------------
+
+  Fixed divide-by-zero crash in editor support code (refer crash report #50).
+
+  Expand uses of FixedSimpleVector<64> to 127 elements to alleviate issues
+  with reports of 'out of memory' in some circumstances. This comes at the
+  cost of using more memory per recursion level, though. Also updated the
+  code to make sure hitting the internal limit of 127 elements is now clearly
+  reported as an internal limit rather than a memory limit.
+
+  Fixed bug causing interpolated image maps to be shifted by half a pixel, as 
+  described in http://news.povray.org/4bdad2a5@news.povray.org
+
+  Improved alpha premultiplication handling for pattern images
+
+  Updated support for file-backed RGBFT images to allow 64-bit seek offsets,
+  and added code to automatically switch to using file-backed intermediate 
+  images when width >= 32 and pixel count >= 1024*1024. This will significantly
+  reduce memory usage for large renders, at the cost of more I/O overhead.
+
+  Fixed issue where a shutdown after a render that allocated a lot of memory 
+  blocks (or any other case where the shutdown takes more than five seconds) 
+  could throw an uncaught exception. This could then cause the 'terminated in 
+  an unusual way' windows error message.
+
+  Revised Fractal fields in pattern structure to allow deeper iterations 
+  (past 32767, now upto 2^32-1) for fractal patterns.
+
+--------------------------------------------
+Changes between 3.7.beta.38 and 3.7.beta.39
+--------------------------------------------
+
+----------
+Bugs fixed
+----------
+
+  http://bugs.povray.org/task/114  FS#114  (corrected 1 pixel error in mosaic preview)
+  http://bugs.povray.org/task/155  FS#155  (changed Output_File_Type to type "n")
+  http://bugs.povray.org/task/157  FS#157  (fix parse warnings)
+  http://bugs.povray.org/task/158  FS#158  (wrong value to be reported for antialiasing gamma)
+  http://bugs.povray.org/task/162  FS#162  (fix for Character 101 (0x65) not found)
+
+  - Fixed some dormant photons code that, was broken with radiosity change #4761
+  - Fixed a parser issue related to the obsolete "max_intersections" keyword. 
+  - A shellout fix.
+
+------------
+New Features
+------------
+
+  ---------------------------------------------------------------------------------
+  Mesh Camera
+  ---------------------------------------------------------------------------------
+
+  Note: The mesh camera is an experimental feature introduced in version 3.7 
+  beta 39 and its syntax is likely to change. Additionally, many of the normal 
+  camera concepts presented in this section (such as location and direction) 
+  either do not work as they do for other cameras or do not work at all (for 
+  example, the concept of 'up' simply does not apply to a mesh camera). It should 
+  also be kept in mind that the camera has not yet been tested with many of 
+  POV-Ray's advanced features such as photons and radiosity, and more work in 
+  that area is likely to be needed.
+
+  The mesh projection is a special camera type that allows complete control of 
+  the ray origin and direction for each pixel of the output image. The basic 
+  concept is to associate pixels with faces defined within a mesh or mesh2 
+  object. The mesh need not be instantiated in the scene, though it can be, and 
+  doing so can lead to some interesting uses, such as texture baking or 
+  illumination calculations.
+
+  In its simplest form, each pixel of the output image is assigned to a face of 
+  the mesh according to (width * (int) y) + (int) x, however, more complex 
+  mapping is possible via multiple meshes and multiple rays per pixel. The type 
+  of mapping in use is determined by the distribution type parameter in the 
+  camera declaration. Except for mapping #3, the ray origin will be set to the 
+  centroid of the face, and the direction will be that of the face's normal. For 
+  mapping #3, barycentric co-ordinates are determined from the UV co-ordinates of 
+  the first face to match the X and Y position, and those are then converted to a 
+  position on the face which will serve as the ray origin. Support is provided to 
+  move the origin off the face along the normal, and to reverse the ray 
+  direction.
+
+  For most of the distribution methods, any POV feature that causes sub-pixel 
+  positioning to be used for shooting rays (e.g. anti-aliasing or jitter) will 
+  not do anything useful, because X and Y are converted to integers for indexing 
+  purposes. At this time, no warning is issued if anti-aliasing or jitter is 
+  requested when rendering a non-applicable distribution; this may be added 
+  later.
+
+  The syntax for the mesh camera is as follows:
+
+  camera {
+    mesh_camera {
+      rays per pixel
+      distribution type
+      [max distance]
+      mesh {
+        MESH_OBJECT_IDENTIFIER
+        [TRANSFORMATIONS]
+      }
+      [mesh ...]
+    }
+    [location]
+    [direction]
+    [smooth]
+  } 
+
+  Rays Per Pixel
+  --------------
+
+  This float parameter controls the number of rays that will be shot for each 
+  pixel in the output image. Each distribution allows different values, but the 
+  minimum is always 1.
+
+  Distribution Type
+  -----------------
+
+    This float parameter controls how pixels are assigned to faces as documented below:
+
+    * distribution #0
+
+      This method allows single or multiple rays per pixel, with the ray number 
+      for that pixel allocated to each mesh in turn. The index into the meshes is the 
+      ray number, where rays per pixel is greater than one, and the index into the 
+      selected mesh is the pixel number within the output image. If there is no face 
+      at that pixel position, the resulting output pixel is unaffected.
+
+      You must supply at least as many meshes as rays per pixel. Each pixel is 
+      shot rays per pixel times, and the results averaged. Any ray that does not 
+      correspond with a face (i.e. the pixel number is greater than or equal to the 
+      face count) does not affect the resulting pixel color. Generally, it would be 
+      expected that the number of faces in each mesh is the same, but this is not a 
+      requirement. Keep in mind that a ray that is not associated with a face is not 
+      the same thing as a ray that is but that, when shot, hits nothing. The latter 
+      will return a pixel (even if it is transparent or the background color), 
+      whereas the former causes the ray to not be shot in the first place; hence, it 
+      is not included in the calculation of the average for the pixel.
+
+      Using multiple rays per pixel is useful for generating anti-aliasing (since 
+      standard AA won't work) or for special effects such as focal blur, motion blur, 
+      and so forth, with each additional mesh specified in the camera representing a 
+      slightly different camera position.
+
+      Note: It is legal to use transformations on meshes specified in the camera 
+      body, hence it's possible to obtain basic anti-aliasing by using a single mesh 
+      multiple times, with subsequent ones jittered slightly from the first combined 
+      with a suitable rays per pixel count.
+
+    * distribution #1
+
+      This method allows both multiple rays per pixel and summing of meshes, in other 
+      words the faces of all the supplied meshes are logically summed together as if 
+      they were one single mesh. In this mode, if you specify more than one ray per 
+      pixel, the second ray for a given pixel will go to the face at (width * height 
+      * ray_number) + pixel_number, where ray_number is the count of rays shot into a 
+      specific pixel. If the calculated face index exceeds the total number of faces 
+      for all the meshes, no ray is shot.
+
+      The primary use for this summing method is convenience in generation of the 
+      meshes, as some modelers slow down to an irritating extent with very large 
+      meshes. Using distribution #1 allows these to be split up.
+
+    * distribution #2
+
+      Distribution method 2 is a horizontal array of sub-cameras, one per mesh (i.e. 
+      like method #0, it does not sum meshes). The image is divided horizontally into 
+      #num_meshes blocks, with the first mesh listed being the left-most camera, and 
+      the last being the right-most. The most obvious use of this would be with two 
+      meshes to generate a stereo camera arrangement.
+
+      In this mode, you can (currently) only have a single ray per pixel.
+
+    * distribution #3
+
+      This method will reverse-map the face from the UV co-ordinates. Currently, only 
+      a single ray per pixel is supported, however, unlike the preceding methods, 
+      standard AA and jitter will work. This method is particularly useful for 
+      texture baking and resolution-independent mesh cameras, but requires that the 
+      mesh have a UV map supplied with it.
+
+      You can use the smooth modifier to allow interpolation of the normals at the 
+      vertices. This allows for use of UV mapped meshes as cameras with the benefit 
+      of not being resolution dependent, unlike the other distributions. The 
+      interpolation is identical to that used for smooth_triangles.
+
+      If used for texture baking, the generated image may have visible seams when 
+      applied back to the mesh, this can be mitigated. Also, depending on the way the 
+      original UV map was set up, using AA may produce incorrect pixels on the 
+      outside edge of the generated maps.
+
+  Max Distance
+  ------------
+
+  This is an optional floating-point value which, if greater than EPSILON (a very 
+  small value used internally for comparisons with 0), will be used as the limit 
+  for the length of any rays cast. Objects at a distance greater than this from 
+  the ray origin will not be intersected by the ray.
+
+  The primary use for this parameter is to allow a mesh camera to 'probe' a scene 
+  in order to determine whether or not a given location contains a visible 
+  object. Two examples would be a camera that divides the scene into slices for 
+  use in 3d printing or to generate an STL file, and a camera that divides the 
+  scene into cubes to generate voxel information. In both cases, some external 
+  means of processing the generated image into a useful form would be required.
+
+  It should be kept in mind that this method of determining spatial information 
+  is not guaranteed to generate an accurate result, as it is entirely possible 
+  for a ray to miss an object that is within its section of the scene, should 
+  that object have features that are smaller than the resolution of the mesh 
+  being used. In other words, it is (literally) hit and miss. This issue is 
+  conceptually similar to aliasing in a normal render.
+
+  It is left as an exercise for the reader to come up with means of generating 
+  pixel information that carries useful information, given the lack of light 
+  sources within the interior of an opaque object (hint: try ambient).
+
+  Mesh Object
+  -----------
+
+  One or more mesh or mesh2 objects to be used for the camera. These will be 
+  treated differently depending on the distribution method, as explained above. 
+  Transformations on the meshes can be used here, and will reflect on the 
+  resulting image as it would be expected for a regular camera.
+
+  Location
+  --------
+
+  With this special camera, location doesn't affect where the camera is placed 
+  per se (that information is on the mesh object itself), but is used to move the 
+  origin of the ray off the face, along the normal of that face. This would 
+  typically be done for texture baking or illumination calculation scenes where 
+  the camera mesh is also instantiated into the scene, usually only a tiny amount 
+  of displacement is needed. The X and Y for location is not currently used, and 
+  the Z always refers to the normal of the face, rather than the real Z direction 
+  in the scene.
+
+  Direction
+  ---------
+
+  Like location, this doesn't correspond to the real direction vector of the 
+  camera. It serves only to reverse the normal of all the faces, if necessary. If 
+  the Z component is less than -EPSILON, then the rays will be shot in the 
+  opposite direction than they would otherwise have been. X and Y are not used.
+
+  Smooth
+  ------
+
+  This optional parameter is only useful with distribution #3, and will cause the 
+  ray direction to be interpolated according to the same rules as are applied to 
+  smooth triangles. For this to work, the mesh must have provided a normal for 
+  each vertex.
+
+  See the sample scene files located in ~scenes/camera/mesh_camera/ for additional
+  usages and other samples of mesh cameras. There are also some useful macros to
+  assist in generating and processing meshes for use as cameras.
+  
+  ---------------------------------------------------------------------------------
+
+  Added support for focal blur with user-defined bokeh, using the following syntax:
+
+    camera {
+      // ... focal blur camera...
+      bokeh {
+        pigment { ... }
+      }
+    }
+
+  If bokeh is specified, focal blur will use a custom sampling sequence based
+  on the specified pigment's brightness in the range <0,0,0> to <1,1,0>, i.e.
+  the unit square in the XY plane.
+
+  ---------------------------------------------------------------------------------
+
+  Introduced new framework for internal random number generators, intended for
+  reducing the memory footprint (by sharing precomputed values among
+  generators with identical parameters) as well as easier replacement of
+  implementations.
+
+  ---------------------------------------------------------------------------------
+
+------------
+Improvements
+------------
+
+  Radiosity improvements:
+
+  - Removed the max 1600 count limit; if the count exceeds 1600, POV-Ray will
+    now use a Halton sequence instead of the built-in sequence.
+
+  - POV-Ray can now draw sample directions in a round-robin fashion from a
+    larger pool, so that different samples can use different sets of sample
+    directions, leveraging the benefit of the nearest_count mechanism.
+    For this purpose, the count keyword syntax has been changed:
+
+      count RAYS_PER_SAMPLE [, DIRECTION_POOL_SIZE ]
+
+  - Added importance sampling to radiosity; full ray computations are
+    performed only for a certain portion of sample rays, depending on the
+    importance of the first object each ray encounters. Importance can be
+    assigned on a per-object basis using the followng syntax (using a sphere
+    as an example):
+
+      sphere { ... radiosity { importance IMPORTANCE } }
+
+    where IMPORTANCE is a value in the range from >0.0 to <=1.0 specifying the
+    percentage of rays to actually compute on average. A particular ray will
+    only be fully computed if it is within the first COUNT*IMPORTANCE rays of
+    the sampling sequence; due to the low-discrepancy sub-random nature of the
+    sequence, this is mostly equivalent to a per-ray weighted random choice,
+    while maintaining a low-discrepancy uniform distribution on a per-object
+    basis. Rays actually computed are weighted to compensate for those
+    not computed.
+
+    Objects derived from previously defined objects will default to the
+    "inherited" importance. CSG components without an explicit importance will
+    default to their parent object's importance. Other objects normally
+    default to an importance of 1.0, but this can be changed in a
+    default {} block:
+
+      default { radiosity { importance DEFAULT_IMPORTANCE } }
+
+    NOTE: The "radiosity on|off" feature for objects (specifying whether an
+    object shall receive radiosity illumination) is currently NOT available.
+    Depending on user feedback, it will be substituted with some keyword
+    within the object-specific radiosity{} block, or dropped completely.
+
+  - Some more minor modifications.
+
+  ---------------------------------------------------------------------------------
+
+  Improved focal blur:
+
+  - Modified code to generate extra samples in a circular rather than square
+    pattern when blur_samples is not 4, 7, 19 or 37, leading to a circular
+    rather than square bokeh.
+
+  - Modified the code that re-placed an extra sample if it would be close to
+    another one, in order to get rid of the lower-right bias the old
+    code produced.
+
+  - Extra samples are now generated from a halton sequence rather than a
+    random stream.
+
+  - Modified blur_samples syntax to optionally specify a minimum number of
+    samples to be taken before testing against confidence/variance settings
+    (default is 4 if blur_samples maximum is <7, otherwise 7), to provide a
+    means to get rid of stray non-blurred pixels. The new syntax is:
+
+      blur_samples [ MIN_SAMPLES, ] MAX_SAMPLES
+
+  - Eliminated the VEC2 type in favor of Vector2d.
+
+  - Simplified a few statements and did a bit of cleanup.
+
+  ---------------------------------------------------------------------------------
+
+  SSLT improvements:
+
+  - Fixed a bug in SSLT code that caused the single-scattering
+    term to be ignored.
+
+  - Using halton sequence instead of random generator for picking sampling
+    directions, to reduce visible patterns in noise.
+
+  ---------------------------------------------------------------------------------
+
+------------
+Misc Changes
+------------
+
+  - Changed radiosity defaults to "always_sample off" and "recursion_limit 2"
+  - Changed Output_File_Type to type "n" in ~scenes/advanced/benchmark.ini
+  - Updates in preparation for provision of crash upload utility.
+  - Installer changes see article <web.4c558a54f4269f7c380f8080@news.povray.org>
+
+--------------------------------------------
+Changes between 3.7.beta.37 and 3.7.beta.38
+--------------------------------------------
+
+----------
+Bugs fixed
+----------
+
+  http://bugs.povray.org/task/103  FS#103  (JPEG output does not conform to baseline JFIF standard)
+  http://bugs.povray.org/task/104  FS#104  (Output file gamma broken for File_Gamma=1.0)
+  http://bugs.povray.org/task/107  FS#107  (Failed to parse INI file, over network)
+  http://bugs.povray.org/task/111  FS#111  (Remove_Bounds=off / -UR does not work properly)
+  http://bugs.povray.org/task/112  FS#112  (OpenEXR alpha is only written when it shouldn't be)
+  http://bugs.povray.org/task/113  FS#113  (Multi-layered reflections broken)
+  http://bugs.povray.org/task/114  FS#114  (Mosaic Preview not displaying properly" for unix systems)
+  http://bugs.povray.org/task/116  FS#116  (Assertion fails when using 'filter all' with small-palette images)
+
+  Fixed an issue with SSLT that could cause rendering threads to hang
+  Fix crash reported in http://news.povray.org/4bd949b3@news.povray.org
+  Fixed error in windows version expiry test causing timeout message from 1 July.
+  Fixed UV mapping for bezier spline lathe.
+
+--------------------------
+Changes to Windows version
+--------------------------
+
+  Expanded number of available insert menu ID's to about 9000.
+  Added support for loading of JPG and PNG files as insert menu hints. The
+  search order is PNG, then JPG and if they don't exist then BMP.
+
+  Windows editor tab/indent settings are no longer per-file+global default;
+  changing one affects all files.
+
+  Added display of filename when hovering over an editor tab.
+  
+  Added right-click menu to editor tabs allowing opening of folder in explorer
+  and copy of filename to clipboard.
+
+  Default output file type is now PNG (SYS format is still mapped to BMP though).
+
+----------------------------------------
+Gamma and color-handling related changes
+----------------------------------------
+
+  Changed effect of filter in a layered-pigment sky_sphere to match the 
+  behavior of a corresponding layered-texture large regular sphere. (The old 
+  behavior, though probably having been unintentional, is automatically 
+  re-activated for backward compatibility when #version < 3.7 is specified.)
+  
+  Partial fix for broken alpha channel output; v3.6 behavior is now reproduced 
+  exactly (including bugs), regardless of version. Further changes will address 
+  the premultiplied-alpha issue (which was already handled wrong in 3.6) and 
+  possibly add options for use cases where v3.6 behavior might be undesired.
+
+                                     -----
+
+  Changes to input image transparency handling:
+  
+    For material_map, /no/ alpha premultiplication handling is done whatsoever; 
+    instead, the data as stored in the file is used.
+
+    For bump_map and image_pattern, images with alpha channel are treated as if 
+    they had a black background (unless the alpha channel itself is used).
+
+                                     -----
+
+  Changed alpha handling for image file input and output:
+  
+    Previous versions of POV-Ray always expected straight (non-premultiplied) 
+    alpha for file input, while always writing associated (premultiplied) alpha 
+    for output; this has been changed on a per-file-format basis to use the same 
+    alpha handling mode for in- and output alike:
+
+    - PNG will use straight alpha as per specification;
+  
+    - OpenEXR and TIFF will use associated alpha as per specifications;
+  
+    - TGA and BMP 32-bit RGBA (an inofficial extension to BMP) will use 
+      straight alpha, retaining file input compatibility for now, until a final 
+      decision has been made on these formats.
+  
+    When generating non-premultiplied alpha output to a classic 
+    low-dynamic-range file format (e.g. PNG), transparency of particularly bright 
+    areas will now be reduced, in order to better preserve highlights on 
+    transparent objects. (Note that this mechanism has some limitations with 
+    colored highlights.)
+  
+    When used with file formats for which alpha output is currently not 
+    supported by POV-Ray (or only via an inofficial extension, as with BMP), 
+    turning on alpha output via Output_Alpha=on or +UA will now generate a 
+    warning.
+  
+                                     -----
+
+  Changed antialiasing to compare gamma-adjusted colours instead of linear 
+  colours, to improve antialiasing of darker regions.
+  
+  Note that this gamma-adjustment is only applied to copies of the sample 
+  values, and does not affect averaging of the sample values, which is still 
+  performed on the original linear data. It is also independent of both preview 
+  display and output file gamma.
+  
+  The antialiasing gamma-adjustment is controlled by the new ini-file / 
+  command-line options "Antialias_Gamma=x" and "+AGx" respectively, defaulting 
+  to 2.5. Note that this differs from Display_Gamma and File_Gamma defaults, as 
+  it is intended to fit human vision rather than typical CRT characteristics. 
+  Nevertheless, the value specified is once again the inverse of the gamma 
+  actually applied, in order to use the more familiar value range.
+
+                                     -----
+
+  Changed input file gamma syntax for individual files; as an alternative to 
+  the "file_gamma" keyword, the parser will now also accept the "gamma" keyword 
+  originally introduced for specifying gamma in color values. (To specify the 
+  default input file gamma in the global_settings section, "file_gamma" is 
+  still mandatory though, as "gamma" would be ambiguous and misleading.)
+
+                                     -----
+
+  Added "gamma" keyword to specify gamma pre-corrected colours. The colour
+  syntax is extended as follows:
+  
+      COLOR_BODY:
+        COLOR_VECTOR [GAMMA] |
+        COLOR_KEYWORD_GROUP |
+        COLOR_IDENTIFIER [GAMMA]
+      ...
+      COLOR_KEYWORD_ITEM:
+        COLOR_IDENTIFIER       |
+        red Red_Amount         |
+        blue Blue_Amount       |
+        green Green_Amount     |
+        filter Filter_Amount   |
+        transmit Transmit_Amount |
+        GAMMA
+      GAMMA:
+        gamma Gamma_Value |
+        gamma srgb
+  
+    Specifying "gamma Gamma_Value" indicates that the colour components are 
+    gamma-precorrected for a display gamma of Gamma_Value, instructing POV-Ray to 
+    automatically convert the colour components to linear values using the 
+    following formula:
+  
+      Effective_Red_Amount      = pow ( Red_Amount,   Gamma_Value )
+      Effective_Green_Amount    = pow ( Green_Amount, Gamma_Value )
+      Effective_Blue_Amount     = pow ( Blue_Amount,  Gamma_Value )
+      Effective_Filter_Amount   = Filter_Amount
+      Effective_Transmit_Amount = Transmit_Amount
+  
+    Likewise, specifying "gamma srgb" indicates that the colour components are 
+    gamma-precorrected using the sRGB transfer function (being roughly, but not 
+    quite, equivalent to a Gamma_Value of 2.2).
+  
+    Note that gamma is NOT an additional component, but rather modifies the 
+    interpretation of the other colour keywords. For instance, the following 
+    statements are all fully equivalent:
+  
+      #declare Foo = colour rgbt <0.2, 0.3, 0.4, 0.5> gamma 2;
+      #declare Foo = colour rgbt <0.04,0.09,0.16,0.50>;
+      #local Fnord = colour rgbt <0.2, 0.3, 0.4, 0.5>; #declare Foo = colour Fnord gamma 2;
+  
+    Also note that specifying gamma does not affect the filter or transmit components.
+
+                                     -----
+
+  Added "premultiplied BOOL" parameter to input image file syntax.
+  
+    Like the gamma/file_gamma parameter, it must immediately follow the filename
+    (though the order of gamma/file_gamma and premultiplied does not matter).
+  
+    The boolean parameter specifies whether the file is stored in premultiplied
+    ("associated") or non-premultiplied ("straight") alpha format, overriding the
+    file format specific default. (This keyword has no effect on files without an
+    alpha channel.)
+
+                                     -----
+
+  Added support for using the sRGB transfer function for output file gamma; 
+  syntax is "File_Gamma=sRGB". ("SRGB" and "srgb" are supported as well.)
+  
+    Note: When "File_Gamma=sRGB" is used with PNG output file format, POV-Ray 
+    writes an sRGB chunk, thereby claiming that the output conforms to the sRGB 
+    color space; however, this claim is not necessarily true, as POV-Ray is 
+    currently not color space aware; it depends on whether your scene input data 
+    conforms to the sRGB color space.
+  
+    NB: The other gamma INI file parameters (Antialias_Gamma and DisplayGamma) 
+    do NOT support the "sRGB" value at present.
+
+------------
+Misc Changes
+------------
+  
+  Added "#declare atand = function (x) {degrees(atan(x))} " to "math.inc".
+
+  Add special handling for INI lines that are shell-out commands and re-implement
+  support for shellouts.
+
+  Implemented bicubic image interpolation as interpolation type 3.
+
+  Changes to sky_sphere handling:
+  
+    Using filter in a sky_sphere with layered pigments now has the same effect 
+    as in a large sphere with a multi-layered texture. (For compatibility with 
+    legacy scenes, specifying a #version < 3.70 will revert to the old, poorly 
+    specified behavior.)
+  
+    Using Output_Alpha=on with legacy scenes (#version < 3.70) will now 
+    suppress sky spheres and background except in reflections, for backward 
+    compatibility with v3.6.
+
+  Various output file type-related changes:
+
+    When specifying an input image in SDL without a file type (neither via type 
+    keyword nor via extension), parser would not fall back to system default 
+    (broken since change #4932); fixed.
+  
+    When specifying an IFF input image in SDL, POV-Ray would instead attempt to 
+    read it as a TIFF file; should be fixed (not that anybody would probably care 
+    these days...).
+  
+    Some code pertaining to histogram output was not updated with change #4932; 
+    fixed. (no symptoms there, as histogram output is presently out of order 
+    anyway)
+  
+    Validity check for Grayscale_Output setting was broken with change #4932; fixed.
+  
+    Disabled chroma sub-sampling in JPEG output; reduced default quality setting 
+    from 95% to 85% to retain same overall quality & file size.
+
+-----------------
+Radiosity Changes
+-----------------
+  
+  Modified radiosity pretrace mechanism:
+  
+    POV-Ray will now create only one set of threads for the whole pretrace, 
+    instead of one set for each pretrace step; likewise, progress report will 
+    pertain to the whole pretrace rather than each step; POV-Ray will no longer 
+    wait for a pretrace step to be fully completed, and instead assign threads to 
+    the next step as soon as all blocks of the previous step are either finished 
+    or already assigned.
+  
+    Implemented adaptive pretrace. When a second parameter is specified after 
+    the "nearest_count" keyword, pretrace will stop re-iterating over areas 
+    where, on average, that many (average-quality) samples are already present 
+    per ray.
+  
+                                     -----
+
+  Parser now checks for plausible relation between radiosity minimum_reuse and maximum_reuse:
+
+    If ony one value is specified, parser will warn if minimum_reuse > maximum_reuse/2,
+    and adjust the unspecified value accordingly.
+  
+    If both values are specified, parser will warn if minimum_reuse > maximum_reuse/2,
+    but not modify any of the values; if minimum_reuse >= maximum_reuse; the parser will
+    raise an error.
+
+------------------------------
+Other SDL Changes/Enhancements
+------------------------------
+  
+  Added #elseif statement; the #if, #ifdef and #ifndef directives syntax is 
+  changed as follows:
+  
+    IF_DIRECTIVE:
+      #if ( Cond ) TOKENS... [ELSE_DIRECTIVE] #end
+    IFDEF_DIRECTIVE:
+      #ifdef ( IDENTIFIER ) TOKENS... [ELSE_DIRECTIVE] #end
+    IFNDEF_DIRECTIVE:
+      #ifndef ( IDENTIFIER ) TOKENS... [ELSE_DIRECTIVE] #end
+  
+    ELSE_DIRECTIVE:
+      #else TOKENS... |
+      #elseif ( Cond ) TOKENS... [ELSE_DIRECTIVE]
+  
+  Example:
+  
+    #if (Foo)
+      #debug "Foo is true\n"
+    #elseif (Bar)
+      #debug "Foo is false, but Bar is true\n"
+    #else
+      #debug "Foo and Bar are both false\n"
+    #end
+
+                                     -----
+
+  Added "emission" parameter to the finish block; syntax and effect are 
+  virtually identicall to "ambient", except that "emission" is unaffected by 
+  the global "ambient_light" parameter, which will now effectively be set to 0 
+  if radiosity is active (except in legacy scenes having #version set to < 3.70).
+  
+  The intention is to simplify the use of materials designed for non-radiosity
+  scenes in scenes with radiosity, or the design of scenes that can be rendered
+  with or without radiosity.
+
+--------------------------------------------
+Changes between 3.7.beta.35 and 3.7.beta.37
+--------------------------------------------
+
+  Partially fixed the following bugs:
+
+    http://bugs.povray.org/task/81   FS#81  (sphere_sweep generating artifacts)
+    http://bugs.povray.org/task/93   FS#93  (Photons are unnaturally amplified by pass_through objects)
+    http://bugs.povray.org/task/102  FS#102 (#switch directive parsing problem)
+
+  Fixed the following bugs:
+
+    http://bugs.povray.org/task/67   FS#67  (Alpha channel in image map is ignored for shadows)
+    http://bugs.povray.org/task/78   FS#78  (Wrong rendering of BeamTest-Scene in 3.7.beta.35a)
+    http://bugs.povray.org/task/83   FS#83  (Redundant code in pvengine.cpp) (removed apparently duplicate 
+    http://bugs.povray.org/task/88   FS#88  (File output code does not properly handle negative color values)
+    http://bugs.povray.org/task/89   FS#89  (PPM output garbled for bit depths other than 8 bits)
+    http://bugs.povray.org/task/90   FS#90  (POV-Ray accepts additional patterns after (slope))
+    http://bugs.povray.org/task/92   FS#92  (Sphere_Sweep Bug)
+    http://bugs.povray.org/task/94   FS#94  (Unexpected refraction angle in interfaces with changing IOR <> 1.0)
+    http://bugs.povray.org/task/95   FS#95  (Photons are over-attenuated by semi-transparent surfaces)
+    http://bugs.povray.org/task/97   FS#97  (Forward-slash pathnames not fully supported in Windows version)
+    http://bugs.povray.org/task/100  FS#100 (cutaway_textures)
+
+  Implemented the following enhancement requests:
+
+    http://bugs.povray.org/task/84    FS#84  (A for-loop construct)
+  
+  Photon changes
+  --------------
+  
+    Refer FS#93 (Photons are unnaturally amplified by pass_through objects)
+  
+    As the error is also present in POV-Ray 3.6, behavior has necessarily 
+    changed with this fix; pass_through objects will now affect the color of 
+    photons on their way to their target, according to pigment filter/transmit, 
+    interior fade, and media (which implies that opaque objects will block 
+    photons even when declared pass_through); it needs to be seen whether this 
+    new behavior will be accepted by the users, or whether some additional 
+    mechanism will have to be implemented to choose between old and new 
+    behavior for compatibility with legacy scenes. At present, behavior can 
+    only be changed at compile time with the preprocessor defines PT_FILTER_BEFORE_TARGET
+    and PT_AMPLIFY_BUG in photons.cpp.
+  
+  Radiosity changes
+  -----------------
+  
+    When a new sample has been gathered after sample lookup returned insufficient
+    samples, sample lookup is no longer run again; instead, the new sample is
+    interpolated with the results of the earlier lookup.
+  
+    The actual number of samples required to satisfy the reuse_count setting is 
+    now influenced by sample quality, with high-quality samples reducing the 
+    effective number of samples required (down to 1/4 of the parameter value in 
+    extreme cases) and low-quality samples increasing the number. Note that this 
+    may change the balance between speed and quality for some scenes.
+
+    The maximum_reuse parameter now governs the maximum effective radius of a 
+    sample more directly.
+
+    Trimmed down radiosity sample memory footprint a bit.
+
+    Improved pretrace "pixel" coordinates computation
+
+  New features
+  ------------
+  
+    AOI Pattern:
+
+      Implemented AOI pattern (thanks to Grimbert Jerome for most of the code); 
+      the syntax is as follows:
+  
+        pigment { aoi pigment_map { ... } }
+        normal { aoi normal_map { ... } }
+        texture { aoi texture_map { ... } }
+  
+      The pattern gives a value proportional to the angle between the ray and the 
+      surface; for consistency with the slope pattern, values range from 0.5 where 
+      ray is tangent to the suftace, to 1.0 where perpendicular; in practice, 
+      values below 0.5 may occur in conjunction with smooth triangles or meshes.
+  
+      (Note that this differs from the current MegaPOV implementation, where the values
+      range from 0.5 down to 0.0 instead.)
+  
+    Slope Pattern extension:
+
+      Extended slope pattern to specify a reference point instead of a direction; 
+      the new syntax is as follows:
+  
+        slope { point_at <ReferencePoint> [, Lo_Slope, Hi_Slope] }
+  
+      (Note that this variant currently does *not* allow for the "altitude" keyword to be used.)
+  
+      The functionality is similar to MegaPOV's "aoi <ReferencePoint>" pattern, 
+      except that the values are reversed, i.e. range from 0.0 for surfaces 
+      facing away from the point in question, to 1.0 for surfaces facing towards 
+      that point; thus, "slope { <Vector> }" and "slope { point_at 
+      <Vector>*VeryLargeNumber }" have virtually the same effect.
+  
+  Other SDL changes
+  -----------------
+  
+    Modified #break semantics; the #break directive can now be used:
+
+        - anywhere within a #case or #range block, to skip to the end of the 
+          #switch directive (previously, #break was only useful right before the next 
+          #case, #range or #else directive, to indicate that a slip-through was not 
+          desired);
+
+        - anywhere within a loop block (both #while and #for), to preliminarily 
+          terminate the loop; and
+
+        - anywhere within a #macro block, to preliminarily terminate the macro.
+  
+      Example for the use in a loop:
+  
+        #local R = seed(4711);
+        #for (I, 1, 100)
+          #if (rand(R) < I/1000)
+            #break // terminate loop early
+          #end
+          #debug concat(str(I,0,0), " iterations and counting\n")
+        #end
+  
+      Where multiple #switch, loop and/or #macro blocks are nested, #break will 
+      leave only the innermost of these.
+
+    Implemented a #for loop construct (see FS#84); the following syntax -
+  
+        #for (Identifier, Start, End [, Step])
+          //...
+        #end
+  
+      is now available for simple loops incrementing Identifier from Start to End 
+      (inclusive) with the given Step size (default: +1.0). Basically, it works the 
+      same as the classic #while pattern:
+  
+        #local Identifier = Start;
+        #while (Identifier <= End)
+          //...
+          #local Identifier = Identifier + Step;
+        #end
+  
+      Some additional notes:
+
+        - If Step is negative, comparison will be automatically adjusted to match a 
+          "countdown" pattern.
+
+        - Start, End and Step are evaluated only *once*.
+  
+        - The loop counter is a full-fledged local variable. Any local variable of 
+          the same name already defined before the loop *will* be overwritten without 
+          warning (note that in the main scene file, all local variables outside of 
+          macros are effectively global); inside the loop, any tampering with the 
+          variable is possible for effect, as long as it is defined as a local numeric 
+          variable at the end of each iteration.
+  
+        - After the loop has terminated, the variable will remain defined, typically 
+          holding the value End+Step.
+  
+        - The loop counter must *not* be an array element.
+
+  Image output changes
+  --------------------
+
+    Image file output now uses the GammaCurve mechanism already in use for 
+    image file input, to allow for arbitrary transfer functions (e.g. as used by 
+    sRGB) in the future.
+
+    Output/histogram file type is now identified by the command line / INI 
+    options parser, removing some uglies from the code and allowing for easier 
+    maintenance of file type letters.
+  
+    Radiance HDR image output no longer writes the proprietary GAMMA header field.
+  
+    PPM image output now supports 16-bit greyscale output (effectively writing a 
+    PGM file instead), to be activated via the "Greyscale_Output=on" option or 
+    the "+FPg" file type switch.
+
+--------------------------------------------
+Changes between 3.7.beta.35 and 3.7.beta.35a
+--------------------------------------------
+
+Fixed an axis problem with cones.
+Fixed a crash observed in fish13.pov (but which could happen in many scenes).
+
+-------------------------------------------
+Changes between 3.7.beta.34 and 3.7.beta.35
+-------------------------------------------
+
+  Fixed the following bugs:
+    http://bugs.povray.org/task/10
+    http://bugs.povray.org/task/32
+    http://bugs.povray.org/task/48
+    http://bugs.povray.org/task/49
+    http://bugs.povray.org/task/51
+    http://bugs.povray.org/task/52
+    http://bugs.povray.org/task/53
+    http://bugs.povray.org/task/55
+    http://bugs.povray.org/task/57
+    http://bugs.povray.org/task/59
+    http://bugs.povray.org/task/61
+    http://bugs.povray.org/task/73
+
+  Implemented some media improvements that may significantly speed up scenes 
+  using both "heavyweight" averaged or pattern-mapped textures (e.g. 
+  micronormals) and interior media.
+
+  Subsurface light transport code should now properly handle light attenuation 
+  due to distance, spotlight falloff or intervening non-opaque objects 
+  (including media and projected_through objects). Diffuse ambient illumination 
+  is also supported to some extent (multiple-scattering term only) when 
+  radiosity is turned on (however, it does not actually call radiosity code at 
+  present).
+
+  Various bug fixes and minor improvements in input file reading code.
+  Added "out-of-the-box" transparency support for GIF files.
+  Added support for PNG sRGB chunks.
+  
+  NOTE: Non-legacy scene default gamma handling for image input files has 
+  changed significantly from previous betas, affecting all file formats except 
+  OpenEXR, Radiance HDR and (with minor differences) most flavors of PNG; there 
+  will be NO corresponding warnings. See below for more detail.
+
+  ---------------------------------------------------
+  Changes to improve input image file gamma handling.
+  ---------------------------------------------------
+  
+  Input image files not carrying unambiguous gamma information will now be 
+  assumed to match a common gamma setting, and gamma-adjusted accordingly; this 
+  common input file gamma setting can be specified in the scene file using the 
+  following syntax:
+  
+    global_settings {
+        file_gamma GAMMA
+    }
+  
+  where GAMMA is either a numeric expression specifying the approximate display 
+  gamma for which input files are assumed to be gamma pre-corrected, or the 
+  keyword 'srgb' indicating that input files are assumed to match the sRGB 
+  standard. (In the latter case, gamma adjustment is applied according to the 
+  sRGB standard, instead of approximating with a gamma 2.2 power-law function.) 
+  The default setting is sRGB.
+  
+  Regardless of this global setting, gamma correction is not applied if the 
+  image input file is obviously used as a mere data container, such as when 
+  immediately used in a height field.
+  
+  Default gamma handling rules for any image input file can be overridden by 
+  specifying 'file_gamma GAMMA" immediately after the file name, e.g.:
+  
+    image_map {
+        jpeg "foobar.jpg" file_gamma 1.8
+        interpolate 2
+    }
+  
+  This also applies to contexts where gamma adjustment is not normally applied, 
+  e.g. file formats that are defined to be encoded linearly, or files used in 
+  height fields, to simplify handling of files not conforming to standards.
+  
+  NOTE: Gamma handling for PNG input files has changed as follows in legacy 
+  ('#version 3.6') scenes:
+
+  - In the absence of an 'assumed_gamma' statement, non-indexed PNG files with 
+    a gAMA chunk (i.e. virtually all PNG files) will appear far brighter than 
+    with POV-Ray 3.6.
+
+  - In the presence of an 'assumed_gamma 1.0' statement, indexed PNG files 
+    (uncommon) will appear darker than with POV-Ray 3.6.
+
+  - In the presence of an 'assumed_gamma 2.2' statement, PNG files with a gAMA 
+    lower than 2.2 (uncommon) will appear darker than with POV-Ray 3.6.
+
+  - PNG files with an sRGB chunk but no gAMA chunk may appear significantly 
+    different than with POV-Ray 3.6.
+
+  - PNG files may generally appear slightly different than with POV-Ray 3.6.
+
+  A warning will be printed in these cases, except for the latter.
+  
+-------------------------------------------
+Changes between 3.7.beta.33 and 3.7.beta.34
+-------------------------------------------
+
+  Fixed following bugs:
+    http://bugs.povray.org/task/39
+    http://bugs.povray.org/task/40
+
+  Added support for diffuse backside illumination:
+  
+    To model thin, diffusely-translucent objects (e.g. paper, curtains, leaves 
+    etc.), an optional 2nd float parameter has been added to the "diffuse" 
+    finish statement to control the effect of illumination from the back of the 
+    surface. The default value is 0.0, i.e. no diffuse backside illumination. 
+    For realistic results, the sum of both parameters should be between 0.0 and 
+    1.0, and the 2nd parameter should be the smaller of the two.
+  
+    Note: This feature is currently experimental and may be subject to change. 
+    In particular, the syntax as well as interoperation with double_illuminate, 
+    multi-layered textures or conserve_energy are still under investigation.
+
+    A new sample scene, "advanced/diffuse_back.pov", has been provided to 
+    illustrate this new feature.
+
+    New option added speed up radiosity pretrace:
+  
+      As some computations don't contribute to the generation of radiosity 
+      samples, they can safely be skipped during radiosity pretrace to gain 
+      some speed if the pretrace's other role as a coarse preview is not 
+      required.
+  
+      The following .ini file / command line options control whether pretrace 
+      performs all computations so it can double-feature as a coarse preview 
+      ("vain pretrace"):
+  
+        Radiosity_Vain_Pretrace=bool   turns vain pretrace on/off
+        +RVP                           turns vain pretrace on (default)
+        -RVP                           turns vain pretrace off
+  
+    Note that with vain pretrace off, preview will look remarkably odd during 
+    the radiosity pretrace phase; this is normal, and no reason to be alarmed.
+  
+    At the moment, turning vain pretrace off will affect only classic lighting 
+    computations (diffuse lighting, higlights and iridescence); other features 
+    expendable during pretrace may follow in future versions.
+
+  Windows console version now sends stream output to stderr by default.
+
+-------------------------------------------
+Changes between 3.7.beta.32 and 3.7.beta.33
+-------------------------------------------
+
+  Fixed following bugs:
+    http://bugs.povray.org/task/13 (4k files crash in Windows 64-bit editor)
+    http://bugs.povray.org/task/14 (coincident transparency issue)
+    http://bugs.povray.org/task/15 (julia fractal, trace and inside cause crash)
+    http://bugs.povray.org/task/16 (reflective texture map crash)
+    http://bugs.povray.org/task/17 (square blotches in transparency)
+    http://bugs.povray.org/task/21 (unix scripts have wrong version set)
+    http://bugs.povray.org/task/24 (isosurface, bounding box & threads)
+    http://bugs.povray.org/task/31 (function pattern in image map)
+    http://bugs.povray.org/task/32 (tiff file extension error)
+    http://bugs.povray.org/task/33 (parse accepting invalid vector float components)
+    http://bugs.povray.org/task/34 (could not link against boost_thread-boost_thread)
+
+  Improved support for image output to stdout/stderr for supported file types.
+  This does not implement progressive output - the image is only written after the
+  render completes. Progressive output will be added in a later beta. Also, don't
+  fclose stream if it's stdout, stderr or stdin, which fixes some issues with using
+  stdout for animations. Also adds support for image output to stderr.
+
+  Optimized the way imageProcessing handles creating new images; this should reduce
+  the chance of an out-of-memory error when rendering with image output enabled.
+
+  Added support for file-backed RGBFT image container; this is used for intermediate
+  image storage if allocating a memory-backed one fails. This ought to significantly
+  reduce "out of memory"-type errors, particularly "cannot allocate intermediate image
+  storage". This implementation is basic in that it doesn't support large files (anything
+  more than what fseek/fwrite etc can handle) and only buffers a single line. A better
+  solution to the intermediate image storage issue is to go away from using an image
+  container and cache the render blocks on disk instead, using a class that can stream
+  fully-completed rows to the image output code (required for writing to stdout to work
+  properly again).
+
+  Added some more radiosity stats for performance tweaking
+
+  On unix, drop support for --with-boost-src configure option.
+  Note: with this change, the libraries/ folder is no longer distributed.
+  Also get rid of --disable-vsnprintf-check and unimplemented SVGA support
+  (--with-svga).
+
+  Fixed ARRAYS_WriteDF3 macro (16-bit depth output and parse warning).
+
+  Added no_radiosity keyword, as known from MegaPOV:
+    Specifying "no_radiosity" in an object block makes that object invisible to radiosity 
+    rays, in the same way as "no_image", "no_reflection" and "no_shadow" make an object 
+    invisible to primary, reflected and shadow test rays, respectively.
+
+  Revival of Radiosity Load/Save + various other radiosity code changes:
+  
+    The following .ini / command line parameters are recognized:
+  
+      Radiosity_File_Name=<name>" or "+RF<name>" to set the cache file name;
+      Radiosity_From_File=<on/off>" or "+RFI" to enable reading the radiosity file at startup
+      Radiosity_To_File=<on/off>" or "+RFO" to enable writing new samples to the radiosity file
+  
+    NOTE: The parameter names are preliminary, and may still be subject to change; there is 
+    a potential conflict between the shorthand forms)
+  
+    If both +RFI and +RFO are specified, new samples gathered are appended; otherwise, +RFO 
+    causes the file to be overwritten if it exists.
+  
+    New samples gathered are written whenever an SMP block is completed. Tests indicate 
+    that this is almost neutral regarding performance, compared to operation with radiosity 
+    file output disabled.
+  
+  New radiosity "high reproducibility" mode: when specifying "High_Reproducibility" or "+HR"
+  on the command line, POV-Ray will spend extra effort to make sure renders are deterministic
+  despite SMP (currently, radiosity is the only code to use this flag; in HR mode, radiosity
+  pretrace starts out with fewer threads, and some extra rules are imposed on sample re-use
+  that may cause surplus samples to be gathered).
+
+-------------------------------------------
+Changes between 3.7.beta.31 and 3.7.beta.32
+-------------------------------------------
+
+Added ARRAYS_WriteDF3 macro to arrays.inc for writing an array to a df3 file.
+
+Fixed bug creating artifacts in output file when mosaic preview is used with +EP2 and -A.
+
+Several Unix build fixes.
+
+Added radiosity octree performance stats and fixed stats for max trace level & parse time.
+
+Made some improvements to performance in crackle cache, and optimised the management of the
+  crackle cache size by setting limits in megabytes (currently per-thread and not user-
+  settable: this will change).
+  
+-------------
+Binary #write
+-------------
+
+It is now possible to write 8, 16 and 32-bit words to an external file. These
+words may be arranged in either little or big-endian fashion.
+
+Placing one of the following keywords in the argument list of a #write
+statement causes the values up to the next comma to be written in binary
+format, using 2's complement integer representation, rounded to the nearest
+integer in the representable range:
+
+  uint8              - unsigned byte (0..255)
+  sint8              - signed byte (-128..127)
+  uint16be, uint16le - unsigned 16-bit word (0..65535)
+  sint16be, sint16le - signed 16-bit word (-32768..32767)
+  sint32be, sint32le - signed 32-bit word (-2^31..2^31-1)
+
+As of now, unsigned 32-bit words are not supported.
+
+Keywords ending in "be" will cause the values to be written most significant
+byte first ("big endian", aka network byte order) while those ending in "le"
+will instead write the least significant byte first ("little endian", Intel
+format).
+
+The values to be written in binary must be numbers or vectors; the latter
+will be written component by component as specified, in the standard x-y-z
+order, without any separating or enclosing characters.
+
+There is a sample macro called 'ARRAYS_WriteDF3' in arrays.inc which shows how
+this feature may be used.
+
+---------------------------------
+Subsurface Light Transport (SSLT)
+---------------------------------
+
+Beta 31 adds experimental support for subsurface light transport (aka subsurface scattering).
+  
+Currently, SSLT is activated for a particular object by adding the following statement to
+its finish (note that this is very likely to change):
+  
+  subsurface { COLOR, COLOR }
+  
+specifying the (reduced) scattering coefficients (sigma'[s]) and absorption coefficients
+(sigma[a]), respectively, in units of 1/mm, for each of the three basic colors. The object's
+IOR will also affect the results.
+  
+The algorithm is designed to give realistic results at a scale of 10 mm per POV-Ray unit by
+default; for other scales, place the following statement in the global_settings section:
+  
+  mm_per_unit NUMBER
+  
+To tune the algorithm for quality or performance, the number of samples for the diffuse
+scattering and single-scattering approximation, respectively, can be specified by placing
+the following statement in the global_settings section:
+  
+  subsurface { samples NUMBER, NUMBER }
+
+There is a sample SSLT scene in scenes/subsurface/subsurface.pov.
+  
+SSLT is still in alpha stage.
+
+-------------------------------------------
+Changes between 3.7.beta.29 and 3.7.beta.31
+-------------------------------------------
+
+Fixed inconsistent usage of int/long in line numbers within POVMS messages,
+which caused warning messages in some cases to be printed without location
+information.
+
+Implemented filename display in console warning and error message output where
+name is supplied from core code.
+
+Changed windows progress panel to auto-size render progress bar such that it
+will either fit in remaining status panel space, or not be shown at all. This
+ought to resolve several reported issues where it overlaid the panel text.
+
+Fixed bug that caused wrong radiosity illumination on transformed mapped textures.
+
+Numerous fixes/changes for Unix autoconf/automake code, plus a number of bashism's
+in scripts.
+
+Major radiosity improvements, plus mosaic preview is now implemented: thanks to
+new contributor Christoph Lipka for both of these.
+
+Fixed Windows install issue where shortcut to SSE2 binary was always used even
+if system didn't have SSE2.
+
+-------------------------------------------
+Changes between 3.7.beta.28 and 3.7.beta.29
+-------------------------------------------
+
+Allow POVWIN 'save as' to succeed without 'file is already open in editor'
+error if case of current file is being changed.
+
+Improved detection of true number of logical and physical cores on Intel CPU's.
+
+Added colored text output to POVWIN message window. warning and debug messages
+get different colors than error messages and standard text.
+
+Added ability to declare an identifier as deprecated.
+  
+Many updates to scene and include files (see revision.txt for more details).
+
+Worked around issue where new (for 3.7) crackle hash function returns large
+range of possible values, causing memory used by cache to grow quickly. Work-
+around is to revert to old hash function (this may also make crackle faster
+since now we will get more cache hits).
+
+Moved assumed location of POVWIN user-editable files into a subdir of 'My
+Documents'.
+
+Fixed two crashes reported in thread <web.48b1839e38b6f50ec03ef3130@news.povray.org>.
+
+Fixed sphere_sweep parse crash reported in <web.48bc447cc2ccad1e8510f03f0@news.povray.org>.
+
+Changed POVWIN UCS2 handling so that ASCII codes > 127 but < 256 are able to
+be used. This should solve the issue reported in <48c04138$1@news.povray.org>.
+
+Changed media confidence test to accept 0.0 as per docs.
+
+Fixed crash in JPEG code.
+
+Included Solaris patch by John Martin as reported in <web.47e9bdccd4b82d06c7064b8c0%40news.povray.org>.
+
+  Deprecation Support
+  -------------------
+
+  The ability to add a 'deprecated' flag to a #declare has been added. This is
+  to aid in migrating scenes away from old constructs (e.g. old textures). The
+  usage is illustrated below:
+
+    #declare deprecated Col_Glass_Old=color rgbf <0.8, 0.9, 0.85, 0.85>;
+    #declare deprecated once Col_Glass_Old=... etc
+    #declare deprecated "Some message" Col_Glass_Old=... etc
+  
+  A deprecated identifier generates no message at the time it is declared: a
+  warning is only issued if it is used.
+  
+  If the optional 'once' keyword is present it must immediately follow the
+  'deprecated' keyword and indicates that the warning should only be
+  displayed once per parse.
+  
+  If the optional message string is present, it will be used as the warning
+  to be displayed if the identifier is used. Otherwise, a message of the form
+  "Identifier 'Col_Glass_Old' was declared deprecated." is used.
+  
+  An identifier is considered 'used' if it is referenced anywhere (even if in
+  another #declare).
+
+-------------------------------------------
+Changes between 3.7.beta.27 and 3.7.beta.28
+-------------------------------------------
+
+Fixed multiple invocations of crash handler if exceptions occur in more than
+one thread.
+
+Fixed 'white outlines in df3 patterns with interpolate 2' issue reported in
+  <483d2920@news.povray.org>.
+
+Fixed str() crash reported in <web.4880f0adaf19f856c59235590@news.povray.org>.
+
+Fixed bounding box calculation flaw that caused in some cases major slow-downs
+  in scenes using difference (e.g. abyss.pov).
+
+Re-implemented light color cache for textures. without this, each subsequent
+layer (after the first) in a multi-layered texture will cause an unnecessary
+call to TraceShadowRay and its subsequent intersection test to determine the
+light color at that point.
+
+Fixed issue with INI directory exclusion in IO permissions.
+
+Improvements to Windows installer: now asks if install is for one user or all
+users, and sets default install dir to suit. Note: it would be nice to detect
+if a user has Administrator permissions prior to showing this option, but
+unfortunately - at least on Vista - the windows installer engine intentionally
+provides false information about the privileges of the user. This will lead to
+non-privileged Vista users being offered the opportunity to do a global install
+which of course will fail (presuming they accept the default destination). The
+workaround for this (setting a property) causes the opposite problem: all users
+get tagged as not having Administrator permissions, even if UAC elevation would
+have granted it during install.
+
+-------------------------------------------
+Changes between 3.7.beta.26 and 3.7.beta.27
+-------------------------------------------
+
+Fixed incorrect flag test which would have resulted in issues with cutaway
+textures and CSG or objects with double_illuminate set.
+
+Fixed crash with inverse and CSG reported in <web.4828b51b6d261ebff3e4f6a20@news.povray.org>.
+
+Added support for specifying grayscale output via INI file or command-line.
+
+  This is intended to replace the use of hf_gray_16 in global_settings. 
+  hf_gray_16, if encountered, has no effect on the output type and will 
+  additionally generate a warning message (as before).
+  
+  Currently only PNG file support is provided with grayscale output; others 
+  will be added over time.
+  
+  Grayscale output may be specified via 'Grayscale_Output=true' as an INI 
+  option, or '+Fxg' (for output type 'x') as a command-line option. For 
+  example, '+Fng' for PNG grayscale output.
+  
+  Caveat: grayscale output implies the maximum bit-depth the format supports; 
+  for PNG this is 16. it is not valid to specify bits per color channel with 
+  'g' (e.g. '+Fng16' is not allowed, and nor for that matter is '+Fn16g'). If 
+  bits per channel is provided via an INI option, it is ignored.
+  
+Improved handling of memory allocation failures during parse.
+
+Fixed issue whereby manual bounds, clips, patterns, UV, and interior were left
+behind when a transformation was applied to a CSG object.
+
+Changed back to using pvengine.ini to store POVWIN options and improved the
+code that migrates version 3.6 options (if present) to 3.7. NOTE: not all
+options from the v3.6 pvengine.ini are migrated: this is intentional and may
+change later (it mainly involves options that contained pathnames).
+
+Further split the POVWIN install and data dirs - this moves the ini, scenes,
+and insert menu directories to the user's Application Data folder, for example,
+c:\Documents and Settings\<user name>\Application Data\POV-Ray\v3.7\.
+
+Created a Windows Installer which takes care of setting up the above for Win32
+systems. Win64 is pending. NOTE: the installer currently only installs for the
+user who ran it: that is, the 'Application Data\POV-Ray\v3.7\...' files are
+only installed for that user. This won't be the case with the final installer;
+it will set things up such that when pvengine.exe is run for the first time by
+a user who has not had the program set up for them, the appropriate files are
+created in their Application Data directory (this is a Windows Installer feature).
+
+-------------------------------------------
+Changes between 3.7.beta.25 and 3.7.beta.26
+-------------------------------------------
+
+Fix the "no_image and transparency" problem reported in <web.46f84a9cd032f3c7cb86afba0@news.povray.org>.
+
+Fix the animation frame number issue reported in <478561e3@news.povray.org>;
+
+Re-enable Include_Header thanks to patch from Stefaan De Roeck (see <47fb5d65@news.povray.org>).
+
+Fix 'library path accumulation' issue reported in <481da512$1@news.povray.org>.
+
+Apply isosurface cache fix suggested by Lukas Winter in <47c5b8b6$1@news.povray.org>.
+
+Workaround for race condition that would cause 'timed out waiting for worker thread' error.
+
+-------------------------------------------
+Changes between 3.7.beta.24 and 3.7.beta.25
+-------------------------------------------
+
+Windows: moved all settings that used to be in PVENGINE.INI into the registry.
+  This means that all PVENGINE settings (not to be confused with editor settings,
+  which were already in the registry) will revert to their defaults. PVENGINE.INI
+  is no longer used by POV-Ray 3.7.
+
+Windows: moved the location of PVTOOLS.INI into the user profile folder: e.g.
+    C:\Documents and Settings\<user>\Application Data\POV-Ray for Windows\pvtools.ini
+  This change only alters the location that POV-Ray for Windows looks for the
+  tools file - it does *not* automatically copy it. This is because of course
+  when 3.7 is finally distributed, the installer will put the file in the 
+  correct place. If you use pvtools.ini, please manually copy it as above (the
+  destination folder will be created the first time the new beta runs).
+
+Windows: as of this beta, version 5 of the common control DLL is required. 
+  This was supplied with IE5, so it's highly unlikely that it won't be present 
+  on any version of windows that POVWIN still supports.
+
+Linux: add auto setting of thread count and rework --benchmark. The number of
+  threads is now set as the number of detected CPUs, or 4 otherwise. The built-in
+  benchmark now accepts +Lpath command-line options and does no longer read any
+  INI file but the provided one.
+
+Fixed double-illumination problem with the area_illumination feature.
+
+Fixed an issue where irid, ground fog, and constant fog were using noise generator
+  0 rather than the default generator.
+
+Fixed the 'area lights and transform' bug reported in
+  <web.4639ad4565c782bbc717c9af0@news.povray.org>.
+
+-------------------------------------------
+Changes between 3.7.beta.23 and 3.7.beta.24
+-------------------------------------------
+
+Added multiple-thread support to photon shooting code. To take advantage
+  of this at the moment, your scene will need multiple light sources.
+Added experimental support for full area light diffuse and specular
+  illumination. By default this is off and thus area lights will work as
+  previously, but the new feature can be turned on by specifying the new
+  'area_illumination' keyword (followed by an optional on/off keyword) in
+  the light source definition. The settings which determine the quality of
+  the lighting are the Size_1 and Size_2 parameters of the area light
+  (similarly to how they determine the quality of the shadows).
+Added experimental support for reading the pixel resolution of an image
+  map. This is done by giving an image map pigment identifier to max_extent(),
+  which will ten return the resolution of the image map as the x and y values
+  of the returned vector.
+Added a new list pattern type: 'cubic'. It takes six texture elements and maps
+  each one to each of the six pyramids centered at each half-axis (thus
+  effectively mapping each texture element to each side of a origin-centered
+  cube).
+Added a new warp type: cubic (which takes no parameters). It maps an area
+  in the x-y plane between <0,0> and <1,1> around the origin in the same way
+  as uv-mapping an origin-centered cube-shaped box would. (Naturally the warp
+  works with any object whereas the uv-mapping only works for the box object.)
+  See the documentation of box uv-mapping for details.
+Fixed superellipsoid bug reported in <6p8nj3tckhrd1pihpofmvltqrfrs4lish8@4ax.com>
+
+-------------------------------------------
+Changes between 3.7.beta.22 and 3.7.beta.23
+-------------------------------------------
+
+POVWIN now allows an expired beta to be extended by up to one week at a time.
+Photon refraction and dispersion fixes.
+Added comparison ('=', '!=', '<', '<=', '>', '>=') support for strings.
+
+--------------------------------------------
+Changes between 3.7.beta.20b and 3.7.beta.22
+--------------------------------------------
+
+The trace level in the trace() function is now incremented only if
+  an object was hit and the object is marked to increment the trace
+  level, or if the ray was a radiosity ray. Objects which do not use
+  reflection nor ior (but which might be semi-transparent) are marked
+  as not incrementing the trace level.
+Workaround for the temp file mapping not being completed.
+  Temp files are now created as before (in the place specified).
+Fixed issue whereby an I/O restrictions error would be displayed rather than 
+  'input file not found' in certain cases where POVWIN was asked to render a 
+  source file that was not present.
+Further fix for media_attenuation bug
+Fix SDL crash reported in <4617c41e$1@news.povray.org>.
+Added Control-A support in windows version commandline input box (select all).
+Changed windows version render window keypress code to hand focus to main window
+  for any key, not just escape.
+Fixed fog (and participating media) shadow attenuation issues.
+  Media computation was ignoring the lightsource's media_attenuation
+  flag under some circumstances, and was attenuating shadow rays if
+  the shadow ray had intersected an object.
+Fixed jpeg temp file issue reported in thread <web.46168c053403448a4f02351a0@news.povray.org>.
+Fixed incorrect unix exit value when closing the display window (user abort)
+Temporarily hard-coded INI keywords into editor syntax table for INI files.
+
+Changes between 3.7.beta.20a and 3.7.beta.20b
+---------------------------------------------
+
+Added 'alternate render file' feature to povwin IDE. See comments below.
+Added extensions .MCR and .MAC to list of files povwin considers include 
+  files (i.e. which are filtered as such in the various file dialogs and 
+  assigned the POV file type for the editor syntax highlighting).
+Added .INI file type to povwin editor syntax highlighting.
+Added window menu to povwin IDE. Entries are MRU-sorted.
+Activated memory statistics code in Windows build.
+Fixed issue with editor window splitting not being restored 
+  (<45620b9e$1@news.povray.org>).
+Fixed issue with file type not being set on initial save if 'save as'
+  was not used (reported many times, including <45602a08@news.povray.org>
+  and <46092c8a@news.povray.org>).
+
+  Windows Editor Changes
+  ----------------------
+
+  This beta introduces two notable changes to the POVWIN IDE.
+
+  Firstly, it now has a Window menu, which is located where the GUIEXT 
+  menu used to be (the latter has moved to within the Options menu).
+
+  While technically a Window menu is not necessary, as all open files
+  are visible in tabs, the addition of this menu provides two advantages:
+
+    1. We can provide the option of showing all tabs on a single line, 
+       with a scroller to view non-visible ones. This has not yet been
+       added but will be at a later point.
+
+    2. The MRU arrangement of the window menu makes it trivial to toggle
+       between files without taking your eyes off the text or using the
+       mouse. The most recently view window (i.e. the current one) will
+       always be entry 1 in the list. The second most recently viewed
+       (i.e. the last window viewed before switching to the current one) 
+       will always be entry 2 in the list, and so forth. Given that 
+       entries 1 through 10 in the list are given the menu mnemonics
+       1 through 0 respectively, it is therefore clear that to toggle
+       between the current and previous files all you need to do is hit 
+       Alt-W then 2. To go to the third oldest, Alt-W then 3, and so 
+       forth.
+       
+       Currently, the MRU list is not saved on exit. This will be added.
+       We may also add keyboard accelerators (e.g. ALT-2, ALT-3 etc) as
+       a shortcut for Alt-W 2, etc.
+
+  Secondly, there is now an 'alternate render file' feature. This is 
+  intended to make things easier when editing macro or include files. 
+  While it is possible to use SDL to detect whether a macro/include file 
+  is being rendered directly and to pull in supporting code, that approach 
+  is not very flexible.
+
+  The alternate render file feature allows a render to be started on an 
+  include file, and instead of the include file being rendered directly 
+  (as would have happened previously), the source file that most recently 
+  included that file in a render will be rendered instead. Note that by 
+  'source file', we mean either a .POV or .INI file.
+
+  For this feature to work, you need to have rendered a file which 
+  includes the target file during the current editing session (the 
+  association between include files and source files is not persisted when 
+  POVWIN exits). Additionally you need to have requested to render a 
+  source file which does not have the .POV or .INI extension. When you 
+  request the render, a message box will appear asking you what to do. You 
+  can choose to render the alternate file this time only, to render the 
+  alternate file each time you render this one, or to render this one each 
+  time (i.e. disable the alternate file option).
+
+  In all cases, the choice you give only persists for the current editing
+  session; it is not restored when you re-launch POVWIN. This is by 
+  design.
+
+Changes between 3.7.beta.20 and 3.7.beta.20a
+--------------------------------------------
+
+Added preliminary Linux support for CPU timer; might return incorrect results
+   depending on the platform.
+Added preliminary Linux support for signal catching (e.g. when aborting a
+   render by hitting Ctrl+C).
+Fixed the +p option under Linux to trigger an interframe pause in animations.
+Fixed unrestricted display and file gamma; must now be at least 0.001.
+Fixed PNG gamma issue reported in <45aa976e$1@news.povray.org> and
+   <45c11eed$1@news.povray.org>.
+Fixed uv mapping issue reported in <45602a08@news.povray.org> and
+   <46092c8a@news.povray.org>.
+Fixed Winpov issue with editor window splitting not being restored
+   reported in <45620b9e$1@news.povray.org>.
+Fixed Winpov issue with file type not being set on initial save if 'save as'
+   was not used (reported many times, including <45602a08@news.povray.org>
+   and <46092c8a@news.povray.org>).
+Fixed exit code for the Linux build; now 0 = ok, 1 = error, 2 = user abort.
+Tweaked a few scene files.
+Improved w3c conformance and keyword index for the Linux docs.
+
+Changes between 3.7.beta.19 and 3.7.beta.20
+-------------------------------------------
+
+Added 'file modified' indicator to filename shown in POVWIN main window
+  caption.
+Added feature notification for when auto-reload results in files being
+  auto-saved.
+Some vfe changes to assist resolution of the 'pause after render' race
+  condition.
+Added support for --benchmark on unix (works together with +wt) and print
+  built-in features with --version
+
+Changes between 3.7.beta.18 and 3.7.beta.19
+-------------------------------------------
+
+Fixed render never completes when using crackle error reported in
+   <web.458d0fbb495005281bd6cd0c0@news.povray.org> and several others.
+Fixed issue reported in <45781d0d$1@news.povray.org> where reading a
+   continue state file would hang POV.
+Fixed "POV-Ray reports wrong file to be missing" Unix issue reported in
+   <pan.2006.12.30.10.45.30.743879@removeit.geloescht.net>.
+Fixed a minor issue with #version handling as found in the Linux betas.
+
+Changes between 3.7.beta.17 and 3.7.beta.18
+-------------------------------------------
+
+Added preliminary support for per-thread crackle pattern cache.
+Fixed a povwin bug in vidcap code.
+Added experimental windows-specific memory management code.
+Improved the Unix preview display code.
+
+Changes between 3.7.beta.16 and 3.7.beta.17
+-------------------------------------------
+
+Unix default file gamma changed from from 1.0 to 2.2.
+Fixed crash reported in <web.453677b9876cd74e72d86b490@news.povray.org>.
+Fixed issue with trace returning an incorrect intersection point in some 
+  circumstances (see <web.45367d932f1ac4de72d86b490@news.povray.org>).
+Fixed issue caused by failure to clear ray interiors during focal blur sample
+  loop (<web.45424a798f1b3f6c1bd6cd0c0@news.povray.org>).
+Added RTR (real-time raytracing), clockless animation, and video capture
+  support (windows only). See below for more information.
+Fixed bug that stopped radiosity from being activated when it should have been.
+Enabled multi-threaded radiosity. This is still VERY experimental and is in no
+  way in its final form.
+Fixed missing definition for FILENAME_SEPARATOR that caused run failure with
+  absolute filenames on unix systems.
+Fixed infinite loop in radiosity pre-trace code that would occur with small 
+  values of pretrace end.
+Fixed issue with BSP missing objects and speckled rendering (cornell.pov gave
+  a good example of both).
+Improved BSP tree build speed; it is now roughly twice as fast on complex
+  scenes (e.g. isocacti.pov).
+Fixed 'Subset_Start_Frame not working' issue
+  (<web.454b67a8defacc9bf2985afc0@news.povray.org>).
+Fixed issue with sys output file extension on windows
+  (<455a0770@news.povray.org>).
+Improved povwin vidcap handling of video source pins that are not RGB8 (it
+  now ignores them).
+
+  Real-Time Raytracing
+  --------------------
+
+  POV-Ray now has some highly experimental support for a real-time raytracing
+  loop. This is basically a mode where a single pre-parsed scene is rendered
+  multiple times with no re-parsing inbetween frames. The camera is moved
+  according to camera definitions provided in the main scene file. Additionally,
+  on windows, a live video stream (e.g. from a webcam) may be mapped into the
+  image in exactly the same way that a normal image map may be.
+
+  For full documentation on these features, please see http://www.povray.org/beta/rtr/.
+
+Changes between 3.7.beta.15 and 3.7.beta.16
+-------------------------------------------
+
+Work around an issue caused by apparent resource starvation within windows.
+  This would show itself as non-updating editor windows when switching tabs
+  or focus.
+Added support for 'pause when done' in linux build.
+Changed alpha handling when version is set to 3.7 (see below).
+Fixed animation problem where Initial_Frame was ignored.
+Changed WorkThreads INI option to Work_Threads for consistency.
+Changed bounding method command-line option from +b2 to +bm2 for the same reason.
+Fixed major slowdown when using BSP bounding, an orthographic camera (or
+  any camera with non-constant origin), and large numbers of slow objects.
+Added ability to close edit tab in windows version by middle-clicking on it.
+  (NB this means on the tab itself, not the contents of the tab).
+  Also, Ctrl-W now defaults to closing the current editor file.
+Improve parsing of POVWIN-specific command-line filenames containing single
+  quotes.
+Added /EDITDLLPATH command-line parameter which overrides the default
+  edit DLL locations for the windows version.
+Added SEH and minidump generation to windows code. After an unhandled exception
+  POVWIN will now offer the option of creating a minidump (brief or full) for
+  submission to the team to assist in tracking down crashes.
+Changed default number of threads in windows version to number of CPU's
+  (was number of CPU's * 2).
+
+  Photon Changes
+  --------------
+
+  We are re-working some areas of the photon support, and as such photons will
+  not work as well as in the previous beta.
+
+  Alpha Changes
+  -------------
+
+  Some changes have been made to the way alpha is handled when +UA is activated.
+  Firstly, in previous versions, specifying a background with the background
+  keyword would by default supply a background with transmit set to 1.0 (i.e.
+  fully transparent provided that +ua is being used). This is no longer the case.
+
+  While the default background is transparent, any background specified in a
+  scene file (unless 3.6 or earlier compatibility is being used) will now be
+  opaque unless transmit is explicitly given. (In other words, use rgbft<>
+  rather than rgb<> in the background statement if you want the old behaviour).
+  
+  Secondly, the way that objects are blended with the background has changed.
+  Previously the color of the background was not taken into account when
+  calculating effects of transmission through translucent objects when +ua is
+  in effect (i.e. where the background could otherwise have been seen through
+  the object). Now, however, the background color is taken into account, even
+  if it is not otherwise visible. (In other words, blending is performed in the
+  same way regardless of the presence of background transparency).
+
+  Note that this change is not affected by the #version directive, so it may
+  change the appearance of scenes written for version 3.6 and earlier. We will
+  monitor feedback on this from beta testers to evaluate the impact of this.
+
+Changes between 3.7.beta.14/14a and 3.7.beta.15
+-----------------------------------------------
+
+Fixed PNG output causing corrupted (yet often readable) files
+Fixed broken RLE Targa output (+FC) causing program abort
+Partial fix for "Crash when assigning materials" issue reported in <44f596fa$1@news.povray.org>
+Partial fix for "Darkness in grenadine.pov" issue reported in <web.448348adc379ad5b1bd6cd0c0@news.povray.org>
+Fixed large DF3 files issue reported in <web.44f40e4698b0d9e4b399450c0@news.povray.org>
+Fixed legacy heap overwrite in BVH code reported in <web.44e5a00bfcc26e0fc717c9af0@news.povray.org>
+Added ability to specify thread count from Windows version render menu (unsaved setting)
+Fixed Linux "Unknown internal error" issue reported in <44fc07af$1@news.povray.org>
+Improved html code and navigation for the Linux documentation
+
+Changes between 3.7.beta.13 and 3.7.beta.14
+--------------------------------------------
+
+Added radiosity on/off flag for objects
+Fixed default blend map destruction issue
+Fixed photons with media issue
+Added "WorkThreads" INI option and "WT" command-line option
+Added "File_Gamma" INI option
+Added gamma correction to file output
+First beta release for Linux
+
+Changes between 3.7.beta.12a and 3.7.beta.13
+--------------------------------------------
+
+Some fixes to bounding and object count statistics.
+Fixed render percentage error when a large number of pixels are being rendered.
+Parse and bounding times are now included in stream output.
+Implemented debug output to stream.
+Bugfix for printing of max depth stopped nodes per node.
+Improved error reporting when exception is caught in renderbackend.
+Fixed sombrero.pov bug reported in <web.442c3cd3ccb62fd8c7294af50@news.povray.org>.
+Fixed issue with ray interior being removed during evaluation of area lights.
+Fixed issue with intersection min depth being too coarse (e.g. the liquid in 
+  the glass in balcony.pov did not render).
+No longer send mem usage stats as they are not accurate (will restore this before
+  final release).
+Fixed photon memory issue referred to in <web.444b4f4ed5b924f08b9c27240@news.povray.org>.
+Fixed object count when no bounding is used, rendering empty file leaves stop icon, and
+  winpov exit command not working issues as reported in <442df1da$1@news.povray.org>.
+
+Changes between 3.7.beta.12 and 3.7.beta.12a
+--------------------------------------------
+
+Fixed issue with BSP that caused long build times on large trees.
+Changed default BSP child access cost to 5.0 (was 1.5).
+Fixed issue with BSP trees that would cause some objects to vanish.
+Added an optimization which speeds up BSP renders.
+
+Changes between 3.7.beta.11c and 3.7.beta.12
+--------------------------------------------
+
+Fixed spheresweep copy bug reported in <43fbaf97$1@news.povray.org>.
+Fixed 'aa incorrectly reported to be on' issue reported in <43fc75f9$1@news.povray.org>.
+Added progress and stats reporting for BSP bounding.
+Fixed camera inside media/interior mostly lost bug.
+Fixed debug message output.
+AA method 1 block artifact fix (<43ebe0bc@news.povray.org>). Also correct
+  some jitter option issues. NB it is still technically possible that
+  block-boundary AA artifacts could occur but they are much less likely.
+Fixed bug in generation of lit intervals for media.
+Fixed "light doesn't pass through transparent image_map" issue
+  (<43a97c75$1@news.povray.org>).
+Fixed 'trace fails with no_image object in union' bug
+  (<43f57a9d$1@news.povray.org>.)
+Fixed issue where cancelling a render may not work if all CPU resources
+  are committed to the render.
+Fixed 'unrecognized file format' warning when HDR output is selected.
+Fixed flipped image HDR reading bug (<43e8190e@news.povray.org>)
+Fixed one dispersion bug (long render times).
+Re-implemented display retention and bitmap preservation during animation.
+Added fix for image filename generation and rendered pixel counting.
+Fixed gamma assignment in PNG output.
+
+  Render Window
+  -------------
+
+  Due to issues with CPU usage, the new render window is now by default
+  off. To work well this feature requires that hardware-assisted alpha
+  blending is available on the target system, and as of the time of writing
+  this is not common enough to justify turning it on by default.
+
+  Note: it will remain turned on if you already had it on (e.g. from a
+  previous beta).
+
+  BSP Bounding
+  ------------
+
+  BSP (Binary Space Partitioning) tree bounding is now available. To turn
+  it on use '+B2' or 'Bounding_Method=2' in the INI file or on the command-
+  line. When it is in use you will get some additional statistics in the
+  output pane regarding the built tree.
+
+  Please keep in mind that this implementation of BSP is highly beta and
+  will not speed up scenes in many cases (and in fact may slow some down).
+  In particular the building of the tree can take a long time and lots of
+  memory in severe cases. Using the BSP tree rather than our traditional
+  BVH system (default or +B1) is a choice best made for specific scenes
+  that will benefit from the way the BSP operates, and in particular if
+  the render is long enough to offset the build time. (The BSP tree build
+  time will be constant for a given scene and set of BSP parameters,
+  regardless of the output resolution. A 30-second BSP build may not be
+  a good choice on a 60-second test render but may be acceptable for a
+  60-minute final render if the use of BSP adds a few PPS).
+
+  On some scenes the difference however will be dramatic, with short
+  build times and radically increased render speed.
+
+  We have provided some BSP-related options via the INI file and encourage
+  you to experiment with them to see if you can get better results than
+  the default values built in to POV-Ray. We will listen to feedback from
+  this and if necessary tweak the defaults. We do not guarantee that all
+  of the following INI file settings will remain in the final release of
+  3.7.
+
+    BSP_MaxDepth=128
+    BSP_BaseAccessCost=1.0
+    BSP_ChildAccessCost=1.5
+    BSP_IsectCost=150.0
+    BSP_MissChance=0.2
+
+  The values shown above are the default. You can also get the defaults
+  if you use a value of 0 for any of the above (or of course just by not
+  specifying the option at all). For an explanation of what the values
+  mean you may refer to Ray Tracing News v17n1 (look for Eric Haines'
+  article on BSP), or follow the discussion on BSP that is sure to crop
+  up in the beta-test group.
+
+  Please note that we are aware of some render artifacts visible with +B2
+  and are seeking to address them. Don't be surprised if you find some,
+  and if you can generate a minimal scene demonstrating them feel free to
+  post it to the appropriate group.
+
+  Example BSP scene
+  -----------------
+
+  There is a scene included with this release called 'Tango.pov' which is
+  a good example of a scene that benefits from the BSP bounding.
+
+  Tango.pov rendered at 800x600, no AA -
+
+    With +B1 : 70 seconds total
+    With +B2 : 48 seconds total
+
+Changes between 3.7.beta.10 and 3.7.beta.11c
+--------------------------------------------
+
+No core bugs have been fixed. This release extends the expiration time
+to the start of April 2006 and provides a new render window feature.
+
+  Render Window
+  -------------
+
+  The new render window mode is only available on Windows 2000 or later.
+  The presence of this code may case the beta to be unable to load on
+  Windows 9x systems; if this occurs it will be fixed in the next beta.
+  Note that we have not tested this new code on a Windows 2000 system,
+  so we can't comment on how well it will work on those systems.
+
+  To activate the new render window, open the 'Render Window' sub-menu in
+  the 'Options' menu, and select the 'Use New-style Render Window' entry.
+
+  The new render window is designed to help users get around the issue of
+  the render window getting in the way when doing edit/render/fix cycles.
+  It supports a 'transparency' mode that is in effect two things: both
+  optical transparency (or more specifically translucency), and input
+  transparency (more specifically, the Windows WS_EX_TRANSPARENT style).
+
+  'Input transparency' means that the window is transparent to input -
+  so if you move your mouse over it or attempt to click on it, the mouse
+  messages are in fact sent to whatever is underneath the window. In
+  effect therefore it is as if the window were not there - even if you
+  can still see it.
+
+  The effect of this is that, coupled with translucency, you can both
+  see what is under the window (e.g. the POV-Ray editor), and also work
+  with it (typing or selecting with the mouse, etc).
+
+  'Input Transparency' is enabled whenever you set the translucency of
+  the render window to 25% or more (see below). At settings less than
+  this, the render window will behave more or less as normal (though
+  without some of the features of the classic render window, such as the
+  ability to be de-coupled from the main window such that it does not
+  get hidden when the main window is minimized).
+
+  To set the translucency of the render window, either rotate your mouse
+  wheel when the render window has focus (this is the preferred method),
+  or alternatively right-click on the window's title bar and choose a
+  setting from the context menu that is provided.
+
+  When the render window has input focus, translucency is removed and it
+  becomes opaque. It will switch back once another window gets focus, or
+  if you adjust the translucency using one of the above methods.
+
+  If you want to work with input transparency, it is important that you
+  understand that this means you can't work with the render window in
+  the manner you are accustomed to, since of course the window will pass
+  input to the application below it. To allow for interaction with the
+  window in this circumstance, we have added a feature whereby hovering
+  the mouse over the render window's caption for a short time, or clicking
+  on the title bar, will activate the window, make it opaque, and allow
+  input to be processed normally.
+
+  (Of course the ability to click on the caption means that it's not
+  completely input transparent, and we might disable this feature later
+  if the hover feature works out well).
+
+  You will know if your mouse is over the appropriate area of the window
+  since the cursor will turn to a hourglass shape during the 'hover' time.
+
+  Provided that the window is left in input transparency mode, if you
+  move your mouse out of the window for a short time, it will automatically
+  snap back into its former translucent mode.
+
+  You can tell if the window is in input transparency mode by looking for
+  a '[T]' at the start of the render window caption. If present, then it's
+  going to pass input to the application underneath it. While adjusting
+  the translucency with the mouse wheel, the caption will display the new
+  translucency setting and, if appropriate, a comment that the window has
+  switched to passing input. (Recall however that this doesn't kick in
+  until you switch focus to another window).
+
+Changes between 3.7.beta.9 and 3.7.beta.10
+------------------------------------------
+
+Added gamma correction support.
+Add more frequent stop-checking to all render tasks.
+Radiosity now works a lot better than beta.9.
+Fixed some memory leaks in radiosity.
+Fixed crash in some image file reads.
+Improved handling of cancel render in windows version.
+Fixed output filename generation logic.
+Changed all internal file paths to UCS2.
+Fix for using truetype in CSG.
+Improved responsiveness in backend.
+
+  Gamma Correction
+  ----------------
+
+  The way POV-Ray 3.7 handles the 'assumed_gamma' keyword has changed.
+  Previously the presence of this keyword in global_settings caused a
+  'possible error' warning and its presence was ignored. In addition
+  no gamma correction was available in previous betas. Starting with
+  beta.10 however, gamma correction is performed on both the display and
+  file output, subject to the following criteria:
+
+    o If the scene language version is set to 3.7 (or not set at all), then
+      gamma correction will default to ON, with the value used being set by
+      the 'display_gamma' INI file setting. Note that in previous versions of
+      POV-Ray gamma correction was OFF by default but otherwise this is the
+      same.
+
+    o If the scene language version is set to earlier than 3.7, then gamma
+      will be OFF by default.
+
+    o Notwithstanding the above, if the keyword 'assumed_gamma' is present
+      in the scene's global_settings, then POV will take one of the following
+      actions:
+
+        a) if "assumed_gamma 2.2" is present, gamma correction will be turned
+           OFF and a warning issued. the same thing will happen if the value
+           specified is not 2.2 but happens to be the default for the platform
+           setting given to POV-Ray when it was compiled (e.g. Windows is 2.2).
+
+        b) if "assumed_gamma 1.0" is present, gamma correction will be turned
+           ON (if it's not already on) and in any case a warning will be issued.
+
+        c) if a value other than the above is specified, it is ignored and a
+           'possible error' message is issued.
+
+      You will note from the above that therefore it is no longer possible to
+      adjust the amount of gamma correction from a scene file. This is as
+      designed since scene files should be as much as possible be platform
+      independent, and the gamma of particular display hardware does not belong
+      in the scene file. If you really need to specify 'assumed_gamma' you can
+      do so in an INI file or on the command-line; however in those cases you
+      may as well just use 'display_gamma' in its place.
+
+      When writing file formats that support gamma specification, the inverse
+      of the assumed_gamma value will be embedded in the file headers, so that
+      an appropriately equipped display program can 'undo' the gamma correction
+      if it is so desired. This is as per previous versions of POV-Ray.
+
+  Frontend and Backend
+  --------------------
+      
+  Note that POV-Ray uses a logical separation of frontend and backend. The
+  'frontend' is that part which deals with the user-interface, locating files,
+  parsing command-line options, reading INI files, and so forth. The 'backend'
+  deals with parsing the scene file and doing the actual render. These two parts
+  of POV-Ray communicate via a message-passing interface, even when linked into
+  the one executable program.
+  
+  Whilst currently not supported, it is entirely possible to separate the front
+  and back ends via for example a network interface, and have the render done
+  on one machine while the user interface (and display) is on another. Knowing
+  this may make it easier to understand why, for example, we are moving away
+  from allowing things such as gamma correction to be specified in the scene
+  file; there is no reason to assume the scene file is on the same machine as
+  the image will be displayed upon, and as such the specification of gamma
+  should be done in the frontend via INI or command-line options.
+
+  There will be more changes along these lines as we prepare for the future
+  transition to a fully network-capable renderer. The POV-Team will attempt
+  to ease the change to the new system by doing things such as the assumed_gamma
+  interpretation above, where it is possible to do so.
+
+Changes between 3.7.beta.8 and 3.7.beta.9
+-----------------------------------------
+
+Fixed crash caused by resource exhaustion (too many threads); refer <4303d267$1@news.povray.org>.
+Addressed state issue referred to in <web.42af2f04951c51e46a3607400@news.povray.org>.
+Fixed output file reporting issue reported in <web.430dc75ff23d654e726bd13c0@news.povray.org>.
+Fixed AA method 2 crash reported in <430358ed@news.povray.org>.
+Fixed render window re-display problem.
+Fixed focal blur problem.
+Moved assumed_gamma to command-line or INI-file only option (causes warning if found in scene).
+
+  Render block size
+  -----------------
+
+  You now have the ability to specify the render block size via either an
+  INI-style option ("Render_Block_Size=n") or on the command-line ("+BSn"),
+  where 'n' is an integer larger than or equal to 4. This represents the
+  edge size of the square used to distribute work to the render threads,
+  and thus the number of pixels in each block will be n squared.
+
+  The default value is 32. If you specify a value that is greater than the
+  larger of the width or height of the image being rendered, it is clipped
+  to that value.
+
+  Note that using render block sizes of less than eight can impact performance,
+  particularly on large images that render quickly, as it significantly
+  increases the amount of message traffic between the render backend and the
+  graphical frontend (which communicate using a shared-memory queue).
+
+  Editor
+  ------
+
+  A few changes have been made to the editor in the hope of avoiding the
+  error that some users get when it attempts to open a file that has been
+  removed from the disk. We have not been able to replicate this error
+  ourselves (the code was already designed to handle this situation) so we
+  have added some extra checks. The net result of this is that when a file
+  no longer exists, instead of opening a blank file, the edit session for
+  that file will instead be discarded.
+
+  Additionally we have improved the handling of modified files during active
+  application changes; now, you should never get more than one message box
+  displayed at any one time (which previously could happen if you switched
+  focus multiple times).
+
+  Dispersion
+  ----------
+
+  Dispersion has been added back, however this is still mostly untested.
+  There will be numerous issues with this; we would appreciate help in
+  identifying what they are and where they may lie (i.e. reports that
+  'dispersion doesn't work properly' with no additional information will
+  not be of much help).
+
+  Radiosity
+  ---------
+
+  Radiosity has been re-enabled. Currently it is limited to a single thread
+  and has some issues. As stated for dispersion, we would appreciate assistance
+  in determining where individual issues lie and what influences them.
+
+  Multi-thread support will be added later, once the radiosity code settles
+  down and is functioning as expected in single-thread mode.
+
+  Mosaic Preview
+  --------------
+
+  Mosaic preview now works again. The same issue as mentioned in the above
+  section on render block size apply; we don't recommend using an end preview
+  size of less than 8. Note that unless you specify an end preview size the
+  code will default to using +ep2, so it is strongly recommended that you
+  do provide it.
+
+  Be aware that when using mosaic preview, the count of rendered pixels shown
+  in the status bar will be wrong. This will be fixed later.
+
+  Improved handling of large render sizes
+  ---------------------------------------
+
+  Handling of large renders (e.g. 10,000 x 5,000 pixels) has been improved.
+  Previously the intermediate data structure used to store rendered pixels
+  was held in RAM. On windows it is now stored in a virtual-memory backed
+  file which maps to the swap file. This means that your swap file needs to
+  have at least enough free space to store this file at the start of a render.
+  For reference, the amount of room needed is roughly 20 bytes per pixel, so
+  the above example 10,000 x 5,000 pixel image would need one gigabyte in the
+  swap file.
+
+  One other issue to be aware of is that, on windows, there has to be enough
+  contiguous virtual address space available to hold the file. This can be a
+  problem since by default many Win32 systems only provide each process a total
+  of two gigabytes of address space, which is then divided up amongst the
+  exe and its various DLL's, the local heap, stack, and so forth. Additionally
+  some Win9x versions (at the least Windows 95) will only allow a maximum of
+  one gigabyte to be mapped in this way, and that is divided up amongst other
+  resources as well.
+
+  Therefore it is entirely possible that even if you have sufficient swap space
+  the allocation of the memory mapped file will fail, at least for win32 users
+  (win64 won't have this problem). We are working to fix this limitation by
+  moving to a less efficient but more reliable file-based solution.
+
+  One final note: please be aware that the Windows process manager will add the
+  amount of virtual memory mapped by a process in this way to its total memory
+  statistics. Please don't assume that the figure reported by Windows is
+  necessarily the amount of physical RAM being used.
+
+Changes between 3.7.beta.7 and 3.7.beta.8
+-----------------------------------------
+
+AA buffering restored; AA should be as efficient as version 3.6 now.
+Fixed major problem in crackle when using more than one thread.
+Reverted to older version of Intel compiler to avoid some optimization bugs.
+Added HDR file support (RGBE, as used in Radiance).
+Added EXR file support using OpenEXR library (http://www.openexr.org/).
+Fixed animation clock jump issue.
+
+Changes between 3.7.beta.6 and 3.7.beta.7
+-----------------------------------------
+
+New thread-safe random number generator added.
+Continue trace support added (see release notice for usage details).
+Animation support added.
+Made render cancellation more responsive when large numbers of threads are in use.
+Fixed most wrapping problems in windows message display.
+
+Changes between 3.7.beta.5a and 3.7.beta.6
+------------------------------------------
+
+Fixed quadric bounding problem.
+Fixed CSG merge problem.
+Made numerous other changes to speed up code, should be closer to v3.6.1 now.
+
+Changes between 3.7.beta.5 and 3.7.beta.5a
+------------------------------------------
+
+Fixed bug reported in <428de855@news.povray.org> re:sunsethf.pov.
+Worked around SMP bug in trace related to lighting code altering lightsources during render.
+
+Changes between 3.7.beta.4 and 3.7.beta.5
+-----------------------------------------
+
+Fixed a photon building issue that caused progressive slowdown.
+Fixed scattering media problem reported in <427ca163@news.povray.org>.
+(This also fixes <427c0121@news.povray.org>).
+Parser now honors Split_Unions and Remove_Bounds options.
+Fixed lathe artifacts bug reported in <427c0f95@news.povray.org>.
+Fixed no_image and no_reflection issues reported in <427c1900@news.povray.org>.
+Fixed area light orient issue reported in <427c14ef@news.povray.org>.
+Fixed issue where a new clip statement would overwrite a previous one rather than appending to it.
+Fixed speed issue with quadrics by reverting to old bbox calculation method.
+Fixed a swathe of memory leaks.
+
+Changes between 3.7.beta.3 and 3.7.beta.4
+-----------------------------------------
+
+Fixed indexed PNG alpha problem reported in <42765ef3$1@news.povray.org>.
+Fix area light problem reported in <427a3fa5$1@news.povray.org>.
+Fixed crash during trace of lathe reported in <42796797@news.povray.org>.
+Improved handling of cancel/pause render.
+Fixed max_trace_level calculation and display (see <42769105@news.povray.org>).
+Fixed image memory leak.
+Fixed speed issues reported in <42769f6d@news.povray.org>.
+Fixed shadow problem mentioned in <42769f6d@news.povray.org>.
+Fixed sphere_sweep bug reported in <42773e51@news.povray.org>.
+Fixed 'inverting pre-declared union' crash reported in <42769b59@news.povray.org>.
+Fixed focal blur issue.
+Fixed omnimax camera bug reported in <42775c1b$1@news.povray.org>, plus several other related camera issues.
+Fixed facets pattern crash reported in <42773fab$1@news.povray.org>.
+
+Changes between 3.7.beta.2 and 3.7.beta.3
+-----------------------------------------
+
+Partial render (start col/row etc) now works
+Fixed CSG merge issue reported in <42645c3b@news.povray.org>.
+Added warning and better progress reporting to photons.
+Some hollow media fixes.
+Re-enabled alpha display in render window for windows port.
+Fixed alpha bug reported in <web.426402d627a031d914107e060@news.povray.org>
+Fixed no_image bug reported in <web.426402d627a031d914107e060@news.povray.org>
+Changed default bounding threshold back to 3 as per v3.6.
+Fixed alpha inversion bug in BMP, Targa, and PNG file reading/writing.
+Fixed crash mentioned in <42689685@news.povray.org>.
+Fixed noise generator default issue reported in <426898db@news.povray.org>.
+Fixed irid problem reported in <42680b39@news.povray.org>.
+Fix for area light problem from Massimo Valentini.
+Made quick_colour work as it should.
+
+Changes between 3.7.beta.1 and 3.7.beta.2
+-----------------------------------------
+
+CSG should now work properly
+Problem with too many recursions when rendering shadows fixed
+I/O restrictions should now work
+Fixed recursion bug in renderer
+Initialise photon variables
+Restore ability to open error file in editor (note: column number not always correct).
+Fixes no-display crash
+Fixes image closing bug
+Tweak to some radiosity local vars
+Fixes rendering area bug
+Fixes AA method 2 brightness issue
+Add output file type '+FB' (bmp).
+Add 'bmp' token to parser.
+Fix for BMP reading.
+File output defaults to on.
+Fix render quality options output.
+Change references to 'CPU(s)' to 'thread(s)'.
+Update render time output to include fractional seconds.
+Fix crash reported in <4263125b@news.povray.org> and one related bug.
+
+Intentional changes for POV-Ray 3.7
+-----------------------------------
+
+The version directive and command-line setting no longer provide compatibility 
+with most rendering bugs in versions prior to POV-Ray 3.5. However, compatibility
+with the scene language is provided for scenes as old as POV-Ray 1.0 just as 
+in all previous versions of POV-Ray. Nevertheless, we strongly recommend you 
+update scenes at least to POV-Ray 3.5 syntax if you plan to use them in future 
+versions of POV-Ray.
+
+This version uses multi-threaded rendering by default. The ability to render 
+in more than one thread is primarily of use to those users who have SMP 
+machines (i.e. more than one CPU). There have been reports of benefits for 
+users of hyperthreading systems, particularly with higher thread counts (e.g. 
+16 threads).
+
+You can render in only one thread by using the '/THREADS 1' switch in the 
+Windows version. Note that parsing and photon building will only use one 
+thread no matter how many are specified. However photon scenes will benefit 
+from multiple threads once photon building has completed.

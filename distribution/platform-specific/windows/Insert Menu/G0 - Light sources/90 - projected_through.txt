@@ -1,0 +1,4 @@
+// light_source { ...
+  // put this inside a light_source to give the light beam
+  // the shape of the object
+  projected_through { object { ... } }

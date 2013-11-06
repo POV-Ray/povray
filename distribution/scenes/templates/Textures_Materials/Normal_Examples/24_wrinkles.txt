@@ -1,0 +1,4 @@
+        texture{ pigment{ color rgb<0.8,0.55,0.25>}
+                 normal { wrinkles 0.75 scale 0.1  }
+                 finish { phong 1 reflection{ 0.05 } }
+               } // end of texture

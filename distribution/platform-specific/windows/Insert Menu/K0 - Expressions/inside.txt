@@ -1,0 +1,10 @@
+// inside function tests if a certain point  
+// is inside a specified object
+
+#declare Obj = sphere { 0, 1 }
+#declare Point = <0.6, 0.5, 0.6>;
+
+// if point is inside the object:
+#if ( inside(Obj, Point) )
+ //...
+#end

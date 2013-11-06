@@ -1,0 +1,48 @@
+//---------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------
+/*#declare R=1;
+#declare F1=function(u,v){R*sin(v)*cos(u)}
+#declare F2=function(u,v){R*cos(v)}
+#declare F3=function(u,v){R*sin(v)*sin(u)}
+*/
+
+#declare R=0.75;  //base radius of sphere
+#declare D=0.5;   //depth
+#declare FR=function{pattern{bozo scale 0.3}}
+#declare F1=function(u,v){((FR(u,v,0)*D)+R)*sin(v)*cos(u)}
+#declare F2=function(u,v){((FR(u,v,0)*D)+R)*cos(v)}
+#declare F3=function(u,v){((FR(u,v,0)*D)+R)*sin(v)*sin(u)}
+//---------------------------------------------------------------------------------------------------
+#include "meshmaker.inc"
+//---------------------------------------------------------------------------------------------------
+object{ //-------------------------------------------------------------------------------------------
+   Parametric( //(Fx,Fy, Fz, <UVmin>, <UVmax>, Iter_U, Iter_V, FileName)
+               // Builds a parametric surface out of three given functions. 
+               // The uv_coordinates for texturing the surface come from the square <0,0> - <1,1>. 
+      F1, F2, F3, //three functions from which the object will be generated. 
+        // Following 2 vectors are the range within which the surface is calculated: 
+      <  0, FromV(0)>, // 2-D vector that gives the lower boundaries of the uv-rectangle, <u min, v min>. 
+      < 2*pi, pi>,     // 2-D vector that gives the upper boundaries of the uv-rectangle. 
+      200, // 
+      100, //
+       ""  // FileName: ""= non, "NAME.obj'= Wavefront objectfile, "NAME.pcm" compressed mesh file 
+           // "NAME.arr" = include file with arrays to build a mesh2 from, 
+           //  others: includefile with a mesh2 object 
+   ) //----------------------------------------------------------------------------------------------
+   interior_texture {  //  outside texture
+   pigment {uv_mapping bozo scale 0.3}
+   //  uv_mapping
+   //  pigment {checker color rgb <0.0,0.2,0.5> rgb <1,1,1> scale <0.02,0.05,1>}
+     finish{specular 0.5}
+   } // 
+   texture{            // inside texture
+     uv_mapping
+     pigment {checker color rgb <0.0,0,0.0> rgb <1,0.7,0.7> scale <0.02,0.05,1>}
+     finish{specular 0.5}
+   } // 
+   //rotate <90,0,0>
+   //scale<2,1,2>
+   //translate< 0,1,0>
+} // end of object 
+//---------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------

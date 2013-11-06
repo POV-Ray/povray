@@ -1,0 +1,26 @@
+
+#declare MyObject = 
+union{
+
+cone{ <0,0,0>,0.50, <0,3,0>,0.4 }  
+torus{ 0.50, 0.075 translate<0,  0.075,0>} 
+torus{ 0.40, 0.075 translate<0,3-0.075,0>} 
+
+texture{ pigment{ color rgb<0.9,0.84,0.80>}
+         finish { phong 1}
+       }
+scale <1,1,1> rotate<0,0,0> translate<0,0,0>
+} // --------------------------------------- 
+
+union{ //-----------------------------------
+
+//#for(Identifier, Start, End [, Step]) 
+ #for (Nr, 0, 5, 1) 
+
+   object{ MyObject translate< 0, 0, Nr*2 >} 
+
+ #end // --------------- end of #for loop 
+
+rotate<0,0,0> 
+translate<0,0,0>
+} // end of union --------------------------

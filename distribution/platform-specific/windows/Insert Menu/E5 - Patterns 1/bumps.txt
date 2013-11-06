@@ -1,0 +1,5 @@
+// pattern for use in texture/pigment/normal/density
+// bumps is identical to bozo when used in pigment/density
+// especially suited for normal {}
+  bumps 0.5    // bumpy surface (0...1 or more)
+  //bumps      // for use with pigment{}

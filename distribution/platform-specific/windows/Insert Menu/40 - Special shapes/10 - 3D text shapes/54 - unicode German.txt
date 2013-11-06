@@ -1,0 +1,21 @@
+global_settings { charset utf8 }
+text{
+   ttf "arial.ttf",
+   concat(  chr(196),chr(214),chr(220)," ",chr(8364)
+         ) 0.01, 0 
+   texture{ pigment{ color rgb<0.65,1,0>*0.75}
+            finish { phong 1 }
+          }
+   
+  scale <1,1,1> rotate< 0,0,0> translate<0,1,-0.05>         
+} // end of text ----------------------------------------------------------
+
+text{
+   ttf "arial.ttf",
+   concat(  chr(228),chr(246),chr(252),chr(223)," ",chr(169)) 0.01, 0 
+   texture{ pigment{ color rgb<0.1,1.0,0>*0.5}
+            finish { phong 1 }
+          }
+   
+  scale <1,1,1> rotate< 0,0,0> translate<0,0,-0.05>         
+} // end of text ----------------------------------------------------------

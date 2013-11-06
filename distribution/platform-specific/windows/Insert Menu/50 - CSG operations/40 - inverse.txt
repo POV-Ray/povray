@@ -1,0 +1,5 @@
+// flip an object's inside and outside for intersect/difference
+intersection {
+  Shape1 {... inverse }
+  Shape2 {...}
+}

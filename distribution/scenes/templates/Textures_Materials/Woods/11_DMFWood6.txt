@@ -1,0 +1,5 @@
+       texture{ DMFWood6     
+                normal { wood 0.5 scale 0.3 turbulence 0.1}
+                finish { phong 1} 
+                rotate<60,0,45> scale 1
+              } // end of texture 

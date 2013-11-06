@@ -1,0 +1,28 @@
+Persistence of Vision Raytracer Version 3.5
+--------------------------------------------
+These are the quartic example scene files for use with the Persistence
+of Vision Raytracer version 3.5.
+
+Files contained in "quartic" sub-directory
+-------------------------------------
+axisbox.inc   <- Standard X, Y, Z, axis template
+bicube.pov    <- A Bicubic Cube (Smooth Edged)
+folium.pov    <- A Folium (Defies Description - Neat)
+grafbic.pov   <- A Cubic Bicorn Example
+helix.pov     <- A Quartic Helix Example
+hyptorus.pov  <- A Hyperbolic Torus Example
+lemnisc2.pov  <- 2 Lemniscates of Gerono Example
+lemnisca.pov  <- A Lemniscate of Gerono Example
+quartic.cat      <- This description file
+monkey.pov    <- A Quartic Saddle (Monkey Saddle)
+partorus.pov  <- A Parabolic Torus Example
+piriform.pov  <- A Piriform Example ("Hershey's Kiss")
+quarcyl.pov   <- A Quartic Cylinder Example (Space Needle)
+quarpara.pov  <- A Quartic Paraboloid Example
+steiner.pov   <- A Quartic Steiner's Surface Example
+tcubic.pov    <- A Cubic Curve Example (Teardrop)
+teardrop.pov  <- Another Teardrop (using a Piriform)
+torus.pov     <- A Quartic Torus Example
+trough.pov    <- A Quartic Saddle Example (Crossed Troughs)
+witch.pov     <- A Quartic Witch of Agnesi Example
+

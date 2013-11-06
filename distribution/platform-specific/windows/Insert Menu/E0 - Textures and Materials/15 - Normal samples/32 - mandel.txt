@@ -1,0 +1,4 @@
+        texture{ pigment{ color rgb<0.5,1,1>*0.85 }
+                 normal { mandel  255 scale 0.75  turbulence 0}
+                 finish { phong 1 phong_size 100 reflection{ 0.05 } }
+               } // end of texture

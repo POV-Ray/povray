@@ -1,0 +1,4 @@
+// pattern for use in texture/pigment/normal/density
+// especially suited for normal {}
+  wrinkles 0.5   // create a wrinkly surface (0...1 or more)
+  //wrinkles      // for use with pigment{}

@@ -1,0 +1,9 @@
+       texture{ pigment{ bozo turbulence 0.76
+                         color_map { [0.5 rgb <0.20, 0.20, 1.0>]
+                                     [0.6 rgb <1,1,1>]
+                                     [1.0 rgb <0.5,0.5,0.5>]}
+                         scale 0.25
+                       }
+                finish { phong 1 } 
+                rotate<0,0,0> scale 1 translate<0,0,0>
+              } // end of texture 

@@ -1,0 +1,5 @@
+// pattern for use in texture/pigment/normal/density
+// radially projected color_map in X-Z
+  radial
+  //radial 0.5     // for use with normal{} (0...1 or more)
+  //frequency 4.0  // increases # of color "spokes"

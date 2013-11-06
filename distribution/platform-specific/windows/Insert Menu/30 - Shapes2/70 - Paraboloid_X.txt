@@ -1,0 +1,8 @@
+object{ Paraboloid_X
+        clipped_by { box {<0,-2.5,-2.5>,<4.0, 2.5,2.5>} }  
+        texture { pigment{ color rgb< 0.85, 0.25, 0.45> }
+                  finish { phong 1 }
+                }
+        scale <1,1,1>*0.5 rotate<0,0,0> translate<0,0.00,0.0>
+      } // end of object ------------------------------------
+                                                              

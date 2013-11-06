@@ -1,0 +1,23 @@
+#include "shapes_lo.inc" //object{  Segment_of_CylinderRing(...)
+
+union{ //-------------------------------------------------------
+ #local Nr = 0;     // start
+ #local EndNr = 8; // end
+ #while (Nr< EndNr) 
+
+object{ Segment_of_CylinderRing ( 1.50+0.05, 1.50-0.05 ,0.0015, -20)   
+
+        texture{ pigment{ color rgb<1,1,1>*1}
+               //normal { bumps 0.5 scale 0.005}
+                 finish { phong 0.1}
+               } // end of texture
+         
+        rotate<0,-Nr*40,0> 
+      } // end of object 
+
+ #local Nr = Nr + 1;    // next Nr
+ #end // ---------------  end of loop 
+
+rotate<0,0,0>
+translate<0,0,0>
+} // end of union ---------------------------------------------.

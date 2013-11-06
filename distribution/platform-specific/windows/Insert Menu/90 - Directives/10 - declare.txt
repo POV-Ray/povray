@@ -1,0 +1,2 @@
+// note that #declare of float, vector and color require semicolon at the end
+#declare MyColor = color rgb<0.7, 0.5, 0.3>;

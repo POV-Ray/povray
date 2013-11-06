@@ -1,0 +1,31 @@
+// ==== Additional Includes ====
+// Don't have all of the following included at once, it'll cost memory and time
+// to parse!
+// --- general include files ---
+#include "arrays.inc"     // macros for manipulating arrays
+#include "chars.inc"      // A complete library of character objects, by Ken Maeno
+#include "consts.inc"     // Various constants and alias definitions
+#include "debug.inc"      // contains various macros for debugging scene files
+#include "logo.inc"       // The official POV-Ray Logo in various forms
+#include "math.inc"       // general math functions and macros
+#include "rad_def.inc"    // Some common radiosity settings
+#include "rand.inc"       // macros for generating random numbers
+#include "shapes.inc"     // macros for generating various shapes
+#include "shapes2.inc"    // some not built in basic shapes
+#include "shapesq.inc"    // Pre-defined quartic shapes
+#include "skies.inc"      // Ready defined sky spheres
+#include "stars.inc"      // Some star fields
+#include "strings.inc"    // macros for generating and manipulating text strings
+#include "sunpos.inc"     // macro for sun position on a given date, time, and location on earth
+#include "transforms.inc" // transformation macros 
+
+// --- textures ---
+#include "finish.inc"     // Some basic finishes
+#include "glass.inc"      // Glass textures/interiors
+#include "golds.inc"      // Gold textures
+#include "metals.inc"     // Metallic pigments, finishes, and textures
+#include "stones.inc"     // Binding include-file for STONES1 and STONES2
+#include "stones1.inc"    // Great stone-textures created by Mike Miller
+#include "stones2.inc"    // More, done by Dan Farmer and Paul Novak
+#include "woodmaps.inc"   // Basic wooden colormaps
+#include "woods.inc"      // Great wooden textures created by Dan Farmer and Paul Novak

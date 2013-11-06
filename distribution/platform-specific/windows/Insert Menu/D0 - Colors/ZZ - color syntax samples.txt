@@ -1,0 +1,33 @@
+// color syntax samples
+/*
+// rgb - Red Green Blue color shortcut
+color rgb <0.2, 0.3, 0.4>
+
+// rgbf - Red Green Blue Filter color shortcut
+color rgbf <0.2, 0.3, 0.4, 0.9>
+
+// rgbt - Red Green Blue Transmit color shortcut
+color rgbt <0.2, 0.3, 0.4, 0.9>
+
+// rgbft - Red Green Blue Filter Transmit color shortcut
+// NOTE: filter + transmit should always equal 1.0
+color rgbft <0.5, 0.5, 0.5, 0.4, 0.6>
+
+// ------------------------------------- 
+color red 1
+// 
+color green 1
+// 
+color blue 1
+// 
+color red 1 filter 1
+// 
+color green 1 transmit 1
+// ------------------------------------- 
+// extract each component of a color:
+#if (MyColor.red < 0.5) ...
+#if (MyColor.green < 0.5) ...
+#if (MyColor.blue < 0.5) ...
+#if (MyColor.filter < 0.5) ...
+#if (MyColor.transmit < 0.5) ...
+*/

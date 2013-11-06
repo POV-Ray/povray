@@ -1,0 +1,10 @@
+// set clipping shape for parent object.
+// (parent shape will not extend beyond ClipShape bounds)
+// example: 
+sphere { <0,0,0>, 1 
+         texture{ pigment{ color rgb<1,0,0> }
+                  finish{ specular 0.2 }
+                }
+         clipped_by { box{<-1,-1,-1>,<1,0.00,1>}}
+         translate<0,1,0>       
+       } //-----------------------

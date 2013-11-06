@@ -1,0 +1,840 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "winuser.h"
+#define APSTUDIO_HIDDEN_SYMBOLS
+#include "windows.h"
+#undef APSTUDIO_HIDDEN_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (Australia) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENA)
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_AUS
+#pragma code_page(1252)
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+POPUPMENU MENU
+BEGIN
+    POPUP "Popup Menu"
+    BEGIN
+        MENUITEM SEPARATOR
+        MENUITEM "Cu&t",                        CM_CUT
+        MENUITEM "&Copy",                       CM_COPY
+        MENUITEM "&Paste",                      CM_PASTE
+        MENUITEM SEPARATOR
+        MENUITEM "&Undo",                       CM_UNDO
+        MENUITEM "&Redo",                       CM_REDO
+        MENUITEM SEPARATOR
+        POPUP "&Bookmark"
+        BEGIN
+            MENUITEM "&Toggle",                     CM_TOGGLEBOOKMARK
+            MENUITEM "&First",                      CM_FIRSTBOOKMARK
+            MENUITEM "&Last",                       CM_LASTBOOKMARK
+            MENUITEM "&Next",                       CM_NEXTBOOKMARK
+            MENUITEM "&Previous",                   CM_PREVIOUSBOOKMARK
+            MENUITEM "Clear &All",                  CM_CLEARALLBOOKMARKS
+        END
+        POPUP "&File"
+        BEGIN
+            MENUITEM "&Save",                       CM_SAVE
+            MENUITEM "Save &As",                    CM_SAVEAS
+            MENUITEM "Sa&ve All",                   CM_SAVEALL
+            MENUITEM "&Open ...",                   CM_OPENFILE
+            MENUITEM "Clo&se",                      CM_CLOSEFILE
+            MENUITEM "&Print ...",                  CM_PRINT
+        END
+        POPUP "&Search"
+        BEGIN
+            MENUITEM "&Find ...",                   CM_FIND
+            MENUITEM "&Replace ...",                CM_REPLACE
+            MENUITEM "Find &Next",                  CM_FINDNEXT
+            MENUITEM SEPARATOR
+            MENUITEM "&Match Brace",                CM_MATCHBRACE
+            MENUITEM "&Go To Line ...",             CM_GOTOLINE
+        END
+        POPUP "Selectio&n"
+        BEGIN
+            MENUITEM "&Indent",                     CM_INDENTSELECTION
+            MENUITEM "Indent To &Previous",         CM_INDENTSELECTIONPREVIOUS
+            MENUITEM "&Undent",                     CM_UNDENTSELECTION
+            MENUITEM "Upper&case",                  CM_UPPERCASESELECTION
+            MENUITEM "&Lowercase",                  CM_LOWERCASESELECTION
+            MENUITEM "Convert &Spaces To Tabs",     CM_SPACESTOTABS
+            MENUITEM "Convert &Tabs To Spaces",     CM_TABSTOSPACES
+        END
+        MENUITEM SEPARATOR
+        MENUITEM "Open Inclu&de File Under Cursor", CM_OPENFILEUNDERCURSOR
+        MENUITEM "Cl&ose Current File",         CM_CLOSECURRENTFILE
+        MENUITEM "Context &Help",               CM_CONTEXTHELP
+        MENUITEM "Show &Messages",              CM_SHOWMESSAGES
+        MENUITEM "Prop&erties (Colors, Keys, etc.) ...", CM_PROPERTIES
+    END
+END
+
+MAINMENU MENU
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "&Help On This Menu",          CM_FILEMENUHELP
+        MENUITEM SEPARATOR
+        MENUITEM "&New File",                   CM_NEWFILE
+        MENUITEM "&Open File ...",              CM_OPENFILE
+        MENUITEM SEPARATOR
+        MENUITEM "&Close",                      CM_CLOSEFILE
+        MENUITEM "Close A&ll",                  CM_CLOSEALLFILES
+        MENUITEM SEPARATOR
+        MENUITEM "&Save",                       CM_SAVE
+        MENUITEM "Save &As ...",                CM_SAVEAS
+        MENUITEM "Sa&ve All",                   CM_SAVEALL
+        MENUITEM SEPARATOR
+        MENUITEM "&Print ...",                  CM_PRINT
+        MENUITEM "Pa&ge Setup ...",             CM_PAGESETUP
+        MENUITEM SEPARATOR
+        MENUITEM "E&xit",                       CM_EXIT
+        MENUITEM SEPARATOR
+        POPUP "Older &Files"
+        BEGIN
+            MENUITEM "Dummy Entry",                 CM_OLDERFILES_DUMMYENTRY
+        END
+        MENUITEM SEPARATOR
+    END
+    POPUP "&Edit"
+    BEGIN
+        MENUITEM "&Help On This Menu",          CM_EDITMENUHELP
+        MENUITEM SEPARATOR
+        MENUITEM "&Undo",                       CM_UNDO
+        MENUITEM "&Redo",                       CM_REDO
+        MENUITEM SEPARATOR
+        MENUITEM "Cu&t",                        CM_CUT
+        MENUITEM "&Copy",                       CM_COPY
+        MENUITEM "&Paste",                      CM_PASTE
+        MENUITEM "&Delete",                     CM_DELETE
+        MENUITEM SEPARATOR
+        MENUITEM "Select &All",                 CM_SELECTALL
+        POPUP "&Selection"
+        BEGIN
+            MENUITEM "&Indent",                     CM_INDENTSELECTION
+            MENUITEM "Indent To &Previous",         CM_INDENTSELECTIONPREVIOUS
+            MENUITEM "&Undent",                     CM_UNDENTSELECTION
+            MENUITEM "Upper&case",                  CM_UPPERCASESELECTION
+            MENUITEM "&Lowercase",                  CM_LOWERCASESELECTION
+            MENUITEM "Convert &Spaces To Tabs",     CM_SPACESTOTABS
+            MENUITEM "Convert &Tabs To Spaces",     CM_TABSTOSPACES
+        END
+    END
+    POPUP "&Search"
+    BEGIN
+        MENUITEM "&Help On This Menu",          CM_SEARCHMENUHELP
+        MENUITEM SEPARATOR
+        MENUITEM "&Find ...",                   CM_FIND
+        MENUITEM "&Replace ...",                CM_REPLACE
+        MENUITEM "Find &Next",                  CM_FINDNEXT
+        MENUITEM SEPARATOR
+        MENUITEM "&Match Brace",                CM_MATCHBRACE
+        MENUITEM "&Go To Line ...",             CM_GOTOLINE
+    END
+    POPUP "&Text"
+    BEGIN
+        MENUITEM "&Help On This Menu",          CM_TEXTMENUHELP
+        MENUITEM SEPARATOR
+        MENUITEM "Show &White Space",           CM_SHOWWHITESPACE
+        MENUITEM "Set &Repeat Count",           CM_SETREPEATCOUNT
+        MENUITEM "&Tab Size ...",               CM_SETTABSIZE
+        MENUITEM SEPARATOR
+        POPUP "&Indent"
+        BEGIN
+            MENUITEM "&Indent Selection",           CM_INDENTSELECTION
+            MENUITEM "Indent to &Previous",         CM_INDENTSELECTIONPREVIOUS
+            MENUITEM "&Undent Selection",           CM_UNDENTSELECTION
+        END
+        POPUP "&Auto-Indent Style"
+        BEGIN
+            MENUITEM "&None",                       CM_INDENTSTYLENONE
+            MENUITEM "&Language Scope",             CM_INDENTSTYLELANGUAGE
+            MENUITEM "&Copy From Previous Line",    CM_INDENTSTYLECOPY
+        END
+        POPUP "&Bookmarks"
+        BEGIN
+            MENUITEM "Clear &All",                  CM_CLEARALLBOOKMARKS
+            MENUITEM "&First",                      CM_FIRSTBOOKMARK
+            MENUITEM "&Last",                       CM_LASTBOOKMARK
+            MENUITEM "&Next",                       CM_NEXTBOOKMARK
+            MENUITEM "&Previous",                   CM_PREVIOUSBOOKMARK
+            MENUITEM "&Toggle",                     CM_TOGGLEBOOKMARK
+        END
+    END
+    POPUP "E&ditor"
+    BEGIN
+        MENUITEM "&Help On This Menu",          CM_EDITORMENUHELP
+        MENUITEM SEPARATOR
+        MENUITEM "&Auto-Load Error File",       CM_AUTOLOADERRORFILE
+        MENUITEM "Auto-Show Pars&e Messages",   CM_SHOWPARSEMESSAGES
+        MENUITEM "Au&to-Save Delay ...",        CM_AUTOSAVE
+        MENUITEM SEPARATOR
+        MENUITEM "Create &Backups",             CM_CREATEBACKUPS
+        MENUITEM "Allow &Undo After Manual Save", CM_UNDOAFTERSAVE
+        MENUITEM "Click Beyond E&OL",           CM_CURSORBEYONDEOL
+        MENUITEM "Co&nstrain Caret To Text",    CM_CONSTRAINCARET
+        MENUITEM "Overlay &Keyword Expansion On Tab Key", CM_OVERLAYKEYWORDEXPANSION
+        MENUITEM SEPARATOR
+        MENUITEM "Show Message &Window",        CM_SHOWMESSAGES
+        MENUITEM SEPARATOR
+        POPUP "Auto-&Reload"
+        BEGIN
+            MENUITEM "&Never",                      CM_AUTORELOADNEVER
+            MENUITEM "As&k",                        CM_AUTORELOADASK
+            MENUITEM "&Always",                     CM_AUTORELOADALWAYS
+        END
+        POPUP "&Scroll Bars"
+        BEGIN
+            MENUITEM "&None",                       CM_SCROLLNONE
+            MENUITEM "&Horizontal",                 CM_SCROLLHORIZONTAL
+            MENUITEM "&Vertical",                   CM_SCROLLVERTICAL
+            MENUITEM "&Both",                       CM_SCROLLBOTH
+        END
+        POPUP "&Color Scheme"
+        BEGIN
+            MENUITEM "&1. Custom",                  CM_CUSTOMCOLOURS
+            MENUITEM "&2. Black On White",          CM_BLACKONWHITE
+            MENUITEM "&3. White On Black",          CM_WHITEONBLACK
+        END
+        MENUITEM SEPARATOR
+        MENUITEM "Record &Macro",               CM_RECORDMACRO
+        POPUP "P&lay Macro"
+        BEGIN
+            MENUITEM "Play Macro &1",               CM_PLAYMACRO1
+            MENUITEM "Play Macro &2",               CM_PLAYMACRO2
+            MENUITEM "Play Macro &3",               CM_PLAYMACRO3
+            MENUITEM "Play Macro &4",               CM_PLAYMACRO4
+            MENUITEM "Play Macro &5",               CM_PLAYMACRO5
+            MENUITEM "Play Macro &6",               CM_PLAYMACRO6
+            MENUITEM "Play Macro &7",               CM_PLAYMACRO7
+            MENUITEM "Play Macro &8",               CM_PLAYMACRO8
+            MENUITEM "Play Macro &9",               CM_PLAYMACRO9
+            MENUITEM "Play Macro 1&0",              CM_PLAYMACRO10
+        END
+        MENUITEM SEPARATOR
+        MENUITEM "Editor &Preferences (Colors, Keystrokes, etc.) ...", CM_PROPERTIES
+    END
+    POPUP "&Insert"
+    BEGIN
+        MENUITEM "&Help On This Menu",          CM_INSERTMENUHELP
+        MENUITEM "&Edit This Menu",             CM_EDITINSERTMENU
+        MENUITEM SEPARATOR
+    END
+    POPUP "&Window"
+    BEGIN
+        MENUITEM "&Help On This Menu",          CM_WINDOWMENUHELP
+        MENUITEM SEPARATOR
+        MENUITEM "&New Window",                 CM_NEWFILE
+        MENUITEM "&Close Window",               CM_CLOSECURRENTFILE
+        MENUITEM "Close All &But This",         CM_CLOSEALLBUTTHIS
+        MENUITEM "Close &All Windows",          CM_CLOSEALLFILES
+        MENUITEM SEPARATOR
+        MENUITEM "&Split Left/Right",           CM_SPLITHORIZONTALLY
+        MENUITEM "Split &Top/Bottom",           CM_SPLITVERTICALLY
+        MENUITEM SEPARATOR
+        MENUITEM "Shift Tab &Left",             CM_SHIFTLEFT
+        MENUITEM "Shift Tab &Right",            CM_SHIFTRIGHT
+        MENUITEM SEPARATOR
+    END
+END
+
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""winuser.h""\r\n"
+    "#define APSTUDIO_HIDDEN_SYMBOLS\r\n"
+    "#include ""windows.h""\r\n"
+    "#undef APSTUDIO_HIDDEN_SYMBOLS\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#ifdef _WIN64\r\n"
+    "#define DLLNAME ""cmedit64.dll""\r\n"
+    "#else\r\n"
+    "#define DLLNAME ""cmedit32.dll""\r\n"
+    "#endif\r\n"
+    "\r\n"
+    "1 VERSIONINFO\r\n"
+    "FILEVERSION 3,7,0,0\r\n"
+    "PRODUCTVERSION 3,7,0,0\r\n"
+    "FILEFLAGSMASK 0x3fL\r\n"
+    "#ifdef _DEBUG\r\n"
+    "FILEFLAGS 0x1L\r\n"
+    "#else\r\n"
+    "FILEFLAGS 0x0L\r\n"
+    "#endif\r\n"
+    "FILEOS 0x4L\r\n"
+    "FILETYPE 0x2L\r\n"
+    "FILESUBTYPE 0x0L\r\n"
+    "BEGIN\r\n"
+    "    BLOCK ""StringFileInfo""\r\n"
+    "    BEGIN\r\n"
+    "        BLOCK ""0c0904e4""\r\n"
+    "        BEGIN\r\n"
+    "            VALUE ""CompanyName"", ""Persistence of Vision Raytracer Pty. Ltd.""\r\n"
+    "            VALUE ""FileDescription"", ""POV-Ray for Windows editor interface DLL""\r\n"
+    "            VALUE ""FileVersion"", ""3.7.0.0""\r\n"
+    "            VALUE ""InternalName"", DLLNAME\r\n"
+    "            VALUE ""LegalCopyright"", ""Copyright 2004-2008 Persistence of Vision Raytracer Pty. Ltd.""\r\n"
+    "            VALUE ""OriginalFilename"", DLLNAME\r\n"
+    "            VALUE ""ProductName"", ""The Persistence of Vision Raytracer""\r\n"
+    "            VALUE ""ProductVersion"", ""3.7.0.0""\r\n"
+    "        END\r\n"
+    "    END\r\n"
+    "    BLOCK ""VarFileInfo""\r\n"
+    "    BEGIN\r\n"
+    "        VALUE ""Translation"", 0xc09, 1252\r\n"
+    "    END\r\n"
+    "END\r\0"
+END
+
+4 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_SAVEMODIFIED DIALOGEX 0, 0, 170, 46
+STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | DS_NOFAILCREATE | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "File has been modified"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "&Save",IDSAVE,7,25,50,14
+    PUSHBUTTON      "&Discard",IDDISCARD,60,25,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,113,25,50,14
+    CTEXT           "ABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCD",IDC_MESSAGE,7,10,156,11,SS_ENDELLIPSIS
+END
+
+IDD_SAVEALLMODIFIED DIALOGEX 0, 0, 229, 46
+STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | DS_NOFAILCREATE | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "File has been modified"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "&Save",IDSAVE,7,25,50,14
+    PUSHBUTTON      "Save &All",IDSAVEALL,62,25,50,14
+    PUSHBUTTON      "&Discard",IDDISCARD,117,25,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,172,25,50,14
+    CTEXT           "ABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCD",IDC_MESSAGE,7,10,215,11,SS_ENDELLIPSIS
+END
+
+IDD_RELOADFILE DIALOGEX 0, 0, 362, 62
+STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | DS_NOFAILCREATE | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "File Changed"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "&Yes, Reload",IDRELOAD,7,41,77,14
+    PUSHBUTTON      "&No, Don't Reload",IDDISCARD,97,41,77,14
+    PUSHBUTTON      "&Ignore All",IDCANCEL,187,41,77,14
+    PUSHBUTTON      "&Help",IDHELP,277,41,77,14
+    CTEXT           "text\ntext\ntext",IDC_MESSAGE,7,3,348,37
+END
+
+IDD_SAVEBEFORERENDER DIALOGEX 0, 0, 229, 62
+STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | DS_NOFAILCREATE | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "Save before render"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "&Save",IDSAVE,7,41,50,14
+    CONTROL         "&Automatically autosave files for the rest of this session",IDC_CHECKBOX,
+                    "Button",BS_AUTOCHECKBOX | BS_CENTER | WS_TABSTOP,7,25,13,8
+    PUSHBUTTON      "Save &All",IDSAVEALL,62,41,50,14
+    PUSHBUTTON      "&No",IDNO,117,41,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,172,41,50,14
+    CTEXT           "ABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCD",IDC_MESSAGE,7,10,215,11,SS_ENDELLIPSIS
+END
+
+IDD_ENTERVALUE DIALOGEX 0, 0, 119, 43
+STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | DS_NOFAILCREATE | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "Enter value"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    EDITTEXT        IDC_EDIT,7,15,32,13,ES_AUTOHSCROLL | ES_NUMBER,WS_EX_RIGHT
+    CONTROL         "",IDC_SPIN,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,41,14,11,13
+    DEFPUSHBUTTON   "&Ok",IDOK,62,7,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,62,22,50,14
+END
+
+IDD_PRINT DIALOGEX 32, 32, 409, 185
+STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | DS_FIXEDSYS | DS_CONTEXTHELP | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "Print"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    GROUPBOX        "Printer",1075,8,4,272,84,WS_GROUP
+    LTEXT           "&Name:",1093,16,20,36,8
+    COMBOBOX        1139,52,18,152,152,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_GROUP | WS_TABSTOP
+    PUSHBUTTON      "&Properties...",1025,212,17,60,14,WS_GROUP
+    LTEXT           "Status:",1095,16,36,36,10,SS_NOPREFIX
+    CONTROL         "",1099,"Static",SS_LEFTNOWORDWRAP | SS_NOPREFIX | WS_GROUP,52,36,224,10
+    LTEXT           "Type:",1094,16,48,36,10,SS_NOPREFIX
+    CONTROL         "",1098,"Static",SS_LEFTNOWORDWRAP | SS_NOPREFIX | WS_GROUP,52,48,224,10
+    LTEXT           "Where:",1097,16,60,36,10,SS_NOPREFIX
+    CONTROL         "",1101,"Static",SS_LEFTNOWORDWRAP | SS_NOPREFIX | WS_GROUP,52,60,224,10
+    LTEXT           "Comment:",1096,16,72,36,10,SS_NOPREFIX
+    CONTROL         "",1100,"Static",SS_LEFTNOWORDWRAP | SS_NOPREFIX | WS_GROUP,52,72,156,10
+    CONTROL         "Print to fi&le",1040,"Button",BS_AUTOCHECKBOX | WS_GROUP | WS_TABSTOP,212,72,64,12
+    GROUPBOX        "Apearance",IDC_STATIC,288,4,112,84,WS_GROUP
+    CONTROL         "Use color",IDC_USECOLOR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,295,16,103,11
+    CONTROL         "Use fancy te&xt",IDC_USEFANCYTEXT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,295,27,103,11
+    CONTROL         "Include page numbers",IDC_PAGENUMBERS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,295,38,103,11
+    CONTROL         "Include &date/time",IDC_DATETIME,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,295,49,103,11
+    CONTROL         "Include filename",IDC_FILENAME,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,295,60,103,11
+    LTEXT           "Point Size",IDC_STATIC,295,74,49,8
+    EDITTEXT        IDC_POINTSIZE,353,72,38,13,ES_AUTOHSCROLL | ES_NUMBER,WS_EX_RIGHT
+    CONTROL         "",IDC_SPIN,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,391,72,11,13
+    GROUPBOX        "Print range",1072,8,92,144,64,WS_GROUP
+    RADIOBUTTON     "&All",1056,16,106,64,12,WS_GROUP
+    RADIOBUTTON     "Pa&ges",1058,16,122,36,12
+    RTEXT           "&from:",1089,52,124,20,8
+    EDITTEXT        1152,74,122,26,12,ES_NUMBER | WS_GROUP
+    RTEXT           "&to:",1090,102,124,16,8
+    EDITTEXT        1153,120,122,26,12,ES_NUMBER | WS_GROUP
+    RADIOBUTTON     "&Selection",1057,16,138,64,12
+    GROUPBOX        "Copies",1073,160,92,120,64,WS_GROUP
+    LTEXT           "Number of &copies:",1092,168,108,68,8
+    EDITTEXT        1154,240,106,32,12,ES_NUMBER | WS_GROUP
+    CONTROL         "C&ollate",1041,"Button",BS_AUTOCHECKBOX | WS_GROUP | WS_TABSTOP,240,130,36,12
+    GROUPBOX        "Border",IDC_STATIC,288,92,112,64,WS_GROUP
+    CONTROL         "No Border",IDC_BORDERNONE,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,293,106,96,12
+    CONTROL         "Thin Border",IDC_BORDERTHIN,"Button",BS_AUTORADIOBUTTON,293,122,96,12
+    CONTROL         "Thic&k Border",IDC_BORDERTHICK,"Button",BS_AUTORADIOBUTTON,293,138,96,12
+    PUSHBUTTON      "&Help",1038,8,164,48,14
+    DEFPUSHBUTTON   "OK",IDOK,288,164,48,14,WS_GROUP
+    PUSHBUTTON      "Cancel",IDCANCEL,351,164,48,14
+END
+
+IDD_PAGESETUP DIALOGEX 32, 32, 395, 239
+STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | DS_FIXEDSYS | DS_CONTEXTHELP | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "Page Setup"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    GROUPBOX        "Paper",1073,8,4,224,56,WS_GROUP
+    LTEXT           "Si&ze:",1089,16,20,36,8
+    COMBOBOX        1137,64,18,160,160,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_GROUP | WS_TABSTOP
+    LTEXT           "&Source:",1090,16,40,36,8
+    COMBOBOX        1138,64,38,159,160,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_GROUP | WS_TABSTOP
+    GROUPBOX        "Orientation",1072,8,64,64,50,WS_GROUP
+    RADIOBUTTON     "P&ortrait",1056,16,76,52,12,WS_GROUP | WS_TABSTOP
+    RADIOBUTTON     "L&andscape",1057,16,93,52,12
+    GROUPBOX        "Margins",1075,80,64,152,50,WS_GROUP
+    LTEXT           "&Left:",1102,86,78,32,8
+    EDITTEXT        1155,118,76,32,12,WS_GROUP
+    CONTROL         "",IDC_SPIN2,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,149,77,11,13
+    LTEXT           "&Right:",1103,162,78,32,8
+    EDITTEXT        1157,192,76,32,12,WS_GROUP
+    CONTROL         "",IDC_SPIN3,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,216,76,11,13
+    LTEXT           "&Top:",1104,86,95,32,8
+    EDITTEXT        1156,118,93,32,12,WS_GROUP
+    CONTROL         "",IDC_SPIN4,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,150,92,11,13
+    LTEXT           "&Bottom:",1105,162,95,32,8
+    EDITTEXT        1158,192,93,32,12,WS_GROUP
+    CONTROL         "",IDC_SPIN5,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,216,92,11,13
+    GROUPBOX        "Po&int Size",IDC_STATIC,8,117,64,40,WS_GROUP
+    EDITTEXT        IDC_POINTSIZE,16,133,42,13,ES_AUTOHSCROLL | ES_NUMBER,WS_EX_RIGHT
+    CONTROL         "",IDC_SPIN,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,57,133,11,13
+    GROUPBOX        "Syntax Highlighting",IDC_STATIC,80,117,152,40,WS_GROUP
+    CONTROL         "Use &color",IDC_USECOLOR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,86,129,138,11
+    CONTROL         "Use fancy te&xt (e.g. bold, italic)",IDC_USEFANCYTEXT,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,86,141,139,11
+    GROUPBOX        "Border",IDC_STATIC,8,160,64,50,WS_GROUP
+    CONTROL         "&None",IDC_BORDERNONE,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,14,170,54,12
+    CONTROL         "T&hin",IDC_BORDERTHIN,"Button",BS_AUTORADIOBUTTON,14,182,54,12
+    CONTROL         "Thic&k",IDC_BORDERTHICK,"Button",BS_AUTORADIOBUTTON,14,194,54,12
+    GROUPBOX        "Info",IDC_STATIC,80,160,151,50,WS_GROUP
+    CONTROL         "Print pa&ge numbers",IDC_PAGENUMBERS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,86,170,137,9
+    CONTROL         "Include &date/time",IDC_DATETIME,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,86,182,138,9
+    CONTROL         "Include &filename",IDC_FILENAME,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,86,194,138,9
+    GROUPBOX        "Print Preview",IDC_STATIC,240,4,147,206
+    CONTROL         "",1080,"Static",SS_WHITERECT | WS_GROUP,264,47,93,117
+    CONTROL         "",1082,"Static",SS_GRAYRECT | WS_GROUP,303,176,75,4
+    CONTROL         "",1081,"Static",SS_GRAYRECT | WS_GROUP,377,94,4,86
+    PUSHBUTTON      "Help",1038,8,217,48,14
+    DEFPUSHBUTTON   "OK",IDOK,240,217,44,14,WS_GROUP
+    PUSHBUTTON      "Cancel",IDCANCEL,292,217,44,14
+    PUSHBUTTON      "&Printer...",1026,343,217,44,14
+END
+
+IDD_PRINTSETUP DIALOGEX 32, 32, 288, 178
+STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | DS_FIXEDSYS | DS_CONTEXTHELP | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "Print Setup"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    PUSHBUTTON      "&Properties...",1025,212,17,60,14,WS_GROUP
+    LTEXT           "Status:",1095,16,36,36,10,SS_NOPREFIX
+    CONTROL         "",1099,"Static",SS_LEFTNOWORDWRAP | SS_NOPREFIX | WS_GROUP,52,36,224,10
+    LTEXT           "Type:",1094,16,48,36,10,SS_NOPREFIX
+    CONTROL         "",1098,"Static",SS_LEFTNOWORDWRAP | SS_NOPREFIX | WS_GROUP,52,48,224,10
+    LTEXT           "Where:",1097,16,60,36,10,SS_NOPREFIX
+    CONTROL         "",1101,"Static",SS_LEFTNOWORDWRAP | SS_NOPREFIX | WS_GROUP,52,60,224,10
+    LTEXT           "Comment:",1096,16,72,36,10,SS_NOPREFIX
+    CONTROL         "",1100,"Static",SS_LEFTNOWORDWRAP | SS_NOPREFIX | WS_GROUP,52,72,224,10
+    GROUPBOX        "Paper",1073,8,92,164,56,WS_GROUP
+    LTEXT           "Si&ze:",1089,16,108,36,8
+    COMBOBOX        1137,52,106,112,112,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_GROUP | WS_TABSTOP
+    LTEXT           "&Source:",1090,16,128,36,8
+    COMBOBOX        1138,52,126,112,112,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_GROUP | WS_TABSTOP
+    GROUPBOX        "Orientation",1072,180,92,100,56,WS_GROUP
+    ICON            "",1084,190,112,20,20,WS_GROUP
+    RADIOBUTTON     "P&ortrait",1056,224,106,52,12,WS_GROUP | WS_TABSTOP
+    RADIOBUTTON     "L&andscape",1057,224,126,52,12
+    DEFPUSHBUTTON   "OK",IDOK,180,156,48,14,WS_GROUP
+    PUSHBUTTON      "Cancel",IDCANCEL,232,156,48,14
+    PUSHBUTTON      "&Help",1038,8,156,48,14
+    COMBOBOX        1136,52,18,152,152,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_GROUP | WS_TABSTOP
+    LTEXT           "&Name:",1093,16,20,36,8
+    GROUPBOX        "Printer",1075,8,4,272,84,WS_GROUP
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_SAVEMODIFIED, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 163
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 36
+    END
+
+    IDD_SAVEALLMODIFIED, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 222
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 39
+    END
+
+    IDD_RELOADFILE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 355
+        TOPMARGIN, 3
+        BOTTOMMARGIN, 55
+    END
+
+    IDD_SAVEBEFORERENDER, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 222
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 55
+    END
+
+    IDD_ENTERVALUE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 112
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 36
+    END
+
+    IDD_PRINT, DIALOG
+    BEGIN
+        LEFTMARGIN, 8
+        VERTGUIDE, 295
+        VERTGUIDE, 398
+        HORZGUIDE, 154
+    END
+
+    IDD_PAGESETUP, DIALOG
+    BEGIN
+        LEFTMARGIN, 8
+        RIGHTMARGIN, 387
+        TOPMARGIN, 8
+        BOTTOMMARGIN, 231
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Cursor
+//
+
+IDC_VSPLIT              CURSOR                  "res\\vsplit.cur"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE
+BEGIN
+    CM_AUTOLOADERRORFILE    "Automatically load the file in which an error occurred"
+    CM_SHOWPARSEMESSAGES    "Automatically show the message window when rendering"
+    CM_AUTOSAVE             "Sets Auto-Save time for all files (0 for no auto-save)"
+END
+
+STRINGTABLE
+BEGIN
+    CM_AUTORELOADNEVER      "Never auto-reload a file that has been changed by another program"
+    CM_AUTORELOADASK        "Ask if a file that has been changed by another program shoud be reloaded"
+    CM_AUTORELOADALWAYS     "Always auto-reload a file that has been changed by another program (without asking)"
+END
+
+STRINGTABLE
+BEGIN
+    CM_CUSTOMCOLOURS        "Create your own color scheme"
+    CM_BLACKONWHITE         "Black text on a white background"
+    CM_WHITEONBLACK         "White text on a black background"
+END
+
+STRINGTABLE
+BEGIN
+    CM_NEXTBOOKMARK         "Go to next bookmark"
+    CM_PREVIOUSBOOKMARK     "Go to previous bookmark"
+    CM_CLEARALLBOOKMARKS    "Clear all bookmarks"
+END
+
+STRINGTABLE
+BEGIN
+    CM_CLOSEALLFILES        "Closes all edit windows"
+    CM_CLOSEALLBUTTHIS      "Close all windows other than the current one"
+END
+
+STRINGTABLE
+BEGIN
+    CM_OPENFILEUNDERCURSOR  "If the edit caret is over the name of an include file, attempt to find and open it"
+    CM_CLOSECURRENTFILE     "Close the currently displayed file"
+END
+
+STRINGTABLE
+BEGIN
+    CM_OPENFILE             "Loads a file into a new edit window"
+    CM_CLOSEFILE            "Close this file"
+    CM_PRINT                "Print all or part of the current file"
+END
+
+STRINGTABLE
+BEGIN
+    CM_CONSTRAINCARET       "If set, the arrow keys or mouse cannot move the caret beyond existing text"
+    CM_OVERLAYKEYWORDEXPANSION 
+                            "Allows the Tab and Shift-Tab keystrokes to perform keyword expansion as well as their normal function."
+END
+
+STRINGTABLE
+BEGIN
+    CM_CONTEXTHELP          "Attempt to find a topic related to the word underneath the edit caret"
+    CM_PROPERTIES           "Set editor preferences"
+END
+
+STRINGTABLE
+BEGIN
+    CM_CUT                  "Cut selection"
+    CM_COPY                 "Copy selection"
+    CM_PASTE                "Paste Selection"
+END
+
+STRINGTABLE
+BEGIN
+    CM_CREATEBACKUPS        "Create a backup file once per session"
+    CM_UNDOAFTERSAVE        "Allow undo after the file is manually saved"
+END
+
+STRINGTABLE
+BEGIN
+    CM_DELETE               "Deletes the selected text"
+END
+
+STRINGTABLE
+BEGIN
+    CM_EDITINSERTMENU       "Edit the directories that make up this menu"
+END
+
+STRINGTABLE
+BEGIN
+    CM_PAGESETUP            "Set page layout parameters for use in printing"
+    CM_EXIT                 "Exit POV-Ray for Windows"
+END
+
+STRINGTABLE
+BEGIN
+    CM_SETTABSIZE           "Sets the tab expansion size for the current file"
+END
+
+STRINGTABLE
+BEGIN
+    CM_FIND                 "Find text"
+    CM_REPLACE              "Find and replace text"
+    CM_FINDNEXT             "Repeat last find (not replace)"
+END
+
+STRINGTABLE
+BEGIN
+    CM_TOGGLEBOOKMARK       "Toggle a bookmark on or off at the current location"
+    CM_FIRSTBOOKMARK        "Go to first bookmark in file"
+    CM_LASTBOOKMARK         "Go to last bookmark in file"
+END
+
+STRINGTABLE
+BEGIN
+    CM_MATCHBRACE           "If the cursor is over a brace, goes to the matching one"
+    CM_GOTOLINE             "Enter a line number to go to"
+    CM_INDENTSELECTION      "Indent selected text"
+END
+
+STRINGTABLE
+BEGIN
+    CM_INDENTSELECTIONPREVIOUS 
+                            "Indent selected text to level of previous line"
+    CM_UNDENTSELECTION      "Undent selected text"
+    CM_UPPERCASESELECTION   "Make selected text uppercase"
+END
+
+STRINGTABLE
+BEGIN
+    CM_INDENTSTYLELANGUAGE  "Auto-indent follows the language scope"
+    CM_INDENTSTYLECOPY      "Auto-indent copies the indent of the previous line"
+END
+
+STRINGTABLE
+BEGIN
+    CM_LOWERCASESELECTION   "Make selected text lowercase"
+    CM_SPACESTOTABS         "Convert spaces in selection to tabs"
+    CM_TABSTOSPACES         "Convert tabs in selection to spaces"
+END
+
+STRINGTABLE
+BEGIN
+    CM_NEWFILE              "Create a new, untitled edit session"
+END
+
+STRINGTABLE
+BEGIN
+    CM_RECORDMACRO          "Start recording a keyboard macro"
+END
+
+STRINGTABLE
+BEGIN
+    CM_UNDO                 "Undo the last edit action"
+    CM_REDO                 "Redo the last undone action"
+END
+
+STRINGTABLE
+BEGIN
+    CM_SAVE                 "Save this file"
+    CM_SAVEAS               "Saves the current file as a different name"
+    CM_SAVEALL              "Saves all modified files open in the editor"
+END
+
+STRINGTABLE
+BEGIN
+    CM_SELECTALL            "Select all text in the current editor"
+END
+
+STRINGTABLE
+BEGIN
+    CM_SHOWWHITESPACE       "Visually identifies white space characters"
+    CM_SETREPEATCOUNT       "Set the number of times for the next command to repeat"
+END
+
+STRINGTABLE
+BEGIN
+    CM_SPLITHORIZONTALLY    "Split current edit window horizontally (one left pane, one right pane)"
+END
+
+STRINGTABLE
+BEGIN
+    CM_SPLITVERTICALLY      "Split current edit window vertically (one top pane, one bottom pane)"
+END
+
+STRINGTABLE
+BEGIN
+    CM_SHIFTLEFT            "Shifts the current tab towards the start of the tab list"
+    CM_SHIFTRIGHT           "Shifts the current tab toward the end of the tab list"
+END
+
+#endif    // English (Australia) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#ifdef _WIN64
+#define DLLNAME "cmedit64.dll"
+#else
+#define DLLNAME "cmedit32.dll"
+#endif
+
+1 VERSIONINFO
+FILEVERSION 3,7,0,0
+PRODUCTVERSION 3,7,0,0
+FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+FILEFLAGS 0x1L
+#else
+FILEFLAGS 0x0L
+#endif
+FILEOS 0x4L
+FILETYPE 0x2L
+FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "0c0904e4"
+        BEGIN
+            VALUE "CompanyName", "Persistence of Vision Raytracer Pty. Ltd."
+            VALUE "FileDescription", "POV-Ray for Windows editor interface DLL"
+            VALUE "FileVersion", "3.7.0.0"
+            VALUE "InternalName", DLLNAME
+            VALUE "LegalCopyright", "Copyright 2004-2008 Persistence of Vision Raytracer Pty. Ltd."
+            VALUE "OriginalFilename", DLLNAME
+            VALUE "ProductName", "The Persistence of Vision Raytracer"
+            VALUE "ProductVersion", "3.7.0.0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0xc09, 1252
+    END
+END
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

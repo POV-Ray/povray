@@ -1,0 +1,3 @@
+// pattern for use in texture/pigment/normal/density
+// originally designed for use with media density
+  planar         // similar to gradient y, but only +/- 1 unit around origin

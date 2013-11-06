@@ -1,0 +1,4 @@
+  // vrotate( V ,<Rotate_X, Rotate_Y, Rotate_Z>)  
+  // = Rotate V about origin by rotation vector <Rotate_X, Rotate_Y, Rotate_Z>
+  vrotate( < 2.5,1,0>, // vector
+           < 0,90,0> ) // rotation

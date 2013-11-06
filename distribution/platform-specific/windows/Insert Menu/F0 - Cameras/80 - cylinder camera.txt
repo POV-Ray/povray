@@ -1,0 +1,12 @@
+// cylinder lens for axis distorted field of view
+// 1 is vertical cylinder, fixed viewpoint
+// 2 is horizontal cylinder, fixed viewpoint
+// 3 is vertical cylinder, viewpoint moves along the cylinder's axis
+// 4 is horizontal cylinder, viewpoint moves along the cylinder's axis
+camera {
+  cylinder 1            // types 1, 2 ,3, 4
+  location <0,0,-1>     // position
+  right x*5             // horizontal aspect or field of view
+  up y*2                // vertical aspect or field of view
+  look_at  <0,0,0>      // view
+}

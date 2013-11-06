@@ -1,0 +1,19 @@
+//------------------------------------------- unicode
+global_settings { charset utf8 }  // "\u5000"
+ 
+ // only with the according unicode fonts installed!!!
+ // Japan, Tokyo   
+ text{ ttf "simsun.ttc" concat(chr(26085),chr(26412),chr(26481),chr(20140)) 0.01, 0  
+       texture{ pigment{ color rgb<0.5,0.25,0>*0} 
+                normal { bumps 0.5 scale 0.01}
+                finish { diffuse 0.9 }//specular 1 reflection 0.25}
+              } // end of texture
+       translate<-1.8,  1.55,0>
+     } // end of text ----------------------------------------------------------------
+ text{ ttf "batang.ttc" concat(chr(26085),chr(26412),chr(26481),chr(20140)) 0.01, 0  
+       texture{ pigment{ color rgb<0.5,0.25,0>*0} 
+                normal { bumps 0.5 scale 0.01}
+                // finish { specular 1 reflection 0.25}
+              } // end of texture
+       translate<-1.8,0.3,0>
+     } // end of text ---------------------------------------------------------------- 

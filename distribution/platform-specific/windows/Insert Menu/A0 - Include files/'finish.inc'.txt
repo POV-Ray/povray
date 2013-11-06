@@ -1,0 +1,16 @@
+// some standard finishes
+#include "finish.inc"
+
+  finish {
+    Dull               // large, soft highlight
+    //Shiny            // small, tight highlight
+
+    //Phong_Dull       // less "realistic" but sometimes useful phong highlight
+    //Phong_Shiny      // same in "shiny"
+
+    //Glossy           // very tight highlights and some reflection
+    //Phong_Glossy     // phong version of the same
+
+    //Luminous         // totally ambient not influenced by light sources (for example sky)
+    //Mirror           // perfect mirror without highlights
+  }

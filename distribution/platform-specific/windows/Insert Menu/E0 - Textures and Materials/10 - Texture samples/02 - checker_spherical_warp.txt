@@ -1,0 +1,11 @@
+ texture{ pigment {
+               checker color rgb<1,1,1>
+                       color rgb<0,0,0>
+               translate<0,0,1> scale 0.1
+               warp{ spherical
+                     orientation <0,0,1>
+                     dist_exp 0
+                   } // end of warp
+               } // end of pigment --------------------
+          rotate<-40,0,0>  translate<0,0,0>
+        } // end of texture

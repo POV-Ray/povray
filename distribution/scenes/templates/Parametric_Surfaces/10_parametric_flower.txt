@@ -1,0 +1,20 @@
+// Parametric in a flower shape
+
+parametric {
+// (2) like a flower...?
+  function { u*v*sin (10*v) },            // x-axis
+  function { v*pow(2,u) },                // y-axis
+  function { u*v*cos (10*v) }             // z-axis
+  <0,0>, <5,5>
+  contained_by { box { <-0.6,-1,-0.6>, <0.6,1,0.6> } }
+ // max_gradient 2
+  accuracy 0.01 // 0.001 default, lower slower but better
+  precompute 15 x,y,z // precompute normally gives faster rendering (<=20) but longer parsing
+
+  scale 1.5 rotate<0,0,0> translate <0,0,0> 
+  texture{ pigment{ color rgb<1,1,1> } 
+            
+         } 
+  translate<0,0,0>
+}
+

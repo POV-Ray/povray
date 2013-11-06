@@ -1,0 +1,6 @@
+// create a regular point light source
+light_source {
+  0*x                  // light's position (translated below)
+  color rgb <1,1,1>    // light's color
+  translate <-20, 40, -20>
+}

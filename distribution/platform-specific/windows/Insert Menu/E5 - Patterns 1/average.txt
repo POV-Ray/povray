@@ -1,0 +1,9 @@
+// average pattern averaging several pigments
+// can also be used for texture_map, density_map, or normal_map
+  pigment {
+    average
+    pigment_map {
+      [1.0  Pigment_1]     // weighting 1.0
+      [0.5  Pigment_2]     // weighting 0.5
+    }
+  }

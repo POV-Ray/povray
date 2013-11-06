@@ -1,0 +1,45 @@
+global_settings { charset utf8 }
+text{ // line 1
+   ttf "arial.ttf",
+   concat(  chr(945),chr(946),chr(947),chr(948),chr(949)," ",chr(950),chr(951),chr(952),chr(955) 
+          //   alpha,   beta,  gamma,     delta, epsilon,    zeta,   eta,    theta  ,lambda,       
+         ) 0.01, 0 
+   texture{ pigment{ color rgb<0.65,1,0>*0.25} finish { phong 1 }}
+  scale <1,1,1>*0.55  rotate< 0,0,0> translate<-1.5,2.00,-0.05>         
+} // end of text ----------------------------------------------------------
+//global_settings { charset utf8 }
+text{
+   ttf "arial.ttf",
+   concat(  chr(956),chr(957),chr(958),chr(960),chr(961),chr(963),chr(964),chr(966),chr(968) 
+          //  my,       ny,         xi       pi,   rho,  sigma,  tau,  epsilon,  phi,    omega,
+         ) 0.01, 0 
+   texture{ pigment{ color rgb<0.65,1,0>*0.25} finish { phong 1 }}
+   scale <1,1,1>*0.55  rotate< 0,0,0> translate<-1.5,1.5,-0.05>         
+ } // end of text ----------------------------------------------------------
+//global_settings { charset utf8 }
+text{
+   ttf "arial.ttf",
+   concat(     "  "chr(916),chr(920),chr(931),chr(934),chr(936),chr(937)  
+          //        Delta  ,Theta ,   Sigma,      Phi,    Psi,   Omega
+         ) 0.01, 0 
+   texture{ pigment{ color rgb<0.65,1,0>*0.25} finish { phong 1 } }
+   scale <1,1,1>*0.65  rotate< 0,0,0> translate<-1.75,0.75,-0.05>         
+} // end of text ----------------------------------------------------------
+//global_settings { charset utf8 }
+text{
+   ttf "arial.ttf",
+   concat(  "5",chr(176),", x",chr(178)," x",chr(179)," x",chr(183),"y"  ) 0.01, 0 
+       //     degree, square , cubic ,                     multiplication
+   
+   texture{ pigment{ color rgb<0.1,1.0,0>*0.5} finish { phong 1 }}
+   scale <1,1,1>*0.65 rotate< 0,0,0> translate<-1.5,0.15,-0.05>         
+} // end of text ----------------------------------------------------------
+
+text{
+   ttf "arial.ttf",
+   concat( " x", chr(1013),"A,B",chr(1014),"x"," ,",chr(8734)  ) 0.01, 0 
+       //    element,                               infinite
+   
+   texture{ pigment{ color rgb<0.1,1.0,0>*0.5} finish { phong 1 }}
+   scale <1,1,1>*0.65 rotate< 0,0,0> translate<-1.5,-0.5,-0.05>         
+} // end of text ----------------------------------------------------------

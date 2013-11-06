@@ -1,0 +1,19 @@
+isosurface { //-------------------------------------------
+
+  function{
+   f_sphere(x/2, y, z, 1.8)
+   -f_marble(x*2,y*3,z*3)*0.2 
+   //-f_bumps(x*3,y*2,z*3)*0.15
+  }
+
+  contained_by { sphere {<0,0,0>,  4.6  } }
+  accuracy 0.003
+  max_gradient 5
+
+  texture{ pigment{ color rgb<0.3,0.1,0.9>}
+           finish { phong 0.4 reflection 0.1}
+         }
+  scale 0.4
+  rotate<0, 30,0>
+  translate < -0.2, 1.2, 0>
+}// end of isosurface  ----------------------------------- 

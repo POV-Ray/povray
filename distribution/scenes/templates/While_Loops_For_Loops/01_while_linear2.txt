@@ -1,0 +1,21 @@
+
+union{ //---------------------------------------
+ #local Nr = -500;   // start
+ #local EndNr = 500; // end
+ #while (Nr< EndNr) 
+
+ box{ <-0.05, 0.00, 0>,< 0.05, 0.0015, 1.00>   
+      texture{ pigment{ color rgb<1,1,1>*1.1}
+             //normal { bumps 0.5 scale 0.005}
+               finish { phong 0.5}
+             } // end of texture
+  
+      translate<0,0,Nr*2.00>} 
+
+ #local Nr = Nr + 1;  // next Nr
+ #end // --------------- end of loop 
+
+rotate<0,0,0> 
+translate<0,0,0>
+} // end of union -----------------------------
+

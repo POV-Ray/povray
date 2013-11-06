@@ -1,0 +1,2 @@
+  // vaxis_rotate(V1,V2,A) = rotate V1 around V2 by A degrees 
+  vaxis_rotate( < 0,1,0.5>, <  2, 3, 0>, 70 ) 

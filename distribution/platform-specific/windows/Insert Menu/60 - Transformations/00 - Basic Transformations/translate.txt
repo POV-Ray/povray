@@ -1,0 +1,3 @@
+// Move object or texture relative to current position
+// example: translate -5.0*z
+translate <2.0, 4.0, -1.0>  // <dX, dY, dZ>

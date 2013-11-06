@@ -1,0 +1,56 @@
+===============================================================================
+POV-Ray 3.7 for PC-Linux, binary version (povlinux.tgz) - README file
+
+For the binary distribution for PC-Linux
+===============================================================================
+
+This is the README file for the compiled version of POV-Ray 3.7 for
+PC-Linux.  Platform specific instructions for POV-Ray can be found in
+README.unix and in chapter 1 of the documentation.
+
+This package contains a statically linked version of POV-Ray 3.7
+compiled for the i586 platform.  The install script can do both 
+system wide installation (requires root privileges) as well as user
+level installation.  Installation as root is the recommended method.
+
+======================
+Installation procedure
+======================
+
+  a) Install as root
+
+     From the directory where this file resides, run:
+
+       $ su
+       # ./install
+
+     and follow the instructions.
+
+  b) Install as non-privileged user
+
+     From the directory where this file resides, run:
+
+       $ ./install
+
+     and select 'U' to start a user level install.  Afterwards
+     follow the instructions of the install script.
+
+
+Additional command line options that can be used are:
+
+  --no-arch-check : skip the architecture compatibility test
+  kde       : only install kde panel icons and file types for current 
+              user. In a single user installation this is done 
+              automatically after installation.
+  user      : only update the user povray.ini/povray.conf file when 
+              required.
+  uninstall : uninstall POV-Ray.  This will remove all installed
+              files.  Any changes made to sample scenes or include
+              files will get lost.  This has to be called by the 
+              same user who installed POV-Ray.  Uninstall of older
+              versions of POV-Ray is not supported (and is not 
+              required to install POV-Ray 3.6).
+  test      : run a short test render to check if installation was
+              successful.  This should be run as a normal user and
+              not as root.
+

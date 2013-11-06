@@ -1,0 +1,4 @@
+         texture{ Chrome_Metal
+                  // normal { bumps 0.5 scale 0.05 } 
+                  // finish { phong 1 }
+                } // end of texture ---------------------------  

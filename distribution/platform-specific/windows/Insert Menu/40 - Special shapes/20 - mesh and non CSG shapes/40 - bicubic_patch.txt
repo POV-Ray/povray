@@ -1,0 +1,28 @@
+// 3D non-CSG shape with curved surface created with a mesh of triangles
+bicubic_patch {
+  type 1 
+  // patch_type (0 or 1)
+  // 0 = Bezier patch, just store the triangular vertices
+  // 1 = Bezier patch, store all plane equations defined by
+  // the triangulation of the patch into sub patches (faster, but needs more memory)
+  flatness 0.1  
+  // flatness_value from 0.0 to 1.0, 
+  // higher values are giving flatter, less smooth results!
+  u_steps 4 // number of triangles to subdivide (1 to 5)
+  v_steps 4 // number of triangles to subdivide (1 to 5)
+  <0, 0, 2>,<1, 0, 0>,<2, 0, 0>,<3, 0, -2>,
+  <0, 1, 0>,<1, 1, 0>,<2, 1, 0>,<3, 1,  0>,
+  <0, 2, 0>,<1, 2, 0>,<2, 2, 0>,<3, 2,  0>,
+  <0, 3, 2>,<1, 3, 0>,<2, 3, 0>,<3, 3, -2>
+         texture { pigment{ color rgb< 0.75, 0.5, 1.0> } //  light violet 
+                // normal { bumps 0.5 scale 0.05 }
+                   finish { phong 0.3}
+                 } // end of texture 
+
+/*  texture { pigment{ color rgb< 0.0, 0.5, 0.0> }// dark green  
+           // normal { bumps 0.5 scale 0.05 }
+              finish { phong 0.1 }
+            } // end of texture 
+*/
+  scale <1,1,1> rotate< 0,90,0> translate<0,0,0>         
+} // end of bicubic_patch ----------------------------------------------------------

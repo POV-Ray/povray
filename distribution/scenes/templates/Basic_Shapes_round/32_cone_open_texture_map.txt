@@ -1,0 +1,15 @@
+cone { <0,0,0>,0.35,<0,0.50,0>, 1.1  
+       open // 
+       texture{ radial frequency 16  
+                texture_map{
+                   [ 0.00 pigment{color rgbf<1,1,1,1>} ] 
+                   [ 0.15 pigment{color rgbf<1,1,1,1>} ] 
+                   [ 0.15 pigment{color rgbf<1,1,1,0>} finish { phong 1  reflection{ 0.10 } } ] 
+                   [ 1.00 pigment{color rgbf<1,1,1,0>} finish { phong 1  reflection{ 0.10 } } ] 
+                } // end texture_map
+              } // end of texture
+
+       scale <1,1,1> 
+       rotate<-90,-20,0> 
+       translate<0,1.1,0>
+     } // end of cone ------------------------------------------

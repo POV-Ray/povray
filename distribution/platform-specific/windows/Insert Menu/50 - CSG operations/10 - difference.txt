@@ -1,0 +1,6 @@
+// CSG difference, subtract intersections of shapes 2...N from Shape1
+difference {
+  Shape1 {...} // Start with this shape
+  Shape2 {...} // This will be "cut out" of Shape1
+  ShapeN {...} // This will be "cut out" of Shape1
+}

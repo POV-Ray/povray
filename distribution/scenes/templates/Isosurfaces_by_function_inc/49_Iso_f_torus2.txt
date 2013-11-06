@@ -1,0 +1,18 @@
+isosurface { //-------------------------------------------------------------
+
+  function{ f_torus2( x,y,z, -0.75, 0.65, 0.02) // needs negative Field Strength 
+                                                // or a negated function, major radius, minor radius
+          }          
+
+  contained_by {box {<-1,-1,-1>*1,<1,1,1>*1}}
+  threshold 0.16 
+  max_gradient 5
+ 
+  texture{ pigment{ color rgb <1.0,0.05,0.20>} 
+           normal { bumps 0.5 scale 0.035}
+           finish { specular 0.2 phong 0.7 reflection 0.05}
+         }
+  rotate<-40,20,0>
+  scale 1.5
+  translate< 0,1.1,0>
+} // end of isosurface -------------------------------------------------------

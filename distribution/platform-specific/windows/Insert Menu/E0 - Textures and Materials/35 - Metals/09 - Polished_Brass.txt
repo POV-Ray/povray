@@ -1,0 +1,4 @@
+         texture{ Polished_Brass
+                  finish { phong 1 }
+                  scale 0.5
+                } // end of texture ---------------------------  

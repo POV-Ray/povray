@@ -1,0 +1,10 @@
+         // scale your object first!!!
+         texture{ pigment{ brick color White                // color mortar
+                                 color rgb<0.8,0.25,0.1>    // color brick
+                           brick_size <0.25, 0.0525, 0.125> // format in x ,y and z- direction 
+                           mortar 0.01                      // size of the mortar 
+                         } // end of pigment
+                  normal { wrinkles 0.75 scale 0.01}
+                  finish { phong 0.2} 
+                  rotate<0,0,0>  translate<0.01, 0.04, 0.00>
+               } // end of texture ----------------------------

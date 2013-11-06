@@ -1,0 +1,15 @@
+isosurface { //-------------------------------------------------------------
+  function{  
+    y - sin(x*4*pi)*0.1
+  }
+  threshold 0
+  contained_by {box {<-1,-0.5,-1>, < 1, 1, 1>}}
+  //open
+
+  texture{ pigment{ color rgb<1,0.6,0.0>}
+           finish { phong 1}
+	 }
+  scale 1.5
+  rotate <-35, 25, 0>
+  translate < 0.1, 1.7, 0>
+} // end of isosurface ----------------------------------------------------- 

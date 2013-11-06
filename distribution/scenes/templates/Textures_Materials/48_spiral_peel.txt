@@ -1,0 +1,12 @@
+         texture { spiral1 5 scale 0.5                   //--------------- 
+                   texture_map{ [0.25 pigment{ color rgbf <1,0.65,0.2,0>}
+                                      normal { bumps 0.5 scale 0.25}
+                                      finish { phong 0.2 reflection 0.30}]
+                                [0.25 pigment{ color rgbf <1,1,1,1>} ]
+                                [0.75 pigment{ color rgbf <1,1,1,1>} ]
+                                [0.75 pigment{ color rgbf <1,0.65,0.2,0>}
+                                      normal { bumps 0.5 scale 0.25}
+                                      finish { phong 0.2 reflection 0.30}]
+                              } // end of texture_map
+                    rotate<90,0,0>
+                 } // end of texture ------------------------------------- 

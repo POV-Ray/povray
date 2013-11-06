@@ -1,0 +1,10 @@
+// cutaway_textures can be useful for texturing differences
+difference {
+  sphere {
+    0, 1
+    texture { pigment { color Red } }
+  }
+  box { 0, 1 }
+  // the visible parts of this object will get the texture of the sphere:
+  cutaway_textures
+}

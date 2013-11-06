@@ -1,0 +1,2 @@
+// Set a color of the background (sky)
+background { color rgb< 1, 1, 1> }

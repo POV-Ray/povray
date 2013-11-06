@@ -1,0 +1,13 @@
+
+#include "shapesq.inc"
+object{ Piriform      //-------------------------------------
+        sturm
+        texture { pigment{ color White}  
+                  finish { phong 1}
+                } // end of texture 
+        scale 2
+        rotate<0,-150,0>
+        translate <1,1.25,0>
+ } // ----------------------------------------- end of object
+
+

@@ -1,0 +1,12 @@
+// texture pigment {} attribute
+// create a smooth color gradation map
+color_map {
+  //  [ END_VAL color red R green G blue B filter F transmit T]
+  [ 0.1  color red 0.0 green 0.0 blue 0.0]
+  [ 0.3  color red 0.8 green 0.4 blue 0.2]
+  [ 0.5  color red 0.0 green 0.0 blue 0.0]
+  [ 0.7  color red 0.0 green 0.0 blue 0.8 filter 0.5]
+  [ 1.0  color red 0.8 green 0.8 blue 0.8 filter 1.0]
+  // (---alternative form---)
+  //[ 1.0  color rgbf <0.8, 0.8, 0.8, 1.0> ]
+} // color_map

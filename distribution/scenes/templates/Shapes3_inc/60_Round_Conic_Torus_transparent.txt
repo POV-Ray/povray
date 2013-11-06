@@ -1,0 +1,28 @@
+//---------------------------------------------------------------------------- 
+#include "shapes3.inc"
+//---------------------------------------------------------------------------- 
+global_settings { max_trace_level 20 } // for transparent materials
+//----------------------------------------------------------------------------
+object{ Round_Conic_Torus( 0.80, // >0, vertical center distance of the upper and lower torii
+                           0.50, // >0, upper radius up by <0,C_distance,0>
+                           0.80, // >0,  lower radius on zero !!!
+                           0.10, // border radius, // max. = min(lower radius, upper radius)
+                           1 // Merge_On
+                         ) // -------------------------------------------------  
+      material{   //-----------------------------------------------------------
+        texture { pigment{ rgbf <0.98, 0.98, 0.98, 0.9> }
+                  finish { diffuse 0.1 reflection 0.2  
+                          specular 0.8 roughness 0.0003 phong 1 phong_size 400}
+                } // end of texture -------------------------------------------
+        interior{ ior 1.5 caustics 0.5
+                } // end of interior ------------------------------------------
+      } // end of material ----------------------------------------------------
+
+/*
+        texture{ pigment{ color rgb<1,1,1>}
+                 finish { phong 1}
+               } // end of texture
+*/
+         scale<1,1,1>  rotate<0,0,0>  translate<0,0.00,0>
+       }  // end of object ---------------------------------------------------
+//---------------------------------------------------------------------------- 

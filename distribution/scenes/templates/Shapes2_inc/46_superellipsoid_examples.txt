@@ -1,0 +1,29 @@
+// --- Superquadric Ellipsoid ------------------------------------------------------   
+//                                                                         lower row
+//------------------------------------------------------------------------ left
+superellipsoid {<0.25,0.25> scale <1,1,1>*0.5 rotate<0,0,0> translate<-1.25,0.5,0>
+    texture{pigment{ color rgb<0.5,1,0>}
+            finish { phong 1}}}
+//------------------------------------------------------------------------ middle
+superellipsoid {<1.00,1.00> scale <1,1,1>*0.5 rotate<0,0,0> translate<0,0.5,0>
+    texture{pigment{ color rgb<0.25,1,0>}
+            finish { phong 1}}}
+//------------------------------------------------------------------------ right
+superellipsoid {<1.00,0.25> scale <1,1,1>*0.5 rotate<0,0,0> translate<1.25,0.5,0>
+    texture{pigment{ color rgb<0.0,1,0>}
+            finish { phong 1}}}
+//----------------------------------------------------------------------------------
+//               upper row  
+//------------------------------------------------------------------------ left
+superellipsoid {<3.50,0.25> scale <1,1,1>*0.55 rotate<0,0,0> translate<-1.25,1.75,0>
+    texture{pigment{ color rgb<0,1,0.25>}
+            finish { phong 1}}}
+//------------------------------------------------------------------------ middle
+superellipsoid {<2.55,2.50> scale <1,1,1>*0.55 rotate<0,0,0> translate<0,1.75,0>
+    texture{pigment{ color rgb<0,1,0.5>}
+            finish { phong 1}}}
+//------------------------------------------------------------------------ right
+superellipsoid {<1.00,3.50> scale <1,1,1>*0.55 rotate<0,0,0> translate<1.25,1.75,0>
+    texture{pigment{ color rgb<0,1,0.75>}
+            finish { phong 1}}}
+//---------------------------------------------------------------------------

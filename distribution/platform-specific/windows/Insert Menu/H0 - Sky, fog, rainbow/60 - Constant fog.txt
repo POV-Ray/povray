@@ -1,0 +1,5 @@
+fog{ fog_type   1
+     distance   30
+     color      White*0.5  
+     turbulence 1.8 
+} // end fog

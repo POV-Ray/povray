@@ -1,0 +1,4 @@
+// pattern for use in texture/pigment/normal/density
+  density_file df3 "spiral.df3"         // 3D raster file (df3) pattern
+  //density_file df3 "spiral.df3", 0.5  // for use with normal{} (0...1 or more)
+  //interpolate 1                       // optional interpolation

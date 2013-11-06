@@ -1,0 +1,19 @@
+//------------------------------------------------------------------------------ 
+#include "shapes3.inc"                                                        
+//------------------------------------------------------------------------------
+object{ Round_Cylinder_Tube( <-1,-0.2,-0.2>, // starting point
+                             <1.0,0.9,-0.3>, // end point
+                             0.95, // major radius
+                             0.12, // minor radius (borders)
+                             0, //  1 = filled; 0 = open tube#
+                             1 // 0 = union, 1 = merge for transparent materials 
+                           ) //-------------------------------------------------
+        texture{ pigment{ color rgbt<1 ,1,1,0.0>} 
+              // normal { bumps 0.5 scale 0.005 } 
+                 finish { phong 1}                               
+               } // end texture
+        scale <1,1,1> 
+        rotate<0,0,0> 
+        translate<0,0,0>
+      } // end of object ------------------------------------------------------- 
+//------------------------------------------------------------------------------

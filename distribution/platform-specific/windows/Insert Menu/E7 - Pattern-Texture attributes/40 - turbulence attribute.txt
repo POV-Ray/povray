@@ -1,0 +1,7 @@
+// pattern modifier
+// Takes a float or vector for selective turbulence in different directions
+  turbulence <0, 1, 0.5> // how much to 'stir up' the texture (0...1 or more)
+  // (---additional parameters influencing style of turbulence---)
+  lambda 2.0      // (1.0...5.0) (smooth...random) [2.0]
+  omega 0.5       // (0.0...2.0) (crinkly...fuzzy) [0.5]
+  octaves 6       // number of "folds" in turbulence (1...10) [6]

@@ -1,0 +1,11 @@
+// describes inside of a shape (similar to texture, but for inside, not surface)
+  interior {
+    ior 1.31              // index of refraction
+    dispersion            // needs a color_map in the light source
+    dispersion_samples 7  // accuracy of calculation (2..100) [7]
+    caustics 1.0          // faked caustics (0..1)
+    fade_power 1001       // values larger than 1000 give realistic exponential attenuation
+    fade_distance 3       // distance where light reaches half intensity
+    fade_color <0, .3, 0> // color for fading
+    media {..media items..}
+  }

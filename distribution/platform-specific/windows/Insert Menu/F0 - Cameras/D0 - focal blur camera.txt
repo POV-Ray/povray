@@ -1,0 +1,11 @@
+// focal blur camera
+camera {
+  location  <0.0, 2.0, -5.0>
+  look_at   <0.0, 0.0,  0.0>
+  right     x*image_width/image_height
+  aperture 1.0           // [0...N] larger is narrower depth of field (blurrier)
+  blur_samples 10        // number of rays per pixel for sampling
+  focal_point <0,1,2>    // point that is in focus <X,Y,Z>
+  confidence 0.95        // [0...<1] when to move on while sampling (smaller is less accurate)
+  variance 1/200         // [0...1] how precise to calculate (smaller is more accurate)
+}

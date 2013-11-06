@@ -1,0 +1,86 @@
+//------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------
+// This spline describes the path along the object
+// From control points 0 to 1
+#declare USpline_1 =
+   spline {
+     natural_spline
+    0.00, <-1.00, 0.5, 0.0>, // start point
+    0.25, <-0.50, 0.2, 0.4>,
+    0.5,  < 0.01, 0.2, 0.2>,// not 0.00!
+    0.75, < 0.50, 0.4, 0.4>,
+    1.00, < 1.00, 0.0,-0.6>, // end point
+   } // ------------------------------------- 
+
+// This spline describes the cross section of the object
+// For a closed shape the spline should have the same values at control points 0 and 1 
+// The z coordinate is not used
+#declare VSpline_1 =
+  spline {
+    natural_spline
+   -0.25,  < 0,-1,0>,
+    0,     < 1, 0,0>, // start point
+    0.25,  < 0, 1,0>,
+    0.5,   <-1, 0,0>,
+    0.75,  < 0,-1,0>,
+    1,     < 1, 0,0>, // end point
+    1.25,  < 0, 1,0>,
+  } // ------------------------------------- 
+
+// This spline describes how the width varies 
+#declare WSpline_1 = spline {
+  cubic_spline
+   -1.0, 0.10, // Control Pont
+    0.0, 0.15, // start point
+    0.8, 0.10,
+    1.0, 0.15, // end point
+    2.0, 0.20  // Control Point
+ } // ------------------------------------- 
+//------------------------------------------------------------------------------------
+#include "meshmaker.inc"
+// For some surfaces the previous version of SweepSpline might 
+// possibly look a little better. The new version has a completely
+// different algorithm for finding the normals. 
+// To use the old version use SweepSpline1() instead
+//------------------------------------------------------------------------------------
+object {
+  SweepSpline2( USpline_1, // spline for path along the object
+                VSpline_1, // the cross section of the object, not necessarily closed!
+                WSpline_1, // spline for how the width varies 
+                20,50, // points along, points around, 
+                "", // Filename
+              ) //-------------------------------------------------------------------- 
+ //  no_shadow
+   texture{   // outside texture
+     uv_mapping
+     pigment{ checker color rgb <0.0,0,0.0> rgb <1,0.9,0.9> scale <0.04,0.04,1>}
+     finish { phong 0.5 }
+   } // 
+   interior_texture {            // inside texture
+     uv_mapping
+     pigment{ checker color rgb <0.5,0.0,0.1> rgb <1,1,1> scale <0.04,0.04,0.01>}
+     finish { specular 0.5}
+   } // 
+}
+//------------------------------------------------------------------------------------
+
+
+
+
+#declare ctr = 0;  // show center spline  --------------------------------------------------------
+#while (ctr < 1)
+  sphere {<USpline_1(ctr).x, USpline_1(ctr).y, USpline_1(ctr).z> ,0.02  pigment { rgb <0.6,0,0>}}
+  #declare ctr = ctr + 0.002;
+#end // ------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+

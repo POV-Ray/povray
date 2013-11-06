@@ -1,0 +1,9 @@
+box { <-1.00, 0.00, -1000>,< 1.00, 0.001, 1000>   
+
+      texture{ pigment{ color rgb<1,1,1>*0.3}
+               normal { bumps 0.5 scale 0.005}
+               finish { phong 0.1}
+             } // end of texture
+
+      scale <1,1,1> rotate<0,0,0> translate<0,0,0> 
+    } // end of box --------------------------------------

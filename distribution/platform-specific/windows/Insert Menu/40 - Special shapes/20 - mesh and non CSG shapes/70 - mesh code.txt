@@ -1,0 +1,34 @@
+// triangle or smooth-triangle mesh FINITE (no CSG) shape
+// NOTE: Each triangle can be independently textured,
+//       remaining triangles get texture at bottom
+//       For the individual triangles you have to use declared textures
+
+#declare T1=texture { pigment { color rgb x } } 
+#declare T2=texture { pigment { color rgb y } } 
+#declare T3=texture { pigment { color rgb z } } 
+
+mesh { // box example here 
+  /* top side */
+  triangle { <-2,  2, -2>, < 2,  2, -2>, < 2,  2,  2> }
+  triangle { <-2,  2, -2>, <-2,  2,  2>, < 2,  2,  2> texture { T1 } }
+  /* bottom side */
+  triangle { <-2, -2, -2>, < 2, -2, -2>, < 2, -2,  2> }
+  triangle { <-2, -2, -2>, <-2, -2,  2>, < 2, -2,  2> }
+  /* left side */
+  triangle { <-2, -2, -2>, <-2, -2,  2>, <-2,  2,  2> }
+  triangle { <-2, -2, -2>, <-2,  2, -2>, <-2,  2,  2> }
+  /* right side */
+  triangle { < 2, -2, -2>, < 2, -2,  2>, < 2,  2,  2> texture { T2 } }
+  triangle { < 2, -2, -2>, < 2,  2, -2>, < 2,  2,  2> texture { T2 } }
+  /* front side */
+  triangle { <-2, -2, -2>, < 2, -2, -2>, <-2,  2, -2> texture { T3 } }
+  triangle { <-2,  2, -2>, < 2,  2, -2>, < 2, -2, -2> texture { T3 } }
+  /* back side */
+  triangle { <-2, -2,  2>, < 2, -2,  2>, <-2,  2,  2> }
+  triangle { <-2,  2,  2>, < 2,  2,  2>, < 2, -2,  2> }
+  texture
+  { // remaining triangles get this texture
+    pigment { color rgb<0.9, 0.9, 0.9> }
+    finish { ambient 0.2 diffuse 0.7 }
+  }
+}

@@ -1,0 +1,10 @@
+       texture{ pigment{ radial frequency 35 
+                         color_map{ [0.0 color Black]
+                                    [0.4 color White]
+                                    [0.6 color White]
+                                    [1.0 color Black]
+                                  }
+                       }   
+                finish { diffuse 0.9 phong 1 } 
+                rotate<0,0,0> scale 0.25 translate<0,0,0>
+              } // end of texture 

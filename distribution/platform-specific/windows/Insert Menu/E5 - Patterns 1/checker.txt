@@ -1,0 +1,5 @@
+// solid pattern for use in texture/pigment/normal(/density)
+// cube checker pattern, alternates color1 and color2
+  checker
+    color rgb <1, 1, 1>,
+    color rgb <0, 1, 0>

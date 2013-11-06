@@ -1,0 +1,34 @@
+//----------------------------------------------------------------------------------------- 
+#include "shapes3.inc"
+//-----------------------------------------------------------------------------------------
+global_settings{ max_trace_level 15 } //  for transparent materials 
+//----------------------------------------------------------------------------------------- 
+object{ Round_Pyramid_N_out( // defined by circumcircle radii 
+                             6 , // number of side faces 
+                             <0,00,0>, 1.30, <0,1.20,0>, 0.90 , // A, radius A, B, radius B, 
+                             0.15, // wire radius or border radius 
+                             1,   // 1 = filled, 0 = wireframe
+                             1   // 0 = union, 1 = merge for transparent materials           
+                           ) //------------------------------------------------------------
+
+        material{ //----------------------------------------- 
+           texture { pigment{ rgbf <0.98, 0.98, 0.98, 0.9> }
+                     finish { diffuse 0.1 reflection 0.25  
+                              specular 0.8 roughness 0.0003 
+                              phong 1 phong_size 400}
+                   } // end of texture ---------------------- 
+           interior{ ior 1.5 caustics 0.5
+                } // end of interior ------------------------ 
+        } // end of material -------------------------------- 
+/*       
+        // non-transparent:   
+        texture{ pigment{ color rgb<1,1,1> }
+                 //normal { bumps 0.5 scale 0.015}
+                 finish { phong 1}
+               } // end of texture
+*/
+         scale <1,1,1>*1 
+         rotate <0,0,0>
+         translate< 0, 0.0, 0>
+       } // end of object -----------------------------------------------------------------   
+//-----------------------------------------------------------------------------------------  

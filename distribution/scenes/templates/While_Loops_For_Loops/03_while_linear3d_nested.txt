@@ -1,0 +1,36 @@
+#declare Ball = 
+  sphere{ <0,0,0>,0.15 scale <1,1,1>
+          texture { pigment{ color rgb<1,0.1,0>}
+                    finish { phong 1}
+                  }
+          rotate<0,0,0> translate<0,0,0>
+        }
+
+union{ //----------------------------------------------
+ #local NrX = 0;    // start x
+ #local EndNrX = 5; // end   x
+ #while (NrX< EndNrX) 
+    // more inner loop
+    #local NrY = 0;    // start y 
+    #local EndNrY = 5; // end    y
+    #while (NrY< EndNrY) 
+       // innerst loop
+       #local NrZ = 0;     // start z
+       #local EndNrZ = 8; // end   z
+       #while (NrZ< EndNrZ) 
+     
+       object{ Ball translate<NrX*0.5 NrY*0.5 NrZ*0.5>} 
+
+       #local NrZ = NrZ + 1;  // next Nr z
+       #end // --------------- end of loop z
+       // end innerst loop
+    #local NrY = NrY + 1;  // next Nr y
+    #end // --------------- end of loop y
+    // end more inner loop
+ #local NrX = NrX + 1;  // next Nr x
+ #end // --------------- end of loop x
+ // end of outer loop
+
+rotate<0,-30,0> 
+translate<0,0.2,0>
+} // end of union --------------------------------------

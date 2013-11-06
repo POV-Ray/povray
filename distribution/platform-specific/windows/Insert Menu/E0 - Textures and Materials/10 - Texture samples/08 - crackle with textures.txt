@@ -1,0 +1,28 @@
+//----------------------------------------------------------------------------
+// declare these textures outside of any objects !!!
+/*
+#declare Texture_W =
+ texture{ pigment{ color White*0.9}
+          finish{ specular 1} // shiny
+        } // end of texture
+#declare Texture_S =
+ texture{ T_Stone10 scale 0.15
+          normal { agate 0.25 scale 0.25 rotate<0,0,0> }
+          finish { phong 1 }
+          scale 0.5 translate<0,0,0>
+        } // end of texture
+*/
+//---------------------------------------------- end outside of objects
+
+
+ // put this part inside the object brackets !!!
+ //----------------------------------------------------------------------------
+ texture{  crackle  scale 1.5 turbulence 0.1
+           texture_map {[0.00 Texture_W]
+                        [0.05 Texture_W]
+                        [0.05 Texture_S]
+                        [1.00 Texture_S]
+                       }// end of texture_map
+                   scale 0.25
+             }// end of texture ----------------------------------------------
+//----------------------------------------------------------------------------

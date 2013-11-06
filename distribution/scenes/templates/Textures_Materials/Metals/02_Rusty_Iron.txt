@@ -1,0 +1,5 @@
+         texture{ Rust
+                  normal { agate 1.5 scale 0.25}
+                  //finish { phong 0.1  }
+                  scale 0.5
+                } // end of texture ---------------------------  

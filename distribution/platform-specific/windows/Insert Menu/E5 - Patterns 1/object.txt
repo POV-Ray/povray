@@ -1,0 +1,7 @@
+// solid pattern for use in texture/pigment/normal(/density)
+  object {        // create a solid pattern based on an object shape
+    sphere { <0,0,0>, 1 }
+    color rgb <1,0,0>,      // outside object
+    color rgb <0,0,1>       // inside object
+  }
+

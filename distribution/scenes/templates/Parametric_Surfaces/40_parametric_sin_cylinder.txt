@@ -1,0 +1,15 @@
+// --------------------------------------- parametric surface -------------- 
+parametric{
+  function{ sin(u)+0.25*sin(v*2*pi)}// x(u,v)
+  function{ cos(u) }   // y(u,v)
+  function{ v }        // z(u,v)
+  <0,-2>,<2*pi,2>  // start, end (u,v)
+  contained_by {box {<-2,-2,-2>,<2,2,2>}}
+  max_gradient 7
+  accuracy 0.005
+  precompute 18 x,y,z
+  texture{
+    pigment{ color rgb<1,1,1>*.8}
+    finish { phong 0.1 }}
+  scale 0.5
+} // end of parametric ----------------------------------------------------- 

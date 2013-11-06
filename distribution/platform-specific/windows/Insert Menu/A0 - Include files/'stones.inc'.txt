@@ -1,0 +1,4 @@
+// a lot of stone textures
+// T_Stone1 - T_Stone44
+#include "stones.inc"
+

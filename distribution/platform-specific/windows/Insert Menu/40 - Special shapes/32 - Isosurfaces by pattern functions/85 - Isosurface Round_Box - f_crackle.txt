@@ -1,0 +1,20 @@
+isosurface { //--------------------------------------- 
+  function{
+   f_rounded_box( x, y, z,
+                  0.3,  // radius of curvature
+                  0.8,0.8,0.8) // scale<x,y,z>
+     -(f_crackle(x/0.4,y/0.4,z/0.4)*0.2)
+   }
+  threshold 0
+  contained_by {box {<-1,-1,-1>*1.5,<1,1,1>*1.5}}
+  max_gradient 3.2
+  accuracy 0.0001
+  texture { pigment{ color rgb<1.0,0.9,0.7>}
+            normal { bumps 0.5 scale 0.05}
+            finish { phong 0.3}
+	  }
+  scale 0.80
+  rotate <0,-50,0>
+  rotate <-20,0,0>  
+  translate < 0, 1.2, -0.5>
+} // end of isosurface -------------------------------- 

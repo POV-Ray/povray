@@ -1,0 +1,7 @@
+// omnimax lens for 180 degree equirectangular field of view (angle unused)
+camera {
+  omnimax
+  location <0,0,-1>                    // position
+  look_at  <0,0,0>                     // view
+  right    x*image_width/image_height  // aspect
+}

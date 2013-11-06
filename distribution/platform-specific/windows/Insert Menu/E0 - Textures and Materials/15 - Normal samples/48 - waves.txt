@@ -1,0 +1,4 @@
+        texture{ pigment{ color rgb<1,0.55,0.0>}
+                 normal { waves 0.5 scale 0.025  translate<0,1.35,0>}
+                 finish { phong 1 phong_size 10 reflection{ 0.1 } } 
+               } // end of texture --------------------------------- 

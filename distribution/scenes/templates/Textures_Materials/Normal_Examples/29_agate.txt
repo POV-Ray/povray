@@ -1,0 +1,4 @@
+        texture{ pigment{ color rgb<1,0.3,0.4> }
+                 normal { agate 1.00 scale 0.5 }
+                 finish { phong 1 phong_size 20 reflection{ 0.05 } }
+               } // end of texture

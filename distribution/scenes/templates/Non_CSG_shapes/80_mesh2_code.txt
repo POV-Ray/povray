@@ -1,0 +1,40 @@
+// new more compact mesh FINITE shape (for CSG with inside_vector) 
+mesh2 {
+  vertex_vectors {
+    number_of_vertices,
+    <vertex1>, <vertex2>, ...
+  }
+  normal_vectors {
+    number_of_normals,
+    <normal1>, <normal2>, ...
+  }
+  uv_vectors {
+    number_of_uv_vectors,
+    <uv_vect1>, <uv_vect2>, ...
+  }
+  texture_list {
+    number_of_textures,
+    texture { Texture1 },
+    texture { Texture2 }, ...
+  }
+  face_indices {
+    number_of_faces,
+    <index_a, index_b, index_c> [,texture_index [, texture_index, texture_index]],
+    <index_d, index_e, index_f> [,texture_index [, texture_index, texture_index]],
+    ...
+  }
+  normal_indices {
+    number_of_faces,
+    <index_a, index_b, index_c>,
+    <index_d, index_e, index_f>,
+    ...
+  }
+  uv_indices {
+    number_of_faces,
+    <index_a, index_b, index_c>,
+    <index_d, index_e, index_f>,
+    ...
+  }
+ inside_vector <0,0,1> // for use in CSG 
+ [object modifiers]
+}

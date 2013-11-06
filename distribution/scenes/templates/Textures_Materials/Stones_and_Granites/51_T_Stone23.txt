@@ -1,0 +1,5 @@
+       texture{ T_Stone23   
+                normal { agate 0.25 scale 0.15 rotate<0,0,0> }
+                finish { phong 1 } 
+                rotate<0,0,0> scale 0.5 translate<0,0,0>
+              } // end of texture 

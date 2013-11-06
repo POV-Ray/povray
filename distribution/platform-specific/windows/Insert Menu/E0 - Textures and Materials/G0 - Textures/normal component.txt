@@ -1,0 +1,7 @@
+// texture component
+  normal {
+    bumps 0.5         // any pattern optionally followed by an intensity value [0.5]
+    //bump_size 2.0   // optional
+    //accuracy 0.02   // changes the scale for normal calculation [0.02]
+    //scale 0.3       // any transformations
+  }

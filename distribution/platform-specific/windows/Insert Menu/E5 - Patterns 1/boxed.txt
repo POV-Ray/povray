@@ -1,0 +1,3 @@
+// pattern for use in texture/pigment/normal/density
+// originally designed for use with media density
+  boxed     // box shaped gradient around origin

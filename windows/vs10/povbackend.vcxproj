@@ -1,0 +1,551 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release-SSE2|Win32">
+      <Configuration>Release-SSE2</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{C6D9B754-11EB-4FC3-8683-593B53E9AD1F}</ProjectGuid>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-SSE2|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release-SSE2|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">bin32\lib\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">bin64\lib\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">bin32\lib\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">bin64\lib\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release-SSE2|Win32'">bin32\lib\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release-SSE2|Win32'">build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">povbackend32d</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">povbackend32</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release-SSE2|Win32'">povbackend32-sse2</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">povbackend64d</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">povbackend64</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <BuildLog>
+      <Path>
+      </Path>
+    </BuildLog>
+    <Midl>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+      <HeaderFileName>
+      </HeaderFileName>
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>..\..\libraries\boost;..\..\vfe\win\;..\..\vfe\;..\..\source;..\..\source\base;..\..\source\backend;..\..\source\frontend;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BOOST_ALL_NO_LIB;_DEBUG;WIN32;WIN32_LEAN_AND_MEAN;_WINDOWS;WINVER=0x0500;_WIN32_WINNT=0x0500;COMMONCTRL_VERSION=0x500;CLASSLIB_DEFS_H;NOMINMAX;ISOLATION_AWARE_ENABLED;_CRT_SECURE_NO_DEPRECATE;_HAS_ITERATOR_DEBUGGING=0;_HAS_CPP0X=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>precomp.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)precomp.pch</PrecompiledHeaderOutputFile>
+      <BrowseInformation>true</BrowseInformation>
+      <BrowseInformationFile>$(IntDir)</BrowseInformationFile>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+      <DisableSpecificWarnings>4800;4355;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <ForcedIncludeFiles>precomp.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Lib>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <BuildLog>
+      <Path>
+      </Path>
+    </BuildLog>
+    <Midl>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>X64</TargetEnvironment>
+      <HeaderFileName>
+      </HeaderFileName>
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>..\..\libraries\boost;..\..\vfe\win\;..\..\vfe\;..\..\source;..\..\source\base;..\..\source\backend;..\..\source\frontend;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BOOST_ALL_NO_LIB;_DEBUG;WIN32;WIN32_LEAN_AND_MEAN;_WINDOWS;CLASSLIB_DEFS_H;NOMINMAX;ISOLATION_AWARE_ENABLED;_CRT_SECURE_NO_DEPRECATE;_HAS_ITERATOR_DEBUGGING=0;_HAS_CPP0X=0;BUILDING_AMD64=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>precomp.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)precomp.pch</PrecompiledHeaderOutputFile>
+      <BrowseInformation>true</BrowseInformation>
+      <BrowseInformationFile>$(IntDir)</BrowseInformationFile>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+      <DisableSpecificWarnings>4800;4355;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <ForcedIncludeFiles>precomp.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Lib>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <BuildLog>
+      <Path>
+      </Path>
+    </BuildLog>
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+      <HeaderFileName>
+      </HeaderFileName>
+    </Midl>
+    <ClCompile>
+      <Optimization>Full</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>false</OmitFramePointers>
+      <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <AdditionalIncludeDirectories>..\..\libraries\boost;..\..\vfe\win\;..\..\vfe\;..\..\source;..\..\source\base;..\..\source\backend;..\..\source\frontend;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BOOST_ALL_NO_LIB;NDEBUG;WIN32;WIN32_LEAN_AND_MEAN;_WINDOWS;COMMONCTRL_VERSION=0x500;CLASSLIB_DEFS_H;WINVER=0x0500;_WIN32_WINNT=0x0500;NOMINMAX;ISOLATION_AWARE_ENABLED;_CRT_SECURE_NO_DEPRECATE;_SECURE_SCL=0;_HAS_CPP0X=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Precise</FloatingPointModel>
+      <FloatingPointExceptions>false</FloatingPointExceptions>
+      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>precomp.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)precomp.pch</PrecompiledHeaderOutputFile>
+      <BrowseInformation>true</BrowseInformation>
+      <BrowseInformationFile>$(IntDir)</BrowseInformationFile>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+      <DisableSpecificWarnings>4800;4355;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <ForcedIncludeFiles>precomp.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Lib>
+    </Lib>
+    <Lib>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <BuildLog>
+      <Path>
+      </Path>
+    </BuildLog>
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>X64</TargetEnvironment>
+      <HeaderFileName>
+      </HeaderFileName>
+    </Midl>
+    <ClCompile>
+      <Optimization>Full</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>false</OmitFramePointers>
+      <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
+      <AdditionalIncludeDirectories>..\..\libraries\boost;..\..\vfe\win\;..\..\vfe\;..\..\source;..\..\source\base;..\..\source\backend;..\..\source\frontend;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BOOST_ALL_NO_LIB;NDEBUG;WIN32;WIN32_LEAN_AND_MEAN;_WINDOWS;CLASSLIB_DEFS_H;NOMINMAX;ISOLATION_AWARE_ENABLED;_CRT_SECURE_NO_DEPRECATE;_SECURE_SCL=0;BUILDING_AMD64=1;_HAS_CPP0X=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Precise</FloatingPointModel>
+      <FloatingPointExceptions>false</FloatingPointExceptions>
+      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>precomp.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)precomp.pch</PrecompiledHeaderOutputFile>
+      <BrowseInformation>true</BrowseInformation>
+      <BrowseInformationFile>$(IntDir)</BrowseInformationFile>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+      <DisableSpecificWarnings>4800;4355;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <ForcedIncludeFiles>precomp.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Lib>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release-SSE2|Win32'">
+    <BuildLog>
+      <Path>
+      </Path>
+    </BuildLog>
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+      <HeaderFileName>
+      </HeaderFileName>
+    </Midl>
+    <ClCompile>
+      <Optimization>Full</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>false</OmitFramePointers>
+      <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <AdditionalIncludeDirectories>..\..\libraries\boost;..\..\vfe\win\;..\..\vfe\;..\..\source;..\..\source\base;..\..\source\backend;..\..\source\frontend;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BOOST_ALL_NO_LIB;NDEBUG;WIN32;WIN32_LEAN_AND_MEAN;_WINDOWS;COMMONCTRL_VERSION=0x500;CLASSLIB_DEFS_H;WINVER=0x0500;_WIN32_WINNT=0x0500;NOMINMAX;ISOLATION_AWARE_ENABLED;_CRT_SECURE_NO_DEPRECATE;_SECURE_SCL=0;BUILD_SSE2=1;_HAS_CPP0X=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Precise</FloatingPointModel>
+      <FloatingPointExceptions>false</FloatingPointExceptions>
+      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>precomp.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)precomp.pch</PrecompiledHeaderOutputFile>
+      <BrowseInformation>true</BrowseInformation>
+      <BrowseInformationFile>$(IntDir)</BrowseInformationFile>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+      <DisableSpecificWarnings>4800;4355;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <ForcedIncludeFiles>precomp.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Lib>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\source\lightgrp.cpp" />
+    <ClCompile Include="..\..\source\optout.cpp" />
+    <ClCompile Include="..\..\source\pov_mem.cpp" />
+    <ClCompile Include="..\..\source\backend\povray.cpp" />
+    <ClCompile Include="..\..\source\backend\bounding\bbox.cpp" />
+    <ClCompile Include="..\..\source\backend\bounding\bcyl.cpp" />
+    <ClCompile Include="..\..\source\backend\bounding\boundingtask.cpp" />
+    <ClCompile Include="..\..\source\backend\bounding\bsphere.cpp" />
+    <ClCompile Include="..\..\source\backend\colour\colour.cpp" />
+    <ClCompile Include="..\..\source\backend\colour\colutils.cpp" />
+    <ClCompile Include="..\..\source\backend\colour\spectral.cpp" />
+    <ClCompile Include="..\..\source\backend\control\benchmark.cpp" />
+    <ClCompile Include="..\..\source\backend\control\messagefactory.cpp" />
+    <ClCompile Include="..\..\source\backend\control\renderbackend.cpp" />
+    <ClCompile Include="..\..\source\backend\interior\interior.cpp" />
+    <ClCompile Include="..\..\source\backend\interior\media.cpp" />
+    <ClCompile Include="..\..\source\backend\math\chi2.cpp" />
+    <ClCompile Include="..\..\source\backend\math\hcmplx.cpp" />
+    <ClCompile Include="..\..\source\backend\math\mathutil.cpp" />
+    <ClCompile Include="..\..\source\backend\math\matrices.cpp" />
+    <ClCompile Include="..\..\source\backend\math\polysolv.cpp" />
+    <ClCompile Include="..\..\source\backend\math\quatern.cpp" />
+    <ClCompile Include="..\..\source\backend\math\splines.cpp" />
+    <ClCompile Include="..\..\source\backend\parser\express.cpp" />
+    <ClCompile Include="..\..\source\backend\parser\fnsyntax.cpp" />
+    <ClCompile Include="..\..\source\backend\parser\function.cpp" />
+    <ClCompile Include="..\..\source\backend\parser\parse.cpp" />
+    <ClCompile Include="..\..\source\backend\parser\parsestr.cpp" />
+    <ClCompile Include="..\..\source\backend\parser\parstxtr.cpp" />
+    <ClCompile Include="..\..\source\backend\parser\reswords.cpp" />
+    <ClCompile Include="..\..\source\backend\parser\tokenize.cpp" />
+    <ClCompile Include="..\..\source\backend\pattern\pattern.cpp" />
+    <ClCompile Include="..\..\source\backend\pattern\warps.cpp" />
+    <ClCompile Include="..\..\source\backend\render\radiositytask.cpp" />
+    <ClCompile Include="..\..\source\backend\render\ray.cpp" />
+    <ClCompile Include="..\..\source\backend\render\rendertask.cpp" />
+    <ClCompile Include="..\..\source\backend\render\trace.cpp" />
+    <ClCompile Include="..\..\source\backend\render\tracepixel.cpp" />
+    <ClCompile Include="..\..\source\backend\render\tracetask.cpp" />
+    <ClCompile Include="..\..\source\backend\scene\atmosph.cpp" />
+    <ClCompile Include="..\..\source\backend\scene\camera.cpp" />
+    <ClCompile Include="..\..\source\backend\scene\objects.cpp" />
+    <ClCompile Include="..\..\source\backend\scene\scene.cpp" />
+    <ClCompile Include="..\..\source\backend\scene\threaddata.cpp" />
+    <ClCompile Include="..\..\source\backend\scene\view.cpp" />
+    <ClCompile Include="..\..\source\backend\shape\bezier.cpp" />
+    <ClCompile Include="..\..\source\backend\shape\blob.cpp" />
+    <ClCompile Include="..\..\source\backend\shape\boxes.cpp" />
+    <ClCompile Include="..\..\source\backend\shape\cones.cpp" />
+    <ClCompile Include="..\..\source\backend\shape\csg.cpp" />
+    <ClCompile Include="..\..\source\backend\shape\discs.cpp" />
+    <ClCompile Include="..\..\source\backend\shape\fpmetric.cpp" />
+    <ClCompile Include="..\..\source\backend\shape\fractal.cpp" />
+    <ClCompile Include="..\..\source\backend\shape\hfield.cpp" />
+    <ClCompile Include="..\..\source\backend\shape\isosurf.cpp" />
+    <ClCompile Include="..\..\source\backend\shape\lathe.cpp" />
+    <ClCompile Include="..\..\source\backend\shape\mesh.cpp" />
+    <ClCompile Include="..\..\source\backend\shape\ovus.cpp" />
+    <ClCompile Include="..\..\source\backend\shape\planes.cpp" />
+    <ClCompile Include="..\..\source\backend\shape\poly.cpp" />
+    <ClCompile Include="..\..\source\backend\shape\polygon.cpp" />
+    <ClCompile Include="..\..\source\backend\shape\prism.cpp" />
+    <ClCompile Include="..\..\source\backend\shape\quadrics.cpp" />
+    <ClCompile Include="..\..\source\backend\shape\sor.cpp" />
+    <ClCompile Include="..\..\source\backend\shape\spheres.cpp" />
+    <ClCompile Include="..\..\source\backend\shape\sphsweep.cpp" />
+    <ClCompile Include="..\..\source\backend\shape\super.cpp" />
+    <ClCompile Include="..\..\source\backend\shape\torus.cpp" />
+    <ClCompile Include="..\..\source\backend\shape\triangle.cpp" />
+    <ClCompile Include="..\..\source\backend\shape\truetype.cpp" />
+    <ClCompile Include="..\..\source\backend\support\bsptree.cpp" />
+    <ClCompile Include="..\..\source\backend\support\fileutil.cpp" />
+    <ClCompile Include="..\..\source\backend\support\imageutil.cpp" />
+    <ClCompile Include="..\..\source\backend\support\jitter.cpp" />
+    <ClCompile Include="..\..\source\backend\support\msgutil.cpp" />
+    <ClCompile Include="..\..\source\backend\support\octree.cpp" />
+    <ClCompile Include="..\..\source\backend\support\randomsequences.cpp" />
+    <ClCompile Include="..\..\source\backend\support\statistics.cpp" />
+    <ClCompile Include="..\..\source\backend\support\task.cpp" />
+    <ClCompile Include="..\..\source\backend\support\taskqueue.cpp" />
+    <ClCompile Include="..\..\source\backend\texture\normal.cpp" />
+    <ClCompile Include="..\..\source\backend\texture\pigment.cpp" />
+    <ClCompile Include="..\..\source\backend\texture\texture.cpp" />
+    <ClCompile Include="..\..\source\backend\vm\fncode.cpp" />
+    <ClCompile Include="..\..\source\backend\vm\fnintern.cpp" />
+    <ClCompile Include="..\..\source\backend\vm\fnpovfpu.cpp" />
+    <ClCompile Include="..\..\source\backend\lighting\photonestimationtask.cpp" />
+    <ClCompile Include="..\..\source\backend\lighting\photons.cpp" />
+    <ClCompile Include="..\..\source\backend\lighting\photonshootingstrategy.cpp" />
+    <ClCompile Include="..\..\source\backend\lighting\photonshootingtask.cpp" />
+    <ClCompile Include="..\..\source\backend\lighting\photonsortingtask.cpp" />
+    <ClCompile Include="..\..\source\backend\lighting\photonstrategytask.cpp" />
+    <ClCompile Include="..\..\source\backend\lighting\point.cpp" />
+    <ClCompile Include="..\..\source\backend\lighting\rad_data.cpp" />
+    <ClCompile Include="..\..\source\backend\lighting\radiosity.cpp" />
+    <ClCompile Include="..\..\source\backend\lighting\subsurface.cpp" />
+    <ClCompile Include="..\..\source\precomp.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release-SSE2|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\source\backend\texture\avxfma4check.h" />
+    <ClInclude Include="..\..\source\lightgrp.h" />
+    <ClInclude Include="..\..\source\pov_mem.h" />
+    <ClInclude Include="..\..\source\statspov.h" />
+    <ClInclude Include="..\..\source\backend\configbackend.h" />
+    <ClInclude Include="..\..\source\backend\frame.h" />
+    <ClInclude Include="..\..\source\backend\povray.h" />
+    <ClInclude Include="..\..\source\backend\bounding\bbox.h" />
+    <ClInclude Include="..\..\source\backend\bounding\bcyl.h" />
+    <ClInclude Include="..\..\source\backend\bounding\boundingtask.h" />
+    <ClInclude Include="..\..\source\backend\bounding\bsphere.h" />
+    <ClInclude Include="..\..\source\backend\colour\colour.h" />
+    <ClInclude Include="..\..\source\backend\colour\colutils.h" />
+    <ClInclude Include="..\..\source\backend\colour\spectral.h" />
+    <ClInclude Include="..\..\source\backend\control\benchmark.h" />
+    <ClInclude Include="..\..\source\backend\control\messagefactory.h" />
+    <ClInclude Include="..\..\source\backend\control\renderbackend.h" />
+    <ClInclude Include="..\..\source\backend\interior\interior.h" />
+    <ClInclude Include="..\..\source\backend\interior\media.h" />
+    <ClInclude Include="..\..\source\backend\math\chi2.h" />
+    <ClInclude Include="..\..\source\backend\math\hcmplx.h" />
+    <ClInclude Include="..\..\source\backend\math\mathutil.h" />
+    <ClInclude Include="..\..\source\backend\math\matrices.h" />
+    <ClInclude Include="..\..\source\backend\math\polysolv.h" />
+    <ClInclude Include="..\..\source\backend\math\quatern.h" />
+    <ClInclude Include="..\..\source\backend\math\splines.h" />
+    <ClInclude Include="..\..\source\backend\math\vector.h" />
+    <ClInclude Include="..\..\source\backend\parser\parse.h" />
+    <ClInclude Include="..\..\source\backend\parser\reswords.h" />
+    <ClInclude Include="..\..\source\backend\pattern\pattern.h" />
+    <ClInclude Include="..\..\source\backend\pattern\warps.h" />
+    <ClInclude Include="..\..\source\backend\render\radiositytask.h" />
+    <ClInclude Include="..\..\source\backend\render\ray.h" />
+    <ClInclude Include="..\..\source\backend\render\rendertask.h" />
+    <ClInclude Include="..\..\source\backend\render\trace.h" />
+    <ClInclude Include="..\..\source\backend\render\tracepixel.h" />
+    <ClInclude Include="..\..\source\backend\render\tracetask.h" />
+    <ClInclude Include="..\..\source\backend\scene\atmosph.h" />
+    <ClInclude Include="..\..\source\backend\scene\camera.h" />
+    <ClInclude Include="..\..\source\backend\scene\objects.h" />
+    <ClInclude Include="..\..\source\backend\scene\scene.h" />
+    <ClInclude Include="..\..\source\backend\scene\threaddata.h" />
+    <ClInclude Include="..\..\source\backend\scene\view.h" />
+    <ClInclude Include="..\..\source\backend\shape\bezier.h" />
+    <ClInclude Include="..\..\source\backend\shape\blob.h" />
+    <ClInclude Include="..\..\source\backend\shape\boxes.h" />
+    <ClInclude Include="..\..\source\backend\shape\cones.h" />
+    <ClInclude Include="..\..\source\backend\shape\csg.h" />
+    <ClInclude Include="..\..\source\backend\shape\discs.h" />
+    <ClInclude Include="..\..\source\backend\shape\fpmetric.h" />
+    <ClInclude Include="..\..\source\backend\shape\fractal.h" />
+    <ClInclude Include="..\..\source\backend\shape\hfield.h" />
+    <ClInclude Include="..\..\source\backend\shape\isosurf.h" />
+    <ClInclude Include="..\..\source\backend\shape\lathe.h" />
+    <ClInclude Include="..\..\source\backend\shape\mesh.h" />
+    <ClInclude Include="..\..\source\backend\shape\ovus.h" />
+    <ClInclude Include="..\..\source\backend\shape\planes.h" />
+    <ClInclude Include="..\..\source\backend\shape\poly.h" />
+    <ClInclude Include="..\..\source\backend\shape\polygon.h" />
+    <ClInclude Include="..\..\source\backend\shape\prism.h" />
+    <ClInclude Include="..\..\source\backend\shape\quadrics.h" />
+    <ClInclude Include="..\..\source\backend\shape\sor.h" />
+    <ClInclude Include="..\..\source\backend\shape\spheres.h" />
+    <ClInclude Include="..\..\source\backend\shape\sphsweep.h" />
+    <ClInclude Include="..\..\source\backend\shape\super.h" />
+    <ClInclude Include="..\..\source\backend\shape\torus.h" />
+    <ClInclude Include="..\..\source\backend\shape\triangle.h" />
+    <ClInclude Include="..\..\source\backend\shape\truetype.h" />
+    <ClInclude Include="..\..\source\backend\support\bsptree.h" />
+    <ClInclude Include="..\..\source\backend\support\fileutil.h" />
+    <ClInclude Include="..\..\source\backend\support\fixedallocator.h" />
+    <ClInclude Include="..\..\source\backend\support\imageutil.h" />
+    <ClInclude Include="..\..\source\backend\support\jitter.h" />
+    <ClInclude Include="..\..\source\backend\support\msgutil.h" />
+    <ClInclude Include="..\..\source\backend\support\octree.h" />
+    <ClInclude Include="..\..\source\backend\support\randomsequences.h" />
+    <ClInclude Include="..\..\source\backend\support\simplevector.h" />
+    <ClInclude Include="..\..\source\backend\support\statistics.h" />
+    <ClInclude Include="..\..\source\backend\support\task.h" />
+    <ClInclude Include="..\..\source\backend\support\taskqueue.h" />
+    <ClInclude Include="..\..\source\backend\texture\normal.h" />
+    <ClInclude Include="..\..\source\backend\texture\pigment.h" />
+    <ClInclude Include="..\..\source\backend\texture\texture.h" />
+    <ClInclude Include="..\..\source\backend\vm\fncode.h" />
+    <ClInclude Include="..\..\source\backend\vm\fnintern.h" />
+    <ClInclude Include="..\..\source\backend\vm\fnpovfpu.h" />
+    <ClInclude Include="..\..\source\backend\lighting\photonestimationtask.h" />
+    <ClInclude Include="..\..\source\backend\lighting\photons.h" />
+    <ClInclude Include="..\..\source\backend\lighting\photonshootingstrategy.h" />
+    <ClInclude Include="..\..\source\backend\lighting\photonshootingtask.h" />
+    <ClInclude Include="..\..\source\backend\lighting\photonsortingtask.h" />
+    <ClInclude Include="..\..\source\backend\lighting\photonstrategytask.h" />
+    <ClInclude Include="..\..\source\backend\lighting\point.h" />
+    <ClInclude Include="..\..\source\backend\lighting\radiosity.h" />
+    <ClInclude Include="..\..\source\backend\lighting\subsurface.h" />
+    <ClInclude Include="..\..\source\povrayold.h" />
+    <ClInclude Include="..\..\source\precomp.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
