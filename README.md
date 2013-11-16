@@ -62,7 +62,7 @@ Building POV-Ray
 
 At this point in time we recommend building from the 3.7-stable branch. POV-Ray
 should compile on any POSIX-compliant system with the required tools (please see
-[unix/README.md](/POV-Ray/povray/blob/master/unix/README.md) for build instructions),
+[unix/README.md](unix/README.md) for build instructions),
 on Microsoft Windows systems that have Visual Studio 2010 or later installed (targeting
 XP or later, both 32 and 64-bit - be sure to see README.HTML in the windows source dir,
 otherwise your build *will not work*), and also on Mac systems (console mode only, using
