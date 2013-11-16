@@ -1,0 +1,798 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+
+<!--  This file copyright Persistence of Vision Raytracer Pty. Ltd. 2009-2011  -->
+
+<html lang="en">
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=windows-1252">
+<title>Tutorial Section 1</title>
+<link rel="StyleSheet" href="povray37.css" type="text/css">
+<link rel="shortcut icon" href="favicon.ico">
+
+<!--  NOTE: In order to help users find information about POV-Ray using web      -->
+<!--  search engines, we ask that you *not* let them index documentation         -->
+<!--  mirrors because effectively, when searching, users will get hundreds of    -->
+<!--  results containing the same information! For this reason, these meta tags  -->
+<!--  below disable archiving of this page by search engines.                    -->
+
+<meta name="robots" content="noarchive">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="expires" content="0">
+</head>
+<body>
+
+<div class="Page">
+
+<!-- NavPanel Begin -->
+<div class="NavPanel">
+<table class="NavTable">
+<tr>
+  <td class="FixedPanelHeading"><a title="2.1" href="#t2_1">Introduction</a></td>
+</tr>
+<tr>
+  <td><div class="divh2"><strong><a title="2.1.1" href="#t2_1_1">Program Description</a></strong></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><strong><a title="2.1.2" href="#t2_1_2">What is Ray-Tracing?</a></strong></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><strong><a title="2.1.3" href="#t2_1_3">What is POV-Ray?</a></strong></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><strong><a title="2.1.4" href="#t2_1_4">Features</a></strong></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a title="2.1.4.1" href="#t2_1_4_1">Changes and New Features Summary</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><strong><a title="2.1.5" href="#t2_1_5">Trademarks</a></strong></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><strong><a title="2.1.6" href="#t2_1_6">The Early History of POV-Ray</a></strong></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a title="2.1.6.1" href="#t2_1_6_1">The Original Creation Message</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a title="2.1.6.2" href="#t2_1_6_2">The Name</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a title="2.1.6.3" href="#t2_1_6_3">A Historic 'Version History'</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><strong><a title="2.1.7" href="#t2_1_7">How Do I Begin?</a></strong></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><strong><a title="2.1.8" href="#t2_1_8">Notation and Basic Assumptions</a></strong></div></td>
+</tr>
+<tr>
+  <td><div class="divh1">&nbsp;</div></td>
+</tr>
+<tr>
+  <td><div class="divh1">&nbsp;</div></td>
+</tr>
+</table>
+</div>
+<!-- NavPanel End -->
+
+<div class="Content">
+<table class="HeaderFooter" width="100%">
+<tr>
+  <td colspan=5 align="left" class="HeaderFooter">
+    POV-Ray for Unix <strong class="HeaderFooter">version 3.7</strong>
+  </td>
+</tr>
+<tr >
+  <td colspan=5>
+    <hr align="right" width="70%">
+  </td>
+</tr>
+<tr>
+  <td width="30%"></td>
+  <td class="NavBar"><a href="index.html" title="The Front Door">Home</a></td>
+  <td class="NavBar"><a href="u1_0.html" title="Unix Table of Contents">POV-Ray for Unix</a></td>
+  <td class="NavBar"><a href="t2_0.html" title="Tutorial Table of Contents">POV-Ray Tutorial</a></td>
+  <td class="NavBar"><a href="r3_0.html" title="Reference Table of Contents">POV-Ray Reference</a></td>
+</tr>
+</table>
+
+<a name="t2_1"></a>
+<div class="content-level-h2" contains="Introduction" id="t2_1">
+<h2>2.1 Introduction</h2>
+<p>This document provides a tutorial for the Persistence of Vision Ray-Tracer&trade;
+(POV-Ray). The documentation applies to all platforms to which this version of POV-Ray
+is ported. The platform-specific documentation is available for each platform separately.</p>
+
+<p>The tutorial is divided into five main parts:</p>
+
+<ol>
+	<li>This introduction which explains what POV-Ray is and what ray-tracing
+	is. It gives a brief overview of how to create ray-traced images.</li>
+
+	<li>A <a href="t2_2.html#t2_2">Beginning Tutorial</a>
+	which explains step by step how to use the different features of POV-Ray.</li>
+
+	<li>An <a href="t2_3.html#t2_3">Advanced Tutorial</a>
+	which contains more advanced tutorial topics.</li>
+
+	<li><a href="t2_4.html#t2_4">POV-Ray questions and tips</a>
+	gives answers to many frequently-asked questions about POV-Ray.</li>
+
+	<li>In the <a href="t2_5.html#t2_5">Appendices</a> you will find 
+	some tips and hints, where to get the latest version and versions for other 
+	platforms, the POV-Ray licence, information on compiling custom versions of 
+	POV-Ray, suggested reading, contact addresses and legal information.</li>
+</ol>
+
+<p>
+The current release of POV-Ray runs on 32 and 64-bit versions of Microsoft Windows from XP through Windows 8, Mac OS X, Linux/UNIX, and numerous other platforms (when compiled from source).
+</p>
+
+<p>If you do not yet have POV-Ray installed or are not sure you have the official version or the latest version, see appendix 
+<a href="t2_5.html#t2_5_8">What to do if you don't have POV-Ray</a>.</p>
+
+<p>This book covers only the generic parts of the program which are common
+to each version.</p>
+<p class="Note"><strong>Note:</strong> Each version has platform-specific documentation not included in this section.</p>
+<p>We recommend you finish reading this introductory section then read the platform-specific information before reading the rest of the tutorial. The platform-specific docs will show you how to render a sample scene and
+will give you detailed descriptions of the platform-specific features.</p>
+
+<p>The Windows version documentation is available on the POV-Ray program's
+Help menu or by pressing the F1 key while in the program.</p>
+
+<p>The Unix / Linux version documentation can be found at the same place as
+the platform independent part.  Usually that is
+<code>/usr/local/share/povray-3.?</code></p>
+
+</div>
+<a name="t2_1_1"></a>
+<div class="content-level-h3" contains="Program Description" id="t2_1_1">
+<h3>2.1.1 Program Description</h3>
+ <p>The Persistence of Vision Ray-Tracer creates three-dimensional,
+  photo-realistic images using a rendering technique called ray-tracing. It
+  reads in a text file containing information describing the objects and
+  lighting in a scene and generates an image of that scene from the view point
+  of a camera also described in the text file. Ray-tracing is not a fast
+  process by any means, but it produces very high quality images with realistic
+  reflections, shading, perspective and other effects.</p>
+
+</div>
+<a name="t2_1_2"></a>
+<div class="content-level-h3" contains="What is Ray-Tracing?" id="t2_1_2">
+<h3>2.1.2 What is Ray-Tracing?</h3>
+<p>Ray-tracing is a rendering technique that calculates an image of a scene
+  by simulating the way rays of light travel in the real world. However it does
+  this simulation backwards; in the real world, rays of light are emitted from a light
+  source and then strike objects. Some of the light rays then bounce off the objects
+  and enter our eyes (or perhaps a camera). However, most of the rays never reach
+  anything that 'observes' them; they either leave the area of interest or are
+  absorbed by objects within it.
+</p>
+
+<p>
+  Because the vast majority of rays never reach an observer, it would take a very long
+  time for software to trace even a simple image if the rays were cast as they were in
+  the real world (because almost all of the calculations would end up going to waste).
+  For the purposes of drawing a representation of a scene as viewed from an imaginary
+  camera, we are generally only interested in rays that reach that camera's lens.</p>
+
+<p class="Note">A 'scene' is the virtual world which you wish to take a 'picture' of
+  with our simulated camera. There can be (and usually are) objects in the scene that
+  do not appear in the final image, just as objects outside the field of view of a real
+  camera do not directly appear in the final image. (They can still cast shadows or be
+  seen as reflections, though).</p>
+
+<p>
+  Accordingly, ray-tracing programs like POV-Ray start with their simulated camera and
+  trace rays <i>backwards</i> out into the scene. The user specifies the location of
+  the camera and the type of lens it is using, the light sources that illuminate the scene, the objects within it, as
+  well as the surface texture properties of objects, their interiors (if transparent)
+  and any atmospheric media such as fog, haze, or fire.</p>
+<p>
+   For every pixel in the final image one or more viewing rays are shot from
+  the camera into the scene to see if it intersects with any of the objects in
+  the scene. These &quot;viewing rays&quot; originate from the viewer
+  (represented by the camera), and pass through the viewing window (representing
+  the pixels of the final image).</p>
+<p>
+   Every time an object is hit, the color of the surface at that point is
+  calculated. For this purpose rays are sent from that point to each light source to
+  determine the amount of light coming from that source. These &quot;shadow
+  rays&quot; are tested to tell whether the surface point lies in shadow or
+  not. If the surface is reflective or transparent new rays are set up and
+  traced in order to determine the contribution of the reflected and refracted
+  light to the final surface color.</p>
+<p>
+   Special features like inter-diffuse reflection (radiosity), atmospheric
+  effects and area lights make it necessary to shoot a lot of additional rays
+  into the scene for every pixel.</p>
+
+</div>
+<a name="t2_1_3"></a>
+<div class="content-level-h3" contains="What is POV-Ray?" id="t2_1_3">
+<h3>2.1.3 What is POV-Ray?</h3>
+<p>
+POV-Ray&trade; is short for the Persistence of Vision Raytracer&trade;, a tool for producing
+high-quality computer graphics. POV-Ray is Free Software (as per the definition of the Free
+Software Foundation) as its source code is licensed under the
+<a href="http://www.gnu.org/licenses/agpl-3.0.html">Affero General Public License</a> (AGPL).
+</p>
+<p>POV-Ray was developed from DKBTrace 2.12
+(written by David K. Buck and Aaron A. Collins) by a bunch of people (called
+the POV-Team&trade;) in their spare time. The headquarters of the POV-Team is on
+the <a href="http://www.povray.org/">internet</a> (see
+<a href="t2_5.html#t2_5_8_2">Where to Find POV-Ray Files</a> for more details).</p>
+
+<p>The POV-Ray package includes detailed instructions on using the ray-tracer
+and creating scenes. Many stunning scenes are included with POV-Ray so you
+can start creating images immediately when you get the package. These scenes
+can also be modified so you do not have to start from scratch.</p>
+
+<p>In addition to the pre-defined scenes, a library of pre-defined shapes
+and materials is provided. You can include these shapes and materials in your
+own scenes by just including the library file name at the top of your scene
+file, and by using the shape or material name in your scene.</p>
+
+</div>
+<a name="t2_1_4"></a>
+<div class="content-level-h3" contains="Features" id="t2_1_4">
+<h3>2.1.4 Features</h3>
+ <p>Here are some highlights of POV-Ray's features:</p>
+
+  <ul>
+   <li>Easy to use scene description language.</li>
+   <li>Large library of stunning example scene files.</li>
+   <li>Standard include files that pre-define many shapes, colors and textures.</li>
+   <li>Very high quality output image files (up to 48-bit color).</li>
+   <li>Create landscapes using smoothed height fields.</li>
+   <li>Many camera types, including <a href="r3_4.html#r3_4_2_2_1">perspective</a>, <a href="r3_4.html#r3_4_2_2_2">orthographic</a>, <a href="r3_4.html#r3_4_2_2_4">fisheye</a>, etc.</li>
+   <li><a href="r3_4.html#r3_4_4_1_2">Spotlights</a>, <a href="r3_4.html#r3_4_4_1_3">cylindrical lights</a> and <a href="r3_4.html#r3_4_4_1_5">area lights</a> for sophisticated lighting.</li>
+   <li><a href="r3_4.html#r3_4_4_4">Photons</a> for realistic, reflected and refracted, caustics. Photons also interact with media.</li>
+   <li><a href="r3_4.html#r3_4_6_3_4_1">Phong</a> and <a href="r3_4.html#r3_4_6_3_4_2">specular highlighting</a> for more realistic-looking surfaces.</li>
+   <li>Inter-diffuse reflection (<a href="r3_4.html#r3_4_4_3_1">radiosity</a>) for more realistic lighting.</li>
+   <li>Atmospheric effects like <a href="r3_4.html#r3_4_3_1">atmosphere</a>, <a href="r3_4.html#r3_4_3_3">ground-fog</a> and <a href="r3_4.html#r3_4_3_5">rainbow</a>.</li>
+   <li><a href="r3_4.html#r3_4_8">Particle media</a> to model effects like clouds, dust, fire and steam.</li>
+   <li>Several image file <a href="r3_2.html#r3_2_4">output formats</a> including BMP, PNG, JPG and OpenEXR.</li>
+   <li>Basic shape primitives such as:</li>
+     <ul><li><a href="r3_4.html#r3_4_5_1_12">spheres</a></li>
+     <li><a href="r3_4.html#r3_4_5_1_2">boxes</a></li>
+     <li><a href="r3_4.html#r3_4_5_1_14">quadrics</a></li>
+     <li><a href="r3_4.html#r3_4_5_1_4">cylinders</a></li>
+     <li><a href="r3_4.html#r3_4_5_1_3">cones</a></li>
+     <li><a href="r3_4.html#r3_4_5_2_6">triangle</a></li>
+     <li><a href="r3_4.html#r3_4_5_3_1">planes</a></li></ul>
+   <li>Advanced shape primitives such as:</li>
+     <ul><li><a href="r3_4.html#r3_4_5_1_17">tori</a> (donuts)</li>
+     <li><a href="r3_4.html#r3_4_5_2_1">bezier patches</a></li>
+     <li><a href="r3_4.html#r3_4_5_1_5">height fields</a> (mountains)</li>
+     <li><a href="r3_4.html#r3_4_5_1_1">blobs</a></li>
+     <li><a href="r3_4.html#r3_4_5_3_4">quartics</a></li>
+     <li><a href="r3_4.html#r3_4_5_2_7">smooth triangles</a></li>
+     <li><a href="r3_4.html#r3_4_5_1_16">text</a></li>
+     <li><a href="r3_4.html#r3_4_5_1_14">superquadrics</a></li>
+     <li><a href="r3_4.html#r3_4_5_1_15">surface of revolution</a></li>
+     <li><a href="r3_4.html#r3_4_5_1_11">prisms</a></li>
+     <li><a href="r3_4.html#r3_4_5_2_5">polygons</a></li>
+     <li><a href="r3_4.html#r3_4_5_1_8">lathes</a></li>
+     <li><a href="r3_4.html#r3_4_5_1_7">fractals</a></li>
+     <li><a href="r3_4.html#r3_4_5_1_6">isosurfaces</a></li>
+     <li><a href="r3_4.html#r3_4_5_1_10">parametric</a></li></ul>
+   <li>Shapes can easily be combined to create new complex shapes using <a href="r3_4.html#r3_4_5_4">Constructive Solid Geometry</a>.</li>
+    <li>POV-Ray supports <a href="r3_4.html#r3_4_5_4_2">unions</a>, <a href="r3_4.html#r3_4_5_4_5">merges</a>, <a href="r3_4.html#r3_4_5_4_3">intersections</a> and <a href="r3_4.html#r3_4_5_4_4">differences</a>.</li>
+   <li>Objects are assigned materials called <a href="r3_4.html#r3_4_6">textures</a> and interior properties such as <a href="r3_4.html#r3_4_8_1_4">index of refraction</a> and <a href="r3_4.html#r3_4_8">particle media</a>.</li>
+   <li>Built-in color and normal patterns:</li>
+   <ul><li><a href="r3_4.html#r3_4_7_1_1">Agate</a></li>
+   <li><a href="r3_4.html#r3_4_7_1_3">Bozo</a></li>
+   <li><a href="r3_4.html#r3_4_7_1_5">Bumps</a></li>
+   <li><a href="r3_4.html#r3_4_7_2_2">Checker</a></li>
+   <li><a href="r3_4.html#r3_4_7_2_3">Crackle</a></li>
+   <li><a href="r3_4.html#r3_4_7_1_9">Dents</a></li>
+   <li><a href="r3_4.html#r3_4_7_1_12">Functions</a></li>
+   <li><a href="r3_4.html#r3_4_7_1_14">Granite</a></li>
+   <li><a href="r3_4.html#r3_4_7_1_13">Gradient</a></li>
+   <li><a href="r3_4.html#r3_4_7_2_4">Hexagon</a></li>
+   <li><a href="r3_4.html#r3_4_7_4_2">Image</a></li>
+   <li><a href="r3_4.html#r3_4_7_1_15">Leopard</a></li>
+   <li><a href="r3_4.html#r3_4_7_1_11">Mandel</a></li>
+   <li><a href="r3_4.html#r3_4_7_1_16">Marble</a></li>
+   <li><a href="r3_4.html#r3_4_7_1_17">Onion</a></li>
+   <li><a href="r3_4.html#r3_4_7_1_21">Quilted</a></li>
+   <li><a href="r3_4.html#r3_4_7_1_23">Ripples</a></li>
+   <li><a href="r3_4.html#r3_4_7_1_27">Spotted</a></li>
+   <li><a href="r3_4.html#r3_4_7_1_25">Spiral</a></li>
+   <li><a href="r3_4.html#r3_4_7_1_22">Radial</a></li>
+   <li><a href="r3_4.html#r3_4_7_1_29">Waves</a></li>
+   <li><a href="r3_4.html#r3_4_7_1_30">Wood</a></li>
+   <li><a href="r3_4.html#r3_4_7_1_31">Wrinkles</a></li></ul>
+   <li>Users can create their own textures or use the pre-defined ones included with the distribution.</li>
+   <li>Combine textures using layering of semi-transparent textures or tiles of textures or material map files.</li>
+   <li>Display preview of image while rendering (on supported platforms).</li>
+   <li>Halt and save a render part way through, and continue rendering the halted partial render later.</li>
+  </ul>
+
+</div>
+<a name="t2_1_4_1"></a>
+<div class="content-level-h4" contains="Changes and New Features Summary" id="t2_1_4_1">
+<h4>2.1.4.1 Changes and New Features Summary</h4>
+<p>This section covers version 3.7 <em>Changes</em> and <em>New Features</em> that apply no matter what platform you are using. Changes and information pertaining to your particular installation are covered in the platform specific documentation that's included with the distribution.</p>
+<p>The categorized list below outlines the additions, changes and improvements along with links (when appropriate) to their relevant passages in the <em>Reference Section</em>.</p>
+<p><strong>Look Here First</strong></p>
+<p>These items <em>definitely</em> deserve your attention, because some of them represent key changes or enhancements to the way POV-Ray operates or behaves.</p>
+<p>
+<ol>
+<li>POV-Ray now supports <a href="r3_2.html#r3_2_8_1">Symmetric MultiProcessing</a>.</li>
+<li>The addition of the <code><a href="r3_4.html#r3_4_2_2_3">mesh_camera</a></code> permits simulation of arbitrary lenses and makes texture baking possible.</li>
+<li>An <em>experimental</em> <a href="t2_3.html#t2_3_4">gamma handling</a> feature has been added, some of the highlights are:</li>
+<ol TYPE=a>
+<li>a different role for <code><a href="r3_4.html#r3_4_1_3">assumed_gamma</a></code></li>
+<li>changes in the <code><a href="r3_4.html#r3_4_1">global_settings</a></code> section</li>
+<li>the <code><a href="r3_3.html#r3_3_1_7_2">srgb</a></code> keyword and its kin can be used to specify gamma pre-corrected colors</li>
+<li>an <code><a href="r3_2.html#r3_2_8_7">Antialias_Gamma</a></code> feature has been added</li>
+<li>lastly you can also change the input file <code><a href="r3_4.html#r3_4_7_6_2">gamma</a></code> for individual input files</li>
+</ol>
+<li>Make sure to review the <em>Images and Image Related</em> category below for <em>important</em> changes and additions.</li>
+<li>Redistribute the workload to render threads by specifying a <a href="r3_2.html#r3_2_8_2">render block size</a>.</li>
+<li>Binary Space Partitioning or <a href="r3_2.html#r3_2_8_6">BSP</a> tree bounding is now available.</li>
+<li>A resource control <a href="r3_2.html#r3_2_2_2">option</a> for output image caching has been added.</li> 
+<li>An overall review of the <em>entire</em> <a href="r3_4.html#r3_4_4_3">radiosity</a> section is probably a good idea; some of the highlights are:</li>
+<ol TYPE=a>
+<li>a revised <a href="t2_3.html#t2_3_8">radiosity</a> tutorial</li>
+<li>the <em>new</em> <code><a href="r3_4.html#r3_4_4_3_3_9">maximum_reuse</a></code> parameter</li>
+<li>adaptive pretrace mode added to the <code> <a href="r3_4.html#r3_4_4_3_3_11">nearest_count</a></code> parameter</li>
+<li>the <a href="r3_2.html#r3_2_8_8_2">loading and saving</a> of radiosity data has changed</li>
+<li>new command line <a href="r3_2.html#r3_2_8_8">options</a> can help to further customize radiosity features</li>
+</ol>
+<li>The <a href="r3_4.html#r3_4_5_1_9">ovus</a> object was added, along with support for <code><a href="r3_4.html#r3_4_6_7">uv_mapping</a></code></li>
+<li>Raised max order of the <code><a href="r3_4.html#r3_4_5_3_2">poly</a></code>, <code><a href="r3_4.html#r3_4_5_3_3">cubic</a></code> and <code><a href="r3_4.html#r3_4_5_3_4">quartic</a></code> objects. Alternate syntax is also available.</li>
+<li>Added multiple-thread support to <a href="r3_4.html#r3_4_4_4_5">photon</a> shooting code.</li>
+<li>New thread-safe random number generator was added.</li>
+<li>The <em>buit-in</em> benchmark process now runs without any other distribution files. See the platform specific documentation for details.</li>
+<li>The <code>Draw_Vistas</code>, <code>Vista_Buffer</code> and <code>Light_Buffer</code> options have been deprecated. Look <a href="r3_2.html#r3_2_3_3">here</a> for additional details.
+</ol>
+</p>
+<p><strong>Patterns Pigments and Textures</strong></p>
+<p>This category deals with items that are the building blocks of materials and textures and their appearance.</p>
+<p> 
+<ol>
+<li>Added <code><a href="r3_4.html#r3_4_6_3_3_1">diffuse</a></code> backside illumination capability.</li>
+<li>An <em>experimental</em> <a href="r3_4.html#r3_4_6_3_3_4">subsurface scattering</a> feature was added.</li>
+<li>Support for <code><a href="r3_4.html#r3_4_4_1_5">area_light</a></code> diffuse and specular illumination was implemented.</li>
+<li>These list patterns, a warp, and a slope pattern extensions were added:</li>
+<ol TYPE=a>
+<li><code><a href="r3_4.html#r3_4_7_3_1">aoi</a></code> <em>pattern</em></li>
+<li><code><a href="r3_4.html#r3_4_7_1_6">cubic</a></code> <em>pattern</em></li>
+<li><code><a href="r3_4.html#r3_4_7_5_5_7">cubic</a></code> <em>warp</em></li>
+<li><code><a href="r3_4.html#r3_4_7_1_18">pavement</a></code> <em>pattern</em></li>
+<li><code><a href="r3_4.html#r3_4_7_2_6">square</a></code> <em>pattern</em></li>
+<li><code><a href="r3_4.html#r3_4_7_1_28">tiling</a></code> <em>pattern</em></li>
+<li><code><a href="r3_4.html#r3_4_7_2_7">triangular</a></code> <em>pattern</em></li>
+<li><code><a href="r3_4.html#r3_4_7_3_2">slope</a></code> <em>pattern extension</em></li>
+</ol>
+<li>Improvements to <code>iterations</code> and two new <code>exterior</code> types were added. See <a href="r3_4.html#r3_4_7_1_11">Fractal Patterns</a> for more details.</li>
+<li>The finish block now supports the <code><a href="r3_4.html#r3_4_6_3_2">emission</a></code> keyword.</li>
+<li>A <code><a href="r3_4.html#r3_4_3_4">sky_sphere</a></code> layered pigment related behavior change.</li>
+<li>A new <a href="t2_3.html#t2_3_5_2_3">Slope Map Tutorial</a> has been added.</li>
+<li>Re-enabled the <a href="r3_4.html#r3_4_6_3_3_3">crand</a> <code>finish</code> attribute.</li>
+</ol>
+</p>
+<p><strong>Images and Image Related</strong></p>
+<p>Image formats and handling issues are covered in this section.</p>
+<p>
+<ol>
+<li>Get your display gamma correct! See the new <code><a href="t2_3.html#t2_3_4">gamma handling</a></code> tutorial.</li>
+<li>There have been various changes regarding <a href="r3_2.html#r3_2_4_1">output file types</a> these are the highlights:</li>
+<ol TYPE="a">
+<li>cross platform default output file type is PNG</li>
+<li><em>BOTH</em> input and output support for two High Dynamic Range file types has been added</li>
+<li>JPEG default quality and chroma sub-sampling changes</li>
+<li>output file type &quot;s&quot; has been deprecated</li>
+</ol>
+<li>An output file <a href="r3_2.html#r3_2_4_4">dithering</a> feature has been added.</li>
+<li>The <code><a href="r3_4.html#r3_4_7_7_3">interpolate</a></code> option now supports bicubic interpolation.</li>
+<li>Use of the <code><a href="r3_4.html#r3_4_1_4">hf_gray_16</a></code> keyword has been deprecated in the <code>global_settings</code> block.</li>
+<li>A couple of <em>important</em> changes and additions regarding <a href="r3_4.html#r3_4_7_6_4">Alpha Channel</a> usage.  
+<li>Added &quot;out-of-the-box&quot; transparency support for GIF input files.</li>
+</ol>
+</p>
+<p><strong>Language Basics and Directives</strong></p>
+<p>A macro, a few functions and some programming directives completes this summary.</p>
+<p>
+<ol>
+<li>Now you can declare an identifier as <code><a href="r3_3.html#r3_3_2_2_5">deprecated</a></code>.</li>
+<li>Several <em>bitwise</em> <a href="r3_3.html#r3_3_1_6_5">functions</a> were added.</li>
+<li>A string  function <code><a href="r3_3.html#r3_3_1_9_4">datetime()</a></code> has also been added.</li>
+<li>Added a new pre-declared variable <code><a href="r3_3.html#r3_3_1_9_5">input_file_name</a></code>.</li>
+<li>New <a href="r3_3.html#r3_3_1_9_3">string relational operators</a> have been added.</li>
+<li>Added binary <code><a href="r3_3.html#r3_3_2_3_4">#write</a></code> capability, see the <code><a href="r3_4.html#r3_4_9_1_1">ARRAYS_WriteDF3</a></code> macro for usage.</li>
+<li>The <code><a href="r3_3.html#r3_3_2_6_4">#break</a></code> directive behavior has changed.</li>
+<li>An <code>atand</code> function has been added to the <a href="r3_4.html#r3_4_9_1_12">math.inc</a> file.</li>
+<li>The <code><a href="r3_3.html#r3_3_1_6_5">max_extent</a></code> function can now return the pixel resolution of an image map.</li>
+<li>A new <code><a href="r3_3.html#r3_3_2_5">#version</a></code> directive requirement has been added.</li>
+<li>The <code>#if</code> directive now supports an <code><a href="r3_3.html#r3_3_2_6_1">#elseif</a></code> clause.</li>
+<li>A new <code><a href="r3_3.html#r3_3_2_6_3">#for</a></code> loop directive has been added.</li>
+<li>The <a href="r3_2.html#r3_2_4_6">CPU Utilization Histogram</a> feature has been deprecated.</li>
+<li>Added a <code>+GP</code> option. See the section: <a href="r3_2.html#r3_2_7_3">Directing Text Streams to Files</a> for more information.</li>
+</ol>
+</p>
+
+</div>
+<a name="t2_1_5"></a>
+<div class="content-level-h3" contains="Trademarks" id="t2_1_5">
+<h3>2.1.5 Trademarks</h3>
+<p>
+The terms 'POV-Ray', 'Persistence of Vision Ray Tracer', and 'POV-Team'
+are trademarks of Persistence of Vision Raytracer Pty. Ltd. All other trademarks are acknowledged
+as being the property of their respective owners.
+</p>
+
+</div>
+<a name="t2_1_6"></a>
+<div class="content-level-h3" contains="The Early History of POV-Ray" id="t2_1_6">
+<h3>2.1.6 The Early History of POV-Ray</h3>
+<p>Here's how POV-Ray came to be, as described by David Buck:</p>
+
+<p>Back in 1986 or so, I had an Amiga.  A friend who also has an Amiga downloaded the C code for
+ a raytracer for Unix from the Internet and brought it over.  I thought it looked interesting and
+ I ported it to the Amiga and wrote the drivers to display it with Amiga graphics.  The program
+ only rendered untextured spheres with a planar floor in black and white, but I was still impressed
+ by it.  I played with it a bit adding support for color, but I eventually decided that I could do
+ a better job writing a raytracer from scratch, so I scrapped the C program and started my
+ own - DKBTrace had begun.</p>
+
+<p>I decided to start with general quadric surfaces since they could represent spheres, ellipsoids,
+ cylinders, planes, and more.  I worked out the ray-quadric intersection calculations and used some
+ calculus to work out the surface normal to a quadric surface at a point.  For the program structure,
+ I decided to use an object-oriented style since I had learned Smalltalk at university and it fit
+ nicely.  To make modeling more flexible, I added CSG and procedural textures. In the end, I had an
+ interesting little raytracer and I decided to release it as freeware since I was planning to return
+ to university to start my Master's degree and didn't have time to develop a commercial raytracer.
+ Besides, there were already commercial renders for the Amiga that had user interfaces
+ (not just text files) and I felt I couldn't sell it as a commercial product.  I called it DKBTrace
+ and released it to local BBS'es and to the Internet.</p>
+
+<p>DKBTrace was an Amiga-only program, but it attracted quite a lot of interest.  I released several
+ versions of it adding in new features, better primitives, more texturing options, etc.  Eventually
+ I released version 2.01.</p>
+
+<p>Sometime around 1987 or 1988, I was contacted by Aaron Collins.  He had found the C code for
+ DKBTrace and ported it to the PC.  He also added a Phong lighting model and a few more goodies.
+ I was interested in what he had done, so I contacted him to see if he wanted to help develop a new
+ version of the program. This one would be portable across more platforms (at university I had
+ access to Unix workstations). We eventually came up with version 2.12 which was the last version
+ of DKBTrace ever released (1989).</p>
+
+<p>While Aaron and I were working up to version 2.12, there was a group of people on CompuServe
+ who were very excited about DKBTrace and were creating all sorts of neat scenes for it.  They
+ were also expressing frustration that Aaron and I weren't able to add new features into DKBTrace
+ fast enough.  They started talking about building a whole new raytracer from scratch that they
+ could control and add the features they wanted. At that time, I was starting to pursue other areas
+ and was starting to drift away from raytracing. So, I posted a message on CompuServe with the
+ following offer:  We could form a team to develop a new raytracer using DKBTrace as a base.
+ I had three requirements for this team.  The resulting code had to be freeware with the source code
+ freely available, it had to remain portable between different platforms, and it had to have a
+ different name than DKBTrace.</p>  
+
+<p>The name DKBTrace was, of course, based on my initials:  David Kirk Buck (there's some little
+ known trivia for you).  With a package developed by a team of people, it was inappropriate to
+ use my initials.  I was also starting to drift away from raytracing (as I mentioned) and I didn't
+ want people thinking that I was the head of the team forever.  The name that was proposed was
+ &quot;Persistance Of Vision Raytracer&quot; which was shortened to POV-Ray.  It worked in three ways.
+ It was the result of a persistent vision of the developers, it was a reference to the Salvador Dali
+ work which depicted a distorted but realistic world, and the term &quot;persistance of vision&quot; in
+ biology referred to the ability to see an image that was presented briefly - almost an after image.</p>
+
+<p>In 1989, then, DKBTrace 2.12 was officially released and the POV-Ray project had begun. I worked
+ with the team for a few years after that. I was responsible for the Amiga port among other things.
+ Drew Wells was the project leader.  Aaron Collins dropped out of the project around that time as well.
+ Other early members included Chris Young, Steve Anger, Tim Wegner, Dan Farmer, Bill Pulver (IBM drivers),
+ and Alexander Enzmann (quartics and cool math stuff).  Chris Cason joined shortly after (my apologies if
+ I left anyone out - lots of people were involved).  The reference to Robert Skinner in the credits for
+ POV-Ray was because we had a hard time finding a good noise function.  In another raytracer, he had
+ a great noise function written by Robert Skinner, so we asked for and received permission to use it
+ in POV-Ray.</p>
+
+<p>There was so much demand for us to release a new version that we created POV-Ray 0.5 and released it.
+ It was basically an enhanced DKBTrace with a similar grammar but many more features. Eventually, we
+ released POV-Ray 1.0 which had the new grammar and lots of new stuff.  Drew dropped out later and
+ Chris Young took over as project leader.</p>
+
+<p>It was around that time that I started to drift away from the POV-Ray team.  The project had
+ momentum and could continue on without me.  I was getting into different areas (physically based
+ modeling and animation) and no longer had the time to continue with POV-Ray.  Around the release
+ of version 2.0, I left the project and the POV-Ray team developed it to its current state.
+ Chris Cason is now the project leader.</p>
+
+<p>Even though I'm no longer on the POV-Ray development team, I still like to follow its progress.
+ I haven't built my own scene by hand for years now (although I occasionally use Moray). I still
+ enjoy the one thing that drove me back in the DKBTrace days - I love seeing the works of other
+ people who used my software. Even though I can no longer call POV-Ray &quot;my software&quot;, I still
+ enjoy admiring the artwork people create with it.  I'm constantly amazed at what people can do. It
+ was always the feedback from user community that drove me.</p>
+
+<p>David Buck,<br>
+david [at] simberon.com<br><br>
+august 2001</p>
+
+</div>
+
+
+<a name="t2_1_6_1"></a>
+<div class="content-level-h4" contains="The Original Creation Message" id="t2_1_6_1">
+<h4>2.1.6.1 The Original Creation Message</h4>
+<pre>
+11906 S16/Raytraced Images
+   07-Mar-91 18:56:37
+Sb: DKB Development
+Fm: David Buck 70521,1371
+To: All
+
+Greetings all.  This is my first posting to this group, so you'll
+have to excuse me if I make any mistakes in this post.
+
+Finally, after several weeks of waiting, I've received my CompuServe
+account.  It's nice to see that people are enjoying my raytracer
+(DKB, of course). I have noticed, however, that you are less than
+satisfied at the support I've been able to provide &lt;grin&gt;.
+True, I'm the first to admit that the support is poor.  I have 
+little time these days to work on graphics - it takes long enough
+to answer all the questions I get asked on a daily basis from all
+across the world.
+
+My motivation for releasing the raytracer as Freely Distributable
+software in the first place was to allow people to have some fun
+with a program I'd developed for just that purpose.  I don't 
+consider it to be a professional package - I know it's nowhere near
+that good.  I didn't make it shareware, however, because I knew I
+wouldn't have much time for support.  I didn't want the hassles of
+maintaining user lists, sending updates and notices, etc.
+
+There has recently been a proposal in this forum that you write
+your own raytracer to use instead of DKB.  Perhaps I can make that
+prospect a little bit easier.  Suppose we take DKB and use it as a
+base for a completely new system (the name &quot;Renderdog&quot; has
+been tossed around, but I'm not fond of that one &lt;g&gt;). I would
+like to propose the name &quot;Software Taskforce on Animation and
+Rendering&quot; or STAR.  I would imagine that there would be
+several packages developed such as:
+
+ STAR Light  - the raytracer
+ STAR Guider - an animation system
+ STAR Maker - a user interface for StarLight
+
+If you decide to do this, I would like to place a few rules on the
+packages (or at least those developed from DKB):
+
+  - they will remain freely distributable
+  - support and maintenance of this new product will be undertaken
+    by the STAR team (including but not limited to myself)
+  - the programs will remain as portable as possible
+
+What do you think of this proposal?
+
+David Buck
+</pre>
+
+</div>
+<a name="t2_1_6_2"></a>
+<div class="content-level-h4" contains="The Name" id="t2_1_6_2">
+<h4>2.1.6.2 The Name</h4>
+<p>More on how POV-Ray came to its name.</p>
+
+<pre>
+**************************************************************
+from Chris Young, to whom I asked if POV's name was related
+to the title of a sci-fi book I had just found on a flea market.
+**************************************************************
+ 
+Varley is one of my favorite authors and I've owned that book 
+long before POV-Ray existed.  POV-Ray was originally going to be 
+called Starlight or StarLite or something similar but somebody 
+else, I don't know who, said we'd get in trademark trouble over 
+some existing product.  Drew Wells was team leader and he picked 
+Persistence of Vision based on the properties of the human visual 
+system. I also felt there was a double meaning in that POV-Ray 
+was the continuation (or persistance) of David K. Buck's DKB-Trace.  
+I warned Drew about Varley's book but book titles aren't as messy 
+as product names.  Note also that Public Broadcasting System has 
+a documentary series called POV but that stands for Point Of View 
+which is the filmmaking term for hand-held camera, cinema-verite 
+style used in many documentaries.
+ 
+I wanted to take our team name from the Fractint Stone Soup Group 
+and call us the Crystal Soup Group but I got voted down.
+ 
+        Chris Young, POV-Team Coordinator
+</pre>
+
+<pre>
+
+**************************************************************
+from unknown source
+**************************************************************
+ 
+After the recent thread on the starting time of POV-Ray I did
+a search and found this post to this very news group from
+David Buck himself. The message places the birth of the POV-Ray
+project to be in May of 1991. A very historic event!
+ 
+I hope I'm not stepping on toes by re-posting
+it  :-)
+ 
+Harold
+ 
+Sun, 19 Feb 1995 19:14:44 GMT
+(STEERPIKE) says:
+&gt;I had always presumed that Persistance of Vision was a pun on
+&gt;the name of Salvador Dali's painting &quot;The Persistance of
+&gt;Memory&quot;. Is this right, and if not, how did POV-Ray come to 
+&gt; have such a poetic name? :)
+ 
+The POV-Ray project started in May 1991 when I first proposed the
+idea to a group of people on CompuServe.  They liked my DKBTrace
+raytracer but didn't like the fact that I was too slow adding new
+features to it.  They were going to re-write a raytracer from
+scratch, but I suggested that after version 2.12 of DKBTrace, they
+could take the code as is and develop it from there into a new
+raytracer.  The first name was STAR - an acronym for something or
+other.  Then someone in the group came up with &quot;Persistance of
+Vision&quot;.  We liked it because of its reference to Dali (I
+believe the painting was actually called Persistance of Vision - am
+I mistaken?).  Moreover, it seemed to symbolize the team who 
+&quot;Persisted&quot; to achieve their &quot;Vision&quot;.  The 
+third reference was to the phychological effect that seeing an image
+flashed on a screen causes you to retain that image in short term
+memory.  Thus, your memory was a representation of reality but not
+really reality. They all seemed to fit together to make a nice name.
+Early on, we were abbreviating the name to PVRay, but we were
+concerned about a commercial product called PV-Wave.  We agreed to
+change the abbreviation to POV-Ray and standardize on the spelling.
+ 
+&gt;David Buck
+</pre>
+
+</div>
+<a name="t2_1_6_3"></a>
+<div class="content-level-h4" contains="A Historic 'Version History'" id="t2_1_6_3">
+<h4>2.1.6.3 A Historic 'Version History'</h4>
+<p>The version history as it was included in PV-Ray 0.5 BETA. Notice the
+name changes...
+</p>
+
+<pre>
+Persistence of Vision Raytracer Version History
+-------------------------------------------------
+
+ PV-Ray was originally DKBTrace Ver. 2.12 written by David Buck. He 
+donated the rights to his source code so the PV-Team could enhance
+this raytracer as a group project similar to Fractint. The source
+code for PV-Ray will always be freely distributable subject to the
+restrictions in the header files. Thanks David, for your generous
+gift!
+	
+Version 0.02 BETA Release 7/29/91 (as STAR-Light)
+----------------------------------
+ First version is still basically DKBTrace 2.12 with a few new
+ features.
+ 
+ - Materials mapping added by Drew Wells.(see matmap.dat)
+ - ONION &amp; LEOPARD textures added by Scott Taylor.
+ - Time to trace display added by Bill Pulver.
+ - Grayscale display (+g) for IBM-PC's added by Scott Taylor.
+ - Small wood texture bug fixed to create true cylinders.
+ - Verbose now displays more info including file being traced.
+ - Option +vO added to enable old-style terse verbose.
+ - Texture.c broken into smaller modules.
+ - PAINTED1, 2, &amp; 3 added for developers.
+ - BUMPY1, 2, &amp; 3 added for developers.
+  
+PvRay Version 0.5 BETA Release 9/07/91
+----------------------------------
+ Many more changes this time around, including...
+
+- Many enhancements from Alexander Enzmann
+   - Bezier bicubic subpatches
+   - Polynomial surfaces
+   - New mapping types (sphere, etc.)
+   - Sturmian sequences
+   - Clipping shapes
+   - (have I forgotten anything??)
+- Lots of hard work and enhancements by Aaron Collins
+- Height fields by Doug Muir
+- Bump Mapping by Doug Muir and Drew Wells
+- Interpolation by Girish T. Hagan adapted for mapping by Drew Wells
+- # and ; are now ignored. 
+- case_sensitive keywords and commandline option added by Drew Wells
+  &gt; case_sensitive_yes -- All words checked for exact case.
+                             Keywords must be in upper case.
+                             (*Old DKB Style*)
+  &gt; case_sensitive_no  -- Case is ignored for all words.
+  &gt; case_sensitive_opt -- DEFAULT - All words checked for exact
+                             case except keywords. Keywords will be
+                             accepted in upper and/or lower case. 
+  &gt; command line -- /ty = yes, /tn = no, /to = opt
+- cnvdat.c to convert old dat files included with pvsrc.
+- C++ style commenting - // ignore to end of line. 
+  and /* ignore between braces */ nesting not allowed.
+- New default style verbose trace info (+v1) 
+- Old-new style verbose (+v0)
+- Verbose trace info outputs to stderr so that stats can be
+  redirected to file.
+- New stats display outputs to stdout for better redirection.
+- New lighting routines by David Buck.
+- The declared colors Red, Green, and Blue in colors.dat are now
+  CRed, CBlue, CGreen.
+- The declared quadric Sphere in shapes.dat is now QSphere.
+- Textures.dat has been cleaned up and commented.
+</pre>
+
+</div>
+<a name="t2_1_7"></a>
+<div class="content-level-h3" contains="How Do I Begin?" id="t2_1_7">
+<h3>2.1.7 How Do I Begin?</h3>
+  <p>POV-Ray scenes are described in a special text language called a
+  <a href="r3_3.html#r3_3">scene description language</a>.
+  You will type commands into a plain  text file and POV-Ray will read it
+  to create the image. The process of running POV-Ray is a little different
+  on each platform or operating system. You should read the platform-specific
+  documentation as suggested earlier in this introduction. It will tell you how
+  to command POV-Ray to turn your text scene description into an image. You should
+  try rendering several sample images before attempting to create your own.</p>
+<p>
+  Once you know how to run POV-Ray on your computer and your operating system,
+  you can proceed with the tutorial which follows. The tutorial explains how to
+  describe the scene using the POV-Ray language.</p>
+
+</div>
+<a name="t2_1_8"></a>
+<div class="content-level-h3" contains="Notation and Basic Assumptions" id="t2_1_8">
+<h3>2.1.8 Notation and Basic Assumptions</h3>
+<p>Throughout the tutorial and reference books, a consistent notation is used to mark keywords of the scene description language, command line switches, INI file keywords and file names.</p>
+<p><strong>For example:</strong></p>
+<p>Scene description language keywords and command-line switches:</p>
+<ul class="index">
+  <li><code>sphere</code>, <code>4.0 * sin(45.0)</code></li>
+  <li><code>+W640 +H480</code></li>
+</ul>
+
+<p>Syntax, optional syntax, multiple syntax, and zero or more syntax items allowed respectively:</p>
+<ul class="index">
+  <li><code>SYNTAX_ITEM</code></li>
+  <li><code>[SYNTAX_ITEM]</code></li>
+  <li><code>SYNTAX_ITEM...</code></li>
+  <li><code>[SYNTAX_ITEM...]</code></li>
+</ul>
+
+<p>A float value or expression, and a vector value or expression:</p>
+<ul class="index">
+  <li><code>Value_1</code></li>
+  <li><code>&lt;Value_1&gt;</code></li>
+</ul>
+
+<p>Choices are represented by a vertical bar between syntax items:</p>
+<ul class="index">
+  <li><code>ITEM1 | ITEM2 | ITEM3</code></li>
+</ul>
+
+<p>Certain lists and arrays also require square braces as part of the language rather than the language description:</p>
+<ul class="index">
+  <li><code>[ ITEM ]</code></li>
+</ul>
+
+<p class="Note"><strong>Note:</strong> POV-Ray is available as a command-line program on some platforms and as a GUI on others. Some of these platforms use folders to store files while others use directories. Some separate the folders and sub-folders with a slash character (<code>/</code>), back-slash character (<code>\</code>), or others. We have tried to make this documentation as generic as possible but sometimes we have to refer to folders, files, options etc., and rather than try to represent all possible combinations
+we sometimes simplify the documentation by referring to a hypothetical 'standard installation' of POV-Ray upon a Microsoft Windows computer.
+</p>
+<p> Here are some assumptions to be found in the documentation:</p>
+<ol>
+<li>You installed POV-Ray in the default location (on Windows, binaries in <code>c:\Program Files\POV-Ray\v3.7</code> and include/scene files in <code>My Documents\POV-Ray\v3.7</code>).
+If we say 'include files are stored in the <code>include</code> directory', we mean the directory called 'include' located immediately within the folder which was used for documents (in the above case, it would be <code>My Documents\POV-Ray\v3.7\include</code>). We assume you can translate that to something like <code>/usr/local/share/povray-3.7/include</code> (for Linux) or whatever is appropriate for your platform, operating system and personal installation.
+<li> POV-Ray uses INI files and/or command-line switches (if available) to choose options in all versions, but some platforms (e.g. Windows) also use dialog boxes or menu choices to set options. We will describe options assuming you are using switches or INI files when describing what the options do, as it is consistent across all platforms (all GUI versions of POV-Ray also provide a means of accepting command-line options and reading INI files from within the GUI - generally speaking, the menus and dialogs just provide
+an easier means of doing the same thing).
+<li>You may be reading this documentation using an operating-system specific help program, web browser, physical printout, PDF viewer, or text editor. We assume you know how to get around in which ever medium you are using. If we say &quot;See the chapter on <a href="t2_2.html#t2_2_8">Setting POV-Ray Options</a>&quot; we assume you can click, scroll, browse, flip pages or whatever to get there.</ol>
+
+</div>
+
+</div>
+
+</div>
+</body>
+</html>

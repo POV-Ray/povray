@@ -1,0 +1,139 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+
+<!--  This file copyright Persistence of Vision Raytracer Pty. Ltd. 2009-2011  -->
+
+<html lang="en">
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=windows-1252">
+<title>Unix Section 2</title>
+<link rel="StyleSheet" href="povray37.css" type="text/css">
+<link rel="shortcut icon" href="favicon.ico">
+
+<!--  NOTE: In order to help users find information about POV-Ray using web      -->
+<!--  search engines, we ask that you *not* let them index documentation         -->
+<!--  mirrors because effectively, when searching, users will get hundreds of    -->
+<!--  results containing the same information! For this reason, these meta tags  -->
+<!--  below disable archiving of this page by search engines.                    -->
+
+<meta name="robots" content="noarchive">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="expires" content="0">
+</head>
+<body>
+
+<div class="Page">
+
+<!-- NavPanel Begin -->
+<div class="NavPanel">
+<table class="NavTable">
+<tr>
+  <td class="FixedPanelHeading"><a title="1.2" href="#u1_2">Features</a></td>
+</tr>
+<tr>
+  <td><div class="divh2"><strong><a title="1.2.1" href="#u1_2_1">New Features</a></strong></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><strong><a title="1.2.2" href="#u1_2_2">Display Options</a></strong></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><strong><a title="1.2.3" href="#u1_2_3">Benchmark Mode</a></strong></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><strong><a title="1.2.4" href="#u1_2_4">Sample scene render scripts</a></strong></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><strong><a title="1.2.5" href="#u1_2_5">KDE Integration</a></strong></div></td>
+</tr>
+<tr>
+  <td><div class="divh1">&nbsp;</div></td>
+</tr>
+<tr>
+  <td><div class="divh1">&nbsp;</div></td>
+</tr>
+</table>
+</div>
+<!-- NavPanel End -->
+
+<div class="Content">
+<table class="HeaderFooter" width="100%">
+<tr>
+  <td colspan=5 align="left" class="HeaderFooter">
+    POV-Ray for Unix <strong class="HeaderFooter">version 3.7</strong>
+  </td>
+</tr>
+<tr >
+  <td colspan=5>
+    <hr align="right" width="70%">
+  </td>
+</tr>
+<tr>
+  <td width="30%"></td>
+  <td class="NavBar"><a href="index.html" title="The Front Door">Home</a></td>
+  <td class="NavBar"><a href="u1_0.html" title="Unix Table of Contents">POV-Ray for Unix</a></td>
+  <td class="NavBar"><a href="t2_0.html" title="Tutorial Table of Contents">POV-Ray Tutorial</a></td>
+  <td class="NavBar"><a href="r3_0.html" title="Reference Table of Contents">POV-Ray Reference</a></td>
+</tr>
+</table>
+
+<a name="u1_2"></a>
+<div class="content-level-h2" contains="Features" id="u1_2">
+<h2>1.2 Features</h2>
+<p>This section covers version 3.7 changes and new features that apply to POV-Ray for Unix. See the section <a href="t2_1.html#t2_1_4_1">Changes and New Features Summary</a> for information about <em>non-platform</em> specific changes.</p>
+</div>
+<a name="u1_2_1"></a>
+<div class="content-level-h3" contains="New Features" id="u1_2_1">
+<h3>1.2.1 New Features</h3>
+<ol>
+<li>Reworked the built-in <code>--benchmark</code></li>
+<ul>
+<li>The built-in benchmark now accepts the <code>+L&lt;path&gt;</code> command-line option</li>
+<li>and now <em>ONLY</em> reads the built-in INI file.</li>
+<li>It also accepts <code>+wt</code> to set the number of work threads</li>
+<li>and now also accepts the <code>--version</code> parameter</li>
+</ul>
+<li> Added preliminary Linux support for these two features:
+<ul>
+<li> CPU timer; might return incorrect results depending on the platform.</li>
+<li> signal catching when aborting a render by hitting Ctrl+C</li>
+</ul>
+<li> Added support for the <code>+P</code> option  to allow <em>pause when done</em>.</li>
+<li> Unix default file gamma changed from from 1.0 to 2.2.</li>
+</ol>
+
+</div>
+<a name="u1_2_2"></a>
+<div class="content-level-h3" contains="Display Options" id="u1_2_2">
+<h3>1.2.2 Display Options</h3>
+<p>The Unix version now has a single binary which supports display using the X Window System, or using the SVGA library with the console on <em>GNU/Linux systems only</em>, or via text graphics otherwise.  If the command-line options or INI files turn on display, the following heuristic is used to determine what kind of display should be used.  If the DISPLAY environment variable is set, the X Window display is used.  Otherwise, if the user is on the console, and has permission to do so, SVGAlib is used.  Otherwise, text graphics are used.</p>
+
+<p>Text graphics display a crude 75x24 ASCII version of the image which can be useful none the less to monitor the render progress on a text terminal. Using text graphics and the Verbose <code>+v</code> option simultaneously will not work very well.</p> 
+
+<p class="Note"><strong>Note:</strong> See the section <a href="u1_7.html#u1_7_1">Known Bugs</a> for more information about a problem with the X11 windows system.</p>
+
+</div>
+<a name="u1_2_3"></a>
+<div class="content-level-h3" contains="Benchmark Mode" id="u1_2_3">
+<h3>1.2.3 Benchmark Mode</h3>
+<p>POV-Ray 3.7 for Unix provides a new mode to render a built-in version of the standard POV-Ray benchmark scene. See the <a href="u1_6.html#u1_6_2">Benchmark Rendering Mode documentation</a> for details.</p>
+
+</div>
+<a name="u1_2_4"></a>
+<div class="content-level-h3" contains="Sample scene render scripts" id="u1_2_4">
+<h3>1.2.4 Sample scene render scripts</h3>
+<p>POV-Ray 3.7 includes a set of shell scripts to automatically render all the samples coming with POV-Ray and that generate HTML files to easily browse the sample scenes.  See <a href="u1_3.html#u1_3_6">Rendering the Sample Scenes</a> for more information.</p>
+
+</div>
+<a name="u1_2_5"></a>
+<div class="content-level-h3" contains="KDE Integration" id="u1_2_5">
+<h3>1.2.5 KDE Integration</h3>
+<p>The binary package for x86-Linux (<code>povlinux.tgz</code>) comes with an install script that generates some useful entries in the <a href="http://www.kde.org/">KDE</a> panel for convenient access to the POV-Ray documentation and configuration files.</p>
+
+<p>The generic Unix source distribution also comes with the <code>kde_install.sh</code> script to perform the same task.</p>
+
+</div>
+
+</div>
+
+</div>
+</body>
+</html>

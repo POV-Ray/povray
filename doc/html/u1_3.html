@@ -1,0 +1,285 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+
+<!--  This file copyright Persistence of Vision Raytracer Pty. Ltd. 2009-2011  -->
+
+<html lang="en">
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=windows-1252">
+<title>Unix Section 3</title>
+<link rel="StyleSheet" href="povray37.css" type="text/css">
+<link rel="shortcut icon" href="favicon.ico">
+
+<!--  NOTE: In order to help users find information about POV-Ray using web      -->
+<!--  search engines, we ask that you *not* let them index documentation         -->
+<!--  mirrors because effectively, when searching, users will get hundreds of    -->
+<!--  results containing the same information! For this reason, these meta tags  -->
+<!--  below disable archiving of this page by search engines.                    -->
+
+<meta name="robots" content="noarchive">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="expires" content="0">
+</head>
+<body>
+
+<div class="Page">
+
+<!-- NavPanel Begin -->
+<div class="NavPanel">
+<table class="NavTable">
+<tr>
+  <td class="FixedPanelHeading"><a title="1.3" href="#u1_3">Getting Started</a></td>
+</tr>
+<tr>
+  <td><div class="divh2"><strong><a title="1.3.1" href="#u1_3_1">Available distributions</a></strong></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><strong><a title="1.3.2" href="#u1_3_2">Configuration</a></strong></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a title="1.3.2.1" href="#u1_3_2_1">The I/O Restrictions configuration file</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a title="1.3.2.2" href="#u1_3_2_2">The main POV-Ray INI file</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><strong><a title="1.3.3" href="#u1_3_3">Starting a Render Job</a></strong></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a title="1.3.3.1" href="#u1_3_3_1">X Window display</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a title="1.3.3.2" href="#u1_3_3_2">SVGAlib display</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a title="1.3.3.3" href="#u1_3_3_3">Output file formats</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><strong><a title="1.3.4" href="#u1_3_4">Interrupting POV-Ray</a></strong></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><strong><a title="1.3.5" href="#u1_3_5">Tutorials</a></strong></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><strong><a title="1.3.6" href="#u1_3_6">Rendering the Sample Scenes</a></strong></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><strong><a title="1.3.7" href="#u1_3_7">POV-Ray for Unix Tips</a></strong></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a title="1.3.7.1" href="#u1_3_7_1">Automated execution</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a title="1.3.7.2" href="#u1_3_7_2">Post-processing Images</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh1">&nbsp;</div></td>
+</tr>
+<tr>
+  <td><div class="divh1">&nbsp;</div></td>
+</tr>
+</table>
+</div>
+<!-- NavPanel End -->
+
+<div class="Content">
+<table class="HeaderFooter" width="100%">
+<tr>
+  <td colspan=5 align="left" class="HeaderFooter">
+    POV-Ray for Unix <strong class="HeaderFooter">version 3.7</strong>
+  </td>
+</tr>
+<tr >
+  <td colspan=5>
+    <hr align="right" width="70%">
+  </td>
+</tr>
+<tr>
+  <td width="30%"></td>
+  <td class="NavBar"><a href="index.html" title="The Front Door">Home</a></td>
+  <td class="NavBar"><a href="u1_0.html" title="Unix Table of Contents">POV-Ray for Unix</a></td>
+  <td class="NavBar"><a href="t2_0.html" title="Tutorial Table of Contents">POV-Ray Tutorial</a></td>
+  <td class="NavBar"><a href="r3_0.html" title="Reference Table of Contents">POV-Ray Reference</a></td>
+</tr>
+</table>
+
+<a name="u1_3"></a>
+<div class="content-level-h2" contains="Getting Started" id="u1_3">
+<h2>1.3 Getting Started</h2>
+<p>This section will help new users get started with POV-Ray for Unix.</p>
+
+</div>
+<a name="u1_3_1"></a>
+<div class="content-level-h3" contains="Available distributions" id="u1_3_1">
+<h3>1.3.1 Available distributions</h3>
+<p>The <em>official</em> distribution for version 3.7 of POV-Ray for Unix is a source code <em>only</em> release. This package contains all the source files and Makefiles required for building POV-Ray.  Building the program from source should work on most Unix/Linux systems. The package uses a configuration mechanism to detect the appropriate settings needed to build POV-Ray on your platform. Since all the required support libraries are <em>NOT</em> included in the package, you need to make sure you have an adequate build environment.</p>
+
+<p>The distribution package is available for download from the POV-Ray <a href="http://www.povray.org/">website</a>. See the INSTALL file in the source package for more details.</p>
+
+</div>
+<a name="u1_3_2"></a>
+<div class="content-level-h3" contains="Configuration" id="u1_3_2">
+<h3>1.3.2 Configuration</h3>
+<p>All official versions of POV-Ray for Unix come with procedures for correctly installing and configuring POV-Ray.  These explanations are for reference.</p>
+
+</div>
+<a name="u1_3_2_1"></a>
+<div class="content-level-h4" contains="The I/O Restrictions configuration file" id="u1_3_2_1">
+<h4>1.3.2.1 The I/O Restrictions configuration file</h4>
+<p>When POV-Ray starts it reads the configuration for the I/O Restriction feature from the <code>povray.conf</code> files.  See the <a href="u1_4.html#u1_4">I/O Restrictions Documentation</a> for a description of these files.</p>
+
+</div>
+<a name="u1_3_2_2"></a>
+<div class="content-level-h4" contains="The main POV-Ray INI file" id="u1_3_2_2">
+<h4>1.3.2.2 The main POV-Ray INI file</h4>
+<p>When starting, POV-Ray for UNIX searches for an INI file containing default configuration options.  The details can be found in the <a href="t2_2.html#t2_2_8_2">INI File Documentation</a>.</p>
+
+</div>
+<a name="u1_3_3"></a>
+<div class="content-level-h3" contains="Starting a Render Job" id="u1_3_3">
+<h3>1.3.3 Starting a Render Job</h3>
+<p>Starting POV-Ray rendering any scene file is as simple as running <code>povray</code> from a command-line with the scene file name as an argument.  This will work with either a POV file or an INI file (as long as it has an associated POV file). See <a href="u1_5.html#u1_5">Understanding File Types</a>. The scene is rendered with the current POV-Ray 3 options (see
+<a href="u1_6.html#u1_6">Understanding POV-Ray Options</a>).</p>
+
+<p class="Note"><strong>Note:</strong> One of the more common errors new users make is turning off the display option. The Display option <code>+d</code> is ON by default. If you turn this OFF in the INI file or on the command
+line, POV-Ray will not display the file as you render.</p>
+
+<p>Please also note that POV-Ray for Unix will write the output file to a .png by default. There is no way to 'save the render window' after rendering is completed. If you turned file output off before starting the render, and change your mind, you will have to start the rendering all over again. We recommend that you just leave file output on all the time.</p>
+
+</div>
+<a name="u1_3_3_1"></a>
+<div class="content-level-h4" contains="X Window display" id="u1_3_3_1">
+<h4>1.3.3.1 X Window display</h4>
+<p>When the X Window display is used, the rendered image is displayed in a graphics window. During rendering, the window will be updated after every scanline has been rendered, or sooner if the rendering is taking a long time.  To update it sooner you can click any mouse button in the window or press (almost) any key.  Pressing <code>&lt;CTRL-R&gt;</code> or <code>&lt;CTRL-L&gt;</code> during rendering will refresh the whole screen.  If you have the <code>Exit_Enable</code> or <code>+X</code> flag set, pressing 'q' or 'Q' at any time during the rendering will stop POV-Ray rendering and exit.  The rendering will pause when complete if the <code>Pause_When_Done</code> or <code>+P</code> flag is set.  To exit at this point, press the 'q' or 'Q' key or click any mouse button in the window.</p>
+
+<p>POV-Ray 3.7 includes a color icon in the program if it was compiled with libXpm (which is available on most platforms where the X Window System is installed). If this icon is used for the render view window depends on the window manager
+being used (KDE, Gnome, fvwm, or ...). POV-Ray also comes with a separate color icon <code>xpovicon.xpm</code>
+for use with the window managers that can use external icons.  For instance, to have fvwm use this icon, copy the icon file to one of the directories pointed to by PixmapPath (or ImagePath) which is defined in your <code>$HOME/.fvwmrc</code>.  Then, add the following line in <code>$HOME/.fvwmrc</code>:</p>
+
+<pre>Style &quot;Povray&quot; Icon xpovicon.xpm</pre>
+
+<p>and re-start the X Window server, re-starting fvwm will not be enough. Using this icon with another window manager may use a different procedure.</p>
+
+<p>Documentation of the special command line options to configure the X Window display can be found in <a href="u1_6.html#u1_6_1">Special Command-Line Options</a>.</p>
+
+</div>
+<a name="u1_3_3_2"></a>
+<div class="content-level-h4" contains="SVGAlib display" id="u1_3_3_2">
+<h4>1.3.3.2 SVGAlib display</h4>
+<p>For GNU/Linux systems that don't have the X Window System installed, or for those Linux users who prefer to run on the console, it is possible to use the SVGA library to display directly to the screen.  For SVGAlib display, the <code>povray</code> binary must be installed as a setuid root executable. If POV-Ray does not use SVGAlib display, first try as root:</p>
+
+<pre>
+chown root.root povray
+chmod 4755 povray
+</pre>
+
+<p class="Note"><strong>Note:</strong> Doing this may have serious security implications.  Running POV-Ray as root or through 'sudo' might be a better idea.</p>
+
+<p>If it still doesn't work then make sure SVGAlib is installed on your machine and works properly.  Anything that can at least use the 320x200x256 mode (regular VGA) should be fine, although modes up to 1280x1024x16M are possible.  If you do not have root privileges or can't have the system admin install POV-Ray, then you must use the X Window or text display which do not require any special system privileges to run.  If you are using a display resolution that is lower than what you are rendering, the display will be scaled to fit as much of the viewing window as possible.</p>
+
+</div>
+<a name="u1_3_3_3"></a>
+<div class="content-level-h4" contains="Output file formats" id="u1_3_3_3">
+<h4>1.3.3.3 Output file formats</h4>
+<p>The default output file format of POV-Ray for Unix is PNG, or <code>+fn</code>.</p>
+<p>This can be changed at runtime by setting the <code>Output_File_Type</code> or <code>+fx</code> option.</p> <p>Alternately the default format can be changed at compile time by changing <code>DEFAULT_OUTPUT_FORMAT</code> in the <code>syspovconfig.h</code> file located in the <code>~vfe/unix</code> directory of the source code distribution.</p>
+
+<p>Other convenient formats on Unix systems might be PPM <code>+fp</code> and TGA <code>+ft</code>.</p>
+<p>For more information about output file formats see <a href="r3_2.html#r3_2_4">File Output Options</a>.</p>
+
+<p> If you are generating histogram files (See <a href="r3_2.html#r3_2_4_6">CPU Utilization Histogram</a>) in the CSV format (comma separated values), then the units of time are in tens of microseconds (10 x 10<sup>-6</sup> s), and each grid block can store times up to 12 hours.</p>
+
+</div>
+<a name="u1_3_4"></a>
+<div class="content-level-h3" contains="Interrupting POV-Ray" id="u1_3_4">
+<h3>1.3.4 Interrupting POV-Ray</h3>
+<p>To interrupt a rendering in progress, you can use CTRL-C (SIGINT), which will allow POV-Ray to finish writing out any rendered data before it quits.  When graphics display mode is used, you can also press the 'q' or 'Q' keys in the rendering preview window to interrupt the trace if the <code>Test_Abort</code> or <code>+X</code> flag is set.</p>
+
+</div>
+<a name="u1_3_5"></a>
+<div class="content-level-h3" contains="Tutorials" id="u1_3_5">
+<h3>1.3.5 Tutorials</h3>
+<p>There is a comprehensive <a href="t2_2.html#t2_2">beginner's tutorial</a> included in this help file. It relates to the use of POV-Ray in general, on all platforms, not only Unix, so we recommend that you read the rest of section 1 first before attempting to go any further, as section 1 tells you how to use the interface of POV-Ray for Unix itself. The more ambitious may like to check out the <a href="t2_3.html#t2_3">advanced features</a> section.</p>
+
+</div>
+<a name="u1_3_6"></a>
+<div class="content-level-h3" contains="Rendering the Sample Scenes" id="u1_3_6">
+<h3>1.3.6 Rendering the Sample Scenes</h3>
+<p>POV-Ray for Unix comes with a set of shell scripts to automatically render the sample scenes coming with POV-Ray.</p>
+
+<p>These shell scripts are usually installed in <code>/usr/local/share/povray-3.7/scripts</code>.  They require a bash 
+compatible shell.  There are three scripts that are supposed to be called by the user.</p>
+
+<ul>
+<li><code>allscene.sh</code>:
+<p>renders all stills.  The syntax is:</p>
+<pre>allscene.sh [log] [all] [-d scene_directory] [-o output_directory] [-h html_file]</pre>
+<p>If <code>html_file</code> is specified a HTML listing of the rendered scenes is generated. If <a href="http://www.imagemagick.org/">ImageMagick</a> is installed the listing will also contain thumbnails of the rendered images.
+</p>
+
+<li><code>allanim.sh</code>:
+<p>renders all animations.  The syntax is:</p>
+<pre>allanim.sh [log] [-d scene_directory] [-o output_directory] [-h html_file]</pre>
+<p>If <a href="http://ffmpeg.org/">ffmpeg</a> is installed the script will compile mpeg files from the rendered animations.</p>
+
+<li><code>portfolio.sh</code>:
+<p>renders the portfolio.  The syntax is:</p>
+<pre>portfolio.sh [log] [-d scene_directory] [-o output_directory]</pre>
+<p>The portfolio is a collection of images illustrating the POV-Ray features and include files coming with the package.</p>
+</ul>
+
+<p>If the option <code>log</code> is specified, a log file with the complete text output from POV-Ray is written to filename <code>log.txt</code></p>
+
+<p>If <code>scene_directory</code> is specified, the sample scenes in this directory are rendered, otherwise the scene directory is determined form the main povray ini file, usually <code>/usr/local/share/povray-3.7/scenes</code>.</p>
+
+<p>If <code>output_directory</code> is specified, all images are written to this directory; if it is not specified the images are written into the scene file directories.  If the directories are not writable, the images are written in the current directory.  All other files (html files, thumbnails) are written here as well.</p>
+
+<p>To determine the correct render options the scripts analyze the beginning of the scene files.  They search for a comment of the form:</p>
+
+<pre>// -w320 -h240 +a0.3</pre>
+
+<p>in the first 50 lines of the scene.  The animation script possibly also uses an INI  file with the same basename as the scene file.  The <code>allscene.sh</code> has the additional <code>all</code> option which <em>if specified</em> renders also scenes without such an options comment (using default options then).</p>
+
+</div>
+<a name="u1_3_7"></a>
+<div class="content-level-h3" contains="POV-Ray for Unix Tips" id="u1_3_7">
+<h3>1.3.7 POV-Ray for Unix Tips</h3>
+
+
+</div>
+<a name="u1_3_7_1"></a>
+<div class="content-level-h4" contains="Automated execution" id="u1_3_7_1">
+<h4>1.3.7.1 Automated execution</h4>
+<p>POV-Ray for Unix is well suited for automated execution, for example, for rendering diagrams displaying statistical data on a regular basis or similar things.</p>
+
+<p>POV-Ray can also write its image output directly to stdout.  Therefore the image data can be piped in another program for further processing.  To do this the special output filename '-' needs to be specified.  For instance:</p>
+
+<pre>
+povray -iscene.pov +fp -o- | cjpeg &gt; scene.jpg
+</pre>
+
+<p>will pass the image data to the <code>cjpeg</code> utility which writes the image in the JPEG format.</p>
+
+<p>The text output of POV-Ray is always written to stderr, it can be redirected to a file with (using a Bourne-compatible shell):</p>
+
+<pre>
+povray [Options] 2&gt; log.txt
+</pre>
+
+<p>See also <a href="r3_2.html#r3_2_7_3">Directing Text Streams to Files</a>.</p>
+
+<p>For remote execution of POV-Ray, as for example in a rendering service on the web, make sure you read and comply with the [[Documentation:Tutorial Section 5#POV-Ray User License|POV-Ray Legal Document]].</p>
+
+</div>
+<a name="u1_3_7_2"></a>
+<div class="content-level-h4" contains="Post-processing Images" id="u1_3_7_2">
+<h4>1.3.7.2 Post-processing Images</h4>
+<p>For Unix systems, the PBM utilities (<a href="http://www.acme.com/software/pbmplus">PBMPLUS</a>, <a href="http://netpbm.sourceforge.net">NetPBM</a>) and <a href="http://www.imagemagick.org">ImageMagick</a> are an excellent choice for post-processing utilities, especially if you only have a command-line interface to Unix.</p>
+
+
+</div>
+
+</div>
+
+</div>
+</body>
+</html>

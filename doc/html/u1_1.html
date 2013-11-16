@@ -1,0 +1,239 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+
+<!--  This file copyright Persistence of Vision Raytracer Pty. Ltd. 2009-2011  -->
+
+<html lang="en">
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=windows-1252">
+<title>Unix Section 1</title>
+<link rel="StyleSheet" href="povray37.css" type="text/css">
+<link rel="shortcut icon" href="favicon.ico">
+
+<!--  NOTE: In order to help users find information about POV-Ray using web      -->
+<!--  search engines, we ask that you *not* let them index documentation         -->
+<!--  mirrors because effectively, when searching, users will get hundreds of    -->
+<!--  results containing the same information! For this reason, these meta tags  -->
+<!--  below disable archiving of this page by search engines.                    -->
+
+<meta name="robots" content="noarchive">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="expires" content="0">
+</head>
+<body>
+
+<div class="Page">
+
+<!-- NavPanel Begin -->
+<div class="NavPanel">
+<table class="NavTable">
+<tr>
+  <td class="FixedPanelHeading"><a title="1.1" href="#u1_1">Introduction</a></td>
+</tr>
+<tr>
+  <td><div class="divh2"><strong><a title="1.1.1" href="#u1_1_1">What is POV-Ray?</a></strong></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><strong><a title="1.1.2" href="#u1_1_2">What is POV-Ray for Unix?</a></strong></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><strong><a title="1.1.3" href="#u1_1_3">... And What Is It Not?</a></strong></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><strong><a title="1.1.4" href="#u1_1_4">Who Can Use POV-Ray for Unix?</a></strong></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><strong><a title="1.1.5" href="#u1_1_5">Spelling</a></strong></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><strong><a title="1.1.6" href="#u1_1_6">Reporting Bugs</a></strong></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><strong><a title="1.1.7" href="#u1_1_7">Trademarks</a></strong></div></td>
+</tr>
+<tr>
+  <td><div class="divh1">&nbsp;</div></td>
+</tr>
+<tr>
+  <td><div class="divh1">&nbsp;</div></td>
+</tr>
+</table>
+</div>
+<!-- NavPanel End -->
+
+<div class="Content">
+<table class="HeaderFooter" width="100%">
+<tr>
+  <td colspan=5 align="left" class="HeaderFooter">
+    POV-Ray for Unix <strong class="HeaderFooter">version 3.7</strong>
+  </td>
+</tr>
+<tr >
+  <td colspan=5>
+    <hr align="right" width="70%">
+  </td>
+</tr>
+<tr>
+  <td width="30%"></td>
+  <td class="NavBar"><a href="index.html" title="The Front Door">Home</a></td>
+  <td class="NavBar"><a href="u1_0.html" title="Unix Table of Contents">POV-Ray for Unix</a></td>
+  <td class="NavBar"><a href="t2_0.html" title="Tutorial Table of Contents">POV-Ray Tutorial</a></td>
+  <td class="NavBar"><a href="r3_0.html" title="Reference Table of Contents">POV-Ray Reference</a></td>
+</tr>
+</table>
+
+<a name="u1_1"></a>
+<div class="content-level-h2" contains="Introduction" id="u1_1">
+<h2>1.1 Introduction</h2>
+<p>
+This section provides information on how to use the Unix version
+of the Persistence of Vision Raytracer&trade;.
+</p>
+
+<p>
+Before we start we'll have a brief discussion of just what this program <em>is</em>, and
+what it <em>does</em>.
+</p>
+</div>
+<a name="u1_1_1"></a>
+<div class="content-level-h3" contains="What is POV-Ray?" id="u1_1_1">
+<h3>1.1.1 What is POV-Ray?</h3>
+<p>
+POV-Ray&trade; is short for the Persistence of Vision Raytracer&trade;, a tool for producing
+high-quality computer graphics. POV-Ray is Free Software (as per the definition of the Free
+Software Foundation) as its source code is licensed under the
+<a href="http://www.gnu.org/licenses/agpl-3.0.html">Affero General Public License</a> (AGPL).
+</p>
+<p>
+Without a doubt, POV-Ray is the worlds most popular raytracer. From our website alone we see
+several hundred thousand downloads per year, and this of course doesn't count the copies that are
+obtained from our mirror sites, other internet sites, on CD-ROM, or from persons sharing their
+copies.
+</p>
+<p>
+The fact that it is free helps a lot in this area, of course, but there's more to it than that.
+There are quite a few other free raytracers and renderers available. What makes this program
+different ?
+</p>
+<p>
+The answers are too numerous to detail in full here. Suffice it to say that POV-Ray has the
+right balance of power and versatility to satisfy extremely experienced and competent users,
+while at the same time not being so intimidating as to completely scare new users off.
+</p>
+<p>
+Of course, the most important factor is image quality, and in the right hands, POV-Ray has it.
+We, the developers, have seen images that were rendered using our software that we at first
+thought were photographs - they were that realistic.</p>
+<p class="Note"><strong>Note:</strong> Photo-realism is an advanced skill; one that takes some practice to develop.</p>
+
+</div>
+<a name="u1_1_2"></a>
+<div class="content-level-h3" contains="What is POV-Ray for Unix?" id="u1_1_2">
+<h3>1.1.2 What is POV-Ray for Unix?</h3>
+<p>
+POV-Ray for Unix is essentially a version of the POV-Ray rendering engine prepared
+for running on a Unix or Unix-like operating system (such as GNU/Linux).  It contains
+all the features of POV-Ray described in chapters 2 and 3 of the documentation, plus
+a few others specific to Unix and GNU/Linux systems.  These additional features do not
+affect the core rendering code.  They only make the program suitable for running
+under an Unix-based system, and provide the user with Unix-specific displaying
+capabilities.  For instance, POV-Ray for Unix can use the X Window System to display
+the image it is rendering.  On GNU/Linux machines, it can also display the image
+directly on the console screen using the SVGA library.
+</p>
+<p>
+POV-Ray for Unix uses the same scheme as the other supported platforms to create
+ray-traced images.  The POV-Ray input is platform-independant, as it is using
+text files (POV-Ray scripts) to describe the scene: camera, lights, and various
+objects.  An extensive discussion of the
+<a href="r3_3.html#r3_3">POV-Ray Scene Description Language</a>
+can be found elsewhere in this documentation.
+</p>
+
+</div>
+<a name="u1_1_3"></a>
+<div class="content-level-h3" contains="... And What Is It Not?" id="u1_1_3">
+<h3>1.1.3 ... And What Is It Not?</h3>
+<p>
+POV-Ray for Unix is not a modeler. It will not let you design scenes graphically
+on-screen. There are several shareware and freeware programs available for this purpose. To
+write or modify POV-Ray scenes you just edit the actual text file containing the commands.
+</p>
+<p>
+New users might be surprised to learn that, although this <em>sounds</em> primitive, it is in
+fact one of the things that gives POV-Ray so much power and flexibility. There are many other
+rendering programs that give you a point-and-click interface, but when it comes down to absolute
+control of your scene, it's hard to beat a text-based scene description language (even though
+it's harder for some to learn).
+</p>
+
+</div>
+<a name="u1_1_4"></a>
+<div class="content-level-h3" contains="Who Can Use POV-Ray for Unix?" id="u1_1_4">
+<h3>1.1.4 Who Can Use POV-Ray for Unix?</h3>
+<p>
+Almost anyone can use POV-Ray for Unix. If you have never seen a ray tracing program
+before, you can have great fun just rendering the sample scenes and animations installed
+together with POV-Ray for Unix. Once you have studied some scene files and spent a little
+bit of time reading this documentation, you can start putting basic scene files together.
+</p>
+<p>
+Remember, though, that you do need to invest some time getting to know the program. For
+instance, you do not have to worry about most of the POV-Ray settings at first, but some of
+them are critical. Ignore them and POV-Ray for Unix may not do what you expect. The default
+settings have been selected so as to be satisfactory in the large majority of cases, but
+sometimes they will not give you what you want. Don't give up. The solution is bound to be a
+simple one, as long as you take the time to read the documentation. Investing a little bit of
+time getting to know the program will pay off - guaranteed!
+</p>
+<p>
+As for experienced POV-Ray users, you will find that running POV-Ray in a Unix environment
+makes life much easier.  Working under Unix means you can use editors and other powerful tools
+with which you may already be quite familiar.  POV-Ray modes exist for popular text editors
+such as Emacs, and these provide many of the features found in the POV-Ray GUI interface on
+other platforms.
+</p>
+
+</div>
+<a name="u1_1_5"></a>
+<div class="content-level-h3" contains="Spelling" id="u1_1_5">
+<h3>1.1.5 Spelling</h3>
+<p>
+Some US Residents have commented on the spelling of some words such as colour, initialisation,
+and minimised (they expect color, initialization, or minimized). POV-Ray is an international
+effort and as such our spelling sometimes conforms to British, European, or Australian, rather
+than American, English. You'll find examples of this both in this document and in POV-Ray
+itself (for example, POV accepts both 'color' and 'colour' as valid keywords).
+</p>
+
+</div>
+<a name="u1_1_6"></a>
+<div class="content-level-h3" contains="Reporting Bugs" id="u1_1_6">
+<h3>1.1.6 Reporting Bugs</h3>
+<p>
+There is a section in this help file for bug reports. Make sure that you <a href="u1_7.html#u1_7">read it</a>
+before sending us a complaint/bug report !
+</p>
+
+</div>
+<a name="u1_1_7"></a>
+<div class="content-level-h3" contains="Trademarks" id="u1_1_7">
+<h3>1.1.7 Trademarks</h3>
+<p>
+The terms 'POV-Ray', 'Persistence of Vision Ray Tracer', and 'POV-Team'
+are trademarks of Persistence of Vision Raytracer Pty. Ltd.
+</p>
+<p>
+UNIX (also commonly referred to as 'Unix') is a registered trademark of The Open Group.
+'Linux' is a trademark of Linus Torvalds.
+X Window System is a trademark of X Consortium, Inc.  All other trademarks are acknowledged
+as being the property of their respective owners.
+</p>
+
+
+</div>
+
+</div>
+
+</div>
+</body>
+</html>

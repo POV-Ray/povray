@@ -1,0 +1,914 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+
+<!--  This file copyright Persistence of Vision Raytracer Pty. Ltd. 2009-2011  -->
+
+<html lang="en">
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=windows-1252">
+<title>Tutorial Table of Contents</title>
+<link rel="StyleSheet" href="povray37.css" type="text/css">
+<link rel="shortcut icon" href="favicon.ico">
+
+<!--  NOTE: In order to help users find information about POV-Ray using web      -->
+<!--  search engines, we ask that you *not* let them index documentation         -->
+<!--  mirrors because effectively, when searching, users will get hundreds of    -->
+<!--  results containing the same information! For this reason, these meta tags  -->
+<!--  below disable archiving of this page by search engines.                    -->
+
+<meta name="robots" content="noarchive">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="expires" content="0">
+</head>
+<body>
+
+<div class="Page">
+<!-- NavPanel Begin -->
+<div class="NavPanel">
+<table class="NavTable">
+<tr>
+  <td class="FixedPanelHeading"><a title="2.1" href="#t2_1">Introduction</a></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="2.1.1" href="#t2_1_1">Program Description</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="2.1.2" href="#t2_1_2">What is Ray-Tracing?</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="2.1.3" href="#t2_1_3">What is POV-Ray?</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="2.1.4" href="#t2_1_4">Features</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="2.1.5" href="#t2_1_5">Trademarks</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="2.1.6" href="#t2_1_6">The Early History of POV-Ray</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="2.1.7" href="#t2_1_7">How Do I Begin?</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="2.1.8" href="#t2_1_8">Notation and Basic Assumptions</a></div></td>
+</tr>
+<tr>
+  <td class="FixedPanelHeading"><a title="2.2" href="#t2_2">Getting Started</a></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="2.2.1" href="#t2_2_1">Our First Image</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="2.2.2" href="#t2_2_2">Basic Shapes</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="2.2.3" href="#t2_2_3">CSG Objects</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="2.2.4" href="#t2_2_4">The Light Source</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="2.2.5" href="#t2_2_5">Simple Texture Options</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="2.2.6" href="#t2_2_6">Using the Camera</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="2.2.7" href="#t2_2_7">POV-Ray Coordinate System</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="2.2.8" href="#t2_2_8">Setting POV-Ray Options</a></div></td>
+</tr>
+<tr>
+  <td class="FixedPanelHeading"><a title="2.3" href="#t2_3">Advanced Features</a></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="2.3.1" href="#t2_3_1">Spline Based Shapes</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="2.3.2" href="#t2_3_2">Polygon Based Shapes</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="2.3.3" href="#t2_3_3">Other Shapes</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="2.3.4" href="#t2_3_4">Gamma Handling</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="2.3.5" href="#t2_3_5">Advanced Texture Options</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="2.3.6" href="#t2_3_6">Using Atmospheric Effects</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="2.3.7" href="#t2_3_7">Simple Media Tutorial</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="2.3.8" href="#t2_3_8">Radiosity</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="2.3.9" href="#t2_3_9">Making Animations</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="2.3.10" href="#t2_3_10">While-loop tutorial</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="2.3.11" href="#t2_3_11">SDL tutorial: A raytracer</a></div></td>
+</tr>
+<tr>
+  <td class="FixedPanelHeading"><a title="2.4" href="#t2_4">Questions and Tips</a></td>
+</tr>
+<tr>
+  <td class="FixedPanelHeading"><a title="2.5" href="#t2_5">Appendices</a></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="2.5.1" href="#t2_5_1">Contacting the Authors</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="2.5.2" href="#t2_5_2">POV-Ray License</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="2.5.3" href="#t2_5_3">Contact Information</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="2.5.4" href="#t2_5_4">Support Library Licenses</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="2.5.5" href="#t2_5_5">Citing POV-Ray in Academic Publications</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="2.5.6" href="#t2_5_6">Contributors to POV-Ray</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="2.5.7" href="#t2_5_7">Thanks</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="2.5.8" href="#t2_5_8">What to do if you don't have POV-Ray</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="2.5.9" href="#t2_5_9">Suggested Reading</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh1">&nbsp;</div></td>
+</tr>
+<tr>
+  <td><div class="divh1">&nbsp;</div></td>
+</tr>
+</table>
+</div>
+<!-- NavPanel End -->
+
+<div class="Content">
+<table class="HeaderFooter" width="100%">
+<tr>
+  <td colspan=5 align="left" class="HeaderFooter">
+    POV-Ray for Unix <strong class="HeaderFooter">version 3.7</strong>
+  </td>
+</tr>
+<tr >
+  <td colspan=5>
+    <hr align="right" width="70%">
+  </td>
+</tr>
+<tr>
+  <td width="30%"></td>
+  <td class="NavBar"><a href="index.html" title="The Front Door">Home</a></td>
+  <td class="NavBar"><a href="u1_0.html" title="Unix Table of Contents">POV-Ray for Unix</a></td>
+  <td class="NavBar"><a href="t2_0.html" title="You're already here!">POV-Ray Tutorial</a></td>
+  <td class="NavBar"><a href="r3_0.html" title="Reference Table of Contents">POV-Ray Reference</a></td>
+</tr>
+</table>
+
+<table>
+<tr>
+  <td class="ContentsHeading"><div class="divh1"><a name="t2_1"></a><a title="2.1" href="t2_1.html#t2_1">Introduction</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="t2_1_1"></a><a title="2.1.1" href="t2_1.html#t2_1_1">Program Description</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="t2_1_2"></a><a title="2.1.2" href="t2_1.html#t2_1_2">What is Ray-Tracing?</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="t2_1_3"></a><a title="2.1.3" href="t2_1.html#t2_1_3">What is POV-Ray?</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="t2_1_4"></a><a title="2.1.4" href="t2_1.html#t2_1_4">Features</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_1_4_1"></a><a title="2.1.4.1" href="t2_1.html#t2_1_4_1">Changes and New Features Summary</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="t2_1_5"></a><a title="2.1.5" href="t2_1.html#t2_1_5">Trademarks</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="t2_1_6"></a><a title="2.1.6" href="t2_1.html#t2_1_6">The Early History of POV-Ray</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_1_6_1"></a><a title="2.1.6.1" href="t2_1.html#t2_1_6_1">The Original Creation Message</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_1_6_2"></a><a title="2.1.6.2" href="t2_1.html#t2_1_6_2">The Name</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_1_6_3"></a><a title="2.1.6.3" href="t2_1.html#t2_1_6_3">A Historic 'Version History'</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="t2_1_7"></a><a title="2.1.7" href="t2_1.html#t2_1_7">How Do I Begin?</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="t2_1_8"></a><a title="2.1.8" href="t2_1.html#t2_1_8">Notation and Basic Assumptions</a></div></td>
+</tr>
+<tr>
+  <td class="ContentsHeading"><div class="divh1"><a name="t2_2"></a><a title="2.2" href="t2_2.html#t2_2">Getting Started</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="t2_2_1"></a><a title="2.2.1" href="t2_2.html#t2_2_1">Our First Image</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_2_1_1"></a><a title="2.2.1.1" href="t2_2.html#t2_2_1_1">Understanding POV-Ray's Coordinate System</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_2_1_2"></a><a title="2.2.1.2" href="t2_2.html#t2_2_1_2">Adding Standard Include Files</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_2_1_3"></a><a title="2.2.1.3" href="t2_2.html#t2_2_1_3">Adding a Camera</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_2_1_4"></a><a title="2.2.1.4" href="t2_2.html#t2_2_1_4">Describing an Object</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_2_1_5"></a><a title="2.2.1.5" href="t2_2.html#t2_2_1_5">Adding Texture to an Object</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_2_1_6"></a><a title="2.2.1.6" href="t2_2.html#t2_2_1_6">Defining a Light Source</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="t2_2_2"></a><a title="2.2.2" href="t2_2.html#t2_2_2">Basic Shapes</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_2_2_1"></a><a title="2.2.2.1" href="t2_2.html#t2_2_2_1">Box Object</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_2_2_2"></a><a title="2.2.2.2" href="t2_2.html#t2_2_2_2">Cone Object</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_2_2_3"></a><a title="2.2.2.3" href="t2_2.html#t2_2_2_3">Cylinder Object</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_2_2_4"></a><a title="2.2.2.4" href="t2_2.html#t2_2_2_4">Plane Object</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_2_2_5"></a><a title="2.2.2.5" href="t2_2.html#t2_2_2_5">Torus Object</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="t2_2_3"></a><a title="2.2.3" href="t2_2.html#t2_2_3">CSG Objects</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_2_3_1"></a><a title="2.2.3.1" href="t2_2.html#t2_2_3_1">What is CSG?</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_2_3_2"></a><a title="2.2.3.2" href="t2_2.html#t2_2_3_2">CSG Union</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_2_3_3"></a><a title="2.2.3.3" href="t2_2.html#t2_2_3_3">CSG Intersection</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_2_3_4"></a><a title="2.2.3.4" href="t2_2.html#t2_2_3_4">CSG Difference</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_2_3_5"></a><a title="2.2.3.5" href="t2_2.html#t2_2_3_5">CSG Merge</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_2_3_6"></a><a title="2.2.3.6" href="t2_2.html#t2_2_3_6">CSG Pitfalls</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_2_3_6_1"></a><a title="2.2.3.6.1" href="t2_2.html#t2_2_3_6_1">Co-incident Surfaces</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="t2_2_4"></a><a title="2.2.4" href="t2_2.html#t2_2_4">The Light Source</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_2_4_1"></a><a title="2.2.4.1" href="t2_2.html#t2_2_4_1">The Pointlight Source</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_2_4_2"></a><a title="2.2.4.2" href="t2_2.html#t2_2_4_2">The Spotlight Source</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_2_4_3"></a><a title="2.2.4.3" href="t2_2.html#t2_2_4_3">The Cylindrical Light Source</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_2_4_4"></a><a title="2.2.4.4" href="t2_2.html#t2_2_4_4">The Area Light Source</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_2_4_5"></a><a title="2.2.4.5" href="t2_2.html#t2_2_4_5">The Ambient Light Source</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_2_4_6"></a><a title="2.2.4.6" href="t2_2.html#t2_2_4_6">Light Source Specials</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_2_4_6_1"></a><a title="2.2.4.6.1" href="t2_2.html#t2_2_4_6_1">Using Shadowless Lights</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_2_4_6_2"></a><a title="2.2.4.6.2" href="t2_2.html#t2_2_4_6_2">Assigning an Object to a Light Source</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_2_4_6_3"></a><a title="2.2.4.6.3" href="t2_2.html#t2_2_4_6_3">Using Light Fading</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="t2_2_5"></a><a title="2.2.5" href="t2_2.html#t2_2_5">Simple Texture Options</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_2_5_1"></a><a title="2.2.5.1" href="t2_2.html#t2_2_5_1">Surface Finishes</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_2_5_2"></a><a title="2.2.5.2" href="t2_2.html#t2_2_5_2">Adding Bumpiness</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_2_5_3"></a><a title="2.2.5.3" href="t2_2.html#t2_2_5_3">Creating Color Patterns</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_2_5_4"></a><a title="2.2.5.4" href="t2_2.html#t2_2_5_4">Pre-defined Textures</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="t2_2_6"></a><a title="2.2.6" href="t2_2.html#t2_2_6">Using the Camera</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_2_6_1"></a><a title="2.2.6.1" href="t2_2.html#t2_2_6_1">Using Focal Blur</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="t2_2_7"></a><a title="2.2.7" href="t2_2.html#t2_2_7">POV-Ray Coordinate System</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_2_7_1"></a><a title="2.2.7.1" href="t2_2.html#t2_2_7_1">Transformations</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_2_7_1_1"></a><a title="2.2.7.1.1" href="t2_2.html#t2_2_7_1_1">Translate</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_2_7_1_2"></a><a title="2.2.7.1.2" href="t2_2.html#t2_2_7_1_2">Scale</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_2_7_1_3"></a><a title="2.2.7.1.3" href="t2_2.html#t2_2_7_1_3">Rotate</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_2_7_1_4"></a><a title="2.2.7.1.4" href="t2_2.html#t2_2_7_1_4">Matrix</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_2_7_2"></a><a title="2.2.7.2" href="t2_2.html#t2_2_7_2">Transformation Order</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_2_7_3"></a><a title="2.2.7.3" href="t2_2.html#t2_2_7_3">Inverse Transform</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_2_7_4"></a><a title="2.2.7.4" href="t2_2.html#t2_2_7_4">Transform Identifiers</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_2_7_5"></a><a title="2.2.7.5" href="t2_2.html#t2_2_7_5">Transforming Textures and Objects</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="t2_2_8"></a><a title="2.2.8" href="t2_2.html#t2_2_8">Setting POV-Ray Options</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_2_8_1"></a><a title="2.2.8.1" href="t2_2.html#t2_2_8_1">Command Line Switches</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_2_8_2"></a><a title="2.2.8.2" href="t2_2.html#t2_2_8_2">Using INI Files</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_2_8_3"></a><a title="2.2.8.3" href="t2_2.html#t2_2_8_3">Using the POVINI Environment Variable</a></div></td>
+</tr>
+<tr>
+  <td class="ContentsHeading"><div class="divh1"><a name="t2_3"></a><a title="2.3" href="t2_3.html#t2_3">Advanced Features</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="t2_3_1"></a><a title="2.3.1" href="t2_3.html#t2_3_1">Spline Based Shapes</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_1_1"></a><a title="2.3.1.1" href="t2_3.html#t2_3_1_1">Lathe Object</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_3_1_1_1"></a><a title="2.3.1.1.1" href="t2_3.html#t2_3_1_1_1">Understanding The Concept of Splines</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_1_2"></a><a title="2.3.1.2" href="t2_3.html#t2_3_1_2">Surface of Revolution Object</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_1_3"></a><a title="2.3.1.3" href="t2_3.html#t2_3_1_3">Prism Object</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_3_1_3_1"></a><a title="2.3.1.3.1" href="t2_3.html#t2_3_1_3_1">Teaching An Old Spline New Tricks</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_3_1_3_2"></a><a title="2.3.1.3.2" href="t2_3.html#t2_3_1_3_2">Smooth Transitions</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_3_1_3_3"></a><a title="2.3.1.3.3" href="t2_3.html#t2_3_1_3_3">Multiple Sub-Shapes</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_3_1_3_4"></a><a title="2.3.1.3.4" href="t2_3.html#t2_3_1_3_4">Conic Sweeps And The Tapering Effect</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_1_4"></a><a title="2.3.1.4" href="t2_3.html#t2_3_1_4">Sphere Sweep Object</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_1_5"></a><a title="2.3.1.5" href="t2_3.html#t2_3_1_5">Bicubic Patch Object</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_1_6"></a><a title="2.3.1.6" href="t2_3.html#t2_3_1_6">Text Object</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="t2_3_2"></a><a title="2.3.2" href="t2_3.html#t2_3_2">Polygon Based Shapes</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_2_1"></a><a title="2.3.2.1" href="t2_3.html#t2_3_2_1">Mesh Object</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_2_2"></a><a title="2.3.2.2" href="t2_3.html#t2_3_2_2">Mesh2 Object</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_3_2_2_1"></a><a title="2.3.2.2.1" href="t2_3.html#t2_3_2_2_1">Smooth triangles and mesh2</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_3_2_2_2"></a><a title="2.3.2.2.2" href="t2_3.html#t2_3_2_2_2">UV mapping and mesh2</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_3_2_2_3"></a><a title="2.3.2.2.3" href="t2_3.html#t2_3_2_2_3">A separate texture per triangle</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_2_3"></a><a title="2.3.2.3" href="t2_3.html#t2_3_2_3">Polygon Object</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="t2_3_3"></a><a title="2.3.3" href="t2_3.html#t2_3_3">Other Shapes</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_3_1"></a><a title="2.3.3.1" href="t2_3.html#t2_3_3_1">Blob Object</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_3_3_1_1"></a><a title="2.3.3.1.1" href="t2_3.html#t2_3_3_1_1">Component Types and Other New Features</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_3_3_1_2"></a><a title="2.3.3.1.2" href="t2_3.html#t2_3_3_1_2">Complex Blob Constructs and Negative Strength</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_3_2"></a><a title="2.3.3.2" href="t2_3.html#t2_3_3_2">Height Field Object</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_3_3"></a><a title="2.3.3.3" href="t2_3.html#t2_3_3_3">Isosurface Object</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_3_3_3_1"></a><a title="2.3.3.3.1" href="t2_3.html#t2_3_3_3_1">Simple functions</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_3_3_3_2"></a><a title="2.3.3.3.2" href="t2_3.html#t2_3_3_3_2">Several surfaces</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_3_3_3_3"></a><a title="2.3.3.3.3" href="t2_3.html#t2_3_3_3_3">Non-linear functions</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_3_3_3_4"></a><a title="2.3.3.3.4" href="t2_3.html#t2_3_3_3_4">Specifying functions</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_3_3_3_5"></a><a title="2.3.3.3.5" href="t2_3.html#t2_3_3_3_5">Internal functions</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_3_3_3_6"></a><a title="2.3.3.3.6" href="t2_3.html#t2_3_3_3_6">Combining isosurface functions</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_3_3_3_7"></a><a title="2.3.3.3.7" href="t2_3.html#t2_3_3_3_7">Noise and pigment functions</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_3_3_3_8"></a><a title="2.3.3.3.8" href="t2_3.html#t2_3_3_3_8">Conditional directives and loops</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_3_3_3_9"></a><a title="2.3.3.3.9" href="t2_3.html#t2_3_3_3_9">Transformations on functions</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_3_3_3_10"></a><a title="2.3.3.3.10" href="t2_3.html#t2_3_3_3_10">Improving Isosurface Speed</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_3_4"></a><a title="2.3.3.4" href="t2_3.html#t2_3_3_4">Poly Object</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_3_3_4_1"></a><a title="2.3.3.4.1" href="t2_3.html#t2_3_3_4_1">Creating the polynomial function</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_3_3_4_2"></a><a title="2.3.3.4.2" href="t2_3.html#t2_3_3_4_2">Writing the polynomial vector</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_3_3_4_3"></a><a title="2.3.3.4.3" href="t2_3.html#t2_3_3_4_3">Polynomial made easy</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_3_5"></a><a title="2.3.3.5" href="t2_3.html#t2_3_3_5">Superquadric Ellipsoid Object</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="t2_3_4"></a><a title="2.3.4" href="t2_3.html#t2_3_4">Gamma Handling</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_4_1"></a><a title="2.3.4.1" href="t2_3.html#t2_3_4_1">Setting Up Your Display</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_4_2"></a><a title="2.3.4.2" href="t2_3.html#t2_3_4_2">Setting Up POV-Ray</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_4_3"></a><a title="2.3.4.3" href="t2_3.html#t2_3_4_3">Gamma in Output Images</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_4_4"></a><a title="2.3.4.4" href="t2_3.html#t2_3_4_4">Setting Up Your Scene</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_4_5"></a><a title="2.3.4.5" href="t2_3.html#t2_3_4_5">Gamma in Literal Colors</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_4_6"></a><a title="2.3.4.6" href="t2_3.html#t2_3_4_6">Gamma in Input Images</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_4_7"></a><a title="2.3.4.7" href="t2_3.html#t2_3_4_7">Gamma in Legacy Scenes</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="t2_3_5"></a><a title="2.3.5" href="t2_3.html#t2_3_5">Advanced Texture Options</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_5_1"></a><a title="2.3.5.1" href="t2_3.html#t2_3_5_1">Pigments</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_3_5_1_1"></a><a title="2.3.5.1.1" href="t2_3.html#t2_3_5_1_1">Using Color List Pigments</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_3_5_1_2"></a><a title="2.3.5.1.2" href="t2_3.html#t2_3_5_1_2">Using Pigment and Patterns</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_3_5_1_3"></a><a title="2.3.5.1.3" href="t2_3.html#t2_3_5_1_3">Using Pattern Modifiers</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_3_5_1_4"></a><a title="2.3.5.1.4" href="t2_3.html#t2_3_5_1_4">Using Transparent Pigments and Layered Textures</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_3_5_1_5"></a><a title="2.3.5.1.5" href="t2_3.html#t2_3_5_1_5">Using Pigment Maps</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_5_2"></a><a title="2.3.5.2" href="t2_3.html#t2_3_5_2">Normals</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_3_5_2_1"></a><a title="2.3.5.2.1" href="t2_3.html#t2_3_5_2_1">Using Basic Normal Modifiers</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_3_5_2_2"></a><a title="2.3.5.2.2" href="t2_3.html#t2_3_5_2_2">Blending Normals</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_3_5_2_3"></a><a title="2.3.5.2.3" href="t2_3.html#t2_3_5_2_3">Slope Map Tutorial</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh5"><a name="t2_3_5_2_3_1"></a><a title="2.3.5.2.3.1" href="t2_3.html#t2_3_5_2_3_1">Slopes, what are they?</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh5"><a name="t2_3_5_2_3_2"></a><a title="2.3.5.2.3.2" href="t2_3.html#t2_3_5_2_3_2">Syntax of a slope map</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh5"><a name="t2_3_5_2_3_3"></a><a title="2.3.5.2.3.3" href="t2_3.html#t2_3_5_2_3_3">Examples of slope maps</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_5_3"></a><a title="2.3.5.3" href="t2_3.html#t2_3_5_3">Finishes</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_3_5_3_1"></a><a title="2.3.5.3.1" href="t2_3.html#t2_3_5_3_1">Using Ambient</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_3_5_3_2"></a><a title="2.3.5.3.2" href="t2_3.html#t2_3_5_3_2">Using Emission</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_3_5_3_3"></a><a title="2.3.5.3.3" href="t2_3.html#t2_3_5_3_3">Using Surface Highlights</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_3_5_3_4"></a><a title="2.3.5.3.4" href="t2_3.html#t2_3_5_3_4">Using Reflection, Metallic and Metallic</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_3_5_3_5"></a><a title="2.3.5.3.5" href="t2_3.html#t2_3_5_3_5">Using Iridescence</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_5_4"></a><a title="2.3.5.4" href="t2_3.html#t2_3_5_4">Working With Pigment Maps</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_5_5"></a><a title="2.3.5.5" href="t2_3.html#t2_3_5_5">Working With Normal Maps</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_5_6"></a><a title="2.3.5.6" href="t2_3.html#t2_3_5_6">Working With Texture Maps</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_5_7"></a><a title="2.3.5.7" href="t2_3.html#t2_3_5_7">Working With List Textures</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_5_8"></a><a title="2.3.5.8" href="t2_3.html#t2_3_5_8">What About Tiles?</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_5_9"></a><a title="2.3.5.9" href="t2_3.html#t2_3_5_9">Average Function</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_5_10"></a><a title="2.3.5.10" href="t2_3.html#t2_3_5_10">Working With Layered Textures</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_3_5_10_1"></a><a title="2.3.5.10.1" href="t2_3.html#t2_3_5_10_1">Declaring Layered Textures</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_3_5_10_2"></a><a title="2.3.5.10.2" href="t2_3.html#t2_3_5_10_2">Another Layered Textures Example</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_5_11"></a><a title="2.3.5.11" href="t2_3.html#t2_3_5_11">When All Else Fails: Material Maps</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_5_12"></a><a title="2.3.5.12" href="t2_3.html#t2_3_5_12">Limitations Of Special Textures</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="t2_3_6"></a><a title="2.3.6" href="t2_3.html#t2_3_6">Using Atmospheric Effects</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_6_1"></a><a title="2.3.6.1" href="t2_3.html#t2_3_6_1">The Background</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_6_2"></a><a title="2.3.6.2" href="t2_3.html#t2_3_6_2">The Sky Sphere</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_3_6_2_1"></a><a title="2.3.6.2.1" href="t2_3.html#t2_3_6_2_1">Creating a Sky with a Color Gradient</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_3_6_2_2"></a><a title="2.3.6.2.2" href="t2_3.html#t2_3_6_2_2">Adding the Sun</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_3_6_2_3"></a><a title="2.3.6.2.3" href="t2_3.html#t2_3_6_2_3">Adding Some Clouds</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_6_3"></a><a title="2.3.6.3" href="t2_3.html#t2_3_6_3">The Fog</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_3_6_3_1"></a><a title="2.3.6.3.1" href="t2_3.html#t2_3_6_3_1">A Constant Fog</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_3_6_3_2"></a><a title="2.3.6.3.2" href="t2_3.html#t2_3_6_3_2">Setting a Minimum Translucency</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_3_6_3_3"></a><a title="2.3.6.3.3" href="t2_3.html#t2_3_6_3_3">Creating a Filtering Fog</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_3_6_3_4"></a><a title="2.3.6.3.4" href="t2_3.html#t2_3_6_3_4">Adding Some Turbulence to the Fog</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_3_6_3_5"></a><a title="2.3.6.3.5" href="t2_3.html#t2_3_6_3_5">Using Ground Fog</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_3_6_3_6"></a><a title="2.3.6.3.6" href="t2_3.html#t2_3_6_3_6">Using Multiple Layers of Fog</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_3_6_3_7"></a><a title="2.3.6.3.7" href="t2_3.html#t2_3_6_3_7">Fog and Hollow Objects</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_6_4"></a><a title="2.3.6.4" href="t2_3.html#t2_3_6_4">The Rainbow</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_3_6_4_1"></a><a title="2.3.6.4.1" href="t2_3.html#t2_3_6_4_1">Starting With a Simple Rainbow</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_3_6_4_2"></a><a title="2.3.6.4.2" href="t2_3.html#t2_3_6_4_2">Increasing the Rainbow's Translucency</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_3_6_4_3"></a><a title="2.3.6.4.3" href="t2_3.html#t2_3_6_4_3">Using a Rainbow Arc</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="t2_3_7"></a><a title="2.3.7" href="t2_3.html#t2_3_7">Simple Media Tutorial</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_7_1"></a><a title="2.3.7.1" href="t2_3.html#t2_3_7_1">Types of media</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_7_2"></a><a title="2.3.7.2" href="t2_3.html#t2_3_7_2">Some media concepts</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_7_3"></a><a title="2.3.7.3" href="t2_3.html#t2_3_7_3">Simple media examples</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_3_7_3_1"></a><a title="2.3.7.3.1" href="t2_3.html#t2_3_7_3_1">Emitting media</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_3_7_3_2"></a><a title="2.3.7.3.2" href="t2_3.html#t2_3_7_3_2">Absorbing media</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_3_7_3_3"></a><a title="2.3.7.3.3" href="t2_3.html#t2_3_7_3_3">Scattering media</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_7_4"></a><a title="2.3.7.4" href="t2_3.html#t2_3_7_4">Multiple medias inside the same object</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_7_5"></a><a title="2.3.7.5" href="t2_3.html#t2_3_7_5">Media and transformations</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_7_6"></a><a title="2.3.7.6" href="t2_3.html#t2_3_7_6">A more advanced example of scattering media</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_7_7"></a><a title="2.3.7.7" href="t2_3.html#t2_3_7_7">Media and photons</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="t2_3_8"></a><a title="2.3.8" href="t2_3.html#t2_3_8">Radiosity</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_8_1"></a><a title="2.3.8.1" href="t2_3.html#t2_3_8_1">Introduction</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_8_2"></a><a title="2.3.8.2" href="t2_3.html#t2_3_8_2">Radiosity with conventional lighting</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_8_3"></a><a title="2.3.8.3" href="t2_3.html#t2_3_8_3">Radiosity without conventional lighting</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_8_4"></a><a title="2.3.8.4" href="t2_3.html#t2_3_8_4">Normals and Radiosity</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_8_5"></a><a title="2.3.8.5" href="t2_3.html#t2_3_8_5">Performance considerations</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="t2_3_9"></a><a title="2.3.9" href="t2_3.html#t2_3_9">Making Animations</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_9_1"></a><a title="2.3.9.1" href="t2_3.html#t2_3_9_1">The Clock Variable: Key To It All</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_9_2"></a><a title="2.3.9.2" href="t2_3.html#t2_3_9_2">Clock Dependant Variables And Multi-Stage Animations</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_9_3"></a><a title="2.3.9.3" href="t2_3.html#t2_3_9_3">The Phase Keyword</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_9_4"></a><a title="2.3.9.4" href="t2_3.html#t2_3_9_4">Do Not Use Jitter Or Crand</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_9_5"></a><a title="2.3.9.5" href="t2_3.html#t2_3_9_5">INI File Settings</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="t2_3_10"></a><a title="2.3.10" href="t2_3.html#t2_3_10">While-loop tutorial</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_10_1"></a><a title="2.3.10.1" href="t2_3.html#t2_3_10_1">What a while-loop is and what it is not</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_10_2"></a><a title="2.3.10.2" href="t2_3.html#t2_3_10_2">How does a single while-loop work?</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_10_3"></a><a title="2.3.10.3" href="t2_3.html#t2_3_10_3">How do I make a while-loop?</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_10_4"></a><a title="2.3.10.4" href="t2_3.html#t2_3_10_4">What is a condition and how do I make one?</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_10_5"></a><a title="2.3.10.5" href="t2_3.html#t2_3_10_5">What about loop types other than simple for-loops?</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_10_6"></a><a title="2.3.10.6" href="t2_3.html#t2_3_10_6">What about nested loops?</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_10_7"></a><a title="2.3.10.7" href="t2_3.html#t2_3_10_7">Mixed-type nested loops</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_10_8"></a><a title="2.3.10.8" href="t2_3.html#t2_3_10_8">Other things to note</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="t2_3_11"></a><a title="2.3.11" href="t2_3.html#t2_3_11">SDL tutorial: A raytracer</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_11_1"></a><a title="2.3.11.1" href="t2_3.html#t2_3_11_1">Introduction</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_11_2"></a><a title="2.3.11.2" href="t2_3.html#t2_3_11_2">The idea and the code</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_11_3"></a><a title="2.3.11.3" href="t2_3.html#t2_3_11_3">Short introduction to raytracing</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_11_4"></a><a title="2.3.11.4" href="t2_3.html#t2_3_11_4">Global settings</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_11_5"></a><a title="2.3.11.5" href="t2_3.html#t2_3_11_5">Scene definition</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_11_6"></a><a title="2.3.11.6" href="t2_3.html#t2_3_11_6">Initializing the raytracer</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_11_7"></a><a title="2.3.11.7" href="t2_3.html#t2_3_11_7">Ray-sphere intersection</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_3_11_7_1"></a><a title="2.3.11.7.1" href="t2_3.html#t2_3_11_7_1">Inner workings of a macro</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_3_11_7_2"></a><a title="2.3.11.7.2" href="t2_3.html#t2_3_11_7_2">The ray-sphere intersection macro</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_11_8"></a><a title="2.3.11.8" href="t2_3.html#t2_3_11_8">The Trace macro</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_3_11_8_1"></a><a title="2.3.11.8.1" href="t2_3.html#t2_3_11_8_1">Calculating the closest intersection</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_3_11_8_2"></a><a title="2.3.11.8.2" href="t2_3.html#t2_3_11_8_2">If the ray doesn't hit anything</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_3_11_8_3"></a><a title="2.3.11.8.3" href="t2_3.html#t2_3_11_8_3">Initializing color calculations</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_3_11_8_4"></a><a title="2.3.11.8.4" href="t2_3.html#t2_3_11_8_4">Going through the light sources</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_3_11_8_5"></a><a title="2.3.11.8.5" href="t2_3.html#t2_3_11_8_5">Shadow test</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_3_11_8_6"></a><a title="2.3.11.8.6" href="t2_3.html#t2_3_11_8_6">Diffuse lighting</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_3_11_8_7"></a><a title="2.3.11.8.7" href="t2_3.html#t2_3_11_8_7">Specular lighting</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_3_11_8_8"></a><a title="2.3.11.8.8" href="t2_3.html#t2_3_11_8_8">Reflection Calculation</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_11_9"></a><a title="2.3.11.9" href="t2_3.html#t2_3_11_9">Calculating the image</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_11_10"></a><a title="2.3.11.10" href="t2_3.html#t2_3_11_10">Creating the colored mesh</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_3_11_10_1"></a><a title="2.3.11.10.1" href="t2_3.html#t2_3_11_10_1">The structure of the mesh</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_3_11_10_2"></a><a title="2.3.11.10.2" href="t2_3.html#t2_3_11_10_2">Creating the mesh</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_3_11_10_3"></a><a title="2.3.11.10.3" href="t2_3.html#t2_3_11_10_3">Creating the vertex points</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_3_11_10_4"></a><a title="2.3.11.10.4" href="t2_3.html#t2_3_11_10_4">Creating the textures</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_3_11_10_5"></a><a title="2.3.11.10.5" href="t2_3.html#t2_3_11_10_5">Creating the triangles</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_3_11_11"></a><a title="2.3.11.11" href="t2_3.html#t2_3_11_11">The Camera-setup</a></div></td>
+</tr>
+<tr>
+  <td class="ContentsHeading"><div class="divh1"><a name="t2_4"></a><a title="2.4" href="t2_4.html#t2_4">Questions and Tips</a></div></td>
+</tr>
+<tr>
+  <td class="ContentsHeading"><div class="divh1"><a name="t2_5"></a><a title="2.5" href="t2_5.html#t2_5">Appendices</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="t2_5_1"></a><a title="2.5.1" href="t2_5.html#t2_5_1">Contacting the Authors</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="t2_5_2"></a><a title="2.5.2" href="t2_5.html#t2_5_2">POV-Ray License</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="t2_5_3"></a><a title="2.5.3" href="t2_5.html#t2_5_3">Contact Information</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="t2_5_4"></a><a title="2.5.4" href="t2_5.html#t2_5_4">Support Library Licenses</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_5_4_1"></a><a title="2.5.4.1" href="t2_5.html#t2_5_4_1">OpenEXR</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="t2_5_5"></a><a title="2.5.5" href="t2_5.html#t2_5_5">Citing POV-Ray in Academic Publications</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="t2_5_6"></a><a title="2.5.6" href="t2_5.html#t2_5_6">Contributors to POV-Ray</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="t2_5_7"></a><a title="2.5.7" href="t2_5.html#t2_5_7">Thanks</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="t2_5_8"></a><a title="2.5.8" href="t2_5.html#t2_5_8">What to do if you don't have POV-Ray</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_5_8_1"></a><a title="2.5.8.1" href="t2_5.html#t2_5_8_1">Which Version of POV-Ray should you use?</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_5_8_1_1"></a><a title="2.5.8.1.1" href="t2_5.html#t2_5_8_1_1">Microsoft Windows</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_5_8_1_2"></a><a title="2.5.8.1.2" href="t2_5.html#t2_5_8_1_2">Apple  Macintosh</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_5_8_1_3"></a><a title="2.5.8.1.3" href="t2_5.html#t2_5_8_1_3">Linux/Unix</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_5_8_1_4"></a><a title="2.5.8.1.4" href="t2_5.html#t2_5_8_1_4">All Versions</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="t2_5_8_2"></a><a title="2.5.8.2" href="t2_5.html#t2_5_8_2">Where to Find POV-Ray Files</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a name="t2_5_8_2_1"></a><a title="2.5.8.2.1" href="t2_5.html#t2_5_8_2_1">World Wide Website www.povray.org</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="t2_5_9"></a><a title="2.5.9" href="t2_5.html#t2_5_9">Suggested Reading</a></div></td>
+</tr>
+</table>
+</div>
+
+</div>
+</body>
+</html>

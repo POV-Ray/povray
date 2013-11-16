@@ -1,0 +1,120 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+
+<!--  This file copyright Persistence of Vision Raytracer Pty. Ltd. 2009-2011  -->
+
+<html lang="en">
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=windows-1252">
+<title>Unix Section 8</title>
+<link rel="StyleSheet" href="povray37.css" type="text/css">
+<link rel="shortcut icon" href="favicon.ico">
+
+<!--  NOTE: In order to help users find information about POV-Ray using web      -->
+<!--  search engines, we ask that you *not* let them index documentation         -->
+<!--  mirrors because effectively, when searching, users will get hundreds of    -->
+<!--  results containing the same information! For this reason, these meta tags  -->
+<!--  below disable archiving of this page by search engines.                    -->
+
+<meta name="robots" content="noarchive">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="expires" content="0">
+</head>
+<body>
+
+<div class="Page">
+
+<!-- NavPanel Begin -->
+<div class="NavPanel">
+<table class="NavTable">
+<tr>
+  <td class="FixedPanelHeading"><a title="1.8" href="#u1_8">Speed Considerations</a></td>
+</tr>
+<tr>
+  <td><div class="divh2"><strong><a title="1.8.1" href="#u1_8_1">Render Priority</a></strong></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><strong><a title="1.8.2" href="#u1_8_2">Render Window</a></strong></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><strong><a title="1.8.3" href="#u1_8_3">Memory</a></strong></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><strong><a title="1.8.4" href="#u1_8_4">Scene Features</a></strong></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><strong><a title="1.8.5" href="#u1_8_5">Render Quality</a></strong></div></td>
+</tr>
+<tr>
+  <td><div class="divh1">&nbsp;</div></td>
+</tr>
+<tr>
+  <td><div class="divh1">&nbsp;</div></td>
+</tr>
+</table>
+</div>
+<!-- NavPanel End -->
+
+<div class="Content">
+<table class="HeaderFooter" width="100%">
+<tr>
+  <td colspan=5 align="left" class="HeaderFooter">
+    POV-Ray for Unix <strong class="HeaderFooter">version 3.7</strong>
+  </td>
+</tr>
+<tr >
+  <td colspan=5>
+    <hr align="right" width="70%">
+  </td>
+</tr>
+<tr>
+  <td width="30%"></td>
+  <td class="NavBar"><a href="index.html" title="The Front Door">Home</a></td>
+  <td class="NavBar"><a href="u1_0.html" title="Unix Table of Contents">POV-Ray for Unix</a></td>
+  <td class="NavBar"><a href="t2_0.html" title="Tutorial Table of Contents">POV-Ray Tutorial</a></td>
+  <td class="NavBar"><a href="r3_0.html" title="Reference Table of Contents">POV-Ray Reference</a></td>
+</tr>
+</table>
+
+<a name="u1_8"></a>
+<div class="content-level-h2" contains="Speed Considerations" id="u1_8">
+<h2>1.8 Speed Considerations</h2>
+<p>The following tips can help you increase the speed at which your images render. Most of the time, the increase will be marginal, but in a very long render (some users have renders that take several days) even a small increase can save a noticable amount of time.</p>
+
+</div>
+<a name="u1_8_1"></a>
+<div class="content-level-h3" contains="Render Priority" id="u1_8_1">
+<h3>1.8.1 Render Priority</h3>
+<p>The easiest way to change the priority across Unix systems is with the nice(1) command.  The semantics vary from SVR4-based Unix to BSD-based Unix, so consult the manual page for instructions on usage.</p>
+
+</div>
+<a name="u1_8_2"></a>
+<div class="content-level-h3" contains="Render Window" id="u1_8_2">
+<h3>1.8.2 Render Window</h3>
+<p>Rendering without display will also speed up things.  If your render is writing a lot of text to a terminal window, either hiding it, or better still, minimizing the window(s), will help somewhat. Note that the effect that these actions have is generally directly related to the time it takes to render the file, and the resolution of the render. They have less effect
+on long renders, and more effect on very fast renders.</p>
+
+</div>
+<a name="u1_8_3"></a>
+<div class="content-level-h3" contains="Memory" id="u1_8_3">
+<h3>1.8.3 Memory</h3>
+<p>In general, the more memory you have (up to a point) the faster things will run, although this is not a direct effect, the less time Unix spends swapping things out to disk, the more time is available for your render.</p>
+
+</div>
+<a name="u1_8_4"></a>
+<div class="content-level-h3" contains="Scene Features" id="u1_8_4">
+<h3>1.8.4 Scene Features</h3>
+<p>Anti-aliasing, fog, halos, area lights, atmosphere ... all of these will cause your scene to require more time for completion. See the POV-Ray documentation for more details.</p>
+
+</div>
+<a name="u1_8_5"></a>
+<div class="content-level-h3" contains="Render Quality" id="u1_8_5">
+<h3>1.8.5 Render Quality</h3>
+<p>Consider using a lower <a href="r3_2.html#r3_2_8_3">quality</a> setting if you're just testing your scene, and do not care about the quality of the output.</p>
+
+</div>
+
+</div>
+
+</div>
+</body>
+</html>
