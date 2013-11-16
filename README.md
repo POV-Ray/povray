@@ -27,7 +27,7 @@ Forums
 --------------------------------------
 
 Discussion regarding POV-Ray is traditionally done via our forums at http://news.povray.org/.
-These are also available via [NNTP](news://news.povray.org/) for those preferring that.
+These are also available via NNTP at news://news.povray.org/ for those preferring that.
 
 Please note that the POV-Ray developers do not monitor all forums regularly. The ones we
 tend to check most frequently are povray.general, povray.windows and povray.unix.
@@ -61,13 +61,12 @@ Building POV-Ray
 --------------------------------------
 
 At this point in time we recommend building from the 3.7-stable branch. POV-Ray
-should compile on any POSIX-compliant system with the required tools (see 
-unix/install.txt for detailed instructions), on Microsoft Windows systems that
-have Visual Studio 2010 or later installed (targeting XP or later, both 32 and
-64-bit - be sure to read the README.HTML in the windows source dir, otherwise
-your build *will not work*), and also on Mac systems (console mode only, using
-an appropriately-modified version of the unix build - not currently provided by
-us).
+should compile on any POSIX-compliant system with the required tools (please see
+[unix/README.md](unix/README.md) for build instructions),
+on Microsoft Windows systems that have Visual Studio 2010 or later installed (targeting
+XP or later, both 32 and 64-bit - be sure to see README.HTML in the windows source dir,
+otherwise your build *will not work*), and also on Mac systems (console mode only, using
+an appropriately-modified version of the unix build - not currently provided by us).
 
 If you are using an operating system with a package or ports system such as
 Ubuntu or FreeBSD, you may like to check whether or not POV-Ray 3.7 is available
