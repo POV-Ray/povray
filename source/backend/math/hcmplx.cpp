@@ -40,6 +40,8 @@
 #include "backend/shape/spheres.h" // TODO - Move sphere intersection function to math code! [trf]
 #include "backend/math/hcmplx.h"
 
+#include "hcmplx.h" // own include
+
 // this must be the last file included
 #include "base/povdebug.h"
 

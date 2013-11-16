@@ -105,13 +105,13 @@ typedef char Targa_extension[495];
 #define EXT_GAMMA_OFF 478
 #define EXT_PIXRATIO_OFF 474
 
-Pixel *GetPix (const Image *image, int x, int y, Pixel *pixel, const GammaCurvePtr& gamma, DitherHandler& dither, bool premul)
+static Pixel *GetPix (const Image *image, int x, int y, Pixel *pixel, const GammaCurvePtr& gamma, DitherHandler& dither, bool premul)
 {
 	GetEncodedRGBAValue (image, x, y, gamma, 255, pixel->r, pixel->g, pixel->b, pixel->a, dither, premul);
 	return (pixel);
 }
 
-void PutPix (vector<unsigned char>& line, const pix *pixel, bool opaque)
+static void PutPix (vector<unsigned char>& line, const pix *pixel, bool opaque)
 {
 	line.push_back (pixel->b);
 	line.push_back (pixel->g);
@@ -346,7 +346,7 @@ void Write (OStream *file, const Image *image, const Image::WriteOptions& option
 	file->write(foo,sizeof(foo));
 }
 
-void ConvertColor (Pixel *pixel, unsigned pixelsize, const unsigned char *bytes)
+static void ConvertColor (Pixel *pixel, unsigned pixelsize, const unsigned char *bytes)
 {
 	unsigned char r;
 	unsigned char g;
@@ -395,7 +395,7 @@ void ConvertColor (Pixel *pixel, unsigned pixelsize, const unsigned char *bytes)
 	pixel->a = a;
 }
 
-void ConvertColor (Image::RGBAMapEntry *pixel, unsigned pixelsize, const unsigned char *bytes, const GammaCurvePtr& gamma)
+static void ConvertColor (Image::RGBAMapEntry *pixel, unsigned pixelsize, const unsigned char *bytes, const GammaCurvePtr& gamma)
 {
 	unsigned char r;
 	unsigned char g;

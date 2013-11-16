@@ -277,7 +277,7 @@ extern "C"
 		file->flush();
 	}
 
-	bool ReadPNGUpdateInfo (png_structp png_ptr, png_infop info_ptr)
+	static bool ReadPNGUpdateInfo (png_structp png_ptr, png_infop info_ptr)
 	{
 		if (setjmp(png_jmpbuf(png_ptr)))
 		{
@@ -288,7 +288,7 @@ extern "C"
 		return (true);
 	}
 
-	bool ReadPNGImage (png_structp r_png_ptr, png_bytepp row_ptrs)
+	static bool ReadPNGImage (png_structp r_png_ptr, png_bytepp row_ptrs)
 	{
 		if (setjmp(png_jmpbuf(r_png_ptr)))
 		{

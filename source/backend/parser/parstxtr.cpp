@@ -2114,7 +2114,7 @@ void Parser::Parse_Pattern (TPATTERN *New, int TPat_Type)
 		Error("Patterned texture must have texture_map.");
 	}
 
-	if ((New->Type==PAVEMENT_PATTERN))
+	if (New->Type == PAVEMENT_PATTERN)
 	{
 		const int valid6[]={1,1,3,7,22};
 		const int valid4[]={1,1,2,5,12,35};

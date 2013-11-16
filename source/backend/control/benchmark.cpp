@@ -44,7 +44,7 @@
 namespace pov
 {
 
-char Benchmark_File [] =
+static const char Benchmark_File [] =
 {
 	// Persistence Of Vision Ray Tracer Scene Description File
 	//
@@ -1278,7 +1278,7 @@ char Benchmark_File [] =
 	"#end\n"
 } ;
 
-char Benchmark_Options [] =
+static const char Benchmark_Options [] =
 {
 	"All_Console=On\n"
 	"All_File=\n"

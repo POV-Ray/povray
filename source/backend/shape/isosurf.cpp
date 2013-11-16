@@ -57,8 +57,6 @@ namespace pov
 * Local preprocessor defines
 ******************************************************************************/
 
-#define close(x, y) (fabs(x-y) < EPSILON ? 1 : 0)
-
 /* Side hit. */
 const int SIDE_X_0 = 1;
 const int SIDE_X_1 = 2;
@@ -66,15 +64,6 @@ const int SIDE_Y_0 = 3;
 const int SIDE_Y_1 = 4;
 const int SIDE_Z_0 = 5;
 const int SIDE_Z_1 = 6;
-
-#define OK_X         1
-#define OK_Y         2
-#define OK_Z         4
-#define OK_R         8
-#define OK_S        16
-#define OK_T        32
-#define OK_U        64
-#define OK_V       128
 
 
 /*****************************************************************************

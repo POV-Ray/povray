@@ -45,8 +45,6 @@
 namespace pov_base
 {
 
-const char *BIN2HEX = "0123456789ABCDEF";
-
 Path::Path()
 {
 }

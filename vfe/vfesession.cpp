@@ -41,13 +41,13 @@
 #include "vfe.h"
 #include "povray.h"
 
-POVMSContext POVMS_Output_Context = NULL;
+static POVMSContext POVMS_Output_Context = NULL;
 
 namespace pov
 {
-  volatile POVMSContext POVMS_GUI_Context = NULL ;
-  volatile POVMSAddress RenderThreadAddr = POVMSInvalidAddress ;
-  volatile POVMSAddress GUIThreadAddr = POVMSInvalidAddress ;
+  static volatile POVMSContext POVMS_GUI_Context = NULL ;
+  static volatile POVMSAddress RenderThreadAddr = POVMSInvalidAddress ;
+  static volatile POVMSAddress GUIThreadAddr = POVMSInvalidAddress ;
 }
 
 namespace vfe

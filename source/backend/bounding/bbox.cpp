@@ -467,7 +467,7 @@ bool Intersect_BBox_Tree(PriorityQueue& pqueue, const BBOX_TREE *Root, const Ray
 	return (found);
 }
 
-void priority_queue_insert(PriorityQueue& Queue, DBL Depth, const BBOX_TREE *Node)
+static void priority_queue_insert(PriorityQueue& Queue, DBL Depth, const BBOX_TREE *Node)
 {
 	unsigned size;
 	int i;
