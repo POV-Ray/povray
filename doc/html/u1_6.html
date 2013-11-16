@@ -1,0 +1,132 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+
+<!--  This file copyright Persistence of Vision Raytracer Pty. Ltd. 2009-2011  -->
+
+<html lang="en">
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=windows-1252">
+<title>Unix Section 6</title>
+<link rel="StyleSheet" href="povray37.css" type="text/css">
+<link rel="shortcut icon" href="favicon.ico">
+
+<!--  NOTE: In order to help users find information about POV-Ray using web      -->
+<!--  search engines, we ask that you *not* let them index documentation         -->
+<!--  mirrors because effectively, when searching, users will get hundreds of    -->
+<!--  results containing the same information! For this reason, these meta tags  -->
+<!--  below disable archiving of this page by search engines.                    -->
+
+<meta name="robots" content="noarchive">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="expires" content="0">
+</head>
+<body>
+
+<div class="Page">
+
+<!-- NavPanel Begin -->
+<div class="NavPanel">
+<table class="NavTable">
+<tr>
+  <td class="FixedPanelHeading"><a title="1.6" href="#u1_6">Understanding POV-Ray Options</a></td>
+</tr>
+<tr>
+  <td><div class="divh2"><strong><a title="1.6.1" href="#u1_6_1">Special Command-Line Options</a></strong></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><strong><a title="1.6.2" href="#u1_6_2">Benchmark Rendering Mode</a></strong></div></td>
+</tr>
+<tr>
+  <td><div class="divh1">&nbsp;</div></td>
+</tr>
+<tr>
+  <td><div class="divh1">&nbsp;</div></td>
+</tr>
+</table>
+</div>
+<!-- NavPanel End -->
+
+<div class="Content">
+<table class="HeaderFooter" width="100%">
+<tr>
+  <td colspan=5 align="left" class="HeaderFooter">
+    POV-Ray for Unix <strong class="HeaderFooter">version 3.7</strong>
+  </td>
+</tr>
+<tr >
+  <td colspan=5>
+    <hr align="right" width="70%">
+  </td>
+</tr>
+<tr>
+  <td width="30%"></td>
+  <td class="NavBar"><a href="index.html" title="The Front Door">Home</a></td>
+  <td class="NavBar"><a href="u1_0.html" title="Unix Table of Contents">POV-Ray for Unix</a></td>
+  <td class="NavBar"><a href="t2_0.html" title="Tutorial Table of Contents">POV-Ray Tutorial</a></td>
+  <td class="NavBar"><a href="r3_0.html" title="Reference Table of Contents">POV-Ray Reference</a></td>
+</tr>
+</table>
+
+<a name="u1_6"></a>
+<div class="content-level-h2" contains="Understanding POV-Ray Options" id="u1_6">
+<h2>1.6 Understanding POV-Ray Options</h2>
+<p>Options are what previous versions of POV-Ray used to refer to as command-line options. The term is no longer accurate for POV-Ray 3.x, because the command line is only one way of passing options to the program. The other, more convenient way, is to use <a href="u1_5.html#u1_5_2">INI files</a>.</p>
+
+</div>
+<a name="u1_6_1"></a>
+<div class="content-level-h3" contains="Special Command-Line Options" id="u1_6_1">
+<h3>1.6.1 Special Command-Line Options</h3>
+<p>POV-Ray for Unix supports several special command-line options not recognized by other versions.  They follow the standards for programs that run under the X Window System.</p>
+
+<p class="Note"><strong>Note:</strong> See the section <a href="u1_7.html#u1_7_1">Known Bugs</a> for more information about a problem with the X11 windows system.</p>
+
+<dl>
+<dt><code>-display &lt;display_name&gt;</code></dt>
+<dd>Display preview on  display_name  rather  than  the default  display.   This  is  meant  to  be used to change the display to a remote  host.   The  normal dispay option <code>+d</code> is still valid.</dd>
+
+<dt><code>-geometry [WIDTHxHEIGHT][+XOFF+YOFF]</code></dt>
+<dd>Render the image with <code>WIDTH</code> and <code>HEIGHT</code> as the dimensions, and locate the window <code>XOFF</code> from the left edge, and <code>YOFF</code> from the top edge of the screen, or if negative the right and bottom edges respectively.<br>For instance: <code>-geometry 640x480+10+20</code> creates a display for a 640x480 image placed at (10,20) pixels from the top-left corner of the screen. The <code>WIDTH</code> and <code>HEIGHT</code>, if given, override any previous <code>+Wn</code> and <code>+Hn</code> settings.</dd>
+
+<dt><code>-help</code></dt>
+<dd>Display the X Window System-specific options. Use<code>-H</code> by itself on the command-line to output the general POV-Ray options.</dd>
+
+<dt><code>-icon</code></dt>
+<dd>Start the preview window as an icon.</dd>
+
+<dt><code>-title &lt;window_title&gt;</code></dt>
+<dd>Override the default preview window title with <strong><code>window_title</code></strong>.</dd>
+
+<dt><code>-visual &lt;visual_type&gt;</code></dt>
+<dd>Use  the  deepest  visual of <strong><code>visual_type</code></strong>, if available, instead of the automatically  selected visual.</dd>
+</dl>
+<p>Valid <strong><code>visual_type</code></strong> values:</p>
+<ul>
+<li>StaticGray</li>
+<li>GrayScale</li>
+<li>StaticColor</li>
+<li>PseudoColor</li>
+<li>TrueColor</li>
+<li>DirectColor</li>
+</ul>
+
+<p class="Note"><strong>Note:</strong> If you are supplying a filename with spaces in it, you will need to enclose the filename itself within quotes.</p>
+
+</div>
+<a name="u1_6_2"></a>
+<div class="content-level-h3" contains="Benchmark Rendering Mode" id="u1_6_2">
+<h3>1.6.2 Benchmark Rendering Mode</h3>
+<p>POV-Ray for Unix has a <em>built-in</em> version of the standard benchmark scene. In version 3.7 the <em>built-in</em> benchmark mode has been further modified to run without accessing <em>any</em> other distribution files, so now benchmarking can now be done with <em>just</em> the compiled executable.</p>
+<p>To run this scene use the <code>--benchmark</code> command line option:</p>
+
+<pre>
+povray --benchmark
+</pre>
+
+<p>Note that running the benchmark takes some time, on a 3 GHz AMD x2 250 processor with 4GB ram, about 12 minutes. There will be no image or file output from this render. For more information on the standard POV-Ray benchmark have a look at the <a href="http://www.povray.org/download/benchmark.php">Benchmarking with POV-Ray</a> page.</p>
+
+</div>
+
+</div>
+
+</div>
+</body>
+</html>
