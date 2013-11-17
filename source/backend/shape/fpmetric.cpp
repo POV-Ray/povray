@@ -970,7 +970,7 @@ void Parametric::Precomp_Par_Int(int depth, DBL umin, DBL vmin, DBL umax, DBL vm
 void Parametric::Precompute_Parametric_Values(char flags, int depth, FPUContext *ctx)
 {
 	DBL * Last;
-	char* es = "precompute";
+	const char* es = "precompute";
 	int nmb;
 
 	if ((depth < 1) || (depth > 20))

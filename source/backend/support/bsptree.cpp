@@ -90,7 +90,7 @@ BSPTree::~BSPTree()
 {
 }
 
-FILE *gFile = NULL;
+static FILE *gFile = NULL;
 
 bool BSPTree::operator()(const Ray& ray, Intersect& isect, Mailbox& mailbox, double maxdist)
 {

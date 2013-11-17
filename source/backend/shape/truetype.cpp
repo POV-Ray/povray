@@ -418,7 +418,7 @@ ULONG readULONG(IStream *infile, int line, const char *file)
 	                (((ULONG) i2) << 8)  |  ((ULONG) i3));
 }
 
-int compare_tag4(const BYTE *ttf_tag, const BYTE *known_tag)
+static int compare_tag4(const BYTE *ttf_tag, const BYTE *known_tag)
 {
 	return (ttf_tag[0] == known_tag[0] && ttf_tag[1] == known_tag[1] &&
 	        ttf_tag[2] == known_tag[2] && ttf_tag[3] == known_tag[3]);

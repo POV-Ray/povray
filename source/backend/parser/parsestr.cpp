@@ -485,7 +485,7 @@ UCS2 *Parser::Parse_Datetime(bool pathname)
 		CASE(RIGHT_PAREN_TOKEN)
 			CallFree = false;
 			// we use GMT as some platforms (e.g. windows) have different ideas of what to print when handling '%z'.
-			FormatStr = "%Y-%m-%d %H:%M:%SZ";
+			FormatStr = (char *)"%Y-%m-%d %H:%M:%SZ";
 			EXIT
 		END_CASE
 
@@ -493,7 +493,7 @@ UCS2 *Parser::Parse_Datetime(bool pathname)
 			UNGET
 			CallFree = true;
 			FormatStr = Parse_C_String(pathname);
-			if (strlen(FormatStr) == 0)
+			if (FormatStr[0] == '\0')
 			{
 				POV_FREE(FormatStr);
 				Error("Empty format string.");
@@ -529,7 +529,7 @@ UCS2 *Parser::Parse_Datetime(bool pathname)
 			throw;
 		vlen = 0;
 	}
-	if ((vlen == PARSE_NOW_VAL_LENGTH)) // on error: max for libc 4.4.1 & before
+	if (vlen == PARSE_NOW_VAL_LENGTH) // on error: max for libc 4.4.1 & before
 		vlen = 0; // return an empty string on error (content of val[] is undefined)
 	val[vlen]='\0'; // whatever, that operation is now safe (and superflous except for error)
 

@@ -2732,7 +2732,7 @@ POVMSNode *POVMSObject_Find(POVMSObjectPtr object, POVMSType key)
 
 #ifndef POVMS_NO_DUMP_SUPPORT
 
-int gPOVMSDumpLevel = 0;
+static int gPOVMSDumpLevel = 0;
 
 POVMS_EXPORT int POVMS_CDECL POVMSObject_Dump(FILE *file, POVMSObjectPtr object)
 {

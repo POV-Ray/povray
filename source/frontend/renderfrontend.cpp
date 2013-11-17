@@ -52,7 +52,7 @@ namespace pov_frontend
 
 const int gStreamTypeUtilDataCount = 6;
 
-const POVMSType gStreamTypeUtilData[gStreamTypeUtilDataCount] =
+static const POVMSType gStreamTypeUtilData[gStreamTypeUtilDataCount] =
 {
 	kPOVAttrib_DebugFile,
 	kPOVAttrib_FatalFile,
@@ -62,7 +62,7 @@ const POVMSType gStreamTypeUtilData[gStreamTypeUtilDataCount] =
 	kPOVAttrib_AllFile
 };
 
-const char *gStreamDefaultFile[gStreamTypeUtilDataCount] =
+static const char *gStreamDefaultFile[gStreamTypeUtilDataCount] =
 {
 	"debug.out",
 	"fatal.out",
@@ -72,7 +72,7 @@ const char *gStreamDefaultFile[gStreamTypeUtilDataCount] =
 	"alltext.out"
 };
 
-const int gStreamNumber[gStreamTypeUtilDataCount] =
+static const int gStreamNumber[gStreamTypeUtilDataCount] =
 {
 	DEBUG_STREAM,
 	FATAL_STREAM,
@@ -989,7 +989,7 @@ void OutputOptions(POVMS_Object& cppmsg, TextStreamBuffer *tsb)
 	int startRow, startCol, endRow, endCol;
 	POVMSBool b;
 	UCS2 ucs2buf[1024];
-	char *t;
+	const char *t;
 	int outputQuality = 8; // default bits per pixel channel // TODO FIXME: Default values shouldn't be hard-coded in here!
 	int outputCompression;
 	int l;
@@ -1045,7 +1045,7 @@ void OutputOptions(POVMS_Object& cppmsg, TextStreamBuffer *tsb)
 	b = false;
 	if(POVMSUtil_GetBool(msg, kPOVAttrib_OutputToFile, &b) != kNoErr || b == true) // TODO FIXME: Defaults (in this case b=true) shouldn't be hard-coded in here!
 	{
-		char *al = "";
+		const char *al = "";
 
 		l = 1023;
 		ucs2buf[0] = 0;

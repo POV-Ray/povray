@@ -8426,7 +8426,7 @@ int PickInCube(const VECTOR tv, VECTOR  p1)
 ******************************************************************************/
 
 #ifndef HAVE_BOOST_HASH
-unsigned long int NewHash(long int tvx, long int tvy, long int tvz)
+static unsigned long int NewHash(long int tvx, long int tvy, long int tvz)
 {
 	unsigned long int seed;
 	long int r;

@@ -54,7 +54,7 @@ namespace pov
 
 const DBL COORDINATE_LIMIT = 1.0e17;
 
-RandomDoubleSequence WarpRands(0.0, 1.0, 32768);
+static RandomDoubleSequence WarpRands(0.0, 1.0, 32768);
 
 /*****************************************************************************
 * Static functions

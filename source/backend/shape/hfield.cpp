@@ -1470,10 +1470,10 @@ void HField::Compute_BBox()
 
 bool HField::dda_traversal(const Ray &ray, const VECTOR Start, const HFIELD_BLOCK *Block, IStack &HField_Stack, const Ray &RRay, DBL mindist, DBL maxdist, TraceThreadData *Thread)
 {
-	char *dda_msg = "Illegal grid value in dda_traversal().\n"
-	                "The height field may contain dark spots. To eliminate them\n"
-	                "moving the camera a tiny bit should help. For more information\n"
-	                "read the user manual!";
+	const char *dda_msg = "Illegal grid value in dda_traversal().\n"
+	                      "The height field may contain dark spots. To eliminate them\n"
+	                      "moving the camera a tiny bit should help. For more information\n"
+	                      "read the user manual!";
 	int found;
 	int xmin, xmax, zmin, zmax;
 	int x, z, signx, signz;

@@ -59,7 +59,7 @@ enum DispMode
 	DISP_MODE_SDL
 };
 
-DispMode gDisplayMode;
+static DispMode gDisplayMode;
 
 enum ReturnValue
 {
@@ -68,14 +68,14 @@ enum ReturnValue
 	RETURN_USER_ABORT
 };
 
-bool gCancelRender = false;
+static bool gCancelRender = false;
 
 // for handling asynchronous (external) signals
-int gSignalNumber = 0;
-boost::mutex gSignalMutex;
+static int gSignalNumber = 0;
+static boost::mutex gSignalMutex;
 
 
-void SignalHandler (void)
+static void SignalHandler (void)
 {
 	sigset_t sigset;
 	int      signum;
@@ -90,7 +90,7 @@ void SignalHandler (void)
 }
 
 
-void ProcessSignal (void)
+static void ProcessSignal (void)
 {
 	boost::mutex::scoped_lock lock(gSignalMutex);
 
@@ -134,7 +134,7 @@ void ProcessSignal (void)
 	gSignalNumber = 0;
 }
 
-vfeDisplay *UnixDisplayCreator (unsigned int width, unsigned int height, GammaCurvePtr gamma, vfeSession *session, bool visible)
+static vfeDisplay *UnixDisplayCreator (unsigned int width, unsigned int height, GammaCurvePtr gamma, vfeSession *session, bool visible)
 {
 	UnixDisplay *display = GetRenderWindow () ;
 	switch (gDisplayMode)
@@ -159,7 +159,7 @@ vfeDisplay *UnixDisplayCreator (unsigned int width, unsigned int height, GammaCu
 	}
 }
 
-void PrintStatus (vfeSession *session)
+static void PrintStatus (vfeSession *session)
 {
 	string str;
 	vfeSession::MessageType type;
@@ -179,7 +179,7 @@ void PrintStatus (vfeSession *session)
 	}
 }
 
-void PrintStatusChanged (vfeSession *session, State force = kUnknown)
+static void PrintStatusChanged (vfeSession *session, State force = kUnknown)
 {
 	if (force == kUnknown)
 		force = session->GetBackendState();
@@ -197,7 +197,7 @@ void PrintStatusChanged (vfeSession *session, State force = kUnknown)
 	}
 }
 
-void PrintVersion(void)
+static void PrintVersion(void)
 {
 	fprintf(stderr,
 		"%s %s\n\n"
@@ -226,7 +226,7 @@ void PrintVersion(void)
 	);
 }
 
-void ErrorExit(vfeSession *session)
+static void ErrorExit(vfeSession *session)
 {
 	fprintf(stderr, "%s\n", session->GetErrorString());
 	session->Shutdown();
@@ -234,7 +234,7 @@ void ErrorExit(vfeSession *session)
 	exit(RETURN_ERROR);
 }
 
-void CancelRender(vfeSession *session)
+static void CancelRender(vfeSession *session)
 {
 	session->CancelRender();  // request the backend to cancel
 	PrintStatus (session);
@@ -243,7 +243,7 @@ void CancelRender(vfeSession *session)
 	PrintStatus (session);
 }
 
-void PauseWhenDone(vfeSession *session)
+static void PauseWhenDone(vfeSession *session)
 {
 	GetRenderWindow()->UpdateScreen(true);
 	GetRenderWindow()->PauseWhenDoneNotifyStart();
@@ -258,7 +258,7 @@ void PauseWhenDone(vfeSession *session)
 	GetRenderWindow()->PauseWhenDoneNotifyEnd();
 }
 
-ReturnValue PrepareBenchmark(vfeSession *session, vfeRenderOptions& opts, string& ini, string& pov, int argc, char **argv)
+static ReturnValue PrepareBenchmark(vfeSession *session, vfeRenderOptions& opts, string& ini, string& pov, int argc, char **argv)
 {
 	// parse command-line options
 	while (*++argv)
@@ -345,7 +345,7 @@ Press <Enter> to continue or <Ctrl-C> to abort.\n\
 	return RETURN_OK;
 }
 
-void CleanupBenchmark(vfeUnixSession *session, string& ini, string& pov)
+static void CleanupBenchmark(vfeUnixSession *session, string& ini, string& pov)
 {
 	fprintf(stderr, "%s: removing %s\n", PACKAGE, ini.c_str());
 	session->DeleteTemporaryFile(ASCIItoUCS2String(ini.c_str()));

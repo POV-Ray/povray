@@ -52,7 +52,7 @@ namespace pov_frontend
 }
 
 
-void PrintStatus (vfeSession *session)
+static void PrintStatus (vfeSession *session)
 {
   string str;
   vfeSession::MessageType type;
@@ -72,7 +72,7 @@ void PrintStatus (vfeSession *session)
   }
 }
 
-void ErrorExit(vfeSession *session)
+static void ErrorExit(vfeSession *session)
 {
   fprintf (stderr, "%s\n", session->GetErrorString());
   session->Shutdown();

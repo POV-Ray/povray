@@ -48,7 +48,7 @@ namespace pov_frontend
   extern struct ProcessRenderOptions::Output_FileType_Table FileTypeTable[];
 }
 
-struct pov_base::ProcessOptions::INI_Parser_Table *GetPT(const char *OptionName)
+static struct pov_base::ProcessOptions::INI_Parser_Table *GetPT(const char *OptionName)
 {
   for (struct pov_base::ProcessOptions::INI_Parser_Table *op = pov_frontend::RenderOptions_INI_Table; op->keyword != NULL; op++)
     if (strcmp(op->keyword, OptionName) == 0)
