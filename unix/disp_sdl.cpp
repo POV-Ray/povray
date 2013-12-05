@@ -175,7 +175,7 @@ namespace pov_frontend
 			// determine maximum display area (wrong and ugly)
 			{
 				SDL_Rect **modes = SDL_ListModes(NULL, SDL_FULLSCREEN);
-        // [JG] about testing vs ...(-1), have a look at SDL_ListModes API (the return is very ugly).
+				// [JG] about testing vs ...(-1), have a look at SDL_ListModes API (the return is very ugly).
 				if ((modes != NULL)&&(reinterpret_cast<SDL_Rect**>(-1) != modes))
 				{
 					width = min(modes[0]->w - 10, width);
