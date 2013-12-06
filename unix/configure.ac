@@ -308,18 +308,30 @@ else
   LIBS="$BOOST_THREAD_LIB $LIBS"
 fi
 AC_MSG_CHECKING([whether the boost thread library is usable])
+SAVED_LIBS=$LIBS
+boost_thread_links=0
+for extralib in '' '-lboost_system'
+do
+  LIBS=$SAVED_LIBS
+  LIBS="$LIBS $extralib"
 AC_RUN_IFELSE(
   [AC_LANG_PROGRAM([[
 #include <boost/thread/thread.hpp>
     ]],
     [[boost::defer_lock_t(); return 0;]])],
-  [AC_MSG_RESULT([yes])],
   [
-    AC_MSG_RESULT([no])
-    AC_MSG_FAILURE([cannot link with the boost thread library])
-  ],
+    AC_MSG_RESULT([yes])
+    BOOST_THREAD_LIB="$BOOST_THREAD_LIB $extralib"
+    boost_thread_links=1
+  ],,
   [AC_MSG_RESULT([cross-compiling])]  # FIXME
 )
+done
+if test $boost_thread_links != '1'; then
+  AC_MSG_RESULT([no])
+  AC_MSG_FAILURE([cannot link with the boost thread library])
+fi
+
 AC_DEFINE([USE_OFFICIAL_BOOST], [], [Use the official Boost libraries.])
 
 # Intel Math Kernel library
