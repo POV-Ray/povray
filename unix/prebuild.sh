@@ -724,7 +724,7 @@ aclocal -I .
 autoheader --warnings=all
 
 # Create all Makefile.in's from Makefile.am's
-automake --warnings=all ###--ignore-deps
+automake --warnings=all --add-missing ###--ignore-deps
 
 # Create configure from configure.ac
 autoconf --warnings=all

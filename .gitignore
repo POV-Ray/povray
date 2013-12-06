@@ -185,3 +185,10 @@ $RECYCLE.BIN/
 # Mac crap
 .DS_Store
 
+# Unix build helper scripts
+unix/config/compile
+unix/config/config.guess
+unix/config/config.sub
+unix/config/depcomp
+unix/config/install-sh
+unix/config/missing
