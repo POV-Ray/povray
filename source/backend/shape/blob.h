@@ -45,8 +45,8 @@ namespace pov
 
 #define BLOB_OBJECT (STURM_OK_OBJECT+HIERARCHY_OK_OBJECT)
 
-/* Do not use the first bit!!! (Used for enter/exit in intersection test) */
-
+// TODO - the following values probably don't have to be all discrete bits, except for BLOB_ENTER_EXIT_FLAG
+#define BLOB_ENTER_EXIT_FLAG      1 // internal use only
 #define BLOB_SPHERE               2
 #define BLOB_CYLINDER             4
 #define BLOB_ELLIPSOID            8
@@ -57,8 +57,8 @@ namespace pov
 
 
 /* Define max. number of blob components. */
-
-#define MAX_BLOB_COMPONENTS 1000000
+// [CLi] un-comment the following line if you want a hard limit of blob components; should be obsolete by now.
+// #define MAX_BLOB_COMPONENTS 1000000
 
 /* Generate additional blob statistics. */
 
