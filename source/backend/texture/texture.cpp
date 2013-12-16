@@ -29,9 +29,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/texture/texture.cpp $
- * $Revision: #44 $
- * $Change: 6154 $
- * $DateTime: 2013/12/01 13:49:24 $
+ * $Revision: #46 $
+ * $Change: 6158 $
+ * $DateTime: 2013/12/02 21:19:56 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -70,7 +70,6 @@ static unsigned int next_rand = 1;
 ******************************************************************************/
 
 static void InitTextureTable (void);
-static TEXTURE *Copy_Materials (TEXTURE *Old);
 static void InitSolidNoise(void);
 static DBL SolidNoise(const Vector3d& P);
 
@@ -1096,16 +1095,16 @@ void Transform_Textures(TEXTURE *Textures, const TRANSFORM *Trans)
 {
 	TEXTURE *Layer;
 
-	for (Layer = Textures; Layer != NULL; Layer = reinterpret_cast<TEXTURE *>(Layer->Next))
+	for (Layer = Textures; Layer != NULL; Layer = Layer->Next)
 	{
 		if (Layer->Type == PLAIN_PATTERN)
 		{
-			Transform_Tpattern(reinterpret_cast<TPATTERN *>(Layer->Pigment), Trans);
-			Transform_Tpattern(reinterpret_cast<TPATTERN *>(Layer->Tnormal), Trans);
+			Transform_Tpattern(Layer->Pigment, Trans);
+			Transform_Tpattern(Layer->Tnormal, Trans);
 		}
 		else
 		{
-			Transform_Tpattern(reinterpret_cast<TPATTERN *>(Layer), Trans);
+			Transform_Tpattern(Layer, Trans);
 		}
 	}
 }
@@ -1244,8 +1243,9 @@ TEXTURE *Create_Texture()
 
 	New = new TEXTURE;
 
-	Init_TPat_Fields(reinterpret_cast<TPATTERN *>(New));
+	Init_TPat_Fields(New);
 
+	New->Next = NULL;
 	New->References = 1;
 
 	New->Type    = PLAIN_PATTERN;
@@ -1255,11 +1255,7 @@ TEXTURE *Create_Texture()
 	New->Tnormal = NULL;
 	New->Finish  = NULL;
 
-	New->Next          = NULL;
-	New->Next_Material = NULL;
-
-	New->Materials = NULL;
-	New->Num_Of_Mats = 0;
+	New->Next    = NULL;
 
 	return (New);
 }
@@ -1325,10 +1321,10 @@ TEXTURE *Copy_Textures(const TEXTURE *Textures)
 
 	Previous = First = NULL;
 
-	for (Layer = Textures; Layer != NULL; Layer = reinterpret_cast<const TEXTURE *>(Layer->Next))
+	for (Layer = Textures; Layer != NULL; Layer = Layer->Next)
 	{
 		New = Create_Texture();
-		Copy_TPat_Fields (reinterpret_cast<TPATTERN *>(New), reinterpret_cast<const TPATTERN *>(Layer));
+		Copy_TPat_Fields (New, Layer);
 
 		/*  Mesh copies a texture pointer that already has multiple
 		    references.  We just want a clean copy, not a copy
@@ -1347,9 +1343,9 @@ TEXTURE *Copy_Textures(const TEXTURE *Textures)
 				break;
 
 			case BITMAP_PATTERN:
-
-				New->Materials   = Copy_Materials(Layer->Materials);
-				New->Num_Of_Mats = Layer->Num_Of_Mats;
+				New->Materials.reserve(Layer->Materials.size());
+				for (vector<TEXTURE*>::const_iterator i = Layer->Materials.begin(); i != Layer->Materials.end(); ++ i)
+					New->Materials.push_back(Copy_Textures(*i));
 
 //				Not needed. Copied by Copy_TPat_Fields:
 //				New->Vals.Image  = Copy_Image(Layer->Vals.Image);
@@ -1364,55 +1360,7 @@ TEXTURE *Copy_Textures(const TEXTURE *Textures)
 
 		if (Previous != NULL)
 		{
-			Previous->Next = reinterpret_cast<TPATTERN *>(New);
-		}
-
-		Previous = New;
-	}
-
-	return (First);
-}
-
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-*   POV-Ray Team
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
-
-static TEXTURE *Copy_Materials(TEXTURE *Old)
-{
-	TEXTURE *New, *First, *Previous, *Material;
-
-	Previous = First = NULL;
-
-	for (Material = Old; Material != NULL; Material = Material->Next_Material)
-	{
-		New = Copy_Textures(Material);
-
-		if (First == NULL)
-		{
-			First = New;
-		}
-
-		if (Previous != NULL)
-		{
-			Previous->Next_Material = New;
+			Previous->Next = New;
 		}
 
 		Previous = New;
@@ -1446,7 +1394,6 @@ static TEXTURE *Copy_Materials(TEXTURE *Old)
 void Destroy_Textures(TEXTURE *Textures)
 {
 	TEXTURE *Layer = Textures;
-	TEXTURE *Mats;
 	TEXTURE *Temp;
 
 	if ((Textures == NULL) || (--(Textures->References) > 0))
@@ -1456,39 +1403,18 @@ void Destroy_Textures(TEXTURE *Textures)
 
 	while (Layer != NULL)
 	{
-		Mats = Layer->Next_Material;
+		Destroy_TPat_Fields(Layer);
 
-		while (Mats != NULL)
-		{
-			Temp = Mats->Next_Material;
-			Mats->Next_Material = NULL;
-			Destroy_Textures(Mats);
-			Mats = Temp;
-		}
+		// Theoretically these should only be non-NULL for PLAIN_PATTERN, but let's clean them up either way.
+		Destroy_Pigment(Layer->Pigment);
+		Destroy_Tnormal(Layer->Tnormal);
+		Destroy_Finish(Layer->Finish);
 
-		Destroy_TPat_Fields(reinterpret_cast<TPATTERN *>(Layer));
+		// Theoretically these should only be non-empty for BITMAP_PATTERN, but let's clean them up either way.
+		for(vector<TEXTURE*>::iterator i = Layer->Materials.begin(); i != Layer->Materials.end(); ++ i)
+			Destroy_Textures(*i);
 
-		switch (Layer->Type)
-		{
-			case PLAIN_PATTERN:
-
-				Destroy_Pigment(Layer->Pigment);
-				Destroy_Tnormal(Layer->Tnormal);
-				Destroy_Finish(Layer->Finish);
-
-			break;
-
-
-			case BITMAP_PATTERN:
-
-				Destroy_Textures(Layer->Materials);
-				/*taken care of by Destroy_TPat_Fields*/
-				/*Destroy_Image(Layer->Vals.Image);*/
-
-			break;
-		}
-
-		Temp = reinterpret_cast<TEXTURE *>(Layer->Next);
+		Temp = Layer->Next;
 		delete Layer;
 		Layer = Temp;
 	}
@@ -1518,7 +1444,7 @@ void Destroy_Textures(TEXTURE *Textures)
 
 void Post_Textures(TEXTURE *Textures)
 {
-	TEXTURE *Layer, *Material;
+	TEXTURE *Layer;
 	int i;
 	BLEND_MAP *Map;
 
@@ -1527,7 +1453,7 @@ void Post_Textures(TEXTURE *Textures)
 		return;
 	}
 
-	for (Layer = Textures; Layer != NULL; Layer = reinterpret_cast<TEXTURE *>(Layer->Next))
+	for (Layer = Textures; Layer != NULL; Layer = Layer->Next)
 	{
 		if (!((Layer->Flags) & POST_DONE))
 		{
@@ -1547,11 +1473,11 @@ void Post_Textures(TEXTURE *Textures)
 
 				case BITMAP_PATTERN:
 
-					for (Material = Layer->Materials; Material != NULL; Material = Material->Next_Material)
+					for (vector<TEXTURE*>::iterator i = Layer->Materials.begin(); i != Layer->Materials.end(); ++ i)
 
-						Post_Textures(Material);
+						Post_Textures(*i);
 
-						break;
+					break;
 			}
 
 			if ((Map=Layer->Blend_Map) != NULL)
@@ -1614,7 +1540,7 @@ void Post_Textures(TEXTURE *Textures)
 int Test_Opacity(const TEXTURE *Texture)
 {
 	int Opaque, Help;
-	const TEXTURE *Layer, *Material;
+	const TEXTURE *Layer;
 
 	if (Texture == NULL)
 	{
@@ -1627,7 +1553,7 @@ int Test_Opacity(const TEXTURE *Texture)
 
 	/* Test all layers. If at least one layer is opaque the object is opaque. */
 
-	for (Layer = Texture; Layer != NULL; Layer = reinterpret_cast<const TEXTURE *>(Layer->Next))
+	for (Layer = Texture; Layer != NULL; Layer = Layer->Next)
 	{
 		switch (Layer->Type)
 		{
@@ -1658,9 +1584,9 @@ int Test_Opacity(const TEXTURE *Texture)
 
 				Help = true;
 
-				for (Material = Layer->Materials; Material != NULL; Material = Material->Next_Material)
+				for (vector<TEXTURE*>::const_iterator i = Layer->Materials.begin(); i != Layer->Materials.end(); ++ i)
 				{
-					if (!Test_Opacity(Material))
+					if (!Test_Opacity(*i))
 					{
 						/* Material is not opaque --> layer is not opaque. */
 

@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/parser/parstxtr.cpp $
- * $Revision: #96 $
- * $Change: 6154 $
- * $DateTime: 2013/12/01 13:49:24 $
+ * $Revision: #98 $
+ * $Change: 6158 $
+ * $DateTime: 2013/12/02 21:19:56 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -940,7 +940,7 @@ void Parser::Parse_Pigment (PIGMENT **Pigment_Ptr)
 		END_CASE
 	END_EXPECT    /* End pigment_id */
 
-	Parse_Pattern(reinterpret_cast<TPATTERN *>(*Pigment_Ptr),PIGMENT_TYPE);
+	Parse_Pattern(*Pigment_Ptr,PIGMENT_TYPE);
 
 	if (Not_In_Default && ((*Pigment_Ptr)->Type == NO_PATTERN))
 	{
@@ -1118,6 +1118,8 @@ void Parser::Parse_Pattern (TPATTERN *New, int TPat_Type)
 					Error("Invalid magnet pattern found. Valid types are 'mandel' and 'julia'.");
 				END_CASE
 			END_EXPECT
+			if (New->Type == NO_PATTERN)
+				Error("No magnet pattern found. Valid types are 'mandel' and 'julia'.");
 			dynamic_cast<FractalPattern*>(New->pattern.get())->interior_type = DEFAULT_FRACTAL_INTERIOR_TYPE;
 			dynamic_cast<FractalPattern*>(New->pattern.get())->exterior_type = DEFAULT_FRACTAL_EXTERIOR_TYPE;
 			dynamic_cast<FractalPattern*>(New->pattern.get())->efactor = DEFAULT_FRACTAL_EXTERIOR_FACTOR;
@@ -1195,14 +1197,14 @@ void Parser::Parse_Pattern (TPATTERN *New, int TPat_Type)
 				Only_In("color","pigment or density");
 			}
 			New->Type = PLAIN_PATTERN;
-			New->pattern.reset();
+			New->pattern = PatternPtr(new PlainPattern());
 			Parse_Colour ((reinterpret_cast<PIGMENT *>(New))->colour);
 			EXIT
 		END_CASE
 
 		CASE (UV_MAPPING_TOKEN)
 			New->Type = UV_MAP_PATTERN;
-			New->pattern.reset();
+			New->pattern = PatternPtr(new PlainPattern());
 			Destroy_Blend_Map(New->Blend_Map);
 			New->Blend_Map = Parse_Item_Into_Blend_List(TPat_Type);
 			EXIT
@@ -1394,7 +1396,7 @@ void Parser::Parse_Pattern (TPATTERN *New, int TPat_Type)
 
 		CASE (AVERAGE_TOKEN)
 			New->Type = AVERAGE_PATTERN;
-			New->pattern.reset();
+			New->pattern = PatternPtr(new PlainPattern());
 			EXIT
 		END_CASE
 
@@ -2258,7 +2260,7 @@ void Parser::Parse_Tnormal (TNORMAL **Tnormal_Ptr)
 			*Tnormal_Ptr = Create_Tnormal ();
 		}
 	}
-	Parse_Pattern(reinterpret_cast<TPATTERN *>(*Tnormal_Ptr),NORMAL_TYPE);
+	Parse_Pattern(*Tnormal_Ptr,NORMAL_TYPE);
 }
 
 
@@ -2794,7 +2796,7 @@ TEXTURE *Parser::Parse_Texture ()
 					Texture->Pigment = NULL;
 					Texture->Tnormal = NULL;
 					Texture->Finish  = NULL;
-					Parse_Pattern(reinterpret_cast<TPATTERN *>(Texture),TEXTURE_TYPE);
+					Parse_Pattern(Texture,TEXTURE_TYPE);
 					/* if following is true, parsed "texture{}" so restore
 					   default texture.
 					 */
@@ -2922,7 +2924,7 @@ TEXTURE *Parser::Parse_Tiles()
 
 TEXTURE *Parser::Parse_Material_Map()
 {
-	TEXTURE *Texture, *Local_Texture;
+	TEXTURE *Texture;
 	Vector2d Repeat;
 
 	Parse_Begin ();
@@ -2935,6 +2937,7 @@ TEXTURE *Parser::Parse_Material_Map()
 	Texture->Tnormal = NULL;
 	Texture->Finish  = NULL;
 	Texture->Type = BITMAP_PATTERN;
+	Texture->pattern = PatternPtr(new ImagePattern());
 
 	dynamic_cast<ImagePattern*>(Texture->pattern.get())->image = Parse_Image(MATERIAL_FILE);
 	dynamic_cast<ImagePattern*>(Texture->pattern.get())->image->Use = USE_NONE; // was false [trf]
@@ -2974,17 +2977,14 @@ TEXTURE *Parser::Parse_Material_Map()
 
 	GET (TEXTURE_TOKEN)                /* First material */
 	Parse_Begin();
-	Texture->Materials = Local_Texture = Parse_Texture ();
+	Texture->Materials.push_back(Parse_Texture ());
 	Parse_End();
-	Texture->Num_Of_Mats++;
 
 	EXPECT                             /* Subsequent materials */
 		CASE (TEXTURE_TOKEN)
 			Parse_Begin();
-			Local_Texture->Next_Material = Parse_Texture ();
+			Texture->Materials.push_back(Parse_Texture ());
 			Parse_End();
-			Local_Texture = Local_Texture->Next_Material;
-			Texture->Num_Of_Mats++;
 		END_CASE
 
 		OTHERWISE
@@ -3175,7 +3175,7 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
 				CASE_COLOUR
 					Warn_State(Token.Token_Id, PIGMENT_TOKEN);
 					Pigment->Type = PLAIN_PATTERN;
-					Pigment->pattern.reset();
+					Pigment->pattern = PatternPtr(new PlainPattern());
 					Parse_Colour (Pigment->colour);
 				END_CASE
 
@@ -3270,6 +3270,7 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
 					Warn_State(Token.Token_Id, TNORMAL_TOKEN);
 					ADD_TNORMAL
 					Tnormal->Type = BUMPS_PATTERN;
+					Tnormal->pattern = PatternPtr(new BumpsPattern());
 					Tnormal->Amount = Parse_Float ();
 				END_CASE
 
@@ -3277,6 +3278,7 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
 					Warn_State(Token.Token_Id, TNORMAL_TOKEN);
 					ADD_TNORMAL
 					Tnormal->Type = DENTS_PATTERN;
+					Tnormal->pattern = PatternPtr(new DentsPattern());
 					Tnormal->Amount = Parse_Float ();
 				END_CASE
 
@@ -3284,6 +3286,7 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
 					Warn_State(Token.Token_Id, TNORMAL_TOKEN);
 					ADD_TNORMAL
 					Tnormal->Type = RIPPLES_PATTERN;
+					Tnormal->pattern = PatternPtr(new RipplesPattern());
 					Tnormal->Amount = Parse_Float ();
 				END_CASE
 
@@ -3291,6 +3294,7 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
 					Warn_State(Token.Token_Id, TNORMAL_TOKEN);
 					ADD_TNORMAL
 					Tnormal->Type = WAVES_PATTERN;
+					Tnormal->pattern = PatternPtr(new WavesPattern());
 					Tnormal->Amount = Parse_Float ();
 				END_CASE
 
@@ -3298,6 +3302,7 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
 					Warn_State(Token.Token_Id, TNORMAL_TOKEN);
 					ADD_TNORMAL
 					Tnormal->Type = WRINKLES_PATTERN;
+					Tnormal->pattern = PatternPtr(new WrinklesPattern());
 					Tnormal->Amount = Parse_Float ();
 				END_CASE
 
@@ -3305,6 +3310,7 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
 					Warn_State(Token.Token_Id, TNORMAL_TOKEN);
 					ADD_TNORMAL
 					Tnormal->Type = BITMAP_PATTERN;
+					Tnormal->pattern = PatternPtr(new ImagePattern());
 					Tnormal->pattern->Frequency = 0.0;
 					Parse_Bump_Map (Tnormal);
 				END_CASE
@@ -3697,7 +3703,7 @@ void Parser::Parse_Media(vector<Media>& medialist)
 
 		CASE (DENSITY_TOKEN)
 			Parse_Begin();
-			Parse_Media_Density_Pattern(&(IMedia->Density));
+			Parse_Media_Density_Pattern(IMedia->Density);
 			Parse_End();
 		END_CASE
 
@@ -3873,27 +3879,31 @@ void Parser::Parse_Interior(Interior **Interior_Ptr)
 *
 ******************************************************************************/
 
-void Parser::Parse_Media_Density_Pattern(PIGMENT **Density_Ptr)
+void Parser::Parse_Media_Density_Pattern(PIGMENT** Density)
 {
-	PIGMENT *New;
-
 	EXPECT
 		CASE (DENSITY_ID_TOKEN)
-			New = Copy_Pigment (reinterpret_cast<PIGMENT *>(Token.Data));
+			*Density = Copy_Pigment (reinterpret_cast<PIGMENT *>(Token.Data));
 			EXIT
 		END_CASE
 
 		OTHERWISE
-			New = Create_Pigment();
+			*Density = Create_Pigment();
 			UNGET
 			EXIT
 		END_CASE
 	END_EXPECT
 
-	Parse_Pattern(reinterpret_cast<TPATTERN *>(New),DENSITY_TYPE);
+	Parse_Pattern(*Density,DENSITY_TYPE);
+}
 
-	New->Next = reinterpret_cast<TPATTERN *>(*Density_Ptr);
-	*Density_Ptr = New;
+void Parser::Parse_Media_Density_Pattern(vector<PIGMENT*>& Density)
+{
+	PIGMENT *New;
+
+	Parse_Media_Density_Pattern(&New);
+
+	Density.push_back(New);
 }
 
 
@@ -4129,6 +4139,7 @@ RAINBOW *Parser::Parse_Rainbow()
 		END_CASE
 
 		CASE (COLOUR_MAP_TOKEN)
+			// TODO FIXME - what if the user specifies multiple color maps?
 			Rainbow->Pigment = Create_Pigment();
 			Rainbow->Pigment->Blend_Map = Parse_Colour_Map();
 			Rainbow->Pigment->Type = GENERIC_PATTERN;
@@ -4297,11 +4308,9 @@ SKYSPHERE *Parser::Parse_Skysphere()
 
 	EXPECT
 		CASE (PIGMENT_TOKEN)
-			Skysphere->Count++;
-			Skysphere->Pigments = reinterpret_cast<PIGMENT **>(POV_REALLOC(Skysphere->Pigments, Skysphere->Count*sizeof(SKYSPHERE *), "sky-sphere pigment"));
-			Skysphere->Pigments[Skysphere->Count-1] = Create_Pigment();
+			Skysphere->Pigments.push_back(Create_Pigment());
 			Parse_Begin();
-			Parse_Pigment(&(Skysphere->Pigments[Skysphere->Count-1]));
+			Parse_Pigment(&(Skysphere->Pigments.back()));
 			Parse_End();
 		END_CASE
 
@@ -4342,7 +4351,7 @@ SKYSPHERE *Parser::Parse_Skysphere()
 
 	Parse_End();
 
-	if (Skysphere->Count==0)
+	if (Skysphere->Pigments.empty())
 	{
 		Error("Empty sky_sphere statement.");
 	}
@@ -5024,6 +5033,8 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
 					Error("Invalid magnet pattern found. Valid types are 'mandel' and 'julia'.");
 				END_CASE
 			END_EXPECT
+			if (New->Type == NO_PATTERN)
+				Error("No magnet pattern found. Valid types are 'mandel' and 'julia'.");
 			dynamic_cast<FractalPattern*>(New->pattern.get())->interior_type = DEFAULT_FRACTAL_INTERIOR_TYPE;
 			dynamic_cast<FractalPattern*>(New->pattern.get())->exterior_type = DEFAULT_FRACTAL_EXTERIOR_TYPE;
 			dynamic_cast<FractalPattern*>(New->pattern.get())->efactor = DEFAULT_FRACTAL_EXTERIOR_FACTOR;

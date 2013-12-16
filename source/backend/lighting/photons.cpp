@@ -27,9 +27,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/lighting/photons.cpp $
- * $Revision: #65 $
- * $Change: 6150 $
- * $DateTime: 2013/11/30 14:13:48 $
+ * $Revision: #67 $
+ * $Change: 6158 $
+ * $DateTime: 2013/12/02 21:19:56 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -373,7 +373,7 @@ void PhotonTrace::ComputeLightedTexture(Colour& LightCol, const TEXTURE *Texture
 	one_colour_found = false;
 	for (layer_number = 0, Layer = Texture;
 	     (Layer != NULL) && (Trans > ticket.adcBailout);
-	     layer_number++, Layer = reinterpret_cast<TEXTURE *>(Layer->Next))
+	     layer_number++, Layer = Layer->Next)
 	{
 		// Get perturbed surface normal.
 		LayNormal = rawnormal;
@@ -381,15 +381,17 @@ void PhotonTrace::ComputeLightedTexture(Colour& LightCol, const TEXTURE *Texture
 		if ((qualityFlags & Q_NORMAL) && (Layer->Tnormal != NULL))
 		{
 			for(vector<const TEXTURE *>::iterator i(warps.begin()); i != warps.end(); i++)
-				Warp_Normal(LayNormal, LayNormal, reinterpret_cast<const TPATTERN *>(*i), Test_Flag((*i), DONT_SCALE_BUMPS_FLAG));
+				Warp_Normal(LayNormal, LayNormal, *i, Test_Flag(*i, DONT_SCALE_BUMPS_FLAG));
 
 			Perturb_Normal(LayNormal, Layer->Tnormal, ipoint, &isect, &ray, threadData);
 
 			if((Test_Flag(Layer->Tnormal, DONT_SCALE_BUMPS_FLAG)))
 				LayNormal.normalize();
 
+			// TODO - Reverse iterator may be less performant than forward iterator; we might want to
+			//        compare performance with using forward iterators and decrement, or using random access.
 			for(vector<const TEXTURE *>::reverse_iterator i(warps.rbegin()); i != warps.rend(); i++)
-				UnWarp_Normal(LayNormal, LayNormal, reinterpret_cast<const TPATTERN *>(*i), Test_Flag((*i), DONT_SCALE_BUMPS_FLAG));
+				UnWarp_Normal(LayNormal, LayNormal, *i, Test_Flag(*i, DONT_SCALE_BUMPS_FLAG));
 		}
 
 		// Store top layer normal.
@@ -699,7 +701,7 @@ void PhotonTrace::ComputeLightedTexture(Colour& LightCol, const TEXTURE *Texture
 			if (threadData->photonTargetObject==NULL)
 				break;
 
-			Layer = reinterpret_cast<TEXTURE *>(Layer->Next);
+			Layer = Layer->Next;
 		}
 	}
 
@@ -1084,8 +1086,8 @@ void PhotonMediaFunction::ComputeMediaAndDepositPhotons(MediaVector& medias, con
 		use_scattering = use_scattering || (*i)->use_scattering;
 
 		// NK fast light_ray media calculation for constant media
-		if((*i)->Density)
-			all_constant_and_light_ray = all_constant_and_light_ray && ((*i)->Density->Type == PLAIN_PATTERN);
+		for (vector<PIGMENT*>::iterator ii = (*i)->Density.begin(); ii != (*i)->Density.end(); ++ ii)
+			all_constant_and_light_ray = all_constant_and_light_ray && ((*ii)->Type == PLAIN_PATTERN);
 	}
 
 	// If this is a light ray and no extinction is used we can return.

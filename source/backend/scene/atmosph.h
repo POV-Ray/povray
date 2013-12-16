@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/scene/atmosph.h $
- * $Revision: #20 $
- * $Change: 6147 $
- * $DateTime: 2013/11/29 20:46:11 $
+ * $Revision: #21 $
+ * $Change: 6158 $
+ * $DateTime: 2013/12/02 21:19:56 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -82,10 +82,9 @@ struct Rainbow_Struct
 
 struct Skysphere_Struct
 {
-	int Count;           ///< Number of pigments.
-	RGBColour Emission;  ///< Brightness adjustment.
-	PIGMENT **Pigments;  ///< Pigment(s) to use.
-	TRANSFORM *Trans;    ///< Skysphere transformation.
+	RGBColour         Emission; ///< Brightness adjustment.
+	vector<PIGMENT *> Pigments; ///< Pigment(s) to use.
+	TRANSFORM *       Trans;    ///< Skysphere transformation.
 };
 
 /*****************************************************************************

@@ -26,9 +26,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/texture/pigment.cpp $
- * $Revision: #38 $
- * $Change: 6154 $
- * $DateTime: 2013/12/01 13:49:24 $
+ * $Revision: #40 $
+ * $Change: 6158 $
+ * $DateTime: 2013/12/02 21:19:56 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -111,7 +111,7 @@ PIGMENT *Create_Pigment ()
 
 	New = new PIGMENT;
 
-	Init_TPat_Fields(reinterpret_cast<TPATTERN *>(New));
+	Init_TPat_Fields(New);
 
 	New->colour.clear();
 	New->Quick_Colour = Colour(-1.0,-1.0,-1.0);
@@ -155,12 +155,11 @@ PIGMENT *Copy_Pigment (const PIGMENT *Old)
 	{
 		New = Create_Pigment ();
 
-		Copy_TPat_Fields (reinterpret_cast<TPATTERN *>(New), reinterpret_cast<const TPATTERN *>(Old));
+		Copy_TPat_Fields (New, Old);
 
 		if (Old->Type == PLAIN_PATTERN)
 			New->colour = Old->colour;
 		New->Quick_Colour = Old->Quick_Colour;
-		New->Next = reinterpret_cast<TPATTERN *>(Copy_Pigment(reinterpret_cast<const PIGMENT *>(Old->Next)));
 	}
 	else
 	{
@@ -168,6 +167,14 @@ PIGMENT *Copy_Pigment (const PIGMENT *Old)
 	}
 
 	return (New);
+}
+
+void Copy_Pigments (vector<PIGMENT*>& New, const vector<PIGMENT*>& Old)
+{
+	New.resize(0);
+	New.reserve(Old.size());
+	for (vector<PIGMENT*>::const_iterator i = Old.begin(); i != Old.end(); ++ i)
+		New.push_back(Copy_Pigment(*i));
 }
 
 
@@ -200,9 +207,7 @@ void Destroy_Pigment (PIGMENT *Pigment)
 {
 	if (Pigment != NULL)
 	{
-		Destroy_Pigment(reinterpret_cast<PIGMENT *>(Pigment->Next));
-
-		Destroy_TPat_Fields (reinterpret_cast<TPATTERN *>(Pigment));
+		Destroy_TPat_Fields (Pigment);
 
 		delete Pigment;
 	}
@@ -322,11 +327,6 @@ int Post_Pigment(PIGMENT *Pigment)
 		Pigment->Flags |= HAS_FILTER;
 	}
 
-	if (Pigment->Next != NULL)
-	{
-		Post_Pigment(reinterpret_cast<PIGMENT *>(Pigment->Next));
-	}
-
 	return(Has_Filter);
 }
 
@@ -405,7 +405,7 @@ bool Compute_Pigment (Colour& colour, const PIGMENT *Pigment, const Vector3d& EP
 
 			case AVERAGE_PATTERN:
 
-				Warp_EPoint (TPoint, EPoint, reinterpret_cast<const TPATTERN *>(Pigment));
+				Warp_EPoint (TPoint, EPoint, Pigment);
 
 				Do_Average_Pigments(colour, Pigment, TPoint, Intersect, ray, Thread);
 
@@ -439,7 +439,7 @@ bool Compute_Pigment (Colour& colour, const PIGMENT *Pigment, const Vector3d& EP
 
 			case BITMAP_PATTERN:
 
-				Warp_EPoint (TPoint, EPoint, reinterpret_cast<const TPATTERN *>(Pigment));
+				Warp_EPoint (TPoint, EPoint, Pigment);
 
 				colour.clear();
 
@@ -458,8 +458,8 @@ bool Compute_Pigment (Colour& colour, const PIGMENT *Pigment, const Vector3d& EP
 	Colour_Found = false;
 
 	/* NK 19 Nov 1999 added Warp_EPoint */
-	Warp_EPoint (TPoint, EPoint, reinterpret_cast<const TPATTERN *>(Pigment));
-	value = Evaluate_TPat (reinterpret_cast<const TPATTERN *>(Pigment), TPoint, Intersect, ray, Thread);
+	Warp_EPoint (TPoint, EPoint, Pigment);
+	value = Evaluate_TPat (Pigment, TPoint, Intersect, ray, Thread);
 
 	Search_Blend_Map (value, Blend_Map, &Prev, &Cur);
 
@@ -471,7 +471,7 @@ bool Compute_Pigment (Colour& colour, const PIGMENT *Pigment, const Vector3d& EP
 	}
 	else
 	{
-		Warp_EPoint (TPoint, EPoint, reinterpret_cast<const TPATTERN *>(Pigment));
+		Warp_EPoint (TPoint, EPoint, Pigment);
 
 		if (Compute_Pigment(colour, Cur->Vals.Pigment, TPoint, Intersect, ray, Thread))
 			Colour_Found = true;
@@ -542,23 +542,24 @@ static void Do_Average_Pigments (Colour& colour, const PIGMENT *Pigment, const V
 	colour /= Total;
 }
 
-void Evaluate_Density_Pigment(const PIGMENT *pigm, const Vector3d& p, RGBColour& c, TraceThreadData *ttd)
+void Evaluate_Density_Pigment(vector<PIGMENT*>& Density, const Vector3d& p, RGBColour& c, TraceThreadData *ttd)
 {
 	Colour lc;
 
 	c.set(1.0);
 
-	while(pigm != NULL)
+	// TODO - Reverse iterator may be less performant than forward iterator; we might want to
+	//        compare performance with using forward iterators and decrement, or using random access.
+	//        Alternatively, reversing the vector after parsing might be another option.
+	for (vector<PIGMENT*>::reverse_iterator i = Density.rbegin(); i != Density.rend(); ++ i)
 	{
 		lc.clear();
 
-		Compute_Pigment(lc, pigm, p, NULL, NULL, ttd);
+		Compute_Pigment(lc, *i, p, NULL, NULL, ttd);
 
 		c.red()   *= lc.red();
 		c.green() *= lc.green();
 		c.blue()  *= lc.blue();
-
-		pigm = reinterpret_cast<const PIGMENT *>(pigm->Next);
 	}
 }
 

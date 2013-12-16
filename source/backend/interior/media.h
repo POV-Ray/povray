@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/interior/media.h $
- * $Revision: #22 $
- * $Change: 6146 $
- * $DateTime: 2013/11/29 17:08:55 $
+ * $Revision: #23 $
+ * $Change: 6158 $
+ * $DateTime: 2013/12/02 21:19:56 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -50,7 +50,7 @@ enum
 	SCATTERING_TYPES                = 5
 };
 
-void Transform_Density(PIGMENT *Density, const TRANSFORM *Trans);
+void Transform_Density(vector<PIGMENT*>& Density, const TRANSFORM *Trans);
 
 class MediaFunction : public Trace::MediaFunctor
 {

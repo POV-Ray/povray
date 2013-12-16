@@ -26,9 +26,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/parser/parse.h $
- * $Revision: #60 $
- * $Change: 6122 $
- * $DateTime: 2013/11/23 10:33:00 $
+ * $Revision: #61 $
+ * $Change: 6158 $
+ * $DateTime: 2013/12/02 21:19:56 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -341,6 +341,7 @@ class Parser : public Task
 		void Parse_Media (vector<Media>&);
 		void Parse_Interior (Interior **);
 		void Parse_Media_Density_Pattern (PIGMENT **);
+		void Parse_Media_Density_Pattern (vector<PIGMENT*>&);
 		FOG *Parse_Fog (void);
 		RAINBOW *Parse_Rainbow (void);
 		SKYSPHERE *Parse_Skysphere (void);

@@ -26,9 +26,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/support/imageutil.cpp $
- * $Revision: #42 $
- * $Change: 6154 $
- * $DateTime: 2013/12/01 13:49:24 $
+ * $Revision: #44 $
+ * $Change: 6158 $
+ * $DateTime: 2013/12/02 21:19:56 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -145,7 +145,7 @@ bool image_map(const Vector3d& EPoint, const PIGMENT *Pigment, Colour& colour)
 
 	// If outside map coverage area, return clear
 
-	if(map_pos(EPoint, reinterpret_cast<const TPATTERN *>(Pigment), &xcoor, &ycoor))
+	if(map_pos(EPoint, Pigment, &xcoor, &ycoor))
 	{
 		colour = Colour(1.0, 1.0, 1.0, 0.0, 1.0);
 		return false;
@@ -184,17 +184,15 @@ TEXTURE *material_map(const Vector3d& EPoint, const TEXTURE *Texture)
 {
 	int reg_number = -1;
 	int Material_Number;
-	int numtex;
 	DBL xcoor = 0.0, ycoor = 0.0;
 	Colour colour;
-	TEXTURE *Temp_Tex;
 
 	/*
 	 * Now we have transformed x, y, z we use image mapping routine to determine
 	 * texture index.
 	 */
 
-	if(map_pos(EPoint, reinterpret_cast<const TPATTERN *>(Texture), &xcoor, &ycoor))
+	if(map_pos(EPoint, Texture, &xcoor, &ycoor))
 		Material_Number = 0;
 	else
 	{
@@ -206,17 +204,10 @@ TEXTURE *material_map(const Vector3d& EPoint, const TEXTURE *Texture)
 			Material_Number = reg_number;
 	}
 
-	if(Material_Number > Texture->Num_Of_Mats)
-		Material_Number %= Texture->Num_Of_Mats;
+	if(Material_Number > Texture->Materials.size())
+		Material_Number %= Texture->Materials.size();
 
-	for(numtex = 0, Temp_Tex = Texture->Materials;
-	    (Temp_Tex->Next_Material != NULL) && (numtex < Material_Number);
-	    Temp_Tex = Temp_Tex->Next_Material, numtex++)
-	{
-		// do nothing
-	}
-
-	return (Temp_Tex);
+	return Texture->Materials[Material_Number % Texture->Materials.size()];
 }
 
 
@@ -254,7 +245,7 @@ void bump_map(const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& normal)
 	// going to have to change this
 	// need to know if bump point is off of image for all 3 points
 
-	if(map_pos(EPoint, reinterpret_cast<const TPATTERN *>(Tnormal), &xcoor, &ycoor))
+	if(map_pos(EPoint, Tnormal, &xcoor, &ycoor))
 		return;
 	else
 		image_colour_at(image, xcoor, ycoor, colour1, &index); // TODO ALPHA - we should decide whether we prefer premultiplied or non-premultiplied alpha

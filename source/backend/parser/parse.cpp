@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/parser/parse.cpp $
- * $Revision: #202 $
- * $Change: 6150 $
- * $DateTime: 2013/11/30 14:13:48 $
+ * $Revision: #204 $
+ * $Change: 6158 $
+ * $DateTime: 2013/12/02 21:19:56 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -1978,7 +1978,7 @@ void Parser::Parse_Camera (Camera& Cam)
 bool Parser::Parse_Camera_Mods(Camera& New)
 {
 	TRANSFORM Local_Trans;
-	PIGMENT* Local_Pigment;
+	PIGMENT *Local_Pigment;
 	MATRIX Local_Matrix;
 	Vector3d tempv;
 	DBL k1;
@@ -2088,7 +2088,7 @@ bool Parser::Parse_Camera_Mods(Camera& New)
 
 			EXPECT
 				CASE (PIGMENT_TOKEN)
-					Local_Pigment = Copy_Pigment((Default_Texture->Pigment));
+					Local_Pigment = Copy_Pigment(Default_Texture->Pigment);
 					Parse_Begin();
 					Parse_Pigment(&Local_Pigment);
 					Parse_End();
@@ -6596,7 +6596,6 @@ void Parser::Parse_Frame ()
 	RAINBOW  *Local_Rainbow;
 	FOG  *Local_Fog;
 	SKYSPHERE  *Local_Skysphere;
-	int i;
 	bool had_camera = false;
 
 	try
@@ -6616,9 +6615,9 @@ void Parser::Parse_Frame ()
 					Destroy_Skysphere(sceneData->skysphere);
 				}
 				sceneData->skysphere = Local_Skysphere;
-				for (i=0; i<Local_Skysphere->Count; i++)
+				for (vector<PIGMENT*>::iterator i = Local_Skysphere->Pigments.begin() ; i != Local_Skysphere->Pigments.end(); ++ i)
 				{
-					Post_Pigment(Local_Skysphere->Pigments[i]);
+					Post_Pigment(*i);
 				}
 			END_CASE
 
@@ -7311,7 +7310,7 @@ ObjectPtr Parser::Parse_Object_Mods (ObjectPtr Object)
 			if(dynamic_cast<CSGUnion *>(Object) == NULL) // FIXME
 				Error("split_union found in non-union object.\n");
 
-			(reinterpret_cast<CSG*>(Object))->do_split = (int)Parse_Float();
+			(reinterpret_cast<CSG *>(Object))->do_split = (int)Parse_Float();
 		END_CASE
 
 		CASE(PHOTONS_TOKEN)
@@ -8621,7 +8620,7 @@ int Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTR
 		END_CASE
 
 		CASE (PIGMENT_TOKEN)
-			Local_Pigment = Copy_Pigment((Default_Texture->Pigment));
+			Local_Pigment = Copy_Pigment(Default_Texture->Pigment);
 			Parse_Begin ();
 			Parse_Pigment (&Local_Pigment);
 			Parse_End ();
@@ -8632,7 +8631,7 @@ int Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTR
 		END_CASE
 
 		CASE (TNORMAL_TOKEN)
-			Local_Tnormal = Copy_Tnormal((Default_Texture->Tnormal));
+			Local_Tnormal = Copy_Tnormal(Default_Texture->Tnormal);
 			Parse_Begin ();
 			Parse_Tnormal (&Local_Tnormal);
 			Parse_End ();
@@ -8643,7 +8642,7 @@ int Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTR
 		END_CASE
 
 		CASE (FINISH_TOKEN)
-			Local_Finish = Copy_Finish((Default_Texture->Finish));
+			Local_Finish = Copy_Finish(Default_Texture->Finish);
 			Parse_Finish (&Local_Finish);
 			*NumberPtr = FINISH_ID_TOKEN;
 			Test_Redefine(Previous,NumberPtr,*DataPtr, allow_redefine);
@@ -9049,7 +9048,7 @@ void Parser::Link_Textures (TEXTURE **Old_Textures, TEXTURE *New_Textures)
 	}
 	for (Layer = New_Textures ;
 	     Layer->Next != NULL ;
-	     Layer = reinterpret_cast<TEXTURE *>(Layer->Next))
+	     Layer = Layer->Next)
 	{
 		/* NK layers - 1999 June 10 - for backwards compatiblity with layered textures */
 		if(sceneData->languageVersion<=310)
@@ -9060,7 +9059,7 @@ void Parser::Link_Textures (TEXTURE **Old_Textures, TEXTURE *New_Textures)
 	if ((sceneData->languageVersion<=310) && (*Old_Textures!=NULL))
 		Convert_Filter_To_Transmit(Layer->Pigment);
 
-	Layer->Next = reinterpret_cast<TPATTERN *>(*Old_Textures);
+	Layer->Next = *Old_Textures;
 	*Old_Textures = New_Textures;
 
 	if ((New_Textures->Type != PLAIN_PATTERN) && (New_Textures->Next != NULL))

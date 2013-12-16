@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/scene/atmosph.cpp $
- * $Revision: #26 $
- * $Change: 6147 $
- * $DateTime: 2013/11/29 20:46:11 $
+ * $Revision: #27 $
+ * $Change: 6158 $
+ * $DateTime: 2013/12/02 21:19:56 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -363,10 +363,7 @@ SKYSPHERE *Create_Skysphere()
 
 	New = new SKYSPHERE;
 
-	New->Count = 0;
 	New->Emission = RGBColour(1.0);
-
-	New->Pigments = NULL;
 
 	New->Trans = Create_Transform();
 
@@ -407,7 +404,6 @@ SKYSPHERE *Create_Skysphere()
 
 SKYSPHERE *Copy_Skysphere(const SKYSPHERE *Old)
 {
-	int i;
 	SKYSPHERE *New;
 
 	New = Create_Skysphere();
@@ -418,14 +414,11 @@ SKYSPHERE *Copy_Skysphere(const SKYSPHERE *Old)
 
 	New->Trans = Copy_Transform(Old->Trans);
 
-	if (New->Count > 0)
+	// The standard assignment operator of SKYSPHERE has created a shallow copy of the Pigments vector, but we need a
+	// deep copy in case Old gets destroyed.
+	for (vector<PIGMENT*>::iterator i = New->Pigments.begin(); i != New->Pigments.end(); ++ i)
 	{
-		New->Pigments = reinterpret_cast<PIGMENT **>(POV_MALLOC(New->Count*sizeof(PIGMENT *), "skysphere pigment"));
-
-		for (i = 0; i < New->Count; i++)
-		{
-			New->Pigments[i] = Copy_Pigment(Old->Pigments[i]);
-		}
+		*i = Copy_Pigment(*i);
 	}
 
 	return (New);
@@ -463,16 +456,12 @@ SKYSPHERE *Copy_Skysphere(const SKYSPHERE *Old)
 
 void Destroy_Skysphere(SKYSPHERE *Skysphere)
 {
-	int i;
-
 	if (Skysphere != NULL)
 	{
-		for (i = 0; i < Skysphere->Count; i++)
+		for (vector<PIGMENT*>::iterator i = Skysphere->Pigments.begin(); i != Skysphere->Pigments.end(); ++ i)
 		{
-			Destroy_Pigment(Skysphere->Pigments[i]);
+			Destroy_Pigment(*i);
 		}
-
-		POV_FREE(Skysphere->Pigments);
 
 		Destroy_Transform(Skysphere->Trans);
 

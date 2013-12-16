@@ -623,8 +623,6 @@ void Init_TPat_Fields (TPATTERN *Tpat)
 {
 	Tpat->Type       = NO_PATTERN;
 	Tpat->Flags      = NO_FLAGS;
-	Tpat->References = 1;
-	Tpat->Next       = NULL;
 	Tpat->Blend_Map  = NULL;
 }
 
@@ -652,10 +650,6 @@ void Copy_TPat_Fields (TPATTERN *New, const TPATTERN *Old)
 	*New = *Old;
 
 	New->Blend_Map = Copy_Blend_Map(Old->Blend_Map);
-
-	/* Note, cannot copy Old->Next because we don't know what kind of
-	   thing this is.  It must be copied by Copy_Pigment, Copy_Tnormal etc.
-	*/
 
 	if (Old->pattern)
 		New->pattern = Old->pattern->Clone();
@@ -685,9 +679,6 @@ void Copy_TPat_Fields (TPATTERN *New, const TPATTERN *Old)
 void Destroy_TPat_Fields(TPATTERN *Tpat)
 {
 	Destroy_Blend_Map(Tpat->Blend_Map);
-	/* Note, cannot destroy Tpat->Next nor pattern itself because we don't
-	   know what kind of thing this is.  It must be destroied by Destroy_Pigment, etc.
-	*/
 
 	if (Tpat->pattern)
 		Tpat->pattern.reset();
@@ -970,6 +961,17 @@ static const TURB *Search_For_Turb(const WARP *Warps)
 
 	return (reinterpret_cast<const TURB *>(Temp));
 }
+
+
+/*****************************************************************************/
+
+
+DBL PlainPattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
+{
+	return 0.0;
+}
+
+
 
 /* Tiling & Pavement */
 
@@ -6148,7 +6150,7 @@ DBL FunctionPattern::operator()(const Vector3d& EPoint, const Intersection *Isec
 	ctx->SetLocal(Y, EPoint[Y]);
 	ctx->SetLocal(Z, EPoint[Z]);
 
-	value = POVFPU_Run(ctx, *(reinterpret_cast<const FUNCTION*>(Fn)));
+	value = POVFPU_Run(ctx, *(reinterpret_cast<const FUNCTION *>(Fn)));
 
 	return ((value > 1.0) ? fmod(value, 1.0) : value);
 }

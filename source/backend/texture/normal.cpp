@@ -26,9 +26,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/texture/normal.cpp $
- * $Revision: #35 $
- * $Change: 6154 $
- * $DateTime: 2013/12/01 13:49:24 $
+ * $Revision: #37 $
+ * $Change: 6158 $
+ * $DateTime: 2013/12/02 21:19:56 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -253,7 +253,7 @@ static void dents (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& nor
 	DBL noise;
 	Vector3d stucco_turb;
 
-	noise = Noise (EPoint, GetNoiseGen(reinterpret_cast<const TPATTERN *>(Tnormal), Thread));
+	noise = Noise (EPoint, GetNoiseGen(Tnormal, Thread));
 
 	noise = noise * noise * noise * Tnormal->Amount;
 
@@ -578,7 +578,7 @@ TNORMAL *Create_Tnormal ()
 
 	New = new TNORMAL;
 
-	Init_TPat_Fields(reinterpret_cast<TPATTERN *>(New));
+	Init_TPat_Fields(New);
 
 	New->Amount = 0.5;
 
@@ -620,7 +620,7 @@ TNORMAL *Copy_Tnormal (const TNORMAL *Old)
 	{
 		New = Create_Tnormal();
 
-		Copy_TPat_Fields (reinterpret_cast<TPATTERN *>(New), reinterpret_cast<const TPATTERN *>(Old));
+		Copy_TPat_Fields (New, Old);
 
 		New->Amount = Old->Amount;
 		New->Delta = Old->Delta;
@@ -661,7 +661,7 @@ void Destroy_Tnormal(TNORMAL *Tnormal)
 {
 	if (Tnormal != NULL)
 	{
-		Destroy_TPat_Fields (reinterpret_cast<TPATTERN *>(Tnormal));
+		Destroy_TPat_Fields (Tnormal);
 
 		delete Tnormal;
 	}
@@ -814,15 +814,15 @@ void Perturb_Normal(Vector3d& Layer_Normal, const TNORMAL *Tnormal, const Vector
 		else if ((Blend_Map->Type == NORMAL_TYPE) && (Tnormal->Type != AVERAGE_PATTERN))
 		{
 			/* NK 19 Nov 1999 added Warp_EPoint */
-			Warp_EPoint (TPoint, EPoint, reinterpret_cast<const TPATTERN *>(Tnormal));
-			value1 = Evaluate_TPat(reinterpret_cast<const TPATTERN *>(Tnormal), TPoint, Intersection, ray, Thread);
+			Warp_EPoint (TPoint, EPoint, Tnormal);
+			value1 = Evaluate_TPat(Tnormal, TPoint, Intersection, ray, Thread);
 
 			Search_Blend_Map (value1,Blend_Map,&Prev,&Cur);
 
-			Warp_Normal(Layer_Normal,Layer_Normal, reinterpret_cast<const TPATTERN *>(Tnormal), Test_Flag(Tnormal,DONT_SCALE_BUMPS_FLAG));
+			Warp_Normal(Layer_Normal,Layer_Normal, Tnormal, Test_Flag(Tnormal,DONT_SCALE_BUMPS_FLAG));
 			P1 = Layer_Normal;
 
-			Warp_EPoint (TPoint, EPoint, reinterpret_cast<const TPATTERN *>(Tnormal));
+			Warp_EPoint (TPoint, EPoint, Tnormal);
 
 			Perturb_Normal(Layer_Normal,Cur->Vals.Tnormal,TPoint,Intersection,ray,Thread);
 
@@ -836,7 +836,7 @@ void Perturb_Normal(Vector3d& Layer_Normal, const TNORMAL *Tnormal, const Vector
 				Layer_Normal = value1 * P1 + value2 * Layer_Normal;
 			}
 
-			UnWarp_Normal(Layer_Normal,Layer_Normal, reinterpret_cast<const TPATTERN *>(Tnormal), Test_Flag(Tnormal,DONT_SCALE_BUMPS_FLAG));
+			UnWarp_Normal(Layer_Normal,Layer_Normal, Tnormal, Test_Flag(Tnormal,DONT_SCALE_BUMPS_FLAG));
 
 			Layer_Normal.normalize();
 
@@ -850,10 +850,10 @@ void Perturb_Normal(Vector3d& Layer_Normal, const TNORMAL *Tnormal, const Vector
 
 	if (Tnormal->Type <= LAST_NORM_ONLY_PATTERN)
 	{
-		Warp_Normal(Layer_Normal,Layer_Normal, reinterpret_cast<const TPATTERN *>(Tnormal),
+		Warp_Normal(Layer_Normal,Layer_Normal, Tnormal,
 		            Test_Flag(Tnormal,DONT_SCALE_BUMPS_FLAG));
 
-		Warp_EPoint (TPoint, EPoint, reinterpret_cast<const TPATTERN *>(Tnormal));
+		Warp_EPoint (TPoint, EPoint, Tnormal);
 
 		switch (Tnormal->Type)
 		{
@@ -870,28 +870,28 @@ void Perturb_Normal(Vector3d& Layer_Normal, const TNORMAL *Tnormal, const Vector
 				throw POV_EXCEPTION_STRING("Normal pattern not yet implemented.");
 		}
 
-		UnWarp_Normal(Layer_Normal,Layer_Normal, reinterpret_cast<const TPATTERN *>(Tnormal),
+		UnWarp_Normal(Layer_Normal,Layer_Normal, Tnormal,
 		              Test_Flag(Tnormal,DONT_SCALE_BUMPS_FLAG));
 	}
 	else
 	{
-		Warp_Normal(Layer_Normal,Layer_Normal, reinterpret_cast<const TPATTERN *>(Tnormal),
+		Warp_Normal(Layer_Normal,Layer_Normal, Tnormal,
 		            Test_Flag(Tnormal,DONT_SCALE_BUMPS_FLAG));
 
 		Amount=Tnormal->Amount * -5.0; /*fudge factor*/
 		Amount*=0.02/Tnormal->Delta; /* NK delta */
 
 		/* warp the center point first - this is the last warp */
-		Warp_EPoint(TPoint,EPoint,reinterpret_cast<const TPATTERN *>(Tnormal));
+		Warp_EPoint(TPoint,EPoint,Tnormal);
 
 		for(i=0; i<=3; i++)
 		{
 			P1 = TPoint + (DBL)Tnormal->Delta * Pyramid_Vect[i]; /* NK delta */
-			value1 = Do_Slope_Map(Evaluate_TPat(reinterpret_cast<const TPATTERN *>(Tnormal), P1, Intersection, ray, Thread), Blend_Map);
+			value1 = Do_Slope_Map(Evaluate_TPat(Tnormal, P1, Intersection, ray, Thread), Blend_Map);
 			Layer_Normal += (value1*Amount) * Pyramid_Vect[i];
 		}
 
-		UnWarp_Normal(Layer_Normal,Layer_Normal,reinterpret_cast<const TPATTERN *>(Tnormal),
+		UnWarp_Normal(Layer_Normal,Layer_Normal,Tnormal,
 		              Test_Flag(Tnormal,DONT_SCALE_BUMPS_FLAG));
 
 	}

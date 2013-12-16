@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/pattern/pattern.h $
- * $Revision: #30 $
- * $Change: 6154 $
- * $DateTime: 2013/12/01 13:49:24 $
+ * $Revision: #31 $
+ * $Change: 6158 $
+ * $DateTime: 2013/12/02 21:19:56 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -167,6 +167,13 @@ struct BasicPattern
 struct DiscretePattern : public BasicPattern
 {
 	virtual unsigned int NumBlendMapEntries() const = 0;
+};
+
+
+struct PlainPattern : public BasicPattern
+{
+	virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
+	virtual DBL operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const;
 };
 
 

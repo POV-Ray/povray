@@ -26,9 +26,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/frame.h $
- * $Revision: #134 $
- * $Change: 6154 $
- * $DateTime: 2013/12/01 13:49:24 $
+ * $Revision: #136 $
+ * $Change: 6158 $
+ * $DateTime: 2013/12/02 21:19:56 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -970,7 +970,7 @@ class Media
 		DBL AA_Threshold;
 		int AA_Level;
 
-		PIGMENT *Density;
+		vector<PIGMENT*> Density;
 
 		Media();
 		Media(const Media&);
@@ -1115,8 +1115,6 @@ struct Pattern_Struct
 {
 	unsigned short Type;
 	unsigned short Flags;
-	int References;
-	TPATTERN *Next;
 	PatternPtr pattern;
 	BLEND_MAP *Blend_Map;
 };
@@ -1124,7 +1122,7 @@ struct Pattern_Struct
 struct Pigment_Struct : public Pattern_Struct
 {
 	Colour colour;       // may have a filter/transmit component
-	Colour Quick_Colour; // may have a filter/transmit component
+	Colour Quick_Colour; // may have a filter/transmit component    // TODO - can't we decide between regular colour and quick_colour at parse time already?
 };
 
 struct Tnormal_Struct : public Pattern_Struct
@@ -1135,13 +1133,12 @@ struct Tnormal_Struct : public Pattern_Struct
 
 struct Texture_Struct : public Pattern_Struct
 {
-	TEXTURE *Next_Material;
+	int References;
+	TEXTURE *Next;
 	PIGMENT *Pigment;
 	TNORMAL *Tnormal;
 	FINISH *Finish;
-	TEXTURE *Materials;
-	int Num_Of_Mats;
-
+	vector<TEXTURE*> Materials; // used for BITMAP_PATTERN (and only there)
 };
 
 struct Finish_Struct

@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/texture/pigment.h $
- * $Revision: #25 $
- * $Change: 6154 $
- * $DateTime: 2013/12/01 13:49:24 $
+ * $Revision: #26 $
+ * $Change: 6158 $
+ * $DateTime: 2013/12/02 21:19:56 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -69,10 +69,11 @@ namespace pov
 
 PIGMENT *Create_Pigment();
 PIGMENT *Copy_Pigment(const PIGMENT *Old);
+void Copy_Pigments (vector<PIGMENT*>& New, const vector<PIGMENT*>& Old);
 void Destroy_Pigment(PIGMENT *Pigment);
 int Post_Pigment(PIGMENT *Pigment);
 bool Compute_Pigment(Colour& colour, const PIGMENT *Pigment, const Vector3d& IPoint, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread);
-void Evaluate_Density_Pigment(const PIGMENT *pigm, const Vector3d& p, RGBColour& c, TraceThreadData *ttd);
+void Evaluate_Density_Pigment(vector<PIGMENT*>& Density, const Vector3d& p, RGBColour& c, TraceThreadData *ttd);
 
 }
 

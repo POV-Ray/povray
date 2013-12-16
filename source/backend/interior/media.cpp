@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/interior/media.cpp $
- * $Revision: #49 $
- * $Change: 6147 $
- * $DateTime: 2013/11/29 20:46:11 $
+ * $Revision: #51 $
+ * $Change: 6158 $
+ * $DateTime: 2013/12/02 21:19:56 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -80,8 +80,6 @@ Media::Media()
 
 	Sample_Threshold = NULL;
 
-	Density = NULL;
-
 	Sample_Method = 1;
 	AA_Threshold = 0.1;
 	AA_Level = 3;
@@ -91,7 +89,6 @@ Media::Media()
 Media::Media(const Media& source)
 {
 	Sample_Threshold = NULL;
-	Density = NULL;
 
 	*this = source;
 }
@@ -101,9 +98,8 @@ Media::~Media()
 	if(Sample_Threshold != NULL)
 		POV_FREE(Sample_Threshold);
 
-	// Note Destroy_Pigment also handles Density->Next
-	if(Density != NULL)
-		Destroy_Pigment(Density);
+	for (vector<PIGMENT*>::iterator i = Density.begin(); i != Density.end(); ++ i)
+		Destroy_Pigment(*i);
 }
 
 Media& Media::operator=(const Media& source)
@@ -138,9 +134,12 @@ Media& Media::operator=(const Media& source)
 			POV_FREE(Sample_Threshold);
 		Sample_Threshold = NULL;
 
-		if(Density != NULL)
-			Destroy_Pigment(Density);
-		Density = NULL;
+		for (vector<PIGMENT*>::iterator i = Density.begin(); i != Density.end(); ++ i)
+			Destroy_Pigment(*i);
+		Density.resize(0);
+		Density.reserve(source.Density.size());
+		for (vector<PIGMENT*>::const_iterator i = source.Density.begin(); i != source.Density.end(); ++ i)
+			Density.push_back(Copy_Pigment(*i));
 
 		if(source.Sample_Threshold != NULL)
 		{
@@ -152,9 +151,6 @@ Media& Media::operator=(const Media& source)
 					Sample_Threshold[i] =  source.Sample_Threshold[i];
 			}
 		}
-
-		if(source.Density != NULL)
-			Density = Copy_Pigment(source.Density);
 	}
 
 	return *this;
@@ -175,7 +171,7 @@ void Media::PostProcess()
 
 	// Determine used effects.
 
-	is_constant = (Density == NULL);
+	is_constant = Density.empty();
 
 	use_absorption = !Absorption.isZero();
 	use_emission   = !Emission.isZero();
@@ -204,19 +200,14 @@ void Media::PostProcess()
 	else
 		Sample_Threshold[0] = 0.0;
 
-	if(Density != NULL)
-		Post_Pigment(Density);
+	for (vector<PIGMENT*>::iterator i = Density.begin(); i != Density.end(); ++ i)
+		Post_Pigment(*i);
 }
 
-void Transform_Density(PIGMENT *Density, const TRANSFORM *Trans)
+void Transform_Density(vector<PIGMENT*>& Density, const TRANSFORM *Trans)
 {
-	TPATTERN *Temp = reinterpret_cast<TPATTERN *>(Density);
-
-	while(Temp != NULL)
-	{
-		Transform_Tpattern(Temp, Trans);
-		Temp = Temp->Next;
-	}
+	for (vector<PIGMENT*>::iterator i = Density.begin(); i != Density.end(); ++ i)
+		Transform_Tpattern(*i, Trans);
 }
 
 MediaFunction::MediaFunction(TraceThreadData *td, Trace *t, PhotonGatherer *pg) :
@@ -313,8 +304,8 @@ void MediaFunction::ComputeMedia(MediaVector& medias, const Ray& ray, Intersecti
 		use_scattering = use_scattering || (*i)->use_scattering;
 
 		// NK fast light_ray media calculation for constant media
-		if((*i)->Density)
-			all_constant_and_light_ray = all_constant_and_light_ray && ((*i)->Density->Type == PLAIN_PATTERN);
+		for (vector<PIGMENT*>::iterator ii = (*i)->Density.begin(); ii != (*i)->Density.end(); ++ ii)
+			all_constant_and_light_ray = all_constant_and_light_ray && ((*ii)->Type == PLAIN_PATTERN);
 	}
 
 	// If this is a light ray and no extinction is used we can return.
