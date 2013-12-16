@@ -22,11 +22,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/support/randomsequences.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/support/randomsequences.cpp $
+ * $Revision: #23 $
+ * $Change: 6132 $
+ * $DateTime: 2013/11/25 14:23:41 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #include <cassert>
@@ -37,8 +37,6 @@
 #include <boost/random/uniform_int.hpp>
 #include <boost/random/uniform_real.hpp>
 #include <boost/random/variate_generator.hpp>
-
-#include <boost/weak_ptr.hpp>
 
 // frame.h must always be the first POV file included (pulls in platform config)
 #include "backend/frame.h"
@@ -56,8 +54,6 @@ using boost::uniform_int;
 using boost::uniform_real;
 using boost::variate_generator;
 using boost::mt19937;
-
-using boost::weak_ptr;
 
 #ifndef SIZE_MAX
 #define SIZE_MAX ((size_t)-1)

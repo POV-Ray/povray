@@ -24,11 +24,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/vfe/vfe.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/vfe/vfe.h $
+ * $Revision: #19 $
+ * $Change: 6132 $
+ * $DateTime: 2013/11/25 14:23:41 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #ifndef __VFE_H__
@@ -222,7 +222,7 @@ namespace vfe
       virtual bool IsPausable() ;
       virtual bool Paused() ;
       virtual bool PausePending() { return m_PauseRequested; }
-      virtual boost::shared_ptr<Display> GetDisplay() { return renderFrontend.GetDisplay(viewId); }
+      virtual shared_ptr<Display> GetDisplay() { return renderFrontend.GetDisplay(viewId); }
 
       // TODO: take care of any pending messages (e.g. a thread waiting on a blocking send)
       virtual void InvalidateBackend() { backendAddress = POVMSInvalidAddress; }

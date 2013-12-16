@@ -27,9 +27,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/vfe/win/syspovconfig.h $
- * $Revision: #40 $
- * $Change: 6131 $
- * $DateTime: 2013/11/25 11:38:15 $
+ * $Revision: #41 $
+ * $Change: 6132 $
+ * $DateTime: 2013/11/25 14:23:41 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -63,7 +63,7 @@
 #include <string>
 #include <vector>
 #include <list>
-#include <boost/shared_ptr.hpp>
+#include <boost/tr1/memory.hpp>
 
 // when we say 'string' we mean std::string
 using std::string;
@@ -78,12 +78,9 @@ using std::list;
 // to in a few other places.
 using std::runtime_error;
 
-// C++0x has a shared_ptr, but we currently use the boost one. alas, Visual Studio 2010
-// pulls in the std::tr1::shared_ptr in some headers (particularly <memory>), and we thus
-// have to either specifically nominate boost::shared_ptr wherever we use it, or typedef
-// it. C++ doesn't [currently] support template typedefs but we could use the struct rebind
-// workaround. for the moment it's being left unfixed.
-using boost::shared_ptr;
+// these may actually be the boost implementations, depending on what boost/tr1/memory.hpp has pulled in
+using std::tr1::shared_ptr;
+using std::tr1::weak_ptr;
 
 #endif // STD_POV_TYPES_DECLARED
 
