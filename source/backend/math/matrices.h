@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/math/matrices.h $
- * $Revision: #17 $
- * $Change: 6150 $
- * $DateTime: 2013/11/30 14:13:48 $
+ * $Revision: #18 $
+ * $Change: 6161 $
+ * $DateTime: 2013/12/05 18:42:17 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -73,12 +73,15 @@ void MScale (MATRIX result, const MATRIX matrix1, DBL amount);
 void MTranspose (MATRIX result);
 void MTranspose (MATRIX result, const MATRIX matrix1);
 
-void MTransPoint (Vector3d& result, const Vector3d& vector, const TRANSFORM *trans);
-void MInvTransPoint (Vector3d& result, const Vector3d& vector, const TRANSFORM *trans);
-void MTransDirection (Vector3d& result, const Vector3d& vector, const TRANSFORM *trans);
-void MInvTransDirection (Vector3d& result, const Vector3d& vector, const TRANSFORM *trans);
-void MTransNormal (Vector3d& result, const Vector3d& vector, const TRANSFORM *trans);
-void MInvTransNormal (Vector3d& result, const Vector3d& vector, const TRANSFORM *trans);
+void MTransPoint        (Vector3d& result, const Vector3d& vector, const TRANSFORM* trans);
+void MInvTransPoint     (Vector3d& result, const Vector3d& vector, const TRANSFORM* trans);
+void MTransDirection    (Vector3d& result, const Vector3d& vector, const TRANSFORM* trans);
+void MInvTransDirection (Vector3d& result, const Vector3d& vector, const TRANSFORM* trans);
+void MTransNormal       (Vector3d& result, const Vector3d& vector, const TRANSFORM* trans);
+void MInvTransNormal    (Vector3d& result, const Vector3d& vector, const TRANSFORM* trans);
+
+inline void MTransRay    (BasicRay& res, const BasicRay& r, const TRANSFORM* t) { MTransPoint    (res.Origin, r.Origin, t); MTransDirection    (res.Direction, r.Direction, t); }
+inline void MInvTransRay (BasicRay& res, const BasicRay& r, const TRANSFORM* t) { MInvTransPoint (res.Origin, r.Origin, t); MInvTransDirection (res.Direction, r.Direction, t); }
 
 void Compute_Matrix_Transform (TRANSFORM *result, const MATRIX matrix);
 void Compute_Scaling_Transform (TRANSFORM *result, const Vector3d& vector);

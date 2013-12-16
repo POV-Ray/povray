@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/math/quatern.h $
- * $Revision: #17 $
- * $Change: 6145 $
- * $DateTime: 2013/11/29 11:52:27 $
+ * $Revision: #18 $
+ * $Change: 6161 $
+ * $DateTime: 2013/12/05 18:42:17 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -57,7 +57,7 @@ class QuaternionFractalRules : public FractalRules
 {
 	public:
 		virtual ~QuaternionFractalRules() {}
-		virtual bool Bound (const Ray &, const Fractal *, DBL *, DBL *) const;
+		virtual bool Bound (const BasicRay&, const Fractal *, DBL *, DBL *) const;
 };
 
 class JuliaFractalRules : public QuaternionFractalRules

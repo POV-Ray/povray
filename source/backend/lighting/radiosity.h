@@ -24,11 +24,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/lighting/radiosity.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/lighting/radiosity.h $
+ * $Revision: #40 $
+ * $Change: 6162 $
+ * $DateTime: 2013/12/07 19:55:09 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #ifndef POVRAY_BACKEND_RADIOSITY_H
@@ -265,10 +265,10 @@ class RadiosityFunction : public Trace::RadiosityFunctor
 		//      layer_normal    - texture-pertubed normal
 		//      ambient_colour  - (output) the ambient color at this point
 		//      weight          - the base "weight" of the traced ray (used to compare againgst ADC bailout)
-		virtual void ComputeAmbient(const Vector3d& ipoint, const Vector3d& raw_normal, const Vector3d& layer_normal, RGBColour& ambient_colour, DBL weight, Trace::TraceTicket& ticket);
+		virtual void ComputeAmbient(const Vector3d& ipoint, const Vector3d& raw_normal, const Vector3d& layer_normal, RGBColour& ambient_colour, DBL weight, TraceTicket& ticket);
 
 		// checks whether the specified recursion depth is still within the configured limits
-		virtual bool CheckRadiosityTraceLevel(const Trace::TraceTicket& ticket);
+		virtual bool CheckRadiosityTraceLevel(const TraceTicket& ticket);
 
 		// retrieves top level statistics information to drive pretrace re-iteration
 		virtual void GetTopLevelStats(long& queryCount, float& reuse);
@@ -338,7 +338,7 @@ class RadiosityFunction : public Trace::RadiosityFunctor
 		float topLevelReuse;
 		int tileId;
 
-		double GatherLight(const Vector3d& IPoint, const Vector3d& Raw_Normal, const Vector3d& LayNormal, RGBColour& Illuminance, Trace::TraceTicket& ticket);
+		double GatherLight(const Vector3d& IPoint, const Vector3d& Raw_Normal, const Vector3d& LayNormal, RGBColour& Illuminance, TraceTicket& ticket);
 };
 
 } // end of namespace

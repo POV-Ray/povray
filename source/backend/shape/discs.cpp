@@ -27,9 +27,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/discs.cpp $
- * $Revision: #31 $
- * $Change: 6147 $
- * $DateTime: 2013/11/29 20:46:11 $
+ * $Revision: #32 $
+ * $Change: 6161 $
+ * $DateTime: 2013/12/05 18:42:17 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -128,7 +128,7 @@ bool Disc::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDat
 *
 ******************************************************************************/
 
-bool Disc::Intersect(const Ray& ray, DBL *Depth) const
+bool Disc::Intersect(const BasicRay& ray, DBL *Depth) const
 {
 	DBL t, u, v, r2, len;
 	Vector3d P, D;

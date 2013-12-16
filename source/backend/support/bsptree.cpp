@@ -92,7 +92,7 @@ BSPTree::~BSPTree()
 
 static FILE *gFile = NULL;
 
-bool BSPTree::operator()(const Ray& ray, Intersect& isect, Mailbox& mailbox, double maxdist)
+bool BSPTree::operator()(const BasicRay& ray, Intersect& isect, Mailbox& mailbox, double maxdist)
 {
 	TraceStack tstack[MAX_BSP_TREE_LEVEL];
 	Vector3d rayorigin(ray.GetOrigin());

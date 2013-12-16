@@ -96,7 +96,7 @@ bool IsoSurface::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
 {
 	int Side1 = 0, Side2 = 0, itrace = 0, i_flg = 0;
 	DBL Depth1 = 0.0, Depth2 = 0.0, len = 0.0;
-	Ray New_Ray;
+	BasicRay New_Ray;
 	Vector3d IPoint;
 	Vector3d Plocal, Dlocal;
 	DBL tmax = 0.0, tmin = 0.0, tmp = 0.0;
@@ -115,8 +115,7 @@ bool IsoSurface::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
 	{
 		if(Trans != NULL)
 		{
-			MInvTransPoint(New_Ray.Origin, ray.Origin, Trans);
-			MInvTransDirection(New_Ray.Direction, ray.Direction, Trans);
+			MInvTransRay(New_Ray, ray, Trans);
 			len = New_Ray.Direction.length();
 			New_Ray.Direction /= len;
 			i_flg = Sphere::Intersect(New_Ray, Vector3d(container.sphere.center),

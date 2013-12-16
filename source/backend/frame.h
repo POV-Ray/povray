@@ -26,9 +26,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/frame.h $
- * $Revision: #136 $
- * $Change: 6158 $
- * $DateTime: 2013/12/02 21:19:56 $
+ * $Revision: #138 $
+ * $Change: 6162 $
+ * $DateTime: 2013/12/07 19:55:09 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -1298,7 +1298,7 @@ class ObjectBase
 		Interior *interior;
 		vector<ObjectPtr> Bound;
 		vector<ObjectPtr> Clip;
-		vector<LightSource *> LLights;
+		vector<LightSource *> LLights;  ///< Used for light groups.
 		BoundingBox BBox;
 		TRANSFORM *Trans;
 		TRANSFORM *UV_Trans;
@@ -1437,10 +1437,8 @@ class LightSource : public CompoundObject
 		DBL Fade_Distance, Fade_Power;
 		int Area_Size1, Area_Size2;
 		int Adaptive_Level;
-//		ObjectBase *Shadow_Cached_Object;
 		ObjectBase *Projected_Through_Object;
 		BLEND_MAP *blend_map;// NK for dispersion
-//		PROJECT_TREE_NODE *Light_Buffer[6]; // Light buffers for the six general directions in space. [DB 9/94]
 
 		unsigned Light_Type : 8;
 		bool Area_Light : 1;
@@ -1448,7 +1446,6 @@ class LightSource : public CompoundObject
 		bool Jitter : 1;
 		bool Orient : 1;
 		bool Circular : 1;
-//		bool Track : 1;
 		bool Parallel : 1;
 		bool Photon_Area_Light : 1;
 		bool Media_Attenuation : 1;
@@ -1595,7 +1592,30 @@ class Intersection
 #pragma mark * Ray
 #endif
 
-class Ray
+struct BasicRay
+{
+	Vector3d Origin;
+	Vector3d Direction;
+
+	inline BasicRay() {}
+	inline BasicRay(const BasicRay& obj) : Origin(obj.Origin), Direction(obj.Direction) {}
+	inline BasicRay(const Vector3d& ov, const Vector3d& dv) : Origin(ov), Direction(dv) {}
+	inline Vector3d Evaluate(double depth) const { return Origin + Direction * depth; }
+
+	/// Make sure the ray's direction is normalized.
+	/// @return     The length of the direction vector before normalization.
+	inline DBL Normalize() { DBL len = Direction.length(); Direction /= len; return len; }
+
+	inline const Vector3d& GetOrigin() const { return Origin; }
+	inline const Vector3d& GetDirection() const { return Direction; }
+
+	inline Vector3d& GetOrigin() { return Origin; }
+	inline Vector3d& GetDirection() { return Direction; }
+};
+
+struct TraceTicket;
+
+class Ray : public BasicRay
 {
 	public:
 		enum RayType
@@ -1607,15 +1627,9 @@ class Ray
 			SubsurfaceRay = 4,  ///< Ray is shot from just below a surface; very close intersections shall not be suppressed.
 		};
 
-		Vector3d Origin;
-		Vector3d Direction;
-
-		Ray(RayType rt = PrimaryRay, bool shadowTest = false, bool photon = false, bool radiosity = false, bool monochromatic = false, bool pretrace = false);
-		Ray(const Vector3d& ov, const Vector3d& dv, RayType rt = PrimaryRay, bool shadowTest = false, bool photon = false, bool radiosity = false, bool monochromatic = false, bool pretrace = false);
+		Ray(TraceTicket& ticket, RayType rt = PrimaryRay, bool shadowTest = false, bool photon = false, bool radiosity = false, bool monochromatic = false, bool pretrace = false);
+		Ray(TraceTicket& ticket, const Vector3d& ov, const Vector3d& dv, RayType rt = PrimaryRay, bool shadowTest = false, bool photon = false, bool radiosity = false, bool monochromatic = false, bool pretrace = false);
 		~Ray();
-
-		const Vector3d& GetOrigin() const { return Origin; }
-		const Vector3d& GetDirection() const { return Direction; }
 
 		void AppendInterior(Interior *i);
 		void AppendInteriors(RayInteriorVector&);
@@ -1646,11 +1660,13 @@ class Ray
 
 		bool Inside(const BoundingBox& bbox) const { return Inside_BBox(Origin, bbox); }
 
-		Vector3d Evaluate(double depth) const { return Origin + Direction * depth; }
+		inline TraceTicket& GetTicket() { return ticket; }
+		inline const TraceTicket& GetTicket() const { return ticket; }
 
 	private:
 		RayInteriorVector interiors;
 		SpectralBand spectralBand;
+		TraceTicket& ticket;
 
 		bool primaryRay : 1;
 		bool reflectionRay : 1;
@@ -1765,7 +1781,7 @@ class FractalRules
 		virtual void CalcNormal (Vector3d&, int, const Fractal *, DBL **) const = 0;
 		virtual bool Iterate (const Vector3d&, const Fractal *, DBL **) const = 0;
 		virtual bool Iterate (const Vector3d&, const Fractal *, const Vector3d&, DBL *, DBL **) const = 0;
-		virtual bool Bound (const Ray &, const Fractal *, DBL *, DBL *) const = 0;
+		virtual bool Bound (const BasicRay&, const Fractal *, DBL *, DBL *) const = 0;
 };
 
 typedef shared_ptr<FractalRules> FractalRulesPtr;

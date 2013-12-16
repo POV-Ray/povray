@@ -27,9 +27,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/lighting/photons.cpp $
- * $Revision: #67 $
- * $Change: 6158 $
- * $DateTime: 2013/12/02 21:19:56 $
+ * $Revision: #69 $
+ * $Change: 6162 $
+ * $DateTime: 2013/12/07 19:55:09 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -114,7 +114,7 @@ PhotonTrace::~PhotonTrace()
 {
 }
 
-DBL PhotonTrace::TraceRay(const Ray& ray, Colour& colour, COLC weight, Trace::TraceTicket& ticket, bool continuedRay, DBL maxDepth)
+DBL PhotonTrace::TraceRay(Ray& ray, Colour& colour, COLC weight, bool continuedRay, DBL maxDepth)
 {
 	Intersection bestisect;
 	bool found;
@@ -126,9 +126,9 @@ DBL PhotonTrace::TraceRay(const Ray& ray, Colour& colour, COLC weight, Trace::Tr
 		cooperate();
 
 	// Check for max. trace level or ADC bailout.
-	if((ticket.traceLevel >= ticket.maxAllowedTraceLevel) || (weight < ticket.adcBailout))
+	if((ray.GetTicket().traceLevel >= ray.GetTicket().maxAllowedTraceLevel) || (weight < ray.GetTicket().adcBailout))
 	{
-		if(weight < ticket.adcBailout)
+		if(weight < ray.GetTicket().adcBailout)
 			threadData->Stats()[ADC_Saves]++;
 		colour.clear();
 		return BOUND_HUGE;
@@ -136,8 +136,8 @@ DBL PhotonTrace::TraceRay(const Ray& ray, Colour& colour, COLC weight, Trace::Tr
 
 	// Set highest level traced.
 
-	ticket.traceLevel++;
-	ticket.maxFoundTraceLevel = max(ticket.maxFoundTraceLevel, ticket.traceLevel);
+	ray.GetTicket().traceLevel++;
+	ray.GetTicket().maxFoundTraceLevel = max(ray.GetTicket().maxFoundTraceLevel, ray.GetTicket().traceLevel);
 
 	if (maxDepth >= EPSILON)
 		bestisect.Depth = maxDepth;
@@ -156,7 +156,7 @@ DBL PhotonTrace::TraceRay(const Ray& ray, Colour& colour, COLC weight, Trace::Tr
 			threadData->passThruThis = false;
 
 			// if either this is the first ray or the last thing we hit was a pass-through object
-			if((ticket.traceLevel==1) || threadData->passThruPrev)
+			if((ray.GetTicket().traceLevel==1) || threadData->passThruPrev)
 			{
 				if (Test_Flag(bestisect.Object, PH_TARGET_FLAG))
 				{
@@ -180,7 +180,7 @@ DBL PhotonTrace::TraceRay(const Ray& ray, Colour& colour, COLC weight, Trace::Tr
 
 							threadData->passThruThis = threadData->passThruPrev;
 							threadData->passThruPrev = oldptflag;
-							ticket.traceLevel--;
+							ray.GetTicket().traceLevel--;
 							return (BOUND_HUGE);
 						}
 					}
@@ -204,21 +204,21 @@ DBL PhotonTrace::TraceRay(const Ray& ray, Colour& colour, COLC weight, Trace::Tr
 
 						threadData->passThruThis = threadData->passThruPrev;
 						threadData->passThruPrev = oldptflag;
-						ticket.traceLevel--;
+						ray.GetTicket().traceLevel--;
 						return (BOUND_HUGE);
 					}
 				}
 			}
 		}
 
-		ComputeTextureColour(bestisect, colour, ray, weight, true, ticket);
+		ComputeTextureColour(bestisect, colour, ray, weight, true);
 
 		// NK phmap
 		threadData->passThruThis = threadData->passThruPrev;
 		threadData->passThruPrev = oldptflag;
 	}
 
-	ticket.traceLevel--;
+	ray.GetTicket().traceLevel--;
 
 	if(found == false)
 		return HUGE_VAL;
@@ -227,7 +227,7 @@ DBL PhotonTrace::TraceRay(const Ray& ray, Colour& colour, COLC weight, Trace::Tr
 }
 
 void PhotonTrace::ComputeLightedTexture(Colour& LightCol, const TEXTURE *Texture, vector<const TEXTURE *>& warps, const Vector3d& ipoint, const Vector3d& rawnormal,
-                                        const Ray& ray, COLC weight, Intersection& isect, Trace::TraceTicket& ticket)
+                                        Ray& ray, COLC weight, Intersection& isect)
 {
 	int i;
 	int layer_number;
@@ -290,14 +290,14 @@ void PhotonTrace::ComputeLightedTexture(Colour& LightCol, const TEXTURE *Texture
 */
 			if(!medialist.empty())
 			{
-				if((ticket.traceLevel > 1) && !threadData->passThruPrev && (sceneData->photonSettings.maxMediaSteps > 0))
-					mediaPhotons.ComputeMediaAndDepositPhotons(medialist, ray, isect, LightCol, ticket);
+				if((ray.GetTicket().traceLevel > 1) && !threadData->passThruPrev && (sceneData->photonSettings.maxMediaSteps > 0))
+					mediaPhotons.ComputeMediaAndDepositPhotons(medialist, ray, isect, LightCol);
 				else
 				{
 					// compute media WITHOUT depositing photons
 					RGBColour tempLightCol(LightCol);
 					COLC tempLightTransm = LightCol.transm();
-					mediaPhotons.ComputeMedia(medialist, ray, isect, tempLightCol, tempLightTransm, ticket);
+					mediaPhotons.ComputeMedia(medialist, ray, isect, tempLightCol, tempLightTransm);
 					LightCol = Colour(tempLightCol, LightCol.filter(), tempLightTransm);
 				}
 			}
@@ -336,7 +336,7 @@ void PhotonTrace::ComputeLightedTexture(Colour& LightCol, const TEXTURE *Texture
 
 	// First, we should save this photon!
 
-	if ((ticket.traceLevel > 1) && !threadData->passThruPrev &&
+	if ((ray.GetTicket().traceLevel > 1) && !threadData->passThruPrev &&
 	    !Test_Flag(isect.Object,PH_IGNORE_PHOTONS_FLAG) &&
 	    Check_Photon_Light_Group(isect.Object))
 	{
@@ -360,7 +360,7 @@ void PhotonTrace::ComputeLightedTexture(Colour& LightCol, const TEXTURE *Texture
 		}
 #endif // PT_AMPLIFY_BUG
 
-		TraceRay(NRay, LightCol, weight, ticket, true);
+		TraceRay(NRay, LightCol, weight, true);
 
 #ifndef PT_AMPLIFY_BUG
 		return;
@@ -372,7 +372,7 @@ void PhotonTrace::ComputeLightedTexture(Colour& LightCol, const TEXTURE *Texture
 	// phong and specular for these textures.
 	one_colour_found = false;
 	for (layer_number = 0, Layer = Texture;
-	     (Layer != NULL) && (Trans > ticket.adcBailout);
+	     (Layer != NULL) && (Trans > ray.GetTicket().adcBailout);
 	     layer_number++, Layer = Layer->Next)
 	{
 		// Get perturbed surface normal.
@@ -503,7 +503,7 @@ void PhotonTrace::ComputeLightedTexture(Colour& LightCol, const TEXTURE *Texture
 
 		// normalize weights: make sum be 1.0
 		totalWeight = reflectionWeight + refractionWeight + diffuseWeight + dieWeight;
-		if ((reflectionWeight + refractionWeight + diffuseWeight) > ticket.adcBailout)
+		if ((reflectionWeight + refractionWeight + diffuseWeight) > ray.GetTicket().adcBailout)
 		{
 			diffuseWeight /= totalWeight;
 			refractionWeight /= totalWeight;
@@ -592,7 +592,7 @@ void PhotonTrace::ComputeLightedTexture(Colour& LightCol, const TEXTURE *Texture
 		}
 #endif // PT_AMPLIFY_BUG
 
-		TraceRay(NRay, CurLightCol, (float)New_Weight, ticket, true);
+		TraceRay(NRay, CurLightCol, (float)New_Weight, true);
 
 #ifndef PT_AMPLIFY_BUG
 		return;
@@ -604,8 +604,8 @@ void PhotonTrace::ComputeLightedTexture(Colour& LightCol, const TEXTURE *Texture
 
 	if (doDiffuse)
 	{
-		//ChooseRay(Ray &NewRay, Vector3d& Normal, Ray &ray, Vector3d& Raw_Normal, int WhichRay)
-		ChooseRay(NewRay, LayNormal, ray, rawnormal, rand()%400);
+		//ChooseRay(Ray &NewRay, Vector3d& Normal, Vector3d& Raw_Normal, int WhichRay)
+		ChooseRay(NewRay, LayNormal, rawnormal, rand()%400); // TODO - magic number
 
 		Colour CurLightCol;
 		CurLightCol.red() = LightCol.red()*ResCol.red();
@@ -615,7 +615,7 @@ void PhotonTrace::ComputeLightedTexture(Colour& LightCol, const TEXTURE *Texture
 		// don't trace if < EPSILON
 
 		// now trace it
-		TraceRay(NewRay, CurLightCol, 1.0, ticket, false);
+		TraceRay(NewRay, CurLightCol, 1.0, false);
 	}
 
 	// Shoot refracted photons.
@@ -633,7 +633,7 @@ void PhotonTrace::ComputeLightedTexture(Colour& LightCol, const TEXTURE *Texture
 
 	// If the surface is translucent a transmitted ray is traced
 	// and its illunination is filtered by FilCol.
-	if (doRefraction && ((interior = isect.Object->interior) != NULL) && (Trans > ticket.adcBailout) && (qualityFlags & Q_REFRACT))
+	if (doRefraction && ((interior = isect.Object->interior) != NULL) && (Trans > ray.GetTicket().adcBailout) && (qualityFlags & Q_REFRACT))
 	{
 		w1 = FilCol.weightMax();
 		New_Weight = weight * max(w1, 0.0);
@@ -644,7 +644,7 @@ void PhotonTrace::ComputeLightedTexture(Colour& LightCol, const TEXTURE *Texture
 		// Trace refracted ray.
 		threadData->GFilCol = FilCol;
 
-		TIR_occured = ComputeRefractionForPhotons(Texture->Finish, interior, isect.IPoint, ray, TopNormal, rawnormal, LightCol, New_Weight, ticket);
+		TIR_occured = ComputeRefractionForPhotons(Texture->Finish, interior, isect.IPoint, ray, TopNormal, rawnormal, LightCol, New_Weight);
 	}
 
 	// Shoot reflected photons.
@@ -693,7 +693,7 @@ void PhotonTrace::ComputeLightedTexture(Colour& LightCol, const TEXTURE *Texture
 
 					TempWeight = (*listWNRX)[i].weight * (*listWNRX)[i].reflec.weightMax();
 
-					ComputeReflection(Layer->Finish, isect.IPoint, ray, LayNormal, rawnormal, TmpCol, TempWeight, ticket);
+					ComputeReflection(Layer->Finish, isect.IPoint, ray, LayNormal, rawnormal, TmpCol, TempWeight);
 				}
 			}
 
@@ -710,7 +710,7 @@ void PhotonTrace::ComputeLightedTexture(Colour& LightCol, const TEXTURE *Texture
 }
 
 
-bool PhotonTrace::ComputeRefractionForPhotons(const FINISH* finish, Interior *interior, const Vector3d& ipoint, const Ray& ray, const Vector3d& normal, const Vector3d& rawnormal, Colour& colour, COLC weight, Trace::TraceTicket& ticket)
+bool PhotonTrace::ComputeRefractionForPhotons(const FINISH* finish, Interior *interior, const Vector3d& ipoint, Ray& ray, const Vector3d& normal, const Vector3d& rawnormal, Colour& colour, COLC weight)
 {
 	Ray nray(ray);
 	Vector3d localnormal;
@@ -805,7 +805,7 @@ bool PhotonTrace::ComputeRefractionForPhotons(const FINISH* finish, Interior *in
 		lc.green() = colour.green() * GFilCol.green();
 		lc.blue()  = colour.blue()  * GFilCol.blue();
 
-		TraceRay(nray, lc, weight, ticket, true);
+		TraceRay(nray, lc, weight, true);
 		return false;
 	}
 	else
@@ -822,9 +822,9 @@ bool PhotonTrace::ComputeRefractionForPhotons(const FINISH* finish, Interior *in
 			localnormal = -normal;
 
 		if(fabs (dispersion - 1.0) < EPSILON)
-			return TraceRefractionRayForPhotons(finish, ipoint, ray, nray, ior, n, normal, rawnormal, localnormal, colour, weight, ticket);
+			return TraceRefractionRayForPhotons(finish, ipoint, ray, nray, ior, n, normal, rawnormal, localnormal, colour, weight);
 		else if(ray.IsMonochromaticRay() == true)
-			return TraceRefractionRayForPhotons(finish, ipoint, ray, nray, ray.GetSpectralBand().GetDispersionIOR(ior, dispersion), n, normal, rawnormal, localnormal, colour, weight, ticket);
+			return TraceRefractionRayForPhotons(finish, ipoint, ray, nray, ray.GetSpectralBand().GetDispersionIOR(ior, dispersion), n, normal, rawnormal, localnormal, colour, weight);
 		else
 		{
 			for(unsigned int i = 0; i < dispersionelements; i++)
@@ -836,7 +836,7 @@ bool PhotonTrace::ComputeRefractionForPhotons(const FINISH* finish, Interior *in
 				// NB setting the dispersion factor also causes the MonochromaticRay flag to be set
 				nray.SetSpectralBand(spectralBand);
 
-				(void)TraceRefractionRayForPhotons(finish, ipoint, ray, nray, spectralBand.GetDispersionIOR(ior, dispersion), n, normal, rawnormal, localnormal, tempcolour, weight, ticket);
+				(void)TraceRefractionRayForPhotons(finish, ipoint, ray, nray, spectralBand.GetDispersionIOR(ior, dispersion), n, normal, rawnormal, localnormal, tempcolour, weight);
 			}
 		}
 	}
@@ -844,7 +844,7 @@ bool PhotonTrace::ComputeRefractionForPhotons(const FINISH* finish, Interior *in
 	return false;
 }
 
-bool PhotonTrace::TraceRefractionRayForPhotons(const FINISH* finish, const Vector3d& ipoint, const Ray& ray, Ray& nray, DBL ior, DBL n, const Vector3d& normal, const Vector3d& rawnormal, const Vector3d& localnormal, Colour& colour, COLC weight, Trace::TraceTicket& ticket)
+bool PhotonTrace::TraceRefractionRayForPhotons(const FINISH* finish, const Vector3d& ipoint, Ray& ray, Ray& nray, DBL ior, DBL n, const Vector3d& normal, const Vector3d& rawnormal, const Vector3d& localnormal, Colour& colour, COLC weight)
 {
 	// Compute refrated ray direction using Heckbert's method.
 	DBL t = 1.0 + Sqr(ior) * (Sqr(n) - 1.0);
@@ -853,7 +853,7 @@ bool PhotonTrace::TraceRefractionRayForPhotons(const FINISH* finish, const Vecto
 	{
 		// Total internal reflection occures.
 		threadData->Stats()[Internal_Reflected_Rays_Traced]++;
-		ComputeReflection(finish, ipoint, ray, normal, rawnormal, colour, weight, ticket);
+		ComputeReflection(finish, ipoint, ray, normal, rawnormal, colour, weight);
 
 		return true;
 	}
@@ -871,7 +871,7 @@ bool PhotonTrace::TraceRefractionRayForPhotons(const FINISH* finish, const Vecto
 	lc.green() = colour.green() * GFilCol.green();
 	lc.blue()  = colour.blue()  * GFilCol.blue();
 
-	TraceRay(nray, lc, weight, ticket, false);
+	TraceRay(nray, lc, weight, false);
 
 	return false;
 }
@@ -1050,7 +1050,7 @@ void PhotonMediaFunction::addMediaPhoton(const Vector3d& Point, const Vector3d& 
 
 }
 
-void PhotonMediaFunction::ComputeMediaAndDepositPhotons(MediaVector& medias, const Ray& ray, const Intersection& isect, Colour& colour, Trace::TraceTicket& ticket)
+void PhotonMediaFunction::ComputeMediaAndDepositPhotons(MediaVector& medias, const Ray& ray, const Intersection& isect, Colour& colour)
 {
 	LightSourceEntryVector lights;
 	LitIntervalVector litintervals;
@@ -1125,11 +1125,11 @@ void PhotonMediaFunction::ComputeMediaAndDepositPhotons(MediaVector& medias, con
 	//if((IMedia->Sample_Method == 3) && !all_constant_and_light_ray) //  adaptive sampling
 	//  ComputeMediaAdaptiveSampling(medias, lights, mediaintervals, ray, IMedia, aa_threshold, minSamples, ignore_photons, use_scattering, false);
 	//else
-	DepositMediaPhotons(colour, medias, lights, mediaintervals, ray, minSamples, ignore_photons, use_scattering, all_constant_and_light_ray, ticket);
+	DepositMediaPhotons(colour, medias, lights, mediaintervals, ray, minSamples, ignore_photons, use_scattering, all_constant_and_light_ray);
 }
 
 void PhotonMediaFunction::DepositMediaPhotons(Colour& colour, MediaVector& medias, LightSourceEntryVector& lights, MediaIntervalVector& mediaintervals,
-                                              const Ray& ray, int minsamples, bool ignore_photons, bool use_scattering, bool all_constant_and_light_ray, Trace::TraceTicket& ticket)
+                                              const Ray& ray, int minsamples, bool ignore_photons, bool use_scattering, bool all_constant_and_light_ray)
 {
 	int j;
 	RGBColour Od;
@@ -1191,7 +1191,7 @@ void PhotonMediaFunction::DepositMediaPhotons(Colour& colour, MediaVector& media
 		for(j = 0; j < minsamples; j++)
 		{
 			d0 = (j + 0.5 + randomNumberGenerator()*sceneData->photonSettings.jitter - 0.5*sceneData->photonSettings.jitter) / minsamples;
-			ComputeOneMediaSample(medias, lights, *i, ray, d0, C0, od0, 2 /* use method 2 */, ignore_photons, use_scattering, true, ticket);
+			ComputeOneMediaSample(medias, lights, *i, ray, d0, C0, od0, 2 /* use method 2 */, ignore_photons, use_scattering, true);
 
 			if (use_scattering && !ignore_photons)
 			{
@@ -2596,7 +2596,7 @@ extern BYTE_XYZ rad_samples[];
 
 /******************************************************************
 ******************************************************************/
-void ChooseRay(Ray &NewRay, const Vector3d& Normal, const Ray & /*ray*/, const Vector3d& Raw_Normal, int WhichRay)
+void ChooseRay(BasicRay &NewRay, const Vector3d& Normal, const Vector3d& Raw_Normal, int WhichRay)
 {
 	Vector3d random_vec;
 	Vector3d up, n2, n3;

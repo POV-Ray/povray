@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/interior/media.h $
- * $Revision: #23 $
- * $Change: 6158 $
- * $DateTime: 2013/12/02 21:19:56 $
+ * $Revision: #25 $
+ * $Change: 6162 $
+ * $DateTime: 2013/12/07 19:55:09 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -57,9 +57,9 @@ class MediaFunction : public Trace::MediaFunctor
 	public:
 		MediaFunction(TraceThreadData *td, Trace *t, PhotonGatherer *pg);
 
-		virtual void ComputeMedia(vector<Media>& mediasource, const Ray& ray, Intersection& isect, RGBColour& colour, COLC& transm, Trace::TraceTicket& ticket);
-		virtual void ComputeMedia(const RayInteriorVector& mediasource, const Ray& ray, Intersection& isect, RGBColour& colour, COLC& transm, Trace::TraceTicket& ticket);
-		virtual void ComputeMedia(MediaVector& medias, const Ray& ray, Intersection& isect, RGBColour& colour, COLC& transm, Trace::TraceTicket& ticket);
+		virtual void ComputeMedia(vector<Media>& mediasource, const Ray& ray, Intersection& isect, RGBColour& colour, COLC& transm);
+		virtual void ComputeMedia(const RayInteriorVector& mediasource, const Ray& ray, Intersection& isect, RGBColour& colour, COLC& transm);
+		virtual void ComputeMedia(MediaVector& medias, const Ray& ray, Intersection& isect, RGBColour& colour, COLC& transm);
 	protected:
 		/// pseudo-random number sequence
 		RandomDoubleSequence randomNumbers;
@@ -74,9 +74,9 @@ class MediaFunction : public Trace::MediaFunctor
 
 		void ComputeMediaRegularSampling(MediaVector& medias, LightSourceEntryVector& lights, MediaIntervalVector& mediaintervals,
 		                                 const Ray& ray, const Media *IMedia, int minsamples, bool ignore_photons, bool use_scattering,
-		                                 bool all_constant_and_light_ray, Trace::TraceTicket& ticket);
+		                                 bool all_constant_and_light_ray);
 		void ComputeMediaAdaptiveSampling(MediaVector& medias, LightSourceEntryVector& lights, MediaIntervalVector& mediaintervals,
-		                                  const Ray& ray, const Media *IMedia, DBL aa_threshold, int minsamples, bool ignore_photons, bool use_scattering, Trace::TraceTicket& ticket);
+		                                  const Ray& ray, const Media *IMedia, DBL aa_threshold, int minsamples, bool ignore_photons, bool use_scattering);
 		void ComputeMediaColour(MediaIntervalVector& mediaintervals, RGBColour& colour, COLC& transm);
 		void ComputeMediaSampleInterval(LitIntervalVector& litintervals, MediaIntervalVector& mediaintervals, const Media *media);
 		void ComputeMediaLightInterval(LightSourceEntryVector& lights, LitIntervalVector& litintervals, const Ray& ray, const Intersection& isect);
@@ -84,12 +84,12 @@ class MediaFunction : public Trace::MediaFunctor
 		bool ComputeSpotLightInterval(const Ray &ray, const LightSource *Light, DBL *d1, DBL *d2);
 		bool ComputeCylinderLightInterval(const Ray &ray, const LightSource *Light, DBL *d1, DBL *d2);
 		void ComputeOneMediaSample(MediaVector& medias, LightSourceEntryVector& lights, MediaInterval& mediainterval, const Ray &ray, DBL d0, RGBColour& SampCol,
-		                           RGBColour& SampOptDepth, int sample_method, bool ignore_photons, bool use_scattering, bool photonPass, Trace::TraceTicket& ticket);
+		                           RGBColour& SampOptDepth, int sample_method, bool ignore_photons, bool use_scattering, bool photonPass);
 		void ComputeOneMediaSampleRecursive(MediaVector& medias, LightSourceEntryVector& lights, MediaInterval& mediainterval, const Ray& ray,
 		                                    DBL d1, DBL d3, RGBColour& Result, const RGBColour& C1, const RGBColour& C3, RGBColour& ODResult, const RGBColour& od1, const RGBColour& od3,
-		                                    int depth, DBL Jitter, DBL aa_threshold, bool ignore_photons, bool use_scattering, bool photonPass, Trace::TraceTicket& ticket);
-		void ComputeMediaPhotons(MediaVector& medias, RGBColour& Te, const RGBColour& Sc, const Ray& ray, const Vector3d& H);
-		void ComputeMediaScatteringAttenuation(MediaVector& medias, RGBColour& OutputColor, const RGBColour& Sc, const RGBColour& Light_Colour, const Ray &ray, const Ray &Light_Ray);
+		                                    int depth, DBL Jitter, DBL aa_threshold, bool ignore_photons, bool use_scattering, bool photonPass);
+		void ComputeMediaPhotons(MediaVector& medias, RGBColour& Te, const RGBColour& Sc, const BasicRay& ray, const Vector3d& H);
+		void ComputeMediaScatteringAttenuation(MediaVector& medias, RGBColour& OutputColor, const RGBColour& Sc, const RGBColour& Light_Colour, const BasicRay &ray, const BasicRay &Light_Ray);
 };
 
 }

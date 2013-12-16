@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/triangle.cpp $
- * $Revision: #35 $
- * $Change: 6139 $
- * $DateTime: 2013/11/25 21:34:55 $
+ * $Revision: #36 $
+ * $Change: 6161 $
+ * $DateTime: 2013/12/05 18:42:17 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -464,7 +464,7 @@ bool Triangle::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThrea
 *
 ******************************************************************************/
 
-bool Triangle::Intersect(const Ray& ray, DBL *Depth) const
+bool Triangle::Intersect(const BasicRay& ray, DBL *Depth) const
 {
 	DBL NormalDotOrigin, NormalDotDirection;
 	DBL s, t;

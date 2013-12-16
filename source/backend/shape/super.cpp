@@ -28,9 +28,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/super.cpp $
- * $Revision: #33 $
- * $Change: 6139 $
- * $DateTime: 2013/11/25 21:34:55 $
+ * $Revision: #34 $
+ * $Change: 6161 $
+ * $DateTime: 2013/12/05 18:42:17 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -198,7 +198,7 @@ bool Superellipsoid::All_Intersections(const Ray& ray, IStack& Depth_Stack, Trac
 *
 ******************************************************************************/
 
-bool Superellipsoid::Intersect(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread)
+bool Superellipsoid::Intersect(const BasicRay& ray, IStack& Depth_Stack, TraceThreadData *Thread)
 {
 	int i, cnt, Found = false;
 	DBL dists[PLANECOUNT+2];
@@ -1196,7 +1196,7 @@ DBL Superellipsoid::power(DBL x, DBL  e)
 *
 ******************************************************************************/
 
-bool Superellipsoid::insert_hit(const Ray &ray, DBL Depth, IStack& Depth_Stack, TraceThreadData *Thread)
+bool Superellipsoid::insert_hit(const BasicRay &ray, DBL Depth, IStack& Depth_Stack, TraceThreadData *Thread)
 {
 	Vector3d IPoint;
 

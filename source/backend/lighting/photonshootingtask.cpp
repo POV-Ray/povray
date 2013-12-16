@@ -27,9 +27,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/lighting/photonshootingtask.cpp $
- * $Revision: #22 $
- * $Change: 6147 $
- * $DateTime: 2013/11/29 20:46:11 $
+ * $Revision: #23 $
+ * $Change: 6162 $
+ * $DateTime: 2013/12/07 19:55:09 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -238,7 +238,8 @@ void PhotonShootingTask::ShootPhotonsAtObject(LightTargetCombo& combo)
 			{
 				for(area_y=0; area_y<y_samples; area_y++)
 				{
-					Ray ray;                 /* ray that we shoot */
+					TraceTicket ticket(maxTraceLevel, adcBailout);
+					Ray ray(ticket);
 
 					ray.Origin = combo.light->Center;
 
@@ -363,10 +364,8 @@ void PhotonShootingTask::ShootPhotonsAtObject(LightTargetCombo& combo)
 					//disp_elem = 0;   /* for dispersion */
 					//disp_nelems = 0; /* for dispersion */
 
-					Trace::TraceTicket ticket(maxTraceLevel, adcBailout);
-
 					ray.SetFlags(Ray::PrimaryRay, false, true);
-					trace.TraceRay(ray, PhotonColour, 1.0, ticket, false);
+					trace.TraceRay(ray, PhotonColour, 1.0, false);
 
 					/* display here */
 					if ((i++%100) == 0)

@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/render/ray.cpp $
- * $Revision: #35 $
- * $Change: 6118 $
- * $DateTime: 2013/11/22 16:39:19 $
+ * $Revision: #37 $
+ * $Change: 6162 $
+ * $DateTime: 2013/12/07 19:55:09 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -45,15 +45,17 @@
 namespace pov
 {
 
-Ray::Ray(RayType rt, bool shadowTest, bool photon, bool radiosity, bool monochromatic, bool pretrace)
+Ray::Ray(TraceTicket& ticket, RayType rt, bool shadowTest, bool photon, bool radiosity, bool monochromatic, bool pretrace) :
+	ticket(ticket)
 {
 	SetFlags(rt, shadowTest, photon, radiosity, monochromatic, pretrace);
 	hollowRay = true;
 	ClearInteriors();
 }
 
-Ray::Ray(const Vector3d& ov, const Vector3d& dv, RayType rt, bool shadowTest, bool photon, bool radiosity, bool monochromatic, bool pretrace) :
-	Origin(ov), Direction(dv)
+Ray::Ray(TraceTicket& ticket, const Vector3d& ov, const Vector3d& dv, RayType rt, bool shadowTest, bool photon, bool radiosity, bool monochromatic, bool pretrace) :
+	BasicRay(ov, dv),
+	ticket(ticket)
 {
 	SetFlags(rt, shadowTest, photon, radiosity, monochromatic, pretrace);
 	hollowRay = true;

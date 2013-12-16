@@ -27,9 +27,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/sor.cpp $
- * $Revision: #39 $
- * $Change: 6143 $
- * $DateTime: 2013/11/28 17:10:31 $
+ * $Revision: #40 $
+ * $Change: 6161 $
+ * $DateTime: 2013/12/05 18:42:17 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -222,7 +222,7 @@ bool Sor::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadData
 *
 ******************************************************************************/
 
-bool Sor::Intersect(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread)
+bool Sor::Intersect(const BasicRay& ray, IStack& Depth_Stack, TraceThreadData *Thread)
 {
 	int cnt;
 	int found, j, n;
@@ -1213,7 +1213,7 @@ void Sor::Compute_Sor(Vector2d *P, TraceThreadData *Thread)
 *
 ******************************************************************************/
 
-bool Sor::test_hit(const Ray &ray, IStack& Depth_Stack, DBL d, DBL k, int t, int n, TraceThreadData *Thread)
+bool Sor::test_hit(const BasicRay &ray, IStack& Depth_Stack, DBL d, DBL k, int t, int n, TraceThreadData *Thread)
 {
 	Vector3d IPoint;
 

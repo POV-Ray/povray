@@ -28,9 +28,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/sphsweep.cpp $
- * $Revision: #41 $
- * $Change: 6147 $
- * $DateTime: 2013/11/29 20:46:11 $
+ * $Revision: #42 $
+ * $Change: 6161 $
+ * $DateTime: 2013/12/05 18:42:17 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -165,7 +165,7 @@ bool SphereSweep::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceTh
 	SPHSWEEP_INT    *Isect = reinterpret_cast<SPHSWEEP_INT *>(POV_MALLOC((sizeof(SPHSWEEP_INT) * SPHSWEEP_MAX_ISECT), "sphere sweep intersections"));
 	SPHSWEEP_INT    *Sphere_Isect = reinterpret_cast<SPHSWEEP_INT *>(POV_MALLOC(sizeof(SPHSWEEP_INT) * 2 * Num_Spheres, "Sphere sweep sphere intersections"));
 	SPHSWEEP_INT    *Segment_Isect = reinterpret_cast<SPHSWEEP_INT *>(POV_MALLOC(sizeof(SPHSWEEP_INT) * 12 * Num_Segments, "Sphere sweep segment intersections"));
-	Ray             New_Ray;
+	BasicRay        New_Ray;
 	DBL             len;
 	bool            Intersection_Found = false;
 	int             Num_Isect = 0;
@@ -181,8 +181,7 @@ bool SphereSweep::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceTh
 	}
 	else
 	{
-		MInvTransPoint(New_Ray.Origin, ray.Origin, Trans);
-		MInvTransDirection(New_Ray.Direction, ray.Direction, Trans);
+		MInvTransRay(New_Ray, ray, Trans);
 
 		len = New_Ray.Direction.length();
 		New_Ray.Direction /= len;
@@ -315,7 +314,7 @@ bool SphereSweep::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceTh
 *
 ******************************************************************************/
 
-bool SphereSweep::Intersect_Sphere(const Ray &ray, const SPHSWEEP_SPH *Sphere, SPHSWEEP_INT *Inter)
+bool SphereSweep::Intersect_Sphere(const BasicRay &ray, const SPHSWEEP_SPH *Sphere, SPHSWEEP_INT *Inter)
 {
 	DBL         Radius2;
 	DBL         OCSquared;
@@ -402,7 +401,7 @@ bool SphereSweep::Intersect_Sphere(const Ray &ray, const SPHSWEEP_SPH *Sphere, S
 *
 ******************************************************************************/
 
-int SphereSweep::Intersect_Segment(const Ray &ray, const SPHSWEEP_SEG *Segment, SPHSWEEP_INT *Isect, TraceThreadData *Thread)
+int SphereSweep::Intersect_Segment(const BasicRay &ray, const SPHSWEEP_SEG *Segment, SPHSWEEP_INT *Isect, TraceThreadData *Thread)
 {
 	int             Isect_Count;
 	DBL             Dot1, Dot2;
@@ -1705,7 +1704,7 @@ void SphereSweep::Compute()
 *
 ******************************************************************************/
 
-int SphereSweep::Find_Valid_Points(SPHSWEEP_INT *Inter, int Num_Inter, const Ray &ray)
+int SphereSweep::Find_Valid_Points(SPHSWEEP_INT *Inter, int Num_Inter, const BasicRay &ray)
 {
 	int     i;
 	int     j;

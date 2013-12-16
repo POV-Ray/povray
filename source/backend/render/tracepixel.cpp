@@ -28,9 +28,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/render/tracepixel.cpp $
- * $Revision: #52 $
- * $Change: 6150 $
- * $DateTime: 2013/11/30 14:13:48 $
+ * $Revision: #53 $
+ * $Change: 6162 $
+ * $DateTime: 2013/12/07 19:55:09 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -262,14 +262,14 @@ void TracePixel::operator()(DBL x, DBL y, DBL width, DBL height, Colour& colour)
 		int numTraced = 0;
 		for (size_t rayno = 0; rayno < camera.Rays_Per_Pixel; rayno++)
 		{
-			Ray ray;
+			TraceTicket ticket(maxTraceLevel, adcBailout, sceneData->outputAlpha);
+			Ray ray(ticket);
 
 			if (CreateCameraRay(ray, x, y, width, height, rayno) == true)
 			{
 				Colour col;
 
-				Trace::TraceTicket ticket(maxTraceLevel, adcBailout, sceneData->outputAlpha);
-				TraceRay(ray, col, 1.0, ticket, false, camera.Max_Ray_Distance);
+				TraceRay(ray, col, 1.0, false, camera.Max_Ray_Distance);
 				colour += col;
 				numTraced++;
 			}
@@ -935,7 +935,9 @@ void TracePixel::TraceRayWithFocalBlur(Colour& colour, DBL x, DBL y, DBL width, 
 	DBL dx, dy, n, randx, randy;
 	Colour C, V1, S1, S2;
 	int seed = int(x * 313.0 + 11.0) + int(y * 311.0 + 17.0);
-	Ray ray;
+
+	TraceTicket ticket(maxTraceLevel, adcBailout, sceneData->outputAlpha);
+	Ray ray(ticket);
 
 	colour.clear();
 	V1.clear();
@@ -983,8 +985,7 @@ void TracePixel::TraceRayWithFocalBlur(Colour& colour, DBL x, DBL y, DBL width, 
 				// Increase_Counter(stats[Number_Of_Samples]);
 
 				C.clear();
-				Trace::TraceTicket ticket(maxTraceLevel, adcBailout, sceneData->outputAlpha);
-				TraceRay(ray, C, 1.0, ticket, false, camera.Max_Ray_Distance);
+				TraceRay(ray, C, 1.0, false, camera.Max_Ray_Distance);
 
 				colour += C;
 			}

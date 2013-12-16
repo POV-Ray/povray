@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/lathe.h $
- * $Revision: #23 $
- * $Change: 6143 $
- * $DateTime: 2013/11/28 17:10:31 $
+ * $Revision: #24 $
+ * $Change: 6161 $
+ * $DateTime: 2013/12/05 18:42:17 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -103,8 +103,8 @@ class Lathe : public ObjectBase
 
 		void Compute_Lathe(Vector2d *P, TraceThreadData *);
 	protected:
-		bool Intersect(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread);
-		bool test_hit(const Ray&, IStack&, DBL, DBL, int, TraceThreadData *Thread);
+		bool Intersect(const BasicRay& ray, IStack& Depth_Stack, TraceThreadData *Thread);
+		bool test_hit(const BasicRay&, IStack&, DBL, DBL, int, TraceThreadData *Thread);
 };
 
 }

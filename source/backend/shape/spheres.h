@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/spheres.h $
- * $Revision: #23 $
- * $Change: 6139 $
- * $DateTime: 2013/11/25 21:34:55 $
+ * $Revision: #24 $
+ * $Change: 6161 $
+ * $DateTime: 2013/12/05 18:42:17 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -71,7 +71,7 @@ class Sphere : public ObjectBase
 		virtual void Compute_BBox();
 		virtual bool Intersect_BBox(BBoxDirection, const BBoxVector3d&, const BBoxVector3d&, BBoxScalar) const;
 
-		static bool Intersect(const Ray& ray, const Vector3d& Center, DBL Radius2, DBL *Depth1, DBL  *Depth2);
+		static bool Intersect(const BasicRay& ray, const Vector3d& Center, DBL Radius2, DBL *Depth1, DBL  *Depth2);
 	private:
 		bool Do_Ellipsoid; // TODO - parser needs to take care of this
 };

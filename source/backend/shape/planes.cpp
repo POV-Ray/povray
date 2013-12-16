@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/planes.cpp $
- * $Revision: #34 $
- * $Change: 6142 $
- * $DateTime: 2013/11/26 21:24:29 $
+ * $Revision: #35 $
+ * $Change: 6161 $
+ * $DateTime: 2013/12/05 18:42:17 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -126,7 +126,7 @@ bool Plane::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDa
 *
 ******************************************************************************/
 
-bool Plane::Intersect(const Ray& ray, DBL *Depth, TraceThreadData *Thread) const
+bool Plane::Intersect(const BasicRay& ray, DBL *Depth, TraceThreadData *Thread) const
 {
 	DBL NormalDotOrigin, NormalDotDirection;
 	Vector3d P, D;

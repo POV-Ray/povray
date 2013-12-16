@@ -28,9 +28,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/bezier.cpp $
- * $Revision: #35 $
- * $Change: 6150 $
- * $DateTime: 2013/11/30 14:13:48 $
+ * $Revision: #36 $
+ * $Change: 6161 $
+ * $DateTime: 2013/12/05 18:42:17 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -515,7 +515,7 @@ bool BicubicPatch::subpatch_normal(const Vector3d& v1, const Vector3d& v2, const
 *
 ******************************************************************************/
 
-bool BicubicPatch::intersect_subpatch(const Ray &ray, const TripleVector3d& V1, const DBL uu[3], const DBL vv[3], DBL *Depth, Vector3d& P, Vector3d& N, DBL *u, DBL *v) const
+bool BicubicPatch::intersect_subpatch(const BasicRay &ray, const TripleVector3d& V1, const DBL uu[3], const DBL vv[3], DBL *Depth, Vector3d& P, Vector3d& N, DBL *u, DBL *v) const
 {
 	DBL squared_b0, squared_b1;
 	DBL d, n, a, b, r;
@@ -638,7 +638,7 @@ bool BicubicPatch::intersect_subpatch(const Ray &ray, const TripleVector3d& V1, 
 *
 ******************************************************************************/
 
-bool BicubicPatch::spherical_bounds_check(const Ray &ray, const Vector3d& center, DBL radiusSqr)
+bool BicubicPatch::spherical_bounds_check(const BasicRay &ray, const Vector3d& center, DBL radiusSqr)
 {
 	Vector3d v;
 	DBL dist1, dist2;
@@ -853,7 +853,7 @@ DBL BicubicPatch::point_plane_distance(const Vector3d& p, const Vector3d& n, DBL
 *
 ******************************************************************************/
 
-int BicubicPatch::bezier_subpatch_intersect(const Ray &ray, const ControlPoints *Patch, DBL u0, DBL  u1, DBL  v0, DBL  v1, IStack& Depth_Stack)
+int BicubicPatch::bezier_subpatch_intersect(const BasicRay &ray, const ControlPoints *Patch, DBL u0, DBL  u1, DBL  v0, DBL  v1, IStack& Depth_Stack)
 {
 	int cnt = 0;
 	TripleVector3d V1;
@@ -1266,7 +1266,7 @@ bool BicubicPatch::flat_enough(const ControlPoints *Patch) const
 *
 ******************************************************************************/
 
-int BicubicPatch::bezier_subdivider(const Ray &ray, const ControlPoints *Patch, DBL u0, DBL  u1, DBL  v0, DBL  v1, int recursion_depth, IStack& Depth_Stack)
+int BicubicPatch::bezier_subdivider(const BasicRay &ray, const ControlPoints *Patch, DBL u0, DBL  u1, DBL  v0, DBL  v1, int recursion_depth, IStack& Depth_Stack)
 {
 	int cnt = 0;
 	DBL ut, vt, radiusSqr;
@@ -1429,7 +1429,7 @@ void BicubicPatch::bezier_tree_deleter(BEZIER_NODE *Node)
 *
 ******************************************************************************/
 
-int BicubicPatch::bezier_tree_walker(const Ray &ray, const BEZIER_NODE *Node, IStack& Depth_Stack)
+int BicubicPatch::bezier_tree_walker(const BasicRay &ray, const BEZIER_NODE *Node, IStack& Depth_Stack)
 {
 	int i, cnt = 0;
 	DBL Depth, u, v;
@@ -1555,7 +1555,7 @@ int BicubicPatch::bezier_tree_walker(const Ray &ray, const BEZIER_NODE *Node, IS
 *
 ******************************************************************************/
 
-int BicubicPatch::intersect_bicubic_patch0(const Ray &ray, IStack& Depth_Stack)
+int BicubicPatch::intersect_bicubic_patch0(const BasicRay &ray, IStack& Depth_Stack)
 {
 	return (bezier_subdivider(ray, &Control_Points, 0.0, 1.0, 0.0, 1.0, 0, Depth_Stack));
 }

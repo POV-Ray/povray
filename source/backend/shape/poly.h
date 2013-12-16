@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/poly.h $
- * $Revision: #23 $
- * $Change: 6144 $
- * $DateTime: 2013/11/28 20:20:53 $
+ * $Revision: #24 $
+ * $Change: 6161 $
+ * $DateTime: 2013/12/05 18:42:17 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -79,12 +79,12 @@ class Poly : public ObjectBase
 
 		bool Set_Coeff(const unsigned int x,const unsigned int y, const unsigned int z, const DBL value);
 	protected:
-		static int intersect(const Ray &Ray, int Order, const DBL *Coeffs, int Sturm_Flag, DBL *Depths, TraceThreadData *Thread);
+		static int intersect(const BasicRay &Ray, int Order, const DBL *Coeffs, int Sturm_Flag, DBL *Depths, TraceThreadData *Thread);
 		static void normal0(Vector3d& Result, int Order, const DBL *Coeffs, const Vector3d& IPoint);
 		static void normal1(Vector3d& Result, int Order, const DBL *Coeffs, const Vector3d& IPoint);
 		static DBL inside(const Vector3d& IPoint, int Order, const DBL *Coeffs);
-		static int intersect_linear(const Ray &ray, const DBL *Coeffs, DBL *Depths);
-		static int intersect_quadratic(const Ray &ray, const DBL *Coeffs, DBL *Depths);
+		static int intersect_linear(const BasicRay &ray, const DBL *Coeffs, DBL *Depths);
+		static int intersect_quadratic(const BasicRay &ray, const DBL *Coeffs, DBL *Depths);
 		// static int factor_out(int n, int i, int *c, int *s);
 		//static int binomial(int n, int r);
 		//static void factor1(int n, int *c, int *s);

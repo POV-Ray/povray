@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/planes.h $
- * $Revision: #22 $
- * $Change: 6142 $
- * $DateTime: 2013/11/26 21:24:29 $
+ * $Revision: #23 $
+ * $Change: 6161 $
+ * $DateTime: 2013/12/05 18:42:17 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -72,7 +72,7 @@ class Plane : public ObjectBase
 		virtual void Compute_BBox();
 		virtual bool Intersect_BBox(BBoxDirection, const BBoxVector3d&, const BBoxVector3d&, BBoxScalar) const;
 	protected:
-		bool Intersect(const Ray& ray, DBL *Depth, TraceThreadData *Thread) const;
+		bool Intersect(const BasicRay& ray, DBL *Depth, TraceThreadData *Thread) const;
 };
 
 }

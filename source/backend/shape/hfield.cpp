@@ -122,13 +122,12 @@ bool HField::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadD
 {
 	int Side1, Side2;
 	Vector3d Start;
-	Ray Temp_Ray;
+	BasicRay Temp_Ray;
 	DBL depth1, depth2;
 
 	Thread->Stats()[Ray_HField_Tests]++;
 
-	MInvTransPoint(Temp_Ray.Origin, ray.Origin, Trans);
-	MInvTransDirection(Temp_Ray.Direction, ray.Direction, Trans);
+	MInvTransRay(Temp_Ray, ray, Trans);
 
 #ifdef HFIELD_EXTRA_STATS
 	Thread->Stats()[Ray_HField_Box_Tests]++;
@@ -442,7 +441,7 @@ DBL HField::normalize(Vector3d& A, const Vector3d& B)
 *
 ******************************************************************************/
 
-bool HField::intersect_pixel(int x, int z, const Ray &ray, DBL height1, DBL height2, IStack& HField_Stack, const Ray &RRay, DBL mindist, DBL maxdist, TraceThreadData *Thread)
+bool HField::intersect_pixel(int x, int z, const BasicRay &ray, DBL height1, DBL height2, IStack& HField_Stack, const BasicRay &RRay, DBL mindist, DBL maxdist, TraceThreadData *Thread)
 {
 	int Found;
 	DBL dot1, depth1, depth2;
@@ -1463,7 +1462,7 @@ void HField::Compute_BBox()
 *
 ******************************************************************************/
 
-bool HField::dda_traversal(const Ray &ray, const Vector3d& Start, const HFIELD_BLOCK *Block, IStack &HField_Stack, const Ray &RRay, DBL mindist, DBL maxdist, TraceThreadData *Thread)
+bool HField::dda_traversal(const BasicRay &ray, const Vector3d& Start, const HFIELD_BLOCK *Block, IStack &HField_Stack, const BasicRay &RRay, DBL mindist, DBL maxdist, TraceThreadData *Thread)
 {
 	const char *dda_msg = "Illegal grid value in dda_traversal().\n"
 	                      "The height field may contain dark spots. To eliminate them\n"
@@ -1876,7 +1875,7 @@ bool HField::dda_traversal(const Ray &ray, const Vector3d& Start, const HFIELD_B
 *
 ******************************************************************************/
 
-bool HField::block_traversal(const Ray &ray, const Vector3d& Start, IStack &HField_Stack, const Ray &RRay, DBL mindist, DBL maxdist, TraceThreadData *Thread)
+bool HField::block_traversal(const BasicRay &ray, const Vector3d& Start, IStack &HField_Stack, const BasicRay &RRay, DBL mindist, DBL maxdist, TraceThreadData *Thread)
 {
 	int xmax, zmax;
 	int x, z, nx, nz, signx, signz;

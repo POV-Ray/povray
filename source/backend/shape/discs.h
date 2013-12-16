@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/discs.h $
- * $Revision: #18 $
- * $Change: 6139 $
- * $DateTime: 2013/11/25 21:34:55 $
+ * $Revision: #19 $
+ * $Change: 6161 $
+ * $DateTime: 2013/12/05 18:42:17 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -76,7 +76,7 @@ class Disc : public ObjectBase
 
 		void Compute_Disc();
 	protected:
-		bool Intersect(const Ray& ray, DBL *Depth) const;
+		bool Intersect(const BasicRay& ray, DBL *Depth) const;
 };
 
 }

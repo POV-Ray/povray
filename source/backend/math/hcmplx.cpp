@@ -27,9 +27,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/math/hcmplx.cpp $
- * $Revision: #23 $
- * $Change: 6145 $
- * $DateTime: 2013/11/29 11:52:27 $
+ * $Revision: #24 $
+ * $Change: 6161 $
+ * $DateTime: 2013/12/05 18:42:17 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -421,7 +421,7 @@ void HypercomplexFractalRules::CalcNormal(Vector3d& Result, int N_Max, const Fra
 *
 ******************************************************************************/
 
-bool HypercomplexBaseFractalRules::Bound(const Ray & ray, const Fractal *fractal, DBL *Depth_Min, DBL *Depth_Max) const
+bool HypercomplexBaseFractalRules::Bound(const BasicRay& ray, const Fractal *fractal, DBL *Depth_Min, DBL *Depth_Max) const
 {
 	return (Sphere::Intersect(ray, fractal->Center, fractal->Radius_Squared, Depth_Min, Depth_Max));
 }

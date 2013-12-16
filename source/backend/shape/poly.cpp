@@ -28,9 +28,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/poly.cpp $
- * $Revision: #39 $
- * $Change: 6147 $
- * $DateTime: 2013/11/29 20:46:11 $
+ * $Revision: #40 $
+ * $Change: 6161 $
+ * $DateTime: 2013/12/05 18:42:17 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -205,12 +205,11 @@ bool Poly::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDat
 	DBL len;
 	Vector3d IPoint;
 	int cnt, i, j, Intersection_Found, same_root;
-	Ray New_Ray;
+	BasicRay New_Ray;
 
 	/* Transform the ray into the polynomial's space */
 
-	MInvTransPoint(New_Ray.Origin, ray.Origin, Trans);
-	MInvTransDirection(New_Ray.Direction, ray.Direction, Trans);
+	MInvTransRay(New_Ray, ray, Trans);
 
 	len = New_Ray.Direction.length();
 	New_Ray.Direction /= len;
@@ -645,7 +644,7 @@ DBL Poly::inside(const Vector3d& IPoint, int Order, const DBL *Coeffs)
 *
 ******************************************************************************/
 
-int Poly::intersect(const Ray &ray, int Order, const DBL *Coeffs, int Sturm_Flag, DBL *Depths, TraceThreadData *Thread)
+int Poly::intersect(const BasicRay &ray, int Order, const DBL *Coeffs, int Sturm_Flag, DBL *Depths, TraceThreadData *Thread)
 {
 	DBL eqn_v[3][MAX_ORDER+1], eqn_vt[3][MAX_ORDER+1];
 	DBL eqn[MAX_ORDER+1];
@@ -793,7 +792,7 @@ int Poly::intersect(const Ray &ray, int Order, const DBL *Coeffs, int Sturm_Flag
 *
 ******************************************************************************/
 
-int Poly::intersect_linear(const Ray &ray, const DBL *Coeffs, DBL *Depths)
+int Poly::intersect_linear(const BasicRay &ray, const DBL *Coeffs, DBL *Depths)
 {
 	DBL t0, t1;
 	const DBL *a = Coeffs;
@@ -841,7 +840,7 @@ int Poly::intersect_linear(const Ray &ray, const DBL *Coeffs, DBL *Depths)
 *
 ******************************************************************************/
 
-int Poly::intersect_quadratic(const Ray &ray, const DBL *Coeffs, DBL *Depths)
+int Poly::intersect_quadratic(const BasicRay &ray, const DBL *Coeffs, DBL *Depths)
 {
 	DBL x, y, z, x2, y2, z2;
 	DBL xx, yy, zz, xx2, yy2, zz2, ac, bc, cc, d, t;

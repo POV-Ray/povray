@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/cones.h $
- * $Revision: #20 $
- * $Change: 6139 $
- * $DateTime: 2013/11/25 21:34:55 $
+ * $Revision: #21 $
+ * $Change: 6161 $
+ * $DateTime: 2013/12/05 18:42:17 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -84,7 +84,7 @@ class Cone : public ObjectBase
 		void Compute_Cone_Data();
 		void Compute_Cylinder_Data();
 	protected:
-		int Intersect(const Ray& ray, CONE_INT *Intersection, TraceThreadData *Thread) const;
+		int Intersect(const BasicRay& ray, CONE_INT *Intersection, TraceThreadData *Thread) const;
 };
 
 }

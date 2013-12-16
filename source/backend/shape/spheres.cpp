@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/spheres.cpp $
- * $Revision: #37 $
- * $Change: 6147 $
- * $DateTime: 2013/11/29 20:46:11 $
+ * $Revision: #38 $
+ * $Change: 6161 $
+ * $DateTime: 2013/12/05 18:42:17 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -88,12 +88,11 @@ bool Sphere::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadD
 		register int Intersection_Found;
 		DBL Depth1, Depth2, len;
 		Vector3d IPoint;
-		Ray New_Ray;
+		BasicRay New_Ray;
 
 		// Transform the ray into the ellipsoid's space
 
-		MInvTransPoint(New_Ray.Origin, ray.Origin, Trans);
-		MInvTransDirection(New_Ray.Direction, ray.Direction, Trans);
+		MInvTransRay(New_Ray, ray, Trans);
 
 		len = New_Ray.Direction.length();
 		New_Ray.Direction /= len;
@@ -202,7 +201,7 @@ bool Sphere::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadD
 *
 ******************************************************************************/
 
-bool Sphere::Intersect(const Ray& ray, const Vector3d& Center, DBL Radius2, DBL *Depth1, DBL *Depth2)
+bool Sphere::Intersect(const BasicRay& ray, const Vector3d& Center, DBL Radius2, DBL *Depth1, DBL *Depth2)
 {
 	DBL OCSquared, t_Closest_Approach, Half_Chord, t_Half_Chord_Squared;
 	Vector3d Origin_To_Center;

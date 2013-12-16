@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/torus.h $
- * $Revision: #20 $
- * $Change: 6139 $
- * $DateTime: 2013/11/25 21:34:55 $
+ * $Revision: #21 $
+ * $Change: 6161 $
+ * $DateTime: 2013/12/05 18:42:17 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -81,7 +81,7 @@ class Torus : public ObjectBase
 		virtual void Invert();
 		virtual void Compute_BBox();
 	protected:
-		int Intersect(const Ray& ray, DBL *Depth, TraceThreadData *Thread) const;
+		int Intersect(const BasicRay& ray, DBL *Depth, TraceThreadData *Thread) const;
 		bool Test_Thick_Cylinder(const Vector3d& P, const Vector3d& D, DBL h1, DBL h2, DBL r1, DBL r2) const;
 		void CalcUV(const Vector3d& IPoint, Vector2d& Result) const;
 };

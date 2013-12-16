@@ -27,9 +27,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/cones.cpp $
- * $Revision: #40 $
- * $Change: 6147 $
- * $DateTime: 2013/11/29 20:46:11 $
+ * $Revision: #41 $
+ * $Change: 6161 $
+ * $DateTime: 2013/12/05 18:42:17 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -144,7 +144,7 @@ bool Cone::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDat
 *
 ******************************************************************************/
 
-int Cone::Intersect(const Ray& ray, CONE_INT *Intersection, TraceThreadData *Thread) const
+int Cone::Intersect(const BasicRay& ray, CONE_INT *Intersection, TraceThreadData *Thread) const
 {
 	int i = 0;
 	DBL a, b, c, z, t1, t2, len;

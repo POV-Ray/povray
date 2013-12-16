@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/boxes.h $
- * $Revision: #21 $
- * $Change: 6138 $
- * $DateTime: 2013/11/25 18:52:19 $
+ * $Revision: #22 $
+ * $Change: 6161 $
+ * $DateTime: 2013/12/05 18:42:17 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -71,7 +71,7 @@ class Box : public ObjectBase
 		virtual void Compute_BBox();
 		virtual bool Intersect_BBox(BBoxDirection, const BBoxVector3d&, const BBoxVector3d&, BBoxScalar) const;
 
-		static bool Intersect(const Ray& ray, const TRANSFORM *Trans, const Vector3d& Corner1, const Vector3d& Corner2, DBL *Depth1, DBL *Depth2, int *Side1, int  *Side2);
+		static bool Intersect(const BasicRay& ray, const TRANSFORM *Trans, const Vector3d& Corner1, const Vector3d& Corner2, DBL *Depth1, DBL *Depth2, int *Side1, int  *Side2);
 };
 
 }

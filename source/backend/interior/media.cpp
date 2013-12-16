@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/interior/media.cpp $
- * $Revision: #51 $
- * $Change: 6158 $
- * $DateTime: 2013/12/02 21:19:56 $
+ * $Revision: #53 $
+ * $Change: 6162 $
+ * $DateTime: 2013/12/07 19:55:09 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -219,7 +219,7 @@ MediaFunction::MediaFunction(TraceThreadData *td, Trace *t, PhotonGatherer *pg) 
 {
 }
 
-void MediaFunction::ComputeMedia(vector<Media>& mediasource, const Ray& ray, Intersection& isect, RGBColour& colour, COLC& transm, Trace::TraceTicket& ticket)
+void MediaFunction::ComputeMedia(vector<Media>& mediasource, const Ray& ray, Intersection& isect, RGBColour& colour, COLC& transm)
 {
 	if(!mediasource.empty())
 	{
@@ -233,11 +233,11 @@ void MediaFunction::ComputeMedia(vector<Media>& mediasource, const Ray& ray, Int
 		// to deposit photons in the infinite atmosphere, only in contained
 		// media, which is processed later (in ComputeLightedTexture).  [nk]
 		if(!medialist.empty())
-			ComputeMedia(medialist, ray, isect, colour, transm, ticket);
+			ComputeMedia(medialist, ray, isect, colour, transm);
 	}
 }
 
-void MediaFunction::ComputeMedia(const RayInteriorVector& mediasource, const Ray& ray, Intersection& isect, RGBColour& colour, COLC& transm, Trace::TraceTicket& ticket)
+void MediaFunction::ComputeMedia(const RayInteriorVector& mediasource, const Ray& ray, Intersection& isect, RGBColour& colour, COLC& transm)
 {
 	if(!mediasource.empty())
 	{
@@ -254,7 +254,7 @@ void MediaFunction::ComputeMedia(const RayInteriorVector& mediasource, const Ray
 		// to deposit photons in the infinite atmosphere, only in contained
 		// media, which is processed later (in ComputeLightedTexture).  [nk]
 		if(!medialist.empty())
-			ComputeMedia(medialist, ray, isect, colour, transm, ticket);
+			ComputeMedia(medialist, ray, isect, colour, transm);
 	}
 }
 
@@ -268,7 +268,7 @@ void MediaFunction::ComputeMedia(const RayInteriorVector& mediasource, const Ray
 *   Colour    - Color arriving at the end point
 ******************************************************************************/
 
-void MediaFunction::ComputeMedia(MediaVector& medias, const Ray& ray, Intersection& isect, RGBColour& colour, COLC& transm, Trace::TraceTicket& ticket)
+void MediaFunction::ComputeMedia(MediaVector& medias, const Ray& ray, Intersection& isect, RGBColour& colour, COLC& transm)
 {
 	LightSourceEntryVector lights;
 	LitIntervalVector litintervals;
@@ -340,16 +340,15 @@ void MediaFunction::ComputeMedia(MediaVector& medias, const Ray& ray, Intersecti
 
 	// Sample all intervals.
 	if((IMedia->Sample_Method == 3) && !all_constant_and_light_ray) //  adaptive sampling
-		ComputeMediaAdaptiveSampling(medias, lights, mediaintervals, ray, IMedia, aa_threshold, minSamples, ignore_photons, use_scattering, ticket);
+		ComputeMediaAdaptiveSampling(medias, lights, mediaintervals, ray, IMedia, aa_threshold, minSamples, ignore_photons, use_scattering);
 	else
-		ComputeMediaRegularSampling(medias, lights, mediaintervals, ray, IMedia, minSamples, ignore_photons, use_scattering, all_constant_and_light_ray, ticket);
+		ComputeMediaRegularSampling(medias, lights, mediaintervals, ray, IMedia, minSamples, ignore_photons, use_scattering, all_constant_and_light_ray);
 
 	ComputeMediaColour(mediaintervals, colour, transm);
 }
 
 void MediaFunction::ComputeMediaRegularSampling(MediaVector& medias, LightSourceEntryVector& lights, MediaIntervalVector& mediaintervals,
-                                                const Ray& ray, const Media *IMedia, int minsamples, bool ignore_photons, bool use_scattering, bool all_constant_and_light_ray,
-                                                Trace::TraceTicket& ticket)
+                                                const Ray& ray, const Media *IMedia, int minsamples, bool ignore_photons, bool use_scattering, bool all_constant_and_light_ray)
 {
 	int j;
 	DBL n;
@@ -368,13 +367,13 @@ void MediaFunction::ComputeMediaRegularSampling(MediaVector& medias, LightSource
 			if(IMedia->Sample_Method == 2)
 			{
 				d0 = (j + 0.5) / minsamples + (randomNumberGenerator() * IMedia->Jitter / minsamples);
-				ComputeOneMediaSample(medias, lights, *i, ray, d0, C0, od0, 2, ignore_photons, use_scattering, false, ticket);
+				ComputeOneMediaSample(medias, lights, *i, ray, d0, C0, od0, 2, ignore_photons, use_scattering, false);
 			}
 			else
 			{
 				// we may get here with media method 3
 				d0 = randomNumberGenerator();
-				ComputeOneMediaSample(medias, lights, *i, ray, d0, C0, od0, 1, ignore_photons, use_scattering, false, ticket);
+				ComputeOneMediaSample(medias, lights, *i, ray, d0, C0, od0, 1, ignore_photons, use_scattering, false);
 			}
 
 			if(all_constant_and_light_ray)
@@ -400,7 +399,7 @@ void MediaFunction::ComputeMediaRegularSampling(MediaVector& medias, LightSource
 				      (Va.blue() >= IMedia->Sample_Threshold[i->samples - 1]))
 				{
 					// Sample current interval again.
-					ComputeOneMediaSample(medias, lights, *i, ray, randomNumberGenerator(), C0, od0, 1, ignore_photons, use_scattering, false, ticket);
+					ComputeOneMediaSample(medias, lights, *i, ray, randomNumberGenerator(), C0, od0, 1, ignore_photons, use_scattering, false);
 
 					// Have we reached maximum number of samples.
 					if(i->samples > IMedia->Max_Samples)
@@ -417,8 +416,7 @@ void MediaFunction::ComputeMediaRegularSampling(MediaVector& medias, LightSource
 }
 
 void MediaFunction::ComputeMediaAdaptiveSampling(MediaVector& medias, LightSourceEntryVector& lights, MediaIntervalVector& mediaintervals,
-                                                 const Ray& ray, const Media *IMedia, DBL aa_threshold, int minsamples, bool ignore_photons, bool use_scattering,
-                                                 Trace::TraceTicket& ticket)
+                                                 const Ray& ray, const Media *IMedia, DBL aa_threshold, int minsamples, bool ignore_photons, bool use_scattering)
 {
 	// adaptive sampling
 	int sampleCount; // internal count for samples to take
@@ -445,10 +443,10 @@ void MediaFunction::ComputeMediaAdaptiveSampling(MediaVector& medias, LightSourc
 			// always do at least three samples - one on each end and one in the middle
 
 			// don't re-sample this if we've already done it in the previous interval
-			ComputeOneMediaSample(medias, lights, *i, ray, 0.0 + IMedia->Jitter * (randomNumberGenerator() - 0.5), C0, od0, 3, ignore_photons, use_scattering, false, ticket);
-			ComputeOneMediaSample(medias, lights, *i, ray, 1.0 + IMedia->Jitter * (randomNumberGenerator() - 0.5), C1, od1, 3, ignore_photons, use_scattering, false, ticket);
+			ComputeOneMediaSample(medias, lights, *i, ray, 0.0 + IMedia->Jitter * (randomNumberGenerator() - 0.5), C0, od0, 3, ignore_photons, use_scattering, false);
+			ComputeOneMediaSample(medias, lights, *i, ray, 1.0 + IMedia->Jitter * (randomNumberGenerator() - 0.5), C1, od1, 3, ignore_photons, use_scattering, false);
 			ComputeOneMediaSampleRecursive(medias, lights, *i, ray, 0.0, 1.0, i->te, C0, C1, i->od, od0, od1, IMedia->AA_Level - 1,
-			                               IMedia->Jitter, aa_threshold, ignore_photons, use_scattering, false, ticket);
+			                               IMedia->Jitter, aa_threshold, ignore_photons, use_scattering, false);
 			i->samples = 1;
 
 			// move c1 to c0 to go on to next sample/interval
@@ -462,7 +460,7 @@ void MediaFunction::ComputeMediaAdaptiveSampling(MediaVector& medias, LightSourc
 			dd = 1.0 / (DBL)(sampleCount + 1); // TODO FIXME - [CLi] shouldn't this be 1/sampleCount??
 			d0 = 0.0;
 
-			ComputeOneMediaSample(medias, lights, *i, ray, d0 + dd * IMedia->Jitter * (randomNumberGenerator() - 0.5), C0, od0, 3, ignore_photons, use_scattering, false, ticket);
+			ComputeOneMediaSample(medias, lights, *i, ray, d0 + dd * IMedia->Jitter * (randomNumberGenerator() - 0.5), C0, od0, 3, ignore_photons, use_scattering, false);
 
 			// clear out od & te
 			i->te.clear();
@@ -470,9 +468,9 @@ void MediaFunction::ComputeMediaAdaptiveSampling(MediaVector& medias, LightSourc
 
 			for(j = 1, d0 += dd; j <= sampleCount; j++, d0 += dd)
 			{
-				ComputeOneMediaSample(medias, lights, *i, ray, d0 + dd * IMedia->Jitter * (randomNumberGenerator() - 0.5), C1, od1, 3, ignore_photons, use_scattering, false, ticket);
+				ComputeOneMediaSample(medias, lights, *i, ray, d0 + dd * IMedia->Jitter * (randomNumberGenerator() - 0.5), C1, od1, 3, ignore_photons, use_scattering, false);
 				ComputeOneMediaSampleRecursive(medias, lights, *i, ray, d0-dd, d0, Result, C0, C1, ODResult, od0, od1, IMedia->AA_Level - 1,
-				                               IMedia->Jitter, aa_threshold, ignore_photons, use_scattering, false, ticket);
+				                               IMedia->Jitter, aa_threshold, ignore_photons, use_scattering, false);
 
 				n = 1.0 / (DBL)sampleCount; // number of sub-intervals explored recursively
 
@@ -920,7 +918,7 @@ bool MediaFunction::ComputeCylinderLightInterval(const Ray &ray, const LightSour
 ******************************************************************************/
 
 void MediaFunction::ComputeOneMediaSample(MediaVector& medias, LightSourceEntryVector& lights, MediaInterval& mediainterval, const Ray &ray, DBL d0, RGBColour& SampCol,
-                                          RGBColour& SampOptDepth, int sample_method, bool ignore_photons, bool use_scattering, bool photonPass, Trace::TraceTicket& ticket)
+                                          RGBColour& SampOptDepth, int sample_method, bool ignore_photons, bool use_scattering, bool photonPass)
 {
 	// NK samples - moved d0 to parameter list
 	DBL d1, len;
@@ -986,7 +984,7 @@ void MediaFunction::ComputeOneMediaSample(MediaVector& medias, LightSourceEntryV
 				// Use light only if active and within it's boundaries.
 				if((d1 >= lights[i].s0) && (d1 <= lights[i].s1))
 				{
-					if(!(trace->TestShadow(*lights[i].light, len, Light_Ray, P, Light_Colour, ticket)))
+					if(!(trace->TestShadow(*lights[i].light, len, Light_Ray, P, Light_Colour)))
 						ComputeMediaScatteringAttenuation(medias, Emission, Scattering, Light_Colour, ray, Light_Ray);
 				}
 			}
@@ -1026,7 +1024,7 @@ void MediaFunction::ComputeOneMediaSample(MediaVector& medias, LightSourceEntryV
 
 void MediaFunction::ComputeOneMediaSampleRecursive(MediaVector& medias, LightSourceEntryVector& lights, MediaInterval& mediainterval, const Ray& ray,
                                                    DBL d1, DBL d3, RGBColour& Result, const RGBColour& C1, const RGBColour& C3, RGBColour& ODResult, const RGBColour& od1, const RGBColour& od3,
-                                                   int depth, DBL Jitter, DBL aa_threshold, bool ignore_photons, bool use_scattering, bool photonPass, Trace::TraceTicket& ticket)
+                                                   int depth, DBL Jitter, DBL aa_threshold, bool ignore_photons, bool use_scattering, bool photonPass)
 {
 	RGBColour C2, Result2;
 	RGBColour od2, ODResult2;
@@ -1036,7 +1034,7 @@ void MediaFunction::ComputeOneMediaSampleRecursive(MediaVector& medias, LightSou
 	d2 = 0.5 * (d1 + d3);
 	jdist = d2 + Jitter * (d3 - d1) * (randomNumberGenerator() - 0.5);
 
-	ComputeOneMediaSample(medias, lights, mediainterval, ray, jdist, C2, od2, 3, ignore_photons, use_scattering, photonPass, ticket);
+	ComputeOneMediaSample(medias, lights, mediainterval, ray, jdist, C2, od2, 3, ignore_photons, use_scattering, photonPass);
 
 	// TODO FIXME - this gives C1, C2 and C3 a weigt of 1:1:1,
 	// which is no good as C1 and C3 are on the border of the interval, and may influence the neighboring interval as well.
@@ -1062,7 +1060,7 @@ void MediaFunction::ComputeOneMediaSampleRecursive(MediaVector& medias, LightSou
 	{
 		// recurse again
 		ComputeOneMediaSampleRecursive(medias, lights, mediainterval, ray, d1, d2, Result2, C1, C2, ODResult2, od1, od2,
-		                               depth - 1, Jitter, aa_threshold, ignore_photons, use_scattering, photonPass, ticket);
+		                               depth - 1, Jitter, aa_threshold, ignore_photons, use_scattering, photonPass);
 
 		// average colors & optical depth (well, actually do half of the averaging; we'll ad another "half a color" later)
 		Result   = Result2   / 2.0;
@@ -1088,7 +1086,7 @@ void MediaFunction::ComputeOneMediaSampleRecursive(MediaVector& medias, LightSou
 	{
 		// recurse again
 		ComputeOneMediaSampleRecursive(medias, lights, mediainterval, ray,  d2, d3, Result2, C2, C3, ODResult2, od2, od3,
-		                               depth - 1, Jitter, aa_threshold, ignore_photons, use_scattering, photonPass, ticket);
+		                               depth - 1, Jitter, aa_threshold, ignore_photons, use_scattering, photonPass);
 
 		// average colors & optical depth (well, actually do half of the averaging; we already did "half a color" earlier)
 		Result   += Result2   / 2.0;
@@ -1111,9 +1109,9 @@ void MediaFunction::ComputeOneMediaSampleRecursive(MediaVector& medias, LightSou
 }
 
 
-void MediaFunction::ComputeMediaPhotons(MediaVector& medias, RGBColour& Te, const RGBColour& Sc, const Ray& ray, const Vector3d& H)
+void MediaFunction::ComputeMediaPhotons(MediaVector& medias, RGBColour& Te, const RGBColour& Sc, const BasicRay& ray, const Vector3d& H)
 {
-	Ray Light_Ray;
+	BasicRay Light_Ray;
 	DBL r;
 	int j;
 	RGBColour Light_Colour;
@@ -1167,7 +1165,7 @@ void MediaFunction::ComputeMediaPhotons(MediaVector& medias, RGBColour& Te, cons
 	}
 }
 
-void MediaFunction::ComputeMediaScatteringAttenuation(MediaVector& medias, RGBColour& OutputColor, const RGBColour& Sc, const RGBColour& Light_Colour, const Ray& ray, const Ray& Light_Ray)
+void MediaFunction::ComputeMediaScatteringAttenuation(MediaVector& medias, RGBColour& OutputColor, const RGBColour& Sc, const RGBColour& Light_Colour, const BasicRay& ray, const BasicRay& Light_Ray)
 {
 	DBL k = 0.0, g = 0.0, g2 = 0.0, alpha = 0.0;
 

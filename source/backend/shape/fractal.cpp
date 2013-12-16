@@ -27,9 +27,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/fractal.cpp $
- * $Revision: #37 $
- * $Change: 6149 $
- * $DateTime: 2013/11/30 09:05:35 $
+ * $Revision: #38 $
+ * $Change: 6161 $
+ * $DateTime: 2013/12/05 18:42:17 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -119,7 +119,7 @@ bool Fractal::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThread
 	Vector3d IPoint, Mid_Point, Next_Point, Real_Pt;
 	Vector3d Real_Normal, F_Normal;
 	Vector3d Direction;
-	Ray New_Ray;
+	BasicRay New_Ray;
 
 	Thread->Stats()[Ray_Fractal_Tests]++;
 

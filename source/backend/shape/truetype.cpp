@@ -2774,7 +2774,7 @@ void TrueType::GetZeroOneHits(const GlyphStruct* glyph, const Vector3d& P, const
  * This is then solved using the quadratic formula.  Any solutions of s that are
  * between 0 and 1 (inclusive) are valid solutions.
  */
-bool TrueType::GlyphIntersect(const Vector3d& P, const Vector3d& D, const GlyphStruct* glyph, DBL glyph_depth, const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread)
+bool TrueType::GlyphIntersect(const Vector3d& P, const Vector3d& D, const GlyphStruct* glyph, DBL glyph_depth, const BasicRay& ray, IStack& Depth_Stack, TraceThreadData *Thread)
 {
 	Contour *contour;
 	int i, j, k, l, n, m;

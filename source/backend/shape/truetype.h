@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/truetype.h $
- * $Revision: #25 $
- * $Change: 6143 $
- * $DateTime: 2013/11/28 17:10:31 $
+ * $Revision: #26 $
+ * $Change: 6161 $
+ * $DateTime: 2013/12/05 18:42:17 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -82,7 +82,7 @@ class TrueType : public ObjectBase
 		bool Inside_Glyph(double x, double y, const GlyphStruct* glyph) const;
 		int solve_quad(double *x, double *y, double mindist, DBL maxdist) const;
 		void GetZeroOneHits(const GlyphStruct* glyph, const Vector3d& P, const Vector3d& D, DBL glyph_depth, double *t0, double *t1) const;
-		bool GlyphIntersect(const Vector3d& P, const Vector3d& D, const GlyphStruct* glyph, DBL glyph_depth, const Ray &ray, IStack& Depth_Stack, TraceThreadData *Thread);
+		bool GlyphIntersect(const Vector3d& P, const Vector3d& D, const GlyphStruct* glyph, DBL glyph_depth, const BasicRay &ray, IStack& Depth_Stack, TraceThreadData *Thread);
 };
 
 void FreeFontInfo(FontFileInfo *ffi);

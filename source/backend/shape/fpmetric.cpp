@@ -108,7 +108,7 @@ bool Parametric::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
 {
 	Vector3d P, D, IPoint;
 	Vector2d low_vect, hi_vect, uv;
-	Ray New_Ray;
+	BasicRay New_Ray;
 	DBL XRayMin, XRayMax, YRayMin, YRayMax, ZRayMin, ZRayMax, TPotRes, TLen;
 	DBL Depth1, Depth2, temp, Len, TResult = HUGE_VAL;
 	DBL low, hi, len;
@@ -126,8 +126,7 @@ bool Parametric::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
 	{
 		if(Trans != NULL)
 		{
-			MInvTransPoint(New_Ray.Origin, ray.Origin, Trans);
-			MInvTransDirection(New_Ray.Direction, ray.Direction, Trans);
+			MInvTransRay(New_Ray, ray, Trans);
 			len = New_Ray.Direction.length();
 			New_Ray.Direction /= len;
 			i_flg = Sphere::Intersect(New_Ray, Vector3d(container.sphere.center),

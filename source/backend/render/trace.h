@@ -23,9 +23,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/render/trace.h $
- * $Revision: #105 $
- * $Change: 6109 $
- * $DateTime: 2013/11/20 17:03:27 $
+ * $Revision: #107 $
+ * $Change: 6162 $
+ * $DateTime: 2013/12/07 19:55:09 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -137,6 +137,43 @@ typedef FixedSimpleVector<LitInterval, LIT_INTERVAL_VECTOR_SIZE> LitIntervalVect
 typedef FixedSimpleVector<LightSourceIntersectionEntry, LIGHT_INTERSECTION_VECTOR_SIZE> LightSourceIntersectionVector; // TODO FIXME - cannot allow this to be fixed size [trf]
 typedef FixedSimpleVector<LightSourceEntry, LIGHTSOURCE_VECTOR_SIZE> LightSourceEntryVector; // TODO FIXME - cannot allow this to be fixed size [trf]
 
+
+struct TraceTicket
+{
+	/// trace recursion level
+	unsigned int traceLevel;
+
+	/// maximum trace recursion level allowed
+	unsigned int maxAllowedTraceLevel;
+
+	/// maximum trace recursion level found
+	unsigned int maxFoundTraceLevel;
+
+	/// adc bailout
+	double adcBailout;
+
+	/// whether background should be rendered all transparent
+	bool alphaBackground;
+
+	/// something the radiosity algorithm needs
+	unsigned int radiosityRecursionDepth;
+
+	/// something the radiosity algorithm needs
+	float radiosityImportanceQueried;
+	/// something the radiosity algorithm needs
+	float radiosityImportanceFound;
+	/// set by radiosity code according to the sample quality encountered (1.0 is ideal, 0.0 really sucks)
+	float radiosityQuality;
+
+	/// something the subsurface scattering algorithm needs
+	unsigned int subsurfaceRecursionDepth;
+
+	TraceTicket(unsigned int mtl, double adcb, bool ab = true, unsigned int rrd = 0, unsigned int ssrd = 0, float riq = -1.0, float rq = 1.0):
+		traceLevel(0), maxAllowedTraceLevel(mtl), maxFoundTraceLevel(0), adcBailout(adcb), alphaBackground(ab), radiosityRecursionDepth(rrd), subsurfaceRecursionDepth(ssrd),
+		radiosityImportanceQueried(riq), radiosityImportanceFound(-1.0), radiosityQuality(rq) {}
+};
+
+
 /**
  *  Ray tracing and shading engine.
  *  This class provides the fundamental functionality to trace rays and determine the effective colour.
@@ -144,41 +181,6 @@ typedef FixedSimpleVector<LightSourceEntry, LIGHTSOURCE_VECTOR_SIZE> LightSource
 class Trace
 {
 	public:
-		struct TraceTicket
-		{
-			/// trace recursion level
-			unsigned int traceLevel;
-
-			/// maximum trace recursion level allowed
-			unsigned int maxAllowedTraceLevel;
-
-			/// maximum trace recursion level found
-			unsigned int maxFoundTraceLevel;
-
-			/// adc bailout
-			double adcBailout;
-
-			/// whether background should be rendered all transparent
-			bool alphaBackground;
-
-			/// something the radiosity algorithm needs
-			unsigned int radiosityRecursionDepth;
-
-			/// something the radiosity algorithm needs
-			float radiosityImportanceQueried;
-			/// something the radiosity algorithm needs
-			float radiosityImportanceFound;
-			/// set by radiosity code according to the sample quality encountered (1.0 is ideal, 0.0 really sucks)
-			float radiosityQuality;
-
-			/// something the subsurface scattering algorithm needs
-			unsigned int subsurfaceRecursionDepth;
-
-			TraceTicket(unsigned int mtl, double adcb, bool ab = true, unsigned int rrd = 0, unsigned int ssrd = 0, float riq = -1.0, float rq = 1.0):
-				traceLevel(0), maxAllowedTraceLevel(mtl), maxFoundTraceLevel(0), adcBailout(adcb), alphaBackground(ab), radiosityRecursionDepth(rrd), subsurfaceRecursionDepth(ssrd),
-				radiosityImportanceQueried(riq), radiosityImportanceFound(-1.0), radiosityQuality(rq) {}
-		};
-
 		class CooperateFunctor
 		{
 			public:
@@ -188,16 +190,16 @@ class Trace
 		class MediaFunctor
 		{
 			public:
-				virtual void ComputeMedia(vector<Media>&, const Ray&, Intersection&, RGBColour&, COLC&, Trace::TraceTicket& ticket) { }
-				virtual void ComputeMedia(const RayInteriorVector&, const Ray&, Intersection&, RGBColour&, COLC&, Trace::TraceTicket& ticket) { }
-				virtual void ComputeMedia(MediaVector&, const Ray&, Intersection&, RGBColour&, COLC&, Trace::TraceTicket& ticket) { }
+				virtual void ComputeMedia(vector<Media>&, const Ray&, Intersection&, RGBColour&, COLC&) { }
+				virtual void ComputeMedia(const RayInteriorVector&, const Ray&, Intersection&, RGBColour&, COLC&) { }
+				virtual void ComputeMedia(MediaVector&, const Ray&, Intersection&, RGBColour&, COLC&) { }
 		};
 
 		class RadiosityFunctor
 		{
 			public:
-				virtual void ComputeAmbient(const Vector3d& ipoint, const Vector3d& raw_normal, const Vector3d& layer_normal, RGBColour& ambient_colour, double weight, Trace::TraceTicket& ticket) { }
-				virtual bool CheckRadiosityTraceLevel(const Trace::TraceTicket& ticket) { return false; }
+				virtual void ComputeAmbient(const Vector3d& ipoint, const Vector3d& raw_normal, const Vector3d& layer_normal, RGBColour& ambient_colour, double weight, TraceTicket& ticket) { }
+				virtual bool CheckRadiosityTraceLevel(const TraceTicket& ticket) { return false; }
 		};
 
 		Trace(shared_ptr<SceneData> sd, TraceThreadData *td, unsigned int qf,
@@ -208,31 +210,29 @@ class Trace
 		 *  Trace a ray.
 		 *  Call this if filter and transmittance matter.
 		 *
-		 *  @param[in]      ray                 ray
+		 *  @param[in,out]  ray                 ray and associated information
 		 *  @param[out]     colour              computed colour
 		 *  @param[in]      weight              importance of this computation
-		 *  @param[in,out]  ticket              additional information passed through to/from secondary rays
 		 *  @param[in]      continuedRay        set to true when tracing a ray after it went through some surface
 		 *                                      without a change in direction; this governs trace level handling
 		 *  @param[in]      maxDepth            objects at or beyond this distance won't be hit by the ray (ignored if < EPSILON)
 		 *  @return                             the distance to the nearest object hit
 		 */
-		virtual double TraceRay(const Ray& ray, Colour& colour, COLC weight, TraceTicket& ticket, bool continuedRay, DBL maxDepth = 0.0);
+		virtual double TraceRay(Ray& ray, Colour& colour, COLC weight, bool continuedRay, DBL maxDepth = 0.0);
 
 		/**
 		 *  Trace a ray.
 		 *  Call this if filter and transmittance will be ignored anyway.
 		 *
-		 *  @param[in]      ray                 ray
+		 *  @param[in,out]  ray                 ray and associated information
 		 *  @param[out]     colour              computed colour
 		 *  @param[in]      weight              importance of this computation
-		 *  @param[in,out]  ticket              additional information passed through to/from secondary rays
 		 *  @param[in]      continuedRay        set to true when tracing a ray after it went through some surface
 		 *                                      without a change in direction; this governs trace level handling
 		 *  @param[in]      maxDepth            objects at or beyond this distance won't be hit by the ray (ignored if < EPSILON)
 		 *  @return                             the distance to the nearest object hit
 		 */
-		virtual double TraceRay(const Ray& ray, RGBColour& colour, COLC weight, TraceTicket& ticket, bool continuedRay, DBL maxDepth = 0.0);
+		virtual double TraceRay(Ray& ray, RGBColour& colour, COLC weight, bool continuedRay, DBL maxDepth = 0.0);
 
 		bool FindIntersection(Intersection& isect, const Ray& ray);
 		bool FindIntersection(Intersection& isect, const Ray& ray, const RayObjectCondition& precondition, const RayObjectCondition& postcondition);
@@ -241,7 +241,7 @@ class Trace
 
 		unsigned int GetHighestTraceLevel();
 
-		bool TestShadow(const LightSource &light, double& depth, Ray& light_source_ray, const Vector3d& p, RGBColour& colour, TraceTicket& ticket); // TODO FIXME - this should not be exposed here
+		bool TestShadow(const LightSource &light, double& depth, Ray& light_source_ray, const Vector3d& p, RGBColour& colour); // TODO FIXME - this should not be exposed here
 
 	protected: // TODO FIXME - should be private
 
@@ -348,12 +348,11 @@ class Trace
 		 *
 		 *  @param[in]      isect               intersection information
 		 *  @param[in,out]  colour              computed colour [in,out]; during photon pass: light colour [in]
-		 *  @param[in]      ray                 ray
+		 *  @param[in,out]  ray                 ray and associated information
 		 *  @param[in]      weight              importance of this computation
 		 *  @param[in]      photonpass          whether to deposit photons instead of computing a colour
-		 *  @param[in,out]  ticket              additional information passed through to/from secondary rays
 		 */
-		void ComputeTextureColour(Intersection& isect, Colour& colour, const Ray& ray, COLC weight, bool photonpass, TraceTicket& ticket);
+		void ComputeTextureColour(Intersection& isect, Colour& colour, Ray& ray, COLC weight, bool photonpass);
 
 		/**
 		 *  Compute the effective colour of an arbitrarily complex texture, or deposits photons.
@@ -368,16 +367,15 @@ class Trace
 		 *  @param[in]      warps               stack of warps to be applied
 		 *  @param[in]      ipoint              intersection point (possibly with earlier warps already applied)
 		 *  @param[in]      rawnormal           geometric (possibly smoothed) surface normal
-		 *  @param[in]      ray                 ray
+		 *  @param[in,out]  ray                 ray and associated information
 		 *  @param[in]      weight              importance of this computation
 		 *  @param[in]      isect               intersection information
 		 *  @param[in]      shadowflag          whether to perform only computations necessary for shadow testing
 		 *  @param[in]      photonpass          whether to deposit photons instead of computing a colour
-		 *  @param[in,out]  ticket              additional information passed through to/from secondary rays
 		 */
 		void ComputeOneTextureColour(Colour& resultcolour, const TEXTURE *texture, vector<const TEXTURE *>& warps, const Vector3d& ipoint,
-		                             const Vector3d& rawnormal, const Ray& ray, COLC weight, Intersection& isect, bool shadowflag,
-		                             bool photonpass, TraceTicket& ticket);
+		                             const Vector3d& rawnormal, Ray& ray, COLC weight, Intersection& isect, bool shadowflag,
+		                             bool photonpass);
 
 		/**
 		 *  Compute the effective colour of an averaged texture, or deposits photons.
@@ -392,16 +390,15 @@ class Trace
 		 *  @param[in]      warps               stack of warps to be applied
 		 *  @param[in]      ipoint              intersection point (possibly with earlier warps already applied)
 		 *  @param[in]      rawnormal           geometric (possibly smoothed) surface normal
-		 *  @param[in]      ray                 ray
+		 *  @param[in,out]  ray                 ray and associated information
 		 *  @param[in]      weight              importance of this computation
 		 *  @param[in]      isect               intersection information
 		 *  @param[in]      shadowflag          whether to perform only computations necessary for shadow testing
 		 *  @param[in]      photonpass          whether to deposit photons instead of computing a colour
-		 *  @param[in,out]  ticket              additional information passed through to/from secondary rays
 		 */
 		void ComputeAverageTextureColours(Colour& resultcolour, const TEXTURE *texture, vector<const TEXTURE *>& warps, const Vector3d& ipoint,
-		                                  const Vector3d& rawnormal, const Ray& ray, COLC weight, Intersection& isect, bool shadowflag,
-		                                  bool photonpass, TraceTicket& ticket);
+		                                  const Vector3d& rawnormal, Ray& ray, COLC weight, Intersection& isect, bool shadowflag,
+		                                  bool photonpass);
 
 		/**
 		 *  Compute the effective colour of a simple or layered texture.
@@ -419,13 +416,12 @@ class Trace
 		 *  @param[in]      warps               stack of warps to be applied
 		 *  @param[in]      ipoint              intersection point (possibly with earlier warps already applied)
 		 *  @param[in]      rawnormal           geometric (possibly smoothed) surface normal
-		 *  @param[in]      ray                 ray
+		 *  @param[in,out]  ray                 ray and associated information
 		 *  @param[in]      weight              importance of this computation
 		 *  @param[in]      isect               intersection information
-		 *  @param[in,out]  ticket              additional information passed through to/from secondary rays
 		 */
 		virtual void ComputeLightedTexture(Colour& resultcolour, const TEXTURE *texture, vector<const TEXTURE *>& warps, const Vector3d& ipoint,
-		                                   const Vector3d& rawnormal, const Ray& ray, COLC weight, Intersection& isect, TraceTicket& ticket);
+		                                   const Vector3d& rawnormal, Ray& ray, COLC weight, Intersection& isect);
 
 
 		/**
@@ -440,12 +436,11 @@ class Trace
 		 *  @param[in]      warps               stack of warps to be applied
 		 *  @param[in]      ipoint              intersection point (possibly with earlier warps already applied)
 		 *  @param[in]      rawnormal           geometric (possibly smoothed) surface normal
-		 *  @param[in]      ray                 ray
+		 *  @param[in,out]  ray                 ray and associated information
 		 *  @param[in]      isect               intersection information
-		 *  @param[in,out]  ticket              additional information passed through to/from secondary rays
 		 */
 		void ComputeShadowTexture(Colour& filtercolour, const TEXTURE *texture, vector<const TEXTURE *>& warps, const Vector3d& ipoint,
-		                          const Vector3d& rawnormal, const Ray& ray, Intersection& isect, TraceTicket& ticket);
+		                          const Vector3d& rawnormal, const Ray& ray, Intersection& isect);
 
 	/**
 	 *  @}
@@ -462,42 +457,40 @@ class Trace
 		/**
 		 *  Compute the refraction contribution.
 		 *
-		 *  @remarks        The computed contribution @e overwrites any value passed in @c colour.
+		 *  @remark         The computed contribution @e overwrites any value passed in @c colour.
 		 *
 		 *  @param[in]      ipoint              intersection point
-		 *  @param[in]      ray                 ray
+		 *  @param[in,out]  ray                 ray and associated information
 		 *  @param[in]      normal              effective (possibly pertubed) surface normal
 		 *  @param[in]      rawnormal           geometric (possibly smoothed) surface normal
 		 *  @param[out]     colour              computed colour
 		 *  @param[in]      weight              importance of this computation
-		 *  @param[in,out]  ticket              additional information passed through to/from secondary rays
 		 */
-		void ComputeReflection(const FINISH* finish, const Vector3d& ipoint, const Ray& ray, const Vector3d& normal, const Vector3d& rawnormal, Colour& colour, COLC weight, TraceTicket& ticket);
+		void ComputeReflection(const FINISH* finish, const Vector3d& ipoint, Ray& ray, const Vector3d& normal, const Vector3d& rawnormal, Colour& colour, COLC weight);
 
 		/**
 		 *  Compute the refraction contribution.
 		 *
-		 *  @remarks        The computed contribution @e overwrites any value passed in @c colour.
+		 *  @remark         The computed contribution @e overwrites any value passed in @c colour.
 		 *
 		 *  @param[in]      interior            stack of currently effective interiors
 		 *  @param[in]      ipoint              intersection point
-		 *  @param[in]      ray                 ray
+		 *  @param[in,out]  ray                 ray and associated information
 		 *  @param[in]      normal              effective (possibly pertubed) surface normal
 		 *  @param[in]      rawnormal           geometric (possibly smoothed) surface normal
 		 *  @param[out]     colour              computed colour
 		 *  @param[in]      weight              importance of this computation
-		 *  @param[in,out]  ticket              additional information passed through to/from secondary rays
 		 *  @return                             true if total internal reflection @e did occur
 		 */
-		bool ComputeRefraction(const FINISH* finish, Interior *interior, const Vector3d& ipoint, const Ray& ray, const Vector3d& normal, const Vector3d& rawnormal, Colour& colour, COLC weight, TraceTicket& ticket);
+		bool ComputeRefraction(const FINISH* finish, Interior *interior, const Vector3d& ipoint, Ray& ray, const Vector3d& normal, const Vector3d& rawnormal, Colour& colour, COLC weight);
 
 		/**
 		 *  Compute the contribution of a single refracted ray.
 		 *
-		 *  @remarks        The computed contribution @e overwrites any value passed in @c colour.
+		 *  @remark         The computed contribution @e overwrites any value passed in @c colour.
 		 *
 		 *  @param[in]      ipoint              intersection point
-		 *  @param[in]      ray                 ray
+		 *  @param[in,out]  ray                 ray and associated information
 		 *  @param[in]      ior                 relative index of refraction
 		 *  @param[in]      n                   cosine of angle of incidence
 		 *  @param[in]      normal              effective (possibly pertubed) surface normal
@@ -505,10 +498,9 @@ class Trace
 		 *  @param[in]      localnormal         effective surface normal, possibly flipped to match ray
 		 *  @param[out]     colour              computed colour
 		 *  @param[in]      weight              importance of this computation
-		 *  @param[in,out]  ticket              additional information passed through to/from secondary rays
 		 *  @return                             true if total internal reflection @e did occur
 		 */
-		bool TraceRefractionRay(const FINISH* finish, const Vector3d& ipoint, const Ray& ray, Ray& nray, double ior, double n, const Vector3d& normal, const Vector3d& rawnormal, const Vector3d& localnormal, Colour& colour, COLC weight, TraceTicket& ticket);
+		bool TraceRefractionRay(const FINISH* finish, const Vector3d& ipoint, Ray& ray, Ray& nray, double ior, double n, const Vector3d& normal, const Vector3d& rawnormal, const Vector3d& localnormal, Colour& colour, COLC weight);
 
 	/**
 	 *  @}
@@ -524,10 +516,10 @@ class Trace
 
 		/// @todo The name is misleading, as it computes all contributions of classic lighting, including highlights.
 		void ComputeDiffuseLight(const FINISH *finish, const Vector3d& ipoint, const  Ray& eye, const Vector3d& layer_normal, const RGBColour& layer_pigment_colour,
-		                         RGBColour& colour, double attenuation, ObjectPtr object, TraceTicket& ticket);
+		                         RGBColour& colour, double attenuation, ObjectPtr object);
 		/// @todo The name is misleading, as it computes all contributions of classic lighting, including highlights.
 		void ComputeOneDiffuseLight(const LightSource &lightsource, const Vector3d& reye, const FINISH *finish, const Vector3d& ipoint, const Ray& eye,
-		                            const Vector3d& layer_normal, const RGBColour& Layer_Pigment_Colour, RGBColour& colour, double Attenuation, ConstObjectPtr Object, TraceTicket& ticket, int light_index = -1);
+		                            const Vector3d& layer_normal, const RGBColour& Layer_Pigment_Colour, RGBColour& colour, double Attenuation, ConstObjectPtr Object, int light_index = -1);
 		/// @todo The name is misleading, as it computes all contributions of classic lighting, including highlights.
 		void ComputeFullAreaDiffuseLight(const LightSource &lightsource, const Vector3d& reye, const FINISH *finish, const Vector3d& ipoint, const Ray& eye,
 		                                 const Vector3d& layer_normal, const RGBColour& layer_pigment_colour, RGBColour& colour, double attenuation,
@@ -548,13 +540,12 @@ class Trace
 		 */
 		void ComputeOneLightRay(const LightSource &lightsource, double& lightsourcedepth, Ray& lightsourceray, const Vector3d& ipoint, RGBColour& lightcolour, bool forceAttenuate = false);
 
-		void TraceShadowRay(const LightSource &light, double depth, const Ray& lightsourceray, const Vector3d& point, RGBColour& colour, TraceTicket& ticket);
-		void TracePointLightShadowRay(const LightSource &lightsource, double& lightsourcedepth, Ray& lightsourceray, RGBColour& lightcolour, TraceTicket& ticket);
+		void TraceShadowRay(const LightSource &light, double depth, Ray& lightsourceray, const Vector3d& point, RGBColour& colour);
+		void TracePointLightShadowRay(const LightSource &lightsource, double& lightsourcedepth, Ray& lightsourceray, RGBColour& lightcolour);
 		void TraceAreaLightShadowRay(const LightSource &lightsource, double& lightsourcedepth, Ray& lightsourceray,
-		                             const Vector3d& ipoint, RGBColour& lightcolour, TraceTicket& ticket);
+		                             const Vector3d& ipoint, RGBColour& lightcolour);
 		void TraceAreaLightSubsetShadowRay(const LightSource &lightsource, double& lightsourcedepth, Ray& lightsourceray,
-		                                   const Vector3d& ipoint, RGBColour& lightcolour, int u1, int  v1, int  u2, int  v2, int level, const Vector3d& axis1, const Vector3d& axis2,
-		                                   TraceTicket& ticket);
+		                                   const Vector3d& ipoint, RGBColour& lightcolour, int u1, int  v1, int  u2, int  v2, int level, const Vector3d& axis1, const Vector3d& axis2);
 
 		/**
 		 *  Compute the filtering effect of an object on incident light from a particular light source.
@@ -567,9 +558,8 @@ class Trace
 		 *  @param[in]      isect               intersection information
 		 *  @param[in,out]  lightsourceray      ray to the light source
 		 *  @param[in,out]  colour              computed effect on the incident light
-		 *  @param[in,out]  ticket              additional information passed through to/from secondary rays
 		 */
-		void ComputeShadowColour(const LightSource &lightsource, Intersection& isect, Ray& lightsourceray, RGBColour& colour, TraceTicket& ticket);
+		void ComputeShadowColour(const LightSource &lightsource, Intersection& isect, Ray& lightsourceray, RGBColour& colour);
 
 		/**
 		 *  Compute the direction and distance of a single light source to a given intersection point.
@@ -621,7 +611,7 @@ class Trace
 		 *  @remark     The computed contribution is @e added to the value passed in @c colour.
 		 *
 		 *  @param[in]      finish              finish
-		 *  @param[in]      lightsourceray      ray from intersection to light source
+		 *  @param[in]      lightDirection      direction of incoming light
 		 *  @param[in]      layer_normal        effective (possibly pertubed) surface normal
 		 *  @param[in,out]  colour              effective surface colour
 		 *  @param[in]      light_colour        effective light colour
@@ -629,7 +619,7 @@ class Trace
 		 *  @param[in]      attenuation         attenuation factor to account for partial transparency
 		 *  @param[in]      backside            whether to use backside instead of frontside diffuse brightness factor
 		 */
-		void ComputeDiffuseColour(const FINISH *finish, const Ray& lightsourceray, const Vector3d& layer_normal, RGBColour& colour,
+		void ComputeDiffuseColour(const FINISH *finish, const Vector3d& lightDirection, const Vector3d& layer_normal, RGBColour& colour,
 		                          const RGBColour& light_colour, const RGBColour& layer_pigment_colour, double attenuation, bool backside);
 
 		/**
@@ -638,12 +628,13 @@ class Trace
 		 *  @remark     The computed contribution is @e added to the value passed in @c colour.
 		 *
 		 *  @param[in]      finish              finish
-		 *  @param[in]      lightsourceray      ray from intersection to light source
+		 *  @param[in]      lightDirection      direction of incoming light
+		 *  @param[in]      eyeDirection        direction from observer
 		 *  @param[in]      layer_normal        effective (possibly pertubed) surface normal
 		 *  @param[in]      ipoint              intersection point (possibly with earlier warps already applied)
 		 *  @param[in,out]  colour              effective surface colour
 		 */
-		void ComputeIridColour(const FINISH *finish, const Vector3d& lightsource, const Vector3d& eye, const Vector3d& layer_normal, const Vector3d& ipoint, RGBColour& colour);
+		void ComputeIridColour(const FINISH *finish, const Vector3d& lightDirection, const Vector3d& eyeDirection, const Vector3d& layer_normal, const Vector3d& ipoint, RGBColour& colour);
 
 		/**
 		 *  Compute the Phong highlight contribution of a finish illuminated by light from a given direction.
@@ -654,13 +645,14 @@ class Trace
 		 *  @remark     The computed contribution is @e added to the value passed in @c colour.
 		 *
 		 *  @param[in]      finish              finish
-		 *  @param[in]      lightsourceray      ray from intersection to light source
+		 *  @param[in]      lightDirection      direction of ray from light source
+		 *  @param[in]      eyeDirection        direction from observer
 		 *  @param[in]      layer_normal        effective (possibly pertubed) surface normal
 		 *  @param[in,out]  colour              effective surface colour
 		 *  @param[in]      light_colour        effective light colour
 		 *  @param[in]      layer_pigment_colour  nominal pigment colour
 		 */
-		void ComputePhongColour(const FINISH *finish, const Ray& lightsourceray, const Vector3d& eye, const Vector3d& layer_normal, RGBColour& colour,
+		void ComputePhongColour(const FINISH *finish, const Vector3d& lightDirection, const Vector3d& eyeDirection, const Vector3d& layer_normal, RGBColour& colour,
 		                        const RGBColour& light_colour, const RGBColour& layer_pigment_colour);
 
 		/**
@@ -672,14 +664,14 @@ class Trace
 		 *  @remark     The computed contribution is @e added to the value passed in @c colour.
 		 *
 		 *  @param[in]      finish              finish
-		 *  @param[in]      lightsourceray      ray from intersection to light source
-		 *  @param[in]      eye                 vector from intersection to observer
+		 *  @param[in]      lightDirection      direction of ray from light source
+		 *  @param[in]      eyeDirection        direction from observer
 		 *  @param[in]      layer_normal        effective (possibly pertubed) surface normal
 		 *  @param[in,out]  colour              effective surface colour
 		 *  @param[in]      light_colour        effective light colour
 		 *  @param[in]      layer_pigment_colour  nominal pigment colour
 		 */
-		void ComputeSpecularColour(const FINISH *finish, const Ray& lightsourceray, const Vector3d& eye, const Vector3d& layer_normal, RGBColour& colour,
+		void ComputeSpecularColour(const FINISH *finish, const Vector3d& lightDirection, const Vector3d& eyeDirection, const Vector3d& layer_normal, RGBColour& colour,
 		                           const RGBColour& light_colour, const RGBColour& layer_pigment_colour);
 
 	/**
@@ -702,13 +694,12 @@ class Trace
 		/** 
 		 *  Compute Sky & Background Colour.
 		 *
-		 *  @remarks        The computed colour @e overwrites any value passed in @c colour.
+		 *  @remark         The computed colour @e overwrites any value passed in @c colour.
 		 *
 		 *  @param[in]      ray                 ray
 		 *  @param[out]     colour              computed sky/background colour
-		 *  @param[in,out]  ticket              additional information passed through to/from secondary rays
 		 */
-		void ComputeSky(const Ray& ray, Colour& colour, TraceTicket& ticket);
+		void ComputeSky(const Ray& ray, Colour& colour);
 
 		void ComputeFog(const Ray& ray, const Intersection& isect, RGBColour& colour, COLC& transm);
 		double ComputeConstantFogDepth(const Ray &ray, double depth, double width, const FOG *fog);
@@ -724,7 +715,7 @@ class Trace
 		 *                  .
 		 *              In other words, you can't skip this whole thing, because the entry/exit is important.
 		 */
-		void ComputeShadowMedia(Ray& light_source_ray, Intersection& isect, RGBColour& resultcolour, bool media_attenuation_and_interaction, TraceTicket& ticket);
+		void ComputeShadowMedia(Ray& light_source_ray, Intersection& isect, RGBColour& resultcolour, bool media_attenuation_and_interaction);
 
 		/**
 		 *  Test whether an object is part of (or identical to) a given other object.
@@ -756,14 +747,14 @@ class Trace
 		void ComputeSurfaceTangents(const Vector3d& normal, Vector3d& u, Vector3d& v);
 		void ComputeSSLTNormal (Intersection& Ray_Intersection);
 		bool IsSameSSLTObject(const ObjectBase* obj1, const ObjectBase* obj2);
-		void ComputeDiffuseSampleBase(Vector3d& basePoint, const Intersection& out, const Vector3d& vOut, double avgFreeDist);
+		void ComputeDiffuseSampleBase(Vector3d& basePoint, const Intersection& out, const Vector3d& vOut, double avgFreeDist, TraceTicket& ticket);
 		void ComputeDiffuseSamplePoint(const Vector3d& basePoint, Intersection& in, double& sampleArea, TraceTicket& ticket);
 		void ComputeDiffuseContribution(const Intersection& out, const Vector3d& vOut, const Vector3d& pIn, const Vector3d& nIn, const Vector3d& vIn, double& sd, double sigma_prime_s, double sigma_a, double eta);
 		void ComputeDiffuseContribution1(const LightSource& lightsource, const Intersection& out, const Vector3d& vOut, const Intersection& in, RGBColour& Total_Colour, const DblRGBColour& sigma_prime_s, const DblRGBColour& sigma_a, double eta, double weight, TraceTicket& ticket);
 		void ComputeDiffuseAmbientContribution1(const Intersection& out, const Vector3d& vOut, const Intersection& in, RGBColour& Total_Colour, const DblRGBColour& sigma_prime_s, const DblRGBColour& sigma_a, double eta, double weight, TraceTicket& ticket);
 		void ComputeOneSingleScatteringContribution(const LightSource& lightsource, const Intersection& out, double sigma_t_xo, double sigma_s, double s_prime_out, RGBColour& Lo, double eta, const Vector3d& bend_point, double phi_out, double cos_out_prime, TraceTicket& ticket);
 		void ComputeSingleScatteringContribution(const Intersection& out, double dist, double theta_out, double cos_out_prime, const Vector3d& refractedREye, double sigma_t_xo, double sigma_s, RGBColour& Lo, double eta, TraceTicket& ticket);
-		void ComputeSubsurfaceScattering (const FINISH *Finish, const RGBColour& layer_pigment_colour, const Intersection& isect, const Ray& Eye, const Vector3d& Layer_Normal, RGBColour& colour, double Attenuation, TraceTicket& ticket);
+		void ComputeSubsurfaceScattering (const FINISH *Finish, const RGBColour& layer_pigment_colour, const Intersection& isect, Ray& Eye, const Vector3d& Layer_Normal, RGBColour& colour, double Attenuation);
 		bool SSLTComputeRefractedDirection(const Vector3d& v, const Vector3d& n, double eta, Vector3d& refracted);
 
 	/**

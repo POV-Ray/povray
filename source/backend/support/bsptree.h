@@ -23,9 +23,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/support/bsptree.h $
- * $Revision: #46 $
- * $Change: 6119 $
- * $DateTime: 2013/11/22 20:31:53 $
+ * $Revision: #47 $
+ * $Change: 6161 $
+ * $DateTime: 2013/12/05 18:42:17 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -118,7 +118,7 @@ class BSPTree
 		BSPTree(unsigned int md = 0, float oic = 0.0f, float bac = 0.0f, float cac = 0.0f, float mc = 0.0f);
 		virtual ~BSPTree();
 
-		bool operator()(const Ray& ray, Intersect& isect, Mailbox& mailbox, double maxdist);
+		bool operator()(const BasicRay& ray, Intersect& isect, Mailbox& mailbox, double maxdist);
 		bool operator()(const Vector3d& origin, Inside& inside, Mailbox& mailbox, bool earlyExit = false);
 
 		void build(const Progress& progress, const Objects& objects,

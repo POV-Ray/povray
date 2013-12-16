@@ -28,9 +28,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/sphsweep.h $
- * $Revision: #22 $
- * $Change: 6144 $
- * $DateTime: 2013/11/28 20:20:53 $
+ * $Revision: #23 $
+ * $Change: 6161 $
+ * $DateTime: 2013/12/05 18:42:17 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -124,10 +124,9 @@ class SphereSweep : public ObjectBase
 
 		void Compute();
 	protected:
-		bool Intersect(Ray& ray, Vector3d& Center, DBL Radius2, DBL *Depth1, DBL *Depth2);
-		static bool Intersect_Sphere(const Ray &ray, const SPHSWEEP_SPH *Sphere, SPHSWEEP_INT *Isect);
-		static int Intersect_Segment(const Ray &ray, const SPHSWEEP_SEG *Segment, SPHSWEEP_INT *Isect, TraceThreadData *Thread);
-		static int Find_Valid_Points(SPHSWEEP_INT *Inter, int Num_Inter, const Ray &ray);
+		static bool Intersect_Sphere(const BasicRay &ray, const SPHSWEEP_SPH *Sphere, SPHSWEEP_INT *Isect);
+		static int Intersect_Segment(const BasicRay &ray, const SPHSWEEP_SEG *Segment, SPHSWEEP_INT *Isect, TraceThreadData *Thread);
+		static int Find_Valid_Points(SPHSWEEP_INT *Inter, int Num_Inter, const BasicRay &ray);
 		static int Comp_Isects(const void *Intersection_1, const void *Intersection_2);
 		static int bezier_01(int degree, const DBL* Coef, DBL* Roots, bool sturm, DBL tolerance, TraceThreadData *Thread);
 };

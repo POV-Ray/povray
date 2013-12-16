@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/polygon.h $
- * $Revision: #21 $
- * $Change: 6142 $
- * $DateTime: 2013/11/26 21:24:29 $
+ * $Revision: #22 $
+ * $Change: 6161 $
+ * $DateTime: 2013/12/05 18:42:17 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -82,7 +82,7 @@ class Polygon : public ObjectBase
 
 		void Compute_Polygon(int number, Vector3d *points);
 	protected:
-		bool Intersect(const Ray& ray, DBL *Depth, TraceThreadData *Thread) const;
+		bool Intersect(const BasicRay& ray, DBL *Depth, TraceThreadData *Thread) const;
 		static bool in_polygon(int number, Vector2d *points, DBL u, DBL  v);
 };
 

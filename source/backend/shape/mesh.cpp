@@ -27,9 +27,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/mesh.cpp $
- * $Revision: #49 $
- * $Change: 6147 $
- * $DateTime: 2013/11/29 20:46:11 $
+ * $Revision: #50 $
+ * $Change: 6161 $
+ * $DateTime: 2013/12/05 18:42:17 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -164,19 +164,18 @@ bool Mesh::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDat
 *
 ******************************************************************************/
 
-bool Mesh::Intersect(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread)
+bool Mesh::Intersect(const BasicRay& ray, IStack& Depth_Stack, TraceThreadData *Thread)
 {
 	MeshIndex i;
 	bool found;
 	DBL len, t;
-	Ray New_Ray;
+	BasicRay New_Ray;
 
 	/* Transform the ray into mesh space. */
 
 	if (Trans != NULL)
 	{
-		MInvTransPoint(New_Ray.Origin, ray.Origin, Trans);
-		MInvTransDirection(New_Ray.Direction, ray.Direction, Trans);
+		MInvTransRay(New_Ray, ray, Trans);
 
 		len = New_Ray.Direction.length();
 		New_Ray.Direction /= len;
@@ -251,29 +250,21 @@ bool Mesh::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 	bool inside;
 	MeshIndex i;
 	unsigned int found;
-	DBL len, t;
-	Ray ray, New_Ray;
+	DBL t;
+	BasicRay ray;
 
 	if (has_inside_vector==false)
 		return false;
 
 	ray.Direction = Data->Inside_Vect;
-
 	ray.Origin = IPoint;
 
 	/* Transform the ray into mesh space. */
 	if (Trans != NULL)
 	{
-		MInvTransPoint(New_Ray.Origin, ray.Origin, Trans);
-		MInvTransDirection(New_Ray.Direction, ray.Direction, Trans);
+		MInvTransRay(ray, ray, Trans);
 
-		len = New_Ray.Direction.length();
-		New_Ray.Direction /= len;
-	}
-	else
-	{
-		New_Ray = ray;
-		len = 1.0;
+		ray.Direction.normalize();
 	}
 
 	found = 0;
@@ -283,7 +274,7 @@ bool Mesh::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 		/* just step through all elements. */
 		for (i = 0; i < Data->Number_Of_Triangles; i++)
 		{
-			if (intersect_mesh_triangle(New_Ray, &Data->Triangles[i], &t))
+			if (intersect_mesh_triangle(ray, &Data->Triangles[i], &t))
 			{
 				/* actually, this should push onto a local depth stack and
 				   make sure that we don't have the same intersection point from
@@ -297,7 +288,7 @@ bool Mesh::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 	else
 	{
 		/* Use the mesh's bounding hierarchy. */
-		inside = inside_bbox_tree(New_Ray, Thread);
+		inside = inside_bbox_tree(ray, Thread);
 	}
 
 	if (Test_Flag(this, INVERTED_FLAG))
@@ -1062,7 +1053,7 @@ void Mesh::compute_smooth_triangle(MESH_TRIANGLE *Triangle, const Vector3d& P1, 
 *
 ******************************************************************************/
 
-bool Mesh::intersect_mesh_triangle(const Ray &ray, const MESH_TRIANGLE *Triangle, DBL *Depth) const
+bool Mesh::intersect_mesh_triangle(const BasicRay &ray, const MESH_TRIANGLE *Triangle, DBL *Depth) const
 {
 	DBL NormalDotOrigin, NormalDotDirection;
 	DBL s, t;
@@ -1240,7 +1231,7 @@ void Mesh::MeshUV(const Vector3d& P, const MESH_TRIANGLE *Triangle, Vector2d& Re
 *
 ******************************************************************************/
 
-bool Mesh::test_hit(const MESH_TRIANGLE *Triangle, const Ray &OrigRay, DBL Depth, DBL len, IStack& Depth_Stack, TraceThreadData *Thread)
+bool Mesh::test_hit(const MESH_TRIANGLE *Triangle, const BasicRay &OrigRay, DBL Depth, DBL len, IStack& Depth_Stack, TraceThreadData *Thread)
 {
 	Vector3d IPoint;
 	DBL world_dist = Depth / len;
@@ -1474,7 +1465,7 @@ void Mesh::Build_Mesh_BBox_Tree()
 *
 ******************************************************************************/
 
-bool Mesh::intersect_bbox_tree(const Ray &ray, const Ray &Orig_Ray, DBL len, IStack& Depth_Stack, TraceThreadData *Thread)
+bool Mesh::intersect_bbox_tree(const BasicRay &ray, const BasicRay &Orig_Ray, DBL len, IStack& Depth_Stack, TraceThreadData *Thread)
 {
 	bool found;
 	MeshIndex i;
@@ -2397,7 +2388,7 @@ void Mesh::UVCoord(Vector2d& Result, const Intersection *Inter, TraceThreadData 
 *
 ******************************************************************************/
 
-bool Mesh::inside_bbox_tree(const Ray &ray, TraceThreadData *Thread) const
+bool Mesh::inside_bbox_tree(const BasicRay &ray, TraceThreadData *Thread) const
 {
 	MeshIndex i, found;
 	DBL Best, Depth;

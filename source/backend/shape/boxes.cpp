@@ -27,9 +27,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/boxes.cpp $
- * $Revision: #35 $
- * $Change: 6138 $
- * $DateTime: 2013/11/25 18:52:19 $
+ * $Revision: #36 $
+ * $Change: 6161 $
+ * $DateTime: 2013/12/05 18:42:17 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -170,7 +170,7 @@ bool Box::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadData
 *
 ******************************************************************************/
 
-bool Box::Intersect(const Ray& ray, const TRANSFORM *Trans, const Vector3d& Corner1, const Vector3d& Corner2, DBL *Depth1, DBL  *Depth2, int *Side1, int  *Side2)
+bool Box::Intersect(const BasicRay& ray, const TRANSFORM *Trans, const Vector3d& Corner1, const Vector3d& Corner2, DBL *Depth1, DBL  *Depth2, int *Side1, int  *Side2)
 {
 	int smin = 0, smax = 0;    /* Side hit for min/max intersection. */
 	DBL t, tmin, tmax;

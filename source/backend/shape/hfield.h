@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/hfield.h $
- * $Revision: #24 $
- * $Change: 6154 $
- * $DateTime: 2013/12/01 13:49:24 $
+ * $Revision: #25 $
+ * $Change: 6161 $
+ * $DateTime: 2013/12/05 18:42:17 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -107,10 +107,10 @@ class HField : public ObjectBase
 	protected:
 		static DBL normalize(Vector3d& A, const Vector3d& B);
 		void smooth_height_field(int xsize, int zsize);
-		bool intersect_pixel(int x, int z, const Ray& ray, DBL height1, DBL height2, IStack &HField_Stack, const Ray &RRay, DBL mindist, DBL maxdist, TraceThreadData *Thread);
+		bool intersect_pixel(int x, int z, const BasicRay& ray, DBL height1, DBL height2, IStack &HField_Stack, const BasicRay &RRay, DBL mindist, DBL maxdist, TraceThreadData *Thread);
 		static int add_single_normal(HF_VAL **data, int xsize, int zsize, int x0, int z0,int x1, int z1,int x2, int z2, Vector3d& N);
-		bool dda_traversal(const Ray &ray, const Vector3d& Start, const HFIELD_BLOCK *Block, IStack &HField_Stack, const Ray &RRay, DBL mindist, DBL maxdist, TraceThreadData *Thread);
-		bool block_traversal(const Ray &ray, const Vector3d& Start, IStack &HField_Stack, const Ray &RRay, DBL mindist, DBL maxdist, TraceThreadData *Thread);
+		bool dda_traversal(const BasicRay &ray, const Vector3d& Start, const HFIELD_BLOCK *Block, IStack &HField_Stack, const BasicRay &RRay, DBL mindist, DBL maxdist, TraceThreadData *Thread);
+		bool block_traversal(const BasicRay &ray, const Vector3d& Start, IStack &HField_Stack, const BasicRay &RRay, DBL mindist, DBL maxdist, TraceThreadData *Thread);
 		void build_hfield_blocks();
 };
 

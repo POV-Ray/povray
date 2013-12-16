@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/quadrics.cpp $
- * $Revision: #39 $
- * $Change: 6142 $
- * $DateTime: 2013/11/26 21:24:29 $
+ * $Revision: #40 $
+ * $Change: 6161 $
+ * $DateTime: 2013/12/05 18:42:17 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -173,7 +173,7 @@ bool Quadric::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThread
 *
 ******************************************************************************/
 
-bool Quadric::Intersect(const Ray& ray, DBL *Depth1, DBL *Depth2) const
+bool Quadric::Intersect(const BasicRay& ray, DBL *Depth1, DBL *Depth2) const
 {
 	register DBL a, b, c, d;
 

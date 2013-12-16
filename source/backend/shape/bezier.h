@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/bezier.h $
- * $Revision: #21 $
- * $Change: 6123 $
- * $DateTime: 2013/11/23 13:45:56 $
+ * $Revision: #22 $
+ * $Change: 6161 $
+ * $DateTime: 2013/12/05 18:42:17 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -115,20 +115,20 @@ class BicubicPatch : public ObjectBase
 		typedef DBL      TripleDouble[3];
 
 		static void bezier_value(const ControlPoints *cp, DBL u0, DBL v0, Vector3d& P, Vector3d& N);
-		bool intersect_subpatch(const Ray&, const TripleVector3d&, const DBL [3], const DBL [3], DBL *, Vector3d&, Vector3d&, DBL *, DBL *) const;
-		static bool spherical_bounds_check(const Ray &, const Vector3d& c, DBL);
-		int intersect_bicubic_patch0(const Ray& , IStack&);
+		bool intersect_subpatch(const BasicRay&, const TripleVector3d&, const DBL [3], const DBL [3], DBL *, Vector3d&, Vector3d&, DBL *, DBL *) const;
+		static bool spherical_bounds_check(const BasicRay &, const Vector3d& c, DBL);
+		int intersect_bicubic_patch0(const BasicRay& , IStack&);
 		static DBL point_plane_distance(const Vector3d&, const Vector3d&, DBL);
 		static DBL determine_subpatch_flatness(const ControlPoints *);
 		bool flat_enough(const ControlPoints *) const;
 		static void bezier_bounding_sphere(const ControlPoints *, Vector3d&, DBL *);
-		int bezier_subpatch_intersect(const Ray &, const ControlPoints *, DBL, DBL, DBL, DBL, IStack&);
+		int bezier_subpatch_intersect(const BasicRay&, const ControlPoints *, DBL, DBL, DBL, DBL, IStack&);
 		static void bezier_split_left_right(const ControlPoints *, ControlPoints *, ControlPoints *);
 		static void bezier_split_up_down(const ControlPoints *, ControlPoints *, ControlPoints *);
-		int bezier_subdivider(const Ray &, const ControlPoints *, DBL, DBL, DBL, DBL, int, IStack&);
+		int bezier_subdivider(const BasicRay&, const ControlPoints *, DBL, DBL, DBL, DBL, int, IStack&);
 		static void bezier_tree_deleter(BEZIER_NODE *Node);
 		BEZIER_NODE *bezier_tree_builder(const ControlPoints *, DBL u0, DBL u1, DBL v0, DBL v1, int depth, int& max_depth_reached);
-		int bezier_tree_walker(const Ray &, const BEZIER_NODE *, IStack&);
+		int bezier_tree_walker(const BasicRay&, const BEZIER_NODE *, IStack&);
 		static BEZIER_NODE *create_new_bezier_node(void);
 		static BEZIER_VERTICES *create_bezier_vertex_block(void);
 		static BEZIER_CHILDREN *create_bezier_child_block(void);

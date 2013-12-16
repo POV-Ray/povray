@@ -27,9 +27,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/torus.cpp $
- * $Revision: #33 $
- * $Change: 6139 $
- * $DateTime: 2013/11/25 21:34:55 $
+ * $Revision: #34 $
+ * $Change: 6161 $
+ * $DateTime: 2013/12/05 18:42:17 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -175,7 +175,7 @@ bool Torus::All_Intersections(const Ray& ray, IStack& Depth_Stack, SceneThreadDa
 *
 ******************************************************************************/
 
-int Torus::Intersect(const Ray& ray, DBL *Depth, SceneThreadData *Thread) const
+int Torus::Intersect(const BasicRay& ray, DBL *Depth, SceneThreadData *Thread) const
 {
 	int i, n;
 	DBL len, R2, Py2, Dy2, PDy2, k1, k2;

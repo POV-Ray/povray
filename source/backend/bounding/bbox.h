@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/bounding/bbox.h $
- * $Revision: #28 $
- * $Change: 6119 $
- * $DateTime: 2013/11/22 20:31:53 $
+ * $Revision: #29 $
+ * $Change: 6161 $
+ * $DateTime: 2013/12/05 18:42:17 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -64,7 +64,7 @@ class Rayinfo
 		VECTORB nonzero;
 		VECTORB positive;
 
-		explicit Rayinfo(const Ray& ray)
+		explicit Rayinfo(const BasicRay& ray)
 		{
 			DBL t;
 

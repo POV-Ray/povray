@@ -26,9 +26,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/parser/express.cpp $
- * $Revision: #57 $
- * $Change: 6154 $
- * $DateTime: 2013/12/01 13:49:24 $
+ * $Revision: #58 $
+ * $Change: 6162 $
+ * $DateTime: 2013/12/07 19:55:09 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -227,7 +227,8 @@ void Parser::Parse_Trace(Vector3d& Res)
 {
 	ObjectPtr Object;
 	Intersection intersect;
-	Ray    ray;
+	TraceTicket ticket(1, 0.0);
+	Ray ray(ticket);
 	Vector3d Local_Normal;
 
 	GET (LEFT_PAREN_TOKEN);
@@ -567,7 +568,7 @@ void Parser::Parse_Vector_Function_Call(EXPRESS Express, int *Terms)
 
 void Parser::Parse_Spline_Call(EXPRESS Express, int *Terms)
 {
-	SPLINE *spline = reinterpret_cast<SPLINE*>(Token.Data);
+	SPLINE *spline = reinterpret_cast<SPLINE *>(Token.Data);
 	DBL Val;
 
 	// NB while parsing the call parameters, the parser may drop out of the current scope (macro or include file)
@@ -663,7 +664,7 @@ void Parser::Parse_Num_Factor (EXPRESS Express,int *Terms)
 	POV_ARRAY *a;
 	int Old_Ok=Ok_To_Declare;
 	DBL greater_val, less_val, equal_val ;
-	PIGMENT* Pigment; // JN2007: Image map dimensions
+	PIGMENT *Pigment; // JN2007: Image map dimensions
 
 	Ok_To_Declare=true;
 
@@ -1197,7 +1198,7 @@ void Parser::Parse_Num_Factor (EXPRESS Express,int *Terms)
 
 						// JN2007: Image map dimensions:
 						CASE (PIGMENT_ID_TOKEN)
-							Pigment = reinterpret_cast<PIGMENT*>(Token.Data);
+							Pigment = reinterpret_cast<PIGMENT *>(Token.Data);
 							if(Pigment->Type != BITMAP_PATTERN)
 							{
 								Error("The parameter to max_extent must be an image map pigment identifier");
