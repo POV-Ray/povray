@@ -24,11 +24,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/interior/interior.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/interior/interior.cpp $
+ * $Revision: #24 $
+ * $Change: 6085 $
+ * $DateTime: 2013/11/10 07:39:29 $
+ * $Author: clipka $
  *******************************************************************************/
 
 // frame.h must always be the first POV file included (pulls in platform config)
@@ -176,7 +176,7 @@ MATERIAL *Create_Material()
 {
 	MATERIAL *New;
 
-	New = (MATERIAL *)POV_MALLOC(sizeof(MATERIAL), "material");
+	New = reinterpret_cast<MATERIAL *>(POV_MALLOC(sizeof(MATERIAL), "material"));
 
 	New->Texture  = NULL;
 	New->Interior_Texture  = NULL;

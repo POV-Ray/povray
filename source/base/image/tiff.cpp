@@ -24,11 +24,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/base/image/tiff.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/base/image/tiff.cpp $
+ * $Revision: #29 $
+ * $Change: 6085 $
+ * $DateTime: 2013/11/10 07:39:29 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #include <vector>
@@ -79,7 +79,7 @@ static void SuppressTIFFWarnings(const char *, const char *, va_list)
 
 static tsize_t Tiff_Read(thandle_t fd, tdata_t buf, tsize_t size)
 {
-	IStream *file = (IStream *)fd;
+	IStream *file = reinterpret_cast<IStream *>(fd);
 
 	if(!file->read(buf, size))
 		return 0;
@@ -94,7 +94,7 @@ static tsize_t Tiff_Write(thandle_t fd, tdata_t buf, tsize_t size)
 
 static toff_t Tiff_Seek(thandle_t fd, toff_t off, int whence)
 {
-	IStream *file = (IStream *)fd;
+	IStream *file = reinterpret_cast<IStream *>(fd);
 
 	file->seekg(off, whence);
 
@@ -103,7 +103,7 @@ static toff_t Tiff_Seek(thandle_t fd, toff_t off, int whence)
 
 static int Tiff_Close(thandle_t fd)
 {
-	IStream *file = (IStream *)fd;
+	IStream *file = reinterpret_cast<IStream *>(fd);
 
 	// we don't close the file here; it's done by the caller
 	// delete file;
@@ -113,7 +113,7 @@ static int Tiff_Close(thandle_t fd)
 
 static toff_t Tiff_Size(thandle_t fd)
 {
-	IStream *file = (IStream *)fd;
+	IStream *file = reinterpret_cast<IStream *>(fd);
 	unsigned int pos = 0;
 	unsigned int len = 0;
 

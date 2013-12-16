@@ -26,11 +26,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/vfe/win/platformbase.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/vfe/win/platformbase.cpp $
+ * $Revision: #26 $
+ * $Change: 6085 $
+ * $DateTime: 2013/11/10 07:39:29 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #include <windows.h>
@@ -255,7 +255,7 @@ namespace pov_base
 
     if (m_ThreadTimeOnly)
     {
-      if (!GetThreadTimes (m_ThreadHandle, &ct, &et, (FILETIME *) &kt, (FILETIME *) &ut))
+      if (!GetThreadTimes (m_ThreadHandle, &ct, &et, reinterpret_cast<FILETIME *>(&kt), reinterpret_cast<FILETIME *>(&ut)))
       {
         assert (false) ;
         return (0) ;
@@ -263,7 +263,7 @@ namespace pov_base
     }
     else
     {
-      if (!GetProcessTimes (GetCurrentProcess (), &ct, &et, (FILETIME *) &kt, (FILETIME *) &ut))
+      if (!GetProcessTimes (GetCurrentProcess (), &ct, &et, reinterpret_cast<FILETIME *>(&kt), reinterpret_cast<FILETIME *>(&ut)))
       {
         assert (false) ;
         return (0) ;

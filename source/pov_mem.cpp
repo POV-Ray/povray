@@ -25,11 +25,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/pov_mem.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/pov_mem.cpp $
+ * $Revision: #23 $
+ * $Change: 6085 $
+ * $DateTime: 2013/11/10 07:39:29 $
+ * $Author: clipka $
  *******************************************************************************/
 
 // frame.h must always be the first POV file included (pulls in platform config)
@@ -366,13 +366,13 @@ void *pov_malloc(size_t size, const char *file, int line, const char *msg)
 
 	totalsize = size + NODESIZE + (MEM_GUARD_SIZE * 2); /* number of bytes allocated in OS */
 
-	block = (void *)MALLOC(totalsize);
+	block = reinterpret_cast<void *>(MALLOC(totalsize));
 
 	if (block == NULL)
 		throw std::bad_alloc();; // TODO FIXME !!! // Parser::MAError(msg, (int)size);
 
 #if defined(MEM_HEADER)
-	node = (MEMNODE *) block;
+	node = reinterpret_cast<MEMNODE *>(block);
 #endif
 
 #if defined(MEM_TAG)
@@ -388,16 +388,16 @@ void *pov_malloc(size_t size, const char *file, int line, const char *msg)
 #endif
 
 #if defined(MEM_PREFILL)
-	memptr = (char *)block + NODESIZE + MEM_GUARD_SIZE;
+	memptr = reinterpret_cast<char *>(block) + NODESIZE + MEM_GUARD_SIZE;
 	for(i = 0; i < size; i++)
 		memptr[i] = mem_prefill_string[i % mem_prefill_string_len];
 #endif
 
 #if defined(MEM_GUARD)
-	memptr = (char *)block + NODESIZE;
+	memptr = reinterpret_cast<char *>(block) + NODESIZE;
 	for(i = 0; i < MEM_GUARD_SIZE; i++)
 		memptr[i] = mem_guard_string[i % mem_guard_string_len];
-	memptr = (char *)block + ((MEMNODE *)block)->size - MEM_GUARD_SIZE;
+	memptr = reinterpret_cast<char *>(block) + (reinterpret_cast<MEMNODE *>(block))->size - MEM_GUARD_SIZE;
 	for(i = 0; i < MEM_GUARD_SIZE; i++)
 		memptr[i] = mem_guard_string[i % mem_guard_string_len];
 #endif
@@ -410,7 +410,7 @@ void *pov_malloc(size_t size, const char *file, int line, const char *msg)
 	mem_stats_alloc(totalsize, file, line);
 #endif
 
-	return (void *)((char *)block + NODESIZE + MEM_GUARD_SIZE);
+	return reinterpret_cast<void *>(reinterpret_cast<char *>(block) + NODESIZE + MEM_GUARD_SIZE);
 }
 
 
@@ -429,7 +429,7 @@ void *pov_calloc(size_t nitems, size_t size, const char *file, int line, const c
 	}
 #endif
 
-	block = (void *)pov_malloc(actsize, file, line, msg);
+	block = reinterpret_cast<void *>(pov_malloc(actsize, file, line, msg));
 
 	if (block != NULL)
 		memset(block, 0, actsize);
@@ -469,10 +469,10 @@ void *pov_realloc(void *ptr, size_t size, const char *file, int line, const char
 	else if (ptr == NULL)
 		return pov_malloc(size, file, line, msg);
 
-	block = (void *)((char *)ptr - NODESIZE - MEM_GUARD_SIZE);
+	block = reinterpret_cast<void *>(reinterpret_cast<char *>(ptr) - NODESIZE - MEM_GUARD_SIZE);
 
 #if defined(MEM_GUARD)
-	memptr = (char *)block + NODESIZE;
+	memptr = reinterpret_cast<char *>(block) + NODESIZE;
 	for(i = 0; i < MEM_GUARD_SIZE; i++)
 	{
 		if(memptr[i] != mem_guard_string[i % mem_guard_string_len])
@@ -481,7 +481,7 @@ void *pov_realloc(void *ptr, size_t size, const char *file, int line, const char
 			break;
 		}
 	}
-	memptr = (char *)block + ((MEMNODE *)block)->size - MEM_GUARD_SIZE;
+	memptr = reinterpret_cast<char *>(block) + (reinterpret_cast<MEMNODE *>(block))->size - MEM_GUARD_SIZE;
 	for(i = 0; i < MEM_GUARD_SIZE; i++)
 	{
 		if(memptr[i] != mem_guard_string[i % mem_guard_string_len])
@@ -493,7 +493,7 @@ void *pov_realloc(void *ptr, size_t size, const char *file, int line, const char
 #endif
 
 #if defined(MEM_HEADER)
-	node = (MEMNODE *) block;
+	node = reinterpret_cast<MEMNODE *>(block);
 #endif
 
 #if defined(MEM_TAG)
@@ -509,16 +509,16 @@ void *pov_realloc(void *ptr, size_t size, const char *file, int line, const char
 #endif
 
 #if defined(MEM_STATS)
-	oldsize = ((MEMNODE *)block)->size;
+	oldsize = (reinterpret_cast<MEMNODE *>(block))->size;
 #endif
 
 #if defined(MEM_PREFILL)
-	memptr = (char *)block + NODESIZE + MEM_GUARD_SIZE;
+	memptr = reinterpret_cast<char *>(block) + NODESIZE + MEM_GUARD_SIZE;
 	for(i = size; i < oldsize - NODESIZE - (MEM_GUARD_SIZE * 2); i++)
 		memptr[i] = mem_clear_string[i % mem_clear_string_len];
 #endif
 
-	block = (void *)REALLOC(block, NODESIZE + (MEM_GUARD_SIZE * 2) + size);
+	block = reinterpret_cast<void *>(REALLOC(block, NODESIZE + (MEM_GUARD_SIZE * 2) + size));
 
 	if (block == NULL)
 		throw std::bad_alloc(); // TODO FIXME !!! // Parser::MAError(msg, (int)size);
@@ -531,13 +531,13 @@ void *pov_realloc(void *ptr, size_t size, const char *file, int line, const char
 #endif
 
 #if defined(MEM_PREFILL)
-	memptr = (char *)block + NODESIZE + MEM_GUARD_SIZE;
+	memptr = reinterpret_cast<char *>(block) + NODESIZE + MEM_GUARD_SIZE;
 	for(i = oldsize - NODESIZE - (MEM_GUARD_SIZE * 2); i < size; i++)
 		memptr[i] = mem_prefill_string[i % mem_prefill_string_len];
 #endif
 
 #if defined(MEM_HEADER)
-	node = (MEMNODE *) block;
+	node = reinterpret_cast<MEMNODE *>(block);
 #endif
 
 #if defined(MEM_TAG)
@@ -553,10 +553,10 @@ void *pov_realloc(void *ptr, size_t size, const char *file, int line, const char
 #endif
 
 #if defined(MEM_GUARD)
-	memptr = (char *)block + NODESIZE;
+	memptr = reinterpret_cast<char *>(block) + NODESIZE;
 	for(i = 0; i < MEM_GUARD_SIZE; i++)
 		memptr[i] = mem_guard_string[i % mem_guard_string_len];
-	memptr = (char *)block + ((MEMNODE *)block)->size - MEM_GUARD_SIZE;
+	memptr = reinterpret_cast<char *>(block) + (reinterpret_cast<MEMNODE *>(block))->size - MEM_GUARD_SIZE;
 	for(i = 0; i < MEM_GUARD_SIZE; i++)
 		memptr[i] = mem_guard_string[i % mem_guard_string_len];
 #endif
@@ -572,7 +572,7 @@ void *pov_realloc(void *ptr, size_t size, const char *file, int line, const char
 		next->prev = node;
 #endif
 
-	return (void *)((char *)block + NODESIZE + MEM_GUARD_SIZE);
+	return reinterpret_cast<void *>(reinterpret_cast<char *>(block) + NODESIZE + MEM_GUARD_SIZE);
 }
 
 
@@ -594,10 +594,10 @@ void pov_free(void *ptr, const char *file, int line)
 	if (ptr == NULL)
 		throw pov_base::Exception(NULL, file, (unsigned int)line, "Attempt to free NULL pointer.");
 
-	block = (void *)((char *)ptr - NODESIZE - MEM_GUARD_SIZE);
+	block = reinterpret_cast<void *>(reinterpret_cast<char *>(ptr) - NODESIZE - MEM_GUARD_SIZE);
 
 #if defined(MEM_HEADER)
-	node = (MEMNODE *) block;
+	node = reinterpret_cast<MEMNODE *>(block);
 #endif
 
 #if defined(MEM_TAG)
@@ -615,7 +615,7 @@ void pov_free(void *ptr, const char *file, int line)
 #endif
 
 #if defined(MEM_GUARD)
-	memptr = (char *)block + NODESIZE;
+	memptr = reinterpret_cast<char *>(block) + NODESIZE;
 	for(i = 0; i < MEM_GUARD_SIZE; i++)
 	{
 		if(memptr[i] != mem_guard_string[i % mem_guard_string_len])
@@ -624,7 +624,7 @@ void pov_free(void *ptr, const char *file, int line)
 			break;
 		}
 	}
-	memptr = (char *)block + ((MEMNODE *)block)->size - MEM_GUARD_SIZE;
+	memptr = reinterpret_cast<char *>(block) + (reinterpret_cast<MEMNODE *>(block))->size - MEM_GUARD_SIZE;
 	for(i = 0; i < MEM_GUARD_SIZE; i++)
 	{
 		if(memptr[i] != mem_guard_string[i % mem_guard_string_len])
@@ -646,12 +646,12 @@ void pov_free(void *ptr, const char *file, int line)
 #endif
 
 #if defined(MEM_STATS)
-	mem_stats_free(((MEMNODE*)block)->size);
+	mem_stats_free((reinterpret_cast<MEMNODE*>(block))->size);
 #endif
 
 #if defined(MEM_PREFILL)
-	size = ((MEMNODE *)block)->size;
-	memptr = (char *)block + NODESIZE + MEM_GUARD_SIZE;
+	size = (reinterpret_cast<MEMNODE *>(block))->size;
+	memptr = reinterpret_cast<char *>(block) + NODESIZE + MEM_GUARD_SIZE;
 	for(i = 0; i < size - NODESIZE - (MEM_GUARD_SIZE * 2); i++)
 		memptr[i] = mem_clear_string[i % mem_clear_string_len];
 #endif
@@ -880,7 +880,7 @@ char *pov_strdup(const char *s)
 {
 	char *New;
 
-	New=(char *)POV_MALLOC(strlen(s)+1,s);
+	New=reinterpret_cast<char *>(POV_MALLOC(strlen(s)+1,s));
 	strcpy(New,s);
 	return (New);
 }
@@ -891,8 +891,8 @@ char *pov_strdup(const char *s)
 
 void *pov_memmove (void *dest, void  *src, size_t length)
 {
-	char *csrc =(char *)src;
-	char *cdest=(char *)dest;
+	char *csrc =reinterpret_cast<char *>(src);
+	char *cdest=reinterpret_cast<char *>(dest);
 
 	if (csrc < cdest && csrc + length >= cdest)
 	{

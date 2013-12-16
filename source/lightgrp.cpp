@@ -24,11 +24,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/lightgrp.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/lightgrp.cpp $
+ * $Revision: #23 $
+ * $Change: 6085 $
+ * $DateTime: 2013/11/10 07:39:29 $
+ * $Author: clipka $
  *******************************************************************************/
 
 // frame.h must always be the first POV file included (pulls in platform config)
@@ -102,7 +102,7 @@ void Promote_Local_Lights(CSG *Object)
 	{
 		if(((*curObject)->Type & LIGHT_GROUP_LIGHT_OBJECT) == LIGHT_GROUP_LIGHT_OBJECT)
 		{
-			lights.push_back((LightSource *)(*curObject));
+			lights.push_back(reinterpret_cast<LightSource *>(*curObject));
 			light_counter++;
 		}
 		else
@@ -127,7 +127,7 @@ void Promote_Local_Lights(CSG *Object)
 	Object->LLights = lights;
 
 	// promote light recursively to all other objects in the CSG union
-	Promote_Local_Lights_Recursive((CompoundObject *)Object, lights);
+	Promote_Local_Lights_Recursive(reinterpret_cast<CompoundObject *>(Object), lights);
 }
 
 /*****************************************************************************
@@ -182,7 +182,7 @@ void Promote_Local_Lights_Recursive(CompoundObject *Object, vector<LightSource *
 			// allow easy promotion of lights (if this is part of another light group)
 			(*curObject)->LLights = Lights;
 
-			Promote_Local_Lights_Recursive((CompoundObject *)(*curObject), Lights);
+			Promote_Local_Lights_Recursive(reinterpret_cast<CompoundObject *>(*curObject), Lights);
 		}
 		else
 		{

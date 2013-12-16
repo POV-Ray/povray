@@ -11,11 +11,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/vm/fncode.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/vm/fncode.cpp $
+ * $Revision: #21 $
+ * $Change: 6085 $
+ * $DateTime: 2013/11/10 07:39:29 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #include <stdio.h>
@@ -222,7 +222,7 @@ void FNCode::Compile(Parser::ExprNode *expression)
 	// allocate some program memory in advance
 	max_program_size = 256;
 	function->program_size = 0;
-	function->program = (Instruction *)POV_MALLOC(sizeof(Instruction) * max_program_size, "fn: program");
+	function->program = reinterpret_cast<Instruction *>(POV_MALLOC(sizeof(Instruction) * max_program_size, "fn: program"));
 
 #if (DEBUG_FLOATFUNCTION == 1)
 	if(asm_input != NULL)
@@ -302,7 +302,7 @@ void FNCode::Compile(Parser::ExprNode *expression)
 	compile_instruction(OPCODE_RTS, 0, 0, 0);
 
 	// set optimal size of program memory
-	function->program = (Instruction *)POV_REALLOC(function->program, sizeof(Instruction) * function->program_size, "fn: program");
+	function->program = reinterpret_cast<Instruction *>(POV_REALLOC(function->program, sizeof(Instruction) * function->program_size, "fn: program"));
 
 #if (DEBUG_FLOATFUNCTION == 1)
 	if(asm_output != NULL)
@@ -363,17 +363,17 @@ void FNCode_Copy(FunctionCode *f, FunctionCode *fnew)
 
 	if(f->program != NULL)
 	{
-		fnew->program = (Instruction *)POV_MALLOC(sizeof(Instruction) * f->program_size, "fn: program");
+		fnew->program = reinterpret_cast<Instruction *>(POV_MALLOC(sizeof(Instruction) * f->program_size, "fn: program"));
 		POV_MEMCPY(fnew->program, f->program, sizeof(Instruction) * f->program_size);
 	}
 	if(f->name != NULL)
 	{
-		fnew->name = (char *)POV_MALLOC((UCS2_strlen(f->name) + 1) * sizeof(UCS2), "fn: name");
+		fnew->name = reinterpret_cast<char *>(POV_MALLOC((UCS2_strlen(f->name) + 1) * sizeof(UCS2), "fn: name"));
 		UCS2_strcpy(fnew->name, f->name);
 	}
 	if(f->filename != NULL)
 	{
-		fnew->filename = (char *)POV_MALLOC(strlen(f->filename) + 1, "fn: scene file name");
+		fnew->filename = reinterpret_cast<char *>(POV_MALLOC(strlen(f->filename) + 1, "fn: scene file name"));
 		strcpy(fnew->filename, f->filename);
 	}
 
@@ -2008,7 +2008,7 @@ unsigned int FNCode::compile_instruction(unsigned int op, unsigned int rs, unsig
 	if(function->program_size >= max_program_size)
 	{
 		max_program_size = min(MAX_K, ((unsigned int)max_program_size) + 256);
-		function->program = (Instruction *)POV_REALLOC(function->program, sizeof(Instruction) * max_program_size, "fn: program");
+		function->program = reinterpret_cast<Instruction *>(POV_REALLOC(function->program, sizeof(Instruction) * max_program_size, "fn: program"));
 	}
 /*	if(function->program_size > 0)
 	{

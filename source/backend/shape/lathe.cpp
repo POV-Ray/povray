@@ -26,11 +26,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/shape/lathe.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/shape/lathe.cpp $
+ * $Revision: #36 $
+ * $Change: 6085 $
+ * $DateTime: 2013/11/10 07:39:29 $
+ * $Author: clipka $
  *******************************************************************************/
 
 /****************************************************************************
@@ -278,9 +278,9 @@ bool Lathe::Intersect(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thre
 		return false;
 
 	// Intersect all cylindrical bounds.
-	BCYL_INT *intervals = (BCYL_INT *) Thread->BCyl_Intervals ;
-	BCYL_INT *rint = (BCYL_INT *) Thread->BCyl_RInt ;
-	BCYL_INT *hint = (BCYL_INT *) Thread->BCyl_HInt ;
+	BCYL_INT *intervals = reinterpret_cast<BCYL_INT *>(Thread->BCyl_Intervals) ;
+	BCYL_INT *rint = reinterpret_cast<BCYL_INT *>(Thread->BCyl_RInt) ;
+	BCYL_INT *hint = reinterpret_cast<BCYL_INT *>(Thread->BCyl_HInt) ;
 
 	if((cnt = Intersect_BCyl(Spline->BCyl, intervals, rint, hint, P, D)) == 0)
 		return false;
@@ -1035,13 +1035,13 @@ void Lathe::Compute_Lathe(UV_VECT *P, TraceThreadData *Thread)
 
 	if (Spline == NULL)
 	{
-		Spline = (LATHE_SPLINE *)POV_MALLOC(sizeof(LATHE_SPLINE), "spline segments of lathe");
+		Spline = reinterpret_cast<LATHE_SPLINE *>(POV_MALLOC(sizeof(LATHE_SPLINE), "spline segments of lathe"));
 
 		/* Init spline. */
 
 		Spline->References = 1;
 
-		Spline->Entry = (LATHE_SPLINE_ENTRY *)POV_MALLOC(number_of_segments*sizeof(LATHE_SPLINE_ENTRY), "spline segments of lathe");
+		Spline->Entry = reinterpret_cast<LATHE_SPLINE_ENTRY *>(POV_MALLOC(number_of_segments*sizeof(LATHE_SPLINE_ENTRY), "spline segments of lathe"));
 	}
 	else
 	{
@@ -1052,10 +1052,10 @@ void Lathe::Compute_Lathe(UV_VECT *P, TraceThreadData *Thread)
 
 	/* Allocate temporary lists. */
 
-	tmp_r1 = (DBL *)POV_MALLOC(number_of_segments * sizeof(DBL), "temp lathe data");
-	tmp_r2 = (DBL *)POV_MALLOC(number_of_segments * sizeof(DBL), "temp lathe data");
-	tmp_h1 = (DBL *)POV_MALLOC(number_of_segments * sizeof(DBL), "temp lathe data");
-	tmp_h2 = (DBL *)POV_MALLOC(number_of_segments * sizeof(DBL), "temp lathe data");
+	tmp_r1 = reinterpret_cast<DBL *>(POV_MALLOC(number_of_segments * sizeof(DBL), "temp lathe data"));
+	tmp_r2 = reinterpret_cast<DBL *>(POV_MALLOC(number_of_segments * sizeof(DBL), "temp lathe data"));
+	tmp_h1 = reinterpret_cast<DBL *>(POV_MALLOC(number_of_segments * sizeof(DBL), "temp lathe data"));
+	tmp_h2 = reinterpret_cast<DBL *>(POV_MALLOC(number_of_segments * sizeof(DBL), "temp lathe data"));
 
 	/***************************************************************************
 	* Calculate segments.

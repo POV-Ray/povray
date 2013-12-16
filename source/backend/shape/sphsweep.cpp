@@ -27,11 +27,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/shape/sphsweep.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/shape/sphsweep.cpp $
+ * $Revision: #37 $
+ * $Change: 6085 $
+ * $DateTime: 2013/11/10 07:39:29 $
+ * $Author: clipka $
  *******************************************************************************/
 
 /*****************************************************************************
@@ -162,9 +162,9 @@ const MATRIX B_Matrix =
 
 bool SphereSweep::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread)
 {
-	SPHSWEEP_INT    *Isect = (SPHSWEEP_INT *)POV_MALLOC((sizeof(SPHSWEEP_INT) * SPHSWEEP_MAX_ISECT), "sphere sweep intersections");;
-	SPHSWEEP_INT    *Sphere_Isect = (SPHSWEEP_INT *)POV_MALLOC(sizeof(SPHSWEEP_INT) * 2 * Num_Spheres, "Sphere sweep sphere intersections");
-	SPHSWEEP_INT    *Segment_Isect = (SPHSWEEP_INT *)POV_MALLOC(sizeof(SPHSWEEP_INT) * 12 * Num_Segments, "Sphere sweep segment intersections");
+	SPHSWEEP_INT    *Isect = reinterpret_cast<SPHSWEEP_INT *>(POV_MALLOC((sizeof(SPHSWEEP_INT) * SPHSWEEP_MAX_ISECT), "sphere sweep intersections"));
+	SPHSWEEP_INT    *Sphere_Isect = reinterpret_cast<SPHSWEEP_INT *>(POV_MALLOC(sizeof(SPHSWEEP_INT) * 2 * Num_Spheres, "Sphere sweep sphere intersections"));
+	SPHSWEEP_INT    *Segment_Isect = reinterpret_cast<SPHSWEEP_INT *>(POV_MALLOC(sizeof(SPHSWEEP_INT) * 12 * Num_Segments, "Sphere sweep segment intersections"));
 	Ray             New_Ray;
 	DBL             len;
 	bool            Intersection_Found = false;
@@ -238,7 +238,7 @@ bool SphereSweep::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceTh
 	if(Num_Isect > 0)
 	{
 		// Sort intersections
-		QSORT((void *)Isect, Num_Isect, sizeof(SPHSWEEP_INT), Comp_Isects);
+		QSORT(reinterpret_cast<void *>(Isect), Num_Isect, sizeof(SPHSWEEP_INT), Comp_Isects);
 
 		// Delete invalid intersections inside the sphere sweep
 		Num_Isect = Find_Valid_Points(Isect, Num_Isect, New_Ray);
@@ -1000,7 +1000,7 @@ ObjectPtr SphereSweep::Copy()
 	New->Interpolation = Interpolation;
 
 	New->Num_Modeling_Spheres = Num_Modeling_Spheres;
-	New->Modeling_Sphere = (SPHSWEEP_SPH *)POV_MALLOC(Num_Modeling_Spheres * sizeof(SPHSWEEP_SPH), "modeling sphere");
+	New->Modeling_Sphere = reinterpret_cast<SPHSWEEP_SPH *>(POV_MALLOC(Num_Modeling_Spheres * sizeof(SPHSWEEP_SPH), "modeling sphere"));
 	for(i = 0; i < New->Num_Modeling_Spheres; i++)
 		New->Modeling_Sphere[i] = Modeling_Sphere[i];
 
@@ -1476,7 +1476,7 @@ void SphereSweep::Compute()
 			{
 				Num_Segments = Num_Modeling_Spheres - 1;
 				size = Num_Segments * sizeof(SPHSWEEP_SEG);
-				Segment = (SPHSWEEP_SEG *)POV_MALLOC(size, "sphere sweep segments");
+				Segment = reinterpret_cast<SPHSWEEP_SEG *>(POV_MALLOC(size, "sphere sweep segments"));
 			}
 
 			// Calculate polynomials for each segment
@@ -1508,7 +1508,7 @@ void SphereSweep::Compute()
 			{
 				Num_Segments = Num_Modeling_Spheres - 3;
 				size = Num_Segments * sizeof(SPHSWEEP_SEG);
-				Segment = (SPHSWEEP_SEG *)POV_MALLOC(size, "sphere sweep segments");
+				Segment = reinterpret_cast<SPHSWEEP_SEG *>(POV_MALLOC(size, "sphere sweep segments"));
 			}
 
 			// Calculate polynomials for each segment
@@ -1551,7 +1551,7 @@ void SphereSweep::Compute()
 			{
 				Num_Segments = Num_Modeling_Spheres - 3;
 				size = Num_Segments * sizeof(SPHSWEEP_SEG);
-				Segment = (SPHSWEEP_SEG *)POV_MALLOC(size, "sphere sweep segments");
+				Segment = reinterpret_cast<SPHSWEEP_SEG *>(POV_MALLOC(size, "sphere sweep segments"));
 			}
 
 			// Calculate polynomials for each segment
@@ -1664,7 +1664,7 @@ void SphereSweep::Compute()
 	{
 		Num_Spheres = Num_Segments + 1;
 		size = Num_Spheres * sizeof(SPHSWEEP_SPH);
-		Sphere = (SPHSWEEP_SPH *)POV_MALLOC(size, "sphere sweep spheres");
+		Sphere = reinterpret_cast<SPHSWEEP_SPH *>(POV_MALLOC(size, "sphere sweep spheres"));
 	}
 
 	// Calculate first sphere of every segment
@@ -1816,11 +1816,11 @@ int SphereSweep::Find_Valid_Points(SPHSWEEP_INT *Inter, int Num_Inter, const Ray
 
 int SphereSweep::Comp_Isects(const void *Intersection_1, const void *Intersection_2)
 {
-	SPHSWEEP_INT    *Int_1;
-	SPHSWEEP_INT    *Int_2;
+	const SPHSWEEP_INT *Int_1;
+	const SPHSWEEP_INT *Int_2;
 
-	Int_1 = (SPHSWEEP_INT *)Intersection_1;
-	Int_2 = (SPHSWEEP_INT *)Intersection_2;
+	Int_1 = reinterpret_cast<const SPHSWEEP_INT *>(Intersection_1);
+	Int_2 = reinterpret_cast<const SPHSWEEP_INT *>(Intersection_2);
 
 	if(Int_1->t < Int_2->t)
 		return -1;

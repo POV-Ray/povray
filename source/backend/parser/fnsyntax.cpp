@@ -27,11 +27,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/parser/fnsyntax.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/parser/fnsyntax.cpp $
+ * $Revision: #20 $
+ * $Change: 6085 $
+ * $DateTime: 2013/11/10 07:39:29 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #include <limits.h>
@@ -430,7 +430,7 @@ TOKEN Parser::expr_get_token()
 			return FLOAT_TOKEN;
 		else if(Token.Function_Id == FLOAT_ID_TOKEN)
 		{
-			Token.Token_Float = *((DBL *)Token.Data);
+			Token.Token_Float = *(reinterpret_cast<DBL *>(Token.Data));
 			return FLOAT_TOKEN;
 		}
 
@@ -476,7 +476,7 @@ Parser::ExprNode *Parser::new_expr_node(int stage, int op)
 {
 	ExprNode *node = NULL;
 
-	node = (ExprNode *)POV_MALLOC(sizeof(ExprNode), "ExprNode");
+	node = reinterpret_cast<ExprNode *>(POV_MALLOC(sizeof(ExprNode), "ExprNode"));
 	node->parent = NULL;
 	node->child = NULL;
 	node->prev = NULL;

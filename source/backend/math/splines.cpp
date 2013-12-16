@@ -24,11 +24,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/math/splines.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/math/splines.cpp $
+ * $Revision: #19 $
+ * $Change: 6085 $
+ * $DateTime: 2013/11/10 07:39:29 $
+ * $Author: clipka $
  *******************************************************************************/
 
 // frame.h must always be the first POV file included (pulls in platform config)
@@ -114,10 +114,10 @@ void Precompute_Cubic_Coeffs(SPLINE *sp)
 	DBL *u;
 	DBL *v;
 
-	h = (DBL *)POV_MALLOC(sp->Number_Of_Entries*sizeof(DBL), "Spline coefficient storage");
-	b = (DBL *)POV_MALLOC(sp->Number_Of_Entries*sizeof(DBL), "Spline coefficient storage");
-	u = (DBL *)POV_MALLOC(sp->Number_Of_Entries*sizeof(DBL), "Spline coefficient storage");
-	v = (DBL *)POV_MALLOC(sp->Number_Of_Entries*sizeof(DBL), "Spline coefficient storage");
+	h = reinterpret_cast<DBL *>(POV_MALLOC(sp->Number_Of_Entries*sizeof(DBL), "Spline coefficient storage"));
+	b = reinterpret_cast<DBL *>(POV_MALLOC(sp->Number_Of_Entries*sizeof(DBL), "Spline coefficient storage"));
+	u = reinterpret_cast<DBL *>(POV_MALLOC(sp->Number_Of_Entries*sizeof(DBL), "Spline coefficient storage"));
+	v = reinterpret_cast<DBL *>(POV_MALLOC(sp->Number_Of_Entries*sizeof(DBL), "Spline coefficient storage"));
 
 	for(k = 0; k < 5; k++)
 	{
@@ -473,8 +473,8 @@ void mkfree(SPLINE * sp, int i)
 SPLINE * Create_Spline(int Type)
 {
 	SPLINE * New;
-	New = (SPLINE *)POV_MALLOC(sizeof(SPLINE), "spline");
-	New->SplineEntries = (SPLINE_ENTRY *)POV_MALLOC(INIT_SPLINE_SIZE*sizeof(SPLINE_ENTRY), "spline entry");
+	New = reinterpret_cast<SPLINE *>(POV_MALLOC(sizeof(SPLINE), "spline"));
+	New->SplineEntries = reinterpret_cast<SPLINE_ENTRY *>(POV_MALLOC(INIT_SPLINE_SIZE*sizeof(SPLINE_ENTRY), "spline entry"));
 	New->Max_Entries = INIT_SPLINE_SIZE;
 	New->Number_Of_Entries = 0;
 	New->Type = Type;
@@ -526,9 +526,9 @@ SPLINE * Create_Spline(int Type)
 SPLINE * Copy_Spline(const SPLINE * Old)
 {
 	SPLINE * New;
-	New = (SPLINE *)POV_MALLOC(sizeof(SPLINE), "spline");
+	New = reinterpret_cast<SPLINE *>(POV_MALLOC(sizeof(SPLINE), "spline"));
 
-	New->SplineEntries = (SPLINE_ENTRY *)POV_MALLOC(Old->Number_Of_Entries*sizeof(SPLINE_ENTRY), "spline entry");
+	New->SplineEntries = reinterpret_cast<SPLINE_ENTRY *>(POV_MALLOC(Old->Number_Of_Entries*sizeof(SPLINE_ENTRY), "spline entry"));
 	POV_MEMCPY(New->SplineEntries, Old->SplineEntries, Old->Number_Of_Entries*sizeof(SPLINE_ENTRY));
 
 	New->Max_Entries = Old->Number_Of_Entries;
@@ -649,7 +649,7 @@ void Insert_Spline_Entry(SPLINE * sp, DBL p, const EXPRESS v)
 	if(sp->Number_Of_Entries >= sp->Max_Entries)
 	{
 		sp->Max_Entries += INIT_SPLINE_SIZE;
-		sp->SplineEntries = (SPLINE_ENTRY *)POV_REALLOC(sp->SplineEntries, sp->Max_Entries * sizeof(SPLINE_ENTRY), "Temporary Spline Entries");
+		sp->SplineEntries = reinterpret_cast<SPLINE_ENTRY *>(POV_REALLOC(sp->SplineEntries, sp->Max_Entries * sizeof(SPLINE_ENTRY), "Temporary Spline Entries"));
 		for (i = sp->Number_Of_Entries; i < sp->Max_Entries; i++)
 		{
 			sp->SplineEntries[i].par=-1e6;

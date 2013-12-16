@@ -26,11 +26,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/support/fixedallocator.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/support/fixedallocator.h $
+ * $Revision: #10 $
+ * $Change: 6085 $
+ * $DateTime: 2013/11/10 07:39:29 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #if !defined __FIXED_ALLOCATOR_H__
@@ -124,9 +124,9 @@ namespace pov
 
 		pointer allocate (size_type nItems, std::allocator<void>::const_pointer hint = 0)
 		{
-			if (((unsigned char *) hint >= m_Data) && ((unsigned char *) hint < m_Data + sizeof (T) * MaxElements))
+			if ((reinterpret_cast<unsigned char *>(hint) >= m_Data) && (reinterpret_cast<unsigned char *>(hint) < m_Data + sizeof (T) * MaxElements))
 			{
-				unsigned char slot = ((unsigned char *) hint - m_Data) / sizeof (T) ;
+				unsigned char slot = (reinterpret_cast<unsigned char *>(hint) - m_Data) / sizeof (T) ;
 				if ((slot = allocateBlocks (nItems, slot)) != 0xff)
 					return ((pointer) (m_Data + byteCount (slot))) ;
 			}
@@ -142,9 +142,9 @@ namespace pov
 
 		void deallocate (pointer what, unsigned char nItems)
 		{
-			if (((unsigned char *) what >= m_Data) && ((unsigned char *) what < m_Data + sizeof (T) * MaxElements))
+			if ((reinterpret_cast<unsigned char *>(what) >= m_Data) && (reinterpret_cast<unsigned char *>(what) < m_Data + sizeof (T) * MaxElements))
 			{
-				unsigned char slot = ((unsigned char *) what - m_Data) / sizeof (T) ;
+				unsigned char slot = (reinterpret_cast<unsigned char *>(what) - m_Data) / sizeof (T) ;
 				if (m_Headers [slot].allocated && m_Headers [slot].nItems == nItems)
 				{
 					m_Headers [slot].allocated = false ;

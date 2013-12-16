@@ -26,11 +26,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/vfe/vfepovms.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/vfe/vfepovms.cpp $
+ * $Revision: #13 $
+ * $Change: 6085 $
+ * $DateTime: 2013/11/10 07:39:29 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #include "vfe.h"
@@ -150,7 +150,7 @@ int SysQNode::Send (void *pData, int Len)
   assert (m_Sanity == 0xEDFEEFBE) ;
   if (m_Sanity == 0xEDFEEFBE)
   {
-    DataNode *dNode = (DataNode *) POVMS_Sys_Malloc (sizeof (DataNode)) ;
+    DataNode *dNode = reinterpret_cast<DataNode *>(POVMS_Sys_Malloc (sizeof (DataNode))) ;
     if (dNode == NULL)
       return (-3) ;
 
@@ -233,7 +233,7 @@ POVMSAddress vfe_POVMS_Sys_QueueToAddress (SysQNode *Node)
 
 SysQNode *vfe_POVMS_Sys_AddressToQueue (POVMSAddress Addr)
 {
-  return ((SysQNode *) Addr) ;
+  return (reinterpret_cast<SysQNode *>(Addr)) ;
 }
 
 SysQNode *vfe_POVMS_Sys_QueueOpen (void)

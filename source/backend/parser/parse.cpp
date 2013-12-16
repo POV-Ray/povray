@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/parser/parse.cpp $
- * $Revision: #188 $
- * $Change: 6075 $
- * $DateTime: 2013/11/09 16:27:09 $
+ * $Revision: #189 $
+ * $Change: 6085 $
+ * $DateTime: 2013/11/10 07:39:29 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -161,7 +161,7 @@ void Parser::Run()
 		Init_Random_Generators();
 
 		Initialize_Tokenizer();
-		Brace_Stack = (TOKEN *)POV_MALLOC(MAX_BRACES*sizeof (TOKEN), "brace stack");
+		Brace_Stack = reinterpret_cast<TOKEN *>(POV_MALLOC(MAX_BRACES*sizeof (TOKEN), "brace stack"));
 		Brace_Index = 0;
 
 		Default_Texture = Create_Texture ();
@@ -184,14 +184,14 @@ void Parser::Run()
 				if(i->second[0] == '\"')
 				{
 					string tmp(i->second, 1, i->second.length() - 2);
-					Temp_Entry = Add_Symbol(1, i->first.c_str(), STRING_ID_TOKEN);
-					Temp_Entry->Data = String_To_UCS2(tmp.c_str(), false);
+					Temp_Entry = Add_Symbol(1, const_cast<char *>(i->first.c_str()), STRING_ID_TOKEN);
+					Temp_Entry->Data = String_To_UCS2(const_cast<char *>(tmp.c_str()), false);
 				}
 				else
 				{
-					Temp_Entry = Add_Symbol(1, i->first.c_str(), FLOAT_ID_TOKEN);
+					Temp_Entry = Add_Symbol(1, const_cast<char *>(i->first.c_str()), FLOAT_ID_TOKEN);
 					Temp_Entry->Data = Create_Float();
-					*((DBL *)(Temp_Entry->Data)) = atof(i->second.c_str());
+					*(reinterpret_cast<DBL *>(Temp_Entry->Data)) = atof(i->second.c_str());
 				}
 			}
 		}
@@ -697,9 +697,9 @@ ObjectPtr Parser::Parse_Bicubic_Patch ()
 
 	Parse_Begin ();
 
-	if ( (Object = (BicubicPatch *)Parse_Object_Id()) != NULL)
+	if ( (Object = reinterpret_cast<BicubicPatch *>(Parse_Object_Id())) != NULL)
 	{
-		return ((ObjectPtr ) Object);
+		return (reinterpret_cast<ObjectPtr>(Object));
 	}
 
 	Object = new BicubicPatch();
@@ -785,9 +785,9 @@ ObjectPtr Parser::Parse_Bicubic_Patch ()
 
 	Object->Compute_BBox();
 
-	Parse_Object_Mods((ObjectPtr)Object);
+	Parse_Object_Mods(reinterpret_cast<ObjectPtr>(Object));
 
-	return ((ObjectPtr)Object);
+	return (reinterpret_cast<ObjectPtr>(Object));
 }
 
 
@@ -827,9 +827,9 @@ ObjectPtr Parser::Parse_Blob()
 
 	Parse_Begin();
 
-	if ((Object = (Blob *)Parse_Object_Id()) != NULL)
+	if ((Object = reinterpret_cast<Blob *>(Parse_Object_Id())) != NULL)
 	{
-		return ((ObjectPtr ) Object);
+		return (reinterpret_cast<ObjectPtr>(Object));
 	}
 
 	Object = new Blob();
@@ -976,7 +976,7 @@ ObjectPtr Parser::Parse_Blob()
 
 	Object->Create_Blob_Element_Texture_List(blob_components, npoints);
 
-	Parse_Object_Mods((ObjectPtr)Object);
+	Parse_Object_Mods(reinterpret_cast<ObjectPtr>(Object));
 
 	/* The blob's texture has to be processed before Make_Blob() is called. */
 
@@ -988,7 +988,7 @@ ObjectPtr Parser::Parse_Blob()
 	if (components > sceneData->Max_Blob_Components)
 		sceneData->Max_Blob_Components = components;
 
-	return ((ObjectPtr)Object);
+	return (reinterpret_cast<ObjectPtr>(Object));
 }
 
 
@@ -1136,8 +1136,8 @@ ObjectPtr Parser::Parse_Box ()
 
 	Parse_Begin ();
 
-	if ( (Object = (Box *)Parse_Object_Id()) != NULL)
-		return ((ObjectPtr ) Object);
+	if ( (Object = reinterpret_cast<Box *>(Parse_Object_Id())) != NULL)
+		return (reinterpret_cast<ObjectPtr>(Object));
 
 	Object = new Box();
 
@@ -1162,9 +1162,9 @@ ObjectPtr Parser::Parse_Box ()
 
 	Object->Compute_BBox();
 
-	Parse_Object_Mods ((ObjectPtr )Object);
+	Parse_Object_Mods (reinterpret_cast<ObjectPtr>(Object));
 
-	return ((ObjectPtr ) Object);
+	return (reinterpret_cast<ObjectPtr>(Object));
 }
 
 void Parser::Parse_Mesh_Camera (Camera& Cam)
@@ -1292,7 +1292,7 @@ void Parser::Parse_Camera (Camera& Cam)
 
 	EXPECT
 		CASE (CAMERA_ID_TOKEN)
-			Cam = *(Camera *) Token.Data;
+			Cam = *reinterpret_cast<Camera *>(Token.Data);
 			if (sceneData->languageVersion >= 350)
 				only_mods = true;
 			EXIT
@@ -2149,8 +2149,8 @@ ObjectPtr Parser::Parse_CSG(int CSG_Type)
 
 	Parse_Begin();
 
-	if((Object = (CSG *)Parse_Object_Id()) != NULL)
-		return ((ObjectPtr ) Object);
+	if((Object = reinterpret_cast<CSG *>(Parse_Object_Id())) != NULL)
+		return (reinterpret_cast<ObjectPtr>(Object));
 
 	if(CSG_Type & CSG_UNION_TYPE)
 		Object = new CSGUnion();
@@ -2190,13 +2190,13 @@ ObjectPtr Parser::Parse_CSG(int CSG_Type)
 	// if the invert flag is in the object mods, the returned pointer will be
 	// different than the passed one, though the object will still be an instance
 	// of a CSG. we use dynamic_cast here to aid debugging since the overhead is small.
-	Object = dynamic_cast<CSG *>(Parse_Object_Mods((ObjectPtr) Object));
+	Object = dynamic_cast<CSG *>(Parse_Object_Mods(reinterpret_cast<ObjectPtr>(Object)));
 	assert(Object != NULL);
 
 	if(CSG_Type & CSG_DIFFERENCE_TYPE)
 		Object->Type |= CSG_DIFFERENCE_OBJECT;
 
-	return ((ObjectPtr)Object);
+	return (reinterpret_cast<ObjectPtr>(Object));
 }
 
 /*****************************************************************************
@@ -2223,8 +2223,8 @@ ObjectPtr Parser::Parse_Cone ()
 
 	Parse_Begin ();
 
-	if ( (Object = (Cone *)Parse_Object_Id()) != NULL)
-		return ((ObjectPtr ) Object);
+	if ( (Object = reinterpret_cast<Cone *>(Parse_Object_Id())) != NULL)
+		return (reinterpret_cast<ObjectPtr>(Object));
 
 	Object = new Cone();
 
@@ -2251,9 +2251,9 @@ ObjectPtr Parser::Parse_Cone ()
 
 	Object->Compute_BBox();
 
-	Parse_Object_Mods((ObjectPtr)Object);
+	Parse_Object_Mods(reinterpret_cast<ObjectPtr>(Object));
 
-	return ((ObjectPtr)Object);
+	return (reinterpret_cast<ObjectPtr>(Object));
 }
 
 
@@ -2281,8 +2281,8 @@ ObjectPtr Parser::Parse_Cylinder ()
 
 	Parse_Begin ();
 
-	if ( (Object = (Cone *)Parse_Object_Id()) != NULL)
-		return ((ObjectPtr ) Object);
+	if ( (Object = reinterpret_cast<Cone *>(Parse_Object_Id())) != NULL)
+		return (reinterpret_cast<ObjectPtr>(Object));
 
 	Object = new Cone();
 	Object->Cylinder();
@@ -2308,9 +2308,9 @@ ObjectPtr Parser::Parse_Cylinder ()
 
 	Object->Compute_BBox();
 
-	Parse_Object_Mods((ObjectPtr)Object);
+	Parse_Object_Mods(reinterpret_cast<ObjectPtr>(Object));
 
-	return ((ObjectPtr)Object);
+	return (reinterpret_cast<ObjectPtr>(Object));
 }
 
 
@@ -2339,8 +2339,8 @@ ObjectPtr Parser::Parse_Disc ()
 
 	Parse_Begin();
 
-	if((Object = (Disc *)Parse_Object_Id()) != NULL)
-		return ((ObjectPtr)Object);
+	if((Object = reinterpret_cast<Disc *>(Parse_Object_Id())) != NULL)
+		return (reinterpret_cast<ObjectPtr>(Object));
 
 	Object = new Disc();
 
@@ -2369,9 +2369,9 @@ ObjectPtr Parser::Parse_Disc ()
 
 	Object->Compute_Disc();
 
-	Parse_Object_Mods ((ObjectPtr )Object);
+	Parse_Object_Mods (reinterpret_cast<ObjectPtr>(Object));
 
-	return ((ObjectPtr ) Object);
+	return (reinterpret_cast<ObjectPtr>(Object));
 }
 
 
@@ -2403,8 +2403,8 @@ ObjectPtr Parser::Parse_HField ()
 
 	Parse_Begin ();
 
-	if ( (Object = (HField *)Parse_Object_Id()) != NULL)
-		return ((ObjectPtr ) Object);
+	if ( (Object = reinterpret_cast<HField *>(Parse_Object_Id())) != NULL)
+		return (reinterpret_cast<ObjectPtr>(Object));
 
 	Object = new HField();
 
@@ -2430,7 +2430,7 @@ ObjectPtr Parser::Parse_HField ()
 			Temp_Water_Level = Parse_Float();
 			if (sceneData->languageVersion < 200)
 				Temp_Water_Level /=256.0;
-			((HField *) Object)->bounding_corner1[Y] = 65536.0 * Temp_Water_Level;
+			(reinterpret_cast<HField *>(Object))->bounding_corner1[Y] = 65536.0 * Temp_Water_Level;
 		END_CASE
 
 		CASE (SMOOTH_TOKEN)
@@ -2443,7 +2443,7 @@ ObjectPtr Parser::Parse_HField ()
 		END_CASE
 	END_EXPECT
 
-	Parse_Object_Mods((ObjectPtr )Object);
+	Parse_Object_Mods(reinterpret_cast<ObjectPtr>(Object));
 
 	Object->Compute_HField(image);
 
@@ -2451,7 +2451,7 @@ ObjectPtr Parser::Parse_HField ()
 
 	Destroy_Image(image);
 
-	return ((ObjectPtr)Object);
+	return (reinterpret_cast<ObjectPtr>(Object));
 }
 
 
@@ -2481,8 +2481,8 @@ ObjectPtr Parser::Parse_Isosurface()
 
 	Parse_Begin();
 
-	if ((Object = (IsoSurface *)Parse_Object_Id()) != NULL)
-		return ((ObjectPtr )Object);
+	if ((Object = reinterpret_cast<IsoSurface *>(Parse_Object_Id())) != NULL)
+		return (reinterpret_cast<ObjectPtr>(Object));
 
 	Object = new IsoSurface();
 	Object->vm = sceneData->functionVM;
@@ -2635,9 +2635,9 @@ ObjectPtr Parser::Parse_Isosurface()
 		Object->max_trace = 1;
 	}
 
-	Parse_Object_Mods ((ObjectPtr )Object);
+	Parse_Object_Mods (reinterpret_cast<ObjectPtr>(Object));
 
-	return ((ObjectPtr )Object);
+	return (reinterpret_cast<ObjectPtr>(Object));
 }
 
 
@@ -2677,8 +2677,8 @@ ObjectPtr Parser::Parse_Julia_Fractal ()
 
 	Parse_Begin();
 
-	if ( (Object = (Fractal *)Parse_Object_Id()) != NULL)
-		return((ObjectPtr )Object);
+	if ( (Object = reinterpret_cast<Fractal *>(Parse_Object_Id())) != NULL)
+		return(reinterpret_cast<ObjectPtr>(Object));
 
 	Object = new Fractal();
 
@@ -2810,7 +2810,7 @@ ObjectPtr Parser::Parse_Julia_Fractal ()
 
 	END_EXPECT
 
-	Parse_Object_Mods((ObjectPtr )Object);
+	Parse_Object_Mods(reinterpret_cast<ObjectPtr>(Object));
 
 	int num_iterations = Object->SetUp_Fractal();
 	if (num_iterations > sceneData->Fractal_Iteration_Stack_Length)
@@ -2820,7 +2820,7 @@ ObjectPtr Parser::Parse_Julia_Fractal ()
 		Fractal::Allocate_Iteration_Stack(td->Fractal_IStack, sceneData->Fractal_Iteration_Stack_Length);
 	}
 
-	return((ObjectPtr)Object);
+	return(reinterpret_cast<ObjectPtr>(Object));
 }
 /*****************************************************************************
 *
@@ -2858,8 +2858,8 @@ ObjectPtr Parser::Parse_Lathe()
 
 	Parse_Begin();
 
-	if((Object = (Lathe *)Parse_Object_Id()) != NULL)
-		return((ObjectPtr)Object);
+	if((Object = reinterpret_cast<Lathe *>(Parse_Object_Id())) != NULL)
+		return(reinterpret_cast<ObjectPtr>(Object));
 
 	Object = new Lathe();
 
@@ -2933,7 +2933,7 @@ ObjectPtr Parser::Parse_Lathe()
 
 	/* Get temporary points describing the rotated curve. */
 
-	Points = (UV_VECT *)POV_MALLOC(Object->Number*sizeof(UV_VECT), "temporary lathe points");
+	Points = reinterpret_cast<UV_VECT *>(POV_MALLOC(Object->Number*sizeof(UV_VECT), "temporary lathe points"));
 
 	/* Read points (x : radius; y : height; z : not used). */
 
@@ -2959,7 +2959,7 @@ ObjectPtr Parser::Parse_Lathe()
 
 	/* Parse object's modifiers. */
 
-	Parse_Object_Mods((ObjectPtr)Object);
+	Parse_Object_Mods(reinterpret_cast<ObjectPtr>(Object));
 
 	/* Destroy temporary points. */
 
@@ -2974,7 +2974,7 @@ ObjectPtr Parser::Parse_Lathe()
 		td->BCyl_HInt = POV_REALLOC (td->BCyl_HInt, 2*sceneData->Max_Bounding_Cylinders*sizeof(BCYL_INT), "lathe intersection list");
 	}
 
-	return ((ObjectPtr)Object);
+	return (reinterpret_cast<ObjectPtr>(Object));
 }
 
 
@@ -3042,35 +3042,35 @@ ObjectPtr Parser::Parse_Light_Group()
 	// changing it to not allow those would slow it down,
 	// so the bits of code needed are just duplicated
 	// here. [trf]
-	// Parse_Object_Mods((ObjectPtr )Object);
+	// Parse_Object_Mods(reinterpret_cast<ObjectPtr>(Object));
 
 	EXPECT
 		CASE (TRANSLATE_TOKEN)
 			Parse_Vector (Local_Vector);
 			Compute_Translation_Transform(&Local_Trans, Local_Vector);
-			Translate_Object ((ObjectPtr )Object, Local_Vector, &Local_Trans);
+			Translate_Object (reinterpret_cast<ObjectPtr>(Object), Local_Vector, &Local_Trans);
 		END_CASE
 
 		CASE (ROTATE_TOKEN)
 			Parse_Vector (Local_Vector);
 			Compute_Rotation_Transform(&Local_Trans, Local_Vector);
-			Rotate_Object ((ObjectPtr )Object, Local_Vector, &Local_Trans);
+			Rotate_Object (reinterpret_cast<ObjectPtr>(Object), Local_Vector, &Local_Trans);
 		END_CASE
 
 		CASE (SCALE_TOKEN)
 			Parse_Scale_Vector (Local_Vector);
 			Compute_Scaling_Transform(&Local_Trans, Local_Vector);
-			Scale_Object ((ObjectPtr )Object, Local_Vector, &Local_Trans);
+			Scale_Object (reinterpret_cast<ObjectPtr>(Object), Local_Vector, &Local_Trans);
 		END_CASE
 
 		CASE (TRANSFORM_TOKEN)
-			Transform_Object ((ObjectPtr )Object, Parse_Transform(&Local_Trans));
+			Transform_Object (reinterpret_cast<ObjectPtr>(Object), Parse_Transform(&Local_Trans));
 		END_CASE
 
 		CASE (MATRIX_TOKEN)
 			Parse_Matrix (Local_Matrix);
 			Compute_Matrix_Transform(&Local_Trans, Local_Matrix);
-			Transform_Object ((ObjectPtr )Object, &Local_Trans);
+			Transform_Object (reinterpret_cast<ObjectPtr>(Object), &Local_Trans);
 		END_CASE
 
 		CASE (GLOBAL_LIGHTS_TOKEN)
@@ -3085,7 +3085,7 @@ ObjectPtr Parser::Parse_Light_Group()
 					if (Object->Ph_Density > 0)
 					{
 						Set_Flag(Object,PH_TARGET_FLAG);
-						CheckPassThru((ObjectPtr )Object, PH_TARGET_FLAG);
+						CheckPassThru(reinterpret_cast<ObjectPtr>(Object), PH_TARGET_FLAG);
 					}
 					else
 					{
@@ -3098,7 +3098,7 @@ ObjectPtr Parser::Parse_Light_Group()
 					{
 						Set_Flag(Object, PH_RFR_ON_FLAG);
 						Clear_Flag(Object, PH_RFR_OFF_FLAG);
-						CheckPassThru((ObjectPtr )Object, PH_RFR_ON_FLAG);
+						CheckPassThru(reinterpret_cast<ObjectPtr>(Object), PH_RFR_ON_FLAG);
 					}
 					else
 					{
@@ -3124,7 +3124,7 @@ ObjectPtr Parser::Parse_Light_Group()
 					if((int)Allow_Float(1.0))
 					{
 						Set_Flag(Object, PH_PASSTHRU_FLAG);
-						CheckPassThru((ObjectPtr )Object, PH_PASSTHRU_FLAG);
+						CheckPassThru(reinterpret_cast<ObjectPtr>(Object), PH_PASSTHRU_FLAG);
 					}
 					else
 					{
@@ -3154,7 +3154,7 @@ ObjectPtr Parser::Parse_Light_Group()
 
 	Parse_End();
 
-	return ((ObjectPtr)Object);
+	return (reinterpret_cast<ObjectPtr>(Object));
 }
 
 
@@ -3192,8 +3192,8 @@ ObjectPtr Parser::Parse_Light_Source ()
 
 	Parse_Begin ();
 
-	if ( (Object = (LightSource *)Parse_Object_Id()) != NULL)
-		return ((ObjectPtr ) Object);
+	if ( (Object = reinterpret_cast<LightSource *>(Parse_Object_Id())) != NULL)
+		return (reinterpret_cast<ObjectPtr>(Object));
 
 	Object = new LightSource ();
 
@@ -3437,29 +3437,29 @@ ObjectPtr Parser::Parse_Light_Source ()
 		CASE (TRANSLATE_TOKEN)
 			Parse_Vector (Local_Vector);
 			Compute_Translation_Transform(&Local_Trans, Local_Vector);
-			Translate_Object ((ObjectPtr )Object, Local_Vector, &Local_Trans);
+			Translate_Object (reinterpret_cast<ObjectPtr>(Object), Local_Vector, &Local_Trans);
 		END_CASE
 
 		CASE (ROTATE_TOKEN)
 			Parse_Vector (Local_Vector);
 			Compute_Rotation_Transform(&Local_Trans, Local_Vector);
-			Rotate_Object ((ObjectPtr )Object, Local_Vector, &Local_Trans);
+			Rotate_Object (reinterpret_cast<ObjectPtr>(Object), Local_Vector, &Local_Trans);
 		END_CASE
 
 		CASE (SCALE_TOKEN)
 			Parse_Scale_Vector (Local_Vector);
 			Compute_Scaling_Transform(&Local_Trans, Local_Vector);
-			Scale_Object ((ObjectPtr )Object, Local_Vector, &Local_Trans);
+			Scale_Object (reinterpret_cast<ObjectPtr>(Object), Local_Vector, &Local_Trans);
 		END_CASE
 
 		CASE (TRANSFORM_TOKEN)
-			Transform_Object ((ObjectPtr )Object, Parse_Transform(&Local_Trans));
+			Transform_Object (reinterpret_cast<ObjectPtr>(Object), Parse_Transform(&Local_Trans));
 		END_CASE
 
 		CASE (MATRIX_TOKEN)
 			Parse_Matrix (Local_Matrix);
 			Compute_Matrix_Transform(&Local_Trans, Local_Matrix);
-			Transform_Object ((ObjectPtr )Object, &Local_Trans);
+			Transform_Object (reinterpret_cast<ObjectPtr>(Object), &Local_Trans);
 		END_CASE
 
 		OTHERWISE
@@ -3489,7 +3489,7 @@ ObjectPtr Parser::Parse_Light_Source ()
 		}
 	}
 
-	return ((ObjectPtr ) Object);
+	return (reinterpret_cast<ObjectPtr>(Object));
 }
 
 
@@ -3546,8 +3546,8 @@ ObjectPtr Parser::Parse_Mesh()
 
 	Parse_Begin();
 
-	if ((Object = (Mesh *)Parse_Object_Id()) != NULL)
-		return ((ObjectPtr)Object);
+	if ((Object = reinterpret_cast<Mesh *>(Parse_Object_Id())) != NULL)
+		return (reinterpret_cast<ObjectPtr>(Object));
 
 	/* Create object. */
 
@@ -3563,13 +3563,13 @@ ObjectPtr Parser::Parse_Mesh()
 
 	max_triangles = 256;
 
-	Normals = (SNGL_VECT *)POV_MALLOC(max_normals*sizeof(SNGL_VECT), "temporary triangle mesh data");
+	Normals = reinterpret_cast<SNGL_VECT *>(POV_MALLOC(max_normals*sizeof(SNGL_VECT), "temporary triangle mesh data"));
 
-	Textures = (TEXTURE **)POV_MALLOC(max_textures*sizeof(TEXTURE *), "temporary triangle mesh data");
+	Textures = reinterpret_cast<TEXTURE **>(POV_MALLOC(max_textures*sizeof(TEXTURE *), "temporary triangle mesh data"));
 
-	Triangles = (MESH_TRIANGLE *)POV_MALLOC(max_triangles*sizeof(MESH_TRIANGLE), "temporary triangle mesh data");
+	Triangles = reinterpret_cast<MESH_TRIANGLE *>(POV_MALLOC(max_triangles*sizeof(MESH_TRIANGLE), "temporary triangle mesh data"));
 
-	Vertices = (SNGL_VECT *)POV_MALLOC(max_vertices*sizeof(SNGL_VECT), "temporary triangle mesh data");
+	Vertices = reinterpret_cast<SNGL_VECT *>(POV_MALLOC(max_vertices*sizeof(SNGL_VECT), "temporary triangle mesh data"));
 
 	/* Read raw triangle file. */
 
@@ -3582,7 +3582,7 @@ ObjectPtr Parser::Parse_Mesh()
 	number_of_vertices = 0;
 
 	max_uvcoords = 256;
-	UVCoords = (UV_VECT *)POV_MALLOC(max_uvcoords*sizeof(UV_VECT), "temporary triangle mesh data");
+	UVCoords = reinterpret_cast<UV_VECT *>(POV_MALLOC(max_uvcoords*sizeof(UV_VECT), "temporary triangle mesh data"));
 	number_of_uvcoords = 0;
 
 	/* Create hash tables. */
@@ -3608,7 +3608,7 @@ ObjectPtr Parser::Parse_Mesh()
 
 					max_triangles *= 2;
 
-					Triangles = (MESH_TRIANGLE *)POV_REALLOC(Triangles, max_triangles*sizeof(MESH_TRIANGLE), "triangle triangle mesh data");
+					Triangles = reinterpret_cast<MESH_TRIANGLE *>(POV_REALLOC(Triangles, max_triangles*sizeof(MESH_TRIANGLE), "triangle triangle mesh data"));
 				}
 
 				/* Init triangle. */
@@ -3704,7 +3704,7 @@ ObjectPtr Parser::Parse_Mesh()
 
 					max_triangles *= 2;
 
-					Triangles = (MESH_TRIANGLE *)POV_REALLOC(Triangles, max_triangles*sizeof(MESH_TRIANGLE), "triangle triangle mesh data");
+					Triangles = reinterpret_cast<MESH_TRIANGLE *>(POV_REALLOC(Triangles, max_triangles*sizeof(MESH_TRIANGLE), "triangle triangle mesh data"));
 				}
 
 				VInverseScaleEq(N1, l1);
@@ -3807,7 +3807,7 @@ ObjectPtr Parser::Parse_Mesh()
 
 	/* Init triangle mesh data. */
 
-	Object->Data = (MESH_DATA *)POV_MALLOC(sizeof(MESH_DATA), "triangle mesh data");
+	Object->Data = reinterpret_cast<MESH_DATA *>(POV_MALLOC(sizeof(MESH_DATA), "triangle mesh data"));
 
 
 	Object->Data->References = 1;
@@ -3845,19 +3845,19 @@ ObjectPtr Parser::Parse_Mesh()
 
 	Object->Data->Number_Of_Vertices = number_of_vertices;
 
-	Object->Data->Normals = (SNGL_VECT *)POV_MALLOC(number_of_normals*sizeof(SNGL_VECT), "triangle mesh data");
+	Object->Data->Normals = reinterpret_cast<SNGL_VECT *>(POV_MALLOC(number_of_normals*sizeof(SNGL_VECT), "triangle mesh data"));
 
 	if (number_of_textures)
 	{
 		Set_Flag(Object, MULTITEXTURE_FLAG);
 
 		/* [LSK] Removed "Data->" */
-		Object->Textures = (TEXTURE **)POV_MALLOC(number_of_textures*sizeof(TEXTURE *), "triangle mesh data");
+		Object->Textures = reinterpret_cast<TEXTURE **>(POV_MALLOC(number_of_textures*sizeof(TEXTURE *), "triangle mesh data"));
 	}
 
-	Object->Data->Triangles = (MESH_TRIANGLE *)POV_MALLOC(number_of_triangles*sizeof(MESH_TRIANGLE), "triangle mesh data");
+	Object->Data->Triangles = reinterpret_cast<MESH_TRIANGLE *>(POV_MALLOC(number_of_triangles*sizeof(MESH_TRIANGLE), "triangle mesh data"));
 
-	Object->Data->Vertices = (SNGL_VECT *)POV_MALLOC(number_of_vertices*sizeof(SNGL_VECT), "triangle mesh data");
+	Object->Data->Vertices = reinterpret_cast<SNGL_VECT *>(POV_MALLOC(number_of_vertices*sizeof(SNGL_VECT), "triangle mesh data"));
 
 	/* Copy normals, textures, triangles and vertices into mesh. */
 
@@ -3895,7 +3895,7 @@ ObjectPtr Parser::Parse_Mesh()
 	/* do the four steps above, but for UV coordinates*/
 	Object->Data->UVCoords  = NULL;
 	Object->Data->Number_Of_UVCoords = number_of_uvcoords;
-	Object->Data->UVCoords = (UV_VECT *)POV_MALLOC(number_of_uvcoords*sizeof(UV_VECT), "triangle mesh data");
+	Object->Data->UVCoords = reinterpret_cast<UV_VECT *>(POV_MALLOC(number_of_uvcoords*sizeof(UV_VECT), "triangle mesh data"));
 	for (i = 0; i < number_of_uvcoords; i++)
 	{
 		Assign_UV_Vect(Object->Data->UVCoords[i], UVCoords[i]);
@@ -3928,13 +3928,13 @@ ObjectPtr Parser::Parse_Mesh()
 
 	/* Parse object modifiers. */
 
-	Parse_Object_Mods((ObjectPtr )Object);
+	Parse_Object_Mods(reinterpret_cast<ObjectPtr>(Object));
 
 	/* Create bounding box tree. */
 
 	Object->Build_Mesh_BBox_Tree();
 
-	return ((ObjectPtr)Object);
+	return (reinterpret_cast<ObjectPtr>(Object));
 }
 
 /*****************************************************************************
@@ -3992,8 +3992,8 @@ ObjectPtr Parser::Parse_Mesh2()
 
 	Parse_Begin();
 
-	if ((Object = (Mesh *)Parse_Object_Id()) != NULL)
-		return((ObjectPtr )Object);
+	if ((Object = reinterpret_cast<Mesh *>(Parse_Object_Id())) != NULL)
+		return(reinterpret_cast<ObjectPtr>(Object));
 
 	/* Create object. */
 	Object = new Mesh();
@@ -4024,7 +4024,7 @@ ObjectPtr Parser::Parse_Mesh2()
 				Error("No vertices in triangle mesh.");
 
 			/* allocate memory for vertices */
-			Vertices = (SNGL_VECT *)POV_MALLOC(number_of_vertices*sizeof(SNGL_VECT), "triangle mesh data");
+			Vertices = reinterpret_cast<SNGL_VECT *>(POV_MALLOC(number_of_vertices*sizeof(SNGL_VECT), "triangle mesh data"));
 
 			for(i=0; i<number_of_vertices; i++)
 			{
@@ -4046,7 +4046,7 @@ ObjectPtr Parser::Parse_Mesh2()
 
 			if (number_of_normals>0)
 			{
-				Normals = (SNGL_VECT *)POV_MALLOC(number_of_normals*sizeof(SNGL_VECT), "triangle mesh data");
+				Normals = reinterpret_cast<SNGL_VECT *>(POV_MALLOC(number_of_normals*sizeof(SNGL_VECT), "triangle mesh data"));
 
 				/* leave space in the array for the raw triangle normals */
 				for(i=0; i<number_of_normals; i++)
@@ -4079,7 +4079,7 @@ ObjectPtr Parser::Parse_Mesh2()
 
 			if (number_of_uvcoords>0)
 			{
-				UVCoords = (UV_VECT *)POV_MALLOC(number_of_uvcoords*sizeof(UV_VECT), "triangle mesh data");
+				UVCoords = reinterpret_cast<UV_VECT *>(POV_MALLOC(number_of_uvcoords*sizeof(UV_VECT), "triangle mesh data"));
 
 				for(i=0; i<number_of_uvcoords; i++)
 				{
@@ -4105,13 +4105,13 @@ ObjectPtr Parser::Parse_Mesh2()
 
 			if (number_of_textures>0)
 			{
-				Textures = (TEXTURE **)POV_MALLOC(number_of_textures*sizeof(TEXTURE *), "triangle mesh data");
+				Textures = reinterpret_cast<TEXTURE **>(POV_MALLOC(number_of_textures*sizeof(TEXTURE *), "triangle mesh data"));
 
 				for(i=0; i<number_of_textures; i++)
 				{
 					/*
 					GET(TEXTURE_ID_TOKEN)
-					Textures[i] = Copy_Texture_Pointer((TEXTURE *)Token.Data);
+					Textures[i] = Copy_Texture_Pointer((reinterpret_cast<EXTURE *>(Token.Data));
 					*/
 					GET(TEXTURE_TOKEN);
 					Parse_Begin();
@@ -4140,7 +4140,7 @@ ObjectPtr Parser::Parse_Mesh2()
 	if (number_of_uvcoords == 0)
 	{
 		number_of_uvcoords = 1;
-		UVCoords = (UV_VECT *)POV_MALLOC(number_of_uvcoords*sizeof(UV_VECT), "triangle mesh data");
+		UVCoords = reinterpret_cast<UV_VECT *>(POV_MALLOC(number_of_uvcoords*sizeof(UV_VECT), "triangle mesh data"));
 		UVCoords[0][U] = 0;
 		UVCoords[0][V] = 0;
 	}
@@ -4158,7 +4158,7 @@ ObjectPtr Parser::Parse_Mesh2()
 	}
 
 	/* allocate memory for triangles */
-	Triangles = (MESH_TRIANGLE *)POV_MALLOC(number_of_triangles*sizeof(MESH_TRIANGLE), "triangle mesh data");
+	Triangles = reinterpret_cast<MESH_TRIANGLE *>(POV_MALLOC(number_of_triangles*sizeof(MESH_TRIANGLE), "triangle mesh data"));
 
 	/* start reading triangles */
 
@@ -4419,9 +4419,9 @@ ObjectPtr Parser::Parse_Mesh2()
 
 	/* reallocate the normals stuff */
 	if (!number_of_normals)
-		Normals = (SNGL_VECT *)POV_MALLOC(number_of_triangles*sizeof(SNGL_VECT), "triangle mesh data");
+		Normals = reinterpret_cast<SNGL_VECT *>(POV_MALLOC(number_of_triangles*sizeof(SNGL_VECT), "triangle mesh data"));
 	else
-		Normals = (SNGL_VECT *)POV_REALLOC(Normals, (number_of_normals+number_of_triangles)*sizeof(SNGL_VECT), "triangle mesh data");
+		Normals = reinterpret_cast<SNGL_VECT *>(POV_REALLOC(Normals, (number_of_normals+number_of_triangles)*sizeof(SNGL_VECT), "triangle mesh data"));
 
 	for (i=0; i<number_of_triangles; i++)
 	{
@@ -4479,7 +4479,7 @@ ObjectPtr Parser::Parse_Mesh2()
 	/* ----------------------------------------------------- */
 
 	/* Init triangle mesh data. */
-	Object->Data = (MESH_DATA *)POV_MALLOC(sizeof(MESH_DATA), "triangle mesh data");
+	Object->Data = reinterpret_cast<MESH_DATA *>(POV_MALLOC(sizeof(MESH_DATA), "triangle mesh data"));
 	Object->Data->References = 1;
 	Object->Data->Tree = NULL;
 	/* NK 1998 */
@@ -4522,7 +4522,7 @@ ObjectPtr Parser::Parse_Mesh2()
 	Object->Compute_BBox();
 
 	/* Parse object modifiers. */
-	Parse_Object_Mods((ObjectPtr)Object);
+	Parse_Object_Mods(reinterpret_cast<ObjectPtr>(Object));
 
 	/* Create bounding box tree. */
 	Object->Build_Mesh_BBox_Tree();
@@ -4539,7 +4539,7 @@ ObjectPtr Parser::Parse_Mesh2()
 		Object->Data->Number_Of_Triangles);
 */
 
-	return((ObjectPtr )Object);
+	return(reinterpret_cast<ObjectPtr>(Object));
 }
 
 
@@ -4583,7 +4583,7 @@ TEXTURE *Parser::Parse_Mesh_Texture (TEXTURE **t2, TEXTURE **t3)
 
 			GET(TEXTURE_ID_TOKEN);
 
-			Texture = (TEXTURE *)Token.Data;
+			Texture = reinterpret_cast<TEXTURE *>(Token.Data);
 
 			Parse_End();
 		END_CASE
@@ -4593,17 +4593,17 @@ TEXTURE *Parser::Parse_Mesh_Texture (TEXTURE **t2, TEXTURE **t3)
 			Parse_Begin();
 
 			GET(TEXTURE_ID_TOKEN);
-			Texture = (TEXTURE *)Token.Data;
+			Texture = reinterpret_cast<TEXTURE *>(Token.Data);
 
 			Parse_Comma();
 
 			GET(TEXTURE_ID_TOKEN);
-			*t2 = (TEXTURE *)Token.Data;
+			*t2 = reinterpret_cast<TEXTURE *>(Token.Data);
 
 			Parse_Comma();
 
 			GET(TEXTURE_ID_TOKEN);
-			*t3 = (TEXTURE *)Token.Data;
+			*t3 = reinterpret_cast<TEXTURE *>(Token.Data);
 
 			Parse_End();
 			EXIT
@@ -4654,9 +4654,9 @@ ObjectPtr Parser::Parse_Ovus()
 
 	Parse_Begin();
 
-	if ((Object = (Ovus *)Parse_Object_Id()) != NULL)
+	if ((Object = reinterpret_cast<Ovus *>(Parse_Object_Id())) != NULL)
 	{
-		return((ObjectPtr )Object);
+		return(reinterpret_cast<ObjectPtr>(Object));
 	}
 
 	Object = new Ovus();
@@ -4693,8 +4693,8 @@ ObjectPtr Parser::Parse_Ovus()
 		}
 
 		Object->Compute_BBox();
-		Parse_Object_Mods ((ObjectPtr )Object);
-		return ((ObjectPtr ) Object);
+		Parse_Object_Mods (reinterpret_cast<ObjectPtr>(Object));
+		return (reinterpret_cast<ObjectPtr>(Object));
 	}
 	else
 	{
@@ -4707,8 +4707,8 @@ ObjectPtr Parser::Parse_Ovus()
 		Replacement->Radius = Object->TopRadius;
 		delete Object;
 		Replacement->Compute_BBox();
-		Parse_Object_Mods ((ObjectPtr )Replacement);
-		return ((ObjectPtr ) Replacement);
+		Parse_Object_Mods (reinterpret_cast<ObjectPtr>(Replacement));
+		return (reinterpret_cast<ObjectPtr>(Replacement));
 	}
 }
 
@@ -4742,8 +4742,8 @@ ObjectPtr Parser::Parse_Parametric(void)
 
 	Parse_Begin();
 
-	if((Object = (Parametric *)Parse_Object_Id()) != NULL)
-		return ((ObjectPtr )Object);
+	if((Object = reinterpret_cast<Parametric *>(Parse_Object_Id())) != NULL)
+		return (reinterpret_cast<ObjectPtr>(Object));
 
 	Object = new Parametric();
 	Object->vm = sceneData->functionVM;
@@ -4963,12 +4963,12 @@ ObjectPtr Parser::Parse_Parametric(void)
 		END_CASE
 	END_EXPECT
 
-	Parse_Object_Mods((ObjectPtr )Object);
+	Parse_Object_Mods(reinterpret_cast<ObjectPtr>(Object));
 
 	if(PrecompFlag != 0)
 		Object->Precompute_Parametric_Values(PrecompFlag, PrecompDepth, fnVMContext);
 
-	return ((ObjectPtr)Object);
+	return (reinterpret_cast<ObjectPtr>(Object));
 }
 
 
@@ -4997,8 +4997,8 @@ ObjectPtr Parser::Parse_Plane ()
 
 	Parse_Begin ();
 
-	if ( (Object = (Plane *)Parse_Object_Id()) != NULL)
-		return ((ObjectPtr ) Object);
+	if ( (Object = reinterpret_cast<Plane *>(Parse_Object_Id())) != NULL)
+		return (reinterpret_cast<ObjectPtr>(Object));
 
 	Object = new Plane();
 
@@ -5013,9 +5013,9 @@ ObjectPtr Parser::Parse_Plane ()
 
 	Object->Compute_BBox();
 
-	Parse_Object_Mods ((ObjectPtr )Object);
+	Parse_Object_Mods (reinterpret_cast<ObjectPtr>(Object));
 
-	return ((ObjectPtr ) Object);
+	return (reinterpret_cast<ObjectPtr>(Object));
 }
 
 
@@ -5044,8 +5044,8 @@ ObjectPtr Parser::Parse_Poly (int order)
 
 	Parse_Begin ();
 
-	if ( (Object = (Poly *)Parse_Object_Id()) != NULL)
-		return ((ObjectPtr ) Object);
+	if ( (Object = reinterpret_cast<Poly *>(Parse_Object_Id())) != NULL)
+		return (reinterpret_cast<ObjectPtr>(Object));
 
 	if (order == 0)
 	{
@@ -5060,9 +5060,9 @@ ObjectPtr Parser::Parse_Poly (int order)
 
 	Object->Compute_BBox();
 
-	Parse_Object_Mods ((ObjectPtr )Object);
+	Parse_Object_Mods (reinterpret_cast<ObjectPtr>(Object));
 
-	return ((ObjectPtr ) Object);
+	return (reinterpret_cast<ObjectPtr>(Object));
 }
 
 /*****************************************************************************
@@ -5092,8 +5092,8 @@ ObjectPtr Parser::Parse_Polynom ()
 
 	Parse_Begin ();
 
-	if ( (Object = (Poly *)Parse_Object_Id()) != NULL)
-		return ((ObjectPtr ) Object);
+	if ( (Object = reinterpret_cast<Poly *>(Parse_Object_Id())) != NULL)
+		return (reinterpret_cast<ObjectPtr>(Object));
 
 	order = (int)Parse_Float();      Parse_Comma();
 	if (order < 2 || order > MAX_ORDER)
@@ -5130,9 +5130,9 @@ ObjectPtr Parser::Parse_Polynom ()
 
 	Object->Compute_BBox();
 
-	Parse_Object_Mods ((ObjectPtr )Object);
+	Parse_Object_Mods (reinterpret_cast<ObjectPtr>(Object));
 
-	return ((ObjectPtr ) Object);
+	return (reinterpret_cast<ObjectPtr>(Object));
 }
 
 /*****************************************************************************
@@ -5175,9 +5175,9 @@ ObjectPtr Parser::Parse_Polygon()
 
 	Parse_Begin();
 
-	if ((Object = (Polygon *)Parse_Object_Id()) != NULL)
+	if ((Object = reinterpret_cast<Polygon *>(Parse_Object_Id())) != NULL)
 	{
-		return((ObjectPtr ) Object);
+		return(reinterpret_cast<ObjectPtr>(Object));
 	}
 
 	Object = new Polygon();
@@ -5189,7 +5189,7 @@ ObjectPtr Parser::Parse_Polygon()
 		Error("Polygon needs at least three points.");
 	}
 
-	Points = (VECTOR *)POV_MALLOC((Number+1)*sizeof(VECTOR), "temporary polygon points");
+	Points = reinterpret_cast<VECTOR *>(POV_MALLOC((Number+1)*sizeof(VECTOR), "temporary polygon points"));
 
 	for (i = 0; i < Number; i++)
 	{
@@ -5238,9 +5238,9 @@ ObjectPtr Parser::Parse_Polygon()
 
 	POV_FREE (Points);
 
-	Parse_Object_Mods ((ObjectPtr )Object);
+	Parse_Object_Mods (reinterpret_cast<ObjectPtr>(Object));
 
-	return((ObjectPtr ) Object);
+	return(reinterpret_cast<ObjectPtr>(Object));
 }
 
 
@@ -5285,9 +5285,9 @@ ObjectPtr Parser::Parse_Prism()
 
 	Parse_Begin();
 
-	if ((Object = (Prism *)Parse_Object_Id()) != NULL)
+	if ((Object = reinterpret_cast<Prism *>(Parse_Object_Id())) != NULL)
 	{
-		return((ObjectPtr ) Object);
+		return(reinterpret_cast<ObjectPtr>(Object));
 	}
 
 	Object = new Prism();
@@ -5385,7 +5385,7 @@ ObjectPtr Parser::Parse_Prism()
 
 	/* Allocate Object->Number points for the prism. */
 
-	Points = (UV_VECT *)POV_MALLOC((Object->Number+1) * sizeof(UV_VECT), "temporary prism points");
+	Points = reinterpret_cast<UV_VECT *>(POV_MALLOC((Object->Number+1) * sizeof(UV_VECT), "temporary prism points"));
 
 	/* Read points (x, y : coordinate of 2d point; z : not used). */
 
@@ -5540,13 +5540,13 @@ ObjectPtr Parser::Parse_Prism()
 
 	/* Parse object's modifiers. */
 
-	Parse_Object_Mods((ObjectPtr )Object);
+	Parse_Object_Mods(reinterpret_cast<ObjectPtr>(Object));
 
 	/* Destroy temporary points. */
 
 	POV_FREE (Points);
 
-	return((ObjectPtr ) Object);
+	return(reinterpret_cast<ObjectPtr>(Object));
 }
 
 
@@ -5576,8 +5576,8 @@ ObjectPtr Parser::Parse_Quadric ()
 
 	Parse_Begin ();
 
-	if ( (Object = (Quadric *)Parse_Object_Id()) != NULL)
-		return ((ObjectPtr ) Object);
+	if ( (Object = reinterpret_cast<Quadric *>(Parse_Object_Id())) != NULL)
+		return (reinterpret_cast<ObjectPtr>(Object));
 
 	Object = new Quadric();
 
@@ -5591,9 +5591,9 @@ ObjectPtr Parser::Parse_Quadric ()
 
 	Object->Compute_BBox(Min, Max);
 
-	Parse_Object_Mods ((ObjectPtr )Object);
+	Parse_Object_Mods (reinterpret_cast<ObjectPtr>(Object));
 
-	return ((ObjectPtr ) Object);
+	return (reinterpret_cast<ObjectPtr>(Object));
 }
 
 
@@ -5626,8 +5626,8 @@ ObjectPtr Parser::Parse_Smooth_Triangle ()
 
 	Parse_Begin ();
 
-	if ( (Object = (SmoothTriangle *)Parse_Object_Id()) != NULL)
-		return ((ObjectPtr ) Object);
+	if ( (Object = reinterpret_cast<SmoothTriangle *>(Parse_Object_Id())) != NULL)
+		return (reinterpret_cast<ObjectPtr>(Object));
 
 	Object = new SmoothTriangle();
 
@@ -5669,9 +5669,9 @@ ObjectPtr Parser::Parse_Smooth_Triangle ()
 
 	Object->Compute_BBox();
 
-	Parse_Object_Mods((ObjectPtr )Object);
+	Parse_Object_Mods(reinterpret_cast<ObjectPtr>(Object));
 
-	return ((ObjectPtr)Object);
+	return (reinterpret_cast<ObjectPtr>(Object));
 }
 
 
@@ -5712,9 +5712,9 @@ ObjectPtr Parser::Parse_Sor()
 
 	Parse_Begin();
 
-	if ((Object = (Sor *)Parse_Object_Id()) != NULL)
+	if ((Object = reinterpret_cast<Sor *>(Parse_Object_Id())) != NULL)
 	{
-		return((ObjectPtr )Object);
+		return(reinterpret_cast<ObjectPtr>(Object));
 	}
 
 	Object = new Sor();
@@ -5730,7 +5730,7 @@ ObjectPtr Parser::Parse_Sor()
 
 	/* Get temporary points describing the rotated curve. */
 
-	Points = (UV_VECT *)POV_MALLOC(Object->Number*sizeof(UV_VECT), "temporary surface of revolution points");
+	Points = reinterpret_cast<UV_VECT *>(POV_MALLOC(Object->Number*sizeof(UV_VECT), "temporary surface of revolution points"));
 
 	/* Read points (x : radius; y : height; z : not used). */
 
@@ -5775,7 +5775,7 @@ ObjectPtr Parser::Parse_Sor()
 
 	/* Parse object's modifiers. */
 
-	Parse_Object_Mods((ObjectPtr )Object);
+	Parse_Object_Mods(reinterpret_cast<ObjectPtr>(Object));
 
 	/* Destroy temporary points. */
 
@@ -5790,7 +5790,7 @@ ObjectPtr Parser::Parse_Sor()
 		td->BCyl_HInt = POV_REALLOC (td->BCyl_HInt, 2*sceneData->Max_Bounding_Cylinders*sizeof(BCYL_INT), "lathe intersection list");
 	}
 
-	return ((ObjectPtr ) Object);
+	return (reinterpret_cast<ObjectPtr>(Object));
 }
 
 
@@ -5819,9 +5819,9 @@ ObjectPtr Parser::Parse_Sphere()
 
 	Parse_Begin();
 
-	if ((Object = (Sphere *)Parse_Object_Id()) != NULL)
+	if ((Object = reinterpret_cast<Sphere *>(Parse_Object_Id())) != NULL)
 	{
-		return ((ObjectPtr ) Object);
+		return (reinterpret_cast<ObjectPtr>(Object));
 	}
 
 	Object = new Sphere();
@@ -5834,9 +5834,9 @@ ObjectPtr Parser::Parse_Sphere()
 
 	Object->Compute_BBox();
 
-	Parse_Object_Mods((ObjectPtr )Object);
+	Parse_Object_Mods(reinterpret_cast<ObjectPtr>(Object));
 
-	return((ObjectPtr )Object);
+	return(reinterpret_cast<ObjectPtr>(Object));
 }
 
 
@@ -5876,8 +5876,8 @@ ObjectPtr Parser::Parse_Sphere_Sweep()
 
 	Parse_Begin();
 
-	if ((Object = (SphereSweep *)Parse_Object_Id()) != NULL)
-		return ((ObjectPtr)Object);
+	if ((Object = reinterpret_cast<SphereSweep *>(Parse_Object_Id())) != NULL)
+		return (reinterpret_cast<ObjectPtr>(Object));
 
 	Object = new SphereSweep();
 
@@ -5915,8 +5915,8 @@ ObjectPtr Parser::Parse_Sphere_Sweep()
 		Error("Too few modeling spheres for interpolation type.");
 
 	Object->Modeling_Sphere =
-		(SPHSWEEP_SPH *)POV_MALLOC(Object->Num_Modeling_Spheres * sizeof(SPHSWEEP_SPH),
-		"sphere sweep modeling spheres");
+		reinterpret_cast<SPHSWEEP_SPH *>(POV_MALLOC(Object->Num_Modeling_Spheres * sizeof(SPHSWEEP_SPH),
+		"sphere sweep modeling spheres"));
 
 	for (i = 0; i < Object->Num_Modeling_Spheres; i++)
 	{
@@ -5941,9 +5941,9 @@ ObjectPtr Parser::Parse_Sphere_Sweep()
 
 	Object->Compute_BBox();
 
-	Parse_Object_Mods((ObjectPtr )Object);
+	Parse_Object_Mods(reinterpret_cast<ObjectPtr>(Object));
 
-	return ((ObjectPtr )Object);
+	return (reinterpret_cast<ObjectPtr>(Object));
 }
 
 
@@ -5983,9 +5983,9 @@ ObjectPtr Parser::Parse_Superellipsoid()
 
 	Parse_Begin();
 
-	if ((Object = (Superellipsoid *)Parse_Object_Id()) != NULL)
+	if ((Object = reinterpret_cast<Superellipsoid *>(Parse_Object_Id())) != NULL)
 	{
-		return((ObjectPtr )Object);
+		return(reinterpret_cast<ObjectPtr>(Object));
 	}
 
 	Object = new Superellipsoid();
@@ -6004,9 +6004,9 @@ ObjectPtr Parser::Parse_Superellipsoid()
 
 	/* Parse object's modifiers. */
 
-	Parse_Object_Mods((ObjectPtr)Object);
+	Parse_Object_Mods(reinterpret_cast<ObjectPtr>(Object));
 
-	return((ObjectPtr ) Object);
+	return(reinterpret_cast<ObjectPtr>(Object));
 }
 
 
@@ -6044,9 +6044,9 @@ ObjectPtr Parser::Parse_Torus()
 
 	Parse_Begin();
 
-	if ((Object = (Torus *)Parse_Object_Id()) != NULL)
+	if ((Object = reinterpret_cast<Torus *>(Parse_Object_Id())) != NULL)
 	{
-		return((ObjectPtr )Object);
+		return(reinterpret_cast<ObjectPtr>(Object));
 	}
 
 	Object = new Torus();
@@ -6061,9 +6061,9 @@ ObjectPtr Parser::Parse_Torus()
 
 	Object->Compute_BBox();
 
-	Parse_Object_Mods ((ObjectPtr )Object);
+	Parse_Object_Mods (reinterpret_cast<ObjectPtr>(Object));
 
-	return ((ObjectPtr ) Object);
+	return (reinterpret_cast<ObjectPtr>(Object));
 }
 
 
@@ -6092,9 +6092,9 @@ ObjectPtr Parser::Parse_Triangle()
 
 	Parse_Begin();
 
-	if ((Object = (Triangle *)Parse_Object_Id()) != NULL)
+	if ((Object = reinterpret_cast<Triangle *>(Parse_Object_Id())) != NULL)
 	{
-		return((ObjectPtr ) Object);
+		return(reinterpret_cast<ObjectPtr>(Object));
 	}
 
 	Object = new Triangle();
@@ -6108,9 +6108,9 @@ ObjectPtr Parser::Parse_Triangle()
 	if(!Object->Compute_Triangle())
 		Warning(0, "Degenerate triangle. Please remove.");
 
-	Parse_Object_Mods((ObjectPtr )Object);
+	Parse_Object_Mods(reinterpret_cast<ObjectPtr>(Object));
 
-	return((ObjectPtr )Object);
+	return(reinterpret_cast<ObjectPtr>(Object));
 }
 
 
@@ -6145,8 +6145,8 @@ ObjectPtr Parser::Parse_TrueType ()
 
 	Parse_Begin ();
 
-	if ( (Object = (ObjectPtr )Parse_Object_Id()) != NULL)
-		return ((ObjectPtr ) Object);
+	if ( (Object = reinterpret_cast<ObjectPtr>(Parse_Object_Id())) != NULL)
+		return (reinterpret_cast<ObjectPtr>(Object));
 
 	EXPECT
 		CASE(TTF_TOKEN)
@@ -6178,7 +6178,7 @@ ObjectPtr Parser::Parse_TrueType ()
 
 	/* Process all this good info */
 	Object = new CSGUnion();
-	TrueType::ProcessNewTTF((CSG *)Object, filename, builtin_font, text_string, depth, offset, this, sceneData);
+	TrueType::ProcessNewTTF(reinterpret_cast<CSG *>(Object), filename, builtin_font, text_string, depth, offset, this, sceneData);
 	if (filename)
 	{
 		/* Free up the filename  */
@@ -6194,12 +6194,12 @@ ObjectPtr Parser::Parse_TrueType ()
 	/* This tiny rotation should fix cracks in text that lies along an axis */
 	Make_Vector(offset, 0.001, 0.001, 0.001);
 	Compute_Rotation_Transform(&Local_Trans, offset);
-	Rotate_Object ((ObjectPtr )Object, offset, &Local_Trans);
+	Rotate_Object (reinterpret_cast<ObjectPtr>(Object), offset, &Local_Trans);
 
 	/* Get any rotate/translate or texturing stuff */
-	Object = Parse_Object_Mods ((ObjectPtr) Object);
+	Object = Parse_Object_Mods (reinterpret_cast<ObjectPtr>(Object));
 
-	return ((ObjectPtr ) Object);
+	return (reinterpret_cast<ObjectPtr>(Object));
 }
 
 
@@ -6363,7 +6363,7 @@ ObjectPtr Parser::Parse_Object ()
 		END_CASE
 
 		CASE (OBJECT_ID_TOKEN)
-			Object = Copy_Object((ObjectPtr ) Token.Data);
+			Object = Copy_Object(reinterpret_cast<ObjectPtr>(Token.Data));
 			EXIT
 		END_CASE
 
@@ -6438,7 +6438,7 @@ ObjectPtr Parser::Parse_Object ()
 			Object = Parse_Object ();
 			if (!Object)
 				Expectation_Error ("object");
-			Object = Parse_Object_Mods ((ObjectPtr )Object);
+			Object = Parse_Object_Mods (reinterpret_cast<ObjectPtr>(Object));
 			EXIT
 		END_CASE
 
@@ -6448,7 +6448,7 @@ ObjectPtr Parser::Parse_Object ()
 		END_CASE
 	END_EXPECT
 
-	return ((ObjectPtr ) Object);
+	return (reinterpret_cast<ObjectPtr>(Object));
 }
 
 
@@ -7322,7 +7322,7 @@ ObjectPtr Parser::Parse_Object_Mods (ObjectPtr Object)
 			if(dynamic_cast<CSGUnion *>(Object) == NULL) // FIXME
 				Error("split_union found in non-union object.\n");
 
-			((CSG*)Object)->do_split = (int)Parse_Float();
+			(reinterpret_cast<CSG*>(Object))->do_split = (int)Parse_Float();
 		END_CASE
 
 		CASE(PHOTONS_TOKEN)
@@ -7492,7 +7492,7 @@ ObjectPtr Parser::Parse_Object_Mods (ObjectPtr Object)
 						Make_Vector(Min, -BOUND_HUGE, -BOUND_HUGE, -BOUND_HUGE);
 						Make_Vector(Max,  BOUND_HUGE,  BOUND_HUGE,  BOUND_HUGE);
 
-						((Quadric *)Object)->Compute_BBox(Min, Max);
+						(dynamic_cast<Quadric *>(Object))->Compute_BBox(Min, Max);
 					}
 					EXIT
 				END_CASE
@@ -7518,7 +7518,7 @@ ObjectPtr Parser::Parse_Object_Mods (ObjectPtr Object)
 		END_CASE
 
 		CASE (INTERIOR_TOKEN)
-			Parse_Interior((Interior **)(&Object->interior));
+			Parse_Interior(reinterpret_cast<Interior **>(&Object->interior));
 		END_CASE
 
 		CASE (MATERIAL_TOKEN)
@@ -7850,7 +7850,7 @@ TRANSFORM *Parser::Parse_Transform(TRANSFORM *Trans)
 			MIdentity (Trans->matrix);
 			MIdentity (Trans->inverse);
 		}
-		Compose_Transforms(Trans, (TRANSFORM *)Token.Data);
+		Compose_Transforms(Trans, reinterpret_cast<TRANSFORM *>(Token.Data));
 	}
 	else
 	{
@@ -7900,7 +7900,7 @@ TRANSFORM *Parser::Parse_Transform_Block(TRANSFORM *New)
 		END_CASE
 
 		CASE(TRANSFORM_ID_TOKEN)
-			Compose_Transforms(New, (TRANSFORM *)Token.Data);
+			Compose_Transforms(New, reinterpret_cast<TRANSFORM *>(Token.Data));
 		END_CASE
 
 		CASE (TRANSFORM_TOKEN)
@@ -8231,7 +8231,7 @@ ObjectPtr Parser::Parse_Object_Id ()
 	EXPECT
 		CASE (OBJECT_ID_TOKEN)
 			Warn_State(OBJECT_ID_TOKEN, OBJECT_TOKEN);
-			Object = Copy_Object((ObjectPtr ) Token.Data);
+			Object = Copy_Object(reinterpret_cast<ObjectPtr>(Token.Data));
 			Object = Parse_Object_Mods (Object);
 			EXIT
 		END_CASE
@@ -8452,17 +8452,17 @@ int Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTR
 			if ((ParFlag) && (Token.Table_Index <= old_table_index))
 			{
 				// pass by reference
-				New_Par            = (POV_PARAM *)POV_MALLOC(sizeof(POV_PARAM),"parameter");
+				New_Par            = reinterpret_cast<POV_PARAM *>(POV_MALLOC(sizeof(POV_PARAM),"parameter"));
 				New_Par->NumberPtr = Token.NumberPtr;
 				New_Par->DataPtr   = Token.DataPtr;
 				New_Par->Table_Index = Token.Table_Index;
 				*NumberPtr = PARAMETER_ID_TOKEN;
-				*DataPtr   = (void *)New_Par;
+				*DataPtr   = reinterpret_cast<void *>(New_Par);
 			}
 			else
 			{
 				// pass by value
-				Temp_Data  = (void *) Copy_Identifier((void *)*Token.DataPtr,*Token.NumberPtr);
+				Temp_Data  = reinterpret_cast<void *>(Copy_Identifier(reinterpret_cast<void *>(*Token.DataPtr),*Token.NumberPtr));
 				*NumberPtr = *Token.NumberPtr;
 				Test_Redefine(Previous,NumberPtr,*DataPtr, allow_redefine);
 				*DataPtr   = Temp_Data;
@@ -8495,7 +8495,7 @@ int Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTR
 				Ok_To_Declare = true;
 				*NumberPtr    = COLOUR_ID_TOKEN;
 				Test_Redefine(Previous,NumberPtr,*DataPtr, allow_redefine);
-				*DataPtr      = (void *) Local_Colour;
+				*DataPtr      = reinterpret_cast<void *>(Local_Colour);
 				EXIT
 				END_CASE
 			}
@@ -8568,7 +8568,7 @@ int Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTR
 				if(!(ParFlag) || (ParFlag && function_identifier))
 				{
 					// pass by value
-					Temp_Data  = (void *) Copy_Identifier((void *)*Token.DataPtr,*Token.NumberPtr);
+					Temp_Data  = reinterpret_cast<void *>(Copy_Identifier(reinterpret_cast<void *>(*Token.DataPtr),*Token.NumberPtr));
 					*NumberPtr = *Token.NumberPtr;
 					Test_Redefine(Previous,NumberPtr,*DataPtr, allow_redefine);
 					*DataPtr   = Temp_Data;
@@ -8576,13 +8576,13 @@ int Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTR
 				else
 				{
 					// pass by reference
-					New_Par            = (POV_PARAM *)POV_MALLOC(sizeof(POV_PARAM),"parameter");
+					New_Par            = reinterpret_cast<POV_PARAM *>(POV_MALLOC(sizeof(POV_PARAM),"parameter"));
 					New_Par->NumberPtr = Token.NumberPtr;
 					New_Par->DataPtr   = Token.DataPtr;
 					New_Par->Table_Index = Token.Table_Index;
 
 					*NumberPtr = PARAMETER_ID_TOKEN;
-					*DataPtr   = (void *)New_Par;
+					*DataPtr   = reinterpret_cast<void *>(New_Par);
 				}
 			}
 			else // an expression has been found, so create a new identifier
@@ -8592,36 +8592,36 @@ int Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTR
 					case 1:
 						*NumberPtr = FLOAT_ID_TOKEN;
 						Test_Redefine(Previous,NumberPtr,*DataPtr, allow_redefine);
-						*DataPtr   = (void *) Create_Float();
-						*((DBL *)*DataPtr)  = Local_Express[X];
+						*DataPtr   = reinterpret_cast<void *>(Create_Float());
+						*(reinterpret_cast<DBL *>(*DataPtr))  = Local_Express[X];
 						break;
 
 					case 2:
 						*NumberPtr = UV_ID_TOKEN;
 						Test_Redefine(Previous,NumberPtr,*DataPtr, allow_redefine);
-						*DataPtr   = (void *) Create_UV_Vect();
-						Assign_UV_Vect((DBL *)*DataPtr, Local_Express);
+						*DataPtr   = reinterpret_cast<void *>(Create_UV_Vect());
+						Assign_UV_Vect(reinterpret_cast<DBL *>(*DataPtr), Local_Express);
 						break;
 
 					case 3:
 						*NumberPtr = VECTOR_ID_TOKEN;
 						Test_Redefine(Previous,NumberPtr,*DataPtr, allow_redefine);
-						*DataPtr   = (void *) Create_Vector();
-						Assign_Vector((DBL *)*DataPtr, Local_Express);
+						*DataPtr   = reinterpret_cast<void *>(Create_Vector());
+						Assign_Vector(reinterpret_cast<DBL *>(*DataPtr), Local_Express);
 						break;
 
 					case 4:
 						*NumberPtr = VECTOR_4D_ID_TOKEN;
 						Test_Redefine(Previous,NumberPtr,*DataPtr, allow_redefine);
-						*DataPtr   = (void *) Create_Vector_4D();
-						Assign_Vector_4D((DBL *)*DataPtr, Local_Express);
+						*DataPtr   = reinterpret_cast<void *>(Create_Vector_4D());
+						Assign_Vector_4D(reinterpret_cast<DBL *>(*DataPtr), Local_Express);
 						break;
 
 					case 5:
 						*NumberPtr    = COLOUR_ID_TOKEN;
 						Test_Redefine(Previous,NumberPtr,*DataPtr, allow_redefine);
-						*DataPtr      = (void *) Create_Colour();
-						Assign_Colour_Express((COLC*)(*DataPtr), Local_Express);
+						*DataPtr      = reinterpret_cast<void *>(Create_Colour());
+						Assign_Colour_Express(reinterpret_cast<COLC *>(*DataPtr), Local_Express);
 						break;
 				}
 			}
@@ -8640,7 +8640,7 @@ int Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTR
 			Parse_End ();
 			*NumberPtr = PIGMENT_ID_TOKEN;
 			Test_Redefine(Previous,NumberPtr,*DataPtr, allow_redefine);
-			*DataPtr   = (void *)Local_Pigment;
+			*DataPtr   = reinterpret_cast<void *>(Local_Pigment);
 			EXIT
 		END_CASE
 
@@ -8651,7 +8651,7 @@ int Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTR
 			Parse_End ();
 			*NumberPtr = TNORMAL_ID_TOKEN;
 			Test_Redefine(Previous,NumberPtr,*DataPtr, allow_redefine);
-			*DataPtr   = (void *) Local_Tnormal;
+			*DataPtr   = reinterpret_cast<void *>(Local_Tnormal);
 			EXIT
 		END_CASE
 
@@ -8660,7 +8660,7 @@ int Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTR
 			Parse_Finish (&Local_Finish);
 			*NumberPtr = FINISH_ID_TOKEN;
 			Test_Redefine(Previous,NumberPtr,*DataPtr, allow_redefine);
-			*DataPtr   = (void *) Local_Finish;
+			*DataPtr   = reinterpret_cast<void *>(Local_Finish);
 			EXIT
 		END_CASE
 
@@ -8669,7 +8669,7 @@ int Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTR
 			Parse_Camera (*Local_Camera);
 			*NumberPtr = CAMERA_ID_TOKEN;
 			Test_Redefine(Previous,NumberPtr,*DataPtr, allow_redefine);
-			*DataPtr   = (void *) Local_Camera;
+			*DataPtr   = reinterpret_cast<void *>(Local_Camera);
 			EXIT
 		END_CASE
 
@@ -8696,13 +8696,13 @@ int Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTR
 
 			*NumberPtr    = TEXTURE_ID_TOKEN;
 			Test_Redefine(Previous,NumberPtr,*DataPtr, allow_redefine);
-			*DataPtr      = (void *)Temp_Texture;
+			*DataPtr      = reinterpret_cast<void *>(Temp_Texture);
 			Ok_To_Declare = true;
 			EXIT
 		END_CASE
 
 		CASE (COLOUR_MAP_TOKEN)
-			Temp_Data=(void *) Parse_Colour_Map ();
+			Temp_Data  = reinterpret_cast<void *>(Parse_Colour_Map ());
 			*NumberPtr = COLOUR_MAP_ID_TOKEN;
 			Test_Redefine(Previous,NumberPtr,*DataPtr, allow_redefine);
 			*DataPtr   = Temp_Data;
@@ -8710,7 +8710,7 @@ int Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTR
 		END_CASE
 
 		CASE (PIGMENT_MAP_TOKEN)
-			Temp_Data  = (void *) Parse_Blend_Map (PIGMENT_TYPE,NO_PATTERN);
+			Temp_Data  = reinterpret_cast<void *>(Parse_Blend_Map (PIGMENT_TYPE,NO_PATTERN));
 			*NumberPtr = PIGMENT_MAP_ID_TOKEN;
 			Test_Redefine(Previous,NumberPtr,*DataPtr, allow_redefine);
 			*DataPtr   = Temp_Data;
@@ -8720,16 +8720,16 @@ int Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTR
 		CASE (SPLINE_TOKEN)
 			Experimental_Flag |= EF_SPLINE;
 			Parse_Begin();
-			Temp_Data=(char *) Parse_Spline();
+			Temp_Data  = reinterpret_cast<void *>(Parse_Spline());
 			Parse_End();
 			*NumberPtr = SPLINE_ID_TOKEN;
 			Test_Redefine(Previous,NumberPtr,*DataPtr, allow_redefine);
-			*DataPtr = (void *)Temp_Data;
+			*DataPtr   = Temp_Data;
 			EXIT
 		END_CASE
 
 		CASE (DENSITY_MAP_TOKEN)
-			Temp_Data  = (void *) Parse_Blend_Map (DENSITY_TYPE,NO_PATTERN);
+			Temp_Data  = reinterpret_cast<void *>(Parse_Blend_Map (DENSITY_TYPE,NO_PATTERN));
 			*NumberPtr = DENSITY_MAP_ID_TOKEN;
 			Test_Redefine(Previous,NumberPtr,*DataPtr, allow_redefine);
 			*DataPtr   = Temp_Data;
@@ -8737,7 +8737,7 @@ int Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTR
 		END_CASE
 
 		CASE (SLOPE_MAP_TOKEN)
-			Temp_Data  = (void *) Parse_Blend_Map (SLOPE_TYPE,NO_PATTERN);
+			Temp_Data  = reinterpret_cast<void *>(Parse_Blend_Map (SLOPE_TYPE,NO_PATTERN));
 			*NumberPtr = SLOPE_MAP_ID_TOKEN;
 			Test_Redefine(Previous,NumberPtr,*DataPtr, allow_redefine);
 			*DataPtr   = Temp_Data;
@@ -8745,7 +8745,7 @@ int Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTR
 		END_CASE
 
 		CASE (TEXTURE_MAP_TOKEN)
-			Temp_Data  = (void *) Parse_Blend_Map (TEXTURE_TYPE,NO_PATTERN);
+			Temp_Data  = reinterpret_cast<void *>(Parse_Blend_Map (TEXTURE_TYPE,NO_PATTERN));
 			*NumberPtr = TEXTURE_MAP_ID_TOKEN;
 			Test_Redefine(Previous,NumberPtr,*DataPtr, allow_redefine);
 			*DataPtr   = Temp_Data;
@@ -8753,7 +8753,7 @@ int Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTR
 		END_CASE
 
 		CASE (NORMAL_MAP_TOKEN)
-			Temp_Data  = (void *) Parse_Blend_Map (NORMAL_TYPE,NO_PATTERN);
+			Temp_Data  = reinterpret_cast<void *>(Parse_Blend_Map (NORMAL_TYPE,NO_PATTERN));
 			*NumberPtr = NORMAL_MAP_ID_TOKEN;
 			Test_Redefine(Previous,NumberPtr,*DataPtr, allow_redefine);
 			*DataPtr   = Temp_Data;
@@ -8761,7 +8761,7 @@ int Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTR
 		END_CASE
 
 		CASE (RAINBOW_TOKEN)
-			Temp_Data  = (void *) Parse_Rainbow();
+			Temp_Data  = reinterpret_cast<void *>(Parse_Rainbow());
 			*NumberPtr = RAINBOW_ID_TOKEN;
 			Test_Redefine(Previous,NumberPtr,*DataPtr, allow_redefine);
 			*DataPtr   = Temp_Data;
@@ -8769,7 +8769,7 @@ int Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTR
 		END_CASE
 
 		CASE (FOG_TOKEN)
-			Temp_Data  = (void *) Parse_Fog();
+			Temp_Data  = reinterpret_cast<void *>(Parse_Fog());
 			*NumberPtr = FOG_ID_TOKEN;
 			Test_Redefine(Previous,NumberPtr,*DataPtr, allow_redefine);
 			*DataPtr   = Temp_Data;
@@ -8778,7 +8778,7 @@ int Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTR
 
 		CASE (MEDIA_TOKEN)
 			Parse_Media(Local_Media);
-			Temp_Data  = (void *)(new Media(Local_Media.front()));
+			Temp_Data  = reinterpret_cast<void *>(new Media(Local_Media.front()));
 			*NumberPtr = MEDIA_ID_TOKEN;
 			Test_Redefine(Previous,NumberPtr,*DataPtr, allow_redefine);
 			*DataPtr   = Temp_Data;
@@ -8792,14 +8792,14 @@ int Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTR
 			Parse_End ();
 			*NumberPtr = DENSITY_ID_TOKEN;
 			Test_Redefine(Previous,NumberPtr,*DataPtr, allow_redefine);
-			*DataPtr   = (void *)Local_Density;
+			*DataPtr   = reinterpret_cast<void *>(Local_Density);
 			EXIT
 		END_CASE
 
 		CASE (INTERIOR_TOKEN)
 			Local_Interior = NULL;
 			Parse_Interior(&Local_Interior);
-			Temp_Data  = (void *)Local_Interior;
+			Temp_Data  = reinterpret_cast<void *>(Local_Interior);
 			*NumberPtr = INTERIOR_ID_TOKEN;
 			Test_Redefine(Previous,NumberPtr,*DataPtr, allow_redefine);
 			*DataPtr   = Temp_Data;
@@ -8809,7 +8809,7 @@ int Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTR
 		CASE (MATERIAL_TOKEN)
 			Local_Material = Create_Material();
 			Parse_Material(Local_Material);
-			Temp_Data  = (void *)Local_Material;
+			Temp_Data  = reinterpret_cast<void *>(Local_Material);
 			*NumberPtr = MATERIAL_ID_TOKEN;
 			Test_Redefine(Previous,NumberPtr,*DataPtr, allow_redefine);
 			*DataPtr   = Temp_Data;
@@ -8817,7 +8817,7 @@ int Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTR
 		END_CASE
 
 		CASE (SKYSPHERE_TOKEN)
-			Temp_Data  = (void *) Parse_Skysphere();
+			Temp_Data  = reinterpret_cast<void *>(Parse_Skysphere());
 			*NumberPtr = SKYSPHERE_ID_TOKEN;
 			Test_Redefine(Previous,NumberPtr,*DataPtr, allow_redefine);
 			*DataPtr   = Temp_Data;
@@ -8835,9 +8835,9 @@ int Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTR
 			// anyway. However, allowing such code now would cause problems
 			// implementing recursive functions after POV-Ray 3.5!
 			if(sym != NULL)
-				Temp_Data  = (void *)Parse_DeclareFunction(NumberPtr, sym->Token_Name, is_local);
+				Temp_Data  = reinterpret_cast<void *>(Parse_DeclareFunction(NumberPtr, sym->Token_Name, is_local));
 			else
-				Temp_Data  = (void *)Parse_DeclareFunction(NumberPtr, NULL, is_local);
+				Temp_Data  = reinterpret_cast<void *>(Parse_DeclareFunction(NumberPtr, NULL, is_local));
 			Test_Redefine(Previous, NumberPtr, *DataPtr, false);
 			*DataPtr   = Temp_Data;
 			EXIT
@@ -8847,7 +8847,7 @@ int Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTR
 			Local_Trans = Parse_Transform ();
 			*NumberPtr  = TRANSFORM_ID_TOKEN;
 			Test_Redefine(Previous,NumberPtr,*DataPtr, allow_redefine);
-			*DataPtr    = (void *) Local_Trans;
+			*DataPtr    = reinterpret_cast<void *>(Local_Trans);
 			EXIT
 		END_CASE
 
@@ -8862,7 +8862,7 @@ int Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTR
 		END_CASE
 
 		CASE (ARRAY_TOKEN)
-			Temp_Data  = (void *) Parse_Array_Declare();
+			Temp_Data  = reinterpret_cast<void *>(Parse_Array_Declare());
 			*NumberPtr = ARRAY_ID_TOKEN;
 			Test_Redefine(Previous,NumberPtr,*DataPtr, allow_redefine);
 			*DataPtr   = Temp_Data;
@@ -8875,7 +8875,7 @@ int Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTR
 			Found=(Local_Object!=NULL);
 			*NumberPtr   = OBJECT_ID_TOKEN;
 			Test_Redefine(Previous,NumberPtr,*DataPtr, allow_redefine);
-			*DataPtr     = (void *) Local_Object;
+			*DataPtr     = reinterpret_cast<void *>(Local_Object);
 			EXIT
 		END_CASE
 
@@ -8897,44 +8897,44 @@ void Parser::Destroy_Ident_Data(void *Data, int Type)
 	switch(Type)
 	{
 		case COLOUR_ID_TOKEN:
-			Destroy_Colour((COLOUR *)Data);
+			Destroy_Colour(reinterpret_cast<COLOUR *>(Data));
 			break;
 		case VECTOR_ID_TOKEN:
-			Destroy_Vector((VECTOR *)Data);
+			Destroy_Vector(reinterpret_cast<VECTOR *>(Data));
 			break;
 		case UV_ID_TOKEN:
-			Destroy_UV_Vect((UV_VECT *)Data);
+			Destroy_UV_Vect(reinterpret_cast<UV_VECT *>(Data));
 			break;
 		case VECTOR_4D_ID_TOKEN:
-			Destroy_Vector_4D((VECTOR_4D *)Data);
+			Destroy_Vector_4D(reinterpret_cast<VECTOR_4D *>(Data));
 			break;
 		case FLOAT_ID_TOKEN:
-			Destroy_Float((DBL *)Data);
+			Destroy_Float(reinterpret_cast<DBL *>(Data));
 			break;
 		case PIGMENT_ID_TOKEN:
 		case DENSITY_ID_TOKEN:
-			Destroy_Pigment((PIGMENT *)Data);
+			Destroy_Pigment(reinterpret_cast<PIGMENT *>(Data));
 			break;
 		case TNORMAL_ID_TOKEN:
-			Destroy_Tnormal((TNORMAL *)Data);
+			Destroy_Tnormal(reinterpret_cast<TNORMAL *>(Data));
 			break;
 		case FINISH_ID_TOKEN:
 			Destroy_Finish(Data);
 			break;
 		case MEDIA_ID_TOKEN:
-			delete ((Media *)Data);
+			delete (reinterpret_cast<Media *>(Data));
 			break;
 		case INTERIOR_ID_TOKEN:
-			Destroy_Interior((Interior *)Data);
+			Destroy_Interior(reinterpret_cast<Interior *>(Data));
 			break;
 		case MATERIAL_ID_TOKEN:
-			Destroy_Material((MATERIAL *)Data);
+			Destroy_Material(reinterpret_cast<MATERIAL *>(Data));
 			break;
 		case TEXTURE_ID_TOKEN:
-			Destroy_Textures((TEXTURE *)Data);
+			Destroy_Textures(reinterpret_cast<TEXTURE *>(Data));
 			break;
 		case OBJECT_ID_TOKEN:
-			Destroy_Object((ObjectPtr )Data);
+			Destroy_Object(reinterpret_cast<ObjectPtr>(Data));
 			break;
 		case COLOUR_MAP_ID_TOKEN:
 		case PIGMENT_MAP_ID_TOKEN:
@@ -8942,32 +8942,32 @@ void Parser::Destroy_Ident_Data(void *Data, int Type)
 		case TEXTURE_MAP_ID_TOKEN:
 		case NORMAL_MAP_ID_TOKEN:
 		case DENSITY_MAP_ID_TOKEN:
-			Destroy_Blend_Map((BLEND_MAP *)Data);
+			Destroy_Blend_Map(reinterpret_cast<BLEND_MAP *>(Data));
 			break;
 		case TRANSFORM_ID_TOKEN:
-			Destroy_Transform((TRANSFORM *)Data);
+			Destroy_Transform(reinterpret_cast<TRANSFORM *>(Data));
 			break;
 		case CAMERA_ID_TOKEN:
-			delete (Camera *) Data;
+			delete reinterpret_cast<Camera *>(Data);
 			break;
 		case RAINBOW_ID_TOKEN:
-			Destroy_Rainbow((RAINBOW *)Data);
+			Destroy_Rainbow(reinterpret_cast<RAINBOW *>(Data));
 			break;
 		case FOG_ID_TOKEN:
-			Destroy_Fog((FOG *)Data);
+			Destroy_Fog(reinterpret_cast<FOG *>(Data));
 			break;
 		case SKYSPHERE_ID_TOKEN:
-			Destroy_Skysphere((SKYSPHERE *)Data);
+			Destroy_Skysphere(reinterpret_cast<SKYSPHERE *>(Data));
 			break;
 		case MACRO_ID_TOKEN:
 		case TEMPORARY_MACRO_ID_TOKEN:
-			Destroy_Macro((POV_MACRO *)Data);
+			Destroy_Macro(reinterpret_cast<POV_MACRO *>(Data));
 			break;
 		case STRING_ID_TOKEN:
 				POV_FREE(Data);
 			break;
 		case ARRAY_ID_TOKEN:
-			a = (POV_ARRAY *)Data;
+			a = reinterpret_cast<POV_ARRAY *>(Data);
 			for(i=0; i<a->Total; i++)
 			{
 				Destroy_Ident_Data(a->DataPtrs[i], a->Type);
@@ -8980,7 +8980,7 @@ void Parser::Destroy_Ident_Data(void *Data, int Type)
 			POV_FREE(Data);
 			break;
 		case FILE_ID_TOKEN:
-			Temp_File = (DATA_FILE *)Data;
+			Temp_File = reinterpret_cast<DATA_FILE *>(Data);
 			if(Temp_File->In_File != NULL)
 				delete Temp_File->In_File;
 			if(Temp_File->Out_File != NULL)
@@ -8992,7 +8992,7 @@ void Parser::Destroy_Ident_Data(void *Data, int Type)
 			Destroy_Function((FUNCTION_PTR)Data);
 			break;
 		case SPLINE_ID_TOKEN:
-			Destroy_Spline((SPLINE *)Data);
+			Destroy_Spline(reinterpret_cast<SPLINE *>(Data));
 			break;
 		default:
 			Error("Do not know how to free memory for identifier type %d", Type);
@@ -9062,7 +9062,7 @@ void Parser::Link_Textures (TEXTURE **Old_Textures, TEXTURE *New_Textures)
 	}
 	for (Layer = New_Textures ;
 	     Layer->Next != NULL ;
-	     Layer = (TEXTURE *)Layer->Next)
+	     Layer = reinterpret_cast<TEXTURE *>(Layer->Next))
 	{
 		/* NK layers - 1999 June 10 - for backwards compatiblity with layered textures */
 		if(sceneData->languageVersion<=310)
@@ -9073,7 +9073,7 @@ void Parser::Link_Textures (TEXTURE **Old_Textures, TEXTURE *New_Textures)
 	if ((sceneData->languageVersion<=310) && (*Old_Textures!=NULL))
 		Convert_Filter_To_Transmit(Layer->Pigment);
 
-	Layer->Next = (TPATTERN *)*Old_Textures;
+	Layer->Next = reinterpret_cast<TPATTERN *>(*Old_Textures);
 	*Old_Textures = New_Textures;
 
 	if ((New_Textures->Type != PLAIN_PATTERN) && (New_Textures->Next != NULL))
@@ -9228,7 +9228,7 @@ void Parser::Warn_State(TOKEN Token_Id, TOKEN Type)
 	if(sceneData->languageVersion >= 150)
 		return;
 
-	str = (char *)POV_MALLOC(160, "global setting warning string");
+	str = reinterpret_cast<char *>(POV_MALLOC(160, "global setting warning string"));
 
 	strcpy(str, "Found '");
 	strcat(str, Get_Token_String (Token_Id));
@@ -9296,7 +9296,7 @@ void Parser::Post_Process (ObjectPtr Object, ObjectPtr Parent)
 
 	if (Object->Type & LT_SRC_UNION_OBJECT)
 	{
-		for (vector<ObjectPtr>::iterator Sib = ((CSG *)Object)->children.begin(); Sib != ((CSG *)Object)->children.end(); Sib++)
+		for (vector<ObjectPtr>::iterator Sib = (reinterpret_cast<CSG *>(Object))->children.begin(); Sib != (reinterpret_cast<CSG *>(Object))->children.end(); Sib++)
 		{
 			Post_Process(*Sib, Object);
 		}
@@ -9427,7 +9427,7 @@ void Parser::Post_Process (ObjectPtr Object, ObjectPtr Parent)
 	if(Object->Type & LIGHT_SOURCE_OBJECT)
 	{
 		DBL len1,len2;
-		LightSource *Light = (LightSource *)Object;
+		LightSource *Light = reinterpret_cast<LightSource *>(Object);
 
 
 		// check some properties of the orient light sources
@@ -9471,18 +9471,18 @@ void Parser::Post_Process (ObjectPtr Object, ObjectPtr Parent)
 	if (Object->Type & LIGHT_SOURCE_OBJECT)
 	{
 		// post-process the light source
-		if (((LightSource *)Object)->Projected_Through_Object != NULL)
+		if ((reinterpret_cast<LightSource *>(Object))->Projected_Through_Object != NULL)
 		{
-			if (((LightSource *)Object)->Projected_Through_Object->interior != NULL)
+			if ((reinterpret_cast<LightSource *>(Object))->Projected_Through_Object->interior != NULL)
 			{
-				Destroy_Interior(((LightSource *)Object)->Projected_Through_Object->interior);
-				((LightSource *)Object)->Projected_Through_Object->interior=NULL;
+				Destroy_Interior((reinterpret_cast<LightSource *>(Object))->Projected_Through_Object->interior);
+				(reinterpret_cast<LightSource *>(Object))->Projected_Through_Object->interior=NULL;
 				Warning(0,"Projected through objects can not have interior, interior removed.");
 			}
-			if (((LightSource *)Object)->Projected_Through_Object->Texture != NULL)
+			if ((reinterpret_cast<LightSource *>(Object))->Projected_Through_Object->Texture != NULL)
 			{
-				Destroy_Textures(((LightSource *)Object)->Projected_Through_Object->Texture);
-				((LightSource *)Object)->Projected_Through_Object->Texture = NULL;
+				Destroy_Textures((reinterpret_cast<LightSource *>(Object))->Projected_Through_Object->Texture);
+				(reinterpret_cast<LightSource *>(Object))->Projected_Through_Object->Texture = NULL;
 				Warning(0,"Projected through objects can not have texture, texture removed.");
 			}
 		}
@@ -9490,10 +9490,10 @@ void Parser::Post_Process (ObjectPtr Object, ObjectPtr Parent)
 		// only global light sources are in Frame.Light_Sources list [trf]
 		if(!(Object->Type & LIGHT_GROUP_LIGHT_OBJECT))
 			// add this light to the frame's list of global light sources
-			sceneData->lightSources.push_back((LightSource *)Object);
+			sceneData->lightSources.push_back(reinterpret_cast<LightSource *>(Object));
 		else
 			// Put it into the frame's list of light-group lights
-			sceneData->lightGroupLightSources.push_back((LightSource *)Object);
+			sceneData->lightGroupLightSources.push_back(reinterpret_cast<LightSource *>(Object));
 	}
 	else
 	{
@@ -9551,7 +9551,7 @@ void Parser::Post_Process (ObjectPtr Object, ObjectPtr Parent)
 
 	if (Object->Type & IS_COMPOUND_OBJECT)
 	{
-		for (vector<ObjectPtr>::iterator Sib = ((CSG *)Object)->children.begin(); Sib != ((CSG *)Object)->children.end(); Sib++)
+		for (vector<ObjectPtr>::iterator Sib = (reinterpret_cast<CSG *>(Object))->children.begin(); Sib != (reinterpret_cast<CSG *>(Object))->children.end(); Sib++)
 		{
 			Post_Process(*Sib, Object);
 		}
@@ -9582,10 +9582,10 @@ void Parser::Post_Process (ObjectPtr Object, ObjectPtr Parent)
 		// Objects with multiple textures have to be handled separately.
 
 		if(dynamic_cast<Blob *>(Object) != NULL) // FIXME
-			((Blob *)Object)->Test_Blob_Opacity();
+			(dynamic_cast<Blob *>(Object))->Test_Blob_Opacity();
 
 		if(dynamic_cast<Mesh *>(Object) != NULL) // FIXME
-			((Mesh *)Object)->Test_Mesh_Opacity();
+			(dynamic_cast<Mesh *>(Object))->Test_Mesh_Opacity();
 	}
 }
 
@@ -9634,7 +9634,7 @@ void Parser::Link_To_Frame(ObjectPtr Object)
 		    (dynamic_cast<CSGMerge *>(Object) == NULL)        && // FIXME
 		    (dynamic_cast<Poly *>(Object) == NULL)            && // FIXME
 		    (dynamic_cast<TrueType *>(Object) == NULL)        && // FIXME
-		    ((dynamic_cast<Quadric *>(Object) == NULL) || ((Quadric *)Object)->Automatic_Bounds))
+		    ((dynamic_cast<Quadric *>(Object) == NULL) || (dynamic_cast<Quadric *>(Object)->Automatic_Bounds)))
 		{
 			/* Destroy only, if bounding object is not used as clipping object. */
 
@@ -9653,14 +9653,14 @@ void Parser::Link_To_Frame(ObjectPtr Object)
 	 */
 	if(dynamic_cast<CSGUnion *>(Object) != NULL && dynamic_cast<CSGMerge *>(Object) == NULL)
 	{
-		vector<ObjectPtr>::iterator This_Sib = ((CSG *)Object)->children.begin();
-		while (This_Sib != ((CSG *)Object)->children.end())
+		vector<ObjectPtr>::iterator This_Sib = (dynamic_cast<CSG *>(Object))->children.begin();
+		while (This_Sib != (dynamic_cast<CSG *>(Object))->children.end())
 		{
 			if((dynamic_cast<LightSource *>(*This_Sib) == NULL) && !Test_Flag ((*This_Sib), NO_SHADOW_FLAG)) // FIXME
 				break;
 			This_Sib++;
 		}
-		if(This_Sib == ((CSG *)Object)->children.end())
+		if(This_Sib == (dynamic_cast<CSG *>(Object))->children.end())
 			Set_Flag(Object, NO_SHADOW_FLAG);
 	}
 
@@ -9683,7 +9683,7 @@ void Parser::Link_To_Frame(ObjectPtr Object)
 	/* NK phmap - added code so union is not split up if it is
 	              flagged for hi-density photon mapping...
 	          maybe we SHOULD split it anyways... do speed tests later */
-	if(((CSGUnion *) Object)->do_split == false)
+	if((reinterpret_cast<CSGUnion *>(Object))->do_split == false)
 	{
 		Link(Object, sceneData->objects);
 		return;
@@ -9694,7 +9694,7 @@ void Parser::Link_To_Frame(ObjectPtr Object)
 		/* Test if all siblings are finite. */
 		bool finite = true;
 		DBL Volume;
-		for(vector<ObjectPtr>::iterator This_Sib = ((CSG *)Object)->children.begin(); This_Sib != ((CSG *)Object)->children.end(); This_Sib++)
+		for(vector<ObjectPtr>::iterator This_Sib = (reinterpret_cast<CSG *>(Object))->children.begin(); This_Sib != (reinterpret_cast<CSG *>(Object))->children.end(); This_Sib++)
 		{
 			BOUNDS_VOLUME(Volume, (*This_Sib)->BBox);
 			if (Volume > BOUND_HUGE)
@@ -9721,14 +9721,14 @@ void Parser::Link_To_Frame(ObjectPtr Object)
 	}
 
 	// Link all siblings of a union to the frame.
-	for(vector<ObjectPtr>::iterator This_Sib = ((CSG *)Object)->children.begin(); This_Sib != ((CSG *)Object)->children.end(); This_Sib++)
+	for(vector<ObjectPtr>::iterator This_Sib = (reinterpret_cast<CSG *>(Object))->children.begin(); This_Sib != (reinterpret_cast<CSG *>(Object))->children.end(); This_Sib++)
 	{
 		// Sibling is no longer inside a CSG object.
 		(*This_Sib)->Type &= ~IS_CHILD_OBJECT;
 		Link_To_Frame(*This_Sib);
 	}
 
-	((CSG *)Object)->children.clear();
+	(reinterpret_cast<CSG *>(Object))->children.clear();
 	Destroy_Object(Object);
 }
 
@@ -9827,7 +9827,7 @@ void Parser::Global_Setting_Warn()
 {
 	char *str;
 
-	str = (char *)POV_MALLOC(strlen(Token.Token_String) + 80, "global setting warning string");
+	str = reinterpret_cast<char *>(POV_MALLOC(strlen(Token.Token_String) + 80, "global setting warning string"));
 
 	if (sceneData->languageVersion >= 300)
 	{
@@ -9862,7 +9862,7 @@ void Parser::Global_Setting_Warn()
 
 void Parser::Set_CSG_Children_Flag(ObjectPtr Object, unsigned int f, unsigned int  flag, unsigned int  set_flag)
 {
-	for(vector<ObjectPtr>::iterator Sib = ((CSG *)Object)->children.begin(); Sib != ((CSG *)Object)->children.end(); Sib++)
+	for(vector<ObjectPtr>::iterator Sib = (reinterpret_cast<CSG *>(Object))->children.begin(); Sib != (reinterpret_cast<CSG *>(Object))->children.end(); Sib++)
 	{
 		ObjectPtr p = *Sib ;
 		if(!Test_Flag (p, set_flag))
@@ -9905,7 +9905,7 @@ void Parser::Set_CSG_Children_Flag(ObjectPtr Object, unsigned int f, unsigned in
 
 void Parser::Set_CSG_Tree_Flag(ObjectPtr Object, unsigned int f, int val)
 {
-	for(vector<ObjectPtr>::iterator Sib = ((CSG *)Object)->children.begin(); Sib != ((CSG *)Object)->children.end(); Sib++)
+	for(vector<ObjectPtr>::iterator Sib = (reinterpret_cast<CSG *>(Object))->children.begin(); Sib != (reinterpret_cast<CSG *>(Object))->children.end(); Sib++)
 	{
 		ObjectPtr p = *Sib ;
 		if((dynamic_cast<CSGUnion *>(p) != NULL) || // FIXME
@@ -9957,52 +9957,52 @@ void *Parser::Copy_Identifier (void *Data, int Type)
 	switch (Type)
 	{
 		case COLOUR_ID_TOKEN:
-			New = (void *)Copy_Colour(*(COLOUR *)Data);
+			New = reinterpret_cast<void *>(Copy_Colour(*reinterpret_cast<COLOUR *>(Data)));
 			break;
 		case VECTOR_ID_TOKEN:
 			vp = Create_Vector();
-			Assign_Vector((*vp),(*((VECTOR *)Data)));
+			Assign_Vector((*vp),(*(reinterpret_cast<VECTOR *>(Data))));
 			New=vp;
 			break;
 		case UV_ID_TOKEN:
 			uvp = Create_UV_Vect();
-			Assign_UV_Vect((*uvp),(*((UV_VECT *)Data)));
+			Assign_UV_Vect((*uvp),(*(reinterpret_cast<UV_VECT *>(Data))));
 			New=uvp;
 			break;
 		case VECTOR_4D_ID_TOKEN:
 			v4p = Create_Vector_4D();
-			Assign_Vector_4D((*v4p),(*((VECTOR_4D *)Data)));
+			Assign_Vector_4D((*v4p),(*(reinterpret_cast<VECTOR_4D *>(Data))));
 			New=v4p;
 			break;
 		case FLOAT_ID_TOKEN:
 			dp = Create_Float();
-			*dp = *((DBL *)Data);
+			*dp = *(reinterpret_cast<DBL *>(Data));
 			New = dp;
 			break;
 		case PIGMENT_ID_TOKEN:
 		case DENSITY_ID_TOKEN:
-			New = (void *)Copy_Pigment((PIGMENT *)Data);
+			New = reinterpret_cast<void *>(Copy_Pigment(reinterpret_cast<PIGMENT *>(Data)));
 			break;
 		case TNORMAL_ID_TOKEN:
-			New = (void *)Copy_Tnormal((TNORMAL *)Data);
+			New = reinterpret_cast<void *>(Copy_Tnormal(reinterpret_cast<TNORMAL *>(Data)));
 			break;
 		case FINISH_ID_TOKEN:
-			New = (void *)Copy_Finish((FINISH *)Data);
+			New = reinterpret_cast<void *>(Copy_Finish(reinterpret_cast<FINISH *>(Data)));
 			break;
 		case MEDIA_ID_TOKEN:
-			New = (void *)new Media(*((Media *)Data));
+			New = reinterpret_cast<void *>(new Media(*(reinterpret_cast<Media *>(Data))));
 			break;
 		case INTERIOR_ID_TOKEN:
-			New = (void *)new Interior(*((Interior *)Data));
+			New = reinterpret_cast<void *>(new Interior(*(reinterpret_cast<Interior *>(Data))));
 			break;
 		case MATERIAL_ID_TOKEN:
-			New = (void *)Copy_Material((MATERIAL *)Data);
+			New = reinterpret_cast<void *>(Copy_Material(reinterpret_cast<MATERIAL *>(Data)));
 			break;
 		case TEXTURE_ID_TOKEN:
-			New = (void *)Copy_Textures((TEXTURE *)Data);
+			New = reinterpret_cast<void *>(Copy_Textures(reinterpret_cast<TEXTURE *>(Data)));
 			break;
 		case OBJECT_ID_TOKEN:
-			New = (void *)Copy_Object((ObjectPtr )Data);
+			New = reinterpret_cast<void *>(Copy_Object(reinterpret_cast<ObjectPtr>(Data)));
 			break;
 		case COLOUR_MAP_ID_TOKEN:
 		case PIGMENT_MAP_ID_TOKEN:
@@ -10010,46 +10010,46 @@ void *Parser::Copy_Identifier (void *Data, int Type)
 		case TEXTURE_MAP_ID_TOKEN:
 		case NORMAL_MAP_ID_TOKEN:
 		case DENSITY_MAP_ID_TOKEN:
-			New = (void *)Copy_Blend_Map((BLEND_MAP *)Data);
+			New = reinterpret_cast<void *>(Copy_Blend_Map(reinterpret_cast<BLEND_MAP *>(Data)));
 			break;
 		case TRANSFORM_ID_TOKEN:
-			New = (void *)Copy_Transform((TRANSFORM *)Data);
+			New = reinterpret_cast<void *>(Copy_Transform(reinterpret_cast<TRANSFORM *>(Data)));
 			break;
 		case CAMERA_ID_TOKEN:
-			New = (void *)new Camera(*(Camera *)Data);
+			New = reinterpret_cast<void *>(new Camera(*reinterpret_cast<Camera *>(Data)));
 			break;
 		case RAINBOW_ID_TOKEN:
-			New = (void *)Copy_Rainbow((RAINBOW *)Data);
+			New = reinterpret_cast<void *>(Copy_Rainbow(reinterpret_cast<RAINBOW *>(Data)));
 			break;
 		case FOG_ID_TOKEN:
-			New = (void *)Copy_Fog((FOG *)Data);
+			New = reinterpret_cast<void *>(Copy_Fog(reinterpret_cast<FOG *>(Data)));
 			break;
 		case SKYSPHERE_ID_TOKEN:
-			New = (void *)Copy_Skysphere((SKYSPHERE *)Data);
+			New = reinterpret_cast<void *>(Copy_Skysphere(reinterpret_cast<SKYSPHERE *>(Data)));
 			break;
 		case STRING_ID_TOKEN:
-			//New = (void *)POV_STRDUP((char *)Data);
-			len = UCS2_strlen((UCS2 *)(Data)) + 1;
-			New = (UCS2 *)POV_MALLOC(len * sizeof(UCS2), "UCS2 String");
-			POV_MEMMOVE((void *)New, (void *)(Data), len * sizeof(UCS2));
+			//New = reinterpret_cast<void *>(POV_STRDUP(reinterpret_cast<char *>(Data)));
+			len = UCS2_strlen(reinterpret_cast<UCS2 *>(Data)) + 1;
+			New = reinterpret_cast<UCS2 *>(POV_MALLOC(len * sizeof(UCS2), "UCS2 String"));
+			POV_MEMMOVE(reinterpret_cast<void *>(New), reinterpret_cast<void *>(Data), len * sizeof(UCS2));
 			break;
 		case ARRAY_ID_TOKEN:
-			a=(POV_ARRAY *)Data;
-			na=(POV_ARRAY *)POV_MALLOC(sizeof(POV_ARRAY),"array");
+			a=reinterpret_cast<POV_ARRAY *>(Data);
+			na=reinterpret_cast<POV_ARRAY *>(POV_MALLOC(sizeof(POV_ARRAY),"array"));
 			*na=*a;
-			na->DataPtrs = (void **)POV_MALLOC(sizeof(void *)*(a->Total),"array");
+			na->DataPtrs = reinterpret_cast<void **>(POV_MALLOC(sizeof(void *)*(a->Total),"array"));
 			for (i=0; i<a->Total; i++)
 			{
-				na->DataPtrs[i] = (void *)Copy_Identifier (a->DataPtrs[i],a->Type);
+				na->DataPtrs[i] = reinterpret_cast<void *>(Copy_Identifier (a->DataPtrs[i],a->Type));
 			}
-			New = (void *)na;
+			New = reinterpret_cast<void *>(na);
 			break;
 		case FUNCT_ID_TOKEN:
 		case VECTFUNCT_ID_TOKEN:
-			New = (void *)Copy_Function((FUNCTION_PTR )Data);
+			New = reinterpret_cast<void *>(Copy_Function((FUNCTION_PTR )Data));
 			break;
 		case SPLINE_ID_TOKEN:
-			New = (void *)Copy_Spline((SPLINE *)Data);
+			New = reinterpret_cast<void *>(Copy_Spline((SPLINE *)Data));
 			break;
 		default:
 			Error("Cannot copy identifier");

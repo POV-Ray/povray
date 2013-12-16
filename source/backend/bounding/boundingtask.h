@@ -22,11 +22,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/bounding/boundingtask.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/bounding/boundingtask.h $
+ * $Revision: #16 $
+ * $Change: 6085 $
+ * $DateTime: 2013/11/10 07:39:29 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #ifndef POVRAY_BACKEND_BOUNDINGTASK_H
@@ -60,7 +60,7 @@ class BoundingTask : public Task
 
 		void AppendObject(ObjectPtr p);
 
-		inline SceneThreadData *GetSceneDataPtr() { return (SceneThreadData *)(GetDataPtr()); }
+		inline SceneThreadData *GetSceneDataPtr() { return reinterpret_cast<SceneThreadData *>(GetDataPtr()); }
 	private:
 		shared_ptr<SceneData> sceneData;
 		unsigned int boundingThreshold;

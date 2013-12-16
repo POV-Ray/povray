@@ -26,11 +26,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/vfe/win/vfeplatform.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/vfe/win/vfeplatform.cpp $
+ * $Revision: #27 $
+ * $Change: 6085 $
+ * $DateTime: 2013/11/10 07:39:29 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #include <windows.h>
@@ -216,7 +216,7 @@ namespace vfePlatform
     SYSTEMTIME        systemTime ;
 
     GetSystemTime (&systemTime) ;
-    SystemTimeToFileTime (&systemTime, (FILETIME *) &fileTime) ;
+    SystemTimeToFileTime (&systemTime, reinterpret_cast<FILETIME *>(&fileTime)) ;
     fileTime /= 10000;
     fileTime += m_TimestampOffset;
     if (fileTime < m_LastTimestamp)
@@ -570,7 +570,7 @@ namespace vfePlatform
                      NULL,
                      m_LastError,
                      MAKELANGID (LANG_ENGLISH, SUBLANG_ENGLISH_US),
-                     (char *) &buffer,
+                     reinterpret_cast<char *>(&buffer),
                      0,
                      NULL);
       output += buffer;

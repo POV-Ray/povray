@@ -29,11 +29,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/vm/fnintern.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/vm/fnintern.cpp $
+ * $Revision: #23 $
+ * $Change: 6085 $
+ * $DateTime: 2013/11/10 07:39:29 $
+ * $Author: clipka $
  *******************************************************************************/
 
 // frame.h must always be the first POV file included (pulls in platform config)
@@ -989,18 +989,18 @@ DBL f_ridged_mf(FPUContext *ctx, DBL *ptr, unsigned int fn) // 59
 	V1[Z]=PARAM_Z;
 	if (f->private_data == NULL)
 	{
-		ea = (DBL*)POV_MALLOC((PARAM(2) + 1)*sizeof(DBL), "exponent array");
+		ea = reinterpret_cast<DBL *>(POV_MALLOC((PARAM(2) + 1)*sizeof(DBL), "exponent array"));
 		freq = 1.0;
 		for (i=0; i<=PARAM(2);i++)
 		{
 			ea[i]= pow(freq,-PARAM(0));
 			freq *= PARAM(1);
 		}
-		f->private_data = (void *)ea;
+		f->private_data = reinterpret_cast<void *>(ea);
 	}
 	else
 	{
-		ea = (DBL *)(f->private_data);
+		ea = reinterpret_cast<DBL *>(f->private_data);
 	}
 	signal = Noise(V1,ngen)*2.0-1.0;
 	if (signal < 0.0 )
@@ -1196,9 +1196,9 @@ DBL f_pattern(FPUContext *ctx, DBL *ptr, unsigned int fn) // 77
 	if(f->private_data == NULL)
 		return 0.0;
 
-	Warp_EPoint (TPoint, Vec, (TPATTERN *)(f->private_data));
+	Warp_EPoint (TPoint, Vec, reinterpret_cast<const TPATTERN *>(f->private_data));
 
-	return Evaluate_TPat((TPATTERN *)(f->private_data), TPoint, NULL, NULL, ctx->threaddata);
+	return Evaluate_TPat(reinterpret_cast<const TPATTERN *>(f->private_data), TPoint, NULL, NULL, ctx->threaddata);
 }
 
 DBL f_noise_generator(FPUContext *ctx, DBL *ptr, unsigned int) // 78
@@ -1225,7 +1225,7 @@ void f_pigment(FPUContext *ctx, DBL *ptr, unsigned int fn, unsigned int sp) // 0
 		return;
 	}
 
-	Compute_Pigment(Col, (PIGMENT *)(f->private_data), Vec, NULL, NULL, ctx->threaddata);
+	Compute_Pigment(Col, reinterpret_cast<const PIGMENT *>(f->private_data), Vec, NULL, NULL, ctx->threaddata);
 
 	ctx->SetLocal(sp + pRED, Col[pRED]);
 	ctx->SetLocal(sp + pGREEN, Col[pGREEN]);
@@ -1248,7 +1248,7 @@ void f_transform(FPUContext *ctx, DBL *ptr, unsigned int fn, unsigned int sp) //
 		return;
 	}
 
-	MTransPoint(Result, Vec, (TRANSFORM *)(f->private_data));
+	MTransPoint(Result, Vec, reinterpret_cast<const TRANSFORM *>(f->private_data));
 
 	ctx->SetLocal(sp + X, Result[X]);
 	ctx->SetLocal(sp + Y, Result[Y]);
@@ -1269,9 +1269,9 @@ void f_spline(FPUContext *ctx, DBL *ptr, unsigned int fn, unsigned int sp) // 2
 		return;
 	}
 
-	Terms = ((SPLINE *)(f->private_data))->Terms;
+	Terms = (reinterpret_cast<SPLINE *>(f->private_data))->Terms;
 
-	Get_Spline_Val((SPLINE *)(f->private_data), PARAM_N_X(Terms), Result, &Terms);
+	Get_Spline_Val(reinterpret_cast<SPLINE *>(f->private_data), PARAM_N_X(Terms), Result, &Terms);
 
 	ctx->SetLocal(sp + X, Result[X]);
 	ctx->SetLocal(sp + Y, Result[Y]);

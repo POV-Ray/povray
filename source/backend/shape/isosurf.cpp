@@ -650,7 +650,7 @@ IsoSurface::IsoSurface() : ObjectBase(ISOSURFACE_OBJECT)
 	gradient = 0.0;
 	threshold = 0.0;
 
-	mginfo = (ISO_Max_Gradient *)POV_MALLOC(sizeof(ISO_Max_Gradient), "isosurface max_gradient info");
+	mginfo = reinterpret_cast<ISO_Max_Gradient *>(POV_MALLOC(sizeof(ISO_Max_Gradient), "isosurface max_gradient info"));
 	mginfo->refcnt = 1;
 	mginfo->max_gradient = 0.0;
 	mginfo->gradient = 0.0; // not really necessary yet [trf]

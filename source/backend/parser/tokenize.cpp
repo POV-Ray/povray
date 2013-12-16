@@ -30,11 +30,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/parser/tokenize.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/parser/tokenize.cpp $
+ * $Revision: #69 $
+ * $Change: 6085 $
+ * $DateTime: 2013/11/10 07:39:29 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #include <ctype.h>
@@ -108,7 +108,7 @@ void Parser::Initialize_Tokenizer()
 
 	/* Init conditional stack. */
 
-	Cond_Stack = (CS_ENTRY*)POV_MALLOC(sizeof(CS_ENTRY) * COND_STACK_SIZE, "conditional stack");
+	Cond_Stack = reinterpret_cast<CS_ENTRY*>(POV_MALLOC(sizeof(CS_ENTRY) * COND_STACK_SIZE, "conditional stack"));
 
 	Cond_Stack[0].Cond_Type    = ROOT_COND;
 	Cond_Stack[0].Switch_Value = 0.0;
@@ -811,7 +811,7 @@ inline void Parser::Begin_String()
 	if((String != NULL) && (String != String_Fast_Buffer))
 		POV_FREE(String);
 
-	String = (char *)POV_MALLOC(256, "C String");
+	String = reinterpret_cast<char *>(POV_MALLOC(256, "C String"));
 	String_Buffer_Free = 256;
 	String_Index = 0;
 }
@@ -842,7 +842,7 @@ inline void Parser::Stuff_Character(int chr)
 	{
 		Error("String too long.");
 // This caused too many problems with buffer overflows [trf]
-//		String = (char *)POV_REALLOC(String, String_Index + 256, "String Literal Buffer");
+//		String = reinterpret_cast<char *>(POV_REALLOC(String, String_Index + 256, "String Literal Buffer"));
 //		String_Buffer_Free += 256;
 	}
 
@@ -876,7 +876,7 @@ inline void Parser::End_String()
 	Stuff_Character(0);
 
 	if(String_Buffer_Free > 0)
-		String = (char *)POV_REALLOC(String, String_Index, "String Literal Buffer");
+		String = reinterpret_cast<char *>(POV_REALLOC(String, String_Index, "String Literal Buffer"));
 
 	String_Buffer_Free = 0;
 }
@@ -1353,7 +1353,7 @@ void Parser::Read_Symbol()
 							break;
 						}
 
-						a = (POV_ARRAY *)(*(Token.DataPtr));
+						a = reinterpret_cast<POV_ARRAY *>(*(Token.DataPtr));
 						j = 0;
 
 						for (i=0; i <= a->Dims; i++)
@@ -1387,7 +1387,7 @@ void Parser::Read_Symbol()
 					}
 					else
 					{
-						Par             = (POV_PARAM *)(Temp_Entry->Data);
+						Par             = reinterpret_cast<POV_PARAM *>(Temp_Entry->Data);
 						Token.Token_Id  = *(Par->NumberPtr);
 						Token.is_array_elem = false;
 						Token.NumberPtr = Par->NumberPtr;
@@ -1489,7 +1489,7 @@ char *Parser::Get_Reserved_Words (const char *additional_words)
 
 	length += (int)strlen (additional_words) ;
 
-	char *result = (char *) POV_MALLOC (++length, "Keyword List") ;
+	char *result = reinterpret_cast<char *>(POV_MALLOC (++length, "Keyword List")) ;
 	strcpy (result, additional_words) ;
 	char *s = result + strlen (additional_words) ;
 
@@ -2077,7 +2077,7 @@ void Parser::Parse_Directive(int After_Hash)
 						if ((Entry == NULL) || (Entry->Token_Number != FLOAT_ID_TOKEN))
 							Error ("#for loop variable must remain defined and numerical during loop.");
 
-						DBL* CurrentPtr = (DBL*)Entry->Data;
+						DBL* CurrentPtr = reinterpret_cast<DBL*>(Entry->Data);
 						DBL  End        = Cond_Stack[CS_Index].For_Loop_End;
 						DBL  Step       = Cond_Stack[CS_Index].For_Loop_Step;
 
@@ -2708,7 +2708,7 @@ void Parser::Add_Sym_Table()
 		Error("Too many nested symbol tables");
 	}
 
-	Tables[Table_Index]=New=(SYM_TABLE *)POV_MALLOC(sizeof(SYM_TABLE),"symbol table");
+	Tables[Table_Index]=New=reinterpret_cast<SYM_TABLE *>(POV_MALLOC(sizeof(SYM_TABLE),"symbol table"));
 
 	for (i = 0; i < SYM_TABLE_SIZE; i++)
 	{
@@ -2743,7 +2743,7 @@ SYM_ENTRY *Parser::Create_Entry (int Index,const char *Name,TOKEN Number)
 {
 	SYM_ENTRY *New;
 
-	New = (SYM_ENTRY *)POV_MALLOC(sizeof(SYM_ENTRY), "symbol table entry");
+	New = reinterpret_cast<SYM_ENTRY *>(POV_MALLOC(sizeof(SYM_ENTRY), "symbol table entry"));
 
 	New->Token_Number        = Number;
 	New->Data                = NULL;
@@ -2943,9 +2943,9 @@ Parser::POV_MACRO *Parser::Parse_Macro()
 		END_CASE
 	END_EXPECT
 
-	New=(POV_MACRO *)POV_MALLOC(sizeof(POV_MACRO),"macro");
+	New=reinterpret_cast<POV_MACRO *>(POV_MALLOC(sizeof(POV_MACRO),"macro"));
 
-	Table_Entry->Data=(void *)New;
+	Table_Entry->Data=reinterpret_cast<void *>(New);
 
 	New->Macro_Filename = NULL;
 	New->Num_Of_Pars=0;
@@ -3031,14 +3031,14 @@ Parser::POV_MACRO *Parser::Parse_Macro()
 
 void Parser::Invoke_Macro()
 {
-	POV_MACRO *PMac=(POV_MACRO *)Token.Data;
+	POV_MACRO *PMac=reinterpret_cast<POV_MACRO *>(Token.Data);
 	SYM_ENTRY **Table_Entries=NULL;
 	int i,Local_Index;
 
 	if(PMac == NULL)
 	{
 		if(Token.DataPtr!=NULL)
-			PMac = (POV_MACRO*)(*(Token.DataPtr));
+			PMac = reinterpret_cast<POV_MACRO*>(*(Token.DataPtr));
 		else
 			Error("Error in Invoke_Macro");
 	}
@@ -3049,7 +3049,7 @@ void Parser::Invoke_Macro()
 
 	if (PMac->Num_Of_Pars > 0)
 	{
-		Table_Entries = (SYM_ENTRY **)POV_MALLOC(sizeof(SYM_ENTRY *)*PMac->Num_Of_Pars,"parameters");
+		Table_Entries = reinterpret_cast<SYM_ENTRY **>(POV_MALLOC(sizeof(SYM_ENTRY *)*PMac->Num_Of_Pars,"parameters"));
 
 		/* We must parse all parameters before adding new symbol table
 		   or adding entries.  Otherwise recursion won't always work.
@@ -3179,7 +3179,7 @@ Parser::POV_ARRAY *Parser::Parse_Array_Declare (void)
 	POV_ARRAY *New;
 	int i,j;
 
-	New=(POV_ARRAY *)POV_MALLOC(sizeof(POV_ARRAY),"array");
+	New=reinterpret_cast<POV_ARRAY *>(POV_MALLOC(sizeof(POV_ARRAY),"array"));
 
 	i=0;
 	j=1;
@@ -3214,7 +3214,7 @@ Parser::POV_ARRAY *Parser::Parse_Array_Declare (void)
 	New->Dims     = i-1;
 	New->Total    = j;
 	New->Type     = EMPTY_ARRAY_TOKEN;
-	New->DataPtrs = (void **)POV_MALLOC(sizeof(void *)*j,"array");
+	New->DataPtrs = reinterpret_cast<void **>(POV_MALLOC(sizeof(void *)*j,"array"));
 
 	j = 1;
 
@@ -3284,13 +3284,13 @@ void Parser::Parse_Fopen(void)
 	UCS2String ign;
 	SYM_ENTRY *Entry;
 
-	New=(DATA_FILE *)POV_MALLOC(sizeof(DATA_FILE),"user file");
+	New=reinterpret_cast<DATA_FILE *>(POV_MALLOC(sizeof(DATA_FILE),"user file"));
 	New->In_File=NULL;
 	New->Out_File=NULL;
 
 	GET(IDENTIFIER_TOKEN)
 	Entry = Add_Symbol (1,Token.Token_String,FILE_ID_TOKEN);
-	Entry->Data=(void *)New;
+	Entry->Data=reinterpret_cast<void *>(New);
 
 	asciitemp = Parse_C_String(true);
 	temp = ASCIItoUCS2String(asciitemp);
@@ -3348,7 +3348,7 @@ void Parser::Parse_Fclose(void)
 
 	EXPECT
 		CASE(FILE_ID_TOKEN)
-			Data=(DATA_FILE *)Token.Data;
+			Data=reinterpret_cast<DATA_FILE *>(Token.Data);
 			if(Data->In_File != NULL)
 				delete Data->In_File;
 			if(Data->Out_File != NULL)
@@ -3376,7 +3376,7 @@ void Parser::Parse_Read()
 	GET(LEFT_PAREN_TOKEN)
 
 	GET(FILE_ID_TOKEN)
-	User_File=(DATA_FILE *)Token.Data;
+	User_File=reinterpret_cast<DATA_FILE *>(Token.Data);
 	File_Id=POV_STRDUP(Token.Token_String);
 	if(User_File->In_File == NULL)
 		Error("Cannot read from file %s because the file is open for writing only.", UCS2toASCIIString(UCS2String(User_File->Out_File->name())).c_str());
@@ -3476,8 +3476,8 @@ int Parser::Parse_Read_Value(DATA_FILE *User_File,int Previous,int *NumberPtr,vo
 				Val=Parse_Signed_Float();
 				*NumberPtr = FLOAT_ID_TOKEN;
 				Test_Redefine(Previous,NumberPtr,*DataPtr);
-				*DataPtr   = (void *) Create_Float();
-				*((DBL *)*DataPtr) = Val;
+				*DataPtr   = reinterpret_cast<void *>(Create_Float());
+				*(reinterpret_cast<DBL *>(*DataPtr)) = Val;
 				Parse_Comma(); /* data file comma between 2 data items  */
 				EXIT
 			END_CASE
@@ -3511,29 +3511,29 @@ int Parser::Parse_Read_Value(DATA_FILE *User_File,int Previous,int *NumberPtr,vo
 					case 1:
 						*NumberPtr = UV_ID_TOKEN;
 						Test_Redefine(Previous,NumberPtr,*DataPtr);
-						*DataPtr   = (void *) Create_UV_Vect();
-						Assign_UV_Vect((DBL *)*DataPtr, Express);
+						*DataPtr   = reinterpret_cast<void *>(Create_UV_Vect());
+						Assign_UV_Vect(reinterpret_cast<DBL *>(*DataPtr), Express);
 						break;
 
 					case 2:
 						*NumberPtr = VECTOR_ID_TOKEN;
 						Test_Redefine(Previous,NumberPtr,*DataPtr);
-						*DataPtr   = (void *) Create_Vector();
-						Assign_Vector((DBL *)*DataPtr, Express);
+						*DataPtr   = reinterpret_cast<void *>(Create_Vector());
+						Assign_Vector(reinterpret_cast<DBL *>(*DataPtr), Express);
 						break;
 
 					case 3:
 						*NumberPtr = VECTOR_4D_ID_TOKEN;
 						Test_Redefine(Previous,NumberPtr,*DataPtr);
-						*DataPtr   = (void *) Create_Vector_4D();
-						Assign_Vector_4D((DBL *)*DataPtr, Express);
+						*DataPtr   = reinterpret_cast<void *>(Create_Vector_4D());
+						Assign_Vector_4D(reinterpret_cast<DBL *>(*DataPtr), Express);
 						break;
 
 					case 4:
 						*NumberPtr    = COLOUR_ID_TOKEN;
 						Test_Redefine(Previous,NumberPtr,*DataPtr);
-						*DataPtr      = (void *) Create_Colour();
-						Assign_Colour_Express((COLC*)(*DataPtr), Express); /* NK fix assign_colour bug */
+						*DataPtr      = reinterpret_cast<void *>(Create_Colour());
+						Assign_Colour_Express(reinterpret_cast<COLC *>(*DataPtr), Express); /* NK fix assign_colour bug */
 						break;
 				}
 
@@ -3590,7 +3590,7 @@ void Parser::Parse_Write(void)
 	GET(LEFT_PAREN_TOKEN)
 	GET(FILE_ID_TOKEN)
 
-	User_File=(DATA_FILE *)Token.Data;
+	User_File=reinterpret_cast<DATA_FILE *>(Token.Data);
 	if(User_File->Out_File == NULL)
 		Error("Cannot write to file %s because the file is open for reading only.", UCS2toASCIIString(UCS2String(User_File->In_File->name())).c_str());
 
@@ -3785,8 +3785,8 @@ int Parser::Parse_Ifdef_Param (void)
 
 			if ( Token.Token_Id == PARAMETER_ID_TOKEN )
 			{
-				Token.NumberPtr = ((POV_PARAM *)(Entry->Data))->NumberPtr;
-				Token.DataPtr   = ((POV_PARAM *)(Entry->Data))->DataPtr;
+				Token.NumberPtr = (reinterpret_cast<POV_PARAM *>(Entry->Data))->NumberPtr;
+				Token.DataPtr   = (reinterpret_cast<POV_PARAM *>(Entry->Data))->DataPtr;
 			}
 
 			if (Token.NumberPtr && *(Token.NumberPtr)==ARRAY_ID_TOKEN)
@@ -3801,7 +3801,7 @@ int Parser::Parse_Ifdef_Param (void)
 					break;
 				}
 
-				a = (POV_ARRAY *)(*(Token.DataPtr));
+				a = reinterpret_cast<POV_ARRAY *>(*(Token.DataPtr));
 				j = 0;
 
 				for (i=0; i <= a->Dims; i++)
@@ -3936,11 +3936,11 @@ int Parser::Parse_For_Param (char** IdentifierPtr, DBL* EndPtr, DBL* StepPtr)
 
 	*Token.NumberPtr = FLOAT_ID_TOKEN;
 	Test_Redefine(Previous,Token.NumberPtr,*Token.DataPtr, true);
-	*Token.DataPtr   = (void *) Create_Float();
-	DBL* CurrentPtr = ((DBL *)*Token.DataPtr);
+	*Token.DataPtr   = reinterpret_cast<void *>(Create_Float());
+	DBL* CurrentPtr = (reinterpret_cast<DBL *>(*Token.DataPtr));
 
 	size_t len = strlen(Token.Token_String)+1;
-	*IdentifierPtr = (char*)POV_MALLOC(len, "loop identifier");
+	*IdentifierPtr = reinterpret_cast<char *>(POV_MALLOC(len, "loop identifier"));
 	memcpy(*IdentifierPtr, Token.Token_String, len);
 
 	Parse_Comma();

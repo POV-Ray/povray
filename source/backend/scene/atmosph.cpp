@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/scene/atmosph.cpp $
- * $Revision: #24 $
- * $Change: 6082 $
- * $DateTime: 2013/11/10 06:21:12 $
+ * $Revision: #25 $
+ * $Change: 6085 $
+ * $DateTime: 2013/11/10 07:39:29 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -142,7 +142,7 @@ FOG *Copy_Fog(const FOG *Old)
 
 	*New = *Old;
 
-	New->Turb = (TURB *)Copy_Warps(((WARP *)Old->Turb));
+	New->Turb = reinterpret_cast<TURB *>(Copy_Warps((reinterpret_cast<WARP *>(Old->Turb))));
 
 	return (New);
 }
@@ -420,7 +420,7 @@ SKYSPHERE *Copy_Skysphere(const SKYSPHERE *Old)
 
 	if (New->Count > 0)
 	{
-		New->Pigments = (PIGMENT **)POV_MALLOC(New->Count*sizeof(PIGMENT *), "skysphere pigment");
+		New->Pigments = reinterpret_cast<PIGMENT **>(POV_MALLOC(New->Count*sizeof(PIGMENT *), "skysphere pigment"));
 
 		for (i = 0; i < New->Count; i++)
 		{

@@ -25,11 +25,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/bounding/bcyl.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/bounding/bcyl.cpp $
+ * $Revision: #17 $
+ * $Change: 6085 $
+ * $DateTime: 2013/11/10 07:39:29 $
+ * $Author: clipka $
  *******************************************************************************/
 
 // frame.h must always be the first POV file included (pulls in platform config)
@@ -552,23 +552,23 @@ BCYL *Create_BCyl(int number, const DBL *tmp_r1, const DBL *tmp_r2, const DBL *t
 
 	/* Allocate bounding cylinder. */
 
-	bcyl = (BCYL *)POV_MALLOC(sizeof(BCYL), "bounding cylinder");
+	bcyl = reinterpret_cast<BCYL *>(POV_MALLOC(sizeof(BCYL), "bounding cylinder"));
 
 	/* Allocate entries. */
 
 	bcyl->number = number;
 
-	bcyl->entry = (BCYL_ENTRY *)POV_MALLOC(bcyl->number*sizeof(BCYL_ENTRY), "bounding cylinder data");
+	bcyl->entry = reinterpret_cast<BCYL_ENTRY *>(POV_MALLOC(bcyl->number*sizeof(BCYL_ENTRY), "bounding cylinder data"));
 
 	/* Allocate temporary lists. */
 
-	tmp_r1_index = (int *)POV_MALLOC(bcyl->number * sizeof(int), "temp lathe data");
-	tmp_r2_index = (int *)POV_MALLOC(bcyl->number * sizeof(int), "temp lathe data");
-	tmp_h1_index = (int *)POV_MALLOC(bcyl->number * sizeof(int), "temp lathe data");
-	tmp_h2_index = (int *)POV_MALLOC(bcyl->number * sizeof(int), "temp lathe data");
+	tmp_r1_index = reinterpret_cast<int *>(POV_MALLOC(bcyl->number * sizeof(int), "temp lathe data"));
+	tmp_r2_index = reinterpret_cast<int *>(POV_MALLOC(bcyl->number * sizeof(int), "temp lathe data"));
+	tmp_h1_index = reinterpret_cast<int *>(POV_MALLOC(bcyl->number * sizeof(int), "temp lathe data"));
+	tmp_h2_index = reinterpret_cast<int *>(POV_MALLOC(bcyl->number * sizeof(int), "temp lathe data"));
 
-	tmp_radius = (DBL *)POV_MALLOC(2 * bcyl->number * sizeof(DBL), "temp lathe data");
-	tmp_height = (DBL *)POV_MALLOC(2 * bcyl->number * sizeof(DBL), "temp lathe data");
+	tmp_radius = reinterpret_cast<DBL *>(POV_MALLOC(2 * bcyl->number * sizeof(DBL), "temp lathe data"));
+	tmp_height = reinterpret_cast<DBL *>(POV_MALLOC(2 * bcyl->number * sizeof(DBL), "temp lathe data"));
 
 	/* Get different bounding radii and heights. */
 
@@ -645,8 +645,8 @@ BCYL *Create_BCyl(int number, const DBL *tmp_r1, const DBL *tmp_r2, const DBL *t
 
 	/* Copy lists into the lathe. */
 
-	bcyl->radius = (DBL *)POV_MALLOC(nr * sizeof(DBL), "bounding cylinder data");
-	bcyl->height = (DBL *)POV_MALLOC(nh * sizeof(DBL), "bounding cylinder data");
+	bcyl->radius = reinterpret_cast<DBL *>(POV_MALLOC(nr * sizeof(DBL), "bounding cylinder data"));
+	bcyl->height = reinterpret_cast<DBL *>(POV_MALLOC(nh * sizeof(DBL), "bounding cylinder data"));
 
 	for (i = 0; i < nr; i++)
 	{

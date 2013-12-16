@@ -24,11 +24,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/shape/csg.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/shape/csg.cpp $
+ * $Revision: #58 $
+ * $Change: 6085 $
+ * $DateTime: 2013/11/10 07:39:29 $
+ * $Author: clipka $
  *******************************************************************************/
 
 // frame.h must always be the first POV file included (pulls in platform config)
@@ -225,7 +225,7 @@ bool CSGIntersection::All_Intersections(const Ray& ray, IStack& Depth_Stack, Tra
 					{
 						if(*Inside_Sib != *Current_Sib)
 						{
-							if(!((*Inside_Sib)->Type & LIGHT_SOURCE_OBJECT) || (!((LightSource *)(*Inside_Sib))->children.empty()))
+							if(!((*Inside_Sib)->Type & LIGHT_SOURCE_OBJECT) || (!(reinterpret_cast<LightSource *>(*Inside_Sib))->children.empty()))
 							{
 								if(!Inside_Object(Local_Stack->top().IPoint, *Inside_Sib, Thread))
 								{
@@ -324,7 +324,7 @@ bool CSGMerge::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThrea
 							{
 								if (*Sib1 != *Sib2)
 								{
-									if (!((*Sib2)->Type & LIGHT_SOURCE_OBJECT) || (!((LightSource *)(*Sib2))->children.empty()))
+									if (!((*Sib2)->Type & LIGHT_SOURCE_OBJECT) || (!(reinterpret_cast<LightSource *>(*Sib2))->children.empty()))
 									{
 										if ( Test_Ray_Flags_Shadow(ray, (*Sib2)) )// TODO CLARIFY - why does CSGUnion use Test_Ray_Flags(), while CSGMerge uses Test_Ray_Flags_Shadow(), and CSGIntersection uses neither?
 										{
@@ -391,7 +391,7 @@ bool CSGUnion::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
 {
 	for(vector<ObjectPtr>::const_iterator Current_Sib = children.begin(); Current_Sib != children.end(); Current_Sib++)
 	{
-		if(!((*Current_Sib)->Type & LIGHT_SOURCE_OBJECT) || (!((LightSource *)(*Current_Sib))->children.empty()))
+		if(!((*Current_Sib)->Type & LIGHT_SOURCE_OBJECT) || (!(reinterpret_cast<LightSource *>(*Current_Sib))->children.empty()))
 		{
 			if(Inside_Object(IPoint, *Current_Sib, Thread))
 				return (true);
@@ -432,7 +432,7 @@ bool CSGUnion::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
 bool CSGIntersection::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
 {
 	for(vector<ObjectPtr>::const_iterator Current_Sib = children.begin(); Current_Sib != children.end(); Current_Sib++)
-		if(!((*Current_Sib)->Type & LIGHT_SOURCE_OBJECT) || (!((LightSource *)(*Current_Sib))->children.empty()))
+		if(!((*Current_Sib)->Type & LIGHT_SOURCE_OBJECT) || (!(reinterpret_cast<LightSource *>(*Current_Sib))->children.empty()))
 			if(!Inside_Object(IPoint, (*Current_Sib), Thread))
 				return (false);
 	return (true);
@@ -897,7 +897,7 @@ void CSG::Compute_BBox()
 				if(dynamic_cast<Quadric *>(*Current_Sib) == NULL) // FIXME
 				{
 					if(dynamic_cast<Plane *>(*Current_Sib) != NULL) // FIXME
-						Quadric::Compute_Plane_Min_Max((Plane *)(*Current_Sib), TmpMin, TmpMax);
+						Quadric::Compute_Plane_Min_Max(dynamic_cast<Plane *>(*Current_Sib), TmpMin, TmpMax);
 					else
 						Make_min_max_from_BBox(TmpMin, TmpMax, (*Current_Sib)->BBox);
 

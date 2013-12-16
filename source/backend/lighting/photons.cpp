@@ -26,11 +26,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/lighting/photons.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/lighting/photons.cpp $
+ * $Revision: #55 $
+ * $Change: 6085 $
+ * $DateTime: 2013/11/10 07:39:29 $
+ * $Author: clipka $
  *******************************************************************************/
 
 // frame.h must always be the first POV file included (pulls in platform config)
@@ -369,7 +369,7 @@ void PhotonTrace::ComputeLightedTexture(Colour& LightCol, const TEXTURE *Texture
 	one_colour_found = false;
 	for (layer_number = 0, Layer = Texture;
 	     (Layer != NULL) && (Trans > ticket.adcBailout);
-	     layer_number++, Layer = (TEXTURE *)Layer->Next)
+	     layer_number++, Layer = reinterpret_cast<TEXTURE *>(Layer->Next))
 	{
 		// Get perturbed surface normal.
 		LayNormal = rawnormal;
@@ -696,7 +696,7 @@ void PhotonTrace::ComputeLightedTexture(Colour& LightCol, const TEXTURE *Texture
 			if (threadData->photonTargetObject==NULL)
 				break;
 
-			Layer = (TEXTURE *)Layer->Next;
+			Layer = reinterpret_cast<TEXTURE *>(Layer->Next);
 		}
 	}
 
@@ -1268,7 +1268,7 @@ PhotonMap::PhotonMap()
 	// allocate the base array
 	numPhotons = 0;
 	numBlocks = INITIAL_BASE_ARRAY_SIZE;
-	head = (PhotonBlock *)POV_MALLOC(sizeof(PhotonBlock *)*INITIAL_BASE_ARRAY_SIZE, "photons");
+	head = reinterpret_cast<PhotonBlock *>(POV_MALLOC(sizeof(PhotonBlock *)*INITIAL_BASE_ARRAY_SIZE, "photons"));
 
 	// zero the array
 	for(k=0; k<numBlocks; k++)
@@ -1282,8 +1282,8 @@ SinCosOptimizations::SinCosOptimizations()
 
 	// create the sin/cos arrays for speed
 	// range is -127..+127  =>  0..254
-	sinTheta = (DBL *)POV_MALLOC(sizeof(DBL)*255, "Photon Map Info");
-	cosTheta = (DBL *)POV_MALLOC(sizeof(DBL)*255, "Photon Map Info");
+	sinTheta = reinterpret_cast<DBL *>(POV_MALLOC(sizeof(DBL)*255, "Photon Map Info"));
+	cosTheta = reinterpret_cast<DBL *>(POV_MALLOC(sizeof(DBL)*255, "Photon Map Info"));
 	for(i=0; i<255; i++)
 	{
 		theta = (double)(i-127)*M_PI/127.0;
@@ -1351,7 +1351,7 @@ Photon* PhotonMap::AllocatePhoton()
 	{
 		// the base array is too small, we need to reallocate it
 		Photon **newMap;
-		newMap = (Photon **)POV_MALLOC(sizeof(Photon *)*this->numBlocks*2, "photons");
+		newMap = reinterpret_cast<Photon **>(POV_MALLOC(sizeof(Photon *)*this->numBlocks*2, "photons"));
 		this->numBlocks*=2;
 
 		// copy entries
@@ -1369,7 +1369,7 @@ Photon* PhotonMap::AllocatePhoton()
 
 	if(this->head[j] == NULL)
 		// allocate a new block of photons
-		this->head[j] = (Photon *)POV_MALLOC(sizeof(Photon)*PHOTON_BLOCK_SIZE, "photons");
+		this->head[j] = reinterpret_cast<Photon *>(POV_MALLOC(sizeof(Photon)*PHOTON_BLOCK_SIZE, "photons"));
 
 	return &(this->head[j][i]);
 }
@@ -1394,7 +1394,7 @@ void PhotonMap::mergeMap(PhotonMap* map)
 	{
 		// the base array is too small, we need to reallocate it
 		Photon **newMap;
-		newMap = (Photon **)POV_MALLOC(sizeof(Photon *)*blocksNeeded, "photons");
+		newMap = reinterpret_cast<Photon **>(POV_MALLOC(sizeof(Photon *)*blocksNeeded, "photons"));
 		this->numBlocks = blocksNeeded;
 
 		int k;
@@ -1426,7 +1426,7 @@ void PhotonMap::mergeMap(PhotonMap* map)
 	if(map->head[mapj]!=NULL)
 	{
 		if(this->head[thisj]==NULL)
-			this->head[thisj] = (Photon *)POV_MALLOC(sizeof(Photon)*PHOTON_BLOCK_SIZE, "photons");
+			this->head[thisj] = reinterpret_cast<Photon *>(POV_MALLOC(sizeof(Photon)*PHOTON_BLOCK_SIZE, "photons"));
 
 		int i;
 		for(i=0; thisi<PHOTON_BLOCK_SIZE && i<mapi; i++,thisi++)
@@ -1437,7 +1437,7 @@ void PhotonMap::mergeMap(PhotonMap* map)
 		if(i<mapi)
 		{
 			thisj++;
-			this->head[thisj] = (Photon *)POV_MALLOC(sizeof(Photon)*PHOTON_BLOCK_SIZE, "photons");
+			this->head[thisj] = reinterpret_cast<Photon *>(POV_MALLOC(sizeof(Photon)*PHOTON_BLOCK_SIZE, "photons"));
 			thisi=0;
 			for(/*nothing*/;i<mapi;i++,thisi++)
 			{
@@ -2718,8 +2718,8 @@ void GatheredPhotons::swapWith(GatheredPhotons& toCopy)
 GatheredPhotons::GatheredPhotons(int maxGatherCount)
 {
 	numFound = 0;
-	photonGatherList = (Photon**)POV_MALLOC(sizeof(Photon *)*maxGatherCount, "Photon Map Info");
-	photonDistances = (DBL *)POV_MALLOC(sizeof(DBL)*maxGatherCount, "Photon Map Info");
+	photonGatherList = reinterpret_cast<Photon**>(POV_MALLOC(sizeof(Photon *)*maxGatherCount, "Photon Map Info"));
+	photonDistances = reinterpret_cast<DBL *>(POV_MALLOC(sizeof(DBL)*maxGatherCount, "Photon Map Info"));
 }
 
 GatheredPhotons::~GatheredPhotons()

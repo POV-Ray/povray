@@ -24,11 +24,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/colour/colour.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/colour/colour.cpp $
+ * $Revision: #17 $
+ * $Change: 6085 $
+ * $DateTime: 2013/11/10 07:39:29 $
+ * $Author: clipka $
  *******************************************************************************/
 
 // frame.h must always be the first POV file included (pulls in platform config)
@@ -98,7 +98,7 @@ COLOUR *Create_Colour ()
 {
 	COLOUR *New;
 
-	New = (COLOUR *)POV_MALLOC(sizeof (COLOUR), "color");
+	New = reinterpret_cast<COLOUR *>(POV_MALLOC(sizeof (COLOUR), "color"));
 
 	Make_ColourA (*New, 0.0, 0.0, 0.0, 0.0, 0.0);
 
@@ -179,7 +179,7 @@ BLEND_MAP_ENTRY *Create_BMap_Entries (int Map_Size)
 {
 	BLEND_MAP_ENTRY *New;
 
-	New = (BLEND_MAP_ENTRY *)POV_CALLOC(Map_Size, sizeof (BLEND_MAP_ENTRY), "blend map entry");
+	New = reinterpret_cast<BLEND_MAP_ENTRY *>(POV_CALLOC(Map_Size, sizeof (BLEND_MAP_ENTRY), "blend map entry"));
 
 	return (New);
 }
@@ -287,7 +287,7 @@ BLEND_MAP *Create_Blend_Map ()
 {
 	BLEND_MAP *New;
 
-	New = (BLEND_MAP *)POV_MALLOC(sizeof (BLEND_MAP), "blend map");
+	New = reinterpret_cast<BLEND_MAP *>(POV_MALLOC(sizeof (BLEND_MAP), "blend map"));
 
 	New->Users = 1;
 

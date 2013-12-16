@@ -145,7 +145,7 @@ extern "C"
 
 	void png_pov_warn(png_structp png_ptr, png_const_charp msg)
 	{
-		Messages *m = (Messages *)png_get_error_ptr(png_ptr);
+		Messages *m = reinterpret_cast<Messages *>(png_get_error_ptr(png_ptr));
 
 		if (m)
 			m->warnings.push_back (string(msg)) ;
@@ -175,7 +175,7 @@ extern "C"
 
 	void png_pov_err(png_structp png_ptr, png_const_charp msg)
 	{
-		Messages *m = (Messages *)png_get_error_ptr(png_ptr);
+		Messages *m = reinterpret_cast<Messages *>(png_get_error_ptr(png_ptr));
 
 		if (m)
 			m->error = string(msg) ;
@@ -205,11 +205,11 @@ extern "C"
 
 	void png_pov_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
 	{
-		IStream *file = (IStream *)png_get_io_ptr(png_ptr);
+		IStream *file = reinterpret_cast<IStream *>(png_get_io_ptr(png_ptr));
 
-		if (!file->read ((char *)data, length))
+		if (!file->read (data, length))
 		{
-			Messages *m = (Messages *)png_get_error_ptr(png_ptr);
+			Messages *m = reinterpret_cast<Messages *>(png_get_error_ptr(png_ptr));
 			if (m)
 				m->error = string("Cannot read PNG data");
 			throw POV_EXCEPTION(kFileDataErr, "Cannot read PNG data");
@@ -239,11 +239,11 @@ extern "C"
 
 	void png_pov_write_data(png_structp png_ptr, png_bytep data, png_size_t length)
 	{
-		OStream *file = (OStream *)png_get_io_ptr(png_ptr);
+		OStream *file = reinterpret_cast<OStream *>(png_get_io_ptr(png_ptr));
 
-		if (!file->write ((char *)data, length))
+		if (!file->write (data, length))
 		{
-			Messages *m = (Messages *)png_get_error_ptr(png_ptr);
+			Messages *m = reinterpret_cast<Messages *>(png_get_error_ptr(png_ptr));
 			if (m)
 				m->error = string("Cannot write PNG data");
 			throw POV_EXCEPTION(kFileDataErr, "Cannot write PNG data");
@@ -273,7 +273,7 @@ extern "C"
 
 	void png_pov_flush_data(png_structp png_ptr)
 	{
-		OStream *file = (OStream *)png_get_io_ptr(png_ptr);
+		OStream *file = reinterpret_cast<OStream *>(png_get_io_ptr(png_ptr));
 		file->flush();
 	}
 

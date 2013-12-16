@@ -24,11 +24,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/lighting/radiosity.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/lighting/radiosity.cpp $
+ * $Revision: #59 $
+ * $Change: 6085 $
+ * $DateTime: 2013/11/10 07:39:29 $
+ * $Author: clipka $
  *******************************************************************************/
 
 /************************************************************************
@@ -1210,7 +1210,7 @@ OT_NODE *RadiosityCache::GetNode(RenderStatistics* stats, const OT_ID& id)
 		// (some other thread might have created it just as we were waiting to get the lock)
 		if (octree.root == NULL)
 		{
-			octree.root = (OT_NODE *)POV_CALLOC(1, sizeof(OT_NODE), "octree node");
+			octree.root = reinterpret_cast<OT_NODE *>(POV_CALLOC(1, sizeof(OT_NODE), "octree node"));
 #ifdef OCTREE_PERFORMANCE_DEBUG
 			if (stats != NULL) (*stats)[Radiosity_OctreeNodes]++;
 #endif
@@ -1336,7 +1336,7 @@ OT_NODE *RadiosityCache::GetNode(RenderStatistics* stats, const OT_ID& id)
 			// We may have acquired the lock just now, so some other task may have changed the root since last time we looked
 			if (this_node->Kids[index] == NULL)
 			{
-				temp_node = (OT_NODE *)POV_CALLOC(1, sizeof(OT_NODE), "octree node");
+				temp_node = reinterpret_cast<OT_NODE *>(POV_CALLOC(1, sizeof(OT_NODE), "octree node"));
 #ifdef OCTREE_PERFORMANCE_DEBUG
 				if (stats!= NULL) (*stats)[Radiosity_OctreeNodes]++;
 #endif
@@ -1427,7 +1427,7 @@ DBL RadiosityCache::FindReusableBlock(RenderStatistics& stats, DBL errorbound, c
 		// Go through the tree calculating a weighted average of all of the usable points near this one
 		// [CLi] inspection of octree.cpp tree code indicates that tree traversal is perfectly safe
 		// regarding insertions by other threads, so no locking is needed
-		ot_dist_traverse(octree.root, ipoint, recursionDepth, AverageNearBlock, (void *)&gather);
+		ot_dist_traverse(octree.root, ipoint, recursionDepth, AverageNearBlock, reinterpret_cast<void *>(&gather));
 
 #ifdef OCTREE_PERFORMANCE_DEBUG
 		stats[Radiosity_OctreeLookups]  += gather.Lookup_Count;
@@ -1491,7 +1491,7 @@ DBL RadiosityCache::FindReusableBlock(RenderStatistics& stats, DBL errorbound, c
 
 bool RadiosityCache::AverageNearBlock(OT_BLOCK *block, void *void_info)
 {
-	WT_AVG *info = (WT_AVG *)void_info;
+	WT_AVG *info = reinterpret_cast<WT_AVG *>(void_info);
 
 #ifdef OCTREE_PERFORMANCE_DEBUG
 	info->Lookup_Count ++;

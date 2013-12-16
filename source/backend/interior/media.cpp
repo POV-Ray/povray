@@ -24,11 +24,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/interior/media.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/interior/media.cpp $
+ * $Revision: #44 $
+ * $Change: 6085 $
+ * $DateTime: 2013/11/10 07:39:29 $
+ * $Author: clipka $
  *******************************************************************************/
 
 // frame.h must always be the first POV file included (pulls in platform config)
@@ -147,7 +147,7 @@ Media& Media::operator=(const Media& source)
 		{
 			if(Intervals > 0)
 			{
-				Sample_Threshold = (DBL *)POV_MALLOC(Intervals * sizeof(DBL), "sample threshold list");
+				Sample_Threshold = reinterpret_cast<DBL *>(POV_MALLOC(Intervals * sizeof(DBL), "sample threshold list"));
 
 				for(int i = 0; i < Intervals; i++)
 					Sample_Threshold[i] =  source.Sample_Threshold[i];
@@ -188,7 +188,7 @@ void Media::PostProcess()
 		POV_FREE(Sample_Threshold);
 
 	// Create list of thresholds for confidence test.
-	Sample_Threshold = (DBL *)POV_MALLOC(Max_Samples*sizeof(DBL), "sample threshold list");
+	Sample_Threshold = reinterpret_cast<DBL *>(POV_MALLOC(Max_Samples*sizeof(DBL), "sample threshold list"));
 
 	if(Max_Samples > 1)
 	{
@@ -211,7 +211,7 @@ void Media::PostProcess()
 
 void Transform_Density(PIGMENT *Density, const TRANSFORM *Trans)
 {
-	TPATTERN *Temp = (TPATTERN *)Density;
+	TPATTERN *Temp = reinterpret_cast<TPATTERN *>(Density);
 
 	while(Temp != NULL)
 	{

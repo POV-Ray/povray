@@ -27,11 +27,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/parser/function.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/parser/function.cpp $
+ * $Revision: #19 $
+ * $Change: 6085 $
+ * $DateTime: 2013/11/10 07:39:29 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #include <limits.h>
@@ -300,7 +300,7 @@ FUNCTION_PTR Parser::Parse_DeclareFunction(int *token_id, const char *fn_name, b
 		function.private_copy_method = (FNCODE_PRIVATE_COPY_METHOD)Copy_Transform;
 		function.private_destroy_method = (FNCODE_PRIVATE_DESTROY_METHOD)Destroy_Transform;
 
-		function.private_data = (void *)Parse_Transform_Block();
+		function.private_data = reinterpret_cast<void *>(Parse_Transform_Block());
 
 		function.return_size = 3; // returns a 3d vector!!!
 
@@ -320,10 +320,10 @@ FUNCTION_PTR Parser::Parse_DeclareFunction(int *token_id, const char *fn_name, b
 		function.private_destroy_method = (FNCODE_PRIVATE_DESTROY_METHOD)Destroy_Spline;
 
 		Parse_Begin();
-		function.private_data = (void *)Parse_Spline();
+		function.private_data = reinterpret_cast<void *>(Parse_Spline());
 		Parse_End();
 
-		function.return_size = ((SPLINE *)(function.private_data))->Terms; // returns a 2d, 3d, 4d or 5d vector!!!
+		function.return_size = (reinterpret_cast<SPLINE *>(function.private_data))->Terms; // returns a 2d, 3d, 4d or 5d vector!!!
 
 		// function type is vector function
 		*token_id = VECTFUNCT_ID_TOKEN;
@@ -339,10 +339,10 @@ FUNCTION_PTR Parser::Parse_DeclareFunction(int *token_id, const char *fn_name, b
 		function.private_destroy_method = (FNCODE_PRIVATE_DESTROY_METHOD)Destroy_Pigment;
 
 		Parse_Begin();
-		function.private_data = (void *)Create_Pigment();
-		Parse_Pigment((PIGMENT **)(&function.private_data));
+		function.private_data = reinterpret_cast<void *>(Create_Pigment());
+		Parse_Pigment(reinterpret_cast<PIGMENT **>(&function.private_data));
 		Parse_End();
-		Post_Pigment((PIGMENT *)(function.private_data));
+		Post_Pigment(reinterpret_cast<PIGMENT *>(function.private_data));
 
 		function.return_size = 5; // returns a color!!!
 
@@ -360,10 +360,10 @@ FUNCTION_PTR Parser::Parse_DeclareFunction(int *token_id, const char *fn_name, b
 		function.private_destroy_method = (FNCODE_PRIVATE_DESTROY_METHOD)Destroy_Pigment;
 
 		Parse_Begin();
-		function.private_data = (void *)Create_Pigment(); // Yes, this is a pigment! [trf]
-		Parse_PatternFunction((TPATTERN *)(function.private_data));
+		function.private_data = reinterpret_cast<void *>(Create_Pigment()); // Yes, this is a pigment! [trf]
+		Parse_PatternFunction(reinterpret_cast<TPATTERN *>(function.private_data));
 		Parse_End();
-		Post_Pigment((PIGMENT *)(function.private_data));
+		Post_Pigment(reinterpret_cast<PIGMENT *>(function.private_data));
 	}
 	else if(Token.Token_Id == STRING_LITERAL_TOKEN)
 	{

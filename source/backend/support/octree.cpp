@@ -26,11 +26,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/support/octree.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/support/octree.cpp $
+ * $Revision: #31 $
+ * $Change: 6085 $
+ * $DateTime: 2013/11/10 07:39:29 $
+ * $Author: clipka $
  *******************************************************************************/
 
 /************************************************************************
@@ -267,7 +267,7 @@ void ot_ins(OT_NODE **root_ptr, OT_BLOCK *new_block, const OT_ID *new_id)
 		}
 #endif
 
-		*root_ptr = (OT_NODE *)POV_CALLOC(1, sizeof(OT_NODE), "octree node");
+		*root_ptr = reinterpret_cast<OT_NODE *>(POV_CALLOC(1, sizeof(OT_NODE), "octree node"));
 
 #ifdef RADSTATS
 		ot_nodecount = 1;
@@ -344,7 +344,7 @@ void ot_ins(OT_NODE **root_ptr, OT_BLOCK *new_block, const OT_ID *new_id)
 		if (this_node->Kids[index] == NULL)
 		{
 			// Next level down doesn't exist yet, so create it
-			temp_node = (OT_NODE *)POV_CALLOC(1, sizeof(OT_NODE), "octree node");
+			temp_node = reinterpret_cast<OT_NODE *>(POV_CALLOC(1, sizeof(OT_NODE), "octree node"));
 
 #ifdef RADSTATS
 			ot_nodecount++;
@@ -457,7 +457,7 @@ void ot_newroot(OT_NODE **root_ptr)
 	OT_NODE *newroot;
 	int dx, dy, dz, index;
 
-	newroot = (OT_NODE *)POV_CALLOC(1, sizeof(OT_NODE), "octree node");
+	newroot = reinterpret_cast<OT_NODE *>(POV_CALLOC(1, sizeof(OT_NODE), "octree node"));
 
 #ifdef RADSTATS
 	ot_nodecount++;
@@ -1077,7 +1077,7 @@ bool ot_save_tree(OT_NODE *root, OStream *fd)
 	bool retval = false;
 
 	if(fd != NULL)
-		retval = ot_traverse(root, ot_write_block, (void *)fd);
+		retval = ot_traverse(root, ot_write_block, reinterpret_cast<void *>(fd));
 	else
 ;// TODO MESSAGE    Warning(0, "Bad radiosity cache file handle");
 
@@ -1114,7 +1114,7 @@ bool ot_save_tree(OT_NODE *root, OStream *fd)
 
 bool ot_write_block(OT_BLOCK *bl, void *fd) // must be passed as void * for compatibility
 {
-	((OStream *)fd)->printf("C%d\t%g\t%g\t%g\t%02x%02x%02x\t%.4f\t%.4f\t%.4f\t%g\t%g\t%02x%02x%02x\n", // tw
+	(reinterpret_cast<OStream *>(fd))->printf("C%d\t%g\t%g\t%g\t%02x%02x%02x\t%.4f\t%.4f\t%.4f\t%g\t%g\t%02x%02x%02x\n", // tw
 		(int)(bl->Bounce_Depth + 1), // file format still uses 1-based bounce depth counting
 
 		bl->Point[X], bl->Point[Y], bl->Point[Z],
@@ -1338,7 +1338,7 @@ bool ot_read_file(OT_NODE **root, IStream *fd, const OT_READ_PARAM* param, OT_RE
 
 						line_num++;
 
-						new_block = (OT_BLOCK *)POV_MALLOC(sizeof (OT_BLOCK), "octree node from file");
+						new_block = reinterpret_cast<OT_BLOCK *>(POV_MALLOC(sizeof (OT_BLOCK), "octree node from file"));
 						if ( new_block != NULL )
 						{
 							POV_MEMCPY(new_block, &bl, sizeof (OT_BLOCK));

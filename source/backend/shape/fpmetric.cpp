@@ -409,7 +409,7 @@ bool Parametric::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
 		{
 			/*
 			  compute_param_normal( Par, UResult, VResult , &N); 
-			  push_normal_entry( TResult ,IPoint, N, (ObjectPtr ) Object, Depth_Stack);
+			  push_normal_entry( TResult ,IPoint, N, reinterpret_cast<ObjectPtr>(Object), Depth_Stack);
 			*/
 			Depth_Stack->push(Intersection(TResult, IPoint, uv, this));
 
@@ -977,7 +977,7 @@ void Parametric::Precompute_Parametric_Values(char flags, int depth, FPUContext 
 		throw POV_EXCEPTION_STRING("Precompute: invalid depth");
 	nmb = 1 << depth;
 
-	PData = (PRECOMP_PAR_DATA *)POV_MALLOC(sizeof(PRECOMP_PAR_DATA), es);
+	PData = reinterpret_cast<PRECOMP_PAR_DATA *>(POV_MALLOC(sizeof(PRECOMP_PAR_DATA), es));
 	if (PData == NULL)
 		throw POV_EXCEPTION_STRING("Cannot allocate memory for parametric precomputation data.");
 	PData->flags = flags;
@@ -986,18 +986,18 @@ void Parametric::Precompute_Parametric_Values(char flags, int depth, FPUContext 
 
 	if (flags & OK_X)
 	{
-		PData->Low[0] = (DBL *)POV_MALLOC(sizeof(DBL) * nmb, es);
-		Last = PData->Hi[0] = (DBL *)POV_MALLOC(sizeof(DBL) * nmb, es);
+		PData->Low[0] = reinterpret_cast<DBL *>(POV_MALLOC(sizeof(DBL) * nmb, es));
+		Last = PData->Hi[0] = reinterpret_cast<DBL *>(POV_MALLOC(sizeof(DBL) * nmb, es));
 	}
 	if (flags & OK_Y)
 	{
-		PData->Low[1] = (DBL *)POV_MALLOC(sizeof(DBL) * nmb, es);
-		Last = PData->Hi[1] = (DBL *)POV_MALLOC(sizeof(DBL) * nmb, es);
+		PData->Low[1] = reinterpret_cast<DBL *>(POV_MALLOC(sizeof(DBL) * nmb, es));
+		Last = PData->Hi[1] = reinterpret_cast<DBL *>(POV_MALLOC(sizeof(DBL) * nmb, es));
 	}
 	if (flags & OK_Z)
 	{
-		PData->Low[2] = (DBL *)POV_MALLOC(sizeof(DBL) * nmb, es);
-		Last = PData->Hi[2] = (DBL *)POV_MALLOC(sizeof(DBL) * nmb, es);
+		PData->Low[2] = reinterpret_cast<DBL *>(POV_MALLOC(sizeof(DBL) * nmb, es));
+		Last = PData->Hi[2] = reinterpret_cast<DBL *>(POV_MALLOC(sizeof(DBL) * nmb, es));
 	}
 	if (Last == NULL)
 		throw POV_EXCEPTION_STRING("Cannot allocate memory for parametric precomputation data.");

@@ -24,11 +24,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/shape/quadrics.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/shape/quadrics.cpp $
+ * $Revision: #35 $
+ * $Change: 6085 $
+ * $DateTime: 2013/11/10 07:39:29 $
+ * $Author: clipka $
  *******************************************************************************/
 
 // frame.h must always be the first POV file included (pulls in platform config)
@@ -770,7 +770,7 @@ void Quadric::Compute_BBox(VECTOR ClipMin, VECTOR ClipMax)
 			if (Test_Flag(p, INVERTED_FLAG) == false)
 			{
 				if (dynamic_cast<Plane *> (p) != NULL)
-					Compute_Plane_Min_Max((Plane *) p, TmpMin, TmpMax);
+					Compute_Plane_Min_Max(dynamic_cast<Plane *> (p), TmpMin, TmpMax);
 				else
 					Make_min_max_from_BBox(TmpMin, TmpMax, p->BBox);
 

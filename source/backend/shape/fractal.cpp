@@ -26,11 +26,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/shape/fractal.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/shape/fractal.cpp $
+ * $Revision: #33 $
+ * $Change: 6085 $
+ * $DateTime: 2013/11/10 07:39:29 $
+ * $Author: clipka $
  *******************************************************************************/
 
 // frame.h must always be the first POV file included (pulls in platform config)
@@ -882,7 +882,7 @@ void Fractal::Allocate_Iteration_Stack(DBL **IStack, int Len)
 		return ;
 	const int len = (Len + 1) * sizeof(DBL);
 	for (int i = 0 ; i < 4 ; i++)
-		IStack [i] = (DBL *) POV_MALLOC(len, "fractal iteration stack");
+		IStack [i] = reinterpret_cast<DBL *>(POV_MALLOC(len, "fractal iteration stack"));
 }
 
 /*****************************************************************************

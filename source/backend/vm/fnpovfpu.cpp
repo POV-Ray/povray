@@ -715,10 +715,10 @@ void FPUContext::SetLocal(unsigned int k, DBL v)
 		#endif
 
 		maxdblstacksize = max(k + 1, (unsigned int)256);
-		dblstackbase = (DBL *)POV_REALLOC(dblstackbase, sizeof(DBL) * maxdblstacksize, "fn: stack");
+		dblstackbase = reinterpret_cast<DBL *>(POV_REALLOC(dblstackbase, sizeof(DBL) * maxdblstacksize, "fn: stack"));
 
 		#if (SYS_FUNCTIONS == 1)
-		dblstack = (DBL *)(((size_t)(dblstackbase)) + diff);
+		dblstack = reinterpret_cast<DBL *>(((size_t)(dblstackbase)) + diff);
 		#endif
 	}
 
@@ -1121,11 +1121,11 @@ FPUContext *FunctionVM::NewContext(TraceThreadData *td)
 {
 	boost::recursive_mutex::scoped_lock lock(contextMutex);
 
-	FPUContext *context = (FPUContext *)POV_MALLOC(sizeof(FPUContext), "fn: context");
+	FPUContext *context = reinterpret_cast<FPUContext *>(POV_MALLOC(sizeof(FPUContext), "fn: context"));
 
 	context->maxdblstacksize = 256;
-	context->dblstackbase = (DBL *)POV_MALLOC(sizeof(DBL) * context->maxdblstacksize, "fn: dblstack");
-	context->pstackbase = (StackFrame *)POV_MALLOC(sizeof(StackFrame) * MAX_CALL_STACK_SIZE, "fn: pstack");
+	context->dblstackbase = reinterpret_cast<DBL *>(POV_MALLOC(sizeof(DBL) * context->maxdblstacksize, "fn: dblstack"));
+	context->pstackbase = reinterpret_cast<StackFrame *>(POV_MALLOC(sizeof(StackFrame) * MAX_CALL_STACK_SIZE, "fn: pstack"));
 	context->functionvm = this;
 	context->threaddata = td;
 
@@ -1442,7 +1442,7 @@ DBL POVFPU_RunDefault(FPUContext *context, FUNCTION fn)
 				else if(sp + k >= maxdblstacksize)
 				{
 					maxdblstacksize = context->maxdblstacksize = context->maxdblstacksize + max(k + 1, (unsigned int)256);
-					dblstack = context->dblstackbase = (DBL *)POV_REALLOC(dblstack, sizeof(DBL) * maxdblstacksize, "fn: stack");
+					dblstack = context->dblstackbase = reinterpret_cast<DBL *>(POV_REALLOC(dblstack, sizeof(DBL) * maxdblstacksize, "fn: stack"));
 				}
 				break;
 			OP_SPECIAL_CASE(15,1,1)                     // push  k

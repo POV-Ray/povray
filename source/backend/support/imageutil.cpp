@@ -25,11 +25,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/support/imageutil.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/support/imageutil.cpp $
+ * $Revision: #37 $
+ * $Change: 6085 $
+ * $DateTime: 2013/11/10 07:39:29 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #include <boost/scoped_ptr.hpp>
@@ -146,7 +146,7 @@ bool image_map(const VECTOR EPoint, const PIGMENT *Pigment, Colour& colour)
 
 	// If outside map coverage area, return clear
 
-	if(map_pos(EPoint, ((const TPATTERN *) Pigment), &xcoor, &ycoor))
+	if(map_pos(EPoint, reinterpret_cast<const TPATTERN *>(Pigment), &xcoor, &ycoor))
 	{
 		colour = Colour(1.0, 1.0, 1.0, 0.0, 1.0);
 		return false;
@@ -195,7 +195,7 @@ TEXTURE *material_map(const VECTOR EPoint, const TEXTURE *Texture)
 	 * texture index.
 	 */
 
-	if(map_pos(EPoint, ((const TPATTERN *) Texture), &xcoor, &ycoor))
+	if(map_pos(EPoint, reinterpret_cast<const TPATTERN *>(Texture), &xcoor, &ycoor))
 		Material_Number = 0;
 	else
 	{
@@ -255,7 +255,7 @@ void bump_map(const VECTOR EPoint, const TNORMAL *Tnormal, VECTOR normal)
 	// going to have to change this
 	// need to know if bump point is off of image for all 3 points
 
-	if(map_pos(EPoint, (const TPATTERN *) Tnormal, &xcoor, &ycoor))
+	if(map_pos(EPoint, reinterpret_cast<const TPATTERN *>(Tnormal), &xcoor, &ycoor))
 		return;
 	else
 		image_colour_at(image, xcoor, ycoor, colour1, &index); // TODO ALPHA - we should decide whether we prefer premultiplied or non-premultiplied alpha
@@ -1266,7 +1266,7 @@ ImageData *Create_Image()
 {
 	ImageData *image;
 
-	image = (ImageData *) POV_CALLOC(1, sizeof(ImageData), "image file");
+	image = reinterpret_cast<ImageData *>(POV_CALLOC(1, sizeof(ImageData), "image file"));
 
 	image->References = 1;
 

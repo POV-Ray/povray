@@ -740,7 +740,7 @@ FontFileInfo *ProcessFontFile(const char *fontfilename, const int font_id, Parse
 	 * Read the initial directory header on the TTF.  The numTables variable
 	 * tells us how many tables are present in this file.
 	 */
-	if (!ffile->fp->read((char *)(&temp_tag), sizeof(BYTE) * 4))
+	if (!ffile->fp->read(reinterpret_cast<char *>(&temp_tag), sizeof(BYTE) * 4))
 	{
 		throw POV_EXCEPTION(kFileDataErr, "Cannot read TrueType font file table tag");
 	}
@@ -787,7 +787,7 @@ FontFileInfo *ProcessFontFile(const char *fontfilename, const int font_id, Parse
 
 	for (i = 0; i < OffsetTable.numTables && i < 40; i++)
 	{
-		if (!ffile->fp->read((char *)(&Table.tag), sizeof(BYTE) * 4))
+		if (!ffile->fp->read(reinterpret_cast<char *>(&Table.tag), sizeof(BYTE) * 4))
 		{
 			throw POV_EXCEPTION(kFileDataErr, "Cannot read TrueType font file table tag");
 		}
@@ -921,7 +921,7 @@ FontFileInfo *OpenFontFile(const char *asciifn, const int font_id, Parser *parse
 		 * information and set some defaults
 		 */
 
-		fontlist = (FontFileInfo *)POV_CALLOC(1, sizeof(FontFileInfo), "FontFileInfo");
+		fontlist = reinterpret_cast<FontFileInfo *>(POV_CALLOC(1, sizeof(FontFileInfo), "FontFileInfo"));
 
 		if (asciifn)
 		{
@@ -1114,7 +1114,7 @@ void ProcessLocaTable(FontFileInfo *ffile, int loca_table_offset)
 	/* Move to location of table in file */
 	ffile->fp->seekg(loca_table_offset) ;
 
-	ffile->loca_table = (ULONG *)POV_MALLOC((ffile->numGlyphs+1) * sizeof(ULONG), "ttf");
+	ffile->loca_table = reinterpret_cast<ULONG *>(POV_MALLOC((ffile->numGlyphs+1) * sizeof(ULONG), "ttf"));
 
 #ifdef TTF_DEBUG
 	Debug_Info("\nlocation table:\n");
@@ -1194,8 +1194,8 @@ void ProcessKernTable(FontFileInfo *ffile, int kern_table_offset)
 	if (kern_table->nTables == 0)
 		return;
 
-	kern_table->tables = (TTKernTable *)POV_MALLOC(kern_table->nTables * sizeof(TTKernTable),
-	                                "ProcessKernTable");
+	kern_table->tables = reinterpret_cast<TTKernTable *>(POV_MALLOC(kern_table->nTables * sizeof(TTKernTable),
+	                                                                "ProcessKernTable"));
 
 	for (i = 0; i < kern_table->nTables; i++)
 	{
@@ -1235,7 +1235,7 @@ void ProcessKernTable(FontFileInfo *ffile, int kern_table_offset)
 			temp16 = READUSHORT(ffile->fp);     /* rangeShift */
 
 			kern_table->tables[i].kern_pairs =
-			(KernData *)POV_MALLOC(kern_table->tables[i].nPairs * sizeof(KernData), "Kern Pairs");
+			reinterpret_cast<KernData *>(POV_MALLOC(kern_table->tables[i].nPairs * sizeof(KernData), "Kern Pairs"));
 
 			for (j = 0; j < kern_table->tables[i].nPairs; j++)
 			{
@@ -1328,7 +1328,7 @@ void ProcessHmtxTable (FontFileInfo *ffile, int hmtx_table_offset)
 
 	ffile->fp->seekg (hmtx_table_offset) ;
 
-	ffile->hmtx_table = (longHorMetric *)POV_MALLOC(ffile->numGlyphs*sizeof(longHorMetric), "ttf");
+	ffile->hmtx_table = reinterpret_cast<longHorMetric *>(POV_MALLOC(ffile->numGlyphs*sizeof(longHorMetric), "ttf"));
 
 	/*
 	 * Read in the total glyph width, and the left side offset.  There is
@@ -1611,7 +1611,7 @@ USHORT ProcessFormat0Glyph(FontFileInfo *ffile, unsigned int search_char)
 
 	ffile->fp->seekg ((int)search_char, POV_SEEK_CUR) ;
 
-	if (!ffile->fp->read ((char *)(&temp_index), 1)) /* Each index is 1 byte */
+	if (!ffile->fp->read (reinterpret_cast<char *>(&temp_index), 1)) /* Each index is 1 byte */
 	{
 		throw POV_EXCEPTION(kFileDataErr, "Cannot read TrueType font file.");
 	}
@@ -1665,10 +1665,10 @@ USHORT ProcessFormat4Glyph(FontFileInfo *ffile, unsigned int search_char)
 
 		/* Now allocate and read in the segment arrays */
 
-		ffile->endCount = (USHORT *)POV_MALLOC(ffile->segCount * sizeof(USHORT), "ttf");
-		ffile->startCount = (USHORT *)POV_MALLOC(ffile->segCount * sizeof(USHORT), "ttf");
-		ffile->idDelta = (USHORT *)POV_MALLOC(ffile->segCount * sizeof(USHORT), "ttf");
-		ffile->idRangeOffset = (USHORT *)POV_MALLOC(ffile->segCount * sizeof(USHORT), "ttf");
+		ffile->endCount = reinterpret_cast<USHORT *>(POV_MALLOC(ffile->segCount * sizeof(USHORT), "ttf"));
+		ffile->startCount = reinterpret_cast<USHORT *>(POV_MALLOC(ffile->segCount * sizeof(USHORT), "ttf"));
+		ffile->idDelta = reinterpret_cast<USHORT *>(POV_MALLOC(ffile->segCount * sizeof(USHORT), "ttf"));
+		ffile->idRangeOffset = reinterpret_cast<USHORT *>(POV_MALLOC(ffile->segCount * sizeof(USHORT), "ttf"));
 
 		for (i = 0; i < ffile->segCount; i++)
 		{
@@ -1962,7 +1962,7 @@ GlyphOutline *ExtractGlyphOutline(FontFileInfo *ffile, unsigned int glyph_index,
 	SHORT nc;
 	GlyphOutline *ttglyph;
 
-	ttglyph = (GlyphOutline *)POV_CALLOC(1, sizeof(GlyphOutline), "ttf");
+	ttglyph = reinterpret_cast<GlyphOutline *>(POV_CALLOC(1, sizeof(GlyphOutline), "ttf"));
 	ttglyph->myMetrics = glyph_index;
 
 	/* Have to treat space characters differently */
@@ -1998,7 +1998,7 @@ GlyphOutline *ExtractGlyphOutline(FontFileInfo *ffile, unsigned int glyph_index,
 
 		/* Grab the contour endpoints */
 
-		ttglyph->endPoints = (USHORT *)POV_MALLOC(nc * sizeof(USHORT), "ttf");
+		ttglyph->endPoints = reinterpret_cast<USHORT *>(POV_MALLOC(nc * sizeof(USHORT), "ttf"));
 
 		for (i = 0; i < nc; i++)
 		{
@@ -2024,18 +2024,18 @@ GlyphOutline *ExtractGlyphOutline(FontFileInfo *ffile, unsigned int glyph_index,
 
 		/* Read the flags */
 
-		ttglyph->flags = (BYTE *)POV_MALLOC(n * sizeof(BYTE), "ttf");
+		ttglyph->flags = reinterpret_cast<BYTE *>(POV_MALLOC(n * sizeof(BYTE), "ttf"));
 
 		for (i = 0; i < ttglyph->numPoints; i++)
 		{
-			if (!ffile->fp->read((char *)(&ttglyph->flags[i]), sizeof(BYTE)))
+			if (!ffile->fp->read(reinterpret_cast<char *>(&ttglyph->flags[i]), sizeof(BYTE)))
 			{
 				throw POV_EXCEPTION(kFileDataErr, "Cannot read TrueType font file.");
 			}
 
 			if (ttglyph->flags[i] & REPEAT_FLAGS)
 			{
-				if (!ffile->fp->read((char *)(&repeat_count), sizeof(BYTE)))
+				if (!ffile->fp->read(reinterpret_cast<char *>(&repeat_count), sizeof(BYTE)))
 				{
 					throw POV_EXCEPTION(kFileDataErr, "Cannot read TrueType font file.");
 				}
@@ -2060,8 +2060,8 @@ GlyphOutline *ExtractGlyphOutline(FontFileInfo *ffile, unsigned int glyph_index,
 #endif
 		/* Read the coordinate vectors */
 
-		ttglyph->x = (DBL *)POV_MALLOC(n * sizeof(DBL), "ttf");
-		ttglyph->y = (DBL *)POV_MALLOC(n * sizeof(DBL), "ttf");
+		ttglyph->x = reinterpret_cast<DBL *>(POV_MALLOC(n * sizeof(DBL), "ttf"));
+		ttglyph->y = reinterpret_cast<DBL *>(POV_MALLOC(n * sizeof(DBL), "ttf"));
 
 		coord = 0;
 
@@ -2075,7 +2075,7 @@ GlyphOutline *ExtractGlyphOutline(FontFileInfo *ffile, unsigned int glyph_index,
 			{
 				BYTE temp8;
 
-				if (!ffile->fp->read((char *)(&temp8), 1))
+				if (!ffile->fp->read(reinterpret_cast<char *>(&temp8), 1))
 				{
 					throw POV_EXCEPTION(kFileDataErr, "Cannot read TrueType font file.");
 				}
@@ -2111,7 +2111,7 @@ GlyphOutline *ExtractGlyphOutline(FontFileInfo *ffile, unsigned int glyph_index,
 			{
 				BYTE temp8;
 
-				if (!ffile->fp->read((char *)(&temp8), 1))
+				if (!ffile->fp->read(reinterpret_cast<char *>(&temp8), 1))
 				{
 					throw POV_EXCEPTION(kFileDataErr, "Cannot read TrueType font file.");
 				}
@@ -2266,11 +2266,11 @@ GlyphOutline *ExtractGlyphOutline(FontFileInfo *ffile, unsigned int glyph_index,
 			n = ttglyph->numPoints;
 			n2 = sub_ttglyph->numPoints;
 
-			ttglyph->endPoints = (USHORT *)POV_REALLOC(ttglyph->endPoints,
-			                                 (nc + nc2) * sizeof(USHORT), "ttf");
-			ttglyph->flags = (BYTE *)POV_REALLOC(ttglyph->flags, (n+n2)*sizeof(BYTE), "ttf");
-			ttglyph->x = (DBL *)POV_REALLOC(ttglyph->x, (n + n2) * sizeof(DBL), "ttf");
-			ttglyph->y = (DBL *)POV_REALLOC(ttglyph->y, (n + n2) * sizeof(DBL), "ttf");
+			ttglyph->endPoints = reinterpret_cast<USHORT *>(POV_REALLOC(ttglyph->endPoints,
+			                                                            (nc + nc2) * sizeof(USHORT), "ttf"));
+			ttglyph->flags = reinterpret_cast<BYTE *>(POV_REALLOC(ttglyph->flags, (n+n2)*sizeof(BYTE), "ttf"));
+			ttglyph->x = reinterpret_cast<DBL *>(POV_REALLOC(ttglyph->x, (n + n2) * sizeof(DBL), "ttf"));
+			ttglyph->y = reinterpret_cast<DBL *>(POV_REALLOC(ttglyph->y, (n + n2) * sizeof(DBL), "ttf"));
 
 			/* Add the sub glyph info to the end of the current glyph */
 
@@ -2373,10 +2373,10 @@ GlyphPtr ConvertOutlineToGlyph(FontFileInfo *ffile, const GlyphOutline *ttglyph)
 
 	/* Create storage for this glyph */
 
-	glyph = (Glyph *)POV_MALLOC(sizeof(Glyph), "ttf");
+	glyph = reinterpret_cast<Glyph *>(POV_MALLOC(sizeof(Glyph), "ttf"));
 	if (ttglyph->header.numContours > 0)
 	{
-		glyph->contours = (Contour *)POV_MALLOC(ttglyph->header.numContours * sizeof(Contour), "ttf");
+		glyph->contours = reinterpret_cast<Contour *>(POV_MALLOC(ttglyph->header.numContours * sizeof(Contour), "ttf"));
 	}
 	else
 	{
@@ -2401,10 +2401,10 @@ GlyphPtr ConvertOutlineToGlyph(FontFileInfo *ffile, const GlyphOutline *ttglyph)
 
 		/* Copy the coordinate information into the glyph */
 
-		temp_x = (DBL *)POV_MALLOC((j + 1) * sizeof(DBL), "ttf");
-		temp_y = (DBL *)POV_MALLOC((j + 1) * sizeof(DBL), "ttf");
+		temp_x = reinterpret_cast<DBL *>(POV_MALLOC((j + 1) * sizeof(DBL), "ttf"));
+		temp_y = reinterpret_cast<DBL *>(POV_MALLOC((j + 1) * sizeof(DBL), "ttf"));
 
-		temp_f = (BYTE *)POV_MALLOC((j + 1) * sizeof(BYTE), "ttf");
+		temp_f = reinterpret_cast<BYTE *>(POV_MALLOC((j + 1) * sizeof(BYTE), "ttf"));
 		POV_MEMCPY(temp_x, &ttglyph->x[last_j], j * sizeof(DBL));
 		POV_MEMCPY(temp_y, &ttglyph->y[last_j], j * sizeof(DBL));
 

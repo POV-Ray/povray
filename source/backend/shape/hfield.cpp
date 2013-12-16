@@ -758,11 +758,11 @@ void HField::smooth_height_field(int xsize, int zsize)
 
 	Data->Normals_Height = zsize+1;
 
-	Data->Normals = (HF_Normals **)POV_MALLOC((zsize+1)*sizeof(HF_Normals *), "height field normals");
+	Data->Normals = reinterpret_cast<HF_Normals **>(POV_MALLOC((zsize+1)*sizeof(HF_Normals *), "height field normals"));
 
 	for (i = 0; i <= zsize; i++)
 	{
-		Data->Normals[i] = (HF_Normals *)POV_MALLOC((xsize+1)*sizeof(HF_Normals), "height field normals");
+		Data->Normals[i] = reinterpret_cast<HF_Normals *>(POV_MALLOC((xsize+1)*sizeof(HF_Normals), "height field normals"));
 	}
 
 	/*
@@ -838,11 +838,11 @@ void HField::Compute_HField(const ImageData *image)
 
 	/* Allocate memory for map. */
 
-	Data->Map = (HF_VAL **)POV_MALLOC(max_z*sizeof(HF_VAL *), "height field");
+	Data->Map = reinterpret_cast<HF_VAL **>(POV_MALLOC(max_z*sizeof(HF_VAL *), "height field"));
 
 	for (z = 0; z < max_z; z++)
 	{
-		Data->Map[z] = (HF_VAL *)POV_MALLOC(max_x*sizeof(HF_VAL), "height field");
+		Data->Map[z] = reinterpret_cast<HF_VAL *>(POV_MALLOC(max_x*sizeof(HF_VAL), "height field"));
 	}
 
 	/* Copy map. */
@@ -945,9 +945,9 @@ void HField::build_hfield_blocks()
 	{
 		/* We don't want a bounding hierarchy. Just use one block. */
 
-		Data->Block = (HFIELD_BLOCK **)POV_MALLOC(sizeof(HFIELD_BLOCK *), "height field blocks");
+		Data->Block = reinterpret_cast<HFIELD_BLOCK **>(POV_MALLOC(sizeof(HFIELD_BLOCK *), "height field blocks"));
 
-		Data->Block[0] = (HFIELD_BLOCK *)POV_MALLOC(sizeof(HFIELD_BLOCK), "height field blocks");
+		Data->Block[0] = reinterpret_cast<HFIELD_BLOCK *>(POV_MALLOC(sizeof(HFIELD_BLOCK), "height field blocks"));
 
 		Data->Block[0][0].xmin = 0;
 		Data->Block[0][0].xmax = Data->max_x;
@@ -972,7 +972,7 @@ void HField::build_hfield_blocks()
 
 	/* Allocate memory for blocks. */
 
-	Data->Block = (HFIELD_BLOCK **)POV_MALLOC(nz*sizeof(HFIELD_BLOCK *), "height field blocks");
+	Data->Block = reinterpret_cast<HFIELD_BLOCK **>(POV_MALLOC(nz*sizeof(HFIELD_BLOCK *), "height field blocks"));
 
 	/* Store block information. */
 
@@ -986,7 +986,7 @@ void HField::build_hfield_blocks()
 
 	for (z = 0; z < nz; z++)
 	{
-		Data->Block[z] = (HFIELD_BLOCK *)POV_MALLOC(nx*sizeof(HFIELD_BLOCK), "height field blocks");
+		Data->Block[z] = reinterpret_cast<HFIELD_BLOCK *>(POV_MALLOC(nx*sizeof(HFIELD_BLOCK), "height field blocks"));
 
 		for (x = 0; x < nx; x++)
 		{
@@ -1231,7 +1231,7 @@ HField::HField() : ObjectBase(HFIELD_OBJECT)
 
 	/* Allocate height field data. */
 
-	Data = (HFIELD_DATA *)POV_MALLOC(sizeof(HFIELD_DATA), "height field");
+	Data = reinterpret_cast<HFIELD_DATA *>(POV_MALLOC(sizeof(HFIELD_DATA), "height field"));
 
 	Data->References = 1;
 
