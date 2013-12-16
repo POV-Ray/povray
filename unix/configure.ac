@@ -166,7 +166,7 @@ Environment
 AC_CANONICAL_BUILD
 AC_CANONICAL_HOST
 
-AM_INIT_AUTOMAKE([1.9 dist-bzip2])
+AM_INIT_AUTOMAKE([1.9 dist-bzip2 subdir-objects])
 AM_MAINTAINER_MODE
 
 AX_FIX_INCORRECT_PATH(C_INCLUDE_PATH, ".", [pov_warn_path="$pov_warn_path C_INCLUDE_PATH"])
