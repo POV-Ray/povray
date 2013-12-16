@@ -26,11 +26,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/vfe/win/vfeplatform.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/vfe/win/vfeplatform.h $
+ * $Revision: #19 $
+ * $Change: 6130 $
+ * $DateTime: 2013/11/25 11:36:19 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #ifndef __VFEPLATFORM_H__
@@ -43,7 +43,7 @@ namespace vfePlatform
   class WinShelloutProcessing: public ShelloutProcessing
   {
   public:
-    WinShelloutProcessing(POVMS_Object& opts, const string& scene, uint width, uint height);
+    WinShelloutProcessing(POVMS_Object& opts, const string& scene, unsigned int width, unsigned int height);
     ~WinShelloutProcessing();
 
     virtual int ProcessID(void);
@@ -88,7 +88,7 @@ namespace vfePlatform
       virtual int RequestNewOutputPath(int CallCount, const string& Reason, const UCS2String& OldPath, UCS2String& NewPath);
       virtual bool TestAccessAllowed(const Path& file, bool isWrite) const;
       virtual bool ImageOutputToStdoutSupported(void) const { return m_OptimizeForConsoleOutput; }
-      virtual ShelloutProcessing *CreateShelloutProcessing(POVMS_Object& opts, const string& scene, uint width, uint height) { return new WinShelloutProcessing(opts, scene, width, height); }
+      virtual ShelloutProcessing *CreateShelloutProcessing(POVMS_Object& opts, const string& scene, unsigned int width, unsigned int height) { return new WinShelloutProcessing(opts, scene, width, height); }
 
       virtual void Clear(bool Notify = true);
 

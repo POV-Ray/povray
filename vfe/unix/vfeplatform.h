@@ -26,11 +26,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/vfe/unix/vfeplatform.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/vfe/unix/vfeplatform.h $
+ * $Revision: #11 $
+ * $Change: 6130 $
+ * $DateTime: 2013/11/25 11:36:19 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #ifndef __VFEPLATFORM_H__
@@ -47,7 +47,7 @@ namespace vfePlatform
 	class UnixShelloutProcessing: public ShelloutProcessing
 	{
 		public:
-			UnixShelloutProcessing(POVMS_Object& opts, const string& scene, uint width, uint height);
+			UnixShelloutProcessing(POVMS_Object& opts, const string& scene, unsigned int width, unsigned int height);
 			~UnixShelloutProcessing();
 
 			virtual int ProcessID(void);
@@ -88,7 +88,7 @@ namespace vfePlatform
 			virtual void NotifyCriticalError(const char *message, const char *file, int line);
 			virtual int RequestNewOutputPath(int CallCount, const string& Reason, const UCS2String& OldPath, UCS2String& NewPath);
 			virtual bool TestAccessAllowed(const Path& file, bool isWrite) const;
-			virtual ShelloutProcessing *CreateShelloutProcessing(POVMS_Object& opts, const string& scene, uint width, uint height)
+			virtual ShelloutProcessing *CreateShelloutProcessing(POVMS_Object& opts, const string& scene, unsigned int width, unsigned int height)
 				{ return new UnixShelloutProcessing(opts, scene, width, height); }
 
 			boost::shared_ptr<UnixOptionsProcessor> GetUnixOptions(void) { return m_OptionsProc; }

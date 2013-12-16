@@ -26,11 +26,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/vfe/unix/vfeplatform.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/vfe/unix/vfeplatform.cpp $
+ * $Revision: #17 $
+ * $Change: 6130 $
+ * $DateTime: 2013/11/25 11:36:19 $
+ * $Author: clipka $
  *******************************************************************************/
 
 // must come first
@@ -324,7 +324,7 @@ namespace vfePlatform
 	// on the requirements for these methods.
 	/////////////////////////////////////////////////////////////////////////////
 
-	UnixShelloutProcessing::UnixShelloutProcessing(POVMS_Object& opts, const string& scene, uint width, uint height): ShelloutProcessing(opts, scene, width, height)
+	UnixShelloutProcessing::UnixShelloutProcessing(POVMS_Object& opts, const string& scene, unsigned int width, unsigned int height): ShelloutProcessing(opts, scene, width, height)
 	{
 		m_ProcessRunning = false;
 		m_ProcessId = m_LastError = m_ExitCode = 0;

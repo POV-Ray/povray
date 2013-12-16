@@ -26,11 +26,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/vfe/vfesession.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/vfe/vfesession.h $
+ * $Revision: #32 $
+ * $Change: 6130 $
+ * $DateTime: 2013/11/25 11:36:19 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #ifndef __VFESESSION_H__
@@ -1192,7 +1192,7 @@ namespace vfe
 
       // Create an instance of the frontend ShelloutProcessing class. this handles creating and
       // managing render shellout commands, and typically will need platform-specific implementation.
-      virtual ShelloutProcessing *CreateShelloutProcessing(POVMS_Object& opts, const string& scene, uint width, uint height) { return new ShelloutProcessing(opts, scene, width, height); }
+      virtual ShelloutProcessing *CreateShelloutProcessing(POVMS_Object& opts, const string& scene, unsigned int width, unsigned int height) { return new ShelloutProcessing(opts, scene, width, height); }
 
       struct vfeSessionWorker
       {
