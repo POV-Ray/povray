@@ -24,11 +24,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/scene/atmosph.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/scene/atmosph.cpp $
+ * $Revision: #24 $
+ * $Change: 6082 $
+ * $DateTime: 2013/11/10 06:21:12 $
+ * $Author: clipka $
  *******************************************************************************/
 
 // frame.h must always be the first POV file included (pulls in platform config)
@@ -82,7 +82,7 @@ FOG *Create_Fog()
 {
 	FOG *New;
 
-	New = (FOG *)POV_MALLOC(sizeof(FOG), "fog");
+	New = new FOG;
 
 	New->Type = ORIG_FOG;
 
@@ -183,7 +183,7 @@ void Destroy_Fog(FOG *Fog)
 	{
 		Destroy_Turb(Fog->Turb);
 
-		POV_FREE(Fog);
+		delete Fog;
 	}
 }
 
@@ -221,7 +221,7 @@ RAINBOW *Create_Rainbow()
 {
 	RAINBOW *New;
 
-	New = (RAINBOW *)POV_MALLOC(sizeof(RAINBOW), "fog");
+	New = new RAINBOW;
 
 	New->Distance = MAX_DISTANCE;
 	New->Jitter   = 0.0;
@@ -323,7 +323,7 @@ void Destroy_Rainbow(RAINBOW *Rainbow)
 	{
 		Destroy_Pigment(Rainbow->Pigment);
 
-		POV_FREE(Rainbow);
+		delete Rainbow;
 	}
 }
 
@@ -361,7 +361,7 @@ SKYSPHERE *Create_Skysphere()
 {
 	SKYSPHERE *New;
 
-	New = (SKYSPHERE *)POV_MALLOC(sizeof(SKYSPHERE), "fog");
+	New = new SKYSPHERE;
 
 	New->Count = 0;
 	New->Emission = RGBColour(1.0);
@@ -476,7 +476,7 @@ void Destroy_Skysphere(SKYSPHERE *Skysphere)
 
 		Destroy_Transform(Skysphere->Trans);
 
-		POV_FREE(Skysphere);
+		delete Skysphere;
 	}
 }
 
