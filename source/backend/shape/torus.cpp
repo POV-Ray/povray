@@ -27,9 +27,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/torus.cpp $
- * $Revision: #34 $
- * $Change: 6161 $
- * $DateTime: 2013/12/05 18:42:17 $
+ * $Revision: #35 $
+ * $Change: 6164 $
+ * $DateTime: 2013/12/09 17:21:04 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -543,43 +543,6 @@ void Torus::Transform(const TRANSFORM *tr)
 	Compose_Transforms(Trans, tr);
 
 	Compute_BBox();
-}
-
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-*   Invert_Torus
-*
-* INPUT
-*
-*   Object - Object
-*   
-* OUTPUT
-*
-*   Object
-*   
-* RETURNS
-*   
-* AUTHOR
-*
-*   Dieter Bayer
-*   
-* DESCRIPTION
-*
-*   Invert a torus.
-*
-* CHANGES
-*
-*   Jun 1994 : Creation.
-*
-******************************************************************************/
-
-void Torus::Invert()
-{
-	Invert_Flag(this, INVERTED_FLAG);
 }
 
 

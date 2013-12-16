@@ -28,9 +28,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/bezier.cpp $
- * $Revision: #36 $
- * $Change: 6161 $
- * $DateTime: 2013/12/05 18:42:17 $
+ * $Revision: #37 $
+ * $Change: 6164 $
+ * $DateTime: 2013/12/09 17:21:04 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -1868,38 +1868,6 @@ void BicubicPatch::Transform(const TRANSFORM *tr)
 *
 * FUNCTION
 *
-*   Invert_Bicubic_Patch
-*
-* INPUT
-*   
-* OUTPUT
-*   
-* RETURNS
-*   
-* AUTHOR
-*
-*   Alexander Enzmann
-*   
-* DESCRIPTION
-*
-*   Inversion of a patch really doesn't make sense.
-*
-* CHANGES
-*
-*   -
-*
-******************************************************************************/
-
-void BicubicPatch::Invert()
-{
-}
-
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
 *   Create_Bicubic_Patch
 *
 * INPUT
@@ -1922,7 +1890,7 @@ void BicubicPatch::Invert()
 *
 ******************************************************************************/
 
-BicubicPatch::BicubicPatch() : ObjectBase(BICUBIC_PATCH_OBJECT)
+BicubicPatch::BicubicPatch() : NonsolidObject(BICUBIC_PATCH_OBJECT)
 {
 	Patch_Type = - 1;
 

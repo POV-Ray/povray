@@ -27,9 +27,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/mesh.cpp $
- * $Revision: #50 $
- * $Change: 6161 $
- * $DateTime: 2013/12/05 18:42:17 $
+ * $Revision: #51 $
+ * $Change: 6164 $
+ * $DateTime: 2013/12/09 17:21:04 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -570,39 +570,6 @@ void Mesh::Transform(const TRANSFORM *tr)
 	if (!Test_Flag(this, UV_FLAG))
 		for (i=0; i<Number_Of_Textures; i++)
 			Transform_Textures(Textures[i], tr);
-}
-
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-*   Invert_Mesh
-*
-* INPUT
-*   
-* OUTPUT
-*   
-* RETURNS
-*   
-* AUTHOR
-*
-*   Dieter Bayer
-*   
-* DESCRIPTION
-*
-*   -
-*
-* CHANGES
-*
-*   Feb 1995 : Creation.
-*
-******************************************************************************/
-
-void Mesh::Invert()
-{
-	Invert_Flag(this, INVERTED_FLAG);
 }
 
 

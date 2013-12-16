@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/ovus.cpp $
- * $Revision: #7 $
- * $Change: 6142 $
- * $DateTime: 2013/11/26 21:24:29 $
+ * $Revision: #8 $
+ * $Change: 6164 $
+ * $DateTime: 2013/12/09 17:21:04 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -654,42 +654,6 @@ void Ovus::Transform(const TRANSFORM *tr)
 	Compose_Transforms(Trans, tr);
 
 	Compute_BBox();
-}
-
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-*   Invert_Ovus
-*
-* INPUT
-*
-*   Object - Object
-*
-* OUTPUT
-*
-*   Object
-*
-* RETURNS
-*
-* AUTHOR
-*
-*   Jerome Grimbert
-*
-* DESCRIPTION
-*
-*   Invert an ovus.
-*
-* CHANGES
-*
-*
-******************************************************************************/
-
-void Ovus::Invert()
-{
-	Invert_Flag(this, INVERTED_FLAG);
 }
 
 

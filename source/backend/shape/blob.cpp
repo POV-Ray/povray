@@ -30,9 +30,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/blob.cpp $
- * $Revision: #52 $
- * $Change: 6147 $
- * $DateTime: 2013/11/29 20:46:11 $
+ * $Revision: #54 $
+ * $Change: 6164 $
+ * $DateTime: 2013/12/09 17:21:04 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -2026,43 +2026,6 @@ void Blob::Transform(const TRANSFORM *tr)
 
 	for(i = 0; i < Data->Number_Of_Components; i++)
 		Transform_Textures(Element_Texture[i], tr);
-}
-
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-*   Invert_Blob
-*
-* INPUT
-*
-*   Object - Pointer to blob structure
-*
-* OUTPUT
-*
-*   Object
-*
-* RETURNS
-*
-* AUTHOR
-*
-*   Alexander Enzmann
-*
-* DESCRIPTION
-*
-*   Invert a blob.
-*
-* CHANGES
-*
-*   -
-*
-******************************************************************************/
-
-void Blob::Invert()
-{
-	Invert_Flag(this, INVERTED_FLAG);
 }
 
 

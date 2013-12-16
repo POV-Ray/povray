@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/quadrics.cpp $
- * $Revision: #40 $
- * $Change: 6161 $
- * $DateTime: 2013/12/05 18:42:17 $
+ * $Revision: #41 $
+ * $Change: 6164 $
+ * $DateTime: 2013/12/09 17:21:04 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -582,7 +582,7 @@ void Quadric::Scale(const Vector3d&, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void Quadric::Invert()
+ObjectPtr Quadric::Invert()
 {
 	Square_Terms.invert();
 	Mixed_Terms.invert();
@@ -590,7 +590,7 @@ void Quadric::Invert()
 
 	Constant *= -1.0;
 
-	Invert_Flag(this, INVERTED_FLAG);
+	return this;
 }
 
 

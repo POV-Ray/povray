@@ -676,35 +676,6 @@ void Parametric::Transform(const TRANSFORM* tr)
  *
  * FUNCTION
  *
- *   Invert_Parametric
- *
- * INPUT
- *
- * OUTPUT
- *
- * RETURNS
- *
- * AUTHOR
- *
- * DESCRIPTION
- *
- *   -
- *
- * CHANGES
- *
- *   -
- *
- ******************************************************************************/
-
-void Parametric::Invert()
-{
-}
-
-
-/*****************************************************************************
- *
- * FUNCTION
- *
  *   Copy_Parametric
  *
  * INPUT
@@ -799,7 +770,7 @@ Parametric::~Parametric()
  *
  ******************************************************************************/
 
-Parametric::Parametric() : ObjectBase(PARAMETRIC_OBJECT)
+Parametric::Parametric() : NonsolidObject(PARAMETRIC_OBJECT)
 {
 	Make_Vector(container.box.corner1, -1.0, -1.0, -1.0);
 	Make_Vector(container.box.corner2, 1.0, 1.0, 1.0);
@@ -813,7 +784,6 @@ Parametric::Parametric() : ObjectBase(PARAMETRIC_OBJECT)
 	Function[2] = NULL;
 	accuracy = 0.001;
 	max_gradient = 1;
-	Inverted = false;
 	PData = NULL;
 	container_shape = 0;
 }

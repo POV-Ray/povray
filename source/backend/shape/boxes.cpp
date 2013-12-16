@@ -27,9 +27,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/boxes.cpp $
- * $Revision: #36 $
- * $Change: 6161 $
- * $DateTime: 2013/12/05 18:42:17 $
+ * $Revision: #37 $
+ * $Change: 6164 $
+ * $DateTime: 2013/12/09 17:21:04 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -766,39 +766,6 @@ void Box::Scale(const Vector3d& Vector, const TRANSFORM *tr)
 	{
 		Transform(tr);
 	}
-}
-
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-*   Invert_Box
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-*   Alexander Enzmann
-*
-* DESCRIPTION
-*
-*   -
-*
-* CHANGES
-*
-*   -
-*
-******************************************************************************/
-
-void Box::Invert()
-{
-	Invert_Flag(this, INVERTED_FLAG);
 }
 
 

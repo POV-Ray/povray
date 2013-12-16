@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/spheres.cpp $
- * $Revision: #38 $
- * $Change: 6161 $
- * $DateTime: 2013/12/05 18:42:17 $
+ * $Revision: #39 $
+ * $Change: 6164 $
+ * $DateTime: 2013/12/09 17:21:04 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -512,39 +512,6 @@ void Sphere::Scale(const Vector3d& Vector, const TRANSFORM *tr)
 	{
 		Transform(tr);
 	}
-}
-
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-*   Invert_Sphere
-*
-* INPUT
-*   
-* OUTPUT
-*   
-* RETURNS
-*   
-* AUTHOR
-*
-*   ?
-*   
-* DESCRIPTION
-*
-*   -
-*
-* CHANGES
-*
-*   -
-*
-******************************************************************************/
-
-void Sphere::Invert()
-{
-	Invert_Flag(this, INVERTED_FLAG);
 }
 
 

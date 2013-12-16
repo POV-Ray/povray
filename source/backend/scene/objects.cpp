@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/scene/objects.cpp $
- * $Revision: #57 $
- * $Change: 6163 $
- * $DateTime: 2013/12/08 22:48:58 $
+ * $Revision: #58 $
+ * $Change: 6164 $
+ * $DateTime: 2013/12/09 17:21:04 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -680,65 +680,6 @@ void Transform_Object (ObjectPtr Object, const TRANSFORM *Trans)
 *
 * FUNCTION
 *
-*   Invert_Object
-*
-* INPUT
-*   
-* OUTPUT
-*   
-* RETURNS
-*   
-* AUTHOR
-*
-*   POV-Ray Team
-*   
-* DESCRIPTION
-*
-*   -
-*
-* CHANGES
-*
-*   -
-*
-******************************************************************************/
-
-// this function must not be called on CSG objects
-void Invert_Object(ObjectPtr Object)
-{
-	if (Object == NULL)
-		return;
-	assert((Object->Type & IS_CSG_OBJECT) == 0);
-	Object->Invert();
-}
-
-// Invert_CSG_Object deletes the original object and returns a new one
-// we force use of a separate function for this to help ensure that calling code handles this
-// we also set the passed pointer to NULL
-// (yes, this is ugly and needs to be fixed)
-ObjectPtr Invert_CSG_Object(ObjectPtr& Object)
-{
-	CSG     *csg_object;
-
-	if(Object == NULL)
-		return NULL;
-	Object->Invert();
-
-	csg_object = dynamic_cast<CSG *>(Object);
-	assert(csg_object != NULL);
-
-	// Morph will delete the old object
-	csg_object = csg_object->Morph();
-	Object = NULL;
-
-	return csg_object;
-}
-
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
 *   Copy_Object
 *
 * INPUT
@@ -953,6 +894,25 @@ void ObjectBase::Determine_Textures(Intersection *isect, bool hitinside, Weighte
 		textures.push_back(WeightedTexture(1.0, Texture));
 	else if(isect->Csg != NULL)
 		isect->Csg->Determine_Textures(isect, hitinside, textures, threaddata);
+}
+
+ObjectPtr ObjectBase::Invert()
+{
+	Invert_Flag(this, INVERTED_FLAG);
+	return this;
+}
+
+ObjectPtr NonsolidObject::Invert()
+{
+	return this;
+}
+
+ObjectPtr CompoundObject::Invert()
+{
+	for(vector<ObjectPtr>::iterator Current_Sib = children.begin(); Current_Sib != children.end(); Current_Sib++)
+		*Current_Sib = (*Current_Sib)->Invert();
+	Invert_Flag(this, INVERTED_FLAG);
+	return this;
 }
 
 bool ObjectBase::Intersect_BBox(BBoxDirection variant, const BBoxVector3d& origin, const BBoxVector3d& invdir, BBoxScalar maxd) const

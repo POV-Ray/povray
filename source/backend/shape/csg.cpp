@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/csg.cpp $
- * $Revision: #63 $
- * $Change: 6163 $
- * $DateTime: 2013/12/08 22:48:58 $
+ * $Revision: #64 $
+ * $Change: 6164 $
+ * $DateTime: 2013/12/09 17:21:04 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -611,17 +611,24 @@ void CSG::Transform(const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void CSG::Invert()
+ObjectPtr CSGUnion::Invert()
 {
-	// REMINDER: Invert_Object will de-allocate the original object pointer and set it to NULL for any CSG children.
-	for(vector<ObjectPtr>::iterator Current_Sib = children.begin(); Current_Sib != children.end(); Current_Sib++)
-	{
-		if (((*Current_Sib)->Type & IS_CSG_OBJECT) != 0)
-			*Current_Sib = Invert_CSG_Object(*Current_Sib);
-		else
-			Invert_Object(*Current_Sib);
-	}
-	Invert_Flag(this, INVERTED_FLAG);
+	ObjectPtr p = CompoundObject::Invert();
+	assert(p == this);
+
+	CSGIntersection *New = new CSGIntersection(false, *this, true);
+	delete this;
+	return (New);
+}
+
+ObjectPtr CSGIntersection::Invert()
+{
+	ObjectPtr p = CompoundObject::Invert();
+	assert(p == this);
+
+	CSGMerge *New = new CSGMerge(*this, true);
+	delete this;
+	return (New);
 }
 
 /*****************************************************************************
@@ -818,27 +825,6 @@ ObjectPtr CSGIntersection::Copy()
 		Promote_Local_Lights(New);
 	}
 
-	return (New);
-}
-
-CSG *CSGMerge::Morph(void)
-{
-	CSGIntersection *New = new CSGIntersection(false, *this, true);
-	delete this ;
-	return (New);
-}
-
-CSG *CSGUnion::Morph(void)
-{
-	CSGIntersection *New = new CSGIntersection(false, *this, true);
-	delete this ;
-	return (New);
-}
-
-CSG *CSGIntersection::Morph(void)
-{
-	CSGMerge *New = new CSGMerge(*this, true);
-	delete this ;
 	return (New);
 }
 

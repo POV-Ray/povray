@@ -27,9 +27,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/fractal.cpp $
- * $Revision: #38 $
- * $Change: 6161 $
- * $DateTime: 2013/12/05 18:42:17 $
+ * $Revision: #39 $
+ * $Change: 6164 $
+ * $DateTime: 2013/12/09 17:21:04 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -354,7 +354,7 @@ bool Fractal::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 		Result = Iteration(IPoint, this, Thread->Fractal_IStack);
 	}
 
-	if (Inverted)
+	if (Test_Flag(this, INVERTED_FLAG))
 	{
 		return (!Result);
 	}
@@ -536,35 +536,6 @@ void Fractal::Transform(const TRANSFORM *tr)
 * CHANGES
 *
 *   Dec 1994 : Creation.
-*
-******************************************************************************/
-
-void Fractal::Invert()
-{
-	Inverted ^= true;
-}
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*   
-* OUTPUT
-*   
-* RETURNS
-*   
-* AUTHOR
-*
-*   Pascal Massimino
-*   
-* DESCRIPTION
-*
-*   -
-*
-* CHANGES
-*
-*   Dec 1994 : Creation.
 *   Mar 1996 : Added call to recompute_BBox() to bottom (TW)
 *
 ******************************************************************************/
@@ -600,8 +571,6 @@ void Fractal::Compute_BBox()
 	}
 
 	Radius_Squared = Sqr(R);
-
-	Inverted = false;
 
 	Make_BBox(BBox, -R, -R, -R, 2.0 * R, 2.0 * R, 2.0 * R);
 
@@ -654,8 +623,6 @@ Fractal::Fractal() : ObjectBase(BASIC_OBJECT)
 	Num_Iterations = 20;
 
 	Precision = 1.0 / 20.0;
-
-	Inverted = false;
 
 	Algebra = QUATERNION_TYPE;
 

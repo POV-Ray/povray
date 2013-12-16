@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/scene/objects.h $
- * $Revision: #36 $
- * $Change: 6163 $
- * $DateTime: 2013/12/08 22:48:58 $
+ * $Revision: #37 $
+ * $Change: 6164 $
+ * $DateTime: 2013/12/09 17:21:04 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -207,7 +207,7 @@ class ObjectBase
 		virtual void Rotate(const Vector3d&, const TRANSFORM *) = 0;
 		virtual void Scale(const Vector3d&, const TRANSFORM *) = 0;
 		virtual void Transform(const TRANSFORM *) = 0;
-		virtual void Invert() = 0;
+		virtual ObjectPtr Invert(); ///< @note This method may return a newly constructed object and destroy itself.
 		virtual void Compute_BBox() = 0;
 		virtual void Determine_Textures(Intersection *, bool, WeightedTextureVector&, TraceThreadData *Thread); // could be "(const Intersection*...) const" if it wasn't for blob specials
 
@@ -226,6 +226,13 @@ class ObjectBase
 		explicit ObjectBase(const ObjectBase&) { }
 };
 
+class NonsolidObject : public ObjectBase
+{
+	public:
+		NonsolidObject(int t) : ObjectBase(t) {}
+		virtual ObjectPtr Invert();
+};
+
 /* This is an abstract structure that is never actually used.
    All other objects are descendents of this primitive type */
 
@@ -235,6 +242,7 @@ class CompoundObject : public ObjectBase
 		CompoundObject(int t) : ObjectBase(t) {}
 		CompoundObject(int t, CompoundObject& o, bool transplant) : ObjectBase(t, o, transplant), children(o.children) { if (transplant) o.children.clear(); }
 		vector<ObjectPtr> children;
+		virtual ObjectPtr Invert();
 };
 
 
@@ -276,8 +284,7 @@ class LightSource : public CompoundObject
 		virtual void Rotate(const Vector3d&, const TRANSFORM *);
 		virtual void Scale(const Vector3d&, const TRANSFORM *);
 		virtual void Transform(const TRANSFORM *);
-		virtual void Invert();
-		virtual void Compute_BBox() { }
+		virtual void Compute_BBox() {}
 };
 
 
@@ -298,8 +305,6 @@ void Rotate_Object(ObjectPtr Object, const Vector3d& Vector, const TRANSFORM *Tr
 void Scale_Object(ObjectPtr Object, const Vector3d& Vector, const TRANSFORM *Trans);
 void Transform_Object(ObjectPtr Object, const TRANSFORM *Trans);
 bool Inside_Object(const Vector3d& IPoint, ObjectPtr Object, TraceThreadData *Thread);
-void Invert_Object(ObjectPtr Object);
-ObjectPtr Invert_CSG_Object(ObjectPtr& Object); // deletes Object and returns new pointer
 void Destroy_Object(vector<ObjectPtr>& Object);
 void Destroy_Object(ObjectPtr Object);
 void Destroy_Single_Object(ObjectPtr *ObjectPtr);

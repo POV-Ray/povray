@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/parser/parse.cpp $
- * $Revision: #204 $
- * $Change: 6158 $
- * $DateTime: 2013/12/02 21:19:56 $
+ * $Revision: #205 $
+ * $Change: 6164 $
+ * $DateTime: 2013/12/09 17:21:04 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -2158,12 +2158,8 @@ ObjectPtr Parser::Parse_CSG(int CSG_Type)
 		Object_Count++;
 
 		if((CSG_Type & CSG_DIFFERENCE_TYPE) && (Object_Count > 1))
-		{
-			if ((Local->Type & IS_CSG_OBJECT) != 0)
-				Local = Invert_CSG_Object(Local);
-			else
-				Invert_Object(Local);
-		}
+			// warning: Local->Invert will change the pointer if Object is CSG
+			Local = Local->Invert();
 		Object->Type |= (Local->Type & CHILDREN_FLAGS);
 		if(!(Local->Type & LIGHT_SOURCE_OBJECT))
 			Light_Source_Union = false;
@@ -7559,12 +7555,8 @@ ObjectPtr Parser::Parse_Object_Mods (ObjectPtr Object)
 			if (Object->Type & PATCH_OBJECT)
 				Warning (0, "Cannot invert a patch object.");
 
-			// warning: Invert_Object will change the pointer if Object is CSG
-			//          (this is a bit hackish and needs to be fixed).
-			if ((Object->Type & IS_CSG_OBJECT) != 0)
-				Object = Invert_CSG_Object(Object);
-			else
-				Invert_Object (Object);
+			// warning: Object->Invert will change the pointer if Object is CSG
+			Object = Object->Invert();
 		END_CASE
 
 		CASE (STURM_TOKEN)

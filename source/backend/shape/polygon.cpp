@@ -27,9 +27,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/polygon.cpp $
- * $Revision: #37 $
- * $Change: 6161 $
- * $DateTime: 2013/12/05 18:42:17 $
+ * $Revision: #38 $
+ * $Change: 6164 $
+ * $DateTime: 2013/12/09 17:21:04 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -472,42 +472,6 @@ void Polygon::Transform(const TRANSFORM *tr)
 *
 * FUNCTION
 *
-*   Invert_Polygon
-*
-* INPUT
-*
-*   Object - Object
-*   
-* OUTPUT
-*
-*   Object
-*   
-* RETURNS
-*   
-* AUTHOR
-*
-*   Dieter Bayer
-*   
-* DESCRIPTION
-*
-*   Invert a polygon.
-*
-* CHANGES
-*
-*   May 1994 : Creation.
-*
-******************************************************************************/
-
-void Polygon::Invert()
-{
-}
-
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
 *   Create_Polygon
 *
 * INPUT
@@ -532,7 +496,7 @@ void Polygon::Invert()
 *
 ******************************************************************************/
 
-Polygon::Polygon() : ObjectBase(POLYGON_OBJECT)
+Polygon::Polygon() : NonsolidObject(POLYGON_OBJECT)
 {
 	Trans = Create_Transform();
 

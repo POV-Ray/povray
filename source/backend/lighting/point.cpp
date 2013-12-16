@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/lighting/point.cpp $
- * $Revision: #31 $
- * $Change: 6147 $
- * $DateTime: 2013/11/29 20:46:11 $
+ * $Revision: #32 $
+ * $Change: 6164 $
+ * $DateTime: 2013/12/09 17:21:04 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -324,40 +324,6 @@ void LightSource::Transform(const TRANSFORM *tr)
 *
 * FUNCTION
 *
-*   Invert_Light_Source
-*
-* INPUT
-*   
-* OUTPUT
-*   
-* RETURNS
-*   
-* AUTHOR
-*
-*   POV-Ray Team
-*   
-* DESCRIPTION
-*
-*   -
-*
-* CHANGES
-*
-*   -
-*
-******************************************************************************/
-
-void LightSource::Invert()
-{
-	if(!children.empty())
-		Invert_Object(children[0]);
-}
-
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
 *   Create_Light_Source
 *
 * INPUT
@@ -398,7 +364,6 @@ LightSource::LightSource() : CompoundObject(LIGHT_OBJECT)
 	Fade_Distance = 0.0;
 	Fade_Power    = 0.0;
 
-// TODO  Shadow_Cached_Object = NULL;
 	Projected_Through_Object= NULL;
 	blend_map            = NULL;
 
@@ -419,9 +384,6 @@ LightSource::LightSource() : CompoundObject(LIGHT_OBJECT)
 
 	Media_Attenuation = false;
 	Media_Interaction = true;
-
-// TODO  for(i = 0; i < 6; i++)
-// TODO    Light_Buffer[i] = NULL;
 }
 
 

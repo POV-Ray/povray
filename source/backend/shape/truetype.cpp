@@ -3072,11 +3072,6 @@ void TrueType::Scale(const Vector3d& /*Vector*/, const TRANSFORM *tr)
 	Transform(tr);
 }
 
-void TrueType::Invert()
-{
-	Invert_Flag(this, INVERTED_FLAG);
-}
-
 void TrueType::Transform(const TRANSFORM *tr)
 {
 	Compose_Transforms(Trans, tr);

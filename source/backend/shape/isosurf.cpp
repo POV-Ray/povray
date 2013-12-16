@@ -534,39 +534,6 @@ void IsoSurface::Scale(const Vector3d&, const TRANSFORM* tr)
 *
 * FUNCTION
 *
-*   Invert_IsoSurface
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-*   R. Suzuki
-*
-* DESCRIPTION
-*
-*   -
-*
-* CHANGES
-*
-*   -
-*
-******************************************************************************/
-
-void IsoSurface::Invert()
-{
-	Invert_Flag(this, INVERTED_FLAG);
-}
-
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
 *   Transform_IsoSurface
 *
 * INPUT

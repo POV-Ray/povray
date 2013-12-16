@@ -1129,39 +1129,6 @@ void HField::Scale(const Vector3d&, const TRANSFORM *tr)
 *
 * FUNCTION
 *
-*   Invert_HField
-*
-* INPUT
-*   
-* OUTPUT
-*   
-* RETURNS
-*   
-* AUTHOR
-*
-*   Doug Muir, David Buck, Drew Wells
-*   
-* DESCRIPTION
-*
-*   -
-*
-* CHANGES
-*
-*   -
-*
-******************************************************************************/
-
-void HField::Invert()
-{
-	Invert_Flag(this, INVERTED_FLAG);
-}
-
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
 *   Transform_HField
 *
 * INPUT

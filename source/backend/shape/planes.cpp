@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/planes.cpp $
- * $Revision: #35 $
- * $Change: 6161 $
- * $DateTime: 2013/12/05 18:42:17 $
+ * $Revision: #36 $
+ * $Change: 6164 $
+ * $DateTime: 2013/12/09 17:21:04 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -421,11 +421,12 @@ void Plane::Scale(const Vector3d& Vector, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void Plane::Invert()
+ObjectPtr Plane::Invert()
 {
 	Normal_Vector.invert();
-
 	Distance *= -1.0;
+
+	return this;
 }
 
 

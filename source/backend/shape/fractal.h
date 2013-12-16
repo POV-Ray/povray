@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/fractal.h $
- * $Revision: #26 $
- * $Change: 6163 $
- * $DateTime: 2013/12/08 22:48:58 $
+ * $Revision: #27 $
+ * $Change: 6164 $
+ * $DateTime: 2013/12/09 17:21:04 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -95,7 +95,6 @@ class Fractal : public ObjectBase
 		DBL Exit_Value;
 		int Num_Iterations;           /* number of iterations */
 		DBL Precision;                /* Precision value */
-		int Inverted;
 		int Algebra;                  /* Quaternion or Hypercomplex */
 		int Sub_Type;
 		Complex exponent;             /* exponent of power function */
@@ -114,7 +113,6 @@ class Fractal : public ObjectBase
 		virtual void Rotate(const Vector3d&, const TRANSFORM *);
 		virtual void Scale(const Vector3d&, const TRANSFORM *);
 		virtual void Transform(const TRANSFORM *);
-		virtual void Invert();
 		virtual void Compute_BBox();
 
 		static void Free_Iteration_Stack(DBL **IStack);

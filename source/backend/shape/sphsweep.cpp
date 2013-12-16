@@ -28,9 +28,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/sphsweep.cpp $
- * $Revision: #42 $
- * $Change: 6161 $
- * $DateTime: 2013/12/05 18:42:17 $
+ * $Revision: #43 $
+ * $Change: 6164 $
+ * $DateTime: 2013/12/09 17:21:04 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -1147,45 +1147,6 @@ void SphereSweep::Scale(const Vector3d& Vector, const TRANSFORM *tr)
 	}
 	else
 		Transform(tr);
-}
-
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-*   Invert_Sphere_Sweep
-*
-* INPUT
-*
-*   Object
-*
-* OUTPUT
-*
-*   Object
-*
-* RETURNS
-*
-*   -
-*
-* AUTHOR
-*
-*   Jochen Lippert
-*
-* DESCRIPTION
-*
-*   Invert a sphere sweep.
-*
-* CHANGES
-*
-*   -
-*
-******************************************************************************/
-
-void SphereSweep::Invert()
-{
-	Invert_Flag(this, INVERTED_FLAG);
 }
 
 

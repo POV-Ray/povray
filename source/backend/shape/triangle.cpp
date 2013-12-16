@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/triangle.cpp $
- * $Revision: #36 $
- * $Change: 6161 $
- * $DateTime: 2013/12/05 18:42:17 $
+ * $Revision: #37 $
+ * $Change: 6164 $
+ * $DateTime: 2013/12/09 17:21:04 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -887,38 +887,6 @@ void Triangle::Transform(const TRANSFORM *tr)
 *
 * FUNCTION
 *
-*   Invert_Triangle
-*
-* INPUT
-*   
-* OUTPUT
-*   
-* RETURNS
-*   
-* AUTHOR
-*
-*   POV-Ray Team
-*   
-* DESCRIPTION
-*
-*   -
-*
-* CHANGES
-*
-*   -
-*
-******************************************************************************/
-
-void Triangle::Invert()
-{
-}
-
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
 *   Create_Triangle
 *
 * INPUT
@@ -941,7 +909,7 @@ void Triangle::Invert()
 *
 ******************************************************************************/
 
-Triangle::Triangle() : ObjectBase(TRIANGLE_OBJECT)
+Triangle::Triangle() : NonsolidObject(TRIANGLE_OBJECT)
 {
 	Normal_Vector = Vector3d(0.0, 1.0, 0.0);
 
@@ -952,7 +920,7 @@ Triangle::Triangle() : ObjectBase(TRIANGLE_OBJECT)
 	P3 = Vector3d(0.0, 1.0, 0.0);
 }
 
-Triangle::Triangle(int t) : ObjectBase(t)
+Triangle::Triangle(int t) : NonsolidObject(t)
 {
 	Normal_Vector = Vector3d(0.0, 1.0, 0.0);
 
@@ -1196,38 +1164,6 @@ void SmoothTriangle::Transform(const TRANSFORM *tr)
 
 		Compute_Triangle();
 	}
-}
-
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-*   Invert_Smooth_Triangle
-*
-* INPUT
-*   
-* OUTPUT
-*   
-* RETURNS
-*   
-* AUTHOR
-*
-*   POV-Ray Team
-*   
-* DESCRIPTION
-*
-*   -
-*
-* CHANGES
-*
-*   -
-*
-******************************************************************************/
-
-void SmoothTriangle::Invert()
-{
 }
 
 

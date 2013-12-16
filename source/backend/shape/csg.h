@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/csg.h $
- * $Revision: #24 $
- * $Change: 6163 $
- * $DateTime: 2013/12/08 22:48:58 $
+ * $Revision: #25 $
+ * $Change: 6164 $
+ * $DateTime: 2013/12/09 17:21:04 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -70,11 +70,10 @@ class CSG : public CompoundObject
 		virtual void Rotate(const Vector3d&, const TRANSFORM *);
 		virtual void Scale(const Vector3d&, const TRANSFORM *);
 		virtual void Transform(const TRANSFORM *);
+		virtual ObjectPtr Invert() = 0;
 		virtual void Compute_BBox();
-		virtual void Invert();
 
 		void Determine_Textures(Intersection *isect, bool hitinside, WeightedTextureVector& textures, TraceThreadData *Threaddata);
-		virtual CSG *Morph(void) = 0;
 };
 
 class CSGUnion : public CSG
@@ -88,7 +87,7 @@ class CSGUnion : public CSG
 
 		virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
 		virtual bool Inside(const Vector3d&, TraceThreadData *) const;
-		virtual CSG *Morph(void);
+		virtual ObjectPtr Invert();
 };
 
 class CSGMerge : public CSGUnion
@@ -100,7 +99,6 @@ class CSGMerge : public CSGUnion
 		virtual ObjectPtr Copy();
 
 		virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
-		virtual CSG *Morph(void);
 };
 
 class CSGIntersection : public CSG
@@ -113,7 +111,7 @@ class CSGIntersection : public CSG
 
 		virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
 		virtual bool Inside(const Vector3d&, TraceThreadData *) const;
-		virtual CSG *Morph(void);
+		virtual ObjectPtr Invert();
 
 		bool isDifference;
 };
