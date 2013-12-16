@@ -22,11 +22,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/render/tracetask.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/render/tracetask.cpp $
+ * $Revision: #100 $
+ * $Change: 6113 $
+ * $DateTime: 2013/11/20 20:39:54 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #include <vector>
@@ -35,7 +35,6 @@
 
 // frame.h must always be the first POV file included (pulls in platform config)
 #include "backend/frame.h"
-#include "backend/colour/colour.h"
 #include "backend/math/vector.h"
 #include "backend/math/matrices.h"
 #include "backend/render/trace.h"
@@ -635,8 +634,8 @@ void TraceTask::NonAdaptiveSupersamplingForOnePixel(DBL x, DBL y, Colour& leftco
 	Colour gcTop  = GammaCurve::Encode(aaGamma, topcol);
 	Colour gcCur  = GammaCurve::Encode(aaGamma, curcol);
 
-	bool leftdiff = (Colour_Distance_RGBT(gcLeft, gcCur) >= aaThreshold);
-	bool topdiff  = (Colour_Distance_RGBT(gcTop,  gcCur) >= aaThreshold);
+	bool leftdiff = (colourDistanceRGBT(gcLeft, gcCur) >= aaThreshold);
+	bool topdiff  = (colourDistanceRGBT(gcTop,  gcCur) >= aaThreshold);
 
 	sampleleft = sampleleft && leftdiff;
 	sampletop = sampletop && topdiff;
@@ -704,12 +703,12 @@ void TraceTask::SubdivideOnePixel(DBL x, DBL y, DBL d, size_t bx, size_t by, siz
 	Colour cx2y2g = GammaCurve::Encode(aaGamma, cx2y2);
 
 	if((level > 0) &&
-	   ((Colour_Distance_RGBT(cx0y0g, cx0y2g) >= aaThreshold) ||
-	    (Colour_Distance_RGBT(cx0y0g, cx2y0g) >= aaThreshold) ||
-	    (Colour_Distance_RGBT(cx0y0g, cx2y2g) >= aaThreshold) ||
-	    (Colour_Distance_RGBT(cx0y2g, cx2y0g) >= aaThreshold) ||
-	    (Colour_Distance_RGBT(cx0y2g, cx2y2g) >= aaThreshold) ||
-	    (Colour_Distance_RGBT(cx2y0g, cx2y2g) >= aaThreshold)))
+	   ((colourDistanceRGBT(cx0y0g, cx0y2g) >= aaThreshold) ||
+	    (colourDistanceRGBT(cx0y0g, cx2y0g) >= aaThreshold) ||
+	    (colourDistanceRGBT(cx0y0g, cx2y2g) >= aaThreshold) ||
+	    (colourDistanceRGBT(cx0y2g, cx2y0g) >= aaThreshold) ||
+	    (colourDistanceRGBT(cx0y2g, cx2y2g) >= aaThreshold) ||
+	    (colourDistanceRGBT(cx2y0g, cx2y2g) >= aaThreshold)))
 	{
 		Colour rcx0y0;
 		Colour rcx0y1;

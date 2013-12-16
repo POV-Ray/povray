@@ -1,7 +1,7 @@
 /*******************************************************************************
- * colour.h
+ * colour_old.h
  *
- * This module contains all defines, typedefs, and prototypes for COLOUR.CPP.
+ * This module contains all defines, typedefs, and prototypes for colour_old.cpp.
  *
  * ---------------------------------------------------------------------------
  * Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
@@ -24,17 +24,17 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/colour/colour.h $
+ * $File: //depot/povray/smp/source/backend/colour/colour_old.h $
  * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $Change: 6113 $
+ * $DateTime: 2013/11/20 20:39:54 $
+ * $Author: clipka $
  *******************************************************************************/
 
 /* NOTE: FRAME.H contains other colour stuff. */
 
-#ifndef COLOUR_H
-#define COLOUR_H
+#ifndef COLOUR_OLD_H
+#define COLOUR_OLD_H
 
 namespace pov
 {
@@ -43,17 +43,10 @@ namespace pov
 * Global preprocessor defines
 ******************************************************************************/
 
-#define RED2GRAY   0.297
-#define GREEN2GRAY 0.589
-#define BLUE2GRAY  0.114
-#define GREY_SCALE3(CR,CG,CB) (RED2GRAY*(CR) + GREEN2GRAY*(CG) + BLUE2GRAY*(CB))
-#define GREY_SCALE(C) GREY_SCALE3((C)[pRED],(C)[pGREEN],(C)[pBLUE])
 
 /*****************************************************************************
 * Global typedefs
 ******************************************************************************/
-
-
 
 
 /*****************************************************************************
@@ -61,18 +54,18 @@ namespace pov
 ******************************************************************************/
 
 
-
 /*****************************************************************************
 * Global functions
 ******************************************************************************/
 
+// TODO - obsolete
 COLOUR *Create_Colour (void);
 COLOUR *Copy_Colour (const COLOUR Old);
+
+// TODO - refactor
 BLEND_MAP_ENTRY *Create_BMap_Entries (int Map_Size);
-BLEND_MAP_ENTRY *Copy_BMap_Entries (const BLEND_MAP_ENTRY *Old, int Map_Size, int Type);
 BLEND_MAP *Create_Blend_Map (void);
 BLEND_MAP *Copy_Blend_Map (BLEND_MAP *Old);
-DBL Colour_Distance_RGBT (const Colour& colour1, const Colour& colour2);
 void Destroy_Blend_Map (BLEND_MAP *BMap);
 
 

@@ -30,9 +30,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/vm/fnintern.cpp $
- * $Revision: #23 $
- * $Change: 6085 $
- * $DateTime: 2013/11/10 07:39:29 $
+ * $Revision: #24 $
+ * $Change: 6096 $
+ * $DateTime: 2013/11/18 14:11:26 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -1227,11 +1227,11 @@ void f_pigment(FPUContext *ctx, DBL *ptr, unsigned int fn, unsigned int sp) // 0
 
 	Compute_Pigment(Col, reinterpret_cast<const PIGMENT *>(f->private_data), Vec, NULL, NULL, ctx->threaddata);
 
-	ctx->SetLocal(sp + pRED, Col[pRED]);
-	ctx->SetLocal(sp + pGREEN, Col[pGREEN]);
-	ctx->SetLocal(sp + pBLUE, Col[pBLUE]);
-	ctx->SetLocal(sp + pFILTER, Col[pFILTER]);
-	ctx->SetLocal(sp + pTRANSM, Col[pTRANSM]);
+	ctx->SetLocal(sp + pRED, Col.red());
+	ctx->SetLocal(sp + pGREEN, Col.green());
+	ctx->SetLocal(sp + pBLUE, Col.blue());
+	ctx->SetLocal(sp + pFILTER, Col.filter());
+	ctx->SetLocal(sp + pTRANSM, Col.transm());
 }
 
 void f_transform(FPUContext *ctx, DBL *ptr, unsigned int fn, unsigned int sp) // 1

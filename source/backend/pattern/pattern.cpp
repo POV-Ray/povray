@@ -46,7 +46,7 @@
 #include "backend/scene/objects.h"
 #include "backend/scene/scene.h"
 #include "backend/support/imageutil.h"
-#include "backend/colour/colour.h"
+#include "backend/colour/colour_old.h"
 #include "backend/parser/parse.h"
 #include "backend/math/vector.h"
 #include "backend/math/matrices.h"

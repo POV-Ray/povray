@@ -26,9 +26,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/support/imageutil.cpp $
- * $Revision: #37 $
- * $Change: 6085 $
- * $DateTime: 2013/11/10 07:39:29 $
+ * $Revision: #40 $
+ * $Change: 6113 $
+ * $DateTime: 2013/11/20 20:39:54 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -39,7 +39,6 @@
 #include "backend/support/imageutil.h"
 #include "backend/math/vector.h"
 #include "backend/pattern/pattern.h"
-#include "backend/colour/colour.h"
 #include "backend/support/fileutil.h"
 #include "base/pov_err.h"
 
@@ -202,7 +201,7 @@ TEXTURE *material_map(const VECTOR EPoint, const TEXTURE *Texture)
 		image_colour_at(Texture->Vals.image, xcoor, ycoor, colour, &reg_number); // TODO ALPHA - we should decide whether we prefer premultiplied or non-premultiplied alpha
 
 		if(reg_number == -1)
-			Material_Number = (int)(colour[pRED] * 255.0);
+			Material_Number = (int)(colour.red() * 255.0);
 		else
 			Material_Number = reg_number;
 	}
@@ -395,9 +394,9 @@ DBL image_pattern(const VECTOR EPoint, const TPATTERN *TPattern)
 		{
 			// use alpha channel or red channel
 			if(image->data->HasTransparency() == true)
-				Value = colour[pTRANSM];
+				Value = colour.transm();
 			else
-				Value = colour[pRED];   // otherwise, just use the red channel
+				Value = colour.red();   // otherwise, just use the red channel
 		}
 		else
 			// use grey-scaled version of the color
@@ -466,13 +465,7 @@ static void image_colour_at(const ImageData *image, DBL xcoor, DBL ycoor, Colour
 	if (!premul && getPremul)
 	{
 		// we fetched premultiplied data, but caller expects it non-premultiplied, so we need to fix that
-		float alpha = colour.FTtoA();
-		if (float(alpha) > EPSILON)
-		{
-			colour.red()   /= alpha;
-			colour.green() /= alpha;
-			colour.blue()  /= alpha;
-		}
+		AlphaUnPremultiply(colour);
 	}
 }
 
@@ -499,30 +492,30 @@ HF_VAL image_height_at(const ImageData *image, int x, int y)
 {
 	// TODO ALPHA - handling of premultiplied vs. non-premultiplied alpha needs to be considered
 
-	float r, g, b;
+	RGBColour colour;
 
 	// for 8-bit indexed images, use the index (scaled to match short int range)
 	if (image->data->IsIndexed())
 		return ((HF_VAL)image->data->GetIndexedValue(x, y) * 256); 
-  // TODO FIXME - should be *257 to get a max value of 255*257 = 65535
-  /* [JG-2013]: do not change 256 for 257, due to backward compatibility with all versions up to 3.6
-   * it's a shame to not being able to cover the full range when using indexed image, but
-   * it was like that for a very very long time (since the introduction of height field in povray)
-   */
+	// TODO FIXME - should be *257 to get a max value of 255*257 = 65535
+	/* [JG-2013]: do not change 256 for 257, due to backward compatibility with all versions up to 3.6
+	 * it's a shame to not being able to cover the full range when using indexed image, but
+	 * it was like that for a very very long time (since the introduction of height field in povray)
+	 */
 
 	// for greyscale images, use the float greyscale value (scaled to match short int range)
 	if (image->data->IsGrayscale())
 		return ((HF_VAL) (image->data->GetGrayValue(x, y) * 65535.0f));
 
-	image->data->GetRGBValue(x, y, r, g, b);
+	image->data->GetRGBValue(x, y, colour); // TODO - what about alpha premultiplication?
 
 	// for images with high bit depth (>8 bit per color channel), use the float greyscale value (scaled to match short int range)
 	if (image->data->GetMaxIntValue() > 255)
-		return ((HF_VAL) (GREY_SCALE3 (r, g, b) * 65535.0f));
+		return ((HF_VAL) (colour.greyscale() * 65535.0f));
 
 	// for images with low bit depth (<=8 bit per color channel), compose from red (high byte) and green (low byte) channel.
-	return ((HF_VAL) ((r * 256.0 + g) * 255.0)); 
-  // [JG-2013] : the high byte / low byte is (r *255) * 256 + (g*255) , which is factored as (r*256+g)*255 (was issue flyspray #308)
+	return ((HF_VAL) ((colour.red() * 256.0 + colour.green()) * 255.0)); 
+	// [JG-2013] : the high byte / low byte is (r *255) * 256 + (g*255) , which is factored as (r*256+g)*255 (was issue flyspray #308)
 }
 
 
@@ -1010,8 +1003,8 @@ static void no_interpolation(const ImageData *image, DBL xcoor, DBL ycoor, Colou
 
 		// Note: Transmit_all supplements alpha channel
 		// TODO ALPHA - check how this affects premultiplied/non-premultiplied alpha considerations
-		colour[pTRANSM] += image->AllTransmit;
-		colour[pFILTER] += image->AllFilter;
+		colour.transm() += image->AllTransmit;
+		colour.filter() += image->AllFilter;
 	}
 	else
 		*index = image->data->GetIndexedValue(ixcoor, iycoor);

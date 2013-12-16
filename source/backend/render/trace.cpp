@@ -23,9 +23,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/render/trace.cpp $
- * $Revision: #210 $
- * $Change: 6076 $
- * $DateTime: 2013/11/10 05:27:15 $
+ * $Revision: #213 $
+ * $Change: 6097 $
+ * $DateTime: 2013/11/18 15:19:34 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -36,7 +36,6 @@
 
 // frame.h must always be the first POV file included (pulls in platform config)
 #include "backend/frame.h"
-#include "backend/colour/colour.h"
 #include "backend/math/vector.h"
 #include "backend/math/matrices.h"
 #include "backend/scene/objects.h"
@@ -64,8 +63,6 @@ namespace pov
 {
 
 #define SHADOW_TOLERANCE 1.0e-3
-
-#define MEDIA_AFTER_TEXTURE_INTERPOLATION 1
 
 Trace::Trace(shared_ptr<SceneData> sd, TraceThreadData *td, unsigned int qf,
              CooperateFunctor& cf, MediaFunctor& mf, RadiosityFunctor& rf) :
@@ -167,10 +164,13 @@ double Trace::TraceRay(const Ray& ray, Colour& colour, COLC weight, TraceTicket&
 		// intentional.  Even though we're processing a photon ray, we don't want
 		// to deposit photons in the infinite atmosphere, only in contained
 		// media, which is processed later (in ComputeLightedTexture).  [nk]
-		media.ComputeMedia(sceneData->atmosphere, ray, bestisect, colour, ticket);
+		RGBColour tempColour(colour);
+		media.ComputeMedia(sceneData->atmosphere, ray, bestisect, tempColour, colour.transm(), ticket);
 
 		if(sceneData->fog != NULL)
-			ComputeFog(ray, bestisect, colour);
+			ComputeFog(ray, bestisect, tempColour, colour.transm());
+
+		colour.setRGB(tempColour);
 	}
 
 	if(found)
@@ -183,10 +183,13 @@ double Trace::TraceRay(const Ray& ray, Colour& colour, COLC weight, TraceTicket&
 		if((sceneData->rainbow != NULL) && (ray.IsShadowTestRay() == false))
 			ComputeRainbow(ray, bestisect, colour);
 
-		media.ComputeMedia(sceneData->atmosphere, ray, bestisect, colour, ticket);
+		RGBColour tempColour(colour);
+		media.ComputeMedia(sceneData->atmosphere, ray, bestisect, tempColour, colour.transm(), ticket);
 
 		if(sceneData->fog != NULL)
-			ComputeFog(ray, bestisect, colour);
+			ComputeFog(ray, bestisect, tempColour, colour.transm());
+
+		colour.setRGB(tempColour);
 	}
 
 	if(traceLevelIncremented)
@@ -199,6 +202,14 @@ double Trace::TraceRay(const Ray& ray, Colour& colour, COLC weight, TraceTicket&
 		return HUGE_VAL;
 	else
 		return bestisect.Depth;
+}
+
+double Trace::TraceRay(const Ray& ray, RGBColour& colour, COLC weight, TraceTicket& ticket, bool continuedRay, DBL maxDepth)
+{
+	Colour tempColour(colour, 0.0, 0.0);
+	double ret = TraceRay(ray, tempColour, weight, ticket, continuedRay, maxDepth);
+	colour = RGBColour(tempColour);
+	return ret;
 }
 
 bool Trace::FindIntersection(Intersection& bestisect, const Ray& ray)
@@ -546,15 +557,17 @@ void Trace::ComputeTextureColour(Intersection& isect, Colour& colour, const Ray&
 		}
 	}
 
-#if MEDIA_AFTER_TEXTURE_INTERPOLATION
 	// [CLi] moved this here from Trace::ComputeShadowTexture() and Trace::ComputeLightedTexture(), respectively,
 	// to avoid media to be computed twice when dealing with averaged textures.
 	// TODO - For photon rays we're still potentially doing double work on media.
 	// TODO - For shadow rays we're still potentially doing double work on distance-based attenuation.
 	// Calculate participating media effects.
 	if(!photonPass && (qualityFlags & Q_VOLUME) && (!ray.GetInteriors().empty()) && (ray.IsHollowRay() == true))
-		media.ComputeMedia(ray.GetInteriors(), ray, isect, tmpCol, ticket);
-#endif
+	{
+		RGBColour tmpCol2(tmpCol);
+		media.ComputeMedia(ray.GetInteriors(), ray, isect, tmpCol2, tmpCol.transm(), ticket);
+		tmpCol.setRGB(tmpCol2);
+	}
 
 	colour += tmpCol;
 
@@ -691,7 +704,7 @@ void Trace::ComputeAverageTextureColours(Colour& resultcolour, const TEXTURE *te
 
 		for(int i = 0; i < bmap->Number_Of_Entries; i++)
 		{
-			VScale(*lc, *resultcolour, bmap->Blend_Map_Entries[i].value / total); // modifies RGB, but leaves Filter and Transmit unchanged
+			lc.setRGB(RGBColour(resultcolour) * (bmap->Blend_Map_Entries[i].value / total));
 
 			ComputeOneTextureColour(lc, bmap->Blend_Map_Entries[i].Vals.Texture, warps, ipoint, rawnormal, ray, weight, isect, shadowflag, photonPass, ticket);
 		}
@@ -847,7 +860,7 @@ void Trace::ComputeLightedTexture(Colour& resultcolour, const TEXTURE *texture, 
 			// We need to reduce the layer's own brightness if it is transparent.
 			if (sceneData->EffectiveLanguageVersion() < 370)
 				// this formula is bogus, but it has been around for a while so we're keeping it for compatibility with legacy scenes
-				att = (1.0 - (layCol.filter() * max3(layCol.red(), layCol.green(), layCol.blue()) + layCol.transm()));
+				att = (1.0 - (layCol.filter() * RGBColour(layCol).max() + layCol.transm()));
 			else
 				att = layCol.opacity();
 
@@ -876,7 +889,7 @@ void Trace::ComputeLightedTexture(Colour& resultcolour, const TEXTURE *texture, 
 					// TODO FIXME - other layers may see a higher weight!
 					// Maybe we should go along and compute *first* the total contribution radiosity will make,
 					// and at the *end* apply it.
-					max_Radiosity_Contribution = (filCol * RGBColour(layCol)).greyscale() * att * layer->Finish->RawDiffuse;
+					max_Radiosity_Contribution = (filCol * RGBColour(layCol)).weightGreyscale() * att * layer->Finish->RawDiffuse;
 
 					if(max_Radiosity_Contribution > ticket.adcBailout)
 					{
@@ -898,7 +911,7 @@ void Trace::ComputeLightedTexture(Colour& resultcolour, const TEXTURE *texture, 
 						// TODO FIXME - other layers may see a higher weight!
 						// Maybe we should go along and compute *first* the total contribution radiosity will make,
 						// and at the *end* apply it.
-						max_Radiosity_Contribution = (filCol * RGBColour(layCol)).greyscale() * att * layer->Finish->RawDiffuseBack;
+						max_Radiosity_Contribution = (filCol * RGBColour(layCol)).weightGreyscale() * att * layer->Finish->RawDiffuseBack;
 
 						if(max_Radiosity_Contribution > ticket.adcBailout)
 						{
@@ -945,7 +958,7 @@ void Trace::ComputeLightedTexture(Colour& resultcolour, const TEXTURE *texture, 
 			}
 
 			tmpCol *= filCol;
-			VAddEq(*resultcolour, *tmpCol); // modifies RGB, but leaves Filter and Transmit unchanged
+			resultcolour.addRGB(tmpCol);
 		}
 
 		// Get new filter color.
@@ -980,7 +993,7 @@ void Trace::ComputeLightedTexture(Colour& resultcolour, const TEXTURE *texture, 
 	{
 		// [CLi] changed filCol to RGB, as filter and transmit were always pinned to 1.0 and 0.0, respectively anyway
 		// TODO CLARIFY - is this working properly if some filCol component is negative? (what would be the right thing then?)
-		w1 = max3(fabs(filCol.red()), fabs(filCol.green()), fabs(filCol.blue()));
+		w1 = filCol.weightMaxAbs();
 		new_Weight = weight * w1;
 
 		// Trace refracted ray.
@@ -1084,15 +1097,6 @@ void Trace::ComputeLightedTexture(Colour& resultcolour, const TEXTURE *texture, 
 			layer = reinterpret_cast<const TEXTURE *>(layer->Next);
 		}
 	}
-
-#if MEDIA_AFTER_TEXTURE_INTERPOLATION
-	// [CLi] moved this to Trace::ComputeTextureColour() and Trace::ComputeShadowColour(), respectively
-	// to avoid media to be computed twice when dealing with averaged textures.
-#else
-	// Calculate participating media effects.
-	if((qualityFlags & Q_VOLUME) && (!ray.GetInteriors().empty()) && (ray.IsHollowRay() == true))
-		media.ComputeMedia(ray.GetInteriors(), ray, isect, resultcolour, ticket);
-#endif
 }
 
 void Trace::ComputeShadowTexture(Colour& filtercolour, const TEXTURE *texture, vector<const TEXTURE *>& warps, const Vector3d& ipoint,
@@ -1175,15 +1179,6 @@ void Trace::ComputeShadowTexture(Colour& filtercolour, const TEXTURE *texture, v
 
 	// Get distance based attenuation.
 	filtercolour = Colour(tmpCol * refraction, 1.0, 0.0);
-
-#if MEDIA_AFTER_TEXTURE_INTERPOLATION
-	// [CLi] moved this to Trace::ComputeTextureColour() and Trace::ComputeShadowColour(), respectively
-	// to avoid media to be computed twice when dealing with averaged textures.
-#else
-	// Calculate participating media effects.
-	if((qualityFlags & Q_VOLUME) && (!ray.GetInteriors().empty()) && (ray.IsHollowRay() == true))
-		media.ComputeMedia(ray.GetInteriors(), ray, isect, filtercolour, ticket);
-#endif
 }
 
 void Trace::ComputeReflection(const FINISH* finish, const Vector3d& ipoint, const Ray& ray, const Vector3d& normal, const Vector3d& rawnormal, Colour& colour, COLC weight, TraceTicket& ticket)
@@ -2355,15 +2350,17 @@ void Trace::ComputeShadowColour(const LightSource &lightsource, Intersection& is
 		return;
 	}
 
-#if MEDIA_AFTER_TEXTURE_INTERPOLATION
 	// [CLi] moved this here from Trace::ComputeShadowTexture() and Trace::ComputeLightedTexture(), respectively,
 	// to avoid media to be computed twice when dealing with averaged textures.
 	// TODO - For photon rays we're still potentially doing double work on media.
 	// TODO - For shadow rays we're still potentially doing double work on distance-based attenuation.
 	// Calculate participating media effects.
 	if((qualityFlags & Q_VOLUME) && (!lightsourceray.GetInteriors().empty()) && (lightsourceray.IsHollowRay() == true))
-		media.ComputeMedia(lightsourceray.GetInteriors(), lightsourceray, isect, temp_Colour, ticket);
-#endif
+	{
+		RGBColour tempColour2(temp_Colour);
+		media.ComputeMedia(lightsourceray.GetInteriors(), lightsourceray, isect, tempColour2, temp_Colour.transm(), ticket);
+		temp_Colour.setRGB(tempColour2);
+	}
 
 	colour *= temp_Colour.rgbTransm();
 
@@ -2584,8 +2581,8 @@ void Trace::ComputeReflectivity(double& weight, RGBColour& reflectivity, const R
 	{
 		case 0: // Standard reflection
 		{
-			temp_Weight_Max = max3(reflection_max.red(), reflection_max.green(), reflection_max.blue());
-			temp_Weight_Min = max3(reflection_min.red(), reflection_min.green(), reflection_min.blue());
+			temp_Weight_Max = reflection_max.weightMax();
+			temp_Weight_Min = reflection_min.weightMax();
 			weight = weight * max(temp_Weight_Max, temp_Weight_Min);
 
 			if(fabs(reflection_falloff - 1.0) > EPSILON)
@@ -2631,7 +2628,7 @@ void Trace::ComputeReflectivity(double& weight, RGBColour& reflectivity, const R
 			else
 				reflectivity = reflection_max;
 
-			weight = weight * max3(reflectivity.red(), reflectivity.green(), reflectivity.blue());
+			weight = weight * reflectivity.weightMax();
 			break;
 		}
 		default:
@@ -2805,18 +2802,17 @@ void Trace::ComputeSky(const Ray& ray, Colour& colour, TraceTicket& ticket)
 		col += RGBColour(col_Temp) * att * filCol;
 		filCol *= col_Temp.rgbTransm();
 
-		colour.red()    = col.red();
-		colour.green()  = col.green();
-		colour.blue()   = col.blue();
+		colour.setRGB(col);
 		colour.filter() = 0.0;
 		colour.transm() = min(1.0f, fabs(filCol.greyscale()));
 	}
 }
 
-void Trace::ComputeFog(const Ray& ray, const Intersection& isect, Colour& colour)
+void Trace::ComputeFog(const Ray& ray, const Intersection& isect, RGBColour& colour, COLC& transm)
 {
-	double att, att_inv, width;
-	Colour col_fog;
+	double att, width;
+	RGBColour col_fog;
+	COLC filter_fog, transm_fog;
 	RGBColour sum_att; // total attenuation.
 	RGBColour sum_col; // total color.
 
@@ -2839,39 +2835,36 @@ void Trace::ComputeFog(const Ray& ray, const Intersection& isect, Colour& colour
 			switch(fog->Type)
 			{
 				case GROUND_MIST:
-					att = ComputeGroundFogColour(ray, 0.0, width, fog, col_fog);
+					att = ComputeGroundFogDepth(ray, 0.0, width, fog);
 					break;
 				default:
-					att = ComputeConstantFogColour(ray, 0.0, width, fog, col_fog);
+					att = ComputeConstantFogDepth(ray, 0.0, width, fog);
 					break;
 			}
 
+			col_fog = RGBColour(fog->colour);
+			filter_fog = fog->colour.filter();
+			transm_fog = fog->colour.transm();
+
 			// Check for minimum transmittance.
-			if(att < col_fog.transm())
-				att = col_fog.transm();
+			if(att < transm_fog)
+				att = transm_fog;
 
 			// Get attenuation sum due to filtered/unfiltered translucency.
 			// [CLi] removed computation of sum_att.filer() and sum_att.transm(), as they were discarded anyway
-			sum_att.red()    *= att * ((1.0 - col_fog.filter()) + col_fog.filter() * col_fog.red());
-			sum_att.green()  *= att * ((1.0 - col_fog.filter()) + col_fog.filter() * col_fog.green());
-			sum_att.blue()   *= att * ((1.0 - col_fog.filter()) + col_fog.filter() * col_fog.blue());
+			sum_att *= att * ((1.0 - filter_fog) + filter_fog * col_fog);
 
 			if(!ray.IsShadowTestRay())
-			{
-				att_inv = 1.0 - att;
-				sum_col += att_inv * RGBColour(col_fog);
-			}
+				sum_col += (1.0 - att) * col_fog;
 		}
 	}
 
 	// Add light coming from background.
-	colour.red()   = sum_col.red()   + sum_att.red()   * colour.red();
-	colour.green() = sum_col.green() + sum_att.green() * colour.green();
-	colour.blue()  = sum_col.blue()  + sum_att.blue()  * colour.blue();
-	colour.transm() *= sum_att.greyscale();
+	colour = sum_col + sum_att * colour;
+	transm *= sum_att.greyscale();
 }
 
-double Trace::ComputeConstantFogColour(const Ray &ray, double depth, double width, const FOG *fog, Colour& colour)
+double Trace::ComputeConstantFogDepth(const Ray &ray, double depth, double width, const FOG *fog)
 {
 	Vector3d p;
 	double k;
@@ -2888,8 +2881,6 @@ double Trace::ComputeConstantFogColour(const Ray &ray, double depth, double widt
 
 		width *= (1.0 - k * min(1.0, Turbulence(*p, fog->Turb, sceneData->noiseGenerator) * fog->Turb_Depth));
 	}
-
-	colour = fog->colour;
 
 	return (exp(-width / fog->Distance));
 }
@@ -2914,7 +2905,7 @@ double Trace::ComputeConstantFogColour(const Ray &ray, double depth, double widt
 *   The integral of the density is atan(Y) (for Y >= 0).
 ******************************************************************************/
 
-double Trace::ComputeGroundFogColour(const Ray& ray, double depth, double width, const FOG *fog, Colour& colour)
+double Trace::ComputeGroundFogDepth(const Ray& ray, double depth, double width, const FOG *fog)
 {
 	double fog_density, delta;
 	double start, end;
@@ -2969,8 +2960,6 @@ double Trace::ComputeGroundFogColour(const Ray& ray, double depth, double width,
 		width *= (1.0 - k * min(1.0, Turbulence(*p, fog->Turb, sceneData->noiseGenerator) * fog->Turb_Depth));
 	}
 
-	colour = fog->colour;
-
 	return (exp(-width * fog_density / fog->Distance));
 }
 
@@ -2983,19 +2972,17 @@ void Trace::ComputeShadowMedia(Ray& light_source_ray, Intersection& isect, RGBCo
 	if(media_attenuation_and_interaction && (qualityFlags & Q_VOLUME) && ((light_source_ray.IsHollowRay() == true) || (isect.Object != NULL && isect.Object->interior != NULL)))
 	{
 		// we're using general-purpose media and fog handling code, which insists on computing a transmissive component (for alpha channel)
-		Colour tmpCol = Colour(resultcolour);
-
-		media.ComputeMedia(sceneData->atmosphere, light_source_ray, isect, tmpCol, ticket);
+		COLC tmpTransm = 0.0;
+		media.ComputeMedia(sceneData->atmosphere, light_source_ray, isect, resultcolour, tmpTransm, ticket);
 
 		if((sceneData->fog != NULL) && (light_source_ray.IsHollowRay() == true) && (light_source_ray.IsPhotonRay() == false))
-			ComputeFog(light_source_ray, isect, tmpCol);
+			ComputeFog(light_source_ray, isect, resultcolour, tmpTransm);
 
 		// discard the transmissive component (alpha channel)
-		resultcolour = RGBColour(tmpCol);
 	}
 
 	// If ray is entering from the atmosphere or the ray is currently *not* inside an object add it,
-	// but it it is currently inside an object, the ray is leaving the current object and is removed
+	// but if it is currently inside an object, the ray is leaving the current object and is removed
 	if((isect.Object != NULL) && ((light_source_ray.GetInteriors().empty()) || (light_source_ray.RemoveInterior(isect.Object->interior) == false)))
 		light_source_ray.AppendInterior(isect.Object->interior);
 }
@@ -3618,7 +3605,7 @@ void Trace::ComputeDiffuseAmbientContribution1(const Intersection& out, const Ve
 		return;
 
 	Ray ambientray = Ray(in.IPoint, *vIn, Ray::OtherRay); // TODO FIXME - [CLi] check whether ray type is suitable
-	Colour ambientcolour;
+	RGBColour ambientcolour;
 	TraceRay(ambientray, ambientcolour, weight, ticket, false);
 
 	// Don't calculate anything more if there's no light input
@@ -3712,8 +3699,8 @@ void Trace::ComputeSubsurfaceScattering(const FINISH *Finish, const RGBColour& l
 	double      sampleArea;
 	double      weight;
 	double      weightSum;
-	double      sigma_a_mean        = sigma_a.greyscale();
-	double      sigma_prime_s_mean  = sigma_prime_s.greyscale();
+	double      sigma_a_mean        = sigma_a.greyscale(); // TODO FIXME - use a "fair" average of all three color channels
+	double      sigma_prime_s_mean  = sigma_prime_s.greyscale(); // TODO FIXME - use a "fair" average of all three color channels
 	double      sigma_prime_t_mean  = sigma_a_mean + sigma_prime_s_mean;
 	double      sigma_tr_mean_sqr   = sigma_a_mean * sigma_prime_t_mean * 3.0;
 	double      sigma_tr_mean       = sqrt(sigma_tr_mean_sqr);
@@ -3813,11 +3800,11 @@ void Trace::ComputeSubsurfaceScattering(const FINISH *Finish, const RGBColour& l
 		// colour dependent unscattered contribution
 
 		// Trace refracted ray.
-		Colour tempcolor;
+		RGBColour tempcolor;
 
 		// TODO FIXME - account for fresnel attenuation at interfaces
 		DblRGBColour att = exp(-sigma_prime_t * dist); // TODO should be sigma_t
-		weight = max3(att.red(), att.green(), att.blue());
+		weight = att.weightMax();
 		if (weight > ticket.adcBailout)
 		{
 			if (!found)
@@ -3837,7 +3824,7 @@ void Trace::ComputeSubsurfaceScattering(const FINISH *Finish, const RGBColour& l
 					Assign_Vector(doubleRefractedEyeRay.Origin, unscatteredIn.IPoint);
 					Assign_Vector(doubleRefractedEyeRay.Direction, *(doubleRefractedEye));
 					TraceRay(doubleRefractedEyeRay, tempcolor, weight, ticket, false);
-					Total_Colour += RGBColour(DblRGBColour(RGBColour(tempcolor)) * att);
+					Total_Colour += RGBColour(DblRGBColour(tempcolor) * att);
 				}
 			}
 			else

@@ -24,17 +24,16 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/colour/colutils.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/colour/colutils.cpp $
+ * $Revision: #22 $
+ * $Change: 6113 $
+ * $DateTime: 2013/11/20 20:39:54 $
+ * $Author: clipka $
  *******************************************************************************/
 
 // frame.h must always be the first POV file included (pulls in platform config)
 #include "backend/frame.h"
 #include "backend/colour/colutils.h"
-#include "backend/colour/colour.h"
 #include "backend/math/vector.h"
 
 // this must be the last file included
@@ -94,17 +93,18 @@ void colour2photonRgbe(SMALL_COLOUR rgbe, const RGBColour& c)
 	float v;
 	int e;
 
-	v = c[pRED];
-	if (c[pGREEN] > v) v = c[pGREEN];
-	if (c[pBLUE] > v) v = c[pBLUE];
+	// TODO FIXME - This may not work properly with negative color channel values.
+	// TODO FIXME - Maybe add dither to avoid potential color banding.
+
+	v =  c.max();
 	if (v < 1e-32) {
 		rgbe[0] = rgbe[1] = rgbe[2] = rgbe[3] = 0;
 	}
 	else {
 		v = frexp(v,&e) * 256.0/v;
-		rgbe[0] = (unsigned char) (c[pRED] * v);
-		rgbe[1] = (unsigned char) (c[pGREEN] * v);
-		rgbe[2] = (unsigned char) (c[pBLUE] * v);
+		rgbe[0] = (unsigned char) (c.red() * v);
+		rgbe[1] = (unsigned char) (c.green() * v);
+		rgbe[2] = (unsigned char) (c.blue() * v);
 		//rgbe[3] = (unsigned char) (e + 128);
 		rgbe[3] = (unsigned char) (e + 250);
 	}
@@ -164,9 +164,9 @@ void photonRgbe2colour(RGBColour& c, const SMALL_COLOUR rgbe)
 
 	if (rgbe[3]) {   /*nonzero pixel*/
 		f = ldexp(1.0,rgbe[3]-(int)(250+8));
-		c[pRED] = rgbe[0] * f;
-		c[pGREEN] = rgbe[1] * f;
-		c[pBLUE] = rgbe[2] * f;
+		c.red()   = rgbe[0] * f;
+		c.green() = rgbe[1] * f;
+		c.blue()  = rgbe[2] * f;
 	}
 	else
 		c.clear();

@@ -24,11 +24,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/lighting/point.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/lighting/point.cpp $
+ * $Revision: #28 $
+ * $Change: 6113 $
+ * $DateTime: 2013/11/20 20:39:54 $
+ * $Author: clipka $
  *******************************************************************************/
 
 // frame.h must always be the first POV file included (pulls in platform config)
@@ -36,7 +36,7 @@
 #include "backend/math/vector.h"
 #include "backend/math/matrices.h"
 #include "backend/scene/objects.h"
-#include "backend/colour/colour.h"
+#include "backend/colour/colour_old.h"
 #include "point.h"
 
 // this must be the last file included

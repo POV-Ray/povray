@@ -350,7 +350,7 @@
     <ClCompile Include="..\..\source\backend\bounding\bcyl.cpp" />
     <ClCompile Include="..\..\source\backend\bounding\boundingtask.cpp" />
     <ClCompile Include="..\..\source\backend\bounding\bsphere.cpp" />
-    <ClCompile Include="..\..\source\backend\colour\colour.cpp" />
+    <ClCompile Include="..\..\source\backend\colour\colour_old.cpp" />
     <ClCompile Include="..\..\source\backend\colour\colutils.cpp" />
     <ClCompile Include="..\..\source\backend\colour\spectral.cpp" />
     <ClCompile Include="..\..\source\backend\control\benchmark.cpp" />
@@ -458,7 +458,7 @@
     <ClInclude Include="..\..\source\backend\bounding\bcyl.h" />
     <ClInclude Include="..\..\source\backend\bounding\boundingtask.h" />
     <ClInclude Include="..\..\source\backend\bounding\bsphere.h" />
-    <ClInclude Include="..\..\source\backend\colour\colour.h" />
+    <ClInclude Include="..\..\source\backend\colour\colour_old.h" />
     <ClInclude Include="..\..\source\backend\colour\colutils.h" />
     <ClInclude Include="..\..\source\backend\colour\spectral.h" />
     <ClInclude Include="..\..\source\backend\control\benchmark.h" />

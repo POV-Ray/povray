@@ -25,11 +25,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/frame.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/frame.h $
+ * $Revision: #122 $
+ * $Change: 6089 $
+ * $DateTime: 2013/11/11 09:18:35 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #ifndef FRAME_H
@@ -52,6 +52,7 @@
 
 #include "base/configbase.h"
 #include "base/types.h"
+#include "base/colour.h"
 
 #include "backend/configbackend.h"
 #include "backend/support/simplevector.h"
@@ -193,6 +194,7 @@ inline void Assign_Vector_4D(VECTOR_4D d, const VECTOR_4D s)
 	d[T] = s[T];
 }
 
+// TODO - obsolete
 inline void Assign_Colour(COLOUR d, const COLOUR s)
 {
 	d[pRED] = s[pRED];
@@ -202,6 +204,7 @@ inline void Assign_Colour(COLOUR d, const COLOUR s)
 	d[pTRANSM] = s[pTRANSM];
 }
 
+// TODO - obsolete
 inline void Assign_Colour_Express(COLOUR d, const EXPRESS s)
 {
 	d[pRED] = s[pRED];
@@ -220,6 +223,7 @@ inline void Assign_Express(EXPRESS d, const EXPRESS s)
 	d[pTRANSM] = s[pTRANSM];
 }
 
+// TODO - obsolete
 inline void Make_ColourA(COLOUR c, COLC r, COLC g, COLC b, COLC a, COLC t)
 {
 	c[pRED] = r;
@@ -273,6 +277,7 @@ inline void Destroy_Vector_4D(VECTOR_4D *x)
 		POV_FREE(x);
 }
 
+// TODO - obsolete
 inline void Destroy_Colour(COLOUR *x)
 {
 	if(x != NULL)

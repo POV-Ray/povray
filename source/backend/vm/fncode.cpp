@@ -12,9 +12,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/vm/fncode.cpp $
- * $Revision: #21 $
- * $Change: 6085 $
- * $DateTime: 2013/11/10 07:39:29 $
+ * $Revision: #23 $
+ * $Change: 6113 $
+ * $DateTime: 2013/11/20 20:39:54 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -30,7 +30,6 @@
 #include "backend/vm/fncode.h"
 #include "backend/vm/fnpovfpu.h"
 #include "backend/vm/fnintern.h"
-#include "backend/colour/colour.h"
 
 // this must be the last header file included
 #include "base/povdebug.h"
@@ -821,14 +820,13 @@ void FNCode::compile_member(char *name)
 		compile_instruction(OPCODE_LOAD, 1, 5, return_parameter_sp + 4);
 	else if((strcmp(name, "gray") == 0) || (strcmp(name, "grey") == 0))
 	{
-		// values taken from GREY_SCALE!!!
 		compile_instruction(OPCODE_LOAD, 1, 5, return_parameter_sp);
-		compile_instruction(OPCODE_MULI, 0, 5, functionVM->AddConstant(RED2GRAY));
+		compile_instruction(OPCODE_MULI, 0, 5, functionVM->AddConstant(RED_INTENSITY));
 		compile_instruction(OPCODE_LOAD, 1, 0, return_parameter_sp + 1);
-		compile_instruction(OPCODE_MULI, 0, 0, functionVM->AddConstant(GREEN2GRAY));
+		compile_instruction(OPCODE_MULI, 0, 0, functionVM->AddConstant(GREEN_INTENSITY));
 		compile_instruction(OPCODE_ADD, 0, 5, 0);
 		compile_instruction(OPCODE_LOAD, 1, 0, return_parameter_sp + 2);
-		compile_instruction(OPCODE_MULI, 0, 0, functionVM->AddConstant(BLUE2GRAY));
+		compile_instruction(OPCODE_MULI, 0, 0, functionVM->AddConstant(BLUE_INTENSITY));
 		compile_instruction(OPCODE_ADD, 0, 5, 0);
 	}
 	else if(strcmp(name, "hf") == 0)

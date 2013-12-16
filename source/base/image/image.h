@@ -22,11 +22,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/base/image/image.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/base/image/image.h $
+ * $Revision: #51 $
+ * $Change: 6090 $
+ * $DateTime: 2013/11/11 09:49:29 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #ifndef POVRAY_BASE_IMAGE_H
@@ -354,7 +354,7 @@ class Image
 
 		float RGB2Gray(float red, float green, float blue) const
 		{
-			return (red * 0.297f + green * 0.589f + blue * 0.114f);
+			return RGBColour(red, green, blue).greyscale();
 		}
 	private:
 		/// not available

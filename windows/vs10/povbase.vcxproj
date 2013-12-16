@@ -343,6 +343,7 @@
     </BuildLog>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\source\base\colour.cpp" />
     <ClCompile Include="..\..\source\base\fileinputoutput.cpp" />
     <ClCompile Include="..\..\source\base\font\crystal.cpp" />
     <ClCompile Include="..\..\source\base\font\cyrvetic.cpp" />
@@ -395,6 +396,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\source\base\colour.h" />
     <ClInclude Include="..\..\source\base\configbase.h" />
     <ClInclude Include="..\..\source\base\fileinputoutput.h" />
     <ClInclude Include="..\..\source\base\font\crystal.h" />

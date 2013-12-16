@@ -125,7 +125,7 @@
     <ClCompile Include="..\..\source\backend\bounding\bsphere.cpp">
       <Filter>Backend Source\Bounding</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\backend\colour\colour.cpp">
+    <ClCompile Include="..\..\source\backend\colour\colour_old.cpp">
       <Filter>Backend Source\Colour</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\backend\colour\colutils.cpp">
@@ -422,7 +422,7 @@
     <ClInclude Include="..\..\source\backend\bounding\bsphere.h">
       <Filter>Backend Headers\Bounding</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\backend\colour\colour.h">
+    <ClInclude Include="..\..\source\backend\colour\colour_old.h">
       <Filter>Backend Headers\Colour</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\backend\colour\colutils.h">

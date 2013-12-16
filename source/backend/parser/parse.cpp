@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/parser/parse.cpp $
- * $Revision: #189 $
- * $Change: 6085 $
- * $DateTime: 2013/11/10 07:39:29 $
+ * $Revision: #191 $
+ * $Change: 6113 $
+ * $DateTime: 2013/11/20 20:39:54 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -47,7 +47,7 @@
 #include "backend/math/splines.h"
 #include "backend/math/polysolv.h"
 #include "backend/bounding/bsphere.h"
-#include "backend/colour/colour.h"
+#include "backend/colour/colour_old.h"
 #include "backend/scene/atmosph.h"
 #include "backend/scene/objects.h"
 #include "backend/interior/interior.h"
@@ -10088,8 +10088,8 @@ void Parser::Convert_Filter_To_Transmit(PIGMENT *Pigment)
 	switch (Pigment->Type)
 	{
 		case PLAIN_PATTERN:
-			Pigment->colour[pTRANSM] += Pigment->colour[pFILTER];
-			Pigment->colour[pFILTER] =  0;
+			Pigment->colour.transm() += Pigment->colour.filter();
+			Pigment->colour.filter() =  0;
 			break;
 
 		default:

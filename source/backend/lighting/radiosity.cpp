@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/lighting/radiosity.cpp $
- * $Revision: #60 $
- * $Change: 6092 $
- * $DateTime: 2013/11/16 07:47:59 $
+ * $Revision: #62 $
+ * $Change: 6113 $
+ * $DateTime: 2013/11/20 20:39:54 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -68,7 +68,6 @@
 #include "backend/math/vector.h"
 #include "backend/support/fileutil.h"
 #include "backend/support/octree.h"
-#include "backend/colour/colour.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -577,7 +576,8 @@ double RadiosityFunction::GatherLight(const Vector3d& ipoint, const Vector3d& ra
 			// this is necessary to fix problems splotchiness caused by very
 			// bright objects
 			// changed lighting.c to ignore phong/specular if tracing radiosity beam
-			COLC max_ill = max3(temp_colour[pRED], temp_colour[pGREEN], temp_colour[pBLUE]);
+			// TODO FIXME - while the following line is required for backward compatibility, we might consider replacing .max() with .weight(), .weightMax() or .weightMaxAbs() for v3.7.x
+			COLC max_ill = temp_colour.max();
 
 			if((max_ill > settings.maxSample) && (settings.maxSample > 0.0))
 				temp_colour *= (settings.maxSample / max_ill);
@@ -1672,14 +1672,14 @@ bool RadiosityCache::AverageNearBlock(OT_BLOCK *block, void *void_info)
 						// it doesn't seem to cause problems for non-HRD scenes.
 						// But we want to make sure that our deltas don't cause a positive illumination
 						// to go below zero, while allowing negative illuminations to stay negative.
-						if((d[pRED] + block->Illuminance[pRED] < 0.0) && (block->Illuminance[pRED]>  0.0))
-							d[pRED] = -block->Illuminance[pRED];
+						if((d.red() + block->Illuminance.red() < 0.0) && (block->Illuminance.red()>  0.0))
+							d.red() = -block->Illuminance.red();
 
-						if((d[pGREEN] + block->Illuminance[pGREEN] < 0.0) && (block->Illuminance[pGREEN] > 0.0))
-							d[pGREEN] = -block->Illuminance[pGREEN];
+						if((d.green() + block->Illuminance.green() < 0.0) && (block->Illuminance.green() > 0.0))
+							d.green() = -block->Illuminance.green();
 
-						if((d[pBLUE] + block->Illuminance[pBLUE] < 0.0) && (block->Illuminance[pBLUE] > 0.0))
-							d[pBLUE] = -block->Illuminance[pBLUE];
+						if((d.blue() + block->Illuminance.blue() < 0.0) && (block->Illuminance.blue() > 0.0))
+							d.blue() = -block->Illuminance.blue();
 
 						prediction = block->Illuminance + d;
 

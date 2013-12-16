@@ -27,11 +27,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/render/tracepixel.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/render/tracepixel.cpp $
+ * $Revision: #45 $
+ * $Change: 6113 $
+ * $DateTime: 2013/11/20 20:39:54 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #include <vector>
@@ -41,7 +41,6 @@
 
 // frame.h must always be the first POV file included (pulls in platform config)
 #include "backend/frame.h"
-#include "backend/colour/colour.h"
 #include "backend/math/vector.h"
 #include "backend/math/chi2.h"
 #include "backend/math/matrices.h"
@@ -1002,17 +1001,17 @@ void TracePixel::TraceRayWithFocalBlur(Colour& colour, DBL x, DBL y, DBL width, 
 
 			// Add color to color sum.
 
-			S1[pRED]    += C[pRED];
-			S1[pGREEN]  += C[pGREEN];
-			S1[pBLUE]   += C[pBLUE];
-			S1[pTRANSM] += C[pTRANSM];
+			S1.red()    += C.red();
+			S1.green()  += C.green();
+			S1.blue()   += C.blue();
+			S1.transm() += C.transm();
 
 			// Add color to squared color sum.
 
-			S2[pRED]    += Sqr(C[pRED]);
-			S2[pGREEN]  += Sqr(C[pGREEN]);
-			S2[pBLUE]   += Sqr(C[pBLUE]);
-			S2[pTRANSM] += Sqr(C[pTRANSM]);
+			S2.red()    += Sqr(C.red());
+			S2.green()  += Sqr(C.green());
+			S2.blue()   += Sqr(C.blue());
+			S2.transm() += Sqr(C.transm());
 
 			nr++;
 		}
@@ -1021,16 +1020,16 @@ void TracePixel::TraceRayWithFocalBlur(Colour& colour, DBL x, DBL y, DBL width, 
 
 		n = (DBL)nr;
 
-		V1[pRED]    = (S2[pRED]    / n - Sqr(S1[pRED]    / n)) / n;
-		V1[pGREEN]  = (S2[pGREEN]  / n - Sqr(S1[pGREEN]  / n)) / n;
-		V1[pBLUE]   = (S2[pBLUE]   / n - Sqr(S1[pBLUE]   / n)) / n;
-		V1[pTRANSM] = (S2[pTRANSM] / n - Sqr(S1[pTRANSM] / n)) / n;
+		V1.red()    = (S2.red()    / n - Sqr(S1.red()    / n)) / n;
+		V1.green()  = (S2.green()  / n - Sqr(S1.green()  / n)) / n;
+		V1.blue()   = (S2.blue()   / n - Sqr(S1.blue()   / n)) / n;
+		V1.transm() = (S2.transm() / n - Sqr(S1.transm() / n)) / n;
 
 		// Exit if samples are likely too be good enough.
 
 		if((nr >= camera.Blur_Samples_Min) &&
-		   (V1[pRED]  < focalBlurData->Sample_Threshold[nr - 1]) && (V1[pGREEN]  < focalBlurData->Sample_Threshold[nr - 1]) &&
-		   (V1[pBLUE] < focalBlurData->Sample_Threshold[nr - 1]) && (V1[pTRANSM] < focalBlurData->Sample_Threshold[nr - 1]))
+		   (V1.red()  < focalBlurData->Sample_Threshold[nr - 1]) && (V1.green()  < focalBlurData->Sample_Threshold[nr - 1]) &&
+		   (V1.blue() < focalBlurData->Sample_Threshold[nr - 1]) && (V1.transm() < focalBlurData->Sample_Threshold[nr - 1]))
 			break;
 	}
 	while(nr < camera.Blur_Samples);
@@ -1109,7 +1108,7 @@ TracePixel::FocalBlurData::FocalBlurData(const Camera& camera, TraceThreadData* 
 			{
 				v = (*vgen)();
 				Compute_Pigment(c, camera.Bokeh, *Vector3d(v.x() + 0.5, v.y() + 0.5, 0.0), NULL, NULL, threadData);
-				weight = c.greyscale();
+				weight = RGBColour(c).weightGreyscale();
 				weightSum += weight;
 				weightMax = max(weightMax, weight);
 				weight += tries / max_tries; // safeguard against infinite loops

@@ -23,9 +23,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/frontend/imagemessagehandler.cpp $
- * $Revision: #40 $
- * $Change: 6086 $
- * $DateTime: 2013/11/10 10:34:40 $
+ * $Revision: #41 $
+ * $Change: 6096 $
+ * $DateTime: 2013/11/18 14:11:26 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -107,13 +107,7 @@ void ImageMessageHandler::DrawPixelSet(const SceneData& sd, const ViewData& vd, 
 		{
 			// TODO ALPHA - display may profit from receiving the data in its original, premultiplied form
 			// Premultiplied alpha was good for the math, but the display expects non-premultiplied alpha, so fix this if possible.
-			float alpha = gcol.FTtoA();
-			if (alpha != 1.0 && fabs(alpha) > 1e-6) // TODO FIXME - magic value
-			{
-				gcol.red()   /= alpha;
-				gcol.green() /= alpha;
-				gcol.blue()  /= alpha;
-			}
+			AlphaUnPremultiply(gcol);
 		}
 
 		rgba.red   = IntEncode(gamma, gcol.red(),   255, dither);
@@ -186,13 +180,7 @@ void ImageMessageHandler::DrawPixelBlockSet(const SceneData& sd, const ViewData&
 		{
 			// TODO ALPHA - display may profit from receiving the data in its original, premultiplied form
 			// Premultiplied alpha was good for the math, but the display expects non-premultiplied alpha, so fix this if possible.
-			float alpha = gcol.FTtoA();
-			if (alpha != 1.0 && fabs(alpha) > 1e-6) // TODO FIXME - magic value
-			{
-				gcol.red()   /= alpha;
-				gcol.green() /= alpha;
-				gcol.blue()  /= alpha;
-			}
+			AlphaUnPremultiply(gcol);
 		}
 
 		rgba.red   = IntEncode(gamma, gcol.red(),   255, dither);

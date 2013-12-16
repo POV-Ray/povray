@@ -31,9 +31,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/parser/tokenize.cpp $
- * $Revision: #69 $
- * $Change: 6085 $
- * $DateTime: 2013/11/10 07:39:29 $
+ * $Revision: #70 $
+ * $Change: 6113 $
+ * $DateTime: 2013/11/20 20:39:54 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -44,7 +44,7 @@
 #include "base/povmsgid.h"
 #include "base/stringutilities.h"
 #include "backend/parser/parse.h"
-#include "backend/colour/colour.h"
+#include "backend/colour/colour_old.h"
 #include "backend/texture/texture.h"
 #include "backend/math/matrices.h"
 #include "backend/support/fileutil.h"

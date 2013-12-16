@@ -27,9 +27,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/lighting/photons.cpp $
- * $Revision: #55 $
- * $Change: 6085 $
- * $DateTime: 2013/11/10 07:39:29 $
+ * $Revision: #59 $
+ * $Change: 6113 $
+ * $DateTime: 2013/11/20 20:39:54 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -52,7 +52,6 @@
 #include "backend/texture/normal.h"
 #include "backend/texture/pigment.h"
 #include "backend/texture/texture.h"
-#include "backend/colour/colour.h"
 #include "lightgrp.h"
 #include "backend/lighting/photonshootingstrategy.h"
 
@@ -294,8 +293,13 @@ void PhotonTrace::ComputeLightedTexture(Colour& LightCol, const TEXTURE *Texture
 				if((ticket.traceLevel > 1) && !threadData->passThruPrev && (sceneData->photonSettings.maxMediaSteps > 0))
 					mediaPhotons.ComputeMediaAndDepositPhotons(medialist, ray, isect, LightCol, ticket);
 				else
+				{
 					// compute media WITHOUT depositing photons
-					mediaPhotons.ComputeMedia(medialist, ray, isect, LightCol, ticket);
+					RGBColour tempLightCol(LightCol);
+					COLC tempLightTransm = LightCol.transm();
+					mediaPhotons.ComputeMedia(medialist, ray, isect, tempLightCol, tempLightTransm, ticket);
+					LightCol = Colour(tempLightCol, LightCol.filter(), tempLightTransm);
+				}
 			}
 	}
 
@@ -398,7 +402,7 @@ void PhotonTrace::ComputeLightedTexture(Colour& LightCol, const TEXTURE *Texture
 		New_Weight = weight * Trans;
 		colour_found = Compute_Pigment(LayCol, Layer->Pigment, *ipoint, &isect, &ray, threadData);
 
-		Att = Trans * (1.0 - min(1.0, (DBL)(LayCol[pFILTER] + LayCol[pTRANSM])));
+		Att = Trans * (1.0 - min(1.0, (DBL)(LayCol.filter() + LayCol.transm())));
 
 		LayCol.red()   *= FilCol.red();
 		LayCol.green() *= FilCol.green();
@@ -442,9 +446,9 @@ void PhotonTrace::ComputeLightedTexture(Colour& LightCol, const TEXTURE *Texture
 			DBL F = 0.014567225 / Sqr(x - 1.12) - 0.011612903;
 			F=min(1.0,max(0.0,F));
 
-			listWNRX->back().reflec[pRED]   *= (1.0 + R_M * (1.0 - F) * (LayCol[pRED]   - 1.0));
-			listWNRX->back().reflec[pGREEN] *= (1.0 + R_M * (1.0 - F) * (LayCol[pGREEN] - 1.0));
-			listWNRX->back().reflec[pBLUE]  *= (1.0 + R_M * (1.0 - F) * (LayCol[pBLUE]  - 1.0));
+			listWNRX->back().reflec.red()   *= (1.0 + R_M * (1.0 - F) * (LayCol.red()   - 1.0));
+			listWNRX->back().reflec.green() *= (1.0 + R_M * (1.0 - F) * (LayCol.green() - 1.0));
+			listWNRX->back().reflec.blue()  *= (1.0 + R_M * (1.0 - F) * (LayCol.blue()  - 1.0));
 		}
 
 		// NK - I think we SHOULD do something like this: (to apply the layer's color)
@@ -486,14 +490,14 @@ void PhotonTrace::ComputeLightedTexture(Colour& LightCol, const TEXTURE *Texture
 	else
 	{
 		// if photon is for global map, then decide which we want to do
-		diffuseWeight = max(0.0f, fabs(ResCol.greyscale()));
+		diffuseWeight = ResCol.weightGreyscaleAbs();
 		// use top-layer finish only
 		if(Texture->Finish)
 			diffuseWeight*=Texture->Finish->Diffuse;
 		refractionWeight = Trans;
 		// reflection only for top layer!!!!!!
 		// TODO is "rend()" the top layer or the bottom layer???
-		reflectionWeight = max(0.0f, fabs(listWNRX->rend()->reflec.greyscale()));
+		reflectionWeight = listWNRX->rend()->reflec.weightGreyscaleAbs();
 		dieWeight = max(0.0,(1.0-diffuseWeight));
 
 		// normalize weights: make sum be 1.0
@@ -558,9 +562,11 @@ void PhotonTrace::ComputeLightedTexture(Colour& LightCol, const TEXTURE *Texture
 #ifdef PT_FILTER_BEFORE_TARGET
 	if (threadData->passThruThis)
 	{
-		w1 = max3(FilCol.red(), FilCol.green(), FilCol.blue());
-
-		New_Weight = weight * max(w1, 0.0); // TODO FIXME - check if the max() is necessary
+		w1 = FilCol.weightMax();
+		New_Weight = weight * max(w1, 0.0);
+		// TODO FIXME - replace the two lines above with:
+		//  w1 = FilCol.weightMaxAbs();
+		//  New_Weight = weight * w1;
 
 		// Trace refracted ray.
 		threadData->GFilCol = FilCol;
@@ -629,9 +635,11 @@ void PhotonTrace::ComputeLightedTexture(Colour& LightCol, const TEXTURE *Texture
 	// and its illunination is filtered by FilCol.
 	if (doRefraction && ((interior = isect.Object->interior) != NULL) && (Trans > ticket.adcBailout) && (qualityFlags & Q_REFRACT))
 	{
-		w1 = max3(FilCol.red(), FilCol.green(), FilCol.blue());
-
-		New_Weight = weight * max(w1, 0.0); // TODO FIXME - check if the max() is necessary
+		w1 = FilCol.weightMax();
+		New_Weight = weight * max(w1, 0.0);
+		// TODO FIXME - replace the two lines above with:
+		//  w1 = FilCol.weightMaxAbs();
+		//  New_Weight = weight * w1;
 
 		// Trace refracted ray.
 		threadData->GFilCol = FilCol;
@@ -684,7 +692,7 @@ void PhotonTrace::ComputeLightedTexture(Colour& LightCol, const TEXTURE *Texture
 						TmpCol.blue()  = (*listWNRX)[i].reflec.blue()  * TmpCol.blue();
 					}
 
-					TempWeight = (*listWNRX)[i].weight * max3((*listWNRX)[i].reflec.red(), (*listWNRX)[i].reflec.green(), (*listWNRX)[i].reflec.blue());
+					TempWeight = (*listWNRX)[i].weight * (*listWNRX)[i].reflec.weightMax();
 
 					Vector3d tmpIPoint(isect.IPoint);
 
@@ -1204,10 +1212,6 @@ void PhotonMediaFunction::DepositMediaPhotons(Colour& colour, MediaVector& media
 					                      threadData->photonSpread );
 				}
 
-				//Od[0] = colour[0]*exp(-(*i).od[0]/(minsamples*2));
-				//Od[1] = colour[1]*exp(-(*i).od[1]/(minsamples*2));
-				//Od[2] = colour[2]*exp(-(*i).od[2]/(minsamples*2));
-
 				VECTOR TempPoint;
 				VEvaluateRay(TempPoint, ray.Origin, d0*(*i).ds+(*i).s0, ray.Direction);
 
@@ -1227,9 +1231,9 @@ void PhotonMediaFunction::DepositMediaPhotons(Colour& colour, MediaVector& media
 	}
 
 	// Add contribution estimated for the participating media.
-	colour[0] *= exp(-Od[0]);
-	colour[1] *= exp(-Od[1]);
-	colour[2] *= exp(-Od[2]);
+	colour.red()   *= exp(-Od.red());
+	colour.green() *= exp(-Od.green());
+	colour.blue()  *= exp(-Od.blue());
 }
 
 /*****************************************************************************

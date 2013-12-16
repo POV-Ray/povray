@@ -24,11 +24,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/base/image/encoding.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/base/image/encoding.h $
+ * $Revision: #5 $
+ * $Change: 6096 $
+ * $DateTime: 2013/11/18 14:11:26 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #ifndef POVRAY_BASE_IMAGE_ENCODING_H
@@ -190,6 +190,33 @@ inline unsigned int IntEncode(const GammaCurvePtr& g, float x, unsigned int max,
 	err = clip(x,0.0f,1.0f) - IntDecode(g,v,max);
 	return v;
 }
+
+/**
+ *  Function to apply alpha premultiplication.
+ *  @param[in,out]  colour  RGBFT colour to premultiply
+ */
+void AlphaPremultiply(Colour& colour);
+
+/**
+ *  Function to apply alpha premultiplication.
+ *  @param[in,out]  colour  RGB colour to premultiply
+ *  @param[in]      alpha   alpha to premultiply with
+ */
+void AlphaPremultiply(RGBColour& colour, float alpha);
+
+/**
+ *  Function to undo alpha premultiplication.
+ *  @param[in,out]  colour  RGBFT colour to un-premultiply
+ */
+void AlphaUnPremultiply(Colour& colour);
+
+/**
+ *  Function to undo alpha premultiplication.
+ *  @param[in,out]  colour  RGB colour to un-premultiply
+ *  @param[in]      alpha   alpha the colour is premultiplied with
+ */
+void AlphaUnPremultiply(RGBColour& colour, float alpha);
+
 
 /*******************************************************************************/
 

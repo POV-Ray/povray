@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/interior/media.cpp $
- * $Revision: #44 $
- * $Change: 6085 $
- * $DateTime: 2013/11/10 07:39:29 $
+ * $Revision: #46 $
+ * $Change: 6113 $
+ * $DateTime: 2013/11/20 20:39:54 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -39,7 +39,6 @@
 #include "backend/interior/media.h"
 #include "backend/texture/pigment.h"
 #include "backend/pattern/pattern.h"
-#include "backend/colour/colour.h"
 #include "backend/math/chi2.h"
 #include "backend/math/vector.h"
 
@@ -229,7 +228,7 @@ MediaFunction::MediaFunction(TraceThreadData *td, Trace *t, PhotonGatherer *pg) 
 {
 }
 
-void MediaFunction::ComputeMedia(vector<Media>& mediasource, const Ray& ray, Intersection& isect, Colour& colour, Trace::TraceTicket& ticket)
+void MediaFunction::ComputeMedia(vector<Media>& mediasource, const Ray& ray, Intersection& isect, RGBColour& colour, COLC& transm, Trace::TraceTicket& ticket)
 {
 	if(!mediasource.empty())
 	{
@@ -243,11 +242,11 @@ void MediaFunction::ComputeMedia(vector<Media>& mediasource, const Ray& ray, Int
 		// to deposit photons in the infinite atmosphere, only in contained
 		// media, which is processed later (in ComputeLightedTexture).  [nk]
 		if(!medialist.empty())
-			ComputeMedia(medialist, ray, isect, colour, ticket);
+			ComputeMedia(medialist, ray, isect, colour, transm, ticket);
 	}
 }
 
-void MediaFunction::ComputeMedia(const RayInteriorVector& mediasource, const Ray& ray, Intersection& isect, Colour& colour, Trace::TraceTicket& ticket)
+void MediaFunction::ComputeMedia(const RayInteriorVector& mediasource, const Ray& ray, Intersection& isect, RGBColour& colour, COLC& transm, Trace::TraceTicket& ticket)
 {
 	if(!mediasource.empty())
 	{
@@ -264,7 +263,7 @@ void MediaFunction::ComputeMedia(const RayInteriorVector& mediasource, const Ray
 		// to deposit photons in the infinite atmosphere, only in contained
 		// media, which is processed later (in ComputeLightedTexture).  [nk]
 		if(!medialist.empty())
-			ComputeMedia(medialist, ray, isect, colour, ticket);
+			ComputeMedia(medialist, ray, isect, colour, transm, ticket);
 	}
 }
 
@@ -278,7 +277,7 @@ void MediaFunction::ComputeMedia(const RayInteriorVector& mediasource, const Ray
 *   Colour    - Color arriving at the end point
 ******************************************************************************/
 
-void MediaFunction::ComputeMedia(MediaVector& medias, const Ray& ray, Intersection& isect, Colour& colour, Trace::TraceTicket& ticket)
+void MediaFunction::ComputeMedia(MediaVector& medias, const Ray& ray, Intersection& isect, RGBColour& colour, COLC& transm, Trace::TraceTicket& ticket)
 {
 	LightSourceEntryVector lights;
 	LitIntervalVector litintervals;
@@ -354,7 +353,7 @@ void MediaFunction::ComputeMedia(MediaVector& medias, const Ray& ray, Intersecti
 	else
 		ComputeMediaRegularSampling(medias, lights, mediaintervals, ray, IMedia, minSamples, ignore_photons, use_scattering, all_constant_and_light_ray, ticket);
 
-	ComputeMediaColour(mediaintervals, colour);
+	ComputeMediaColour(mediaintervals, colour, transm);
 }
 
 void MediaFunction::ComputeMediaRegularSampling(MediaVector& medias, LightSourceEntryVector& lights, MediaIntervalVector& mediaintervals,
@@ -505,7 +504,7 @@ void MediaFunction::ComputeMediaAdaptiveSampling(MediaVector& medias, LightSourc
 	}
 }
 
-void MediaFunction::ComputeMediaColour(MediaIntervalVector& mediaintervals, Colour& colour)
+void MediaFunction::ComputeMediaColour(MediaIntervalVector& mediaintervals, RGBColour& colour, COLC& transm)
 {
 	RGBColour Od, Te;
 	DBL n;
@@ -525,11 +524,8 @@ void MediaFunction::ComputeMediaColour(MediaIntervalVector& mediaintervals, Colo
 	// Add contribution estimated for the participating media.
 	Od = exp(-Od);
 
-	colour.red()   = colour.red()   * Od.red()   + Te.red();
-	colour.green() = colour.green() * Od.green() + Te.green();
-	colour.blue()  = colour.blue()  * Od.blue()  + Te.blue();
-
-	colour.transm() *= Od.greyscale();
+	colour = colour * Od + Te;
+	transm *= Od.greyscale(); // TODO - in the long run, we should make transm a full-fledged RGB term
 }
 
 void MediaFunction::ComputeMediaSampleInterval(LitIntervalVector& litintervals, MediaIntervalVector& mediaintervals, const Media *media)

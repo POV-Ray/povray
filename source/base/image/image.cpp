@@ -22,11 +22,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/base/image/image.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/base/image/image.cpp $
+ * $Revision: #82 $
+ * $Change: 6096 $
+ * $DateTime: 2013/11/18 14:11:26 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #include <vector>
@@ -4009,15 +4009,14 @@ void Image::GetRGBValue(unsigned int x, unsigned int y, RGBColour& colour, bool 
 		// data is non-premultiplied, but caller expects premultiplied data
 		float alpha;
 		GetRGBAValue(x, y, colour.red(), colour.green(), colour.blue(), alpha);
-		colour *= alpha;
+		AlphaPremultiply(colour, alpha);
 	}
 	if (!premul && premultiplied && HasTransparency())
 	{
 		// data is premultiplied, but caller expects non-premultiplied data
 		float alpha;
 		GetRGBAValue(x, y, colour.red(), colour.green(), colour.blue(), alpha);
-		if (alpha != 0.0) // TODO maybe use some epsilon?!
-			colour /= alpha;
+		AlphaUnPremultiply(colour, alpha);
 	}
 	else
 	{
@@ -4030,21 +4029,12 @@ void Image::GetRGBFTValue(unsigned int x, unsigned int y, Colour& colour, bool p
 	if (premul && !premultiplied && HasTransparency())
 	{
 		// data is non-premultiplied, but caller expects premultiplied data
-		float alpha = colour.FTtoA();
-		colour.red()   *= alpha;
-		colour.green() *= alpha;
-		colour.blue()  *= alpha;
+		AlphaPremultiply(colour);
 	}
 	else if (!premul && premultiplied && HasTransparency())
 	{
 		// data is premultiplied, but caller expects non-premultiplied data
-		float alpha = colour.FTtoA();
-		if (alpha != 0.0) // TODO maybe use some epsilon?!
-		{
-			colour.red()   /= alpha;
-			colour.green() /= alpha;
-			colour.blue()  /= alpha;
-		}
+		AlphaUnPremultiply(colour);
 	}
 }
 

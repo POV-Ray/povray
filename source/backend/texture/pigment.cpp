@@ -25,11 +25,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/texture/pigment.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/texture/pigment.cpp $
+ * $Revision: #35 $
+ * $Change: 6096 $
+ * $DateTime: 2013/11/18 14:11:26 $
+ * $Author: clipka $
  *******************************************************************************/
 
 /*
@@ -73,7 +73,7 @@ namespace pov
 
 static BLEND_MAP_ENTRY Black_White_Entries[2] =
 	{{0.0, false, {{0.0, 0.0, 0.0, 0.0, 0.0}}},
-	{1.0, false, {{1.0, 1.0, 1.0, 0.0, 0.0}}}};
+	 {1.0, false, {{1.0, 1.0, 1.0, 0.0, 0.0}}}};
 
 const BLEND_MAP Gray_Default_Map =
 	{ -1,  2,  false, COLOUR_TYPE,  Black_White_Entries};
@@ -403,8 +403,8 @@ int Post_Pigment(PIGMENT *Pigment)
 
 	Has_Filter = false;
 
-	if ((fabs(Pigment->colour[pFILTER]) > EPSILON) ||
-	    (fabs(Pigment->colour[pTRANSM]) > EPSILON))
+	if ((fabs(Pigment->colour.filter()) > EPSILON) ||
+	    (fabs(Pigment->colour.transm()) > EPSILON))
 	{
 		Has_Filter = true;
 	}
@@ -497,7 +497,7 @@ bool Compute_Pigment (Colour& colour, const PIGMENT *Pigment, const VECTOR EPoin
 	const BLEND_MAP *Blend_Map = Pigment->Blend_Map;
 	UV_VECT UV_Coords;
 
-	if ((Thread->qualityFlags & Q_QUICKC) != 0 && Pigment->Quick_Colour[pRED] != -1.0 && Pigment->Quick_Colour[pGREEN] != -1.0 && Pigment->Quick_Colour[pBLUE] != -1.0)
+	if ((Thread->qualityFlags & Q_QUICKC) != 0 && Pigment->Quick_Colour.red() != -1.0 && Pigment->Quick_Colour.green() != -1.0 && Pigment->Quick_Colour.blue() != -1.0)
 	{
 		colour = Pigment->Quick_Colour;
 		return (true);

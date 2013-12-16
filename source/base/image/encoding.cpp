@@ -22,11 +22,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/base/image/encoding.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/base/image/encoding.cpp $
+ * $Revision: #6 $
+ * $Change: 6096 $
+ * $DateTime: 2013/11/18 14:11:26 $
+ * $Author: clipka $
  *******************************************************************************/
 
 // configbase.h must always be the first POV file included within base *.cpp files
@@ -43,7 +43,7 @@ namespace pov_base
 
 /*******************************************************************************/
 
-#define ALPHA_EPSILON 1.0e-6
+#define ALPHA_EPSILON 1.0e-6 ///< Smallest alpha value we dare to safely use with premultiplied alpha
 
 static const unsigned int MaxBayerMatrixSize = 4;
 typedef float BayerMatrix[MaxBayerMatrixSize][MaxBayerMatrixSize];
@@ -295,6 +295,27 @@ inline void AlphaUnPremultiply(float& fRed, float& fGreen, float& fBlue, float f
 	fGreen /= fAlpha;
 	fBlue  /= fAlpha;
 }
+
+void AlphaPremultiply(RGBColour& colour, float fAlpha)
+{
+	AlphaPremultiply(colour.red(), colour.green(), colour.blue(), fAlpha);
+}
+
+void AlphaUnPremultiply(RGBColour& colour, float fAlpha)
+{
+	AlphaUnPremultiply(colour.red(), colour.green(), colour.blue(), fAlpha);
+}
+
+void AlphaPremultiply(Colour& colour)
+{
+	AlphaPremultiply(colour.red(), colour.green(), colour.blue(), colour.FTtoA());
+}
+
+void AlphaUnPremultiply(Colour& colour)
+{
+	AlphaUnPremultiply(colour.red(), colour.green(), colour.blue(), colour.FTtoA());
+}
+
 
 void SetEncodedGrayValue(Image* img, unsigned int x, unsigned int y, const GammaCurvePtr& g, unsigned int max, unsigned int gray)
 {

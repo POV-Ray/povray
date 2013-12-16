@@ -26,9 +26,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/parser/express.cpp $
- * $Revision: #48 $
- * $Change: 6085 $
- * $DateTime: 2013/11/10 07:39:29 $
+ * $Revision: #50 $
+ * $Change: 6113 $
+ * $DateTime: 2013/11/20 20:39:54 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -39,7 +39,7 @@
 #include "backend/frame.h"
 #include "backend/parser/parse.h"
 #include "backend/math/vector.h"
-#include "backend/colour/colour.h"
+#include "backend/colour/colour_old.h"
 #include "backend/math/splines.h"
 #include "backend/math/matrices.h"
 #include "backend/pattern/pattern.h"
@@ -1456,7 +1456,7 @@ void Parser::Parse_Num_Factor (EXPRESS Express,int *Terms)
 
 						case GRAY_TOKEN:
 							*Terms=1;
-							Express[0]=GREY_SCALE(Express);
+							Express[0]=DblColour(Express).greyscale();
 							return;
 
 						default:

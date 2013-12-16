@@ -1,5 +1,7 @@
 /*******************************************************************************
- * imageprocessing.h
+ * colour.cpp
+ *
+ * This file contains implementations and data for colour computations.
  *
  * ---------------------------------------------------------------------------
  * Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
@@ -22,61 +24,22 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/povray/smp/source/frontend/imageprocessing.h $
- * $Revision: #19 $
- * $Change: 6097 $
- * $DateTime: 2013/11/18 15:19:34 $
+ * $File: //depot/povray/smp/source/base/colour.cpp $
+ * $Revision: #1 $
+ * $Change: 6089 $
+ * $DateTime: 2013/11/11 09:18:35 $
  * $Author: clipka $
  *******************************************************************************/
 
-#ifndef POVRAY_FRONTEND_IMAGEPROCESSING_H
-#define POVRAY_FRONTEND_IMAGEPROCESSING_H
+// configbase.h must always be the first POV file included within base *.cpp files
+#include "base/configbase.h"
+#include "base/colour.h"
 
-#include "base/povmscpp.h"
-#include "base/povmsgid.h"
-#include "base/image/image.h"
-#include "base/fileinputoutput.h"
+// this must be the last file included
+#include "base/povdebug.h"
 
-#include "frontend/configfrontend.h"
-
-#include <string>
-
-#include <boost/scoped_ptr.hpp>
-
-namespace pov_frontend
+namespace pov_base
 {
 
-using namespace pov_base;
-
-class ImageProcessing
-{
-	public:
-		ImageProcessing(unsigned int width, unsigned int height);
-		ImageProcessing(POVMS_Object& ropts);
-		ImageProcessing(shared_ptr<Image>& img);
-		virtual ~ImageProcessing();
-
-		UCS2String WriteImage(POVMS_Object& ropts, POVMSInt frame = 0, int digits = 0);
-
-		shared_ptr<Image>& GetImage();
-
-		UCS2String GetOutputFilename(POVMS_Object& ropts, POVMSInt frame, int digits);
-		bool OutputIsStdout(void) { return toStdout; }
-		bool OutputIsStderr(void) { return toStderr; }
-		virtual bool OutputIsStdout(POVMS_Object& ropts);
-		virtual bool OutputIsStderr(POVMS_Object& ropts);
-
-	protected:
-		shared_ptr<Image> image;
-		bool toStdout;
-		bool toStderr;
-
-	private:
-		ImageProcessing();
-		ImageProcessing(const ImageProcessing&);
-		ImageProcessing& operator=(const ImageProcessing&);
-};
 
 }
-
-#endif // POVRAY_FRONTEND_IMAGEPROCESSING_H

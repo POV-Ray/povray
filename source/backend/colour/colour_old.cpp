@@ -1,7 +1,7 @@
 /*******************************************************************************
- * colour.cpp
+ * colour_old.cpp
  *
- * This module implements routines to manipulate colours.
+ * This module implements legacy routines to manipulate colours.
  *
  * ---------------------------------------------------------------------------
  * Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
@@ -24,16 +24,16 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/povray/smp/source/backend/colour/colour.cpp $
- * $Revision: #17 $
- * $Change: 6085 $
- * $DateTime: 2013/11/10 07:39:29 $
+ * $File: //depot/povray/smp/source/backend/colour/colour_old.cpp $
+ * $Revision: #1 $
+ * $Change: 6113 $
+ * $DateTime: 2013/11/20 20:39:54 $
  * $Author: clipka $
  *******************************************************************************/
 
 // frame.h must always be the first POV file included (pulls in platform config)
 #include "backend/frame.h"
-#include "backend/colour/colour.h"
+#include "backend/colour/colour_old.h"
 #include "backend/texture/texture.h"
 #include "backend/texture/pigment.h"
 #include "backend/texture/normal.h"
@@ -190,77 +190,6 @@ BLEND_MAP_ENTRY *Create_BMap_Entries (int Map_Size)
 *
 * FUNCTION
 *
-* INPUT
-*   
-* OUTPUT
-*   
-* RETURNS
-*   
-* AUTHOR
-*
-*   POV-Ray Team
-*   
-* DESCRIPTION
-*
-*
-* CHANGES
-*
-******************************************************************************/
-
-BLEND_MAP_ENTRY *Copy_BMap_Entries (const BLEND_MAP_ENTRY *Old, int Map_Size, int Type)
-{
-	int i;
-	BLEND_MAP_ENTRY *New;
-
-	if (Old != NULL)
-	{
-		New = Create_BMap_Entries (Map_Size);
-
-		for (i = 0; i < Map_Size; i++)
-		{
-			switch (Type)
-			{
-				case PIGMENT_TYPE:
-
-					New[i].Vals.Pigment = Copy_Pigment(Old[i].Vals.Pigment);
-
-					break;
-
-				case NORMAL_TYPE:
-
-					New[i].Vals.Tnormal = Copy_Tnormal(Old[i].Vals.Tnormal);
-
-					break;
-
-				case TEXTURE_TYPE:
-
-					New[i].Vals.Texture = Copy_Textures(Old[i].Vals.Texture);
-
-					break;
-
-				case COLOUR_TYPE:
-				case SLOPE_TYPE:
-
-					New[i] = Old[i];
-
-					break;
-			}
-		}
-	}
-	else
-	{
-		New = NULL;
-	}
-
-	return (New);
-}
-
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
 *   Create_Blend_Map
 *
 * INPUT
@@ -350,42 +279,6 @@ BLEND_MAP *Copy_Blend_Map (BLEND_MAP *Old)
 	}
 
 	return (New);
-}
-
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-*   Colour_Distance_RGBT
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-*   POV-Ray Team
-*
-* DESCRIPTION
-*
-*   -
-*
-* CHANGES
-*
-*   -
-*
-******************************************************************************/
-
-DBL Colour_Distance_RGBT (const Colour& colour1, const Colour& colour2)
-{
-	return (fabs(colour1[pRED]    - colour2[pRED]) +
-	        fabs(colour1[pGREEN]  - colour2[pGREEN]) +
-	        fabs(colour1[pBLUE]   - colour2[pBLUE]) +
-	        fabs(colour1[pTRANSM] - colour2[pTRANSM]));
 }
 
 

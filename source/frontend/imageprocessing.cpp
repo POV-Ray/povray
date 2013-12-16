@@ -22,11 +22,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/frontend/imageprocessing.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/frontend/imageprocessing.cpp $
+ * $Revision: #51 $
+ * $Change: 6097 $
+ * $DateTime: 2013/11/18 15:19:34 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #include <string>
@@ -190,22 +190,6 @@ UCS2String ImageProcessing::WriteImage(POVMS_Object& ropts, POVMSInt frame, int 
 shared_ptr<Image>& ImageProcessing::GetImage()
 {
 	return image;
-}
-
-void ImageProcessing::RGB2XYZ(const COLC *rgb, COLC *xyz)
-{
-	// assumes D65 white point (slightly rounded sRGB)
-	xyz[X] = (0.412453 * rgb[Colour::RED]) + (0.357580 * rgb[Colour::GREEN]) + (0.180423 * rgb[Colour::BLUE]);
-	xyz[Y] = (0.212671 * rgb[Colour::RED]) + (0.715160 * rgb[Colour::GREEN]) + (0.072169 * rgb[Colour::BLUE]);
-	xyz[Z] = (0.019334 * rgb[Colour::RED]) + (0.119193 * rgb[Colour::GREEN]) + (0.950227 * rgb[Colour::BLUE]);
-}
-
-void ImageProcessing::XYZ2RGB(const COLC *xyz, COLC *rgb)
-{
-	// assumes D65 white point (slightly rounded sRGB)
-	rgb[Colour::RED] =    (3.240479 * xyz[X]) + (-1.537150 * xyz[X]) + (-0.498535 * xyz[X]);
-	rgb[Colour::GREEN] = (-0.969256 * xyz[Y]) +  (1.875992 * xyz[Y]) +  (0.041556 * xyz[Y]);
-	rgb[Colour::BLUE] =   (0.055648 * xyz[Z]) + (-0.204043 * xyz[Z]) +  (1.057311 * xyz[Z]);
 }
 
 bool ImageProcessing::OutputIsStdout(POVMS_Object& ropts)

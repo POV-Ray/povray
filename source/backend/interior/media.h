@@ -24,11 +24,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/interior/media.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/interior/media.h $
+ * $Revision: #21 $
+ * $Change: 6095 $
+ * $DateTime: 2013/11/18 06:02:33 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #ifndef MEDIA_H
@@ -57,9 +57,9 @@ class MediaFunction : public Trace::MediaFunctor
 	public:
 		MediaFunction(TraceThreadData *td, Trace *t, PhotonGatherer *pg);
 
-		virtual void ComputeMedia(vector<Media>& mediasource, const Ray& ray, Intersection& isect, Colour& colour, Trace::TraceTicket& ticket);
-		virtual void ComputeMedia(const RayInteriorVector& mediasource, const Ray& ray, Intersection& isect, Colour& colour, Trace::TraceTicket& ticket);
-		virtual void ComputeMedia(MediaVector& medias, const Ray& ray, Intersection& isect, Colour& colour, Trace::TraceTicket& ticket);
+		virtual void ComputeMedia(vector<Media>& mediasource, const Ray& ray, Intersection& isect, RGBColour& colour, COLC& transm, Trace::TraceTicket& ticket);
+		virtual void ComputeMedia(const RayInteriorVector& mediasource, const Ray& ray, Intersection& isect, RGBColour& colour, COLC& transm, Trace::TraceTicket& ticket);
+		virtual void ComputeMedia(MediaVector& medias, const Ray& ray, Intersection& isect, RGBColour& colour, COLC& transm, Trace::TraceTicket& ticket);
 	protected:
 		/// pseudo-random number sequence
 		RandomDoubleSequence randomNumbers;
@@ -77,7 +77,7 @@ class MediaFunction : public Trace::MediaFunctor
 		                                 bool all_constant_and_light_ray, Trace::TraceTicket& ticket);
 		void ComputeMediaAdaptiveSampling(MediaVector& medias, LightSourceEntryVector& lights, MediaIntervalVector& mediaintervals,
 		                                  const Ray& ray, const Media *IMedia, DBL aa_threshold, int minsamples, bool ignore_photons, bool use_scattering, Trace::TraceTicket& ticket);
-		void ComputeMediaColour(MediaIntervalVector& mediaintervals, Colour& colour);
+		void ComputeMediaColour(MediaIntervalVector& mediaintervals, RGBColour& colour, COLC& transm);
 		void ComputeMediaSampleInterval(LitIntervalVector& litintervals, MediaIntervalVector& mediaintervals, const Media *media);
 		void ComputeMediaLightInterval(LightSourceEntryVector& lights, LitIntervalVector& litintervals, const Ray& ray, const Intersection& isect);
 		void ComputeOneMediaLightInterval(LightSource *light, LightSourceEntryVector&lights, const Ray& ray, const Intersection& isect);
