@@ -26,36 +26,24 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/lighting/subsurface.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/lighting/subsurface.h $
+ * $Revision: #5 $
+ * $Change: 6078 $
+ * $DateTime: 2013/11/10 05:55:46 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #ifndef SUBSURFACE_H
 #define SUBSURFACE_H
 
-#include <boost/version.hpp>
-#if BOOST_VERSION >= 103800 // flyweight is unavailable prior to boost 1.38
-#define HAVE_BOOST_FLYWEIGHT 1
-#else
-#define HAVE_BOOST_FLYWEIGHT 0
-#endif
-
-#if HAVE_BOOST_FLYWEIGHT
 #include <boost/flyweight.hpp>
 #include <boost/flyweight/key_value.hpp>
-#endif // HAVE_BOOST_FLYWEIGHT
 
 namespace pov
 {
 
-//using namespace pov_base;
-#if HAVE_BOOST_FLYWEIGHT
 using boost::flyweights::flyweight;
 using boost::flyweights::key_value;
-#endif // HAVE_BOOST_FLYWEIGHT
 
 /// Class storing SSLT data precomputed based on index of refraction.
 class SubsurfaceInterior {
@@ -72,16 +60,11 @@ class SubsurfaceInterior {
 		// precomputed reduced albedo for selected values of diffuse reflectance
 		struct PrecomputedReducedAlbedo {
 			float reducedAlbedo[ReducedAlbedoSamples+1];
-			PrecomputedReducedAlbedo(double ior);
+			PrecomputedReducedAlbedo(float ior);
 			double operator()(double diffuseReflectance) const;
 		};
 
-#if HAVE_BOOST_FLYWEIGHT
-		flyweight<key_value<double,PrecomputedReducedAlbedo> > precomputedReducedAlbedo;
-#else // HAVE_BOOST_FLYWEIGHT
-		// TODO - if flyweight is unavailable, we're currently resorting to a simple but memory-hungry fallback solution
-		PrecomputedReducedAlbedo precomputedReducedAlbedo;
-#endif // HAVE_BOOST_FLYWEIGHT
+		flyweight<key_value<float,PrecomputedReducedAlbedo> > precomputedReducedAlbedo;
 };
 
 /// Approximation to the Fresnel diffuse reflectance.

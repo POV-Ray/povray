@@ -26,11 +26,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/lighting/subsurface.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/lighting/subsurface.cpp $
+ * $Revision: #8 $
+ * $Change: 6078 $
+ * $DateTime: 2013/11/10 05:55:46 $
+ * $Author: clipka $
  *******************************************************************************/
 
 // frame.h must always be the first POV file included (pulls in platform config)
@@ -57,7 +57,7 @@ SubsurfaceInterior::SubsurfaceInterior(double ior) :
 	precomputedReducedAlbedo(ior)
 {}
 
-SubsurfaceInterior::PrecomputedReducedAlbedo::PrecomputedReducedAlbedo(double ior)
+SubsurfaceInterior::PrecomputedReducedAlbedo::PrecomputedReducedAlbedo(float ior)
 {
 	reducedAlbedo[ReducedAlbedoSamples] = 1.0;
 	double Fdr = FresnelDiffuseReflectance(ior);
