@@ -22,11 +22,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/povray.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/povray.cpp $
+ * $Revision: #81 $
+ * $Change: 6079 $
+ * $DateTime: 2013/11/10 06:01:56 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #include <boost/thread.hpp>
@@ -60,11 +60,22 @@
 	#ifndef LIBJPEG_MISSING
 		#include <jversion.h>
 	#endif
-
-	// Including tiffio.h causes the Windows compile to break. As all we need is the
-	// version function, we just declare it here.
 	#ifndef LIBTIFF_MISSING
-		extern "C" const char* TIFFGetVersion(void);
+		extern "C"
+		{
+			#ifndef __STDC__
+			#define __STDC__        (1)
+			#define UNDEF__STDC__
+			#endif
+			#ifndef AVOID_WIN32_FILEIO
+			#define AVOID_WIN32_FILEIO // this stops the tiff headers from pulling in windows.h on win32/64
+			#endif
+			#include <tiffio.h>
+			#ifdef UNDEF__STDC__
+			#undef __STDC__
+			#undef UNDEF__STDC__
+			#endif
+		}
 	#endif
 
 	// get boost version number. it isn't an image library but there's little point
