@@ -7,11 +7,11 @@ Please report bugs via our bugtracker at http://bugs.povray.org/ or to our
 forum at news://news.povray.org/povray.unix/ or http://news.povray.org/povray.unix/
 
 -------------------------------------------------------------------------------
-$File: //depot/public/povray/3.x/unix/install.txt $
-$Revision: #1 $
-$Change: 6069 $
-$DateTime: 2013/11/06 11:59:40 $
-$Author: chrisc $
+$File: //depot/povray/smp/unix/install.txt $
+$Revision: #9 $
+$Change: 6077 $
+$DateTime: 2013/11/10 05:50:00 $
+$Author: clipka $
 ===============================================================================
 
 Table of contents
@@ -106,7 +106,7 @@ relatively standard and should be automatically detected at least on most
 Linux-based systems.  Be sure to have not only the run-time libraries but also
 the development packages (header files in particular).
 
-- Boost version 1.37 or above
+- Boost version 1.38 or above
   http://www.boost.org
 
 - Zlib version 1.2.1 or above
@@ -327,7 +327,7 @@ LIBS="additional libraries to link with"
 Additional POV-Ray specific options are:
 
 --with-boost=DIR
-    requests to find the Boost library in the DIR directory.  Boost 1.36 or
+    requests to find the Boost library in the DIR directory.  Boost 1.38 or
     above is mandatory to build POV-Ray.
 
 --with-boost-thread=special-lib

@@ -74,7 +74,7 @@ m4_include([unix/config/ax_x86_arch.m4])
 
 # Required versions of the support libraries.
 # Must be declared after AC_INIT.
-required_libboost_version="1.37"
+required_libboost_version="1.38"
 required_libz_version="1.2.1"
 required_libpng_version="1.2.5"
 required_libjpeg_version="6b"
