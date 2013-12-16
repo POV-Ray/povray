@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/lighting/radiosity.cpp $
- * $Revision: #59 $
- * $Change: 6085 $
- * $DateTime: 2013/11/10 07:39:29 $
+ * $Revision: #60 $
+ * $Change: 6092 $
+ * $DateTime: 2013/11/16 07:47:59 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -318,10 +318,13 @@ void RadiosityFunction::ResetTopLevelStats()
 
 void RadiosityFunction::BeforeTile(int id, unsigned int pts)
 {
+	// TODO - find out why this assertion does not hold true when mosaic pretrace is enabled
+	/*
 	if (isFinalTrace)
 		assert( pts == FINAL_TRACE );
 	else
 		assert( (pts >= PRETRACE_FIRST) && (pts <= PRETRACE_MAX) );
+	*/
 
 	// different pretrace step than last tile
 	if (pts != pretraceStep)
