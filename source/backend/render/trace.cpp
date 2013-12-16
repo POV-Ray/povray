@@ -22,11 +22,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/render/trace.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/render/trace.cpp $
+ * $Revision: #210 $
+ * $Change: 6076 $
+ * $DateTime: 2013/11/10 05:27:15 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #include <boost/thread.hpp>
@@ -1795,7 +1795,7 @@ void Trace::ComputeFullAreaDiffuseLight(const LightSource &lightsource, const Ve
 			}
 
 			if(finish->Irid > 0.0)
-				ComputeIridColour(finish, Vector3d(lightsourceray.Direction), Vector3d(eye.Direction), layer_normal, ipoint, tmpCol);
+				ComputeIridColour(finish, Vector3d(lsr.Direction), Vector3d(eye.Direction), layer_normal, ipoint, tmpCol);
 
 			colour += tmpCol;
 		}
@@ -3687,7 +3687,7 @@ void Trace::ComputeSubsurfaceScattering(const FINISH *Finish, const RGBColour& l
 
 #if 0
 	// user setting specifies mean free path
-	DblRGBColour   alpha_prime      = object->interior->subsurface->GetReducedAlbedo(layer_pigment_colour * Finish->Diffuse);
+	DblRGBColour   alpha_prime      = object->interior->subsurface->GetReducedAlbedo(layer_pigment_colour * Finish->RawDiffuse);
 	DblRGBColour   sigma_tr         = DblRGBColour(1.0) / DblRGBColour(Finish->SubsurfaceTranslucency);
 
 	DblRGBColour   sigma_prime_t    = sigma_tr / sqrt(3*(RGBColour(1.0)-alpha_prime));
