@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/truetype.h $
- * $Revision: #24 $
- * $Change: 6121 $
- * $DateTime: 2013/11/23 07:38:50 $
+ * $Revision: #25 $
+ * $Change: 6143 $
+ * $DateTime: 2013/11/28 17:10:31 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -77,12 +77,12 @@ class TrueType : public ObjectBase
 		virtual void Invert();
 		virtual void Compute_BBox();
 
-		static void ProcessNewTTF(CSG *Object, const char *filename, const int font_id, const UCS2 *text_string, DBL depth, const VECTOR offset, Parser *parser, shared_ptr<SceneData>& sceneData);
+		static void ProcessNewTTF(CSG *Object, const char *filename, const int font_id, const UCS2 *text_string, DBL depth, const Vector3d& offset, Parser *parser, shared_ptr<SceneData>& sceneData);
 	protected:
 		bool Inside_Glyph(double x, double y, const GlyphStruct* glyph) const;
 		int solve_quad(double *x, double *y, double mindist, DBL maxdist) const;
-		void GetZeroOneHits(const GlyphStruct* glyph, const VECTOR P, const VECTOR D, DBL glyph_depth, double *t0, double *t1) const;
-		bool GlyphIntersect(const VECTOR P, const VECTOR D, const GlyphStruct* glyph, DBL glyph_depth, const Ray &ray, IStack& Depth_Stack, TraceThreadData *Thread);
+		void GetZeroOneHits(const GlyphStruct* glyph, const Vector3d& P, const Vector3d& D, DBL glyph_depth, double *t0, double *t1) const;
+		bool GlyphIntersect(const Vector3d& P, const Vector3d& D, const GlyphStruct* glyph, DBL glyph_depth, const Ray &ray, IStack& Depth_Stack, TraceThreadData *Thread);
 };
 
 void FreeFontInfo(FontFileInfo *ffi);

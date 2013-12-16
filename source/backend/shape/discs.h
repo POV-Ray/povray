@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/discs.h $
- * $Revision: #17 $
- * $Change: 6121 $
- * $DateTime: 2013/11/23 07:38:50 $
+ * $Revision: #18 $
+ * $Change: 6139 $
+ * $DateTime: 2013/11/25 21:34:55 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -52,11 +52,11 @@ namespace pov
 class Disc : public ObjectBase
 {
 	public:
-		VECTOR center;    /* Center of the disc */
-		VECTOR normal;    /* Direction perpendicular to the disc (plane normal) */
-		DBL d;            /* The constant part of the plane equation */
-		DBL iradius2;     /* Distance from center to inner circle of the disc */
-		DBL oradius2;     /* Distance from center to outer circle of the disc */
+		Vector3d center;  ///< Center of the disc.
+		Vector3d normal;  ///< Direction perpendicular to the disc (plane normal).
+		DBL d;            ///< The constant part of the plane equation.
+		DBL iradius2;     ///< Distance from center to inner circle of the disc.
+		DBL oradius2;     ///< Distance from center to outer circle of the disc.
 
 		Disc();
 		virtual ~Disc();

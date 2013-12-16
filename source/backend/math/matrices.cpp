@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/math/matrices.cpp $
- * $Revision: #19 $
- * $Change: 6122 $
- * $DateTime: 2013/11/23 10:33:00 $
+ * $Revision: #20 $
+ * $Change: 6123 $
+ * $DateTime: 2013/11/23 13:45:56 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -1261,6 +1261,43 @@ int MInvers3(const VECTOR inM[3], VECTOR  outM[3])
 	VScaleEq(outM[0], det);
 	VScaleEq(outM[1], det);
 	VScaleEq(outM[2], det);
+
+	return (1);
+}
+
+int MInvers3(const Matrix3x3& inM, Matrix3x3& outM)
+{
+	DBL det;
+
+	outM[0][X] =   (inM[1][Y] * inM[2][Z] - inM[1][Z] * inM[2][Y]);
+	outM[1][X] = - (inM[0][Y] * inM[2][Z] - inM[0][Z] * inM[2][Y]);
+	outM[2][X] =   (inM[0][Y] * inM[1][Z] - inM[0][Z] * inM[1][Y]);
+
+	outM[0][Y] = - (inM[1][X] * inM[2][Z] - inM[1][Z] * inM[2][X]);
+	outM[1][Y] =   (inM[0][X] * inM[2][Z] - inM[0][Z] * inM[2][X]);
+	outM[2][Y] = - (inM[0][X] * inM[1][Z] - inM[0][Z] * inM[1][X]);
+
+	outM[0][Z] =   (inM[1][X] * inM[2][Y] - inM[1][Y] * inM[2][X]);
+	outM[1][Z] = - (inM[0][X] * inM[2][Y] - inM[0][Y] * inM[2][X]);
+	outM[2][Z] =   (inM[0][X] * inM[1][Y] - inM[0][Y] * inM[1][X]);
+
+	det = inM[0][X] * inM[1][Y] * inM[2][Z] +
+	      inM[0][Y] * inM[1][Z] * inM[2][X] +
+	      inM[0][Z] * inM[1][X] * inM[2][Y] -
+	      inM[0][Z] * inM[1][Y] * inM[2][X] -
+	      inM[0][X] * inM[1][Z] * inM[2][Y] -
+	      inM[0][Y] * inM[1][X] * inM[2][Z];
+
+	if (fabs(det) < 1.0e-10)
+	{
+		return (0);
+	}
+
+	det = 1.0 / det;
+
+	outM[0] *= det;
+	outM[1] *= det;
+	outM[2] *= det;
 
 	return (1);
 }

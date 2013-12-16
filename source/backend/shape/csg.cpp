@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/csg.cpp $
- * $Revision: #61 $
- * $Change: 6121 $
- * $DateTime: 2013/11/23 07:38:50 $
+ * $Revision: #62 $
+ * $Change: 6142 $
+ * $DateTime: 2013/11/26 21:24:29 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -871,7 +871,7 @@ CSG *CSGIntersection::Morph(void)
 void CSG::Compute_BBox()
 {
 	DBL Old_Volume, New_Volume;
-	VECTOR NewMin, NewMax, TmpMin, TmpMax, Min, Max;
+	Vector3d NewMin, NewMax, TmpMin, TmpMax, Min, Max;
 
 	if(dynamic_cast<CSGIntersection *>(this) != NULL) // FIXME
 	{
@@ -880,8 +880,8 @@ void CSG::Compute_BBox()
 		 * by intersecting the bounding boxes of all children.
 		 */
 
-		Make_Vector(NewMin, -BOUND_HUGE, -BOUND_HUGE, -BOUND_HUGE);
-		Make_Vector(NewMax,  BOUND_HUGE,  BOUND_HUGE,  BOUND_HUGE);
+		NewMin = Vector3d(-BOUND_HUGE);
+		NewMax = Vector3d(BOUND_HUGE);
 
 		vector<Quadric *> Quadrics;
 
@@ -901,12 +901,8 @@ void CSG::Compute_BBox()
 					else
 						Make_min_max_from_BBox(TmpMin, TmpMax, (*Current_Sib)->BBox);
 
-					NewMin[X] = max(NewMin[X], TmpMin[X]);
-					NewMin[Y] = max(NewMin[Y], TmpMin[Y]);
-					NewMin[Z] = max(NewMin[Z], TmpMin[Z]);
-					NewMax[X] = min(NewMax[X], TmpMax[X]);
-					NewMax[Y] = min(NewMax[Y], TmpMax[Y]);
-					NewMax[Z] = min(NewMax[Z], TmpMax[Z]);
+					NewMin = max(NewMin, TmpMin);
+					NewMax = min(NewMax, TmpMax);
 				}
 				else
 					Quadrics.push_back(dynamic_cast<Quadric *>(*Current_Sib));
@@ -919,38 +915,30 @@ void CSG::Compute_BBox()
 		{
 			Quadric *q = *i;
 
-			Assign_Vector(Min, NewMin);
-			Assign_Vector(Max, NewMax);
+			Min = NewMin;
+			Max = NewMax;
 
 			q->Compute_BBox(Min, Max);
 
 			Make_min_max_from_BBox(TmpMin, TmpMax, q->BBox);
 
-			NewMin[X] = max(NewMin[X], TmpMin[X]);
-			NewMin[Y] = max(NewMin[Y], TmpMin[Y]);
-			NewMin[Z] = max(NewMin[Z], TmpMin[Z]);
-			NewMax[X] = min(NewMax[X], TmpMax[X]);
-			NewMax[Y] = min(NewMax[Y], TmpMax[Y]);
-			NewMax[Z] = min(NewMax[Z], TmpMax[Z]);
+			NewMin = max(NewMin, TmpMin);
+			NewMax = min(NewMax, TmpMax);
 		}
 	}
 	else
 	{
 		/* Calculate the bounding box of a CSG merge/union object. */
 
-		Make_Vector(NewMin,  BOUND_HUGE,  BOUND_HUGE,  BOUND_HUGE);
-		Make_Vector(NewMax, -BOUND_HUGE, -BOUND_HUGE, -BOUND_HUGE);
+		NewMin = Vector3d(BOUND_HUGE);
+		NewMax = Vector3d(-BOUND_HUGE);
 
 		for(vector<ObjectPtr>::iterator Current_Sib = children.begin(); Current_Sib != children.end(); Current_Sib++)
 		{
 			Make_min_max_from_BBox(TmpMin, TmpMax, (*Current_Sib)->BBox);
 
-			NewMin[X] = min(NewMin[X], TmpMin[X]);
-			NewMin[Y] = min(NewMin[Y], TmpMin[Y]);
-			NewMin[Z] = min(NewMin[Z], TmpMin[Z]);
-			NewMax[X] = max(NewMax[X], TmpMax[X]);
-			NewMax[Y] = max(NewMax[Y], TmpMax[Y]);
-			NewMax[Z] = max(NewMax[Z], TmpMax[Z]);
+			NewMin = min(NewMin, TmpMin);
+			NewMax = max(NewMax, TmpMax);
 		}
 	}
 

@@ -28,9 +28,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/poly.cpp $
- * $Revision: #37 $
- * $Change: 6121 $
- * $DateTime: 2013/11/23 07:38:50 $
+ * $Revision: #38 $
+ * $Change: 6144 $
+ * $DateTime: 2013/11/28 20:20:53 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -311,7 +311,7 @@ bool Poly::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDat
 /* For speedup of low order polynomials, expand out the terms
    involved in evaluating the poly. */
 /* unused
-DBL evaluate_linear(VECTOR P, DBL *a)
+DBL evaluate_linear(const Vector3d& P, DBL *a)
 {
 	return(a[0] * P[X]) + (a[1] * P[Y]) + (a[2] * P[Z]) + a[3];
 }
@@ -346,7 +346,7 @@ DBL evaluate_linear(VECTOR P, DBL *a)
 ******************************************************************************/
 
 /*
-DBL evaluate_quadratic(VECTOR P, DBL *a)
+DBL evaluate_quadratic(const Vector3d& P, DBL *a)
 {
 	DBL x, y, z;
 
@@ -579,7 +579,7 @@ l1:;
 *
 ******************************************************************************/
 
-DBL Poly::inside(const VECTOR IPoint, int Order, const DBL *Coeffs)
+DBL Poly::inside(const Vector3d& IPoint, int Order, const DBL *Coeffs)
 {
 	DBL x[MAX_ORDER+1], y[MAX_ORDER+1], z[MAX_ORDER+1];
 	DBL c, Result;
@@ -650,7 +650,7 @@ int Poly::intersect(const Ray &ray, int Order, const DBL *Coeffs, int Sturm_Flag
 	DBL eqn_v[3][MAX_ORDER+1], eqn_vt[3][MAX_ORDER+1];
 	DBL eqn[MAX_ORDER+1];
 	DBL t[3][MAX_ORDER+1];
-	VECTOR  P, D;
+	Vector3d P, D;
 	DBL val;
 	int h, i, j, k, i1, j1, k1, term;
 	int offset;
@@ -658,8 +658,8 @@ int Poly::intersect(const Ray &ray, int Order, const DBL *Coeffs, int Sturm_Flag
 	/* First we calculate the values of the individual powers
 	   of x, y, and z as they are represented by the ray */
 
-	Assign_Vector(P,*ray.Origin);
-	Assign_Vector(D,*ray.Direction);
+	P = ray.Origin;
+	D = ray.Direction;
 
 	for (i = 0; i < 3; i++)
 	{
@@ -938,7 +938,7 @@ int Poly::intersect_quadratic(const Ray &ray, const DBL *Coeffs, DBL *Depths)
 *
 ******************************************************************************/
 
-void Poly::normal0(VECTOR Result, int Order, const DBL *Coeffs, const VECTOR IPoint)
+void Poly::normal0(Vector3d& Result, int Order, const DBL *Coeffs, const Vector3d& IPoint)
 {
 	int i, j, k, term;
 	DBL x[MAX_ORDER+1], y[MAX_ORDER+1], z[MAX_ORDER+1];
@@ -964,7 +964,7 @@ void Poly::normal0(VECTOR Result, int Order, const DBL *Coeffs, const VECTOR IPo
 
 	term = 0;
 
-	Make_Vector(Result, 0.0, 0.0, 0.0);
+	Result = Vector3d(0.0, 0.0, 0.0);
 
 	for (i = Order; i >= 0; i--)
 	{
@@ -1024,7 +1024,7 @@ void Poly::normal0(VECTOR Result, int Order, const DBL *Coeffs, const VECTOR IPo
 *
 ******************************************************************************/
 
-void Poly::normal1(VECTOR Result, int Order, const DBL *Coeffs, const VECTOR IPoint)
+void Poly::normal1(Vector3d& Result, int Order, const DBL *Coeffs, const Vector3d& IPoint)
 {
 	DBL x, y, z, x2, y2, z2, x3, y3, z3;
 	const DBL *a;
@@ -1041,7 +1041,7 @@ void Poly::normal1(VECTOR Result, int Order, const DBL *Coeffs, const VECTOR IPo
 
 			/* Linear partial derivatives */
 
-			Make_Vector(Result, a[0], a[1], a[2]);
+			Result = Vector3d(a[0], a[1], a[2]);
 
 			break;
 
@@ -1122,12 +1122,12 @@ void Poly::normal1(VECTOR Result, int Order, const DBL *Coeffs, const VECTOR IPo
 
 bool Poly::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 {
-	VECTOR  New_Point;
+	Vector3d New_Point;
 	DBL Result;
 
 	/* Transform the point into polynomial's space */
 
-	MInvTransPoint(New_Point, *IPoint, Trans);
+	MInvTransPoint(New_Point, IPoint, Trans);
 
 	Result = inside(New_Point, Order, Coeffs);
 
@@ -1172,24 +1172,24 @@ bool Poly::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 void Poly::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread) const
 {
 	DBL val;
-	VECTOR  New_Point;
+	Vector3d New_Point;
 
 	/* Transform the point into the polynomials space. */
 
-	MInvTransPoint(New_Point, *Inter->IPoint, Trans);
+	MInvTransPoint(New_Point, Inter->IPoint, Trans);
 
 	if (Order > 4)
 	{
-		normal0(*Result, Order, Coeffs, New_Point);
+		normal0(Result, Order, Coeffs, New_Point);
 	}
 	else
 	{
-		normal1(*Result, Order, Coeffs, New_Point);
+		normal1(Result, Order, Coeffs, New_Point);
 	}
 
 	/* Transform back to world space. */
 
-	MTransNormal(*Result, *Result, Trans);
+	MTransNormal(Result, Result, Trans);
 
 	/* Normalize (accounting for the possibility of a 0 length normal). */
 

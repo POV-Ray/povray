@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/quadrics.h $
- * $Revision: #18 $
- * $Change: 6121 $
- * $DateTime: 2013/11/23 07:38:50 $
+ * $Revision: #19 $
+ * $Change: 6142 $
+ * $DateTime: 2013/11/26 21:24:29 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -54,9 +54,9 @@ namespace pov
 class Quadric : public ObjectBase
 {
 	public:
-		VECTOR Square_Terms;
-		VECTOR Mixed_Terms;
-		VECTOR Terms;
+		Vector3d Square_Terms;
+		Vector3d Mixed_Terms;
+		Vector3d Terms;
 		DBL Constant;
 		bool Automatic_Bounds;
 
@@ -75,8 +75,8 @@ class Quadric : public ObjectBase
 		virtual void Invert();
 		virtual void Compute_BBox();
 
-		static void Compute_Plane_Min_Max(const Plane *plane, VECTOR Min, VECTOR Max);
-		void Compute_BBox(VECTOR ClipMin, VECTOR  ClipMax);
+		static void Compute_Plane_Min_Max(const Plane *plane, Vector3d& Min, Vector3d& Max);
+		void Compute_BBox(Vector3d& ClipMin, Vector3d& ClipMax);
 	protected:
 		bool Intersect(const Ray& ray, DBL *Depth1, DBL *Depth2) const;
 		void Quadric_To_Matrix(MATRIX Matrix) const;

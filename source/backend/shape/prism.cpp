@@ -27,9 +27,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/prism.cpp $
- * $Revision: #35 $
- * $Change: 6121 $
- * $DateTime: 2013/11/23 07:38:50 $
+ * $Revision: #36 $
+ * $Change: 6142 $
+ * $DateTime: 2013/11/26 21:24:29 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -188,7 +188,7 @@ bool Prism::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDa
 	DBL x[4];
 	DBL y[3];
 	DBL k1, k2, k3;
-	VECTOR P, D;
+	Vector3d P, D;
 	PRISM_SPLINE_ENTRY *Entry;
 	DBL distance ;
 
@@ -199,10 +199,10 @@ bool Prism::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDa
 	Thread->Stats()[Ray_Prism_Tests]++;
 
 	/* Transform the ray into the prism space */
-	MInvTransPoint(P, *ray.Origin, Trans);
-	MInvTransDirection(D, *ray.Direction, Trans);
-	VLength(len, D);
-	VInverseScaleEq(D, len);
+	MInvTransPoint(P, ray.Origin, Trans);
+	MInvTransDirection(D, ray.Direction, Trans);
+	len = D.length();
+	D /= len;
 
 	/* Test overall bounding rectangle. */
 
@@ -618,11 +618,11 @@ bool Prism::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDa
 
 bool Prism::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 {
-	VECTOR P;
+	Vector3d P;
 
 	/* Transform the point into the prism space. */
 
-	MInvTransPoint(P, *IPoint, Trans);
+	MInvTransPoint(P, IPoint, Trans);
 
 	if ((P[Y] >= Height1) && (P[Y] < Height2))
 	{
@@ -688,11 +688,11 @@ bool Prism::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 
 void Prism::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread) const
 {
-	VECTOR P;
+	Vector3d P;
 	PRISM_SPLINE_ENTRY Entry;
-	VECTOR N;
+	Vector3d N;
 
-	Make_Vector(N, 0.0, 1.0, 0.0);
+	N = Vector3d(0.0, 1.0, 0.0);
 
 	if (Inter->i1 == SPLINE_HIT)
 	{
@@ -712,7 +712,7 @@ void Prism::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Threa
 
 				/* Transform the point into the prism space. */
 
-				MInvTransPoint(P, *Inter->IPoint, Trans);
+				MInvTransPoint(P, Inter->IPoint, Trans);
 
 				if (fabs(P[Y]) > EPSILON)
 				{
@@ -731,7 +731,7 @@ void Prism::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Threa
 
 	/* Transform the normalt out of the prism space. */
 
-	MTransNormal(*Result, N, Trans);
+	MTransNormal(Result, N, Trans);
 
 	Result.normalize();
 }
@@ -1230,7 +1230,7 @@ int Prism::in_curve(DBL u, DBL v, TraceThreadData *Thread) const
 *
 ******************************************************************************/
 
-bool Prism::test_rectangle(const VECTOR P, const VECTOR D, DBL x1, DBL z1, DBL x2, DBL z2)
+bool Prism::test_rectangle(const Vector3d& P, const Vector3d& D, DBL x1, DBL z1, DBL x2, DBL z2)
 {
 	DBL dmin, dmax, tmin, tmax;
 
@@ -1372,7 +1372,7 @@ bool Prism::test_rectangle(const VECTOR P, const VECTOR D, DBL x1, DBL z1, DBL x
 *
 ******************************************************************************/
 
-void Prism::Compute_Prism(UV_VECT *P, TraceThreadData *Thread)
+void Prism::Compute_Prism(Vector2d *P, TraceThreadData *Thread)
 {
 	int i, n, number_of_splines;
 	int i1, i2, i3;
@@ -1382,7 +1382,7 @@ void Prism::Compute_Prism(UV_VECT *P, TraceThreadData *Thread)
 	DBL c[3];
 	DBL r[2];
 
-	UV_VECT A, B, C, D, First;
+	Vector2d A, B, C, D, First;
 
 	/* Allocate Object->Number segments. */
 
@@ -1413,14 +1413,14 @@ void Prism::Compute_Prism(UV_VECT *P, TraceThreadData *Thread)
 	{
 		case LINEAR_SPLINE:
 
-			Assign_UV_Vect(First, P[0]);
+			First = P[0];
 
 			break;
 
 		case QUADRATIC_SPLINE:
 		case CUBIC_SPLINE:
 
-			Assign_UV_Vect(First, P[1]);
+			First = P[1];
 
 			break;
 	}
@@ -1448,15 +1448,10 @@ void Prism::Compute_Prism(UV_VECT *P, TraceThreadData *Thread)
 
 				/* Use linear interpolation. */
 
-				A[X] =  0.0;
-				B[X] =  0.0;
-				C[X] = -1.0 * P[i][X] + 1.0 * P[i1][X];
-				D[X] =  1.0 * P[i][X];
-
-				A[Y] =  0.0;
-				B[Y] =  0.0;
-				C[Y] = -1.0 * P[i][Y] + 1.0 * P[i1][Y];
-				D[Y] =  1.0 * P[i][Y];
+				A =  Vector2d(0.0);
+				B =  Vector2d(0.0);
+				C = -1.0 * P[i] + 1.0 * P[i1];
+				D =  1.0 * P[i];
 
 				x[0] = x[2] = P[i][X];
 				x[1] = x[3] = P[i1][X];
@@ -1479,15 +1474,10 @@ void Prism::Compute_Prism(UV_VECT *P, TraceThreadData *Thread)
 
 				/* Use quadratic interpolation. */
 
-				A[X] =  0.0;
-				B[X] =  0.5 * P[i][X] - 1.0 * P[i1][X] + 0.5 * P[i2][X];
-				C[X] = -0.5 * P[i][X]                  + 0.5 * P[i2][X];
-				D[X] =                  1.0 * P[i1][X];
-
-				A[Y] =  0.0;
-				B[Y] =  0.5 * P[i][Y] - 1.0 * P[i1][Y] + 0.5 * P[i2][Y];
-				C[Y] = -0.5 * P[i][Y]                  + 0.5 * P[i2][Y];
-				D[Y] =                  1.0 * P[i1][Y];
+				A =  Vector2d(0.0);
+				B =  0.5 * P[i] - 1.0 * P[i1] + 0.5 * P[i2];
+				C = -0.5 * P[i]               + 0.5 * P[i2];
+				D =               1.0 * P[i1];
 
 				x[0] = x[2] = P[i1][X];
 				x[1] = x[3] = P[i2][X];
@@ -1510,15 +1500,10 @@ void Prism::Compute_Prism(UV_VECT *P, TraceThreadData *Thread)
 
 				/* Use cubic interpolation. */
 
-				A[X] = -0.5 * P[i][X] + 1.5 * P[i1][X] - 1.5 * P[i2][X] + 0.5 * P[i3][X];
-				B[X] =        P[i][X] - 2.5 * P[i1][X] + 2.0 * P[i2][X] - 0.5 * P[i3][X];
-				C[X] = -0.5 * P[i][X]                  + 0.5 * P[i2][X];
-				D[X] =                        P[i1][X];
-
-				A[Y] = -0.5 * P[i][Y] + 1.5 * P[i1][Y] - 1.5 * P[i2][Y] + 0.5 * P[i3][Y];
-				B[Y] =        P[i][Y] - 2.5 * P[i1][Y] + 2.0 * P[i2][Y] - 0.5 * P[i3][Y];
-				C[Y] = -0.5 * P[i][Y]                  + 0.5 * P[i2][Y];
-				D[Y] =                        P[i1][Y];
+				A = -0.5 * P[i] + 1.5 * P[i1] - 1.5 * P[i2] + 0.5 * P[i3];
+				B =        P[i] - 2.5 * P[i1] + 2.0 * P[i2] - 0.5 * P[i3];
+				C = -0.5 * P[i]               + 0.5 * P[i2];
+				D =                     P[i1];
 
 				x[0] = x[2] = P[i1][X];
 				x[1] = x[3] = P[i2][X];
@@ -1541,15 +1526,10 @@ void Prism::Compute_Prism(UV_VECT *P, TraceThreadData *Thread)
 
 				/* Use Bernstein blending function interpolation. */
 
-				A[X] = P[i][X] - 3.0 * P[i1][X] + 3.0 * P[i2][X] -       P[i3][X];
-				B[X] =           3.0 * P[i1][X] - 6.0 * P[i2][X] + 3.0 * P[i3][X];
-				C[X] =           3.0 * P[i2][X] - 3.0 * P[i3][X];
-				D[X] =                                                   P[i3][X];
-
-				A[Y] = P[i][Y] - 3.0 * P[i1][Y] + 3.0 * P[i2][Y] -       P[i3][Y];
-				B[Y] =           3.0 * P[i1][Y] - 6.0 * P[i2][Y] + 3.0 * P[i3][Y];
-				C[Y] =           3.0 * P[i2][Y] - 3.0 * P[i3][Y];
-				D[Y] =                                                   P[i3][Y];
+				A = P[i] - 3.0 * P[i1] + 3.0 * P[i2] -       P[i3];
+				B =        3.0 * P[i1] - 6.0 * P[i2] + 3.0 * P[i3];
+				C =        3.0 * P[i2] - 3.0 * P[i3];
+				D =                                          P[i3];
 
 				x[0] = P[i][X];
 				x[1] = P[i1][X];
@@ -1568,10 +1548,10 @@ void Prism::Compute_Prism(UV_VECT *P, TraceThreadData *Thread)
 				throw POV_EXCEPTION_STRING("Unknown spline type in Compute_Prism().");
 		}
 
-		Assign_UV_Vect(Spline->Entry[number_of_splines].A, A);
-		Assign_UV_Vect(Spline->Entry[number_of_splines].B, B);
-		Assign_UV_Vect(Spline->Entry[number_of_splines].C, C);
-		Assign_UV_Vect(Spline->Entry[number_of_splines].D, D);
+		Spline->Entry[number_of_splines].A = A;
+		Spline->Entry[number_of_splines].B = B;
+		Spline->Entry[number_of_splines].C = C;
+		Spline->Entry[number_of_splines].D = D;
 
 		if ((Spline_Type == QUADRATIC_SPLINE) ||
 		    (Spline_Type == CUBIC_SPLINE))
@@ -1580,7 +1560,7 @@ void Prism::Compute_Prism(UV_VECT *P, TraceThreadData *Thread)
 
 			c[0] = 3.0 * A[X];
 			c[1] = 2.0 * B[X];
-			c[2] = C[X];
+			c[2] =       C[X];
 
 			n = Solve_Polynomial(2, c, r, false, 0.0, Thread);
 
@@ -1594,7 +1574,7 @@ void Prism::Compute_Prism(UV_VECT *P, TraceThreadData *Thread)
 
 			c[0] = 3.0 * A[Y];
 			c[1] = 2.0 * B[Y];
-			c[2] = C[Y];
+			c[2] =       C[Y];
 
 			n = Solve_Polynomial(2, c, r, false, 0.0, Thread);
 
@@ -1643,7 +1623,7 @@ void Prism::Compute_Prism(UV_VECT *P, TraceThreadData *Thread)
 
 					if (i+1 < Number)
 					{
-						Assign_UV_Vect(First, P[i+1]);
+						First = P[i+1];
 					}
 				}
 
@@ -1658,7 +1638,7 @@ void Prism::Compute_Prism(UV_VECT *P, TraceThreadData *Thread)
 
 					if (i+2 < Number)
 					{
-						Assign_UV_Vect(First, P[i+2]);
+						First = P[i+2];
 					}
 				}
 
@@ -1673,7 +1653,7 @@ void Prism::Compute_Prism(UV_VECT *P, TraceThreadData *Thread)
 
 					if (i+2 < Number)
 					{
-						Assign_UV_Vect(First, P[i+2]);
+						First = P[i+2];
 					}
 				}
 

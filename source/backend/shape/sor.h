@@ -24,9 +24,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/sor.h $
- * $Revision: #23 $
- * $Change: 6121 $
- * $DateTime: 2013/11/23 07:38:50 $
+ * $Revision: #24 $
+ * $Change: 6143 $
+ * $DateTime: 2013/11/28 17:10:31 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -95,7 +95,7 @@ class Sor : public ObjectBase
 		virtual void Invert();
 		virtual void Compute_BBox();
 
-		void Compute_Sor(UV_VECT *P, TraceThreadData *Thread);
+		void Compute_Sor(Vector2d *P, TraceThreadData *Thread);
 	protected:
 		bool Intersect(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread);
 		bool test_hit(const Ray&, IStack&, DBL, DBL, int, int, TraceThreadData *Thread);

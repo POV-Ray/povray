@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/triangle.cpp $
- * $Revision: #34 $
- * $Change: 6121 $
- * $DateTime: 2013/11/23 07:38:50 $
+ * $Revision: #35 $
+ * $Change: 6139 $
+ * $DateTime: 2013/11/25 21:34:55 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -125,10 +125,10 @@ void Triangle::find_triangle_dominant_axis()
 
 bool SmoothTriangle::Compute_Smooth_Triangle()
 {
-	VECTOR P3MinusP2, VTemp1, VTemp2;
+	Vector3d P3MinusP2, VTemp1, VTemp2;
 	DBL x, y, z, uDenominator, Proj;
 
-	VSub(P3MinusP2, P3, P2);
+	P3MinusP2 = P3 - P2;
 
 	x = fabs(P3MinusP2[X]);
 	y = fabs(P3MinusP2[Y]);
@@ -136,29 +136,25 @@ bool SmoothTriangle::Compute_Smooth_Triangle()
 
 	vAxis = max3_coordinate(x, y, z);
 
-	VSub(VTemp1, P2, P3);
+	VTemp1 = (P2 - P3).normalized();
 
-	VNormalize(VTemp1, VTemp1);
+	VTemp2 = (P1 - P3);
 
-	VSub(VTemp2, P1, P3);
+	Proj = dot(VTemp2, VTemp1);
 
-	VDot(Proj, VTemp2, VTemp1);
+	VTemp1 *= Proj;
 
-	VScaleEq(VTemp1, Proj);
+	Perp = (VTemp1 - VTemp2).normalized();
 
-	VSub(Perp, VTemp1, VTemp2);
+	uDenominator = dot(VTemp2, Perp);
 
-	VNormalize(Perp, Perp);
-
-	VDot(uDenominator, VTemp2, Perp);
-
-	VInverseScaleEq(Perp, -uDenominator);
+	Perp /= -uDenominator;
 
 	/* Degenerate if smooth normals are more than 90 from actual normal
 	   or its inverse. */
-	VDot(x,Normal_Vector,N1);
-	VDot(y,Normal_Vector,N2);
-	VDot(z,Normal_Vector,N3);
+	x = dot(Normal_Vector,N1);
+	y = dot(Normal_Vector,N2);
+	z = dot(Normal_Vector,N3);
 	if ( ((x<0.0) && (y<0.0) && (z<0.0)) ||
 	     ((x>0.0) && (y>0.0) && (z>0.0)) )
 	{
@@ -199,15 +195,15 @@ bool SmoothTriangle::Compute_Smooth_Triangle()
 bool SmoothTriangle::Compute_Triangle()
 {
 	int swap, degn;
-	VECTOR V1, V2, Temp;
+	Vector3d V1, V2, Temp;
 	DBL Length;
 
-	VSub(V1, P1, P2);
-	VSub(V2, P3, P2);
+	V1 = P1 - P2;
+	V2 = P3 - P2;
 
-	VCross(Normal_Vector, V1, V2);
+	Normal_Vector = cross(V1, V2);
 
-	VLength(Length, Normal_Vector);
+	Length = Normal_Vector.length();
 
 	/* Set up a flag so we can ignore degenerate triangles */
 
@@ -220,11 +216,9 @@ bool SmoothTriangle::Compute_Triangle()
 
 	/* Normalize the normal vector. */
 
-	VInverseScaleEq(Normal_Vector, Length);
+	Normal_Vector /= Length;
 
-	VDot(Distance, Normal_Vector, P1);
-
-	Distance *= -1.0;
+	Distance = -dot(Normal_Vector, P1);
 
 	find_triangle_dominant_axis();
 
@@ -265,13 +259,13 @@ bool SmoothTriangle::Compute_Triangle()
 
 	if (swap)
 	{
-		Assign_Vector(Temp, P2);
-		Assign_Vector(P2, P1);
-		Assign_Vector(P1, Temp);
+		Temp = P2;
+		P2 = P1;
+		P1 = Temp;
 
-		Assign_Vector(Temp, N2);
-		Assign_Vector(N2, N1);
-		Assign_Vector(N1, Temp);
+		Temp = N2;
+		N2 = N1;
+		N1 = Temp;
 	}
 
 	degn=Compute_Smooth_Triangle();
@@ -314,15 +308,15 @@ bool SmoothTriangle::Compute_Triangle()
 bool Triangle::Compute_Triangle()
 {
 	int swap;
-	VECTOR V1, V2, Temp;
+	Vector3d V1, V2, Temp;
 	DBL Length;
 
-	VSub(V1, P1, P2);
-	VSub(V2, P3, P2);
+	V1 = P1 - P2;
+	V2 = P3 - P2;
 
-	VCross(Normal_Vector, V1, V2);
+	Normal_Vector = cross(V1, V2);
 
-	VLength(Length, Normal_Vector);
+	Length = Normal_Vector.length();
 
 	/* Set up a flag so we can ignore degenerate triangles */
 
@@ -335,9 +329,9 @@ bool Triangle::Compute_Triangle()
 
 	/* Normalize the normal vector. */
 
-	VInverseScaleEq(Normal_Vector, Length);
+	Normal_Vector /= Length;
 
-	VDot(Distance, Normal_Vector, P1);
+	Distance = dot(Normal_Vector, P1);
 
 	Distance *= -1.0;
 
@@ -380,9 +374,9 @@ bool Triangle::Compute_Triangle()
 
 	if (swap)
 	{
-		Assign_Vector(Temp, P2);
-		Assign_Vector(P2, P1);
-		Assign_Vector(P1, Temp);
+		Temp = P2;
+		P2 = P1;
+		P1 = Temp;
 	}
 
 	/* Build the bounding information from the vertices. */
@@ -478,12 +472,12 @@ bool Triangle::Intersect(const Ray& ray, DBL *Depth) const
 	if (Test_Flag(this, DEGENERATE_FLAG))
 		return(false);
 
-	VDot(NormalDotDirection, Normal_Vector, *ray.Direction);
+	NormalDotDirection = dot(Normal_Vector, ray.Direction);
 
 	if (fabs(NormalDotDirection) < EPSILON)
 		return(false);
 
-	VDot(NormalDotOrigin, Normal_Vector, *ray.Origin);
+	NormalDotOrigin = dot(Normal_Vector, ray.Origin);
 
 	*Depth = -(Distance + NormalDotOrigin) / NormalDotDirection;
 
@@ -634,7 +628,7 @@ bool Triangle::Inside(const Vector3d&, TraceThreadData *Thread) const
 
 void Triangle::Normal(Vector3d& Result, Intersection *, TraceThreadData *) const
 {
-	Result = Vector3d(Normal_Vector);
+	Result = Normal_Vector;
 }
 
 
@@ -707,15 +701,15 @@ void SmoothTriangle::Normal(Vector3d& Result, Intersection *Inter, TraceThreadDa
 {
 	int Axis;
 	DBL u, v;
-	VECTOR PIMinusP1;
+	Vector3d PIMinusP1;
 
-	VSub(PIMinusP1, *Inter->IPoint, P1);
+	PIMinusP1 = Inter->IPoint - P1;
 
-	VDot(u, PIMinusP1, Perp);
+	u = dot(PIMinusP1, Perp);
 
 	if (u < EPSILON)
 	{
-		Result = Vector3d(N1);
+		Result = N1;
 
 		return;
 	}
@@ -726,9 +720,7 @@ void SmoothTriangle::Normal(Vector3d& Result, Intersection *Inter, TraceThreadDa
 
 	/* This is faster. [DB 8/94] */
 
-	Result[X] = N1[X] + u * (N2[X] - N1[X] + v * (N3[X] - N2[X]));
-	Result[Y] = N1[Y] + u * (N2[Y] - N1[Y] + v * (N3[Y] - N2[Y]));
-	Result[Z] = N1[Z] + u * (N2[Z] - N1[Z] + v * (N3[Z] - N2[Z]));
+	Result = N1 + u * (N2 - N1 + v * (N3 - N2));
 
 	Result.normalize();
 }
@@ -765,9 +757,9 @@ void Triangle::Translate(const Vector3d& Vector, const TRANSFORM *)
 {
 	if(!Test_Flag(this, DEGENERATE_FLAG))
 	{
-		VAddEq(P1, *Vector);
-		VAddEq(P2, *Vector);
-		VAddEq(P3, *Vector);
+		P1 += Vector;
+		P2 += Vector;
+		P3 += Vector;
 
 		Compute_Triangle();
 	}
@@ -841,9 +833,9 @@ void Triangle::Scale(const Vector3d& Vector, const TRANSFORM *)
 {
 	if(!Test_Flag(this, DEGENERATE_FLAG))
 	{
-		VEvaluateEq(P1, *Vector);
-		VEvaluateEq(P2, *Vector);
-		VEvaluateEq(P3, *Vector);
+		P1 *= Vector;
+		P2 *= Vector;
+		P3 *= Vector;
 
 		Compute_Triangle();
 	}
@@ -951,24 +943,24 @@ void Triangle::Invert()
 
 Triangle::Triangle() : ObjectBase(TRIANGLE_OBJECT)
 {
-	Make_Vector(Normal_Vector, 0.0, 1.0, 0.0);
+	Normal_Vector = Vector3d(0.0, 1.0, 0.0);
 
 	Distance = 0.0;
 
-	Make_Vector(P1, 0.0, 0.0, 0.0);
-	Make_Vector(P2, 1.0, 0.0, 0.0);
-	Make_Vector(P3, 0.0, 1.0, 0.0);
+	P1 = Vector3d(0.0, 0.0, 0.0);
+	P2 = Vector3d(1.0, 0.0, 0.0);
+	P3 = Vector3d(0.0, 1.0, 0.0);
 }
 
 Triangle::Triangle(int t) : ObjectBase(t)
 {
-	Make_Vector(Normal_Vector, 0.0, 1.0, 0.0);
+	Normal_Vector = Vector3d(0.0, 1.0, 0.0);
 
 	Distance = 0.0;
 
-	Make_Vector(P1, 0.0, 0.0, 0.0);
-	Make_Vector(P2, 1.0, 0.0, 0.0);
-	Make_Vector(P3, 0.0, 1.0, 0.0);
+	P1 = Vector3d(0.0, 0.0, 0.0);
+	P2 = Vector3d(1.0, 0.0, 0.0);
+	P3 = Vector3d(0.0, 1.0, 0.0);
 }
 
 
@@ -1072,9 +1064,9 @@ void SmoothTriangle::Translate(const Vector3d& Vector, const TRANSFORM *)
 {
 	if(!Test_Flag(this, DEGENERATE_FLAG))
 	{
-		VAddEq(P1, *Vector);
-		VAddEq(P2, *Vector);
-		VAddEq(P3, *Vector);
+		P1 += Vector;
+		P2 += Vector;
+		P3 += Vector;
 
 		Compute_Triangle();
 	}
@@ -1146,29 +1138,18 @@ void SmoothTriangle::Rotate(const Vector3d&, const TRANSFORM *tr)
 
 void SmoothTriangle::Scale(const Vector3d& Vector, const TRANSFORM *)
 {
-	DBL Length;
-
 	if(!Test_Flag(this, DEGENERATE_FLAG))
 	{
-		VEvaluateEq(P1, *Vector);
-		VEvaluateEq(P2, *Vector);
-		VEvaluateEq(P3, *Vector);
+		P1 *= Vector;
+		P2 *= Vector;
+		P3 *= Vector;
 
-		N1[X] /= Vector[X];
-		N1[Y] /= Vector[Y];
-		N1[Z] /= Vector[Z];
-		VLength(Length,N1);
-		VScaleEq(N1,1.0/Length);
-		N2[X] /= Vector[X];
-		N2[Y] /= Vector[Y];
-		N2[Z] /= Vector[Z];
-		VLength(Length,N2);
-		VScaleEq(N2,1.0/Length);
-		N3[X] /= Vector[X];
-		N3[Y] /= Vector[Y];
-		N3[Z] /= Vector[Z];
-		VLength(Length,N3);
-		VScaleEq(N3,1.0/Length);
+		N1 /= Vector;
+		N1.normalize();
+		N2 /= Vector;
+		N2.normalize();
+		N3 /= Vector;
+		N3.normalize();
 
 		Compute_Triangle();
 	}
@@ -1279,16 +1260,16 @@ void SmoothTriangle::Invert()
 
 SmoothTriangle::SmoothTriangle() : Triangle(SMOOTH_TRIANGLE_OBJECT)
 {
-	Make_Vector(Normal_Vector, 0.0, 1.0, 0.0);
+	Normal_Vector = Vector3d(0.0, 1.0, 0.0);
 
 	Distance = 0.0;
 
-	Make_Vector(P1, 0.0, 0.0, 0.0);
-	Make_Vector(P2, 1.0, 0.0, 0.0);
-	Make_Vector(P3, 0.0, 1.0, 0.0);
-	Make_Vector(N1, 0.0, 1.0, 0.0);
-	Make_Vector(N2, 0.0, 1.0, 0.0);
-	Make_Vector(N3, 0.0, 1.0, 0.0);
+	P1 = Vector3d(0.0, 0.0, 0.0);
+	P2 = Vector3d(1.0, 0.0, 0.0);
+	P3 = Vector3d(0.0, 1.0, 0.0);
+	N1 = Vector3d(0.0, 1.0, 0.0);
+	N2 = Vector3d(0.0, 1.0, 0.0);
+	N3 = Vector3d(0.0, 1.0, 0.0);
 }
 
 
@@ -1362,9 +1343,9 @@ ObjectPtr SmoothTriangle::Copy()
 
 void Triangle::Compute_BBox()
 {
-	VECTOR Min, Max, Epsilon;
+	Vector3d Min, Max, Epsilon;
 
-	Make_Vector(Epsilon, EPSILON, EPSILON, EPSILON);
+	Epsilon = Vector3d(EPSILON);
 
 	Min[X] = min3(P1[X], P2[X], P3[X]);
 	Min[Y] = min3(P1[Y], P2[Y], P3[Y]);
@@ -1374,8 +1355,8 @@ void Triangle::Compute_BBox()
 	Max[Y] = max3(P1[Y], P2[Y], P3[Y]);
 	Max[Z] = max3(P1[Z], P2[Z], P3[Z]);
 
-	VSubEq(Min, Epsilon);
-	VAddEq(Max, Epsilon);
+	Min -= Epsilon;
+	Max += Epsilon;
 
 	Make_BBox_from_min_max(BBox, Min, Max);
 }
@@ -1403,23 +1384,23 @@ void Triangle::Compute_BBox()
  */
 
 
-DBL SmoothTriangle::Calculate_Smooth_T(const VECTOR IPoint, const VECTOR P1, const VECTOR P2, const VECTOR P3)
+DBL SmoothTriangle::Calculate_Smooth_T(const Vector3d& IPoint, const Vector3d& P1, const Vector3d& P2, const Vector3d& P3)
 {
 	DBL a,b,c,d,e,f,g,h,i;
 	DBL dm1,dm2,dm3,r,s,t;
-	VECTOR Q;
+	Vector3d Q;
 
-	a=IPoint[0]-P1[0];
-	b=P2[0]-P3[0];
-	c=P2[0]-P1[0];
+	a=IPoint[X]-P1[X];
+	b=P2[X]-P3[X];
+	c=P2[X]-P1[X];
 
-	d=IPoint[1]-P1[1];
-	e=P2[1]-P3[1];
-	f=P2[1]-P1[1];
+	d=IPoint[Y]-P1[Y];
+	e=P2[Y]-P3[Y];
+	f=P2[Y]-P1[Y];
 
-	g=IPoint[2]-P1[2];
-	h=P2[2]-P3[2];
-	i=P2[2]-P1[2];
+	g=IPoint[Z]-P1[Z];
+	h=P2[Z]-P3[Z];
+	i=P2[Z]-P1[Z];
 
 	dm1=a*e-d*b;
 	dm2=a*h-g*b;
@@ -1455,18 +1436,15 @@ DBL SmoothTriangle::Calculate_Smooth_T(const VECTOR IPoint, const VECTOR P1, con
 		s=(a*f-d*c)/dm1;
 	}
 
-
-	Q[0]=P2[0]+s*(P3[0]-P2[0]);
-	Q[1]=P2[1]+s*(P3[1]-P2[1]);
-	Q[2]=P2[2]+s*(P3[2]-P2[2]);
+	Q = P2 + s*(P3-P2);
 
 	/*
 	 t=(M-A)/(Q-A)
 	*/
 
-	a=Q[0]-P1[0];
-	b=Q[1]-P1[1];
-	c=Q[2]-P1[2];
+	a=Q[X]-P1[X];
+	b=Q[Y]-P1[Y];
+	c=Q[Z]-P1[Z];
 
 	if(a*a<EPSILON)
 	{
@@ -1475,13 +1453,13 @@ DBL SmoothTriangle::Calculate_Smooth_T(const VECTOR IPoint, const VECTOR P1, con
 			if(c*c<EPSILON)
 				t=0;
 			else
-				t=(IPoint[2]-P1[2])/c;
+				t=(IPoint[Z]-P1[Z])/c;
 		}
 		else
-			t=(IPoint[1]-P1[1])/b;
+			t=(IPoint[Y]-P1[Y])/b;
 	}
 	else
-		t=(IPoint[0]-P1[0])/a;
+		t=(IPoint[X]-P1[X])/a;
 
 	return t;
 }

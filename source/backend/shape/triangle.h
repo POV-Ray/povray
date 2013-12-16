@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/triangle.h $
- * $Revision: #22 $
- * $Change: 6121 $
- * $DateTime: 2013/11/23 07:38:50 $
+ * $Revision: #23 $
+ * $Change: 6139 $
+ * $DateTime: 2013/11/25 21:34:55 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -53,11 +53,11 @@ namespace pov
 class Triangle : public ObjectBase
 {
 	public:
-		VECTOR  Normal_Vector;
-		DBL     Distance;
-		unsigned int  Dominant_Axis:2;
-		unsigned int  vAxis:2;  /* used only for smooth triangles */
-		VECTOR  P1, P2, P3;
+		Vector3d        P1, P2, P3;
+		Vector3d        Normal_Vector;
+		DBL             Distance;
+		unsigned int    Dominant_Axis:2;
+		unsigned int    vAxis:2;  /* used only for smooth triangles */
 
 		Triangle();
 		Triangle(int t);
@@ -86,7 +86,7 @@ class Triangle : public ObjectBase
 class SmoothTriangle : public Triangle
 {
 	public:
-		VECTOR  N1, N2, N3, Perp;
+		Vector3d  N1, N2, N3, Perp;
 
 		SmoothTriangle();
 
@@ -101,7 +101,7 @@ class SmoothTriangle : public Triangle
 
 		virtual bool Compute_Triangle();
 
-		static DBL Calculate_Smooth_T(const VECTOR IPoint, const VECTOR P1, const VECTOR P2, const VECTOR P3);
+		static DBL Calculate_Smooth_T(const Vector3d& IPoint, const Vector3d& P1, const Vector3d& P2, const Vector3d& P3);
 	protected:
 		bool Compute_Smooth_Triangle();
 };

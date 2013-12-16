@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/hfield.h $
- * $Revision: #22 $
- * $Change: 6121 $
- * $DateTime: 2013/11/23 07:38:50 $
+ * $Revision: #23 $
+ * $Change: 6138 $
+ * $DateTime: 2013/11/25 18:52:19 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -57,14 +57,7 @@ namespace pov
 
 typedef struct HField_Data_Struct HFIELD_DATA;
 typedef struct HField_Block_Struct HFIELD_BLOCK;
-typedef struct HField_Normal_Struct HFIELD_NORMAL;
 typedef short HF_Normals[3];
-
-struct HField_Normal_Struct
-{
-	DBL fx, fz;
-	VECTOR normal;
-};
 
 struct HField_Block_Struct
 {
@@ -89,8 +82,8 @@ struct HField_Data_Struct
 class HField : public ObjectBase
 {
 	public:
-		VECTOR bounding_corner1;
-		VECTOR bounding_corner2;
+		Vector3d bounding_corner1;
+		Vector3d bounding_corner2;
 		HFIELD_DATA *Data;
 
 		HField();
@@ -110,12 +103,12 @@ class HField : public ObjectBase
 
 		void Compute_HField(const ImageData *image);
 	protected:
-		static DBL normalize(VECTOR A, const VECTOR B);
+		static DBL normalize(Vector3d& A, const Vector3d& B);
 		void smooth_height_field(int xsize, int zsize);
 		bool intersect_pixel(int x, int z, const Ray& ray, DBL height1, DBL height2, IStack &HField_Stack, const Ray &RRay, DBL mindist, DBL maxdist, TraceThreadData *Thread);
-		static int add_single_normal(HF_VAL **data, int xsize, int zsize, int x0, int z0,int x1, int z1,int x2, int z2, VECTOR N);
-		bool dda_traversal(const Ray &ray, const VECTOR Start, const HFIELD_BLOCK *Block, IStack &HField_Stack, const Ray &RRay, DBL mindist, DBL maxdist, TraceThreadData *Thread);
-		bool block_traversal(const Ray &ray, const VECTOR Start, IStack &HField_Stack, const Ray &RRay, DBL mindist, DBL maxdist, TraceThreadData *Thread);
+		static int add_single_normal(HF_VAL **data, int xsize, int zsize, int x0, int z0,int x1, int z1,int x2, int z2, Vector3d& N);
+		bool dda_traversal(const Ray &ray, const Vector3d& Start, const HFIELD_BLOCK *Block, IStack &HField_Stack, const Ray &RRay, DBL mindist, DBL maxdist, TraceThreadData *Thread);
+		bool block_traversal(const Ray &ray, const Vector3d& Start, IStack &HField_Stack, const Ray &RRay, DBL mindist, DBL maxdist, TraceThreadData *Thread);
 		void build_hfield_blocks();
 };
 

@@ -27,9 +27,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/boxes.cpp $
- * $Revision: #34 $
- * $Change: 6121 $
- * $DateTime: 2013/11/23 07:38:50 $
+ * $Revision: #35 $
+ * $Change: 6138 $
+ * $DateTime: 2013/11/25 18:52:19 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -170,23 +170,23 @@ bool Box::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadData
 *
 ******************************************************************************/
 
-bool Box::Intersect(const Ray& ray, const TRANSFORM *Trans, const VECTOR Corner1, const VECTOR Corner2, DBL *Depth1, DBL  *Depth2, int *Side1, int  *Side2)
+bool Box::Intersect(const Ray& ray, const TRANSFORM *Trans, const Vector3d& Corner1, const Vector3d& Corner2, DBL *Depth1, DBL  *Depth2, int *Side1, int  *Side2)
 {
 	int smin = 0, smax = 0;    /* Side hit for min/max intersection. */
 	DBL t, tmin, tmax;
-	VECTOR P, D;
+	Vector3d P, D;
 
 	/* Transform the point into the boxes space */
 
 	if (Trans != NULL)
 	{
-		MInvTransPoint(P, *ray.Origin, Trans);
-		MInvTransDirection(D, *ray.Direction, Trans);
+		MInvTransPoint(P, ray.Origin, Trans);
+		MInvTransDirection(D, ray.Direction, Trans);
 	}
 	else
 	{
-		Assign_Vector(P, *ray.Origin);
-		Assign_Vector(D, *ray.Direction);
+		P = ray.Origin;
+		D = ray.Direction;
 	}
 
 	tmin = 0.0;
@@ -535,17 +535,17 @@ bool Box::Intersect(const Ray& ray, const TRANSFORM *Trans, const VECTOR Corner1
 
 bool Box::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 {
-	VECTOR New_Point;
+	Vector3d New_Point;
 
 	/* Transform the point into box space. */
 
 	if (Trans != NULL)
 	{
-		MInvTransPoint(New_Point, *IPoint, Trans);
+		MInvTransPoint(New_Point, IPoint, Trans);
 	}
 	else
 	{
-		Assign_Vector(New_Point, *IPoint);
+		New_Point = IPoint;
 	}
 
 	/* Test to see if we are outside the box. */
@@ -616,7 +616,7 @@ void Box::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread)
 
 	if (Trans != NULL)
 	{
-		MTransNormal(*Result, *Result, Trans);
+		MTransNormal(Result, Result, Trans);
 
 		Result.normalize();
 	}
@@ -654,9 +654,9 @@ void Box::Translate(const Vector3d& Vector, const TRANSFORM *tr)
 {
 	if (Trans == NULL)
 	{
-		VAddEq(bounds[0], *Vector);
+		bounds[0] += Vector;
 
-		VAddEq(bounds[1], *Vector);
+		bounds[1] += Vector;
 
 		Compute_BBox();
 	}
@@ -733,8 +733,8 @@ void Box::Scale(const Vector3d& Vector, const TRANSFORM *tr)
 
 	if (Trans == NULL)
 	{
-		VEvaluateEq(bounds[0], *Vector);
-		VEvaluateEq(bounds[1], *Vector);
+		bounds[0] *= Vector;
+		bounds[1] *= Vector;
 
 		if (bounds[0][X] > bounds[1][X])
 		{
@@ -869,8 +869,8 @@ void Box::Transform(const TRANSFORM *tr)
 
 Box::Box() : ObjectBase(BOX_OBJECT)
 {
-	Make_Vector(bounds[0], -1.0, -1.0, -1.0);
-	Make_Vector(bounds[1],  1.0,  1.0,  1.0);
+	bounds[0] = Vector3d(-1.0, -1.0, -1.0);
+	bounds[1] = Vector3d( 1.0,  1.0,  1.0);
 
 	Make_BBox(BBox, -1.0, -1.0, -1.0, 2.0, 2.0, 2.0);
 
@@ -984,7 +984,7 @@ void Box::Compute_BBox()
 {
 	BBox.lowerLeft = BBoxVector3d(bounds[0]);
 
-	BBox.size = BBoxVector3d(Vector3d(bounds[1]) - Vector3d(bounds[0]));
+	BBox.size = BBoxVector3d(bounds[1] - bounds[0]);
 
 	if (Trans != NULL)
 	{
@@ -1063,20 +1063,20 @@ void Box::Compute_BBox()
 
 void Box::UVCoord(Vector2d& Result, const Intersection *Inter, TraceThreadData *Thread) const
 {
-	VECTOR P, Box_Diff;
+	Vector3d P, Box_Diff;
 
 	/* Transform the point into the cube's space */
 	if (Trans != NULL)
-		MInvTransPoint(P, *Inter->IPoint, Trans);
+		MInvTransPoint(P, Inter->IPoint, Trans);
 	else
-		Assign_Vector(P, *Inter->IPoint);
+		P = Inter->IPoint;
 
-	VSub(Box_Diff,bounds[1],bounds[0]);
+	Box_Diff = bounds[1] - bounds[0];
 
 	/* this line moves the bottom,left,front corner of the box to <0,0,0> */
-	VSubEq(P, bounds[0]);
+	P -= bounds[0];
 	/* this line normalizes the face offsets */
-	VDivEq(P, Box_Diff);
+	P /= Box_Diff;
 
 	/* if no normalize above, then we should use Box->UV_Trans and also
 	   inverse-transform the bounds */

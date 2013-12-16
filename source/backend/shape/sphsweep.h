@@ -28,9 +28,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/sphsweep.h $
- * $Revision: #21 $
- * $Change: 6121 $
- * $DateTime: 2013/11/23 07:38:50 $
+ * $Revision: #22 $
+ * $Change: 6144 $
+ * $DateTime: 2013/11/28 20:20:53 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -71,19 +71,19 @@ typedef struct Sphere_Sweep_Intersection_Structure SPHSWEEP_INT;
 /* Single sphere, used to connect two adjacent segments */
 struct Sphere_Sweep_Sphere_Struct
 {
-	VECTOR      Center;
+	Vector3d    Center;
 	DBL         Radius;
 };
 
 /* One segment of the sphere sweep */
 struct Sphere_Sweep_Segment_Struct
 {
-	SPHSWEEP_SPH  Closing_Sphere[2];        /* Spheres closing the segment   */
-	VECTOR  Center_Deriv[2];    /* Derivatives of center funcs for 0 and 1   */
-	DBL     Radius_Deriv[2];    /* Derivatives of radius funcs for 0 and 1   */
-	int     Num_Coefs;                      /* Number of coefficients        */
-	VECTOR  Center_Coef[SPH_SWP_MAX_COEFS]; /* Coefs of center polynomial    */
-	DBL     Radius_Coef[SPH_SWP_MAX_COEFS]; /* Coefs of radius polynomial    */
+	SPHSWEEP_SPH  Closing_Sphere[2];              /* Spheres closing the segment   */
+	Vector3d      Center_Deriv[2];                /* Derivatives of center funcs for 0 and 1   */
+	DBL           Radius_Deriv[2];                /* Derivatives of radius funcs for 0 and 1   */
+	int           Num_Coefs;                      /* Number of coefficients        */
+	Vector3d      Center_Coef[SPH_SWP_MAX_COEFS]; /* Coefs of center polynomial    */
+	DBL           Radius_Coef[SPH_SWP_MAX_COEFS]; /* Coefs of radius polynomial    */
 };
 
 // Temporary storage for intersection values
@@ -124,7 +124,7 @@ class SphereSweep : public ObjectBase
 
 		void Compute();
 	protected:
-		bool Intersect(Ray& ray, VECTOR Center, DBL Radius2, DBL *Depth1, DBL *Depth2);
+		bool Intersect(Ray& ray, Vector3d& Center, DBL Radius2, DBL *Depth1, DBL *Depth2);
 		static bool Intersect_Sphere(const Ray &ray, const SPHSWEEP_SPH *Sphere, SPHSWEEP_INT *Isect);
 		static int Intersect_Segment(const Ray &ray, const SPHSWEEP_SEG *Segment, SPHSWEEP_INT *Isect, TraceThreadData *Thread);
 		static int Find_Valid_Points(SPHSWEEP_INT *Inter, int Num_Inter, const Ray &ray);

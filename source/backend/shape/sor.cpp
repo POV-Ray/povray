@@ -27,9 +27,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/sor.cpp $
- * $Revision: #38 $
- * $Change: 6121 $
- * $DateTime: 2013/11/23 07:38:50 $
+ * $Revision: #39 $
+ * $Change: 6143 $
+ * $DateTime: 2013/11/28 17:10:31 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -230,18 +230,18 @@ bool Sor::Intersect(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread
 	DBL x[4];
 	DBL y[3];
 	DBL best;
-	VECTOR P, D;
+	Vector3d P, D;
 	SOR_SPLINE_ENTRY *Entry;
 
 	/* Transform the ray into the surface of revolution space. */
 
-	MInvTransPoint(P, *ray.Origin, Trans);
+	MInvTransPoint(P, ray.Origin, Trans);
 
-	MInvTransDirection(D, *ray.Direction, Trans);
+	MInvTransDirection(D, ray.Direction, Trans);
 
-	VLength(len, D);
+	len = D.length();
 
-	VInverseScaleEq(D, len);
+	D /= len;
 
 	/* Test if ray misses object's bounds. */
 
@@ -337,7 +337,7 @@ bool Sor::Intersect(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread
 	BCYL_INT *rint = reinterpret_cast<BCYL_INT *>(Thread->BCyl_RInt) ;
 	BCYL_INT *hint = reinterpret_cast<BCYL_INT *>(Thread->BCyl_HInt) ;
 
-	if ((cnt = Intersect_BCyl(Spline->BCyl, intervals, rint, hint, Vector3d(P), Vector3d(D))) == 0)
+	if ((cnt = Intersect_BCyl(Spline->BCyl, intervals, rint, hint, P, D)) == 0)
 	{
 #ifdef SOR_EXTRA_STATS
 		if (found)
@@ -442,12 +442,12 @@ bool Sor::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 {
 	int i;
 	DBL r0, r;
-	VECTOR P;
+	Vector3d P;
 	SOR_SPLINE_ENTRY *Entry=NULL;
 
 	/* Transform the point into the surface of revolution space. */
 
-	MInvTransPoint(P, *IPoint, Trans);
+	MInvTransPoint(P, IPoint, Trans);
 
 	/* Test if we are inside the cylindrical bound. */
 
@@ -530,9 +530,9 @@ bool Sor::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 void Sor::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread) const
 {
 	DBL k;
-	VECTOR P;
+	Vector3d P;
 	SOR_SPLINE_ENTRY *Entry;
-	VECTOR N;
+	Vector3d N;
 
 	switch (Inter->i1)
 	{
@@ -540,7 +540,7 @@ void Sor::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread)
 
 			/* Transform the intersection point into the surface of revolution space. */
 
-			MInvTransPoint(P, *Inter->IPoint, Trans);
+			MInvTransPoint(P, Inter->IPoint, Trans);
 
 			Entry = &Spline->Entry[Inter->i2];
 
@@ -554,21 +554,21 @@ void Sor::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread)
 
 		case BASE_PLANE:
 
-			Make_Vector(N, 0.0, -1.0, 0.0);
+			N = Vector3d(0.0, -1.0, 0.0);
 
 			break;
 
 
 		case CAP_PLANE:
 
-			Make_Vector(N, 0.0, 1.0, 0.0);
+			N = Vector3d(0.0, 1.0, 0.0);
 
 			break;
 	}
 
 	/* Transform the normal out of the surface of revolution space. */
 
-	MTransNormal(*Result, N, Trans);
+	MTransNormal(Result, N, Trans);
 
 	Result.normalize();
 }
@@ -982,7 +982,7 @@ void Sor::Compute_BBox()
 *
 ******************************************************************************/
 
-void Sor::Compute_Sor(UV_VECT *P, TraceThreadData *Thread)
+void Sor::Compute_Sor(Vector2d *P, TraceThreadData *Thread)
 {
 	int i, n;
 	DBL *tmp_r1;
@@ -1271,10 +1271,10 @@ void Sor::UVCoord(Vector2d& Result, const Intersection *Inter, TraceThreadData *
 {
 	DBL len, theta;
 	DBL h, v_per_segment;
-	VECTOR P;
+	Vector3d P;
 
 	/* Transform the point into the lathe space. */
-	MInvTransPoint(P, *Inter->IPoint, Trans);
+	MInvTransPoint(P, Inter->IPoint, Trans);
 
 	/* Determine its angle from the point (1, 0, 0) in the x-z plane. */
 	len = P[X] * P[X] + P[Z] * P[Z];

@@ -28,9 +28,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/render/tracepixel.cpp $
- * $Revision: #48 $
- * $Change: 6121 $
- * $DateTime: 2013/11/23 07:38:50 $
+ * $Revision: #49 $
+ * $Change: 6140 $
+ * $DateTime: 2013/11/26 11:07:00 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -649,9 +649,7 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
 
 				// set the ray origin to the centriod of the triangle.
 				const Mesh_Triangle_Struct& tr = mesh->Data->Triangles[faceIndex];
-				ray.Origin[X] = (mesh->Data->Vertices[tr.P1][X] + mesh->Data->Vertices[tr.P2][X] + mesh->Data->Vertices[tr.P3][X]) / 3;
-				ray.Origin[Y] = (mesh->Data->Vertices[tr.P1][Y] + mesh->Data->Vertices[tr.P2][Y] + mesh->Data->Vertices[tr.P3][Y]) / 3;
-				ray.Origin[Z] = (mesh->Data->Vertices[tr.P1][Z] + mesh->Data->Vertices[tr.P2][Z] + mesh->Data->Vertices[tr.P3][Z]) / 3;
+				ray.Origin = Vector3d(mesh->Data->Vertices[tr.P1] + mesh->Data->Vertices[tr.P2] + mesh->Data->Vertices[tr.P3]) / 3;
 
 				// set the ray direction according to the normal of the face
 				ray.Direction = Vector3d(mesh->Data->Normals[tr.Normal_Ind]);
@@ -707,9 +705,7 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
 						Mesh_Triangle_Struct& tr = mesh->Data->Triangles[faceIndex];
 
 						// see comments for distribution method 0
-						ray.Origin[X] = (mesh->Data->Vertices[tr.P1][X] + mesh->Data->Vertices[tr.P2][X] + mesh->Data->Vertices[tr.P3][X]) / 3;
-						ray.Origin[Y] = (mesh->Data->Vertices[tr.P1][Y] + mesh->Data->Vertices[tr.P2][Y] + mesh->Data->Vertices[tr.P3][Y]) / 3;
-						ray.Origin[Z] = (mesh->Data->Vertices[tr.P1][Z] + mesh->Data->Vertices[tr.P2][Z] + mesh->Data->Vertices[tr.P3][Z]) / 3;
+						ray.Origin = Vector3d(mesh->Data->Vertices[tr.P1] + mesh->Data->Vertices[tr.P2] + mesh->Data->Vertices[tr.P3]) / 3;
 						ray.Direction = Vector3d(mesh->Data->Normals[tr.Normal_Ind]);
 						ray.Origin = ray.Evaluate(camera.Location[Z]);
 						if (camera.Direction[Z] < -EPSILON)
@@ -744,9 +740,7 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
 
 				// see comments for distribution method 0
 				Mesh_Triangle_Struct& tr = mesh->Data->Triangles[faceIndex];
-				ray.Origin[X] = (mesh->Data->Vertices[tr.P1][X] + mesh->Data->Vertices[tr.P2][X] + mesh->Data->Vertices[tr.P3][X]) / 3;
-				ray.Origin[Y] = (mesh->Data->Vertices[tr.P1][Y] + mesh->Data->Vertices[tr.P2][Y] + mesh->Data->Vertices[tr.P3][Y]) / 3;
-				ray.Origin[Z] = (mesh->Data->Vertices[tr.P1][Z] + mesh->Data->Vertices[tr.P2][Z] + mesh->Data->Vertices[tr.P3][Z]) / 3;
+				ray.Origin = Vector3d(mesh->Data->Vertices[tr.P1] + mesh->Data->Vertices[tr.P2] + mesh->Data->Vertices[tr.P3]) / 3;
 				ray.Direction = Vector3d(mesh->Data->Normals[tr.Normal_Ind]);
 				ray.Origin = ray.Evaluate(camera.Location[Z]);
 				if (camera.Direction[Z] < -EPSILON)
@@ -809,14 +803,12 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
 									continue;
 
 								// now all we need to do is convert the barycentric co-ordinates back to a point in 3d space which is on the surface of the face
-								ray.Origin[X] = mesh->Data->Vertices[tr->P1][X] * B1 + mesh->Data->Vertices[tr->P2][X] * B2 + mesh->Data->Vertices[tr->P3][X] * B3;
-								ray.Origin[Y] = mesh->Data->Vertices[tr->P1][Y] * B1 + mesh->Data->Vertices[tr->P2][Y] * B2 + mesh->Data->Vertices[tr->P3][Y] * B3;
-								ray.Origin[Z] = mesh->Data->Vertices[tr->P1][Z] * B1 + mesh->Data->Vertices[tr->P2][Z] * B2 + mesh->Data->Vertices[tr->P3][Z] * B3;
+								ray.Origin = Vector3d(mesh->Data->Vertices[tr->P1][X] * B1 + mesh->Data->Vertices[tr->P2][X] * B2 + mesh->Data->Vertices[tr->P3][X] * B3);
 
 								// we use the one normal for any location on the face, unless smooth is set
 								ray.Direction = Vector3d(mesh->Data->Normals[tr->Normal_Ind]);
 								if (camera.Smooth)
-									mesh->Smooth_Mesh_Normal(*ray.Direction, tr, *ray.Origin);
+									mesh->Smooth_Mesh_Normal(ray.Direction, tr, ray.Origin);
 
 								found = true;
 								break;

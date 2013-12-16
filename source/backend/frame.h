@@ -26,9 +26,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/frame.h $
- * $Revision: #126 $
- * $Change: 6122 $
- * $DateTime: 2013/11/23 10:33:00 $
+ * $Revision: #130 $
+ * $Change: 6145 $
+ * $DateTime: 2013/11/29 11:52:27 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -65,6 +65,8 @@ namespace pov
 {
 
 using namespace pov_base;
+using std::min;
+using std::max;
 
 // these defines affect the maximum size of some types based on FixedSimpleVector
 
@@ -343,22 +345,22 @@ class GenericVector2d
 
 		GenericVector2d operator+(const GenericVector2d& b) const
 		{
-			return Vector2d(vect[X] + b[X], vect[Y] + b[Y]);
+			return GenericVector2d(vect[X] + b[X], vect[Y] + b[Y]);
 		}
 
 		GenericVector2d operator-(const GenericVector2d& b) const
 		{
-			return Vector2d(vect[X] - b[X], vect[Y] - b[Y]);
+			return GenericVector2d(vect[X] - b[X], vect[Y] - b[Y]);
 		}
 
 		GenericVector2d operator*(const GenericVector2d& b) const
 		{
-			return Vector2d(vect[X] * b[X], vect[Y] * b[Y]);
+			return GenericVector2d(vect[X] * b[X], vect[Y] * b[Y]);
 		}
 
 		GenericVector2d operator/(const GenericVector2d& b) const
 		{
-			return Vector2d(vect[X] / b[X], vect[Y] / b[Y]);
+			return GenericVector2d(vect[X] / b[X], vect[Y] / b[Y]);
 		}
 
 		GenericVector2d& operator+=(const GenericVector2d& b)
@@ -718,6 +720,8 @@ typedef GenericVector2d<SNGL> SnglVector2d;
 typedef GenericVector3d<DBL> Vector3d;
 typedef GenericVector3d<SNGL> SnglVector3d;
 
+typedef Vector3d Matrix3x3[3];
+
 template<typename T>
 inline T dot(const GenericVector2d<T>& a, const GenericVector2d<T>& b)
 {
@@ -739,13 +743,69 @@ inline GenericVector3d<T> cross(const GenericVector3d<T>& a, const GenericVector
 }
 
 template<typename T>
+inline GenericVector3d<T> midpoint(const GenericVector3d<T>& a, const GenericVector3d<T>& b)
+{
+	return 0.5 * (a + b);
+}
+
+template<typename T>
 inline bool similar(const GenericVector3d<T>& a, const GenericVector3d<T>& b)
 {
 	return ( fabs(a.x()-b.x()) + fabs(a.y()-b.y()) + fabs(a.z()-b.z()) < EPSILON );
 }
 
 template<typename T>
+inline GenericVector2d<T> operator* (T a, const GenericVector2d<T>& b) { return b * a; }
+template<typename T>
 inline GenericVector3d<T> operator* (T a, const GenericVector3d<T>& b) { return b * a; }
+
+template<typename T>
+inline GenericVector3d<T> min(GenericVector3d<T>& a, const GenericVector3d<T>& b)
+{
+	return GenericVector3d<T>( std::min(a[X], b[X]),
+	                           std::min(a[Y], b[Y]),
+	                           std::min(a[Z], b[Z]) );
+}
+
+template<typename T>
+inline GenericVector3d<T> min(GenericVector3d<T>& a, const GenericVector3d<T>& b, const GenericVector3d<T>& c)
+{
+	return GenericVector3d<T>( std::min(a[X], std::min(b[X], c[X])),
+	                           std::min(a[Y], std::min(b[Y], c[Y])),
+	                           std::min(a[Z], std::min(b[Z], c[Z])) );
+}
+
+template<typename T>
+inline GenericVector3d<T> min(GenericVector3d<T>& a, const GenericVector3d<T>& b, const GenericVector3d<T>& c, const GenericVector3d<T>& d)
+{
+	return GenericVector3d<T>( std::min(a[X], std::min(b[X], std::min(c[X], d[X]))),
+	                           std::min(a[Y], std::min(b[Y], std::min(c[Y], d[Y]))),
+	                           std::min(a[Z], std::min(b[Z], std::min(c[Z], d[Z]))) );
+}
+
+template<typename T>
+inline GenericVector3d<T> max(GenericVector3d<T>& a, const GenericVector3d<T>& b)
+{
+	return GenericVector3d<T>( std::max(a[X], b[X]),
+	                           std::max(a[Y], b[Y]),
+	                           std::max(a[Z], b[Z]) );
+}
+
+template<typename T>
+inline GenericVector3d<T> max(GenericVector3d<T>& a, const GenericVector3d<T>& b, const GenericVector3d<T>& c)
+{
+	return GenericVector3d<T>( std::max(a[X], std::max(b[X], c[X])),
+	                           std::max(a[Y], std::max(b[Y], c[Y])),
+	                           std::max(a[Z], std::max(b[Z], c[Z])) );
+}
+
+template<typename T>
+inline GenericVector3d<T> max(GenericVector3d<T>& a, const GenericVector3d<T>& b, const GenericVector3d<T>& c, const GenericVector3d<T>& d)
+{
+	return GenericVector3d<T>( std::max(a[X], std::max(b[X], std::max(c[X], d[X]))),
+	                           std::max(a[Y], std::max(b[Y], std::max(c[Y], d[Y]))),
+	                           std::max(a[Z], std::max(b[Z], std::max(c[Z], d[Z]))) );
+}
 
 template<typename T>
 inline GenericVector2d<T>::GenericVector2d(const GenericVector3d<T>& b)
@@ -825,6 +885,12 @@ inline void Make_min_max_from_BBox(VECTOR& mins, VECTOR& maxs, const BoundingBox
 	maxs[X] = mins[X] + BBox.size[X];
 	maxs[Y] = mins[Y] + BBox.size[Y];
 	maxs[Z] = mins[Z] + BBox.size[Z];
+}
+
+inline void Make_min_max_from_BBox(Vector3d& mins, Vector3d& maxs, const BoundingBox& BBox)
+{
+	mins = Vector3d(BBox.lowerLeft);
+	maxs = mins + Vector3d(BBox.size);
 }
 
 inline bool Inside_BBox(const VECTOR point, const BoundingBox& bbox)
@@ -1813,6 +1879,21 @@ inline void VUnpack(Vector3d& dest_vec, const BYTE_XYZ * pack_vec)
 
 	dest_vec.normalize(); // already good to about 1%, but we can do better
 }
+
+class Fractal;
+
+class FractalRules
+{
+	public:
+		virtual ~FractalRules() {}
+		virtual void CalcNormal (Vector3d&, int, const Fractal *, DBL **) const = 0;
+		virtual bool Iterate (const Vector3d&, const Fractal *, DBL **) const = 0;
+		virtual bool Iterate (const Vector3d&, const Fractal *, const Vector3d&, DBL *, DBL **) const = 0;
+		virtual bool Bound (const Ray &, const Fractal *, DBL *, DBL *) const = 0;
+};
+
+typedef shared_ptr<FractalRules> FractalRulesPtr;
+
 
 // platform-specific headers should have provided DECLARE_THREAD_LOCAL_PTR.
 // if not, we default to using the boost thread_specific_ptr class.

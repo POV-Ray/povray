@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/spheres.cpp $
- * $Revision: #35 $
- * $Change: 6121 $
- * $DateTime: 2013/11/23 07:38:50 $
+ * $Revision: #36 $
+ * $Change: 6139 $
+ * $DateTime: 2013/11/25 21:34:55 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -202,16 +202,16 @@ bool Sphere::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadD
 *
 ******************************************************************************/
 
-bool Sphere::Intersect(const Ray& ray, const VECTOR Center, DBL Radius2, DBL *Depth1, DBL *Depth2)
+bool Sphere::Intersect(const Ray& ray, const Vector3d& Center, DBL Radius2, DBL *Depth1, DBL *Depth2)
 {
 	DBL OCSquared, t_Closest_Approach, Half_Chord, t_Half_Chord_Squared;
-	VECTOR Origin_To_Center;
+	Vector3d Origin_To_Center;
 
-	VSub(Origin_To_Center, Center, *ray.Origin);
+	Origin_To_Center = Center - ray.Origin;
 
-	VDot(OCSquared, Origin_To_Center, Origin_To_Center);
+	OCSquared = Origin_To_Center.lengthSqr();
 
-	VDot(t_Closest_Approach, Origin_To_Center, *ray.Direction);
+	t_Closest_Approach = dot(Origin_To_Center, ray.Direction);
 
 	if ((OCSquared >= Radius2) && (t_Closest_Approach < EPSILON))
 		return(false);
@@ -262,20 +262,20 @@ bool Sphere::Intersect(const Ray& ray, const VECTOR Center, DBL Radius2, DBL *De
 bool Sphere::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 {
 	DBL OCSquared;
-	VECTOR Origin_To_Center;
+	Vector3d Origin_To_Center;
 
 	if(Do_Ellipsoid)
 	{
 		DBL OCSquared;
-		VECTOR Origin_To_Center, New_Point;
+		Vector3d New_Point;
 
 		/* Transform the point into the sphere's space */
 
-		MInvTransPoint(New_Point, *IPoint, Trans);
+		MInvTransPoint(New_Point, IPoint, Trans);
 
-		VSub(Origin_To_Center, Center, New_Point);
+		Origin_To_Center = Center - New_Point;
 
-		VDot(OCSquared, Origin_To_Center, Origin_To_Center);
+		OCSquared = Origin_To_Center.lengthSqr();
 
 		if (Test_Flag(this, INVERTED_FLAG))
 			return(OCSquared > Sqr(Radius));
@@ -284,9 +284,9 @@ bool Sphere::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 	}
 	else
 	{
-		VSub(Origin_To_Center, Center, *IPoint);
+		Origin_To_Center = Center - IPoint;
 
-		VDot(OCSquared, Origin_To_Center, Origin_To_Center);
+		OCSquared = Origin_To_Center.lengthSqr();
 
 		if(Test_Flag(this, INVERTED_FLAG))
 			return(OCSquared > Sqr(Radius));
@@ -327,16 +327,16 @@ void Sphere::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thre
 {
 	if(Do_Ellipsoid)
 	{
-		VECTOR New_Point;
+		Vector3d New_Point;
 		// Transform the point into the sphere's space
-		MInvTransPoint(New_Point, *Inter->IPoint, Trans);
-		VSub(*Result, New_Point, Center);
-		MTransNormal(*Result, *Result, Trans);
+		MInvTransPoint(New_Point, Inter->IPoint, Trans);
+		Result = New_Point - Center;
+		MTransNormal(Result, Result, Trans);
 		Result.normalize();
 	}
 	else
 	{
-		Result = (Inter->IPoint - Vector3d(Center)) / Radius;
+		Result = (Inter->IPoint - Center) / Radius;
 	}
 }
 
@@ -409,7 +409,7 @@ void Sphere::Translate(const Vector3d& Vector, const TRANSFORM *tr)
 {
 	if(Trans == NULL)
 	{
-		VAddEq(Center, *Vector);
+		Center += Vector;
 
 		Compute_BBox();
 	}
@@ -503,7 +503,7 @@ void Sphere::Scale(const Vector3d& Vector, const TRANSFORM *tr)
 
 	if (Trans == NULL)
 	{
-		VScaleEq(Center, Vector[X]);
+		Center *= Vector[X];
 
 		Radius *= fabs(Vector[X]);
 
@@ -578,7 +578,7 @@ void Sphere::Invert()
 
 Sphere::Sphere() : ObjectBase(SPHERE_OBJECT)
 {
-	Make_Vector(Center, 0.0, 0.0, 0.0);
+	Center = Vector3d(0.0, 0.0, 0.0);
 
 	Radius = 1.0;
 
@@ -743,25 +743,25 @@ void Sphere::UVCoord(Vector2d& Result, const Intersection *Inter, TraceThreadDat
 {
 	DBL len, phi, theta;
 	DBL x,y,z;
-	VECTOR New_Point, New_Center;
+	Vector3d New_Point, New_Center;
 
 	/* Transform the point into the sphere's space */
 	if (UV_Trans != NULL)
 	{
 
-		MInvTransPoint(New_Point, *Inter->IPoint, UV_Trans);
+		MInvTransPoint(New_Point, Inter->IPoint, UV_Trans);
 
 		if (Trans != NULL)
 			MTransPoint(New_Center, Center, Trans);
 		else
-			Assign_Vector(New_Center, Center);
+			New_Center = Center;
 
 		MInvTransPoint(New_Center, New_Center, UV_Trans);
 	}
 	else
 	{
-		Assign_Vector(New_Point, *Inter->IPoint);
-		Assign_Vector(New_Center, Center);
+		New_Point = Inter->IPoint;
+		New_Center = Center;
 	}
 	x = New_Point[X]-New_Center[X];
 	y = New_Point[Y]-New_Center[Y];

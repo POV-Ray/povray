@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/cones.h $
- * $Revision: #19 $
- * $Change: 6121 $
- * $DateTime: 2013/11/23 07:38:50 $
+ * $Revision: #20 $
+ * $Change: 6139 $
+ * $DateTime: 2013/11/25 21:34:55 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -57,11 +57,11 @@ class Cone : public ObjectBase
 			int t;  /* Type of intersection: base/cap plane or side */
 		};
 	public:
-		VECTOR apex;        /* Center of the top of the cone */
-		VECTOR base;        /* Center of the bottom of the cone */
-		DBL apex_radius;    /* Radius of the cone at the top */
-		DBL base_radius;    /* Radius of the cone at the bottom */
-		DBL dist;           /* Distance to end of cone in canonical coords */
+		Vector3d apex;      ///< Center of the top of the cone.
+		Vector3d base;      ///< Center of the bottom of the cone.
+		DBL apex_radius;    ///< Radius of the cone at the top.
+		DBL base_radius;    ///< Radius of the cone at the bottom.
+		DBL dist;           ///< Distance to end of cone in canonical coords.
 
 		Cone();
 		virtual ~Cone();

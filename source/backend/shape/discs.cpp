@@ -27,9 +27,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/discs.cpp $
- * $Revision: #29 $
- * $Change: 6121 $
- * $DateTime: 2013/11/23 07:38:50 $
+ * $Revision: #30 $
+ * $Change: 6139 $
+ * $DateTime: 2013/11/25 21:34:55 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -131,15 +131,15 @@ bool Disc::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDat
 bool Disc::Intersect(const Ray& ray, DBL *Depth) const
 {
 	DBL t, u, v, r2, len;
-	VECTOR P, D;
+	Vector3d P, D;
 
 	/* Transform the point into the discs space */
 
-	MInvTransPoint(P, *ray.Origin, Trans);
-	MInvTransDirection(D, *ray.Direction, Trans);
+	MInvTransPoint(P, ray.Origin, Trans);
+	MInvTransDirection(D, ray.Direction, Trans);
 
-	VLength(len, D);
-	VInverseScaleEq(D, len);
+	len = D.length();
+	D /= len;
 
 	if (fabs(D[Z]) > EPSILON)
 	{
@@ -195,11 +195,11 @@ bool Disc::Intersect(const Ray& ray, DBL *Depth) const
 
 bool Disc::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 {
-	VECTOR New_Point;
+	Vector3d New_Point;
 
 	/* Transform the point into the discs space */
 
-	MInvTransPoint(New_Point, *IPoint, Trans);
+	MInvTransPoint(New_Point, IPoint, Trans);
 
 	if (New_Point[Z] >= 0.0)
 	{
@@ -245,7 +245,7 @@ bool Disc::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 
 void Disc::Normal(Vector3d& Result, Intersection *, TraceThreadData *) const
 {
-	Result = Vector3d(normal);
+	Result = normal;
 }
 
 
@@ -412,7 +412,7 @@ void Disc::Transform(const TRANSFORM *tr)
 {
 	MTransNormal(normal, normal, tr);
 
-	VNormalize(normal, normal);
+	normal.normalize();
 
 	Compose_Transforms(Trans, tr);
 
@@ -451,8 +451,8 @@ void Disc::Transform(const TRANSFORM *tr)
 
 Disc::Disc() : ObjectBase(DISC_OBJECT)
 {
-	Make_Vector (center, 0.0, 0.0, 0.0);
-	Make_Vector (normal, 0.0, 0.0, 1.0);
+	center = Vector3d(0.0, 0.0, 0.0);
+	normal = Vector3d(0.0, 0.0, 1.0);
 
 	iradius2 = 0.0;
 	oradius2 = 1.0;
@@ -572,7 +572,7 @@ Disc::~Disc()
 
 void Disc::Compute_Disc()
 {
-	Compute_Coordinate_Transform(Trans, center, normal, 1.0, 1.0);
+	Compute_Coordinate_Transform(Trans, *center, *normal, 1.0, 1.0);
 
 	Compute_BBox();
 }

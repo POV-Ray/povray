@@ -28,9 +28,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/fpmetric.h $
- * $Revision: #19 $
- * $Change: 6121 $
- * $DateTime: 2013/11/23 07:38:50 $
+ * $Revision: #20 $
+ * $Change: 6138 $
+ * $DateTime: 2013/11/25 18:52:19 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -110,8 +110,8 @@ class Parametric : public ObjectBase
 		PRECOMP_PAR_DATA *Copy_PrecompParVal();
 		void Destroy_PrecompParVal();
 
-		static inline DBL Evaluate_Function_UV(FPUContext *ctx, FUNCTION funct, const UV_VECT fnvec);
-		static inline void Evaluate_Function_Interval_UV(FPUContext *ctx, FUNCTION funct, DBL threshold, const UV_VECT fnvec_low, const UV_VECT fnvec_hi, DBL max_gradient, DBL& low, DBL& hi);
+		static inline DBL Evaluate_Function_UV(FPUContext *ctx, FUNCTION funct, const Vector2d& fnvec);
+		static inline void Evaluate_Function_Interval_UV(FPUContext *ctx, FUNCTION funct, DBL threshold, const Vector2d& fnvec_low, const Vector2d& fnvec_hi, DBL max_gradient, DBL& low, DBL& hi);
 		static void Interval(DBL dx, DBL a, DBL b, DBL max_gradient, DBL *Min, DBL *Max);
 	private:
 		PRECOMP_PAR_DATA *PData;

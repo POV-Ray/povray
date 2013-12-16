@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/parser/parse.cpp $
- * $Revision: #195 $
- * $Change: 6122 $
- * $DateTime: 2013/11/23 10:33:00 $
+ * $Revision: #200 $
+ * $Change: 6143 $
+ * $DateTime: 2013/11/28 17:10:31 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -2345,7 +2345,7 @@ ObjectPtr Parser::Parse_Disc ()
 
 	Parse_Vector(Object->center); Parse_Comma ();
 	Parse_Vector(Object->normal); Parse_Comma ();
-	VNormalize(Object->normal, Object->normal);
+	Object->normal.normalize();
 
 	tmpf = Parse_Float(); Parse_Comma ();
 	Object->oradius2 = tmpf * tmpf;
@@ -2363,7 +2363,7 @@ ObjectPtr Parser::Parse_Disc ()
 	END_EXPECT
 
 	/* Calculate info needed for ray-disc intersections */
-	VDot(tmpf, Object->center, Object->normal);
+	tmpf = dot(Object->center, Object->normal);
 	Object->d = -tmpf;
 
 	Object->Compute_Disc();
@@ -2410,14 +2410,10 @@ ObjectPtr Parser::Parse_HField ()
 	image = Parse_Image (HF_FILE);
 	image->Use = USE_NONE;
 
-	Make_Vector(Object->bounding_corner1, 0.0, 0.0, 0.0);
+	Object->bounding_corner1 = Vector3d(0.0, 0.0, 0.0);
+	Object->bounding_corner2 = Vector3d(image->width - 1.0, 65536.0, image->height - 1.0);
 
-	Object->bounding_corner2[X] = image->width - 1.0;
-
-	Object->bounding_corner2[Y] = 65536.0;
-	Object->bounding_corner2[Z] = image->height - 1.0;
-
-	Local_Vector = Vector3d(1.0) / Vector3d(Object->bounding_corner2);
+	Local_Vector = Vector3d(1.0) / Object->bounding_corner2;
 
 	Compute_Scaling_Transform(Object->Trans, *Local_Vector);
 
@@ -2850,7 +2846,7 @@ ObjectPtr Parser::Parse_Lathe()
 {
 	int i;
 	Lathe *Object;
-	UV_VECT *Points;
+	Vector2d *Points;
 
 	Parse_Begin();
 
@@ -2929,7 +2925,7 @@ ObjectPtr Parser::Parse_Lathe()
 
 	/* Get temporary points describing the rotated curve. */
 
-	Points = reinterpret_cast<UV_VECT *>(POV_MALLOC(Object->Number*sizeof(UV_VECT), "temporary lathe points"));
+	Points = reinterpret_cast<Vector2d *>(POV_MALLOC(Object->Number*sizeof(Vector2d), "temporary lathe points"));
 
 	/* Read points (x : radius; y : height; z : not used). */
 
@@ -3527,12 +3523,12 @@ ObjectPtr Parser::Parse_Mesh()
 	DBL l1, l2, l3;
 	Vector3d D1, D2, P1, P2, P3, N1, N2, N3, N;
 	Vector2d UV1, UV2, UV3;
-	SNGL_VECT *Normals, *Vertices;
+	MeshVector *Normals, *Vertices;
 	TEXTURE **Textures;
-	UV_VECT *UVCoords;
+	MeshUVVector *UVCoords;
 	Mesh *Object;
 	MESH_TRIANGLE *Triangles;
-	int fully_textured=true;
+	bool fully_textured=true;
 	/* NK 1998 */
 	Vector3d Inside_Vect;
 	TEXTURE *t2, *t3;
@@ -3559,13 +3555,13 @@ ObjectPtr Parser::Parse_Mesh()
 
 	max_triangles = 256;
 
-	Normals = reinterpret_cast<SNGL_VECT *>(POV_MALLOC(max_normals*sizeof(SNGL_VECT), "temporary triangle mesh data"));
+	Normals = reinterpret_cast<MeshVector *>(POV_MALLOC(max_normals*sizeof(MeshVector), "temporary triangle mesh data"));
 
 	Textures = reinterpret_cast<TEXTURE **>(POV_MALLOC(max_textures*sizeof(TEXTURE *), "temporary triangle mesh data"));
 
 	Triangles = reinterpret_cast<MESH_TRIANGLE *>(POV_MALLOC(max_triangles*sizeof(MESH_TRIANGLE), "temporary triangle mesh data"));
 
-	Vertices = reinterpret_cast<SNGL_VECT *>(POV_MALLOC(max_vertices*sizeof(SNGL_VECT), "temporary triangle mesh data"));
+	Vertices = reinterpret_cast<MeshVector *>(POV_MALLOC(max_vertices*sizeof(MeshVector), "temporary triangle mesh data"));
 
 	/* Read raw triangle file. */
 
@@ -3578,7 +3574,7 @@ ObjectPtr Parser::Parse_Mesh()
 	number_of_vertices = 0;
 
 	max_uvcoords = 256;
-	UVCoords = reinterpret_cast<UV_VECT *>(POV_MALLOC(max_uvcoords*sizeof(UV_VECT), "temporary triangle mesh data"));
+	UVCoords = reinterpret_cast<MeshUVVector *>(POV_MALLOC(max_uvcoords*sizeof(MeshUVVector), "temporary triangle mesh data"));
 	number_of_uvcoords = 0;
 
 	/* Create hash tables. */
@@ -3593,7 +3589,7 @@ ObjectPtr Parser::Parse_Mesh()
 			Parse_Vector(P2);  Parse_Comma();
 			Parse_Vector(P3);
 
-			if (!Object->Degenerate(*P1, *P2, *P3))
+			if (!Object->Degenerate(P1, P2, P3))
 			{
 				if (number_of_triangles >= max_triangles)
 				{
@@ -3611,15 +3607,15 @@ ObjectPtr Parser::Parse_Mesh()
 
 				Object->Init_Mesh_Triangle(&Triangles[number_of_triangles]);
 
-				Triangles[number_of_triangles].P1 = Object->Mesh_Hash_Vertex(&number_of_vertices, &max_vertices, &Vertices, *P1);
-				Triangles[number_of_triangles].P2 = Object->Mesh_Hash_Vertex(&number_of_vertices, &max_vertices, &Vertices, *P2);
-				Triangles[number_of_triangles].P3 = Object->Mesh_Hash_Vertex(&number_of_vertices, &max_vertices, &Vertices, *P3);
+				Triangles[number_of_triangles].P1 = Object->Mesh_Hash_Vertex(&number_of_vertices, &max_vertices, &Vertices, P1);
+				Triangles[number_of_triangles].P2 = Object->Mesh_Hash_Vertex(&number_of_vertices, &max_vertices, &Vertices, P2);
+				Triangles[number_of_triangles].P3 = Object->Mesh_Hash_Vertex(&number_of_vertices, &max_vertices, &Vertices, P3);
 
 				/* NK 1998 */
 				Parse_Three_UVCoords(UV1,UV2,UV3);
-				Triangles[number_of_triangles].UV1 = Object->Mesh_Hash_UV(&number_of_uvcoords, &max_uvcoords, &UVCoords, *UV1);
-				Triangles[number_of_triangles].UV2 = Object->Mesh_Hash_UV(&number_of_uvcoords, &max_uvcoords, &UVCoords, *UV2);
-				Triangles[number_of_triangles].UV3 = Object->Mesh_Hash_UV(&number_of_uvcoords, &max_uvcoords, &UVCoords, *UV3);
+				Triangles[number_of_triangles].UV1 = Object->Mesh_Hash_UV(&number_of_uvcoords, &max_uvcoords, &UVCoords, UV1);
+				Triangles[number_of_triangles].UV2 = Object->Mesh_Hash_UV(&number_of_uvcoords, &max_uvcoords, &UVCoords, UV2);
+				Triangles[number_of_triangles].UV3 = Object->Mesh_Hash_UV(&number_of_uvcoords, &max_uvcoords, &UVCoords, UV3);
 				/* NK ---- */
 
 				/* NK */
@@ -3631,9 +3627,9 @@ ObjectPtr Parser::Parse_Mesh()
 				if (t3) Triangles[number_of_triangles].Texture3 = Object->Mesh_Hash_Texture(&number_of_textures, &max_textures, &Textures, t3);
 				if (t2 || t3) Triangles[number_of_triangles].ThreeTex = true;
 
-				Object->Compute_Mesh_Triangle(&Triangles[number_of_triangles], false, *P1, *P2, *P3, *N);
+				Object->Compute_Mesh_Triangle(&Triangles[number_of_triangles], false, P1, P2, P3, N);
 
-				Triangles[number_of_triangles].Normal_Ind = Object->Mesh_Hash_Normal(&number_of_normals, &max_normals, &Normals, *N);
+				Triangles[number_of_triangles].Normal_Ind = Object->Mesh_Hash_Normal(&number_of_normals, &max_normals, &Normals, N);
 
 				if(Triangles[number_of_triangles].Texture < 0)
 					fully_textured = false;
@@ -3691,7 +3687,7 @@ ObjectPtr Parser::Parse_Mesh()
 			l2 = N2.length();
 			l3 = N3.length();
 
-			if ((l1 != 0.0) && (l2 != 0.0) && (l3 != 0.0) && (!Object->Degenerate(*P1, *P2, *P3)))
+			if ((l1 != 0.0) && (l2 != 0.0) && (l3 != 0.0) && (!Object->Degenerate(P1, P2, P3)))
 			{
 				if (number_of_triangles >= max_triangles)
 				{
@@ -3711,9 +3707,9 @@ ObjectPtr Parser::Parse_Mesh()
 
 				Object->Init_Mesh_Triangle(&Triangles[number_of_triangles]);
 
-				Triangles[number_of_triangles].P1 = Object->Mesh_Hash_Vertex(&number_of_vertices, &max_vertices, &Vertices, *P1);
-				Triangles[number_of_triangles].P2 = Object->Mesh_Hash_Vertex(&number_of_vertices, &max_vertices, &Vertices, *P2);
-				Triangles[number_of_triangles].P3 = Object->Mesh_Hash_Vertex(&number_of_vertices, &max_vertices, &Vertices, *P3);
+				Triangles[number_of_triangles].P1 = Object->Mesh_Hash_Vertex(&number_of_vertices, &max_vertices, &Vertices, P1);
+				Triangles[number_of_triangles].P2 = Object->Mesh_Hash_Vertex(&number_of_vertices, &max_vertices, &Vertices, P2);
+				Triangles[number_of_triangles].P3 = Object->Mesh_Hash_Vertex(&number_of_vertices, &max_vertices, &Vertices, P3);
 
 				/* Check for equal normals. */
 
@@ -3725,9 +3721,9 @@ ObjectPtr Parser::Parse_Mesh()
 
 				/* NK 1998 */
 				Parse_Three_UVCoords(UV1,UV2,UV3);
-				Triangles[number_of_triangles].UV1 = Object->Mesh_Hash_UV(&number_of_uvcoords, &max_uvcoords, &UVCoords, *UV1);
-				Triangles[number_of_triangles].UV2 = Object->Mesh_Hash_UV(&number_of_uvcoords, &max_uvcoords, &UVCoords, *UV2);
-				Triangles[number_of_triangles].UV3 = Object->Mesh_Hash_UV(&number_of_uvcoords, &max_uvcoords, &UVCoords, *UV3);
+				Triangles[number_of_triangles].UV1 = Object->Mesh_Hash_UV(&number_of_uvcoords, &max_uvcoords, &UVCoords, UV1);
+				Triangles[number_of_triangles].UV2 = Object->Mesh_Hash_UV(&number_of_uvcoords, &max_uvcoords, &UVCoords, UV2);
+				Triangles[number_of_triangles].UV3 = Object->Mesh_Hash_UV(&number_of_uvcoords, &max_uvcoords, &UVCoords, UV3);
 
 				/* read possibly three instead of only one texture */
 				/* read these before compute!!! */
@@ -3741,20 +3737,20 @@ ObjectPtr Parser::Parse_Mesh()
 				{
 					/* Smooth triangle. */
 
-					Triangles[number_of_triangles].N1 = Object->Mesh_Hash_Normal(&number_of_normals, &max_normals, &Normals, *N1);
-					Triangles[number_of_triangles].N2 = Object->Mesh_Hash_Normal(&number_of_normals, &max_normals, &Normals, *N2);
-					Triangles[number_of_triangles].N3 = Object->Mesh_Hash_Normal(&number_of_normals, &max_normals, &Normals, *N3);
+					Triangles[number_of_triangles].N1 = Object->Mesh_Hash_Normal(&number_of_normals, &max_normals, &Normals, N1);
+					Triangles[number_of_triangles].N2 = Object->Mesh_Hash_Normal(&number_of_normals, &max_normals, &Normals, N2);
+					Triangles[number_of_triangles].N3 = Object->Mesh_Hash_Normal(&number_of_normals, &max_normals, &Normals, N3);
 
-					Object->Compute_Mesh_Triangle(&Triangles[number_of_triangles], true, *P1, *P2, *P3, *N);
+					Object->Compute_Mesh_Triangle(&Triangles[number_of_triangles], true, P1, P2, P3, N);
 				}
 				else
 				{
 					/* Flat triangle. */
 
-					Object->Compute_Mesh_Triangle(&Triangles[number_of_triangles], false, *P1, *P2, *P3, *N);
+					Object->Compute_Mesh_Triangle(&Triangles[number_of_triangles], false, P1, P2, P3, N);
 				}
 
-				Triangles[number_of_triangles].Normal_Ind = Object->Mesh_Hash_Normal(&number_of_normals, &max_normals, &Normals, *N);
+				Triangles[number_of_triangles].Normal_Ind = Object->Mesh_Hash_Normal(&number_of_normals, &max_normals, &Normals, N);
 
 				if (Triangles[number_of_triangles].Texture < 0)
 				{
@@ -3818,7 +3814,7 @@ ObjectPtr Parser::Parse_Mesh()
 	}
 	else
 	{
-		VNormalize(Object->Data->Inside_Vect, *Inside_Vect);
+		Object->Data->Inside_Vect = Inside_Vect.normalized();
 		Object->has_inside_vector=true;
 		Object->Type &= ~PATCH_OBJECT;
 	}
@@ -3841,7 +3837,7 @@ ObjectPtr Parser::Parse_Mesh()
 
 	Object->Data->Number_Of_Vertices = number_of_vertices;
 
-	Object->Data->Normals = reinterpret_cast<SNGL_VECT *>(POV_MALLOC(number_of_normals*sizeof(SNGL_VECT), "triangle mesh data"));
+	Object->Data->Normals = reinterpret_cast<MeshVector *>(POV_MALLOC(number_of_normals*sizeof(MeshVector), "triangle mesh data"));
 
 	if (number_of_textures)
 	{
@@ -3853,13 +3849,13 @@ ObjectPtr Parser::Parse_Mesh()
 
 	Object->Data->Triangles = reinterpret_cast<MESH_TRIANGLE *>(POV_MALLOC(number_of_triangles*sizeof(MESH_TRIANGLE), "triangle mesh data"));
 
-	Object->Data->Vertices = reinterpret_cast<SNGL_VECT *>(POV_MALLOC(number_of_vertices*sizeof(SNGL_VECT), "triangle mesh data"));
+	Object->Data->Vertices = reinterpret_cast<MeshVector *>(POV_MALLOC(number_of_vertices*sizeof(MeshVector), "triangle mesh data"));
 
 	/* Copy normals, textures, triangles and vertices into mesh. */
 
 	for (i = 0; i < number_of_normals; i++)
 	{
-		Assign_Vector(Object->Data->Normals[i], Normals[i]);
+		Object->Data->Normals[i] = Normals[i];
 	}
 
 	for (i = 0; i < number_of_textures; i++)
@@ -3884,17 +3880,17 @@ ObjectPtr Parser::Parse_Mesh()
 
 	for (i = 0; i < number_of_vertices; i++)
 	{
-		Assign_Vector(Object->Data->Vertices[i], Vertices[i]);
+		Object->Data->Vertices[i] = Vertices[i];
 	}
 
 	/* NK 1998 */
 	/* do the four steps above, but for UV coordinates*/
 	Object->Data->UVCoords  = NULL;
 	Object->Data->Number_Of_UVCoords = number_of_uvcoords;
-	Object->Data->UVCoords = reinterpret_cast<UV_VECT *>(POV_MALLOC(number_of_uvcoords*sizeof(UV_VECT), "triangle mesh data"));
+	Object->Data->UVCoords = reinterpret_cast<MeshUVVector *>(POV_MALLOC(number_of_uvcoords*sizeof(MeshUVVector), "triangle mesh data"));
 	for (i = 0; i < number_of_uvcoords; i++)
 	{
-		Assign_UV_Vect(Object->Data->UVCoords[i], UVCoords[i]);
+		Object->Data->UVCoords[i] = UVCoords[i];
 	}
 	POV_FREE(UVCoords);
 	/* NK ---- */
@@ -3908,10 +3904,10 @@ ObjectPtr Parser::Parse_Mesh()
 
 /*
 	Render_Info("Mesh: %ld bytes: %ld vertices, %ld normals, %ld textures, %ld triangles\n",
-		Object->Data->Number_Of_Normals*sizeof(SNGL_VECT)+
+		Object->Data->Number_Of_Normals*sizeof(MeshVector)+
 		Object->Number_Of_Textures*sizeof(TEXTURE *)+
 		Object->Data->Number_Of_Triangles*sizeof(MESH_TRIANGLE)+
-		Object->Data->Number_Of_Vertices*sizeof(SNGL_VECT),
+		Object->Data->Number_Of_Vertices*sizeof(MeshVector),
 		Object->Data->Number_Of_Vertices,
 		Object->Data->Number_Of_Normals,
 		Object->Number_Of_Textures,
@@ -3967,8 +3963,8 @@ ObjectPtr Parser::Parse_Mesh2()
 	int number_of_normal_indices;
 	int a,b,c;
 	int n1, n2, n3;
-	int found_normal_indices = 0;
-	int found_uv_indices = 0;
+	bool found_normal_indices = false;
+	bool found_uv_indices = false;
 	bool fully_textured = true;
 	bool foundZeroNormal = false;
 
@@ -3977,10 +3973,10 @@ ObjectPtr Parser::Parse_Mesh2()
 	Vector3d Inside_Vect;
 
 	Vector2d UV1;
-	SNGL_VECT *Normals = NULL;
-	SNGL_VECT *Vertices = NULL;
+	MeshVector *Normals = NULL;
+	MeshVector *Vertices = NULL;
 	TEXTURE **Textures = NULL;
-	UV_VECT *UVCoords = NULL;
+	MeshUVVector *UVCoords = NULL;
 	Mesh *Object;
 	MESH_TRIANGLE *Triangles;
 
@@ -4020,12 +4016,12 @@ ObjectPtr Parser::Parse_Mesh2()
 				Error("No vertices in triangle mesh.");
 
 			/* allocate memory for vertices */
-			Vertices = reinterpret_cast<SNGL_VECT *>(POV_MALLOC(number_of_vertices*sizeof(SNGL_VECT), "triangle mesh data"));
+			Vertices = reinterpret_cast<MeshVector *>(POV_MALLOC(number_of_vertices*sizeof(MeshVector), "triangle mesh data"));
 
 			for(i=0; i<number_of_vertices; i++)
 			{
 				Parse_Vector(P1); Parse_Comma();
-				Assign_Vector(Vertices[i], *P1);
+				Vertices[i] = MeshVector(P1);
 			}
 			Parse_End();
 		END_CASE
@@ -4042,7 +4038,7 @@ ObjectPtr Parser::Parse_Mesh2()
 
 			if (number_of_normals>0)
 			{
-				Normals = reinterpret_cast<SNGL_VECT *>(POV_MALLOC(number_of_normals*sizeof(SNGL_VECT), "triangle mesh data"));
+				Normals = reinterpret_cast<MeshVector *>(POV_MALLOC(number_of_normals*sizeof(MeshVector), "triangle mesh data"));
 
 				/* leave space in the array for the raw triangle normals */
 				for(i=0; i<number_of_normals; i++)
@@ -4056,7 +4052,7 @@ ObjectPtr Parser::Parse_Mesh2()
 						foundZeroNormal = true;
 					}
 					N1.normalize();
-					Assign_Vector(Normals[i], *N1);
+					Normals[i] = MeshVector(N1);
 				}
 			}
 
@@ -4075,12 +4071,12 @@ ObjectPtr Parser::Parse_Mesh2()
 
 			if (number_of_uvcoords>0)
 			{
-				UVCoords = reinterpret_cast<UV_VECT *>(POV_MALLOC(number_of_uvcoords*sizeof(UV_VECT), "triangle mesh data"));
+				UVCoords = reinterpret_cast<MeshUVVector *>(POV_MALLOC(number_of_uvcoords*sizeof(MeshUVVector), "triangle mesh data"));
 
 				for(i=0; i<number_of_uvcoords; i++)
 				{
 					Parse_UV_Vect(UV1); Parse_Comma();
-					Assign_UV_Vect(UVCoords[i], *UV1);
+					UVCoords[i] = MeshUVVector(UV1);
 				}
 			}
 
@@ -4136,7 +4132,7 @@ ObjectPtr Parser::Parse_Mesh2()
 	if (number_of_uvcoords == 0)
 	{
 		number_of_uvcoords = 1;
-		UVCoords = reinterpret_cast<UV_VECT *>(POV_MALLOC(number_of_uvcoords*sizeof(UV_VECT), "triangle mesh data"));
+		UVCoords = reinterpret_cast<MeshUVVector *>(POV_MALLOC(number_of_uvcoords*sizeof(MeshUVVector), "triangle mesh data"));
 		UVCoords[0][U] = 0;
 		UVCoords[0][V] = 0;
 	}
@@ -4246,7 +4242,7 @@ ObjectPtr Parser::Parse_Mesh2()
 			{
 				Error("Only one uv_indices section is allowed in mesh2");
 			}
-			found_uv_indices = 1;
+			found_uv_indices = true;
 			Parse_Begin();
 
 			if (Parse_Float() != number_of_triangles)
@@ -4294,7 +4290,7 @@ ObjectPtr Parser::Parse_Mesh2()
 			{
 				Error("Only one normal_indices section is allowed in mesh2");
 			}
-			found_normal_indices = 1;
+			found_normal_indices = true;
 			Parse_Begin();
 
 			/*
@@ -4415,9 +4411,9 @@ ObjectPtr Parser::Parse_Mesh2()
 
 	/* reallocate the normals stuff */
 	if (!number_of_normals)
-		Normals = reinterpret_cast<SNGL_VECT *>(POV_MALLOC(number_of_triangles*sizeof(SNGL_VECT), "triangle mesh data"));
+		Normals = reinterpret_cast<MeshVector *>(POV_MALLOC(number_of_triangles*sizeof(MeshVector), "triangle mesh data"));
 	else
-		Normals = reinterpret_cast<SNGL_VECT *>(POV_REALLOC(Normals, (number_of_normals+number_of_triangles)*sizeof(SNGL_VECT), "triangle mesh data"));
+		Normals = reinterpret_cast<MeshVector *>(POV_REALLOC(Normals, (number_of_normals+number_of_triangles)*sizeof(MeshVector), "triangle mesh data"));
 
 	for (i=0; i<number_of_triangles; i++)
 	{
@@ -4449,24 +4445,24 @@ ObjectPtr Parser::Parse_Mesh2()
 			if ((fabs(l1) > EPSILON) || (fabs(l2) > EPSILON))
 			{
 				/* Smooth triangle. */
-				Object->Compute_Mesh_Triangle(&Triangles[i], true, *P1, *P2, *P3, *N);
+				Object->Compute_Mesh_Triangle(&Triangles[i], true, P1, P2, P3, N);
 				Triangles[i].Smooth = true;
 			}
 			else
 			{
 				/* Flat triangle. */
-				Object->Compute_Mesh_Triangle(&Triangles[i], false, *P1, *P2, *P3, *N);
+				Object->Compute_Mesh_Triangle(&Triangles[i], false, P1, P2, P3, N);
 			}
 		}
 		else
 		{
 			/* Flat triangle. */
-			Object->Compute_Mesh_Triangle(&Triangles[i], false, *P1, *P2, *P3, *N);
+			Object->Compute_Mesh_Triangle(&Triangles[i], false, P1, P2, P3, N);
 		}
 
 		/* assign the triangle normal that we just computed */
 		Triangles[i].Normal_Ind = i+number_of_normals;
-		Assign_Vector(Normals[i+number_of_normals], *N);
+		Normals[i+number_of_normals] = MeshVector(N);
 	}
 
 	/* now remember how many normals we really have */
@@ -4488,7 +4484,7 @@ ObjectPtr Parser::Parse_Mesh2()
 	}
 	else
 	{
-		VNormalize(Object->Data->Inside_Vect, *Inside_Vect);
+		Object->Data->Inside_Vect = Inside_Vect.normalized();
 		Object->has_inside_vector=true;
 		Object->Type &= ~PATCH_OBJECT;
 	}
@@ -4999,12 +4995,12 @@ ObjectPtr Parser::Parse_Plane ()
 	Object = new Plane();
 
 	Parse_Vector(Object->Normal_Vector);   Parse_Comma();
-	VLength(len, Object->Normal_Vector);
+	len = Object->Normal_Vector.length();
 	if (len < EPSILON)
 	{
 		Error("Degenerate plane normal.");
 	}
-	VInverseScaleEq(Object->Normal_Vector, len);
+	Object->Normal_Vector /= len;
 	Object->Distance = -Parse_Float();
 
 	Object->Compute_BBox();
@@ -5166,7 +5162,7 @@ ObjectPtr Parser::Parse_Polygon()
 	int i, closed = false;
 	int Number;
 	Polygon *Object;
-	VECTOR *Points;
+	Vector3d *Points;
 	Vector3d P;
 
 	Parse_Begin();
@@ -5185,7 +5181,7 @@ ObjectPtr Parser::Parse_Polygon()
 		Error("Polygon needs at least three points.");
 	}
 
-	Points = reinterpret_cast<VECTOR *>(POV_MALLOC((Number+1)*sizeof(VECTOR), "temporary polygon points"));
+	Points = reinterpret_cast<Vector3d *>(POV_MALLOC((Number+1)*sizeof(Vector3d), "temporary polygon points"));
 
 	for (i = 0; i < Number; i++)
 	{
@@ -5196,7 +5192,7 @@ ObjectPtr Parser::Parse_Polygon()
 
 	/* Check for closed polygons. */
 
-	P = Vector3d(Points[0]);
+	P = Points[0];
 
 	for (i = 1; i < Number; i++)
 	{
@@ -5208,13 +5204,13 @@ ObjectPtr Parser::Parse_Polygon()
 		{
 			// force almost-identical vertices to be /exactly/ identical,
 			// to make processing easier later
-			Assign_Vector(Points[i], *P);
+			Points[i] = P;
 
 			i++;
 
 			if (i < Number)
 			{
-				P = Vector3d(Points[i]);
+				P = Points[i];
 			}
 
 			closed = true;
@@ -5225,7 +5221,7 @@ ObjectPtr Parser::Parse_Polygon()
 	{
 		Warning(0, "Polygon not closed. Closing it.");
 
-		Assign_Vector(Points[Number], *P);
+		Points[Number] = P;
 
 		Number++;
 	}
@@ -5276,7 +5272,7 @@ ObjectPtr Parser::Parse_Prism()
 	int loopStart = 0;
 
 	Prism *Object;
-	UV_VECT *Points;
+	Vector2d *Points;
 	Vector2d P;
 
 	Parse_Begin();
@@ -5381,7 +5377,7 @@ ObjectPtr Parser::Parse_Prism()
 
 	/* Allocate Object->Number points for the prism. */
 
-	Points = reinterpret_cast<UV_VECT *>(POV_MALLOC((Object->Number+1) * sizeof(UV_VECT), "temporary prism points"));
+	Points = reinterpret_cast<Vector2d *>(POV_MALLOC((Object->Number+1) * sizeof(Vector2d), "temporary prism points"));
 
 	/* Read points (x, y : coordinate of 2d point; z : not used). */
 
@@ -5418,7 +5414,7 @@ ObjectPtr Parser::Parse_Prism()
 
 				i = 1;
 
-				P = Vector2d(Points[0]);
+				P = Points[0];
 
 				break;
 
@@ -5427,7 +5423,7 @@ ObjectPtr Parser::Parse_Prism()
 
 				i = 2;
 
-				P = Vector2d(Points[1]);
+				P = Points[1];
 
 				break;
 		}
@@ -5447,7 +5443,7 @@ ObjectPtr Parser::Parse_Prism()
 
 						if (i < Object->Number)
 						{
-							P = Vector2d(Points[i]);
+							P = Points[i];
 						}
 
 						break;
@@ -5458,7 +5454,7 @@ ObjectPtr Parser::Parse_Prism()
 
 						if (i < Object->Number)
 						{
-							P = Vector2d(Points[i]);
+							P = Points[i];
 						}
 
 						break;
@@ -5469,7 +5465,7 @@ ObjectPtr Parser::Parse_Prism()
 
 						if (i < Object->Number)
 						{
-							P = Vector2d(Points[i]);
+							P = Points[i];
 						}
 
 						break;
@@ -5512,7 +5508,7 @@ ObjectPtr Parser::Parse_Prism()
 	{
 		if (Object->Spline_Type == LINEAR_SPLINE)
 		{
-			Assign_UV_Vect(Points[Object->Number], *P);
+			Points[Object->Number] = P;
 
 			Object->Number++;
 
@@ -5585,7 +5581,7 @@ ObjectPtr Parser::Parse_Quadric ()
 	Min = Vector3d(-BOUND_HUGE);
 	Max = Vector3d(BOUND_HUGE);
 
-	Object->Compute_BBox(*Min, *Max);
+	Object->Compute_BBox(Min, Max);
 
 	Parse_Object_Mods (reinterpret_cast<ObjectPtr>(Object));
 
@@ -5630,32 +5626,32 @@ ObjectPtr Parser::Parse_Smooth_Triangle ()
 	Parse_Vector (Object->P1);    Parse_Comma();
 	Parse_Vector (Object->N1);    Parse_Comma();
 
-	VLength(vlen,Object->N1);
+	vlen = Object->N1.length();
 
 	if (vlen == 0.0)
 		degen=true;
 	else
-		VNormalize (Object->N1, Object->N1);
+		Object->N1 /= vlen;
 
 	Parse_Vector (Object->P2);    Parse_Comma();
 	Parse_Vector (Object->N2);    Parse_Comma();
 
-	VLength(vlen,Object->N2);
+	vlen = Object->N2.length();
 
 	if(vlen == 0.0)
 		degen=true;
 	else
-		VNormalize (Object->N2, Object->N2);
+		Object->N2 /= vlen;
 
 	Parse_Vector (Object->P3);    Parse_Comma();
 	Parse_Vector (Object->N3);
 
-	VLength(vlen,Object->N3);
+	vlen = Object->N3.length();
 
 	if(vlen == 0.0)
 		degen=true;
 	else
-		VNormalize (Object->N3, Object->N3);
+		Object->N3.normalize();
 
 	if(!degen)
 		degen = !Object->Compute_Triangle();
@@ -5704,7 +5700,7 @@ ObjectPtr Parser::Parse_Sor()
 {
 	int i;
 	Sor *Object;
-	UV_VECT *Points;
+	Vector2d *Points;
 
 	Parse_Begin();
 
@@ -5726,7 +5722,7 @@ ObjectPtr Parser::Parse_Sor()
 
 	/* Get temporary points describing the rotated curve. */
 
-	Points = reinterpret_cast<UV_VECT *>(POV_MALLOC(Object->Number*sizeof(UV_VECT), "temporary surface of revolution points"));
+	Points = reinterpret_cast<Vector2d *>(POV_MALLOC(Object->Number*sizeof(Vector2d), "temporary surface of revolution points"));
 
 	/* Read points (x : radius; y : height; z : not used). */
 
@@ -6174,7 +6170,7 @@ ObjectPtr Parser::Parse_TrueType ()
 
 	/* Process all this good info */
 	Object = new CSGUnion();
-	TrueType::ProcessNewTTF(reinterpret_cast<CSG *>(Object), filename, builtin_font, text_string, depth, *offset, this, sceneData);
+	TrueType::ProcessNewTTF(reinterpret_cast<CSG *>(Object), filename, builtin_font, text_string, depth, offset, this, sceneData);
 	if (filename)
 	{
 		/* Free up the filename  */
@@ -7488,7 +7484,7 @@ ObjectPtr Parser::Parse_Object_Mods (ObjectPtr Object)
 						Min = Vector3d(-BOUND_HUGE);
 						Max = Vector3d(BOUND_HUGE);
 
-						(dynamic_cast<Quadric *>(Object))->Compute_BBox(*Min, *Max);
+						(dynamic_cast<Quadric *>(Object))->Compute_BBox(Min, Max);
 					}
 					EXIT
 				END_CASE

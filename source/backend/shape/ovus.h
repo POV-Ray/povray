@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/ovus.h $
- * $Revision: #4 $
- * $Change: 6121 $
- * $DateTime: 2013/11/23 07:38:50 $
+ * $Revision: #5 $
+ * $Change: 6142 $
+ * $DateTime: 2013/11/26 21:24:29 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -85,8 +85,8 @@ class Ovus : public ObjectBase
 		DBL ConnectingRadius;
 
 	private:
-		void CalcUV(const VECTOR IPoint, UV_VECT Result) const;
-		void Intersect_Ovus_Spheres(const VECTOR&, const VECTOR&,
+		void CalcUV(const Vector3d& IPoint, Vector2d& Result) const;
+		void Intersect_Ovus_Spheres(const Vector3d&, const Vector3d&,
 		                            DBL * Depth1,DBL *Depth2, DBL * Depth3,
 		                            DBL * Depth4, DBL * Depth5, DBL * Depth6,
 		                            SceneThreadData *Thread) const;

@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/lathe.h $
- * $Revision: #22 $
- * $Change: 6121 $
- * $DateTime: 2013/11/23 07:38:50 $
+ * $Revision: #23 $
+ * $Change: 6143 $
+ * $DateTime: 2013/11/28 17:10:31 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -66,7 +66,7 @@ typedef struct Lathe_Spline_Entry_Struct LATHE_SPLINE_ENTRY;
 
 struct Lathe_Spline_Entry_Struct
 {
-	UV_VECT A, B, C, D;  /* Coefficients of segment */
+	Vector2d A, B, C, D;  /* Coefficients of segment */
 };
 
 struct Lathe_Spline_Struct
@@ -101,7 +101,7 @@ class Lathe : public ObjectBase
 		virtual void Invert();
 		virtual void Compute_BBox();
 
-		void Compute_Lathe(UV_VECT *P, TraceThreadData *);
+		void Compute_Lathe(Vector2d *P, TraceThreadData *);
 	protected:
 		bool Intersect(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread);
 		bool test_hit(const Ray&, IStack&, DBL, DBL, int, TraceThreadData *Thread);

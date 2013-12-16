@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/planes.h $
- * $Revision: #21 $
- * $Change: 6121 $
- * $DateTime: 2013/11/23 07:38:50 $
+ * $Revision: #22 $
+ * $Change: 6142 $
+ * $DateTime: 2013/11/26 21:24:29 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -52,7 +52,7 @@ namespace pov
 class Plane : public ObjectBase
 {
 	public:
-		VECTOR Normal_Vector;
+		Vector3d Normal_Vector;
 		DBL Distance;
 
 		Plane();

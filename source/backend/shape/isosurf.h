@@ -28,9 +28,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/isosurf.h $
- * $Revision: #24 $
- * $Change: 6121 $
- * $DateTime: 2013/11/23 07:38:50 $
+ * $Revision: #25 $
+ * $Change: 6138 $
+ * $DateTime: 2013/11/25 18:52:19 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -70,8 +70,8 @@ struct ISO_ThreadData
 {
 	const IsoSurface *current;
 	FPUContext *ctx;
-	VECTOR Pglobal;
-	VECTOR Dglobal;
+	Vector3d Pglobal;
+	Vector3d Dglobal;
 	DBL Vlength;
 	DBL tl;
 	DBL fmax;
@@ -127,12 +127,12 @@ class IsoSurface : public ObjectBase
 		virtual void DispatchShutdownMessages(MessageFactory& messageFactory);
 
 	protected:
-		bool Function_Find_Root(ISO_ThreadData& itd, const VECTOR, const VECTOR, DBL*, DBL*, DBL& max_gradient, bool in_shadow_test);
+		bool Function_Find_Root(ISO_ThreadData& itd, const Vector3d&, const Vector3d&, DBL*, DBL*, DBL& max_gradient, bool in_shadow_test);
 		bool Function_Find_Root_R(ISO_ThreadData& itd, const ISO_Pair*, const ISO_Pair*, DBL, DBL, DBL, DBL& max_gradient);
 
-		inline DBL Vector_Function(FPUContext *ctx, const VECTOR VPos) const;
+		inline DBL Vector_Function(FPUContext *ctx, const Vector3d& VPos) const;
 		inline DBL Float_Function(ISO_ThreadData& itd, DBL t) const;
-		static inline DBL Evaluate_Function(FPUContext *ctx, FUNCTION funct, const VECTOR fnvec);
+		static inline DBL Evaluate_Function(FPUContext *ctx, FUNCTION funct, const Vector3d& fnvec);
 	private:
 		ISO_Max_Gradient *mginfo; // global, but just a statistic (read: not thread safe but we don't care) [trf]
 };

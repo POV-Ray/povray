@@ -27,9 +27,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/torus.cpp $
- * $Revision: #32 $
- * $Change: 6121 $
- * $DateTime: 2013/11/23 07:38:50 $
+ * $Revision: #33 $
+ * $Change: 6139 $
+ * $DateTime: 2013/11/25 21:34:55 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -182,7 +182,7 @@ int Torus::Intersect(const Ray& ray, DBL *Depth, SceneThreadData *Thread) const
 	DBL y1, y2, r1, r2;
 	DBL c[5];
 	DBL r[4];
-	VECTOR P, D;
+	Vector3d P, D;
 	DBL DistanceP;            // Distance from P to torus center (origo).
 	DBL BoundingSphereRadius; // Sphere fully (amply) enclosing torus.
 	DBL Closer;               // P is moved Closer*D closer to torus.
@@ -191,13 +191,13 @@ int Torus::Intersect(const Ray& ray, DBL *Depth, SceneThreadData *Thread) const
 
 	/* Transform the ray into the torus space. */
 
-	MInvTransPoint(P, *ray.Origin, Trans);
+	MInvTransPoint(P, ray.Origin, Trans);
 
-	MInvTransDirection(D, *ray.Direction, Trans);
+	MInvTransDirection(D, ray.Direction, Trans);
 
-	VLength(len, D);
+	len = D.length();
 
-	VInverseScaleEq(D, len);
+	D /= len;
 
 	i = 0;
 
@@ -224,13 +224,13 @@ int Torus::Intersect(const Ray& ray, DBL *Depth, SceneThreadData *Thread) const
 		// Bounding sphere radius is R + r, we add r once more to ensure
 		// that P is safely outside sphere.
 		BoundingSphereRadius = MajorRadius + MinorRadius + MinorRadius;
-		DistanceP = VSumSqr(P); // Distance is currently squared.
+		DistanceP = P.lengthSqr(); // Distance is currently squared.
 		Closer = 0.0;
 		if (DistanceP > Sqr(BoundingSphereRadius))
 		{
 			DistanceP = sqrt(DistanceP); // Now real distance.
 			Closer = DistanceP - BoundingSphereRadius;
-			VAddScaledEq(P, Closer, D);
+			P += Closer * D;
 		}
 
 		R2   = Sqr(MajorRadius);
@@ -301,11 +301,11 @@ int Torus::Intersect(const Ray& ray, DBL *Depth, SceneThreadData *Thread) const
 bool Torus::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 {
 	DBL r, r2;
-	VECTOR P;
+	Vector3d P;
 
 	/* Transform the point into the torus space. */
 
-	MInvTransPoint(P, *IPoint, Trans);
+	MInvTransPoint(P, IPoint, Trans);
 
 	r  = sqrt(Sqr(P[X]) + Sqr(P[Z]));
 
@@ -358,11 +358,11 @@ bool Torus::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 void Torus::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread) const
 {
 	DBL dist;
-	VECTOR P, N, M;
+	Vector3d P, N, M;
 
 	/* Transform the point into the torus space. */
 
-	MInvTransPoint(P, *Inter->IPoint, Trans);
+	MInvTransPoint(P, Inter->IPoint, Trans);
 
 	/* Get normal from derivatives. */
 
@@ -376,14 +376,14 @@ void Torus::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Threa
 	}
 	else
 	{
-		Make_Vector(M, 0.0, 0.0, 0.0);
+		M = Vector3d(0.0, 0.0, 0.0);
 	}
 
-	VSub(N, P, M);
+	N = P - M;
 
 	/* Transform the normalt out of the torus space. */
 
-	MTransNormal(*Result, N, Trans);
+	MTransNormal(Result, N, Trans);
 
 	Result.normalize();
 }
@@ -784,7 +784,7 @@ void Torus::Compute_BBox()
 *
 ******************************************************************************/
 
-bool Torus::Test_Thick_Cylinder(const VECTOR P, const VECTOR D, DBL h1, DBL h2, DBL r1, DBL r2) const
+bool Torus::Test_Thick_Cylinder(const Vector3d& P, const Vector3d& D, DBL h1, DBL h2, DBL r1, DBL r2) const
 {
 	DBL a, b, c, d;
 	DBL u, v, k, r, h;
@@ -940,7 +940,7 @@ bool Torus::Test_Thick_Cylinder(const VECTOR P, const VECTOR D, DBL h1, DBL h2, 
 
 void Torus::UVCoord(Vector2d& Result, const Intersection *Inter, TraceThreadData *Thread) const
 {
-	CalcUV(*Inter->IPoint, *Result);
+	CalcUV(Inter->IPoint, Result);
 }
 
 
@@ -970,10 +970,10 @@ void Torus::UVCoord(Vector2d& Result, const Intersection *Inter, TraceThreadData
 *
 ******************************************************************************/
 
-void Torus::CalcUV(const VECTOR IPoint, UV_VECT Result) const
+void Torus::CalcUV(const Vector3d& IPoint, Vector2d& Result) const
 {
 	DBL len, v, u, x, y, z;
-	VECTOR P;
+	Vector3d P;
 
 	// Transform the ray into the torus space.
 	MInvTransPoint(P, IPoint, Trans);

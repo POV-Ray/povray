@@ -102,7 +102,7 @@ bool BSPTree::operator()(const Ray& ray, Intersect& isect, Mailbox& mailbox, dou
 	int ignore1, ignore2;
 	unsigned int tstackpos = 0;
 
-	if(Box::Intersect(ray, NULL, *bmin, *bmax, &rentry, &rexit, &ignore1, &ignore2) == false)
+	if(Box::Intersect(ray, NULL, bmin, bmax, &rentry, &rexit, &ignore1, &ignore2) == false)
 		return false; // no objects hit
 
 	unsigned int inode = 0;
