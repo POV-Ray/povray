@@ -28,9 +28,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/poly.cpp $
- * $Revision: #38 $
- * $Change: 6144 $
- * $DateTime: 2013/11/28 20:20:53 $
+ * $Revision: #39 $
+ * $Change: 6147 $
+ * $DateTime: 2013/11/29 20:46:11 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -209,8 +209,8 @@ bool Poly::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDat
 
 	/* Transform the ray into the polynomial's space */
 
-	MInvTransPoint(*New_Ray.Origin, *ray.Origin, Trans);
-	MInvTransDirection(*New_Ray.Direction, *ray.Direction, Trans);
+	MInvTransPoint(New_Ray.Origin, ray.Origin, Trans);
+	MInvTransDirection(New_Ray.Direction, ray.Direction, Trans);
 
 	len = New_Ray.Direction.length();
 	New_Ray.Direction /= len;
@@ -265,7 +265,7 @@ bool Poly::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDat
 
 				/* Transform the point into world space */
 
-				MTransPoint(*IPoint, *IPoint, Trans);
+				MTransPoint(IPoint, IPoint, Trans);
 
 				if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
 				{

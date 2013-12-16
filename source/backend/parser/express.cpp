@@ -26,9 +26,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/parser/express.cpp $
- * $Revision: #54 $
- * $Change: 6122 $
- * $DateTime: 2013/11/23 10:33:00 $
+ * $Revision: #56 $
+ * $Change: 6150 $
+ * $DateTime: 2013/11/30 14:13:48 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -1099,8 +1099,8 @@ void Parser::Parse_Num_Factor (EXPRESS Express,int *Terms)
 					Parse_Comma();
 					Val=Parse_Float()*M_PI_180;
 					GET (RIGHT_PAREN_TOKEN);
-					Compute_Axis_Rotation_Transform(&Trans,*Vect3,Val);
-					MTransPoint(*Vect, *Vect2, &Trans);
+					Compute_Axis_Rotation_Transform(&Trans,Vect3,Val);
+					MTransPoint(Vect, Vect2, &Trans);
 					break;
 
 				case VCROSS_TOKEN:
@@ -1126,8 +1126,8 @@ void Parser::Parse_Num_Factor (EXPRESS Express,int *Terms)
 
 				case VROTATE_TOKEN:
 					Parse_Vector_Param2(Vect2,Vect3);
-					Compute_Rotation_Transform (&Trans, *Vect3);
-					MTransPoint(*Vect, *Vect2, &Trans);
+					Compute_Rotation_Transform (&Trans, Vect3);
+					MTransPoint(Vect, Vect2, &Trans);
 					break;
 
 				case VTURBULENCE_TOKEN:
@@ -1145,7 +1145,7 @@ void Parser::Parse_Num_Factor (EXPRESS Express,int *Terms)
 					Parse_Vector(Vect2); // input vector
 					Parse_Comma();
 					GET (RIGHT_PAREN_TOKEN);
-					DTurbulence(*Vect, *Vect2, &Turb);
+					DTurbulence(Vect, Vect2, &Turb);
 					break;
 
 				case X_TOKEN:

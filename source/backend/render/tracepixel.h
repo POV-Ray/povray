@@ -23,9 +23,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/render/tracepixel.h $
- * $Revision: #27 $
- * $Change: 6121 $
- * $DateTime: 2013/11/23 07:38:50 $
+ * $Revision: #28 $
+ * $Change: 6146 $
+ * $DateTime: 2013/11/29 17:08:55 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -227,7 +227,7 @@ class TracePixel : public Trace
 			// Maximum amount of jitter to use. 
 			DBL Max_Jitter;
 			// Vectors in the viewing plane. 
-			VECTOR XPerp, YPerp;
+			Vector3d XPerp, YPerp;
 
 		};
 

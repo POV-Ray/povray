@@ -27,9 +27,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/discs.cpp $
- * $Revision: #30 $
- * $Change: 6139 $
- * $DateTime: 2013/11/25 21:34:55 $
+ * $Revision: #31 $
+ * $Change: 6147 $
+ * $DateTime: 2013/11/29 20:46:11 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -572,7 +572,7 @@ Disc::~Disc()
 
 void Disc::Compute_Disc()
 {
-	Compute_Coordinate_Transform(Trans, *center, *normal, 1.0, 1.0);
+	Compute_Coordinate_Transform(Trans, center, normal, 1.0, 1.0);
 
 	Compute_BBox();
 }

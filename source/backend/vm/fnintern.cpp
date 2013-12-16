@@ -30,9 +30,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/vm/fnintern.cpp $
- * $Revision: #24 $
- * $Change: 6096 $
- * $DateTime: 2013/11/18 14:11:26 $
+ * $Revision: #26 $
+ * $Change: 6150 $
+ * $DateTime: 2013/11/30 14:13:48 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -642,14 +642,14 @@ DBL f_hex_y(FPUContext *ctx, DBL *ptr, unsigned int) // 28
 DBL f_hetero_mf(FPUContext *ctx, DBL *ptr, unsigned int fn) // 29
 {
 	DBL signal;
-	VECTOR V1;
+	Vector3d V1;
 	DBL rem;
 
-	Make_Vector(V1, PARAM_X, PARAM_Y, PARAM_Z);
+	V1 = Vector3d(PARAM_X, PARAM_Y, PARAM_Z);
 
 	int ngen = (int)PARAM(5) & 3;
 	signal = (Noise(V1, ngen)*2.0 - 1.0) + PARAM(3);
-	VScaleEq(V1, PARAM(1));
+	V1 *= PARAM(1);
 
 	DBL p1_2_mp0 = pow(PARAM(1), -PARAM(0)), ea = p1_2_mp0;
 	for (int i = 1; i < PARAM(2); i++)
@@ -665,7 +665,7 @@ DBL f_hetero_mf(FPUContext *ctx, DBL *ptr, unsigned int fn) // 29
 
 		signal += inc;
 		// go to next 'octave'
-		VScaleEq(V1, PARAM(1));
+		V1 *= PARAM(1);
 		ea *= p1_2_mp0;
 	}
 
@@ -935,11 +935,11 @@ DBL f_r(FPUContext *ctx, DBL *ptr, unsigned int) // 57
 
 DBL f_ridge(FPUContext *ctx, DBL *ptr, unsigned int) // 58
 {
-	VECTOR EPoint = { PARAM_X, PARAM_Y, PARAM_Z };
+	Vector3d EPoint = Vector3d(PARAM_X, PARAM_Y, PARAM_Z);
 	int i;
 	DBL Lambda, Omega, l, o;
 	DBL value, v, resid, tot = 1.0, off, ridge, scale, rscale;
-	VECTOR temp;
+	Vector3d temp;
 	int Octaves;
 	int ngen = (int)PARAM(5) & 0x03;
 
@@ -958,7 +958,7 @@ DBL f_ridge(FPUContext *ctx, DBL *ptr, unsigned int) // 58
 
 	for (i = 2; i <= Octaves; i++)
 	{
-		VScale(temp,EPoint,l);
+		temp = EPoint * l;
 		v = fabs(Noise(temp,ngen) - ridge) * rscale;
 		value += o * (v - off);
 		tot += o;
@@ -967,7 +967,7 @@ DBL f_ridge(FPUContext *ctx, DBL *ptr, unsigned int) // 58
 	}
 	if (0.0 != resid)
 	{
-		VScale(temp,EPoint,l);
+		temp = EPoint * l;
 		v = fabs(Noise(temp,ngen) - ridge) * rscale;
 		value += o * (v - off) * resid;
 		tot += o * resid;
@@ -981,12 +981,10 @@ DBL f_ridged_mf(FPUContext *ctx, DBL *ptr, unsigned int fn) // 59
 	FunctionCode *f = ctx->functionvm->GetFunction(fn);
 	DBL *ea,freq,signal,weight,result;
 	int i;
-	VECTOR V1;
+	Vector3d V1;
 	int ngen = (int)PARAM(5) & 0x03;
 
-	V1[X]=PARAM_X;
-	V1[Y]=PARAM_Y;
-	V1[Z]=PARAM_Z;
+	V1 = Vector3d(PARAM_X, PARAM_Y, PARAM_Z);
 	if (f->private_data == NULL)
 	{
 		ea = reinterpret_cast<DBL *>(POV_MALLOC((PARAM(2) + 1)*sizeof(DBL), "exponent array"));
@@ -1012,9 +1010,7 @@ DBL f_ridged_mf(FPUContext *ctx, DBL *ptr, unsigned int fn) // 59
 
 	for (i=1; i<PARAM(2); i++)
 	{
-		V1[X] *= PARAM(1);
-		V1[Y] *= PARAM(1);
-		V1[Z] *= PARAM(1);
+		V1 *= PARAM(1);
 		weight = signal * PARAM(4);
 		if (weight > 1.0)
 			weight = 1.0;
@@ -1183,14 +1179,14 @@ DBL f_witch_of_agnesi_2d(FPUContext *ctx, DBL *ptr, unsigned int) // 75
 
 DBL f_noise3d(FPUContext *ctx, DBL *ptr, unsigned int) // 76
 {
-	VECTOR Vec = { PARAM_X, PARAM_Y, PARAM_Z };
+	Vector3d Vec = Vector3d(PARAM_X, PARAM_Y, PARAM_Z);
 	return Noise(Vec, ctx->threaddata->GetSceneData()->noiseGenerator);
 }
 
 DBL f_pattern(FPUContext *ctx, DBL *ptr, unsigned int fn) // 77
 {
-	VECTOR TPoint;
-	VECTOR Vec = { PARAM_X, PARAM_Y, PARAM_Z };
+	Vector3d TPoint;
+	Vector3d Vec = Vector3d(PARAM_X, PARAM_Y, PARAM_Z);
 	FunctionCode *f = ctx->functionvm->GetFunction(fn);
 
 	if(f->private_data == NULL)
@@ -1203,7 +1199,7 @@ DBL f_pattern(FPUContext *ctx, DBL *ptr, unsigned int fn) // 77
 
 DBL f_noise_generator(FPUContext *ctx, DBL *ptr, unsigned int) // 78
 {
-	VECTOR Vec = { PARAM_X, PARAM_Y, PARAM_Z };
+	Vector3d Vec = Vector3d(PARAM_X, PARAM_Y, PARAM_Z);
 	int ngen = (int)PARAM(0) & 0x03;
 
 	return Noise(Vec, ngen);
@@ -1211,7 +1207,7 @@ DBL f_noise_generator(FPUContext *ctx, DBL *ptr, unsigned int) // 78
 
 void f_pigment(FPUContext *ctx, DBL *ptr, unsigned int fn, unsigned int sp) // 0
 {
-	VECTOR Vec = { PARAM_N_X(5), PARAM_N_Y(5), PARAM_N_Z(5) };
+	Vector3d Vec = Vector3d(PARAM_N_X(5), PARAM_N_Y(5), PARAM_N_Z(5));
 	Colour Col;
 	FunctionCode *f = ctx->functionvm->GetFunction(fn);
 
@@ -1236,8 +1232,8 @@ void f_pigment(FPUContext *ctx, DBL *ptr, unsigned int fn, unsigned int sp) // 0
 
 void f_transform(FPUContext *ctx, DBL *ptr, unsigned int fn, unsigned int sp) // 1
 {
-	VECTOR Vec = { PARAM_N_X(3), PARAM_N_Y(3), PARAM_N_Z(3) };
-	VECTOR Result;
+	Vector3d Vec = Vector3d(PARAM_N_X(3), PARAM_N_Y(3), PARAM_N_Z(3));
+	Vector3d Result;
 	FunctionCode *f = ctx->functionvm->GetFunction(fn);
 
 	if(f->private_data == NULL)

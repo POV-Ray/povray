@@ -115,8 +115,8 @@ bool IsoSurface::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
 	{
 		if(Trans != NULL)
 		{
-			MInvTransPoint(*New_Ray.Origin, *ray.Origin, Trans);
-			MInvTransDirection(*New_Ray.Direction, *ray.Direction, Trans);
+			MInvTransPoint(New_Ray.Origin, ray.Origin, Trans);
+			MInvTransDirection(New_Ray.Direction, ray.Direction, Trans);
 			len = New_Ray.Direction.length();
 			New_Ray.Direction /= len;
 			i_flg = Sphere::Intersect(New_Ray, Vector3d(container.sphere.center),
@@ -424,7 +424,7 @@ void IsoSurface::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *
 
 	if(Trans != NULL)
 	{
-		MTransNormal(*Result, *Result, Trans);
+		MTransNormal(Result, Result, Trans);
 
 		Result.normalize();
 	}

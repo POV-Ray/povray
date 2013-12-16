@@ -28,9 +28,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/sphsweep.cpp $
- * $Revision: #40 $
- * $Change: 6144 $
- * $DateTime: 2013/11/28 20:20:53 $
+ * $Revision: #41 $
+ * $Change: 6147 $
+ * $DateTime: 2013/11/29 20:46:11 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -181,8 +181,8 @@ bool SphereSweep::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceTh
 	}
 	else
 	{
-		MInvTransPoint(*New_Ray.Origin, *ray.Origin, Trans);
-		MInvTransDirection(*New_Ray.Direction, *ray.Direction, Trans);
+		MInvTransPoint(New_Ray.Origin, ray.Origin, Trans);
+		MInvTransDirection(New_Ray.Direction, ray.Direction, Trans);
 
 		len = New_Ray.Direction.length();
 		New_Ray.Direction /= len;
@@ -251,8 +251,8 @@ bool SphereSweep::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceTh
 			{
 				// Yes, invert the transformation
 				Isect[i].t /= len;
-				MTransPoint(*Isect[i].Point, *Isect[i].Point, Trans);
-				MTransNormal(*Isect[i].Normal, *Isect[i].Normal, Trans);
+				MTransPoint(Isect[i].Point, Isect[i].Point, Trans);
+				MTransNormal(Isect[i].Normal, Isect[i].Normal, Trans);
 				Isect[i].Normal.normalize();
 			}
 

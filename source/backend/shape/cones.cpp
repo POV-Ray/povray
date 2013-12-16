@@ -27,9 +27,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/cones.cpp $
- * $Revision: #39 $
- * $Change: 6139 $
- * $DateTime: 2013/11/25 21:34:55 $
+ * $Revision: #40 $
+ * $Change: 6147 $
+ * $DateTime: 2013/11/29 20:46:11 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -400,7 +400,7 @@ void Cone::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread
 {
 	/* Transform the point into the cones space */
 
-	MInvTransPoint(*Result, *Inter->IPoint, Trans);
+	MInvTransPoint(Result, Inter->IPoint, Trans);
 
 	/* Calculating the normal is real simple in canonical cone space */
 
@@ -434,7 +434,7 @@ void Cone::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread
 
 	/* Transform the point out of the cones space */
 
-	MTransNormal(*Result, *Result, Trans);
+	MTransNormal(Result, Result, Trans);
 
 	Result.normalize();
 }
@@ -822,7 +822,7 @@ void Cone::Compute_Cone_Data()
 
 	dist = tmpf / tlen;
 	/* Determine alignment */
-	Compute_Coordinate_Transform(Trans, *origin, *axis, apex_radius, tlen);
+	Compute_Coordinate_Transform(Trans, origin, axis, apex_radius, tlen);
 
 	/* Recalculate the bounds */
 
@@ -874,7 +874,7 @@ void Cone::Compute_Cylinder_Data()
 	{
 		axis /= tmpf;
 
-		Compute_Coordinate_Transform(Trans, *base, *axis, apex_radius, tmpf);
+		Compute_Coordinate_Transform(Trans, base, axis, apex_radius, tmpf);
 	}
 
 	dist = 0.0;

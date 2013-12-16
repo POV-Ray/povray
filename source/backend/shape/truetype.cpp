@@ -515,7 +515,7 @@ void TrueType::ProcessNewTTF(CSG *Object, const char *filename, const int font_i
 			/* Shift the glyph to start at the origin */
 			total_offset[X] = -ttf->glyph->header.xMin * funit_size;
 
-			Compute_Translation_Transform(&Trans, *total_offset);
+			Compute_Translation_Transform(&Trans, total_offset);
 
 			ttf->Translate(total_offset, &Trans);
 
@@ -632,7 +632,7 @@ void TrueType::ProcessNewTTF(CSG *Object, const char *filename, const int font_i
 			local_offset[Y] = total_offset[Y] + (DBL)kern_value_y * funit_size;
 
 			/* Translate this glyph to its final position in the string */
-			Compute_Translation_Transform(&Trans, *local_offset);
+			Compute_Translation_Transform(&Trans, local_offset);
 
 			ttf->Translate(local_offset, &Trans);
 
@@ -2975,7 +2975,7 @@ bool TrueType::GlyphIntersect(const Vector3d& P, const Vector3d& D, const GlyphS
 					{
 						IPoint = ray.Evaluate(Depth);
 
-						if (Clip.empty() || Point_In_Clip(Vector3d(IPoint), Clip, Thread))
+						if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
 						{
 							N = Vector3d(2.0 * yt2 * S[l] + yt1, -2.0 * xt2 * S[l] - xt1, 0.0);
 							MTransNormal(N, N, Trans);

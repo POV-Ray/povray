@@ -30,9 +30,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/blob.cpp $
- * $Revision: #51 $
- * $Change: 6134 $
- * $DateTime: 2013/11/25 16:03:36 $
+ * $Revision: #52 $
+ * $Change: 6147 $
+ * $DateTime: 2013/11/29 20:46:11 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -247,8 +247,8 @@ bool Blob::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDat
 
 	if (Trans != NULL)
 	{
-		MInvTransPoint(*P, *ray.Origin, Trans);
-		MInvTransDirection(*D, *ray.Direction, Trans);
+		MInvTransPoint(P, ray.Origin, Trans);
+		MInvTransDirection(D, ray.Direction, Trans);
 
 		len = D.length();
 		D /= len;
@@ -355,8 +355,8 @@ bool Blob::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDat
 
 				case BLOB_ELLIPSOID:
 
-					MInvTransPoint(*PP, *P, Element->Trans);
-					MInvTransDirection(*DD, *D, Element->Trans);
+					MInvTransPoint(PP, P, Element->Trans);
+					MInvTransDirection(DD, D, Element->Trans);
 
 					V1 = PP - Element->O;
 
@@ -379,8 +379,8 @@ bool Blob::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDat
 				case BLOB_BASE_HEMISPHERE:
 				case BLOB_APEX_HEMISPHERE:
 
-					MInvTransPoint(*PP, *P, Element->Trans);
-					MInvTransDirection(*DD, *D, Element->Trans);
+					MInvTransPoint(PP, P, Element->Trans);
+					MInvTransDirection(DD, D, Element->Trans);
 
 					if (Element->Type == BLOB_APEX_HEMISPHERE)
 					{
@@ -407,8 +407,8 @@ bool Blob::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDat
 
 					/* Transform ray into cylinder space. */
 
-					MInvTransPoint(*PP, *P, Element->Trans);
-					MInvTransDirection(*DD, *D, Element->Trans);
+					MInvTransPoint(PP, P, Element->Trans);
+					MInvTransDirection(DD, D, Element->Trans);
 
 					t0 = PP[X] * PP[X] + PP[Y] * PP[Y];
 					t1 = PP[X] * DD[X] + PP[Y] * DD[Y];
@@ -707,8 +707,8 @@ int Blob::intersect_cylinder(const Blob_Element *Element, const Vector3d& P, con
 
 	/* Transform ray into cylinder space. */
 
-	MInvTransPoint(*PP, *P, Element->Trans);
-	MInvTransDirection(*DD, *D, Element->Trans);
+	MInvTransPoint(PP, P, Element->Trans);
+	MInvTransDirection(DD, D, Element->Trans);
 
 	len = DD.length();
 	DD /= len;
@@ -836,8 +836,8 @@ int Blob::intersect_ellipsoid(const Blob_Element *Element, const Vector3d& P, co
 	DBL b, d, t, len;
 	Vector3d V1, PP, DD;
 
-	MInvTransPoint(*PP, *P, Element->Trans);
-	MInvTransDirection(*DD, *D, Element->Trans);
+	MInvTransPoint(PP, P, Element->Trans);
+	MInvTransDirection(DD, D, Element->Trans);
 
 	len = DD.length();
 	DD /= len;
@@ -914,8 +914,8 @@ int Blob::intersect_hemisphere(const Blob_Element *Element, const Vector3d& P, c
 
 	/* Transform ray into hemisphere space. */
 
-	MInvTransPoint(*PP, *P, Element->Trans);
-	MInvTransDirection(*DD, *D, Element->Trans);
+	MInvTransPoint(PP, P, Element->Trans);
+	MInvTransDirection(DD, D, Element->Trans);
 
 	len = DD.length();
 	DD /= len;
@@ -1388,7 +1388,7 @@ DBL Blob::calculate_element_field(const Blob_Element *Element, const Vector3d& P
 
 		case BLOB_ELLIPSOID:
 
-			MInvTransPoint(*PP, *P, Element->Trans);
+			MInvTransPoint(PP, P, Element->Trans);
 
 			V1 = PP - Element->O;
 
@@ -1403,7 +1403,7 @@ DBL Blob::calculate_element_field(const Blob_Element *Element, const Vector3d& P
 
 		case BLOB_BASE_HEMISPHERE:
 
-			MInvTransPoint(*PP, *P, Element->Trans);
+			MInvTransPoint(PP, P, Element->Trans);
 
 			if (PP[Z] <= 0.0)
 			{
@@ -1419,7 +1419,7 @@ DBL Blob::calculate_element_field(const Blob_Element *Element, const Vector3d& P
 
 		case BLOB_APEX_HEMISPHERE:
 
-			MInvTransPoint(*PP, *P, Element->Trans);
+			MInvTransPoint(PP, P, Element->Trans);
 
 			PP[Z] -= Element->len;
 
@@ -1437,7 +1437,7 @@ DBL Blob::calculate_element_field(const Blob_Element *Element, const Vector3d& P
 
 		case BLOB_CYLINDER:
 
-			MInvTransPoint(*PP, *P, Element->Trans);
+			MInvTransPoint(PP, P, Element->Trans);
 
 			if ((PP[Z] >= 0.0) && (PP[Z] <= Element->len))
 			{
@@ -1590,7 +1590,7 @@ bool Blob::Inside(const Vector3d& Test_Point, TraceThreadData *Thread) const
 
 	if (Trans != NULL)
 	{
-		MInvTransPoint(*New_Point, *Test_Point, Trans);
+		MInvTransPoint(New_Point, Test_Point, Trans);
 	}
 	else
 	{
@@ -1668,7 +1668,7 @@ void Blob::element_normal(Vector3d& Result, const Vector3d& P, const Blob_Elemen
 
 		case BLOB_ELLIPSOID:
 
-			MInvTransPoint(*PP, *P, Element->Trans);
+			MInvTransPoint(PP, P, Element->Trans);
 
 			V1 = PP - Element->O;
 
@@ -1678,7 +1678,7 @@ void Blob::element_normal(Vector3d& Result, const Vector3d& P, const Blob_Elemen
 			{
 				val = -2.0 * Element->c[0] * dist - Element->c[1];
 
-				MTransNormal(*V1, *V1, Element->Trans);
+				MTransNormal(V1, V1, Element->Trans);
 
 				Result += val * V1;
 			}
@@ -1687,7 +1687,7 @@ void Blob::element_normal(Vector3d& Result, const Vector3d& P, const Blob_Elemen
 
 		case BLOB_BASE_HEMISPHERE:
 
-			MInvTransPoint(*PP, *P, Element->Trans);
+			MInvTransPoint(PP, P, Element->Trans);
 
 			if (PP[Z] <= 0.0)
 			{
@@ -1697,7 +1697,7 @@ void Blob::element_normal(Vector3d& Result, const Vector3d& P, const Blob_Elemen
 				{
 					val = -2.0 * Element->c[0] * dist - Element->c[1];
 
-					MTransNormal(*PP, *PP, Element->Trans);
+					MTransNormal(PP, PP, Element->Trans);
 
 					Result += val * PP;
 				}
@@ -1707,7 +1707,7 @@ void Blob::element_normal(Vector3d& Result, const Vector3d& P, const Blob_Elemen
 
 		case BLOB_APEX_HEMISPHERE:
 
-			MInvTransPoint(*PP, *P, Element->Trans);
+			MInvTransPoint(PP, P, Element->Trans);
 
 			PP[Z] -= Element->len;
 
@@ -1719,7 +1719,7 @@ void Blob::element_normal(Vector3d& Result, const Vector3d& P, const Blob_Elemen
 				{
 					val = -2.0 * Element->c[0] * dist - Element->c[1];
 
-					MTransNormal(*PP, *PP, Element->Trans);
+					MTransNormal(PP, PP, Element->Trans);
 
 					Result += val * PP;
 				}
@@ -1729,7 +1729,7 @@ void Blob::element_normal(Vector3d& Result, const Vector3d& P, const Blob_Elemen
 
 		case BLOB_CYLINDER:
 
-			MInvTransPoint(*PP, *P, Element->Trans);
+			MInvTransPoint(PP, P, Element->Trans);
 
 			if ((PP[Z] >= 0.0) && (PP[Z] <= Element->len))
 			{
@@ -1739,7 +1739,7 @@ void Blob::element_normal(Vector3d& Result, const Vector3d& P, const Blob_Elemen
 
 					PP[Z] = 0.0;
 
-					MTransNormal(*PP, *PP, Element->Trans);
+					MTransNormal(PP, PP, Element->Trans);
 
 					Result += val * PP;
 				}
@@ -1864,7 +1864,7 @@ void Blob::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread
 
 	if (Trans != NULL)
 	{
-		MTransNormal(*Result, *Result, Trans);
+		MTransNormal(Result, Result, Trans);
 
 		Result.normalize();
 	}
@@ -2383,7 +2383,7 @@ void Blob::get_element_bounding_sphere(const Blob_Element *Element, Vector3d& Ce
 	{
 		r = sqrt(r2);
 
-		MTransPoint(*C, *C, Element->Trans);
+		MTransPoint(C, C, Element->Trans);
 
 		Make_BBox(local_BBox, 0, 0, 0, r, r, r);
 		Recompute_BBox(&local_BBox, Element->Trans);
@@ -2941,7 +2941,7 @@ void Blob::Translate_Blob_Element(Blob_Element *Element, const Vector3d& Vector)
 {
 	TRANSFORM Trans;
 
-	Compute_Translation_Transform(&Trans, *Vector);
+	Compute_Translation_Transform(&Trans, Vector);
 
 	if (Element->Trans == NULL)
 	{
@@ -2995,13 +2995,13 @@ void Blob::Rotate_Blob_Element(Blob_Element *Element, const Vector3d& Vector)
 {
 	TRANSFORM Trans;
 
-	Compute_Rotation_Transform(&Trans, *Vector);
+	Compute_Rotation_Transform(&Trans, Vector);
 
 	if (Element->Trans == NULL)
 	{
 		/* This is a sphere component. */
 
-		MTransPoint(*Element->O, *Element->O, &Trans);
+		MTransPoint(Element->O, Element->O, &Trans);
 		Transform_Textures(Element->Texture, &Trans);
 	}
 	else
@@ -3061,7 +3061,7 @@ void Blob::Scale_Blob_Element(Blob_Element *Element, const Vector3d& Vector)
 		}
 	}
 
-	Compute_Scaling_Transform(&Trans, *Vector);
+	Compute_Scaling_Transform(&Trans, Vector);
 
 	if (Element->Trans == NULL)
 	{
@@ -3288,7 +3288,7 @@ void Blob::getLocalIPoint(Vector3d& lip, Intersection *isect) const
 	if(isect->haveLocalIPoint == false)
 	{
 		if(Trans != NULL)
-			MInvTransPoint(*isect->LocalIPoint, *isect->IPoint, Trans);
+			MInvTransPoint(isect->LocalIPoint, isect->IPoint, Trans);
 		else
 			isect->LocalIPoint = isect->IPoint;
 

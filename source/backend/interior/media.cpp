@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/interior/media.cpp $
- * $Revision: #47 $
- * $Change: 6118 $
- * $DateTime: 2013/11/22 16:39:19 $
+ * $Revision: #49 $
+ * $Change: 6147 $
+ * $DateTime: 2013/11/29 20:46:11 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -750,15 +750,15 @@ bool MediaFunction::ComputeSpotLightInterval(const Ray &ray, const LightSource *
 {
 	int viewpoint_is_in_cone;
 	DBL a, b, c, d, m, l, l1, l2, t, t1, t2, k1, k2, k3, k4;
-	VECTOR V1;
+	Vector3d V1;
 
 	// Get cone's slope. Note that cos(falloff) is stored in Falloff!
 	m = 1 / (Light->Falloff * Light->Falloff);
 
-	VSub(V1, *ray.Origin, Light->Center);
-	VDot(k1, *ray.Direction, Light->Direction);
-	VDot(k2, V1, Light->Direction);
-	VLength(l, V1);
+	V1 = ray.Origin - Light->Center;
+	k1 = dot(ray.Direction, Light->Direction);
+	k2 = dot(V1, Light->Direction);
+	l = V1.length();
 
 	if(l > EPSILON)
 		viewpoint_is_in_cone = (k2 / l >= Light->Falloff);
@@ -768,8 +768,8 @@ bool MediaFunction::ComputeSpotLightInterval(const Ray &ray, const LightSource *
 	if((k1 <= 0.0) && (k2 < 0.0))
 		return false;
 
-	VDot(k3, V1, *ray.Direction);
-	VDot(k4, V1, V1);
+	k3 = dot(V1, ray.Direction);
+	k4 = V1.lengthSqr();
 
 	a = 1.0 - Sqr(k1) * m;
 	b = k3 - k1 * k2 * m;
@@ -861,11 +861,11 @@ bool MediaFunction::ComputeSpotLightInterval(const Ray &ray, const LightSource *
 bool MediaFunction::ComputeCylinderLightInterval(const Ray &ray, const LightSource *Light, DBL *d1, DBL *d2)
 {
 	DBL a, b, c, d, l1, l2, t, t1, t2, k1, k2, k3, k4;
-	VECTOR V1;
+	Vector3d V1;
 
-	VSub(V1, *ray.Origin, Light->Center);
-	VDot(k1, *ray.Direction, Light->Direction);
-	VDot(k2, V1, Light->Direction);
+	V1 = ray.Origin - Light->Center;
+	k1 = dot(ray.Direction, Light->Direction);
+	k2 = dot(V1, Light->Direction);
 
 	if((k1 <= 0.0) && (k2 < 0.0))
 		return false;
@@ -874,8 +874,8 @@ bool MediaFunction::ComputeCylinderLightInterval(const Ray &ray, const LightSour
 
 	if(a != 0.0)
 	{
-		VDot(k3, V1, *ray.Direction);
-		VDot(k4, V1, V1);
+		k3 = dot(V1, ray.Direction);
+		k4 = V1.lengthSqr();
 
 		b = k3 - k1 * k2;
 		c = k4 - Sqr(k2) - Sqr(Light->Falloff);
@@ -1004,7 +1004,7 @@ void MediaFunction::ComputeOneMediaSample(MediaVector& medias, LightSourceEntryV
 		// process media photons whether or not the interval is directly lit
 		if((photonGatherer != NULL) && (photonGatherer->map->numPhotons > 0))
 		{
-			ComputeMediaPhotons(medias, Emission, Scattering, ray, *H);
+			ComputeMediaPhotons(medias, Emission, Scattering, ray, H);
 		}
 	}
 
@@ -1120,7 +1120,7 @@ void MediaFunction::ComputeOneMediaSampleRecursive(MediaVector& medias, LightSou
 }
 
 
-void MediaFunction::ComputeMediaPhotons(MediaVector& medias, RGBColour& Te, const RGBColour& Sc, const Ray& ray, const VECTOR H)
+void MediaFunction::ComputeMediaPhotons(MediaVector& medias, RGBColour& Te, const RGBColour& Sc, const Ray& ray, const Vector3d& H)
 {
 	Ray Light_Ray;
 	DBL r;
@@ -1138,7 +1138,7 @@ void MediaFunction::ComputeMediaPhotons(MediaVector& medias, RGBColour& Te, cons
 		if(photonGatherer->gathered)
 			r = photonGatherer->alreadyGatheredRadius;
 		else
-			r = photonGatherer->gatherPhotonsAdaptive(H, NULL, false);
+			r = photonGatherer->gatherPhotonsAdaptive(&H, NULL, false);
 
 		Colour2.clear();
 

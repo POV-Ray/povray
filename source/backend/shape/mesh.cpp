@@ -27,9 +27,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/mesh.cpp $
- * $Revision: #48 $
- * $Change: 6140 $
- * $DateTime: 2013/11/26 11:07:00 $
+ * $Revision: #49 $
+ * $Change: 6147 $
+ * $DateTime: 2013/11/29 20:46:11 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -175,8 +175,8 @@ bool Mesh::Intersect(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Threa
 
 	if (Trans != NULL)
 	{
-		MInvTransPoint(*New_Ray.Origin, *ray.Origin, Trans);
-		MInvTransDirection(*New_Ray.Direction, *ray.Direction, Trans);
+		MInvTransPoint(New_Ray.Origin, ray.Origin, Trans);
+		MInvTransDirection(New_Ray.Direction, ray.Direction, Trans);
 
 		len = New_Ray.Direction.length();
 		New_Ray.Direction /= len;
@@ -264,8 +264,8 @@ bool Mesh::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 	/* Transform the ray into mesh space. */
 	if (Trans != NULL)
 	{
-		MInvTransPoint(*New_Ray.Origin, *ray.Origin, Trans);
-		MInvTransDirection(*New_Ray.Direction, *ray.Direction, Trans);
+		MInvTransPoint(New_Ray.Origin, ray.Origin, Trans);
+		MInvTransDirection(New_Ray.Direction, ray.Direction, Trans);
 
 		len = New_Ray.Direction.length();
 		New_Ray.Direction /= len;
@@ -358,7 +358,7 @@ void Mesh::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread
 
 		if (Trans != NULL)
 		{
-			MTransNormal(*Result, *Result, Trans);
+			MTransNormal(Result, Result, Trans);
 		}
 
 		Result.normalize();
@@ -369,7 +369,7 @@ void Mesh::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread
 
 		if (Trans != NULL)
 		{
-			MTransNormal(*Result, *Result, Trans);
+			MTransNormal(Result, Result, Trans);
 
 			Result.normalize();
 		}
@@ -1173,7 +1173,9 @@ const DBL BARY_VAL2 =  1.00001;
 void Mesh::MeshUV(const Vector3d& P, const MESH_TRIANGLE *Triangle, Vector2d& Result) const
 {
 	DBL a, b, r;
-	Vector3d Q, B[3], IB[3], P1, P2, P3;
+	Vector3d Q;
+	Matrix3x3 B, IB;
+	Vector3d P1, P2, P3;
 	Vector2d UV1, UV2, UV3;
 
 	get_triangle_vertices(Triangle, P1, P2, P3);

@@ -59,11 +59,11 @@ static RandomDoubleSequence WarpRands(0.0, 1.0, 32768);
 /*****************************************************************************
 * Static functions
 ******************************************************************************/
-static int warp_cylindrical(VECTOR TPoint, const CYLW *Warp);
-static int warp_spherical(VECTOR TPoint, const SPHEREW *Warp);
-static int warp_toroidal(VECTOR TPoint, const TOROIDAL *Warp);
-static int warp_planar(VECTOR TPoint, const PLANARW *Warp);
-static int warp_cubic(VECTOR TPoint); // JN2007: Cubic warp
+static int warp_cylindrical(Vector3d& TPoint, const CYLW *Warp);
+static int warp_spherical(Vector3d& TPoint, const SPHEREW *Warp);
+static int warp_toroidal(Vector3d& TPoint, const TOROIDAL *Warp);
+static int warp_planar(Vector3d& TPoint, const PLANARW *Warp);
+static int warp_cubic(Vector3d& TPoint); // JN2007: Cubic warp
 
 
 
@@ -96,9 +96,9 @@ static int warp_cubic(VECTOR TPoint); // JN2007: Cubic warp
 *
 ******************************************************************************/
 
-void Warp_EPoint (VECTOR TPoint, const VECTOR EPoint, const TPATTERN *TPat)
+void Warp_EPoint (Vector3d& TPoint, const Vector3d& EPoint, const TPATTERN *TPat)
 {
-	VECTOR PTurbulence,RP;
+	Vector3d PTurbulence, RP;
 	int Axis,i;
 	int blockX = 0, blockY = 0, blockZ = 0 ;
 	SNGL BlkNum;
@@ -109,9 +109,9 @@ void Warp_EPoint (VECTOR TPoint, const VECTOR EPoint, const TPATTERN *TPat)
 	TRANS *Tr;
 	REPEAT *Repeat;
 	BLACK_HOLE *Black_Hole;
-	VECTOR Delta, Center;
+	Vector3d Delta, Center;
 
-	Assign_Vector(TPoint, EPoint);
+	TPoint = EPoint;
 
 	while (Warp != NULL)
 	{
@@ -129,9 +129,7 @@ void Warp_EPoint (VECTOR TPoint, const VECTOR EPoint, const TPATTERN *TPat)
 			case EXTRA_TURB_WARP:
 				Turb=reinterpret_cast<TURB *>(Warp);
 				DTurbulence (PTurbulence, TPoint, Turb);
-				TPoint[X] += PTurbulence[X] * Turb->Turbulence[X];
-				TPoint[Y] += PTurbulence[Y] * Turb->Turbulence[Y];
-				TPoint[Z] += PTurbulence[Z] * Turb->Turbulence[Z];
+				TPoint += PTurbulence * Turb->Turbulence;
 				break;
 
 			case NO_WARP:
@@ -144,7 +142,7 @@ void Warp_EPoint (VECTOR TPoint, const VECTOR EPoint, const TPATTERN *TPat)
 
 			case REPEAT_WARP:
 				Repeat=reinterpret_cast<REPEAT *>(Warp);
-				Assign_Vector(RP,TPoint);
+				RP = TPoint;
 				Axis=Repeat->Axis;
 				BlkNum=(SNGL)floor(TPoint[Axis]/Repeat->Width);
 
@@ -152,20 +150,20 @@ void Warp_EPoint (VECTOR TPoint, const VECTOR EPoint, const TPATTERN *TPat)
 
 				if (((int)BlkNum) & 1)
 				{
-					VEvaluateEq(RP,Repeat->Flip);
+					RP *= Repeat->Flip;
 					if ( Repeat->Flip[Axis] < 0 )
 					{
 						RP[Axis] = Repeat->Width+RP[Axis];
 					}
 				}
 
-				VAddScaledEq(RP,BlkNum,Repeat->Offset);
-				Assign_Vector(TPoint,RP);
+				RP += (DBL)BlkNum * Repeat->Offset;
+				TPoint = RP;
 				break;
 
 			case BLACK_HOLE_WARP:
 				Black_Hole = reinterpret_cast<BLACK_HOLE *>(Warp) ;
-				Assign_Vector (Center, Black_Hole->Center) ;
+				Center = Black_Hole->Center;
 
 				if (Black_Hole->Repeat)
 				{
@@ -190,7 +188,7 @@ void Warp_EPoint (VECTOR TPoint, const VECTOR EPoint, const TPATTERN *TPat)
 						/* this will allow the same numbers to be returned by frand */
 
 						int seed = Hash3d (blockX, blockY, blockZ);
-						Center [X] += WarpRands(seed) * Black_Hole->Uncertainty_Vector [X] ;
+						Center [X] += WarpRands(seed)     * Black_Hole->Uncertainty_Vector [X] ;
 						Center [Y] += WarpRands(seed + 1) * Black_Hole->Uncertainty_Vector [Y] ;
 						Center [Z] += WarpRands(seed + 2) * Black_Hole->Uncertainty_Vector [Z] ;
 					}
@@ -200,8 +198,8 @@ void Warp_EPoint (VECTOR TPoint, const VECTOR EPoint, const TPATTERN *TPat)
 					Center [Z] += Black_Hole->Repeat_Vector [Z] * blockZ ;
 				}
 
-				VSub (Delta, TPoint, Center) ;
-				VLength (Length, Delta) ;
+				Delta = TPoint - Center;
+				Length = Delta.length();
 
 				/* Length is the distance from the centre of the black hole */
 				if (Length >= Black_Hole->Radius) break ;
@@ -235,10 +233,10 @@ void Warp_EPoint (VECTOR TPoint, const VECTOR EPoint, const TPATTERN *TPat)
 
 					/* if the Black Hole is inverted, it gives the impression of 'push-
 					   ing' the pattern away from its centre. otherwise it sucks. */
-					VScaleEq (Delta, Black_Hole->Inverted ? -Strength : Strength) ;
+					Delta *= (Black_Hole->Inverted ? -Strength : Strength);
 
 					/* add the scaled Delta to the input point to end up with TPoint. */
-					VAddEq (TPoint, Delta) ;
+					TPoint += Delta;
 				}
 				break;
 
@@ -280,15 +278,15 @@ void Warp_EPoint (VECTOR TPoint, const VECTOR EPoint, const TPATTERN *TPat)
 
 }
 
-void Warp_Normal (VECTOR TNorm, const VECTOR ENorm, const TPATTERN *TPat, bool DontScaleBumps)
+void Warp_Normal (Vector3d& TNorm, const Vector3d& ENorm, const TPATTERN *TPat, bool DontScaleBumps)
 {
 	const WARP *Warp=TPat->Warps;
 	const TRANS *Tr;
 
 	if(!DontScaleBumps)
-		VNormalize(TNorm,ENorm);
+		TNorm = ENorm.normalized();
 	else
-		Assign_Vector(TNorm,ENorm);
+		TNorm = ENorm;
 
 	while(Warp != NULL)
 	{
@@ -310,17 +308,17 @@ void Warp_Normal (VECTOR TNorm, const VECTOR ENorm, const TPATTERN *TPat, bool D
 	}
 
 	if(!DontScaleBumps)
-		VNormalizeEq(TNorm);
+		TNorm.normalize();
 }
 
-void UnWarp_Normal (VECTOR TNorm, const VECTOR ENorm, const TPATTERN *TPat, bool DontScaleBumps)
+void UnWarp_Normal (Vector3d& TNorm, const Vector3d& ENorm, const TPATTERN *TPat, bool DontScaleBumps)
 {
 	const WARP *Warp = NULL;
 
 	if(!DontScaleBumps)
-		VNormalize(TNorm,ENorm);
+		TNorm = ENorm.normalized();
 	else
-		Assign_Vector(TNorm,ENorm);
+		TNorm = ENorm;
 
 	if(TPat->Warps != NULL)
 	{
@@ -336,7 +334,7 @@ void UnWarp_Normal (VECTOR TNorm, const VECTOR ENorm, const TPATTERN *TPat, bool
 	}
 
 	if(!DontScaleBumps)
-		VNormalizeEq(TNorm);
+		TNorm.normalize();
 }
 
 /*****************************************************************************
@@ -360,7 +358,7 @@ void UnWarp_Normal (VECTOR TNorm, const VECTOR ENorm, const TPATTERN *TPat, bool
 *
 ******************************************************************************/
 
-static int warp_planar(VECTOR EPoint, const PLANARW *Warp)
+static int warp_planar(Vector3d& EPoint, const PLANARW *Warp)
 {
 	DBL x = EPoint[X];
 	DBL z = Warp->OffSet;
@@ -412,7 +410,7 @@ static int warp_planar(VECTOR EPoint, const PLANARW *Warp)
 *
 ******************************************************************************/
 
-static int warp_cylindrical(VECTOR EPoint, const CYLW *Warp)
+static int warp_cylindrical(Vector3d& EPoint, const CYLW *Warp)
 {
 	DBL len, theta;
 	DBL x = EPoint[X];
@@ -478,7 +476,7 @@ static int warp_cylindrical(VECTOR EPoint, const CYLW *Warp)
 /*****************************************************************************
 *
 * FUNCTION
-*        warp_toroidal(VECTOR EPoint, TOROIDAL *Warp)
+*        warp_toroidal(Vector3d& EPoint, TOROIDAL *Warp)
 *
 * INPUT
 *
@@ -497,7 +495,7 @@ static int warp_cylindrical(VECTOR EPoint, const CYLW *Warp)
 *
 ******************************************************************************/
 
-static int warp_toroidal(VECTOR EPoint, const TOROIDAL *Warp)
+static int warp_toroidal(Vector3d& EPoint, const TOROIDAL *Warp)
 {
 	DBL len, phi, theta;
 	DBL r0;
@@ -606,7 +604,7 @@ static int warp_toroidal(VECTOR EPoint, const TOROIDAL *Warp)
 * CHANGES
 *
 ******************************************************************************/
-static int warp_spherical(VECTOR EPoint, const SPHEREW *Warp)
+static int warp_spherical(Vector3d& EPoint, const SPHEREW *Warp)
 {
 	DBL len, phi, theta,dist;
 	DBL x = EPoint[X];
@@ -714,7 +712,7 @@ static int warp_spherical(VECTOR EPoint, const SPHEREW *Warp)
 * CHANGES
 *
 ******************************************************************************/
-static int warp_cubic(VECTOR EPoint)
+static int warp_cubic(Vector3d& EPoint)
 {
 	DBL x = EPoint[X], y = EPoint[Y], z = EPoint[Z];
 	const DBL ax = fabs(x), ay = fabs(y), az = fabs(z);
@@ -801,7 +799,7 @@ WARP *Create_Warp (int Warp_Type)
 
 			TNew = reinterpret_cast<TURB *>(POV_MALLOC(sizeof(TURB),"turbulence struct"));
 
-			Make_Vector(TNew->Turbulence,0.0,0.0,0.0);
+			TNew->Turbulence = Vector3d(0.0,0.0,0.0);
 
 			TNew->Octaves = 6;
 			TNew->Omega = 0.5;
@@ -818,8 +816,8 @@ WARP *Create_Warp (int Warp_Type)
 			RNew->Axis = -1;
 			RNew->Width = 0.0;
 
-			Make_Vector(RNew->Offset,0.0,0.0,0.0);
-			Make_Vector(RNew->Flip,1.0,1.0,1.0);
+			RNew->Offset = Vector3d(0.0,0.0,0.0);
+			RNew->Flip   = Vector3d(1.0,1.0,1.0);
 
 			New = reinterpret_cast<WARP *>(RNew);
 
@@ -827,9 +825,9 @@ WARP *Create_Warp (int Warp_Type)
 
 		case BLACK_HOLE_WARP:
 			BNew = reinterpret_cast<BLACK_HOLE *>(POV_MALLOC (sizeof (BLACK_HOLE), "black hole warp")) ;
-			Make_Vector (BNew->Center, 0.0, 0.0, 0.0) ;
-			Make_Vector (BNew->Repeat_Vector, 0.0, 0.0, 0.0) ;
-			Make_Vector (BNew->Uncertainty_Vector, 0.0, 0.0, 0.0) ;
+			BNew->Center = Vector3d(0.0, 0.0, 0.0) ;
+			BNew->Repeat_Vector = Vector3d(0.0, 0.0, 0.0) ;
+			BNew->Uncertainty_Vector = Vector3d(0.0, 0.0, 0.0) ;
 			BNew->Strength = 1.0 ;
 			BNew->Power = 2.0 ;
 			BNew->Radius = 1.0 ;
@@ -855,21 +853,21 @@ WARP *Create_Warp (int Warp_Type)
 
 		case SPHERICAL_WARP:
 			SNew = reinterpret_cast<SPHEREW *>(POV_MALLOC(sizeof(SPHEREW),"spherical warp"));
-			Make_Vector (SNew->Orientation_Vector, 0.0, 0.0, 1.0) ;
+			SNew->Orientation_Vector = Vector3d(0.0, 0.0, 1.0) ;
 			SNew->DistExp = 0.0;
 			New = reinterpret_cast<WARP *>(SNew);
 			break;
 
 		case PLANAR_WARP:
 			PNew = reinterpret_cast<PLANARW *>(POV_MALLOC(sizeof(PLANARW),"planar warp"));
-			Make_Vector (PNew->Orientation_Vector, 0.0, 0.0, 1.0) ;
+			PNew->Orientation_Vector = Vector3d(0.0, 0.0, 1.0) ;
 			PNew->OffSet = 0.0;
 			New = reinterpret_cast<WARP *>(PNew);
 			break;
 
 		case CYLINDRICAL_WARP:
 			CNew = reinterpret_cast<CYLW *>(POV_MALLOC(sizeof(CYLW),"cylindrical warp"));
-			Make_Vector (CNew->Orientation_Vector, 0.0, 0.0, 1.0) ;
+			CNew->Orientation_Vector = Vector3d(0.0, 0.0, 1.0) ;
 			CNew->DistExp = 0.0;
 			New = reinterpret_cast<WARP *>(CNew);
 			break;
@@ -878,7 +876,7 @@ WARP *Create_Warp (int Warp_Type)
 			TorNew = reinterpret_cast<TOROIDAL *>(POV_MALLOC(sizeof(TOROIDAL),"toroidal warp"));
 			TorNew->MajorRadius = 1.0 ;
 			TorNew->DistExp = 0.0;
-			Make_Vector (TorNew->Orientation_Vector, 0.0, 0.0, 1.0) ;
+			TorNew->Orientation_Vector = Vector3d(0.0, 0.0, 1.0) ;
 			New = reinterpret_cast<WARP *>(TorNew);
 			break;
 

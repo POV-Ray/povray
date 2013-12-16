@@ -126,8 +126,8 @@ bool Parametric::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
 	{
 		if(Trans != NULL)
 		{
-			MInvTransPoint(*New_Ray.Origin, *ray.Origin, Trans);
-			MInvTransDirection(*New_Ray.Direction, *ray.Direction, Trans);
+			MInvTransPoint(New_Ray.Origin, ray.Origin, Trans);
+			MInvTransDirection(New_Ray.Direction, ray.Direction, Trans);
 			len = New_Ray.Direction.length();
 			New_Ray.Direction /= len;
 			i_flg = Sphere::Intersect(New_Ray, Vector3d(container.sphere.center),
@@ -496,7 +496,7 @@ void Parametric::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *
 
 	Result = cross(RU, RV);
 	if (Trans != NULL)
-		MTransNormal(*Result, *Result, Trans);
+		MTransNormal(Result, Result, Trans);
 	Result.normalize();
 }
 

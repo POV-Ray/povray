@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/math/matrices.h $
- * $Revision: #15 $
- * $Change: 6138 $
- * $DateTime: 2013/11/25 18:52:19 $
+ * $Revision: #17 $
+ * $Change: 6150 $
+ * $DateTime: 2013/11/30 14:13:48 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -73,39 +73,29 @@ void MScale (MATRIX result, const MATRIX matrix1, DBL amount);
 void MTranspose (MATRIX result);
 void MTranspose (MATRIX result, const MATRIX matrix1);
 
-void MTransPoint (VECTOR result, const VECTOR vector, const TRANSFORM *trans);
-void MInvTransPoint (VECTOR result, const VECTOR vector, const TRANSFORM *trans);
-void MTransDirection (VECTOR result, const VECTOR vector, const TRANSFORM *trans);
-void MInvTransDirection (VECTOR result, const VECTOR vector, const TRANSFORM *trans);
-void MTransNormal (VECTOR result, const VECTOR vector, const TRANSFORM *trans);
-void MInvTransNormal (VECTOR result, const VECTOR vector, const TRANSFORM *trans);
-
-inline void MTransPoint (Vector3d& result, const Vector3d& vector, const TRANSFORM *trans) { MTransPoint(*result, *vector, trans); }
-inline void MInvTransPoint (Vector3d& result, const Vector3d& vector, const TRANSFORM *trans) { MInvTransPoint(*result, *vector, trans); }
-inline void MTransDirection (Vector3d& result, const Vector3d& vector, const TRANSFORM *trans) { MTransDirection(*result, *vector, trans); }
-inline void MInvTransDirection (Vector3d& result, const Vector3d& vector, const TRANSFORM *trans) { MInvTransDirection(*result, *vector, trans); }
-inline void MTransNormal (Vector3d& result, const Vector3d& vector, const TRANSFORM *trans) { MTransNormal(*result, *vector, trans); }
-inline void MInvTransNormal (Vector3d& result, const Vector3d& vector, const TRANSFORM *trans) { MInvTransNormal(*result, *vector, trans); }
+void MTransPoint (Vector3d& result, const Vector3d& vector, const TRANSFORM *trans);
+void MInvTransPoint (Vector3d& result, const Vector3d& vector, const TRANSFORM *trans);
+void MTransDirection (Vector3d& result, const Vector3d& vector, const TRANSFORM *trans);
+void MInvTransDirection (Vector3d& result, const Vector3d& vector, const TRANSFORM *trans);
+void MTransNormal (Vector3d& result, const Vector3d& vector, const TRANSFORM *trans);
+void MInvTransNormal (Vector3d& result, const Vector3d& vector, const TRANSFORM *trans);
 
 void Compute_Matrix_Transform (TRANSFORM *result, const MATRIX matrix);
-void Compute_Scaling_Transform (TRANSFORM *result, const VECTOR vector);
+void Compute_Scaling_Transform (TRANSFORM *result, const Vector3d& vector);
 void Compute_Inversion_Transform (TRANSFORM *result);
-void Compute_Translation_Transform (TRANSFORM *transform, const VECTOR vector);
-void Compute_Rotation_Transform (TRANSFORM *transform, const VECTOR vector);
-void Compute_Look_At_Transform (TRANSFORM *transform, const VECTOR Look_At, const VECTOR Up, const VECTOR Right);
+void Compute_Translation_Transform (TRANSFORM *transform, const Vector3d& vector);
+void Compute_Rotation_Transform (TRANSFORM *transform, const Vector3d& vector);
+void Compute_Look_At_Transform (TRANSFORM *transform, const Vector3d& Look_At, const Vector3d& Up, const Vector3d& Right);
 void Compose_Transforms (TRANSFORM *transform, const TRANSFORM *Additional_Transform);
-void Compute_Axis_Rotation_Transform (TRANSFORM *transform, const VECTOR AxisVect, DBL angle);
-void Compute_Coordinate_Transform (TRANSFORM *trans, const VECTOR origin, VECTOR up, DBL r, DBL len);
+void Compute_Axis_Rotation_Transform (TRANSFORM *transform, const Vector3d& AxisVect, DBL angle);
+void Compute_Coordinate_Transform (TRANSFORM *trans, const Vector3d& origin, Vector3d& up, DBL r, DBL len);
 TRANSFORM *Create_Transform (void);
 TRANSFORM *Copy_Transform (const TRANSFORM *Old);
 void Destroy_Transform (TRANSFORM *Trans);
 VECTOR_4D *Create_Vector_4D (void);
 DBL *Create_Float (void);
 void MInvers (MATRIX r, const MATRIX m);
-int MInvers3(const VECTOR inM[3], VECTOR outM[3]);
 int MInvers3(const Matrix3x3& inM, Matrix3x3& outM);
-void MTransUVPoint(const DBL p[2], const DBL m[3][3], DBL t[2]);
-void MSquareQuad(const UV_VECT st[4], DBL sq[3][3]);
 
 }
 

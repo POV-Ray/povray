@@ -24,11 +24,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/support/imageutil.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/support/imageutil.h $
+ * $Revision: #17 $
+ * $Change: 6150 $
+ * $DateTime: 2013/11/30 14:13:48 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #ifndef IMAGE_H
@@ -86,10 +86,10 @@ class ImageData
 		int Interpolation_Type;
 		bool Once_Flag;
 		char Use;
-		VECTOR Gradient;
+		Vector3d Gradient;
 		int iwidth, iheight;
 		SNGL width, height;
-		UV_VECT Offset;
+		Vector2d Offset;
 		DBL AllFilter, AllTransmit;
 		void *Object;
 		Image *data;
@@ -107,10 +107,10 @@ class ImageData
 class Parser;
 class SceneData;
 
-DBL image_pattern(const VECTOR EPoint, const TPATTERN *TPattern);
-bool image_map(const VECTOR EPoint, const PIGMENT *Pigment, Colour& colour);
-TEXTURE *material_map(const VECTOR IPoint, const TEXTURE *Texture);
-void bump_map(const VECTOR EPoint, const TNORMAL *Tnormal, VECTOR normal);
+DBL image_pattern(const Vector3d& EPoint, const TPATTERN *TPattern);
+bool image_map(const Vector3d& EPoint, const PIGMENT *Pigment, Colour& colour);
+TEXTURE *material_map(const Vector3d& IPoint, const TEXTURE *Texture);
+void bump_map(const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& normal);
 HF_VAL image_height_at(const ImageData *image, int x, int y);
 bool is_image_opaque(const ImageData *image);
 ImageData *Copy_Image(ImageData *old);

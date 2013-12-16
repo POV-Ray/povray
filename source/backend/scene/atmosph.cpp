@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/scene/atmosph.cpp $
- * $Revision: #25 $
- * $Change: 6085 $
- * $DateTime: 2013/11/10 07:39:29 $
+ * $Revision: #26 $
+ * $Change: 6147 $
+ * $DateTime: 2013/11/29 20:46:11 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -92,7 +92,7 @@ FOG *Create_Fog()
 
 	New->colour.clear();
 
-	Make_Vector(New->Up, 0.0, 1.0, 0.0);
+	New->Up = Vector3d(0.0, 1.0, 0.0);
 
 	New->Turb = NULL;
 	New->Turb_Depth = 0.5;
@@ -234,10 +234,10 @@ RAINBOW *Create_Rainbow()
 
 	New->Pigment = NULL;
 
-	Make_Vector(New->Antisolar_Vector, 0.0, 0.0, 0.0);
+	New->Antisolar_Vector = Vector3d(0.0, 0.0, 0.0);
 
-	Make_Vector(New->Right_Vector, 1.0, 0.0, 0.0);
-	Make_Vector(New->Up_Vector, 0.0, 1.0, 0.0);
+	New->Right_Vector = Vector3d(1.0, 0.0, 0.0);
+	New->Up_Vector = Vector3d(0.0, 1.0, 0.0);
 
 	New->Next = NULL;
 
@@ -512,7 +512,7 @@ void Destroy_Skysphere(SKYSPHERE *Skysphere)
 *
 ******************************************************************************/
 
-void Rotate_Skysphere(SKYSPHERE *Skysphere, const VECTOR Vector)
+void Rotate_Skysphere(SKYSPHERE *Skysphere, const Vector3d& Vector)
 {
 	TRANSFORM Trans;
 
@@ -553,7 +553,7 @@ void Rotate_Skysphere(SKYSPHERE *Skysphere, const VECTOR Vector)
 *
 ******************************************************************************/
 
-void Scale_Skysphere(SKYSPHERE *Skysphere, const VECTOR Vector)
+void Scale_Skysphere(SKYSPHERE *Skysphere, const Vector3d& Vector)
 {
 	TRANSFORM Trans;
 
@@ -594,7 +594,7 @@ void Scale_Skysphere(SKYSPHERE *Skysphere, const VECTOR Vector)
 *
 ******************************************************************************/
 
-void Translate_Skysphere(SKYSPHERE *Skysphere, const VECTOR Vector)
+void Translate_Skysphere(SKYSPHERE *Skysphere, const Vector3d& Vector)
 {
 	TRANSFORM Trans;
 

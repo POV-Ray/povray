@@ -121,7 +121,7 @@ void Recompute_BBox(BoundingBox *bbox, const TRANSFORM *trans)
 		corner[Y] += ((i & 2) ? lengths[Y] : 0.0);
 		corner[Z] += ((i & 4) ? lengths[Z] : 0.0);
 
-		MTransPoint(*corner, *corner, trans);
+		MTransPoint(corner, corner, trans);
 
 		if(corner[X] < mins[X]) { mins[X] = corner[X]; }
 		if(corner[X] > maxs[X]) { maxs[X] = corner[X]; }
@@ -165,7 +165,7 @@ void Recompute_Inverse_BBox(BoundingBox *bbox, const TRANSFORM *trans)
 		corner[Y] += ((i & 2) ? lengths[Y] : 0.0);
 		corner[Z] += ((i & 4) ? lengths[Z] : 0.0);
 
-		MInvTransPoint(*corner, *corner, trans);
+		MInvTransPoint(corner, corner, trans);
 
 		if(corner[X] < mins[X]) { mins[X] = corner[X]; }
 		if(corner[X] > maxs[X]) { maxs[X] = corner[X]; }

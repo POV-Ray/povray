@@ -22,11 +22,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/scene/threaddata.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/scene/threaddata.h $
+ * $Revision: #71 $
+ * $Change: 6150 $
+ * $DateTime: 2013/11/30 14:13:48 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #ifndef POVRAY_BACKEND_THREADDATA_H
@@ -94,7 +94,7 @@ class SceneThreadData : public Task::TaskData
 		vector<FPUContext *> functionPatternContext;
 		int Facets_Last_Seed;
 		int Facets_CVC;
-		VECTOR Facets_Cube[81];
+		Vector3d Facets_Cube[81];
 
 		// TODO FIXME - thread-local copy of lightsources. we need this
 		// because various parts of the lighting code seem to make changes

@@ -31,9 +31,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/parser/tokenize.cpp $
- * $Revision: #71 $
- * $Change: 6122 $
- * $DateTime: 2013/11/23 10:33:00 $
+ * $Revision: #72 $
+ * $Change: 6150 $
+ * $DateTime: 2013/11/30 14:13:48 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -3511,15 +3511,13 @@ int Parser::Parse_Read_Value(DATA_FILE *User_File,int Previous,int *NumberPtr,vo
 					case 1:
 						*NumberPtr = UV_ID_TOKEN;
 						Test_Redefine(Previous,NumberPtr,*DataPtr);
-						*DataPtr   = reinterpret_cast<void *>(new Vector2d());
-						Assign_UV_Vect(reinterpret_cast<DBL *>(*DataPtr), Express);
+						*DataPtr   = reinterpret_cast<void *>(new Vector2d(Express));
 						break;
 
 					case 2:
 						*NumberPtr = VECTOR_ID_TOKEN;
 						Test_Redefine(Previous,NumberPtr,*DataPtr);
-						*DataPtr   = reinterpret_cast<void *>(new Vector3d());
-						Assign_Vector(reinterpret_cast<DBL *>(*DataPtr), Express);
+						*DataPtr   = reinterpret_cast<void *>(new Vector3d(Express));
 						break;
 
 					case 3:

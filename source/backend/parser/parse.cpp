@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/parser/parse.cpp $
- * $Revision: #200 $
- * $Change: 6143 $
- * $DateTime: 2013/11/28 17:10:31 $
+ * $Revision: #202 $
+ * $Change: 6150 $
+ * $DateTime: 2013/11/30 14:13:48 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -203,10 +203,7 @@ void Parser::Run()
 #if 0 // [CLi] Dist_Max is completely obsolete
 		// init misc radiosity stuff
 		if(sceneData->parsedRadiositySettings.Dist_Max == 0.0)
-		{
-			VDist(sceneData->parsedRadiositySettings.Dist_Max, sceneData->parsedCamera.Location, sceneData->parsedCamera.Look_At);
-			sceneData->parsedRadiositySettings.Dist_Max *= 0.2;
-		}
+			sceneData->parsedRadiositySettings.Dist_Max = (sceneData->parsedCamera.Location - sceneData->parsedCamera.Look_At).length() * 0.2;
 #endif
 
 		// post process atmospheric media
@@ -955,7 +952,7 @@ ObjectPtr Parser::Parse_Blob()
 
 			Axis /= blob_component->elem.len;
 
-			Compute_Coordinate_Transform(blob_component->elem.Trans, *Base, *Axis, 1.0, 1.0);
+			Compute_Coordinate_Transform(blob_component->elem.Trans, Base, Axis, 1.0, 1.0);
 
 			Parse_Blob_Element_Mods(&blob_component->elem);
 
@@ -1317,19 +1314,19 @@ void Parser::Parse_Camera (Camera& Cam)
 		EXPECT
 			CASE (TRANSLATE_TOKEN)
 				Parse_Vector (tempv);
-				Compute_Translation_Transform(&Local_Trans, *tempv);
+				Compute_Translation_Transform(&Local_Trans, tempv);
 				Compose_Transforms(New.Trans, &Local_Trans);
 			END_CASE
 
 			CASE (ROTATE_TOKEN)
 				Parse_Vector (tempv);
-				Compute_Rotation_Transform(&Local_Trans, *tempv);
+				Compute_Rotation_Transform(&Local_Trans, tempv);
 				Compose_Transforms(New.Trans, &Local_Trans);
 			END_CASE
 
 			CASE (SCALE_TOKEN)
 				Parse_Scale_Vector(tempv);
-				Compute_Scaling_Transform(&Local_Trans, *tempv);
+				Compute_Scaling_Transform(&Local_Trans, tempv);
 				Compose_Transforms(New.Trans, &Local_Trans);
 			END_CASE
 
@@ -1381,16 +1378,16 @@ void Parser::Parse_Camera (Camera& Cam)
 		Vector3d old_look_at, old_up, old_right, old_focal_point;
 		DBL old_angle;
 
-		old_look_at = Vector3d(New.Look_At);
-		Make_Vector(New.Look_At, HUGE_VAL, HUGE_VAL, HUGE_VAL);
-		old_up = Vector3d(New.Up);
-		Make_Vector(New.Up, HUGE_VAL, HUGE_VAL, HUGE_VAL);
-		old_right = Vector3d(New.Right);
-		Make_Vector(New.Right, HUGE_VAL, HUGE_VAL, HUGE_VAL);
-		old_focal_point = Vector3d(New.Focal_Point);
-		Make_Vector(New.Focal_Point, HUGE_VAL, HUGE_VAL, HUGE_VAL);
-		old_angle = New.Angle;
-		New.Angle = HUGE_VAL;
+		old_look_at     = New.Look_At;
+		New.Look_At     = Vector3d(HUGE_VAL);
+		old_up          = New.Up;
+		New.Up          = Vector3d(HUGE_VAL);
+		old_right       = New.Right;
+		New.Right       = Vector3d(HUGE_VAL);
+		old_focal_point = New.Focal_Point;
+		New.Focal_Point = Vector3d(HUGE_VAL);
+		old_angle       = New.Angle;
+		New.Angle       = HUGE_VAL;
 
 		EXPECT
 			CASE (PERSPECTIVE_TOKEN)
@@ -1632,7 +1629,7 @@ void Parser::Parse_Camera (Camera& Cam)
 		// handle "up"
 		if (New.Up[X] == HUGE_VAL)
 		{
-			Assign_Vector(New.Up, *old_up); // restore default up
+			New.Up = old_up; // restore default up
 		}
 		else
 			had_up = true;
@@ -1640,7 +1637,7 @@ void Parser::Parse_Camera (Camera& Cam)
 		// handle "right"
 		if (New.Right[X] == HUGE_VAL)
 		{
-			Assign_Vector(New.Right, *old_right); // restore default right
+			New.Right = old_right; // restore default right
 		}
 		else
 			had_right = true;
@@ -1655,10 +1652,10 @@ void Parser::Parse_Camera (Camera& Cam)
 
 				if (New.Angle > 0.0)
 				{
-					VNormalize(New.Direction, New.Direction);
-					VLength (Right_Length, New.Right);
+					New.Direction.normalize();
+					Right_Length = New.Right.length();
 					Direction_Length = Right_Length / tan(New.Angle * M_PI_360)/2.0;
-					VScaleEq(New.Direction, Direction_Length);
+					New.Direction *= Direction_Length;
 				}
 			}
 
@@ -1670,26 +1667,24 @@ void Parser::Parse_Camera (Camera& Cam)
 		// apply "look_at"
 		if (New.Look_At[X] != HUGE_VAL)
 		{
-			VLength (Direction_Length, New.Direction);
-			VLength (Up_Length,        New.Up);
-			VLength (Right_Length,     New.Right);
-			tempv = cross(Vector3d(New.Up), Vector3d(New.Direction));
-			VDot    (Handedness,       *tempv, New.Right);
+			Direction_Length = New.Direction.length();
+			Up_Length        = New.Up.length();
+			Right_Length     = New.Right.length();
+			tempv            = cross(New.Up, New.Direction);
+			Handedness       = dot(tempv, New.Right);
 
-			Assign_Vector(New.Direction, New.Look_At);
-
-			VSub (New.Direction, New.Direction, New.Location);
+			New.Direction    = New.Look_At - New.Location;
 
 			// Check for zero length direction vector.
-			if (VSumSqr(New.Direction) < EPSILON)
+			if (New.Direction.lengthSqr() < EPSILON)
 				Error("Camera location and look_at point must be different.");
 
-			VNormalize (New.Direction, New.Direction);
+			New.Direction.normalize();
 
 			// Save Right vector
-			tempv = Vector3d(New.Right);
+			tempv = New.Right;
 
-			VCross (New.Right, New.Sky, New.Direction);
+			New.Right = cross(New.Sky, New.Direction);
 
 			// Avoid DOMAIN error (from Terry Kanakis)
 			if((fabs(New.Right[X]) < EPSILON) &&
@@ -1700,26 +1695,26 @@ void Parser::Parse_Camera (Camera& Cam)
 				           "Using default/supplied right vector instead.");
 
 				// Restore Right vector
-				Assign_Vector (New.Right, *tempv);
+				New.Right = tempv;
 			}
 
-			VNormalize (New.Right,     New.Right);
-			VCross     (New.Up,        New.Direction, New.Right);
-			VScale     (New.Direction, New.Direction, Direction_Length);
+			New.Right.normalize();
+			New.Up = cross(New.Direction, New.Right);
+			New.Direction *= Direction_Length;
 
 			if (Handedness > 0.0)
 			{
-				VScaleEq (New.Right, Right_Length);
+				New.Right *= Right_Length;
 			}
 			else
 			{
-				VScaleEq (New.Right, -Right_Length);
+				New.Right *= -Right_Length;
 			}
 
-			VScaleEq(New.Up, Up_Length);
+			New.Up *= Up_Length;
 		}
 		else
-			Assign_Vector(New.Look_At, *old_look_at); // restore default look_at
+			New.Look_At = old_look_at; // restore default look_at
 
 		// apply "orthographic"
 		if (New.Type == ORTHOGRAPHIC_CAMERA)
@@ -1730,13 +1725,13 @@ void Parser::Parse_Camera (Camera& Cam)
 			{
 				// resize right and up vector to get the same image
 				// area as we get with the perspective camera
-				tempv = Vector3d(New.Look_At) - Vector3d(New.Location);
+				tempv = New.Look_At - New.Location;
 				k1 = tempv.length();
-				VLength(k2, New.Direction);
+				k2 = New.Direction.length();
 				if ((k1 > EPSILON) && (k2 > EPSILON))
 				{
-					VScaleEq(New.Right, k1 / k2);
-					VScaleEq(New.Up, k1 / k2);
+					New.Right *= (k1 / k2);
+					New.Up    *= (k1 / k2);
 				}
 			}
 		}
@@ -1744,11 +1739,11 @@ void Parser::Parse_Camera (Camera& Cam)
 		// apply "focal_point"
 		if (New.Focal_Point[X] != HUGE_VAL)
 		{
-			tempv = Vector3d(New.Focal_Point) - Vector3d(New.Location);
+			tempv = New.Focal_Point - New.Location;
 			New.Focal_Distance = tempv.length();
 		}
 		else
-			Assign_Vector(New.Focal_Point, *old_focal_point); // restore default focal_point
+			New.Focal_Point = old_focal_point; // restore default focal_point
 
 		// apply camera transformations
 		New.Transform(New.Trans);
@@ -1764,13 +1759,13 @@ void Parser::Parse_Camera (Camera& Cam)
 				New.Type = ORTHOGRAPHIC_CAMERA;
 				// resize right and up vector to get the same image
 				// area as we get with the perspective camera
-				tempv = Vector3d(New.Look_At) - Vector3d(New.Location);
+				tempv = New.Look_At - New.Location;
 				k1 = tempv.length();
-				VLength(k2, New.Direction);
+				k2 = New.Direction.length();
 				if ((k1 > EPSILON) && (k2 > EPSILON))
 				{
-					VScaleEq(New.Right, k1 / k2);
-					VScaleEq(New.Up, k1 / k2);
+					New.Right *= (k1 / k2);
+					New.Up    *= (k1 / k2);
 				}
 			END_CASE
 
@@ -1816,10 +1811,10 @@ void Parser::Parse_Camera (Camera& Cam)
 					if (New.Angle >= 180.0)
 						Error("Viewing angle has to be smaller than 180 degrees.");
 
-					VNormalize(New.Direction, New.Direction);
-					VLength (Right_Length, New.Right);
+					New.Direction.normalize();
+					Right_Length = New.Right.length();
 					Direction_Length = Right_Length / tan(New.Angle * M_PI_360)/2.0;
-					VScaleEq(New.Direction, Direction_Length);
+					New.Direction *= Direction_Length;
 				}
 			END_CASE
 
@@ -1850,27 +1845,25 @@ void Parser::Parse_Camera (Camera& Cam)
 			END_CASE
 
 			CASE (LOOK_AT_TOKEN)
-				VLength (Direction_Length, New.Direction);
-				VLength (Up_Length,        New.Up);
-				VLength (Right_Length,     New.Right);
-				tempv = cross(Vector3d(New.Up), Vector3d(New.Direction));
-				VDot    (Handedness,       *tempv,   New.Right);
+				Direction_Length = New.Direction.length();
+				Up_Length        = New.Up.length();
+				Right_Length     = New.Right.length();
+				tempv            = cross(New.Up, New.Direction);
+				Handedness       = dot(tempv, New.Right);
 
-				Parse_Vector (New.Direction);
-				Assign_Vector(New.Look_At, New.Direction);
-
-				VSub (New.Direction, New.Direction, New.Location);
+				Parse_Vector (New.Look_At);
+				New.Direction = New.Look_At - New.Location;
 
 				// Check for zero length direction vector.
-				if (VSumSqr(New.Direction) < EPSILON)
+				if (New.Direction.lengthSqr() < EPSILON)
 					Error("Camera location and look_at point must be different.");
 
-				VNormalize (New.Direction, New.Direction);
+				New.Direction.normalize();
 
 				// Save Right vector
-				tempv = Vector3d(New.Right);
+				tempv = New.Right;
 
-				VCross (New.Right, New.Sky, New.Direction);
+				New.Right = cross(New.Sky, New.Direction);
 
 				// Avoid DOMAIN error (from Terry Kanakis)
 				if((fabs(New.Right[X]) < EPSILON) &&
@@ -1878,38 +1871,38 @@ void Parser::Parse_Camera (Camera& Cam)
 				   (fabs(New.Right[Z]) < EPSILON))
 				{
 					// Restore Right vector
-					Assign_Vector (New.Right, *tempv);
+					New.Right = tempv;
 				}
 
-				VNormalize (New.Right,     New.Right);
-				VCross     (New.Up,        New.Direction, New.Right);
-				VScale     (New.Direction, New.Direction, Direction_Length);
+				New.Right.normalize();
+				New.Up = cross(New.Direction, New.Right);
+				New.Direction *= Direction_Length;
 
 				if (Handedness > 0.0)
 				{
-					VScaleEq (New.Right, Right_Length);
+					New.Right *= Right_Length;
 				}
 				else
 				{
-					VScaleEq (New.Right, -Right_Length);
+					New.Right *= -Right_Length;
 				}
 
-				VScaleEq(New.Up, Up_Length);
+				New.Up *= Up_Length;
 			END_CASE
 
 			CASE (TRANSLATE_TOKEN)
 				Parse_Vector (tempv);
-				New.Translate (*tempv);
+				New.Translate (tempv);
 			END_CASE
 
 			CASE (ROTATE_TOKEN)
 				Parse_Vector (tempv);
-				New.Rotate (*tempv);
+				New.Rotate (tempv);
 			END_CASE
 
 			CASE (SCALE_TOKEN)
 				Parse_Scale_Vector (tempv);
-				New.Scale (*tempv);
+				New.Scale (tempv);
 			END_CASE
 
 			CASE (TRANSFORM_TOKEN)
@@ -1950,8 +1943,8 @@ void Parser::Parse_Camera (Camera& Cam)
 
 			CASE (FOCAL_POINT_TOKEN)
 				Parse_Vector(tempv);
-				Assign_Vector(New.Focal_Point, *tempv);
-				tempv = Vector3d(New.Focal_Point) - Vector3d(New.Location);
+				New.Focal_Point = tempv;
+				tempv = New.Focal_Point - New.Location;
 				New.Focal_Distance = tempv.length();
 			END_CASE
 
@@ -1971,9 +1964,9 @@ void Parser::Parse_Camera (Camera& Cam)
 		New.Focal_Distance = 1.0;
 
 	// Print a warning message if vectors are not perpendicular. [DB 10/94]
-	VDot(k1, New.Right, New.Up);
-	VDot(k2, New.Right, New.Direction);
-	VDot(k3, New.Up, New.Direction);
+	k1 = dot(New.Right, New.Up);
+	k2 = dot(New.Right, New.Direction);
+	k3 = dot(New.Up, New.Direction);
 
 	if ((fabs(k1) > EPSILON) || (fabs(k2) > EPSILON) || (fabs(k3) > EPSILON))
 	{
@@ -1993,19 +1986,19 @@ bool Parser::Parse_Camera_Mods(Camera& New)
 	EXPECT_ONE
 		CASE (TRANSLATE_TOKEN)
 			Parse_Vector (tempv);
-			Compute_Translation_Transform(&Local_Trans, *tempv);
+			Compute_Translation_Transform(&Local_Trans, tempv);
 			Compose_Transforms(New.Trans, &Local_Trans);
 		END_CASE
 
 		CASE (ROTATE_TOKEN)
 			Parse_Vector (tempv);
-			Compute_Rotation_Transform(&Local_Trans, *tempv);
+			Compute_Rotation_Transform(&Local_Trans, tempv);
 			Compose_Transforms(New.Trans, &Local_Trans);
 		END_CASE
 
 		CASE (SCALE_TOKEN)
 			Parse_Scale_Vector(tempv);
-			Compute_Scaling_Transform(&Local_Trans, *tempv);
+			Compute_Scaling_Transform(&Local_Trans, tempv);
 			Compose_Transforms(New.Trans, &Local_Trans);
 		END_CASE
 
@@ -2415,7 +2408,7 @@ ObjectPtr Parser::Parse_HField ()
 
 	Local_Vector = Vector3d(1.0) / Object->bounding_corner2;
 
-	Compute_Scaling_Transform(Object->Trans, *Local_Vector);
+	Compute_Scaling_Transform(Object->Trans, Local_Vector);
 
 	EXPECT
 		CASE (WATER_LEVEL_TOKEN)
@@ -3039,19 +3032,19 @@ ObjectPtr Parser::Parse_Light_Group()
 	EXPECT
 		CASE (TRANSLATE_TOKEN)
 			Parse_Vector (Local_Vector);
-			Compute_Translation_Transform(&Local_Trans, *Local_Vector);
+			Compute_Translation_Transform(&Local_Trans, Local_Vector);
 			Translate_Object (reinterpret_cast<ObjectPtr>(Object), Local_Vector, &Local_Trans);
 		END_CASE
 
 		CASE (ROTATE_TOKEN)
 			Parse_Vector (Local_Vector);
-			Compute_Rotation_Transform(&Local_Trans, *Local_Vector);
+			Compute_Rotation_Transform(&Local_Trans, Local_Vector);
 			Rotate_Object (reinterpret_cast<ObjectPtr>(Object), Local_Vector, &Local_Trans);
 		END_CASE
 
 		CASE (SCALE_TOKEN)
 			Parse_Scale_Vector (Local_Vector);
-			Compute_Scaling_Transform(&Local_Trans, *Local_Vector);
+			Compute_Scaling_Transform(&Local_Trans, Local_Vector);
 			Scale_Object (reinterpret_cast<ObjectPtr>(Object), Local_Vector, &Local_Trans);
 		END_CASE
 
@@ -3274,7 +3267,7 @@ ObjectPtr Parser::Parse_Light_Source ()
 			if(Object->children.empty() || (Object->children[0] == NULL))
 				Expectation_Error("object");
 			Compute_Translation_Transform(&Local_Trans, Object->Center);
-			Translate_Object(Object->children[0], Vector3d(Object->Center), &Local_Trans);
+			Translate_Object(Object->children[0], Object->Center, &Local_Trans);
 			Object->children[0] = Parse_Object_Mods (Object->children[0]);
 			Set_Flag(Object->children[0], NO_SHADOW_FLAG);
 			Set_Flag(Object, NO_SHADOW_FLAG);
@@ -3428,19 +3421,19 @@ ObjectPtr Parser::Parse_Light_Source ()
 
 		CASE (TRANSLATE_TOKEN)
 			Parse_Vector (Local_Vector);
-			Compute_Translation_Transform(&Local_Trans, *Local_Vector);
+			Compute_Translation_Transform(&Local_Trans, Local_Vector);
 			Translate_Object (reinterpret_cast<ObjectPtr>(Object), Local_Vector, &Local_Trans);
 		END_CASE
 
 		CASE (ROTATE_TOKEN)
 			Parse_Vector (Local_Vector);
-			Compute_Rotation_Transform(&Local_Trans, *Local_Vector);
+			Compute_Rotation_Transform(&Local_Trans, Local_Vector);
 			Rotate_Object (reinterpret_cast<ObjectPtr>(Object), Local_Vector, &Local_Trans);
 		END_CASE
 
 		CASE (SCALE_TOKEN)
 			Parse_Scale_Vector (Local_Vector);
-			Compute_Scaling_Transform(&Local_Trans, *Local_Vector);
+			Compute_Scaling_Transform(&Local_Trans, Local_Vector);
 			Scale_Object (reinterpret_cast<ObjectPtr>(Object), Local_Vector, &Local_Trans);
 		END_CASE
 
@@ -3463,13 +3456,13 @@ ObjectPtr Parser::Parse_Light_Source ()
 	Parse_End ();
 
 
-	VSub(Object->Direction, Object->Points_At, Object->Center);
+	Object->Direction = Object->Points_At - Object->Center;
 
-	VLength(Len, Object->Direction);
+	Len = Object->Direction.length();
 
 	if (Len > EPSILON)
 	{
-		VInverseScaleEq(Object->Direction, Len);
+		Object->Direction /= Len;
 	}
 
 	/* Make sure that circular light sources are larger than 1 by x [ENB 9/97] */
@@ -3903,15 +3896,17 @@ ObjectPtr Parser::Parse_Mesh()
 	POV_FREE(Vertices);
 
 /*
-	Render_Info("Mesh: %ld bytes: %ld vertices, %ld normals, %ld textures, %ld triangles\n",
+	Render_Info("Mesh: %ld bytes: %ld vertices, %ld normals, %ld textures, %ld triangles, %ld uv-coords\n",
 		Object->Data->Number_Of_Normals*sizeof(MeshVector)+
 		Object->Number_Of_Textures*sizeof(TEXTURE *)+
 		Object->Data->Number_Of_Triangles*sizeof(MESH_TRIANGLE)+
-		Object->Data->Number_Of_Vertices*sizeof(MeshVector),
+		Object->Data->Number_Of_Vertices*sizeof(MeshVector)+
+		Object->Data->Number_Of_UVCoords*sizeof(MeshUVVector),
 		Object->Data->Number_Of_Vertices,
 		Object->Data->Number_Of_Normals,
 		Object->Number_Of_Textures,
-		Object->Data->Number_Of_Triangles);
+		Object->Data->Number_Of_Triangles,
+		Object->Data->Number_Of_UVCoords);
 */
 
 	/* Create bounding box. */
@@ -4520,15 +4515,17 @@ ObjectPtr Parser::Parse_Mesh2()
 	Object->Build_Mesh_BBox_Tree();
 
 /*
-	Render_Info("Mesh2: %ld bytes: %ld vertices, %ld normals, %ld textures, %ld triangles\n",
-		Object->Data->Number_Of_Normals*sizeof(SNGL_VECT)+
+	Render_Info("Mesh2: %ld bytes: %ld vertices, %ld normals, %ld textures, %ld triangles, %ld uv-coords\n",
+		Object->Data->Number_Of_Normals*sizeof(MeshVector)+
 		Object->Number_Of_Textures*sizeof(TEXTURE *)+
 		Object->Data->Number_Of_Triangles*sizeof(MESH_TRIANGLE)+
-		Object->Data->Number_Of_Vertices*sizeof(SNGL_VECT),
+		Object->Data->Number_Of_Vertices*sizeof(MeshVector)+
+		Object->Data->Number_Of_UVCoords*sizeof(MeshUVVector),
 		Object->Data->Number_Of_Vertices,
 		Object->Data->Number_Of_Normals,
 		Object->Number_Of_Textures,
-		Object->Data->Number_Of_Triangles);
+		Object->Data->Number_Of_Triangles,
+		Object->Data->Number_Of_UVCoords);
 */
 
 	return(reinterpret_cast<ObjectPtr>(Object));
@@ -6185,7 +6182,7 @@ ObjectPtr Parser::Parse_TrueType ()
 
 	/* This tiny rotation should fix cracks in text that lies along an axis */
 	offset = Vector3d(0.001, 0.001, 0.001); // TODO - try to find a different solution to this hack
-	Compute_Rotation_Transform(&Local_Trans, *offset);
+	Compute_Rotation_Transform(&Local_Trans, offset);
 	Rotate_Object (reinterpret_cast<ObjectPtr>(Object), offset, &Local_Trans);
 
 	/* Get any rotate/translate or texturing stuff */
@@ -7409,19 +7406,19 @@ ObjectPtr Parser::Parse_Object_Mods (ObjectPtr Object)
 
 		CASE (TRANSLATE_TOKEN)
 			Parse_Vector (Local_Vector);
-			Compute_Translation_Transform(&Local_Trans, *Local_Vector);
+			Compute_Translation_Transform(&Local_Trans, Local_Vector);
 			Translate_Object (Object, Local_Vector, &Local_Trans);
 		END_CASE
 
 		CASE (ROTATE_TOKEN)
 			Parse_Vector (Local_Vector);
-			Compute_Rotation_Transform(&Local_Trans, *Local_Vector);
+			Compute_Rotation_Transform(&Local_Trans, Local_Vector);
 			Rotate_Object (Object, Local_Vector, &Local_Trans);
 		END_CASE
 
 		CASE (SCALE_TOKEN)
 			Parse_Scale_Vector (Local_Vector);
-			Compute_Scaling_Transform(&Local_Trans, *Local_Vector);
+			Compute_Scaling_Transform(&Local_Trans, Local_Vector);
 			Scale_Object (Object, Local_Vector, &Local_Trans);
 		END_CASE
 
@@ -7901,19 +7898,19 @@ TRANSFORM *Parser::Parse_Transform_Block(TRANSFORM *New)
 
 		CASE (TRANSLATE_TOKEN)
 			Parse_Vector(Local_Vector);
-			Compute_Translation_Transform(&Local_Trans, *Local_Vector);
+			Compute_Translation_Transform(&Local_Trans, Local_Vector);
 			Compose_Transforms(New, &Local_Trans);
 		END_CASE
 
 		CASE (ROTATE_TOKEN)
 			Parse_Vector(Local_Vector);
-			Compute_Rotation_Transform(&Local_Trans, *Local_Vector);
+			Compute_Rotation_Transform(&Local_Trans, Local_Vector);
 			Compose_Transforms(New, &Local_Trans);
 		END_CASE
 
 		CASE (SCALE_TOKEN)
 			Parse_Scale_Vector(Local_Vector);
-			Compute_Scaling_Transform(&Local_Trans, *Local_Vector);
+			Compute_Scaling_Transform(&Local_Trans, Local_Vector);
 			Compose_Transforms(New, &Local_Trans);
 		END_CASE
 
@@ -7978,7 +7975,7 @@ void Parser::Parse_Bound_Clip(vector<ObjectPtr>& dest, bool notexture)
 	EXPECT
 		CASE (TRANSLATE_TOKEN)
 			Parse_Vector(Local_Vector);
-			Compute_Translation_Transform(&Local_Trans, *Local_Vector);
+			Compute_Translation_Transform(&Local_Trans, Local_Vector);
 			for(vector<ObjectPtr>::iterator i = objects.begin(); i != objects.end(); i++)
 			{
 				Translate_Object(*i, Local_Vector, &Local_Trans);
@@ -7987,7 +7984,7 @@ void Parser::Parse_Bound_Clip(vector<ObjectPtr>& dest, bool notexture)
 
 		CASE (ROTATE_TOKEN)
 			Parse_Vector(Local_Vector);
-			Compute_Rotation_Transform(&Local_Trans, *Local_Vector);
+			Compute_Rotation_Transform(&Local_Trans, Local_Vector);
 			for(vector<ObjectPtr>::iterator i = objects.begin(); i != objects.end(); i++)
 			{
 				Rotate_Object(*i, Local_Vector, &Local_Trans);
@@ -7996,7 +7993,7 @@ void Parser::Parse_Bound_Clip(vector<ObjectPtr>& dest, bool notexture)
 
 		CASE (SCALE_TOKEN)
 			Parse_Scale_Vector(Local_Vector);
-			Compute_Scaling_Transform(&Local_Trans, *Local_Vector);
+			Compute_Scaling_Transform(&Local_Trans, Local_Vector);
 			for(vector<ObjectPtr>::iterator i = objects.begin(); i != objects.end(); i++)
 			{
 				Scale_Object(*i, Local_Vector, &Local_Trans);
@@ -8591,15 +8588,13 @@ int Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTR
 					case 2:
 						*NumberPtr = UV_ID_TOKEN;
 						Test_Redefine(Previous,NumberPtr,*DataPtr, allow_redefine);
-						*DataPtr   = reinterpret_cast<void *>(new Vector2d());
-						Assign_UV_Vect(reinterpret_cast<DBL *>(*DataPtr), Local_Express);
+						*DataPtr   = reinterpret_cast<void *>(new Vector2d(Local_Express));
 						break;
 
 					case 3:
 						*NumberPtr = VECTOR_ID_TOKEN;
 						Test_Redefine(Previous,NumberPtr,*DataPtr, allow_redefine);
-						*DataPtr   = reinterpret_cast<void *>(new Vector3d());
-						Assign_Vector(reinterpret_cast<DBL *>(*DataPtr), Local_Express);
+						*DataPtr   = reinterpret_cast<void *>(new Vector3d(Local_Express));
 						break;
 
 					case 4:
@@ -9431,8 +9426,8 @@ void Parser::Post_Process (ObjectPtr Object, ObjectPtr Parent)
 				Warning(0,"Orient can only be used with circular area lights. This area light is now circular.");
 			}
 
-			VLength(len1,Light->Axis1);
-			VLength(len2,Light->Axis2);
+			len1 = Light->Axis1.length();
+			len2 = Light->Axis2.length();
 
 			if(fabs(len1-len2)>EPSILON)
 			{

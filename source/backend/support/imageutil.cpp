@@ -26,9 +26,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/support/imageutil.cpp $
- * $Revision: #40 $
- * $Change: 6113 $
- * $DateTime: 2013/11/20 20:39:54 $
+ * $Revision: #41 $
+ * $Change: 6150 $
+ * $DateTime: 2013/11/30 14:13:48 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -77,10 +77,10 @@ const DBL DIV_1_BY_255 = 1.0 / 255.0;
 * Static functions
 ******************************************************************************/
 
-static int cylindrical_image_map(const VECTOR EPoint, const ImageData *image, DBL *u, DBL *v);
-static int torus_image_map(const VECTOR EPoint, const ImageData *image, DBL *u, DBL *v);
-static int spherical_image_map(const VECTOR EPoint, const ImageData *image, DBL *u, DBL *v);
-static int planar_image_map(const VECTOR EPoint, const ImageData *image, DBL *u, DBL *v);
+static int cylindrical_image_map(const Vector3d& EPoint, const ImageData *image, DBL *u, DBL *v);
+static int torus_image_map(const Vector3d& EPoint, const ImageData *image, DBL *u, DBL *v);
+static int spherical_image_map(const Vector3d& EPoint, const ImageData *image, DBL *u, DBL *v);
+static int planar_image_map(const Vector3d& EPoint, const ImageData *image, DBL *u, DBL *v);
 static void no_interpolation(const ImageData *image, DBL xcoor, DBL ycoor, Colour& colour, int *index, bool premul);
 static void bilinear(DBL *factors, DBL x, DBL y);
 static void norm_dist(DBL *factors, DBL x, DBL y);
@@ -89,7 +89,7 @@ static void Interp(const ImageData *image, DBL xcoor, DBL ycoor, Colour& colour,
 static void InterpolateBicubic(const ImageData *image, DBL xcoor, DBL ycoor, Colour& colour, int *index, bool premul);
 static void image_colour_at(const ImageData *image, DBL xcoor, DBL ycoor, Colour& colour, int *index); // TODO ALPHA - caller should decide whether to prefer premultiplied or non-premultiplied alpha
 static void image_colour_at(const ImageData *image, DBL xcoor, DBL ycoor, Colour& colour, int *index, bool premul);
-static int map_pos(const VECTOR EPoint, const TPATTERN *Turb, DBL *xcoor, DBL *ycoor);
+static int map_pos(const Vector3d& EPoint, const TPATTERN *Turb, DBL *xcoor, DBL *ycoor);
 
 /*
  * 2-D to 3-D Procedural Texture Mapping of a Bitmapped Image onto an Object:
@@ -136,7 +136,7 @@ static int map_pos(const VECTOR EPoint, const TPATTERN *Turb, DBL *xcoor, DBL *y
 *
 ******************************************************************************/
 
-bool image_map(const VECTOR EPoint, const PIGMENT *Pigment, Colour& colour)
+bool image_map(const Vector3d& EPoint, const PIGMENT *Pigment, Colour& colour)
 {
 	// TODO ALPHA - the caller does expect non-premultiplied data, but maybe he could profit from premultiplied data?
 
@@ -180,7 +180,7 @@ bool image_map(const VECTOR EPoint, const PIGMENT *Pigment, Colour& colour)
 *
 ******************************************************************************/
 
-TEXTURE *material_map(const VECTOR EPoint, const TEXTURE *Texture)
+TEXTURE *material_map(const Vector3d& EPoint, const TEXTURE *Texture)
 {
 	int reg_number = -1;
 	int Material_Number;
@@ -239,14 +239,14 @@ TEXTURE *material_map(const VECTOR EPoint, const TEXTURE *Texture)
 *
 ******************************************************************************/
 
-void bump_map(const VECTOR EPoint, const TNORMAL *Tnormal, VECTOR normal)
+void bump_map(const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& normal)
 {
 	DBL xcoor = 0.0, ycoor = 0.0;
 	int index = -1, index2 = -1, index3 = -1;
 	Colour colour1, colour2, colour3;
-	VECTOR p1, p2, p3;
-	VECTOR bump_normal;
-	VECTOR xprime, yprime, zprime, Temp;
+	Vector3d p1, p2, p3;
+	Vector3d bump_normal;
+	Vector3d xprime, yprime, zprime;
 	DBL Length;
 	DBL Amount = Tnormal->Amount;
 	const ImageData *image = Tnormal->Vals.image;
@@ -314,41 +314,36 @@ void bump_map(const VECTOR EPoint, const TNORMAL *Tnormal, VECTOR normal)
 
 	// we have points 1,2,3 for a triangle now we need the surface normal for it
 
-	VSub(xprime, p1, p2);
-	VSub(yprime, p3, p2);
-	VCross(bump_normal, yprime, xprime);
-	VNormalize(bump_normal, bump_normal);
+	xprime = p1 - p2;
+	yprime = p3 - p2;
+	bump_normal = cross(yprime, xprime).normalized();
 
-	Assign_Vector(yprime, normal);
-	Make_Vector(Temp, 0.0, 1.0, 0.0);
-	VCross(xprime, yprime, Temp);
-	VLength(Length, xprime);
+	yprime = normal;
+	xprime = cross(yprime, Vector3d(0.0, 1.0, 0.0));
+	Length = xprime.length();
 
 	if(Length < EPSILON)
 	{
 		if(fabs(normal[Y] - 1.0) < EPSILON)
 		{
-			Make_Vector(yprime, 0.0, 1.0, 0.0);
-			Make_Vector(xprime, 1.0, 0.0, 0.0);
+			yprime = Vector3d(0.0, 1.0, 0.0);
+			xprime = Vector3d(1.0, 0.0, 0.0);
 			Length = 1.0;
 		}
 		else
 		{
-			Make_Vector(yprime, 0.0, -1.0, 0.0);
-			Make_Vector(xprime, 1.0, 0.0, 0.0);
+			yprime = Vector3d(0.0,-1.0, 0.0);
+			xprime = Vector3d(1.0, 0.0, 0.0);
 			Length = 1.0;
 		}
 	}
 
-	VScaleEq(xprime, 1.0 / Length);
-	VCross(zprime, xprime, yprime);
-	VNormalizeEq(zprime);
-	VScaleEq(xprime, bump_normal[X]);
-	VScaleEq(yprime, bump_normal[Y]);
-	VScaleEq(zprime, bump_normal[Z]);
-	VAdd(Temp, xprime, yprime);
-	VScaleEq(zprime, -1);
-	VAdd(normal, Temp, zprime);
+	xprime /= Length;
+	zprime = cross(xprime, yprime).normalized();
+	xprime *= bump_normal[X];
+	yprime *= bump_normal[Y];
+	zprime *= bump_normal[Z];
+	normal = xprime + yprime - zprime;
 }
 
 
@@ -370,7 +365,7 @@ void bump_map(const VECTOR EPoint, const TNORMAL *Tnormal, VECTOR normal)
 *
 ******************************************************************************/
 
-DBL image_pattern(const VECTOR EPoint, const TPATTERN *TPattern)
+DBL image_pattern(const Vector3d& EPoint, const TPATTERN *TPattern)
 {
 	DBL xcoor = 0.0, ycoor = 0.0;
 	int index = -1;
@@ -564,7 +559,7 @@ bool is_image_opaque(const ImageData *image)
 *
 ******************************************************************************/
 
-static int cylindrical_image_map(const VECTOR EPoint, const ImageData *image, DBL *u, DBL  *v)
+static int cylindrical_image_map(const Vector3d& EPoint, const ImageData *image, DBL *u, DBL  *v)
 {
 	DBL len, theta;
 	DBL x = EPoint[X];
@@ -643,7 +638,7 @@ static int cylindrical_image_map(const VECTOR EPoint, const ImageData *image, DB
 *
 ******************************************************************************/
 
-static int torus_image_map(const VECTOR EPoint, const ImageData *image, DBL *u, DBL  *v)
+static int torus_image_map(const Vector3d& EPoint, const ImageData *image, DBL *u, DBL  *v)
 {
 	DBL len, phi, theta;
 	DBL r0;
@@ -722,7 +717,7 @@ static int torus_image_map(const VECTOR EPoint, const ImageData *image, DBL *u, 
 *
 ******************************************************************************/
 
-static int spherical_image_map(const VECTOR EPoint, const ImageData *image, DBL *u, DBL *v)
+static int spherical_image_map(const Vector3d& EPoint, const ImageData *image, DBL *u, DBL *v)
 {
 	DBL len, phi, theta;
 	DBL x = EPoint[X];
@@ -814,7 +809,7 @@ static int spherical_image_map(const VECTOR EPoint, const ImageData *image, DBL 
 *
 ******************************************************************************/
 
-static int planar_image_map(const VECTOR EPoint, const ImageData *image, DBL *u, DBL  *v)
+static int planar_image_map(const Vector3d& EPoint, const ImageData *image, DBL *u, DBL  *v)
 {
 	DBL x = EPoint[X];
 	DBL y = EPoint[Y];
@@ -886,7 +881,7 @@ static int planar_image_map(const VECTOR EPoint, const ImageData *image, DBL *u,
 *
 ******************************************************************************/
 
-static int map_pos(const VECTOR EPoint, const TPATTERN *TPattern, DBL *xcoor, DBL *ycoor)
+static int map_pos(const Vector3d& EPoint, const TPATTERN *TPattern, DBL *xcoor, DBL *ycoor)
 {
 	const ImageData *image = TPattern->Vals.image;
 
@@ -1272,11 +1267,11 @@ ImageData *Create_Image()
 
 	image->Once_Flag = false;
 
-	Make_UV_Vector(image->Offset,0.0,0.0);
+	image->Offset = Vector2d(0.0,0.0);
 
 	image->Use = USE_NONE;
 
-	Make_Vector(image->Gradient, 1.0, -1.0, 0.0);
+	image->Gradient = Vector3d(1.0, -1.0, 0.0);
 
 	image->AllFilter = 0;
 	image->AllTransmit = 0;

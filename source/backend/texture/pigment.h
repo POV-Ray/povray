@@ -24,11 +24,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/texture/pigment.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/texture/pigment.h $
+ * $Revision: #24 $
+ * $Change: 6150 $
+ * $DateTime: 2013/11/30 14:13:48 $
+ * $Author: clipka $
  *******************************************************************************/
 
 /* NOTE: FRAME.H contains other pigment stuff. */
@@ -78,7 +78,7 @@ PIGMENT *Create_Pigment();
 PIGMENT *Copy_Pigment(const PIGMENT *Old);
 void Destroy_Pigment(PIGMENT *Pigment);
 int Post_Pigment(PIGMENT *Pigment);
-bool Compute_Pigment(Colour& colour, const PIGMENT *Pigment, const VECTOR IPoint, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread);
+bool Compute_Pigment(Colour& colour, const PIGMENT *Pigment, const Vector3d& IPoint, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread);
 void Evaluate_Density_Pigment(const PIGMENT *pigm, const Vector3d& p, RGBColour& c, TraceThreadData *ttd);
 
 }

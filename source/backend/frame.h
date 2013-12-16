@@ -26,9 +26,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/frame.h $
- * $Revision: #130 $
- * $Change: 6145 $
- * $DateTime: 2013/11/29 11:52:27 $
+ * $Revision: #133 $
+ * $Change: 6150 $
+ * $DateTime: 2013/11/30 14:13:48 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -124,7 +124,6 @@ typedef DBL MATRIX[4][4];
 typedef DBL EXPRESS[5];
 typedef COLC COLOUR[5];
 typedef COLC RGB[3];
-typedef SNGL SNGL_VECT[3];
 
 // Vector array elements.
 enum
@@ -155,27 +154,6 @@ enum
 // Macros to manipulate scalars, vectors, and colors.
 
 inline void Assign_Vector(VECTOR d, const VECTOR s)
-{
-	d[X] = s[X];
-	d[Y] = s[Y];
-	d[Z] = s[Z];
-}
-
-inline void Assign_Vector(VECTOR d, const SNGL_VECT s)
-{
-	d[X] = s[X];
-	d[Y] = s[Y];
-	d[Z] = s[Z];
-}
-
-inline void Assign_Vector(SNGL_VECT d, const VECTOR s)
-{
-	d[X] = s[X];
-	d[Y] = s[Y];
-	d[Z] = s[Z];
-}
-
-inline void Assign_Vector(SNGL_VECT d, const SNGL_VECT s)
 {
 	d[X] = s[X];
 	d[Y] = s[Y];
@@ -242,13 +220,6 @@ inline void Make_Vector(VECTOR v, DBL a, DBL b, DBL c)
 	v[Z] = c;
 }
 
-inline void Make_Vector(SNGL_VECT v, SNGL a, SNGL b, SNGL c)
-{
-	v[X] = a;
-	v[Y] = b;
-	v[Z] = c;
-}
-
 inline void Make_UV_Vector(UV_VECT v, DBL a, DBL b)
 {
 	v[U] = a;
@@ -307,12 +278,6 @@ class GenericVector2d
 		}
 
 		explicit GenericVector2d(const UV_VECT vi)
-		{
-			vect[X] = T(vi[X]);
-			vect[Y] = T(vi[Y]);
-		}
-
-		explicit GenericVector2d(const SNGL_VECT vi)
 		{
 			vect[X] = T(vi[X]);
 			vect[Y] = T(vi[Y]);
@@ -520,13 +485,6 @@ class GenericVector3d
 		}
 
 		explicit GenericVector3d(const VECTOR vi)
-		{
-			vect[X] = T(vi[X]);
-			vect[Y] = T(vi[Y]);
-			vect[Z] = T(vi[Z]);
-		}
-
-		explicit GenericVector3d(const SNGL_VECT vi)
 		{
 			vect[X] = T(vi[X]);
 			vect[Y] = T(vi[Y]);
@@ -861,30 +819,10 @@ inline void Make_BBox_from_min_max(BoundingBox& BBox, const Vector3d& mins, cons
 	BBox.size      = BBoxVector3d(maxs - mins);
 }
 
-inline void Make_BBox_from_min_max(BoundingBox& BBox, const VECTOR mins, const VECTOR maxs)
-{
-	BBox.lowerLeft[X] = (BBoxScalar)(mins[X]);
-	BBox.lowerLeft[Y] = (BBoxScalar)(mins[Y]);
-	BBox.lowerLeft[Z] = (BBoxScalar)(mins[Z]);
-	BBox.size[X] = (BBoxScalar)(maxs[X]-mins[X]);
-	BBox.size[Y] = (BBoxScalar)(maxs[Y]-mins[Y]);
-	BBox.size[Z] = (BBoxScalar)(maxs[Z]-mins[Z]);
-}
-
 inline void Make_min_max_from_BBox(BBoxVector3d& mins, BBoxVector3d& maxs, const BoundingBox& BBox)
 {
 	mins = BBox.lowerLeft;
 	maxs = mins + BBox.size;
-}
-
-inline void Make_min_max_from_BBox(VECTOR& mins, VECTOR& maxs, const BoundingBox& BBox)
-{
-	mins[X] = BBox.lowerLeft[X];
-	mins[Y] = BBox.lowerLeft[Y];
-	mins[Z] = BBox.lowerLeft[Z];
-	maxs[X] = mins[X] + BBox.size[X];
-	maxs[Y] = mins[Y] + BBox.size[Y];
-	maxs[Z] = mins[Z] + BBox.size[Z];
 }
 
 inline void Make_min_max_from_BBox(Vector3d& mins, Vector3d& maxs, const BoundingBox& BBox)
@@ -893,7 +831,7 @@ inline void Make_min_max_from_BBox(Vector3d& mins, Vector3d& maxs, const Boundin
 	maxs = mins + Vector3d(BBox.size);
 }
 
-inline bool Inside_BBox(const VECTOR point, const BoundingBox& bbox)
+inline bool Inside_BBox(const Vector3d& point, const BoundingBox& bbox)
 {
 	if (point[X] < (DBL)bbox.lowerLeft[X])
 		return(false);
@@ -909,11 +847,6 @@ inline bool Inside_BBox(const VECTOR point, const BoundingBox& bbox)
 		return(false);
 
 	return(true);
-}
-
-inline bool Inside_BBox(const Vector3d& point, const BoundingBox& bbox)
-{
-	return Inside_BBox(*point, bbox);
 }
 
 
@@ -1198,13 +1131,6 @@ struct Density_file_Data_Struct
 class ImageData;
 class FunctionVM;
 
-struct Crackle_Cache_Struct
-{
-	VECTOR data [125];
-	bool valid [125];
-	int lastSeed;
-};
-
 struct Pattern_Struct
 {
 	unsigned short Type, Wave_Type, Flags;
@@ -1292,7 +1218,7 @@ struct Warps_Struct
 
 struct Turb_Struct : public Warps_Struct
 {
-	VECTOR Turbulence;
+	Vector3d Turbulence;
 	int Octaves;
 	SNGL Lambda, Omega;
 };
@@ -1556,7 +1482,7 @@ class LightSource : public CompoundObject
 	public:
 		size_t index;
 		RGBColour colour;
-		VECTOR Direction, Center, Points_At, Axis1, Axis2;
+		Vector3d Direction, Center, Points_At, Axis1, Axis2;
 		DBL Coeff, Radius, Falloff;
 		DBL Fade_Distance, Fade_Power;
 		int Area_Size1, Area_Size2;

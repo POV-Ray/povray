@@ -26,9 +26,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/texture/normal.cpp $
- * $Revision: #33 $
- * $Change: 6121 $
- * $DateTime: 2013/11/23 07:38:50 $
+ * $Revision: #34 $
+ * $Change: 6150 $
+ * $DateTime: 2013/11/30 14:13:48 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -72,25 +72,25 @@ namespace pov
 * Local constants
 ******************************************************************************/
 
-static const VECTOR Pyramid_Vect [4]= {{ 0.942809041,-0.333333333, 0.0},
-                                       {-0.471404521,-0.333333333, 0.816496581},
-                                       {-0.471404521,-0.333333333,-0.816496581},
-                                       { 0.0        , 1.0        , 0.0}};
+static const Vector3d Pyramid_Vect [4]= { Vector3d( 0.942809041,-0.333333333, 0.0),
+                                          Vector3d(-0.471404521,-0.333333333, 0.816496581),
+                                          Vector3d(-0.471404521,-0.333333333,-0.816496581),
+                                          Vector3d( 0.0        , 1.0        , 0.0) };
 
 /*****************************************************************************
 * Static functions
 ******************************************************************************/
 
-static void ripples (const VECTOR EPoint, const TNORMAL *Tnormal, VECTOR Vector, const TraceThreadData *Thread);
-static void waves (const VECTOR EPoint, const TNORMAL *Tnormal, VECTOR Vector, const TraceThreadData *Thread);
-static void bumps (const VECTOR EPoint, const TNORMAL *Tnormal, VECTOR normal);
-static void dents (const VECTOR EPoint, const TNORMAL *Tnormal, VECTOR normal, const TraceThreadData *Thread);
-static void wrinkles (const VECTOR EPoint, const TNORMAL *Tnormal, VECTOR normal);
-static void quilted (const VECTOR EPoint, const TNORMAL *Tnormal, VECTOR normal);
+static void ripples (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& Vector, const TraceThreadData *Thread);
+static void waves (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& Vector, const TraceThreadData *Thread);
+static void bumps (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& normal);
+static void dents (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& normal, const TraceThreadData *Thread);
+static void wrinkles (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& normal);
+static void quilted (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& normal);
 static DBL Hermite_Cubic (DBL T1, const UV_VECT UV1, const UV_VECT UV2);
 static DBL Do_Slope_Map (DBL value, const BLEND_MAP *Blend_Map);
-static void Do_Average_Normals (const VECTOR EPoint, const TNORMAL *Tnormal, VECTOR normal, Intersection *Inter, const Ray *ray, TraceThreadData *Thread);
-static void facets (const VECTOR EPoint, const TNORMAL *Tnormal, VECTOR normal, TraceThreadData *Thread);
+static void Do_Average_Normals (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& normal, Intersection *Inter, const Ray *ray, TraceThreadData *Thread);
+static void facets (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& normal, TraceThreadData *Thread);
 
 /*****************************************************************************
 *
@@ -114,16 +114,16 @@ static void facets (const VECTOR EPoint, const TNORMAL *Tnormal, VECTOR normal, 
 *
 ******************************************************************************/
 
-static void ripples (const VECTOR EPoint, const TNORMAL *Tnormal, VECTOR normal, const TraceThreadData *Thread)
+static void ripples (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& normal, const TraceThreadData *Thread)
 {
 	register unsigned int i;
 	register DBL length, scalar, index;
-	VECTOR point;
+	Vector3d point;
 
 	for (i = 0 ; i < Thread->numberOfWaves ; i++)
 	{
-		VSub (point, EPoint, *Thread->waveSources[i]);
-		VLength (length, point);
+		point = EPoint - Thread->waveSources[i];
+		length = point.length();
 
 		if (length == 0.0)
 			length = 1.0;
@@ -132,7 +132,7 @@ static void ripples (const VECTOR EPoint, const TNORMAL *Tnormal, VECTOR normal,
 
 		scalar = cycloidal(index) * Tnormal ->Amount;
 
-		VAddScaledEq(normal, scalar / (length * (DBL)Thread->numberOfWaves), point);
+		normal += (scalar / (length * (DBL)Thread->numberOfWaves)) * point;
 	}
 }
 
@@ -160,17 +160,17 @@ static void ripples (const VECTOR EPoint, const TNORMAL *Tnormal, VECTOR normal,
 *
 ******************************************************************************/
 
-static void waves (const VECTOR EPoint, const TNORMAL *Tnormal, VECTOR normal, const TraceThreadData *Thread)
+static void waves (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& normal, const TraceThreadData *Thread)
 {
 	register unsigned int i;
 	register DBL length, scalar, index, sinValue ;
-	VECTOR point;
+	Vector3d point;
 
 	for (i = 0 ; i < Thread->numberOfWaves ; i++)
 	{
-		VSub (point, EPoint, *Thread->waveSources[i]);
+		point = EPoint - Thread->waveSources[i];
 
-		VLength (length, point);
+		length = point.length();
 
 		if (length == 0.0)
 		{
@@ -183,7 +183,7 @@ static void waves (const VECTOR EPoint, const TNORMAL *Tnormal, VECTOR normal, c
 
 		scalar = sinValue * Tnormal->Amount / Thread->waveFrequencies[i];
 
-		VAddScaledEq(normal, scalar / (length * (DBL)Thread->numberOfWaves), point);
+		normal += (scalar / (length * (DBL)Thread->numberOfWaves)) * point;
 	}
 }
 
@@ -211,9 +211,9 @@ static void waves (const VECTOR EPoint, const TNORMAL *Tnormal, VECTOR normal, c
 *
 ******************************************************************************/
 
-static void bumps (const VECTOR EPoint, const TNORMAL *Tnormal, VECTOR normal)
+static void bumps (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& normal)
 {
-	VECTOR bump_turb;
+	Vector3d bump_turb;
 
 	/* Get normal displacement value. */
 
@@ -221,7 +221,7 @@ static void bumps (const VECTOR EPoint, const TNORMAL *Tnormal, VECTOR normal)
 
 	/* Displace "normal". */
 
-	VAddScaledEq(normal, Tnormal->Amount, bump_turb);
+	normal += (DBL)Tnormal->Amount * bump_turb;
 }
 
 
@@ -248,10 +248,10 @@ static void bumps (const VECTOR EPoint, const TNORMAL *Tnormal, VECTOR normal)
 *
 ******************************************************************************/
 
-static void dents (const VECTOR EPoint, const TNORMAL *Tnormal, VECTOR normal, const TraceThreadData *Thread)
+static void dents (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& normal, const TraceThreadData *Thread)
 {
 	DBL noise;
-	VECTOR stucco_turb;
+	Vector3d stucco_turb;
 
 	noise = Noise (EPoint, GetNoiseGen(reinterpret_cast<const TPATTERN *>(Tnormal), Thread));
 
@@ -263,7 +263,7 @@ static void dents (const VECTOR EPoint, const TNORMAL *Tnormal, VECTOR normal, c
 
 	/* Displace "normal". */
 
-	VAddScaledEq(normal, noise, stucco_turb);
+	normal += noise * stucco_turb;
 }
 
 
@@ -301,17 +301,17 @@ static void dents (const VECTOR EPoint, const TNORMAL *Tnormal, VECTOR normal, c
 *
 ******************************************************************************/
 
-static void wrinkles (const VECTOR EPoint, const TNORMAL *Tnormal, VECTOR normal)
+static void wrinkles (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& normal)
 {
 	register int i;
 	register DBL scale = 1.0;
-	VECTOR result, value, value2;
+	Vector3d result, value, value2;
 
-	Make_Vector(result, 0.0, 0.0, 0.0);
+	result = Vector3d(0.0, 0.0, 0.0);
 
 	for (i = 0; i < 10; scale *= 2.0, i++)
 	{
-		VScale(value2,EPoint,scale);
+		value2 = EPoint * scale;
 		DNoise(value, value2);
 
 		result[X] += fabs(value[X] / scale);
@@ -321,7 +321,7 @@ static void wrinkles (const VECTOR EPoint, const TNORMAL *Tnormal, VECTOR normal
 
 	/* Displace "normal". */
 
-	VAddScaledEq(normal, Tnormal->Amount, result);
+	normal += (DBL)Tnormal->Amount * result;
 }
 
 
@@ -347,24 +347,22 @@ static void wrinkles (const VECTOR EPoint, const TNORMAL *Tnormal, VECTOR normal
 *
 ******************************************************************************/
 
-static void quilted (const VECTOR EPoint, const TNORMAL *Tnormal, VECTOR normal)
+static void quilted (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& normal)
 {
-	VECTOR value;
+	Vector3d value;
 	DBL t;
 
 	value[X] = EPoint[X]-FLOOR(EPoint[X])-0.5;
 	value[Y] = EPoint[Y]-FLOOR(EPoint[Y])-0.5;
 	value[Z] = EPoint[Z]-FLOOR(EPoint[Z])-0.5;
 
-	t = sqrt(value[X]*value[X]+value[Y]*value[Y]+value[Z]*value[Z]);
+	t = value.length();
 
 	t = quilt_cubic(t, Tnormal->Vals.Quilted.Control0, Tnormal->Vals.Quilted.Control1);
 
-	value[X] *= t;
-	value[Y] *= t;
-	value[Z] *= t;
+	value *= t;
 
-	VAddScaledEq (normal, Tnormal->Amount,value);
+	normal += (DBL)Tnormal->Amount * value;
 }
 
 /*****************************************************************************
@@ -392,32 +390,32 @@ static void quilted (const VECTOR EPoint, const TNORMAL *Tnormal, VECTOR normal)
 *
 ******************************************************************************/
 
-static void facets (const VECTOR EPoint, const TNORMAL *Tnormal, VECTOR normal, TraceThreadData *Thread)
+static void facets (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& normal, TraceThreadData *Thread)
 {
-	int    i;
-	int    thisseed;
-	DBL    sum, minsum;
-	VECTOR sv, tv, dv, t1, add, newnormal, pert;
-	DBL    scale;
-	int    UseSquare;
-	int    UseUnity;
-	DBL    Metric;
+	int      i;
+	int      thisseed;
+	DBL      sum, minsum;
+	Vector3d sv, tv, dv, t1, add, newnormal, pert;
+	DBL      scale;
+	int      UseSquare;
+	int      UseUnity;
+	DBL      Metric;
 
-	VECTOR *cv = Thread->Facets_Cube;
+	Vector3d *cv = Thread->Facets_Cube;
 	Metric = Tnormal->Vals.Facets.Metric;
 
 	UseSquare = (Metric == 2 );
 	UseUnity  = (Metric == 1 );
 
-	VNormalize( normal, normal );
+	normal.normalize();
 
 	if ( Tnormal->Vals.Facets.UseCoords )
 	{
-		Assign_Vector(tv,EPoint);
+		tv = EPoint;
 	}
 	else
 	{
-		Assign_Vector(tv,normal);
+		tv = normal;
 	}
 
 	if ( Tnormal->Vals.Facets.Size < 1e-6 )
@@ -429,7 +427,7 @@ static void facets (const VECTOR EPoint, const TNORMAL *Tnormal, VECTOR normal, 
 		scale = 1. / Tnormal->Vals.Facets.Size;
 	}
 
-	VScaleEq( tv, scale );
+	tv *= scale;
 
 	/*
 	 * Check to see if the input point is in the same unit cube as the last
@@ -466,13 +464,11 @@ static void facets (const VECTOR EPoint, const TNORMAL *Tnormal, VECTOR normal, 
 					{
 						/* Yes, it's within a 3d knight move away. */
 
-						VAdd(sv, tv, add);
+						sv = tv + add;
 
 						PickInCube(sv, t1);
 
-						cv[cvc][X] = t1[X];
-						cv[cvc][Y] = t1[Y];
-						cv[cvc][Z] = t1[Z];
+						cv[cvc] = t1;
 						cvc++;
 					}
 				}
@@ -487,10 +483,10 @@ static void facets (const VECTOR EPoint, const TNORMAL *Tnormal, VECTOR normal, 
 	 * Find the point with the shortest distance from the input point.
 	 */
 
-	VSub(dv, cv[0], tv);
+	dv = cv[0] - tv;
 	if ( UseSquare )
 	{
-		minsum  = VSumSqr(dv);
+		minsum  = dv.lengthSqr();
 	}
 	else if ( UseUnity )
 	{
@@ -503,17 +499,17 @@ static void facets (const VECTOR EPoint, const TNORMAL *Tnormal, VECTOR normal, 
 		         pow(fabs(dv[Z]), Metric);
 	}
 
-	Assign_Vector( newnormal, cv[0] );
+	newnormal = cv[0];
 
 	/* Loop for the 81 cubelets to find closest. */
 
 	for (i = 1; i < Thread->Facets_CVC; i++)
 	{
-		VSub(dv, cv[i], tv);
+		dv = cv[i] - tv;
 
 		if ( UseSquare )
 		{
-			sum  = VSumSqr(dv);
+			sum  = dv.lengthSqr();
 		}
 		else
 		{
@@ -532,21 +528,21 @@ static void facets (const VECTOR EPoint, const TNORMAL *Tnormal, VECTOR normal, 
 		if (sum < minsum)
 		{
 			minsum = sum;
-			Assign_Vector( newnormal, cv[i] );
+			newnormal = cv[i];
 		}
 	}
 
 	if ( Tnormal->Vals.Facets.UseCoords )
 	{
 		DNoise( pert, newnormal );
-		VDot( sum, pert, normal );
-		VScale( newnormal, normal, sum );
-		VSubEq( pert, newnormal );
-		VAddScaledEq( normal, Tnormal->Vals.Facets.UseCoords, pert );
+		sum = dot(pert, normal);
+		newnormal = normal * sum;
+		pert -= newnormal;
+		normal += Tnormal->Vals.Facets.UseCoords * pert;
 	}
 	else
 	{
-		Assign_Vector( normal, newnormal );
+		normal = newnormal;
 	}
 }
 
@@ -780,9 +776,9 @@ void Post_Tnormal (TNORMAL *Tnormal)
 *
 ******************************************************************************/
 
-void Perturb_Normal(VECTOR Layer_Normal, const TNORMAL *Tnormal, const VECTOR EPoint, Intersection *Intersection, const Ray *ray, TraceThreadData *Thread)
+void Perturb_Normal(Vector3d& Layer_Normal, const TNORMAL *Tnormal, const Vector3d& EPoint, Intersection *Intersection, const Ray *ray, TraceThreadData *Thread)
 {
-	VECTOR TPoint,P1;
+	Vector3d TPoint,P1;
 	DBL value1,value2,Amount;
 	int i;
 	const BLEND_MAP *Blend_Map;
@@ -810,8 +806,8 @@ void Perturb_Normal(VECTOR Layer_Normal, const TNORMAL *Tnormal, const VECTOR EP
 			TPoint[Z] = 0;
 
 			Perturb_Normal(Layer_Normal,Cur->Vals.Tnormal,TPoint,Intersection,ray,Thread);
-			VNormalizeEq(Layer_Normal);
-			Intersection->PNormal = Vector3d(Layer_Normal); /* -hdf- June 98 */
+			Layer_Normal.normalize();
+			Intersection->PNormal = Layer_Normal; /* -hdf- June 98 */
 
 			return;
 		}
@@ -819,12 +815,12 @@ void Perturb_Normal(VECTOR Layer_Normal, const TNORMAL *Tnormal, const VECTOR EP
 		{
 			/* NK 19 Nov 1999 added Warp_EPoint */
 			Warp_EPoint (TPoint, EPoint, reinterpret_cast<const TPATTERN *>(Tnormal));
-			value1 = Evaluate_TPat(reinterpret_cast<const TPATTERN *>(Tnormal),TPoint,Intersection,ray,Thread);
+			value1 = Evaluate_TPat(reinterpret_cast<const TPATTERN *>(Tnormal), TPoint, Intersection, ray, Thread);
 
 			Search_Blend_Map (value1,Blend_Map,&Prev,&Cur);
 
 			Warp_Normal(Layer_Normal,Layer_Normal, reinterpret_cast<const TPATTERN *>(Tnormal), Test_Flag(Tnormal,DONT_SCALE_BUMPS_FLAG));
-			Assign_Vector(P1,Layer_Normal);
+			P1 = Layer_Normal;
 
 			Warp_EPoint (TPoint, EPoint, reinterpret_cast<const TPATTERN *>(Tnormal));
 
@@ -837,14 +833,14 @@ void Perturb_Normal(VECTOR Layer_Normal, const TNORMAL *Tnormal, const VECTOR EP
 				value2 = (value1-Prev->value)/(Cur->value-Prev->value);
 				value1 = 1.0-value2;
 
-				VLinComb2(Layer_Normal,value1,P1,value2,Layer_Normal);
+				Layer_Normal = value1 * P1 + value2 * Layer_Normal;
 			}
 
 			UnWarp_Normal(Layer_Normal,Layer_Normal, reinterpret_cast<const TPATTERN *>(Tnormal), Test_Flag(Tnormal,DONT_SCALE_BUMPS_FLAG));
 
-			VNormalizeEq(Layer_Normal);
+			Layer_Normal.normalize();
 
-			Intersection->PNormal = Vector3d(Layer_Normal); /* -hdf- June 98 */
+			Intersection->PNormal = Layer_Normal; /* -hdf- June 98 */
 
 			return;
 		}
@@ -890,9 +886,9 @@ void Perturb_Normal(VECTOR Layer_Normal, const TNORMAL *Tnormal, const VECTOR EP
 
 		for(i=0; i<=3; i++)
 		{
-			VAddScaled(P1,TPoint,Tnormal->Delta,Pyramid_Vect[i]); /* NK delta */
-			value1 = Do_Slope_Map(Evaluate_TPat(reinterpret_cast<const TPATTERN *>(Tnormal),P1,Intersection,ray,Thread),Blend_Map);
-			VAddScaledEq(Layer_Normal,value1*Amount,Pyramid_Vect[i]);
+			P1 = TPoint + (DBL)Tnormal->Delta * Pyramid_Vect[i]; /* NK delta */
+			value1 = Do_Slope_Map(Evaluate_TPat(reinterpret_cast<const TPATTERN *>(Tnormal), P1, Intersection, ray, Thread), Blend_Map);
+			Layer_Normal += (value1*Amount) * Pyramid_Vect[i];
 		}
 
 		UnWarp_Normal(Layer_Normal,Layer_Normal,reinterpret_cast<const TPATTERN *>(Tnormal),
@@ -901,7 +897,7 @@ void Perturb_Normal(VECTOR Layer_Normal, const TNORMAL *Tnormal, const VECTOR EP
 	}
 
 	if ( Intersection )
-		Intersection->PNormal = Vector3d(Layer_Normal); /* -hdf- June 98 */
+		Intersection->PNormal = Layer_Normal; /* -hdf- June 98 */
 }
 
 
@@ -1000,30 +996,30 @@ static DBL Hermite_Cubic(DBL T1, const UV_VECT UV1, const UV_VECT UV2)
 *
 ******************************************************************************/
 
-static void Do_Average_Normals (const VECTOR EPoint, const TNORMAL *Tnormal, VECTOR normal, Intersection *Inter, const Ray *ray, TraceThreadData *Thread)
+static void Do_Average_Normals (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& normal, Intersection *Inter, const Ray *ray, TraceThreadData *Thread)
 {
 	int i;
 	BLEND_MAP *Map = Tnormal->Blend_Map;
 	SNGL Value;
 	SNGL Total = 0.0;
-	VECTOR V1,V2;
+	Vector3d V1,V2;
 
-	Make_Vector (V1, 0.0, 0.0, 0.0);
+	V1 = Vector3d(0.0, 0.0, 0.0);
 
 	for (i = 0; i < Map->Number_Of_Entries; i++)
 	{
 		Value = Map->Blend_Map_Entries[i].value;
 
-		Assign_Vector(V2,normal);
+		V2 = normal;
 
 		Perturb_Normal(V2,Map->Blend_Map_Entries[i].Vals.Tnormal,EPoint,Inter,ray,Thread);
 
-		VAddScaledEq(V1,Value,V2);
+		V1 += (DBL)Value * V2;
 
 		Total += Value;
 	}
 
-	VInverseScale(normal,V1,Total);
+	normal = V1 / Total;
 }
 
 }

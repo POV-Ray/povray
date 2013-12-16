@@ -27,9 +27,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/lighting/photonshootingtask.cpp $
- * $Revision: #21 $
- * $Change: 6121 $
- * $DateTime: 2013/11/23 07:38:50 $
+ * $Revision: #22 $
+ * $Change: 6147 $
+ * $DateTime: 2013/11/29 20:46:11 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -240,7 +240,7 @@ void PhotonShootingTask::ShootPhotonsAtObject(LightTargetCombo& combo)
 				{
 					Ray ray;                 /* ray that we shoot */
 
-					ray.Origin = Vector3d(combo.light->Center);
+					ray.Origin = combo.light->Center;
 
 					if (combo.light->Area_Light && combo.light->Photon_Area_Light && !combo.light->Parallel)
 					{
@@ -254,33 +254,33 @@ void PhotonShootingTask::ShootPhotonsAtObject(LightTargetCombo& combo)
 					if (combo.light->Parallel)
 					{
 						DBL a;
-						VECTOR v;
+						Vector3d v;
 						/* assign the direction */
-						ray.Direction = Vector3d(combo.light->Direction);
+						ray.Direction = combo.light->Direction;
 					
 						/* project ctr onto plane defined by Direction & light location */
 
 						a = dot(ray.Direction, shootingDirection.toctr);
-						VScale(v,*ray.Direction, -a*shootingDirection.dist); /* MAYBE NEEDS TO BE NEGATIVE! */
+						v = ray.Direction * (-a*shootingDirection.dist); /* MAYBE NEEDS TO BE NEGATIVE! */
 
-						ray.Origin = shootingDirection.ctr + Vector3d(v);
+						ray.Origin = shootingDirection.ctr + v;
 
 						/* move point along "left" distance theta (remember theta means rad) */
-						VScale(v,*shootingDirection.left,jittheta);
+						v = shootingDirection.left * jittheta;
 
 						/* rotate pt around ray.Direction by phi */
 						/* use POV funcitons... slower but easy */
 						Compute_Axis_Rotation_Transform(&Trans,combo.light->Direction,jitphi);
 						MTransPoint(v, v, &Trans);
 
-						ray.Origin += Vector3d(v);
+						ray.Origin += v;
 
 						// compute the length of "v" if we're going to use it
 						if (combo.light->Light_Type == CYLINDER_SOURCE)
 						{
-							VECTOR initial_from_center;
-							VSub(initial_from_center, *ray.Origin, combo.light->Center);
-							VLength(dist_of_initial_from_center, initial_from_center);
+							Vector3d initial_from_center;
+							initial_from_center = ray.Origin - combo.light->Center;
+							dist_of_initial_from_center = initial_from_center.length();
 						}
 					}
 					else
@@ -294,8 +294,8 @@ void PhotonShootingTask::ShootPhotonsAtObject(LightTargetCombo& combo)
 
 						/* then rotate by phi around toctr */
 						/* use POV funcitons... slower but easy */
-						Compute_Axis_Rotation_Transform(&Trans,*shootingDirection.toctr,jitphi);
-						MTransPoint(*ray.Direction, *shootingDirection.v, &Trans);
+						Compute_Axis_Rotation_Transform(&Trans,shootingDirection.toctr,jitphi);
+						MTransPoint(ray.Direction, shootingDirection.v, &Trans);
 					}
 
 					/* ------ attenuation for spot/cylinder (copied from point.c) ---- */
@@ -402,7 +402,7 @@ DBL PhotonShootingTask::computeAttenuation(const LightSource* Light, const Ray& 
 	/* ---------- spot light --------- */
 	if (Light->Light_Type == SPOT_SOURCE)
 	{
-		VDot(costheta_spot, *ray.Direction, Light->Direction);
+		costheta_spot = dot(ray.Direction, Light->Direction);
 
 		if (costheta_spot > 0.0)
 		{
@@ -420,7 +420,7 @@ DBL PhotonShootingTask::computeAttenuation(const LightSource* Light, const Ray& 
 	{
 		DBL k, len;
 
-		VDot(k, *ray.Direction, Light->Direction);
+		k = dot(ray.Direction, Light->Direction);
 
 		if (k > 0.0)
 		{

@@ -24,11 +24,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/pattern/warps.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/pattern/warps.h $
+ * $Revision: #17 $
+ * $Change: 6150 $
+ * $DateTime: 2013/11/30 14:13:48 $
+ * $Author: clipka $
  *******************************************************************************/
 
 /* NOTE: FRAME.H contains other warp stuff. */
@@ -72,26 +72,26 @@ typedef struct Planar_Warp PLANARW;
 
 struct Toroidal_Warp : public Warps_Struct
 {
-	VECTOR Orientation_Vector;
+	Vector3d Orientation_Vector;
 	DBL DistExp;
 	DBL MajorRadius;
 };
 
 struct Cylindrical_Warp : public Warps_Struct
 {
-	VECTOR Orientation_Vector;
+	Vector3d Orientation_Vector;
 	DBL DistExp;
 };
 
 struct Planar_Warp : public Warps_Struct
 {
-	VECTOR Orientation_Vector;
+	Vector3d Orientation_Vector;
 	DBL OffSet;
 };
 
 struct Spherical_Warp : public Warps_Struct
 {
-	VECTOR Orientation_Vector;
+	Vector3d Orientation_Vector;
 	DBL DistExp;
 };
 
@@ -99,7 +99,7 @@ struct Repeat_Warp : public Warps_Struct
 {
 	int Axis;
 	SNGL Width;
-	VECTOR Flip, Offset;
+	Vector3d Flip, Offset;
 };
 
 struct Trans_Warp : public Warps_Struct
@@ -109,9 +109,9 @@ struct Trans_Warp : public Warps_Struct
 
 struct Black_Hole_Warp : public Warps_Struct
 {
-	VECTOR      Center ;
-	VECTOR      Repeat_Vector ;
-	VECTOR      Uncertainty_Vector ;
+	Vector3d    Center ;
+	Vector3d    Repeat_Vector ;
+	Vector3d    Uncertainty_Vector ;
 	DBL         Strength ;
 	DBL         Radius ;
 	DBL         Radius_Squared ;
@@ -138,12 +138,12 @@ struct Black_Hole_Warp : public Warps_Struct
 * Global functions
 ******************************************************************************/
 
-void Warp_EPoint (VECTOR TPoint, const VECTOR EPoint, const TPATTERN *TPat);
+void Warp_EPoint (Vector3d& TPoint, const Vector3d& EPoint, const TPATTERN *TPat);
 WARP *Create_Warp (int Warp_Type);
 void Destroy_Warps (WARP *Warps);
 WARP *Copy_Warps (const WARP *Old);
-void Warp_Normal (VECTOR TNorm, const VECTOR ENorm, const TPATTERN *TPat, bool DontScaleBumps);
-void UnWarp_Normal (VECTOR TNorm, const VECTOR ENorm, const TPATTERN *TPat, bool DontScaleBumps);
+void Warp_Normal (Vector3d& TNorm, const Vector3d& ENorm, const TPATTERN *TPat, bool DontScaleBumps);
+void UnWarp_Normal (Vector3d& TNorm, const Vector3d& ENorm, const TPATTERN *TPat, bool DontScaleBumps);
 
 }
 

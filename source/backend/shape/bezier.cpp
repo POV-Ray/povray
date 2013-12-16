@@ -28,9 +28,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/bezier.cpp $
- * $Revision: #33 $
- * $Change: 6124 $
- * $DateTime: 2013/11/23 17:30:25 $
+ * $Revision: #35 $
+ * $Change: 6150 $
+ * $DateTime: 2013/11/30 14:13:48 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -556,7 +556,7 @@ bool BicubicPatch::intersect_subpatch(const Ray &ray, const TripleVector3d& V1, 
 		return false;
 	}
 
-	Q = Vector3d(V1[0]) - ray.Origin;
+	Q = V1[0] - ray.Origin;
 
 	n = dot(Q, IB[2]);
 
@@ -571,7 +571,7 @@ bool BicubicPatch::intersect_subpatch(const Ray &ray, const TripleVector3d& V1, 
 
 	P = ray.Origin + T1;
 
-	Q = P - Vector3d(V1[0]);
+	Q = P - V1[0];
 
 	a = dot(Q, IB[0]);
 	b = dot(Q, IB[1]);
@@ -1853,7 +1853,7 @@ void BicubicPatch::Transform(const TRANSFORM *tr)
 	{
 		for (j = 0; j < 4; j++)
 		{
-			MTransPoint(*Control_Points[i][j], *Control_Points[i][j], tr);
+			MTransPoint(Control_Points[i][j], Control_Points[i][j], tr);
 		}
 	}
 

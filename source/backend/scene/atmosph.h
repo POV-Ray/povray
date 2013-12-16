@@ -24,11 +24,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/scene/atmosph.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/scene/atmosph.h $
+ * $Revision: #20 $
+ * $Change: 6147 $
+ * $DateTime: 2013/11/29 20:46:11 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #ifndef ATMOSPH_H
@@ -62,7 +62,7 @@ struct Fog_Struct
 	DBL Alt;
 	DBL Offset;
 	Colour colour; // may have a filter/transmit component
-	VECTOR Up;
+	Vector3d Up;
 	TURB *Turb;
 	SNGL Turb_Depth;
 	FOG *Next;
@@ -74,8 +74,8 @@ struct Rainbow_Struct
 	DBL Jitter;
 	DBL Angle, Width;
 	DBL Arc_Angle, Falloff_Angle, Falloff_Width;
-	VECTOR Antisolar_Vector;
-	VECTOR Up_Vector, Right_Vector;
+	Vector3d Antisolar_Vector;
+	Vector3d Up_Vector, Right_Vector;
 	PIGMENT *Pigment;
 	RAINBOW *Next;
 };
@@ -103,9 +103,9 @@ void Destroy_Rainbow (RAINBOW *Rainbow);
 SKYSPHERE *Create_Skysphere (void);
 SKYSPHERE *Copy_Skysphere (const SKYSPHERE *Skysphere);
 void Destroy_Skysphere (SKYSPHERE *Skysphere);
-void Scale_Skysphere (SKYSPHERE *Skysphere, const VECTOR Vector);
-void Rotate_Skysphere (SKYSPHERE *Skysphere, const VECTOR Vector);
-void Translate_Skysphere (SKYSPHERE *Skysphere, const VECTOR Vector);
+void Scale_Skysphere (SKYSPHERE *Skysphere, const Vector3d& Vector);
+void Rotate_Skysphere (SKYSPHERE *Skysphere, const Vector3d& Vector);
+void Translate_Skysphere (SKYSPHERE *Skysphere, const Vector3d& Vector);
 void Transform_Skysphere (SKYSPHERE *Skysphere, const TRANSFORM *Trans);
 
 }

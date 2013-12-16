@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/lighting/radiosity.cpp $
- * $Revision: #63 $
- * $Change: 6118 $
- * $DateTime: 2013/11/22 16:39:19 $
+ * $Revision: #64 $
+ * $Change: 6150 $
+ * $DateTime: 2013/11/30 14:13:48 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -499,7 +499,7 @@ double RadiosityFunction::GatherLight(const Vector3d& ipoint, const Vector3d& ra
 	RecursionParameters& param = recursionParameters[ticket.radiosityRecursionDepth];
 	const RadiosityRecursionSettings& recSettings = recursionSettings[ticket.radiosityRecursionDepth];
 
-	DBL to_eye = Vector3d(this->cameraPosition - ipoint).length();
+	DBL to_eye = (this->cameraPosition - ipoint).length();
 	DBL reuse_dist_min      = to_eye * recSettings.minReuseFactor;
 	DBL maximum_distance    = to_eye * recSettings.maxReuseFactor;
 	if (recSettings.maxReuseFactor >= HUGE_VAL)

@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/spheres.cpp $
- * $Revision: #36 $
- * $Change: 6139 $
- * $DateTime: 2013/11/25 21:34:55 $
+ * $Revision: #37 $
+ * $Change: 6147 $
+ * $DateTime: 2013/11/29 20:46:11 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -92,8 +92,8 @@ bool Sphere::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadD
 
 		// Transform the ray into the ellipsoid's space
 
-		MInvTransPoint(*New_Ray.Origin, *ray.Origin, Trans);
-		MInvTransDirection(*New_Ray.Direction, *ray.Direction, Trans);
+		MInvTransPoint(New_Ray.Origin, ray.Origin, Trans);
+		MInvTransDirection(New_Ray.Direction, ray.Direction, Trans);
 
 		len = New_Ray.Direction.length();
 		New_Ray.Direction /= len;
@@ -106,7 +106,7 @@ bool Sphere::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadD
 			if((Depth1 > DEPTH_TOLERANCE) && (Depth1 < MAX_DISTANCE))
 			{
 				IPoint = New_Ray.Evaluate(Depth1);
-				MTransPoint(*IPoint, *IPoint, Trans);
+				MTransPoint(IPoint, IPoint, Trans);
 
 				if(Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
 				{
@@ -118,7 +118,7 @@ bool Sphere::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadD
 			if((Depth2 > DEPTH_TOLERANCE) && (Depth2 < MAX_DISTANCE))
 			{
 				IPoint = New_Ray.Evaluate(Depth2);
-				MTransPoint(*IPoint, *IPoint, Trans);
+				MTransPoint(IPoint, IPoint, Trans);
 
 				if(Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
 				{

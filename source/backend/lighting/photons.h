@@ -27,9 +27,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/lighting/photons.h $
- * $Revision: #32 $
- * $Change: 6119 $
- * $DateTime: 2013/11/22 20:31:53 $
+ * $Revision: #33 $
+ * $Change: 6146 $
+ * $DateTime: 2013/11/29 17:08:55 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -153,6 +153,10 @@ class ScenePhotonSettings
 /* ------------------------------------------------------ */
 /* photon */
 /* ------------------------------------------------------ */
+
+typedef float PhotonScalar;
+typedef GenericVector3d<PhotonScalar> PhotonVector3d;
+
 struct Photon
 {
 	void init(unsigned char _info)
@@ -160,7 +164,7 @@ struct Photon
 		this->info = _info;
 	}
 
-	SNGL_VECT Loc;          /* location */
+	PhotonVector3d Loc;     /* location */
 	SMALL_COLOUR colour;    /* color & intensity (flux) */
 	unsigned char info;     /* info byte for kd-tree */
 	signed char theta, phi; /* incoming direction */
@@ -272,8 +276,8 @@ class PhotonGatherer
 		DBL Size_s;      // search radius (static)
 		DBL sqrt_dmax_s, dmax_s;      // dynamic search radius... current maximum
 		int TargetNum_s; // how many to gather
-		const DBL *pt_s;       // point around which we are gathering
-		const DBL *norm_s;     // surface normal
+		const Vector3d *pt_s;       // point around which we are gathering
+		const Vector3d *norm_s;     // surface normal
 		DBL flattenFactor; // amount to flatten the spher to make it
 		                   // an ellipsoid when gathering photons
 		                   // zero = no flatten, one = regular
@@ -285,8 +289,8 @@ class PhotonGatherer
 		PhotonGatherer(PhotonMap *map, ScenePhotonSettings& photonSettings);
 
 		void gatherPhotonsRec(int start, int end);
-		int gatherPhotons(const VECTOR pt, DBL Size, DBL *r, const VECTOR norm, bool flatten);
-		DBL gatherPhotonsAdaptive(const VECTOR pt, const VECTOR norm, bool flatten);
+		int gatherPhotons(const Vector3d* pt, DBL Size, DBL *r, const Vector3d* norm, bool flatten);
+		DBL gatherPhotonsAdaptive(const Vector3d* pt, const Vector3d* norm, bool flatten);
 
 		void PQInsert(Photon *photon, DBL d);
 		void FullPQInsert(Photon *photon, DBL d);
@@ -304,7 +308,7 @@ class PhotonMediaFunction : public MediaFunction
 	private:
 		shared_ptr<SceneData> sceneData;
 
-		void addMediaPhoton(const VECTOR Point, const VECTOR Origin, const RGBColour& LightCol, DBL depthDiff);
+		void addMediaPhoton(const Vector3d& Point, const Vector3d& Origin, const RGBColour& LightCol, DBL depthDiff);
 };
 
 class PhotonTrace : public Trace
@@ -322,7 +326,7 @@ class PhotonTrace : public Trace
 		PhotonMediaFunction mediaPhotons;
 		RadiosityFunctor noRadiosity;
 
-		void addSurfacePhoton(const VECTOR Point, const VECTOR Origin, const RGBColour& LightCol);
+		void addSurfacePhoton(const Vector3d& Point, const Vector3d& Origin, const RGBColour& LightCol);
 };
 
 // foward declaration
@@ -396,7 +400,7 @@ extern SinCosOptimizations sinCosData;
 /* global functions */
 /* for documentation of these functions, see photons.c */
 /* ------------------------------------------------------ */
-void ChooseRay(Ray &NewRay, const VECTOR Normal, const Ray &Ray, const VECTOR Raw_Normal, int WhichRay);
+void ChooseRay(Ray &NewRay, const Vector3d& Normal, const Ray &Ray, const Vector3d& Raw_Normal, int WhichRay);
 int GetPhotonStat(POVMSType a);
 
 }

@@ -127,8 +127,8 @@ bool HField::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadD
 
 	Thread->Stats()[Ray_HField_Tests]++;
 
-	MInvTransPoint(*Temp_Ray.Origin, *ray.Origin, Trans);
-	MInvTransDirection(*Temp_Ray.Direction, *ray.Direction, Trans);
+	MInvTransPoint(Temp_Ray.Origin, ray.Origin, Trans);
+	MInvTransDirection(Temp_Ray.Direction, ray.Direction, Trans);
 
 #ifdef HFIELD_EXTRA_STATS
 	Thread->Stats()[Ray_HField_Box_Tests]++;
@@ -362,7 +362,7 @@ void HField::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thre
 			Result = Vector3d(y2-y1, 1.0, y3-y1);
 		}
 
-		MTransNormal(*Result, *Result, Trans);
+		MTransNormal(Result, Result, Trans);
 	}
 
 	Result.normalize();

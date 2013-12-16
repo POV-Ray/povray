@@ -24,11 +24,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/pattern/pattern.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/pattern/pattern.h $
+ * $Revision: #29 $
+ * $Change: 6150 $
+ * $DateTime: 2013/11/30 14:13:48 $
+ * $Author: clipka $
  *******************************************************************************/
 
 /* NOTE: FRAME.H contains other pattern stuff. */
@@ -193,7 +193,7 @@ public:
 struct Crackle_Cache_Entry
 {
 	size_t last_used;
-	VECTOR data[81];
+	Vector3d data[81];
 };
 
 typedef boost::unordered_map<Crackle_Cell_Coord, Crackle_Cache_Entry, boost::hash<Crackle_Cell_Coord> > Crackle_Cache_Type;
@@ -212,13 +212,13 @@ typedef boost::unordered_map<Crackle_Cell_Coord, Crackle_Cache_Entry, boost::has
 * Global functions
 ******************************************************************************/
 
-DBL Evaluate_TPat (const TPATTERN *TPat, const VECTOR EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread);
+DBL Evaluate_TPat (const TPATTERN *TPat, const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread);
 void Init_TPat_Fields (TPATTERN *Tpat);
 void Copy_TPat_Fields (TPATTERN *New, const TPATTERN *Old);
 void Destroy_TPat_Fields (TPATTERN *Tpat);
-void Translate_Tpattern (TPATTERN *Tpattern, const VECTOR Vector);
-void Rotate_Tpattern (TPATTERN *Tpattern, const VECTOR Vector);
-void Scale_Tpattern (TPATTERN *Tpattern, const VECTOR Vector);
+void Translate_Tpattern (TPATTERN *Tpattern, const Vector3d& Vector);
+void Rotate_Tpattern (TPATTERN *Tpattern, const Vector3d& Vector);
+void Scale_Tpattern (TPATTERN *Tpattern, const Vector3d& Vector);
 void Transform_Tpattern (TPATTERN *Tpattern, const TRANSFORM *Trans);
 DBL quilt_cubic (DBL t,DBL p1,DBL p2);
 void Search_Blend_Map (DBL value, const BLEND_MAP *Blend_Map,
@@ -229,7 +229,7 @@ DENSITY_FILE *Create_Density_File ();
 DENSITY_FILE *Copy_Density_File (DENSITY_FILE *);
 void Destroy_Density_File (DENSITY_FILE *);
 void Read_Density_File (IStream *dfile, DENSITY_FILE *df);
-int PickInCube (const VECTOR tv, VECTOR p1);
+int PickInCube (const Vector3d& tv, Vector3d& p1);
 
 void InitializePatternGenerators(void);
 

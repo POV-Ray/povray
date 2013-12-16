@@ -22,11 +22,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/scene/view.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/scene/view.h $
+ * $Revision: #64 $
+ * $Change: 6147 $
+ * $DateTime: 2013/11/29 20:46:11 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #ifndef POVRAY_BACKEND_VIEW_H
@@ -497,8 +497,8 @@ class View
 		 *  returns true if so. comes in two versions, one for manual iteration of
 		 *  the object list, and one for a bounding tree.
 		 */
-		bool CheckCameraHollowObject(const VECTOR point); // TODO - comment incomplete - consider moving elsewhere [trf]
-		bool CheckCameraHollowObject(const VECTOR point, const BBOX_TREE *node); // TODO - comment missing - consider moving elsewhere [trf]
+		bool CheckCameraHollowObject(const Vector3d& point); // TODO - comment incomplete - consider moving elsewhere [trf]
+		bool CheckCameraHollowObject(const Vector3d& point, const BBOX_TREE *node); // TODO - comment missing - consider moving elsewhere [trf]
 };
 
 }

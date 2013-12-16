@@ -27,9 +27,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/lighting/photons.cpp $
- * $Revision: #62 $
- * $Change: 6120 $
- * $DateTime: 2013/11/23 06:59:22 $
+ * $Revision: #65 $
+ * $Change: 6150 $
+ * $DateTime: 2013/11/30 14:13:48 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -340,7 +340,7 @@ void PhotonTrace::ComputeLightedTexture(Colour& LightCol, const TEXTURE *Texture
 	    !Test_Flag(isect.Object,PH_IGNORE_PHOTONS_FLAG) &&
 	    Check_Photon_Light_Group(isect.Object))
 	{
-		addSurfacePhoton(*isect.IPoint, *ray.Origin, RGBColour(LightCol));
+		addSurfacePhoton(isect.IPoint, ray.Origin, RGBColour(LightCol));
 	}
 
 #ifndef PT_FILTER_BEFORE_TARGET
@@ -381,15 +381,15 @@ void PhotonTrace::ComputeLightedTexture(Colour& LightCol, const TEXTURE *Texture
 		if ((qualityFlags & Q_NORMAL) && (Layer->Tnormal != NULL))
 		{
 			for(vector<const TEXTURE *>::iterator i(warps.begin()); i != warps.end(); i++)
-				Warp_Normal(*LayNormal, *LayNormal, reinterpret_cast<const TPATTERN *>(*i), Test_Flag((*i), DONT_SCALE_BUMPS_FLAG));
+				Warp_Normal(LayNormal, LayNormal, reinterpret_cast<const TPATTERN *>(*i), Test_Flag((*i), DONT_SCALE_BUMPS_FLAG));
 
-			Perturb_Normal(*LayNormal, Layer->Tnormal, *ipoint, &isect, &ray, threadData);
+			Perturb_Normal(LayNormal, Layer->Tnormal, ipoint, &isect, &ray, threadData);
 
 			if((Test_Flag(Layer->Tnormal, DONT_SCALE_BUMPS_FLAG)))
 				LayNormal.normalize();
 
 			for(vector<const TEXTURE *>::reverse_iterator i(warps.rbegin()); i != warps.rend(); i++)
-				UnWarp_Normal(*LayNormal, *LayNormal, reinterpret_cast<const TPATTERN *>(*i), Test_Flag((*i), DONT_SCALE_BUMPS_FLAG));
+				UnWarp_Normal(LayNormal, LayNormal, reinterpret_cast<const TPATTERN *>(*i), Test_Flag((*i), DONT_SCALE_BUMPS_FLAG));
 		}
 
 		// Store top layer normal.
@@ -400,7 +400,7 @@ void PhotonTrace::ComputeLightedTexture(Colour& LightCol, const TEXTURE *Texture
 
 		// Get surface colour.
 		New_Weight = weight * Trans;
-		colour_found = Compute_Pigment(LayCol, Layer->Pigment, *ipoint, &isect, &ray, threadData);
+		colour_found = Compute_Pigment(LayCol, Layer->Pigment, ipoint, &isect, &ray, threadData);
 
 		Att = Trans * (1.0 - min(1.0, (DBL)(LayCol.filter() + LayCol.transm())));
 
@@ -602,8 +602,8 @@ void PhotonTrace::ComputeLightedTexture(Colour& LightCol, const TEXTURE *Texture
 
 	if (doDiffuse)
 	{
-		//ChooseRay(Ray &NewRay, VECTOR Normal, Ray &ray, VECTOR Raw_Normal, int WhichRay)
-		ChooseRay(NewRay, *LayNormal, ray, *rawnormal, rand()%400);
+		//ChooseRay(Ray &NewRay, Vector3d& Normal, Ray &ray, Vector3d& Raw_Normal, int WhichRay)
+		ChooseRay(NewRay, LayNormal, ray, rawnormal, rand()%400);
 
 		Colour CurLightCol;
 		CurLightCol.red() = LightCol.red()*ResCol.red();
@@ -898,13 +898,13 @@ bool PhotonTrace::TraceRefractionRayForPhotons(const FINISH* finish, const Vecto
 
 ******************************************************************************/
 
-void PhotonTrace::addSurfacePhoton(const VECTOR Point, const VECTOR Origin, const RGBColour& LightCol)
+void PhotonTrace::addSurfacePhoton(const Vector3d& Point, const Vector3d& Origin, const RGBColour& LightCol)
 {
 	// TODO FIXME - this seems to have a lot in common with addMediaPhoton()
 	Photon *Photon;
 	RGBColour LightCol2;
 	DBL Attenuation;
-	VECTOR d;
+	Vector3d d;
 	DBL d_len, phi, theta;
 	PhotonMap *map;
 
@@ -944,11 +944,10 @@ void PhotonTrace::addSurfacePhoton(const VECTOR Point, const VECTOR Origin, cons
 	colour2photonRgbe(Photon->colour, LightCol2);
 
 	// store the location
-	Assign_Vector(Photon->Loc, Point);
+	Photon->Loc = PhotonVector3d(Point);
 
 	// now determine rotation angles
-	VSub(d,Origin, Point);
-	VNormalizeEq(d);
+	d = (Origin - Point).normalized();
 	d_len = sqrt(d[X]*d[X]+d[Z]*d[Z]);
 
 	phi = acos(d[X]/d_len);
@@ -990,13 +989,13 @@ PhotonMediaFunction::PhotonMediaFunction(shared_ptr<SceneData> sd, TraceThreadDa
 
 ******************************************************************************/
 
-void PhotonMediaFunction::addMediaPhoton(const VECTOR Point, const VECTOR Origin, const RGBColour& LightCol, DBL depthDiff)
+void PhotonMediaFunction::addMediaPhoton(const Vector3d& Point, const Vector3d& Origin, const RGBColour& LightCol, DBL depthDiff)
 {
 	// TODO FIXME - this seems to have a lot in common with addSurfacePhoton()
 	Photon *Photon;
 	RGBColour LightCol2;
 	DBL Attenuation;
-	VECTOR d;
+	Vector3d d;
 	DBL d_len, phi, theta;
 
 	// first, compensate for POV's weird light attenuation
@@ -1031,11 +1030,10 @@ void PhotonMediaFunction::addMediaPhoton(const VECTOR Point, const VECTOR Origin
 	colour2photonRgbe(Photon->colour, LightCol2);
 
 	// store the location
-	Assign_Vector(Photon->Loc, Point);
+	Photon->Loc = PhotonVector3d(Point);
 
 	// now determine rotation angles
-	VSub(d,Origin, Point);
-	VNormalizeEq(d);
+	d = (Origin - Point).normalized();
 	d_len = sqrt(d[X]*d[X]+d[Z]*d[Z]);
 
 	phi = acos(d[X]/d_len);
@@ -1210,7 +1208,7 @@ void PhotonMediaFunction::DepositMediaPhotons(Colour& colour, MediaVector& media
 				Vector3d TempPoint;
 				TempPoint = ray.Evaluate(d0*(*i).ds+(*i).s0);
 
-				addMediaPhoton(*TempPoint, *ray.Origin, PhotonColour, d0*(*i).ds+(*i).s0);
+				addMediaPhoton(TempPoint, ray.Origin, PhotonColour, d0*(*i).ds+(*i).s0);
 			}
 		}
 	}
@@ -1512,7 +1510,7 @@ void ShootingDirection::recomputeForAreaLight(Ray& ray, int area_x, int area_y)
 	// ray's initial point and ending points are both jittered to
 	// produce the area-light effect.
 	DBL Jitter_u, Jitter_v, ScaleFactor;
-	VECTOR NewAxis1, NewAxis2;
+	Vector3d NewAxis1, NewAxis2;
 
 	/*
 	Jitter_u = (int)(FRAND()*Light->Area_Size1);
@@ -1524,26 +1522,26 @@ void ShootingDirection::recomputeForAreaLight(Ray& ray, int area_x, int area_y)
 	if (light->Area_Size1 > 1)
 	{
 		ScaleFactor = Jitter_u/(DBL)(light->Area_Size1 - 1) - 0.5;
-		VScale (NewAxis1, light->Axis1, ScaleFactor);
+		NewAxis1 = light->Axis1 * ScaleFactor;
 	}
 	else
 	{
-		Make_Vector(NewAxis1, 0.0, 0.0, 0.0);
+		NewAxis1 = Vector3d(0.0, 0.0, 0.0);
 	}
 
 	if (light->Area_Size2 > 1)
 	{
 		ScaleFactor = Jitter_v/(DBL)(light->Area_Size2 - 1) - 0.5;
-		VScale (NewAxis2, light->Axis2, ScaleFactor);
+		NewAxis2 = light->Axis2 * ScaleFactor;
 	}
 	else
 	{
-		Make_Vector(NewAxis2, 0.0, 0.0, 0.0);
+		NewAxis2 = Vector3d(0.0, 0.0, 0.0);
 	}
 
 	// need a new toctr & left
-	ray.Origin += Vector3d(NewAxis1);
-	ray.Origin += Vector3d(NewAxis2);
+	ray.Origin += NewAxis1;
+	ray.Origin += NewAxis2;
 
 	toctr = ctr - ray.Origin;
 	dist = toctr.length();
@@ -1576,7 +1574,7 @@ void ShootingDirection::compute()
 	rad = v.length();
 
 	// find direction from object to bounding sphere
-	toctr = ctr - Vector3d(light->Center);
+	toctr = ctr - light->Center;
 	dist = toctr.length();
 
 	toctr.normalize(); // TODO - toctr /= dist  should do the job
@@ -1595,7 +1593,7 @@ void ShootingDirection::compute()
 	{
 		// for parallel lights, left is actually perpendicular to the direction of the
 		// light source
-		left = cross(Vector3d(light->Direction), up).normalized();
+		left = cross(light->Direction, up).normalized();
 	}
 	else
 	{
@@ -1834,7 +1832,7 @@ void PhotonMap::halfSortRec(int left, int right, int d, int mid)
 void PhotonMap::sortAndSubdivide(int start, int end, int /*sorted*/)
 {
 	int i,j;             // counters
-	SNGL_VECT min,max;   // min/max vectors for finding range
+	PhotonVector3d min,max; // min/max vectors for finding range
 	int DimToUse;        // which dimesion has the greatest range
 	int mid;             // index of median (middle)
 	int len;             // length of the array we're sorting
@@ -1849,8 +1847,8 @@ void PhotonMap::sortAndSubdivide(int start, int end, int /*sorted*/)
 
 	// loop and find greatest range
 
-	Make_Vector(min, 1/EPSILON, 1/EPSILON, 1/EPSILON);
-	Make_Vector(max, -1/EPSILON, -1/EPSILON, -1/EPSILON);
+	min = PhotonVector3d(1/EPSILON);  // TODO - should probably use  numeric_limits<PhotonScalar>::max() instead of  1/EPSILON
+	max = PhotonVector3d(-1/EPSILON); // TODO - should probably use -numeric_limits<PhotonScalar>::max() instead of -1/EPSILON
 
 	for(i=start; i<=end; i++)
 	{
@@ -1941,7 +1939,7 @@ void PhotonMap::setGatherOptions(ScenePhotonSettings &photonSettings, int mediaM
 {
 	DBL r;
 	DBL density;
-	VECTOR Point;
+	Vector3d Point;
 	int numToSample;
 	int n,i,j;
 	DBL mind,maxd,avgd;
@@ -1968,11 +1966,11 @@ void PhotonMap::setGatherOptions(ScenePhotonSettings &photonSettings, int mediaM
 		{
 			j = rand() % this->numPhotons;
 
-			Assign_Vector(Point,(PHOTON_AMF(this->head, j)).Loc);
+			Point = Vector3d((PHOTON_AMF(this->head, j)).Loc);
 
 			// TODO FIXME (this allocates then frees memory each time around the loop)
 			PhotonGatherer gatherer(this, photonSettings);
-			n=gatherer.gatherPhotons(Point, 10000000.0, &r, NULL, false);
+			n=gatherer.gatherPhotons(&Point, 10000000.0, &r, NULL, false);
 
 			// sometimes, if we gather all (100) photons at a single point, the radius will
 			// be zero, which will lead to an infinite density, which will mess up all the
@@ -2017,9 +2015,9 @@ void PhotonMap::setGatherOptions(ScenePhotonSettings &photonSettings, int mediaM
 		{
 			j = rand() % this->numPhotons;
 
-			Assign_Vector(Point,(PHOTON_AMF(this->head, j)).Loc);
+			Point = Vector3d((PHOTON_AMF(this->head, j)).Loc);
 
-			n=gatherPhotons(Point, 10000000.0, &r, NULL, false, map);
+			n=gatherPhotons(&Point, 10000000.0, &r, NULL, false, map);
 
 			if(mediaMap)
 				density = 3.0 * n / (4.0*M_PI*r*r*r); // should that be 4/3?
@@ -2048,10 +2046,10 @@ void PhotonMap::setGatherOptions(ScenePhotonSettings &photonSettings, int mediaM
 		{
 			j = rand() % this->numPhotons;
 
-			Assign_Vector(Point,(PHOTON_AMF(this->head, j)).Loc);
+			Point = Vector3d((PHOTON_AMF(this->head, j)).Loc);
 
 			PhotonGatherer gatherer(this, photonSettings);
-			n=gatherer.gatherPhotons(Point, this->minGatherRad, &r, NULL, false);
+			n=gatherer.gatherPhotons(&Point, this->minGatherRad, &r, NULL, false);
 
 			if(r>0)
 			{
@@ -2322,7 +2320,7 @@ void PhotonGatherer::gatherPhotonsRec(int start, int end)
 	DBL d,dx,dy,dz;
 	int mid;
 	Photon *photon;
-	VECTOR ptToPhoton;
+	Vector3d ptToPhoton;
 	DBL discFix;   // use disc(ellipsoid) for gathering instead of sphere
 
 	// find midpoint
@@ -2334,9 +2332,7 @@ void PhotonGatherer::gatherPhotonsRec(int start, int end)
 	// check this photon
 
 	// find distance from pt
-	ptToPhoton[X] = - pt_s[X] + photon->Loc[X];
-	ptToPhoton[Y] = - pt_s[Y] + photon->Loc[Y];
-	ptToPhoton[Z] = - pt_s[Z] + photon->Loc[Z];
+	ptToPhoton = - (*pt_s) + Vector3d(photon->Loc);
 	// all distances are squared
 	dx = ptToPhoton[X]*ptToPhoton[X];
 	dy = ptToPhoton[Y]*ptToPhoton[Y];
@@ -2358,13 +2354,13 @@ void PhotonGatherer::gatherPhotonsRec(int start, int end)
 		// dmax_s is square of radius of major axis
 		// dmax_s/16 is  "   "   "     " minor  "    (1/6 of major axis)
 		/*
-		VDot(discFix,norm_s,ptToPhoton);
+		discFix = dot(*norm_s,ptToPhoton);
 		discFix*=discFix*(dmax_s/1000.0-dmax_s); // TODO FIXME - magic number
 		*/
 
 		if (flattenFactor!=0.0)
 		{
-			VDot(discFix,norm_s,ptToPhoton);
+			discFix = dot(*norm_s,ptToPhoton);
 			discFix = fabs(discFix);
 			d += flattenFactor*(discFix)*d*16;
 		}
@@ -2386,7 +2382,7 @@ void PhotonGatherer::gatherPhotonsRec(int start, int end)
 	// now go left & right if appropriate - if going left or right goes out
 	// the current range, then don't go that way.
 	/*
-	delta=pt_s[DimToUse]-photon->Loc[DimToUse];
+	delta=(*pt_s)[DimToUse]-photon->Loc[DimToUse];
 	if(delta<0)
 	{
 		if (end>=mid+1) gatherPhotonsRec(start, mid - 1);
@@ -2400,16 +2396,16 @@ void PhotonGatherer::gatherPhotonsRec(int start, int end)
 			if (end>=mid+1) gatherPhotonsRec(start, mid - 1);
 	}
 	*/
-	delta=pt_s[DimToUse]-photon->Loc[DimToUse];
+	delta=(*pt_s)[DimToUse]-photon->Loc[DimToUse];
 	if(delta<0)
 	{
 		// on left - go left first
-		if (pt_s[DimToUse]-sqrt_dmax_s < photon->Loc[DimToUse])
+		if ((*pt_s)[DimToUse]-sqrt_dmax_s < photon->Loc[DimToUse])
 		{
 			if (mid-1>=start)
 				gatherPhotonsRec(start, mid - 1);
 		}
-		if (pt_s[DimToUse]+sqrt_dmax_s > photon->Loc[DimToUse])
+		if ((*pt_s)[DimToUse]+sqrt_dmax_s > photon->Loc[DimToUse])
 		{
 			if(end>=mid+1)
 				gatherPhotonsRec(mid + 1, end);
@@ -2418,12 +2414,12 @@ void PhotonGatherer::gatherPhotonsRec(int start, int end)
 	else
 	{
 		// on right - go right first
-		if (pt_s[DimToUse]+sqrt_dmax_s > photon->Loc[DimToUse])
+		if ((*pt_s)[DimToUse]+sqrt_dmax_s > photon->Loc[DimToUse])
 		{
 			if(end>=mid+1)
 				gatherPhotonsRec(mid + 1, end);
 		}
-		if (pt_s[DimToUse]-sqrt_dmax_s < photon->Loc[DimToUse])
+		if ((*pt_s)[DimToUse]-sqrt_dmax_s < photon->Loc[DimToUse])
 		{
 			if (mid-1>=start)
 				gatherPhotonsRec(start, mid - 1);
@@ -2458,7 +2454,7 @@ void PhotonGatherer::gatherPhotonsRec(int start, int end)
 
 ******************************************************************************/
 
-int PhotonGatherer::gatherPhotons(const VECTOR pt, DBL Size, DBL *r, const VECTOR norm, bool flatten)
+int PhotonGatherer::gatherPhotons(const Vector3d* pt, DBL Size, DBL *r, const Vector3d* norm, bool flatten)
 {
 	if (map->numPhotons<=0) return 0; // no crashes, please...
 
@@ -2503,7 +2499,7 @@ PhotonGatherer::PhotonGatherer(PhotonMap *map, ScenePhotonSettings& photonSettin
 	gathered = false;
 }
 
-DBL PhotonGatherer::gatherPhotonsAdaptive(const VECTOR pt, const VECTOR norm, bool flatten)
+DBL PhotonGatherer::gatherPhotonsAdaptive(const Vector3d* pt, const Vector3d* norm, bool flatten)
 {
 	// set up initial radius
 	int num;
@@ -2598,46 +2594,46 @@ extern BYTE_XYZ rad_samples[];
 
 /******************************************************************
 ******************************************************************/
-void ChooseRay(Ray &NewRay, const VECTOR Normal, const Ray & /*ray*/, const VECTOR Raw_Normal, int WhichRay)
+void ChooseRay(Ray &NewRay, const Vector3d& Normal, const Ray & /*ray*/, const Vector3d& Raw_Normal, int WhichRay)
 {
 	Vector3d random_vec;
-	VECTOR up, n2, n3;
+	Vector3d up, n2, n3;
 	int i;
 	DBL NRay_Direction;
 
 #define REFLECT_FOR_RADIANCE 0
 #if (REFLECT_FOR_RADIANCE)
 	// Get direction of reflected ray.
-	DBL n = -2.0 * (ray.Direction[X] * Normal[X] + ray.Direction[Y] * Normal[Y] + ray.Direction[Z] * Normal[Z]);
+	DBL n = -2.0 * dot(ray.Direction, Normal);
 
-	NewRay.Direction = n * Vector3d(Normal) + ray.Direction;
+	NewRay.Direction = n * Normal + ray.Direction;
 
-	NRay_Direction = dot(NewRay.Direction, Vector3d(Raw_Normal));
+	NRay_Direction = dot(NewRay.Direction, Raw_Normal);
 	if (NRay_Direction < 0.0)
 	{
 		// subtract 2*(projection of NRay.Direction onto Raw_Normal)
 		// from NRay.Direction
 		DBL Proj;
 		Proj = NRay_Direction * -2;
-		NewRay.Direction += Proj * Vector3d(Raw_Normal);
+		NewRay.Direction += Proj * Raw_Normal;
 	}
 	return;
 #else
-	NewRay.Direction = Vector3d(Normal);
+	NewRay.Direction = Normal;
 #endif
 
 	if ( fabs(fabs(NewRay.Direction[Z])- 1.) < .1 )
 	{
 		// too close to vertical for comfort, so use cross product with horizon
-		up[X] = 0.; up[Y] = 1.; up[Z] = 0.;
+		up = Vector3d(0., 1., 0.);
 	}
 	else
 	{
-		up[X] = 0.; up[Y] = 0.; up[Z] = 1.;
+		up = Vector3d(0., 0., 1.);
 	}
 
-	VCross(n2, *NewRay.Direction, up);  VNormalizeEq(n2);
-	VCross(n3, *NewRay.Direction, n2);  VNormalizeEq(n3);
+	n2 = cross(NewRay.Direction, up).normalized();
+	n3 = cross(NewRay.Direction, n2).normalized();
 
 	// TODO FIXME - Magic Numbers
 	//i = (int)(FRAND()*1600);
@@ -2654,21 +2650,19 @@ void ChooseRay(Ray &NewRay, const VECTOR Normal, const Ray & /*ray*/, const VECT
 	}
 	else
 	{
-		NewRay.Direction[X] = n2[X]*random_vec[X] + NewRay.Direction[X]*random_vec[Y] + n3[X]*random_vec[Z];
-		NewRay.Direction[Y] = n2[Y]*random_vec[X] + NewRay.Direction[Y]*random_vec[Y] + n3[Y]*random_vec[Z];
-		NewRay.Direction[Z] = n2[Z]*random_vec[X] + NewRay.Direction[Z]*random_vec[Y] + n3[Z]*random_vec[Z];
+		NewRay.Direction = n2*random_vec[X] + NewRay.Direction*random_vec[Y] + n3*random_vec[Z];
 	}
 
 	// if our new ray goes through, flip it back across raw_normal
 
-	VDot(NRay_Direction, *NewRay.Direction, Raw_Normal);
+	NRay_Direction = dot(NewRay.Direction, Raw_Normal);
 	if (NRay_Direction < 0.0)
 	{
 		// subtract 2*(projection of NRay.Direction onto Raw_Normal)
 		// from NRay.Direction
 		DBL Proj;
 		Proj = NRay_Direction * -2;
-		NewRay.Direction += Proj * Vector3d(Raw_Normal);
+		NewRay.Direction += Proj * Raw_Normal;
 	}
 
 	NewRay.Direction.normalize();

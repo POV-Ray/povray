@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/interior/media.h $
- * $Revision: #21 $
- * $Change: 6095 $
- * $DateTime: 2013/11/18 06:02:33 $
+ * $Revision: #22 $
+ * $Change: 6146 $
+ * $DateTime: 2013/11/29 17:08:55 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -88,7 +88,7 @@ class MediaFunction : public Trace::MediaFunctor
 		void ComputeOneMediaSampleRecursive(MediaVector& medias, LightSourceEntryVector& lights, MediaInterval& mediainterval, const Ray& ray,
 		                                    DBL d1, DBL d3, RGBColour& Result, const RGBColour& C1, const RGBColour& C3, RGBColour& ODResult, const RGBColour& od1, const RGBColour& od3,
 		                                    int depth, DBL Jitter, DBL aa_threshold, bool ignore_photons, bool use_scattering, bool photonPass, Trace::TraceTicket& ticket);
-		void ComputeMediaPhotons(MediaVector& medias, RGBColour& Te, const RGBColour& Sc, const Ray& ray, const VECTOR H);
+		void ComputeMediaPhotons(MediaVector& medias, RGBColour& Te, const RGBColour& Sc, const Ray& ray, const Vector3d& H);
 		void ComputeMediaScatteringAttenuation(MediaVector& medias, RGBColour& OutputColor, const RGBColour& Sc, const RGBColour& Light_Colour, const Ray &ray, const Ray &Light_Ray);
 };
 

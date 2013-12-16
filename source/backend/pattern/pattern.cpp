@@ -86,53 +86,53 @@ static int CrackleCubeTable[81*3];
 * Static functions
 ******************************************************************************/
 
-static DBL agate_pattern (const VECTOR EPoint, const TPATTERN *TPat, int noise_generator);
-static DBL boxed_pattern (const VECTOR EPoint);
-static DBL brick_pattern (const VECTOR EPoint, const TPATTERN *TPat);
-static DBL cells_pattern (const VECTOR EPoint);
-static DBL checker_pattern (const VECTOR EPoint);
-static DBL crackle_pattern (const VECTOR EPoint, const TPATTERN *TPat, TraceThreadData *Thread);
-static DBL cylindrical_pattern (const VECTOR EPoint);
-static DBL dents_pattern (const VECTOR EPoint, int noise_generator);
-static DBL density_pattern (const VECTOR EPoint, const TPATTERN *TPat);
-static DBL function_pattern (const VECTOR EPoint, const TPATTERN *TPat, TraceThreadData *Thread);
-static DBL gradient_pattern (const VECTOR EPoint, const TPATTERN *TPat);
-static DBL granite_pattern (const VECTOR EPoint, int noise_generator);
-static DBL hexagon_pattern (const VECTOR EPoint);
-static DBL square_pattern (const VECTOR EPoint);
-static DBL triangular_pattern (const VECTOR EPoint);
-static DBL cubic_pattern (const VECTOR EPoint);
-static DBL julia_pattern (const VECTOR EPoint, const TPATTERN *TPat);
-static DBL julia3_pattern (const VECTOR EPoint, const TPATTERN *TPat);
-static DBL julia4_pattern (const VECTOR EPoint, const TPATTERN *TPat);
-static DBL juliax_pattern (const VECTOR EPoint, const TPATTERN *TPat);
-static DBL leopard_pattern (const VECTOR EPoint);
-static DBL magnet1m_pattern (const VECTOR EPoint, const TPATTERN *TPat);
-static DBL magnet1j_pattern (const VECTOR EPoint, const TPATTERN *TPat);
-static DBL magnet2m_pattern (const VECTOR EPoint, const TPATTERN *TPat);
-static DBL magnet2j_pattern (const VECTOR EPoint, const TPATTERN *TPat);
-static DBL mandel_pattern (const VECTOR EPoint, const TPATTERN *TPat);
-static DBL mandel3_pattern (const VECTOR EPoint, const TPATTERN *TPat);
-static DBL mandel4_pattern (const VECTOR EPoint, const TPATTERN *TPat);
-static DBL mandelx_pattern (const VECTOR EPoint, const TPATTERN *TPat);
-static DBL marble_pattern (const VECTOR EPoint, const TPATTERN *TPat, int noise_generator);
-static DBL object_pattern (const VECTOR EPoint, const TPATTERN *TPat, TraceThreadData *Thread);
-static DBL onion_pattern (const VECTOR EPoint);
-static DBL pavement_pattern (const VECTOR EPoint, const TPATTERN *TPat);
-static DBL pigment_pattern (const VECTOR EPoint, const TPATTERN *TPat, const Intersection *isect, const Ray *ray, TraceThreadData *Thread);
-static DBL planar_pattern (const VECTOR EPoint);
-static DBL quilted_pattern (const VECTOR EPoint, const TPATTERN *TPat);
-static DBL radial_pattern (const VECTOR EPoint);
-static DBL ripples_pattern (const VECTOR EPoint, const TPATTERN *TPat, const TraceThreadData *Thread);
-static DBL slope_pattern (const VECTOR EPoint, const TPATTERN *TPat, const Intersection *Intersection);
+static DBL agate_pattern (const Vector3d& EPoint, const TPATTERN *TPat, int noise_generator);
+static DBL boxed_pattern (const Vector3d& EPoint);
+static DBL brick_pattern (const Vector3d& EPoint, const TPATTERN *TPat);
+static DBL cells_pattern (const Vector3d& EPoint);
+static DBL checker_pattern (const Vector3d& EPoint);
+static DBL crackle_pattern (const Vector3d& EPoint, const TPATTERN *TPat, TraceThreadData *Thread);
+static DBL cylindrical_pattern (const Vector3d& EPoint);
+static DBL dents_pattern (const Vector3d& EPoint, int noise_generator);
+static DBL density_pattern (const Vector3d& EPoint, const TPATTERN *TPat);
+static DBL function_pattern (const Vector3d& EPoint, const TPATTERN *TPat, TraceThreadData *Thread);
+static DBL gradient_pattern (const Vector3d& EPoint, const TPATTERN *TPat);
+static DBL granite_pattern (const Vector3d& EPoint, int noise_generator);
+static DBL hexagon_pattern (const Vector3d& EPoint);
+static DBL square_pattern (const Vector3d& EPoint);
+static DBL triangular_pattern (const Vector3d& EPoint);
+static DBL cubic_pattern (const Vector3d& EPoint);
+static DBL julia_pattern (const Vector3d& EPoint, const TPATTERN *TPat);
+static DBL julia3_pattern (const Vector3d& EPoint, const TPATTERN *TPat);
+static DBL julia4_pattern (const Vector3d& EPoint, const TPATTERN *TPat);
+static DBL juliax_pattern (const Vector3d& EPoint, const TPATTERN *TPat);
+static DBL leopard_pattern (const Vector3d& EPoint);
+static DBL magnet1m_pattern (const Vector3d& EPoint, const TPATTERN *TPat);
+static DBL magnet1j_pattern (const Vector3d& EPoint, const TPATTERN *TPat);
+static DBL magnet2m_pattern (const Vector3d& EPoint, const TPATTERN *TPat);
+static DBL magnet2j_pattern (const Vector3d& EPoint, const TPATTERN *TPat);
+static DBL mandel_pattern (const Vector3d& EPoint, const TPATTERN *TPat);
+static DBL mandel3_pattern (const Vector3d& EPoint, const TPATTERN *TPat);
+static DBL mandel4_pattern (const Vector3d& EPoint, const TPATTERN *TPat);
+static DBL mandelx_pattern (const Vector3d& EPoint, const TPATTERN *TPat);
+static DBL marble_pattern (const Vector3d& EPoint, const TPATTERN *TPat, int noise_generator);
+static DBL object_pattern (const Vector3d& EPoint, const TPATTERN *TPat, TraceThreadData *Thread);
+static DBL onion_pattern (const Vector3d& EPoint);
+static DBL pavement_pattern (const Vector3d& EPoint, const TPATTERN *TPat);
+static DBL pigment_pattern (const Vector3d& EPoint, const TPATTERN *TPat, const Intersection *isect, const Ray *ray, TraceThreadData *Thread);
+static DBL planar_pattern (const Vector3d& EPoint);
+static DBL quilted_pattern (const Vector3d& EPoint, const TPATTERN *TPat);
+static DBL radial_pattern (const Vector3d& EPoint);
+static DBL ripples_pattern (const Vector3d& EPoint, const TPATTERN *TPat, const TraceThreadData *Thread);
+static DBL slope_pattern (const Vector3d& EPoint, const TPATTERN *TPat, const Intersection *Intersection);
 static DBL aoi_pattern (const Intersection *Intersection, const Ray *ray);
-static DBL spiral1_pattern (const VECTOR EPoint, const TPATTERN *TPat, int noise_generator);
-static DBL spiral2_pattern (const VECTOR EPoint, const TPATTERN *TPat, int noise_generator);
-static DBL spherical_pattern (const VECTOR EPoint);
-static DBL tiling_pattern (const VECTOR EPoint, const TPATTERN *TPat);
-static DBL waves_pattern (const VECTOR EPoint, const TPATTERN *TPat, const TraceThreadData *Thread);
-static DBL wood_pattern (const VECTOR EPoint, const TPATTERN *TPat);
-static DBL wrinkles_pattern (const VECTOR EPoint, int noise_generator);
+static DBL spiral1_pattern (const Vector3d& EPoint, const TPATTERN *TPat, int noise_generator);
+static DBL spiral2_pattern (const Vector3d& EPoint, const TPATTERN *TPat, int noise_generator);
+static DBL spherical_pattern (const Vector3d& EPoint);
+static DBL tiling_pattern (const Vector3d& EPoint, const TPATTERN *TPat);
+static DBL waves_pattern (const Vector3d& EPoint, const TPATTERN *TPat, const TraceThreadData *Thread);
+static DBL wood_pattern (const Vector3d& EPoint, const TPATTERN *TPat);
+static DBL wrinkles_pattern (const Vector3d& EPoint, int noise_generator);
 
 static DBL fractal_exterior_color(const TPATTERN *TPat, int iters, DBL a, DBL b);
 static DBL fractal_interior_color(const TPATTERN *TPat, int iters, DBL a, DBL b, DBL mindist2);
@@ -215,7 +215,7 @@ int GetNoiseGen (const TPATTERN *TPat, const TraceThreadData *Thread)
 *
 ******************************************************************************/
 
-DBL Evaluate_TPat (const TPATTERN *TPat, const VECTOR EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread)
+DBL Evaluate_TPat (const TPATTERN *TPat, const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread)
 {
 	DBL value = 0.0;
 
@@ -496,7 +496,7 @@ TURB *Create_Turb()
 
 	New = reinterpret_cast<TURB *>(POV_MALLOC(sizeof(TURB),"turbulence struct"));
 
-	Make_Vector(New->Turbulence, 0.0, 0.0, 0.0);
+	New->Turbulence = Vector3d(0.0, 0.0, 0.0);
 
 	New->Octaves = 6;
 	New->Omega = 0.5;
@@ -528,7 +528,7 @@ TURB *Create_Turb()
 *
 ******************************************************************************/
 
-void Translate_Tpattern(TPATTERN *Tpattern, const VECTOR Vector)
+void Translate_Tpattern(TPATTERN *Tpattern, const Vector3d& Vector)
 {
 	TRANSFORM Trans;
 
@@ -563,7 +563,7 @@ void Translate_Tpattern(TPATTERN *Tpattern, const VECTOR Vector)
 *
 ******************************************************************************/
 
-void Rotate_Tpattern(TPATTERN *Tpattern, const VECTOR Vector)
+void Rotate_Tpattern(TPATTERN *Tpattern, const Vector3d& Vector)
 {
 	TRANSFORM Trans;
 
@@ -598,7 +598,7 @@ void Rotate_Tpattern(TPATTERN *Tpattern, const VECTOR Vector)
 *
 ******************************************************************************/
 
-void Scale_Tpattern(TPATTERN *Tpattern, const VECTOR Vector)
+void Scale_Tpattern(TPATTERN *Tpattern, const Vector3d& Vector)
 {
 	TRANSFORM Trans;
 
@@ -783,7 +783,7 @@ static const TURB *Search_For_Turb(const WARP *Warps)
 *
 ******************************************************************************/
 
-static DBL tiling_square (const VECTOR EPoint)
+static DBL tiling_square (const Vector3d& EPoint)
 {
 	/* 
 	 ** Classical square tiling
@@ -800,7 +800,7 @@ static DBL tiling_square (const VECTOR EPoint)
 	return max(x,z);
 }
 
-static DBL tiling_hexagon (const VECTOR EPoint)
+static DBL tiling_hexagon (const Vector3d& EPoint)
 {
 	/* 
 	 ** Classical Hexagon tiling
@@ -852,7 +852,7 @@ static DBL tiling_hexagon (const VECTOR EPoint)
 	return answer;
 }
 
-static DBL tiling_triangle (const VECTOR EPoint)
+static DBL tiling_triangle (const Vector3d& EPoint)
 {
 	DBL x,z;
 	DBL slop1;
@@ -895,7 +895,7 @@ static DBL tiling_triangle (const VECTOR EPoint)
 	return delta/2.0+(0.5)*max(dist1,dist2);
 }
 
-static DBL tiling_lozenge (const VECTOR EPoint)
+static DBL tiling_lozenge (const Vector3d& EPoint)
 {
 	DBL x,z;
 	DBL slop1;
@@ -937,7 +937,7 @@ static DBL tiling_lozenge (const VECTOR EPoint)
 	return max(dist1,dist2);
 }
 
-static DBL tiling_rhombus (const VECTOR EPoint)
+static DBL tiling_rhombus (const Vector3d& EPoint)
 {
 	DBL x,z;
 	DBL answer;
@@ -1031,7 +1031,7 @@ static DBL tiling_rhombus (const VECTOR EPoint)
 	return answer;
 }
 
-static DBL tiling_rectangle (const VECTOR EPoint)
+static DBL tiling_rectangle (const Vector3d& EPoint)
 {
 	/*
 	 ** Tiling with rectangles
@@ -1123,7 +1123,7 @@ static DBL tiling_rectangle (const VECTOR EPoint)
 	return answer;
 }
 
-static DBL tiling_octa_square (const VECTOR EPoint)
+static DBL tiling_octa_square (const Vector3d& EPoint)
 {
 	/*
 	 ** Tiling with a square and an octagon
@@ -1156,7 +1156,7 @@ static DBL tiling_octa_square (const VECTOR EPoint)
 	return max(0.500000000001,max(dist1,dist2)); // TODO FIXME - magic number! Use nextafter() instead (or maybe actually 0.5)
 }
 
-static DBL tiling_square_triangle (const VECTOR EPoint)
+static DBL tiling_square_triangle (const Vector3d& EPoint)
 {
 	DBL x,z;
 	DBL slop1;
@@ -1220,7 +1220,7 @@ static DBL tiling_square_triangle (const VECTOR EPoint)
 	}
 }
 
-static DBL tiling_hexa_triangle (const VECTOR EPoint)
+static DBL tiling_hexa_triangle (const Vector3d& EPoint)
 {
 	/* 
 	 ** Tiling with a hexagon and 2 triangles
@@ -1280,7 +1280,7 @@ static DBL tiling_hexa_triangle (const VECTOR EPoint)
 	return answer;
 }
 
-static DBL tiling_square_offset (const VECTOR EPoint)
+static DBL tiling_square_offset (const Vector3d& EPoint)
 {
 	/*
 	 ** Tiling with a square, offset of half size
@@ -1303,7 +1303,7 @@ static DBL tiling_square_offset (const VECTOR EPoint)
 	return max(x,z);
 }
 
-static DBL tiling_square_rectangle (const VECTOR EPoint)
+static DBL tiling_square_rectangle (const Vector3d& EPoint)
 {
 	/*
 	 ** tiling with a central square and 4 rectangle (2x1)
@@ -1377,7 +1377,7 @@ static DBL tiling_square_rectangle (const VECTOR EPoint)
 	return ((max(x,z))+delta)/3.0 ;
 }
 
-static DBL tiling_rectangle_square (const VECTOR EPoint)
+static DBL tiling_rectangle_square (const Vector3d& EPoint)
 {
 	/*
 	 ** Tiling with a central square and 4 rectangles (2x1)
@@ -1455,7 +1455,7 @@ static DBL tiling_rectangle_square (const VECTOR EPoint)
 	return ((max(x,z))+delta)/3.0 ;
 }
 
-static DBL tiling_square_internal (const VECTOR EPoint)
+static DBL tiling_square_internal (const Vector3d& EPoint)
 {
 	DBL answer=0;
 	DBL x,z;
@@ -1518,7 +1518,7 @@ static DBL tiling_square_internal (const VECTOR EPoint)
 	return answer;
 }
 
-static DBL tiling_square_internal_5 (const VECTOR EPoint)
+static DBL tiling_square_internal_5 (const Vector3d& EPoint)
 {
 	DBL answer=0;
 	DBL x,z;
@@ -1590,7 +1590,7 @@ static DBL tiling_square_internal_5 (const VECTOR EPoint)
 	return answer;
 }
 
-static DBL tiling_square_double (const VECTOR EPoint)
+static DBL tiling_square_double (const Vector3d& EPoint)
 {
 	/*
 	 ** Tiling with a square (1x1) and a square (2x2)
@@ -1698,7 +1698,7 @@ static DBL tiling_square_double (const VECTOR EPoint)
 	return fabs((max(x,z))/2.0+delta);
 }
 
-static DBL tiling_hexa_square_triangle (const VECTOR EPoint)
+static DBL tiling_hexa_square_triangle (const Vector3d& EPoint)
 {
 	/* 
 	 ** tiling with 1 hexagon, squares and triangles
@@ -1804,7 +1804,7 @@ static DBL tiling_hexa_square_triangle (const VECTOR EPoint)
 	return answer;
 }
 
-static DBL tiling_hexa_square_triangle_6 (const VECTOR EPoint)
+static DBL tiling_hexa_square_triangle_6 (const Vector3d& EPoint)
 {
 	/* 
 	 ** tiling with 1 hexagon, squares and triangles
@@ -1928,7 +1928,7 @@ static DBL tiling_hexa_square_triangle_6 (const VECTOR EPoint)
 	return answer;
 }
 
-static DBL tiling_rectangle_pair (const VECTOR EPoint)
+static DBL tiling_rectangle_pair (const Vector3d& EPoint)
 {
 
 	/*
@@ -2015,7 +2015,7 @@ static DBL tiling_rectangle_pair (const VECTOR EPoint)
 	return answer;
 }
 
-static DBL tiling_hexa_tri_right (const VECTOR EPoint)
+static DBL tiling_hexa_tri_right (const Vector3d& EPoint)
 {
 	DBL x,z;
 	DBL answer;
@@ -2114,7 +2114,7 @@ static DBL tiling_hexa_tri_right (const VECTOR EPoint)
 	}
 }
 
-static DBL tiling_hexa_tri_left (const VECTOR EPoint)
+static DBL tiling_hexa_tri_left (const Vector3d& EPoint)
 {
 	DBL x,z;
 	DBL slop1;
@@ -2213,7 +2213,7 @@ static DBL tiling_hexa_tri_left (const VECTOR EPoint)
 	}
 }
 
-static DBL tiling_square_tri (const VECTOR EPoint)
+static DBL tiling_square_tri (const Vector3d& EPoint)
 {
 	DBL x,z;
 	DBL slop1;
@@ -2311,7 +2311,7 @@ static DBL tiling_square_tri (const VECTOR EPoint)
 	}
 }
 
-static DBL tiling_dodeca_tri (const VECTOR EPoint)
+static DBL tiling_dodeca_tri (const Vector3d& EPoint)
 {
 	DBL x,z;
 	DBL dist1,dist2,dist3,dist4,ret_value;
@@ -2373,7 +2373,7 @@ static DBL tiling_dodeca_tri (const VECTOR EPoint)
 	return ret_value;
 }
 
-static DBL tiling_dodeca_hex (const VECTOR EPoint)
+static DBL tiling_dodeca_hex (const Vector3d& EPoint)
 {
 	DBL x,z;
 	DBL dist1,dist2,dist3,dist4,ret_value;
@@ -2469,7 +2469,7 @@ static DBL tiling_dodeca_hex (const VECTOR EPoint)
 	return ret_value;
 }
 
-static DBL tiling_dodeca_hex_5 (const VECTOR EPoint)
+static DBL tiling_dodeca_hex_5 (const Vector3d& EPoint)
 {
 	DBL x,z;
 	DBL dist1,dist2,dist3,dist4,ret_value;
@@ -2650,7 +2650,7 @@ static DBL tiling_penrose_halfdart (DBL pX, DBL pZ, int depth, bool rhombs)
 	}
 }
 
-static DBL tiling_penrose (const VECTOR EPoint, bool rhombs, bool centerFlag)
+static DBL tiling_penrose (const Vector3d& EPoint, bool rhombs, bool centerFlag)
 {
 	// Penrose tiling
 	// rhombs=false: P2 ("kite and dart") Penrose tiling
@@ -2974,7 +2974,7 @@ static DBL tiling_penrose1_diamond (DBL pX, DBL pZ, int depth, bool sideA)
 	}
 }
 
-static DBL tiling_penrose1 (const VECTOR EPoint, bool centerFlag)
+static DBL tiling_penrose1 (const Vector3d& EPoint, bool centerFlag)
 {
 	// Penrose P1 ("pentagon, star, boat and diamond") tiling
 	//   centerFlag=false: pentagon at center
@@ -3088,7 +3088,7 @@ static unsigned char hexagon[][12]=
 	{ 0x0A, 0x0D, 5, 0x92, 0x68, 5, 7, 0x0A, 0x0B, 0x0E, 0x0E, 0x0B}
 };
 
-static DBL tetragonal (const VECTOR EPoint, const TPATTERN *TPat)
+static DBL tetragonal (const Vector3d& EPoint, const TPATTERN *TPat)
 {
 	unsigned char how;
 	long xv,zv;
@@ -3621,7 +3621,7 @@ static unsigned short trihexagon[][12]=
 	{0x691,0x3C4,0x5A2,0x5A2,0x3C4,0x691, 0x5A2,0x3C4,0x691,0x691,0x3C4,0x5A2},
 };
 
-static DBL trigonal (const VECTOR EPoint, const TPATTERN *TPat)
+static DBL trigonal (const Vector3d& EPoint, const TPATTERN *TPat)
 {
 	unsigned short how;
 	long xv,zv;
@@ -4439,7 +4439,7 @@ static unsigned short hexpentagon[][60]=
 	}
 };
 
-static DBL hexagonal (const VECTOR EPoint, const TPATTERN *TPat)
+static DBL hexagonal (const Vector3d& EPoint, const TPATTERN *TPat)
 {
 	unsigned short how;
 	long xv,zv;
@@ -4879,7 +4879,7 @@ static DBL hexagonal (const VECTOR EPoint, const TPATTERN *TPat)
 *
 *
 ******************************************************************************/
-static DBL tiling_pattern (const VECTOR EPoint, const TPATTERN *TPat)
+static DBL tiling_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
 {
 	switch(TPat->Vals.Tiling.Pattern)
 	{
@@ -4944,7 +4944,7 @@ static DBL tiling_pattern (const VECTOR EPoint, const TPATTERN *TPat)
 *
 *
 ******************************************************************************/
-static DBL pavement_pattern (const VECTOR EPoint, const TPATTERN *TPat)
+static DBL pavement_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
 {
 	switch(TPat->Vals.Pavement.Side)
 	{
@@ -4989,7 +4989,7 @@ static DBL pavement_pattern (const VECTOR EPoint, const TPATTERN *TPat)
 *
 ******************************************************************************/
 
-static DBL agate_pattern (const VECTOR EPoint, const TPATTERN *TPat, int noise_generator)
+static DBL agate_pattern (const Vector3d& EPoint, const TPATTERN *TPat, int noise_generator)
 {
 	register DBL noise, turb_val;
 	const TURB* Turb;
@@ -5045,7 +5045,7 @@ static DBL agate_pattern (const VECTOR EPoint, const TPATTERN *TPat, int noise_g
 *
 ******************************************************************************/
 
-static DBL boxed_pattern (const VECTOR EPoint)
+static DBL boxed_pattern (const Vector3d& EPoint)
 {
 	register DBL value;
 
@@ -5086,7 +5086,7 @@ static DBL boxed_pattern (const VECTOR EPoint)
 *
 ******************************************************************************/
 
-static DBL brick_pattern (const VECTOR EPoint, const TPATTERN *TPat)
+static DBL brick_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
 {
 	int ibrickx, ibricky, ibrickz;
 	DBL brickheight, brickwidth, brickdepth;
@@ -5243,7 +5243,7 @@ static DBL brick_pattern (const VECTOR EPoint, const TPATTERN *TPat)
 *
 ******************************************************************************/
 
-static DBL cells_pattern (const VECTOR EPoint)
+static DBL cells_pattern (const Vector3d& EPoint)
 {
 	/* select a random value based on the cube from which this came. */
 
@@ -5282,7 +5282,7 @@ static DBL cells_pattern (const VECTOR EPoint)
 *
 ******************************************************************************/
 
-static DBL checker_pattern (const VECTOR EPoint)
+static DBL checker_pattern (const Vector3d& EPoint)
 {
 	int value;
 
@@ -5349,13 +5349,13 @@ static DBL checker_pattern (const VECTOR EPoint)
 *   Other changes: enhanced by Ron Parker, Integer math by Nathan Kopp
 *
 ******************************************************************************/
-static int IntPickInCube(int tvx, int tvy, int tvz, VECTOR  p1);
+static int IntPickInCube(int tvx, int tvy, int tvz, Vector3d& p1);
 
-static DBL crackle_pattern (const VECTOR EPoint, const TPATTERN *TPat, TraceThreadData *Thread)
+static DBL crackle_pattern (const Vector3d& EPoint, const TPATTERN *TPat, TraceThreadData *Thread)
 {
 	DBL sum, minsum, minsum2, minsum3, tf;
 	int minVecIdx = 0;
-	VECTOR dv;
+	Vector3d dv;
 
 	int flox, floy, floz;
 
@@ -5428,26 +5428,26 @@ static DBL crackle_pattern (const VECTOR EPoint, const TPATTERN *TPat, TraceThre
 
 	// Find the 3 points with the 3 shortest distances from the input point.
 	// Set up the loop so the invariant is true:  minsum <= minsum2 <= minsum3
-	VSub(dv, entry->data[0], EPoint);
+	dv = entry->data[0] - EPoint;
 
 	if(UseSquare)
 	{
-		minsum = VSumSqr(dv);
+		minsum = dv.lengthSqr();
 
-		VSub(dv, entry->data[1], EPoint);
-		minsum2 = VSumSqr(dv);
+		dv = entry->data[1] - EPoint;
+		minsum2 = dv.lengthSqr();
 
-		VSub(dv, entry->data[2], EPoint);
-		minsum3  = VSumSqr(dv);
+		dv = entry->data[2] - EPoint;
+		minsum3  = dv.lengthSqr();
 	}
 	else if(UseUnity)
 	{
 		minsum = fabs(dv[X]) + fabs(dv[Y]) + fabs(dv[Z]);
 
-		VSub(dv, entry->data[1], EPoint);
+		dv = entry->data[1] - EPoint;
 		minsum2 = fabs(dv[X]) + fabs(dv[Y]) + fabs(dv[Z]);
 
-		VSub(dv, entry->data[2], EPoint);
+		dv = entry->data[2] - EPoint;
 		minsum3 = fabs(dv[X]) + fabs(dv[Y]) + fabs(dv[Z]);
 	}
 	else
@@ -5456,12 +5456,12 @@ static DBL crackle_pattern (const VECTOR EPoint, const TPATTERN *TPat, TraceThre
 		         pow(fabs(dv[Y]), Metric) +
 		         pow(fabs(dv[Z]), Metric);
 
-		VSub(dv, entry->data[1], EPoint);
+		dv = entry->data[1] - EPoint;
 		minsum2 = pow(fabs(dv[X]), Metric) +
 		          pow(fabs(dv[Y]), Metric) +
 		          pow(fabs(dv[Z]), Metric);
 
-		VSub(dv, entry->data[2], EPoint);
+		dv = entry->data[2] - EPoint;
 		minsum3 = pow(fabs(dv[X]), Metric) +
 		          pow(fabs(dv[Y]), Metric) +
 		          pow(fabs(dv[Z]), Metric);
@@ -5488,10 +5488,10 @@ static DBL crackle_pattern (const VECTOR EPoint, const TPATTERN *TPat, TraceThre
 	// Loop for the 81 cubelets to find closest and 2nd closest.
 	for(int i = 3; i < 81; i++)
 	{
-		VSub(dv, entry->data[i], EPoint);
+		dv = entry->data[i] - EPoint;
 
 		if(UseSquare)
-			sum  = VSumSqr(dv);
+			sum = dv.lengthSqr();
 		else if(UseUnity)
 			sum = fabs(dv[X]) + fabs(dv[Y]) + fabs(dv[Z]);
 		else
@@ -5597,7 +5597,7 @@ static DBL crackle_pattern (const VECTOR EPoint, const TPATTERN *TPat, TraceThre
 *
 ******************************************************************************/
 
-static DBL cylindrical_pattern (const VECTOR EPoint)
+static DBL cylindrical_pattern (const Vector3d& EPoint)
 {
 	register DBL value;
 
@@ -5657,7 +5657,7 @@ inline float intp3_2(float t, float fa, float fb, float fc, float fd)
 
 #define zmax(i,imax) (((i)<0)?(imax-1):((i) % (imax)))
 
-static DBL density_pattern(const VECTOR EPoint, const TPATTERN *TPat)
+static DBL density_pattern(const Vector3d& EPoint, const TPATTERN *TPat)
 {
 	size_t x, y, z;
 	size_t x1, y1, z1;
@@ -5877,7 +5877,7 @@ static DBL density_pattern(const VECTOR EPoint, const TPATTERN *TPat)
 *
 ******************************************************************************/
 
-static DBL dents_pattern (const VECTOR EPoint, int noise_generator)
+static DBL dents_pattern (const Vector3d& EPoint, int noise_generator)
 {
 	DBL noise;
 
@@ -5914,7 +5914,7 @@ static DBL dents_pattern (const VECTOR EPoint, int noise_generator)
 *
 ******************************************************************************/
 
-static DBL function_pattern (const VECTOR EPoint, const TPATTERN *TPat, TraceThreadData *Thread)
+static DBL function_pattern (const Vector3d& EPoint, const TPATTERN *TPat, TraceThreadData *Thread)
 {
 	DBL value;
 
@@ -5968,10 +5968,10 @@ static DBL function_pattern (const VECTOR EPoint, const TPATTERN *TPat, TraceThr
 *
 ******************************************************************************/
 
-static DBL gradient_pattern (const VECTOR EPoint, const TPATTERN *TPat)
+static DBL gradient_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
 {
 	DBL Result;
-	VDot( Result, EPoint, TPat->Vals.Gradient );
+	Result = dot(EPoint, Vector3d(TPat->Vals.Gradient));
 
 	/* Mod to keep within [0.0,1.0] range */
 	return ((Result > 1.0) ? fmod(Result, 1.0) : Result);
@@ -6011,17 +6011,17 @@ static DBL gradient_pattern (const VECTOR EPoint, const TPATTERN *TPat)
 *
 ******************************************************************************/
 
-static DBL granite_pattern (const VECTOR EPoint, int noise_generator)
+static DBL granite_pattern (const Vector3d& EPoint, int noise_generator)
 {
 	register int i;
 	register DBL temp, noise = 0.0, freq = 1.0;
-	VECTOR tv1,tv2;
+	Vector3d tv1, tv2;
 
-	VScale(tv1,EPoint,4.0);
+	tv1 = EPoint * 4.0;
 
 	for (i = 0; i < 6 ; freq *= 2.0, i++)
 	{
-		VScale(tv2,tv1,freq);
+		tv2 = tv1 * freq;
 		if(noise_generator==1)
 		{
 			temp = 0.5 - Noise (tv2, noise_generator);
@@ -6086,7 +6086,7 @@ static DBL granite_pattern (const VECTOR EPoint, int noise_generator)
 const DBL xfactor = 0.5;         /* each triangle is split in half for the grid */
 const DBL zfactor = 0.866025404; /* sqrt(3)/2 -- Height of an equilateral triangle */
 
-static DBL hexagon_pattern (const VECTOR EPoint)
+static DBL hexagon_pattern (const Vector3d& EPoint)
 {
 	int xm, zm;
 	int brkindx;
@@ -6273,7 +6273,7 @@ static DBL hexagon_pattern (const VECTOR EPoint)
 *
 ******************************************************************************/
 
-static DBL cubic_pattern (const VECTOR EPoint)
+static DBL cubic_pattern (const Vector3d& EPoint)
 {
 	const DBL x = EPoint[X], y = EPoint[Y], z = EPoint[Z];
 	const DBL ax = fabs(x), ay = fabs(y), az = fabs(z);
@@ -6314,7 +6314,7 @@ static DBL cubic_pattern (const VECTOR EPoint)
 *
 ******************************************************************************/
 
-static DBL square_pattern (const VECTOR EPoint)
+static DBL square_pattern (const Vector3d& EPoint)
 {
 	int valueX,valueZ;
 
@@ -6373,7 +6373,7 @@ static DBL square_pattern (const VECTOR EPoint)
 *
 ******************************************************************************/
 
-static DBL triangular_pattern (const VECTOR EPoint)
+static DBL triangular_pattern (const Vector3d& EPoint)
 {
 	DBL answer;
 	DBL x,z;
@@ -6466,7 +6466,7 @@ static DBL triangular_pattern (const VECTOR EPoint)
 *
 ******************************************************************************/
 
-static DBL julia_pattern (const VECTOR EPoint, const TPATTERN *TPat)
+static DBL julia_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
 {
 	int it_max, col;
 	DBL a, b, cf, a2, b2, dist2, mindist2,
@@ -6533,7 +6533,7 @@ static DBL julia_pattern (const VECTOR EPoint, const TPATTERN *TPat)
 *
 ******************************************************************************/
 
-static DBL julia3_pattern (const VECTOR EPoint, const TPATTERN *TPat)
+static DBL julia3_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
 {
 	int it_max, col;
 	DBL a, b, cf, a2, b2, dist2, mindist2,
@@ -6600,7 +6600,7 @@ static DBL julia3_pattern (const VECTOR EPoint, const TPATTERN *TPat)
 *
 ******************************************************************************/
 
-static DBL julia4_pattern (const VECTOR EPoint, const TPATTERN *TPat)
+static DBL julia4_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
 {
 	int it_max, col;
 	DBL a, b, cf, a2, b2, dist2, mindist2,
@@ -6667,7 +6667,7 @@ static DBL julia4_pattern (const VECTOR EPoint, const TPATTERN *TPat)
 *
 ******************************************************************************/
 
-static DBL juliax_pattern (const VECTOR EPoint, const TPATTERN *TPat)
+static DBL juliax_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
 {
 	int it_max, col, exponent;
 	DBL a, b, cf=0, x, y, dist2, mindist2,
@@ -6747,7 +6747,7 @@ static DBL juliax_pattern (const VECTOR EPoint, const TPATTERN *TPat)
 *
 ******************************************************************************/
 
-static DBL leopard_pattern (const VECTOR EPoint)
+static DBL leopard_pattern (const Vector3d& EPoint)
 {
 	register DBL value, temp1, temp2, temp3;
 
@@ -6796,7 +6796,7 @@ static DBL leopard_pattern (const VECTOR EPoint)
 *
 ******************************************************************************/
 
-static DBL magnet1m_pattern (const VECTOR EPoint, const TPATTERN *TPat)
+static DBL magnet1m_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
 {
 	int it_max, col;
 	DBL a, b, cf, a2, b2, x, y, tmp, tmp1r, tmp1i, tmp2r, tmp2i, dist2, mindist2;
@@ -6873,7 +6873,7 @@ static DBL magnet1m_pattern (const VECTOR EPoint, const TPATTERN *TPat)
 *
 ******************************************************************************/
 
-static DBL magnet1j_pattern (const VECTOR EPoint, const TPATTERN *TPat)
+static DBL magnet1j_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
 {
 	int it_max, col;
 	DBL a, b, cf, a2, b2, tmp, tmp1r, tmp1i, tmp2r, tmp2i, dist2, mindist2,
@@ -6949,7 +6949,7 @@ static DBL magnet1j_pattern (const VECTOR EPoint, const TPATTERN *TPat)
 *
 ******************************************************************************/
 
-static DBL magnet2m_pattern (const VECTOR EPoint, const TPATTERN *TPat)
+static DBL magnet2m_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
 {
 	int it_max, col;
 	DBL a, b, cf, a2, b2, x, y, tmp, tmp1r, tmp1i, tmp2r, tmp2i,
@@ -7031,7 +7031,7 @@ static DBL magnet2m_pattern (const VECTOR EPoint, const TPATTERN *TPat)
 *
 ******************************************************************************/
 
-static DBL magnet2j_pattern (const VECTOR EPoint, const TPATTERN *TPat)
+static DBL magnet2j_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
 {
 	int it_max, col;
 	DBL a, b, cf, a2, b2, tmp, tmp1r, tmp1i, tmp2r, tmp2i, c1r,c2r,c1c2r,c1c2i,
@@ -7115,7 +7115,7 @@ static DBL magnet2j_pattern (const VECTOR EPoint, const TPATTERN *TPat)
 *
 ******************************************************************************/
 
-static DBL mandel_pattern (const VECTOR EPoint, const TPATTERN *TPat)
+static DBL mandel_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
 {
 	int it_max, col;
 	DBL a, b, cf, a2, b2, x, y, dist2, mindist2;
@@ -7181,7 +7181,7 @@ static DBL mandel_pattern (const VECTOR EPoint, const TPATTERN *TPat)
 *
 ******************************************************************************/
 
-static DBL mandel3_pattern (const VECTOR EPoint, const TPATTERN *TPat)
+static DBL mandel3_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
 {
 	int it_max, col;
 	DBL a, b, cf, a2, b2, x, y, dist2, mindist2;
@@ -7247,7 +7247,7 @@ static DBL mandel3_pattern (const VECTOR EPoint, const TPATTERN *TPat)
 *
 ******************************************************************************/
 
-static DBL mandel4_pattern (const VECTOR EPoint, const TPATTERN *TPat)
+static DBL mandel4_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
 {
 	int it_max, col;
 	DBL a, b, cf, a2, b2, x, y, dist2, mindist2;
@@ -7313,7 +7313,7 @@ static DBL mandel4_pattern (const VECTOR EPoint, const TPATTERN *TPat)
 *
 ******************************************************************************/
 
-static DBL mandelx_pattern (const VECTOR EPoint, const TPATTERN *TPat)
+static DBL mandelx_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
 {
 	int it_max, col, exponent;
 	DBL a, b, cf=0, x, y, dist2, mindist2;
@@ -7392,7 +7392,7 @@ static DBL mandelx_pattern (const VECTOR EPoint, const TPATTERN *TPat)
 *
 ******************************************************************************/
 
-static DBL marble_pattern (const VECTOR EPoint, const TPATTERN *TPat, int noise_generator)
+static DBL marble_pattern (const Vector3d& EPoint, const TPATTERN *TPat, int noise_generator)
 {
 	register DBL turb_val;
 	const TURB *Turb;
@@ -7436,11 +7436,11 @@ static DBL marble_pattern (const VECTOR EPoint, const TPATTERN *TPat, int noise_
 *
 ******************************************************************************/
 
-static DBL object_pattern (const VECTOR EPoint, const TPATTERN *TPat, TraceThreadData *Thread)
+static DBL object_pattern (const Vector3d& EPoint, const TPATTERN *TPat, TraceThreadData *Thread)
 {
 	if(TPat->Vals.Object != NULL)
 	{
-		if(Inside_Object(Vector3d(EPoint), TPat->Vals.Object, Thread))
+		if(Inside_Object(EPoint, TPat->Vals.Object, Thread))
 			return 1.0;
 		else
 			return 0.0;
@@ -7479,7 +7479,7 @@ static DBL object_pattern (const VECTOR EPoint, const TPATTERN *TPat, TraceThrea
 *
 ******************************************************************************/
 
-static DBL onion_pattern (const VECTOR EPoint)
+static DBL onion_pattern (const Vector3d& EPoint)
 {
 	/* The variable noise is not used as noise in this function */
 
@@ -7495,7 +7495,7 @@ static DBL onion_pattern (const VECTOR EPoint)
 
 	/* This ramp goes 0-1, 0-1, 0-1, 0-1 ... */
 
-	noise = (fmod(sqrt(Sqr(EPoint[X])+Sqr(EPoint[Y])+Sqr(EPoint[Z])), 1.0));
+	noise = (fmod(EPoint.length(), 1.0));
 
 	return(noise);
 }
@@ -7519,7 +7519,7 @@ static DBL onion_pattern (const VECTOR EPoint)
 *
 ******************************************************************************/
 
-static DBL pigment_pattern (const VECTOR EPoint, const TPATTERN *TPat, const Intersection *isect, const Ray *ray, TraceThreadData *Thread)
+static DBL pigment_pattern (const Vector3d& EPoint, const TPATTERN *TPat, const Intersection *isect, const Ray *ray, TraceThreadData *Thread)
 {
 	DBL value;
 	Colour Col;
@@ -7569,7 +7569,7 @@ static DBL pigment_pattern (const VECTOR EPoint, const TPATTERN *TPat, const Int
 *
 ******************************************************************************/
 
-static DBL planar_pattern (const VECTOR EPoint)
+static DBL planar_pattern (const Vector3d& EPoint)
 {
 	register DBL value = fabs(EPoint[Y]);
 
@@ -7601,22 +7601,20 @@ static DBL planar_pattern (const VECTOR EPoint)
 *
 ******************************************************************************/
 
-static DBL quilted_pattern (const VECTOR EPoint, const TPATTERN *TPat)
+static DBL quilted_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
 {
-	VECTOR value;
+	Vector3d value;
 	DBL t;
 
 	value[X] = EPoint[X]-FLOOR(EPoint[X])-0.5;
 	value[Y] = EPoint[Y]-FLOOR(EPoint[Y])-0.5;
 	value[Z] = EPoint[Z]-FLOOR(EPoint[Z])-0.5;
 
-	t = sqrt(value[X]*value[X]+value[Y]*value[Y]+value[Z]*value[Z]);
+	t = value.length();
 
 	t = quilt_cubic(t, TPat->Vals.Quilted.Control0, TPat->Vals.Quilted.Control1);
 
-	value[X] *= t;
-	value[Y] *= t;
-	value[Z] *= t;
+	value *= t;
 
 	return((fabs(value[X])+fabs(value[Y])+fabs(value[Z]))/3.0);
 }
@@ -7651,7 +7649,7 @@ static DBL quilted_pattern (const VECTOR EPoint, const TPATTERN *TPat)
 *
 ******************************************************************************/
 
-static DBL radial_pattern (const VECTOR EPoint)
+static DBL radial_pattern (const Vector3d& EPoint)
 {
 	register DBL value;
 
@@ -7699,17 +7697,17 @@ static DBL radial_pattern (const VECTOR EPoint)
 *
 ******************************************************************************/
 
-static DBL ripples_pattern (const VECTOR EPoint, const TPATTERN *TPat, const TraceThreadData *Thread)
+static DBL ripples_pattern (const Vector3d& EPoint, const TPATTERN *TPat, const TraceThreadData *Thread)
 {
 	register unsigned int i;
 	register DBL length, index;
 	DBL scalar =0.0;
-	VECTOR point;
+	Vector3d point;
 
 	for (i = 0 ; i < Thread->numberOfWaves ; i++)
 	{
-		VSub (point, EPoint, *Thread->waveSources[i]);
-		VLength (length, point);
+		point = EPoint - Thread->waveSources[i];
+		length = point.length();
 
 		if (length == 0.0)
 			length = 1.0;
@@ -7759,7 +7757,7 @@ static DBL ripples_pattern (const VECTOR EPoint, const TPATTERN *TPat, const Tra
 *
 ******************************************************************************/
 
-static DBL slope_pattern (const VECTOR EPoint, const TPATTERN *TPat, const Intersection *Isection)
+static DBL slope_pattern (const Vector3d& EPoint, const TPATTERN *TPat, const Intersection *Isection)
 {
 	DBL value, value1, value2;
 
@@ -7767,10 +7765,9 @@ static DBL slope_pattern (const VECTOR EPoint, const TPATTERN *TPat, const Inter
 
 	if (TPat->Vals.Slope.Point_At)
 	{
-		VECTOR vect;
-		VSub(vect,TPat->Vals.Slope.Slope_Vector,*Isection->IPoint);
-		VNormalizeEq(vect);
-		VDot(value1, *Isection->PNormal, vect);
+		Vector3d vect;
+		vect = Vector3d(TPat->Vals.Slope.Slope_Vector) - Isection->IPoint.normalized();
+		value1 = dot(Isection->PNormal, vect);
 	}
 	else
 	{
@@ -7782,7 +7779,7 @@ static DBL slope_pattern (const VECTOR EPoint, const TPATTERN *TPat, const Inter
 			value1 = -Isection->PNormal[-TPat->Vals.Slope.Slope_Base - 1];
 		else
 			/* projection slope onto normal vector */
-			VDot(value1, *Isection->PNormal, TPat->Vals.Slope.Slope_Vector);
+			value1 = dot(Isection->PNormal, Vector3d(TPat->Vals.Slope.Slope_Vector));
 	}
 
 	/* Clamp to 1.0. */
@@ -7822,7 +7819,7 @@ static DBL slope_pattern (const VECTOR EPoint, const TPATTERN *TPat, const Inter
 		value2 = -EPoint[-TPat->Vals.Slope.Altit_Base - 1];
 	else
 		/* projection of Epoint along altitude vector */
-		VDot(value2, EPoint, TPat->Vals.Slope.Altit_Vector);
+		value2 = dot(EPoint, Vector3d(TPat->Vals.Slope.Altit_Vector));
 
 	if (0.0 != TPat->Vals.Slope.Altit_Mod[V])
 	{
@@ -7881,15 +7878,15 @@ static DBL slope_pattern (const VECTOR EPoint, const TPATTERN *TPat, const Inter
 
 static DBL aoi_pattern (const Intersection *Isection, const Ray *ray)
 {
-	VECTOR    a, b;
+	Vector3d  a, b;
 	DBL       cosAngle, angle;
 
 	if ((Isection == NULL) || (ray == NULL))
 		return 0.0;
 
-	VNormalize(a, *Isection->PNormal);
-	VNormalize(b, *ray->Direction);
-	VDot(cosAngle, a, b);
+	a = Isection->PNormal.normalized(); // TODO - shouldn't Isection->PNormal be normalized already?
+	b = ray->Direction.normalized();    // TODO - shouldn't ray->Direction be normalized already?
+	cosAngle = dot(a, b);
 
 	// clip to [-1.0; 1.0], just to be sure
 	// (should never be necessary since both vectors are normalized)
@@ -7933,7 +7930,7 @@ static DBL aoi_pattern (const Intersection *Isection, const Ray *ray)
 *
 ******************************************************************************/
 
-static DBL spiral1_pattern (const VECTOR EPoint, const TPATTERN *TPat, int noise_generator)
+static DBL spiral1_pattern (const Vector3d& EPoint, const TPATTERN *TPat, int noise_generator)
 {
 	DBL rad, phi, turb_val;
 	DBL x = EPoint[X];
@@ -8009,7 +8006,7 @@ static DBL spiral1_pattern (const VECTOR EPoint, const TPATTERN *TPat, int noise
 *
 ******************************************************************************/
 
-static DBL spiral2_pattern (const VECTOR EPoint, const TPATTERN *TPat, int noise_generator)
+static DBL spiral2_pattern (const Vector3d& EPoint, const TPATTERN *TPat, int noise_generator)
 {
 	DBL rad, phi, turb_val;
 	DBL x = EPoint[X];
@@ -8086,11 +8083,11 @@ static DBL spiral2_pattern (const VECTOR EPoint, const TPATTERN *TPat, int noise
 *
 ******************************************************************************/
 
-static DBL spherical_pattern (const VECTOR EPoint)
+static DBL spherical_pattern (const Vector3d& EPoint)
 {
 	register DBL value;
 
-	VLength(value, EPoint);
+	value = EPoint.length();
 	CLIP_DENSITY(value);
 
 	return(value);
@@ -8128,17 +8125,17 @@ static DBL spherical_pattern (const VECTOR EPoint)
 *
 ******************************************************************************/
 
-static DBL waves_pattern (const VECTOR EPoint, const TPATTERN *TPat, const TraceThreadData *Thread)
+static DBL waves_pattern (const Vector3d& EPoint, const TPATTERN *TPat, const TraceThreadData *Thread)
 {
 	register unsigned int i;
 	register DBL length, index;
 	DBL scalar = 0.0;
-	VECTOR point;
+	Vector3d point;
 
 	for (i = 0 ; i < Thread->numberOfWaves ; i++)
 	{
-		VSub (point, EPoint, *Thread->waveSources[i]);
-		VLength (length, point);
+		point = EPoint - Thread->waveSources[i];
+		length = point.length();
 
 		if (length == 0.0)
 		{
@@ -8186,18 +8183,18 @@ static DBL waves_pattern (const VECTOR EPoint, const TPATTERN *TPat, const Trace
 *
 ******************************************************************************/
 
-static DBL wood_pattern (const VECTOR EPoint, const TPATTERN *TPat)
+static DBL wood_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
 {
 	register DBL length;
-	VECTOR WoodTurbulence;
-	VECTOR point;
+	Vector3d WoodTurbulence;
+	Vector3d point;
 	DBL x=EPoint[X];
 	DBL y=EPoint[Y];
 	const TURB *Turb;
 
 	if ((Turb=Search_For_Turb(TPat->Warps)) != NULL)
 	{
-		DTurbulence (WoodTurbulence, EPoint,Turb);
+		DTurbulence (WoodTurbulence, EPoint, Turb);
 		point[X] = cycloidal((x + WoodTurbulence[X]) * Turb->Turbulence[X]);
 		point[Y] = cycloidal((y + WoodTurbulence[Y]) * Turb->Turbulence[Y]);
 	}
@@ -8213,7 +8210,7 @@ static DBL wood_pattern (const VECTOR EPoint, const TPATTERN *TPat)
 
 	/* point[Z] += z; Deleted per David Buck --  BP 7/91 */
 
-	VLength (length, point);
+	length = point.length();
 
 	return(length);
 }
@@ -8249,13 +8246,13 @@ static DBL wood_pattern (const VECTOR EPoint, const TPATTERN *TPat)
 *
 ******************************************************************************/
 
-static DBL wrinkles_pattern (const VECTOR EPoint, int noise_generator)
+static DBL wrinkles_pattern (const Vector3d& EPoint, int noise_generator)
 {
 	register int i;
 	DBL lambda = 2.0;
 	DBL omega = 0.5;
 	DBL value;
-	VECTOR temp;
+	Vector3d temp;
 	DBL noise;
 
 	if(noise_generator>1)
@@ -8270,7 +8267,7 @@ static DBL wrinkles_pattern (const VECTOR EPoint, int noise_generator)
 
 	for (i = 1; i < 10; i++)
 	{
-		VScale(temp,EPoint,lambda);
+		temp = EPoint * lambda;
 
 		if(noise_generator>1)
 		{
@@ -8325,7 +8322,7 @@ static DBL wrinkles_pattern (const VECTOR EPoint, int noise_generator)
 *
 ******************************************************************************/
 
-static int IntPickInCube(int tvx, int tvy, int tvz, VECTOR  p1)
+static int IntPickInCube(int tvx, int tvy, int tvz, Vector3d& p1)
 {
 	size_t seed;
 
@@ -8371,10 +8368,10 @@ static int IntPickInCube(int tvx, int tvy, int tvz, VECTOR  p1)
 *
 ******************************************************************************/
 
-int PickInCube(const VECTOR tv, VECTOR  p1)
+int PickInCube(const Vector3d& tv, Vector3d& p1)
 {
 	size_t seed;
-	VECTOR flo;
+	Vector3d flo;
 
 	/*
 	 * This uses floor() not FLOOR, so it will not be a mirror

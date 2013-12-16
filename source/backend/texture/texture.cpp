@@ -28,11 +28,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/texture/texture.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/texture/texture.cpp $
+ * $Revision: #43 $
+ * $Change: 6150 $
+ * $DateTime: 2013/11/30 14:13:48 $
+ * $Author: clipka $
  *******************************************************************************/
 
 /*
@@ -72,7 +72,7 @@ static unsigned int next_rand = 1;
 static void InitTextureTable (void);
 static TEXTURE *Copy_Materials (TEXTURE *Old);
 static void InitSolidNoise(void);
-static DBL SolidNoise(const VECTOR P);
+static DBL SolidNoise(const Vector3d& P);
 
 /*****************************************************************************
 * Local preprocessor defines
@@ -250,7 +250,7 @@ void Initialize_Waves(vector<double>& waveFrequencies, vector<Vector3d>& waveSou
 	for(int i = 0, next_rand = -560851967; i < numberOfWaves ; i++)
 	{
 		point = Vector3d((double)i,0.0,0.0);
-		DNoise(*point, *point);
+		DNoise(point, point);
 		waveSources.push_back(point.normalized());
 
 		next_rand = next_rand * 1812433253L + 12345L;
@@ -382,7 +382,7 @@ void Free_Noise_Tables()
 *
 ******************************************************************************/
 
-DBL OriNoise(const VECTOR EPoint, int noise_generator)
+DBL OriNoise(const Vector3d& EPoint, int noise_generator)
 {
 	DBL x, y, z;
 	DBL *mp;
@@ -520,7 +520,7 @@ DBL OriNoise(const VECTOR EPoint, int noise_generator)
 *
 * OUTPUT
 *
-*   VECTOR result
+*   Vector3d& result
 *
 * RETURNS
 *
@@ -540,7 +540,7 @@ DBL OriNoise(const VECTOR EPoint, int noise_generator)
 *
 ******************************************************************************/
 
-void OriDNoise(VECTOR result, const VECTOR EPoint)
+void OriDNoise(Vector3d& result, const Vector3d& EPoint)
 {
 	DBL x, y, z;
 	DBL *mp;
@@ -664,7 +664,7 @@ void OriDNoise(VECTOR result, const VECTOR EPoint)
 // the input values to the noise function.
 const int NoiseEntries = 2048;
 static int NoisePermutation[2*(NoiseEntries+1)];
-static VECTOR NoiseGradients[2*(NoiseEntries+1)];
+static Vector3d NoiseGradients[2*(NoiseEntries+1)];
 
 const DBL ROLLOVER = 10000000.023157213;
 
@@ -672,7 +672,7 @@ static void
 InitSolidNoise(void)
 {
 	int i, j, k;
-	VECTOR v;
+	Vector3d v;
 	DBL s;
 
 	// Create an array of random gradient vectors uniformly on the unit sphere
@@ -686,12 +686,11 @@ InitSolidNoise(void)
 				next_rand = next_rand * 1812433253L + 12345L;
 				v[j] = (DBL)((((int)(next_rand >> 16) & 0x7FFF) % (NoiseEntries << 1)) - NoiseEntries) / (DBL)NoiseEntries;
 			}
-			s = VSumSqr(v);
+			s = v.lengthSqr();
 		} while ((s > 1.0) || (s < 1.0e-5));
-		s = 1.0 / sqrt(s);
-		VScaleEq(v, s);
+		v /= sqrt(s);
 
-		Assign_Vector(NoiseGradients[i], v);
+		NoiseGradients[i] = v;
 	}
 	// Create a pseudorandom permutation of [0..NoiseEntries]
 	for(i = 0; i < NoiseEntries; i++)
@@ -709,7 +708,7 @@ InitSolidNoise(void)
 	for(i = 0; i < NoiseEntries + 2; i++)
 	{
 		NoisePermutation[NoiseEntries + i] = NoisePermutation[i];
-		Assign_Vector(NoiseGradients[NoiseEntries+i], NoiseGradients[i]);
+		NoiseGradients[NoiseEntries + i] = NoiseGradients[i];
 	}
 }
 
@@ -730,7 +729,7 @@ Lerp(DBL t, DBL a, DBL b)
 
 // Linear interpolation between a and b, as the value of t goes from 0 to 1.
 static void inline
-VLerp(VECTOR v, DBL t, const VECTOR a, const VECTOR b)
+VLerp(Vector3d& v, DBL t, const Vector3d& a, const Vector3d& b)
 {
 	v[X] = Lerp(t, a[X], b[X]);
 	v[Y] = Lerp(t, a[Y], b[Y]);
@@ -738,7 +737,7 @@ VLerp(VECTOR v, DBL t, const VECTOR a, const VECTOR b)
 }
 
 static void inline
-SetupSolidNoise(const VECTOR P, int i, int &b0, int &b1, DBL &r0, DBL &r1)
+SetupSolidNoise(const Vector3d& P, int i, int &b0, int &b1, DBL &r0, DBL &r1)
 {
 	DBL t = P[i] + ROLLOVER;
 
@@ -750,13 +749,13 @@ SetupSolidNoise(const VECTOR P, int i, int &b0, int &b1, DBL &r0, DBL &r1)
 }
 
 static DBL inline
-NoiseValueAt(const VECTOR q, DBL rx, DBL ry, DBL rz)
+NoiseValueAt(const Vector3d& q, DBL rx, DBL ry, DBL rz)
 {
 	return (rx * q[X] + ry * q[Y] + rz * q[Z]);
 }
 
 static DBL
-SolidNoise(const VECTOR P)
+SolidNoise(const Vector3d& P)
 {
 	int bx0, bx1, by0, by1, bz0, bz1;
 	int b00, b10, b01, b11;
@@ -806,13 +805,13 @@ SolidNoise(const VECTOR P)
 }
 
 static void
-SolidDNoise(const VECTOR P, VECTOR D)
+SolidDNoise(const Vector3d& P, Vector3d& D)
 {
 	int bx0, bx1, by0, by1, bz0, bz1;
 	int b00, b10, b01, b11;
 	DBL rx0, rx1, ry0, ry1, rz0, rz1;
 	DBL sx, sy, sz;
-	VECTOR a, b, c, d, u, v;
+	Vector3d a, b, c, d, u, v;
 	int i, j;
 
 	SetupSolidNoise(P, 0, bx0, bx1, rx0, rx1);
@@ -832,22 +831,22 @@ SolidDNoise(const VECTOR P, VECTOR D)
 	sz = SCurve(rz0);
 
 
-	Assign_Vector(u, NoiseGradients[b00 + bz0]);
-	Assign_Vector(v, NoiseGradients[b10 + bz0]);
+	u = NoiseGradients[b00 + bz0];
+	v = NoiseGradients[b10 + bz0];
 	VLerp(a, sx, u, v);
 
-	Assign_Vector(u, NoiseGradients[b01 + bz0]);
-	Assign_Vector(v, NoiseGradients[b11 + bz0]);
+	u = NoiseGradients[b01 + bz0];
+	v = NoiseGradients[b11 + bz0];
 	VLerp(b, sx, u, v);
 
 	VLerp(c, sy, a, b);
 
-	Assign_Vector(u, NoiseGradients[b00 + bz1]);
-	Assign_Vector(v, NoiseGradients[b10 + bz1]);
+	u = NoiseGradients[b00 + bz1];
+	v = NoiseGradients[b10 + bz1];
 	VLerp(a, sx, u, v);
 
-	Assign_Vector(u, NoiseGradients[b01 + bz1]);
-	Assign_Vector(v, NoiseGradients[b11 + bz1]);
+	u = NoiseGradients[b01 + bz1];
+	v = NoiseGradients[b11 + bz1];
 	VLerp(b, sx, u, v);
 
 	VLerp(d, sy, a, b);
@@ -885,11 +884,11 @@ SolidDNoise(const VECTOR P, VECTOR D)
 *
 ******************************************************************************/
 
-DBL Turbulence(const VECTOR EPoint, const TURB *Turb, int noise_generator)
+DBL Turbulence(const Vector3d& EPoint, const TURB *Turb, int noise_generator)
 {
 	int i;
 	DBL Lambda, Omega, l, o, value;
-	VECTOR temp;
+	Vector3d temp;
 	int Octaves=Turb->Octaves;
 
 	if (noise_generator>1)
@@ -905,7 +904,7 @@ DBL Turbulence(const VECTOR EPoint, const TURB *Turb, int noise_generator)
 
 	for (i = 2; i <= Octaves; i++)
 	{
-		VScale(temp,EPoint,l);
+		temp = EPoint * l;
 		if (noise_generator>1)
 			value += o * (2.0 * Noise(temp, noise_generator) - 0.5);
 	else
@@ -951,12 +950,12 @@ DBL Turbulence(const VECTOR EPoint, const TURB *Turb, int noise_generator)
 ******************************************************************************/
 
 
-void DTurbulence(VECTOR result, const VECTOR EPoint, const TURB *Turb)
+void DTurbulence(Vector3d& result, const Vector3d& EPoint, const TURB *Turb)
 {
 	DBL Omega, Lambda;
 	int i;
 	DBL l, o;
-	VECTOR value, temp;
+	Vector3d value, temp;
 	int Octaves=Turb->Octaves;
 
 	result[X] = result[Y] = result[Z] = 0.0;
@@ -969,12 +968,10 @@ void DTurbulence(VECTOR result, const VECTOR EPoint, const TURB *Turb)
 
 	for (i = 2; i <= Octaves; i++)
 	{
-		VScale(temp,EPoint,l);
+		temp = EPoint * l;
 
 		DNoise(value, temp);
-		result[X] += o * value[X];
-		result[Y] += o * value[Y];
-		result[Z] += o * value[Z];
+		result += o * value;
 		if (i < Octaves)
 		{
 			l *= Lambda;
@@ -1693,8 +1690,8 @@ int Test_Opacity(const TEXTURE *Texture)
 /* Noise and DNoise. These functions have been optimized using AVX and FMA4 instructions    */
 /*                                                                                          */
 /********************************************************************************************/
-DBL (*Noise) (const VECTOR EPoint, int noise_generator);
-void (*DNoise) (VECTOR result, const VECTOR EPoint);
+DBL (*Noise) (const Vector3d& EPoint, int noise_generator);
+void (*DNoise) (Vector3d& result, const Vector3d& EPoint);
 
 /*****************************************************************************
 *
@@ -1782,7 +1779,7 @@ void Initialise_NoiseDispatch()
 *
 ******************************************************************************/
 
-DBL AVX_FMA4_Noise(const VECTOR EPoint, int noise_generator)
+DBL AVX_FMA4_Noise(const Vector3d& EPoint, int noise_generator)
 {
 	DBL x, y, z;
 	DBL *mp;
@@ -1987,7 +1984,7 @@ DBL AVX_FMA4_Noise(const VECTOR EPoint, int noise_generator)
 *
 * OUTPUT
 *
-*   VECTOR result
+*   Vector3d& result
 *
 * RETURNS
 *
@@ -2010,7 +2007,7 @@ DBL AVX_FMA4_Noise(const VECTOR EPoint, int noise_generator)
 *
 ******************************************************************************/
 
-void AVX_FMA4_DNoise(VECTOR result, const VECTOR EPoint)
+void AVX_FMA4_DNoise(Vector3d& result, const Vector3d& EPoint)
 {
 	DBL x, y, z;
 	int ix, iy, iz;
@@ -2367,7 +2364,7 @@ void AVX_FMA4_DNoise(VECTOR result, const VECTOR EPoint)
 	t_sum__Z = _mm_macc_sd(jz_mm,mp6_mm,t_sum__Z);
 	sum__Z = _mm_macc_sd(mm_s,t_sum__Z,sum__Z);
 
-	_mm_storeu_pd(result,sum_X_Y);
+	_mm_storeu_pd(*result,sum_X_Y);
 	
 	_mm_store_sd(&result[Z],sum__Z);
 

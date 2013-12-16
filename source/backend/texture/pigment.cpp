@@ -26,9 +26,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/texture/pigment.cpp $
- * $Revision: #36 $
- * $Change: 6121 $
- * $DateTime: 2013/11/23 07:38:50 $
+ * $Revision: #37 $
+ * $Change: 6150 $
+ * $DateTime: 2013/11/30 14:13:48 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -174,7 +174,7 @@ const BLEND_MAP Square_Default_Map =
 /*****************************************************************************
 * Static functions
 ******************************************************************************/
-static void Do_Average_Pigments (Colour& colour, const PIGMENT *Pigment, const VECTOR EPoint, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread);
+static void Do_Average_Pigments (Colour& colour, const PIGMENT *Pigment, const Vector3d& EPoint, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread);
 
 
 
@@ -486,10 +486,10 @@ int Post_Pigment(PIGMENT *Pigment)
 *
 ******************************************************************************/
 
-bool Compute_Pigment (Colour& colour, const PIGMENT *Pigment, const VECTOR EPoint, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread)
+bool Compute_Pigment (Colour& colour, const PIGMENT *Pigment, const Vector3d& EPoint, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread)
 {
 	int Colour_Found;
-	VECTOR TPoint;
+	Vector3d TPoint;
 	DBL value;
 	register DBL fraction;
 	const BLEND_MAP_ENTRY *Cur, *Prev;
@@ -549,7 +549,7 @@ bool Compute_Pigment (Colour& colour, const PIGMENT *Pigment, const VECTOR EPoin
 					TPoint[Y] = UV_Coords[V];
 					TPoint[Z] = 0;
 
-					if (Compute_Pigment(colour, Cur->Vals.Pigment,TPoint,Intersect, ray, Thread))
+					if (Compute_Pigment(colour, Cur->Vals.Pigment, TPoint, Intersect, ray, Thread))
 						Colour_Found = true;
 				}
 
@@ -577,7 +577,7 @@ bool Compute_Pigment (Colour& colour, const PIGMENT *Pigment, const VECTOR EPoin
 
 	/* NK 19 Nov 1999 added Warp_EPoint */
 	Warp_EPoint (TPoint, EPoint, reinterpret_cast<const TPATTERN *>(Pigment));
-	value = Evaluate_TPat (reinterpret_cast<const TPATTERN *>(Pigment),TPoint,Intersect, ray, Thread);
+	value = Evaluate_TPat (reinterpret_cast<const TPATTERN *>(Pigment), TPoint, Intersect, ray, Thread);
 
 	Search_Blend_Map (value, Blend_Map, &Prev, &Cur);
 
@@ -591,7 +591,7 @@ bool Compute_Pigment (Colour& colour, const PIGMENT *Pigment, const VECTOR EPoin
 	{
 		Warp_EPoint (TPoint, EPoint, reinterpret_cast<const TPATTERN *>(Pigment));
 
-		if (Compute_Pigment(colour, Cur->Vals.Pigment,TPoint,Intersect, ray, Thread))
+		if (Compute_Pigment(colour, Cur->Vals.Pigment, TPoint, Intersect, ray, Thread))
 			Colour_Found = true;
 	}
 
@@ -638,7 +638,7 @@ bool Compute_Pigment (Colour& colour, const PIGMENT *Pigment, const VECTOR EPoin
 *
 ******************************************************************************/
 
-static void Do_Average_Pigments (Colour& colour, const PIGMENT *Pigment, const VECTOR EPoint, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread)
+static void Do_Average_Pigments (Colour& colour, const PIGMENT *Pigment, const Vector3d& EPoint, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread)
 {
 	int i;
 	Colour LC;
@@ -670,7 +670,7 @@ void Evaluate_Density_Pigment(const PIGMENT *pigm, const Vector3d& p, RGBColour&
 	{
 		lc.clear();
 
-		Compute_Pigment(lc, pigm, *p, NULL, NULL, ttd);
+		Compute_Pigment(lc, pigm, p, NULL, NULL, ttd);
 
 		c.red()   *= lc.red();
 		c.green() *= lc.green();

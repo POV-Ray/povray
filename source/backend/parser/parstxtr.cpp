@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/parser/parstxtr.cpp $
- * $Revision: #93 $
- * $Change: 6122 $
- * $DateTime: 2013/11/23 10:33:00 $
+ * $Revision: #95 $
+ * $Change: 6150 $
+ * $DateTime: 2013/11/30 14:13:48 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -1148,8 +1148,9 @@ void Parser::Parse_Pattern (TPATTERN *New, int TPat_Type)
 
 		CASE (GRADIENT_TOKEN)
 			New->Type = GRADIENT_PATTERN;
-			Parse_Vector (New->Vals.Gradient);
-			VNormalizeEq(New->Vals.Gradient);
+			Parse_Vector (Local_Vector);
+			Local_Vector.normalize();
+			Assign_Vector(New->Vals.Gradient, *Local_Vector);
 			EXIT
 		END_CASE
 
@@ -2070,17 +2071,17 @@ void Parser::Parse_Pattern (TPATTERN *New, int TPat_Type)
 
 		CASE (TRANSLATE_TOKEN)
 			Parse_Vector (Local_Vector);
-			Translate_Tpattern (New, *Local_Vector);
+			Translate_Tpattern (New, Local_Vector);
 		END_CASE
 
 		CASE (ROTATE_TOKEN)
 			Parse_Vector (Local_Vector);
-			Rotate_Tpattern (New, *Local_Vector);
+			Rotate_Tpattern (New, Local_Vector);
 		END_CASE
 
 		CASE (SCALE_TOKEN)
 			Parse_Scale_Vector (Local_Vector);
-			Scale_Tpattern (New, *Local_Vector);
+			Scale_Tpattern (New, Local_Vector);
 		END_CASE
 
 		CASE (MATRIX_TOKEN)
@@ -2668,21 +2669,21 @@ TEXTURE *Parser::Parse_Texture ()
 
 			CASE (TRANSLATE_TOKEN)
 				Parse_Vector (Local_Vector);
-				Compute_Translation_Transform(&Local_Trans, *Local_Vector);
+				Compute_Translation_Transform(&Local_Trans, Local_Vector);
 				Transform_Textures (Texture, &Local_Trans);
 				Modified_Pnf = true;
 			END_CASE
 
 			CASE (ROTATE_TOKEN)
 				Parse_Vector (Local_Vector);
-				Compute_Rotation_Transform(&Local_Trans, *Local_Vector);
+				Compute_Rotation_Transform(&Local_Trans, Local_Vector);
 				Transform_Textures (Texture, &Local_Trans);
 				Modified_Pnf = true;
 			END_CASE
 
 			CASE (SCALE_TOKEN)
 				Parse_Scale_Vector (Local_Vector);
-				Compute_Scaling_Transform(&Local_Trans, *Local_Vector);
+				Compute_Scaling_Transform(&Local_Trans, Local_Vector);
 				Transform_Textures (Texture, &Local_Trans);
 				Modified_Pnf = true;
 			END_CASE
@@ -3117,8 +3118,9 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
 				CASE (GRADIENT_TOKEN)
 					Warn_State(Token.Token_Id, PIGMENT_TOKEN);
 					Pigment->Type = GRADIENT_PATTERN;
-					Parse_Vector (Pigment->Vals.Gradient);
-					VNormalizeEq(Pigment->Vals.Gradient);
+					Parse_Vector (Local_Vector);
+					Local_Vector.normalize();
+					Assign_Vector(Pigment->Vals.Gradient, *Local_Vector);
 				END_CASE
 
 				CASE_COLOUR
@@ -3354,19 +3356,19 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
 
 				CASE (TRANSLATE_TOKEN)
 					Parse_Vector (Local_Vector);
-					Compute_Translation_Transform(&Local_Trans, *Local_Vector);
+					Compute_Translation_Transform(&Local_Trans, Local_Vector);
 					Transform_Textures (Texture, &Local_Trans);
 				END_CASE
 
 				CASE (ROTATE_TOKEN)
 					Parse_Vector (Local_Vector);
-					Compute_Rotation_Transform(&Local_Trans, *Local_Vector);
+					Compute_Rotation_Transform(&Local_Trans, Local_Vector);
 					Transform_Textures (Texture, &Local_Trans);
 				END_CASE
 
 				CASE (SCALE_TOKEN)
 					Parse_Scale_Vector (Local_Vector);
-					Compute_Scaling_Transform(&Local_Trans, *Local_Vector);
+					Compute_Scaling_Transform(&Local_Trans, Local_Vector);
 					Transform_Textures (Texture, &Local_Trans);
 				END_CASE
 
@@ -3440,19 +3442,19 @@ void Parser::Parse_Texture_Transform (TEXTURE *Texture)
 	EXPECT
 		CASE (TRANSLATE_TOKEN)
 			Parse_Vector (Local_Vector);
-			Compute_Translation_Transform(&Local_Trans, *Local_Vector);
+			Compute_Translation_Transform(&Local_Trans, Local_Vector);
 			Transform_Textures (Texture, &Local_Trans);
 		END_CASE
 
 		CASE (ROTATE_TOKEN)
 			Parse_Vector (Local_Vector);
-			Compute_Rotation_Transform(&Local_Trans, *Local_Vector);
+			Compute_Rotation_Transform(&Local_Trans, Local_Vector);
 			Transform_Textures (Texture, &Local_Trans);
 		END_CASE
 
 		CASE (SCALE_TOKEN)
 			Parse_Scale_Vector (Local_Vector);
-			Compute_Scaling_Transform(&Local_Trans, *Local_Vector);
+			Compute_Scaling_Transform(&Local_Trans, Local_Vector);
 			Transform_Textures (Texture, &Local_Trans);
 		END_CASE
 
@@ -3650,19 +3652,19 @@ void Parser::Parse_Media(vector<Media>& medialist)
 
 		CASE (TRANSLATE_TOKEN)
 			Parse_Vector (Local_Vector);
-			Compute_Translation_Transform(&Local_Trans, *Local_Vector);
+			Compute_Translation_Transform(&Local_Trans, Local_Vector);
 			Transform_Density (IMedia->Density, &Local_Trans);
 		END_CASE
 
 		CASE (ROTATE_TOKEN)
 			Parse_Vector (Local_Vector);
-			Compute_Rotation_Transform(&Local_Trans, *Local_Vector);
+			Compute_Rotation_Transform(&Local_Trans, Local_Vector);
 			Transform_Density (IMedia->Density, &Local_Trans);
 		END_CASE
 
 		CASE (SCALE_TOKEN)
 			Parse_Scale_Vector (Local_Vector);
-			Compute_Scaling_Transform(&Local_Trans, *Local_Vector);
+			Compute_Scaling_Transform(&Local_Trans, Local_Vector);
 			Transform_Density (IMedia->Density, &Local_Trans);
 		END_CASE
 
@@ -3967,13 +3969,13 @@ FOG *Parser::Parse_Fog()
 
 		CASE (ROTATE_TOKEN)
 			Parse_Vector(Vector);
-			Compute_Rotation_Transform(&Trans, *Vector);
+			Compute_Rotation_Transform(&Trans, Vector);
 			MTransDirection(Fog->Up, Fog->Up, &Trans);
 		END_CASE
 
 		CASE (SCALE_TOKEN)
 			Parse_Vector(Vector);
-			Compute_Scaling_Transform(&Trans, *Vector);
+			Compute_Scaling_Transform(&Trans, Vector);
 			MTransDirection(Fog->Up, Fog->Up, &Trans);
 		END_CASE
 
@@ -3981,7 +3983,7 @@ FOG *Parser::Parse_Fog()
 			Parse_Vector(Vector);
 			Warning(0, "A fog's up vector can't be translated.");
 /*
-			Compute_Translation_Transform(&Trans, *Vector);
+			Compute_Translation_Transform(&Trans, Vector);
 			MTransDirection(Fog->Up, Fog->Up, &Trans);
 */
 		END_CASE
@@ -4006,7 +4008,7 @@ FOG *Parser::Parse_Fog()
 
 	/* Make sure the up vector is normalized. */
 
-	VNormalize(Fog->Up, Fog->Up);
+	Fog->Up.normalize();
 
 	return(Fog);
 }
@@ -4146,24 +4148,24 @@ RAINBOW *Parser::Parse_Rainbow()
 
 	/* Check for illegal vectors. */
 
-	VDot(dot, Rainbow->Antisolar_Vector, Rainbow->Antisolar_Vector);
+	dot = Rainbow->Antisolar_Vector.lengthSqr();
 
 	if (fabs(dot) < EPSILON)
 	{
 		Error("Rainbow's direction vector is zero.");
 	}
 
-	VDot(dot, Rainbow->Up_Vector, Rainbow->Up_Vector);
+	dot = Rainbow->Up_Vector.lengthSqr();
 
 	if (fabs(dot) < EPSILON)
 	{
 		Error("Rainbow's up vector is zero.");
 	}
 
-	VNormalizeEq(Rainbow->Antisolar_Vector);
-	VNormalizeEq(Rainbow->Up_Vector);
+	Rainbow->Antisolar_Vector.normalize();
+	Rainbow->Up_Vector.normalize();
 
-	VDot(dot, Rainbow->Up_Vector, Rainbow->Antisolar_Vector);
+	dot = Rainbow->Up_Vector.lengthSqr();
 
 	if (fabs(1.0 - fabs(dot)) < EPSILON)
 	{
@@ -4172,12 +4174,12 @@ RAINBOW *Parser::Parse_Rainbow()
 
 	/* Make sure that up and antisolar vector are perpendicular. */
 
-	VCross(Rainbow->Right_Vector, Rainbow->Up_Vector, Rainbow->Antisolar_Vector);
+	Rainbow->Right_Vector = cross(Rainbow->Up_Vector, Rainbow->Antisolar_Vector);
 
-	VCross(Rainbow->Up_Vector, Rainbow->Antisolar_Vector, Rainbow->Right_Vector);
+	Rainbow->Up_Vector = cross(Rainbow->Antisolar_Vector, Rainbow->Right_Vector);
 
-	VNormalizeEq(Rainbow->Up_Vector);
-	VNormalizeEq(Rainbow->Right_Vector);
+	Rainbow->Up_Vector.normalize();
+	Rainbow->Right_Vector.normalize();
 
 	/* Adjust rainbow angle and width. */
 
@@ -4257,17 +4259,17 @@ SKYSPHERE *Parser::Parse_Skysphere()
 
 		CASE (TRANSLATE_TOKEN)
 			Parse_Vector (Local_Vector);
-			Translate_Skysphere(Skysphere, *Local_Vector);
+			Translate_Skysphere(Skysphere, Local_Vector);
 		END_CASE
 
 		CASE (ROTATE_TOKEN)
 			Parse_Vector (Local_Vector);
-			Rotate_Skysphere(Skysphere, *Local_Vector);
+			Rotate_Skysphere(Skysphere, Local_Vector);
 		END_CASE
 
 		CASE (SCALE_TOKEN)
 			Parse_Scale_Vector (Local_Vector);
-			Scale_Skysphere(Skysphere, *Local_Vector);
+			Scale_Skysphere(Skysphere, Local_Vector);
 		END_CASE
 
 		CASE (MATRIX_TOKEN)
@@ -4467,7 +4469,7 @@ void Parser::Parse_Warp (WARP **Warp_Ptr)
 		CASE(TURBULENCE_TOKEN)
 			New=Create_Warp(EXTRA_TURB_WARP);
 			Turb=reinterpret_cast<TURB *>(New);
-			Parse_Vector(Local_Vector); Assign_Vector(Turb->Turbulence, *Local_Vector);
+			Parse_Vector(Turb->Turbulence);
 			EXPECT
 				CASE(OCTAVES_TOKEN)
 					Turb->Octaves = (int)Parse_Float();
@@ -4554,7 +4556,7 @@ void Parser::Parse_Warp (WARP **Warp_Ptr)
 			New = Create_Warp(BLACK_HOLE_WARP) ;
 			Black_Hole = reinterpret_cast<BLACK_HOLE *>(New) ;
 			Parse_Vector (Local_Vector) ;
-			Assign_Vector (Black_Hole->Center, *Local_Vector) ;
+			Black_Hole->Center = Local_Vector;
 			Parse_Comma () ;
 			Black_Hole->Radius = Parse_Float () ;
 			Black_Hole->Radius_Squared = Black_Hole->Radius * Black_Hole->Radius ;
@@ -4608,7 +4610,7 @@ void Parser::Parse_Warp (WARP **Warp_Ptr)
 				CASE(ORIENTATION_TOKEN)
 					Parse_Vector (Local_Vector) ;
 					Local_Vector.normalize();
-					Assign_Vector (CylW->Orientation_Vector, *Local_Vector) ;
+					CylW->Orientation_Vector = Local_Vector;
 				END_CASE
 
 				CASE(DIST_EXP_TOKEN)
@@ -4630,7 +4632,7 @@ void Parser::Parse_Warp (WARP **Warp_Ptr)
 				CASE(ORIENTATION_TOKEN)
 					Parse_Vector (Local_Vector) ;
 					Local_Vector.normalize();
-					Assign_Vector (SphereW->Orientation_Vector, *Local_Vector) ;
+					SphereW->Orientation_Vector = Local_Vector;
 				END_CASE
 
 				CASE(DIST_EXP_TOKEN)
@@ -4651,7 +4653,7 @@ void Parser::Parse_Warp (WARP **Warp_Ptr)
 			if(Allow_Vector(Local_Vector))
 			{
 				Local_Vector.normalize();
-				Assign_Vector(PlanarW->Orientation_Vector,*Local_Vector);
+				PlanarW->Orientation_Vector = Local_Vector;
 				Parse_Comma();
 				PlanarW->OffSet=Parse_Float();
 			}
@@ -4665,7 +4667,7 @@ void Parser::Parse_Warp (WARP **Warp_Ptr)
 				CASE(ORIENTATION_TOKEN)
 					Parse_Vector (Local_Vector) ;
 					Local_Vector.normalize();
-					Assign_Vector (Toroidal->Orientation_Vector, *Local_Vector) ;
+					Toroidal->Orientation_Vector = Local_Vector;
 				END_CASE
 
 				CASE(DIST_EXP_TOKEN)
@@ -4762,7 +4764,7 @@ void Parser::Parse_Material(MATERIAL *Material)
 
 		CASE (TRANSLATE_TOKEN)
 			Parse_Vector (Local_Vector);
-			Compute_Translation_Transform(&Local_Trans, *Local_Vector);
+			Compute_Translation_Transform(&Local_Trans, Local_Vector);
 			Transform_Textures (Material->Texture, &Local_Trans);
 			if(Material->interior!= NULL)
 				Material->interior->Transform(&Local_Trans);
@@ -4770,7 +4772,7 @@ void Parser::Parse_Material(MATERIAL *Material)
 
 		CASE (ROTATE_TOKEN)
 			Parse_Vector (Local_Vector);
-			Compute_Rotation_Transform(&Local_Trans, *Local_Vector);
+			Compute_Rotation_Transform(&Local_Trans, Local_Vector);
 			Transform_Textures (Material->Texture, &Local_Trans);
 			if(Material->interior!= NULL)
 				Material->interior->Transform(&Local_Trans);
@@ -4778,7 +4780,7 @@ void Parser::Parse_Material(MATERIAL *Material)
 
 		CASE (SCALE_TOKEN)
 			Parse_Scale_Vector (Local_Vector);
-			Compute_Scaling_Transform(&Local_Trans, *Local_Vector);
+			Compute_Scaling_Transform(&Local_Trans, Local_Vector);
 			Transform_Textures (Material->Texture, &Local_Trans);
 			if(Material->interior!= NULL)
 				Material->interior->Transform(&Local_Trans);
@@ -4996,8 +4998,9 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
 
 		CASE (GRADIENT_TOKEN)
 			New->Type = GRADIENT_PATTERN;
-			Parse_Vector (New->Vals.Gradient);
-			VNormalizeEq(New->Vals.Gradient);
+			Parse_Vector (Local_Vector);
+			Local_Vector.normalize();
+			Assign_Vector(New->Vals.Gradient, *Local_Vector);
 			EXIT
 		END_CASE
 
@@ -5432,17 +5435,17 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
 
 		CASE (TRANSLATE_TOKEN)
 			Parse_Vector (Local_Vector);
-			Translate_Tpattern (New, *Local_Vector);
+			Translate_Tpattern (New, Local_Vector);
 		END_CASE
 
 		CASE (ROTATE_TOKEN)
 			Parse_Vector (Local_Vector);
-			Rotate_Tpattern (New, *Local_Vector);
+			Rotate_Tpattern (New, Local_Vector);
 		END_CASE
 
 		CASE (SCALE_TOKEN)
 			Parse_Scale_Vector (Local_Vector);
-			Scale_Tpattern (New, *Local_Vector);
+			Scale_Tpattern (New, Local_Vector);
 		END_CASE
 
 		CASE (MATRIX_TOKEN)
