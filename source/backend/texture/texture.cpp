@@ -29,9 +29,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/texture/texture.cpp $
- * $Revision: #43 $
- * $Change: 6150 $
- * $DateTime: 2013/11/30 14:13:48 $
+ * $Revision: #44 $
+ * $Change: 6154 $
+ * $DateTime: 2013/12/01 13:49:24 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -1242,7 +1242,7 @@ TEXTURE *Create_Texture()
 {
 	TEXTURE *New;
 
-	New = reinterpret_cast<TEXTURE *>(POV_MALLOC(sizeof (TEXTURE), "texture"));
+	New = new TEXTURE;
 
 	Init_TPat_Fields(reinterpret_cast<TPATTERN *>(New));
 
@@ -1489,7 +1489,7 @@ void Destroy_Textures(TEXTURE *Textures)
 		}
 
 		Temp = reinterpret_cast<TEXTURE *>(Layer->Next);
-		POV_FREE(Layer);
+		delete Layer;
 		Layer = Temp;
 	}
 }
@@ -1646,9 +1646,9 @@ int Test_Opacity(const TEXTURE *Texture)
 
 				/* Layer is not opaque if the image map is used just once. */
 
-				if (Layer->Vals.image != NULL)
+				if (dynamic_cast<ImagePattern*>(Layer->pattern.get())->image != NULL)
 				{
-					if (Layer->Vals.image->Once_Flag)
+					if (dynamic_cast<ImagePattern*>(Layer->pattern.get())->image->Once_Flag)
 					{
 						break;
 					}

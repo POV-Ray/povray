@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/pattern/pattern.h $
- * $Revision: #29 $
- * $Change: 6150 $
- * $DateTime: 2013/11/30 14:13:48 $
+ * $Revision: #30 $
+ * $Change: 6154 $
+ * $DateTime: 2013/12/01 13:49:24 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -57,8 +57,8 @@ namespace pov
 ******************************************************************************/
 
 #define LAST_SPECIAL_PATTERN     BITMAP_PATTERN
-#define LAST_NORM_ONLY_PATTERN   DENTS_PATTERN
-#define LAST_INTEGER_PATTERN     HEXAGON_PATTERN
+#define LAST_NORM_ONLY_PATTERN   GENERIC_NORM_ONLY_PATTERN
+#define LAST_INTEGER_PATTERN     GENERIC_INTEGER_PATTERN
 
 enum PATTERN_IDS
 {
@@ -78,29 +78,20 @@ enum PATTERN_IDS
 	FACETS_PATTERN,
 	DENTS_PATTERN,
 
+	GENERIC_NORM_ONLY_PATTERN,  ///< Pattern does not need any legacy special handling anywhere, except for its property of having a special implementation for normals.
+
 /* These patterns return integer values.  They must be kept
-   together in the list.  Any new integer functions added must be added
-   here and the list renumbered. */
-	CHECKER_PATTERN,
-	OBJECT_PATTERN,
-	BRICK_PATTERN,
-	CUBIC_PATTERN, // JN2007: Cubic pattern
-	SQUARE_PATTERN,
-	TRIANGULAR_PATTERN,
-	HEXAGON_PATTERN,
+   together in the list.  Any new integer functions added must be added here. */
+	OBJECT_PATTERN, // NOT in all cases as the others in this group
+	BRICK_PATTERN,  // NOT in all cases as the others in this group
+
+	GENERIC_INTEGER_PATTERN,    ///< Pattern does not need any legacy special handling anywhere, except for its property of returning an integer value.
 
 /* These patterns return float values.  They must be kept together
    and seperate from those above. */
-	BOZO_PATTERN,
-	CELLS_PATTERN,
 	MARBLE_PATTERN,
 	WOOD_PATTERN,
-	SPOTTED_PATTERN,
 	AGATE_PATTERN,
-	GRANITE_PATTERN,
-	GRADIENT_PATTERN,
-	ONION_PATTERN,
-	LEOPARD_PATTERN,
 	JULIA_PATTERN,
 	JULIA3_PATTERN,
 	JULIA4_PATTERN,
@@ -113,34 +104,22 @@ enum PATTERN_IDS
 	MAGNET1J_PATTERN,
 	MAGNET2M_PATTERN,
 	MAGNET2J_PATTERN,
-	RADIAL_PATTERN,
 	CRACKLE_PATTERN,
-	SPIRAL1_PATTERN,
-	SPIRAL2_PATTERN,
-	PLANAR_PATTERN,
-	SPHERICAL_PATTERN,
-	BOXED_PATTERN,
-	CYLINDRICAL_PATTERN,
 	DENSITY_FILE_PATTERN,
-	FUNCTION_PATTERN,
-	SLOPE_PATTERN,
-	AOI_PATTERN,
-	PIGMENT_PATTERN,
 	IMAGE_PATTERN,
 	PAVEMENT_PATTERN,
-	TILING_PATTERN
+	TILING_PATTERN,
+
+	GENERIC_PATTERN     ///< Pattern does not need any legacy special handling anywhere
 };
 
-/* Pattern flags */
+/* flags for patterned stuff */
 
 #define NO_FLAGS              0
 #define HAS_FILTER            1
-#define FULL_BLOCKING         2
+// value 2 is currently not used
 #define POST_DONE             4
 #define DONT_SCALE_BUMPS_FLAG 8 /* scale bumps for normals */
-#define NOISE_FLAG_1         16 /* this flag and the next one work together */
-#define NOISE_FLAG_2         32 /* neither=default, 1=orig,2=range,3=perlin */
-#define NOISE_FLAGS         NOISE_FLAG_1+NOISE_FLAG_2
 
 #define Destroy_Turb(t) if ((t)!=NULL) POV_FREE(t);
 
@@ -163,6 +142,502 @@ enum
 /*****************************************************************************
 * Global typedefs
 ******************************************************************************/
+
+
+struct BasicPattern
+{
+	unsigned short Wave_Type;
+	unsigned char noiseGenerator; ///< 0=default, 1=orig, 2=range, 3=perlin
+	SNGL Frequency, Phase;
+	SNGL Exponent;
+	WARP *Warps;
+
+	BasicPattern();
+	BasicPattern(const BasicPattern& obj);
+	virtual ~BasicPattern();
+	int GetNoiseGen(const TraceThreadData *Thread) const;
+	virtual PatternPtr Clone() const = 0;
+	virtual DBL operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const = 0;
+	virtual const BLEND_MAP* GetDefaultBlendMap() const;
+
+	template<typename T>
+	static PatternPtr Clone(const T& obj) { return PatternPtr(new T(obj)); }
+};
+
+struct DiscretePattern : public BasicPattern
+{
+	virtual unsigned int NumBlendMapEntries() const = 0;
+};
+
+
+struct AgatePattern : public BasicPattern
+{
+	SNGL Agate_Turb_Scale;
+
+	virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
+	virtual DBL operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const;
+	virtual const BLEND_MAP* GetDefaultBlendMap() const;
+};
+
+struct AOIPattern : public BasicPattern
+{
+	virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
+	virtual DBL operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const;
+};
+
+struct BoxedPattern : public BasicPattern
+{
+	virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
+	virtual DBL operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const;
+};
+
+struct BrickPattern : public DiscretePattern
+{
+	SNGL Mortar;
+	Vector3d Size;
+
+	virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
+	virtual DBL operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const;
+	virtual const BLEND_MAP* GetDefaultBlendMap() const;
+	virtual unsigned int NumBlendMapEntries() const;
+};
+
+struct CellsPattern : public BasicPattern
+{
+	virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
+	virtual DBL operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const;
+};
+
+struct CheckerPattern : public DiscretePattern
+{
+	virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
+	virtual DBL operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const;
+	virtual const BLEND_MAP* GetDefaultBlendMap() const;
+	virtual unsigned int NumBlendMapEntries() const;
+};
+
+struct CracklePattern : public BasicPattern
+{
+	Vector3d Form;
+	DBL Metric;
+	DBL Offset;
+	DBL Dim;
+	short IsSolid;
+
+	virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
+	virtual DBL operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const;
+};
+
+struct CubicPattern : public DiscretePattern
+{
+	virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
+	virtual DBL operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const;
+	virtual const BLEND_MAP* GetDefaultBlendMap() const;
+	virtual unsigned int NumBlendMapEntries() const;
+};
+
+struct CylindricalPattern : public BasicPattern
+{
+	virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
+	virtual DBL operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const;
+};
+
+struct DentsPattern : public BasicPattern
+{
+	virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
+	virtual DBL operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const;
+};
+
+struct DensityFilePattern : public BasicPattern
+{
+	struct Density_file_Data_Struct
+	{
+		int References;
+		char *Name;
+		size_t Sx, Sy, Sz;
+		int Type;
+		union
+		{
+			unsigned char *Density8;
+			unsigned short *Density16;
+			unsigned int *Density32;
+		};
+	};
+	struct Density_file_Struct
+	{
+		int Interpolation;
+		Density_file_Data_Struct *Data;
+	};
+
+	Density_file_Struct *Density_File;
+
+	DensityFilePattern();
+	DensityFilePattern(const DensityFilePattern& obj);
+	virtual ~DensityFilePattern();
+	virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
+	virtual DBL operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const;
+};
+typedef struct DensityFilePattern::Density_file_Struct DENSITY_FILE;
+typedef struct DensityFilePattern::Density_file_Data_Struct DENSITY_FILE_DATA;
+
+struct FacetsPattern : public BasicPattern
+{
+	DBL Size, UseCoords, Metric;
+
+	virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
+	virtual DBL operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const;
+};
+
+struct FractalPattern : public BasicPattern
+{
+	unsigned int Iterations;
+	DBL efactor, ifactor; 
+	unsigned char interior_type, exterior_type;
+
+	virtual PatternPtr Clone() const = 0;
+	virtual DBL operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const = 0;
+	DBL ExteriorColour(int iters, DBL a, DBL b) const;
+	DBL InteriorColour(DBL a, DBL b, DBL mindist2) const;
+};
+
+class FunctionVM;
+struct FunctionPattern : public BasicPattern
+{
+	void *Fn;
+	unsigned int Data;
+	FunctionVM *vm;
+
+	FunctionPattern();
+	FunctionPattern(const FunctionPattern& obj);
+	virtual ~FunctionPattern();
+	virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
+	virtual DBL operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const;
+};
+
+struct GradientPattern : public BasicPattern
+{
+	Vector3d Gradient;
+
+	virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
+	virtual DBL operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const;
+};
+
+struct GranitePattern : public BasicPattern
+{
+	virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
+	virtual DBL operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const;
+};
+
+struct HexagonPattern : public DiscretePattern
+{
+	virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
+	virtual DBL operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const;
+	virtual const BLEND_MAP* GetDefaultBlendMap() const;
+	virtual unsigned int NumBlendMapEntries() const;
+};
+
+class ImageData;
+struct ImagePattern : public BasicPattern
+{
+	ImageData *image;
+
+	ImagePattern();
+	ImagePattern(const ImagePattern& obj);
+	virtual ~ImagePattern();
+	virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
+	virtual DBL operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const;
+};
+
+struct LeopardPattern : public BasicPattern
+{
+	virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
+	virtual DBL operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const;
+};
+
+struct MarblePattern : public BasicPattern
+{
+	virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
+	virtual DBL operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const;
+	virtual const BLEND_MAP* GetDefaultBlendMap() const;
+};
+
+struct NoisePattern : public BasicPattern
+{
+	virtual PatternPtr Clone() const = 0;
+	virtual DBL operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const;
+};
+
+struct ObjectPattern : public DiscretePattern
+{
+	ObjectBase *Object;
+
+	ObjectPattern();
+	ObjectPattern(const ObjectPattern& obj);
+	virtual ~ObjectPattern();
+	virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
+	virtual DBL operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const;
+	virtual const BLEND_MAP* GetDefaultBlendMap() const;
+	virtual unsigned int NumBlendMapEntries() const;
+};
+
+struct OnionPattern : public BasicPattern
+{
+	virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
+	virtual DBL operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const;
+};
+
+// TODO - we should probably make this one class per pavement type
+struct PavementPattern : public BasicPattern
+{
+	unsigned char Side, Tile, Number, Exterior, Interior, Form;
+
+	virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
+	virtual DBL operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const;
+	DBL hexagonal (const Vector3d& EPoint) const;
+	DBL trigonal (const Vector3d& EPoint) const;
+	DBL tetragonal (const Vector3d& EPoint) const;
+};
+
+struct PigmentPattern : public BasicPattern
+{
+	PIGMENT *Pigment;
+
+	PigmentPattern();
+	PigmentPattern(const PigmentPattern& obj);
+	virtual ~PigmentPattern();
+	virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
+	virtual DBL operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const;
+};
+
+struct PlanarPattern : public BasicPattern
+{
+	virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
+	virtual DBL operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const;
+};
+
+struct QuiltedPattern : public BasicPattern
+{
+	SNGL Control0, Control1;
+
+	virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
+	virtual DBL operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const;
+};
+
+struct RadialPattern : public BasicPattern
+{
+	virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
+	virtual DBL operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const;
+	virtual const BLEND_MAP* GetDefaultBlendMap() const;
+};
+
+struct RipplesPattern : public BasicPattern
+{
+	virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
+	virtual DBL operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const;
+};
+
+struct SlopePattern : public BasicPattern
+{
+	Vector3d Slope_Vector, Altit_Vector;
+	short Slope_Base, Altit_Base;
+	DBL Slope_Len, Altit_Len;
+	UV_VECT Slope_Mod, Altit_Mod;
+	bool Point_At;
+
+	virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
+	virtual DBL operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const;
+};
+
+struct SphericalPattern : public BasicPattern
+{
+	virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
+	virtual DBL operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const;
+};
+
+struct SpiralPattern : public BasicPattern
+{
+	short Arms;
+
+	virtual PatternPtr Clone() const = 0;
+	virtual DBL operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const = 0;
+};
+
+struct SquarePattern : public DiscretePattern
+{
+	virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
+	virtual DBL operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const;
+	virtual const BLEND_MAP* GetDefaultBlendMap() const;
+	virtual unsigned int NumBlendMapEntries() const;
+};
+
+// TODO - we should probably make this one class per tiling type
+struct TilingPattern : public BasicPattern
+{
+	unsigned char Pattern;
+
+	virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
+	virtual DBL operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const;
+};
+
+struct TriangularPattern : public DiscretePattern
+{
+	virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
+	virtual DBL operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const;
+	virtual const BLEND_MAP* GetDefaultBlendMap() const;
+	virtual unsigned int NumBlendMapEntries() const;
+};
+
+struct WavesPattern : public BasicPattern
+{
+	virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
+	virtual DBL operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const;
+};
+
+struct WoodPattern : public BasicPattern
+{
+	virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
+	virtual DBL operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const;
+	virtual const BLEND_MAP* GetDefaultBlendMap() const;
+};
+
+struct WrinklesPattern : public BasicPattern
+{
+	virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
+	virtual DBL operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const;
+};
+
+
+struct JuliaPattern : public FractalPattern
+{
+	Vector2d Coord;
+
+	JuliaPattern();
+	JuliaPattern(const JuliaPattern& obj);
+	virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
+	virtual DBL operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const;
+};
+
+struct Julia3Pattern : public JuliaPattern
+{
+	Julia3Pattern();
+	Julia3Pattern(const JuliaPattern& obj);
+	virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
+	virtual DBL operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const;
+};
+
+struct Julia4Pattern : public JuliaPattern
+{
+	Julia4Pattern();
+	Julia4Pattern(const JuliaPattern& obj);
+	virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
+	virtual DBL operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const;
+};
+
+struct JuliaXPattern : public JuliaPattern
+{
+	int Exponent;
+
+	JuliaXPattern();
+	JuliaXPattern(const JuliaPattern& obj);
+	virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
+	virtual DBL operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const;
+};
+
+
+struct MandelPattern : public FractalPattern
+{
+};
+
+struct Mandel2Pattern : public MandelPattern
+{
+	Mandel2Pattern();
+	Mandel2Pattern(const MandelPattern& obj);
+	virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
+	virtual DBL operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const;
+	virtual const BLEND_MAP* GetDefaultBlendMap() const;
+};
+
+struct Mandel3Pattern : public MandelPattern
+{
+	Mandel3Pattern();
+	Mandel3Pattern(const MandelPattern& obj);
+	virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
+	virtual DBL operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const;
+};
+
+struct Mandel4Pattern : public MandelPattern
+{
+	Mandel4Pattern();
+	Mandel4Pattern(const MandelPattern& obj);
+	virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
+	virtual DBL operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const;
+};
+
+struct MandelXPattern : public MandelPattern
+{
+	int Exponent;
+
+	MandelXPattern();
+	MandelXPattern(const MandelPattern& obj);
+	virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
+	virtual DBL operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const;
+};
+
+
+struct Magnet1MPattern : public MandelPattern
+{
+	virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
+	virtual DBL operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const;
+};
+
+struct Magnet1JPattern : public JuliaPattern
+{
+	virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
+	virtual DBL operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const;
+};
+
+struct Magnet2MPattern : public MandelPattern
+{
+	virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
+	virtual DBL operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const;
+};
+
+struct Magnet2JPattern : public JuliaPattern
+{
+	virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
+	virtual DBL operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const;
+};
+
+
+struct BozoPattern : public NoisePattern
+{
+	virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
+	virtual const BLEND_MAP* GetDefaultBlendMap() const;
+};
+
+struct BumpsPattern : public NoisePattern
+{
+	virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
+};
+
+struct SpottedPattern : public NoisePattern
+{
+	virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
+};
+
+
+struct Spiral1Pattern : public SpiralPattern
+{
+	virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
+	virtual DBL operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const;
+};
+
+struct Spiral2Pattern : public SpiralPattern
+{
+	virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
+	virtual DBL operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const;
+};
+
 
 // see boost functional/hash example
 class Crackle_Cell_Coord

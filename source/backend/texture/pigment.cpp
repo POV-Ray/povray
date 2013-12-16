@@ -26,9 +26,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/texture/pigment.cpp $
- * $Revision: #37 $
- * $Change: 6150 $
- * $DateTime: 2013/11/30 14:13:48 $
+ * $Revision: #38 $
+ * $Change: 6154 $
+ * $DateTime: 2013/12/01 13:49:24 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -71,104 +71,6 @@ namespace pov
 * Local variables
 ******************************************************************************/
 
-static BLEND_MAP_ENTRY Black_White_Entries[2] =
-	{{0.0, false, {{0.0, 0.0, 0.0, 0.0, 0.0}}},
-	 {1.0, false, {{1.0, 1.0, 1.0, 0.0, 0.0}}}};
-
-const BLEND_MAP Gray_Default_Map =
-	{ -1,  2,  false, COLOUR_TYPE,  Black_White_Entries};
-
-static BLEND_MAP_ENTRY Bozo_Entries[6] =
-	{{0.4, false, {{1.0, 1.0, 1.0, 0.0, 0.0}}},
-	 {0.4, false, {{0.0, 1.0, 0.0, 0.0, 0.0}}},
-	 {0.6, false, {{0.0, 1.0, 0.0, 0.0, 0.0}}},
-	 {0.6, false, {{0.0, 0.0, 1.0, 0.0, 0.0}}},
-	 {0.8, false, {{0.0, 0.0, 1.0, 0.0, 0.0}}},
-	 {0.8, false, {{1.0, 0.0, 0.0, 0.0, 0.0}}}};
-
-const BLEND_MAP Bozo_Default_Map =
-	{ -1,  6,  false, COLOUR_TYPE,  Bozo_Entries};
-
-static BLEND_MAP_ENTRY Wood_Entries[2] =
-	{{0.6, false, {{0.666, 0.312,  0.2,   0.0, 0.0}}},
-	 {0.6, false, {{0.4,   0.1333, 0.066, 0.0, 0.0}}}};
-
-const BLEND_MAP Wood_Default_Map =
-	{ -1,  2,  false, COLOUR_TYPE,  Wood_Entries};
-
-static BLEND_MAP_ENTRY Mandel_Entries[5] =
-	{{0.001, false, {{0.0, 0.0, 0.0, 0.0, 0.0}}},
-	 {0.001, false, {{0.0, 1.0, 1.0, 0.0, 0.0}}},
-	 {0.012, false, {{1.0, 1.0, 0.0, 0.0, 0.0}}},
-	 {0.015, false, {{1.0, 0.0, 1.0, 0.0, 0.0}}},
-	 {0.1,   false, {{0.0, 1.0, 1.0, 0.0, 0.0}}}};
-
-const BLEND_MAP Mandel_Default_Map =
-	{ -1,  5,  false, COLOUR_TYPE,  Mandel_Entries};
-
-static BLEND_MAP_ENTRY Agate_Entries[6] =
-	{{0.0, false, {{1.0,  1.0,  1.0,  0.0, 0.0}}},
-	 {0.5, false, {{0.95, 0.75, 0.5,  0.0, 0.0}}},
-	 {0.5, false, {{0.9,  0.7,  0.5,  0.0, 0.0}}},
-	 {0.6, false, {{0.9,  0.7,  0.4,  0.0, 0.0}}},
-	 {0.6, false, {{1.0,  0.7,  0.4,  0.0, 0.0}}},
-	 {1.0, false, {{0.6,  0.3,  0.0,  0.0, 0.0}}}};
-
-const BLEND_MAP Agate_Default_Map =
-	{ -1,  6,  false, COLOUR_TYPE,  Agate_Entries};
-
-static BLEND_MAP_ENTRY Radial_Entries[4] =
-	{{0.0,   false, {{0.0, 1.0, 1.0, 0.0, 0.0}}},
-	 {0.333, false, {{1.0, 1.0, 0.0, 0.0, 0.0}}},
-	 {0.666, false, {{1.0, 0.0, 1.0, 0.0, 0.0}}},
-	 {1.0,   false, {{0.0, 1.0, 1.0, 0.0, 0.0}}}};
-
-const BLEND_MAP Radial_Default_Map =
-	{ -1,  4,  false, COLOUR_TYPE,  Radial_Entries};
-
-static BLEND_MAP_ENTRY Marble_Entries[3] =
-	{{0.0, false, {{0.9, 0.8,  0.8,  0.0, 0.0}}},
-	 {0.9, false, {{0.9, 0.08, 0.08, 0.0, 0.0}}},
-	 {0.9, false, {{0.0, 0.0, 0.0, 0.0, 0.0}}}};
-
-const BLEND_MAP Marble_Default_Map =
-	{ -1,  3,  false, COLOUR_TYPE,  Marble_Entries};
-
-static BLEND_MAP_ENTRY Brick_Entries[2] =
-	{{0.0, false, {{0.5, 0.5,  0.5,  0.0, 0.0}}},
-	 {1.0, false, {{0.6, 0.15, 0.15, 0.0, 0.0}}}};
-
-const BLEND_MAP Brick_Default_Map =
-	{ -1,  2,  false, COLOUR_TYPE,  Brick_Entries};
-
-static BLEND_MAP_ENTRY Hex_Entries[3] =
-	{{0.0, false, {{0.0, 0.0, 1.0, 0.0, 0.0}}},
-	 {1.0, false, {{0.0, 1.0, 0.0, 0.0, 0.0}}},
-	 {2.0, false, {{1.0, 0.0, 0.0, 0.0, 0.0}}}};
-
-const BLEND_MAP Hex_Default_Map =
-	{ -1, 3, false,COLOUR_TYPE, Hex_Entries};
-
-// JN2007: Cubic pattern
-static BLEND_MAP_ENTRY Cubic_Entries[6] =
-	{{0.0, false, {{1.0, 0.0, 0.0, 0.0, 0.0}}},
-	 {1.0, false, {{0.0, 1.0, 0.0, 0.0, 0.0}}},
-	 {1.0, false, {{0.0, 0.0, 1.0, 0.0, 0.0}}},
-	 {1.0, false, {{1.0, 1.0, 0.0, 0.0, 0.0}}},
-	 {1.0, false, {{0.0, 1.0, 1.0, 0.0, 0.0}}},
-	 {2.0, false, {{1.0, 0.0, 1.0, 0.0, 0.0}}}};
-const BLEND_MAP Cubic_Default_Map =
-	{ -1, 6, false,COLOUR_TYPE, Cubic_Entries};
-
-const BLEND_MAP Check_Default_Map =
-	{ -1, 2, false,COLOUR_TYPE, Hex_Entries}; /* Yes... Hex_Entries, not Check [CY] */
-
-const BLEND_MAP Triangular_Default_Map =
-	{ -1, 6, false,COLOUR_TYPE, Cubic_Entries}; /* Yes... Cubic_Entries, not Triangular [JG] */
-
-const BLEND_MAP Square_Default_Map =
-	{ -1, 4, false,COLOUR_TYPE, Cubic_Entries}; /* Yes... Cubic_Entries, not Square [JG] */
-
 
 
 /*****************************************************************************
@@ -207,7 +109,7 @@ PIGMENT *Create_Pigment ()
 {
 	PIGMENT *New;
 
-	New = reinterpret_cast<PIGMENT *>(POV_MALLOC(sizeof (PIGMENT), "pigment"));
+	New = new PIGMENT;
 
 	Init_TPat_Fields(reinterpret_cast<TPATTERN *>(New));
 
@@ -302,7 +204,7 @@ void Destroy_Pigment (PIGMENT *Pigment)
 
 		Destroy_TPat_Fields (reinterpret_cast<TPATTERN *>(Pigment));
 
-		POV_FREE(Pigment);
+		delete Pigment;
 	}
 }
 
@@ -359,13 +261,6 @@ int Post_Pigment(PIGMENT *Pigment)
 	switch (Pigment->Type)
 	{
 		case PLAIN_PATTERN:
-
-			Destroy_Warps (Pigment->Warps);
-
-			Pigment->Warps = NULL;
-
-			break;
-
 		case NO_PATTERN:
 		case BITMAP_PATTERN:
 
@@ -378,21 +273,8 @@ int Post_Pigment(PIGMENT *Pigment)
 				switch (Pigment->Type)
 				{
 					// NB: The const default blend maps are marked so that they will not be modified nor destroyed later.
-					case BOZO_PATTERN:    Pigment->Blend_Map = const_cast<BLEND_MAP *>(&Bozo_Default_Map);  break;
-					case BRICK_PATTERN:   Pigment->Blend_Map = const_cast<BLEND_MAP *>(&Brick_Default_Map); break;
-					case WOOD_PATTERN:    Pigment->Blend_Map = const_cast<BLEND_MAP *>(&Wood_Default_Map);  break;
-					case MANDEL_PATTERN:  Pigment->Blend_Map = const_cast<BLEND_MAP *>(&Mandel_Default_Map);break;
-					case RADIAL_PATTERN:  Pigment->Blend_Map = const_cast<BLEND_MAP *>(&Radial_Default_Map);break;
-					case AGATE_PATTERN:   Pigment->Blend_Map = const_cast<BLEND_MAP *>(&Agate_Default_Map); break;
-					case MARBLE_PATTERN:  Pigment->Blend_Map = const_cast<BLEND_MAP *>(&Marble_Default_Map);break;
-					case HEXAGON_PATTERN: Pigment->Blend_Map = const_cast<BLEND_MAP *>(&Hex_Default_Map);   break;
-					case SQUARE_PATTERN:  Pigment->Blend_Map = const_cast<BLEND_MAP *>(&Square_Default_Map);break;
-					case TRIANGULAR_PATTERN: Pigment->Blend_Map = const_cast<BLEND_MAP *>(&Triangular_Default_Map);break;
-					case CUBIC_PATTERN:   Pigment->Blend_Map = const_cast<BLEND_MAP *>(&Cubic_Default_Map); break; // JN2007: Cubic pattern
-					case CHECKER_PATTERN: Pigment->Blend_Map = const_cast<BLEND_MAP *>(&Check_Default_Map); break;
 					case AVERAGE_PATTERN: break;// TODO MESSAGE Error("Missing pigment_map in average pigment"); break;
-					case OBJECT_PATTERN:  Pigment->Blend_Map = const_cast<BLEND_MAP *>(&Check_Default_Map); break;
-					default:              Pigment->Blend_Map = const_cast<BLEND_MAP *>(&Gray_Default_Map);  break;
+					default:              Pigment->Blend_Map = const_cast<BLEND_MAP *>(Pigment->pattern->GetDefaultBlendMap());  break;
 				}
 			}
 
@@ -410,10 +292,10 @@ int Post_Pigment(PIGMENT *Pigment)
 	}
 
 	if ((Pigment->Type == BITMAP_PATTERN) &&
-	    (Pigment->Vals.image != NULL))
+	    (dynamic_cast<ImagePattern*>(Pigment->pattern.get())->image != NULL))
 	{
 		// bitmaps are transparent if they are used only once, or the image is not opaque
-		Has_Filter |= (Pigment->Vals.image->Once_Flag) || !is_image_opaque(Pigment->Vals.image);
+		Has_Filter |= (dynamic_cast<ImagePattern*>(Pigment->pattern.get())->image->Once_Flag) || !is_image_opaque(dynamic_cast<ImagePattern*>(Pigment->pattern.get())->image);
 	}
 
 	if ((Map = Pigment->Blend_Map) != NULL)

@@ -26,9 +26,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/texture/normal.cpp $
- * $Revision: #34 $
- * $Change: 6150 $
- * $DateTime: 2013/11/30 14:13:48 $
+ * $Revision: #35 $
+ * $Change: 6154 $
+ * $DateTime: 2013/12/01 13:49:24 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -128,7 +128,7 @@ static void ripples (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& n
 		if (length == 0.0)
 			length = 1.0;
 
-		index = length * Tnormal->Frequency + Tnormal->Phase;
+		index = length * Tnormal->pattern->Frequency + Tnormal->pattern->Phase;
 
 		scalar = cycloidal(index) * Tnormal ->Amount;
 
@@ -177,7 +177,7 @@ static void waves (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& nor
 			length = 1.0;
 		}
 
-		index = length * Tnormal->Frequency * Thread->waveFrequencies[i] + Tnormal->Phase;
+		index = length * Tnormal->pattern->Frequency * Thread->waveFrequencies[i] + Tnormal->pattern->Phase;
 
 		sinValue = cycloidal(index);
 
@@ -358,7 +358,7 @@ static void quilted (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& n
 
 	t = value.length();
 
-	t = quilt_cubic(t, Tnormal->Vals.Quilted.Control0, Tnormal->Vals.Quilted.Control1);
+	t = quilt_cubic(t, dynamic_cast<QuiltedPattern*>(Tnormal->pattern.get())->Control0, dynamic_cast<QuiltedPattern*>(Tnormal->pattern.get())->Control1);
 
 	value *= t;
 
@@ -402,14 +402,14 @@ static void facets (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& no
 	DBL      Metric;
 
 	Vector3d *cv = Thread->Facets_Cube;
-	Metric = Tnormal->Vals.Facets.Metric;
+	Metric = dynamic_cast<FacetsPattern*>(Tnormal->pattern.get())->Metric;
 
 	UseSquare = (Metric == 2 );
 	UseUnity  = (Metric == 1 );
 
 	normal.normalize();
 
-	if ( Tnormal->Vals.Facets.UseCoords )
+	if ( dynamic_cast<FacetsPattern*>(Tnormal->pattern.get())->UseCoords )
 	{
 		tv = EPoint;
 	}
@@ -418,13 +418,13 @@ static void facets (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& no
 		tv = normal;
 	}
 
-	if ( Tnormal->Vals.Facets.Size < 1e-6 )
+	if ( dynamic_cast<FacetsPattern*>(Tnormal->pattern.get())->Size < 1e-6 )
 	{
 		scale = 1e6;
 	}
 	else
 	{
-		scale = 1. / Tnormal->Vals.Facets.Size;
+		scale = 1. / dynamic_cast<FacetsPattern*>(Tnormal->pattern.get())->Size;
 	}
 
 	tv *= scale;
@@ -532,13 +532,13 @@ static void facets (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& no
 		}
 	}
 
-	if ( Tnormal->Vals.Facets.UseCoords )
+	if ( dynamic_cast<FacetsPattern*>(Tnormal->pattern.get())->UseCoords )
 	{
 		DNoise( pert, newnormal );
 		sum = dot(pert, normal);
 		newnormal = normal * sum;
 		pert -= newnormal;
-		normal += Tnormal->Vals.Facets.UseCoords * pert;
+		normal += dynamic_cast<FacetsPattern*>(Tnormal->pattern.get())->UseCoords * pert;
 	}
 	else
 	{
@@ -576,7 +576,7 @@ TNORMAL *Create_Tnormal ()
 {
 	TNORMAL *New;
 
-	New = reinterpret_cast<TNORMAL *>(POV_MALLOC(sizeof(TNORMAL), "normal"));
+	New = new TNORMAL;
 
 	Init_TPat_Fields(reinterpret_cast<TPATTERN *>(New));
 
@@ -663,7 +663,7 @@ void Destroy_Tnormal(TNORMAL *Tnormal)
 	{
 		Destroy_TPat_Fields (reinterpret_cast<TPATTERN *>(Tnormal));
 
-		POV_FREE(Tnormal);
+		delete Tnormal;
 	}
 }
 

@@ -26,9 +26,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/parser/express.cpp $
- * $Revision: #56 $
- * $Change: 6150 $
- * $DateTime: 2013/11/30 14:13:48 $
+ * $Revision: #57 $
+ * $Change: 6154 $
+ * $DateTime: 2013/12/01 13:49:24 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -1204,8 +1204,8 @@ void Parser::Parse_Num_Factor (EXPRESS Express,int *Terms)
 							}
 							else
 							{
-								Vect[X] = Pigment->Vals.image->iwidth;
-								Vect[Y] = Pigment->Vals.image->iheight;
+								Vect[X] = dynamic_cast<ImagePattern*>(Pigment->pattern.get())->image->iwidth;
+								Vect[Y] = dynamic_cast<ImagePattern*>(Pigment->pattern.get())->image->iheight;
 								Vect[Z] = 0;
 							}
 							EXIT

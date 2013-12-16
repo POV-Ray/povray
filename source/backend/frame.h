@@ -26,9 +26,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/frame.h $
- * $Revision: #133 $
- * $Change: 6150 $
- * $DateTime: 2013/11/30 14:13:48 $
+ * $Revision: #134 $
+ * $Change: 6154 $
+ * $DateTime: 2013/12/01 13:49:24 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -916,7 +916,7 @@ struct Blend_Map_Entry
 
 struct Blend_Map_Struct
 {
-	int Users;
+	int Users;                              ///< -1 for default blend maps (prevents them from being destroyed)
 	short Number_Of_Entries;
 	char Transparency_Flag, Type;
 	BLEND_MAP_ENTRY *Blend_Map_Entries;
@@ -1105,67 +1105,20 @@ typedef struct Spline_Entry SPLINE_ENTRY;
 #pragma mark * Pigment, Normal, Finish, Texture, Warp
 #endif
 
-typedef struct Density_file_Struct DENSITY_FILE;
-typedef struct Density_file_Data_Struct DENSITY_FILE_DATA;
+struct BasicPattern;
 
-struct Density_file_Struct
-{
-	int Interpolation;
-	DENSITY_FILE_DATA *Data;
-};
+typedef shared_ptr<BasicPattern> PatternPtr;
+typedef shared_ptr<const BasicPattern> ConstPatternPtr;
 
-struct Density_file_Data_Struct
-{
-	int References;
-	char *Name;
-	size_t Sx, Sy, Sz;
-	int Type;
-	union
-	{
-		unsigned char *Density8;
-		unsigned short *Density16;
-		unsigned int *Density32;
-	};
-};
-
-class ImageData;
-class FunctionVM;
 
 struct Pattern_Struct
 {
-	unsigned short Type, Wave_Type, Flags;
+	unsigned short Type;
+	unsigned short Flags;
 	int References;
-	SNGL Frequency, Phase;
-	SNGL Exponent;
-	WARP *Warps;
 	TPATTERN *Next;
+	PatternPtr pattern;
 	BLEND_MAP *Blend_Map;
-	union {
-		DENSITY_FILE *Density_File;
-		ImageData *image;
-		VECTOR Gradient;
-		SNGL Agate_Turb_Scale;
-		short Num_of_Waves;
-		short Iterations;
-		short Arms;
-		struct { SNGL Mortar; VECTOR Size; } Brick;
-		struct { SNGL Control0, Control1; } Quilted;
-		struct { DBL Size, UseCoords, Metric; } Facets;
-		struct { VECTOR Form; DBL Metric; DBL Offset; DBL Dim;
-		         short IsSolid; } Crackle;
-		struct { VECTOR Slope_Vector, Altit_Vector;
-		         short Slope_Base, Altit_Base; DBL Slope_Len,
-		         Altit_Len; UV_VECT Slope_Mod, Altit_Mod;
-		         bool Point_At; } Slope;
-		struct { UV_VECT Coord; DBL efactor, ifactor; 
-		         unsigned int Iterations; int Exponent; 
-		         unsigned char interior_type, exterior_type; } Fractal;
-		struct { void *Fn; unsigned int Data; FunctionVM *vm; } Function;
-		struct { unsigned char Side,Tile,Number,Exterior,Interior,Form;} Pavement;
-		struct { unsigned char Pattern; } Tiling;
-		PIGMENT *Pigment;
-		ObjectBase *Object;
-	} Vals;
 };
 
 struct Pigment_Struct : public Pattern_Struct
@@ -1250,7 +1203,7 @@ struct Material_Struct
 
 // TODO FIXME
 class SceneThreadData;
-#define TraceThreadData SceneThreadData
+typedef SceneThreadData TraceThreadData;
 
 // These fields are common to all objects.
 class LightSource;

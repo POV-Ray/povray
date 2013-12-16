@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/hfield.h $
- * $Revision: #23 $
- * $Change: 6138 $
- * $DateTime: 2013/11/25 18:52:19 $
+ * $Revision: #24 $
+ * $Change: 6154 $
+ * $DateTime: 2013/12/01 13:49:24 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -78,6 +78,8 @@ struct HField_Data_Struct
 	HF_Normals **Normals;
 	HFIELD_BLOCK **Block;
 };
+
+class ImageData;
 
 class HField : public ObjectBase
 {

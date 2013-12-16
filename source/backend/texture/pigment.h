@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/texture/pigment.h $
- * $Revision: #24 $
- * $Change: 6150 $
- * $DateTime: 2013/11/30 14:13:48 $
+ * $Revision: #25 $
+ * $Change: 6154 $
+ * $DateTime: 2013/12/01 13:49:24 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -61,13 +61,6 @@ namespace pov
 /*****************************************************************************
 * Global constants
 ******************************************************************************/
-
-extern const BLEND_MAP Brick_Default_Map;
-extern const BLEND_MAP Hex_Default_Map;
-extern const BLEND_MAP Square_Default_Map;
-extern const BLEND_MAP Triangular_Default_Map;
-extern const BLEND_MAP Cubic_Default_Map; // JN2007: Cubic pattern
-extern const BLEND_MAP Check_Default_Map;
 
 
 /*****************************************************************************

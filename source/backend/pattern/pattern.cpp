@@ -82,60 +82,142 @@ static int BinomialCoefficients[((FRACTAL_MAX_EXPONENT+1)*(FRACTAL_MAX_EXPONENT+
 boost::hash<Crackle_Cell_Coord> Crackle_Cell_Hasher;
 static int CrackleCubeTable[81*3];
 
+
+static BLEND_MAP_ENTRY Black_White_Entries[2] =
+	{{0.0, false, {{0.0, 0.0, 0.0, 0.0, 0.0}}},
+	 {1.0, false, {{1.0, 1.0, 1.0, 0.0, 0.0}}}};
+
+const BLEND_MAP Gray_Default_Map =
+	{ -1,  2,  false, COLOUR_TYPE,  Black_White_Entries};
+
+
+static BLEND_MAP_ENTRY Agate_Entries[6] =
+	{{0.0, false, {{1.0,  1.0,  1.0,  0.0, 0.0}}},
+	 {0.5, false, {{0.95, 0.75, 0.5,  0.0, 0.0}}},
+	 {0.5, false, {{0.9,  0.7,  0.5,  0.0, 0.0}}},
+	 {0.6, false, {{0.9,  0.7,  0.4,  0.0, 0.0}}},
+	 {0.6, false, {{1.0,  0.7,  0.4,  0.0, 0.0}}},
+	 {1.0, false, {{0.6,  0.3,  0.0,  0.0, 0.0}}}};
+
+const BLEND_MAP Agate_Default_Map =
+	{ -1,  6,  false, COLOUR_TYPE,  Agate_Entries};
+
+
+static BLEND_MAP_ENTRY Bozo_Entries[6] =
+	{{0.4, false, {{1.0, 1.0, 1.0, 0.0, 0.0}}},
+	 {0.4, false, {{0.0, 1.0, 0.0, 0.0, 0.0}}},
+	 {0.6, false, {{0.0, 1.0, 0.0, 0.0, 0.0}}},
+	 {0.6, false, {{0.0, 0.0, 1.0, 0.0, 0.0}}},
+	 {0.8, false, {{0.0, 0.0, 1.0, 0.0, 0.0}}},
+	 {0.8, false, {{1.0, 0.0, 0.0, 0.0, 0.0}}}};
+
+const BLEND_MAP Bozo_Default_Map =
+	{ -1,  6,  false, COLOUR_TYPE,  Bozo_Entries};
+
+
+static BLEND_MAP_ENTRY Brick_Entries[2] =
+	{{0.0, false, {{0.5, 0.5,  0.5,  0.0, 0.0}}},
+	 {1.0, false, {{0.6, 0.15, 0.15, 0.0, 0.0}}}};
+
+const BLEND_MAP Brick_Default_Map =
+	{ -1,  2,  false, COLOUR_TYPE,  Brick_Entries};
+
+
+static BLEND_MAP_ENTRY Checker_Entries[2] =
+	{{0.0, false, {{0.0, 0.0, 1.0, 0.0, 0.0}}},
+	 {1.0, false, {{0.0, 1.0, 0.0, 0.0, 0.0}}}};
+
+const BLEND_MAP Checker_Default_Map =
+	{ -1, 2,  false, COLOUR_TYPE,  Checker_Entries};
+
+
+static BLEND_MAP_ENTRY Cubic_Entries[6] =
+	{{0.0, false, {{1.0, 0.0, 0.0, 0.0, 0.0}}},
+	 {1.0, false, {{0.0, 1.0, 0.0, 0.0, 0.0}}}, // TODO FIXME - duplicate entry for 1.0
+	 {1.0, false, {{0.0, 0.0, 1.0, 0.0, 0.0}}}, // TODO FIXME - duplicate entry for 1.0
+	 {1.0, false, {{1.0, 1.0, 0.0, 0.0, 0.0}}}, // TODO FIXME - duplicate entry for 1.0
+	 {1.0, false, {{0.0, 1.0, 1.0, 0.0, 0.0}}}, // TODO FIXME - duplicate entry for 1.0
+	 {2.0, false, {{1.0, 0.0, 1.0, 0.0, 0.0}}}};
+
+const BLEND_MAP Cubic_Default_Map =
+	{ -1, 6,  false, COLOUR_TYPE,  Cubic_Entries};
+
+
+static BLEND_MAP_ENTRY Hexagon_Entries[3] =
+	{{0.0, false, {{0.0, 0.0, 1.0, 0.0, 0.0}}},
+	 {1.0, false, {{0.0, 1.0, 0.0, 0.0, 0.0}}},
+	 {2.0, false, {{1.0, 0.0, 0.0, 0.0, 0.0}}}};
+
+const BLEND_MAP Hexagon_Default_Map =
+	{ -1,  3,  false, COLOUR_TYPE,  Hexagon_Entries};
+
+
+static BLEND_MAP_ENTRY Mandel_Entries[5] =
+	{{0.001, false, {{0.0, 0.0, 0.0, 0.0, 0.0}}},
+	 {0.001, false, {{0.0, 1.0, 1.0, 0.0, 0.0}}},
+	 {0.012, false, {{1.0, 1.0, 0.0, 0.0, 0.0}}},
+	 {0.015, false, {{1.0, 0.0, 1.0, 0.0, 0.0}}},
+	 {0.1,   false, {{0.0, 1.0, 1.0, 0.0, 0.0}}}};
+
+const BLEND_MAP Mandel_Default_Map =
+	{ -1,  5,  false, COLOUR_TYPE,  Mandel_Entries};
+
+
+static BLEND_MAP_ENTRY Marble_Entries[3] =
+	{{0.0, false, {{0.9, 0.8,  0.8,  0.0, 0.0}}},
+	 {0.9, false, {{0.9, 0.08, 0.08, 0.0, 0.0}}},
+	 {0.9, false, {{0.0, 0.0, 0.0, 0.0, 0.0}}}};
+
+const BLEND_MAP Marble_Default_Map =
+	{ -1,  3,  false, COLOUR_TYPE,  Marble_Entries};
+
+
+static BLEND_MAP_ENTRY Radial_Entries[4] =
+	{{0.0,   false, {{0.0, 1.0, 1.0, 0.0, 0.0}}},
+	 {0.333, false, {{1.0, 1.0, 0.0, 0.0, 0.0}}},
+	 {0.666, false, {{1.0, 0.0, 1.0, 0.0, 0.0}}},
+	 {1.0,   false, {{0.0, 1.0, 1.0, 0.0, 0.0}}}};
+
+const BLEND_MAP Radial_Default_Map =
+	{ -1,  4,  false, COLOUR_TYPE,  Radial_Entries};
+
+
+static BLEND_MAP_ENTRY Square_Entries[6] =
+	{{0.0, false, {{1.0, 0.0, 0.0, 0.0, 0.0}}},
+	 {1.0, false, {{0.0, 1.0, 0.0, 0.0, 0.0}}}, // TODO FIXME - duplicate entry for 1.0
+	 {1.0, false, {{0.0, 0.0, 1.0, 0.0, 0.0}}}, // TODO FIXME - duplicate entry for 1.0
+	 {1.0, false, {{1.0, 1.0, 0.0, 0.0, 0.0}}}, // TODO FIXME - duplicate entry for 1.0
+	 {1.0, false, {{0.0, 1.0, 1.0, 0.0, 0.0}}}, // TODO FIXME - unused duplicate entry for 1.0
+	 {2.0, false, {{1.0, 0.0, 1.0, 0.0, 0.0}}}}; // TODO FIXME - unused entry (kept around until we've clarified the duplicate entries for 1.0)
+
+const BLEND_MAP Square_Default_Map =
+	{ -1, 4,  false, COLOUR_TYPE,  Square_Entries};
+
+
+static BLEND_MAP_ENTRY Triangular_Entries[6] =
+	{{0.0, false, {{1.0, 0.0, 0.0, 0.0, 0.0}}},
+	 {1.0, false, {{0.0, 1.0, 0.0, 0.0, 0.0}}}, // TODO FIXME - duplicate entry for 1.0
+	 {1.0, false, {{0.0, 0.0, 1.0, 0.0, 0.0}}}, // TODO FIXME - duplicate entry for 1.0
+	 {1.0, false, {{1.0, 1.0, 0.0, 0.0, 0.0}}}, // TODO FIXME - duplicate entry for 1.0
+	 {1.0, false, {{0.0, 1.0, 1.0, 0.0, 0.0}}}, // TODO FIXME - duplicate entry for 1.0
+	 {2.0, false, {{1.0, 0.0, 1.0, 0.0, 0.0}}}};
+
+const BLEND_MAP Triangular_Default_Map =
+	{ -1, 6,  false, COLOUR_TYPE,  Triangular_Entries};
+
+
+static BLEND_MAP_ENTRY Wood_Entries[2] =
+	{{0.6, false, {{0.666, 0.312,  0.2,   0.0, 0.0}}},
+	 {0.6, false, {{0.4,   0.1333, 0.066, 0.0, 0.0}}}};
+
+const BLEND_MAP Wood_Default_Map =
+	{ -1,  2,  false, COLOUR_TYPE,  Wood_Entries};
+
+
 /*****************************************************************************
 * Static functions
 ******************************************************************************/
 
-static DBL agate_pattern (const Vector3d& EPoint, const TPATTERN *TPat, int noise_generator);
-static DBL boxed_pattern (const Vector3d& EPoint);
-static DBL brick_pattern (const Vector3d& EPoint, const TPATTERN *TPat);
-static DBL cells_pattern (const Vector3d& EPoint);
-static DBL checker_pattern (const Vector3d& EPoint);
-static DBL crackle_pattern (const Vector3d& EPoint, const TPATTERN *TPat, TraceThreadData *Thread);
-static DBL cylindrical_pattern (const Vector3d& EPoint);
-static DBL dents_pattern (const Vector3d& EPoint, int noise_generator);
-static DBL density_pattern (const Vector3d& EPoint, const TPATTERN *TPat);
-static DBL function_pattern (const Vector3d& EPoint, const TPATTERN *TPat, TraceThreadData *Thread);
-static DBL gradient_pattern (const Vector3d& EPoint, const TPATTERN *TPat);
-static DBL granite_pattern (const Vector3d& EPoint, int noise_generator);
-static DBL hexagon_pattern (const Vector3d& EPoint);
-static DBL square_pattern (const Vector3d& EPoint);
-static DBL triangular_pattern (const Vector3d& EPoint);
-static DBL cubic_pattern (const Vector3d& EPoint);
-static DBL julia_pattern (const Vector3d& EPoint, const TPATTERN *TPat);
-static DBL julia3_pattern (const Vector3d& EPoint, const TPATTERN *TPat);
-static DBL julia4_pattern (const Vector3d& EPoint, const TPATTERN *TPat);
-static DBL juliax_pattern (const Vector3d& EPoint, const TPATTERN *TPat);
-static DBL leopard_pattern (const Vector3d& EPoint);
-static DBL magnet1m_pattern (const Vector3d& EPoint, const TPATTERN *TPat);
-static DBL magnet1j_pattern (const Vector3d& EPoint, const TPATTERN *TPat);
-static DBL magnet2m_pattern (const Vector3d& EPoint, const TPATTERN *TPat);
-static DBL magnet2j_pattern (const Vector3d& EPoint, const TPATTERN *TPat);
-static DBL mandel_pattern (const Vector3d& EPoint, const TPATTERN *TPat);
-static DBL mandel3_pattern (const Vector3d& EPoint, const TPATTERN *TPat);
-static DBL mandel4_pattern (const Vector3d& EPoint, const TPATTERN *TPat);
-static DBL mandelx_pattern (const Vector3d& EPoint, const TPATTERN *TPat);
-static DBL marble_pattern (const Vector3d& EPoint, const TPATTERN *TPat, int noise_generator);
-static DBL object_pattern (const Vector3d& EPoint, const TPATTERN *TPat, TraceThreadData *Thread);
-static DBL onion_pattern (const Vector3d& EPoint);
-static DBL pavement_pattern (const Vector3d& EPoint, const TPATTERN *TPat);
-static DBL pigment_pattern (const Vector3d& EPoint, const TPATTERN *TPat, const Intersection *isect, const Ray *ray, TraceThreadData *Thread);
-static DBL planar_pattern (const Vector3d& EPoint);
-static DBL quilted_pattern (const Vector3d& EPoint, const TPATTERN *TPat);
-static DBL radial_pattern (const Vector3d& EPoint);
-static DBL ripples_pattern (const Vector3d& EPoint, const TPATTERN *TPat, const TraceThreadData *Thread);
-static DBL slope_pattern (const Vector3d& EPoint, const TPATTERN *TPat, const Intersection *Intersection);
-static DBL aoi_pattern (const Intersection *Intersection, const Ray *ray);
-static DBL spiral1_pattern (const Vector3d& EPoint, const TPATTERN *TPat, int noise_generator);
-static DBL spiral2_pattern (const Vector3d& EPoint, const TPATTERN *TPat, int noise_generator);
-static DBL spherical_pattern (const Vector3d& EPoint);
-static DBL tiling_pattern (const Vector3d& EPoint, const TPATTERN *TPat);
-static DBL waves_pattern (const Vector3d& EPoint, const TPATTERN *TPat, const TraceThreadData *Thread);
-static DBL wood_pattern (const Vector3d& EPoint, const TPATTERN *TPat);
-static DBL wrinkles_pattern (const Vector3d& EPoint, int noise_generator);
-
-static DBL fractal_exterior_color(const TPATTERN *TPat, int iters, DBL a, DBL b);
-static DBL fractal_interior_color(const TPATTERN *TPat, int iters, DBL a, DBL b, DBL mindist2);
 static const TURB *Search_For_Turb(const WARP *Warps);
 static unsigned short readushort(IStream *infile);
 static unsigned int readuint(IStream *infile);
@@ -180,11 +262,273 @@ static unsigned int readuint(IStream *infile);
 
 int GetNoiseGen (const TPATTERN *TPat, const TraceThreadData *Thread)
 {
-	int noise_gen = (TPat->Flags & NOISE_FLAGS) / NOISE_FLAG_1;
+	int noise_gen = TPat->pattern->noiseGenerator;
 	if (!noise_gen)
 		noise_gen = Thread->GetSceneData()->noiseGenerator;
 	return noise_gen;
 }
+
+
+BasicPattern::BasicPattern() :
+	Wave_Type(RAMP_WAVE),
+	noiseGenerator(0),
+	Frequency(1.0),
+	Phase(0.0),
+	Exponent(1.0),
+	Warps(NULL)
+{}
+
+BasicPattern::BasicPattern(const BasicPattern& obj) :
+	Wave_Type(obj.Wave_Type),
+	noiseGenerator(obj.noiseGenerator),
+	Frequency(obj.Frequency),
+	Phase(obj.Phase),
+	Exponent(obj.Exponent),
+	Warps(NULL)
+{
+	if (obj.Warps)
+		Warps = Copy_Warps(obj.Warps);
+}
+
+BasicPattern::~BasicPattern()
+{
+	if (Warps)
+		Destroy_Warps(Warps);
+}
+
+int BasicPattern::GetNoiseGen(const TraceThreadData *Thread) const
+{
+	int noise_gen = noiseGenerator;
+	if (!noise_gen)
+		noise_gen = Thread->GetSceneData()->noiseGenerator;
+	return noise_gen;
+}
+
+const BLEND_MAP* BasicPattern::GetDefaultBlendMap() const { return &Gray_Default_Map; }
+
+
+const BLEND_MAP* AgatePattern::GetDefaultBlendMap() const { return &Agate_Default_Map; }
+
+const BLEND_MAP* BozoPattern::GetDefaultBlendMap() const { return &Bozo_Default_Map; }
+
+const BLEND_MAP* BrickPattern::GetDefaultBlendMap() const { return &Brick_Default_Map; }
+unsigned int BrickPattern::NumBlendMapEntries() const { return 2; }
+
+const BLEND_MAP* CheckerPattern::GetDefaultBlendMap() const { return &Checker_Default_Map; }
+unsigned int CheckerPattern::NumBlendMapEntries() const { return 2; }
+
+const BLEND_MAP* CubicPattern::GetDefaultBlendMap() const { return &Cubic_Default_Map; }
+unsigned int CubicPattern::NumBlendMapEntries() const { return 6; }
+
+
+DensityFilePattern::DensityFilePattern() :
+	Density_File(NULL)
+{}
+
+DensityFilePattern::DensityFilePattern(const DensityFilePattern& obj) :
+	BasicPattern(obj),
+	Density_File(NULL)
+{
+	if (obj.Density_File)
+		Density_File = Copy_Density_File(obj.Density_File);
+}
+
+DensityFilePattern::~DensityFilePattern()
+{
+	if (Density_File)
+		Destroy_Density_File(Density_File);
+}
+
+
+DBL FacetsPattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
+{
+	throw POV_EXCEPTION_STRING("Internal Error: FacetsPattern::operator() called.");
+}
+
+
+FunctionPattern::FunctionPattern() :
+	Fn(NULL), vm(NULL), Data(0)
+{}
+
+FunctionPattern::FunctionPattern(const FunctionPattern& obj) :
+	BasicPattern(obj),
+	Fn(NULL), vm(obj.vm), Data(obj.Data)
+{
+	if (obj.Fn)
+		Fn = reinterpret_cast<void *>(Parser::Copy_Function(obj.vm, (FUNCTION_PTR)obj.Fn));
+}
+
+FunctionPattern::~FunctionPattern()
+{
+	if (Fn)
+		Parser::Destroy_Function(vm, (FUNCTION_PTR)Fn);
+}
+
+
+const BLEND_MAP* HexagonPattern::GetDefaultBlendMap() const { return &Hexagon_Default_Map; }
+unsigned int HexagonPattern::NumBlendMapEntries() const { return 3; }
+
+
+ImagePattern::ImagePattern() :
+	image(NULL)
+{}
+
+ImagePattern::ImagePattern(const ImagePattern& obj) :
+	BasicPattern(obj),
+	image(NULL)
+{
+	if (obj.image)
+		image = Copy_Image(obj.image);
+}
+
+ImagePattern::~ImagePattern()
+{
+	if (image)
+		Destroy_Image(image);
+}
+
+DBL ImagePattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
+{
+	throw POV_EXCEPTION_STRING("Internal Error: ImagePattern::operator() called.");
+}
+
+
+const BLEND_MAP* MarblePattern::GetDefaultBlendMap() const { return &Marble_Default_Map; }
+
+
+ObjectPattern::ObjectPattern() :
+	Object(NULL)
+{}
+
+ObjectPattern::ObjectPattern(const ObjectPattern& obj) :
+	DiscretePattern(obj),
+	Object(NULL)
+{
+	if (obj.Object)
+		Object = Copy_Object(obj.Object);
+}
+
+ObjectPattern::~ObjectPattern()
+{
+	if (Object)
+		Destroy_Object(Object);
+}
+
+const BLEND_MAP* ObjectPattern::GetDefaultBlendMap() const { return &Checker_Default_Map; } // sic!
+unsigned int ObjectPattern::NumBlendMapEntries() const { return 2; }
+
+
+PigmentPattern::PigmentPattern() :
+	Pigment(NULL)
+{}
+
+PigmentPattern::PigmentPattern(const PigmentPattern& obj) :
+	BasicPattern(obj),
+	Pigment(NULL)
+{
+	if (obj.Pigment)
+		Pigment = Copy_Pigment(obj.Pigment);
+}
+
+PigmentPattern::~PigmentPattern()
+{
+	if (Pigment)
+		Destroy_Pigment(Pigment);
+}
+
+
+const BLEND_MAP* RadialPattern::GetDefaultBlendMap() const { return &Radial_Default_Map; }
+
+const BLEND_MAP* SquarePattern::GetDefaultBlendMap() const { return &Square_Default_Map; }
+unsigned int SquarePattern::NumBlendMapEntries() const { return 4; }
+
+const BLEND_MAP* TriangularPattern::GetDefaultBlendMap() const { return &Triangular_Default_Map; }
+unsigned int TriangularPattern::NumBlendMapEntries() const { return 6; }
+
+const BLEND_MAP* WoodPattern::GetDefaultBlendMap() const { return &Wood_Default_Map; }
+
+
+JuliaPattern::JuliaPattern() :
+	FractalPattern(),
+	Coord()
+{}
+
+JuliaPattern::JuliaPattern(const JuliaPattern& obj) :
+	FractalPattern(obj),
+	Coord(obj.Coord)
+{}
+
+
+Julia3Pattern::Julia3Pattern() :
+	JuliaPattern()
+{}
+
+Julia3Pattern::Julia3Pattern(const JuliaPattern& obj) :
+	JuliaPattern(obj)
+{}
+
+
+Julia4Pattern::Julia4Pattern() :
+	JuliaPattern()
+{}
+
+Julia4Pattern::Julia4Pattern(const JuliaPattern& obj) :
+	JuliaPattern(obj)
+{}
+
+
+JuliaXPattern::JuliaXPattern() :
+	JuliaPattern(),
+	Exponent(0.0)
+{}
+
+JuliaXPattern::JuliaXPattern(const JuliaPattern& obj) :
+	JuliaPattern(obj),
+	Exponent(obj.Exponent)
+{}
+
+
+Mandel2Pattern::Mandel2Pattern() :
+	MandelPattern()
+{}
+
+Mandel2Pattern::Mandel2Pattern(const MandelPattern& obj) :
+	MandelPattern(obj)
+{}
+
+const BLEND_MAP* Mandel2Pattern::GetDefaultBlendMap() const { return &Mandel_Default_Map; }
+
+
+Mandel3Pattern::Mandel3Pattern() :
+	MandelPattern()
+{}
+
+Mandel3Pattern::Mandel3Pattern(const MandelPattern& obj) :
+	MandelPattern(obj)
+{}
+
+
+Mandel4Pattern::Mandel4Pattern() :
+	MandelPattern()
+{}
+
+Mandel4Pattern::Mandel4Pattern(const MandelPattern& obj) :
+	MandelPattern(obj)
+{}
+
+
+MandelXPattern::MandelXPattern() :
+	MandelPattern(),
+	Exponent(0.0)
+{}
+
+MandelXPattern::MandelXPattern(const MandelPattern& obj) :
+	MandelPattern(obj),
+	Exponent(obj.Exponent)
+{}
+
+
+
 
 /*****************************************************************************
 *
@@ -221,71 +565,16 @@ DBL Evaluate_TPat (const TPATTERN *TPat, const Vector3d& EPoint, const Intersect
 
 	/* NK 19 Nov 1999 removed Warp_EPoint call */
 
-	switch(TPat->Type)
-	{
-		case AGATE_PATTERN:       value = agate_pattern      (EPoint, TPat, GetNoiseGen(TPat, Thread)); break;
-		case BOZO_PATTERN:
-		case SPOTTED_PATTERN:
-		case BUMPS_PATTERN:       value = Noise              (EPoint,       GetNoiseGen(TPat, Thread)); break;
-		case BRICK_PATTERN:       value = brick_pattern      (EPoint, TPat);                            break;
-		case CELLS_PATTERN:       value = cells_pattern      (EPoint);                                  break;
-		case CHECKER_PATTERN:     value = checker_pattern    (EPoint);                                  break;
-		case CRACKLE_PATTERN:     value = crackle_pattern    (EPoint, TPat, Thread);                    break;
-		case GRADIENT_PATTERN:    value = gradient_pattern   (EPoint, TPat);                            break;
-		case GRANITE_PATTERN:     value = granite_pattern    (EPoint,       GetNoiseGen(TPat, Thread)); break;
-		case HEXAGON_PATTERN:     value = hexagon_pattern    (EPoint);                                  break;
-		case SQUARE_PATTERN:      value = square_pattern     (EPoint);                                  break;
-		case TRIANGULAR_PATTERN:  value = triangular_pattern (EPoint);                                  break;
-		case CUBIC_PATTERN:       value = cubic_pattern      (EPoint);                                  break;
-		case JULIA_PATTERN:       value = julia_pattern      (EPoint, TPat);                            break;
-		case JULIA3_PATTERN:      value = julia3_pattern     (EPoint, TPat);                            break;
-		case JULIA4_PATTERN:      value = julia4_pattern     (EPoint, TPat);                            break;
-		case JULIAX_PATTERN:      value = juliax_pattern     (EPoint, TPat);                            break;
-		case LEOPARD_PATTERN:     value = leopard_pattern    (EPoint);                                  break;
-		case MAGNET1M_PATTERN:    value = magnet1m_pattern   (EPoint, TPat);                            break;
-		case MAGNET1J_PATTERN:    value = magnet1j_pattern   (EPoint, TPat);                            break;
-		case MAGNET2M_PATTERN:    value = magnet2m_pattern   (EPoint, TPat);                            break;
-		case MAGNET2J_PATTERN:    value = magnet2j_pattern   (EPoint, TPat);                            break;
-		case MANDEL_PATTERN:      value = mandel_pattern     (EPoint, TPat);                            break;
-		case MANDEL3_PATTERN:     value = mandel3_pattern    (EPoint, TPat);                            break;
-		case MANDEL4_PATTERN:     value = mandel4_pattern    (EPoint, TPat);                            break;
-		case MANDELX_PATTERN:     value = mandelx_pattern    (EPoint, TPat);                            break;
-		case MARBLE_PATTERN:      value = marble_pattern     (EPoint, TPat, GetNoiseGen(TPat, Thread)); break;
-		case ONION_PATTERN:       value = onion_pattern      (EPoint);                                  break;
-		case RADIAL_PATTERN:      value = radial_pattern     (EPoint);                                  break;
-		case SPIRAL1_PATTERN:     value = spiral1_pattern    (EPoint, TPat, GetNoiseGen(TPat, Thread)); break;
-		case SPIRAL2_PATTERN:     value = spiral2_pattern    (EPoint, TPat, GetNoiseGen(TPat, Thread)); break;
-		case WOOD_PATTERN:        value = wood_pattern       (EPoint, TPat);                            break;
-		case WAVES_PATTERN:       value = waves_pattern      (EPoint, TPat, Thread);                    break;
-		case RIPPLES_PATTERN:     value = ripples_pattern    (EPoint, TPat, Thread);                    break;
-		case WRINKLES_PATTERN:    value = wrinkles_pattern   (EPoint,       GetNoiseGen(TPat, Thread)); break;
-		case DENTS_PATTERN:       value = dents_pattern      (EPoint,       GetNoiseGen(TPat, Thread)); break;
-		case QUILTED_PATTERN:     value = quilted_pattern    (EPoint, TPat);                            break;
-		case FUNCTION_PATTERN:    value = function_pattern   (EPoint, TPat, Thread);                    break;
-		case PLANAR_PATTERN:      value = planar_pattern     (EPoint);                                  break;
-		case BOXED_PATTERN:       value = boxed_pattern      (EPoint);                                  break;
-		case SPHERICAL_PATTERN:   value = spherical_pattern  (EPoint);                                  break;
-		case CYLINDRICAL_PATTERN: value = cylindrical_pattern(EPoint);                                  break;
-		case DENSITY_FILE_PATTERN:value = density_pattern    (EPoint, TPat);                            break;
-		case IMAGE_PATTERN:       value = image_pattern      (EPoint, TPat);                            break;
-		case SLOPE_PATTERN:       value = slope_pattern      (EPoint, TPat, Isection);                  break;
-		case AOI_PATTERN:         value = aoi_pattern        (Isection, ray);                           break;
-		case PAVEMENT_PATTERN:    value = pavement_pattern   (EPoint, TPat);                            break;
-		case TILING_PATTERN:      value = tiling_pattern     (EPoint, TPat);                            break;
-		case PIGMENT_PATTERN:     value = pigment_pattern    (EPoint, TPat, Isection, ray, Thread);     break;
-		case OBJECT_PATTERN:      value = object_pattern     (EPoint, TPat, Thread);                    break;
+	value = (*TPat->pattern)(EPoint, Isection, ray, Thread);
 
-		default: throw POV_EXCEPTION_STRING("Problem in Evaluate_TPat.");
-	}
-
-	if(TPat->Frequency != 0.0)
-		value = fmod(value * TPat->Frequency + TPat->Phase, 1.00001); // TODO FIXME - magic number! Should be 1.0+SOME_EPSILON (or maybe actually 1.0?)
+	if(TPat->pattern->Frequency != 0.0)
+		value = fmod(value * TPat->pattern->Frequency + TPat->pattern->Phase, 1.00001); // TODO FIXME - magic number! Should be 1.0+SOME_EPSILON (or maybe actually 1.0?)
 
 	/* allow negative Frequency */
 	if(value < 0.0)
 		value -= floor(value);
 
-	switch(TPat->Wave_Type)
+	switch(TPat->pattern->Wave_Type)
 	{
 		case RAMP_WAVE:
 			break;
@@ -302,7 +591,7 @@ DBL Evaluate_TPat (const TPATTERN *TPat, const Vector3d& EPoint, const Intersect
 			value = Sqr(value) * ((-2.0 * value) + 3.0);
 			break;
 		case POLY_WAVE:
-			value = pow(value, (DBL) TPat->Exponent);
+			value = pow(value, (DBL) TPat->pattern->Exponent);
 			break;
 		default:
 			throw POV_EXCEPTION_STRING("Unknown Wave Type.");
@@ -333,13 +622,8 @@ DBL Evaluate_TPat (const TPATTERN *TPat, const Vector3d& EPoint, const Intersect
 void Init_TPat_Fields (TPATTERN *Tpat)
 {
 	Tpat->Type       = NO_PATTERN;
-	Tpat->Wave_Type  = RAMP_WAVE;
 	Tpat->Flags      = NO_FLAGS;
 	Tpat->References = 1;
-	Tpat->Exponent   = 1.0;
-	Tpat->Frequency  = 1.0;
-	Tpat->Phase      = 0.0;
-	Tpat->Warps      = NULL;
 	Tpat->Next       = NULL;
 	Tpat->Blend_Map  = NULL;
 }
@@ -367,46 +651,16 @@ void Copy_TPat_Fields (TPATTERN *New, const TPATTERN *Old)
 {
 	*New = *Old;
 
-	/* Copy warp chain */
-	New->Warps = Copy_Warps(Old->Warps);
-
 	New->Blend_Map = Copy_Blend_Map(Old->Blend_Map);
 
 	/* Note, cannot copy Old->Next because we don't know what kind of
 	   thing this is.  It must be copied by Copy_Pigment, Copy_Tnormal etc.
 	*/
 
-	/* NK 1998 - added IMAGE_PATTERN */
-	if ((Old->Type == BITMAP_PATTERN) || (Old->Type == IMAGE_PATTERN))
-	{
-		New->Vals.image = Copy_Image(Old->Vals.image);
-	}
-
-	if (Old->Type == DENSITY_FILE_PATTERN)
-	{
-		New->Vals.Density_File = Copy_Density_File(Old->Vals.Density_File);
-	}
-
-	if (Old->Type == PIGMENT_PATTERN )
-	{
-		New->Vals.Pigment = Copy_Pigment(Old->Vals.Pigment);
-	}
-
-	if (Old->Type == OBJECT_PATTERN)
-	{
-		if(Old->Vals.Object != NULL)
-		{
-			New->Vals.Object = reinterpret_cast<ObjectPtr>(Copy_Object(Old->Vals.Object));
-		}
-	}
-
-	if (Old->Type == FUNCTION_PATTERN)
-	{
-		if (Old->Vals.Function.Fn != NULL)
-		{
-			New->Vals.Function.Fn = reinterpret_cast<void *>(Parser::Copy_Function( Old->Vals.Function.vm, (FUNCTION_PTR)(Old->Vals.Function.Fn) ));
-		}
-	}
+	if (Old->pattern)
+		New->pattern = Old->pattern->Clone();
+	else
+		New->pattern.reset();
 }
 
 
@@ -430,45 +684,13 @@ void Copy_TPat_Fields (TPATTERN *New, const TPATTERN *Old)
 
 void Destroy_TPat_Fields(TPATTERN *Tpat)
 {
-	Destroy_Warps(Tpat->Warps);
 	Destroy_Blend_Map(Tpat->Blend_Map);
 	/* Note, cannot destroy Tpat->Next nor pattern itself because we don't
 	   know what kind of thing this is.  It must be destroied by Destroy_Pigment, etc.
 	*/
 
-	if ((Tpat->Type == BITMAP_PATTERN) || (Tpat->Type == IMAGE_PATTERN))
-	{
-		Destroy_Image(Tpat->Vals.image);
-	}
-
-	if (Tpat->Type == DENSITY_FILE_PATTERN)
-	{
-		Destroy_Density_File(Tpat->Vals.Density_File);
-	}
-
-	if (Tpat->Type == OBJECT_PATTERN)
-	{
-		if(Tpat->Vals.Object != NULL)
-		{
-			Destroy_Object(reinterpret_cast<ObjectPtr>(Tpat->Vals.Object));
-		}
-	}
-
-	if (Tpat->Type == PIGMENT_PATTERN)
-	{
-		if (Tpat->Vals.Pigment != NULL)
-		{
-			Destroy_Pigment( Tpat->Vals.Pigment );
-		}
-	}
-
-	if (Tpat->Type == FUNCTION_PATTERN)
-	{
-		if (Tpat->Vals.Function.Fn != NULL)
-		{
-			Parser::Destroy_Function(Tpat->Vals.Function.vm, (FUNCTION_PTR)(Tpat->Vals.Function.Fn));
-		}
-	}
+	if (Tpat->pattern)
+		Tpat->pattern.reset();
 }
 
 
@@ -637,27 +859,27 @@ void Transform_Tpattern(TPATTERN *Tpattern, const TRANSFORM *Trans)
 {
 	WARP *Temp;
 
-	if (Tpattern != NULL)
+	if ((Tpattern != NULL) && (Tpattern->pattern != NULL))
 	{
-		if (Tpattern->Warps == NULL)
+		if (Tpattern->pattern->Warps == NULL)
 		{
-			Tpattern->Warps = Create_Warp(TRANSFORM_WARP);
+			Tpattern->pattern->Warps = Create_Warp(TRANSFORM_WARP);
 		}
 		else
 		{
-			if (Tpattern->Warps->Warp_Type != TRANSFORM_WARP)
+			if (Tpattern->pattern->Warps->Warp_Type != TRANSFORM_WARP)
 			{
-				Temp = Tpattern->Warps;
+				Temp = Tpattern->pattern->Warps;
 
-				Tpattern->Warps = Create_Warp(TRANSFORM_WARP);
+				Tpattern->pattern->Warps = Create_Warp(TRANSFORM_WARP);
 
-				Tpattern->Warps->Next_Warp = Temp;
-				if(Tpattern->Warps->Next_Warp != NULL)
-					Tpattern->Warps->Next_Warp->Prev_Warp = Tpattern->Warps;
+				Tpattern->pattern->Warps->Next_Warp = Temp;
+				if(Tpattern->pattern->Warps->Next_Warp != NULL)
+					Tpattern->pattern->Warps->Next_Warp->Prev_Warp = Tpattern->pattern->Warps;
 			}
 		}
 
-		Compose_Transforms (&( (reinterpret_cast<TRANS *>(Tpattern->Warps))->Trans), Trans);
+		Compose_Transforms (&( (reinterpret_cast<TRANS *>(Tpattern->pattern->Warps))->Trans), Trans);
 	}
 }
 
@@ -3088,7 +3310,7 @@ static unsigned char hexagon[][12]=
 	{ 0x0A, 0x0D, 5, 0x92, 0x68, 5, 7, 0x0A, 0x0B, 0x0E, 0x0E, 0x0B}
 };
 
-static DBL tetragonal (const Vector3d& EPoint, const TPATTERN *TPat)
+DBL PavementPattern::tetragonal (const Vector3d& EPoint) const
 {
 	unsigned char how;
 	long xv,zv;
@@ -3100,10 +3322,10 @@ static DBL tetragonal (const Vector3d& EPoint, const TPATTERN *TPat)
 	int lng=0;
 	zv = floor(y=EPoint[Z]);
 	xv = floor(x=EPoint[X]);
-	switch(TPat->Vals.Pavement.Tile)
+	switch(Tile)
 	{
 		case 6:
-			switch(TPat->Vals.Pavement.Number-1)
+			switch(Number-1)
 			{
 				case 0:
 				case 1:
@@ -3209,10 +3431,10 @@ static DBL tetragonal (const Vector3d& EPoint, const TPATTERN *TPat)
 					zv %= 3; if (zv<0) { zv += 3;}
 					break;
 			}
-			how = hexagon[TPat->Vals.Pavement.Number-1][xv+zv*lng];
+			how = hexagon[Number-1][xv+zv*lng];
 			break;
 		case 5:
-			switch(TPat->Vals.Pavement.Number-1)
+			switch(Number-1)
 			{
 				case 0:
 				case 1:
@@ -3265,17 +3487,17 @@ static DBL tetragonal (const Vector3d& EPoint, const TPATTERN *TPat)
 					zv = 0x00;
 					break;
 			}
-			how = pentagon[TPat->Vals.Pavement.Number-1][xv+zv*5];
+			how = pentagon[Number-1][xv+zv*5];
 			break;
 		case 4:
 			xv &= 0x03;
 			zv &= 0x03;
-			how = tetragon[TPat->Vals.Pavement.Number-1][xv+zv*4];
+			how = tetragon[Number-1][xv+zv*4];
 			break;
 		case 3:
 			xv %= 3; if (xv < 0) { xv += 3; }
 			zv &= 0x01;
-			how = trigon[TPat->Vals.Pavement.Number-1][xv+zv*3];
+			how = trigon[Number-1][xv+zv*3];
 			break;
 		case 2:
 			zv &= 0x01;
@@ -3295,7 +3517,7 @@ static DBL tetragonal (const Vector3d& EPoint, const TPATTERN *TPat)
 	 */
 	x -= floor(x);
 	y -= floor(y);
-	switch(TPat->Vals.Pavement.Form)
+	switch(Form)
 	{
 		case 2:
 			if ((how & 0x16) == 0x16)
@@ -3435,7 +3657,7 @@ static DBL tetragonal (const Vector3d& EPoint, const TPATTERN *TPat)
 		value = 1 - 2*x;
 		return_value = max(return_value,value);
 	}
-	switch(TPat->Vals.Pavement.Interior)
+	switch(Interior)
 	{
 		case 2:
 			if (how & 0x40)
@@ -3529,7 +3751,7 @@ static DBL tetragonal (const Vector3d& EPoint, const TPATTERN *TPat)
 			}
 			break;
 	}
-	switch(TPat->Vals.Pavement.Exterior)
+	switch(Exterior)
 	{
 		case 2:
 			value1 = 2*x - 1;
@@ -3621,7 +3843,7 @@ static unsigned short trihexagon[][12]=
 	{0x691,0x3C4,0x5A2,0x5A2,0x3C4,0x691, 0x5A2,0x3C4,0x691,0x691,0x3C4,0x5A2},
 };
 
-static DBL trigonal (const Vector3d& EPoint, const TPATTERN *TPat)
+DBL PavementPattern::trigonal (const Vector3d& EPoint) const
 {
 	unsigned short how;
 	long xv,zv;
@@ -3674,10 +3896,10 @@ static DBL trigonal (const Vector3d& EPoint, const TPATTERN *TPat)
 		x = 1.5 -x;
 		xv++;
 	}
-	switch(TPat->Vals.Pavement.Tile)
+	switch(Tile)
 	{
 		case 6:
-			switch(TPat->Vals.Pavement.Number-1)
+			switch(Number-1)
 			{
 				case 0:
 				case 1:
@@ -3721,10 +3943,10 @@ static DBL trigonal (const Vector3d& EPoint, const TPATTERN *TPat)
 					zv %= 3; if (zv <0) { zv +=3;}
 					break;
 			}
-			how = trihexagon[TPat->Vals.Pavement.Number-1][xv+zv*lng];
+			how = trihexagon[Number-1][xv+zv*lng];
 			break;
 		case 5:
-			switch(TPat->Vals.Pavement.Number-1)
+			switch(Number-1)
 			{
 				case 0:
 				case 1:
@@ -3741,21 +3963,21 @@ static DBL trigonal (const Vector3d& EPoint, const TPATTERN *TPat)
 					zv = 0x00;
 					break;
 			}
-			how = tripentagon[TPat->Vals.Pavement.Number-1][xv];
+			how = tripentagon[Number-1][xv];
 			break;
 		case 4:
 			zv &= 0x03;
 			xv += zv;
 			xv &= 0x03;
 			zv &= 0x01;
-			how = tritetragon[TPat->Vals.Pavement.Number-1][xv+zv*4];
+			how = tritetragon[Number-1][xv+zv*4];
 			break;
 		case 3:
 			zv &= 0x01;
 			xv += 3*zv;
 			xv %= 6; if (xv < 0) { xv += 6; }
 			zv = 0x00;
-			how = tritrigon[TPat->Vals.Pavement.Number-1][xv];
+			how = tritrigon[Number-1][xv];
 			break;
 		case 2:
 			how = 0x166;
@@ -3789,7 +4011,7 @@ static DBL trigonal (const Vector3d& EPoint, const TPATTERN *TPat)
 		dist3 = 1.0 - (z * 2.0 * SQRT3 );
 		return_value = max(return_value,dist3);
 	}
-	switch(TPat->Vals.Pavement.Interior)
+	switch(Interior)
 	{
 		case 1:
 			dist1 = (1.0 - (fabs(SQRT3 * z + x) ));
@@ -3858,7 +4080,7 @@ static DBL trigonal (const Vector3d& EPoint, const TPATTERN *TPat)
 			}
 			break;
 	}
-	switch(TPat->Vals.Pavement.Exterior)
+	switch(Exterior)
 	{
 		case 2:
 			dist1 = (1.0 - (fabs(SQRT3 * z + x) ));
@@ -3906,7 +4128,7 @@ static DBL trigonal (const Vector3d& EPoint, const TPATTERN *TPat)
 	dist1 = (1.0 - (fabs(SQRT3 * z + x) ));
 	dist2 = (1.0 - (fabs(SQRT3 * z - x + 1.0) ));
 	dist3 = (1.0 - (x * 2.0 ));
-	switch(TPat->Vals.Pavement.Form)
+	switch(Form)
 	{
 		case 2:
 			if (((how & 0x120) == 0x120)&&(dist1<0)&&(dist2<0))
@@ -4439,7 +4661,7 @@ static unsigned short hexpentagon[][60]=
 	}
 };
 
-static DBL hexagonal (const Vector3d& EPoint, const TPATTERN *TPat)
+DBL PavementPattern::hexagonal (const Vector3d& EPoint) const
 {
 	unsigned short how;
 	long xv,zv;
@@ -4492,10 +4714,10 @@ static DBL hexagonal (const Vector3d& EPoint, const TPATTERN *TPat)
 		x = 1.5 -x;
 		xv++;
 	}
-	switch(TPat->Vals.Pavement.Tile)
+	switch(Tile)
 	{
 		case 5:
-			switch(TPat->Vals.Pavement.Number-1)
+			switch(Number-1)
 			{
 				case 0:
 				case 2:
@@ -4555,10 +4777,10 @@ static DBL hexagonal (const Vector3d& EPoint, const TPATTERN *TPat)
 					zv = 0;
 					break;
 			}
-			how = hexpentagon[TPat->Vals.Pavement.Number-1][xv];
+			how = hexpentagon[Number-1][xv];
 			break;
 		case 4:
-			switch(TPat->Vals.Pavement.Number-1)
+			switch(Number-1)
 			{
 				case 0:
 					zv &= 0x07;
@@ -4601,10 +4823,10 @@ static DBL hexagonal (const Vector3d& EPoint, const TPATTERN *TPat)
 					zv = 0;
 					break;
 			}
-			how = hextetragon[TPat->Vals.Pavement.Number-1][xv];
+			how = hextetragon[Number-1][xv];
 			break;
 		case 3:
-			switch(TPat->Vals.Pavement.Number-1)
+			switch(Number-1)
 			{
 				case 0:
 					zv %= 6; if(zv <0) { zv += 6; }
@@ -4626,12 +4848,12 @@ static DBL hexagonal (const Vector3d& EPoint, const TPATTERN *TPat)
 					zv = 0x00;
 					break;
 			}
-			how = hextrigon[TPat->Vals.Pavement.Number-1][xv];
+			how = hextrigon[Number-1][xv];
 			break;
 		case 2:
 			zv &= 0x01;
 			xv %= 6; if (xv < 0) { xv += 6; }
-			how = hexdigon[TPat->Vals.Pavement.Number-1][xv+6*zv];
+			how = hexdigon[Number-1][xv+6*zv];
 			break;
 		case 1:
 		default:
@@ -4639,7 +4861,7 @@ static DBL hexagonal (const Vector3d& EPoint, const TPATTERN *TPat)
 			xv += 3*zv;
 			xv %= 6; if (xv <0) { xv += 6;}
 			lng = 0;
-			how = hexmonogon[TPat->Vals.Pavement.Number-1][xv];
+			how = hexmonogon[Number-1][xv];
 			break;
 	}
 
@@ -4666,7 +4888,7 @@ static DBL hexagonal (const Vector3d& EPoint, const TPATTERN *TPat)
 		dist3 = 1.0 - (z * 2.0 * SQRT3 );
 		return_value = max(return_value,dist3);
 	}
-	switch(TPat->Vals.Pavement.Interior)
+	switch(Interior)
 	{
 		case 1:
 			dist1 = (1.0 - (fabs(SQRT3 * z + x) ));
@@ -4741,7 +4963,7 @@ static DBL hexagonal (const Vector3d& EPoint, const TPATTERN *TPat)
 	dist1 = (1.0 - (fabs(SQRT3 * z + x) ));
 	dist2 = (1.0 - (fabs(SQRT3 * z - x + 1.0) ));
 	dist3 = (1.0 - (x * 2.0 ));
-	switch(TPat->Vals.Pavement.Form)
+	switch(Form)
 	{
 		case 2:
 			if (((how & 0x120) == 0x120)&&(dist1<0)&&(dist2<0))
@@ -4879,9 +5101,9 @@ static DBL hexagonal (const Vector3d& EPoint, const TPATTERN *TPat)
 *
 *
 ******************************************************************************/
-static DBL tiling_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
+DBL TilingPattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
 {
-	switch(TPat->Vals.Tiling.Pattern)
+	switch(Pattern)
 	{
 		case 27: return tiling_penrose(EPoint, true, false);
 		case 26: return tiling_penrose(EPoint, false, false);
@@ -4919,7 +5141,7 @@ static DBL tiling_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
 *
 * FUNCTION
 *
-*   tiling_pattern
+*   pavement_pattern
 *
 * INPUT
 *
@@ -4944,19 +5166,19 @@ static DBL tiling_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
 *
 *
 ******************************************************************************/
-static DBL pavement_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
+DBL PavementPattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
 {
-	switch(TPat->Vals.Pavement.Side)
+	switch(Side)
 	{
 		case 6:
-			return hexagonal(EPoint,TPat);
+			return hexagonal(EPoint);
 
 		case 4:
-			return tetragonal(EPoint,TPat);
+			return tetragonal(EPoint);
 
 		case 3:
 		default:
-			return trigonal(EPoint,TPat);
+			return trigonal(EPoint);
 	}
 }
 
@@ -4989,14 +5211,16 @@ static DBL pavement_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
 *
 ******************************************************************************/
 
-static DBL agate_pattern (const Vector3d& EPoint, const TPATTERN *TPat, int noise_generator)
+DBL AgatePattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
 {
+	int noise_generator = GetNoiseGen(Thread);
+
 	register DBL noise, turb_val;
 	const TURB* Turb;
 
-	Turb=Search_For_Turb(TPat->Warps);
+	Turb=Search_For_Turb(Warps);
 
-	turb_val = TPat->Vals.Agate_Turb_Scale * Turbulence(EPoint,Turb,noise_generator);
+	turb_val = Agate_Turb_Scale * Turbulence(EPoint,Turb,noise_generator);
 
 	noise = 0.5 * (cycloidal(1.3 * turb_val + 1.1 * EPoint[Z]) + 1.0);
 
@@ -5045,7 +5269,7 @@ static DBL agate_pattern (const Vector3d& EPoint, const TPATTERN *TPat, int nois
 *
 ******************************************************************************/
 
-static DBL boxed_pattern (const Vector3d& EPoint)
+DBL BoxedPattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
 {
 	register DBL value;
 
@@ -5086,7 +5310,7 @@ static DBL boxed_pattern (const Vector3d& EPoint)
 *
 ******************************************************************************/
 
-static DBL brick_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
+DBL BrickPattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
 {
 	int ibrickx, ibricky, ibrickz;
 	DBL brickheight, brickwidth, brickdepth;
@@ -5094,16 +5318,16 @@ static DBL brick_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
 	DBL brickx, bricky, brickz;
 	DBL x, y, z, fudgit;
 
-	fudgit=EPSILON+TPat->Vals.Brick.Mortar;
+	fudgit = EPSILON + Mortar;
 
 	x =  EPoint[X]+fudgit;
 	y =  EPoint[Y]+fudgit;
 	z =  EPoint[Z]+fudgit;
 
-	brickwidth  = TPat->Vals.Brick.Size[X];
-	brickheight = TPat->Vals.Brick.Size[Y];
-	brickdepth  = TPat->Vals.Brick.Size[Z];
-	brickmortar = (DBL)TPat->Vals.Brick.Mortar;
+	brickwidth  = Size[X];
+	brickheight = Size[Y];
+	brickdepth  = Size[Z];
+	brickmortar = Mortar;
 
 	mortarwidth  = brickmortar / brickwidth;
 	mortarheight = brickmortar / brickheight;
@@ -5243,7 +5467,7 @@ static DBL brick_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
 *
 ******************************************************************************/
 
-static DBL cells_pattern (const Vector3d& EPoint)
+DBL CellsPattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
 {
 	/* select a random value based on the cube from which this came. */
 
@@ -5282,7 +5506,7 @@ static DBL cells_pattern (const Vector3d& EPoint)
 *
 ******************************************************************************/
 
-static DBL checker_pattern (const Vector3d& EPoint)
+DBL CheckerPattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
 {
 	int value;
 
@@ -5351,16 +5575,13 @@ static DBL checker_pattern (const Vector3d& EPoint)
 ******************************************************************************/
 static int IntPickInCube(int tvx, int tvy, int tvz, Vector3d& p1);
 
-static DBL crackle_pattern (const Vector3d& EPoint, const TPATTERN *TPat, TraceThreadData *Thread)
+DBL CracklePattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
 {
 	DBL sum, minsum, minsum2, minsum3, tf;
 	int minVecIdx = 0;
 	Vector3d dv;
 
 	int flox, floy, floz;
-
-	DBL Metric = TPat->Vals.Crackle.Metric;
-	DBL Offset = TPat->Vals.Crackle.Offset;
 
 	bool UseSquare = ( Metric == 2);
 	bool UseUnity  = ( Metric == 1);
@@ -5539,27 +5760,27 @@ static DBL crackle_pattern (const Vector3d& EPoint, const TPATTERN *TPat, TraceT
 		}
 	}
 
-	if(TPat->Vals.Crackle.IsSolid)
+	if(IsSolid)
 	{
-		tf = Noise( entry->data[minVecIdx], GetNoiseGen(TPat, Thread) );
+		tf = Noise( entry->data[minVecIdx], GetNoiseGen(Thread) );
 	}
 	else if(UseSquare)
 	{
-		tf = TPat->Vals.Crackle.Form[X]*sqrt(minsum) +
-		     TPat->Vals.Crackle.Form[Y]*sqrt(minsum2) +
-		     TPat->Vals.Crackle.Form[Z]*sqrt(minsum3);
+		tf = Form[X]*sqrt(minsum) +
+		     Form[Y]*sqrt(minsum2) +
+		     Form[Z]*sqrt(minsum3);
 	}
 	else if(UseUnity)
 	{
-		tf = TPat->Vals.Crackle.Form[X]*minsum +
-		     TPat->Vals.Crackle.Form[Y]*minsum2 +
-		     TPat->Vals.Crackle.Form[Z]*minsum3;
+		tf = Form[X]*minsum +
+		     Form[Y]*minsum2 +
+		     Form[Z]*minsum3;
 	}
 	else
 	{
-		tf = TPat->Vals.Crackle.Form[X]*pow(minsum, 1.0/Metric) +
-		     TPat->Vals.Crackle.Form[Y]*pow(minsum2, 1.0/Metric) +
-		     TPat->Vals.Crackle.Form[Z]*pow(minsum3, 1.0/Metric);
+		tf = Form[X]*pow(minsum, 1.0/Metric) +
+		     Form[Y]*pow(minsum2, 1.0/Metric) +
+		     Form[Z]*pow(minsum3, 1.0/Metric);
 	}
 
 	return max(min(tf, 1.), 0.);
@@ -5597,7 +5818,7 @@ static DBL crackle_pattern (const Vector3d& EPoint, const TPATTERN *TPat, TraceT
 *
 ******************************************************************************/
 
-static DBL cylindrical_pattern (const Vector3d& EPoint)
+DBL CylindricalPattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
 {
 	register DBL value;
 
@@ -5657,7 +5878,7 @@ inline float intp3_2(float t, float fa, float fb, float fc, float fd)
 
 #define zmax(i,imax) (((i)<0)?(imax-1):((i) % (imax)))
 
-static DBL density_pattern(const Vector3d& EPoint, const TPATTERN *TPat)
+DBL DensityFilePattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
 {
 	size_t x, y, z;
 	size_t x1, y1, z1;
@@ -5675,7 +5896,7 @@ static DBL density_pattern(const Vector3d& EPoint, const TPATTERN *TPat)
 	Ey=EPoint[Y];
 	Ez=EPoint[Z];
 
-	if((TPat->Vals.Density_File != NULL) && ((Data = TPat->Vals.Density_File->Data) != NULL) &&
+	if((Density_File != NULL) && ((Data = Density_File->Data) != NULL) &&
 	   (Data->Sx) && (Data->Sy) && (Data->Sz))
 	{
 /*		if(Data->Cyclic == true) 
@@ -5687,7 +5908,7 @@ static DBL density_pattern(const Vector3d& EPoint, const TPATTERN *TPat)
 */
 		if((Ex >= 0.0) && (Ex < 1.0) && (Ey >= 0.0) && (Ey < 1.0) && (Ez >= 0.0) && (Ez < 1.0))
 		{
-			switch (TPat->Vals.Density_File->Interpolation % 10)
+			switch (Density_File->Interpolation % 10)
 			{
 				case NO_INTERPOLATION:
 					x = (size_t)(Ex * (DBL)Data->Sx);
@@ -5877,11 +6098,11 @@ static DBL density_pattern(const Vector3d& EPoint, const TPATTERN *TPat)
 *
 ******************************************************************************/
 
-static DBL dents_pattern (const Vector3d& EPoint, int noise_generator)
+DBL DentsPattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
 {
 	DBL noise;
 
-	noise = Noise (EPoint, noise_generator);
+	noise = Noise (EPoint, GetNoiseGen(Thread));
 
 	return(noise * noise * noise);
 }
@@ -5914,20 +6135,20 @@ static DBL dents_pattern (const Vector3d& EPoint, int noise_generator)
 *
 ******************************************************************************/
 
-static DBL function_pattern (const Vector3d& EPoint, const TPATTERN *TPat, TraceThreadData *Thread)
+DBL FunctionPattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
 {
 	DBL value;
 
-	if(Thread->functionPatternContext[TPat->Vals.Function.Data] == NULL)
-		Thread->functionPatternContext[TPat->Vals.Function.Data] = Thread->functionContext->functionvm->NewContext(const_cast<TraceThreadData *>(Thread));
+	if(Thread->functionPatternContext[Data] == NULL)
+		Thread->functionPatternContext[Data] = Thread->functionContext->functionvm->NewContext(const_cast<TraceThreadData *>(Thread));
 
-	FPUContext *ctx = Thread->functionPatternContext[TPat->Vals.Function.Data];
+	FPUContext *ctx = Thread->functionPatternContext[Data];
 
 	ctx->SetLocal(X, EPoint[X]);
 	ctx->SetLocal(Y, EPoint[Y]);
 	ctx->SetLocal(Z, EPoint[Z]);
 
-	value = POVFPU_Run(ctx, *(reinterpret_cast<const FUNCTION*>(TPat->Vals.Function.Fn)));
+	value = POVFPU_Run(ctx, *(reinterpret_cast<const FUNCTION*>(Fn)));
 
 	return ((value > 1.0) ? fmod(value, 1.0) : value);
 }
@@ -5968,10 +6189,10 @@ static DBL function_pattern (const Vector3d& EPoint, const TPATTERN *TPat, Trace
 *
 ******************************************************************************/
 
-static DBL gradient_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
+DBL GradientPattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
 {
 	DBL Result;
-	Result = dot(EPoint, Vector3d(TPat->Vals.Gradient));
+	Result = dot(EPoint, Gradient);
 
 	/* Mod to keep within [0.0,1.0] range */
 	return ((Result > 1.0) ? fmod(Result, 1.0) : Result);
@@ -6011,8 +6232,10 @@ static DBL gradient_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
 *
 ******************************************************************************/
 
-static DBL granite_pattern (const Vector3d& EPoint, int noise_generator)
+DBL GranitePattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
 {
+	int noise_generator = GetNoiseGen(Thread);
+
 	register int i;
 	register DBL temp, noise = 0.0, freq = 1.0;
 	Vector3d tv1, tv2;
@@ -6086,7 +6309,7 @@ static DBL granite_pattern (const Vector3d& EPoint, int noise_generator)
 const DBL xfactor = 0.5;         /* each triangle is split in half for the grid */
 const DBL zfactor = 0.866025404; /* sqrt(3)/2 -- Height of an equilateral triangle */
 
-static DBL hexagon_pattern (const Vector3d& EPoint)
+DBL HexagonPattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
 {
 	int xm, zm;
 	int brkindx;
@@ -6273,7 +6496,7 @@ static DBL hexagon_pattern (const Vector3d& EPoint)
 *
 ******************************************************************************/
 
-static DBL cubic_pattern (const Vector3d& EPoint)
+DBL CubicPattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
 {
 	const DBL x = EPoint[X], y = EPoint[Y], z = EPoint[Z];
 	const DBL ax = fabs(x), ay = fabs(y), az = fabs(z);
@@ -6314,7 +6537,7 @@ static DBL cubic_pattern (const Vector3d& EPoint)
 *
 ******************************************************************************/
 
-static DBL square_pattern (const Vector3d& EPoint)
+DBL SquarePattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
 {
 	int valueX,valueZ;
 
@@ -6373,7 +6596,7 @@ static DBL square_pattern (const Vector3d& EPoint)
 *
 ******************************************************************************/
 
-static DBL triangular_pattern (const Vector3d& EPoint)
+DBL TriangularPattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
 {
 	DBL answer;
 	DBL x,z;
@@ -6466,17 +6689,17 @@ static DBL triangular_pattern (const Vector3d& EPoint)
 *
 ******************************************************************************/
 
-static DBL julia_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
+DBL JuliaPattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
 {
 	int it_max, col;
 	DBL a, b, cf, a2, b2, dist2, mindist2,
-	    cr = TPat->Vals.Fractal.Coord[U], ci = TPat->Vals.Fractal.Coord[V];
+	    cr = Coord[U], ci = Coord[V];
 
 	a = EPoint[X]; a2 = Sqr(a);
 	b = EPoint[Y]; b2 = Sqr(b);
 	mindist2 = a2+b2;
 
-	it_max = TPat->Vals.Fractal.Iterations;
+	it_max = Iterations;
 
 	for (col = 0; col < it_max; col++)
 	{
@@ -6490,13 +6713,13 @@ static DBL julia_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
 		if(dist2 < mindist2) mindist2 = dist2;
 		if(dist2 > 4.0)
 		{
-			cf = fractal_exterior_color(TPat, col, a, b);
+			cf = ExteriorColour(col, a, b);
 			break;
 		}
 	}
 
 	if(col == it_max)
-		cf = fractal_interior_color(TPat, col, a, b, mindist2);
+		cf = InteriorColour(a, b, mindist2);
 
 	return(cf);
 }
@@ -6533,17 +6756,17 @@ static DBL julia_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
 *
 ******************************************************************************/
 
-static DBL julia3_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
+DBL Julia3Pattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
 {
 	int it_max, col;
 	DBL a, b, cf, a2, b2, dist2, mindist2,
-	    cr = TPat->Vals.Fractal.Coord[U], ci = TPat->Vals.Fractal.Coord[V];
+	    cr = Coord[U], ci = Coord[V];
 
 	a = EPoint[X]; a2 = Sqr(a);
 	b = EPoint[Y]; b2 = Sqr(b);
 	mindist2 = a2+b2;
 
-	it_max = TPat->Vals.Fractal.Iterations;
+	it_max = Iterations;
 
 	for (col = 0; col < it_max; col++)
 	{
@@ -6557,13 +6780,13 @@ static DBL julia3_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
 		if(dist2 < mindist2) mindist2 = dist2;
 		if(dist2 > 4.0)
 		{
-			cf = fractal_exterior_color(TPat, col, a, b);
+			cf = ExteriorColour(col, a, b);
 			break;
 		}
 	}
 
 	if(col == it_max)
-		cf = fractal_interior_color(TPat, col, a, b, mindist2);
+		cf = InteriorColour(a, b, mindist2);
 
 	return(cf);
 }
@@ -6600,17 +6823,17 @@ static DBL julia3_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
 *
 ******************************************************************************/
 
-static DBL julia4_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
+DBL Julia4Pattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
 {
 	int it_max, col;
 	DBL a, b, cf, a2, b2, dist2, mindist2,
-	    cr = TPat->Vals.Fractal.Coord[U], ci = TPat->Vals.Fractal.Coord[V];
+	    cr = Coord[U], ci = Coord[V];
 
 	a = EPoint[X]; a2 = Sqr(a);
 	b = EPoint[Y]; b2 = Sqr(b);
 	mindist2 = a2+b2;
 
-	it_max = TPat->Vals.Fractal.Iterations;
+	it_max = Iterations;
 
 	for (col = 0; col < it_max; col++)
 	{
@@ -6624,13 +6847,13 @@ static DBL julia4_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
 		if(dist2 < mindist2) mindist2 = dist2;
 		if(dist2 > 4.0)
 		{
-			cf = fractal_exterior_color(TPat, col, a, b);
+			cf = ExteriorColour(col, a, b);
 			break;
 		}
 	}
 
 	if(col == it_max)
-		cf = fractal_interior_color(TPat, col, a, b, mindist2);
+		cf = InteriorColour(a, b, mindist2);
 
 	return(cf);
 }
@@ -6667,19 +6890,19 @@ static DBL julia4_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
 *
 ******************************************************************************/
 
-static DBL juliax_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
+DBL JuliaXPattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
 {
 	int it_max, col, exponent;
 	DBL a, b, cf=0, x, y, dist2, mindist2,
-	    cr = TPat->Vals.Fractal.Coord[U], ci = TPat->Vals.Fractal.Coord[V];
+	    cr = Coord[U], ci = Coord[V];
 	int* binomial_coeff;
 
 	a = x = EPoint[X];
 	b = y = EPoint[Y];
 	mindist2 = a*a+b*b;
 
-	it_max = TPat->Vals.Fractal.Iterations;
-	exponent = TPat->Vals.Fractal.Exponent;
+	it_max = Iterations;
+	exponent = Exponent;
 
 	binomial_coeff = &BinomialCoefficients[(exponent+1)*exponent/2];
 
@@ -6705,13 +6928,13 @@ static DBL juliax_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
 		if(dist2 < mindist2) mindist2 = dist2;
 		if(dist2 > 4.0)
 		{
-			cf = fractal_exterior_color(TPat, col, a, b);
+			cf = ExteriorColour(col, a, b);
 			break;
 		}
 	}
 
 	if(col == it_max)
-		cf = fractal_interior_color(TPat, col, a, b, mindist2);
+		cf = InteriorColour(a, b, mindist2);
 
 	return(cf);
 }
@@ -6747,7 +6970,7 @@ static DBL juliax_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
 *
 ******************************************************************************/
 
-static DBL leopard_pattern (const Vector3d& EPoint)
+DBL LeopardPattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
 {
 	register DBL value, temp1, temp2, temp3;
 
@@ -6796,7 +7019,7 @@ static DBL leopard_pattern (const Vector3d& EPoint)
 *
 ******************************************************************************/
 
-static DBL magnet1m_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
+DBL Magnet1MPattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
 {
 	int it_max, col;
 	DBL a, b, cf, a2, b2, x, y, tmp, tmp1r, tmp1i, tmp2r, tmp2i, dist2, mindist2;
@@ -6807,7 +7030,7 @@ static DBL magnet1m_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
 	b = b2 = 0;
 	mindist2 = 10000;
 
-	it_max = TPat->Vals.Fractal.Iterations;
+	it_max = Iterations;
 
 	for (col = 0; col < it_max; col++)
 	{
@@ -6830,13 +7053,13 @@ static DBL magnet1m_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
 		tmp1r = a-1;
 		if(dist2 > 10000.0 || tmp1r*tmp1r+b2 < 1/10000.0)
 		{
-			cf = fractal_exterior_color(TPat, col, a, b);
+			cf = ExteriorColour(col, a, b);
 			break;
 		}
 	}
 
 	if(col == it_max)
-		cf = fractal_interior_color(TPat, col, a, b, mindist2);
+		cf = InteriorColour(a, b, mindist2);
 
 	return(cf);
 }
@@ -6873,17 +7096,17 @@ static DBL magnet1m_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
 *
 ******************************************************************************/
 
-static DBL magnet1j_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
+DBL Magnet1JPattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
 {
 	int it_max, col;
 	DBL a, b, cf, a2, b2, tmp, tmp1r, tmp1i, tmp2r, tmp2i, dist2, mindist2,
-	    cr = TPat->Vals.Fractal.Coord[U], ci = TPat->Vals.Fractal.Coord[V];
+	    cr = Coord[U], ci = Coord[V];
 
 	a = EPoint[X]; a2 = Sqr(a);
 	b = EPoint[Y]; b2 = Sqr(b);
 	mindist2 = a2+b2;
 
-	it_max = TPat->Vals.Fractal.Iterations;
+	it_max = Iterations;
 
 	for (col = 0; col < it_max; col++)
 	{
@@ -6906,13 +7129,13 @@ static DBL magnet1j_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
 		tmp1r = a-1;
 		if(dist2 > 10000.0 || tmp1r*tmp1r+b2 < 1/10000.0)
 		{
-			cf = fractal_exterior_color(TPat, col, a, b);
+			cf = ExteriorColour(col, a, b);
 			break;
 		}
 	}
 
 	if(col == it_max)
-		cf = fractal_interior_color(TPat, col, a, b, mindist2);
+		cf = InteriorColour(a, b, mindist2);
 
 	return(cf);
 }
@@ -6949,7 +7172,7 @@ static DBL magnet1j_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
 *
 ******************************************************************************/
 
-static DBL magnet2m_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
+DBL Magnet2MPattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
 {
 	int it_max, col;
 	DBL a, b, cf, a2, b2, x, y, tmp, tmp1r, tmp1i, tmp2r, tmp2i,
@@ -6965,7 +7188,7 @@ static DBL magnet2m_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
 	c1c2r = c1r*c2r-y*y;
 	c1c2i = (c1r+c2r)*y;
 
-	it_max = TPat->Vals.Fractal.Iterations;
+	it_max = Iterations;
 
 	for (col = 0; col < it_max; col++)
 	{
@@ -6988,13 +7211,13 @@ static DBL magnet2m_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
 		tmp1r = a-1;
 		if(dist2 > 10000.0 || tmp1r*tmp1r+b2 < 1/10000.0)
 		{
-			cf = fractal_exterior_color(TPat, col, a, b);
+			cf = ExteriorColour(col, a, b);
 			break;
 		}
 	}
 
 	if(col == it_max)
-		cf = fractal_interior_color(TPat, col, a, b, mindist2);
+		cf = InteriorColour(a, b, mindist2);
 
 	return(cf);
 }
@@ -7031,11 +7254,11 @@ static DBL magnet2m_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
 *
 ******************************************************************************/
 
-static DBL magnet2j_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
+DBL Magnet2JPattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
 {
 	int it_max, col;
 	DBL a, b, cf, a2, b2, tmp, tmp1r, tmp1i, tmp2r, tmp2i, c1r,c2r,c1c2r,c1c2i,
-	    cr = TPat->Vals.Fractal.Coord[U], ci = TPat->Vals.Fractal.Coord[V],
+	    cr = Coord[U], ci = Coord[V],
 	    dist2, mindist2;
 
 	a = EPoint[X]; a2 = Sqr(a);
@@ -7046,7 +7269,7 @@ static DBL magnet2j_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
 	c1c2r = c1r*c2r-ci*ci;
 	c1c2i = (c1r+c2r)*ci;
 
-	it_max = TPat->Vals.Fractal.Iterations;
+	it_max = Iterations;
 
 	for (col = 0; col < it_max; col++)
 	{
@@ -7069,13 +7292,13 @@ static DBL magnet2j_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
 		tmp1r = a-1;
 		if(dist2 > 10000.0 || tmp1r*tmp1r+b2 < 1/10000.0)
 		{
-			cf = fractal_exterior_color(TPat, col, a, b);
+			cf = ExteriorColour(col, a, b);
 			break;
 		}
 	}
 
 	if(col == it_max)
-		cf = fractal_interior_color(TPat, col, a, b, mindist2);
+		cf = InteriorColour(a, b, mindist2);
 
 	return(cf);
 }
@@ -7115,7 +7338,7 @@ static DBL magnet2j_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
 *
 ******************************************************************************/
 
-static DBL mandel_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
+DBL Mandel2Pattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
 {
 	int it_max, col;
 	DBL a, b, cf, a2, b2, x, y, dist2, mindist2;
@@ -7124,7 +7347,7 @@ static DBL mandel_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
 	b = y = EPoint[Y]; b2 = Sqr(b);
 	mindist2 = a2+b2;
 
-	it_max = TPat->Vals.Fractal.Iterations;
+	it_max = Iterations;
 
 	for (col = 0; col < it_max; col++)
 	{
@@ -7138,13 +7361,13 @@ static DBL mandel_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
 		if(dist2 < mindist2) mindist2 = dist2;
 		if(dist2 > 4.0)
 		{
-			cf = fractal_exterior_color(TPat, col, a, b);
+			cf = ExteriorColour(col, a, b);
 			break;
 		}
 	}
 
 	if(col == it_max)
-		cf = fractal_interior_color(TPat, col, a, b, mindist2);
+		cf = InteriorColour(a, b, mindist2);
 
 	return(cf);
 }
@@ -7181,7 +7404,7 @@ static DBL mandel_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
 *
 ******************************************************************************/
 
-static DBL mandel3_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
+DBL Mandel3Pattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
 {
 	int it_max, col;
 	DBL a, b, cf, a2, b2, x, y, dist2, mindist2;
@@ -7190,7 +7413,7 @@ static DBL mandel3_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
 	b = y = EPoint[Y]; b2 = Sqr(b);
 	mindist2 = a2+b2;
 
-	it_max = TPat->Vals.Fractal.Iterations;
+	it_max = Iterations;
 
 	for (col = 0; col < it_max; col++)
 	{
@@ -7204,13 +7427,13 @@ static DBL mandel3_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
 		if(dist2 < mindist2) mindist2 = dist2;
 		if(dist2 > 4.0)
 		{
-			cf = fractal_exterior_color(TPat, col, a, b);
+			cf = ExteriorColour(col, a, b);
 			break;
 		}
 	}
 
 	if(col == it_max)
-		cf = fractal_interior_color(TPat, col, a, b, mindist2);
+		cf = InteriorColour(a, b, mindist2);
 
 	return(cf);
 }
@@ -7247,7 +7470,7 @@ static DBL mandel3_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
 *
 ******************************************************************************/
 
-static DBL mandel4_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
+DBL Mandel4Pattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
 {
 	int it_max, col;
 	DBL a, b, cf, a2, b2, x, y, dist2, mindist2;
@@ -7256,7 +7479,7 @@ static DBL mandel4_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
 	b = y = EPoint[Y]; b2 = Sqr(b);
 	mindist2 = a2+b2;
 
-	it_max = TPat->Vals.Fractal.Iterations;
+	it_max = Iterations;
 
 	for (col = 0; col < it_max; col++)
 	{
@@ -7270,13 +7493,13 @@ static DBL mandel4_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
 		if(dist2 < mindist2) mindist2 = dist2;
 		if(dist2 > 4.0)
 		{
-			cf = fractal_exterior_color(TPat, col, a, b);
+			cf = ExteriorColour(col, a, b);
 			break;
 		}
 	}
 
 	if(col == it_max)
-		cf = fractal_interior_color(TPat, col, a, b, mindist2);
+		cf = InteriorColour(a, b, mindist2);
 
 	return(cf);
 }
@@ -7313,7 +7536,7 @@ static DBL mandel4_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
 *
 ******************************************************************************/
 
-static DBL mandelx_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
+DBL MandelXPattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
 {
 	int it_max, col, exponent;
 	DBL a, b, cf=0, x, y, dist2, mindist2;
@@ -7323,8 +7546,8 @@ static DBL mandelx_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
 	b = y = EPoint[Y];
 	mindist2 = a*a+b*b;
 
-	it_max = TPat->Vals.Fractal.Iterations;
-	exponent = TPat->Vals.Fractal.Exponent;
+	it_max = Iterations;
+	exponent = Exponent;
 
 	binomial_coeff = &BinomialCoefficients[(exponent+1)*exponent/2];
 
@@ -7350,13 +7573,13 @@ static DBL mandelx_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
 		if(dist2 < mindist2) mindist2 = dist2;
 		if(dist2 > 4.0)
 		{
-			cf = fractal_exterior_color(TPat, col, a, b);
+			cf = ExteriorColour(col, a, b);
 			break;
 		}
 	}
 
 	if(col == it_max)
-		cf = fractal_interior_color(TPat, col, a, b, mindist2);
+		cf = InteriorColour(a, b, mindist2);
 
 	return(cf);
 }
@@ -7392,14 +7615,14 @@ static DBL mandelx_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
 *
 ******************************************************************************/
 
-static DBL marble_pattern (const Vector3d& EPoint, const TPATTERN *TPat, int noise_generator)
+DBL MarblePattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
 {
 	register DBL turb_val;
 	const TURB *Turb;
 
-	if ((Turb=Search_For_Turb(TPat->Warps)) != NULL)
+	if ((Turb=Search_For_Turb(Warps)) != NULL)
 	{
-		turb_val = Turb->Turbulence[X] * Turbulence(EPoint,Turb,noise_generator);
+		turb_val = Turb->Turbulence[X] * Turbulence(EPoint,Turb,GetNoiseGen(Thread));
 	}
 	else
 	{
@@ -7408,6 +7631,17 @@ static DBL marble_pattern (const Vector3d& EPoint, const TPATTERN *TPat, int noi
 
 	return(EPoint[X] + turb_val);
 }
+
+
+
+/*****************************************************************************/
+
+
+DBL NoisePattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
+{
+	return Noise(EPoint, GetNoiseGen(Thread));
+}
+
 
 
 /*****************************************************************************
@@ -7436,11 +7670,11 @@ static DBL marble_pattern (const Vector3d& EPoint, const TPATTERN *TPat, int noi
 *
 ******************************************************************************/
 
-static DBL object_pattern (const Vector3d& EPoint, const TPATTERN *TPat, TraceThreadData *Thread)
+DBL ObjectPattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
 {
-	if(TPat->Vals.Object != NULL)
+	if(Object != NULL)
 	{
-		if(Inside_Object(EPoint, TPat->Vals.Object, Thread))
+		if(Inside_Object(EPoint, Object, Thread))
 			return 1.0;
 		else
 			return 0.0;
@@ -7479,9 +7713,9 @@ static DBL object_pattern (const Vector3d& EPoint, const TPATTERN *TPat, TraceTh
 *
 ******************************************************************************/
 
-static DBL onion_pattern (const Vector3d& EPoint)
+DBL OnionPattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
 {
-	/* The variable noise is not used as noise in this function */
+	// TODO - The variable noise is not used as noise in this function
 
 	register DBL noise;
 
@@ -7519,15 +7753,15 @@ static DBL onion_pattern (const Vector3d& EPoint)
 *
 ******************************************************************************/
 
-static DBL pigment_pattern (const Vector3d& EPoint, const TPATTERN *TPat, const Intersection *isect, const Ray *ray, TraceThreadData *Thread)
+DBL PigmentPattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
 {
 	DBL value;
 	Colour Col;
 	int colour_found=false;
 
-	if (TPat->Vals.Pigment)
+	if (Pigment)
 		// TODO ALPHA - we're discarding transparency information, so maybe we want to pre-multiply if there's alpha in there?
-		colour_found = Compute_Pigment(Col, TPat->Vals.Pigment, EPoint, isect, ray, Thread);
+		colour_found = Compute_Pigment(Col, Pigment, EPoint, Isection, ray, Thread);
 
 	if(!colour_found)
 		value = 0.0;
@@ -7569,7 +7803,7 @@ static DBL pigment_pattern (const Vector3d& EPoint, const TPATTERN *TPat, const 
 *
 ******************************************************************************/
 
-static DBL planar_pattern (const Vector3d& EPoint)
+DBL PlanarPattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
 {
 	register DBL value = fabs(EPoint[Y]);
 
@@ -7601,7 +7835,7 @@ static DBL planar_pattern (const Vector3d& EPoint)
 *
 ******************************************************************************/
 
-static DBL quilted_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
+DBL QuiltedPattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
 {
 	Vector3d value;
 	DBL t;
@@ -7612,7 +7846,7 @@ static DBL quilted_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
 
 	t = value.length();
 
-	t = quilt_cubic(t, TPat->Vals.Quilted.Control0, TPat->Vals.Quilted.Control1);
+	t = quilt_cubic(t, Control0, Control1);
 
 	value *= t;
 
@@ -7649,7 +7883,7 @@ static DBL quilted_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
 *
 ******************************************************************************/
 
-static DBL radial_pattern (const Vector3d& EPoint)
+DBL RadialPattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
 {
 	register DBL value;
 
@@ -7697,7 +7931,7 @@ static DBL radial_pattern (const Vector3d& EPoint)
 *
 ******************************************************************************/
 
-static DBL ripples_pattern (const Vector3d& EPoint, const TPATTERN *TPat, const TraceThreadData *Thread)
+DBL RipplesPattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
 {
 	register unsigned int i;
 	register DBL length, index;
@@ -7712,7 +7946,7 @@ static DBL ripples_pattern (const Vector3d& EPoint, const TPATTERN *TPat, const 
 		if (length == 0.0)
 			length = 1.0;
 
-		index = length * TPat->Frequency + TPat->Phase;
+		index = length * Frequency + Phase;
 
 		scalar += cycloidal(index);
 	}
@@ -7757,29 +7991,29 @@ static DBL ripples_pattern (const Vector3d& EPoint, const TPATTERN *TPat, const 
 *
 ******************************************************************************/
 
-static DBL slope_pattern (const Vector3d& EPoint, const TPATTERN *TPat, const Intersection *Isection)
+DBL SlopePattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
 {
 	DBL value, value1, value2;
 
 	if (Isection == NULL) return 0.0; /* just in case ... */
 
-	if (TPat->Vals.Slope.Point_At)
+	if (Point_At)
 	{
 		Vector3d vect;
-		vect = Vector3d(TPat->Vals.Slope.Slope_Vector) - Isection->IPoint.normalized();
+		vect = Slope_Vector - Isection->IPoint.normalized();
 		value1 = dot(Isection->PNormal, vect);
 	}
 	else
 	{
-		if (TPat->Vals.Slope.Slope_Base > 0)
+		if (Slope_Base > 0)
 			/* short case 1: slope vector in x, y or z direction */
-			value1 = Isection->PNormal[TPat->Vals.Slope.Slope_Base - 1];
-		else if (TPat->Vals.Slope.Slope_Base < 0)
+			value1 = Isection->PNormal[Slope_Base - 1];
+		else if (Slope_Base < 0)
 			/* short case 2: slope vector in negative x, y or z direction */
-			value1 = -Isection->PNormal[-TPat->Vals.Slope.Slope_Base - 1];
+			value1 = -Isection->PNormal[-Slope_Base - 1];
 		else
 			/* projection slope onto normal vector */
-			value1 = dot(Isection->PNormal, Vector3d(TPat->Vals.Slope.Slope_Vector));
+			value1 = dot(Isection->PNormal, Slope_Vector);
 	}
 
 	/* Clamp to 1.0. */
@@ -7791,12 +8025,12 @@ static DBL slope_pattern (const Vector3d& EPoint, const TPATTERN *TPat, const In
 	value1 = (value1 + 1.0) * 0.5;        /* normalize to [0..1] interval */
 
 	/* If set, use offset and scalings for slope and altitude. */
-	if (0.0 != TPat->Vals.Slope.Slope_Mod[V])
+	if (0.0 != Slope_Mod[V])
 	{
-		value1 = (value1 - TPat->Vals.Slope.Slope_Mod[U]) / TPat->Vals.Slope.Slope_Mod[V];
+		value1 = (value1 - Slope_Mod[U]) / Slope_Mod[V];
 	}
 
-	if (!TPat->Vals.Slope.Altit_Len)
+	if (!Altit_Len)
 	{
 		/* Clamp to 1.0. */
 		if ( value1 == 1.0 )
@@ -7811,22 +8045,22 @@ static DBL slope_pattern (const Vector3d& EPoint, const TPATTERN *TPat, const In
 	}
 
 	/* Calculate projection of Epoint along altitude vector */
-	if (TPat->Vals.Slope.Altit_Base > 0)
+	if (Altit_Base > 0)
 		/* short case 1: altitude vector in x, y or z direction */
-		value2 = EPoint[TPat->Vals.Slope.Altit_Base - 1];
-	else if (TPat->Vals.Slope.Altit_Base < 0)
+		value2 = EPoint[Altit_Base - 1];
+	else if (Altit_Base < 0)
 		/* short case 2: altitude vector in negative x, y or z direction */
-		value2 = -EPoint[-TPat->Vals.Slope.Altit_Base - 1];
+		value2 = -EPoint[-Altit_Base - 1];
 	else
 		/* projection of Epoint along altitude vector */
-		value2 = dot(EPoint, Vector3d(TPat->Vals.Slope.Altit_Vector));
+		value2 = dot(EPoint, Altit_Vector);
 
-	if (0.0 != TPat->Vals.Slope.Altit_Mod[V])
+	if (0.0 != Altit_Mod[V])
 	{
-		value2 = (value2 - TPat->Vals.Slope.Altit_Mod[U]) / TPat->Vals.Slope.Altit_Mod[V];
+		value2 = (value2 - Altit_Mod[U]) / Altit_Mod[V];
 	}
 
-	value = TPat->Vals.Slope.Slope_Len * value1 + TPat->Vals.Slope.Altit_Len * value2;
+	value = Slope_Len * value1 + Altit_Len * value2;
 
 	/* Clamp to 1.0. */
 	if ( value - 1.0 < EPSILON && value >= 1.0 )
@@ -7876,7 +8110,7 @@ static DBL slope_pattern (const Vector3d& EPoint, const TPATTERN *TPat, const In
 *
 ******************************************************************************/
 
-static DBL aoi_pattern (const Intersection *Isection, const Ray *ray)
+DBL AOIPattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
 {
 	Vector3d  a, b;
 	DBL       cosAngle, angle;
@@ -7930,7 +8164,7 @@ static DBL aoi_pattern (const Intersection *Isection, const Ray *ray)
 *
 ******************************************************************************/
 
-static DBL spiral1_pattern (const Vector3d& EPoint, const TPATTERN *TPat, int noise_generator)
+DBL Spiral1Pattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
 {
 	DBL rad, phi, turb_val;
 	DBL x = EPoint[X];
@@ -7938,9 +8172,9 @@ static DBL spiral1_pattern (const Vector3d& EPoint, const TPATTERN *TPat, int no
 	DBL z = EPoint[Z];
 	const TURB *Turb;
 
-	if ((Turb=Search_For_Turb(TPat->Warps)) != NULL)
+	if ((Turb=Search_For_Turb(Warps)) != NULL)
 	{
-		turb_val = Turb->Turbulence[X] * Turbulence(EPoint,Turb,noise_generator);
+		turb_val = Turb->Turbulence[X] * Turbulence(EPoint,Turb,GetNoiseGen(Thread));
 	}
 	else
 	{
@@ -7969,7 +8203,7 @@ static DBL spiral1_pattern (const Vector3d& EPoint, const TPATTERN *TPat, int no
 		}
 	}
 
-	return(z + rad + (DBL)TPat->Vals.Arms * phi / TWO_M_PI + turb_val);
+	return(z + rad + (DBL)Arms * phi / TWO_M_PI + turb_val);
 }
 
 
@@ -8006,7 +8240,7 @@ static DBL spiral1_pattern (const Vector3d& EPoint, const TPATTERN *TPat, int no
 *
 ******************************************************************************/
 
-static DBL spiral2_pattern (const Vector3d& EPoint, const TPATTERN *TPat, int noise_generator)
+DBL Spiral2Pattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
 {
 	DBL rad, phi, turb_val;
 	DBL x = EPoint[X];
@@ -8014,9 +8248,9 @@ static DBL spiral2_pattern (const Vector3d& EPoint, const TPATTERN *TPat, int no
 	DBL z = EPoint[Z];
 	const TURB *Turb;
 
-	if ((Turb=Search_For_Turb(TPat->Warps)) != NULL)
+	if ((Turb=Search_For_Turb(Warps)) != NULL)
 	{
-		turb_val = Turb->Turbulence[X] * Turbulence(EPoint,Turb,noise_generator);
+		turb_val = Turb->Turbulence[X] * Turbulence(EPoint,Turb,GetNoiseGen(Thread));
 	}
 	else
 	{
@@ -8045,7 +8279,7 @@ static DBL spiral2_pattern (const Vector3d& EPoint, const TPATTERN *TPat, int no
 		}
 	}
 
-	turb_val = Triangle_Wave(z + rad + (DBL)TPat->Vals.Arms * phi / TWO_M_PI +
+	turb_val = Triangle_Wave(z + rad + (DBL)Arms * phi / TWO_M_PI +
 	                         turb_val);
 
 	return(Triangle_Wave(rad) + turb_val);
@@ -8083,7 +8317,7 @@ static DBL spiral2_pattern (const Vector3d& EPoint, const TPATTERN *TPat, int no
 *
 ******************************************************************************/
 
-static DBL spherical_pattern (const Vector3d& EPoint)
+DBL SphericalPattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
 {
 	register DBL value;
 
@@ -8125,7 +8359,7 @@ static DBL spherical_pattern (const Vector3d& EPoint)
 *
 ******************************************************************************/
 
-static DBL waves_pattern (const Vector3d& EPoint, const TPATTERN *TPat, const TraceThreadData *Thread)
+DBL WavesPattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
 {
 	register unsigned int i;
 	register DBL length, index;
@@ -8142,7 +8376,7 @@ static DBL waves_pattern (const Vector3d& EPoint, const TPATTERN *TPat, const Tr
 			length = 1.0;
 		}
 
-		index = length * TPat->Frequency * Thread->waveFrequencies[i] + TPat->Phase;
+		index = length * Frequency * Thread->waveFrequencies[i] + Phase;
 
 		scalar += cycloidal(index)/Thread->waveFrequencies[i];
 	}
@@ -8183,7 +8417,7 @@ static DBL waves_pattern (const Vector3d& EPoint, const TPATTERN *TPat, const Tr
 *
 ******************************************************************************/
 
-static DBL wood_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
+DBL WoodPattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
 {
 	register DBL length;
 	Vector3d WoodTurbulence;
@@ -8192,7 +8426,7 @@ static DBL wood_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
 	DBL y=EPoint[Y];
 	const TURB *Turb;
 
-	if ((Turb=Search_For_Turb(TPat->Warps)) != NULL)
+	if ((Turb=Search_For_Turb(Warps)) != NULL)
 	{
 		DTurbulence (WoodTurbulence, EPoint, Turb);
 		point[X] = cycloidal((x + WoodTurbulence[X]) * Turb->Turbulence[X]);
@@ -8246,8 +8480,10 @@ static DBL wood_pattern (const Vector3d& EPoint, const TPATTERN *TPat)
 *
 ******************************************************************************/
 
-static DBL wrinkles_pattern (const Vector3d& EPoint, int noise_generator)
+DBL WrinklesPattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
 {
+	int noise_generator = GetNoiseGen(Thread);
+
 	register int i;
 	DBL lambda = 2.0;
 	DBL omega = 0.5;
@@ -8503,28 +8739,28 @@ DBL quilt_cubic(DBL t, DBL p1, DBL p2)
 *
 ******************************************************************************/
 
-static DBL fractal_exterior_color(const TPATTERN *TPat, int iters, DBL a, DBL b)
+DBL FractalPattern::ExteriorColour(int iters, DBL a, DBL b) const
 {
-	switch(TPat->Vals.Fractal.exterior_type)
+	switch(exterior_type)
 	{
 		case 0:
-			return  (DBL)TPat->Vals.Fractal.efactor;
+			return efactor;
 		case 1:
-			return (DBL)iters / (DBL)TPat->Vals.Fractal.Iterations;
+			return (DBL)iters / (DBL)Iterations;
 		case 2:
-			return a * (DBL)TPat->Vals.Fractal.efactor;
+			return a * efactor;
 		case 3:
-			return b * (DBL)TPat->Vals.Fractal.efactor;
+			return b * efactor;
 		case 4:
-			return a*a * (DBL)TPat->Vals.Fractal.efactor;
+			return a*a * efactor;
 		case 5:
-			return b*b * (DBL)TPat->Vals.Fractal.efactor;
+			return b*b * efactor;
 		case 6:
-			return sqrt(a*a+b*b) * (DBL)TPat->Vals.Fractal.efactor;
+			return sqrt(a*a+b*b) * efactor;
 		case 7: // range 0.. (n-1)/n
-			return  (DBL)( iters % (unsigned int)TPat->Vals.Fractal.efactor )/(DBL)TPat->Vals.Fractal.efactor;
+			return (DBL)( iters % (unsigned int)efactor )/efactor;
 		case 8: // range 0.. 1
-			return  (DBL)( iters % (unsigned int)(1+TPat->Vals.Fractal.efactor) )/(DBL)TPat->Vals.Fractal.efactor;
+			return (DBL)( iters % (unsigned int)(1+efactor) )/efactor;
 	}
 	return 0;
 }
@@ -8548,24 +8784,24 @@ static DBL fractal_exterior_color(const TPATTERN *TPat, int iters, DBL a, DBL b)
 *
 ******************************************************************************/
 
-static DBL fractal_interior_color(const TPATTERN *TPat, int /*iters*/, DBL a, DBL b, DBL mindist2)
+DBL FractalPattern::InteriorColour(DBL a, DBL b, DBL mindist2) const
 {
-	switch(TPat->Vals.Fractal.interior_type)
+	switch(interior_type)
 	{
 		case 0:
-			return  (DBL)TPat->Vals.Fractal.ifactor;
+			return ifactor;
 		case 1:
-			return sqrt(mindist2) * (DBL)TPat->Vals.Fractal.ifactor;
+			return sqrt(mindist2) * ifactor;
 		case 2:
-			return a * (DBL)TPat->Vals.Fractal.ifactor;
+			return a * ifactor;
 		case 3:
-			return b * (DBL)TPat->Vals.Fractal.ifactor;
+			return b * ifactor;
 		case 4:
-			return a*a * (DBL)TPat->Vals.Fractal.ifactor;
+			return a*a * ifactor;
 		case 5:
-			return b*b * (DBL)TPat->Vals.Fractal.ifactor;
+			return b*b * ifactor;
 		case 6:
-			return a*a+b*b * (DBL)TPat->Vals.Fractal.ifactor;
+			return a*a+b*b * ifactor;
 	}
 	return 0;
 }

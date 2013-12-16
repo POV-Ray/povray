@@ -26,9 +26,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/support/imageutil.cpp $
- * $Revision: #41 $
- * $Change: 6150 $
- * $DateTime: 2013/11/30 14:13:48 $
+ * $Revision: #42 $
+ * $Change: 6154 $
+ * $DateTime: 2013/12/01 13:49:24 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -151,7 +151,7 @@ bool image_map(const Vector3d& EPoint, const PIGMENT *Pigment, Colour& colour)
 		return false;
 	}
 	else
-		image_colour_at(Pigment->Vals.image, xcoor, ycoor, colour, &reg_number, false);
+		image_colour_at(dynamic_cast<ImagePattern*>(Pigment->pattern.get())->image, xcoor, ycoor, colour, &reg_number, false);
 
 	return true;
 }
@@ -198,7 +198,7 @@ TEXTURE *material_map(const Vector3d& EPoint, const TEXTURE *Texture)
 		Material_Number = 0;
 	else
 	{
-		image_colour_at(Texture->Vals.image, xcoor, ycoor, colour, &reg_number); // TODO ALPHA - we should decide whether we prefer premultiplied or non-premultiplied alpha
+		image_colour_at(dynamic_cast<ImagePattern*>(Texture->pattern.get())->image, xcoor, ycoor, colour, &reg_number); // TODO ALPHA - we should decide whether we prefer premultiplied or non-premultiplied alpha
 
 		if(reg_number == -1)
 			Material_Number = (int)(colour.red() * 255.0);
@@ -249,7 +249,7 @@ void bump_map(const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& normal)
 	Vector3d xprime, yprime, zprime;
 	DBL Length;
 	DBL Amount = Tnormal->Amount;
-	const ImageData *image = Tnormal->Vals.image;
+	const ImageData *image = dynamic_cast<ImagePattern*>(Tnormal->pattern.get())->image;
 
 	// going to have to change this
 	// need to know if bump point is off of image for all 3 points
@@ -370,7 +370,7 @@ DBL image_pattern(const Vector3d& EPoint, const TPATTERN *TPattern)
 	DBL xcoor = 0.0, ycoor = 0.0;
 	int index = -1;
 	Colour colour;
-	const ImageData *image = TPattern->Vals.image;
+	const ImageData *image = dynamic_cast<ImagePattern*>(TPattern->pattern.get())->image;
 	DBL Value;
 
 	colour.clear();
@@ -883,7 +883,7 @@ static int planar_image_map(const Vector3d& EPoint, const ImageData *image, DBL 
 
 static int map_pos(const Vector3d& EPoint, const TPATTERN *TPattern, DBL *xcoor, DBL *ycoor)
 {
-	const ImageData *image = TPattern->Vals.image;
+	const ImageData *image = dynamic_cast<ImagePattern*>(TPattern->pattern.get())->image;
 
 	// Now determine which mapper to use.
 

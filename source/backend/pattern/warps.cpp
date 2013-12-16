@@ -104,7 +104,7 @@ void Warp_EPoint (Vector3d& TPoint, const Vector3d& EPoint, const TPATTERN *TPat
 	SNGL BlkNum;
 	DBL  Length;
 	DBL  Strength;
-	WARP *Warp=TPat->Warps;
+	WARP *Warp=TPat->pattern->Warps;
 	TURB *Turb;
 	TRANS *Tr;
 	REPEAT *Repeat;
@@ -280,7 +280,7 @@ void Warp_EPoint (Vector3d& TPoint, const Vector3d& EPoint, const TPATTERN *TPat
 
 void Warp_Normal (Vector3d& TNorm, const Vector3d& ENorm, const TPATTERN *TPat, bool DontScaleBumps)
 {
-	const WARP *Warp=TPat->Warps;
+	const WARP *Warp=TPat->pattern->Warps;
 	const TRANS *Tr;
 
 	if(!DontScaleBumps)
@@ -320,10 +320,10 @@ void UnWarp_Normal (Vector3d& TNorm, const Vector3d& ENorm, const TPATTERN *TPat
 	else
 		TNorm = ENorm;
 
-	if(TPat->Warps != NULL)
+	if(TPat->pattern->Warps != NULL)
 	{
 		// go to the last entry
-		for(Warp = TPat->Warps; Warp->Next_Warp != NULL; Warp = Warp->Next_Warp) ;
+		for(Warp = TPat->pattern->Warps; Warp->Next_Warp != NULL; Warp = Warp->Next_Warp) ;
 
 		// walk backwards from the last entry
 		for(; Warp != NULL; Warp = Warp->Prev_Warp)
