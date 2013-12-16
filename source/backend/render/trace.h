@@ -23,9 +23,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/render/trace.h $
- * $Revision: #104 $
- * $Change: 6095 $
- * $DateTime: 2013/11/18 06:02:33 $
+ * $Revision: #105 $
+ * $Change: 6109 $
+ * $DateTime: 2013/11/20 17:03:27 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -762,7 +762,7 @@ class Trace
 		void ComputeDiffuseContribution1(const LightSource& lightsource, const Intersection& out, const Vector3d& vOut, const Intersection& in, RGBColour& Total_Colour, const DblRGBColour& sigma_prime_s, const DblRGBColour& sigma_a, double eta, double weight, TraceTicket& ticket);
 		void ComputeDiffuseAmbientContribution1(const Intersection& out, const Vector3d& vOut, const Intersection& in, RGBColour& Total_Colour, const DblRGBColour& sigma_prime_s, const DblRGBColour& sigma_a, double eta, double weight, TraceTicket& ticket);
 		void ComputeOneSingleScatteringContribution(const LightSource& lightsource, const Intersection& out, double sigma_t_xo, double sigma_s, double s_prime_out, RGBColour& Lo, double eta, const Vector3d& bend_point, double phi_out, double cos_out_prime, TraceTicket& ticket);
-		void ComputeSingleScatteringContribution(const Intersection& out, double dist, double cos_out, const Vector3d& refractedREye, double sigma_prime_t, double sigma_prime_s, RGBColour& Lo, double eta, TraceTicket& ticket);
+		void ComputeSingleScatteringContribution(const Intersection& out, double dist, double theta_out, double cos_out_prime, const Vector3d& refractedREye, double sigma_t_xo, double sigma_s, RGBColour& Lo, double eta, TraceTicket& ticket);
 		void ComputeSubsurfaceScattering (const FINISH *Finish, const RGBColour& layer_pigment_colour, const Intersection& isect, const Ray& Eye, const Vector3d& Layer_Normal, RGBColour& colour, double Attenuation, TraceTicket& ticket);
 		bool SSLTComputeRefractedDirection(const Vector3d& v, const Vector3d& n, double eta, Vector3d& refracted);
 

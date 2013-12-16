@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/base/colour.h $
- * $Revision: #4 $
- * $Change: 6097 $
- * $DateTime: 2013/11/18 15:19:34 $
+ * $Revision: #6 $
+ * $Change: 6113 $
+ * $DateTime: 2013/11/20 20:39:54 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -758,6 +758,11 @@ template<typename T>
 inline GenericColour<T> operator+ (double a, const GenericColour<T>& b) { return b + a; }
 template<typename T>
 inline GenericRGBColour<T> operator+ (double a, const GenericRGBColour<T>& b) { return b + a; }
+
+template<typename T>
+inline GenericColour<T> operator- (double a, const GenericColour<T>& b) { return GenericColour<T>(a) - b; }
+template<typename T>
+inline GenericRGBColour<T> operator- (double a, const GenericRGBColour<T>& b) { return GenericRGBColour<T>(a) - b; }
 
 template<typename T>
 inline double colourDistance (const GenericColour<T>& a, const GenericColour<T>& b) { return fabs(a.red() - b.red()) + fabs(a.green() - b.green()) + fabs(a.blue() - b.blue()); }

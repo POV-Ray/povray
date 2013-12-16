@@ -23,9 +23,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/render/trace.cpp $
- * $Revision: #213 $
- * $Change: 6097 $
- * $DateTime: 2013/11/18 15:19:34 $
+ * $Revision: #215 $
+ * $Change: 6113 $
+ * $DateTime: 2013/11/20 20:39:54 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -2062,7 +2062,7 @@ void Trace::TraceAreaLightShadowRay(const LightSource &lightsource, double& ligh
 }
 
 void Trace::TraceAreaLightSubsetShadowRay(const LightSource &lightsource, double& lightsourcedepth, Ray& lightsourceray,
-                                    const Vector3d& ipoint, RGBColour& lightcolour, int u1, int  v1, int  u2, int  v2, int level, const Vector3d& axis1, const Vector3d& axis2, TraceTicket& ticket)
+                                          const Vector3d& ipoint, RGBColour& lightcolour, int u1, int  v1, int  u2, int  v2, int level, const Vector3d& axis1, const Vector3d& axis2, TraceTicket& ticket)
 {
 	RGBColour sample_Colour[4];
 	int i, u, v, new_u1, new_v1, new_u2, new_v2;
@@ -3395,45 +3395,35 @@ void Trace::ComputeOneSingleScatteringContribution(const LightSource& lightsourc
 
 // call this once for each color
 // out.INormal is calculated
-void Trace::ComputeSingleScatteringContribution(const Intersection& out, double dist, double cos_out, const Vector3d& refractedREye, double sigma_prime_t, double sigma_prime_s, RGBColour& Lo, double eta,
+void Trace::ComputeSingleScatteringContribution(const Intersection& out, double dist, double theta_out, double cos_out_prime, const Vector3d& refractedREye, double sigma_t_xo, double sigma_s, RGBColour& Lo, double eta,
                                                 TraceTicket& ticket)
 {
-	double          g = 0; // the mean cosine of the scattering angle; for isotropic scattering, g = 0
-	double          sigma_t_xo = sigma_prime_t / (1-g); // TODO FIXME - precompute
-	double          sigma_s = sigma_prime_s / (1-g); // TODO FIXME - precompute
-	double          epsilon;
-	double          s_prime_out;
-
 	Lo.clear();
-
-	// TODO FIXME - a significant deal of this only needs to be computed once for any intersection point!
 
 	// calculate s_prime_out
 	while (ssltUniformNumberGenerator.size() <= ticket.subsurfaceRecursionDepth)
 		ssltUniformNumberGenerator.push_back(GetRandomDoubleGenerator(0.0, 1.0, 32767));
-	epsilon = (*(ssltUniformNumberGenerator[ticket.subsurfaceRecursionDepth]))(); // epsilon is a random floating point value in the range [0,1) {including 0, not including 1}
-	s_prime_out = fabs(log(epsilon)) / sigma_t_xo;
+	double epsilon = 1.0 - (*(ssltUniformNumberGenerator[ticket.subsurfaceRecursionDepth]))(); // epsilon is a random floating point value in the range (0,1] (i.e. not including 0, but including 1)
+	double s_prime_out = fabs(log(epsilon)) / sigma_t_xo;
 
 	if (s_prime_out >= dist)
-		return; // not within the object - this will be covered by a "zero scattering" term
+		return; // not within the object - this is covered by a "zero scattering" term instead
 
 	//compute bend_point wihch is s_prime_out distance away on refractedREye
 	Vector3d bend_point = Vector3d(out.IPoint) + refractedREye * (s_prime_out / sceneData->mmPerUnit);
-
-	double cos_out_prime = sqrt(1 - ((Sqr(1.0 / eta)) * (1 - Sqr(cos_out))));
 
 	// global light sources, if not turned off for this object
 	if((out.Object->Flags & NO_GLOBAL_LIGHTS_FLAG) != NO_GLOBAL_LIGHTS_FLAG)
 	{
 		for(int i = 0; i < threadData->lightSources.size(); i++)
-			ComputeOneSingleScatteringContribution(*threadData->lightSources[i], out, sigma_t_xo, sigma_s, s_prime_out, Lo, eta, bend_point, acos(cos_out), cos_out_prime, ticket);
+			ComputeOneSingleScatteringContribution(*threadData->lightSources[i], out, sigma_t_xo, sigma_s, s_prime_out, Lo, eta, bend_point, theta_out, cos_out_prime, ticket);
 	}
 
 	// local light sources from a light group, if any
 	if(!out.Object->LLights.empty())
 	{
 		for(int i = 0; i < out.Object->LLights.size(); i++)
-			ComputeOneSingleScatteringContribution(*out.Object->LLights[i], out, sigma_t_xo, sigma_s, s_prime_out, Lo, eta, bend_point, acos(cos_out), cos_out_prime, ticket);
+			ComputeOneSingleScatteringContribution(*out.Object->LLights[i], out, sigma_t_xo, sigma_s, s_prime_out, Lo, eta, bend_point, theta_out, cos_out_prime, ticket);
 	}
 
 	assert ((Lo.red()   >= 0) &&
@@ -3692,6 +3682,10 @@ void Trace::ComputeSubsurfaceScattering(const FINISH *Finish, const RGBColour& l
 	DblRGBColour   sigma_tr         = sqrt(sigma_tr_sqr);
 #endif
 
+	DblRGBColour   g(0.0); // the mean cosine of the scattering angle; for isotropic scattering, g = 0
+	DblRGBColour   sigma_t_xo       = sigma_prime_t / (1.0-g);
+	DblRGBColour   sigma_s          = sigma_prime_s / (1.0-g);
+
 #if 1
 
 	// colour dependent diffuse contribution
@@ -3778,6 +3772,8 @@ void Trace::ComputeSubsurfaceScattering(const FINISH *Finish, const RGBColour& l
 			dist = HUGE_VAL;
 
 		double cos_out = dot(vOut, Vector3d(out.INormal));
+		double cos_out_prime = sqrt(1 - ((Sqr(1.0 / eta)) * (1 - Sqr(cos_out))));
+		double theta_out = acos(cos_out);
 
 #if 1
 
@@ -3788,7 +3784,7 @@ void Trace::ComputeSubsurfaceScattering(const FINISH *Finish, const RGBColour& l
 			for (int j = 0; j < 3; j ++)
 			{
 				RGBColour temp;
-				ComputeSingleScatteringContribution(out, dist, cos_out, refractedEye, sigma_prime_t[j], sigma_prime_s[j], temp, eta, ticket);
+				ComputeSingleScatteringContribution(out, dist, theta_out, cos_out_prime, refractedEye, sigma_t_xo[j], sigma_s[j], temp, eta, ticket);
 				Total_Colour[j] += temp[j] / NumSamplesSingle;
 			}
 		}
