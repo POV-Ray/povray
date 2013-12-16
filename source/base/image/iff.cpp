@@ -24,11 +24,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/base/image/iff.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/base/image/iff.cpp $
+ * $Revision: #20 $
+ * $Change: 6081 $
+ * $DateTime: 2013/11/10 06:05:11 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #include <vector>
@@ -271,6 +271,9 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
 										Previous_Green = g = (unsigned char)(((creg & 0xf) << 4) + (creg & 0xf));
 										b = (unsigned char)Previous_Blue;
 										break;
+
+									default:
+										throw POV_EXCEPTION(kFileDataErr, "Invalid data in IFF file");
 								}
 								image->SetRGBValue (col, row, r, g, b); // TODO FIXME - gamma!
 							}
