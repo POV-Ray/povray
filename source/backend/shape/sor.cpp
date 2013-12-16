@@ -27,9 +27,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/sor.cpp $
- * $Revision: #37 $
- * $Change: 6119 $
- * $DateTime: 2013/11/22 20:31:53 $
+ * $Revision: #38 $
+ * $Change: 6121 $
+ * $DateTime: 2013/11/23 07:38:50 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -438,7 +438,7 @@ bool Sor::Intersect(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread
 *
 ******************************************************************************/
 
-bool Sor::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
+bool Sor::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 {
 	int i;
 	DBL r0, r;
@@ -447,7 +447,7 @@ bool Sor::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
 
 	/* Transform the point into the surface of revolution space. */
 
-	MInvTransPoint(P, IPoint, Trans);
+	MInvTransPoint(P, *IPoint, Trans);
 
 	/* Test if we are inside the cylindrical bound. */
 
@@ -527,7 +527,7 @@ bool Sor::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
 *
 ******************************************************************************/
 
-void Sor::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) const
+void Sor::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread) const
 {
 	DBL k;
 	VECTOR P;
@@ -568,9 +568,9 @@ void Sor::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) co
 
 	/* Transform the normal out of the surface of revolution space. */
 
-	MTransNormal(Result, N, Trans);
+	MTransNormal(*Result, N, Trans);
 
-	VNormalize(Result, Result);
+	Result.normalize();
 }
 
 
@@ -606,7 +606,7 @@ void Sor::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) co
 *
 ******************************************************************************/
 
-void Sor::Translate(const VECTOR, const TRANSFORM *tr)
+void Sor::Translate(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
@@ -644,7 +644,7 @@ void Sor::Translate(const VECTOR, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void Sor::Rotate(const VECTOR, const TRANSFORM *tr)
+void Sor::Rotate(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
@@ -682,7 +682,7 @@ void Sor::Rotate(const VECTOR, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void Sor::Scale(const VECTOR, const TRANSFORM *tr)
+void Sor::Scale(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
@@ -1221,7 +1221,7 @@ bool Sor::test_hit(const Ray &ray, IStack& Depth_Stack, DBL d, DBL k, int t, int
 	{
 		IPoint = ray.Evaluate(d);
 
-		if (Clip.empty() || Point_In_Clip(*IPoint, Clip, Thread))
+		if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
 		{
 			/* is the extra copy of d redundant? */
 			Depth_Stack->push(Intersection(d, IPoint, this, t, n, k));
@@ -1267,7 +1267,7 @@ bool Sor::test_hit(const Ray &ray, IStack& Depth_Stack, DBL d, DBL k, int t, int
 *
 ******************************************************************************/
 
-void Sor::UVCoord(UV_VECT Result, const Intersection *Inter, TraceThreadData *Thread) const
+void Sor::UVCoord(Vector2d& Result, const Intersection *Inter, TraceThreadData *Thread) const
 {
 	DBL len, theta;
 	DBL h, v_per_segment;

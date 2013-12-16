@@ -168,7 +168,7 @@ bool IsoSurface::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
 				if(tmp < 0.0)                   /* The ray hits the bounding shape */
 				{
 					IPoint = ray.Evaluate(Depth1);
-					if(Clip.empty() || Point_In_Clip(*IPoint, Clip, Thread))
+					if(Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
 					{
 						Depth_Stack->push(Intersection(Depth1, IPoint, this, Side1));
 						IFound = true;
@@ -191,7 +191,7 @@ bool IsoSurface::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
 				if(Vector_Function(Thread->functionContext, VTmp) < 0.0)
 				{
 					IPoint = ray.Evaluate(Depth2);
-					if(Clip.empty() || Point_In_Clip(*IPoint, Clip, Thread))
+					if(Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
 					{
 						Depth_Stack->push(Intersection(Depth2, IPoint, this, Side2));
 						IFound = true;
@@ -233,7 +233,7 @@ bool IsoSurface::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
 			else
 			{
 				IPoint = ray.Evaluate(tmin);
-				if(Clip.empty() || Point_In_Clip(*IPoint, Clip, Thread))
+				if(Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
 				{
 					Depth_Stack->push(Intersection(tmin, IPoint, this, 0 /*Side1*/));
 					IFound = true;
@@ -285,7 +285,7 @@ bool IsoSurface::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
 *
 ******************************************************************************/
 
-bool IsoSurface::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
+bool IsoSurface::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 {
 	VECTOR Origin_To_Center;
 	VECTOR New_Point;
@@ -293,9 +293,9 @@ bool IsoSurface::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
 
 	/* Transform the point into box space. */
 	if(Trans != NULL)
-		MInvTransPoint(New_Point, IPoint, Trans);
+		MInvTransPoint(New_Point, *IPoint, Trans);
 	else
-		Assign_Vector(New_Point, IPoint);
+		Assign_Vector(New_Point, *IPoint);
 
 	if(container_shape != 0)
 	{
@@ -354,7 +354,7 @@ bool IsoSurface::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
 *
 ******************************************************************************/
 
-void IsoSurface::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) const
+void IsoSurface::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread) const
 {
 	VECTOR New_Point, TPoint;
 	DBL funct;
@@ -362,22 +362,22 @@ void IsoSurface::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thr
 	switch (Inter->i1)
 	{
 		case SIDE_X_0:
-			Make_Vector(Result, -1.0, 0.0, 0.0);
+			Result = Vector3d(-1.0, 0.0, 0.0);
 			break;
 		case SIDE_X_1:
-			Make_Vector(Result, 1.0, 0.0, 0.0);
+			Result = Vector3d( 1.0, 0.0, 0.0);
 			break;
 		case SIDE_Y_0:
-			Make_Vector(Result, 0.0, -1.0, 0.0);
+			Result = Vector3d( 0.0, -1.0, 0.0);
 			break;
 		case SIDE_Y_1:
-			Make_Vector(Result, 0.0, 1.0, 0.0);
+			Result = Vector3d( 0.0, 1.0, 0.0);
 			break;
 		case SIDE_Z_0:
-			Make_Vector(Result, 0.0, 0.0, -1.0);
+			Result = Vector3d( 0.0, 0.0, -1.0);
 			break;
 		case SIDE_Z_1:
-			Make_Vector(Result, 0.0, 0.0, 1.0);
+			Result = Vector3d( 0.0, 0.0, 1.0);
 			break;
 
 		default:
@@ -390,11 +390,11 @@ void IsoSurface::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thr
 
 			if(container_shape)
 			{
-				VSub(Result, New_Point, container.sphere.center);
-				VLength(funct, Result);
+				Result = Vector3d(New_Point) - Vector3d(container.sphere.center);
+				funct = Result.length();
 				if(fabs(funct - container.sphere.radius) < EPSILON)
 				{
-					VInverseScaleEq(Result, container.sphere.radius);
+					Result /= container.sphere.radius;
 					break;
 				}
 			}
@@ -413,7 +413,7 @@ void IsoSurface::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thr
 
 			if((Result[X] == 0) && (Result[Y] == 0) && (Result[Z] == 0))
 				Result[X] = 1.0;
-			VNormalize(Result, Result);
+			Result.normalize();
 	}
 
 
@@ -421,9 +421,9 @@ void IsoSurface::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thr
 
 	if(Trans != NULL)
 	{
-		MTransNormal(Result, Result, Trans);
+		MTransNormal(*Result, *Result, Trans);
 
-		VNormalize(Result, Result);
+		Result.normalize();
 	}
 }
 
@@ -455,7 +455,7 @@ void IsoSurface::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thr
 *
 ******************************************************************************/
 
-void IsoSurface::Translate(const VECTOR, const TRANSFORM* tr)
+void IsoSurface::Translate(const Vector3d&, const TRANSFORM* tr)
 {
 	Transform(tr);
 }
@@ -488,7 +488,7 @@ void IsoSurface::Translate(const VECTOR, const TRANSFORM* tr)
 *
 ******************************************************************************/
 
-void IsoSurface::Rotate(const VECTOR, const TRANSFORM* tr)
+void IsoSurface::Rotate(const Vector3d&, const TRANSFORM* tr)
 {
 	Transform(tr);
 }
@@ -521,7 +521,7 @@ void IsoSurface::Rotate(const VECTOR, const TRANSFORM* tr)
 *
 ******************************************************************************/
 
-void IsoSurface::Scale(const VECTOR, const TRANSFORM* tr)
+void IsoSurface::Scale(const Vector3d&, const TRANSFORM* tr)
 {
 	Transform(tr);
 }

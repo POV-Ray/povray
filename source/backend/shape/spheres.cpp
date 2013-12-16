@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/spheres.cpp $
- * $Revision: #34 $
- * $Change: 6119 $
- * $DateTime: 2013/11/22 20:31:53 $
+ * $Revision: #35 $
+ * $Change: 6121 $
+ * $DateTime: 2013/11/23 07:38:50 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -108,7 +108,7 @@ bool Sphere::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadD
 				IPoint = New_Ray.Evaluate(Depth1);
 				MTransPoint(*IPoint, *IPoint, Trans);
 
-				if(Clip.empty() || Point_In_Clip(*IPoint, Clip, Thread))
+				if(Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
 				{
 					Depth_Stack->push(Intersection(Depth1 / len, IPoint, this));
 					Intersection_Found = true;
@@ -120,7 +120,7 @@ bool Sphere::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadD
 				IPoint = New_Ray.Evaluate(Depth2);
 				MTransPoint(*IPoint, *IPoint, Trans);
 
-				if(Clip.empty() || Point_In_Clip(*IPoint, Clip, Thread))
+				if(Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
 				{
 					Depth_Stack->push(Intersection(Depth2 / len, IPoint, this));
 					Intersection_Found = true;
@@ -145,7 +145,7 @@ bool Sphere::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadD
 			{
 				IPoint = ray.Evaluate(Depth1);
 
-				if(Clip.empty() || Point_In_Clip(*IPoint, Clip, Thread))
+				if(Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
 				{
 					Depth_Stack->push(Intersection(Depth1, IPoint, this));
 					Intersection_Found = true;
@@ -156,7 +156,7 @@ bool Sphere::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadD
 			{
 				IPoint = ray.Evaluate(Depth2);
 
-				if(Clip.empty() || Point_In_Clip(*IPoint, Clip, Thread))
+				if(Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
 				{
 					Depth_Stack->push(Intersection(Depth2, IPoint, this));
 					Intersection_Found = true;
@@ -259,7 +259,7 @@ bool Sphere::Intersect(const Ray& ray, const VECTOR Center, DBL Radius2, DBL *De
 *
 ******************************************************************************/
 
-bool Sphere::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
+bool Sphere::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 {
 	DBL OCSquared;
 	VECTOR Origin_To_Center;
@@ -271,7 +271,7 @@ bool Sphere::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
 
 		/* Transform the point into the sphere's space */
 
-		MInvTransPoint(New_Point, IPoint, Trans);
+		MInvTransPoint(New_Point, *IPoint, Trans);
 
 		VSub(Origin_To_Center, Center, New_Point);
 
@@ -284,7 +284,7 @@ bool Sphere::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
 	}
 	else
 	{
-		VSub(Origin_To_Center, Center, IPoint);
+		VSub(Origin_To_Center, Center, *IPoint);
 
 		VDot(OCSquared, Origin_To_Center, Origin_To_Center);
 
@@ -323,21 +323,20 @@ bool Sphere::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
 *
 ******************************************************************************/
 
-void Sphere::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) const
+void Sphere::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread) const
 {
 	if(Do_Ellipsoid)
 	{
 		VECTOR New_Point;
 		// Transform the point into the sphere's space
 		MInvTransPoint(New_Point, *Inter->IPoint, Trans);
-		VSub(Result, New_Point, Center);
-		MTransNormal(Result, Result, Trans);
-		VNormalize(Result, Result);
+		VSub(*Result, New_Point, Center);
+		MTransNormal(*Result, *Result, Trans);
+		Result.normalize();
 	}
 	else
 	{
-		VSub(Result, *Inter->IPoint, Center);
-		VInverseScaleEq(Result, Radius);
+		Result = (Inter->IPoint - Vector3d(Center)) / Radius;
 	}
 }
 
@@ -406,11 +405,11 @@ ObjectPtr Sphere::Copy()
 *
 ******************************************************************************/
 
-void Sphere::Translate(const VECTOR Vector, const TRANSFORM *tr)
+void Sphere::Translate(const Vector3d& Vector, const TRANSFORM *tr)
 {
 	if(Trans == NULL)
 	{
-		VAddEq(Center, Vector);
+		VAddEq(Center, *Vector);
 
 		Compute_BBox();
 	}
@@ -448,7 +447,7 @@ void Sphere::Translate(const VECTOR Vector, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void Sphere::Rotate(const VECTOR, const TRANSFORM *tr)
+void Sphere::Rotate(const Vector3d&, const TRANSFORM *tr)
 {
 	if(Trans == NULL)
 	{
@@ -490,7 +489,7 @@ void Sphere::Rotate(const VECTOR, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void Sphere::Scale(const VECTOR Vector, const TRANSFORM *tr)
+void Sphere::Scale(const Vector3d& Vector, const TRANSFORM *tr)
 {
 	if ((Vector[X] != Vector[Y]) || (Vector[X] != Vector[Z]))
 	{
@@ -740,7 +739,7 @@ void Sphere::Compute_BBox()
 *
 ******************************************************************************/
 
-void Sphere::UVCoord(UV_VECT Result, const Intersection *Inter, TraceThreadData *Thread) const
+void Sphere::UVCoord(Vector2d& Result, const Intersection *Inter, TraceThreadData *Thread) const
 {
 	DBL len, phi, theta;
 	DBL x,y,z;

@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/scene/objects.h $
- * $Revision: #34 $
- * $Change: 6119 $
- * $DateTime: 2013/11/22 20:31:53 $
+ * $Revision: #35 $
+ * $Change: 6121 $
+ * $DateTime: 2013/11/23 07:38:50 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -150,14 +150,14 @@ bool Find_Intersection(Intersection *Ray_Intersection, ObjectPtr Object, const R
 bool Find_Intersection(Intersection *isect, ObjectPtr object, const Ray& ray, ObjectBase::BBoxDirection variant, const BBoxVector3d& origin, const BBoxVector3d& invdir, TraceThreadData *ThreadData);
 bool Find_Intersection(Intersection *isect, ObjectPtr object, const Ray& ray, ObjectBase::BBoxDirection variant, const BBoxVector3d& origin, const BBoxVector3d& invdir, const RayObjectCondition& postcondition, TraceThreadData *ThreadData);
 bool Ray_In_Bound(const Ray& ray, const vector<ObjectPtr>& Bounding_Object, TraceThreadData *Thread);
-bool Point_In_Clip(const VECTOR IPoint, const vector<ObjectPtr>& Clip, TraceThreadData *Thread);
+bool Point_In_Clip(const Vector3d& IPoint, const vector<ObjectPtr>& Clip, TraceThreadData *Thread);
 ObjectPtr Copy_Object(ObjectPtr Old);
 vector<ObjectPtr> Copy_Objects(vector<ObjectPtr>& Src);
-void Translate_Object(ObjectPtr Object, const VECTOR Vector, const TRANSFORM *Trans);
-void Rotate_Object(ObjectPtr Object, const VECTOR Vector, const TRANSFORM *Trans);
-void Scale_Object(ObjectPtr Object, const VECTOR Vector, const TRANSFORM *Trans);
+void Translate_Object(ObjectPtr Object, const Vector3d& Vector, const TRANSFORM *Trans);
+void Rotate_Object(ObjectPtr Object, const Vector3d& Vector, const TRANSFORM *Trans);
+void Scale_Object(ObjectPtr Object, const Vector3d& Vector, const TRANSFORM *Trans);
 void Transform_Object(ObjectPtr Object, const TRANSFORM *Trans);
-bool Inside_Object(const VECTOR IPoint, ObjectPtr Vector, TraceThreadData *Thread);
+bool Inside_Object(const Vector3d& IPoint, ObjectPtr Object, TraceThreadData *Thread);
 void Invert_Object(ObjectPtr Object);
 ObjectPtr Invert_CSG_Object(ObjectPtr& Object); // deletes Object and returns new pointer
 void Destroy_Object(vector<ObjectPtr>& Object);

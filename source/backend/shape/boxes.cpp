@@ -27,9 +27,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/boxes.cpp $
- * $Revision: #33 $
- * $Change: 6119 $
- * $DateTime: 2013/11/22 20:31:53 $
+ * $Revision: #34 $
+ * $Change: 6121 $
+ * $DateTime: 2013/11/23 07:38:50 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -115,7 +115,7 @@ bool Box::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadData
 		{
 			IPoint = ray.Evaluate(Depth1);
 
-			if (Clip.empty() || Point_In_Clip(*IPoint, Clip, Thread))
+			if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
 			{
 				Depth_Stack->push(Intersection(Depth1,IPoint,this,Side1));
 
@@ -125,7 +125,7 @@ bool Box::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadData
 
 		IPoint = ray.Evaluate(Depth2);
 
-		if (Clip.empty() || Point_In_Clip(*IPoint, Clip, Thread))
+		if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
 		{
 			Depth_Stack->push(Intersection(Depth2,IPoint,this,Side2));
 
@@ -533,7 +533,7 @@ bool Box::Intersect(const Ray& ray, const TRANSFORM *Trans, const VECTOR Corner1
 *
 ******************************************************************************/
 
-bool Box::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
+bool Box::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 {
 	VECTOR New_Point;
 
@@ -541,11 +541,11 @@ bool Box::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
 
 	if (Trans != NULL)
 	{
-		MInvTransPoint(New_Point, IPoint, Trans);
+		MInvTransPoint(New_Point, *IPoint, Trans);
 	}
 	else
 	{
-		Assign_Vector(New_Point,IPoint);
+		Assign_Vector(New_Point, *IPoint);
 	}
 
 	/* Test to see if we are outside the box. */
@@ -598,16 +598,16 @@ bool Box::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
 *
 ******************************************************************************/
 
-void Box::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) const
+void Box::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread) const
 {
 	switch (Inter->i1)
 	{
-		case SIDE_X_0: Make_Vector(Result, -1.0,  0.0,  0.0); break;
-		case SIDE_X_1: Make_Vector(Result,  1.0,  0.0,  0.0); break;
-		case SIDE_Y_0: Make_Vector(Result,  0.0, -1.0,  0.0); break;
-		case SIDE_Y_1: Make_Vector(Result,  0.0,  1.0,  0.0); break;
-		case SIDE_Z_0: Make_Vector(Result,  0.0,  0.0, -1.0); break;
-		case SIDE_Z_1: Make_Vector(Result,  0.0,  0.0,  1.0); break;
+		case SIDE_X_0: Result = Vector3d(-1.0,  0.0,  0.0); break;
+		case SIDE_X_1: Result = Vector3d( 1.0,  0.0,  0.0); break;
+		case SIDE_Y_0: Result = Vector3d( 0.0, -1.0,  0.0); break;
+		case SIDE_Y_1: Result = Vector3d( 0.0,  1.0,  0.0); break;
+		case SIDE_Z_0: Result = Vector3d( 0.0,  0.0, -1.0); break;
+		case SIDE_Z_1: Result = Vector3d( 0.0,  0.0,  1.0); break;
 
 		default: throw POV_EXCEPTION_STRING("Unknown box side in Box_Normal().");
 	}
@@ -616,9 +616,9 @@ void Box::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) co
 
 	if (Trans != NULL)
 	{
-		MTransNormal(Result, Result, Trans);
+		MTransNormal(*Result, *Result, Trans);
 
-		VNormalize(Result, Result);
+		Result.normalize();
 	}
 }
 
@@ -650,13 +650,13 @@ void Box::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) co
 *
 ******************************************************************************/
 
-void Box::Translate(const VECTOR Vector, const TRANSFORM *tr)
+void Box::Translate(const Vector3d& Vector, const TRANSFORM *tr)
 {
 	if (Trans == NULL)
 	{
-		VAddEq(bounds[0], Vector);
+		VAddEq(bounds[0], *Vector);
 
-		VAddEq(bounds[1], Vector);
+		VAddEq(bounds[1], *Vector);
 
 		Compute_BBox();
 	}
@@ -694,7 +694,7 @@ void Box::Translate(const VECTOR Vector, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void Box::Rotate(const VECTOR, const TRANSFORM *tr)
+void Box::Rotate(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
@@ -727,14 +727,14 @@ void Box::Rotate(const VECTOR, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void Box::Scale(const VECTOR Vector, const TRANSFORM *tr)
+void Box::Scale(const Vector3d& Vector, const TRANSFORM *tr)
 {
 	DBL temp;
 
 	if (Trans == NULL)
 	{
-		VEvaluateEq(bounds[0], Vector);
-		VEvaluateEq(bounds[1], Vector);
+		VEvaluateEq(bounds[0], *Vector);
+		VEvaluateEq(bounds[1], *Vector);
 
 		if (bounds[0][X] > bounds[1][X])
 		{
@@ -1061,7 +1061,7 @@ void Box::Compute_BBox()
 *
 ******************************************************************************/
 
-void Box::UVCoord(UV_VECT Result, const Intersection *Inter, TraceThreadData *Thread) const
+void Box::UVCoord(Vector2d& Result, const Intersection *Inter, TraceThreadData *Thread) const
 {
 	VECTOR P, Box_Diff;
 

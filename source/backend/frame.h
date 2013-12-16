@@ -26,9 +26,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/frame.h $
- * $Revision: #124 $
- * $Change: 6119 $
- * $DateTime: 2013/11/22 20:31:53 $
+ * $Revision: #126 $
+ * $Change: 6122 $
+ * $DateTime: 2013/11/23 10:33:00 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -254,18 +254,6 @@ inline void Make_UV_Vector(UV_VECT v, DBL a, DBL b)
 }
 
 inline void Destroy_Float(DBL *x)
-{
-	if(x != NULL)
-		POV_FREE(x);
-}
-
-inline void Destroy_Vector(VECTOR *x)
-{
-	if(x != NULL)
-		POV_FREE(x);
-}
-
-inline void Destroy_UV_Vect(UV_VECT *x)
 {
 	if(x != NULL)
 		POV_FREE(x);
@@ -1422,12 +1410,12 @@ class ObjectBase
 		virtual ObjectPtr Copy() = 0;
 
 		virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *) = 0; // could be "const", if it wasn't for isosurface max_gradient estimation stuff
-		virtual bool Inside(const VECTOR, TraceThreadData *) const = 0;
-		virtual void Normal(VECTOR, Intersection *, TraceThreadData *) const = 0;
-		virtual void UVCoord(UV_VECT, const Intersection *, TraceThreadData *) const;
-		virtual void Translate(const VECTOR, const TRANSFORM *) = 0;
-		virtual void Rotate(const VECTOR, const TRANSFORM *) = 0;
-		virtual void Scale(const VECTOR, const TRANSFORM *) = 0;
+		virtual bool Inside(const Vector3d&, TraceThreadData *) const = 0;
+		virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const = 0;
+		virtual void UVCoord(Vector2d&, const Intersection *, TraceThreadData *) const;
+		virtual void Translate(const Vector3d&, const TRANSFORM *) = 0;
+		virtual void Rotate(const Vector3d&, const TRANSFORM *) = 0;
+		virtual void Scale(const Vector3d&, const TRANSFORM *) = 0;
 		virtual void Transform(const TRANSFORM *) = 0;
 		virtual void Invert() = 0;
 		virtual void Compute_BBox() = 0;
@@ -1531,12 +1519,12 @@ class LightSource : public CompoundObject
 		virtual ObjectPtr Copy();
 
 		virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
-		virtual bool Inside(const VECTOR, TraceThreadData *) const;
-		virtual void Normal(VECTOR, Intersection *, TraceThreadData *) const;
-		virtual void UVCoord(UV_VECT, const Intersection *, TraceThreadData *) const;
-		virtual void Translate(const VECTOR, const TRANSFORM *);
-		virtual void Rotate(const VECTOR, const TRANSFORM *);
-		virtual void Scale(const VECTOR, const TRANSFORM *);
+		virtual bool Inside(const Vector3d&, TraceThreadData *) const;
+		virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const;
+		virtual void UVCoord(Vector2d&, const Intersection *, TraceThreadData *) const;
+		virtual void Translate(const Vector3d&, const TRANSFORM *);
+		virtual void Rotate(const Vector3d&, const TRANSFORM *);
+		virtual void Scale(const Vector3d&, const TRANSFORM *);
 		virtual void Transform(const TRANSFORM *);
 		virtual void Invert();
 		virtual void Compute_BBox() { }

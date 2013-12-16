@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/spheres.h $
- * $Revision: #21 $
- * $Change: 6119 $
- * $DateTime: 2013/11/22 20:31:53 $
+ * $Revision: #22 $
+ * $Change: 6121 $
+ * $DateTime: 2013/11/23 07:38:50 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -60,12 +60,12 @@ class Sphere : public ObjectBase
 		virtual ObjectPtr Copy();
 
 		virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
-		virtual bool Inside(const VECTOR, TraceThreadData *) const;
-		virtual void Normal(VECTOR, Intersection *, TraceThreadData *) const;
-		virtual void UVCoord(UV_VECT, const Intersection *, TraceThreadData *) const;
-		virtual void Translate(const VECTOR, const TRANSFORM *);
-		virtual void Rotate(const VECTOR, const TRANSFORM *);
-		virtual void Scale(const VECTOR, const TRANSFORM *);
+		virtual bool Inside(const Vector3d&, TraceThreadData *) const;
+		virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const;
+		virtual void UVCoord(Vector2d&, const Intersection *, TraceThreadData *) const;
+		virtual void Translate(const Vector3d&, const TRANSFORM *);
+		virtual void Rotate(const Vector3d&, const TRANSFORM *);
+		virtual void Scale(const Vector3d&, const TRANSFORM *);
 		virtual void Transform(const TRANSFORM *);
 		virtual void Invert();
 		virtual void Compute_BBox();

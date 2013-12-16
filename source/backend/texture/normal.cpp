@@ -26,9 +26,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/texture/normal.cpp $
- * $Revision: #32 $
- * $Change: 6118 $
- * $DateTime: 2013/11/22 16:39:19 $
+ * $Revision: #33 $
+ * $Change: 6121 $
+ * $DateTime: 2013/11/23 07:38:50 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -799,7 +799,7 @@ void Perturb_Normal(VECTOR Layer_Normal, const TNORMAL *Tnormal, const VECTOR EP
 	{
 		if ((Blend_Map->Type == NORMAL_TYPE) && (Tnormal->Type == UV_MAP_PATTERN))
 		{
-			UV_VECT UV_Coords;
+			Vector2d UV_Coords;
 
 			Cur = &(Tnormal->Blend_Map->Blend_Map_Entries[0]);
 

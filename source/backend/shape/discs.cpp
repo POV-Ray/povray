@@ -27,9 +27,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/discs.cpp $
- * $Revision: #28 $
- * $Change: 6118 $
- * $DateTime: 2013/11/22 16:39:19 $
+ * $Revision: #29 $
+ * $Change: 6121 $
+ * $DateTime: 2013/11/23 07:38:50 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -90,7 +90,7 @@ bool Disc::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDat
 		Thread->Stats()[Ray_Disc_Tests_Succeeded]++;
 		IPoint = ray.Evaluate(Depth);
 
-		if (Clip.empty() || Point_In_Clip (*IPoint, Clip, Thread))
+		if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
 		{
 			Depth_Stack->push(Intersection(Depth,IPoint,this));
 			Intersection_Found = true;
@@ -193,13 +193,13 @@ bool Disc::Intersect(const Ray& ray, DBL *Depth) const
 *
 ******************************************************************************/
 
-bool Disc::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
+bool Disc::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 {
 	VECTOR New_Point;
 
 	/* Transform the point into the discs space */
 
-	MInvTransPoint(New_Point, IPoint, Trans);
+	MInvTransPoint(New_Point, *IPoint, Trans);
 
 	if (New_Point[Z] >= 0.0)
 	{
@@ -243,9 +243,9 @@ bool Disc::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
 *
 ******************************************************************************/
 
-void Disc::Normal (VECTOR Result, Intersection *, TraceThreadData *) const
+void Disc::Normal(Vector3d& Result, Intersection *, TraceThreadData *) const
 {
-	Assign_Vector(Result, normal);
+	Result = Vector3d(normal);
 }
 
 
@@ -276,7 +276,7 @@ void Disc::Normal (VECTOR Result, Intersection *, TraceThreadData *) const
 *
 ******************************************************************************/
 
-void Disc::Translate(const VECTOR, const TRANSFORM *tr)
+void Disc::Translate(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
@@ -309,7 +309,7 @@ void Disc::Translate(const VECTOR, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void Disc::Rotate(const VECTOR, const TRANSFORM *tr)
+void Disc::Rotate(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
@@ -342,7 +342,7 @@ void Disc::Rotate(const VECTOR, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void Disc::Scale(const VECTOR, const TRANSFORM *tr)
+void Disc::Scale(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }

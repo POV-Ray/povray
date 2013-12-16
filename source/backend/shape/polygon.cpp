@@ -27,9 +27,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/polygon.cpp $
- * $Revision: #34 $
- * $Change: 6119 $
- * $DateTime: 2013/11/22 20:31:53 $
+ * $Revision: #35 $
+ * $Change: 6121 $
+ * $DateTime: 2013/11/23 07:38:50 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -128,7 +128,7 @@ bool Polygon::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThread
 	{
 		IPoint = ray.Evaluate(Depth);
 
-		if (Clip.empty() || Point_In_Clip(*IPoint, Clip, Thread))
+		if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
 		{
 			Depth_Stack->push(Intersection(Depth, IPoint, this));
 
@@ -257,7 +257,7 @@ bool Polygon::Intersect(const Ray& ray, DBL *Depth, TraceThreadData *Thread) con
 *
 ******************************************************************************/
 
-bool Polygon::Inside(const VECTOR, TraceThreadData *Thread) const
+bool Polygon::Inside(const Vector3d&, TraceThreadData *Thread) const
 {
 	return(false);
 }
@@ -296,9 +296,9 @@ bool Polygon::Inside(const VECTOR, TraceThreadData *Thread) const
 *
 ******************************************************************************/
 
-void Polygon::Normal(VECTOR Result, Intersection *, TraceThreadData *) const
+void Polygon::Normal(Vector3d& Result, Intersection *, TraceThreadData *) const
 {
-	Assign_Vector(Result, S_Normal);
+	Result = Vector3d(S_Normal);
 }
 
 
@@ -334,7 +334,7 @@ void Polygon::Normal(VECTOR Result, Intersection *, TraceThreadData *) const
 *
 ******************************************************************************/
 
-void Polygon::Translate(const VECTOR, const TRANSFORM *tr)
+void Polygon::Translate(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
@@ -372,7 +372,7 @@ void Polygon::Translate(const VECTOR, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void Polygon::Rotate(const VECTOR, const TRANSFORM *tr)
+void Polygon::Rotate(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
@@ -410,7 +410,7 @@ void Polygon::Rotate(const VECTOR, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void Polygon::Scale(const VECTOR, const TRANSFORM *tr)
+void Polygon::Scale(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }

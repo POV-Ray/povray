@@ -24,11 +24,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/math/matrices.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/math/matrices.h $
+ * $Revision: #13 $
+ * $Change: 6122 $
+ * $DateTime: 2013/11/23 10:33:00 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #ifndef MATRICES_H
@@ -90,8 +90,6 @@ void Compute_Coordinate_Transform (TRANSFORM *trans, const VECTOR origin, VECTOR
 TRANSFORM *Create_Transform (void);
 TRANSFORM *Copy_Transform (const TRANSFORM *Old);
 void Destroy_Transform (TRANSFORM *Trans);
-UV_VECT *Create_UV_Vect (void);
-VECTOR *Create_Vector (void);
 VECTOR_4D *Create_Vector_4D (void);
 DBL *Create_Float (void);
 void MInvers (MATRIX r, const MATRIX m);

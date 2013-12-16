@@ -27,9 +27,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/prism.cpp $
- * $Revision: #34 $
- * $Change: 6118 $
- * $DateTime: 2013/11/22 16:39:19 $
+ * $Revision: #35 $
+ * $Change: 6121 $
+ * $DateTime: 2013/11/23 07:38:50 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -254,7 +254,7 @@ bool Prism::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDa
 							if ((distance > DEPTH_TOLERANCE) && (distance < MAX_DISTANCE))
 							{
 								IPoint = ray.Evaluate(distance);
-								if (Clip.empty() || Point_In_Clip(*IPoint, Clip, Thread))
+								if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
 								{
 									Depth_Stack->push (Intersection (distance, IPoint, this, CAP_HIT, 0, 0));
 									Found = true;
@@ -278,7 +278,7 @@ bool Prism::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDa
 							if ((distance > DEPTH_TOLERANCE) && (distance < MAX_DISTANCE))
 							{
 								IPoint = ray.Evaluate(distance);
-								if (Clip.empty() || Point_In_Clip(*IPoint, Clip, Thread))
+								if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
 								{
 									Depth_Stack->push (Intersection (distance, IPoint, this, BASE_HIT, 0, 0));
 									Found = true;
@@ -381,7 +381,7 @@ bool Prism::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDa
 								if ((distance > DEPTH_TOLERANCE) && (distance < MAX_DISTANCE))
 								{
 									IPoint = ray.Evaluate(distance);
-									if (Clip.empty() || Point_In_Clip(*IPoint, Clip, Thread))
+									if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
 									{
 										Depth_Stack->push (Intersection (distance, IPoint, this, SPLINE_HIT, j, w));
 										Found = true;
@@ -426,7 +426,7 @@ bool Prism::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDa
 								if ((distance > DEPTH_TOLERANCE) && (distance < MAX_DISTANCE))
 								{
 									IPoint = ray.Evaluate(distance);
-									if (Clip.empty() || Point_In_Clip(*IPoint, Clip, Thread))
+									if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
 									{
 										Depth_Stack->push (Intersection (distance, IPoint, this, CAP_HIT, 0, 0));
 										Found = true;
@@ -453,7 +453,7 @@ bool Prism::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDa
 								if ((distance > DEPTH_TOLERANCE) && (distance < MAX_DISTANCE))
 								{
 									IPoint = ray.Evaluate(distance);
-									if (Clip.empty() || Point_In_Clip(*IPoint, Clip, Thread))
+									if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
 									{
 										Depth_Stack->push (Intersection (distance, IPoint, this, BASE_HIT, 0, 0));
 										Found = true;
@@ -563,7 +563,7 @@ bool Prism::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDa
 								if ((distance > DEPTH_TOLERANCE) && (distance < MAX_DISTANCE))
 								{
 									IPoint = ray.Evaluate(distance);
-									if (Clip.empty() || Point_In_Clip(*IPoint, Clip, Thread))
+									if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
 									{
 										Depth_Stack->push (Intersection (distance, IPoint, this, SPLINE_HIT, j, w));
 										Found = true;
@@ -616,13 +616,13 @@ bool Prism::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDa
 *
 ******************************************************************************/
 
-bool Prism::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
+bool Prism::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 {
 	VECTOR P;
 
 	/* Transform the point into the prism space. */
 
-	MInvTransPoint(P, IPoint, Trans);
+	MInvTransPoint(P, *IPoint, Trans);
 
 	if ((P[Y] >= Height1) && (P[Y] < Height2))
 	{
@@ -686,7 +686,7 @@ bool Prism::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
 *
 ******************************************************************************/
 
-void Prism::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) const
+void Prism::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread) const
 {
 	VECTOR P;
 	PRISM_SPLINE_ENTRY Entry;
@@ -731,9 +731,9 @@ void Prism::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) 
 
 	/* Transform the normalt out of the prism space. */
 
-	MTransNormal(Result, N, Trans);
+	MTransNormal(*Result, N, Trans);
 
-	VNormalize(Result, Result);
+	Result.normalize();
 }
 
 
@@ -769,7 +769,7 @@ void Prism::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) 
 *
 ******************************************************************************/
 
-void Prism::Translate(const VECTOR, const TRANSFORM *tr)
+void Prism::Translate(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
@@ -807,7 +807,7 @@ void Prism::Translate(const VECTOR, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void Prism::Rotate(const VECTOR, const TRANSFORM *tr)
+void Prism::Rotate(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
@@ -845,7 +845,7 @@ void Prism::Rotate(const VECTOR, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void Prism::Scale(const VECTOR, const TRANSFORM *tr)
+void Prism::Scale(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }

@@ -7440,7 +7440,7 @@ static DBL object_pattern (const VECTOR EPoint, const TPATTERN *TPat, TraceThrea
 {
 	if(TPat->Vals.Object != NULL)
 	{
-		if(Inside_Object(EPoint, TPat->Vals.Object, Thread))
+		if(Inside_Object(Vector3d(EPoint), TPat->Vals.Object, Thread))
 			return 1.0;
 		else
 			return 0.0;

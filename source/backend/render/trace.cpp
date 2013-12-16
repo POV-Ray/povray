@@ -23,9 +23,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/render/trace.cpp $
- * $Revision: #217 $
- * $Change: 6119 $
- * $DateTime: 2013/11/22 20:31:53 $
+ * $Revision: #218 $
+ * $Change: 6121 $
+ * $DateTime: 2013/11/23 07:38:50 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -461,7 +461,7 @@ void Trace::ComputeTextureColour(Intersection& isect, Colour& colour, const Ray&
 		it->tested = false;
 
 	// compute the surface normal
-	isect.Object->Normal(*rawnormal, &isect, threadData);
+	isect.Object->Normal(rawnormal, &isect, threadData);
 
 	// I added this to flip the normal if the object is inverted (for CSG).
 	// However, I subsequently commented it out for speed reasons - it doesn't
@@ -488,7 +488,7 @@ void Trace::ComputeTextureColour(Intersection& isect, Colour& colour, const Ray&
 		//  This causes slopes do be applied in the wrong directions.
 
 		// get the UV vect of the intersection
-		isect.Object->UVCoord(*uvcoords, &isect, threadData);
+		isect.Object->UVCoord(uvcoords, &isect, threadData);
 		// save the normal and UV coords into Intersection
 		isect.Iuv = uvcoords;
 	}
@@ -616,7 +616,7 @@ void Trace::ComputeOneTextureColour(Colour& resultcolour, const TEXTURE *texture
 				break;
 			case UV_MAP_PATTERN:
 				// Don't bother warping, simply get the UV vect of the intersection
-				isect.Object->UVCoord(*uvcoords, &isect, threadData);
+				isect.Object->UVCoord(uvcoords, &isect, threadData);
 				tpoint = Vector3d(uvcoords[U], uvcoords[V], 0.0);
 				cur = &(texture->Blend_Map->Blend_Map_Entries[0]);
 				ComputeOneTextureColour(resultcolour, cur->Vals.Texture, warps, tpoint, rawnormal, ray, weight, isect, shadowflag, photonPass, ticket);
@@ -1182,7 +1182,7 @@ void Trace::ComputeReflection(const FINISH* finish, const Vector3d& ipoint, cons
 
 	// The rest of this is essentally what was originally here, with small changes.
 	n = -2.0 * dot(ray.Direction, normal);
-	nray.Direction += n * normal;
+	nray.Direction = ray.Direction + n * normal;
 
 	// Nathan Kopp & CEY 1998 - Reflection bugfix
 	// if the new ray is going the opposite direction as raw normal, we
@@ -1198,7 +1198,7 @@ void Trace::ComputeReflection(const FINISH* finish, const Vector3d& ipoint, cons
 		{
 			// reflected inside rear virtual surface. Reflect Ray using Raw_Normal
 			n = -2.0 * dot(ray.Direction, rawnormal);
-			nray.Direction += n * rawnormal;
+			nray.Direction = ray.Direction + n * rawnormal;
 		}
 		else
 		{
@@ -2242,7 +2242,7 @@ void Trace::ComputeShadowColour(const LightSource &lightsource, Intersection& is
 	}
 
 	// Get the normal to the surface
-	isect.Object->Normal(*raw_Normal, &isect, threadData);
+	isect.Object->Normal(raw_Normal, &isect, threadData);
 
 	// I added this to flip the normal if the object is inverted (for CSG).
 	// However, I subsequently commented it out for speed reasons - it doesn't
@@ -2266,7 +2266,7 @@ void Trace::ComputeShadowColour(const LightSource &lightsource, Intersection& is
 	if(Test_Flag(isect.Object, UV_FLAG))
 	{
 		// get the UV vect of the intersection
-		isect.Object->UVCoord(*uv_Coords, &isect, threadData);
+		isect.Object->UVCoord(uv_Coords, &isect, threadData);
 		// save the normal and UV coords into Intersection
 		isect.Iuv = uv_Coords;
 	}
@@ -3189,7 +3189,7 @@ void Trace::ComputeSSLTNormal(Intersection& Ray_Intersection)
 	Vector3d Raw_Normal;
 
 	/* Get the normal to the surface */
-	Ray_Intersection.Object->Normal(*Raw_Normal, &Ray_Intersection, threadData);
+	Ray_Intersection.Object->Normal(Raw_Normal, &Ray_Intersection, threadData);
 	Ray_Intersection.INormal = Raw_Normal;
 	Ray_Intersection.PNormal = Raw_Normal; // TODO FIXME - we should possibly take normal pertubation into account
 }
@@ -3793,7 +3793,7 @@ void Trace::ComputeSubsurfaceScattering(const FINISH *Finish, const RGBColour& l
 			}
 			else if (IsSameSSLTObject(unscatteredIn.Object, out.Object))
 			{
-				unscatteredIn.Object->Normal(*unscatteredIn.INormal, &unscatteredIn, threadData);
+				unscatteredIn.Object->Normal(unscatteredIn.INormal, &unscatteredIn, threadData);
 				if (dot(refractedEye, unscatteredIn.INormal) > 0)
 					unscatteredIn.INormal.invert();
 				Vector3d doubleRefractedEye;

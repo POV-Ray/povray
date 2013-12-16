@@ -27,9 +27,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/lathe.cpp $
- * $Revision: #38 $
- * $Change: 6119 $
- * $DateTime: 2013/11/22 20:31:53 $
+ * $Revision: #39 $
+ * $Change: 6121 $
+ * $DateTime: 2013/11/23 07:38:50 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -423,7 +423,7 @@ bool Lathe::Intersect(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thre
 *
 ******************************************************************************/
 
-bool Lathe::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
+bool Lathe::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 {
 	int i, n, NC;
 	DBL r, k, w;
@@ -440,7 +440,7 @@ bool Lathe::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
 
 	/* Transform the point into the lathe space. */
 
-	MInvTransPoint(P, IPoint, Trans);
+	MInvTransPoint(P, *IPoint, Trans);
 
 	/* Number of crossings. */
 
@@ -531,7 +531,7 @@ bool Lathe::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
 *
 ******************************************************************************/
 
-void Lathe::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) const
+void Lathe::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread) const
 {
 	DBL r, dx, dy;
 	VECTOR P, N;
@@ -569,9 +569,9 @@ void Lathe::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) 
 
 	/* Transform the normalt out of the lathe space. */
 
-	MTransNormal(Result, N, Trans);
+	MTransNormal(*Result, N, Trans);
 
-	VNormalize(Result, Result);
+	Result.normalize();
 }
 
 
@@ -607,7 +607,7 @@ void Lathe::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) 
 *
 ******************************************************************************/
 
-void Lathe::Translate(const VECTOR, const TRANSFORM *tr)
+void Lathe::Translate(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
@@ -645,7 +645,7 @@ void Lathe::Translate(const VECTOR, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void Lathe::Rotate(const VECTOR, const TRANSFORM *tr)
+void Lathe::Rotate(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
@@ -683,7 +683,7 @@ void Lathe::Rotate(const VECTOR, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void Lathe::Scale(const VECTOR, const TRANSFORM *tr)
+void Lathe::Scale(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
@@ -1342,7 +1342,7 @@ bool Lathe::test_hit(const Ray &ray, IStack& Depth_Stack, DBL d, DBL w, int n, T
 	{
 		IPoint = ray.Evaluate(d);
 
-		if (Clip.empty() || Point_In_Clip(*IPoint, Clip, Thread))
+		if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
 		{
 			Depth_Stack->push(Intersection(d, IPoint, this, n, w));
 
@@ -1387,7 +1387,7 @@ bool Lathe::test_hit(const Ray &ray, IStack& Depth_Stack, DBL d, DBL w, int n, T
 *
 ******************************************************************************/
 
-void Lathe::UVCoord(UV_VECT Result, const Intersection *Inter, TraceThreadData *) const
+void Lathe::UVCoord(Vector2d& Result, const Intersection *Inter, TraceThreadData *) const
 {
 	DBL len, theta;
 	VECTOR P;

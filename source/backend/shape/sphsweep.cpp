@@ -28,9 +28,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/sphsweep.cpp $
- * $Revision: #38 $
- * $Change: 6118 $
- * $DateTime: 2013/11/22 16:39:19 $
+ * $Revision: #39 $
+ * $Change: 6121 $
+ * $DateTime: 2013/11/23 07:38:50 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -260,7 +260,7 @@ bool SphereSweep::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceTh
 			if(Isect[i].t > Depth_Tolerance)
 			{
 				// Test for clipping volume
-				if (Clip.empty() || Point_In_Clip(*Isect[i].Point, Clip, Thread))
+				if (Clip.empty() || Point_In_Clip(Isect[i].Point, Clip, Thread))
 				{
 					Depth_Stack->push(Intersection(Isect[i].t, Isect[i].Point, Isect[i].Normal, this));
 					Intersection_Found = true;
@@ -763,7 +763,7 @@ int SphereSweep::Intersect_Segment(const Ray &ray, const SPHSWEEP_SEG *Segment, 
 *
 ******************************************************************************/
 
-bool SphereSweep::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
+bool SphereSweep::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 {
 	int     inside;
 	VECTOR  New_Point;
@@ -777,9 +777,9 @@ bool SphereSweep::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
 	inside = false;
 
 	if(Trans == NULL)
-		Assign_Vector(New_Point, IPoint);
+		Assign_Vector(New_Point, *IPoint);
 	else
-		MInvTransPoint(New_Point, IPoint, Trans);
+		MInvTransPoint(New_Point, *IPoint, Trans);
 
 	switch(Interpolation)
 	{
@@ -941,9 +941,9 @@ bool SphereSweep::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
 *
 ******************************************************************************/
 
-void SphereSweep::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *) const
+void SphereSweep::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *) const
 {
-	Assign_Vector(Result, *Inter->INormal);
+	Result = Inter->INormal;
 }
 
 
@@ -1040,12 +1040,12 @@ ObjectPtr SphereSweep::Copy()
 *
 ******************************************************************************/
 
-void SphereSweep::Translate(const VECTOR Vector, const TRANSFORM *tr)
+void SphereSweep::Translate(const Vector3d& Vector, const TRANSFORM *tr)
 {
 	if(Trans == NULL)
 	{
 		for(int i = 0; i < Num_Modeling_Spheres; i++)
-			VAddEq(Modeling_Sphere[i].Center, Vector);
+			VAddEq(Modeling_Sphere[i].Center, *Vector);
 		Compute();
 		Compute_BBox();
 	}
@@ -1087,7 +1087,7 @@ void SphereSweep::Translate(const VECTOR Vector, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void SphereSweep::Rotate(const VECTOR, const TRANSFORM *tr)
+void SphereSweep::Rotate(const Vector3d&, const TRANSFORM *tr)
 {
 	if(Trans == NULL)
 	{
@@ -1134,7 +1134,7 @@ void SphereSweep::Rotate(const VECTOR, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void SphereSweep::Scale(const VECTOR Vector, const TRANSFORM *tr)
+void SphereSweep::Scale(const Vector3d& Vector, const TRANSFORM *tr)
 {
 	if((Vector[X] != Vector[Y]) || (Vector[X] != Vector[Z]))
 	{

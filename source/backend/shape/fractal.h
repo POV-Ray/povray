@@ -24,11 +24,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/shape/fractal.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/shape/fractal.h $
+ * $Revision: #24 $
+ * $Change: 6122 $
+ * $DateTime: 2013/11/23 10:33:00 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #ifndef FRACTAL_H
@@ -89,8 +89,8 @@ class Fractal : public ObjectBase
 {
 	public:
 		VECTOR Center;
-		DBL Julia_Parm[4];
-		DBL Slice[4];                 /* vector perpendicular to slice plane */
+		VECTOR_4D Julia_Parm;
+		VECTOR_4D Slice;              /* vector perpendicular to slice plane */
 		DBL SliceDist;                /* distance from slice plane to origin */
 		DBL Exit_Value;
 		int Num_Iterations;           /* number of iterations */
@@ -112,11 +112,11 @@ class Fractal : public ObjectBase
 		virtual ObjectPtr Copy();
 
 		virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
-		virtual bool Inside(const VECTOR, TraceThreadData *) const;
-		virtual void Normal(VECTOR, Intersection *, TraceThreadData *) const;
-		virtual void Translate(const VECTOR, const TRANSFORM *);
-		virtual void Rotate(const VECTOR, const TRANSFORM *);
-		virtual void Scale(const VECTOR, const TRANSFORM *);
+		virtual bool Inside(const Vector3d&, TraceThreadData *) const;
+		virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const;
+		virtual void Translate(const Vector3d&, const TRANSFORM *);
+		virtual void Rotate(const Vector3d&, const TRANSFORM *);
+		virtual void Scale(const Vector3d&, const TRANSFORM *);
 		virtual void Transform(const TRANSFORM *);
 		virtual void Invert();
 		virtual void Compute_BBox();

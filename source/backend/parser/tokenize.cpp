@@ -31,9 +31,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/parser/tokenize.cpp $
- * $Revision: #70 $
- * $Change: 6113 $
- * $DateTime: 2013/11/20 20:39:54 $
+ * $Revision: #71 $
+ * $Change: 6122 $
+ * $DateTime: 2013/11/23 10:33:00 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -2077,7 +2077,7 @@ void Parser::Parse_Directive(int After_Hash)
 						if ((Entry == NULL) || (Entry->Token_Number != FLOAT_ID_TOKEN))
 							Error ("#for loop variable must remain defined and numerical during loop.");
 
-						DBL* CurrentPtr = reinterpret_cast<DBL*>(Entry->Data);
+						DBL* CurrentPtr = reinterpret_cast<DBL *>(Entry->Data);
 						DBL  End        = Cond_Stack[CS_Index].For_Loop_End;
 						DBL  Step       = Cond_Stack[CS_Index].For_Loop_Step;
 
@@ -3511,14 +3511,14 @@ int Parser::Parse_Read_Value(DATA_FILE *User_File,int Previous,int *NumberPtr,vo
 					case 1:
 						*NumberPtr = UV_ID_TOKEN;
 						Test_Redefine(Previous,NumberPtr,*DataPtr);
-						*DataPtr   = reinterpret_cast<void *>(Create_UV_Vect());
+						*DataPtr   = reinterpret_cast<void *>(new Vector2d());
 						Assign_UV_Vect(reinterpret_cast<DBL *>(*DataPtr), Express);
 						break;
 
 					case 2:
 						*NumberPtr = VECTOR_ID_TOKEN;
 						Test_Redefine(Previous,NumberPtr,*DataPtr);
-						*DataPtr   = reinterpret_cast<void *>(Create_Vector());
+						*DataPtr   = reinterpret_cast<void *>(new Vector3d());
 						Assign_Vector(reinterpret_cast<DBL *>(*DataPtr), Express);
 						break;
 

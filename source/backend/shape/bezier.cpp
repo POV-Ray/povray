@@ -28,9 +28,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/bezier.cpp $
- * $Revision: #30 $
- * $Change: 6118 $
- * $DateTime: 2013/11/22 16:39:19 $
+ * $Revision: #31 $
+ * $Change: 6121 $
+ * $DateTime: 2013/11/23 07:38:50 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -1746,7 +1746,7 @@ bool BicubicPatch::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceT
 *
 ******************************************************************************/
 
-bool BicubicPatch::Inside(const VECTOR, TraceThreadData *) const
+bool BicubicPatch::Inside(const Vector3d&, TraceThreadData *) const
 {
 	return false;
 }
@@ -1779,11 +1779,11 @@ bool BicubicPatch::Inside(const VECTOR, TraceThreadData *) const
 *
 ******************************************************************************/
 
-void BicubicPatch::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) const
+void BicubicPatch::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread) const
 {
 	/* Use preocmputed normal. */
 
-	Assign_Vector(Result, *Inter->INormal);
+	Result = Inter->INormal;
 }
 
 
@@ -1814,7 +1814,7 @@ void BicubicPatch::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *T
 *
 ******************************************************************************/
 
-void BicubicPatch::Translate(const VECTOR Vector, const TRANSFORM *)
+void BicubicPatch::Translate(const Vector3d& Vector, const TRANSFORM *)
 {
 	int i, j;
 
@@ -1822,7 +1822,7 @@ void BicubicPatch::Translate(const VECTOR Vector, const TRANSFORM *)
 	{
 		for (j = 0; j < 4; j++)
 		{
-			VAdd(Control_Points[i][j], Control_Points[i][j], Vector);
+			VAdd(Control_Points[i][j], Control_Points[i][j], *Vector);
 		}
 	}
 
@@ -1859,7 +1859,7 @@ void BicubicPatch::Translate(const VECTOR Vector, const TRANSFORM *)
 *
 ******************************************************************************/
 
-void BicubicPatch::Rotate(const VECTOR, const TRANSFORM *tr)
+void BicubicPatch::Rotate(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
@@ -1892,7 +1892,7 @@ void BicubicPatch::Rotate(const VECTOR, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void BicubicPatch::Scale(const VECTOR Vector, const TRANSFORM *)
+void BicubicPatch::Scale(const Vector3d& Vector, const TRANSFORM *)
 {
 	int i, j;
 
@@ -1900,7 +1900,7 @@ void BicubicPatch::Scale(const VECTOR Vector, const TRANSFORM *)
 	{
 		for (j = 0; j < 4; j++)
 		{
-			VEvaluate(Control_Points[i][j], Control_Points[i][j], Vector);
+			VEvaluate(Control_Points[i][j], Control_Points[i][j], *Vector);
 		}
 	}
 
@@ -2239,11 +2239,11 @@ void BicubicPatch::Compute_BBox()
 *
 ******************************************************************************/
 
-void BicubicPatch::UVCoord(UV_VECT Result, const Intersection *Inter, TraceThreadData *Thread) const
+void BicubicPatch::UVCoord(Vector2d& Result, const Intersection *Inter, TraceThreadData *Thread) const
 {
 	/* Use preocmputed uv coordinates. */
 
-	Assign_UV_Vect(Result, *Inter->Iuv);
+	Result = Inter->Iuv;
 }
 
 

@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/planes.cpp $
- * $Revision: #32 $
- * $Change: 6119 $
- * $DateTime: 2013/11/22 20:31:53 $
+ * $Revision: #33 $
+ * $Change: 6121 $
+ * $DateTime: 2013/11/23 07:38:50 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -88,7 +88,7 @@ bool Plane::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDa
 	{
 		IPoint = ray.Evaluate(Depth);
 
-		if (Clip.empty() || Point_In_Clip(*IPoint, Clip, Thread))
+		if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
 		{
 			Depth_Stack->push(Intersection(Depth,IPoint,this));
 			return(true);
@@ -200,18 +200,18 @@ bool Plane::Intersect(const Ray& ray, DBL *Depth, TraceThreadData *Thread) const
 *
 ******************************************************************************/
 
-bool Plane::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
+bool Plane::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 {
 	DBL Temp;
 	VECTOR P;
 
 	if(Trans == NULL)
 	{
-		VDot(Temp, IPoint, Normal_Vector);
+		VDot(Temp, *IPoint, Normal_Vector);
 	}
 	else
 	{
-		MInvTransPoint(P, IPoint, Trans);
+		MInvTransPoint(P, *IPoint, Trans);
 
 		VDot(Temp, P, Normal_Vector);
 	}
@@ -247,15 +247,15 @@ bool Plane::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
 *
 ******************************************************************************/
 
-void Plane::Normal(VECTOR Result, Intersection *, TraceThreadData *) const
+void Plane::Normal(Vector3d& Result, Intersection *, TraceThreadData *) const
 {
-	Assign_Vector(Result, Normal_Vector);
+	Result = Vector3d(Normal_Vector);
 
 	if(Trans != NULL)
 	{
-		MTransNormal(Result, Result, Trans);
+		MTransNormal(*Result, *Result, Trans);
 
-		VNormalize(Result, Result);
+		Result.normalize();
 	}
 }
 
@@ -287,13 +287,13 @@ void Plane::Normal(VECTOR Result, Intersection *, TraceThreadData *) const
 *
 ******************************************************************************/
 
-void Plane::Translate(const VECTOR Vector, const TRANSFORM *tr)
+void Plane::Translate(const Vector3d& Vector, const TRANSFORM *tr)
 {
 	VECTOR Translation;
 
 	if(Trans == NULL)
 	{
-		VEvaluate (Translation, Normal_Vector, Vector);
+		VEvaluate (Translation, Normal_Vector, *Vector);
 
 		Distance -= Translation[X] + Translation[Y] + Translation[Z];
 
@@ -333,7 +333,7 @@ void Plane::Translate(const VECTOR Vector, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void Plane::Rotate(const VECTOR, const TRANSFORM *tr)
+void Plane::Rotate(const Vector3d&, const TRANSFORM *tr)
 {
 	if(Trans == NULL)
 	{
@@ -375,13 +375,13 @@ void Plane::Rotate(const VECTOR, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void Plane::Scale(const VECTOR Vector, const TRANSFORM *tr)
+void Plane::Scale(const Vector3d& Vector, const TRANSFORM *tr)
 {
 	DBL Length;
 
 	if(Trans == NULL)
 	{
-		VDivEq(Normal_Vector, Vector);
+		VDivEq(Normal_Vector, *Vector);
 
 		VLength(Length, Normal_Vector);
 

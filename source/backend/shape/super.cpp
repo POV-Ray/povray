@@ -28,9 +28,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/super.cpp $
- * $Revision: #31 $
- * $Change: 6118 $
- * $DateTime: 2013/11/22 16:39:19 $
+ * $Revision: #32 $
+ * $Change: 6121 $
+ * $DateTime: 2013/11/23 07:38:50 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -381,14 +381,14 @@ bool Superellipsoid::Intersect(const Ray& ray, IStack& Depth_Stack, TraceThreadD
 *
 ******************************************************************************/
 
-bool Superellipsoid::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
+bool Superellipsoid::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 {
 	DBL val;
 	VECTOR P;
 
 	/* Transform the point into the superellipsoid space. */
 
-	MInvTransPoint(P, IPoint, Trans);
+	MInvTransPoint(P, *IPoint, Trans);
 
 	val = evaluate_superellipsoid(P);
 
@@ -436,7 +436,7 @@ bool Superellipsoid::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
 *
 ******************************************************************************/
 
-void Superellipsoid::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) const
+void Superellipsoid::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread) const
 {
 	VECTOR const& E = Power;
 	VECTOR P;
@@ -469,9 +469,9 @@ void Superellipsoid::Normal(VECTOR Result, Intersection *Inter, TraceThreadData 
 		P[Z] *= (1 + r);
 
 	/* Transform the normalt out of the superellipsoid space. */
-	MTransNormal(Result, P, Trans);
+	MTransNormal(*Result, P, Trans);
 
-	VNormalize(Result, Result);
+	Result.normalize();
 }
 
 
@@ -507,7 +507,7 @@ void Superellipsoid::Normal(VECTOR Result, Intersection *Inter, TraceThreadData 
 *
 ******************************************************************************/
 
-void Superellipsoid::Translate(const VECTOR, const TRANSFORM *tr)
+void Superellipsoid::Translate(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
@@ -545,7 +545,7 @@ void Superellipsoid::Translate(const VECTOR, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void Superellipsoid::Rotate(const VECTOR, const TRANSFORM *tr)
+void Superellipsoid::Rotate(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
@@ -583,7 +583,7 @@ void Superellipsoid::Rotate(const VECTOR, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void Superellipsoid::Scale(const VECTOR, const TRANSFORM *tr)
+void Superellipsoid::Scale(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
@@ -1204,7 +1204,7 @@ bool Superellipsoid::insert_hit(const Ray &ray, DBL Depth, IStack& Depth_Stack, 
 	{
 		IPoint = ray.Evaluate(Depth);
 
-		if (Clip.empty() || Point_In_Clip(*IPoint, Clip, Thread))
+		if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
 		{
 			Depth_Stack->push(Intersection(Depth, IPoint, this));
 

@@ -405,7 +405,7 @@ bool Parametric::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
 		VScale(IPoint, *ray.Direction, TResult);
 		VAddEq(IPoint, *ray.Origin);
 
-		if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
+		if (Clip.empty() || Point_In_Clip(Vector3d(IPoint), Clip, Thread))
 		{
 			/*
 			  compute_param_normal( Par, UResult, VResult , &N); 
@@ -446,7 +446,7 @@ bool Parametric::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
  *
  ******************************************************************************/
 
-bool Parametric::Inside(const VECTOR, TraceThreadData *Thread) const
+bool Parametric::Inside(const Vector3d&, TraceThreadData *Thread) const
 {
 	return false;
 }
@@ -476,7 +476,7 @@ bool Parametric::Inside(const VECTOR, TraceThreadData *Thread) const
  *
  ******************************************************************************/
 
-void Parametric::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) const
+void Parametric::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread) const
 {
 	VECTOR RU, RV;
 	UV_VECT uv_vect;
@@ -498,10 +498,10 @@ void Parametric::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thr
 	RV[Y] += Evaluate_Function_UV(Thread->functionContext, *(Function[Y]), uv_vect);
 	RV[Z] += Evaluate_Function_UV(Thread->functionContext, *(Function[Z]), uv_vect);
 
-	VCross(Result, RU, RV);
+	Result = cross(Vector3d(RU), Vector3d(RV));
 	if (Trans != NULL)
-		MTransNormal(Result, Result, Trans);
-	VNormalize(Result, Result);
+		MTransNormal(*Result, *Result, Trans);
+	Result.normalize();
 }
 
 
@@ -578,7 +578,7 @@ void Parametric::Compute_BBox()
  *
  ******************************************************************************/
 
-void Parametric::Translate(const VECTOR, const TRANSFORM* tr)
+void Parametric::Translate(const Vector3d&, const TRANSFORM* tr)
 {
 	Transform(tr);
 }
@@ -608,7 +608,7 @@ void Parametric::Translate(const VECTOR, const TRANSFORM* tr)
  *
  ******************************************************************************/
 
-void Parametric::Rotate(const VECTOR, const TRANSFORM* tr)
+void Parametric::Rotate(const Vector3d&, const TRANSFORM* tr)
 {
 	Transform(tr);
 }
@@ -638,7 +638,7 @@ void Parametric::Rotate(const VECTOR, const TRANSFORM* tr)
  *
  ******************************************************************************/
 
-void Parametric::Scale(const VECTOR, const TRANSFORM* tr)
+void Parametric::Scale(const Vector3d&, const TRANSFORM* tr)
 {
 	Transform(tr);
 }
@@ -852,9 +852,9 @@ Parametric::Parametric() : ObjectBase(PARAMETRIC_OBJECT)
  *
 ******************************************************************************/
 
-void Parametric::UVCoord(UV_VECT Result, const Intersection *inter, TraceThreadData *Thread) const
+void Parametric::UVCoord(Vector2d& Result, const Intersection *inter, TraceThreadData *Thread) const
 {
-	Assign_UV_Vect(Result, *inter->Iuv);
+	Result = inter->Iuv;
 }
 
 

@@ -27,9 +27,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/fractal.cpp $
- * $Revision: #34 $
- * $Change: 6118 $
- * $DateTime: 2013/11/22 16:39:19 $
+ * $Revision: #35 $
+ * $Change: 6121 $
+ * $DateTime: 2013/11/23 07:38:50 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -286,7 +286,7 @@ bool Fractal::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThread
 			Normal_Calc(this, Real_Normal, Thread->Fractal_IStack);
 		}
 
-		if (Clip.empty() || Point_In_Clip(Real_Pt, Clip, Thread))
+		if (Clip.empty() || Point_In_Clip(Vector3d(Real_Pt), Clip, Thread))
 		{
 			VNormalize(Real_Normal, Real_Normal);
 			Depth_Stack->push(Intersection(Depth * Len, Vector3d(Real_Pt), Vector3d(Real_Normal), this));
@@ -337,20 +337,20 @@ bool Fractal::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThread
 *
 ******************************************************************************/
 
-bool Fractal::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
+bool Fractal::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 {
 	int Result;
 	VECTOR New_Point;
 
 	if (Trans != NULL)
 	{
-		MInvTransPoint(New_Point, IPoint, Trans);
+		MInvTransPoint(New_Point, *IPoint, Trans);
 
 		Result = Iteration(New_Point, this, Thread->Fractal_IStack);
 	}
 	else
 	{
-		Result = Iteration(IPoint, this, Thread->Fractal_IStack);
+		Result = Iteration(*IPoint, this, Thread->Fractal_IStack);
 	}
 
 	if (Inverted)
@@ -387,9 +387,9 @@ bool Fractal::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
 *
 ******************************************************************************/
 
-void Fractal::Normal(VECTOR Result, Intersection *Intersect, TraceThreadData *) const
+void Fractal::Normal(Vector3d& Result, Intersection *Intersect, TraceThreadData *) const
 {
-	Assign_Vector(Result, *Intersect->INormal);
+	Result = Intersect->INormal;
 }
 
 /*****************************************************************************
@@ -416,36 +416,7 @@ void Fractal::Normal(VECTOR Result, Intersection *Intersect, TraceThreadData *) 
 *
 ******************************************************************************/
 
-void Fractal::Translate(const VECTOR, const TRANSFORM *tr)
-{
-	Transform(tr);
-}
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*   
-* OUTPUT
-*   
-* RETURNS
-*   
-* AUTHOR
-*
-*   Pascal Massimino
-*   
-* DESCRIPTION
-*
-*   -
-*
-* CHANGES
-*
-*   Dec 1994 : Creation.
-*
-******************************************************************************/
-
-void Fractal::Rotate(const VECTOR, const TRANSFORM *tr)
+void Fractal::Translate(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
@@ -474,7 +445,36 @@ void Fractal::Rotate(const VECTOR, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void Fractal::Scale(const VECTOR, const TRANSFORM *tr)
+void Fractal::Rotate(const Vector3d&, const TRANSFORM *tr)
+{
+	Transform(tr);
+}
+
+/*****************************************************************************
+*
+* FUNCTION
+*
+* INPUT
+*   
+* OUTPUT
+*   
+* RETURNS
+*   
+* AUTHOR
+*
+*   Pascal Massimino
+*   
+* DESCRIPTION
+*
+*   -
+*
+* CHANGES
+*
+*   Dec 1994 : Creation.
+*
+******************************************************************************/
+
+void Fractal::Scale(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }

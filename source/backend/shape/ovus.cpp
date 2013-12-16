@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/ovus.cpp $
- * $Revision: #5 $
- * $Change: 6118 $
- * $DateTime: 2013/11/22 16:39:19 $
+ * $Revision: #6 $
+ * $Change: 6121 $
+ * $DateTime: 2013/11/23 07:38:50 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -281,7 +281,7 @@ bool Ovus::All_Intersections(const Ray& ray, IStack& Depth_Stack, SceneThreadDat
 		if (IPoint[Y] < BottomVertical)
 		{
 			MTransPoint(Real_Pt, IPoint, Trans);
-			if (Clip.empty()||(Point_In_Clip(Real_Pt, Clip, Thread)))
+			if (Clip.empty()||(Point_In_Clip(Vector3d(Real_Pt), Clip, Thread)))
 			{
 				Assign_Vector(INormal, IPoint);
 				VInverseScaleEq(INormal, BottomRadius);
@@ -300,7 +300,7 @@ bool Ovus::All_Intersections(const Ray& ray, IStack& Depth_Stack, SceneThreadDat
 		if (IPoint[Y] < BottomVertical)
 		{
 			MTransPoint(Real_Pt, IPoint, Trans);
-			if (Clip.empty()||(Point_In_Clip(Real_Pt, Clip, Thread)))
+			if (Clip.empty()||(Point_In_Clip(Vector3d(Real_Pt), Clip, Thread)))
 			{
 				Assign_Vector(INormal, IPoint);
 				VInverseScaleEq(INormal, BottomRadius);
@@ -319,7 +319,7 @@ bool Ovus::All_Intersections(const Ray& ray, IStack& Depth_Stack, SceneThreadDat
 		if (IPoint[Y] > TopVertical)
 		{
 			MTransPoint(Real_Pt, IPoint, Trans);
-			if (Clip.empty()||(Point_In_Clip(Real_Pt, Clip, Thread)))
+			if (Clip.empty()||(Point_In_Clip(Vector3d(Real_Pt), Clip, Thread)))
 			{
 				Assign_Vector(INormal, IPoint);
 				INormal[Y] -= BottomRadius;
@@ -338,7 +338,7 @@ bool Ovus::All_Intersections(const Ray& ray, IStack& Depth_Stack, SceneThreadDat
 		if (IPoint[Y] > TopVertical)
 		{
 			MTransPoint(Real_Pt, IPoint, Trans);
-			if (Clip.empty()||(Point_In_Clip(Real_Pt, Clip, Thread)))
+			if (Clip.empty()||(Point_In_Clip(Vector3d(Real_Pt), Clip, Thread)))
 			{
 				Assign_Vector(INormal, IPoint);
 				INormal[Y] -= BottomRadius;
@@ -356,7 +356,7 @@ bool Ovus::All_Intersections(const Ray& ray, IStack& Depth_Stack, SceneThreadDat
 		VEvaluateRay(IPoint, P, Depth5, D);
 		MTransPoint(Real_Pt, IPoint, Trans);
 
-		if (Clip.empty()||(Point_In_Clip(Real_Pt, Clip, Thread)))
+		if (Clip.empty()||(Point_In_Clip(Vector3d(Real_Pt), Clip, Thread)))
 		{
 			Assign_Vector(INormal, IPoint);
 
@@ -376,7 +376,7 @@ bool Ovus::All_Intersections(const Ray& ray, IStack& Depth_Stack, SceneThreadDat
 		VEvaluateRay(IPoint, P, Depth6, D);
 		MTransPoint(Real_Pt, IPoint, Trans);
 
-		if (Clip.empty()||(Point_In_Clip(Real_Pt, Clip, Thread)))
+		if (Clip.empty()||(Point_In_Clip(Vector3d(Real_Pt), Clip, Thread)))
 		{
 			Assign_Vector(INormal, IPoint);
 			INormal[Y] -= VerticalPosition;
@@ -429,14 +429,14 @@ bool Ovus::All_Intersections(const Ray& ray, IStack& Depth_Stack, SceneThreadDat
 *
 ******************************************************************************/
 
-bool Ovus::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
+bool Ovus::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 {
 	DBL OCSquared;
 	DBL horizontal, vertical;
 	bool INSide = false;
 	VECTOR Origin, New_Point, Other;
 	Make_Vector(Origin, 0, BottomRadius, 0);
-	MInvTransPoint(New_Point, IPoint, Trans);
+	MInvTransPoint(New_Point, *IPoint, Trans);
 	VDot(OCSquared, New_Point, New_Point);
 	if (OCSquared < Sqr(BottomRadius))
 	{
@@ -500,9 +500,9 @@ bool Ovus::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
 *
 ******************************************************************************/
 
-void Ovus::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) const
+void Ovus::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread) const
 {
-	Assign_Vector(Result, *Inter->INormal);
+	Result = Inter->INormal;
 }
 
 
@@ -537,7 +537,7 @@ void Ovus::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) c
 *
 ******************************************************************************/
 
-void Ovus::Translate(const VECTOR, const TRANSFORM *tr)
+void Ovus::Translate(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
@@ -574,7 +574,7 @@ void Ovus::Translate(const VECTOR, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void Ovus::Rotate(const VECTOR, const TRANSFORM *tr)
+void Ovus::Rotate(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
@@ -611,7 +611,7 @@ void Ovus::Rotate(const VECTOR, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void Ovus::Scale(const VECTOR, const TRANSFORM *tr)
+void Ovus::Scale(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
@@ -893,9 +893,9 @@ void Ovus::Compute_BBox()
 *
 ******************************************************************************/
 
-void Ovus::UVCoord(UV_VECT Result, const Intersection *Inter, TraceThreadData *Thread) const
+void Ovus::UVCoord(Vector2d& Result, const Intersection *Inter, TraceThreadData *Thread) const
 {
-	CalcUV(*Inter->IPoint, Result);
+	CalcUV(*Inter->IPoint, *Result);
 }
 
 

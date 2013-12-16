@@ -28,9 +28,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/render/tracepixel.cpp $
- * $Revision: #47 $
- * $Change: 6119 $
- * $DateTime: 2013/11/22 20:31:53 $
+ * $Revision: #48 $
+ * $Change: 6121 $
+ * $DateTime: 2013/11/23 07:38:50 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -872,13 +872,13 @@ void TracePixel::InitRayContainerState(Ray& ray, bool compute)
 
 			// test infinite objects
 			for(vector<ObjectPtr>::iterator object = sceneData->objects.begin() + sceneData->numberOfFiniteObjects; object != sceneData->objects.end(); object++)
-				if(((*object)->interior != NULL) && Inside_BBox(ray.Origin, (*object)->BBox) && (*object)->Inside(*ray.Origin, threadData))
+				if(((*object)->interior != NULL) && Inside_BBox(ray.Origin, (*object)->BBox) && (*object)->Inside(ray.Origin, threadData))
 					containingInteriors.push_back((*object)->interior);
 		}
 		else if((sceneData->boundingMethod == 0) || (sceneData->boundingSlabs == NULL))
 		{
 			for(vector<ObjectPtr>::iterator object = sceneData->objects.begin(); object != sceneData->objects.end(); object++)
-				if(((*object)->interior != NULL) && Inside_BBox(ray.Origin, (*object)->BBox) && (*object)->Inside(*ray.Origin, threadData))
+				if(((*object)->interior != NULL) && Inside_BBox(ray.Origin, (*object)->BBox) && (*object)->Inside(ray.Origin, threadData))
 					containingInteriors.push_back((*object)->interior);
 		}
 		else
@@ -922,7 +922,7 @@ void TracePixel::InitRayContainerStateTree(Ray& ray, BBOX_TREE *node)
 	{
 		/* This is a leaf so test contained object. */
 		ObjectPtr object = ObjectPtr(node->Node);
-		if((object->interior != NULL) && object->Inside(*ray.Origin, threadData))
+		if((object->interior != NULL) && object->Inside(ray.Origin, threadData))
 			containingInteriors.push_back(object->interior);
 	}
 	else

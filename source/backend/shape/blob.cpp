@@ -30,9 +30,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/blob.cpp $
- * $Revision: #49 $
- * $Change: 6119 $
- * $DateTime: 2013/11/22 20:31:53 $
+ * $Revision: #51 $
+ * $Change: 6134 $
+ * $DateTime: 2013/11/25 16:03:36 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -532,7 +532,7 @@ bool Blob::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDat
 				{
 					IPoint = ray.Evaluate(dist);
 
-					if (Clip.empty() || Point_In_Clip(*IPoint, Clip, Thread))
+					if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
 					{
 						Depth_Stack->push(Intersection(dist, IPoint, this));
 
@@ -1309,7 +1309,7 @@ int Blob::determine_influences(const Vector3d& P, const Vector3d& D, DBL mindist
 					Thread->Stats()[Blob_Bound_Tests]++;
 #endif
 
-					V1 = Vector3d(Tree->Node[i]->C) - P;
+					V1 = Tree->Node[i]->C - P;
 					b = dot(V1, D);
 					t = V1.lengthSqr();
 
@@ -1533,7 +1533,7 @@ DBL Blob::calculate_field_value(const Vector3d& P, TraceThreadData *Thread) cons
 				{
 					/* Insert sub-node if we are inside. */
 
-					V1 = P - Vector3d(Tree->Node[i]->C);
+					V1 = P - Tree->Node[i]->C;
 
 					rad2 = V1.lengthSqr();
 
@@ -1582,7 +1582,7 @@ DBL Blob::calculate_field_value(const Vector3d& P, TraceThreadData *Thread) cons
 *
 ******************************************************************************/
 
-bool Blob::Inside(const VECTOR Test_Point, TraceThreadData *Thread) const
+bool Blob::Inside(const Vector3d& Test_Point, TraceThreadData *Thread) const
 {
 	Vector3d New_Point;
 
@@ -1590,11 +1590,11 @@ bool Blob::Inside(const VECTOR Test_Point, TraceThreadData *Thread) const
 
 	if (Trans != NULL)
 	{
-		MInvTransPoint(*New_Point, Test_Point, Trans);
+		MInvTransPoint(*New_Point, *Test_Point, Trans);
 	}
 	else
 	{
-		New_Point = Vector3d(Test_Point);
+		New_Point = Test_Point;
 	}
 
 	if (calculate_field_value(New_Point, Thread) > Data->Threshold - INSIDE_TOLERANCE)
@@ -1782,7 +1782,7 @@ void Blob::element_normal(Vector3d& Result, const Vector3d& P, const Blob_Elemen
 *
 ******************************************************************************/
 
-void Blob::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) const
+void Blob::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread) const
 {
 	int i;
 	unsigned int size;
@@ -1794,7 +1794,7 @@ void Blob::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) c
 	/* Transform the point into the blob space. */
 	getLocalIPoint(New_Point, Inter);
 
-	Make_Vector(Result, 0.0, 0.0, 0.0);
+	Result = Vector3d(0.0, 0.0, 0.0);
 
 	/* For each component that contributes to this point, add its bit to the normal */
 
@@ -1804,9 +1804,7 @@ void Blob::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) c
 
 		for (i = 0; i < Data->Number_Of_Components; i++)
 		{
-			Vector3d tempResult;
-			element_normal(tempResult, New_Point, &(Data->Entry[i]));
-			Assign_Vector(Result, *tempResult);
+			element_normal(Result, New_Point, &(Data->Entry[i]));
 		}
 	}
 	else
@@ -1825,9 +1823,7 @@ void Blob::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) c
 
 			if (Tree->Entries <= 0)
 			{
-				Vector3d tempResult;
-				element_normal(tempResult, New_Point, reinterpret_cast<Blob_Element *>(Tree->Node));
-				Assign_Vector(Result, *tempResult);
+				element_normal(Result, New_Point, reinterpret_cast<Blob_Element *>(Tree->Node));
 			}
 			else
 			{
@@ -1837,7 +1833,7 @@ void Blob::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) c
 				{
 					/* Insert sub-node if we are inside. */
 
-					V1 = New_Point - Vector3d(Tree->Node[i]->C);
+					V1 = New_Point - Tree->Node[i]->C;
 
 					dist = V1.lengthSqr();
 
@@ -1849,11 +1845,11 @@ void Blob::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) c
 		}
 	}
 
-	VDot(val, Result, Result);
+	val = Result.lengthSqr();
 
 	if (val == 0.0)
 	{
-		Make_Vector(Result, 1.0, 0.0, 0.0);
+		Result = Vector3d(1.0, 0.0, 0.0);
 	}
 	else
 	{
@@ -1861,16 +1857,16 @@ void Blob::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) c
 
 		val = 1.0 / sqrt(val);
 
-		VScaleEq(Result, val);
+		Result *= val;
 	}
 
 	/* Transform back to world space. */
 
 	if (Trans != NULL)
 	{
-		MTransNormal(Result, Result, Trans);
+		MTransNormal(*Result, *Result, Trans);
 
-		VNormalize(Result, Result);
+		Result.normalize();
 	}
 }
 
@@ -1906,7 +1902,7 @@ void Blob::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) c
 *
 ******************************************************************************/
 
-void Blob::Translate(const VECTOR, const TRANSFORM *tr)
+void Blob::Translate(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
@@ -1943,7 +1939,7 @@ void Blob::Translate(const VECTOR, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void Blob::Rotate(const VECTOR, const TRANSFORM *tr)
+void Blob::Rotate(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
@@ -1980,7 +1976,7 @@ void Blob::Rotate(const VECTOR, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void Blob::Scale(const VECTOR, const TRANSFORM *tr)
+void Blob::Scale(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
@@ -2750,7 +2746,7 @@ void Blob::build_bounding_hierarchy()
 		Elements[i]->Entries = 0;
 		Elements[i]->Node    = reinterpret_cast<BSPHERE_TREE **>(&Data->Entry[i]);
 
-		get_element_bounding_sphere(&Data->Entry[i], Vector3d(Elements[i]->C), &Elements[i]->r2);
+		get_element_bounding_sphere(&Data->Entry[i], Elements[i]->C, &Elements[i]->r2);
 	}
 
 	Build_Bounding_Sphere_Hierarchy(&Data->Tree, nElem, &Elements);
@@ -2843,7 +2839,7 @@ void Blob::Determine_Textures(Intersection *isect, bool hitinside, WeightedTextu
 				{
 					/* Insert sub-node if we are inside. */
 
-					V1 = Vector3d(P) - Vector3d(Tree->Node[i]->C);
+					V1 = P - Tree->Node[i]->C;
 
 					rad2 = V1.lengthSqr();
 

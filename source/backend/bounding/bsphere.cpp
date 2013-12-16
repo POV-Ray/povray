@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/bounding/bsphere.cpp $
- * $Revision: #18 $
- * $Change: 6119 $
- * $DateTime: 2013/11/22 20:31:53 $
+ * $Revision: #19 $
+ * $Change: 6151 $
+ * $DateTime: 2013/12/01 04:48:21 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -185,7 +185,7 @@ static void recompute_bound(BSPHERE_TREE *Node)
 		merge_spheres(C, &r2, C, r2, Node->Node[i]->C, Node->Node[i]->r2);
 	}
 
-	Node->C, C;
+	Node->C = C;
 
 	Node->r2 = r2;
 }

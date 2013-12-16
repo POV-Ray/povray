@@ -22,11 +22,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/scene/view.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/scene/view.cpp $
+ * $Revision: #156 $
+ * $Change: 6121 $
+ * $DateTime: 2013/11/23 07:38:50 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #include <boost/thread.hpp>
@@ -622,7 +622,7 @@ bool View::CheckCameraHollowObject(const VECTOR point, const BBOX_TREE *node)
 		// This is a leaf so test contained object.
 		TraceThreadData threadData(viewData.GetSceneData());
 		ObjectPtr object = reinterpret_cast<ObjectPtr>(node->Node);
-		if((object->interior != NULL) && (object->Inside(point, &threadData)))
+		if((object->interior != NULL) && (object->Inside(Vector3d(point), &threadData)))
 			return true;
 	}
 
@@ -646,7 +646,7 @@ bool View::CheckCameraHollowObject(const VECTOR point)
 
 		// test infinite objects
 		for(vector<ObjectPtr>::iterator object = sd->objects.begin() + sd->numberOfFiniteObjects; object != sd->objects.end(); object++)
-			if(((*object)->interior != NULL) && Inside_BBox(point, (*object)->BBox) && (*object)->Inside(point, &threadData))
+			if(((*object)->interior != NULL) && Inside_BBox(point, (*object)->BBox) && (*object)->Inside(Vector3d(point), &threadData))
 				return true;
 	}
 	else if((sd->boundingMethod == 0) || (sd->boundingSlabs == NULL))
@@ -654,7 +654,7 @@ bool View::CheckCameraHollowObject(const VECTOR point)
 		TraceThreadData threadData(sd); // TODO: avoid the need to construct threadData
 		for(vector<ObjectPtr>::const_iterator object = viewData.GetSceneData()->objects.begin(); object != viewData.GetSceneData()->objects.end(); object++)
 			if((*object)->interior != NULL)
-				if((*object)->Inside(point, &threadData))
+				if((*object)->Inside(Vector3d(point), &threadData))
 					return true;
 	}
 	else

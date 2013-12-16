@@ -192,13 +192,13 @@ bool HField::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadD
 *
 ******************************************************************************/
 
-bool HField::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
+bool HField::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 {
 	int px, pz;
 	DBL x,z,y1,y2,y3,water, dot1, dot2;
 	VECTOR Local_Origin, H_Normal, Test;
 
-	MInvTransPoint(Test, IPoint, Trans);
+	MInvTransPoint(Test, *IPoint, Trans);
 
 	water = bounding_corner1[Y];
 
@@ -287,7 +287,7 @@ bool HField::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
 *
 ******************************************************************************/
 
-void HField::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) const
+void HField::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread) const
 {
 	int px,pz, i;
 	DBL x,z,y1,y2,y3,u,v;
@@ -296,7 +296,7 @@ void HField::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread)
 
 	if(Inter->haveNormal == true)
 	{
-		Assign_Vector(Result,*Inter->INormal);
+		Result = Inter->INormal;
 		return;
 	}
 
@@ -351,7 +351,7 @@ void HField::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread)
 			y2 = Get_Height(px+1, pz);
 			y3 = Get_Height(px,   pz+1);
 
-			Make_Vector(Result, y1-y2, 1.0, y1-y3);
+			Result = Vector3d(y1-y2, 1.0, y1-y3);
 		}
 		else
 		{
@@ -361,13 +361,13 @@ void HField::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread)
 			y2 = Get_Height(px,   pz+1);
 			y3 = Get_Height(px+1, pz);
 
-			Make_Vector(Result, y2-y1, 1.0, y3-y1);
+			Result = Vector3d(y2-y1, 1.0, y3-y1);
 		}
 
-		MTransNormal(Result, Result, Trans);
+		MTransNormal(*Result, *Result, Trans);
 	}
 
-	VNormalize(Result, Result);
+	Result.normalize();
 }
 
 
@@ -545,7 +545,7 @@ bool HField::intersect_pixel(int x, int z, const Ray &ray, DBL height1, DBL heig
 
 					P = RRay.Evaluate(depth1);
 
-					if (Clip.empty() || Point_In_Clip(*P, Clip, Thread))
+					if (Clip.empty() || Point_In_Clip(P, Clip, Thread))
 						// (Check whether the point of intersection is within the clipped-by volume)
 					{
 						if (Test_Flag(this, SMOOTHED_FLAG))
@@ -624,7 +624,7 @@ bool HField::intersect_pixel(int x, int z, const Ray &ray, DBL height1, DBL heig
 
 					P = RRay.Evaluate(depth2);
 
-					if (Clip.empty() || Point_In_Clip(*P, Clip, Thread))
+					if (Clip.empty() || Point_In_Clip(P, Clip, Thread))
 						// (Check whether the point of intersection is within the clipped-by volume)
 					{
 						if (Test_Flag(this, SMOOTHED_FLAG))
@@ -1056,7 +1056,7 @@ void HField::build_hfield_blocks()
 *
 ******************************************************************************/
 
-void HField::Translate(const VECTOR, const TRANSFORM *tr)
+void HField::Translate(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
@@ -1089,7 +1089,7 @@ void HField::Translate(const VECTOR, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void HField::Rotate(const VECTOR, const TRANSFORM *tr)
+void HField::Rotate(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
@@ -1122,7 +1122,7 @@ void HField::Rotate(const VECTOR, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void HField::Scale(const VECTOR, const TRANSFORM *tr)
+void HField::Scale(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }

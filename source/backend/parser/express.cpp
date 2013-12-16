@@ -26,9 +26,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/parser/express.cpp $
- * $Revision: #52 $
- * $Change: 6119 $
- * $DateTime: 2013/11/22 20:31:53 $
+ * $Revision: #54 $
+ * $Change: 6122 $
+ * $DateTime: 2013/11/23 10:33:00 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -169,7 +169,7 @@ void Parser::Parse_Float_Param2(DBL *Val1,DBL *Val2)
 *
 ******************************************************************************/
 
-void Parser::Parse_Vector_Param(VECTOR Vector)
+void Parser::Parse_Vector_Param(Vector3d& Vector)
 {
 	GET(LEFT_PAREN_TOKEN);
 	Parse_Vector(Vector);
@@ -196,7 +196,7 @@ void Parser::Parse_Vector_Param(VECTOR Vector)
 *
 ******************************************************************************/
 
-void Parser::Parse_Vector_Param2(VECTOR Val1,VECTOR Val2)
+void Parser::Parse_Vector_Param2(Vector3d& Val1, Vector3d& Val2)
 {
 	GET (LEFT_PAREN_TOKEN);
 	Parse_Vector(Val1);
@@ -223,12 +223,12 @@ void Parser::Parse_Vector_Param2(VECTOR Val1,VECTOR Val2)
 *
 ******************************************************************************/
 
-void Parser::Parse_Trace(VECTOR Res)
+void Parser::Parse_Trace(Vector3d& Res)
 {
 	ObjectPtr Object;
 	Intersection intersect;
 	Ray    ray;
-	VECTOR Local_Normal;
+	Vector3d Local_Normal;
 
 	GET (LEFT_PAREN_TOKEN);
 
@@ -250,30 +250,26 @@ void Parser::Parse_Trace(VECTOR Res)
 
 	Parse_Comma();
 
-	Parse_Vector(*ray.Origin);
+	Parse_Vector(ray.Origin);
 	Parse_Comma();
-	Parse_Vector(*ray.Direction);
+	Parse_Vector(ray.Direction);
 	ray.Direction.normalize();
 
 	Parse_Comma();
 
 	if ( Find_Intersection( &intersect, Object, ray, GetParserDataPtr()) )
 	{
-		Assign_Vector( Res, *intersect.IPoint );
+		Res = intersect.IPoint;
 
 		intersect.Object->Normal( Local_Normal, &intersect, GetParserDataPtr());
 
 		if (Test_Flag(intersect.Object,INVERTED_FLAG))
-		{
-			Local_Normal[X] = -Local_Normal[X];
-			Local_Normal[Y] = -Local_Normal[Y];
-			Local_Normal[Z] = -Local_Normal[Z];
-		}
+			Local_Normal.invert();
 	}
 	else
 	{
 		Res[X]=Res[Y]=Res[Z]=0;
-		Local_Normal[X] = Local_Normal[Y] = Local_Normal[Z] = 0;
+		Local_Normal = Vector3d(0.0, 0.0, 0.0);
 	}
 
 	EXPECT
@@ -281,7 +277,7 @@ void Parser::Parse_Trace(VECTOR Res)
 			/* All of these functions return a VECTOR result */
 			if(Token.Function_Id == VECTOR_ID_TOKEN)
 			{
-				Assign_Vector(reinterpret_cast<DBL *>(Token.Data), Local_Normal);
+				(*reinterpret_cast<Vector3d *>(Token.Data)) = Local_Normal;
 			}
 			else
 			{
@@ -321,7 +317,7 @@ void Parser::Parse_Trace(VECTOR Res)
 int Parser::Parse_Inside()
 {
 	ObjectPtr Object;
-	VECTOR Local_Vector;
+	Vector3d Local_Vector;
 	int Result = 0;
 
 	GET (LEFT_PAREN_TOKEN);
@@ -656,7 +652,7 @@ void Parser::Parse_Num_Factor (EXPRESS Express,int *Terms)
 	int i = 0;
 	int l1,l2;
 	DBL Val,Val2;
-	VECTOR Vect,Vect2,Vect3;
+	Vector3d Vect,Vect2,Vect3;
 	ObjectPtr Object;
 	TRANSFORM Trans;
 	TURB Turb;
@@ -1022,12 +1018,12 @@ void Parser::Parse_Num_Factor (EXPRESS Express,int *Terms)
 
 				case VDOT_TOKEN:
 					Parse_Vector_Param2(Vect,Vect2);
-					VDot(Val,Vect,Vect2);
+					Val = dot(Vect,Vect2);
 					break;
 
 				case VLENGTH_TOKEN:
 					Parse_Vector_Param(Vect);
-					VLength(Val,Vect);
+					Val = Vect.length();
 					break;
 
 				case VERSION_TOKEN:
@@ -1103,17 +1099,17 @@ void Parser::Parse_Num_Factor (EXPRESS Express,int *Terms)
 					Parse_Comma();
 					Val=Parse_Float()*M_PI_180;
 					GET (RIGHT_PAREN_TOKEN);
-					Compute_Axis_Rotation_Transform(&Trans,Vect3,Val);
-					MTransPoint(Vect, Vect2, &Trans);
+					Compute_Axis_Rotation_Transform(&Trans,*Vect3,Val);
+					MTransPoint(*Vect, *Vect2, &Trans);
 					break;
 
 				case VCROSS_TOKEN:
 					Parse_Vector_Param2(Vect2,Vect3);
-					VCross(Vect,Vect2,Vect3);
+					Vect = cross(Vect2,Vect3);
 					break;
 
 				case VECTOR_ID_TOKEN:
-					Assign_Vector(Vect, reinterpret_cast<DBL *>(Token.Data));
+					Vect = *reinterpret_cast<Vector3d *>(Token.Data);
 					break;
 
 				case VNORMALIZE_TOKEN:
@@ -1125,13 +1121,13 @@ void Parser::Parse_Num_Factor (EXPRESS Express,int *Terms)
 						Vect[X] = Vect[Y] = Vect[Z] = 0.0 ;
 					}
 					else
-						VNormalize(Vect,Vect2);
+						Vect = Vect2.normalized();
 					break;
 
 				case VROTATE_TOKEN:
 					Parse_Vector_Param2(Vect2,Vect3);
-					Compute_Rotation_Transform (&Trans, Vect3);
-					MTransPoint(Vect, Vect2, &Trans);
+					Compute_Rotation_Transform (&Trans, *Vect3);
+					MTransPoint(*Vect, *Vect2, &Trans);
 					break;
 
 				case VTURBULENCE_TOKEN:
@@ -1149,19 +1145,19 @@ void Parser::Parse_Num_Factor (EXPRESS Express,int *Terms)
 					Parse_Vector(Vect2); // input vector
 					Parse_Comma();
 					GET (RIGHT_PAREN_TOKEN);
-					DTurbulence(Vect, Vect2, &Turb);
+					DTurbulence(*Vect, *Vect2, &Turb);
 					break;
 
 				case X_TOKEN:
-					Make_Vector(Vect,1.0,0.0,0.0);
+					Vect = Vector3d(1.0,0.0,0.0);
 					break;
 
 				case Y_TOKEN:
-					Make_Vector(Vect,0.0,1.0,0.0);
+					Vect = Vector3d(0.0,1.0,0.0);
 					break;
 
 				case Z_TOKEN:
-					Make_Vector(Vect,0.0,0.0,1.0);
+					Vect = Vector3d(0.0,0.0,1.0);
 					break;
 
 				case TRACE_TOKEN:
@@ -1174,17 +1170,13 @@ void Parser::Parse_Num_Factor (EXPRESS Express,int *Terms)
 						CASE (OBJECT_ID_TOKEN)
 							Object = reinterpret_cast<ObjectPtr>(Token.Data);
 							if ( Object )
-							{
-								Vect[X]=Object->BBox.lowerLeft[X];
-								Vect[Y]=Object->BBox.lowerLeft[Y];
-								Vect[Z]=Object->BBox.lowerLeft[Z];
-							}
+								Vect = Vector3d(Object->BBox.lowerLeft);
 							EXIT
 						END_CASE
 
 						OTHERWISE
 							Object = NULL;
-							Make_Vector(Vect,0.0,0.0,0.0);
+							Vect = Vector3d(0.0,0.0,0.0);
 							UNGET
 							EXIT
 						END_CASE
@@ -1199,11 +1191,7 @@ void Parser::Parse_Num_Factor (EXPRESS Express,int *Terms)
 						CASE (OBJECT_ID_TOKEN)
 							Object = reinterpret_cast<ObjectPtr>(Token.Data);
 							if ( Object )
-							{
-								Vect[X]=Object->BBox.lowerLeft[X]+Object->BBox.size[X];
-								Vect[Y]=Object->BBox.lowerLeft[Y]+Object->BBox.size[Y];
-								Vect[Z]=Object->BBox.lowerLeft[Z]+Object->BBox.size[Z];
-							}
+								Vect = Vector3d(Object->BBox.lowerLeft+Object->BBox.size);
 							EXIT
 						END_CASE
 
@@ -1225,7 +1213,7 @@ void Parser::Parse_Num_Factor (EXPRESS Express,int *Terms)
 
 						OTHERWISE
 							Object = NULL;
-							Make_Vector(Vect,0.0,0.0,0.0);
+							Vect = Vector3d(0.0,0.0,0.0);
 							UNGET
 							EXIT
 						END_CASE
@@ -1280,7 +1268,7 @@ void Parser::Parse_Num_Factor (EXPRESS Express,int *Terms)
 		CASE (UV_ID_TOKEN)
 			*Terms=2;
 			for (i=0; i<2; i++)
-				Express[i]=(DBL)(  (reinterpret_cast<DBL *>(Token.Data))[i]  );
+				Express[i]=(DBL)(  (*reinterpret_cast<Vector2d *>(Token.Data))[i]  );
 			EXIT
 		END_CASE
 
@@ -2108,7 +2096,7 @@ DBL Parser::Allow_Float (DBL defval)
 *
 ******************************************************************************/
 
-int Parser::Allow_Vector (VECTOR Vect)
+int Parser::Allow_Vector (Vector3d& Vect)
 {
 	int retval;
 
@@ -2149,7 +2137,7 @@ int Parser::Allow_Vector (VECTOR Vect)
 *
 ******************************************************************************/
 
-void Parser::Parse_Vector (VECTOR Vector)
+void Parser::Parse_Vector (Vector3d& Vector)
 {
 	EXPRESS Express;
 	int Terms;
@@ -2198,7 +2186,7 @@ void Parser::Parse_Vector (VECTOR Vector)
 *
 ******************************************************************************/
 
-void Parser::Parse_Vector4D (VECTOR Vector)
+void Parser::Parse_Vector4D (VECTOR_4D Vector)
 {
 	EXPRESS Express;
 	int Terms;
@@ -2250,7 +2238,7 @@ void Parser::Parse_Vector4D (VECTOR Vector)
 *
 ******************************************************************************/
 
-void Parser::Parse_UV_Vect (UV_VECT UV_Vect)
+void Parser::Parse_UV_Vect (Vector2d& UV_Vect)
 {
 	EXPRESS Express;
 	int Terms;
@@ -2349,7 +2337,7 @@ int Parser::Parse_Unknown_Vector(EXPRESS Express, bool allow_identifier, bool *h
 *
 ******************************************************************************/
 
-void Parser::Parse_Scale_Vector (VECTOR Vector)
+void Parser::Parse_Scale_Vector (Vector3d& Vector)
 {
 	Parse_Vector(Vector);
 

@@ -24,11 +24,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/shape/quadrics.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/shape/quadrics.h $
+ * $Revision: #18 $
+ * $Change: 6121 $
+ * $DateTime: 2013/11/23 07:38:50 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #ifndef QUADRICS_H
@@ -66,11 +66,11 @@ class Quadric : public ObjectBase
 		virtual ObjectPtr Copy();
 
 		virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
-		virtual bool Inside(const VECTOR, TraceThreadData *) const;
-		virtual void Normal(VECTOR, Intersection *, TraceThreadData *) const;
-		virtual void Translate(const VECTOR, const TRANSFORM *);
-		virtual void Rotate(const VECTOR, const TRANSFORM *);
-		virtual void Scale(const VECTOR, const TRANSFORM *);
+		virtual bool Inside(const Vector3d&, TraceThreadData *) const;
+		virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const;
+		virtual void Translate(const Vector3d&, const TRANSFORM *);
+		virtual void Rotate(const Vector3d&, const TRANSFORM *);
+		virtual void Scale(const Vector3d&, const TRANSFORM *);
 		virtual void Transform(const TRANSFORM *);
 		virtual void Invert();
 		virtual void Compute_BBox();

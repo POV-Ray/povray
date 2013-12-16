@@ -27,9 +27,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/mesh.cpp $
- * $Revision: #45 $
- * $Change: 6119 $
- * $DateTime: 2013/11/22 20:31:53 $
+ * $Revision: #46 $
+ * $Change: 6121 $
+ * $DateTime: 2013/11/23 07:38:50 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -246,7 +246,7 @@ bool Mesh::Intersect(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Threa
 *
 ******************************************************************************/
 
-bool Mesh::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
+bool Mesh::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 {
 	int inside, i;
 	unsigned found;
@@ -270,7 +270,7 @@ bool Mesh::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
 
 	ray.Direction = Vector3d(Data->Inside_Vect);
 
-	ray.Origin = Vector3d(IPoint);
+	ray.Origin = IPoint;
 
 	/* Transform the ray into mesh space. */
 	if (Trans != NULL)
@@ -347,7 +347,7 @@ bool Mesh::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
 *
 ******************************************************************************/
 
-void Mesh::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) const
+void Mesh::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread) const
 {
 	VECTOR IPoint;
 	const MESH_TRIANGLE *Triangle;
@@ -365,24 +365,24 @@ void Mesh::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) c
 			Assign_Vector(IPoint, *Inter->IPoint);
 		}
 
-		Smooth_Mesh_Normal(Result, Triangle, IPoint);
+		Smooth_Mesh_Normal(*Result, Triangle, IPoint);
 
 		if (Trans != NULL)
 		{
-			MTransNormal(Result, Result, Trans);
+			MTransNormal(*Result, *Result, Trans);
 		}
 
-		VNormalize(Result, Result);
+		Result.normalize();
 	}
 	else
 	{
-		Assign_Vector(Result, Data->Normals[Triangle->Normal_Ind]);
+		Result = Vector3d(Data->Normals[Triangle->Normal_Ind]);
 
 		if (Trans != NULL)
 		{
-			MTransNormal(Result, Result, Trans);
+			MTransNormal(*Result, *Result, Trans);
 
-			VNormalize(Result, Result);
+			Result.normalize();
 		}
 	}
 }
@@ -476,7 +476,7 @@ void Mesh::Smooth_Mesh_Normal(VECTOR Result, const MESH_TRIANGLE *Triangle, cons
 *
 ******************************************************************************/
 
-void Mesh::Translate(const VECTOR, const TRANSFORM *tr)
+void Mesh::Translate(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
@@ -509,7 +509,7 @@ void Mesh::Translate(const VECTOR, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void Mesh::Rotate(const VECTOR, const TRANSFORM *tr)
+void Mesh::Rotate(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
@@ -542,7 +542,7 @@ void Mesh::Rotate(const VECTOR, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void Mesh::Scale(const VECTOR, const TRANSFORM *tr)
+void Mesh::Scale(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
@@ -1270,7 +1270,7 @@ bool Mesh::test_hit(const MESH_TRIANGLE *Triangle, const Ray &OrigRay, DBL Depth
 
 	IPoint = OrigRay.Evaluate(world_dist);
 
-	if (Clip.empty() || Point_In_Clip(*IPoint, Clip, Thread))
+	if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
 	{
 		/*
 		don't bother calling MeshUV because we reclaculate it later (if needed) anyway
@@ -2314,7 +2314,7 @@ void Mesh::Test_Mesh_Opacity()
 *
 ******************************************************************************/
 
-void Mesh::UVCoord(VECTOR Result, const Intersection *Inter, TraceThreadData *) const
+void Mesh::UVCoord(Vector2d& Result, const Intersection *Inter, TraceThreadData *) const
 {
 	DBL w1, w2, w3, t1, t2;
 	VECTOR vA, vB;

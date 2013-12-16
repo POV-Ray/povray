@@ -27,9 +27,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/cones.cpp $
- * $Revision: #37 $
- * $Change: 6118 $
- * $DateTime: 2013/11/22 16:39:19 $
+ * $Revision: #38 $
+ * $Change: 6121 $
+ * $DateTime: 2013/11/23 07:38:50 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -105,7 +105,7 @@ bool Cone::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDat
 		{
 			IPoint = ray.Evaluate(I[i].d);
 
-			if (Clip.empty() || Point_In_Clip(*IPoint, Clip, Thread))
+			if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
 			{
 				Depth_Stack->push(Intersection(I[i].d,IPoint,this,I[i].t));
 				Intersection_Found = true;
@@ -321,14 +321,14 @@ int Cone::Intersect(const Ray& ray, CONE_INT *Intersection, TraceThreadData *Thr
 *
 ******************************************************************************/
 
-bool Cone::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
+bool Cone::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 {
 	DBL w2, z2, offset = (Test_Flag(this, CLOSED_FLAG) ? -EPSILON : EPSILON);
 	VECTOR New_Point;
 
 	/* Transform the point into the cones space */
 
-	MInvTransPoint(New_Point, IPoint, Trans);
+	MInvTransPoint(New_Point, *IPoint, Trans);
 
 	/* Test to see if we are inside the cone */
 
@@ -396,11 +396,11 @@ bool Cone::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
 *
 ******************************************************************************/
 
-void Cone::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) const
+void Cone::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread) const
 {
 	/* Transform the point into the cones space */
 
-	MInvTransPoint(Result, *Inter->IPoint, Trans);
+	MInvTransPoint(*Result, *Inter->IPoint, Trans);
 
 	/* Calculating the normal is real simple in canonical cone space */
 
@@ -421,22 +421,22 @@ void Cone::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) c
 
 		case BASE_HIT:
 
-			Make_Vector(Result, 0.0, 0.0, -1.0);
+			Result = Vector3d(0.0, 0.0, -1.0);
 
 			break;
 
 		case CAP_HIT:
 
-			Make_Vector(Result, 0.0, 0.0, 1.0);
+			Result = Vector3d(0.0, 0.0, 1.0);
 
 			break;
 	}
 
 	/* Transform the point out of the cones space */
 
-	MTransNormal(Result, Result, Trans);
+	MTransNormal(*Result, *Result, Trans);
 
-	VNormalize(Result, Result);
+	Result.normalize();
 }
 
 
@@ -467,7 +467,7 @@ void Cone::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) c
 *
 ******************************************************************************/
 
-void Cone::Translate(const VECTOR, const TRANSFORM *tr)
+void Cone::Translate(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
@@ -500,7 +500,7 @@ void Cone::Translate(const VECTOR, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void Cone::Rotate(const VECTOR, const TRANSFORM *tr)
+void Cone::Rotate(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
@@ -533,7 +533,7 @@ void Cone::Rotate(const VECTOR, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void Cone::Scale(const VECTOR, const TRANSFORM *tr)
+void Cone::Scale(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }

@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/lighting/point.cpp $
- * $Revision: #29 $
- * $Change: 6118 $
- * $DateTime: 2013/11/22 16:39:19 $
+ * $Revision: #30 $
+ * $Change: 6121 $
+ * $DateTime: 2013/11/23 07:38:50 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -113,7 +113,7 @@ bool LightSource::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceTh
 *
 ******************************************************************************/
 
-bool LightSource::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
+bool LightSource::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 {
 	if(!children.empty())
 	{
@@ -152,7 +152,7 @@ bool LightSource::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
 *
 ******************************************************************************/
 
-void LightSource::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) const
+void LightSource::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread) const
 {
 	if(!children.empty())
 		children[0]->Normal(Result, Inter, Thread);
@@ -186,10 +186,10 @@ void LightSource::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Th
 *
 ******************************************************************************/
 
-void LightSource::Translate(const VECTOR Vector, const TRANSFORM *tr)
+void LightSource::Translate(const Vector3d& Vector, const TRANSFORM *tr)
 {
-	VAddEq(Center, Vector);
-	VAddEq(Points_At, Vector);
+	VAddEq(Center, *Vector);
+	VAddEq(Points_At, *Vector);
 
 	if(!children.empty())
 		Translate_Object(children[0], Vector, tr);
@@ -226,7 +226,7 @@ void LightSource::Translate(const VECTOR Vector, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void LightSource::Rotate(const VECTOR, const TRANSFORM *tr)
+void LightSource::Rotate(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
@@ -259,7 +259,7 @@ void LightSource::Rotate(const VECTOR, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void LightSource::Scale(const VECTOR, const TRANSFORM *tr)
+void LightSource::Scale(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
@@ -693,7 +693,7 @@ DBL Attenuate_Light (const LightSource *Light, const Ray &ray, DBL Distance)
 *
 ******************************************************************************/
 
-void LightSource::UVCoord(UV_VECT Result, const Intersection *Inter, TraceThreadData *Thread) const
+void LightSource::UVCoord(Vector2d& Result, const Intersection *Inter, TraceThreadData *Thread) const
 {
 	if(!children.empty())
 		children[0]->UVCoord(Result, Inter, Thread);

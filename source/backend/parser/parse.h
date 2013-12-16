@@ -26,9 +26,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/parser/parse.h $
- * $Revision: #58 $
- * $Change: 6085 $
- * $DateTime: 2013/11/10 07:39:29 $
+ * $Revision: #60 $
+ * $Change: 6122 $
+ * $DateTime: 2013/11/23 10:33:00 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -365,12 +365,14 @@ class Parser : public Task
 		/// Parses an optional FLOAT.
 		DBL Allow_Float (DBL defval);
 
-		int Allow_Vector (VECTOR Vect);
-		void Parse_UV_Vect (UV_VECT UV_Vect);
-		void Parse_Vector (VECTOR Vector);
-		void Parse_Vector4D (VECTOR Vector);
+		int Allow_Vector (Vector3d& Vect);
+		void Parse_UV_Vect (Vector2d& UV_Vect);
+		inline void Parse_UV_Vect (UV_VECT UV_Vect) { Vector2d temp; Parse_UV_Vect(temp); Assign_UV_Vect(UV_Vect, *temp); }
+		void Parse_Vector (Vector3d& Vector);
+		inline void Parse_Vector (VECTOR Vector) { Vector3d temp; Parse_Vector(temp); Assign_Vector(Vector, *temp); }
+		void Parse_Vector4D (VECTOR_4D Vector);
 		int Parse_Unknown_Vector (EXPRESS Express, bool allow_identifier = false, bool *had_identifier = NULL);
-		void Parse_Scale_Vector (VECTOR Vector);
+		void Parse_Scale_Vector (Vector3d& Vector);
 		DBL Parse_Float_Param (void);
 		void Parse_Float_Param2 (DBL *Val1, DBL *Val2);
 		void Init_Random_Generators (void);
@@ -579,7 +581,7 @@ class Parser : public Task
 		ObjectPtr Parse_Parametric(void);
 
 		ObjectPtr Parse_Sphere_Sweep(void);
-		int Parse_Three_UVCoords(UV_VECT UV1, UV_VECT UV2, UV_VECT UV3);
+		int Parse_Three_UVCoords(Vector2d& UV1, Vector2d& UV2, Vector2d& UV3);
 
 		// tokenize.h/tokenize.cpp
 		void Echo_ungetc (int c);
@@ -649,9 +651,9 @@ class Parser : public Task
 		UCS2 *Convert_UTF8_To_UCS2(const unsigned char *text_array, int text_array_size, int *char_array_size);
 
 		// express.h/express.cpp
-		void Parse_Vector_Param (VECTOR Vector);
-		void Parse_Vector_Param2 (VECTOR Vect1, VECTOR Vect2);
-		void Parse_Trace(VECTOR Res);
+		void Parse_Vector_Param (Vector3d& Vector);
+		void Parse_Vector_Param2 (Vector3d& Vect1, Vector3d& Vect2);
+		void Parse_Trace(Vector3d& Res);
 		int Parse_Inside();
 		bool Parse_Call();
 		DBL Parse_Function_Call();

@@ -28,9 +28,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/poly.cpp $
- * $Revision: #36 $
- * $Change: 6119 $
- * $DateTime: 2013/11/22 20:31:53 $
+ * $Revision: #37 $
+ * $Change: 6121 $
+ * $DateTime: 2013/11/23 07:38:50 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -267,7 +267,7 @@ bool Poly::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDat
 
 				MTransPoint(*IPoint, *IPoint, Trans);
 
-				if (Clip.empty() || Point_In_Clip(*IPoint, Clip, Thread))
+				if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
 				{
 					Depth_Stack->push(Intersection(Depths[i] / len,IPoint,this));
 
@@ -1120,14 +1120,14 @@ void Poly::normal1(VECTOR Result, int Order, const DBL *Coeffs, const VECTOR IPo
 *
 ******************************************************************************/
 
-bool Poly::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
+bool Poly::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 {
 	VECTOR  New_Point;
 	DBL Result;
 
 	/* Transform the point into polynomial's space */
 
-	MInvTransPoint(New_Point, IPoint, Trans);
+	MInvTransPoint(New_Point, *IPoint, Trans);
 
 	Result = inside(New_Point, Order, Coeffs);
 
@@ -1169,7 +1169,7 @@ bool Poly::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
 *
 ******************************************************************************/
 
-void Poly::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) const
+void Poly::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread) const
 {
 	DBL val;
 	VECTOR  New_Point;
@@ -1180,30 +1180,30 @@ void Poly::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) c
 
 	if (Order > 4)
 	{
-		normal0(Result, Order, Coeffs, New_Point);
+		normal0(*Result, Order, Coeffs, New_Point);
 	}
 	else
 	{
-		normal1(Result, Order, Coeffs, New_Point);
+		normal1(*Result, Order, Coeffs, New_Point);
 	}
 
 	/* Transform back to world space. */
 
-	MTransNormal(Result, Result, Trans);
+	MTransNormal(*Result, *Result, Trans);
 
 	/* Normalize (accounting for the possibility of a 0 length normal). */
 
-	VDot(val, Result, Result);
+	val = Result.lengthSqr();
 
 	if (val > 0.0)
 	{
 		val = 1.0 / sqrt(val);
 
-		VScaleEq(Result, val);
+		Result *= val;
 	}
 	else
 	{
-		Make_Vector(Result, 1.0, 0.0, 0.0);
+		Result = Vector3d(1.0, 0.0, 0.0);
 	}
 }
 
@@ -1235,7 +1235,7 @@ void Poly::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) c
 *
 ******************************************************************************/
 
-void Poly::Translate(const VECTOR, const TRANSFORM *tr)
+void Poly::Translate(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
@@ -1268,7 +1268,7 @@ void Poly::Translate(const VECTOR, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void Poly::Rotate(const VECTOR, const TRANSFORM *tr)
+void Poly::Rotate(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
@@ -1301,7 +1301,7 @@ void Poly::Rotate(const VECTOR, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void Poly::Scale(const VECTOR, const TRANSFORM *tr)
+void Poly::Scale(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }

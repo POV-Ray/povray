@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/scene/objects.cpp $
- * $Revision: #55 $
- * $Change: 6119 $
- * $DateTime: 2013/11/22 20:31:53 $
+ * $Revision: #56 $
+ * $Change: 6121 $
+ * $DateTime: 2013/11/23 07:38:50 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -327,7 +327,7 @@ bool Find_Intersection(Intersection *isect, ObjectPtr object, const Ray& ray, Ob
 *
 ******************************************************************************/
 
-bool Inside_Object (const VECTOR IPoint, ObjectPtr Object, TraceThreadData *Thread)
+bool Inside_Object (const Vector3d& IPoint, ObjectPtr Object, TraceThreadData *Thread)
 {
 	for (vector<ObjectPtr>::iterator Sib = Object->Clip.begin(); Sib != Object->Clip.end(); Sib++)
 	{
@@ -374,7 +374,7 @@ bool Ray_In_Bound (const Ray& ray, const vector<ObjectPtr>& Bounding_Object, Tra
 	{
 		Thread->Stats()[Bounding_Region_Tests]++;
 
-		if((!Find_Intersection (&Local, *Bound, ray, Thread)) && (!Inside_Object(*ray.Origin, *Bound, Thread)))
+		if((!Find_Intersection (&Local, *Bound, ray, Thread)) && (!Inside_Object(ray.Origin, *Bound, Thread)))
 			return false;
 
 		Thread->Stats()[Bounding_Region_Tests_Succeeded]++;
@@ -411,7 +411,7 @@ bool Ray_In_Bound (const Ray& ray, const vector<ObjectPtr>& Bounding_Object, Tra
 *
 ******************************************************************************/
 
-bool Point_In_Clip (const VECTOR IPoint, const vector<ObjectPtr>& Clip, TraceThreadData *Thread)
+bool Point_In_Clip (const Vector3d& IPoint, const vector<ObjectPtr>& Clip, TraceThreadData *Thread)
 {
 	for(vector<ObjectPtr>::const_iterator Local_Clip = Clip.begin(); Local_Clip != Clip.end(); Local_Clip++)
 	{
@@ -454,7 +454,7 @@ bool Point_In_Clip (const VECTOR IPoint, const vector<ObjectPtr>& Clip, TraceThr
 *
 ******************************************************************************/
 
-void Translate_Object (ObjectPtr Object, const VECTOR Vector, const TRANSFORM *Trans)
+void Translate_Object (ObjectPtr Object, const Vector3d& Vector, const TRANSFORM *Trans)
 {
 	if(Object == NULL)
 		return;
@@ -515,7 +515,7 @@ void Translate_Object (ObjectPtr Object, const VECTOR Vector, const TRANSFORM *T
 *
 ******************************************************************************/
 
-void Rotate_Object (ObjectPtr Object, const VECTOR Vector, const TRANSFORM *Trans)
+void Rotate_Object (ObjectPtr Object, const Vector3d& Vector, const TRANSFORM *Trans)
 {
 	if (Object == NULL)
 		return;
@@ -578,7 +578,7 @@ void Rotate_Object (ObjectPtr Object, const VECTOR Vector, const TRANSFORM *Tran
 *
 ******************************************************************************/
 
-void Scale_Object (ObjectPtr Object, const VECTOR Vector, const TRANSFORM *Trans)
+void Scale_Object (ObjectPtr Object, const Vector3d& Vector, const TRANSFORM *Trans)
 {
 	if (Object == NULL)
 		return;
@@ -939,7 +939,7 @@ void Destroy_Object(ObjectPtr Object)
 *
 ******************************************************************************/
 
-void ObjectBase::UVCoord(UV_VECT Result, const Intersection *Inter, TraceThreadData *) const
+void ObjectBase::UVCoord(Vector2d& Result, const Intersection *Inter, TraceThreadData *) const
 {
 	Result[U] = Inter->IPoint[X];
 	Result[V] = Inter->IPoint[Y];

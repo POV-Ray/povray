@@ -23,9 +23,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/render/tracepixel.h $
- * $Revision: #26 $
- * $Change: 6119 $
- * $DateTime: 2013/11/22 20:31:53 $
+ * $Revision: #27 $
+ * $Change: 6121 $
+ * $DateTime: 2013/11/23 07:38:50 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -164,7 +164,7 @@ class BSPInsideCondFunctor : public BSPTree::Inside
 		{
 			ObjectPtr object = objects[index];
 			if(precondition(origin, object))
-				if(Inside_BBox(origin, object->BBox) && object->Inside(*origin, threadData))
+				if(Inside_BBox(origin, object->BBox) && object->Inside(origin, threadData))
 					if(postcondition(origin, object))
 						found = true;
 			return found;

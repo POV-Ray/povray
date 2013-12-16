@@ -517,7 +517,7 @@ void TrueType::ProcessNewTTF(CSG *Object, const char *filename, const int font_i
 
 			Compute_Translation_Transform(&Trans, total_offset);
 
-			ttf->Translate(total_offset, &Trans);
+			ttf->Translate(Vector3d(total_offset), &Trans);
 
 			/* Shift next glyph by the width of this one excluding the left offset*/
 			total_offset[X] = (ffile->hmtx_table[ttf->glyph->myMetrics].advanceWidth -
@@ -634,7 +634,7 @@ void TrueType::ProcessNewTTF(CSG *Object, const char *filename, const int font_i
 			/* Translate this glyph to its final position in the string */
 			Compute_Translation_Transform(&Trans, local_offset);
 
-			ttf->Translate(local_offset, &Trans);
+			ttf->Translate(Vector3d(local_offset), &Trans);
 
 			/* Shift next glyph by the width of this one + any kerning amount */
 			total_offset[X] += (ffile->hmtx_table[ttf->glyph->myMetrics].advanceWidth +kern_value_x) * funit_size;
@@ -2801,7 +2801,7 @@ bool TrueType::GlyphIntersect(const VECTOR P, const VECTOR D, const GlyphStruct*
 		VScale(IPoint, *ray.Direction, Depth);
 		VAddEq(IPoint, *ray.Origin);
 
-		if (Depth > TTF_Tolerance && (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread)))
+		if (Depth > TTF_Tolerance && (Clip.empty() || Point_In_Clip(Vector3d(IPoint), Clip, Thread)))
 		{
 			Make_Vector(N, 0.0, 0.0, -1.0);
 			MTransNormal(N, N, Trans);
@@ -2817,7 +2817,7 @@ bool TrueType::GlyphIntersect(const VECTOR P, const VECTOR D, const GlyphStruct*
 		VScale(IPoint, *ray.Direction, Depth);
 		VAddEq(IPoint, *ray.Origin);
 
-		if (Depth > TTF_Tolerance && (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread)))
+		if (Depth > TTF_Tolerance && (Clip.empty() || Point_In_Clip(Vector3d(IPoint), Clip, Thread)))
 		{
 			Make_Vector(N, 0.0, 0.0, 1.0);
 			MTransNormal(N, N, Trans);
@@ -2905,7 +2905,7 @@ bool TrueType::GlyphIntersect(const VECTOR P, const VECTOR D, const GlyphStruct*
 					VScale(IPoint, *ray.Direction, Depth);
 					VAddEq(IPoint, *ray.Origin);
 
-					if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
+					if (Clip.empty() || Point_In_Clip(Vector3d(IPoint), Clip, Thread))
 					{
 						Make_Vector(N, d1, -d0, 0.0);
 						MTransNormal(N, N, Trans);
@@ -2979,7 +2979,7 @@ bool TrueType::GlyphIntersect(const VECTOR P, const VECTOR D, const GlyphStruct*
 						VScale(IPoint, *ray.Direction, Depth);
 						VAddEq(IPoint, *ray.Origin);
 
-						if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
+						if (Clip.empty() || Point_In_Clip(Vector3d(IPoint), Clip, Thread))
 						{
 							Make_Vector(N, 2.0 * yt2 * S[l] + yt1, -2.0 * xt2 * S[l] - xt1, 0.0);
 							MTransNormal(N, N, Trans);
@@ -3029,13 +3029,13 @@ bool TrueType::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThrea
 	return false;
 }
 
-bool TrueType::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
+bool TrueType::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 {
 	VECTOR New_Point;
 
 	/* Transform the point into font space */
 
-	MInvTransPoint(New_Point, IPoint, Trans);
+	MInvTransPoint(New_Point, *IPoint, Trans);
 
 	if (New_Point[Z] >= 0.0 && New_Point[Z] <= depth &&
 	    Inside_Glyph(New_Point[X], New_Point[Y], glyph))
@@ -3044,11 +3044,11 @@ bool TrueType::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
 		return (Test_Flag(this, INVERTED_FLAG));
 }
 
-void TrueType::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) const
+void TrueType::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread) const
 {
 	/* Use precomputed normal. [ARE 11/94] */
 
-	Assign_Vector(Result, *Inter->INormal);
+	Result = Inter->INormal;
 }
 
 ObjectPtr TrueType::Copy()
@@ -3061,17 +3061,17 @@ ObjectPtr TrueType::Copy()
 	return (New);
 }
 
-void TrueType::Translate(const VECTOR /*Vector*/, const TRANSFORM *tr)
+void TrueType::Translate(const Vector3d& /*Vector*/, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
 
-void TrueType::Rotate(const VECTOR /*Vector*/, const TRANSFORM *tr)
+void TrueType::Rotate(const Vector3d& /*Vector*/, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
 
-void TrueType::Scale(const VECTOR /*Vector*/, const TRANSFORM *tr)
+void TrueType::Scale(const Vector3d& /*Vector*/, const TRANSFORM *tr)
 {
 	Transform(tr);
 }

@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/parser/parse.cpp $
- * $Revision: #193 $
- * $Change: 6119 $
- * $DateTime: 2013/11/22 20:31:53 $
+ * $Revision: #195 $
+ * $Change: 6122 $
+ * $DateTime: 2013/11/23 10:33:00 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -821,7 +821,7 @@ ObjectPtr Parser::Parse_Blob()
 {
 	int npoints;
 	DBL threshold;
-	VECTOR Axis, Base, Apex;
+	Vector3d Axis, Base, Apex;
 	Blob *Object;
 	Blob_List_Struct *blob_components, *blob_component;
 
@@ -864,7 +864,7 @@ ObjectPtr Parser::Parse_Blob()
 
 			blob_component->elem.rad2 = Sqr(blob_component->elem.rad2);
 
-			Parse_Vector(*blob_component->elem.O);
+			Parse_Vector(blob_component->elem.O);
 
 			/* Next component. */
 
@@ -886,7 +886,7 @@ ObjectPtr Parser::Parse_Blob()
 
 			Parse_Begin();
 
-			Parse_Vector(*blob_component->elem.O);
+			Parse_Vector(blob_component->elem.O);
 
 			Parse_Comma();
 
@@ -944,18 +944,18 @@ ObjectPtr Parser::Parse_Blob()
 
 			/* Calculate cylinder's coordinate system. */
 
-			VSub(Axis, Apex, Base);
+			Axis = Apex - Base;
 
-			VLength(blob_component->elem.len, Axis);
+			blob_component->elem.len = Axis.length();
 
 			if (blob_component->elem.len < EPSILON)
 			{
 				Error("Degenerate cylindrical component in blob.");
 			}
 
-			VInverseScaleEq(Axis, blob_component->elem.len);
+			Axis /= blob_component->elem.len;
 
-			Compute_Coordinate_Transform(blob_component->elem.Trans, Base, Axis, 1.0, 1.0);
+			Compute_Coordinate_Transform(blob_component->elem.Trans, *Base, *Axis, 1.0, 1.0);
 
 			Parse_Blob_Element_Mods(&blob_component->elem);
 
@@ -1021,7 +1021,7 @@ ObjectPtr Parser::Parse_Blob()
 
 void Parser::Parse_Blob_Element_Mods(Blob_Element *Element)
 {
-	VECTOR Local_Vector;
+	Vector3d Local_Vector;
 	MATRIX Local_Matrix;
 	TRANSFORM Local_Trans;
 	TEXTURE *Local_Texture;
@@ -1029,17 +1029,17 @@ void Parser::Parse_Blob_Element_Mods(Blob_Element *Element)
 	EXPECT
 		CASE (TRANSLATE_TOKEN)
 			Parse_Vector (Local_Vector);
-			Blob::Translate_Blob_Element (Element, Vector3d(Local_Vector));
+			Blob::Translate_Blob_Element (Element, Local_Vector);
 		END_CASE
 
 		CASE (ROTATE_TOKEN)
 			Parse_Vector (Local_Vector);
-			Blob::Rotate_Blob_Element (Element, Vector3d(Local_Vector));
+			Blob::Rotate_Blob_Element (Element, Local_Vector);
 		END_CASE
 
 		CASE (SCALE_TOKEN)
 			Parse_Scale_Vector (Local_Vector);
-			Blob::Scale_Blob_Element (Element, Vector3d(Local_Vector));
+			Blob::Scale_Blob_Element (Element, Local_Vector);
 		END_CASE
 
 		CASE (TRANSFORM_TOKEN)
@@ -1283,7 +1283,7 @@ void Parser::Parse_Camera (Camera& Cam)
 	int i;
 	DBL Direction_Length = 1.0, Up_Length, Right_Length, Handedness;
 	DBL k1, k2, k3;
-	VECTOR tempv;
+	Vector3d tempv;
 	MATRIX Local_Matrix;
 	TRANSFORM Local_Trans;
 	bool only_mods = false;
@@ -1317,19 +1317,19 @@ void Parser::Parse_Camera (Camera& Cam)
 		EXPECT
 			CASE (TRANSLATE_TOKEN)
 				Parse_Vector (tempv);
-				Compute_Translation_Transform(&Local_Trans, tempv);
+				Compute_Translation_Transform(&Local_Trans, *tempv);
 				Compose_Transforms(New.Trans, &Local_Trans);
 			END_CASE
 
 			CASE (ROTATE_TOKEN)
 				Parse_Vector (tempv);
-				Compute_Rotation_Transform(&Local_Trans, tempv);
+				Compute_Rotation_Transform(&Local_Trans, *tempv);
 				Compose_Transforms(New.Trans, &Local_Trans);
 			END_CASE
 
 			CASE (SCALE_TOKEN)
 				Parse_Scale_Vector(tempv);
-				Compute_Scaling_Transform(&Local_Trans, tempv);
+				Compute_Scaling_Transform(&Local_Trans, *tempv);
 				Compose_Transforms(New.Trans, &Local_Trans);
 			END_CASE
 
@@ -1378,16 +1378,16 @@ void Parser::Parse_Camera (Camera& Cam)
 		 */
 
 		bool had_angle = false, had_up = false, had_right = false;
-		VECTOR old_look_at, old_up, old_right, old_focal_point;
+		Vector3d old_look_at, old_up, old_right, old_focal_point;
 		DBL old_angle;
 
-		Assign_Vector(old_look_at, New.Look_At);
+		old_look_at = Vector3d(New.Look_At);
 		Make_Vector(New.Look_At, HUGE_VAL, HUGE_VAL, HUGE_VAL);
-		Assign_Vector(old_up, New.Up);
+		old_up = Vector3d(New.Up);
 		Make_Vector(New.Up, HUGE_VAL, HUGE_VAL, HUGE_VAL);
-		Assign_Vector(old_right, New.Right);
+		old_right = Vector3d(New.Right);
 		Make_Vector(New.Right, HUGE_VAL, HUGE_VAL, HUGE_VAL);
-		Assign_Vector(old_focal_point, New.Focal_Point);
+		old_focal_point = Vector3d(New.Focal_Point);
 		Make_Vector(New.Focal_Point, HUGE_VAL, HUGE_VAL, HUGE_VAL);
 		old_angle = New.Angle;
 		New.Angle = HUGE_VAL;
@@ -1632,7 +1632,7 @@ void Parser::Parse_Camera (Camera& Cam)
 		// handle "up"
 		if (New.Up[X] == HUGE_VAL)
 		{
-			Assign_Vector(New.Up, old_up); // restore default up
+			Assign_Vector(New.Up, *old_up); // restore default up
 		}
 		else
 			had_up = true;
@@ -1640,7 +1640,7 @@ void Parser::Parse_Camera (Camera& Cam)
 		// handle "right"
 		if (New.Right[X] == HUGE_VAL)
 		{
-			Assign_Vector(New.Right, old_right); // restore default right
+			Assign_Vector(New.Right, *old_right); // restore default right
 		}
 		else
 			had_right = true;
@@ -1673,8 +1673,8 @@ void Parser::Parse_Camera (Camera& Cam)
 			VLength (Direction_Length, New.Direction);
 			VLength (Up_Length,        New.Up);
 			VLength (Right_Length,     New.Right);
-			VCross  (tempv,            New.Up, New.Direction);
-			VDot    (Handedness,       tempv, New.Right);
+			tempv = cross(Vector3d(New.Up), Vector3d(New.Direction));
+			VDot    (Handedness,       *tempv, New.Right);
 
 			Assign_Vector(New.Direction, New.Look_At);
 
@@ -1687,7 +1687,7 @@ void Parser::Parse_Camera (Camera& Cam)
 			VNormalize (New.Direction, New.Direction);
 
 			// Save Right vector
-			Assign_Vector (tempv, New.Right);
+			tempv = Vector3d(New.Right);
 
 			VCross (New.Right, New.Sky, New.Direction);
 
@@ -1700,7 +1700,7 @@ void Parser::Parse_Camera (Camera& Cam)
 				           "Using default/supplied right vector instead.");
 
 				// Restore Right vector
-				Assign_Vector (New.Right, tempv);
+				Assign_Vector (New.Right, *tempv);
 			}
 
 			VNormalize (New.Right,     New.Right);
@@ -1719,7 +1719,7 @@ void Parser::Parse_Camera (Camera& Cam)
 			VScaleEq(New.Up, Up_Length);
 		}
 		else
-			Assign_Vector(New.Look_At, old_look_at); // restore default look_at
+			Assign_Vector(New.Look_At, *old_look_at); // restore default look_at
 
 		// apply "orthographic"
 		if (New.Type == ORTHOGRAPHIC_CAMERA)
@@ -1730,8 +1730,8 @@ void Parser::Parse_Camera (Camera& Cam)
 			{
 				// resize right and up vector to get the same image
 				// area as we get with the perspective camera
-				VSub(tempv, New.Look_At, New.Location);
-				VLength(k1, tempv);
+				tempv = Vector3d(New.Look_At) - Vector3d(New.Location);
+				k1 = tempv.length();
 				VLength(k2, New.Direction);
 				if ((k1 > EPSILON) && (k2 > EPSILON))
 				{
@@ -1744,12 +1744,11 @@ void Parser::Parse_Camera (Camera& Cam)
 		// apply "focal_point"
 		if (New.Focal_Point[X] != HUGE_VAL)
 		{
-			Assign_Vector(tempv, New.Focal_Point);
-			VSubEq(tempv, New.Location);
-			VLength (New.Focal_Distance, tempv);
+			tempv = Vector3d(New.Focal_Point) - Vector3d(New.Location);
+			New.Focal_Distance = tempv.length();
 		}
 		else
-			Assign_Vector(New.Focal_Point, old_focal_point); // restore default focal_point
+			Assign_Vector(New.Focal_Point, *old_focal_point); // restore default focal_point
 
 		// apply camera transformations
 		New.Transform(New.Trans);
@@ -1765,8 +1764,8 @@ void Parser::Parse_Camera (Camera& Cam)
 				New.Type = ORTHOGRAPHIC_CAMERA;
 				// resize right and up vector to get the same image
 				// area as we get with the perspective camera
-				VSub(tempv, New.Look_At, New.Location);
-				VLength(k1, tempv);
+				tempv = Vector3d(New.Look_At) - Vector3d(New.Location);
+				k1 = tempv.length();
 				VLength(k2, New.Direction);
 				if ((k1 > EPSILON) && (k2 > EPSILON))
 				{
@@ -1854,8 +1853,8 @@ void Parser::Parse_Camera (Camera& Cam)
 				VLength (Direction_Length, New.Direction);
 				VLength (Up_Length,        New.Up);
 				VLength (Right_Length,     New.Right);
-				VCross  (tempv,            New.Up, New.Direction);
-				VDot    (Handedness,       tempv,   New.Right);
+				tempv = cross(Vector3d(New.Up), Vector3d(New.Direction));
+				VDot    (Handedness,       *tempv,   New.Right);
 
 				Parse_Vector (New.Direction);
 				Assign_Vector(New.Look_At, New.Direction);
@@ -1869,7 +1868,7 @@ void Parser::Parse_Camera (Camera& Cam)
 				VNormalize (New.Direction, New.Direction);
 
 				// Save Right vector
-				Assign_Vector (tempv, New.Right);
+				tempv = Vector3d(New.Right);
 
 				VCross (New.Right, New.Sky, New.Direction);
 
@@ -1879,7 +1878,7 @@ void Parser::Parse_Camera (Camera& Cam)
 				   (fabs(New.Right[Z]) < EPSILON))
 				{
 					// Restore Right vector
-					Assign_Vector (New.Right, tempv);
+					Assign_Vector (New.Right, *tempv);
 				}
 
 				VNormalize (New.Right,     New.Right);
@@ -1900,17 +1899,17 @@ void Parser::Parse_Camera (Camera& Cam)
 
 			CASE (TRANSLATE_TOKEN)
 				Parse_Vector (tempv);
-				New.Translate (tempv);
+				New.Translate (*tempv);
 			END_CASE
 
 			CASE (ROTATE_TOKEN)
 				Parse_Vector (tempv);
-				New.Rotate (tempv);
+				New.Rotate (*tempv);
 			END_CASE
 
 			CASE (SCALE_TOKEN)
 				Parse_Scale_Vector (tempv);
-				New.Scale (tempv);
+				New.Scale (*tempv);
 			END_CASE
 
 			CASE (TRANSFORM_TOKEN)
@@ -1950,10 +1949,10 @@ void Parser::Parse_Camera (Camera& Cam)
 			END_CASE
 
 			CASE (FOCAL_POINT_TOKEN)
-				Parse_Vector(New.Focal_Point);
-				Assign_Vector(tempv, New.Focal_Point);
-				VSubEq(tempv, New.Location);
-				VLength (New.Focal_Distance, tempv);
+				Parse_Vector(tempv);
+				Assign_Vector(New.Focal_Point, *tempv);
+				tempv = Vector3d(New.Focal_Point) - Vector3d(New.Location);
+				New.Focal_Distance = tempv.length();
 			END_CASE
 
 			OTHERWISE
@@ -1988,25 +1987,25 @@ bool Parser::Parse_Camera_Mods(Camera& New)
 	TRANSFORM Local_Trans;
 	PIGMENT* Local_Pigment;
 	MATRIX Local_Matrix;
-	VECTOR tempv;
+	Vector3d tempv;
 	DBL k1;
 
 	EXPECT_ONE
 		CASE (TRANSLATE_TOKEN)
 			Parse_Vector (tempv);
-			Compute_Translation_Transform(&Local_Trans, tempv);
+			Compute_Translation_Transform(&Local_Trans, *tempv);
 			Compose_Transforms(New.Trans, &Local_Trans);
 		END_CASE
 
 		CASE (ROTATE_TOKEN)
 			Parse_Vector (tempv);
-			Compute_Rotation_Transform(&Local_Trans, tempv);
+			Compute_Rotation_Transform(&Local_Trans, *tempv);
 			Compose_Transforms(New.Trans, &Local_Trans);
 		END_CASE
 
 		CASE (SCALE_TOKEN)
 			Parse_Scale_Vector(tempv);
-			Compute_Scaling_Transform(&Local_Trans, tempv);
+			Compute_Scaling_Transform(&Local_Trans, *tempv);
 			Compose_Transforms(New.Trans, &Local_Trans);
 		END_CASE
 
@@ -2396,7 +2395,7 @@ ObjectPtr Parser::Parse_Disc ()
 
 ObjectPtr Parser::Parse_HField ()
 {
-	VECTOR Local_Vector;
+	Vector3d Local_Vector;
 	DBL Temp_Water_Level;
 	HField *Object;
 	ImageData *image;
@@ -2418,12 +2417,9 @@ ObjectPtr Parser::Parse_HField ()
 	Object->bounding_corner2[Y] = 65536.0;
 	Object->bounding_corner2[Z] = image->height - 1.0;
 
-	Make_Vector(Local_Vector,
-	            1.0 / (Object->bounding_corner2[X]),
-	            1.0 / (Object->bounding_corner2[Y]),
-	            1.0 / (Object->bounding_corner2[Z]));
+	Local_Vector = Vector3d(1.0) / Vector3d(Object->bounding_corner2);
 
-	Compute_Scaling_Transform(Object->Trans, Local_Vector);
+	Compute_Scaling_Transform(Object->Trans, *Local_Vector);
 
 	EXPECT
 		CASE (WATER_LEVEL_TOKEN)
@@ -3013,7 +3009,7 @@ ObjectPtr Parser::Parse_Light_Group()
 {
 	CSG *Object;
 	ObjectPtr Local;
-	VECTOR Local_Vector;
+	Vector3d Local_Vector;
 	MATRIX Local_Matrix;
 	TRANSFORM Local_Trans;
 
@@ -3047,19 +3043,19 @@ ObjectPtr Parser::Parse_Light_Group()
 	EXPECT
 		CASE (TRANSLATE_TOKEN)
 			Parse_Vector (Local_Vector);
-			Compute_Translation_Transform(&Local_Trans, Local_Vector);
+			Compute_Translation_Transform(&Local_Trans, *Local_Vector);
 			Translate_Object (reinterpret_cast<ObjectPtr>(Object), Local_Vector, &Local_Trans);
 		END_CASE
 
 		CASE (ROTATE_TOKEN)
 			Parse_Vector (Local_Vector);
-			Compute_Rotation_Transform(&Local_Trans, Local_Vector);
+			Compute_Rotation_Transform(&Local_Trans, *Local_Vector);
 			Rotate_Object (reinterpret_cast<ObjectPtr>(Object), Local_Vector, &Local_Trans);
 		END_CASE
 
 		CASE (SCALE_TOKEN)
 			Parse_Scale_Vector (Local_Vector);
-			Compute_Scaling_Transform(&Local_Trans, Local_Vector);
+			Compute_Scaling_Transform(&Local_Trans, *Local_Vector);
 			Scale_Object (reinterpret_cast<ObjectPtr>(Object), Local_Vector, &Local_Trans);
 		END_CASE
 
@@ -3180,7 +3176,7 @@ ObjectPtr Parser::Parse_Light_Group()
 ObjectPtr Parser::Parse_Light_Source ()
 {
 	DBL Len;
-	VECTOR Local_Vector;
+	Vector3d Local_Vector;
 	MATRIX Local_Matrix;
 	TRANSFORM Local_Trans;
 	LightSource *Object;
@@ -3282,7 +3278,7 @@ ObjectPtr Parser::Parse_Light_Source ()
 			if(Object->children.empty() || (Object->children[0] == NULL))
 				Expectation_Error("object");
 			Compute_Translation_Transform(&Local_Trans, Object->Center);
-			Translate_Object(Object->children[0], Object->Center, &Local_Trans);
+			Translate_Object(Object->children[0], Vector3d(Object->Center), &Local_Trans);
 			Object->children[0] = Parse_Object_Mods (Object->children[0]);
 			Set_Flag(Object->children[0], NO_SHADOW_FLAG);
 			Set_Flag(Object, NO_SHADOW_FLAG);
@@ -3436,19 +3432,19 @@ ObjectPtr Parser::Parse_Light_Source ()
 
 		CASE (TRANSLATE_TOKEN)
 			Parse_Vector (Local_Vector);
-			Compute_Translation_Transform(&Local_Trans, Local_Vector);
+			Compute_Translation_Transform(&Local_Trans, *Local_Vector);
 			Translate_Object (reinterpret_cast<ObjectPtr>(Object), Local_Vector, &Local_Trans);
 		END_CASE
 
 		CASE (ROTATE_TOKEN)
 			Parse_Vector (Local_Vector);
-			Compute_Rotation_Transform(&Local_Trans, Local_Vector);
+			Compute_Rotation_Transform(&Local_Trans, *Local_Vector);
 			Rotate_Object (reinterpret_cast<ObjectPtr>(Object), Local_Vector, &Local_Trans);
 		END_CASE
 
 		CASE (SCALE_TOKEN)
 			Parse_Scale_Vector (Local_Vector);
-			Compute_Scaling_Transform(&Local_Trans, Local_Vector);
+			Compute_Scaling_Transform(&Local_Trans, *Local_Vector);
 			Scale_Object (reinterpret_cast<ObjectPtr>(Object), Local_Vector, &Local_Trans);
 		END_CASE
 
@@ -3529,8 +3525,8 @@ ObjectPtr Parser::Parse_Mesh()
 	int number_of_normals, number_of_textures, number_of_triangles, number_of_vertices, number_of_uvcoords;
 	int max_normals, max_textures, max_triangles, max_vertices, max_uvcoords;
 	DBL l1, l2, l3;
-	VECTOR D1, D2, P1, P2, P3, N1, N2, N3, N;
-	UV_VECT UV1, UV2, UV3;
+	Vector3d D1, D2, P1, P2, P3, N1, N2, N3, N;
+	Vector2d UV1, UV2, UV3;
 	SNGL_VECT *Normals, *Vertices;
 	TEXTURE **Textures;
 	UV_VECT *UVCoords;
@@ -3538,11 +3534,11 @@ ObjectPtr Parser::Parse_Mesh()
 	MESH_TRIANGLE *Triangles;
 	int fully_textured=true;
 	/* NK 1998 */
-	VECTOR Inside_Vect;
+	Vector3d Inside_Vect;
 	TEXTURE *t2, *t3;
 	bool foundZeroNormal=false;
 
-	Make_Vector(Inside_Vect, 0, 0, 0);
+	Inside_Vect = Vector3d(0.0, 0.0, 0.0);
 
 	Parse_Begin();
 
@@ -3597,7 +3593,7 @@ ObjectPtr Parser::Parse_Mesh()
 			Parse_Vector(P2);  Parse_Comma();
 			Parse_Vector(P3);
 
-			if (!Object->Degenerate(P1, P2, P3))
+			if (!Object->Degenerate(*P1, *P2, *P3))
 			{
 				if (number_of_triangles >= max_triangles)
 				{
@@ -3615,15 +3611,15 @@ ObjectPtr Parser::Parse_Mesh()
 
 				Object->Init_Mesh_Triangle(&Triangles[number_of_triangles]);
 
-				Triangles[number_of_triangles].P1 = Object->Mesh_Hash_Vertex(&number_of_vertices, &max_vertices, &Vertices, P1);
-				Triangles[number_of_triangles].P2 = Object->Mesh_Hash_Vertex(&number_of_vertices, &max_vertices, &Vertices, P2);
-				Triangles[number_of_triangles].P3 = Object->Mesh_Hash_Vertex(&number_of_vertices, &max_vertices, &Vertices, P3);
+				Triangles[number_of_triangles].P1 = Object->Mesh_Hash_Vertex(&number_of_vertices, &max_vertices, &Vertices, *P1);
+				Triangles[number_of_triangles].P2 = Object->Mesh_Hash_Vertex(&number_of_vertices, &max_vertices, &Vertices, *P2);
+				Triangles[number_of_triangles].P3 = Object->Mesh_Hash_Vertex(&number_of_vertices, &max_vertices, &Vertices, *P3);
 
 				/* NK 1998 */
 				Parse_Three_UVCoords(UV1,UV2,UV3);
-				Triangles[number_of_triangles].UV1 = Object->Mesh_Hash_UV(&number_of_uvcoords, &max_uvcoords, &UVCoords,UV1);
-				Triangles[number_of_triangles].UV2 = Object->Mesh_Hash_UV(&number_of_uvcoords, &max_uvcoords, &UVCoords,UV2);
-				Triangles[number_of_triangles].UV3 = Object->Mesh_Hash_UV(&number_of_uvcoords, &max_uvcoords, &UVCoords,UV3);
+				Triangles[number_of_triangles].UV1 = Object->Mesh_Hash_UV(&number_of_uvcoords, &max_uvcoords, &UVCoords, *UV1);
+				Triangles[number_of_triangles].UV2 = Object->Mesh_Hash_UV(&number_of_uvcoords, &max_uvcoords, &UVCoords, *UV2);
+				Triangles[number_of_triangles].UV3 = Object->Mesh_Hash_UV(&number_of_uvcoords, &max_uvcoords, &UVCoords, *UV3);
 				/* NK ---- */
 
 				/* NK */
@@ -3635,9 +3631,9 @@ ObjectPtr Parser::Parse_Mesh()
 				if (t3) Triangles[number_of_triangles].Texture3 = Object->Mesh_Hash_Texture(&number_of_textures, &max_textures, &Textures, t3);
 				if (t2 || t3) Triangles[number_of_triangles].ThreeTex = true;
 
-				Object->Compute_Mesh_Triangle(&Triangles[number_of_triangles], false, P1, P2, P3, N);
+				Object->Compute_Mesh_Triangle(&Triangles[number_of_triangles], false, *P1, *P2, *P3, *N);
 
-				Triangles[number_of_triangles].Normal_Ind = Object->Mesh_Hash_Normal(&number_of_normals, &max_normals, &Normals, N);
+				Triangles[number_of_triangles].Normal_Ind = Object->Mesh_Hash_Normal(&number_of_normals, &max_normals, &Normals, *N);
 
 				if(Triangles[number_of_triangles].Texture < 0)
 					fully_textured = false;
@@ -3691,11 +3687,11 @@ ObjectPtr Parser::Parse_Mesh()
 				foundZeroNormal = true;
 			}
 
-			VLength(l1, N1);
-			VLength(l2, N2);
-			VLength(l3, N3);
+			l1 = N1.length();
+			l2 = N2.length();
+			l3 = N3.length();
 
-			if ((l1 != 0.0) && (l2 != 0.0) && (l3 != 0.0) && (!Object->Degenerate(P1, P2, P3)))
+			if ((l1 != 0.0) && (l2 != 0.0) && (l3 != 0.0) && (!Object->Degenerate(*P1, *P2, *P3)))
 			{
 				if (number_of_triangles >= max_triangles)
 				{
@@ -3707,31 +3703,31 @@ ObjectPtr Parser::Parse_Mesh()
 					Triangles = reinterpret_cast<MESH_TRIANGLE *>(POV_REALLOC(Triangles, max_triangles*sizeof(MESH_TRIANGLE), "triangle triangle mesh data"));
 				}
 
-				VInverseScaleEq(N1, l1);
-				VInverseScaleEq(N2, l2);
-				VInverseScaleEq(N3, l3);
+				N1 /= l1;
+				N2 /= l2;
+				N3 /= l3;
 
 				/* Init triangle. */
 
 				Object->Init_Mesh_Triangle(&Triangles[number_of_triangles]);
 
-				Triangles[number_of_triangles].P1 = Object->Mesh_Hash_Vertex(&number_of_vertices, &max_vertices, &Vertices, P1);
-				Triangles[number_of_triangles].P2 = Object->Mesh_Hash_Vertex(&number_of_vertices, &max_vertices, &Vertices, P2);
-				Triangles[number_of_triangles].P3 = Object->Mesh_Hash_Vertex(&number_of_vertices, &max_vertices, &Vertices, P3);
+				Triangles[number_of_triangles].P1 = Object->Mesh_Hash_Vertex(&number_of_vertices, &max_vertices, &Vertices, *P1);
+				Triangles[number_of_triangles].P2 = Object->Mesh_Hash_Vertex(&number_of_vertices, &max_vertices, &Vertices, *P2);
+				Triangles[number_of_triangles].P3 = Object->Mesh_Hash_Vertex(&number_of_vertices, &max_vertices, &Vertices, *P3);
 
 				/* Check for equal normals. */
 
-				VSub(D1, N1, N2);
-				VSub(D2, N1, N3);
+				D1 = N1 - N2;
+				D2 = N1 - N3;
 
-				VDot(l1, D1, D1);
-				VDot(l2, D2, D2);
+				l1 = D1.lengthSqr();
+				l2 = D2.lengthSqr();
 
 				/* NK 1998 */
 				Parse_Three_UVCoords(UV1,UV2,UV3);
-				Triangles[number_of_triangles].UV1 = Object->Mesh_Hash_UV(&number_of_uvcoords, &max_uvcoords, &UVCoords,UV1);
-				Triangles[number_of_triangles].UV2 = Object->Mesh_Hash_UV(&number_of_uvcoords, &max_uvcoords, &UVCoords,UV2);
-				Triangles[number_of_triangles].UV3 = Object->Mesh_Hash_UV(&number_of_uvcoords, &max_uvcoords, &UVCoords,UV3);
+				Triangles[number_of_triangles].UV1 = Object->Mesh_Hash_UV(&number_of_uvcoords, &max_uvcoords, &UVCoords, *UV1);
+				Triangles[number_of_triangles].UV2 = Object->Mesh_Hash_UV(&number_of_uvcoords, &max_uvcoords, &UVCoords, *UV2);
+				Triangles[number_of_triangles].UV3 = Object->Mesh_Hash_UV(&number_of_uvcoords, &max_uvcoords, &UVCoords, *UV3);
 
 				/* read possibly three instead of only one texture */
 				/* read these before compute!!! */
@@ -3745,20 +3741,20 @@ ObjectPtr Parser::Parse_Mesh()
 				{
 					/* Smooth triangle. */
 
-					Triangles[number_of_triangles].N1 = Object->Mesh_Hash_Normal(&number_of_normals, &max_normals, &Normals, N1);
-					Triangles[number_of_triangles].N2 = Object->Mesh_Hash_Normal(&number_of_normals, &max_normals, &Normals, N2);
-					Triangles[number_of_triangles].N3 = Object->Mesh_Hash_Normal(&number_of_normals, &max_normals, &Normals, N3);
+					Triangles[number_of_triangles].N1 = Object->Mesh_Hash_Normal(&number_of_normals, &max_normals, &Normals, *N1);
+					Triangles[number_of_triangles].N2 = Object->Mesh_Hash_Normal(&number_of_normals, &max_normals, &Normals, *N2);
+					Triangles[number_of_triangles].N3 = Object->Mesh_Hash_Normal(&number_of_normals, &max_normals, &Normals, *N3);
 
-					Object->Compute_Mesh_Triangle(&Triangles[number_of_triangles], true, P1, P2, P3, N);
+					Object->Compute_Mesh_Triangle(&Triangles[number_of_triangles], true, *P1, *P2, *P3, *N);
 				}
 				else
 				{
 					/* Flat triangle. */
 
-					Object->Compute_Mesh_Triangle(&Triangles[number_of_triangles], false, P1, P2, P3, N);
+					Object->Compute_Mesh_Triangle(&Triangles[number_of_triangles], false, *P1, *P2, *P3, *N);
 				}
 
-				Triangles[number_of_triangles].Normal_Ind = Object->Mesh_Hash_Normal(&number_of_normals, &max_normals, &Normals, N);
+				Triangles[number_of_triangles].Normal_Ind = Object->Mesh_Hash_Normal(&number_of_normals, &max_normals, &Normals, *N);
 
 				if (Triangles[number_of_triangles].Texture < 0)
 				{
@@ -3822,7 +3818,7 @@ ObjectPtr Parser::Parse_Mesh()
 	}
 	else
 	{
-		VNormalize(Object->Data->Inside_Vect, Inside_Vect);
+		VNormalize(Object->Data->Inside_Vect, *Inside_Vect);
 		Object->has_inside_vector=true;
 		Object->Type &= ~PATCH_OBJECT;
 	}
@@ -3977,10 +3973,10 @@ ObjectPtr Parser::Parse_Mesh2()
 	bool foundZeroNormal = false;
 
 	DBL l1, l2;
-	VECTOR D1, D2, P1, P2, P3, N1, N;
-	VECTOR Inside_Vect;
+	Vector3d D1, D2, P1, P2, P3, N1, N;
+	Vector3d Inside_Vect;
 
-	UV_VECT UV1;
+	Vector2d UV1;
 	SNGL_VECT *Normals = NULL;
 	SNGL_VECT *Vertices = NULL;
 	TEXTURE **Textures = NULL;
@@ -3988,7 +3984,7 @@ ObjectPtr Parser::Parse_Mesh2()
 	Mesh *Object;
 	MESH_TRIANGLE *Triangles;
 
-	Make_Vector(Inside_Vect, 0, 0, 0);
+	Inside_Vect = Vector3d(0.0, 0.0, 0.0);
 
 	Parse_Begin();
 
@@ -4029,7 +4025,7 @@ ObjectPtr Parser::Parse_Mesh2()
 			for(i=0; i<number_of_vertices; i++)
 			{
 				Parse_Vector(P1); Parse_Comma();
-				Assign_Vector(Vertices[i], P1);
+				Assign_Vector(Vertices[i], *P1);
 			}
 			Parse_End();
 		END_CASE
@@ -4059,8 +4055,8 @@ ObjectPtr Parser::Parse_Mesh2()
 							Warning(0,"Normal vector in mesh2 cannot be zero - changing it to <1,0,0>.");
 						foundZeroNormal = true;
 					}
-					VNormalizeEq(N1);
-					Assign_Vector(Normals[i], N1);
+					N1.normalize();
+					Assign_Vector(Normals[i], *N1);
 				}
 			}
 
@@ -4084,7 +4080,7 @@ ObjectPtr Parser::Parse_Mesh2()
 				for(i=0; i<number_of_uvcoords; i++)
 				{
 					Parse_UV_Vect(UV1); Parse_Comma();
-					Assign_UV_Vect(UVCoords[i], UV1);
+					Assign_UV_Vect(UVCoords[i], *UV1);
 				}
 			}
 
@@ -4432,9 +4428,9 @@ ObjectPtr Parser::Parse_Mesh2()
 		n2 = (int) Triangles[i].N2;
 		n3 = (int) Triangles[i].N3;
 
-		Assign_Vector(P1, Vertices[a]);
-		Assign_Vector(P2, Vertices[b]);
-		Assign_Vector(P3, Vertices[c]);
+		P1 = Vector3d(Vertices[a]);
+		P2 = Vector3d(Vertices[b]);
+		P3 = Vector3d(Vertices[c]);
 
 		Triangles[i].Smooth = false;
 
@@ -4444,33 +4440,33 @@ ObjectPtr Parser::Parse_Mesh2()
 		if (i<number_of_normal_indices)
 		{
 			/* Check for equal normals. */
-			VSub(D1, Normals[n1], Normals[n2]);
-			VSub(D2, Normals[n1], Normals[n3]);
+			D1 = Vector3d(Normals[n1]) - Vector3d(Normals[n2]);
+			D2 = Vector3d(Normals[n1]) - Vector3d(Normals[n3]);
 
-			VDot(l1, D1, D1);
-			VDot(l2, D2, D2);
+			l1 = D1.lengthSqr();
+			l2 = D2.lengthSqr();
 
 			if ((fabs(l1) > EPSILON) || (fabs(l2) > EPSILON))
 			{
 				/* Smooth triangle. */
-				Object->Compute_Mesh_Triangle(&Triangles[i], true, P1, P2, P3, N);
+				Object->Compute_Mesh_Triangle(&Triangles[i], true, *P1, *P2, *P3, *N);
 				Triangles[i].Smooth = true;
 			}
 			else
 			{
 				/* Flat triangle. */
-				Object->Compute_Mesh_Triangle(&Triangles[i], false, P1, P2, P3, N);
+				Object->Compute_Mesh_Triangle(&Triangles[i], false, *P1, *P2, *P3, *N);
 			}
 		}
 		else
 		{
 			/* Flat triangle. */
-			Object->Compute_Mesh_Triangle(&Triangles[i], false, P1, P2, P3, N);
+			Object->Compute_Mesh_Triangle(&Triangles[i], false, *P1, *P2, *P3, *N);
 		}
 
 		/* assign the triangle normal that we just computed */
 		Triangles[i].Normal_Ind = i+number_of_normals;
-		Assign_Vector(Normals[i+number_of_normals], N);
+		Assign_Vector(Normals[i+number_of_normals], *N);
 	}
 
 	/* now remember how many normals we really have */
@@ -4492,7 +4488,7 @@ ObjectPtr Parser::Parse_Mesh2()
 	}
 	else
 	{
-		VNormalize(Object->Data->Inside_Vect, Inside_Vect);
+		VNormalize(Object->Data->Inside_Vect, *Inside_Vect);
 		Object->has_inside_vector=true;
 		Object->Type &= ~PATCH_OBJECT;
 	}
@@ -4738,7 +4734,7 @@ ObjectPtr Parser::Parse_Parametric(void)
 	DBL         temp;
 	char        PrecompFlag = 0;
 	int         PrecompDepth = 1;
-	UV_VECT     tempUV;
+	Vector2d    tempUV;
 
 	Parse_Begin();
 
@@ -5171,7 +5167,7 @@ ObjectPtr Parser::Parse_Polygon()
 	int Number;
 	Polygon *Object;
 	VECTOR *Points;
-	VECTOR P;
+	Vector3d P;
 
 	Parse_Begin();
 
@@ -5200,7 +5196,7 @@ ObjectPtr Parser::Parse_Polygon()
 
 	/* Check for closed polygons. */
 
-	Assign_Vector(P, Points[0]);
+	P = Vector3d(Points[0]);
 
 	for (i = 1; i < Number; i++)
 	{
@@ -5212,13 +5208,13 @@ ObjectPtr Parser::Parse_Polygon()
 		{
 			// force almost-identical vertices to be /exactly/ identical,
 			// to make processing easier later
-			Assign_Vector(Points[i], P);
+			Assign_Vector(Points[i], *P);
 
 			i++;
 
 			if (i < Number)
 			{
-				Assign_Vector(P, Points[i]);
+				P = Vector3d(Points[i]);
 			}
 
 			closed = true;
@@ -5229,7 +5225,7 @@ ObjectPtr Parser::Parse_Polygon()
 	{
 		Warning(0, "Polygon not closed. Closing it.");
 
-		Assign_Vector(Points[Number], P);
+		Assign_Vector(Points[Number], *P);
 
 		Number++;
 	}
@@ -5281,7 +5277,7 @@ ObjectPtr Parser::Parse_Prism()
 
 	Prism *Object;
 	UV_VECT *Points;
-	UV_VECT P;
+	Vector2d P;
 
 	Parse_Begin();
 
@@ -5422,7 +5418,7 @@ ObjectPtr Parser::Parse_Prism()
 
 				i = 1;
 
-				Assign_UV_Vect(P, Points[0]);
+				P = Vector2d(Points[0]);
 
 				break;
 
@@ -5431,7 +5427,7 @@ ObjectPtr Parser::Parse_Prism()
 
 				i = 2;
 
-				Assign_UV_Vect(P, Points[1]);
+				P = Vector2d(Points[1]);
 
 				break;
 		}
@@ -5451,7 +5447,7 @@ ObjectPtr Parser::Parse_Prism()
 
 						if (i < Object->Number)
 						{
-							Assign_UV_Vect(P, Points[i]);
+							P = Vector2d(Points[i]);
 						}
 
 						break;
@@ -5462,7 +5458,7 @@ ObjectPtr Parser::Parse_Prism()
 
 						if (i < Object->Number)
 						{
-							Assign_UV_Vect(P, Points[i]);
+							P = Vector2d(Points[i]);
 						}
 
 						break;
@@ -5473,7 +5469,7 @@ ObjectPtr Parser::Parse_Prism()
 
 						if (i < Object->Number)
 						{
-							Assign_UV_Vect(P, Points[i]);
+							P = Vector2d(Points[i]);
 						}
 
 						break;
@@ -5516,7 +5512,7 @@ ObjectPtr Parser::Parse_Prism()
 	{
 		if (Object->Spline_Type == LINEAR_SPLINE)
 		{
-			Assign_UV_Vect(Points[Object->Number], P);
+			Assign_UV_Vect(Points[Object->Number], *P);
 
 			Object->Number++;
 
@@ -5571,7 +5567,7 @@ ObjectPtr Parser::Parse_Prism()
 
 ObjectPtr Parser::Parse_Quadric ()
 {
-	VECTOR Min, Max;
+	Vector3d Min, Max;
 	Quadric *Object;
 
 	Parse_Begin ();
@@ -5586,10 +5582,10 @@ ObjectPtr Parser::Parse_Quadric ()
 	Parse_Vector(Object->Terms);            Parse_Comma();
 	Object->Constant = Parse_Float();
 
-	Make_Vector(Min, -BOUND_HUGE, -BOUND_HUGE, -BOUND_HUGE);
-	Make_Vector(Max,  BOUND_HUGE,  BOUND_HUGE,  BOUND_HUGE);
+	Min = Vector3d(-BOUND_HUGE);
+	Max = Vector3d(BOUND_HUGE);
 
-	Object->Compute_BBox(Min, Max);
+	Object->Compute_BBox(*Min, *Max);
 
 	Parse_Object_Mods (reinterpret_cast<ObjectPtr>(Object));
 
@@ -5978,7 +5974,7 @@ ObjectPtr Parser::Parse_Sphere_Sweep()
 
 ObjectPtr Parser::Parse_Superellipsoid()
 {
-	UV_VECT V1;
+	Vector2d V1;
 	Superellipsoid *Object;
 
 	Parse_Begin();
@@ -6139,7 +6135,7 @@ ObjectPtr Parser::Parse_TrueType ()
 	char *filename = NULL;
 	UCS2 *text_string;
 	DBL depth;
-	VECTOR offset;
+	Vector3d offset;
 	int builtin_font = 0;
 	TRANSFORM Local_Trans;
 
@@ -6178,7 +6174,7 @@ ObjectPtr Parser::Parse_TrueType ()
 
 	/* Process all this good info */
 	Object = new CSGUnion();
-	TrueType::ProcessNewTTF(reinterpret_cast<CSG *>(Object), filename, builtin_font, text_string, depth, offset, this, sceneData);
+	TrueType::ProcessNewTTF(reinterpret_cast<CSG *>(Object), filename, builtin_font, text_string, depth, *offset, this, sceneData);
 	if (filename)
 	{
 		/* Free up the filename  */
@@ -6192,8 +6188,8 @@ ObjectPtr Parser::Parse_TrueType ()
 	Object->Compute_BBox();
 
 	/* This tiny rotation should fix cracks in text that lies along an axis */
-	Make_Vector(offset, 0.001, 0.001, 0.001);
-	Compute_Rotation_Transform(&Local_Trans, offset);
+	offset = Vector3d(0.001, 0.001, 0.001); // TODO - try to find a different solution to this hack
+	Compute_Rotation_Transform(&Local_Trans, *offset);
 	Rotate_Object (reinterpret_cast<ObjectPtr>(Object), offset, &Local_Trans);
 
 	/* Get any rotate/translate or texturing stuff */
@@ -7293,8 +7289,8 @@ void Parser::Parse_Global_Settings()
 ObjectPtr Parser::Parse_Object_Mods (ObjectPtr Object)
 {
 	DBL V1, V2;
-	VECTOR Min, Max;
-	VECTOR Local_Vector;
+	Vector3d Min, Max;
+	Vector3d Local_Vector;
 	MATRIX Local_Matrix;
 	TRANSFORM Local_Trans;
 	BoundingBox BBox;
@@ -7417,19 +7413,19 @@ ObjectPtr Parser::Parse_Object_Mods (ObjectPtr Object)
 
 		CASE (TRANSLATE_TOKEN)
 			Parse_Vector (Local_Vector);
-			Compute_Translation_Transform(&Local_Trans, Local_Vector);
+			Compute_Translation_Transform(&Local_Trans, *Local_Vector);
 			Translate_Object (Object, Local_Vector, &Local_Trans);
 		END_CASE
 
 		CASE (ROTATE_TOKEN)
 			Parse_Vector (Local_Vector);
-			Compute_Rotation_Transform(&Local_Trans, Local_Vector);
+			Compute_Rotation_Transform(&Local_Trans, *Local_Vector);
 			Rotate_Object (Object, Local_Vector, &Local_Trans);
 		END_CASE
 
 		CASE (SCALE_TOKEN)
 			Parse_Scale_Vector (Local_Vector);
-			Compute_Scaling_Transform(&Local_Trans, Local_Vector);
+			Compute_Scaling_Transform(&Local_Trans, *Local_Vector);
 			Scale_Object (Object, Local_Vector, &Local_Trans);
 		END_CASE
 
@@ -7489,10 +7485,10 @@ ObjectPtr Parser::Parse_Object_Mods (ObjectPtr Object)
 
 					if (dynamic_cast<Quadric *>(Object) != NULL)
 					{
-						Make_Vector(Min, -BOUND_HUGE, -BOUND_HUGE, -BOUND_HUGE);
-						Make_Vector(Max,  BOUND_HUGE,  BOUND_HUGE,  BOUND_HUGE);
+						Min = Vector3d(-BOUND_HUGE);
+						Max = Vector3d(BOUND_HUGE);
 
-						(dynamic_cast<Quadric *>(Object))->Compute_BBox(Min, Max);
+						(dynamic_cast<Quadric *>(Object))->Compute_BBox(*Min, *Max);
 					}
 					EXIT
 				END_CASE
@@ -7683,8 +7679,8 @@ ObjectPtr Parser::Parse_Object_Mods (ObjectPtr Object)
 	{
 		/* Get bounding objects bounding box. */
 
-		Make_Vector(Min, -BOUND_HUGE, -BOUND_HUGE, -BOUND_HUGE);
-		Make_Vector(Max,  BOUND_HUGE,  BOUND_HUGE,  BOUND_HUGE);
+		Min = Vector3d(-BOUND_HUGE);
+		Max = Vector3d(BOUND_HUGE);
 
 		for(vector<ObjectPtr>::iterator Sib = Object->Bound.begin(); Sib != Object->Bound.end(); Sib++)
 		{
@@ -7721,8 +7717,8 @@ ObjectPtr Parser::Parse_Object_Mods (ObjectPtr Object)
 	{
 		/* Get clipping objects bounding box. */
 
-		Make_Vector(Min, -BOUND_HUGE, -BOUND_HUGE, -BOUND_HUGE);
-		Make_Vector(Max,  BOUND_HUGE,  BOUND_HUGE,  BOUND_HUGE);
+		Min = Vector3d(-BOUND_HUGE);
+		Max = Vector3d(BOUND_HUGE);
 
 		for(vector<ObjectPtr>::iterator Sib = Object->Clip.begin(); Sib != Object->Clip.end(); Sib++)
 		{
@@ -7882,7 +7878,7 @@ TRANSFORM *Parser::Parse_Transform_Block(TRANSFORM *New)
 {
 	MATRIX Local_Matrix;
 	TRANSFORM Local_Trans;
-	VECTOR Local_Vector;
+	Vector3d Local_Vector;
 	bool isInverse = false;
 
 	Parse_Begin();
@@ -7909,19 +7905,19 @@ TRANSFORM *Parser::Parse_Transform_Block(TRANSFORM *New)
 
 		CASE (TRANSLATE_TOKEN)
 			Parse_Vector(Local_Vector);
-			Compute_Translation_Transform(&Local_Trans, Local_Vector);
+			Compute_Translation_Transform(&Local_Trans, *Local_Vector);
 			Compose_Transforms(New, &Local_Trans);
 		END_CASE
 
 		CASE (ROTATE_TOKEN)
 			Parse_Vector(Local_Vector);
-			Compute_Rotation_Transform(&Local_Trans, Local_Vector);
+			Compute_Rotation_Transform(&Local_Trans, *Local_Vector);
 			Compose_Transforms(New, &Local_Trans);
 		END_CASE
 
 		CASE (SCALE_TOKEN)
 			Parse_Scale_Vector(Local_Vector);
-			Compute_Scaling_Transform(&Local_Trans, Local_Vector);
+			Compute_Scaling_Transform(&Local_Trans, *Local_Vector);
 			Compose_Transforms(New, &Local_Trans);
 		END_CASE
 
@@ -7970,7 +7966,7 @@ TRANSFORM *Parser::Parse_Transform_Block(TRANSFORM *New)
 
 void Parser::Parse_Bound_Clip(vector<ObjectPtr>& dest, bool notexture)
 {
-	VECTOR Local_Vector;
+	Vector3d Local_Vector;
 	MATRIX Local_Matrix;
 	TRANSFORM Local_Trans;
 	ObjectPtr Current;
@@ -7986,7 +7982,7 @@ void Parser::Parse_Bound_Clip(vector<ObjectPtr>& dest, bool notexture)
 	EXPECT
 		CASE (TRANSLATE_TOKEN)
 			Parse_Vector(Local_Vector);
-			Compute_Translation_Transform(&Local_Trans, Local_Vector);
+			Compute_Translation_Transform(&Local_Trans, *Local_Vector);
 			for(vector<ObjectPtr>::iterator i = objects.begin(); i != objects.end(); i++)
 			{
 				Translate_Object(*i, Local_Vector, &Local_Trans);
@@ -7995,7 +7991,7 @@ void Parser::Parse_Bound_Clip(vector<ObjectPtr>& dest, bool notexture)
 
 		CASE (ROTATE_TOKEN)
 			Parse_Vector(Local_Vector);
-			Compute_Rotation_Transform(&Local_Trans, Local_Vector);
+			Compute_Rotation_Transform(&Local_Trans, *Local_Vector);
 			for(vector<ObjectPtr>::iterator i = objects.begin(); i != objects.end(); i++)
 			{
 				Rotate_Object(*i, Local_Vector, &Local_Trans);
@@ -8004,7 +8000,7 @@ void Parser::Parse_Bound_Clip(vector<ObjectPtr>& dest, bool notexture)
 
 		CASE (SCALE_TOKEN)
 			Parse_Scale_Vector(Local_Vector);
-			Compute_Scaling_Transform(&Local_Trans, Local_Vector);
+			Compute_Scaling_Transform(&Local_Trans, *Local_Vector);
 			for(vector<ObjectPtr>::iterator i = objects.begin(); i != objects.end(); i++)
 			{
 				Scale_Object(*i, Local_Vector, &Local_Trans);
@@ -8068,7 +8064,7 @@ void Parser::Parse_Bound_Clip(vector<ObjectPtr>& dest, bool notexture)
 *
 ******************************************************************************/
 
-int Parser::Parse_Three_UVCoords(UV_VECT UV1, UV_VECT UV2, UV_VECT UV3)
+int Parser::Parse_Three_UVCoords(Vector2d& UV1, Vector2d& UV2, Vector2d& UV3)
 {
 	int Return_Value;
 
@@ -8599,14 +8595,14 @@ int Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTR
 					case 2:
 						*NumberPtr = UV_ID_TOKEN;
 						Test_Redefine(Previous,NumberPtr,*DataPtr, allow_redefine);
-						*DataPtr   = reinterpret_cast<void *>(Create_UV_Vect());
+						*DataPtr   = reinterpret_cast<void *>(new Vector2d());
 						Assign_UV_Vect(reinterpret_cast<DBL *>(*DataPtr), Local_Express);
 						break;
 
 					case 3:
 						*NumberPtr = VECTOR_ID_TOKEN;
 						Test_Redefine(Previous,NumberPtr,*DataPtr, allow_redefine);
-						*DataPtr   = reinterpret_cast<void *>(Create_Vector());
+						*DataPtr   = reinterpret_cast<void *>(new Vector3d());
 						Assign_Vector(reinterpret_cast<DBL *>(*DataPtr), Local_Express);
 						break;
 
@@ -8900,10 +8896,10 @@ void Parser::Destroy_Ident_Data(void *Data, int Type)
 			Destroy_Colour(reinterpret_cast<COLOUR *>(Data));
 			break;
 		case VECTOR_ID_TOKEN:
-			Destroy_Vector(reinterpret_cast<VECTOR *>(Data));
+			delete reinterpret_cast<Vector3d *>(Data);
 			break;
 		case UV_ID_TOKEN:
-			Destroy_UV_Vect(reinterpret_cast<UV_VECT *>(Data));
+			delete reinterpret_cast<Vector2d *>(Data);
 			break;
 		case VECTOR_4D_ID_TOKEN:
 			Destroy_Vector_4D(reinterpret_cast<VECTOR_4D *>(Data));
@@ -9942,9 +9938,9 @@ void *Parser::Copy_Identifier (void *Data, int Type)
 {
 	int i;
 	POV_ARRAY *a, *na;
-	VECTOR *vp;
+	Vector3d *vp;
 	DBL *dp;
-	UV_VECT *uvp;
+	Vector2d *uvp;
 	VECTOR_4D *v4p;
 	int len;
 	void *New=NULL;
@@ -9960,13 +9956,13 @@ void *Parser::Copy_Identifier (void *Data, int Type)
 			New = reinterpret_cast<void *>(Copy_Colour(*reinterpret_cast<COLOUR *>(Data)));
 			break;
 		case VECTOR_ID_TOKEN:
-			vp = Create_Vector();
-			Assign_Vector((*vp),(*(reinterpret_cast<VECTOR *>(Data))));
+			vp = new Vector3d();
+			*vp = *(reinterpret_cast<Vector3d *>(Data));
 			New=vp;
 			break;
 		case UV_ID_TOKEN:
-			uvp = Create_UV_Vect();
-			Assign_UV_Vect((*uvp),(*(reinterpret_cast<UV_VECT *>(Data))));
+			uvp = new Vector2d();
+			*uvp = *(reinterpret_cast<Vector2d *>(Data));
 			New=uvp;
 			break;
 		case VECTOR_4D_ID_TOKEN:

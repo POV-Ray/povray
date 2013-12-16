@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/parser/parstxtr.cpp $
- * $Revision: #92 $
- * $Change: 6113 $
- * $DateTime: 2013/11/20 20:39:54 $
+ * $Revision: #93 $
+ * $Change: 6122 $
+ * $DateTime: 2013/11/23 10:33:00 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -98,7 +98,7 @@ void Parser::Make_Pattern_Image(ImageData *image, FUNCTION_PTR fn, int token)
 	int j = 0;
 	DBL val = 0;
 	FunctionCode *f = sceneData->functionVM->GetFunction(*fn);
-	VECTOR point;
+	Vector3d point;
 
 	image->iwidth  = image->width;
 	image->iheight = image->height;
@@ -183,7 +183,7 @@ void Parser::Make_Pattern_Image(ImageData *image, FUNCTION_PTR fn, int token)
 ImageData *Parser::Parse_Image(int Legal, bool GammaCorrect)
 {
 	ImageData *image = NULL;
-	VECTOR Local_Vector;
+	Vector3d Local_Vector;
 	char *Name = NULL;
 	int token_id;
 	int filetype = NO_FILE;
@@ -541,6 +541,7 @@ void Parser::Parse_Image_Map (PIGMENT *Pigment)
 {
 	int reg;
 	ImageData *image;
+	Vector2d Repeat;
 
 	Parse_Begin();
 
@@ -592,7 +593,6 @@ void Parser::Parse_Image_Map (PIGMENT *Pigment)
 		END_CASE
 
 		CASE (REPEAT_TOKEN)
-			UV_VECT Repeat;
 			Parse_UV_Vect (Repeat);
 			if ((Repeat[0]<=0.0) || (Repeat[1]<=0.0))
 				Error("Zero or Negative Image Repeat Vector.");
@@ -766,6 +766,7 @@ void Parser::Parse_Image_Map (PIGMENT *Pigment)
 void Parser::Parse_Bump_Map (TNORMAL *Tnormal)
 {
 	ImageData *image;
+	Vector2d Repeat;
 
 	Parse_Begin();
 
@@ -798,7 +799,6 @@ void Parser::Parse_Bump_Map (TNORMAL *Tnormal)
 		END_CASE
 
 		CASE (REPEAT_TOKEN)
-			UV_VECT Repeat;
 			Parse_UV_Vect (Repeat);
 			if ((Repeat[0]<=0.0) || (Repeat[1]<=0.0))
 				Error("Zero or Negative Image Repeat Vector.");
@@ -848,6 +848,7 @@ void Parser::Parse_Bump_Map (TNORMAL *Tnormal)
 void Parser::Parse_Image_Pattern (TPATTERN *TPattern)
 {
 	ImageData *image;
+	Vector2d Repeat;
 
 	Parse_Begin();
 
@@ -880,7 +881,6 @@ void Parser::Parse_Image_Pattern (TPATTERN *TPattern)
 		END_CASE
 
 		CASE (REPEAT_TOKEN)
-			UV_VECT Repeat;
 			Parse_UV_Vect (Repeat);
 			if ((Repeat[0]<=0.0) || (Repeat[1]<=0.0))
 				Error("Zero or Negative Image Repeat Vector.");
@@ -972,7 +972,7 @@ void Parser::Parse_Pigment (PIGMENT **Pigment_Ptr)
 
 void Parser::Parse_Pattern (TPATTERN *New, int TPat_Type)
 {
-	VECTOR Local_Vector;
+	Vector3d Local_Vector;
 	MATRIX Local_Matrix;
 	TRANSFORM Local_Trans;
 	TURB *Local_Turb;
@@ -2070,17 +2070,17 @@ void Parser::Parse_Pattern (TPATTERN *New, int TPat_Type)
 
 		CASE (TRANSLATE_TOKEN)
 			Parse_Vector (Local_Vector);
-			Translate_Tpattern (New, Local_Vector);
+			Translate_Tpattern (New, *Local_Vector);
 		END_CASE
 
 		CASE (ROTATE_TOKEN)
 			Parse_Vector (Local_Vector);
-			Rotate_Tpattern (New, Local_Vector);
+			Rotate_Tpattern (New, *Local_Vector);
 		END_CASE
 
 		CASE (SCALE_TOKEN)
 			Parse_Scale_Vector (Local_Vector);
-			Scale_Tpattern (New, Local_Vector);
+			Scale_Tpattern (New, *Local_Vector);
 		END_CASE
 
 		CASE (MATRIX_TOKEN)
@@ -2248,7 +2248,7 @@ void Parser::Parse_Finish (FINISH **Finish_Ptr)
 {
 	Colour Temp_Colour;
 	FINISH *New;
-	VECTOR Local_Vector;
+	Vector3d Local_Vector;
 	bool diffuseAdjust = false;
 	bool phongAdjust = false;
 	bool specularAdjust = false;
@@ -2575,7 +2575,7 @@ void Parser::Parse_Finish (FINISH **Finish_Ptr)
 
 TEXTURE *Parser::Parse_Texture ()
 {
-	VECTOR Local_Vector;
+	Vector3d Local_Vector;
 	MATRIX Local_Matrix;
 	TRANSFORM Local_Trans;
 	TEXTURE *Texture;
@@ -2668,21 +2668,21 @@ TEXTURE *Parser::Parse_Texture ()
 
 			CASE (TRANSLATE_TOKEN)
 				Parse_Vector (Local_Vector);
-				Compute_Translation_Transform(&Local_Trans, Local_Vector);
+				Compute_Translation_Transform(&Local_Trans, *Local_Vector);
 				Transform_Textures (Texture, &Local_Trans);
 				Modified_Pnf = true;
 			END_CASE
 
 			CASE (ROTATE_TOKEN)
 				Parse_Vector (Local_Vector);
-				Compute_Rotation_Transform(&Local_Trans, Local_Vector);
+				Compute_Rotation_Transform(&Local_Trans, *Local_Vector);
 				Transform_Textures (Texture, &Local_Trans);
 				Modified_Pnf = true;
 			END_CASE
 
 			CASE (SCALE_TOKEN)
 				Parse_Scale_Vector (Local_Vector);
-				Compute_Scaling_Transform(&Local_Trans, Local_Vector);
+				Compute_Scaling_Transform(&Local_Trans, *Local_Vector);
 				Transform_Textures (Texture, &Local_Trans);
 				Modified_Pnf = true;
 			END_CASE
@@ -2883,6 +2883,8 @@ TEXTURE *Parser::Parse_Tiles()
 TEXTURE *Parser::Parse_Material_Map()
 {
 	TEXTURE *Texture, *Local_Texture;
+	Vector2d Repeat;
+
 	Parse_Begin ();
 
 	Texture = Create_Texture ();
@@ -2911,7 +2913,6 @@ TEXTURE *Parser::Parse_Material_Map()
 		END_CASE
 
 		CASE (REPEAT_TOKEN)
-			UV_VECT Repeat;
 			Parse_UV_Vect (Repeat);
 			if ((Repeat[0]<=0.0) || (Repeat[1]<=0.0))
 				Error("Zero or Negative Image Repeat Vector.");
@@ -2981,7 +2982,7 @@ TEXTURE *Parser::Parse_Material_Map()
 
 TEXTURE *Parser::Parse_Vers1_Texture ()
 {
-	VECTOR Local_Vector;
+	Vector3d Local_Vector;
 	MATRIX Local_Matrix;
 	TRANSFORM Local_Trans;
 	TURB *Local_Turb;
@@ -3353,19 +3354,19 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
 
 				CASE (TRANSLATE_TOKEN)
 					Parse_Vector (Local_Vector);
-					Compute_Translation_Transform(&Local_Trans, Local_Vector);
+					Compute_Translation_Transform(&Local_Trans, *Local_Vector);
 					Transform_Textures (Texture, &Local_Trans);
 				END_CASE
 
 				CASE (ROTATE_TOKEN)
 					Parse_Vector (Local_Vector);
-					Compute_Rotation_Transform(&Local_Trans, Local_Vector);
+					Compute_Rotation_Transform(&Local_Trans, *Local_Vector);
 					Transform_Textures (Texture, &Local_Trans);
 				END_CASE
 
 				CASE (SCALE_TOKEN)
 					Parse_Scale_Vector (Local_Vector);
-					Compute_Scaling_Transform(&Local_Trans, Local_Vector);
+					Compute_Scaling_Transform(&Local_Trans, *Local_Vector);
 					Transform_Textures (Texture, &Local_Trans);
 				END_CASE
 
@@ -3432,26 +3433,26 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
 
 void Parser::Parse_Texture_Transform (TEXTURE *Texture)
 {
-	VECTOR Local_Vector;
+	Vector3d Local_Vector;
 	MATRIX Local_Matrix;
 	TRANSFORM Local_Trans;
 
 	EXPECT
 		CASE (TRANSLATE_TOKEN)
 			Parse_Vector (Local_Vector);
-			Compute_Translation_Transform(&Local_Trans, Local_Vector);
+			Compute_Translation_Transform(&Local_Trans, *Local_Vector);
 			Transform_Textures (Texture, &Local_Trans);
 		END_CASE
 
 		CASE (ROTATE_TOKEN)
 			Parse_Vector (Local_Vector);
-			Compute_Rotation_Transform(&Local_Trans, Local_Vector);
+			Compute_Rotation_Transform(&Local_Trans, *Local_Vector);
 			Transform_Textures (Texture, &Local_Trans);
 		END_CASE
 
 		CASE (SCALE_TOKEN)
 			Parse_Scale_Vector (Local_Vector);
-			Compute_Scaling_Transform(&Local_Trans, Local_Vector);
+			Compute_Scaling_Transform(&Local_Trans, *Local_Vector);
 			Transform_Textures (Texture, &Local_Trans);
 		END_CASE
 
@@ -3508,7 +3509,7 @@ void Parser::Parse_Media(vector<Media>& medialist)
 	Media IMediaObj;
 	Media *IMedia = &IMediaObj;
 	TRANSFORM Local_Trans;
-	VECTOR Local_Vector;
+	Vector3d Local_Vector;
 	MATRIX Local_Matrix;
 
 	Parse_Begin();
@@ -3649,19 +3650,19 @@ void Parser::Parse_Media(vector<Media>& medialist)
 
 		CASE (TRANSLATE_TOKEN)
 			Parse_Vector (Local_Vector);
-			Compute_Translation_Transform(&Local_Trans, Local_Vector);
+			Compute_Translation_Transform(&Local_Trans, *Local_Vector);
 			Transform_Density (IMedia->Density, &Local_Trans);
 		END_CASE
 
 		CASE (ROTATE_TOKEN)
 			Parse_Vector (Local_Vector);
-			Compute_Rotation_Transform(&Local_Trans, Local_Vector);
+			Compute_Rotation_Transform(&Local_Trans, *Local_Vector);
 			Transform_Density (IMedia->Density, &Local_Trans);
 		END_CASE
 
 		CASE (SCALE_TOKEN)
 			Parse_Scale_Vector (Local_Vector);
-			Compute_Scaling_Transform(&Local_Trans, Local_Vector);
+			Compute_Scaling_Transform(&Local_Trans, *Local_Vector);
 			Transform_Density (IMedia->Density, &Local_Trans);
 		END_CASE
 
@@ -3870,7 +3871,7 @@ void Parser::Parse_Media_Density_Pattern(PIGMENT **Density_Ptr)
 
 FOG *Parser::Parse_Fog()
 {
-	VECTOR Vector;
+	Vector3d Vector;
 	MATRIX Matrix;
 	TRANSFORM Trans;
 	FOG *Fog;
@@ -3966,13 +3967,13 @@ FOG *Parser::Parse_Fog()
 
 		CASE (ROTATE_TOKEN)
 			Parse_Vector(Vector);
-			Compute_Rotation_Transform(&Trans, Vector);
+			Compute_Rotation_Transform(&Trans, *Vector);
 			MTransDirection(Fog->Up, Fog->Up, &Trans);
 		END_CASE
 
 		CASE (SCALE_TOKEN)
 			Parse_Vector(Vector);
-			Compute_Scaling_Transform(&Trans, Vector);
+			Compute_Scaling_Transform(&Trans, *Vector);
 			MTransDirection(Fog->Up, Fog->Up, &Trans);
 		END_CASE
 
@@ -3980,7 +3981,7 @@ FOG *Parser::Parse_Fog()
 			Parse_Vector(Vector);
 			Warning(0, "A fog's up vector can't be translated.");
 /*
-			Compute_Translation_Transform(&Trans, Vector);
+			Compute_Translation_Transform(&Trans, *Vector);
 			MTransDirection(Fog->Up, Fog->Up, &Trans);
 */
 		END_CASE
@@ -4220,7 +4221,7 @@ RAINBOW *Parser::Parse_Rainbow()
 
 SKYSPHERE *Parser::Parse_Skysphere()
 {
-	VECTOR Local_Vector;
+	Vector3d Local_Vector;
 	MATRIX Local_Matrix;
 	TRANSFORM Local_Trans;
 	SKYSPHERE *Skysphere;
@@ -4256,17 +4257,17 @@ SKYSPHERE *Parser::Parse_Skysphere()
 
 		CASE (TRANSLATE_TOKEN)
 			Parse_Vector (Local_Vector);
-			Translate_Skysphere(Skysphere, Local_Vector);
+			Translate_Skysphere(Skysphere, *Local_Vector);
 		END_CASE
 
 		CASE (ROTATE_TOKEN)
 			Parse_Vector (Local_Vector);
-			Rotate_Skysphere(Skysphere, Local_Vector);
+			Rotate_Skysphere(Skysphere, *Local_Vector);
 		END_CASE
 
 		CASE (SCALE_TOKEN)
 			Parse_Scale_Vector (Local_Vector);
-			Scale_Skysphere(Skysphere, Local_Vector);
+			Scale_Skysphere(Skysphere, *Local_Vector);
 		END_CASE
 
 		CASE (MATRIX_TOKEN)
@@ -4454,7 +4455,7 @@ void Parser::Parse_Warp (WARP **Warp_Ptr)
 	TURB *Turb;
 	REPEAT *Repeat;
 	BLACK_HOLE *Black_Hole;
-	VECTOR Local_Vector;
+	Vector3d Local_Vector;
 	CYLW *CylW;
 	SPHEREW *SphereW;
 	TOROIDAL *Toroidal;
@@ -4466,7 +4467,7 @@ void Parser::Parse_Warp (WARP **Warp_Ptr)
 		CASE(TURBULENCE_TOKEN)
 			New=Create_Warp(EXTRA_TURB_WARP);
 			Turb=reinterpret_cast<TURB *>(New);
-			Parse_Vector(Turb->Turbulence);
+			Parse_Vector(Local_Vector); Assign_Vector(Turb->Turbulence, *Local_Vector);
 			EXPECT
 				CASE(OCTAVES_TOKEN)
 					Turb->Octaves = (int)Parse_Float();
@@ -4553,7 +4554,7 @@ void Parser::Parse_Warp (WARP **Warp_Ptr)
 			New = Create_Warp(BLACK_HOLE_WARP) ;
 			Black_Hole = reinterpret_cast<BLACK_HOLE *>(New) ;
 			Parse_Vector (Local_Vector) ;
-			Assign_Vector (Black_Hole->Center, Local_Vector) ;
+			Assign_Vector (Black_Hole->Center, *Local_Vector) ;
 			Parse_Comma () ;
 			Black_Hole->Radius = Parse_Float () ;
 			Black_Hole->Radius_Squared = Black_Hole->Radius * Black_Hole->Radius ;
@@ -4606,8 +4607,8 @@ void Parser::Parse_Warp (WARP **Warp_Ptr)
 			EXPECT
 				CASE(ORIENTATION_TOKEN)
 					Parse_Vector (Local_Vector) ;
-					VNormalizeEq(Local_Vector);
-					Assign_Vector (CylW->Orientation_Vector, Local_Vector) ;
+					Local_Vector.normalize();
+					Assign_Vector (CylW->Orientation_Vector, *Local_Vector) ;
 				END_CASE
 
 				CASE(DIST_EXP_TOKEN)
@@ -4628,8 +4629,8 @@ void Parser::Parse_Warp (WARP **Warp_Ptr)
 			EXPECT
 				CASE(ORIENTATION_TOKEN)
 					Parse_Vector (Local_Vector) ;
-					VNormalizeEq(Local_Vector);
-					Assign_Vector (SphereW->Orientation_Vector, Local_Vector) ;
+					Local_Vector.normalize();
+					Assign_Vector (SphereW->Orientation_Vector, *Local_Vector) ;
 				END_CASE
 
 				CASE(DIST_EXP_TOKEN)
@@ -4649,10 +4650,10 @@ void Parser::Parse_Warp (WARP **Warp_Ptr)
 			PlanarW = reinterpret_cast<PLANARW *>(New) ;
 			if(Allow_Vector(Local_Vector))
 			{
-					VNormalizeEq(Local_Vector);
-					Assign_Vector(PlanarW->Orientation_Vector,Local_Vector);
-					Parse_Comma();
-					PlanarW->OffSet=Parse_Float();
+				Local_Vector.normalize();
+				Assign_Vector(PlanarW->Orientation_Vector,*Local_Vector);
+				Parse_Comma();
+				PlanarW->OffSet=Parse_Float();
 			}
 			EXIT
 		END_CASE
@@ -4663,8 +4664,8 @@ void Parser::Parse_Warp (WARP **Warp_Ptr)
 			EXPECT
 				CASE(ORIENTATION_TOKEN)
 					Parse_Vector (Local_Vector) ;
-					VNormalizeEq(Local_Vector);
-					Assign_Vector (Toroidal->Orientation_Vector, Local_Vector) ;
+					Local_Vector.normalize();
+					Assign_Vector (Toroidal->Orientation_Vector, *Local_Vector) ;
 				END_CASE
 
 				CASE(DIST_EXP_TOKEN)
@@ -4713,7 +4714,7 @@ void Parser::Parse_Material(MATERIAL *Material)
 	MATERIAL *Temp;
 	TEXTURE *Texture;
 	TEXTURE * Int_Texture;
-	VECTOR Local_Vector;
+	Vector3d Local_Vector;
 	MATRIX Local_Matrix;
 	TRANSFORM Local_Trans;
 
@@ -4761,7 +4762,7 @@ void Parser::Parse_Material(MATERIAL *Material)
 
 		CASE (TRANSLATE_TOKEN)
 			Parse_Vector (Local_Vector);
-			Compute_Translation_Transform(&Local_Trans, Local_Vector);
+			Compute_Translation_Transform(&Local_Trans, *Local_Vector);
 			Transform_Textures (Material->Texture, &Local_Trans);
 			if(Material->interior!= NULL)
 				Material->interior->Transform(&Local_Trans);
@@ -4769,7 +4770,7 @@ void Parser::Parse_Material(MATERIAL *Material)
 
 		CASE (ROTATE_TOKEN)
 			Parse_Vector (Local_Vector);
-			Compute_Rotation_Transform(&Local_Trans, Local_Vector);
+			Compute_Rotation_Transform(&Local_Trans, *Local_Vector);
 			Transform_Textures (Material->Texture, &Local_Trans);
 			if(Material->interior!= NULL)
 				Material->interior->Transform(&Local_Trans);
@@ -4777,7 +4778,7 @@ void Parser::Parse_Material(MATERIAL *Material)
 
 		CASE (SCALE_TOKEN)
 			Parse_Scale_Vector (Local_Vector);
-			Compute_Scaling_Transform(&Local_Trans, Local_Vector);
+			Compute_Scaling_Transform(&Local_Trans, *Local_Vector);
 			Transform_Textures (Material->Texture, &Local_Trans);
 			if(Material->interior!= NULL)
 				Material->interior->Transform(&Local_Trans);
@@ -4834,7 +4835,7 @@ void Parser::Parse_Material(MATERIAL *Material)
 
 void Parser::Parse_PatternFunction(TPATTERN *New)
 {
-	VECTOR Local_Vector;
+	Vector3d Local_Vector;
 	MATRIX Local_Matrix;
 	TRANSFORM Local_Trans;
 	TURB *Local_Turb;
@@ -5431,17 +5432,17 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
 
 		CASE (TRANSLATE_TOKEN)
 			Parse_Vector (Local_Vector);
-			Translate_Tpattern (New, Local_Vector);
+			Translate_Tpattern (New, *Local_Vector);
 		END_CASE
 
 		CASE (ROTATE_TOKEN)
 			Parse_Vector (Local_Vector);
-			Rotate_Tpattern (New, Local_Vector);
+			Rotate_Tpattern (New, *Local_Vector);
 		END_CASE
 
 		CASE (SCALE_TOKEN)
 			Parse_Scale_Vector (Local_Vector);
-			Scale_Tpattern (New, Local_Vector);
+			Scale_Tpattern (New, *Local_Vector);
 		END_CASE
 
 		CASE (MATRIX_TOKEN)

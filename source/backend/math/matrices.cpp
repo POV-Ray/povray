@@ -24,11 +24,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/math/matrices.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/math/matrices.cpp $
+ * $Revision: #19 $
+ * $Change: 6122 $
+ * $DateTime: 2013/11/23 10:33:00 $
+ * $Author: clipka $
  *******************************************************************************/
 
 // frame.h must always be the first POV file included (pulls in platform config)
@@ -1190,43 +1190,6 @@ void Destroy_Transform (TRANSFORM *Trans)
 *
 ******************************************************************************/
 
-VECTOR *Create_Vector ()
-{
-	VECTOR *New;
-
-	New = reinterpret_cast<VECTOR *>(POV_MALLOC(sizeof (VECTOR), "vector"));
-
-	Make_Vector (*New, 0.0, 0.0, 0.0);
-
-	return (New);
-}
-
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*   
-* OUTPUT
-*   
-* RETURNS
-*   
-* AUTHOR
-*
-*   POV-Ray Team
-*   
-* DESCRIPTION
-*
-*   -
-*
-* CHANGES
-*
-*   -
-*
-******************************************************************************/
-
 DBL *Create_Float ()
 {
 	DBL *New_Float;
@@ -1383,18 +1346,6 @@ void MInvers(MATRIX r, const MATRIX  m)
 	r[1][0] = -d01/D; r[1][1] =  d11/D;  r[1][2] = -d21/D; r[1][3] =  d31/D;
 	r[2][0] =  d02/D; r[2][1] = -d12/D;  r[2][2] =  d22/D; r[2][3] = -d32/D;
 	r[3][0] = -d03/D; r[3][1] =  d13/D;  r[3][2] = -d23/D; r[3][3] =  d33/D;
-}
-
-UV_VECT *Create_UV_Vect ()
-{
-	UV_VECT *New;
-
-	New = reinterpret_cast<UV_VECT *>(POV_MALLOC(sizeof (UV_VECT), "uv vector"));
-
-	(*New)[0]= 0.0;
-	(*New)[1]= 0.0;
-
-	return (New);
 }
 
 VECTOR_4D *Create_Vector_4D ()

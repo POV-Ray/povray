@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/triangle.cpp $
- * $Revision: #33 $
- * $Change: 6119 $
- * $DateTime: 2013/11/22 20:31:53 $
+ * $Revision: #34 $
+ * $Change: 6121 $
+ * $DateTime: 2013/11/23 07:38:50 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -431,7 +431,7 @@ bool Triangle::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThrea
 		Thread->Stats()[Ray_Triangle_Tests_Succeeded]++;
 		IPoint = ray.Evaluate(Depth);
 
-		if (Clip.empty() || Point_In_Clip(*IPoint,Clip, Thread))
+		if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
 		{
 			Depth_Stack->push(Intersection(Depth,IPoint,this));
 
@@ -599,7 +599,7 @@ bool Triangle::Intersect(const Ray& ray, DBL *Depth) const
 *
 ******************************************************************************/
 
-bool Triangle::Inside(const VECTOR, TraceThreadData *Thread) const
+bool Triangle::Inside(const Vector3d&, TraceThreadData *Thread) const
 {
 	return(false);
 }
@@ -632,9 +632,9 @@ bool Triangle::Inside(const VECTOR, TraceThreadData *Thread) const
 *
 ******************************************************************************/
 
-void Triangle::Normal(VECTOR Result, Intersection *, TraceThreadData *) const
+void Triangle::Normal(Vector3d& Result, Intersection *, TraceThreadData *) const
 {
-	Assign_Vector(Result, Normal_Vector);
+	Result = Vector3d(Normal_Vector);
 }
 
 
@@ -703,7 +703,7 @@ void Triangle::Normal(VECTOR Result, Intersection *, TraceThreadData *) const
 *
 ******************************************************************************/
 
-void SmoothTriangle::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) const
+void SmoothTriangle::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread) const
 {
 	int Axis;
 	DBL u, v;
@@ -715,7 +715,7 @@ void SmoothTriangle::Normal(VECTOR Result, Intersection *Inter, TraceThreadData 
 
 	if (u < EPSILON)
 	{
-		Assign_Vector(Result, N1);
+		Result = Vector3d(N1);
 
 		return;
 	}
@@ -730,7 +730,7 @@ void SmoothTriangle::Normal(VECTOR Result, Intersection *Inter, TraceThreadData 
 	Result[Y] = N1[Y] + u * (N2[Y] - N1[Y] + v * (N3[Y] - N2[Y]));
 	Result[Z] = N1[Z] + u * (N2[Z] - N1[Z] + v * (N3[Z] - N2[Z]));
 
-	VNormalize(Result, Result);
+	Result.normalize();
 }
 
 
@@ -761,13 +761,13 @@ void SmoothTriangle::Normal(VECTOR Result, Intersection *Inter, TraceThreadData 
 *
 ******************************************************************************/
 
-void Triangle::Translate(const VECTOR Vector, const TRANSFORM *)
+void Triangle::Translate(const Vector3d& Vector, const TRANSFORM *)
 {
 	if(!Test_Flag(this, DEGENERATE_FLAG))
 	{
-		VAddEq(P1, Vector);
-		VAddEq(P2, Vector);
-		VAddEq(P3, Vector);
+		VAddEq(P1, *Vector);
+		VAddEq(P2, *Vector);
+		VAddEq(P3, *Vector);
 
 		Compute_Triangle();
 	}
@@ -801,7 +801,7 @@ void Triangle::Translate(const VECTOR Vector, const TRANSFORM *)
 *
 ******************************************************************************/
 
-void Triangle::Rotate(const VECTOR, const TRANSFORM *tr)
+void Triangle::Rotate(const Vector3d&, const TRANSFORM *tr)
 {
 	if (!Test_Flag(this, DEGENERATE_FLAG))
 	{
@@ -837,13 +837,13 @@ void Triangle::Rotate(const VECTOR, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void Triangle::Scale(const VECTOR Vector, const TRANSFORM *)
+void Triangle::Scale(const Vector3d& Vector, const TRANSFORM *)
 {
 	if(!Test_Flag(this, DEGENERATE_FLAG))
 	{
-		VEvaluateEq(P1, Vector);
-		VEvaluateEq(P2, Vector);
-		VEvaluateEq(P3, Vector);
+		VEvaluateEq(P1, *Vector);
+		VEvaluateEq(P2, *Vector);
+		VEvaluateEq(P3, *Vector);
 
 		Compute_Triangle();
 	}
@@ -1068,13 +1068,13 @@ Triangle::~Triangle()
 *
 ******************************************************************************/
 
-void SmoothTriangle::Translate(const VECTOR Vector, const TRANSFORM *)
+void SmoothTriangle::Translate(const Vector3d& Vector, const TRANSFORM *)
 {
 	if(!Test_Flag(this, DEGENERATE_FLAG))
 	{
-		VAddEq(P1, Vector);
-		VAddEq(P2, Vector);
-		VAddEq(P3, Vector);
+		VAddEq(P1, *Vector);
+		VAddEq(P2, *Vector);
+		VAddEq(P3, *Vector);
 
 		Compute_Triangle();
 	}
@@ -1108,7 +1108,7 @@ void SmoothTriangle::Translate(const VECTOR Vector, const TRANSFORM *)
 *
 ******************************************************************************/
 
-void SmoothTriangle::Rotate(const VECTOR, const TRANSFORM *tr)
+void SmoothTriangle::Rotate(const Vector3d&, const TRANSFORM *tr)
 {
 	if(!Test_Flag(this, DEGENERATE_FLAG))
 	{
@@ -1144,15 +1144,15 @@ void SmoothTriangle::Rotate(const VECTOR, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void SmoothTriangle::Scale(const VECTOR Vector, const TRANSFORM *)
+void SmoothTriangle::Scale(const Vector3d& Vector, const TRANSFORM *)
 {
 	DBL Length;
 
 	if(!Test_Flag(this, DEGENERATE_FLAG))
 	{
-		VEvaluateEq(P1, Vector);
-		VEvaluateEq(P2, Vector);
-		VEvaluateEq(P3, Vector);
+		VEvaluateEq(P1, *Vector);
+		VEvaluateEq(P2, *Vector);
+		VEvaluateEq(P3, *Vector);
 
 		N1[X] /= Vector[X];
 		N1[Y] /= Vector[Y];

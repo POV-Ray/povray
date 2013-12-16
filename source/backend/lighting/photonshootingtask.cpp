@@ -27,9 +27,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/lighting/photonshootingtask.cpp $
- * $Revision: #20 $
- * $Change: 6119 $
- * $DateTime: 2013/11/22 20:31:53 $
+ * $Revision: #21 $
+ * $Change: 6121 $
+ * $DateTime: 2013/11/23 07:38:50 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -355,7 +355,7 @@ void PhotonShootingTask::ShootPhotonsAtObject(LightTargetCombo& combo)
 
 					for(vector<ObjectPtr>::iterator object = GetSceneData()->objects.begin(); object != GetSceneData()->objects.end(); object++)
 					{
-						if((*object)->Inside(*ray.Origin, renderDataPtr) && ((*object)->interior != NULL))
+						if((*object)->Inside(ray.Origin, renderDataPtr) && ((*object)->interior != NULL))
 							ray.AppendInterior((*object)->interior);
 					}
 

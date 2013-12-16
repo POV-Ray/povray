@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/quadrics.cpp $
- * $Revision: #37 $
- * $Change: 6119 $
- * $DateTime: 2013/11/22 20:31:53 $
+ * $Revision: #38 $
+ * $Change: 6121 $
+ * $DateTime: 2013/11/23 07:38:50 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -121,7 +121,7 @@ bool Quadric::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThread
 		if ((Depth1 > DEPTH_TOLERANCE) && (Depth1 < MAX_DISTANCE))
 		{
 			IPoint = ray.Evaluate(Depth1);
-			if (Clip.empty() || Point_In_Clip(*IPoint, Clip, Thread))
+			if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
 			{
 				Depth_Stack->push(Intersection(Depth1, IPoint, this));
 
@@ -133,7 +133,7 @@ bool Quadric::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThread
 		{
 			IPoint = ray.Evaluate(Depth2);
 
-			if (Clip.empty() || Point_In_Clip(*IPoint, Clip, Thread))
+			if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
 			{
 				Depth_Stack->push(Intersection(Depth2, IPoint, this));
 
@@ -250,7 +250,7 @@ bool Quadric::Intersect(const Ray& ray, DBL *Depth1, DBL *Depth2) const
 *
 ******************************************************************************/
 
-bool Quadric::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
+bool Quadric::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 {
 	/* This is faster and shorter. [DB 7/94] */
 
@@ -287,7 +287,7 @@ bool Quadric::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
 *
 ******************************************************************************/
 
-void Quadric::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) const
+void Quadric::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread) const
 {
 	DBL Len;
 
@@ -308,18 +308,18 @@ void Quadric::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread
 	            2.0 * QH * Inter->IPoint[Z] +
 	                  QI;
 
-	VLength(Len, Result);
+	Len = Result.length();
 
 	if (Len == 0.0)
 	{
 		/* The normal is not defined at this point of the surface. */
 		/* Set it to any arbitrary direction. */
 
-		Make_Vector(Result, 1.0, 0.0, 0.0);
+		Result = Vector3d(1.0, 0.0, 0.0);
 	}
 	else
 	{
-		VInverseScaleEq(Result, Len);
+		Result /= Len;
 	}
 }
 
@@ -483,7 +483,7 @@ void Quadric::Matrix_To_Quadric(const MATRIX Matrix)
 *
 ******************************************************************************/
 
-void Quadric::Translate(const VECTOR, const TRANSFORM *tr)
+void Quadric::Translate(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
@@ -516,7 +516,7 @@ void Quadric::Translate(const VECTOR, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void Quadric::Rotate(const VECTOR, const TRANSFORM *tr)
+void Quadric::Rotate(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
@@ -549,7 +549,7 @@ void Quadric::Rotate(const VECTOR, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void Quadric::Scale(const VECTOR, const TRANSFORM *tr)
+void Quadric::Scale(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
