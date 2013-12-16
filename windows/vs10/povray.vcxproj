@@ -518,7 +518,6 @@
     <ClInclude Include="..\pvguiext.h" />
     <ClInclude Include="..\pvlegal.h" />
     <ClInclude Include="..\pvmem.h" />
-    <ClInclude Include="..\pvtips.h" />
     <ClInclude Include="..\resource.h" />
     <ClInclude Include="..\winprecomp.h" />
   </ItemGroup>
