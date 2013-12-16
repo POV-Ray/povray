@@ -26,11 +26,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/vfe/win/syspovconfig.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/vfe/win/syspovconfig.h $
+ * $Revision: #40 $
+ * $Change: 6131 $
+ * $DateTime: 2013/11/25 11:38:15 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #ifndef __SYSPOVCONFIG_H__
@@ -194,8 +194,7 @@ namespace povwin
 #pragma warning(pop)
 #endif
 
-#define fseek64(stream,offset,whence)       _fseeki64(stream,offset,whence)
-#define lseek64(handle,offset,whence)       _lseeki64(handle,offset,whence)
+#define lseek64(handle,offset,whence) _lseeki64(handle,offset,whence)
 
 namespace pov_base
 {
