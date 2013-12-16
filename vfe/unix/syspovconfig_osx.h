@@ -26,9 +26,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/vfe/unix/syspovconfig_osx.h $
- * $Revision: #2 $
- * $Change: 6133 $
- * $DateTime: 2013/11/25 15:28:53 $
+ * $Revision: #3 $
+ * $Change: 6148 $
+ * $DateTime: 2013/11/30 04:25:45 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -52,10 +52,10 @@
 	#define POV_LONG long long
 #endif
 
-// TODO - the TLS stuff is just copied from the Linux settings; someone needs to verify OS X compatibility.
-#define DECLARE_THREAD_LOCAL_PTR(ptrType, ptrName)                __thread ptrType *ptrName
-#define IMPLEMENT_THREAD_LOCAL_PTR(ptrType, ptrName, ignore)      __thread ptrType *ptrName
-#define GET_THREAD_LOCAL_PTR(ptrName)                             (ptrName)
-#define SET_THREAD_LOCAL_PTR(ptrName, ptrValue)                   (ptrName = ptrValue)
+// The following macros are deliberately left undefined; POV-Ray will use boost as a fallback there:
+//  DECLARE_THREAD_LOCAL_PTR(ptrType, ptrName)
+//  IMPLEMENT_THREAD_LOCAL_PTR(ptrType, ptrName, ignore)
+//  GET_THREAD_LOCAL_PTR(ptrName)
+//  SET_THREAD_LOCAL_PTR(ptrName, ptrValue)
 
 #endif
