@@ -24,11 +24,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/parser/parse.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/parser/parse.cpp $
+ * $Revision: #188 $
+ * $Change: 6075 $
+ * $DateTime: 2013/11/09 16:27:09 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #include <cctype>
@@ -6158,7 +6158,7 @@ ObjectPtr Parser::Parse_TrueType ()
 			EXIT
 		END_CASE
 		OTHERWISE
-		  Expectation_Error ("ttf or internal");
+			Expectation_Error ("ttf or internal");
 		END_CASE
 	END_EXPECT
 
@@ -6184,7 +6184,6 @@ ObjectPtr Parser::Parse_TrueType ()
 		/* Free up the filename  */
 		POV_FREE (filename);
 	}
-
 
 	/* Free up the text string memory */
 	POV_FREE (text_string);

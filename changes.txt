@@ -31,7 +31,7 @@ Changes between 3.7.RC7 and 3.7.0
 
    - For technical reasons the Macintosh OS graphical user interface was not
      ready at the time of this release. However, the source code will be made
-     available to users so they can build there own binary if the wish.
+     available to users so they can build their own binary if the wish.
 
 Windows Related:
 ----------------

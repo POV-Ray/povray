@@ -26,11 +26,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/vfe/win/console/winconsole.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/vfe/win/console/winconsole.cpp $
+ * $Revision: #12 $
+ * $Change: 6075 $
+ * $DateTime: 2013/11/09 16:27:09 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #include "vfe.h"
@@ -52,7 +52,7 @@ namespace pov_frontend
 }
 
 
-static void PrintStatus (vfeSession *session)
+void PrintStatus (vfeSession *session)
 {
   string str;
   vfeSession::MessageType type;
@@ -72,7 +72,7 @@ static void PrintStatus (vfeSession *session)
   }
 }
 
-static void ErrorExit(vfeSession *session)
+void ErrorExit(vfeSession *session)
 {
   fprintf (stderr, "%s\n", session->GetErrorString());
   session->Shutdown();
@@ -94,13 +94,13 @@ int main (int argc, char **argv)
   fprintf(stderr,
           "This is an example of a minimal console build of POV-Ray under Windows.\n\n"
           "Persistence of Vision Raytracer(tm) " POV_RAY_VERSION COMPILER_VER SSE2_INCLUDED "." PVENGINE_VER ".\n"
-		  DISTRIBUTION_MESSAGE_1 "\n"
-		  DISTRIBUTION_MESSAGE_2 "\n"
-		  DISTRIBUTION_MESSAGE_3 "\n"
-		  POV_RAY_COPYRIGHT "\n"
-		  DISCLAIMER_MESSAGE_1 "\n"
-		  DISCLAIMER_MESSAGE_2 "\n\n");
-  
+          DISTRIBUTION_MESSAGE_1 "\n"
+          DISTRIBUTION_MESSAGE_2 "\n"
+          DISTRIBUTION_MESSAGE_3 "\n"
+          POV_RAY_COPYRIGHT "\n"
+          DISCLAIMER_MESSAGE_1 "\n"
+          DISCLAIMER_MESSAGE_2 "\n\n");
+
   if (session->Initialize(NULL, NULL) != vfeNoError)
     ErrorExit(session);
 
