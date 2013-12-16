@@ -40,11 +40,11 @@
 #
 # Note that the 'clean' and 'doc(s)(clean)' options are mutually exclusive.
 #
-# $File: //depot/public/povray/3.x/unix/prebuild.sh $
-# $Revision: #1 $
-# $Change: 6069 $
-# $DateTime: 2013/11/06 11:59:40 $
-# $Author: chrisc $
+# $File: //depot/povray/smp/unix/prebuild.sh $
+# $Revision: #31 $
+# $Change: 6136 $
+# $DateTime: 2013/11/25 16:36:15 $
+# $Author: clipka $
 # $Log$
 ###############################################################################
 
@@ -353,8 +353,8 @@ echo "make maintainer-clean" 1>&2  &&  make maintainer-clean 1>&2 ; \
   for file in \
     AUTHORS ChangeLog configure.ac COPYING NEWS README VERSION \
     povray.1 povray.conf \
-    scripts/ \
-    ../distribution/ini/ ../distribution/include/ ../distribution/scenes/
+    scripts \
+    ../distribution/ini ../distribution/include ../distribution/scenes
   do
     out=`basename $file`
     echo "Create ../$out`test -d $file && echo /`"
@@ -724,7 +724,7 @@ aclocal -I .
 autoheader --warnings=all
 
 # Create all Makefile.in's from Makefile.am's
-automake --warnings=all --add-missing ###--ignore-deps
+automake --add-missing --warnings=all ###--ignore-deps
 
 # Create configure from configure.ac
 autoconf --warnings=all

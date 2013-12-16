@@ -1,9 +1,9 @@
 /*******************************************************************************
- * $File: //depot/public/povray/3.x/source/precomp.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/precomp.h $
+ * $Revision: #3 $
+ * $Change: 6132 $
+ * $DateTime: 2013/11/25 14:23:41 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #include <algorithm>
@@ -37,6 +37,6 @@
 #include <boost/thread.hpp>
 #include <boost/thread/condition.hpp>
 #include <boost/unordered_map.hpp>
-#include <boost/weak_ptr.hpp>
+#include <boost/tr1/memory.hpp>
 
 

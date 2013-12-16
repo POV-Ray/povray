@@ -26,11 +26,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/vfe/unix/vfeplatform.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/vfe/unix/vfeplatform.cpp $
+ * $Revision: #18 $
+ * $Change: 6132 $
+ * $DateTime: 2013/11/25 14:23:41 $
+ * $Author: clipka $
  *******************************************************************************/
 
 // must come first
@@ -72,7 +72,7 @@ namespace vfePlatform
 	vfeUnixSession::vfeUnixSession(int id) :
 		m_LastTimestamp(0), m_TimestampOffset(0), vfeSession(id)
 	{
-		m_OptionsProc = boost::shared_ptr<UnixOptionsProcessor>(new UnixOptionsProcessor(this));
+		m_OptionsProc = shared_ptr<UnixOptionsProcessor>(new UnixOptionsProcessor(this));
 	}
 
 	/////////////////////////////////////////////////////////////////////////
@@ -324,7 +324,7 @@ namespace vfePlatform
 	// on the requirements for these methods.
 	/////////////////////////////////////////////////////////////////////////////
 
-	UnixShelloutProcessing::UnixShelloutProcessing(POVMS_Object& opts, const string& scene, uint width, uint height): ShelloutProcessing(opts, scene, width, height)
+	UnixShelloutProcessing::UnixShelloutProcessing(POVMS_Object& opts, const string& scene, unsigned int width, unsigned int height): ShelloutProcessing(opts, scene, width, height)
 	{
 		m_ProcessRunning = false;
 		m_ProcessId = m_LastError = m_ExitCode = 0;

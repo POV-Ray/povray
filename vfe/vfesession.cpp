@@ -540,7 +540,7 @@ const char *vfeSession::GetBackendStateName (void) const
 // Returns a copy of the shared pointer containing the current instance
 // of a pov_frontend::Display-derived render preview instance, which may
 // be NULL.
-boost::shared_ptr<Display> vfeSession::GetDisplay() const
+shared_ptr<Display> vfeSession::GetDisplay() const
 {
   if (m_Frontend == NULL)
     return (shared_ptr<Display>());

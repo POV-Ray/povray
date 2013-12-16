@@ -22,11 +22,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/base/image/colourspace.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/base/image/colourspace.cpp $
+ * $Revision: #8 $
+ * $Change: 6132 $
+ * $DateTime: 2013/11/25 14:23:41 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #include <vector>
@@ -46,7 +46,7 @@ namespace pov_base
 {
 
 // definitions of static GammaCurve member variables to satisfy the linker
-list<boost::weak_ptr<GammaCurve> > GammaCurve::cache;
+list<weak_ptr<GammaCurve> > GammaCurve::cache;
 boost::mutex GammaCurve::cacheMutex;
 
 // definitions of static GammaCurve-derivatives' member variables to satisfy the linker
@@ -95,7 +95,7 @@ GammaCurvePtr GammaCurve::GetMatching(const GammaCurvePtr& newInstance)
 	// Check if we already have created a matching gamma curve object; if so, return that object instead.
 	// Also, make sure we get the new object stored (as we're using weak pointers, we may have stale entries;
 	// it also won't hurt if we store the new instance, even if we decide to discard it)
-	for(list<boost::weak_ptr<GammaCurve> >::iterator i(cache.begin()); i != cache.end(); i++)
+	for(list<weak_ptr<GammaCurve> >::iterator i(cache.begin()); i != cache.end(); i++)
 	{
 		oldInstance = (*i).lock();
 		if (!oldInstance)
@@ -247,7 +247,7 @@ SimpleGammaCurvePtr PowerLawGammaCurve::GetByEncodingGamma(float gamma)
 {
 	if (IsNeutral(gamma))
 		return NeutralGammaCurve::Get();
-	return boost::dynamic_pointer_cast<SimpleGammaCurve,GammaCurve>(GetMatching(GammaCurvePtr(new PowerLawGammaCurve(gamma))));
+	return std::tr1::dynamic_pointer_cast<SimpleGammaCurve,GammaCurve>(GetMatching(GammaCurvePtr(new PowerLawGammaCurve(gamma))));
 }
 SimpleGammaCurvePtr PowerLawGammaCurve::GetByDecodingGamma(float gamma)
 {
