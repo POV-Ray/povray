@@ -24,11 +24,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/base/povmscpp.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/base/povmscpp.cpp $
+ * $Revision: #49 $
+ * $Change: 6080 $
+ * $DateTime: 2013/11/10 06:03:13 $
+ * $Author: clipka $
  *******************************************************************************/
 
 // configbase.h must always be the first POV file included within base *.cpp files
@@ -36,7 +36,7 @@
 
 #include "povmscpp.h"
 
-#include "zlib.h"
+#include <zlib.h>
 
 // this must be the last file included
 #include "base/povdebug.h"
