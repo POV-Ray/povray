@@ -44,6 +44,8 @@ Fixed or Mitigated Bugs
   - Modify `./configure` script to invoke `stat` with `-c` parameter instead
     of `--format` on busybox-style systems (partially fixes GitHub issue #400,
     "Building on postmarketOS on PinePhone").
+  - Eliminate uint type from platform-independent code (concludes fix of
+    GitHub issue #400, "Building on postmarketOS on PinePhone").
 
 
 Changes between 3.7.0.7 and 3.7.0.8

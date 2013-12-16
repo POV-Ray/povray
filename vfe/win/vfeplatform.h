@@ -43,7 +43,7 @@ namespace vfePlatform
   class WinShelloutProcessing: public ShelloutProcessing
   {
   public:
-    WinShelloutProcessing(POVMS_Object& opts, const string& scene, uint width, uint height);
+    WinShelloutProcessing(POVMS_Object& opts, const string& scene, unsigned int width, unsigned int height);
     ~WinShelloutProcessing();
 
     virtual int ProcessID(void);
@@ -88,7 +88,7 @@ namespace vfePlatform
       virtual int RequestNewOutputPath(int CallCount, const string& Reason, const UCS2String& OldPath, UCS2String& NewPath);
       virtual bool TestAccessAllowed(const Path& file, bool isWrite) const;
       virtual bool ImageOutputToStdoutSupported(void) const { return m_OptimizeForConsoleOutput; }
-      virtual ShelloutProcessing *CreateShelloutProcessing(POVMS_Object& opts, const string& scene, uint width, uint height) { return new WinShelloutProcessing(opts, scene, width, height); }
+      virtual ShelloutProcessing *CreateShelloutProcessing(POVMS_Object& opts, const string& scene, unsigned int width, unsigned int height) { return new WinShelloutProcessing(opts, scene, width, height); }
 
       virtual void Clear(bool Notify = true);
 

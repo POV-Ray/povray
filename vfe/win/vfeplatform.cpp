@@ -422,7 +422,7 @@ namespace vfePlatform
   /////////////////////////////////////////////////////////////////////////
   /////////////////////////////////////////////////////////////////////////
 
-  WinShelloutProcessing::WinShelloutProcessing(POVMS_Object& opts, const string& scene, uint width, uint height): ShelloutProcessing(opts, scene, width, height)
+  WinShelloutProcessing::WinShelloutProcessing(POVMS_Object& opts, const string& scene, unsigned int width, unsigned int height): ShelloutProcessing(opts, scene, width, height)
   {
     m_ProcessRunning = false;
     m_ProcessId = m_LastError = m_ExitCode = 0;

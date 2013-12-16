@@ -47,7 +47,7 @@ namespace vfePlatform
 	class UnixShelloutProcessing: public ShelloutProcessing
 	{
 		public:
-			UnixShelloutProcessing(POVMS_Object& opts, const string& scene, uint width, uint height);
+			UnixShelloutProcessing(POVMS_Object& opts, const string& scene, unsigned int width, unsigned int height);
 			~UnixShelloutProcessing();
 
 			virtual int ProcessID(void);
@@ -88,7 +88,7 @@ namespace vfePlatform
 			virtual void NotifyCriticalError(const char *message, const char *file, int line);
 			virtual int RequestNewOutputPath(int CallCount, const string& Reason, const UCS2String& OldPath, UCS2String& NewPath);
 			virtual bool TestAccessAllowed(const Path& file, bool isWrite) const;
-			virtual ShelloutProcessing *CreateShelloutProcessing(POVMS_Object& opts, const string& scene, uint width, uint height)
+			virtual ShelloutProcessing *CreateShelloutProcessing(POVMS_Object& opts, const string& scene, unsigned int width, unsigned int height)
 				{ return new UnixShelloutProcessing(opts, scene, width, height); }
 
 			shared_ptr<UnixOptionsProcessor> GetUnixOptions(void) { return m_OptionsProc; }

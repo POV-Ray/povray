@@ -1192,7 +1192,7 @@ namespace vfe
 
       // Create an instance of the frontend ShelloutProcessing class. this handles creating and
       // managing render shellout commands, and typically will need platform-specific implementation.
-      virtual ShelloutProcessing *CreateShelloutProcessing(POVMS_Object& opts, const string& scene, uint width, uint height) { return new ShelloutProcessing(opts, scene, width, height); }
+      virtual ShelloutProcessing *CreateShelloutProcessing(POVMS_Object& opts, const string& scene, unsigned int width, unsigned int height) { return new ShelloutProcessing(opts, scene, width, height); }
 
       struct vfeSessionWorker
       {
