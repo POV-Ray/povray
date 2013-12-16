@@ -26,9 +26,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/frame.h $
- * $Revision: #138 $
- * $Change: 6162 $
- * $DateTime: 2013/12/07 19:55:09 $
+ * $Revision: #139 $
+ * $Change: 6163 $
+ * $DateTime: 2013/12/08 22:48:58 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -1289,106 +1289,6 @@ class ObjectDebugHelper
 		ObjectDebugHelper(const ObjectDebugHelper& src) { Index = ObjectIndex++; IsCopy = true; Tag = src.Tag; }
 };
 
-class ObjectBase
-{
-	public:
-		int Type;
-		TEXTURE *Texture;
-		TEXTURE *Interior_Texture;
-		Interior *interior;
-		vector<ObjectPtr> Bound;
-		vector<ObjectPtr> Clip;
-		vector<LightSource *> LLights;  ///< Used for light groups.
-		BoundingBox BBox;
-		TRANSFORM *Trans;
-		TRANSFORM *UV_Trans;
-		SNGL Ph_Density;
-		FloatSetting RadiosityImportance;
-		unsigned int Flags;
-
-#ifdef OBJECT_DEBUG_HELPER
-		ObjectDebugHelper Debug;
-#endif
-		enum BBoxDirection
-		{
-			BBOX_DIR_X0Y0Z0 = 0,
-			BBOX_DIR_X0Y0Z1 = 1,
-			BBOX_DIR_X0Y1Z0 = 2,
-			BBOX_DIR_X0Y1Z1 = 3,
-			BBOX_DIR_X1Y0Z0 = 4,
-			BBOX_DIR_X1Y0Z1 = 5,
-			BBOX_DIR_X1Y1Z0 = 6,
-			BBOX_DIR_X1Y1Z1 = 7
-		};
-
-		ObjectBase(int t) :
-			Type(t),
-			Texture(NULL), Interior_Texture(NULL), interior(NULL), Trans(NULL), UV_Trans(NULL),
-			Ph_Density(0), RadiosityImportance(0.0), Flags(0)
-		{
-			Make_BBox(BBox, -BOUND_HUGE/2.0, -BOUND_HUGE/2.0, -BOUND_HUGE/2.0, BOUND_HUGE, BOUND_HUGE, BOUND_HUGE);
-		}
-
-		ObjectBase(int t, ObjectBase& o, bool transplant) :
-			Type(t),
-			Texture(o.Texture), Interior_Texture(o.Interior_Texture), interior(o.interior), Trans(o.Trans), UV_Trans(o.UV_Trans),
-			Ph_Density(o.Ph_Density), RadiosityImportance(o.RadiosityImportance), Flags(o.Flags),
-			Bound(o.Bound), Clip(o.Clip), LLights(o.LLights), BBox(o.BBox)
-		{
-			if (transplant)
-			{
-				o.Texture = NULL;
-				o.Interior_Texture = NULL;
-				o.interior = NULL;
-				o.Trans = NULL;
-				o.UV_Trans = NULL;
-				o.Bound.clear();
-				o.Clip.clear();
-				o.LLights.clear();
-			}
-		}
-		virtual ~ObjectBase() { }
-
-		virtual ObjectPtr Copy() = 0;
-
-		virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *) = 0; // could be "const", if it wasn't for isosurface max_gradient estimation stuff
-		virtual bool Inside(const Vector3d&, TraceThreadData *) const = 0;
-		virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const = 0;
-		virtual void UVCoord(Vector2d&, const Intersection *, TraceThreadData *) const;
-		virtual void Translate(const Vector3d&, const TRANSFORM *) = 0;
-		virtual void Rotate(const Vector3d&, const TRANSFORM *) = 0;
-		virtual void Scale(const Vector3d&, const TRANSFORM *) = 0;
-		virtual void Transform(const TRANSFORM *) = 0;
-		virtual void Invert() = 0;
-		virtual void Compute_BBox() = 0;
-		virtual void Determine_Textures(Intersection *, bool, WeightedTextureVector&, TraceThreadData *Thread); // could be "(const Intersection*...) const" if it wasn't for blob specials
-
-		/// Checks whether a given ray intersects the object's bounding box.
-		/// Primitives with low-cost intersection tests may override this to always return true
-		virtual bool Intersect_BBox(BBoxDirection, const BBoxVector3d&, const BBoxVector3d&, BBoxScalar = HUGE_VAL) const;
-
-		// optional post-render message dispatcher; will be called upon completion
-		// of rendering a view. this is the appropriate place to send messages that
-		// would traditionally have been sent at the end of a render or at object
-		// destruction - e.g. IsoSurface max_gradient warnings. (object destruction
-		// isn't the place to do that anymore since a scene may persist between views).
-		virtual void DispatchShutdownMessages(MessageFactory& messageFactory) {};
-
-	protected:
-		explicit ObjectBase(const ObjectBase&) { }
-};
-
-/* This is an abstract structure that is never actually used.
-   All other objects are descendents of this primitive type */
-
-class CompoundObject : public ObjectBase
-{
-	public:
-		CompoundObject(int t) : ObjectBase(t) {}
-		CompoundObject(int t, CompoundObject& o, bool transplant) : ObjectBase(t, o, transplant), children(o.children) { if (transplant) o.children.clear(); }
-		vector<ObjectPtr> children;
-};
-
 typedef struct BBox_Tree_Struct BBOX_TREE;
 
 struct BBox_Tree_Struct
@@ -1421,52 +1321,6 @@ struct Project_Tree_Node_Struct
 	PROJECT Project;
 	unsigned short Entries;
 	PROJECT_TREE_NODE **Entry;
-};
-
-#if 0
-#pragma mark * Light Source
-#endif
-
-class LightSource : public CompoundObject
-{
-	public:
-		size_t index;
-		RGBColour colour;
-		Vector3d Direction, Center, Points_At, Axis1, Axis2;
-		DBL Coeff, Radius, Falloff;
-		DBL Fade_Distance, Fade_Power;
-		int Area_Size1, Area_Size2;
-		int Adaptive_Level;
-		ObjectBase *Projected_Through_Object;
-		BLEND_MAP *blend_map;// NK for dispersion
-
-		unsigned Light_Type : 8;
-		bool Area_Light : 1;
-		bool Use_Full_Area_Lighting : 1; // JN2007: Full area lighting
-		bool Jitter : 1;
-		bool Orient : 1;
-		bool Circular : 1;
-		bool Parallel : 1;
-		bool Photon_Area_Light : 1;
-		bool Media_Attenuation : 1;
-		bool Media_Interaction : 1;
-		bool lightGroupLight : 1;
-
-		LightSource();
-		virtual ~LightSource();
-
-		virtual ObjectPtr Copy();
-
-		virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
-		virtual bool Inside(const Vector3d&, TraceThreadData *) const;
-		virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const;
-		virtual void UVCoord(Vector2d&, const Intersection *, TraceThreadData *) const;
-		virtual void Translate(const Vector3d&, const TRANSFORM *);
-		virtual void Rotate(const Vector3d&, const TRANSFORM *);
-		virtual void Scale(const Vector3d&, const TRANSFORM *);
-		virtual void Transform(const TRANSFORM *);
-		virtual void Invert();
-		virtual void Compute_BBox() { }
 };
 
 typedef unsigned short HF_VAL;
@@ -1503,7 +1357,7 @@ class Intersection
 		/// UV texture coordinate.
 		Vector2d Iuv;
 		/// Intersected object.
-		ObjectBase *Object;
+		ObjectPtr Object;
 
 		/// @name Object-Specific Auxiliary Data
 		/// These members hold information specific to particular object types, typically generated during
@@ -1529,53 +1383,53 @@ class Intersection
 		//@}
 
 		/// Root-level parent CSG object for cutaway textures.
-		ObjectBase *Csg;
+		ObjectPtr Csg;
 
 		Intersection() :
 			Depth(BOUND_HUGE), Object(NULL), Csg(NULL)
 		{}
 
-		Intersection(DBL d, const Vector3d& v, ObjectBase *o) :
+		Intersection(DBL d, const Vector3d& v, ObjectPtr o) :
 			Depth(d), Object(o), IPoint(v), Iuv(v), haveNormal(false), haveLocalIPoint(false), Csg(NULL)
 		{}
 
-		Intersection(DBL d, const Vector3d& v, const Vector3d& n, ObjectBase *o) :
+		Intersection(DBL d, const Vector3d& v, const Vector3d& n, ObjectPtr o) :
 			Depth(d), Object(o), IPoint(v), Iuv(v), INormal(n), haveNormal(true), haveLocalIPoint(false), Csg(NULL)
 		{}
 
-		Intersection(DBL d, const Vector3d& v, const Vector2d& uv, ObjectBase *o) :
+		Intersection(DBL d, const Vector3d& v, const Vector2d& uv, ObjectPtr o) :
 			Depth(d), Object(o), IPoint(v), Iuv(uv), haveNormal(false), haveLocalIPoint(false), Csg(NULL)
 		{}
 
-		Intersection(DBL d, const Vector3d& v, const Vector3d& n, const Vector2d& uv, ObjectBase *o) :
+		Intersection(DBL d, const Vector3d& v, const Vector3d& n, const Vector2d& uv, ObjectPtr o) :
 			Depth(d), Object(o), IPoint(v), INormal(n), Iuv(uv), haveNormal(true), haveLocalIPoint(false), Csg(NULL)
 		{}
 
-		Intersection(DBL d, const Vector3d& v, ObjectBase *o, const void *a) :
+		Intersection(DBL d, const Vector3d& v, ObjectPtr o, const void *a) :
 			Depth(d), Object(o), Pointer(a), IPoint(v), Iuv(v), haveNormal(false), haveLocalIPoint(false), Csg(NULL)
 		{}
 
-		Intersection(DBL d, const Vector3d& v, const Vector2d& uv, ObjectBase *o, const void *a) :
+		Intersection(DBL d, const Vector3d& v, const Vector2d& uv, ObjectPtr o, const void *a) :
 			Depth(d), Object(o), Pointer(a), IPoint(v), Iuv(uv), haveNormal(false), haveLocalIPoint(false), Csg(NULL)
 		{}
 
-		Intersection(DBL d, const Vector3d& v, ObjectBase *o, int a) :
+		Intersection(DBL d, const Vector3d& v, ObjectPtr o, int a) :
 			Depth(d), Object(o), i1(a), IPoint(v), haveNormal(false), haveLocalIPoint(false), Csg(NULL)
 		{}
 
-		Intersection(DBL d, const Vector3d& v, ObjectBase *o, DBL a) :
+		Intersection(DBL d, const Vector3d& v, ObjectPtr o, DBL a) :
 			Depth(d), Object(o), d1(a), IPoint(v), haveNormal(false), haveLocalIPoint(false), Csg(NULL)
 		{}
 
-		Intersection(DBL d, const Vector3d& v, ObjectBase *o, int a, int b) :
+		Intersection(DBL d, const Vector3d& v, ObjectPtr o, int a, int b) :
 			Depth(d), Object(o), i1(a), i2(b), IPoint(v), haveNormal(false), haveLocalIPoint(false), Csg(NULL)
 		{}
 
-		Intersection(DBL d, const Vector3d& v, ObjectBase *o, int a, DBL b) :
+		Intersection(DBL d, const Vector3d& v, ObjectPtr o, int a, DBL b) :
 			Depth(d), Object(o), i1(a), d1(b), IPoint(v), haveNormal(false), haveLocalIPoint(false), Csg(NULL)
 		{}
 
-		Intersection(DBL d, const Vector3d& v, ObjectBase *o, int a, int b, DBL c) :
+		Intersection(DBL d, const Vector3d& v, ObjectPtr o, int a, int b, DBL c) :
 			Depth(d), Object(o), i1(a), i2(b), d1(c), IPoint(v), haveNormal(false), haveLocalIPoint(false), Csg(NULL)
 		{}
 
@@ -1682,22 +1536,22 @@ class Ray : public BasicRay
 
 struct RayObjectCondition
 {
-	virtual bool operator()(const Ray& ray, const ObjectBase* object, DBL data) const = 0;
+	virtual bool operator()(const Ray& ray, ConstObjectPtr object, DBL data) const = 0;
 };
 
 struct TrueRayObjectCondition : public RayObjectCondition
 {
-	virtual bool operator()(const Ray&, const ObjectBase*, DBL) const { return true; }
+	virtual bool operator()(const Ray&, ConstObjectPtr, DBL) const { return true; }
 };
 
 struct PointObjectCondition
 {
-	virtual bool operator()(const Vector3d& point, const ObjectBase* object) const = 0;
+	virtual bool operator()(const Vector3d& point, ConstObjectPtr object) const = 0;
 };
 
 struct TruePointObjectCondition : public PointObjectCondition
 {
-	virtual bool operator()(const Vector3d&, const ObjectBase*) const { return true; }
+	virtual bool operator()(const Vector3d&, ConstObjectPtr) const { return true; }
 };
 
 
@@ -1707,18 +1561,8 @@ struct TruePointObjectCondition : public PointObjectCondition
  *
  *****************************************************************************/
 
-enum FRAMETYPE
-{
-	FT_SINGLE_FRAME,
-	FT_MULTIPLE_FRAME
-};
-
-#define INT_VALUE_UNSET (-1)
-#define DBL_VALUE_UNSET (-1.0)
-
 struct FrameSettings
 {
-	FRAMETYPE FrameType;
 	DBL Clock_Value;      // May change between frames of an animation
 	int FrameNumber;      // May change between frames of an animation
 
@@ -1744,19 +1588,6 @@ struct FrameSettings
  * Miscellaneous stuff.
  *
  *****************************************************************************/
-
-typedef struct complex_block complex;
-
-struct Chunk_Header_Struct
-{
-	int name;
-	int size;
-};
-
-struct complex_block
-{
-	DBL r, c;
-};
 
 struct BYTE_XYZ
 {

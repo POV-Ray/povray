@@ -23,9 +23,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/support/bsptree.h $
- * $Revision: #47 $
- * $Change: 6161 $
- * $DateTime: 2013/12/05 18:42:17 $
+ * $Revision: #48 $
+ * $Change: 6163 $
+ * $DateTime: 2013/12/08 22:48:58 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -38,6 +38,7 @@
 
 #include "backend/frame.h"
 #include "backend/math/vector.h"
+#include "backend/bounding/bbox.h"
 
 namespace pov
 {
@@ -248,6 +249,64 @@ class BSPTree
 		char *GetLine(char *str, int len, FILE *infile);
 		void ValidateBounds(FILE *infile, const Objects& objects);
 };
+
+
+class BSPIntersectFunctor : public BSPTree::Intersect
+{
+	public:
+		BSPIntersectFunctor(Intersection& bi, const Ray& r, vector<ObjectPtr>& objs, TraceThreadData *t);
+		virtual bool operator()(unsigned int index, double& maxdist);
+		virtual bool operator()() const;
+
+	private:
+		bool found;
+		vector<ObjectPtr>& objects;
+		Intersection& bestisect;
+		const Ray& ray;
+		BBoxVector3d origin;
+		BBoxVector3d invdir;
+		BBoxDirection variant;
+		TraceThreadData *traceThreadData;
+};
+
+class BSPIntersectCondFunctor : public BSPTree::Intersect
+{
+	public:
+		BSPIntersectCondFunctor(Intersection& bi, const Ray& r, vector<ObjectPtr>& objs, TraceThreadData *t,
+		                        const RayObjectCondition& prec, const RayObjectCondition& postc);
+		virtual bool operator()(unsigned int index, double& maxdist);
+		virtual bool operator()() const;
+
+	private:
+		bool found;
+		vector<ObjectPtr>& objects;
+		Intersection& bestisect;
+		const Ray& ray;
+		BBoxVector3d origin;
+		BBoxVector3d invdir;
+		BBoxDirection variant;
+		TraceThreadData *traceThreadData;
+		const RayObjectCondition& precondition;
+		const RayObjectCondition& postcondition;
+};
+
+class BSPInsideCondFunctor : public BSPTree::Inside
+{
+	public:
+		BSPInsideCondFunctor(Vector3d o, vector<ObjectPtr>& objs, TraceThreadData *t,
+		                     const PointObjectCondition& prec, const PointObjectCondition& postc);
+		virtual bool operator()(unsigned int index);
+		virtual bool operator()() const;
+
+	private:
+		bool found;
+		vector<ObjectPtr>& objects;
+		Vector3d origin;
+		const PointObjectCondition& precondition;
+		const PointObjectCondition& postcondition;
+		TraceThreadData *threadData;
+};
+
 
 }
 

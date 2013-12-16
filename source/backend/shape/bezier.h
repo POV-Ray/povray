@@ -25,14 +25,16 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/bezier.h $
- * $Revision: #22 $
- * $Change: 6161 $
- * $DateTime: 2013/12/05 18:42:17 $
+ * $Revision: #23 $
+ * $Change: 6163 $
+ * $DateTime: 2013/12/08 22:48:58 $
  * $Author: clipka $
  *******************************************************************************/
 
 #ifndef BEZIER_H
 #define BEZIER_H
+
+#include "backend/scene/objects.h"
 
 namespace pov
 {

@@ -25,15 +25,16 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/blob.h $
- * $Revision: #29 $
- * $Change: 6121 $
- * $DateTime: 2013/11/23 07:38:50 $
+ * $Revision: #31 $
+ * $Change: 6163 $
+ * $DateTime: 2013/12/08 22:48:58 $
  * $Author: clipka $
  *******************************************************************************/
 
 #ifndef BLOB_H
 #define BLOB_H
 
+#include "backend/scene/objects.h"
 #include "backend/bounding/bsphere.h"
 
 namespace pov

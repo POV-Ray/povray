@@ -23,9 +23,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/render/trace.cpp $
- * $Revision: #226 $
- * $Change: 6162 $
- * $DateTime: 2013/12/07 19:55:09 $
+ * $Revision: #227 $
+ * $Change: 6163 $
+ * $DateTime: 2013/12/08 22:48:58 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -63,6 +63,20 @@ namespace pov
 {
 
 #define SHADOW_TOLERANCE 1.0e-3
+
+
+bool NoSomethingFlagRayObjectCondition::operator()(const Ray& ray, ConstObjectPtr object, double) const
+{
+	if(ray.IsImageRay() && Test_Flag(object, NO_IMAGE_FLAG))
+		return false;
+	if(ray.IsReflectionRay() && Test_Flag(object, NO_REFLECTION_FLAG))
+		return false;
+	if(ray.IsRadiosityRay() && Test_Flag(object, NO_RADIOSITY_FLAG))
+		return false;
+	if(ray.IsPhotonRay() && Test_Flag(object, NO_SHADOW_FLAG))
+		return false;
+	return true;
+}
 
 Trace::Trace(shared_ptr<SceneData> sd, TraceThreadData *td, unsigned int qf,
              CooperateFunctor& cf, MediaFunctor& mf, RadiosityFunctor& rf) :
@@ -334,12 +348,12 @@ bool Trace::FindIntersection(ObjectPtr object, Intersection& isect, const Ray& r
 	{
 		BBoxVector3d origin;
 		BBoxVector3d invdir;
-		ObjectBase::BBoxDirection variant;
+		BBoxDirection variant;
 
 		Vector3d tmp(1.0 / ray.GetDirection()[X], 1.0 / ray.GetDirection()[Y], 1.0 /ray.GetDirection()[Z]);
 		origin = BBoxVector3d(ray.Origin);
 		invdir = BBoxVector3d(tmp);
-		variant = (ObjectBase::BBoxDirection)((int(invdir[X] < 0.0) << 2) | (int(invdir[Y] < 0.0) << 1) | int(invdir[Z] < 0.0));
+		variant = (BBoxDirection)((int(invdir[X] < 0.0) << 2) | (int(invdir[Y] < 0.0) << 1) | int(invdir[Z] < 0.0));
 
 		if(object->Intersect_BBox(variant, origin, invdir, closest) == false)
 			return false;
@@ -387,12 +401,12 @@ bool Trace::FindIntersection(ObjectPtr object, Intersection& isect, const Ray& r
 	{
 		BBoxVector3d origin;
 		BBoxVector3d invdir;
-		ObjectBase::BBoxDirection variant;
+		BBoxDirection variant;
 
 		Vector3d tmp(1.0 / ray.GetDirection()[X], 1.0 / ray.GetDirection()[Y], 1.0 /ray.GetDirection()[Z]);
 		origin = BBoxVector3d(ray.Origin);
 		invdir = BBoxVector3d(tmp);
-		variant = (ObjectBase::BBoxDirection)((int(invdir[X] < 0.0) << 2) | (int(invdir[Y] < 0.0) << 1) | int(invdir[Z] < 0.0));
+		variant = (BBoxDirection)((int(invdir[X] < 0.0) << 2) | (int(invdir[Y] < 0.0) << 1) | int(invdir[Z] < 0.0));
 
 		if(object->Intersect_BBox(variant, origin, invdir, closest) == false)
 			return false;
@@ -1852,12 +1866,12 @@ void Trace::TraceShadowRay(const LightSource &lightsource, double depth, Ray& li
 // TODO: try moving it back in at some point in the future.
 struct NoShadowFlagRayObjectCondition : public RayObjectCondition
 {
-	virtual bool operator()(const Ray&, const ObjectBase* object, double) const { return !Test_Flag(object, NO_SHADOW_FLAG); }
+	virtual bool operator()(const Ray&, ConstObjectPtr object, double) const { return !Test_Flag(object, NO_SHADOW_FLAG); }
 };
 
 struct SmallToleranceRayObjectCondition : public RayObjectCondition
 {
-	virtual bool operator()(const Ray&, const ObjectBase*, double dist) const { return dist > SMALL_TOLERANCE; }
+	virtual bool operator()(const Ray&, ConstObjectPtr, double dist) const { return dist > SMALL_TOLERANCE; }
 };
 
 void Trace::TracePointLightShadowRay(const LightSource &lightsource, double& lightsourcedepth, Ray& lightsourceray, RGBColour& lightcolour)
@@ -3107,7 +3121,7 @@ bool Trace::TestShadow(const LightSource &lightsource, double& depth, Ray& light
 	return false;
 }
 
-bool Trace::IsObjectInCSG(const ObjectBase* object, const ObjectBase* parent)
+bool Trace::IsObjectInCSG(ConstObjectPtr object, ConstObjectPtr parent)
 {
 	bool found = false;
 
@@ -3196,7 +3210,7 @@ void Trace::ComputeSSLTNormal(Intersection& Ray_Intersection)
 	Ray_Intersection.PNormal = Raw_Normal; // TODO FIXME - we should possibly take normal pertubation into account
 }
 
-bool Trace::IsSameSSLTObject(const ObjectBase* obj1, const ObjectBase* obj2)
+bool Trace::IsSameSSLTObject(ConstObjectPtr obj1, ConstObjectPtr obj2)
 {
 	// TODO maybe use something smarter
 	return (obj1 && obj2 && obj1->interior == obj2->interior);

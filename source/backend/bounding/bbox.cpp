@@ -65,16 +65,16 @@ void calc_bbox(BoundingBox *BBox, BBOX_TREE **Finite, ptrdiff_t first, ptrdiff_t
 void build_area_table(BBOX_TREE **Finite, ptrdiff_t a, ptrdiff_t b, DBL *areas);
 int sort_and_split(BBOX_TREE **Root, BBOX_TREE **&Finite, size_t *numOfFiniteObjects, ptrdiff_t first, ptrdiff_t last, size_t& maxfinitecount);
 
-void priority_queue_insert(PriorityQueue& Queue, DBL Depth, BBOX_TREE *Node);
+void priority_queue_insert(BBoxPriorityQueue& Queue, DBL Depth, BBOX_TREE *Node);
 
-PriorityQueue::PriorityQueue()
+BBoxPriorityQueue::BBoxPriorityQueue()
 {
 	QSize = 0;
 	Queue = reinterpret_cast<Qelem *>(POV_MALLOC(INITIAL_PRIORITY_QUEUE_SIZE * sizeof(Qelem), "priority queue"));
 	Max_QSize = INITIAL_PRIORITY_QUEUE_SIZE;
 }
 
-PriorityQueue::~PriorityQueue()
+BBoxPriorityQueue::~BBoxPriorityQueue()
 {
 	POV_FREE(Queue);
 }
@@ -358,7 +358,7 @@ void Build_Bounding_Slabs(BBOX_TREE **Root, vector<ObjectPtr>& objects, unsigned
 		POV_FREE(Infinite);
 }
 
-bool Intersect_BBox_Tree(PriorityQueue& pqueue, const BBOX_TREE *Root, const Ray& ray, Intersection *Best_Intersection, TraceThreadData *Thread)
+bool Intersect_BBox_Tree(BBoxPriorityQueue& pqueue, const BBOX_TREE *Root, const Ray& ray, Intersection *Best_Intersection, TraceThreadData *Thread)
 {
 	int i, found;
 	DBL Depth;
@@ -411,7 +411,7 @@ bool Intersect_BBox_Tree(PriorityQueue& pqueue, const BBOX_TREE *Root, const Ray
 	return (found);
 }
 
-bool Intersect_BBox_Tree(PriorityQueue& pqueue, const BBOX_TREE *Root, const Ray& ray, Intersection *Best_Intersection, const RayObjectCondition& precondition, const RayObjectCondition& postcondition, TraceThreadData *Thread)
+bool Intersect_BBox_Tree(BBoxPriorityQueue& pqueue, const BBOX_TREE *Root, const Ray& ray, Intersection *Best_Intersection, const RayObjectCondition& precondition, const RayObjectCondition& postcondition, TraceThreadData *Thread)
 {
 	int i, found;
 	DBL Depth;
@@ -467,12 +467,12 @@ bool Intersect_BBox_Tree(PriorityQueue& pqueue, const BBOX_TREE *Root, const Ray
 	return (found);
 }
 
-static void priority_queue_insert(PriorityQueue& Queue, DBL Depth, const BBOX_TREE *Node)
+static void priority_queue_insert(BBoxPriorityQueue& Queue, DBL Depth, const BBOX_TREE *Node)
 {
 	unsigned size;
 	int i;
-	//PriorityQueue::Qelem tmp;
-	PriorityQueue::Qelem *List;
+	//BBoxPriorityQueue::Qelem tmp;
+	BBoxPriorityQueue::Qelem *List;
 
 	Queue.QSize++;
 
@@ -491,7 +491,7 @@ static void priority_queue_insert(PriorityQueue& Queue, DBL Depth, const BBOX_TR
 
 		Queue.Max_QSize *= 2;
 
-		Queue.Queue = reinterpret_cast<PriorityQueue::Qelem *>(POV_REALLOC(Queue.Queue, Queue.Max_QSize*sizeof(PriorityQueue::Qelem), "priority queue"));
+		Queue.Queue = reinterpret_cast<BBoxPriorityQueue::Qelem *>(POV_REALLOC(Queue.Queue, Queue.Max_QSize*sizeof(BBoxPriorityQueue::Qelem), "priority queue"));
 	}
 
 	List = Queue.Queue;
@@ -528,10 +528,10 @@ static void priority_queue_insert(PriorityQueue& Queue, DBL Depth, const BBOX_TR
 
 // Get an element from the priority queue.
 // NOTE: This element will always be the one closest to the ray origin.
-void Priority_Queue_Delete(PriorityQueue& Queue, DBL *Depth, const BBOX_TREE **Node)
+void Priority_Queue_Delete(BBoxPriorityQueue& Queue, DBL *Depth, const BBOX_TREE **Node)
 {
-	PriorityQueue::Qelem tmp;
-	PriorityQueue::Qelem *List;
+	BBoxPriorityQueue::Qelem tmp;
+	BBoxPriorityQueue::Qelem *List;
 	int i, j;
 	unsigned size;
 
@@ -588,7 +588,7 @@ void Priority_Queue_Delete(PriorityQueue& Queue, DBL *Depth, const BBOX_TREE **N
 	}
 }
 
-void Check_And_Enqueue(PriorityQueue& Queue, const BBOX_TREE *Node, const BoundingBox *BBox, const Rayinfo *rayinfo, TraceThreadData *Thread)
+void Check_And_Enqueue(BBoxPriorityQueue& Queue, const BBOX_TREE *Node, const BoundingBox *BBox, const Rayinfo *rayinfo, TraceThreadData *Thread)
 {
 	DBL tmin, tmax;
 	DBL dmin, dmax;

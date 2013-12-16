@@ -25,15 +25,16 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/hfield.h $
- * $Revision: #25 $
- * $Change: 6161 $
- * $DateTime: 2013/12/05 18:42:17 $
+ * $Revision: #26 $
+ * $Change: 6163 $
+ * $DateTime: 2013/12/08 22:48:58 $
  * $Author: clipka $
  *******************************************************************************/
 
 #ifndef HFIELD_H
 #define HFIELD_H
 
+#include "backend/scene/objects.h"
 #include "backend/bounding/bbox.h"
 #include "backend/shape/boxes.h"
 

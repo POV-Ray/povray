@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/scene/objects.cpp $
- * $Revision: #56 $
- * $Change: 6121 $
- * $DateTime: 2013/11/23 07:38:50 $
+ * $Revision: #57 $
+ * $Change: 6163 $
+ * $DateTime: 2013/12/08 22:48:58 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -106,12 +106,12 @@ bool Find_Intersection(Intersection *isect, ObjectPtr object, const Ray& ray, Tr
 		DBL closest = HUGE_VAL;
 		BBoxVector3d origin;
 		BBoxVector3d invdir;
-		ObjectBase::BBoxDirection variant;
+		BBoxDirection variant;
 
 		Vector3d tmp(1.0 / ray.GetDirection()[X], 1.0 / ray.GetDirection()[Y], 1.0 /ray.GetDirection()[Z]);
 		origin = BBoxVector3d(ray.Origin);
 		invdir = BBoxVector3d(tmp);
-		variant = (ObjectBase::BBoxDirection)((int(invdir[X] < 0.0) << 2) | (int(invdir[Y] < 0.0) << 1) | int(invdir[Z] < 0.0));
+		variant = (BBoxDirection)((int(invdir[X] < 0.0) << 2) | (int(invdir[Y] < 0.0) << 1) | int(invdir[Z] < 0.0));
 
 		if(object->Intersect_BBox(variant, origin, invdir, closest) == false)
 			return false;
@@ -160,12 +160,12 @@ bool Find_Intersection(Intersection *isect, ObjectPtr object, const Ray& ray, co
 		DBL closest = HUGE_VAL;
 		BBoxVector3d origin;
 		BBoxVector3d invdir;
-		ObjectBase::BBoxDirection variant;
+		BBoxDirection variant;
 
 		Vector3d tmp(1.0 / ray.GetDirection()[X], 1.0 / ray.GetDirection()[Y], 1.0 /ray.GetDirection()[Z]);
 		origin = BBoxVector3d(ray.Origin);
 		invdir = BBoxVector3d(tmp);
-		variant = (ObjectBase::BBoxDirection)((int(invdir[X] < 0.0) << 2) | (int(invdir[Y] < 0.0) << 1) | int(invdir[Z] < 0.0));
+		variant = (BBoxDirection)((int(invdir[X] < 0.0) << 2) | (int(invdir[Y] < 0.0) << 1) | int(invdir[Z] < 0.0));
 
 		if(object->Intersect_BBox(variant, origin, invdir, closest) == false)
 			return false;
@@ -207,7 +207,7 @@ bool Find_Intersection(Intersection *isect, ObjectPtr object, const Ray& ray, co
 	return false;
 }
 
-bool Find_Intersection(Intersection *isect, ObjectPtr object, const Ray& ray, ObjectBase::BBoxDirection variant, const BBoxVector3d& origin, const BBoxVector3d& invdir, TraceThreadData *threadData)
+bool Find_Intersection(Intersection *isect, ObjectPtr object, const Ray& ray, BBoxDirection variant, const BBoxVector3d& origin, const BBoxVector3d& invdir, TraceThreadData *threadData)
 {
 	if(object != NULL)
 	{
@@ -253,7 +253,7 @@ bool Find_Intersection(Intersection *isect, ObjectPtr object, const Ray& ray, Ob
 	return false;
 }
 
-bool Find_Intersection(Intersection *isect, ObjectPtr object, const Ray& ray, ObjectBase::BBoxDirection variant, const BBoxVector3d& origin, const BBoxVector3d& invdir, const RayObjectCondition& postcondition, TraceThreadData *threadData)
+bool Find_Intersection(Intersection *isect, ObjectPtr object, const Ray& ray, BBoxDirection variant, const BBoxVector3d& origin, const BBoxVector3d& invdir, const RayObjectCondition& postcondition, TraceThreadData *threadData)
 {
 	if(object != NULL)
 	{

@@ -868,4 +868,112 @@ void BSPTree::ReadRecursive(const Progress& progress, FILE *infile, unsigned int
 	}
 }
 
+
+BSPIntersectFunctor::BSPIntersectFunctor(Intersection& bi, const Ray& r, vector<ObjectPtr>& objs, TraceThreadData *t) :
+	found(false),
+	bestisect(bi),
+	ray(r),
+	objects(objs),
+	traceThreadData(t)
+{
+	Vector3d tmp(1.0 / ray.GetDirection()[X], 1.0 / ray.GetDirection()[Y], 1.0 /ray.GetDirection()[Z]);
+	origin = BBoxVector3d(ray.Origin);
+	invdir = BBoxVector3d(tmp);
+	variant = (BBoxDirection)((int(invdir[X] < 0.0) << 2) | (int(invdir[Y] < 0.0) << 1) | int(invdir[Z] < 0.0));
+}
+
+bool BSPIntersectFunctor::operator()(unsigned int index, double& maxdist)
+{
+	ObjectPtr object = objects[index];
+	Intersection isect;
+
+	if(Find_Intersection(&isect, object, ray, variant, origin, invdir, traceThreadData) && (isect.Depth <= maxdist))
+	{
+		if(isect.Depth < bestisect.Depth)
+		{
+			bestisect = isect;
+			found = true;
+			maxdist = bestisect.Depth;
+		}
+	}
+
+	return found;
+}
+
+bool BSPIntersectFunctor::operator()() const
+{
+	return found;
+}
+
+
+BSPIntersectCondFunctor::BSPIntersectCondFunctor(Intersection& bi, const Ray& r, vector<ObjectPtr>& objs, TraceThreadData *t,
+                                                 const RayObjectCondition& prec, const RayObjectCondition& postc) :
+	found(false),
+	bestisect(bi),
+	ray(r),
+	objects(objs),
+	traceThreadData(t),
+	precondition(prec),
+	postcondition(postc)
+{
+	Vector3d tmp(1.0 / ray.GetDirection()[X], 1.0 / ray.GetDirection()[Y], 1.0 /ray.GetDirection()[Z]);
+	origin = BBoxVector3d(ray.Origin);
+	invdir = BBoxVector3d(tmp);
+	variant = (BBoxDirection)((int(invdir[X] < 0.0) << 2) | (int(invdir[Y] < 0.0) << 1) | int(invdir[Z] < 0.0));
+}
+
+bool BSPIntersectCondFunctor::operator()(unsigned int index, double& maxdist)
+{
+	ObjectPtr object = objects[index];
+
+	if(precondition(ray, object, 0.0) == true)
+	{
+		Intersection isect;
+
+		if(Find_Intersection(&isect, object, ray, variant, origin, invdir, postcondition, traceThreadData) && (isect.Depth <= maxdist))
+		{
+			if(isect.Depth < bestisect.Depth)
+			{
+				bestisect = isect;
+				found = true;
+				maxdist = bestisect.Depth;
+			}
+		}
+	}
+
+	return found;
+}
+
+bool BSPIntersectCondFunctor::operator()() const
+{
+	return found;
+}
+
+
+BSPInsideCondFunctor::BSPInsideCondFunctor(Vector3d o, vector<ObjectPtr>& objs, TraceThreadData *t,
+                                           const PointObjectCondition& prec, const PointObjectCondition& postc) :
+	found(false),
+	origin(o),
+	objects(objs),
+	precondition(prec),
+	postcondition(postc),
+	threadData(t)
+{
+}
+
+bool BSPInsideCondFunctor::operator()(unsigned int index)
+{
+	ObjectPtr object = objects[index];
+	if(precondition(origin, object))
+		if(Inside_BBox(origin, object->BBox) && object->Inside(origin, threadData))
+			if(postcondition(origin, object))
+				found = true;
+	return found;
+}
+
+bool BSPInsideCondFunctor::operator()() const
+{
+	return found;
+}
+
 }

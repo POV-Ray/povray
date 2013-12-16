@@ -23,9 +23,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/render/trace.h $
- * $Revision: #107 $
- * $Change: 6162 $
- * $DateTime: 2013/12/07 19:55:09 $
+ * $Revision: #108 $
+ * $Change: 6163 $
+ * $DateTime: 2013/12/08 22:48:58 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -37,13 +37,10 @@
 #include <boost/thread.hpp>
 
 #include "backend/frame.h"
-#include "backend/povray.h"
 #include "backend/scene/atmosph.h"
-#include "backend/scene/threaddata.h"
-#include "backend/scene/objects.h"
+#include "backend/bounding/bbox.h"
 #include "backend/support/bsptree.h"
 #include "backend/support/randomsequences.h"
-#include "povrayold.h"
 
 namespace pov
 {
@@ -55,18 +52,7 @@ class PhotonGatherer;
 
 struct NoSomethingFlagRayObjectCondition : public RayObjectCondition
 {
-	virtual bool operator()(const Ray& ray, const ObjectBase* object, double) const
-	{
-		if(ray.IsImageRay() && Test_Flag(object, NO_IMAGE_FLAG))
-			return false;
-		if(ray.IsReflectionRay() && Test_Flag(object, NO_REFLECTION_FLAG))
-			return false;
-		if(ray.IsRadiosityRay() && Test_Flag(object, NO_RADIOSITY_FLAG))
-			return false;
-		if(ray.IsPhotonRay() && Test_Flag(object, NO_SHADOW_FLAG))
-			return false;
-		return true;
-	}
+	virtual bool operator()(const Ray& ray, ConstObjectPtr object, double) const;
 };
 
 struct LitInterval
@@ -292,7 +278,7 @@ class Trace
 		unsigned int qualityFlags;
 
 		/// bounding slabs priority queue
-		PriorityQueue priorityQueue;
+		BBoxPriorityQueue priorityQueue;
 		/// BSP tree mailbox
 		BSPTree::Mailbox mailbox;
 		/// area light grid buffer
@@ -728,7 +714,7 @@ class Trace
 		 *  @param[in]      parent              the object to test against
 		 *  @return                             true if @c object is part of, or identical to, @c parent
 		 */
-		bool IsObjectInCSG(const ObjectBase *object, const ObjectBase *parent);
+		bool IsObjectInCSG(ConstObjectPtr object, ConstObjectPtr parent);
 
 
 	/**
@@ -746,7 +732,7 @@ class Trace
 		double ComputeFt(double phi, double eta);
 		void ComputeSurfaceTangents(const Vector3d& normal, Vector3d& u, Vector3d& v);
 		void ComputeSSLTNormal (Intersection& Ray_Intersection);
-		bool IsSameSSLTObject(const ObjectBase* obj1, const ObjectBase* obj2);
+		bool IsSameSSLTObject(ConstObjectPtr obj1, ConstObjectPtr obj2);
 		void ComputeDiffuseSampleBase(Vector3d& basePoint, const Intersection& out, const Vector3d& vOut, double avgFreeDist, TraceTicket& ticket);
 		void ComputeDiffuseSamplePoint(const Vector3d& basePoint, Intersection& in, double& sampleArea, TraceTicket& ticket);
 		void ComputeDiffuseContribution(const Intersection& out, const Vector3d& vOut, const Vector3d& pIn, const Vector3d& nIn, const Vector3d& vIn, double& sd, double sigma_prime_s, double sigma_a, double eta);

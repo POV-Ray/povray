@@ -26,9 +26,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/texture/pigment.cpp $
- * $Revision: #40 $
- * $Change: 6158 $
- * $DateTime: 2013/12/02 21:19:56 $
+ * $Revision: #41 $
+ * $Change: 6163 $
+ * $DateTime: 2013/12/08 22:48:58 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -421,7 +421,7 @@ bool Compute_Pigment (Colour& colour, const PIGMENT *Pigment, const Vector3d& EP
 				{
 					Colour_Found = true;
 
-					Assign_Colour(*colour, Cur->Vals.colour);
+					colour = Colour(Cur->Vals.colour);
 				}
 				else
 				{
@@ -467,7 +467,7 @@ bool Compute_Pigment (Colour& colour, const PIGMENT *Pigment, const Vector3d& EP
 	{
 		Colour_Found = true;
 
-		Assign_Colour(*colour, Cur->Vals.colour);
+		colour = Colour(Cur->Vals.colour);
 	}
 	else
 	{
@@ -483,7 +483,7 @@ bool Compute_Pigment (Colour& colour, const PIGMENT *Pigment, const Vector3d& EP
 		{
 			Colour_Found = true;
 
-			Assign_Colour(*Temp_Colour, Prev->Vals.colour);
+			Temp_Colour = Colour(Prev->Vals.colour);
 		}
 		else
 		{

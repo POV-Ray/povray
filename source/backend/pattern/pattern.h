@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/pattern/pattern.h $
- * $Revision: #31 $
- * $Change: 6158 $
- * $DateTime: 2013/12/02 21:19:56 $
+ * $Revision: #32 $
+ * $Change: 6163 $
+ * $DateTime: 2013/12/08 22:48:58 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -376,7 +376,7 @@ struct NoisePattern : public BasicPattern
 
 struct ObjectPattern : public DiscretePattern
 {
-	ObjectBase *Object;
+	ObjectPtr Object;
 
 	ObjectPattern();
 	ObjectPattern(const ObjectPattern& obj);

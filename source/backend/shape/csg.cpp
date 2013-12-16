@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/csg.cpp $
- * $Revision: #62 $
- * $Change: 6142 $
- * $DateTime: 2013/11/26 21:24:29 $
+ * $Revision: #63 $
+ * $Change: 6163 $
+ * $DateTime: 2013/12/08 22:48:58 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -62,7 +62,7 @@ namespace pov
 
 
 
-inline bool Test_Ray_Flags(const Ray& ray, const ObjectBase* obj)
+inline bool Test_Ray_Flags(const Ray& ray, ConstObjectPtr obj)
 {
 	// CJC 2005 if ray is primary ray ignore NO_IMAGE_FLAG to support the trace() SDL function
  	// TODO FIXME - I uess it would be better to have the trace() function use a different ray type [CLi]
@@ -73,7 +73,7 @@ inline bool Test_Ray_Flags(const Ray& ray, const ObjectBase* obj)
 	         ( ray.IsPhotonRay() && !Test_Flag(obj, NO_SHADOW_FLAG) ) );
 }
 
-inline bool Test_Ray_Flags_Shadow(const Ray& ray, const ObjectBase* obj)
+inline bool Test_Ray_Flags_Shadow(const Ray& ray, ConstObjectPtr obj)
 {
 	// TODO CLARIFY - why does this function not ignore NO_IMAGE_FLAG for primary rays, as Test_Ray_Flags() does? [CLi]
 	return ( ( !ray.IsPhotonRay() &&

@@ -23,9 +23,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/scene/threaddata.h $
- * $Revision: #71 $
- * $Change: 6150 $
- * $DateTime: 2013/11/30 14:13:48 $
+ * $Revision: #72 $
+ * $Change: 6163 $
+ * $DateTime: 2013/12/08 22:48:58 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -78,7 +78,7 @@ class SceneThreadData : public Task::TaskData
 		RenderStatistics& Stats(void) { return renderStats; }
 
 		DBL *Fractal_IStack[4];
-		PriorityQueue Mesh_Queue;
+		BBoxPriorityQueue Mesh_Queue;
 		void **Blob_Queue;
 		unsigned int Max_Blob_Queue_Size;
 		DBL *Blob_Coefficients;

@@ -28,15 +28,16 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/fpmetric.h $
- * $Revision: #20 $
- * $Change: 6138 $
- * $DateTime: 2013/11/25 18:52:19 $
+ * $Revision: #21 $
+ * $Change: 6163 $
+ * $DateTime: 2013/12/08 22:48:58 $
  * $Author: clipka $
  *******************************************************************************/
 
 #ifndef FPMETRIC_H
 #define FPMETRIC_H
 
+#include "backend/scene/objects.h"
 #include "backend/parser/parse.h"
 
 namespace pov

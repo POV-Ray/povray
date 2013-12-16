@@ -28,9 +28,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/render/tracepixel.cpp $
- * $Revision: #53 $
- * $Change: 6162 $
- * $DateTime: 2013/12/07 19:55:09 $
+ * $Revision: #54 $
+ * $Change: 6163 $
+ * $DateTime: 2013/12/08 22:48:58 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -49,6 +49,9 @@
 #include "backend/support/jitter.h"
 #include "backend/texture/normal.h"
 #include "backend/texture/pigment.h"
+#include "backend/scene/objects.h"
+#include "backend/scene/view.h"
+#include "backend/scene/scene.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -172,6 +175,19 @@ inline int PseudoRandom(int v)
 {
 	return int(hashTable[int(v & 0x0fff)]);
 }
+
+
+bool HasInteriorPointObjectCondition::operator()(const Vector3d& point, ConstObjectPtr object) const
+{
+	return object->interior != NULL;
+}
+
+bool ContainingInteriorsPointObjectCondition::operator()(const Vector3d& point, ConstObjectPtr object) const
+{
+	containingInteriors.push_back(object->interior);
+	return true;
+}
+
 
 TracePixel::TracePixel(ViewData *vd, TraceThreadData *td, unsigned int mtl, DBL adcb, unsigned int qf,
                        CooperateFunctor& cf, MediaFunctor& mf, RadiosityFunctor& af, bool pt) :
