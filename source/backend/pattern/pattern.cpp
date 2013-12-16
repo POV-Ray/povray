@@ -7768,9 +7768,9 @@ static DBL slope_pattern (const VECTOR EPoint, const TPATTERN *TPat, const Inter
 	if (TPat->Vals.Slope.Point_At)
 	{
 		VECTOR vect;
-		VSub(vect,TPat->Vals.Slope.Slope_Vector,Isection->IPoint);
+		VSub(vect,TPat->Vals.Slope.Slope_Vector,*Isection->IPoint);
 		VNormalizeEq(vect);
-		VDot(value1, Isection->PNormal, vect);
+		VDot(value1, *Isection->PNormal, vect);
 	}
 	else
 	{
@@ -7782,7 +7782,7 @@ static DBL slope_pattern (const VECTOR EPoint, const TPATTERN *TPat, const Inter
 			value1 = -Isection->PNormal[-TPat->Vals.Slope.Slope_Base - 1];
 		else
 			/* projection slope onto normal vector */
-			VDot(value1, Isection->PNormal, TPat->Vals.Slope.Slope_Vector);
+			VDot(value1, *Isection->PNormal, TPat->Vals.Slope.Slope_Vector);
 	}
 
 	/* Clamp to 1.0. */
@@ -7887,8 +7887,8 @@ static DBL aoi_pattern (const Intersection *Isection, const Ray *ray)
 	if ((Isection == NULL) || (ray == NULL))
 		return 0.0;
 
-	VNormalize(a, Isection->PNormal);
-	VNormalize(b, ray->Direction);
+	VNormalize(a, *Isection->PNormal);
+	VNormalize(b, *ray->Direction);
 	VDot(cosAngle, a, b);
 
 	// clip to [-1.0; 1.0], just to be sure

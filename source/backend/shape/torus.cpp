@@ -26,11 +26,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/shape/torus.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/shape/torus.cpp $
+ * $Revision: #31 $
+ * $Change: 6118 $
+ * $DateTime: 2013/11/22 16:39:19 $
+ * $Author: clipka $
  *******************************************************************************/
 
 /****************************************************************************
@@ -112,7 +112,7 @@ bool Torus::All_Intersections(const Ray& ray, IStack& Depth_Stack, SceneThreadDa
 {
 	int i, max_i, Found;
 	DBL Depth[4];
-	VECTOR IPoint;
+	Vector3d IPoint;
 
 	Found = false;
 
@@ -122,9 +122,9 @@ bool Torus::All_Intersections(const Ray& ray, IStack& Depth_Stack, SceneThreadDa
 		{
 			if ((Depth[i] > DEPTH_TOLERANCE) && (Depth[i] < MAX_DISTANCE))
 			{
-				VEvaluateRay(IPoint, ray.Origin, Depth[i], ray.Direction);
+				IPoint = ray.Evaluate(Depth[i]);
 
-				if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
+				if (Clip.empty() || Point_In_Clip(*IPoint, Clip, Thread))
 				{
 					Depth_Stack->push(Intersection(Depth[i], IPoint, this));
 
@@ -191,9 +191,9 @@ int Torus::Intersect(const Ray& ray, DBL *Depth, SceneThreadData *Thread) const
 
 	/* Transform the ray into the torus space. */
 
-	MInvTransPoint(P, ray.Origin, Trans);
+	MInvTransPoint(P, *ray.Origin, Trans);
 
-	MInvTransDirection(D, ray.Direction, Trans);
+	MInvTransDirection(D, *ray.Direction, Trans);
 
 	VLength(len, D);
 
@@ -362,7 +362,7 @@ void Torus::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) 
 
 	/* Transform the point into the torus space. */
 
-	MInvTransPoint(P, Inter->IPoint, Trans);
+	MInvTransPoint(P, *Inter->IPoint, Trans);
 
 	/* Get normal from derivatives. */
 
@@ -940,7 +940,7 @@ bool Torus::Test_Thick_Cylinder(const VECTOR P, const VECTOR D, DBL h1, DBL h2, 
 
 void Torus::UVCoord(UV_VECT Result, const Intersection *Inter, TraceThreadData *Thread) const
 {
-	CalcUV(Inter->IPoint, Result);
+	CalcUV(*Inter->IPoint, Result);
 }
 
 

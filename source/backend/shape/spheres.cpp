@@ -24,11 +24,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/shape/spheres.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/shape/spheres.cpp $
+ * $Revision: #34 $
+ * $Change: 6119 $
+ * $DateTime: 2013/11/22 20:31:53 $
+ * $Author: clipka $
  *******************************************************************************/
 
 // frame.h must always be the first POV file included (pulls in platform config)
@@ -87,16 +87,16 @@ bool Sphere::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadD
 	{
 		register int Intersection_Found;
 		DBL Depth1, Depth2, len;
-		VECTOR IPoint;
+		Vector3d IPoint;
 		Ray New_Ray;
 
 		// Transform the ray into the ellipsoid's space
 
-		MInvTransPoint(New_Ray.Origin, ray.Origin, Trans);
-		MInvTransDirection(New_Ray.Direction, ray.Direction, Trans);
+		MInvTransPoint(*New_Ray.Origin, *ray.Origin, Trans);
+		MInvTransDirection(*New_Ray.Direction, *ray.Direction, Trans);
 
-		VLength(len, New_Ray.Direction);
-		VInverseScaleEq(New_Ray.Direction, len);
+		len = New_Ray.Direction.length();
+		New_Ray.Direction /= len;
 
 		Intersection_Found = false;
 
@@ -105,10 +105,10 @@ bool Sphere::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadD
 			Thread->Stats()[Ray_Sphere_Tests_Succeeded]++;
 			if((Depth1 > DEPTH_TOLERANCE) && (Depth1 < MAX_DISTANCE))
 			{
-				VEvaluateRay(IPoint, New_Ray.Origin, Depth1, New_Ray.Direction);
-				MTransPoint(IPoint, IPoint, Trans);
+				IPoint = New_Ray.Evaluate(Depth1);
+				MTransPoint(*IPoint, *IPoint, Trans);
 
-				if(Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
+				if(Clip.empty() || Point_In_Clip(*IPoint, Clip, Thread))
 				{
 					Depth_Stack->push(Intersection(Depth1 / len, IPoint, this));
 					Intersection_Found = true;
@@ -117,10 +117,10 @@ bool Sphere::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadD
 
 			if((Depth2 > DEPTH_TOLERANCE) && (Depth2 < MAX_DISTANCE))
 			{
-				VEvaluateRay(IPoint, New_Ray.Origin, Depth2, New_Ray.Direction);
-				MTransPoint(IPoint, IPoint, Trans);
+				IPoint = New_Ray.Evaluate(Depth2);
+				MTransPoint(*IPoint, *IPoint, Trans);
 
-				if(Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
+				if(Clip.empty() || Point_In_Clip(*IPoint, Clip, Thread))
 				{
 					Depth_Stack->push(Intersection(Depth2 / len, IPoint, this));
 					Intersection_Found = true;
@@ -134,7 +134,7 @@ bool Sphere::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadD
 	{
 		register int Intersection_Found;
 		DBL Depth1, Depth2;
-		VECTOR IPoint;
+		Vector3d IPoint;
 
 		Intersection_Found = false;
 
@@ -143,9 +143,9 @@ bool Sphere::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadD
 			Thread->Stats()[Ray_Sphere_Tests_Succeeded]++;
 			if((Depth1 > DEPTH_TOLERANCE) && (Depth1 < MAX_DISTANCE))
 			{
-				VEvaluateRay(IPoint, ray.Origin, Depth1, ray.Direction);
+				IPoint = ray.Evaluate(Depth1);
 
-				if(Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
+				if(Clip.empty() || Point_In_Clip(*IPoint, Clip, Thread))
 				{
 					Depth_Stack->push(Intersection(Depth1, IPoint, this));
 					Intersection_Found = true;
@@ -154,9 +154,9 @@ bool Sphere::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadD
 
 			if((Depth2 > DEPTH_TOLERANCE) && (Depth2 < MAX_DISTANCE))
 			{
-				VEvaluateRay(IPoint, ray.Origin, Depth2, ray.Direction);
+				IPoint = ray.Evaluate(Depth2);
 
-				if(Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
+				if(Clip.empty() || Point_In_Clip(*IPoint, Clip, Thread))
 				{
 					Depth_Stack->push(Intersection(Depth2, IPoint, this));
 					Intersection_Found = true;
@@ -207,11 +207,11 @@ bool Sphere::Intersect(const Ray& ray, const VECTOR Center, DBL Radius2, DBL *De
 	DBL OCSquared, t_Closest_Approach, Half_Chord, t_Half_Chord_Squared;
 	VECTOR Origin_To_Center;
 
-	VSub(Origin_To_Center, Center, ray.Origin);
+	VSub(Origin_To_Center, Center, *ray.Origin);
 
 	VDot(OCSquared, Origin_To_Center, Origin_To_Center);
 
-	VDot(t_Closest_Approach, Origin_To_Center, ray.Direction);
+	VDot(t_Closest_Approach, Origin_To_Center, *ray.Direction);
 
 	if ((OCSquared >= Radius2) && (t_Closest_Approach < EPSILON))
 		return(false);
@@ -329,14 +329,14 @@ void Sphere::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread)
 	{
 		VECTOR New_Point;
 		// Transform the point into the sphere's space
-		MInvTransPoint(New_Point, Inter->IPoint, Trans);
+		MInvTransPoint(New_Point, *Inter->IPoint, Trans);
 		VSub(Result, New_Point, Center);
 		MTransNormal(Result, Result, Trans);
 		VNormalize(Result, Result);
 	}
 	else
 	{
-		VSub(Result, Inter->IPoint, Center);
+		VSub(Result, *Inter->IPoint, Center);
 		VInverseScaleEq(Result, Radius);
 	}
 }
@@ -750,7 +750,7 @@ void Sphere::UVCoord(UV_VECT Result, const Intersection *Inter, TraceThreadData 
 	if (UV_Trans != NULL)
 	{
 
-		MInvTransPoint(New_Point, Inter->IPoint, UV_Trans);
+		MInvTransPoint(New_Point, *Inter->IPoint, UV_Trans);
 
 		if (Trans != NULL)
 			MTransPoint(New_Center, Center, Trans);
@@ -761,7 +761,7 @@ void Sphere::UVCoord(UV_VECT Result, const Intersection *Inter, TraceThreadData 
 	}
 	else
 	{
-		Assign_Vector(New_Point, Inter->IPoint);
+		Assign_Vector(New_Point, *Inter->IPoint);
 		Assign_Vector(New_Center, Center);
 	}
 	x = New_Point[X]-New_Center[X];
@@ -812,7 +812,7 @@ void Sphere::UVCoord(UV_VECT Result, const Intersection *Inter, TraceThreadData 
 	Result[V] = phi;
 }
 
-bool Sphere::Intersect_BBox(BBoxDirection, const BBOX_VECT&, const BBOX_VECT&, BBOX_VAL) const
+bool Sphere::Intersect_BBox(BBoxDirection, const BBoxVector3d&, const BBoxVector3d&, BBoxScalar) const
 {
 	return true;
 }

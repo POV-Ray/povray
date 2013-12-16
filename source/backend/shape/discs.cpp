@@ -26,11 +26,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/shape/discs.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/shape/discs.cpp $
+ * $Revision: #28 $
+ * $Change: 6118 $
+ * $DateTime: 2013/11/22 16:39:19 $
+ * $Author: clipka $
  *******************************************************************************/
 
 // frame.h must always be the first POV file included (pulls in platform config)
@@ -80,7 +80,7 @@ bool Disc::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDat
 {
 	int Intersection_Found;
 	DBL Depth;
-	VECTOR IPoint;
+	Vector3d IPoint;
 
 	Intersection_Found = false;
 
@@ -88,9 +88,9 @@ bool Disc::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDat
 	if (Intersect(ray, &Depth))
 	{
 		Thread->Stats()[Ray_Disc_Tests_Succeeded]++;
-		VEvaluateRay(IPoint, ray.Origin, Depth, ray.Direction);
+		IPoint = ray.Evaluate(Depth);
 
-		if (Clip.empty() || Point_In_Clip (IPoint, Clip, Thread))
+		if (Clip.empty() || Point_In_Clip (*IPoint, Clip, Thread))
 		{
 			Depth_Stack->push(Intersection(Depth,IPoint,this));
 			Intersection_Found = true;
@@ -135,8 +135,8 @@ bool Disc::Intersect(const Ray& ray, DBL *Depth) const
 
 	/* Transform the point into the discs space */
 
-	MInvTransPoint(P, ray.Origin, Trans);
-	MInvTransDirection(D, ray.Direction, Trans);
+	MInvTransPoint(P, *ray.Origin, Trans);
+	MInvTransDirection(D, *ray.Direction, Trans);
 
 	VLength(len, D);
 	VInverseScaleEq(D, len);

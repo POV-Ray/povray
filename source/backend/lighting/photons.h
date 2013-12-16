@@ -26,11 +26,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/lighting/photons.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/lighting/photons.h $
+ * $Revision: #32 $
+ * $Change: 6119 $
+ * $DateTime: 2013/11/22 20:31:53 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #ifndef PHOTONS_H
@@ -340,7 +340,7 @@ class ShootingDirection
 
 		LightSource* light;
 		ObjectPtr target;
-		VECTOR up, left, ctr, toctr, v; /* vectors to determine direction of shot */
+		Vector3d up, left, ctr, toctr, v; /* vectors to determine direction of shot */
 		DBL dist;                      /* distance from light to center of bounding sphere */
 		DBL rad;                       /* radius of bounding sphere */
 

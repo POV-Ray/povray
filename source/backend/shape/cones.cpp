@@ -26,11 +26,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/shape/cones.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/shape/cones.cpp $
+ * $Revision: #37 $
+ * $Change: 6118 $
+ * $DateTime: 2013/11/22 16:39:19 $
+ * $Author: clipka $
  *******************************************************************************/
 
 // frame.h must always be the first POV file included (pulls in platform config)
@@ -94,7 +94,7 @@ const int SIDE_HIT = 3;
 bool Cone::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread)
 {
 	int Intersection_Found, cnt, i;
-	VECTOR IPoint;
+	Vector3d IPoint;
 	CONE_INT I[4];
 
 	Intersection_Found = false;
@@ -103,9 +103,9 @@ bool Cone::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDat
 	{
 		for (i = 0; i < cnt; i++)
 		{
-			VEvaluateRay(IPoint, ray.Origin, I[i].d, ray.Direction);
+			IPoint = ray.Evaluate(I[i].d);
 
-			if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
+			if (Clip.empty() || Point_In_Clip(*IPoint, Clip, Thread))
 			{
 				Depth_Stack->push(Intersection(I[i].d,IPoint,this,I[i].t));
 				Intersection_Found = true;
@@ -155,8 +155,8 @@ int Cone::Intersect(const Ray& ray, CONE_INT *Intersection, TraceThreadData *Thr
 
 	/* Transform the ray into the cones space */
 
-	MInvTransPoint(P, ray.Origin, Trans);
-	MInvTransDirection(D, ray.Direction, Trans);
+	MInvTransPoint(P, *ray.Origin, Trans);
+	MInvTransDirection(D, *ray.Direction, Trans);
 
 	VLength(len, D);
 	VInverseScaleEq(D, len);
@@ -400,7 +400,7 @@ void Cone::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) c
 {
 	/* Transform the point into the cones space */
 
-	MInvTransPoint(Result, Inter->IPoint, Trans);
+	MInvTransPoint(Result, *Inter->IPoint, Trans);
 
 	/* Calculating the normal is real simple in canonical cone space */
 

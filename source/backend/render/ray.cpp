@@ -24,11 +24,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/render/ray.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/render/ray.cpp $
+ * $Revision: #35 $
+ * $Change: 6118 $
+ * $DateTime: 2013/11/22 16:39:19 $
+ * $Author: clipka $
  *******************************************************************************/
 
 // frame.h must always be the first POV file included (pulls in platform config)
@@ -47,19 +47,14 @@ namespace pov
 
 Ray::Ray(RayType rt, bool shadowTest, bool photon, bool radiosity, bool monochromatic, bool pretrace)
 {
-	Make_Vector(Origin, 0.0, 0.0, 0.0);
-	Make_Vector(Direction, 0.0, 0.0, 0.0);
-
 	SetFlags(rt, shadowTest, photon, radiosity, monochromatic, pretrace);
 	hollowRay = true;
 	ClearInteriors();
 }
 
-Ray::Ray(const VECTOR ov, const VECTOR dv, RayType rt, bool shadowTest, bool photon, bool radiosity, bool monochromatic, bool pretrace)
+Ray::Ray(const Vector3d& ov, const Vector3d& dv, RayType rt, bool shadowTest, bool photon, bool radiosity, bool monochromatic, bool pretrace) :
+	Origin(ov), Direction(dv)
 {
-	Assign_Vector(Origin, ov);
-	Assign_Vector(Direction, dv);
-
 	SetFlags(rt, shadowTest, photon, radiosity, monochromatic, pretrace);
 	hollowRay = true;
 	ClearInteriors();

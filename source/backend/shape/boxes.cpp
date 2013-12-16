@@ -26,11 +26,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/shape/boxes.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/shape/boxes.cpp $
+ * $Revision: #33 $
+ * $Change: 6119 $
+ * $DateTime: 2013/11/22 20:31:53 $
+ * $Author: clipka $
  *******************************************************************************/
 
 // frame.h must always be the first POV file included (pulls in platform config)
@@ -103,7 +103,7 @@ bool Box::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadData
 	int Intersection_Found;
 	int Side1, Side2;
 	DBL Depth1, Depth2;
-	VECTOR IPoint;
+	Vector3d IPoint;
 
 	Thread->Stats()[Ray_Box_Tests]++;
 
@@ -113,9 +113,9 @@ bool Box::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadData
 	{
 		if (Depth1 > DEPTH_TOLERANCE)
 		{
-			VEvaluateRay(IPoint, ray.Origin, Depth1, ray.Direction);
+			IPoint = ray.Evaluate(Depth1);
 
-			if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
+			if (Clip.empty() || Point_In_Clip(*IPoint, Clip, Thread))
 			{
 				Depth_Stack->push(Intersection(Depth1,IPoint,this,Side1));
 
@@ -123,9 +123,9 @@ bool Box::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadData
 			}
 		}
 
-		VEvaluateRay(IPoint, ray.Origin, Depth2, ray.Direction);
+		IPoint = ray.Evaluate(Depth2);
 
-		if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
+		if (Clip.empty() || Point_In_Clip(*IPoint, Clip, Thread))
 		{
 			Depth_Stack->push(Intersection(Depth2,IPoint,this,Side2));
 
@@ -180,13 +180,13 @@ bool Box::Intersect(const Ray& ray, const TRANSFORM *Trans, const VECTOR Corner1
 
 	if (Trans != NULL)
 	{
-		MInvTransPoint(P, ray.Origin, Trans);
-		MInvTransDirection(D, ray.Direction, Trans);
+		MInvTransPoint(P, *ray.Origin, Trans);
+		MInvTransDirection(D, *ray.Direction, Trans);
 	}
 	else
 	{
-		Assign_Vector(P, ray.Origin);
-		Assign_Vector(D, ray.Direction);
+		Assign_Vector(P, *ray.Origin);
+		Assign_Vector(D, *ray.Direction);
 	}
 
 	tmin = 0.0;
@@ -982,9 +982,9 @@ Box::~Box()
 
 void Box::Compute_BBox()
 {
-	Assign_BBox_Vect(BBox.Lower_Left, bounds[0]);
+	BBox.lowerLeft = BBoxVector3d(bounds[0]);
 
-	VSub(BBox.Lengths, bounds[1], bounds[0]);
+	BBox.size = BBoxVector3d(Vector3d(bounds[1]) - Vector3d(bounds[0]));
 
 	if (Trans != NULL)
 	{
@@ -1067,9 +1067,9 @@ void Box::UVCoord(UV_VECT Result, const Intersection *Inter, TraceThreadData *Th
 
 	/* Transform the point into the cube's space */
 	if (Trans != NULL)
-		MInvTransPoint(P, Inter->IPoint, Trans);
+		MInvTransPoint(P, *Inter->IPoint, Trans);
 	else
-		Assign_Vector(P, Inter->IPoint);
+		Assign_Vector(P, *Inter->IPoint);
 
 	VSub(Box_Diff,bounds[1],bounds[0]);
 
@@ -1115,7 +1115,7 @@ void Box::UVCoord(UV_VECT Result, const Intersection *Inter, TraceThreadData *Th
 	}
 }
 
-bool Box::Intersect_BBox(BBoxDirection, const BBOX_VECT&, const BBOX_VECT&, BBOX_VAL) const
+bool Box::Intersect_BBox(BBoxDirection, const BBoxVector3d&, const BBoxVector3d&, BBoxScalar) const
 {
 	return true;
 }

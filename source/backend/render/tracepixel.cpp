@@ -28,9 +28,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/render/tracepixel.cpp $
- * $Revision: #45 $
- * $Change: 6113 $
- * $DateTime: 2013/11/20 20:39:54 $
+ * $Revision: #47 $
+ * $Change: 6119 $
+ * $DateTime: 2013/11/22 20:31:53 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -298,7 +298,7 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
 	ray.SetFlags(Ray::PrimaryRay, false, false, false, false, pretrace);
 
 	// Create primary ray according to the camera used.
-	Assign_Vector(ray.Origin, *cameraLocation);
+	ray.Origin = cameraLocation;
 
 	switch(camera.Type)
 	{
@@ -311,7 +311,7 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
 			y0 = ((height - 1) - y) / height - 0.5;
 
 			// Create primary ray.
-			VLinComb3(ray.Direction, 1.0, *cameraDirection, x0, *cameraRight, y0, *cameraUp);
+			ray.Direction = cameraDirection + x0 * cameraRight + y0 * cameraUp;
 
 			// Do focal blurring (by Dan Farmer).
 			if(useFocalBlur)
@@ -332,9 +332,9 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
 			y0 = ((height - 1) - y) / height - 0.5;
 
 			// Create primary ray.
-			Assign_Vector(ray.Direction, *cameraDirection);
+			ray.Direction = cameraDirection;
 
-			VLinComb3(ray.Origin, 1.0, *cameraLocation, x0, *cameraRight, y0, *cameraUp);
+			ray.Origin = cameraLocation + x0 * cameraRight + y0 * cameraUp;
 
 			if(useFocalBlur)
 				JitterCameraRay(ray, x, y, ray_number);
@@ -378,7 +378,7 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
 			cx = cos(x0);  sx = sin(x0);
 			cy = cos(y0);  sy = sin(y0);
 
-			VLinComb3(ray.Direction, cx * sy, *cameraRight, sx * sy, *cameraUp, cy, *cameraDirection);
+			ray.Direction = (cx * sy) * cameraRight + (sx * sy) * cameraUp + cy * cameraDirection;
 
 			if(useFocalBlur)
 				JitterCameraRay(ray, x, y, ray_number);
@@ -434,7 +434,7 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
 			if (sx * sy < tan(135.0 * M_PI_180) * cy)
 				return false;
 
-			VLinComb3(ray.Direction, cx * sy, *cameraRight, sx * sy, *cameraUp, cy, *cameraDirection);
+			ray.Direction = (cx * sy) * cameraRight + (sx * sy) * cameraUp + cy * cameraDirection;
 
 			if(useFocalBlur)
 				JitterCameraRay(ray, x, y, ray_number);
@@ -468,7 +468,7 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
 				ty = tan(y0);
 
 			// Create primary ray.
-			VLinComb3(ray.Direction, cx, *cameraRight, ty, *cameraUp, sx, *cameraDirection);
+			ray.Direction = cx * cameraRight + ty * cameraUp + sx * cameraDirection;
 
 			if(useFocalBlur)
 				JitterCameraRay(ray, x, y, ray_number);
@@ -493,7 +493,7 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
 			cx = cos(x0);  sx = sin(x0);
 			cy = cos(y0);  sy = sin(y0);
 
-			VLinComb3(ray.Direction, sx, *cameraRight, sy, *cameraUp, cx * cy, *cameraDirection);
+			ray.Direction = sx * cameraRight + sy * cameraUp + (cx * cy) * cameraDirection;
 
 			if(useFocalBlur)
 				JitterCameraRay(ray, x, y, ray_number);
@@ -516,7 +516,7 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
 			cx = cos(x0);
 			sx = sin(x0);
 
-			VLinComb3(ray.Direction, sx, *cameraRight, y0, *cameraUp, cx, *cameraDirection);
+			ray.Direction = sx * cameraRight + y0 * cameraUp + cx * cameraDirection;
 
 			if(useFocalBlur)
 				JitterCameraRay(ray, x, y, ray_number);
@@ -538,7 +538,7 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
 			cy = cos(y0);
 			sy = sin(y0);
 
-			VLinComb3(ray.Direction, x0, *cameraRight, sy, *cameraUp, cy, *cameraDirection);
+			ray.Direction = x0 * cameraRight + sy * cameraUp + cy * cameraDirection;
 
 			if(useFocalBlur)
 				JitterCameraRay(ray, x, y, ray_number);
@@ -561,9 +561,9 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
 			cx = cos(x0);
 			sx = sin(x0);
 
-			VLinComb2(ray.Direction, sx, *cameraRight, cx, *cameraDirection);
+			ray.Direction = sx * cameraRight + cx * cameraDirection;
 
-			VLinComb2(ray.Origin, 1.0, *cameraLocation, y0, *cameraUp);
+			ray.Origin = cameraLocation + y0 * cameraUp;
 
 			if(useFocalBlur)
 				JitterCameraRay(ray, x, y, ray_number);
@@ -586,9 +586,9 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
 			cy = cos(y0);
 			sy = sin(y0);
 
-			VLinComb2(ray.Direction, sy, *cameraUp, cy, *cameraDirection);
+			ray.Direction = sy * cameraUp + cy * cameraDirection;
 
-			VLinComb2(ray.Origin, 1.0, *cameraLocation, x0, *cameraRight);
+			ray.Origin = cameraLocation + x0 * cameraRight;
 
 			if(useFocalBlur)
 				JitterCameraRay(ray, x, y, ray_number);
@@ -616,7 +616,7 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
 			Compute_Axis_Rotation_Transform(&Trans, *cameraUp, x0);
 
 			// Create primary ray.
-			MTransPoint(ray.Direction, V1, &Trans);
+			MTransPoint(*ray.Direction, V1, &Trans);
 
 			if(useFocalBlur)
 				JitterCameraRay(ray, x, y, ray_number);
@@ -654,24 +654,24 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
 				ray.Origin[Z] = (mesh->Data->Vertices[tr.P1][Z] + mesh->Data->Vertices[tr.P2][Z] + mesh->Data->Vertices[tr.P3][Z]) / 3;
 
 				// set the ray direction according to the normal of the face
-				Assign_Vector(ray.Direction, mesh->Data->Normals[tr.Normal_Ind]);
+				ray.Direction = Vector3d(mesh->Data->Normals[tr.Normal_Ind]);
 
 				// we use the Z co-ordinate of the camera location to indicate how far, along
 				// the ray's direction, we should move the ray's origin point. this allows the
 				// ray origin to be set slightly above the face, for example.
-				VEvaluateRay(ray.Origin, ray.Origin, camera.Location[Z], ray.Direction);
+				ray.Origin = ray.Evaluate(camera.Location[Z]);
 
 				// we use the Z component of the camera direction to indicate whether or not
 				// we should invert the ray direction. if the Z component is less than 0 (or
 				// actually -EPSILON), then we shoot the ray in the opposite direction.
 				if (camera.Direction[Z] < -EPSILON)
-					VScaleEq(ray.Direction, -1);
+					ray.Direction.invert();
 
 				// apply any transformations needed
 				if (mesh->Trans)
 				{
-					MTransPoint (ray.Origin, ray.Origin, mesh->Trans);
-					MTransNormal (ray.Direction, ray.Direction, mesh->Trans);
+					MTransPoint (*ray.Origin, *ray.Origin, mesh->Trans);
+					MTransNormal (*ray.Direction, *ray.Direction, mesh->Trans);
 				}
 
 				// we're done
@@ -710,14 +710,14 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
 						ray.Origin[X] = (mesh->Data->Vertices[tr.P1][X] + mesh->Data->Vertices[tr.P2][X] + mesh->Data->Vertices[tr.P3][X]) / 3;
 						ray.Origin[Y] = (mesh->Data->Vertices[tr.P1][Y] + mesh->Data->Vertices[tr.P2][Y] + mesh->Data->Vertices[tr.P3][Y]) / 3;
 						ray.Origin[Z] = (mesh->Data->Vertices[tr.P1][Z] + mesh->Data->Vertices[tr.P2][Z] + mesh->Data->Vertices[tr.P3][Z]) / 3;
-						Assign_Vector(ray.Direction, mesh->Data->Normals[tr.Normal_Ind]);
-						VEvaluateRay(ray.Origin, ray.Origin, camera.Location[Z], ray.Direction);
+						ray.Direction = Vector3d(mesh->Data->Normals[tr.Normal_Ind]);
+						ray.Origin = ray.Evaluate(camera.Location[Z]);
 						if (camera.Direction[Z] < -EPSILON)
-							VScaleEq(ray.Direction, -1);
+							ray.Direction.invert();
 						if (mesh->Trans)
 						{
-							MTransPoint (ray.Origin, ray.Origin, mesh->Trans);
-							MTransNormal (ray.Direction, ray.Direction, mesh->Trans);
+							MTransPoint (*ray.Origin, *ray.Origin, mesh->Trans);
+							MTransNormal (*ray.Direction, *ray.Direction, mesh->Trans);
 						}
 						InitRayContainerState(ray);
 						break;
@@ -747,14 +747,14 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
 				ray.Origin[X] = (mesh->Data->Vertices[tr.P1][X] + mesh->Data->Vertices[tr.P2][X] + mesh->Data->Vertices[tr.P3][X]) / 3;
 				ray.Origin[Y] = (mesh->Data->Vertices[tr.P1][Y] + mesh->Data->Vertices[tr.P2][Y] + mesh->Data->Vertices[tr.P3][Y]) / 3;
 				ray.Origin[Z] = (mesh->Data->Vertices[tr.P1][Z] + mesh->Data->Vertices[tr.P2][Z] + mesh->Data->Vertices[tr.P3][Z]) / 3;
-				Assign_Vector(ray.Direction, mesh->Data->Normals[tr.Normal_Ind]);
-				VEvaluateRay(ray.Origin, ray.Origin, camera.Location[Z], ray.Direction);
+				ray.Direction = Vector3d(mesh->Data->Normals[tr.Normal_Ind]);
+				ray.Origin = ray.Evaluate(camera.Location[Z]);
 				if (camera.Direction[Z] < -EPSILON)
-					VScaleEq(ray.Direction, -1);
+					ray.Direction.invert();
 				if (mesh->Trans)
 				{
-					MTransPoint (ray.Origin, ray.Origin, mesh->Trans);
-					MTransNormal (ray.Direction, ray.Direction, mesh->Trans);
+					MTransPoint (*ray.Origin, *ray.Origin, mesh->Trans);
+					MTransNormal (*ray.Direction, *ray.Direction, mesh->Trans);
 				}
 				InitRayContainerState(ray);
 			}
@@ -814,9 +814,9 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
 								ray.Origin[Z] = mesh->Data->Vertices[tr->P1][Z] * B1 + mesh->Data->Vertices[tr->P2][Z] * B2 + mesh->Data->Vertices[tr->P3][Z] * B3;
 
 								// we use the one normal for any location on the face, unless smooth is set
-								Assign_Vector(ray.Direction, mesh->Data->Normals[tr->Normal_Ind]);
+								ray.Direction = Vector3d(mesh->Data->Normals[tr->Normal_Ind]);
 								if (camera.Smooth)
-									mesh->Smooth_Mesh_Normal(ray.Direction, tr, ray.Origin);
+									mesh->Smooth_Mesh_Normal(*ray.Direction, tr, *ray.Origin);
 
 								found = true;
 								break;
@@ -826,13 +826,13 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
 				}
 				if (!found)
 					return false;
-				VEvaluateRay(ray.Origin, ray.Origin, camera.Location[Z], ray.Direction);
+				ray.Origin = ray.Evaluate(camera.Location[Z]);
 				if (camera.Direction[Z] < -EPSILON)
-					VScaleEq(ray.Direction, -1);
+					ray.Direction.invert();
 				if (mesh->Trans)
 				{
-					MTransPoint (ray.Origin, ray.Origin, mesh->Trans);
-					MTransNormal (ray.Direction, ray.Direction, mesh->Trans);
+					MTransPoint (*ray.Origin, *ray.Origin, mesh->Trans);
+					MTransNormal (*ray.Direction, *ray.Direction, mesh->Trans);
 				}
 				InitRayContainerState(ray);
 			}
@@ -844,12 +844,12 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
 
 	if(camera.Tnormal != NULL)
 	{
-		VNormalize(ray.Direction, ray.Direction);
+		ray.Direction.normalize();
 		Make_Vector(V1, x0, y0, 0.0);
-		Perturb_Normal(ray.Direction, camera.Tnormal, V1, NULL, NULL, threadData);
+		Perturb_Normal(*ray.Direction, camera.Tnormal, V1, NULL, NULL, threadData);
 	}
 
-	VNormalize(ray.Direction, ray.Direction);
+	ray.Direction.normalize();
 
 	return true;
 }
@@ -865,20 +865,20 @@ void TracePixel::InitRayContainerState(Ray& ray, bool compute)
 		{
 			HasInteriorPointObjectCondition precond;
 			ContainingInteriorsPointObjectCondition postcond(containingInteriors);
-			BSPInsideCondFunctor ifn(Vector3d(ray.Origin), sceneData->objects, threadData, precond, postcond);
+			BSPInsideCondFunctor ifn(ray.Origin, sceneData->objects, threadData, precond, postcond);
 
 			mailbox.clear();
-			(*sceneData->tree)(Vector3d(ray.Origin), ifn, mailbox);
+			(*sceneData->tree)(ray.Origin, ifn, mailbox);
 
 			// test infinite objects
 			for(vector<ObjectPtr>::iterator object = sceneData->objects.begin() + sceneData->numberOfFiniteObjects; object != sceneData->objects.end(); object++)
-				if(((*object)->interior != NULL) && Inside_BBox(ray.Origin, (*object)->BBox) && (*object)->Inside(ray.Origin, threadData))
+				if(((*object)->interior != NULL) && Inside_BBox(ray.Origin, (*object)->BBox) && (*object)->Inside(*ray.Origin, threadData))
 					containingInteriors.push_back((*object)->interior);
 		}
 		else if((sceneData->boundingMethod == 0) || (sceneData->boundingSlabs == NULL))
 		{
 			for(vector<ObjectPtr>::iterator object = sceneData->objects.begin(); object != sceneData->objects.end(); object++)
-				if(((*object)->interior != NULL) && Inside_BBox(ray.Origin, (*object)->BBox) && (*object)->Inside(ray.Origin, threadData))
+				if(((*object)->interior != NULL) && Inside_BBox(ray.Origin, (*object)->BBox) && (*object)->Inside(*ray.Origin, threadData))
 					containingInteriors.push_back((*object)->interior);
 		}
 		else
@@ -922,7 +922,7 @@ void TracePixel::InitRayContainerStateTree(Ray& ray, BBOX_TREE *node)
 	{
 		/* This is a leaf so test contained object. */
 		ObjectPtr object = ObjectPtr(node->Node);
-		if((object->interior != NULL) && object->Inside(ray.Origin, threadData))
+		if((object->interior != NULL) && object->Inside(*ray.Origin, threadData))
 			containingInteriors.push_back(object->interior);
 	}
 	else
@@ -1059,16 +1059,16 @@ void TracePixel::JitterCameraRay(Ray& ray, DBL x, DBL y, size_t ray_number)
 
 	VSub(deflection, temp_xperp, temp_yperp);
 
-	VAdd(ray.Origin, camera.Location, deflection);
+	ray.Origin = Vector3d(camera.Location) + Vector3d(deflection);
 
 	// Deflect the direction of the ray in the opposite direction we deflected
 	// the eye position.  This makes sure that we are looking at the same place
 	// when the distance from the eye is equal to "Focal_Distance".
 
-	VScale(ray.Direction, ray.Direction, focalBlurData->Focal_Distance);
-	VSub(ray.Direction, ray.Direction, deflection);
+	ray.Direction *= focalBlurData->Focal_Distance;
+	ray.Direction -= Vector3d(deflection);
 
-	VNormalize(ray.Direction, ray.Direction);
+	ray.Direction.normalize();
 }
 
 TracePixel::FocalBlurData::FocalBlurData(const Camera& camera, TraceThreadData* threadData)

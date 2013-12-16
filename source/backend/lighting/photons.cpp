@@ -27,9 +27,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/lighting/photons.cpp $
- * $Revision: #59 $
- * $Change: 6113 $
- * $DateTime: 2013/11/20 20:39:54 $
+ * $Revision: #62 $
+ * $Change: 6120 $
+ * $DateTime: 2013/11/23 06:59:22 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -263,7 +263,7 @@ void PhotonTrace::ComputeLightedTexture(Colour& LightCol, const TEXTURE *Texture
 	Trans = 1.0;
 
 	// initialize the new ray... we will probably end up using it
-	Assign_Vector(NewRay.Origin, isect.IPoint);
+	NewRay.Origin = isect.IPoint;
 
 	// In the future, we could enhance this so that users can determine
 	// how and when photons are deposited into different media.
@@ -340,7 +340,7 @@ void PhotonTrace::ComputeLightedTexture(Colour& LightCol, const TEXTURE *Texture
 	    !Test_Flag(isect.Object,PH_IGNORE_PHOTONS_FLAG) &&
 	    Check_Photon_Light_Group(isect.Object))
 	{
-		addSurfacePhoton(isect.IPoint, ray.Origin, RGBColour(LightCol));
+		addSurfacePhoton(*isect.IPoint, *ray.Origin, RGBColour(LightCol));
 	}
 
 #ifndef PT_FILTER_BEFORE_TARGET
@@ -348,8 +348,8 @@ void PhotonTrace::ComputeLightedTexture(Colour& LightCol, const TEXTURE *Texture
 	{
 		Ray NRay(ray);
 
-		Assign_Vector(NRay.Origin, isect.IPoint); // [CLi] this erroneously used *ipoint before
-		Assign_Vector(NRay.Direction, ray.Direction);
+		NRay.Origin = isect.IPoint;
+		NRay.Direction = ray.Direction;
 
 #ifndef PT_AMPLIFY_BUG
 		// Make sure we get insideness right
@@ -421,8 +421,7 @@ void PhotonTrace::ComputeLightedTexture(Colour& LightCol, const TEXTURE *Texture
 		listWNRX->push_back(WNRX(New_Weight, LayNormal, RGBColour(), Layer->Finish->Reflect_Exp));
 
 		// angle-dependent reflectivity
-		VDot(Cos_Angle_Incidence, ray.Direction, *LayNormal);
-		Cos_Angle_Incidence *= -1.0;
+		Cos_Angle_Incidence = -dot(ray.Direction, LayNormal);
 
 		if ((isect.Object->interior != NULL) ||
 		    (Layer->Finish->Reflection_Type != 1))
@@ -570,12 +569,11 @@ void PhotonTrace::ComputeLightedTexture(Colour& LightCol, const TEXTURE *Texture
 
 		// Trace refracted ray.
 		threadData->GFilCol = FilCol;
-		Vector3d tmpIPoint(isect.IPoint);
 
 		Ray NRay(ray);
 
-		Assign_Vector(NRay.Origin, isect.IPoint);
-		Assign_Vector(NRay.Direction, ray.Direction);
+		NRay.Origin = isect.IPoint;
+		NRay.Direction = ray.Direction;
 
 		Colour CurLightCol;
 		RGBColour GFilCol = threadData->GFilCol;
@@ -643,9 +641,8 @@ void PhotonTrace::ComputeLightedTexture(Colour& LightCol, const TEXTURE *Texture
 
 		// Trace refracted ray.
 		threadData->GFilCol = FilCol;
-		Vector3d tmpIPoint(isect.IPoint);
 
-		TIR_occured = ComputeRefractionForPhotons(Texture->Finish, interior, tmpIPoint, ray, TopNormal, rawnormal, LightCol, New_Weight, ticket);
+		TIR_occured = ComputeRefractionForPhotons(Texture->Finish, interior, isect.IPoint, ray, TopNormal, rawnormal, LightCol, New_Weight, ticket);
 	}
 
 	// Shoot reflected photons.
@@ -694,9 +691,7 @@ void PhotonTrace::ComputeLightedTexture(Colour& LightCol, const TEXTURE *Texture
 
 					TempWeight = (*listWNRX)[i].weight * (*listWNRX)[i].reflec.weightMax();
 
-					Vector3d tmpIPoint(isect.IPoint);
-
-					ComputeReflection(Layer->Finish, tmpIPoint, ray, LayNormal, rawnormal, TmpCol, TempWeight, ticket);
+					ComputeReflection(Layer->Finish, isect.IPoint, ray, LayNormal, rawnormal, TmpCol, TempWeight, ticket);
 				}
 			}
 
@@ -724,7 +719,7 @@ bool PhotonTrace::ComputeRefractionForPhotons(const FINISH* finish, Interior *in
 	nray.SetFlags(Ray::RefractionRay, ray);
 
 	// Set up new ray.
-	Assign_Vector(nray.Origin, *ipoint);
+	nray.Origin = ipoint;
 
 	// Get ratio of iors depending on the interiors the ray is traversing.
 
@@ -794,7 +789,7 @@ bool PhotonTrace::ComputeRefractionForPhotons(const FINISH* finish, Interior *in
 	if((fabs(ior - 1.0) < EPSILON) && (fabs(dispersion - 1.0) < EPSILON))
 	{
 		// Only transmit the ray.
-		Assign_Vector(nray.Direction, ray.Direction);
+		nray.Direction = ray.Direction;
 		// Trace a transmitted ray.
 		threadData->Stats()[Transmitted_Rays_Traced]++;
 
@@ -814,7 +809,7 @@ bool PhotonTrace::ComputeRefractionForPhotons(const FINISH* finish, Interior *in
 	else
 	{
 		// Refract the ray.
-		VDot(n, ray.Direction, *normal);
+		n = dot(ray.Direction, normal);
 
 		if(n <= 0.0)
 		{
@@ -863,7 +858,7 @@ bool PhotonTrace::TraceRefractionRayForPhotons(const FINISH* finish, const Vecto
 
 	t = ior * n - sqrt(t);
 
-	VLinComb2(nray.Direction, ior, ray.Direction, t, *localnormal);
+	nray.Direction = ior * ray.Direction + t * localnormal;
 
 	// Trace a refracted ray.
 	threadData->Stats()[Refracted_Rays_Traced]++;
@@ -1212,10 +1207,10 @@ void PhotonMediaFunction::DepositMediaPhotons(Colour& colour, MediaVector& media
 					                      threadData->photonSpread );
 				}
 
-				VECTOR TempPoint;
-				VEvaluateRay(TempPoint, ray.Origin, d0*(*i).ds+(*i).s0, ray.Direction);
+				Vector3d TempPoint;
+				TempPoint = ray.Evaluate(d0*(*i).ds+(*i).s0);
 
-				addMediaPhoton(TempPoint, ray.Origin, PhotonColour, d0*(*i).ds+(*i).s0);
+				addMediaPhoton(*TempPoint, *ray.Origin, PhotonColour, d0*(*i).ds+(*i).s0);
 			}
 		}
 	}
@@ -1547,54 +1542,52 @@ void ShootingDirection::recomputeForAreaLight(Ray& ray, int area_x, int area_y)
 	}
 
 	// need a new toctr & left
-	VAddEq(ray.Origin, NewAxis1);
-	VAddEq(ray.Origin, NewAxis2);
+	ray.Origin += Vector3d(NewAxis1);
+	ray.Origin += Vector3d(NewAxis2);
 
-	VSub(toctr, ctr, ray.Origin);
-	VLength(dist, toctr);
+	toctr = ctr - ray.Origin;
+	dist = toctr.length();
 
-	VNormalizeEq(toctr);
+	toctr.normalize(); // TODO - toctr /= dist  should do the job
 	if ( fabs(fabs(toctr[Z])- 1.) < .1 )
 	{
 		// too close to vertical for comfort, so use cross product with horizon
-		up[X] = 0.; up[Y] = 1.; up[Z] = 0.;
+		up = Vector3d(0.0, 1.0, 0.0);
 	}
 	else
 	{
-		up[X] = 0.; up[Y] = 0.; up[Z] = 1.;
+		up = Vector3d(0.0, 0.0, 1.0);
 	}
-	VCross(left, toctr, up);  VNormalizeEq(left);
+	left = cross(toctr, up).normalized();
 
 	if (fabs(dist)<EPSILON)
 	{
-		Make_Vector(up, 1,0,0);
-		Make_Vector(left, 0,1,0);
-		Make_Vector(toctr, 0,0,1);
+		up    = Vector3d(1.0, 0.0, 0.0);
+		left  = Vector3d(0.0, 1.0, 0.0);
+		toctr = Vector3d(0.0, 0.0, 1.0);
 	}
 }
 
 void ShootingDirection::compute()
 {
 	// find bounding sphere based on bounding box
-	ctr[X] = target->BBox.Lower_Left[X] + target->BBox.Lengths[X] / 2.0;
-	ctr[Y] = target->BBox.Lower_Left[Y] + target->BBox.Lengths[Y] / 2.0;
-	ctr[Z] = target->BBox.Lower_Left[Z] + target->BBox.Lengths[Z] / 2.0;
-	VSub(v, ctr,target->BBox.Lower_Left);
-	VLength(rad, v);
+	v   = Vector3d(target->BBox.size) / 2.0;
+	ctr = Vector3d(target->BBox.lowerLeft) + v;
+	rad = v.length();
 
 	// find direction from object to bounding sphere
-	VSub(toctr, ctr, light->Center);
-	VLength(dist, toctr);
+	toctr = ctr - Vector3d(light->Center);
+	dist = toctr.length();
 
-	VNormalizeEq(toctr);
+	toctr.normalize(); // TODO - toctr /= dist  should do the job
 	if ( fabs(fabs(toctr[Z])- 1.) < .1 )
 	{
 		// too close to vertical for comfort, so use cross product with horizon
-		up[X] = 0.; up[Y] = 1.; up[Z] = 0.;
+		up = Vector3d(0.0, 1.0, 0.0);
 	}
 	else
 	{
-		up[X] = 0.; up[Y] = 0.; up[Z] = 1.;
+		up = Vector3d(0.0, 0.0, 1.0);
 	}
 
 	// find "left", which is vector perpendicular to toctr
@@ -1602,11 +1595,11 @@ void ShootingDirection::compute()
 	{
 		// for parallel lights, left is actually perpendicular to the direction of the
 		// light source
-		VCross(left, light->Direction, up);  VNormalizeEq(left);
+		left = cross(Vector3d(light->Direction), up).normalized();
 	}
 	else
 	{
-		VCross(left, toctr, up);  VNormalizeEq(left);
+		left = cross(toctr, up).normalized();
 	}
 
 
@@ -2615,22 +2608,22 @@ void ChooseRay(Ray &NewRay, const VECTOR Normal, const Ray & /*ray*/, const VECT
 #define REFLECT_FOR_RADIANCE 0
 #if (REFLECT_FOR_RADIANCE)
 	// Get direction of reflected ray.
-	DBL n = -2.0 * (ray->Direction[X] * Normal[X] + ray->Direction[Y] * Normal[Y] + ray->Direction[Z] * Normal[Z]);
+	DBL n = -2.0 * (ray.Direction[X] * Normal[X] + ray.Direction[Y] * Normal[Y] + ray.Direction[Z] * Normal[Z]);
 
-	VLinComb2(NewRay->Direction, n, Normal, 1.0, ray->Direction);
+	NewRay.Direction = n * Vector3d(Normal) + ray.Direction;
 
-	VDot(NRay_Direction, NewRay->Direction, Raw_Normal);
+	NRay_Direction = dot(NewRay.Direction, Vector3d(Raw_Normal));
 	if (NRay_Direction < 0.0)
 	{
 		// subtract 2*(projection of NRay.Direction onto Raw_Normal)
 		// from NRay.Direction
 		DBL Proj;
 		Proj = NRay_Direction * -2;
-		VAddScaledEq(NewRay.Direction, Proj, Raw_Normal);
+		NewRay.Direction += Proj * Vector3d(Raw_Normal);
 	}
 	return;
 #else
-	Assign_Vector(NewRay.Direction, Normal);
+	NewRay.Direction = Vector3d(Normal);
 #endif
 
 	if ( fabs(fabs(NewRay.Direction[Z])- 1.) < .1 )
@@ -2643,8 +2636,8 @@ void ChooseRay(Ray &NewRay, const VECTOR Normal, const Ray & /*ray*/, const VECT
 		up[X] = 0.; up[Y] = 0.; up[Z] = 1.;
 	}
 
-	VCross(n2, NewRay.Direction, up);  VNormalizeEq(n2);
-	VCross(n3, NewRay.Direction, n2);  VNormalizeEq(n3);
+	VCross(n2, *NewRay.Direction, up);  VNormalizeEq(n2);
+	VCross(n3, *NewRay.Direction, n2);  VNormalizeEq(n3);
 
 	// TODO FIXME - Magic Numbers
 	//i = (int)(FRAND()*1600);
@@ -2657,7 +2650,7 @@ void ChooseRay(Ray &NewRay, const VECTOR Normal, const Ray & /*ray*/, const VECT
 	{
 		// we are within 1/20 degree of pointing in the Y axis.
 		// use all vectors as is--they're precomputed this way
-		Assign_Vector(NewRay.Direction, *random_vec);
+		NewRay.Direction = random_vec;
 	}
 	else
 	{
@@ -2668,17 +2661,17 @@ void ChooseRay(Ray &NewRay, const VECTOR Normal, const Ray & /*ray*/, const VECT
 
 	// if our new ray goes through, flip it back across raw_normal
 
-	VDot(NRay_Direction, NewRay.Direction, Raw_Normal);
+	VDot(NRay_Direction, *NewRay.Direction, Raw_Normal);
 	if (NRay_Direction < 0.0)
 	{
 		// subtract 2*(projection of NRay.Direction onto Raw_Normal)
 		// from NRay.Direction
 		DBL Proj;
 		Proj = NRay_Direction * -2;
-		VAddScaledEq(NewRay.Direction, Proj, Raw_Normal);
+		NewRay.Direction += Proj * Vector3d(Raw_Normal);
 	}
 
-	VNormalizeEq(NewRay.Direction);
+	NewRay.Direction.normalize();
 }
 
 #if(0)
@@ -2803,9 +2796,9 @@ void LightTargetCombo::computeAnglesAndDeltas(shared_ptr<SceneData> sceneData)
 		maxtheta = M_PI;
 		if (fabs(shootingDirection.dist)<EPSILON)
 		{
-			Make_Vector(shootingDirection.up, 1,0,0);
-			Make_Vector(shootingDirection.left, 0,1,0);
-			Make_Vector(shootingDirection.toctr, 0,0,1);
+			shootingDirection.up    = Vector3d(1.0, 0.0, 0.0);
+			shootingDirection.left  = Vector3d(0.0, 1.0, 0.0);
+			shootingDirection.toctr = Vector3d(0.0, 0.0, 1.0);
 		}
 		shootingDirection.dist = shootingDirection.rad;
 	}

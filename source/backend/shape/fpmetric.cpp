@@ -126,10 +126,10 @@ bool Parametric::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
 	{
 		if(Trans != NULL)
 		{
-			MInvTransPoint(New_Ray.Origin, ray.Origin, Trans);
-			MInvTransDirection(New_Ray.Direction, ray.Direction, Trans);
-			VLength(len, New_Ray.Direction);
-			VInverseScaleEq(New_Ray.Direction, len);
+			MInvTransPoint(*New_Ray.Origin, *ray.Origin, Trans);
+			MInvTransDirection(*New_Ray.Direction, *ray.Direction, Trans);
+			len = New_Ray.Direction.length();
+			New_Ray.Direction /= len;
 			i_flg = Sphere::Intersect(New_Ray, container.sphere.center,
 			                          (container.sphere.radius) * (container.sphere.radius),
 			                          &Depth1, &Depth2);
@@ -159,8 +159,8 @@ bool Parametric::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
 
 	if (Trans != NULL)
 	{
-		MInvTransPoint(P, ray.Origin, Trans);
-		MInvTransDirection(D, ray.Direction, Trans);
+		MInvTransPoint(P, *ray.Origin, Trans);
+		MInvTransDirection(D, *ray.Direction, Trans);
 	}
 	else
 	{
@@ -402,8 +402,8 @@ bool Parametric::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
 	if (TResult < Depth2)
 	{
 		Thread->Stats()[Ray_Parametric_Tests_Succeeded]++;
-		VScale(IPoint, ray.Direction, TResult);
-		VAddEq(IPoint, ray.Origin);
+		VScale(IPoint, *ray.Direction, TResult);
+		VAddEq(IPoint, *ray.Origin);
 
 		if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
 		{
@@ -411,7 +411,7 @@ bool Parametric::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
 			  compute_param_normal( Par, UResult, VResult , &N); 
 			  push_normal_entry( TResult ,IPoint, N, reinterpret_cast<ObjectPtr>(Object), Depth_Stack);
 			*/
-			Depth_Stack->push(Intersection(TResult, IPoint, uv, this));
+			Depth_Stack->push(Intersection(TResult, Vector3d(IPoint), Vector2d(uv), this));
 
 			return true;
 		}
@@ -543,11 +543,8 @@ void Parametric::Compute_BBox()
 	}
 	else
 	{
-		// [ABX 20.01.2004] Low_Left introduced to hide BCC 5.5 bug
-		BBOX_VECT& Low_Left = BBox.Lower_Left;
-
-		Assign_BBox_Vect(Low_Left, container.box.corner1);
-		VSub(BBox.Lengths, container.box.corner2, container.box.corner1);
+		BBox.lowerLeft = BBoxVector3d(container.box.corner1);
+		BBox.size = BBoxVector3d(Vector3d(container.box.corner2) - Vector3d(container.box.corner1));
 	}
 
 	if(Trans != NULL)
@@ -857,7 +854,7 @@ Parametric::Parametric() : ObjectBase(PARAMETRIC_OBJECT)
 
 void Parametric::UVCoord(UV_VECT Result, const Intersection *inter, TraceThreadData *Thread) const
 {
-	Assign_UV_Vect(Result, inter->Iuv);
+	Assign_UV_Vect(Result, *inter->Iuv);
 }
 
 

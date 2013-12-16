@@ -26,11 +26,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/shape/mesh.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/shape/mesh.cpp $
+ * $Revision: #45 $
+ * $Change: 6119 $
+ * $DateTime: 2013/11/22 20:31:53 $
+ * $Author: clipka $
  *******************************************************************************/
 
 /****************************************************************************
@@ -175,11 +175,11 @@ bool Mesh::Intersect(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Threa
 
 	if (Trans != NULL)
 	{
-		MInvTransPoint(New_Ray.Origin, ray.Origin, Trans);
-		MInvTransDirection(New_Ray.Direction, ray.Direction, Trans);
+		MInvTransPoint(*New_Ray.Origin, *ray.Origin, Trans);
+		MInvTransDirection(*New_Ray.Direction, *ray.Direction, Trans);
 
-		VLength(len, New_Ray.Direction);
-		VInverseScaleEq(New_Ray.Direction, len);
+		len = New_Ray.Direction.length();
+		New_Ray.Direction /= len;
 	}
 	else
 	{
@@ -264,22 +264,22 @@ bool Mesh::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
 //		/* if no inside_vect , use X... maybe we should quit */
 //		/* return(false); */
 //
-//		Make_Vector(Ray.Direction, 0, 0, 1);
+//		Ray.Direction = Vector3d(0.0, 0.0, 1.0);
 //	}
 //	else
 
-	Assign_Vector(ray.Direction, Data->Inside_Vect);
+	ray.Direction = Vector3d(Data->Inside_Vect);
 
-	Assign_Vector(ray.Origin, IPoint);
+	ray.Origin = Vector3d(IPoint);
 
 	/* Transform the ray into mesh space. */
 	if (Trans != NULL)
 	{
-		MInvTransPoint(New_Ray.Origin, ray.Origin, Trans);
-		MInvTransDirection(New_Ray.Direction, ray.Direction, Trans);
+		MInvTransPoint(*New_Ray.Origin, *ray.Origin, Trans);
+		MInvTransDirection(*New_Ray.Direction, *ray.Direction, Trans);
 
-		VLength(len, New_Ray.Direction);
-		VInverseScaleEq(New_Ray.Direction, len);
+		len = New_Ray.Direction.length();
+		New_Ray.Direction /= len;
 	}
 	else
 	{
@@ -358,11 +358,11 @@ void Mesh::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) c
 	{
 		if (Trans != NULL)
 		{
-			MInvTransPoint(IPoint, Inter->IPoint, Trans);
+			MInvTransPoint(IPoint, *Inter->IPoint, Trans);
 		}
 		else
 		{
-			Assign_Vector(IPoint, Inter->IPoint);
+			Assign_Vector(IPoint, *Inter->IPoint);
 		}
 
 		Smooth_Mesh_Normal(Result, Triangle, IPoint);
@@ -1091,14 +1091,14 @@ bool Mesh::intersect_mesh_triangle(const Ray &ray, const MESH_TRIANGLE *Triangle
 
 	Assign_Vector(S_Normal, Data->Normals[Triangle->Normal_Ind]);
 
-	VDot(NormalDotDirection, S_Normal, ray.Direction);
+	VDot(NormalDotDirection, S_Normal, *ray.Direction);
 
 	if (fabs(NormalDotDirection) < EPSILON)
 	{
 		return(false);
 	}
 
-	VDot(NormalDotOrigin, S_Normal, ray.Origin);
+	VDot(NormalDotOrigin, S_Normal, *ray.Origin);
 
 	*Depth = -(Triangle->Distance + NormalDotOrigin) / NormalDotDirection;
 
@@ -1265,22 +1265,22 @@ void Mesh::MeshUV(const VECTOR P, const MESH_TRIANGLE *Triangle, UV_VECT Result)
 
 bool Mesh::test_hit(const MESH_TRIANGLE *Triangle, const Ray &OrigRay, DBL Depth, DBL len, IStack& Depth_Stack, TraceThreadData *Thread)
 {
-	VECTOR IPoint;
+	Vector3d IPoint;
 	DBL world_dist = Depth / len;
 
-	VEvaluateRay(IPoint, OrigRay.Origin, world_dist, OrigRay.Direction);
+	IPoint = OrigRay.Evaluate(world_dist);
 
-	if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
+	if (Clip.empty() || Point_In_Clip(*IPoint, Clip, Thread))
 	{
 		/*
 		don't bother calling MeshUV because we reclaculate it later (if needed) anyway
 		UV_VECT uv;
-		VECTOR P; // Object coordinates of intersection
-		VEvaluateRay(P, ray.Origin, Depth, ray.Direction);
+		Vector3d P; // Object coordinates of intersection
+		P = ray.Evaluate(Depth);
 
-		MeshUV(P, Triangle, Mesh, uv);  
+		MeshUV(*P, Triangle, Mesh, uv);  
 
-		push_entry_pointer_uv(world_dist, IPoint, uv, Object, Triangle, Depth_Stack);
+		push_entry_pointer_uv(world_dist, *IPoint, uv, Object, Triangle, Depth_Stack);
 		*/
 
 		Depth_Stack->push(Intersection(world_dist, IPoint, this, Triangle));
@@ -1380,7 +1380,7 @@ void Mesh::Init_Mesh_Triangle(MESH_TRIANGLE *Triangle)
 *
 ******************************************************************************/
 
-void Mesh::get_triangle_bbox(const MESH_TRIANGLE *Triangle, BBOX *BBox) const
+void Mesh::get_triangle_bbox(const MESH_TRIANGLE *Triangle, BoundingBox *BBox) const
 {
 	VECTOR P1, P2, P3;
 	VECTOR Min, Max;
@@ -2323,9 +2323,9 @@ void Mesh::UVCoord(VECTOR Result, const Intersection *Inter, TraceThreadData *) 
 	VECTOR P;
 
 	if (Trans != NULL)
-		MInvTransPoint(P, Inter->IPoint, Trans);
+		MInvTransPoint(P, *Inter->IPoint, Trans);
 	else
-		Assign_Vector(P, Inter->IPoint);
+		Assign_Vector(P, *Inter->IPoint);
 
 	Triangle = reinterpret_cast<const MESH_TRIANGLE *>(Inter->Pointer);
 
@@ -2499,9 +2499,9 @@ void Mesh::Determine_Textures(Intersection *isect, bool hitinside, WeightedTextu
 		COLC wsum;
 
 		if(Trans != NULL)
-			MInvTransPoint(epoint, isect->IPoint, Trans);
+			MInvTransPoint(epoint, *isect->IPoint, Trans);
 		else
-			Assign_Vector(epoint, isect->IPoint);
+			Assign_Vector(epoint, *isect->IPoint);
 
 		Assign_Vector(p1, Data->Vertices[tri->P1]);
 		Assign_Vector(p2, Data->Vertices[tri->P2]);

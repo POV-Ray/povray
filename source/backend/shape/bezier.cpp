@@ -27,11 +27,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/shape/bezier.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/shape/bezier.cpp $
+ * $Revision: #30 $
+ * $Change: 6118 $
+ * $DateTime: 2013/11/22 16:39:19 $
+ * $Author: clipka $
  *******************************************************************************/
 
 // frame.h must always be the first POV file included (pulls in platform config)
@@ -549,14 +549,14 @@ bool BicubicPatch::intersect_subpatch(const Ray &ray, const VECTOR V1[3], const 
 		return false;
 	}
 
-	VDot(d, ray.Direction, IB[2]);
+	VDot(d, *ray.Direction, IB[2]);
 
 	if (fabs(d) < BEZIER_EPSILON)
 	{
 		return false;
 	}
 
-	VSub(Q, V1[0], ray.Origin);
+	VSub(Q, V1[0], *ray.Origin);
 
 	VDot(n, Q, IB[2]);
 
@@ -567,9 +567,9 @@ bool BicubicPatch::intersect_subpatch(const Ray &ray, const VECTOR V1[3], const 
 		return false;
 	}
 
-	VScale(T1, ray.Direction, *Depth);
+	VScale(T1, *ray.Direction, *Depth);
 
-	VAdd(P, ray.Origin, T1);
+	VAdd(P, *ray.Origin, T1);
 
 	VSub(Q, P, V1[0]);
 
@@ -971,7 +971,7 @@ int BicubicPatch::bezier_subpatch_intersect(const Ray &ray, const VECTOR (*Patch
 
 		UV[U] = tpoint[0];
 		UV[V] = tpoint[1];
-		Depth_Stack->push(Intersection(Depth, P, N, UV, this));
+		Depth_Stack->push(Intersection(Depth, Vector3d(P), Vector3d(N), Vector2d(UV), this));
 
 		cnt++;
 	}
@@ -991,7 +991,7 @@ int BicubicPatch::bezier_subpatch_intersect(const Ray &ray, const VECTOR (*Patch
 
 		UV[U] = tpoint[0];
 		UV[V] = tpoint[1];
-		Depth_Stack->push(Intersection(Depth, P, N, UV, this));
+		Depth_Stack->push(Intersection(Depth, Vector3d(P), Vector3d(N), Vector2d(UV), this));
 
 		cnt++;
 	}
@@ -1585,7 +1585,7 @@ int BicubicPatch::bezier_tree_walker(const Ray &ray, const BEZIER_NODE *Node, IS
 
 			UV[U] = tpoint[0];
 			UV[V] = tpoint[1];
-			Depth_Stack->push(Intersection(Depth, P, N, UV, this));
+			Depth_Stack->push(Intersection(Depth, Vector3d(P), Vector3d(N), Vector2d(UV), this));
 
 			cnt++;
 		}
@@ -1605,7 +1605,7 @@ int BicubicPatch::bezier_tree_walker(const Ray &ray, const BEZIER_NODE *Node, IS
 
 			UV[U] = tpoint[0];
 			UV[V] = tpoint[1];
-			Depth_Stack->push(Intersection(Depth, P, N, UV, this));
+			Depth_Stack->push(Intersection(Depth, Vector3d(P), Vector3d(N), Vector2d(UV), this));
 
 			cnt++;
 		}
@@ -1783,7 +1783,7 @@ void BicubicPatch::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *T
 {
 	/* Use preocmputed normal. */
 
-	Assign_Vector(Result, Inter->INormal);
+	Assign_Vector(Result, *Inter->INormal);
 }
 
 
@@ -2243,7 +2243,7 @@ void BicubicPatch::UVCoord(UV_VECT Result, const Intersection *Inter, TraceThrea
 {
 	/* Use preocmputed uv coordinates. */
 
-	Assign_UV_Vect(Result, Inter->Iuv);
+	Assign_UV_Vect(Result, *Inter->Iuv);
 }
 
 

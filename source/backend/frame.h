@@ -26,9 +26,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/frame.h $
- * $Revision: #122 $
- * $Change: 6089 $
- * $DateTime: 2013/11/11 09:18:35 $
+ * $Revision: #124 $
+ * $Change: 6119 $
+ * $DateTime: 2013/11/22 20:31:53 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -288,182 +288,198 @@ inline void Destroy_Colour(COLOUR *x)
 #pragma mark * Vector2d
 #endif
 
-class Vector2d
+template<typename T>
+class GenericVector3d;
+
+template<typename T>
+class GenericVector2d
 {
 	public:
-		Vector2d()
+
+		typedef T UV_VECT_T[2];
+
+		GenericVector2d()
 		{
 			vect[X] = 0.0;
 			vect[Y] = 0.0;
 		}
 
-		explicit Vector2d(DBL d)
+		explicit GenericVector2d(T d)
 		{
 			vect[X] = d;
 			vect[Y] = d;
 		}
 
-		Vector2d(DBL x, DBL y)
+		GenericVector2d(T x, T y)
 		{
 			vect[X] = x;
 			vect[Y] = y;
 		}
 
-		explicit Vector2d(const UV_VECT vi)
+		explicit GenericVector2d(const UV_VECT vi)
 		{
-			vect[X] = vi[X];
-			vect[Y] = vi[Y];
+			vect[X] = T(vi[X]);
+			vect[Y] = T(vi[Y]);
 		}
 
-		explicit Vector2d(const SNGL_VECT vi)
+		explicit GenericVector2d(const SNGL_VECT vi)
 		{
-			vect[X] = DBL(vi[X]);
-			vect[Y] = DBL(vi[Y]);
+			vect[X] = T(vi[X]);
+			vect[Y] = T(vi[Y]);
 		}
 
-		Vector2d(const Vector2d& b)
+		explicit GenericVector2d(const GenericVector3d<T>& b);
+
+		template<typename T2>
+		explicit GenericVector2d(const GenericVector2d<T2>& b)
+		{
+			vect[X] = T(b[X]);
+			vect[Y] = T(b[Y]);
+		}
+
+		GenericVector2d(const GenericVector2d& b)
 		{
 			vect[X] = b[X];
 			vect[Y] = b[Y];
 		}
 
-		Vector2d& operator=(const Vector2d& b)
+		GenericVector2d& operator=(const GenericVector2d& b)
 		{
 			vect[X] = b[X];
 			vect[Y] = b[Y];
 			return *this;
 		}
 
-		DBL operator[](int idx) const { return vect[idx]; }
-		DBL& operator[](int idx) { return vect[idx]; }
+		T operator[](int idx) const { return vect[idx]; }
+		T& operator[](int idx) { return vect[idx]; }
 
-		Vector2d operator+(const Vector2d& b) const
+		GenericVector2d operator+(const GenericVector2d& b) const
 		{
 			return Vector2d(vect[X] + b[X], vect[Y] + b[Y]);
 		}
 
-		Vector2d operator-(const Vector2d& b) const
+		GenericVector2d operator-(const GenericVector2d& b) const
 		{
 			return Vector2d(vect[X] - b[X], vect[Y] - b[Y]);
 		}
 
-		Vector2d operator*(const Vector2d& b) const
+		GenericVector2d operator*(const GenericVector2d& b) const
 		{
 			return Vector2d(vect[X] * b[X], vect[Y] * b[Y]);
 		}
 
-		Vector2d operator/(const Vector2d& b) const
+		GenericVector2d operator/(const GenericVector2d& b) const
 		{
 			return Vector2d(vect[X] / b[X], vect[Y] / b[Y]);
 		}
 
-		Vector2d& operator+=(const Vector2d& b)
+		GenericVector2d& operator+=(const GenericVector2d& b)
 		{
 			vect[X] += b[X];
 			vect[Y] += b[Y];
 			return *this;
 		}
 
-		Vector2d& operator-=(const Vector2d& b)
+		GenericVector2d& operator-=(const GenericVector2d& b)
 		{
 			vect[X] -= b[X];
 			vect[Y] -= b[Y];
 			return *this;
 		}
 
-		Vector2d& operator*=(const Vector2d& b)
+		GenericVector2d& operator*=(const GenericVector2d& b)
 		{
 			vect[X] *= b[X];
 			vect[Y] *= b[Y];
 			return *this;
 		}
 
-		Vector2d& operator/=(const Vector2d& b)
+		GenericVector2d& operator/=(const GenericVector2d& b)
 		{
 			vect[X] /= b[X];
 			vect[Y] /= b[Y];
 			return *this;
 		}
 
-		Vector2d operator-() const
+		GenericVector2d operator-() const
 		{
-			return Vector2d(-vect[X], -vect[Y]);
+			return GenericVector2d(-vect[X], -vect[Y]);
 		}
 
-		Vector2d operator+(DBL b) const
+		GenericVector2d operator+(T b) const
 		{
-			return Vector2d(vect[X] + b, vect[Y] + b);
+			return GenericVector2d(vect[X] + b, vect[Y] + b);
 		}
 
-		Vector2d operator-(DBL b) const
+		GenericVector2d operator-(T b) const
 		{
-			return Vector2d(vect[X] - b, vect[Y] - b);
+			return GenericVector2d(vect[X] - b, vect[Y] - b);
 		}
 
-		Vector2d operator*(DBL b) const
+		GenericVector2d operator*(T b) const
 		{
-			return Vector2d(vect[X] * b, vect[Y] * b);
+			return GenericVector2d(vect[X] * b, vect[Y] * b);
 		}
 
-		Vector2d operator/(DBL b) const
+		GenericVector2d operator/(T b) const
 		{
-			return Vector2d(vect[X] / b, vect[Y] / b);
+			return GenericVector2d(vect[X] / b, vect[Y] / b);
 		}
 
-		Vector2d& operator+=(DBL b)
+		GenericVector2d& operator+=(T b)
 		{
 			vect[X] += b;
 			vect[Y] += b;
 			return *this;
 		}
 
-		Vector2d& operator-=(DBL b)
+		GenericVector2d& operator-=(T b)
 		{
 			vect[X] -= b;
 			vect[Y] -= b;
 			return *this;
 		}
 
-		Vector2d& operator*=(DBL b)
+		GenericVector2d& operator*=(T b)
 		{
 			vect[X] *= b;
 			vect[Y] *= b;
 			return *this;
 		}
 
-		Vector2d& operator/=(DBL b)
+		GenericVector2d& operator/=(T b)
 		{
 			vect[X] /= b;
 			vect[Y] /= b;
 			return *this;
 		}
 
-		const UV_VECT& operator*() const { return vect; }
-		UV_VECT& operator*() { return vect; }
+		const UV_VECT_T& operator*() const { return vect; }
+		UV_VECT_T& operator*() { return vect; }
 
-		DBL x() const { return vect[X]; }
-		DBL& x() { return vect[X]; }
+		T x() const { return vect[X]; }
+		T& x() { return vect[X]; }
 
-		DBL y() const { return vect[Y]; }
-		DBL& y() { return vect[Y]; }
+		T y() const { return vect[Y]; }
+		T& y() { return vect[Y]; }
 
-		DBL u() const { return vect[X]; }
-		DBL& u() { return vect[X]; }
+		T u() const { return vect[X]; }
+		T& u() { return vect[X]; }
 
-		DBL v() const { return vect[Y]; }
-		DBL& v() { return vect[Y]; }
+		T v() const { return vect[Y]; }
+		T& v() { return vect[Y]; }
 
-		DBL length() const
+		T length() const
 		{
 			return sqrt(vect[X] * vect[X] + vect[Y] * vect[Y]);
 		}
-		DBL lengthSqr() const
+		T lengthSqr() const
 		{
 			return vect[X] * vect[X] + vect[Y] * vect[Y];
 		}
-		Vector2d normalized() const
+		GenericVector2d normalized() const
 		{
-			DBL l = length();
+			T l = length();
 			if (l != 0)
 				return *this / l;
 			else
@@ -471,67 +487,78 @@ class Vector2d
 		}
 		void normalize()
 		{
-			DBL l = length();
+			T l = length();
 			if (l != 0)
 				*this /= l;
 			// no else
 		}
 
 	private:
-		DBL vect[2];
+		UV_VECT_T vect;
 };
 
 #if 0
 #pragma mark * Vector3d
 #endif
 
-class Vector3d
+template<typename T>
+class GenericVector3d
 {
 	public:
 
-		Vector3d()
+		typedef T VECTOR_T[3];
+
+		GenericVector3d()
 		{
 			vect[X] = 0.0;
 			vect[Y] = 0.0;
 			vect[Z] = 0.0;
 		}
 
-		explicit Vector3d(DBL d)
+		explicit GenericVector3d(T d)
 		{
 			vect[X] = d;
 			vect[Y] = d;
 			vect[Z] = d;
 		}
 
-		Vector3d(DBL x, DBL y, DBL z)
+		GenericVector3d(T x, T y, T z)
 		{
 			vect[X] = x;
 			vect[Y] = y;
 			vect[Z] = z;
 		}
 
-		explicit Vector3d(const VECTOR vi)
+		explicit GenericVector3d(const VECTOR vi)
 		{
-			vect[X] = vi[X];
-			vect[Y] = vi[Y];
-			vect[Z] = vi[Z];
+			vect[X] = T(vi[X]);
+			vect[Y] = T(vi[Y]);
+			vect[Z] = T(vi[Z]);
 		}
 
-		explicit Vector3d(const SNGL_VECT vi)
+		explicit GenericVector3d(const SNGL_VECT vi)
 		{
-			vect[X] = DBL(vi[X]);
-			vect[Y] = DBL(vi[Y]);
-			vect[Z] = DBL(vi[Z]);
+			vect[X] = T(vi[X]);
+			vect[Y] = T(vi[Y]);
+			vect[Z] = T(vi[Z]);
 		}
 
-		Vector3d(const Vector3d& b)
+		template<typename T2>
+		explicit GenericVector3d(const GenericVector3d<T2>& b)
+		{
+			vect[X] = T(b[X]);
+			vect[Y] = T(b[Y]);
+			vect[Z] = T(b[Z]);
+		}
+
+		GenericVector3d(const GenericVector3d& b)
 		{
 			vect[X] = b[X];
 			vect[Y] = b[Y];
 			vect[Z] = b[Z];
 		}
 
-		Vector3d& operator=(const Vector3d& b)
+		GenericVector3d& operator=(const GenericVector3d& b)
 		{
 			vect[X] = b[X];
 			vect[Y] = b[Y];
@@ -539,30 +566,30 @@ class Vector3d
 			return *this;
 		}
 
-		DBL operator[](int idx) const { return vect[idx]; }
-		DBL& operator[](int idx) { return vect[idx]; }
+		T operator[](int idx) const { return vect[idx]; }
+		T& operator[](int idx) { return vect[idx]; }
 
-		Vector3d operator+(const Vector3d& b) const
+		GenericVector3d operator+(const GenericVector3d& b) const
 		{
-			return Vector3d(vect[X] + b[X], vect[Y] + b[Y], vect[Z] + b[Z]);
+			return GenericVector3d(vect[X] + b[X], vect[Y] + b[Y], vect[Z] + b[Z]);
 		}
 
-		Vector3d operator-(const Vector3d& b) const
+		GenericVector3d operator-(const GenericVector3d& b) const
 		{
-			return Vector3d(vect[X] - b[X], vect[Y] - b[Y], vect[Z] - b[Z]);
+			return GenericVector3d(vect[X] - b[X], vect[Y] - b[Y], vect[Z] - b[Z]);
 		}
 
-		Vector3d operator*(const Vector3d& b) const
+		GenericVector3d operator*(const GenericVector3d& b) const
 		{
-			return Vector3d(vect[X] * b[X], vect[Y] * b[Y], vect[Z] * b[Z]);
+			return GenericVector3d(vect[X] * b[X], vect[Y] * b[Y], vect[Z] * b[Z]);
 		}
 
-		Vector3d operator/(const Vector3d& b) const
+		GenericVector3d operator/(const GenericVector3d& b) const
 		{
-			return Vector3d(vect[X] / b[X], vect[Y] / b[Y], vect[Z] / b[Z]);
+			return GenericVector3d(vect[X] / b[X], vect[Y] / b[Y], vect[Z] / b[Z]);
 		}
 
-		Vector3d& operator+=(const Vector3d& b)
+		GenericVector3d& operator+=(const GenericVector3d& b)
 		{
 			vect[X] += b[X];
 			vect[Y] += b[Y];
@@ -570,7 +597,7 @@ class Vector3d
 			return *this;
 		}
 
-		Vector3d& operator-=(const Vector3d& b)
+		GenericVector3d& operator-=(const GenericVector3d& b)
 		{
 			vect[X] -= b[X];
 			vect[Y] -= b[Y];
@@ -578,7 +605,7 @@ class Vector3d
 			return *this;
 		}
 
-		Vector3d& operator*=(const Vector3d& b)
+		GenericVector3d& operator*=(const GenericVector3d& b)
 		{
 			vect[X] *= b[X];
 			vect[Y] *= b[Y];
@@ -586,7 +613,7 @@ class Vector3d
 			return *this;
 		}
 
-		Vector3d& operator/=(const Vector3d& b)
+		GenericVector3d& operator/=(const GenericVector3d& b)
 		{
 			vect[X] /= b[X];
 			vect[Y] /= b[Y];
@@ -594,32 +621,32 @@ class Vector3d
 			return *this;
 		}
 
-		Vector3d operator-() const
+		GenericVector3d operator-() const
 		{
-			return Vector3d(-vect[X], -vect[Y], -vect[Z]);
+			return GenericVector3d(-vect[X], -vect[Y], -vect[Z]);
 		}
 
-		Vector3d operator+(DBL b) const
+		GenericVector3d operator+(T b) const
 		{
-			return Vector3d(vect[X] + b, vect[Y] + b, vect[Z] + b);
+			return GenericVector3d(vect[X] + b, vect[Y] + b, vect[Z] + b);
 		}
 
-		Vector3d operator-(DBL b) const
+		GenericVector3d operator-(T b) const
 		{
-			return Vector3d(vect[X] - b, vect[Y] - b, vect[Z] - b);
+			return GenericVector3d(vect[X] - b, vect[Y] - b, vect[Z] - b);
 		}
 
-		Vector3d operator*(DBL b) const
+		GenericVector3d operator*(T b) const
 		{
-			return Vector3d(vect[X] * b, vect[Y] * b, vect[Z] * b);
+			return GenericVector3d(vect[X] * b, vect[Y] * b, vect[Z] * b);
 		}
 
-		Vector3d operator/(DBL b) const
+		GenericVector3d operator/(T b) const
 		{
-			return Vector3d(vect[X] / b, vect[Y] / b, vect[Z] / b);
+			return GenericVector3d(vect[X] / b, vect[Y] / b, vect[Z] / b);
 		}
 
-		Vector3d& operator+=(DBL b)
+		GenericVector3d& operator+=(T b)
 		{
 			vect[X] += b;
 			vect[Y] += b;
@@ -627,7 +654,7 @@ class Vector3d
 			return *this;
 		}
 
-		Vector3d& operator-=(DBL b)
+		GenericVector3d& operator-=(T b)
 		{
 			vect[X] -= b;
 			vect[Y] -= b;
@@ -635,7 +662,7 @@ class Vector3d
 			return *this;
 		}
 
-		Vector3d& operator*=(DBL b)
+		GenericVector3d& operator*=(T b)
 		{
 			vect[X] *= b;
 			vect[Y] *= b;
@@ -643,7 +670,7 @@ class Vector3d
 			return *this;
 		}
 
-		Vector3d& operator/=(DBL b)
+		GenericVector3d& operator/=(T b)
 		{
 			vect[X] /= b;
 			vect[Y] /= b;
@@ -651,29 +678,29 @@ class Vector3d
 			return *this;
 		}
 
-		const VECTOR& operator*() const { return vect; }
-		VECTOR& operator*() { return vect; }
+		const VECTOR_T& operator*() const { return vect; }
+		VECTOR_T& operator*() { return vect; }
 
-		DBL x() const { return vect[X]; }
-		DBL& x() { return vect[X]; }
+		T x() const { return vect[X]; }
+		T& x() { return vect[X]; }
 
-		DBL y() const { return vect[Y]; }
-		DBL& y() { return vect[Y]; }
+		T y() const { return vect[Y]; }
+		T& y() { return vect[Y]; }
 
-		DBL z() const { return vect[Z]; }
-		DBL& z() { return vect[Z]; }
+		T z() const { return vect[Z]; }
+		T& z() { return vect[Z]; }
 
-		DBL length() const
+		T length() const
 		{
 			return sqrt(vect[X] * vect[X] + vect[Y] * vect[Y] + vect[Z] * vect[Z]);
 		}
-		DBL lengthSqr() const
+		T lengthSqr() const
 		{
 			return vect[X] * vect[X] + vect[Y] * vect[Y] + vect[Z] * vect[Z];
 		}
-		Vector3d normalized() const
+		GenericVector3d normalized() const
 		{
-			DBL l = length();
+			T l = length();
 			if (l != 0)
 				return *this / l;
 			else
@@ -681,39 +708,63 @@ class Vector3d
 		}
 		void normalize()
 		{
-			DBL l = length();
+			T l = length();
 			if (l != 0)
 				*this /= l;
 			// no else
 		}
+		void invert()
+		{
+			vect[X] = -vect[X];
+			vect[Y] = -vect[Y];
+			vect[Z] = -vect[Z];
+		}
 
 	private:
-		DBL vect[3];
+		VECTOR_T vect;
 };
 
-inline DBL dot(const Vector2d& a, const Vector2d& b)
+typedef GenericVector2d<DBL> Vector2d;
+typedef GenericVector2d<SNGL> SnglVector2d;
+
+typedef GenericVector3d<DBL> Vector3d;
+typedef GenericVector3d<SNGL> SnglVector3d;
+
+template<typename T>
+inline T dot(const GenericVector2d<T>& a, const GenericVector2d<T>& b)
 {
 	return (a.x() * b.x()) + (a.y() * b.y());
 }
 
-inline DBL dot(const Vector3d& a, const Vector3d& b)
+template<typename T>
+inline T dot(const GenericVector3d<T>& a, const GenericVector3d<T>& b)
 {
 	return ((a.x() * b.x()) + (a.y() * b.y()) + (a.z() * b.z()));
 }
 
-inline Vector3d cross(const Vector3d& a, const Vector3d& b)
+template<typename T>
+inline GenericVector3d<T> cross(const GenericVector3d<T>& a, const GenericVector3d<T>& b)
 {
-	return Vector3d( ((a.y() * b.z()) - (a.z() * b.y())),
-	                 ((a.z() * b.x()) - (a.x() * b.z())),
-	                 ((a.x() * b.y()) - (a.y() * b.x())) );
+	return GenericVector3d<T>( ((a.y() * b.z()) - (a.z() * b.y())),
+	                           ((a.z() * b.x()) - (a.x() * b.z())),
+	                           ((a.x() * b.y()) - (a.y() * b.x())) );
 }
 
-inline bool similar(const Vector3d& a, const Vector3d& b)
+template<typename T>
+inline bool similar(const GenericVector3d<T>& a, const GenericVector3d<T>& b)
 {
 	return ( fabs(a.x()-b.x()) + fabs(a.y()-b.y()) + fabs(a.z()-b.z()) < EPSILON );
 }
 
-inline Vector3d operator* (double a, const Vector3d& b) { return b * a; }
+template<typename T>
+inline GenericVector3d<T> operator* (T a, const GenericVector3d<T>& b) { return b * a; }
+
+template<typename T>
+inline GenericVector2d<T>::GenericVector2d(const GenericVector3d<T>& b)
+{
+	vect[X] = b[X];
+	vect[Y] = b[Y];
+}
 
 typedef pov_base::Colour Colour;
 
@@ -727,124 +778,96 @@ typedef pov_base::Colour Colour;
 #pragma mark * Bounding
 #endif
 
-typedef SNGL BBOX_VAL;
+typedef SNGL BBoxScalar;
+typedef GenericVector3d<BBoxScalar> BBoxVector3d;
 
-typedef BBOX_VAL BBOX_VECT[3];
-
-typedef struct Bounding_Box_Struct BBOX;
-
-struct Bounding_Box_Struct
+struct BoundingBox
 {
-	union
-	{
-		BBOX_VECT Lower_Left;
-		BBOX_VECT pmin;
-		BBOX_VECT lowerleft;
-	};
-	union
-	{
-		BBOX_VECT Lengths;
-		BBOX_VECT pmax;
-		BBOX_VECT length;
-	};
+	BBoxVector3d lowerLeft;
+	BBoxVector3d size;
 
-	SNGL GetMinX() const { return Lower_Left[X]; }
-	SNGL GetMinY() const { return Lower_Left[Y]; }
-	SNGL GetMinZ() const { return Lower_Left[Z]; }
+	SNGL GetMinX() const { return lowerLeft[X]; }
+	SNGL GetMinY() const { return lowerLeft[Y]; }
+	SNGL GetMinZ() const { return lowerLeft[Z]; }
 
-	SNGL GetMaxX() const { return Lower_Left[X] + Lengths[X]; }
-	SNGL GetMaxY() const { return Lower_Left[Y] + Lengths[Y]; }
-	SNGL GetMaxZ() const { return Lower_Left[Z] + Lengths[Z]; }
+	SNGL GetMaxX() const { return lowerLeft[X] + size[X]; }
+	SNGL GetMaxY() const { return lowerLeft[Y] + size[Y]; }
+	SNGL GetMaxZ() const { return lowerLeft[Z] + size[Z]; }
 };
 
-inline void Assign_BBox_Vect(BBOX_VECT& d, const BBOX_VECT s)
+inline void Make_BBox(BoundingBox& BBox, const BBoxScalar llx, const BBoxScalar lly, const BBoxScalar llz, const BBoxScalar lex, const BBoxScalar ley, const BBoxScalar lez)
 {
-	d[X] = s[X];
-	d[Y] = s[Y];
-	d[Z] = s[Z];
+	BBox.lowerLeft = BBoxVector3d(llx, lly, llz);
+	BBox.size      = BBoxVector3d(lex, ley, lez);
 }
 
-inline void Assign_BBox_Vect(BBOX_VECT& d, const VECTOR s)
+inline void Make_BBox_from_min_max(BoundingBox& BBox, const BBoxVector3d& mins, const BBoxVector3d& maxs)
 {
-	d[X] = s[X];
-	d[Y] = s[Y];
-	d[Z] = s[Z];
+	BBox.lowerLeft = mins;
+	BBox.size      = maxs - mins;
 }
 
-inline void Assign_BBox_Vect(VECTOR& d, const BBOX_VECT s)
+inline void Make_BBox_from_min_max(BoundingBox& BBox, const Vector3d& mins, const Vector3d& maxs)
 {
-	d[X] = s[X];
-	d[Y] = s[Y];
-	d[Z] = s[Z];
+	BBox.lowerLeft = BBoxVector3d(mins);
+	BBox.size      = BBoxVector3d(maxs - mins);
 }
 
-inline void Make_BBox(BBOX& BBox, const BBOX_VAL llx, const BBOX_VAL lly, const BBOX_VAL llz, const BBOX_VAL lex, const BBOX_VAL ley, const BBOX_VAL lez)
+inline void Make_BBox_from_min_max(BoundingBox& BBox, const VECTOR mins, const VECTOR maxs)
 {
-	BBox.Lower_Left[X] = (BBOX_VAL)(llx);
-	BBox.Lower_Left[Y] = (BBOX_VAL)(lly);
-	BBox.Lower_Left[Z] = (BBOX_VAL)(llz);
-	BBox.Lengths[X] = (BBOX_VAL)(lex);
-	BBox.Lengths[Y] = (BBOX_VAL)(ley);
-	BBox.Lengths[Z] = (BBOX_VAL)(lez);
+	BBox.lowerLeft[X] = (BBoxScalar)(mins[X]);
+	BBox.lowerLeft[Y] = (BBoxScalar)(mins[Y]);
+	BBox.lowerLeft[Z] = (BBoxScalar)(mins[Z]);
+	BBox.size[X] = (BBoxScalar)(maxs[X]-mins[X]);
+	BBox.size[Y] = (BBoxScalar)(maxs[Y]-mins[Y]);
+	BBox.size[Z] = (BBoxScalar)(maxs[Z]-mins[Z]);
 }
 
-inline void Make_BBox_from_min_max(BBOX& BBox, const BBOX_VECT mins, const BBOX_VECT maxs)
+inline void Make_min_max_from_BBox(BBoxVector3d& mins, BBoxVector3d& maxs, const BoundingBox& BBox)
 {
-	BBox.Lower_Left[X] = (BBOX_VAL)(mins[X]);
-	BBox.Lower_Left[Y] = (BBOX_VAL)(mins[Y]);
-	BBox.Lower_Left[Z] = (BBOX_VAL)(mins[Z]);
-	BBox.Lengths[X] = (BBOX_VAL)(maxs[X]-mins[X]);
-	BBox.Lengths[Y] = (BBOX_VAL)(maxs[Y]-mins[Y]);
-	BBox.Lengths[Z] = (BBOX_VAL)(maxs[Z]-mins[Z]);
+	mins = BBox.lowerLeft;
+	maxs = mins + BBox.size;
 }
 
-inline void Make_BBox_from_min_max(BBOX& BBox, const VECTOR mins, const VECTOR maxs)
+inline void Make_min_max_from_BBox(VECTOR& mins, VECTOR& maxs, const BoundingBox& BBox)
 {
-	BBox.Lower_Left[X] = (BBOX_VAL)(mins[X]);
-	BBox.Lower_Left[Y] = (BBOX_VAL)(mins[Y]);
-	BBox.Lower_Left[Z] = (BBOX_VAL)(mins[Z]);
-	BBox.Lengths[X] = (BBOX_VAL)(maxs[X]-mins[X]);
-	BBox.Lengths[Y] = (BBOX_VAL)(maxs[Y]-mins[Y]);
-	BBox.Lengths[Z] = (BBOX_VAL)(maxs[Z]-mins[Z]);
+	mins[X] = BBox.lowerLeft[X];
+	mins[Y] = BBox.lowerLeft[Y];
+	mins[Z] = BBox.lowerLeft[Z];
+	maxs[X] = mins[X] + BBox.size[X];
+	maxs[Y] = mins[Y] + BBox.size[Y];
+	maxs[Z] = mins[Z] + BBox.size[Z];
 }
 
-inline void Make_min_max_from_BBox(BBOX_VECT& mins, BBOX_VECT& maxs, const BBOX& BBox)
+inline bool Inside_BBox(const VECTOR point, const BoundingBox& bbox)
 {
-	mins[X] = BBox.Lower_Left[X];
-	mins[Y] = BBox.Lower_Left[Y];
-	mins[Z] = BBox.Lower_Left[Z];
-	maxs[X] = mins[X] + BBox.Lengths[X];
-	maxs[Y] = mins[Y] + BBox.Lengths[Y];
-	maxs[Z] = mins[Z] + BBox.Lengths[Z];
-}
-
-inline void Make_min_max_from_BBox(VECTOR& mins, VECTOR& maxs, const BBOX& BBox)
-{
-	mins[X] = BBox.Lower_Left[X];
-	mins[Y] = BBox.Lower_Left[Y];
-	mins[Z] = BBox.Lower_Left[Z];
-	maxs[X] = mins[X] + BBox.Lengths[X];
-	maxs[Y] = mins[Y] + BBox.Lengths[Y];
-	maxs[Z] = mins[Z] + BBox.Lengths[Z];
-}
-
-inline bool Inside_BBox(const VECTOR point, const BBOX& bbox)
-{
-	if (point[X] < (DBL)bbox.Lower_Left[X])
+	if (point[X] < (DBL)bbox.lowerLeft[X])
 		return(false);
-	if (point[Y] < (DBL)bbox.Lower_Left[Y])
+	if (point[Y] < (DBL)bbox.lowerLeft[Y])
 		return(false);
-	if (point[Z] < (DBL)bbox.Lower_Left[Z])
+	if (point[Z] < (DBL)bbox.lowerLeft[Z])
 		return(false);
-	if (point[X] > (DBL)bbox.Lower_Left[X] + (DBL)bbox.Lengths[X])
+	if (point[X] > (DBL)bbox.lowerLeft[X] + (DBL)bbox.size[X])
 		return(false);
-	if (point[Y] > (DBL)bbox.Lower_Left[Y] + (DBL)bbox.Lengths[Y])
+	if (point[Y] > (DBL)bbox.lowerLeft[Y] + (DBL)bbox.size[Y])
 		return(false);
-	if (point[Z] > (DBL)bbox.Lower_Left[Z] + (DBL)bbox.Lengths[Z])
+	if (point[Z] > (DBL)bbox.lowerLeft[Z] + (DBL)bbox.size[Z])
 		return(false);
 
 	return(true);
 }
+
+inline bool Inside_BBox(const Vector3d& point, const BoundingBox& bbox)
+{
+	return Inside_BBox(*point, bbox);
+}
+
+
+struct MinMaxBoundingBox
+{
+	BBoxVector3d pmin;
+	BBoxVector3d pmax;
+};
 
 /*****************************************************************************
  *
@@ -1346,7 +1369,7 @@ class ObjectBase
 		vector<ObjectPtr> Bound;
 		vector<ObjectPtr> Clip;
 		vector<LightSource *> LLights;
-		BBOX BBox;
+		BoundingBox BBox;
 		TRANSFORM *Trans;
 		TRANSFORM *UV_Trans;
 		SNGL Ph_Density;
@@ -1409,7 +1432,10 @@ class ObjectBase
 		virtual void Invert() = 0;
 		virtual void Compute_BBox() = 0;
 		virtual void Determine_Textures(Intersection *, bool, WeightedTextureVector&, TraceThreadData *Thread); // could be "(const Intersection*...) const" if it wasn't for blob specials
-		virtual bool Intersect_BBox(BBoxDirection, const BBOX_VECT&, const BBOX_VECT&, BBOX_VAL = HUGE_VAL) const;
+
+		/// Checks whether a given ray intersects the object's bounding box.
+		/// Primitives with low-cost intersection tests may override this to always return true
+		virtual bool Intersect_BBox(BBoxDirection, const BBoxVector3d&, const BBoxVector3d&, BBoxScalar = HUGE_VAL) const;
 
 		// optional post-render message dispatcher; will be called upon completion
 		// of rendering a view. this is the appropriate place to send messages that
@@ -1439,7 +1465,7 @@ struct BBox_Tree_Struct
 {
 	short Infinite;   // Flag if node is infinite
 	short Entries;    // Number of sub-nodes in this node
-	BBOX BBox;        // Bounding box of this node
+	BoundingBox BBox; // Bounding box of this node
 	BBOX_TREE **Node; // If node: children; if leaf: element
 };
 
@@ -1539,16 +1565,16 @@ class Intersection
 		/// Distance from the intersecting ray's origin.
 		DBL Depth;
 		/// Point of the intersection in global coordinate space.
-		VECTOR IPoint;
+		Vector3d IPoint;
 		/// Unpertubed surface normal at the intersection point.
 		/// @note This is not necessarily the true geometric surface normal, as it may include fake smoothing.
 		/// @note This value is invalid if haveNormal is false.
 		/// @todo We should have two distinct vectors: A true geometric one, and a separate one for faked smoothing.
-		VECTOR INormal;
+		Vector3d INormal;
 		/// Perturbed normal vector (set during texture evaluation).
-		VECTOR PNormal;
+		Vector3d PNormal;
 		/// UV texture coordinate.
-		UV_VECT Iuv;
+		Vector2d Iuv;
 		/// Intersected object.
 		ObjectBase *Object;
 
@@ -1559,7 +1585,7 @@ class Intersection
 		//@{
 		/// Point of the intersection in local coordinate space (used by Blob)
 		/// @note This value is invalid if haveLocalIPoint is false.
-		VECTOR LocalIPoint;
+		Vector3d LocalIPoint;
 		/// Flag to indicate whether INormal was computed during intersection testing (used by HField)
 		/// @note Objects either always or never computing INormal during intersection testing don't use this flag.
 		bool haveNormal;
@@ -1578,136 +1604,53 @@ class Intersection
 		/// Root-level parent CSG object for cutaway textures.
 		ObjectBase *Csg;
 
-		Intersection() { Depth = BOUND_HUGE; Object = NULL; Csg = NULL; }
+		Intersection() :
+			Depth(BOUND_HUGE), Object(NULL), Csg(NULL)
+		{}
 
-		Intersection(DBL d, const VECTOR& v, ObjectBase *o)
-		{
-			Depth  = d;
-			Object = o;
-			Assign_Vector(IPoint, v);
-			Assign_UV_Vect(Iuv, v);
-			haveNormal = false;
-			haveLocalIPoint = false;
-			Csg = NULL;
-		}
+		Intersection(DBL d, const Vector3d& v, ObjectBase *o) :
+			Depth(d), Object(o), IPoint(v), Iuv(v), haveNormal(false), haveLocalIPoint(false), Csg(NULL)
+		{}
 
-		Intersection(DBL d, const VECTOR& v, const VECTOR& n, ObjectBase *o)
-		{
-			Depth  = d;
-			Object = o;
-			Assign_Vector(IPoint, v);
-			Assign_UV_Vect(Iuv, v);
-			Assign_Vector(INormal, n);
-			haveNormal = true;
-			haveLocalIPoint = false;
-			Csg = NULL;
-		}
+		Intersection(DBL d, const Vector3d& v, const Vector3d& n, ObjectBase *o) :
+			Depth(d), Object(o), IPoint(v), Iuv(v), INormal(n), haveNormal(true), haveLocalIPoint(false), Csg(NULL)
+		{}
 
-		Intersection(DBL d, const VECTOR& v, const UV_VECT& uv, ObjectBase *o)
-		{
-			Depth  = d;
-			Object = o;
-			Assign_Vector(IPoint, v);
-			Assign_UV_Vect(Iuv, uv);
-			haveNormal = false;
-			haveLocalIPoint = false;
-			Csg = NULL;
-		}
+		Intersection(DBL d, const Vector3d& v, const Vector2d& uv, ObjectBase *o) :
+			Depth(d), Object(o), IPoint(v), Iuv(uv), haveNormal(false), haveLocalIPoint(false), Csg(NULL)
+		{}
 
-		Intersection(DBL d, const VECTOR& v, const VECTOR& n, const UV_VECT& uv, ObjectBase *o)
-		{
-			Depth  = d;
-			Object = o;
-			Assign_Vector(IPoint, v);
-			Assign_Vector(INormal, n);
-			Assign_UV_Vect(Iuv, uv);
-			haveNormal = true;
-			haveLocalIPoint = false;
-			Csg = NULL;
-		}
+		Intersection(DBL d, const Vector3d& v, const Vector3d& n, const Vector2d& uv, ObjectBase *o) :
+			Depth(d), Object(o), IPoint(v), INormal(n), Iuv(uv), haveNormal(true), haveLocalIPoint(false), Csg(NULL)
+		{}
 
-		Intersection(DBL d, const VECTOR& v, ObjectBase *o, const void *a)
-		{
-			Depth  = d;
-			Object = o;
-			Pointer = a;
-			Assign_Vector(IPoint, v);
-			Assign_UV_Vect(Iuv, v);
-			haveNormal = false;
-			haveLocalIPoint = false;
-			Csg = NULL;
-		}
+		Intersection(DBL d, const Vector3d& v, ObjectBase *o, const void *a) :
+			Depth(d), Object(o), Pointer(a), IPoint(v), Iuv(v), haveNormal(false), haveLocalIPoint(false), Csg(NULL)
+		{}
 
-		Intersection(DBL d, const VECTOR& v, const UV_VECT& uv, ObjectBase *o, const void *a)
-		{
-			Depth  = d;
-			Object = o;
-			Pointer = a;
-			Assign_Vector(IPoint, v);
-			Assign_UV_Vect(Iuv, uv);
-			haveNormal = false;
-			haveLocalIPoint = false;
-			Csg = NULL;
-		}
+		Intersection(DBL d, const Vector3d& v, const Vector2d& uv, ObjectBase *o, const void *a) :
+			Depth(d), Object(o), Pointer(a), IPoint(v), Iuv(uv), haveNormal(false), haveLocalIPoint(false), Csg(NULL)
+		{}
 
-		Intersection(DBL d, const VECTOR& v, ObjectBase *o, int a)
-		{
-			Depth  = d;
-			Object = o;
-			i1 = a;
-			Assign_Vector(IPoint, v);
-			haveNormal = false;
-			haveLocalIPoint = false;
-			Csg = NULL;
-		}
+		Intersection(DBL d, const Vector3d& v, ObjectBase *o, int a) :
+			Depth(d), Object(o), i1(a), IPoint(v), haveNormal(false), haveLocalIPoint(false), Csg(NULL)
+		{}
 
-		Intersection(DBL d, const VECTOR& v, ObjectBase *o, DBL a)
-		{
-			Depth  = d;
-			Object = o;
-			d1 = a;
-			Assign_Vector(IPoint, v);
-			haveNormal = false;
-			haveLocalIPoint = false;
-			Csg = NULL;
-		}
+		Intersection(DBL d, const Vector3d& v, ObjectBase *o, DBL a) :
+			Depth(d), Object(o), d1(a), IPoint(v), haveNormal(false), haveLocalIPoint(false), Csg(NULL)
+		{}
 
-		Intersection(DBL d, const VECTOR& v, ObjectBase *o, int a, int b)
-		{
-			Depth  = d;
-			Object = o;
-			i1 = a;
-			i2 = b;
-			Assign_Vector(IPoint, v);
-			haveNormal = false;
-			haveLocalIPoint = false;
-			Csg = NULL;
-		}
+		Intersection(DBL d, const Vector3d& v, ObjectBase *o, int a, int b) :
+			Depth(d), Object(o), i1(a), i2(b), IPoint(v), haveNormal(false), haveLocalIPoint(false), Csg(NULL)
+		{}
 
-		Intersection(DBL d, const VECTOR& v, ObjectBase *o, int a, DBL b)
-		{
-			Depth  = d;
-			Object = o;
-			i1 = a;
-			d1 = b;
-			Assign_Vector(IPoint, v);
-			haveNormal = false;
-			haveLocalIPoint = false;
-			Csg = NULL;
-		}
+		Intersection(DBL d, const Vector3d& v, ObjectBase *o, int a, DBL b) :
+			Depth(d), Object(o), i1(a), d1(b), IPoint(v), haveNormal(false), haveLocalIPoint(false), Csg(NULL)
+		{}
 
-		Intersection(DBL d, const VECTOR& v, ObjectBase *o, int a, int b, DBL c)
-		{
-			Depth  = d;
-			Object = o;
-			i1 = a;
-			i2 = b;
-			d1 = c;
-			Assign_Vector(IPoint, v);
-			haveNormal = false;
-			haveLocalIPoint = false;
-			Csg = NULL;
-		}
+		Intersection(DBL d, const Vector3d& v, ObjectBase *o, int a, int b, DBL c) :
+			Depth(d), Object(o), i1(a), i2(b), d1(c), IPoint(v), haveNormal(false), haveLocalIPoint(false), Csg(NULL)
+		{}
 
 		~Intersection() { }
 };
@@ -1734,15 +1677,15 @@ class Ray
 			SubsurfaceRay = 4,  ///< Ray is shot from just below a surface; very close intersections shall not be suppressed.
 		};
 
-		VECTOR Origin;
-		VECTOR Direction;
+		Vector3d Origin;
+		Vector3d Direction;
 
 		Ray(RayType rt = PrimaryRay, bool shadowTest = false, bool photon = false, bool radiosity = false, bool monochromatic = false, bool pretrace = false);
-		Ray(const VECTOR ov, const VECTOR dv, RayType rt = PrimaryRay, bool shadowTest = false, bool photon = false, bool radiosity = false, bool monochromatic = false, bool pretrace = false);
+		Ray(const Vector3d& ov, const Vector3d& dv, RayType rt = PrimaryRay, bool shadowTest = false, bool photon = false, bool radiosity = false, bool monochromatic = false, bool pretrace = false);
 		~Ray();
 
-		const VECTOR& GetOrigin() const { return Origin; }
-		const VECTOR& GetDirection() const { return Direction; }
+		const Vector3d& GetOrigin() const { return Origin; }
+		const Vector3d& GetDirection() const { return Direction; }
 
 		void AppendInterior(Interior *i);
 		void AppendInteriors(RayInteriorVector&);
@@ -1771,7 +1714,10 @@ class Ray
 		bool IsHollowRay() const { return hollowRay; }
 		bool IsPretraceRay() const { return pretraceRay; }
 
-		bool Inside(const BBOX& bbox) const { return Inside_BBox(Origin, bbox); }
+		bool Inside(const BoundingBox& bbox) const { return Inside_BBox(Origin, bbox); }
+
+		Vector3d Evaluate(double depth) const { return Origin + Direction * depth; }
+
 	private:
 		RayInteriorVector interiors;
 		SpectralBand spectralBand;

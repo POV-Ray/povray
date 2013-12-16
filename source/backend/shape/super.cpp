@@ -27,11 +27,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/shape/super.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/shape/super.cpp $
+ * $Revision: #31 $
+ * $Change: 6118 $
+ * $DateTime: 2013/11/22 16:39:19 $
+ * $Author: clipka $
  *******************************************************************************/
 
 /****************************************************************************
@@ -207,9 +207,9 @@ bool Superellipsoid::Intersect(const Ray& ray, IStack& Depth_Stack, TraceThreadD
 
 	/* Transform the ray into the superellipsoid space. */
 
-	MInvTransPoint(P, ray.Origin, Trans);
+	MInvTransPoint(P, *ray.Origin, Trans);
 
-	MInvTransDirection(D, ray.Direction, Trans);
+	MInvTransDirection(D, *ray.Direction, Trans);
 
 	VLength(len, D);
 
@@ -442,7 +442,7 @@ void Superellipsoid::Normal(VECTOR Result, Intersection *Inter, TraceThreadData 
 	VECTOR P;
 
 	/* Transform the point into the superellipsoid space. */
-	MInvTransPoint(P, Inter->IPoint, Trans);
+	MInvTransPoint(P, *Inter->IPoint, Trans);
 
 	DBL r, z2n = 0;
 	if (P[Z] != 0)
@@ -1198,13 +1198,13 @@ DBL Superellipsoid::power(DBL x, DBL  e)
 
 bool Superellipsoid::insert_hit(const Ray &ray, DBL Depth, IStack& Depth_Stack, TraceThreadData *Thread)
 {
-	VECTOR IPoint;
+	Vector3d IPoint;
 
 	if ((Depth > DEPTH_TOLERANCE) && (Depth < MAX_DISTANCE))
 	{
-		VEvaluateRay(IPoint, ray.Origin, Depth, ray.Direction);
+		IPoint = ray.Evaluate(Depth);
 
-		if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
+		if (Clip.empty() || Point_In_Clip(*IPoint, Clip, Thread))
 		{
 			Depth_Stack->push(Intersection(Depth, IPoint, this));
 

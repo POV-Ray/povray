@@ -24,11 +24,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/scene/objects.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/scene/objects.cpp $
+ * $Revision: #55 $
+ * $Change: 6119 $
+ * $DateTime: 2013/11/22 20:31:53 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #include <cassert>
@@ -49,7 +49,7 @@ namespace pov
 {
 
 template<int BX, int BY, int BZ>
-FORCEINLINE bool Intersect_BBox_Dir(const BBOX& bbox, const BBOX_VECT& origin, const BBOX_VECT& invdir, BBOX_VAL mind, BBOX_VAL maxd);
+FORCEINLINE bool Intersect_BBox_Dir(const BoundingBox& bbox, const BBoxVector3d& origin, const BBoxVector3d& invdir, BBoxScalar mind, BBoxScalar maxd);
 
 /*****************************************************************************
  * ObjectDebugHelper class support code
@@ -104,13 +104,13 @@ bool Find_Intersection(Intersection *isect, ObjectPtr object, const Ray& ray, Tr
 	if(object != NULL)
 	{
 		DBL closest = HUGE_VAL;
-		BBOX_VECT origin;
-		BBOX_VECT invdir;
+		BBoxVector3d origin;
+		BBoxVector3d invdir;
 		ObjectBase::BBoxDirection variant;
 
 		Vector3d tmp(1.0 / ray.GetDirection()[X], 1.0 / ray.GetDirection()[Y], 1.0 /ray.GetDirection()[Z]);
-		Assign_Vector(origin, ray.Origin);
-		Assign_Vector(invdir, *tmp);
+		origin = BBoxVector3d(ray.Origin);
+		invdir = BBoxVector3d(tmp);
 		variant = (ObjectBase::BBoxDirection)((int(invdir[X] < 0.0) << 2) | (int(invdir[Y] < 0.0) << 1) | int(invdir[Z] < 0.0));
 
 		if(object->Intersect_BBox(variant, origin, invdir, closest) == false)
@@ -158,13 +158,13 @@ bool Find_Intersection(Intersection *isect, ObjectPtr object, const Ray& ray, co
 	if(object != NULL)
 	{
 		DBL closest = HUGE_VAL;
-		BBOX_VECT origin;
-		BBOX_VECT invdir;
+		BBoxVector3d origin;
+		BBoxVector3d invdir;
 		ObjectBase::BBoxDirection variant;
 
 		Vector3d tmp(1.0 / ray.GetDirection()[X], 1.0 / ray.GetDirection()[Y], 1.0 /ray.GetDirection()[Z]);
-		Assign_Vector(origin, ray.Origin);
-		Assign_Vector(invdir, *tmp);
+		origin = BBoxVector3d(ray.Origin);
+		invdir = BBoxVector3d(tmp);
 		variant = (ObjectBase::BBoxDirection)((int(invdir[X] < 0.0) << 2) | (int(invdir[Y] < 0.0) << 1) | int(invdir[Z] < 0.0));
 
 		if(object->Intersect_BBox(variant, origin, invdir, closest) == false)
@@ -207,7 +207,7 @@ bool Find_Intersection(Intersection *isect, ObjectPtr object, const Ray& ray, co
 	return false;
 }
 
-bool Find_Intersection(Intersection *isect, ObjectPtr object, const Ray& ray, ObjectBase::BBoxDirection variant, const BBOX_VECT& origin, const BBOX_VECT& invdir, TraceThreadData *threadData)
+bool Find_Intersection(Intersection *isect, ObjectPtr object, const Ray& ray, ObjectBase::BBoxDirection variant, const BBoxVector3d& origin, const BBoxVector3d& invdir, TraceThreadData *threadData)
 {
 	if(object != NULL)
 	{
@@ -253,7 +253,7 @@ bool Find_Intersection(Intersection *isect, ObjectPtr object, const Ray& ray, Ob
 	return false;
 }
 
-bool Find_Intersection(Intersection *isect, ObjectPtr object, const Ray& ray, ObjectBase::BBoxDirection variant, const BBOX_VECT& origin, const BBOX_VECT& invdir, const RayObjectCondition& postcondition, TraceThreadData *threadData)
+bool Find_Intersection(Intersection *isect, ObjectPtr object, const Ray& ray, ObjectBase::BBoxDirection variant, const BBoxVector3d& origin, const BBoxVector3d& invdir, const RayObjectCondition& postcondition, TraceThreadData *threadData)
 {
 	if(object != NULL)
 	{
@@ -374,7 +374,7 @@ bool Ray_In_Bound (const Ray& ray, const vector<ObjectPtr>& Bounding_Object, Tra
 	{
 		Thread->Stats()[Bounding_Region_Tests]++;
 
-		if((!Find_Intersection (&Local, *Bound, ray, Thread)) && (!Inside_Object(ray.Origin, *Bound, Thread)))
+		if((!Find_Intersection (&Local, *Bound, ray, Thread)) && (!Inside_Object(*ray.Origin, *Bound, Thread)))
 			return false;
 
 		Thread->Stats()[Bounding_Region_Tests_Succeeded]++;
@@ -955,7 +955,7 @@ void ObjectBase::Determine_Textures(Intersection *isect, bool hitinside, Weighte
 		isect->Csg->Determine_Textures(isect, hitinside, textures, threaddata);
 }
 
-bool ObjectBase::Intersect_BBox(BBoxDirection variant, const BBOX_VECT& origin, const BBOX_VECT& invdir, BBOX_VAL maxd) const
+bool ObjectBase::Intersect_BBox(BBoxDirection variant, const BBoxVector3d& origin, const BBoxVector3d& invdir, BBoxScalar maxd) const
 {
 	// TODO FIXME - This was SMALL_TOLERANCE, but that's too rough for some scenes [cjc] need to check what it was in the old code [trf]
 	switch(variant)
@@ -982,10 +982,10 @@ bool ObjectBase::Intersect_BBox(BBoxDirection variant, const BBOX_VECT& origin, 
 }
 
 template<int BX, int BY, int BZ>
-FORCEINLINE bool Intersect_BBox_Dir(const BBOX& bbox, const BBOX_VECT& origin, const BBOX_VECT& invdir, BBOX_VAL mind, BBOX_VAL maxd)
+FORCEINLINE bool Intersect_BBox_Dir(const BoundingBox& bbox, const BBoxVector3d& origin, const BBoxVector3d& invdir, BBoxScalar mind, BBoxScalar maxd)
 {
-	BBOX_VAL tmin, tmax, tymin, tymax, tzmin, tzmax;
-	BBOX_VECT bounds[2];
+	BBoxScalar tmin, tmax, tymin, tymax, tzmin, tzmax;
+	BBoxVector3d bounds[2];
 
 	Make_min_max_from_BBox(bounds[0], bounds[1], bbox);
 

@@ -27,9 +27,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/fractal.cpp $
- * $Revision: #33 $
- * $Change: 6085 $
- * $DateTime: 2013/11/10 07:39:29 $
+ * $Revision: #34 $
+ * $Change: 6118 $
+ * $DateTime: 2013/11/22 16:39:19 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -129,7 +129,7 @@ bool Fractal::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThread
 
 	if (Trans != NULL)
 	{
-		MInvTransDirection(Direction, ray.Direction, Trans);
+		MInvTransDirection(Direction, *ray.Direction, Trans);
 		VDot(Len, Direction, Direction);
 
 		if (Len == 0.0)
@@ -143,12 +143,12 @@ bool Fractal::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThread
 			VScaleEq(Direction, Len);
 		}
 
-		Assign_Vector(New_Ray.Direction, Direction);
-		MInvTransPoint(New_Ray.Origin, ray.Origin, Trans);
+		New_Ray.Direction = Vector3d(Direction);
+		MInvTransPoint(*New_Ray.Origin, *ray.Origin, Trans);
 	}
 	else
 	{
-		Assign_Vector(Direction, ray.Direction);
+		Assign_Vector(Direction, *ray.Direction);
 		New_Ray = ray;
 		Len = 1.0;
 	}
@@ -173,7 +173,7 @@ bool Fractal::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThread
 	/* Jump to starting point */
 
 	VScale(Next_Point, Direction, Depth);
-	VAddEq(Next_Point, New_Ray.Origin);
+	VAddEq(Next_Point, *New_Ray.Origin);
 
 	CURRENT = D_Iteration(Next_Point, this, Direction, &Dist, Thread->Fractal_IStack);
 
@@ -289,7 +289,7 @@ bool Fractal::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThread
 		if (Clip.empty() || Point_In_Clip(Real_Pt, Clip, Thread))
 		{
 			VNormalize(Real_Normal, Real_Normal);
-			Depth_Stack->push(Intersection(Depth * Len, Real_Pt, Real_Normal, this));
+			Depth_Stack->push(Intersection(Depth * Len, Vector3d(Real_Pt), Vector3d(Real_Normal), this));
 			Intersection_Found = true;
 
 			/* If fractal isn't used with CSG we can exit now. */
@@ -389,7 +389,7 @@ bool Fractal::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
 
 void Fractal::Normal(VECTOR Result, Intersection *Intersect, TraceThreadData *) const
 {
-	Assign_Vector(Result, Intersect->INormal);
+	Assign_Vector(Result, *Intersect->INormal);
 }
 
 /*****************************************************************************

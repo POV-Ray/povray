@@ -28,9 +28,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/poly.cpp $
- * $Revision: #34 $
- * $Change: 6085 $
- * $DateTime: 2013/11/10 07:39:29 $
+ * $Revision: #36 $
+ * $Change: 6119 $
+ * $DateTime: 2013/11/22 20:31:53 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -203,17 +203,17 @@ bool Poly::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDat
 {
 	DBL Depths[MAX_ORDER];
 	DBL len;
-	VECTOR  IPoint;
+	Vector3d IPoint;
 	int cnt, i, j, Intersection_Found, same_root;
 	Ray New_Ray;
 
 	/* Transform the ray into the polynomial's space */
 
-	MInvTransPoint(New_Ray.Origin, ray.Origin, Trans);
-	MInvTransDirection(New_Ray.Direction, ray.Direction, Trans);
+	MInvTransPoint(*New_Ray.Origin, *ray.Origin, Trans);
+	MInvTransDirection(*New_Ray.Direction, *ray.Direction, Trans);
 
-	VLength(len, New_Ray.Direction);
-	VInverseScaleEq(New_Ray.Direction, len);
+	len = New_Ray.Direction.length();
+	New_Ray.Direction /= len;
 
 	Intersection_Found = false;
 
@@ -261,13 +261,13 @@ bool Poly::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDat
 
 			if (!same_root)
 			{
-				VEvaluateRay(IPoint, New_Ray.Origin, Depths[i], New_Ray.Direction);
+				IPoint = New_Ray.Evaluate(Depths[i]);
 
 				/* Transform the point into world space */
 
-				MTransPoint(IPoint, IPoint, Trans);
+				MTransPoint(*IPoint, *IPoint, Trans);
 
-				if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
+				if (Clip.empty() || Point_In_Clip(*IPoint, Clip, Thread))
 				{
 					Depth_Stack->push(Intersection(Depths[i] / len,IPoint,this));
 
@@ -658,8 +658,8 @@ int Poly::intersect(const Ray &ray, int Order, const DBL *Coeffs, int Sturm_Flag
 	/* First we calculate the values of the individual powers
 	   of x, y, and z as they are represented by the ray */
 
-	Assign_Vector(P,ray.Origin);
-	Assign_Vector(D,ray.Direction);
+	Assign_Vector(P,*ray.Origin);
+	Assign_Vector(D,*ray.Direction);
 
 	for (i = 0; i < 3; i++)
 	{
@@ -1176,7 +1176,7 @@ void Poly::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) c
 
 	/* Transform the point into the polynomials space. */
 
-	MInvTransPoint(New_Point, Inter->IPoint, Trans);
+	MInvTransPoint(New_Point, *Inter->IPoint, Trans);
 
 	if (Order > 4)
 	{
@@ -1534,7 +1534,7 @@ void Poly::Compute_BBox()
 		BBox = Clip[0]->BBox; // FIXME - does not seem to support more than one bounding object? [trf]
 }
 
-bool Poly::Intersect_BBox(BBoxDirection, const BBOX_VECT&, const BBOX_VECT&, BBOX_VAL) const
+bool Poly::Intersect_BBox(BBoxDirection, const BBoxVector3d&, const BBoxVector3d&, BBoxScalar) const
 {
 	return true;
 }

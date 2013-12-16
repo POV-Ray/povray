@@ -24,11 +24,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/shape/planes.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/shape/planes.cpp $
+ * $Revision: #32 $
+ * $Change: 6119 $
+ * $DateTime: 2013/11/22 20:31:53 $
+ * $Author: clipka $
  *******************************************************************************/
 
 // frame.h must always be the first POV file included (pulls in platform config)
@@ -82,13 +82,13 @@ const DBL DEPTH_TOLERANCE = 1.0e-6;
 bool Plane::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread)
 {
 	DBL Depth;
-	VECTOR IPoint;
+	Vector3d IPoint;
 
 	if (Intersect(ray, &Depth, Thread))
 	{
-		VEvaluateRay(IPoint, ray.Origin, Depth, ray.Direction);
+		IPoint = ray.Evaluate(Depth);
 
-		if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
+		if (Clip.empty() || Point_In_Clip(*IPoint, Clip, Thread))
 		{
 			Depth_Stack->push(Intersection(Depth,IPoint,this));
 			return(true);
@@ -135,19 +135,19 @@ bool Plane::Intersect(const Ray& ray, DBL *Depth, TraceThreadData *Thread) const
 
 	if (Trans == NULL)
 	{
-		VDot(NormalDotDirection, Normal_Vector, ray.Direction);
+		VDot(NormalDotDirection, Normal_Vector, *ray.Direction);
 
 		if (fabs(NormalDotDirection) < EPSILON)
 		{
 			return(false);
 		}
 
-		VDot(NormalDotOrigin, Normal_Vector, ray.Origin);
+		VDot(NormalDotOrigin, Normal_Vector, *ray.Origin);
 	}
 	else
 	{
-		MInvTransPoint(P, ray.Origin, Trans);
-		MInvTransDirection(D, ray.Direction, Trans);
+		MInvTransPoint(P, *ray.Origin, Trans);
+		MInvTransDirection(D, *ray.Direction, Trans);
 
 		VDot(NormalDotDirection, Normal_Vector, D);
 
@@ -621,7 +621,7 @@ void Plane::Compute_BBox()
 	}
 }
 
-bool Plane::Intersect_BBox(BBoxDirection, const BBOX_VECT&, const BBOX_VECT&, BBOX_VAL) const
+bool Plane::Intersect_BBox(BBoxDirection, const BBoxVector3d&, const BBoxVector3d&, BBoxScalar) const
 {
 	return true;
 }

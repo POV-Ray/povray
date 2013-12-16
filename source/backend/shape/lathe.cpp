@@ -27,9 +27,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/lathe.cpp $
- * $Revision: #36 $
- * $Change: 6085 $
- * $DateTime: 2013/11/10 07:39:29 $
+ * $Revision: #38 $
+ * $Change: 6119 $
+ * $DateTime: 2013/11/22 20:31:53 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -248,8 +248,8 @@ bool Lathe::Intersect(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thre
 
 	// Transform the ray into the lathe space.
 
-	MInvTransPoint(P, ray.Origin, Trans);
-	MInvTransDirection(D, ray.Direction, Trans);
+	MInvTransPoint(P, *ray.Origin, Trans);
+	MInvTransDirection(D, *ray.Direction, Trans);
 
 	VLength(len, D);
 	VInverseScaleEq(D, len);
@@ -282,7 +282,7 @@ bool Lathe::Intersect(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thre
 	BCYL_INT *rint = reinterpret_cast<BCYL_INT *>(Thread->BCyl_RInt) ;
 	BCYL_INT *hint = reinterpret_cast<BCYL_INT *>(Thread->BCyl_HInt) ;
 
-	if((cnt = Intersect_BCyl(Spline->BCyl, intervals, rint, hint, P, D)) == 0)
+	if((cnt = Intersect_BCyl(Spline->BCyl, intervals, rint, hint, Vector3d(P), Vector3d(D))) == 0)
 		return false;
 
 	#ifdef LATHE_EXTRA_STATS
@@ -541,7 +541,7 @@ void Lathe::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) 
 
 	/* Transform the point into the lathe space. */
 
-	MInvTransPoint(P, Inter->IPoint, Trans);
+	MInvTransPoint(P, *Inter->IPoint, Trans);
 
 	/* Get distance from rotation axis. */
 
@@ -1336,13 +1336,13 @@ void Lathe::Compute_Lathe(UV_VECT *P, TraceThreadData *Thread)
 
 bool Lathe::test_hit(const Ray &ray, IStack& Depth_Stack, DBL d, DBL w, int n, TraceThreadData *Thread)
 {
-	VECTOR IPoint;
+	Vector3d IPoint;
 
 	if ((d > DEPTH_TOLERANCE) && (d < MAX_DISTANCE))
 	{
-		VEvaluateRay(IPoint, ray.Origin, d, ray.Direction);
+		IPoint = ray.Evaluate(d);
 
-		if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
+		if (Clip.empty() || Point_In_Clip(*IPoint, Clip, Thread))
 		{
 			Depth_Stack->push(Intersection(d, IPoint, this, n, w));
 
@@ -1398,7 +1398,7 @@ void Lathe::UVCoord(UV_VECT Result, const Intersection *Inter, TraceThreadData *
 */
 
 	/* Transform the point into the lathe space. */
-	MInvTransPoint(P, Inter->IPoint, Trans);
+	MInvTransPoint(P, *Inter->IPoint, Trans);
 
 	/* Determine its angle from the point (1, 0, 0) in the x-z plane. */
 	len = P[X] * P[X] + P[Z] * P[Z];

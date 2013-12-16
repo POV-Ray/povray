@@ -25,11 +25,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/texture/normal.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/texture/normal.cpp $
+ * $Revision: #32 $
+ * $Change: 6118 $
+ * $DateTime: 2013/11/22 16:39:19 $
+ * $Author: clipka $
  *******************************************************************************/
 
 /*
@@ -811,7 +811,7 @@ void Perturb_Normal(VECTOR Layer_Normal, const TNORMAL *Tnormal, const VECTOR EP
 
 			Perturb_Normal(Layer_Normal,Cur->Vals.Tnormal,TPoint,Intersection,ray,Thread);
 			VNormalizeEq(Layer_Normal);
-			Assign_Vector(Intersection->PNormal, Layer_Normal); /* -hdf- June 98 */
+			Intersection->PNormal = Vector3d(Layer_Normal); /* -hdf- June 98 */
 
 			return;
 		}
@@ -844,7 +844,7 @@ void Perturb_Normal(VECTOR Layer_Normal, const TNORMAL *Tnormal, const VECTOR EP
 
 			VNormalizeEq(Layer_Normal);
 
-			Assign_Vector(Intersection->PNormal, Layer_Normal); /* -hdf- June 98 */
+			Intersection->PNormal = Vector3d(Layer_Normal); /* -hdf- June 98 */
 
 			return;
 		}
@@ -901,7 +901,7 @@ void Perturb_Normal(VECTOR Layer_Normal, const TNORMAL *Tnormal, const VECTOR EP
 	}
 
 	if ( Intersection )
-		Assign_Vector(Intersection->PNormal, Layer_Normal); /* -hdf- June 98 */
+		Intersection->PNormal = Vector3d(Layer_Normal); /* -hdf- June 98 */
 }
 
 

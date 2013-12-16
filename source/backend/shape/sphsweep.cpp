@@ -28,9 +28,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/sphsweep.cpp $
- * $Revision: #37 $
- * $Change: 6085 $
- * $DateTime: 2013/11/10 07:39:29 $
+ * $Revision: #38 $
+ * $Change: 6118 $
+ * $DateTime: 2013/11/22 16:39:19 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -176,16 +176,16 @@ bool SphereSweep::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceTh
 
 	if(Trans == NULL)
 	{
-		Assign_Vector(New_Ray.Origin, ray.Origin);
-		Assign_Vector(New_Ray.Direction, ray.Direction);
+		New_Ray.Origin = ray.Origin;
+		New_Ray.Direction = ray.Direction;
 	}
 	else
 	{
-		MInvTransPoint(New_Ray.Origin, ray.Origin, Trans);
-		MInvTransDirection(New_Ray.Direction, ray.Direction, Trans);
+		MInvTransPoint(*New_Ray.Origin, *ray.Origin, Trans);
+		MInvTransDirection(*New_Ray.Direction, *ray.Direction, Trans);
 
-		VLength(len, New_Ray.Direction);
-		VInverseScaleEq(New_Ray.Direction, len);
+		len = New_Ray.Direction.length();
+		New_Ray.Direction /= len;
 	}
 
 	// Intersections with single spheres
@@ -251,16 +251,16 @@ bool SphereSweep::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceTh
 			{
 				// Yes, invert the transformation
 				Isect[i].t /= len;
-				MTransPoint(Isect[i].Point, Isect[i].Point, Trans);
-				MTransNormal(Isect[i].Normal, Isect[i].Normal, Trans);
-				VNormalizeEq(Isect[i].Normal);
+				MTransPoint(*Isect[i].Point, *Isect[i].Point, Trans);
+				MTransNormal(*Isect[i].Normal, *Isect[i].Normal, Trans);
+				Isect[i].Normal.normalize();
 			}
 
 			// Check for positive values of t (it's a ray after all...)
 			if(Isect[i].t > Depth_Tolerance)
 			{
 				// Test for clipping volume
-				if (Clip.empty() || Point_In_Clip(Isect[i].Point, Clip, Thread))
+				if (Clip.empty() || Point_In_Clip(*Isect[i].Point, Clip, Thread))
 				{
 					Depth_Stack->push(Intersection(Isect[i].t, Isect[i].Point, Isect[i].Normal, this));
 					Intersection_Found = true;
@@ -326,11 +326,11 @@ bool SphereSweep::Intersect_Sphere(const Ray &ray, const SPHSWEEP_SPH *Sphere, S
 
 	Radius2 = Sqr(Sphere->Radius);
 
-	VSub(Origin_To_Center, Sphere->Center, ray.Origin);
+	VSub(Origin_To_Center, Sphere->Center, *ray.Origin);
 
 	VDot(OCSquared, Origin_To_Center, Origin_To_Center);
 
-	VDot(t_Closest_Approach, Origin_To_Center, ray.Direction);
+	VDot(t_Closest_Approach, Origin_To_Center, *ray.Direction);
 
 	if((OCSquared >= Radius2) && (t_Closest_Approach < EPSILON))
 		return false;
@@ -345,21 +345,19 @@ bool SphereSweep::Intersect_Sphere(const Ray &ray, const SPHSWEEP_SPH *Sphere, S
 		Inter[0].t = t_Closest_Approach - Half_Chord;
 
 		// Calculate point
-		VEvaluateRay(Inter[0].Point, ray.Origin, Inter[0].t, ray.Direction);
+		Inter[0].Point = ray.Evaluate(Inter[0].t);
 
 		// Calculate normal
-		VSub(Inter[0].Normal, Inter[0].Point, Sphere->Center);
-		VInverseScaleEq(Inter[0].Normal, Sphere->Radius);
+		Inter[0].Normal = (Inter[0].Point - Vector3d(Sphere->Center)) / Sphere->Radius;
 
 		// Calculate bigger depth
 		Inter[1].t = t_Closest_Approach + Half_Chord;
 
 		// Calculate point
-		VEvaluateRay(Inter[1].Point, ray.Origin, Inter[1].t, ray.Direction);
+		Inter[1].Point = ray.Evaluate(Inter[1].t);
 
 		// Calculate normal
-		VSub(Inter[1].Normal, Inter[1].Point, Sphere->Center);
-		VInverseScaleEq(Inter[1].Normal, Sphere->Radius);
+		Inter[1].Normal = (Inter[1].Point - Vector3d(Sphere->Center)) / Sphere->Radius;
 
 		return true;
 	}
@@ -410,7 +408,7 @@ int SphereSweep::Intersect_Segment(const Ray &ray, const SPHSWEEP_SEG *Segment, 
 	DBL     Dot1, Dot2;
 	DBL     t1, t2;
 	VECTOR  Vector;
-	VECTOR  IPoint;
+	Vector3d IPoint;
 	VECTOR  DCenter;
 	DBL     DCenterDot;
 	DBL     temp;
@@ -427,19 +425,19 @@ int SphereSweep::Intersect_Segment(const Ray &ray, const SPHSWEEP_SEG *Segment, 
 	Isect_Count = 0;
 
 	// Calculate intersections with closing surface for u = 0
-	VDot(Dot1, ray.Direction, Segment->Center_Deriv[0]);
+	VDot(Dot1, *ray.Direction, Segment->Center_Deriv[0]);
 	if(fabs(Dot1) > EPSILON)
 	{
-		VSub(Vector, ray.Origin, Segment->Closing_Sphere[0].Center);
+		VSub(Vector, *ray.Origin, Segment->Closing_Sphere[0].Center);
 		VDot(Dot2, Vector, Segment->Center_Deriv[0]);
 		t1 = -(Dot2 + Segment->Closing_Sphere[0].Radius * Segment->Radius_Deriv[0]) / Dot1;
 		if ((t1 > -MAX_DISTANCE) && (t1 < MAX_DISTANCE))
 		{
 			// Calculate point
-			VEvaluateRay(IPoint, ray.Origin, t1, ray.Direction);
+			IPoint = ray.Evaluate(t1);
 
 			// Is the point inside the closing sphere?
-			VSub(DCenter, IPoint, Segment->Closing_Sphere[0].Center);
+			VSub(DCenter, *IPoint, Segment->Closing_Sphere[0].Center);
 			VDot(DCenterDot, DCenter, DCenter);
 			if(DCenterDot < Sqr(Segment->Closing_Sphere[0].Radius))
 			{
@@ -447,12 +445,10 @@ int SphereSweep::Intersect_Segment(const Ray &ray, const SPHSWEEP_SEG *Segment, 
 				Isect[Isect_Count].t = t1;
 
 				// Copy point
-				Assign_Vector(Isect[Isect_Count].Point, IPoint);
+				Isect[Isect_Count].Point = IPoint;
 
 				// Calculate normal
-				Assign_Vector(Isect[Isect_Count].Normal, Segment->Center_Deriv[0]);
-				VScaleEq(Isect[Isect_Count].Normal, -1.0);
-				VNormalizeEq(Isect[Isect_Count].Normal);
+				Isect[Isect_Count].Normal = (-Vector3d(Segment->Center_Deriv[0])).normalized();
 
 				Isect_Count++;
 			}
@@ -460,19 +456,19 @@ int SphereSweep::Intersect_Segment(const Ray &ray, const SPHSWEEP_SEG *Segment, 
 	}
 
 	// Calculate intersections with closing surface for u = 1
-	VDot(Dot1, ray.Direction, Segment->Center_Deriv[1]);
+	VDot(Dot1, *ray.Direction, Segment->Center_Deriv[1]);
 	if(fabs(Dot1) > EPSILON)
 	{
-		VSub(Vector, ray.Origin, Segment->Closing_Sphere[1].Center);
+		VSub(Vector, *ray.Origin, Segment->Closing_Sphere[1].Center);
 		VDot(Dot2, Vector, Segment->Center_Deriv[1]);
 		t2 = -(Dot2 + Segment->Closing_Sphere[1].Radius * Segment->Radius_Deriv[1]) / Dot1;
 		if((t2 > -MAX_DISTANCE) && (t2 < MAX_DISTANCE))
 		{
 			// Calculate point
-			VEvaluateRay(IPoint, ray.Origin, t2, ray.Direction);
+			IPoint = ray.Evaluate(t2);
 
 			// Is the point inside the closing sphere?
-			VSub(DCenter, IPoint, Segment->Closing_Sphere[1].Center);
+			VSub(DCenter, *IPoint, Segment->Closing_Sphere[1].Center);
 			VDot(DCenterDot, DCenter, DCenter);
 			if(DCenterDot < Sqr(Segment->Closing_Sphere[1].Radius))
 			{
@@ -480,11 +476,10 @@ int SphereSweep::Intersect_Segment(const Ray &ray, const SPHSWEEP_SEG *Segment, 
 				Isect[Isect_Count].t = t2;
 
 				// Copy point
-				Assign_Vector(Isect[Isect_Count].Point, IPoint);
+				Isect[Isect_Count].Point = IPoint;
 
 				// Calculate normal
-				Assign_Vector(Isect[Isect_Count].Normal, Segment->Center_Deriv[1]);
-				VNormalizeEq(Isect[Isect_Count].Normal);
+				Isect[Isect_Count].Normal = Vector3d(Segment->Center_Deriv[1]).normalized();
 
 				Isect_Count++;
 			}
@@ -497,14 +492,14 @@ int SphereSweep::Intersect_Segment(const Ray &ray, const SPHSWEEP_SEG *Segment, 
 	{
 		case 2:   // First order Polynomial
 
-			VSub(Vector, ray.Origin, Segment->Center_Coef[0]);
+			VSub(Vector, *ray.Origin, Segment->Center_Coef[0]);
 
 			// a is always 1.0
 
-			VDot(b, Segment->Center_Coef[1], ray.Direction);
+			VDot(b, Segment->Center_Coef[1], *ray.Direction);
 			b *= -2.0;
 
-			VDot(c, Vector, ray.Direction);
+			VDot(c, Vector, *ray.Direction);
 			c *= 2.0;
 
 			VDot(d, Segment->Center_Coef[1], Segment->Center_Coef[1]);
@@ -524,20 +519,20 @@ int SphereSweep::Intersect_Segment(const Ray &ray, const SPHSWEEP_SEG *Segment, 
 			Num_Poly_Roots = Solve_Polynomial(2, Coef, Root, true, 1e-10, Thread);
 			break;
 		case 4:   // Third order polynomial
-			VSub(Vector, ray.Origin, Segment->Center_Coef[0]);
+			VSub(Vector, *ray.Origin, Segment->Center_Coef[0]);
 
 			// a is always 1.0
 
-			VDot(b, Segment->Center_Coef[3], ray.Direction);
+			VDot(b, Segment->Center_Coef[3], *ray.Direction);
 			b *= -2.0;
 
-			VDot(c, Segment->Center_Coef[2], ray.Direction);
+			VDot(c, Segment->Center_Coef[2], *ray.Direction);
 			c *= -2.0;
 
-			VDot(d, Segment->Center_Coef[1], ray.Direction);
+			VDot(d, Segment->Center_Coef[1], *ray.Direction);
 			d *= -2.0;
 
-			VDot(e, Vector, ray.Direction);
+			VDot(e, Vector, *ray.Direction);
 			e *= 2.0;
 
 			VDot(f, Segment->Center_Coef[3], Segment->Center_Coef[3]);
@@ -637,12 +632,11 @@ int SphereSweep::Intersect_Segment(const Ray &ray, const SPHSWEEP_SEG *Segment, 
 						Isect[Isect_Count].t = t;
 
 						// Calculate point
-						VEvaluateRay(Isect[Isect_Count].Point, ray.Origin, t, ray.Direction);
+						Isect[Isect_Count].Point = ray.Evaluate(t);
 
 						// Calculate normal
 						VAddScaled(Center, Segment->Center_Coef[0], Root[m], Segment->Center_Coef[1]);
-						VSub(Isect[Isect_Count].Normal, Isect[Isect_Count].Point, Center);
-						VNormalizeEq(Isect[Isect_Count].Normal);
+						Isect[Isect_Count].Normal = (Isect[Isect_Count].Point - Vector3d(Center)).normalized();
 
 						Isect_Count++;
 					}
@@ -692,14 +686,13 @@ int SphereSweep::Intersect_Segment(const Ray &ray, const SPHSWEEP_SEG *Segment, 
 						Isect[Isect_Count].t = t;
 
 						// Calculate point
-						VEvaluateRay(Isect[Isect_Count].Point, ray.Origin, t, ray.Direction);
+						Isect[Isect_Count].Point = ray.Evaluate(t);
 
 						// Calculate normal
 						VAddScaled(Center, Segment->Center_Coef[0], Root[m], Segment->Center_Coef[1]);
 						VAddScaledEq(Center, Root[m] * Root[m], Segment->Center_Coef[2]);
 						VAddScaledEq(Center, Root[m] * Root[m] * Root[m], Segment->Center_Coef[3]);
-						VSub(Isect[Isect_Count].Normal, Isect[Isect_Count].Point, Center);
-						VNormalizeEq(Isect[Isect_Count].Normal);
+						Isect[Isect_Count].Normal = (Isect[Isect_Count].Point - Vector3d(Center)).normalized();
 
 						Isect_Count++;
 					}
@@ -950,7 +943,7 @@ bool SphereSweep::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
 
 void SphereSweep::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *) const
 {
-	Assign_Vector(Result, Inter->INormal);
+	Assign_Vector(Result, *Inter->INormal);
 }
 
 
@@ -1751,7 +1744,7 @@ int SphereSweep::Find_Valid_Points(SPHSWEEP_INT *Inter, int Num_Inter, const Ray
 	while(i < Num_Inter - 1)
 	{
 		// Angle between normal and ray
-		VDot(NormalDotDirection, Inter[i].Normal, ray.Direction);
+		NormalDotDirection = dot(Inter[i].Normal, ray.Direction);
 
 		// Does the ray enter the part?
 		if(NormalDotDirection < 0.0)

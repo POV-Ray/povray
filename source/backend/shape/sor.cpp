@@ -27,9 +27,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/sor.cpp $
- * $Revision: #35 $
- * $Change: 6085 $
- * $DateTime: 2013/11/10 07:39:29 $
+ * $Revision: #37 $
+ * $Change: 6119 $
+ * $DateTime: 2013/11/22 20:31:53 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -235,9 +235,9 @@ bool Sor::Intersect(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread
 
 	/* Transform the ray into the surface of revolution space. */
 
-	MInvTransPoint(P, ray.Origin, Trans);
+	MInvTransPoint(P, *ray.Origin, Trans);
 
-	MInvTransDirection(D, ray.Direction, Trans);
+	MInvTransDirection(D, *ray.Direction, Trans);
 
 	VLength(len, D);
 
@@ -337,7 +337,7 @@ bool Sor::Intersect(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread
 	BCYL_INT *rint = reinterpret_cast<BCYL_INT *>(Thread->BCyl_RInt) ;
 	BCYL_INT *hint = reinterpret_cast<BCYL_INT *>(Thread->BCyl_HInt) ;
 
-	if ((cnt = Intersect_BCyl(Spline->BCyl, intervals, rint, hint, P, D)) == 0)
+	if ((cnt = Intersect_BCyl(Spline->BCyl, intervals, rint, hint, Vector3d(P), Vector3d(D))) == 0)
 	{
 #ifdef SOR_EXTRA_STATS
 		if (found)
@@ -540,7 +540,7 @@ void Sor::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) co
 
 			/* Transform the intersection point into the surface of revolution space. */
 
-			MInvTransPoint(P, Inter->IPoint, Trans);
+			MInvTransPoint(P, *Inter->IPoint, Trans);
 
 			Entry = &Spline->Entry[Inter->i2];
 
@@ -1215,13 +1215,13 @@ void Sor::Compute_Sor(UV_VECT *P, TraceThreadData *Thread)
 
 bool Sor::test_hit(const Ray &ray, IStack& Depth_Stack, DBL d, DBL k, int t, int n, TraceThreadData *Thread)
 {
-	VECTOR IPoint;
+	Vector3d IPoint;
 
 	if ((d > DEPTH_TOLERANCE) && (d < MAX_DISTANCE))
 	{
-		VEvaluateRay(IPoint, ray.Origin, d, ray.Direction);
+		IPoint = ray.Evaluate(d);
 
-		if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
+		if (Clip.empty() || Point_In_Clip(*IPoint, Clip, Thread))
 		{
 			/* is the extra copy of d redundant? */
 			Depth_Stack->push(Intersection(d, IPoint, this, t, n, k));
@@ -1274,7 +1274,7 @@ void Sor::UVCoord(UV_VECT Result, const Intersection *Inter, TraceThreadData *Th
 	VECTOR P;
 
 	/* Transform the point into the lathe space. */
-	MInvTransPoint(P, Inter->IPoint, Trans);
+	MInvTransPoint(P, *Inter->IPoint, Trans);
 
 	/* Determine its angle from the point (1, 0, 0) in the x-z plane. */
 	len = P[X] * P[X] + P[Z] * P[Z];

@@ -24,11 +24,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/shape/mesh.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/shape/mesh.h $
+ * $Revision: #30 $
+ * $Change: 6119 $
+ * $DateTime: 2013/11/22 20:31:53 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #ifndef MESH_H
@@ -146,7 +146,7 @@ class Mesh : public ObjectBase
 		void compute_smooth_triangle(MESH_TRIANGLE *Triangle, const VECTOR P1, const VECTOR P2, const VECTOR P3);
 		bool intersect_mesh_triangle(const Ray& ray, const MESH_TRIANGLE *Triangle, DBL *Depth) const;
 		bool test_hit(const MESH_TRIANGLE *Triangle, const Ray& OrigRay, DBL Depth, DBL len, IStack& Depth_Stack, TraceThreadData *Thread);
-		void get_triangle_bbox(const MESH_TRIANGLE *Triangle, BBOX *BBox) const;
+		void get_triangle_bbox(const MESH_TRIANGLE *Triangle, BoundingBox *BBox) const;
 		bool intersect_bbox_tree(const Ray& ray, const Ray& Orig_Ray, DBL len, IStack& Depth_Stack, TraceThreadData *Thread);
 		bool inside_bbox_tree(const Ray& ray, TraceThreadData *Thread) const;
 		void get_triangle_vertices(const MESH_TRIANGLE *Triangle, VECTOR P1, VECTOR P2, VECTOR P3) const;

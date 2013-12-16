@@ -22,11 +22,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/support/bsptree.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/support/bsptree.h $
+ * $Revision: #46 $
+ * $Change: 6119 $
+ * $DateTime: 2013/11/22 20:31:53 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #ifndef POVRAY_BACKEND_BSPTREE_H
@@ -241,7 +241,7 @@ class BSPTree
 		/// object index list (only used while building tree)
 		vector<unsigned int> indices;
 
-		void BuildRecursive(const Progress& progress, const Objects& objects, unsigned int inode, unsigned int indexbegin, unsigned int indexend, BBOX& cell, unsigned int maxlevel);
+		void BuildRecursive(const Progress& progress, const Objects& objects, unsigned int inode, unsigned int indexbegin, unsigned int indexend, MinMaxBoundingBox& cell, unsigned int maxlevel);
 		void SetObjectNode(unsigned int inode, unsigned int indexbegin, unsigned int indexend);
 
 		void ReadRecursive(const Progress& progress, FILE *infile, unsigned int inode, unsigned int level, unsigned int maxIndex);

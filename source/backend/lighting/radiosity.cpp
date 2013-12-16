@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/lighting/radiosity.cpp $
- * $Revision: #62 $
- * $Change: 6113 $
- * $DateTime: 2013/11/20 20:39:54 $
+ * $Revision: #63 $
+ * $Change: 6118 $
+ * $DateTime: 2013/11/22 16:39:19 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -551,7 +551,7 @@ double RadiosityFunction::GatherLight(const Vector3d& ipoint, const Vector3d& ra
 		okCount ++;
 		if (use_raw_normal) okCountRaw ++;
 		ticket.radiosityQuality = 1.0;
-		Ray nray(*ipoint, *direction, Ray::OtherRay, false, false, true); // Build a ray pointing in the chosen direction
+		Ray nray(ipoint, direction, Ray::OtherRay, false, false, true); // Build a ray pointing in the chosen direction
 		ticket.radiosityRecursionDepth++;
 		ticket.radiosityImportanceQueried = (float)i / (float)(cur_sample_count-1);
 		bool alphaBackground = ticket.alphaBackground;

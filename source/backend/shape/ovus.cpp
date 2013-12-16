@@ -24,11 +24,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/shape/ovus.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/shape/ovus.cpp $
+ * $Revision: #5 $
+ * $Change: 6118 $
+ * $DateTime: 2013/11/22 16:39:19 $
+ * $Author: clipka $
  *******************************************************************************/
 
 /****************************************************************************
@@ -268,8 +268,8 @@ bool Ovus::All_Intersections(const Ray& ray, IStack& Depth_Stack, SceneThreadDat
 	VECTOR P,D;
 
 	Thread->Stats()[Ray_Ovus_Tests]++;
-	MInvTransPoint(P, ray.Origin, Trans);
-	MInvTransDirection(D, ray.Direction, Trans);
+	MInvTransPoint(P, *ray.Origin, Trans);
+	MInvTransDirection(D, *ray.Direction, Trans);
 	VLength(len, D);
 	VInverseScaleEq(D, len);
 
@@ -287,7 +287,7 @@ bool Ovus::All_Intersections(const Ray& ray, IStack& Depth_Stack, SceneThreadDat
 				VInverseScaleEq(INormal, BottomRadius);
 				MTransNormal(Real_Normal, INormal, Trans);
 				VNormalizeEq(Real_Normal);
-				Depth_Stack->push(Intersection(Depth1/len, Real_Pt, Real_Normal, this));
+				Depth_Stack->push(Intersection(Depth1/len, Vector3d(Real_Pt), Vector3d(Real_Normal), this));
 				Found = true;
 			}
 		}
@@ -306,7 +306,7 @@ bool Ovus::All_Intersections(const Ray& ray, IStack& Depth_Stack, SceneThreadDat
 				VInverseScaleEq(INormal, BottomRadius);
 				MTransNormal(Real_Normal, INormal, Trans);
 				VNormalizeEq(Real_Normal);
-				Depth_Stack->push(Intersection(Depth2/len, Real_Pt, Real_Normal, this));
+				Depth_Stack->push(Intersection(Depth2/len, Vector3d(Real_Pt), Vector3d(Real_Normal), this));
 				Found = true;
 			}
 		}
@@ -326,7 +326,7 @@ bool Ovus::All_Intersections(const Ray& ray, IStack& Depth_Stack, SceneThreadDat
 				VInverseScaleEq(INormal, TopRadius);
 				MTransNormal(Real_Normal, INormal, Trans);
 				VNormalizeEq(Real_Normal);
-				Depth_Stack->push(Intersection(Depth3/len, Real_Pt, Real_Normal, this));
+				Depth_Stack->push(Intersection(Depth3/len, Vector3d(Real_Pt), Vector3d(Real_Normal), this));
 				Found = true;
 			}
 		}
@@ -345,7 +345,7 @@ bool Ovus::All_Intersections(const Ray& ray, IStack& Depth_Stack, SceneThreadDat
 				VInverseScaleEq(INormal, TopRadius);
 				MTransNormal(Real_Normal, INormal, Trans);
 				VNormalizeEq(Real_Normal);
-				Depth_Stack->push(Intersection(Depth4/len, Real_Pt, Real_Normal, this));
+				Depth_Stack->push(Intersection(Depth4/len, Vector3d(Real_Pt), Vector3d(Real_Normal), this));
 				Found = true;
 			}
 		}
@@ -367,7 +367,7 @@ bool Ovus::All_Intersections(const Ray& ray, IStack& Depth_Stack, SceneThreadDat
 			VNormalizeEq(INormal);
 			MTransNormal(Real_Normal, INormal, Trans);
 			VNormalizeEq(Real_Normal);
-			Depth_Stack->push(Intersection(Depth5/len, Real_Pt, Real_Normal, this));
+			Depth_Stack->push(Intersection(Depth5/len, Vector3d(Real_Pt), Vector3d(Real_Normal), this));
 			Found = true;
 		}
 	}
@@ -387,7 +387,7 @@ bool Ovus::All_Intersections(const Ray& ray, IStack& Depth_Stack, SceneThreadDat
 			MTransNormal(Real_Normal, INormal, Trans);
 			VNormalizeEq(Real_Normal);
 
-			Depth_Stack->push(Intersection(Depth6/len, Real_Pt, Real_Normal, this));
+			Depth_Stack->push(Intersection(Depth6/len, Vector3d(Real_Pt), Vector3d(Real_Normal), this));
 			Found = true;
 		}
 	}
@@ -502,7 +502,7 @@ bool Ovus::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
 
 void Ovus::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) const
 {
-	Assign_Vector(Result, Inter->INormal);
+	Assign_Vector(Result, *Inter->INormal);
 }
 
 
@@ -895,7 +895,7 @@ void Ovus::Compute_BBox()
 
 void Ovus::UVCoord(UV_VECT Result, const Intersection *Inter, TraceThreadData *Thread) const
 {
-	CalcUV(Inter->IPoint, Result);
+	CalcUV(*Inter->IPoint, Result);
 }
 
 

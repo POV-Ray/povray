@@ -2798,15 +2798,15 @@ bool TrueType::GlyphIntersect(const VECTOR P, const VECTOR D, const GlyphStruct*
 	if (t0 > 0.0)
 	{
 		Depth = t0 /* / len */;
-		VScale(IPoint, ray.Direction, Depth);
-		VAddEq(IPoint, ray.Origin);
+		VScale(IPoint, *ray.Direction, Depth);
+		VAddEq(IPoint, *ray.Origin);
 
 		if (Depth > TTF_Tolerance && (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread)))
 		{
 			Make_Vector(N, 0.0, 0.0, -1.0);
 			MTransNormal(N, N, Trans);
 			VNormalize(N, N);
-			Depth_Stack->push(Intersection(Depth, IPoint, N, this));
+			Depth_Stack->push(Intersection(Depth, Vector3d(IPoint), Vector3d(N), this));
 			Flag = true;
 		}
 	}
@@ -2814,15 +2814,15 @@ bool TrueType::GlyphIntersect(const VECTOR P, const VECTOR D, const GlyphStruct*
 	if (t1 > 0.0)
 	{
 		Depth = t1 /* / len */;
-		VScale(IPoint, ray.Direction, Depth);
-		VAddEq(IPoint, ray.Origin);
+		VScale(IPoint, *ray.Direction, Depth);
+		VAddEq(IPoint, *ray.Origin);
 
 		if (Depth > TTF_Tolerance && (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread)))
 		{
 			Make_Vector(N, 0.0, 0.0, 1.0);
 			MTransNormal(N, N, Trans);
 			VNormalize(N, N);
-			Depth_Stack->push(Intersection(Depth, IPoint, N, this));
+			Depth_Stack->push(Intersection(Depth, Vector3d(IPoint), Vector3d(N), this));
 			Flag = true;
 		}
 	}
@@ -2902,15 +2902,15 @@ bool TrueType::GlyphIntersect(const VECTOR P, const VECTOR D, const GlyphStruct*
 
 				if (z >= 0 && z <= glyph_depth && Depth > TTF_Tolerance)
 				{
-					VScale(IPoint, ray.Direction, Depth);
-					VAddEq(IPoint, ray.Origin);
+					VScale(IPoint, *ray.Direction, Depth);
+					VAddEq(IPoint, *ray.Origin);
 
 					if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
 					{
 						Make_Vector(N, d1, -d0, 0.0);
 						MTransNormal(N, N, Trans);
 						VNormalize(N, N);
-						Depth_Stack->push(Intersection(Depth, IPoint, N, this));
+						Depth_Stack->push(Intersection(Depth, Vector3d(IPoint), Vector3d(N), this));
 						Flag = true;
 					}
 				}
@@ -2976,15 +2976,15 @@ bool TrueType::GlyphIntersect(const VECTOR P, const VECTOR D, const GlyphStruct*
 
 					if (z >= 0 && z <= glyph_depth && Depth > TTF_Tolerance)
 					{
-						VScale(IPoint, ray.Direction, Depth);
-						VAddEq(IPoint, ray.Origin);
+						VScale(IPoint, *ray.Direction, Depth);
+						VAddEq(IPoint, *ray.Origin);
 
 						if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
 						{
 							Make_Vector(N, 2.0 * yt2 * S[l] + yt1, -2.0 * xt2 * S[l] - xt1, 0.0);
 							MTransNormal(N, N, Trans);
 							VNormalize(N, N);
-							Depth_Stack->push(Intersection(Depth, IPoint, N, this));
+							Depth_Stack->push(Intersection(Depth, Vector3d(IPoint), Vector3d(N), this));
 							Flag = true;
 						}
 					}
@@ -3007,8 +3007,8 @@ bool TrueType::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThrea
 
 	/* Transform the point into the glyph's space */
 
-	MInvTransPoint(P, ray.Origin, Trans);
-	MInvTransDirection(D, ray.Direction, Trans);
+	MInvTransPoint(P, *ray.Origin, Trans);
+	MInvTransDirection(D, *ray.Direction, Trans);
 
 	/* Tweak the ray to try to avoid pathalogical intersections */
 /* 	DBL len;
@@ -3048,7 +3048,7 @@ void TrueType::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Threa
 {
 	/* Use precomputed normal. [ARE 11/94] */
 
-	Assign_Vector(Result, Inter->INormal);
+	Assign_Vector(Result, *Inter->INormal);
 }
 
 ObjectPtr TrueType::Copy()
@@ -3157,12 +3157,12 @@ void TrueType::Compute_BBox()
 
 #ifdef TTF_DEBUG
 	Debug_Info("Bounds: <%g,%g,%g> -> <%g,%g,%g>\n",
-	           ttf->BBox.Lower_Left[0],
-	           ttf->BBox.Lower_Left[1],
-	           ttf->BBox.Lower_Left[2],
-	           ttf->BBox.Lengths[0],
-	           ttf->BBox.Lengths[1],
-	           ttf->BBox.Lengths[2]);
+	           ttf->BBox.lowerLeft[0],
+	           ttf->BBox.lowerLeft[1],
+	           ttf->BBox.lowerLeft[2],
+	           ttf->BBox.size[0],
+	           ttf->BBox.size[1],
+	           ttf->BBox.size[2]);
 #endif
 
 	/* Apply the transformation to the bounding box */

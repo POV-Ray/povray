@@ -121,14 +121,14 @@ const DBL HFIELD_TOLERANCE = 1.0e-6;
 bool HField::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread)
 {
 	int Side1, Side2;
-	VECTOR Start;
+	Vector3d Start;
 	Ray Temp_Ray;
 	DBL depth1, depth2;
 
 	Thread->Stats()[Ray_HField_Tests]++;
 
-	MInvTransPoint(Temp_Ray.Origin, ray.Origin, Trans);
-	MInvTransDirection(Temp_Ray.Direction, ray.Direction, Trans);
+	MInvTransPoint(*Temp_Ray.Origin, *ray.Origin, Trans);
+	MInvTransDirection(*Temp_Ray.Direction, *ray.Direction, Trans);
 
 #ifdef HFIELD_EXTRA_STATS
 	Thread->Stats()[Ray_HField_Box_Tests]++;
@@ -153,9 +153,9 @@ bool HField::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadD
 		}
 	}
 
-	VEvaluateRay(Start, Temp_Ray.Origin, depth1, Temp_Ray.Direction);
+	Start = Temp_Ray.Evaluate(depth1);
 
-	if (block_traversal(Temp_Ray, Start, Depth_Stack, ray, depth1, depth2, Thread))
+	if (block_traversal(Temp_Ray, *Start, Depth_Stack, ray, depth1, depth2, Thread))
 	{
 		Thread->Stats()[Ray_HField_Tests_Succeeded]++;
 
@@ -296,11 +296,11 @@ void HField::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread)
 
 	if(Inter->haveNormal == true)
 	{
-		Assign_Vector(Result,Inter->INormal);
+		Assign_Vector(Result,*Inter->INormal);
 		return;
 	}
 
-	MInvTransPoint(Local_Origin, Inter->IPoint, Trans);
+	MInvTransPoint(Local_Origin, *Inter->IPoint, Trans);
 
 	px = (int)Local_Origin[X];
 	pz = (int)Local_Origin[Z];
@@ -451,7 +451,8 @@ bool HField::intersect_pixel(int x, int z, const Ray &ray, DBL height1, DBL heig
 	DBL s, t, y1, y2, y3, y4;
 	DBL min_y2_y3, max_y2_y3;
 	DBL max_height, min_height;
-	VECTOR P, N, V1;
+	Vector3d P;
+	VECTOR N, V1;
 
 #ifdef HFIELD_EXTRA_STATS
 	Thread->Stats()[Ray_HField_Cell_Tests]++;
@@ -505,7 +506,7 @@ bool HField::intersect_pixel(int x, int z, const Ray &ray, DBL height1, DBL heig
 
 		/* Set up triangle. */
 
-		Make_Vector(P, (DBL)x, y1, (DBL)z);
+		P = Vector3d((DBL)x, y1, (DBL)z);
 
 		/*
 		 * Calculate the normal vector from:
@@ -517,13 +518,13 @@ bool HField::intersect_pixel(int x, int z, const Ray &ray, DBL height1, DBL heig
 
 		/* Now intersect the triangle. */
 
-		VDot(dot, N, ray.Direction);
+		VDot(dot, N, *ray.Direction);
 
 		if ((dot > EPSILON) || (dot < -EPSILON))
 			// (Rays virtually parallel to the triangle's plane are asking for mathematical trouble,
 			// so they're always presumed to be a no-hit.)
 		{
-			VSub(V1, P, ray.Origin);
+			VSub(V1, *P, *ray.Origin);
 
 			VDot(depth1, N, V1);
 
@@ -542,9 +543,9 @@ bool HField::intersect_pixel(int x, int z, const Ray &ray, DBL height1, DBL heig
 					Thread->Stats()[Ray_HField_Triangle_Tests_Succeeded]++;
 #endif
 
-					VEvaluateRay(P, RRay.Origin, depth1, RRay.Direction);
+					P = RRay.Evaluate(depth1);
 
-					if (Clip.empty() || Point_In_Clip(P, Clip, Thread))
+					if (Clip.empty() || Point_In_Clip(*P, Clip, Thread))
 						// (Check whether the point of intersection is within the clipped-by volume)
 					{
 						if (Test_Flag(this, SMOOTHED_FLAG))
@@ -561,7 +562,7 @@ bool HField::intersect_pixel(int x, int z, const Ray &ray, DBL height1, DBL heig
 							Assign_Vector(tmp,N);
 							MTransNormal(tmp,tmp,Trans);
 							VNormalize(tmp,tmp);
-							HField_Stack->push(Intersection(depth1, P, tmp, this));
+							HField_Stack->push(Intersection(depth1, P, Vector3d(tmp), this));
 						}
 
 						Found = true;
@@ -584,7 +585,7 @@ bool HField::intersect_pixel(int x, int z, const Ray &ray, DBL height1, DBL heig
 
 		/* Set up triangle. */
 
-		Make_Vector(P, (DBL)(x+1), y4, (DBL)(z+1));
+		P = Vector3d((DBL)(x+1), y4, (DBL)(z+1));
 
 		/*
 		 * Calculate the normal vector from:
@@ -596,13 +597,13 @@ bool HField::intersect_pixel(int x, int z, const Ray &ray, DBL height1, DBL heig
 
 		/* Now intersect the triangle. */
 
-		VDot(dot, N, ray.Direction);
+		VDot(dot, N, *ray.Direction);
 
 		if ((dot > EPSILON) || (dot < -EPSILON))
 			// (Rays virtually parallel to the triangle's plane are asking for mathematical trouble,
 			// so they're always presumed to be a no-hit.)
 		{
-			VSub(V1, P, ray.Origin);
+			VSub(V1, *P, *ray.Origin);
 
 			VDot(depth2, N, V1);
 
@@ -621,9 +622,9 @@ bool HField::intersect_pixel(int x, int z, const Ray &ray, DBL height1, DBL heig
 					Thread->Stats()[Ray_HField_Triangle_Tests_Succeeded]++;
 #endif
 
-					VEvaluateRay(P, RRay.Origin, depth2, RRay.Direction);
+					P = RRay.Evaluate(depth2);
 
-					if (Clip.empty() || Point_In_Clip(P, Clip, Thread))
+					if (Clip.empty() || Point_In_Clip(*P, Clip, Thread))
 						// (Check whether the point of intersection is within the clipped-by volume)
 					{
 						if (Test_Flag(this, SMOOTHED_FLAG))
@@ -640,7 +641,7 @@ bool HField::intersect_pixel(int x, int z, const Ray &ray, DBL height1, DBL heig
 							Assign_Vector(tmp,N);
 							MTransNormal(tmp,tmp,Trans);
 							VNormalize(tmp,tmp);
-							HField_Stack->push(Intersection(depth2, P, tmp, this));
+							HField_Stack->push(Intersection(depth2, P, Vector3d(tmp), this));
 						}
 
 						Found = true;
@@ -1410,12 +1411,9 @@ HField::~HField()
 
 void HField::Compute_BBox()
 {
-	// [ABX 20.01.2004] Low_Left introduced to hide BCC 5.5 bug
-	BBOX_VECT& Low_Left = BBox.Lower_Left;
+	BBox.lowerLeft = BBoxVector3d(bounding_corner1);
 
-	Assign_BBox_Vect(Low_Left, bounding_corner1);
-
-	VSub (BBox.Lengths, bounding_corner2, bounding_corner1);
+	BBox.size = BBoxVector3d(Vector3d(bounding_corner2) - Vector3d(bounding_corner1));
 
 	if (Trans != NULL)
 	{
@@ -1892,7 +1890,8 @@ bool HField::block_traversal(const Ray &ray, const VECTOR Start, IStack &HField_
 	DBL ymin, ymax, y1, y2;
 	DBL neary, fary;
 	DBL k1, k2, dist;
-	VECTOR nearP, farP;
+	VECTOR nearP;
+	Vector3d farP;
 	HFIELD_BLOCK *Block;
 
 	px = Start[X];
@@ -2043,7 +2042,7 @@ bool HField::block_traversal(const Ray &ray, const VECTOR Start, IStack &HField_
 
 		/* Get point where ray leaves current block. */
 
-		VEvaluateRay(farP, ray.Origin, dist, ray.Direction);
+		farP = ray.Evaluate(dist);
 
 		fary = farP[Y];
 
@@ -2086,7 +2085,7 @@ bool HField::block_traversal(const Ray &ray, const VECTOR Start, IStack &HField_
 		x = nx;
 		z = nz;
 
-		Assign_Vector(nearP, farP);
+		Assign_Vector(nearP, *farP);
 
 		neary = fary;
 	}

@@ -97,7 +97,7 @@ bool IsoSurface::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
 	int Side1 = 0, Side2 = 0, itrace = 0, i_flg = 0;
 	DBL Depth1 = 0.0, Depth2 = 0.0, len = 0.0;
 	Ray New_Ray;
-	VECTOR IPoint;
+	Vector3d IPoint;
 	VECTOR Plocal, Dlocal;
 	DBL tmax = 0.0, tmin = 0.0, tmp = 0.0;
 	DBL maxg = max_gradient;
@@ -115,10 +115,10 @@ bool IsoSurface::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
 	{
 		if(Trans != NULL)
 		{
-			MInvTransPoint(New_Ray.Origin, ray.Origin, Trans);
-			MInvTransDirection(New_Ray.Direction, ray.Direction, Trans);
-			VLength(len, New_Ray.Direction);
-			VInverseScaleEq(New_Ray.Direction, len);
+			MInvTransPoint(*New_Ray.Origin, *ray.Origin, Trans);
+			MInvTransDirection(*New_Ray.Direction, *ray.Direction, Trans);
+			len = New_Ray.Direction.length();
+			New_Ray.Direction /= len;
 			i_flg = Sphere::Intersect(New_Ray, container.sphere.center,
 			                          (container.sphere.radius) * (container.sphere.radius),
 			                          &Depth1, &Depth2);
@@ -148,13 +148,13 @@ bool IsoSurface::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
 		Thread->Stats()[Ray_IsoSurface_Bound_Tests_Succeeded]++;
 		if(Trans != NULL)
 		{
-			MInvTransPoint(Plocal, ray.Origin, Trans);
-			MInvTransDirection(Dlocal, ray.Direction, Trans);
+			MInvTransPoint(Plocal, *ray.Origin, Trans);
+			MInvTransDirection(Dlocal, *ray.Direction, Trans);
 		}
 		else
 		{
-			Assign_Vector(Plocal, ray.Origin);
-			Assign_Vector(Dlocal, ray.Direction);
+			Assign_Vector(Plocal, *ray.Origin);
+			Assign_Vector(Dlocal, *ray.Direction);
 		}
 
 		Thread->isosurfaceData->Inv3 = 1;
@@ -167,8 +167,8 @@ bool IsoSurface::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
 			{
 				if(tmp < 0.0)                   /* The ray hits the bounding shape */
 				{
-					VEvaluateRay(IPoint, ray.Origin, Depth1, ray.Direction);
-					if(Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
+					IPoint = ray.Evaluate(Depth1);
+					if(Clip.empty() || Point_In_Clip(*IPoint, Clip, Thread))
 					{
 						Depth_Stack->push(Intersection(Depth1, IPoint, this, Side1));
 						IFound = true;
@@ -190,8 +190,8 @@ bool IsoSurface::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
 				VEvaluateRay(VTmp, Plocal, Depth2, Dlocal);
 				if(Vector_Function(Thread->functionContext, VTmp) < 0.0)
 				{
-					VEvaluateRay(IPoint, ray.Origin, Depth2, ray.Direction);
-					if(Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
+					IPoint = ray.Evaluate(Depth2);
+					if(Clip.empty() || Point_In_Clip(*IPoint, Clip, Thread))
 					{
 						Depth_Stack->push(Intersection(Depth2, IPoint, this, Side2));
 						IFound = true;
@@ -232,8 +232,8 @@ bool IsoSurface::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
 				break;
 			else
 			{
-				VEvaluateRay(IPoint, ray.Origin, tmin, ray.Direction);
-				if(Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
+				IPoint = ray.Evaluate(tmin);
+				if(Clip.empty() || Point_In_Clip(*IPoint, Clip, Thread))
 				{
 					Depth_Stack->push(Intersection(tmin, IPoint, this, 0 /*Side1*/));
 					IFound = true;
@@ -384,9 +384,9 @@ void IsoSurface::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thr
 
 			/* Transform the point into the isosurface space */
 			if(Trans != NULL)
-				MInvTransPoint(New_Point, Inter->IPoint, Trans);
+				MInvTransPoint(New_Point, *Inter->IPoint, Trans);
 			else
-				Assign_Vector(New_Point, Inter->IPoint);
+				Assign_Vector(New_Point, *Inter->IPoint);
 
 			if(container_shape)
 			{
@@ -872,11 +872,8 @@ void IsoSurface::Compute_BBox()
 	}
 	else
 	{
-		// [ABX 20.01.2004] Low_Left introduced to hide BCC 5.5 bug
-		BBOX_VECT& Low_Left = BBox.Lower_Left;
-
-		Assign_BBox_Vect(Low_Left, container.box.corner1);
-		VSub(BBox.Lengths, container.box.corner2, container.box.corner1);
+		BBox.lowerLeft = BBoxVector3d(container.box.corner1);
+		BBox.size = BBoxVector3d(Vector3d(container.box.corner2) - Vector3d(container.box.corner1));
 	}
 
 	if(Trans != NULL)

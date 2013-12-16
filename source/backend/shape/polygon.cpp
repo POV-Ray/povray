@@ -27,9 +27,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/polygon.cpp $
- * $Revision: #32 $
- * $Change: 6085 $
- * $DateTime: 2013/11/10 07:39:29 $
+ * $Revision: #34 $
+ * $Change: 6119 $
+ * $DateTime: 2013/11/22 20:31:53 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -122,13 +122,13 @@ const DBL ZERO_TOLERANCE = 1.0e-10;
 bool Polygon::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread)
 {
 	DBL Depth;
-	VECTOR IPoint;
+	Vector3d IPoint;
 
 	if (Intersect(ray, &Depth, Thread))
 	{
-		VEvaluateRay(IPoint, ray.Origin, Depth, ray.Direction);
+		IPoint = ray.Evaluate(Depth);
 
-		if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
+		if (Clip.empty() || Point_In_Clip(*IPoint, Clip, Thread))
 		{
 			Depth_Stack->push(Intersection(Depth, IPoint, this));
 
@@ -189,9 +189,9 @@ bool Polygon::Intersect(const Ray& ray, DBL *Depth, TraceThreadData *Thread) con
 
 	/* Transform the ray into the polygon space. */
 
-	MInvTransPoint(p, ray.Origin, Trans);
+	MInvTransPoint(p, *ray.Origin, Trans);
 
-	MInvTransDirection(d, ray.Direction, Trans);
+	MInvTransDirection(d, *ray.Direction, Trans);
 
 	VLength(len, d);
 
@@ -854,22 +854,22 @@ void Polygon::Compute_BBox()
 
 	Make_BBox_from_min_max(BBox, Min, Max);
 
-	if (fabs(BBox.Lengths[X]) < SMALL_TOLERANCE)
+	if (fabs(BBox.size[X]) < SMALL_TOLERANCE)
 	{
-		BBox.Lower_Left[X] -= SMALL_TOLERANCE;
-		BBox.Lengths[X]    += 2.0 * SMALL_TOLERANCE;
+		BBox.lowerLeft[X] -= SMALL_TOLERANCE;
+		BBox.size[X]    += 2.0 * SMALL_TOLERANCE;
 	}
 
-	if (fabs(BBox.Lengths[Y]) < SMALL_TOLERANCE)
+	if (fabs(BBox.size[Y]) < SMALL_TOLERANCE)
 	{
-		BBox.Lower_Left[Y] -= SMALL_TOLERANCE;
-		BBox.Lengths[Y]    += 2.0 * SMALL_TOLERANCE;
+		BBox.lowerLeft[Y] -= SMALL_TOLERANCE;
+		BBox.size[Y]    += 2.0 * SMALL_TOLERANCE;
 	}
 
-	if (fabs(BBox.Lengths[Z]) < SMALL_TOLERANCE)
+	if (fabs(BBox.size[Z]) < SMALL_TOLERANCE)
 	{
-		BBox.Lower_Left[Z] -= SMALL_TOLERANCE;
-		BBox.Lengths[Z]    += 2.0 * SMALL_TOLERANCE;
+		BBox.lowerLeft[Z] -= SMALL_TOLERANCE;
+		BBox.size[Z]    += 2.0 * SMALL_TOLERANCE;
 	}
 }
 

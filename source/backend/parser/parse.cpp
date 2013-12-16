@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/parser/parse.cpp $
- * $Revision: #191 $
- * $Change: 6113 $
- * $DateTime: 2013/11/20 20:39:54 $
+ * $Revision: #193 $
+ * $Change: 6119 $
+ * $DateTime: 2013/11/22 20:31:53 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -864,7 +864,7 @@ ObjectPtr Parser::Parse_Blob()
 
 			blob_component->elem.rad2 = Sqr(blob_component->elem.rad2);
 
-			Parse_Vector(blob_component->elem.O);
+			Parse_Vector(*blob_component->elem.O);
 
 			/* Next component. */
 
@@ -886,7 +886,7 @@ ObjectPtr Parser::Parse_Blob()
 
 			Parse_Begin();
 
-			Parse_Vector(blob_component->elem.O);
+			Parse_Vector(*blob_component->elem.O);
 
 			Parse_Comma();
 
@@ -1029,17 +1029,17 @@ void Parser::Parse_Blob_Element_Mods(Blob_Element *Element)
 	EXPECT
 		CASE (TRANSLATE_TOKEN)
 			Parse_Vector (Local_Vector);
-			Blob::Translate_Blob_Element (Element, Local_Vector);
+			Blob::Translate_Blob_Element (Element, Vector3d(Local_Vector));
 		END_CASE
 
 		CASE (ROTATE_TOKEN)
 			Parse_Vector (Local_Vector);
-			Blob::Rotate_Blob_Element (Element, Local_Vector);
+			Blob::Rotate_Blob_Element (Element, Vector3d(Local_Vector));
 		END_CASE
 
 		CASE (SCALE_TOKEN)
 			Parse_Scale_Vector (Local_Vector);
-			Blob::Scale_Blob_Element (Element, Local_Vector);
+			Blob::Scale_Blob_Element (Element, Vector3d(Local_Vector));
 		END_CASE
 
 		CASE (TRANSFORM_TOKEN)
@@ -7297,7 +7297,7 @@ ObjectPtr Parser::Parse_Object_Mods (ObjectPtr Object)
 	VECTOR Local_Vector;
 	MATRIX Local_Matrix;
 	TRANSFORM Local_Trans;
-	BBOX BBox;
+	BoundingBox BBox;
 	TEXTURE *Local_Texture;
 	TEXTURE *Local_Int_Texture;
 	MATERIAL Local_Material;
@@ -7690,12 +7690,12 @@ ObjectPtr Parser::Parse_Object_Mods (ObjectPtr Object)
 		{
 			if(!Test_Flag((*Sib), INVERTED_FLAG))
 			{
-				Min[X] = max(Min[X], (DBL)((*Sib)->BBox.Lower_Left[X]));
-				Min[Y] = max(Min[Y], (DBL)((*Sib)->BBox.Lower_Left[Y]));
-				Min[Z] = max(Min[Z], (DBL)((*Sib)->BBox.Lower_Left[Z]));
-				Max[X] = min(Max[X], (DBL)((*Sib)->BBox.Lower_Left[X] + (*Sib)->BBox.Lengths[X]));
-				Max[Y] = min(Max[Y], (DBL)((*Sib)->BBox.Lower_Left[Y] + (*Sib)->BBox.Lengths[Y]));
-				Max[Z] = min(Max[Z], (DBL)((*Sib)->BBox.Lower_Left[Z] + (*Sib)->BBox.Lengths[Z]));
+				Min[X] = max(Min[X], (DBL)((*Sib)->BBox.lowerLeft[X]));
+				Min[Y] = max(Min[Y], (DBL)((*Sib)->BBox.lowerLeft[Y]));
+				Min[Z] = max(Min[Z], (DBL)((*Sib)->BBox.lowerLeft[Z]));
+				Max[X] = min(Max[X], (DBL)((*Sib)->BBox.lowerLeft[X] + (*Sib)->BBox.size[X]));
+				Max[Y] = min(Max[Y], (DBL)((*Sib)->BBox.lowerLeft[Y] + (*Sib)->BBox.size[Y]));
+				Max[Z] = min(Max[Z], (DBL)((*Sib)->BBox.lowerLeft[Z] + (*Sib)->BBox.size[Z]));
 			}
 		}
 
@@ -7728,12 +7728,12 @@ ObjectPtr Parser::Parse_Object_Mods (ObjectPtr Object)
 		{
 			if(!Test_Flag((*Sib), INVERTED_FLAG))
 			{
-				Min[X] = max(Min[X], (DBL)((*Sib)->BBox.Lower_Left[X]));
-				Min[Y] = max(Min[Y], (DBL)((*Sib)->BBox.Lower_Left[Y]));
-				Min[Z] = max(Min[Z], (DBL)((*Sib)->BBox.Lower_Left[Z]));
-				Max[X] = min(Max[X], (DBL)((*Sib)->BBox.Lower_Left[X] + (*Sib)->BBox.Lengths[X]));
-				Max[Y] = min(Max[Y], (DBL)((*Sib)->BBox.Lower_Left[Y] + (*Sib)->BBox.Lengths[Y]));
-				Max[Z] = min(Max[Z], (DBL)((*Sib)->BBox.Lower_Left[Z] + (*Sib)->BBox.Lengths[Z]));
+				Min[X] = max(Min[X], (DBL)((*Sib)->BBox.lowerLeft[X]));
+				Min[Y] = max(Min[Y], (DBL)((*Sib)->BBox.lowerLeft[Y]));
+				Min[Z] = max(Min[Z], (DBL)((*Sib)->BBox.lowerLeft[Z]));
+				Max[X] = min(Max[X], (DBL)((*Sib)->BBox.lowerLeft[X] + (*Sib)->BBox.size[X]));
+				Max[Y] = min(Max[Y], (DBL)((*Sib)->BBox.lowerLeft[Y] + (*Sib)->BBox.size[Y]));
+				Max[Z] = min(Max[Z], (DBL)((*Sib)->BBox.lowerLeft[Z] + (*Sib)->BBox.size[Z]));
 			}
 		}
 

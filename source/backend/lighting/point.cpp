@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/lighting/point.cpp $
- * $Revision: #28 $
- * $Change: 6113 $
- * $DateTime: 2013/11/20 20:39:54 $
+ * $Revision: #29 $
+ * $Change: 6118 $
+ * $DateTime: 2013/11/22 16:39:19 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -595,7 +595,7 @@ DBL Attenuate_Light (const LightSource *Light, const Ray &ray, DBL Distance)
 	{
 		case SPOT_SOURCE:
 
-			VDot(costheta, ray.Direction, Light->Direction);
+			VDot(costheta, *ray.Direction, Light->Direction);
 
 			if(Distance>0.0) costheta = -costheta;
 
@@ -619,7 +619,7 @@ DBL Attenuate_Light (const LightSource *Light, const Ray &ray, DBL Distance)
 
 			// Project light->point onto light direction
 			// to make sure that we're on the correct side of the light
-			VSub(V1, ray.Origin, Light->Center);
+			VSub(V1, *ray.Origin, Light->Center);
 			VDot(k, V1, Light->Direction);
 
 			if (k > 0.0)

@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/quadrics.cpp $
- * $Revision: #35 $
- * $Change: 6085 $
- * $DateTime: 2013/11/10 07:39:29 $
+ * $Revision: #37 $
+ * $Change: 6119 $
+ * $DateTime: 2013/11/22 20:31:53 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -109,7 +109,7 @@ const DBL DEPTH_TOLERANCE = 1.0e-6;
 bool Quadric::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread)
 {
 	DBL Depth1, Depth2;
-	VECTOR IPoint;
+	Vector3d IPoint;
 	register int Intersection_Found;
 
 	Intersection_Found = false;
@@ -120,8 +120,8 @@ bool Quadric::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThread
 		Thread->Stats()[Ray_Quadric_Tests_Succeeded]++;
 		if ((Depth1 > DEPTH_TOLERANCE) && (Depth1 < MAX_DISTANCE))
 		{
-			VEvaluateRay(IPoint, ray.Origin, Depth1, ray.Direction);
-			if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
+			IPoint = ray.Evaluate(Depth1);
+			if (Clip.empty() || Point_In_Clip(*IPoint, Clip, Thread))
 			{
 				Depth_Stack->push(Intersection(Depth1, IPoint, this));
 
@@ -131,9 +131,9 @@ bool Quadric::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThread
 
 		if ((Depth2 > DEPTH_TOLERANCE) && (Depth2 < MAX_DISTANCE))
 		{
-			VEvaluateRay(IPoint, ray.Origin, Depth2, ray.Direction);
+			IPoint = ray.Evaluate(Depth2);
 
-			if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
+			if (Clip.empty() || Point_In_Clip(*IPoint, Clip, Thread))
 			{
 				Depth_Stack->push(Intersection(Depth2, IPoint, this));
 
@@ -759,7 +759,7 @@ void Quadric::Compute_BBox(VECTOR ClipMin, VECTOR ClipMax)
 	DBL rx, ry, rz, rx1, rx2, ry1, ry2, rz1, rz2, x, y, z;
 	DBL New_Volume, Old_Volume;
 	VECTOR TmpMin, TmpMax, NewMin, NewMax, T1;
-	BBOX Old = BBox;
+	BoundingBox Old = BBox;
 
 	if(!Clip.empty())
 	{
@@ -1374,9 +1374,9 @@ void Quadric::Compute_BBox(VECTOR ClipMin, VECTOR ClipMax)
 
 		/* Beware of bounding boxes to large. */
 
-		if ((BBox.Lengths[X] > CRITICAL_LENGTH) ||
-		    (BBox.Lengths[Y] > CRITICAL_LENGTH) ||
-		    (BBox.Lengths[Z] > CRITICAL_LENGTH))
+		if ((BBox.size[X] > CRITICAL_LENGTH) ||
+		    (BBox.size[Y] > CRITICAL_LENGTH) ||
+		    (BBox.size[Z] > CRITICAL_LENGTH))
 		{
 			Make_BBox(BBox, -BOUND_HUGE/2, -BOUND_HUGE/2, -BOUND_HUGE/2,
 			  BOUND_HUGE, BOUND_HUGE, BOUND_HUGE);

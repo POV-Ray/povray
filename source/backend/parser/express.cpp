@@ -26,9 +26,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/parser/express.cpp $
- * $Revision: #50 $
- * $Change: 6113 $
- * $DateTime: 2013/11/20 20:39:54 $
+ * $Revision: #52 $
+ * $Change: 6119 $
+ * $DateTime: 2013/11/22 20:31:53 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -250,16 +250,16 @@ void Parser::Parse_Trace(VECTOR Res)
 
 	Parse_Comma();
 
-	Parse_Vector(ray.Origin);
+	Parse_Vector(*ray.Origin);
 	Parse_Comma();
-	Parse_Vector(ray.Direction);
-	VNormalizeEq( ray.Direction );
+	Parse_Vector(*ray.Direction);
+	ray.Direction.normalize();
 
 	Parse_Comma();
 
 	if ( Find_Intersection( &intersect, Object, ray, GetParserDataPtr()) )
 	{
-		Assign_Vector( Res, intersect.IPoint );
+		Assign_Vector( Res, *intersect.IPoint );
 
 		intersect.Object->Normal( Local_Normal, &intersect, GetParserDataPtr());
 
@@ -1175,9 +1175,9 @@ void Parser::Parse_Num_Factor (EXPRESS Express,int *Terms)
 							Object = reinterpret_cast<ObjectPtr>(Token.Data);
 							if ( Object )
 							{
-								Vect[X]=Object->BBox.Lower_Left[X];
-								Vect[Y]=Object->BBox.Lower_Left[Y];
-								Vect[Z]=Object->BBox.Lower_Left[Z];
+								Vect[X]=Object->BBox.lowerLeft[X];
+								Vect[Y]=Object->BBox.lowerLeft[Y];
+								Vect[Z]=Object->BBox.lowerLeft[Z];
 							}
 							EXIT
 						END_CASE
@@ -1200,9 +1200,9 @@ void Parser::Parse_Num_Factor (EXPRESS Express,int *Terms)
 							Object = reinterpret_cast<ObjectPtr>(Token.Data);
 							if ( Object )
 							{
-								Vect[X]=Object->BBox.Lower_Left[X]+Object->BBox.Lengths[X];
-								Vect[Y]=Object->BBox.Lower_Left[Y]+Object->BBox.Lengths[Y];
-								Vect[Z]=Object->BBox.Lower_Left[Z]+Object->BBox.Lengths[Z];
+								Vect[X]=Object->BBox.lowerLeft[X]+Object->BBox.size[X];
+								Vect[Y]=Object->BBox.lowerLeft[Y]+Object->BBox.size[Y];
+								Vect[Z]=Object->BBox.lowerLeft[Z]+Object->BBox.size[Z];
 							}
 							EXIT
 						END_CASE

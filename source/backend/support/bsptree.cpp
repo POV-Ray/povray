@@ -243,7 +243,7 @@ void BSPTree::build(const Progress& progress, const Objects& objects,
                     unsigned int& maxobjects, float& averageobjects, unsigned int& maxdepth, float& averagedepth,
                     unsigned int& aborts, float& averageaborts, float& averageabortobjects, const UCS2String& inputFile)
 {
-	BBOX bbox;
+	MinMaxBoundingBox bbox;
 
 	lastProgressNodeCounter = 0;
 	maxObjectsInNode = 0;
@@ -425,7 +425,7 @@ void BSPTree::clear()
 	lists.clear();
 }
 
-void BSPTree::BuildRecursive(const Progress& progress, const Objects& objects, unsigned int inode, unsigned int indexbegin, unsigned int indexend, BBOX& cell, unsigned int maxlevel)
+void BSPTree::BuildRecursive(const Progress& progress, const Objects& objects, unsigned int inode, unsigned int indexbegin, unsigned int indexend, MinMaxBoundingBox& cell, unsigned int maxlevel)
 {
 	maxTreeDepth = max(maxTreeDepth, maxDepth - maxlevel);
 
@@ -486,7 +486,7 @@ void BSPTree::BuildRecursive(const Progress& progress, const Objects& objects, u
 
 		cellsize[X] = cellsize[X + 3] = cell.pmax[X] - cell.pmin[X];
 		cellsize[Y] = cellsize[Y + 3] = cell.pmax[Y] - cell.pmin[Y];
-		cellsize[Z] = cell.pmax[Z] - cell.pmin[Z];
+		cellsize[Z] =                   cell.pmax[Z] - cell.pmin[Z];
 
 		// enh is node hit expectance
 		float enh = cellsize[X] * cellsize[Y] + cellsize[X] * cellsize[Z] + cellsize[Y] * cellsize[Z];

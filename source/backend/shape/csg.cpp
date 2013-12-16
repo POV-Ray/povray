@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/csg.cpp $
- * $Revision: #58 $
- * $Change: 6085 $
- * $DateTime: 2013/11/10 07:39:29 $
+ * $Revision: #60 $
+ * $Change: 6119 $
+ * $DateTime: 2013/11/22 20:31:53 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -149,7 +149,7 @@ bool CSGUnion::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThrea
 					{
 						while(Local_Stack->size() > 0)
 						{
-							if(Clip.empty() || Point_In_Clip(Local_Stack->top().IPoint, Clip, Thread))
+							if(Clip.empty() || Point_In_Clip(*(Local_Stack->top().IPoint), Clip, Thread))
 							{
 								Local_Stack->top().Csg = this;
 
@@ -227,7 +227,7 @@ bool CSGIntersection::All_Intersections(const Ray& ray, IStack& Depth_Stack, Tra
 						{
 							if(!((*Inside_Sib)->Type & LIGHT_SOURCE_OBJECT) || (!(reinterpret_cast<LightSource *>(*Inside_Sib))->children.empty()))
 							{
-								if(!Inside_Object(Local_Stack->top().IPoint, *Inside_Sib, Thread))
+								if(!Inside_Object(*(Local_Stack->top().IPoint), *Inside_Sib, Thread))
 								{
 									Maybe_Found = false;
 									break;
@@ -238,7 +238,7 @@ bool CSGIntersection::All_Intersections(const Ray& ray, IStack& Depth_Stack, Tra
 
 					if(Maybe_Found)
 					{
-						if(Clip.empty() || Point_In_Clip(Local_Stack->top().IPoint, Clip, Thread))
+						if(Clip.empty() || Point_In_Clip(*(Local_Stack->top().IPoint), Clip, Thread))
 						{
 							Local_Stack->top().Csg = this;
 
@@ -316,7 +316,7 @@ bool CSGMerge::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThrea
 				{
 					while (Local_Stack->size() > 0)
 					{
-						if (Clip.empty() || Point_In_Clip (Local_Stack->top().IPoint, Clip, Thread))
+						if (Clip.empty() || Point_In_Clip (*(Local_Stack->top().IPoint), Clip, Thread))
 						{
 							inside_flag = true;
 
@@ -328,7 +328,7 @@ bool CSGMerge::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThrea
 									{
 										if ( Test_Ray_Flags_Shadow(ray, (*Sib2)) )// TODO CLARIFY - why does CSGUnion use Test_Ray_Flags(), while CSGMerge uses Test_Ray_Flags_Shadow(), and CSGIntersection uses neither?
 										{
-											if (Inside_Object(Local_Stack->top().IPoint, *Sib2, Thread))
+											if (Inside_Object(*(Local_Stack->top().IPoint), *Sib2, Thread))
 												inside_flag = false;
 										}
 									}
@@ -968,9 +968,9 @@ void CSG::Compute_BBox()
 
 			/* Beware of bounding boxes too large. */
 
-			if((BBox.Lengths[X] > CRITICAL_LENGTH) ||
-			   (BBox.Lengths[Y] > CRITICAL_LENGTH) ||
-			   (BBox.Lengths[Z] > CRITICAL_LENGTH))
+			if((BBox.size[X] > CRITICAL_LENGTH) ||
+			   (BBox.size[Y] > CRITICAL_LENGTH) ||
+			   (BBox.size[Z] > CRITICAL_LENGTH))
 				Make_BBox(BBox, -BOUND_HUGE/2, -BOUND_HUGE/2, -BOUND_HUGE/2, BOUND_HUGE, BOUND_HUGE, BOUND_HUGE);
 		}
 	}
@@ -1013,7 +1013,7 @@ void CSG::Determine_Textures(Intersection *isect, bool hitinside, WeightedTextur
 			// (which is the first object in the POV file.  All other objects
 			// are the ones that were "removed" from the first one, so their
 			// textures should NOT be used.
-			if(children[0]->Inside(isect->IPoint, threaddata))
+			if(children[0]->Inside(*isect->IPoint, threaddata))
 			{
 				if(children[0]->Type & IS_COMPOUND_OBJECT)
 					children[0]->Determine_Textures(isect, hitinside, textures, threaddata);
@@ -1027,7 +1027,7 @@ void CSG::Determine_Textures(Intersection *isect, bool hitinside, WeightedTextur
 
 			for(vector<ObjectPtr>::const_iterator Current_Sib = children.begin(); Current_Sib != children.end(); Current_Sib++)
 			{
-				if((*Current_Sib)->Inside(isect->IPoint, threaddata))
+				if((*Current_Sib)->Inside(*isect->IPoint, threaddata))
 				{
 					if((*Current_Sib)->Type & IS_COMPOUND_OBJECT)
 						(*Current_Sib)->Determine_Textures(isect, hitinside, textures, threaddata);

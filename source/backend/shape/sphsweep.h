@@ -27,11 +27,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/shape/sphsweep.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/shape/sphsweep.h $
+ * $Revision: #20 $
+ * $Change: 6118 $
+ * $DateTime: 2013/11/22 16:39:19 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #ifndef SPHERE_SWEEP_H
@@ -89,9 +89,9 @@ struct Sphere_Sweep_Segment_Struct
 // Temporary storage for intersection values
 struct Sphere_Sweep_Intersection_Structure
 {
-	DBL     t;          // Distance along ray
-	VECTOR  Point;      // Intersection point
-	VECTOR  Normal;     // Normal at intersection point
+	DBL         t;          // Distance along ray
+	Vector3d    Point;      // Intersection point
+	Vector3d    Normal;     // Normal at intersection point
 };
 
 /* The complete object */

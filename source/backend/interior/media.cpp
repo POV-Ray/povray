@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/interior/media.cpp $
- * $Revision: #46 $
- * $Change: 6113 $
- * $DateTime: 2013/11/20 20:39:54 $
+ * $Revision: #47 $
+ * $Change: 6118 $
+ * $DateTime: 2013/11/22 16:39:19 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -755,8 +755,8 @@ bool MediaFunction::ComputeSpotLightInterval(const Ray &ray, const LightSource *
 	// Get cone's slope. Note that cos(falloff) is stored in Falloff!
 	m = 1 / (Light->Falloff * Light->Falloff);
 
-	VSub(V1, ray.Origin, Light->Center);
-	VDot(k1, ray.Direction, Light->Direction);
+	VSub(V1, *ray.Origin, Light->Center);
+	VDot(k1, *ray.Direction, Light->Direction);
 	VDot(k2, V1, Light->Direction);
 	VLength(l, V1);
 
@@ -768,7 +768,7 @@ bool MediaFunction::ComputeSpotLightInterval(const Ray &ray, const LightSource *
 	if((k1 <= 0.0) && (k2 < 0.0))
 		return false;
 
-	VDot(k3, V1, ray.Direction);
+	VDot(k3, V1, *ray.Direction);
 	VDot(k4, V1, V1);
 
 	a = 1.0 - Sqr(k1) * m;
@@ -863,8 +863,8 @@ bool MediaFunction::ComputeCylinderLightInterval(const Ray &ray, const LightSour
 	DBL a, b, c, d, l1, l2, t, t1, t2, k1, k2, k3, k4;
 	VECTOR V1;
 
-	VSub(V1, ray.Origin, Light->Center);
-	VDot(k1, ray.Direction, Light->Direction);
+	VSub(V1, *ray.Origin, Light->Center);
+	VDot(k1, *ray.Direction, Light->Direction);
 	VDot(k2, V1, Light->Direction);
 
 	if((k1 <= 0.0) && (k2 < 0.0))
@@ -874,7 +874,7 @@ bool MediaFunction::ComputeCylinderLightInterval(const Ray &ray, const LightSour
 
 	if(a != 0.0)
 	{
-		VDot(k3, V1, ray.Direction);
+		VDot(k3, V1, *ray.Direction);
 		VDot(k4, V1, V1);
 
 		b = k3 - k1 * k2;
@@ -943,7 +943,7 @@ void MediaFunction::ComputeOneMediaSample(MediaVector& medias, LightSourceEntryV
 	// Set up sampling location.
 	d0 *= mediainterval.ds;
 	d1 = mediainterval.s0 + d0;
-	VEvaluateRay(*H, ray.Origin, d1, ray.Direction);
+	H = ray.Evaluate(d1);
 
 	// Get coefficients in current sample location.
 	for(MediaVector::iterator i(medias.begin()); i != medias.end(); i++)
@@ -1164,7 +1164,7 @@ void MediaFunction::ComputeMediaPhotons(MediaVector& medias, RGBColour& Te, cons
 			Light_Ray.Direction[Z] = Light_Ray.Direction[X]*sinCosData.sinTheta[phi];
 			Light_Ray.Direction[X] = Light_Ray.Direction[X]*sinCosData.cosTheta[phi];
 
-			VSub(Light_Ray.Origin, photonGatherer->gatheredPhotons.photonGatherList[j]->Loc, Light_Ray.Direction);
+			Light_Ray.Origin = Vector3d(photonGatherer->gatheredPhotons.photonGatherList[j]->Loc) - Light_Ray.Direction;
 
 			ComputeMediaScatteringAttenuation(medias, Colour2, Sc, Light_Colour, ray, Light_Ray);
 		}
@@ -1185,19 +1185,19 @@ void MediaFunction::ComputeMediaScatteringAttenuation(MediaVector& medias, RGBCo
 		switch((*i)->Type)
 		{
 			case RAYLEIGH_SCATTERING:
-				VDot(alpha, Light_Ray.Direction, ray.Direction);
+				alpha = dot(Light_Ray.Direction, ray.Direction);
 				k += 0.799372013 * (1.0 + Sqr(alpha));
 				break;
 			case MIE_HAZY_SCATTERING:
-				VDot(alpha, Light_Ray.Direction, ray.Direction);
+				alpha = dot(Light_Ray.Direction, ray.Direction);
 				k += 0.576655375 * (1.0 + 9.0 * pow(0.5 * (1.0 + alpha), 8.0));
 				break;
 			case MIE_MURKY_SCATTERING:
-				VDot(alpha, Light_Ray.Direction, ray.Direction);
+				alpha = dot(Light_Ray.Direction, ray.Direction);
 				k += 0.495714547 * (1.0 + 50.0 * pow(0.5 * (1.0 + alpha), 32.0));
 				break;
 			case HENYEY_GREENSTEIN_SCATTERING:
-				VDot(alpha, Light_Ray.Direction, ray.Direction);
+				alpha = dot(Light_Ray.Direction, ray.Direction);
 				g = (*i)->Eccentricity;
 				g2 = Sqr(g);
 				k += (1.0 - g2) / pow(1.0 + g2 - 2.0 * g * alpha, 1.5);

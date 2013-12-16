@@ -22,11 +22,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/render/tracepixel.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/render/tracepixel.h $
+ * $Revision: #26 $
+ * $Change: 6119 $
+ * $DateTime: 2013/11/22 20:31:53 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #ifndef POVRAY_BACKEND_TRACEPIXEL_H
@@ -56,8 +56,8 @@ class BSPIntersectFunctor : public BSPTree::Intersect
 			traceThreadData(t)
 		{
 			Vector3d tmp(1.0 / ray.GetDirection()[X], 1.0 / ray.GetDirection()[Y], 1.0 /ray.GetDirection()[Z]);
-			Assign_Vector(origin, ray.Origin);
-			Assign_Vector(invdir, *tmp);
+			origin = BBoxVector3d(ray.Origin);
+			invdir = BBoxVector3d(tmp);
 			variant = (ObjectBase::BBoxDirection)((int(invdir[X] < 0.0) << 2) | (int(invdir[Y] < 0.0) << 1) | int(invdir[Z] < 0.0));
 		}
 
@@ -85,8 +85,8 @@ class BSPIntersectFunctor : public BSPTree::Intersect
 		vector<ObjectPtr>& objects;
 		Intersection& bestisect;
 		const Ray& ray;
-		BBOX_VECT origin;
-		BBOX_VECT invdir;
+		BBoxVector3d origin;
+		BBoxVector3d invdir;
 		ObjectBase::BBoxDirection variant;
 		TraceThreadData *traceThreadData;
 };
@@ -105,8 +105,8 @@ class BSPIntersectCondFunctor : public BSPTree::Intersect
 			postcondition(postc)
 		{
 			Vector3d tmp(1.0 / ray.GetDirection()[X], 1.0 / ray.GetDirection()[Y], 1.0 /ray.GetDirection()[Z]);
-			Assign_Vector(origin, ray.Origin);
-			Assign_Vector(invdir, *tmp);
+			origin = BBoxVector3d(ray.Origin);
+			invdir = BBoxVector3d(tmp);
 			variant = (ObjectBase::BBoxDirection)((int(invdir[X] < 0.0) << 2) | (int(invdir[Y] < 0.0) << 1) | int(invdir[Z] < 0.0));
 		}
 
@@ -138,8 +138,8 @@ class BSPIntersectCondFunctor : public BSPTree::Intersect
 		vector<ObjectPtr>& objects;
 		Intersection& bestisect;
 		const Ray& ray;
-		BBOX_VECT origin;
-		BBOX_VECT invdir;
+		BBoxVector3d origin;
+		BBoxVector3d invdir;
 		ObjectBase::BBoxDirection variant;
 		TraceThreadData *traceThreadData;
 		const RayObjectCondition& precondition;
@@ -164,7 +164,7 @@ class BSPInsideCondFunctor : public BSPTree::Inside
 		{
 			ObjectPtr object = objects[index];
 			if(precondition(origin, object))
-				if(Inside_BBox(*origin, object->BBox) && object->Inside(*origin, threadData))
+				if(Inside_BBox(origin, object->BBox) && object->Inside(*origin, threadData))
 					if(postcondition(origin, object))
 						found = true;
 			return found;

@@ -27,9 +27,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/prism.cpp $
- * $Revision: #33 $
- * $Change: 6085 $
- * $DateTime: 2013/11/10 07:39:29 $
+ * $Revision: #34 $
+ * $Change: 6118 $
+ * $DateTime: 2013/11/22 16:39:19 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -182,7 +182,7 @@ const int SPLINE_HIT = 3;
 bool Prism::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread)
 {
 	bool Found = false ;
-	VECTOR IPoint;
+	Vector3d IPoint;
 	int j, n;
 	DBL k, u, v, w, h, len;
 	DBL x[4];
@@ -199,8 +199,8 @@ bool Prism::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDa
 	Thread->Stats()[Ray_Prism_Tests]++;
 
 	/* Transform the ray into the prism space */
-	MInvTransPoint(P, ray.Origin, Trans);
-	MInvTransDirection(D, ray.Direction, Trans);
+	MInvTransPoint(P, *ray.Origin, Trans);
+	MInvTransDirection(D, *ray.Direction, Trans);
 	VLength(len, D);
 	VInverseScaleEq(D, len);
 
@@ -253,8 +253,8 @@ bool Prism::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDa
 							distance = k / len;
 							if ((distance > DEPTH_TOLERANCE) && (distance < MAX_DISTANCE))
 							{
-								VEvaluateRay(IPoint, ray.Origin, distance, ray.Direction);
-								if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
+								IPoint = ray.Evaluate(distance);
+								if (Clip.empty() || Point_In_Clip(*IPoint, Clip, Thread))
 								{
 									Depth_Stack->push (Intersection (distance, IPoint, this, CAP_HIT, 0, 0));
 									Found = true;
@@ -277,8 +277,8 @@ bool Prism::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDa
 							distance = k / len;
 							if ((distance > DEPTH_TOLERANCE) && (distance < MAX_DISTANCE))
 							{
-								VEvaluateRay(IPoint, ray.Origin, distance, ray.Direction);
-								if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
+								IPoint = ray.Evaluate(distance);
+								if (Clip.empty() || Point_In_Clip(*IPoint, Clip, Thread))
 								{
 									Depth_Stack->push (Intersection (distance, IPoint, this, BASE_HIT, 0, 0));
 									Found = true;
@@ -380,8 +380,8 @@ bool Prism::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDa
 								distance = k / len;
 								if ((distance > DEPTH_TOLERANCE) && (distance < MAX_DISTANCE))
 								{
-									VEvaluateRay(IPoint, ray.Origin, distance, ray.Direction);
-									if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
+									IPoint = ray.Evaluate(distance);
+									if (Clip.empty() || Point_In_Clip(*IPoint, Clip, Thread))
 									{
 										Depth_Stack->push (Intersection (distance, IPoint, this, SPLINE_HIT, j, w));
 										Found = true;
@@ -425,8 +425,8 @@ bool Prism::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDa
 								distance = k / len;
 								if ((distance > DEPTH_TOLERANCE) && (distance < MAX_DISTANCE))
 								{
-									VEvaluateRay(IPoint, ray.Origin, distance, ray.Direction);
-									if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
+									IPoint = ray.Evaluate(distance);
+									if (Clip.empty() || Point_In_Clip(*IPoint, Clip, Thread))
 									{
 										Depth_Stack->push (Intersection (distance, IPoint, this, CAP_HIT, 0, 0));
 										Found = true;
@@ -452,8 +452,8 @@ bool Prism::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDa
 								distance = k / len;
 								if ((distance > DEPTH_TOLERANCE) && (distance < MAX_DISTANCE))
 								{
-									VEvaluateRay(IPoint, ray.Origin, distance, ray.Direction);
-									if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
+									IPoint = ray.Evaluate(distance);
+									if (Clip.empty() || Point_In_Clip(*IPoint, Clip, Thread))
 									{
 										Depth_Stack->push (Intersection (distance, IPoint, this, BASE_HIT, 0, 0));
 										Found = true;
@@ -562,8 +562,8 @@ bool Prism::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDa
 								distance = k / len;
 								if ((distance > DEPTH_TOLERANCE) && (distance < MAX_DISTANCE))
 								{
-									VEvaluateRay(IPoint, ray.Origin, distance, ray.Direction);
-									if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
+									IPoint = ray.Evaluate(distance);
+									if (Clip.empty() || Point_In_Clip(*IPoint, Clip, Thread))
 									{
 										Depth_Stack->push (Intersection (distance, IPoint, this, SPLINE_HIT, j, w));
 										Found = true;
@@ -712,7 +712,7 @@ void Prism::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) 
 
 				/* Transform the point into the prism space. */
 
-				MInvTransPoint(P, Inter->IPoint, Trans);
+				MInvTransPoint(P, *Inter->IPoint, Trans);
 
 				if (fabs(P[Y]) > EPSILON)
 				{

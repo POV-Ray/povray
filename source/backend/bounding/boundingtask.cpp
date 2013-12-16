@@ -22,11 +22,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/bounding/boundingtask.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/bounding/boundingtask.cpp $
+ * $Revision: #54 $
+ * $Change: 6119 $
+ * $DateTime: 2013/11/22 20:31:53 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #include <set>
@@ -86,12 +86,12 @@ class SceneObjects : public BSPTree::Objects
 
 		virtual float GetMin(unsigned int axis, unsigned int i) const
 		{
-			return finite[i]->BBox.lowerleft[axis];
+			return finite[i]->BBox.lowerLeft[axis];
 		}
 
 		virtual float GetMax(unsigned int axis, unsigned int i) const
 		{
-			return (finite[i]->BBox.lowerleft[axis] + finite[i]->BBox.length[axis]);
+			return (finite[i]->BBox.lowerLeft[axis] + finite[i]->BBox.size[axis]);
 		}
 };
 
