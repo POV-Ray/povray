@@ -22,11 +22,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/frontend/imagemessagehandler.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/frontend/imagemessagehandler.cpp $
+ * $Revision: #40 $
+ * $Change: 6086 $
+ * $DateTime: 2013/11/10 10:34:40 $
+ * $Author: clipka $
  *******************************************************************************/
 
 // configbase.h must always be the first POV file included within base *.cpp files
@@ -53,27 +53,29 @@ ImageMessageHandler::~ImageMessageHandler()
 
 void ImageMessageHandler::HandleMessage(const SceneData& sd, const ViewData& vd, POVMSType ident, POVMS_Object& msg)
 {
+	bool final = msg.Exist(kPOVAttrib_PixelId); // only final blocks will be stored in the image buffer, others are just sent to the preview display
+
 	switch(ident)
 	{
 		case kPOVMsgIdent_PixelSet:
-			DrawPixelSet(sd, vd, msg);
+			DrawPixelSet(sd, vd, msg, final);
 			break;
 		case kPOVMsgIdent_PixelBlockSet:
-			DrawPixelBlockSet(sd, vd, msg);
+			DrawPixelBlockSet(sd, vd, msg, final);
 			break;
 		case kPOVMsgIdent_PixelRowSet:
-			DrawPixelRowSet(sd, vd, msg);
+			DrawPixelRowSet(sd, vd, msg, final);
 			break;
 		case kPOVMsgIdent_RectangleFrameSet:
-			DrawRectangleFrameSet(sd, vd, msg);
+			DrawRectangleFrameSet(sd, vd, msg, final);
 			break;
 		case kPOVMsgIdent_FilledRectangleSet:
-			DrawFilledRectangleSet(sd, vd, msg);
+			DrawFilledRectangleSet(sd, vd, msg, final);
 			break;
 	}
 }
 
-void ImageMessageHandler::DrawPixelSet(const SceneData& sd, const ViewData& vd, POVMS_Object& msg)
+void ImageMessageHandler::DrawPixelSet(const SceneData& sd, const ViewData& vd, POVMS_Object& msg, bool final)
 {
 	POVMS_Attribute pixelposattr;
 	POVMS_Attribute pixelcolattr;
@@ -124,7 +126,7 @@ void ImageMessageHandler::DrawPixelSet(const SceneData& sd, const ViewData& vd, 
 			if(vd.display != NULL)
 				vd.display->DrawPixel(x, y, rgba);
 
-			if((vd.image != NULL) && (x < vd.image->GetWidth()) && (y < vd.image->GetHeight()))
+			if(final && (vd.image != NULL) && (x < vd.image->GetWidth()) && (y < vd.image->GetHeight()))
 				vd.image->SetRGBAValue(x, y, col.red(), col.green(), col.blue(), col.FTtoA());
 		}
 		else
@@ -132,7 +134,7 @@ void ImageMessageHandler::DrawPixelSet(const SceneData& sd, const ViewData& vd, 
 			if(vd.display != NULL)
 				vd.display->DrawFilledRectangle(x, y, x + psize - 1, y + psize - 1, rgba);
 
-			if(vd.image != NULL)
+			if(final && (vd.image != NULL))
 			{
 				for(unsigned int py = 0; (py < psize) && (y + py < vd.image->GetHeight()); py++)
 				{
@@ -143,14 +145,14 @@ void ImageMessageHandler::DrawPixelSet(const SceneData& sd, const ViewData& vd, 
 		}
 	}
 
-	if(vd.imageBackup != NULL)
+	if(final && (vd.imageBackup != NULL))
 	{
 		msg.Write(*vd.imageBackup);
 		vd.imageBackup->flush();
 	}
 }
 
-void ImageMessageHandler::DrawPixelBlockSet(const SceneData& sd, const ViewData& vd, POVMS_Object& msg)
+void ImageMessageHandler::DrawPixelBlockSet(const SceneData& sd, const ViewData& vd, POVMS_Object& msg, bool final)
 {
 	POVRect rect(msg.GetInt(kPOVAttrib_Left), msg.GetInt(kPOVAttrib_Top), msg.GetInt(kPOVAttrib_Right), msg.GetInt(kPOVAttrib_Bottom));
 	POVMS_Attribute pixelattr;
@@ -216,7 +218,7 @@ void ImageMessageHandler::DrawPixelBlockSet(const SceneData& sd, const ViewData&
 		}
 	}
 
-	if(vd.image != NULL)
+	if(final && (vd.image != NULL))
 	{
 		for(unsigned int y = rect.top, i = 0; y <= rect.bottom; y += psize)
 		{
@@ -231,22 +233,22 @@ void ImageMessageHandler::DrawPixelBlockSet(const SceneData& sd, const ViewData&
 		}
 	}
 
-	if(vd.imageBackup != NULL)
+	if(final && (vd.imageBackup != NULL))
 	{
 		msg.Write(*vd.imageBackup);
 		vd.imageBackup->flush();
 	}
 }
 
-void ImageMessageHandler::DrawPixelRowSet(const SceneData& sd, const ViewData& vd, POVMS_Object& msg)
+void ImageMessageHandler::DrawPixelRowSet(const SceneData& sd, const ViewData& vd, POVMS_Object& msg, bool final)
 {
 }
 
-void ImageMessageHandler::DrawRectangleFrameSet(const SceneData& sd, const ViewData& vd, POVMS_Object& msg)
+void ImageMessageHandler::DrawRectangleFrameSet(const SceneData& sd, const ViewData& vd, POVMS_Object& msg, bool final)
 {
 }
 
-void ImageMessageHandler::DrawFilledRectangleSet(const SceneData& sd, const ViewData& vd, POVMS_Object& msg)
+void ImageMessageHandler::DrawFilledRectangleSet(const SceneData& sd, const ViewData& vd, POVMS_Object& msg, bool final)
 {
 }
 

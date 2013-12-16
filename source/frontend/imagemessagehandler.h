@@ -22,11 +22,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/frontend/imagemessagehandler.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/frontend/imagemessagehandler.h $
+ * $Revision: #17 $
+ * $Change: 6086 $
+ * $DateTime: 2013/11/10 10:34:40 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #ifndef POVRAY_FRONTEND_IMAGEMESSAGEHANDLER_H
@@ -54,11 +54,11 @@ class ImageMessageHandler
 
 		void HandleMessage(const SceneData&, const ViewData&, POVMSType, POVMS_Object&);
 	protected:
-		virtual void DrawPixelSet(const SceneData&, const ViewData&, POVMS_Object&);
-		virtual void DrawPixelBlockSet(const SceneData&, const ViewData&, POVMS_Object&);
-		virtual void DrawPixelRowSet(const SceneData&, const ViewData&, POVMS_Object&);
-		virtual void DrawRectangleFrameSet(const SceneData&, const ViewData&, POVMS_Object&);
-		virtual void DrawFilledRectangleSet(const SceneData&, const ViewData&, POVMS_Object&);
+		virtual void DrawPixelSet(const SceneData&, const ViewData&, POVMS_Object&, bool final);
+		virtual void DrawPixelBlockSet(const SceneData&, const ViewData&, POVMS_Object&, bool final);
+		virtual void DrawPixelRowSet(const SceneData&, const ViewData&, POVMS_Object&, bool final);
+		virtual void DrawRectangleFrameSet(const SceneData&, const ViewData&, POVMS_Object&, bool final);
+		virtual void DrawFilledRectangleSet(const SceneData&, const ViewData&, POVMS_Object&, bool final);
 };
 
 }
