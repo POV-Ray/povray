@@ -242,7 +242,12 @@ namespace pov_frontend
 			else
 			{
 				m_display_scaled = true;
-				m_display_scale = float(width) / GetWidth();
+      /* [JG] the scaling factor between the requested resolution and the actual window is the same in both direction
+       * yet, the factor (as a float) need the smallest value to avoid an access out of the two buffers for the pixels. 
+       * The difference is nearly invisible until the values of GetWidth and GetHeight are subtil (such as +W2596 +H1003 on a display of 1920 x 1080)
+       * where in such situation, the computed ratio is not exactly the same as the other.
+       */
+				m_display_scale = min(float(width) / GetWidth(), float(height) / GetHeight());
 			}
 
 			SetCaption(false);
