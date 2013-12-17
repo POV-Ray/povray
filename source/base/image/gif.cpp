@@ -22,7 +22,16 @@
  *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
+ * ---------------------------------------------------------------------------
+ * POV-Ray is based on the popular DKB raytracer version 2.12.
+ * DKBTrace was originally written by David K. Buck.
+ * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
+ * ---------------------------------------------------------------------------
+ * $File: N/A $
+ * $Revision: N/A $
+ * $Change: N/A $
+ * $DateTime: N/A $
+ * $Author: N/A $
  *********************************************************************************/
 
 /*

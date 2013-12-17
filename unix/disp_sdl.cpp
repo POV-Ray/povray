@@ -26,11 +26,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/povray/smp/unix/disp_sdl.cpp $
- * $Revision: #23 $
- * $Change: 6132 $
- * $DateTime: 2013/11/25 14:23:41 $
- * $Author: clipka $
+ * $File: N/A $
+ * $Revision: N/A $
+ * $Change: N/A $
+ * $DateTime: N/A $
+ * $Author: N/A $
  *******************************************************************************/
 
 #include "config.h"
@@ -242,11 +242,11 @@ namespace pov_frontend
 			else
 			{
 				m_display_scaled = true;
-      /* [JG] the scaling factor between the requested resolution and the actual window is the same in both direction
-       * yet, the factor (as a float) need the smallest value to avoid an access out of the two buffers for the pixels. 
-       * The difference is nearly invisible until the values of GetWidth and GetHeight are subtil (such as +W2596 +H1003 on a display of 1920 x 1080)
-       * where in such situation, the computed ratio is not exactly the same as the other.
-       */
+				/* [JG] the scaling factor between the requested resolution and the actual window is the same in both direction
+				 * yet, the factor (as a float) need the smallest value to avoid an access out of the two buffers for the pixels. 
+				 * The difference is nearly invisible until the values of GetWidth and GetHeight are subtil (such as +W2596 +H1003 on a display of 1920 x 1080)
+				 * where in such situation, the computed ratio is not exactly the same as the other.
+				 */
 				m_display_scale = min(float(width) / GetWidth(), float(height) / GetHeight());
 			}
 
