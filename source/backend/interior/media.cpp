@@ -430,10 +430,9 @@ void MediaFunction::ComputeMediaAdaptiveSampling(MediaVector& medias, LightSourc
                                                  Trace::TraceTicket& ticket)
 {
 	// adaptive sampling
-	int sampleCount; // internal count for samples to take
+	int subIntervalCount;
 	int j;
-	DBL n;
-	DBL d0, dd;
+	DBL d0, d1, dd;
 	RGBColour C0, C1, Result;
 	RGBColour ODResult;
 	RGBColour od0, od1;
@@ -444,63 +443,46 @@ void MediaFunction::ComputeMediaAdaptiveSampling(MediaVector& medias, LightSourc
 
 		threadData->Stats()[Media_Intervals]++;
 
-		sampleCount = (int)(minsamples / 2.0) + 1;
+		subIntervalCount = (minsamples + 1) / 2;
 
-		if(sampleCount < 2)
-			sampleCount = 2;
+		// TODO - if minsamples is guaranteed to be >=1, the following is redundant:
+		if(subIntervalCount < 1)
+			subIntervalCount = 1;
 
-		if(sampleCount < 2)
+		dd = 1.0 / (DBL)subIntervalCount;
+
+		ComputeOneMediaSample(medias, lights, *i, ray, dd * IMedia->Jitter * (randomNumberGenerator() - 0.5), C0, od0, 3, ignore_photons, use_scattering, false, ticket);
+
+		// clear out od & te
+		i->te.clear();
+		i->od.clear();
+
+		d0 = 0.0;
+		for(j = 1; j <= subIntervalCount; j++)
 		{
-			// always do at least three samples - one on each end and one in the middle
-
-			// don't re-sample this if we've already done it in the previous interval
-			ComputeOneMediaSample(medias, lights, *i, ray, 0.0 + IMedia->Jitter * (randomNumberGenerator() - 0.5), C0, od0, 3, ignore_photons, use_scattering, false, ticket);
-			ComputeOneMediaSample(medias, lights, *i, ray, 1.0 + IMedia->Jitter * (randomNumberGenerator() - 0.5), C1, od1, 3, ignore_photons, use_scattering, false, ticket);
-			ComputeOneMediaSampleRecursive(medias, lights, *i, ray, 0.0, 1.0, i->te, C0, C1, i->od, od0, od1, IMedia->AA_Level - 1,
+			d1 = d0 + dd;
+			ComputeOneMediaSample(medias, lights, *i, ray, d1 + dd * IMedia->Jitter * (randomNumberGenerator() - 0.5), C1, od1, 3, ignore_photons, use_scattering, false, ticket);
+			ComputeOneMediaSampleRecursive(medias, lights, *i, ray, d0, d1, Result, C0, C1, ODResult, od0, od1, IMedia->AA_Level - 1,
 			                               IMedia->Jitter, aa_threshold, ignore_photons, use_scattering, false, ticket);
-			i->samples = 1;
+
+			// keep a sum of the results
+			// do some attenuation, too, since we are doing samples in order
+			// TODO - we could do even better if we handled attenuation on a per-sample basis
+			i->te += Result * exp(-(i->od + ODResult * 0.5) * dd);
 
 			// move c1 to c0 to go on to next sample/interval
-			C0  = C1;
+			C0 = C1;
+
+			// now do the same for optical depth
+			i->od += ODResult;
 
 			// move od1 to od0 to go on to the next sample/interval
 			od0 = od1;
+
+			d0 = d1;
 		}
-		else
-		{
-			dd = 1.0 / (DBL)(sampleCount + 1); // TODO FIXME - [CLi] shouldn't this be 1/sampleCount??
-			d0 = 0.0;
 
-			ComputeOneMediaSample(medias, lights, *i, ray, d0 + dd * IMedia->Jitter * (randomNumberGenerator() - 0.5), C0, od0, 3, ignore_photons, use_scattering, false, ticket);
-
-			// clear out od & te
-			i->te.clear();
-			i->od.clear();
-
-			for(j = 1, d0 += dd; j <= sampleCount; j++, d0 += dd)
-			{
-				ComputeOneMediaSample(medias, lights, *i, ray, d0 + dd * IMedia->Jitter * (randomNumberGenerator() - 0.5), C1, od1, 3, ignore_photons, use_scattering, false, ticket);
-				ComputeOneMediaSampleRecursive(medias, lights, *i, ray, d0-dd, d0, Result, C0, C1, ODResult, od0, od1, IMedia->AA_Level - 1,
-				                               IMedia->Jitter, aa_threshold, ignore_photons, use_scattering, false, ticket);
-
-				n = 1.0 / (DBL)sampleCount; // number of sub-intervals explored recursively
-
-				// keep a sum of the results
-				// do some attenuation, too, since we are doing samples in order
-				i->te += Result * exp(-i->od * n);
-
-				// move c1 to c0 to go on to next sample/interval
-				C0 = C1;
-
-				// now do the same for optical depth
-				i->od += ODResult;
-
-				// move od1 to od0 to go on to the next sample/interval
-				od0 = od1;
-			}
-
-			i->samples = sampleCount;
-		}
+		i->samples = subIntervalCount;
 	}
 }
 
