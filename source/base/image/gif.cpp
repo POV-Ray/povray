@@ -166,7 +166,7 @@ Image *Read (IStream *file, const Image::ReadOptions& options, bool IsPOTFile)
 				/* Check "interlaced" bit. */
 				if ((buffer[8] & 0x40) != 0)
 					throw POV_EXCEPTION(kFileDataErr, "Interlacing in GIF image unsupported");
-        /* Check for local palette */
+				/* Check for local palette */
 				if ((buffer[8] & 0x80) != 0)
 					throw POV_EXCEPTION(kFileDataErr, "Image block with local palette in GIF image unsupported");
 
