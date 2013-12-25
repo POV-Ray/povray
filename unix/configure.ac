@@ -335,10 +335,13 @@ fi
 AC_DEFINE([USE_OFFICIAL_BOOST], [], [Use the official Boost libraries.])
 
 # Intel Math Kernel library
+AS_IF([test x"$with_libmkl" != x"no"], [
 pov_save_ldflags="$LDFLAGS"
-test x"$with_libmkl" != x"" && LDFLAGS="-L$with_libmkl $LDFLAGS"
+LDFLAGS="-L$with_libmkl $LDFLAGS"
 AC_CHECK_LIB([mkl], [sin]) 
-test x"ac_cv_lib_mkl_sin" = x"no" && LDFLAGS="$pov_save_ldflags"
+test x"ac_cv_lib_mkl_sin" = x"no" && LDFLAGS="$pov_save_ldflags" && \
+	AC_MSG_ERROR([Cannot find working mkl library])
+])
 
 # libm
 AC_CHECK_LIB([m], [sin])
