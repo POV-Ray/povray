@@ -326,7 +326,7 @@ AC_RUN_IFELSE(
   ],,
   [AC_MSG_RESULT([cross-compiling])]  # FIXME
 )
-  if test $boost_thread_links == '1'; then
+  if test $boost_thread_links = '1'; then
     break
   fi
 done
