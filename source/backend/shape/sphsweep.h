@@ -73,6 +73,8 @@ struct Sphere_Sweep_Sphere_Struct
 {
 	VECTOR      Center;
 	DBL         Radius;
+  DBL         Uvalue;
+  VECTOR      Vbase[2];
 };
 
 /* One segment of the sphere sweep */
@@ -84,6 +86,8 @@ struct Sphere_Sweep_Segment_Struct
 	int     Num_Coefs;                      /* Number of coefficients        */
 	VECTOR  Center_Coef[SPH_SWP_MAX_COEFS]; /* Coefs of center polynomial    */
 	DBL     Radius_Coef[SPH_SWP_MAX_COEFS]; /* Coefs of radius polynomial    */
+  DBL         Uvalue[2];
+  VECTOR      Vbase[2];
 };
 
 // Temporary storage for intersection values
@@ -92,6 +96,8 @@ struct Sphere_Sweep_Intersection_Structure
 	DBL     t;          // Distance along ray
 	VECTOR  Point;      // Intersection point
 	VECTOR  Normal;     // Normal at intersection point
+  UV_VECT uv;
+  VECTOR  Vbase[2];
 };
 
 /* The complete object */
@@ -115,6 +121,7 @@ class SphereSweep : public ObjectBase
 		virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
 		virtual bool Inside(const VECTOR, TraceThreadData *) const;
 		virtual void Normal(VECTOR, Intersection *, TraceThreadData *) const;
+		virtual void UVCoord(UV_VECT, const Intersection *, TraceThreadData *) const;
 		virtual void Translate(const VECTOR, const TRANSFORM *);
 		virtual void Rotate(const VECTOR, const TRANSFORM *);
 		virtual void Scale(const VECTOR, const TRANSFORM *);

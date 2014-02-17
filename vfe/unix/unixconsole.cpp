@@ -474,9 +474,11 @@ int main (int argc, char **argv)
 			opts.AddCommand (*argv);
 	}
 
+	PrintStatus (session);
 	// set all options and start rendering
 	if (session->SetOptions(opts) != vfeNoError)
 	{
+		PrintStatus (session);
 		fprintf(stderr,"\nProblem with option setting\n");
 		for(int loony=0;loony<argc_copy;loony++)
 		{
