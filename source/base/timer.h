@@ -90,8 +90,8 @@ class TimerDefault
 		/**
 		 *  Determine if CPU time is supported for the current settings.
 		 *  in particular this has to return false if keeping the CPU time
-		 *  for the current thread is not supported but was requsted!
-		 *  @return         True if the CPU time is validfor the current
+		 *  for the current thread is not supported but was requested!
+		 *  @return         True if the CPU time is valid for the current
 		 *                  requested settings, false otherwise.
 		 */
 		bool HasValidCPUTime() const;

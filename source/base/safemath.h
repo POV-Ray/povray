@@ -45,7 +45,7 @@ namespace pov_base
 template<typename T, typename T1, typename T2, typename T3, typename T4>
 static inline T SafeUnsignedProduct(T1 p1, T2 p2, T3 p3, T4 p4)
 {
-	// the function is intended for use with unisgned integer parameters only
+	// the function is intended for use with unsigned integer parameters only
 	// (NB: Instead of testing for (pN >= 0) we could also test for (!numeric_limits<TN>::is_signed),
 	//  but this would make passing constant factors more cumbersome)
 	assert (numeric_limits<T>::is_integer);
