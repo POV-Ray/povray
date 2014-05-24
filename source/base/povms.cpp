@@ -303,7 +303,7 @@ void POVMS_Sys_Trace_Remove(POVMSMemoryTraceHeader *ptr);
 *   POVMS_OpenContext
 *   
 * DESCRIPTION
-*   Call to create data strcutures for receiving messages.
+*   Call to create data structures for receiving messages.
 *
 * CHANGES
 *   -
@@ -447,7 +447,7 @@ int POVMS_AssertFunction(int cond, const char *str, const char *filename, int li
 *   
 * DESCRIPTION
 *   Installs a function which will be called when a message with the given
-*   class and id is received. You may specifiy kPOVMSType_WildCard as id, then
+*   class and id is received. You may specify kPOVMSType_WildCard as id, then
 *   the function will get all messages of the class. Note that you may not
 *   define other handlers for a class if you registered a handler function
 *   with the kPOVMSType_WildCard id for that class. However, there is currently
@@ -1951,7 +1951,7 @@ int POVMSStream_Dump(FILE *file, POVMSStream *stream, int datasize)
 *   everything is ok and kIncompleteDataErr if there was not enough data to
 *   determine if the header was valid (that is, the header was not complete,
 *   which currently implies there were less than 16 bytes). It either returns
-*   kCannotHandleDataErr, kVersionErr or kInvalidDataSizeErr if the heeader
+*   kCannotHandleDataErr, kVersionErr or kInvalidDataSizeErr if the header
 *   was invalid. It returns kParamErr if the stream or totalsize pointers
 *   were invalid. It returns 0 (kNoErr) and the total expected size of the
 *   message in totalsize (including streamsize!). Use this function when
@@ -4600,7 +4600,7 @@ int POVMS_Sys_AddressToStream_Default(POVMSAddress a, POVMSStream *s, int *z)
 		s[i] = ((POVMSStream *)(&a))[i];
 	s += sizeof(POVMSAddress);
 
-	// substract size written
+	// subtract size written
 	*z -= (2 + sizeof(POVMSAddress));
 
 	// return size written

@@ -512,7 +512,7 @@ class GenericRGBColour
 			//  - in general, the weight should scale proportionally with the color brightness [2]
 			//  - white should have a weight of 1.0
 			//  - the weight should be non-negative in any case
-			//  - a change in any color component should affect the weight, whether it is the the brightest one or not
+			//  - a change in any color component should affect the weight, whether it is the brightest one or not
 			//  - negative color components should increase the weight
 			//  - the individual color components should have the same weight [3]
 			// For backward compatibility, weightMax() and weightMaxAbs() are provided.
