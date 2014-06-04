@@ -85,8 +85,7 @@ class BayerDither : public DitherHandler
 		virtual void getOffset(unsigned int x, unsigned int y, OffsetInfo& offLin, OffsetInfo& offQnt);
 		static inline float getOffset(unsigned int x, unsigned int y, unsigned int ms) { return BayerMatrices[ms][x%ms][y%ms]; }
 	protected:
-		OffsetInfo  lastErr;
-		int         matrixSize;
+		unsigned int matrixSize;
 };
 
 /// Class representing simple 1D error diffusion dithering rules, carrying over the error from one pixel to the next.
@@ -100,7 +99,7 @@ class DiffusionDither1D : public DitherHandler
 };
 
 /// Class representing simple 2D error diffusion dithering rules, carrying over the error from one pixel to the right, as well as the two pixels below.
-/// @note   This implementation uses an additional 1-line pixel buffer to avoid manipulating the original image.
+/// @note   This implementation uses an additional 2-line pixel buffer to avoid manipulating the original image.
 class DiffusionDither2D : public DitherHandler
 {
 	public:
@@ -115,7 +114,7 @@ class DiffusionDither2D : public DitherHandler
 };
 
 /// Class representing Floyd-Steinberg dithering rules, carrying over the error from one pixel to the right, as well as the three pixels below.
-/// @note   This implementation uses an additional 1-line pixel buffer to avoid manipulating the original image.
+/// @note   This implementation uses an additional 2-line pixel buffer to avoid manipulating the original image.
 class FloydSteinbergDither : public DitherHandler
 {
 	public:
