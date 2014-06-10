@@ -163,7 +163,7 @@ Miscellaneous Coding Rules
       .
     In any case, the rationale for dragging along such unused code should be well documented in the
     source code.
-    <!-- MISRA C++ 2008 **required** rules 0-1-1...0-1-6, 0-1-8...0-1-12, 14-7-1) -->
+    <!-- MISRA C++ 2008 **required** rules 0-1-1...0-1-6, 0-1-8...0-1-12, 14-7-1 -->
 
   - **Unused return values**: Whenever the return value of a function is ignored, it must be
     explicitly casti to `(void)` to indicate that this is intentional.
@@ -177,20 +177,36 @@ Miscellaneous Coding Rules
     arithmetic errors (numeric overflow, division by zero, limits of floating-point precision,
     etc.), failed memory allocations, or bogus parameter values. Most notably, if a called function
     may indicate an error, make sure to test for that error indication and handle it appropriately.
-    <!-- MISRA C++ 2008 **required** rule 0-3-2, document rule 0-3-1 (c) -->
+    <!-- MISRA C++ 2008 document rule 0-3-1 (c), **required** rule 0-3-2 -->
 
-  - **Language Standard**: Source code should be written in C++ adhering to the ISO-IEC 14882-2003
-    standard (aka C++03).
+    <!-- MISRA C++ 2008 document rule 0-4-1 (Use of scaled-integer or fixed-point arithmetic shall be documented)
+         IGNORED: We're not using any of these... or are we? -->
+    <!-- MISRA C++ 2008 document rule 0-4-2 (Use of floating-point arithmetic shall be documented)
+         IGNORED: We're using floating-points virtually everywhere, and can't do without for obvious reasons. -->
+    <!-- MISRA C++ 2008 document rule 0-4-3 (Floating-point implementations shall comply with a defined floating-point
+	     standard)
+         IGNORED: This depends on the user's choice of compiler, and is therefore beyond the scope of any
+		 platform-independent project. -->
+
+  - **Language Standard**: Source code should be written in C++ adhering to the ISO-IEC 14882-2003 standard (aka C++03).
+    Compiler-specific language extensions may only be used in the dedicated headers intended to _hide_ compiler-specific
+	implementation details.
     <!-- MISRA C++ 2008 **required** rule 1-0-1 -->
+
+    <!-- MISRA C++ 2008 document rule 1-0-2 (Multiple compilers shall only be used if they have a common, defined
+	     interface)
+         IGNORED: This depends on the user's choice of compiler, and is therefore beyond the scope of any
+		 platform-independent project. -->
 
   - **Negative Integer Division**: Source code should avoid division or modulus operations on
     negative integers, or should not rely on a particular rounding mode (towards negative infinity
     or towards zero) in such cases.
-    <!-- MISRA C++ 2008 **document** rule 1-0-3 -->
+    <!-- MISRA C++ 2008 document rule 1-0-3 -->
 
-  - **Source File Encoding**: Source files should be either plain vanilla ASCII or ISO-8859-1.
-    Non-ASCII characters should not appear outside of comments.
-    <!-- MISRA C++ 2008 **document** rule 2-2-1 -->
+  - **Character Encoding**: Source files should be plain vanilla ASCII, and should not use _universal character name
+    notation_ (`\uXXXX` or `\UXXXXXXXX`). String literals should not encode any non-ASCII character by means of escape
+	sequences.
+    <!-- MISRA C++ 2008 document rule 2-2-1 -->
 
   - **Tri- and Digraphs**: Neither tri- nor digraphs should be used in the source code. Multiple
     consecutive question marks (`??`) in string literals should be escaped (`?\?`) to prevent the
@@ -203,7 +219,7 @@ Miscellaneous Coding Rules
   - Do not use comments (neither block nor single-line style) to disable code.
     <!-- MISRA C++ 2008 **required** rule 2-7-2, advisory rule 2-7-3 -->
 
-  - **Identifier Names**: We expect any sane developer to be using a fixed-pitch font where easily
+  - **Identifier Names**: We expect any sane developer to be using a fixed-pitch font with reasonably
     discernable characters, including (but not limited to) the notorious lowercase letter 'l' and
     digit '1'. However, try to avoid cryptic identifiers with a high percentage of such problematic
     characters. Well, actually, better avoid _any_ cryptic identifiers.
@@ -225,7 +241,7 @@ Miscellaneous Coding Rules
     <!-- MISRA C++ 2008 **required** rule 2-13-2 -->
 
   - **Hexadecimal Constants**: When using hexadecimal constants, always explicitly specify them as
-    signed or unsigned by append either a "u" or "s" suffix.
+    signed or unsigned by append either a `u` or `s` suffix.
     <!-- MISRA C++ 2008 **required** rule 2-13-3 -->
 
   .
@@ -376,7 +392,7 @@ Miscellaneous Coding Rules
   - (Multiple declarations for an identifier in the same namespace shall not straddle a using-declaration for that identifier) <!-- MISRA C++ 2008 **required** rule 7-3-5 -->
   - (Using-directives/declarations (excluding class scope or function scope using-declarations) shall not be used in header file) <!-- MISRA C++ 2008 **required** rule 7-3-6 -->
 
-  - (All usage of assembler shall be documented) <!-- MISRA C++ 2008 doc rule 7-4-1 -->
+  - (All usage of assembler shall be documented) <!-- MISRA C++ 2008 document rule 7-4-1 -->
   - (Assembler instructions shall only be introduced using the asm directive) <!-- MISRA C++ 2008 **required** rule 7-4-2 -->
   - (Assembly language shall be encapsulated and isolated) <!-- MISRA C++ 2008 **required** rule 7-4-3 -->
 
@@ -403,7 +419,7 @@ Miscellaneous Coding Rules
   - (member functions shall not return non-const handles to class-data) <!-- MISRA C++ 2008 **required** rule 9-3-2 -->
   - (If a member function can be made static then it shall be made static, otherwise if it can be made const then it shall be made const) <!-- MISRA C++ 2008 **required** rule 9-3-3 -->
 
-  - (When the absolute positioning of bits representing a bit-field is required, then the behaviour and packing of bit-fields shall be documented) <!-- MISRA C++ 2008 doc rule 9-6-1 -->
+  - (When the absolute positioning of bits representing a bit-field is required, then the behaviour and packing of bit-fields shall be documented) <!-- MISRA C++ 2008 document rule 9-6-1 -->
   - (bit-fields shall be either bool type or an explicitly unsigned or signed integral type) <!-- MISRA C++ 2008 **required** rule 9-6-2 -->
   - (bit fields shall not have enum type) <!-- MISRA C++ 2008 **required** rule 9-6-3 -->
   - (named bit-fields with signed integer type shall have a length of more than one bit) <!-- MISRA C++ 2008 **required** rule 9-6-4 -->
@@ -441,7 +457,7 @@ Miscellaneous Coding Rules
   - (Overloaded function templates shall not be explicitly specialized) <!-- MISRA C++ 2008 **required** rule 14-8-1 -->
   - (The viable function set for a function call should either contain no function specializations, or only contain function specializations) <!-- MISRA C++ 2008 advisory rule 14-8-2 -->
 
-  - (Exceptions shall only be used for error handling) <!-- MISRA C++ 2008 doc rule 15-0-1 -->
+  - (Exceptions shall only be used for error handling) <!-- MISRA C++ 2008 document rule 15-0-1 -->
   - (An exception object should not have pointer type) <!-- MISRA C++ 2008 advisory rule 15-0-2 -->
   - (Control shall not be transferred into a try or catch block using a goto or a switch statement) <!-- MISRA C++ 2008 **required** rule 15-0-3 -->
 
@@ -486,18 +502,19 @@ Miscellaneous Coding Rules
   - (There shall be at most one occurrence of the # or ## operators in a single macro definition) <!-- MISRA C++ 2008 **required** rule 16-3-1 -->
   - (The # and ## operators should not be used) <!-- MISRA C++ 2008 advisory rule 16-3-2 -->
 
-  - (All uses of the #pragma directive shall be documented) <!-- MISRA C++ 2008 doc rule 16-6-1 -->
+  - (All uses of the #pragma directive shall be documented) <!-- MISRA C++ 2008 document rule 16-6-1 -->
 
   - (Reserved identifiers, macros and functions in the standard library shall not be defined, redefined or undefined) <!-- MISRA C++ 2008 **required** rule 17-0-1 -->
   - (The names of standard library macros and objects shall not be reused) <!-- MISRA C++ 2008 **required** rule 17-0-2 -->
   - (The names of standard library functions shall not be overridden) <!-- MISRA C++ 2008 **required** rule 17-0-3 -->
   .
 
-    <!-- IGNORED: (All library code shall conform to MISRA C++) --> <!-- MISRA C++ 2008 **required** rule 17-0-4 -->
+    <!-- MISRA C++ 2008 **required** rule 17-0-4 (All library code shall conform to MISRA C++)
+	     IGNORED: We're using MISRA C++ only as a guideline for our own code, presuming that authors of well-established
+		 3rd party libraries take their own reasonable measures to assure good code quality. -->
 
-  .
-  - (The setjmp macro and the longjmp function shall not be used) <!-- MISRA C++ 2008 **required** rule 17-0-5 -->
-  .
+  - **longjmp**: The `setjmp` macro and `longjmp` function are evil. Do not use them.
+    <!-- MISRA C++ 2008 **required** rule 17-0-5 -->
 
   - **Standard Libraries**: Do not use the C libraries (e.g. `<stdio.h>`); use the corresponding C++
     libraries instead (e.g. `<cstdio>`).
@@ -517,7 +534,8 @@ Miscellaneous Coding Rules
   - (The macro offsetof shall not be used) <!-- MISRA C++ 2008 **required** rule 18-2-1 -->
   .
 
-    <!-- IGNORED: (Dynamic heap memory allocation shall not be used) --> <!-- MISRA C++ 2008 **required** rule 18-4-1) -->
+    <!-- MISRA C++ 2008 **required** rule 18-4-1 (Dynamic heap memory allocation shall not be used)
+	     IGNORED: We're making heavy use of dynamic heap memory allocation and can't reasonably do without. -->
 
   - **Memory Allocation**: When allocating dynamic memory, do not use C-style allocation
     (`malloc()`), but the `new` operator.
