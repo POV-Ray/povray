@@ -24,11 +24,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/math/quatern.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/math/quatern.h $
+ * $Revision: #18 $
+ * $Change: 6161 $
+ * $DateTime: 2013/12/05 18:42:17 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #ifndef JULIA_H
@@ -53,13 +53,30 @@ namespace pov
 * Global functions
 ******************************************************************************/
 
-int F_Bound_Julia (const Ray & Ray, const Fractal * Fractal, DBL * Depth_Min, DBL * Depth_Max);
-void Normal_Calc_Julia (VECTOR Result, int N_Max, const Fractal *fractal, DBL **);
-void Normal_Calc_z3 (VECTOR Result, int N_Max, const Fractal *fractal, DBL **);
-int Iteration_Julia (const VECTOR point, const Fractal * Julia, DBL **);
-int D_Iteration_Julia (const VECTOR point, const Fractal *Julia, const VECTOR& Direction, DBL *Dist, DBL **);
-int Iteration_z3 (const VECTOR point, const Fractal * Julia, DBL **);
-int D_Iteration_z3 (const VECTOR point, const Fractal *Julia, const VECTOR& Direction, DBL *Dist, DBL **);
+class QuaternionFractalRules : public FractalRules
+{
+	public:
+		virtual ~QuaternionFractalRules() {}
+		virtual bool Bound (const BasicRay&, const Fractal *, DBL *, DBL *) const;
+};
+
+class JuliaFractalRules : public QuaternionFractalRules
+{
+	public:
+		virtual ~JuliaFractalRules() {}
+		virtual void CalcNormal (Vector3d&, int, const Fractal *, DBL **) const;
+		virtual bool Iterate (const Vector3d&, const Fractal *, DBL **) const;
+		virtual bool Iterate (const Vector3d&, const Fractal *, const Vector3d&, DBL *, DBL **) const;
+};
+
+class Z3FractalRules : public QuaternionFractalRules
+{
+	public:
+		virtual ~Z3FractalRules() {}
+		virtual void CalcNormal (Vector3d&, int, const Fractal *, DBL **) const;
+		virtual bool Iterate (const Vector3d&, const Fractal *, DBL **) const;
+		virtual bool Iterate (const Vector3d&, const Fractal *, const Vector3d&, DBL *, DBL **) const;
+};
 
 }
 

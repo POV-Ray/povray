@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/base/colour.h $
- * $Revision: #6 $
- * $Change: 6113 $
- * $DateTime: 2013/11/20 20:39:54 $
+ * $Revision: #7 $
+ * $Change: 6147 $
+ * $DateTime: 2013/11/29 20:46:11 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -390,7 +390,6 @@ template<typename T>
 class GenericRGBColour
 {
 	public:
-		typedef DBL VECTOR[3];
 		typedef COLC RGB[3];
 		typedef T DATA[3];
 
@@ -423,13 +422,6 @@ class GenericRGBColour
 		}
 
 		explicit GenericRGBColour(const RGB col)
-		{
-			colour[RED] = col[RED];
-			colour[GREEN] = col[GREEN];
-			colour[BLUE] = col[BLUE];
-		}
-
-		explicit GenericRGBColour(const VECTOR col)
 		{
 			colour[RED] = col[RED];
 			colour[GREEN] = col[GREEN];
@@ -484,9 +476,6 @@ class GenericRGBColour
 		T operator[](int idx) const { return colour[idx]; }
 		T& operator[](int idx) { return colour[idx]; }
 
-		const DATA& operator*() const { return colour; }
-		DATA& operator*() { return colour; }
-
 		T red() const { return colour[RED]; }
 		T& red() { return colour[RED]; }
 
@@ -512,7 +501,7 @@ class GenericRGBColour
 			//  - in general, the weight should scale proportionally with the color brightness [2]
 			//  - white should have a weight of 1.0
 			//  - the weight should be non-negative in any case
-			//  - a change in any color component should affect the weight, whether it is the the brightest one or not
+			//  - a change in any color component should affect the weight, whether it is the brightest one or not
 			//  - negative color components should increase the weight
 			//  - the individual color components should have the same weight [3]
 			// For backward compatibility, weightMax() and weightMaxAbs() are provided.

@@ -24,15 +24,17 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/shape/planes.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/shape/planes.h $
+ * $Revision: #25 $
+ * $Change: 6164 $
+ * $DateTime: 2013/12/09 17:21:04 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #ifndef PLANES_H
 #define PLANES_H
+
+#include "backend/scene/objects.h"
 
 namespace pov
 {
@@ -52,7 +54,7 @@ namespace pov
 class Plane : public ObjectBase
 {
 	public:
-		VECTOR Normal_Vector;
+		Vector3d Normal_Vector;
 		DBL Distance;
 
 		Plane();
@@ -61,18 +63,18 @@ class Plane : public ObjectBase
 		virtual ObjectPtr Copy();
 
 		virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
-		virtual bool Inside(const VECTOR, TraceThreadData *) const;
-		virtual void Normal(VECTOR, Intersection *, TraceThreadData *) const;
-		// virtual void UVCoord(UV_VECT, const Intersection *, TraceThreadData *) const; // TODO FIXME - document that is uses the default (it does, right?) [trf]
-		virtual void Translate(const VECTOR, const TRANSFORM *);
-		virtual void Rotate(const VECTOR, const TRANSFORM *);
-		virtual void Scale(const VECTOR, const TRANSFORM *);
+		virtual bool Inside(const Vector3d&, TraceThreadData *) const;
+		virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const;
+		// virtual void UVCoord(Vector2d&, const Intersection *, TraceThreadData *) const; // TODO FIXME - document that it uses the default (it does, right?) [trf]
+		virtual void Translate(const Vector3d&, const TRANSFORM *);
+		virtual void Rotate(const Vector3d&, const TRANSFORM *);
+		virtual void Scale(const Vector3d&, const TRANSFORM *);
 		virtual void Transform(const TRANSFORM *);
-		virtual void Invert();
+		virtual ObjectPtr Invert();
 		virtual void Compute_BBox();
-		virtual bool Intersect_BBox(BBoxDirection, const BBOX_VECT&, const BBOX_VECT&, BBOX_VAL) const;
+		virtual bool Intersect_BBox(BBoxDirection, const BBoxVector3d&, const BBoxVector3d&, BBoxScalar) const;
 	protected:
-		bool Intersect(const Ray& ray, DBL *Depth, TraceThreadData *Thread) const;
+		bool Intersect(const BasicRay& ray, DBL *Depth, TraceThreadData *Thread) const;
 };
 
 }

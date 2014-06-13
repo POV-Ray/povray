@@ -22,11 +22,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/support/bsptree.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/support/bsptree.h $
+ * $Revision: #48 $
+ * $Change: 6163 $
+ * $DateTime: 2013/12/08 22:48:58 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #ifndef POVRAY_BACKEND_BSPTREE_H
@@ -38,6 +38,7 @@
 
 #include "backend/frame.h"
 #include "backend/math/vector.h"
+#include "backend/bounding/bbox.h"
 
 namespace pov
 {
@@ -118,7 +119,7 @@ class BSPTree
 		BSPTree(unsigned int md = 0, float oic = 0.0f, float bac = 0.0f, float cac = 0.0f, float mc = 0.0f);
 		virtual ~BSPTree();
 
-		bool operator()(const Ray& ray, Intersect& isect, Mailbox& mailbox, double maxdist);
+		bool operator()(const BasicRay& ray, Intersect& isect, Mailbox& mailbox, double maxdist);
 		bool operator()(const Vector3d& origin, Inside& inside, Mailbox& mailbox, bool earlyExit = false);
 
 		void build(const Progress& progress, const Objects& objects,
@@ -241,13 +242,71 @@ class BSPTree
 		/// object index list (only used while building tree)
 		vector<unsigned int> indices;
 
-		void BuildRecursive(const Progress& progress, const Objects& objects, unsigned int inode, unsigned int indexbegin, unsigned int indexend, BBOX& cell, unsigned int maxlevel);
+		void BuildRecursive(const Progress& progress, const Objects& objects, unsigned int inode, unsigned int indexbegin, unsigned int indexend, MinMaxBoundingBox& cell, unsigned int maxlevel);
 		void SetObjectNode(unsigned int inode, unsigned int indexbegin, unsigned int indexend);
 
 		void ReadRecursive(const Progress& progress, FILE *infile, unsigned int inode, unsigned int level, unsigned int maxIndex);
 		char *GetLine(char *str, int len, FILE *infile);
 		void ValidateBounds(FILE *infile, const Objects& objects);
 };
+
+
+class BSPIntersectFunctor : public BSPTree::Intersect
+{
+	public:
+		BSPIntersectFunctor(Intersection& bi, const Ray& r, vector<ObjectPtr>& objs, TraceThreadData *t);
+		virtual bool operator()(unsigned int index, double& maxdist);
+		virtual bool operator()() const;
+
+	private:
+		bool found;
+		vector<ObjectPtr>& objects;
+		Intersection& bestisect;
+		const Ray& ray;
+		BBoxVector3d origin;
+		BBoxVector3d invdir;
+		BBoxDirection variant;
+		TraceThreadData *traceThreadData;
+};
+
+class BSPIntersectCondFunctor : public BSPTree::Intersect
+{
+	public:
+		BSPIntersectCondFunctor(Intersection& bi, const Ray& r, vector<ObjectPtr>& objs, TraceThreadData *t,
+		                        const RayObjectCondition& prec, const RayObjectCondition& postc);
+		virtual bool operator()(unsigned int index, double& maxdist);
+		virtual bool operator()() const;
+
+	private:
+		bool found;
+		vector<ObjectPtr>& objects;
+		Intersection& bestisect;
+		const Ray& ray;
+		BBoxVector3d origin;
+		BBoxVector3d invdir;
+		BBoxDirection variant;
+		TraceThreadData *traceThreadData;
+		const RayObjectCondition& precondition;
+		const RayObjectCondition& postcondition;
+};
+
+class BSPInsideCondFunctor : public BSPTree::Inside
+{
+	public:
+		BSPInsideCondFunctor(Vector3d o, vector<ObjectPtr>& objs, TraceThreadData *t,
+		                     const PointObjectCondition& prec, const PointObjectCondition& postc);
+		virtual bool operator()(unsigned int index);
+		virtual bool operator()() const;
+
+	private:
+		bool found;
+		vector<ObjectPtr>& objects;
+		Vector3d origin;
+		const PointObjectCondition& precondition;
+		const PointObjectCondition& postcondition;
+		TraceThreadData *threadData;
+};
+
 
 }
 

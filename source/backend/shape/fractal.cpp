@@ -27,9 +27,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/fractal.cpp $
- * $Revision: #33 $
- * $Change: 6085 $
- * $DateTime: 2013/11/10 07:39:29 $
+ * $Revision: #39 $
+ * $Change: 6164 $
+ * $DateTime: 2013/12/09 17:21:04 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -110,16 +110,16 @@ const COMPLEX_FUNCTION_METHOD Complex_Function_List[] =
 
 bool Fractal::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread)
 {
-	int Intersection_Found;
-	int Last = 0;
-	int CURRENT, NEXT;
+	bool Intersection_Found;
+	bool LastIsInside = false;
+	bool CurrentIsInside, NextIsInside;
 	DBL Depth, Depth_Max;
-	DBL Dist, Dist_Next, Len;
+	DBL Dist, Dist_Next, LenSqr, LenInv;
 
-	VECTOR IPoint, Mid_Point, Next_Point, Real_Pt;
-	VECTOR Real_Normal, F_Normal;
-	VECTOR Direction;
-	Ray New_Ray;
+	Vector3d IPoint, Mid_Point, Next_Point, Real_Pt;
+	Vector3d Real_Normal, F_Normal;
+	Vector3d Direction;
+	BasicRay New_Ray;
 
 	Thread->Stats()[Ray_Fractal_Tests]++;
 
@@ -130,27 +130,29 @@ bool Fractal::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThread
 	if (Trans != NULL)
 	{
 		MInvTransDirection(Direction, ray.Direction, Trans);
-		VDot(Len, Direction, Direction);
+		LenSqr = Direction.lengthSqr();
 
-		if (Len == 0.0)
+		if (LenSqr == 0.0)
 		{
 			return (false);
 		}
 
-		if (Len != 1.0)
+		if (LenSqr != 1.0)
 		{
-			Len = 1.0 / sqrt(Len);
-			VScaleEq(Direction, Len);
+			LenInv = 1.0 / sqrt(LenSqr);
+			Direction *= LenInv;
 		}
+		else
+			LenInv = 1.0;
 
-		Assign_Vector(New_Ray.Direction, Direction);
+		New_Ray.Direction = Direction;
 		MInvTransPoint(New_Ray.Origin, ray.Origin, Trans);
 	}
 	else
 	{
-		Assign_Vector(Direction, ray.Direction);
+		Direction = ray.Direction;
 		New_Ray = ray;
-		Len = 1.0;
+		LenInv = 1.0;
 	}
 
 	/* Bound fractal. */
@@ -172,16 +174,15 @@ bool Fractal::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThread
 
 	/* Jump to starting point */
 
-	VScale(Next_Point, Direction, Depth);
-	VAddEq(Next_Point, New_Ray.Origin);
+	Next_Point = New_Ray.Origin + Direction * Depth;
 
-	CURRENT = D_Iteration(Next_Point, this, Direction, &Dist, Thread->Fractal_IStack);
+	CurrentIsInside = D_Iteration(Next_Point, this, Direction, &Dist, Thread->Fractal_IStack);
 
 	/* Light ray starting inside ? */
 
-	if (CURRENT)
+	if (CurrentIsInside)
 	{
-		VAddScaledEq(Next_Point, 2.0 * Fractal_Tolerance, Direction);
+		Next_Point += (2.0 * Fractal_Tolerance) * Direction;
 
 		Depth += 2.0 * Fractal_Tolerance;
 
@@ -190,7 +191,7 @@ bool Fractal::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThread
 			return (false);
 		}
 
-		CURRENT = D_Iteration(Next_Point, this, Direction, &Dist, Thread->Fractal_IStack);
+		CurrentIsInside = D_Iteration(Next_Point, this, Direction, &Dist, Thread->Fractal_IStack);
 	}
 
 	/* Ok. Trace it */
@@ -216,12 +217,12 @@ bool Fractal::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThread
 				return (Intersection_Found);
 			}
 
-			Assign_Vector(IPoint, Next_Point);
-			VAddScaledEq(Next_Point, Dist, Direction);
+			IPoint = Next_Point;
+			Next_Point += Dist * Direction;
 
-			NEXT = D_Iteration(Next_Point, this, Direction, &Dist_Next, Thread->Fractal_IStack);
+			NextIsInside = D_Iteration(Next_Point, this, Direction, &Dist_Next, Thread->Fractal_IStack);
 
-			if (NEXT != CURRENT)
+			if (NextIsInside != CurrentIsInside)
 			{
 				/* Set surface was crossed... */
 
@@ -239,13 +240,13 @@ bool Fractal::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThread
 		while (Dist > Fractal_Tolerance)
 		{
 			Dist *= 0.5;
-			VAddScaled(Mid_Point, IPoint, Dist, Direction);
+			Mid_Point = IPoint + Dist * Direction;
 
-			Last = Iteration(Mid_Point, this, Thread->Fractal_IStack);
+			LastIsInside = Iteration(Mid_Point, this, Thread->Fractal_IStack);
 
-			if (Last == CURRENT)
+			if (LastIsInside == CurrentIsInside)
 			{
-				Assign_Vector(IPoint, Mid_Point);
+				IPoint = Mid_Point;
 
 				Depth += Dist;
 
@@ -258,9 +259,9 @@ bool Fractal::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThread
 			}
 		}
 
-		if (CURRENT == false) /* Mid_Point isn't inside the set */
+		if (!CurrentIsInside) /* Mid_Point isn't inside the set */
 		{
-			VAddScaledEq(IPoint, Dist, Direction);
+			IPoint += Dist * Direction;
 
 			Depth += Dist;
 
@@ -268,7 +269,7 @@ bool Fractal::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThread
 		}
 		else
 		{
-			if (Last != CURRENT)
+			if (LastIsInside != CurrentIsInside)
 			{
 				Iteration(IPoint, this, Thread->Fractal_IStack);
 			}
@@ -282,14 +283,14 @@ bool Fractal::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThread
 		}
 		else
 		{
-			Assign_Vector(Real_Pt, IPoint);
+			Real_Pt = IPoint;
 			Normal_Calc(this, Real_Normal, Thread->Fractal_IStack);
 		}
 
 		if (Clip.empty() || Point_In_Clip(Real_Pt, Clip, Thread))
 		{
-			VNormalize(Real_Normal, Real_Normal);
-			Depth_Stack->push(Intersection(Depth * Len, Real_Pt, Real_Normal, this));
+			Real_Normal.normalize();
+			Depth_Stack->push(Intersection(Depth * LenInv, Real_Pt, Real_Normal, this));
 			Intersection_Found = true;
 
 			/* If fractal isn't used with CSG we can exit now. */
@@ -302,9 +303,9 @@ bool Fractal::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThread
 
 		/* Start over where work was left */
 
-		Assign_Vector(IPoint, Next_Point);
+		IPoint = Next_Point;
 		Dist = Dist_Next;
-		CURRENT = NEXT;
+		CurrentIsInside = NextIsInside;
 
 	}
 
@@ -337,10 +338,10 @@ bool Fractal::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThread
 *
 ******************************************************************************/
 
-bool Fractal::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
+bool Fractal::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 {
-	int Result;
-	VECTOR New_Point;
+	bool Result;
+	Vector3d New_Point;
 
 	if (Trans != NULL)
 	{
@@ -353,7 +354,7 @@ bool Fractal::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
 		Result = Iteration(IPoint, this, Thread->Fractal_IStack);
 	}
 
-	if (Inverted)
+	if (Test_Flag(this, INVERTED_FLAG))
 	{
 		return (!Result);
 	}
@@ -387,9 +388,9 @@ bool Fractal::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
 *
 ******************************************************************************/
 
-void Fractal::Normal(VECTOR Result, Intersection *Intersect, TraceThreadData *) const
+void Fractal::Normal(Vector3d& Result, Intersection *Intersect, TraceThreadData *) const
 {
-	Assign_Vector(Result, Intersect->INormal);
+	Result = Intersect->INormal;
 }
 
 /*****************************************************************************
@@ -416,36 +417,7 @@ void Fractal::Normal(VECTOR Result, Intersection *Intersect, TraceThreadData *) 
 *
 ******************************************************************************/
 
-void Fractal::Translate(const VECTOR, const TRANSFORM *tr)
-{
-	Transform(tr);
-}
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*   
-* OUTPUT
-*   
-* RETURNS
-*   
-* AUTHOR
-*
-*   Pascal Massimino
-*   
-* DESCRIPTION
-*
-*   -
-*
-* CHANGES
-*
-*   Dec 1994 : Creation.
-*
-******************************************************************************/
-
-void Fractal::Rotate(const VECTOR, const TRANSFORM *tr)
+void Fractal::Translate(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
@@ -474,7 +446,36 @@ void Fractal::Rotate(const VECTOR, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void Fractal::Scale(const VECTOR, const TRANSFORM *tr)
+void Fractal::Rotate(const Vector3d&, const TRANSFORM *tr)
+{
+	Transform(tr);
+}
+
+/*****************************************************************************
+*
+* FUNCTION
+*
+* INPUT
+*   
+* OUTPUT
+*   
+* RETURNS
+*   
+* AUTHOR
+*
+*   Pascal Massimino
+*   
+* DESCRIPTION
+*
+*   -
+*
+* CHANGES
+*
+*   Dec 1994 : Creation.
+*
+******************************************************************************/
+
+void Fractal::Scale(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
@@ -535,35 +536,6 @@ void Fractal::Transform(const TRANSFORM *tr)
 * CHANGES
 *
 *   Dec 1994 : Creation.
-*
-******************************************************************************/
-
-void Fractal::Invert()
-{
-	Inverted ^= true;
-}
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*   
-* OUTPUT
-*   
-* RETURNS
-*   
-* AUTHOR
-*
-*   Pascal Massimino
-*   
-* DESCRIPTION
-*
-*   -
-*
-* CHANGES
-*
-*   Dec 1994 : Creation.
 *   Mar 1996 : Added call to recompute_BBox() to bottom (TW)
 *
 ******************************************************************************/
@@ -600,8 +572,6 @@ void Fractal::Compute_BBox()
 
 	Radius_Squared = Sqr(R);
 
-	Inverted = false;
-
 	Make_BBox(BBox, -R, -R, -R, 2.0 * R, 2.0 * R, 2.0 * R);
 
 	Recompute_BBox(&BBox, Trans);
@@ -635,7 +605,7 @@ Fractal::Fractal() : ObjectBase(BASIC_OBJECT)
 {
 	Trans = NULL;
 
-	Make_Vector(Center, 0.0, 0.0, 0.0);
+	Center = Vector3d(0.0, 0.0, 0.0);
 
 	Julia_Parm[X] = 1.0;
 	Julia_Parm[Y] = 0.0;
@@ -654,17 +624,11 @@ Fractal::Fractal() : ObjectBase(BASIC_OBJECT)
 
 	Precision = 1.0 / 20.0;
 
-	Inverted = false;
-
 	Algebra = QUATERNION_TYPE;
 
 	Sub_Type = SQR_STYPE;
 
-	Normal_Calc_Method = NULL;
-	Iteration_Method   = NULL;
-	D_Iteration_Method = NULL;
-	F_Bound_Method     = NULL;
-	Complex_Function_Method = NULL;
+	Rules.reset();
 
 	Radius_Squared = 0.0;
 	exponent.x = 0.0;
@@ -701,6 +665,7 @@ ObjectPtr Fractal::Copy()
 	Destroy_Transform(New->Trans);
 	*New = *this;
 	New->Trans = Copy_Transform(Trans);
+	New->Rules = Rules;
 
 	return (New);
 }
@@ -767,19 +732,14 @@ int Fractal::SetUp_Fractal(void)
 			switch(Sub_Type)
 			{
 				case CUBE_STYPE:
-					Iteration_Method = Iteration_z3;
-					Normal_Calc_Method = Normal_Calc_z3;
-					D_Iteration_Method = D_Iteration_z3;
+					Rules = FractalRulesPtr(new Z3FractalRules());
 					break;
 				case SQR_STYPE:
-					Iteration_Method = Iteration_Julia;
-					D_Iteration_Method = D_Iteration_Julia;
-					Normal_Calc_Method = Normal_Calc_Julia;
+					Rules = FractalRulesPtr(new JuliaFractalRules());
 					break;
 				default:
 					throw POV_EXCEPTION_STRING("Illegal function: quaternion only supports sqr and cube");
 			}
-			F_Bound_Method = F_Bound_Julia;
 
 			break;
 
@@ -789,11 +749,7 @@ int Fractal::SetUp_Fractal(void)
 			{
 				case RECIPROCAL_STYPE:
 
-					Iteration_Method = Iteration_HCompl_Reciprocal;
-					Normal_Calc_Method = Normal_Calc_HCompl_Reciprocal;
-					D_Iteration_Method = D_Iteration_HCompl_Reciprocal;
-					F_Bound_Method = F_Bound_HCompl_Reciprocal;
-
+					Rules = FractalRulesPtr(new HypercomplexReciprocalFractalRules());
 					break;
 
 				case EXP_STYPE:
@@ -812,30 +768,17 @@ int Fractal::SetUp_Fractal(void)
 				case ATANH_STYPE:
 				case PWR_STYPE:
 
-					Iteration_Method = Iteration_HCompl_Func;
-					Normal_Calc_Method = Normal_Calc_HCompl_Func;
-					D_Iteration_Method = D_Iteration_HCompl_Func;
-					F_Bound_Method = F_Bound_HCompl_Func;
-					Complex_Function_Method = Complex_Function_List[Sub_Type];
-
+					Rules = FractalRulesPtr(new HypercomplexFunctionFractalRules(Complex_Function_List[Sub_Type]));
 					break;
 
 				case CUBE_STYPE:
 
-					Iteration_Method = Iteration_HCompl_z3;
-					Normal_Calc_Method = Normal_Calc_HCompl_z3;
-					D_Iteration_Method = D_Iteration_HCompl_z3;
-					F_Bound_Method = F_Bound_HCompl_z3;
-
+					Rules = FractalRulesPtr(new HypercomplexZ3FractalRules());
 					break;
 
 				default:  /* SQR_STYPE or else... */
 
-					Iteration_Method = Iteration_HCompl;
-					Normal_Calc_Method = Normal_Calc_HCompl;
-					D_Iteration_Method = D_Iteration_HCompl;
-					F_Bound_Method = F_Bound_HCompl;
-
+					Rules = FractalRulesPtr(new HypercomplexFractalRules());
 					break;
 			}
 

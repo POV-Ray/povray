@@ -24,16 +24,17 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: N/A $
- * $Revision: N/A $
- * $Change: N/A $
- * $DateTime: N/A $
- * $Author: N/A $
+ * $File: //depot/povray/smp/source/backend/shape/blob.h $
+ * $Revision: #32 $
+ * $Change: 6164 $
+ * $DateTime: 2013/12/09 17:21:04 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #ifndef BLOB_H
 #define BLOB_H
 
+#include "backend/scene/objects.h"
 #include "backend/bounding/bsphere.h"
 
 namespace pov
@@ -75,7 +76,7 @@ class Blob_Element
 	public:
 		short Type;       /* Type of component: sphere, hemisphere, cylinder */
 		int index;
-		VECTOR O;         /* Element's origin                                */
+		Vector3d O;       /* Element's origin                                */
 		DBL len;          /* Cylinder's length                               */
 		DBL rad2;         /* Sphere's/Cylinder's radius^2                    */
 		DBL c[3];         /* Component's coeffs                              */
@@ -129,13 +130,12 @@ class Blob : public ObjectBase
 		virtual ObjectPtr Copy();
 
 		virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
-		virtual bool Inside(const VECTOR, TraceThreadData *) const;
-		virtual void Normal(VECTOR, Intersection *, TraceThreadData *) const;
-		virtual void Translate(const VECTOR, const TRANSFORM *);
-		virtual void Rotate(const VECTOR, const TRANSFORM *);
-		virtual void Scale(const VECTOR, const TRANSFORM *);
+		virtual bool Inside(const Vector3d&, TraceThreadData *) const;
+		virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const;
+		virtual void Translate(const Vector3d&, const TRANSFORM *);
+		virtual void Rotate(const Vector3d&, const TRANSFORM *);
+		virtual void Scale(const Vector3d&, const TRANSFORM *);
 		virtual void Transform(const TRANSFORM *);
-		virtual void Invert();
 		virtual void Compute_BBox();
 
 		void Determine_Textures(Intersection *, bool, WeightedTextureVector&, TraceThreadData *);
@@ -146,32 +146,32 @@ class Blob : public ObjectBase
 
 		void Test_Blob_Opacity();
 
-		static void Translate_Blob_Element(Blob_Element *Element, const VECTOR Vector);
-		static void Rotate_Blob_Element(Blob_Element *Element, const VECTOR Vector);
-		static void Scale_Blob_Element(Blob_Element *Element, const VECTOR Vector);
+		static void Translate_Blob_Element(Blob_Element *Element, const Vector3d& Vector);
+		static void Rotate_Blob_Element(Blob_Element *Element, const Vector3d& Vector);
+		static void Scale_Blob_Element(Blob_Element *Element, const Vector3d& Vector);
 		static void Invert_Blob_Element(Blob_Element *Element);
 		static void Transform_Blob_Element(Blob_Element *Element, const TRANSFORM *Trans);
 	private:
-		static void element_normal(VECTOR Result, const VECTOR P, const Blob_Element *Element);
-		static int intersect_element(const VECTOR P, const VECTOR D, const Blob_Element *Element, DBL mindist, DBL *t0, DBL *t1, TraceThreadData *Thread);
+		static void element_normal(Vector3d& Result, const Vector3d& P, const Blob_Element *Element);
+		static int intersect_element(const Vector3d& P, const Vector3d& D, const Blob_Element *Element, DBL mindist, DBL *t0, DBL *t1, TraceThreadData *Thread);
 		static void insert_hit(const Blob_Element *Element, DBL t0, DBL t1, Blob_Interval_Struct *intervals, unsigned int *cnt);
-		int determine_influences(const VECTOR P, const VECTOR D, DBL mindist, Blob_Interval_Struct *intervals, TraceThreadData *Thread) const;
-		DBL calculate_field_value(const VECTOR P, TraceThreadData *Thread) const;
-		static DBL calculate_element_field(const Blob_Element *Element, const VECTOR P);
+		int determine_influences(const Vector3d& P, const Vector3d& D, DBL mindist, Blob_Interval_Struct *intervals, TraceThreadData *Thread) const;
+		DBL calculate_field_value(const Vector3d& P, TraceThreadData *Thread) const;
+		static DBL calculate_element_field(const Blob_Element *Element, const Vector3d& P);
 
-		static int intersect_cylinder(const Blob_Element *Element, const VECTOR P, const VECTOR D, DBL mindist, DBL *tmin, DBL *tmax);
-		static int intersect_hemisphere(const Blob_Element *Element, const VECTOR P, const VECTOR D, DBL mindist, DBL *tmin, DBL *tmax);
-		static int intersect_sphere(const Blob_Element *Element, const VECTOR P, const VECTOR D, DBL mindist, DBL *tmin, DBL *tmax);
-		static int intersect_ellipsoid(const Blob_Element *Element, const VECTOR P, const VECTOR D, DBL mindist, DBL *tmin, DBL *tmax);
+		static int intersect_cylinder(const Blob_Element *Element, const Vector3d& P, const Vector3d& D, DBL mindist, DBL *tmin, DBL *tmax);
+		static int intersect_hemisphere(const Blob_Element *Element, const Vector3d& P, const Vector3d& D, DBL mindist, DBL *tmin, DBL *tmax);
+		static int intersect_sphere(const Blob_Element *Element, const Vector3d& P, const Vector3d& D, DBL mindist, DBL *tmin, DBL *tmax);
+		static int intersect_ellipsoid(const Blob_Element *Element, const Vector3d& P, const Vector3d& D, DBL mindist, DBL *tmin, DBL *tmax);
 
-		static void get_element_bounding_sphere(const Blob_Element *Element, VECTOR Center, DBL *Radius2);
+		static void get_element_bounding_sphere(const Blob_Element *Element, Vector3d& Center, DBL *Radius2);
 		void build_bounding_hierarchy();
 
-		void determine_element_texture(const Blob_Element *Element, TEXTURE *Texture, const VECTOR P, WeightedTextureVector&);
+		void determine_element_texture(const Blob_Element *Element, TEXTURE *Texture, const Vector3d& P, WeightedTextureVector&);
 
 		static bool insert_node(BSPHERE_TREE *Node, unsigned int *size, TraceThreadData *Thread);
 
-		void getLocalIPoint(VECTOR lip, Intersection *isect) const;
+		void getLocalIPoint(Vector3d& lip, Intersection *isect) const;
 };
 
 }

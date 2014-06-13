@@ -24,11 +24,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/bounding/bsphere.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/bounding/bsphere.h $
+ * $Revision: #11 $
+ * $Change: 6119 $
+ * $DateTime: 2013/11/22 20:31:53 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #ifndef BSPHERE_H
@@ -52,7 +52,7 @@ typedef struct BSphere_Tree_Struct BSPHERE_TREE;
 struct BSphere_Tree_Struct
 {
 	short Entries;       /* Number of components (node if 0)    */
-	VECTOR C;            /* Center of bounding sphere           */
+	Vector3d C;          /* Center of bounding sphere           */
 	DBL r2;              /* Radius^2 of bounding sphere         */
 	BSPHERE_TREE **Node; /* if node: children; if leaf: element */
 };

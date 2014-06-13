@@ -24,11 +24,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/math/matrices.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/math/matrices.h $
+ * $Revision: #18 $
+ * $Change: 6161 $
+ * $DateTime: 2013/12/05 18:42:17 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #ifndef MATRICES_H
@@ -72,32 +72,33 @@ void MSub (MATRIX result, const MATRIX matrix1, const MATRIX matrix2);
 void MScale (MATRIX result, const MATRIX matrix1, DBL amount);
 void MTranspose (MATRIX result);
 void MTranspose (MATRIX result, const MATRIX matrix1);
-void MTransPoint (VECTOR result, const VECTOR vector, const TRANSFORM *trans);
-void MInvTransPoint (VECTOR result, const VECTOR vector, const TRANSFORM *trans);
-void MTransDirection (VECTOR result, const VECTOR vector, const TRANSFORM *trans);
-void MInvTransDirection (VECTOR result, const VECTOR vector, const TRANSFORM *trans);
-void MTransNormal (VECTOR result, const VECTOR vector, const TRANSFORM *trans);
-void MInvTransNormal (VECTOR result, const VECTOR vector, const TRANSFORM *trans);
+
+void MTransPoint        (Vector3d& result, const Vector3d& vector, const TRANSFORM* trans);
+void MInvTransPoint     (Vector3d& result, const Vector3d& vector, const TRANSFORM* trans);
+void MTransDirection    (Vector3d& result, const Vector3d& vector, const TRANSFORM* trans);
+void MInvTransDirection (Vector3d& result, const Vector3d& vector, const TRANSFORM* trans);
+void MTransNormal       (Vector3d& result, const Vector3d& vector, const TRANSFORM* trans);
+void MInvTransNormal    (Vector3d& result, const Vector3d& vector, const TRANSFORM* trans);
+
+inline void MTransRay    (BasicRay& res, const BasicRay& r, const TRANSFORM* t) { MTransPoint    (res.Origin, r.Origin, t); MTransDirection    (res.Direction, r.Direction, t); }
+inline void MInvTransRay (BasicRay& res, const BasicRay& r, const TRANSFORM* t) { MInvTransPoint (res.Origin, r.Origin, t); MInvTransDirection (res.Direction, r.Direction, t); }
+
 void Compute_Matrix_Transform (TRANSFORM *result, const MATRIX matrix);
-void Compute_Scaling_Transform (TRANSFORM *result, const VECTOR vector);
+void Compute_Scaling_Transform (TRANSFORM *result, const Vector3d& vector);
 void Compute_Inversion_Transform (TRANSFORM *result);
-void Compute_Translation_Transform (TRANSFORM *transform, const VECTOR vector);
-void Compute_Rotation_Transform (TRANSFORM *transform, const VECTOR vector);
-void Compute_Look_At_Transform (TRANSFORM *transform, const VECTOR Look_At, const VECTOR Up, const VECTOR Right);
+void Compute_Translation_Transform (TRANSFORM *transform, const Vector3d& vector);
+void Compute_Rotation_Transform (TRANSFORM *transform, const Vector3d& vector);
+void Compute_Look_At_Transform (TRANSFORM *transform, const Vector3d& Look_At, const Vector3d& Up, const Vector3d& Right);
 void Compose_Transforms (TRANSFORM *transform, const TRANSFORM *Additional_Transform);
-void Compute_Axis_Rotation_Transform (TRANSFORM *transform, const VECTOR AxisVect, DBL angle);
-void Compute_Coordinate_Transform (TRANSFORM *trans, const VECTOR origin, VECTOR up, DBL r, DBL len);
+void Compute_Axis_Rotation_Transform (TRANSFORM *transform, const Vector3d& AxisVect, DBL angle);
+void Compute_Coordinate_Transform (TRANSFORM *trans, const Vector3d& origin, Vector3d& up, DBL r, DBL len);
 TRANSFORM *Create_Transform (void);
 TRANSFORM *Copy_Transform (const TRANSFORM *Old);
 void Destroy_Transform (TRANSFORM *Trans);
-UV_VECT *Create_UV_Vect (void);
-VECTOR *Create_Vector (void);
 VECTOR_4D *Create_Vector_4D (void);
 DBL *Create_Float (void);
 void MInvers (MATRIX r, const MATRIX m);
-int MInvers3(const VECTOR inM[3], VECTOR outM[3]);
-void MTransUVPoint(const DBL p[2], const DBL m[3][3], DBL t[2]);
-void MSquareQuad(const UV_VECT st[4], DBL sq[3][3]);
+int MInvers3(const Matrix3x3& inM, Matrix3x3& outM);
 
 }
 

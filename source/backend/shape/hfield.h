@@ -24,16 +24,17 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/shape/hfield.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/shape/hfield.h $
+ * $Revision: #27 $
+ * $Change: 6164 $
+ * $DateTime: 2013/12/09 17:21:04 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #ifndef HFIELD_H
 #define HFIELD_H
 
+#include "backend/scene/objects.h"
 #include "backend/bounding/bbox.h"
 #include "backend/shape/boxes.h"
 
@@ -57,14 +58,7 @@ namespace pov
 
 typedef struct HField_Data_Struct HFIELD_DATA;
 typedef struct HField_Block_Struct HFIELD_BLOCK;
-typedef struct HField_Normal_Struct HFIELD_NORMAL;
 typedef short HF_Normals[3];
-
-struct HField_Normal_Struct
-{
-	DBL fx, fz;
-	VECTOR normal;
-};
 
 struct HField_Block_Struct
 {
@@ -86,11 +80,13 @@ struct HField_Data_Struct
 	HFIELD_BLOCK **Block;
 };
 
+class ImageData;
+
 class HField : public ObjectBase
 {
 	public:
-		VECTOR bounding_corner1;
-		VECTOR bounding_corner2;
+		Vector3d bounding_corner1;
+		Vector3d bounding_corner2;
 		HFIELD_DATA *Data;
 
 		HField();
@@ -99,23 +95,22 @@ class HField : public ObjectBase
 		virtual ObjectPtr Copy();
 
 		virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
-		virtual bool Inside(const VECTOR, TraceThreadData *) const;
-		virtual void Normal(VECTOR, Intersection *, TraceThreadData *) const;
-		virtual void Translate(const VECTOR, const TRANSFORM *);
-		virtual void Rotate(const VECTOR, const TRANSFORM *);
-		virtual void Scale(const VECTOR, const TRANSFORM *);
+		virtual bool Inside(const Vector3d&, TraceThreadData *) const;
+		virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const;
+		virtual void Translate(const Vector3d&, const TRANSFORM *);
+		virtual void Rotate(const Vector3d&, const TRANSFORM *);
+		virtual void Scale(const Vector3d&, const TRANSFORM *);
 		virtual void Transform(const TRANSFORM *);
-		virtual void Invert();
 		virtual void Compute_BBox();
 
 		void Compute_HField(const ImageData *image);
 	protected:
-		static DBL normalize(VECTOR A, const VECTOR B);
+		static DBL normalize(Vector3d& A, const Vector3d& B);
 		void smooth_height_field(int xsize, int zsize);
-		bool intersect_pixel(int x, int z, const Ray& ray, DBL height1, DBL height2, IStack &HField_Stack, const Ray &RRay, DBL mindist, DBL maxdist, TraceThreadData *Thread);
-		static int add_single_normal(HF_VAL **data, int xsize, int zsize, int x0, int z0,int x1, int z1,int x2, int z2, VECTOR N);
-		bool dda_traversal(const Ray &ray, const VECTOR Start, const HFIELD_BLOCK *Block, IStack &HField_Stack, const Ray &RRay, DBL mindist, DBL maxdist, TraceThreadData *Thread);
-		bool block_traversal(const Ray &ray, const VECTOR Start, IStack &HField_Stack, const Ray &RRay, DBL mindist, DBL maxdist, TraceThreadData *Thread);
+		bool intersect_pixel(int x, int z, const BasicRay& ray, DBL height1, DBL height2, IStack &HField_Stack, const BasicRay &RRay, DBL mindist, DBL maxdist, TraceThreadData *Thread);
+		static int add_single_normal(HF_VAL **data, int xsize, int zsize, int x0, int z0,int x1, int z1,int x2, int z2, Vector3d& N);
+		bool dda_traversal(const BasicRay &ray, const Vector3d& Start, const HFIELD_BLOCK *Block, IStack &HField_Stack, const BasicRay &RRay, DBL mindist, DBL maxdist, TraceThreadData *Thread);
+		bool block_traversal(const BasicRay &ray, const Vector3d& Start, IStack &HField_Stack, const BasicRay &RRay, DBL mindist, DBL maxdist, TraceThreadData *Thread);
 		void build_hfield_blocks();
 };
 

@@ -26,11 +26,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/shape/boxes.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/shape/boxes.cpp $
+ * $Revision: #37 $
+ * $Change: 6164 $
+ * $DateTime: 2013/12/09 17:21:04 $
+ * $Author: clipka $
  *******************************************************************************/
 
 // frame.h must always be the first POV file included (pulls in platform config)
@@ -103,7 +103,7 @@ bool Box::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadData
 	int Intersection_Found;
 	int Side1, Side2;
 	DBL Depth1, Depth2;
-	VECTOR IPoint;
+	Vector3d IPoint;
 
 	Thread->Stats()[Ray_Box_Tests]++;
 
@@ -113,7 +113,7 @@ bool Box::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadData
 	{
 		if (Depth1 > DEPTH_TOLERANCE)
 		{
-			VEvaluateRay(IPoint, ray.Origin, Depth1, ray.Direction);
+			IPoint = ray.Evaluate(Depth1);
 
 			if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
 			{
@@ -123,7 +123,7 @@ bool Box::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadData
 			}
 		}
 
-		VEvaluateRay(IPoint, ray.Origin, Depth2, ray.Direction);
+		IPoint = ray.Evaluate(Depth2);
 
 		if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
 		{
@@ -170,11 +170,11 @@ bool Box::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadData
 *
 ******************************************************************************/
 
-bool Box::Intersect(const Ray& ray, const TRANSFORM *Trans, const VECTOR Corner1, const VECTOR Corner2, DBL *Depth1, DBL  *Depth2, int *Side1, int  *Side2)
+bool Box::Intersect(const BasicRay& ray, const TRANSFORM *Trans, const Vector3d& Corner1, const Vector3d& Corner2, DBL *Depth1, DBL  *Depth2, int *Side1, int  *Side2)
 {
 	int smin = 0, smax = 0;    /* Side hit for min/max intersection. */
 	DBL t, tmin, tmax;
-	VECTOR P, D;
+	Vector3d P, D;
 
 	/* Transform the point into the boxes space */
 
@@ -185,8 +185,8 @@ bool Box::Intersect(const Ray& ray, const TRANSFORM *Trans, const VECTOR Corner1
 	}
 	else
 	{
-		Assign_Vector(P, ray.Origin);
-		Assign_Vector(D, ray.Direction);
+		P = ray.Origin;
+		D = ray.Direction;
 	}
 
 	tmin = 0.0;
@@ -533,9 +533,9 @@ bool Box::Intersect(const Ray& ray, const TRANSFORM *Trans, const VECTOR Corner1
 *
 ******************************************************************************/
 
-bool Box::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
+bool Box::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 {
-	VECTOR New_Point;
+	Vector3d New_Point;
 
 	/* Transform the point into box space. */
 
@@ -545,7 +545,7 @@ bool Box::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
 	}
 	else
 	{
-		Assign_Vector(New_Point,IPoint);
+		New_Point = IPoint;
 	}
 
 	/* Test to see if we are outside the box. */
@@ -598,16 +598,16 @@ bool Box::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
 *
 ******************************************************************************/
 
-void Box::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) const
+void Box::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread) const
 {
 	switch (Inter->i1)
 	{
-		case SIDE_X_0: Make_Vector(Result, -1.0,  0.0,  0.0); break;
-		case SIDE_X_1: Make_Vector(Result,  1.0,  0.0,  0.0); break;
-		case SIDE_Y_0: Make_Vector(Result,  0.0, -1.0,  0.0); break;
-		case SIDE_Y_1: Make_Vector(Result,  0.0,  1.0,  0.0); break;
-		case SIDE_Z_0: Make_Vector(Result,  0.0,  0.0, -1.0); break;
-		case SIDE_Z_1: Make_Vector(Result,  0.0,  0.0,  1.0); break;
+		case SIDE_X_0: Result = Vector3d(-1.0,  0.0,  0.0); break;
+		case SIDE_X_1: Result = Vector3d( 1.0,  0.0,  0.0); break;
+		case SIDE_Y_0: Result = Vector3d( 0.0, -1.0,  0.0); break;
+		case SIDE_Y_1: Result = Vector3d( 0.0,  1.0,  0.0); break;
+		case SIDE_Z_0: Result = Vector3d( 0.0,  0.0, -1.0); break;
+		case SIDE_Z_1: Result = Vector3d( 0.0,  0.0,  1.0); break;
 
 		default: throw POV_EXCEPTION_STRING("Unknown box side in Box_Normal().");
 	}
@@ -618,7 +618,7 @@ void Box::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) co
 	{
 		MTransNormal(Result, Result, Trans);
 
-		VNormalize(Result, Result);
+		Result.normalize();
 	}
 }
 
@@ -650,13 +650,13 @@ void Box::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) co
 *
 ******************************************************************************/
 
-void Box::Translate(const VECTOR Vector, const TRANSFORM *tr)
+void Box::Translate(const Vector3d& Vector, const TRANSFORM *tr)
 {
 	if (Trans == NULL)
 	{
-		VAddEq(bounds[0], Vector);
+		bounds[0] += Vector;
 
-		VAddEq(bounds[1], Vector);
+		bounds[1] += Vector;
 
 		Compute_BBox();
 	}
@@ -694,7 +694,7 @@ void Box::Translate(const VECTOR Vector, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void Box::Rotate(const VECTOR, const TRANSFORM *tr)
+void Box::Rotate(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
@@ -727,14 +727,14 @@ void Box::Rotate(const VECTOR, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void Box::Scale(const VECTOR Vector, const TRANSFORM *tr)
+void Box::Scale(const Vector3d& Vector, const TRANSFORM *tr)
 {
 	DBL temp;
 
 	if (Trans == NULL)
 	{
-		VEvaluateEq(bounds[0], Vector);
-		VEvaluateEq(bounds[1], Vector);
+		bounds[0] *= Vector;
+		bounds[1] *= Vector;
 
 		if (bounds[0][X] > bounds[1][X])
 		{
@@ -766,39 +766,6 @@ void Box::Scale(const VECTOR Vector, const TRANSFORM *tr)
 	{
 		Transform(tr);
 	}
-}
-
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-*   Invert_Box
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-*   Alexander Enzmann
-*
-* DESCRIPTION
-*
-*   -
-*
-* CHANGES
-*
-*   -
-*
-******************************************************************************/
-
-void Box::Invert()
-{
-	Invert_Flag(this, INVERTED_FLAG);
 }
 
 
@@ -869,8 +836,8 @@ void Box::Transform(const TRANSFORM *tr)
 
 Box::Box() : ObjectBase(BOX_OBJECT)
 {
-	Make_Vector(bounds[0], -1.0, -1.0, -1.0);
-	Make_Vector(bounds[1],  1.0,  1.0,  1.0);
+	bounds[0] = Vector3d(-1.0, -1.0, -1.0);
+	bounds[1] = Vector3d( 1.0,  1.0,  1.0);
 
 	Make_BBox(BBox, -1.0, -1.0, -1.0, 2.0, 2.0, 2.0);
 
@@ -982,9 +949,9 @@ Box::~Box()
 
 void Box::Compute_BBox()
 {
-	Assign_BBox_Vect(BBox.Lower_Left, bounds[0]);
+	BBox.lowerLeft = BBoxVector3d(bounds[0]);
 
-	VSub(BBox.Lengths, bounds[1], bounds[0]);
+	BBox.size = BBoxVector3d(bounds[1] - bounds[0]);
 
 	if (Trans != NULL)
 	{
@@ -1061,22 +1028,22 @@ void Box::Compute_BBox()
 *
 ******************************************************************************/
 
-void Box::UVCoord(UV_VECT Result, const Intersection *Inter, TraceThreadData *Thread) const
+void Box::UVCoord(Vector2d& Result, const Intersection *Inter, TraceThreadData *Thread) const
 {
-	VECTOR P, Box_Diff;
+	Vector3d P, Box_Diff;
 
 	/* Transform the point into the cube's space */
 	if (Trans != NULL)
 		MInvTransPoint(P, Inter->IPoint, Trans);
 	else
-		Assign_Vector(P, Inter->IPoint);
+		P = Inter->IPoint;
 
-	VSub(Box_Diff,bounds[1],bounds[0]);
+	Box_Diff = bounds[1] - bounds[0];
 
 	/* this line moves the bottom,left,front corner of the box to <0,0,0> */
-	VSubEq(P, bounds[0]);
+	P -= bounds[0];
 	/* this line normalizes the face offsets */
-	VDivEq(P, Box_Diff);
+	P /= Box_Diff;
 
 	/* if no normalize above, then we should use Box->UV_Trans and also
 	   inverse-transform the bounds */
@@ -1115,7 +1082,7 @@ void Box::UVCoord(UV_VECT Result, const Intersection *Inter, TraceThreadData *Th
 	}
 }
 
-bool Box::Intersect_BBox(BBoxDirection, const BBOX_VECT&, const BBOX_VECT&, BBOX_VAL) const
+bool Box::Intersect_BBox(BBoxDirection, const BBoxVector3d&, const BBoxVector3d&, BBoxScalar) const
 {
 	return true;
 }

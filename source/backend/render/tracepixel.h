@@ -22,11 +22,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/render/tracepixel.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/render/tracepixel.h $
+ * $Revision: #29 $
+ * $Change: 6163 $
+ * $DateTime: 2013/12/08 22:48:58 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #ifndef POVRAY_BACKEND_TRACEPIXEL_H
@@ -37,165 +37,21 @@
 #include <boost/thread.hpp>
 
 #include "backend/frame.h"
-#include "backend/povray.h"
-#include "backend/scene/view.h"
-#include "backend/scene/scene.h"
+#include "backend/scene/camera.h"
 #include "backend/render/trace.h"
 
 namespace pov
 {
 
-class BSPIntersectFunctor : public BSPTree::Intersect
-{
-	public:
-		BSPIntersectFunctor(Intersection& bi, const Ray& r, vector<ObjectPtr>& objs, TraceThreadData *t) :
-			found(false),
-			bestisect(bi),
-			ray(r),
-			objects(objs),
-			traceThreadData(t)
-		{
-			Vector3d tmp(1.0 / ray.GetDirection()[X], 1.0 / ray.GetDirection()[Y], 1.0 /ray.GetDirection()[Z]);
-			Assign_Vector(origin, ray.Origin);
-			Assign_Vector(invdir, *tmp);
-			variant = (ObjectBase::BBoxDirection)((int(invdir[X] < 0.0) << 2) | (int(invdir[Y] < 0.0) << 1) | int(invdir[Z] < 0.0));
-		}
-
-		virtual bool operator()(unsigned int index, double& maxdist)
-		{
-			ObjectPtr object = objects[index];
-			Intersection isect;
-
-			if(Find_Intersection(&isect, object, ray, variant, origin, invdir, traceThreadData) && (isect.Depth <= maxdist))
-			{
-				if(isect.Depth < bestisect.Depth)
-				{
-					bestisect = isect;
-					found = true;
-					maxdist = bestisect.Depth;
-				}
-			}
-
-			return found;
-		}
-
-		virtual bool operator()() const { return found; }
-	private:
-		bool found;
-		vector<ObjectPtr>& objects;
-		Intersection& bestisect;
-		const Ray& ray;
-		BBOX_VECT origin;
-		BBOX_VECT invdir;
-		ObjectBase::BBoxDirection variant;
-		TraceThreadData *traceThreadData;
-};
-
-class BSPIntersectCondFunctor : public BSPTree::Intersect
-{
-	public:
-		BSPIntersectCondFunctor(Intersection& bi, const Ray& r, vector<ObjectPtr>& objs, TraceThreadData *t,
-		                        const RayObjectCondition& prec, const RayObjectCondition& postc) :
-			found(false),
-			bestisect(bi),
-			ray(r),
-			objects(objs),
-			traceThreadData(t),
-			precondition(prec),
-			postcondition(postc)
-		{
-			Vector3d tmp(1.0 / ray.GetDirection()[X], 1.0 / ray.GetDirection()[Y], 1.0 /ray.GetDirection()[Z]);
-			Assign_Vector(origin, ray.Origin);
-			Assign_Vector(invdir, *tmp);
-			variant = (ObjectBase::BBoxDirection)((int(invdir[X] < 0.0) << 2) | (int(invdir[Y] < 0.0) << 1) | int(invdir[Z] < 0.0));
-		}
-
-		virtual bool operator()(unsigned int index, double& maxdist)
-		{
-			ObjectPtr object = objects[index];
-
-			if(precondition(ray, object, 0.0) == true)
-			{
-				Intersection isect;
-
-				if(Find_Intersection(&isect, object, ray, variant, origin, invdir, postcondition, traceThreadData) && (isect.Depth <= maxdist))
-				{
-					if(isect.Depth < bestisect.Depth)
-					{
-						bestisect = isect;
-						found = true;
-						maxdist = bestisect.Depth;
-					}
-				}
-			}
-
-			return found;
-		}
-
-		virtual bool operator()() const { return found; }
-	private:
-		bool found;
-		vector<ObjectPtr>& objects;
-		Intersection& bestisect;
-		const Ray& ray;
-		BBOX_VECT origin;
-		BBOX_VECT invdir;
-		ObjectBase::BBoxDirection variant;
-		TraceThreadData *traceThreadData;
-		const RayObjectCondition& precondition;
-		const RayObjectCondition& postcondition;
-};
-
-class BSPInsideCondFunctor : public BSPTree::Inside
-{
-	public:
-		BSPInsideCondFunctor(Vector3d o, vector<ObjectPtr>& objs, TraceThreadData *t,
-		                     const PointObjectCondition& prec, const PointObjectCondition& postc) :
-			found(false),
-			origin(o),
-			objects(objs),
-			precondition(prec),
-			postcondition(postc),
-			threadData(t)
-		{
-		}
-
-		virtual bool operator()(unsigned int index)
-		{
-			ObjectPtr object = objects[index];
-			if(precondition(origin, object))
-				if(Inside_BBox(*origin, object->BBox) && object->Inside(*origin, threadData))
-					if(postcondition(origin, object))
-						found = true;
-			return found;
-		}
-
-		virtual bool operator()() const { return found; }
-	private:
-		bool found;
-		vector<ObjectPtr>& objects;
-		Vector3d origin;
-		const PointObjectCondition& precondition;
-		const PointObjectCondition& postcondition;
-		TraceThreadData *threadData;
-};
-
 struct HasInteriorPointObjectCondition : public PointObjectCondition
 {
-	virtual bool operator()(const Vector3d& point, const ObjectBase* object) const
-	{
-		return object->interior != NULL;
-	}
+	virtual bool operator()(const Vector3d& point, ConstObjectPtr object) const;
 };
 
 struct ContainingInteriorsPointObjectCondition : public PointObjectCondition
 {
 	ContainingInteriorsPointObjectCondition(RayInteriorVector& ci) : containingInteriors(ci) {}
-	virtual bool operator()(const Vector3d& point, const ObjectBase* object) const
-	{
-		containingInteriors.push_back(object->interior);
-		return true;
-	}
+	virtual bool operator()(const Vector3d& point, ConstObjectPtr object) const;
 	RayInteriorVector &containingInteriors;
 };
 
@@ -227,7 +83,7 @@ class TracePixel : public Trace
 			// Maximum amount of jitter to use. 
 			DBL Max_Jitter;
 			// Vectors in the viewing plane. 
-			VECTOR XPerp, YPerp;
+			Vector3d XPerp, YPerp;
 
 		};
 

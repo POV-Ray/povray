@@ -24,11 +24,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/math/hcmplx.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/math/hcmplx.h $
+ * $Revision: #19 $
+ * $Change: 6161 $
+ * $DateTime: 2013/12/05 18:42:17 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #ifndef HCMPLX_H
@@ -53,44 +53,73 @@ namespace pov
 * Global functions
 ******************************************************************************/
 
-int F_Bound_HCompl (const Ray&, const Fractal *, DBL *, DBL *);
-void Normal_Calc_HCompl (VECTOR, int, const Fractal *, DBL **);
-int Iteration_HCompl (const VECTOR, const Fractal *, DBL **);
-int D_Iteration_HCompl (const VECTOR, const Fractal *, const VECTOR &, DBL *, DBL **);
+typedef void (*COMPLEX_FUNCTION_METHOD) (Complex *, const Complex *, const Complex *);
 
-int F_Bound_HCompl_z3 (const Ray &, const Fractal *, DBL *, DBL *);
-void Normal_Calc_HCompl_z3 (VECTOR, int, const Fractal *, DBL **);
-int Iteration_HCompl_z3 (const VECTOR, const Fractal *, DBL **);
-int D_Iteration_HCompl_z3 (const VECTOR, const Fractal *, const VECTOR &, DBL *, DBL **);
+class HypercomplexBaseFractalRules : public FractalRules
+{
+	public:
+		virtual ~HypercomplexBaseFractalRules() {}
+		virtual bool Bound (const BasicRay&, const Fractal *, DBL *, DBL *) const;
+};
 
-int F_Bound_HCompl_Reciprocal (const Ray &, const Fractal *, DBL *, DBL *);
-void Normal_Calc_HCompl_Reciprocal (VECTOR, int, const Fractal *, DBL **);
-int Iteration_HCompl_Reciprocal (const VECTOR, const Fractal *, DBL **);
-int D_Iteration_HCompl_Reciprocal (const VECTOR, const Fractal *, const VECTOR &, DBL *, DBL **);
+class HypercomplexFractalRules : public HypercomplexBaseFractalRules
+{
+	public:
+		virtual ~HypercomplexFractalRules() {}
+		virtual void CalcNormal (Vector3d&, int, const Fractal *, DBL **) const;
+		virtual bool Iterate (const Vector3d&, const Fractal *, DBL **) const;
+		virtual bool Iterate (const Vector3d&, const Fractal *, const Vector3d&, DBL *, DBL **) const;
+};
 
-int F_Bound_HCompl_Func (const Ray &, const Fractal *, DBL *, DBL *);
-void Normal_Calc_HCompl_Func (VECTOR, int, const Fractal *, DBL **);
-int Iteration_HCompl_Func (const VECTOR, const Fractal *, DBL **);
-int D_Iteration_HCompl_Func (const VECTOR, const Fractal *, const VECTOR &, DBL *, DBL **);
+class HypercomplexFunctionFractalRules : public HypercomplexBaseFractalRules
+{
+	public:
+		HypercomplexFunctionFractalRules(COMPLEX_FUNCTION_METHOD fn) : ComplexFunction(fn) {}
+		virtual ~HypercomplexFunctionFractalRules() {}
+		virtual void CalcNormal (Vector3d&, int, const Fractal *, DBL **) const;
+		virtual bool Iterate (const Vector3d&, const Fractal *, DBL **) const;
+		virtual bool Iterate (const Vector3d&, const Fractal *, const Vector3d&, DBL *, DBL **) const;
+	protected:
+		COMPLEX_FUNCTION_METHOD ComplexFunction;
+		void HFunc(DBL *xr, DBL *yr, DBL *zr, DBL *wr, DBL x, DBL y, DBL z, DBL w, const Fractal * f) const;
+};
 
-void Complex_Exp (CMPLX *target, const CMPLX *source, const CMPLX *);
-void Complex_Ln (CMPLX *target, const CMPLX *source, const CMPLX *);
-void Complex_Sin (CMPLX *target, const CMPLX *source, const CMPLX *);
-void Complex_ASin (CMPLX *target, const CMPLX *source, const CMPLX *);
-void Complex_Sinh (CMPLX *target, const CMPLX *source, const CMPLX *);
-void Complex_ASinh (CMPLX *target, const CMPLX *source, const CMPLX *);
-void Complex_Cos (CMPLX *target, const CMPLX *source, const CMPLX *);
-void Complex_ACos (CMPLX *target, const CMPLX *source, const CMPLX *);
-void Complex_Cosh (CMPLX *target, const CMPLX *source, const CMPLX *);
-void Complex_ACosh (CMPLX *target, const CMPLX *source, const CMPLX *);
-void Complex_Tan (CMPLX *target, const CMPLX *source, const CMPLX *);
-void Complex_ATan (CMPLX *target, const CMPLX *source, const CMPLX *);
-void Complex_Tanh (CMPLX *target, const CMPLX *source, const CMPLX *);
-void Complex_ATanh (CMPLX *target, const CMPLX *source, const CMPLX *);
-void Complex_Sqrt (CMPLX *target, const CMPLX *source, const CMPLX *);
-void Complex_Pwr (CMPLX *target, const CMPLX *source1, const CMPLX *source2);
-void Complex_Mult (CMPLX *target, const CMPLX *source1, const CMPLX *source2);
-void Complex_Div (CMPLX *target, const CMPLX *source1, const CMPLX *source2);
+class HypercomplexZ3FractalRules : public HypercomplexBaseFractalRules
+{
+	public:
+		virtual ~HypercomplexZ3FractalRules() {}
+		virtual void CalcNormal (Vector3d&, int, const Fractal *, DBL **) const;
+		virtual bool Iterate (const Vector3d&, const Fractal *, DBL **) const;
+		virtual bool Iterate (const Vector3d&, const Fractal *, const Vector3d&, DBL *, DBL **) const;
+};
+
+class HypercomplexReciprocalFractalRules : public HypercomplexBaseFractalRules
+{
+	public:
+		virtual ~HypercomplexReciprocalFractalRules() {}
+		virtual void CalcNormal (Vector3d&, int, const Fractal *, DBL **) const;
+		virtual bool Iterate (const Vector3d&, const Fractal *, DBL **) const;
+		virtual bool Iterate (const Vector3d&, const Fractal *, const Vector3d&, DBL *, DBL **) const;
+};
+
+void Complex_Exp (Complex *target, const Complex *source, const Complex *);
+void Complex_Ln (Complex *target, const Complex *source, const Complex *);
+void Complex_Sin (Complex *target, const Complex *source, const Complex *);
+void Complex_ASin (Complex *target, const Complex *source, const Complex *);
+void Complex_Sinh (Complex *target, const Complex *source, const Complex *);
+void Complex_ASinh (Complex *target, const Complex *source, const Complex *);
+void Complex_Cos (Complex *target, const Complex *source, const Complex *);
+void Complex_ACos (Complex *target, const Complex *source, const Complex *);
+void Complex_Cosh (Complex *target, const Complex *source, const Complex *);
+void Complex_ACosh (Complex *target, const Complex *source, const Complex *);
+void Complex_Tan (Complex *target, const Complex *source, const Complex *);
+void Complex_ATan (Complex *target, const Complex *source, const Complex *);
+void Complex_Tanh (Complex *target, const Complex *source, const Complex *);
+void Complex_ATanh (Complex *target, const Complex *source, const Complex *);
+void Complex_Sqrt (Complex *target, const Complex *source, const Complex *);
+void Complex_Pwr (Complex *target, const Complex *source1, const Complex *source2);
+void Complex_Mult (Complex *target, const Complex *source1, const Complex *source2);
+void Complex_Div (Complex *target, const Complex *source1, const Complex *source2);
 
 }
 

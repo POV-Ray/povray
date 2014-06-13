@@ -24,15 +24,17 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/shape/triangle.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/shape/triangle.h $
+ * $Revision: #26 $
+ * $Change: 6164 $
+ * $DateTime: 2013/12/09 17:21:04 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #ifndef TRIANGLE_H
 #define TRIANGLE_H
+
+#include "backend/scene/objects.h"
 
 namespace pov
 {
@@ -50,14 +52,14 @@ namespace pov
 * Global typedefs
 ******************************************************************************/
 
-class Triangle : public ObjectBase
+class Triangle : public NonsolidObject
 {
 	public:
-		VECTOR  Normal_Vector;
-		DBL     Distance;
-		unsigned int  Dominant_Axis:2;
-		unsigned int  vAxis:2;  /* used only for smooth triangles */
-		VECTOR  P1, P2, P3;
+		Vector3d        P1, P2, P3;
+		Vector3d        Normal_Vector;
+		DBL             Distance;
+		unsigned int    Dominant_Axis:2;
+		unsigned int    vAxis:2;  /* used only for smooth triangles */
 
 		Triangle();
 		Triangle(int t);
@@ -66,42 +68,40 @@ class Triangle : public ObjectBase
 		virtual ObjectPtr Copy();
 
 		virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
-		virtual bool Inside(const VECTOR, TraceThreadData *) const;
-		virtual void Normal(VECTOR, Intersection *, TraceThreadData *) const;
-		// virtual void UVCoord(UV_VECT, const Intersection *, TraceThreadData *) const; // TODO FIXME - why is there no UV-mapping for this trivial object? [trf]
-		virtual void Translate(const VECTOR, const TRANSFORM *);
-		virtual void Rotate(const VECTOR, const TRANSFORM *);
-		virtual void Scale(const VECTOR, const TRANSFORM *);
+		virtual bool Inside(const Vector3d&, TraceThreadData *) const;
+		virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const;
+		// virtual void UVCoord(Vector2d&, const Intersection *, TraceThreadData *) const; // TODO FIXME - why is there no UV-mapping for this trivial object? [trf]
+		virtual void Translate(const Vector3d&, const TRANSFORM *);
+		virtual void Rotate(const Vector3d&, const TRANSFORM *);
+		virtual void Scale(const Vector3d&, const TRANSFORM *);
 		virtual void Transform(const TRANSFORM *);
-		virtual void Invert();
 		virtual void Compute_BBox();
-		virtual bool Intersect_BBox(BBoxDirection, const BBOX_VECT&, const BBOX_VECT&, BBOX_VAL) const;
+		virtual bool Intersect_BBox(BBoxDirection, const BBoxVector3d&, const BBoxVector3d&, BBoxScalar) const;
 
 		virtual bool Compute_Triangle();
 	protected:
-		bool Intersect(const Ray& ray, DBL *Depth) const;
+		bool Intersect(const BasicRay& ray, DBL *Depth) const;
 		void find_triangle_dominant_axis();
 };
 
 class SmoothTriangle : public Triangle
 {
 	public:
-		VECTOR  N1, N2, N3, Perp;
+		Vector3d  N1, N2, N3, Perp;
 
 		SmoothTriangle();
 
 		virtual ObjectPtr Copy();
 
-		virtual void Normal(VECTOR, Intersection *, TraceThreadData *) const;
-		virtual void Translate(const VECTOR, const TRANSFORM *);
-		virtual void Rotate(const VECTOR, const TRANSFORM *);
-		virtual void Scale(const VECTOR, const TRANSFORM *);
+		virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const;
+		virtual void Translate(const Vector3d&, const TRANSFORM *);
+		virtual void Rotate(const Vector3d&, const TRANSFORM *);
+		virtual void Scale(const Vector3d&, const TRANSFORM *);
 		virtual void Transform(const TRANSFORM *);
-		virtual void Invert();
 
 		virtual bool Compute_Triangle();
 
-		static DBL Calculate_Smooth_T(const VECTOR IPoint, const VECTOR P1, const VECTOR P2, const VECTOR P3);
+		static DBL Calculate_Smooth_T(const Vector3d& IPoint, const Vector3d& P1, const Vector3d& P2, const Vector3d& P3);
 	protected:
 		bool Compute_Smooth_Triangle();
 };

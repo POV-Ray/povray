@@ -24,11 +24,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/texture/normal.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/texture/normal.h $
+ * $Revision: #19 $
+ * $Change: 6150 $
+ * $DateTime: 2013/11/30 14:13:48 $
+ * $Author: clipka $
  *******************************************************************************/
 
 /* NOTE: FRAME.H contains other normal stuff. */
@@ -62,7 +62,7 @@ TNORMAL *Create_Tnormal ();
 TNORMAL *Copy_Tnormal (const TNORMAL *Old);
 void Destroy_Tnormal (TNORMAL *Tnormal);
 void Post_Tnormal (TNORMAL *Tnormal);
-void Perturb_Normal (VECTOR Layer_Normal, const TNORMAL *Tnormal, const VECTOR IPoint, Intersection *Intersection, const Ray *ray, TraceThreadData *Thread);
+void Perturb_Normal (Vector3d& Layer_Normal, const TNORMAL *Tnormal, const Vector3d& IPoint, Intersection *Intersection, const Ray *ray, TraceThreadData *Thread);
 
 }
 

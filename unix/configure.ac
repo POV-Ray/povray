@@ -326,6 +326,9 @@ AC_RUN_IFELSE(
   ],,
   [AC_MSG_RESULT([cross-compiling])]  # FIXME
 )
+  if test $boost_thread_links = '1'; then
+    break
+  fi
 done
 if test $boost_thread_links != '1'; then
   AC_MSG_RESULT([no])
@@ -336,9 +339,9 @@ AC_DEFINE([USE_OFFICIAL_BOOST], [], [Use the official Boost libraries.])
 
 # Intel Math Kernel library
 pov_save_ldflags="$LDFLAGS"
-test x"$with_libmkl" != x"" && LDFLAGS="-L$with_libmkl $LDFLAGS"
+test x"$with_libmkl" != x"" && test x"$with_libmkl" != x"no" && LDFLAGS="-L$with_libmkl $LDFLAGS"
 AC_CHECK_LIB([mkl], [sin]) 
-test x"ac_cv_lib_mkl_sin" = x"no" && LDFLAGS="$pov_save_ldflags"
+test x"$ac_cv_lib_mkl_sin" = x"no" && LDFLAGS="$pov_save_ldflags"
 
 # libm
 AC_CHECK_LIB([m], [sin])

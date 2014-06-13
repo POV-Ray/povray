@@ -27,9 +27,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/lathe.cpp $
- * $Revision: #36 $
- * $Change: 6085 $
- * $DateTime: 2013/11/10 07:39:29 $
+ * $Revision: #42 $
+ * $Change: 6164 $
+ * $DateTime: 2013/12/09 17:21:04 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -233,7 +233,7 @@ bool Lathe::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDa
 *
 ******************************************************************************/
 
-bool Lathe::Intersect(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread)
+bool Lathe::Intersect(const BasicRay& ray, IStack& Depth_Stack, TraceThreadData *Thread)
 {
 	int cnt;
 	int found, j, n1, n2;
@@ -243,7 +243,7 @@ bool Lathe::Intersect(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thre
 	DBL y1[6];
 	DBL y2[2];
 	DBL best;
-	VECTOR P, D;
+	Vector3d P, D;
 	LATHE_SPLINE_ENTRY *Entry;
 
 	// Transform the ray into the lathe space.
@@ -251,10 +251,10 @@ bool Lathe::Intersect(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thre
 	MInvTransPoint(P, ray.Origin, Trans);
 	MInvTransDirection(D, ray.Direction, Trans);
 
-	VLength(len, D);
-	VInverseScaleEq(D, len);
+	len = D.length();
+	D /= len;
 
-	Dylen = D[Y] * len;
+	Dylen = D[Y] * len; // TODO FIXME - why don't we do this *before* normalizing, saving us the multiplication by len?
 
 	#ifdef LATHE_EXTRA_STATS
 		Thread->Stats()[Lathe_Bound_Tests]++;
@@ -423,14 +423,14 @@ bool Lathe::Intersect(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thre
 *
 ******************************************************************************/
 
-bool Lathe::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
+bool Lathe::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 {
 	int i, n, NC;
 	DBL r, k, w;
 	DBL x[4];
 	DBL y[3];
 	DBL *height;
-	VECTOR P;
+	Vector3d P;
 	BCYL_ENTRY *entry;
 	LATHE_SPLINE_ENTRY *Entry;
 
@@ -531,10 +531,10 @@ bool Lathe::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
 *
 ******************************************************************************/
 
-void Lathe::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) const
+void Lathe::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread) const
 {
 	DBL r, dx, dy;
-	VECTOR P, N;
+	Vector3d P, N;
 	LATHE_SPLINE_ENTRY *Entry;
 
 	Entry = &Spline->Entry[Inter->i1];
@@ -571,7 +571,7 @@ void Lathe::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) 
 
 	MTransNormal(Result, N, Trans);
 
-	VNormalize(Result, Result);
+	Result.normalize();
 }
 
 
@@ -607,7 +607,7 @@ void Lathe::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) 
 *
 ******************************************************************************/
 
-void Lathe::Translate(const VECTOR, const TRANSFORM *tr)
+void Lathe::Translate(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
@@ -645,7 +645,7 @@ void Lathe::Translate(const VECTOR, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void Lathe::Rotate(const VECTOR, const TRANSFORM *tr)
+void Lathe::Rotate(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
@@ -683,7 +683,7 @@ void Lathe::Rotate(const VECTOR, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void Lathe::Scale(const VECTOR, const TRANSFORM *tr)
+void Lathe::Scale(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
@@ -726,43 +726,6 @@ void Lathe::Transform(const TRANSFORM *tr)
 	Compose_Transforms(Trans, tr);
 
 	Compute_BBox();
-}
-
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-*   Invert_Lathe
-*
-* INPUT
-*
-*   Object - Object
-*   
-* OUTPUT
-*
-*   Object
-*   
-* RETURNS
-*   
-* AUTHOR
-*
-*   Dieter Bayer
-*   
-* DESCRIPTION
-*
-*   Invert a lathe.
-*
-* CHANGES
-*
-*   Jun 1994 : Creation.
-*
-******************************************************************************/
-
-void Lathe::Invert()
-{
-	Invert_Flag(this, INVERTED_FLAG);
 }
 
 
@@ -985,7 +948,7 @@ void Lathe::Compute_BBox()
 *
 ******************************************************************************/
 
-void Lathe::Compute_Lathe(UV_VECT *P, TraceThreadData *Thread)
+void Lathe::Compute_Lathe(Vector2d *P, TraceThreadData *Thread)
 {
 	int i, i1, i2, i3, n, segment, number_of_segments;
 	DBL x[4], y[4];
@@ -996,7 +959,7 @@ void Lathe::Compute_Lathe(UV_VECT *P, TraceThreadData *Thread)
 	DBL *tmp_r2;
 	DBL *tmp_h1;
 	DBL *tmp_h2;
-	UV_VECT A, B, C, D;
+	Vector2d A, B, C, D;
 
 	/* Get number of segments. */
 
@@ -1082,15 +1045,10 @@ void Lathe::Compute_Lathe(UV_VECT *P, TraceThreadData *Thread)
 
 				/* Use linear interpolation. */
 
-				A[X] =  0.0;
-				B[X] =  0.0;
-				C[X] = -1.0 * P[i][X] + 1.0 * P[i1][X];
-				D[X] =  1.0 * P[i][X];
-
-				A[Y] =  0.0;
-				B[Y] =  0.0;
-				C[Y] = -1.0 * P[i][Y] + 1.0 * P[i1][Y];
-				D[Y] =  1.0 * P[i][Y];
+				A =  Vector2d(0.0);
+				B =  Vector2d(0.0);
+				C = -1.0 * P[i] + 1.0 * P[i1];
+				D =  1.0 * P[i];
 
 				/* Get maximum coordinates in current segment. */
 
@@ -1111,15 +1069,10 @@ void Lathe::Compute_Lathe(UV_VECT *P, TraceThreadData *Thread)
 
 				/* Use quadratic interpolation. */
 
-				A[X] =  0.0;
-				B[X] =  0.5 * P[i][X] - 1.0 * P[i1][X] + 0.5 * P[i2][X];
-				C[X] = -0.5 * P[i][X]                  + 0.5 * P[i2][X];
-				D[X] =                  1.0 * P[i1][X];
-
-				A[Y] =  0.0;
-				B[Y] =  0.5 * P[i][Y] - 1.0 * P[i1][Y] + 0.5 * P[i2][Y];
-				C[Y] = -0.5 * P[i][Y]                  + 0.5 * P[i2][Y];
-				D[Y] =                  1.0 * P[i1][Y];
+				A =  Vector2d(0.0);
+				B =  0.5 * P[i] - 1.0 * P[i1] + 0.5 * P[i2];
+				C = -0.5 * P[i]               + 0.5 * P[i2];
+				D =               1.0 * P[i1];
 
 				/* Get maximum coordinates in current segment. */
 
@@ -1140,15 +1093,10 @@ void Lathe::Compute_Lathe(UV_VECT *P, TraceThreadData *Thread)
 
 				/* Use cubic interpolation. */
 
-				A[X] = -0.5 * P[i][X] + 1.5 * P[i1][X] - 1.5 * P[i2][X] + 0.5 * P[i3][X];
-				B[X] =        P[i][X] - 2.5 * P[i1][X] + 2.0 * P[i2][X] - 0.5 * P[i3][X];
-				C[X] = -0.5 * P[i][X]                  + 0.5 * P[i2][X];
-				D[X] =                        P[i1][X];
-
-				A[Y] = -0.5 * P[i][Y] + 1.5 * P[i1][Y] - 1.5 * P[i2][Y] + 0.5 * P[i3][Y];
-				B[Y] =        P[i][Y] - 2.5 * P[i1][Y] + 2.0 * P[i2][Y] - 0.5 * P[i3][Y];
-				C[Y] = -0.5 * P[i][Y]                  + 0.5 * P[i2][Y];
-				D[Y] =                        P[i1][Y];
+				A = -0.5 * P[i] + 1.5 * P[i1] - 1.5 * P[i2] + 0.5 * P[i3];
+				B =        P[i] - 2.5 * P[i1] + 2.0 * P[i2] - 0.5 * P[i3];
+				C = -0.5 * P[i]               + 0.5 * P[i2];
+				D =                     P[i1];
 
 				/* Get maximum coordinates in current segment. */
 
@@ -1168,15 +1116,10 @@ void Lathe::Compute_Lathe(UV_VECT *P, TraceThreadData *Thread)
 
 				/* Use Bernstein interpolation. */
 
-				A[X] = P[i3][X] - 3.0 * P[i2][X] + 3.0 * P[i1][X] -       P[i][X];
-				B[X] =            3.0 * P[i2][X] - 6.0 * P[i1][X] + 3.0 * P[i][X];
-				C[X] =                             3.0 * P[i1][X] - 3.0 * P[i][X];
-				D[X] =                                                    P[i][X];
-
-				A[Y] = P[i3][Y] - 3.0 * P[i2][Y] + 3.0 * P[i1][Y] -       P[i][Y];
-				B[Y] =            3.0 * P[i2][Y] - 6.0 * P[i1][Y] + 3.0 * P[i][Y];
-				C[Y] =                             3.0 * P[i1][Y] - 3.0 * P[i][Y];
-				D[Y] =                                                    P[i][Y];
+				A = P[i3] - 3.0 * P[i2] + 3.0 * P[i1] -       P[i];
+				B =         3.0 * P[i2] - 6.0 * P[i1] + 3.0 * P[i];
+				C =                       3.0 * P[i1] - 3.0 * P[i];
+				D =                                           P[i];
 
 				x[0] = P[i][X];
 				x[1] = P[i1][X];
@@ -1196,10 +1139,10 @@ void Lathe::Compute_Lathe(UV_VECT *P, TraceThreadData *Thread)
 
 		}
 
-		Assign_UV_Vect(Spline->Entry[segment].A, A);
-		Assign_UV_Vect(Spline->Entry[segment].B, B);
-		Assign_UV_Vect(Spline->Entry[segment].C, C);
-		Assign_UV_Vect(Spline->Entry[segment].D, D);
+		Spline->Entry[segment].A = A;
+		Spline->Entry[segment].B = B;
+		Spline->Entry[segment].C = C;
+		Spline->Entry[segment].D = D;
 
 		if ((Spline_Type == QUADRATIC_SPLINE) ||
 		    (Spline_Type == CUBIC_SPLINE))
@@ -1334,13 +1277,13 @@ void Lathe::Compute_Lathe(UV_VECT *P, TraceThreadData *Thread)
 *
 ******************************************************************************/
 
-bool Lathe::test_hit(const Ray &ray, IStack& Depth_Stack, DBL d, DBL w, int n, TraceThreadData *Thread)
+bool Lathe::test_hit(const BasicRay &ray, IStack& Depth_Stack, DBL d, DBL w, int n, TraceThreadData *Thread)
 {
-	VECTOR IPoint;
+	Vector3d IPoint;
 
 	if ((d > DEPTH_TOLERANCE) && (d < MAX_DISTANCE))
 	{
-		VEvaluateRay(IPoint, ray.Origin, d, ray.Direction);
+		IPoint = ray.Evaluate(d);
 
 		if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
 		{
@@ -1387,10 +1330,10 @@ bool Lathe::test_hit(const Ray &ray, IStack& Depth_Stack, DBL d, DBL w, int n, T
 *
 ******************************************************************************/
 
-void Lathe::UVCoord(UV_VECT Result, const Intersection *Inter, TraceThreadData *) const
+void Lathe::UVCoord(Vector2d& Result, const Intersection *Inter, TraceThreadData *) const
 {
 	DBL len, theta;
-	VECTOR P;
+	Vector3d P;
 /*
 	LATHE_SPLINE_ENTRY *Entry;
 

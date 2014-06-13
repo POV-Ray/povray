@@ -26,9 +26,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/bounding/bcyl.cpp $
- * $Revision: #17 $
- * $Change: 6085 $
- * $DateTime: 2013/11/10 07:39:29 $
+ * $Revision: #18 $
+ * $Change: 6119 $
+ * $DateTime: 2013/11/22 20:31:53 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -61,7 +61,7 @@ namespace pov
 
 static int  intersect_thick_cylinder (const BCYL *BCyl, const BCYL_INT *rint, const BCYL_INT *hint, const BCYL_ENTRY *Entry, DBL *dist);
 static void insert_hit (const BCYL_INT *Element, BCYL_INT *intervals, int *cnt);
-static void intersect_bound_elements (const BCYL *BCyl, BCYL_INT *rint, BCYL_INT *hint, const VECTOR P, const VECTOR D);
+static void intersect_bound_elements (const BCYL *BCyl, BCYL_INT *rint, BCYL_INT *hint, const Vector3d& P, const Vector3d& D);
 
 
 /*****************************************************************************
@@ -235,7 +235,7 @@ static int intersect_thick_cylinder(const BCYL *BCyl, const BCYL_INT *rint, cons
 *
 ******************************************************************************/
 
-static void intersect_bound_elements(const BCYL *BCyl, BCYL_INT *rint, BCYL_INT *hint, const VECTOR P, const VECTOR  D)
+static void intersect_bound_elements(const BCYL *BCyl, BCYL_INT *rint, BCYL_INT *hint, const Vector3d& P, const Vector3d& D)
 {
 	int i;
 	DBL a, b, bb, b2, c, d, k;
@@ -394,7 +394,7 @@ static void insert_hit(const BCYL_INT *element, BCYL_INT *intervals, int *cnt)
 *
 ******************************************************************************/
 
-int Intersect_BCyl(const BCYL *BCyl, BCYL_INT *intervals, BCYL_INT *rint, BCYL_INT *hint, const VECTOR P, const VECTOR  D)
+int Intersect_BCyl(const BCYL *BCyl, BCYL_INT *intervals, BCYL_INT *rint, BCYL_INT *hint, const Vector3d& P, const Vector3d& D)
 {
 	int i, cnt;
 	DBL dist[8];

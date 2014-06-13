@@ -24,15 +24,17 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/shape/csg.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/shape/csg.h $
+ * $Revision: #25 $
+ * $Change: 6164 $
+ * $DateTime: 2013/12/09 17:21:04 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #ifndef CSG_H
 #define CSG_H
+
+#include "backend/scene/objects.h"
 
 namespace pov
 {
@@ -63,16 +65,15 @@ class CSG : public CompoundObject
 
 		int do_split;
 
-		virtual void Normal(VECTOR, Intersection *, TraceThreadData *) const { }
-		virtual void Translate(const VECTOR, const TRANSFORM *);
-		virtual void Rotate(const VECTOR, const TRANSFORM *);
-		virtual void Scale(const VECTOR, const TRANSFORM *);
+		virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const { }
+		virtual void Translate(const Vector3d&, const TRANSFORM *);
+		virtual void Rotate(const Vector3d&, const TRANSFORM *);
+		virtual void Scale(const Vector3d&, const TRANSFORM *);
 		virtual void Transform(const TRANSFORM *);
+		virtual ObjectPtr Invert() = 0;
 		virtual void Compute_BBox();
-		virtual void Invert();
 
 		void Determine_Textures(Intersection *isect, bool hitinside, WeightedTextureVector& textures, TraceThreadData *Threaddata);
-		virtual CSG *Morph(void) = 0;
 };
 
 class CSGUnion : public CSG
@@ -85,8 +86,8 @@ class CSGUnion : public CSG
 		virtual ObjectPtr Copy();
 
 		virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
-		virtual bool Inside(const VECTOR, TraceThreadData *) const;
-		virtual CSG *Morph(void);
+		virtual bool Inside(const Vector3d&, TraceThreadData *) const;
+		virtual ObjectPtr Invert();
 };
 
 class CSGMerge : public CSGUnion
@@ -98,7 +99,6 @@ class CSGMerge : public CSGUnion
 		virtual ObjectPtr Copy();
 
 		virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
-		virtual CSG *Morph(void);
 };
 
 class CSGIntersection : public CSG
@@ -110,8 +110,8 @@ class CSGIntersection : public CSG
 		virtual ObjectPtr Copy();
 
 		virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
-		virtual bool Inside(const VECTOR, TraceThreadData *) const;
-		virtual CSG *Morph(void);
+		virtual bool Inside(const Vector3d&, TraceThreadData *) const;
+		virtual ObjectPtr Invert();
 
 		bool isDifference;
 };

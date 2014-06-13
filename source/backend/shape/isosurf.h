@@ -27,16 +27,17 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/shape/isosurf.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/shape/isosurf.h $
+ * $Revision: #27 $
+ * $Change: 6164 $
+ * $DateTime: 2013/12/09 17:21:04 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #ifndef ISOSURF_H
 #define ISOSURF_H
 
+#include "backend/scene/objects.h"
 #include "backend/parser/parse.h"
 
 namespace pov
@@ -70,8 +71,8 @@ struct ISO_ThreadData
 {
 	const IsoSurface *current;
 	FPUContext *ctx;
-	VECTOR Pglobal;
-	VECTOR Dglobal;
+	Vector3d Pglobal;
+	Vector3d Dglobal;
 	DBL Vlength;
 	DBL tl;
 	DBL fmax;
@@ -115,24 +116,23 @@ class IsoSurface : public ObjectBase
 		virtual ObjectPtr Copy();
 
 		virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
-		virtual bool Inside(const VECTOR, TraceThreadData *) const;
-		virtual void Normal(VECTOR, Intersection *, TraceThreadData *) const;
-		virtual void Translate(const VECTOR, const TRANSFORM *);
-		virtual void Rotate(const VECTOR, const TRANSFORM *);
-		virtual void Scale(const VECTOR, const TRANSFORM *);
+		virtual bool Inside(const Vector3d&, TraceThreadData *) const;
+		virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const;
+		virtual void Translate(const Vector3d&, const TRANSFORM *);
+		virtual void Rotate(const Vector3d&, const TRANSFORM *);
+		virtual void Scale(const Vector3d&, const TRANSFORM *);
 		virtual void Transform(const TRANSFORM *);
-		virtual void Invert();
 		virtual void Compute_BBox();
 
 		virtual void DispatchShutdownMessages(MessageFactory& messageFactory);
 
 	protected:
-		bool Function_Find_Root(ISO_ThreadData& itd, const VECTOR, const VECTOR, DBL*, DBL*, DBL& max_gradient, bool in_shadow_test);
+		bool Function_Find_Root(ISO_ThreadData& itd, const Vector3d&, const Vector3d&, DBL*, DBL*, DBL& max_gradient, bool in_shadow_test);
 		bool Function_Find_Root_R(ISO_ThreadData& itd, const ISO_Pair*, const ISO_Pair*, DBL, DBL, DBL, DBL& max_gradient);
 
-		inline DBL Vector_Function(FPUContext *ctx, const VECTOR VPos) const;
+		inline DBL Vector_Function(FPUContext *ctx, const Vector3d& VPos) const;
 		inline DBL Float_Function(ISO_ThreadData& itd, DBL t) const;
-		static inline DBL Evaluate_Function(FPUContext *ctx, FUNCTION funct, const VECTOR fnvec);
+		static inline DBL Evaluate_Function(FPUContext *ctx, FUNCTION funct, const Vector3d& fnvec);
 	private:
 		ISO_Max_Gradient *mginfo; // global, but just a statistic (read: not thread safe but we don't care) [trf]
 };

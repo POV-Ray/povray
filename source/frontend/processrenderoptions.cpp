@@ -113,6 +113,7 @@ struct ProcessOptions::INI_Parser_Table RenderOptions_INI_Table[] =
 	{ "Clockless_Animation", kPOVAttrib_ClocklessAnimation, kPOVMSType_Bool },
 	{ "Compression",         kPOVAttrib_Compression,        kPOVMSType_Int },
 	{ "Continue_Trace",      kPOVAttrib_ContinueTrace,      kPOVMSType_Bool },
+	{ "Create_Continue_Trace_Log", kPOVAttrib_BackupTrace,  kPOVMSType_Bool },
 	{ "Create_Histogram",    0,                             0 },
 	{ "Create_Ini",          kPOVAttrib_CreateIni,          kPOVMSType_UCS2String },
 	{ "Cyclic_Animation",    kPOVAttrib_CyclicAnimation,    kPOVMSType_Bool },
@@ -243,6 +244,7 @@ struct ProcessOptions::Cmd_Parser_Table RenderOptions_Cmd_Table[] =
 	{ "BS",  kPOVAttrib_RenderBlockSize,    kPOVMSType_Int,         kNoParameter },
 	{ "B",   kNoParameter,                  kNoParameter,           kPOVAttrib_Bounding },
 
+	{ "CC",  kNoParameter,                  kNoParameter,           kPOVAttrib_BackupTrace },
 	{ "C",   kNoParameter,                  kNoParameter,           kPOVAttrib_ContinueTrace },
 
 	{ "D",   kPOVAttrib_Display,            kUseSpecialHandler,     kPOVAttrib_Display },

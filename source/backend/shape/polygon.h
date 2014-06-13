@@ -24,15 +24,17 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/shape/polygon.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/shape/polygon.h $
+ * $Revision: #24 $
+ * $Change: 6164 $
+ * $DateTime: 2013/12/09 17:21:04 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #ifndef POLYGON_H
 #define POLYGON_H
+
+#include "backend/scene/objects.h"
 
 namespace pov
 {
@@ -55,13 +57,13 @@ struct Polygon_Data_Struct
 {
 	int References;
 	int Number;
-	UV_VECT *Points;
+	Vector2d *Points;
 };
 
-class Polygon : public ObjectBase
+class Polygon : public NonsolidObject
 {
 	public:
-		VECTOR S_Normal;
+		Vector3d S_Normal;
 		POLYGON_DATA *Data;
 
 		Polygon();
@@ -70,20 +72,19 @@ class Polygon : public ObjectBase
 		virtual ObjectPtr Copy();
 
 		virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
-		virtual bool Inside(const VECTOR, TraceThreadData *) const;
-		virtual void Normal(VECTOR, Intersection *, TraceThreadData *) const;
-		// virtual void UVCoord(UV_VECT, const Intersection *, TraceThreadData *) const; // TODO FIXME - does this use the default mapping? [trf]
-		virtual void Translate(const VECTOR, const TRANSFORM *);
-		virtual void Rotate(const VECTOR, const TRANSFORM *);
-		virtual void Scale(const VECTOR, const TRANSFORM *);
+		virtual bool Inside(const Vector3d&, TraceThreadData *) const;
+		virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const;
+		// virtual void UVCoord(Vector2d&, const Intersection *, TraceThreadData *) const; // TODO FIXME - does this use the default mapping? [trf]
+		virtual void Translate(const Vector3d&, const TRANSFORM *);
+		virtual void Rotate(const Vector3d&, const TRANSFORM *);
+		virtual void Scale(const Vector3d&, const TRANSFORM *);
 		virtual void Transform(const TRANSFORM *);
-		virtual void Invert();
 		virtual void Compute_BBox();
 
-		void Compute_Polygon(int number, VECTOR *points);
+		void Compute_Polygon(int number, Vector3d *points);
 	protected:
-		bool Intersect(const Ray& ray, DBL *Depth, TraceThreadData *Thread) const;
-		static bool in_polygon(int number, UV_VECT *points, DBL u, DBL  v);
+		bool Intersect(const BasicRay& ray, DBL *Depth, TraceThreadData *Thread) const;
+		static bool in_polygon(int number, Vector2d *points, DBL u, DBL  v);
 };
 
 }

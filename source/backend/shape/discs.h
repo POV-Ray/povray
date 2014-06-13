@@ -24,15 +24,17 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/shape/discs.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/shape/discs.h $
+ * $Revision: #21 $
+ * $Change: 6164 $
+ * $DateTime: 2013/12/09 17:21:04 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #ifndef DISCS_H
 #define DISCS_H
+
+#include "backend/scene/objects.h"
 
 namespace pov
 {
@@ -52,11 +54,11 @@ namespace pov
 class Disc : public ObjectBase
 {
 	public:
-		VECTOR center;    /* Center of the disc */
-		VECTOR normal;    /* Direction perpendicular to the disc (plane normal) */
-		DBL d;            /* The constant part of the plane equation */
-		DBL iradius2;     /* Distance from center to inner circle of the disc */
-		DBL oradius2;     /* Distance from center to outer circle of the disc */
+		Vector3d center;  ///< Center of the disc.
+		Vector3d normal;  ///< Direction perpendicular to the disc (plane normal).
+		DBL d;            ///< The constant part of the plane equation.
+		DBL iradius2;     ///< Distance from center to inner circle of the disc.
+		DBL oradius2;     ///< Distance from center to outer circle of the disc.
 
 		Disc();
 		virtual ~Disc();
@@ -64,19 +66,18 @@ class Disc : public ObjectBase
 		virtual ObjectPtr Copy();
 
 		virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
-		virtual bool Inside(const VECTOR, TraceThreadData *) const;
-		virtual void Normal(VECTOR, Intersection *, TraceThreadData *) const;
-		// virtual void UVCoord(UV_VECT, const Intersection *, TraceThreadData *) const; // TODO FIXME - why is there no UV-mapping for this object?
-		virtual void Translate(const VECTOR, const TRANSFORM *);
-		virtual void Rotate(const VECTOR, const TRANSFORM *);
-		virtual void Scale(const VECTOR, const TRANSFORM *);
+		virtual bool Inside(const Vector3d&, TraceThreadData *) const;
+		virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const;
+		// virtual void UVCoord(Vector2d&, const Intersection *, TraceThreadData *) const; // TODO FIXME - why is there no UV-mapping for this object?
+		virtual void Translate(const Vector3d&, const TRANSFORM *);
+		virtual void Rotate(const Vector3d&, const TRANSFORM *);
+		virtual void Scale(const Vector3d&, const TRANSFORM *);
 		virtual void Transform(const TRANSFORM *);
-		virtual void Invert();
 		virtual void Compute_BBox();
 
 		void Compute_Disc();
 	protected:
-		bool Intersect(const Ray& ray, DBL *Depth) const;
+		bool Intersect(const BasicRay& ray, DBL *Depth) const;
 };
 
 }

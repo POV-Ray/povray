@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/lighting/point.cpp $
- * $Revision: #28 $
- * $Change: 6113 $
- * $DateTime: 2013/11/20 20:39:54 $
+ * $Revision: #32 $
+ * $Change: 6164 $
+ * $DateTime: 2013/12/09 17:21:04 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -113,7 +113,7 @@ bool LightSource::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceTh
 *
 ******************************************************************************/
 
-bool LightSource::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
+bool LightSource::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 {
 	if(!children.empty())
 	{
@@ -152,7 +152,7 @@ bool LightSource::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
 *
 ******************************************************************************/
 
-void LightSource::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) const
+void LightSource::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread) const
 {
 	if(!children.empty())
 		children[0]->Normal(Result, Inter, Thread);
@@ -186,10 +186,10 @@ void LightSource::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Th
 *
 ******************************************************************************/
 
-void LightSource::Translate(const VECTOR Vector, const TRANSFORM *tr)
+void LightSource::Translate(const Vector3d& Vector, const TRANSFORM *tr)
 {
-	VAddEq(Center, Vector);
-	VAddEq(Points_At, Vector);
+	Center    += Vector;
+	Points_At += Vector;
 
 	if(!children.empty())
 		Translate_Object(children[0], Vector, tr);
@@ -226,7 +226,7 @@ void LightSource::Translate(const VECTOR Vector, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void LightSource::Rotate(const VECTOR, const TRANSFORM *tr)
+void LightSource::Rotate(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
@@ -259,7 +259,7 @@ void LightSource::Rotate(const VECTOR, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void LightSource::Scale(const VECTOR, const TRANSFORM *tr)
+void LightSource::Scale(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
@@ -305,10 +305,10 @@ void LightSource::Transform(const TRANSFORM *tr)
 
 	/* Make sure direction has unit length. */
 
-	VLength(len, Direction);
+	len = Direction.length();
 
 	if(len > EPSILON)
-		VInverseScaleEq(Direction, len);
+		Direction /= len;
 
 	if(!children.empty())
 		Transform_Object(children[0], tr);
@@ -318,40 +318,6 @@ void LightSource::Transform(const TRANSFORM *tr)
 }
 	
 	
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-*   Invert_Light_Source
-*
-* INPUT
-*   
-* OUTPUT
-*   
-* RETURNS
-*   
-* AUTHOR
-*
-*   POV-Ray Team
-*   
-* DESCRIPTION
-*
-*   -
-*
-* CHANGES
-*
-*   -
-*
-******************************************************************************/
-
-void LightSource::Invert()
-{
-	if(!children.empty())
-		Invert_Object(children[0]);
-}
-
 
 
 /*****************************************************************************
@@ -385,11 +351,11 @@ LightSource::LightSource() : CompoundObject(LIGHT_OBJECT)
 	Set_Flag(this, NO_SHADOW_FLAG);
 
 	colour = RGBColour(1.0);
-	Make_Vector(Direction, 0.0, 0.0, 0.0);
-	Make_Vector(Center,    0.0, 0.0, 0.0);
-	Make_Vector(Points_At, 0.0, 0.0, 1.0);
-	Make_Vector(Axis1,     0.0, 0.0, 1.0);
-	Make_Vector(Axis2,     0.0, 1.0, 0.0);
+	Direction = Vector3d(0.0, 0.0, 0.0);
+	Center    = Vector3d(0.0, 0.0, 0.0);
+	Points_At = Vector3d(0.0, 0.0, 1.0);
+	Axis1     = Vector3d(0.0, 0.0, 1.0);
+	Axis2     = Vector3d(0.0, 1.0, 0.0);
 
 	Coeff   = 0.0;
 	Radius  = 0.0;
@@ -398,7 +364,6 @@ LightSource::LightSource() : CompoundObject(LIGHT_OBJECT)
 	Fade_Distance = 0.0;
 	Fade_Power    = 0.0;
 
-// TODO  Shadow_Cached_Object = NULL;
 	Projected_Through_Object= NULL;
 	blend_map            = NULL;
 
@@ -419,9 +384,6 @@ LightSource::LightSource() : CompoundObject(LIGHT_OBJECT)
 
 	Media_Attenuation = false;
 	Media_Interaction = true;
-
-// TODO  for(i = 0; i < 6; i++)
-// TODO    Light_Buffer[i] = NULL;
 }
 
 
@@ -587,7 +549,7 @@ DBL Attenuate_Light (const LightSource *Light, const Ray &ray, DBL Distance)
 {
 	DBL len, k, costheta;
 	DBL Attenuation = 1.0;
-	VECTOR P, V1;
+	Vector3d P, V1;
 
 	/* If this is a spotlight then attenuate based on the incidence angle. */
 
@@ -595,7 +557,7 @@ DBL Attenuate_Light (const LightSource *Light, const Ray &ray, DBL Distance)
 	{
 		case SPOT_SOURCE:
 
-			VDot(costheta, ray.Direction, Light->Direction);
+			costheta = dot(ray.Direction, Light->Direction);
 
 			if(Distance>0.0) costheta = -costheta;
 
@@ -619,16 +581,16 @@ DBL Attenuate_Light (const LightSource *Light, const Ray &ray, DBL Distance)
 
 			// Project light->point onto light direction
 			// to make sure that we're on the correct side of the light
-			VSub(V1, ray.Origin, Light->Center);
-			VDot(k, V1, Light->Direction);
+			V1 = ray.Origin - Light->Center;
+			k = dot(V1, Light->Direction);
 
 			if (k > 0.0)
 			{
 				// Now subtract that from the light-direction.  This will
 				// give us a vector showing us the distance from the
 				// point to the center of the cylinder.
-				VLinComb2(P, 1.0, V1, -k, Light->Direction);
-				VLength(len, P);
+				P = V1 - k * Light->Direction;
+				len = P.length();
 
 				if (len < Light->Falloff)
 				{
@@ -693,7 +655,7 @@ DBL Attenuate_Light (const LightSource *Light, const Ray &ray, DBL Distance)
 *
 ******************************************************************************/
 
-void LightSource::UVCoord(UV_VECT Result, const Intersection *Inter, TraceThreadData *Thread) const
+void LightSource::UVCoord(Vector2d& Result, const Intersection *Inter, TraceThreadData *Thread) const
 {
 	if(!children.empty())
 		children[0]->UVCoord(Result, Inter, Thread);
