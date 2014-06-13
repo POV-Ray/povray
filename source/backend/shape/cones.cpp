@@ -26,11 +26,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/shape/cones.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/shape/cones.cpp $
+ * $Revision: #42 $
+ * $Change: 6164 $
+ * $DateTime: 2013/12/09 17:21:04 $
+ * $Author: clipka $
  *******************************************************************************/
 
 // frame.h must always be the first POV file included (pulls in platform config)
@@ -94,7 +94,7 @@ const int SIDE_HIT = 3;
 bool Cone::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread)
 {
 	int Intersection_Found, cnt, i;
-	VECTOR IPoint;
+	Vector3d IPoint;
 	CONE_INT I[4];
 
 	Intersection_Found = false;
@@ -103,7 +103,7 @@ bool Cone::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDat
 	{
 		for (i = 0; i < cnt; i++)
 		{
-			VEvaluateRay(IPoint, ray.Origin, I[i].d, ray.Direction);
+			IPoint = ray.Evaluate(I[i].d);
 
 			if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
 			{
@@ -144,12 +144,12 @@ bool Cone::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDat
 *
 ******************************************************************************/
 
-int Cone::Intersect(const Ray& ray, CONE_INT *Intersection, TraceThreadData *Thread) const
+int Cone::Intersect(const BasicRay& ray, CONE_INT *Intersection, TraceThreadData *Thread) const
 {
 	int i = 0;
 	DBL a, b, c, z, t1, t2, len;
 	DBL d;
-	VECTOR P, D;
+	Vector3d P, D;
 
 	Thread->Stats()[Ray_Cone_Tests]++;
 
@@ -158,8 +158,8 @@ int Cone::Intersect(const Ray& ray, CONE_INT *Intersection, TraceThreadData *Thr
 	MInvTransPoint(P, ray.Origin, Trans);
 	MInvTransDirection(D, ray.Direction, Trans);
 
-	VLength(len, D);
-	VInverseScaleEq(D, len);
+	len = D.length();
+	D /= len;
 
 	if (Test_Flag(this, CYLINDER_FLAG))
 	{
@@ -321,10 +321,10 @@ int Cone::Intersect(const Ray& ray, CONE_INT *Intersection, TraceThreadData *Thr
 *
 ******************************************************************************/
 
-bool Cone::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
+bool Cone::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 {
 	DBL w2, z2, offset = (Test_Flag(this, CLOSED_FLAG) ? -EPSILON : EPSILON);
-	VECTOR New_Point;
+	Vector3d New_Point;
 
 	/* Transform the point into the cones space */
 
@@ -396,7 +396,7 @@ bool Cone::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
 *
 ******************************************************************************/
 
-void Cone::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) const
+void Cone::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread) const
 {
 	/* Transform the point into the cones space */
 
@@ -421,13 +421,13 @@ void Cone::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) c
 
 		case BASE_HIT:
 
-			Make_Vector(Result, 0.0, 0.0, -1.0);
+			Result = Vector3d(0.0, 0.0, -1.0);
 
 			break;
 
 		case CAP_HIT:
 
-			Make_Vector(Result, 0.0, 0.0, 1.0);
+			Result = Vector3d(0.0, 0.0, 1.0);
 
 			break;
 	}
@@ -436,7 +436,7 @@ void Cone::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) c
 
 	MTransNormal(Result, Result, Trans);
 
-	VNormalize(Result, Result);
+	Result.normalize();
 }
 
 
@@ -467,7 +467,7 @@ void Cone::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) c
 *
 ******************************************************************************/
 
-void Cone::Translate(const VECTOR, const TRANSFORM *tr)
+void Cone::Translate(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
@@ -500,7 +500,7 @@ void Cone::Translate(const VECTOR, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void Cone::Rotate(const VECTOR, const TRANSFORM *tr)
+void Cone::Rotate(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
@@ -533,7 +533,7 @@ void Cone::Rotate(const VECTOR, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void Cone::Scale(const VECTOR, const TRANSFORM *tr)
+void Cone::Scale(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
@@ -579,39 +579,6 @@ void Cone::Transform(const TRANSFORM *tr)
 *
 * FUNCTION
 *
-*   Invert_Cone
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-*   Alexander Enzmann
-*
-* DESCRIPTION
-*
-*   -
-*
-* CHANGES
-*
-*   -
-*
-******************************************************************************/
-
-void Cone::Invert()
-{
-	Invert_Flag(this, INVERTED_FLAG);
-}
-
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
 *   Create_Cone
 *
 * INPUT
@@ -636,8 +603,8 @@ void Cone::Invert()
 
 Cone::Cone() : ObjectBase(CONE_OBJECT)
 {
-	Make_Vector(apex, 0.0, 0.0, 1.0);
-	Make_Vector(base, 0.0, 0.0, 0.0);
+	apex = Vector3d(0.0, 0.0, 1.0);
+	base = Vector3d(0.0, 0.0, 0.0);
 
 	apex_radius = 1.0;
 	base_radius = 0.0;
@@ -759,15 +726,15 @@ void Cone::Cylinder()
 void Cone::Compute_Cone_Data()
 {
 	DBL tlen, len, tmpf;
-	VECTOR tmpv, axis, origin;
+	Vector3d tmpv, axis, origin;
 
 	/* Process the primitive specific information */
 
 	/* Find the axis and axis length */
 
-	VSub(axis, apex, base);
+	axis = apex - base;
 
-	VLength(len, axis);
+	len = axis.length();
 
 	if (len < EPSILON)
 	{
@@ -775,7 +742,7 @@ void Cone::Compute_Cone_Data()
 	}
 	else
 	{
-		VInverseScaleEq(axis, len);
+		axis /= len;
 	}
 	/* we need to trap that case first */
 	if (fabs(apex_radius - base_radius) < EPSILON)
@@ -793,21 +760,19 @@ void Cone::Compute_Cone_Data()
 	{
 		/* Want the bigger end at the top */
 
-		Assign_Vector(tmpv,base);
-		Assign_Vector(base,apex);
-		Assign_Vector(apex,tmpv);
+		tmpv = base;
+		base = apex;
+		apex = tmpv;
 
 		tmpf = base_radius;
 		base_radius = apex_radius;
 		apex_radius = tmpf;
-		VScaleEq(axis, -1.0);
+		axis.invert();
 	}
 	/* apex & base are different, yet, it might looks like a cylinder */
 	tmpf = base_radius * len / (apex_radius - base_radius);
 
-	VScale(origin, axis, tmpf);
-
-	VSub(origin, base, origin);
+	origin = base - axis * tmpf;
 
 	tlen = tmpf + len;
 	/* apex is always bigger here */
@@ -862,11 +827,11 @@ void Cone::Compute_Cone_Data()
 void Cone::Compute_Cylinder_Data()
 {
 	DBL tmpf;
-	VECTOR axis;
+	Vector3d axis;
 
-	VSub(axis, apex, base);
+	axis = apex - base;
 
-	VLength(tmpf, axis);
+	tmpf = axis.length();
 
 	if (tmpf < EPSILON)
 	{
@@ -874,7 +839,7 @@ void Cone::Compute_Cylinder_Data()
 	}
 	else
 	{
-		VInverseScaleEq(axis, tmpf);
+		axis /= tmpf;
 
 		Compute_Coordinate_Transform(Trans, base, axis, apex_radius, tmpf);
 	}

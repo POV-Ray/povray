@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/lighting/radiosity.cpp $
- * $Revision: #62 $
- * $Change: 6113 $
- * $DateTime: 2013/11/20 20:39:54 $
+ * $Revision: #65 $
+ * $Change: 6162 $
+ * $DateTime: 2013/12/07 19:55:09 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -359,7 +359,7 @@ void RadiosityFunction::AfterTile()
 	cacheBlockPool = NULL;
 }
 
-void RadiosityFunction::ComputeAmbient(const Vector3d& ipoint, const Vector3d& raw_normal, const Vector3d& layer_normal, RGBColour& ambient_colour, DBL weight, Trace::TraceTicket& ticket)
+void RadiosityFunction::ComputeAmbient(const Vector3d& ipoint, const Vector3d& raw_normal, const Vector3d& layer_normal, RGBColour& ambient_colour, DBL weight, TraceTicket& ticket)
 {
 	DBL temp_error_bound = errorBound;
 	const RecursionParameters& param = recursionParameters[ticket.radiosityRecursionDepth];
@@ -437,7 +437,7 @@ void RadiosityFunction::ComputeAmbient(const Vector3d& ipoint, const Vector3d& r
 }
 
 // returns true if radiosity can be traced, false otherwise (that is, if the radiosity max trace level was already reached)
-bool RadiosityFunction::CheckRadiosityTraceLevel(const Trace::TraceTicket& ticket)
+bool RadiosityFunction::CheckRadiosityTraceLevel(const TraceTicket& ticket)
 {
 	return (ticket.radiosityRecursionDepth < settings.recursionLimit);
 }
@@ -482,7 +482,7 @@ bool RadiosityFunction::CheckRadiosityTraceLevel(const Trace::TraceTicket& ticke
 *
 ******************************************************************************/
 
-double RadiosityFunction::GatherLight(const Vector3d& ipoint, const Vector3d& raw_normal, const Vector3d& layer_normal, RGBColour& illuminance, Trace::TraceTicket& ticket)
+double RadiosityFunction::GatherLight(const Vector3d& ipoint, const Vector3d& raw_normal, const Vector3d& layer_normal, RGBColour& illuminance, TraceTicket& ticket)
 {
 	unsigned int cur_sample_count;
 
@@ -499,7 +499,7 @@ double RadiosityFunction::GatherLight(const Vector3d& ipoint, const Vector3d& ra
 	RecursionParameters& param = recursionParameters[ticket.radiosityRecursionDepth];
 	const RadiosityRecursionSettings& recSettings = recursionSettings[ticket.radiosityRecursionDepth];
 
-	DBL to_eye = Vector3d(this->cameraPosition - ipoint).length();
+	DBL to_eye = (this->cameraPosition - ipoint).length();
 	DBL reuse_dist_min      = to_eye * recSettings.minReuseFactor;
 	DBL maximum_distance    = to_eye * recSettings.maxReuseFactor;
 	if (recSettings.maxReuseFactor >= HUGE_VAL)
@@ -551,13 +551,13 @@ double RadiosityFunction::GatherLight(const Vector3d& ipoint, const Vector3d& ra
 		okCount ++;
 		if (use_raw_normal) okCountRaw ++;
 		ticket.radiosityQuality = 1.0;
-		Ray nray(*ipoint, *direction, Ray::OtherRay, false, false, true); // Build a ray pointing in the chosen direction
+		Ray nray(ticket, ipoint, direction, Ray::OtherRay, false, false, true); // Build a ray pointing in the chosen direction
 		ticket.radiosityRecursionDepth++;
 		ticket.radiosityImportanceQueried = (float)i / (float)(cur_sample_count-1);
 		bool alphaBackground = ticket.alphaBackground;
 		ticket.alphaBackground = false;
 		Colour temp_full_colour;
-		DBL depth = trace.TraceRay(nray, temp_full_colour, weight, ticket, false); // Go down in recursion, trace the result, and come back up
+		DBL depth = trace.TraceRay(nray, temp_full_colour, weight, false); // Go down in recursion, trace the result, and come back up
 		RGBColour temp_colour = RGBColour(temp_full_colour);
 		ticket.radiosityRecursionDepth--;
 		ticket.alphaBackground = alphaBackground;

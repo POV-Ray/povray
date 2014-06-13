@@ -24,11 +24,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/math/matrices.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/math/matrices.cpp $
+ * $Revision: #21 $
+ * $Change: 6147 $
+ * $DateTime: 2013/11/29 20:46:11 $
+ * $Author: clipka $
  *******************************************************************************/
 
 // frame.h must always be the first POV file included (pulls in platform config)
@@ -403,7 +403,7 @@ void MTranspose (MATRIX result, const MATRIX matrix1)
 *
 ******************************************************************************/
 
-void MTransPoint (VECTOR result, const VECTOR vector, const TRANSFORM *transform)
+void MTransPoint (Vector3d& result, const Vector3d& vector, const TRANSFORM *transform)
 {
 	register int i;
 	DBL answer_array[4];
@@ -449,7 +449,7 @@ void MTransPoint (VECTOR result, const VECTOR vector, const TRANSFORM *transform
 *
 ******************************************************************************/
 
-void MInvTransPoint (VECTOR result, const VECTOR vector, const TRANSFORM *transform)
+void MInvTransPoint (Vector3d& result, const Vector3d& vector, const TRANSFORM *transform)
 {
 	register int i;
 	DBL answer_array[4];
@@ -495,7 +495,7 @@ void MInvTransPoint (VECTOR result, const VECTOR vector, const TRANSFORM *transf
 *
 ******************************************************************************/
 
-void MTransDirection (VECTOR result, const VECTOR vector, const TRANSFORM *transform)
+void MTransDirection (Vector3d& result, const Vector3d& vector, const TRANSFORM *transform)
 {
 	register int i;
 	DBL answer_array[4];
@@ -541,7 +541,7 @@ void MTransDirection (VECTOR result, const VECTOR vector, const TRANSFORM *trans
 *
 ******************************************************************************/
 
-void MInvTransDirection (VECTOR result, const VECTOR vector, const TRANSFORM*transform)
+void MInvTransDirection (Vector3d& result, const Vector3d& vector, const TRANSFORM*transform)
 {
 	register int i;
 	DBL answer_array[4];
@@ -587,7 +587,7 @@ void MInvTransDirection (VECTOR result, const VECTOR vector, const TRANSFORM*tra
 *
 ******************************************************************************/
 
-void MTransNormal (VECTOR result, const VECTOR vector, const TRANSFORM*transform)
+void MTransNormal (Vector3d& result, const Vector3d& vector, const TRANSFORM*transform)
 {
 	register int i;
 	DBL answer_array[3];
@@ -633,7 +633,7 @@ void MTransNormal (VECTOR result, const VECTOR vector, const TRANSFORM*transform
 *
 ******************************************************************************/
 
-void MInvTransNormal (VECTOR result, const VECTOR vector, const TRANSFORM*transform)
+void MInvTransNormal (Vector3d& result, const Vector3d& vector, const TRANSFORM*transform)
 {
 	register int i;
 	DBL answer_array[3];
@@ -679,7 +679,7 @@ void MInvTransNormal (VECTOR result, const VECTOR vector, const TRANSFORM*transf
 *
 ******************************************************************************/
 
-void Compute_Scaling_Transform (TRANSFORM *result, const VECTOR vector)
+void Compute_Scaling_Transform (TRANSFORM *result, const Vector3d& vector)
 {
 	MIdentity (result->matrix);
 
@@ -788,7 +788,7 @@ void Compute_Inversion_Transform (TRANSFORM *result)
 *
 ******************************************************************************/
 
-void Compute_Translation_Transform (TRANSFORM *transform, const VECTOR vector)
+void Compute_Translation_Transform (TRANSFORM *transform, const Vector3d& vector)
 {
 	MIdentity (transform->matrix);
 
@@ -829,13 +829,13 @@ void Compute_Translation_Transform (TRANSFORM *transform, const VECTOR vector)
 *
 ******************************************************************************/
 
-void Compute_Rotation_Transform (TRANSFORM *transform, const VECTOR vector)
+void Compute_Rotation_Transform (TRANSFORM *transform, const Vector3d& vector)
 {
 	register DBL cosx, cosy, cosz, sinx, siny, sinz;
 	MATRIX Matrix;
-	VECTOR Radian_Vector;
+	Vector3d Radian_Vector;
 
-	VScale (Radian_Vector, vector, M_PI_180);
+	Radian_Vector = vector * M_PI_180;
 
 	MIdentity (transform->matrix);
 
@@ -884,7 +884,7 @@ void Compute_Rotation_Transform (TRANSFORM *transform, const VECTOR vector)
 
 /* AAC - This is not used so it's commented out...
 
-void Compute_Look_At_Transform (TRANSFORM *result, VECTOR Look_At, VECTOR Up, VECTOR Right)
+void Compute_Look_At_Transform (TRANSFORM *result, Vector3d& Look_At, Vector3d& Up, Vector3d& Right)
 {
 	MIdentity (result->inverse);
 
@@ -969,12 +969,12 @@ void Compose_Transforms (TRANSFORM *Original_Transform, const TRANSFORM *Additio
 *
 ******************************************************************************/
 
-void Compute_Axis_Rotation_Transform (TRANSFORM *transform, const VECTOR AxisVect, DBL angle)
+void Compute_Axis_Rotation_Transform (TRANSFORM *transform, const Vector3d& AxisVect, DBL angle)
 {
 	DBL cosx, sinx;
-	VECTOR V1;
+	Vector3d V1;
 
-	VNormalize(V1, AxisVect);
+	V1 = AxisVect.normalized();
 
 	MIdentity(transform->matrix);
 
@@ -1024,23 +1024,23 @@ void Compute_Axis_Rotation_Transform (TRANSFORM *transform, const VECTOR AxisVec
 *
 ******************************************************************************/
 
-void Compute_Coordinate_Transform(TRANSFORM *trans, const VECTOR origin, VECTOR up, DBL radius, DBL length)
+void Compute_Coordinate_Transform(TRANSFORM *trans, const Vector3d& origin, Vector3d& up, DBL radius, DBL length)
 {
 	TRANSFORM trans2;
-	VECTOR tmpv;
+	Vector3d tmpv;
 
-	Make_Vector(tmpv, radius, radius, length);
+	tmpv = Vector3d(radius, radius, length);
 
 	Compute_Scaling_Transform(trans, tmpv);
 
 	if (fabs(up[Z]) > 1.0 - EPSILON)
 	{
-		Make_Vector(tmpv, 1.0, 0.0, 0.0);
+		tmpv = Vector3d(1.0, 0.0, 0.0);
 		up[Z] = up[Z] < 0.0 ? -1.0 : 1.0;
 	}
 	else
 	{
-		Make_Vector(tmpv, -up[Y], up[X], 0.0);
+		tmpv = Vector3d(-up[Y], up[X], 0.0);
 	}
 
 	Compute_Axis_Rotation_Transform(&trans2, tmpv, acos(up[Z]));
@@ -1190,43 +1190,6 @@ void Destroy_Transform (TRANSFORM *Trans)
 *
 ******************************************************************************/
 
-VECTOR *Create_Vector ()
-{
-	VECTOR *New;
-
-	New = reinterpret_cast<VECTOR *>(POV_MALLOC(sizeof (VECTOR), "vector"));
-
-	Make_Vector (*New, 0.0, 0.0, 0.0);
-
-	return (New);
-}
-
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*   
-* OUTPUT
-*   
-* RETURNS
-*   
-* AUTHOR
-*
-*   POV-Ray Team
-*   
-* DESCRIPTION
-*
-*   -
-*
-* CHANGES
-*
-*   -
-*
-******************************************************************************/
-
 DBL *Create_Float ()
 {
 	DBL *New_Float;
@@ -1265,7 +1228,7 @@ DBL *Create_Float ()
 *   -
 *
 ******************************************************************************/
-int MInvers3(const VECTOR inM[3], VECTOR  outM[3])
+int MInvers3(const Matrix3x3& inM, Matrix3x3& outM)
 {
 	DBL det;
 
@@ -1295,9 +1258,9 @@ int MInvers3(const VECTOR inM[3], VECTOR  outM[3])
 
 	det = 1.0 / det;
 
-	VScaleEq(outM[0], det);
-	VScaleEq(outM[1], det);
-	VScaleEq(outM[2], det);
+	outM[0] *= det;
+	outM[1] *= det;
+	outM[2] *= det;
 
 	return (1);
 }
@@ -1385,18 +1348,6 @@ void MInvers(MATRIX r, const MATRIX  m)
 	r[3][0] = -d03/D; r[3][1] =  d13/D;  r[3][2] = -d23/D; r[3][3] =  d33/D;
 }
 
-UV_VECT *Create_UV_Vect ()
-{
-	UV_VECT *New;
-
-	New = reinterpret_cast<UV_VECT *>(POV_MALLOC(sizeof (UV_VECT), "uv vector"));
-
-	(*New)[0]= 0.0;
-	(*New)[1]= 0.0;
-
-	return (New);
-}
-
 VECTOR_4D *Create_Vector_4D ()
 {
 	VECTOR_4D *New;
@@ -1409,111 +1360,6 @@ VECTOR_4D *Create_Vector_4D ()
 	(*New)[3]= 0.0;
 
 	return (New);
-}
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-*   MTransUVPoint
-*
-* INPUT
-*
-*   p - point to tranform
-*   m - 3x3 matrix
-*   
-* OUTPUT
-*
-*   t
-*   
-* RETURNS
-*   
-* AUTHOR
-*
-*   Michael Hough
-*   
-* DESCRIPTION
-*
-* CHANGES
-*
-*   June 2000 : Creation.
-*
-******************************************************************************/
-
-void MTransUVPoint(const DBL p[2], const DBL m[3][3], DBL t[2])
-{
-	DBL w;
-
-	t[0] = p[0]*m[0][0] + p[1]*m[1][0] + m[2][0];
-	t[1] = p[0]*m[0][1] + p[1]*m[1][1] + m[2][1];
-
-	w = p[0]*m[0][2] + p[1]*m[1][2] + m[2][2];
-
-	t[0] /= w;
-	t[1] /= w;
-}
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-*   MSquare_To_Quad
-*
-* INPUT
-*
-*   st - four texture coordinates
-*   
-* OUTPUT
-*
-*   sq - 3x3 matrix
-*   
-* RETURNS
-*   
-* AUTHOR
-*
-*   Michael Hough
-* 
-* DESCRIPTION
-*
-*   Find the forward mapping matrix - unit square -> general quadrilateral
-*
-*   formula from: "Fundamentals of Texture Mapping and Image Warping", Paul Heckbert
-*
-* CHANGES
-*
-*   June 2000 : Creation.
-*
-******************************************************************************/
-
-void MSquareQuad(const UV_VECT st[4], DBL sq[3][3])
-{
-	DBL sx, sy, dx1, dx2, dy1, dy2, det;
-
-	dx1 = st[1][0] - st[2][0];
-	dx2 = st[3][0] - st[2][0];
-	dy1 = st[1][1] - st[2][1];
-	dy2 = st[3][1] - st[2][1];
-
-	sx = st[0][0] - st[1][0] + st[2][0] - st[3][0];
-	sy = st[0][1] - st[1][1] + st[2][1] - st[3][1];
-
-	det = Det(dx1, dx2, dy1, dy2);
-
-	if(det == 0.0)
-	{
-		throw POV_EXCEPTION_STRING("Equal uv-vectors detected, division by zero!");
-	}
-
-	sq[0][2] = Det(sx, dx2, sy, dy2)/det;
-	sq[1][2] = Det(dx1, sx, dy1, sy)/det;
-	sq[2][2] = 1;
-	sq[0][0] = st[1][0] - st[0][0] + sq[0][2]*st[1][0];
-	sq[1][0] = st[3][0] - st[0][0] + sq[1][2]*st[3][0];
-	sq[2][0] = st[0][0];
-	sq[0][1] = st[1][1] - st[0][1] + sq[0][2]*st[1][1];
-	sq[1][1] = st[3][1] - st[0][1] + sq[1][2]*st[3][1];
-	sq[2][1] = st[0][1];
 }
 
 }

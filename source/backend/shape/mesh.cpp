@@ -26,11 +26,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/shape/mesh.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/shape/mesh.cpp $
+ * $Revision: #51 $
+ * $Change: 6164 $
+ * $DateTime: 2013/12/09 17:21:04 $
+ * $Author: clipka $
  *******************************************************************************/
 
 /****************************************************************************
@@ -164,22 +164,21 @@ bool Mesh::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDat
 *
 ******************************************************************************/
 
-bool Mesh::Intersect(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread)
+bool Mesh::Intersect(const BasicRay& ray, IStack& Depth_Stack, TraceThreadData *Thread)
 {
-	int i;
+	MeshIndex i;
 	bool found;
 	DBL len, t;
-	Ray New_Ray;
+	BasicRay New_Ray;
 
 	/* Transform the ray into mesh space. */
 
 	if (Trans != NULL)
 	{
-		MInvTransPoint(New_Ray.Origin, ray.Origin, Trans);
-		MInvTransDirection(New_Ray.Direction, ray.Direction, Trans);
+		MInvTransRay(New_Ray, ray, Trans);
 
-		VLength(len, New_Ray.Direction);
-		VInverseScaleEq(New_Ray.Direction, len);
+		len = New_Ray.Direction.length();
+		New_Ray.Direction /= len;
 	}
 	else
 	{
@@ -246,45 +245,26 @@ bool Mesh::Intersect(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Threa
 *
 ******************************************************************************/
 
-bool Mesh::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
+bool Mesh::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 {
-	int inside, i;
-	unsigned found;
-	DBL len, t;
-	Ray ray, New_Ray;
+	bool inside;
+	MeshIndex i;
+	unsigned int found;
+	DBL t;
+	BasicRay ray;
 
 	if (has_inside_vector==false)
 		return false;
 
-	/* shoot a ray in the chosen direction from this point */
-//	if( (fabs(Data->Inside_Vect[X]) < EPSILON) &&
-//	    (fabs(Data->Inside_Vect[Y]) < EPSILON) &&
-//	    (fabs(Data->Inside_Vect[Z]) < EPSILON))
-//	{
-//		/* if no inside_vect , use X... maybe we should quit */
-//		/* return(false); */
-//
-//		Make_Vector(Ray.Direction, 0, 0, 1);
-//	}
-//	else
-
-	Assign_Vector(ray.Direction, Data->Inside_Vect);
-
-	Assign_Vector(ray.Origin, IPoint);
+	ray.Direction = Data->Inside_Vect;
+	ray.Origin = IPoint;
 
 	/* Transform the ray into mesh space. */
 	if (Trans != NULL)
 	{
-		MInvTransPoint(New_Ray.Origin, ray.Origin, Trans);
-		MInvTransDirection(New_Ray.Direction, ray.Direction, Trans);
+		MInvTransRay(ray, ray, Trans);
 
-		VLength(len, New_Ray.Direction);
-		VInverseScaleEq(New_Ray.Direction, len);
-	}
-	else
-	{
-		New_Ray = ray;
-		len = 1.0;
+		ray.Direction.normalize();
 	}
 
 	found = 0;
@@ -294,7 +274,7 @@ bool Mesh::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
 		/* just step through all elements. */
 		for (i = 0; i < Data->Number_Of_Triangles; i++)
 		{
-			if (intersect_mesh_triangle(New_Ray, &Data->Triangles[i], &t))
+			if (intersect_mesh_triangle(ray, &Data->Triangles[i], &t))
 			{
 				/* actually, this should push onto a local depth stack and
 				   make sure that we don't have the same intersection point from
@@ -303,12 +283,12 @@ bool Mesh::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
 			}
 		}
 		/* odd number = inside, even number = outside */
-		inside = found & 1;
+		inside = ((found & 1) != 0);
 	}
 	else
 	{
 		/* Use the mesh's bounding hierarchy. */
-		inside = inside_bbox_tree(New_Ray, Thread);
+		inside = inside_bbox_tree(ray, Thread);
 	}
 
 	if (Test_Flag(this, INVERTED_FLAG))
@@ -347,9 +327,9 @@ bool Mesh::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
 *
 ******************************************************************************/
 
-void Mesh::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) const
+void Mesh::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread) const
 {
-	VECTOR IPoint;
+	Vector3d IPoint;
 	const MESH_TRIANGLE *Triangle;
 
 	Triangle = reinterpret_cast<const MESH_TRIANGLE *>(Inter->Pointer);
@@ -362,7 +342,7 @@ void Mesh::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) c
 		}
 		else
 		{
-			Assign_Vector(IPoint, Inter->IPoint);
+			IPoint = Inter->IPoint;
 		}
 
 		Smooth_Mesh_Normal(Result, Triangle, IPoint);
@@ -372,17 +352,17 @@ void Mesh::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) c
 			MTransNormal(Result, Result, Trans);
 		}
 
-		VNormalize(Result, Result);
+		Result.normalize();
 	}
 	else
 	{
-		Assign_Vector(Result, Data->Normals[Triangle->Normal_Ind]);
+		Result = Vector3d(Data->Normals[Triangle->Normal_Ind]);
 
 		if (Trans != NULL)
 		{
 			MTransNormal(Result, Result, Trans);
 
-			VNormalize(Result, Result);
+			Result.normalize();
 		}
 	}
 }
@@ -415,22 +395,22 @@ void Mesh::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) c
 *
 ******************************************************************************/
 
-void Mesh::Smooth_Mesh_Normal(VECTOR Result, const MESH_TRIANGLE *Triangle, const VECTOR IPoint) const
+void Mesh::Smooth_Mesh_Normal(Vector3d& Result, const MESH_TRIANGLE *Triangle, const Vector3d& IPoint) const
 {
 	int axis;
 	DBL u, v;
 	DBL k1, k2, k3;
-	VECTOR PIMinusP1, N1, N2, N3;
+	Vector3d PIMinusP1, N1, N2, N3;
 
 	get_triangle_normals(Triangle, N1, N2, N3);
 
-	VSub(PIMinusP1, IPoint, Data->Vertices[Triangle->P1]);
+	PIMinusP1 = IPoint - Vector3d(Data->Vertices[Triangle->P1]);
 
-	VDot(u, PIMinusP1, Triangle->Perp);
+	u = dot(PIMinusP1, Vector3d(Triangle->Perp));
 
 	if (u < EPSILON)
 	{
-		Assign_Vector(Result, N1);
+		Result = N1;
 	}
 	else
 	{
@@ -442,9 +422,7 @@ void Mesh::Smooth_Mesh_Normal(VECTOR Result, const MESH_TRIANGLE *Triangle, cons
 
 		v = (PIMinusP1[axis] / u + k1 - k2) / (k3 - k2);
 
-		Result[X] = N1[X] + u * (N2[X] - N1[X] + v * (N3[X] - N2[X]));
-		Result[Y] = N1[Y] + u * (N2[Y] - N1[Y] + v * (N3[Y] - N2[Y]));
-		Result[Z] = N1[Z] + u * (N2[Z] - N1[Z] + v * (N3[Z] - N2[Z]));
+		Result = N1 + u * (N2 - N1 + v * (N3 - N2));
 	}
 }
 
@@ -476,7 +454,7 @@ void Mesh::Smooth_Mesh_Normal(VECTOR Result, const MESH_TRIANGLE *Triangle, cons
 *
 ******************************************************************************/
 
-void Mesh::Translate(const VECTOR, const TRANSFORM *tr)
+void Mesh::Translate(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
@@ -509,7 +487,7 @@ void Mesh::Translate(const VECTOR, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void Mesh::Rotate(const VECTOR, const TRANSFORM *tr)
+void Mesh::Rotate(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
@@ -542,7 +520,7 @@ void Mesh::Rotate(const VECTOR, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void Mesh::Scale(const VECTOR, const TRANSFORM *tr)
+void Mesh::Scale(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
@@ -577,7 +555,7 @@ void Mesh::Scale(const VECTOR, const TRANSFORM *tr)
 
 void Mesh::Transform(const TRANSFORM *tr)
 {
-	int i;
+	MeshIndex i;
 
 	if (Trans == NULL)
 	{
@@ -592,39 +570,6 @@ void Mesh::Transform(const TRANSFORM *tr)
 	if (!Test_Flag(this, UV_FLAG))
 		for (i=0; i<Number_Of_Textures; i++)
 			Transform_Textures(Textures[i], tr);
-}
-
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-*   Invert_Mesh
-*
-* INPUT
-*   
-* OUTPUT
-*   
-* RETURNS
-*   
-* AUTHOR
-*
-*   Dieter Bayer
-*   
-* DESCRIPTION
-*
-*   -
-*
-* CHANGES
-*
-*   Feb 1995 : Creation.
-*
-******************************************************************************/
-
-void Mesh::Invert()
-{
-	Invert_Flag(this, INVERTED_FLAG);
 }
 
 
@@ -705,7 +650,7 @@ Mesh::Mesh() : ObjectBase(MESH_OBJECT)
 ObjectPtr Mesh::Copy()
 {
 	Mesh *New = new Mesh();
-	int i;
+	MeshIndex i;
 
 	Destroy_Transform(New->Trans);
 	*New = *this;
@@ -755,7 +700,7 @@ ObjectPtr Mesh::Copy()
 
 Mesh::~Mesh()
 {
-	int i;
+	MeshIndex i;
 
 	Destroy_Transform(Trans);
 
@@ -834,24 +779,19 @@ Mesh::~Mesh()
 
 void Mesh::Compute_BBox()
 {
-	int i;
-	VECTOR P1, P2, P3;
-	VECTOR mins, maxs;
+	MeshIndex i;
+	Vector3d P1, P2, P3;
+	Vector3d mins, maxs;
 
-	Make_Vector(mins, BOUND_HUGE, BOUND_HUGE, BOUND_HUGE);
-	Make_Vector(maxs, -BOUND_HUGE, -BOUND_HUGE, -BOUND_HUGE);
+	mins = Vector3d(BOUND_HUGE);
+	maxs = Vector3d(-BOUND_HUGE);
 
 	for (i = 0; i < Data->Number_Of_Triangles; i++)
 	{
 		get_triangle_vertices(&Data->Triangles[i], P1, P2, P3);
 
-		mins[X] = min(mins[X], min3(P1[X], P2[X], P3[X]));
-		mins[Y] = min(mins[Y], min3(P1[Y], P2[Y], P3[Y]));
-		mins[Z] = min(mins[Z], min3(P1[Z], P2[Z], P3[Z]));
-
-		maxs[X] = max(maxs[X], max3(P1[X], P2[X], P3[X]));
-		maxs[Y] = max(maxs[Y], max3(P1[Y], P2[Y], P3[Y]));
-		maxs[Z] = max(maxs[Z], max3(P1[Z], P2[Z], P3[Z]));
+		mins = min(mins, P1, P2, P3);
+		maxs = max(maxs, P1, P2, P3);
 	}
 
 	Make_BBox_from_min_max(BBox, mins, maxs);
@@ -885,19 +825,20 @@ void Mesh::Compute_BBox()
 *
 ******************************************************************************/
 
-bool Mesh::Compute_Mesh_Triangle(MESH_TRIANGLE *Triangle, int Smooth, VECTOR P1, VECTOR  P2, VECTOR  P3, VECTOR  S_Normal)
+bool Mesh::Compute_Mesh_Triangle(MESH_TRIANGLE *Triangle, bool Smooth, Vector3d& P1, Vector3d& P2, Vector3d& P3, Vector3d& S_Normal)
 {
-	int temp, swap;
+	MeshIndex temp;
+	bool swap;
 	DBL x, y, z;
-	VECTOR V1, V2, T1;
+	Vector3d V1, V2, T1;
 	DBL Length;
 
-	VSub(V1, P2, P1);
-	VSub(V2, P3, P1);
+	V1 = P2 - P1;
+	V2 = P3 - P1;
 
-	VCross(S_Normal, V2, V1);
+	S_Normal = cross(V2, V1);
 
-	VLength(Length, S_Normal);
+	Length = S_Normal.length();
 
 	/* Set up a flag so we can ignore degenerate triangles */
 
@@ -908,9 +849,9 @@ bool Mesh::Compute_Mesh_Triangle(MESH_TRIANGLE *Triangle, int Smooth, VECTOR P1,
 
 	/* Normalize the normal vector. */
 
-	VInverseScaleEq(S_Normal, Length);
+	S_Normal /= Length;
 
-	VDot(Triangle->Distance, S_Normal, P1);
+	Triangle->Distance = dot(S_Normal, P1);
 
 	Triangle->Distance *= -1.0;
 
@@ -972,9 +913,9 @@ bool Mesh::Compute_Mesh_Triangle(MESH_TRIANGLE *Triangle, int Smooth, VECTOR P1,
 			Triangle->Texture = temp;
 		}
 
-		Assign_Vector(T1, P1);
-		Assign_Vector(P1, P2);
-		Assign_Vector(P2, T1);
+		T1 = P1;
+		P1 = P2;
+		P2 = T1;
 
 		if (Smooth)
 		{
@@ -1023,12 +964,12 @@ bool Mesh::Compute_Mesh_Triangle(MESH_TRIANGLE *Triangle, int Smooth, VECTOR P1,
 *
 ******************************************************************************/
 
-void Mesh::compute_smooth_triangle(MESH_TRIANGLE *Triangle, const VECTOR P1, const VECTOR P2, const VECTOR P3)
+void Mesh::compute_smooth_triangle(MESH_TRIANGLE *Triangle, const Vector3d& P1, const Vector3d& P2, const Vector3d& P3)
 {
-	VECTOR P3MinusP2, VTemp1, VTemp2;
+	Vector3d P3MinusP2, VTemp1, VTemp2;
 	DBL x, y, z, uDenominator, Proj;
 
-	VSub(P3MinusP2, P3, P2);
+	P3MinusP2 = P3 - P2;
 
 	x = fabs(P3MinusP2[X]);
 	y = fabs(P3MinusP2[Y]);
@@ -1036,23 +977,19 @@ void Mesh::compute_smooth_triangle(MESH_TRIANGLE *Triangle, const VECTOR P1, con
 
 	Triangle->vAxis = max3_coordinate(x, y, z);
 
-	VSub(VTemp1, P2, P3);
+	VTemp1 = (P2 - P3).normalized();
 
-	VNormalize(VTemp1, VTemp1);
+	VTemp2 = P1 - P3;
 
-	VSub(VTemp2, P1, P3);
+	Proj = dot(VTemp2, VTemp1);
 
-	VDot(Proj, VTemp2, VTemp1);
+	VTemp1 *= Proj;
 
-	VScaleEq(VTemp1, Proj);
+	Triangle->Perp = MeshVector((VTemp1 - VTemp2).normalized());
 
-	VSub(Triangle->Perp, VTemp1, VTemp2);
+	uDenominator = -dot(VTemp2, Vector3d(Triangle->Perp));
 
-	VNormalize(Triangle->Perp, Triangle->Perp);
-
-	VDot(uDenominator, VTemp2, Triangle->Perp);
-
-	VInverseScaleEq(Triangle->Perp, -uDenominator);
+	Triangle->Perp /= uDenominator;
 }
 
 
@@ -1083,22 +1020,22 @@ void Mesh::compute_smooth_triangle(MESH_TRIANGLE *Triangle, const VECTOR P1, con
 *
 ******************************************************************************/
 
-bool Mesh::intersect_mesh_triangle(const Ray &ray, const MESH_TRIANGLE *Triangle, DBL *Depth) const
+bool Mesh::intersect_mesh_triangle(const BasicRay &ray, const MESH_TRIANGLE *Triangle, DBL *Depth) const
 {
 	DBL NormalDotOrigin, NormalDotDirection;
 	DBL s, t;
-	VECTOR P1, P2, P3, S_Normal;
+	Vector3d P1, P2, P3, S_Normal;
 
-	Assign_Vector(S_Normal, Data->Normals[Triangle->Normal_Ind]);
+	S_Normal = Vector3d(Data->Normals[Triangle->Normal_Ind]);
 
-	VDot(NormalDotDirection, S_Normal, ray.Direction);
+	NormalDotDirection = dot(S_Normal, ray.Direction);
 
 	if (fabs(NormalDotDirection) < EPSILON)
 	{
 		return(false);
 	}
 
-	VDot(NormalDotOrigin, S_Normal, ray.Origin);
+	NormalDotOrigin = dot(S_Normal, ray.Origin);
 
 	*Depth = -(Triangle->Distance + NormalDotOrigin) / NormalDotDirection;
 
@@ -1191,16 +1128,18 @@ bool Mesh::intersect_mesh_triangle(const Ray &ray, const MESH_TRIANGLE *Triangle
 const DBL BARY_VAL1 = -0.00001;
 const DBL BARY_VAL2 =  1.00001;
 
-void Mesh::MeshUV(const VECTOR P, const MESH_TRIANGLE *Triangle, UV_VECT Result) const
+void Mesh::MeshUV(const Vector3d& P, const MESH_TRIANGLE *Triangle, Vector2d& Result) const
 {
 	DBL a, b, r;
-	VECTOR Q, B[3], IB[3], P1, P2, P3;
-	UV_VECT UV1, UV2, UV3;
+	Vector3d Q;
+	Matrix3x3 B, IB;
+	Vector3d P1, P2, P3;
+	Vector2d UV1, UV2, UV3;
 
 	get_triangle_vertices(Triangle, P1, P2, P3);
-	VSub(B[0], P2, P1);
-		VSub(B[1], P3, P1);
-		Assign_Vector(B[2], Data->Normals[Triangle->Normal_Ind]);
+	B[0] = P2 - P1;
+	B[1] = P3 - P1;
+	B[2] = Vector3d(Data->Normals[Triangle->Normal_Ind]);
 
 	if (!MInvers3(B, IB)) {
 		// Failed to invert - that means this is a degenerate triangle
@@ -1209,9 +1148,9 @@ void Mesh::MeshUV(const VECTOR P, const MESH_TRIANGLE *Triangle, UV_VECT Result)
 		return;
 	}
 
-	VSub(Q, P, P1);
-	VDot(a, Q, IB[0]);
-	VDot(b, Q, IB[1]);
+	Q = P - P1;
+	a = dot(Q, IB[0]);
+	b = dot(Q, IB[1]);
 
 	if (a < BARY_VAL1 || b < BARY_VAL1 || a + b > BARY_VAL2)
 	{
@@ -1228,12 +1167,8 @@ void Mesh::MeshUV(const VECTOR P, const MESH_TRIANGLE *Triangle, UV_VECT Result)
 	r = 1.0f - a - b;
 
 	get_triangle_uvcoords(Triangle, UV1, UV2, UV3);
-	VScale(Q, UV1, r);
-	VAddScaledEq(Q, a, UV2);
-	VAddScaledEq(Q, b, UV3);
 
-	Result[U] = Q[U];
-	Result[V] = Q[V];
+	Result = r * UV1 + a * UV2 + b * UV3;
 }
 
 
@@ -1263,22 +1198,22 @@ void Mesh::MeshUV(const VECTOR P, const MESH_TRIANGLE *Triangle, UV_VECT Result)
 *
 ******************************************************************************/
 
-bool Mesh::test_hit(const MESH_TRIANGLE *Triangle, const Ray &OrigRay, DBL Depth, DBL len, IStack& Depth_Stack, TraceThreadData *Thread)
+bool Mesh::test_hit(const MESH_TRIANGLE *Triangle, const BasicRay &OrigRay, DBL Depth, DBL len, IStack& Depth_Stack, TraceThreadData *Thread)
 {
-	VECTOR IPoint;
+	Vector3d IPoint;
 	DBL world_dist = Depth / len;
 
-	VEvaluateRay(IPoint, OrigRay.Origin, world_dist, OrigRay.Direction);
+	IPoint = OrigRay.Evaluate(world_dist);
 
 	if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
 	{
 		/*
 		don't bother calling MeshUV because we reclaculate it later (if needed) anyway
-		UV_VECT uv;
-		VECTOR P; // Object coordinates of intersection
-		VEvaluateRay(P, ray.Origin, Depth, ray.Direction);
+		Vector2d uv;
+		Vector3d P; // Object coordinates of intersection
+		P = ray.Evaluate(Depth);
 
-		MeshUV(P, Triangle, Mesh, uv);  
+		MeshUV(P, Triangle, Mesh, uv);
 
 		push_entry_pointer_uv(world_dist, IPoint, uv, Object, Triangle, Depth_Stack);
 		*/
@@ -1343,7 +1278,7 @@ void Mesh::Init_Mesh_Triangle(MESH_TRIANGLE *Triangle)
 	Triangle->UV2 =
 	Triangle->UV3 = -1;
 
-	Make_Vector(Triangle->Perp, 0.0, 0.0, 0.0);
+	Triangle->Perp = MeshVector(0.0, 0.0, 0.0);
 
 	Triangle->Distance = 0.0;
 }
@@ -1380,20 +1315,15 @@ void Mesh::Init_Mesh_Triangle(MESH_TRIANGLE *Triangle)
 *
 ******************************************************************************/
 
-void Mesh::get_triangle_bbox(const MESH_TRIANGLE *Triangle, BBOX *BBox) const
+void Mesh::get_triangle_bbox(const MESH_TRIANGLE *Triangle, BoundingBox *BBox) const
 {
-	VECTOR P1, P2, P3;
-	VECTOR Min, Max;
+	Vector3d P1, P2, P3;
+	Vector3d Min, Max;
 
 	get_triangle_vertices(Triangle, P1, P2, P3);
 
-	Min[X] = min3(P1[X], P2[X], P3[X]);
-	Min[Y] = min3(P1[Y], P2[Y], P3[Y]);
-	Min[Z] = min3(P1[Z], P2[Z], P3[Z]);
-
-	Max[X] = max3(P1[X], P2[X], P3[X]);
-	Max[Y] = max3(P1[Y], P2[Y], P3[Y]);
-	Max[Z] = max3(P1[Z], P2[Z], P3[Z]);
+	Min = min(P1, P2, P3);
+	Max = max(P1, P2, P3);
 
 	Make_BBox_from_min_max(*BBox, Min, Max);
 }
@@ -1428,7 +1358,7 @@ void Mesh::get_triangle_bbox(const MESH_TRIANGLE *Triangle, BBOX *BBox) const
 
 void Mesh::Build_Mesh_BBox_Tree()
 {
-	int i, nElem, maxelements;
+	MeshIndex i, nElem, maxelements;
 	BBOX_TREE **Triangles;
 
 	if (!Test_Flag(this, HIERARCHY_FLAG))
@@ -1436,7 +1366,7 @@ void Mesh::Build_Mesh_BBox_Tree()
 		return;
 	}
 
-	nElem = (int)Data->Number_Of_Triangles;
+	nElem = Data->Number_Of_Triangles;
 
 	maxelements = 2 * nElem;
 
@@ -1486,7 +1416,7 @@ void Mesh::Build_Mesh_BBox_Tree()
 *   
 * RETURNS
 *
-*   int - true if an intersection was found
+*   bool - true if an intersection was found
 *   
 * AUTHOR
 *
@@ -1502,13 +1432,13 @@ void Mesh::Build_Mesh_BBox_Tree()
 *
 ******************************************************************************/
 
-bool Mesh::intersect_bbox_tree(const Ray &ray, const Ray &Orig_Ray, DBL len, IStack& Depth_Stack, TraceThreadData *Thread)
+bool Mesh::intersect_bbox_tree(const BasicRay &ray, const BasicRay &Orig_Ray, DBL len, IStack& Depth_Stack, TraceThreadData *Thread)
 {
 	bool found;
-	int i;
+	MeshIndex i;
 	DBL Best, Depth;
 	const BBOX_TREE *Node, *Root;
-	short OldStyle= has_inside_vector;
+	bool OldStyle = has_inside_vector;
 
 	/* Create the direction vectors for this ray. */
 	Rayinfo rayinfo(ray);
@@ -1601,7 +1531,7 @@ bool Mesh::intersect_bbox_tree(const Ray &ray, const Ray &Orig_Ray, DBL len, ISt
 *   
 * RETURNS
 *
-*   int - Index of normal/vertex into the normals/vertices list
+*   MeshIndex - Index of normal/vertex into the normals/vertices list
 *   
 * AUTHOR
 *
@@ -1618,23 +1548,24 @@ bool Mesh::intersect_bbox_tree(const Ray &ray, const Ray &Orig_Ray, DBL len, ISt
 *
 ******************************************************************************/
 
-int Mesh::mesh_hash(HASH_TABLE **Hash_Table, int *Number, int  *Max, SNGL_VECT **Elements, const VECTOR aPoint)
+MeshIndex Mesh::mesh_hash(HASH_TABLE **Hash_Table, MeshIndex *Number, MeshIndex  *Max, MeshVector **Elements, const Vector3d& aPoint)
 {
 	int hash;
-	SNGL_VECT D, P;
+	MeshVector D, P;
 	HASH_TABLE *p;
 
-	Assign_Vector(P, aPoint);
+	P = MeshVector(aPoint);
 
 	/* Get hash value. */
 
-	hash = (unsigned)((int)(326.0*P[X])^(int)(694.7*P[Y])^(int)(1423.6*P[Z])) % HASH_SIZE;
+	// TODO - This is inefficient for very small meshes. Maybe scale by 2^N (or 2^-N) into the range 1.0..2.0 first.
+	hash = (unsigned int)((int)(326.0*P[X])^(int)(694.7*P[Y])^(int)(1423.6*P[Z])) % HASH_SIZE;
 
 	/* Try to find normal/vertex. */
 
 	for (p = Hash_Table[hash]; p != NULL; p = p->Next)
 	{
-		VSub(D, p->P, P);
+		D = p->P - P;
 
 		if ((fabs(D[X]) < EPSILON) && (fabs(D[Y]) < EPSILON) && (fabs(D[Z]) < EPSILON))
 		{
@@ -1651,21 +1582,21 @@ int Mesh::mesh_hash(HASH_TABLE **Hash_Table, int *Number, int  *Max, SNGL_VECT *
 
 	if ((*Number) >= (*Max))
 	{
-		if ((*Max) >= INT_MAX/2)
+		if ((*Max) >= numeric_limits<MeshIndex>::max()/2)
 		{
 			throw POV_EXCEPTION_STRING("Too many normals/vertices in mesh.");
 		}
 
 		(*Max) *= 2;
 
-		(*Elements) = reinterpret_cast<SNGL_VECT *>(POV_REALLOC((*Elements), (*Max)*sizeof(SNGL_VECT), "mesh data"));
+		(*Elements) = reinterpret_cast<MeshVector *>(POV_REALLOC((*Elements), (*Max)*sizeof(MeshVector), "mesh data"));
 	}
 
-	Assign_Vector((*Elements)[*Number], P);
+	(*Elements)[*Number] = P;
 
 	p = reinterpret_cast<HASH_TABLE *>(POV_MALLOC(sizeof(HASH_TABLE), "mesh data"));
 
-	Assign_Vector(p->P, P);
+	p->P = P;
 
 	p->Index = *Number;
 
@@ -1696,7 +1627,7 @@ int Mesh::mesh_hash(HASH_TABLE **Hash_Table, int *Number, int  *Max, SNGL_VECT *
 *   
 * RETURNS
 *
-*   int - Index of vertex into the vertices list
+*   MeshIndex - Index of vertex into the vertices list
 *   
 * AUTHOR
 *
@@ -1713,7 +1644,7 @@ int Mesh::mesh_hash(HASH_TABLE **Hash_Table, int *Number, int  *Max, SNGL_VECT *
 *
 ******************************************************************************/
 
-int Mesh::Mesh_Hash_Vertex(int *Number_Of_Vertices, int  *Max_Vertices, SNGL_VECT **Vertices, const VECTOR Vertex)
+MeshIndex Mesh::Mesh_Hash_Vertex(MeshIndex *Number_Of_Vertices, MeshIndex *Max_Vertices, MeshVector **Vertices, const Vector3d& Vertex)
 {
 	return(mesh_hash(Vertex_Hash_Table, Number_Of_Vertices, Max_Vertices, Vertices, Vertex));
 }
@@ -1738,7 +1669,7 @@ int Mesh::Mesh_Hash_Vertex(int *Number_Of_Vertices, int  *Max_Vertices, SNGL_VEC
 *   
 * RETURNS
 *
-*   int - Index of normal into the normals list
+*   MeshIndex - Index of normal into the normals list
 *   
 * AUTHOR
 *
@@ -1755,7 +1686,7 @@ int Mesh::Mesh_Hash_Vertex(int *Number_Of_Vertices, int  *Max_Vertices, SNGL_VEC
 *
 ******************************************************************************/
 
-int Mesh::Mesh_Hash_Normal(int *Number_Of_Normals, int  *Max_Normals, SNGL_VECT **Normals, const VECTOR S_Normal)
+MeshIndex Mesh::Mesh_Hash_Normal(MeshIndex *Number_Of_Normals, MeshIndex *Max_Normals, MeshVector **Normals, const Vector3d& S_Normal)
 {
 	return(mesh_hash(Normal_Hash_Table, Number_Of_Normals, Max_Normals, Normals, S_Normal));
 }
@@ -1780,7 +1711,7 @@ int Mesh::Mesh_Hash_Normal(int *Number_Of_Normals, int  *Max_Normals, SNGL_VECT 
 *   
 * RETURNS
 *
-*   int - Index of texture into the texture list
+*   MeshIndex - Index of texture into the texture list
 *   
 * AUTHOR
 *
@@ -1797,9 +1728,9 @@ int Mesh::Mesh_Hash_Normal(int *Number_Of_Normals, int  *Max_Normals, SNGL_VECT 
 *
 ******************************************************************************/
 
-int Mesh::Mesh_Hash_Texture(int *Number_Of_Textures, int *Max_Textures, TEXTURE ***Textures, TEXTURE *Texture)
+MeshIndex Mesh::Mesh_Hash_Texture(MeshIndex *Number_Of_Textures, MeshIndex *Max_Textures, TEXTURE ***Textures, TEXTURE *Texture)
 {
-	int i;
+	MeshIndex i;
 
 	if (Texture == NULL)
 	{
@@ -1820,7 +1751,7 @@ int Mesh::Mesh_Hash_Texture(int *Number_Of_Textures, int *Max_Textures, TEXTURE 
 	{
 		if ((*Number_Of_Textures) >= (*Max_Textures))
 		{
-			if ((*Max_Textures) >= INT_MAX/2)
+			if ((*Max_Textures) >= numeric_limits<MeshIndex>::max()/2)
 			{
 				throw POV_EXCEPTION_STRING("Too many textures in mesh.");
 			}
@@ -1855,7 +1786,7 @@ int Mesh::Mesh_Hash_Texture(int *Number_Of_Textures, int *Max_Textures, TEXTURE 
 *
 * RETURNS
 *
-*   int - Index of UV vector into the UV vector list
+*   MeshIndex - Index of UV vector into the UV vector list
 *
 * AUTHOR
 *
@@ -1870,25 +1801,25 @@ int Mesh::Mesh_Hash_Texture(int *Number_Of_Textures, int *Max_Textures, TEXTURE 
 *
 ******************************************************************************/
 
-int Mesh::Mesh_Hash_UV(int *Number, int *Max, UV_VECT **Elements, const UV_VECT aPoint)
+MeshIndex Mesh::Mesh_Hash_UV(MeshIndex *Number, MeshIndex *Max, MeshUVVector **Elements, const Vector2d& aPoint)
 {
 	int hash;
-	UV_VECT D, P;
+	MeshUVVector D, P;
 	UV_HASH_TABLE *p;
 
-	Assign_UV_Vect(P, aPoint);
+	P = MeshUVVector(aPoint);
 
 	/* Get hash value. */
 
-	hash = (unsigned)((int)(326.0*P[U])^(int)(694.7*P[V])) % HASH_SIZE;
+	// TODO - This is inefficient for very small meshes. Maybe scale by 2^N (or 2^-N) into the range 1.0..2.0 first.
+	hash = (unsigned int)((int)(326.0*P[U])^(int)(694.7*P[V])) % HASH_SIZE;
 
 	/* Try to find normal/vertex. */
 
 	for (p = UV_Hash_Table[hash]; p != NULL; p = p->Next)
 	{
 		/* VSub(D, p->P, P); */
-		D[U] = p->P[U] - P[U];
-		D[V] = p->P[V] - P[V];
+		D = p->P - P;
 
 		if ((fabs(D[U]) < EPSILON) && (fabs(D[V]) < EPSILON))
 		{
@@ -1905,21 +1836,21 @@ int Mesh::Mesh_Hash_UV(int *Number, int *Max, UV_VECT **Elements, const UV_VECT 
 
 	if ((*Number) >= (*Max))
 	{
-		if ((*Max) >= INT_MAX/2)
+		if ((*Max) >= numeric_limits<MeshIndex>::max()/2)
 		{
 			throw POV_EXCEPTION_STRING("Too many normals/vertices in mesh.");
 		}
 
 		(*Max) *= 2;
 
-		(*Elements) = reinterpret_cast<UV_VECT *>(POV_REALLOC((*Elements), (*Max)*sizeof(UV_VECT), "mesh data"));
+		(*Elements) = reinterpret_cast<MeshUVVector *>(POV_REALLOC((*Elements), (*Max)*sizeof(MeshUVVector), "mesh data"));
 	}
 
-	Assign_UV_Vect((*Elements)[*Number], P);
+	(*Elements)[*Number] = P;
 
 	p = reinterpret_cast<UV_HASH_TABLE *>(POV_MALLOC(sizeof(UV_HASH_TABLE), "mesh data"));
 
-	Assign_UV_Vect(p->P, P);
+	p->P = P;
 
 	p->Index = *Number;
 
@@ -1960,7 +1891,7 @@ int Mesh::Mesh_Hash_UV(int *Number, int *Max, UV_VECT **Elements, const UV_VECT 
 
 void Mesh::Create_Mesh_Hash_Tables()
 {
-	int i;
+	MeshIndex i;
 
 	Vertex_Hash_Table = reinterpret_cast<HASH_TABLE **>(POV_MALLOC(HASH_SIZE*sizeof(HASH_TABLE *), "mesh hash table"));
 
@@ -2016,7 +1947,7 @@ void Mesh::Create_Mesh_Hash_Tables()
 
 void Mesh::Destroy_Mesh_Hash_Tables()
 {
-	int i;
+	MeshIndex i;
 	HASH_TABLE *Temp;
 	/* NK 1998 */
 	UV_HASH_TABLE *UVTemp;
@@ -2100,11 +2031,11 @@ void Mesh::Destroy_Mesh_Hash_Tables()
 *
 ******************************************************************************/
 
-void Mesh::get_triangle_vertices(const MESH_TRIANGLE *Triangle, VECTOR P1, VECTOR P2, VECTOR P3) const
+void Mesh::get_triangle_vertices(const MESH_TRIANGLE *Triangle, Vector3d& P1, Vector3d& P2, Vector3d& P3) const
 {
-	Assign_Vector(P1, Data->Vertices[Triangle->P1]);
-	Assign_Vector(P2, Data->Vertices[Triangle->P2]);
-	Assign_Vector(P3, Data->Vertices[Triangle->P3]);
+	P1 = Vector3d(Data->Vertices[Triangle->P1]);
+	P2 = Vector3d(Data->Vertices[Triangle->P2]);
+	P3 = Vector3d(Data->Vertices[Triangle->P3]);
 }
 
 
@@ -2140,11 +2071,11 @@ void Mesh::get_triangle_vertices(const MESH_TRIANGLE *Triangle, VECTOR P1, VECTO
 *
 ******************************************************************************/
 
-void Mesh::get_triangle_normals(const MESH_TRIANGLE *Triangle, VECTOR N1, VECTOR N2, VECTOR N3) const
+void Mesh::get_triangle_normals(const MESH_TRIANGLE *Triangle, Vector3d& N1, Vector3d& N2, Vector3d& N3) const
 {
-	Assign_Vector(N1, Data->Normals[Triangle->N1]);
-	Assign_Vector(N2, Data->Normals[Triangle->N2]);
-	Assign_Vector(N3, Data->Normals[Triangle->N3]);
+	N1 = Vector3d(Data->Normals[Triangle->N1]);
+	N2 = Vector3d(Data->Normals[Triangle->N2]);
+	N3 = Vector3d(Data->Normals[Triangle->N3]);
 }
 
 
@@ -2177,11 +2108,11 @@ void Mesh::get_triangle_normals(const MESH_TRIANGLE *Triangle, VECTOR N1, VECTOR
 *
 ******************************************************************************/
 
-void Mesh::get_triangle_uvcoords(const MESH_TRIANGLE *Triangle, UV_VECT UV1, UV_VECT UV2, UV_VECT UV3) const
+void Mesh::get_triangle_uvcoords(const MESH_TRIANGLE *Triangle, Vector2d& UV1, Vector2d& UV2, Vector2d& UV3) const
 {
-	Assign_UV_Vect(UV1, Data->UVCoords[Triangle->UV1]);
-	Assign_UV_Vect(UV2, Data->UVCoords[Triangle->UV2]);
-	Assign_UV_Vect(UV3, Data->UVCoords[Triangle->UV3]);
+	UV1 = Vector2d(Data->UVCoords[Triangle->UV1]);
+	UV2 = Vector2d(Data->UVCoords[Triangle->UV2]);
+	UV3 = Vector2d(Data->UVCoords[Triangle->UV3]);
 }
 
 
@@ -2199,7 +2130,7 @@ void Mesh::get_triangle_uvcoords(const MESH_TRIANGLE *Triangle, UV_VECT UV1, UV_
 *   
 * RETURNS
 *
-*   int - true if degenerate
+*   bool - true if degenerate
 *   
 * AUTHOR
 *
@@ -2215,17 +2146,17 @@ void Mesh::get_triangle_uvcoords(const MESH_TRIANGLE *Triangle, UV_VECT UV1, UV_
 *
 ******************************************************************************/
 
-bool Mesh::Degenerate(const VECTOR P1, const VECTOR  P2, const VECTOR  P3)
+bool Mesh::Degenerate(const Vector3d& P1, const Vector3d& P2, const Vector3d& P3)
 {
-	VECTOR V1, V2, Temp;
+	Vector3d V1, V2, Temp;
 	DBL Length;
 
-	VSub(V1, P1, P2);
-	VSub(V2, P3, P2);
+	V1 = P1 - P2;
+	V2 = P3 - P2;
 
-	VCross(Temp, V1, V2);
+	Temp = cross(V1, V2);
 
-	VLength(Length, Temp);
+	Length = Temp.length();
 
 	return(Length == 0.0);
 }
@@ -2264,7 +2195,7 @@ bool Mesh::Degenerate(const VECTOR P1, const VECTOR  P2, const VECTOR  P3)
 
 void Mesh::Test_Mesh_Opacity()
 {
-	int i;
+	MeshIndex i;
 
 	/* Initialize opacity flag to the opacity of the object's texture. */
 
@@ -2314,88 +2245,82 @@ void Mesh::Test_Mesh_Opacity()
 *
 ******************************************************************************/
 
-void Mesh::UVCoord(VECTOR Result, const Intersection *Inter, TraceThreadData *) const
+void Mesh::UVCoord(Vector2d& Result, const Intersection *Inter, TraceThreadData *) const
 {
 	DBL w1, w2, w3, t1, t2;
-	VECTOR vA, vB;
-	VECTOR Side1, Side2;
+	Vector3d vA, vB;
+	Vector3d Side1, Side2;
 	const MESH_TRIANGLE *Triangle;
-	VECTOR P;
+	Vector3d P;
 
 	if (Trans != NULL)
 		MInvTransPoint(P, Inter->IPoint, Trans);
 	else
-		Assign_Vector(P, Inter->IPoint);
+		P = Inter->IPoint;
 
 	Triangle = reinterpret_cast<const MESH_TRIANGLE *>(Inter->Pointer);
 
 	/* ---------------- this is for P1 ---------------- */
 	/* Side1 is opposite side, Side2 is an adjacent side (vector pointing away) */
-	VSub(Side1, Data->Vertices[Triangle->P3], Data->Vertices[Triangle->P2]);
-	VSub(Side2, Data->Vertices[Triangle->P3], Data->Vertices[Triangle->P1]);
+	Side1 = Vector3d(Data->Vertices[Triangle->P3] - Data->Vertices[Triangle->P2]);
+	Side2 = Vector3d(Data->Vertices[Triangle->P3] - Data->Vertices[Triangle->P1]);
 
 	/* find A */
 	/* A is a vector from this vertex to the intersection point */
-	VSub(vA, P, Data->Vertices[Triangle->P1]);
+	vA = P - Vector3d(Data->Vertices[Triangle->P1]);
 
 	/* find B */
 	/* B is a vector from this intersection to the opposite side (Side1) */
 	/*    which is the exact length to get to the side                   */
 	/* to do this we split Side2 into two components, but only keep the  */
 	/*    one that's perp to Side2                                       */
-	VDot(t1, Side2, Side1);
-	VDot(t2, Side1, Side1);
-	VScale(vB, Side1, t1/t2);
-	VSubEq(vB, Side2);
+	t1 = dot(Side2, Side1);
+	t2 = dot(Side1, Side1);
+	vB = Side1 * (t1/t2) - Side2;
 
 	/* finding the weight is the scale part of a projection of A onto B */
-	VDot(t1, vA, vB);
-	VDot(t2, vB, vB);
+	t1 = dot(vA, vB);
+	t2 = dot(vB, vB);
 	/* w1 = 1-fabs(t1/t2); */
 	w1 = 1+t1/t2;
 
 	/* ---------------- this is for P2 ---------------- */
-	VSub(Side1, Data->Vertices[Triangle->P3], Data->Vertices[Triangle->P1]);
-	VSub(Side2, Data->Vertices[Triangle->P3], Data->Vertices[Triangle->P2]);
+	Side1 = Vector3d(Data->Vertices[Triangle->P3] - Data->Vertices[Triangle->P1]);
+	Side2 = Vector3d(Data->Vertices[Triangle->P3] - Data->Vertices[Triangle->P2]);
 
 	/* find A */
-	VSub(vA, P, Data->Vertices[Triangle->P2]);
+	vA = P - Vector3d(Data->Vertices[Triangle->P2]);
 
 	/* find B */
-	VDot(t1, Side2, Side1);
-	VDot(t2, Side1, Side1);
-	VScale(vB, Side1, t1/t2);
-	VSubEq(vB, Side2);
+	t1 = dot(Side2, Side1);
+	t2 = dot(Side1, Side1);
+	vB = Side1 * (t1/t2) - Side2;
 
-	VDot(t1, vA, vB);
-	VDot(t2, vB, vB);
+	t1 = dot(vA, vB);
+	t2 = dot(vB, vB);
 	/* w2 = 1-fabs(t1/t2); */
 	w2 = 1+t1/t2;
 
 	/* ---------------- this is for P3 ---------------- */
-	VSub(Side1, Data->Vertices[Triangle->P2], Data->Vertices[Triangle->P1]);
-	VSub(Side2, Data->Vertices[Triangle->P2], Data->Vertices[Triangle->P3]);
+	Side1 = Vector3d(Data->Vertices[Triangle->P2] - Data->Vertices[Triangle->P1]);
+	Side2 = Vector3d(Data->Vertices[Triangle->P2] - Data->Vertices[Triangle->P3]);
 
 	/* find A */
-	VSub(vA, P, Data->Vertices[Triangle->P3]);
+	vA = P - Vector3d(Data->Vertices[Triangle->P3]);
 
 	/* find B */
-	VDot(t1, Side2, Side1);
-	VDot(t2, Side1, Side1);
-	VScale(vB, Side1, t1/t2);
-	VSubEq(vB, Side2);
+	t1 = dot(Side2, Side1);
+	t2 = dot(Side1, Side1);
+	vB = Side1 * (t1/t2) - Side2;
 
-	VDot(t1, vA, vB);
-	VDot(t2, vB, vB);
+	t1 = dot(vA, vB);
+	t2 = dot(vB, vB);
 	/* w3 = 1-fabs(t1/t2); */
 	w3 = 1+t1/t2;
 
-	Result[U] =  w1 * Data->UVCoords[Triangle->UV1][U] +
-	             w2 * Data->UVCoords[Triangle->UV2][U] +
-	             w3 * Data->UVCoords[Triangle->UV3][U];
-	Result[V] =  w1 * Data->UVCoords[Triangle->UV1][V] +
-	             w2 * Data->UVCoords[Triangle->UV2][V] +
-	             w3 * Data->UVCoords[Triangle->UV3][V];
+	Result =  w1 * Vector2d(Data->UVCoords[Triangle->UV1]) +
+	          w2 * Vector2d(Data->UVCoords[Triangle->UV2]) +
+	          w3 * Vector2d(Data->UVCoords[Triangle->UV3]);
 }
 
 
@@ -2414,7 +2339,7 @@ void Mesh::UVCoord(VECTOR Result, const Intersection *Inter, TraceThreadData *) 
 *
 * RETURNS
 *
-*   int - true if inside the object
+*   bool - true if inside the object
 *   
 * AUTHOR
 *
@@ -2430,9 +2355,9 @@ void Mesh::UVCoord(VECTOR Result, const Intersection *Inter, TraceThreadData *) 
 *
 ******************************************************************************/
 
-bool Mesh::inside_bbox_tree(const Ray &ray, TraceThreadData *Thread) const
+bool Mesh::inside_bbox_tree(const BasicRay &ray, TraceThreadData *Thread) const
 {
-	int i, found;
+	MeshIndex i, found;
 	DBL Best, Depth;
 	const BBOX_TREE *Node, *Root;
 
@@ -2493,19 +2418,19 @@ void Mesh::Determine_Textures(Intersection *isect, bool hitinside, WeightedTextu
 		textures.push_back(WeightedTexture(1.0, Interior_Texture));
 	else if(tri->ThreeTex)
 	{
-		VECTOR p1, p2, p3;
-		VECTOR epoint;
+		Vector3d p1, p2, p3;
+		Vector3d epoint;
 		COLC w1, w2, w3;
 		COLC wsum;
 
 		if(Trans != NULL)
 			MInvTransPoint(epoint, isect->IPoint, Trans);
 		else
-			Assign_Vector(epoint, isect->IPoint);
+			epoint = isect->IPoint;
 
-		Assign_Vector(p1, Data->Vertices[tri->P1]);
-		Assign_Vector(p2, Data->Vertices[tri->P2]);
-		Assign_Vector(p3, Data->Vertices[tri->P3]);
+		p1 = Vector3d(Data->Vertices[tri->P1]);
+		p2 = Vector3d(Data->Vertices[tri->P2]);
+		p3 = Vector3d(Data->Vertices[tri->P3]);
 
 		w1 = 1.0 - COLC(SmoothTriangle::Calculate_Smooth_T(epoint, p1, p2, p3));
 		w2 = 1.0 - COLC(SmoothTriangle::Calculate_Smooth_T(epoint, p2, p3, p1));

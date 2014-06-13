@@ -27,16 +27,17 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/shape/fpmetric.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/shape/fpmetric.h $
+ * $Revision: #22 $
+ * $Change: 6164 $
+ * $DateTime: 2013/12/09 17:21:04 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #ifndef FPMETRIC_H
 #define FPMETRIC_H
 
+#include "backend/scene/objects.h"
 #include "backend/parser/parse.h"
 
 namespace pov
@@ -63,7 +64,7 @@ struct PrecompParValues_Struct
 	DBL *Low[3], *Hi[3];     /*  X,Y,Z  */
 };
 
-class Parametric : public ObjectBase
+class Parametric : public NonsolidObject
 {
 	public:
 		FunctionVM *vm;
@@ -71,7 +72,6 @@ class Parametric : public ObjectBase
 		DBL umin, umax, vmin, vmax;
 		DBL accuracy;
 		DBL max_gradient;
-		int Inverted;
 
 		int container_shape;
 		union
@@ -94,14 +94,13 @@ class Parametric : public ObjectBase
 		virtual ObjectPtr Copy();
 
 		virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
-		virtual bool Inside(const VECTOR, TraceThreadData *) const;
-		virtual void Normal(VECTOR, Intersection *, TraceThreadData *) const;
-		virtual void UVCoord(UV_VECT, const Intersection *, TraceThreadData *) const;
-		virtual void Translate(const VECTOR, const TRANSFORM *);
-		virtual void Rotate(const VECTOR, const TRANSFORM *);
-		virtual void Scale(const VECTOR, const TRANSFORM *);
+		virtual bool Inside(const Vector3d&, TraceThreadData *) const;
+		virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const;
+		virtual void UVCoord(Vector2d&, const Intersection *, TraceThreadData *) const;
+		virtual void Translate(const Vector3d&, const TRANSFORM *);
+		virtual void Rotate(const Vector3d&, const TRANSFORM *);
+		virtual void Scale(const Vector3d&, const TRANSFORM *);
 		virtual void Transform(const TRANSFORM *);
-		virtual void Invert();
 		virtual void Compute_BBox();
 
 		void Precompute_Parametric_Values(char flags, int depth, FPUContext *ctx);
@@ -110,8 +109,8 @@ class Parametric : public ObjectBase
 		PRECOMP_PAR_DATA *Copy_PrecompParVal();
 		void Destroy_PrecompParVal();
 
-		static inline DBL Evaluate_Function_UV(FPUContext *ctx, FUNCTION funct, const UV_VECT fnvec);
-		static inline void Evaluate_Function_Interval_UV(FPUContext *ctx, FUNCTION funct, DBL threshold, const UV_VECT fnvec_low, const UV_VECT fnvec_hi, DBL max_gradient, DBL& low, DBL& hi);
+		static inline DBL Evaluate_Function_UV(FPUContext *ctx, FUNCTION funct, const Vector2d& fnvec);
+		static inline void Evaluate_Function_Interval_UV(FPUContext *ctx, FUNCTION funct, DBL threshold, const Vector2d& fnvec_low, const Vector2d& fnvec_hi, DBL max_gradient, DBL& low, DBL& hi);
 		static void Interval(DBL dx, DBL a, DBL b, DBL max_gradient, DBL *Min, DBL *Max);
 	private:
 		PRECOMP_PAR_DATA *PData;

@@ -27,11 +27,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/math/quatern.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/math/quatern.cpp $
+ * $Revision: #23 $
+ * $Change: 6161 $
+ * $DateTime: 2013/12/05 18:42:17 $
+ * $Author: clipka $
  *******************************************************************************/
 
 // frame.h must always be the first POV file included (pulls in platform config)
@@ -114,7 +114,7 @@ namespace pov
 *
 ******************************************************************************/
 
-int Iteration_z3(const VECTOR point, const Fractal *Julia, DBL **IterStack)
+bool Z3FractalRules::Iterate(const Vector3d& point, const Fractal *Julia, DBL **IterStack) const
 {
 	int i;
 	DBL x, y, z, w;
@@ -125,9 +125,9 @@ int Iteration_z3(const VECTOR point, const Fractal *Julia, DBL **IterStack)
 	IterStack[Y][0] = y = point[Y];
 	IterStack[Z][0] = z = point[Z];
 	IterStack[W][0] = w = (Julia->SliceDist
-	                - Julia->Slice[X]*x
-	                - Julia->Slice[Y]*y
-	                - Julia->Slice[Z]*z)/Julia->Slice[T];
+	                     - Julia->Slice[X]*x
+	                     - Julia->Slice[Y]*y
+	                     - Julia->Slice[Z]*z)/Julia->Slice[T];
 
 	Exit_Value = Julia->Exit_Value;
 
@@ -179,7 +179,7 @@ int Iteration_z3(const VECTOR point, const Fractal *Julia, DBL **IterStack)
 *
 ******************************************************************************/
 
-int Iteration_Julia(const VECTOR point, const Fractal *Julia, DBL **IterStack)
+bool JuliaFractalRules::Iterate(const Vector3d& point, const Fractal *Julia, DBL **IterStack) const
 {
 	int i;
 	DBL x, y, z, w;
@@ -190,9 +190,9 @@ int Iteration_Julia(const VECTOR point, const Fractal *Julia, DBL **IterStack)
 	IterStack[Y][0] = y = point[Y];
 	IterStack[Z][0] = z = point[Z];
 	IterStack[W][0] = w = (Julia->SliceDist
-	                - Julia->Slice[X]*x
-	                - Julia->Slice[Y]*y
-	                - Julia->Slice[Z]*z)/Julia->Slice[T];
+	                     - Julia->Slice[X]*x
+	                     - Julia->Slice[Y]*y
+	                     - Julia->Slice[Z]*z)/Julia->Slice[T];
 
 	Exit_Value = Julia->Exit_Value;
 
@@ -248,7 +248,7 @@ int Iteration_Julia(const VECTOR point, const Fractal *Julia, DBL **IterStack)
 
 /*----------- Distance estimator + iterations ------------*/
 
-int D_Iteration_z3(const VECTOR point, const Fractal *Julia, const VECTOR &, DBL *Dist, DBL **IterStack)
+bool Z3FractalRules::Iterate(const Vector3d& point, const Fractal *Julia, const Vector3d&, DBL *Dist, DBL **IterStack) const
 {
 	int i, j;
 	DBL Norm, d;
@@ -262,9 +262,9 @@ int D_Iteration_z3(const VECTOR point, const Fractal *Julia, const VECTOR &, DBL
 	y = IterStack[Y][0] = point[Y];
 	z = IterStack[Z][0] = point[Z];
 	w = IterStack[W][0] = (Julia->SliceDist
-	                - Julia->Slice[X]*x
-	                - Julia->Slice[Y]*y
-	                - Julia->Slice[Z]*z)/Julia->Slice[T];
+	                     - Julia->Slice[X]*x
+	                     - Julia->Slice[Y]*y
+	                     - Julia->Slice[Z]*z)/Julia->Slice[T];
 
 	Exit_Value = Julia->Exit_Value;
 
@@ -343,7 +343,7 @@ int D_Iteration_z3(const VECTOR point, const Fractal *Julia, const VECTOR &, DBL
 *
 ******************************************************************************/
 
-int D_Iteration_Julia(const VECTOR point, const Fractal *Julia, const VECTOR &, DBL *Dist, DBL **IterStack)
+bool JuliaFractalRules::Iterate(const Vector3d& point, const Fractal *Julia, const Vector3d&, DBL *Dist, DBL **IterStack) const
 {
 	int i, j;
 	DBL Norm, d;
@@ -356,9 +356,9 @@ int D_Iteration_Julia(const VECTOR point, const Fractal *Julia, const VECTOR &, 
 	y = IterStack[Y][0] = point[Y];
 	z = IterStack[Z][0] = point[Z];
 	w = IterStack[W][0] = (Julia->SliceDist
-	                - Julia->Slice[X]*x
-	                - Julia->Slice[Y]*y
-	                - Julia->Slice[Z]*z)/Julia->Slice[T];
+	                     - Julia->Slice[X]*x
+	                     - Julia->Slice[Y]*y
+	                     - Julia->Slice[Z]*z)/Julia->Slice[T];
 
 	Exit_Value = Julia->Exit_Value;
 
@@ -437,7 +437,7 @@ int D_Iteration_Julia(const VECTOR point, const Fractal *Julia, const VECTOR &, 
 *
 ******************************************************************************/
 
-void Normal_Calc_z3(VECTOR Result, int N_Max, const Fractal *, DBL **IterStack)
+void Z3FractalRules::CalcNormal(Vector3d& Result, int N_Max, const Fractal *, DBL **IterStack) const
 {
 	DBL
 	n11 = 1.0, n12 = 0.0, n13 = 0.0, n14 = 0.0,
@@ -502,7 +502,7 @@ void Normal_Calc_z3(VECTOR Result, int N_Max, const Fractal *, DBL **IterStack)
 *
 ******************************************************************************/
 
-void Normal_Calc_Julia(VECTOR Result, int N_Max, const Fractal *, DBL **IterStack)
+void JuliaFractalRules::CalcNormal(Vector3d& Result, int N_Max, const Fractal *, DBL **IterStack) const
 {
 	DBL
 	n11 = 1.0, n12 = 0.0, n13 = 0.0, n14 = 0.0,
@@ -560,7 +560,7 @@ void Normal_Calc_Julia(VECTOR Result, int N_Max, const Fractal *, DBL **IterStac
 *
 ******************************************************************************/
 
-int F_Bound_Julia(const Ray& ray, const Fractal *fractal, DBL *Depth_Min, DBL *Depth_Max)
+bool QuaternionFractalRules::Bound(const BasicRay& ray, const Fractal *fractal, DBL *Depth_Min, DBL *Depth_Max) const
 {
 	return (Sphere::Intersect(ray, fractal->Center, fractal->Radius_Squared, Depth_Min, Depth_Max));
 }

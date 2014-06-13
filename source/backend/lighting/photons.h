@@ -26,11 +26,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/lighting/photons.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/lighting/photons.h $
+ * $Revision: #35 $
+ * $Change: 6162 $
+ * $DateTime: 2013/12/07 19:55:09 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #ifndef PHOTONS_H
@@ -153,6 +153,10 @@ class ScenePhotonSettings
 /* ------------------------------------------------------ */
 /* photon */
 /* ------------------------------------------------------ */
+
+typedef float PhotonScalar;
+typedef GenericVector3d<PhotonScalar> PhotonVector3d;
+
 struct Photon
 {
 	void init(unsigned char _info)
@@ -160,7 +164,7 @@ struct Photon
 		this->info = _info;
 	}
 
-	SNGL_VECT Loc;          /* location */
+	PhotonVector3d Loc;     /* location */
 	SMALL_COLOUR colour;    /* color & intensity (flux) */
 	unsigned char info;     /* info byte for kd-tree */
 	signed char theta, phi; /* incoming direction */
@@ -272,8 +276,8 @@ class PhotonGatherer
 		DBL Size_s;      // search radius (static)
 		DBL sqrt_dmax_s, dmax_s;      // dynamic search radius... current maximum
 		int TargetNum_s; // how many to gather
-		const DBL *pt_s;       // point around which we are gathering
-		const DBL *norm_s;     // surface normal
+		const Vector3d *pt_s;       // point around which we are gathering
+		const Vector3d *norm_s;     // surface normal
 		DBL flattenFactor; // amount to flatten the spher to make it
 		                   // an ellipsoid when gathering photons
 		                   // zero = no flatten, one = regular
@@ -285,8 +289,8 @@ class PhotonGatherer
 		PhotonGatherer(PhotonMap *map, ScenePhotonSettings& photonSettings);
 
 		void gatherPhotonsRec(int start, int end);
-		int gatherPhotons(const VECTOR pt, DBL Size, DBL *r, const VECTOR norm, bool flatten);
-		DBL gatherPhotonsAdaptive(const VECTOR pt, const VECTOR norm, bool flatten);
+		int gatherPhotons(const Vector3d* pt, DBL Size, DBL *r, const Vector3d* norm, bool flatten);
+		DBL gatherPhotonsAdaptive(const Vector3d* pt, const Vector3d* norm, bool flatten);
 
 		void PQInsert(Photon *photon, DBL d);
 		void FullPQInsert(Photon *photon, DBL d);
@@ -297,14 +301,14 @@ class PhotonMediaFunction : public MediaFunction
 	public:
 		PhotonMediaFunction(shared_ptr<SceneData> sd, TraceThreadData *td, Trace *t, PhotonGatherer *pg);
 
-		void ComputeMediaAndDepositPhotons(MediaVector& medias, const Ray& ray, const Intersection& isect, Colour& colour, Trace::TraceTicket& ticket);
+		void ComputeMediaAndDepositPhotons(MediaVector& medias, const Ray& ray, const Intersection& isect, Colour& colour);
 	protected:
 		void DepositMediaPhotons(Colour& colour, MediaVector& medias, LightSourceEntryVector& lights, MediaIntervalVector& mediaintervals,
-		                         const Ray& ray, int minsamples, bool ignore_photons, bool use_scattering, bool all_constant_and_light_ray, Trace::TraceTicket& ticket);
+		                         const Ray& ray, int minsamples, bool ignore_photons, bool use_scattering, bool all_constant_and_light_ray);
 	private:
 		shared_ptr<SceneData> sceneData;
 
-		void addMediaPhoton(const VECTOR Point, const VECTOR Origin, const RGBColour& LightCol, DBL depthDiff);
+		void addMediaPhoton(const Vector3d& Point, const Vector3d& Origin, const RGBColour& LightCol, DBL depthDiff);
 };
 
 class PhotonTrace : public Trace
@@ -313,16 +317,16 @@ class PhotonTrace : public Trace
 		PhotonTrace(shared_ptr<SceneData> sd, TraceThreadData *td, unsigned int mtl, DBL adcb, unsigned int qf, Trace::CooperateFunctor& cf);
 		~PhotonTrace();
 
-		virtual DBL TraceRay(const Ray& ray, Colour& colour, COLC weight, Trace::TraceTicket& ticket, bool continuedRay, DBL maxDepth = 0.0);
+		virtual DBL TraceRay(Ray& ray, Colour& colour, COLC weight, bool continuedRay, DBL maxDepth = 0.0);
 	protected:
-		virtual void ComputeLightedTexture(Colour& LightCol, const TEXTURE *Texture, vector<const TEXTURE *>& warps, const Vector3d& ipoint, const Vector3d& rawnormal, const Ray& ray, COLC weight, Intersection& isect, Trace::TraceTicket& ticket);
-		bool ComputeRefractionForPhotons(const FINISH* finish, Interior *interior, const Vector3d& ipoint, const Ray& ray, const Vector3d& normal, const Vector3d& rawnormal, Colour& colour, COLC weight, Trace::TraceTicket& ticket);
-		bool TraceRefractionRayForPhotons(const FINISH* finish, const Vector3d& ipoint, const Ray& ray, Ray& nray, DBL ior, DBL n, const Vector3d& normal, const Vector3d& rawnormal, const Vector3d& localnormal, Colour& colour, COLC weight, Trace::TraceTicket& ticket);
+		virtual void ComputeLightedTexture(Colour& LightCol, const TEXTURE *Texture, vector<const TEXTURE *>& warps, const Vector3d& ipoint, const Vector3d& rawnormal, Ray& ray, COLC weight, Intersection& isect);
+		bool ComputeRefractionForPhotons(const FINISH* finish, Interior *interior, const Vector3d& ipoint, Ray& ray, const Vector3d& normal, const Vector3d& rawnormal, Colour& colour, COLC weight);
+		bool TraceRefractionRayForPhotons(const FINISH* finish, const Vector3d& ipoint, Ray& ray, Ray& nray, DBL ior, DBL n, const Vector3d& normal, const Vector3d& rawnormal, const Vector3d& localnormal, Colour& colour, COLC weight);
 	private:
 		PhotonMediaFunction mediaPhotons;
 		RadiosityFunctor noRadiosity;
 
-		void addSurfacePhoton(const VECTOR Point, const VECTOR Origin, const RGBColour& LightCol);
+		void addSurfacePhoton(const Vector3d& Point, const Vector3d& Origin, const RGBColour& LightCol);
 };
 
 // foward declaration
@@ -340,7 +344,7 @@ class ShootingDirection
 
 		LightSource* light;
 		ObjectPtr target;
-		VECTOR up, left, ctr, toctr, v; /* vectors to determine direction of shot */
+		Vector3d up, left, ctr, toctr, v; /* vectors to determine direction of shot */
 		DBL dist;                      /* distance from light to center of bounding sphere */
 		DBL rad;                       /* radius of bounding sphere */
 
@@ -396,7 +400,7 @@ extern SinCosOptimizations sinCosData;
 /* global functions */
 /* for documentation of these functions, see photons.c */
 /* ------------------------------------------------------ */
-void ChooseRay(Ray &NewRay, const VECTOR Normal, const Ray &Ray, const VECTOR Raw_Normal, int WhichRay);
+void ChooseRay(BasicRay &NewRay, const Vector3d& Normal, const Vector3d& Raw_Normal, int WhichRay);
 int GetPhotonStat(POVMSType a);
 
 }

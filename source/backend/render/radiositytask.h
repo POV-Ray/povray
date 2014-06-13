@@ -24,17 +24,22 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/render/radiositytask.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/render/radiositytask.h $
+ * $Revision: #17 $
+ * $Change: 6163 $
+ * $DateTime: 2013/12/08 22:48:58 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #ifndef POVRAY_BACKEND_RADIOSITYTASK_H
 #define POVRAY_BACKEND_RADIOSITYTASK_H
 
 #include "backend/render/tracepixel.h"
+#include "backend/render/rendertask.h"
+#include "backend/scene/view.h"
+#include "backend/interior/media.h"
+#include "backend/lighting/radiosity.h"
+#include "backend/lighting/photons.h"
 
 namespace pov
 {

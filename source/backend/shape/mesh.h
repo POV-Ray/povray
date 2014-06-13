@@ -24,16 +24,17 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/shape/mesh.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/shape/mesh.h $
+ * $Revision: #35 $
+ * $Change: 6164 $
+ * $DateTime: 2013/12/09 17:21:04 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #ifndef MESH_H
 #define MESH_H
 
+#include "backend/scene/objects.h"
 #include "backend/bounding/bbox.h"
 
 namespace pov
@@ -56,57 +57,67 @@ typedef struct Mesh_Triangle_Struct MESH_TRIANGLE;
 typedef struct Hash_Table_Struct HASH_TABLE;
 typedef struct UV_Hash_Table_Struct UV_HASH_TABLE;
 
+// TODO - a SnglVector2d should probably suffice for MeshUVVector, and reduce the Mesh's memory footprint by 8 bytes per triangle.
+// TODO - on systems with 64-bit int type, int is probably overkill for MeshIndex; maybe we even want to make Mesh a template, using short for small meshes.
+
+typedef SnglVector3d MeshVector;   ///< Data type used to store vertices and normals.
+typedef Vector2d     MeshUVVector; ///< Data type used to store UV coordinates.
+typedef signed int   MeshIndex;    ///< Data type used to store indices into vertices / normals / uv coordinate / texture tables. Must be signed and able to hold 2*max.
+
 struct Mesh_Data_Struct
 {
-	int References;                /* Number of references to the mesh. */
-	long Number_Of_UVCoords;       /* Number of UV coords in the mesh.  */
-	long Number_Of_Normals;        /* Number of normals in the mesh.    */
-	long Number_Of_Triangles;      /* Number of trinagles in the mesh.  */
-	long Number_Of_Vertices;       /* Number of vertices in the mesh.   */
-	SNGL_VECT *Normals, *Vertices; /* Arrays of normals and vertices.   */
-	UV_VECT *UVCoords;             /* Array of UV coordinates           */
-	MESH_TRIANGLE *Triangles;      /* Array of triangles.               */
-	BBOX_TREE *Tree;               /* Bounding box tree for mesh.       */
-	VECTOR Inside_Vect;            /* vector to use to test 'inside'    */
+	int References;                    ///< Number of references to the mesh.
+	MeshIndex Number_Of_UVCoords;      ///< Number of UV coords in the mesh.
+	MeshIndex Number_Of_Normals;       ///< Number of normals in the mesh.
+	MeshIndex Number_Of_Triangles;     ///< Number of trinagles in the mesh.
+	MeshIndex Number_Of_Vertices;      ///< Number of vertices in the mesh.
+	MeshVector *Normals, *Vertices;    ///< Arrays of normals and vertices.
+	MeshUVVector *UVCoords;            ///< Array of UV coordinates
+	MESH_TRIANGLE *Triangles;          ///< Array of triangles.
+	BBOX_TREE *Tree;                   ///< Bounding box tree for mesh.
+	Vector3d Inside_Vect;              ///< vector to use to test 'inside'
 };
 
 struct Mesh_Triangle_Struct
 {
-	unsigned int Smooth:1;         /* Is this a smooth triangle.            */
-	unsigned int Dominant_Axis:2;  /* Dominant axis.                        */
-	unsigned int vAxis:2;          /* Axis for smooth triangle.             */
-	unsigned int ThreeTex:1;       /* Color Triangle Patch.                 */
-	long Normal_Ind;               /* Index of unsmoothed triangle normal.  */
-	long P1, P2, P3;               /* Indices of triangle vertices.         */
-	long Texture;                  /* Index of triangle texture.            */
-	long Texture2, Texture3;       /* Color Triangle Patch.                 */
-	long N1, N2, N3;               /* Indices of smoothed triangle normals. */
-	long UV1, UV2, UV3;            /* Indicies of UV coordinate vectors     */
-	SNGL Distance;                 /* Distance of triangle along normal.    */
-	SNGL_VECT Perp;                /* Vector used for smooth triangles.     */
+	MeshVector Perp;               ///< Vector used for smooth triangles.
+
+	SNGL Distance;                 ///< Distance of triangle along normal.
+
+	MeshIndex Normal_Ind;          ///< Index of unsmoothed triangle normal.
+	MeshIndex P1, P2, P3;          ///< Indices of triangle vertices.
+	MeshIndex Texture;             ///< Index of triangle texture.
+	MeshIndex Texture2, Texture3;  ///< Color Triangle Patch.
+	MeshIndex N1, N2, N3;          ///< Indices of smoothed triangle normals.
+	MeshIndex UV1, UV2, UV3;       ///< Indicies of UV coordinate vectors
+
+	unsigned int Smooth:1;         ///< Is this a smooth triangle.
+	unsigned int Dominant_Axis:2;  ///< Dominant axis.
+	unsigned int vAxis:2;          ///< Axis for smooth triangle.
+	unsigned int ThreeTex:1;       ///< Color Triangle Patch.
 };
 
 struct Hash_Table_Struct
 {
-	int Index;
-	SNGL_VECT P;
+	MeshIndex Index;
+	MeshVector P;
 	HASH_TABLE *Next;
 };
 
 struct UV_Hash_Table_Struct
 {
-	int Index;
-	UV_VECT P;
+	MeshIndex Index;
+	MeshUVVector P;
 	UV_HASH_TABLE *Next;
 };
 
 class Mesh : public ObjectBase
 {
 	public:
-		MESH_DATA *Data;               /* Mesh data holding triangles.    */
-		long Number_Of_Textures;       /* Number of textures in the mesh.   */
-		TEXTURE **Textures;            /* Array of texture references.      */
-		short has_inside_vector;
+		MESH_DATA *Data;                ///< Mesh data holding triangles.
+		MeshIndex Number_Of_Textures;   ///< Number of textures in the mesh.
+		TEXTURE **Textures;             ///< Array of texture references.
+		bool has_inside_vector;
 
 		Mesh();
 		virtual ~Mesh();
@@ -114,45 +125,44 @@ class Mesh : public ObjectBase
 		virtual ObjectPtr Copy();
 
 		virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
-		virtual bool Inside(const VECTOR, TraceThreadData *) const;
-		virtual void Normal(VECTOR, Intersection *, TraceThreadData *) const;
-		virtual void UVCoord(UV_VECT, const Intersection *, TraceThreadData *) const;
-		virtual void Translate(const VECTOR, const TRANSFORM *);
-		virtual void Rotate(const VECTOR, const TRANSFORM *);
-		virtual void Scale(const VECTOR, const TRANSFORM *);
+		virtual bool Inside(const Vector3d&, TraceThreadData *) const;
+		virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const;
+		virtual void UVCoord(Vector2d&, const Intersection *, TraceThreadData *) const;
+		virtual void Translate(const Vector3d&, const TRANSFORM *);
+		virtual void Rotate(const Vector3d&, const TRANSFORM *);
+		virtual void Scale(const Vector3d&, const TRANSFORM *);
 		virtual void Transform(const TRANSFORM *);
-		virtual void Invert();
 		virtual void Compute_BBox();
 
 		void Test_Mesh_Opacity();
 
 		void Create_Mesh_Hash_Tables();
-		bool Compute_Mesh_Triangle(MESH_TRIANGLE *Triangle, int Smooth, VECTOR P1, VECTOR P2, VECTOR P3, VECTOR S_Normal);
+		bool Compute_Mesh_Triangle(MESH_TRIANGLE *Triangle, bool Smooth, Vector3d& P1, Vector3d& P2, Vector3d& P3, Vector3d& S_Normal);
 		void Build_Mesh_BBox_Tree();
-		bool Degenerate(const VECTOR P1, const VECTOR P2, const VECTOR P3);
+		bool Degenerate(const Vector3d& P1, const Vector3d& P2, const Vector3d& P3);
 		void Init_Mesh_Triangle(MESH_TRIANGLE *Triangle);
 		void Destroy_Mesh_Hash_Tables();
-		int Mesh_Hash_Vertex(int *Number_Of_Vertices, int *Max_Vertices, SNGL_VECT **Vertices, const VECTOR Vertex);
-		int Mesh_Hash_Normal(int *Number_Of_Normals, int *Max_Normals, SNGL_VECT **Normals, const VECTOR Normal);
-		int Mesh_Hash_Texture(int *Number_Of_Textures, int *Max_Textures, TEXTURE ***Textures, TEXTURE *Texture);
-		int Mesh_Hash_UV(int *Number, int *Max, UV_VECT **Elements, const UV_VECT aPoint);
-		void Smooth_Mesh_Normal(VECTOR Result, const MESH_TRIANGLE *Triangle, const VECTOR IPoint) const;
+		MeshIndex Mesh_Hash_Vertex(MeshIndex *Number_Of_Vertices, MeshIndex *Max_Vertices, MeshVector **Vertices, const Vector3d& Vertex);
+		MeshIndex Mesh_Hash_Normal(MeshIndex *Number_Of_Normals, MeshIndex *Max_Normals, MeshVector **Normals, const Vector3d& Normal);
+		MeshIndex Mesh_Hash_Texture(MeshIndex *Number_Of_Textures, MeshIndex *Max_Textures, TEXTURE ***Textures, TEXTURE *Texture);
+		MeshIndex Mesh_Hash_UV(MeshIndex *Number, MeshIndex *Max, MeshUVVector **Elements, const Vector2d& aPoint);
+		void Smooth_Mesh_Normal(Vector3d& Result, const MESH_TRIANGLE *Triangle, const Vector3d& IPoint) const;
 
 		void Determine_Textures(Intersection *, bool, WeightedTextureVector&, TraceThreadData *);
 	protected:
-		bool Intersect(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread);
+		bool Intersect(const BasicRay& ray, IStack& Depth_Stack, TraceThreadData *Thread);
 		void Compute_Mesh_BBox();
-		void MeshUV(const VECTOR P, const MESH_TRIANGLE *Triangle, UV_VECT Result) const;
-		void compute_smooth_triangle(MESH_TRIANGLE *Triangle, const VECTOR P1, const VECTOR P2, const VECTOR P3);
-		bool intersect_mesh_triangle(const Ray& ray, const MESH_TRIANGLE *Triangle, DBL *Depth) const;
-		bool test_hit(const MESH_TRIANGLE *Triangle, const Ray& OrigRay, DBL Depth, DBL len, IStack& Depth_Stack, TraceThreadData *Thread);
-		void get_triangle_bbox(const MESH_TRIANGLE *Triangle, BBOX *BBox) const;
-		bool intersect_bbox_tree(const Ray& ray, const Ray& Orig_Ray, DBL len, IStack& Depth_Stack, TraceThreadData *Thread);
-		bool inside_bbox_tree(const Ray& ray, TraceThreadData *Thread) const;
-		void get_triangle_vertices(const MESH_TRIANGLE *Triangle, VECTOR P1, VECTOR P2, VECTOR P3) const;
-		void get_triangle_normals(const MESH_TRIANGLE *Triangle, VECTOR N1, VECTOR N2, VECTOR N3) const;
-		void get_triangle_uvcoords(const MESH_TRIANGLE *Triangle, UV_VECT U1, UV_VECT U2, UV_VECT U3) const;
-		static int mesh_hash(HASH_TABLE **Hash_Table, int *Number, int *Max, SNGL_VECT **Elements, const VECTOR aPoint);
+		void MeshUV(const Vector3d& P, const MESH_TRIANGLE *Triangle, Vector2d& Result) const;
+		void compute_smooth_triangle(MESH_TRIANGLE *Triangle, const Vector3d& P1, const Vector3d& P2, const Vector3d& P3);
+		bool intersect_mesh_triangle(const BasicRay& ray, const MESH_TRIANGLE *Triangle, DBL *Depth) const;
+		bool test_hit(const MESH_TRIANGLE *Triangle, const BasicRay& OrigRay, DBL Depth, DBL len, IStack& Depth_Stack, TraceThreadData *Thread);
+		void get_triangle_bbox(const MESH_TRIANGLE *Triangle, BoundingBox *BBox) const;
+		bool intersect_bbox_tree(const BasicRay& ray, const BasicRay& Orig_Ray, DBL len, IStack& Depth_Stack, TraceThreadData *Thread);
+		bool inside_bbox_tree(const BasicRay& ray, TraceThreadData *Thread) const;
+		void get_triangle_vertices(const MESH_TRIANGLE *Triangle, Vector3d& P1, Vector3d& P2, Vector3d& P3) const;
+		void get_triangle_normals(const MESH_TRIANGLE *Triangle, Vector3d& N1, Vector3d& N2, Vector3d& N3) const;
+		void get_triangle_uvcoords(const MESH_TRIANGLE *Triangle, Vector2d& U1, Vector2d& U2, Vector2d& U3) const;
+		static MeshIndex mesh_hash(HASH_TABLE **Hash_Table, MeshIndex *Number, MeshIndex *Max, MeshVector **Elements, const Vector3d& aPoint);
 
 private:
 		// these are used temporarily during parsing and are destroyed

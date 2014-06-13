@@ -106,9 +106,9 @@ const int OK_V     = 128;
 
 bool Parametric::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread)
 {
-	VECTOR P, D, IPoint;
-	UV_VECT low_vect, hi_vect, uv;
-	Ray New_Ray;
+	Vector3d P, D, IPoint;
+	Vector2d low_vect, hi_vect, uv;
+	BasicRay New_Ray;
 	DBL XRayMin, XRayMax, YRayMin, YRayMax, ZRayMin, ZRayMax, TPotRes, TLen;
 	DBL Depth1, Depth2, temp, Len, TResult = HUGE_VAL;
 	DBL low, hi, len;
@@ -126,11 +126,10 @@ bool Parametric::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
 	{
 		if(Trans != NULL)
 		{
-			MInvTransPoint(New_Ray.Origin, ray.Origin, Trans);
-			MInvTransDirection(New_Ray.Direction, ray.Direction, Trans);
-			VLength(len, New_Ray.Direction);
-			VInverseScaleEq(New_Ray.Direction, len);
-			i_flg = Sphere::Intersect(New_Ray, container.sphere.center,
+			MInvTransRay(New_Ray, ray, Trans);
+			len = New_Ray.Direction.length();
+			New_Ray.Direction /= len;
+			i_flg = Sphere::Intersect(New_Ray, Vector3d(container.sphere.center),
 			                          (container.sphere.radius) * (container.sphere.radius),
 			                          &Depth1, &Depth2);
 			Depth1 = Depth1 / len;
@@ -138,7 +137,7 @@ bool Parametric::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
 		}
 		else
 		{
-			i_flg = Sphere::Intersect(ray, container.sphere.center,
+			i_flg = Sphere::Intersect(ray, Vector3d(container.sphere.center),
 			                          (container.sphere.radius) * (container.sphere.radius), &Depth1, &Depth2);
 		}
 		Thread->Stats()[Ray_Sphere_Tests]--;
@@ -147,7 +146,7 @@ bool Parametric::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
 	}
 	else
 	{
-		i_flg = Box::Intersect(ray, Trans, container.box.corner1, container.box.corner2,
+		i_flg = Box::Intersect(ray, Trans, Vector3d(container.box.corner1), Vector3d(container.box.corner2),
 		                       &Depth1, &Depth2, &Side1, &Side2);
 	}
 
@@ -164,12 +163,8 @@ bool Parametric::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
 	}
 	else
 	{
-		P[X] = ray.Origin[X];
-		P[Y] = ray.Origin[Y];
-		P[Z] = ray.Origin[Z];
-		D[X] = ray.Direction[X];
-		D[Y] = ray.Direction[Y];
-		D[Z] = ray.Direction[Z];
+		P = ray.Origin;
+		D = ray.Direction;
 	}
 
 	if (Depth1 == Depth2)
@@ -225,10 +220,10 @@ bool Parametric::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
 			Evaluate_Function_Interval_UV(Thread->functionContext, *(Function[0]), accuracy, low_vect, hi_vect, max_gradient, low, hi);
 		/* fabs(D[X] *(T2-T1)) is not OK with new method */
 
-		if (close(D[0], 0))
+		if (close(D[X], 0))
 		{
 			parX = 1;
-			if ((hi < P[0]) || (low > P[0]))
+			if ((hi < P[X]) || (low > P[X]))
 			{
 				i--;
 				continue;
@@ -236,8 +231,8 @@ bool Parametric::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
 		}
 		else
 		{
-			XRayMin = (hi - P[0]) / D[0];
-			XRayMax = (low - P[0]) / D[0];
+			XRayMin = (hi - P[X]) / D[X];
+			XRayMax = (low - P[X]) / D[X];
 			if (XRayMin > XRayMax)
 			{
 				temp = XRayMin;
@@ -269,10 +264,10 @@ bool Parametric::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
 		else
 			Evaluate_Function_Interval_UV(Thread->functionContext, *(Function[1]), accuracy, low_vect, hi_vect, max_gradient, low, hi);
 
-		if (close(D[1], 0))
+		if (close(D[Y], 0))
 		{
 			parY = 1;
-			if ((hi < P[1]) || (low > P[1]))
+			if ((hi < P[Y]) || (low > P[Y]))
 			{
 				i--;
 				continue;
@@ -280,8 +275,8 @@ bool Parametric::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
 		}
 		else
 		{
-			YRayMin = (hi - P[1]) / D[1];
-			YRayMax = (low - P[1]) / D[1];
+			YRayMin = (hi - P[Y]) / D[Y];
+			YRayMax = (low - P[Y]) / D[Y];
 			if (YRayMin > YRayMax)
 			{
 				temp = YRayMin;
@@ -319,9 +314,9 @@ bool Parametric::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
 		else
 			Evaluate_Function_Interval_UV(Thread->functionContext, *(Function[2]), accuracy, low_vect, hi_vect, max_gradient, low, hi);
 
-		if (close(D[2], 0))
+		if (close(D[Z], 0))
 		{
-			if ((hi < P[2]) || (low > P[2]))
+			if ((hi < P[Z]) || (low > P[Z]))
 			{
 				i--;
 				continue;
@@ -329,8 +324,8 @@ bool Parametric::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
 		}
 		else
 		{
-			ZRayMin = (hi - P[2]) / D[2];
-			ZRayMax = (low - P[2]) / D[2];
+			ZRayMin = (hi - P[Z]) / D[Z];
+			ZRayMax = (low - P[Z]) / D[Z];
 			if (ZRayMin > ZRayMax)
 			{
 				temp = ZRayMin;
@@ -374,7 +369,7 @@ bool Parametric::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
 			if ((TResult > TPotRes) && (TPotRes > Depth1))
 			{
 				TResult = TPotRes;
-				Assign_UV_Vect(uv, low_vect);
+				uv = low_vect;
 			}
 			i--;
 		}
@@ -402,8 +397,8 @@ bool Parametric::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
 	if (TResult < Depth2)
 	{
 		Thread->Stats()[Ray_Parametric_Tests_Succeeded]++;
-		VScale(IPoint, ray.Direction, TResult);
-		VAddEq(IPoint, ray.Origin);
+		IPoint = ray.Direction * TResult;
+		IPoint += ray.Origin;
 
 		if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
 		{
@@ -446,7 +441,7 @@ bool Parametric::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
  *
  ******************************************************************************/
 
-bool Parametric::Inside(const VECTOR, TraceThreadData *Thread) const
+bool Parametric::Inside(const Vector3d&, TraceThreadData *Thread) const
 {
 	return false;
 }
@@ -476,10 +471,10 @@ bool Parametric::Inside(const VECTOR, TraceThreadData *Thread) const
  *
  ******************************************************************************/
 
-void Parametric::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) const
+void Parametric::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread) const
 {
-	VECTOR RU, RV;
-	UV_VECT uv_vect;
+	Vector3d RU, RV;
+	Vector2d uv_vect;
 
 	uv_vect[U] = Inter->Iuv[U];
 	uv_vect[V] = Inter->Iuv[V];
@@ -498,10 +493,10 @@ void Parametric::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thr
 	RV[Y] += Evaluate_Function_UV(Thread->functionContext, *(Function[Y]), uv_vect);
 	RV[Z] += Evaluate_Function_UV(Thread->functionContext, *(Function[Z]), uv_vect);
 
-	VCross(Result, RU, RV);
+	Result = cross(RU, RV);
 	if (Trans != NULL)
 		MTransNormal(Result, Result, Trans);
-	VNormalize(Result, Result);
+	Result.normalize();
 }
 
 
@@ -543,11 +538,8 @@ void Parametric::Compute_BBox()
 	}
 	else
 	{
-		// [ABX 20.01.2004] Low_Left introduced to hide BCC 5.5 bug
-		BBOX_VECT& Low_Left = BBox.Lower_Left;
-
-		Assign_BBox_Vect(Low_Left, container.box.corner1);
-		VSub(BBox.Lengths, container.box.corner2, container.box.corner1);
+		BBox.lowerLeft = BBoxVector3d(container.box.corner1);
+		BBox.size = BBoxVector3d(Vector3d(container.box.corner2) - Vector3d(container.box.corner1));
 	}
 
 	if(Trans != NULL)
@@ -581,7 +573,7 @@ void Parametric::Compute_BBox()
  *
  ******************************************************************************/
 
-void Parametric::Translate(const VECTOR, const TRANSFORM* tr)
+void Parametric::Translate(const Vector3d&, const TRANSFORM* tr)
 {
 	Transform(tr);
 }
@@ -611,7 +603,7 @@ void Parametric::Translate(const VECTOR, const TRANSFORM* tr)
  *
  ******************************************************************************/
 
-void Parametric::Rotate(const VECTOR, const TRANSFORM* tr)
+void Parametric::Rotate(const Vector3d&, const TRANSFORM* tr)
 {
 	Transform(tr);
 }
@@ -641,7 +633,7 @@ void Parametric::Rotate(const VECTOR, const TRANSFORM* tr)
  *
  ******************************************************************************/
 
-void Parametric::Scale(const VECTOR, const TRANSFORM* tr)
+void Parametric::Scale(const Vector3d&, const TRANSFORM* tr)
 {
 	Transform(tr);
 }
@@ -677,35 +669,6 @@ void Parametric::Transform(const TRANSFORM* tr)
 		Trans = Create_Transform();
 	Compose_Transforms(Trans, tr);
 	Compute_BBox();
-}
-
-
-/*****************************************************************************
- *
- * FUNCTION
- *
- *   Invert_Parametric
- *
- * INPUT
- *
- * OUTPUT
- *
- * RETURNS
- *
- * AUTHOR
- *
- * DESCRIPTION
- *
- *   -
- *
- * CHANGES
- *
- *   -
- *
- ******************************************************************************/
-
-void Parametric::Invert()
-{
 }
 
 
@@ -807,7 +770,7 @@ Parametric::~Parametric()
  *
  ******************************************************************************/
 
-Parametric::Parametric() : ObjectBase(PARAMETRIC_OBJECT)
+Parametric::Parametric() : NonsolidObject(PARAMETRIC_OBJECT)
 {
 	Make_Vector(container.box.corner1, -1.0, -1.0, -1.0);
 	Make_Vector(container.box.corner2, 1.0, 1.0, 1.0);
@@ -821,7 +784,6 @@ Parametric::Parametric() : ObjectBase(PARAMETRIC_OBJECT)
 	Function[2] = NULL;
 	accuracy = 0.001;
 	max_gradient = 1;
-	Inverted = false;
 	PData = NULL;
 	container_shape = 0;
 }
@@ -855,9 +817,9 @@ Parametric::Parametric() : ObjectBase(PARAMETRIC_OBJECT)
  *
 ******************************************************************************/
 
-void Parametric::UVCoord(UV_VECT Result, const Intersection *inter, TraceThreadData *Thread) const
+void Parametric::UVCoord(Vector2d& Result, const Intersection *inter, TraceThreadData *Thread) const
 {
-	Assign_UV_Vect(Result, inter->Iuv);
+	Result = inter->Iuv;
 }
 
 
@@ -895,7 +857,7 @@ void Parametric::Precomp_Par_Int(int depth, DBL umin, DBL vmin, DBL umax, DBL vm
 		{
 			if(PData->flags & (1 << j))
 			{
-				UV_VECT low,hi;
+				Vector2d low,hi;
 
 				low[U] = umin;
 				hi[U] = umax;
@@ -1118,7 +1080,7 @@ void Parametric::Destroy_PrecompParVal()
  *
  ******************************************************************************/
 
-DBL Parametric::Evaluate_Function_UV(FPUContext *ctx, FUNCTION funct, const UV_VECT fnvec)
+DBL Parametric::Evaluate_Function_UV(FPUContext *ctx, FUNCTION funct, const Vector2d& fnvec)
 {
 	ctx->SetLocal(U, fnvec[U]);
 	ctx->SetLocal(V, fnvec[V]);
@@ -1190,7 +1152,7 @@ void Parametric::Interval(DBL dx, DBL a, DBL b, DBL max_gradient, DBL *Min, DBL 
  *
  ******************************************************************************/
 
-void Parametric::Evaluate_Function_Interval_UV(FPUContext *ctx, FUNCTION funct, DBL threshold, const UV_VECT fnvec_low, const UV_VECT fnvec_hi, DBL max_gradient, DBL& low, DBL& hi)
+void Parametric::Evaluate_Function_Interval_UV(FPUContext *ctx, FUNCTION funct, DBL threshold, const Vector2d& fnvec_low, const Vector2d& fnvec_hi, DBL max_gradient, DBL& low, DBL& hi)
 {
 	DBL f_0_0, f_0_1, f_1_0, f_1_1;
 	DBL f_0_min, f_0_max;

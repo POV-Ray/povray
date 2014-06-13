@@ -24,11 +24,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/scene/objects.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/scene/objects.cpp $
+ * $Revision: #58 $
+ * $Change: 6164 $
+ * $DateTime: 2013/12/09 17:21:04 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #include <cassert>
@@ -49,7 +49,7 @@ namespace pov
 {
 
 template<int BX, int BY, int BZ>
-FORCEINLINE bool Intersect_BBox_Dir(const BBOX& bbox, const BBOX_VECT& origin, const BBOX_VECT& invdir, BBOX_VAL mind, BBOX_VAL maxd);
+FORCEINLINE bool Intersect_BBox_Dir(const BoundingBox& bbox, const BBoxVector3d& origin, const BBoxVector3d& invdir, BBoxScalar mind, BBoxScalar maxd);
 
 /*****************************************************************************
  * ObjectDebugHelper class support code
@@ -104,14 +104,14 @@ bool Find_Intersection(Intersection *isect, ObjectPtr object, const Ray& ray, Tr
 	if(object != NULL)
 	{
 		DBL closest = HUGE_VAL;
-		BBOX_VECT origin;
-		BBOX_VECT invdir;
-		ObjectBase::BBoxDirection variant;
+		BBoxVector3d origin;
+		BBoxVector3d invdir;
+		BBoxDirection variant;
 
 		Vector3d tmp(1.0 / ray.GetDirection()[X], 1.0 / ray.GetDirection()[Y], 1.0 /ray.GetDirection()[Z]);
-		Assign_Vector(origin, ray.Origin);
-		Assign_Vector(invdir, *tmp);
-		variant = (ObjectBase::BBoxDirection)((int(invdir[X] < 0.0) << 2) | (int(invdir[Y] < 0.0) << 1) | int(invdir[Z] < 0.0));
+		origin = BBoxVector3d(ray.Origin);
+		invdir = BBoxVector3d(tmp);
+		variant = (BBoxDirection)((int(invdir[X] < 0.0) << 2) | (int(invdir[Y] < 0.0) << 1) | int(invdir[Z] < 0.0));
 
 		if(object->Intersect_BBox(variant, origin, invdir, closest) == false)
 			return false;
@@ -158,14 +158,14 @@ bool Find_Intersection(Intersection *isect, ObjectPtr object, const Ray& ray, co
 	if(object != NULL)
 	{
 		DBL closest = HUGE_VAL;
-		BBOX_VECT origin;
-		BBOX_VECT invdir;
-		ObjectBase::BBoxDirection variant;
+		BBoxVector3d origin;
+		BBoxVector3d invdir;
+		BBoxDirection variant;
 
 		Vector3d tmp(1.0 / ray.GetDirection()[X], 1.0 / ray.GetDirection()[Y], 1.0 /ray.GetDirection()[Z]);
-		Assign_Vector(origin, ray.Origin);
-		Assign_Vector(invdir, *tmp);
-		variant = (ObjectBase::BBoxDirection)((int(invdir[X] < 0.0) << 2) | (int(invdir[Y] < 0.0) << 1) | int(invdir[Z] < 0.0));
+		origin = BBoxVector3d(ray.Origin);
+		invdir = BBoxVector3d(tmp);
+		variant = (BBoxDirection)((int(invdir[X] < 0.0) << 2) | (int(invdir[Y] < 0.0) << 1) | int(invdir[Z] < 0.0));
 
 		if(object->Intersect_BBox(variant, origin, invdir, closest) == false)
 			return false;
@@ -207,7 +207,7 @@ bool Find_Intersection(Intersection *isect, ObjectPtr object, const Ray& ray, co
 	return false;
 }
 
-bool Find_Intersection(Intersection *isect, ObjectPtr object, const Ray& ray, ObjectBase::BBoxDirection variant, const BBOX_VECT& origin, const BBOX_VECT& invdir, TraceThreadData *threadData)
+bool Find_Intersection(Intersection *isect, ObjectPtr object, const Ray& ray, BBoxDirection variant, const BBoxVector3d& origin, const BBoxVector3d& invdir, TraceThreadData *threadData)
 {
 	if(object != NULL)
 	{
@@ -253,7 +253,7 @@ bool Find_Intersection(Intersection *isect, ObjectPtr object, const Ray& ray, Ob
 	return false;
 }
 
-bool Find_Intersection(Intersection *isect, ObjectPtr object, const Ray& ray, ObjectBase::BBoxDirection variant, const BBOX_VECT& origin, const BBOX_VECT& invdir, const RayObjectCondition& postcondition, TraceThreadData *threadData)
+bool Find_Intersection(Intersection *isect, ObjectPtr object, const Ray& ray, BBoxDirection variant, const BBoxVector3d& origin, const BBoxVector3d& invdir, const RayObjectCondition& postcondition, TraceThreadData *threadData)
 {
 	if(object != NULL)
 	{
@@ -327,7 +327,7 @@ bool Find_Intersection(Intersection *isect, ObjectPtr object, const Ray& ray, Ob
 *
 ******************************************************************************/
 
-bool Inside_Object (const VECTOR IPoint, ObjectPtr Object, TraceThreadData *Thread)
+bool Inside_Object (const Vector3d& IPoint, ObjectPtr Object, TraceThreadData *Thread)
 {
 	for (vector<ObjectPtr>::iterator Sib = Object->Clip.begin(); Sib != Object->Clip.end(); Sib++)
 	{
@@ -411,7 +411,7 @@ bool Ray_In_Bound (const Ray& ray, const vector<ObjectPtr>& Bounding_Object, Tra
 *
 ******************************************************************************/
 
-bool Point_In_Clip (const VECTOR IPoint, const vector<ObjectPtr>& Clip, TraceThreadData *Thread)
+bool Point_In_Clip (const Vector3d& IPoint, const vector<ObjectPtr>& Clip, TraceThreadData *Thread)
 {
 	for(vector<ObjectPtr>::const_iterator Local_Clip = Clip.begin(); Local_Clip != Clip.end(); Local_Clip++)
 	{
@@ -454,7 +454,7 @@ bool Point_In_Clip (const VECTOR IPoint, const vector<ObjectPtr>& Clip, TraceThr
 *
 ******************************************************************************/
 
-void Translate_Object (ObjectPtr Object, const VECTOR Vector, const TRANSFORM *Trans)
+void Translate_Object (ObjectPtr Object, const Vector3d& Vector, const TRANSFORM *Trans)
 {
 	if(Object == NULL)
 		return;
@@ -515,7 +515,7 @@ void Translate_Object (ObjectPtr Object, const VECTOR Vector, const TRANSFORM *T
 *
 ******************************************************************************/
 
-void Rotate_Object (ObjectPtr Object, const VECTOR Vector, const TRANSFORM *Trans)
+void Rotate_Object (ObjectPtr Object, const Vector3d& Vector, const TRANSFORM *Trans)
 {
 	if (Object == NULL)
 		return;
@@ -578,7 +578,7 @@ void Rotate_Object (ObjectPtr Object, const VECTOR Vector, const TRANSFORM *Tran
 *
 ******************************************************************************/
 
-void Scale_Object (ObjectPtr Object, const VECTOR Vector, const TRANSFORM *Trans)
+void Scale_Object (ObjectPtr Object, const Vector3d& Vector, const TRANSFORM *Trans)
 {
 	if (Object == NULL)
 		return;
@@ -672,65 +672,6 @@ void Transform_Object (ObjectPtr Object, const TRANSFORM *Trans)
 		Object->interior->Transform(Trans);
 
 	Object->Transform(Trans);
-}
-
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-*   Invert_Object
-*
-* INPUT
-*   
-* OUTPUT
-*   
-* RETURNS
-*   
-* AUTHOR
-*
-*   POV-Ray Team
-*   
-* DESCRIPTION
-*
-*   -
-*
-* CHANGES
-*
-*   -
-*
-******************************************************************************/
-
-// this function must not be called on CSG objects
-void Invert_Object(ObjectPtr Object)
-{
-	if (Object == NULL)
-		return;
-	assert((Object->Type & IS_CSG_OBJECT) == 0);
-	Object->Invert();
-}
-
-// Invert_CSG_Object deletes the original object and returns a new one
-// we force use of a separate function for this to help ensure that calling code handles this
-// we also set the passed pointer to NULL
-// (yes, this is ugly and needs to be fixed)
-ObjectPtr Invert_CSG_Object(ObjectPtr& Object)
-{
-	CSG     *csg_object;
-
-	if(Object == NULL)
-		return NULL;
-	Object->Invert();
-
-	csg_object = dynamic_cast<CSG *>(Object);
-	assert(csg_object != NULL);
-
-	// Morph will delete the old object
-	csg_object = csg_object->Morph();
-	Object = NULL;
-
-	return csg_object;
 }
 
 
@@ -939,7 +880,7 @@ void Destroy_Object(ObjectPtr Object)
 *
 ******************************************************************************/
 
-void ObjectBase::UVCoord(UV_VECT Result, const Intersection *Inter, TraceThreadData *) const
+void ObjectBase::UVCoord(Vector2d& Result, const Intersection *Inter, TraceThreadData *) const
 {
 	Result[U] = Inter->IPoint[X];
 	Result[V] = Inter->IPoint[Y];
@@ -955,7 +896,26 @@ void ObjectBase::Determine_Textures(Intersection *isect, bool hitinside, Weighte
 		isect->Csg->Determine_Textures(isect, hitinside, textures, threaddata);
 }
 
-bool ObjectBase::Intersect_BBox(BBoxDirection variant, const BBOX_VECT& origin, const BBOX_VECT& invdir, BBOX_VAL maxd) const
+ObjectPtr ObjectBase::Invert()
+{
+	Invert_Flag(this, INVERTED_FLAG);
+	return this;
+}
+
+ObjectPtr NonsolidObject::Invert()
+{
+	return this;
+}
+
+ObjectPtr CompoundObject::Invert()
+{
+	for(vector<ObjectPtr>::iterator Current_Sib = children.begin(); Current_Sib != children.end(); Current_Sib++)
+		*Current_Sib = (*Current_Sib)->Invert();
+	Invert_Flag(this, INVERTED_FLAG);
+	return this;
+}
+
+bool ObjectBase::Intersect_BBox(BBoxDirection variant, const BBoxVector3d& origin, const BBoxVector3d& invdir, BBoxScalar maxd) const
 {
 	// TODO FIXME - This was SMALL_TOLERANCE, but that's too rough for some scenes [cjc] need to check what it was in the old code [trf]
 	switch(variant)
@@ -982,10 +942,10 @@ bool ObjectBase::Intersect_BBox(BBoxDirection variant, const BBOX_VECT& origin, 
 }
 
 template<int BX, int BY, int BZ>
-FORCEINLINE bool Intersect_BBox_Dir(const BBOX& bbox, const BBOX_VECT& origin, const BBOX_VECT& invdir, BBOX_VAL mind, BBOX_VAL maxd)
+FORCEINLINE bool Intersect_BBox_Dir(const BoundingBox& bbox, const BBoxVector3d& origin, const BBoxVector3d& invdir, BBoxScalar mind, BBoxScalar maxd)
 {
-	BBOX_VAL tmin, tmax, tymin, tymax, tzmin, tzmax;
-	BBOX_VECT bounds[2];
+	BBoxScalar tmin, tmax, tymin, tymax, tzmin, tzmax;
+	BBoxVector3d bounds[2];
 
 	Make_min_max_from_BBox(bounds[0], bounds[1], bbox);
 

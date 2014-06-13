@@ -121,14 +121,13 @@ const DBL HFIELD_TOLERANCE = 1.0e-6;
 bool HField::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread)
 {
 	int Side1, Side2;
-	VECTOR Start;
-	Ray Temp_Ray;
+	Vector3d Start;
+	BasicRay Temp_Ray;
 	DBL depth1, depth2;
 
 	Thread->Stats()[Ray_HField_Tests]++;
 
-	MInvTransPoint(Temp_Ray.Origin, ray.Origin, Trans);
-	MInvTransDirection(Temp_Ray.Direction, ray.Direction, Trans);
+	MInvTransRay(Temp_Ray, ray, Trans);
 
 #ifdef HFIELD_EXTRA_STATS
 	Thread->Stats()[Ray_HField_Box_Tests]++;
@@ -153,7 +152,7 @@ bool HField::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadD
 		}
 	}
 
-	VEvaluateRay(Start, Temp_Ray.Origin, depth1, Temp_Ray.Direction);
+	Start = Temp_Ray.Evaluate(depth1);
 
 	if (block_traversal(Temp_Ray, Start, Depth_Stack, ray, depth1, depth2, Thread))
 	{
@@ -192,11 +191,11 @@ bool HField::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadD
 *
 ******************************************************************************/
 
-bool HField::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
+bool HField::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 {
 	int px, pz;
 	DBL x,z,y1,y2,y3,water, dot1, dot2;
-	VECTOR Local_Origin, H_Normal, Test;
+	Vector3d Local_Origin, H_Normal, Test;
 
 	MInvTransPoint(Test, IPoint, Trans);
 
@@ -230,9 +229,9 @@ bool HField::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
 		y2 = max(Get_Height(px+1, pz), water);
 		y3 = max(Get_Height(px,   pz+1), water);
 
-		Make_Vector(Local_Origin,(DBL)px,y1,(DBL)pz);
+		Local_Origin = Vector3d((DBL)px,y1,(DBL)pz);
 
-		Make_Vector(H_Normal, y1-y2, 1.0, y1-y3);
+		H_Normal = Vector3d(y1-y2, 1.0, y1-y3);
 	}
 	else
 	{
@@ -243,13 +242,13 @@ bool HField::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
 		y2 = max(Get_Height(px-1, pz), water);
 		y3 = max(Get_Height(px,   pz-1), water);
 
-		Make_Vector(Local_Origin,(DBL)px,y1,(DBL)pz);
+		Local_Origin = Vector3d((DBL)px,y1,(DBL)pz);
 
-		Make_Vector(H_Normal, y2-y1, 1.0, y3-y1);
+		H_Normal = Vector3d(y2-y1, 1.0, y3-y1);
 	}
 
-	VDot(dot1, Test, H_Normal);
-	VDot(dot2, Local_Origin, H_Normal);
+	dot1 = dot(Test, H_Normal);
+	dot2 = dot(Local_Origin, H_Normal);
 
 	if (dot1 < dot2)
 	{
@@ -287,16 +286,16 @@ bool HField::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
 *
 ******************************************************************************/
 
-void HField::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) const
+void HField::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread) const
 {
 	int px,pz, i;
 	DBL x,z,y1,y2,y3,u,v;
-	VECTOR Local_Origin;
-	VECTOR n[5];
+	Vector3d Local_Origin;
+	Vector3d n[4];
 
 	if(Inter->haveNormal == true)
 	{
-		Assign_Vector(Result,Inter->INormal);
+		Result = Inter->INormal;
 		return;
 	}
 
@@ -331,15 +330,13 @@ void HField::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread)
 		for (i = 0; i < 4; i++)
 		{
 			MTransNormal(n[i], n[i], Trans);
-			VNormalizeEq(n[i]);
+			n[i].normalize();
 		}
 
 		u = (1.0 - x);
 		v = (1.0 - z);
 
-		Result[X] = v*(u*n[0][X] + x*n[1][X]) + z*(u*n[2][X] + x*n[3][X]);
-		Result[Y] = v*(u*n[0][Y] + x*n[1][Y]) + z*(u*n[2][Y] + x*n[3][Y]);
-		Result[Z] = v*(u*n[0][Z] + x*n[1][Z]) + z*(u*n[2][Z] + x*n[3][Z]);
+		Result = v*(u*n[0] + x*n[1]) + z*(u*n[2] + x*n[3]);
 	}
 	else
 	{
@@ -351,7 +348,7 @@ void HField::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread)
 			y2 = Get_Height(px+1, pz);
 			y3 = Get_Height(px,   pz+1);
 
-			Make_Vector(Result, y1-y2, 1.0, y1-y3);
+			Result = Vector3d(y1-y2, 1.0, y1-y3);
 		}
 		else
 		{
@@ -361,13 +358,13 @@ void HField::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread)
 			y2 = Get_Height(px,   pz+1);
 			y3 = Get_Height(px+1, pz);
 
-			Make_Vector(Result, y2-y1, 1.0, y3-y1);
+			Result = Vector3d(y2-y1, 1.0, y3-y1);
 		}
 
 		MTransNormal(Result, Result, Trans);
 	}
 
-	VNormalize(Result, Result);
+	Result.normalize();
 }
 
 
@@ -398,19 +395,19 @@ void HField::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread)
 *
 ******************************************************************************/
 
-DBL HField::normalize(VECTOR A, const VECTOR  B)
+DBL HField::normalize(Vector3d& A, const Vector3d& B)
 {
 	DBL tmp;
 
-	VLength(tmp, B);
+	tmp = B.length();
 
 	if (fabs(tmp) > EPSILON)
 	{
-		VInverseScale(A, B, tmp);
+		A = B / tmp;
 	}
 	else
 	{
-		Make_Vector(A, 0.0, 1.0, 0.0);
+		A = Vector3d(0.0, 1.0, 0.0);
 	}
 
 	return(tmp);
@@ -444,14 +441,15 @@ DBL HField::normalize(VECTOR A, const VECTOR  B)
 *
 ******************************************************************************/
 
-bool HField::intersect_pixel(int x, int z, const Ray &ray, DBL height1, DBL height2, IStack& HField_Stack, const Ray &RRay, DBL mindist, DBL maxdist, TraceThreadData *Thread)
+bool HField::intersect_pixel(int x, int z, const BasicRay &ray, DBL height1, DBL height2, IStack& HField_Stack, const BasicRay &RRay, DBL mindist, DBL maxdist, TraceThreadData *Thread)
 {
 	int Found;
-	DBL dot, depth1, depth2;
+	DBL dot1, depth1, depth2;
 	DBL s, t, y1, y2, y3, y4;
 	DBL min_y2_y3, max_y2_y3;
 	DBL max_height, min_height;
-	VECTOR P, N, V1;
+	Vector3d P;
+	Vector3d N, V1;
 
 #ifdef HFIELD_EXTRA_STATS
 	Thread->Stats()[Ray_HField_Cell_Tests]++;
@@ -505,7 +503,7 @@ bool HField::intersect_pixel(int x, int z, const Ray &ray, DBL height1, DBL heig
 
 		/* Set up triangle. */
 
-		Make_Vector(P, (DBL)x, y1, (DBL)z);
+		P = Vector3d((DBL)x, y1, (DBL)z);
 
 		/*
 		 * Calculate the normal vector from:
@@ -513,21 +511,21 @@ bool HField::intersect_pixel(int x, int z, const Ray &ray, DBL height1, DBL heig
 		 * N = V2 x V1, with V1 = <1, y2-y1, 0>, V2 = <0, y3-y1, 1>.
 		 */
 
-		Make_Vector(N, y1-y2, 1.0, y1-y3);
+		N = Vector3d(y1-y2, 1.0, y1-y3);
 
 		/* Now intersect the triangle. */
 
-		VDot(dot, N, ray.Direction);
+		dot1 = dot(N, ray.Direction);
 
-		if ((dot > EPSILON) || (dot < -EPSILON))
+		if ((dot1 > EPSILON) || (dot1 < -EPSILON))
 			// (Rays virtually parallel to the triangle's plane are asking for mathematical trouble,
 			// so they're always presumed to be a no-hit.)
 		{
-			VSub(V1, P, ray.Origin);
+			V1 = P - ray.Origin;
 
-			VDot(depth1, N, V1);
+			depth1 = dot(N, V1);
 
-			depth1 /= dot;
+			depth1 /= dot1;
 
 			if ((depth1 >= mindist) && (depth1 <= maxdist))
 				// (More expensive check to make sure the ray isn't near-parallel to the triangle's plane.)
@@ -542,7 +540,7 @@ bool HField::intersect_pixel(int x, int z, const Ray &ray, DBL height1, DBL heig
 					Thread->Stats()[Ray_HField_Triangle_Tests_Succeeded]++;
 #endif
 
-					VEvaluateRay(P, RRay.Origin, depth1, RRay.Direction);
+					P = RRay.Evaluate(depth1);
 
 					if (Clip.empty() || Point_In_Clip(P, Clip, Thread))
 						// (Check whether the point of intersection is within the clipped-by volume)
@@ -557,10 +555,9 @@ bool HField::intersect_pixel(int x, int z, const Ray &ray, DBL height1, DBL heig
 							// Non-smoothed height field;
 							// we've already computed the surface normal by now, so just convert it into
 							// world coordinate space, so we don't need to re-compute it in case it's indeed needed later.
-							VECTOR tmp;
-							Assign_Vector(tmp,N);
+							Vector3d tmp = N;
 							MTransNormal(tmp,tmp,Trans);
-							VNormalize(tmp,tmp);
+							tmp.normalize();
 							HField_Stack->push(Intersection(depth1, P, tmp, this));
 						}
 
@@ -584,7 +581,7 @@ bool HField::intersect_pixel(int x, int z, const Ray &ray, DBL height1, DBL heig
 
 		/* Set up triangle. */
 
-		Make_Vector(P, (DBL)(x+1), y4, (DBL)(z+1));
+		P = Vector3d((DBL)(x+1), y4, (DBL)(z+1));
 
 		/*
 		 * Calculate the normal vector from:
@@ -592,21 +589,21 @@ bool HField::intersect_pixel(int x, int z, const Ray &ray, DBL height1, DBL heig
 		 * N = V2 x V1, with V1 = <-1, y3-y4, 0>, V2 = <0, y2-y4, -1>.
 		 */
 
-		Make_Vector(N, y3-y4, 1.0, y2-y4);
+		N = Vector3d(y3-y4, 1.0, y2-y4);
 
 		/* Now intersect the triangle. */
 
-		VDot(dot, N, ray.Direction);
+		dot1 = dot(N, ray.Direction);
 
-		if ((dot > EPSILON) || (dot < -EPSILON))
+		if ((dot1 > EPSILON) || (dot1 < -EPSILON))
 			// (Rays virtually parallel to the triangle's plane are asking for mathematical trouble,
 			// so they're always presumed to be a no-hit.)
 		{
-			VSub(V1, P, ray.Origin);
+			V1 = P - ray.Origin;
 
-			VDot(depth2, N, V1);
+			depth2 = dot(N, V1);
 
-			depth2 /= dot;
+			depth2 /= dot1;
 
 			if ((depth2 >= mindist) && (depth2 <= maxdist))
 				// (More expensive check to make sure the ray isn't near-parallel to the triangle's plane.)
@@ -621,7 +618,7 @@ bool HField::intersect_pixel(int x, int z, const Ray &ray, DBL height1, DBL heig
 					Thread->Stats()[Ray_HField_Triangle_Tests_Succeeded]++;
 #endif
 
-					VEvaluateRay(P, RRay.Origin, depth2, RRay.Direction);
+					P = RRay.Evaluate(depth2);
 
 					if (Clip.empty() || Point_In_Clip(P, Clip, Thread))
 						// (Check whether the point of intersection is within the clipped-by volume)
@@ -636,10 +633,9 @@ bool HField::intersect_pixel(int x, int z, const Ray &ray, DBL height1, DBL heig
 							// Non-smoothed height field;
 							// we've already computed the surface normal by now, so just convert it into
 							// world coordinate space, so we don't need to re-compute it in case it's indeed needed later.
-							VECTOR tmp;
-							Assign_Vector(tmp,N);
+							Vector3d tmp = N;
 							MTransNormal(tmp,tmp,Trans);
-							VNormalize(tmp,tmp);
+							tmp.normalize();
 							HField_Stack->push(Intersection(depth2, P, tmp, this));
 						}
 
@@ -681,9 +677,10 @@ bool HField::intersect_pixel(int x, int z, const Ray &ray, DBL height1, DBL heig
 *
 ******************************************************************************/
 
-int HField::add_single_normal(HF_VAL **data, int xsize, int zsize, int x0, int z0, int x1, int z1, int x2, int z2, VECTOR N)
+int HField::add_single_normal(HF_VAL **data, int xsize, int zsize, int x0, int z0, int x1, int z1, int x2, int z2, Vector3d& N)
 {
-	VECTOR v0, v1, v2, t0, t1, Nt;
+	Vector3d v0, v1, v2;
+	Vector3d t0, t1, Nt;
 
 	if ((x0 < 0) || (z0 < 0) ||
 	    (x1 < 0) || (z1 < 0) ||
@@ -696,23 +693,23 @@ int HField::add_single_normal(HF_VAL **data, int xsize, int zsize, int x0, int z
 	}
 	else
 	{
-		Make_Vector(v0, x0, (DBL)data[z0][x0], z0);
-		Make_Vector(v1, x1, (DBL)data[z1][x1], z1);
-		Make_Vector(v2, x2, (DBL)data[z2][x2], z2);
+		v0 = Vector3d(x0, (DBL)data[z0][x0], z0);
+		v1 = Vector3d(x1, (DBL)data[z1][x1], z1);
+		v2 = Vector3d(x2, (DBL)data[z2][x2], z2);
 
-		VSub(t0, v2, v0);
-		VSub(t1, v1, v0);
+		t0 = v2 - v0;
+		t1 = v1 - v0;
 
-		VCross(Nt, t0, t1);
+		Nt = cross(t0, t1);
 
-		normalize(Nt, Nt);
+		Nt.normalize();
 
 		if (Nt[Y] < 0.0)
 		{
-			VScaleEq(Nt, -1.0);
+			Nt.invert();
 		}
 
-		VAddEq(N, Nt);
+		N += Nt;
 
 		return(1);
 	}
@@ -751,7 +748,7 @@ int HField::add_single_normal(HF_VAL **data, int xsize, int zsize, int x0, int z
 void HField::smooth_height_field(int xsize, int zsize)
 {
 	int i, j, k;
-	VECTOR N;
+	Vector3d N;
 	HF_VAL **map = Data->Map;
 
 	/* First off, allocate all the memory needed to store the normal information */
@@ -774,7 +771,7 @@ void HField::smooth_height_field(int xsize, int zsize)
 	{
 		for (j = 0; j <= xsize; j++)
 		{
-			Make_Vector(N, 0.0, 0.0, 0.0);
+			N = Vector3d(0.0, 0.0, 0.0);
 
 			k = 0;
 
@@ -788,7 +785,7 @@ void HField::smooth_height_field(int xsize, int zsize)
 				throw POV_EXCEPTION_STRING("Failed to find any normals at.");
 			}
 
-			normalize(N, N);
+			N.normalize();
 
 			Data->Normals[i][j][0] = (short)(32767 * N[X]);
 			Data->Normals[i][j][1] = (short)(32767 * N[Y]);
@@ -1055,7 +1052,7 @@ void HField::build_hfield_blocks()
 *
 ******************************************************************************/
 
-void HField::Translate(const VECTOR, const TRANSFORM *tr)
+void HField::Translate(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
@@ -1088,7 +1085,7 @@ void HField::Translate(const VECTOR, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void HField::Rotate(const VECTOR, const TRANSFORM *tr)
+void HField::Rotate(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
@@ -1121,42 +1118,9 @@ void HField::Rotate(const VECTOR, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void HField::Scale(const VECTOR, const TRANSFORM *tr)
+void HField::Scale(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
-}
-
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-*   Invert_HField
-*
-* INPUT
-*   
-* OUTPUT
-*   
-* RETURNS
-*   
-* AUTHOR
-*
-*   Doug Muir, David Buck, Drew Wells
-*   
-* DESCRIPTION
-*
-*   -
-*
-* CHANGES
-*
-*   -
-*
-******************************************************************************/
-
-void HField::Invert()
-{
-	Invert_Flag(this, INVERTED_FLAG);
 }
 
 
@@ -1226,8 +1190,8 @@ HField::HField() : ObjectBase(HFIELD_OBJECT)
 {
 	Trans = Create_Transform();
 
-	Make_Vector(bounding_corner1, -1.0, -1.0, -1.0);
-	Make_Vector(bounding_corner2,  1.0,  1.0,  1.0);
+	bounding_corner1 = Vector3d(-1.0, -1.0, -1.0);
+	bounding_corner2 = Vector3d( 1.0,  1.0,  1.0);
 
 	/* Allocate height field data. */
 
@@ -1293,8 +1257,8 @@ ObjectPtr HField::Copy()
 	*New = *this;
 	New->Trans = Copy_Transform(Trans);
 
-	Assign_Vector(New->bounding_corner1, bounding_corner1);
-	Assign_Vector(New->bounding_corner2, bounding_corner2);
+	New->bounding_corner1 = bounding_corner1;
+	New->bounding_corner2 = bounding_corner2;
 
 	New->Data = Data;
 	New->Data->References++;
@@ -1410,12 +1374,9 @@ HField::~HField()
 
 void HField::Compute_BBox()
 {
-	// [ABX 20.01.2004] Low_Left introduced to hide BCC 5.5 bug
-	BBOX_VECT& Low_Left = BBox.Lower_Left;
+	BBox.lowerLeft = BBoxVector3d(bounding_corner1);
 
-	Assign_BBox_Vect(Low_Left, bounding_corner1);
-
-	VSub (BBox.Lengths, bounding_corner2, bounding_corner1);
+	BBox.size = BBoxVector3d(bounding_corner2 - bounding_corner1);
 
 	if (Trans != NULL)
 	{
@@ -1468,7 +1429,7 @@ void HField::Compute_BBox()
 *
 ******************************************************************************/
 
-bool HField::dda_traversal(const Ray &ray, const VECTOR Start, const HFIELD_BLOCK *Block, IStack &HField_Stack, const Ray &RRay, DBL mindist, DBL maxdist, TraceThreadData *Thread)
+bool HField::dda_traversal(const BasicRay &ray, const Vector3d& Start, const HFIELD_BLOCK *Block, IStack &HField_Stack, const BasicRay &RRay, DBL mindist, DBL maxdist, TraceThreadData *Thread)
 {
 	const char *dda_msg = "Illegal grid value in dda_traversal().\n"
 	                      "The height field may contain dark spots. To eliminate them\n"
@@ -1881,7 +1842,7 @@ bool HField::dda_traversal(const Ray &ray, const VECTOR Start, const HFIELD_BLOC
 *
 ******************************************************************************/
 
-bool HField::block_traversal(const Ray &ray, const VECTOR Start, IStack &HField_Stack, const Ray &RRay, DBL mindist, DBL maxdist, TraceThreadData *Thread)
+bool HField::block_traversal(const BasicRay &ray, const Vector3d& Start, IStack &HField_Stack, const BasicRay &RRay, DBL mindist, DBL maxdist, TraceThreadData *Thread)
 {
 	int xmax, zmax;
 	int x, z, nx, nz, signx, signz;
@@ -1892,7 +1853,8 @@ bool HField::block_traversal(const Ray &ray, const VECTOR Start, IStack &HField_
 	DBL ymin, ymax, y1, y2;
 	DBL neary, fary;
 	DBL k1, k2, dist;
-	VECTOR nearP, farP;
+	Vector3d nearP;
+	Vector3d farP;
 	HFIELD_BLOCK *Block;
 
 	px = Start[X];
@@ -1954,7 +1916,7 @@ bool HField::block_traversal(const Ray &ray, const VECTOR Start, IStack &HField_
 	x = (int)px;
 	z = (int)pz;
 
-	Assign_Vector(nearP, Start);
+	nearP = Start;
 
 	neary = Start[Y];
 
@@ -2043,7 +2005,7 @@ bool HField::block_traversal(const Ray &ray, const VECTOR Start, IStack &HField_
 
 		/* Get point where ray leaves current block. */
 
-		VEvaluateRay(farP, ray.Origin, dist, ray.Direction);
+		farP = ray.Evaluate(dist);
 
 		fary = farP[Y];
 
@@ -2086,7 +2048,7 @@ bool HField::block_traversal(const Ray &ray, const VECTOR Start, IStack &HField_
 		x = nx;
 		z = nz;
 
-		Assign_Vector(nearP, farP);
+		nearP = farP;
 
 		neary = fary;
 	}

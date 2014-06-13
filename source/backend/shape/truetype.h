@@ -24,16 +24,17 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/shape/truetype.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/shape/truetype.h $
+ * $Revision: #28 $
+ * $Change: 6164 $
+ * $DateTime: 2013/12/09 17:21:04 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #ifndef TRUETYPE_H
 #define TRUETYPE_H
 
+#include "backend/scene/objects.h"
 #include "backend/scene/scene.h"
 #include "backend/shape/csg.h"
 
@@ -68,21 +69,20 @@ class TrueType : public ObjectBase
 		virtual ObjectPtr Copy();
 
 		virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
-		virtual bool Inside(const VECTOR, TraceThreadData *) const;
-		virtual void Normal(VECTOR, Intersection *, TraceThreadData *) const;
-		virtual void Translate(const VECTOR, const TRANSFORM *);
-		virtual void Rotate(const VECTOR, const TRANSFORM *);
-		virtual void Scale(const VECTOR, const TRANSFORM *);
+		virtual bool Inside(const Vector3d&, TraceThreadData *) const;
+		virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const;
+		virtual void Translate(const Vector3d&, const TRANSFORM *);
+		virtual void Rotate(const Vector3d&, const TRANSFORM *);
+		virtual void Scale(const Vector3d&, const TRANSFORM *);
 		virtual void Transform(const TRANSFORM *);
-		virtual void Invert();
 		virtual void Compute_BBox();
 
-		static void ProcessNewTTF(CSG *Object, const char *filename, const int font_id, const UCS2 *text_string, DBL depth, const VECTOR offset, Parser *parser, shared_ptr<SceneData>& sceneData);
+		static void ProcessNewTTF(CSG *Object, const char *filename, const int font_id, const UCS2 *text_string, DBL depth, const Vector3d& offset, Parser *parser, shared_ptr<SceneData>& sceneData);
 	protected:
 		bool Inside_Glyph(double x, double y, const GlyphStruct* glyph) const;
 		int solve_quad(double *x, double *y, double mindist, DBL maxdist) const;
-		void GetZeroOneHits(const GlyphStruct* glyph, const VECTOR P, const VECTOR D, DBL glyph_depth, double *t0, double *t1) const;
-		bool GlyphIntersect(const VECTOR P, const VECTOR D, const GlyphStruct* glyph, DBL glyph_depth, const Ray &ray, IStack& Depth_Stack, TraceThreadData *Thread);
+		void GetZeroOneHits(const GlyphStruct* glyph, const Vector3d& P, const Vector3d& D, DBL glyph_depth, double *t0, double *t1) const;
+		bool GlyphIntersect(const Vector3d& P, const Vector3d& D, const GlyphStruct* glyph, DBL glyph_depth, const BasicRay &ray, IStack& Depth_Stack, TraceThreadData *Thread);
 };
 
 void FreeFontInfo(FontFileInfo *ffi);

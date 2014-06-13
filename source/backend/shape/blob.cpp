@@ -29,11 +29,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: N/A $
- * $Revision: N/A $
- * $Change: N/A $
- * $DateTime: N/A $
- * $Author: N/A $
+ * $File: //depot/povray/smp/source/backend/shape/blob.cpp $
+ * $Revision: #54 $
+ * $Change: 6164 $
+ * $DateTime: 2013/12/09 17:21:04 $
+ * $Author: clipka $
  *******************************************************************************/
 
 /****************************************************************************
@@ -233,8 +233,8 @@ bool Blob::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDat
 	DBL *fcoeffs;
 	DBL coeffs[5];
 	DBL roots[4];
-	VECTOR P, D, V1, PP, DD;
-	VECTOR IPoint;
+	Vector3d P, D, V1, PP, DD;
+	Vector3d IPoint;
 	const Blob_Element *Element;
 	DBL newcoeffs[5], dk[5];
 	DBL max_bound;
@@ -250,13 +250,13 @@ bool Blob::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDat
 		MInvTransPoint(P, ray.Origin, Trans);
 		MInvTransDirection(D, ray.Direction, Trans);
 
-		VLength(len, D);
-		VInverseScaleEq(D, len);
+		len = D.length();
+		D /= len;
 	}
 	else
 	{
-		Assign_Vector(P, ray.Origin);
-		Assign_Vector(D, ray.Direction);
+		P = ray.Origin;
+		D = ray.Direction;
 
 		len = 1.0;
 	}
@@ -281,7 +281,7 @@ bool Blob::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDat
 		intervals[i].bound -= start_dist;
 	}
 
-	VAddScaledEq(P, start_dist, D);
+	P += start_dist * D;
 
 	max_bound = intervals[0].bound;
 	for (i = 0; i < cnt; i++)
@@ -294,7 +294,7 @@ bool Blob::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDat
 
 	if (max_bound != 0)
 	{
-		VScaleEq(D, max_bound);
+		D *= max_bound;
 
 		for (i = 0; i < cnt; i++)
 			intervals[i].bound /= max_bound;
@@ -335,10 +335,10 @@ bool Blob::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDat
 			{
 				case BLOB_SPHERE:
 
-					VSub(V1, P, Element->O);
+					V1 = P - Element->O;
 
-					VDot(t0, V1, V1);
-					VDot(t1, V1, D);
+					t0 = V1.lengthSqr();
+					t1 = dot(V1, D);
 					t2 = max_bound * max_bound;
 
 					c0 = Element->c[0];
@@ -358,11 +358,11 @@ bool Blob::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDat
 					MInvTransPoint(PP, P, Element->Trans);
 					MInvTransDirection(DD, D, Element->Trans);
 
-					VSub(V1, PP, Element->O);
+					V1 = PP - Element->O;
 
-					VDot(t0, V1, V1);
-					VDot(t1, V1, DD);
-					VDot(t2, DD, DD);
+					t0 = V1.lengthSqr();
+					t1 = dot(V1, DD);
+					t2 = DD.lengthSqr();
 
 					c0 = Element->c[0];
 					c1 = Element->c[1];
@@ -387,9 +387,9 @@ bool Blob::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDat
 						PP[Z] -= Element->len;
 					}
 
-					VDot(t0, PP, PP);
-					VDot(t1, PP, DD);
-					VDot(t2, DD, DD);
+					t0 = PP.lengthSqr();
+					t1 = dot(PP, DD);
+					t2 = DD.lengthSqr();
 
 					c0 = Element->c[0];
 					c1 = Element->c[1];
@@ -530,7 +530,7 @@ bool Blob::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDat
 
 				if ((dist > depthTolerance) && (dist < MAX_DISTANCE))
 				{
-					VEvaluateRay(IPoint, ray.Origin, dist, ray.Direction);
+					IPoint = ray.Evaluate(dist);
 
 					if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
 					{
@@ -700,18 +700,18 @@ void Blob::insert_hit(const Blob_Element *Element, DBL t0, DBL t1, Blob_Interval
 *
 ******************************************************************************/
 
-int Blob::intersect_cylinder(const Blob_Element *Element, const VECTOR P, const VECTOR D, DBL mindist, DBL *tmin, DBL *tmax)
+int Blob::intersect_cylinder(const Blob_Element *Element, const Vector3d& P, const Vector3d& D, DBL mindist, DBL *tmin, DBL *tmax)
 {
 	DBL a, b, c, d, t, u, v, w, len;
-	VECTOR PP, DD;
+	Vector3d PP, DD;
 
 	/* Transform ray into cylinder space. */
 
 	MInvTransPoint(PP, P, Element->Trans);
 	MInvTransDirection(DD, D, Element->Trans);
 
-	VLength(len, DD);
-	VInverseScaleEq(DD, len);
+	len = DD.length();
+	DD /= len;
 
 	/* Intersect ray with cylinder. */
 
@@ -831,20 +831,20 @@ int Blob::intersect_cylinder(const Blob_Element *Element, const VECTOR P, const 
 *
 ******************************************************************************/
 
-int Blob::intersect_ellipsoid(const Blob_Element *Element, const VECTOR P, const VECTOR D, DBL mindist, DBL *tmin, DBL *tmax)
+int Blob::intersect_ellipsoid(const Blob_Element *Element, const Vector3d& P, const Vector3d& D, DBL mindist, DBL *tmin, DBL *tmax)
 {
 	DBL b, d, t, len;
-	VECTOR V1, PP, DD;
+	Vector3d V1, PP, DD;
 
 	MInvTransPoint(PP, P, Element->Trans);
 	MInvTransDirection(DD, D, Element->Trans);
 
-	VLength(len, DD);
-	VInverseScaleEq(DD, len);
+	len = DD.length();
+	DD /= len;
 
-	VSub(V1, PP, Element->O);
-	VDot(b, V1, DD);
-	VDot(t, V1, V1);
+	V1 = PP - Element->O;
+	b = dot(V1, DD);
+	t = V1.lengthSqr();
 
 	d = b * b - t + Element->rad2;
 
@@ -907,23 +907,23 @@ int Blob::intersect_ellipsoid(const Blob_Element *Element, const VECTOR P, const
 *
 ******************************************************************************/
 
-int Blob::intersect_hemisphere(const Blob_Element *Element, const VECTOR P, const VECTOR D, DBL mindist, DBL *tmin, DBL *tmax)
+int Blob::intersect_hemisphere(const Blob_Element *Element, const Vector3d& P, const Vector3d& D, DBL mindist, DBL *tmin, DBL *tmax)
 {
 	DBL b, d, t, z1, z2, len;
-	VECTOR PP, DD;
+	Vector3d PP, DD;
 
 	/* Transform ray into hemisphere space. */
 
 	MInvTransPoint(PP, P, Element->Trans);
 	MInvTransDirection(DD, D, Element->Trans);
 
-	VLength(len, DD);
-	VInverseScaleEq(DD, len);
+	len = DD.length();
+	DD /= len;
 
 	if (Element->Type == BLOB_BASE_HEMISPHERE)
 	{
-		VDot(b, PP, DD);
-		VDot(t, PP, PP);
+		b = dot(PP, DD);
+		t = PP.lengthSqr();
 
 		d = b * b - t + Element->rad2;
 
@@ -990,8 +990,8 @@ int Blob::intersect_hemisphere(const Blob_Element *Element, const VECTOR P, cons
 	{
 		PP[Z] -= Element->len;
 
-		VDot(b, PP, DD);
-		VDot(t, PP, PP);
+		b = dot(PP, DD);
+		t = PP.lengthSqr();
 
 		d = b * b - t + Element->rad2;
 
@@ -1090,14 +1090,14 @@ int Blob::intersect_hemisphere(const Blob_Element *Element, const VECTOR P, cons
 *
 ******************************************************************************/
 
-int Blob::intersect_sphere(const Blob_Element *Element, const VECTOR P, const VECTOR D, DBL mindist, DBL *tmin, DBL *tmax)
+int Blob::intersect_sphere(const Blob_Element *Element, const Vector3d& P, const Vector3d& D, DBL mindist, DBL *tmin, DBL *tmax)
 {
 	DBL b, d, t;
-	VECTOR V1;
+	Vector3d V1;
 
-	VSub(V1, P, Element->O);
-	VDot(b, V1, D);
-	VDot(t, V1, V1);
+	V1 = P - Element->O;
+	b = dot(V1, D);
+	t = V1.lengthSqr();
 
 	d = b * b - t + Element->rad2;
 
@@ -1160,7 +1160,7 @@ int Blob::intersect_sphere(const Blob_Element *Element, const VECTOR P, const VE
 *
 ******************************************************************************/
 
-int Blob::intersect_element(const VECTOR P, const VECTOR D, const Blob_Element *Element, DBL mindist, DBL *tmin, DBL *tmax, TraceThreadData *Thread)
+int Blob::intersect_element(const Vector3d& P, const Vector3d& D, const Blob_Element *Element, DBL mindist, DBL *tmin, DBL *tmax, TraceThreadData *Thread)
 {
 #ifdef BLOB_EXTRA_STATS
 	Thread->Stats()[Blob_Element_Tests]++;
@@ -1253,12 +1253,12 @@ int Blob::intersect_element(const VECTOR P, const VECTOR D, const Blob_Element *
 *
 ******************************************************************************/
 
-int Blob::determine_influences(const VECTOR P, const VECTOR  D, DBL mindist, Blob_Interval_Struct *intervals, TraceThreadData *Thread) const
+int Blob::determine_influences(const Vector3d& P, const Vector3d& D, DBL mindist, Blob_Interval_Struct *intervals, TraceThreadData *Thread) const
 {
 	int i;
 	unsigned int cnt, size;
 	DBL b, t, t0, t1;
-	VECTOR V1;
+	Vector3d V1;
 	BSPHERE_TREE *Tree;
 	BSPHERE_TREE **Queue = reinterpret_cast<BSPHERE_TREE **>(Thread->Blob_Queue);
 
@@ -1309,9 +1309,9 @@ int Blob::determine_influences(const VECTOR P, const VECTOR  D, DBL mindist, Blo
 					Thread->Stats()[Blob_Bound_Tests]++;
 #endif
 
-					VSub(V1, Tree->Node[i]->C, P);
-					VDot(b, V1, D);
-					VDot(t, V1, V1);
+					V1 = Tree->Node[i]->C - P;
+					b = dot(V1, D);
+					t = V1.lengthSqr();
 
 					if ((t - Sqr(b)) <= Tree->Node[i]->r2)
 					{
@@ -1364,10 +1364,10 @@ int Blob::determine_influences(const VECTOR P, const VECTOR  D, DBL mindist, Blo
 *
 ******************************************************************************/
 
-DBL Blob::calculate_element_field(const Blob_Element *Element, const VECTOR P)
+DBL Blob::calculate_element_field(const Blob_Element *Element, const Vector3d& P)
 {
 	DBL rad2, density;
-	VECTOR V1, PP;
+	Vector3d V1, PP;
 
 	density = 0.0;
 
@@ -1375,9 +1375,9 @@ DBL Blob::calculate_element_field(const Blob_Element *Element, const VECTOR P)
 	{
 		case BLOB_SPHERE:
 
-			VSub(V1, P, Element->O);
+			V1 = P - Element->O;
 
-			VDot(rad2, V1, V1);
+			rad2 = V1.lengthSqr();
 
 			if (rad2 < Element->rad2)
 			{
@@ -1390,9 +1390,9 @@ DBL Blob::calculate_element_field(const Blob_Element *Element, const VECTOR P)
 
 			MInvTransPoint(PP, P, Element->Trans);
 
-			VSub(V1, PP, Element->O);
+			V1 = PP - Element->O;
 
-			VDot(rad2, V1, V1);
+			rad2 = V1.lengthSqr();
 
 			if (rad2 < Element->rad2)
 			{
@@ -1407,7 +1407,7 @@ DBL Blob::calculate_element_field(const Blob_Element *Element, const VECTOR P)
 
 			if (PP[Z] <= 0.0)
 			{
-				VDot(rad2, PP, PP);
+				rad2 = PP.lengthSqr();
 
 				if (rad2 <= Element->rad2)
 				{
@@ -1425,7 +1425,7 @@ DBL Blob::calculate_element_field(const Blob_Element *Element, const VECTOR P)
 
 			if (PP[Z] >= 0.0)
 			{
-				VDot(rad2, PP, PP);
+				rad2 = PP.lengthSqr();
 
 				if (rad2 <= Element->rad2)
 				{
@@ -1487,12 +1487,12 @@ DBL Blob::calculate_element_field(const Blob_Element *Element, const VECTOR P)
 *
 ******************************************************************************/
 
-DBL Blob::calculate_field_value(const VECTOR P, TraceThreadData *Thread) const
+DBL Blob::calculate_field_value(const Vector3d& P, TraceThreadData *Thread) const
 {
 	int i;
 	unsigned int size;
 	DBL density, rad2;
-	VECTOR V1;
+	Vector3d V1;
 	BSPHERE_TREE *Tree;
 	BSPHERE_TREE **Queue = reinterpret_cast<BSPHERE_TREE **>(Thread->Blob_Queue);
 
@@ -1533,9 +1533,9 @@ DBL Blob::calculate_field_value(const VECTOR P, TraceThreadData *Thread) const
 				{
 					/* Insert sub-node if we are inside. */
 
-					VSub(V1, P, Tree->Node[i]->C);
+					V1 = P - Tree->Node[i]->C;
 
-					VDot(rad2, V1, V1);
+					rad2 = V1.lengthSqr();
 
 					if (rad2 <= Tree->Node[i]->r2)
 						if (insert_node(Tree->Node[i], &size, Thread))
@@ -1582,9 +1582,9 @@ DBL Blob::calculate_field_value(const VECTOR P, TraceThreadData *Thread) const
 *
 ******************************************************************************/
 
-bool Blob::Inside(const VECTOR Test_Point, TraceThreadData *Thread) const
+bool Blob::Inside(const Vector3d& Test_Point, TraceThreadData *Thread) const
 {
-	VECTOR New_Point;
+	Vector3d New_Point;
 
 	/* Transform the point into blob space. */
 
@@ -1594,7 +1594,7 @@ bool Blob::Inside(const VECTOR Test_Point, TraceThreadData *Thread) const
 	}
 	else
 	{
-		Assign_Vector(New_Point, Test_Point);
+		New_Point = Test_Point;
 	}
 
 	if (calculate_field_value(New_Point, Thread) > Data->Threshold - INSIDE_TOLERANCE)
@@ -1644,24 +1644,24 @@ bool Blob::Inside(const VECTOR Test_Point, TraceThreadData *Thread) const
 *
 ******************************************************************************/
 
-void Blob::element_normal(VECTOR Result, const VECTOR P, const Blob_Element *Element)
+void Blob::element_normal(Vector3d& Result, const Vector3d& P, const Blob_Element *Element)
 {
 	DBL val, dist;
-	VECTOR V1, PP;
+	Vector3d V1, PP;
 
 	switch (Element->Type)
 	{
 		case BLOB_SPHERE:
 
-			VSub(V1, P, Element->O);
+			V1 = P - Element->O;
 
-			VDot(dist, V1, V1);
+			dist = V1.lengthSqr();
 
 			if (dist <= Element->rad2)
 			{
 				val = -2.0 * Element->c[0] * dist - Element->c[1];
 
-				VAddScaledEq(Result, val, V1);
+				Result += val * V1;
 			}
 
 			break;
@@ -1670,9 +1670,9 @@ void Blob::element_normal(VECTOR Result, const VECTOR P, const Blob_Element *Ele
 
 			MInvTransPoint(PP, P, Element->Trans);
 
-			VSub(V1, PP, Element->O);
+			V1 = PP - Element->O;
 
-			VDot(dist, V1, V1);
+			dist = V1.lengthSqr();
 
 			if (dist <= Element->rad2)
 			{
@@ -1680,7 +1680,7 @@ void Blob::element_normal(VECTOR Result, const VECTOR P, const Blob_Element *Ele
 
 				MTransNormal(V1, V1, Element->Trans);
 
-				VAddScaledEq(Result, val, V1);
+				Result += val * V1;
 			}
 
 			break;
@@ -1691,7 +1691,7 @@ void Blob::element_normal(VECTOR Result, const VECTOR P, const Blob_Element *Ele
 
 			if (PP[Z] <= 0.0)
 			{
-				VDot(dist, PP, PP);
+				dist = PP.lengthSqr();
 
 				if (dist <= Element->rad2)
 				{
@@ -1699,7 +1699,7 @@ void Blob::element_normal(VECTOR Result, const VECTOR P, const Blob_Element *Ele
 
 					MTransNormal(PP, PP, Element->Trans);
 
-					VAddScaledEq(Result, val, PP);
+					Result += val * PP;
 				}
 			}
 
@@ -1713,7 +1713,7 @@ void Blob::element_normal(VECTOR Result, const VECTOR P, const Blob_Element *Ele
 
 			if (PP[Z] >= 0.0)
 			{
-				VDot(dist, PP, PP);
+				dist = PP.lengthSqr();
 
 				if (dist <= Element->rad2)
 				{
@@ -1721,7 +1721,7 @@ void Blob::element_normal(VECTOR Result, const VECTOR P, const Blob_Element *Ele
 
 					MTransNormal(PP, PP, Element->Trans);
 
-					VAddScaledEq(Result, val, PP);
+					Result += val * PP;
 				}
 			}
 
@@ -1741,7 +1741,7 @@ void Blob::element_normal(VECTOR Result, const VECTOR P, const Blob_Element *Ele
 
 					MTransNormal(PP, PP, Element->Trans);
 
-					VAddScaledEq(Result, val, PP);
+					Result += val * PP;
 				}
 			}
 
@@ -1782,19 +1782,19 @@ void Blob::element_normal(VECTOR Result, const VECTOR P, const Blob_Element *Ele
 *
 ******************************************************************************/
 
-void Blob::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) const
+void Blob::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread) const
 {
 	int i;
 	unsigned int size;
 	DBL dist, val;
-	VECTOR New_Point, V1;
+	Vector3d New_Point, V1;
 	BSPHERE_TREE *Tree;
 	BSPHERE_TREE **Queue = reinterpret_cast<BSPHERE_TREE **>(Thread->Blob_Queue);
 
 	/* Transform the point into the blob space. */
 	getLocalIPoint(New_Point, Inter);
 
-	Make_Vector(Result, 0.0, 0.0, 0.0);
+	Result = Vector3d(0.0, 0.0, 0.0);
 
 	/* For each component that contributes to this point, add its bit to the normal */
 
@@ -1833,9 +1833,9 @@ void Blob::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) c
 				{
 					/* Insert sub-node if we are inside. */
 
-					VSub(V1, New_Point, Tree->Node[i]->C);
+					V1 = New_Point - Tree->Node[i]->C;
 
-					VDot(dist, V1, V1);
+					dist = V1.lengthSqr();
 
 					if (dist <= Tree->Node[i]->r2)
 						if (insert_node(Tree->Node[i], &size, Thread))
@@ -1845,11 +1845,11 @@ void Blob::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) c
 		}
 	}
 
-	VDot(val, Result, Result);
+	val = Result.lengthSqr();
 
 	if (val == 0.0)
 	{
-		Make_Vector(Result, 1.0, 0.0, 0.0);
+		Result = Vector3d(1.0, 0.0, 0.0);
 	}
 	else
 	{
@@ -1857,7 +1857,7 @@ void Blob::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) c
 
 		val = 1.0 / sqrt(val);
 
-		VScaleEq(Result, val);
+		Result *= val;
 	}
 
 	/* Transform back to world space. */
@@ -1866,7 +1866,7 @@ void Blob::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) c
 	{
 		MTransNormal(Result, Result, Trans);
 
-		VNormalize(Result, Result);
+		Result.normalize();
 	}
 }
 
@@ -1902,7 +1902,7 @@ void Blob::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) c
 *
 ******************************************************************************/
 
-void Blob::Translate(const VECTOR, const TRANSFORM *tr)
+void Blob::Translate(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
@@ -1939,7 +1939,7 @@ void Blob::Translate(const VECTOR, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void Blob::Rotate(const VECTOR, const TRANSFORM *tr)
+void Blob::Rotate(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
@@ -1976,7 +1976,7 @@ void Blob::Rotate(const VECTOR, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void Blob::Scale(const VECTOR, const TRANSFORM *tr)
+void Blob::Scale(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
@@ -2026,43 +2026,6 @@ void Blob::Transform(const TRANSFORM *tr)
 
 	for(i = 0; i < Data->Number_Of_Components; i++)
 		Transform_Textures(Element_Texture[i], tr);
-}
-
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-*   Invert_Blob
-*
-* INPUT
-*
-*   Object - Pointer to blob structure
-*
-* OUTPUT
-*
-*   Object
-*
-* RETURNS
-*
-* AUTHOR
-*
-*   Alexander Enzmann
-*
-* DESCRIPTION
-*
-*   Invert a blob.
-*
-* CHANGES
-*
-*   -
-*
-******************************************************************************/
-
-void Blob::Invert()
-{
-	Invert_Flag(this, INVERTED_FLAG);
 }
 
 
@@ -2272,10 +2235,10 @@ void Blob::Compute_BBox()
 {
 	int i;
 	DBL radius, radius2;
-	VECTOR Center, Min, Max;
+	Vector3d Center, Min, Max;
 
-	Make_Vector(Min, BOUND_HUGE, BOUND_HUGE, BOUND_HUGE);
-	Make_Vector(Max, - BOUND_HUGE, - BOUND_HUGE, - BOUND_HUGE);
+	Min = Vector3d(BOUND_HUGE);
+	Max = Vector3d(-BOUND_HUGE);
 
 	for (i = 0; i < Data->Number_Of_Components; i++)
 	{
@@ -2336,11 +2299,11 @@ void Blob::Compute_BBox()
 *
 ******************************************************************************/
 
-void Blob::get_element_bounding_sphere(const Blob_Element *Element, VECTOR Center, DBL *Radius2)
+void Blob::get_element_bounding_sphere(const Blob_Element *Element, Vector3d& Center, DBL *Radius2)
 {
 	DBL r, r2 = 0.0;
-	VECTOR C;
-	BBOX local_BBox;
+	Vector3d C;
+	BoundingBox local_BBox;
 
 	switch (Element->Type)
 	{
@@ -2349,7 +2312,7 @@ void Blob::get_element_bounding_sphere(const Blob_Element *Element, VECTOR Cente
 
 			r2 = Element->rad2;
 
-			Assign_Vector(C, Element->O);
+			C = Element->O;
 
 			break;
 
@@ -2357,7 +2320,7 @@ void Blob::get_element_bounding_sphere(const Blob_Element *Element, VECTOR Cente
 
 			r2 = Element->rad2;
 
-			Make_Vector(C, 0.0, 0.0, 0.0);
+			C = Vector3d(0.0, 0.0, 0.0);
 
 			break;
 
@@ -2365,13 +2328,13 @@ void Blob::get_element_bounding_sphere(const Blob_Element *Element, VECTOR Cente
 
 			r2 = Element->rad2;
 
-			Make_Vector(C, 0.0, 0.0, Element->len);
+			C = Vector3d(0.0, 0.0, Element->len);
 
 			break;
 
 		case BLOB_CYLINDER :
 
-			Make_Vector(C, 0.0, 0.0, 0.5 * Element->len);
+			C = Vector3d(0.0, 0.0, 0.5 * Element->len);
 
 			r2 = Element->rad2 + Sqr(0.5 * Element->len);
 
@@ -2387,13 +2350,13 @@ void Blob::get_element_bounding_sphere(const Blob_Element *Element, VECTOR Cente
 
 		Make_BBox(local_BBox, 0, 0, 0, r, r, r);
 		Recompute_BBox(&local_BBox, Element->Trans);
-		r = max(max(fabs(local_BBox.Lengths[X]), fabs(local_BBox.Lengths[Y])),
-		           fabs(local_BBox.Lengths[Z]));
+		r = max(max(fabs(local_BBox.size[X]), fabs(local_BBox.size[Y])),
+		           fabs(local_BBox.size[Z]));
 
 		r2 = Sqr(r) + EPSILON;
 	}
 
-	Assign_Vector(Center, C);
+	Center = C;
 
 	*Radius2 = r2;
 }
@@ -2434,7 +2397,6 @@ Blob_Element::Blob_Element (void)
 	c[0] = 0.0;
 	c[1] = 0.0;
 	c[2] = 0.0;
-	Make_Vector(O, 0.0, 0.0, 0.0);
 	Texture = NULL;
 	Trans = NULL;
 }
@@ -2797,7 +2759,7 @@ void Blob::Determine_Textures(Intersection *isect, bool hitinside, WeightedTextu
 	int i;
 	unsigned int size;
 	DBL rad2;
-	VECTOR V1, P;
+	Vector3d V1, P;
 	Blob_Element *Element;
 	BSPHERE_TREE *Tree;
 	size_t firstinserted = textures.size();
@@ -2842,9 +2804,9 @@ void Blob::Determine_Textures(Intersection *isect, bool hitinside, WeightedTextu
 				{
 					/* Insert sub-node if we are inside. */
 
-					VSub(V1, P, Tree->Node[i]->C);
+					V1 = P - Tree->Node[i]->C;
 
-					VDot(rad2, V1, V1);
+					rad2 = V1.lengthSqr();
 
 					if (rad2 <= Tree->Node[i]->r2)
 						if (insert_node(Tree->Node[i], &size, Thread))
@@ -2899,7 +2861,7 @@ void Blob::Determine_Textures(Intersection *isect, bool hitinside, WeightedTextu
 *
 ******************************************************************************/
 
-void Blob::determine_element_texture(const Blob_Element *Element, TEXTURE *ElementTex, const VECTOR P, WeightedTextureVector& textures)
+void Blob::determine_element_texture(const Blob_Element *Element, TEXTURE *ElementTex, const Vector3d& P, WeightedTextureVector& textures)
 {
 		DBL density = fabs(calculate_element_field(Element, P));
 
@@ -2940,7 +2902,7 @@ void Blob::determine_element_texture(const Blob_Element *Element, TEXTURE *Eleme
 *
 ******************************************************************************/
 
-void Blob::Translate_Blob_Element(Blob_Element *Element, const VECTOR Vector)
+void Blob::Translate_Blob_Element(Blob_Element *Element, const Vector3d& Vector)
 {
 	TRANSFORM Trans;
 
@@ -2950,7 +2912,7 @@ void Blob::Translate_Blob_Element(Blob_Element *Element, const VECTOR Vector)
 	{
 		/* This is a sphere component. */
 
-		VAddEq(Element->O, Vector);
+		Element->O += Vector;
 		Transform_Textures(Element->Texture, &Trans);
 	}
 	else
@@ -2994,7 +2956,7 @@ void Blob::Translate_Blob_Element(Blob_Element *Element, const VECTOR Vector)
 *
 ******************************************************************************/
 
-void Blob::Rotate_Blob_Element(Blob_Element *Element, const VECTOR Vector)
+void Blob::Rotate_Blob_Element(Blob_Element *Element, const Vector3d& Vector)
 {
 	TRANSFORM Trans;
 
@@ -3048,7 +3010,7 @@ void Blob::Rotate_Blob_Element(Blob_Element *Element, const VECTOR Vector)
 *
 ******************************************************************************/
 
-void Blob::Scale_Blob_Element(Blob_Element *Element, const VECTOR Vector)
+void Blob::Scale_Blob_Element(Blob_Element *Element, const Vector3d& Vector)
 {
 	TRANSFORM Trans;
 
@@ -3070,7 +3032,7 @@ void Blob::Scale_Blob_Element(Blob_Element *Element, const VECTOR Vector)
 	{
 		/* This is a sphere component. */
 
-		VScaleEq(Element->O, Vector[X]);
+		Element->O *= Vector[X];
 
 		Element->rad2 *= Sqr(Vector[X]);
 
@@ -3288,19 +3250,19 @@ void Blob::Create_Blob_Element_Texture_List(Blob_List_Struct *BlobList, int npoi
 
 /*****************************************************************************/
 
-void Blob::getLocalIPoint(VECTOR lip, Intersection *isect) const
+void Blob::getLocalIPoint(Vector3d& lip, Intersection *isect) const
 {
 	if(isect->haveLocalIPoint == false)
 	{
 		if(Trans != NULL)
 			MInvTransPoint(isect->LocalIPoint, isect->IPoint, Trans);
 		else
-			Assign_Vector(isect->LocalIPoint, isect->IPoint);
+			isect->LocalIPoint = isect->IPoint;
 
 		isect->haveLocalIPoint = true;
 	}
 
-	Assign_Vector(lip, isect->LocalIPoint);
+	lip = isect->LocalIPoint;
 }
 
 }

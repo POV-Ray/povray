@@ -24,17 +24,18 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/shape/quadrics.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/shape/quadrics.h $
+ * $Revision: #22 $
+ * $Change: 6164 $
+ * $DateTime: 2013/12/09 17:21:04 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #ifndef QUADRICS_H
 #define QUADRICS_H
 
-#include "planes.h"
+#include "backend/scene/objects.h"
+#include "backend/shape/planes.h"
 
 namespace pov
 {
@@ -54,9 +55,9 @@ namespace pov
 class Quadric : public ObjectBase
 {
 	public:
-		VECTOR Square_Terms;
-		VECTOR Mixed_Terms;
-		VECTOR Terms;
+		Vector3d Square_Terms;
+		Vector3d Mixed_Terms;
+		Vector3d Terms;
 		DBL Constant;
 		bool Automatic_Bounds;
 
@@ -66,19 +67,19 @@ class Quadric : public ObjectBase
 		virtual ObjectPtr Copy();
 
 		virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
-		virtual bool Inside(const VECTOR, TraceThreadData *) const;
-		virtual void Normal(VECTOR, Intersection *, TraceThreadData *) const;
-		virtual void Translate(const VECTOR, const TRANSFORM *);
-		virtual void Rotate(const VECTOR, const TRANSFORM *);
-		virtual void Scale(const VECTOR, const TRANSFORM *);
+		virtual bool Inside(const Vector3d&, TraceThreadData *) const;
+		virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const;
+		virtual void Translate(const Vector3d&, const TRANSFORM *);
+		virtual void Rotate(const Vector3d&, const TRANSFORM *);
+		virtual void Scale(const Vector3d&, const TRANSFORM *);
 		virtual void Transform(const TRANSFORM *);
-		virtual void Invert();
+		virtual ObjectPtr Invert();
 		virtual void Compute_BBox();
 
-		static void Compute_Plane_Min_Max(const Plane *plane, VECTOR Min, VECTOR Max);
-		void Compute_BBox(VECTOR ClipMin, VECTOR  ClipMax);
+		static void Compute_Plane_Min_Max(const Plane *plane, Vector3d& Min, Vector3d& Max);
+		void Compute_BBox(Vector3d& ClipMin, Vector3d& ClipMax);
 	protected:
-		bool Intersect(const Ray& ray, DBL *Depth1, DBL *Depth2) const;
+		bool Intersect(const BasicRay& ray, DBL *Depth1, DBL *Depth2) const;
 		void Quadric_To_Matrix(MATRIX Matrix) const;
 		void Matrix_To_Quadric(const MATRIX Matrix);
 };

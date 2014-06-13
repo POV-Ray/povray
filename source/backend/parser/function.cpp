@@ -28,9 +28,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/parser/function.cpp $
- * $Revision: #19 $
- * $Change: 6085 $
- * $DateTime: 2013/11/10 07:39:29 $
+ * $Revision: #20 $
+ * $Change: 6158 $
+ * $DateTime: 2013/12/02 21:19:56 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -361,7 +361,7 @@ FUNCTION_PTR Parser::Parse_DeclareFunction(int *token_id, const char *fn_name, b
 
 		Parse_Begin();
 		function.private_data = reinterpret_cast<void *>(Create_Pigment()); // Yes, this is a pigment! [trf]
-		Parse_PatternFunction(reinterpret_cast<TPATTERN *>(function.private_data));
+		Parse_PatternFunction(reinterpret_cast<PIGMENT *>(function.private_data));
 		Parse_End();
 		Post_Pigment(reinterpret_cast<PIGMENT *>(function.private_data));
 	}

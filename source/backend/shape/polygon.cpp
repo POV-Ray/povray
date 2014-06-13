@@ -27,9 +27,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/polygon.cpp $
- * $Revision: #32 $
- * $Change: 6085 $
- * $DateTime: 2013/11/10 07:39:29 $
+ * $Revision: #38 $
+ * $Change: 6164 $
+ * $DateTime: 2013/12/09 17:21:04 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -122,11 +122,11 @@ const DBL ZERO_TOLERANCE = 1.0e-10;
 bool Polygon::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread)
 {
 	DBL Depth;
-	VECTOR IPoint;
+	Vector3d IPoint;
 
 	if (Intersect(ray, &Depth, Thread))
 	{
-		VEvaluateRay(IPoint, ray.Origin, Depth, ray.Direction);
+		IPoint = ray.Evaluate(Depth);
 
 		if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
 		{
@@ -175,10 +175,10 @@ bool Polygon::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThread
 *
 ******************************************************************************/
 
-bool Polygon::Intersect(const Ray& ray, DBL *Depth, TraceThreadData *Thread) const
+bool Polygon::Intersect(const BasicRay& ray, DBL *Depth, TraceThreadData *Thread) const
 {
 	DBL x, y, len;
-	VECTOR p, d;
+	Vector3d p, d;
 
 	/* Don't test degenerate polygons. */
 
@@ -193,9 +193,9 @@ bool Polygon::Intersect(const Ray& ray, DBL *Depth, TraceThreadData *Thread) con
 
 	MInvTransDirection(d, ray.Direction, Trans);
 
-	VLength(len, d);
+	len = d.length();
 
-	VInverseScaleEq(d, len);
+	d /= len;
 
 	/* Intersect ray with the plane in which the polygon lies. */
 
@@ -257,7 +257,7 @@ bool Polygon::Intersect(const Ray& ray, DBL *Depth, TraceThreadData *Thread) con
 *
 ******************************************************************************/
 
-bool Polygon::Inside(const VECTOR, TraceThreadData *Thread) const
+bool Polygon::Inside(const Vector3d&, TraceThreadData *Thread) const
 {
 	return(false);
 }
@@ -296,9 +296,9 @@ bool Polygon::Inside(const VECTOR, TraceThreadData *Thread) const
 *
 ******************************************************************************/
 
-void Polygon::Normal(VECTOR Result, Intersection *, TraceThreadData *) const
+void Polygon::Normal(Vector3d& Result, Intersection *, TraceThreadData *) const
 {
-	Assign_Vector(Result, S_Normal);
+	Result = S_Normal;
 }
 
 
@@ -334,7 +334,7 @@ void Polygon::Normal(VECTOR Result, Intersection *, TraceThreadData *) const
 *
 ******************************************************************************/
 
-void Polygon::Translate(const VECTOR, const TRANSFORM *tr)
+void Polygon::Translate(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
@@ -372,7 +372,7 @@ void Polygon::Translate(const VECTOR, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void Polygon::Rotate(const VECTOR, const TRANSFORM *tr)
+void Polygon::Rotate(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
@@ -410,7 +410,7 @@ void Polygon::Rotate(const VECTOR, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void Polygon::Scale(const VECTOR, const TRANSFORM *tr)
+void Polygon::Scale(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
@@ -451,55 +451,19 @@ void Polygon::Scale(const VECTOR, const TRANSFORM *tr)
 
 void Polygon::Transform(const TRANSFORM *tr)
 {
-	VECTOR N;
+	Vector3d N;
 
 	if(Trans == NULL)
 		Trans = Create_Transform();
 
 	Compose_Transforms(Trans, tr);
 
-	Make_Vector(N, 0.0, 0.0, 1.0);
+	N = Vector3d(0.0, 0.0, 1.0);
 	MTransNormal(S_Normal, N, Trans);
 
-	VNormalizeEq(S_Normal);
+	S_Normal.normalize();
 
 	Compute_BBox();
-}
-
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-*   Invert_Polygon
-*
-* INPUT
-*
-*   Object - Object
-*   
-* OUTPUT
-*
-*   Object
-*   
-* RETURNS
-*   
-* AUTHOR
-*
-*   Dieter Bayer
-*   
-* DESCRIPTION
-*
-*   Invert a polygon.
-*
-* CHANGES
-*
-*   May 1994 : Creation.
-*
-******************************************************************************/
-
-void Polygon::Invert()
-{
 }
 
 
@@ -532,11 +496,11 @@ void Polygon::Invert()
 *
 ******************************************************************************/
 
-Polygon::Polygon() : ObjectBase(POLYGON_OBJECT)
+Polygon::Polygon() : NonsolidObject(POLYGON_OBJECT)
 {
 	Trans = Create_Transform();
 
-	Make_Vector(S_Normal, 0.0, 0.0, 1.0);
+	S_Normal = Vector3d(0.0, 0.0, 1.0);
 
 	Data = NULL;
 }
@@ -669,11 +633,11 @@ Polygon::~Polygon()
 *
 ******************************************************************************/
 
-void Polygon::Compute_Polygon(int number, VECTOR *points)
+void Polygon::Compute_Polygon(int number, Vector3d *points)
 {
 	int i;
 	DBL x, y, z, d;
-	VECTOR o, u, v, w, N;
+	Vector3d o, u, v, w, N;
 	MATRIX a, b;
 
 	/* Create polygon data. */
@@ -686,7 +650,7 @@ void Polygon::Compute_Polygon(int number, VECTOR *points)
 
 		Data->Number = number;
 
-		Data->Points = reinterpret_cast<UV_VECT *>(POV_MALLOC(number*sizeof(UV_VECT), "polygon points"));
+		Data->Points = reinterpret_cast<Vector2d *>(POV_MALLOC(number*sizeof(Vector2d), "polygon points"));
 	}
 	else
 	{
@@ -695,15 +659,15 @@ void Polygon::Compute_Polygon(int number, VECTOR *points)
 
 	/* Get polygon's coordinate system (one of the many possible) */
 
-	Assign_Vector(o, points[0]);
+	o = points[0];
 
 	/* Find valid, i.e. non-zero u vector. */
 
 	for (i = 1; i < number; i++)
 	{
-		VSub(u, points[i], o);
+		u = points[i] - o;
 
-		if (VSumSqr(u) > EPSILON)
+		if (u.lengthSqr() > EPSILON)
 		{
 			break;
 		}
@@ -720,11 +684,11 @@ void Polygon::Compute_Polygon(int number, VECTOR *points)
 
 	for (i++; i < number; i++)
 	{
-		VSub(v, points[i], o);
+		v = points[i] - o;
 
-		VCross(w, u, v);
+		w = cross(u, v);
 
-		if ((VSumSqr(v) > EPSILON) && (VSumSqr(w) > EPSILON))
+		if ((v.lengthSqr() > EPSILON) && (w.lengthSqr() > EPSILON))
 		{
 			break;
 		}
@@ -737,12 +701,12 @@ void Polygon::Compute_Polygon(int number, VECTOR *points)
 ;// TODO MESSAGE    Warning(0, "Points in polygon are co-linear. Ignoring polygon.");
 	}
 
-	VCross(u, v, w);
-	VCross(v, w, u);
+	u = cross(v, w);
+	v = cross(w, u);
 
-	VNormalize(u, u);
-	VNormalize(v, v);
-	VNormalize(w, w);
+	u.normalize();
+	v.normalize();
+	w.normalize();
 
 	MIdentity(a);
 	MIdentity(b);
@@ -788,10 +752,10 @@ void Polygon::Compute_Polygon(int number, VECTOR *points)
 		Data->Points[i][Y] = x * v[X] + y * v[Y] + z * v[Z];
 	}
 
-	Make_Vector(N, 0.0, 0.0, 1.0);
+	N = Vector3d(0.0, 0.0, 1.0);
 	MTransNormal(S_Normal, N, Trans);
 
-	VNormalizeEq(S_Normal);
+	S_Normal.normalize();
 
 	Compute_BBox();
 }
@@ -831,7 +795,7 @@ void Polygon::Compute_Polygon(int number, VECTOR *points)
 void Polygon::Compute_BBox()
 {
 	int i;
-	VECTOR p, Puv, Min, Max;
+	Vector3d p, Puv, Min, Max;
 
 	Min[X] = Min[Y] = Min[Z] =  BOUND_HUGE;
 	Max[X] = Max[Y] = Max[Z] = -BOUND_HUGE;
@@ -844,32 +808,28 @@ void Polygon::Compute_BBox()
 
 		MTransPoint(p, Puv, Trans);
 
-		Min[X] = min(Min[X], p[X]);
-		Min[Y] = min(Min[Y], p[Y]);
-		Min[Z] = min(Min[Z], p[Z]);
-		Max[X] = max(Max[X], p[X]);
-		Max[Y] = max(Max[Y], p[Y]);
-		Max[Z] = max(Max[Z], p[Z]);
+		Min = min(Min, p);
+		Max = max(Max, p);
 	}
 
 	Make_BBox_from_min_max(BBox, Min, Max);
 
-	if (fabs(BBox.Lengths[X]) < SMALL_TOLERANCE)
+	if (fabs(BBox.size[X]) < SMALL_TOLERANCE)
 	{
-		BBox.Lower_Left[X] -= SMALL_TOLERANCE;
-		BBox.Lengths[X]    += 2.0 * SMALL_TOLERANCE;
+		BBox.lowerLeft[X] -= SMALL_TOLERANCE;
+		BBox.size[X]    += 2.0 * SMALL_TOLERANCE;
 	}
 
-	if (fabs(BBox.Lengths[Y]) < SMALL_TOLERANCE)
+	if (fabs(BBox.size[Y]) < SMALL_TOLERANCE)
 	{
-		BBox.Lower_Left[Y] -= SMALL_TOLERANCE;
-		BBox.Lengths[Y]    += 2.0 * SMALL_TOLERANCE;
+		BBox.lowerLeft[Y] -= SMALL_TOLERANCE;
+		BBox.size[Y]    += 2.0 * SMALL_TOLERANCE;
 	}
 
-	if (fabs(BBox.Lengths[Z]) < SMALL_TOLERANCE)
+	if (fabs(BBox.size[Z]) < SMALL_TOLERANCE)
 	{
-		BBox.Lower_Left[Z] -= SMALL_TOLERANCE;
-		BBox.Lengths[Z]    += 2.0 * SMALL_TOLERANCE;
+		BBox.lowerLeft[Z] -= SMALL_TOLERANCE;
+		BBox.size[Z]    += 2.0 * SMALL_TOLERANCE;
 	}
 }
 
@@ -932,7 +892,7 @@ void Polygon::Compute_BBox()
 *
 ******************************************************************************/
 
-bool Polygon::in_polygon(int number, UV_VECT *points, DBL u, DBL  v)
+bool Polygon::in_polygon(int number, Vector2d *points, DBL u, DBL  v)
 {
 	register int i, yflag0, yflag1, inside_flag;
 	register DBL ty, tx;

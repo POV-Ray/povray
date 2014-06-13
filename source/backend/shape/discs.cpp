@@ -26,11 +26,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/shape/discs.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/shape/discs.cpp $
+ * $Revision: #33 $
+ * $Change: 6164 $
+ * $DateTime: 2013/12/09 17:21:04 $
+ * $Author: clipka $
  *******************************************************************************/
 
 // frame.h must always be the first POV file included (pulls in platform config)
@@ -80,7 +80,7 @@ bool Disc::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDat
 {
 	int Intersection_Found;
 	DBL Depth;
-	VECTOR IPoint;
+	Vector3d IPoint;
 
 	Intersection_Found = false;
 
@@ -88,9 +88,9 @@ bool Disc::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDat
 	if (Intersect(ray, &Depth))
 	{
 		Thread->Stats()[Ray_Disc_Tests_Succeeded]++;
-		VEvaluateRay(IPoint, ray.Origin, Depth, ray.Direction);
+		IPoint = ray.Evaluate(Depth);
 
-		if (Clip.empty() || Point_In_Clip (IPoint, Clip, Thread))
+		if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
 		{
 			Depth_Stack->push(Intersection(Depth,IPoint,this));
 			Intersection_Found = true;
@@ -128,18 +128,18 @@ bool Disc::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDat
 *
 ******************************************************************************/
 
-bool Disc::Intersect(const Ray& ray, DBL *Depth) const
+bool Disc::Intersect(const BasicRay& ray, DBL *Depth) const
 {
 	DBL t, u, v, r2, len;
-	VECTOR P, D;
+	Vector3d P, D;
 
 	/* Transform the point into the discs space */
 
 	MInvTransPoint(P, ray.Origin, Trans);
 	MInvTransDirection(D, ray.Direction, Trans);
 
-	VLength(len, D);
-	VInverseScaleEq(D, len);
+	len = D.length();
+	D /= len;
 
 	if (fabs(D[Z]) > EPSILON)
 	{
@@ -193,9 +193,9 @@ bool Disc::Intersect(const Ray& ray, DBL *Depth) const
 *
 ******************************************************************************/
 
-bool Disc::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
+bool Disc::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 {
-	VECTOR New_Point;
+	Vector3d New_Point;
 
 	/* Transform the point into the discs space */
 
@@ -243,9 +243,9 @@ bool Disc::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
 *
 ******************************************************************************/
 
-void Disc::Normal (VECTOR Result, Intersection *, TraceThreadData *) const
+void Disc::Normal(Vector3d& Result, Intersection *, TraceThreadData *) const
 {
-	Assign_Vector(Result, normal);
+	Result = normal;
 }
 
 
@@ -276,7 +276,7 @@ void Disc::Normal (VECTOR Result, Intersection *, TraceThreadData *) const
 *
 ******************************************************************************/
 
-void Disc::Translate(const VECTOR, const TRANSFORM *tr)
+void Disc::Translate(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
@@ -309,7 +309,7 @@ void Disc::Translate(const VECTOR, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void Disc::Rotate(const VECTOR, const TRANSFORM *tr)
+void Disc::Rotate(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
@@ -342,42 +342,9 @@ void Disc::Rotate(const VECTOR, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void Disc::Scale(const VECTOR, const TRANSFORM *tr)
+void Disc::Scale(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
-}
-
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-*   Invert_Disc
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-*   Alexander Enzmann
-*
-* DESCRIPTION
-*
-*   -
-*
-* CHANGES
-*
-*   -
-*
-******************************************************************************/
-
-void Disc::Invert()
-{
-	Invert_Flag(this, INVERTED_FLAG);
 }
 
 
@@ -412,7 +379,7 @@ void Disc::Transform(const TRANSFORM *tr)
 {
 	MTransNormal(normal, normal, tr);
 
-	VNormalize(normal, normal);
+	normal.normalize();
 
 	Compose_Transforms(Trans, tr);
 
@@ -451,8 +418,8 @@ void Disc::Transform(const TRANSFORM *tr)
 
 Disc::Disc() : ObjectBase(DISC_OBJECT)
 {
-	Make_Vector (center, 0.0, 0.0, 0.0);
-	Make_Vector (normal, 0.0, 0.0, 1.0);
+	center = Vector3d(0.0, 0.0, 0.0);
+	normal = Vector3d(0.0, 0.0, 1.0);
 
 	iradius2 = 0.0;
 	oradius2 = 1.0;

@@ -24,11 +24,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/scene/camera.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/scene/camera.h $
+ * $Revision: #21 $
+ * $Change: 6147 $
+ * $DateTime: 2013/11/29 20:46:11 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #ifndef CAMERA_H
@@ -63,13 +63,13 @@ namespace pov
 class Camera
 {
 public:
-	VECTOR Location;
-	VECTOR Direction;
-	VECTOR Up;
-	VECTOR Right;
-	VECTOR Sky;
-	VECTOR Look_At;                 // Used only to record the user's preference
-	VECTOR Focal_Point;             // Used only to record the user's preference
+	Vector3d Location;
+	Vector3d Direction;
+	Vector3d Up;
+	Vector3d Right;
+	Vector3d Sky;
+	Vector3d Look_At;                 // Used only to record the user's preference
+	Vector3d Focal_Point;             // Used only to record the user's preference
 	DBL Focal_Distance, Aperture;   // ARE 9/92 for focal blur.
 	int Blur_Samples;               // ARE 9/92 for focal blur.
 	int Blur_Samples_Min;           // Minimum number of blur samples to take regardless of confidence settings.
@@ -99,9 +99,9 @@ public:
 	~Camera();
 	Camera& operator=(const Camera& rhs);
 	void Transform(const TRANSFORM *Trans);
-	void Scale(const VECTOR Vector);
-	void Rotate(const VECTOR Vector);
-	void Translate(const VECTOR Vector);
+	void Scale(const Vector3d& Vector);
+	void Rotate(const Vector3d& Vector);
+	void Translate(const Vector3d& Vector);
 
 private:
 	void Init();

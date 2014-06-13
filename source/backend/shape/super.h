@@ -24,15 +24,17 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/shape/super.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/shape/super.h $
+ * $Revision: #22 $
+ * $Change: 6164 $
+ * $DateTime: 2013/12/09 17:21:04 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #ifndef SUPER_H
 #define SUPER_H
+
+#include "backend/scene/objects.h"
 
 namespace pov
 {
@@ -52,7 +54,7 @@ namespace pov
 class Superellipsoid : public ObjectBase
 {
 	public:
-		VECTOR Power;
+		Vector3d Power;
 
 		Superellipsoid();
 		virtual ~Superellipsoid();
@@ -60,25 +62,24 @@ class Superellipsoid : public ObjectBase
 		virtual ObjectPtr Copy();
 
 		virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
-		virtual bool Inside(const VECTOR, TraceThreadData *) const;
-		virtual void Normal(VECTOR, Intersection *, TraceThreadData *) const;
-		virtual void Translate(const VECTOR, const TRANSFORM *);
-		virtual void Rotate(const VECTOR, const TRANSFORM *);
-		virtual void Scale(const VECTOR, const TRANSFORM *);
+		virtual bool Inside(const Vector3d&, TraceThreadData *) const;
+		virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const;
+		virtual void Translate(const Vector3d&, const TRANSFORM *);
+		virtual void Rotate(const Vector3d&, const TRANSFORM *);
+		virtual void Scale(const Vector3d&, const TRANSFORM *);
 		virtual void Transform(const TRANSFORM *);
-		virtual void Invert();
 		virtual void Compute_BBox();
 	protected:
-		bool Intersect(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread);
-		static bool intersect_box(const VECTOR P, const VECTOR D, DBL *dmin, DBL *dmax);
+		bool Intersect(const BasicRay& ray, IStack& Depth_Stack, TraceThreadData *Thread);
+		static bool intersect_box(const Vector3d& P, const Vector3d& D, DBL *dmin, DBL *dmax);
 		static DBL power(DBL x, DBL e);
 		static DBL evaluate_g(DBL x, DBL y, DBL e);
-		DBL evaluate_superellipsoid(const VECTOR P) const;
+		DBL evaluate_superellipsoid(const Vector3d& P) const;
 		static int compdists(const void *in_a, const void *in_b);
-		int find_ray_plane_points(const VECTOR P, const VECTOR D, int cnt, DBL *dists, DBL mindist, DBL maxdist) const;
-		void solve_hit1(DBL v0, const VECTOR tP0, DBL v1, const VECTOR tP1, VECTOR P) const;
-		bool check_hit2(const VECTOR P, const VECTOR D, DBL t0, VECTOR P0, DBL v0, DBL t1, DBL *t, VECTOR Q) const;
-		bool insert_hit(const Ray& ray, DBL Depth, IStack& Depth_Stack, TraceThreadData *Thread);
+		int find_ray_plane_points(const Vector3d& P, const Vector3d& D, int cnt, DBL *dists, DBL mindist, DBL maxdist) const;
+		void solve_hit1(DBL v0, const Vector3d& tP0, DBL v1, const Vector3d& tP1, Vector3d& P) const;
+		bool check_hit2(const Vector3d& P, const Vector3d& D, DBL t0, Vector3d& P0, DBL v0, DBL t1, DBL *t, Vector3d& Q) const;
+		bool insert_hit(const BasicRay& ray, DBL Depth, IStack& Depth_Stack, TraceThreadData *Thread);
 };
 
 }

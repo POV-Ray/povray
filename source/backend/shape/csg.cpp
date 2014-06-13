@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/csg.cpp $
- * $Revision: #58 $
- * $Change: 6085 $
- * $DateTime: 2013/11/10 07:39:29 $
+ * $Revision: #64 $
+ * $Change: 6164 $
+ * $DateTime: 2013/12/09 17:21:04 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -62,7 +62,7 @@ namespace pov
 
 
 
-inline bool Test_Ray_Flags(const Ray& ray, const ObjectBase* obj)
+inline bool Test_Ray_Flags(const Ray& ray, ConstObjectPtr obj)
 {
 	// CJC 2005 if ray is primary ray ignore NO_IMAGE_FLAG to support the trace() SDL function
  	// TODO FIXME - I uess it would be better to have the trace() function use a different ray type [CLi]
@@ -73,7 +73,7 @@ inline bool Test_Ray_Flags(const Ray& ray, const ObjectBase* obj)
 	         ( ray.IsPhotonRay() && !Test_Flag(obj, NO_SHADOW_FLAG) ) );
 }
 
-inline bool Test_Ray_Flags_Shadow(const Ray& ray, const ObjectBase* obj)
+inline bool Test_Ray_Flags_Shadow(const Ray& ray, ConstObjectPtr obj)
 {
 	// TODO CLARIFY - why does this function not ignore NO_IMAGE_FLAG for primary rays, as Test_Ray_Flags() does? [CLi]
 	return ( ( !ray.IsPhotonRay() &&
@@ -316,7 +316,7 @@ bool CSGMerge::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThrea
 				{
 					while (Local_Stack->size() > 0)
 					{
-						if (Clip.empty() || Point_In_Clip (Local_Stack->top().IPoint, Clip, Thread))
+						if (Clip.empty() || Point_In_Clip(Local_Stack->top().IPoint, Clip, Thread))
 						{
 							inside_flag = true;
 
@@ -387,7 +387,7 @@ bool CSGMerge::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThrea
 *
 ******************************************************************************/
 
-bool CSGUnion::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
+bool CSGUnion::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 {
 	for(vector<ObjectPtr>::const_iterator Current_Sib = children.begin(); Current_Sib != children.end(); Current_Sib++)
 	{
@@ -429,7 +429,7 @@ bool CSGUnion::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
 *
 ******************************************************************************/
 
-bool CSGIntersection::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
+bool CSGIntersection::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 {
 	for(vector<ObjectPtr>::const_iterator Current_Sib = children.begin(); Current_Sib != children.end(); Current_Sib++)
 		if(!((*Current_Sib)->Type & LIGHT_SOURCE_OBJECT) || (!(reinterpret_cast<LightSource *>(*Current_Sib))->children.empty()))
@@ -468,7 +468,7 @@ bool CSGIntersection::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
 ******************************************************************************/
 
 
-void CSG::Translate(const VECTOR Vector, const TRANSFORM *tr)
+void CSG::Translate(const Vector3d& Vector, const TRANSFORM *tr)
 {
 	for(vector<ObjectPtr>::iterator Current_Sib = children.begin(); Current_Sib != children.end(); Current_Sib++)
 		Translate_Object (*Current_Sib, Vector, tr) ;
@@ -505,7 +505,7 @@ void CSG::Translate(const VECTOR Vector, const TRANSFORM *tr)
 ******************************************************************************/
 
 
-void CSG::Rotate(const VECTOR Vector, const TRANSFORM *tr)
+void CSG::Rotate(const Vector3d& Vector, const TRANSFORM *tr)
 {
 	for(vector<ObjectPtr>::iterator Current_Sib = children.begin(); Current_Sib != children.end(); Current_Sib++)
 		Rotate_Object (*Current_Sib, Vector, tr) ;
@@ -542,7 +542,7 @@ void CSG::Rotate(const VECTOR Vector, const TRANSFORM *tr)
 ******************************************************************************/
 
 
-void CSG::Scale(const VECTOR Vector, const TRANSFORM *tr)
+void CSG::Scale(const Vector3d& Vector, const TRANSFORM *tr)
 {
 	for(vector<ObjectPtr>::iterator Current_Sib = children.begin(); Current_Sib != children.end(); Current_Sib++)
 		Scale_Object (*Current_Sib, Vector, tr) ;
@@ -611,17 +611,24 @@ void CSG::Transform(const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void CSG::Invert()
+ObjectPtr CSGUnion::Invert()
 {
-	// REMINDER: Invert_Object will de-allocate the original object pointer and set it to NULL for any CSG children.
-	for(vector<ObjectPtr>::iterator Current_Sib = children.begin(); Current_Sib != children.end(); Current_Sib++)
-	{
-		if (((*Current_Sib)->Type & IS_CSG_OBJECT) != 0)
-			*Current_Sib = Invert_CSG_Object(*Current_Sib);
-		else
-			Invert_Object(*Current_Sib);
-	}
-	Invert_Flag(this, INVERTED_FLAG);
+	ObjectPtr p = CompoundObject::Invert();
+	assert(p == this);
+
+	CSGIntersection *New = new CSGIntersection(false, *this, true);
+	delete this;
+	return (New);
+}
+
+ObjectPtr CSGIntersection::Invert()
+{
+	ObjectPtr p = CompoundObject::Invert();
+	assert(p == this);
+
+	CSGMerge *New = new CSGMerge(*this, true);
+	delete this;
+	return (New);
 }
 
 /*****************************************************************************
@@ -821,27 +828,6 @@ ObjectPtr CSGIntersection::Copy()
 	return (New);
 }
 
-CSG *CSGMerge::Morph(void)
-{
-	CSGIntersection *New = new CSGIntersection(false, *this, true);
-	delete this ;
-	return (New);
-}
-
-CSG *CSGUnion::Morph(void)
-{
-	CSGIntersection *New = new CSGIntersection(false, *this, true);
-	delete this ;
-	return (New);
-}
-
-CSG *CSGIntersection::Morph(void)
-{
-	CSGMerge *New = new CSGMerge(*this, true);
-	delete this ;
-	return (New);
-}
-
 /*****************************************************************************
 *
 * FUNCTION
@@ -871,7 +857,7 @@ CSG *CSGIntersection::Morph(void)
 void CSG::Compute_BBox()
 {
 	DBL Old_Volume, New_Volume;
-	VECTOR NewMin, NewMax, TmpMin, TmpMax, Min, Max;
+	Vector3d NewMin, NewMax, TmpMin, TmpMax, Min, Max;
 
 	if(dynamic_cast<CSGIntersection *>(this) != NULL) // FIXME
 	{
@@ -880,8 +866,8 @@ void CSG::Compute_BBox()
 		 * by intersecting the bounding boxes of all children.
 		 */
 
-		Make_Vector(NewMin, -BOUND_HUGE, -BOUND_HUGE, -BOUND_HUGE);
-		Make_Vector(NewMax,  BOUND_HUGE,  BOUND_HUGE,  BOUND_HUGE);
+		NewMin = Vector3d(-BOUND_HUGE);
+		NewMax = Vector3d(BOUND_HUGE);
 
 		vector<Quadric *> Quadrics;
 
@@ -901,12 +887,8 @@ void CSG::Compute_BBox()
 					else
 						Make_min_max_from_BBox(TmpMin, TmpMax, (*Current_Sib)->BBox);
 
-					NewMin[X] = max(NewMin[X], TmpMin[X]);
-					NewMin[Y] = max(NewMin[Y], TmpMin[Y]);
-					NewMin[Z] = max(NewMin[Z], TmpMin[Z]);
-					NewMax[X] = min(NewMax[X], TmpMax[X]);
-					NewMax[Y] = min(NewMax[Y], TmpMax[Y]);
-					NewMax[Z] = min(NewMax[Z], TmpMax[Z]);
+					NewMin = max(NewMin, TmpMin);
+					NewMax = min(NewMax, TmpMax);
 				}
 				else
 					Quadrics.push_back(dynamic_cast<Quadric *>(*Current_Sib));
@@ -919,38 +901,30 @@ void CSG::Compute_BBox()
 		{
 			Quadric *q = *i;
 
-			Assign_Vector(Min, NewMin);
-			Assign_Vector(Max, NewMax);
+			Min = NewMin;
+			Max = NewMax;
 
 			q->Compute_BBox(Min, Max);
 
 			Make_min_max_from_BBox(TmpMin, TmpMax, q->BBox);
 
-			NewMin[X] = max(NewMin[X], TmpMin[X]);
-			NewMin[Y] = max(NewMin[Y], TmpMin[Y]);
-			NewMin[Z] = max(NewMin[Z], TmpMin[Z]);
-			NewMax[X] = min(NewMax[X], TmpMax[X]);
-			NewMax[Y] = min(NewMax[Y], TmpMax[Y]);
-			NewMax[Z] = min(NewMax[Z], TmpMax[Z]);
+			NewMin = max(NewMin, TmpMin);
+			NewMax = min(NewMax, TmpMax);
 		}
 	}
 	else
 	{
 		/* Calculate the bounding box of a CSG merge/union object. */
 
-		Make_Vector(NewMin,  BOUND_HUGE,  BOUND_HUGE,  BOUND_HUGE);
-		Make_Vector(NewMax, -BOUND_HUGE, -BOUND_HUGE, -BOUND_HUGE);
+		NewMin = Vector3d(BOUND_HUGE);
+		NewMax = Vector3d(-BOUND_HUGE);
 
 		for(vector<ObjectPtr>::iterator Current_Sib = children.begin(); Current_Sib != children.end(); Current_Sib++)
 		{
 			Make_min_max_from_BBox(TmpMin, TmpMax, (*Current_Sib)->BBox);
 
-			NewMin[X] = min(NewMin[X], TmpMin[X]);
-			NewMin[Y] = min(NewMin[Y], TmpMin[Y]);
-			NewMin[Z] = min(NewMin[Z], TmpMin[Z]);
-			NewMax[X] = max(NewMax[X], TmpMax[X]);
-			NewMax[Y] = max(NewMax[Y], TmpMax[Y]);
-			NewMax[Z] = max(NewMax[Z], TmpMax[Z]);
+			NewMin = min(NewMin, TmpMin);
+			NewMax = max(NewMax, TmpMax);
 		}
 	}
 
@@ -968,9 +942,9 @@ void CSG::Compute_BBox()
 
 			/* Beware of bounding boxes too large. */
 
-			if((BBox.Lengths[X] > CRITICAL_LENGTH) ||
-			   (BBox.Lengths[Y] > CRITICAL_LENGTH) ||
-			   (BBox.Lengths[Z] > CRITICAL_LENGTH))
+			if((BBox.size[X] > CRITICAL_LENGTH) ||
+			   (BBox.size[Y] > CRITICAL_LENGTH) ||
+			   (BBox.size[Z] > CRITICAL_LENGTH))
 				Make_BBox(BBox, -BOUND_HUGE/2, -BOUND_HUGE/2, -BOUND_HUGE/2, BOUND_HUGE, BOUND_HUGE, BOUND_HUGE);
 		}
 	}

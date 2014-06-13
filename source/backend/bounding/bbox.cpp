@@ -61,20 +61,20 @@ const int INITIAL_PRIORITY_QUEUE_SIZE = 256;
 BBOX_TREE *create_bbox_node(int size);
 
 int find_axis(BBOX_TREE **Finite, ptrdiff_t first, ptrdiff_t last);
-void calc_bbox(BBOX *BBox, BBOX_TREE **Finite, ptrdiff_t first, ptrdiff_t last);
+void calc_bbox(BoundingBox *BBox, BBOX_TREE **Finite, ptrdiff_t first, ptrdiff_t last);
 void build_area_table(BBOX_TREE **Finite, ptrdiff_t a, ptrdiff_t b, DBL *areas);
 int sort_and_split(BBOX_TREE **Root, BBOX_TREE **&Finite, size_t *numOfFiniteObjects, ptrdiff_t first, ptrdiff_t last, size_t& maxfinitecount);
 
-void priority_queue_insert(PriorityQueue& Queue, DBL Depth, BBOX_TREE *Node);
+void priority_queue_insert(BBoxPriorityQueue& Queue, DBL Depth, BBOX_TREE *Node);
 
-PriorityQueue::PriorityQueue()
+BBoxPriorityQueue::BBoxPriorityQueue()
 {
 	QSize = 0;
 	Queue = reinterpret_cast<Qelem *>(POV_MALLOC(INITIAL_PRIORITY_QUEUE_SIZE * sizeof(Qelem), "priority queue"));
 	Max_QSize = INITIAL_PRIORITY_QUEUE_SIZE;
 }
 
-PriorityQueue::~PriorityQueue()
+BBoxPriorityQueue::~BBoxPriorityQueue()
 {
 	POV_FREE(Queue);
 }
@@ -98,24 +98,24 @@ void Destroy_BBox_Tree(BBOX_TREE *Node)
 	}
 }
 
-void Recompute_BBox(BBOX *bbox, const TRANSFORM *trans)
+void Recompute_BBox(BoundingBox *bbox, const TRANSFORM *trans)
 {
 	int i;
-	VECTOR lower_left, lengths, corner;
-	VECTOR mins, maxs;
+	Vector3d lower_left, lengths, corner;
+	Vector3d mins, maxs;
 
 	if(trans == NULL)
 		return;
 
-	Assign_BBox_Vect(lower_left, bbox->Lower_Left);
-	Assign_BBox_Vect(lengths, bbox->Lengths);
+	lower_left = Vector3d(bbox->lowerLeft);
+	lengths    = Vector3d(bbox->size);
 
-	Make_Vector(mins, BOUND_HUGE, BOUND_HUGE, BOUND_HUGE);
-	Make_Vector(maxs, -BOUND_HUGE, -BOUND_HUGE, -BOUND_HUGE);
+	mins = Vector3d(BOUND_HUGE);
+	maxs = Vector3d(-BOUND_HUGE);
 
 	for(i = 1; i <= 8; i++)
 	{
-		Assign_Vector(corner, lower_left);
+		corner = lower_left;
 
 		corner[X] += ((i & 1) ? lengths[X] : 0.0);
 		corner[Y] += ((i & 2) ? lengths[Y] : 0.0);
@@ -142,24 +142,24 @@ void Recompute_BBox(BBOX *bbox, const TRANSFORM *trans)
 	Make_BBox_from_min_max(*bbox, mins, maxs);
 }
 
-void Recompute_Inverse_BBox(BBOX *bbox, const TRANSFORM *trans)
+void Recompute_Inverse_BBox(BoundingBox *bbox, const TRANSFORM *trans)
 {
 	int i;
-	VECTOR lower_left, lengths, corner;
-	VECTOR mins, maxs;
+	Vector3d lower_left, lengths, corner;
+	Vector3d mins, maxs;
 
 	if(trans == NULL)
 		return;
 
-	Assign_BBox_Vect(lower_left, bbox->Lower_Left);
-	Assign_BBox_Vect(lengths, bbox->Lengths);
+	lower_left = Vector3d(bbox->lowerLeft);
+	lengths    = Vector3d(bbox->size);
 
-	Make_Vector(mins, BOUND_HUGE, BOUND_HUGE, BOUND_HUGE);
-	Make_Vector(maxs, -BOUND_HUGE, -BOUND_HUGE, -BOUND_HUGE);
+	mins = Vector3d(BOUND_HUGE);
+	maxs = Vector3d(-BOUND_HUGE);
 
 	for(i = 1; i <= 8; i++)
 	{
-		Assign_Vector(corner, lower_left);
+		corner = lower_left;
 
 		corner[X] += ((i & 1) ? lengths[X] : 0.0);
 		corner[Y] += ((i & 2) ? lengths[Y] : 0.0);
@@ -358,7 +358,7 @@ void Build_Bounding_Slabs(BBOX_TREE **Root, vector<ObjectPtr>& objects, unsigned
 		POV_FREE(Infinite);
 }
 
-bool Intersect_BBox_Tree(PriorityQueue& pqueue, const BBOX_TREE *Root, const Ray& ray, Intersection *Best_Intersection, TraceThreadData *Thread)
+bool Intersect_BBox_Tree(BBoxPriorityQueue& pqueue, const BBOX_TREE *Root, const Ray& ray, Intersection *Best_Intersection, TraceThreadData *Thread)
 {
 	int i, found;
 	DBL Depth;
@@ -411,7 +411,7 @@ bool Intersect_BBox_Tree(PriorityQueue& pqueue, const BBOX_TREE *Root, const Ray
 	return (found);
 }
 
-bool Intersect_BBox_Tree(PriorityQueue& pqueue, const BBOX_TREE *Root, const Ray& ray, Intersection *Best_Intersection, const RayObjectCondition& precondition, const RayObjectCondition& postcondition, TraceThreadData *Thread)
+bool Intersect_BBox_Tree(BBoxPriorityQueue& pqueue, const BBOX_TREE *Root, const Ray& ray, Intersection *Best_Intersection, const RayObjectCondition& precondition, const RayObjectCondition& postcondition, TraceThreadData *Thread)
 {
 	int i, found;
 	DBL Depth;
@@ -467,12 +467,12 @@ bool Intersect_BBox_Tree(PriorityQueue& pqueue, const BBOX_TREE *Root, const Ray
 	return (found);
 }
 
-static void priority_queue_insert(PriorityQueue& Queue, DBL Depth, const BBOX_TREE *Node)
+static void priority_queue_insert(BBoxPriorityQueue& Queue, DBL Depth, const BBOX_TREE *Node)
 {
 	unsigned size;
 	int i;
-	//PriorityQueue::Qelem tmp;
-	PriorityQueue::Qelem *List;
+	//BBoxPriorityQueue::Qelem tmp;
+	BBoxPriorityQueue::Qelem *List;
 
 	Queue.QSize++;
 
@@ -491,7 +491,7 @@ static void priority_queue_insert(PriorityQueue& Queue, DBL Depth, const BBOX_TR
 
 		Queue.Max_QSize *= 2;
 
-		Queue.Queue = reinterpret_cast<PriorityQueue::Qelem *>(POV_REALLOC(Queue.Queue, Queue.Max_QSize*sizeof(PriorityQueue::Qelem), "priority queue"));
+		Queue.Queue = reinterpret_cast<BBoxPriorityQueue::Qelem *>(POV_REALLOC(Queue.Queue, Queue.Max_QSize*sizeof(BBoxPriorityQueue::Qelem), "priority queue"));
 	}
 
 	List = Queue.Queue;
@@ -528,10 +528,10 @@ static void priority_queue_insert(PriorityQueue& Queue, DBL Depth, const BBOX_TR
 
 // Get an element from the priority queue.
 // NOTE: This element will always be the one closest to the ray origin.
-void Priority_Queue_Delete(PriorityQueue& Queue, DBL *Depth, const BBOX_TREE **Node)
+void Priority_Queue_Delete(BBoxPriorityQueue& Queue, DBL *Depth, const BBOX_TREE **Node)
 {
-	PriorityQueue::Qelem tmp;
-	PriorityQueue::Qelem *List;
+	BBoxPriorityQueue::Qelem tmp;
+	BBoxPriorityQueue::Qelem *List;
 	int i, j;
 	unsigned size;
 
@@ -588,7 +588,7 @@ void Priority_Queue_Delete(PriorityQueue& Queue, DBL *Depth, const BBOX_TREE **N
 	}
 }
 
-void Check_And_Enqueue(PriorityQueue& Queue, const BBOX_TREE *Node, const BBOX *BBox, const Rayinfo *rayinfo, TraceThreadData *Thread)
+void Check_And_Enqueue(BBoxPriorityQueue& Queue, const BBOX_TREE *Node, const BoundingBox *BBox, const Rayinfo *rayinfo, TraceThreadData *Thread)
 {
 	DBL tmin, tmax;
 	DBL dmin, dmax;
@@ -601,19 +601,19 @@ void Check_And_Enqueue(PriorityQueue& Queue, const BBOX_TREE *Node, const BBOX *
 		{
 			if (rayinfo->positive[X])
 			{
-				dmin = (BBox->Lower_Left[X] - rayinfo->slab_num[X]) *  rayinfo->slab_den[X];
-				dmax = dmin + (BBox->Lengths[X]  * rayinfo->slab_den[X]);
+				dmin = (BBox->lowerLeft[X] - rayinfo->slab_num[X]) *  rayinfo->slab_den[X];
+				dmax = dmin + (BBox->size[X]  * rayinfo->slab_den[X]);
 				if(dmax < EPSILON)
 					return;
 			}
 			else
 			{
-				dmax = (BBox->Lower_Left[X] - rayinfo->slab_num[X]) * rayinfo->slab_den[X];
+				dmax = (BBox->lowerLeft[X] - rayinfo->slab_num[X]) * rayinfo->slab_den[X];
 
 				if(dmax < EPSILON)
 					return;
 
-				dmin = dmax + (BBox->Lengths[X]  * rayinfo->slab_den[X]);
+				dmin = dmax + (BBox->size[X]  * rayinfo->slab_den[X]);
 			}
 
 			if(dmin > dmax)
@@ -621,8 +621,8 @@ void Check_And_Enqueue(PriorityQueue& Queue, const BBOX_TREE *Node, const BBOX *
 		}
 		else
 		{
-			if((rayinfo->slab_num[X] < BBox->Lower_Left[X]) ||
-			   (rayinfo->slab_num[X] > BBox->Lengths[X] + BBox->Lower_Left[X]))
+			if((rayinfo->slab_num[X] < BBox->lowerLeft[X]) ||
+			   (rayinfo->slab_num[X] > BBox->size[X] + BBox->lowerLeft[X]))
 				return;
 
 			dmin = -BOUND_HUGE;
@@ -633,13 +633,13 @@ void Check_And_Enqueue(PriorityQueue& Queue, const BBOX_TREE *Node, const BBOX *
 		{
 			if(rayinfo->positive[Y])
 			{
-				tmin = (BBox->Lower_Left[Y] - rayinfo->slab_num[Y]) * rayinfo->slab_den[Y];
-				tmax = tmin + (BBox->Lengths[Y]  * rayinfo->slab_den[Y]);
+				tmin = (BBox->lowerLeft[Y] - rayinfo->slab_num[Y]) * rayinfo->slab_den[Y];
+				tmax = tmin + (BBox->size[Y]  * rayinfo->slab_den[Y]);
 			}
 			else
 			{
-				tmax = (BBox->Lower_Left[Y] - rayinfo->slab_num[Y]) * rayinfo->slab_den[Y];
-				tmin = tmax + (BBox->Lengths[Y]  * rayinfo->slab_den[Y]);
+				tmax = (BBox->lowerLeft[Y] - rayinfo->slab_num[Y]) * rayinfo->slab_den[Y];
+				tmin = tmax + (BBox->size[Y]  * rayinfo->slab_den[Y]);
 			}
 
 			// Unwrap the logic - do the dmin and dmax checks only when tmin and
@@ -680,21 +680,21 @@ void Check_And_Enqueue(PriorityQueue& Queue, const BBOX_TREE *Node, const BBOX *
 				dmin = tmin;
 			}
 		}
-		else if((rayinfo->slab_num[Y] < BBox->Lower_Left[Y]) ||
-		        (rayinfo->slab_num[Y] > BBox->Lengths[Y] + BBox->Lower_Left[Y]))
+		else if((rayinfo->slab_num[Y] < BBox->lowerLeft[Y]) ||
+		        (rayinfo->slab_num[Y] > BBox->size[Y] + BBox->lowerLeft[Y]))
 			return;
 
 		if(rayinfo->nonzero[Z])
 		{
 			if(rayinfo->positive[Z])
 			{
-				tmin = (BBox->Lower_Left[Z] - rayinfo->slab_num[Z]) * rayinfo->slab_den[Z];
-				tmax = tmin + (BBox->Lengths[Z]  * rayinfo->slab_den[Z]);
+				tmin = (BBox->lowerLeft[Z] - rayinfo->slab_num[Z]) * rayinfo->slab_den[Z];
+				tmax = tmin + (BBox->size[Z]  * rayinfo->slab_den[Z]);
 			}
 			else
 			{
-				tmax = (BBox->Lower_Left[Z] - rayinfo->slab_num[Z]) * rayinfo->slab_den[Z];
-				tmin = tmax + (BBox->Lengths[Z]  * rayinfo->slab_den[Z]);
+				tmax = (BBox->lowerLeft[Z] - rayinfo->slab_num[Z]) * rayinfo->slab_den[Z];
+				tmin = tmax + (BBox->size[Z]  * rayinfo->slab_den[Z]);
 			}
 
 			if(tmax < dmax)
@@ -724,7 +724,7 @@ void Check_And_Enqueue(PriorityQueue& Queue, const BBOX_TREE *Node, const BBOX *
 			}
 		}
 		else
-			if((rayinfo->slab_num[Z] < BBox->Lower_Left[Z]) || (rayinfo->slab_num[Z] > BBox->Lengths[Z] + BBox->Lower_Left[Z]))
+			if((rayinfo->slab_num[Z] < BBox->lowerLeft[Z]) || (rayinfo->slab_num[Z] > BBox->size[Z] + BBox->lowerLeft[Z]))
 				return;
 
 		Thread->Stats()[nEnqueued]++;
@@ -758,15 +758,15 @@ BBOX_TREE *create_bbox_node(int size)
 template<int Axis>
 int CDECL compboxes(const void *in_a, const void *in_b)
 {
-	const BBOX *a, *b;
-	BBOX_VAL am, bm;
+	const BoundingBox *a, *b;
+	BBoxScalar am, bm;
 	typedef const BBOX_TREE *CONST_BBOX_TREE_PTR;
 
 	a = &((*reinterpret_cast<const CONST_BBOX_TREE_PTR *>(in_a))->BBox);
 	b = &((*reinterpret_cast<const CONST_BBOX_TREE_PTR *>(in_b))->BBox);
 
-	am = 2.0 * a->Lower_Left[Axis] + a->Lengths[Axis];
-	bm = 2.0 * b->Lower_Left[Axis] + b->Lengths[Axis];
+	am = 2.0 * a->lowerLeft[Axis] + a->size[Axis];
+	bm = 2.0 * b->lowerLeft[Axis] + b->size[Axis];
 
 	if(am < bm)
 		return -1;
@@ -784,33 +784,33 @@ int find_axis(BBOX_TREE **Finite, ptrdiff_t first, ptrdiff_t last)
 	int which = X;
 	ptrdiff_t i;
 	DBL e, d = -BOUND_HUGE;
-	VECTOR mins, maxs;
-	BBOX *bbox;
+	Vector3d mins, maxs;
+	BoundingBox *bbox;
 
-	Make_Vector(mins, BOUND_HUGE, BOUND_HUGE, BOUND_HUGE);
-	Make_Vector(maxs, -BOUND_HUGE, -BOUND_HUGE, -BOUND_HUGE);
+	mins = Vector3d(BOUND_HUGE);
+	maxs = Vector3d(-BOUND_HUGE);
 
 	for(i = first; i < last; i++)
 	{
 		bbox = &(Finite[i]->BBox);
 
-		if(bbox->Lower_Left[X] < mins[X])
-			mins[X] = bbox->Lower_Left[X];
+		if(bbox->lowerLeft[X] < mins[X])
+			mins[X] = bbox->lowerLeft[X];
 
-		if(bbox->Lower_Left[X] + bbox->Lengths[X] > maxs[X])
-			maxs[X] = bbox->Lower_Left[X];
+		if(bbox->lowerLeft[X] + bbox->size[X] > maxs[X])
+			maxs[X] = bbox->lowerLeft[X];
 
-		if(bbox->Lower_Left[Y] < mins[Y])
-			mins[Y] = bbox->Lower_Left[Y];
+		if(bbox->lowerLeft[Y] < mins[Y])
+			mins[Y] = bbox->lowerLeft[Y];
 
-		if(bbox->Lower_Left[Y] + bbox->Lengths[Y] > maxs[Y])
-			maxs[Y] = bbox->Lower_Left[Y];
+		if(bbox->lowerLeft[Y] + bbox->size[Y] > maxs[Y])
+			maxs[Y] = bbox->lowerLeft[Y];
 
-		if(bbox->Lower_Left[Z] < mins[Z])
-			mins[Z] = bbox->Lower_Left[Z];
+		if(bbox->lowerLeft[Z] < mins[Z])
+			mins[Z] = bbox->lowerLeft[Z];
 
-		if(bbox->Lower_Left[Z] + bbox->Lengths[Z] > maxs[Z])
-			maxs[Z] = bbox->Lower_Left[Z];
+		if(bbox->lowerLeft[Z] + bbox->size[Z] > maxs[Z])
+			maxs[Z] = bbox->lowerLeft[Z];
 	}
 
 	e = maxs[X] - mins[X];
@@ -837,34 +837,34 @@ int find_axis(BBOX_TREE **Finite, ptrdiff_t first, ptrdiff_t last)
 	return (which);
 }
 
-void calc_bbox(BBOX *BBox, BBOX_TREE **Finite, ptrdiff_t first, ptrdiff_t last)
+void calc_bbox(BoundingBox *BBox, BBOX_TREE **Finite, ptrdiff_t first, ptrdiff_t last)
 {
 	ptrdiff_t i;
 	DBL tmin, tmax;
-	VECTOR bmin, bmax;
-	BBOX *bbox;
+	Vector3d bmin, bmax;
+	BoundingBox *bbox;
 
-	Make_Vector(bmin, BOUND_HUGE, BOUND_HUGE, BOUND_HUGE);
-	Make_Vector(bmax, -BOUND_HUGE, -BOUND_HUGE, -BOUND_HUGE);
+	bmin = Vector3d(BOUND_HUGE);
+	bmax = Vector3d(-BOUND_HUGE);
 
 	for(i = first; i < last; i++)
 	{
 		bbox = &(Finite[i]->BBox);
 
-		tmin = bbox->Lower_Left[X];
-		tmax = tmin + bbox->Lengths[X];
+		tmin = bbox->lowerLeft[X];
+		tmax = tmin + bbox->size[X];
 
 		if(tmin < bmin[X]) { bmin[X] = tmin; }
 		if(tmax > bmax[X]) { bmax[X] = tmax; }
 
-		tmin = bbox->Lower_Left[Y];
-		tmax = tmin + bbox->Lengths[Y];
+		tmin = bbox->lowerLeft[Y];
+		tmax = tmin + bbox->size[Y];
 
 		if(tmin < bmin[Y]) { bmin[Y] = tmin; }
 		if(tmax > bmax[Y]) { bmax[Y] = tmax; }
 
-		tmin = bbox->Lower_Left[Z];
-		tmax = tmin + bbox->Lengths[Z];
+		tmin = bbox->lowerLeft[Z];
+		tmax = tmin + bbox->size[Z];
 
 		if(tmin < bmin[Z]) { bmin[Z] = tmin; }
 		if(tmax > bmax[Z]) { bmax[Z] = tmax; }
@@ -877,8 +877,8 @@ void build_area_table(BBOX_TREE **Finite, ptrdiff_t a, ptrdiff_t b, DBL *areas)
 {
 	ptrdiff_t i, imin, dir;
 	DBL tmin, tmax;
-	VECTOR bmin, bmax, len;
-	BBOX *bbox;
+	Vector3d bmin, bmax, len;
+	BoundingBox *bbox;
 
 	if (a < b)
 	{
@@ -889,32 +889,32 @@ void build_area_table(BBOX_TREE **Finite, ptrdiff_t a, ptrdiff_t b, DBL *areas)
 		imin = b;  dir = -1;
 	}
 
-	Make_Vector(bmin, BOUND_HUGE, BOUND_HUGE, BOUND_HUGE);
-	Make_Vector(bmax, -BOUND_HUGE, -BOUND_HUGE, -BOUND_HUGE);
+	bmin = Vector3d(BOUND_HUGE);
+	bmax = Vector3d(-BOUND_HUGE);
 
 	for(i = a; i != (b + dir); i += dir)
 	{
 		bbox = &(Finite[i]->BBox);
 
-		tmin = bbox->Lower_Left[X];
-		tmax = tmin + bbox->Lengths[X];
+		tmin = bbox->lowerLeft[X];
+		tmax = tmin + bbox->size[X];
 
 		if (tmin < bmin[X]) { bmin[X] = tmin; }
 		if (tmax > bmax[X]) { bmax[X] = tmax; }
 
-		tmin = bbox->Lower_Left[Y];
-		tmax = tmin + bbox->Lengths[Y];
+		tmin = bbox->lowerLeft[Y];
+		tmax = tmin + bbox->size[Y];
 
 		if (tmin < bmin[Y]) { bmin[Y] = tmin; }
 		if (tmax > bmax[Y]) { bmax[Y] = tmax; }
 
-		tmin = bbox->Lower_Left[Z];
-		tmax = tmin + bbox->Lengths[Z];
+		tmin = bbox->lowerLeft[Z];
+		tmax = tmin + bbox->size[Z];
 
 		if (tmin < bmin[Z]) { bmin[Z] = tmin; }
 		if (tmax > bmax[Z]) { bmax[Z] = tmax; }
 
-		VSub(len, bmax, bmin);
+		len = bmax - bmin;
 
 		areas[i - imin] = len[X] * (len[Y] + len[Z]) + len[Y] * len[Z];
 	}

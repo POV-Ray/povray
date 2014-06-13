@@ -24,17 +24,19 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/scene/objects.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/scene/objects.h $
+ * $Revision: #37 $
+ * $Change: 6164 $
+ * $DateTime: 2013/12/09 17:21:04 $
+ * $Author: clipka $
  *******************************************************************************/
 
 /* NOTE: FRAME.H contains other object stuff. */
 
 #ifndef OBJECTS_H
 #define OBJECTS_H
+
+#include "backend/bounding/bbox.h"
 
 namespace pov
 {
@@ -142,24 +144,167 @@ namespace pov
 
 
 /*****************************************************************************
+* Classes
+******************************************************************************/
+
+
+class ObjectBase
+{
+	public:
+		int Type;
+		TEXTURE *Texture;
+		TEXTURE *Interior_Texture;
+		Interior *interior;
+		vector<ObjectPtr> Bound;
+		vector<ObjectPtr> Clip;
+		vector<LightSource *> LLights;  ///< Used for light groups.
+		BoundingBox BBox;
+		TRANSFORM *Trans;
+		TRANSFORM *UV_Trans;
+		SNGL Ph_Density;
+		FloatSetting RadiosityImportance;
+		unsigned int Flags;
+
+#ifdef OBJECT_DEBUG_HELPER
+		ObjectDebugHelper Debug;
+#endif
+
+		ObjectBase(int t) :
+			Type(t),
+			Texture(NULL), Interior_Texture(NULL), interior(NULL), Trans(NULL), UV_Trans(NULL),
+			Ph_Density(0), RadiosityImportance(0.0), Flags(0)
+		{
+			Make_BBox(BBox, -BOUND_HUGE/2.0, -BOUND_HUGE/2.0, -BOUND_HUGE/2.0, BOUND_HUGE, BOUND_HUGE, BOUND_HUGE);
+		}
+
+		ObjectBase(int t, ObjectBase& o, bool transplant) :
+			Type(t),
+			Texture(o.Texture), Interior_Texture(o.Interior_Texture), interior(o.interior), Trans(o.Trans), UV_Trans(o.UV_Trans),
+			Ph_Density(o.Ph_Density), RadiosityImportance(o.RadiosityImportance), Flags(o.Flags),
+			Bound(o.Bound), Clip(o.Clip), LLights(o.LLights), BBox(o.BBox)
+		{
+			if (transplant)
+			{
+				o.Texture = NULL;
+				o.Interior_Texture = NULL;
+				o.interior = NULL;
+				o.Trans = NULL;
+				o.UV_Trans = NULL;
+				o.Bound.clear();
+				o.Clip.clear();
+				o.LLights.clear();
+			}
+		}
+		virtual ~ObjectBase() { }
+
+		virtual ObjectPtr Copy() = 0;
+
+		virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *) = 0; // could be "const", if it wasn't for isosurface max_gradient estimation stuff
+		virtual bool Inside(const Vector3d&, TraceThreadData *) const = 0;
+		virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const = 0;
+		virtual void UVCoord(Vector2d&, const Intersection *, TraceThreadData *) const;
+		virtual void Translate(const Vector3d&, const TRANSFORM *) = 0;
+		virtual void Rotate(const Vector3d&, const TRANSFORM *) = 0;
+		virtual void Scale(const Vector3d&, const TRANSFORM *) = 0;
+		virtual void Transform(const TRANSFORM *) = 0;
+		virtual ObjectPtr Invert(); ///< @note This method may return a newly constructed object and destroy itself.
+		virtual void Compute_BBox() = 0;
+		virtual void Determine_Textures(Intersection *, bool, WeightedTextureVector&, TraceThreadData *Thread); // could be "(const Intersection*...) const" if it wasn't for blob specials
+
+		/// Checks whether a given ray intersects the object's bounding box.
+		/// Primitives with low-cost intersection tests may override this to always return true
+		virtual bool Intersect_BBox(BBoxDirection, const BBoxVector3d&, const BBoxVector3d&, BBoxScalar = HUGE_VAL) const;
+
+		// optional post-render message dispatcher; will be called upon completion
+		// of rendering a view. this is the appropriate place to send messages that
+		// would traditionally have been sent at the end of a render or at object
+		// destruction - e.g. IsoSurface max_gradient warnings. (object destruction
+		// isn't the place to do that anymore since a scene may persist between views).
+		virtual void DispatchShutdownMessages(MessageFactory& messageFactory) {};
+
+	protected:
+		explicit ObjectBase(const ObjectBase&) { }
+};
+
+class NonsolidObject : public ObjectBase
+{
+	public:
+		NonsolidObject(int t) : ObjectBase(t) {}
+		virtual ObjectPtr Invert();
+};
+
+/* This is an abstract structure that is never actually used.
+   All other objects are descendents of this primitive type */
+
+class CompoundObject : public ObjectBase
+{
+	public:
+		CompoundObject(int t) : ObjectBase(t) {}
+		CompoundObject(int t, CompoundObject& o, bool transplant) : ObjectBase(t, o, transplant), children(o.children) { if (transplant) o.children.clear(); }
+		vector<ObjectPtr> children;
+		virtual ObjectPtr Invert();
+};
+
+
+class LightSource : public CompoundObject
+{
+	public:
+		size_t index;
+		RGBColour colour;
+		Vector3d Direction, Center, Points_At, Axis1, Axis2;
+		DBL Coeff, Radius, Falloff;
+		DBL Fade_Distance, Fade_Power;
+		int Area_Size1, Area_Size2;
+		int Adaptive_Level;
+		ObjectPtr Projected_Through_Object;
+		BLEND_MAP *blend_map;// NK for dispersion
+
+		unsigned Light_Type : 8;
+		bool Area_Light : 1;
+		bool Use_Full_Area_Lighting : 1; // JN2007: Full area lighting
+		bool Jitter : 1;
+		bool Orient : 1;
+		bool Circular : 1;
+		bool Parallel : 1;
+		bool Photon_Area_Light : 1;
+		bool Media_Attenuation : 1;
+		bool Media_Interaction : 1;
+		bool lightGroupLight : 1;
+
+		LightSource();
+		virtual ~LightSource();
+
+		virtual ObjectPtr Copy();
+
+		virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
+		virtual bool Inside(const Vector3d&, TraceThreadData *) const;
+		virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const;
+		virtual void UVCoord(Vector2d&, const Intersection *, TraceThreadData *) const;
+		virtual void Translate(const Vector3d&, const TRANSFORM *);
+		virtual void Rotate(const Vector3d&, const TRANSFORM *);
+		virtual void Scale(const Vector3d&, const TRANSFORM *);
+		virtual void Transform(const TRANSFORM *);
+		virtual void Compute_BBox() {}
+};
+
+
+/*****************************************************************************
 * Global functions
 ******************************************************************************/
 
 bool Find_Intersection(Intersection *Ray_Intersection, ObjectPtr Object, const Ray& ray, TraceThreadData *Thread);
 bool Find_Intersection(Intersection *Ray_Intersection, ObjectPtr Object, const Ray& ray, const RayObjectCondition& postcondition, TraceThreadData *Thread);
-bool Find_Intersection(Intersection *isect, ObjectPtr object, const Ray& ray, ObjectBase::BBoxDirection variant, const BBOX_VECT& origin, const BBOX_VECT& invdir, TraceThreadData *ThreadData);
-bool Find_Intersection(Intersection *isect, ObjectPtr object, const Ray& ray, ObjectBase::BBoxDirection variant, const BBOX_VECT& origin, const BBOX_VECT& invdir, const RayObjectCondition& postcondition, TraceThreadData *ThreadData);
+bool Find_Intersection(Intersection *isect, ObjectPtr object, const Ray& ray, BBoxDirection variant, const BBoxVector3d& origin, const BBoxVector3d& invdir, TraceThreadData *ThreadData);
+bool Find_Intersection(Intersection *isect, ObjectPtr object, const Ray& ray, BBoxDirection variant, const BBoxVector3d& origin, const BBoxVector3d& invdir, const RayObjectCondition& postcondition, TraceThreadData *ThreadData);
 bool Ray_In_Bound(const Ray& ray, const vector<ObjectPtr>& Bounding_Object, TraceThreadData *Thread);
-bool Point_In_Clip(const VECTOR IPoint, const vector<ObjectPtr>& Clip, TraceThreadData *Thread);
+bool Point_In_Clip(const Vector3d& IPoint, const vector<ObjectPtr>& Clip, TraceThreadData *Thread);
 ObjectPtr Copy_Object(ObjectPtr Old);
 vector<ObjectPtr> Copy_Objects(vector<ObjectPtr>& Src);
-void Translate_Object(ObjectPtr Object, const VECTOR Vector, const TRANSFORM *Trans);
-void Rotate_Object(ObjectPtr Object, const VECTOR Vector, const TRANSFORM *Trans);
-void Scale_Object(ObjectPtr Object, const VECTOR Vector, const TRANSFORM *Trans);
+void Translate_Object(ObjectPtr Object, const Vector3d& Vector, const TRANSFORM *Trans);
+void Rotate_Object(ObjectPtr Object, const Vector3d& Vector, const TRANSFORM *Trans);
+void Scale_Object(ObjectPtr Object, const Vector3d& Vector, const TRANSFORM *Trans);
 void Transform_Object(ObjectPtr Object, const TRANSFORM *Trans);
-bool Inside_Object(const VECTOR IPoint, ObjectPtr Vector, TraceThreadData *Thread);
-void Invert_Object(ObjectPtr Object);
-ObjectPtr Invert_CSG_Object(ObjectPtr& Object); // deletes Object and returns new pointer
+bool Inside_Object(const Vector3d& IPoint, ObjectPtr Object, TraceThreadData *Thread);
 void Destroy_Object(vector<ObjectPtr>& Object);
 void Destroy_Object(ObjectPtr Object);
 void Destroy_Single_Object(ObjectPtr *ObjectPtr);

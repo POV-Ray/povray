@@ -24,11 +24,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/shape/planes.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/shape/planes.cpp $
+ * $Revision: #36 $
+ * $Change: 6164 $
+ * $DateTime: 2013/12/09 17:21:04 $
+ * $Author: clipka $
  *******************************************************************************/
 
 // frame.h must always be the first POV file included (pulls in platform config)
@@ -82,11 +82,11 @@ const DBL DEPTH_TOLERANCE = 1.0e-6;
 bool Plane::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread)
 {
 	DBL Depth;
-	VECTOR IPoint;
+	Vector3d IPoint;
 
 	if (Intersect(ray, &Depth, Thread))
 	{
-		VEvaluateRay(IPoint, ray.Origin, Depth, ray.Direction);
+		IPoint = ray.Evaluate(Depth);
 
 		if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
 		{
@@ -126,37 +126,37 @@ bool Plane::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDa
 *
 ******************************************************************************/
 
-bool Plane::Intersect(const Ray& ray, DBL *Depth, TraceThreadData *Thread) const
+bool Plane::Intersect(const BasicRay& ray, DBL *Depth, TraceThreadData *Thread) const
 {
 	DBL NormalDotOrigin, NormalDotDirection;
-	VECTOR P, D;
+	Vector3d P, D;
 
 	Thread->Stats()[Ray_Plane_Tests]++;
 
 	if (Trans == NULL)
 	{
-		VDot(NormalDotDirection, Normal_Vector, ray.Direction);
+		NormalDotDirection = dot(Normal_Vector, ray.Direction);
 
 		if (fabs(NormalDotDirection) < EPSILON)
 		{
 			return(false);
 		}
 
-		VDot(NormalDotOrigin, Normal_Vector, ray.Origin);
+		NormalDotOrigin = dot(Normal_Vector, ray.Origin);
 	}
 	else
 	{
 		MInvTransPoint(P, ray.Origin, Trans);
 		MInvTransDirection(D, ray.Direction, Trans);
 
-		VDot(NormalDotDirection, Normal_Vector, D);
+		NormalDotDirection = dot(Normal_Vector, D);
 
 		if (fabs(NormalDotDirection) < EPSILON)
 		{
 			return(false);
 		}
 
-		VDot(NormalDotOrigin, Normal_Vector, P);
+		NormalDotOrigin = dot(Normal_Vector, P);
 	}
 
 	*Depth = -(NormalDotOrigin + Distance) / NormalDotDirection;
@@ -200,20 +200,20 @@ bool Plane::Intersect(const Ray& ray, DBL *Depth, TraceThreadData *Thread) const
 *
 ******************************************************************************/
 
-bool Plane::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
+bool Plane::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 {
 	DBL Temp;
-	VECTOR P;
+	Vector3d P;
 
 	if(Trans == NULL)
 	{
-		VDot(Temp, IPoint, Normal_Vector);
+		Temp = dot(IPoint, Normal_Vector);
 	}
 	else
 	{
 		MInvTransPoint(P, IPoint, Trans);
 
-		VDot(Temp, P, Normal_Vector);
+		Temp = dot(P, Normal_Vector);
 	}
 
 	return((Temp + Distance) < EPSILON);
@@ -247,15 +247,15 @@ bool Plane::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
 *
 ******************************************************************************/
 
-void Plane::Normal(VECTOR Result, Intersection *, TraceThreadData *) const
+void Plane::Normal(Vector3d& Result, Intersection *, TraceThreadData *) const
 {
-	Assign_Vector(Result, Normal_Vector);
+	Result = Normal_Vector;
 
 	if(Trans != NULL)
 	{
 		MTransNormal(Result, Result, Trans);
 
-		VNormalize(Result, Result);
+		Result.normalize();
 	}
 }
 
@@ -287,15 +287,11 @@ void Plane::Normal(VECTOR Result, Intersection *, TraceThreadData *) const
 *
 ******************************************************************************/
 
-void Plane::Translate(const VECTOR Vector, const TRANSFORM *tr)
+void Plane::Translate(const Vector3d& Vector, const TRANSFORM *tr)
 {
-	VECTOR Translation;
-
 	if(Trans == NULL)
 	{
-		VEvaluate (Translation, Normal_Vector, Vector);
-
-		Distance -= Translation[X] + Translation[Y] + Translation[Z];
+		Distance -= dot(Normal_Vector, Vector);
 
 		Compute_BBox();
 	}
@@ -333,7 +329,7 @@ void Plane::Translate(const VECTOR Vector, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void Plane::Rotate(const VECTOR, const TRANSFORM *tr)
+void Plane::Rotate(const Vector3d&, const TRANSFORM *tr)
 {
 	if(Trans == NULL)
 	{
@@ -375,17 +371,17 @@ void Plane::Rotate(const VECTOR, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void Plane::Scale(const VECTOR Vector, const TRANSFORM *tr)
+void Plane::Scale(const Vector3d& Vector, const TRANSFORM *tr)
 {
 	DBL Length;
 
 	if(Trans == NULL)
 	{
-		VDivEq(Normal_Vector, Vector);
+		Normal_Vector /= Vector;
 
-		VLength(Length, Normal_Vector);
+		Length = Normal_Vector.length();
 
-		VInverseScaleEq(Normal_Vector, Length);
+		Normal_Vector /= Length;
 
 		Distance /= Length;
 
@@ -425,11 +421,12 @@ void Plane::Scale(const VECTOR Vector, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void Plane::Invert()
+ObjectPtr Plane::Invert()
 {
-	VScaleEq(Normal_Vector, -1.0);
-
+	Normal_Vector.invert();
 	Distance *= -1.0;
+
+	return this;
 }
 
 
@@ -500,7 +497,7 @@ void Plane::Transform(const TRANSFORM *tr)
 
 Plane::Plane() : ObjectBase(PLANE_OBJECT)
 {
-	Make_Vector(Normal_Vector, 0.0, 1.0, 0.0);
+	Normal_Vector = Vector3d(0.0, 1.0, 0.0);
 
 	Distance = 0.0;
 
@@ -621,7 +618,7 @@ void Plane::Compute_BBox()
 	}
 }
 
-bool Plane::Intersect_BBox(BBoxDirection, const BBOX_VECT&, const BBOX_VECT&, BBOX_VAL) const
+bool Plane::Intersect_BBox(BBoxDirection, const BBoxVector3d&, const BBoxVector3d&, BBoxScalar) const
 {
 	return true;
 }

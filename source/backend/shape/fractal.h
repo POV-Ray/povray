@@ -24,15 +24,17 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/shape/fractal.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/shape/fractal.h $
+ * $Revision: #27 $
+ * $Change: 6164 $
+ * $DateTime: 2013/12/09 17:21:04 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #ifndef FRACTAL_H
 #define FRACTAL_H
+
+#include "backend/scene/objects.h"
 
 namespace pov
 {
@@ -66,11 +68,11 @@ namespace pov
 #define CUBE_STYPE        16
 #define RECIPROCAL_STYPE  17
 
-#define Iteration(V,F,IS) ( (*((F)->Iteration_Method))(V,F,IS) )
-#define Normal_Calc(F,V,IS) ( (*((F)->Normal_Calc_Method))(V,(F)->Num_Iterations,F,IS) )
-#define F_Bound(R,F,dm,dM) ( (*((F)->F_Bound_Method))(R,F,dm,dM) )
-#define D_Iteration(V,F,I,D,IS) ( (*((F)->D_Iteration_Method))(V,F,I,D,IS) )
-#define Complex_Function(t,s,F) ( (*((F)->Complex_Function_Method))(t,s,&(F)->exponent) )
+#define Iteration(V,F,IS) ( (F)->Rules->Iterate(V,F,IS) )
+#define Normal_Calc(F,V,IS) ( (F)->Rules->CalcNormal(V,(F)->Num_Iterations,F,IS) )
+#define F_Bound(R,F,dm,dM) ( (F)->Rules->Bound(R,F,dm,dM) )
+#define D_Iteration(V,F,I,D,IS) ( (F)->Rules->Iterate(V,F,I,D,IS) )
+#define Complex_Function(t,s,F) ( (*(this->ComplexFunction))(t,s,&(F)->exponent) )
 
 /*****************************************************************************
 * Global typedefs
@@ -78,33 +80,26 @@ namespace pov
 
 class Fractal;
 
-typedef struct cmplx { DBL x,y; } CMPLX;
-typedef void (*NORMAL_CALC_METHOD) (VECTOR, int, const Fractal *, DBL **);
-typedef int (*ITERATION_METHOD) (const VECTOR, const Fractal *, DBL **);
-typedef int (*D_ITERATION_METHOD) (const VECTOR, const Fractal *, const VECTOR&, DBL *, DBL **);
-typedef int (*F_BOUND_METHOD) (const Ray &, const Fractal *, DBL *, DBL *);
-typedef void (*COMPLEX_FUNCTION_METHOD) (CMPLX *, const CMPLX *, const CMPLX *);
+struct Complex
+{
+	DBL x,y;
+};
 
 class Fractal : public ObjectBase
 {
 	public:
-		VECTOR Center;
-		DBL Julia_Parm[4];
-		DBL Slice[4];                 /* vector perpendicular to slice plane */
+		Vector3d Center;
+		VECTOR_4D Julia_Parm;
+		VECTOR_4D Slice;              /* vector perpendicular to slice plane */
 		DBL SliceDist;                /* distance from slice plane to origin */
 		DBL Exit_Value;
 		int Num_Iterations;           /* number of iterations */
 		DBL Precision;                /* Precision value */
-		int Inverted;
 		int Algebra;                  /* Quaternion or Hypercomplex */
 		int Sub_Type;
-		CMPLX exponent;               /* exponent of power function */
+		Complex exponent;             /* exponent of power function */
 		DBL Radius_Squared;           /* For F_Bound(), if needed */
-		NORMAL_CALC_METHOD Normal_Calc_Method;
-		ITERATION_METHOD Iteration_Method;
-		D_ITERATION_METHOD D_Iteration_Method;
-		F_BOUND_METHOD F_Bound_Method;
-		COMPLEX_FUNCTION_METHOD Complex_Function_Method;
+		FractalRulesPtr Rules;
 
 		Fractal();
 		virtual ~Fractal();
@@ -112,13 +107,12 @@ class Fractal : public ObjectBase
 		virtual ObjectPtr Copy();
 
 		virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
-		virtual bool Inside(const VECTOR, TraceThreadData *) const;
-		virtual void Normal(VECTOR, Intersection *, TraceThreadData *) const;
-		virtual void Translate(const VECTOR, const TRANSFORM *);
-		virtual void Rotate(const VECTOR, const TRANSFORM *);
-		virtual void Scale(const VECTOR, const TRANSFORM *);
+		virtual bool Inside(const Vector3d&, TraceThreadData *) const;
+		virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const;
+		virtual void Translate(const Vector3d&, const TRANSFORM *);
+		virtual void Rotate(const Vector3d&, const TRANSFORM *);
+		virtual void Scale(const Vector3d&, const TRANSFORM *);
 		virtual void Transform(const TRANSFORM *);
-		virtual void Invert();
 		virtual void Compute_BBox();
 
 		static void Free_Iteration_Stack(DBL **IStack);

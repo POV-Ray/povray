@@ -27,11 +27,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/shape/bezier.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/shape/bezier.cpp $
+ * $Revision: #37 $
+ * $Change: 6164 $
+ * $DateTime: 2013/12/09 17:21:04 $
+ * $Author: clipka $
  *******************************************************************************/
 
 // frame.h must always be the first POV file included (pulls in platform config)
@@ -197,10 +197,10 @@ BEZIER_CHILDREN *BicubicPatch::create_bezier_child_block()
 *
 ******************************************************************************/
 
-BEZIER_NODE *BicubicPatch::bezier_tree_builder(const VECTOR (*Patch)[4][4], DBL u0, DBL u1, DBL v0, DBL v1, int depth, int& max_depth_reached)
+BEZIER_NODE *BicubicPatch::bezier_tree_builder(const ControlPoints *Patch, DBL u0, DBL u1, DBL v0, DBL v1, int depth, int& max_depth_reached)
 {
-	VECTOR Lower_Left[4][4], Lower_Right[4][4];
-	VECTOR Upper_Left[4][4], Upper_Right[4][4];
+	ControlPoints Lower_Left, Lower_Right;
+	ControlPoints Upper_Left, Upper_Right;
 	BEZIER_CHILDREN *Children;
 	BEZIER_VERTICES *Vertices;
 	BEZIER_NODE *Node = create_new_bezier_node();
@@ -227,10 +227,10 @@ BEZIER_NODE *BicubicPatch::bezier_tree_builder(const VECTOR (*Patch)[4][4], DBL 
 
 		Vertices = create_bezier_vertex_block();
 
-		Assign_Vector(Vertices->Vertices[0], (*Patch)[0][0]);
-		Assign_Vector(Vertices->Vertices[1], (*Patch)[0][3]);
-		Assign_Vector(Vertices->Vertices[2], (*Patch)[3][3]);
-		Assign_Vector(Vertices->Vertices[3], (*Patch)[3][0]);
+		Vertices->Vertices[0] = (*Patch)[0][0];
+		Vertices->Vertices[1] = (*Patch)[0][3];
+		Vertices->Vertices[2] = (*Patch)[3][3];
+		Vertices->Vertices[3] = (*Patch)[3][0];
 
 		Vertices->uvbnds[0] = u0;
 		Vertices->uvbnds[1] = u1;
@@ -251,10 +251,10 @@ BEZIER_NODE *BicubicPatch::bezier_tree_builder(const VECTOR (*Patch)[4][4], DBL 
 
 				Vertices = create_bezier_vertex_block();
 
-				Assign_Vector(Vertices->Vertices[0], (*Patch)[0][0]);
-				Assign_Vector(Vertices->Vertices[1], (*Patch)[0][3]);
-				Assign_Vector(Vertices->Vertices[2], (*Patch)[3][3]);
-				Assign_Vector(Vertices->Vertices[3], (*Patch)[3][0]);
+				Vertices->Vertices[0] = (*Patch)[0][0];
+				Vertices->Vertices[1] = (*Patch)[0][3];
+				Vertices->Vertices[2] = (*Patch)[3][3];
+				Vertices->Vertices[3] = (*Patch)[3][0];
 
 				Vertices->uvbnds[0] = u0;
 				Vertices->uvbnds[1] = u1;
@@ -352,7 +352,7 @@ BEZIER_NODE *BicubicPatch::bezier_tree_builder(const VECTOR (*Patch)[4][4], DBL 
 *
 ******************************************************************************/
 
-void BicubicPatch::bezier_value(const VECTOR (*cp)[4][4], DBL u0, DBL  v0, VECTOR P, VECTOR  N)
+void BicubicPatch::bezier_value(const ControlPoints *cp, DBL u0, DBL  v0, Vector3d& P, Vector3d& N)
 {
 	const DBL C[] = { 1.0, 3.0, 3.0, 1.0 };
 	int i, j;
@@ -360,7 +360,7 @@ void BicubicPatch::bezier_value(const VECTOR (*cp)[4][4], DBL u0, DBL  v0, VECTO
 	DBL u[4], uu[4], v[4], vv[4];
 	DBL du[4], duu[4], dv[4], dvv[4];
 	DBL squared_u1, squared_v1;
-	VECTOR U1, V1;
+	Vector3d U1, V1;
 
 	/* Calculate binomial coefficients times coordinate positions. */
 
@@ -378,9 +378,9 @@ void BicubicPatch::bezier_value(const VECTOR (*cp)[4][4], DBL u0, DBL  v0, VECTO
 
 	/* Now evaluate position and tangents based on control points. */
 
-	Make_Vector(P, 0, 0, 0);
-	Make_Vector(U1, 0, 0, 0);
-	Make_Vector(V1, 0, 0, 0);
+	P  = Vector3d(0.0, 0.0, 0.0);
+	U1 = Vector3d(0.0, 0.0, 0.0);
+	V1 = Vector3d(0.0, 0.0, 0.0);
 
 	for (i = 0; i < 4; i++)
 	{
@@ -393,35 +393,35 @@ void BicubicPatch::bezier_value(const VECTOR (*cp)[4][4], DBL u0, DBL  v0, VECTO
 
 			t = c * ut * vt;
 
-			VAddScaledEq(P, t, (*cp)[i][j]);
+			P += t * (*cp)[i][j];
 
 			t = c * vt * (du[i] * uu[3 - i] + u[i] * duu[3 - i]);
 
-			VAddScaledEq(U1, t, (*cp)[i][j]);
+			U1 += t * (*cp)[i][j];
 
 			t = c * ut * (dv[j] * vv[3 - j] + v[j] * dvv[3 - j]);
 
-			VAddScaledEq(V1, t, (*cp)[i][j]);
+			V1 += t * (*cp)[i][j];
 		}
 	}
 
 	/* Make the normal from the cross product of the tangents. */
 
-	VCross(N, U1, V1);
+	N = cross(U1, V1);
 
-	VDot(t, N, N);
+	t = N.lengthSqr();
 
-	squared_u1 = VSumSqr(U1);
-	squared_v1 = VSumSqr(V1);
+	squared_u1 = U1.lengthSqr();
+	squared_v1 = V1.lengthSqr();
 	if (t > (BEZIER_EPSILON * squared_u1 * squared_v1))
 	{
 		t = 1.0 / sqrt(t);
 
-		VScaleEq(N, t);
+		N *= t;
 	}
 	else
 	{
-		Make_Vector(N, 1, 0, 0);
+		N = Vector3d(1.0, 0.0, 0.0);
 	}
 }
 
@@ -454,26 +454,26 @@ void BicubicPatch::bezier_value(const VECTOR (*cp)[4][4], DBL u0, DBL  v0, VECTO
 *
 ******************************************************************************/
 
-bool BicubicPatch::subpatch_normal(const VECTOR v1, const VECTOR v2, const VECTOR v3, VECTOR Result, DBL *d)
+bool BicubicPatch::subpatch_normal(const Vector3d& v1, const Vector3d& v2, const Vector3d& v3, Vector3d& Result, DBL *d)
 {
-	VECTOR V1, V2;
+	Vector3d V1, V2;
 	DBL squared_v1, squared_v2;
 	DBL Length;
 
-	VSub(V1, v1, v2);
-	VSub(V2, v3, v2);
+	V1 = v1 - v2;
+	V2 = v3 - v2;
 
-	VCross(Result, V1, V2);
+	Result = cross(V1, V2);
 
-	Length = VSumSqr(Result);
-	squared_v1 = VSumSqr(V1);
-	squared_v2 = VSumSqr(V2);
+	Length = Result.lengthSqr();
+	squared_v1 = V1.lengthSqr();
+	squared_v2 = V2.lengthSqr();
 
 	if (Length <= (BEZIER_EPSILON * squared_v1 * squared_v2))
 	{
-		Make_Vector(Result, 1.0, 0.0, 0.0);
+		Result = Vector3d(1.0, 0.0, 0.0);
 
-		*d = -1.0 * v1[X];
+		*d = -v1[X];
 
 		return false;
 	}
@@ -481,11 +481,9 @@ bool BicubicPatch::subpatch_normal(const VECTOR v1, const VECTOR v2, const VECTO
 	{
 		Length = sqrt(Length);
 
-		VInverseScale(Result, Result, Length);
+		Result /= Length;
 
-		VDot(*d, Result, v1);
-
-		*d = 0.0 - *d;
+		*d = -dot(Result, v1);
 
 		return true;
 	}
@@ -517,22 +515,24 @@ bool BicubicPatch::subpatch_normal(const VECTOR v1, const VECTOR v2, const VECTO
 *
 ******************************************************************************/
 
-bool BicubicPatch::intersect_subpatch(const Ray &ray, const VECTOR V1[3], const DBL uu[3], const DBL vv[3], DBL *Depth, VECTOR P, VECTOR N, DBL *u, DBL *v) const
+bool BicubicPatch::intersect_subpatch(const BasicRay &ray, const TripleVector3d& V1, const DBL uu[3], const DBL vv[3], DBL *Depth, Vector3d& P, Vector3d& N, DBL *u, DBL *v) const
 {
 	DBL squared_b0, squared_b1;
 	DBL d, n, a, b, r;
-	VECTOR Q, T1;
-	VECTOR B[3], IB[3], NN[3];
+	Vector3d Q;
+	Vector3d T1;
+	Matrix3x3 B, IB;
+	Vector3d NN[3];
 
-	VSub(B[0], V1[1], V1[0]);
-	VSub(B[1], V1[2], V1[0]);
+	B[0] = V1[1] - V1[0];
+	B[1] = V1[2] - V1[0];
 
-	VCross(B[2], B[0], B[1]);
+	B[2] = cross(B[0], B[1]);
 
-	VDot(d, B[2], B[2]);
+	d = B[2].lengthSqr();
 
-	squared_b0 = VSumSqr(B[0]);
-	squared_b1 = VSumSqr(B[1]);
+	squared_b0 = B[0].lengthSqr();
+	squared_b1 = B[1].lengthSqr();
 	if (d <= (BEZIER_EPSILON * squared_b1 * squared_b0))
 	{
 		return false;
@@ -540,7 +540,7 @@ bool BicubicPatch::intersect_subpatch(const Ray &ray, const VECTOR V1[3], const 
 
 	d = 1.0 / sqrt(d);
 
-	VScaleEq(B[2], d);
+	B[2] *= d;
 
 	/* Degenerate triangle. */
 
@@ -549,16 +549,16 @@ bool BicubicPatch::intersect_subpatch(const Ray &ray, const VECTOR V1[3], const 
 		return false;
 	}
 
-	VDot(d, ray.Direction, IB[2]);
+	d = dot(ray.Direction, IB[2]);
 
 	if (fabs(d) < BEZIER_EPSILON)
 	{
 		return false;
 	}
 
-	VSub(Q, V1[0], ray.Origin);
+	Q = V1[0] - ray.Origin;
 
-	VDot(n, Q, IB[2]);
+	n = dot(Q, IB[2]);
 
 	*Depth = n / d;
 
@@ -567,14 +567,14 @@ bool BicubicPatch::intersect_subpatch(const Ray &ray, const VECTOR V1[3], const 
 		return false;
 	}
 
-	VScale(T1, ray.Direction, *Depth);
+	T1 = ray.Direction * (*Depth);
 
-	VAdd(P, ray.Origin, T1);
+	P = ray.Origin + T1;
 
-	VSub(Q, P, V1[0]);
+	Q = P - V1[0];
 
-	VDot(a, Q, IB[0]);
-	VDot(b, Q, IB[1]);
+	a = dot(Q, IB[0]);
+	b = dot(Q, IB[1]);
 
 	if ((a < 0.0) || (b < 0.0) || (a + b > 1.0))
 	{
@@ -583,99 +583,31 @@ bool BicubicPatch::intersect_subpatch(const Ray &ray, const VECTOR V1[3], const 
 
 	r = 1.0 - a - b;
 
-	Make_Vector(N, 0.0, 0.0, 0.0);
-
 	bezier_value(&Control_Points, uu[0], vv[0], T1, NN[0]);
 	bezier_value(&Control_Points, uu[1], vv[1], T1, NN[1]);
 	bezier_value(&Control_Points, uu[2], vv[2], T1, NN[2]);
 
-	VScale(T1, NN[0], r); VAddEq(N, T1);
-	VScale(T1, NN[1], a); VAddEq(N, T1);
-	VScale(T1, NN[2], b); VAddEq(N, T1);
+	N = NN[0] * r
+	  + NN[1] * a
+	  + NN[2] * b;
 
 	*u = r * uu[0] + a * uu[1] + b * uu[2];
 	*v = r * vv[0] + a * vv[1] + b * vv[2];
 
-	VDot(d, N, N);
+	d = N.lengthSqr();
 
 	if (d > BEZIER_EPSILON)
 	{
 		d = 1.0 / sqrt(d);
 
-		VScaleEq(N, d);
+		N *= d;
 	}
 	else
 	{
-		Make_Vector(N, 1, 0, 0);
+		N = Vector3d(1.0, 0.0, 0.0);
 	}
 
 	return true;
-}
-
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-*   find_average
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-*   Alexander Enzmann
-*
-* DESCRIPTION
-*
-*   Find a sphere that contains all of the points in the list "vectors".
-*
-* CHANGES
-*
-*   -
-*
-******************************************************************************/
-
-void BicubicPatch::find_average(int vector_count, const VECTOR *vectors, VECTOR center, DBL *radius)
-{
-	int i;
-	DBL r0, r1, xc = 0, yc = 0, zc = 0;
-	DBL x0, y0, z0;
-
-	for (i = 0; i < vector_count; i++)
-	{
-		xc += vectors[i][X];
-		yc += vectors[i][Y];
-		zc += vectors[i][Z];
-	}
-
-	xc /= (DBL)vector_count;
-	yc /= (DBL)vector_count;
-	zc /= (DBL)vector_count;
-
-	r0 = 0.0;
-
-	for (i = 0; i < vector_count; i++)
-	{
-		x0 = vectors[i][X] - xc;
-		y0 = vectors[i][Y] - yc;
-		z0 = vectors[i][Z] - zc;
-
-		r1 = x0 * x0 + y0 * y0 + z0 * z0;
-
-		if (r1 > r0)
-		{
-			r0 = r1;
-		}
-	}
-
-	Make_Vector(center, xc, yc, zc);
-
-	*radius = r0;
 }
 
 
@@ -706,17 +638,16 @@ void BicubicPatch::find_average(int vector_count, const VECTOR *vectors, VECTOR 
 *
 ******************************************************************************/
 
-bool BicubicPatch::spherical_bounds_check(const Ray &ray, const VECTOR center, DBL radius)
+bool BicubicPatch::spherical_bounds_check(const BasicRay &ray, const Vector3d& center, DBL radiusSqr)
 {
-	DBL x, y, z, dist1, dist2;
+	Vector3d v;
+	DBL dist1, dist2;
 
-	x = center[X] - ray.Origin[X];
-	y = center[Y] - ray.Origin[Y];
-	z = center[Z] - ray.Origin[Z];
+	v = center - ray.Origin;
 
-	dist1 = x * x + y * y + z * z;
+	dist1 = v.lengthSqr();
 
-	if (dist1 < radius)
+	if (dist1 < radiusSqr)
 	{
 		/* ray starts inside sphere - assume it intersects. */
 
@@ -724,11 +655,11 @@ bool BicubicPatch::spherical_bounds_check(const Ray &ray, const VECTOR center, D
 	}
 	else
 	{
-		dist2 = x*ray.Direction[X] + y*ray.Direction[Y] + z*ray.Direction[Z];
+		dist2 = dot(v, ray.Direction);
 
 		dist2 *= dist2;
 
-		if ((dist2 > 0) && ((dist1 - dist2) <= (radius + BEZIER_EPSILON) ))
+		if ((dist2 > 0) && ((dist1 - dist2) <= (radiusSqr + BEZIER_EPSILON) ))
 		{
 			return true;
 		}
@@ -767,25 +698,21 @@ bool BicubicPatch::spherical_bounds_check(const Ray &ray, const VECTOR center, D
 *
 ******************************************************************************/
 
-void BicubicPatch::bezier_bounding_sphere(const VECTOR (*Patch)[4][4], VECTOR center, DBL *radius)
+void BicubicPatch::bezier_bounding_sphere(const ControlPoints *Patch, Vector3d& center, DBL *radiusSqr)
 {
 	int i, j;
-	DBL r0, r1, xc = 0, yc = 0, zc = 0;
-	DBL x0, y0, z0;
+	DBL r0, r1;
+	Vector3d v0;
 
 	for (i = 0; i < 4; i++)
 	{
 		for (j = 0; j < 4; j++)
 		{
-			xc += (*Patch)[i][j][X];
-			yc += (*Patch)[i][j][Y];
-			zc += (*Patch)[i][j][Z];
+			center += (*Patch)[i][j];
 		}
 	}
 
-	xc /= 16.0;
-	yc /= 16.0;
-	zc /= 16.0;
+	center /= 16.0;
 
 	r0 = 0.0;
 
@@ -793,11 +720,9 @@ void BicubicPatch::bezier_bounding_sphere(const VECTOR (*Patch)[4][4], VECTOR ce
 	{
 		for (j = 0; j < 4; j++)
 		{
-			x0 = (*Patch)[i][j][X] - xc;
-			y0 = (*Patch)[i][j][Y] - yc;
-			z0 = (*Patch)[i][j][Z] - zc;
+			v0 = (*Patch)[i][j] - center;
 
-			r1 = x0 * x0 + y0 * y0 + z0 * z0;
+			r1 = v0.lengthSqr();
 
 			if (r1 > r0)
 			{
@@ -806,9 +731,7 @@ void BicubicPatch::bezier_bounding_sphere(const VECTOR (*Patch)[4][4], VECTOR ce
 		}
 	}
 
-	Make_Vector(center, xc, yc, zc);
-
-	*radius = r0;
+	*radiusSqr = r0;
 }
 
 
@@ -841,22 +764,7 @@ void BicubicPatch::bezier_bounding_sphere(const VECTOR (*Patch)[4][4], VECTOR ce
 
 void BicubicPatch::Precompute_Patch_Values()
 {
-	int i, j;
-	VECTOR cp[16];
-	VECTOR(*Patch_Ptr)[4][4] = &Control_Points;
 	int max_depth_reached = 0;
-
-	/* Calculate the bounding sphere for the entire patch. */
-
-	for (i = 0; i < 4; i++)
-	{
-		for (j = 0; j < 4; j++)
-		{
-			Assign_Vector(cp[4*i + j], Control_Points[i][j]);
-		}
-	}
-
-	find_average(16, cp, Bounding_Sphere_Center, &Bounding_Sphere_Radius);
 
 	if (Patch_Type == 1)
 	{
@@ -865,7 +773,7 @@ void BicubicPatch::Precompute_Patch_Values()
 			bezier_tree_deleter(Node_Tree);
 		}
 
-		Node_Tree = bezier_tree_builder(Patch_Ptr, 0.0, 1.0, 0.0, 1.0, 0, max_depth_reached);
+		Node_Tree = bezier_tree_builder(&Control_Points, 0.0, 1.0, 0.0, 1.0, 0, max_depth_reached);
 	}
 }
 
@@ -897,15 +805,15 @@ void BicubicPatch::Precompute_Patch_Values()
 *
 ******************************************************************************/
 
-DBL BicubicPatch::point_plane_distance(const VECTOR p, const VECTOR n, DBL d)
+DBL BicubicPatch::point_plane_distance(const Vector3d& p, const Vector3d& n, DBL d)
 {
 	DBL temp1, temp2;
 
-	VDot(temp1, p, n);
+	temp1 = dot(p, n);
 
 	temp1 += d;
 
-	VLength(temp2, n);
+	temp2 = n.length();
 
 	if (fabs(temp2) < EPSILON)
 	{
@@ -945,19 +853,19 @@ DBL BicubicPatch::point_plane_distance(const VECTOR p, const VECTOR n, DBL d)
 *
 ******************************************************************************/
 
-int BicubicPatch::bezier_subpatch_intersect(const Ray &ray, const VECTOR (*Patch)[4][4], DBL u0, DBL  u1, DBL  v0, DBL  v1, IStack& Depth_Stack)
+int BicubicPatch::bezier_subpatch_intersect(const BasicRay &ray, const ControlPoints *Patch, DBL u0, DBL  u1, DBL  v0, DBL  v1, IStack& Depth_Stack)
 {
 	int cnt = 0;
-	VECTOR V1[3];
+	TripleVector3d V1;
 	DBL u, v, Depth;
 	DBL uu[3], vv[3];
-	VECTOR P, N;
-	UV_VECT UV;
-	DBL uv_point[2], tpoint[2];
+	Vector3d P, N;
+	Vector2d UV;
+	Vector2d uv_point, tpoint;
 
-	Assign_Vector(V1[0], (*Patch)[0][0]);
-	Assign_Vector(V1[1], (*Patch)[0][3]);
-	Assign_Vector(V1[2], (*Patch)[3][3]);
+	V1[0] = (*Patch)[0][0];
+	V1[1] = (*Patch)[0][3];
+	V1[2] = (*Patch)[3][3];
 
 	uu[0] = u0; uu[1] = u0; uu[2] = u1;
 	vv[0] = v0; vv[1] = v1; vv[2] = v1;
@@ -976,8 +884,8 @@ int BicubicPatch::bezier_subpatch_intersect(const Ray &ray, const VECTOR (*Patch
 		cnt++;
 	}
 
-	Assign_Vector(V1[1], V1[2]);
-	Assign_Vector(V1[2], (*Patch)[3][0]);
+	V1[1] = V1[2];
+	V1[2] = (*Patch)[3][0];
 
 	uu[1] = uu[2]; uu[2] = u1;
 	vv[1] = vv[2]; vv[2] = v0;
@@ -1028,30 +936,30 @@ int BicubicPatch::bezier_subpatch_intersect(const Ray &ray, const VECTOR (*Patch
 *
 ******************************************************************************/
 
-void BicubicPatch::bezier_split_left_right(const VECTOR (*Patch)[4][4], VECTOR (*Left_Patch)[4][4], VECTOR (*Right_Patch)[4][4])
+void BicubicPatch::bezier_split_left_right(const ControlPoints *Patch, ControlPoints *Left_Patch, ControlPoints *Right_Patch)
 {
 	int i, j;
-	VECTOR Half;
-	VECTOR Temp1[4], Temp2[4];
+	Vector3d Half;
+	Vector3d Temp1[4], Temp2[4];
 
 	for (i = 0; i < 4; i++)
 	{
-		Assign_Vector(Temp1[0], (*Patch)[0][i]);
+		Temp1[0] = (*Patch)[0][i];
 
-		VHalf(Temp1[1], (*Patch)[0][i], (*Patch)[1][i]);
-		VHalf(Half, (*Patch)[1][i], (*Patch)[2][i]);
-		VHalf(Temp1[2], Temp1[1], Half);
-		VHalf(Temp2[2], (*Patch)[2][i], (*Patch)[3][i]);
-		VHalf(Temp2[1], Half, Temp2[2]);
-		VHalf(Temp1[3], Temp1[2], Temp2[1]);
+		Temp1[1] = midpoint( (*Patch)[0][i], (*Patch)[1][i] );
+		Half     = midpoint( (*Patch)[1][i], (*Patch)[2][i] );
+		Temp1[2] = midpoint( Temp1[1],       Half );
+		Temp2[2] = midpoint( (*Patch)[2][i], (*Patch)[3][i] );
+		Temp2[1] = midpoint( Half,           Temp2[2] );
+		Temp1[3] = midpoint( Temp1[2],       Temp2[1] );
 
-		Assign_Vector(Temp2[0], Temp1[3]);
-		Assign_Vector(Temp2[3], (*Patch)[3][i]);
+		Temp2[0] = Temp1[3];
+		Temp2[3] = (*Patch)[3][i];
 
 		for (j = 0; j < 4; j++)
 		{
-			Assign_Vector((*Left_Patch)[j][i], Temp1[j]);
-			Assign_Vector((*Right_Patch)[j][i], Temp2[j]);
+			(*Left_Patch)[j][i]  = Temp1[j];
+			(*Right_Patch)[j][i] = Temp2[j];
 		}
 	}
 }
@@ -1084,30 +992,30 @@ void BicubicPatch::bezier_split_left_right(const VECTOR (*Patch)[4][4], VECTOR (
 *
 ******************************************************************************/
 
-void BicubicPatch::bezier_split_up_down(const VECTOR (*Patch)[4][4], VECTOR (*Bottom_Patch)[4][4], VECTOR (*Top_Patch)[4][4])
+void BicubicPatch::bezier_split_up_down(const ControlPoints *Patch, ControlPoints *Bottom_Patch, ControlPoints *Top_Patch)
 {
 	int i, j;
-	VECTOR Temp1[4], Temp2[4];
-	VECTOR Half;
+	Vector3d Temp1[4], Temp2[4];
+	Vector3d Half;
 
 	for (i = 0; i < 4; i++)
 	{
-		Assign_Vector(Temp1[0], (*Patch)[i][0]);
+		Temp1[0] = (*Patch)[i][0];
 
-		VHalf(Temp1[1], (*Patch)[i][0], (*Patch)[i][1]);
-		VHalf(Half, (*Patch)[i][1], (*Patch)[i][2]);
-		VHalf(Temp1[2], Temp1[1], Half);
-		VHalf(Temp2[2], (*Patch)[i][2], (*Patch)[i][3]);
-		VHalf(Temp2[1], Half, Temp2[2]);
-		VHalf(Temp1[3], Temp1[2], Temp2[1]);
+		Temp1[1] = midpoint( (*Patch)[i][0], (*Patch)[i][1] );
+		Half     = midpoint( (*Patch)[i][1], (*Patch)[i][2] );
+		Temp1[2] = midpoint( Temp1[1],       Half );
+		Temp2[2] = midpoint( (*Patch)[i][2], (*Patch)[i][3] );
+		Temp2[1] = midpoint( Half,           Temp2[2] );
+		Temp1[3] = midpoint( Temp1[2],       Temp2[1] );
 
-		Assign_Vector(Temp2[0], Temp1[3]);
-		Assign_Vector(Temp2[3], (*Patch)[i][3]);
+		Temp2[0] = Temp1[3];
+		Temp2[3] = (*Patch)[i][3];
 
 		for (j = 0; j < 4; j++)
 		{
-			Assign_Vector((*Bottom_Patch)[i][j], Temp1[j]);
-			Assign_Vector((*Top_Patch)[i][j]   , Temp2[j]);
+			(*Bottom_Patch)[i][j] = Temp1[j];
+			(*Top_Patch)[i][j]    = Temp2[j];
 		}
 	}
 }
@@ -1142,19 +1050,20 @@ void BicubicPatch::bezier_split_up_down(const VECTOR (*Patch)[4][4], VECTOR (*Bo
 *
 ******************************************************************************/
 
-DBL BicubicPatch::determine_subpatch_flatness(const VECTOR (*Patch)[4][4])
+DBL BicubicPatch::determine_subpatch_flatness(const ControlPoints *Patch)
 {
 	int i, j;
 	DBL d, dist, temp1;
-	VECTOR n, TempV;
-	VECTOR vertices[4];
+	Vector3d n;
+	Vector3d TempV;
+	Vector3d vertices[3];
 
-	Assign_Vector(vertices[0], (*Patch)[0][0]);
-	Assign_Vector(vertices[1], (*Patch)[0][3]);
+	vertices[0] = (*Patch)[0][0];
+	vertices[1] = (*Patch)[0][3];
 
-	VSub(TempV, vertices[0], vertices[1]);
+	TempV = vertices[0] - vertices[1];
 
-	VLength(temp1, TempV);
+	temp1 = TempV.length();
 
 	if (fabs(temp1) < EPSILON)
 	{
@@ -1165,31 +1074,31 @@ DBL BicubicPatch::determine_subpatch_flatness(const VECTOR (*Patch)[4][4])
 		 * but that is somewhat pathalogical and won't be considered.
 		 */
 
-		Assign_Vector(vertices[1], (*Patch)[3][3]);
+		vertices[1] = (*Patch)[3][3];
 
-		VSub(TempV, vertices[0], vertices[1]);
+		TempV = vertices[0] - vertices[1];
 
-		VLength(temp1, TempV);
-
-		if (fabs(temp1) < EPSILON)
-		{
-			return (-1.0);
-		}
-
-		Assign_Vector(vertices[2], (*Patch)[3][0]);
-
-		VSub(TempV, vertices[0], vertices[1]);
-
-		VLength(temp1, TempV);
+		temp1 = TempV.length();
 
 		if (fabs(temp1) < EPSILON)
 		{
 			return (-1.0);
 		}
 
-		VSub(TempV, vertices[1], vertices[2]);
+		vertices[2] = (*Patch)[3][0];
 
-		VLength(temp1, TempV);
+		TempV = vertices[0] - vertices[1];
+
+		temp1 = TempV.length();
+
+		if (fabs(temp1) < EPSILON)
+		{
+			return (-1.0);
+		}
+
+		TempV = vertices[1] - vertices[2];
+
+		temp1 = TempV.length();
 
 		if (fabs(temp1) < EPSILON)
 		{
@@ -1198,28 +1107,28 @@ DBL BicubicPatch::determine_subpatch_flatness(const VECTOR (*Patch)[4][4])
 	}
 	else
 	{
-		Assign_Vector(vertices[2], (*Patch)[3][0]);
+		vertices[2] = (*Patch)[3][0];
 
-		VSub(TempV, vertices[0], vertices[1]);
+		TempV = vertices[0] - vertices[1];
 
-		VLength(temp1, TempV);
+		temp1 = TempV.length();
 
 		if (fabs(temp1) < EPSILON)
 		{
-			Assign_Vector(vertices[2], (*Patch)[3][3]);
+			vertices[2] = (*Patch)[3][3];
 
-			VSub(TempV, vertices[0], vertices[2]);
+			TempV = vertices[0] - vertices[2];
 
-			VLength(temp1, TempV);
+			temp1 = TempV.length();
 
 			if (fabs(temp1) < EPSILON)
 			{
 				return (-1.0);
 			}
 
-			VSub(TempV, vertices[1], vertices[2]);
+			TempV = vertices[1] - vertices[2];
 
-			VLength(temp1, TempV);
+			temp1 = TempV.length();
 
 			if (fabs(temp1) < EPSILON)
 			{
@@ -1228,9 +1137,9 @@ DBL BicubicPatch::determine_subpatch_flatness(const VECTOR (*Patch)[4][4])
 		}
 		else
 		{
-			VSub(TempV, vertices[1], vertices[2]);
+			TempV = vertices[1] - vertices[2];
 
-			VLength(temp1, TempV);
+			temp1 = TempV.length();
 
 			if (fabs(temp1) < EPSILON)
 			{
@@ -1257,7 +1166,7 @@ DBL BicubicPatch::determine_subpatch_flatness(const VECTOR (*Patch)[4][4])
 		{
 			for (j = 0; j < 4; j++)
 			{
-				temp1 = fabs(point_plane_distance(((*Patch)[i][j]), n, d));
+				temp1 = fabs(point_plane_distance((*Patch)[i][j], n, d));
 
 				if (temp1 > dist)
 				{
@@ -1306,7 +1215,7 @@ DBL BicubicPatch::determine_subpatch_flatness(const VECTOR (*Patch)[4][4])
 *
 ******************************************************************************/
 
-bool BicubicPatch::flat_enough(const VECTOR (*Patch)[4][4]) const
+bool BicubicPatch::flat_enough(const ControlPoints *Patch) const
 {
 	DBL Dist;
 
@@ -1357,22 +1266,22 @@ bool BicubicPatch::flat_enough(const VECTOR (*Patch)[4][4]) const
 *
 ******************************************************************************/
 
-int BicubicPatch::bezier_subdivider(const Ray &ray, const VECTOR (*Patch)[4][4], DBL u0, DBL  u1, DBL  v0, DBL  v1, int recursion_depth, IStack& Depth_Stack)
+int BicubicPatch::bezier_subdivider(const BasicRay &ray, const ControlPoints *Patch, DBL u0, DBL  u1, DBL  v0, DBL  v1, int recursion_depth, IStack& Depth_Stack)
 {
 	int cnt = 0;
-	DBL ut, vt, radius;
-	VECTOR Lower_Left[4][4], Lower_Right[4][4];
-	VECTOR Upper_Left[4][4], Upper_Right[4][4];
-	VECTOR center;
+	DBL ut, vt, radiusSqr;
+	ControlPoints Lower_Left, Lower_Right;
+	ControlPoints Upper_Left, Upper_Right;
+	Vector3d center;
 
 	/*
 	 * Make sure the ray passes through a sphere bounding
 	 * the control points of the patch.
 	 */
 
-	bezier_bounding_sphere(Patch, center, &radius);
+	bezier_bounding_sphere(Patch, center, &radiusSqr);
 
-	if (!spherical_bounds_check(ray, center, radius))
+	if (!spherical_bounds_check(ray, center, radiusSqr))
 	{
 		return (0);
 	}
@@ -1520,15 +1429,15 @@ void BicubicPatch::bezier_tree_deleter(BEZIER_NODE *Node)
 *
 ******************************************************************************/
 
-int BicubicPatch::bezier_tree_walker(const Ray &ray, const BEZIER_NODE *Node, IStack& Depth_Stack)
+int BicubicPatch::bezier_tree_walker(const BasicRay &ray, const BEZIER_NODE *Node, IStack& Depth_Stack)
 {
 	int i, cnt = 0;
 	DBL Depth, u, v;
 	DBL uu[3], vv[3];
-	VECTOR N, P;
-	VECTOR V1[3];
-	UV_VECT UV;
-	DBL uv_point[2], tpoint[2];
+	Vector3d N, P;
+	TripleVector3d V1;
+	Vector2d UV;
+	Vector2d uv_point, tpoint;
 	const BEZIER_CHILDREN *Children;
 	const BEZIER_VERTICES *Vertices;
 
@@ -1560,9 +1469,9 @@ int BicubicPatch::bezier_tree_walker(const Ray &ray, const BEZIER_NODE *Node, IS
 	{
 		Vertices = reinterpret_cast<const BEZIER_VERTICES *>(Node->Data_Ptr);
 
-		Assign_Vector(V1[0], Vertices->Vertices[0]);
-		Assign_Vector(V1[1], Vertices->Vertices[1]);
-		Assign_Vector(V1[2], Vertices->Vertices[2]);
+		V1[0] = Vertices->Vertices[0];
+		V1[1] = Vertices->Vertices[1];
+		V1[2] = Vertices->Vertices[2];
 
 		uu[0] = Vertices->uvbnds[0];
 		uu[1] = Vertices->uvbnds[0];
@@ -1590,8 +1499,8 @@ int BicubicPatch::bezier_tree_walker(const Ray &ray, const BEZIER_NODE *Node, IS
 			cnt++;
 		}
 
-		Assign_Vector(V1[1], V1[2]);
-		Assign_Vector(V1[2], Vertices->Vertices[3]);
+		V1[1] = V1[2];
+		V1[2] = Vertices->Vertices[3];
 
 		uu[1] = uu[2]; uu[2] = Vertices->uvbnds[1];
 		vv[1] = vv[2]; vv[2] = Vertices->uvbnds[2];
@@ -1646,11 +1555,9 @@ int BicubicPatch::bezier_tree_walker(const Ray &ray, const BEZIER_NODE *Node, IS
 *
 ******************************************************************************/
 
-int BicubicPatch::intersect_bicubic_patch0(const Ray &ray, IStack& Depth_Stack)
+int BicubicPatch::intersect_bicubic_patch0(const BasicRay &ray, IStack& Depth_Stack)
 {
-	const VECTOR(*Patch)[4][4] = &Control_Points;
-
-	return (bezier_subdivider(ray, Patch, 0.0, 1.0, 0.0, 1.0, 0, Depth_Stack));
+	return (bezier_subdivider(ray, &Control_Points, 0.0, 1.0, 0.0, 1.0, 0, Depth_Stack));
 }
 
 
@@ -1746,7 +1653,7 @@ bool BicubicPatch::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceT
 *
 ******************************************************************************/
 
-bool BicubicPatch::Inside(const VECTOR, TraceThreadData *) const
+bool BicubicPatch::Inside(const Vector3d&, TraceThreadData *) const
 {
 	return false;
 }
@@ -1779,11 +1686,11 @@ bool BicubicPatch::Inside(const VECTOR, TraceThreadData *) const
 *
 ******************************************************************************/
 
-void BicubicPatch::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) const
+void BicubicPatch::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread) const
 {
 	/* Use preocmputed normal. */
 
-	Assign_Vector(Result, Inter->INormal);
+	Result = Inter->INormal;
 }
 
 
@@ -1814,7 +1721,7 @@ void BicubicPatch::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *T
 *
 ******************************************************************************/
 
-void BicubicPatch::Translate(const VECTOR Vector, const TRANSFORM *)
+void BicubicPatch::Translate(const Vector3d& Vector, const TRANSFORM *)
 {
 	int i, j;
 
@@ -1822,7 +1729,7 @@ void BicubicPatch::Translate(const VECTOR Vector, const TRANSFORM *)
 	{
 		for (j = 0; j < 4; j++)
 		{
-			VAdd(Control_Points[i][j], Control_Points[i][j], Vector);
+			Control_Points[i][j] += Vector;
 		}
 	}
 
@@ -1859,7 +1766,7 @@ void BicubicPatch::Translate(const VECTOR Vector, const TRANSFORM *)
 *
 ******************************************************************************/
 
-void BicubicPatch::Rotate(const VECTOR, const TRANSFORM *tr)
+void BicubicPatch::Rotate(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
@@ -1892,7 +1799,7 @@ void BicubicPatch::Rotate(const VECTOR, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void BicubicPatch::Scale(const VECTOR Vector, const TRANSFORM *)
+void BicubicPatch::Scale(const Vector3d& Vector, const TRANSFORM *)
 {
 	int i, j;
 
@@ -1900,7 +1807,7 @@ void BicubicPatch::Scale(const VECTOR Vector, const TRANSFORM *)
 	{
 		for (j = 0; j < 4; j++)
 		{
-			VEvaluate(Control_Points[i][j], Control_Points[i][j], Vector);
+			Control_Points[i][j] *= Vector;
 		}
 	}
 
@@ -1961,38 +1868,6 @@ void BicubicPatch::Transform(const TRANSFORM *tr)
 *
 * FUNCTION
 *
-*   Invert_Bicubic_Patch
-*
-* INPUT
-*   
-* OUTPUT
-*   
-* RETURNS
-*   
-* AUTHOR
-*
-*   Alexander Enzmann
-*   
-* DESCRIPTION
-*
-*   Inversion of a patch really doesn't make sense.
-*
-* CHANGES
-*
-*   -
-*
-******************************************************************************/
-
-void BicubicPatch::Invert()
-{
-}
-
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
 *   Create_Bicubic_Patch
 *
 * INPUT
@@ -2015,7 +1890,7 @@ void BicubicPatch::Invert()
 *
 ******************************************************************************/
 
-BicubicPatch::BicubicPatch() : ObjectBase(BICUBIC_PATCH_OBJECT)
+BicubicPatch::BicubicPatch() : NonsolidObject(BICUBIC_PATCH_OBJECT)
 {
 	Patch_Type = - 1;
 
@@ -2035,14 +1910,10 @@ BicubicPatch::BicubicPatch() : ObjectBase(BICUBIC_PATCH_OBJECT)
 	 */
 
 	/* set the default uv-mapping coordinates */
-	ST[0][U] = 0;
-	ST[0][V] = 0;
-	ST[1][U] = 1;
-	ST[1][V] = 0;
-	ST[2][U] = 1;
-	ST[2][V] = 1;
-	ST[3][U] = 0;
-	ST[3][V] = 1;
+	ST[0] = Vector2d(0.0, 0.0);
+	ST[1] = Vector2d(1.0, 0.0);
+	ST[2] = Vector2d(1.0, 1.0);
+	ST[3] = Vector2d(0.0, 1.0);
 }
 
 
@@ -2077,7 +1948,7 @@ ObjectPtr BicubicPatch::Copy()
 {
 	int i, j;
 	BicubicPatch *New = new BicubicPatch();
-	int m, h;
+	int m;
 
 	/* Do not do *New = *Old so that Precompute works right */
 
@@ -2088,15 +1959,15 @@ ObjectPtr BicubicPatch::Copy()
 
 	if ( Weights != NULL )
 	{
-		New->Weights = reinterpret_cast<WEIGHTS *>(POV_MALLOC( sizeof(WEIGHTS),"bicubic patch" ));
-		POV_MEMCPY( New->Weights, Weights, sizeof(WEIGHTS) );
+		New->Weights = reinterpret_cast<BEZIER_WEIGHTS *>(POV_MALLOC( sizeof(BEZIER_WEIGHTS),"bicubic patch" ));
+		POV_MEMCPY( New->Weights, Weights, sizeof(BEZIER_WEIGHTS) );
 	}
 
 	for (i = 0; i < 4; i++)
 	{
 		for (j = 0; j < 4; j++)
 		{
-			Assign_Vector(New->Control_Points[i][j], Control_Points[i][j]);
+			New->Control_Points[i][j] = Control_Points[i][j];
 		}
 	}
 
@@ -2107,10 +1978,7 @@ ObjectPtr BicubicPatch::Copy()
 	/* copy the mapping */
 	for (m = 0; m < 4; m++)
 	{
-		for (h = 0; h < 3; h++)
-		{
-			New->ST[m][h] = ST[m][h];
-		}
+		New->ST[m] = ST[m];
 	}
 
 	return (New);
@@ -2192,10 +2060,10 @@ BicubicPatch::~BicubicPatch()
 void BicubicPatch::Compute_BBox()
 {
 	int i, j;
-	VECTOR Min, Max;
+	Vector3d Min, Max;
 
-	Make_Vector(Min, BOUND_HUGE, BOUND_HUGE, BOUND_HUGE);
-	Make_Vector(Max, -BOUND_HUGE, -BOUND_HUGE, -BOUND_HUGE);
+	Min = Vector3d(BOUND_HUGE);
+	Max = Vector3d(-BOUND_HUGE);
 
 	for (i = 0; i < 4; i++)
 	{
@@ -2239,11 +2107,11 @@ void BicubicPatch::Compute_BBox()
 *
 ******************************************************************************/
 
-void BicubicPatch::UVCoord(UV_VECT Result, const Intersection *Inter, TraceThreadData *Thread) const
+void BicubicPatch::UVCoord(Vector2d& Result, const Intersection *Inter, TraceThreadData *Thread) const
 {
 	/* Use preocmputed uv coordinates. */
 
-	Assign_UV_Vect(Result, Inter->Iuv);
+	Result = Inter->Iuv;
 }
 
 
@@ -2274,9 +2142,9 @@ void BicubicPatch::UVCoord(UV_VECT Result, const Intersection *Inter, TraceThrea
 *
 ******************************************************************************/
 
-void BicubicPatch::Compute_Texture_UV(const UV_VECT p, const UV_VECT st[4], UV_VECT t)
+void BicubicPatch::Compute_Texture_UV(const Vector2d& p, const Vector2d st[4], Vector2d& t)
 {
-	UV_VECT u1, u2;
+	Vector2d u1, u2;
 
 	u1[0] = st[0][0] + p[0] * (st[1][0] - st[0][0]);
 	u1[1] = st[0][1] + p[0] * (st[1][1] - st[0][1]);
