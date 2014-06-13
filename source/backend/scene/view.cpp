@@ -22,11 +22,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/scene/view.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/scene/view.cpp $
+ * $Revision: #157 $
+ * $Change: 6147 $
+ * $DateTime: 2013/11/29 20:46:11 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #include <boost/thread.hpp>
@@ -602,7 +602,7 @@ View::~View()
 	POV_MEM_STATS_RENDER_END();
 }
 
-bool View::CheckCameraHollowObject(const VECTOR point, const BBOX_TREE *node)
+bool View::CheckCameraHollowObject(const Vector3d& point, const BBOX_TREE *node)
 {
 	// TODO FIXME - duplicate code - remove again!!!
 
@@ -629,7 +629,7 @@ bool View::CheckCameraHollowObject(const VECTOR point, const BBOX_TREE *node)
 	return false;
 }
 
-bool View::CheckCameraHollowObject(const VECTOR point)
+bool View::CheckCameraHollowObject(const Vector3d& point)
 {
 	shared_ptr<SceneData>& sd = viewData.GetSceneData();
 
@@ -638,10 +638,10 @@ bool View::CheckCameraHollowObject(const VECTOR point)
 		HasInteriorPointObjectCondition precond;
 		TruePointObjectCondition postcond;
 		TraceThreadData threadData(sd); // TODO: avoid the need to construct threadData
-		BSPInsideCondFunctor ifn(Vector3d(point), sd->objects, &threadData, precond, postcond);
+		BSPInsideCondFunctor ifn(point, sd->objects, &threadData, precond, postcond);
 
 		mailbox.clear();
-		if ((*sd->tree)(Vector3d(point), ifn, mailbox, true))
+		if ((*sd->tree)(point, ifn, mailbox, true))
 			return true;
 
 		// test infinite objects
@@ -852,42 +852,42 @@ void View::StartRender(POVMS_Object& renderOptions)
 		if(camera.Exist('cloc') == true)
 		{
 			std::vector<POVMSFloat> pv = camera.GetFloatVector('cloc');
-			Assign_Vector(viewData.camera.Location, *Vector3d(pv[X], pv[Y], pv[Z]));
+			viewData.camera.Location = Vector3d(pv[X], pv[Y], pv[Z]);
 			had_location = true;
 		}
 
 		if(camera.Exist('cdir') == true)
 		{
 			std::vector<POVMSFloat> pv = camera.GetFloatVector('cdir');
-			Assign_Vector(viewData.camera.Direction, *Vector3d(pv[X], pv[Y], pv[Z]));
+			viewData.camera.Direction = Vector3d(pv[X], pv[Y], pv[Z]);
 			had_direction = true;
 		}
 
 		if(camera.Exist('cup ') == true)
 		{
 			std::vector<POVMSFloat> pv = camera.GetFloatVector('cup ');
-			Assign_Vector(viewData.camera.Up, *Vector3d(pv[X], pv[Y], pv[Z]));
+			viewData.camera.Up = Vector3d(pv[X], pv[Y], pv[Z]);
 			had_up = true;
 		}
 
 		if(camera.Exist('crig') == true)
 		{
 			std::vector<POVMSFloat> pv = camera.GetFloatVector('crig');
-			Assign_Vector(viewData.camera.Right, *Vector3d(pv[X], pv[Y], pv[Z]));
+			viewData.camera.Right = Vector3d(pv[X], pv[Y], pv[Z]);
 			had_right = true;
 		}
 
 		if(camera.Exist('csky') == true)
 		{
 			std::vector<POVMSFloat> pv = camera.GetFloatVector('csky');
-			Assign_Vector(viewData.camera.Sky, *Vector3d(pv[X], pv[Y], pv[Z]));
+			viewData.camera.Sky = Vector3d(pv[X], pv[Y], pv[Z]);
 			had_sky = true;
 		}
 
 		if(camera.Exist('clat') == true)
 		{
 			std::vector<POVMSFloat> pv = camera.GetFloatVector('clat');
-			Assign_Vector(viewData.camera.Look_At, *Vector3d(pv[X], pv[Y], pv[Z]));
+			viewData.camera.Look_At = Vector3d(pv[X], pv[Y], pv[Z]);
 			had_look_at = true;
 		}
 
@@ -895,28 +895,26 @@ void View::StartRender(POVMS_Object& renderOptions)
 		if(had_look_at == true)
 		{
 			DBL Direction_Length = 1.0, Up_Length, Right_Length, Handedness;
-			VECTOR tempv;
+			Vector3d tempv;
 
-			VLength (Direction_Length, viewData.camera.Direction);
-			VLength (Up_Length,        viewData.camera.Up);
-			VLength (Right_Length,     viewData.camera.Right);
-			VCross  (tempv,            viewData.camera.Up, viewData.camera.Direction);
-			VDot    (Handedness,       tempv,   viewData.camera.Right);
+			Direction_Length = viewData.camera.Direction.length();
+			Up_Length        = viewData.camera.Up.length();
+			Right_Length     = viewData.camera.Right.length();
+			tempv            = cross(viewData.camera.Up, viewData.camera.Direction);
+			Handedness       = dot(tempv, viewData.camera.Right);
 
-			Assign_Vector(viewData.camera.Direction, viewData.camera.Look_At);
-
-			VSub(viewData.camera.Direction, viewData.camera.Direction, viewData.camera.Location);
+			viewData.camera.Direction = viewData.camera.Look_At - viewData.camera.Location;
 
 			// Check for zero length direction vector.
-			if(VSumSqr(viewData.camera.Direction) < EPSILON)
+			if(viewData.camera.Direction.lengthSqr() < EPSILON)
 				; // Error("Camera location and look_at point must be different.");
 
-			VNormalize(viewData.camera.Direction, viewData.camera.Direction);
+			viewData.camera.Direction.normalize();
 
 			// Save Right vector
-			Assign_Vector (tempv, viewData.camera.Right);
+			tempv = viewData.camera.Right;
 
-			VCross(viewData.camera.Right, viewData.camera.Sky, viewData.camera.Direction);
+			viewData.camera.Right = cross(viewData.camera.Sky, viewData.camera.Direction);
 
 			// Avoid DOMAIN error (from Terry Kanakis)
 			if((fabs(viewData.camera.Right[X]) < EPSILON) &&
@@ -927,23 +925,23 @@ void View::StartRender(POVMS_Object& renderOptions)
 				//            "Using default/supplied right vector instead.");
 
 				// Restore Right vector
-				Assign_Vector(viewData.camera.Right, tempv);
+				viewData.camera.Right = tempv;
 			}
 
-			VNormalize (viewData.camera.Right,     viewData.camera.Right);
-			VCross     (viewData.camera.Up,        viewData.camera.Direction, viewData.camera.Right);
-			VScale     (viewData.camera.Direction, viewData.camera.Direction, Direction_Length);
+			viewData.camera.Right.normalize();
+			viewData.camera.Up = cross(viewData.camera.Direction, viewData.camera.Right);
+			viewData.camera.Direction *= Direction_Length;
 
 			if (Handedness > 0.0)
 			{
-				VScaleEq (viewData.camera.Right, Right_Length);
+				viewData.camera.Right *= Right_Length;
 			}
 			else
 			{
-				VScaleEq (viewData.camera.Right, -Right_Length);
+				viewData.camera.Right *= -Right_Length;
 			}
 
-			VScaleEq(viewData.camera.Up, Up_Length);
+			viewData.camera.Up *= Up_Length;
 		}
 	}
 

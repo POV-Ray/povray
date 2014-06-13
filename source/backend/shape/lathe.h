@@ -24,16 +24,17 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/shape/lathe.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/shape/lathe.h $
+ * $Revision: #26 $
+ * $Change: 6164 $
+ * $DateTime: 2013/12/09 17:21:04 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #ifndef LATHE_H
 #define LATHE_H
 
+#include "backend/scene/objects.h"
 #include "backend/bounding/bcyl.h"
 
 namespace pov
@@ -66,7 +67,7 @@ typedef struct Lathe_Spline_Entry_Struct LATHE_SPLINE_ENTRY;
 
 struct Lathe_Spline_Entry_Struct
 {
-	UV_VECT A, B, C, D;  /* Coefficients of segment */
+	Vector2d A, B, C, D;  /* Coefficients of segment */
 };
 
 struct Lathe_Spline_Struct
@@ -91,20 +92,19 @@ class Lathe : public ObjectBase
 		virtual ObjectPtr Copy();
 
 		virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
-		virtual bool Inside(const VECTOR, TraceThreadData *) const;
-		virtual void Normal(VECTOR, Intersection *, TraceThreadData *) const;
-		virtual void UVCoord(UV_VECT, const Intersection *, TraceThreadData *) const;
-		virtual void Translate(const VECTOR, const TRANSFORM *);
-		virtual void Rotate(const VECTOR, const TRANSFORM *);
-		virtual void Scale(const VECTOR, const TRANSFORM *);
+		virtual bool Inside(const Vector3d&, TraceThreadData *) const;
+		virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const;
+		virtual void UVCoord(Vector2d&, const Intersection *, TraceThreadData *) const;
+		virtual void Translate(const Vector3d&, const TRANSFORM *);
+		virtual void Rotate(const Vector3d&, const TRANSFORM *);
+		virtual void Scale(const Vector3d&, const TRANSFORM *);
 		virtual void Transform(const TRANSFORM *);
-		virtual void Invert();
 		virtual void Compute_BBox();
 
-		void Compute_Lathe(UV_VECT *P, TraceThreadData *);
+		void Compute_Lathe(Vector2d *P, TraceThreadData *);
 	protected:
-		bool Intersect(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread);
-		bool test_hit(const Ray&, IStack&, DBL, DBL, int, TraceThreadData *Thread);
+		bool Intersect(const BasicRay& ray, IStack& Depth_Stack, TraceThreadData *Thread);
+		bool test_hit(const BasicRay&, IStack&, DBL, DBL, int, TraceThreadData *Thread);
 };
 
 }

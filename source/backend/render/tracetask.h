@@ -22,11 +22,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/render/tracetask.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/render/tracetask.h $
+ * $Revision: #39 $
+ * $Change: 6163 $
+ * $DateTime: 2013/12/08 22:48:58 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #ifndef POVRAY_BACKEND_TRACETASK_H
@@ -41,7 +41,6 @@
 #include "backend/scene/view.h"
 #include "backend/scene/scene.h"
 #include "backend/render/rendertask.h"
-#include "backend/render/tracepixel.h"
 
 namespace pov
 {

@@ -26,11 +26,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/shape/torus.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/shape/torus.cpp $
+ * $Revision: #35 $
+ * $Change: 6164 $
+ * $DateTime: 2013/12/09 17:21:04 $
+ * $Author: clipka $
  *******************************************************************************/
 
 /****************************************************************************
@@ -112,7 +112,7 @@ bool Torus::All_Intersections(const Ray& ray, IStack& Depth_Stack, SceneThreadDa
 {
 	int i, max_i, Found;
 	DBL Depth[4];
-	VECTOR IPoint;
+	Vector3d IPoint;
 
 	Found = false;
 
@@ -122,7 +122,7 @@ bool Torus::All_Intersections(const Ray& ray, IStack& Depth_Stack, SceneThreadDa
 		{
 			if ((Depth[i] > DEPTH_TOLERANCE) && (Depth[i] < MAX_DISTANCE))
 			{
-				VEvaluateRay(IPoint, ray.Origin, Depth[i], ray.Direction);
+				IPoint = ray.Evaluate(Depth[i]);
 
 				if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
 				{
@@ -175,14 +175,14 @@ bool Torus::All_Intersections(const Ray& ray, IStack& Depth_Stack, SceneThreadDa
 *
 ******************************************************************************/
 
-int Torus::Intersect(const Ray& ray, DBL *Depth, SceneThreadData *Thread) const
+int Torus::Intersect(const BasicRay& ray, DBL *Depth, SceneThreadData *Thread) const
 {
 	int i, n;
 	DBL len, R2, Py2, Dy2, PDy2, k1, k2;
 	DBL y1, y2, r1, r2;
 	DBL c[5];
 	DBL r[4];
-	VECTOR P, D;
+	Vector3d P, D;
 	DBL DistanceP;            // Distance from P to torus center (origo).
 	DBL BoundingSphereRadius; // Sphere fully (amply) enclosing torus.
 	DBL Closer;               // P is moved Closer*D closer to torus.
@@ -195,9 +195,9 @@ int Torus::Intersect(const Ray& ray, DBL *Depth, SceneThreadData *Thread) const
 
 	MInvTransDirection(D, ray.Direction, Trans);
 
-	VLength(len, D);
+	len = D.length();
 
-	VInverseScaleEq(D, len);
+	D /= len;
 
 	i = 0;
 
@@ -224,13 +224,13 @@ int Torus::Intersect(const Ray& ray, DBL *Depth, SceneThreadData *Thread) const
 		// Bounding sphere radius is R + r, we add r once more to ensure
 		// that P is safely outside sphere.
 		BoundingSphereRadius = MajorRadius + MinorRadius + MinorRadius;
-		DistanceP = VSumSqr(P); // Distance is currently squared.
+		DistanceP = P.lengthSqr(); // Distance is currently squared.
 		Closer = 0.0;
 		if (DistanceP > Sqr(BoundingSphereRadius))
 		{
 			DistanceP = sqrt(DistanceP); // Now real distance.
 			Closer = DistanceP - BoundingSphereRadius;
-			VAddScaledEq(P, Closer, D);
+			P += Closer * D;
 		}
 
 		R2   = Sqr(MajorRadius);
@@ -298,10 +298,10 @@ int Torus::Intersect(const Ray& ray, DBL *Depth, SceneThreadData *Thread) const
 *
 ******************************************************************************/
 
-bool Torus::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
+bool Torus::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 {
 	DBL r, r2;
-	VECTOR P;
+	Vector3d P;
 
 	/* Transform the point into the torus space. */
 
@@ -355,10 +355,10 @@ bool Torus::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
 *
 ******************************************************************************/
 
-void Torus::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) const
+void Torus::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread) const
 {
 	DBL dist;
-	VECTOR P, N, M;
+	Vector3d P, N, M;
 
 	/* Transform the point into the torus space. */
 
@@ -376,16 +376,16 @@ void Torus::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) 
 	}
 	else
 	{
-		Make_Vector(M, 0.0, 0.0, 0.0);
+		M = Vector3d(0.0, 0.0, 0.0);
 	}
 
-	VSub(N, P, M);
+	N = P - M;
 
 	/* Transform the normalt out of the torus space. */
 
 	MTransNormal(Result, N, Trans);
 
-	VNormalize(Result, Result);
+	Result.normalize();
 }
 
 
@@ -421,7 +421,7 @@ void Torus::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) 
 *
 ******************************************************************************/
 
-void Torus::Translate(const VECTOR, const TRANSFORM *tr)
+void Torus::Translate(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
@@ -459,7 +459,7 @@ void Torus::Translate(const VECTOR, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void Torus::Rotate(const VECTOR, const TRANSFORM *tr)
+void Torus::Rotate(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
@@ -497,7 +497,7 @@ void Torus::Rotate(const VECTOR, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void Torus::Scale(const VECTOR, const TRANSFORM *tr)
+void Torus::Scale(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
@@ -543,43 +543,6 @@ void Torus::Transform(const TRANSFORM *tr)
 	Compose_Transforms(Trans, tr);
 
 	Compute_BBox();
-}
-
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-*   Invert_Torus
-*
-* INPUT
-*
-*   Object - Object
-*   
-* OUTPUT
-*
-*   Object
-*   
-* RETURNS
-*   
-* AUTHOR
-*
-*   Dieter Bayer
-*   
-* DESCRIPTION
-*
-*   Invert a torus.
-*
-* CHANGES
-*
-*   Jun 1994 : Creation.
-*
-******************************************************************************/
-
-void Torus::Invert()
-{
-	Invert_Flag(this, INVERTED_FLAG);
 }
 
 
@@ -784,7 +747,7 @@ void Torus::Compute_BBox()
 *
 ******************************************************************************/
 
-bool Torus::Test_Thick_Cylinder(const VECTOR P, const VECTOR D, DBL h1, DBL h2, DBL r1, DBL r2) const
+bool Torus::Test_Thick_Cylinder(const Vector3d& P, const Vector3d& D, DBL h1, DBL h2, DBL r1, DBL r2) const
 {
 	DBL a, b, c, d;
 	DBL u, v, k, r, h;
@@ -938,7 +901,7 @@ bool Torus::Test_Thick_Cylinder(const VECTOR P, const VECTOR D, DBL h1, DBL h2, 
 *
 ******************************************************************************/
 
-void Torus::UVCoord(UV_VECT Result, const Intersection *Inter, TraceThreadData *Thread) const
+void Torus::UVCoord(Vector2d& Result, const Intersection *Inter, TraceThreadData *Thread) const
 {
 	CalcUV(Inter->IPoint, Result);
 }
@@ -970,10 +933,10 @@ void Torus::UVCoord(UV_VECT Result, const Intersection *Inter, TraceThreadData *
 *
 ******************************************************************************/
 
-void Torus::CalcUV(const VECTOR IPoint, UV_VECT Result) const
+void Torus::CalcUV(const Vector3d& IPoint, Vector2d& Result) const
 {
 	DBL len, v, u, x, y, z;
-	VECTOR P;
+	Vector3d P;
 
 	// Transform the ray into the torus space.
 	MInvTransPoint(P, IPoint, Trans);

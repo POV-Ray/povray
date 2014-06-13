@@ -22,11 +22,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/render/radiositytask.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/render/radiositytask.cpp $
+ * $Revision: #31 $
+ * $Change: 6147 $
+ * $DateTime: 2013/11/29 20:46:11 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #include <boost/thread.hpp>
@@ -58,7 +58,7 @@ RadiosityTask::RadiosityTask(ViewData *vd, DBL ptsz, DBL ptesz, unsigned int pts
 	cooperate(*this),
 	media(GetViewDataPtr(), &trace, &photonGatherer),
 	radiosity(vd->GetSceneData(), GetViewDataPtr(),
-	          vd->GetSceneData()->radiositySettings, vd->GetRadiosityCache(), cooperate, false, Vector3d(vd->GetCamera().Location)),
+	          vd->GetSceneData()->radiositySettings, vd->GetRadiosityCache(), cooperate, false, vd->GetCamera().Location),
 	photonGatherer(&vd->GetSceneData()->surfacePhotonMap, vd->GetSceneData()->photonSettings),
 	pretraceStep(pts),
 	pretraceStepCount(ptsc),

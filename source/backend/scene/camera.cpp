@@ -24,11 +24,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/scene/camera.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/scene/camera.cpp $
+ * $Revision: #22 $
+ * $Change: 6147 $
+ * $DateTime: 2013/11/29 20:46:11 $
+ * $Author: clipka $
  *******************************************************************************/
 
 // frame.h must always be the first POV file included (pulls in platform config)
@@ -72,9 +72,9 @@ namespace pov
 *
 ******************************************************************************/
 
-void Camera::Translate(const VECTOR Vector)
+void Camera::Translate(const Vector3d& Vector)
 {
-	VAddEq(Location, Vector);
+	Location += Vector;
 }
 
 
@@ -105,7 +105,7 @@ void Camera::Translate(const VECTOR Vector)
 *
 ******************************************************************************/
 
-void Camera::Rotate(const VECTOR Vector)
+void Camera::Rotate(const Vector3d& Vector)
 {
 	TRANSFORM Trans;
 
@@ -141,7 +141,7 @@ void Camera::Rotate(const VECTOR Vector)
 *
 ******************************************************************************/
 
-void Camera::Scale(const VECTOR Vector)
+void Camera::Scale(const Vector3d& Vector)
 {
 	TRANSFORM Trans;
 
@@ -215,13 +215,13 @@ void Camera::Transform(const TRANSFORM *Trans)
 
 void Camera::Init()
 {
-	Make_Vector(Location,    0.0,  0.0, 0.0);
-	Make_Vector(Direction,   0.0,  0.0, 1.0);
-	Make_Vector(Up,          0.0,  1.0, 0.0);
-	Make_Vector(Right,       1.33, 0.0, 0.0);
-	Make_Vector(Sky,         0.0,  1.0, 0.0);
-	Make_Vector(Look_At,     0.0,  0.0, 1.0);
-	Make_Vector(Focal_Point, 0.0,  0.0, 1.0);
+	Location    = Vector3d(0.0,  0.0, 0.0);
+	Direction   = Vector3d(0.0,  0.0, 1.0);
+	Up          = Vector3d(0.0,  1.0, 0.0);
+	Right       = Vector3d(1.33, 0.0, 0.0); // TODO FIXME
+	Sky         = Vector3d(0.0,  1.0, 0.0);
+	Look_At     = Vector3d(0.0,  0.0, 1.0);
+	Focal_Point = Vector3d(0.0,  0.0, 1.0);
 
 	/* Init focal blur stuff (not used by default). */
 	Blur_Samples        = 0;
@@ -313,13 +313,13 @@ Camera::Camera()
 
 Camera& Camera::operator=(const Camera& src)
 {
-	Assign_Vector(Location, src.Location);
-	Assign_Vector(Direction, src.Direction);
-	Assign_Vector(Up, src.Up);
-	Assign_Vector(Right, src.Right);
-	Assign_Vector(Sky, src.Sky);
-	Assign_Vector(Look_At, src.Look_At);
-	Assign_Vector(Focal_Point, src.Focal_Point);
+	Location    = src.Location;
+	Direction   = src.Direction;
+	Up          = src.Up;
+	Right       = src.Right;
+	Sky         = src.Sky;
+	Look_At     = src.Look_At;
+	Focal_Point = src.Focal_Point;
 
 	Focal_Distance = src.Focal_Distance;
 	Aperture = src.Aperture;

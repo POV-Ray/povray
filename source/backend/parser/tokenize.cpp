@@ -1,43 +1,45 @@
-/*******************************************************************************
- * tokenize.cpp
- *
- * This module implements the first part of a two part parser for the scene
- * description files.  This phase changes the input file into tokens.
- *
- * This module tokenizes the input file and sends the tokens created
- * to the parser (the second stage).  Tokens sent to the parser contain a
- * token ID, the line number of the token, and if necessary, some data for
- * the token.
- *
- * ---------------------------------------------------------------------------
- * Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
- * Copyright 1991-2013 Persistence of Vision Raytracer Pty. Ltd.
- *
- * POV-Ray is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * POV-Ray is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------------
- * POV-Ray is based on the popular DKB raytracer version 2.12.
- * DKBTrace was originally written by David K. Buck.
- * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
- * ---------------------------------------------------------------------------
- * $File: //depot/povray/smp/source/backend/parser/tokenize.cpp $
- * $Revision: #70 $
- * $Change: 6113 $
- * $DateTime: 2013/11/20 20:39:54 $
- * $Author: clipka $
- *******************************************************************************/
+//******************************************************************************
+///
+/// @file backend/parser/tokenize.cpp
+///
+/// This module implements the first part of a two part parser for the scene
+/// description files.  This phase changes the input file into tokens.
+///
+/// This module tokenizes the input file and sends the tokens created
+/// to the parser (the second stage).  Tokens sent to the parser contain a
+/// token ID, the line number of the token, and if necessary, some data for
+/// the token.
+///
+/// @copyright
+/// @parblock
+///
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
+/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+///
+/// POV-Ray is free software: you can redistribute it and/or modify
+/// it under the terms of the GNU Affero General Public License as
+/// published by the Free Software Foundation, either version 3 of the
+/// License, or (at your option) any later version.
+///
+/// POV-Ray is distributed in the hope that it will be useful,
+/// but WITHOUT ANY WARRANTY; without even the implied warranty of
+/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+/// GNU Affero General Public License for more details.
+///
+/// You should have received a copy of the GNU Affero General Public License
+/// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+///
+/// ----------------------------------------------------------------------------
+///
+/// POV-Ray is based on the popular DKB raytracer version 2.12.
+/// DKBTrace was originally written by David K. Buck.
+/// DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
+///
+/// @endparblock
+///
+//*******************************************************************************
 
-#include <ctype.h>
+#include <cctype>
 
 // frame.h must always be the first POV file included (pulls in platform config)
 #include "backend/frame.h"
@@ -2077,7 +2079,7 @@ void Parser::Parse_Directive(int After_Hash)
 						if ((Entry == NULL) || (Entry->Token_Number != FLOAT_ID_TOKEN))
 							Error ("#for loop variable must remain defined and numerical during loop.");
 
-						DBL* CurrentPtr = reinterpret_cast<DBL*>(Entry->Data);
+						DBL* CurrentPtr = reinterpret_cast<DBL *>(Entry->Data);
 						DBL  End        = Cond_Stack[CS_Index].For_Loop_End;
 						DBL  Step       = Cond_Stack[CS_Index].For_Loop_Step;
 
@@ -2186,7 +2188,7 @@ void Parser::Parse_Directive(int After_Hash)
 						sceneData->languageVersion = (int)(Parse_Float() * 100 + 0.5);
 						messageFactory.SetLanguageVersion(sceneData->languageVersion);
 						if (sceneData->explicitNoiseGenerator == false)
-							sceneData->noiseGenerator = sceneData->languageVersion >= 350 ? 2 : 1;
+							sceneData->noiseGenerator = sceneData->languageVersion >= 350 ? kNoiseGen_Original : kNoiseGen_RangeCorrected;
 						// [CLi] if assumed_gamma is not specified in a legacy (3.6.x or earlier) scene, gammaMode defaults to kPOVList_GammaMode_None;
 						// this is enforced later anyway after parsing, but we may need this information /now/ during parsing already
 						switch (sceneData->gammaMode)
@@ -3511,15 +3513,13 @@ int Parser::Parse_Read_Value(DATA_FILE *User_File,int Previous,int *NumberPtr,vo
 					case 1:
 						*NumberPtr = UV_ID_TOKEN;
 						Test_Redefine(Previous,NumberPtr,*DataPtr);
-						*DataPtr   = reinterpret_cast<void *>(Create_UV_Vect());
-						Assign_UV_Vect(reinterpret_cast<DBL *>(*DataPtr), Express);
+						*DataPtr   = reinterpret_cast<void *>(new Vector2d(Express));
 						break;
 
 					case 2:
 						*NumberPtr = VECTOR_ID_TOKEN;
 						Test_Redefine(Previous,NumberPtr,*DataPtr);
-						*DataPtr   = reinterpret_cast<void *>(Create_Vector());
-						Assign_Vector(reinterpret_cast<DBL *>(*DataPtr), Express);
+						*DataPtr   = reinterpret_cast<void *>(new Vector3d(Express));
 						break;
 
 					case 3:

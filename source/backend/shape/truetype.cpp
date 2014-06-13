@@ -451,10 +451,10 @@ static int compare_tag4(const BYTE *ttf_tag, const BYTE *known_tag)
 *   (triggered when filename is null) - Oct 2012 [JG]
 *
 ******************************************************************************/
-void TrueType::ProcessNewTTF(CSG *Object, const char *filename, const int font_id, const UCS2 *text_string, DBL depth, const VECTOR offset, Parser *parser, shared_ptr<SceneData>& sceneData)
+void TrueType::ProcessNewTTF(CSG *Object, const char *filename, const int font_id, const UCS2 *text_string, DBL depth, const Vector3d& offset, Parser *parser, shared_ptr<SceneData>& sceneData)
 {
 	FontFileInfo *ffile;
-	VECTOR local_offset, total_offset;
+	Vector3d local_offset, total_offset;
 	TrueType *ttf;
 	DBL funit_size;
 	TTKernTable *table;
@@ -477,7 +477,7 @@ void TrueType::ProcessNewTTF(CSG *Object, const char *filename, const int font_i
 	}
 
 	/* Get info about each character in the string */
-	Make_Vector(total_offset, 0.0, 0.0, 0.0);
+	total_offset = Vector3d(0.0, 0.0, 0.0);
 
 	for (i = 0; text_string[i] != 0; i++)
 	{
@@ -533,7 +533,7 @@ void TrueType::ProcessNewTTF(CSG *Object, const char *filename, const int font_i
 		{
 			kern_value_x = kern_value_y = 0;
 			kern_value_min_x = kern_value_min_y = -ffile->unitsPerEm;
-			Make_Vector(local_offset, 0.0, 0.0, 0.0);
+			local_offset = Vector3d(0.0, 0.0, 0.0);
 
 			for (j = 0; j < ffile->kerning_tables.nTables; j++)
 			{
@@ -653,7 +653,7 @@ void TrueType::ProcessNewTTF(CSG *Object, const char *filename, const int font_i
 		/*
 		 * Add to the offset of the next character the minimum spacing specified.
 		 */
-		VAddEq(total_offset, offset);
+		total_offset += offset;
 
 		/* Link this glyph with the others in the union */
 		Object->Type |= (ttf->Type & CHILDREN_FLAGS);
@@ -2698,7 +2698,7 @@ int TrueType::solve_quad(double *x, double *y, double mindist, DBL maxdist) cons
  * These distances are to the the bottom and top surfaces of the glyph.
  * The distances are set to -1 if there is no hit.
  */
-void TrueType::GetZeroOneHits(const GlyphStruct* glyph, const VECTOR P, const VECTOR D, DBL glyph_depth, double *t0, double *t1) const
+void TrueType::GetZeroOneHits(const GlyphStruct* glyph, const Vector3d& P, const Vector3d& D, DBL glyph_depth, double *t0, double *t1) const
 {
 	double x0, y0, t;
 
@@ -2774,12 +2774,12 @@ void TrueType::GetZeroOneHits(const GlyphStruct* glyph, const VECTOR P, const VE
  * This is then solved using the quadratic formula.  Any solutions of s that are
  * between 0 and 1 (inclusive) are valid solutions.
  */
-bool TrueType::GlyphIntersect(const VECTOR P, const VECTOR D, const GlyphStruct* glyph, DBL glyph_depth, const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread)
+bool TrueType::GlyphIntersect(const Vector3d& P, const Vector3d& D, const GlyphStruct* glyph, DBL glyph_depth, const BasicRay& ray, IStack& Depth_Stack, TraceThreadData *Thread)
 {
 	Contour *contour;
 	int i, j, k, l, n, m;
 	bool Flag = false;
-	VECTOR N, IPoint;
+	Vector3d N, IPoint;
 	DBL Depth;
 	double x0, x1, y0, y1, x2, y2, t, t0, t1, z;
 	double xt0, xt1, xt2, yt0, yt1, yt2;
@@ -2798,14 +2798,13 @@ bool TrueType::GlyphIntersect(const VECTOR P, const VECTOR D, const GlyphStruct*
 	if (t0 > 0.0)
 	{
 		Depth = t0 /* / len */;
-		VScale(IPoint, ray.Direction, Depth);
-		VAddEq(IPoint, ray.Origin);
+		IPoint = ray.Evaluate(Depth);
 
 		if (Depth > TTF_Tolerance && (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread)))
 		{
-			Make_Vector(N, 0.0, 0.0, -1.0);
+			N = Vector3d(0.0, 0.0, -1.0);
 			MTransNormal(N, N, Trans);
-			VNormalize(N, N);
+			N.normalize();
 			Depth_Stack->push(Intersection(Depth, IPoint, N, this));
 			Flag = true;
 		}
@@ -2814,14 +2813,13 @@ bool TrueType::GlyphIntersect(const VECTOR P, const VECTOR D, const GlyphStruct*
 	if (t1 > 0.0)
 	{
 		Depth = t1 /* / len */;
-		VScale(IPoint, ray.Direction, Depth);
-		VAddEq(IPoint, ray.Origin);
+		IPoint = ray.Evaluate(Depth);
 
 		if (Depth > TTF_Tolerance && (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread)))
 		{
-			Make_Vector(N, 0.0, 0.0, 1.0);
+			N = Vector3d(0.0, 0.0, 1.0);
 			MTransNormal(N, N, Trans);
-			VNormalize(N, N);
+			N.normalize();
 			Depth_Stack->push(Intersection(Depth, IPoint, N, this));
 			Flag = true;
 		}
@@ -2902,14 +2900,13 @@ bool TrueType::GlyphIntersect(const VECTOR P, const VECTOR D, const GlyphStruct*
 
 				if (z >= 0 && z <= glyph_depth && Depth > TTF_Tolerance)
 				{
-					VScale(IPoint, ray.Direction, Depth);
-					VAddEq(IPoint, ray.Origin);
+					IPoint = ray.Evaluate(Depth);
 
 					if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
 					{
-						Make_Vector(N, d1, -d0, 0.0);
+						N = Vector3d(d1, -d0, 0.0);
 						MTransNormal(N, N, Trans);
-						VNormalize(N, N);
+						N.normalize();
 						Depth_Stack->push(Intersection(Depth, IPoint, N, this));
 						Flag = true;
 					}
@@ -2976,14 +2973,13 @@ bool TrueType::GlyphIntersect(const VECTOR P, const VECTOR D, const GlyphStruct*
 
 					if (z >= 0 && z <= glyph_depth && Depth > TTF_Tolerance)
 					{
-						VScale(IPoint, ray.Direction, Depth);
-						VAddEq(IPoint, ray.Origin);
+						IPoint = ray.Evaluate(Depth);
 
 						if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
 						{
-							Make_Vector(N, 2.0 * yt2 * S[l] + yt1, -2.0 * xt2 * S[l] - xt1, 0.0);
+							N = Vector3d(2.0 * yt2 * S[l] + yt1, -2.0 * xt2 * S[l] - xt1, 0.0);
 							MTransNormal(N, N, Trans);
-							VNormalize(N, N);
+							N.normalize();
 							Depth_Stack->push(Intersection(Depth, IPoint, N, this));
 							Flag = true;
 						}
@@ -3001,7 +2997,7 @@ bool TrueType::GlyphIntersect(const VECTOR P, const VECTOR D, const GlyphStruct*
 
 bool TrueType::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread)
 {
-	VECTOR P, D;
+	Vector3d P, D;
 
 	Thread->Stats()[Ray_TTF_Tests]++;
 
@@ -3017,8 +3013,8 @@ bool TrueType::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThrea
 	D[1] *= 1.0000022741;
 	D[2] *= 1.0000017011;
 
-	VLength(len, D);
-	VInverseScaleEq(D, len);*/
+	D.normalize();
+*/
 
 	if (GlyphIntersect(P, D, glyph, depth, ray, Depth_Stack, Thread)) /* tw */
 	{
@@ -3029,9 +3025,9 @@ bool TrueType::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThrea
 	return false;
 }
 
-bool TrueType::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
+bool TrueType::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 {
-	VECTOR New_Point;
+	Vector3d New_Point;
 
 	/* Transform the point into font space */
 
@@ -3044,11 +3040,11 @@ bool TrueType::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
 		return (Test_Flag(this, INVERTED_FLAG));
 }
 
-void TrueType::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) const
+void TrueType::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread) const
 {
 	/* Use precomputed normal. [ARE 11/94] */
 
-	Assign_Vector(Result, Inter->INormal);
+	Result = Inter->INormal;
 }
 
 ObjectPtr TrueType::Copy()
@@ -3061,24 +3057,19 @@ ObjectPtr TrueType::Copy()
 	return (New);
 }
 
-void TrueType::Translate(const VECTOR /*Vector*/, const TRANSFORM *tr)
+void TrueType::Translate(const Vector3d& /*Vector*/, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
 
-void TrueType::Rotate(const VECTOR /*Vector*/, const TRANSFORM *tr)
+void TrueType::Rotate(const Vector3d& /*Vector*/, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
 
-void TrueType::Scale(const VECTOR /*Vector*/, const TRANSFORM *tr)
+void TrueType::Scale(const Vector3d& /*Vector*/, const TRANSFORM *tr)
 {
 	Transform(tr);
-}
-
-void TrueType::Invert()
-{
-	Invert_Flag(this, INVERTED_FLAG);
 }
 
 void TrueType::Transform(const TRANSFORM *tr)
@@ -3157,12 +3148,12 @@ void TrueType::Compute_BBox()
 
 #ifdef TTF_DEBUG
 	Debug_Info("Bounds: <%g,%g,%g> -> <%g,%g,%g>\n",
-	           ttf->BBox.Lower_Left[0],
-	           ttf->BBox.Lower_Left[1],
-	           ttf->BBox.Lower_Left[2],
-	           ttf->BBox.Lengths[0],
-	           ttf->BBox.Lengths[1],
-	           ttf->BBox.Lengths[2]);
+	           ttf->BBox.lowerLeft[0],
+	           ttf->BBox.lowerLeft[1],
+	           ttf->BBox.lowerLeft[2],
+	           ttf->BBox.size[0],
+	           ttf->BBox.size[1],
+	           ttf->BBox.size[2]);
 #endif
 
 	/* Apply the transformation to the bounding box */

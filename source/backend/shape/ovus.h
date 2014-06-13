@@ -24,15 +24,17 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/shape/ovus.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/shape/ovus.h $
+ * $Revision: #7 $
+ * $Change: 6164 $
+ * $DateTime: 2013/12/09 17:21:04 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #ifndef OVUS_H
 #define OVUS_H
+
+#include "backend/scene/objects.h"
 
 namespace pov
 {
@@ -58,14 +60,13 @@ class Ovus : public ObjectBase
 		virtual ObjectPtr Copy();
 
 		virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
-		virtual bool Inside(const VECTOR, TraceThreadData *) const;
-		virtual void Normal(VECTOR, Intersection *, TraceThreadData *) const;
-		virtual void UVCoord(UV_VECT, const Intersection *, TraceThreadData *) const;
-		virtual void Translate(const VECTOR, const TRANSFORM *);
-		virtual void Rotate(const VECTOR, const TRANSFORM *);
-		virtual void Scale(const VECTOR, const TRANSFORM *);
+		virtual bool Inside(const Vector3d&, TraceThreadData *) const;
+		virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const;
+		virtual void UVCoord(Vector2d&, const Intersection *, TraceThreadData *) const;
+		virtual void Translate(const Vector3d&, const TRANSFORM *);
+		virtual void Rotate(const Vector3d&, const TRANSFORM *);
+		virtual void Scale(const Vector3d&, const TRANSFORM *);
 		virtual void Transform(const TRANSFORM *);
-		virtual void Invert();
 		virtual void Compute_BBox();
 
 		/// radius of bottom sphere (provided in SDL)
@@ -85,8 +86,8 @@ class Ovus : public ObjectBase
 		DBL ConnectingRadius;
 
 	private:
-		void CalcUV(const VECTOR IPoint, UV_VECT Result) const;
-		void Intersect_Ovus_Spheres(const VECTOR&, const VECTOR&,
+		void CalcUV(const Vector3d& IPoint, Vector2d& Result) const;
+		void Intersect_Ovus_Spheres(const Vector3d&, const Vector3d&,
 		                            DBL * Depth1,DBL *Depth2, DBL * Depth3,
 		                            DBL * Depth4, DBL * Depth5, DBL * Depth6,
 		                            SceneThreadData *Thread) const;

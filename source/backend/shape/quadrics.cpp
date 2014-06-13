@@ -25,9 +25,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/quadrics.cpp $
- * $Revision: #35 $
- * $Change: 6085 $
- * $DateTime: 2013/11/10 07:39:29 $
+ * $Revision: #41 $
+ * $Change: 6164 $
+ * $DateTime: 2013/12/09 17:21:04 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -109,7 +109,7 @@ const DBL DEPTH_TOLERANCE = 1.0e-6;
 bool Quadric::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread)
 {
 	DBL Depth1, Depth2;
-	VECTOR IPoint;
+	Vector3d IPoint;
 	register int Intersection_Found;
 
 	Intersection_Found = false;
@@ -120,7 +120,7 @@ bool Quadric::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThread
 		Thread->Stats()[Ray_Quadric_Tests_Succeeded]++;
 		if ((Depth1 > DEPTH_TOLERANCE) && (Depth1 < MAX_DISTANCE))
 		{
-			VEvaluateRay(IPoint, ray.Origin, Depth1, ray.Direction);
+			IPoint = ray.Evaluate(Depth1);
 			if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
 			{
 				Depth_Stack->push(Intersection(Depth1, IPoint, this));
@@ -131,7 +131,7 @@ bool Quadric::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThread
 
 		if ((Depth2 > DEPTH_TOLERANCE) && (Depth2 < MAX_DISTANCE))
 		{
-			VEvaluateRay(IPoint, ray.Origin, Depth2, ray.Direction);
+			IPoint = ray.Evaluate(Depth2);
 
 			if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
 			{
@@ -173,7 +173,7 @@ bool Quadric::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThread
 *
 ******************************************************************************/
 
-bool Quadric::Intersect(const Ray& ray, DBL *Depth1, DBL *Depth2) const
+bool Quadric::Intersect(const BasicRay& ray, DBL *Depth1, DBL *Depth2) const
 {
 	register DBL a, b, c, d;
 
@@ -250,7 +250,7 @@ bool Quadric::Intersect(const Ray& ray, DBL *Depth1, DBL *Depth2) const
 *
 ******************************************************************************/
 
-bool Quadric::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
+bool Quadric::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 {
 	/* This is faster and shorter. [DB 7/94] */
 
@@ -287,7 +287,7 @@ bool Quadric::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
 *
 ******************************************************************************/
 
-void Quadric::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) const
+void Quadric::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread) const
 {
 	DBL Len;
 
@@ -308,18 +308,18 @@ void Quadric::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread
 	            2.0 * QH * Inter->IPoint[Z] +
 	                  QI;
 
-	VLength(Len, Result);
+	Len = Result.length();
 
 	if (Len == 0.0)
 	{
 		/* The normal is not defined at this point of the surface. */
 		/* Set it to any arbitrary direction. */
 
-		Make_Vector(Result, 1.0, 0.0, 0.0);
+		Result = Vector3d(1.0, 0.0, 0.0);
 	}
 	else
 	{
-		VInverseScaleEq(Result, Len);
+		Result /= Len;
 	}
 }
 
@@ -483,7 +483,7 @@ void Quadric::Matrix_To_Quadric(const MATRIX Matrix)
 *
 ******************************************************************************/
 
-void Quadric::Translate(const VECTOR, const TRANSFORM *tr)
+void Quadric::Translate(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
@@ -516,7 +516,7 @@ void Quadric::Translate(const VECTOR, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void Quadric::Rotate(const VECTOR, const TRANSFORM *tr)
+void Quadric::Rotate(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
@@ -549,7 +549,7 @@ void Quadric::Rotate(const VECTOR, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void Quadric::Scale(const VECTOR, const TRANSFORM *tr)
+void Quadric::Scale(const Vector3d&, const TRANSFORM *tr)
 {
 	Transform(tr);
 }
@@ -582,15 +582,15 @@ void Quadric::Scale(const VECTOR, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void Quadric::Invert()
+ObjectPtr Quadric::Invert()
 {
-	VScaleEq(Square_Terms, -1.0);
-	VScaleEq(Mixed_Terms, -1.0);
-	VScaleEq(Terms, -1.0);
+	Square_Terms.invert();
+	Mixed_Terms.invert();
+	Terms.invert();
 
 	Constant *= -1.0;
 
-	Invert_Flag(this, INVERTED_FLAG);
+	return this;
 }
 
 
@@ -623,10 +623,10 @@ void Quadric::Invert()
 
 Quadric::Quadric() : ObjectBase(QUADRIC_OBJECT)
 {
-	Make_Vector(Square_Terms, 1.0, 1.0, 1.0);
-	Make_Vector(Mixed_Terms, 0.0, 0.0, 0.0);
-	Make_Vector(Terms, 0.0, 0.0, 0.0);
-	Constant = 1.0;
+	Square_Terms     = Vector3d(1.0, 1.0, 1.0);
+	Mixed_Terms      = Vector3d(0.0, 0.0, 0.0);
+	Terms            = Vector3d(0.0, 0.0, 0.0);
+	Constant         = 1.0;
 	Automatic_Bounds = false;
 }
 
@@ -743,23 +743,23 @@ Quadric::~Quadric()
 
 void Quadric::Compute_BBox()
 {
-	VECTOR pOne;
-	VECTOR mOne;
+	Vector3d pOne;
+	Vector3d mOne;
 
-	Make_Vector(pOne, 1.0, 1.0, 1.0);
-	Make_Vector(mOne, -1.0, -1.0, -1.0);
+	pOne = Vector3d( 1.0,  1.0,  1.0);
+	mOne = Vector3d(-1.0, -1.0, -1.0);
 
 	Compute_BBox(mOne, pOne);
 }
 
-void Quadric::Compute_BBox(VECTOR ClipMin, VECTOR ClipMax)
+void Quadric::Compute_BBox(Vector3d& ClipMin, Vector3d& ClipMax)
 {
 	DBL A, B, C, D, E, F, G, H, I, J;
 	DBL a, b, c, d;
 	DBL rx, ry, rz, rx1, rx2, ry1, ry2, rz1, rz2, x, y, z;
 	DBL New_Volume, Old_Volume;
-	VECTOR TmpMin, TmpMax, NewMin, NewMax, T1;
-	BBOX Old = BBox;
+	Vector3d TmpMin, TmpMax, NewMin, NewMax, T1;
+	BoundingBox Old = BBox;
 
 	if(!Clip.empty())
 	{
@@ -774,12 +774,8 @@ void Quadric::Compute_BBox(VECTOR ClipMin, VECTOR ClipMax)
 				else
 					Make_min_max_from_BBox(TmpMin, TmpMax, p->BBox);
 
-				ClipMin[X] = max(ClipMin[X], TmpMin[X]);
-				ClipMin[Y] = max(ClipMin[Y], TmpMin[Y]);
-				ClipMin[Z] = max(ClipMin[Z], TmpMin[Z]);
-				ClipMax[X] = min(ClipMax[X], TmpMax[X]);
-				ClipMax[Y] = min(ClipMax[Y], TmpMax[Y]);
-				ClipMax[Z] = min(ClipMax[Z], TmpMax[Z]);
+				ClipMin = max(ClipMin, TmpMin);
+				ClipMax = min(ClipMax, TmpMax);
 			}
 		}
 	}
@@ -889,7 +885,7 @@ void Quadric::Compute_BBox(VECTOR ClipMin, VECTOR ClipMax)
 	}
 	else
 	{
-		Make_Vector(T1, 0.0, 0.0, 0.0);
+		T1 = Vector3d(0.0, 0.0, 0.0);
 	}
 
 	/* Init new bounding box. */
@@ -899,8 +895,8 @@ void Quadric::Compute_BBox(VECTOR ClipMin, VECTOR ClipMax)
 
 	/* Translate clipping box. */
 
-	VSubEq(ClipMin, T1);
-	VSubEq(ClipMax, T1);
+	ClipMin -= T1;
+	ClipMax -= T1;
 
 	/* We want A to be non-negative. */
 
@@ -1348,13 +1344,8 @@ void Quadric::Compute_BBox(VECTOR ClipMin, VECTOR ClipMax)
 
 	/* Intersect clipping object's and quadric's bounding boxes */
 
-	NewMin[X] = max(NewMin[X], ClipMin[X]);
-	NewMin[Y] = max(NewMin[Y], ClipMin[Y]);
-	NewMin[Z] = max(NewMin[Z], ClipMin[Z]);
-
-	NewMax[X] = min(NewMax[X], ClipMax[X]);
-	NewMax[Y] = min(NewMax[Y], ClipMax[Y]);
-	NewMax[Z] = min(NewMax[Z], ClipMax[Z]);
+	NewMin = max(NewMin, ClipMin);
+	NewMax = min(NewMax, ClipMax);
 
 	/* Use old or new bounding box? */
 
@@ -1367,16 +1358,16 @@ void Quadric::Compute_BBox(VECTOR ClipMin, VECTOR ClipMax)
 		/* Add translation. */
 		Automatic_Bounds = true;
 
-		VAddEq(NewMin, T1);
-		VAddEq(NewMax, T1);
+		NewMin += T1;
+		NewMax += T1;
 
 		Make_BBox_from_min_max(BBox, NewMin, NewMax);
 
 		/* Beware of bounding boxes to large. */
 
-		if ((BBox.Lengths[X] > CRITICAL_LENGTH) ||
-		    (BBox.Lengths[Y] > CRITICAL_LENGTH) ||
-		    (BBox.Lengths[Z] > CRITICAL_LENGTH))
+		if ((BBox.size[X] > CRITICAL_LENGTH) ||
+		    (BBox.size[Y] > CRITICAL_LENGTH) ||
+		    (BBox.size[Z] > CRITICAL_LENGTH))
 		{
 			Make_BBox(BBox, -BOUND_HUGE/2, -BOUND_HUGE/2, -BOUND_HUGE/2,
 			  BOUND_HUGE, BOUND_HUGE, BOUND_HUGE);
@@ -1417,14 +1408,14 @@ void Quadric::Compute_BBox(VECTOR ClipMin, VECTOR ClipMax)
 *
 ******************************************************************************/
 
-void Quadric::Compute_Plane_Min_Max(const Plane *plane, VECTOR Min, VECTOR  Max)
+void Quadric::Compute_Plane_Min_Max(const Plane *plane, Vector3d& Min, Vector3d& Max)
 {
 	DBL d;
-	VECTOR P, N;
+	Vector3d P, N;
 
 	if (plane->Trans == NULL)
 	{
-		Assign_Vector(N, plane->Normal_Vector);
+		N = plane->Normal_Vector;
 
 		d = -plane->Distance;
 	}

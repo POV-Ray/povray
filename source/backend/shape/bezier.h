@@ -24,15 +24,17 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/shape/bezier.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/shape/bezier.h $
+ * $Revision: #24 $
+ * $Change: 6164 $
+ * $DateTime: 2013/12/09 17:21:04 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #ifndef BEZIER_H
 #define BEZIER_H
+
+#include "backend/scene/objects.h"
 
 namespace pov
 {
@@ -55,8 +57,7 @@ namespace pov
 * Global typedefs
 ******************************************************************************/
 
-typedef DBL DISTANCES[4][4];
-typedef DBL WEIGHTS[4][4];
+typedef DBL BEZIER_WEIGHTS[4][4];
 typedef struct Bezier_Node_Struct BEZIER_NODE;
 typedef struct Bezier_Child_Struct BEZIER_CHILDREN;
 typedef struct Bezier_Vertices_Struct BEZIER_VERTICES;
@@ -69,30 +70,30 @@ struct Bezier_Child_Struct
 struct Bezier_Vertices_Struct
 {
 	float uvbnds[4];
-	VECTOR Vertices[4];
+	Vector3d Vertices[4];
 };
 
 struct Bezier_Node_Struct
 {
-	int Node_Type;      /* Is this an interior node, or a leaf */
-	VECTOR Center;      /* Center of sphere bounding the (sub)patch */
-	DBL Radius_Squared; /* Radius of bounding sphere (squared) */
-	int Count;          /* # of subpatches associated with this node */
-	void *Data_Ptr;     /* Either pointer to vertices or pointer to children */
+	int Node_Type;      // Is this an interior node, or a leaf
+	Vector3d Center;    // Center of sphere bounding the (sub)patch
+	DBL Radius_Squared; // Radius of bounding sphere (squared)
+	int Count;          // # of subpatches associated with this node
+	void *Data_Ptr;     // Either pointer to vertices or pointer to children
 };
 
-class BicubicPatch : public ObjectBase
+class BicubicPatch : public NonsolidObject
 {
 	public:
+		typedef Vector3d ControlPoints[4][4];
+
 		int Patch_Type, U_Steps, V_Steps;
-		VECTOR Control_Points[4][4];
-		UV_VECT ST[4];
-		VECTOR Bounding_Sphere_Center;
-		DBL Bounding_Sphere_Radius;
+		ControlPoints Control_Points;
+		Vector2d ST[4];
 		DBL Flatness_Value;
 		DBL accuracy;
 		BEZIER_NODE *Node_Tree;
-		WEIGHTS *Weights;
+		BEZIER_WEIGHTS *Weights;
 
 		BicubicPatch();
 		virtual ~BicubicPatch();
@@ -100,39 +101,40 @@ class BicubicPatch : public ObjectBase
 		virtual ObjectPtr Copy();
 
 		virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
-		virtual bool Inside(const VECTOR, TraceThreadData *) const;
-		virtual void Normal(VECTOR, Intersection *, TraceThreadData *) const;
-		virtual void UVCoord(UV_VECT, const Intersection *, TraceThreadData *) const;
-		virtual void Translate(const VECTOR, const TRANSFORM *);
-		virtual void Rotate(const VECTOR, const TRANSFORM *);
-		virtual void Scale(const VECTOR, const TRANSFORM *);
+		virtual bool Inside(const Vector3d&, TraceThreadData *) const;
+		virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const;
+		virtual void UVCoord(Vector2d&, const Intersection *, TraceThreadData *) const;
+		virtual void Translate(const Vector3d&, const TRANSFORM *);
+		virtual void Rotate(const Vector3d&, const TRANSFORM *);
+		virtual void Scale(const Vector3d&, const TRANSFORM *);
 		virtual void Transform(const TRANSFORM *);
-		virtual void Invert();
 		virtual void Compute_BBox();
 
 		void Precompute_Patch_Values();
 	protected:
-		static void bezier_value(const VECTOR(*Control_Points)[4][4], DBL u0, DBL v0, VECTOR P, VECTOR N);
-		bool intersect_subpatch(const Ray&, const VECTOR [3], const DBL [3], const DBL [3], DBL *, VECTOR, VECTOR, DBL *, DBL *) const;
-		static void find_average(int, const VECTOR *, VECTOR, DBL *);
-		static bool spherical_bounds_check(const Ray &, const VECTOR, DBL);
-		int intersect_bicubic_patch0(const Ray& , IStack&);
-		static DBL point_plane_distance(const VECTOR, const VECTOR, DBL);
-		static DBL determine_subpatch_flatness(const VECTOR(*)[4][4]);
-		bool flat_enough(const VECTOR(*)[4][4]) const;
-		static void bezier_bounding_sphere(const VECTOR(*)[4][4], VECTOR, DBL *);
-		int bezier_subpatch_intersect(const Ray &, const VECTOR(*)[4][4], DBL, DBL, DBL, DBL, IStack&);
-		static void bezier_split_left_right(const VECTOR(*)[4][4], VECTOR(*)[4][4], VECTOR(*)[4][4]);
-		static void bezier_split_up_down(const VECTOR(*)[4][4], VECTOR(*)[4][4], VECTOR(*)[4][4]);
-		int bezier_subdivider(const Ray &, const VECTOR(*)[4][4], DBL, DBL, DBL, DBL, int, IStack&);
+		typedef Vector3d TripleVector3d[3];
+		typedef DBL      TripleDouble[3];
+
+		static void bezier_value(const ControlPoints *cp, DBL u0, DBL v0, Vector3d& P, Vector3d& N);
+		bool intersect_subpatch(const BasicRay&, const TripleVector3d&, const DBL [3], const DBL [3], DBL *, Vector3d&, Vector3d&, DBL *, DBL *) const;
+		static bool spherical_bounds_check(const BasicRay &, const Vector3d& c, DBL);
+		int intersect_bicubic_patch0(const BasicRay& , IStack&);
+		static DBL point_plane_distance(const Vector3d&, const Vector3d&, DBL);
+		static DBL determine_subpatch_flatness(const ControlPoints *);
+		bool flat_enough(const ControlPoints *) const;
+		static void bezier_bounding_sphere(const ControlPoints *, Vector3d&, DBL *);
+		int bezier_subpatch_intersect(const BasicRay&, const ControlPoints *, DBL, DBL, DBL, DBL, IStack&);
+		static void bezier_split_left_right(const ControlPoints *, ControlPoints *, ControlPoints *);
+		static void bezier_split_up_down(const ControlPoints *, ControlPoints *, ControlPoints *);
+		int bezier_subdivider(const BasicRay&, const ControlPoints *, DBL, DBL, DBL, DBL, int, IStack&);
 		static void bezier_tree_deleter(BEZIER_NODE *Node);
-		BEZIER_NODE *bezier_tree_builder(const VECTOR(*Patch)[4][4], DBL u0, DBL u1, DBL v0, DBL v1, int depth, int& max_depth_reached);
-		int bezier_tree_walker(const Ray &, const BEZIER_NODE *, IStack&);
+		BEZIER_NODE *bezier_tree_builder(const ControlPoints *, DBL u0, DBL u1, DBL v0, DBL v1, int depth, int& max_depth_reached);
+		int bezier_tree_walker(const BasicRay&, const BEZIER_NODE *, IStack&);
 		static BEZIER_NODE *create_new_bezier_node(void);
 		static BEZIER_VERTICES *create_bezier_vertex_block(void);
 		static BEZIER_CHILDREN *create_bezier_child_block(void);
-		static bool subpatch_normal(const VECTOR v1, const VECTOR v2, const VECTOR v3, VECTOR Result, DBL *d);
-		static void Compute_Texture_UV(const UV_VECT p, const UV_VECT st[4], UV_VECT t);
+		static bool subpatch_normal(const Vector3d& v1, const Vector3d& v2, const Vector3d& v3, Vector3d& Result, DBL *d);
+		static void Compute_Texture_UV(const Vector2d& p, const Vector2d st[4], Vector2d& t);
 };
 
 

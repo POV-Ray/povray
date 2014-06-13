@@ -27,15 +27,17 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/shape/sphsweep.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/shape/sphsweep.h $
+ * $Revision: #25 $
+ * $Change: 6164 $
+ * $DateTime: 2013/12/09 17:21:04 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #ifndef SPHERE_SWEEP_H
 #define SPHERE_SWEEP_H
+
+#include "backend/scene/objects.h"
 
 namespace pov
 {
@@ -71,27 +73,27 @@ typedef struct Sphere_Sweep_Intersection_Structure SPHSWEEP_INT;
 /* Single sphere, used to connect two adjacent segments */
 struct Sphere_Sweep_Sphere_Struct
 {
-	VECTOR      Center;
+	Vector3d    Center;
 	DBL         Radius;
 };
 
 /* One segment of the sphere sweep */
 struct Sphere_Sweep_Segment_Struct
 {
-	SPHSWEEP_SPH  Closing_Sphere[2];        /* Spheres closing the segment   */
-	VECTOR  Center_Deriv[2];    /* Derivatives of center funcs for 0 and 1   */
-	DBL     Radius_Deriv[2];    /* Derivatives of radius funcs for 0 and 1   */
-	int     Num_Coefs;                      /* Number of coefficients        */
-	VECTOR  Center_Coef[SPH_SWP_MAX_COEFS]; /* Coefs of center polynomial    */
-	DBL     Radius_Coef[SPH_SWP_MAX_COEFS]; /* Coefs of radius polynomial    */
+	SPHSWEEP_SPH  Closing_Sphere[2];              /* Spheres closing the segment   */
+	Vector3d      Center_Deriv[2];                /* Derivatives of center funcs for 0 and 1   */
+	DBL           Radius_Deriv[2];                /* Derivatives of radius funcs for 0 and 1   */
+	int           Num_Coefs;                      /* Number of coefficients        */
+	Vector3d      Center_Coef[SPH_SWP_MAX_COEFS]; /* Coefs of center polynomial    */
+	DBL           Radius_Coef[SPH_SWP_MAX_COEFS]; /* Coefs of radius polynomial    */
 };
 
 // Temporary storage for intersection values
 struct Sphere_Sweep_Intersection_Structure
 {
-	DBL     t;          // Distance along ray
-	VECTOR  Point;      // Intersection point
-	VECTOR  Normal;     // Normal at intersection point
+	DBL         t;          // Distance along ray
+	Vector3d    Point;      // Intersection point
+	Vector3d    Normal;     // Normal at intersection point
 };
 
 /* The complete object */
@@ -113,21 +115,19 @@ class SphereSweep : public ObjectBase
 		virtual ObjectPtr Copy();
 
 		virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
-		virtual bool Inside(const VECTOR, TraceThreadData *) const;
-		virtual void Normal(VECTOR, Intersection *, TraceThreadData *) const;
-		virtual void Translate(const VECTOR, const TRANSFORM *);
-		virtual void Rotate(const VECTOR, const TRANSFORM *);
-		virtual void Scale(const VECTOR, const TRANSFORM *);
+		virtual bool Inside(const Vector3d&, TraceThreadData *) const;
+		virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const;
+		virtual void Translate(const Vector3d&, const TRANSFORM *);
+		virtual void Rotate(const Vector3d&, const TRANSFORM *);
+		virtual void Scale(const Vector3d&, const TRANSFORM *);
 		virtual void Transform(const TRANSFORM *);
-		virtual void Invert();
 		virtual void Compute_BBox();
 
 		void Compute();
 	protected:
-		bool Intersect(Ray& ray, VECTOR Center, DBL Radius2, DBL *Depth1, DBL *Depth2);
-		static bool Intersect_Sphere(const Ray &ray, const SPHSWEEP_SPH *Sphere, SPHSWEEP_INT *Isect);
-		static int Intersect_Segment(const Ray &ray, const SPHSWEEP_SEG *Segment, SPHSWEEP_INT *Isect, TraceThreadData *Thread);
-		static int Find_Valid_Points(SPHSWEEP_INT *Inter, int Num_Inter, const Ray &ray);
+		static bool Intersect_Sphere(const BasicRay &ray, const SPHSWEEP_SPH *Sphere, SPHSWEEP_INT *Isect);
+		static int Intersect_Segment(const BasicRay &ray, const SPHSWEEP_SEG *Segment, SPHSWEEP_INT *Isect, TraceThreadData *Thread);
+		static int Find_Valid_Points(SPHSWEEP_INT *Inter, int Num_Inter, const BasicRay &ray);
 		static int Comp_Isects(const void *Intersection_1, const void *Intersection_2);
 		static int bezier_01(int degree, const DBL* Coef, DBL* Roots, bool sturm, DBL tolerance, TraceThreadData *Thread);
 };

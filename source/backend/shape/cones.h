@@ -24,15 +24,17 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/shape/cones.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/shape/cones.h $
+ * $Revision: #23 $
+ * $Change: 6164 $
+ * $DateTime: 2013/12/09 17:21:04 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #ifndef CONES_H
 #define CONES_H
+
+#include "backend/scene/objects.h"
 
 namespace pov
 {
@@ -57,11 +59,11 @@ class Cone : public ObjectBase
 			int t;  /* Type of intersection: base/cap plane or side */
 		};
 	public:
-		VECTOR apex;        /* Center of the top of the cone */
-		VECTOR base;        /* Center of the bottom of the cone */
-		DBL apex_radius;    /* Radius of the cone at the top */
-		DBL base_radius;    /* Radius of the cone at the bottom */
-		DBL dist;           /* Distance to end of cone in canonical coords */
+		Vector3d apex;      ///< Center of the top of the cone.
+		Vector3d base;      ///< Center of the bottom of the cone.
+		DBL apex_radius;    ///< Radius of the cone at the top.
+		DBL base_radius;    ///< Radius of the cone at the bottom.
+		DBL dist;           ///< Distance to end of cone in canonical coords.
 
 		Cone();
 		virtual ~Cone();
@@ -71,20 +73,19 @@ class Cone : public ObjectBase
 		virtual ObjectPtr Copy();
 
 		virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
-		virtual bool Inside(const VECTOR, TraceThreadData *) const;
-		virtual void Normal(VECTOR, Intersection *, TraceThreadData *) const;
-		// virtual void UVCoord(UV_VECT, const Intersection *, TraceThreadData *) const; // TODO FIXME - why is there no UV-mapping for this simple object?
-		virtual void Translate(const VECTOR, const TRANSFORM *);
-		virtual void Rotate(const VECTOR, const TRANSFORM *);
-		virtual void Scale(const VECTOR, const TRANSFORM *);
+		virtual bool Inside(const Vector3d&, TraceThreadData *) const;
+		virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const;
+		// virtual void UVCoord(Vector2d&, const Intersection *, TraceThreadData *) const; // TODO FIXME - why is there no UV-mapping for this simple object?
+		virtual void Translate(const Vector3d&, const TRANSFORM *);
+		virtual void Rotate(const Vector3d&, const TRANSFORM *);
+		virtual void Scale(const Vector3d&, const TRANSFORM *);
 		virtual void Transform(const TRANSFORM *);
-		virtual void Invert();
 		virtual void Compute_BBox();
 
 		void Compute_Cone_Data();
 		void Compute_Cylinder_Data();
 	protected:
-		int Intersect(const Ray& ray, CONE_INT *Intersection, TraceThreadData *Thread) const;
+		int Intersect(const BasicRay& ray, CONE_INT *Intersection, TraceThreadData *Thread) const;
 };
 
 }

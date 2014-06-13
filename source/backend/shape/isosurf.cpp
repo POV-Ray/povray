@@ -96,16 +96,16 @@ bool IsoSurface::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
 {
 	int Side1 = 0, Side2 = 0, itrace = 0, i_flg = 0;
 	DBL Depth1 = 0.0, Depth2 = 0.0, len = 0.0;
-	Ray New_Ray;
-	VECTOR IPoint;
-	VECTOR Plocal, Dlocal;
+	BasicRay New_Ray;
+	Vector3d IPoint;
+	Vector3d Plocal, Dlocal;
 	DBL tmax = 0.0, tmin = 0.0, tmp = 0.0;
 	DBL maxg = max_gradient;
 	int i = 0 ; /* count of intervals in stack - 1      */
 	int IFound = false;
 	int begin = 0, end = 0;
 	bool in_shadow_test = false;
-	VECTOR VTmp;
+	Vector3d VTmp;
 
 	Thread->Stats()[Ray_IsoSurface_Bound_Tests]++;
 
@@ -115,11 +115,10 @@ bool IsoSurface::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
 	{
 		if(Trans != NULL)
 		{
-			MInvTransPoint(New_Ray.Origin, ray.Origin, Trans);
-			MInvTransDirection(New_Ray.Direction, ray.Direction, Trans);
-			VLength(len, New_Ray.Direction);
-			VInverseScaleEq(New_Ray.Direction, len);
-			i_flg = Sphere::Intersect(New_Ray, container.sphere.center,
+			MInvTransRay(New_Ray, ray, Trans);
+			len = New_Ray.Direction.length();
+			New_Ray.Direction /= len;
+			i_flg = Sphere::Intersect(New_Ray, Vector3d(container.sphere.center),
 			                          (container.sphere.radius) * (container.sphere.radius),
 			                          &Depth1, &Depth2);
 			Depth1 = Depth1 / len;
@@ -127,7 +126,7 @@ bool IsoSurface::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
 		}
 		else
 		{
-			i_flg = Sphere::Intersect(ray, container.sphere.center,
+			i_flg = Sphere::Intersect(ray, Vector3d(container.sphere.center),
 			                          (container.sphere.radius) * (container.sphere.radius), &Depth1, &Depth2);
 		}
 		Thread->Stats()[Ray_Sphere_Tests]--;
@@ -136,7 +135,7 @@ bool IsoSurface::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
 	}
 	else
 	{
-		i_flg = Box::Intersect(ray, Trans, container.box.corner1, container.box.corner2,
+		i_flg = Box::Intersect(ray, Trans, Vector3d(container.box.corner1), Vector3d(container.box.corner2),
 		                       &Depth1, &Depth2, &Side1, &Side2);
 	}
 
@@ -153,21 +152,21 @@ bool IsoSurface::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
 		}
 		else
 		{
-			Assign_Vector(Plocal, ray.Origin);
-			Assign_Vector(Dlocal, ray.Direction);
+			Plocal = ray.Origin;
+			Dlocal = ray.Direction;
 		}
 
 		Thread->isosurfaceData->Inv3 = 1;
 
 		if(closed != false)
 		{
-			VEvaluateRay(VTmp, Plocal, Depth1, Dlocal);
+			VEvaluateRay(*VTmp, *Plocal, Depth1, *Dlocal);
 			tmp = Vector_Function(Thread->functionContext, VTmp);
 			if(Depth1 > accuracy)
 			{
 				if(tmp < 0.0)                   /* The ray hits the bounding shape */
 				{
-					VEvaluateRay(IPoint, ray.Origin, Depth1, ray.Direction);
+					IPoint = ray.Evaluate(Depth1);
 					if(Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
 					{
 						Depth_Stack->push(Intersection(Depth1, IPoint, this, Side1));
@@ -182,15 +181,15 @@ bool IsoSurface::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
 				if(tmp < (maxg * accuracy * 4.0))
 				{
 					Depth1 = accuracy * 5.0;
-					VEvaluateRay(VTmp, Plocal, Depth1, Dlocal);
+					VEvaluateRay(*VTmp, *Plocal, Depth1, *Dlocal);
 					if(Vector_Function(Thread->functionContext, VTmp) < 0)
 						Thread->isosurfaceData->Inv3 = -1;
 					/* Change the sign of the function (IPoint is in the bounding shpae.)*/
 				}
-				VEvaluateRay(VTmp, Plocal, Depth2, Dlocal);
+				VEvaluateRay(*VTmp, *Plocal, Depth2, *Dlocal);
 				if(Vector_Function(Thread->functionContext, VTmp) < 0.0)
 				{
-					VEvaluateRay(IPoint, ray.Origin, Depth2, ray.Direction);
+					IPoint = ray.Evaluate(Depth2);
 					if(Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
 					{
 						Depth_Stack->push(Intersection(Depth2, IPoint, this, Side2));
@@ -213,11 +212,11 @@ bool IsoSurface::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
 		if((Depth1 < accuracy) && (Thread->isosurfaceData->Inv3 == 1))
 		{
 			/* IPoint is on the isosurface */
-			VEvaluateRay(VTmp, Plocal, tmin, Dlocal);
+			VEvaluateRay(*VTmp, *Plocal, tmin, *Dlocal);
 			if(fabs(Vector_Function(Thread->functionContext, VTmp)) < (maxg * accuracy * 4.0))
 			{
 				tmin = accuracy * 5.0;
-				VEvaluateRay(VTmp, Plocal, tmin, Dlocal);
+				VEvaluateRay(*VTmp, *Plocal, tmin, *Dlocal);
 				if(Vector_Function(Thread->functionContext, VTmp) < 0)
 					Thread->isosurfaceData->Inv3 = -1;
 				/* change the sign and go into the isosurface */
@@ -232,7 +231,7 @@ bool IsoSurface::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
 				break;
 			else
 			{
-				VEvaluateRay(IPoint, ray.Origin, tmin, ray.Direction);
+				IPoint = ray.Evaluate(tmin);
 				if(Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
 				{
 					Depth_Stack->push(Intersection(tmin, IPoint, this, 0 /*Side1*/));
@@ -285,23 +284,23 @@ bool IsoSurface::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
 *
 ******************************************************************************/
 
-bool IsoSurface::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
+bool IsoSurface::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 {
-	VECTOR Origin_To_Center;
-	VECTOR New_Point;
+	Vector3d Origin_To_Center;
+	Vector3d New_Point;
 	DBL OCSquared;
 
 	/* Transform the point into box space. */
 	if(Trans != NULL)
 		MInvTransPoint(New_Point, IPoint, Trans);
 	else
-		Assign_Vector(New_Point, IPoint);
+		New_Point = IPoint;
 
 	if(container_shape != 0)
 	{
 		/* Use ellipse method. */
-		VSub(Origin_To_Center, container.sphere.center, New_Point);
-		VDot(OCSquared, Origin_To_Center, Origin_To_Center);
+		Origin_To_Center = Vector3d(container.sphere.center) - New_Point;
+		OCSquared = Origin_To_Center.lengthSqr();
 
 		if(OCSquared > Sqr(container.sphere.radius))
 			return (Test_Flag(this, INVERTED_FLAG));
@@ -354,30 +353,30 @@ bool IsoSurface::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
 *
 ******************************************************************************/
 
-void IsoSurface::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thread) const
+void IsoSurface::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread) const
 {
-	VECTOR New_Point, TPoint;
+	Vector3d New_Point, TPoint;
 	DBL funct;
 
 	switch (Inter->i1)
 	{
 		case SIDE_X_0:
-			Make_Vector(Result, -1.0, 0.0, 0.0);
+			Result = Vector3d(-1.0, 0.0, 0.0);
 			break;
 		case SIDE_X_1:
-			Make_Vector(Result, 1.0, 0.0, 0.0);
+			Result = Vector3d( 1.0, 0.0, 0.0);
 			break;
 		case SIDE_Y_0:
-			Make_Vector(Result, 0.0, -1.0, 0.0);
+			Result = Vector3d( 0.0, -1.0, 0.0);
 			break;
 		case SIDE_Y_1:
-			Make_Vector(Result, 0.0, 1.0, 0.0);
+			Result = Vector3d( 0.0, 1.0, 0.0);
 			break;
 		case SIDE_Z_0:
-			Make_Vector(Result, 0.0, 0.0, -1.0);
+			Result = Vector3d( 0.0, 0.0, -1.0);
 			break;
 		case SIDE_Z_1:
-			Make_Vector(Result, 0.0, 0.0, 1.0);
+			Result = Vector3d( 0.0, 0.0, 1.0);
 			break;
 
 		default:
@@ -386,34 +385,37 @@ void IsoSurface::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thr
 			if(Trans != NULL)
 				MInvTransPoint(New_Point, Inter->IPoint, Trans);
 			else
-				Assign_Vector(New_Point, Inter->IPoint);
+				New_Point = Inter->IPoint;
 
 			if(container_shape)
 			{
-				VSub(Result, New_Point, container.sphere.center);
-				VLength(funct, Result);
+				Result = New_Point - Vector3d(container.sphere.center);
+				funct = Result.length();
 				if(fabs(funct - container.sphere.radius) < EPSILON)
 				{
-					VInverseScaleEq(Result, container.sphere.radius);
+					Result /= container.sphere.radius;
 					break;
 				}
 			}
 
-			Assign_Vector(TPoint, New_Point);
+			TPoint = New_Point;
 			funct = Evaluate_Function(Thread->functionContext, *Function, TPoint);
-			Assign_Vector(TPoint, New_Point);
+
+			TPoint = New_Point;
 			TPoint[X] += accuracy;
 			Result[X] = Evaluate_Function(Thread->functionContext, *Function, TPoint) - funct;
-			Assign_Vector(TPoint, New_Point);
+
+			TPoint = New_Point;
 			TPoint[Y] += accuracy;
 			Result[Y] = Evaluate_Function(Thread->functionContext, *Function, TPoint) - funct;
-			Assign_Vector(TPoint, New_Point);
+
+			TPoint = New_Point;
 			TPoint[Z] += accuracy;
 			Result[Z] = Evaluate_Function(Thread->functionContext, *Function, TPoint) - funct;
 
 			if((Result[X] == 0) && (Result[Y] == 0) && (Result[Z] == 0))
 				Result[X] = 1.0;
-			VNormalize(Result, Result);
+			Result.normalize();
 	}
 
 
@@ -423,7 +425,7 @@ void IsoSurface::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thr
 	{
 		MTransNormal(Result, Result, Trans);
 
-		VNormalize(Result, Result);
+		Result.normalize();
 	}
 }
 
@@ -455,7 +457,7 @@ void IsoSurface::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *Thr
 *
 ******************************************************************************/
 
-void IsoSurface::Translate(const VECTOR, const TRANSFORM* tr)
+void IsoSurface::Translate(const Vector3d&, const TRANSFORM* tr)
 {
 	Transform(tr);
 }
@@ -488,7 +490,7 @@ void IsoSurface::Translate(const VECTOR, const TRANSFORM* tr)
 *
 ******************************************************************************/
 
-void IsoSurface::Rotate(const VECTOR, const TRANSFORM* tr)
+void IsoSurface::Rotate(const Vector3d&, const TRANSFORM* tr)
 {
 	Transform(tr);
 }
@@ -521,42 +523,9 @@ void IsoSurface::Rotate(const VECTOR, const TRANSFORM* tr)
 *
 ******************************************************************************/
 
-void IsoSurface::Scale(const VECTOR, const TRANSFORM* tr)
+void IsoSurface::Scale(const Vector3d&, const TRANSFORM* tr)
 {
 	Transform(tr);
-}
-
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-*   Invert_IsoSurface
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-*   R. Suzuki
-*
-* DESCRIPTION
-*
-*   -
-*
-* CHANGES
-*
-*   -
-*
-******************************************************************************/
-
-void IsoSurface::Invert()
-{
-	Invert_Flag(this, INVERTED_FLAG);
 }
 
 
@@ -872,11 +841,8 @@ void IsoSurface::Compute_BBox()
 	}
 	else
 	{
-		// [ABX 20.01.2004] Low_Left introduced to hide BCC 5.5 bug
-		BBOX_VECT& Low_Left = BBox.Lower_Left;
-
-		Assign_BBox_Vect(Low_Left, container.box.corner1);
-		VSub(BBox.Lengths, container.box.corner2, container.box.corner1);
+		BBox.lowerLeft = BBoxVector3d(container.box.corner1);
+		BBox.size = BBoxVector3d(Vector3d(container.box.corner2) - Vector3d(container.box.corner1));
 	}
 
 	if(Trans != NULL)
@@ -912,25 +878,25 @@ void IsoSurface::Compute_BBox()
 *
 ******************************************************************************/
 
-bool IsoSurface::Function_Find_Root(ISO_ThreadData& itd, const VECTOR PP, const VECTOR DD, DBL* Depth1, DBL* Depth2, DBL& maxg, bool in_shadow_test)
+bool IsoSurface::Function_Find_Root(ISO_ThreadData& itd, const Vector3d& PP, const Vector3d& DD, DBL* Depth1, DBL* Depth2, DBL& maxg, bool in_shadow_test)
 {
 	DBL dt, t21, l_b, l_e, oldmg;
 	ISO_Pair EP1, EP2;
-	VECTOR VTmp;
+	Vector3d VTmp;
 
 	itd.ctx->threaddata->Stats()[Ray_IsoSurface_Find_Root]++;
 
-	VLength(itd.Vlength, DD);
+	itd.Vlength = DD.length();
 
 	if((itd.cache == true) && (itd.current == this))
 	{
 		itd.ctx->threaddata->Stats()[Ray_IsoSurface_Cache]++;
-		VEvaluateRay(VTmp, PP, *Depth1, DD);
-		VSubEq(VTmp, itd.Pglobal);
-		VLength(l_b, VTmp);
-		VEvaluateRay(VTmp, PP, *Depth2, DD);
-		VSubEq(VTmp, itd.Dglobal);
-		VLength(l_e, VTmp);
+		VEvaluateRay(*VTmp, *PP, *Depth1, *DD);
+		VTmp -= itd.Pglobal;
+		l_b = VTmp.length();
+		VEvaluateRay(*VTmp, *PP, *Depth2, *DD);
+		VTmp -= itd.Dglobal;
+		l_e = VTmp.length();
 		if((itd.fmax - maxg * max(l_b, l_e)) > 0.0)
 		{
 			itd.ctx->threaddata->Stats()[Ray_IsoSurface_Cache_Succeeded]++;
@@ -938,8 +904,8 @@ bool IsoSurface::Function_Find_Root(ISO_ThreadData& itd, const VECTOR PP, const 
 		}
 	}
 
-	Assign_Vector(itd.Pglobal, PP);
-	Assign_Vector(itd.Dglobal, DD);
+	itd.Pglobal = PP;
+	itd.Dglobal = DD;
 
 	itd.cache = false;
 	EP1.t = *Depth1;
@@ -983,8 +949,8 @@ bool IsoSurface::Function_Find_Root(ISO_ThreadData& itd, const VECTOR PP, const 
 	else if(!in_shadow_test)
 	{
 		itd.cache = true;
-		VEvaluateRay(itd.Pglobal, PP, EP1.t, DD);
-		VEvaluateRay(itd.Dglobal, PP, EP2.t, DD);
+		VEvaluateRay(*itd.Pglobal, *PP, EP1.t, *DD);
+		VEvaluateRay(*itd.Dglobal, *PP, EP2.t, *DD);
 		itd.current = this;
 
 		return false;
@@ -1089,7 +1055,7 @@ bool IsoSurface::Function_Find_Root_R(ISO_ThreadData& itd, const ISO_Pair* EP1, 
 *
 ******************************************************************************/
 
-DBL IsoSurface::Vector_Function(FPUContext *ctx, const VECTOR VPos) const
+DBL IsoSurface::Vector_Function(FPUContext *ctx, const Vector3d& VPos) const
 {
 	return Evaluate_Function(ctx, *Function, VPos) - threshold;
 }
@@ -1123,9 +1089,9 @@ DBL IsoSurface::Vector_Function(FPUContext *ctx, const VECTOR VPos) const
 
 DBL IsoSurface::Float_Function(ISO_ThreadData& itd, DBL t) const
 {
-	VECTOR VTmp;
+	Vector3d VTmp;
 
-	VEvaluateRay(VTmp, itd.Pglobal, t, itd.Dglobal);
+	VEvaluateRay(*VTmp, *itd.Pglobal, t, *itd.Dglobal);
 
 	return ((DBL)itd.Inv3 * (Evaluate_Function(itd.ctx, *Function, VTmp) - threshold));
 }
@@ -1155,7 +1121,7 @@ DBL IsoSurface::Float_Function(ISO_ThreadData& itd, DBL t) const
  *
  ******************************************************************************/
 
-DBL IsoSurface::Evaluate_Function(FPUContext *ctx, FUNCTION funct, const VECTOR fnvec)
+DBL IsoSurface::Evaluate_Function(FPUContext *ctx, FUNCTION funct, const Vector3d& fnvec)
 {
 	ctx->SetLocal(X, fnvec[X]);
 	ctx->SetLocal(Y, fnvec[Y]);

@@ -24,15 +24,17 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/shape/prism.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/shape/prism.h $
+ * $Revision: #23 $
+ * $Change: 6164 $
+ * $DateTime: 2013/12/09 17:21:04 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #ifndef PRISM_H
 #define PRISM_H
+
+#include "backend/scene/objects.h"
 
 namespace pov
 {
@@ -68,7 +70,7 @@ struct Prism_Spline_Entry_Struct
 {
 	DBL x1, y1, x2, y2;  /* Min./Max. coordinates of segment   */
 	DBL v1, u2, v2;      /* Min./Max. coordinates of segment in <u,v>, u1 not needed  */
-	UV_VECT A, B, C, D;  /* Coefficients of segment            */
+	Vector2d A, B, C, D; /* Coefficients of segment            */
 };
 
 struct Prism_Spline_Struct
@@ -94,19 +96,18 @@ class Prism : public ObjectBase
 		virtual ObjectPtr Copy();
 
 		virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
-		virtual bool Inside(const VECTOR, TraceThreadData *) const;
-		virtual void Normal(VECTOR, Intersection *, TraceThreadData *) const;
-		virtual void Translate(const VECTOR, const TRANSFORM *);
-		virtual void Rotate(const VECTOR, const TRANSFORM *);
-		virtual void Scale(const VECTOR, const TRANSFORM *);
+		virtual bool Inside(const Vector3d&, TraceThreadData *) const;
+		virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const;
+		virtual void Translate(const Vector3d&, const TRANSFORM *);
+		virtual void Rotate(const Vector3d&, const TRANSFORM *);
+		virtual void Scale(const Vector3d&, const TRANSFORM *);
 		virtual void Transform(const TRANSFORM *);
-		virtual void Invert();
 		virtual void Compute_BBox();
 
-		void Compute_Prism(UV_VECT *P, TraceThreadData *Thread);
+		void Compute_Prism(Vector2d *P, TraceThreadData *Thread);
 	protected:
 		int in_curve(DBL u, DBL v, TraceThreadData *Thread) const;
-		static bool test_rectangle(const VECTOR P, const VECTOR D, DBL x1, DBL y1, DBL x2, DBL y2);
+		static bool test_rectangle(const Vector3d& P, const Vector3d& D, DBL x1, DBL y1, DBL x2, DBL y2);
 };
 
 }

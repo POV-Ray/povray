@@ -24,11 +24,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/bounding/bsphere.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/bounding/bsphere.cpp $
+ * $Revision: #19 $
+ * $Change: 6151 $
+ * $DateTime: 2013/12/01 04:48:21 $
+ * $Author: clipka $
  *******************************************************************************/
 
 // frame.h must always be the first POV file included (pulls in platform config)
@@ -55,7 +55,7 @@ const int BRANCHING_FACTOR = 4;
 * Static functions
 ******************************************************************************/
 
-static void merge_spheres (VECTOR C, DBL *r, const VECTOR C1, DBL r1, const VECTOR C2, DBL r2);
+static void merge_spheres (Vector3d& C, DBL *r, const Vector3d& C1, DBL r1, const Vector3d& C2, DBL r2);
 static void recompute_bound (BSPHERE_TREE *Node);
 static int sort_and_split(BSPHERE_TREE **Root, BSPHERE_TREE ***Elements, int *nElem, int first, int last, int& maxelements);
 
@@ -92,14 +92,14 @@ static int sort_and_split(BSPHERE_TREE **Root, BSPHERE_TREE ***Elements, int *nE
 *
 ******************************************************************************/
 
-static void merge_spheres(VECTOR C, DBL *r, const VECTOR C1, DBL r1, const VECTOR C2, DBL r2)
+static void merge_spheres(Vector3d& C, DBL *r, const Vector3d& C1, DBL r1, const Vector3d& C2, DBL r2)
 {
 	DBL l, r1r, r2r, k1, k2;
-	VECTOR D;
+	Vector3d D;
 
-	VSub(D, C1, C2);
+	D = C1 - C2;
 
-	VLength(l, D);
+	l = D.length();
 
 	/* Check if one sphere encloses the other. */
 
@@ -108,7 +108,7 @@ static void merge_spheres(VECTOR C, DBL *r, const VECTOR C1, DBL r1, const VECTO
 
 	if (l + r1r <= r2r)
 	{
-		Assign_Vector(C, C2);
+		C = C2;
 
 		*r = r2;
 
@@ -117,7 +117,7 @@ static void merge_spheres(VECTOR C, DBL *r, const VECTOR C1, DBL r1, const VECTO
 
 	if (l + r2r <= r1r)
 	{
-		Assign_Vector(C, C1);
+		C = C1;
 
 		*r = r1;
 
@@ -127,7 +127,7 @@ static void merge_spheres(VECTOR C, DBL *r, const VECTOR C1, DBL r1, const VECTO
 	k1 = (1.0 + (r1r - r2r) / l) / 2.0;
 	k2 = (1.0 + (r2r - r1r) / l) / 2.0;
 
-	VLinComb2(C, k1, C1, k2, C2);
+	C = k1 * C1 + k2 * C2;
 
 	*r = Sqr((l + r1r + r2r) / 2.0);
 }
@@ -174,9 +174,9 @@ static void recompute_bound(BSPHERE_TREE *Node)
 {
 	short i;
 	DBL r2;
-	VECTOR C;
+	Vector3d C;
 
-	Assign_Vector(C, Node->Node[0]->C);
+	C = Node->Node[0]->C;
 
 	r2 = Node->Node[0]->r2;
 
@@ -185,7 +185,7 @@ static void recompute_bound(BSPHERE_TREE *Node)
 		merge_spheres(C, &r2, C, r2, Node->Node[i]->C, Node->Node[i]->r2);
 	}
 
-	Assign_Vector(Node->C, C);
+	Node->C = C;
 
 	Node->r2 = r2;
 }
@@ -275,14 +275,14 @@ static int find_axis(BSPHERE_TREE **Elements, int first, int  last)
 	int which = X;
 	int i;
 	DBL e, d = - BOUND_HUGE;
-	VECTOR C, mins, maxs;
+	Vector3d C, mins, maxs;
 
-	Make_Vector(mins,  BOUND_HUGE,  BOUND_HUGE,  BOUND_HUGE);
-	Make_Vector(maxs, -BOUND_HUGE, -BOUND_HUGE, -BOUND_HUGE);
+	mins = Vector3d(BOUND_HUGE);
+	maxs = Vector3d(-BOUND_HUGE);
 
 	for (i = first; i < last; i++)
 	{
-		Assign_Vector(C, Elements[i]->C);
+		C = Elements[i]->C;
 
 		mins[X] = min(mins[X], C[X]);
 		maxs[X] = max(maxs[X], C[X]);
@@ -350,7 +350,7 @@ static void build_area_table(BSPHERE_TREE **Elements, int a, int  b, DBL *areas)
 {
 	int i, imin, dir;
 	DBL r2;
-	VECTOR C;
+	Vector3d C;
 
 	if (a < b)
 	{
@@ -361,7 +361,7 @@ static void build_area_table(BSPHERE_TREE **Elements, int a, int  b, DBL *areas)
 		imin = b;  dir = -1;
 	}
 
-	Assign_Vector(C, Elements[a]->C);
+	C = Elements[a]->C;
 
 	r2 = Elements[a]->r2;
 

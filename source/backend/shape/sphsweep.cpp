@@ -28,9 +28,9 @@
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
  * $File: //depot/povray/smp/source/backend/shape/sphsweep.cpp $
- * $Revision: #37 $
- * $Change: 6085 $
- * $DateTime: 2013/11/10 07:39:29 $
+ * $Revision: #43 $
+ * $Change: 6164 $
+ * $DateTime: 2013/12/09 17:21:04 $
  * $Author: clipka $
  *******************************************************************************/
 
@@ -165,7 +165,7 @@ bool SphereSweep::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceTh
 	SPHSWEEP_INT    *Isect = reinterpret_cast<SPHSWEEP_INT *>(POV_MALLOC((sizeof(SPHSWEEP_INT) * SPHSWEEP_MAX_ISECT), "sphere sweep intersections"));
 	SPHSWEEP_INT    *Sphere_Isect = reinterpret_cast<SPHSWEEP_INT *>(POV_MALLOC(sizeof(SPHSWEEP_INT) * 2 * Num_Spheres, "Sphere sweep sphere intersections"));
 	SPHSWEEP_INT    *Segment_Isect = reinterpret_cast<SPHSWEEP_INT *>(POV_MALLOC(sizeof(SPHSWEEP_INT) * 12 * Num_Segments, "Sphere sweep segment intersections"));
-	Ray             New_Ray;
+	BasicRay        New_Ray;
 	DBL             len;
 	bool            Intersection_Found = false;
 	int             Num_Isect = 0;
@@ -176,16 +176,15 @@ bool SphereSweep::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceTh
 
 	if(Trans == NULL)
 	{
-		Assign_Vector(New_Ray.Origin, ray.Origin);
-		Assign_Vector(New_Ray.Direction, ray.Direction);
+		New_Ray.Origin = ray.Origin;
+		New_Ray.Direction = ray.Direction;
 	}
 	else
 	{
-		MInvTransPoint(New_Ray.Origin, ray.Origin, Trans);
-		MInvTransDirection(New_Ray.Direction, ray.Direction, Trans);
+		MInvTransRay(New_Ray, ray, Trans);
 
-		VLength(len, New_Ray.Direction);
-		VInverseScaleEq(New_Ray.Direction, len);
+		len = New_Ray.Direction.length();
+		New_Ray.Direction /= len;
 	}
 
 	// Intersections with single spheres
@@ -253,7 +252,7 @@ bool SphereSweep::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceTh
 				Isect[i].t /= len;
 				MTransPoint(Isect[i].Point, Isect[i].Point, Trans);
 				MTransNormal(Isect[i].Normal, Isect[i].Normal, Trans);
-				VNormalizeEq(Isect[i].Normal);
+				Isect[i].Normal.normalize();
 			}
 
 			// Check for positive values of t (it's a ray after all...)
@@ -315,22 +314,22 @@ bool SphereSweep::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceTh
 *
 ******************************************************************************/
 
-bool SphereSweep::Intersect_Sphere(const Ray &ray, const SPHSWEEP_SPH *Sphere, SPHSWEEP_INT *Inter)
+bool SphereSweep::Intersect_Sphere(const BasicRay &ray, const SPHSWEEP_SPH *Sphere, SPHSWEEP_INT *Inter)
 {
-	DBL     Radius2;
-	DBL     OCSquared;
-	DBL     t_Closest_Approach;
-	DBL     Half_Chord;
-	DBL     t_Half_Chord_Squared;
-	VECTOR  Origin_To_Center;
+	DBL         Radius2;
+	DBL         OCSquared;
+	DBL         t_Closest_Approach;
+	DBL         Half_Chord;
+	DBL         t_Half_Chord_Squared;
+	Vector3d    Origin_To_Center;
 
 	Radius2 = Sqr(Sphere->Radius);
 
-	VSub(Origin_To_Center, Sphere->Center, ray.Origin);
+	Origin_To_Center = Sphere->Center - ray.Origin;
 
-	VDot(OCSquared, Origin_To_Center, Origin_To_Center);
+	OCSquared = Origin_To_Center.lengthSqr();
 
-	VDot(t_Closest_Approach, Origin_To_Center, ray.Direction);
+	t_Closest_Approach = dot(Origin_To_Center, ray.Direction);
 
 	if((OCSquared >= Radius2) && (t_Closest_Approach < EPSILON))
 		return false;
@@ -345,21 +344,19 @@ bool SphereSweep::Intersect_Sphere(const Ray &ray, const SPHSWEEP_SPH *Sphere, S
 		Inter[0].t = t_Closest_Approach - Half_Chord;
 
 		// Calculate point
-		VEvaluateRay(Inter[0].Point, ray.Origin, Inter[0].t, ray.Direction);
+		Inter[0].Point = ray.Evaluate(Inter[0].t);
 
 		// Calculate normal
-		VSub(Inter[0].Normal, Inter[0].Point, Sphere->Center);
-		VInverseScaleEq(Inter[0].Normal, Sphere->Radius);
+		Inter[0].Normal = (Inter[0].Point - Sphere->Center) / Sphere->Radius;
 
 		// Calculate bigger depth
 		Inter[1].t = t_Closest_Approach + Half_Chord;
 
 		// Calculate point
-		VEvaluateRay(Inter[1].Point, ray.Origin, Inter[1].t, ray.Direction);
+		Inter[1].Point = ray.Evaluate(Inter[1].t);
 
 		// Calculate normal
-		VSub(Inter[1].Normal, Inter[1].Point, Sphere->Center);
-		VInverseScaleEq(Inter[1].Normal, Sphere->Radius);
+		Inter[1].Normal = (Inter[1].Point - Sphere->Center) / Sphere->Radius;
 
 		return true;
 	}
@@ -404,55 +401,53 @@ bool SphereSweep::Intersect_Sphere(const Ray &ray, const SPHSWEEP_SPH *Sphere, S
 *
 ******************************************************************************/
 
-int SphereSweep::Intersect_Segment(const Ray &ray, const SPHSWEEP_SEG *Segment, SPHSWEEP_INT *Isect, TraceThreadData *Thread)
+int SphereSweep::Intersect_Segment(const BasicRay &ray, const SPHSWEEP_SEG *Segment, SPHSWEEP_INT *Isect, TraceThreadData *Thread)
 {
-	int     Isect_Count;
-	DBL     Dot1, Dot2;
-	DBL     t1, t2;
-	VECTOR  Vector;
-	VECTOR  IPoint;
-	VECTOR  DCenter;
-	DBL     DCenterDot;
-	DBL     temp;
-	DBL     b, c, d, e, f, g, h, i, j, k, l;
-	DBL     Coef[11];
-	DBL     Root[10];
-	int     Num_Poly_Roots, m, n;
-	DBL     fp0, fp1;
-	DBL     t;
+	int             Isect_Count;
+	DBL             Dot1, Dot2;
+	DBL             t1, t2;
+	Vector3d        Vector;
+	Vector3d        IPoint;
+	Vector3d        DCenter;
+	DBL             DCenterDot;
+	DBL             temp;
+	DBL             b, c, d, e, f, g, h, i, j, k, l;
+	DBL             Coef[11];
+	DBL             Root[10];
+	int             Num_Poly_Roots, m, n;
+	DBL             fp0, fp1;
+	DBL             t;
 	SPHSWEEP_SPH    Temp_Sphere;
 	SPHSWEEP_INT    Temp_Isect[2];
-	VECTOR  Center;
+	Vector3d        Center;
 
 	Isect_Count = 0;
 
 	// Calculate intersections with closing surface for u = 0
-	VDot(Dot1, ray.Direction, Segment->Center_Deriv[0]);
+	Dot1 = dot(ray.Direction, Segment->Center_Deriv[0]);
 	if(fabs(Dot1) > EPSILON)
 	{
-		VSub(Vector, ray.Origin, Segment->Closing_Sphere[0].Center);
-		VDot(Dot2, Vector, Segment->Center_Deriv[0]);
+		Vector = ray.Origin - Segment->Closing_Sphere[0].Center;
+		Dot2 = dot(Vector, Segment->Center_Deriv[0]);
 		t1 = -(Dot2 + Segment->Closing_Sphere[0].Radius * Segment->Radius_Deriv[0]) / Dot1;
 		if ((t1 > -MAX_DISTANCE) && (t1 < MAX_DISTANCE))
 		{
 			// Calculate point
-			VEvaluateRay(IPoint, ray.Origin, t1, ray.Direction);
+			IPoint = ray.Evaluate(t1);
 
 			// Is the point inside the closing sphere?
-			VSub(DCenter, IPoint, Segment->Closing_Sphere[0].Center);
-			VDot(DCenterDot, DCenter, DCenter);
+			DCenter = IPoint - Segment->Closing_Sphere[0].Center;
+			DCenterDot = DCenter.lengthSqr();
 			if(DCenterDot < Sqr(Segment->Closing_Sphere[0].Radius))
 			{
 				// Add intersection
 				Isect[Isect_Count].t = t1;
 
 				// Copy point
-				Assign_Vector(Isect[Isect_Count].Point, IPoint);
+				Isect[Isect_Count].Point = IPoint;
 
 				// Calculate normal
-				Assign_Vector(Isect[Isect_Count].Normal, Segment->Center_Deriv[0]);
-				VScaleEq(Isect[Isect_Count].Normal, -1.0);
-				VNormalizeEq(Isect[Isect_Count].Normal);
+				Isect[Isect_Count].Normal = -Segment->Center_Deriv[0].normalized();
 
 				Isect_Count++;
 			}
@@ -460,31 +455,30 @@ int SphereSweep::Intersect_Segment(const Ray &ray, const SPHSWEEP_SEG *Segment, 
 	}
 
 	// Calculate intersections with closing surface for u = 1
-	VDot(Dot1, ray.Direction, Segment->Center_Deriv[1]);
+	Dot1 = dot(ray.Direction, Segment->Center_Deriv[1]);
 	if(fabs(Dot1) > EPSILON)
 	{
-		VSub(Vector, ray.Origin, Segment->Closing_Sphere[1].Center);
-		VDot(Dot2, Vector, Segment->Center_Deriv[1]);
+		Vector = ray.Origin - Segment->Closing_Sphere[1].Center;
+		Dot2 = dot(Vector, Segment->Center_Deriv[1]);
 		t2 = -(Dot2 + Segment->Closing_Sphere[1].Radius * Segment->Radius_Deriv[1]) / Dot1;
 		if((t2 > -MAX_DISTANCE) && (t2 < MAX_DISTANCE))
 		{
 			// Calculate point
-			VEvaluateRay(IPoint, ray.Origin, t2, ray.Direction);
+			IPoint = ray.Evaluate(t2);
 
 			// Is the point inside the closing sphere?
-			VSub(DCenter, IPoint, Segment->Closing_Sphere[1].Center);
-			VDot(DCenterDot, DCenter, DCenter);
+			DCenter = IPoint - Segment->Closing_Sphere[1].Center;
+			DCenterDot = DCenter.lengthSqr();
 			if(DCenterDot < Sqr(Segment->Closing_Sphere[1].Radius))
 			{
 				// Add intersection
 				Isect[Isect_Count].t = t2;
 
 				// Copy point
-				Assign_Vector(Isect[Isect_Count].Point, IPoint);
+				Isect[Isect_Count].Point = IPoint;
 
 				// Calculate normal
-				Assign_Vector(Isect[Isect_Count].Normal, Segment->Center_Deriv[1]);
-				VNormalizeEq(Isect[Isect_Count].Normal);
+				Isect[Isect_Count].Normal = Segment->Center_Deriv[1].normalized();
 
 				Isect_Count++;
 			}
@@ -497,24 +491,24 @@ int SphereSweep::Intersect_Segment(const Ray &ray, const SPHSWEEP_SEG *Segment, 
 	{
 		case 2:   // First order Polynomial
 
-			VSub(Vector, ray.Origin, Segment->Center_Coef[0]);
+			Vector = ray.Origin - Segment->Center_Coef[0];
 
 			// a is always 1.0
 
-			VDot(b, Segment->Center_Coef[1], ray.Direction);
+			b = dot(Segment->Center_Coef[1], ray.Direction);
 			b *= -2.0;
 
-			VDot(c, Vector, ray.Direction);
+			c = dot(Vector, ray.Direction);
 			c *= 2.0;
 
-			VDot(d, Segment->Center_Coef[1], Segment->Center_Coef[1]);
+			d = Segment->Center_Coef[1].lengthSqr();
 			d -= Sqr(Segment->Radius_Coef[1]);
 
-			VDot(e, Vector, Segment->Center_Coef[1]);
+			e = dot(Vector, Segment->Center_Coef[1]);
 			e += Segment->Radius_Coef[0] * Segment->Radius_Coef[1];
 			e *= -2.0;
 
-			VDot(f, Vector, Vector);
+			f = Vector.lengthSqr();
 			f -= Sqr(Segment->Radius_Coef[0]);
 
 			Coef[0] = 4.0 * Sqr(d) - Sqr(b) * d;
@@ -524,55 +518,51 @@ int SphereSweep::Intersect_Segment(const Ray &ray, const SPHSWEEP_SEG *Segment, 
 			Num_Poly_Roots = Solve_Polynomial(2, Coef, Root, true, 1e-10, Thread);
 			break;
 		case 4:   // Third order polynomial
-			VSub(Vector, ray.Origin, Segment->Center_Coef[0]);
+			Vector = ray.Origin - Segment->Center_Coef[0];
 
 			// a is always 1.0
 
-			VDot(b, Segment->Center_Coef[3], ray.Direction);
-			b *= -2.0;
+			b = -2.0 * dot(Segment->Center_Coef[3], ray.Direction);
 
-			VDot(c, Segment->Center_Coef[2], ray.Direction);
-			c *= -2.0;
+			c = -2.0 * dot(Segment->Center_Coef[2], ray.Direction);
 
-			VDot(d, Segment->Center_Coef[1], ray.Direction);
-			d *= -2.0;
+			d = -2.0 * dot(Segment->Center_Coef[1], ray.Direction);
 
-			VDot(e, Vector, ray.Direction);
-			e *= 2.0;
+			e =  2.0 * dot(Vector, ray.Direction);
 
-			VDot(f, Segment->Center_Coef[3], Segment->Center_Coef[3]);
+			f = Segment->Center_Coef[3].lengthSqr();
 			f -= Sqr(Segment->Radius_Coef[3]);
 
-			VDot(g, Segment->Center_Coef[3], Segment->Center_Coef[2]);
+			g = dot(Segment->Center_Coef[3], Segment->Center_Coef[2]);
 			g -= Segment->Radius_Coef[3] * Segment->Radius_Coef[2];
 			g *= 2.0;
 
-			VDot(h, Segment->Center_Coef[3], Segment->Center_Coef[1]);
+			h = dot(Segment->Center_Coef[3], Segment->Center_Coef[1]);
 			h *= 2.0;
-			VDot(temp, Segment->Center_Coef[2], Segment->Center_Coef[2]);
+			temp = dot(Segment->Center_Coef[2], Segment->Center_Coef[2]);
 			h += temp;
 			h -= 2.0 * Segment->Radius_Coef[3] * Segment->Radius_Coef[1];
 			h -= Sqr(Segment->Radius_Coef[2]);
 
-			VDot(i, Segment->Center_Coef[3], Vector);
-			VDot(temp, Segment->Center_Coef[2], Segment->Center_Coef[1]);
+			i = dot(Segment->Center_Coef[3], Vector);
+			temp = dot(Segment->Center_Coef[2], Segment->Center_Coef[1]);
 			i -= temp;
 			i += Segment->Radius_Coef[3] * Segment->Radius_Coef[0];
 			i += Segment->Radius_Coef[2] * Segment->Radius_Coef[1];
 			i *= -2.0;
 
-			VDot(j, Segment->Center_Coef[2], Vector);
+			j = dot(Segment->Center_Coef[2], Vector);
 			j += Segment->Radius_Coef[2] * Segment->Radius_Coef[0];
 			j *= -2.0;
-			VDot(temp, Segment->Center_Coef[1], Segment->Center_Coef[1]);
+			temp = dot(Segment->Center_Coef[1], Segment->Center_Coef[1]);
 			j += temp;
 			j -= Sqr(Segment->Radius_Coef[1]);
 
-			VDot(k, Segment->Center_Coef[1], Vector);
+			k = dot(Segment->Center_Coef[1], Vector);
 			k += Segment->Radius_Coef[1] * Segment->Radius_Coef[0];
 			k *= -2.0;
 
-			VDot(l, Vector, Vector);
+			l = Vector.lengthSqr();
 			l -= Sqr(Segment->Radius_Coef[0]);
 
 			Coef[0] = 36.0 * Sqr(f) - 9.0 * f * Sqr(b);
@@ -637,12 +627,11 @@ int SphereSweep::Intersect_Segment(const Ray &ray, const SPHSWEEP_SEG *Segment, 
 						Isect[Isect_Count].t = t;
 
 						// Calculate point
-						VEvaluateRay(Isect[Isect_Count].Point, ray.Origin, t, ray.Direction);
+						Isect[Isect_Count].Point = ray.Evaluate(t);
 
 						// Calculate normal
-						VAddScaled(Center, Segment->Center_Coef[0], Root[m], Segment->Center_Coef[1]);
-						VSub(Isect[Isect_Count].Normal, Isect[Isect_Count].Point, Center);
-						VNormalizeEq(Isect[Isect_Count].Normal);
+						Center = Segment->Center_Coef[0] + Root[m] * Segment->Center_Coef[1];
+						Isect[Isect_Count].Normal = (Isect[Isect_Count].Point - Center).normalized();
 
 						Isect_Count++;
 					}
@@ -650,7 +639,7 @@ int SphereSweep::Intersect_Segment(const Ray &ray, const SPHSWEEP_SEG *Segment, 
 				else
 				{
 					// Calculate center of single sphere
-					VAddScaled(Temp_Sphere.Center, Segment->Center_Coef[0], Root[m], Segment->Center_Coef[1]);
+					Temp_Sphere.Center = Segment->Center_Coef[1] * Root[m] + Segment->Center_Coef[0];
 
 					// Calculate radius of single sphere
 					Temp_Sphere.Radius = Segment->Radius_Coef[1] * Root[m] + Segment->Radius_Coef[0];
@@ -692,14 +681,14 @@ int SphereSweep::Intersect_Segment(const Ray &ray, const SPHSWEEP_SEG *Segment, 
 						Isect[Isect_Count].t = t;
 
 						// Calculate point
-						VEvaluateRay(Isect[Isect_Count].Point, ray.Origin, t, ray.Direction);
+						Isect[Isect_Count].Point = ray.Evaluate(t);
 
 						// Calculate normal
-						VAddScaled(Center, Segment->Center_Coef[0], Root[m], Segment->Center_Coef[1]);
-						VAddScaledEq(Center, Root[m] * Root[m], Segment->Center_Coef[2]);
-						VAddScaledEq(Center, Root[m] * Root[m] * Root[m], Segment->Center_Coef[3]);
-						VSub(Isect[Isect_Count].Normal, Isect[Isect_Count].Point, Center);
-						VNormalizeEq(Isect[Isect_Count].Normal);
+						Center = Segment->Center_Coef[3] * (Root[m] * Root[m] * Root[m])
+						       + Segment->Center_Coef[2] * (Root[m] * Root[m])
+						       + Segment->Center_Coef[1] *  Root[m]
+						       + Segment->Center_Coef[0];
+						Isect[Isect_Count].Normal = (Isect[Isect_Count].Point - Center).normalized();
 
 						Isect_Count++;
 					}
@@ -708,9 +697,10 @@ int SphereSweep::Intersect_Segment(const Ray &ray, const SPHSWEEP_SEG *Segment, 
 #endif
 				{
 					// Calculate center of single sphere
-					VAddScaled(Temp_Sphere.Center, Segment->Center_Coef[0], Root[m], Segment->Center_Coef[1]);
-					VAddScaledEq(Temp_Sphere.Center, Root[m] * Root[m], Segment->Center_Coef[2]);
-					VAddScaledEq(Temp_Sphere.Center, Root[m] * Root[m] * Root[m], Segment->Center_Coef[3]);
+					Temp_Sphere.Center = Segment->Center_Coef[3] * (Root[m] * Root[m] * Root[m])
+					                   + Segment->Center_Coef[2] * (Root[m] * Root[m])
+					                   + Segment->Center_Coef[1] *  Root[m]
+					                   + Segment->Center_Coef[0];
 
 					// Calculate radius of single sphere
 					Temp_Sphere.Radius = Segment->Radius_Coef[3] * Root[m] * Root[m] * Root[m]
@@ -770,12 +760,12 @@ int SphereSweep::Intersect_Segment(const Ray &ray, const SPHSWEEP_SEG *Segment, 
 *
 ******************************************************************************/
 
-bool SphereSweep::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
+bool SphereSweep::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 {
 	int     inside;
-	VECTOR  New_Point;
+	Vector3d    New_Point;
 	int     i, j;
-	VECTOR  Vector;
+	Vector3d    Vector;
 	DBL     temp;
 	DBL     Coef[7];
 	DBL     Root[6];
@@ -784,7 +774,7 @@ bool SphereSweep::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
 	inside = false;
 
 	if(Trans == NULL)
-		Assign_Vector(New_Point, IPoint);
+		New_Point = IPoint;
 	else
 		MInvTransPoint(New_Point, IPoint, Trans);
 
@@ -795,21 +785,20 @@ bool SphereSweep::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
 			for(i = 0; i < Num_Segments; i++)
 			{
 				// Pre-calculate vector
-				VSub(Vector, New_Point, Segment[i].Center_Coef[0]);
+				Vector = New_Point - Segment[i].Center_Coef[0];
 
 				// Coefficient for u^2
-				VDot(Coef[0], Segment[i].Center_Coef[1],
-				              Segment[i].Center_Coef[1]);
+				Coef[0] = Segment[i].Center_Coef[1].lengthSqr();
 				Coef[0] -= Sqr(Segment[i].Radius_Coef[1]);
 
 				// Coefficient for u^1
-				VDot(Coef[1], Vector, Segment[i].Center_Coef[1]);
+				Coef[1] = dot(Vector, Segment[i].Center_Coef[1]);
 				Coef[1] += Segment[i].Radius_Coef[0]
 				         * Segment[i].Radius_Coef[1];
 				Coef[1] *= -2.0;
 
 				// Coefficient for u^0
-				VDot(Coef[2], Vector, Vector);
+				Coef[2] = Vector.lengthSqr();
 				Coef[2] -= Sqr(Segment[i].Radius_Coef[0]);
 
 				// Find roots
@@ -834,34 +823,32 @@ bool SphereSweep::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
 			for(i = 0; i < Num_Segments; i++)
 			{
 				// Pre-calculate vector
-				VSub(Vector, New_Point, Segment[i].Center_Coef[0]);
+				Vector = New_Point - Segment[i].Center_Coef[0];
 
 				// Coefficient for u^6
-				VDot(Coef[0], Segment[i].Center_Coef[3],
-				              Segment[i].Center_Coef[3]);
+				Coef[0] = Segment[i].Center_Coef[3].lengthSqr();
 				Coef[0] -= Sqr(Segment[i].Radius_Coef[3]);
 
 				// Coefficient for u^5
-				VDot(Coef[1], Segment[i].Center_Coef[3],
+				Coef[1] = dot(Segment[i].Center_Coef[3],
 				              Segment[i].Center_Coef[2]);
 				Coef[1] -= Segment[i].Radius_Coef[3]
 				         * Segment[i].Radius_Coef[2];
 				Coef[1] *= 2.0;
 
 				// Coefficient for u^4
-				VDot(Coef[2], Segment[i].Center_Coef[3],
+				Coef[2] = dot(Segment[i].Center_Coef[3],
 				              Segment[i].Center_Coef[1]);
 				Coef[2] *= 2.0;
-				VDot(temp, Segment[i].Center_Coef[2],
-				           Segment[i].Center_Coef[2]);
+				temp = Segment[i].Center_Coef[2].lengthSqr();
 				Coef[2] += temp;
 				Coef[2] -= 2.0 * Segment[i].Radius_Coef[3]
 				               * Segment[i].Radius_Coef[1];
 				Coef[2] -= Sqr(Segment[i].Radius_Coef[2]);
 
 				// Coefficient for u^3
-				VDot(Coef[3], Segment[i].Center_Coef[3], Vector);
-				VDot(temp, Segment[i].Center_Coef[2],
+				Coef[3] = dot(Segment[i].Center_Coef[3], Vector);
+				temp = dot(Segment[i].Center_Coef[2],
 				           Segment[i].Center_Coef[1]);
 				Coef[3] -= temp;
 				Coef[3] += Segment[i].Radius_Coef[3]
@@ -871,23 +858,22 @@ bool SphereSweep::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
 				Coef[3] *= -2.0;
 
 				// Coefficient for u^2
-				VDot(Coef[4], Segment[i].Center_Coef[2], Vector);
+				Coef[4] = dot(Segment[i].Center_Coef[2], Vector);
 				Coef[4] += Segment[i].Radius_Coef[2]
 				         * Segment[i].Radius_Coef[0];
 				Coef[4] *= -2.0;
-				VDot(temp, Segment[i].Center_Coef[1],
-				           Segment[i].Center_Coef[1]);
+				temp = Segment[i].Center_Coef[1].lengthSqr();
 				Coef[4] += temp;
 				Coef[4] -= Sqr(Segment[i].Radius_Coef[1]);
 
 				// Coefficient for u^1
-				VDot(Coef[5], Segment[i].Center_Coef[1], Vector);
+				Coef[5] = dot(Segment[i].Center_Coef[1], Vector);
 				Coef[5] += Segment[i].Radius_Coef[1]
 				         * Segment[i].Radius_Coef[0];
 				Coef[5] *= -2.0;
 
 				// Coefficient for u^0
-				VDot(Coef[6], Vector, Vector);
+				Coef[6] = Vector.lengthSqr();
 				Coef[6] -= Sqr(Segment[i].Radius_Coef[0]);
 
 				// Find roots
@@ -948,9 +934,9 @@ bool SphereSweep::Inside(const VECTOR IPoint, TraceThreadData *Thread) const
 *
 ******************************************************************************/
 
-void SphereSweep::Normal(VECTOR Result, Intersection *Inter, TraceThreadData *) const
+void SphereSweep::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *) const
 {
-	Assign_Vector(Result, Inter->INormal);
+	Result = Inter->INormal;
 }
 
 
@@ -1047,12 +1033,12 @@ ObjectPtr SphereSweep::Copy()
 *
 ******************************************************************************/
 
-void SphereSweep::Translate(const VECTOR Vector, const TRANSFORM *tr)
+void SphereSweep::Translate(const Vector3d& Vector, const TRANSFORM *tr)
 {
 	if(Trans == NULL)
 	{
 		for(int i = 0; i < Num_Modeling_Spheres; i++)
-			VAddEq(Modeling_Sphere[i].Center, Vector);
+			Modeling_Sphere[i].Center += Vector;
 		Compute();
 		Compute_BBox();
 	}
@@ -1094,7 +1080,7 @@ void SphereSweep::Translate(const VECTOR Vector, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void SphereSweep::Rotate(const VECTOR, const TRANSFORM *tr)
+void SphereSweep::Rotate(const Vector3d&, const TRANSFORM *tr)
 {
 	if(Trans == NULL)
 	{
@@ -1141,7 +1127,7 @@ void SphereSweep::Rotate(const VECTOR, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-void SphereSweep::Scale(const VECTOR Vector, const TRANSFORM *tr)
+void SphereSweep::Scale(const Vector3d& Vector, const TRANSFORM *tr)
 {
 	if((Vector[X] != Vector[Y]) || (Vector[X] != Vector[Z]))
 	{
@@ -1153,7 +1139,7 @@ void SphereSweep::Scale(const VECTOR Vector, const TRANSFORM *tr)
 	{
 		for(int i = 0; i < Num_Modeling_Spheres; i++)
 		{
-			VScaleEq(Modeling_Sphere[i].Center, Vector[X]);
+			Modeling_Sphere[i].Center *= Vector[X];
 			Modeling_Sphere[i].Radius *= Vector[X];
 		}
 		Compute();
@@ -1161,45 +1147,6 @@ void SphereSweep::Scale(const VECTOR Vector, const TRANSFORM *tr)
 	}
 	else
 		Transform(tr);
-}
-
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-*   Invert_Sphere_Sweep
-*
-* INPUT
-*
-*   Object
-*
-* OUTPUT
-*
-*   Object
-*
-* RETURNS
-*
-*   -
-*
-* AUTHOR
-*
-*   Jochen Lippert
-*
-* DESCRIPTION
-*
-*   Invert a sphere sweep.
-*
-* CHANGES
-*
-*   -
-*
-******************************************************************************/
-
-void SphereSweep::Invert()
-{
-	Invert_Flag(this, INVERTED_FLAG);
 }
 
 
@@ -1377,9 +1324,9 @@ SphereSweep::~SphereSweep()
 
 void SphereSweep::Compute_BBox()
 {
-	VECTOR  mins;
-	VECTOR  maxs;
-	int     i;
+	Vector3d    mins;
+	Vector3d    maxs;
+	int         i;
 
 	mins[X] = mins[Y] = mins[Z] = BOUND_HUGE;
 	maxs[X] = maxs[Y] = maxs[Z] = -BOUND_HUGE;
@@ -1388,34 +1335,14 @@ void SphereSweep::Compute_BBox()
 	{
 		if(Interpolation == CATMULL_ROM_SPLINE_SPHERE_SWEEP)
 		{
-		// Make box a bit larger for Catmull-Rom-Spline sphere sweeps
-			mins[X] = min(mins[X], Modeling_Sphere[i].Center[X]
-			                 - 2 * Modeling_Sphere[i].Radius);
-			mins[Y] = min(mins[Y], Modeling_Sphere[i].Center[Y]
-			                 - 2 * Modeling_Sphere[i].Radius);
-			mins[Z] = min(mins[Z], Modeling_Sphere[i].Center[Z]
-			                 - 2 * Modeling_Sphere[i].Radius);
-			maxs[X] = max(maxs[X], Modeling_Sphere[i].Center[X]
-			                 + 2 * Modeling_Sphere[i].Radius);
-			maxs[Y] = max(maxs[Y], Modeling_Sphere[i].Center[Y]
-			                 + 2 * Modeling_Sphere[i].Radius);
-			maxs[Z] = max(maxs[Z], Modeling_Sphere[i].Center[Z]
-			                 + 2 * Modeling_Sphere[i].Radius);
+			// Make box a bit larger for Catmull-Rom-Spline sphere sweeps
+			mins = min(mins, Modeling_Sphere[i].Center - Vector3d(2.0 * Modeling_Sphere[i].Radius));
+			maxs = max(maxs, Modeling_Sphere[i].Center + Vector3d(2.0 * Modeling_Sphere[i].Radius));
 		}
 		else
 		{
-			mins[X] = min(mins[X], Modeling_Sphere[i].Center[X]
-			                     - Modeling_Sphere[i].Radius);
-			mins[Y] = min(mins[Y], Modeling_Sphere[i].Center[Y]
-			                     - Modeling_Sphere[i].Radius);
-			mins[Z] = min(mins[Z], Modeling_Sphere[i].Center[Z]
-			                     - Modeling_Sphere[i].Radius);
-			maxs[X] = max(maxs[X], Modeling_Sphere[i].Center[X]
-			                     + Modeling_Sphere[i].Radius);
-			maxs[Y] = max(maxs[Y], Modeling_Sphere[i].Center[Y]
-			                     + Modeling_Sphere[i].Radius);
-			maxs[Z] = max(maxs[Z], Modeling_Sphere[i].Center[Z]
-			                     + Modeling_Sphere[i].Radius);
+			mins = min(mins, Modeling_Sphere[i].Center - Vector3d(Modeling_Sphere[i].Radius));
+			maxs = max(maxs, Modeling_Sphere[i].Center + Vector3d(Modeling_Sphere[i].Radius));
 		}
 	}
 
@@ -1486,17 +1413,17 @@ void SphereSweep::Compute()
 				Segment[i].Num_Coefs = 2;
 
 				// Coefficients for u^1
-				VSub(Segment[i].Center_Coef[1],
-				     Modeling_Sphere[i + 1].Center,
-				     Modeling_Sphere[i].Center);
+				Segment[i].Center_Coef[1] =
+				     Modeling_Sphere[i + 1].Center -
+				     Modeling_Sphere[i].Center;
 
 				Segment[i].Radius_Coef[1] =
 				     Modeling_Sphere[i + 1].Radius -
 				     Modeling_Sphere[i].Radius;
 
 				// Coefficients for u^0
-				Assign_Vector(Segment[i].Center_Coef[0],
-				     Modeling_Sphere[i].Center);
+				Segment[i].Center_Coef[0] =
+				     Modeling_Sphere[i].Center;
 
 				Segment[i].Radius_Coef[0] =
 				     Modeling_Sphere[i].Radius;
@@ -1521,9 +1448,9 @@ void SphereSweep::Compute()
 				for(coef = 0; coef < 4; coef++)
 				{
 					// Center
-					VScale(Segment[i].Center_Coef[coef],
-					       Modeling_Sphere[i].Center,
-					       Catmull_Rom_Matrix[coef][0]);
+					Segment[i].Center_Coef[coef] =
+					       Modeling_Sphere[i].Center *
+					       Catmull_Rom_Matrix[coef][0];
 
 					// Radius
 					Segment[i].Radius_Coef[coef] =
@@ -1533,9 +1460,9 @@ void SphereSweep::Compute()
 					for(msph = 1; msph < 4; msph++)
 					{
 						// Center
-						VAddScaledEq(Segment[i].Center_Coef[coef],
-						             Catmull_Rom_Matrix[coef][msph],
-						             Modeling_Sphere[i + msph].Center);
+						Segment[i].Center_Coef[coef] +=
+						             Catmull_Rom_Matrix[coef][msph] *
+						             Modeling_Sphere[i + msph].Center;
 
 						// Radius
 						Segment[i].Radius_Coef[coef] +=
@@ -1564,9 +1491,9 @@ void SphereSweep::Compute()
 				for(coef = 0; coef < 4; coef++)
 				{
 					// Center
-					VScale(Segment[i].Center_Coef[coef],
-					       Modeling_Sphere[i].Center,
-					       B_Matrix[coef][0]);
+					Segment[i].Center_Coef[coef] =
+					       Modeling_Sphere[i].Center *
+					       B_Matrix[coef][0];
 
 					// Radius
 					Segment[i].Radius_Coef[coef] =
@@ -1576,9 +1503,9 @@ void SphereSweep::Compute()
 					for(msph = 1; msph < 4; msph++)
 					{
 						// Center
-						VAddScaledEq(Segment[i].Center_Coef[coef],
-						             B_Matrix[coef][msph],
-						             Modeling_Sphere[i + msph].Center);
+						Segment[i].Center_Coef[coef] +=
+						             B_Matrix[coef][msph] *
+						             Modeling_Sphere[i + msph].Center;
 
 						// Radius
 						Segment[i].Radius_Coef[coef] +=
@@ -1597,8 +1524,8 @@ void SphereSweep::Compute()
 		// Calculate closing sphere for u = 0
 
 		// Center
-		Assign_Vector(Segment[i].Closing_Sphere[0].Center,
-		              Segment[i].Center_Coef[0]);
+		Segment[i].Closing_Sphere[0].Center =
+		              Segment[i].Center_Coef[0];
 
 		// Radius
 		Segment[i].Closing_Sphere[0].Radius =
@@ -1607,8 +1534,8 @@ void SphereSweep::Compute()
 		// Calculate derivatives for u = 0
 
 		// Center
-		Assign_Vector(Segment[i].Center_Deriv[0],
-		              Segment[i].Center_Coef[1]);
+		Segment[i].Center_Deriv[0] =
+		              Segment[i].Center_Coef[1];
 
 		// Radius
 		Segment[i].Radius_Deriv[0] =
@@ -1617,8 +1544,8 @@ void SphereSweep::Compute()
 		// Calculate closing sphere for u = 1
 
 		// Center
-		Assign_Vector(Segment[i].Closing_Sphere[1].Center,
-		              Segment[i].Center_Coef[0]);
+		Segment[i].Closing_Sphere[1].Center =
+		              Segment[i].Center_Coef[0];
 
 		// Radius
 		Segment[i].Closing_Sphere[1].Radius =
@@ -1627,8 +1554,8 @@ void SphereSweep::Compute()
 		for(coef = 1; coef < Segment[i].Num_Coefs; coef++)
 		{
 			// Center
-			VAddEq(Segment[i].Closing_Sphere[1].Center,
-			       Segment[i].Center_Coef[coef]);
+			Segment[i].Closing_Sphere[1].Center +=
+			       Segment[i].Center_Coef[coef];
 
 			// Radius
 			Segment[i].Closing_Sphere[1].Radius +=
@@ -1638,8 +1565,8 @@ void SphereSweep::Compute()
 		// Calculate derivatives for u = 1
 
 		// Center
-		Assign_Vector(Segment[i].Center_Deriv[1],
-		              Segment[i].Center_Coef[1]);
+		Segment[i].Center_Deriv[1] =
+		              Segment[i].Center_Coef[1];
 
 		// Radius
 		Segment[i].Radius_Deriv[1] =
@@ -1648,8 +1575,8 @@ void SphereSweep::Compute()
 		for(coef = 2; coef < Segment[i].Num_Coefs; coef++)
 		{
 			// Center
-			VAddScaledEq(Segment[i].Center_Deriv[1], coef,
-			             Segment[i].Center_Coef[coef]);
+			Segment[i].Center_Deriv[1] += double(coef) *
+			             Segment[i].Center_Coef[coef];
 
 			// Radius
 			Segment[i].Radius_Deriv[1] += coef *
@@ -1672,8 +1599,8 @@ void SphereSweep::Compute()
 	for(i = 0; i < Num_Segments; i++)
 	{
 		// Center
-		Assign_Vector(Sphere[i].Center,
-		              Segment[i].Center_Coef[0]);
+		Sphere[i].Center =
+		              Segment[i].Center_Coef[0];
 
 		// Radius
 		Sphere[i].Radius =
@@ -1686,8 +1613,8 @@ void SphereSweep::Compute()
 	last_seg = Num_Segments - 1;
 
 	// Center
-	Assign_Vector(Sphere[last_sph].Center,
-	              Segment[last_seg].Center_Coef[0]);
+	Sphere[last_sph].Center =
+	              Segment[last_seg].Center_Coef[0];
 	// Radius
 	Sphere[last_sph].Radius =
 	              Segment[last_seg].Radius_Coef[0];
@@ -1695,8 +1622,8 @@ void SphereSweep::Compute()
 	for(coef = 1; coef < Segment[last_seg].Num_Coefs; coef++)
 	{
 		// Center
-		VAddEq(Sphere[last_sph].Center,
-		       Segment[last_seg].Center_Coef[coef]);
+		Sphere[last_sph].Center +=
+		       Segment[last_seg].Center_Coef[coef];
 
 		// Radius
 		Sphere[last_sph].Radius +=
@@ -1738,7 +1665,7 @@ void SphereSweep::Compute()
 *
 ******************************************************************************/
 
-int SphereSweep::Find_Valid_Points(SPHSWEEP_INT *Inter, int Num_Inter, const Ray &ray)
+int SphereSweep::Find_Valid_Points(SPHSWEEP_INT *Inter, int Num_Inter, const BasicRay &ray)
 {
 	int     i;
 	int     j;
@@ -1751,7 +1678,7 @@ int SphereSweep::Find_Valid_Points(SPHSWEEP_INT *Inter, int Num_Inter, const Ray
 	while(i < Num_Inter - 1)
 	{
 		// Angle between normal and ray
-		VDot(NormalDotDirection, Inter[i].Normal, ray.Direction);
+		NormalDotDirection = dot(Inter[i].Normal, ray.Direction);
 
 		// Does the ray enter the part?
 		if(NormalDotDirection < 0.0)

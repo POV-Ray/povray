@@ -1,35 +1,37 @@
-/*******************************************************************************
- * parse.cpp
- *
- * This module implements a parser for the scene description files.
- *
- * ---------------------------------------------------------------------------
- * Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
- * Copyright 1991-2013 Persistence of Vision Raytracer Pty. Ltd.
- *
- * POV-Ray is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * POV-Ray is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------------
- * POV-Ray is based on the popular DKB raytracer version 2.12.
- * DKBTrace was originally written by David K. Buck.
- * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
- * ---------------------------------------------------------------------------
- * $File: //depot/povray/smp/source/backend/parser/parse.cpp $
- * $Revision: #191 $
- * $Change: 6113 $
- * $DateTime: 2013/11/20 20:39:54 $
- * $Author: clipka $
- *******************************************************************************/
+//******************************************************************************
+///
+/// @file backend/parser/parse.cpp
+///
+/// This module implements a parser for the scene description files.
+///
+/// @copyright
+/// @parblock
+///
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
+/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+///
+/// POV-Ray is free software: you can redistribute it and/or modify
+/// it under the terms of the GNU Affero General Public License as
+/// published by the Free Software Foundation, either version 3 of the
+/// License, or (at your option) any later version.
+///
+/// POV-Ray is distributed in the hope that it will be useful,
+/// but WITHOUT ANY WARRANTY; without even the implied warranty of
+/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+/// GNU Affero General Public License for more details.
+///
+/// You should have received a copy of the GNU Affero General Public License
+/// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+///
+/// ----------------------------------------------------------------------------
+///
+/// POV-Ray is based on the popular DKB raytracer version 2.12.
+/// DKBTrace was originally written by David K. Buck.
+/// DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
+///
+/// @endparblock
+///
+//*******************************************************************************
 
 #include <cctype>
 #include <cmath>
@@ -203,10 +205,7 @@ void Parser::Run()
 #if 0 // [CLi] Dist_Max is completely obsolete
 		// init misc radiosity stuff
 		if(sceneData->parsedRadiositySettings.Dist_Max == 0.0)
-		{
-			VDist(sceneData->parsedRadiositySettings.Dist_Max, sceneData->parsedCamera.Location, sceneData->parsedCamera.Look_At);
-			sceneData->parsedRadiositySettings.Dist_Max *= 0.2;
-		}
+			sceneData->parsedRadiositySettings.Dist_Max = (sceneData->parsedCamera.Location - sceneData->parsedCamera.Look_At).length() * 0.2;
 #endif
 
 		// post process atmospheric media
@@ -341,7 +340,7 @@ void Parser::Run()
 	// be gained from disabling the defaulting of the noise generator to
 	// something other than compatibilty mode.
 	if (sceneData->explicitNoiseGenerator == false)
-		sceneData->noiseGenerator = sceneData->languageVersion < 350 ? 1 : 2;
+		sceneData->noiseGenerator = sceneData->languageVersion < 350 ? kNoiseGen_Original : kNoiseGen_RangeCorrected;
 
 	if((sceneData->gammaMode != kPOVList_GammaMode_AssumedGamma36) && (sceneData->gammaMode != kPOVList_GammaMode_AssumedGamma37))
 	{
@@ -821,7 +820,7 @@ ObjectPtr Parser::Parse_Blob()
 {
 	int npoints;
 	DBL threshold;
-	VECTOR Axis, Base, Apex;
+	Vector3d Axis, Base, Apex;
 	Blob *Object;
 	Blob_List_Struct *blob_components, *blob_component;
 
@@ -944,16 +943,16 @@ ObjectPtr Parser::Parse_Blob()
 
 			/* Calculate cylinder's coordinate system. */
 
-			VSub(Axis, Apex, Base);
+			Axis = Apex - Base;
 
-			VLength(blob_component->elem.len, Axis);
+			blob_component->elem.len = Axis.length();
 
 			if (blob_component->elem.len < EPSILON)
 			{
 				Error("Degenerate cylindrical component in blob.");
 			}
 
-			VInverseScaleEq(Axis, blob_component->elem.len);
+			Axis /= blob_component->elem.len;
 
 			Compute_Coordinate_Transform(blob_component->elem.Trans, Base, Axis, 1.0, 1.0);
 
@@ -1021,7 +1020,7 @@ ObjectPtr Parser::Parse_Blob()
 
 void Parser::Parse_Blob_Element_Mods(Blob_Element *Element)
 {
-	VECTOR Local_Vector;
+	Vector3d Local_Vector;
 	MATRIX Local_Matrix;
 	TRANSFORM Local_Trans;
 	TEXTURE *Local_Texture;
@@ -1283,7 +1282,7 @@ void Parser::Parse_Camera (Camera& Cam)
 	int i;
 	DBL Direction_Length = 1.0, Up_Length, Right_Length, Handedness;
 	DBL k1, k2, k3;
-	VECTOR tempv;
+	Vector3d tempv;
 	MATRIX Local_Matrix;
 	TRANSFORM Local_Trans;
 	bool only_mods = false;
@@ -1378,19 +1377,19 @@ void Parser::Parse_Camera (Camera& Cam)
 		 */
 
 		bool had_angle = false, had_up = false, had_right = false;
-		VECTOR old_look_at, old_up, old_right, old_focal_point;
+		Vector3d old_look_at, old_up, old_right, old_focal_point;
 		DBL old_angle;
 
-		Assign_Vector(old_look_at, New.Look_At);
-		Make_Vector(New.Look_At, HUGE_VAL, HUGE_VAL, HUGE_VAL);
-		Assign_Vector(old_up, New.Up);
-		Make_Vector(New.Up, HUGE_VAL, HUGE_VAL, HUGE_VAL);
-		Assign_Vector(old_right, New.Right);
-		Make_Vector(New.Right, HUGE_VAL, HUGE_VAL, HUGE_VAL);
-		Assign_Vector(old_focal_point, New.Focal_Point);
-		Make_Vector(New.Focal_Point, HUGE_VAL, HUGE_VAL, HUGE_VAL);
-		old_angle = New.Angle;
-		New.Angle = HUGE_VAL;
+		old_look_at     = New.Look_At;
+		New.Look_At     = Vector3d(HUGE_VAL);
+		old_up          = New.Up;
+		New.Up          = Vector3d(HUGE_VAL);
+		old_right       = New.Right;
+		New.Right       = Vector3d(HUGE_VAL);
+		old_focal_point = New.Focal_Point;
+		New.Focal_Point = Vector3d(HUGE_VAL);
+		old_angle       = New.Angle;
+		New.Angle       = HUGE_VAL;
 
 		EXPECT
 			CASE (PERSPECTIVE_TOKEN)
@@ -1632,7 +1631,7 @@ void Parser::Parse_Camera (Camera& Cam)
 		// handle "up"
 		if (New.Up[X] == HUGE_VAL)
 		{
-			Assign_Vector(New.Up, old_up); // restore default up
+			New.Up = old_up; // restore default up
 		}
 		else
 			had_up = true;
@@ -1640,7 +1639,7 @@ void Parser::Parse_Camera (Camera& Cam)
 		// handle "right"
 		if (New.Right[X] == HUGE_VAL)
 		{
-			Assign_Vector(New.Right, old_right); // restore default right
+			New.Right = old_right; // restore default right
 		}
 		else
 			had_right = true;
@@ -1655,10 +1654,10 @@ void Parser::Parse_Camera (Camera& Cam)
 
 				if (New.Angle > 0.0)
 				{
-					VNormalize(New.Direction, New.Direction);
-					VLength (Right_Length, New.Right);
+					New.Direction.normalize();
+					Right_Length = New.Right.length();
 					Direction_Length = Right_Length / tan(New.Angle * M_PI_360)/2.0;
-					VScaleEq(New.Direction, Direction_Length);
+					New.Direction *= Direction_Length;
 				}
 			}
 
@@ -1670,26 +1669,24 @@ void Parser::Parse_Camera (Camera& Cam)
 		// apply "look_at"
 		if (New.Look_At[X] != HUGE_VAL)
 		{
-			VLength (Direction_Length, New.Direction);
-			VLength (Up_Length,        New.Up);
-			VLength (Right_Length,     New.Right);
-			VCross  (tempv,            New.Up, New.Direction);
-			VDot    (Handedness,       tempv, New.Right);
+			Direction_Length = New.Direction.length();
+			Up_Length        = New.Up.length();
+			Right_Length     = New.Right.length();
+			tempv            = cross(New.Up, New.Direction);
+			Handedness       = dot(tempv, New.Right);
 
-			Assign_Vector(New.Direction, New.Look_At);
-
-			VSub (New.Direction, New.Direction, New.Location);
+			New.Direction    = New.Look_At - New.Location;
 
 			// Check for zero length direction vector.
-			if (VSumSqr(New.Direction) < EPSILON)
+			if (New.Direction.lengthSqr() < EPSILON)
 				Error("Camera location and look_at point must be different.");
 
-			VNormalize (New.Direction, New.Direction);
+			New.Direction.normalize();
 
 			// Save Right vector
-			Assign_Vector (tempv, New.Right);
+			tempv = New.Right;
 
-			VCross (New.Right, New.Sky, New.Direction);
+			New.Right = cross(New.Sky, New.Direction);
 
 			// Avoid DOMAIN error (from Terry Kanakis)
 			if((fabs(New.Right[X]) < EPSILON) &&
@@ -1700,26 +1697,26 @@ void Parser::Parse_Camera (Camera& Cam)
 				           "Using default/supplied right vector instead.");
 
 				// Restore Right vector
-				Assign_Vector (New.Right, tempv);
+				New.Right = tempv;
 			}
 
-			VNormalize (New.Right,     New.Right);
-			VCross     (New.Up,        New.Direction, New.Right);
-			VScale     (New.Direction, New.Direction, Direction_Length);
+			New.Right.normalize();
+			New.Up = cross(New.Direction, New.Right);
+			New.Direction *= Direction_Length;
 
 			if (Handedness > 0.0)
 			{
-				VScaleEq (New.Right, Right_Length);
+				New.Right *= Right_Length;
 			}
 			else
 			{
-				VScaleEq (New.Right, -Right_Length);
+				New.Right *= -Right_Length;
 			}
 
-			VScaleEq(New.Up, Up_Length);
+			New.Up *= Up_Length;
 		}
 		else
-			Assign_Vector(New.Look_At, old_look_at); // restore default look_at
+			New.Look_At = old_look_at; // restore default look_at
 
 		// apply "orthographic"
 		if (New.Type == ORTHOGRAPHIC_CAMERA)
@@ -1730,13 +1727,13 @@ void Parser::Parse_Camera (Camera& Cam)
 			{
 				// resize right and up vector to get the same image
 				// area as we get with the perspective camera
-				VSub(tempv, New.Look_At, New.Location);
-				VLength(k1, tempv);
-				VLength(k2, New.Direction);
+				tempv = New.Look_At - New.Location;
+				k1 = tempv.length();
+				k2 = New.Direction.length();
 				if ((k1 > EPSILON) && (k2 > EPSILON))
 				{
-					VScaleEq(New.Right, k1 / k2);
-					VScaleEq(New.Up, k1 / k2);
+					New.Right *= (k1 / k2);
+					New.Up    *= (k1 / k2);
 				}
 			}
 		}
@@ -1744,12 +1741,11 @@ void Parser::Parse_Camera (Camera& Cam)
 		// apply "focal_point"
 		if (New.Focal_Point[X] != HUGE_VAL)
 		{
-			Assign_Vector(tempv, New.Focal_Point);
-			VSubEq(tempv, New.Location);
-			VLength (New.Focal_Distance, tempv);
+			tempv = New.Focal_Point - New.Location;
+			New.Focal_Distance = tempv.length();
 		}
 		else
-			Assign_Vector(New.Focal_Point, old_focal_point); // restore default focal_point
+			New.Focal_Point = old_focal_point; // restore default focal_point
 
 		// apply camera transformations
 		New.Transform(New.Trans);
@@ -1765,13 +1761,13 @@ void Parser::Parse_Camera (Camera& Cam)
 				New.Type = ORTHOGRAPHIC_CAMERA;
 				// resize right and up vector to get the same image
 				// area as we get with the perspective camera
-				VSub(tempv, New.Look_At, New.Location);
-				VLength(k1, tempv);
-				VLength(k2, New.Direction);
+				tempv = New.Look_At - New.Location;
+				k1 = tempv.length();
+				k2 = New.Direction.length();
 				if ((k1 > EPSILON) && (k2 > EPSILON))
 				{
-					VScaleEq(New.Right, k1 / k2);
-					VScaleEq(New.Up, k1 / k2);
+					New.Right *= (k1 / k2);
+					New.Up    *= (k1 / k2);
 				}
 			END_CASE
 
@@ -1817,10 +1813,10 @@ void Parser::Parse_Camera (Camera& Cam)
 					if (New.Angle >= 180.0)
 						Error("Viewing angle has to be smaller than 180 degrees.");
 
-					VNormalize(New.Direction, New.Direction);
-					VLength (Right_Length, New.Right);
+					New.Direction.normalize();
+					Right_Length = New.Right.length();
 					Direction_Length = Right_Length / tan(New.Angle * M_PI_360)/2.0;
-					VScaleEq(New.Direction, Direction_Length);
+					New.Direction *= Direction_Length;
 				}
 			END_CASE
 
@@ -1851,27 +1847,25 @@ void Parser::Parse_Camera (Camera& Cam)
 			END_CASE
 
 			CASE (LOOK_AT_TOKEN)
-				VLength (Direction_Length, New.Direction);
-				VLength (Up_Length,        New.Up);
-				VLength (Right_Length,     New.Right);
-				VCross  (tempv,            New.Up, New.Direction);
-				VDot    (Handedness,       tempv,   New.Right);
+				Direction_Length = New.Direction.length();
+				Up_Length        = New.Up.length();
+				Right_Length     = New.Right.length();
+				tempv            = cross(New.Up, New.Direction);
+				Handedness       = dot(tempv, New.Right);
 
-				Parse_Vector (New.Direction);
-				Assign_Vector(New.Look_At, New.Direction);
-
-				VSub (New.Direction, New.Direction, New.Location);
+				Parse_Vector (New.Look_At);
+				New.Direction = New.Look_At - New.Location;
 
 				// Check for zero length direction vector.
-				if (VSumSqr(New.Direction) < EPSILON)
+				if (New.Direction.lengthSqr() < EPSILON)
 					Error("Camera location and look_at point must be different.");
 
-				VNormalize (New.Direction, New.Direction);
+				New.Direction.normalize();
 
 				// Save Right vector
-				Assign_Vector (tempv, New.Right);
+				tempv = New.Right;
 
-				VCross (New.Right, New.Sky, New.Direction);
+				New.Right = cross(New.Sky, New.Direction);
 
 				// Avoid DOMAIN error (from Terry Kanakis)
 				if((fabs(New.Right[X]) < EPSILON) &&
@@ -1879,23 +1873,23 @@ void Parser::Parse_Camera (Camera& Cam)
 				   (fabs(New.Right[Z]) < EPSILON))
 				{
 					// Restore Right vector
-					Assign_Vector (New.Right, tempv);
+					New.Right = tempv;
 				}
 
-				VNormalize (New.Right,     New.Right);
-				VCross     (New.Up,        New.Direction, New.Right);
-				VScale     (New.Direction, New.Direction, Direction_Length);
+				New.Right.normalize();
+				New.Up = cross(New.Direction, New.Right);
+				New.Direction *= Direction_Length;
 
 				if (Handedness > 0.0)
 				{
-					VScaleEq (New.Right, Right_Length);
+					New.Right *= Right_Length;
 				}
 				else
 				{
-					VScaleEq (New.Right, -Right_Length);
+					New.Right *= -Right_Length;
 				}
 
-				VScaleEq(New.Up, Up_Length);
+				New.Up *= Up_Length;
 			END_CASE
 
 			CASE (TRANSLATE_TOKEN)
@@ -1950,10 +1944,10 @@ void Parser::Parse_Camera (Camera& Cam)
 			END_CASE
 
 			CASE (FOCAL_POINT_TOKEN)
-				Parse_Vector(New.Focal_Point);
-				Assign_Vector(tempv, New.Focal_Point);
-				VSubEq(tempv, New.Location);
-				VLength (New.Focal_Distance, tempv);
+				Parse_Vector(tempv);
+				New.Focal_Point = tempv;
+				tempv = New.Focal_Point - New.Location;
+				New.Focal_Distance = tempv.length();
 			END_CASE
 
 			OTHERWISE
@@ -1972,9 +1966,9 @@ void Parser::Parse_Camera (Camera& Cam)
 		New.Focal_Distance = 1.0;
 
 	// Print a warning message if vectors are not perpendicular. [DB 10/94]
-	VDot(k1, New.Right, New.Up);
-	VDot(k2, New.Right, New.Direction);
-	VDot(k3, New.Up, New.Direction);
+	k1 = dot(New.Right, New.Up);
+	k2 = dot(New.Right, New.Direction);
+	k3 = dot(New.Up, New.Direction);
 
 	if ((fabs(k1) > EPSILON) || (fabs(k2) > EPSILON) || (fabs(k3) > EPSILON))
 	{
@@ -1986,9 +1980,9 @@ void Parser::Parse_Camera (Camera& Cam)
 bool Parser::Parse_Camera_Mods(Camera& New)
 {
 	TRANSFORM Local_Trans;
-	PIGMENT* Local_Pigment;
+	PIGMENT *Local_Pigment;
 	MATRIX Local_Matrix;
-	VECTOR tempv;
+	Vector3d tempv;
 	DBL k1;
 
 	EXPECT_ONE
@@ -2096,7 +2090,7 @@ bool Parser::Parse_Camera_Mods(Camera& New)
 
 			EXPECT
 				CASE (PIGMENT_TOKEN)
-					Local_Pigment = Copy_Pigment((Default_Texture->Pigment));
+					Local_Pigment = Copy_Pigment(Default_Texture->Pigment);
 					Parse_Begin();
 					Parse_Pigment(&Local_Pigment);
 					Parse_End();
@@ -2166,12 +2160,8 @@ ObjectPtr Parser::Parse_CSG(int CSG_Type)
 		Object_Count++;
 
 		if((CSG_Type & CSG_DIFFERENCE_TYPE) && (Object_Count > 1))
-		{
-			if ((Local->Type & IS_CSG_OBJECT) != 0)
-				Local = Invert_CSG_Object(Local);
-			else
-				Invert_Object(Local);
-		}
+			// warning: Local->Invert will change the pointer if Object is CSG
+			Local = Local->Invert();
 		Object->Type |= (Local->Type & CHILDREN_FLAGS);
 		if(!(Local->Type & LIGHT_SOURCE_OBJECT))
 			Light_Source_Union = false;
@@ -2346,7 +2336,7 @@ ObjectPtr Parser::Parse_Disc ()
 
 	Parse_Vector(Object->center); Parse_Comma ();
 	Parse_Vector(Object->normal); Parse_Comma ();
-	VNormalize(Object->normal, Object->normal);
+	Object->normal.normalize();
 
 	tmpf = Parse_Float(); Parse_Comma ();
 	Object->oradius2 = tmpf * tmpf;
@@ -2364,7 +2354,7 @@ ObjectPtr Parser::Parse_Disc ()
 	END_EXPECT
 
 	/* Calculate info needed for ray-disc intersections */
-	VDot(tmpf, Object->center, Object->normal);
+	tmpf = dot(Object->center, Object->normal);
 	Object->d = -tmpf;
 
 	Object->Compute_Disc();
@@ -2396,7 +2386,7 @@ ObjectPtr Parser::Parse_Disc ()
 
 ObjectPtr Parser::Parse_HField ()
 {
-	VECTOR Local_Vector;
+	Vector3d Local_Vector;
 	DBL Temp_Water_Level;
 	HField *Object;
 	ImageData *image;
@@ -2411,17 +2401,10 @@ ObjectPtr Parser::Parse_HField ()
 	image = Parse_Image (HF_FILE);
 	image->Use = USE_NONE;
 
-	Make_Vector(Object->bounding_corner1, 0.0, 0.0, 0.0);
+	Object->bounding_corner1 = Vector3d(0.0, 0.0, 0.0);
+	Object->bounding_corner2 = Vector3d(image->width - 1.0, 65536.0, image->height - 1.0);
 
-	Object->bounding_corner2[X] = image->width - 1.0;
-
-	Object->bounding_corner2[Y] = 65536.0;
-	Object->bounding_corner2[Z] = image->height - 1.0;
-
-	Make_Vector(Local_Vector,
-	            1.0 / (Object->bounding_corner2[X]),
-	            1.0 / (Object->bounding_corner2[Y]),
-	            1.0 / (Object->bounding_corner2[Z]));
+	Local_Vector = Vector3d(1.0) / Object->bounding_corner2;
 
 	Compute_Scaling_Transform(Object->Trans, Local_Vector);
 
@@ -2854,7 +2837,7 @@ ObjectPtr Parser::Parse_Lathe()
 {
 	int i;
 	Lathe *Object;
-	UV_VECT *Points;
+	Vector2d *Points;
 
 	Parse_Begin();
 
@@ -2933,7 +2916,7 @@ ObjectPtr Parser::Parse_Lathe()
 
 	/* Get temporary points describing the rotated curve. */
 
-	Points = reinterpret_cast<UV_VECT *>(POV_MALLOC(Object->Number*sizeof(UV_VECT), "temporary lathe points"));
+	Points = reinterpret_cast<Vector2d *>(POV_MALLOC(Object->Number*sizeof(Vector2d), "temporary lathe points"));
 
 	/* Read points (x : radius; y : height; z : not used). */
 
@@ -3013,7 +2996,7 @@ ObjectPtr Parser::Parse_Light_Group()
 {
 	CSG *Object;
 	ObjectPtr Local;
-	VECTOR Local_Vector;
+	Vector3d Local_Vector;
 	MATRIX Local_Matrix;
 	TRANSFORM Local_Trans;
 
@@ -3180,7 +3163,7 @@ ObjectPtr Parser::Parse_Light_Group()
 ObjectPtr Parser::Parse_Light_Source ()
 {
 	DBL Len;
-	VECTOR Local_Vector;
+	Vector3d Local_Vector;
 	MATRIX Local_Matrix;
 	TRANSFORM Local_Trans;
 	LightSource *Object;
@@ -3471,13 +3454,13 @@ ObjectPtr Parser::Parse_Light_Source ()
 	Parse_End ();
 
 
-	VSub(Object->Direction, Object->Points_At, Object->Center);
+	Object->Direction = Object->Points_At - Object->Center;
 
-	VLength(Len, Object->Direction);
+	Len = Object->Direction.length();
 
 	if (Len > EPSILON)
 	{
-		VInverseScaleEq(Object->Direction, Len);
+		Object->Direction /= Len;
 	}
 
 	/* Make sure that circular light sources are larger than 1 by x [ENB 9/97] */
@@ -3529,20 +3512,20 @@ ObjectPtr Parser::Parse_Mesh()
 	int number_of_normals, number_of_textures, number_of_triangles, number_of_vertices, number_of_uvcoords;
 	int max_normals, max_textures, max_triangles, max_vertices, max_uvcoords;
 	DBL l1, l2, l3;
-	VECTOR D1, D2, P1, P2, P3, N1, N2, N3, N;
-	UV_VECT UV1, UV2, UV3;
-	SNGL_VECT *Normals, *Vertices;
+	Vector3d D1, D2, P1, P2, P3, N1, N2, N3, N;
+	Vector2d UV1, UV2, UV3;
+	MeshVector *Normals, *Vertices;
 	TEXTURE **Textures;
-	UV_VECT *UVCoords;
+	MeshUVVector *UVCoords;
 	Mesh *Object;
 	MESH_TRIANGLE *Triangles;
-	int fully_textured=true;
+	bool fully_textured=true;
 	/* NK 1998 */
-	VECTOR Inside_Vect;
+	Vector3d Inside_Vect;
 	TEXTURE *t2, *t3;
 	bool foundZeroNormal=false;
 
-	Make_Vector(Inside_Vect, 0, 0, 0);
+	Inside_Vect = Vector3d(0.0, 0.0, 0.0);
 
 	Parse_Begin();
 
@@ -3563,13 +3546,13 @@ ObjectPtr Parser::Parse_Mesh()
 
 	max_triangles = 256;
 
-	Normals = reinterpret_cast<SNGL_VECT *>(POV_MALLOC(max_normals*sizeof(SNGL_VECT), "temporary triangle mesh data"));
+	Normals = reinterpret_cast<MeshVector *>(POV_MALLOC(max_normals*sizeof(MeshVector), "temporary triangle mesh data"));
 
 	Textures = reinterpret_cast<TEXTURE **>(POV_MALLOC(max_textures*sizeof(TEXTURE *), "temporary triangle mesh data"));
 
 	Triangles = reinterpret_cast<MESH_TRIANGLE *>(POV_MALLOC(max_triangles*sizeof(MESH_TRIANGLE), "temporary triangle mesh data"));
 
-	Vertices = reinterpret_cast<SNGL_VECT *>(POV_MALLOC(max_vertices*sizeof(SNGL_VECT), "temporary triangle mesh data"));
+	Vertices = reinterpret_cast<MeshVector *>(POV_MALLOC(max_vertices*sizeof(MeshVector), "temporary triangle mesh data"));
 
 	/* Read raw triangle file. */
 
@@ -3582,7 +3565,7 @@ ObjectPtr Parser::Parse_Mesh()
 	number_of_vertices = 0;
 
 	max_uvcoords = 256;
-	UVCoords = reinterpret_cast<UV_VECT *>(POV_MALLOC(max_uvcoords*sizeof(UV_VECT), "temporary triangle mesh data"));
+	UVCoords = reinterpret_cast<MeshUVVector *>(POV_MALLOC(max_uvcoords*sizeof(MeshUVVector), "temporary triangle mesh data"));
 	number_of_uvcoords = 0;
 
 	/* Create hash tables. */
@@ -3621,9 +3604,9 @@ ObjectPtr Parser::Parse_Mesh()
 
 				/* NK 1998 */
 				Parse_Three_UVCoords(UV1,UV2,UV3);
-				Triangles[number_of_triangles].UV1 = Object->Mesh_Hash_UV(&number_of_uvcoords, &max_uvcoords, &UVCoords,UV1);
-				Triangles[number_of_triangles].UV2 = Object->Mesh_Hash_UV(&number_of_uvcoords, &max_uvcoords, &UVCoords,UV2);
-				Triangles[number_of_triangles].UV3 = Object->Mesh_Hash_UV(&number_of_uvcoords, &max_uvcoords, &UVCoords,UV3);
+				Triangles[number_of_triangles].UV1 = Object->Mesh_Hash_UV(&number_of_uvcoords, &max_uvcoords, &UVCoords, UV1);
+				Triangles[number_of_triangles].UV2 = Object->Mesh_Hash_UV(&number_of_uvcoords, &max_uvcoords, &UVCoords, UV2);
+				Triangles[number_of_triangles].UV3 = Object->Mesh_Hash_UV(&number_of_uvcoords, &max_uvcoords, &UVCoords, UV3);
 				/* NK ---- */
 
 				/* NK */
@@ -3691,9 +3674,9 @@ ObjectPtr Parser::Parse_Mesh()
 				foundZeroNormal = true;
 			}
 
-			VLength(l1, N1);
-			VLength(l2, N2);
-			VLength(l3, N3);
+			l1 = N1.length();
+			l2 = N2.length();
+			l3 = N3.length();
 
 			if ((l1 != 0.0) && (l2 != 0.0) && (l3 != 0.0) && (!Object->Degenerate(P1, P2, P3)))
 			{
@@ -3707,9 +3690,9 @@ ObjectPtr Parser::Parse_Mesh()
 					Triangles = reinterpret_cast<MESH_TRIANGLE *>(POV_REALLOC(Triangles, max_triangles*sizeof(MESH_TRIANGLE), "triangle triangle mesh data"));
 				}
 
-				VInverseScaleEq(N1, l1);
-				VInverseScaleEq(N2, l2);
-				VInverseScaleEq(N3, l3);
+				N1 /= l1;
+				N2 /= l2;
+				N3 /= l3;
 
 				/* Init triangle. */
 
@@ -3721,17 +3704,17 @@ ObjectPtr Parser::Parse_Mesh()
 
 				/* Check for equal normals. */
 
-				VSub(D1, N1, N2);
-				VSub(D2, N1, N3);
+				D1 = N1 - N2;
+				D2 = N1 - N3;
 
-				VDot(l1, D1, D1);
-				VDot(l2, D2, D2);
+				l1 = D1.lengthSqr();
+				l2 = D2.lengthSqr();
 
 				/* NK 1998 */
 				Parse_Three_UVCoords(UV1,UV2,UV3);
-				Triangles[number_of_triangles].UV1 = Object->Mesh_Hash_UV(&number_of_uvcoords, &max_uvcoords, &UVCoords,UV1);
-				Triangles[number_of_triangles].UV2 = Object->Mesh_Hash_UV(&number_of_uvcoords, &max_uvcoords, &UVCoords,UV2);
-				Triangles[number_of_triangles].UV3 = Object->Mesh_Hash_UV(&number_of_uvcoords, &max_uvcoords, &UVCoords,UV3);
+				Triangles[number_of_triangles].UV1 = Object->Mesh_Hash_UV(&number_of_uvcoords, &max_uvcoords, &UVCoords, UV1);
+				Triangles[number_of_triangles].UV2 = Object->Mesh_Hash_UV(&number_of_uvcoords, &max_uvcoords, &UVCoords, UV2);
+				Triangles[number_of_triangles].UV3 = Object->Mesh_Hash_UV(&number_of_uvcoords, &max_uvcoords, &UVCoords, UV3);
 
 				/* read possibly three instead of only one texture */
 				/* read these before compute!!! */
@@ -3822,7 +3805,7 @@ ObjectPtr Parser::Parse_Mesh()
 	}
 	else
 	{
-		VNormalize(Object->Data->Inside_Vect, Inside_Vect);
+		Object->Data->Inside_Vect = Inside_Vect.normalized();
 		Object->has_inside_vector=true;
 		Object->Type &= ~PATCH_OBJECT;
 	}
@@ -3845,7 +3828,7 @@ ObjectPtr Parser::Parse_Mesh()
 
 	Object->Data->Number_Of_Vertices = number_of_vertices;
 
-	Object->Data->Normals = reinterpret_cast<SNGL_VECT *>(POV_MALLOC(number_of_normals*sizeof(SNGL_VECT), "triangle mesh data"));
+	Object->Data->Normals = reinterpret_cast<MeshVector *>(POV_MALLOC(number_of_normals*sizeof(MeshVector), "triangle mesh data"));
 
 	if (number_of_textures)
 	{
@@ -3857,13 +3840,13 @@ ObjectPtr Parser::Parse_Mesh()
 
 	Object->Data->Triangles = reinterpret_cast<MESH_TRIANGLE *>(POV_MALLOC(number_of_triangles*sizeof(MESH_TRIANGLE), "triangle mesh data"));
 
-	Object->Data->Vertices = reinterpret_cast<SNGL_VECT *>(POV_MALLOC(number_of_vertices*sizeof(SNGL_VECT), "triangle mesh data"));
+	Object->Data->Vertices = reinterpret_cast<MeshVector *>(POV_MALLOC(number_of_vertices*sizeof(MeshVector), "triangle mesh data"));
 
 	/* Copy normals, textures, triangles and vertices into mesh. */
 
 	for (i = 0; i < number_of_normals; i++)
 	{
-		Assign_Vector(Object->Data->Normals[i], Normals[i]);
+		Object->Data->Normals[i] = Normals[i];
 	}
 
 	for (i = 0; i < number_of_textures; i++)
@@ -3888,17 +3871,17 @@ ObjectPtr Parser::Parse_Mesh()
 
 	for (i = 0; i < number_of_vertices; i++)
 	{
-		Assign_Vector(Object->Data->Vertices[i], Vertices[i]);
+		Object->Data->Vertices[i] = Vertices[i];
 	}
 
 	/* NK 1998 */
 	/* do the four steps above, but for UV coordinates*/
 	Object->Data->UVCoords  = NULL;
 	Object->Data->Number_Of_UVCoords = number_of_uvcoords;
-	Object->Data->UVCoords = reinterpret_cast<UV_VECT *>(POV_MALLOC(number_of_uvcoords*sizeof(UV_VECT), "triangle mesh data"));
+	Object->Data->UVCoords = reinterpret_cast<MeshUVVector *>(POV_MALLOC(number_of_uvcoords*sizeof(MeshUVVector), "triangle mesh data"));
 	for (i = 0; i < number_of_uvcoords; i++)
 	{
-		Assign_UV_Vect(Object->Data->UVCoords[i], UVCoords[i]);
+		Object->Data->UVCoords[i] = UVCoords[i];
 	}
 	POV_FREE(UVCoords);
 	/* NK ---- */
@@ -3911,15 +3894,17 @@ ObjectPtr Parser::Parse_Mesh()
 	POV_FREE(Vertices);
 
 /*
-	Render_Info("Mesh: %ld bytes: %ld vertices, %ld normals, %ld textures, %ld triangles\n",
-		Object->Data->Number_Of_Normals*sizeof(SNGL_VECT)+
+	Render_Info("Mesh: %ld bytes: %ld vertices, %ld normals, %ld textures, %ld triangles, %ld uv-coords\n",
+		Object->Data->Number_Of_Normals*sizeof(MeshVector)+
 		Object->Number_Of_Textures*sizeof(TEXTURE *)+
 		Object->Data->Number_Of_Triangles*sizeof(MESH_TRIANGLE)+
-		Object->Data->Number_Of_Vertices*sizeof(SNGL_VECT),
+		Object->Data->Number_Of_Vertices*sizeof(MeshVector)+
+		Object->Data->Number_Of_UVCoords*sizeof(MeshUVVector),
 		Object->Data->Number_Of_Vertices,
 		Object->Data->Number_Of_Normals,
 		Object->Number_Of_Textures,
-		Object->Data->Number_Of_Triangles);
+		Object->Data->Number_Of_Triangles,
+		Object->Data->Number_Of_UVCoords);
 */
 
 	/* Create bounding box. */
@@ -3971,24 +3956,24 @@ ObjectPtr Parser::Parse_Mesh2()
 	int number_of_normal_indices;
 	int a,b,c;
 	int n1, n2, n3;
-	int found_normal_indices = 0;
-	int found_uv_indices = 0;
+	bool found_normal_indices = false;
+	bool found_uv_indices = false;
 	bool fully_textured = true;
 	bool foundZeroNormal = false;
 
 	DBL l1, l2;
-	VECTOR D1, D2, P1, P2, P3, N1, N;
-	VECTOR Inside_Vect;
+	Vector3d D1, D2, P1, P2, P3, N1, N;
+	Vector3d Inside_Vect;
 
-	UV_VECT UV1;
-	SNGL_VECT *Normals = NULL;
-	SNGL_VECT *Vertices = NULL;
+	Vector2d UV1;
+	MeshVector *Normals = NULL;
+	MeshVector *Vertices = NULL;
 	TEXTURE **Textures = NULL;
-	UV_VECT *UVCoords = NULL;
+	MeshUVVector *UVCoords = NULL;
 	Mesh *Object;
 	MESH_TRIANGLE *Triangles;
 
-	Make_Vector(Inside_Vect, 0, 0, 0);
+	Inside_Vect = Vector3d(0.0, 0.0, 0.0);
 
 	Parse_Begin();
 
@@ -4024,12 +4009,12 @@ ObjectPtr Parser::Parse_Mesh2()
 				Error("No vertices in triangle mesh.");
 
 			/* allocate memory for vertices */
-			Vertices = reinterpret_cast<SNGL_VECT *>(POV_MALLOC(number_of_vertices*sizeof(SNGL_VECT), "triangle mesh data"));
+			Vertices = reinterpret_cast<MeshVector *>(POV_MALLOC(number_of_vertices*sizeof(MeshVector), "triangle mesh data"));
 
 			for(i=0; i<number_of_vertices; i++)
 			{
 				Parse_Vector(P1); Parse_Comma();
-				Assign_Vector(Vertices[i], P1);
+				Vertices[i] = MeshVector(P1);
 			}
 			Parse_End();
 		END_CASE
@@ -4046,7 +4031,7 @@ ObjectPtr Parser::Parse_Mesh2()
 
 			if (number_of_normals>0)
 			{
-				Normals = reinterpret_cast<SNGL_VECT *>(POV_MALLOC(number_of_normals*sizeof(SNGL_VECT), "triangle mesh data"));
+				Normals = reinterpret_cast<MeshVector *>(POV_MALLOC(number_of_normals*sizeof(MeshVector), "triangle mesh data"));
 
 				/* leave space in the array for the raw triangle normals */
 				for(i=0; i<number_of_normals; i++)
@@ -4059,8 +4044,8 @@ ObjectPtr Parser::Parse_Mesh2()
 							Warning(0,"Normal vector in mesh2 cannot be zero - changing it to <1,0,0>.");
 						foundZeroNormal = true;
 					}
-					VNormalizeEq(N1);
-					Assign_Vector(Normals[i], N1);
+					N1.normalize();
+					Normals[i] = MeshVector(N1);
 				}
 			}
 
@@ -4079,12 +4064,12 @@ ObjectPtr Parser::Parse_Mesh2()
 
 			if (number_of_uvcoords>0)
 			{
-				UVCoords = reinterpret_cast<UV_VECT *>(POV_MALLOC(number_of_uvcoords*sizeof(UV_VECT), "triangle mesh data"));
+				UVCoords = reinterpret_cast<MeshUVVector *>(POV_MALLOC(number_of_uvcoords*sizeof(MeshUVVector), "triangle mesh data"));
 
 				for(i=0; i<number_of_uvcoords; i++)
 				{
 					Parse_UV_Vect(UV1); Parse_Comma();
-					Assign_UV_Vect(UVCoords[i], UV1);
+					UVCoords[i] = MeshUVVector(UV1);
 				}
 			}
 
@@ -4140,7 +4125,7 @@ ObjectPtr Parser::Parse_Mesh2()
 	if (number_of_uvcoords == 0)
 	{
 		number_of_uvcoords = 1;
-		UVCoords = reinterpret_cast<UV_VECT *>(POV_MALLOC(number_of_uvcoords*sizeof(UV_VECT), "triangle mesh data"));
+		UVCoords = reinterpret_cast<MeshUVVector *>(POV_MALLOC(number_of_uvcoords*sizeof(MeshUVVector), "triangle mesh data"));
 		UVCoords[0][U] = 0;
 		UVCoords[0][V] = 0;
 	}
@@ -4250,7 +4235,7 @@ ObjectPtr Parser::Parse_Mesh2()
 			{
 				Error("Only one uv_indices section is allowed in mesh2");
 			}
-			found_uv_indices = 1;
+			found_uv_indices = true;
 			Parse_Begin();
 
 			if (Parse_Float() != number_of_triangles)
@@ -4298,7 +4283,7 @@ ObjectPtr Parser::Parse_Mesh2()
 			{
 				Error("Only one normal_indices section is allowed in mesh2");
 			}
-			found_normal_indices = 1;
+			found_normal_indices = true;
 			Parse_Begin();
 
 			/*
@@ -4419,9 +4404,9 @@ ObjectPtr Parser::Parse_Mesh2()
 
 	/* reallocate the normals stuff */
 	if (!number_of_normals)
-		Normals = reinterpret_cast<SNGL_VECT *>(POV_MALLOC(number_of_triangles*sizeof(SNGL_VECT), "triangle mesh data"));
+		Normals = reinterpret_cast<MeshVector *>(POV_MALLOC(number_of_triangles*sizeof(MeshVector), "triangle mesh data"));
 	else
-		Normals = reinterpret_cast<SNGL_VECT *>(POV_REALLOC(Normals, (number_of_normals+number_of_triangles)*sizeof(SNGL_VECT), "triangle mesh data"));
+		Normals = reinterpret_cast<MeshVector *>(POV_REALLOC(Normals, (number_of_normals+number_of_triangles)*sizeof(MeshVector), "triangle mesh data"));
 
 	for (i=0; i<number_of_triangles; i++)
 	{
@@ -4432,9 +4417,9 @@ ObjectPtr Parser::Parse_Mesh2()
 		n2 = (int) Triangles[i].N2;
 		n3 = (int) Triangles[i].N3;
 
-		Assign_Vector(P1, Vertices[a]);
-		Assign_Vector(P2, Vertices[b]);
-		Assign_Vector(P3, Vertices[c]);
+		P1 = Vector3d(Vertices[a]);
+		P2 = Vector3d(Vertices[b]);
+		P3 = Vector3d(Vertices[c]);
 
 		Triangles[i].Smooth = false;
 
@@ -4444,11 +4429,11 @@ ObjectPtr Parser::Parse_Mesh2()
 		if (i<number_of_normal_indices)
 		{
 			/* Check for equal normals. */
-			VSub(D1, Normals[n1], Normals[n2]);
-			VSub(D2, Normals[n1], Normals[n3]);
+			D1 = Vector3d(Normals[n1]) - Vector3d(Normals[n2]);
+			D2 = Vector3d(Normals[n1]) - Vector3d(Normals[n3]);
 
-			VDot(l1, D1, D1);
-			VDot(l2, D2, D2);
+			l1 = D1.lengthSqr();
+			l2 = D2.lengthSqr();
 
 			if ((fabs(l1) > EPSILON) || (fabs(l2) > EPSILON))
 			{
@@ -4470,7 +4455,7 @@ ObjectPtr Parser::Parse_Mesh2()
 
 		/* assign the triangle normal that we just computed */
 		Triangles[i].Normal_Ind = i+number_of_normals;
-		Assign_Vector(Normals[i+number_of_normals], N);
+		Normals[i+number_of_normals] = MeshVector(N);
 	}
 
 	/* now remember how many normals we really have */
@@ -4492,7 +4477,7 @@ ObjectPtr Parser::Parse_Mesh2()
 	}
 	else
 	{
-		VNormalize(Object->Data->Inside_Vect, Inside_Vect);
+		Object->Data->Inside_Vect = Inside_Vect.normalized();
 		Object->has_inside_vector=true;
 		Object->Type &= ~PATCH_OBJECT;
 	}
@@ -4528,15 +4513,17 @@ ObjectPtr Parser::Parse_Mesh2()
 	Object->Build_Mesh_BBox_Tree();
 
 /*
-	Render_Info("Mesh2: %ld bytes: %ld vertices, %ld normals, %ld textures, %ld triangles\n",
-		Object->Data->Number_Of_Normals*sizeof(SNGL_VECT)+
+	Render_Info("Mesh2: %ld bytes: %ld vertices, %ld normals, %ld textures, %ld triangles, %ld uv-coords\n",
+		Object->Data->Number_Of_Normals*sizeof(MeshVector)+
 		Object->Number_Of_Textures*sizeof(TEXTURE *)+
 		Object->Data->Number_Of_Triangles*sizeof(MESH_TRIANGLE)+
-		Object->Data->Number_Of_Vertices*sizeof(SNGL_VECT),
+		Object->Data->Number_Of_Vertices*sizeof(MeshVector)+
+		Object->Data->Number_Of_UVCoords*sizeof(MeshUVVector),
 		Object->Data->Number_Of_Vertices,
 		Object->Data->Number_Of_Normals,
 		Object->Number_Of_Textures,
-		Object->Data->Number_Of_Triangles);
+		Object->Data->Number_Of_Triangles,
+		Object->Data->Number_Of_UVCoords);
 */
 
 	return(reinterpret_cast<ObjectPtr>(Object));
@@ -4738,7 +4725,7 @@ ObjectPtr Parser::Parse_Parametric(void)
 	DBL         temp;
 	char        PrecompFlag = 0;
 	int         PrecompDepth = 1;
-	UV_VECT     tempUV;
+	Vector2d    tempUV;
 
 	Parse_Begin();
 
@@ -5003,12 +4990,12 @@ ObjectPtr Parser::Parse_Plane ()
 	Object = new Plane();
 
 	Parse_Vector(Object->Normal_Vector);   Parse_Comma();
-	VLength(len, Object->Normal_Vector);
+	len = Object->Normal_Vector.length();
 	if (len < EPSILON)
 	{
 		Error("Degenerate plane normal.");
 	}
-	VInverseScaleEq(Object->Normal_Vector, len);
+	Object->Normal_Vector /= len;
 	Object->Distance = -Parse_Float();
 
 	Object->Compute_BBox();
@@ -5170,8 +5157,8 @@ ObjectPtr Parser::Parse_Polygon()
 	int i, closed = false;
 	int Number;
 	Polygon *Object;
-	VECTOR *Points;
-	VECTOR P;
+	Vector3d *Points;
+	Vector3d P;
 
 	Parse_Begin();
 
@@ -5189,7 +5176,7 @@ ObjectPtr Parser::Parse_Polygon()
 		Error("Polygon needs at least three points.");
 	}
 
-	Points = reinterpret_cast<VECTOR *>(POV_MALLOC((Number+1)*sizeof(VECTOR), "temporary polygon points"));
+	Points = reinterpret_cast<Vector3d *>(POV_MALLOC((Number+1)*sizeof(Vector3d), "temporary polygon points"));
 
 	for (i = 0; i < Number; i++)
 	{
@@ -5200,7 +5187,7 @@ ObjectPtr Parser::Parse_Polygon()
 
 	/* Check for closed polygons. */
 
-	Assign_Vector(P, Points[0]);
+	P = Points[0];
 
 	for (i = 1; i < Number; i++)
 	{
@@ -5212,13 +5199,13 @@ ObjectPtr Parser::Parse_Polygon()
 		{
 			// force almost-identical vertices to be /exactly/ identical,
 			// to make processing easier later
-			Assign_Vector(Points[i], P);
+			Points[i] = P;
 
 			i++;
 
 			if (i < Number)
 			{
-				Assign_Vector(P, Points[i]);
+				P = Points[i];
 			}
 
 			closed = true;
@@ -5229,7 +5216,7 @@ ObjectPtr Parser::Parse_Polygon()
 	{
 		Warning(0, "Polygon not closed. Closing it.");
 
-		Assign_Vector(Points[Number], P);
+		Points[Number] = P;
 
 		Number++;
 	}
@@ -5280,8 +5267,8 @@ ObjectPtr Parser::Parse_Prism()
 	int loopStart = 0;
 
 	Prism *Object;
-	UV_VECT *Points;
-	UV_VECT P;
+	Vector2d *Points;
+	Vector2d P;
 
 	Parse_Begin();
 
@@ -5385,7 +5372,7 @@ ObjectPtr Parser::Parse_Prism()
 
 	/* Allocate Object->Number points for the prism. */
 
-	Points = reinterpret_cast<UV_VECT *>(POV_MALLOC((Object->Number+1) * sizeof(UV_VECT), "temporary prism points"));
+	Points = reinterpret_cast<Vector2d *>(POV_MALLOC((Object->Number+1) * sizeof(Vector2d), "temporary prism points"));
 
 	/* Read points (x, y : coordinate of 2d point; z : not used). */
 
@@ -5422,7 +5409,7 @@ ObjectPtr Parser::Parse_Prism()
 
 				i = 1;
 
-				Assign_UV_Vect(P, Points[0]);
+				P = Points[0];
 
 				break;
 
@@ -5431,7 +5418,7 @@ ObjectPtr Parser::Parse_Prism()
 
 				i = 2;
 
-				Assign_UV_Vect(P, Points[1]);
+				P = Points[1];
 
 				break;
 		}
@@ -5451,7 +5438,7 @@ ObjectPtr Parser::Parse_Prism()
 
 						if (i < Object->Number)
 						{
-							Assign_UV_Vect(P, Points[i]);
+							P = Points[i];
 						}
 
 						break;
@@ -5462,7 +5449,7 @@ ObjectPtr Parser::Parse_Prism()
 
 						if (i < Object->Number)
 						{
-							Assign_UV_Vect(P, Points[i]);
+							P = Points[i];
 						}
 
 						break;
@@ -5473,7 +5460,7 @@ ObjectPtr Parser::Parse_Prism()
 
 						if (i < Object->Number)
 						{
-							Assign_UV_Vect(P, Points[i]);
+							P = Points[i];
 						}
 
 						break;
@@ -5516,7 +5503,7 @@ ObjectPtr Parser::Parse_Prism()
 	{
 		if (Object->Spline_Type == LINEAR_SPLINE)
 		{
-			Assign_UV_Vect(Points[Object->Number], P);
+			Points[Object->Number] = P;
 
 			Object->Number++;
 
@@ -5571,7 +5558,7 @@ ObjectPtr Parser::Parse_Prism()
 
 ObjectPtr Parser::Parse_Quadric ()
 {
-	VECTOR Min, Max;
+	Vector3d Min, Max;
 	Quadric *Object;
 
 	Parse_Begin ();
@@ -5586,8 +5573,8 @@ ObjectPtr Parser::Parse_Quadric ()
 	Parse_Vector(Object->Terms);            Parse_Comma();
 	Object->Constant = Parse_Float();
 
-	Make_Vector(Min, -BOUND_HUGE, -BOUND_HUGE, -BOUND_HUGE);
-	Make_Vector(Max,  BOUND_HUGE,  BOUND_HUGE,  BOUND_HUGE);
+	Min = Vector3d(-BOUND_HUGE);
+	Max = Vector3d(BOUND_HUGE);
 
 	Object->Compute_BBox(Min, Max);
 
@@ -5634,32 +5621,32 @@ ObjectPtr Parser::Parse_Smooth_Triangle ()
 	Parse_Vector (Object->P1);    Parse_Comma();
 	Parse_Vector (Object->N1);    Parse_Comma();
 
-	VLength(vlen,Object->N1);
+	vlen = Object->N1.length();
 
 	if (vlen == 0.0)
 		degen=true;
 	else
-		VNormalize (Object->N1, Object->N1);
+		Object->N1 /= vlen;
 
 	Parse_Vector (Object->P2);    Parse_Comma();
 	Parse_Vector (Object->N2);    Parse_Comma();
 
-	VLength(vlen,Object->N2);
+	vlen = Object->N2.length();
 
 	if(vlen == 0.0)
 		degen=true;
 	else
-		VNormalize (Object->N2, Object->N2);
+		Object->N2 /= vlen;
 
 	Parse_Vector (Object->P3);    Parse_Comma();
 	Parse_Vector (Object->N3);
 
-	VLength(vlen,Object->N3);
+	vlen = Object->N3.length();
 
 	if(vlen == 0.0)
 		degen=true;
 	else
-		VNormalize (Object->N3, Object->N3);
+		Object->N3.normalize();
 
 	if(!degen)
 		degen = !Object->Compute_Triangle();
@@ -5708,7 +5695,7 @@ ObjectPtr Parser::Parse_Sor()
 {
 	int i;
 	Sor *Object;
-	UV_VECT *Points;
+	Vector2d *Points;
 
 	Parse_Begin();
 
@@ -5730,7 +5717,7 @@ ObjectPtr Parser::Parse_Sor()
 
 	/* Get temporary points describing the rotated curve. */
 
-	Points = reinterpret_cast<UV_VECT *>(POV_MALLOC(Object->Number*sizeof(UV_VECT), "temporary surface of revolution points"));
+	Points = reinterpret_cast<Vector2d *>(POV_MALLOC(Object->Number*sizeof(Vector2d), "temporary surface of revolution points"));
 
 	/* Read points (x : radius; y : height; z : not used). */
 
@@ -5978,7 +5965,7 @@ ObjectPtr Parser::Parse_Sphere_Sweep()
 
 ObjectPtr Parser::Parse_Superellipsoid()
 {
-	UV_VECT V1;
+	Vector2d V1;
 	Superellipsoid *Object;
 
 	Parse_Begin();
@@ -6139,7 +6126,7 @@ ObjectPtr Parser::Parse_TrueType ()
 	char *filename = NULL;
 	UCS2 *text_string;
 	DBL depth;
-	VECTOR offset;
+	Vector3d offset;
 	int builtin_font = 0;
 	TRANSFORM Local_Trans;
 
@@ -6192,7 +6179,7 @@ ObjectPtr Parser::Parse_TrueType ()
 	Object->Compute_BBox();
 
 	/* This tiny rotation should fix cracks in text that lies along an axis */
-	Make_Vector(offset, 0.001, 0.001, 0.001);
+	offset = Vector3d(0.001, 0.001, 0.001); // TODO - try to find a different solution to this hack
 	Compute_Rotation_Transform(&Local_Trans, offset);
 	Rotate_Object (reinterpret_cast<ObjectPtr>(Object), offset, &Local_Trans);
 
@@ -6607,7 +6594,6 @@ void Parser::Parse_Frame ()
 	RAINBOW  *Local_Rainbow;
 	FOG  *Local_Fog;
 	SKYSPHERE  *Local_Skysphere;
-	int i;
 	bool had_camera = false;
 
 	try
@@ -6627,9 +6613,9 @@ void Parser::Parse_Frame ()
 					Destroy_Skysphere(sceneData->skysphere);
 				}
 				sceneData->skysphere = Local_Skysphere;
-				for (i=0; i<Local_Skysphere->Count; i++)
+				for (vector<PIGMENT*>::iterator i = Local_Skysphere->Pigments.begin() ; i != Local_Skysphere->Pigments.end(); ++ i)
 				{
-					Post_Pigment(Local_Skysphere->Pigments[i]);
+					Post_Pigment(*i);
 				}
 			END_CASE
 
@@ -6887,8 +6873,8 @@ void Parser::Parse_Global_Settings()
 
 		CASE (NOISE_GENERATOR_TOKEN)
 			sceneData->noiseGenerator = (int) Parse_Float();
-			if (sceneData->noiseGenerator < 1 || sceneData->noiseGenerator > 3)
-				Error ("Value for noise_generator in global_settings must be 1, 2, or 3.");
+			if (sceneData->noiseGenerator < kNoiseGen_Min || sceneData->noiseGenerator > kNoiseGen_Max)
+				Error ("Value for noise_generator in global_settings must be between %i (inclusive) and %i (inclusive).", kNoiseGen_Min, kNoiseGen_Max);
 			sceneData->explicitNoiseGenerator = true;
 		END_CASE
 
@@ -7293,11 +7279,11 @@ void Parser::Parse_Global_Settings()
 ObjectPtr Parser::Parse_Object_Mods (ObjectPtr Object)
 {
 	DBL V1, V2;
-	VECTOR Min, Max;
-	VECTOR Local_Vector;
+	Vector3d Min, Max;
+	Vector3d Local_Vector;
 	MATRIX Local_Matrix;
 	TRANSFORM Local_Trans;
-	BBOX BBox;
+	BoundingBox BBox;
 	TEXTURE *Local_Texture;
 	TEXTURE *Local_Int_Texture;
 	MATERIAL Local_Material;
@@ -7322,7 +7308,7 @@ ObjectPtr Parser::Parse_Object_Mods (ObjectPtr Object)
 			if(dynamic_cast<CSGUnion *>(Object) == NULL) // FIXME
 				Error("split_union found in non-union object.\n");
 
-			(reinterpret_cast<CSG*>(Object))->do_split = (int)Parse_Float();
+			(reinterpret_cast<CSG *>(Object))->do_split = (int)Parse_Float();
 		END_CASE
 
 		CASE(PHOTONS_TOKEN)
@@ -7489,8 +7475,8 @@ ObjectPtr Parser::Parse_Object_Mods (ObjectPtr Object)
 
 					if (dynamic_cast<Quadric *>(Object) != NULL)
 					{
-						Make_Vector(Min, -BOUND_HUGE, -BOUND_HUGE, -BOUND_HUGE);
-						Make_Vector(Max,  BOUND_HUGE,  BOUND_HUGE,  BOUND_HUGE);
+						Min = Vector3d(-BOUND_HUGE);
+						Max = Vector3d(BOUND_HUGE);
 
 						(dynamic_cast<Quadric *>(Object))->Compute_BBox(Min, Max);
 					}
@@ -7571,12 +7557,8 @@ ObjectPtr Parser::Parse_Object_Mods (ObjectPtr Object)
 			if (Object->Type & PATCH_OBJECT)
 				Warning (0, "Cannot invert a patch object.");
 
-			// warning: Invert_Object will change the pointer if Object is CSG
-			//          (this is a bit hackish and needs to be fixed).
-			if ((Object->Type & IS_CSG_OBJECT) != 0)
-				Object = Invert_CSG_Object(Object);
-			else
-				Invert_Object (Object);
+			// warning: Object->Invert will change the pointer if Object is CSG
+			Object = Object->Invert();
 		END_CASE
 
 		CASE (STURM_TOKEN)
@@ -7683,19 +7665,19 @@ ObjectPtr Parser::Parse_Object_Mods (ObjectPtr Object)
 	{
 		/* Get bounding objects bounding box. */
 
-		Make_Vector(Min, -BOUND_HUGE, -BOUND_HUGE, -BOUND_HUGE);
-		Make_Vector(Max,  BOUND_HUGE,  BOUND_HUGE,  BOUND_HUGE);
+		Min = Vector3d(-BOUND_HUGE);
+		Max = Vector3d(BOUND_HUGE);
 
 		for(vector<ObjectPtr>::iterator Sib = Object->Bound.begin(); Sib != Object->Bound.end(); Sib++)
 		{
 			if(!Test_Flag((*Sib), INVERTED_FLAG))
 			{
-				Min[X] = max(Min[X], (DBL)((*Sib)->BBox.Lower_Left[X]));
-				Min[Y] = max(Min[Y], (DBL)((*Sib)->BBox.Lower_Left[Y]));
-				Min[Z] = max(Min[Z], (DBL)((*Sib)->BBox.Lower_Left[Z]));
-				Max[X] = min(Max[X], (DBL)((*Sib)->BBox.Lower_Left[X] + (*Sib)->BBox.Lengths[X]));
-				Max[Y] = min(Max[Y], (DBL)((*Sib)->BBox.Lower_Left[Y] + (*Sib)->BBox.Lengths[Y]));
-				Max[Z] = min(Max[Z], (DBL)((*Sib)->BBox.Lower_Left[Z] + (*Sib)->BBox.Lengths[Z]));
+				Min[X] = max(Min[X], (DBL)((*Sib)->BBox.lowerLeft[X]));
+				Min[Y] = max(Min[Y], (DBL)((*Sib)->BBox.lowerLeft[Y]));
+				Min[Z] = max(Min[Z], (DBL)((*Sib)->BBox.lowerLeft[Z]));
+				Max[X] = min(Max[X], (DBL)((*Sib)->BBox.lowerLeft[X] + (*Sib)->BBox.size[X]));
+				Max[Y] = min(Max[Y], (DBL)((*Sib)->BBox.lowerLeft[Y] + (*Sib)->BBox.size[Y]));
+				Max[Z] = min(Max[Z], (DBL)((*Sib)->BBox.lowerLeft[Z] + (*Sib)->BBox.size[Z]));
 			}
 		}
 
@@ -7721,19 +7703,19 @@ ObjectPtr Parser::Parse_Object_Mods (ObjectPtr Object)
 	{
 		/* Get clipping objects bounding box. */
 
-		Make_Vector(Min, -BOUND_HUGE, -BOUND_HUGE, -BOUND_HUGE);
-		Make_Vector(Max,  BOUND_HUGE,  BOUND_HUGE,  BOUND_HUGE);
+		Min = Vector3d(-BOUND_HUGE);
+		Max = Vector3d(BOUND_HUGE);
 
 		for(vector<ObjectPtr>::iterator Sib = Object->Clip.begin(); Sib != Object->Clip.end(); Sib++)
 		{
 			if(!Test_Flag((*Sib), INVERTED_FLAG))
 			{
-				Min[X] = max(Min[X], (DBL)((*Sib)->BBox.Lower_Left[X]));
-				Min[Y] = max(Min[Y], (DBL)((*Sib)->BBox.Lower_Left[Y]));
-				Min[Z] = max(Min[Z], (DBL)((*Sib)->BBox.Lower_Left[Z]));
-				Max[X] = min(Max[X], (DBL)((*Sib)->BBox.Lower_Left[X] + (*Sib)->BBox.Lengths[X]));
-				Max[Y] = min(Max[Y], (DBL)((*Sib)->BBox.Lower_Left[Y] + (*Sib)->BBox.Lengths[Y]));
-				Max[Z] = min(Max[Z], (DBL)((*Sib)->BBox.Lower_Left[Z] + (*Sib)->BBox.Lengths[Z]));
+				Min[X] = max(Min[X], (DBL)((*Sib)->BBox.lowerLeft[X]));
+				Min[Y] = max(Min[Y], (DBL)((*Sib)->BBox.lowerLeft[Y]));
+				Min[Z] = max(Min[Z], (DBL)((*Sib)->BBox.lowerLeft[Z]));
+				Max[X] = min(Max[X], (DBL)((*Sib)->BBox.lowerLeft[X] + (*Sib)->BBox.size[X]));
+				Max[Y] = min(Max[Y], (DBL)((*Sib)->BBox.lowerLeft[Y] + (*Sib)->BBox.size[Y]));
+				Max[Z] = min(Max[Z], (DBL)((*Sib)->BBox.lowerLeft[Z] + (*Sib)->BBox.size[Z]));
 			}
 		}
 
@@ -7882,7 +7864,7 @@ TRANSFORM *Parser::Parse_Transform_Block(TRANSFORM *New)
 {
 	MATRIX Local_Matrix;
 	TRANSFORM Local_Trans;
-	VECTOR Local_Vector;
+	Vector3d Local_Vector;
 	bool isInverse = false;
 
 	Parse_Begin();
@@ -7970,7 +7952,7 @@ TRANSFORM *Parser::Parse_Transform_Block(TRANSFORM *New)
 
 void Parser::Parse_Bound_Clip(vector<ObjectPtr>& dest, bool notexture)
 {
-	VECTOR Local_Vector;
+	Vector3d Local_Vector;
 	MATRIX Local_Matrix;
 	TRANSFORM Local_Trans;
 	ObjectPtr Current;
@@ -8068,7 +8050,7 @@ void Parser::Parse_Bound_Clip(vector<ObjectPtr>& dest, bool notexture)
 *
 ******************************************************************************/
 
-int Parser::Parse_Three_UVCoords(UV_VECT UV1, UV_VECT UV2, UV_VECT UV3)
+int Parser::Parse_Three_UVCoords(Vector2d& UV1, Vector2d& UV2, Vector2d& UV3)
 {
 	int Return_Value;
 
@@ -8599,15 +8581,13 @@ int Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTR
 					case 2:
 						*NumberPtr = UV_ID_TOKEN;
 						Test_Redefine(Previous,NumberPtr,*DataPtr, allow_redefine);
-						*DataPtr   = reinterpret_cast<void *>(Create_UV_Vect());
-						Assign_UV_Vect(reinterpret_cast<DBL *>(*DataPtr), Local_Express);
+						*DataPtr   = reinterpret_cast<void *>(new Vector2d(Local_Express));
 						break;
 
 					case 3:
 						*NumberPtr = VECTOR_ID_TOKEN;
 						Test_Redefine(Previous,NumberPtr,*DataPtr, allow_redefine);
-						*DataPtr   = reinterpret_cast<void *>(Create_Vector());
-						Assign_Vector(reinterpret_cast<DBL *>(*DataPtr), Local_Express);
+						*DataPtr   = reinterpret_cast<void *>(new Vector3d(Local_Express));
 						break;
 
 					case 4:
@@ -8634,7 +8614,7 @@ int Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTR
 		END_CASE
 
 		CASE (PIGMENT_TOKEN)
-			Local_Pigment = Copy_Pigment((Default_Texture->Pigment));
+			Local_Pigment = Copy_Pigment(Default_Texture->Pigment);
 			Parse_Begin ();
 			Parse_Pigment (&Local_Pigment);
 			Parse_End ();
@@ -8645,7 +8625,7 @@ int Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTR
 		END_CASE
 
 		CASE (TNORMAL_TOKEN)
-			Local_Tnormal = Copy_Tnormal((Default_Texture->Tnormal));
+			Local_Tnormal = Copy_Tnormal(Default_Texture->Tnormal);
 			Parse_Begin ();
 			Parse_Tnormal (&Local_Tnormal);
 			Parse_End ();
@@ -8656,7 +8636,7 @@ int Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTR
 		END_CASE
 
 		CASE (FINISH_TOKEN)
-			Local_Finish = Copy_Finish((Default_Texture->Finish));
+			Local_Finish = Copy_Finish(Default_Texture->Finish);
 			Parse_Finish (&Local_Finish);
 			*NumberPtr = FINISH_ID_TOKEN;
 			Test_Redefine(Previous,NumberPtr,*DataPtr, allow_redefine);
@@ -8900,10 +8880,10 @@ void Parser::Destroy_Ident_Data(void *Data, int Type)
 			Destroy_Colour(reinterpret_cast<COLOUR *>(Data));
 			break;
 		case VECTOR_ID_TOKEN:
-			Destroy_Vector(reinterpret_cast<VECTOR *>(Data));
+			delete reinterpret_cast<Vector3d *>(Data);
 			break;
 		case UV_ID_TOKEN:
-			Destroy_UV_Vect(reinterpret_cast<UV_VECT *>(Data));
+			delete reinterpret_cast<Vector2d *>(Data);
 			break;
 		case VECTOR_4D_ID_TOKEN:
 			Destroy_Vector_4D(reinterpret_cast<VECTOR_4D *>(Data));
@@ -9062,7 +9042,7 @@ void Parser::Link_Textures (TEXTURE **Old_Textures, TEXTURE *New_Textures)
 	}
 	for (Layer = New_Textures ;
 	     Layer->Next != NULL ;
-	     Layer = reinterpret_cast<TEXTURE *>(Layer->Next))
+	     Layer = Layer->Next)
 	{
 		/* NK layers - 1999 June 10 - for backwards compatiblity with layered textures */
 		if(sceneData->languageVersion<=310)
@@ -9073,7 +9053,7 @@ void Parser::Link_Textures (TEXTURE **Old_Textures, TEXTURE *New_Textures)
 	if ((sceneData->languageVersion<=310) && (*Old_Textures!=NULL))
 		Convert_Filter_To_Transmit(Layer->Pigment);
 
-	Layer->Next = reinterpret_cast<TPATTERN *>(*Old_Textures);
+	Layer->Next = *Old_Textures;
 	*Old_Textures = New_Textures;
 
 	if ((New_Textures->Type != PLAIN_PATTERN) && (New_Textures->Next != NULL))
@@ -9439,8 +9419,8 @@ void Parser::Post_Process (ObjectPtr Object, ObjectPtr Parent)
 				Warning(0,"Orient can only be used with circular area lights. This area light is now circular.");
 			}
 
-			VLength(len1,Light->Axis1);
-			VLength(len2,Light->Axis2);
+			len1 = Light->Axis1.length();
+			len2 = Light->Axis2.length();
 
 			if(fabs(len1-len2)>EPSILON)
 			{
@@ -9942,9 +9922,9 @@ void *Parser::Copy_Identifier (void *Data, int Type)
 {
 	int i;
 	POV_ARRAY *a, *na;
-	VECTOR *vp;
+	Vector3d *vp;
 	DBL *dp;
-	UV_VECT *uvp;
+	Vector2d *uvp;
 	VECTOR_4D *v4p;
 	int len;
 	void *New=NULL;
@@ -9960,13 +9940,13 @@ void *Parser::Copy_Identifier (void *Data, int Type)
 			New = reinterpret_cast<void *>(Copy_Colour(*reinterpret_cast<COLOUR *>(Data)));
 			break;
 		case VECTOR_ID_TOKEN:
-			vp = Create_Vector();
-			Assign_Vector((*vp),(*(reinterpret_cast<VECTOR *>(Data))));
+			vp = new Vector3d();
+			*vp = *(reinterpret_cast<Vector3d *>(Data));
 			New=vp;
 			break;
 		case UV_ID_TOKEN:
-			uvp = Create_UV_Vect();
-			Assign_UV_Vect((*uvp),(*(reinterpret_cast<UV_VECT *>(Data))));
+			uvp = new Vector2d();
+			*uvp = *(reinterpret_cast<Vector2d *>(Data));
 			New=uvp;
 			break;
 		case VECTOR_4D_ID_TOKEN:

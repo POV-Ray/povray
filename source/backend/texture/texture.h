@@ -24,11 +24,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/texture/texture.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/texture/texture.h $
+ * $Revision: #21 $
+ * $Change: 6150 $
+ * $DateTime: 2013/11/30 14:13:48 $
+ * $Author: clipka $
  *******************************************************************************/
 
 /* NOTE: FRAME.H contains other texture stuff. */
@@ -80,18 +80,18 @@ void Initialize_Noise (void);
 void Initialize_Waves(vector<double>& waveFrequencies, vector<Vector3d>& waveSources, unsigned int numberOfWaves);
 void Free_Noise_Tables (void);
 #if defined(USE_AVX_FMA4_FOR_NOISE)
-extern DBL (*Noise) (const VECTOR EPoint, int noise_generator);
-extern void (*DNoise) (VECTOR result, const VECTOR EPoint);
+extern DBL (*Noise) (const Vector3d& EPoint, int noise_generator);
+extern void (*DNoise) (Vector3d& result, const Vector3d& EPoint);
 void Initialise_NoiseDispatch();
-DBL AVX_FMA4_Noise(const VECTOR EPoint, int noise_generator);
-void AVX_FMA4_DNoise(VECTOR result, const VECTOR EPoint);
+DBL AVX_FMA4_Noise(const Vector3d& EPoint, int noise_generator);
+void AVX_FMA4_DNoise(Vector3d& result, const Vector3d& EPoint);
 
 #else
-INLINE_NOISE DBL Noise (const VECTOR EPoint, int noise_generator);
-INLINE_NOISE void DNoise (VECTOR result, const VECTOR EPoint);
+INLINE_NOISE DBL Noise (const Vector3d& EPoint, int noise_generator);
+INLINE_NOISE void DNoise (Vector3d& result, const Vector3d& EPoint);
 #endif
-DBL Turbulence (const VECTOR EPoint, const TURB *Turb, int noise_generator);
-void DTurbulence (VECTOR result, const VECTOR EPoint, const TURB *Turb);
+DBL Turbulence (const Vector3d& EPoint, const TURB *Turb, int noise_generator);
+void DTurbulence (Vector3d& result, const Vector3d& EPoint, const TURB *Turb);
 DBL cycloidal (DBL value);
 DBL Triangle_Wave (DBL value);
 void Transform_Textures (TEXTURE *Textures, const TRANSFORM *Trans);

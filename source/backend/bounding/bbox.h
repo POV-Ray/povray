@@ -24,11 +24,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/bounding/bbox.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/backend/bounding/bbox.h $
+ * $Revision: #30 $
+ * $Change: 6163 $
+ * $DateTime: 2013/12/08 22:48:58 $
+ * $Author: clipka $
  *******************************************************************************/
 
 /* NOTE: FRAME.H contains other bound stuff. */
@@ -54,17 +54,17 @@ namespace pov
 * Global typedefs
 ******************************************************************************/
 
-typedef int VECTORI[3];
+typedef bool VECTORB[3];
 
 class Rayinfo
 {
 	public:
-		BBOX_VECT slab_num;
-		BBOX_VECT slab_den;
-		VECTORI nonzero;
-		VECTORI positive;
+		BBoxVector3d slab_num;
+		BBoxVector3d slab_den;
+		VECTORB nonzero;
+		VECTORB positive;
 
-		explicit Rayinfo(const Ray& ray)
+		explicit Rayinfo(const BasicRay& ray)
 		{
 			DBL t;
 
@@ -92,11 +92,24 @@ class Rayinfo
 		}
 };
 
+enum BBoxDirection
+{
+	BBOX_DIR_X0Y0Z0 = 0,
+	BBOX_DIR_X0Y0Z1 = 1,
+	BBOX_DIR_X0Y1Z0 = 2,
+	BBOX_DIR_X0Y1Z1 = 3,
+	BBOX_DIR_X1Y0Z0 = 4,
+	BBOX_DIR_X1Y0Z1 = 5,
+	BBOX_DIR_X1Y1Z0 = 6,
+	BBOX_DIR_X1Y1Z1 = 7
+};
+
+
 /*****************************************************************************
 * Global functions
 ******************************************************************************/
 
-struct PriorityQueue
+struct BBoxPriorityQueue
 {
 	struct Qelem
 	{
@@ -108,19 +121,19 @@ struct PriorityQueue
 	unsigned Max_QSize;
 	Qelem *Queue;
 
-	PriorityQueue();
-	~PriorityQueue();
+	BBoxPriorityQueue();
+	~BBoxPriorityQueue();
 };
 
 void Build_BBox_Tree(BBOX_TREE **Root, size_t numOfFiniteObjects, BBOX_TREE **&Finite, size_t numOfInfiniteObjects, BBOX_TREE **Infinite, size_t& maxfinitecount);
 void Build_Bounding_Slabs(BBOX_TREE **Root, vector<ObjectPtr>& objects, unsigned int& numberOfFiniteObjects, unsigned int& numberOfInfiniteObjects, unsigned int& numberOfLightSources);
 
-void Recompute_BBox(BBOX *bbox, const TRANSFORM *trans);
-void Recompute_Inverse_BBox(BBOX *bbox, const TRANSFORM *trans);
-bool Intersect_BBox_Tree(PriorityQueue& pqueue, const BBOX_TREE *Root, const Ray& ray, Intersection *Best_Intersection, TraceThreadData *Thread);
-bool Intersect_BBox_Tree(PriorityQueue& pqueue, const BBOX_TREE *Root, const Ray& ray, Intersection *Best_Intersection, const RayObjectCondition& precondition, const RayObjectCondition& postcondition, TraceThreadData *Thread);
-void Check_And_Enqueue(PriorityQueue& Queue, const BBOX_TREE *Node, const BBOX *BBox, const Rayinfo *rayinfo, TraceThreadData *Thread);
-void Priority_Queue_Delete(PriorityQueue& Queue, DBL *key, const BBOX_TREE **Node);
+void Recompute_BBox(BoundingBox *bbox, const TRANSFORM *trans);
+void Recompute_Inverse_BBox(BoundingBox *bbox, const TRANSFORM *trans);
+bool Intersect_BBox_Tree(BBoxPriorityQueue& pqueue, const BBOX_TREE *Root, const Ray& ray, Intersection *Best_Intersection, TraceThreadData *Thread);
+bool Intersect_BBox_Tree(BBoxPriorityQueue& pqueue, const BBOX_TREE *Root, const Ray& ray, Intersection *Best_Intersection, const RayObjectCondition& precondition, const RayObjectCondition& postcondition, TraceThreadData *Thread);
+void Check_And_Enqueue(BBoxPriorityQueue& Queue, const BBOX_TREE *Node, const BoundingBox *BBox, const Rayinfo *rayinfo, TraceThreadData *Thread);
+void Priority_Queue_Delete(BBoxPriorityQueue& Queue, DBL *key, const BBOX_TREE **Node);
 void Destroy_BBox_Tree(BBOX_TREE *Node);
 
 
@@ -129,9 +142,9 @@ void Destroy_BBox_Tree(BBOX_TREE *Node);
 ******************************************************************************/
 
 // Calculate the volume of a bounding box. [DB 8/94]
-inline void BOUNDS_VOLUME(DBL& a, const BBOX& b)
+inline void BOUNDS_VOLUME(DBL& a, const BoundingBox& b)
 {
-	a = b.Lengths[X] * b.Lengths[Y] * b.Lengths[Z];
+	a = b.size[X] * b.size[Y] * b.size[Z];
 }
 
 }
