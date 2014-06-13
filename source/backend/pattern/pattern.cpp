@@ -1,42 +1,47 @@
-/*******************************************************************************
- * pattern.cpp
- *
- * This module implements texturing functions that return a value to be
- * used in a pigment or normal.
- *
- * ---------------------------------------------------------------------------
- * Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
- * Copyright 1991-2013 Persistence of Vision Raytracer Pty. Ltd.
- *
- * POV-Ray is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * POV-Ray is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------------
- * POV-Ray is based on the popular DKB raytracer version 2.12.
- * DKBTrace was originally written by David K. Buck.
- * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
- * ---------------------------------------------------------------------------
- * $File: N/A $
- * $Revision: N/A $
- * $Change: N/A $
- * $DateTime: N/A $
- * $Author: N/A $
- *******************************************************************************/
+//******************************************************************************
+///
+/// @file backend/pattern/pattern.cpp
+///
+/// This module implements texturing functions that return a value to be used in
+/// a pigment or normal.
+///
+/// @copyright
+/// @parblock
+///
+/// Some texture ideas garnered from SIGGRAPH '85 Volume 19 Number 3, "An Image
+/// Synthesizer" By Ken Perlin. Further Ideas Garnered from "The RenderMan
+/// Companion" (Addison Wesley).
+///
+/// ----------------------------------------------------------------------------
+///
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
+/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+///
+/// POV-Ray is free software: you can redistribute it and/or modify
+/// it under the terms of the GNU Affero General Public License as
+/// published by the Free Software Foundation, either version 3 of the
+/// License, or (at your option) any later version.
+///
+/// POV-Ray is distributed in the hope that it will be useful,
+/// but WITHOUT ANY WARRANTY; without even the implied warranty of
+/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+/// GNU Affero General Public License for more details.
+///
+/// You should have received a copy of the GNU Affero General Public License
+/// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+///
+/// ----------------------------------------------------------------------------
+///
+/// POV-Ray is based on the popular DKB raytracer version 2.12.
+/// DKBTrace was originally written by David K. Buck.
+/// DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
+///
+/// @endparblock
+///
+//*******************************************************************************
 
-/*
- * Some texture ideas garnered from SIGGRAPH '85 Volume 19 Number 3,
- * "An Image Synthesizer" By Ken Perlin.
- * Further Ideas Garnered from "The RenderMan Companion" (Addison Wesley).
- */
+#include <climits>
+#include <algorithm>
 
 // frame.h must always be the first POV file included (pulls in platform config)
 #include "backend/frame.h"
@@ -52,10 +57,8 @@
 #include "backend/math/matrices.h"
 #include "backend/vm/fnpovfpu.h"
 #include "backend/support/fileutil.h"
+#include "backend/support/randomsequences.h"
 #include "base/fileinputoutput.h"
-
-#include <algorithm>
-#include <climits>
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -63,164 +66,161 @@
 namespace pov
 {
 
-using namespace pov_base;
-
 /*****************************************************************************
 * Local preprocessor defines
 ******************************************************************************/
 
 #define CLIP_DENSITY(r) { if((r) < 0.0) { (r) = 1.0; } else if((r) > 1.0) { (r) = 0.0; } else { (r) = 1.0 - (r); } }
 
-const int FRACTAL_MAX_EXPONENT = 33;
-
 /*****************************************************************************
 * Local variables
 ******************************************************************************/
 
-static RandomDoubleSequence PatternRands(0.0, 1.0, 32768);
-static int BinomialCoefficients[((FRACTAL_MAX_EXPONENT+1)*(FRACTAL_MAX_EXPONENT+2))/2]; // GLOBAL VARIABLE
-boost::hash<Crackle_Cell_Coord> Crackle_Cell_Hasher;
-static int CrackleCubeTable[81*3];
+static RandomDoubleSequence gPatternRands(0.0, 1.0, 32768);
+static int gaBinomialCoefficients[((kFractalMaxExponent+1)*(kFractalMaxExponent+2))/2]; // GLOBAL VARIABLE
+static int gaCrackleCubeTable[81*3];
+
+// NB: gaDefaultBlendMapEntries_* should be static const in theory, but that complicates matters when referencing them
+// in gDefaultBlendMap_*.
+
+static BLEND_MAP_ENTRY gaDefaultBlendMapEntries_BlackWhite[2] =
+    {{0.0, false, {{0.0, 0.0, 0.0, 0.0, 0.0}}},
+     {1.0, false, {{1.0, 1.0, 1.0, 0.0, 0.0}}}};
+
+static const BLEND_MAP gDefaultBlendMap_Gray =
+    { -1,  2,  false, COLOUR_TYPE,  gaDefaultBlendMapEntries_BlackWhite};
 
 
-static BLEND_MAP_ENTRY Black_White_Entries[2] =
-	{{0.0, false, {{0.0, 0.0, 0.0, 0.0, 0.0}}},
-	 {1.0, false, {{1.0, 1.0, 1.0, 0.0, 0.0}}}};
+static BLEND_MAP_ENTRY gaDefaultBlendMapEntries_Agate[6] =
+    {{0.0, false, {{1.0,  1.0,  1.0,  0.0, 0.0}}},
+     {0.5, false, {{0.95, 0.75, 0.5,  0.0, 0.0}}},
+     {0.5, false, {{0.9,  0.7,  0.5,  0.0, 0.0}}},
+     {0.6, false, {{0.9,  0.7,  0.4,  0.0, 0.0}}},
+     {0.6, false, {{1.0,  0.7,  0.4,  0.0, 0.0}}},
+     {1.0, false, {{0.6,  0.3,  0.0,  0.0, 0.0}}}};
 
-const BLEND_MAP Gray_Default_Map =
-	{ -1,  2,  false, COLOUR_TYPE,  Black_White_Entries};
-
-
-static BLEND_MAP_ENTRY Agate_Entries[6] =
-	{{0.0, false, {{1.0,  1.0,  1.0,  0.0, 0.0}}},
-	 {0.5, false, {{0.95, 0.75, 0.5,  0.0, 0.0}}},
-	 {0.5, false, {{0.9,  0.7,  0.5,  0.0, 0.0}}},
-	 {0.6, false, {{0.9,  0.7,  0.4,  0.0, 0.0}}},
-	 {0.6, false, {{1.0,  0.7,  0.4,  0.0, 0.0}}},
-	 {1.0, false, {{0.6,  0.3,  0.0,  0.0, 0.0}}}};
-
-const BLEND_MAP Agate_Default_Map =
-	{ -1,  6,  false, COLOUR_TYPE,  Agate_Entries};
+static const BLEND_MAP gDefaultBlendMap_Agate =
+    { -1,  6,  false, COLOUR_TYPE,  gaDefaultBlendMapEntries_Agate};
 
 
-static BLEND_MAP_ENTRY Bozo_Entries[6] =
-	{{0.4, false, {{1.0, 1.0, 1.0, 0.0, 0.0}}},
-	 {0.4, false, {{0.0, 1.0, 0.0, 0.0, 0.0}}},
-	 {0.6, false, {{0.0, 1.0, 0.0, 0.0, 0.0}}},
-	 {0.6, false, {{0.0, 0.0, 1.0, 0.0, 0.0}}},
-	 {0.8, false, {{0.0, 0.0, 1.0, 0.0, 0.0}}},
-	 {0.8, false, {{1.0, 0.0, 0.0, 0.0, 0.0}}}};
+static BLEND_MAP_ENTRY gaDefaultBlendMapEntries_Bozo[6] =
+    {{0.4, false, {{1.0, 1.0, 1.0, 0.0, 0.0}}},
+     {0.4, false, {{0.0, 1.0, 0.0, 0.0, 0.0}}},
+     {0.6, false, {{0.0, 1.0, 0.0, 0.0, 0.0}}},
+     {0.6, false, {{0.0, 0.0, 1.0, 0.0, 0.0}}},
+     {0.8, false, {{0.0, 0.0, 1.0, 0.0, 0.0}}},
+     {0.8, false, {{1.0, 0.0, 0.0, 0.0, 0.0}}}};
 
-const BLEND_MAP Bozo_Default_Map =
-	{ -1,  6,  false, COLOUR_TYPE,  Bozo_Entries};
-
-
-static BLEND_MAP_ENTRY Brick_Entries[2] =
-	{{0.0, false, {{0.5, 0.5,  0.5,  0.0, 0.0}}},
-	 {1.0, false, {{0.6, 0.15, 0.15, 0.0, 0.0}}}};
-
-const BLEND_MAP Brick_Default_Map =
-	{ -1,  2,  false, COLOUR_TYPE,  Brick_Entries};
+static const BLEND_MAP gDefaultBlendMap_Bozo =
+    { -1,  6,  false, COLOUR_TYPE,  gaDefaultBlendMapEntries_Bozo};
 
 
-static BLEND_MAP_ENTRY Checker_Entries[2] =
-	{{0.0, false, {{0.0, 0.0, 1.0, 0.0, 0.0}}},
-	 {1.0, false, {{0.0, 1.0, 0.0, 0.0, 0.0}}}};
+static BLEND_MAP_ENTRY gaDefaultBlendMapEntries_Brick[2] =
+    {{0.0, false, {{0.5, 0.5,  0.5,  0.0, 0.0}}},
+     {1.0, false, {{0.6, 0.15, 0.15, 0.0, 0.0}}}};
 
-const BLEND_MAP Checker_Default_Map =
-	{ -1, 2,  false, COLOUR_TYPE,  Checker_Entries};
-
-
-static BLEND_MAP_ENTRY Cubic_Entries[6] =
-	{{0.0, false, {{1.0, 0.0, 0.0, 0.0, 0.0}}},
-	 {1.0, false, {{0.0, 1.0, 0.0, 0.0, 0.0}}}, // TODO FIXME - duplicate entry for 1.0
-	 {1.0, false, {{0.0, 0.0, 1.0, 0.0, 0.0}}}, // TODO FIXME - duplicate entry for 1.0
-	 {1.0, false, {{1.0, 1.0, 0.0, 0.0, 0.0}}}, // TODO FIXME - duplicate entry for 1.0
-	 {1.0, false, {{0.0, 1.0, 1.0, 0.0, 0.0}}}, // TODO FIXME - duplicate entry for 1.0
-	 {2.0, false, {{1.0, 0.0, 1.0, 0.0, 0.0}}}};
-
-const BLEND_MAP Cubic_Default_Map =
-	{ -1, 6,  false, COLOUR_TYPE,  Cubic_Entries};
+static const BLEND_MAP gDefaultBlendMap_Brick =
+    { -1,  2,  false, COLOUR_TYPE,  gaDefaultBlendMapEntries_Brick};
 
 
-static BLEND_MAP_ENTRY Hexagon_Entries[3] =
-	{{0.0, false, {{0.0, 0.0, 1.0, 0.0, 0.0}}},
-	 {1.0, false, {{0.0, 1.0, 0.0, 0.0, 0.0}}},
-	 {2.0, false, {{1.0, 0.0, 0.0, 0.0, 0.0}}}};
+static BLEND_MAP_ENTRY gaDefaultBlendMapEntries_Checker[2] =
+    {{0.0, false, {{0.0, 0.0, 1.0, 0.0, 0.0}}},
+     {1.0, false, {{0.0, 1.0, 0.0, 0.0, 0.0}}}};
 
-const BLEND_MAP Hexagon_Default_Map =
-	{ -1,  3,  false, COLOUR_TYPE,  Hexagon_Entries};
-
-
-static BLEND_MAP_ENTRY Mandel_Entries[5] =
-	{{0.001, false, {{0.0, 0.0, 0.0, 0.0, 0.0}}},
-	 {0.001, false, {{0.0, 1.0, 1.0, 0.0, 0.0}}},
-	 {0.012, false, {{1.0, 1.0, 0.0, 0.0, 0.0}}},
-	 {0.015, false, {{1.0, 0.0, 1.0, 0.0, 0.0}}},
-	 {0.1,   false, {{0.0, 1.0, 1.0, 0.0, 0.0}}}};
-
-const BLEND_MAP Mandel_Default_Map =
-	{ -1,  5,  false, COLOUR_TYPE,  Mandel_Entries};
+static const BLEND_MAP gDefaultBlendMap_Checker =
+    { -1, 2,  false, COLOUR_TYPE,  gaDefaultBlendMapEntries_Checker};
 
 
-static BLEND_MAP_ENTRY Marble_Entries[3] =
-	{{0.0, false, {{0.9, 0.8,  0.8,  0.0, 0.0}}},
-	 {0.9, false, {{0.9, 0.08, 0.08, 0.0, 0.0}}},
-	 {0.9, false, {{0.0, 0.0, 0.0, 0.0, 0.0}}}};
+static BLEND_MAP_ENTRY gaDefaultBlendMapEntries_Cubic[6] =
+    {{0.0, false, {{1.0, 0.0, 0.0, 0.0, 0.0}}},
+     {1.0, false, {{0.0, 1.0, 0.0, 0.0, 0.0}}}, // TODO FIXME - duplicate entry for 1.0
+     {1.0, false, {{0.0, 0.0, 1.0, 0.0, 0.0}}}, // TODO FIXME - duplicate entry for 1.0
+     {1.0, false, {{1.0, 1.0, 0.0, 0.0, 0.0}}}, // TODO FIXME - duplicate entry for 1.0
+     {1.0, false, {{0.0, 1.0, 1.0, 0.0, 0.0}}}, // TODO FIXME - duplicate entry for 1.0
+     {2.0, false, {{1.0, 0.0, 1.0, 0.0, 0.0}}}};
 
-const BLEND_MAP Marble_Default_Map =
-	{ -1,  3,  false, COLOUR_TYPE,  Marble_Entries};
-
-
-static BLEND_MAP_ENTRY Radial_Entries[4] =
-	{{0.0,   false, {{0.0, 1.0, 1.0, 0.0, 0.0}}},
-	 {0.333, false, {{1.0, 1.0, 0.0, 0.0, 0.0}}},
-	 {0.666, false, {{1.0, 0.0, 1.0, 0.0, 0.0}}},
-	 {1.0,   false, {{0.0, 1.0, 1.0, 0.0, 0.0}}}};
-
-const BLEND_MAP Radial_Default_Map =
-	{ -1,  4,  false, COLOUR_TYPE,  Radial_Entries};
+static const BLEND_MAP gDefaultBlendMap_Cubic =
+    { -1, 6,  false, COLOUR_TYPE,  gaDefaultBlendMapEntries_Cubic};
 
 
-static BLEND_MAP_ENTRY Square_Entries[6] =
-	{{0.0, false, {{1.0, 0.0, 0.0, 0.0, 0.0}}},
-	 {1.0, false, {{0.0, 1.0, 0.0, 0.0, 0.0}}}, // TODO FIXME - duplicate entry for 1.0
-	 {1.0, false, {{0.0, 0.0, 1.0, 0.0, 0.0}}}, // TODO FIXME - duplicate entry for 1.0
-	 {1.0, false, {{1.0, 1.0, 0.0, 0.0, 0.0}}}, // TODO FIXME - duplicate entry for 1.0
-	 {1.0, false, {{0.0, 1.0, 1.0, 0.0, 0.0}}}, // TODO FIXME - unused duplicate entry for 1.0
-	 {2.0, false, {{1.0, 0.0, 1.0, 0.0, 0.0}}}}; // TODO FIXME - unused entry (kept around until we've clarified the duplicate entries for 1.0)
+static BLEND_MAP_ENTRY gaDefaultBlendMapEntries_Hexagon[3] =
+    {{0.0, false, {{0.0, 0.0, 1.0, 0.0, 0.0}}},
+     {1.0, false, {{0.0, 1.0, 0.0, 0.0, 0.0}}},
+     {2.0, false, {{1.0, 0.0, 0.0, 0.0, 0.0}}}};
 
-const BLEND_MAP Square_Default_Map =
-	{ -1, 4,  false, COLOUR_TYPE,  Square_Entries};
+static const BLEND_MAP gDefaultBlendMap_Hexagon =
+    { -1,  3,  false, COLOUR_TYPE,  gaDefaultBlendMapEntries_Hexagon};
 
 
-static BLEND_MAP_ENTRY Triangular_Entries[6] =
-	{{0.0, false, {{1.0, 0.0, 0.0, 0.0, 0.0}}},
-	 {1.0, false, {{0.0, 1.0, 0.0, 0.0, 0.0}}}, // TODO FIXME - duplicate entry for 1.0
-	 {1.0, false, {{0.0, 0.0, 1.0, 0.0, 0.0}}}, // TODO FIXME - duplicate entry for 1.0
-	 {1.0, false, {{1.0, 1.0, 0.0, 0.0, 0.0}}}, // TODO FIXME - duplicate entry for 1.0
-	 {1.0, false, {{0.0, 1.0, 1.0, 0.0, 0.0}}}, // TODO FIXME - duplicate entry for 1.0
-	 {2.0, false, {{1.0, 0.0, 1.0, 0.0, 0.0}}}};
+static BLEND_MAP_ENTRY gaDefaultBlendMapEntries_Mandel[5] =
+    {{0.001, false, {{0.0, 0.0, 0.0, 0.0, 0.0}}},
+     {0.001, false, {{0.0, 1.0, 1.0, 0.0, 0.0}}},
+     {0.012, false, {{1.0, 1.0, 0.0, 0.0, 0.0}}},
+     {0.015, false, {{1.0, 0.0, 1.0, 0.0, 0.0}}},
+     {0.1,   false, {{0.0, 1.0, 1.0, 0.0, 0.0}}}};
 
-const BLEND_MAP Triangular_Default_Map =
-	{ -1, 6,  false, COLOUR_TYPE,  Triangular_Entries};
+static const BLEND_MAP gDefaultBlendMap_Mandel =
+    { -1,  5,  false, COLOUR_TYPE,  gaDefaultBlendMapEntries_Mandel};
 
 
-static BLEND_MAP_ENTRY Wood_Entries[2] =
-	{{0.6, false, {{0.666, 0.312,  0.2,   0.0, 0.0}}},
-	 {0.6, false, {{0.4,   0.1333, 0.066, 0.0, 0.0}}}};
+static BLEND_MAP_ENTRY gaDefaultBlendMapEntries_Marble[3] =
+    {{0.0, false, {{0.9, 0.8,  0.8,  0.0, 0.0}}},
+     {0.9, false, {{0.9, 0.08, 0.08, 0.0, 0.0}}},
+     {0.9, false, {{0.0, 0.0, 0.0, 0.0, 0.0}}}};
 
-const BLEND_MAP Wood_Default_Map =
-	{ -1,  2,  false, COLOUR_TYPE,  Wood_Entries};
+static const BLEND_MAP gDefaultBlendMap_Marble =
+    { -1,  3,  false, COLOUR_TYPE,  gaDefaultBlendMapEntries_Marble};
+
+
+static BLEND_MAP_ENTRY gaDefaultBlendMapEntries_Radial[4] =
+    {{0.0,   false, {{0.0, 1.0, 1.0, 0.0, 0.0}}},
+     {0.333, false, {{1.0, 1.0, 0.0, 0.0, 0.0}}},
+     {0.666, false, {{1.0, 0.0, 1.0, 0.0, 0.0}}},
+     {1.0,   false, {{0.0, 1.0, 1.0, 0.0, 0.0}}}};
+
+static const BLEND_MAP gDefaultBlendMap_Radial =
+    { -1,  4,  false, COLOUR_TYPE,  gaDefaultBlendMapEntries_Radial};
+
+
+static BLEND_MAP_ENTRY gaDefaultBlendMapEntries_Square[6] =
+    {{0.0, false, {{1.0, 0.0, 0.0, 0.0, 0.0}}},
+     {1.0, false, {{0.0, 1.0, 0.0, 0.0, 0.0}}}, // TODO FIXME - duplicate entry for 1.0
+     {1.0, false, {{0.0, 0.0, 1.0, 0.0, 0.0}}}, // TODO FIXME - duplicate entry for 1.0
+     {1.0, false, {{1.0, 1.0, 0.0, 0.0, 0.0}}}, // TODO FIXME - duplicate entry for 1.0
+     {1.0, false, {{0.0, 1.0, 1.0, 0.0, 0.0}}}, // TODO FIXME - unused duplicate entry for 1.0
+     {2.0, false, {{1.0, 0.0, 1.0, 0.0, 0.0}}}}; // TODO FIXME - unused entry (kept around until we've clarified the duplicate entries for 1.0)
+
+static const BLEND_MAP gDefaultBlendMap_Square =
+    { -1, 4,  false, COLOUR_TYPE,  gaDefaultBlendMapEntries_Square};
+
+
+static BLEND_MAP_ENTRY gaDefaultBlendMapEntries_Triangular[6] =
+    {{0.0, false, {{1.0, 0.0, 0.0, 0.0, 0.0}}},
+     {1.0, false, {{0.0, 1.0, 0.0, 0.0, 0.0}}}, // TODO FIXME - duplicate entry for 1.0
+     {1.0, false, {{0.0, 0.0, 1.0, 0.0, 0.0}}}, // TODO FIXME - duplicate entry for 1.0
+     {1.0, false, {{1.0, 1.0, 0.0, 0.0, 0.0}}}, // TODO FIXME - duplicate entry for 1.0
+     {1.0, false, {{0.0, 1.0, 1.0, 0.0, 0.0}}}, // TODO FIXME - duplicate entry for 1.0
+     {2.0, false, {{1.0, 0.0, 1.0, 0.0, 0.0}}}};
+
+static const BLEND_MAP gDefaultBlendMap_Triangular =
+    { -1, 6,  false, COLOUR_TYPE,  gaDefaultBlendMapEntries_Triangular};
+
+
+static BLEND_MAP_ENTRY gaDefaultBlendMapEntries_Wood[2] =
+    {{0.6, false, {{0.666, 0.312,  0.2,   0.0, 0.0}}},
+     {0.6, false, {{0.4,   0.1333, 0.066, 0.0, 0.0}}}};
+
+static const BLEND_MAP gDefaultBlendMap_Wood =
+    { -1,  2,  false, COLOUR_TYPE,  gaDefaultBlendMapEntries_Wood};
 
 
 /*****************************************************************************
 * Static functions
 ******************************************************************************/
 
-static const TURB *Search_For_Turb(const WARP *Warps);
-static unsigned short readushort(IStream *infile);
-static unsigned int readuint(IStream *infile);
+static const TURB *SearchForTurb(const WARP *pWarps);
+static unsigned short ReadUShort(IStream *pInFile);
+static unsigned int ReadUInt(IStream *pInFile);
 
 #define SQRT3_2     0.86602540378443864676372317075294  ///< sqrt(3)/2
 #define SQRT3       1.7320508075688772935274463415059   ///< sqrt(3)
@@ -260,271 +260,332 @@ static unsigned int readuint(IStream *infile);
 
 /*****************************************************************************/
 
-int GetNoiseGen (const TPATTERN *TPat, const TraceThreadData *Thread)
+int GetNoiseGen (const TPATTERN *TPat, const TraceThreadData *pThread)
 {
-	int noise_gen = TPat->pattern->noiseGenerator;
-	if (!noise_gen)
-		noise_gen = Thread->GetSceneData()->noiseGenerator;
-	return noise_gen;
+    int noise_gen = TPat->pattern->noiseGenerator;
+    if (noise_gen == kNoiseGen_Default)
+        noise_gen = pThread->GetSceneData()->noiseGenerator;
+    return noise_gen;
 }
 
 
 BasicPattern::BasicPattern() :
-	Wave_Type(RAMP_WAVE),
-	noiseGenerator(0),
-	Frequency(1.0),
-	Phase(0.0),
-	Exponent(1.0),
-	Warps(NULL)
+    noiseGenerator(kNoiseGen_Default),
+    pWarps(NULL)
 {}
 
 BasicPattern::BasicPattern(const BasicPattern& obj) :
-	Wave_Type(obj.Wave_Type),
-	noiseGenerator(obj.noiseGenerator),
-	Frequency(obj.Frequency),
-	Phase(obj.Phase),
-	Exponent(obj.Exponent),
-	Warps(NULL)
+    noiseGenerator(obj.noiseGenerator),
+    pWarps(NULL)
 {
-	if (obj.Warps)
-		Warps = Copy_Warps(obj.Warps);
+    if (obj.pWarps)
+        pWarps = Copy_Warps(obj.pWarps);
 }
 
 BasicPattern::~BasicPattern()
 {
-	if (Warps)
-		Destroy_Warps(Warps);
+    if (pWarps)
+        Destroy_Warps(pWarps);
 }
 
-int BasicPattern::GetNoiseGen(const TraceThreadData *Thread) const
+int BasicPattern::GetNoiseGen(const TraceThreadData *pThread) const
 {
-	int noise_gen = noiseGenerator;
-	if (!noise_gen)
-		noise_gen = Thread->GetSceneData()->noiseGenerator;
-	return noise_gen;
+    int noise_gen = noiseGenerator;
+    if (noise_gen == kNoiseGen_Default)
+        noise_gen = pThread->GetSceneData()->noiseGenerator;
+    return noise_gen;
 }
 
-const BLEND_MAP* BasicPattern::GetDefaultBlendMap() const { return &Gray_Default_Map; }
+const BLEND_MAP* BasicPattern::GetDefaultBlendMap() const { return &gDefaultBlendMap_Gray; }
 
 
-const BLEND_MAP* AgatePattern::GetDefaultBlendMap() const { return &Agate_Default_Map; }
+ContinuousPattern::ContinuousPattern() :
+    BasicPattern(),
+    waveType(kWaveType_Ramp),
+    waveFrequency(1.0),
+    wavePhase(0.0),
+    waveExponent(1.0)
+{}
 
-const BLEND_MAP* BozoPattern::GetDefaultBlendMap() const { return &Bozo_Default_Map; }
+ContinuousPattern::ContinuousPattern(const ContinuousPattern& obj) :
+    BasicPattern(obj),
+    waveType(obj.waveType),
+    waveFrequency(obj.waveFrequency),
+    wavePhase(obj.wavePhase),
+    waveExponent(obj.waveExponent)
+{}
 
-const BLEND_MAP* BrickPattern::GetDefaultBlendMap() const { return &Brick_Default_Map; }
-unsigned int BrickPattern::NumBlendMapEntries() const { return 2; }
+DBL ContinuousPattern::Evaluate(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
+{
+    DBL value = EvaluateRaw(EPoint, pIsection, pRay, pThread);
 
-const BLEND_MAP* CheckerPattern::GetDefaultBlendMap() const { return &Checker_Default_Map; }
-unsigned int CheckerPattern::NumBlendMapEntries() const { return 2; }
+    if(waveFrequency != 0.0)
+        value = fmod(value * waveFrequency + wavePhase, 1.00001); // TODO FIXME - magic number! Should be 1.0+SOME_EPSILON (or maybe actually 1.0?)
 
-const BLEND_MAP* CubicPattern::GetDefaultBlendMap() const { return &Cubic_Default_Map; }
-unsigned int CubicPattern::NumBlendMapEntries() const { return 6; }
+    /* allow negative frequency */
+    if(value < 0.0)
+        value -= floor(value);
+
+    switch(waveType)
+    {
+        case kWaveType_Ramp:
+            break;
+        case kWaveType_Sine:
+            value = (1.0 + cycloidal(value)) * 0.5;
+            break;
+        case kWaveType_Triangle:
+            value = Triangle_Wave(value);
+            break;
+        case kWaveType_Scallop:
+            value = fabs(cycloidal(value * 0.5));
+            break;
+        case kWaveType_Cubic:
+            value = Sqr(value) * ((-2.0 * value) + 3.0);
+            break;
+        case kWaveType_Poly:
+            value = pow(value, (DBL) waveExponent);
+            break;
+        default:
+            throw POV_EXCEPTION_STRING("Unknown Wave Type.");
+    }
+
+    return value;
+}
+
+unsigned int ContinuousPattern::NumDiscreteBlendMapEntries() const { return 0; }
+
+
+unsigned int PlainPattern::NumDiscreteBlendMapEntries() const { return 1; }
+
+
+const BLEND_MAP* AgatePattern::GetDefaultBlendMap() const { return &gDefaultBlendMap_Agate; }
+
+const BLEND_MAP* BozoPattern::GetDefaultBlendMap() const { return &gDefaultBlendMap_Bozo; }
+
+const BLEND_MAP* BrickPattern::GetDefaultBlendMap() const { return &gDefaultBlendMap_Brick; }
+unsigned int BrickPattern::NumDiscreteBlendMapEntries() const { return 2; }
+
+const BLEND_MAP* CheckerPattern::GetDefaultBlendMap() const { return &gDefaultBlendMap_Checker; }
+unsigned int CheckerPattern::NumDiscreteBlendMapEntries() const { return 2; }
+
+const BLEND_MAP* CubicPattern::GetDefaultBlendMap() const { return &gDefaultBlendMap_Cubic; }
+unsigned int CubicPattern::NumDiscreteBlendMapEntries() const { return 6; }
 
 
 DensityFilePattern::DensityFilePattern() :
-	Density_File(NULL)
+    densityFile(NULL)
 {}
 
 DensityFilePattern::DensityFilePattern(const DensityFilePattern& obj) :
-	BasicPattern(obj),
-	Density_File(NULL)
+    ContinuousPattern(obj),
+    densityFile(NULL)
 {
-	if (obj.Density_File)
-		Density_File = Copy_Density_File(obj.Density_File);
+    if (obj.densityFile)
+        densityFile = Copy_Density_File(obj.densityFile);
 }
 
 DensityFilePattern::~DensityFilePattern()
 {
-	if (Density_File)
-		Destroy_Density_File(Density_File);
+    if (densityFile)
+        Destroy_Density_File(densityFile);
 }
 
 
-DBL FacetsPattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
+DBL FacetsPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
-	throw POV_EXCEPTION_STRING("Internal Error: FacetsPattern::operator() called.");
+    throw POV_EXCEPTION_STRING("Internal Error: FacetsPattern::EvaluateRaw() called.");
 }
 
 
 FunctionPattern::FunctionPattern() :
-	Fn(NULL), vm(NULL), Data(0)
+    pFn(NULL), pVm(NULL), contextId(0)
 {}
 
 FunctionPattern::FunctionPattern(const FunctionPattern& obj) :
-	BasicPattern(obj),
-	Fn(NULL), vm(obj.vm), Data(obj.Data)
+    ContinuousPattern(obj),
+    pFn(NULL), pVm(obj.pVm), contextId(obj.contextId)
 {
-	if (obj.Fn)
-		Fn = reinterpret_cast<void *>(Parser::Copy_Function(obj.vm, (FUNCTION_PTR)obj.Fn));
+    if (obj.pFn)
+        pFn = reinterpret_cast<void *>(Parser::Copy_Function(obj.pVm, (FUNCTION_PTR)obj.pFn));
 }
 
 FunctionPattern::~FunctionPattern()
 {
-	if (Fn)
-		Parser::Destroy_Function(vm, (FUNCTION_PTR)Fn);
+    if (pFn)
+        Parser::Destroy_Function(pVm, (FUNCTION_PTR)pFn);
 }
 
 
-const BLEND_MAP* HexagonPattern::GetDefaultBlendMap() const { return &Hexagon_Default_Map; }
-unsigned int HexagonPattern::NumBlendMapEntries() const { return 3; }
+const BLEND_MAP* HexagonPattern::GetDefaultBlendMap() const { return &gDefaultBlendMap_Hexagon; }
+unsigned int HexagonPattern::NumDiscreteBlendMapEntries() const { return 3; }
 
 
 ImagePattern::ImagePattern() :
-	image(NULL)
+    pImage(NULL)
 {}
 
 ImagePattern::ImagePattern(const ImagePattern& obj) :
-	BasicPattern(obj),
-	image(NULL)
+    ContinuousPattern(obj),
+    pImage(NULL)
 {
-	if (obj.image)
-		image = Copy_Image(obj.image);
+    if (obj.pImage)
+        pImage = Copy_Image(obj.pImage);
 }
 
 ImagePattern::~ImagePattern()
 {
-	if (image)
-		Destroy_Image(image);
+    if (pImage)
+        Destroy_Image(pImage);
 }
 
-DBL ImagePattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
+DBL ImagePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
-	throw POV_EXCEPTION_STRING("Internal Error: ImagePattern::operator() called.");
+    throw POV_EXCEPTION_STRING("Internal Error: ImagePattern::EvaluateRaw() called.");
 }
 
 
-const BLEND_MAP* MarblePattern::GetDefaultBlendMap() const { return &Marble_Default_Map; }
+const BLEND_MAP* MarblePattern::GetDefaultBlendMap() const { return &gDefaultBlendMap_Marble; }
 
 
 ObjectPattern::ObjectPattern() :
-	Object(NULL)
+    pObject(NULL)
 {}
 
 ObjectPattern::ObjectPattern(const ObjectPattern& obj) :
-	DiscretePattern(obj),
-	Object(NULL)
+    DiscretePattern(obj),
+    pObject(NULL)
 {
-	if (obj.Object)
-		Object = Copy_Object(obj.Object);
+    if (obj.pObject)
+        pObject = Copy_Object(obj.pObject);
 }
 
 ObjectPattern::~ObjectPattern()
 {
-	if (Object)
-		Destroy_Object(Object);
+    if (pObject)
+        Destroy_Object(pObject);
 }
 
-const BLEND_MAP* ObjectPattern::GetDefaultBlendMap() const { return &Checker_Default_Map; } // sic!
-unsigned int ObjectPattern::NumBlendMapEntries() const { return 2; }
+const BLEND_MAP* ObjectPattern::GetDefaultBlendMap() const { return &gDefaultBlendMap_Checker; } // sic!
+unsigned int ObjectPattern::NumDiscreteBlendMapEntries() const { return 2; }
 
 
 PigmentPattern::PigmentPattern() :
-	Pigment(NULL)
+    pPigment(NULL)
 {}
 
 PigmentPattern::PigmentPattern(const PigmentPattern& obj) :
-	BasicPattern(obj),
-	Pigment(NULL)
+    ContinuousPattern(obj),
+    pPigment(NULL)
 {
-	if (obj.Pigment)
-		Pigment = Copy_Pigment(obj.Pigment);
+    if (obj.pPigment)
+        pPigment = Copy_Pigment(obj.pPigment);
 }
 
 PigmentPattern::~PigmentPattern()
 {
-	if (Pigment)
-		Destroy_Pigment(Pigment);
+    if (pPigment)
+        Destroy_Pigment(pPigment);
 }
 
 
-const BLEND_MAP* RadialPattern::GetDefaultBlendMap() const { return &Radial_Default_Map; }
+const BLEND_MAP* RadialPattern::GetDefaultBlendMap() const { return &gDefaultBlendMap_Radial; }
 
-const BLEND_MAP* SquarePattern::GetDefaultBlendMap() const { return &Square_Default_Map; }
-unsigned int SquarePattern::NumBlendMapEntries() const { return 4; }
+const BLEND_MAP* SquarePattern::GetDefaultBlendMap() const { return &gDefaultBlendMap_Square; }
+unsigned int SquarePattern::NumDiscreteBlendMapEntries() const { return 4; }
 
-const BLEND_MAP* TriangularPattern::GetDefaultBlendMap() const { return &Triangular_Default_Map; }
-unsigned int TriangularPattern::NumBlendMapEntries() const { return 6; }
+const BLEND_MAP* TriangularPattern::GetDefaultBlendMap() const { return &gDefaultBlendMap_Triangular; }
+unsigned int TriangularPattern::NumDiscreteBlendMapEntries() const { return 6; }
 
-const BLEND_MAP* WoodPattern::GetDefaultBlendMap() const { return &Wood_Default_Map; }
+const BLEND_MAP* WoodPattern::GetDefaultBlendMap() const { return &gDefaultBlendMap_Wood; }
 
 
 JuliaPattern::JuliaPattern() :
-	FractalPattern(),
-	Coord()
+    FractalPattern(),
+    juliaCoord()
 {}
 
 JuliaPattern::JuliaPattern(const JuliaPattern& obj) :
-	FractalPattern(obj),
-	Coord(obj.Coord)
+    FractalPattern(obj),
+    juliaCoord(obj.juliaCoord)
 {}
 
 
 Julia3Pattern::Julia3Pattern() :
-	JuliaPattern()
+    JuliaPattern()
 {}
 
 Julia3Pattern::Julia3Pattern(const JuliaPattern& obj) :
-	JuliaPattern(obj)
+    JuliaPattern(obj)
 {}
 
 
 Julia4Pattern::Julia4Pattern() :
-	JuliaPattern()
+    JuliaPattern()
 {}
 
 Julia4Pattern::Julia4Pattern(const JuliaPattern& obj) :
-	JuliaPattern(obj)
+    JuliaPattern(obj)
 {}
 
 
 JuliaXPattern::JuliaXPattern() :
-	JuliaPattern(),
-	Exponent(0.0)
+    JuliaPattern(),
+    fractalExponent(0.0)
 {}
 
 JuliaXPattern::JuliaXPattern(const JuliaPattern& obj) :
-	JuliaPattern(obj),
-	Exponent(obj.Exponent)
+    JuliaPattern(obj),
+    fractalExponent(0.0)
+{}
+
+JuliaXPattern::JuliaXPattern(const JuliaXPattern& obj) :
+    JuliaPattern(obj),
+    fractalExponent(obj.fractalExponent)
 {}
 
 
 Mandel2Pattern::Mandel2Pattern() :
-	MandelPattern()
+    MandelPattern()
 {}
 
 Mandel2Pattern::Mandel2Pattern(const MandelPattern& obj) :
-	MandelPattern(obj)
+    MandelPattern(obj)
 {}
 
-const BLEND_MAP* Mandel2Pattern::GetDefaultBlendMap() const { return &Mandel_Default_Map; }
+const BLEND_MAP* Mandel2Pattern::GetDefaultBlendMap() const { return &gDefaultBlendMap_Mandel; }
 
 
 Mandel3Pattern::Mandel3Pattern() :
-	MandelPattern()
+    MandelPattern()
 {}
 
 Mandel3Pattern::Mandel3Pattern(const MandelPattern& obj) :
-	MandelPattern(obj)
+    MandelPattern(obj)
 {}
 
 
 Mandel4Pattern::Mandel4Pattern() :
-	MandelPattern()
+    MandelPattern()
 {}
 
 Mandel4Pattern::Mandel4Pattern(const MandelPattern& obj) :
-	MandelPattern(obj)
+    MandelPattern(obj)
 {}
 
 
 MandelXPattern::MandelXPattern() :
-	MandelPattern(),
-	Exponent(0.0)
+    MandelPattern(),
+    fractalExponent(0.0)
 {}
 
 MandelXPattern::MandelXPattern(const MandelPattern& obj) :
-	MandelPattern(obj),
-	Exponent(obj.Exponent)
+    MandelPattern(obj),
+    fractalExponent(0.0)
+{}
+
+MandelXPattern::MandelXPattern(const MandelXPattern& obj) :
+    MandelPattern(obj),
+    fractalExponent(obj.fractalExponent)
 {}
 
 
@@ -542,62 +603,26 @@ MandelXPattern::MandelXPattern(const MandelPattern& obj) :
 *   is evaluated.
 *   TPat   -- Texture pattern struct
 *   Intersection - intersection structure
-*   
+*
 * OUTPUT
-*   
+*
 * RETURNS
 *
 *   DBL result usual 0.0 to 1.0 but may be 2.0 in hexagon
-*   
+*
 * AUTHOR
 *
 *   Adapted from Add_Pigment by Chris Young
-*   
+*
 * DESCRIPTION
 *
 * CHANGES
 *
 ******************************************************************************/
 
-DBL Evaluate_TPat (const TPATTERN *TPat, const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread)
+DBL Evaluate_TPat (const TPATTERN *TPat, const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread)
 {
-	DBL value = 0.0;
-
-	/* NK 19 Nov 1999 removed Warp_EPoint call */
-
-	value = (*TPat->pattern)(EPoint, Isection, ray, Thread);
-
-	if(TPat->pattern->Frequency != 0.0)
-		value = fmod(value * TPat->pattern->Frequency + TPat->pattern->Phase, 1.00001); // TODO FIXME - magic number! Should be 1.0+SOME_EPSILON (or maybe actually 1.0?)
-
-	/* allow negative Frequency */
-	if(value < 0.0)
-		value -= floor(value);
-
-	switch(TPat->pattern->Wave_Type)
-	{
-		case RAMP_WAVE:
-			break;
-		case SINE_WAVE:
-			value = (1.0 + cycloidal(value)) * 0.5;
-			break;
-		case TRIANGLE_WAVE:
-			value = Triangle_Wave(value);
-			break;
-		case SCALLOP_WAVE:
-			value = fabs(cycloidal(value * 0.5));
-			break;
-		case CUBIC_WAVE:
-			value = Sqr(value) * ((-2.0 * value) + 3.0);
-			break;
-		case POLY_WAVE:
-			value = pow(value, (DBL) TPat->pattern->Exponent);
-			break;
-		default:
-			throw POV_EXCEPTION_STRING("Unknown Wave Type.");
-	}
-
-	return value;
+    return TPat->pattern->Evaluate(EPoint, pIsection, pRay, pThread);
 }
 
 
@@ -621,9 +646,9 @@ DBL Evaluate_TPat (const TPATTERN *TPat, const Vector3d& EPoint, const Intersect
 
 void Init_TPat_Fields (TPATTERN *Tpat)
 {
-	Tpat->Type       = NO_PATTERN;
-	Tpat->Flags      = NO_FLAGS;
-	Tpat->Blend_Map  = NULL;
+    Tpat->Type       = NO_PATTERN;
+    Tpat->Flags      = NO_FLAGS;
+    Tpat->Blend_Map  = NULL;
 }
 
 
@@ -647,14 +672,14 @@ void Init_TPat_Fields (TPATTERN *Tpat)
 
 void Copy_TPat_Fields (TPATTERN *New, const TPATTERN *Old)
 {
-	*New = *Old;
+    *New = *Old;
 
-	New->Blend_Map = Copy_Blend_Map(Old->Blend_Map);
+    New->Blend_Map = Copy_Blend_Map(Old->Blend_Map);
 
-	if (Old->pattern)
-		New->pattern = Old->pattern->Clone();
-	else
-		New->pattern.reset();
+    if (Old->pattern)
+        New->pattern = Old->pattern->Clone();
+    else
+        New->pattern.reset();
 }
 
 
@@ -678,10 +703,10 @@ void Copy_TPat_Fields (TPATTERN *New, const TPATTERN *Old)
 
 void Destroy_TPat_Fields(TPATTERN *Tpat)
 {
-	Destroy_Blend_Map(Tpat->Blend_Map);
+    Destroy_Blend_Map(Tpat->Blend_Map);
 
-	if (Tpat->pattern)
-		Tpat->pattern.reset();
+    if (Tpat->pattern)
+        Tpat->pattern.reset();
 }
 
 
@@ -705,17 +730,17 @@ void Destroy_TPat_Fields(TPATTERN *Tpat)
 
 TURB *Create_Turb()
 {
-	TURB *New;
+    TURB *New;
 
-	New = reinterpret_cast<TURB *>(POV_MALLOC(sizeof(TURB),"turbulence struct"));
+    New = reinterpret_cast<TURB *>(POV_MALLOC(sizeof(TURB),"turbulence struct"));
 
-	New->Turbulence = Vector3d(0.0, 0.0, 0.0);
+    New->Turbulence = Vector3d(0.0, 0.0, 0.0);
 
-	New->Octaves = 6;
-	New->Omega = 0.5;
-	New->Lambda = 2.0;
+    New->Octaves = 6;
+    New->Omega = 0.5;
+    New->Lambda = 2.0;
 
-	return(New);
+    return(New);
 }
 
 
@@ -743,14 +768,14 @@ TURB *Create_Turb()
 
 void Translate_Tpattern(TPATTERN *Tpattern, const Vector3d& Vector)
 {
-	TRANSFORM Trans;
+    TRANSFORM Trans;
 
-	if (Tpattern != NULL)
-	{
-		Compute_Translation_Transform (&Trans, Vector);
+    if (Tpattern != NULL)
+    {
+        Compute_Translation_Transform (&Trans, Vector);
 
-		Transform_Tpattern (Tpattern, &Trans);
-	}
+        Transform_Tpattern (Tpattern, &Trans);
+    }
 }
 
 
@@ -778,14 +803,14 @@ void Translate_Tpattern(TPATTERN *Tpattern, const Vector3d& Vector)
 
 void Rotate_Tpattern(TPATTERN *Tpattern, const Vector3d& Vector)
 {
-	TRANSFORM Trans;
+    TRANSFORM Trans;
 
-	if (Tpattern != NULL)
-	{
-		Compute_Rotation_Transform (&Trans, Vector);
+    if (Tpattern != NULL)
+    {
+        Compute_Rotation_Transform (&Trans, Vector);
 
-		Transform_Tpattern (Tpattern, &Trans);
-	}
+        Transform_Tpattern (Tpattern, &Trans);
+    }
 }
 
 
@@ -813,14 +838,14 @@ void Rotate_Tpattern(TPATTERN *Tpattern, const Vector3d& Vector)
 
 void Scale_Tpattern(TPATTERN *Tpattern, const Vector3d& Vector)
 {
-	TRANSFORM Trans;
+    TRANSFORM Trans;
 
-	if (Tpattern != NULL)
-	{
-		Compute_Scaling_Transform (&Trans, Vector);
+    if (Tpattern != NULL)
+    {
+        Compute_Scaling_Transform (&Trans, Vector);
 
-		Transform_Tpattern (Tpattern, &Trans);
-	}
+        Transform_Tpattern (Tpattern, &Trans);
+    }
 }
 
 
@@ -848,30 +873,30 @@ void Scale_Tpattern(TPATTERN *Tpattern, const Vector3d& Vector)
 
 void Transform_Tpattern(TPATTERN *Tpattern, const TRANSFORM *Trans)
 {
-	WARP *Temp;
+    WARP *Temp;
 
-	if ((Tpattern != NULL) && (Tpattern->pattern != NULL))
-	{
-		if (Tpattern->pattern->Warps == NULL)
-		{
-			Tpattern->pattern->Warps = Create_Warp(TRANSFORM_WARP);
-		}
-		else
-		{
-			if (Tpattern->pattern->Warps->Warp_Type != TRANSFORM_WARP)
-			{
-				Temp = Tpattern->pattern->Warps;
+    if ((Tpattern != NULL) && (Tpattern->pattern != NULL))
+    {
+        if (Tpattern->pattern->pWarps == NULL)
+        {
+            Tpattern->pattern->pWarps = Create_Warp(TRANSFORM_WARP);
+        }
+        else
+        {
+            if (Tpattern->pattern->pWarps->Warp_Type != TRANSFORM_WARP)
+            {
+                Temp = Tpattern->pattern->pWarps;
 
-				Tpattern->pattern->Warps = Create_Warp(TRANSFORM_WARP);
+                Tpattern->pattern->pWarps = Create_Warp(TRANSFORM_WARP);
 
-				Tpattern->pattern->Warps->Next_Warp = Temp;
-				if(Tpattern->pattern->Warps->Next_Warp != NULL)
-					Tpattern->pattern->Warps->Next_Warp->Prev_Warp = Tpattern->pattern->Warps;
-			}
-		}
+                Tpattern->pattern->pWarps->Next_Warp = Temp;
+                if(Tpattern->pattern->pWarps->Next_Warp != NULL)
+                    Tpattern->pattern->pWarps->Next_Warp->Prev_Warp = Tpattern->pattern->pWarps;
+            }
+        }
 
-		Compose_Transforms (&( (reinterpret_cast<TRANS *>(Tpattern->pattern->Warps))->Trans), Trans);
-	}
+        Compose_Transforms (&( (reinterpret_cast<TRANS *>(Tpattern->pattern->pWarps))->Trans), Trans);
+    }
 }
 
 
@@ -895,32 +920,32 @@ void Transform_Tpattern(TPATTERN *Tpattern, const TRANSFORM *Trans)
 
 void Search_Blend_Map (DBL value, const BLEND_MAP *Blend_Map, const BLEND_MAP_ENTRY **Prev, const BLEND_MAP_ENTRY **Cur)
 {
-	BLEND_MAP_ENTRY *P, *C;
-	int Max_Ent=Blend_Map->Number_Of_Entries-1;
+    BLEND_MAP_ENTRY *P, *C;
+    int Max_Ent=Blend_Map->Number_Of_Entries-1;
 
-	/* if greater than last, use last. */
+    /* if greater than last, use last. */
 
-	if (value >= Blend_Map->Blend_Map_Entries[Max_Ent].value)
-	{
-		P = C = &(Blend_Map->Blend_Map_Entries[Max_Ent]);
-	}
-	else
-	{
-		P = C = &(Blend_Map->Blend_Map_Entries[0]);
+    if (value >= Blend_Map->Blend_Map_Entries[Max_Ent].value)
+    {
+        P = C = &(Blend_Map->Blend_Map_Entries[Max_Ent]);
+    }
+    else
+    {
+        P = C = &(Blend_Map->Blend_Map_Entries[0]);
 
-		while (value > C->value)
-		{
-			P = C++;
-		}
-	}
+        while (value > C->value)
+        {
+            P = C++;
+        }
+    }
 
-	if (value == C->value)
-	{
-		P = C;
-	}
+    if (value == C->value)
+    {
+        P = C;
+    }
 
-	*Prev = P;
-	*Cur  = C;
+    *Prev = P;
+    *Cur  = C;
 }
 
 
@@ -942,33 +967,33 @@ void Search_Blend_Map (DBL value, const BLEND_MAP *Blend_Map, const BLEND_MAP_EN
 *
 ******************************************************************************/
 
-static const TURB *Search_For_Turb(const WARP *Warps)
+static const TURB *SearchForTurb(const WARP *pWarps)
 {
-	const WARP* Temp=Warps;
+    const WARP* Temp=pWarps;
 
-	if (Temp!=NULL)
-	{
-		while (Temp->Next_Warp != NULL)
-		{
-			Temp=Temp->Next_Warp;
-		}
+    if (Temp!=NULL)
+    {
+        while (Temp->Next_Warp != NULL)
+        {
+            Temp=Temp->Next_Warp;
+        }
 
-		if (Temp->Warp_Type != CLASSIC_TURB_WARP)
-		{
-			Temp=NULL;
-		}
-	}
+        if (Temp->Warp_Type != CLASSIC_TURB_WARP)
+        {
+            Temp=NULL;
+        }
+    }
 
-	return (reinterpret_cast<const TURB *>(Temp));
+    return (reinterpret_cast<const TURB *>(Temp));
 }
 
 
 /*****************************************************************************/
 
 
-DBL PlainPattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
+DBL PlainPattern::Evaluate(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
-	return 0.0;
+    return 0.0;
 }
 
 
@@ -1009,1788 +1034,1788 @@ DBL PlainPattern::operator()(const Vector3d& EPoint, const Intersection *Isectio
 
 static DBL tiling_square (const Vector3d& EPoint)
 {
-	/* 
-	 ** Classical square tiling
-	 */
-	DBL x,z;
-	x = fabs(EPoint[X]);
-	x -= floor(x);
-	x = 2*fabs( x-0.5 );
+    /*
+     ** Classical square tiling
+     */
+    DBL x,z;
+    x = fabs(EPoint[X]);
+    x -= floor(x);
+    x = 2*fabs( x-0.5 );
 
-	z = fabs(EPoint[Z]);
-	z -= floor(z);
-	z = 2*fabs( z-0.5 );
+    z = fabs(EPoint[Z]);
+    z -= floor(z);
+    z = 2*fabs( z-0.5 );
 
-	return max(x,z);
+    return max(x,z);
 }
 
 static DBL tiling_hexagon (const Vector3d& EPoint)
 {
-	/* 
-	 ** Classical Hexagon tiling
-	 */
-	DBL x,z;
-	DBL dist1,dist2;
-	DBL answer;
+    /*
+     ** Classical Hexagon tiling
+     */
+    DBL x,z;
+    DBL dist1,dist2;
+    DBL answer;
 
-	x=EPoint[X];
-	z=EPoint[Z];
-	x += 0.5;
-	x -= 3.0*floor(x/3.0);
-	z -= SQRT3*floor(z/(SQRT3));
-	/* x,z is in { [0.0, 3.0 [, [0.0, SQRT3 [ } 
-	 ** but there is some symmetry to simplify the testing
-	 */
-	if (z > SQRT3_2 )
-	{
-		z = SQRT3 - z;
-	}
-	/* 
-	 ** Now only [0,3[,[0,SQRT3/2[
-	 */
-	if (x > 1.5)
-	{
-		x -= 1.5 ; /* translate */
-		z = SQRT3_2 -z; /* mirror */
-	}
-	/*
-	 ** And now, it is even simpler :  [0,1.5],[0,SQRT3/2]
-	 ** on the bottom left corner, part of some other hexagon
-	 ** on the top right corner, center of the hexagon
-	 */
-	if ((SQRT3*x+z)<SQRT3_2)
-	{
-		x = 0.5 - x;
-		z = SQRT3_2 -z; /* mirror */
-	}
-	if (x > 1.0)
-	{
-		x = 2.0 -x; /* mirror */
-	}
-	/* Hexagon */
-	dist1 = 1.0 - ( z / SQRT3_2 );
-	dist2 = 1.0 - (((SQRT3 * x + z - SQRT3_2) ) / SQRT3 );
-	answer = max(dist1,dist2);
-	answer = min(1.0,answer);
-	answer = max(0.0,answer);
-	return answer;
+    x=EPoint[X];
+    z=EPoint[Z];
+    x += 0.5;
+    x -= 3.0*floor(x/3.0);
+    z -= SQRT3*floor(z/(SQRT3));
+    /* x,z is in { [0.0, 3.0 [, [0.0, SQRT3 [ }
+     ** but there is some symmetry to simplify the testing
+     */
+    if (z > SQRT3_2 )
+    {
+        z = SQRT3 - z;
+    }
+    /*
+     ** Now only [0,3[,[0,SQRT3/2[
+     */
+    if (x > 1.5)
+    {
+        x -= 1.5 ; /* translate */
+        z = SQRT3_2 -z; /* mirror */
+    }
+    /*
+     ** And now, it is even simpler :  [0,1.5],[0,SQRT3/2]
+     ** on the bottom left corner, part of some other hexagon
+     ** on the top right corner, center of the hexagon
+     */
+    if ((SQRT3*x+z)<SQRT3_2)
+    {
+        x = 0.5 - x;
+        z = SQRT3_2 -z; /* mirror */
+    }
+    if (x > 1.0)
+    {
+        x = 2.0 -x; /* mirror */
+    }
+    /* Hexagon */
+    dist1 = 1.0 - ( z / SQRT3_2 );
+    dist2 = 1.0 - (((SQRT3 * x + z - SQRT3_2) ) / SQRT3 );
+    answer = max(dist1,dist2);
+    answer = min(1.0,answer);
+    answer = max(0.0,answer);
+    return answer;
 }
 
 static DBL tiling_triangle (const Vector3d& EPoint)
 {
-	DBL x,z;
-	DBL slop1;
-	DBL dist1,dist2;
-	int delta;
-	x=EPoint[X];
-	z=EPoint[Z];
-	delta = 0;
-	x -= floor(x);
-	z -= SQRT3*floor(z/SQRT3);
-	/* x,z is in { [0.0, 1.0 [, [0.0, SQRT3 [ } 
-	 ** but there is some symmetry to simplify the testing
-	 */
-	if (z > SQRT3_2 )
-	{
-		z = SQRT3 - z; /* mirror */
-		delta = 1 - delta;
-	}
-	if (x > 0.5)
-	{
-		x = 1.0 - x; /* mirror */
-	}
-	if (x != 0.0)
-	{
-		slop1 = z/x;
-		if (slop1>SQRT3)
-		{
-			z = SQRT3_2 - z;
-			x = 0.5 -x;
-			delta = 1 - delta;
-		}
-	}
-	else
-	{
-		z = SQRT3_2 -z;
-		x = 0.5;
-	}
-	dist1 = 1.0 - (z * 2 * SQRT3 );
-	dist2 = 1.0 - ((SQRT3 * x - z) * SQRT3 );
-	return delta/2.0+(0.5)*max(dist1,dist2);
+    DBL x,z;
+    DBL slop1;
+    DBL dist1,dist2;
+    int delta;
+    x=EPoint[X];
+    z=EPoint[Z];
+    delta = 0;
+    x -= floor(x);
+    z -= SQRT3*floor(z/SQRT3);
+    /* x,z is in { [0.0, 1.0 [, [0.0, SQRT3 [ }
+     ** but there is some symmetry to simplify the testing
+     */
+    if (z > SQRT3_2 )
+    {
+        z = SQRT3 - z; /* mirror */
+        delta = 1 - delta;
+    }
+    if (x > 0.5)
+    {
+        x = 1.0 - x; /* mirror */
+    }
+    if (x != 0.0)
+    {
+        slop1 = z/x;
+        if (slop1>SQRT3)
+        {
+            z = SQRT3_2 - z;
+            x = 0.5 -x;
+            delta = 1 - delta;
+        }
+    }
+    else
+    {
+        z = SQRT3_2 -z;
+        x = 0.5;
+    }
+    dist1 = 1.0 - (z * 2 * SQRT3 );
+    dist2 = 1.0 - ((SQRT3 * x - z) * SQRT3 );
+    return delta/2.0+(0.5)*max(dist1,dist2);
 }
 
 static DBL tiling_lozenge (const Vector3d& EPoint)
 {
-	DBL x,z;
-	DBL slop1;
-	DBL dist1,dist2;
+    DBL x,z;
+    DBL slop1;
+    DBL dist1,dist2;
 
-	x=EPoint[X];
-	z=EPoint[Z];
+    x=EPoint[X];
+    z=EPoint[Z];
 
-	x -= floor(x);
-	z -= SQRT3*floor(z/SQRT3);
-	/* x,z is in { [0.0, 1.0 [, [0.0, SQRT3 [ } 
-	 ** There is some mirror to reduce the problem
-	 */
-	if ( z > SQRT3_2 )
-	{
-		z -= SQRT3_2;
-		x += 0.5;
-	}
-	if ( (2.0*z) > SQRT3_2 )
-	{
-		z = SQRT3_2 - z;
-		x = 1.5 - x;
-	}
-	if (x > 0.75)
-	{
-		x -= 1.0;
-	}
-	if (x != 0.0)
-	{
-		slop1 = z/x;
-		if (slop1>SQRT3)
-		{
-			z = SQRT3_2 - z;
-			x = 0.5 -x;
-		}
-	}
-	dist1 = 1.0 - (z * 4.0 * SQRT3 / 3.0 );
-	dist2 = 1.0 - (fabs(SQRT3 * x - z) * SQRT3 *2.0 / 3.0);
-	return max(dist1,dist2);
+    x -= floor(x);
+    z -= SQRT3*floor(z/SQRT3);
+    /* x,z is in { [0.0, 1.0 [, [0.0, SQRT3 [ }
+     ** There is some mirror to reduce the problem
+     */
+    if ( z > SQRT3_2 )
+    {
+        z -= SQRT3_2;
+        x += 0.5;
+    }
+    if ( (2.0*z) > SQRT3_2 )
+    {
+        z = SQRT3_2 - z;
+        x = 1.5 - x;
+    }
+    if (x > 0.75)
+    {
+        x -= 1.0;
+    }
+    if (x != 0.0)
+    {
+        slop1 = z/x;
+        if (slop1>SQRT3)
+        {
+            z = SQRT3_2 - z;
+            x = 0.5 -x;
+        }
+    }
+    dist1 = 1.0 - (z * 4.0 * SQRT3 / 3.0 );
+    dist2 = 1.0 - (fabs(SQRT3 * x - z) * SQRT3 *2.0 / 3.0);
+    return max(dist1,dist2);
 }
 
 static DBL tiling_rhombus (const Vector3d& EPoint)
 {
-	DBL x,z;
-	DBL answer;
-	DBL slop1;
-	DBL dist1,dist2;
-	int delta;
-	x=EPoint[X];
-	z=EPoint[Z];
-	delta = 0;
-	x += 0.5;
-	x -= 3.0*floor(x/3.0);
-	z -= SQRT3*floor(z/SQRT3);
-	/* x,z is in { [0.0, 3.0 [, [0.0, SQRT3 [ } 
-	 ** There is some mirror to reduce the problem
-	 */
-	if ( z > SQRT3_2 )
-	{
-		z = SQRT3 -z; /* mirror */
-		delta = 2 - delta;
-	}
-	if (x > 1.5)
-	{
-		x -= 1.5 ; /* translate */
-		z = SQRT3_2 -z; /* mirror */
-		delta = 2 - delta;
-	}
-	/* Now in [0,1.5],[0,SQRT3/2] 
-	 ** from left to right
-	 ** part of a horizontal (z=0)
-	 ** half a vertical 
-	 ** part of a horizontal 
-	 */
-	if (x < 0.5)
-	{
-		/* mirrror */
-		x = 1.0 - x;
-		delta = 2 - delta;
-	}
-	/* 
-	 ** Let shift the [0.5,1.5],[0,SQRT3/2] to [0,1]....
-	 */
-	x -= 0.5;
-	if (x != 0.0)
-	{
-		slop1 = z/x;
-		if (slop1>SQRT3)
-		{ /* rotate the vertical to match the horizontal on the right */
-			dist1 = ( x / 2.0 ) + ( z * SQRT3_2 );
-			dist2 = ( z / 2.0 ) - ( x * SQRT3_2 );
-			z = dist2;
-			x = dist1;
-			delta = 1;
-		}
-	}
-	else
-	{
-		/* rotate the vertical to match the horizontal on the right */
-		dist1 = ( x / 2.0 ) + ( z * SQRT3_2 );
-		dist2 = ( z / 2.0 ) - ( x * SQRT3_2 );
-		z = dist2;
-		x = dist1;
-		delta = 1;
-	}
-	/* It may be similar to lozenge (in fact, IT IS !), now */
+    DBL x,z;
+    DBL answer;
+    DBL slop1;
+    DBL dist1,dist2;
+    int delta;
+    x=EPoint[X];
+    z=EPoint[Z];
+    delta = 0;
+    x += 0.5;
+    x -= 3.0*floor(x/3.0);
+    z -= SQRT3*floor(z/SQRT3);
+    /* x,z is in { [0.0, 3.0 [, [0.0, SQRT3 [ }
+     ** There is some mirror to reduce the problem
+     */
+    if ( z > SQRT3_2 )
+    {
+        z = SQRT3 -z; /* mirror */
+        delta = 2 - delta;
+    }
+    if (x > 1.5)
+    {
+        x -= 1.5 ; /* translate */
+        z = SQRT3_2 -z; /* mirror */
+        delta = 2 - delta;
+    }
+    /* Now in [0,1.5],[0,SQRT3/2]
+     ** from left to right
+     ** part of a horizontal (z=0)
+     ** half a vertical
+     ** part of a horizontal
+     */
+    if (x < 0.5)
+    {
+        /* mirrror */
+        x = 1.0 - x;
+        delta = 2 - delta;
+    }
+    /*
+     ** Let shift the [0.5,1.5],[0,SQRT3/2] to [0,1]....
+     */
+    x -= 0.5;
+    if (x != 0.0)
+    {
+        slop1 = z/x;
+        if (slop1>SQRT3)
+        { /* rotate the vertical to match the horizontal on the right */
+            dist1 = ( x / 2.0 ) + ( z * SQRT3_2 );
+            dist2 = ( z / 2.0 ) - ( x * SQRT3_2 );
+            z = dist2;
+            x = dist1;
+            delta = 1;
+        }
+    }
+    else
+    {
+        /* rotate the vertical to match the horizontal on the right */
+        dist1 = ( x / 2.0 ) + ( z * SQRT3_2 );
+        dist2 = ( z / 2.0 ) - ( x * SQRT3_2 );
+        z = dist2;
+        x = dist1;
+        delta = 1;
+    }
+    /* It may be similar to lozenge (in fact, IT IS !), now */
 
-	if ( (2.0*z) > SQRT3_2 )
-	{
-		z = SQRT3_2 - z;
-		x = 1.5 - x;
-	}
-	if (x > 0.75)
-	{
-		x -= 1.0;
-	}
-	if (x != 0.0)
-	{
-		slop1 = z/x;
-		if (slop1>SQRT3)
-		{
-			z = SQRT3_2 - z;
-			x = 0.5 -x;
-		}
-	}
-	dist1 = 1.0 - (z * 4.0 * SQRT3 / 3.0 );
-	dist2 = 1.0 - (fabs(SQRT3 * x - z) * SQRT3 *2.0 / 3.0);
-	answer = max(dist1,dist2);
-	answer /= 3.0;
-	answer += delta/3.0;
-	answer = min(1.0,answer);
-	answer = max(0.0,answer);
-	return answer;
+    if ( (2.0*z) > SQRT3_2 )
+    {
+        z = SQRT3_2 - z;
+        x = 1.5 - x;
+    }
+    if (x > 0.75)
+    {
+        x -= 1.0;
+    }
+    if (x != 0.0)
+    {
+        slop1 = z/x;
+        if (slop1>SQRT3)
+        {
+            z = SQRT3_2 - z;
+            x = 0.5 -x;
+        }
+    }
+    dist1 = 1.0 - (z * 4.0 * SQRT3 / 3.0 );
+    dist2 = 1.0 - (fabs(SQRT3 * x - z) * SQRT3 *2.0 / 3.0);
+    answer = max(dist1,dist2);
+    answer /= 3.0;
+    answer += delta/3.0;
+    answer = min(1.0,answer);
+    answer = max(0.0,answer);
+    return answer;
 }
 
 static DBL tiling_rectangle (const Vector3d& EPoint)
 {
-	/*
-	 ** Tiling with rectangles
-	 ** resolve to square [0,4][0,4]
-	 ** then 16 cases
-	 **
-	 **  +-----+--+  +
-	 **  |     |  |  |
-	 **  +--+--+  +--+
-	 **     |  |  |
-	 **  +--+  +--+--+
-	 **  |  |  |     |
-	 **  +  +--+--+--+
-	 **  |  |     |  |
-	 **  +--+-----+  +
-	 */
-	DBL x,z;
-	DBL delta;
-	DBL answer;
-	int valueX,valueZ;
-	x=EPoint[X];
-	z=EPoint[Z];
-	x -= 4.0*floor(x/4.0);
-	z -= 4.0*floor(z/4.0);
-	valueX = (int)x;
-	valueZ = (int)z;
-	delta = 1.0;
-	switch((valueX+valueZ*4))
-	{
-		case 0:
-		case 4:
-			z -= 1.0;
-			break;
-		case 1:
-		case 2:
-			x -= 2.0;
-			delta = 0.0;
-			break;
-		case 3:
-			x -= 3.0;
-			break;
-		case 5:
-		case 9:
-			x -= 1.0;
-			z -= 2.0;
-			break;
-		case 6:
-		case 7:
-			x -= 3.0;
-			z -= 1.0;
-			delta = 0.0;
-			break;
-		case 8:
-			z -= 2.0;
-			delta = 0.0;
-			break;
-		case 10:
-		case 14:
-			x -= 2.0;
-			z -= 3.0;
-			break;
-		case 11:
-			x -= 4.0;
-			z -= 2.0;
-			delta = 0.0;
-			break;
-		case 12:
-		case 13:
-			x -= 1.0;
-			z -= 3.0;
-			delta = 0.0;
-			break;
-		case 15:
-			x -= 3.0;
-			z -= 4.0;
-			break;
-	}
-	if (delta == 1.0)
-	{
-		x = 2*fabs( x-0.5 );
-		z = 2*( max(fabs( z),0.5) -0.5 );
-	}
-	else
-	{
-		x = 2*( max(fabs( x),0.5) -0.5 );
-		z = 2*fabs( z -0.5 );
-	}
-	answer = fabs(max(x,z)/2.0 + delta/2);
-	return answer;
+    /*
+     ** Tiling with rectangles
+     ** resolve to square [0,4][0,4]
+     ** then 16 cases
+     **
+     **  +-----+--+  +
+     **  |     |  |  |
+     **  +--+--+  +--+
+     **     |  |  |
+     **  +--+  +--+--+
+     **  |  |  |     |
+     **  +  +--+--+--+
+     **  |  |     |  |
+     **  +--+-----+  +
+     */
+    DBL x,z;
+    DBL delta;
+    DBL answer;
+    int valueX,valueZ;
+    x=EPoint[X];
+    z=EPoint[Z];
+    x -= 4.0*floor(x/4.0);
+    z -= 4.0*floor(z/4.0);
+    valueX = (int)x;
+    valueZ = (int)z;
+    delta = 1.0;
+    switch((valueX+valueZ*4))
+    {
+        case 0:
+        case 4:
+            z -= 1.0;
+            break;
+        case 1:
+        case 2:
+            x -= 2.0;
+            delta = 0.0;
+            break;
+        case 3:
+            x -= 3.0;
+            break;
+        case 5:
+        case 9:
+            x -= 1.0;
+            z -= 2.0;
+            break;
+        case 6:
+        case 7:
+            x -= 3.0;
+            z -= 1.0;
+            delta = 0.0;
+            break;
+        case 8:
+            z -= 2.0;
+            delta = 0.0;
+            break;
+        case 10:
+        case 14:
+            x -= 2.0;
+            z -= 3.0;
+            break;
+        case 11:
+            x -= 4.0;
+            z -= 2.0;
+            delta = 0.0;
+            break;
+        case 12:
+        case 13:
+            x -= 1.0;
+            z -= 3.0;
+            delta = 0.0;
+            break;
+        case 15:
+            x -= 3.0;
+            z -= 4.0;
+            break;
+    }
+    if (delta == 1.0)
+    {
+        x = 2*fabs( x-0.5 );
+        z = 2*( max(fabs( z),0.5) -0.5 );
+    }
+    else
+    {
+        x = 2*( max(fabs( x),0.5) -0.5 );
+        z = 2*fabs( z -0.5 );
+    }
+    answer = fabs(max(x,z)/2.0 + delta/2);
+    return answer;
 }
 
 static DBL tiling_octa_square (const Vector3d& EPoint)
 {
-	/*
-	 ** Tiling with a square and an octagon
-	 */
-	DBL answer;
-	DBL x,z;
-	DBL dist1,dist2;
-	z=EPoint[Z];
-	z -= (SQRT2+1.0)*floor(z/(SQRT2+1.0));
-	z -= SQRT2_2+0.5;
-	z = fabs(z);
-	x=EPoint[X];
-	x -= (SQRT2+1.0)*floor(x/(SQRT2+1.0));
-	x -= SQRT2_2+0.5;
-	x = fabs(x);
-	if (z > x)
-	{
-		answer = x;
-		x = z;
-		z = answer;
-	}
-	if ( (x+z) < SQRT2_2)
-	{
-		/* Square tile */
-		return ( (x+z)/SQRT2 );
-	}
-	dist1 = 1.0-z;
-	dist2 = (SQRT2+SQRT2_2-(x+z))/SQRT2;
+    /*
+     ** Tiling with a square and an octagon
+     */
+    DBL answer;
+    DBL x,z;
+    DBL dist1,dist2;
+    z=EPoint[Z];
+    z -= (SQRT2+1.0)*floor(z/(SQRT2+1.0));
+    z -= SQRT2_2+0.5;
+    z = fabs(z);
+    x=EPoint[X];
+    x -= (SQRT2+1.0)*floor(x/(SQRT2+1.0));
+    x -= SQRT2_2+0.5;
+    x = fabs(x);
+    if (z > x)
+    {
+        answer = x;
+        x = z;
+        z = answer;
+    }
+    if ( (x+z) < SQRT2_2)
+    {
+        /* Square tile */
+        return ( (x+z)/SQRT2 );
+    }
+    dist1 = 1.0-z;
+    dist2 = (SQRT2+SQRT2_2-(x+z))/SQRT2;
 
-	return max(0.500000000001,max(dist1,dist2)); // TODO FIXME - magic number! Use nextafter() instead (or maybe actually 0.5)
+    return max(0.500000000001,max(dist1,dist2)); // TODO FIXME - magic number! Use nextafter() instead (or maybe actually 0.5)
 }
 
 static DBL tiling_square_triangle (const Vector3d& EPoint)
 {
-	DBL x,z;
-	DBL slop1;
-	DBL dist1,dist2;
-	int delta;
-	x=EPoint[X];
-	z=EPoint[Z];
-	delta = 0;
-	x -= floor(x);
-	z -= (2.0+SQRT3)*floor(z/(SQRT3+2.0));
-	/* x,z is in { [0.0, 1.0 [, [0.0, 2+SQRT3 [ } 
-	 ** but there is some symmetry to simplify the testing
-	 */
-	if (z > SQRT3_2+1.0 )
-	{
-		z -= SQRT3_2+1.0;
-		x += (x>0.5)?-0.5:0.5;
-	}
-	if (x > 0.5)
-	{
-		x = 1.0 - x; /* mirror */
-	}
-	z -= 1.0;
-	if (z > 0.0)
-	{ /* triangle */
-		if (x != 0.0)
-		{
-			slop1 = z/x;
-			if (slop1>SQRT3)
-			{
-				z = SQRT3_2 - z;
-				x = 0.5 -x;
-				delta = 1 - delta;
-			}
-		}
-		else
-		{
-			z = SQRT3_2 -z;
-			x = 0.5;
-			delta = 1 - delta;
-		}
-		dist1 = 1.0 - (2 * z * SQRT3 );
-		dist2 = 1.0 - ((SQRT3 * x - z) * SQRT3 );
-		return (delta+max(dist1,dist2))/3.0;
-	}
-	else
-	{ /* square */
-		if (z < -0.5)
-		{
-			z = -1.0 -z;
-		}
-		if (x > 0.5)
-		{
-			x = 1.0 - x;
-		}
-		dist1 = 2 + 2 * SQRT3 * fabs( x ) ;
-		dist2 = 2 + 2 * SQRT3 * fabs( z ) ;
-		dist1 = min(dist1,3.0);
-		dist2 = min(dist2,3.0);
-		return (5.0000001-min(dist1,dist2))/3.0; // TODO FIXME - magic number! Should use nextafter()
-	}
+    DBL x,z;
+    DBL slop1;
+    DBL dist1,dist2;
+    int delta;
+    x=EPoint[X];
+    z=EPoint[Z];
+    delta = 0;
+    x -= floor(x);
+    z -= (2.0+SQRT3)*floor(z/(SQRT3+2.0));
+    /* x,z is in { [0.0, 1.0 [, [0.0, 2+SQRT3 [ }
+     ** but there is some symmetry to simplify the testing
+     */
+    if (z > SQRT3_2+1.0 )
+    {
+        z -= SQRT3_2+1.0;
+        x += (x>0.5)?-0.5:0.5;
+    }
+    if (x > 0.5)
+    {
+        x = 1.0 - x; /* mirror */
+    }
+    z -= 1.0;
+    if (z > 0.0)
+    { /* triangle */
+        if (x != 0.0)
+        {
+            slop1 = z/x;
+            if (slop1>SQRT3)
+            {
+                z = SQRT3_2 - z;
+                x = 0.5 -x;
+                delta = 1 - delta;
+            }
+        }
+        else
+        {
+            z = SQRT3_2 -z;
+            x = 0.5;
+            delta = 1 - delta;
+        }
+        dist1 = 1.0 - (2 * z * SQRT3 );
+        dist2 = 1.0 - ((SQRT3 * x - z) * SQRT3 );
+        return (delta+max(dist1,dist2))/3.0;
+    }
+    else
+    { /* square */
+        if (z < -0.5)
+        {
+            z = -1.0 -z;
+        }
+        if (x > 0.5)
+        {
+            x = 1.0 - x;
+        }
+        dist1 = 2 + 2 * SQRT3 * fabs( x ) ;
+        dist2 = 2 + 2 * SQRT3 * fabs( z ) ;
+        dist1 = min(dist1,3.0);
+        dist2 = min(dist2,3.0);
+        return (5.0000001-min(dist1,dist2))/3.0; // TODO FIXME - magic number! Should use nextafter()
+    }
 }
 
 static DBL tiling_hexa_triangle (const Vector3d& EPoint)
 {
-	/* 
-	 ** Tiling with a hexagon and 2 triangles
-	 */
-	DBL x,z;
-	DBL dist1,dist2;
-	DBL answer=0;
-	int delta;
-	x=EPoint[X];
-	z=EPoint[Z];
-	delta = 0;
-	x += 0.5;
-	x -= 2.0*floor(x/2.0);
-	z -= 2.0*SQRT3*floor(z/(SQRT3*2.0));
-	/* x,z is in { [0.0, 2.0 [, [0.0, 2*SQRT3 [ } 
-	 ** but there is some symmetry to simplify the testing
-	 */
-	if (z > SQRT3 )
-	{
-		z -= SQRT3;
-		x += (x<1.0)?1.0:-1.0;
-	}
-	/* 
-	 ** Now only [0,2[,[0,SQRT3[
-	 */
-	if (z > SQRT3_2 )
-	{
-		z = SQRT3 - z; /* mirror */
-		delta = 1 - delta;
-	}
+    /*
+     ** Tiling with a hexagon and 2 triangles
+     */
+    DBL x,z;
+    DBL dist1,dist2;
+    DBL answer=0;
+    int delta;
+    x=EPoint[X];
+    z=EPoint[Z];
+    delta = 0;
+    x += 0.5;
+    x -= 2.0*floor(x/2.0);
+    z -= 2.0*SQRT3*floor(z/(SQRT3*2.0));
+    /* x,z is in { [0.0, 2.0 [, [0.0, 2*SQRT3 [ }
+     ** but there is some symmetry to simplify the testing
+     */
+    if (z > SQRT3 )
+    {
+        z -= SQRT3;
+        x += (x<1.0)?1.0:-1.0;
+    }
+    /*
+     ** Now only [0,2[,[0,SQRT3[
+     */
+    if (z > SQRT3_2 )
+    {
+        z = SQRT3 - z; /* mirror */
+        delta = 1 - delta;
+    }
 
-	if (x > 1.0)
-	{
-		x = 2.0 - x; /* mirror */
-	}
-	/*
-	 ** And now, it is even simpler :  [0,1],[0,SQRT3/2]
-	 ** on the bottom left corner, part of the triangle
-	 ** on the top right corner, center of the hexagon
-	 */
-	if ((SQRT3*x+z)<SQRT3_2)
-	{
-		/* Triangle */
-		dist1 = 1.0 - (z * 2 * SQRT3 );
-		dist2 = 1.0 + ((SQRT3 * x + z) - SQRT3_2 ) * SQRT3; /* really substracting */
-		answer = (delta + max(dist1,dist2))/3.0;
-	}
-	else
-	{
-		/* Hexagon */
-		dist1 = 2 + 2* (z * SQRT3 );
-		dist2 = 2 + 2* ((SQRT3 * x + z - SQRT3_2) ) * SQRT3_2 ;
-		answer = 5.0-min(dist1,dist2);
-		answer = max(answer,2.0000001); // TODO FIXME - magic number! Should use nextafter()
-		answer /= 3.0;
-	}
-	return answer;
+    if (x > 1.0)
+    {
+        x = 2.0 - x; /* mirror */
+    }
+    /*
+     ** And now, it is even simpler :  [0,1],[0,SQRT3/2]
+     ** on the bottom left corner, part of the triangle
+     ** on the top right corner, center of the hexagon
+     */
+    if ((SQRT3*x+z)<SQRT3_2)
+    {
+        /* Triangle */
+        dist1 = 1.0 - (z * 2 * SQRT3 );
+        dist2 = 1.0 + ((SQRT3 * x + z) - SQRT3_2 ) * SQRT3; /* really substracting */
+        answer = (delta + max(dist1,dist2))/3.0;
+    }
+    else
+    {
+        /* Hexagon */
+        dist1 = 2 + 2* (z * SQRT3 );
+        dist2 = 2 + 2* ((SQRT3 * x + z - SQRT3_2) ) * SQRT3_2 ;
+        answer = 5.0-min(dist1,dist2);
+        answer = max(answer,2.0000001); // TODO FIXME - magic number! Should use nextafter()
+        answer /= 3.0;
+    }
+    return answer;
 }
 
 static DBL tiling_square_offset (const Vector3d& EPoint)
 {
-	/*
-	 ** Tiling with a square, offset of half size
-	 ** Reduce to rectangle [0,1][0,2]
-	 ** move x,[1,2] to [0,1][0,1] with new x = x+1/2
-	 */
-	DBL x,z;
-	z = EPoint[Z];
-	z -= 2.0*floor(z/2.0);
-	x = EPoint[X];
-	if (z > 1.0)
-	{
-		x += 0.5;
-		z -= 1.0;
-	}
-	x -= floor(x);
-	x = 2*fabs( x-0.5 );
-	z = 2*fabs( z-0.5 );
+    /*
+     ** Tiling with a square, offset of half size
+     ** Reduce to rectangle [0,1][0,2]
+     ** move x,[1,2] to [0,1][0,1] with new x = x+1/2
+     */
+    DBL x,z;
+    z = EPoint[Z];
+    z -= 2.0*floor(z/2.0);
+    x = EPoint[X];
+    if (z > 1.0)
+    {
+        x += 0.5;
+        z -= 1.0;
+    }
+    x -= floor(x);
+    x = 2*fabs( x-0.5 );
+    z = 2*fabs( z-0.5 );
 
-	return max(x,z);
+    return max(x,z);
 }
 
 static DBL tiling_square_rectangle (const Vector3d& EPoint)
 {
-	/*
-	 ** tiling with a central square and 4 rectangle (2x1)
-	 ** orbiting around the square
-	 ** Reduce to [0,3][0,3]
-	 ** then 9 cases
-	 **
-	 **  +-----+--+
-	 **  |     |  |
-	 **  +--+--+  |
-	 **  |  |  |  |
-	 **  |  +--+--+
-	 **  |  |     |
-	 **  +--+-----+
-	 */
-	DBL x,z;
-	DBL delta;
-	int valueX,valueZ;
-	x = EPoint[X];
-	x -= 3.0*floor(x/3.0);
-	z = EPoint[Z];
-	z -= 3.0*floor(z/3.0);
-	valueX = (int)x;
-	valueZ = (int)z;
-	delta = 2.0;
-	switch((valueX+valueZ*3))
-	{
-		case 0:
-		case 3:
-			z -= 1.0;
-			break;
-		case 1:
-		case 2:
-			x -= 2.0;
-			delta = 1.0;
-			break;
-		case 4:
-			x -= 1.0;
-			z -= 1.0;
-			delta = 0.0;
-			break;
-		case 5:
-		case 8:
-			x -= 2.0;
-			z -= 2.0;
-			break;
-		case 6:
-		case 7:
-			x -= 1.0;
-			z -= 2.0;
-			delta = 1.0;
-			break;
-	}
-	if (delta == 1.0)
-	{
-		x = fabs( x);
-		x = 2.0*( max( x,0.5) -0.5 );
-		z = 2.0*fabs( z -0.5 );
-	}
-	if (delta == 2.0)
-	{
-		x = 2.0*fabs( x-0.5 );
-		z = fabs(z);
-		z = 2.0*( max(z,0.5) - 0.5 );
-	}
-	if (delta == 0.0)
-	{
-		x = 2.0*fabs( x-0.5 );
-		z = 2.0*fabs( z-0.5 );
-	}
-	return ((max(x,z))+delta)/3.0 ;
+    /*
+     ** tiling with a central square and 4 rectangle (2x1)
+     ** orbiting around the square
+     ** Reduce to [0,3][0,3]
+     ** then 9 cases
+     **
+     **  +-----+--+
+     **  |     |  |
+     **  +--+--+  |
+     **  |  |  |  |
+     **  |  +--+--+
+     **  |  |     |
+     **  +--+-----+
+     */
+    DBL x,z;
+    DBL delta;
+    int valueX,valueZ;
+    x = EPoint[X];
+    x -= 3.0*floor(x/3.0);
+    z = EPoint[Z];
+    z -= 3.0*floor(z/3.0);
+    valueX = (int)x;
+    valueZ = (int)z;
+    delta = 2.0;
+    switch((valueX+valueZ*3))
+    {
+        case 0:
+        case 3:
+            z -= 1.0;
+            break;
+        case 1:
+        case 2:
+            x -= 2.0;
+            delta = 1.0;
+            break;
+        case 4:
+            x -= 1.0;
+            z -= 1.0;
+            delta = 0.0;
+            break;
+        case 5:
+        case 8:
+            x -= 2.0;
+            z -= 2.0;
+            break;
+        case 6:
+        case 7:
+            x -= 1.0;
+            z -= 2.0;
+            delta = 1.0;
+            break;
+    }
+    if (delta == 1.0)
+    {
+        x = fabs( x);
+        x = 2.0*( max( x,0.5) -0.5 );
+        z = 2.0*fabs( z -0.5 );
+    }
+    if (delta == 2.0)
+    {
+        x = 2.0*fabs( x-0.5 );
+        z = fabs(z);
+        z = 2.0*( max(z,0.5) - 0.5 );
+    }
+    if (delta == 0.0)
+    {
+        x = 2.0*fabs( x-0.5 );
+        z = 2.0*fabs( z-0.5 );
+    }
+    return ((max(x,z))+delta)/3.0 ;
 }
 
 static DBL tiling_rectangle_square (const Vector3d& EPoint)
 {
-	/*
-	 ** Tiling with a central square and 4 rectangles (2x1)
-	 ** which turns around the square in both directions
-	 ** Reduce to [0,6][0,6], fold in four and back
-	 ** to 9 cases.
-	 **
-	 **  +-----+--+
-	 **  |     |  |
-	 **  +--+--+  |
-	 **  |  |  |  |
-	 **  |  +--+--+
-	 **  |  |     |
-	 **  +--+--+--+
-	 */
-	DBL x,z;
-	DBL delta;
-	int valueX,valueZ;
-	x = EPoint[X];
-	x -= 6.0*floor(x/6.0);
-	x -= 3.0;
-	x = fabs(x);
-	z = EPoint[Z];
-	z -= 6.0*floor(z/6.0);
-	z -= 3.0;
-	z = fabs(z);
-	valueX = (int)x;
-	valueZ = (int)z;
-	delta = 2.0;
-	switch((valueX+valueZ*3))
-	{
-		case 0:
-		case 3:
-			z -= 1.0;
-			break;
-		case 1:
-		case 2:
-			x -= 2.0;
-			delta = 1.0;
-			break;
-		case 4:
-			x -= 1.0;
-			z -= 1.0;
-			delta = 0.0;
-			break;
-		case 5:
-		case 8:
-			x -= 2.0;
-			z -= 2.0;
-			break;
-		case 6:
-		case 7:
-			x -= 1.0;
-			z -= 2.0;
-			delta = 1.0;
-			break;
-	}
-	if (delta == 1.0)
-	{
-		x = fabs( x);
-		x = 2.0*( max(x,0.5) -0.5 );
-		z = 2.0*fabs( z -0.5 );
-	}
-	if (delta == 2.0)
-	{
-		x = 2.0*fabs( x-0.5 );
-		z = fabs(z);
-		z = 2.0*( max(z,0.5) - 0.5 );
-	}
-	if (delta == 0.0)
-	{
-		x = 2.0*fabs( x-0.5 );
-		z = 2.0*fabs( z-0.5 );
-	}
-	return ((max(x,z))+delta)/3.0 ;
+    /*
+     ** Tiling with a central square and 4 rectangles (2x1)
+     ** which turns around the square in both directions
+     ** Reduce to [0,6][0,6], fold in four and back
+     ** to 9 cases.
+     **
+     **  +-----+--+
+     **  |     |  |
+     **  +--+--+  |
+     **  |  |  |  |
+     **  |  +--+--+
+     **  |  |     |
+     **  +--+--+--+
+     */
+    DBL x,z;
+    DBL delta;
+    int valueX,valueZ;
+    x = EPoint[X];
+    x -= 6.0*floor(x/6.0);
+    x -= 3.0;
+    x = fabs(x);
+    z = EPoint[Z];
+    z -= 6.0*floor(z/6.0);
+    z -= 3.0;
+    z = fabs(z);
+    valueX = (int)x;
+    valueZ = (int)z;
+    delta = 2.0;
+    switch((valueX+valueZ*3))
+    {
+        case 0:
+        case 3:
+            z -= 1.0;
+            break;
+        case 1:
+        case 2:
+            x -= 2.0;
+            delta = 1.0;
+            break;
+        case 4:
+            x -= 1.0;
+            z -= 1.0;
+            delta = 0.0;
+            break;
+        case 5:
+        case 8:
+            x -= 2.0;
+            z -= 2.0;
+            break;
+        case 6:
+        case 7:
+            x -= 1.0;
+            z -= 2.0;
+            delta = 1.0;
+            break;
+    }
+    if (delta == 1.0)
+    {
+        x = fabs( x);
+        x = 2.0*( max(x,0.5) -0.5 );
+        z = 2.0*fabs( z -0.5 );
+    }
+    if (delta == 2.0)
+    {
+        x = 2.0*fabs( x-0.5 );
+        z = fabs(z);
+        z = 2.0*( max(z,0.5) - 0.5 );
+    }
+    if (delta == 0.0)
+    {
+        x = 2.0*fabs( x-0.5 );
+        z = 2.0*fabs( z-0.5 );
+    }
+    return ((max(x,z))+delta)/3.0 ;
 }
 
 static DBL tiling_square_internal (const Vector3d& EPoint)
 {
-	DBL answer=0;
-	DBL x,z;
-	DBL dist1,dist2;
-	int valueX,valueZ;
-	x=EPoint[X];
-	x *= SQRT2;
-	x -= 4.0 * floor(x/4.0);
-	x -= 2.0;
-	x = fabs(x);
-	z=EPoint[Z];
-	z *= SQRT2;
-	z -= 4.0 * floor(z/4.0);
-	z -= 2.0;
-	z = fabs(z);
-	valueX=(int)x;
-	valueZ=(int)z;
-	switch((valueX+valueZ*2))
-	{
-		case 0:
-			x -= 0.5;
-			x = max(x,0.0);
-			x *= 2.0;
-			z -= 0.5;
-			z = max(z,0.0);
-			z *= 2.0;
-			answer=max(x,z)/3.0;
-			break;
-		case 1:
-			answer=(2.0+fabs(1.5-x)*2.0)/3.0;
-			if (z>0.5)
-			{
-				dist2=(3.0-SQRT2*fabs(x-z))/3.0;
-				answer = max(answer,dist2);
-			}
-			break;
-		case 2:
-			answer=(1.0+fabs(1.5-z)*2.0)/3.0;
-			if (x>0.5)
-			{
-				dist2=(2.0-SQRT2*fabs(x-z))/3.0;
-				answer = max(answer,dist2);
-			}
-			break;
-		case 3:
-			if (x > z)
-			{
-				dist1=(2.0+fabs(1.5-x)*2.0)/3.0;
-				dist2=(3.0-SQRT2*fabs(z-x))/3.0;
-				answer=max(dist1,dist2);
-			}
-			else
-			{
-				dist1=(1.0+fabs(1.5-z)*2.0)/3.0;
-				dist2=(2.0-SQRT2*fabs(x-z))/3.0;
-				answer=max(dist1,dist2);
-			}
-			break;
-	}
-	return answer;
+    DBL answer=0;
+    DBL x,z;
+    DBL dist1,dist2;
+    int valueX,valueZ;
+    x=EPoint[X];
+    x *= SQRT2;
+    x -= 4.0 * floor(x/4.0);
+    x -= 2.0;
+    x = fabs(x);
+    z=EPoint[Z];
+    z *= SQRT2;
+    z -= 4.0 * floor(z/4.0);
+    z -= 2.0;
+    z = fabs(z);
+    valueX=(int)x;
+    valueZ=(int)z;
+    switch((valueX+valueZ*2))
+    {
+        case 0:
+            x -= 0.5;
+            x = max(x,0.0);
+            x *= 2.0;
+            z -= 0.5;
+            z = max(z,0.0);
+            z *= 2.0;
+            answer=max(x,z)/3.0;
+            break;
+        case 1:
+            answer=(2.0+fabs(1.5-x)*2.0)/3.0;
+            if (z>0.5)
+            {
+                dist2=(3.0-SQRT2*fabs(x-z))/3.0;
+                answer = max(answer,dist2);
+            }
+            break;
+        case 2:
+            answer=(1.0+fabs(1.5-z)*2.0)/3.0;
+            if (x>0.5)
+            {
+                dist2=(2.0-SQRT2*fabs(x-z))/3.0;
+                answer = max(answer,dist2);
+            }
+            break;
+        case 3:
+            if (x > z)
+            {
+                dist1=(2.0+fabs(1.5-x)*2.0)/3.0;
+                dist2=(3.0-SQRT2*fabs(z-x))/3.0;
+                answer=max(dist1,dist2);
+            }
+            else
+            {
+                dist1=(1.0+fabs(1.5-z)*2.0)/3.0;
+                dist2=(2.0-SQRT2*fabs(x-z))/3.0;
+                answer=max(dist1,dist2);
+            }
+            break;
+    }
+    return answer;
 }
 
 static DBL tiling_square_internal_5 (const Vector3d& EPoint)
 {
-	DBL answer=0;
-	DBL x,z;
-	DBL dist1,dist2;
-	int mirX,mirZ;
-	int valueX,valueZ;
-	mirX=mirZ=0;
-	x=EPoint[X];
-	x *= SQRT2;
-	x -= 4.0 * floor(x/4.0);
-	x -= 2.0;
-	mirX = (x < 0)?1:0;
-	x = fabs(x);
-	z=EPoint[Z];
-	z *= SQRT2;
-	z -= 4.0 * floor(z/4.0);
-	z -= 2.0;
-	mirZ = (z < 0)?2:3;
-	z = fabs(z);
-	valueX=(int)x;
-	valueZ=(int)z;
-	switch((valueX+valueZ*2))
-	{
-		case 0:
-			x -= 0.5;
-			x = max(x,0.0);
-			x *= 2.0;
-			z -= 0.5;
-			z = max(z,0.0);
-			z *= 2.0;
-			answer=(4.000001 + max(x,z))/5.0; // TODO FIXME - magic number! Should use nextafter()
-			break;
-		case 1:
-			answer=fabs(1.5-x)*2.0;
-			if (z>0.5)
-			{
-				dist2=1.0-SQRT2*fabs(x-z);
-				answer = max(answer,dist2);
-			}
-			answer += mirX;
-			answer /= 5.0;
-			break;
-		case 2:
-			answer=fabs(1.5-z)*2.0;
-			if (x>0.5)
-			{
-				dist2=1.0-SQRT2*fabs(x-z);
-				answer = max(answer,dist2);
-			}
-			answer += mirZ;
-			answer /= 5.0;
-			break;
-		case 3:
-			if (x > z)
-			{
-				dist1=fabs(1.5-x)*2.0;
-				dist2=1.0-SQRT2*fabs(z-x);
-				answer=max(dist1,dist2) + mirX;
-			}
-			else
-			{
-				dist1=fabs(1.5-z)*2.0;
-				dist2=1.0-SQRT2*fabs(x-z);
-				answer=max(dist1,dist2) + mirZ;
-			}
-			answer /= 5.0;
-			break;
-	}
-	return answer;
+    DBL answer=0;
+    DBL x,z;
+    DBL dist1,dist2;
+    int mirX,mirZ;
+    int valueX,valueZ;
+    mirX=mirZ=0;
+    x=EPoint[X];
+    x *= SQRT2;
+    x -= 4.0 * floor(x/4.0);
+    x -= 2.0;
+    mirX = (x < 0)?1:0;
+    x = fabs(x);
+    z=EPoint[Z];
+    z *= SQRT2;
+    z -= 4.0 * floor(z/4.0);
+    z -= 2.0;
+    mirZ = (z < 0)?2:3;
+    z = fabs(z);
+    valueX=(int)x;
+    valueZ=(int)z;
+    switch((valueX+valueZ*2))
+    {
+        case 0:
+            x -= 0.5;
+            x = max(x,0.0);
+            x *= 2.0;
+            z -= 0.5;
+            z = max(z,0.0);
+            z *= 2.0;
+            answer=(4.000001 + max(x,z))/5.0; // TODO FIXME - magic number! Should use nextafter()
+            break;
+        case 1:
+            answer=fabs(1.5-x)*2.0;
+            if (z>0.5)
+            {
+                dist2=1.0-SQRT2*fabs(x-z);
+                answer = max(answer,dist2);
+            }
+            answer += mirX;
+            answer /= 5.0;
+            break;
+        case 2:
+            answer=fabs(1.5-z)*2.0;
+            if (x>0.5)
+            {
+                dist2=1.0-SQRT2*fabs(x-z);
+                answer = max(answer,dist2);
+            }
+            answer += mirZ;
+            answer /= 5.0;
+            break;
+        case 3:
+            if (x > z)
+            {
+                dist1=fabs(1.5-x)*2.0;
+                dist2=1.0-SQRT2*fabs(z-x);
+                answer=max(dist1,dist2) + mirX;
+            }
+            else
+            {
+                dist1=fabs(1.5-z)*2.0;
+                dist2=1.0-SQRT2*fabs(x-z);
+                answer=max(dist1,dist2) + mirZ;
+            }
+            answer /= 5.0;
+            break;
+    }
+    return answer;
 }
 
 static DBL tiling_square_double (const Vector3d& EPoint)
 {
-	/*
-	 ** Tiling with a square (1x1) and a square (2x2)
-	 ** Reduce to [0,5][0,5] then 25 cases
-	 **
-	 **  +--+     +--+--+
-	 **     |     |  |  
-	 **     +--+--+--+   
-	 **     |  |     |  
-	 **  +--+--+     +--+
-	 **  |     |     |  |
-	 **  +     +--+--+--+
-	 **  |     |  |     |
-	 **  +--+--+--+     +
-	 **  |  |     |     |
-	 **  +--+     +--+--+
-	 */
-	DBL x,z;
-	DBL delta;
-	int valueX,valueZ;
-	x = EPoint[X];
-	x -= 5.0*floor(x/5.0);
-	z = EPoint[Z];
-	z -= 5.0*floor(z/5.0);
-	valueX = (int)x;
-	valueZ = (int)z;
-	delta = 0.50000001; // TODO FIXME - magic number! Should use nextafter()
-	switch((valueX+valueZ*5))
-	{
-		case 0:
-			delta = 0.0;
-			break;
-		case 1:
-		case 2:
-			x -= 2.0;
-			break;
-		case 3:
-		case 4:
-		case 8:
-		case 9:
-			x -= 4.0;
-			z -= 1.0;
-			break;
-		case 5 :
-		case 6 :
-		case 10:
-		case 11:
-			z -= 2.0;
-			x -= 1.0;
-			break;
-		case 7:
-			delta = 0.0;
-			x -= 2.0;
-			z -= 1.0;
-			break;
-		case 12:
-		case 13:
-		case 17:
-		case 18:
-			x -= 3.0;
-			z -= 3.0;
-			break;
-		case 14:
-			x -= 4.0;
-			z -= 2.0;
-			delta = 0.0;
-			break;
-		case 15:
-		case 20:
-			z -= 4.0;
-			break;
-		case 16:
-			x -= 1.0;
-			z -= 3.0;
-			delta = 0.0;
-			break;
-		case 21:
-		case 22:
-			x -= 2.0;
-			z -= 5.0;
-			break;
-		case 23:
-			x -= 3.0;
-			z -= 4.0;
-			delta = 0.0;
-			break;
-		case 24:
-		case 19:
-			x -= 5.0;
-			z -= 4.0;
-			break;
-	}
-	if (delta)
-	{
-		x = fabs(x);
-		x = 2*( max(x,0.5) -0.5 );
-		z = fabs(z);
-		z = 2*( max(z,0.5) -0.5 );
-	}
-	else
-	{
-		x = 2*fabs( x-0.5 );
-		z = 2*fabs( z-0.5 );
-	}
-	return fabs((max(x,z))/2.0+delta);
+    /*
+     ** Tiling with a square (1x1) and a square (2x2)
+     ** Reduce to [0,5][0,5] then 25 cases
+     **
+     **  +--+     +--+--+
+     **     |     |  |
+     **     +--+--+--+
+     **     |  |     |
+     **  +--+--+     +--+
+     **  |     |     |  |
+     **  +     +--+--+--+
+     **  |     |  |     |
+     **  +--+--+--+     +
+     **  |  |     |     |
+     **  +--+     +--+--+
+     */
+    DBL x,z;
+    DBL delta;
+    int valueX,valueZ;
+    x = EPoint[X];
+    x -= 5.0*floor(x/5.0);
+    z = EPoint[Z];
+    z -= 5.0*floor(z/5.0);
+    valueX = (int)x;
+    valueZ = (int)z;
+    delta = 0.50000001; // TODO FIXME - magic number! Should use nextafter()
+    switch((valueX+valueZ*5))
+    {
+        case 0:
+            delta = 0.0;
+            break;
+        case 1:
+        case 2:
+            x -= 2.0;
+            break;
+        case 3:
+        case 4:
+        case 8:
+        case 9:
+            x -= 4.0;
+            z -= 1.0;
+            break;
+        case 5 :
+        case 6 :
+        case 10:
+        case 11:
+            z -= 2.0;
+            x -= 1.0;
+            break;
+        case 7:
+            delta = 0.0;
+            x -= 2.0;
+            z -= 1.0;
+            break;
+        case 12:
+        case 13:
+        case 17:
+        case 18:
+            x -= 3.0;
+            z -= 3.0;
+            break;
+        case 14:
+            x -= 4.0;
+            z -= 2.0;
+            delta = 0.0;
+            break;
+        case 15:
+        case 20:
+            z -= 4.0;
+            break;
+        case 16:
+            x -= 1.0;
+            z -= 3.0;
+            delta = 0.0;
+            break;
+        case 21:
+        case 22:
+            x -= 2.0;
+            z -= 5.0;
+            break;
+        case 23:
+            x -= 3.0;
+            z -= 4.0;
+            delta = 0.0;
+            break;
+        case 24:
+        case 19:
+            x -= 5.0;
+            z -= 4.0;
+            break;
+    }
+    if (delta)
+    {
+        x = fabs(x);
+        x = 2*( max(x,0.5) -0.5 );
+        z = fabs(z);
+        z = 2*( max(z,0.5) -0.5 );
+    }
+    else
+    {
+        x = 2*fabs( x-0.5 );
+        z = 2*fabs( z-0.5 );
+    }
+    return fabs((max(x,z))/2.0+delta);
 }
 
 static DBL tiling_hexa_square_triangle (const Vector3d& EPoint)
 {
-	/* 
-	 ** tiling with 1 hexagon, squares and triangles
-	 */
-	DBL x,z;
-	DBL dist1,dist2;
-	DBL answer=0;
+    /*
+     ** tiling with 1 hexagon, squares and triangles
+     */
+    DBL x,z;
+    DBL dist1,dist2;
+    DBL answer=0;
 
-	x=EPoint[X];
-	z=EPoint[Z];
-	x += 0.5;
-	x -= (3.0+SQRT3)*floor(x/(3.0+SQRT3));
-	z -= 2.0*(1.0+SQRT3)*floor(z/((SQRT3+1.0)*2.0));
-	/* x,z is in { [0.0, 3.0+SQRT3 [, [0.0, 2*(1+SQRT3) [ } 
-	 ** but there is some symmetry to simplify the testing
-	 */
-	if (x > (SQRT3_2+1.5))
-	{
-		x -= (SQRT3_2+1.5);
-		z += (z < SQRT3+1.0)?(SQRT3_2+0.5):(-1*(SQRT3_2+0.5));
-	}
-	if (z > (SQRT3+1.0) )
-	{
-		z -= SQRT3+1.0;
-	}
-	/* 
-	 ** Now only [0, SQRT3/2+1.5 ], [0,SQRT3+1.0]
-	 */
-	if (z > (0.5+SQRT3_2 ) )
-	{
-		z = SQRT3+1.0 - z; /* mirror */
-	}
+    x=EPoint[X];
+    z=EPoint[Z];
+    x += 0.5;
+    x -= (3.0+SQRT3)*floor(x/(3.0+SQRT3));
+    z -= 2.0*(1.0+SQRT3)*floor(z/((SQRT3+1.0)*2.0));
+    /* x,z is in { [0.0, 3.0+SQRT3 [, [0.0, 2*(1+SQRT3) [ }
+     ** but there is some symmetry to simplify the testing
+     */
+    if (x > (SQRT3_2+1.5))
+    {
+        x -= (SQRT3_2+1.5);
+        z += (z < SQRT3+1.0)?(SQRT3_2+0.5):(-1*(SQRT3_2+0.5));
+    }
+    if (z > (SQRT3+1.0) )
+    {
+        z -= SQRT3+1.0;
+    }
+    /*
+     ** Now only [0, SQRT3/2+1.5 ], [0,SQRT3+1.0]
+     */
+    if (z > (0.5+SQRT3_2 ) )
+    {
+        z = SQRT3+1.0 - z; /* mirror */
+    }
 
-	if (x > (1.0+SQRT3_2) )
-	{
-		x = SQRT3+2.0 - x; /* mirror */
-	}
-	/*
-	 ** And now, it is even simpler :  [0,1+(SQRT3/2)],[0,1+(SQRT3/2)]
-	 ** on the top right corner, center of the hexagon
-	 ** on the bottom right, middle of square, a triangle on the left
-	 ** on the top left corner, half a triangle
-	 ** bottom
-	 */
-	if (((SQRT3*x+z)<(SQRT3_2+2.0))&&(x < 0.5+SQRT3_2))
-	{
-		/* Triangle or square */
-		/* rotate in the lower part */
-		z -= 0.5 + SQRT3_2 ;
-		x -= 1.0 + SQRT3_2 ;
-		dist1 = ( x / 2.0 ) - ( z * SQRT3_2 );
-		dist2 = ( z / 2.0 ) + ( x * SQRT3_2 );
-		z = dist2;
-		x = dist1;
-		z += 0.5 + SQRT3_2 ;
-		x += 1.0 + SQRT3_2 ;
-		if (z < 0)
-		{
-			z *= -1;
-		}
-		if (x > (1.0+SQRT3_2) )
-		{
-			x = SQRT3+2.0 - x; /* mirror */
-		}
-	}
-	if ((!((SQRT3*x+z)<(SQRT3_2+2.0)))&&(!(z < 0.5)))
-	{
-		/* Hexagon */
-		z -= 0.5;
-		x -= SQRT3_2;
-		z= fabs(z);
-		x= fabs(x);
-		dist1 = 2* z * SQRT3 ;
-		dist2 = ((SQRT3 * x + z ) ) * SQRT3 - 1.5;
-		answer = 3.0-min(dist1,dist2);
-		answer = max(answer,2.0000001); // TODO FIXME - magic number! Should use nextafter()
-		answer /= 3.0;
-		return answer;
-	}
-	if (z < 0.5 )
-	{
-		if ( x > SQRT3_2+0.5)
-		{
-			/* square */
-			x -= SQRT3_2+0.5;
-			z -= 0.5;
-			dist1 = 1.0 + z*2 * SQRT3;
-			dist2 = 1.0 - x*2*SQRT3;
-			dist1 = max(dist1,0.0);
-			dist2 = max(dist2,0.0);
-			answer = max(dist1,dist2)/3.0;
-		}
-		else
-		{
-			/* triangle */
-			x -= SQRT3_2 + 0.5;
-			x = fabs(x);
-			dist2 = ((SQRT3 * z + x) ) * SQRT3 +0.5;
-			dist1 = 2.0 - (x * 2.0 * SQRT3 );
-			answer = (max(dist1,dist2))/3.0;
-		}
-	}
-	return answer;
+    if (x > (1.0+SQRT3_2) )
+    {
+        x = SQRT3+2.0 - x; /* mirror */
+    }
+    /*
+     ** And now, it is even simpler :  [0,1+(SQRT3/2)],[0,1+(SQRT3/2)]
+     ** on the top right corner, center of the hexagon
+     ** on the bottom right, middle of square, a triangle on the left
+     ** on the top left corner, half a triangle
+     ** bottom
+     */
+    if (((SQRT3*x+z)<(SQRT3_2+2.0))&&(x < 0.5+SQRT3_2))
+    {
+        /* Triangle or square */
+        /* rotate in the lower part */
+        z -= 0.5 + SQRT3_2 ;
+        x -= 1.0 + SQRT3_2 ;
+        dist1 = ( x / 2.0 ) - ( z * SQRT3_2 );
+        dist2 = ( z / 2.0 ) + ( x * SQRT3_2 );
+        z = dist2;
+        x = dist1;
+        z += 0.5 + SQRT3_2 ;
+        x += 1.0 + SQRT3_2 ;
+        if (z < 0)
+        {
+            z *= -1;
+        }
+        if (x > (1.0+SQRT3_2) )
+        {
+            x = SQRT3+2.0 - x; /* mirror */
+        }
+    }
+    if ((!((SQRT3*x+z)<(SQRT3_2+2.0)))&&(!(z < 0.5)))
+    {
+        /* Hexagon */
+        z -= 0.5;
+        x -= SQRT3_2;
+        z= fabs(z);
+        x= fabs(x);
+        dist1 = 2* z * SQRT3 ;
+        dist2 = ((SQRT3 * x + z ) ) * SQRT3 - 1.5;
+        answer = 3.0-min(dist1,dist2);
+        answer = max(answer,2.0000001); // TODO FIXME - magic number! Should use nextafter()
+        answer /= 3.0;
+        return answer;
+    }
+    if (z < 0.5 )
+    {
+        if ( x > SQRT3_2+0.5)
+        {
+            /* square */
+            x -= SQRT3_2+0.5;
+            z -= 0.5;
+            dist1 = 1.0 + z*2 * SQRT3;
+            dist2 = 1.0 - x*2*SQRT3;
+            dist1 = max(dist1,0.0);
+            dist2 = max(dist2,0.0);
+            answer = max(dist1,dist2)/3.0;
+        }
+        else
+        {
+            /* triangle */
+            x -= SQRT3_2 + 0.5;
+            x = fabs(x);
+            dist2 = ((SQRT3 * z + x) ) * SQRT3 +0.5;
+            dist1 = 2.0 - (x * 2.0 * SQRT3 );
+            answer = (max(dist1,dist2))/3.0;
+        }
+    }
+    return answer;
 }
 
 static DBL tiling_hexa_square_triangle_6 (const Vector3d& EPoint)
 {
-	/* 
-	 ** tiling with 1 hexagon, squares and triangles
-	 ** all tiles get its own colour (according to its orientation)
-	 ** 1 hexagon, 3 squares, 2 triangles
-	 */
-	DBL x,z;
-	DBL dist1,dist2;
-	DBL answer=0;
-	int mirX=0;
-	int mirZ=0;
-	int rota=0;
-	x=EPoint[X];
-	z=EPoint[Z];
-	x += 0.5;
-	x -= (3.0+SQRT3)*floor(x/(3.0+SQRT3));
-	z -= 2.0*(1.0+SQRT3)*floor(z/((SQRT3+1.0)*2.0));
-	/* x,z is in { [0.0, 3.0+SQRT3 [, [0.0, 2*(1+SQRT3) [ } 
-	 ** but there is some symmetry to simplify the testing
-	 */
-	if (x > (SQRT3_2+1.5))
-	{
-		x -= (SQRT3_2+1.5);
-		z += (z < SQRT3+1.0)?(SQRT3_2+0.5):(-1*(SQRT3_2+0.5));
-	}
-	if (z > (SQRT3+1.0) )
-	{
-		z -= SQRT3+1.0;
-	}
-	/* 
-	 ** Now only [0, SQRT3/2+1.5 ], [0,SQRT3+1.0]
-	 */
-	if (z > (0.5+SQRT3_2 ) )
-	{
-		z = SQRT3+1.0 - z; /* mirror */
-		mirZ = 1 - mirZ;
-	}
+    /*
+     ** tiling with 1 hexagon, squares and triangles
+     ** all tiles get its own colour (according to its orientation)
+     ** 1 hexagon, 3 squares, 2 triangles
+     */
+    DBL x,z;
+    DBL dist1,dist2;
+    DBL answer=0;
+    int mirX=0;
+    int mirZ=0;
+    int rota=0;
+    x=EPoint[X];
+    z=EPoint[Z];
+    x += 0.5;
+    x -= (3.0+SQRT3)*floor(x/(3.0+SQRT3));
+    z -= 2.0*(1.0+SQRT3)*floor(z/((SQRT3+1.0)*2.0));
+    /* x,z is in { [0.0, 3.0+SQRT3 [, [0.0, 2*(1+SQRT3) [ }
+     ** but there is some symmetry to simplify the testing
+     */
+    if (x > (SQRT3_2+1.5))
+    {
+        x -= (SQRT3_2+1.5);
+        z += (z < SQRT3+1.0)?(SQRT3_2+0.5):(-1*(SQRT3_2+0.5));
+    }
+    if (z > (SQRT3+1.0) )
+    {
+        z -= SQRT3+1.0;
+    }
+    /*
+     ** Now only [0, SQRT3/2+1.5 ], [0,SQRT3+1.0]
+     */
+    if (z > (0.5+SQRT3_2 ) )
+    {
+        z = SQRT3+1.0 - z; /* mirror */
+        mirZ = 1 - mirZ;
+    }
 
-	if (x > (1.0+SQRT3_2) )
-	{
-		x = SQRT3+2.0 - x; /* mirror */
-		mirX = 1 - mirX;
-	}
-	/*
-	 ** And now, it is even simpler :  [0,1+(SQRT3/2)],[0,1+(SQRT3/2)]
-	 ** on the top right corner, center of the hexagon
-	 ** on the bottom right, middle of square, a triangle on the left
-	 ** on the top left corner, half a triangle
-	 ** bottom
-	 */
-	if (((SQRT3*x+z)<(SQRT3_2+2.0))&&(x < 0.5+SQRT3_2))
-	{
-		/* Triangle or square */
-		/* rotate in the lower part */
-		z -= 0.5 + SQRT3_2 ;
-		x -= 1.0 + SQRT3_2 ;
-		dist1 = ( x / 2.0 ) - ( z * SQRT3_2 );
-		dist2 = ( z / 2.0 ) + ( x * SQRT3_2 );
-		z = dist2;
-		x = dist1;
-		z += 0.5 + SQRT3_2 ;
-		x += 1.0 + SQRT3_2 ;
-		rota = 1 - rota;
-		if (z < 0)
-		{
-			z *= -1;
-		}
-		if (x > (1.0+SQRT3_2) )
-		{
-			x = SQRT3+2.0 - x; /* mirror */
-			mirX = 1 - mirX;
-			mirZ = 1 - mirZ;
-		}
-	}
-	if ((!((SQRT3*x+z)<(SQRT3_2+2.0)))&&(!(z < 0.5)))
-	{
-		/* Hexagon */
-		z -= 0.5;
-		x -= SQRT3_2;
-		z= fabs(z);
-		x= fabs(x);
-		dist1 = 2* z * SQRT3 ;
-		dist2 = ((SQRT3 * x + z ) ) * SQRT3 - 1.5;
-		answer = 6.0 - min(dist1,dist2);
-		answer = max(answer,5.000001); // TODO FIXME - magic number! Should use nextafter()
-		answer /= 6.0;
-		return answer;
-	}
-	if (z < 0.5 )
-	{
-		if ( x > SQRT3_2+0.5)
-		{
-			/* square */
-			x -= SQRT3_2+0.5;
-			z -= 0.5;
-			dist1 = 1.0 + z*2 * SQRT3;
-			dist2 = 1.0 - x*2*SQRT3;
-			dist1 = max(dist1,0.0);
-			dist2 = max(dist2,0.0);
-			answer = (max(dist1,dist2) +  rota * (1.000001 + ((mirX + mirZ) % 2)))/6.0; // TODO FIXME - magic number! Should use nextafter()
-		}
-		else
-		{
-			/* triangle */
-			x -= SQRT3_2 + 0.5;
-			x = fabs(x);
-			dist2 = ((SQRT3 * z + x) ) * SQRT3 +0.5;
-			dist1 = 2.0 - (x * 2.0 * SQRT3 );
-			answer = max(dist1,dist2);
-			if ((rota + mirX)%2)
-			{
-				answer = 2.0 + answer;
-			}
-			else
-			{
-				answer = 3.0 + answer;
-			}
-			answer /= 6.0;
-		}
-	}
-	return answer;
+    if (x > (1.0+SQRT3_2) )
+    {
+        x = SQRT3+2.0 - x; /* mirror */
+        mirX = 1 - mirX;
+    }
+    /*
+     ** And now, it is even simpler :  [0,1+(SQRT3/2)],[0,1+(SQRT3/2)]
+     ** on the top right corner, center of the hexagon
+     ** on the bottom right, middle of square, a triangle on the left
+     ** on the top left corner, half a triangle
+     ** bottom
+     */
+    if (((SQRT3*x+z)<(SQRT3_2+2.0))&&(x < 0.5+SQRT3_2))
+    {
+        /* Triangle or square */
+        /* rotate in the lower part */
+        z -= 0.5 + SQRT3_2 ;
+        x -= 1.0 + SQRT3_2 ;
+        dist1 = ( x / 2.0 ) - ( z * SQRT3_2 );
+        dist2 = ( z / 2.0 ) + ( x * SQRT3_2 );
+        z = dist2;
+        x = dist1;
+        z += 0.5 + SQRT3_2 ;
+        x += 1.0 + SQRT3_2 ;
+        rota = 1 - rota;
+        if (z < 0)
+        {
+            z *= -1;
+        }
+        if (x > (1.0+SQRT3_2) )
+        {
+            x = SQRT3+2.0 - x; /* mirror */
+            mirX = 1 - mirX;
+            mirZ = 1 - mirZ;
+        }
+    }
+    if ((!((SQRT3*x+z)<(SQRT3_2+2.0)))&&(!(z < 0.5)))
+    {
+        /* Hexagon */
+        z -= 0.5;
+        x -= SQRT3_2;
+        z= fabs(z);
+        x= fabs(x);
+        dist1 = 2* z * SQRT3 ;
+        dist2 = ((SQRT3 * x + z ) ) * SQRT3 - 1.5;
+        answer = 6.0 - min(dist1,dist2);
+        answer = max(answer,5.000001); // TODO FIXME - magic number! Should use nextafter()
+        answer /= 6.0;
+        return answer;
+    }
+    if (z < 0.5 )
+    {
+        if ( x > SQRT3_2+0.5)
+        {
+            /* square */
+            x -= SQRT3_2+0.5;
+            z -= 0.5;
+            dist1 = 1.0 + z*2 * SQRT3;
+            dist2 = 1.0 - x*2*SQRT3;
+            dist1 = max(dist1,0.0);
+            dist2 = max(dist2,0.0);
+            answer = (max(dist1,dist2) +  rota * (1.000001 + ((mirX + mirZ) % 2)))/6.0; // TODO FIXME - magic number! Should use nextafter()
+        }
+        else
+        {
+            /* triangle */
+            x -= SQRT3_2 + 0.5;
+            x = fabs(x);
+            dist2 = ((SQRT3 * z + x) ) * SQRT3 +0.5;
+            dist1 = 2.0 - (x * 2.0 * SQRT3 );
+            answer = max(dist1,dist2);
+            if ((rota + mirX)%2)
+            {
+                answer = 2.0 + answer;
+            }
+            else
+            {
+                answer = 3.0 + answer;
+            }
+            answer /= 6.0;
+        }
+    }
+    return answer;
 }
 
 static DBL tiling_rectangle_pair (const Vector3d& EPoint)
 {
 
-	/*
-	 ** Tiling with 2 rectangles (2x1)
-	 ** Reduce to [0,4][0,4] then 16 cases
-	 **
-	 **  +-----+--+--+
-	 **  |     |  |  |
-	 **  +-----+  +  +
-	 **  |     |  |  |
-	 **  +-----+--+--+
-	 **  |  |  |     |
-	 **  |  |  +-----+
-	 **  |  |  |     |
-	 **  +--+--+-----+
-	 */
-	DBL x,z;
-	DBL delta;
-	DBL answer;
-	int valueX,valueZ;
-	x=EPoint[X];
-	z=EPoint[Z];
-	x -= 4.0*floor(x/4.0);
-	z -= 4.0*floor(z/4.0);
-	valueX = (int)x;
-	valueZ = (int)z;
-	delta = 1.0;
-	switch((valueX+valueZ*4))
-	{
-		case 0:
-		case 4:
-			z -= 1.0;
-			break;
-		case 1:
-		case 5:
-			x -= 1.0;
-			z -= 1.0;
-			break;
-		case 2:
-		case 3:
-			x -= 3.0;
-			delta = 0.0;
-			break;
-		case 6:
-		case 7:
-			x -= 3.0;
-			z -= 1.0;
-			delta = 0.0;
-			break;
-		case 8:
-		case 9:
-			x -= 1.0;
-			z -= 2.0;
-			delta = 0.0;
-			break;
-		case 12:
-		case 13:
-			x -= 1.0;
-			z -= 3.0;
-			delta = 0.0;
-			break;
-		case 10:
-		case 14:
-			x -= 2.0;
-			z -= 3.0;
-			break;
-		case 11:
-		case 15:
-			x -= 3.0;
-			z -= 3.0;
-			break;
-	}
-	if (delta == 1.0)
-	{
-		x = 2*fabs( x-0.5 );
-		z = 2*( max(fabs( z),0.5) -0.5 );
-	}
-	else
-	{
-		x = 2*( max(fabs( x),0.5) -0.5 );
-		z = 2*fabs( z -0.5 );
-	}
-	answer = fabs((max(x,z)+delta)/2.0);
-	return answer;
+    /*
+     ** Tiling with 2 rectangles (2x1)
+     ** Reduce to [0,4][0,4] then 16 cases
+     **
+     **  +-----+--+--+
+     **  |     |  |  |
+     **  +-----+  +  +
+     **  |     |  |  |
+     **  +-----+--+--+
+     **  |  |  |     |
+     **  |  |  +-----+
+     **  |  |  |     |
+     **  +--+--+-----+
+     */
+    DBL x,z;
+    DBL delta;
+    DBL answer;
+    int valueX,valueZ;
+    x=EPoint[X];
+    z=EPoint[Z];
+    x -= 4.0*floor(x/4.0);
+    z -= 4.0*floor(z/4.0);
+    valueX = (int)x;
+    valueZ = (int)z;
+    delta = 1.0;
+    switch((valueX+valueZ*4))
+    {
+        case 0:
+        case 4:
+            z -= 1.0;
+            break;
+        case 1:
+        case 5:
+            x -= 1.0;
+            z -= 1.0;
+            break;
+        case 2:
+        case 3:
+            x -= 3.0;
+            delta = 0.0;
+            break;
+        case 6:
+        case 7:
+            x -= 3.0;
+            z -= 1.0;
+            delta = 0.0;
+            break;
+        case 8:
+        case 9:
+            x -= 1.0;
+            z -= 2.0;
+            delta = 0.0;
+            break;
+        case 12:
+        case 13:
+            x -= 1.0;
+            z -= 3.0;
+            delta = 0.0;
+            break;
+        case 10:
+        case 14:
+            x -= 2.0;
+            z -= 3.0;
+            break;
+        case 11:
+        case 15:
+            x -= 3.0;
+            z -= 3.0;
+            break;
+    }
+    if (delta == 1.0)
+    {
+        x = 2*fabs( x-0.5 );
+        z = 2*( max(fabs( z),0.5) -0.5 );
+    }
+    else
+    {
+        x = 2*( max(fabs( x),0.5) -0.5 );
+        z = 2*fabs( z -0.5 );
+    }
+    answer = fabs((max(x,z)+delta)/2.0);
+    return answer;
 }
 
 static DBL tiling_hexa_tri_right (const Vector3d& EPoint)
 {
-	DBL x,z;
-	DBL answer;
-	DBL slop1;
-	DBL dist1,dist2;
-	int zzof;
-	int delta;
-	x=EPoint[X];
-	z=EPoint[Z];
-	/* First, resume to a simple pattern */
-	zzof = z / SQRT3_2;
-	zzof /= 3;
-	if (z < 0)
-	{
-		zzof -= 1;
-	}
-	x += zzof / 2.0; /* right handed */
-	z -= 3*SQRT3_2*floor(z/(3*SQRT3_2));
-	x += 7.0;
-	x -= 7.0 *floor(x/7.0);
-	if ((x > 4.5) && (z > SQRT3))
-	{
-		x -= 4.5;
-		z -= SQRT3_2;
-	}
-	if ((x > 5.0) && (z < SQRT3_2))
-	{
-		x -= 5;
-		z += SQRT3;
-	}
-	if ((x > 2.5) && (z < SQRT3))
-	{
-		x -= 2.5;
-		z += SQRT3_2;
-	}
-	delta = 0;
-	zzof = z /SQRT3_2;
-	if ( zzof == 2)
-	{
-		zzof = 1;
-		z = 2 * SQRT3 - z;
-		delta = 1 - delta;
-	}
-	if ( (!zzof) || (x > 2.0) ||
-	     (( z + SQRT3*x < SQRT3) || ( SQRT3*x -z > SQRT3)) )
-	{
-		/* triangle */
-		x -= 1.0 *floor(x/1.0);
-		z -= SQRT3*floor(z/SQRT3);
-		/* x,z is in { [0.0, 1.0 [, [0.0, SQRT3 [ } 
-		 ** but there is some symmetry to simplify the testing
-		 */
-		if (z > SQRT3_2 )
-		{
-			z = SQRT3 - z; /* mirror */
-			delta = 1 - delta;
-		}
-		if (x > 0.5)
-		{
-			x = 1.0 - x; /* mirror */
-		}
-		if (x != 0.0)
-		{
-			slop1 = z/x;
-			if (slop1>SQRT3)
-			{
-				z = SQRT3_2 - z;
-				x = 0.5 -x;
-				delta = 1 - delta;
-			}
-		}
-		else
-		{
-			z = SQRT3_2 -z;
-			x = 0.5;
-			delta = 1 - delta;
-		}
-		dist1 = 1.0 - (z * 2 * SQRT3 );
-		dist2 = 1.0 - ((SQRT3 * x - z) * SQRT3 );
-		return (delta+max(dist1,dist2))/3.0;
-	}
-	else
-	{ /* hexagon */
-		z -= SQRT3_2;
-		if (x > 1.0)
-		{
-			x = 2.0 - x; /* mirror */
-		}
-		/* Hexagon */
-		dist1 = 2 + 2* (z * SQRT3 );
-		dist2 = 2 + 2* ((SQRT3 * x + z - SQRT3_2) ) * SQRT3_2 ;
-		answer = 5.0-min(dist1,dist2);
-		answer = max(answer, 2.000001); // TODO FIXME - magic number! Should use nextafter()
-		answer /= 3.0;
-		return answer;
-	}
+    DBL x,z;
+    DBL answer;
+    DBL slop1;
+    DBL dist1,dist2;
+    int zzof;
+    int delta;
+    x=EPoint[X];
+    z=EPoint[Z];
+    /* First, resume to a simple pattern */
+    zzof = z / SQRT3_2;
+    zzof /= 3;
+    if (z < 0)
+    {
+        zzof -= 1;
+    }
+    x += zzof / 2.0; /* right handed */
+    z -= 3*SQRT3_2*floor(z/(3*SQRT3_2));
+    x += 7.0;
+    x -= 7.0 *floor(x/7.0);
+    if ((x > 4.5) && (z > SQRT3))
+    {
+        x -= 4.5;
+        z -= SQRT3_2;
+    }
+    if ((x > 5.0) && (z < SQRT3_2))
+    {
+        x -= 5;
+        z += SQRT3;
+    }
+    if ((x > 2.5) && (z < SQRT3))
+    {
+        x -= 2.5;
+        z += SQRT3_2;
+    }
+    delta = 0;
+    zzof = z /SQRT3_2;
+    if ( zzof == 2)
+    {
+        zzof = 1;
+        z = 2 * SQRT3 - z;
+        delta = 1 - delta;
+    }
+    if ( (!zzof) || (x > 2.0) ||
+         (( z + SQRT3*x < SQRT3) || ( SQRT3*x -z > SQRT3)) )
+    {
+        /* triangle */
+        x -= 1.0 *floor(x/1.0);
+        z -= SQRT3*floor(z/SQRT3);
+        /* x,z is in { [0.0, 1.0 [, [0.0, SQRT3 [ }
+         ** but there is some symmetry to simplify the testing
+         */
+        if (z > SQRT3_2 )
+        {
+            z = SQRT3 - z; /* mirror */
+            delta = 1 - delta;
+        }
+        if (x > 0.5)
+        {
+            x = 1.0 - x; /* mirror */
+        }
+        if (x != 0.0)
+        {
+            slop1 = z/x;
+            if (slop1>SQRT3)
+            {
+                z = SQRT3_2 - z;
+                x = 0.5 -x;
+                delta = 1 - delta;
+            }
+        }
+        else
+        {
+            z = SQRT3_2 -z;
+            x = 0.5;
+            delta = 1 - delta;
+        }
+        dist1 = 1.0 - (z * 2 * SQRT3 );
+        dist2 = 1.0 - ((SQRT3 * x - z) * SQRT3 );
+        return (delta+max(dist1,dist2))/3.0;
+    }
+    else
+    { /* hexagon */
+        z -= SQRT3_2;
+        if (x > 1.0)
+        {
+            x = 2.0 - x; /* mirror */
+        }
+        /* Hexagon */
+        dist1 = 2 + 2* (z * SQRT3 );
+        dist2 = 2 + 2* ((SQRT3 * x + z - SQRT3_2) ) * SQRT3_2 ;
+        answer = 5.0-min(dist1,dist2);
+        answer = max(answer, 2.000001); // TODO FIXME - magic number! Should use nextafter()
+        answer /= 3.0;
+        return answer;
+    }
 }
 
 static DBL tiling_hexa_tri_left (const Vector3d& EPoint)
 {
-	DBL x,z;
-	DBL slop1;
-	DBL dist1,dist2;
-	DBL answer;
-	int zzof;
-	int delta;
-	x=EPoint[X];
-	z=EPoint[Z];
-	/* First, resume to a simple pattern */
-	zzof = z / SQRT3_2;
-	zzof /= 3;
-	if (z < 0)
-	{
-		zzof -= 1;
-	}
-	x -= zzof / 2.0; /* left handed */
-	z -= 3*SQRT3_2*floor(z/(3*SQRT3_2));
-	x += 7.0;
-	x -= 7.0 *floor(x/7.0);
-	if ((x > 2.0) && (z < SQRT3_2))
-	{
-		x -= 2.0;
-		z += SQRT3;
-	}
-	if ((x > 4.5) && (z < SQRT3))
-	{
-		x -= 4.5;
-		z += SQRT3_2;
-	}
-	if ((x > 2.5) && (z > SQRT3))
-	{
-		x -= 2.5;
-		z -= SQRT3_2;
-	}
-	delta = 0;
-	zzof = z /SQRT3_2;
-	if ( zzof == 2)
-	{
-		zzof = 1;
-		z = 2 * SQRT3 - z;
-		delta = 1 - delta;
-	}
-	if ( (!zzof) || (x > 2.0) ||
-	     (( z + SQRT3*x < SQRT3) || ( SQRT3*x -z > SQRT3)) )
-	{
-		/* triangle */
-		x -= 1.0 *floor(x/1.0);
-		z -= SQRT3*floor(z/SQRT3);
-		/* x,z is in { [0.0, 1.0 [, [0.0, SQRT3 [ } 
-		 ** but there is some symmetry to simplify the testing
-		 */
-		if (z > SQRT3_2 )
-		{
-			z = SQRT3 - z; /* mirror */
-			delta = 1 - delta;
-		}
-		if (x > 0.5)
-		{
-			x = 1.0 - x; /* mirror */
-		}
-		if (x != 0.0)
-		{
-			slop1 = z/x;
-			if (slop1>SQRT3)
-			{
-				z = SQRT3_2 - z;
-				x = 0.5 -x;
-				delta = 1 - delta;
-			}
-		}
-		else
-		{
-			z = SQRT3_2 -z;
-			x = 0.5;
-			delta = 1 - delta;
-		}
-		dist1 = 1.0 - (z * 2 * SQRT3 );
-		dist2 = 1.0 - ((SQRT3 * x - z) * SQRT3 );
-		return (delta+max(dist1,dist2))/3.0;
-	}
-	else
-	{ /* hexagon */
-		z -= SQRT3_2;
-		if (x > 1.0)
-		{
-			x = 2.0 - x; /* mirror */
-		}
-		/* Hexagon */
-		dist1 = 2 + 2* (z * SQRT3 );
-		dist2 = 2 + 2* ((SQRT3 * x + z - SQRT3_2) ) * SQRT3_2 ;
-		answer = 5.0-min(dist1,dist2);
-		answer = max(answer, 2.000001); // TODO FIXME - magic number! Should use nextafter()
-		answer /= 3.0;
-		return answer;
-	}
+    DBL x,z;
+    DBL slop1;
+    DBL dist1,dist2;
+    DBL answer;
+    int zzof;
+    int delta;
+    x=EPoint[X];
+    z=EPoint[Z];
+    /* First, resume to a simple pattern */
+    zzof = z / SQRT3_2;
+    zzof /= 3;
+    if (z < 0)
+    {
+        zzof -= 1;
+    }
+    x -= zzof / 2.0; /* left handed */
+    z -= 3*SQRT3_2*floor(z/(3*SQRT3_2));
+    x += 7.0;
+    x -= 7.0 *floor(x/7.0);
+    if ((x > 2.0) && (z < SQRT3_2))
+    {
+        x -= 2.0;
+        z += SQRT3;
+    }
+    if ((x > 4.5) && (z < SQRT3))
+    {
+        x -= 4.5;
+        z += SQRT3_2;
+    }
+    if ((x > 2.5) && (z > SQRT3))
+    {
+        x -= 2.5;
+        z -= SQRT3_2;
+    }
+    delta = 0;
+    zzof = z /SQRT3_2;
+    if ( zzof == 2)
+    {
+        zzof = 1;
+        z = 2 * SQRT3 - z;
+        delta = 1 - delta;
+    }
+    if ( (!zzof) || (x > 2.0) ||
+         (( z + SQRT3*x < SQRT3) || ( SQRT3*x -z > SQRT3)) )
+    {
+        /* triangle */
+        x -= 1.0 *floor(x/1.0);
+        z -= SQRT3*floor(z/SQRT3);
+        /* x,z is in { [0.0, 1.0 [, [0.0, SQRT3 [ }
+         ** but there is some symmetry to simplify the testing
+         */
+        if (z > SQRT3_2 )
+        {
+            z = SQRT3 - z; /* mirror */
+            delta = 1 - delta;
+        }
+        if (x > 0.5)
+        {
+            x = 1.0 - x; /* mirror */
+        }
+        if (x != 0.0)
+        {
+            slop1 = z/x;
+            if (slop1>SQRT3)
+            {
+                z = SQRT3_2 - z;
+                x = 0.5 -x;
+                delta = 1 - delta;
+            }
+        }
+        else
+        {
+            z = SQRT3_2 -z;
+            x = 0.5;
+            delta = 1 - delta;
+        }
+        dist1 = 1.0 - (z * 2 * SQRT3 );
+        dist2 = 1.0 - ((SQRT3 * x - z) * SQRT3 );
+        return (delta+max(dist1,dist2))/3.0;
+    }
+    else
+    { /* hexagon */
+        z -= SQRT3_2;
+        if (x > 1.0)
+        {
+            x = 2.0 - x; /* mirror */
+        }
+        /* Hexagon */
+        dist1 = 2 + 2* (z * SQRT3 );
+        dist2 = 2 + 2* ((SQRT3 * x + z - SQRT3_2) ) * SQRT3_2 ;
+        answer = 5.0-min(dist1,dist2);
+        answer = max(answer, 2.000001); // TODO FIXME - magic number! Should use nextafter()
+        answer /= 3.0;
+        return answer;
+    }
 }
 
 static DBL tiling_square_tri (const Vector3d& EPoint)
 {
-	DBL x,z;
-	DBL slop1;
-	DBL dist1,dist2;
-	int delta;
-	int gamma,beta;
-	int xflop,zflop;
-	x=EPoint[X];
-	z=EPoint[Z];
-	delta = 0;
-	gamma = 0;
-	beta = 0;
-	x -= (1.0+SQRT3)*floor(x/(1.0+SQRT3));
-	z -= (1.0+SQRT3)*floor(z/(1.0+SQRT3));
-	/* x,z is in { [0.0, SQRT3+1.0 [, [0.0, SQRT3+1.0 [ } 
-	 ** but there is some symmetry to simplify the testing
-	 */
-	if (z > 0.5 + SQRT3_2 )
-	{
-		z = 1.0 + SQRT3 - z; /* mirror */
-		delta = 1 - delta;
-	}
-	if (x > 0.5 + SQRT3_2)
-	{
-		x = 1.0 + SQRT3 - x; /* mirror */
-		delta = 1 - delta;
-		beta = 1;
-	}
-	/* x,z is in { [0.0, (SQRT3+1)/2 ], [0.0, (SQRT3+1)/2 ] }
-	 ** but there is still a symmetry and a rotation 
-	 */
-	xflop = ( 2.0 * x + (SQRT3 -1.0)* 2.0 * z / ( SQRT3 + 1.0) > (SQRT3)) ? 1: 0;
-	zflop = ( 2.0 * z * SQRT3 + (SQRT3 -3.0)* 2.0 * x / ( SQRT3 + 1.0) > (SQRT3)) ? 1: 0;
-	switch (xflop + 2*zflop)
-	{
-		case 0: /* do nothing */
-			gamma = 2 * beta;
-			break;
-		case 1: /* rotate clockwise */
-			gamma = beta ? 1 + 2 * delta : 3 - 2 *delta;
-			slop1 = x;
-			x = z;
-			z = SQRT3_2 + 0.5 - slop1;
-			break;
-		case 2: /* rotate normal */
-			gamma = beta ? 3 - 2 * delta : 1 + 2 *delta;
-			slop1 = z;
-			z = x;
-			x = SQRT3_2 +0.5 - slop1;
-			break;
-		case 3: /* symmetry */
-			gamma = beta ? 0: 2 ;
-			x = SQRT3_2+0.5 -x;
-			z = SQRT3_2+0.5 -z;
-			break;
-	}
+    DBL x,z;
+    DBL slop1;
+    DBL dist1,dist2;
+    int delta;
+    int gamma,beta;
+    int xflop,zflop;
+    x=EPoint[X];
+    z=EPoint[Z];
+    delta = 0;
+    gamma = 0;
+    beta = 0;
+    x -= (1.0+SQRT3)*floor(x/(1.0+SQRT3));
+    z -= (1.0+SQRT3)*floor(z/(1.0+SQRT3));
+    /* x,z is in { [0.0, SQRT3+1.0 [, [0.0, SQRT3+1.0 [ }
+     ** but there is some symmetry to simplify the testing
+     */
+    if (z > 0.5 + SQRT3_2 )
+    {
+        z = 1.0 + SQRT3 - z; /* mirror */
+        delta = 1 - delta;
+    }
+    if (x > 0.5 + SQRT3_2)
+    {
+        x = 1.0 + SQRT3 - x; /* mirror */
+        delta = 1 - delta;
+        beta = 1;
+    }
+    /* x,z is in { [0.0, (SQRT3+1)/2 ], [0.0, (SQRT3+1)/2 ] }
+     ** but there is still a symmetry and a rotation
+     */
+    xflop = ( 2.0 * x + (SQRT3 -1.0)* 2.0 * z / ( SQRT3 + 1.0) > (SQRT3)) ? 1: 0;
+    zflop = ( 2.0 * z * SQRT3 + (SQRT3 -3.0)* 2.0 * x / ( SQRT3 + 1.0) > (SQRT3)) ? 1: 0;
+    switch (xflop + 2*zflop)
+    {
+        case 0: /* do nothing */
+            gamma = 2 * beta;
+            break;
+        case 1: /* rotate clockwise */
+            gamma = beta ? 1 + 2 * delta : 3 - 2 *delta;
+            slop1 = x;
+            x = z;
+            z = SQRT3_2 + 0.5 - slop1;
+            break;
+        case 2: /* rotate normal */
+            gamma = beta ? 3 - 2 * delta : 1 + 2 *delta;
+            slop1 = z;
+            z = x;
+            x = SQRT3_2 +0.5 - slop1;
+            break;
+        case 3: /* symmetry */
+            gamma = beta ? 0: 2 ;
+            x = SQRT3_2+0.5 -x;
+            z = SQRT3_2+0.5 -z;
+            break;
+    }
 
-	if (x == 0.0)
-	{
-		z = 0.0;
-		x = 0.0;
-	}
-	slop1 = (z * 2 * SQRT3) - SQRT3 + x * 2;
-	if (slop1 < 0)
-	{
-		/* triangle */
+    if (x == 0.0)
+    {
+        z = 0.0;
+        x = 0.0;
+    }
+    slop1 = (z * 2 * SQRT3) - SQRT3 + x * 2;
+    if (slop1 < 0)
+    {
+        /* triangle */
 
-		dist1 = -1.5 / SQRT3 * slop1;
-		dist2 = 2.0 * x * SQRT3;
-		slop1 = min(dist1,dist2);
-		return (gamma+1.0-slop1)/6.0;
-	}
-	else
-	{
-		/* square */
-		slop1 *= 1.5 / SQRT3;
-		slop1 = min(slop1,1.0);
-		if (delta)
-		{
-			slop1 *= -1;
-			slop1 += 6.0;
-			slop1 /= 6.0;
-			slop1 = max(slop1,5.000001/6.0); // TODO FIXME - magic number! Should use nextafter()
-			slop1 = min(slop1,1.0);
-		}
-		else
-		{
-			slop1 *= -1;
-			slop1 += 5.0;
-			slop1 /= 6.0;
-			slop1 = min(slop1,5.0/6.0);
-			slop1 = max(slop1,4.000001/6.0); // TODO FIXME - magic number! Should use nextafter()
-		}
-		return slop1;
-	}
+        dist1 = -1.5 / SQRT3 * slop1;
+        dist2 = 2.0 * x * SQRT3;
+        slop1 = min(dist1,dist2);
+        return (gamma+1.0-slop1)/6.0;
+    }
+    else
+    {
+        /* square */
+        slop1 *= 1.5 / SQRT3;
+        slop1 = min(slop1,1.0);
+        if (delta)
+        {
+            slop1 *= -1;
+            slop1 += 6.0;
+            slop1 /= 6.0;
+            slop1 = max(slop1,5.000001/6.0); // TODO FIXME - magic number! Should use nextafter()
+            slop1 = min(slop1,1.0);
+        }
+        else
+        {
+            slop1 *= -1;
+            slop1 += 5.0;
+            slop1 /= 6.0;
+            slop1 = min(slop1,5.0/6.0);
+            slop1 = max(slop1,4.000001/6.0); // TODO FIXME - magic number! Should use nextafter()
+        }
+        return slop1;
+    }
 }
 
 static DBL tiling_dodeca_tri (const Vector3d& EPoint)
 {
-	DBL x,z;
-	DBL dist1,dist2,dist3,dist4,ret_value;
-	DBL tmpx,tmpz;
-	int toggle=0; /* switched each time a triangle get toggled */
-	x=EPoint[X];
-	z=EPoint[Z];
-	x -= (2.0+SQRT3)*floor(x/(2.0+SQRT3));
-	z -= (3.0+2.0*SQRT3)*floor(z/(3.0+2.0*SQRT3));
-	/* x,z is in { [0.0, SQRT3+2.0 [, [0.0, 2*SQRT3+3.0 [ } 
-	 ** but there is some symmetry to simplify the testing
-	 */
-	if (z > SQRT3+1.5)
-	{
-		/* translate */
-		z -= SQRT3+1.5;
-		x += (x<(1.0+SQRT3_2) ? 1.0: -1.0)*(1.0+SQRT3_2);
-	}
-	if (x > 1.0+SQRT3_2)
-	{
-		x = 2.0 + SQRT3 -x;
-	}
-	if (z > 1.0+SQRT3_2)
-	{
-		z = 2.0 + SQRT3 -z;
-		toggle = 1 - toggle;
-	}
-	dist2 = x - SQRT3_2 - 0.5 + z * SQRT3;
-	if (dist2 < 0.0)
-	{
-		tmpx = x;
-		tmpz = z;
-		x = (1.0+SQRT3)/4.0 + 0.5 * tmpx - SQRT3_2 * tmpz ;
-		z = (3.0+SQRT3)/4.0 - SQRT3_2 * tmpx - 0.5 * tmpz ;
-		dist2 *= -1.0;
-	}
-	dist1 = (z * 3.0 ); /* from the bottom line */
-	dist3 =  z - SQRT3_2 - 0.5 + x * SQRT3;
-	dist3 *= SQRT3;
-	dist2 *= SQRT3;
-	dist4 = (x * 3.0 ); /* from the vertical line */
-	if (dist3 < 0.0)
-	{
-		ret_value = max(dist3,-1.0);
-		ret_value += 1+toggle;
-		ret_value /= 3.0;
-	}
-	else
-	{
-		/* dodecagon */
-		ret_value = min(dist1,dist2);
-		ret_value = min(ret_value,dist3);
-		ret_value = min(ret_value,dist4);
-		ret_value = min(ret_value,1.0);
-		ret_value = 3.0000001 - ret_value; // TODO FIXME - magic number! Should use nextafter()
+    DBL x,z;
+    DBL dist1,dist2,dist3,dist4,ret_value;
+    DBL tmpx,tmpz;
+    int toggle=0; /* switched each time a triangle get toggled */
+    x=EPoint[X];
+    z=EPoint[Z];
+    x -= (2.0+SQRT3)*floor(x/(2.0+SQRT3));
+    z -= (3.0+2.0*SQRT3)*floor(z/(3.0+2.0*SQRT3));
+    /* x,z is in { [0.0, SQRT3+2.0 [, [0.0, 2*SQRT3+3.0 [ }
+     ** but there is some symmetry to simplify the testing
+     */
+    if (z > SQRT3+1.5)
+    {
+        /* translate */
+        z -= SQRT3+1.5;
+        x += (x<(1.0+SQRT3_2) ? 1.0: -1.0)*(1.0+SQRT3_2);
+    }
+    if (x > 1.0+SQRT3_2)
+    {
+        x = 2.0 + SQRT3 -x;
+    }
+    if (z > 1.0+SQRT3_2)
+    {
+        z = 2.0 + SQRT3 -z;
+        toggle = 1 - toggle;
+    }
+    dist2 = x - SQRT3_2 - 0.5 + z * SQRT3;
+    if (dist2 < 0.0)
+    {
+        tmpx = x;
+        tmpz = z;
+        x = (1.0+SQRT3)/4.0 + 0.5 * tmpx - SQRT3_2 * tmpz ;
+        z = (3.0+SQRT3)/4.0 - SQRT3_2 * tmpx - 0.5 * tmpz ;
+        dist2 *= -1.0;
+    }
+    dist1 = (z * 3.0 ); /* from the bottom line */
+    dist3 =  z - SQRT3_2 - 0.5 + x * SQRT3;
+    dist3 *= SQRT3;
+    dist2 *= SQRT3;
+    dist4 = (x * 3.0 ); /* from the vertical line */
+    if (dist3 < 0.0)
+    {
+        ret_value = max(dist3,-1.0);
+        ret_value += 1+toggle;
+        ret_value /= 3.0;
+    }
+    else
+    {
+        /* dodecagon */
+        ret_value = min(dist1,dist2);
+        ret_value = min(ret_value,dist3);
+        ret_value = min(ret_value,dist4);
+        ret_value = min(ret_value,1.0);
+        ret_value = 3.0000001 - ret_value; // TODO FIXME - magic number! Should use nextafter()
 
-		ret_value /= 3.0;
-	}
-	return ret_value;
+        ret_value /= 3.0;
+    }
+    return ret_value;
 }
 
 static DBL tiling_dodeca_hex (const Vector3d& EPoint)
 {
-	DBL x,z;
-	DBL dist1,dist2,dist3,dist4,ret_value;
-	DBL dist5,dist6,dist7;
-	DBL tmpx,tmpz;
-	x=EPoint[X];
-	z=EPoint[Z];
-	x -= (3.0+SQRT3)*floor(x/(3.0+SQRT3));
-	z -= (3.0+3.0*SQRT3)*floor(z/(3.0+3.0*SQRT3));
-	/* x,z is in { [0.0, SQRT3+3.0 [, [0.0, 3*SQRT3+3.0 [ } 
-	 ** but there is some symmetry to simplify the testing
-	 */
-	if (z > 1.5*SQRT3+1.5)
-	{
-		/* translate */
-		z -= 1.5*SQRT3+1.5;
-		x += (x<(1.5+SQRT3_2) ? 1.0: -1.0)*(1.5+SQRT3_2);
-	}
-	if (x > 1.5+SQRT3_2)
-	{
-		x = 3.0 + SQRT3 -x;
-	}
-	if (z > 1.0+SQRT3)
-	{
-		z = 2.0 + 2.0*SQRT3 -z;
-	}
-	dist2 = x - SQRT3_2 - 1.5 + z * SQRT3;
-	if (dist2 < 0.0)
-	{
-		tmpx = x;
-		tmpz = z;
-		x = (3.0+SQRT3)/4.0 + 0.5 * tmpx - SQRT3_2 * tmpz ;
-		z = (3.0+3.0*SQRT3)/4.0 - SQRT3_2 * tmpx - 0.5 * tmpz ;
-	}
-	dist2 = x - SQRT3_2 - 2.5 + z * SQRT3;
-	dist1 = (z * 2.0 ) - SQRT3; /* from the bottom line */
-	dist3 = z - 1.5*SQRT3 - 0.5 + x * SQRT3;
-	dist4 = ((x-0.5) * 2.0 ); /* from the vertical line */
-	if ( (dist2 >= 0.0) &&
-	     (dist1 >= 0.0) &&
-	     (dist3 >= 0.0) &&
-	     (dist4 >= 0.0) )
-	{
-		/* dodecagon */
-		ret_value = min(dist1,dist2);
-		ret_value = min(ret_value,dist3);
-		ret_value = min(ret_value,dist4);
-		ret_value = min(ret_value,1.0);
-		ret_value = 3.000001 - ret_value; // TODO FIXME - magic number! Should use nextafter()
-	}
-	else
-	{
-		dist5 = 2*z - 2*SQRT3 - 1.0;
-		if (dist5 >= 0)
-		{
-			dist4 *= -1.0;
-			ret_value = min(dist5,dist4);
-			ret_value = 2.0 - ret_value;
-		}
-		else
-		{
-			dist6 = SQRT3 * x - z -SQRT3_2 +0.5;
-			dist7 = dist6 - 2.0;
-			switch((dist6 >= 0?0:1)+(dist7 >= 0.0 ?2:0))
-			{
-				case 1: /* left hexagon */
-					dist5 *= -1.0;
-					dist6 *= -1.0;
-					dist3 *= -1.0;
-					ret_value = min(dist6,dist3);
-					ret_value = min(ret_value,dist5);
-					ret_value = min(ret_value,1.0);
-					ret_value = 1.0 - ret_value;
-					break;
-				case 2: /* bottom hexagon */
-					dist1 *= -1.0;
-					ret_value = min(dist7,dist1);
-					ret_value = min(ret_value,1.0);
-					ret_value = 1.0 - ret_value;
-					break;
-				case 0:
-				default: /* slanted square */
-					dist2 *= -1.0;
-					dist7 *= -1.0;
-					ret_value = min(dist6,dist2);
-					ret_value = min(ret_value,dist7);
-					ret_value = 2.0 - ret_value;
-					break;
-			}
-		}
-	}
-	ret_value /= 3.0;
-	return ret_value;
+    DBL x,z;
+    DBL dist1,dist2,dist3,dist4,ret_value;
+    DBL dist5,dist6,dist7;
+    DBL tmpx,tmpz;
+    x=EPoint[X];
+    z=EPoint[Z];
+    x -= (3.0+SQRT3)*floor(x/(3.0+SQRT3));
+    z -= (3.0+3.0*SQRT3)*floor(z/(3.0+3.0*SQRT3));
+    /* x,z is in { [0.0, SQRT3+3.0 [, [0.0, 3*SQRT3+3.0 [ }
+     ** but there is some symmetry to simplify the testing
+     */
+    if (z > 1.5*SQRT3+1.5)
+    {
+        /* translate */
+        z -= 1.5*SQRT3+1.5;
+        x += (x<(1.5+SQRT3_2) ? 1.0: -1.0)*(1.5+SQRT3_2);
+    }
+    if (x > 1.5+SQRT3_2)
+    {
+        x = 3.0 + SQRT3 -x;
+    }
+    if (z > 1.0+SQRT3)
+    {
+        z = 2.0 + 2.0*SQRT3 -z;
+    }
+    dist2 = x - SQRT3_2 - 1.5 + z * SQRT3;
+    if (dist2 < 0.0)
+    {
+        tmpx = x;
+        tmpz = z;
+        x = (3.0+SQRT3)/4.0 + 0.5 * tmpx - SQRT3_2 * tmpz ;
+        z = (3.0+3.0*SQRT3)/4.0 - SQRT3_2 * tmpx - 0.5 * tmpz ;
+    }
+    dist2 = x - SQRT3_2 - 2.5 + z * SQRT3;
+    dist1 = (z * 2.0 ) - SQRT3; /* from the bottom line */
+    dist3 = z - 1.5*SQRT3 - 0.5 + x * SQRT3;
+    dist4 = ((x-0.5) * 2.0 ); /* from the vertical line */
+    if ( (dist2 >= 0.0) &&
+         (dist1 >= 0.0) &&
+         (dist3 >= 0.0) &&
+         (dist4 >= 0.0) )
+    {
+        /* dodecagon */
+        ret_value = min(dist1,dist2);
+        ret_value = min(ret_value,dist3);
+        ret_value = min(ret_value,dist4);
+        ret_value = min(ret_value,1.0);
+        ret_value = 3.000001 - ret_value; // TODO FIXME - magic number! Should use nextafter()
+    }
+    else
+    {
+        dist5 = 2*z - 2*SQRT3 - 1.0;
+        if (dist5 >= 0)
+        {
+            dist4 *= -1.0;
+            ret_value = min(dist5,dist4);
+            ret_value = 2.0 - ret_value;
+        }
+        else
+        {
+            dist6 = SQRT3 * x - z -SQRT3_2 +0.5;
+            dist7 = dist6 - 2.0;
+            switch((dist6 >= 0?0:1)+(dist7 >= 0.0 ?2:0))
+            {
+                case 1: /* left hexagon */
+                    dist5 *= -1.0;
+                    dist6 *= -1.0;
+                    dist3 *= -1.0;
+                    ret_value = min(dist6,dist3);
+                    ret_value = min(ret_value,dist5);
+                    ret_value = min(ret_value,1.0);
+                    ret_value = 1.0 - ret_value;
+                    break;
+                case 2: /* bottom hexagon */
+                    dist1 *= -1.0;
+                    ret_value = min(dist7,dist1);
+                    ret_value = min(ret_value,1.0);
+                    ret_value = 1.0 - ret_value;
+                    break;
+                case 0:
+                default: /* slanted square */
+                    dist2 *= -1.0;
+                    dist7 *= -1.0;
+                    ret_value = min(dist6,dist2);
+                    ret_value = min(ret_value,dist7);
+                    ret_value = 2.0 - ret_value;
+                    break;
+            }
+        }
+    }
+    ret_value /= 3.0;
+    return ret_value;
 }
 
 static DBL tiling_dodeca_hex_5 (const Vector3d& EPoint)
 {
-	DBL x,z;
-	DBL dist1,dist2,dist3,dist4,ret_value;
-	DBL dist5,dist6,dist7;
-	DBL tmpx,tmpz;
-	int mirX,mirZ,rota;
-	mirX = mirZ = rota = 0;
-	x=EPoint[X];
-	z=EPoint[Z];
-	x -= (3.0+SQRT3)*floor(x/(3.0+SQRT3));
-	z -= (3.0+3.0*SQRT3)*floor(z/(3.0+3.0*SQRT3));
-	/* x,z is in { [0.0, SQRT3+3.0 [, [0.0, 3*SQRT3+3.0 [ } 
-	 ** but there is some symmetry to simplify the testing
-	 */
-	if (z > 1.5*SQRT3+1.5)
-	{
-		/* translate */
-		z -= 1.5*SQRT3+1.5;
-		x += (x<(1.5+SQRT3_2) ? 1.0: -1.0)*(1.5+SQRT3_2);
-	}
-	if (x > 1.5+SQRT3_2)
-	{
-		x = 3.0 + SQRT3 -x;
-		mirX = 1 - mirX;
-	}
-	if (z > 1.0+SQRT3)
-	{
-		z = 2.0 + 2.0*SQRT3 -z;
-		mirZ = 1 - mirZ;
-	}
-	dist2 = x - SQRT3_2 - 1.5 + z * SQRT3;
-	if (dist2 < 0.0)
-	{
-		tmpx = x;
-		tmpz = z;
-		x = (3.0+SQRT3)/4.0 + 0.5 * tmpx - SQRT3_2 * tmpz ;
-		z = (3.0+3.0*SQRT3)/4.0 - SQRT3_2 * tmpx - 0.5 * tmpz ;
-	}
-	dist2 = x - SQRT3_2 - 2.5 + z * SQRT3;
-	dist1 = (z * 2.0 ) - SQRT3; /* from the bottom line */
-	dist3 = z - 1.5*SQRT3 - 0.5 + x * SQRT3;
-	dist4 = ((x-0.5) * 2.0 ); /* from the vertical line */
-	if ( (dist2 >= 0.0) &&
-	     (dist1 >= 0.0) &&
-	     (dist3 >= 0.0) &&
-	     (dist4 >= 0.0) )
-	{
-		/* dodecagon */
-		ret_value = min(dist1,dist2);
-		ret_value = min(ret_value,dist3);
-		ret_value = min(ret_value,dist4);
-		ret_value = min(ret_value,1.0);
-		ret_value = 5.000001 - ret_value; // TODO FIXME - magic number! Should use nextafter()
-	}
-	else
-	{
-		dist5 = 2*z - 2*SQRT3 - 1.0;
-		if (dist5 >= 0)
-		{
-			dist4 *= -1.0;
-			ret_value = min(dist5,dist4);
-			ret_value = 2.0 - ret_value;
-		}
-		else
-		{
-			dist6 = SQRT3 * x - z -SQRT3_2 +0.5;
-			dist7 = dist6 - 2.0;
-			switch((dist6 >= 0?0:1)+(dist7 >= 0.0 ?2:0))
-			{
-				case 1: /* left hexagon */
-					dist5 *= -1.0;
-					dist6 *= -1.0;
-					dist3 *= -1.0;
-					ret_value = min(dist6,dist3);
-					ret_value = min(ret_value,dist5);
-					ret_value = min(ret_value,1.0);
-					ret_value = 1.0 - ret_value;
-					break;
-				case 2: /* bottom hexagon */
-					dist1 *= -1.0;
-					ret_value = min(dist7,dist1);
-					ret_value = min(ret_value,1.0);
-					ret_value = 1.0 - ret_value;
-					break;
-				case 0:
-				default: /* slanted square */
-					dist2 *= -1.0;
-					dist7 *= -1.0;
-					ret_value = min(dist6,dist2);
-					ret_value = min(ret_value,dist7);
-					ret_value = (mirZ + mirX) %2 + 3.0 - ret_value;
-					break;
-			}
-		}
-	}
-	ret_value /= 5.0;
-	return ret_value;
+    DBL x,z;
+    DBL dist1,dist2,dist3,dist4,ret_value;
+    DBL dist5,dist6,dist7;
+    DBL tmpx,tmpz;
+    int mirX,mirZ,rota;
+    mirX = mirZ = rota = 0;
+    x=EPoint[X];
+    z=EPoint[Z];
+    x -= (3.0+SQRT3)*floor(x/(3.0+SQRT3));
+    z -= (3.0+3.0*SQRT3)*floor(z/(3.0+3.0*SQRT3));
+    /* x,z is in { [0.0, SQRT3+3.0 [, [0.0, 3*SQRT3+3.0 [ }
+     ** but there is some symmetry to simplify the testing
+     */
+    if (z > 1.5*SQRT3+1.5)
+    {
+        /* translate */
+        z -= 1.5*SQRT3+1.5;
+        x += (x<(1.5+SQRT3_2) ? 1.0: -1.0)*(1.5+SQRT3_2);
+    }
+    if (x > 1.5+SQRT3_2)
+    {
+        x = 3.0 + SQRT3 -x;
+        mirX = 1 - mirX;
+    }
+    if (z > 1.0+SQRT3)
+    {
+        z = 2.0 + 2.0*SQRT3 -z;
+        mirZ = 1 - mirZ;
+    }
+    dist2 = x - SQRT3_2 - 1.5 + z * SQRT3;
+    if (dist2 < 0.0)
+    {
+        tmpx = x;
+        tmpz = z;
+        x = (3.0+SQRT3)/4.0 + 0.5 * tmpx - SQRT3_2 * tmpz ;
+        z = (3.0+3.0*SQRT3)/4.0 - SQRT3_2 * tmpx - 0.5 * tmpz ;
+    }
+    dist2 = x - SQRT3_2 - 2.5 + z * SQRT3;
+    dist1 = (z * 2.0 ) - SQRT3; /* from the bottom line */
+    dist3 = z - 1.5*SQRT3 - 0.5 + x * SQRT3;
+    dist4 = ((x-0.5) * 2.0 ); /* from the vertical line */
+    if ( (dist2 >= 0.0) &&
+         (dist1 >= 0.0) &&
+         (dist3 >= 0.0) &&
+         (dist4 >= 0.0) )
+    {
+        /* dodecagon */
+        ret_value = min(dist1,dist2);
+        ret_value = min(ret_value,dist3);
+        ret_value = min(ret_value,dist4);
+        ret_value = min(ret_value,1.0);
+        ret_value = 5.000001 - ret_value; // TODO FIXME - magic number! Should use nextafter()
+    }
+    else
+    {
+        dist5 = 2*z - 2*SQRT3 - 1.0;
+        if (dist5 >= 0)
+        {
+            dist4 *= -1.0;
+            ret_value = min(dist5,dist4);
+            ret_value = 2.0 - ret_value;
+        }
+        else
+        {
+            dist6 = SQRT3 * x - z -SQRT3_2 +0.5;
+            dist7 = dist6 - 2.0;
+            switch((dist6 >= 0?0:1)+(dist7 >= 0.0 ?2:0))
+            {
+                case 1: /* left hexagon */
+                    dist5 *= -1.0;
+                    dist6 *= -1.0;
+                    dist3 *= -1.0;
+                    ret_value = min(dist6,dist3);
+                    ret_value = min(ret_value,dist5);
+                    ret_value = min(ret_value,1.0);
+                    ret_value = 1.0 - ret_value;
+                    break;
+                case 2: /* bottom hexagon */
+                    dist1 *= -1.0;
+                    ret_value = min(dist7,dist1);
+                    ret_value = min(ret_value,1.0);
+                    ret_value = 1.0 - ret_value;
+                    break;
+                case 0:
+                default: /* slanted square */
+                    dist2 *= -1.0;
+                    dist7 *= -1.0;
+                    ret_value = min(dist6,dist2);
+                    ret_value = min(ret_value,dist7);
+                    ret_value = (mirZ + mirX) %2 + 3.0 - ret_value;
+                    break;
+            }
+        }
+    }
+    ret_value /= 5.0;
+    return ret_value;
 }
 
 static DBL tiling_penrose_halfkite (DBL pX, DBL pZ, int depth, bool rhombs);
@@ -2798,156 +2823,156 @@ static DBL tiling_penrose_halfdart (DBL pX, DBL pZ, int depth, bool rhombs);
 
 static DBL tiling_penrose_halfkite (DBL pX, DBL pZ, int depth, bool rhombs)
 {
-	DBL x = pX;
-	DBL z = abs(pZ);
+    DBL x = pX;
+    DBL z = abs(pZ);
 
-	if (depth > 0)
-	{
-		if (z < (x - INVPHI) * TAN144)
-		{
-			return tiling_penrose_halfdart(x*PHI, z*PHI, depth-1, rhombs);
-		}
-		else
-		{
-			x -= COS36;
-			z -= SIN36;
-			DBL rotX = x*COS108 - z*SIN108;
-			DBL rotZ = z*COS108 + x*SIN108;
-			return tiling_penrose_halfkite(rotX*PHI, rotZ*PHI, depth-1, rhombs);
-		}
-	}
-	else if (rhombs)
-	{
-		if (z < (x - INVPHI) * TAN72)
-		{
-			DBL dist1 = abs( SIN72  * (x-INVPHI) - COS72  * z ) * 5.55; // TODO FIXME - the factor is just an empiric value
-			DBL dist2 = abs( SIN108 * (x-1)      - COS108 * z ) * 5.55;
-			return max3(1.0-dist1/2,1.0-dist2/2,0.5+TILING_EPSILON);
-		}
-		else
-		{
-			DBL dist1 = abs( z )                              * 5.55; // TODO FIXME - the factor is just an empiric value
-			DBL dist2 = abs( SIN72 * (x-INVPHI) - COS72 * z ) * 5.55;
-			return min(max3(0.5-dist1/2,0.5-dist2/2,0.0),0.5-TILING_EPSILON);
-		}
-	}
-	else
-	{
-		DBL dist1 = abs( SIN36  *  x    - COS36  * z ) * 4.46; // TODO FIXME - the factor is just an empiric value
-		DBL dist2 = abs( SIN108 * (x-1) - COS108 * z ) * 4.46;
-		return min(max3(0.5-dist1/2,0.5-dist2/2,0.0),0.5-TILING_EPSILON);
-	}
+    if (depth > 0)
+    {
+        if (z < (x - INVPHI) * TAN144)
+        {
+            return tiling_penrose_halfdart(x*PHI, z*PHI, depth-1, rhombs);
+        }
+        else
+        {
+            x -= COS36;
+            z -= SIN36;
+            DBL rotX = x*COS108 - z*SIN108;
+            DBL rotZ = z*COS108 + x*SIN108;
+            return tiling_penrose_halfkite(rotX*PHI, rotZ*PHI, depth-1, rhombs);
+        }
+    }
+    else if (rhombs)
+    {
+        if (z < (x - INVPHI) * TAN72)
+        {
+            DBL dist1 = abs( SIN72  * (x-INVPHI) - COS72  * z ) * 5.55; // TODO FIXME - the factor is just an empiric value
+            DBL dist2 = abs( SIN108 * (x-1)      - COS108 * z ) * 5.55;
+            return max3(1.0-dist1/2,1.0-dist2/2,0.5+TILING_EPSILON);
+        }
+        else
+        {
+            DBL dist1 = abs( z )                              * 5.55; // TODO FIXME - the factor is just an empiric value
+            DBL dist2 = abs( SIN72 * (x-INVPHI) - COS72 * z ) * 5.55;
+            return min(max3(0.5-dist1/2,0.5-dist2/2,0.0),0.5-TILING_EPSILON);
+        }
+    }
+    else
+    {
+        DBL dist1 = abs( SIN36  *  x    - COS36  * z ) * 4.46; // TODO FIXME - the factor is just an empiric value
+        DBL dist2 = abs( SIN108 * (x-1) - COS108 * z ) * 4.46;
+        return min(max3(0.5-dist1/2,0.5-dist2/2,0.0),0.5-TILING_EPSILON);
+    }
 }
 
 static DBL tiling_penrose_halfdart (DBL pX, DBL pZ, int depth, bool rhombs)
 {
-	DBL x = pX;
-	DBL z = abs(pZ);
+    DBL x = pX;
+    DBL z = abs(pZ);
 
-	if (depth > 0)
-	{
-		if (z < (x - INVPHI) * TAN108)
-		{
-			DBL rotX = x*COS36 + z*SIN36;
-			DBL rotZ = z*COS36 - x*SIN36;
-			return tiling_penrose_halfkite(rotX*PHI, rotZ*PHI, depth-1, rhombs);
-		}
-		else
-		{
-			x -= 1;
-			DBL rotX = x*COS144 + z*SIN144;
-			DBL rotZ = z*COS144 - x*SIN144;
-			return tiling_penrose_halfdart(rotX*PHI, rotZ*PHI, depth-1, rhombs);
-		}
-	}
-	else if (rhombs)
-	{
-		DBL dist1 = abs( SIN36  *  x    - COS36  * z ) * 5.55; // TODO FIXME - the factor is just an empiric value
-		DBL dist2 = abs( SIN144 * (x-1) - COS144 * z ) * 5.55;
-		return min(max3(0.5-dist1/2,0.5-dist2/2,0.0),0.5-TILING_EPSILON);
-	}
-	else
-	{
-		DBL dist1 = abs( z )                           * 4.46; // TODO FIXME - the factor is just an empiric value
-		DBL dist2 = abs( SIN144 * (x-1) - COS144 * z ) * 4.46;
-		return max3(1.0-dist1/2,1.0-dist2/2,0.5+TILING_EPSILON);
-	}
+    if (depth > 0)
+    {
+        if (z < (x - INVPHI) * TAN108)
+        {
+            DBL rotX = x*COS36 + z*SIN36;
+            DBL rotZ = z*COS36 - x*SIN36;
+            return tiling_penrose_halfkite(rotX*PHI, rotZ*PHI, depth-1, rhombs);
+        }
+        else
+        {
+            x -= 1;
+            DBL rotX = x*COS144 + z*SIN144;
+            DBL rotZ = z*COS144 - x*SIN144;
+            return tiling_penrose_halfdart(rotX*PHI, rotZ*PHI, depth-1, rhombs);
+        }
+    }
+    else if (rhombs)
+    {
+        DBL dist1 = abs( SIN36  *  x    - COS36  * z ) * 5.55; // TODO FIXME - the factor is just an empiric value
+        DBL dist2 = abs( SIN144 * (x-1) - COS144 * z ) * 5.55;
+        return min(max3(0.5-dist1/2,0.5-dist2/2,0.0),0.5-TILING_EPSILON);
+    }
+    else
+    {
+        DBL dist1 = abs( z )                           * 4.46; // TODO FIXME - the factor is just an empiric value
+        DBL dist2 = abs( SIN144 * (x-1) - COS144 * z ) * 4.46;
+        return max3(1.0-dist1/2,1.0-dist2/2,0.5+TILING_EPSILON);
+    }
 }
 
 static DBL tiling_penrose (const Vector3d& EPoint, bool rhombs, bool centerFlag)
 {
-	// Penrose tiling
-	// rhombs=false: P2 ("kite and dart") Penrose tiling
-	//   centerFlag=false: 5 darts at center forming a star
-	//   centerFlag=true:  5 kites at center forming a regular decagon ("sun")
-	// rhombs=true:  P3 ("rhombus") Penrose tiling
-	//   centerFlag=false: 5 wide rhombs at center, surrounded by 5 narrow rhombs to form a regular decagon
-	//   centerFlag=true:  5 wide rhombs at center, surrounded by 10 narrow rhombs to form a pointed star
+    // Penrose tiling
+    // rhombs=false: P2 ("kite and dart") Penrose tiling
+    //   centerFlag=false: 5 darts at center forming a star
+    //   centerFlag=true:  5 kites at center forming a regular decagon ("sun")
+    // rhombs=true:  P3 ("rhombus") Penrose tiling
+    //   centerFlag=false: 5 wide rhombs at center, surrounded by 5 narrow rhombs to form a regular decagon
+    //   centerFlag=true:  5 wide rhombs at center, surrounded by 10 narrow rhombs to form a pointed star
 
-	DBL x,z;
-	x = EPoint[X];
-	z = EPoint[Z];
+    DBL x,z;
+    x = EPoint[X];
+    z = EPoint[Z];
 
-	DBL r = sqrt(x*x+z*z);
-	if (r <= EPSILON)
-		return 1.0;
+    DBL r = sqrt(x*x+z*z);
+    if (r <= EPSILON)
+        return 1.0;
 
-	// exploit trivial mirror symmetry
-	z = abs(z);
+    // exploit trivial mirror symmetry
+    z = abs(z);
 
-	// exploit rotational & mirror symmetry
-	if (x < r * COS36)
-	{
-		DBL rotSin;
-		DBL rotCos;
-		if (x < r *COS108)
-		{
-			rotSin = SIN144;
-			rotCos = COS144;
-		}
-		else
-		{
-			rotSin = SIN72;
-			rotCos = COS72;
-		}
-		DBL rotX = x*rotCos + z*rotSin;
-		DBL rotZ = z*rotCos - x*rotSin;
+    // exploit rotational & mirror symmetry
+    if (x < r * COS36)
+    {
+        DBL rotSin;
+        DBL rotCos;
+        if (x < r *COS108)
+        {
+            rotSin = SIN144;
+            rotCos = COS144;
+        }
+        else
+        {
+            rotSin = SIN72;
+            rotCos = COS72;
+        }
+        DBL rotX = x*rotCos + z*rotSin;
+        DBL rotZ = z*rotCos - x*rotSin;
 
-		x =     rotX;
-		z = abs(rotZ);
-	}
+        x =     rotX;
+        z = abs(rotZ);
+    }
 
-	if (rhombs)
-	{
-		x *= INVPHI;
-		z *= INVPHI;
-	}
+    if (rhombs)
+    {
+        x *= INVPHI;
+        z *= INVPHI;
+    }
 
-	DBL dist = abs( SIN108 * x - COS108 * z ) / COS18;
+    DBL dist = abs( SIN108 * x - COS108 * z ) / COS18;
 
-	int depth = max(0, (int)ceil(log(dist)/log(SQRPHI)));
+    int depth = max(0, (int)ceil(log(dist)/log(SQRPHI)));
 
-	x *= pow(INVSQRPHI,depth);
-	z *= pow(INVSQRPHI,depth);
+    x *= pow(INVSQRPHI,depth);
+    z *= pow(INVSQRPHI,depth);
 
-	if (depth % 2)
-	{
-		DBL rotX = x*COS36 + z*SIN36;
-		DBL rotZ = z*COS36 - x*SIN36;
-		x = rotX;
-		z = abs(rotZ);
-	}
+    if (depth % 2)
+    {
+        DBL rotX = x*COS36 + z*SIN36;
+        DBL rotZ = z*COS36 - x*SIN36;
+        x = rotX;
+        z = abs(rotZ);
+    }
 
-	depth *= 2;
+    depth *= 2;
 
-	if (centerFlag)
-	{
-		depth += 1;
-		x *= INVPHI;
-		z *= INVPHI;
-	}
+    if (centerFlag)
+    {
+        depth += 1;
+        x *= INVPHI;
+        z *= INVPHI;
+    }
 
-	return tiling_penrose_halfkite(x, z, depth, rhombs);
+    return tiling_penrose_halfkite(x, z, depth, rhombs);
 }
 
 static DBL tiling_penrose1_pentagon1 (DBL pX, DBL pZ, int depth);
@@ -2959,1284 +2984,1284 @@ static DBL tiling_penrose1_diamond (DBL pX, DBL pZ, int depth, bool sideA);
 
 static void tiling_penrose1_pentagon_symmetry(DBL& x, DBL& z, DBL r)
 {
-	z = abs(z);
+    z = abs(z);
 
-	if (x < r * COS36)
-	{
-		DBL rotSin;
-		DBL rotCos;
-		if (x < r *COS108)
-		{
-			rotSin = SIN144;
-			rotCos = COS144;
-		}
-		else
-		{
-			rotSin = SIN72;
-			rotCos = COS72;
-		}
-		DBL rotX = x*rotCos + z*rotSin;
-		DBL rotZ = z*rotCos - x*rotSin;
+    if (x < r * COS36)
+    {
+        DBL rotSin;
+        DBL rotCos;
+        if (x < r *COS108)
+        {
+            rotSin = SIN144;
+            rotCos = COS144;
+        }
+        else
+        {
+            rotSin = SIN72;
+            rotCos = COS72;
+        }
+        DBL rotX = x*rotCos + z*rotSin;
+        DBL rotZ = z*rotCos - x*rotSin;
 
-		x =     rotX;
-		z = abs(rotZ);
-	}
+        x =     rotX;
+        z = abs(rotZ);
+    }
 }
 
 static void tiling_penrose1_pentagon_symmetry(DBL& x, DBL& z)
 {
-	tiling_penrose1_pentagon_symmetry (x, z, sqrt(x*x+z*z));
+    tiling_penrose1_pentagon_symmetry (x, z, sqrt(x*x+z*z));
 }
 
 static DBL tiling_penrose1_pentagon_dist (DBL pX, DBL pZ)
 {
-	return abs( pX - 0.5/TAN36 ) * 5.55 * INVPHI; // TODO FIXME - the factor is just an empiric value
+    return abs( pX - 0.5/TAN36 ) * 5.55 * INVPHI; // TODO FIXME - the factor is just an empiric value
 }
 
 static DBL tiling_penrose1_pentagon1 (DBL pX, DBL pZ, int depth)
 {
-	DBL x = pX;
-	DBL z = abs(pZ);
+    DBL x = pX;
+    DBL z = abs(pZ);
 
-	tiling_penrose1_pentagon_symmetry (x, z);
+    tiling_penrose1_pentagon_symmetry (x, z);
 
-	if (depth > 0)
-	{
-		if (z < (x - 0.5/TAN36) * TAN54 + 0.5)
-		{
-			DBL rotX = x - 0.5/TAN36 - INVPHI*0.5*COS72/SIN36;
-			DBL rotZ = z;
-			return tiling_penrose1_pentagon2 (rotX*PHI, rotZ*PHI, depth-1, false);
-		}
-		else
-		{
-			DBL rotX = x*COS36 + z*SIN36;
-			DBL rotZ = z*COS36 - x*SIN36;
-			return tiling_penrose1_star (rotX*PHI, rotZ*PHI, depth-1);
-		}
-	}
-	else
-	{
-		DBL dist = tiling_penrose1_pentagon_dist (x, z);
-		return min(max(1.0/6-dist/6,0.0),1.0/6-TILING_EPSILON);
-	}
+    if (depth > 0)
+    {
+        if (z < (x - 0.5/TAN36) * TAN54 + 0.5)
+        {
+            DBL rotX = x - 0.5/TAN36 - INVPHI*0.5*COS72/SIN36;
+            DBL rotZ = z;
+            return tiling_penrose1_pentagon2 (rotX*PHI, rotZ*PHI, depth-1, false);
+        }
+        else
+        {
+            DBL rotX = x*COS36 + z*SIN36;
+            DBL rotZ = z*COS36 - x*SIN36;
+            return tiling_penrose1_star (rotX*PHI, rotZ*PHI, depth-1);
+        }
+    }
+    else
+    {
+        DBL dist = tiling_penrose1_pentagon_dist (x, z);
+        return min(max(1.0/6-dist/6,0.0),1.0/6-TILING_EPSILON);
+    }
 }
 
 static DBL tiling_penrose1_pentagon2 (DBL pX, DBL pZ, int depth, bool insideQuad)
 {
-	DBL x = pX;
-	DBL z = abs(pZ);
+    DBL x = pX;
+    DBL z = abs(pZ);
 
-	if (depth > 0)
-	{
-		if (insideQuad)
-		{
-			if (z < (x - INVSQRPHI*0.5/SIN36) * TAN54)
-			{
-				DBL rotX = x - 0.5/SIN36;
-				DBL rotZ = z;
-				return tiling_penrose1_pentagon1 (rotX*PHI, rotZ*PHI, depth-1);
-			}
-			else if (z < (x - INVSQRPHI*0.5/SIN36) * TAN162)
-			{
-				DBL rotX = -x;
-				DBL rotZ =  z;
-				return tiling_penrose1_diamond (rotX*PHI, rotZ*PHI, depth-1, true);
-			}
-			else
-			{
-				DBL rotX = x*COS108 - z*SIN108 + INVPHI*0.5/SIN36;
-				DBL rotZ = z*COS108 + x*SIN108;
-				return tiling_penrose1_pentagon2 (rotX*PHI, rotZ*PHI, depth-1, true);
-			}
-		}
-		else if (z < (x + 0.5/SIN36) * TAN18)
-		{
-			DBL rotX = x + 0.5/SIN36 - INVSQRPHI*0.5/SIN36;
-			DBL rotZ = z;
-			return tiling_penrose1_diamond (rotX*PHI, rotZ*PHI, depth-1, false);
-		}
-		else
-		{
-			DBL rotX = - (x*COS36 + z*SIN36) - COS72*0.5/SIN36;
-			DBL rotZ =   (z*COS36 - x*SIN36) - SIN72*0.5/SIN36;
-			return tiling_penrose1_pentagon3 (rotX*PHI, rotZ*PHI, depth-1, false);
-		}
-	}
-	else
-	{
-		tiling_penrose1_pentagon_symmetry (x, z);
-		DBL dist = tiling_penrose1_pentagon_dist (x, z);
-		return min(max(2.0/6-dist/6,1.0/6+TILING_EPSILON),2.0/6-TILING_EPSILON);
-	}
+    if (depth > 0)
+    {
+        if (insideQuad)
+        {
+            if (z < (x - INVSQRPHI*0.5/SIN36) * TAN54)
+            {
+                DBL rotX = x - 0.5/SIN36;
+                DBL rotZ = z;
+                return tiling_penrose1_pentagon1 (rotX*PHI, rotZ*PHI, depth-1);
+            }
+            else if (z < (x - INVSQRPHI*0.5/SIN36) * TAN162)
+            {
+                DBL rotX = -x;
+                DBL rotZ =  z;
+                return tiling_penrose1_diamond (rotX*PHI, rotZ*PHI, depth-1, true);
+            }
+            else
+            {
+                DBL rotX = x*COS108 - z*SIN108 + INVPHI*0.5/SIN36;
+                DBL rotZ = z*COS108 + x*SIN108;
+                return tiling_penrose1_pentagon2 (rotX*PHI, rotZ*PHI, depth-1, true);
+            }
+        }
+        else if (z < (x + 0.5/SIN36) * TAN18)
+        {
+            DBL rotX = x + 0.5/SIN36 - INVSQRPHI*0.5/SIN36;
+            DBL rotZ = z;
+            return tiling_penrose1_diamond (rotX*PHI, rotZ*PHI, depth-1, false);
+        }
+        else
+        {
+            DBL rotX = - (x*COS36 + z*SIN36) - COS72*0.5/SIN36;
+            DBL rotZ =   (z*COS36 - x*SIN36) - SIN72*0.5/SIN36;
+            return tiling_penrose1_pentagon3 (rotX*PHI, rotZ*PHI, depth-1, false);
+        }
+    }
+    else
+    {
+        tiling_penrose1_pentagon_symmetry (x, z);
+        DBL dist = tiling_penrose1_pentagon_dist (x, z);
+        return min(max(2.0/6-dist/6,1.0/6+TILING_EPSILON),2.0/6-TILING_EPSILON);
+    }
 }
 
 static DBL tiling_penrose1_pentagon3 (DBL pX, DBL pZ, int depth, bool insideWedge)
 {
-	DBL x = pX;
-	DBL z = abs(pZ);
+    DBL x = pX;
+    DBL z = abs(pZ);
 
-	if (depth > 0)
-	{
-		if (insideWedge && (x > INVSQRPHI*0.5*COS72/SIN36))
-		{
-			DBL rotX = -(x - INVSQRPHI*0.5*COS72/SIN36 - INVPHI*0.5/TAN36);
-			DBL rotZ =   z;
-			return tiling_penrose1_pentagon2 (rotX*PHI, rotZ*PHI, depth-1, true);
-			return 1.0/6 + TILING_EPSILON;
-		}
-		else if (!insideWedge && (x < 0.5*COS108/SIN36))
-		{
-			DBL rotX = x*COS144 + z*SIN144 - 0.5/SIN36;
-			DBL rotZ = z*COS144 - x*SIN144;
-			return tiling_penrose1_pentagon2 (rotX*PHI, rotZ*PHI, depth-1, false);
-		}
-		else if (!insideWedge && (z > (x - INVSQRPHI*0.5/SIN36)*TAN126))
-		{
-			DBL rotX = - (x*COS36 - z*SIN36) - COS72*0.5/SIN36;
-			DBL rotZ =   (z*COS36 + x*SIN36) - SIN72*0.5/SIN36;
-			return tiling_penrose1_pentagon3 (rotX*PHI, rotZ*PHI, depth-1, false);
-		}
-		else
-		{
-			return tiling_penrose1_boat (x*PHI, z*PHI, depth-1, insideWedge);
-		}
-	}
-	else
-	{
-		tiling_penrose1_pentagon_symmetry (x, z);
-		DBL dist = tiling_penrose1_pentagon_dist (x, z);
-		return min(max(3.0/6-dist/6,2.0/6+TILING_EPSILON),3.0/6-TILING_EPSILON);
-	}
+    if (depth > 0)
+    {
+        if (insideWedge && (x > INVSQRPHI*0.5*COS72/SIN36))
+        {
+            DBL rotX = -(x - INVSQRPHI*0.5*COS72/SIN36 - INVPHI*0.5/TAN36);
+            DBL rotZ =   z;
+            return tiling_penrose1_pentagon2 (rotX*PHI, rotZ*PHI, depth-1, true);
+            return 1.0/6 + TILING_EPSILON;
+        }
+        else if (!insideWedge && (x < 0.5*COS108/SIN36))
+        {
+            DBL rotX = x*COS144 + z*SIN144 - 0.5/SIN36;
+            DBL rotZ = z*COS144 - x*SIN144;
+            return tiling_penrose1_pentagon2 (rotX*PHI, rotZ*PHI, depth-1, false);
+        }
+        else if (!insideWedge && (z > (x - INVSQRPHI*0.5/SIN36)*TAN126))
+        {
+            DBL rotX = - (x*COS36 - z*SIN36) - COS72*0.5/SIN36;
+            DBL rotZ =   (z*COS36 + x*SIN36) - SIN72*0.5/SIN36;
+            return tiling_penrose1_pentagon3 (rotX*PHI, rotZ*PHI, depth-1, false);
+        }
+        else
+        {
+            return tiling_penrose1_boat (x*PHI, z*PHI, depth-1, insideWedge);
+        }
+    }
+    else
+    {
+        tiling_penrose1_pentagon_symmetry (x, z);
+        DBL dist = tiling_penrose1_pentagon_dist (x, z);
+        return min(max(3.0/6-dist/6,2.0/6+TILING_EPSILON),3.0/6-TILING_EPSILON);
+    }
 }
 
 static DBL tiling_penrose1_star (DBL pX, DBL pZ, int depth)
 {
-	DBL x = pX;
-	DBL z = abs(pZ);
+    DBL x = pX;
+    DBL z = abs(pZ);
 
-	if (depth > 0)
-	{
-		if (x < INVPHI * 0.5/TAN36)
-		{
-			return tiling_penrose1_pentagon1(x*PHI, z*PHI, depth-1);
-		}
-		else
-		{
-			DBL rotX = -(x - INVPHI/TAN36);
-			DBL rotZ =   z;
-			return tiling_penrose1_pentagon3(rotX*PHI, rotZ*PHI, depth-1, true);
-		}
-	}
-	else
-	{
-		DBL dist = abs( SIN162 * (x - PHI*0.5/SIN36) - COS162 * z) * 5.55 * INVPHI; // TODO FIXME - the factor is just an empiric value
-		return min(max(4.0/6-dist/6,3.0/6+TILING_EPSILON),4.0/6-TILING_EPSILON);
-	}
+    if (depth > 0)
+    {
+        if (x < INVPHI * 0.5/TAN36)
+        {
+            return tiling_penrose1_pentagon1(x*PHI, z*PHI, depth-1);
+        }
+        else
+        {
+            DBL rotX = -(x - INVPHI/TAN36);
+            DBL rotZ =   z;
+            return tiling_penrose1_pentagon3(rotX*PHI, rotZ*PHI, depth-1, true);
+        }
+    }
+    else
+    {
+        DBL dist = abs( SIN162 * (x - PHI*0.5/SIN36) - COS162 * z) * 5.55 * INVPHI; // TODO FIXME - the factor is just an empiric value
+        return min(max(4.0/6-dist/6,3.0/6+TILING_EPSILON),4.0/6-TILING_EPSILON);
+    }
 }
 
 static DBL tiling_penrose1_boat (DBL pX, DBL pZ, int depth, bool insideWedge)
 {
-	DBL x = pX;
-	DBL z = abs(pZ);
+    DBL x = pX;
+    DBL z = abs(pZ);
 
-	if (depth > 0)
-	{
-		if (insideWedge && (x > PHI*0.5*COS108/SIN36))
-		{
-			DBL rotX = -x;
-			DBL rotZ =  z;
-			return tiling_penrose1_pentagon1 (rotX*PHI, rotZ*PHI, depth-1);
-		}
-		else
-		{
-			DBL rotX, rotZ;
-			if (insideWedge)
-			{
-				rotX = x;
-				rotZ = z;
-			}
-			else
-			{
-				rotX = x*COS72 - z*SIN72;
-				rotZ = z*COS72 + x*SIN72;
-			}
-			rotX += 0.5/SIN36;
-			return tiling_penrose1_pentagon3 (rotX*PHI, rotZ*PHI, depth-1, true);
-		}
-	}
-	else
-	{
-		DBL dist1 = abs( x - INVPHI*0.5*COS72/SIN36) * 5.55 * INVPHI; // TODO FIXME - the factor is just an empiric value
-		x = -x;
-		tiling_penrose1_pentagon_symmetry (x, z);
-		DBL dist2 = abs( SIN162 * (x - PHI*0.5/SIN36) - COS162 * z) * 5.55 * INVPHI; // TODO FIXME - the factor is just an empiric value
-		return min(max3(5.0/6-dist1/6,5.0/6-dist2/6,4.0/6+TILING_EPSILON),5.0/6-TILING_EPSILON);
-	}
+    if (depth > 0)
+    {
+        if (insideWedge && (x > PHI*0.5*COS108/SIN36))
+        {
+            DBL rotX = -x;
+            DBL rotZ =  z;
+            return tiling_penrose1_pentagon1 (rotX*PHI, rotZ*PHI, depth-1);
+        }
+        else
+        {
+            DBL rotX, rotZ;
+            if (insideWedge)
+            {
+                rotX = x;
+                rotZ = z;
+            }
+            else
+            {
+                rotX = x*COS72 - z*SIN72;
+                rotZ = z*COS72 + x*SIN72;
+            }
+            rotX += 0.5/SIN36;
+            return tiling_penrose1_pentagon3 (rotX*PHI, rotZ*PHI, depth-1, true);
+        }
+    }
+    else
+    {
+        DBL dist1 = abs( x - INVPHI*0.5*COS72/SIN36) * 5.55 * INVPHI; // TODO FIXME - the factor is just an empiric value
+        x = -x;
+        tiling_penrose1_pentagon_symmetry (x, z);
+        DBL dist2 = abs( SIN162 * (x - PHI*0.5/SIN36) - COS162 * z) * 5.55 * INVPHI; // TODO FIXME - the factor is just an empiric value
+        return min(max3(5.0/6-dist1/6,5.0/6-dist2/6,4.0/6+TILING_EPSILON),5.0/6-TILING_EPSILON);
+    }
 }
 
 static DBL tiling_penrose1_diamond (DBL pX, DBL pZ, int depth, bool sideA)
 {
-	DBL x = pX;
-	DBL z = abs(pZ);
+    DBL x = pX;
+    DBL z = abs(pZ);
 
-	if (depth > 0)
-	{
-		if (sideA)
-		{
-			return tiling_penrose1_pentagon1(x*PHI, z*PHI, depth-1);
-		}
-		else
-		{
-			return tiling_penrose1_pentagon3(x*PHI, z*PHI, depth-1, true);
-		}
-	}
-	else
-	{
-		DBL dist = abs( SIN18 * (x + INVPHI*0.5/SIN36) - COS18 * z) * 5.55 * INVPHI; // TODO FIXME - the factor is just an empiric value
-		return min(max(6.0/6-dist/6,5.0/6+TILING_EPSILON),6.0/6-TILING_EPSILON);
-	}
+    if (depth > 0)
+    {
+        if (sideA)
+        {
+            return tiling_penrose1_pentagon1(x*PHI, z*PHI, depth-1);
+        }
+        else
+        {
+            return tiling_penrose1_pentagon3(x*PHI, z*PHI, depth-1, true);
+        }
+    }
+    else
+    {
+        DBL dist = abs( SIN18 * (x + INVPHI*0.5/SIN36) - COS18 * z) * 5.55 * INVPHI; // TODO FIXME - the factor is just an empiric value
+        return min(max(6.0/6-dist/6,5.0/6+TILING_EPSILON),6.0/6-TILING_EPSILON);
+    }
 }
 
 static DBL tiling_penrose1 (const Vector3d& EPoint, bool centerFlag)
 {
-	// Penrose P1 ("pentagon, star, boat and diamond") tiling
-	//   centerFlag=false: pentagon at center
-	//   centerFlag=true:  pentagram (star) at center
+    // Penrose P1 ("pentagon, star, boat and diamond") tiling
+    //   centerFlag=false: pentagon at center
+    //   centerFlag=true:  pentagram (star) at center
 
-	DBL x,z;
-	x = EPoint[X];
-	z = EPoint[Z];
+    DBL x,z;
+    x = EPoint[X];
+    z = EPoint[Z];
 
-	DBL r = sqrt(x*x+z*z);
-	if (r <= EPSILON)
-		return 1.0;
+    DBL r = sqrt(x*x+z*z);
+    if (r <= EPSILON)
+        return 1.0;
 
-	tiling_penrose1_pentagon_symmetry (x, z, r);
+    tiling_penrose1_pentagon_symmetry (x, z, r);
 
-	DBL dist = x * 2 * TAN36;
+    DBL dist = x * 2 * TAN36;
 
-	int depth = max(0, (int)ceil(log(dist)/log(SQRPHI*SQRPHI)));
+    int depth = max(0, (int)ceil(log(dist)/log(SQRPHI*SQRPHI)));
 
-	x *= pow(INVSQRPHI*INVSQRPHI,depth);
-	z *= pow(INVSQRPHI*INVSQRPHI,depth);
+    x *= pow(INVSQRPHI*INVSQRPHI,depth);
+    z *= pow(INVSQRPHI*INVSQRPHI,depth);
 
-	depth *= 4;
+    depth *= 4;
 
-	/*
-	if (centerFlag)
-	{
-		depth += 1;
-		x *= INVPHI;
-		z *= INVPHI;
-	}
-	*/
+    /*
+    if (centerFlag)
+    {
+        depth += 1;
+        x *= INVPHI;
+        z *= INVPHI;
+    }
+    */
 
-	return tiling_penrose1_pentagon1(x, z, depth);
+    return tiling_penrose1_pentagon1(x, z, depth);
 }
 
 static unsigned char digon[]={ 0x0E, 0x0B };
 static unsigned char trigon[][6]=
 {
-	{ 0x0D, 0x05, 0x07 , 0x0D, 5,7 },
-	{ 0x0E, 0x0D, 0x16, 0x49, 7, 0x0B }
+    { 0x0D, 0x05, 0x07 , 0x0D, 5,7 },
+    { 0x0E, 0x0D, 0x16, 0x49, 7, 0x0B }
 };
 
 static unsigned char tetragon[][16]=
 {
-	{ 0x0D, 5, 5, 7, 0x0D, 5, 5, 7, 0x0D, 5, 5, 7, 0x0D, 5, 5, 7 },
-	{ 0x0E, 0x0D, 5, 0x16, 0x49, 5, 7, 0x0B, 0x0E, 0x0D, 5, 0x16, 0x49, 5, 7, 0x0B },
-	{ 0x0D, 0x34, 0x7, 0x0B, 0x07, 0x0B, 0x0D, 0x34, 0x0D, 0x34, 0x7, 0x0B, 0x07, 0x0B, 0x0D, 0x34},
-	{ 0x0C, 0x06, 0x0C, 0x06, 0x09, 0x03, 0x09, 0x03, 0x0C, 0x06, 0x0C, 0x06, 0x09, 0x03, 0x09, 0x03 },
-	{ 7, 0x2C, 7, 0x2C, 0x0D, 0x83, 0x0D, 0x83, 0x2C, 7, 0x2C,7, 0x83, 0x0D, 0x83, 0x0D  }
+    { 0x0D, 5, 5, 7, 0x0D, 5, 5, 7, 0x0D, 5, 5, 7, 0x0D, 5, 5, 7 },
+    { 0x0E, 0x0D, 5, 0x16, 0x49, 5, 7, 0x0B, 0x0E, 0x0D, 5, 0x16, 0x49, 5, 7, 0x0B },
+    { 0x0D, 0x34, 0x7, 0x0B, 0x07, 0x0B, 0x0D, 0x34, 0x0D, 0x34, 0x7, 0x0B, 0x07, 0x0B, 0x0D, 0x34},
+    { 0x0C, 0x06, 0x0C, 0x06, 0x09, 0x03, 0x09, 0x03, 0x0C, 0x06, 0x0C, 0x06, 0x09, 0x03, 0x09, 0x03 },
+    { 7, 0x2C, 7, 0x2C, 0x0D, 0x83, 0x0D, 0x83, 0x2C, 7, 0x2C,7, 0x83, 0x0D, 0x83, 0x0D  }
 };
 
 static unsigned char pentagon[][10]=
 {
-	{ 0x0D, 5,5,5,7 , 0x0D, 5,5,5,7},
-	{ 0x0E, 0x0D,5,5,0x16, 0x49, 5,5,7,0x0B},
-	{ 7, 0x0C, 6, 0x0C, 0x24, 0x0D, 0x81, 3, 9, 3 },
-	{ 0x0D, 5, 0x34, 7, 0x0B, 15,15,15,15,15 },
-	{ 0x0D, 0xF0, 7, 0x0B, 0x0E , 15,15,15,15,15 },
-	{ 0x0E, 0x0A, 0x49, 5, 7, 0x0D, 5, 0x16, 0x0A, 0x0B },
-	{ 0x0B, 0x0E, 0x49, 0x16, 0x49, 7, 0x0D, 0x16, 0x49, 0x16 },
-	{ 0x2C, 5, 0x16, 0x0B, 0x0E, 0x0B, 0x0E, 0x49, 5, 0x83 },
-	{ 0x0E, 0x49, 5, 0x16, 0x0B, 0x0E, 0x49, 5, 0x16, 0x0B },
-	{ 0x0E, 0x0D, 0xC1, 0x16, 0x0B, 0x49, 0x34, 7, 0x0B, 0x0E },
-	{ 7, 0x2C, 5, 7, 0x2C, 0x0D, 0x83, 0x0D, 5, 0x83 },
-	{ 0x0D, 0x34, 7, 0x0D, 0xC1, 7, 0x0A, 0x0B, 0x0E, 0x0A}
+    { 0x0D, 5,5,5,7 , 0x0D, 5,5,5,7},
+    { 0x0E, 0x0D,5,5,0x16, 0x49, 5,5,7,0x0B},
+    { 7, 0x0C, 6, 0x0C, 0x24, 0x0D, 0x81, 3, 9, 3 },
+    { 0x0D, 5, 0x34, 7, 0x0B, 15,15,15,15,15 },
+    { 0x0D, 0xF0, 7, 0x0B, 0x0E , 15,15,15,15,15 },
+    { 0x0E, 0x0A, 0x49, 5, 7, 0x0D, 5, 0x16, 0x0A, 0x0B },
+    { 0x0B, 0x0E, 0x49, 0x16, 0x49, 7, 0x0D, 0x16, 0x49, 0x16 },
+    { 0x2C, 5, 0x16, 0x0B, 0x0E, 0x0B, 0x0E, 0x49, 5, 0x83 },
+    { 0x0E, 0x49, 5, 0x16, 0x0B, 0x0E, 0x49, 5, 0x16, 0x0B },
+    { 0x0E, 0x0D, 0xC1, 0x16, 0x0B, 0x49, 0x34, 7, 0x0B, 0x0E },
+    { 7, 0x2C, 5, 7, 0x2C, 0x0D, 0x83, 0x0D, 5, 0x83 },
+    { 0x0D, 0x34, 7, 0x0D, 0xC1, 7, 0x0A, 0x0B, 0x0E, 0x0A}
 };
 
 static unsigned char hexagon[][12]=
 {
-	{ 0x0D, 5, 5, 5, 5, 7, 0x0D, 5, 5, 5, 5, 7},
-	{ 0x2C, 5, 5, 5, 7, 0x0E, 0x0B, 0x0D, 5, 5, 5, 0x83 },
-	{ 0x0D, 0x34, 5, 5, 7, 0x0E, 7, 0x0B, 0x0D, 5, 5, 0xC1 },
-	{ 0x0D, 5, 0x34, 5, 7, 0x0E, 5, 7, 0x0B, 0x0D, 5, 0xC1 },
-	{ 0x0D, 0x83, 0x2C, 5, 5, 7 , 15,15,15,15,15,15},
+    { 0x0D, 5, 5, 5, 5, 7, 0x0D, 5, 5, 5, 5, 7},
+    { 0x2C, 5, 5, 5, 7, 0x0E, 0x0B, 0x0D, 5, 5, 5, 0x83 },
+    { 0x0D, 0x34, 5, 5, 7, 0x0E, 7, 0x0B, 0x0D, 5, 5, 0xC1 },
+    { 0x0D, 5, 0x34, 5, 7, 0x0E, 5, 7, 0x0B, 0x0D, 5, 0xC1 },
+    { 0x0D, 0x83, 0x2C, 5, 5, 7 , 15,15,15,15,15,15},
 
-	{ 0x0C, 0x24, 5, 7, 0x0C, 6, 9, 3, 0x0D, 5, 0x81, 3 },
-	{ 7, 0x0C, 6, 0x0D, 0x14, 0x24, 0x0D, 0x81, 0x41, 7, 9, 3},
-	{ 0x0D, 5, 0x83, 0x2C, 5, 7, 15,15,15,15,15,15},
-	{ 7, 0x0C, 0x24, 7, 0x0C, 0x24, 0x0D, 0x81, 3, 0x0D, 0x81, 3},
-	{ 0x0C, 4, 6, 0x0C, 4, 6, 9, 1, 3, 9, 1, 3 },
+    { 0x0C, 0x24, 5, 7, 0x0C, 6, 9, 3, 0x0D, 5, 0x81, 3 },
+    { 7, 0x0C, 6, 0x0D, 0x14, 0x24, 0x0D, 0x81, 0x41, 7, 9, 3},
+    { 0x0D, 5, 0x83, 0x2C, 5, 7, 15,15,15,15,15,15},
+    { 7, 0x0C, 0x24, 7, 0x0C, 0x24, 0x0D, 0x81, 3, 0x0D, 0x81, 3},
+    { 0x0C, 4, 6, 0x0C, 4, 6, 9, 1, 3, 9, 1, 3 },
 
-	{ 0x0E, 0x0D, 0x14, 6, 0x48, 6, 9, 0x12, 9, 0x41, 7, 0x0B},
-	{ 0x0D, 5, 0x16, 0x49, 0x16, 0x0B, 15,15,15,15,15,15},
-	{ 0x0D, 0x34, 5, 0x16, 0x0E, 0x0B, 0x0E, 0x0B, 0x49, 5, 0xC1, 7},
-	{ 0x0D, 0x34, 7, 0x16, 0x0A, 0x0D, 0x0A, 0x49, 7, 0xC1, 7, 0x0D},
-	{ 0x0D, 0x14, 0x82, 0x0E, 9, 3, 15,15,15,15,15,15},
+    { 0x0E, 0x0D, 0x14, 6, 0x48, 6, 9, 0x12, 9, 0x41, 7, 0x0B},
+    { 0x0D, 5, 0x16, 0x49, 0x16, 0x0B, 15,15,15,15,15,15},
+    { 0x0D, 0x34, 5, 0x16, 0x0E, 0x0B, 0x0E, 0x0B, 0x49, 5, 0xC1, 7},
+    { 0x0D, 0x34, 7, 0x16, 0x0A, 0x0D, 0x0A, 0x49, 7, 0xC1, 7, 0x0D},
+    { 0x0D, 0x14, 0x82, 0x0E, 9, 3, 15,15,15,15,15,15},
 
-	{ 0x0E, 0x0D, 0xD0, 6, 9, 3, 15,15,15,15,15,15},
-	{ 0x0D, 0xF0, 5, 7, 0x0E, 0x0B, 0x0E, 0x0B, 0x0D, 5, 0xF0, 7},
-	{ 0x0E, 0x0B, 0x0D, 5, 5, 0x92, 0x68, 5, 5, 7, 0x0E, 0x0B},
-	{ 0x0E, 0x49, 5, 0x16, 0x0A, 0x0B, 15,15,15,15,15,15},
-	{ 0x0B, 0x2C, 5, 5, 0x83, 0x0E, 15,15,15,15,15,15},
+    { 0x0E, 0x0D, 0xD0, 6, 9, 3, 15,15,15,15,15,15},
+    { 0x0D, 0xF0, 5, 7, 0x0E, 0x0B, 0x0E, 0x0B, 0x0D, 5, 0xF0, 7},
+    { 0x0E, 0x0B, 0x0D, 5, 5, 0x92, 0x68, 5, 5, 7, 0x0E, 0x0B},
+    { 0x0E, 0x49, 5, 0x16, 0x0A, 0x0B, 15,15,15,15,15,15},
+    { 0x0B, 0x2C, 5, 5, 0x83, 0x0E, 15,15,15,15,15,15},
 
-	{ 0x0B, 0x0A, 0x2C, 5, 5, 7, 15,15,15,15,15,15},
-	{ 0x2C, 5, 5, 0x16, 0x0B, 0x0E, 0x0E, 0x0B, 5, 0x83, 0x49, 5},
-	{ 0x0A, 0x0D, 0xC1, 0x16, 0x49, 0x34, 7, 0x0A, 0x0E, 0x0B, 0x0E, 0x0B},
-	{ 0x0D, 0x16, 0x0D, 5, 0x92, 0x0B, 0x0E, 0x68, 5, 7, 0x49, 7},
-	{ 0x0D, 0x16, 0x0D, 0x16, 0x16, 0x49, 0x16, 0x49, 0x49, 7, 0x49, 7},
+    { 0x0B, 0x0A, 0x2C, 5, 5, 7, 15,15,15,15,15,15},
+    { 0x2C, 5, 5, 0x16, 0x0B, 0x0E, 0x0E, 0x0B, 5, 0x83, 0x49, 5},
+    { 0x0A, 0x0D, 0xC1, 0x16, 0x49, 0x34, 7, 0x0A, 0x0E, 0x0B, 0x0E, 0x0B},
+    { 0x0D, 0x16, 0x0D, 5, 0x92, 0x0B, 0x0E, 0x68, 5, 7, 0x49, 7},
+    { 0x0D, 0x16, 0x0D, 0x16, 0x16, 0x49, 0x16, 0x49, 0x49, 7, 0x49, 7},
 
-	{ 0x0C, 6, 0x0C, 6, 9, 0x12, 9, 0x12, 7, 0x49, 7, 0x49 },
-	{ 0x2C, 7, 0x2C, 7, 0x92, 0x0D, 0x92, 0x0D, 0x49, 7, 0x49, 7},
-	{ 0x0E, 0x49, 5, 0x16, 0x49, 7, 15,15,15,15,15,15},
-	{ 0x0D, 0x16, 0x0B, 0x0E, 0x49, 7, 0x16, 0x49, 5, 0x83, 0x2C, 5},
-	{ 7, 0x0E, 0x49, 0x34, 7, 0x49, 0x0D, 0xC1, 0x16, 0x0B, 0x0D, 0x16},
+    { 0x0C, 6, 0x0C, 6, 9, 0x12, 9, 0x12, 7, 0x49, 7, 0x49 },
+    { 0x2C, 7, 0x2C, 7, 0x92, 0x0D, 0x92, 0x0D, 0x49, 7, 0x49, 7},
+    { 0x0E, 0x49, 5, 0x16, 0x49, 7, 15,15,15,15,15,15},
+    { 0x0D, 0x16, 0x0B, 0x0E, 0x49, 7, 0x16, 0x49, 5, 0x83, 0x2C, 5},
+    { 7, 0x0E, 0x49, 0x34, 7, 0x49, 0x0D, 0xC1, 0x16, 0x0B, 0x0D, 0x16},
 
-	{ 0x2C, 5, 0xC1, 7, 0x0E, 0x0B, 0x0B, 0x0D, 0x34, 5, 0x83, 0x0E },
-	{ 0x0E, 0x0B, 0x0D, 0x34, 0xC1, 7, 15,15,15,15,15,15},
-	{ 0x0D, 5, 0x16, 0x2C, 7, 0x0A, 0x0A, 0x0D, 0x83, 0x49, 5, 7 },
-	{ 0x2C, 0xC1, 5, 7, 0x0E, 0x0B, 0x0E, 0x0B, 0x0D, 5, 0x34, 0x83 },
-	{ 0x0A, 0x0D, 5, 0x92, 0x68, 5, 7, 0x0A, 0x0B, 0x0E, 0x0E, 0x0B}
+    { 0x2C, 5, 0xC1, 7, 0x0E, 0x0B, 0x0B, 0x0D, 0x34, 5, 0x83, 0x0E },
+    { 0x0E, 0x0B, 0x0D, 0x34, 0xC1, 7, 15,15,15,15,15,15},
+    { 0x0D, 5, 0x16, 0x2C, 7, 0x0A, 0x0A, 0x0D, 0x83, 0x49, 5, 7 },
+    { 0x2C, 0xC1, 5, 7, 0x0E, 0x0B, 0x0E, 0x0B, 0x0D, 5, 0x34, 0x83 },
+    { 0x0A, 0x0D, 5, 0x92, 0x68, 5, 7, 0x0A, 0x0B, 0x0E, 0x0E, 0x0B}
 };
 
 DBL PavementPattern::tetragonal (const Vector3d& EPoint) const
 {
-	unsigned char how;
-	long xv,zv;
-	DBL return_value=0;
-	DBL value;
-	DBL value1;
-	DBL value2;
-	DBL x,y;
-	int lng=0;
-	zv = floor(y=EPoint[Z]);
-	xv = floor(x=EPoint[X]);
-	switch(Tile)
-	{
-		case 6:
-			switch(Number-1)
-			{
-				case 0:
-				case 1:
-				case 2:
-				case 3:
-				case 5:
-				case 6:
-				case 8:
-				case 9:
-					xv %= 6; if (xv < 0) { xv += 6 ;}
-					zv &= 0x01;
-					lng = 6;
-					break;
-				case 4:
-				case 7:
-				case 19:
-				case 20:
-					lng = 0;
-					zv %= 6; if (zv <0) { zv += 6;}
-					xv += 5*zv;
-					xv %= 6; if (xv <0) { xv += 6; }
-					break;
-				case 11:
-				case 18:
-				case 27:
-					lng = 0;
-					zv %= 6; if (zv <0) { zv += 6;}
-					xv += zv;
-					xv %= 6; if (xv <0) { xv += 6; }
-					break;
-				case 10:
-				case 12:
-				case 21:
-				case 22:
-				case 24:
-				case 25:
-				case 26:
-					lng = 4;
-					xv &= 0x03;
-					zv %= 3; if (zv<0) { zv += 3;}
-					break;
-				case 13:
-				case 32:
-					lng = 3;
-					zv &= 0x03;
-					xv %= 3; if (xv < 0) { xv += 3; }
-					break;
-				case 14:
-					lng = 3;
-					zv %= 6; if (zv < 0) { zv += 6; }
-					xv += 2 * (zv/2);
-					zv &= 0x01;
-					xv %= 3; if (xv < 0) { xv += 3; }
-					break;
-				case 15:
-					lng = 2;
-					xv %= 6; if (xv < 0) { xv+= 6; }
-					zv += (xv/2);
-					xv &= 0x01;
-					zv %= 3; if (zv<0) { zv += 3;}
-					break;
-				case 16:
-				case 17:
-					lng = 6;
-					zv %= 12; if (zv <0) { zv+=12; }
-					xv += zv/2;
-					zv &= 0x01;
-					xv %= 6; if (xv < 0) { xv+= 6; }
-					break;
-				case 23:
-				case 28:
-					lng = 6;
-					zv %= 12; if (zv <0) { zv+=12; }
-					xv += 4* (zv/2);
-					zv &= 0x01;
-					xv %= 6; if (xv < 0) { xv+= 6; }
-					break;
-				case 29:
-				case 30:
-					lng = 6;
-					zv &= 0x03;
-					xv += 3* (zv/2);
-					zv &= 0x01;
-					xv %= 6; if (xv < 0) { xv+= 6; }
-					break;
-				case 31:
-					lng = 0;
-					zv %= 3; if (zv <0) { zv+=3; }
-					xv += 4* zv;
-					xv %= 6; if (xv < 0) { xv+= 6; }
-					break;
-				case 33:
-					lng = 0;
-					zv %= 12; if (zv < 0) { zv+= 12; }
-					xv += 7*zv;
-					xv %= 12; if (xv < 0) { xv+= 12; }
-					break;
-				case 34:
-					lng = 4;
-					zv %= 6; if (zv<0) { zv+=6;}
-					xv += 2 * (zv/3);
-					xv &= 0x03;
-					zv %= 3; if (zv<0) { zv += 3;}
-					break;
-			}
-			how = hexagon[Number-1][xv+zv*lng];
-			break;
-		case 5:
-			switch(Number-1)
-			{
-				case 0:
-				case 1:
-					xv %= 5; if (xv <0) { xv += 5 ; }
-					zv &= 0x01;
-					break;
-				case 2:
-				case 9:
-					zv %= 10; if (zv <0) { zv += 10;}
-					xv += 3 * (zv/2);
-					xv %= 5; if (xv <0) { xv += 5;  }
-					zv &= 0x01;
-					break;
-				case 10:
-					zv %= 10; if (zv <0) { zv += 10;}
-					xv += 4*(zv/2);
-					xv %= 5; if (xv <0) { xv += 5 ;  }
-					zv &= 0x01;
-					break;
-				case 3:
-					zv %= 5; if (zv <0) { zv += 5;}
-					xv += 2*zv;
-					xv %= 5; if (xv <0) { xv += 5 ;  }
-					zv = 0x0;
-					break;
-				case 4:
-					zv %= 5; if (zv <0) { zv += 5;}
-					xv += 2 * zv;
-					xv %= 5; if (xv <0) { xv += 5;  }
-					zv = 0x00;
-					break;
-				case 5:
-				case 6:
-				case 8:
-					zv %= 10; if (zv <0) { zv += 10;}
-					xv += zv;
-					xv %= 10; if (xv <0) { xv += 10;  }
-					zv = 0x00;
-					break;
-				case 11:
-					zv %= 10; if (zv <0) { zv += 10;}
-					xv += 8* zv;
-					xv %= 10; if (xv <0) { xv += 10;  }
-					zv = 0x00;
-					break;
-				case 7:
-					zv %= 10; if (zv <0) { zv += 10;}
-					xv += 3*zv;
-					xv %= 10; if (xv <0) { xv += 10;  }
-					zv = 0x00;
-					break;
-			}
-			how = pentagon[Number-1][xv+zv*5];
-			break;
-		case 4:
-			xv &= 0x03;
-			zv &= 0x03;
-			how = tetragon[Number-1][xv+zv*4];
-			break;
-		case 3:
-			xv %= 3; if (xv < 0) { xv += 3; }
-			zv &= 0x01;
-			how = trigon[Number-1][xv+zv*3];
-			break;
-		case 2:
-			zv &= 0x01;
-			how = digon[zv];
-			break;
-		case 1:
-		default:
-			how = 0x0F;
-			break;
-	}
-	/* 
-	 **   5---1---6
-	 **   |       |
-	 **   4       2
-	 **   |       |
-	 **   8---3---7
-	 */
-	x -= floor(x);
-	y -= floor(y);
-	switch(Form)
-	{
-		case 2:
-			if ((how & 0x16) == 0x16)
-			{
-				value1 = 2*x;
-				value2 = 2 - 2*y;
-				value = fabs(sqrt(value1*value1+value2*value2) - 1.0);
-				return_value = min(value,1.0);
-				return return_value;
-			}
-			if ((how & 0x2C) == 0x2C)
-			{
-				value1 = 2 - 2*x;
-				value2 = 2 - 2*y;
-				value = fabs(sqrt(value1*value1+value2*value2) - 1.0);
-				return_value = min(value,1.0);
-				return return_value;
-			}
-			if ((how & 0x49) == 0x49)
-			{
-				value1 = 2 - 2*x;
-				value2 = 2*y;
-				value = fabs(sqrt(value1*value1+value2*value2) - 1.0);
-				return_value = min(value,1.0);
-				return return_value;
-			}
-			if ((how & 0x83) == 0x83)
-			{
-				value1 = 2*x;
-				value2 = 2*y;
-				value = fabs(sqrt(value1*value1+value2*value2) - 1.0);
-				return_value = min(value,1.0);
-				return return_value;
-			}
-			break;
-		case 1:
-			if ((how & 0x16) == 0x16)
-			{
-				value1 = 2*x;
-				value2 = 2*y;
-				value = fabs(value1 - value2 + 1.0);
-				return_value = min(value,1.0);
-				return return_value;
-			}
-			if ((how & 0x2C) == 0x2C)
-			{
-				value1 = 2*x;
-				value2 = 2 - 2*y;
-				value = fabs(value2 - value1 + 1.0);
-				return_value = min(value,1.0);
-				return return_value;
-			}
-			if ((how & 0x49) == 0x49)
-			{
-				value1 = 2*x;
-				value2 = 2*y;
-				value = fabs(value2 - value1 + 1.0);
-				return_value = min(value,1.0);
-				return return_value;
-			}
-			if ((how & 0x83) == 0x83)
-			{
-				value1 = 2*x;
-				value2 = 2 - 2*y;
-				value = fabs(value1 - value2 + 1.0);
-				return_value = min(value,1.0);
-				return return_value;
-			}
-			break;
-		case 0:
-			if ((how & 0x16) == 0x16)
-			{
-				value1 = 2*x -1;
-				value2 = 1 - 2*y;
-				return_value = max(value1,value2);
-				value1 = 1 - 2*x;
-				value2 = 2*y - 1;
-				value = min(value1,value2);
-				return_value = max(return_value,value);
-				return return_value;
-			}
-			if ((how & 0x2C) == 0x2C)
-			{
-				value1 = 1 - 2*x;
-				value2 = 1 - 2*y;
-				return_value = max(value1,value2);
-				value1 = 2*x - 1;
-				value2 = 2*y - 1;
-				value = min(value1,value2);
-				return_value = max(return_value,value);
-				return return_value;
-			}
-			if ((how & 0x49) == 0x49)
-			{
-				value1 = 1 - 2*x;
-				value2 = 2*y - 1;
-				return_value = max(value1,value2);
-				value1 = 2*x - 1;
-				value2 = 1 - 2*y;
-				value = min(value1,value2);
-				return_value = max(return_value,value);
-				return return_value;
-			}
-			if ((how & 0x83) == 0x83)
-			{
-				value1 = 2*x -1;
-				value2 = 2*y -1;
-				return_value = max(value1,value2);
-				value1 = 1 - 2*x;
-				value2 = 1 - 2*y;
-				value = min(value1,value2);
-				return_value = max(return_value,value);
-				return return_value;
-			}
-			break;
-		default:
-		case 3:
-			break;
-	}
-	if (how & 0x01)
-	{
-		value = 2*y - 1;
-		return_value = max(return_value,value);
-	}
-	if (how & 0x02)
-	{
-		value = 2*x -1;
-		return_value = max(return_value,value);
-	}
-	if (how & 0x04)
-	{
-		value = 1 - 2*y;
-		return_value = max(return_value,value);
-	}
-	if (how & 0x08)
-	{
-		value = 1 - 2*x;
-		return_value = max(return_value,value);
-	}
-	switch(Interior)
-	{
-		case 2:
-			if (how & 0x40)
-			{
-				value1 = 2 - 2*x;
-				value2 = 2*y;
-				value = 1.0- sqrt(value1*value1+value2*value2);
-				return_value = max(return_value,value);
-			}
-			if (how & 0x80)
-			{
-				value1 = 2*x;
-				value2 = 2*y;
-				value = 1.0- sqrt(value1*value1+value2*value2);
-				return_value = max(return_value,value);
-			}
-			if (how & 0x10)
-			{
-				value1 = 2*x;
-				value2 = 2 - 2*y;
-				value = 1.0- sqrt(value1*value1+value2*value2);
-				return_value = max(return_value,value);
-			}
-			if (how & 0x20)
-			{
-				value1 = 2 - 2*x;
-				value2 = 2 - 2*y;
-				value = 1.0- sqrt(value1*value1+value2*value2);
-				return_value = max(return_value,value);
-			}
-			break;
-		case 1:
-			if (how & 0x40)
-			{
-				value1 = 2 - 2*x;
-				value2 = 2*y;
-				value = 1.0- (value1+value2);
-				return_value = max(return_value,value);
-			}
-			if (how & 0x80)
-			{
-				value1 = 2*x;
-				value2 = 2*y;
-				value = 1.0- (value1+value2);
-				return_value = max(return_value,value);
-			}
-			if (how & 0x10)
-			{
-				value1 = 2*x;
-				value2 = 2 - 2*y;
-				value = 1.0- (value1+value2);
-				return_value = max(return_value,value);
-			}
-			if (how & 0x20)
-			{
-				value1 = 2 - 2*x;
-				value2 = 2 - 2*y;
-				value = 1.0- (value1+value2);
-				return_value = max(return_value,value);
-			}
-			break;
-		default:
-		case 0:
-			if (how & 0x10)
-			{
-				value1 = 1 - 2*x;
-				value2 = 2*y - 1;
-				value = min(value1,value2);
-				return_value = max(return_value,value);
-			}
-			if (how & 0x20)
-			{
-				value1 = 2*x - 1;
-				value2 = 2*y - 1;
-				value = min(value1,value2);
-				return_value = max(return_value,value);
-			}
-			if (how & 0x40)
-			{
-				value1 = 2*x - 1;
-				value2 = 1 - 2*y;
-				value = min(value1,value2);
-				return_value = max(return_value,value);
-			}
-			if (how & 0x80)
-			{
-				value1 = 1 - 2*x;
-				value2 = 1 - 2*y;
-				value = min(value1,value2);
-				return_value = max(return_value,value);
-			}
-			break;
-	}
-	switch(Exterior)
-	{
-		case 2:
-			value1 = 2*x - 1;
-			value2 = 2*y - 1;
-			if ( (((how & 0x06) == 0x06)&&(value1>=0.0)&&(value2<=0.0)) ||
-			     (((how & 0x0C) == 0x0C)&&(value1<=0.0)&&(value2<=0.0)) ||
-			     (((how & 0x09) == 0x09)&&(value1<=0.0)&&(value2>=0.0)) ||
-			     (((how & 0x03) == 0x03)&&(value1>=0.0)&&(value2>=0.0)) )
-			{
-				value = sqrt(value1*value1+value2*value2);
-				value = min(value,1.0);
-				return_value = max(return_value,value);
-			}
-			break;
-		case 1:
-			if ((how & 0x06) == 0x06)
-			{
-				value1 = 2 - 2*x;
-				value2 = 2*y;
-				value = 2.0- (value1+value2);
-				value = min(value,1.0);
-				return_value = max(return_value,value);
-			}
-			if ((how & 0x0C) == 0x0C)
-			{
-				value1 = 2*x;
-				value2 = 2*y;
-				value = 2.0- (value1+value2);
-				value = min(value,1.0);
-				return_value = max(return_value,value);
-			}
-			if ((how & 0x09) == 0x09)
-			{
-				value1 = 2*x;
-				value2 = 2 - 2*y;
-				value = 2.0- (value1+value2);
-				value = min(value,1.0);
-				return_value = max(return_value,value);
-			}
-			if ((how & 0x03) == 0x03)
-			{
-				value1 = 2 - 2*x;
-				value2 = 2 - 2*y;
-				value = 2.0- (value1+value2);
-				value = min(value,1.0);
-				return_value = max(return_value,value);
-			}
-			break;
-		default:
-		case 0:
-			break;
-	}
-	return return_value;
+    unsigned char how;
+    long xv,zv;
+    DBL return_value=0;
+    DBL value;
+    DBL value1;
+    DBL value2;
+    DBL x,y;
+    int lng=0;
+    zv = floor(y=EPoint[Z]);
+    xv = floor(x=EPoint[X]);
+    switch(Tile)
+    {
+        case 6:
+            switch(Number-1)
+            {
+                case 0:
+                case 1:
+                case 2:
+                case 3:
+                case 5:
+                case 6:
+                case 8:
+                case 9:
+                    xv %= 6; if (xv < 0) { xv += 6 ;}
+                    zv &= 0x01;
+                    lng = 6;
+                    break;
+                case 4:
+                case 7:
+                case 19:
+                case 20:
+                    lng = 0;
+                    zv %= 6; if (zv <0) { zv += 6;}
+                    xv += 5*zv;
+                    xv %= 6; if (xv <0) { xv += 6; }
+                    break;
+                case 11:
+                case 18:
+                case 27:
+                    lng = 0;
+                    zv %= 6; if (zv <0) { zv += 6;}
+                    xv += zv;
+                    xv %= 6; if (xv <0) { xv += 6; }
+                    break;
+                case 10:
+                case 12:
+                case 21:
+                case 22:
+                case 24:
+                case 25:
+                case 26:
+                    lng = 4;
+                    xv &= 0x03;
+                    zv %= 3; if (zv<0) { zv += 3;}
+                    break;
+                case 13:
+                case 32:
+                    lng = 3;
+                    zv &= 0x03;
+                    xv %= 3; if (xv < 0) { xv += 3; }
+                    break;
+                case 14:
+                    lng = 3;
+                    zv %= 6; if (zv < 0) { zv += 6; }
+                    xv += 2 * (zv/2);
+                    zv &= 0x01;
+                    xv %= 3; if (xv < 0) { xv += 3; }
+                    break;
+                case 15:
+                    lng = 2;
+                    xv %= 6; if (xv < 0) { xv+= 6; }
+                    zv += (xv/2);
+                    xv &= 0x01;
+                    zv %= 3; if (zv<0) { zv += 3;}
+                    break;
+                case 16:
+                case 17:
+                    lng = 6;
+                    zv %= 12; if (zv <0) { zv+=12; }
+                    xv += zv/2;
+                    zv &= 0x01;
+                    xv %= 6; if (xv < 0) { xv+= 6; }
+                    break;
+                case 23:
+                case 28:
+                    lng = 6;
+                    zv %= 12; if (zv <0) { zv+=12; }
+                    xv += 4* (zv/2);
+                    zv &= 0x01;
+                    xv %= 6; if (xv < 0) { xv+= 6; }
+                    break;
+                case 29:
+                case 30:
+                    lng = 6;
+                    zv &= 0x03;
+                    xv += 3* (zv/2);
+                    zv &= 0x01;
+                    xv %= 6; if (xv < 0) { xv+= 6; }
+                    break;
+                case 31:
+                    lng = 0;
+                    zv %= 3; if (zv <0) { zv+=3; }
+                    xv += 4* zv;
+                    xv %= 6; if (xv < 0) { xv+= 6; }
+                    break;
+                case 33:
+                    lng = 0;
+                    zv %= 12; if (zv < 0) { zv+= 12; }
+                    xv += 7*zv;
+                    xv %= 12; if (xv < 0) { xv+= 12; }
+                    break;
+                case 34:
+                    lng = 4;
+                    zv %= 6; if (zv<0) { zv+=6;}
+                    xv += 2 * (zv/3);
+                    xv &= 0x03;
+                    zv %= 3; if (zv<0) { zv += 3;}
+                    break;
+            }
+            how = hexagon[Number-1][xv+zv*lng];
+            break;
+        case 5:
+            switch(Number-1)
+            {
+                case 0:
+                case 1:
+                    xv %= 5; if (xv <0) { xv += 5 ; }
+                    zv &= 0x01;
+                    break;
+                case 2:
+                case 9:
+                    zv %= 10; if (zv <0) { zv += 10;}
+                    xv += 3 * (zv/2);
+                    xv %= 5; if (xv <0) { xv += 5;  }
+                    zv &= 0x01;
+                    break;
+                case 10:
+                    zv %= 10; if (zv <0) { zv += 10;}
+                    xv += 4*(zv/2);
+                    xv %= 5; if (xv <0) { xv += 5 ;  }
+                    zv &= 0x01;
+                    break;
+                case 3:
+                    zv %= 5; if (zv <0) { zv += 5;}
+                    xv += 2*zv;
+                    xv %= 5; if (xv <0) { xv += 5 ;  }
+                    zv = 0x0;
+                    break;
+                case 4:
+                    zv %= 5; if (zv <0) { zv += 5;}
+                    xv += 2 * zv;
+                    xv %= 5; if (xv <0) { xv += 5;  }
+                    zv = 0x00;
+                    break;
+                case 5:
+                case 6:
+                case 8:
+                    zv %= 10; if (zv <0) { zv += 10;}
+                    xv += zv;
+                    xv %= 10; if (xv <0) { xv += 10;  }
+                    zv = 0x00;
+                    break;
+                case 11:
+                    zv %= 10; if (zv <0) { zv += 10;}
+                    xv += 8* zv;
+                    xv %= 10; if (xv <0) { xv += 10;  }
+                    zv = 0x00;
+                    break;
+                case 7:
+                    zv %= 10; if (zv <0) { zv += 10;}
+                    xv += 3*zv;
+                    xv %= 10; if (xv <0) { xv += 10;  }
+                    zv = 0x00;
+                    break;
+            }
+            how = pentagon[Number-1][xv+zv*5];
+            break;
+        case 4:
+            xv &= 0x03;
+            zv &= 0x03;
+            how = tetragon[Number-1][xv+zv*4];
+            break;
+        case 3:
+            xv %= 3; if (xv < 0) { xv += 3; }
+            zv &= 0x01;
+            how = trigon[Number-1][xv+zv*3];
+            break;
+        case 2:
+            zv &= 0x01;
+            how = digon[zv];
+            break;
+        case 1:
+        default:
+            how = 0x0F;
+            break;
+    }
+    /*
+     **   5---1---6
+     **   |       |
+     **   4       2
+     **   |       |
+     **   8---3---7
+     */
+    x -= floor(x);
+    y -= floor(y);
+    switch(Form)
+    {
+        case 2:
+            if ((how & 0x16) == 0x16)
+            {
+                value1 = 2*x;
+                value2 = 2 - 2*y;
+                value = fabs(sqrt(value1*value1+value2*value2) - 1.0);
+                return_value = min(value,1.0);
+                return return_value;
+            }
+            if ((how & 0x2C) == 0x2C)
+            {
+                value1 = 2 - 2*x;
+                value2 = 2 - 2*y;
+                value = fabs(sqrt(value1*value1+value2*value2) - 1.0);
+                return_value = min(value,1.0);
+                return return_value;
+            }
+            if ((how & 0x49) == 0x49)
+            {
+                value1 = 2 - 2*x;
+                value2 = 2*y;
+                value = fabs(sqrt(value1*value1+value2*value2) - 1.0);
+                return_value = min(value,1.0);
+                return return_value;
+            }
+            if ((how & 0x83) == 0x83)
+            {
+                value1 = 2*x;
+                value2 = 2*y;
+                value = fabs(sqrt(value1*value1+value2*value2) - 1.0);
+                return_value = min(value,1.0);
+                return return_value;
+            }
+            break;
+        case 1:
+            if ((how & 0x16) == 0x16)
+            {
+                value1 = 2*x;
+                value2 = 2*y;
+                value = fabs(value1 - value2 + 1.0);
+                return_value = min(value,1.0);
+                return return_value;
+            }
+            if ((how & 0x2C) == 0x2C)
+            {
+                value1 = 2*x;
+                value2 = 2 - 2*y;
+                value = fabs(value2 - value1 + 1.0);
+                return_value = min(value,1.0);
+                return return_value;
+            }
+            if ((how & 0x49) == 0x49)
+            {
+                value1 = 2*x;
+                value2 = 2*y;
+                value = fabs(value2 - value1 + 1.0);
+                return_value = min(value,1.0);
+                return return_value;
+            }
+            if ((how & 0x83) == 0x83)
+            {
+                value1 = 2*x;
+                value2 = 2 - 2*y;
+                value = fabs(value1 - value2 + 1.0);
+                return_value = min(value,1.0);
+                return return_value;
+            }
+            break;
+        case 0:
+            if ((how & 0x16) == 0x16)
+            {
+                value1 = 2*x -1;
+                value2 = 1 - 2*y;
+                return_value = max(value1,value2);
+                value1 = 1 - 2*x;
+                value2 = 2*y - 1;
+                value = min(value1,value2);
+                return_value = max(return_value,value);
+                return return_value;
+            }
+            if ((how & 0x2C) == 0x2C)
+            {
+                value1 = 1 - 2*x;
+                value2 = 1 - 2*y;
+                return_value = max(value1,value2);
+                value1 = 2*x - 1;
+                value2 = 2*y - 1;
+                value = min(value1,value2);
+                return_value = max(return_value,value);
+                return return_value;
+            }
+            if ((how & 0x49) == 0x49)
+            {
+                value1 = 1 - 2*x;
+                value2 = 2*y - 1;
+                return_value = max(value1,value2);
+                value1 = 2*x - 1;
+                value2 = 1 - 2*y;
+                value = min(value1,value2);
+                return_value = max(return_value,value);
+                return return_value;
+            }
+            if ((how & 0x83) == 0x83)
+            {
+                value1 = 2*x -1;
+                value2 = 2*y -1;
+                return_value = max(value1,value2);
+                value1 = 1 - 2*x;
+                value2 = 1 - 2*y;
+                value = min(value1,value2);
+                return_value = max(return_value,value);
+                return return_value;
+            }
+            break;
+        default:
+        case 3:
+            break;
+    }
+    if (how & 0x01)
+    {
+        value = 2*y - 1;
+        return_value = max(return_value,value);
+    }
+    if (how & 0x02)
+    {
+        value = 2*x -1;
+        return_value = max(return_value,value);
+    }
+    if (how & 0x04)
+    {
+        value = 1 - 2*y;
+        return_value = max(return_value,value);
+    }
+    if (how & 0x08)
+    {
+        value = 1 - 2*x;
+        return_value = max(return_value,value);
+    }
+    switch(Interior)
+    {
+        case 2:
+            if (how & 0x40)
+            {
+                value1 = 2 - 2*x;
+                value2 = 2*y;
+                value = 1.0- sqrt(value1*value1+value2*value2);
+                return_value = max(return_value,value);
+            }
+            if (how & 0x80)
+            {
+                value1 = 2*x;
+                value2 = 2*y;
+                value = 1.0- sqrt(value1*value1+value2*value2);
+                return_value = max(return_value,value);
+            }
+            if (how & 0x10)
+            {
+                value1 = 2*x;
+                value2 = 2 - 2*y;
+                value = 1.0- sqrt(value1*value1+value2*value2);
+                return_value = max(return_value,value);
+            }
+            if (how & 0x20)
+            {
+                value1 = 2 - 2*x;
+                value2 = 2 - 2*y;
+                value = 1.0- sqrt(value1*value1+value2*value2);
+                return_value = max(return_value,value);
+            }
+            break;
+        case 1:
+            if (how & 0x40)
+            {
+                value1 = 2 - 2*x;
+                value2 = 2*y;
+                value = 1.0- (value1+value2);
+                return_value = max(return_value,value);
+            }
+            if (how & 0x80)
+            {
+                value1 = 2*x;
+                value2 = 2*y;
+                value = 1.0- (value1+value2);
+                return_value = max(return_value,value);
+            }
+            if (how & 0x10)
+            {
+                value1 = 2*x;
+                value2 = 2 - 2*y;
+                value = 1.0- (value1+value2);
+                return_value = max(return_value,value);
+            }
+            if (how & 0x20)
+            {
+                value1 = 2 - 2*x;
+                value2 = 2 - 2*y;
+                value = 1.0- (value1+value2);
+                return_value = max(return_value,value);
+            }
+            break;
+        default:
+        case 0:
+            if (how & 0x10)
+            {
+                value1 = 1 - 2*x;
+                value2 = 2*y - 1;
+                value = min(value1,value2);
+                return_value = max(return_value,value);
+            }
+            if (how & 0x20)
+            {
+                value1 = 2*x - 1;
+                value2 = 2*y - 1;
+                value = min(value1,value2);
+                return_value = max(return_value,value);
+            }
+            if (how & 0x40)
+            {
+                value1 = 2*x - 1;
+                value2 = 1 - 2*y;
+                value = min(value1,value2);
+                return_value = max(return_value,value);
+            }
+            if (how & 0x80)
+            {
+                value1 = 1 - 2*x;
+                value2 = 1 - 2*y;
+                value = min(value1,value2);
+                return_value = max(return_value,value);
+            }
+            break;
+    }
+    switch(Exterior)
+    {
+        case 2:
+            value1 = 2*x - 1;
+            value2 = 2*y - 1;
+            if ( (((how & 0x06) == 0x06)&&(value1>=0.0)&&(value2<=0.0)) ||
+                 (((how & 0x0C) == 0x0C)&&(value1<=0.0)&&(value2<=0.0)) ||
+                 (((how & 0x09) == 0x09)&&(value1<=0.0)&&(value2>=0.0)) ||
+                 (((how & 0x03) == 0x03)&&(value1>=0.0)&&(value2>=0.0)) )
+            {
+                value = sqrt(value1*value1+value2*value2);
+                value = min(value,1.0);
+                return_value = max(return_value,value);
+            }
+            break;
+        case 1:
+            if ((how & 0x06) == 0x06)
+            {
+                value1 = 2 - 2*x;
+                value2 = 2*y;
+                value = 2.0- (value1+value2);
+                value = min(value,1.0);
+                return_value = max(return_value,value);
+            }
+            if ((how & 0x0C) == 0x0C)
+            {
+                value1 = 2*x;
+                value2 = 2*y;
+                value = 2.0- (value1+value2);
+                value = min(value,1.0);
+                return_value = max(return_value,value);
+            }
+            if ((how & 0x09) == 0x09)
+            {
+                value1 = 2*x;
+                value2 = 2 - 2*y;
+                value = 2.0- (value1+value2);
+                value = min(value,1.0);
+                return_value = max(return_value,value);
+            }
+            if ((how & 0x03) == 0x03)
+            {
+                value1 = 2 - 2*x;
+                value2 = 2 - 2*y;
+                value = 2.0- (value1+value2);
+                value = min(value,1.0);
+                return_value = max(return_value,value);
+            }
+            break;
+        default:
+        case 0:
+            break;
+    }
+    return return_value;
 }
 
 static unsigned short tritrigon[][6]=
 {
-	{0x215,0x344,0x126,   0x126,0x344,0x215}
+    {0x215,0x344,0x126,   0x126,0x344,0x215}
 };
 
 static unsigned short tritetragon[][8]=
 {
-	{0x126,0x126,0x144,0x144, 0x126,0x126,0x144,0x144},
-	{0x611,0x344,0x126,0x423, 0x611,0x344,0x126,0x423},
-	{5,0,6,3, 0,5,3,6}
+    {0x126,0x126,0x144,0x144, 0x126,0x126,0x144,0x144},
+    {0x611,0x344,0x126,0x423, 0x611,0x344,0x126,0x423},
+    {5,0,6,3, 0,5,3,6}
 };
 
 static unsigned short tripentagon[][10]=
 {
-	{0x215,0x244,4,0x144,0x126, 0x126,0x144,4,0x244,0x215},
-	{0x215,0x244,0x244,0x611,0x611, 0x244,0x244,0x215,0x423,0x423},
-	{0x146,0x126,0x344,0x611,0x611, 0x344, 0x126,0x146,0x522,0x522},
-	{5,0,0x244,0x215,3, 3,0x215,0x244,0,5}
+    {0x215,0x244,4,0x144,0x126, 0x126,0x144,4,0x244,0x215},
+    {0x215,0x244,0x244,0x611,0x611, 0x244,0x244,0x215,0x423,0x423},
+    {0x146,0x126,0x344,0x611,0x611, 0x344, 0x126,0x146,0x522,0x522},
+    {5,0,0x244,0x215,3, 3,0x215,0x244,0,5}
 };
 
 static unsigned short trihexagon[][12]=
 {
-	{0x215,0x244,4,4,0x244,0x215, 0x215,0x244,4,4,0x244,0x215},
-	{0x413,0x522,0x144,4,0x244,0x215, 0x413,0x522,0x144,4,0x244,0x215},
-	{3,0x126,0x144,0,0x244,0x215, 3,0x126,0x144,0,0x244,0x215},
-	{0x215,0x244,4,0,6,3, 4,0x244,0x215,3,6,0},
-	{5,0,0x244,0x215,0x245,0x211, 5,0x211,0x245,0x215,0x244,0},
-	{0x245,0x211,0x215,0x244,0x244,0x211, 0x245,0x211,0x244,0x244,0x215,0x211},
-	{0x215,0x244,0x244,0x611, 0x522,0x146,0x146,0x522, 0x611,0x244,0x244,0x215},
-	{5,0,0x244,0x215, 0x146,0x122,0x122,0x146, 0x215,0x244,0,5},
-	{5,0,6,0x126,0x344,0x211, 5,0x211,0x344,0x126,6,0},
-	{0x215,0x344,0x122,0x122,0x344,0x215, 0x215,0x344,0x122,0x122,0x344,0x215},
-	{5,0,6,6,0,5, 6,0,5,5,0,6},
-	{0x691,0x3C4,0x5A2,0x5A2,0x3C4,0x691, 0x5A2,0x3C4,0x691,0x691,0x3C4,0x5A2},
+    {0x215,0x244,4,4,0x244,0x215, 0x215,0x244,4,4,0x244,0x215},
+    {0x413,0x522,0x144,4,0x244,0x215, 0x413,0x522,0x144,4,0x244,0x215},
+    {3,0x126,0x144,0,0x244,0x215, 3,0x126,0x144,0,0x244,0x215},
+    {0x215,0x244,4,0,6,3, 4,0x244,0x215,3,6,0},
+    {5,0,0x244,0x215,0x245,0x211, 5,0x211,0x245,0x215,0x244,0},
+    {0x245,0x211,0x215,0x244,0x244,0x211, 0x245,0x211,0x244,0x244,0x215,0x211},
+    {0x215,0x244,0x244,0x611, 0x522,0x146,0x146,0x522, 0x611,0x244,0x244,0x215},
+    {5,0,0x244,0x215, 0x146,0x122,0x122,0x146, 0x215,0x244,0,5},
+    {5,0,6,0x126,0x344,0x211, 5,0x211,0x344,0x126,6,0},
+    {0x215,0x344,0x122,0x122,0x344,0x215, 0x215,0x344,0x122,0x122,0x344,0x215},
+    {5,0,6,6,0,5, 6,0,5,5,0,6},
+    {0x691,0x3C4,0x5A2,0x5A2,0x3C4,0x691, 0x5A2,0x3C4,0x691,0x691,0x3C4,0x5A2},
 };
 
 DBL PavementPattern::trigonal (const Vector3d& EPoint) const
 {
-	unsigned short how;
-	long xv,zv;
-	DBL return_value=0;
-	DBL value;
-	DBL value1;
-	DBL value2;
-	DBL dist1;
-	DBL dist2;
-	DBL dist3;
-	DBL x,z;
-	int lng=0;
+    unsigned short how;
+    long xv,zv;
+    DBL return_value=0;
+    DBL value;
+    DBL value1;
+    DBL value2;
+    DBL dist1;
+    DBL dist2;
+    DBL dist3;
+    DBL x,z;
+    int lng=0;
 
-	x=EPoint[X];
-	z=EPoint[Z];
+    x=EPoint[X];
+    z=EPoint[Z];
 
-	xv = floor(x);
-	zv = floor(z/SQRT3);
-	x -= xv;
-	z -= SQRT3*zv;
-	/* x,z is in { [0.0, 1.0 [, [0.0, SQRT3 [ } 
-	 ** There is some mirror to reduce the problem
-	 */
-	zv *= 2;
-	xv *= 2;
-	if ( z > SQRT3_2 )
-	{
-		z -= SQRT3_2;
-		if (x>0.5)
-		{
-			x -= 0.5;
-			xv++;
-		}
-		else
-		{
-			x += 0.5;
-			xv--;
-		}
-		zv++;
-	}
-	if ((x == 0.0)||(z/x>SQRT3))
-	{
-		z = SQRT3_2 - z;
-		x = 0.5 -x;
-		xv--;
-	}
-	if ((x == 1.0)||(z/(1.0-x)>SQRT3))
-	{
-		z = SQRT3_2 - z;
-		x = 1.5 -x;
-		xv++;
-	}
-	switch(Tile)
-	{
-		case 6:
-			switch(Number-1)
-			{
-				case 0:
-				case 1:
-				case 9:
-					xv += 5*zv;
-					zv = 0;
-					xv %= 6; if (xv <0) { xv += 6;}
-					lng = 0;
-					break;
-				case 2:
-				case 10:
-				case 11:
-					zv &= 0x01;
-					xv += 3*zv;
-					xv %= 6; if (xv <0) { xv += 6;}
-					lng = 0;
-					break;
-				case 3:
-					xv += 14*((zv%6+((zv%6)<0?6:0))/2);
-					xv %= 6; if (xv <0) { xv += 6;}
-					lng = 6;
-					zv &= 0x01;
-					break;
-				case 4:
-				case 8:
-					xv += 8*((zv%6+((zv%6)<0?6:0))/2);
-					xv %= 6; if (xv <0) { xv += 6;}
-					lng = 6;
-					zv &= 0x01;
-					break;
-				case 5:
-					xv %= 6; if (xv <0) { xv += 6;}
-					lng = 6;
-					zv &= 0x01;
-					break;
-				case 6:
-				case 7:
-					xv -= ((zv%12+((zv%12)<0?12:0))/3);
-					xv &= 3;
-					lng = 4;
-					zv %= 3; if (zv <0) { zv +=3;}
-					break;
-			}
-			how = trihexagon[Number-1][xv+zv*lng];
-			break;
-		case 5:
-			switch(Number-1)
-			{
-				case 0:
-				case 1:
-				case 2:
-					zv &= 0x01;
-					xv += 5*zv;
-					xv %= 10; if (xv <0) { xv += 10 ;  }
-					zv = 0x00;
-					break;
-				case 3:
-					zv %= 10; if (zv <0) { zv += 10; }
-					xv += 3*zv;
-					xv %= 10; if (xv <0) { xv += 10 ;  }
-					zv = 0x00;
-					break;
-			}
-			how = tripentagon[Number-1][xv];
-			break;
-		case 4:
-			zv &= 0x03;
-			xv += zv;
-			xv &= 0x03;
-			zv &= 0x01;
-			how = tritetragon[Number-1][xv+zv*4];
-			break;
-		case 3:
-			zv &= 0x01;
-			xv += 3*zv;
-			xv %= 6; if (xv < 0) { xv += 6; }
-			zv = 0x00;
-			how = tritrigon[Number-1][xv];
-			break;
-		case 2:
-			how = 0x166;
-			break;
-		case 1:
-		default:
-			how = 0x07;
-			break;
-	}
+    xv = floor(x);
+    zv = floor(z/SQRT3);
+    x -= xv;
+    z -= SQRT3*zv;
+    /* x,z is in { [0.0, 1.0 [, [0.0, SQRT3 [ }
+     ** There is some mirror to reduce the problem
+     */
+    zv *= 2;
+    xv *= 2;
+    if ( z > SQRT3_2 )
+    {
+        z -= SQRT3_2;
+        if (x>0.5)
+        {
+            x -= 0.5;
+            xv++;
+        }
+        else
+        {
+            x += 0.5;
+            xv--;
+        }
+        zv++;
+    }
+    if ((x == 0.0)||(z/x>SQRT3))
+    {
+        z = SQRT3_2 - z;
+        x = 0.5 -x;
+        xv--;
+    }
+    if ((x == 1.0)||(z/(1.0-x)>SQRT3))
+    {
+        z = SQRT3_2 - z;
+        x = 1.5 -x;
+        xv++;
+    }
+    switch(Tile)
+    {
+        case 6:
+            switch(Number-1)
+            {
+                case 0:
+                case 1:
+                case 9:
+                    xv += 5*zv;
+                    zv = 0;
+                    xv %= 6; if (xv <0) { xv += 6;}
+                    lng = 0;
+                    break;
+                case 2:
+                case 10:
+                case 11:
+                    zv &= 0x01;
+                    xv += 3*zv;
+                    xv %= 6; if (xv <0) { xv += 6;}
+                    lng = 0;
+                    break;
+                case 3:
+                    xv += 14*((zv%6+((zv%6)<0?6:0))/2);
+                    xv %= 6; if (xv <0) { xv += 6;}
+                    lng = 6;
+                    zv &= 0x01;
+                    break;
+                case 4:
+                case 8:
+                    xv += 8*((zv%6+((zv%6)<0?6:0))/2);
+                    xv %= 6; if (xv <0) { xv += 6;}
+                    lng = 6;
+                    zv &= 0x01;
+                    break;
+                case 5:
+                    xv %= 6; if (xv <0) { xv += 6;}
+                    lng = 6;
+                    zv &= 0x01;
+                    break;
+                case 6:
+                case 7:
+                    xv -= ((zv%12+((zv%12)<0?12:0))/3);
+                    xv &= 3;
+                    lng = 4;
+                    zv %= 3; if (zv <0) { zv +=3;}
+                    break;
+            }
+            how = trihexagon[Number-1][xv+zv*lng];
+            break;
+        case 5:
+            switch(Number-1)
+            {
+                case 0:
+                case 1:
+                case 2:
+                    zv &= 0x01;
+                    xv += 5*zv;
+                    xv %= 10; if (xv <0) { xv += 10 ;  }
+                    zv = 0x00;
+                    break;
+                case 3:
+                    zv %= 10; if (zv <0) { zv += 10; }
+                    xv += 3*zv;
+                    xv %= 10; if (xv <0) { xv += 10 ;  }
+                    zv = 0x00;
+                    break;
+            }
+            how = tripentagon[Number-1][xv];
+            break;
+        case 4:
+            zv &= 0x03;
+            xv += zv;
+            xv &= 0x03;
+            zv &= 0x01;
+            how = tritetragon[Number-1][xv+zv*4];
+            break;
+        case 3:
+            zv &= 0x01;
+            xv += 3*zv;
+            xv %= 6; if (xv < 0) { xv += 6; }
+            zv = 0x00;
+            how = tritrigon[Number-1][xv];
+            break;
+        case 2:
+            how = 0x166;
+            break;
+        case 1:
+        default:
+            how = 0x07;
+            break;
+    }
 
-	/* 
-	 **      / \
-	 **     1   \
-	 **    /     2
-	 **   /       \
-	 **  -----3-----
-	 ** *3/2
-	 */
-	if (how & 0x01)
-	{
-		dist1 = 1.0 - (fabs(SQRT3 * x - z) * SQRT3 );
-		return_value = max(return_value,dist1);
-	}
-	if (how & 0x02)
-	{
-		dist2 = 1.0 - (fabs(SQRT3 * (1.0-x) - z) * SQRT3  );
-		return_value = max(return_value,dist2);
-	}
-	if (how & 0x04)
-	{
-		dist3 = 1.0 - (z * 2.0 * SQRT3 );
-		return_value = max(return_value,dist3);
-	}
-	switch(Interior)
-	{
-		case 1:
-			dist1 = (1.0 - (fabs(SQRT3 * z + x) ));
-			dist2 = (1.0 - (fabs(SQRT3 * z - x + 1.0) ));
-			dist3 = (1.0 - (x * 2.0 ));
-			if (((how & 0x83) == 0x00)&&(dist1<0)&&(dist2<0))
-			{
-				value1 = (3.0 / 2.0 *(fabs(SQRT3 * z + x) ) - 2.0);
-				value2 = (3.0 / 2.0 *(fabs(SQRT3 * z - x + 1.0) ) - 2.0);
-				value =  min(value1,value2);
-				return_value = max(return_value,value);
-			}
-			if (((how & 0x85) == 0x00)&&(dist1>0)&&(dist3>0))
-			{
-				value1 = (1.0 - 3.0 / 2.0 * (fabs(SQRT3 * z + x) ));
-				value2 = (1.0 - (x * 3.0 ));
-				value =  min(value1,value2);
-				return_value = max(return_value,value);
-			}
-			if (((how & 0x86) == 0x00)&&(dist3<0)&&(dist2>0))
-			{
-				value1 = (1.0 - 3.0 / 2.0 *(fabs(SQRT3 * z - x + 1.0) ));
-				value2 = ((x * 3.0 ) - 2.0);
-				value =  min(value1,value2);
-				return_value = max(return_value,value);
-			}
-			break;
-		case 2:
-			if ((how & 0x83) == 0x00)
-			{
-				dist1 = x - 0.5;
-				dist2 = z - SQRT3_2;
-				dist3 = 1.0 - (sqrt((dist1*dist1+dist2*dist2))*3.0 );
-				return_value = max(return_value,dist3);
-			}
-			if ((how & 0x85) == 0x00)
-			{
-				dist1 = x;
-				dist2 = z;
-				dist3 = 1.0 - (sqrt((dist1*dist1+dist2*dist2)) *3.0);
-				return_value = max(return_value,dist3);
-			}
-			if ((how & 0x86) == 0x00)
-			{
-				dist1 = x - 1.0;
-				dist2 = z ;
-				dist3 = 1.0 - (sqrt((dist1*dist1+dist2*dist2)) *3.0);
-				return_value = max(return_value,dist3);
-			}
-			break;
-		case 0:
-			if ((how & 0x83) == 0x00)
-			{
-				dist3 = 1.0 - ((SQRT3_2 - z) * 2.0 * SQRT3  );
-				return_value = max(return_value,dist3);
-			}
-			if ((how & 0x85) == 0x00)
-			{
-				dist2 = 1.0 - (fabs(SQRT3 * x + z) * SQRT3 );
-				return_value = max(return_value,dist2);
-			}
-			if ((how & 0x86) == 0x00)
-			{
-				dist1 = 1.0 - (fabs(SQRT3 * (x -1.0) - z) * SQRT3 );
-				return_value = max(return_value,dist1);
-			}
-			break;
-	}
-	switch(Exterior)
-	{
-		case 2:
-			dist1 = (1.0 - (fabs(SQRT3 * z + x) ));
-			dist2 = (1.0 - (fabs(SQRT3 * z - x + 1.0) ));
-			dist3 = (1.0 - (x * 2.0 ));
-			if ( (((how & 0x03) == 0x03)&&(dist1<=0.0)&&(dist2<=0.0)) ||
-			     (((how & 0x06) == 0x06)&&(dist2>=0.0)&&(dist3<=0.0)) ||
-			     (((how & 0x05) == 0x05)&&(dist1>=0.0)&&(dist3>=0.0)) )
-			{
-				value1 = x - 0.5;
-				value2 = z - SQRT3_2/3.0;
-				value = 2 * SQRT3 *sqrt(value1*value1+value2*value2);
-				return_value = min(1.0,value);
-			}
-			break;
-		case 1:
-			/* dist1 = (1.0 - (fabs(SQRT3 * z + x) )); */
-			dist1 = (1.0 - (fabs(SQRT3 * x - z)*SQRT3 ));
-			/* dist2 = (1.0 - (fabs(SQRT3 * z - x + 1.0) )); */
-			dist2 = (1.0 - (fabs(SQRT3 * (1.0 -x ) -z ) *SQRT3));
-			/* dist3 = (1.0 - (x * 2.0 )); */
-			dist3 = (1.0 - (z * 2.0 * SQRT3));
-			value1 = (x - 0.5);
-			value2 = (z - SQRT3_2/3.0);
-			if  (((how & 0x03) == 0x03)&&(dist1>=0.0)&&(dist2>=0.0))
-			{
-				value = fabs(value2 * 2.0 * SQRT3 );
-				return_value = min(1.0,value);
-			}
-			if  (((how & 0x06) == 0x06)&&(dist2>=0.0)&&(dist3>=0.0))
-			{
-				value = fabs(SQRT3 * value1 - value2) * SQRT3 ;
-				return_value = min(1.0,value);
-			}
-			if  (((how & 0x05) == 0x05)&&(dist1>=0.0)&&(dist3>=0.0))
-			{
-				value = fabs(SQRT3 * value1 + value2) * SQRT3  ;
-				return_value = min(1.0,value);
-			}
-			break;
-		case 0:
-		default:
-			break;
-	}
-	dist1 = (1.0 - (fabs(SQRT3 * z + x) ));
-	dist2 = (1.0 - (fabs(SQRT3 * z - x + 1.0) ));
-	dist3 = (1.0 - (x * 2.0 ));
-	switch(Form)
-	{
-		case 2:
-			if (((how & 0x120) == 0x120)&&(dist1<0)&&(dist2<0))
-			{
-				value1 = x;
-				value2 = z;
-				value = 2.0*SQRT3*(sqrt(value1*value1+value2*value2 ) - SQRT3/3.0 );
-				value = max(value,0.0);
-				return_value = min(value,1.0);
-				return return_value;
-			}
-			if (((how & 0x140) == 0x140)&&(dist1>0)&&(dist3>0))
-			{
-				value1 = x - 0.5;
-				value2 = z- SQRT3_2;
-				value = 2.0*SQRT3*(sqrt(value1*value1+value2*value2 ) - SQRT3/3.0 );
-				value = max(value,0.0);
-				return_value = min(value,1.0);
-				return return_value;
-			}
-			if (((how & 0x210) == 0x210)&&(dist1<0)&&(dist2<0))
-			{
-				value1 = x - 1.0;
-				value2 = z;
-				value = 2.0*SQRT3*(sqrt(value1*value1+value2*value2 ) - SQRT3/3.0 );
-				value = max(value,0.0);
-				return_value = min(value,1.0);
-				return return_value;
-			}
-			if (((how & 0x240) == 0x240)&&(dist3<0)&&(dist2>0))
-			{
-				value1 = x - 0.5;
-				value2 = z - SQRT3_2;
-				value = 2.0*SQRT3*(sqrt(value1*value1+value2*value2 ) - SQRT3/3.0 );
-				value = max(value,0.0);
-				return_value = min(value,1.0);
-				return return_value;
-			}
-			if (((how & 0x410) == 0x410)&&(dist1>0)&&(dist3>0))
-			{
-				value1 = x - 1.0;
-				value2 = z;
-				value = 2.0*SQRT3*(sqrt(value1*value1+value2*value2 ) - SQRT3/3.0 );
-				value = max(value,0.0);
-				return_value = min(value,1.0);
-				return return_value;
-			}
-			if (((how & 0x420) == 0x420)&&(dist3<0)&&(dist2>0))
-			{
-				value1 = x;
-				value2 = z;
-				value = 2.0*SQRT3*(sqrt(value1*value1+value2*value2 ) - SQRT3/3.0 );
-				value = max(value,0.0);
-				return_value = min(value,1.0);
-				return return_value;
-			}
-			break;
-		case 1:
-			if (((how & 0x120) == 0x120)&&(dist1<0)&&(dist2<0))
-			{
-				value = -dist1 * 2;
-				return_value = min(value,1.0);
-				return return_value;
-			}
-			if (((how & 0x140) == 0x140)&&(dist1>0)&&(dist3>0))
-			{
-				value = dist1 * 2;
-				return_value = min(value,1.0);
-				return return_value;
-			}
-			if (((how & 0x210) == 0x210)&&(dist1<0)&&(dist2<0))
-			{
-				value = -dist2 * 2;
-				return_value = min(value,1.0);
-				return return_value;
-			}
-			if (((how & 0x240) == 0x240)&&(dist3<0)&&(dist2>0))
-			{
-				value = dist2 * 2;
-				return_value = min(value,1.0);
-				return return_value;
-			}
-			if (((how & 0x410) == 0x410)&&(dist1>0)&&(dist3>0))
-			{
-				value = dist3 * 2;
-				return_value = min(value,1.0);
-				return return_value;
-			}
-			if (((how & 0x420) == 0x420)&&(dist2>0)&&(dist3<0))
-			{
-				value = -dist3 * 2;
-				return_value = min(value,1.0);
-				return return_value;
-			}
-			if (((how & 0x120) == 0x120)&&(dist1<0)&&(dist2<0))
-			{
-				value = -dist1 * 2;
-				return_value = min(value,1.0);
-				return return_value;
-			}
-			break;
-		default:
-		case 0:
-			break;
-	}
-	return return_value;
+    /*
+     **      / \
+     **     1   \
+     **    /     2
+     **   /       \
+     **  -----3-----
+     ** *3/2
+     */
+    if (how & 0x01)
+    {
+        dist1 = 1.0 - (fabs(SQRT3 * x - z) * SQRT3 );
+        return_value = max(return_value,dist1);
+    }
+    if (how & 0x02)
+    {
+        dist2 = 1.0 - (fabs(SQRT3 * (1.0-x) - z) * SQRT3  );
+        return_value = max(return_value,dist2);
+    }
+    if (how & 0x04)
+    {
+        dist3 = 1.0 - (z * 2.0 * SQRT3 );
+        return_value = max(return_value,dist3);
+    }
+    switch(Interior)
+    {
+        case 1:
+            dist1 = (1.0 - (fabs(SQRT3 * z + x) ));
+            dist2 = (1.0 - (fabs(SQRT3 * z - x + 1.0) ));
+            dist3 = (1.0 - (x * 2.0 ));
+            if (((how & 0x83) == 0x00)&&(dist1<0)&&(dist2<0))
+            {
+                value1 = (3.0 / 2.0 *(fabs(SQRT3 * z + x) ) - 2.0);
+                value2 = (3.0 / 2.0 *(fabs(SQRT3 * z - x + 1.0) ) - 2.0);
+                value =  min(value1,value2);
+                return_value = max(return_value,value);
+            }
+            if (((how & 0x85) == 0x00)&&(dist1>0)&&(dist3>0))
+            {
+                value1 = (1.0 - 3.0 / 2.0 * (fabs(SQRT3 * z + x) ));
+                value2 = (1.0 - (x * 3.0 ));
+                value =  min(value1,value2);
+                return_value = max(return_value,value);
+            }
+            if (((how & 0x86) == 0x00)&&(dist3<0)&&(dist2>0))
+            {
+                value1 = (1.0 - 3.0 / 2.0 *(fabs(SQRT3 * z - x + 1.0) ));
+                value2 = ((x * 3.0 ) - 2.0);
+                value =  min(value1,value2);
+                return_value = max(return_value,value);
+            }
+            break;
+        case 2:
+            if ((how & 0x83) == 0x00)
+            {
+                dist1 = x - 0.5;
+                dist2 = z - SQRT3_2;
+                dist3 = 1.0 - (sqrt((dist1*dist1+dist2*dist2))*3.0 );
+                return_value = max(return_value,dist3);
+            }
+            if ((how & 0x85) == 0x00)
+            {
+                dist1 = x;
+                dist2 = z;
+                dist3 = 1.0 - (sqrt((dist1*dist1+dist2*dist2)) *3.0);
+                return_value = max(return_value,dist3);
+            }
+            if ((how & 0x86) == 0x00)
+            {
+                dist1 = x - 1.0;
+                dist2 = z ;
+                dist3 = 1.0 - (sqrt((dist1*dist1+dist2*dist2)) *3.0);
+                return_value = max(return_value,dist3);
+            }
+            break;
+        case 0:
+            if ((how & 0x83) == 0x00)
+            {
+                dist3 = 1.0 - ((SQRT3_2 - z) * 2.0 * SQRT3  );
+                return_value = max(return_value,dist3);
+            }
+            if ((how & 0x85) == 0x00)
+            {
+                dist2 = 1.0 - (fabs(SQRT3 * x + z) * SQRT3 );
+                return_value = max(return_value,dist2);
+            }
+            if ((how & 0x86) == 0x00)
+            {
+                dist1 = 1.0 - (fabs(SQRT3 * (x -1.0) - z) * SQRT3 );
+                return_value = max(return_value,dist1);
+            }
+            break;
+    }
+    switch(Exterior)
+    {
+        case 2:
+            dist1 = (1.0 - (fabs(SQRT3 * z + x) ));
+            dist2 = (1.0 - (fabs(SQRT3 * z - x + 1.0) ));
+            dist3 = (1.0 - (x * 2.0 ));
+            if ( (((how & 0x03) == 0x03)&&(dist1<=0.0)&&(dist2<=0.0)) ||
+                 (((how & 0x06) == 0x06)&&(dist2>=0.0)&&(dist3<=0.0)) ||
+                 (((how & 0x05) == 0x05)&&(dist1>=0.0)&&(dist3>=0.0)) )
+            {
+                value1 = x - 0.5;
+                value2 = z - SQRT3_2/3.0;
+                value = 2 * SQRT3 *sqrt(value1*value1+value2*value2);
+                return_value = min(1.0,value);
+            }
+            break;
+        case 1:
+            /* dist1 = (1.0 - (fabs(SQRT3 * z + x) )); */
+            dist1 = (1.0 - (fabs(SQRT3 * x - z)*SQRT3 ));
+            /* dist2 = (1.0 - (fabs(SQRT3 * z - x + 1.0) )); */
+            dist2 = (1.0 - (fabs(SQRT3 * (1.0 -x ) -z ) *SQRT3));
+            /* dist3 = (1.0 - (x * 2.0 )); */
+            dist3 = (1.0 - (z * 2.0 * SQRT3));
+            value1 = (x - 0.5);
+            value2 = (z - SQRT3_2/3.0);
+            if  (((how & 0x03) == 0x03)&&(dist1>=0.0)&&(dist2>=0.0))
+            {
+                value = fabs(value2 * 2.0 * SQRT3 );
+                return_value = min(1.0,value);
+            }
+            if  (((how & 0x06) == 0x06)&&(dist2>=0.0)&&(dist3>=0.0))
+            {
+                value = fabs(SQRT3 * value1 - value2) * SQRT3 ;
+                return_value = min(1.0,value);
+            }
+            if  (((how & 0x05) == 0x05)&&(dist1>=0.0)&&(dist3>=0.0))
+            {
+                value = fabs(SQRT3 * value1 + value2) * SQRT3  ;
+                return_value = min(1.0,value);
+            }
+            break;
+        case 0:
+        default:
+            break;
+    }
+    dist1 = (1.0 - (fabs(SQRT3 * z + x) ));
+    dist2 = (1.0 - (fabs(SQRT3 * z - x + 1.0) ));
+    dist3 = (1.0 - (x * 2.0 ));
+    switch(Form)
+    {
+        case 2:
+            if (((how & 0x120) == 0x120)&&(dist1<0)&&(dist2<0))
+            {
+                value1 = x;
+                value2 = z;
+                value = 2.0*SQRT3*(sqrt(value1*value1+value2*value2 ) - SQRT3/3.0 );
+                value = max(value,0.0);
+                return_value = min(value,1.0);
+                return return_value;
+            }
+            if (((how & 0x140) == 0x140)&&(dist1>0)&&(dist3>0))
+            {
+                value1 = x - 0.5;
+                value2 = z- SQRT3_2;
+                value = 2.0*SQRT3*(sqrt(value1*value1+value2*value2 ) - SQRT3/3.0 );
+                value = max(value,0.0);
+                return_value = min(value,1.0);
+                return return_value;
+            }
+            if (((how & 0x210) == 0x210)&&(dist1<0)&&(dist2<0))
+            {
+                value1 = x - 1.0;
+                value2 = z;
+                value = 2.0*SQRT3*(sqrt(value1*value1+value2*value2 ) - SQRT3/3.0 );
+                value = max(value,0.0);
+                return_value = min(value,1.0);
+                return return_value;
+            }
+            if (((how & 0x240) == 0x240)&&(dist3<0)&&(dist2>0))
+            {
+                value1 = x - 0.5;
+                value2 = z - SQRT3_2;
+                value = 2.0*SQRT3*(sqrt(value1*value1+value2*value2 ) - SQRT3/3.0 );
+                value = max(value,0.0);
+                return_value = min(value,1.0);
+                return return_value;
+            }
+            if (((how & 0x410) == 0x410)&&(dist1>0)&&(dist3>0))
+            {
+                value1 = x - 1.0;
+                value2 = z;
+                value = 2.0*SQRT3*(sqrt(value1*value1+value2*value2 ) - SQRT3/3.0 );
+                value = max(value,0.0);
+                return_value = min(value,1.0);
+                return return_value;
+            }
+            if (((how & 0x420) == 0x420)&&(dist3<0)&&(dist2>0))
+            {
+                value1 = x;
+                value2 = z;
+                value = 2.0*SQRT3*(sqrt(value1*value1+value2*value2 ) - SQRT3/3.0 );
+                value = max(value,0.0);
+                return_value = min(value,1.0);
+                return return_value;
+            }
+            break;
+        case 1:
+            if (((how & 0x120) == 0x120)&&(dist1<0)&&(dist2<0))
+            {
+                value = -dist1 * 2;
+                return_value = min(value,1.0);
+                return return_value;
+            }
+            if (((how & 0x140) == 0x140)&&(dist1>0)&&(dist3>0))
+            {
+                value = dist1 * 2;
+                return_value = min(value,1.0);
+                return return_value;
+            }
+            if (((how & 0x210) == 0x210)&&(dist1<0)&&(dist2<0))
+            {
+                value = -dist2 * 2;
+                return_value = min(value,1.0);
+                return return_value;
+            }
+            if (((how & 0x240) == 0x240)&&(dist3<0)&&(dist2>0))
+            {
+                value = dist2 * 2;
+                return_value = min(value,1.0);
+                return return_value;
+            }
+            if (((how & 0x410) == 0x410)&&(dist1>0)&&(dist3>0))
+            {
+                value = dist3 * 2;
+                return_value = min(value,1.0);
+                return return_value;
+            }
+            if (((how & 0x420) == 0x420)&&(dist2>0)&&(dist3<0))
+            {
+                value = -dist3 * 2;
+                return_value = min(value,1.0);
+                return return_value;
+            }
+            if (((how & 0x120) == 0x120)&&(dist1<0)&&(dist2<0))
+            {
+                value = -dist1 * 2;
+                return_value = min(value,1.0);
+                return return_value;
+            }
+            break;
+        default:
+        case 0:
+            break;
+    }
+    return return_value;
 }
 
 /*
@@ -4248,830 +4273,830 @@ DBL PavementPattern::trigonal (const Vector3d& EPoint) const
 */
 static unsigned short hexmonogon[][6]=
 {
-	{0x691,0x3C4,0x5A2,0x5A2,0x3C4,0x691}
+    {0x691,0x3C4,0x5A2,0x5A2,0x3C4,0x691}
 };
 
 static unsigned short hexdigon[][12]=
 {
-	{0x691,0x3C4,0x1A2,0x1A2,0x3C4,0x691,0x5A2,0x1C4,0x6080,0x6080,0x1C4,0x5A2 }
+    {0x691,0x3C4,0x1A2,0x1A2,0x3C4,0x691,0x5A2,0x1C4,0x6080,0x6080,0x1C4,0x5A2 }
 };
 
 static unsigned short hextrigon[][36]=
 {
-	{
-		0x691,0x3C4,0x5A2,  0x5A2,0x3C4, 0x691,
-		0x5A2,0x3C4,0x691,  0x491,0x3080,0x4A2,
-		0x491,0x3080,0x4A2, 0x4A2,0x3080,0x491,
-		0x4A2,0x3080,0x491, 0x491,0x3080,0x4A2,
-		0x491,0x3080,0x4A2, 0x4A2,0x3080,0x491,
-		0x4A2,0x3080,0x491, 0x691,0x3C4,0x5A2
-	},
+    {
+        0x691,0x3C4,0x5A2,  0x5A2,0x3C4, 0x691,
+        0x5A2,0x3C4,0x691,  0x491,0x3080,0x4A2,
+        0x491,0x3080,0x4A2, 0x4A2,0x3080,0x491,
+        0x4A2,0x3080,0x491, 0x491,0x3080,0x4A2,
+        0x491,0x3080,0x4A2, 0x4A2,0x3080,0x491,
+        0x4A2,0x3080,0x491, 0x691,0x3C4,0x5A2
+    },
 
-	{
-		0x691,0x3C4,0x1A2, 0x1A2,0x3C4,0x691,
-		0x5A2,0x1C4,0x4080, 0x2080,0x2080,0x4A2,
-		0x691,0x2C4,0x4080, 0x1080,0x1080,0x491,
-		0x5A2,0x3C4,0x291, 0x291,0x3C4,0x5A2,
-		0x491,0x1080,0x1080, 0x4080,0x2C4,0x691,
-		0x4A2,0x2080,0x2080, 0x4080,0x1C4,0x5A2
-	},
+    {
+        0x691,0x3C4,0x1A2, 0x1A2,0x3C4,0x691,
+        0x5A2,0x1C4,0x4080, 0x2080,0x2080,0x4A2,
+        0x691,0x2C4,0x4080, 0x1080,0x1080,0x491,
+        0x5A2,0x3C4,0x291, 0x291,0x3C4,0x5A2,
+        0x491,0x1080,0x1080, 0x4080,0x2C4,0x691,
+        0x4A2,0x2080,0x2080, 0x4080,0x1C4,0x5A2
+    },
 
-	{
-		0x691,0x3C4,0x1A2, 0x1A2,0x3C4,0x291, 0x291,0x3C4,0x5A2,
-		0x5A2,0x1C4,0x6080,0x6080,0x0C4,0x5080,0x5080,0x2C4,0x691,
-		0x5A2,0x1C4,0x6080,0x6080,0x0C4,0x5080,0x5080,0x2C4,0x691,
-		0x691,0x3C4,0x1A2, 0x1A2,0x3C4,0x291, 0x291,0x3C4,0x5A2
-	}
+    {
+        0x691,0x3C4,0x1A2, 0x1A2,0x3C4,0x291, 0x291,0x3C4,0x5A2,
+        0x5A2,0x1C4,0x6080,0x6080,0x0C4,0x5080,0x5080,0x2C4,0x691,
+        0x5A2,0x1C4,0x6080,0x6080,0x0C4,0x5080,0x5080,0x2C4,0x691,
+        0x691,0x3C4,0x1A2, 0x1A2,0x3C4,0x291, 0x291,0x3C4,0x5A2
+    }
 };
 
 static unsigned short hextetragon[][48]=
 {
-	{
-		0x691,0x3C4,0x5A2,  0x5A2,0x3C4, 0x691,
-		0x5A2,0x3C4,0x691,  0x491,0x3080,0x4A2,
-		0x491,0x3080,0x4A2, 0x4A2,0x3080,0x491,
-		0x4A2,0x3080,0x491, 0x491,0x3080,0x4A2,
-		0x491,0x3080,0x4A2, 0x4A2,0x3080,0x491,
-		0x4A2,0x3080,0x491, 0x491,0x3080,0x4A2,
-		0x491,0x3080,0x4A2, 0x4A2,0x3080,0x491,
-		0x4A2,0x3080,0x491, 0x691,0x3C4,0x5A2
-	},
+    {
+        0x691,0x3C4,0x5A2,  0x5A2,0x3C4, 0x691,
+        0x5A2,0x3C4,0x691,  0x491,0x3080,0x4A2,
+        0x491,0x3080,0x4A2, 0x4A2,0x3080,0x491,
+        0x4A2,0x3080,0x491, 0x491,0x3080,0x4A2,
+        0x491,0x3080,0x4A2, 0x4A2,0x3080,0x491,
+        0x4A2,0x3080,0x491, 0x491,0x3080,0x4A2,
+        0x491,0x3080,0x4A2, 0x4A2,0x3080,0x491,
+        0x4A2,0x3080,0x491, 0x691,0x3C4,0x5A2
+    },
 
-	{
-		0x691,0x2C4,0x4080, 0x1080,0x80,0x2080,
-		0x4080,0x2C4,0x691, 0x291,0x3C4,0x1A2,
-		0x4080,0x1C4,0x5A2, 0x1A2,0x3C4,0x291,
-		0x5A2,0x1C4,0x4080, 0x2080,0x80,0x1080,
-		0x691,0x2C4,0x4080, 0x1080,0x80,0x2080,
-		0x4080,0x2C4,0x691, 0x291,0x3C4,0x1A2,
-		0x4080,0x1C4,0x5A2, 0x1A2,0x3C4,0x291,
-		0x5A2,0x1C4,0x4080, 0x2080,0x80,0x1080
-	},
+    {
+        0x691,0x2C4,0x4080, 0x1080,0x80,0x2080,
+        0x4080,0x2C4,0x691, 0x291,0x3C4,0x1A2,
+        0x4080,0x1C4,0x5A2, 0x1A2,0x3C4,0x291,
+        0x5A2,0x1C4,0x4080, 0x2080,0x80,0x1080,
+        0x691,0x2C4,0x4080, 0x1080,0x80,0x2080,
+        0x4080,0x2C4,0x691, 0x291,0x3C4,0x1A2,
+        0x4080,0x1C4,0x5A2, 0x1A2,0x3C4,0x291,
+        0x5A2,0x1C4,0x4080, 0x2080,0x80,0x1080
+    },
 
-	{
-		0x691,0x2C4,0x5080,  0x5080,0x0C4,0x6080,
-		0x6080,0x0C4,0x5080, 0x5080,0x2C4,0x691,
-		0x5A2,0x3C4,0x291, 0x291,0x3C4,0x1A2,
-		0x1A2,0x3C4,0x291, 0x291,0x3C4,0x5A2,
-		0x691,0x2C4,0x5080,  0x5080,0x0C4,0x6080,
-		0x6080,0x0C4,0x5080, 0x5080,0x2C4,0x691,
-		0x5A2,0x3C4,0x291, 0x291,0x3C4,0x1A2,
-		0x1A2,0x3C4,0x291, 0x291,0x3C4,0x5A2,
-	},
+    {
+        0x691,0x2C4,0x5080,  0x5080,0x0C4,0x6080,
+        0x6080,0x0C4,0x5080, 0x5080,0x2C4,0x691,
+        0x5A2,0x3C4,0x291, 0x291,0x3C4,0x1A2,
+        0x1A2,0x3C4,0x291, 0x291,0x3C4,0x5A2,
+        0x691,0x2C4,0x5080,  0x5080,0x0C4,0x6080,
+        0x6080,0x0C4,0x5080, 0x5080,0x2C4,0x691,
+        0x5A2,0x3C4,0x291, 0x291,0x3C4,0x1A2,
+        0x1A2,0x3C4,0x291, 0x291,0x3C4,0x5A2,
+    },
 
-	{
-		0x691,0x3C4,0x5A2,  0x4A2,0x3080,0x491,
-		0x1A2,0x3C4,0x691,  0x691,0x3C4,0x5A2,
-		0x6080,0x1C4,0x5A2, 0x1A2,0x3C4,0x691,
-		0x5A2,0x1C4,0x6080, 0x6080,0x1C4,0x5A2,
-		0x491,0x3080,0x0A2, 0x5A2,0x1C4,0x6080,
-		0x4A2,0x3080,0x491, 0x491,0x3080,0x0A2,
-		0x491,0x3080,0x4A2, 0x4A2,0x3080,0x491,
-		0x4A2,0x3080,0x491, 0x491,0x3080,0x4A2
-	},
+    {
+        0x691,0x3C4,0x5A2,  0x4A2,0x3080,0x491,
+        0x1A2,0x3C4,0x691,  0x691,0x3C4,0x5A2,
+        0x6080,0x1C4,0x5A2, 0x1A2,0x3C4,0x691,
+        0x5A2,0x1C4,0x6080, 0x6080,0x1C4,0x5A2,
+        0x491,0x3080,0x0A2, 0x5A2,0x1C4,0x6080,
+        0x4A2,0x3080,0x491, 0x491,0x3080,0x0A2,
+        0x491,0x3080,0x4A2, 0x4A2,0x3080,0x491,
+        0x4A2,0x3080,0x491, 0x491,0x3080,0x4A2
+    },
 
-	{
-		0x691,0x3C4,0x1A2,  0x5A2,0x1C4,0x6080,
-		0x5080,0x2C4,0x691, 0x491,0x3080,0x0A2,
-		0x291,0x3C4,0x5A2,  0x4A2,0x3080,0x091,
-		0x5A2,0x3C4,0x291,  0x691,0x2C4,0x5080,
-		0x691,0x2C4,0x5080, 0x5080,0x2C4,0x691,
-		0x1A2,0x3C4,0x691,  0x091,0x3080,0x4A2,
-		0x6080,0x1C4,0x5A2, 0x0A2,0x3080,0x491,
-		0x5A2,0x1C4,0x6080, 0x6080,0x1C4,0x5A2
-	},
+    {
+        0x691,0x3C4,0x1A2,  0x5A2,0x1C4,0x6080,
+        0x5080,0x2C4,0x691, 0x491,0x3080,0x0A2,
+        0x291,0x3C4,0x5A2,  0x4A2,0x3080,0x091,
+        0x5A2,0x3C4,0x291,  0x691,0x2C4,0x5080,
+        0x691,0x2C4,0x5080, 0x5080,0x2C4,0x691,
+        0x1A2,0x3C4,0x691,  0x091,0x3080,0x4A2,
+        0x6080,0x1C4,0x5A2, 0x0A2,0x3080,0x491,
+        0x5A2,0x1C4,0x6080, 0x6080,0x1C4,0x5A2
+    },
 
-	{
-		0x691,0x3C4,0x5A2,  0x0A2,0x3080,0x491,
-		0x5A2,0x1C4,0x4080, 0x2080,0x2080,0x4A2,
-		0x691,0x2C4,0x4080, 0x1080,0x1080,0x491,
-		0x5A2,0x3C4,0x291,  0x291,0x3C4,0x5A2,
-		0x491,0x1080,0x1080,0x4080,0x2C4,0x691,
-		0x4A2,0x2080,0x2080,0x4080,0x1C4,0x5A2,
-		0x491,0x3080,0x0A2, 0x5A2,0x3C4,0x691,
-		0x4A2,0x3080,0x491, 0x491,0x3080,0x4A2
-	},
+    {
+        0x691,0x3C4,0x5A2,  0x0A2,0x3080,0x491,
+        0x5A2,0x1C4,0x4080, 0x2080,0x2080,0x4A2,
+        0x691,0x2C4,0x4080, 0x1080,0x1080,0x491,
+        0x5A2,0x3C4,0x291,  0x291,0x3C4,0x5A2,
+        0x491,0x1080,0x1080,0x4080,0x2C4,0x691,
+        0x4A2,0x2080,0x2080,0x4080,0x1C4,0x5A2,
+        0x491,0x3080,0x0A2, 0x5A2,0x3C4,0x691,
+        0x4A2,0x3080,0x491, 0x491,0x3080,0x4A2
+    },
 
-	{
-		0x691,0x3C4,0x5A2,  0x1A2,0x3C4,0x691, 0x091,0x3080,0x0A2, 0x5A2,0x3C4,0x291,
-		0x5080,0x0C4,0x6080,0x6080,0x1C4,0x5A2,0x4A2,0x3080,0x491, 0x691,0x2C4,0x5080,
-		0x091,0x3080,0x0A2, 0x5A2,0x3C4,0x291, 0x691,0x3C4,0x5A2,  0x1A2,0x3C4,0x691,
-		0x4A2,0x3080,0x491, 0x691,0x2C4,0x5080,0x5080,0x0C4,0x6080,0x6080,0x1C4,0x5A2
-	}
+    {
+        0x691,0x3C4,0x5A2,  0x1A2,0x3C4,0x691, 0x091,0x3080,0x0A2, 0x5A2,0x3C4,0x291,
+        0x5080,0x0C4,0x6080,0x6080,0x1C4,0x5A2,0x4A2,0x3080,0x491, 0x691,0x2C4,0x5080,
+        0x091,0x3080,0x0A2, 0x5A2,0x3C4,0x291, 0x691,0x3C4,0x5A2,  0x1A2,0x3C4,0x691,
+        0x4A2,0x3080,0x491, 0x691,0x2C4,0x5080,0x5080,0x0C4,0x6080,0x6080,0x1C4,0x5A2
+    }
 };
 
 static unsigned short hexpentagon[][60]=
 { /* 0 */
-	{
-		0x691,0x3C4,0x5A2,  0x5A2,0x3C4, 0x691,
-		0x5A2,0x3C4,0x691,  0x491,0x3080,0x4A2,
-		0x491,0x3080,0x4A2, 0x4A2,0x3080,0x491,
-		0x4A2,0x3080,0x491, 0x491,0x3080,0x4A2,
-		0x491,0x3080,0x4A2, 0x4A2,0x3080,0x491,
-		0x4A2,0x3080,0x491, 0x491,0x3080,0x4A2,
-		0x491,0x3080,0x4A2, 0x4A2,0x3080,0x491,
-		0x4A2,0x3080,0x491, 0x491,0x3080,0x4A2,
-		0x491,0x3080,0x4A2, 0x4A2,0x3080,0x491,
-		0x4A2,0x3080,0x491, 0x691,0x3C4,0x5A2
-	},
-	/* 1 */
-	{
-		0x6080,0x1C4,0x5A2, 0x1A2,0x3C4,0x691,
-		0x5A2,0x1C4,0x6080, 0x6080,0x1C4,0x5A2 ,
-		0x491,0x3080,0x0A2, 0x5A2,0x1C4,0x6080,
-		0x4A2,0x3080,0x491, 0x491,0x3080,0x0A2,
-		0x491,0x3080,0x4A2, 0x4A2,0x3080,0x491,
-		0x4A2,0x3080,0x491, 0x491,0x3080,0x4A2,
-		0x491,0x3080,0x4A2, 0x4A2,0x3080,0x491,
-		0x4A2,0x3080,0x491, 0x491,0x3080,0x4A2,
-		0x691,0x3C4,0x5A2,  0x4A2,0x3080,0x491,
-		0x1A2,0x3C4,0x691,  0x691,0x3C4,0x5A2
-	},
-	/* 2 */
-	{
-		0x691,0x3C4,0x1A2,  0x1A2,0x3C4, 0x691,
-		0x5A2,0x1C4,0x4080, 0x2080,0x2080,0x4A2,
-		0x691,0x2C4,0x4080, 0x1080,0x1080,0x491,
-		0x5A2,0x3C4,0x691,  0x091,0x3080,0x4A2,
-		0x491,0x3080,0x4A2, 0x4A2,0x3080,0x491,
-		0x4A2,0x3080,0x491, 0x491,0x3080,0x4A2,
-		0x491,0x3080,0x4A2, 0x4A2,0x3080,0x491,
-		0x4A2,0x3080,0x091, 0x691,0x3C4,0x5A2,
-		0x491,0x1080,0x1080,0x4080,0x2C4,0x691,
-		0x4A2,0x2080,0x2080,0x4080,0x1C4,0x5A2
-	},
-	/* 3 */
-	{
-		0x691,0x3C4,0x5A2,  0x0A2,0x3080,0x491,
-		0x5A2,0x1C4,0x4080, 0x2080,0x2080,0x4A2,
-		0x691,0x2C4,0x4080, 0x1080,0x1080,0x491,
-		0x5A2,0x3C4,0x691,  0x091,0x3080,0x4A2,
-		0x491,0x3080,0x4A2, 0x4A2,0x3080,0x491,
-		0x4A2,0x3080,0x091, 0x691,0x3C4,0x5A2,
-		0x491,0x1080,0x1080,0x4080,0x2C4,0x691,
-		0x4A2,0x2080,0x2080,0x4080,0x1C4,0x5A2,
-		0x491,0x3080,0x0A2, 0x5A2,0x3C4, 0x691,
-		0x4A2,0x3080,0x491, 0x491,0x3080,0x4A2
-	},
-	/* 4 */
-	{
-		0x6080,0x1C4,0x5A2, 0x0A2,0x3080,0x491,
-		0x5A2,0x1C4,0x6080, 0x6080,0x1C4,0x5A2,
-		0x491,0x3080,0x0A2, 0x5A2,0x1C4,0x6080,
-		0x4A2,0x3080,0x491, 0x491,0x3080,0x0A2,
-		0x491,0x3080,0x4A2, 0x4A2,0x3080,0x491,
-		0x4A2,0x3080,0x491, 0x491,0x3080,0x4A2,
-		0x691,0x3C4,0x5A2,  0x4A2,0x3080,0x491,
-		0x5A2,0x3C4,0x691,  0x691,0x3C4,0x5A2,
-		0x491,0x3080,0x4A2, 0x5A2,0x3C4,0x691,
-		0x0A2,0x3080,0x491, 0x491,0x3080,0x4A2,
-	},
-	/* 5 */
-	{
-		0x691,0x3C4,0x1A2,  0x1A2,0x3C4, 0x691,
-		0x5A2,0x1C4,0x4080, 0x2080,0x2080,0x4A2,
-		0x491,0x1080,0x080, 0x080,0x1080,0x491,
-		0x4A2,0x2080,0x2080,0x4080,0x1C4,0x5A2,
-		0x491,0x3080,0x0A2, 0x5A2,0x3C4,0x691,
-		0x4A2,0x3080,0x491, 0x491,0x3080,0x4A2,
-		0x691,0x3C4,0x5A2,  0x0A2,0x3080,0x491,
-		0x5A2,0x1C4,0x4080, 0x2080,0x2080,0x4A2,
-		0x491,0x1080,0x080, 0x080,0x1080,0x491,
-		0x4A2,0x2080,0x2080,0x4080,0x1C4,0x5A2
-	},
-	/* 6 */
-	{
-		0x691,0x2C4,0x4080, 0x1080,0x1080, 0x491,
-		0x5A2,0x3C4,0x291,  0x291,0x3C4,0x5A2,
-		0x491,0x1080,0x1080,0x4080,0x2C4,0x691,
-		0x4A2,0x2080,0x080, 0x080,0x2080,0x4A2,
-		0x491,0x1080,0x080, 0x080,0x1080,0x491,
-		0x4A2,0x2080,0x2080,0x4080,0x1C4,0x5A2,
-		0x691,0x3C4,0x1A2,  0x1A2,0x3C4,0x691,
-		0x5A2,0x1C4,0x4080, 0x2080,0x2080,0x4A2,
-		0x491,0x1080,0x080, 0x080,0x1080,0x491,
-		0x4A2,0x2080,0x080, 0x080,0x2080,0x4A2
-	},
-	/* 7 */
-	{
-		0x6080,0x1C4,0x5A2,
-		0x5A2,0x1C4,0x4080,
-		0x691,0x2C4,0x4080,
-		0x4080,0x2C4,0x691,
-		0x4080,0x1C4,0x5A2,
-		0x5A2,0x1C4,0x6080,
-		0x691,0x3C4,0x1A2,
+    {
+        0x691,0x3C4,0x5A2,  0x5A2,0x3C4, 0x691,
+        0x5A2,0x3C4,0x691,  0x491,0x3080,0x4A2,
+        0x491,0x3080,0x4A2, 0x4A2,0x3080,0x491,
+        0x4A2,0x3080,0x491, 0x491,0x3080,0x4A2,
+        0x491,0x3080,0x4A2, 0x4A2,0x3080,0x491,
+        0x4A2,0x3080,0x491, 0x491,0x3080,0x4A2,
+        0x491,0x3080,0x4A2, 0x4A2,0x3080,0x491,
+        0x4A2,0x3080,0x491, 0x491,0x3080,0x4A2,
+        0x491,0x3080,0x4A2, 0x4A2,0x3080,0x491,
+        0x4A2,0x3080,0x491, 0x691,0x3C4,0x5A2
+    },
+    /* 1 */
+    {
+        0x6080,0x1C4,0x5A2, 0x1A2,0x3C4,0x691,
+        0x5A2,0x1C4,0x6080, 0x6080,0x1C4,0x5A2 ,
+        0x491,0x3080,0x0A2, 0x5A2,0x1C4,0x6080,
+        0x4A2,0x3080,0x491, 0x491,0x3080,0x0A2,
+        0x491,0x3080,0x4A2, 0x4A2,0x3080,0x491,
+        0x4A2,0x3080,0x491, 0x491,0x3080,0x4A2,
+        0x491,0x3080,0x4A2, 0x4A2,0x3080,0x491,
+        0x4A2,0x3080,0x491, 0x491,0x3080,0x4A2,
+        0x691,0x3C4,0x5A2,  0x4A2,0x3080,0x491,
+        0x1A2,0x3C4,0x691,  0x691,0x3C4,0x5A2
+    },
+    /* 2 */
+    {
+        0x691,0x3C4,0x1A2,  0x1A2,0x3C4, 0x691,
+        0x5A2,0x1C4,0x4080, 0x2080,0x2080,0x4A2,
+        0x691,0x2C4,0x4080, 0x1080,0x1080,0x491,
+        0x5A2,0x3C4,0x691,  0x091,0x3080,0x4A2,
+        0x491,0x3080,0x4A2, 0x4A2,0x3080,0x491,
+        0x4A2,0x3080,0x491, 0x491,0x3080,0x4A2,
+        0x491,0x3080,0x4A2, 0x4A2,0x3080,0x491,
+        0x4A2,0x3080,0x091, 0x691,0x3C4,0x5A2,
+        0x491,0x1080,0x1080,0x4080,0x2C4,0x691,
+        0x4A2,0x2080,0x2080,0x4080,0x1C4,0x5A2
+    },
+    /* 3 */
+    {
+        0x691,0x3C4,0x5A2,  0x0A2,0x3080,0x491,
+        0x5A2,0x1C4,0x4080, 0x2080,0x2080,0x4A2,
+        0x691,0x2C4,0x4080, 0x1080,0x1080,0x491,
+        0x5A2,0x3C4,0x691,  0x091,0x3080,0x4A2,
+        0x491,0x3080,0x4A2, 0x4A2,0x3080,0x491,
+        0x4A2,0x3080,0x091, 0x691,0x3C4,0x5A2,
+        0x491,0x1080,0x1080,0x4080,0x2C4,0x691,
+        0x4A2,0x2080,0x2080,0x4080,0x1C4,0x5A2,
+        0x491,0x3080,0x0A2, 0x5A2,0x3C4, 0x691,
+        0x4A2,0x3080,0x491, 0x491,0x3080,0x4A2
+    },
+    /* 4 */
+    {
+        0x6080,0x1C4,0x5A2, 0x0A2,0x3080,0x491,
+        0x5A2,0x1C4,0x6080, 0x6080,0x1C4,0x5A2,
+        0x491,0x3080,0x0A2, 0x5A2,0x1C4,0x6080,
+        0x4A2,0x3080,0x491, 0x491,0x3080,0x0A2,
+        0x491,0x3080,0x4A2, 0x4A2,0x3080,0x491,
+        0x4A2,0x3080,0x491, 0x491,0x3080,0x4A2,
+        0x691,0x3C4,0x5A2,  0x4A2,0x3080,0x491,
+        0x5A2,0x3C4,0x691,  0x691,0x3C4,0x5A2,
+        0x491,0x3080,0x4A2, 0x5A2,0x3C4,0x691,
+        0x0A2,0x3080,0x491, 0x491,0x3080,0x4A2,
+    },
+    /* 5 */
+    {
+        0x691,0x3C4,0x1A2,  0x1A2,0x3C4, 0x691,
+        0x5A2,0x1C4,0x4080, 0x2080,0x2080,0x4A2,
+        0x491,0x1080,0x080, 0x080,0x1080,0x491,
+        0x4A2,0x2080,0x2080,0x4080,0x1C4,0x5A2,
+        0x491,0x3080,0x0A2, 0x5A2,0x3C4,0x691,
+        0x4A2,0x3080,0x491, 0x491,0x3080,0x4A2,
+        0x691,0x3C4,0x5A2,  0x0A2,0x3080,0x491,
+        0x5A2,0x1C4,0x4080, 0x2080,0x2080,0x4A2,
+        0x491,0x1080,0x080, 0x080,0x1080,0x491,
+        0x4A2,0x2080,0x2080,0x4080,0x1C4,0x5A2
+    },
+    /* 6 */
+    {
+        0x691,0x2C4,0x4080, 0x1080,0x1080, 0x491,
+        0x5A2,0x3C4,0x291,  0x291,0x3C4,0x5A2,
+        0x491,0x1080,0x1080,0x4080,0x2C4,0x691,
+        0x4A2,0x2080,0x080, 0x080,0x2080,0x4A2,
+        0x491,0x1080,0x080, 0x080,0x1080,0x491,
+        0x4A2,0x2080,0x2080,0x4080,0x1C4,0x5A2,
+        0x691,0x3C4,0x1A2,  0x1A2,0x3C4,0x691,
+        0x5A2,0x1C4,0x4080, 0x2080,0x2080,0x4A2,
+        0x491,0x1080,0x080, 0x080,0x1080,0x491,
+        0x4A2,0x2080,0x080, 0x080,0x2080,0x4A2
+    },
+    /* 7 */
+    {
+        0x6080,0x1C4,0x5A2,
+        0x5A2,0x1C4,0x4080,
+        0x691,0x2C4,0x4080,
+        0x4080,0x2C4,0x691,
+        0x4080,0x1C4,0x5A2,
+        0x5A2,0x1C4,0x6080,
+        0x691,0x3C4,0x1A2,
 
-		0x5A2,0x1C4,0x6080,
-		0x491,0x3080,0x0A2,
+        0x5A2,0x1C4,0x6080,
+        0x491,0x3080,0x0A2,
 
-		0x4A2,0x3080,0x091,
-		0x491,0x1080,0x1080,
-		0x4A2,0x2080,0x2080,
-		0x691,0x3C4,0x1A2,
-		0x1A2,0x3C4,0x691,
-		0x2080,0x2080,0x4A2,
-		0x1080,0x1080,0x491,
-		0x091,0x3080,0x4A2,
-		0x0A2,0x3080,0x491,
-		0x6080,0x1C4,0x5A2,
-		0x1A2,0x3C4,0x691
-	},
-	/* 8 */
-	{
-		0x6080,0x0C4,0x5080, 0x5080,0x2C4, 0x291,
-		0x5A2,0x3C4,0x291,  0x291,0x2C4,0x5080,
-		0x691,0x2C4,0x5080, 0x5080,0x2C4,0x691,
-		0x5080,0x2C4,0x691, 0x091,0x3080,0x4A2,
-		0x091,0x3080,0x4A2, 0x4A2,0x3080,0x491,
-		0x4A2,0x3080,0x491, 0x491,0x3080,0x4A2,
-		0x691,0x3C4,0x5A2, 0x0A2,0x3080,0x491,
-		0x5A2,0x1C4,0x6080, 0x6080,0x1C4,0x5A2,
+        0x4A2,0x3080,0x091,
+        0x491,0x1080,0x1080,
+        0x4A2,0x2080,0x2080,
+        0x691,0x3C4,0x1A2,
+        0x1A2,0x3C4,0x691,
+        0x2080,0x2080,0x4A2,
+        0x1080,0x1080,0x491,
+        0x091,0x3080,0x4A2,
+        0x0A2,0x3080,0x491,
+        0x6080,0x1C4,0x5A2,
+        0x1A2,0x3C4,0x691
+    },
+    /* 8 */
+    {
+        0x6080,0x0C4,0x5080, 0x5080,0x2C4, 0x291,
+        0x5A2,0x3C4,0x291,  0x291,0x2C4,0x5080,
+        0x691,0x2C4,0x5080, 0x5080,0x2C4,0x691,
+        0x5080,0x2C4,0x691, 0x091,0x3080,0x4A2,
+        0x091,0x3080,0x4A2, 0x4A2,0x3080,0x491,
+        0x4A2,0x3080,0x491, 0x491,0x3080,0x4A2,
+        0x691,0x3C4,0x5A2, 0x0A2,0x3080,0x491,
+        0x5A2,0x1C4,0x6080, 0x6080,0x1C4,0x5A2,
 
-		0x691,0x3C4,0x1A2, 0x5A2,0x1C4,0x6080,
-		0x1A2,0x3C4,0x291, 0x691,0x3C4,0x1A2
-	},
-	/* 9 */
-	{
-		0x691,0x3C4,0x1A2,  0x1A2,0x3C4,0x691,
-		0x5080,0x0C4,0x6080,0x6080,0x1C4,0x5A2,
-		0x291,0x3C4,0x1A2,  0x1A2,0x3C4,0x291,
-		0x5A2,0x1C4,0x6080, 0x6080,0x0C4,0x5080,
-		0x491,0x3080,0x0A2, 0x5A2,0x3C4,0x691,
-		0x6A2,0x3080,0x491, 0x491,0x3080,0x4A2,
-		0x691,0x3C4,0x5A2,  0x0A2,0x3080,0x491,
-		0x5080,0x0C4,0x6080,0x6080,0x1C4,0x5A2,
-		0x291,0x3C4,0x1A2, 0x1A2,0x3C4,0x291,
-		0x5A2,0x1C4,0x6080, 0x6080,0x0C4,0x5080,
-	},
-	/* 10 */
-	{
-		0x691,0x3C4,0x1A2,  0x1A2,0x3C4,0x691,
-		0x5A2,0x1C4,0x4080, 0x2080,0x2080,0x4A2,
-		0x491,0x1080,0x80, 0x80,0x1080,0x091,
-		0x4A2,0x2080,0x2080, 0x4080,0x0C4,0x5080,
-		0x691,0x3C4,0x1A2, 0x5A2,0x3C4,0x291,
-		0x5080,0x2C4,0x691, 0x691,0x2C4,0x5080,
-		0x291,0x3C4,0x5A2,  0x1A2,0x3C4,0x691,
-		0x5080,0x0C4,0x4080, 0x2080,0x2080,0x4A2,
-		0x091,0x1080,0x80, 0x80,0x1080,0x491,
-		0x4A2,0x2080,0x2080, 0x4080,0x1C4,0x5A2
-	},
-	/* 11 */
-	{
-		0x291,0x3C4,0x5A2,  0x1A2,0x3C4,0x691,
-		0x4080,0x0C4,0x4080, 0x2080,0x2080,0x4A2,
-		0x4080,0x0C4,0x4080, 0x1080,0x1080,0x491,
-		0x5A2,0x3C4,0x291,  0x291,0x3C4,0x5A2,
-		0x491,0x1080,0x1080,0x4080,0x0C4,0x4080,
-		0x4A2,0x2080,0x2080,0x4080,0x0C4,0x4080,
-		0x691,0x3C4,0x1A2, 0x5A2,0x3C4,0x291,
-		0x1A2,0x3C4,0x691, 0x491,0x1080,0x1080,
-		0x2080,0x2080,0x4A2, 0x4A2,0x2080,0x2080,
-		0x1080,0x1080,0x491, 0x691,0x3C4,0x1A2
-	},
-	/* 12 */
-	{
-		0x691,0x2C4,0x5080, 0x5080,0x2C4,0x691,
-		0x5080,0x2C4,0x691, 0x091,0x3080,0x4A2,
-		0x291,0x3C4,0x5A2,  0x0A2,0x3080,0x491,
-		0x5080,0x0C4,0x6080,0x6080,0x1C4,0x5A2,
-		0x291,0x3C4,0x1A2,  0x1A2,0x3C4,0x291,
-		0x5A2,0x1C4,0x6080, 0x6080,0x0C4,0x5080,
-		0x491,0x3080,0x0A2, 0x5A2,0x3C4,0x291,
-		0x4A2,0x3080,0x091, 0x691,0x2C4,0x5080,
-		0x691,0x2C4,0x5080, 0x5080,0x2C4,0x691,
-		0x5A2,0x3C4,0x291,  0x291,0x3C4,0x5A2
-	},
-	/* 13 */
-	{
-		0x691,0x3C4,0x5A2,  0x5A2,0x3C4,0x691,
-		0x5A2,0x3C4,0x691,  0x491,0x3080,0x4A2,
-		0x491,0x3080,0x4A2, 0x4A2,0x3080,0x091,
-		0x4A2,0x3080,0x091, 0x691,0x2C4,0x5080,
-		0x691,0x2C4,0x5080, 0x5080,0x2C4,0x291,
-		0x5080,0x2C4,0x291, 0x291,0x2C4,0x5080,
-		0x291,0x2C4,0x5080, 0x5080,0x2C4,0x691,
-		0x5080,0x2C4,0x691, 0x091,0x3080,0x4A2,
-		0x091,0x3080,0x4A2, 0x4A2,0x3080,0x491,
-		0x4A2,0x3080,0x491, 0x691,0x3C4,0x5A2
-	},
-	/* 14 */
-	{
-		0x291,0x3C4,0x5A2, 0x5A2,0x3C4,0x691,
-		0x5A2,0x3C4,0x691, 0x491,0x3080,0x4A2,
-		0x491,0x3080,0x4A2,0x4A2,0x3080,0x491,
-		0x4A2,0x3080,0x491,0x491,0x3080,0x4A2,
-		0x491,0x3080,0x4A2,0x4A2,0x3080,0x091,
-		0x4A2,0x3080,0x091,0x691,0x2C4,0x5080,
-		0x691,0x2C4,0x5080,0x5080,0x2C4,0x291,
-		0x5080,0x2C4,0x291,0x291,0x2C4,0x5080,
-		0x291,0x2C4,0x5080,0x5080,0x2C4,0x691,
-		0x5080,0x2C4,0x691,0x291,0x3C4,0x5A2
-	},
-	/* 15 */
-	{
-		0x691,0x2C4,0x5080, 0x5080,0x0C4,0x4080,
-		0x1A2,0x3C4,0x691,  0x291,0x2C4,0x4080,
-		0x2080,0x2080,0x4A2,0x5A2,0x3C4,0x691,
-		0x1080,0x1080,0x491,0x491,0x3080,0x4A2,
-		0x091,0x3080,0x4A2, 0x4A2,0x3080,0x091,
-		0x4A2,0x3080,0x491, 0x491,0x1080,0x1080,
-		0x691,0x3C4,0x5A2,  0x4A2,0x2080,0x2080,
-		0x4080,0x2C4,0x291, 0x691,0x3C4,0x1A2,
-		0x4080,0x0C4,0x5080,0x5080,0x2C4,0x691,
-		0x5A2,0x3C4,0x291,  0x291,0x3C4,0x5A2
-	},
-	/* 16 */
-	{
-		0x4080,0x1C4,0x1A2, 0x1A2,0x1C4,0x4080,
-		0x5A2,0x1C4,0x6080, 0x6080,0x0C4,0x4080,
-		0x691,0x3C4,0x1A2,  0x5A2,0x3C4,0x691,
-		0x1A2,0x3C4,0x691,  0x491,0x3080,0x4A2,
-		0x2080,0x2080,0x4A2,0x4A2,0x3080,0x091,
-		0x1080,0x1080,0x491,0x491,0x1080,0x1080,
-		0x091,0x3080,0x4A2, 0x4A2,0x2080,0x2080,
-		0x4A2,0x3080,0x491, 0x691,0x3C4,0x1A2,
-		0x691,0x3C4,0x5A2,  0x1A2,0x3C4,0x691,
-		0x4080,0x0C4,0x6080,0x6080,0x1C4,0x5A2
-	},
-	/* 17 */
-	{
-		0x291,0x3C4,0x1A2,  0x1A2,0x3C4,0x291,
-		0x5A2,0x1C4,0x6080, 0x6080,0x0C4,0x5080,
-		0x691,0x3C4,0x1A2,  0x5A2,0x3C4,0x691,
-		0x5080,0x2C4,0x691, 0x491,0x3080,0x4A2,
-		0x091,0x3080,0x4A2, 0x4A2,0x3080,0x491,
-		0x4A2,0x3080,0x491, 0x491,0x3080,0x4A2,
-		0x491,0x3080,0x4A2, 0x4A2,0x3080,0x091,
-		0x4A2,0x3080,0x491, 0x691,0x2C4,0x5080,
-		0x691,0x3C4,0x5A2,  0x1A2,0x3C4,0x691,
-		0x5080,0x0C4,0x6080,0x6080,0x1C4,0x5A2
-	},
-	/* 18 */
-	{
-		0x091,0x3080,0x4A2, 0x5A2,0x3C4,0x691,
-		0x4A2,0x3080,0x491, 0x491,0x3080,0x4A2,
-		0x691,0x3C4,0x5A2,  0x0A2,0x3080,0x091,
-		0x5A2,0x1C4,0x6080, 0x6080,0x0C4,0x5080,
-		0x691,0x3C4,0x1A2,  0x1A2,0x3C4,0x691,
-		0x5080,0x0C4,0x6080,0x6080,0x1C4,0x5A2,
-		0x091,0x3080,0x0A2, 0x5A2,0x3C4,0x691,
-		0x4A2,0x3080,0x491, 0x491,0x3080,0x4A2,
-		0x691,0x3C4,0x5A2,  0x4A2,0x3080,0x091,
-		0x5080,0x2C4,0x691, 0x691,0x2C4,0x5080
-	},
-	/* 19 */
-	{
-		0x691,0x3C4,0x1A2,  0x1A2,0x3C4,0x691,
-		0x5A2,0x1C4,0x4080, 0x2080,0x2080,0x4A2,
-		0x691,0x2C4,0x4080, 0x1080,0x1080,0x091,
-		0x5080,0x2C4,0x691, 0x291,0x2C4,0x5080,
-		0x091,0x3080,0x4A2, 0x5A2,0x3C4,0x691,
+        0x691,0x3C4,0x1A2, 0x5A2,0x1C4,0x6080,
+        0x1A2,0x3C4,0x291, 0x691,0x3C4,0x1A2
+    },
+    /* 9 */
+    {
+        0x691,0x3C4,0x1A2,  0x1A2,0x3C4,0x691,
+        0x5080,0x0C4,0x6080,0x6080,0x1C4,0x5A2,
+        0x291,0x3C4,0x1A2,  0x1A2,0x3C4,0x291,
+        0x5A2,0x1C4,0x6080, 0x6080,0x0C4,0x5080,
+        0x491,0x3080,0x0A2, 0x5A2,0x3C4,0x691,
+        0x6A2,0x3080,0x491, 0x491,0x3080,0x4A2,
+        0x691,0x3C4,0x5A2,  0x0A2,0x3080,0x491,
+        0x5080,0x0C4,0x6080,0x6080,0x1C4,0x5A2,
+        0x291,0x3C4,0x1A2, 0x1A2,0x3C4,0x291,
+        0x5A2,0x1C4,0x6080, 0x6080,0x0C4,0x5080,
+    },
+    /* 10 */
+    {
+        0x691,0x3C4,0x1A2,  0x1A2,0x3C4,0x691,
+        0x5A2,0x1C4,0x4080, 0x2080,0x2080,0x4A2,
+        0x491,0x1080,0x80, 0x80,0x1080,0x091,
+        0x4A2,0x2080,0x2080, 0x4080,0x0C4,0x5080,
+        0x691,0x3C4,0x1A2, 0x5A2,0x3C4,0x291,
+        0x5080,0x2C4,0x691, 0x691,0x2C4,0x5080,
+        0x291,0x3C4,0x5A2,  0x1A2,0x3C4,0x691,
+        0x5080,0x0C4,0x4080, 0x2080,0x2080,0x4A2,
+        0x091,0x1080,0x80, 0x80,0x1080,0x491,
+        0x4A2,0x2080,0x2080, 0x4080,0x1C4,0x5A2
+    },
+    /* 11 */
+    {
+        0x291,0x3C4,0x5A2,  0x1A2,0x3C4,0x691,
+        0x4080,0x0C4,0x4080, 0x2080,0x2080,0x4A2,
+        0x4080,0x0C4,0x4080, 0x1080,0x1080,0x491,
+        0x5A2,0x3C4,0x291,  0x291,0x3C4,0x5A2,
+        0x491,0x1080,0x1080,0x4080,0x0C4,0x4080,
+        0x4A2,0x2080,0x2080,0x4080,0x0C4,0x4080,
+        0x691,0x3C4,0x1A2, 0x5A2,0x3C4,0x291,
+        0x1A2,0x3C4,0x691, 0x491,0x1080,0x1080,
+        0x2080,0x2080,0x4A2, 0x4A2,0x2080,0x2080,
+        0x1080,0x1080,0x491, 0x691,0x3C4,0x1A2
+    },
+    /* 12 */
+    {
+        0x691,0x2C4,0x5080, 0x5080,0x2C4,0x691,
+        0x5080,0x2C4,0x691, 0x091,0x3080,0x4A2,
+        0x291,0x3C4,0x5A2,  0x0A2,0x3080,0x491,
+        0x5080,0x0C4,0x6080,0x6080,0x1C4,0x5A2,
+        0x291,0x3C4,0x1A2,  0x1A2,0x3C4,0x291,
+        0x5A2,0x1C4,0x6080, 0x6080,0x0C4,0x5080,
+        0x491,0x3080,0x0A2, 0x5A2,0x3C4,0x291,
+        0x4A2,0x3080,0x091, 0x691,0x2C4,0x5080,
+        0x691,0x2C4,0x5080, 0x5080,0x2C4,0x691,
+        0x5A2,0x3C4,0x291,  0x291,0x3C4,0x5A2
+    },
+    /* 13 */
+    {
+        0x691,0x3C4,0x5A2,  0x5A2,0x3C4,0x691,
+        0x5A2,0x3C4,0x691,  0x491,0x3080,0x4A2,
+        0x491,0x3080,0x4A2, 0x4A2,0x3080,0x091,
+        0x4A2,0x3080,0x091, 0x691,0x2C4,0x5080,
+        0x691,0x2C4,0x5080, 0x5080,0x2C4,0x291,
+        0x5080,0x2C4,0x291, 0x291,0x2C4,0x5080,
+        0x291,0x2C4,0x5080, 0x5080,0x2C4,0x691,
+        0x5080,0x2C4,0x691, 0x091,0x3080,0x4A2,
+        0x091,0x3080,0x4A2, 0x4A2,0x3080,0x491,
+        0x4A2,0x3080,0x491, 0x691,0x3C4,0x5A2
+    },
+    /* 14 */
+    {
+        0x291,0x3C4,0x5A2, 0x5A2,0x3C4,0x691,
+        0x5A2,0x3C4,0x691, 0x491,0x3080,0x4A2,
+        0x491,0x3080,0x4A2,0x4A2,0x3080,0x491,
+        0x4A2,0x3080,0x491,0x491,0x3080,0x4A2,
+        0x491,0x3080,0x4A2,0x4A2,0x3080,0x091,
+        0x4A2,0x3080,0x091,0x691,0x2C4,0x5080,
+        0x691,0x2C4,0x5080,0x5080,0x2C4,0x291,
+        0x5080,0x2C4,0x291,0x291,0x2C4,0x5080,
+        0x291,0x2C4,0x5080,0x5080,0x2C4,0x691,
+        0x5080,0x2C4,0x691,0x291,0x3C4,0x5A2
+    },
+    /* 15 */
+    {
+        0x691,0x2C4,0x5080, 0x5080,0x0C4,0x4080,
+        0x1A2,0x3C4,0x691,  0x291,0x2C4,0x4080,
+        0x2080,0x2080,0x4A2,0x5A2,0x3C4,0x691,
+        0x1080,0x1080,0x491,0x491,0x3080,0x4A2,
+        0x091,0x3080,0x4A2, 0x4A2,0x3080,0x091,
+        0x4A2,0x3080,0x491, 0x491,0x1080,0x1080,
+        0x691,0x3C4,0x5A2,  0x4A2,0x2080,0x2080,
+        0x4080,0x2C4,0x291, 0x691,0x3C4,0x1A2,
+        0x4080,0x0C4,0x5080,0x5080,0x2C4,0x691,
+        0x5A2,0x3C4,0x291,  0x291,0x3C4,0x5A2
+    },
+    /* 16 */
+    {
+        0x4080,0x1C4,0x1A2, 0x1A2,0x1C4,0x4080,
+        0x5A2,0x1C4,0x6080, 0x6080,0x0C4,0x4080,
+        0x691,0x3C4,0x1A2,  0x5A2,0x3C4,0x691,
+        0x1A2,0x3C4,0x691,  0x491,0x3080,0x4A2,
+        0x2080,0x2080,0x4A2,0x4A2,0x3080,0x091,
+        0x1080,0x1080,0x491,0x491,0x1080,0x1080,
+        0x091,0x3080,0x4A2, 0x4A2,0x2080,0x2080,
+        0x4A2,0x3080,0x491, 0x691,0x3C4,0x1A2,
+        0x691,0x3C4,0x5A2,  0x1A2,0x3C4,0x691,
+        0x4080,0x0C4,0x6080,0x6080,0x1C4,0x5A2
+    },
+    /* 17 */
+    {
+        0x291,0x3C4,0x1A2,  0x1A2,0x3C4,0x291,
+        0x5A2,0x1C4,0x6080, 0x6080,0x0C4,0x5080,
+        0x691,0x3C4,0x1A2,  0x5A2,0x3C4,0x691,
+        0x5080,0x2C4,0x691, 0x491,0x3080,0x4A2,
+        0x091,0x3080,0x4A2, 0x4A2,0x3080,0x491,
+        0x4A2,0x3080,0x491, 0x491,0x3080,0x4A2,
+        0x491,0x3080,0x4A2, 0x4A2,0x3080,0x091,
+        0x4A2,0x3080,0x491, 0x691,0x2C4,0x5080,
+        0x691,0x3C4,0x5A2,  0x1A2,0x3C4,0x691,
+        0x5080,0x0C4,0x6080,0x6080,0x1C4,0x5A2
+    },
+    /* 18 */
+    {
+        0x091,0x3080,0x4A2, 0x5A2,0x3C4,0x691,
+        0x4A2,0x3080,0x491, 0x491,0x3080,0x4A2,
+        0x691,0x3C4,0x5A2,  0x0A2,0x3080,0x091,
+        0x5A2,0x1C4,0x6080, 0x6080,0x0C4,0x5080,
+        0x691,0x3C4,0x1A2,  0x1A2,0x3C4,0x691,
+        0x5080,0x0C4,0x6080,0x6080,0x1C4,0x5A2,
+        0x091,0x3080,0x0A2, 0x5A2,0x3C4,0x691,
+        0x4A2,0x3080,0x491, 0x491,0x3080,0x4A2,
+        0x691,0x3C4,0x5A2,  0x4A2,0x3080,0x091,
+        0x5080,0x2C4,0x691, 0x691,0x2C4,0x5080
+    },
+    /* 19 */
+    {
+        0x691,0x3C4,0x1A2,  0x1A2,0x3C4,0x691,
+        0x5A2,0x1C4,0x4080, 0x2080,0x2080,0x4A2,
+        0x691,0x2C4,0x4080, 0x1080,0x1080,0x091,
+        0x5080,0x2C4,0x691, 0x291,0x2C4,0x5080,
+        0x091,0x3080,0x4A2, 0x5A2,0x3C4,0x691,
 
-		0x4A2,0x3080,0x491, 0x491,0x3080,0x4A2,
-		0x691,0x3C4,0x5A2,  0x4A2,0x3080,0x091,
-		0x5080,0x2C4,0x291, 0x691,0x2C4,0x5080,
-		0x091,0x1080,0x1080,0x4080,0x2C4,0x691,
-		0x4A2,0x2080,0x2080,0x4080,0x1C4,0x5A2
-	},
-	/* 20 */
-	{
-		0x291,0x3C4,0x5A2,  0x5A2,0x3C4,0x691,
-		0x5A2,0x3C4,0x691,  0x491,0x3080,0x4A2,
-		0x491,0x3080,0x4A2, 0x4A2,0x3080,0x091,
-		0x4A2,0x3080,0x091, 0x691,0x2C4,0x5080,
-		0x691,0x2C4,0x5080, 0x5080,0x2C4,0x691,
-		0x5080,0x2C4,0x691, 0x091,0x3080,0x4A2,
-		0x091,0x3080,0x4A2, 0x4A2,0x3080,0x091,
-		0x4A2,0x3080,0x091, 0x691,0x2C4,0x5080,
-		0x691,0x2C4,0x5080, 0x5080,0x2C4,0x691,
-		0x5080,0x2C4,0x691, 0x291,0x3C4,0x5A2
-	},
-	/* 21 */
-	{
-		0x691,0x3C4,0x1A2,  0x5A2,0x3C4,0x291,
-		0x5080,0x2C4,0x691, 0x691,0x2C4,0x5080,
-		0x291,0x3C4,0x5A2,  0x1A2,0x3C4,0x691,
-		0x5080,0x0C4,0x6080,0x6080,0x1C4,0x5A2,
-		0x091,0x3080,0x0A2, 0x5A2,0x3C4,0x691,
-		0x4A2,0x3080,0x491, 0x491,0x3080,0x4A2,
-		0x491,0x3080,0x4A2, 0x4A2,0x3080,0x491,
-		0x4A2,0x3080,0x491, 0x491,0x3080,0x4A2,
-		0x691,0x3C4,0x5A2,  0x0A2,0x3080,0x091,
-		0x5A2,0x1C4,0x6080, 0x6080,0x0C4,0x5080
-	}
+        0x4A2,0x3080,0x491, 0x491,0x3080,0x4A2,
+        0x691,0x3C4,0x5A2,  0x4A2,0x3080,0x091,
+        0x5080,0x2C4,0x291, 0x691,0x2C4,0x5080,
+        0x091,0x1080,0x1080,0x4080,0x2C4,0x691,
+        0x4A2,0x2080,0x2080,0x4080,0x1C4,0x5A2
+    },
+    /* 20 */
+    {
+        0x291,0x3C4,0x5A2,  0x5A2,0x3C4,0x691,
+        0x5A2,0x3C4,0x691,  0x491,0x3080,0x4A2,
+        0x491,0x3080,0x4A2, 0x4A2,0x3080,0x091,
+        0x4A2,0x3080,0x091, 0x691,0x2C4,0x5080,
+        0x691,0x2C4,0x5080, 0x5080,0x2C4,0x691,
+        0x5080,0x2C4,0x691, 0x091,0x3080,0x4A2,
+        0x091,0x3080,0x4A2, 0x4A2,0x3080,0x091,
+        0x4A2,0x3080,0x091, 0x691,0x2C4,0x5080,
+        0x691,0x2C4,0x5080, 0x5080,0x2C4,0x691,
+        0x5080,0x2C4,0x691, 0x291,0x3C4,0x5A2
+    },
+    /* 21 */
+    {
+        0x691,0x3C4,0x1A2,  0x5A2,0x3C4,0x291,
+        0x5080,0x2C4,0x691, 0x691,0x2C4,0x5080,
+        0x291,0x3C4,0x5A2,  0x1A2,0x3C4,0x691,
+        0x5080,0x0C4,0x6080,0x6080,0x1C4,0x5A2,
+        0x091,0x3080,0x0A2, 0x5A2,0x3C4,0x691,
+        0x4A2,0x3080,0x491, 0x491,0x3080,0x4A2,
+        0x491,0x3080,0x4A2, 0x4A2,0x3080,0x491,
+        0x4A2,0x3080,0x491, 0x491,0x3080,0x4A2,
+        0x691,0x3C4,0x5A2,  0x0A2,0x3080,0x091,
+        0x5A2,0x1C4,0x6080, 0x6080,0x0C4,0x5080
+    }
 };
 
 DBL PavementPattern::hexagonal (const Vector3d& EPoint) const
 {
-	unsigned short how;
-	long xv,zv;
-	DBL return_value=0;
-	DBL value;
-	DBL value1;
-	DBL value2;
-	DBL dist1;
-	DBL dist2;
-	DBL dist3;
-	DBL x,z;
-	int lng;
+    unsigned short how;
+    long xv,zv;
+    DBL return_value=0;
+    DBL value;
+    DBL value1;
+    DBL value2;
+    DBL dist1;
+    DBL dist2;
+    DBL dist3;
+    DBL x,z;
+    int lng;
 
-	x=EPoint[X];
-	z=EPoint[Z];
+    x=EPoint[X];
+    z=EPoint[Z];
 
-	xv = floor(x);
-	zv = floor(z/SQRT3);
-	x -= xv;
-	z -= SQRT3*zv;
-	/* x,z is in { [0.0, 1.0 [, [0.0, SQRT3 [ } 
-	 ** There is some mirror to reduce the problem
-	 */
-	zv *= 2;
-	xv *= 2;
-	if ( z > SQRT3_2 )
-	{
-		z -= SQRT3_2;
-		if (x>0.5)
-		{
-			x -= 0.5;
-			xv++;
-		}
-		else
-		{
-			x += 0.5;
-			xv--;
-		}
-		zv++;
-	}
-	if ((x == 0.0)||(z/x>SQRT3))
-	{
-		z = SQRT3_2 - z;
-		x = 0.5 -x;
-		xv--;
-	}
-	if ((x == 1.0)||(z/(1.0-x)>SQRT3))
-	{
-		z = SQRT3_2 - z;
-		x = 1.5 -x;
-		xv++;
-	}
-	switch(Tile)
-	{
-		case 5:
-			switch(Number-1)
-			{
-				case 0:
-				case 2:
-				case 3:
-				case 5:
-				case 6:
-				case 19:
-					zv %= 10; if (zv < 0) { zv += 10; }
-					xv %= 6; if (xv < 0) { xv += 6; }
-					xv += 6*zv; /* 60 */
-					zv = 0;
-					break;
-				case 1:
-				case 4:
-				case 9:
-					zv -= 2*(((xv%30+(xv%30<0?30:0))/6));
-					zv %= 10; if (zv < 0) { zv += 10; }
-					xv %= 6; if (xv < 0) { xv += 6; }
-					xv += 6*zv; /* 60 */
-					zv = 0;
-					break;
-				case 7:
-					zv -= 7*(((xv%60+(xv%60<0?60:0))/3));
-					zv %= 20; if (zv < 0) { zv += 20; }
-					xv %= 3; if (xv < 0) { xv += 3; }
-					xv += 3*zv; /* 60 */
-					zv = 0;
-					break;
-				case 8:
-				case 10:
-				case 13:
-				case 14:
-				case 15:
-				case 17:
-				case 20:
-				case 21:
-					zv += 2*(((xv%30+(xv%30<0?30:0))/6));
-					zv %= 10; if (zv < 0) { zv += 10; }
-					xv %= 6; if (xv < 0) { xv += 6; }
-					xv += 6*zv; /* 60 */
-					zv = 0;
-					break;
-				case 11:
-				case 16:
-					zv -= 6*(((xv%30+(xv%30<0?30:0))/6));
-					zv %= 10; if (zv < 0) { zv += 10; }
-					xv %= 6; if (xv < 0) { xv += 6; }
-					xv += 6*zv; /* 60 */
-					zv = 0;
-					break;
-				case 12:
-				case 18:
-					zv += 6*(((xv%30+(xv%30<0?30:0))/6));
-					zv %= 10; if (zv < 0) { zv += 10; }
-					xv %= 6; if (xv < 0) { xv += 6; }
-					xv += 6*zv; /* 60 */
-					zv = 0;
-					break;
-			}
-			how = hexpentagon[Number-1][xv];
-			break;
-		case 4:
-			switch(Number-1)
-			{
-				case 0:
-					zv &= 0x07;
-					xv %= 6; if(xv <0) { xv += 6; }
-					xv += 6*zv; /* 48 */
-					zv = 0;
-					break;
-				case 3:
-					zv -= 2*(((xv%24+(xv%24<0?24:0))/6));
-					zv %= 8; if (zv < 0) { zv += 8; }
-					xv %= 6; if (xv < 0) { xv += 6; }
-					xv += 6*zv; /* 48 */
-					zv = 0;
-					break;
-				case 2:
-					zv &= 0x01;
-					xv %= 12; if (xv < 0) { xv += 12; }
-					xv += 12*zv; /* 24 */
-					zv = 0;
-					break;
-				case 5:
-				case 4:
-					zv -= 2*(((xv%24+(xv%24<0?24:0))/6));
-					zv %= 8; if (zv < 0) { zv += 8; }
-					xv %= 6; if (xv < 0) { xv += 6; }
-					xv += 6*zv; /* 48 */
-					zv = 0;
-					break;
-				case 1:
-					zv += 2*(((xv%12+(xv%12<0?12:0))/6));
-					zv %= 8; if (zv < 0) { zv += 8; }
-					xv %= 6; if (xv < 0) { xv += 6; }
-					xv += 6*zv; /* 48 */
-					zv = 0;
-					break;
-				case 6:
-					zv %= 4; if (zv < 0) { zv += 4; }
-					xv %= 12; if (xv < 0) { xv += 12; }
-					xv += 12*zv; /* 48 */
-					zv = 0;
-					break;
-			}
-			how = hextetragon[Number-1][xv];
-			break;
-		case 3:
-			switch(Number-1)
-			{
-				case 0:
-					zv %= 6; if(zv <0) { zv += 6; }
-					xv %= 6; if(xv <0) { xv += 6; }
-					xv += 6*zv;
-					zv = 0;
-					break;
-				case 1:
-					zv += 2*(((xv%18+(xv%18<0?18:0))/6));
-					zv %= 6; if(zv <0) { zv += 6; }
-					xv %= 6; if(xv <0) { xv += 6; }
-					xv += 6*zv;
-					zv = 0;
-					break;
-				case 2:
-					zv &= 0x01;
-					xv %= 18; if (xv < 0) { xv += 18; }
-					xv += 18*zv;
-					zv = 0x00;
-					break;
-			}
-			how = hextrigon[Number-1][xv];
-			break;
-		case 2:
-			zv &= 0x01;
-			xv %= 6; if (xv < 0) { xv += 6; }
-			how = hexdigon[Number-1][xv+6*zv];
-			break;
-		case 1:
-		default:
-			zv &= 0x01;
-			xv += 3*zv;
-			xv %= 6; if (xv <0) { xv += 6;}
-			lng = 0;
-			how = hexmonogon[Number-1][xv];
-			break;
-	}
+    xv = floor(x);
+    zv = floor(z/SQRT3);
+    x -= xv;
+    z -= SQRT3*zv;
+    /* x,z is in { [0.0, 1.0 [, [0.0, SQRT3 [ }
+     ** There is some mirror to reduce the problem
+     */
+    zv *= 2;
+    xv *= 2;
+    if ( z > SQRT3_2 )
+    {
+        z -= SQRT3_2;
+        if (x>0.5)
+        {
+            x -= 0.5;
+            xv++;
+        }
+        else
+        {
+            x += 0.5;
+            xv--;
+        }
+        zv++;
+    }
+    if ((x == 0.0)||(z/x>SQRT3))
+    {
+        z = SQRT3_2 - z;
+        x = 0.5 -x;
+        xv--;
+    }
+    if ((x == 1.0)||(z/(1.0-x)>SQRT3))
+    {
+        z = SQRT3_2 - z;
+        x = 1.5 -x;
+        xv++;
+    }
+    switch(Tile)
+    {
+        case 5:
+            switch(Number-1)
+            {
+                case 0:
+                case 2:
+                case 3:
+                case 5:
+                case 6:
+                case 19:
+                    zv %= 10; if (zv < 0) { zv += 10; }
+                    xv %= 6; if (xv < 0) { xv += 6; }
+                    xv += 6*zv; /* 60 */
+                    zv = 0;
+                    break;
+                case 1:
+                case 4:
+                case 9:
+                    zv -= 2*(((xv%30+(xv%30<0?30:0))/6));
+                    zv %= 10; if (zv < 0) { zv += 10; }
+                    xv %= 6; if (xv < 0) { xv += 6; }
+                    xv += 6*zv; /* 60 */
+                    zv = 0;
+                    break;
+                case 7:
+                    zv -= 7*(((xv%60+(xv%60<0?60:0))/3));
+                    zv %= 20; if (zv < 0) { zv += 20; }
+                    xv %= 3; if (xv < 0) { xv += 3; }
+                    xv += 3*zv; /* 60 */
+                    zv = 0;
+                    break;
+                case 8:
+                case 10:
+                case 13:
+                case 14:
+                case 15:
+                case 17:
+                case 20:
+                case 21:
+                    zv += 2*(((xv%30+(xv%30<0?30:0))/6));
+                    zv %= 10; if (zv < 0) { zv += 10; }
+                    xv %= 6; if (xv < 0) { xv += 6; }
+                    xv += 6*zv; /* 60 */
+                    zv = 0;
+                    break;
+                case 11:
+                case 16:
+                    zv -= 6*(((xv%30+(xv%30<0?30:0))/6));
+                    zv %= 10; if (zv < 0) { zv += 10; }
+                    xv %= 6; if (xv < 0) { xv += 6; }
+                    xv += 6*zv; /* 60 */
+                    zv = 0;
+                    break;
+                case 12:
+                case 18:
+                    zv += 6*(((xv%30+(xv%30<0?30:0))/6));
+                    zv %= 10; if (zv < 0) { zv += 10; }
+                    xv %= 6; if (xv < 0) { xv += 6; }
+                    xv += 6*zv; /* 60 */
+                    zv = 0;
+                    break;
+            }
+            how = hexpentagon[Number-1][xv];
+            break;
+        case 4:
+            switch(Number-1)
+            {
+                case 0:
+                    zv &= 0x07;
+                    xv %= 6; if(xv <0) { xv += 6; }
+                    xv += 6*zv; /* 48 */
+                    zv = 0;
+                    break;
+                case 3:
+                    zv -= 2*(((xv%24+(xv%24<0?24:0))/6));
+                    zv %= 8; if (zv < 0) { zv += 8; }
+                    xv %= 6; if (xv < 0) { xv += 6; }
+                    xv += 6*zv; /* 48 */
+                    zv = 0;
+                    break;
+                case 2:
+                    zv &= 0x01;
+                    xv %= 12; if (xv < 0) { xv += 12; }
+                    xv += 12*zv; /* 24 */
+                    zv = 0;
+                    break;
+                case 5:
+                case 4:
+                    zv -= 2*(((xv%24+(xv%24<0?24:0))/6));
+                    zv %= 8; if (zv < 0) { zv += 8; }
+                    xv %= 6; if (xv < 0) { xv += 6; }
+                    xv += 6*zv; /* 48 */
+                    zv = 0;
+                    break;
+                case 1:
+                    zv += 2*(((xv%12+(xv%12<0?12:0))/6));
+                    zv %= 8; if (zv < 0) { zv += 8; }
+                    xv %= 6; if (xv < 0) { xv += 6; }
+                    xv += 6*zv; /* 48 */
+                    zv = 0;
+                    break;
+                case 6:
+                    zv %= 4; if (zv < 0) { zv += 4; }
+                    xv %= 12; if (xv < 0) { xv += 12; }
+                    xv += 12*zv; /* 48 */
+                    zv = 0;
+                    break;
+            }
+            how = hextetragon[Number-1][xv];
+            break;
+        case 3:
+            switch(Number-1)
+            {
+                case 0:
+                    zv %= 6; if(zv <0) { zv += 6; }
+                    xv %= 6; if(xv <0) { xv += 6; }
+                    xv += 6*zv;
+                    zv = 0;
+                    break;
+                case 1:
+                    zv += 2*(((xv%18+(xv%18<0?18:0))/6));
+                    zv %= 6; if(zv <0) { zv += 6; }
+                    xv %= 6; if(xv <0) { xv += 6; }
+                    xv += 6*zv;
+                    zv = 0;
+                    break;
+                case 2:
+                    zv &= 0x01;
+                    xv %= 18; if (xv < 0) { xv += 18; }
+                    xv += 18*zv;
+                    zv = 0x00;
+                    break;
+            }
+            how = hextrigon[Number-1][xv];
+            break;
+        case 2:
+            zv &= 0x01;
+            xv %= 6; if (xv < 0) { xv += 6; }
+            how = hexdigon[Number-1][xv+6*zv];
+            break;
+        case 1:
+        default:
+            zv &= 0x01;
+            xv += 3*zv;
+            xv %= 6; if (xv <0) { xv += 6;}
+            lng = 0;
+            how = hexmonogon[Number-1][xv];
+            break;
+    }
 
-	/* 
-	 **      / \
-	 **     1   \
-	 **    /     2
-	 **   /       \
-	 **  -----3-----
-	 ** height = sqrt(3)/2
-	 */
-	if (how & 0x01)
-	{
-		dist1 = 1.0 - (fabs(SQRT3 * x - z) * SQRT3 );
-		return_value = max(return_value,dist1);
-	}
-	if (how & 0x02)
-	{
-		dist2 = 1.0 - (fabs(SQRT3 * (1.0-x) - z) * SQRT3  );
-		return_value = max(return_value,dist2);
-	}
-	if (how & 0x04)
-	{
-		dist3 = 1.0 - (z * 2.0 * SQRT3 );
-		return_value = max(return_value,dist3);
-	}
-	switch(Interior)
-	{
-		case 1:
-			dist1 = (1.0 - (fabs(SQRT3 * z + x) ));
-			dist2 = (1.0 - (fabs(SQRT3 * z - x + 1.0) ));
-			dist3 = (1.0 - (x * 2.0 ));
-			if ( (((how & 0x83) == 0x00)||((how & 0x4000) == 0x4000)) &&
-			     (dist1<0)&&(dist2<0) )
-			{
-				value1 = (3.0 / 2.0 *(fabs(SQRT3 * z + x) ) - 2.0);
-				value2 = (3.0 / 2.0 *(fabs(SQRT3 * z - x + 1.0) ) - 2.0);
-				value =  min(value1,value2);
-				return_value = max(return_value,value);
-			}
-			if ((((how & 0x85) == 0x00)||((how & 0x2000) == 0x2000))
-					&&(dist1>0)&&(dist3>0))
-			{
-				value1 = (1.0 - 3.0 / 2.0 * (fabs(SQRT3 * z + x) ));
-				value2 = (1.0 - (x * 3.0 ));
-				value =  min(value1,value2);
-				return_value = max(return_value,value);
-			}
-			if ((((how & 0x86) == 0x00)||((how & 0x1000) == 0x1000))
-					&&(dist3<0)&&(dist2>0))
-			{
-				value1 = (1.0 - 3.0 / 2.0 *(fabs(SQRT3 * z - x + 1.0) ));
-				value2 = ((x * 3.0 ) - 2.0);
-				value =  min(value1,value2);
-				return_value = max(return_value,value);
-			}
-			break;
-		case 2:
-			if (((how & 0x83) == 0x00)||((how & 0x4000) == 0x4000))
-			{
-				dist1 = x - 0.5;
-				dist2 = z - SQRT3_2;
-				dist3 = 1.0 - (sqrt((dist1*dist1+dist2*dist2))*3.0 );
-				return_value = max(return_value,dist3);
-			}
-			if (((how & 0x85) == 0x00)||((how & 0x2000) == 0x2000))
-			{
-				dist1 = x;
-				dist2 = z;
-				dist3 = 1.0 - (sqrt((dist1*dist1+dist2*dist2)) *3.0);
-				return_value = max(return_value,dist3);
-			}
-			if (((how & 0x86) == 0x00)||((how & 0x1000) == 0x1000))
-			{
-				dist1 = x - 1.0;
-				dist2 = z ;
-				dist3 = 1.0 - (sqrt((dist1*dist1+dist2*dist2)) *3.0);
-				return_value = max(return_value,dist3);
-			}
-			break;
-		case 0:
-			if (((how & 0x83) == 0x00)||((how & 0x4000) == 0x4000))
-			{
-				dist3 = 1.0 - ((SQRT3_2 - z) * 2.0 * SQRT3  );
-				return_value = max(return_value,dist3);
-			}
-			if (((how & 0x85) == 0x00)||((how & 0x2000) == 0x2000))
-			{
-				dist2 = 1.0 - (fabs(SQRT3 * x + z) * SQRT3 );
-				return_value = max(return_value,dist2);
-			}
-			if (((how & 0x86) == 0x00)||((how & 0x1000) == 0x1000))
-			{
-				dist1 = 1.0 - (fabs(SQRT3 * (x -1.0) - z) * SQRT3 );
-				return_value = max(return_value,dist1);
-			}
-			break;
-	}
-	dist1 = (1.0 - (fabs(SQRT3 * z + x) ));
-	dist2 = (1.0 - (fabs(SQRT3 * z - x + 1.0) ));
-	dist3 = (1.0 - (x * 2.0 ));
-	switch(Form)
-	{
-		case 2:
-			if (((how & 0x120) == 0x120)&&(dist1<0)&&(dist2<0))
-			{
-				value1 = x;
-				value2 = z;
-				value = 2.0*SQRT3*(sqrt(value1*value1+value2*value2 ) - SQRT3/3.0 );
-				value = max(value,0.0);
-				return_value = min(value,1.0);
-				return return_value;
-			}
-			if (((how & 0x140) == 0x140)&&(dist1>0)&&(dist3>0))
-			{
-				value1 = x - 0.5;
-				value2 = z- SQRT3_2;
-				value = 2.0*SQRT3*(sqrt(value1*value1+value2*value2 ) - SQRT3/3.0 );
-				value = max(value,0.0);
-				return_value = min(value,1.0);
-				return return_value;
-			}
-			if (((how & 0x210) == 0x210)&&(dist1<0)&&(dist2<0))
-			{
-				value1 = x - 1.0;
-				value2 = z;
-				value = 2.0*SQRT3*(sqrt(value1*value1+value2*value2 ) - SQRT3/3.0 );
-				value = max(value,0.0);
-				return_value = min(value,1.0);
-				return return_value;
-			}
-			if (((how & 0x240) == 0x240)&&(dist3<0)&&(dist2>0))
-			{
-				value1 = x - 0.5;
-				value2 = z - SQRT3_2;
-				value = 2.0*SQRT3*(sqrt(value1*value1+value2*value2 ) - SQRT3/3.0 );
-				value = max(value,0.0);
-				return_value = min(value,1.0);
-				return return_value;
-			}
-			if (((how & 0x410) == 0x410)&&(dist1>0)&&(dist3>0))
-			{
-				value1 = x - 1.0;
-				value2 = z;
-				value = 2.0*SQRT3*(sqrt(value1*value1+value2*value2 ) - SQRT3/3.0 );
-				value = max(value,0.0);
-				return_value = min(value,1.0);
-				return return_value;
-			}
-			if (((how & 0x420) == 0x420)&&(dist3<0)&&(dist2>0))
-			{
-				value1 = x;
-				value2 = z;
-				value = 2.0*SQRT3*(sqrt(value1*value1+value2*value2 ) - SQRT3/3.0 );
-				value = max(value,0.0);
-				return_value = min(value,1.0);
-				return return_value;
-			}
-			break;
-		case 1:
-			if (((how & 0x120) == 0x120)&&(dist1<0)&&(dist2<0))
-			{
-				value = -dist1 * 2;
-				return_value = min(value,1.0);
-				return return_value;
-			}
-			if (((how & 0x140) == 0x140)&&(dist1>0)&&(dist3>0))
-			{
-				value = dist1 * 2;
-				return_value = min(value,1.0);
-				return return_value;
-			}
-			if (((how & 0x210) == 0x210)&&(dist1<0)&&(dist2<0))
-			{
-				value = -dist2 * 2;
-				return_value = min(value,1.0);
-				return return_value;
-			}
-			if (((how & 0x240) == 0x240)&&(dist3<0)&&(dist2>0))
-			{
-				value = dist2 * 2;
-				return_value = min(value,1.0);
-				return return_value;
-			}
-			if (((how & 0x410) == 0x410)&&(dist1>0)&&(dist3>0))
-			{
-				value = dist3 * 2;
-				return_value = min(value,1.0);
-				return return_value;
-			}
-			if (((how & 0x420) == 0x420)&&(dist2>0)&&(dist3<0))
-			{
-				value = -dist3 * 2;
-				return_value = min(value,1.0);
-				return return_value;
-			}
-			if (((how & 0x120) == 0x120)&&(dist1<0)&&(dist2<0))
-			{
-				value = -dist1 * 2;
-				return_value = min(value,1.0);
-				return return_value;
-			}
-			break;
-		default:
-		case 0:
-			break;
-	}
-	return return_value;
+    /*
+     **      / \
+     **     1   \
+     **    /     2
+     **   /       \
+     **  -----3-----
+     ** height = sqrt(3)/2
+     */
+    if (how & 0x01)
+    {
+        dist1 = 1.0 - (fabs(SQRT3 * x - z) * SQRT3 );
+        return_value = max(return_value,dist1);
+    }
+    if (how & 0x02)
+    {
+        dist2 = 1.0 - (fabs(SQRT3 * (1.0-x) - z) * SQRT3  );
+        return_value = max(return_value,dist2);
+    }
+    if (how & 0x04)
+    {
+        dist3 = 1.0 - (z * 2.0 * SQRT3 );
+        return_value = max(return_value,dist3);
+    }
+    switch(Interior)
+    {
+        case 1:
+            dist1 = (1.0 - (fabs(SQRT3 * z + x) ));
+            dist2 = (1.0 - (fabs(SQRT3 * z - x + 1.0) ));
+            dist3 = (1.0 - (x * 2.0 ));
+            if ( (((how & 0x83) == 0x00)||((how & 0x4000) == 0x4000)) &&
+                 (dist1<0)&&(dist2<0) )
+            {
+                value1 = (3.0 / 2.0 *(fabs(SQRT3 * z + x) ) - 2.0);
+                value2 = (3.0 / 2.0 *(fabs(SQRT3 * z - x + 1.0) ) - 2.0);
+                value =  min(value1,value2);
+                return_value = max(return_value,value);
+            }
+            if ((((how & 0x85) == 0x00)||((how & 0x2000) == 0x2000))
+                    &&(dist1>0)&&(dist3>0))
+            {
+                value1 = (1.0 - 3.0 / 2.0 * (fabs(SQRT3 * z + x) ));
+                value2 = (1.0 - (x * 3.0 ));
+                value =  min(value1,value2);
+                return_value = max(return_value,value);
+            }
+            if ((((how & 0x86) == 0x00)||((how & 0x1000) == 0x1000))
+                    &&(dist3<0)&&(dist2>0))
+            {
+                value1 = (1.0 - 3.0 / 2.0 *(fabs(SQRT3 * z - x + 1.0) ));
+                value2 = ((x * 3.0 ) - 2.0);
+                value =  min(value1,value2);
+                return_value = max(return_value,value);
+            }
+            break;
+        case 2:
+            if (((how & 0x83) == 0x00)||((how & 0x4000) == 0x4000))
+            {
+                dist1 = x - 0.5;
+                dist2 = z - SQRT3_2;
+                dist3 = 1.0 - (sqrt((dist1*dist1+dist2*dist2))*3.0 );
+                return_value = max(return_value,dist3);
+            }
+            if (((how & 0x85) == 0x00)||((how & 0x2000) == 0x2000))
+            {
+                dist1 = x;
+                dist2 = z;
+                dist3 = 1.0 - (sqrt((dist1*dist1+dist2*dist2)) *3.0);
+                return_value = max(return_value,dist3);
+            }
+            if (((how & 0x86) == 0x00)||((how & 0x1000) == 0x1000))
+            {
+                dist1 = x - 1.0;
+                dist2 = z ;
+                dist3 = 1.0 - (sqrt((dist1*dist1+dist2*dist2)) *3.0);
+                return_value = max(return_value,dist3);
+            }
+            break;
+        case 0:
+            if (((how & 0x83) == 0x00)||((how & 0x4000) == 0x4000))
+            {
+                dist3 = 1.0 - ((SQRT3_2 - z) * 2.0 * SQRT3  );
+                return_value = max(return_value,dist3);
+            }
+            if (((how & 0x85) == 0x00)||((how & 0x2000) == 0x2000))
+            {
+                dist2 = 1.0 - (fabs(SQRT3 * x + z) * SQRT3 );
+                return_value = max(return_value,dist2);
+            }
+            if (((how & 0x86) == 0x00)||((how & 0x1000) == 0x1000))
+            {
+                dist1 = 1.0 - (fabs(SQRT3 * (x -1.0) - z) * SQRT3 );
+                return_value = max(return_value,dist1);
+            }
+            break;
+    }
+    dist1 = (1.0 - (fabs(SQRT3 * z + x) ));
+    dist2 = (1.0 - (fabs(SQRT3 * z - x + 1.0) ));
+    dist3 = (1.0 - (x * 2.0 ));
+    switch(Form)
+    {
+        case 2:
+            if (((how & 0x120) == 0x120)&&(dist1<0)&&(dist2<0))
+            {
+                value1 = x;
+                value2 = z;
+                value = 2.0*SQRT3*(sqrt(value1*value1+value2*value2 ) - SQRT3/3.0 );
+                value = max(value,0.0);
+                return_value = min(value,1.0);
+                return return_value;
+            }
+            if (((how & 0x140) == 0x140)&&(dist1>0)&&(dist3>0))
+            {
+                value1 = x - 0.5;
+                value2 = z- SQRT3_2;
+                value = 2.0*SQRT3*(sqrt(value1*value1+value2*value2 ) - SQRT3/3.0 );
+                value = max(value,0.0);
+                return_value = min(value,1.0);
+                return return_value;
+            }
+            if (((how & 0x210) == 0x210)&&(dist1<0)&&(dist2<0))
+            {
+                value1 = x - 1.0;
+                value2 = z;
+                value = 2.0*SQRT3*(sqrt(value1*value1+value2*value2 ) - SQRT3/3.0 );
+                value = max(value,0.0);
+                return_value = min(value,1.0);
+                return return_value;
+            }
+            if (((how & 0x240) == 0x240)&&(dist3<0)&&(dist2>0))
+            {
+                value1 = x - 0.5;
+                value2 = z - SQRT3_2;
+                value = 2.0*SQRT3*(sqrt(value1*value1+value2*value2 ) - SQRT3/3.0 );
+                value = max(value,0.0);
+                return_value = min(value,1.0);
+                return return_value;
+            }
+            if (((how & 0x410) == 0x410)&&(dist1>0)&&(dist3>0))
+            {
+                value1 = x - 1.0;
+                value2 = z;
+                value = 2.0*SQRT3*(sqrt(value1*value1+value2*value2 ) - SQRT3/3.0 );
+                value = max(value,0.0);
+                return_value = min(value,1.0);
+                return return_value;
+            }
+            if (((how & 0x420) == 0x420)&&(dist3<0)&&(dist2>0))
+            {
+                value1 = x;
+                value2 = z;
+                value = 2.0*SQRT3*(sqrt(value1*value1+value2*value2 ) - SQRT3/3.0 );
+                value = max(value,0.0);
+                return_value = min(value,1.0);
+                return return_value;
+            }
+            break;
+        case 1:
+            if (((how & 0x120) == 0x120)&&(dist1<0)&&(dist2<0))
+            {
+                value = -dist1 * 2;
+                return_value = min(value,1.0);
+                return return_value;
+            }
+            if (((how & 0x140) == 0x140)&&(dist1>0)&&(dist3>0))
+            {
+                value = dist1 * 2;
+                return_value = min(value,1.0);
+                return return_value;
+            }
+            if (((how & 0x210) == 0x210)&&(dist1<0)&&(dist2<0))
+            {
+                value = -dist2 * 2;
+                return_value = min(value,1.0);
+                return return_value;
+            }
+            if (((how & 0x240) == 0x240)&&(dist3<0)&&(dist2>0))
+            {
+                value = dist2 * 2;
+                return_value = min(value,1.0);
+                return return_value;
+            }
+            if (((how & 0x410) == 0x410)&&(dist1>0)&&(dist3>0))
+            {
+                value = dist3 * 2;
+                return_value = min(value,1.0);
+                return return_value;
+            }
+            if (((how & 0x420) == 0x420)&&(dist2>0)&&(dist3<0))
+            {
+                value = -dist3 * 2;
+                return_value = min(value,1.0);
+                return return_value;
+            }
+            if (((how & 0x120) == 0x120)&&(dist1<0)&&(dist2<0))
+            {
+                value = -dist1 * 2;
+                return_value = min(value,1.0);
+                return return_value;
+            }
+            break;
+        default:
+        case 0:
+            break;
+    }
+    return return_value;
 }
 
 /*****************************************************************************
@@ -5103,40 +5128,40 @@ DBL PavementPattern::hexagonal (const Vector3d& EPoint) const
 *
 *
 ******************************************************************************/
-DBL TilingPattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
+DBL TilingPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
-	switch(Pattern)
-	{
-		case 27: return tiling_penrose(EPoint, true, false);
-		case 26: return tiling_penrose(EPoint, false, false);
-		case 25: return tiling_penrose1(EPoint, false);
-		case 24: return tiling_dodeca_hex_5(EPoint);
-		case 23: return tiling_dodeca_hex(EPoint);
-		case 22: return tiling_dodeca_tri(EPoint);
-		case 21: return tiling_square_tri(EPoint);
-		case 20: return tiling_hexa_tri_left(EPoint);
-		case 19: return tiling_hexa_tri_right(EPoint);
-		case 18: return tiling_rectangle_pair(EPoint);
-		case 17: return tiling_hexa_square_triangle_6(EPoint);
-		case 16: return tiling_hexa_square_triangle(EPoint);
-		case 15: return tiling_square_double(EPoint);
-		case 14: return tiling_square_internal_5(EPoint);
-		case 13: return tiling_square_internal(EPoint);
-		case 12: return tiling_rectangle_square(EPoint);
-		case 11: return tiling_square_rectangle(EPoint);
-		case 10: return tiling_square_offset(EPoint);
-		case 9: return tiling_hexa_triangle(EPoint);
-		case 8: return tiling_square_triangle(EPoint);
-		case 7: return tiling_octa_square(EPoint);
-		case 6: return tiling_rectangle(EPoint);
-		case 5: return tiling_rhombus(EPoint);
-		case 4: return tiling_lozenge(EPoint);
-		case 3: return tiling_triangle(EPoint);
-		case 2: return tiling_hexagon(EPoint);
-		case 1:
-		default:
-			return tiling_square(EPoint);
-	}
+    switch(tilingType)
+    {
+        case 27: return tiling_penrose(EPoint, true, false);
+        case 26: return tiling_penrose(EPoint, false, false);
+        case 25: return tiling_penrose1(EPoint, false);
+        case 24: return tiling_dodeca_hex_5(EPoint);
+        case 23: return tiling_dodeca_hex(EPoint);
+        case 22: return tiling_dodeca_tri(EPoint);
+        case 21: return tiling_square_tri(EPoint);
+        case 20: return tiling_hexa_tri_left(EPoint);
+        case 19: return tiling_hexa_tri_right(EPoint);
+        case 18: return tiling_rectangle_pair(EPoint);
+        case 17: return tiling_hexa_square_triangle_6(EPoint);
+        case 16: return tiling_hexa_square_triangle(EPoint);
+        case 15: return tiling_square_double(EPoint);
+        case 14: return tiling_square_internal_5(EPoint);
+        case 13: return tiling_square_internal(EPoint);
+        case 12: return tiling_rectangle_square(EPoint);
+        case 11: return tiling_square_rectangle(EPoint);
+        case 10: return tiling_square_offset(EPoint);
+        case 9: return tiling_hexa_triangle(EPoint);
+        case 8: return tiling_square_triangle(EPoint);
+        case 7: return tiling_octa_square(EPoint);
+        case 6: return tiling_rectangle(EPoint);
+        case 5: return tiling_rhombus(EPoint);
+        case 4: return tiling_lozenge(EPoint);
+        case 3: return tiling_triangle(EPoint);
+        case 2: return tiling_hexagon(EPoint);
+        case 1:
+        default:
+            return tiling_square(EPoint);
+    }
 }
 
 /*****************************************************************************
@@ -5168,20 +5193,20 @@ DBL TilingPattern::operator()(const Vector3d& EPoint, const Intersection *Isecti
 *
 *
 ******************************************************************************/
-DBL PavementPattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
+DBL PavementPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
-	switch(Side)
-	{
-		case 6:
-			return hexagonal(EPoint);
+    switch(Side)
+    {
+        case 6:
+            return hexagonal(EPoint);
 
-		case 4:
-			return tetragonal(EPoint);
+        case 4:
+            return tetragonal(EPoint);
 
-		case 3:
-		default:
-			return trigonal(EPoint);
-	}
+        case 3:
+        default:
+            return trigonal(EPoint);
+    }
 }
 
 /*****************************************************************************
@@ -5213,30 +5238,30 @@ DBL PavementPattern::operator()(const Vector3d& EPoint, const Intersection *Isec
 *
 ******************************************************************************/
 
-DBL AgatePattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
+DBL AgatePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
-	int noise_generator = GetNoiseGen(Thread);
+    int noise_generator = GetNoiseGen(pThread);
 
-	register DBL noise, turb_val;
-	const TURB* Turb;
+    register DBL noise, turb_val;
+    const TURB* Turb;
 
-	Turb=Search_For_Turb(Warps);
+    Turb=SearchForTurb(pWarps);
 
-	turb_val = Agate_Turb_Scale * Turbulence(EPoint,Turb,noise_generator);
+    turb_val = agateTurbScale * Turbulence(EPoint,Turb,noise_generator);
 
-	noise = 0.5 * (cycloidal(1.3 * turb_val + 1.1 * EPoint[Z]) + 1.0);
+    noise = 0.5 * (cycloidal(1.3 * turb_val + 1.1 * EPoint[Z]) + 1.0);
 
-	if (noise < 0.0)
-	{
-		noise = 0.0;
-	}
-	else
-	{
-		noise = min(1.0, noise);
-		noise = pow(noise, 0.77);
-	}
+    if (noise < 0.0)
+    {
+        noise = 0.0;
+    }
+    else
+    {
+        noise = min(1.0, noise);
+        noise = pow(noise, 0.77);
+    }
 
-	return(noise);
+    return(noise);
 }
 
 
@@ -5271,14 +5296,14 @@ DBL AgatePattern::operator()(const Vector3d& EPoint, const Intersection *Isectio
 *
 ******************************************************************************/
 
-DBL BoxedPattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
+DBL BoxedPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
-	register DBL value;
+    register DBL value;
 
-	value = max(fabs(EPoint[X]), max(fabs(EPoint[Y]), fabs(EPoint[Z])));
-	CLIP_DENSITY(value);
+    value = max(fabs(EPoint[X]), max(fabs(EPoint[Y]), fabs(EPoint[Z])));
+    CLIP_DENSITY(value);
 
-	return(value);
+    return(value);
 }
 
 
@@ -5293,17 +5318,17 @@ DBL BoxedPattern::operator()(const Vector3d& EPoint, const Intersection *Isectio
 *   EPoint -- The point in 3d space at which the pattern
 *   is evaluated.
 *   TPat   -- Texture pattern struct
-*   
+*
 * OUTPUT
-*   
+*
 * RETURNS
 *
 *   DBL value exactly 0.0 or 1.0
-*   
+*
 * AUTHOR
 *
 *   Dan Farmer
-*   
+*
 * DESCRIPTION
 *
 * CHANGES
@@ -5312,122 +5337,122 @@ DBL BoxedPattern::operator()(const Vector3d& EPoint, const Intersection *Isectio
 *
 ******************************************************************************/
 
-DBL BrickPattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
+DBL BrickPattern::Evaluate(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
-	int ibrickx, ibricky, ibrickz;
-	DBL brickheight, brickwidth, brickdepth;
-	DBL brickmortar, mortarheight, mortarwidth, mortardepth;
-	DBL brickx, bricky, brickz;
-	DBL x, y, z, fudgit;
+    int ibrickx, ibricky, ibrickz;
+    DBL brickheight, brickwidth, brickdepth;
+    DBL brickmortar, mortarheight, mortarwidth, mortardepth;
+    DBL brickx, bricky, brickz;
+    DBL x, y, z, fudgit;
 
-	fudgit = EPSILON + Mortar;
+    fudgit = EPSILON + mortar;
 
-	x =  EPoint[X]+fudgit;
-	y =  EPoint[Y]+fudgit;
-	z =  EPoint[Z]+fudgit;
+    x =  EPoint[X]+fudgit;
+    y =  EPoint[Y]+fudgit;
+    z =  EPoint[Z]+fudgit;
 
-	brickwidth  = Size[X];
-	brickheight = Size[Y];
-	brickdepth  = Size[Z];
-	brickmortar = Mortar;
+    brickwidth  = brickSize[X];
+    brickheight = brickSize[Y];
+    brickdepth  = brickSize[Z];
+    brickmortar = mortar;
 
-	mortarwidth  = brickmortar / brickwidth;
-	mortarheight = brickmortar / brickheight;
-	mortardepth  = brickmortar / brickdepth;
+    mortarwidth  = brickmortar / brickwidth;
+    mortarheight = brickmortar / brickheight;
+    mortardepth  = brickmortar / brickdepth;
 
-	/* 1) Check mortar layers in the X-Z plane (ie: top view) */
+    /* 1) Check mortar layers in the X-Z plane (ie: top view) */
 
-	bricky = y / brickheight;
-	ibricky = (int) bricky;
-	bricky -= (DBL) ibricky;
+    bricky = y / brickheight;
+    ibricky = (int) bricky;
+    bricky -= (DBL) ibricky;
 
-	if (bricky < 0.0)
-	{
-		bricky += 1.0;
-	}
+    if (bricky < 0.0)
+    {
+        bricky += 1.0;
+    }
 
-	if (bricky <= mortarheight)
-	{
-		return(0.0);
-	}
+    if (bricky <= mortarheight)
+    {
+        return(0.0);
+    }
 
-	bricky = (y / brickheight) * 0.5;
-	ibricky = (int) bricky;
-	bricky -= (DBL) ibricky;
+    bricky = (y / brickheight) * 0.5;
+    ibricky = (int) bricky;
+    bricky -= (DBL) ibricky;
 
-	if (bricky < 0.0)
-	{
-		bricky += 1.0;
-	}
+    if (bricky < 0.0)
+    {
+        bricky += 1.0;
+    }
 
 
-	/* 2) Check ODD mortar layers in the Y-Z plane (ends) */
+    /* 2) Check ODD mortar layers in the Y-Z plane (ends) */
 
-	brickx = (x / brickwidth);
-	ibrickx = (int) brickx;
-	brickx -= (DBL) ibrickx;
+    brickx = (x / brickwidth);
+    ibrickx = (int) brickx;
+    brickx -= (DBL) ibrickx;
 
-	if (brickx < 0.0)
-	{
-		brickx += 1.0;
-	}
+    if (brickx < 0.0)
+    {
+        brickx += 1.0;
+    }
 
-	if ((brickx <= mortarwidth) && (bricky <= 0.5))
-	{
-		return(0.0);
-	}
+    if ((brickx <= mortarwidth) && (bricky <= 0.5))
+    {
+        return(0.0);
+    }
 
-	/* 3) Check EVEN mortar layers in the Y-Z plane (ends) */
+    /* 3) Check EVEN mortar layers in the Y-Z plane (ends) */
 
-	brickx = (x / brickwidth) + 0.5;
-	ibrickx = (int) brickx;
-	brickx -= (DBL) ibrickx;
+    brickx = (x / brickwidth) + 0.5;
+    ibrickx = (int) brickx;
+    brickx -= (DBL) ibrickx;
 
-	if (brickx < 0.0)
-	{
-		brickx += 1.0;
-	}
+    if (brickx < 0.0)
+    {
+        brickx += 1.0;
+    }
 
-	if ((brickx <= mortarwidth) && (bricky > 0.5))
-	{
-		return(0.0);
-	}
+    if ((brickx <= mortarwidth) && (bricky > 0.5))
+    {
+        return(0.0);
+    }
 
-	/* 4) Check ODD mortar layers in the Y-X plane (facing) */
+    /* 4) Check ODD mortar layers in the Y-X plane (facing) */
 
-	brickz = (z / brickdepth);
-	ibrickz = (int) brickz;
-	brickz -= (DBL) ibrickz;
+    brickz = (z / brickdepth);
+    ibrickz = (int) brickz;
+    brickz -= (DBL) ibrickz;
 
-	if (brickz < 0.0)
-	{
-		brickz += 1.0;
-	}
+    if (brickz < 0.0)
+    {
+        brickz += 1.0;
+    }
 
-	if ((brickz <= mortardepth) && (bricky > 0.5))
-	{
-		return(0.0);
-	}
+    if ((brickz <= mortardepth) && (bricky > 0.5))
+    {
+        return(0.0);
+    }
 
-	/* 5) Check EVEN mortar layers in the X-Y plane (facing) */
+    /* 5) Check EVEN mortar layers in the X-Y plane (facing) */
 
-	brickz = (z / brickdepth) + 0.5;
-	ibrickz = (int) brickz;
-	brickz -= (DBL) ibrickz;
+    brickz = (z / brickdepth) + 0.5;
+    ibrickz = (int) brickz;
+    brickz -= (DBL) ibrickz;
 
-	if (brickz < 0.0)
-	{
-		brickz += 1.0;
-	}
+    if (brickz < 0.0)
+    {
+        brickz += 1.0;
+    }
 
-	if ((brickz <= mortardepth) && (bricky <= 0.5))
-	{
-		return(0.0);
-	}
+    if ((brickz <= mortardepth) && (bricky <= 0.5))
+    {
+        return(0.0);
+    }
 
-	/* If we've gotten this far, color me brick. */
+    /* If we've gotten this far, colour me brick. */
 
-	return(1.0);
+    return(1.0);
 }
 
 
@@ -5469,14 +5494,14 @@ DBL BrickPattern::operator()(const Vector3d& EPoint, const Intersection *Isectio
 *
 ******************************************************************************/
 
-DBL CellsPattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
+DBL CellsPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
-	/* select a random value based on the cube from which this came. */
+    /* select a random value based on the cube from which this came. */
 
-	/* floor the values, instead of just truncating - this eliminates duplicated cells
-	around the axes */
+    /* floor the values, instead of just truncating - this eliminates duplicated cells
+    around the axes */
 
-	return min(PatternRands(Hash3d((int)floor(EPoint[X]+EPSILON), (int)floor(EPoint[Y]+EPSILON), (int)floor(EPoint[Z]+EPSILON))), 1.0);
+    return min(gPatternRands(Hash3d((int)floor(EPoint[X]+EPSILON), (int)floor(EPoint[Y]+EPSILON), (int)floor(EPoint[Z]+EPSILON))), 1.0);
 }
 
 
@@ -5508,22 +5533,22 @@ DBL CellsPattern::operator()(const Vector3d& EPoint, const Intersection *Isectio
 *
 ******************************************************************************/
 
-DBL CheckerPattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
+DBL CheckerPattern::Evaluate(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
-	int value;
+    int value;
 
-	value = (int)(floor(EPoint[X]+EPSILON) +
-	              floor(EPoint[Y]+EPSILON) +
-	              floor(EPoint[Z]+EPSILON));
+    value = (int)(floor(EPoint[X]+EPSILON) +
+                  floor(EPoint[Y]+EPSILON) +
+                  floor(EPoint[Z]+EPSILON));
 
-	if (value & 1)
-	{
-		return (1.0);
-	}
-	else
-	{
-		return (0.0);
-	}
+    if (value & 1)
+    {
+        return (1.0);
+    }
+    else
+    {
+        return (0.0);
+    }
 }
 
 
@@ -5577,215 +5602,215 @@ DBL CheckerPattern::operator()(const Vector3d& EPoint, const Intersection *Isect
 ******************************************************************************/
 static int IntPickInCube(int tvx, int tvy, int tvz, Vector3d& p1);
 
-DBL CracklePattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
+DBL CracklePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
-	DBL sum, minsum, minsum2, minsum3, tf;
-	int minVecIdx = 0;
-	Vector3d dv;
+    DBL sum, minsum, minsum2, minsum3, tf;
+    int minVecIdx = 0;
+    Vector3d dv;
 
-	int flox, floy, floz;
+    int flox, floy, floz;
 
-	bool UseSquare = ( Metric == 2);
-	bool UseUnity  = ( Metric == 1);
+    bool UseSquare = ( crackleMetric == 2);
+    bool UseUnity  = ( crackleMetric == 1);
 
-	/*
-	 * This uses floor() not FLOOR, so it will not be a mirror
-	 * image about zero in the range -1.0 to 1.0. The viewer
-	 * won't see an artefact around the origin.
-	 */
+    /*
+     * This uses floor() not FLOOR, so it will not be a mirror
+     * image about zero in the range -1.0 to 1.0. The viewer
+     * won't see an artefact around the origin.
+     */
 
-	flox = (int)floor(EPoint[X] - EPSILON);
-	floy = (int)floor(EPoint[Y] - EPSILON);
-	floz = (int)floor(EPoint[Z] - EPSILON);
+    flox = (int)floor(EPoint[X] - EPSILON);
+    floy = (int)floor(EPoint[Y] - EPSILON);
+    floz = (int)floor(EPoint[Z] - EPSILON);
 
-	/*
-	 * Check to see if the input point is in the same unit cube as the last
-	 * call to this function, to use cache of cubelets for speed.
-	 */
+    /*
+     * Check to see if the input point is in the same unit cube as the last
+     * call to this function, to use cache of cubelets for speed.
+     */
 
-	Crackle_Cell_Coord ccoord(flox, floy, floz);
-	Thread->Stats()[CrackleCache_Tests]++;
+    CrackleCellCoord ccoord(flox, floy, floz);
+    pThread->Stats()[CrackleCache_Tests]++;
 
-	Crackle_Cache_Entry dummy_entry;
-	Crackle_Cache_Entry* entry = &dummy_entry;
+    CrackleCacheEntry dummy_entry;
+    CrackleCacheEntry* entry = &dummy_entry;
 
-	// search for this hash value in the cache
-	Crackle_Cache_Type::iterator iter = Thread->Crackle_Cache.find(ccoord);
-	if (iter == Thread->Crackle_Cache.end())
-	{
-		/*
-		 * No, not same unit cube.  Calculate the random points for this new
-		 * cube and its 80 neighbours which differ in any axis by 1 or 2.
-		 * Why distance of 2?  If there is 1 point in each cube, located
-		 * randomly, it is possible for the closest random point to be in the
-		 * cube 2 over, or the one two over and one up.  It is NOT possible
-		 * for it to be two over and two up.  Picture a 3x3x3 cube with 9 more
-		 * cubes glued onto each face.
-		 */
+    // search for this hash value in the cache
+    CrackleCache::iterator iter = pThread->mCrackleCache.find(ccoord);
+    if (iter == pThread->mCrackleCache.end())
+    {
+        /*
+         * No, not same unit cube.  Calculate the random points for this new
+         * cube and its 80 neighbours which differ in any axis by 1 or 2.
+         * Why distance of 2?  If there is 1 point in each cube, located
+         * randomly, it is possible for the closest random point to be in the
+         * cube 2 over, or the one two over and one up.  It is NOT possible
+         * for it to be two over and two up.  Picture a 3x3x3 cube with 9 more
+         * cubes glued onto each face.
+         */
 
-		// generate a new cache entry, but only if the size of the cache is reasonable.
-		// having to re-calculate entries that would have been cache hits had we not
-		// skipped on adding an entry is less expensive than chewing up immense amounts
-		// of RAM and finally hitting the swapfile. unfortunately there's no good way
-		// to tell how much memory is 'too much' for the cache, so we just use a hard-
-		// coded number for now (ideally we should allow the user to configure this).
-		// keep in mind that the cache memory usage is per-thread, so the more threads,
-		// the more RAM. if we don't do the insert, entry will point at a local variable.
-		if (Thread->Crackle_Cache.size() * sizeof(Crackle_Cache_Type::value_type) < 30 * 1024 * 1024)
-		{
-			iter = Thread->Crackle_Cache.insert(Thread->Crackle_Cache.end(), Crackle_Cache_Type::value_type(ccoord, Crackle_Cache_Entry()));
-			entry = &iter->second;
-			entry->last_used = Thread->ProgressIndex();
-		}
+        // generate a new cache entry, but only if the size of the cache is reasonable.
+        // having to re-calculate entries that would have been cache hits had we not
+        // skipped on adding an entry is less expensive than chewing up immense amounts
+        // of RAM and finally hitting the swapfile. unfortunately there's no good way
+        // to tell how much memory is 'too much' for the cache, so we just use a hard-
+        // coded number for now (ideally we should allow the user to configure this).
+        // keep in mind that the cache memory usage is per-thread, so the more threads,
+        // the more RAM. if we don't do the insert, entry will point at a local variable.
+        if (pThread->mCrackleCache.size() * sizeof(CrackleCache::value_type) < 30 * 1024 * 1024)
+        {
+            iter = pThread->mCrackleCache.insert(pThread->mCrackleCache.end(), CrackleCache::value_type(ccoord, CrackleCacheEntry()));
+            entry = &iter->second;
+            entry->lastUsed = pThread->ProgressIndex();
+        }
 
-		// see InitializeCrackleCubes() below.
-		int *pc = CrackleCubeTable;
-		for (int i = 0; i < 81; i++, pc += 3)
-			IntPickInCube(flox + pc[X], floy + pc[Y], floz + pc[Z], entry->data[i]);
-	}
-	else
-	{
-		Thread->Stats()[CrackleCache_Tests_Succeeded]++;
-		entry = &iter->second;
-	}
+        // see InitializeCrackleCubes() below.
+        int *pc = gaCrackleCubeTable;
+        for (int i = 0; i < 81; i++, pc += 3)
+            IntPickInCube(flox + pc[X], floy + pc[Y], floz + pc[Z], entry->aCellNuclei[i]);
+    }
+    else
+    {
+        pThread->Stats()[CrackleCache_Tests_Succeeded]++;
+        entry = &iter->second;
+    }
 
-	// Find the 3 points with the 3 shortest distances from the input point.
-	// Set up the loop so the invariant is true:  minsum <= minsum2 <= minsum3
-	dv = entry->data[0] - EPoint;
+    // Find the 3 points with the 3 shortest distances from the input point.
+    // Set up the loop so the invariant is true:  minsum <= minsum2 <= minsum3
+    dv = entry->aCellNuclei[0] - EPoint;
 
-	if(UseSquare)
-	{
-		minsum = dv.lengthSqr();
+    if(UseSquare)
+    {
+        minsum = dv.lengthSqr();
 
-		dv = entry->data[1] - EPoint;
-		minsum2 = dv.lengthSqr();
+        dv = entry->aCellNuclei[1] - EPoint;
+        minsum2 = dv.lengthSqr();
 
-		dv = entry->data[2] - EPoint;
-		minsum3  = dv.lengthSqr();
-	}
-	else if(UseUnity)
-	{
-		minsum = fabs(dv[X]) + fabs(dv[Y]) + fabs(dv[Z]);
+        dv = entry->aCellNuclei[2] - EPoint;
+        minsum3  = dv.lengthSqr();
+    }
+    else if(UseUnity)
+    {
+        minsum = fabs(dv[X]) + fabs(dv[Y]) + fabs(dv[Z]);
 
-		dv = entry->data[1] - EPoint;
-		minsum2 = fabs(dv[X]) + fabs(dv[Y]) + fabs(dv[Z]);
+        dv = entry->aCellNuclei[1] - EPoint;
+        minsum2 = fabs(dv[X]) + fabs(dv[Y]) + fabs(dv[Z]);
 
-		dv = entry->data[2] - EPoint;
-		minsum3 = fabs(dv[X]) + fabs(dv[Y]) + fabs(dv[Z]);
-	}
-	else
-	{
-		minsum = pow(fabs(dv[X]), Metric) +
-		         pow(fabs(dv[Y]), Metric) +
-		         pow(fabs(dv[Z]), Metric);
+        dv = entry->aCellNuclei[2] - EPoint;
+        minsum3 = fabs(dv[X]) + fabs(dv[Y]) + fabs(dv[Z]);
+    }
+    else
+    {
+        minsum = pow(fabs(dv[X]), crackleMetric) +
+                 pow(fabs(dv[Y]), crackleMetric) +
+                 pow(fabs(dv[Z]), crackleMetric);
 
-		dv = entry->data[1] - EPoint;
-		minsum2 = pow(fabs(dv[X]), Metric) +
-		          pow(fabs(dv[Y]), Metric) +
-		          pow(fabs(dv[Z]), Metric);
+        dv = entry->aCellNuclei[1] - EPoint;
+        minsum2 = pow(fabs(dv[X]), crackleMetric) +
+                  pow(fabs(dv[Y]), crackleMetric) +
+                  pow(fabs(dv[Z]), crackleMetric);
 
-		dv = entry->data[2] - EPoint;
-		minsum3 = pow(fabs(dv[X]), Metric) +
-		          pow(fabs(dv[Y]), Metric) +
-		          pow(fabs(dv[Z]), Metric);
-	}
+        dv = entry->aCellNuclei[2] - EPoint;
+        minsum3 = pow(fabs(dv[X]), crackleMetric) +
+                  pow(fabs(dv[Y]), crackleMetric) +
+                  pow(fabs(dv[Z]), crackleMetric);
+    }
 
-	// sort the 3 computed sums
-	if(minsum2 < minsum)
-	{
-		tf = minsum; minsum = minsum2; minsum2 = tf;
-		minVecIdx = 1;
-	}
+    // sort the 3 computed sums
+    if(minsum2 < minsum)
+    {
+        tf = minsum; minsum = minsum2; minsum2 = tf;
+        minVecIdx = 1;
+    }
 
-	if(minsum3 < minsum)
-	{
-		tf = minsum; minsum = minsum3; minsum3 = tf;
-		minVecIdx = 2;
-	}
+    if(minsum3 < minsum)
+    {
+        tf = minsum; minsum = minsum3; minsum3 = tf;
+        minVecIdx = 2;
+    }
 
-	if(minsum3 < minsum2)
-	{
-		tf = minsum2; minsum2 = minsum3; minsum3 = tf;
-	}
+    if(minsum3 < minsum2)
+    {
+        tf = minsum2; minsum2 = minsum3; minsum3 = tf;
+    }
 
-	// Loop for the 81 cubelets to find closest and 2nd closest.
-	for(int i = 3; i < 81; i++)
-	{
-		dv = entry->data[i] - EPoint;
+    // Loop for the 81 cubelets to find closest and 2nd closest.
+    for(int i = 3; i < 81; i++)
+    {
+        dv = entry->aCellNuclei[i] - EPoint;
 
-		if(UseSquare)
-			sum = dv.lengthSqr();
-		else if(UseUnity)
-			sum = fabs(dv[X]) + fabs(dv[Y]) + fabs(dv[Z]);
-		else
-			sum = pow(fabs(dv[X]), Metric) +
-			      pow(fabs(dv[Y]), Metric) +
-			      pow(fabs(dv[Z]), Metric);
+        if(UseSquare)
+            sum = dv.lengthSqr();
+        else if(UseUnity)
+            sum = fabs(dv[X]) + fabs(dv[Y]) + fabs(dv[Z]);
+        else
+            sum = pow(fabs(dv[X]), crackleMetric) +
+                  pow(fabs(dv[Y]), crackleMetric) +
+                  pow(fabs(dv[Z]), crackleMetric);
 
-		if(sum < minsum)
-		{
-			minsum3 = minsum2;
-			minsum2 = minsum;
-			minsum = sum;
-			minVecIdx = i;
-		}
-		else if(sum < minsum2)
-		{
-			minsum3 = minsum2;
-			minsum2 = sum;
-		}
-		else if( sum < minsum3 )
-		{
-			minsum3 = sum;
-		}
-	}
+        if(sum < minsum)
+        {
+            minsum3 = minsum2;
+            minsum2 = minsum;
+            minsum = sum;
+            minVecIdx = i;
+        }
+        else if(sum < minsum2)
+        {
+            minsum3 = minsum2;
+            minsum2 = sum;
+        }
+        else if( sum < minsum3 )
+        {
+            minsum3 = sum;
+        }
+    }
 
-	if (Offset)
-	{
-		if(UseSquare)
-		{
-			minsum += Offset*Offset;
-			minsum2 += Offset*Offset;
-			minsum3 += Offset*Offset;
-		}
-		else if (UseUnity)
-		{
-			minsum += Offset;
-			minsum2 += Offset;
-			minsum3 += Offset;
-		}
-		else
-		{
-			minsum += pow( Offset, Metric );
-			minsum2 += pow( Offset, Metric );
-			minsum3 += pow( Offset, Metric );
-		}
-	}
+    if (crackleOffset)
+    {
+        if(UseSquare)
+        {
+            minsum += crackleOffset*crackleOffset;
+            minsum2 += crackleOffset*crackleOffset;
+            minsum3 += crackleOffset*crackleOffset;
+        }
+        else if (UseUnity)
+        {
+            minsum += crackleOffset;
+            minsum2 += crackleOffset;
+            minsum3 += crackleOffset;
+        }
+        else
+        {
+            minsum += pow( crackleOffset, crackleMetric );
+            minsum2 += pow( crackleOffset, crackleMetric );
+            minsum3 += pow( crackleOffset, crackleMetric );
+        }
+    }
 
-	if(IsSolid)
-	{
-		tf = Noise( entry->data[minVecIdx], GetNoiseGen(Thread) );
-	}
-	else if(UseSquare)
-	{
-		tf = Form[X]*sqrt(minsum) +
-		     Form[Y]*sqrt(minsum2) +
-		     Form[Z]*sqrt(minsum3);
-	}
-	else if(UseUnity)
-	{
-		tf = Form[X]*minsum +
-		     Form[Y]*minsum2 +
-		     Form[Z]*minsum3;
-	}
-	else
-	{
-		tf = Form[X]*pow(minsum, 1.0/Metric) +
-		     Form[Y]*pow(minsum2, 1.0/Metric) +
-		     Form[Z]*pow(minsum3, 1.0/Metric);
-	}
+    if(crackleIsSolid)
+    {
+        tf = Noise( entry->aCellNuclei[minVecIdx], GetNoiseGen(pThread) );
+    }
+    else if(UseSquare)
+    {
+        tf = crackleForm[X]*sqrt(minsum) +
+             crackleForm[Y]*sqrt(minsum2) +
+             crackleForm[Z]*sqrt(minsum3);
+    }
+    else if(UseUnity)
+    {
+        tf = crackleForm[X]*minsum +
+             crackleForm[Y]*minsum2 +
+             crackleForm[Z]*minsum3;
+    }
+    else
+    {
+        tf = crackleForm[X]*pow(minsum, 1.0/crackleMetric) +
+             crackleForm[Y]*pow(minsum2, 1.0/crackleMetric) +
+             crackleForm[Z]*pow(minsum3, 1.0/crackleMetric);
+    }
 
-	return max(min(tf, 1.), 0.);
+    return max(min(tf, 1.), 0.);
 }
 
 
@@ -5820,14 +5845,14 @@ DBL CracklePattern::operator()(const Vector3d& EPoint, const Intersection *Isect
 *
 ******************************************************************************/
 
-DBL CylindricalPattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
+DBL CylindricalPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
-	register DBL value;
+    register DBL value;
 
-	value = sqrt(Sqr(EPoint[X]) + Sqr(EPoint[Z]));
-	CLIP_DENSITY(value);
+    value = sqrt(Sqr(EPoint[X]) + Sqr(EPoint[Z]));
+    CLIP_DENSITY(value);
 
-	return(value);
+    return(value);
 }
 
 
@@ -5857,217 +5882,217 @@ DBL CylindricalPattern::operator()(const Vector3d& EPoint, const Intersection *I
 
 inline float intp3(float t, float fa, float fb, float fc, float fd)
 {
-	float b,d,e,f;
+    float b,d,e,f;
 
-	b = (fc - fa) * 0.5;
-	d = (fd - fb) * 0.5;
-	e = 2.0 * (fb - fc) + b + d;
-	f = -3.0 * (fb - fc) - 2.0 * b - d;
+    b = (fc - fa) * 0.5;
+    d = (fd - fb) * 0.5;
+    e = 2.0 * (fb - fc) + b + d;
+    f = -3.0 * (fb - fc) - 2.0 * b - d;
 
-	return ((e * t + f) * t + b) * t + fb;
+    return ((e * t + f) * t + b) * t + fb;
 }
 
 inline float intp3_2(float t, float fa, float fb, float fc, float fd)
 {
-	float b,e,f;
+    float b,e,f;
 
-	e = fd - fc - fa + fb;
-	f = fa - fb - e;
-	b = fc - fa;
+    e = fd - fc - fa + fb;
+    f = fa - fb - e;
+    b = fc - fa;
 
-	return ((e * t + f) * t + b) * t + fb;
+    return ((e * t + f) * t + b) * t + fb;
 }
 
 #define zmax(i,imax) (((i)<0)?(imax-1):((i) % (imax)))
 
-DBL DensityFilePattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
+DBL DensityFilePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
-	size_t x, y, z;
-	size_t x1, y1, z1;
-	size_t x2, y2, z2;
-	DBL Ex, Ey, Ez;
-	DBL xx, yy, zz;
-	DBL xi, yi;
-	DBL f111, f112, f121, f122, f211, f212, f221, f222;
-	float intpd2[4][4];
-	DBL density = 0.0;
-	DENSITY_FILE_DATA *Data;
-	size_t k0, k1, k2, k3, i,j,ii,jj;
+    size_t x, y, z;
+    size_t x1, y1, z1;
+    size_t x2, y2, z2;
+    DBL Ex, Ey, Ez;
+    DBL xx, yy, zz;
+    DBL xi, yi;
+    DBL f111, f112, f121, f122, f211, f212, f221, f222;
+    float intpd2[4][4];
+    DBL density = 0.0;
+    DENSITY_FILE_DATA *Data;
+    size_t k0, k1, k2, k3, i,j,ii,jj;
 
-	Ex=EPoint[X];
-	Ey=EPoint[Y];
-	Ez=EPoint[Z];
+    Ex=EPoint[X];
+    Ey=EPoint[Y];
+    Ez=EPoint[Z];
 
-	if((Density_File != NULL) && ((Data = Density_File->Data) != NULL) &&
-	   (Data->Sx) && (Data->Sy) && (Data->Sz))
-	{
-/*		if(Data->Cyclic == true) 
-		{
-			Ex -= floor(Ex);
-			Ey -= floor(Ey);
-			Ez -= floor(Ez);
-		}
+    if((densityFile != NULL) && ((Data = densityFile->Data) != NULL) &&
+       (Data->Sx) && (Data->Sy) && (Data->Sz))
+    {
+/*      if(Data->Cyclic == true)
+        {
+            Ex -= floor(Ex);
+            Ey -= floor(Ey);
+            Ez -= floor(Ez);
+        }
 */
-		if((Ex >= 0.0) && (Ex < 1.0) && (Ey >= 0.0) && (Ey < 1.0) && (Ez >= 0.0) && (Ez < 1.0))
-		{
-			switch (Density_File->Interpolation % 10)
-			{
-				case NO_INTERPOLATION:
-					x = (size_t)(Ex * (DBL)Data->Sx);
-					y = (size_t)(Ey * (DBL)Data->Sy);
-					z = (size_t)(Ez * (DBL)Data->Sz);
+        if((Ex >= 0.0) && (Ex < 1.0) && (Ey >= 0.0) && (Ey < 1.0) && (Ez >= 0.0) && (Ez < 1.0))
+        {
+            switch (densityFile->Interpolation % 10) // TODO - why the modulus operation??
+            {
+                case kDensityFileInterpolation_None:
+                    x = (size_t)(Ex * (DBL)Data->Sx);
+                    y = (size_t)(Ey * (DBL)Data->Sy);
+                    z = (size_t)(Ez * (DBL)Data->Sz);
 
-					if ((x < 0) || (x >= Data->Sx) || (y < 0) || (y >= Data->Sy) || (z < 0) || (z >= Data->Sz))
-						density = 0.0;
-					else
-					{
-						if(Data->Type == 4)
-							density = (DBL)Data->Density32[z * Data->Sy * Data->Sx + y * Data->Sx + x] / (DBL)UINT_MAX;
-						else if(Data->Type==2)
-							density = (DBL)Data->Density16[z * Data->Sy * Data->Sx + y * Data->Sx + x] / (DBL)USHRT_MAX;
-						else if(Data->Type == 1)
-							density = (DBL)Data->Density8[z * Data->Sy * Data->Sx + y * Data->Sx + x] / (DBL)UCHAR_MAX;
-					}
-					break;
-				case TRILINEAR_INTERPOLATION:
-					xx = Ex * (DBL)(Data->Sx );
-					yy = Ey * (DBL)(Data->Sy );
-					zz = Ez * (DBL)(Data->Sz );
+                    if ((x < 0) || (x >= Data->Sx) || (y < 0) || (y >= Data->Sy) || (z < 0) || (z >= Data->Sz))
+                        density = 0.0;
+                    else
+                    {
+                        if(Data->Type == 4)
+                            density = (DBL)Data->Density32[z * Data->Sy * Data->Sx + y * Data->Sx + x] / (DBL)UINT_MAX;
+                        else if(Data->Type==2)
+                            density = (DBL)Data->Density16[z * Data->Sy * Data->Sx + y * Data->Sx + x] / (DBL)USHRT_MAX;
+                        else if(Data->Type == 1)
+                            density = (DBL)Data->Density8[z * Data->Sy * Data->Sx + y * Data->Sx + x] / (DBL)UCHAR_MAX;
+                    }
+                    break;
+                case kDensityFileInterpolation_Trilinear:
+                    xx = Ex * (DBL)(Data->Sx );
+                    yy = Ey * (DBL)(Data->Sy );
+                    zz = Ez * (DBL)(Data->Sz );
 
-					x1 = (size_t)xx;
-					y1 = (size_t)yy;
-					z1 = (size_t)zz;
+                    x1 = (size_t)xx;
+                    y1 = (size_t)yy;
+                    z1 = (size_t)zz;
 
-					x2 = (x1 + 1) % Data->Sx;
-					y2 = (y1 + 1) % Data->Sy;
-					z2 = (z1 + 1) % Data->Sz;
+                    x2 = (x1 + 1) % Data->Sx;
+                    y2 = (y1 + 1) % Data->Sy;
+                    z2 = (z1 + 1) % Data->Sz;
 
-					xx -= floor(xx);
-					yy -= floor(yy);
-					zz -= floor(zz);
+                    xx -= floor(xx);
+                    yy -= floor(yy);
+                    zz -= floor(zz);
 
-					xi = 1.0 - xx;
-					yi = 1.0 - yy;
+                    xi = 1.0 - xx;
+                    yi = 1.0 - yy;
 
-					if(Data->Type == 4)
-					{
-						f111 = (DBL)Data->Density32[z1 * Data->Sy * Data->Sx + y1 * Data->Sx + x1] / (DBL)UINT_MAX;
-						f112 = (DBL)Data->Density32[z1 * Data->Sy * Data->Sx + y1 * Data->Sx + x2] / (DBL)UINT_MAX;
-						f121 = (DBL)Data->Density32[z1 * Data->Sy * Data->Sx + y2 * Data->Sx + x1] / (DBL)UINT_MAX;
-						f122 = (DBL)Data->Density32[z1 * Data->Sy * Data->Sx + y2 * Data->Sx + x2] / (DBL)UINT_MAX;
-						f211 = (DBL)Data->Density32[z2 * Data->Sy * Data->Sx + y1 * Data->Sx + x1] / (DBL)UINT_MAX;
-						f212 = (DBL)Data->Density32[z2 * Data->Sy * Data->Sx + y1 * Data->Sx + x2] / (DBL)UINT_MAX;
-						f221 = (DBL)Data->Density32[z2 * Data->Sy * Data->Sx + y2 * Data->Sx + x1] / (DBL)UINT_MAX;
-						f222 = (DBL)Data->Density32[z2 * Data->Sy * Data->Sx + y2 * Data->Sx + x2] / (DBL)UINT_MAX;
-					}
-					else if(Data->Type == 2)
-					{
-						f111 = (DBL)Data->Density16[z1 * Data->Sy * Data->Sx + y1 * Data->Sx + x1] / (DBL)USHRT_MAX;
-						f112 = (DBL)Data->Density16[z1 * Data->Sy * Data->Sx + y1 * Data->Sx + x2] / (DBL)USHRT_MAX;
-						f121 = (DBL)Data->Density16[z1 * Data->Sy * Data->Sx + y2 * Data->Sx + x1] / (DBL)USHRT_MAX;
-						f122 = (DBL)Data->Density16[z1 * Data->Sy * Data->Sx + y2 * Data->Sx + x2] / (DBL)USHRT_MAX;
-						f211 = (DBL)Data->Density16[z2 * Data->Sy * Data->Sx + y1 * Data->Sx + x1] / (DBL)USHRT_MAX;
-						f212 = (DBL)Data->Density16[z2 * Data->Sy * Data->Sx + y1 * Data->Sx + x2] / (DBL)USHRT_MAX;
-						f221 = (DBL)Data->Density16[z2 * Data->Sy * Data->Sx + y2 * Data->Sx + x1] / (DBL)USHRT_MAX;
-						f222 = (DBL)Data->Density16[z2 * Data->Sy * Data->Sx + y2 * Data->Sx + x2] / (DBL)USHRT_MAX;
-					}
-					else if(Data->Type == 1)
-					{
-						f111 = (DBL)Data->Density8[z1 * Data->Sy * Data->Sx + y1 * Data->Sx + x1] / (DBL)UCHAR_MAX;
-						f112 = (DBL)Data->Density8[z1 * Data->Sy * Data->Sx + y1 * Data->Sx + x2] / (DBL)UCHAR_MAX;
-						f121 = (DBL)Data->Density8[z1 * Data->Sy * Data->Sx + y2 * Data->Sx + x1] / (DBL)UCHAR_MAX;
-						f122 = (DBL)Data->Density8[z1 * Data->Sy * Data->Sx + y2 * Data->Sx + x2] / (DBL)UCHAR_MAX;
-						f211 = (DBL)Data->Density8[z2 * Data->Sy * Data->Sx + y1 * Data->Sx + x1] / (DBL)UCHAR_MAX;
-						f212 = (DBL)Data->Density8[z2 * Data->Sy * Data->Sx + y1 * Data->Sx + x2] / (DBL)UCHAR_MAX;
-						f221 = (DBL)Data->Density8[z2 * Data->Sy * Data->Sx + y2 * Data->Sx + x1] / (DBL)UCHAR_MAX;
-						f222 = (DBL)Data->Density8[z2 * Data->Sy * Data->Sx + y2 * Data->Sx + x2] / (DBL)UCHAR_MAX;
-					}
+                    if(Data->Type == 4)
+                    {
+                        f111 = (DBL)Data->Density32[z1 * Data->Sy * Data->Sx + y1 * Data->Sx + x1] / (DBL)UINT_MAX;
+                        f112 = (DBL)Data->Density32[z1 * Data->Sy * Data->Sx + y1 * Data->Sx + x2] / (DBL)UINT_MAX;
+                        f121 = (DBL)Data->Density32[z1 * Data->Sy * Data->Sx + y2 * Data->Sx + x1] / (DBL)UINT_MAX;
+                        f122 = (DBL)Data->Density32[z1 * Data->Sy * Data->Sx + y2 * Data->Sx + x2] / (DBL)UINT_MAX;
+                        f211 = (DBL)Data->Density32[z2 * Data->Sy * Data->Sx + y1 * Data->Sx + x1] / (DBL)UINT_MAX;
+                        f212 = (DBL)Data->Density32[z2 * Data->Sy * Data->Sx + y1 * Data->Sx + x2] / (DBL)UINT_MAX;
+                        f221 = (DBL)Data->Density32[z2 * Data->Sy * Data->Sx + y2 * Data->Sx + x1] / (DBL)UINT_MAX;
+                        f222 = (DBL)Data->Density32[z2 * Data->Sy * Data->Sx + y2 * Data->Sx + x2] / (DBL)UINT_MAX;
+                    }
+                    else if(Data->Type == 2)
+                    {
+                        f111 = (DBL)Data->Density16[z1 * Data->Sy * Data->Sx + y1 * Data->Sx + x1] / (DBL)USHRT_MAX;
+                        f112 = (DBL)Data->Density16[z1 * Data->Sy * Data->Sx + y1 * Data->Sx + x2] / (DBL)USHRT_MAX;
+                        f121 = (DBL)Data->Density16[z1 * Data->Sy * Data->Sx + y2 * Data->Sx + x1] / (DBL)USHRT_MAX;
+                        f122 = (DBL)Data->Density16[z1 * Data->Sy * Data->Sx + y2 * Data->Sx + x2] / (DBL)USHRT_MAX;
+                        f211 = (DBL)Data->Density16[z2 * Data->Sy * Data->Sx + y1 * Data->Sx + x1] / (DBL)USHRT_MAX;
+                        f212 = (DBL)Data->Density16[z2 * Data->Sy * Data->Sx + y1 * Data->Sx + x2] / (DBL)USHRT_MAX;
+                        f221 = (DBL)Data->Density16[z2 * Data->Sy * Data->Sx + y2 * Data->Sx + x1] / (DBL)USHRT_MAX;
+                        f222 = (DBL)Data->Density16[z2 * Data->Sy * Data->Sx + y2 * Data->Sx + x2] / (DBL)USHRT_MAX;
+                    }
+                    else if(Data->Type == 1)
+                    {
+                        f111 = (DBL)Data->Density8[z1 * Data->Sy * Data->Sx + y1 * Data->Sx + x1] / (DBL)UCHAR_MAX;
+                        f112 = (DBL)Data->Density8[z1 * Data->Sy * Data->Sx + y1 * Data->Sx + x2] / (DBL)UCHAR_MAX;
+                        f121 = (DBL)Data->Density8[z1 * Data->Sy * Data->Sx + y2 * Data->Sx + x1] / (DBL)UCHAR_MAX;
+                        f122 = (DBL)Data->Density8[z1 * Data->Sy * Data->Sx + y2 * Data->Sx + x2] / (DBL)UCHAR_MAX;
+                        f211 = (DBL)Data->Density8[z2 * Data->Sy * Data->Sx + y1 * Data->Sx + x1] / (DBL)UCHAR_MAX;
+                        f212 = (DBL)Data->Density8[z2 * Data->Sy * Data->Sx + y1 * Data->Sx + x2] / (DBL)UCHAR_MAX;
+                        f221 = (DBL)Data->Density8[z2 * Data->Sy * Data->Sx + y2 * Data->Sx + x1] / (DBL)UCHAR_MAX;
+                        f222 = (DBL)Data->Density8[z2 * Data->Sy * Data->Sx + y2 * Data->Sx + x2] / (DBL)UCHAR_MAX;
+                    }
 
-					density = ((f111 * xi + f112 * xx) * yi + (f121 * xi + f122 * xx) * yy) * (1.0 - zz) +
-					          ((f211 * xi + f212 * xx) * yi + (f221 * xi + f222 * xx) * yy) * zz;
-					break;
-				case TRICUBIC_INTERPOLATION:
-				default:
-					xx = Ex * (DBL)(Data->Sx);
-					yy = Ey * (DBL)(Data->Sy);
-					zz = Ez * (DBL)(Data->Sz);
+                    density = ((f111 * xi + f112 * xx) * yi + (f121 * xi + f122 * xx) * yy) * (1.0 - zz) +
+                              ((f211 * xi + f212 * xx) * yi + (f221 * xi + f222 * xx) * yy) * zz;
+                    break;
+                case kDensityFileInterpolation_Tricubic:
+                default:
+                    xx = Ex * (DBL)(Data->Sx);
+                    yy = Ey * (DBL)(Data->Sy);
+                    zz = Ez * (DBL)(Data->Sz);
 
-					x1 = (size_t)xx;
-					y1 = (size_t)yy;
-					z1 = (size_t)zz;
+                    x1 = (size_t)xx;
+                    y1 = (size_t)yy;
+                    z1 = (size_t)zz;
 
-					xx -= floor(xx);
-					yy -= floor(yy);
-					zz -= floor(zz);
+                    xx -= floor(xx);
+                    yy -= floor(yy);
+                    zz -= floor(zz);
 
-					k0 = zmax(-1+z1, Data->Sz );
-					k1 = zmax(   z1, Data->Sz );
-					k2 = zmax( 1+z1, Data->Sz );
-					k3 = zmax( 2+z1, Data->Sz );
+                    k0 = zmax(-1+z1, Data->Sz );
+                    k1 = zmax(   z1, Data->Sz );
+                    k2 = zmax( 1+z1, Data->Sz );
+                    k3 = zmax( 2+z1, Data->Sz );
 
-					if(Data->Type == 4)
-					{
-						for(i = 0; i < 4; i++)
-						{
-							ii = zmax(i + x1 - 1, Data->Sx);
-							for(j = 0; j < 4; j++)
-							{
-								jj = zmax(j + y1 - 1, Data->Sy);
-								intpd2[i][j] = intp3(zz,
-								                     Data->Density32[k0 * Data->Sy * Data->Sx + jj * Data->Sx + ii] / (DBL)UINT_MAX,
-								                     Data->Density32[k1 * Data->Sy * Data->Sx + jj * Data->Sx + ii] / (DBL)UINT_MAX,
-								                     Data->Density32[k2 * Data->Sy * Data->Sx + jj * Data->Sx + ii] / (DBL)UINT_MAX,
-								                     Data->Density32[k3 * Data->Sy * Data->Sx + jj * Data->Sx + ii] / (DBL)UINT_MAX);
-							}
-						}
-					}
-					else if(Data->Type == 2)
-					{
-						for(i = 0; i < 4; i++)
-						{
-							ii = zmax(i + x1 - 1, Data->Sx);
-							for(j = 0; j < 4; j++)
-							{
-								jj = zmax(j + y1 - 1, Data->Sy);
-								intpd2[i][j] = intp3(zz,
-								                     Data->Density16[k0 * Data->Sy * Data->Sx + jj * Data->Sx + ii] / (DBL)USHRT_MAX,
-								                     Data->Density16[k1 * Data->Sy * Data->Sx + jj * Data->Sx + ii] / (DBL)USHRT_MAX,
-								                     Data->Density16[k2 * Data->Sy * Data->Sx + jj * Data->Sx + ii] / (DBL)USHRT_MAX,
-								                     Data->Density16[k3 * Data->Sy * Data->Sx + jj * Data->Sx + ii] / (DBL)USHRT_MAX);
-							}
-						}
-					}
-					else if(Data->Type == 1)
-					{
-						for(i = 0; i < 4; i++)
-						{
-							ii = zmax(i + x1 - 1, Data->Sx);
-							for(j = 0; j < 4; j++)
-							{
-								jj = zmax(j + y1 - 1, Data->Sy);
-								intpd2[i][j] = intp3(zz,
-								                     Data->Density8[k0 * Data->Sy * Data->Sx + jj * Data->Sx + ii] / (DBL)UCHAR_MAX,
-								                     Data->Density8[k1 * Data->Sy * Data->Sx + jj * Data->Sx + ii] / (DBL)UCHAR_MAX,
-								                     Data->Density8[k2 * Data->Sy * Data->Sx + jj * Data->Sx + ii] / (DBL)UCHAR_MAX,
-								                     Data->Density8[k3 * Data->Sy * Data->Sx + jj * Data->Sx + ii] / (DBL)UCHAR_MAX);
-							}
-						}
-					}
+                    if(Data->Type == 4)
+                    {
+                        for(i = 0; i < 4; i++)
+                        {
+                            ii = zmax(i + x1 - 1, Data->Sx);
+                            for(j = 0; j < 4; j++)
+                            {
+                                jj = zmax(j + y1 - 1, Data->Sy);
+                                intpd2[i][j] = intp3(zz,
+                                                     Data->Density32[k0 * Data->Sy * Data->Sx + jj * Data->Sx + ii] / (DBL)UINT_MAX,
+                                                     Data->Density32[k1 * Data->Sy * Data->Sx + jj * Data->Sx + ii] / (DBL)UINT_MAX,
+                                                     Data->Density32[k2 * Data->Sy * Data->Sx + jj * Data->Sx + ii] / (DBL)UINT_MAX,
+                                                     Data->Density32[k3 * Data->Sy * Data->Sx + jj * Data->Sx + ii] / (DBL)UINT_MAX);
+                            }
+                        }
+                    }
+                    else if(Data->Type == 2)
+                    {
+                        for(i = 0; i < 4; i++)
+                        {
+                            ii = zmax(i + x1 - 1, Data->Sx);
+                            for(j = 0; j < 4; j++)
+                            {
+                                jj = zmax(j + y1 - 1, Data->Sy);
+                                intpd2[i][j] = intp3(zz,
+                                                     Data->Density16[k0 * Data->Sy * Data->Sx + jj * Data->Sx + ii] / (DBL)USHRT_MAX,
+                                                     Data->Density16[k1 * Data->Sy * Data->Sx + jj * Data->Sx + ii] / (DBL)USHRT_MAX,
+                                                     Data->Density16[k2 * Data->Sy * Data->Sx + jj * Data->Sx + ii] / (DBL)USHRT_MAX,
+                                                     Data->Density16[k3 * Data->Sy * Data->Sx + jj * Data->Sx + ii] / (DBL)USHRT_MAX);
+                            }
+                        }
+                    }
+                    else if(Data->Type == 1)
+                    {
+                        for(i = 0; i < 4; i++)
+                        {
+                            ii = zmax(i + x1 - 1, Data->Sx);
+                            for(j = 0; j < 4; j++)
+                            {
+                                jj = zmax(j + y1 - 1, Data->Sy);
+                                intpd2[i][j] = intp3(zz,
+                                                     Data->Density8[k0 * Data->Sy * Data->Sx + jj * Data->Sx + ii] / (DBL)UCHAR_MAX,
+                                                     Data->Density8[k1 * Data->Sy * Data->Sx + jj * Data->Sx + ii] / (DBL)UCHAR_MAX,
+                                                     Data->Density8[k2 * Data->Sy * Data->Sx + jj * Data->Sx + ii] / (DBL)UCHAR_MAX,
+                                                     Data->Density8[k3 * Data->Sy * Data->Sx + jj * Data->Sx + ii] / (DBL)UCHAR_MAX);
+                            }
+                        }
+                    }
 
-					for(i = 0; i < 4; i++)
-						intpd2[0][i] = intp3(yy, intpd2[i][0], intpd2[i][1],  intpd2[i][2], intpd2[i][3]);
+                    for(i = 0; i < 4; i++)
+                        intpd2[0][i] = intp3(yy, intpd2[i][0], intpd2[i][1],  intpd2[i][2], intpd2[i][3]);
 
-					density = intp3(xx, intpd2[0][0], intpd2[0][1], intpd2[0][2], intpd2[0][3]);
-					break;
-			}
-		}
-		else
-			density = 0.0;
-	}
+                    density = intp3(xx, intpd2[0][0], intpd2[0][1], intpd2[0][2], intpd2[0][3]);
+                    break;
+            }
+        }
+        else
+            density = 0.0;
+    }
 
-	if (density < 0.0)
-		density = 0.0;
-	return density;
+    if (density < 0.0)
+        density = 0.0;
+    return density;
 }
 
 
@@ -6087,11 +6112,11 @@ DBL DensityFilePattern::operator()(const Vector3d& EPoint, const Intersection *I
 * RETURNS
 *
 *   DBL value in the range 0.0 to 1.0
-*   
+*
 * AUTHOR
 *
 *   POV-Ray Team
-*   
+*
 * DESCRIPTION   : Note this pattern is only used for pigments and textures.
 *                 Normals have a specialized pattern for this.
 *
@@ -6100,13 +6125,13 @@ DBL DensityFilePattern::operator()(const Vector3d& EPoint, const Intersection *I
 *
 ******************************************************************************/
 
-DBL DentsPattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
+DBL DentsPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
-	DBL noise;
+    DBL noise;
 
-	noise = Noise (EPoint, GetNoiseGen(Thread));
+    noise = Noise (EPoint, GetNoiseGen(pThread));
 
-	return(noise * noise * noise);
+    return(noise * noise * noise);
 }
 
 
@@ -6120,39 +6145,39 @@ DBL DentsPattern::operator()(const Vector3d& EPoint, const Intersection *Isectio
 *
 *   EPoint -- The point in 3d space at which the pattern
 *   is evaluated.
-*   
+*
 * OUTPUT
-*   
+*
 * RETURNS
 *
 *   DBL value in the range 0.0 to 1.0
-*   
+*
 * AUTHOR
 *
 *   POV-Ray Team
-*   
+*
 * DESCRIPTION
 *
 * CHANGES
 *
 ******************************************************************************/
 
-DBL FunctionPattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
+DBL FunctionPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
-	DBL value;
+    DBL value;
 
-	if(Thread->functionPatternContext[Data] == NULL)
-		Thread->functionPatternContext[Data] = Thread->functionContext->functionvm->NewContext(const_cast<TraceThreadData *>(Thread));
+    if(pThread->functionPatternContext[contextId] == NULL)
+        pThread->functionPatternContext[contextId] = pThread->functionContext->functionvm->NewContext(const_cast<TraceThreadData *>(pThread));
 
-	FPUContext *ctx = Thread->functionPatternContext[Data];
+    FPUContext *ctx = pThread->functionPatternContext[contextId];
 
-	ctx->SetLocal(X, EPoint[X]);
-	ctx->SetLocal(Y, EPoint[Y]);
-	ctx->SetLocal(Z, EPoint[Z]);
+    ctx->SetLocal(X, EPoint[X]);
+    ctx->SetLocal(Y, EPoint[Y]);
+    ctx->SetLocal(Z, EPoint[Z]);
 
-	value = POVFPU_Run(ctx, *(reinterpret_cast<const FUNCTION *>(Fn)));
+    value = POVFPU_Run(ctx, *(reinterpret_cast<const FUNCTION *>(pFn)));
 
-	return ((value > 1.0) ? fmod(value, 1.0) : value);
+    return ((value > 1.0) ? fmod(value, 1.0) : value);
 }
 
 
@@ -6166,17 +6191,17 @@ DBL FunctionPattern::operator()(const Vector3d& EPoint, const Intersection *Isec
 *
 *   EPoint -- The point in 3d space at which the pattern
 *   is evaluated.
-*   
+*
 * OUTPUT
-*   
+*
 * RETURNS
 *
 *   DBL value in the range 0.0 to 1.0
-*   
+*
 * AUTHOR
 *
 *   POV-Ray Team
-*   
+*
 * DESCRIPTION
 *
 *   Gradient Pattern - gradient based on the fractional values of
@@ -6191,13 +6216,13 @@ DBL FunctionPattern::operator()(const Vector3d& EPoint, const Intersection *Isec
 *
 ******************************************************************************/
 
-DBL GradientPattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
+DBL GradientPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
-	DBL Result;
-	Result = dot(EPoint, Gradient);
+    DBL Result;
+    Result = dot(EPoint, gradient);
 
-	/* Mod to keep within [0.0,1.0] range */
-	return ((Result > 1.0) ? fmod(Result, 1.0) : Result);
+    /* Mod to keep within [0.0,1.0] range */
+    return ((Result > 1.0) ? fmod(Result, 1.0) : Result);
 }
 
 
@@ -6211,21 +6236,21 @@ DBL GradientPattern::operator()(const Vector3d& EPoint, const Intersection *Isec
 *
 *   EPoint -- The point in 3d space at which the pattern
 *   is evaluated.
-*   
+*
 * OUTPUT
-*   
+*
 * RETURNS
 *
 *   DBL value in the range 0.0 to 1.0
-*   
+*
 * AUTHOR
 *
 *   POV-Ray Team
-*   
+*
 * DESCRIPTION
 *
 *   Granite - kind of a union of the "spotted" and the "dented" textures,
-*   using a 1/f fractal noise function for color values. Typically used
+*   using a 1/f fractal noise function for colour values. Typically used
 *   with small scaling values. Should work with colour maps for pink granite.
 *
 * CHANGES
@@ -6234,35 +6259,41 @@ DBL GradientPattern::operator()(const Vector3d& EPoint, const Intersection *Isec
 *
 ******************************************************************************/
 
-DBL GranitePattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
+DBL GranitePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
-	int noise_generator = GetNoiseGen(Thread);
+    int noise_generator = GetNoiseGen(pThread);
 
-	register int i;
-	register DBL temp, noise = 0.0, freq = 1.0;
-	Vector3d tv1, tv2;
+    register int i;
+    register DBL temp, noise = 0.0, freq = 1.0;
+    Vector3d tv1, tv2;
 
-	tv1 = EPoint * 4.0;
+    tv1 = EPoint * 4.0;
 
-	for (i = 0; i < 6 ; freq *= 2.0, i++)
-	{
-		tv2 = tv1 * freq;
-		if(noise_generator==1)
-		{
-			temp = 0.5 - Noise (tv2, noise_generator);
-			temp = fabs(temp);
-		}
-		else
-		{
-			temp = 1.0 - 2.0 * Noise (tv2, noise_generator);
-			temp = fabs(temp);
-			if (temp>0.5) temp=0.5;
-		}
+    for (i = 0; i < 6 ; freq *= 2.0, i++)
+    {
+        tv2 = tv1 * freq;
 
-		noise += temp / freq;
-	}
+        // TODO - This distinction (with minor variations that seem to be more of an inconsistency rather than intentional)
+        // appears in other places as well; make it a function.
+        switch (noise_generator)
+        {
+            case kNoiseGen_Default:
+            case kNoiseGen_Original:
+                temp = 0.5 - Noise (tv2, noise_generator);
+                temp = fabs(temp);
+                break;
 
-	return(noise);
+            default:
+                temp = 1.0 - 2.0 * Noise (tv2, noise_generator); // TODO similar code clips the result
+                temp = fabs(temp);
+                if (temp>0.5) temp=0.5;
+                break;
+        }
+
+        noise += temp / freq;
+    }
+
+    return(noise);
 }
 
 
@@ -6286,7 +6317,7 @@ DBL GranitePattern::operator()(const Vector3d& EPoint, const Intersection *Isect
 * AUTHOR
 *
 *   Ernest MacDougal Campbell III
-*   
+*
 * DESCRIPTION
 *
 *   TriHex pattern -- Ernest MacDougal Campbell III (EMC3) 11/23/92
@@ -6297,7 +6328,7 @@ DBL GranitePattern::operator()(const Vector3d& EPoint, const Intersection *Isect
 *   a few of the later calculations easier, then maps some points to be
 *   closer to the Origin.  A small area in the first quadrant is subdivided
 *   into a 6 x 6 grid.  The position of the point mapped into that grid
-*   determines its color.  For some points, just the grid location is enough,
+*   determines its colour.  For some points, just the grid location is enough,
 *   but for others, we have to calculate which half of the block it's in
 *   (this is where the atan2() function comes in handy).
 *
@@ -6311,158 +6342,158 @@ DBL GranitePattern::operator()(const Vector3d& EPoint, const Intersection *Isect
 const DBL xfactor = 0.5;         /* each triangle is split in half for the grid */
 const DBL zfactor = 0.866025404; /* sqrt(3)/2 -- Height of an equilateral triangle */
 
-DBL HexagonPattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
+DBL HexagonPattern::Evaluate(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
-	int xm, zm;
-	int brkindx;
-	DBL xs, zs, xl, zl, value = 0.0;
-	DBL x=EPoint[X];
-	DBL z=EPoint[Z];
+    int xm, zm;
+    int brkindx;
+    DBL xs, zs, xl, zl, value = 0.0;
+    DBL x=EPoint[X];
+    DBL z=EPoint[Z];
 
 
-	/* Keep all numbers positive.  Also, if z is negative, map it in such a
-	 * way as to avoid mirroring across the x-axis.  The value 5.196152424
-	 * is (sqrt(3)/2) * 6 (because the grid is 6 blocks high)
-	 */
+    /* Keep all numbers positive.  Also, if z is negative, map it in such a
+     * way as to avoid mirroring across the x-axis.  The value 5.196152424
+     * is (sqrt(3)/2) * 6 (because the grid is 6 blocks high)
+     */
 
-	x = fabs(x);
+    x = fabs(x);
 
-	/* Avoid mirroring across x-axis. */
+    /* Avoid mirroring across x-axis. */
 
-	z = z < 0.0 ? 5.196152424 - fabs(z) : z;
+    z = z < 0.0 ? 5.196152424 - fabs(z) : z;
 
-	/* Scale point to make calcs easier. */
+    /* Scale point to make calcs easier. */
 
-	xs = x/xfactor;
-	zs = z/zfactor;
+    xs = x/xfactor;
+    zs = z/zfactor;
 
-	/* Map points into the 6 x 6 grid where the basic formula works. */
+    /* Map points into the 6 x 6 grid where the basic formula works. */
 
-	xs -= floor(xs/6.0) * 6.0;
-	zs -= floor(zs/6.0) * 6.0;
+    xs -= floor(xs/6.0) * 6.0;
+    zs -= floor(zs/6.0) * 6.0;
 
-	/* Get a block in the 6 x 6 grid. */
+    /* Get a block in the 6 x 6 grid. */
 
-	xm = (int) FLOOR(xs) % 6;
-	zm = (int) FLOOR(zs) % 6;
+    xm = (int) FLOOR(xs) % 6;
+    zm = (int) FLOOR(zs) % 6;
 
-	switch (xm)
-	{
-		/* These are easy cases: Color depends only on xm and zm. */
+    switch (xm)
+    {
+        /* These are easy cases: Colour depends only on xm and zm. */
 
-		case 0:
-		case 5:
+        case 0:
+        case 5:
 
-			switch (zm)
-			{
-				case 0:
-				case 5: value = 0; break;
+            switch (zm)
+            {
+                case 0:
+                case 5: value = 0; break;
 
-				case 1:
-				case 2: value = 1; break;
+                case 1:
+                case 2: value = 1; break;
 
-				case 3:
-				case 4: value = 2; break;
-			}
+                case 3:
+                case 4: value = 2; break;
+            }
 
-			break;
+            break;
 
-		case 2:
-		case 3:
+        case 2:
+        case 3:
 
-			switch (zm)
-			{
-				case 0:
-				case 1: value = 2; break;
+            switch (zm)
+            {
+                case 0:
+                case 1: value = 2; break;
 
-				case 2:
-				case 3: value = 0; break;
+                case 2:
+                case 3: value = 0; break;
 
-				case 4:
-				case 5: value = 1; break;
-			}
+                case 4:
+                case 5: value = 1; break;
+            }
 
-			break;
+            break;
 
-		/* These cases are harder.  These blocks are divided diagonally
-		 * by the angled edges of the hexagons.  Some slope positive, and
-		 * others negative.  We flip the x value of the negatively sloped
-		 * pieces.  Then we check to see if the point in question falls
-		 * in the upper or lower half of the block.  That info, plus the
-		 * z status of the block determines the color.
-		 */
+        /* These cases are harder.  These blocks are divided diagonally
+         * by the angled edges of the hexagons.  Some slope positive, and
+         * others negative.  We flip the x value of the negatively sloped
+         * pieces.  Then we check to see if the point in question falls
+         * in the upper or lower half of the block.  That info, plus the
+         * z status of the block determines the colour.
+         */
 
-		case 1:
-		case 4:
+        case 1:
+        case 4:
 
-			/* Map the point into the block at the origin. */
+            /* Map the point into the block at the origin. */
 
-			xl = xs-xm;
-			zl = zs-zm;
+            xl = xs-xm;
+            zl = zs-zm;
 
-			/* These blocks have negative slopes so we flip it horizontally. */
+            /* These blocks have negative slopes so we flip it horizontally. */
 
-			if (((xm + zm) % 2) == 1)
-			{
-				xl = 1.0 - xl;
-			}
+            if (((xm + zm) % 2) == 1)
+            {
+                xl = 1.0 - xl;
+            }
 
-			/* Avoid a divide-by-zero error. */
+            /* Avoid a divide-by-zero error. */
 
-			if (xl == 0.0)
-			{
-				xl = 0.0001; // TODO FIXME - magic number! Should be SOME_EPSILON I guess, or use nextafter()
-			}
+            if (xl == 0.0)
+            {
+                xl = 0.0001; // TODO FIXME - magic number! Should be SOME_EPSILON I guess, or use nextafter()
+            }
 
-			/* Is the angle less-than or greater-than 45 degrees? */
+            /* Is the angle less-than or greater-than 45 degrees? */
 
-			brkindx = (zl / xl) < 1.0;
+            brkindx = (zl / xl) < 1.0;
 
-			/* was...
-			 * brkindx = (atan2(zl,xl) < (45 * M_PI_180));
-			 * ...but because of the mapping, it's easier and cheaper,
-			 * CPU-wise, to just use a good ol' slope.
-			 */
+            /* was...
+             * brkindx = (atan2(zl,xl) < (45 * M_PI_180));
+             * ...but because of the mapping, it's easier and cheaper,
+             * CPU-wise, to just use a good ol' slope.
+             */
 
-			switch (brkindx)
-			{
-				case true:
+            switch (brkindx)
+            {
+                case true:
 
-					switch (zm)
-					{
-						case 0:
-						case 3: value = 0; break;
+                    switch (zm)
+                    {
+                        case 0:
+                        case 3: value = 0; break;
 
-						case 2:
-						case 5: value = 1; break;
+                        case 2:
+                        case 5: value = 1; break;
 
-						case 1:
-						case 4: value = 2; break;
-					}
+                        case 1:
+                        case 4: value = 2; break;
+                    }
 
-					break;
+                    break;
 
-				case false:
+                case false:
 
-					switch (zm)
-					{
-						case 0:
-						case 3: value = 2; break;
+                    switch (zm)
+                    {
+                        case 0:
+                        case 3: value = 2; break;
 
-						case 2:
-						case 5: value = 0; break;
+                        case 2:
+                        case 5: value = 0; break;
 
-						case 1:
-						case 4: value = 1; break;
-					}
+                        case 1:
+                        case 4: value = 1; break;
+                    }
 
-					break;
-			}
-	}
+                    break;
+            }
+    }
 
-	value = fmod(value, 3.0);
+    value = fmod(value, 3.0);
 
-	return(value);
+    return(value);
 }
 
 
@@ -6486,7 +6517,7 @@ DBL HexagonPattern::operator()(const Vector3d& EPoint, const Intersection *Isect
 * AUTHOR
 *
 *   Nieminen Juha
-*   
+*
 * DESCRIPTION
 *
 *   Creates a cubic pattern. The six texture elements are mapped to the six
@@ -6498,24 +6529,24 @@ DBL HexagonPattern::operator()(const Vector3d& EPoint, const Intersection *Isect
 *
 ******************************************************************************/
 
-DBL CubicPattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
+DBL CubicPattern::Evaluate(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
-	const DBL x = EPoint[X], y = EPoint[Y], z = EPoint[Z];
-	const DBL ax = fabs(x), ay = fabs(y), az = fabs(z);
+    const DBL x = EPoint[X], y = EPoint[Y], z = EPoint[Z];
+    const DBL ax = fabs(x), ay = fabs(y), az = fabs(z);
 
-	if(x >= 0 && x >= ay && x >= az) return 0.0;
-	if(y >= 0 && y >= ax && y >= az) return 1.0;
-	if(z >= 0 && z >= ax && z >= ay) return 2.0;
-	if(x < 0 && x <= -ay && x <= -az) return 3.0;
-	if(y < 0 && y <= -ax && y <= -az) return 4.0;
-	return 5.0;
+    if(x >= 0 && x >= ay && x >= az) return 0.0;
+    if(y >= 0 && y >= ax && y >= az) return 1.0;
+    if(z >= 0 && z >= ax && z >= ay) return 2.0;
+    if(x < 0 && x <= -ay && x <= -az) return 3.0;
+    if(y < 0 && y <= -ax && y <= -az) return 4.0;
+    return 5.0;
 }
 
 /*****************************************************************************
 *
 * FUNCTION
 *
-*   square_pattern 
+*   square_pattern
 *
 * INPUT
 *
@@ -6539,35 +6570,35 @@ DBL CubicPattern::operator()(const Vector3d& EPoint, const Intersection *Isectio
 *
 ******************************************************************************/
 
-DBL SquarePattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
+DBL SquarePattern::Evaluate(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
-	int valueX,valueZ;
+    int valueX,valueZ;
 
-	valueX = (int)(floor(EPoint[X]));
-	valueZ = (int)(floor(EPoint[Z]));
+    valueX = (int)(floor(EPoint[X]));
+    valueZ = (int)(floor(EPoint[Z]));
 
-	if (valueX & 1)
-	{
-		if (valueZ & 1)
-		{
-			return (2.0);
-		}
-		else
-		{
-			return (3.0);
-		}
-	}
-	else
-	{
-		if (valueZ & 1)
-		{
-			return (1.0);
-		}
-		else
-		{
-			return (0.0);
-		}
-	}
+    if (valueX & 1)
+    {
+        if (valueZ & 1)
+        {
+            return (2.0);
+        }
+        else
+        {
+            return (3.0);
+        }
+    }
+    else
+    {
+        if (valueZ & 1)
+        {
+            return (1.0);
+        }
+        else
+        {
+            return (0.0);
+        }
+    }
 }
 
 /*****************************************************************************
@@ -6598,63 +6629,63 @@ DBL SquarePattern::operator()(const Vector3d& EPoint, const Intersection *Isecti
 *
 ******************************************************************************/
 
-DBL TriangularPattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
+DBL TriangularPattern::Evaluate(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
-	DBL answer;
-	DBL x,z;
-	DBL xs,zs;
-	int a,b;
-	DBL k,slop1,slop2;
-	int mask;
+    DBL answer;
+    DBL x,z;
+    DBL xs,zs;
+    int a,b;
+    DBL k,slop1,slop2;
+    int mask;
 
-	x=EPoint[X];
-	z=EPoint[Z];
+    x=EPoint[X];
+    z=EPoint[Z];
   /* Fold the space to a basic rectangle */
-	xs = x-3.0*floor(x/3.0);
-	zs = z-SQRT3*floor(z/SQRT3);
+    xs = x-3.0*floor(x/3.0);
+    zs = z-SQRT3*floor(z/SQRT3);
 
-	/* xs,zs is in { [0.0, 3.0 [, [0.0, SQRT3 [ } 
-	 ** but there is some symmetry to simplify the testing
-	 */
+    /* xs,zs is in { [0.0, 3.0 [, [0.0, SQRT3 [ }
+     ** but there is some symmetry to simplify the testing
+     */
 
-	a = (int)floor(xs);
-	xs -= a;
-	b = (zs <SQRT3_2 ? 0: 1);
-	if (b)
-	{
-		zs = SQRT3 - zs; /* mirror */
-	}
+    a = (int)floor(xs);
+    xs -= a;
+    b = (zs <SQRT3_2 ? 0: 1);
+    if (b)
+    {
+        zs = SQRT3 - zs; /* mirror */
+    }
 
-	k = 1.0 - xs;
-	if ((xs != 0.0)&&( k != 0.0 )) /* second condition should never occurs */
-	{
-		slop1 = zs/xs;
-		slop2 = zs/k; /* just in case */
-		switch( (slop1<SQRT3?1:0)+(slop2<SQRT3?2:0))
-		{
-			case 3:
-				answer = 0.0;
-				break;
-			case 2:
-				answer = 1.0;
-				break;
-			case 1:
-				answer = 3.0;
-				break;
-		}
-	}
-	else
-	{
-		answer = 1.0;
-	}
-	mask = (int) answer;
-	answer = (mask & 1) ? fmod(answer+2.0*a,6.0): fmod(6.0+answer-2.0*a,6.0);
-	if (b)
-	{
-		answer = 5.0 - answer;
-	}
+    k = 1.0 - xs;
+    if ((xs != 0.0)&&( k != 0.0 )) /* second condition should never occurs */
+    {
+        slop1 = zs/xs;
+        slop2 = zs/k; /* just in case */
+        switch( (slop1<SQRT3?1:0)+(slop2<SQRT3?2:0))
+        {
+            case 3:
+                answer = 0.0;
+                break;
+            case 2:
+                answer = 1.0;
+                break;
+            case 1:
+                answer = 3.0;
+                break;
+        }
+    }
+    else
+    {
+        answer = 1.0;
+    }
+    mask = (int) answer;
+    answer = (mask & 1) ? fmod(answer+2.0*a,6.0): fmod(6.0+answer-2.0*a,6.0);
+    if (b)
+    {
+        answer = 5.0 - answer;
+    }
 
-	return answer;
+    return answer;
 }
 
 
@@ -6691,39 +6722,39 @@ DBL TriangularPattern::operator()(const Vector3d& EPoint, const Intersection *Is
 *
 ******************************************************************************/
 
-DBL JuliaPattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
+DBL JuliaPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
-	int it_max, col;
-	DBL a, b, cf, a2, b2, dist2, mindist2,
-	    cr = Coord[U], ci = Coord[V];
+    int it_max, col;
+    DBL a, b, cf, a2, b2, dist2, mindist2,
+        cr = juliaCoord[U], ci = juliaCoord[V];
 
-	a = EPoint[X]; a2 = Sqr(a);
-	b = EPoint[Y]; b2 = Sqr(b);
-	mindist2 = a2+b2;
+    a = EPoint[X]; a2 = Sqr(a);
+    b = EPoint[Y]; b2 = Sqr(b);
+    mindist2 = a2+b2;
 
-	it_max = Iterations;
+    it_max = maxIterations;
 
-	for (col = 0; col < it_max; col++)
-	{
-		b  = 2.0 * a * b + ci;
-		a  = a2 - b2 + cr;
+    for (col = 0; col < it_max; col++)
+    {
+        b  = 2.0 * a * b + ci;
+        a  = a2 - b2 + cr;
 
-		a2 = Sqr(a);
-		b2 = Sqr(b);
-		dist2 = a2+b2;
+        a2 = Sqr(a);
+        b2 = Sqr(b);
+        dist2 = a2+b2;
 
-		if(dist2 < mindist2) mindist2 = dist2;
-		if(dist2 > 4.0)
-		{
-			cf = ExteriorColour(col, a, b);
-			break;
-		}
-	}
+        if(dist2 < mindist2) mindist2 = dist2;
+        if(dist2 > 4.0)
+        {
+            cf = ExteriorColour(col, a, b);
+            break;
+        }
+    }
 
-	if(col == it_max)
-		cf = InteriorColour(a, b, mindist2);
+    if(col == it_max)
+        cf = InteriorColour(a, b, mindist2);
 
-	return(cf);
+    return(cf);
 }
 
 
@@ -6758,39 +6789,39 @@ DBL JuliaPattern::operator()(const Vector3d& EPoint, const Intersection *Isectio
 *
 ******************************************************************************/
 
-DBL Julia3Pattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
+DBL Julia3Pattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
-	int it_max, col;
-	DBL a, b, cf, a2, b2, dist2, mindist2,
-	    cr = Coord[U], ci = Coord[V];
+    int it_max, col;
+    DBL a, b, cf, a2, b2, dist2, mindist2,
+        cr = juliaCoord[U], ci = juliaCoord[V];
 
-	a = EPoint[X]; a2 = Sqr(a);
-	b = EPoint[Y]; b2 = Sqr(b);
-	mindist2 = a2+b2;
+    a = EPoint[X]; a2 = Sqr(a);
+    b = EPoint[Y]; b2 = Sqr(b);
+    mindist2 = a2+b2;
 
-	it_max = Iterations;
+    it_max = maxIterations;
 
-	for (col = 0; col < it_max; col++)
-	{
-		b = 3.0*a2*b - b2*b + ci;
-		a = a2*a - 3.0*a*b2 + cr;
+    for (col = 0; col < it_max; col++)
+    {
+        b = 3.0*a2*b - b2*b + ci;
+        a = a2*a - 3.0*a*b2 + cr;
 
-		a2 = Sqr(a);
-		b2 = Sqr(b);
-		dist2 = a2+b2;
+        a2 = Sqr(a);
+        b2 = Sqr(b);
+        dist2 = a2+b2;
 
-		if(dist2 < mindist2) mindist2 = dist2;
-		if(dist2 > 4.0)
-		{
-			cf = ExteriorColour(col, a, b);
-			break;
-		}
-	}
+        if(dist2 < mindist2) mindist2 = dist2;
+        if(dist2 > 4.0)
+        {
+            cf = ExteriorColour(col, a, b);
+            break;
+        }
+    }
 
-	if(col == it_max)
-		cf = InteriorColour(a, b, mindist2);
+    if(col == it_max)
+        cf = InteriorColour(a, b, mindist2);
 
-	return(cf);
+    return(cf);
 }
 
 
@@ -6825,39 +6856,39 @@ DBL Julia3Pattern::operator()(const Vector3d& EPoint, const Intersection *Isecti
 *
 ******************************************************************************/
 
-DBL Julia4Pattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
+DBL Julia4Pattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
-	int it_max, col;
-	DBL a, b, cf, a2, b2, dist2, mindist2,
-	    cr = Coord[U], ci = Coord[V];
+    int it_max, col;
+    DBL a, b, cf, a2, b2, dist2, mindist2,
+        cr = juliaCoord[U], ci = juliaCoord[V];
 
-	a = EPoint[X]; a2 = Sqr(a);
-	b = EPoint[Y]; b2 = Sqr(b);
-	mindist2 = a2+b2;
+    a = EPoint[X]; a2 = Sqr(a);
+    b = EPoint[Y]; b2 = Sqr(b);
+    mindist2 = a2+b2;
 
-	it_max = Iterations;
+    it_max = maxIterations;
 
-	for (col = 0; col < it_max; col++)
-	{
-		b = 4.0 * (a2*a*b - a*b2*b) + ci;
-		a = a2*a2 - 6.0*a2*b2 + b2*b2 + cr;
+    for (col = 0; col < it_max; col++)
+    {
+        b = 4.0 * (a2*a*b - a*b2*b) + ci;
+        a = a2*a2 - 6.0*a2*b2 + b2*b2 + cr;
 
-		a2 = Sqr(a);
-		b2 = Sqr(b);
-		dist2 = a2+b2;
+        a2 = Sqr(a);
+        b2 = Sqr(b);
+        dist2 = a2+b2;
 
-		if(dist2 < mindist2) mindist2 = dist2;
-		if(dist2 > 4.0)
-		{
-			cf = ExteriorColour(col, a, b);
-			break;
-		}
-	}
+        if(dist2 < mindist2) mindist2 = dist2;
+        if(dist2 > 4.0)
+        {
+            cf = ExteriorColour(col, a, b);
+            break;
+        }
+    }
 
-	if(col == it_max)
-		cf = InteriorColour(a, b, mindist2);
+    if(col == it_max)
+        cf = InteriorColour(a, b, mindist2);
 
-	return(cf);
+    return(cf);
 }
 
 
@@ -6892,53 +6923,52 @@ DBL Julia4Pattern::operator()(const Vector3d& EPoint, const Intersection *Isecti
 *
 ******************************************************************************/
 
-DBL JuliaXPattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
+DBL JuliaXPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
-	int it_max, col, exponent;
-	DBL a, b, cf=0, x, y, dist2, mindist2,
-	    cr = Coord[U], ci = Coord[V];
-	int* binomial_coeff;
+    int it_max, col;
+    DBL a, b, cf=0, x, y, dist2, mindist2,
+        cr = juliaCoord[U], ci = juliaCoord[V];
+    int* binomial_coeff;
 
-	a = x = EPoint[X];
-	b = y = EPoint[Y];
-	mindist2 = a*a+b*b;
+    a = x = EPoint[X];
+    b = y = EPoint[Y];
+    mindist2 = a*a+b*b;
 
-	it_max = Iterations;
-	exponent = Exponent;
+    it_max = maxIterations;
 
-	binomial_coeff = &BinomialCoefficients[(exponent+1)*exponent/2];
+    binomial_coeff = &(gaBinomialCoefficients[(fractalExponent+1)*fractalExponent/2]);
 
-	for (col = 0; col < it_max; col++)
-	{
-		// Calculate (a+bi)^exponent
-		DBL new_a = pow(a, exponent);
-		for(int k=2; k<=exponent; k+=2)
-		{
-			new_a += binomial_coeff[k]*pow(a, exponent-k)*pow(b, k);
-		}
-		DBL new_b = 0;
-		for(int l=1; l<=exponent; l+=2)
-		{
-			new_b += binomial_coeff[l]*pow(a, exponent-l)*pow(b, l);
-		}
+    for (col = 0; col < it_max; col++)
+    {
+        // Calculate (a+bi)^fractalExponent
+        DBL new_a = pow(a, fractalExponent);
+        for(int k=2; k<=fractalExponent; k+=2)
+        {
+            new_a += binomial_coeff[k]*pow(a, fractalExponent-k)*pow(b, k);
+        }
+        DBL new_b = 0;
+        for(int l=1; l<=fractalExponent; l+=2)
+        {
+            new_b += binomial_coeff[l]*pow(a, fractalExponent-l)*pow(b, l);
+        }
 
-		a = new_a + cr;
-		b = new_b + ci;
+        a = new_a + cr;
+        b = new_b + ci;
 
-		dist2 = a*a+b*b;
+        dist2 = a*a+b*b;
 
-		if(dist2 < mindist2) mindist2 = dist2;
-		if(dist2 > 4.0)
-		{
-			cf = ExteriorColour(col, a, b);
-			break;
-		}
-	}
+        if(dist2 < mindist2) mindist2 = dist2;
+        if(dist2 > 4.0)
+        {
+            cf = ExteriorColour(col, a, b);
+            break;
+        }
+    }
 
-	if(col == it_max)
-		cf = InteriorColour(a, b, mindist2);
+    if(col == it_max)
+        cf = InteriorColour(a, b, mindist2);
 
-	return(cf);
+    return(cf);
 }
 
 
@@ -6972,21 +7002,21 @@ DBL JuliaXPattern::operator()(const Vector3d& EPoint, const Intersection *Isecti
 *
 ******************************************************************************/
 
-DBL LeopardPattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
+DBL LeopardPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
-	register DBL value, temp1, temp2, temp3;
+    register DBL value, temp1, temp2, temp3;
 
-	/* This form didn't work with Zortech 386 compiler */
-	/* value = Sqr((sin(x)+sin(y)+sin(z))/3); */
-	/* So we break it down. */
+    /* This form didn't work with Zortech 386 compiler */
+    /* value = Sqr((sin(x)+sin(y)+sin(z))/3); */
+    /* So we break it down. */
 
-	temp1 = sin(EPoint[X]);
-	temp2 = sin(EPoint[Y]);
-	temp3 = sin(EPoint[Z]);
+    temp1 = sin(EPoint[X]);
+    temp2 = sin(EPoint[Y]);
+    temp3 = sin(EPoint[Z]);
 
-	value = Sqr((temp1 + temp2 + temp3) / 3.0);
+    value = Sqr((temp1 + temp2 + temp3) / 3.0);
 
-	return(value);
+    return(value);
 }
 
 
@@ -7021,49 +7051,49 @@ DBL LeopardPattern::operator()(const Vector3d& EPoint, const Intersection *Isect
 *
 ******************************************************************************/
 
-DBL Magnet1MPattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
+DBL Magnet1MPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
-	int it_max, col;
-	DBL a, b, cf, a2, b2, x, y, tmp, tmp1r, tmp1i, tmp2r, tmp2i, dist2, mindist2;
+    int it_max, col;
+    DBL a, b, cf, a2, b2, x, y, tmp, tmp1r, tmp1i, tmp2r, tmp2i, dist2, mindist2;
 
-	x = EPoint[X];
-	y = EPoint[Y];
-	a = a2 = 0;
-	b = b2 = 0;
-	mindist2 = 10000;
+    x = EPoint[X];
+    y = EPoint[Y];
+    a = a2 = 0;
+    b = b2 = 0;
+    mindist2 = 10000;
 
-	it_max = Iterations;
+    it_max = maxIterations;
 
-	for (col = 0; col < it_max; col++)
-	{
-		tmp1r = a2-b2 + x-1;
-		tmp1i = 2*a*b + y;
-		tmp2r = 2*a + x-2;
-		tmp2i = 2*b + y;
-		tmp = tmp2r*tmp2r + tmp2i*tmp2i;
-		a = (tmp1r*tmp2r + tmp1i*tmp2i) / tmp;
-		b = (tmp1i*tmp2r - tmp1r*tmp2i) / tmp;
-		b2 = b*b;
-		b = 2*a*b;
-		a = a*a-b2;
+    for (col = 0; col < it_max; col++)
+    {
+        tmp1r = a2-b2 + x-1;
+        tmp1i = 2*a*b + y;
+        tmp2r = 2*a + x-2;
+        tmp2i = 2*b + y;
+        tmp = tmp2r*tmp2r + tmp2i*tmp2i;
+        a = (tmp1r*tmp2r + tmp1i*tmp2i) / tmp;
+        b = (tmp1i*tmp2r - tmp1r*tmp2i) / tmp;
+        b2 = b*b;
+        b = 2*a*b;
+        a = a*a-b2;
 
-		a2 = Sqr(a);
-		b2 = Sqr(b);
-		dist2 = a2+b2;
+        a2 = Sqr(a);
+        b2 = Sqr(b);
+        dist2 = a2+b2;
 
-		if(dist2 < mindist2) mindist2 = dist2;
-		tmp1r = a-1;
-		if(dist2 > 10000.0 || tmp1r*tmp1r+b2 < 1/10000.0)
-		{
-			cf = ExteriorColour(col, a, b);
-			break;
-		}
-	}
+        if(dist2 < mindist2) mindist2 = dist2;
+        tmp1r = a-1;
+        if(dist2 > 10000.0 || tmp1r*tmp1r+b2 < 1/10000.0)
+        {
+            cf = ExteriorColour(col, a, b);
+            break;
+        }
+    }
 
-	if(col == it_max)
-		cf = InteriorColour(a, b, mindist2);
+    if(col == it_max)
+        cf = InteriorColour(a, b, mindist2);
 
-	return(cf);
+    return(cf);
 }
 
 
@@ -7098,48 +7128,48 @@ DBL Magnet1MPattern::operator()(const Vector3d& EPoint, const Intersection *Isec
 *
 ******************************************************************************/
 
-DBL Magnet1JPattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
+DBL Magnet1JPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
-	int it_max, col;
-	DBL a, b, cf, a2, b2, tmp, tmp1r, tmp1i, tmp2r, tmp2i, dist2, mindist2,
-	    cr = Coord[U], ci = Coord[V];
+    int it_max, col;
+    DBL a, b, cf, a2, b2, tmp, tmp1r, tmp1i, tmp2r, tmp2i, dist2, mindist2,
+        cr = juliaCoord[U], ci = juliaCoord[V];
 
-	a = EPoint[X]; a2 = Sqr(a);
-	b = EPoint[Y]; b2 = Sqr(b);
-	mindist2 = a2+b2;
+    a = EPoint[X]; a2 = Sqr(a);
+    b = EPoint[Y]; b2 = Sqr(b);
+    mindist2 = a2+b2;
 
-	it_max = Iterations;
+    it_max = maxIterations;
 
-	for (col = 0; col < it_max; col++)
-	{
-		tmp1r = a2-b2 + cr-1;
-		tmp1i = 2*a*b + ci;
-		tmp2r = 2*a + cr-2;
-		tmp2i = 2*b + ci;
-		tmp = tmp2r*tmp2r + tmp2i*tmp2i;
-		a = (tmp1r*tmp2r + tmp1i*tmp2i) / tmp;
-		b = (tmp1i*tmp2r - tmp1r*tmp2i) / tmp;
-		b2 = b*b;
-		b = 2*a*b;
-		a = a*a-b2;
+    for (col = 0; col < it_max; col++)
+    {
+        tmp1r = a2-b2 + cr-1;
+        tmp1i = 2*a*b + ci;
+        tmp2r = 2*a + cr-2;
+        tmp2i = 2*b + ci;
+        tmp = tmp2r*tmp2r + tmp2i*tmp2i;
+        a = (tmp1r*tmp2r + tmp1i*tmp2i) / tmp;
+        b = (tmp1i*tmp2r - tmp1r*tmp2i) / tmp;
+        b2 = b*b;
+        b = 2*a*b;
+        a = a*a-b2;
 
-		a2 = Sqr(a);
-		b2 = Sqr(b);
-		dist2 = a2+b2;
+        a2 = Sqr(a);
+        b2 = Sqr(b);
+        dist2 = a2+b2;
 
-		if(dist2 < mindist2) mindist2 = dist2;
-		tmp1r = a-1;
-		if(dist2 > 10000.0 || tmp1r*tmp1r+b2 < 1/10000.0)
-		{
-			cf = ExteriorColour(col, a, b);
-			break;
-		}
-	}
+        if(dist2 < mindist2) mindist2 = dist2;
+        tmp1r = a-1;
+        if(dist2 > 10000.0 || tmp1r*tmp1r+b2 < 1/10000.0)
+        {
+            cf = ExteriorColour(col, a, b);
+            break;
+        }
+    }
 
-	if(col == it_max)
-		cf = InteriorColour(a, b, mindist2);
+    if(col == it_max)
+        cf = InteriorColour(a, b, mindist2);
 
-	return(cf);
+    return(cf);
 }
 
 
@@ -7174,54 +7204,54 @@ DBL Magnet1JPattern::operator()(const Vector3d& EPoint, const Intersection *Isec
 *
 ******************************************************************************/
 
-DBL Magnet2MPattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
+DBL Magnet2MPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
-	int it_max, col;
-	DBL a, b, cf, a2, b2, x, y, tmp, tmp1r, tmp1i, tmp2r, tmp2i,
-	    c1r, c2r, c1c2r, c1c2i, dist2, mindist2;
+    int it_max, col;
+    DBL a, b, cf, a2, b2, x, y, tmp, tmp1r, tmp1i, tmp2r, tmp2i,
+        c1r, c2r, c1c2r, c1c2i, dist2, mindist2;
 
-	x = EPoint[X];
-	y = EPoint[Y];
-	a = a2 = 0;
-	b = b2 = 0;
-	mindist2 = 10000;
+    x = EPoint[X];
+    y = EPoint[Y];
+    a = a2 = 0;
+    b = b2 = 0;
+    mindist2 = 10000;
 
-	c1r = x-1; c2r = x-2;
-	c1c2r = c1r*c2r-y*y;
-	c1c2i = (c1r+c2r)*y;
+    c1r = x-1; c2r = x-2;
+    c1c2r = c1r*c2r-y*y;
+    c1c2i = (c1r+c2r)*y;
 
-	it_max = Iterations;
+    it_max = maxIterations;
 
-	for (col = 0; col < it_max; col++)
-	{
-		tmp1r = a2*a-3*a*b2 + 3*(a*c1r-b*y) + c1c2r;
-		tmp1i = 3*a2*b-b2*b + 3*(a*y+b*c1r) + c1c2i;
-		tmp2r = 3*(a2-b2) + 3*(a*c2r-b*y) + c1c2r + 1;
-		tmp2i = 6*a*b + 3*(a*y+b*c2r) + c1c2i;
-		tmp = tmp2r*tmp2r + tmp2i*tmp2i;
-		a = (tmp1r*tmp2r + tmp1i*tmp2i) / tmp;
-		b = (tmp1i*tmp2r - tmp1r*tmp2i) / tmp;
-		b2 = b*b;
-		b = 2*a*b;
-		a = a*a-b2;
+    for (col = 0; col < it_max; col++)
+    {
+        tmp1r = a2*a-3*a*b2 + 3*(a*c1r-b*y) + c1c2r;
+        tmp1i = 3*a2*b-b2*b + 3*(a*y+b*c1r) + c1c2i;
+        tmp2r = 3*(a2-b2) + 3*(a*c2r-b*y) + c1c2r + 1;
+        tmp2i = 6*a*b + 3*(a*y+b*c2r) + c1c2i;
+        tmp = tmp2r*tmp2r + tmp2i*tmp2i;
+        a = (tmp1r*tmp2r + tmp1i*tmp2i) / tmp;
+        b = (tmp1i*tmp2r - tmp1r*tmp2i) / tmp;
+        b2 = b*b;
+        b = 2*a*b;
+        a = a*a-b2;
 
-		a2 = Sqr(a);
-		b2 = Sqr(b);
-		dist2 = a2+b2;
+        a2 = Sqr(a);
+        b2 = Sqr(b);
+        dist2 = a2+b2;
 
-		if(dist2 < mindist2) mindist2 = dist2;
-		tmp1r = a-1;
-		if(dist2 > 10000.0 || tmp1r*tmp1r+b2 < 1/10000.0)
-		{
-			cf = ExteriorColour(col, a, b);
-			break;
-		}
-	}
+        if(dist2 < mindist2) mindist2 = dist2;
+        tmp1r = a-1;
+        if(dist2 > 10000.0 || tmp1r*tmp1r+b2 < 1/10000.0)
+        {
+            cf = ExteriorColour(col, a, b);
+            break;
+        }
+    }
 
-	if(col == it_max)
-		cf = InteriorColour(a, b, mindist2);
+    if(col == it_max)
+        cf = InteriorColour(a, b, mindist2);
 
-	return(cf);
+    return(cf);
 }
 
 
@@ -7256,53 +7286,53 @@ DBL Magnet2MPattern::operator()(const Vector3d& EPoint, const Intersection *Isec
 *
 ******************************************************************************/
 
-DBL Magnet2JPattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
+DBL Magnet2JPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
-	int it_max, col;
-	DBL a, b, cf, a2, b2, tmp, tmp1r, tmp1i, tmp2r, tmp2i, c1r,c2r,c1c2r,c1c2i,
-	    cr = Coord[U], ci = Coord[V],
-	    dist2, mindist2;
+    int it_max, col;
+    DBL a, b, cf, a2, b2, tmp, tmp1r, tmp1i, tmp2r, tmp2i, c1r,c2r,c1c2r,c1c2i,
+        cr = juliaCoord[U], ci = juliaCoord[V],
+        dist2, mindist2;
 
-	a = EPoint[X]; a2 = Sqr(a);
-	b = EPoint[Y]; b2 = Sqr(b);
-	mindist2 = a2+b2;
+    a = EPoint[X]; a2 = Sqr(a);
+    b = EPoint[Y]; b2 = Sqr(b);
+    mindist2 = a2+b2;
 
-	c1r = cr-1, c2r = cr-2;
-	c1c2r = c1r*c2r-ci*ci;
-	c1c2i = (c1r+c2r)*ci;
+    c1r = cr-1, c2r = cr-2;
+    c1c2r = c1r*c2r-ci*ci;
+    c1c2i = (c1r+c2r)*ci;
 
-	it_max = Iterations;
+    it_max = maxIterations;
 
-	for (col = 0; col < it_max; col++)
-	{
-		tmp1r = a2*a-3*a*b2 + 3*(a*c1r-b*ci) + c1c2r;
-		tmp1i = 3*a2*b-b2*b + 3*(a*ci+b*c1r) + c1c2i;
-		tmp2r = 3*(a2-b2) + 3*(a*c2r-b*ci) + c1c2r + 1;
-		tmp2i = 6*a*b + 3*(a*ci+b*c2r) + c1c2i;
-		tmp = tmp2r*tmp2r + tmp2i*tmp2i;
-		a = (tmp1r*tmp2r + tmp1i*tmp2i) / tmp;
-		b = (tmp1i*tmp2r - tmp1r*tmp2i) / tmp;
-		b2 = b*b;
-		b = 2*a*b;
-		a = a*a-b2;
+    for (col = 0; col < it_max; col++)
+    {
+        tmp1r = a2*a-3*a*b2 + 3*(a*c1r-b*ci) + c1c2r;
+        tmp1i = 3*a2*b-b2*b + 3*(a*ci+b*c1r) + c1c2i;
+        tmp2r = 3*(a2-b2) + 3*(a*c2r-b*ci) + c1c2r + 1;
+        tmp2i = 6*a*b + 3*(a*ci+b*c2r) + c1c2i;
+        tmp = tmp2r*tmp2r + tmp2i*tmp2i;
+        a = (tmp1r*tmp2r + tmp1i*tmp2i) / tmp;
+        b = (tmp1i*tmp2r - tmp1r*tmp2i) / tmp;
+        b2 = b*b;
+        b = 2*a*b;
+        a = a*a-b2;
 
-		a2 = Sqr(a);
-		b2 = Sqr(b);
-		dist2 = a2+b2;
+        a2 = Sqr(a);
+        b2 = Sqr(b);
+        dist2 = a2+b2;
 
-		if(dist2 < mindist2) mindist2 = dist2;
-		tmp1r = a-1;
-		if(dist2 > 10000.0 || tmp1r*tmp1r+b2 < 1/10000.0)
-		{
-			cf = ExteriorColour(col, a, b);
-			break;
-		}
-	}
+        if(dist2 < mindist2) mindist2 = dist2;
+        tmp1r = a-1;
+        if(dist2 > 10000.0 || tmp1r*tmp1r+b2 < 1/10000.0)
+        {
+            cf = ExteriorColour(col, a, b);
+            break;
+        }
+    }
 
-	if(col == it_max)
-		cf = InteriorColour(a, b, mindist2);
+    if(col == it_max)
+        cf = InteriorColour(a, b, mindist2);
 
-	return(cf);
+    return(cf);
 }
 
 
@@ -7340,38 +7370,38 @@ DBL Magnet2JPattern::operator()(const Vector3d& EPoint, const Intersection *Isec
 *
 ******************************************************************************/
 
-DBL Mandel2Pattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
+DBL Mandel2Pattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
-	int it_max, col;
-	DBL a, b, cf, a2, b2, x, y, dist2, mindist2;
+    int it_max, col;
+    DBL a, b, cf, a2, b2, x, y, dist2, mindist2;
 
-	a = x = EPoint[X]; a2 = Sqr(a);
-	b = y = EPoint[Y]; b2 = Sqr(b);
-	mindist2 = a2+b2;
+    a = x = EPoint[X]; a2 = Sqr(a);
+    b = y = EPoint[Y]; b2 = Sqr(b);
+    mindist2 = a2+b2;
 
-	it_max = Iterations;
+    it_max = maxIterations;
 
-	for (col = 0; col < it_max; col++)
-	{
-		b  = 2.0 * a * b + y;
-		a  = a2 - b2 + x;
+    for (col = 0; col < it_max; col++)
+    {
+        b  = 2.0 * a * b + y;
+        a  = a2 - b2 + x;
 
-		a2 = Sqr(a);
-		b2 = Sqr(b);
-		dist2 = a2+b2;
+        a2 = Sqr(a);
+        b2 = Sqr(b);
+        dist2 = a2+b2;
 
-		if(dist2 < mindist2) mindist2 = dist2;
-		if(dist2 > 4.0)
-		{
-			cf = ExteriorColour(col, a, b);
-			break;
-		}
-	}
+        if(dist2 < mindist2) mindist2 = dist2;
+        if(dist2 > 4.0)
+        {
+            cf = ExteriorColour(col, a, b);
+            break;
+        }
+    }
 
-	if(col == it_max)
-		cf = InteriorColour(a, b, mindist2);
+    if(col == it_max)
+        cf = InteriorColour(a, b, mindist2);
 
-	return(cf);
+    return(cf);
 }
 
 
@@ -7406,38 +7436,38 @@ DBL Mandel2Pattern::operator()(const Vector3d& EPoint, const Intersection *Isect
 *
 ******************************************************************************/
 
-DBL Mandel3Pattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
+DBL Mandel3Pattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
-	int it_max, col;
-	DBL a, b, cf, a2, b2, x, y, dist2, mindist2;
+    int it_max, col;
+    DBL a, b, cf, a2, b2, x, y, dist2, mindist2;
 
-	a = x = EPoint[X]; a2 = Sqr(a);
-	b = y = EPoint[Y]; b2 = Sqr(b);
-	mindist2 = a2+b2;
+    a = x = EPoint[X]; a2 = Sqr(a);
+    b = y = EPoint[Y]; b2 = Sqr(b);
+    mindist2 = a2+b2;
 
-	it_max = Iterations;
+    it_max = maxIterations;
 
-	for (col = 0; col < it_max; col++)
-	{
-		b = 3.0*a2*b - b2*b + y;
-		a = a2*a - 3.0*a*b2 + x;
+    for (col = 0; col < it_max; col++)
+    {
+        b = 3.0*a2*b - b2*b + y;
+        a = a2*a - 3.0*a*b2 + x;
 
-		a2 = Sqr(a);
-		b2 = Sqr(b);
-		dist2 = a2+b2;
+        a2 = Sqr(a);
+        b2 = Sqr(b);
+        dist2 = a2+b2;
 
-		if(dist2 < mindist2) mindist2 = dist2;
-		if(dist2 > 4.0)
-		{
-			cf = ExteriorColour(col, a, b);
-			break;
-		}
-	}
+        if(dist2 < mindist2) mindist2 = dist2;
+        if(dist2 > 4.0)
+        {
+            cf = ExteriorColour(col, a, b);
+            break;
+        }
+    }
 
-	if(col == it_max)
-		cf = InteriorColour(a, b, mindist2);
+    if(col == it_max)
+        cf = InteriorColour(a, b, mindist2);
 
-	return(cf);
+    return(cf);
 }
 
 
@@ -7472,38 +7502,38 @@ DBL Mandel3Pattern::operator()(const Vector3d& EPoint, const Intersection *Isect
 *
 ******************************************************************************/
 
-DBL Mandel4Pattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
+DBL Mandel4Pattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
-	int it_max, col;
-	DBL a, b, cf, a2, b2, x, y, dist2, mindist2;
+    int it_max, col;
+    DBL a, b, cf, a2, b2, x, y, dist2, mindist2;
 
-	a = x = EPoint[X]; a2 = Sqr(a);
-	b = y = EPoint[Y]; b2 = Sqr(b);
-	mindist2 = a2+b2;
+    a = x = EPoint[X]; a2 = Sqr(a);
+    b = y = EPoint[Y]; b2 = Sqr(b);
+    mindist2 = a2+b2;
 
-	it_max = Iterations;
+    it_max = maxIterations;
 
-	for (col = 0; col < it_max; col++)
-	{
-		b = 4.0 * (a2*a*b - a*b2*b) + y;
-		a = a2*a2 - 6.0*a2*b2 + b2*b2 + x;
+    for (col = 0; col < it_max; col++)
+    {
+        b = 4.0 * (a2*a*b - a*b2*b) + y;
+        a = a2*a2 - 6.0*a2*b2 + b2*b2 + x;
 
-		a2 = Sqr(a);
-		b2 = Sqr(b);
-		dist2 = a2+b2;
+        a2 = Sqr(a);
+        b2 = Sqr(b);
+        dist2 = a2+b2;
 
-		if(dist2 < mindist2) mindist2 = dist2;
-		if(dist2 > 4.0)
-		{
-			cf = ExteriorColour(col, a, b);
-			break;
-		}
-	}
+        if(dist2 < mindist2) mindist2 = dist2;
+        if(dist2 > 4.0)
+        {
+            cf = ExteriorColour(col, a, b);
+            break;
+        }
+    }
 
-	if(col == it_max)
-		cf = InteriorColour(a, b, mindist2);
+    if(col == it_max)
+        cf = InteriorColour(a, b, mindist2);
 
-	return(cf);
+    return(cf);
 }
 
 
@@ -7538,52 +7568,51 @@ DBL Mandel4Pattern::operator()(const Vector3d& EPoint, const Intersection *Isect
 *
 ******************************************************************************/
 
-DBL MandelXPattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
+DBL MandelXPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
-	int it_max, col, exponent;
-	DBL a, b, cf=0, x, y, dist2, mindist2;
-	int* binomial_coeff;
+    int it_max, col;
+    DBL a, b, cf=0, x, y, dist2, mindist2;
+    int* binomial_coeff;
 
-	a = x = EPoint[X];
-	b = y = EPoint[Y];
-	mindist2 = a*a+b*b;
+    a = x = EPoint[X];
+    b = y = EPoint[Y];
+    mindist2 = a*a+b*b;
 
-	it_max = Iterations;
-	exponent = Exponent;
+    it_max = maxIterations;
 
-	binomial_coeff = &BinomialCoefficients[(exponent+1)*exponent/2];
+    binomial_coeff = &(gaBinomialCoefficients[(fractalExponent+1)*fractalExponent/2]);
 
-	for (col = 0; col < it_max; col++)
-	{
-		// Calculate (a+bi)^exponent
-		DBL new_a = pow(a, exponent);
-		for(int k=2; k<=exponent; k+=2)
-		{
-			new_a += binomial_coeff[k]*pow(a, exponent-k)*pow(b, k);
-		}
-		DBL new_b = 0;
-		for(int l=1; l<=exponent; l+=2)
-		{
-			new_b += binomial_coeff[l]*pow(a, exponent-l)*pow(b, l);
-		}
+    for (col = 0; col < it_max; col++)
+    {
+        // Calculate (a+bi)^fractalExponent
+        DBL new_a = pow(a, fractalExponent);
+        for(int k=2; k<=fractalExponent; k+=2)
+        {
+            new_a += binomial_coeff[k]*pow(a, fractalExponent-k)*pow(b, k);
+        }
+        DBL new_b = 0;
+        for(int l=1; l<=fractalExponent; l+=2)
+        {
+            new_b += binomial_coeff[l]*pow(a, fractalExponent-l)*pow(b, l);
+        }
 
-		a = new_a + x;
-		b = new_b + y;
+        a = new_a + x;
+        b = new_b + y;
 
-		dist2 = a*a+b*b;
+        dist2 = a*a+b*b;
 
-		if(dist2 < mindist2) mindist2 = dist2;
-		if(dist2 > 4.0)
-		{
-			cf = ExteriorColour(col, a, b);
-			break;
-		}
-	}
+        if(dist2 < mindist2) mindist2 = dist2;
+        if(dist2 > 4.0)
+        {
+            cf = ExteriorColour(col, a, b);
+            break;
+        }
+    }
 
-	if(col == it_max)
-		cf = InteriorColour(a, b, mindist2);
+    if(col == it_max)
+        cf = InteriorColour(a, b, mindist2);
 
-	return(cf);
+    return(cf);
 }
 
 
@@ -7617,21 +7646,21 @@ DBL MandelXPattern::operator()(const Vector3d& EPoint, const Intersection *Isect
 *
 ******************************************************************************/
 
-DBL MarblePattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
+DBL MarblePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
-	register DBL turb_val;
-	const TURB *Turb;
+    register DBL turb_val;
+    const TURB *Turb;
 
-	if ((Turb=Search_For_Turb(Warps)) != NULL)
-	{
-		turb_val = Turb->Turbulence[X] * Turbulence(EPoint,Turb,GetNoiseGen(Thread));
-	}
-	else
-	{
-		turb_val = 0.0;
-	}
+    if ((Turb=SearchForTurb(pWarps)) != NULL)
+    {
+        turb_val = Turb->Turbulence[X] * Turbulence(EPoint,Turb,GetNoiseGen(pThread));
+    }
+    else
+    {
+        turb_val = 0.0;
+    }
 
-	return(EPoint[X] + turb_val);
+    return(EPoint[X] + turb_val);
 }
 
 
@@ -7639,9 +7668,9 @@ DBL MarblePattern::operator()(const Vector3d& EPoint, const Intersection *Isecti
 /*****************************************************************************/
 
 
-DBL NoisePattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
+DBL NoisePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
-	return Noise(EPoint, GetNoiseGen(Thread));
+    return Noise(EPoint, GetNoiseGen(pThread));
 }
 
 
@@ -7672,17 +7701,17 @@ DBL NoisePattern::operator()(const Vector3d& EPoint, const Intersection *Isectio
 *
 ******************************************************************************/
 
-DBL ObjectPattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
+DBL ObjectPattern::Evaluate(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
-	if(Object != NULL)
-	{
-		if(Inside_Object(EPoint, Object, Thread))
-			return 1.0;
-		else
-			return 0.0;
-	}
+    if(pObject != NULL)
+    {
+        if(Inside_Object(EPoint, pObject, pThread))
+            return 1.0;
+        else
+            return 0.0;
+    }
 
-	return 0.0;
+    return 0.0;
 }
 
 /*****************************************************************************
@@ -7715,25 +7744,25 @@ DBL ObjectPattern::operator()(const Vector3d& EPoint, const Intersection *Isecti
 *
 ******************************************************************************/
 
-DBL OnionPattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
+DBL OnionPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
-	// TODO - The variable noise is not used as noise in this function
+    // TODO - The variable noise is not used as noise in this function
 
-	register DBL noise;
+    register DBL noise;
 
 /*
-	 This ramp goes 0-1,1-0,0-1,1-0...
+     This ramp goes 0-1,1-0,0-1,1-0...
 
-	 noise = (fmod(sqrt(Sqr(x)+Sqr(y)+Sqr(z)),2.0)-1.0);
+     noise = (fmod(sqrt(Sqr(x)+Sqr(y)+Sqr(z)),2.0)-1.0);
 
-	 if (noise<0.0) {noise = 0.0-noise;}
+     if (noise<0.0) {noise = 0.0-noise;}
 */
 
-	/* This ramp goes 0-1, 0-1, 0-1, 0-1 ... */
+    /* This ramp goes 0-1, 0-1, 0-1, 0-1 ... */
 
-	noise = (fmod(EPoint.length(), 1.0));
+    noise = (fmod(EPoint.length(), 1.0));
 
-	return(noise);
+    return(noise);
 }
 
 
@@ -7747,7 +7776,7 @@ DBL OnionPattern::operator()(const Vector3d& EPoint, const Intersection *Isectio
 *
 * RETURNS
 *
-* AUTHOR 
+* AUTHOR
 *
 * DESCRIPTION
 *
@@ -7755,22 +7784,22 @@ DBL OnionPattern::operator()(const Vector3d& EPoint, const Intersection *Isectio
 *
 ******************************************************************************/
 
-DBL PigmentPattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
+DBL PigmentPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
-	DBL value;
-	Colour Col;
-	int colour_found=false;
+    DBL value;
+    Colour Col;
+    int colour_found=false;
 
-	if (Pigment)
-		// TODO ALPHA - we're discarding transparency information, so maybe we want to pre-multiply if there's alpha in there?
-		colour_found = Compute_Pigment(Col, Pigment, EPoint, Isection, ray, Thread);
+    if (pPigment)
+        // TODO ALPHA - we're discarding transparency information, so maybe we want to pre-multiply if there's alpha in there?
+        colour_found = Compute_Pigment(Col, pPigment, EPoint, pIsection, pRay, pThread);
 
-	if(!colour_found)
-		value = 0.0;
-	else
-		value = Col.greyscale();
+    if(!colour_found)
+        value = 0.0;
+    else
+        value = Col.greyscale();
 
-	return value ;
+    return value ;
 }
 
 
@@ -7805,13 +7834,13 @@ DBL PigmentPattern::operator()(const Vector3d& EPoint, const Intersection *Isect
 *
 ******************************************************************************/
 
-DBL PlanarPattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
+DBL PlanarPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
-	register DBL value = fabs(EPoint[Y]);
+    register DBL value = fabs(EPoint[Y]);
 
-	CLIP_DENSITY(value);
+    CLIP_DENSITY(value);
 
-	return value;
+    return value;
 }
 
 
@@ -7822,37 +7851,37 @@ DBL PlanarPattern::operator()(const Vector3d& EPoint, const Intersection *Isecti
 *   quilted_pattern
 *
 * INPUT
-*   
+*
 * OUTPUT
-*   
+*
 * RETURNS
-*   
+*
 * AUTHOR
 *
 *   Dan Farmer & Chris Young
-*   
+*
 * DESCRIPTION
 *
 * CHANGES
 *
 ******************************************************************************/
 
-DBL QuiltedPattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
+DBL QuiltedPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
-	Vector3d value;
-	DBL t;
+    Vector3d value;
+    DBL t;
 
-	value[X] = EPoint[X]-FLOOR(EPoint[X])-0.5;
-	value[Y] = EPoint[Y]-FLOOR(EPoint[Y])-0.5;
-	value[Z] = EPoint[Z]-FLOOR(EPoint[Z])-0.5;
+    value[X] = EPoint[X]-FLOOR(EPoint[X])-0.5;
+    value[Y] = EPoint[Y]-FLOOR(EPoint[Y])-0.5;
+    value[Z] = EPoint[Z]-FLOOR(EPoint[Z])-0.5;
 
-	t = value.length();
+    t = value.length();
 
-	t = quilt_cubic(t, Control0, Control1);
+    t = quilt_cubic(t, Control0, Control1);
 
-	value *= t;
+    value *= t;
 
-	return((fabs(value[X])+fabs(value[Y])+fabs(value[Z]))/3.0);
+    return((fabs(value[X])+fabs(value[Y])+fabs(value[Z]))/3.0);
 }
 
 
@@ -7885,20 +7914,20 @@ DBL QuiltedPattern::operator()(const Vector3d& EPoint, const Intersection *Isect
 *
 ******************************************************************************/
 
-DBL RadialPattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
+DBL RadialPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
-	register DBL value;
+    register DBL value;
 
-	if ((fabs(EPoint[X])<0.001) && (fabs(EPoint[Z])<0.001))
-	{
-		value = 0.25;
-	}
-	else
-	{
-		value = 0.25 + (atan2(EPoint[X],EPoint[Z]) + M_PI) / TWO_M_PI;
-	}
+    if ((fabs(EPoint[X])<0.001) && (fabs(EPoint[Z])<0.001))
+    {
+        value = 0.25;
+    }
+    else
+    {
+        value = 0.25 + (atan2(EPoint[X],EPoint[Z]) + M_PI) / TWO_M_PI;
+    }
 
-	return(value);
+    return(value);
 }
 
 
@@ -7915,11 +7944,11 @@ DBL RadialPattern::operator()(const Vector3d& EPoint, const Intersection *Isecti
 *   TPat   -- Texture pattern struct
 *
 * OUTPUT
-*   
+*
 * RETURNS
 *
 *   DBL value in the range 0.0 to 1.0
-*   
+*
 * AUTHOR
 *
 *   POV-Ray Team
@@ -7933,29 +7962,29 @@ DBL RadialPattern::operator()(const Vector3d& EPoint, const Intersection *Isecti
 *
 ******************************************************************************/
 
-DBL RipplesPattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
+DBL RipplesPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
-	register unsigned int i;
-	register DBL length, index;
-	DBL scalar =0.0;
-	Vector3d point;
+    register unsigned int i;
+    register DBL length, index;
+    DBL scalar =0.0;
+    Vector3d point;
 
-	for (i = 0 ; i < Thread->numberOfWaves ; i++)
-	{
-		point = EPoint - Thread->waveSources[i];
-		length = point.length();
+    for (i = 0 ; i < pThread->numberOfWaves ; i++)
+    {
+        point = EPoint - pThread->waveSources[i];
+        length = point.length();
 
-		if (length == 0.0)
-			length = 1.0;
+        if (length == 0.0)
+            length = 1.0;
 
-		index = length * Frequency + Phase;
+        index = length * waveFrequency + wavePhase;
 
-		scalar += cycloidal(index);
-	}
+        scalar += cycloidal(index);
+    }
 
-	scalar = 0.5*(1.0+(scalar / (DBL)Thread->numberOfWaves));
+    scalar = 0.5*(1.0+(scalar / (DBL)pThread->numberOfWaves));
 
-	return(scalar);
+    return(scalar);
 }
 
 
@@ -7993,89 +8022,89 @@ DBL RipplesPattern::operator()(const Vector3d& EPoint, const Intersection *Isect
 *
 ******************************************************************************/
 
-DBL SlopePattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
+DBL SlopePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
-	DBL value, value1, value2;
+    DBL value, value1, value2;
 
-	if (Isection == NULL) return 0.0; /* just in case ... */
+    if (pIsection == NULL) return 0.0; /* just in case ... */
 
-	if (Point_At)
-	{
-		Vector3d vect;
-		vect = Slope_Vector - Isection->IPoint.normalized();
-		value1 = dot(Isection->PNormal, vect);
-	}
-	else
-	{
-		if (Slope_Base > 0)
-			/* short case 1: slope vector in x, y or z direction */
-			value1 = Isection->PNormal[Slope_Base - 1];
-		else if (Slope_Base < 0)
-			/* short case 2: slope vector in negative x, y or z direction */
-			value1 = -Isection->PNormal[-Slope_Base - 1];
-		else
-			/* projection slope onto normal vector */
-			value1 = dot(Isection->PNormal, Slope_Vector);
-	}
+    if (pointAt)
+    {
+        Vector3d vect;
+        vect = slopeDirection - pIsection->IPoint.normalized();
+        value1 = dot(pIsection->PNormal, vect);
+    }
+    else
+    {
+        if (slopeAxis > 0)
+            /* short case 1: slope vector in x, y or z direction */
+            value1 = pIsection->PNormal[slopeAxis - 1];
+        else if (slopeAxis < 0)
+            /* short case 2: slope vector in negative x, y or z direction */
+            value1 = -pIsection->PNormal[-slopeAxis - 1];
+        else
+            /* projection slope onto normal vector */
+            value1 = dot(pIsection->PNormal, slopeDirection);
+    }
 
-	/* Clamp to 1.0. */
-	/* should never be necessary since both vectors are normalized */
-	if      (value1 >  1.0) value1 =  1.0;
-	else if (value1 < -1.0) value1 = -1.0;
+    /* Clamp to 1.0. */
+    /* should never be necessary since both vectors are normalized */
+    if      (value1 >  1.0) value1 =  1.0;
+    else if (value1 < -1.0) value1 = -1.0;
 
-	value1 = asin(value1) / M_PI * 2;
-	value1 = (value1 + 1.0) * 0.5;        /* normalize to [0..1] interval */
+    value1 = asin(value1) / M_PI * 2;
+    value1 = (value1 + 1.0) * 0.5;        /* normalize to [0..1] interval */
 
-	/* If set, use offset and scalings for slope and altitude. */
-	if (0.0 != Slope_Mod[V])
-	{
-		value1 = (value1 - Slope_Mod[U]) / Slope_Mod[V];
-	}
+    /* If set, use offset and scalings for slope and altitude. */
+    if (0.0 != slopeModWidth)
+    {
+        value1 = (value1 - slopeModLow) / slopeModWidth;
+    }
 
-	if (!Altit_Len)
-	{
-		/* Clamp to 1.0. */
-		if ( value1 == 1.0 )
-		{
-			value1= value1- EPSILON;
-		}
-		else
-		{
-			value1 = (value1 < 0.0) ? 1.0 + fmod(value1, 1.0) : fmod(value1, 1.0);
-		}
-		return value1; /* no altitude defined */
-	}
+    if (!altitudeLen)
+    {
+        /* Clamp to 1.0. */
+        if ( value1 == 1.0 )
+        {
+            value1= value1- EPSILON;
+        }
+        else
+        {
+            value1 = (value1 < 0.0) ? 1.0 + fmod(value1, 1.0) : fmod(value1, 1.0);
+        }
+        return value1; /* no altitude defined */
+    }
 
-	/* Calculate projection of Epoint along altitude vector */
-	if (Altit_Base > 0)
-		/* short case 1: altitude vector in x, y or z direction */
-		value2 = EPoint[Altit_Base - 1];
-	else if (Altit_Base < 0)
-		/* short case 2: altitude vector in negative x, y or z direction */
-		value2 = -EPoint[-Altit_Base - 1];
-	else
-		/* projection of Epoint along altitude vector */
-		value2 = dot(EPoint, Altit_Vector);
+    /* Calculate projection of Epoint along altitude vector */
+    if (altitudeAxis > 0)
+        /* short case 1: altitude vector in x, y or z direction */
+        value2 = EPoint[altitudeAxis - 1];
+    else if (altitudeAxis < 0)
+        /* short case 2: altitude vector in negative x, y or z direction */
+        value2 = -EPoint[-altitudeAxis - 1];
+    else
+        /* projection of Epoint along altitude vector */
+        value2 = dot(EPoint, altitudeDirection);
 
-	if (0.0 != Altit_Mod[V])
-	{
-		value2 = (value2 - Altit_Mod[U]) / Altit_Mod[V];
-	}
+    if (0.0 != altitudeModWidth)
+    {
+        value2 = (value2 - altitudeModLow) / altitudeModWidth;
+    }
 
-	value = Slope_Len * value1 + Altit_Len * value2;
+    value = slopeLen * value1 + altitudeLen * value2;
 
-	/* Clamp to 1.0. */
-	if ( value - 1.0 < EPSILON && value >= 1.0 )
-	{
-		/* 1.0 is a very common value to get *exactly*.  We don't want to wrap
-		   it to the bottom end of the map. */
-		value = value - EPSILON;
-	}
-	else
-	{
-		value = (value < 0.0) ? 1.0 + fmod(value, 1.0) : fmod(value, 1.0);
-	}
-	return value;
+    /* Clamp to 1.0. */
+    if ( value - 1.0 < EPSILON && value >= 1.0 )
+    {
+        /* 1.0 is a very common value to get *exactly*.  We don't want to wrap
+           it to the bottom end of the map. */
+        value = value - EPSILON;
+    }
+    else
+    {
+        value = (value < 0.0) ? 1.0 + fmod(value, 1.0) : fmod(value, 1.0);
+    }
+    return value;
 
 }
 
@@ -8112,24 +8141,24 @@ DBL SlopePattern::operator()(const Vector3d& EPoint, const Intersection *Isectio
 *
 ******************************************************************************/
 
-DBL AOIPattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
+DBL AOIPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
-	Vector3d  a, b;
-	DBL       cosAngle, angle;
+    Vector3d  a, b;
+    DBL       cosAngle, angle;
 
-	if ((Isection == NULL) || (ray == NULL))
-		return 0.0;
+    if ((pIsection == NULL) || (pRay == NULL))
+        return 0.0;
 
-	a = Isection->PNormal.normalized(); // TODO - shouldn't Isection->PNormal be normalized already?
-	b = ray->Direction.normalized();    // TODO - shouldn't ray->Direction be normalized already?
-	cosAngle = dot(a, b);
+    a = pIsection->PNormal.normalized(); // TODO - shouldn't pIsection->PNormal be normalized already?
+    b = pRay->Direction.normalized();    // TODO - shouldn't pRay->Direction be normalized already?
+    cosAngle = dot(a, b);
 
-	// clip to [-1.0; 1.0], just to be sure
-	// (should never be necessary since both vectors are normalized)
-	cosAngle = clip(cosAngle, -1.0, 1.0);
-	angle = acos(cosAngle) / M_PI;
+    // clip to [-1.0; 1.0], just to be sure
+    // (should never be necessary since both vectors are normalized)
+    cosAngle = clip(cosAngle, -1.0, 1.0);
+    angle = acos(cosAngle) / M_PI;
 
-	return angle;
+    return angle;
 }
 
 
@@ -8166,46 +8195,46 @@ DBL AOIPattern::operator()(const Vector3d& EPoint, const Intersection *Isection,
 *
 ******************************************************************************/
 
-DBL Spiral1Pattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
+DBL Spiral1Pattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
-	DBL rad, phi, turb_val;
-	DBL x = EPoint[X];
-	DBL y = EPoint[Y];
-	DBL z = EPoint[Z];
-	const TURB *Turb;
+    DBL rad, phi, turb_val;
+    DBL x = EPoint[X];
+    DBL y = EPoint[Y];
+    DBL z = EPoint[Z];
+    const TURB *Turb;
 
-	if ((Turb=Search_For_Turb(Warps)) != NULL)
-	{
-		turb_val = Turb->Turbulence[X] * Turbulence(EPoint,Turb,GetNoiseGen(Thread));
-	}
-	else
-	{
-		turb_val = 0.0;
-	}
+    if ((Turb=SearchForTurb(pWarps)) != NULL)
+    {
+        turb_val = Turb->Turbulence[X] * Turbulence(EPoint,Turb,GetNoiseGen(pThread));
+    }
+    else
+    {
+        turb_val = 0.0;
+    }
 
-	/* Get distance from z-axis. */
+    /* Get distance from z-axis. */
 
-	rad = sqrt(x * x + y * y);
+    rad = sqrt(x * x + y * y);
 
-	/* Get angle in x,y-plane (0...2 PI). */
+    /* Get angle in x,y-plane (0...2 PI). */
 
-	if (rad == 0.0)
-	{
-		phi = 0.0;
-	}
-	else
-	{
-		if (x < 0.0)
-		{
-			phi = 3.0 * M_PI_2 - asin(y / rad);
-		}
-		else
-		{
-			phi = M_PI_2 + asin(y / rad);
-		}
-	}
+    if (rad == 0.0)
+    {
+        phi = 0.0;
+    }
+    else
+    {
+        if (x < 0.0)
+        {
+            phi = 3.0 * M_PI_2 - asin(y / rad);
+        }
+        else
+        {
+            phi = M_PI_2 + asin(y / rad);
+        }
+    }
 
-	return(z + rad + (DBL)Arms * phi / TWO_M_PI + turb_val);
+    return(z + rad + (DBL)arms * phi / TWO_M_PI + turb_val);
 }
 
 
@@ -8242,49 +8271,49 @@ DBL Spiral1Pattern::operator()(const Vector3d& EPoint, const Intersection *Isect
 *
 ******************************************************************************/
 
-DBL Spiral2Pattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
+DBL Spiral2Pattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
-	DBL rad, phi, turb_val;
-	DBL x = EPoint[X];
-	DBL y = EPoint[Y];
-	DBL z = EPoint[Z];
-	const TURB *Turb;
+    DBL rad, phi, turb_val;
+    DBL x = EPoint[X];
+    DBL y = EPoint[Y];
+    DBL z = EPoint[Z];
+    const TURB *Turb;
 
-	if ((Turb=Search_For_Turb(Warps)) != NULL)
-	{
-		turb_val = Turb->Turbulence[X] * Turbulence(EPoint,Turb,GetNoiseGen(Thread));
-	}
-	else
-	{
-		turb_val = 0.0;
-	}
+    if ((Turb=SearchForTurb(pWarps)) != NULL)
+    {
+        turb_val = Turb->Turbulence[X] * Turbulence(EPoint,Turb,GetNoiseGen(pThread));
+    }
+    else
+    {
+        turb_val = 0.0;
+    }
 
-	/* Get distance from z-axis. */
+    /* Get distance from z-axis. */
 
-	rad = sqrt(x * x + y * y);
+    rad = sqrt(x * x + y * y);
 
-	/* Get angle in x,y-plane (0...2 PI) */
+    /* Get angle in x,y-plane (0...2 PI) */
 
-	if (rad == 0.0)
-	{
-		phi = 0.0;
-	}
-	else
-	{
-		if (x < 0.0)
-		{
-			phi = 3.0 * M_PI_2 - asin(y / rad);
-		}
-		else
-		{
-			phi = M_PI_2 + asin(y / rad);
-		}
-	}
+    if (rad == 0.0)
+    {
+        phi = 0.0;
+    }
+    else
+    {
+        if (x < 0.0)
+        {
+            phi = 3.0 * M_PI_2 - asin(y / rad);
+        }
+        else
+        {
+            phi = M_PI_2 + asin(y / rad);
+        }
+    }
 
-	turb_val = Triangle_Wave(z + rad + (DBL)Arms * phi / TWO_M_PI +
-	                         turb_val);
+    turb_val = Triangle_Wave(z + rad + (DBL)arms * phi / TWO_M_PI +
+                             turb_val);
 
-	return(Triangle_Wave(rad) + turb_val);
+    return(Triangle_Wave(rad) + turb_val);
 }
 
 
@@ -8319,14 +8348,14 @@ DBL Spiral2Pattern::operator()(const Vector3d& EPoint, const Intersection *Isect
 *
 ******************************************************************************/
 
-DBL SphericalPattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
+DBL SphericalPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
-	register DBL value;
+    register DBL value;
 
-	value = EPoint.length();
-	CLIP_DENSITY(value);
+    value = EPoint.length();
+    CLIP_DENSITY(value);
 
-	return(value);
+    return(value);
 }
 
 
@@ -8361,31 +8390,31 @@ DBL SphericalPattern::operator()(const Vector3d& EPoint, const Intersection *Ise
 *
 ******************************************************************************/
 
-DBL WavesPattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
+DBL WavesPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
-	register unsigned int i;
-	register DBL length, index;
-	DBL scalar = 0.0;
-	Vector3d point;
+    register unsigned int i;
+    register DBL length, index;
+    DBL scalar = 0.0;
+    Vector3d point;
 
-	for (i = 0 ; i < Thread->numberOfWaves ; i++)
-	{
-		point = EPoint - Thread->waveSources[i];
-		length = point.length();
+    for (i = 0 ; i < pThread->numberOfWaves ; i++)
+    {
+        point = EPoint - pThread->waveSources[i];
+        length = point.length();
 
-		if (length == 0.0)
-		{
-			length = 1.0;
-		}
+        if (length == 0.0)
+        {
+            length = 1.0;
+        }
 
-		index = length * Frequency * Thread->waveFrequencies[i] + Phase;
+        index = length * waveFrequency * pThread->waveFrequencies[i] + wavePhase;
 
-		scalar += cycloidal(index)/Thread->waveFrequencies[i];
-	}
+        scalar += cycloidal(index)/pThread->waveFrequencies[i];
+    }
 
-	scalar = 0.2*(2.5+(scalar / (DBL)Thread->numberOfWaves));
+    scalar = 0.2*(2.5+(scalar / (DBL)pThread->numberOfWaves));
 
-	return(scalar);
+    return(scalar);
 }
 
 
@@ -8419,36 +8448,36 @@ DBL WavesPattern::operator()(const Vector3d& EPoint, const Intersection *Isectio
 *
 ******************************************************************************/
 
-DBL WoodPattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
+DBL WoodPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
-	register DBL length;
-	Vector3d WoodTurbulence;
-	Vector3d point;
-	DBL x=EPoint[X];
-	DBL y=EPoint[Y];
-	const TURB *Turb;
+    register DBL length;
+    Vector3d WoodTurbulence;
+    Vector3d point;
+    DBL x=EPoint[X];
+    DBL y=EPoint[Y];
+    const TURB *Turb;
 
-	if ((Turb=Search_For_Turb(Warps)) != NULL)
-	{
-		DTurbulence (WoodTurbulence, EPoint, Turb);
-		point[X] = cycloidal((x + WoodTurbulence[X]) * Turb->Turbulence[X]);
-		point[Y] = cycloidal((y + WoodTurbulence[Y]) * Turb->Turbulence[Y]);
-	}
-	else
-	{
-		point[X] = 0.0;
-		point[Y] = 0.0;
-	}
-	point[Z] = 0.0;
+    if ((Turb=SearchForTurb(pWarps)) != NULL)
+    {
+        DTurbulence (WoodTurbulence, EPoint, Turb);
+        point[X] = cycloidal((x + WoodTurbulence[X]) * Turb->Turbulence[X]);
+        point[Y] = cycloidal((y + WoodTurbulence[Y]) * Turb->Turbulence[Y]);
+    }
+    else
+    {
+        point[X] = 0.0;
+        point[Y] = 0.0;
+    }
+    point[Z] = 0.0;
 
-	point[X] += x;
-	point[Y] += y;
+    point[X] += x;
+    point[Y] += y;
 
-	/* point[Z] += z; Deleted per David Buck --  BP 7/91 */
+    /* point[Z] += z; Deleted per David Buck --  BP 7/91 */
 
-	length = point.length();
+    length = point.length();
 
-	return(length);
+    return(length);
 }
 
 
@@ -8462,17 +8491,17 @@ DBL WoodPattern::operator()(const Vector3d& EPoint, const Intersection *Isection
 *
 *   EPoint -- The point in 3d space at which the pattern
 *   is evaluated.
-*   
+*
 * OUTPUT
-*   
+*
 * RETURNS
 *
 *   DBL value in the range 0.0 to 1.0
-*   
+*
 * AUTHOR
 *
 *   POV-Ray Team
-*   
+*
 * DESCRIPTION   : Note this pattern is only used for pigments and textures.
 *                 Normals have a specialized pattern for this.
 *
@@ -8482,47 +8511,57 @@ DBL WoodPattern::operator()(const Vector3d& EPoint, const Intersection *Isection
 *
 ******************************************************************************/
 
-DBL WrinklesPattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
+DBL WrinklesPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
-	int noise_generator = GetNoiseGen(Thread);
+    int noise_generator = GetNoiseGen(pThread);
 
-	register int i;
-	DBL lambda = 2.0;
-	DBL omega = 0.5;
-	DBL value;
-	Vector3d temp;
-	DBL noise;
+    register int i;
+    DBL lambda = 2.0;
+    DBL omega = 0.5;
+    DBL value;
+    Vector3d temp;
+    DBL noise;
 
-	if(noise_generator>1)
-	{
-		noise = Noise(EPoint, noise_generator)*2.0-0.5;
-		value = min(max(noise,0.0),1.0);
-	}
-	else
-	{
-		value = Noise(EPoint, noise_generator);
-	}
+    // TODO - This distinction (with minor variations that seem to be more of an inconsistency rather than intentional)
+    // appears in other places as well; make it a function.
+    switch (noise_generator)
+    {
+        case kNoiseGen_Default:
+        case kNoiseGen_Original:
+            value = Noise(EPoint, noise_generator);
+            break;
 
-	for (i = 1; i < 10; i++)
-	{
-		temp = EPoint * lambda;
+        default:
+            noise = Noise(EPoint, noise_generator)*2.0-0.5;
+            value = min(max(noise,0.0),1.0);
+            break;
+    }
 
-		if(noise_generator>1)
-		{
-			noise = Noise(temp, noise_generator)*2.0-0.5;
-			value += omega * min(max(noise,0.0),1.0);
-		}
-		else
-		{
-			value += omega * Noise(temp, noise_generator);
-		}
+    for (i = 1; i < 10; i++)
+    {
+        temp = EPoint * lambda;
 
-		lambda *= 2.0;
+        // TODO - This distinction (with minor variations that seem to be more of an inconsistency rather than intentional)
+        // appears in other places as well; make it a function.
+        switch (noise_generator)
+        {
+            case kNoiseGen_Default:
+            case kNoiseGen_Original:
+                value += omega * Noise(temp, noise_generator);
+                break;
 
-		omega *= 0.5;
-	}
+            default:
+                noise = Noise(temp, noise_generator)*2.0-0.5;
+                value += omega * min(max(noise,0.0),1.0);
+                break;
+        }
 
-	return(value/2.0);
+        lambda *= 2.0;
+
+        omega *= 0.5;
+    }
+
+    return(value/2.0);
 }
 
 
@@ -8538,16 +8577,16 @@ DBL WrinklesPattern::operator()(const Vector3d& EPoint, const Intersection *Isec
 *   ?
 *
 * OUTPUT
-*   
+*
 * RETURNS
 *
 *   long integer hash function used, to speed up cacheing.
-*   
+*
 * AUTHOR
 *
 *   original PickInCube by Jim McElhiney
 *   this integer one modified by Nathan Kopp
-*   
+*
 * DESCRIPTION
 *
 *   A subroutine to go with crackle.
@@ -8562,15 +8601,15 @@ DBL WrinklesPattern::operator()(const Vector3d& EPoint, const Intersection *Isec
 
 static int IntPickInCube(int tvx, int tvy, int tvz, Vector3d& p1)
 {
-	size_t seed;
+    size_t seed;
 
-	seed = size_t(Hash3d(tvx&0xFFF,tvy&0xFFF,tvz&0xFFF));
+    seed = size_t(Hash3d(tvx&0xFFF,tvy&0xFFF,tvz&0xFFF));
 
-	p1[X] = tvx + PatternRands(seed);
-	p1[Y] = tvy + PatternRands(seed + 1);
-	p1[Z] = tvz + PatternRands(seed + 2);
+    p1[X] = tvx + gPatternRands(seed);
+    p1[Y] = tvy + gPatternRands(seed + 1);
+    p1[Z] = tvz + gPatternRands(seed + 2);
 
-	return (int)seed;
+    return (int)seed;
 }
 
 
@@ -8585,15 +8624,15 @@ static int IntPickInCube(int tvx, int tvy, int tvz, Vector3d& p1)
 *   ?
 *
 * OUTPUT
-*   
+*
 * RETURNS
 *
 *   long integer hash function used, to speed up cacheing.
-*   
+*
 * AUTHOR
 *
 *   Jim McElhiney
-*   
+*
 * DESCRIPTION
 *
 *   A subroutine to go with crackle.
@@ -8608,26 +8647,26 @@ static int IntPickInCube(int tvx, int tvy, int tvz, Vector3d& p1)
 
 int PickInCube(const Vector3d& tv, Vector3d& p1)
 {
-	size_t seed;
-	Vector3d flo;
+    size_t seed;
+    Vector3d flo;
 
-	/*
-	 * This uses floor() not FLOOR, so it will not be a mirror
-	 * image about zero in the range -1.0 to 1.0. The viewer
-	 * won't see an artefact around the origin.
-	 */
+    /*
+     * This uses floor() not FLOOR, so it will not be a mirror
+     * image about zero in the range -1.0 to 1.0. The viewer
+     * won't see an artefact around the origin.
+     */
 
-	flo[X] = floor(tv[X] - EPSILON);
-	flo[Y] = floor(tv[Y] - EPSILON);
-	flo[Z] = floor(tv[Z] - EPSILON);
+    flo[X] = floor(tv[X] - EPSILON);
+    flo[Y] = floor(tv[Y] - EPSILON);
+    flo[Z] = floor(tv[Z] - EPSILON);
 
-	seed = size_t(Hash3d((int)flo[X], (int)flo[Y], (int)flo[Z]));
+    seed = size_t(Hash3d((int)flo[X], (int)flo[Y], (int)flo[Z]));
 
-	p1[X] = flo[X] + PatternRands(seed);
-	p1[Y] = flo[Y] + PatternRands(seed + 1);
-	p1[Z] = flo[Z] + PatternRands(seed + 2);
+    p1[X] = flo[X] + gPatternRands(seed);
+    p1[Y] = flo[Y] + gPatternRands(seed + 1);
+    p1[Z] = flo[Z] + gPatternRands(seed + 2);
 
-	return (int)seed;
+    return (int)seed;
 }
 
 /*****************************************************************************
@@ -8641,15 +8680,15 @@ int PickInCube(const Vector3d& tv, Vector3d& p1)
 *   3D integer coordinates of the cell
 *
 * OUTPUT
-*   
+*
 * RETURNS
 *
 *   long integer hash value
-*   
+*
 * AUTHOR
 *
 *   Christoph Hormann based on MechSim Hash function by Daniel Jungmann
-*   
+*
 * DESCRIPTION
 *
 *   New Hash function for the crackle pattern.
@@ -8663,20 +8702,20 @@ int PickInCube(const Vector3d& tv, Vector3d& p1)
 #ifndef HAVE_BOOST_HASH
 static unsigned long int NewHash(long int tvx, long int tvy, long int tvz)
 {
-	unsigned long int seed;
-	long int r;
+    unsigned long int seed;
+    long int r;
 
-	tvx *= 73856093L;
-	tvy *= 19349663L;
-	tvz *= 83492791L;
+    tvx *= 73856093L;
+    tvy *= 19349663L;
+    tvz *= 83492791L;
 
-	r = tvx ^ tvy ^ tvz;
-	seed = abs(r);
-	if (tvx<0) seed += LONG_MAX/2;
-	if (tvy<0) seed += LONG_MAX/4;
-	if (tvz<0) seed += LONG_MAX/8;
+    r = tvx ^ tvy ^ tvz;
+    seed = abs(r);
+    if (tvx<0) seed += LONG_MAX/2;
+    if (tvy<0) seed += LONG_MAX/4;
+    if (tvz<0) seed += LONG_MAX/8;
 
-	return (seed);
+    return (seed);
 }
 #endif
 
@@ -8702,24 +8741,24 @@ static unsigned long int NewHash(long int tvx, long int tvy, long int tvz)
 const DBL INV_SQRT_3_4 = 1.154700538;
 DBL quilt_cubic(DBL t, DBL p1, DBL p2)
 {
-	DBL it=(1-t);
-	DBL itsqrd=it*it;
-	/* DBL itcubed=it*itsqrd; */
-	DBL tsqrd=t*t;
-	DBL tcubed=t*tsqrd;
-	DBL val;
+    DBL it=(1-t);
+    DBL itsqrd=it*it;
+    /* DBL itcubed=it*itsqrd; */
+    DBL tsqrd=t*t;
+    DBL tcubed=t*tsqrd;
+    DBL val;
 
-	/* Originally coded as...
+    /* Originally coded as...
 
-	val= (DBL)(itcubed*n1+(tcubed)*n2+3*t*(itsqrd)*p1+3*(tsqrd)*(it)*p2);
+    val= (DBL)(itcubed*n1+(tcubed)*n2+3*t*(itsqrd)*p1+3*(tsqrd)*(it)*p2);
 
-	re-written by CEY to optimise because n1=0 n2=1 always.
+    re-written by CEY to optimise because n1=0 n2=1 always.
 
-	*/
+    */
 
-	val = (tcubed + 3.0*t*itsqrd*p1 + 3.0*tsqrd*it*p2) * INV_SQRT_3_4;
+    val = (tcubed + 3.0*t*itsqrd*p1 + 3.0*tsqrd*it*p2) * INV_SQRT_3_4;
 
-	return(val);
+    return(val);
 }
 
 
@@ -8743,28 +8782,28 @@ DBL quilt_cubic(DBL t, DBL p1, DBL p2)
 
 DBL FractalPattern::ExteriorColour(int iters, DBL a, DBL b) const
 {
-	switch(exterior_type)
-	{
-		case 0:
-			return efactor;
-		case 1:
-			return (DBL)iters / (DBL)Iterations;
-		case 2:
-			return a * efactor;
-		case 3:
-			return b * efactor;
-		case 4:
-			return a*a * efactor;
-		case 5:
-			return b*b * efactor;
-		case 6:
-			return sqrt(a*a+b*b) * efactor;
-		case 7: // range 0.. (n-1)/n
-			return (DBL)( iters % (unsigned int)efactor )/efactor;
-		case 8: // range 0.. 1
-			return (DBL)( iters % (unsigned int)(1+efactor) )/efactor;
-	}
-	return 0;
+    switch(exteriorType)
+    {
+        case 0:
+            return exteriorFactor;
+        case 1:
+            return (DBL)iters / (DBL)maxIterations;
+        case 2:
+            return a * exteriorFactor;
+        case 3:
+            return b * exteriorFactor;
+        case 4:
+            return a*a * exteriorFactor;
+        case 5:
+            return b*b * exteriorFactor;
+        case 6:
+            return sqrt(a*a+b*b) * exteriorFactor;
+        case 7: // range 0.. (n-1)/n
+            return (DBL)( iters % (unsigned int)exteriorFactor )/exteriorFactor;
+        case 8: // range 0.. 1
+            return (DBL)( iters % (unsigned int)(1+exteriorFactor) )/exteriorFactor;
+    }
+    return 0;
 }
 
 
@@ -8788,24 +8827,24 @@ DBL FractalPattern::ExteriorColour(int iters, DBL a, DBL b) const
 
 DBL FractalPattern::InteriorColour(DBL a, DBL b, DBL mindist2) const
 {
-	switch(interior_type)
-	{
-		case 0:
-			return ifactor;
-		case 1:
-			return sqrt(mindist2) * ifactor;
-		case 2:
-			return a * ifactor;
-		case 3:
-			return b * ifactor;
-		case 4:
-			return a*a * ifactor;
-		case 5:
-			return b*b * ifactor;
-		case 6:
-			return a*a+b*b * ifactor;
-	}
-	return 0;
+    switch(interiorType)
+    {
+        case 0:
+            return interiorFactor;
+        case 1:
+            return sqrt(mindist2) * interiorFactor;
+        case 2:
+            return a * interiorFactor;
+        case 3:
+            return b * interiorFactor;
+        case 4:
+            return a*a * interiorFactor;
+        case 5:
+            return b*b * interiorFactor;
+        case 6:
+            return a*a+b*b * interiorFactor;
+    }
+    return 0;
 }
 
 
@@ -8837,29 +8876,29 @@ DBL FractalPattern::InteriorColour(DBL a, DBL b, DBL mindist2) const
 
 DENSITY_FILE *Create_Density_File()
 {
-	DENSITY_FILE *New;
+    DENSITY_FILE *New;
 
-	New = reinterpret_cast<DENSITY_FILE *>(POV_MALLOC(sizeof(DENSITY_FILE), "density file"));
+    New = reinterpret_cast<DENSITY_FILE *>(POV_MALLOC(sizeof(DENSITY_FILE), "density file"));
 
-	New->Interpolation = NO_INTERPOLATION;
+    New->Interpolation = kDensityFileInterpolation_None;
 
-	New->Data = reinterpret_cast<DENSITY_FILE_DATA *>(POV_MALLOC(sizeof(DENSITY_FILE_DATA), "density file data"));
+    New->Data = reinterpret_cast<DENSITY_FILE_DATA *>(POV_MALLOC(sizeof(DENSITY_FILE_DATA), "density file data"));
 
-	New->Data->References = 1;
+    New->Data->References = 1;
 
-	New->Data->Name = NULL;
+    New->Data->Name = NULL;
 
-	New->Data->Sx =
-	New->Data->Sy =
-	New->Data->Sz = 0;
+    New->Data->Sx =
+    New->Data->Sy =
+    New->Data->Sz = 0;
 
-	New->Data->Type = 0;
+    New->Data->Type = 0;
 
-	New->Data->Density32 = NULL;
-	New->Data->Density16 = NULL;
-	New->Data->Density8 = NULL;
+    New->Data->Density32 = NULL;
+    New->Data->Density16 = NULL;
+    New->Data->Density8 = NULL;
 
-	return (New);
+    return (New);
 }
 
 
@@ -8891,22 +8930,22 @@ DENSITY_FILE *Create_Density_File()
 
 DENSITY_FILE *Copy_Density_File(DENSITY_FILE *Old)
 {
-	DENSITY_FILE *New;
+    DENSITY_FILE *New;
 
-	if (Old != NULL)
-	{
-		New = reinterpret_cast<DENSITY_FILE *>(POV_MALLOC(sizeof(DENSITY_FILE), "density file"));
+    if (Old != NULL)
+    {
+        New = reinterpret_cast<DENSITY_FILE *>(POV_MALLOC(sizeof(DENSITY_FILE), "density file"));
 
-		*New = *Old;
+        *New = *Old;
 
-		New->Data->References++;
-	}
-	else
-	{
-		New=NULL;
-	}
+        New->Data->References++;
+    }
+    else
+    {
+        New=NULL;
+    }
 
-	return(New);
+    return(New);
 }
 
 
@@ -8938,195 +8977,195 @@ DENSITY_FILE *Copy_Density_File(DENSITY_FILE *Old)
 
 void Destroy_Density_File(DENSITY_FILE *Density_File)
 {
-	if(Density_File != NULL)
-	{
-		if((--(Density_File->Data->References)) == 0)
-		{
-			POV_FREE(Density_File->Data->Name);
+    if(Density_File != NULL)
+    {
+        if((--(Density_File->Data->References)) == 0)
+        {
+            POV_FREE(Density_File->Data->Name);
 
-			if(Density_File->Data->Type == 4)
-			{
-				POV_FREE(Density_File->Data->Density32);
-			}
-			else if(Density_File->Data->Type == 2)
-			{
-				POV_FREE(Density_File->Data->Density16);
-			}
-			else if(Density_File->Data->Type == 1)
-			{
-				POV_FREE(Density_File->Data->Density8);
-			}
+            if(Density_File->Data->Type == 4)
+            {
+                POV_FREE(Density_File->Data->Density32);
+            }
+            else if(Density_File->Data->Type == 2)
+            {
+                POV_FREE(Density_File->Data->Density16);
+            }
+            else if(Density_File->Data->Type == 1)
+            {
+                POV_FREE(Density_File->Data->Density8);
+            }
 
-			POV_FREE(Density_File->Data);
-		}
+            POV_FREE(Density_File->Data);
+        }
 
-		POV_FREE(Density_File);
-	}
+        POV_FREE(Density_File);
+    }
 }
 
 void Read_Density_File(IStream *file, DENSITY_FILE *df)
 {
-	size_t x, y, z, sx, sy, sz, len;
+    size_t x, y, z, sx, sy, sz, len;
 
-	if (df == NULL)
-		return;
+    if (df == NULL)
+        return;
 
-	/* Allocate and read density file. */
+    /* Allocate and read density file. */
 
-	if((df != NULL) && (df->Data->Name != NULL))
-	{
-		sx = df->Data->Sx = readushort(file);
-		sy = df->Data->Sy = readushort(file);
-		sz = df->Data->Sz = readushort(file);
+    if((df != NULL) && (df->Data->Name != NULL))
+    {
+        sx = df->Data->Sx = ReadUShort(file);
+        sy = df->Data->Sy = ReadUShort(file);
+        sz = df->Data->Sz = ReadUShort(file);
 
-		file->seekg(0, IOBase::seek_end);
-		len = file->tellg() - 6;
-		file->seekg(6);
+        file->seekg(0, IOBase::seek_end);
+        len = file->tellg() - 6;
+        file->seekg(6);
 
-		// figure out the data size
-		if((sx * sy * sz * 4) == len)
-		{
-			df->Data->Type = 4;
+        // figure out the data size
+        if((sx * sy * sz * 4) == len)
+        {
+            df->Data->Type = 4;
 
-			unsigned int *map = reinterpret_cast<unsigned int *>(POV_MALLOC(sx * sy * sz * sizeof(unsigned int), "media density file data 32 bit"));
+            unsigned int *map = reinterpret_cast<unsigned int *>(POV_MALLOC(sx * sy * sz * sizeof(unsigned int), "media density file data 32 bit"));
 
-			for (z = 0; z < sz; z++)
-			{
-				for (y = 0; y < sy; y++)
-				{
-					for (x = 0; x < sx; x++)
-						map[z * sy * sx + y * sx + x] = readuint(file);
-				}
-			}
+            for (z = 0; z < sz; z++)
+            {
+                for (y = 0; y < sy; y++)
+                {
+                    for (x = 0; x < sx; x++)
+                        map[z * sy * sx + y * sx + x] = ReadUInt(file);
+                }
+            }
 
-			df->Data->Density32 = map;
-		}
-		else if((sx * sy * sz * 2) == len)
-		{
-			df->Data->Type = 2;
+            df->Data->Density32 = map;
+        }
+        else if((sx * sy * sz * 2) == len)
+        {
+            df->Data->Type = 2;
 
-			unsigned short *map = reinterpret_cast<unsigned short *>(POV_MALLOC(sx * sy * sz * sizeof(unsigned short), "media density file data 16 bit"));
+            unsigned short *map = reinterpret_cast<unsigned short *>(POV_MALLOC(sx * sy * sz * sizeof(unsigned short), "media density file data 16 bit"));
 
-			for (z = 0; z < sz; z++)
-			{
-				for (y = 0; y < sy; y++)
-				{
-					for (x = 0; x < sx; x++)
-						map[z * sy * sx + y * sx + x] = readushort(file);
-				}
-			}
+            for (z = 0; z < sz; z++)
+            {
+                for (y = 0; y < sy; y++)
+                {
+                    for (x = 0; x < sx; x++)
+                        map[z * sy * sx + y * sx + x] = ReadUShort(file);
+                }
+            }
 
-			df->Data->Density16 = map;
-		}
-		else if((sx * sy * sz) == len)
-		{
-			df->Data->Type = 1;
+            df->Data->Density16 = map;
+        }
+        else if((sx * sy * sz) == len)
+        {
+            df->Data->Type = 1;
 
-			unsigned char *map = reinterpret_cast<unsigned char *>(POV_MALLOC(sx * sy * sz * sizeof(unsigned char), "media density file data 8 bit"));
+            unsigned char *map = reinterpret_cast<unsigned char *>(POV_MALLOC(sx * sy * sz * sizeof(unsigned char), "media density file data 8 bit"));
 
-			for (z = 0; z < sz; z++)
-			{
-				for (y = 0; y < sy; y++)
-					file->read(&(map[z * sy * sx + y * sx]), sizeof(unsigned char) * sx);
-			}
+            for (z = 0; z < sz; z++)
+            {
+                for (y = 0; y < sy; y++)
+                    file->read(&(map[z * sy * sx + y * sx]), sizeof(unsigned char) * sx);
+            }
 
-			df->Data->Density8 = map;
-		}
-		else
-			throw POV_EXCEPTION_STRING("Invalid density file size");
+            df->Data->Density8 = map;
+        }
+        else
+            throw POV_EXCEPTION_STRING("Invalid density file size");
 
-		if (file != NULL)
-		{
-			delete file;
-		}
-	}
+        if (file != NULL)
+        {
+            delete file;
+        }
+    }
 }
 
-static unsigned short readushort(IStream *infile)
+static unsigned short ReadUShort(IStream *pInFile)
 {
-	short i0 = 0, i1 = 0;
+    int i0 = 0, i1 = 0;
 
-	if ((i0 = infile->Read_Byte ()) == EOF || (i1 = infile->Read_Byte ()) == EOF)
-	{
-		throw POV_EXCEPTION_STRING("Error reading density_file");
-	}
+    if ((i0 = pInFile->Read_Byte ()) == EOF || (i1 = pInFile->Read_Byte ()) == EOF)
+    {
+        throw POV_EXCEPTION_STRING("Error reading density_file");
+    }
 
-	return (((unsigned short)i0 << 8) | (unsigned short)i1);
+    return (((unsigned short)i0 << 8) | (unsigned short)i1);
 }
 
-static unsigned int readuint(IStream *infile)
+static unsigned int ReadUInt(IStream *pInFile)
 {
-	int i0 = 0, i1 = 0, i2 = 0, i3 = 0;
+    int i0 = 0, i1 = 0, i2 = 0, i3 = 0;
 
-	if ((i0 = infile->Read_Byte ()) == EOF || (i1 = infile->Read_Byte ()) == EOF ||
-	    (i2 = infile->Read_Byte ()) == EOF || (i3 = infile->Read_Byte ()) == EOF)
-	{
-		throw POV_EXCEPTION_STRING("Error reading density_file");
-	}
+    if ((i0 = pInFile->Read_Byte ()) == EOF || (i1 = pInFile->Read_Byte ()) == EOF ||
+        (i2 = pInFile->Read_Byte ()) == EOF || (i3 = pInFile->Read_Byte ()) == EOF)
+    {
+        throw POV_EXCEPTION_STRING("Error reading density_file");
+    }
 
-	return (((unsigned int)i0 << 24) | ((unsigned int)i1 << 16) | ((unsigned int)i2 << 8) | (unsigned int)i3);
+    return (((unsigned int)i0 << 24) | ((unsigned int)i1 << 16) | ((unsigned int)i2 << 8) | (unsigned int)i3);
 }
 
 static void InitializeBinomialCoefficients(void)
 {
-	int* ptr = BinomialCoefficients;
-	*ptr = 1; ++ptr;
+    int* ptr = gaBinomialCoefficients;
+    *ptr = 1; ++ptr;
 
-	for(unsigned n=1; n<=FRACTAL_MAX_EXPONENT; ++n)
-	{
-		*ptr = 1; ++ptr;
-		for(unsigned k=1; k<n; ++k)
-		{
-			*ptr = *(ptr-(n+1)) + *(ptr-n); ++ptr;
-		}
-		*ptr = 1; ++ptr;
-	}
-	ptr = BinomialCoefficients+1;
-	for(unsigned m=1; m<=FRACTAL_MAX_EXPONENT; ++m)
-	{
-		++ptr;
-		for(unsigned k=1; k<m; ++k)
-		{
-			if((k&2)!=0) *ptr = -(*ptr);
-			++ptr;
-		}
-		if((m&2)!=0) *ptr = -(*ptr);
-		++ptr;
-	}
+    for(unsigned n=1; n<=kFractalMaxExponent; ++n)
+    {
+        *ptr = 1; ++ptr;
+        for(unsigned k=1; k<n; ++k)
+        {
+            *ptr = *(ptr-(n+1)) + *(ptr-n); ++ptr;
+        }
+        *ptr = 1; ++ptr;
+    }
+    ptr = gaBinomialCoefficients+1;
+    for(unsigned m=1; m<=kFractalMaxExponent; ++m)
+    {
+        ++ptr;
+        for(unsigned k=1; k<m; ++k)
+        {
+            if((k&2)!=0) *ptr = -(*ptr);
+            ++ptr;
+        }
+        if((m&2)!=0) *ptr = -(*ptr);
+        ++ptr;
+    }
 }
 
 static void InitialiseCrackleCubeTable(void)
 {
-	int     *p = CrackleCubeTable;
+    int     *p = gaCrackleCubeTable;
 
-	// the crackle cube table is a list of offsets in the range -2 ... 2 which
-	// are applied to the EPoint while evaluating the Crackle pattern, in order
-	// to look up points in close-by cubes. consider the EPoint to be in a cube
-	// at the center of a 3x3 grid of cubes; candidate cubes are that are within
-	// a "3d knight move" away (i.e. not more than 2 units). we use a lookup table
-	// to speed up iteration of the cube list by avoiding branch tests.
-	for(int addx = -2; addx <= 2; addx++)
-	{
-		for(int addy = -2; addy <= 2; addy++)
-		{
-			for(int addz = -2; addz <= 2; addz++)
-			{
-				if((abs(addx) == 2) + (abs(addy) == 2) + (abs(addz) == 2) <= 1)
-				{
-					*p++ = addx;
-					*p++ = addy;
-					*p++ = addz;
-				}
-			}
-		}
-	}
+    // the crackle cube table is a list of offsets in the range -2 ... 2 which
+    // are applied to the EPoint while evaluating the Crackle pattern, in order
+    // to look up points in close-by cubes. consider the EPoint to be in a cube
+    // at the center of a 3x3 grid of cubes; candidate cubes are that are within
+    // a "3d knight move" away (i.e. not more than 2 units). we use a lookup table
+    // to speed up iteration of the cube list by avoiding branch tests.
+    for(int addx = -2; addx <= 2; addx++)
+    {
+        for(int addy = -2; addy <= 2; addy++)
+        {
+            for(int addz = -2; addz <= 2; addz++)
+            {
+                if((abs(addx) == 2) + (abs(addy) == 2) + (abs(addz) == 2) <= 1)
+                {
+                    *p++ = addx;
+                    *p++ = addy;
+                    *p++ = addz;
+                }
+            }
+        }
+    }
 }
 
 // This should be called once, at povray start
 void InitializePatternGenerators(void)
 {
-	InitializeBinomialCoefficients();
-	InitialiseCrackleCubeTable();
+    InitializeBinomialCoefficients();
+    InitialiseCrackleCubeTable();
 }
 
 }

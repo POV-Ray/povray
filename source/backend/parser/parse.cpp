@@ -1,35 +1,37 @@
-/*******************************************************************************
- * parse.cpp
- *
- * This module implements a parser for the scene description files.
- *
- * ---------------------------------------------------------------------------
- * Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
- * Copyright 1991-2013 Persistence of Vision Raytracer Pty. Ltd.
- *
- * POV-Ray is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * POV-Ray is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------------
- * POV-Ray is based on the popular DKB raytracer version 2.12.
- * DKBTrace was originally written by David K. Buck.
- * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
- * ---------------------------------------------------------------------------
- * $File: //depot/povray/smp/source/backend/parser/parse.cpp $
- * $Revision: #205 $
- * $Change: 6164 $
- * $DateTime: 2013/12/09 17:21:04 $
- * $Author: clipka $
- *******************************************************************************/
+//******************************************************************************
+///
+/// @file backend/parser/parse.cpp
+///
+/// This module implements a parser for the scene description files.
+///
+/// @copyright
+/// @parblock
+///
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
+/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+///
+/// POV-Ray is free software: you can redistribute it and/or modify
+/// it under the terms of the GNU Affero General Public License as
+/// published by the Free Software Foundation, either version 3 of the
+/// License, or (at your option) any later version.
+///
+/// POV-Ray is distributed in the hope that it will be useful,
+/// but WITHOUT ANY WARRANTY; without even the implied warranty of
+/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+/// GNU Affero General Public License for more details.
+///
+/// You should have received a copy of the GNU Affero General Public License
+/// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+///
+/// ----------------------------------------------------------------------------
+///
+/// POV-Ray is based on the popular DKB raytracer version 2.12.
+/// DKBTrace was originally written by David K. Buck.
+/// DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
+///
+/// @endparblock
+///
+//*******************************************************************************
 
 #include <cctype>
 #include <cmath>
@@ -338,7 +340,7 @@ void Parser::Run()
 	// be gained from disabling the defaulting of the noise generator to
 	// something other than compatibilty mode.
 	if (sceneData->explicitNoiseGenerator == false)
-		sceneData->noiseGenerator = sceneData->languageVersion < 350 ? 1 : 2;
+		sceneData->noiseGenerator = sceneData->languageVersion < 350 ? kNoiseGen_Original : kNoiseGen_RangeCorrected;
 
 	if((sceneData->gammaMode != kPOVList_GammaMode_AssumedGamma36) && (sceneData->gammaMode != kPOVList_GammaMode_AssumedGamma37))
 	{
@@ -6871,8 +6873,8 @@ void Parser::Parse_Global_Settings()
 
 		CASE (NOISE_GENERATOR_TOKEN)
 			sceneData->noiseGenerator = (int) Parse_Float();
-			if (sceneData->noiseGenerator < 1 || sceneData->noiseGenerator > 3)
-				Error ("Value for noise_generator in global_settings must be 1, 2, or 3.");
+			if (sceneData->noiseGenerator < kNoiseGen_Min || sceneData->noiseGenerator > kNoiseGen_Max)
+				Error ("Value for noise_generator in global_settings must be between %i (inclusive) and %i (inclusive).", kNoiseGen_Min, kNoiseGen_Max);
 			sceneData->explicitNoiseGenerator = true;
 		END_CASE
 

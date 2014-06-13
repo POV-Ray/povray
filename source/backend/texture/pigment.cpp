@@ -1,42 +1,44 @@
-/*******************************************************************************
- * pigment.cpp
- *
- * This module implements solid texturing functions that modify the color
- * transparency of an object's surface.
- *
- * ---------------------------------------------------------------------------
- * Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
- * Copyright 1991-2013 Persistence of Vision Raytracer Pty. Ltd.
- *
- * POV-Ray is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * POV-Ray is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------------
- * POV-Ray is based on the popular DKB raytracer version 2.12.
- * DKBTrace was originally written by David K. Buck.
- * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
- * ---------------------------------------------------------------------------
- * $File: //depot/povray/smp/source/backend/texture/pigment.cpp $
- * $Revision: #41 $
- * $Change: 6163 $
- * $DateTime: 2013/12/08 22:48:58 $
- * $Author: clipka $
- *******************************************************************************/
-
-/*
-   Some texture ideas garnered from SIGGRAPH '85 Volume 19 Number 3, 
-   "An Image Synthesizer" By Ken Perlin.
-   Further Ideas Garnered from "The RenderMan Companion" (Addison Wesley).
-*/
+//******************************************************************************
+///
+/// @file backend/texture/pigment.cpp
+///
+/// This module implements texturing functions that return a value to be used in
+/// a pigment or normal.
+///
+/// @copyright
+/// @parblock
+///
+/// Some texture ideas garnered from SIGGRAPH '85 Volume 19 Number 3, "An Image
+/// Synthesizer" By Ken Perlin. Further Ideas Garnered from "The RenderMan
+/// Companion" (Addison Wesley).
+///
+/// ----------------------------------------------------------------------------
+///
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
+/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+///
+/// POV-Ray is free software: you can redistribute it and/or modify
+/// it under the terms of the GNU Affero General Public License as
+/// published by the Free Software Foundation, either version 3 of the
+/// License, or (at your option) any later version.
+///
+/// POV-Ray is distributed in the hope that it will be useful,
+/// but WITHOUT ANY WARRANTY; without even the implied warranty of
+/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+/// GNU Affero General Public License for more details.
+///
+/// You should have received a copy of the GNU Affero General Public License
+/// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+///
+/// ----------------------------------------------------------------------------
+///
+/// POV-Ray is based on the popular DKB raytracer version 2.12.
+/// DKBTrace was originally written by David K. Buck.
+/// DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
+///
+/// @endparblock
+///
+//*******************************************************************************
 
 // frame.h must always be the first POV file included (pulls in platform config)
 #include "backend/frame.h"
@@ -87,17 +89,17 @@ static void Do_Average_Pigments (Colour& colour, const PIGMENT *Pigment, const V
 *   Create_Pigment
 *
 * INPUT
-*   
+*
 * OUTPUT
-*   
+*
 * RETURNS
 *
 *   pointer to the created pigment
-*   
+*
 * AUTHOR
 *
 *   POV-Ray Team
-*   
+*
 * DESCRIPTION   : Allocate memory for new pigment and initialize it to
 *                 system default values.
 *
@@ -107,17 +109,17 @@ static void Do_Average_Pigments (Colour& colour, const PIGMENT *Pigment, const V
 
 PIGMENT *Create_Pigment ()
 {
-	PIGMENT *New;
+    PIGMENT *New;
 
-	New = new PIGMENT;
+    New = new PIGMENT;
 
-	Init_TPat_Fields(New);
+    Init_TPat_Fields(New);
 
-	New->colour.clear();
-	New->Quick_Colour = Colour(-1.0,-1.0,-1.0);
-	New->Blend_Map = NULL;
+    New->colour.clear();
+    New->Quick_Colour = Colour(-1.0,-1.0,-1.0);
+    New->Blend_Map = NULL;
 
-	return (New);
+    return (New);
 }
 
 
@@ -131,15 +133,15 @@ PIGMENT *Create_Pigment ()
 * INPUT
 *
 *   Old -- point to pigment to be copied
-*   
+*
 * RETURNS
 *
 *   pointer to the created pigment
-*   
+*
 * AUTHOR
 *
 *   POV-Ray Team
-*   
+*
 * DESCRIPTION   : Allocate memory for new pigment and initialize it to
 *                 values in existing pigment Old.
 *
@@ -149,32 +151,32 @@ PIGMENT *Create_Pigment ()
 
 PIGMENT *Copy_Pigment (const PIGMENT *Old)
 {
-	PIGMENT *New;
+    PIGMENT *New;
 
-	if (Old != NULL)
-	{
-		New = Create_Pigment ();
+    if (Old != NULL)
+    {
+        New = Create_Pigment ();
 
-		Copy_TPat_Fields (New, Old);
+        Copy_TPat_Fields (New, Old);
 
-		if (Old->Type == PLAIN_PATTERN)
-			New->colour = Old->colour;
-		New->Quick_Colour = Old->Quick_Colour;
-	}
-	else
-	{
-		New = NULL;
-	}
+        if (Old->Type == PLAIN_PATTERN)
+            New->colour = Old->colour;
+        New->Quick_Colour = Old->Quick_Colour;
+    }
+    else
+    {
+        New = NULL;
+    }
 
-	return (New);
+    return (New);
 }
 
 void Copy_Pigments (vector<PIGMENT*>& New, const vector<PIGMENT*>& Old)
 {
-	New.resize(0);
-	New.reserve(Old.size());
-	for (vector<PIGMENT*>::const_iterator i = Old.begin(); i != Old.end(); ++ i)
-		New.push_back(Copy_Pigment(*i));
+    New.resize(0);
+    New.reserve(Old.size());
+    for (vector<PIGMENT*>::const_iterator i = Old.begin(); i != Old.end(); ++ i)
+        New.push_back(Copy_Pigment(*i));
 }
 
 
@@ -188,15 +190,15 @@ void Copy_Pigments (vector<PIGMENT*>& New, const vector<PIGMENT*>& Old)
 * INPUT
 *
 *   pointer to pigment to destroied
-*   
+*
 * OUTPUT
-*   
+*
 * RETURNS
-*   
+*
 * AUTHOR
 *
 *   POV-Ray Team
-*   
+*
 * DESCRIPTION   : free all memory associated with given pigment
 *
 * CHANGES
@@ -205,12 +207,12 @@ void Copy_Pigments (vector<PIGMENT*>& New, const vector<PIGMENT*>& Old)
 
 void Destroy_Pigment (PIGMENT *Pigment)
 {
-	if (Pigment != NULL)
-	{
-		Destroy_TPat_Fields (Pigment);
+    if (Pigment != NULL)
+    {
+        Destroy_TPat_Fields (Pigment);
 
-		delete Pigment;
-	}
+        delete Pigment;
+    }
 }
 
 
@@ -222,15 +224,15 @@ void Destroy_Pigment (PIGMENT *Pigment)
 *   Post_Pigment
 *
 * INPUT
-*   
+*
 * OUTPUT
-*   
+*
 * RETURNS
-*   
+*
 * AUTHOR
 *
 *   Chris Young
-*   
+*
 * DESCRIPTION
 *
 * CHANGES
@@ -239,95 +241,95 @@ void Destroy_Pigment (PIGMENT *Pigment)
 
 int Post_Pigment(PIGMENT *Pigment)
 {
-	int i, Has_Filter;
-	BLEND_MAP *Map;
+    int i, Has_Filter;
+    BLEND_MAP *Map;
 
-	if (Pigment == NULL)
-	{
-		throw POV_EXCEPTION_STRING("Missing pigment");
-	}
+    if (Pigment == NULL)
+    {
+        throw POV_EXCEPTION_STRING("Missing pigment");
+    }
 
-	if (Pigment->Flags & POST_DONE)
-	{
-		return(Pigment->Flags & HAS_FILTER);
-	}
+    if (Pigment->Flags & POST_DONE)
+    {
+        return(Pigment->Flags & HAS_FILTER);
+    }
 
-	if (Pigment->Type == NO_PATTERN)
-	{
-		Pigment->Type = PLAIN_PATTERN;
+    if (Pigment->Type == NO_PATTERN)
+    {
+        Pigment->Type = PLAIN_PATTERN;
 
-		Pigment->colour.clear() ;
+        Pigment->colour.clear() ;
 
 ;// TODO MESSAGE    Warning(150, "No pigment type given.");
-	}
+    }
 
-	Pigment->Flags |= POST_DONE;
+    Pigment->Flags |= POST_DONE;
 
-	switch (Pigment->Type)
-	{
-		case PLAIN_PATTERN:
-		case NO_PATTERN:
-		case BITMAP_PATTERN:
+    switch (Pigment->Type)
+    {
+        case PLAIN_PATTERN:
+        case NO_PATTERN:
+        case BITMAP_PATTERN:
 
-			break;
+            break;
 
-		default:
+        default:
 
-			if (Pigment->Blend_Map == NULL)
-			{
-				switch (Pigment->Type)
-				{
-					// NB: The const default blend maps are marked so that they will not be modified nor destroyed later.
-					case AVERAGE_PATTERN: break;// TODO MESSAGE Error("Missing pigment_map in average pigment"); break;
-					default:              Pigment->Blend_Map = const_cast<BLEND_MAP *>(Pigment->pattern->GetDefaultBlendMap());  break;
-				}
-			}
+            if (Pigment->Blend_Map == NULL)
+            {
+                switch (Pigment->Type)
+                {
+                    // NB: The const default blend maps are marked so that they will not be modified nor destroyed later.
+                    case AVERAGE_PATTERN: break;// TODO MESSAGE Error("Missing pigment_map in average pigment"); break;
+                    default:              Pigment->Blend_Map = const_cast<BLEND_MAP *>(Pigment->pattern->GetDefaultBlendMap());  break;
+                }
+            }
 
-			break;
-	}
+            break;
+    }
 
-	/* Now we test wether this pigment is opaque or not. [DB 8/94] */
+    /* Now we test wether this pigment is opaque or not. [DB 8/94] */
 
-	Has_Filter = false;
+    Has_Filter = false;
 
-	if ((fabs(Pigment->colour.filter()) > EPSILON) ||
-	    (fabs(Pigment->colour.transm()) > EPSILON))
-	{
-		Has_Filter = true;
-	}
+    if ((fabs(Pigment->colour.filter()) > EPSILON) ||
+        (fabs(Pigment->colour.transm()) > EPSILON))
+    {
+        Has_Filter = true;
+    }
 
-	if ((Pigment->Type == BITMAP_PATTERN) &&
-	    (dynamic_cast<ImagePattern*>(Pigment->pattern.get())->image != NULL))
-	{
-		// bitmaps are transparent if they are used only once, or the image is not opaque
-		Has_Filter |= (dynamic_cast<ImagePattern*>(Pigment->pattern.get())->image->Once_Flag) || !is_image_opaque(dynamic_cast<ImagePattern*>(Pigment->pattern.get())->image);
-	}
+    if ((Pigment->Type == BITMAP_PATTERN) &&
+        (dynamic_cast<ImagePattern*>(Pigment->pattern.get())->pImage != NULL))
+    {
+        // bitmaps are transparent if they are used only once, or the image is not opaque
+        Has_Filter |= (dynamic_cast<ImagePattern*>(Pigment->pattern.get())->pImage->Once_Flag) || !is_image_opaque(dynamic_cast<ImagePattern*>(Pigment->pattern.get())->pImage);
+    }
 
-	if ((Map = Pigment->Blend_Map) != NULL)
-	{
-		if ((Map->Type == PIGMENT_TYPE) || (Map->Type == DENSITY_TYPE))
-		{
-			for (i = 0; i < Map->Number_Of_Entries; i++)
-			{
-				Has_Filter |= Post_Pigment(Map->Blend_Map_Entries[i].Vals.Pigment);
-			}
-		}
-		else
-		{
-			for (i = 0; i < Map->Number_Of_Entries; i++)
-			{
-				Has_Filter |= fabs(Map->Blend_Map_Entries[i].Vals.colour[pFILTER])>EPSILON;
-				Has_Filter |= fabs(Map->Blend_Map_Entries[i].Vals.colour[pTRANSM])>EPSILON;
-			}
-		}
-	}
+    if ((Map = Pigment->Blend_Map) != NULL)
+    {
+        if ((Map->Type == PIGMENT_TYPE) || (Map->Type == DENSITY_TYPE))
+        {
+            for (i = 0; i < Map->Number_Of_Entries; i++)
+            {
+                Has_Filter |= Post_Pigment(Map->Blend_Map_Entries[i].Vals.Pigment);
+            }
+        }
+        else
+        {
+            for (i = 0; i < Map->Number_Of_Entries; i++)
+            {
+                Has_Filter |= fabs(Map->Blend_Map_Entries[i].Vals.colour[pFILTER])>EPSILON;
+                Has_Filter |= fabs(Map->Blend_Map_Entries[i].Vals.colour[pTRANSM])>EPSILON;
+            }
+        }
+    }
 
-	if (Has_Filter)
-	{
-		Pigment->Flags |= HAS_FILTER;
-	}
+    if (Has_Filter)
+    {
+        Pigment->Flags |= HAS_FILTER;
+    }
 
-	return(Has_Filter);
+    return(Has_Filter);
 }
 
 
@@ -370,133 +372,133 @@ int Post_Pigment(PIGMENT *Pigment)
 
 bool Compute_Pigment (Colour& colour, const PIGMENT *Pigment, const Vector3d& EPoint, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread)
 {
-	int Colour_Found;
-	Vector3d TPoint;
-	DBL value;
-	register DBL fraction;
-	const BLEND_MAP_ENTRY *Cur, *Prev;
-	Colour Temp_Colour;
-	const BLEND_MAP *Blend_Map = Pigment->Blend_Map;
-	Vector2d UV_Coords;
+    int Colour_Found;
+    Vector3d TPoint;
+    DBL value;
+    register DBL fraction;
+    const BLEND_MAP_ENTRY *Cur, *Prev;
+    Colour Temp_Colour;
+    const BLEND_MAP *Blend_Map = Pigment->Blend_Map;
+    Vector2d UV_Coords;
 
-	if ((Thread->qualityFlags & Q_QUICKC) != 0 && Pigment->Quick_Colour.red() != -1.0 && Pigment->Quick_Colour.green() != -1.0 && Pigment->Quick_Colour.blue() != -1.0)
-	{
-		colour = Pigment->Quick_Colour;
-		return (true);
-	}
+    if ((Thread->qualityFlags & Q_QUICKC) != 0 && Pigment->Quick_Colour.red() != -1.0 && Pigment->Quick_Colour.green() != -1.0 && Pigment->Quick_Colour.blue() != -1.0)
+    {
+        colour = Pigment->Quick_Colour;
+        return (true);
+    }
 
-	if (Pigment->Type <= LAST_SPECIAL_PATTERN)
-	{
-		Colour_Found = true;
+    if (Pigment->Type <= LAST_SPECIAL_PATTERN)
+    {
+        Colour_Found = true;
 
-		switch (Pigment->Type)
-		{
-			case NO_PATTERN:
+        switch (Pigment->Type)
+        {
+            case NO_PATTERN:
 
-				colour.clear();
+                colour.clear();
 
-				break;
+                break;
 
-			case PLAIN_PATTERN:
+            case PLAIN_PATTERN:
 
-				colour = Pigment->colour;
+                colour = Pigment->colour;
 
-				break;
+                break;
 
-			case AVERAGE_PATTERN:
+            case AVERAGE_PATTERN:
 
-				Warp_EPoint (TPoint, EPoint, Pigment);
+                Warp_EPoint (TPoint, EPoint, Pigment);
 
-				Do_Average_Pigments(colour, Pigment, TPoint, Intersect, ray, Thread);
+                Do_Average_Pigments(colour, Pigment, TPoint, Intersect, ray, Thread);
 
-				break;
+                break;
 
-			case UV_MAP_PATTERN:
-				if(Intersect == NULL)
-					throw POV_EXCEPTION_STRING("The 'uv_mapping' pattern cannot be used as part of a pigment function!");
+            case UV_MAP_PATTERN:
+                if(Intersect == NULL)
+                    throw POV_EXCEPTION_STRING("The 'uv_mapping' pattern cannot be used as part of a pigment function!");
 
-				Cur = &(Pigment->Blend_Map->Blend_Map_Entries[0]);
+                Cur = &(Pigment->Blend_Map->Blend_Map_Entries[0]);
 
-				if (Blend_Map->Type == COLOUR_TYPE)
-				{
-					Colour_Found = true;
+                if (Blend_Map->Type == COLOUR_TYPE)
+                {
+                    Colour_Found = true;
 
-					colour = Colour(Cur->Vals.colour);
-				}
-				else
-				{
-					/* Don't bother warping, simply get the UV vect of the intersection */
-					Intersect->Object->UVCoord(UV_Coords, Intersect, Thread);
-					TPoint[X] = UV_Coords[U];
-					TPoint[Y] = UV_Coords[V];
-					TPoint[Z] = 0;
+                    colour = Colour(Cur->Vals.colour);
+                }
+                else
+                {
+                    /* Don't bother warping, simply get the UV vect of the intersection */
+                    Intersect->Object->UVCoord(UV_Coords, Intersect, Thread);
+                    TPoint[X] = UV_Coords[U];
+                    TPoint[Y] = UV_Coords[V];
+                    TPoint[Z] = 0;
 
-					if (Compute_Pigment(colour, Cur->Vals.Pigment, TPoint, Intersect, ray, Thread))
-						Colour_Found = true;
-				}
+                    if (Compute_Pigment(colour, Cur->Vals.Pigment, TPoint, Intersect, ray, Thread))
+                        Colour_Found = true;
+                }
 
-				break;
+                break;
 
-			case BITMAP_PATTERN:
+            case BITMAP_PATTERN:
 
-				Warp_EPoint (TPoint, EPoint, Pigment);
+                Warp_EPoint (TPoint, EPoint, Pigment);
 
-				colour.clear();
+                colour.clear();
 
-				Colour_Found = image_map (TPoint, Pigment, colour);
+                Colour_Found = image_map (TPoint, Pigment, colour);
 
-				break;
+                break;
 
-			default:
+            default:
 
-				throw POV_EXCEPTION_STRING("Pigment type not yet implemented.");
-		}
+                throw POV_EXCEPTION_STRING("Pigment type not yet implemented.");
+        }
 
-		return(Colour_Found);
-	}
+        return(Colour_Found);
+    }
 
-	Colour_Found = false;
+    Colour_Found = false;
 
-	/* NK 19 Nov 1999 added Warp_EPoint */
-	Warp_EPoint (TPoint, EPoint, Pigment);
-	value = Evaluate_TPat (Pigment, TPoint, Intersect, ray, Thread);
+    /* NK 19 Nov 1999 added Warp_EPoint */
+    Warp_EPoint (TPoint, EPoint, Pigment);
+    value = Evaluate_TPat (Pigment, TPoint, Intersect, ray, Thread);
 
-	Search_Blend_Map (value, Blend_Map, &Prev, &Cur);
+    Search_Blend_Map (value, Blend_Map, &Prev, &Cur);
 
-	if (Blend_Map->Type == COLOUR_TYPE)
-	{
-		Colour_Found = true;
+    if (Blend_Map->Type == COLOUR_TYPE)
+    {
+        Colour_Found = true;
 
-		colour = Colour(Cur->Vals.colour);
-	}
-	else
-	{
-		Warp_EPoint (TPoint, EPoint, Pigment);
+        colour = Colour(Cur->Vals.colour);
+    }
+    else
+    {
+        Warp_EPoint (TPoint, EPoint, Pigment);
 
-		if (Compute_Pigment(colour, Cur->Vals.Pigment, TPoint, Intersect, ray, Thread))
-			Colour_Found = true;
-	}
+        if (Compute_Pigment(colour, Cur->Vals.Pigment, TPoint, Intersect, ray, Thread))
+            Colour_Found = true;
+    }
 
-	if (Prev != Cur)
-	{
-		if (Blend_Map->Type == COLOUR_TYPE)
-		{
-			Colour_Found = true;
+    if (Prev != Cur)
+    {
+        if (Blend_Map->Type == COLOUR_TYPE)
+        {
+            Colour_Found = true;
 
-			Temp_Colour = Colour(Prev->Vals.colour);
-		}
-		else
-		{
-			if (Compute_Pigment(Temp_Colour, Prev->Vals.Pigment, TPoint, Intersect, ray, Thread))
-				Colour_Found = true;
-		}
+            Temp_Colour = Colour(Prev->Vals.colour);
+        }
+        else
+        {
+            if (Compute_Pigment(Temp_Colour, Prev->Vals.Pigment, TPoint, Intersect, ray, Thread))
+                Colour_Found = true;
+        }
 
-		fraction = (value - Prev->value) / (Cur->value - Prev->value);
+        fraction = (value - Prev->value) / (Cur->value - Prev->value);
 
-		colour = Temp_Colour + fraction * (colour - Temp_Colour);
-	}
+        colour = Temp_Colour + fraction * (colour - Temp_Colour);
+    }
 
-	return(Colour_Found);
+    return(Colour_Found);
 }
 
 
@@ -508,11 +510,11 @@ bool Compute_Pigment (Colour& colour, const PIGMENT *Pigment, const Vector3d& EP
 * INPUT
 *
 * OUTPUT
-*   
+*
 * RETURNS
-*   
+*
 * AUTHOR
-*   
+*
 * DESCRIPTION
 *
 * CHANGES
@@ -522,45 +524,45 @@ bool Compute_Pigment (Colour& colour, const PIGMENT *Pigment, const Vector3d& EP
 
 static void Do_Average_Pigments (Colour& colour, const PIGMENT *Pigment, const Vector3d& EPoint, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread)
 {
-	int i;
-	Colour LC;
-	BLEND_MAP *Map = Pigment->Blend_Map;
-	SNGL Value;
-	SNGL Total = 0.0;
+    int i;
+    Colour LC;
+    BLEND_MAP *Map = Pigment->Blend_Map;
+    SNGL Value;
+    SNGL Total = 0.0;
 
-	colour.clear();
+    colour.clear();
 
-	for (i = 0; i < Map->Number_Of_Entries; i++)
-	{
-		Value = Map->Blend_Map_Entries[i].value;
+    for (i = 0; i < Map->Number_Of_Entries; i++)
+    {
+        Value = Map->Blend_Map_Entries[i].value;
 
-		Compute_Pigment (LC, Map->Blend_Map_Entries[i].Vals.Pigment, EPoint, Intersect, ray, Thread);
+        Compute_Pigment (LC, Map->Blend_Map_Entries[i].Vals.Pigment, EPoint, Intersect, ray, Thread);
 
-		colour += LC * Value;
-		Total  += Value;
-	}
-	colour /= Total;
+        colour += LC * Value;
+        Total  += Value;
+    }
+    colour /= Total;
 }
 
 void Evaluate_Density_Pigment(vector<PIGMENT*>& Density, const Vector3d& p, RGBColour& c, TraceThreadData *ttd)
 {
-	Colour lc;
+    Colour lc;
 
-	c.set(1.0);
+    c.set(1.0);
 
-	// TODO - Reverse iterator may be less performant than forward iterator; we might want to
-	//        compare performance with using forward iterators and decrement, or using random access.
-	//        Alternatively, reversing the vector after parsing might be another option.
-	for (vector<PIGMENT*>::reverse_iterator i = Density.rbegin(); i != Density.rend(); ++ i)
-	{
-		lc.clear();
+    // TODO - Reverse iterator may be less performant than forward iterator; we might want to
+    //        compare performance with using forward iterators and decrement, or using random access.
+    //        Alternatively, reversing the vector after parsing might be another option.
+    for (vector<PIGMENT*>::reverse_iterator i = Density.rbegin(); i != Density.rend(); ++ i)
+    {
+        lc.clear();
 
-		Compute_Pigment(lc, *i, p, NULL, NULL, ttd);
+        Compute_Pigment(lc, *i, p, NULL, NULL, ttd);
 
-		c.red()   *= lc.red();
-		c.green() *= lc.green();
-		c.blue()  *= lc.blue();
-	}
+        c.red()   *= lc.red();
+        c.green() *= lc.green();
+        c.blue()  *= lc.blue();
+    }
 }
 
 }

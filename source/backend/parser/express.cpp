@@ -1,38 +1,41 @@
-/*******************************************************************************
- * express.cpp
- *
- * This module implements an expression parser for the floats, vectors and
- * colours in scene description files.
- *
- * ---------------------------------------------------------------------------
- * Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
- * Copyright 1991-2013 Persistence of Vision Raytracer Pty. Ltd.
- *
- * POV-Ray is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * POV-Ray is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------------
- * POV-Ray is based on the popular DKB raytracer version 2.12.
- * DKBTrace was originally written by David K. Buck.
- * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
- * ---------------------------------------------------------------------------
- * $File: //depot/povray/smp/source/backend/parser/express.cpp $
- * $Revision: #58 $
- * $Change: 6162 $
- * $DateTime: 2013/12/07 19:55:09 $
- * $Author: clipka $
- *******************************************************************************/
+//******************************************************************************
+///
+/// @file backend/parser/express.cpp
+///
+/// This module implements an expression parser for the floats, vectors and
+/// colours in scene description files.
+///
+/// @copyright
+/// @parblock
+///
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
+/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+///
+/// POV-Ray is free software: you can redistribute it and/or modify
+/// it under the terms of the GNU Affero General Public License as
+/// published by the Free Software Foundation, either version 3 of the
+/// License, or (at your option) any later version.
+///
+/// POV-Ray is distributed in the hope that it will be useful,
+/// but WITHOUT ANY WARRANTY; without even the implied warranty of
+/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+/// GNU Affero General Public License for more details.
+///
+/// You should have received a copy of the GNU Affero General Public License
+/// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+///
+/// ----------------------------------------------------------------------------
+///
+/// POV-Ray is based on the popular DKB raytracer version 2.12.
+/// DKBTrace was originally written by David K. Buck.
+/// DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
+///
+/// @endparblock
+///
+//*******************************************************************************
 
-#include <ctype.h>
+#include <cctype>
+#include <algorithm>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
 // frame.h must always be the first POV file included (pulls in platform config)
@@ -54,8 +57,6 @@
 #include "backend/support/fileutil.h"
 #include "backend/support/imageutil.h"
 #include "base/fileinputoutput.h"
-
-#include <algorithm>
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -1205,8 +1206,8 @@ void Parser::Parse_Num_Factor (EXPRESS Express,int *Terms)
 							}
 							else
 							{
-								Vect[X] = dynamic_cast<ImagePattern*>(Pigment->pattern.get())->image->iwidth;
-								Vect[Y] = dynamic_cast<ImagePattern*>(Pigment->pattern.get())->image->iheight;
+								Vect[X] = dynamic_cast<ImagePattern*>(Pigment->pattern.get())->pImage->iwidth;
+								Vect[Y] = dynamic_cast<ImagePattern*>(Pigment->pattern.get())->pImage->iheight;
 								Vect[Z] = 0;
 							}
 							EXIT
