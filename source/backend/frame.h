@@ -66,7 +66,6 @@
 
 #include "backend/configbackend.h"
 #include "backend/support/simplevector.h"
-#include "backend/control/messagefactory.h"
 #include "backend/colour/spectral.h"
 
 #include "pov_mem.h"
@@ -1274,9 +1273,6 @@ class SceneThreadData;
 typedef SceneThreadData TraceThreadData;
 
 class LightSource;
-class Ray;
-class Intersection;
-
 // These fields are common to all objects.
 template<typename T>
 class RefPool
@@ -1326,10 +1322,6 @@ class Ref
         Ref(const Ref&);
         Ref& operator=(Ref&);
 };
-
-typedef stack<Intersection, vector<Intersection> > IStackData;
-typedef RefPool<IStackData> IStackPool;
-typedef Ref<IStackData> IStack;
 
 struct WeightedTexture
 {
@@ -1510,6 +1502,10 @@ class Intersection
 
         ~Intersection() { }
 };
+
+typedef std::stack<Intersection, vector<Intersection> > IStackData;
+typedef RefPool<IStackData> IStackPool;
+typedef Ref<IStackData> IStack;
 
 /// @}
 ///

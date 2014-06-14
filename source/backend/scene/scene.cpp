@@ -40,6 +40,7 @@
 
 // frame.h must always be the first POV file included (pulls in platform config)
 #include "backend/frame.h"
+#include "backend/scene/scene.h"
 
 #include "base/timer.h"
 #include "base/povmsgid.h"
@@ -47,7 +48,6 @@
 #include "base/fileinputoutput.h"
 
 #include "backend/control/renderbackend.h"
-#include "backend/scene/scene.h"
 #include "backend/scene/objects.h"
 #include "backend/parser/parse.h"
 #include "backend/bounding/boundingtask.h"
@@ -73,22 +73,6 @@ SceneData::SceneData() :
     backgroundColour = Colour(0.0, 0.0, 0.0, 0.0, 1.0);
     ambientLight = RGBColour(1.0);
     iridWavelengths = RGBColour(0.70, 0.52, 0.48);
-
-    // These default settings are low quality.
-    // For relatively high quality, use:
-    //   parsedRadiositySettings.Nearest_Count = 8;
-    //   parsedRadiositySettings.Count = 100;
-    //   parsedRadiositySettings.Recursion_Limit = 5;
-    // Only these variables should need adjustment!
-
-    parsedRadiositySettings.Quality = 6;     // Q-flag value for light gathering
-    parsedRadiositySettings.File_ReadOnContinue = 1;
-    parsedRadiositySettings.File_SaveWhileRendering = 1;
-    parsedRadiositySettings.File_AlwaysReadAtStart = 0;
-    parsedRadiositySettings.File_KeepOnAbort = 1;
-    parsedRadiositySettings.File_KeepAlways = 0;
-    parsedRadiositySettings.Load_File_Name = NULL;
-    parsedRadiositySettings.Save_File_Name = NULL;
 
     languageVersion = OFFICIAL_VERSION_NUMBER;
     languageVersionSet = false;
