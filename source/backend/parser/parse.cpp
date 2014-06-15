@@ -43,6 +43,7 @@
 // frame.h must always be the first POV file included (pulls in platform config)
 #include "backend/frame.h"
 #include "backend/parser/parse.h"
+
 #include "base/povmsgid.h"
 #include "backend/bounding/bsphere.h"
 #include "backend/colour/colour_old.h"
@@ -2473,6 +2474,7 @@ ObjectPtr Parser::Parse_Isosurface()
 
     EXPECT
         CASE(CONTAINED_BY_TOKEN)
+            // TODO - same code as for parametric
             Parse_Begin();
             {
                 int Exit_Flag2 = false;
@@ -2483,33 +2485,33 @@ ObjectPtr Parser::Parse_Isosurface()
                     switch(Token.Token_Id)
                     {
                         CASE(BOX_TOKEN)
-                            Object->container_shape = 0;
+                            Object->container = auto_ptr<ContainedByShape>(new ContainedByBox());
 
                             Parse_Begin();
 
-                            Parse_Vector(Object->container.box.corner1);
+                            Parse_Vector(dynamic_cast<ContainedByBox*>(Object->container.get())->corner1);
                             Parse_Comma();
-                            Parse_Vector(Object->container.box.corner2);
+                            Parse_Vector(dynamic_cast<ContainedByBox*>(Object->container.get())->corner2);
 
                             Parse_End();
 
-                            if (Object->container.box.corner1[X] > Object->container.box.corner2[X])
+                            if (dynamic_cast<ContainedByBox*>(Object->container.get())->corner1.x() > dynamic_cast<ContainedByBox*>(Object->container.get())->corner2.x())
                             {
-                                temp = Object->container.box.corner1[X];
-                                Object->container.box.corner1[X] = Object->container.box.corner2[X];
-                                Object->container.box.corner2[X] = temp;
+                                temp = dynamic_cast<ContainedByBox*>(Object->container.get())->corner1.x();
+                                dynamic_cast<ContainedByBox*>(Object->container.get())->corner1.x() = dynamic_cast<ContainedByBox*>(Object->container.get())->corner2.x();
+                                dynamic_cast<ContainedByBox*>(Object->container.get())->corner2.x() = temp;
                             }
-                            if (Object->container.box.corner1[Y] > Object->container.box.corner2[Y])
+                            if (dynamic_cast<ContainedByBox*>(Object->container.get())->corner1.y() > dynamic_cast<ContainedByBox*>(Object->container.get())->corner2.y())
                             {
-                                temp = Object->container.box.corner1[Y];
-                                Object->container.box.corner1[Y] = Object->container.box.corner2[Y];
-                                Object->container.box.corner2[Y] = temp;
+                                temp = dynamic_cast<ContainedByBox*>(Object->container.get())->corner1.y();
+                                dynamic_cast<ContainedByBox*>(Object->container.get())->corner1.y() = dynamic_cast<ContainedByBox*>(Object->container.get())->corner2.y();
+                                dynamic_cast<ContainedByBox*>(Object->container.get())->corner2.y() = temp;
                             }
-                            if (Object->container.box.corner1[Z] > Object->container.box.corner2[Z])
+                            if (dynamic_cast<ContainedByBox*>(Object->container.get())->corner1.z() > dynamic_cast<ContainedByBox*>(Object->container.get())->corner2.z())
                             {
-                                temp = Object->container.box.corner1[Z];
-                                Object->container.box.corner1[Z] = Object->container.box.corner2[Z];
-                                Object->container.box.corner2[Z] = temp;
+                                temp = dynamic_cast<ContainedByBox*>(Object->container.get())->corner1.z();
+                                dynamic_cast<ContainedByBox*>(Object->container.get())->corner1.z() = dynamic_cast<ContainedByBox*>(Object->container.get())->corner2.z();
+                                dynamic_cast<ContainedByBox*>(Object->container.get())->corner2.z() = temp;
                             }
 
                             if (Object->Trans != NULL)
@@ -2519,23 +2521,23 @@ ObjectPtr Parser::Parse_Isosurface()
                         END_CASE
 
                         CASE(SPHERE_TOKEN)
-                            Object->container_shape = 1;
+                            Object->container = auto_ptr<ContainedByShape>(new ContainedBySphere());
 
                             Parse_Begin();
 
-                            Parse_Vector(Object->container.sphere.center);
+                            Parse_Vector(dynamic_cast<ContainedBySphere*>(Object->container.get())->center);
                             Parse_Comma();
-                            Object->container.sphere.radius = Parse_Float();
+                            dynamic_cast<ContainedBySphere*>(Object->container.get())->radius = Parse_Float();
 
                             Parse_End();
 
                             Make_BBox(Object->BBox,
-                                      Object->container.sphere.center[X] - Object->container.sphere.radius,
-                                      Object->container.sphere.center[Y] - Object->container.sphere.radius,
-                                      Object->container.sphere.center[Z] - Object->container.sphere.radius,
-                                      2.0 * Object->container.sphere.radius,
-                                      2.0 * Object->container.sphere.radius,
-                                      2.0 * Object->container.sphere.radius);
+                                      dynamic_cast<ContainedBySphere*>(Object->container.get())->center.x() - dynamic_cast<ContainedBySphere*>(Object->container.get())->radius,
+                                      dynamic_cast<ContainedBySphere*>(Object->container.get())->center.y() - dynamic_cast<ContainedBySphere*>(Object->container.get())->radius,
+                                      dynamic_cast<ContainedBySphere*>(Object->container.get())->center.z() - dynamic_cast<ContainedBySphere*>(Object->container.get())->radius,
+                                      2.0 * dynamic_cast<ContainedBySphere*>(Object->container.get())->radius,
+                                      2.0 * dynamic_cast<ContainedBySphere*>(Object->container.get())->radius,
+                                      2.0 * dynamic_cast<ContainedBySphere*>(Object->container.get())->radius);
 
                             if (Object->Trans != NULL)
                                 Object->Compute_BBox();
@@ -4859,6 +4861,7 @@ ObjectPtr Parser::Parse_Parametric(void)
         END_CASE
 
         CASE(CONTAINED_BY_TOKEN)
+            // TODO - same code as for isosurface
             Parse_Begin();
             {
                 int Exit_Flag2 = false;
@@ -4869,33 +4872,33 @@ ObjectPtr Parser::Parse_Parametric(void)
                     switch(Token.Token_Id)
                     {
                         CASE(BOX_TOKEN)
-                            Object->container_shape = 0;
+                            Object->container = auto_ptr<ContainedByShape>(new ContainedByBox());
 
                             Parse_Begin();
 
-                            Parse_Vector((Object->container.box.corner1));
+                            Parse_Vector(dynamic_cast<ContainedByBox*>(Object->container.get())->corner1);
                             Parse_Comma();
-                            Parse_Vector((Object->container.box.corner2));
+                            Parse_Vector(dynamic_cast<ContainedByBox*>(Object->container.get())->corner2);
 
                             Parse_End();
 
-                            if (Object->container.box.corner1[X] > Object->container.box.corner2[X])
+                            if (dynamic_cast<ContainedByBox*>(Object->container.get())->corner1.x() > dynamic_cast<ContainedByBox*>(Object->container.get())->corner2.x())
                             {
-                                temp = Object->container.box.corner1[X];
-                                Object->container.box.corner1[X] = Object->container.box.corner2[X];
-                                Object->container.box.corner2[X] = temp;
+                                temp = dynamic_cast<ContainedByBox*>(Object->container.get())->corner1.x();
+                                dynamic_cast<ContainedByBox*>(Object->container.get())->corner1.x() = dynamic_cast<ContainedByBox*>(Object->container.get())->corner2.x();
+                                dynamic_cast<ContainedByBox*>(Object->container.get())->corner2.x() = temp;
                             }
-                            if (Object->container.box.corner1[Y] > Object->container.box.corner2[Y])
+                            if (dynamic_cast<ContainedByBox*>(Object->container.get())->corner1.y() > dynamic_cast<ContainedByBox*>(Object->container.get())->corner2.y())
                             {
-                                temp = Object->container.box.corner1[Y];
-                                Object->container.box.corner1[Y] = Object->container.box.corner2[Y];
-                                Object->container.box.corner2[Y] = temp;
+                                temp = dynamic_cast<ContainedByBox*>(Object->container.get())->corner1.y();
+                                dynamic_cast<ContainedByBox*>(Object->container.get())->corner1.y() = dynamic_cast<ContainedByBox*>(Object->container.get())->corner2.y();
+                                dynamic_cast<ContainedByBox*>(Object->container.get())->corner2.y() = temp;
                             }
-                            if (Object->container.box.corner1[Z] > Object->container.box.corner2[Z])
+                            if (dynamic_cast<ContainedByBox*>(Object->container.get())->corner1.z() > dynamic_cast<ContainedByBox*>(Object->container.get())->corner2.z())
                             {
-                                temp = Object->container.box.corner1[Z];
-                                Object->container.box.corner1[Z] = Object->container.box.corner2[Z];
-                                Object->container.box.corner2[Z] = temp;
+                                temp = dynamic_cast<ContainedByBox*>(Object->container.get())->corner1.z();
+                                dynamic_cast<ContainedByBox*>(Object->container.get())->corner1.z() = dynamic_cast<ContainedByBox*>(Object->container.get())->corner2.z();
+                                dynamic_cast<ContainedByBox*>(Object->container.get())->corner2.z() = temp;
                             }
 
                             if (Object->Trans != NULL)
@@ -4905,23 +4908,23 @@ ObjectPtr Parser::Parse_Parametric(void)
                         END_CASE
 
                         CASE(SPHERE_TOKEN)
-                            Object->container_shape = 1;
+                            Object->container = auto_ptr<ContainedByShape>(new ContainedBySphere());
 
                             Parse_Begin();
 
-                            Parse_Vector(Object->container.sphere.center);
+                            Parse_Vector(dynamic_cast<ContainedBySphere*>(Object->container.get())->center);
                             Parse_Comma();
-                            Object->container.sphere.radius = Parse_Float();
+                            dynamic_cast<ContainedBySphere*>(Object->container.get())->radius = Parse_Float();
 
                             Parse_End();
 
                             Make_BBox(Object->BBox,
-                                      Object->container.sphere.center[X] - Object->container.sphere.radius,
-                                      Object->container.sphere.center[Y] - Object->container.sphere.radius,
-                                      Object->container.sphere.center[Z] - Object->container.sphere.radius,
-                                      2.0 * Object->container.sphere.radius,
-                                      2.0 * Object->container.sphere.radius,
-                                      2.0 * Object->container.sphere.radius);
+                                      dynamic_cast<ContainedBySphere*>(Object->container.get())->center.x() - dynamic_cast<ContainedBySphere*>(Object->container.get())->radius,
+                                      dynamic_cast<ContainedBySphere*>(Object->container.get())->center.y() - dynamic_cast<ContainedBySphere*>(Object->container.get())->radius,
+                                      dynamic_cast<ContainedBySphere*>(Object->container.get())->center.z() - dynamic_cast<ContainedBySphere*>(Object->container.get())->radius,
+                                      2.0 * dynamic_cast<ContainedBySphere*>(Object->container.get())->radius,
+                                      2.0 * dynamic_cast<ContainedBySphere*>(Object->container.get())->radius,
+                                      2.0 * dynamic_cast<ContainedBySphere*>(Object->container.get())->radius);
 
                             if (Object->Trans != NULL)
                                 Object->Compute_BBox();

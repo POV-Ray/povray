@@ -44,9 +44,10 @@
 
 #include "backend/frame.h"
 
-#include "base/image/colourspace.h"
+#include "base/fileinputoutput.h"
 #include "base/povmscpp.h"
 #include "base/stringutilities.h"
+#include "base/image/colourspace.h"
 #include "backend/control/renderbackend.h"
 #include "backend/lighting/radiosity.h"
 #include "backend/scene/camera.h"

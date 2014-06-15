@@ -311,6 +311,46 @@ class LightSource : public CompoundObject
 };
 
 
+/// Generic abstract class used for containing inherently infinite objects (isosurface, parametric).
+struct ContainedByShape
+{
+    virtual ~ContainedByShape() {}
+
+    virtual void ComputeBBox(BoundingBox& rBox) const = 0;
+    virtual bool Intersect(const Ray& ray, const TRANSFORM* pTrans, DBL& rDepth1, DBL& rDepth2, int& rSide1, int& sSide2) const = 0;
+    virtual bool Inside(const Vector3d& IPoint) const = 0;
+    virtual void Normal(const Vector3d& IPoint, const TRANSFORM* pTrans, int side, Vector3d& rNormal) const = 0;
+};
+
+/// Class used for containing inherently infinite objects (isosurface, parametric) in a box.
+struct ContainedByBox : public ContainedByShape
+{
+    Vector3d corner1;
+    Vector3d corner2;
+
+    ContainedByBox() : corner1(-1,-1,-1), corner2(1,1,1) {}
+
+    virtual void ComputeBBox(BoundingBox& rBox) const;
+    virtual bool Intersect(const Ray& ray, const TRANSFORM* pTrans, DBL& rDepth1, DBL& rDepth2, int& rSide1, int& sSide2) const;
+    virtual bool Inside(const Vector3d& IPoint) const;
+    virtual void Normal(const Vector3d& IPoint, const TRANSFORM* pTrans, int side, Vector3d& rNormal) const;
+};
+
+/// Class used for containing inherently infinite objects (isosurface, parametric) in a sphere.
+struct ContainedBySphere : public ContainedByShape
+{
+    Vector3d center;
+    DBL radius;
+
+    ContainedBySphere() : center(0,0,0), radius(1) {}
+
+    virtual void ComputeBBox(BoundingBox& rBox) const;
+    virtual bool Intersect(const Ray& ray, const TRANSFORM* pTrans, DBL& rDepth1, DBL& rDepth2, int& rSide1, int& sSide2) const;
+    virtual bool Inside(const Vector3d& IPoint) const;
+    virtual void Normal(const Vector3d& IPoint, const TRANSFORM* pTrans, int side, Vector3d& rNormal) const;
+};
+
+
 /*****************************************************************************
 * Global functions
 ******************************************************************************/

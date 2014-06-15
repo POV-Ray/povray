@@ -133,8 +133,6 @@ class CompoundObject;
 
 typedef DBL UV_VECT[2];   ///< @deprecated Use @ref pov::Vector2d instead.
                           ///< @todo       Get entirely rid of this.
-typedef DBL VECTOR[3];    ///< @deprecated Use @ref pov::Vector3d instead.
-                          ///< @todo       Get entirely rid of this.
 typedef DBL VECTOR_4D[4]; ///< @todo       Make this obsolete.
 typedef DBL MATRIX[4][4]; ///< @todo       Make this obsolete.
 typedef DBL EXPRESS[5];   ///< @todo       Make this obsolete.
@@ -176,14 +174,6 @@ enum
     pFILTER = 3,
     pTRANSM = 4
 };
-
-/// @deprecated See @ref pov::VECTOR.
-inline void Assign_Vector(VECTOR d, const VECTOR s)
-{
-    d[X] = s[X];
-    d[Y] = s[Y];
-    d[Z] = s[Z];
-}
 
 /// @deprecated See @ref pov::UV_VECT.
 inline void Assign_UV_Vect(UV_VECT d, const UV_VECT s)
@@ -236,14 +226,6 @@ inline void Make_ColourA(COLOUR c, COLC r, COLC g, COLC b, COLC a, COLC t)
     c[pBLUE] = b;
     c[pFILTER] = a;
     c[pTRANSM] = t;
-}
-
-/// @deprecated See @ref pov::VECTOR.
-inline void Make_Vector(VECTOR v, DBL a, DBL b, DBL c)
-{
-    v[X] = a;
-    v[Y] = b;
-    v[Z] = c;
 }
 
 /// @deprecated See @ref pov::UV_VECT.
@@ -520,7 +502,7 @@ class GenericVector3d
             vect[Z] = z;
         }
 
-        explicit GenericVector3d(const VECTOR vi)
+        explicit GenericVector3d(const EXPRESS vi)
         {
             vect[X] = T(vi[X]);
             vect[Y] = T(vi[Y]);
@@ -1438,9 +1420,9 @@ class Intersection
         bool haveNormal;
         /// Flag to indicate whether LocalIPoint has already been computed.
         bool haveLocalIPoint;
-        /// Generic auxiliary integer data #1 (used by Sor, Prism, Lathe, Cones, Boxes)
+        /// Generic auxiliary integer data #1 (used by Sor, Prism, Isosurface, Lathe, Cones, Boxes)
         int i1;
-        /// Generic auxiliary integer data #2 (used by Sor, Prism)
+        /// Generic auxiliary integer data #2 (used by Sor, Prism, Isosurface)
         int i2;
         /// Generic auxiliary float data #1 (used by Prism, Lathe)
         DBL d1;

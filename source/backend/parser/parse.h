@@ -369,7 +369,6 @@ class Parser : public Task
         void Parse_UV_Vect (Vector2d& UV_Vect);
         inline void Parse_UV_Vect (UV_VECT UV_Vect) { Vector2d temp; Parse_UV_Vect(temp); Assign_UV_Vect(UV_Vect, *temp); }
         void Parse_Vector (Vector3d& Vector);
-        inline void Parse_Vector (VECTOR Vector) { Vector3d temp; Parse_Vector(temp); Assign_Vector(Vector, *temp); }
         void Parse_Vector4D (VECTOR_4D Vector);
         int Parse_Unknown_Vector (EXPRESS Express, bool allow_identifier = false, bool *had_identifier = NULL);
         void Parse_Scale_Vector (Vector3d& Vector);
