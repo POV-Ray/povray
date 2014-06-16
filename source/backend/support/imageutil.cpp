@@ -91,7 +91,7 @@ static void Interp(const ImageData *image, DBL xcoor, DBL ycoor, Colour& colour,
 static void InterpolateBicubic(const ImageData *image, DBL xcoor, DBL ycoor, Colour& colour, int *index, bool premul);
 static void image_colour_at(const ImageData *image, DBL xcoor, DBL ycoor, Colour& colour, int *index); // TODO ALPHA - caller should decide whether to prefer premultiplied or non-premultiplied alpha
 static void image_colour_at(const ImageData *image, DBL xcoor, DBL ycoor, Colour& colour, int *index, bool premul);
-static int map_pos(const Vector3d& EPoint, const TPATTERN *Turb, DBL *xcoor, DBL *ycoor);
+static int map_pos(const Vector3d& EPoint, const BasicPattern* pPattern, DBL *xcoor, DBL *ycoor);
 
 /*
  * 2-D to 3-D Procedural Texture Mapping of a Bitmapped Image onto an Object:
@@ -147,7 +147,7 @@ bool image_map(const Vector3d& EPoint, const PIGMENT *Pigment, Colour& colour)
 
     // If outside map coverage area, return clear
 
-    if(map_pos(EPoint, Pigment, &xcoor, &ycoor))
+    if(map_pos(EPoint, Pigment->pattern.get(), &xcoor, &ycoor))
     {
         colour = Colour(1.0, 1.0, 1.0, 0.0, 1.0);
         return false;
@@ -194,7 +194,7 @@ TEXTURE *material_map(const Vector3d& EPoint, const TEXTURE *Texture)
      * texture index.
      */
 
-    if(map_pos(EPoint, Texture, &xcoor, &ycoor))
+    if(map_pos(EPoint, Texture->pattern.get(), &xcoor, &ycoor))
         Material_Number = 0;
     else
     {
@@ -247,7 +247,7 @@ void bump_map(const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& normal)
     // going to have to change this
     // need to know if bump point is off of image for all 3 points
 
-    if(map_pos(EPoint, Tnormal, &xcoor, &ycoor))
+    if(map_pos(EPoint, Tnormal->pattern.get(), &xcoor, &ycoor))
         return;
     else
         image_colour_at(image, xcoor, ycoor, colour1, &index); // TODO ALPHA - we should decide whether we prefer premultiplied or non-premultiplied alpha
@@ -358,12 +358,12 @@ void bump_map(const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& normal)
 *
 ******************************************************************************/
 
-DBL image_pattern(const Vector3d& EPoint, const TPATTERN *TPattern)
+DBL image_pattern(const Vector3d& EPoint, const BasicPattern* pPattern)
 {
     DBL xcoor = 0.0, ycoor = 0.0;
     int index = -1;
     Colour colour;
-    const ImageData *image = dynamic_cast<ImagePattern*>(TPattern->pattern.get())->pImage;
+    const ImageData *image = dynamic_cast<const ImagePattern*>(pPattern)->pImage;
     DBL Value;
 
     colour.clear();
@@ -371,7 +371,7 @@ DBL image_pattern(const Vector3d& EPoint, const TPATTERN *TPattern)
     // going to have to change this
     // need to know if bump point is off of image for all 3 points
 
-    if(map_pos(EPoint, TPattern, &xcoor, &ycoor))
+    if(map_pos(EPoint, pPattern, &xcoor, &ycoor))
         return 0.0;
     else
         image_colour_at(image, xcoor, ycoor, colour, &index); // TODO ALPHA - we should decide whether we prefer premultiplied or non-premultiplied alpha
@@ -874,9 +874,9 @@ static int planar_image_map(const Vector3d& EPoint, const ImageData *image, DBL 
 *
 ******************************************************************************/
 
-static int map_pos(const Vector3d& EPoint, const TPATTERN *TPattern, DBL *xcoor, DBL *ycoor)
+static int map_pos(const Vector3d& EPoint, const BasicPattern* pPattern, DBL *xcoor, DBL *ycoor)
 {
-    const ImageData *image = dynamic_cast<ImagePattern*>(TPattern->pattern.get())->pImage;
+    const ImageData *image = dynamic_cast<const ImagePattern*>(pPattern)->pImage;
 
     // Now determine which mapper to use.
 

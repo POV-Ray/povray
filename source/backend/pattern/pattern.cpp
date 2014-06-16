@@ -441,7 +441,7 @@ ImagePattern::~ImagePattern()
 
 DBL ImagePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
-    throw POV_EXCEPTION_STRING("Internal Error: ImagePattern::EvaluateRaw() called.");
+    return image_pattern(EPoint, this);
 }
 
 

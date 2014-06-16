@@ -110,7 +110,7 @@ class ImageData
 class Parser;
 class SceneData;
 
-DBL image_pattern(const Vector3d& EPoint, const TPATTERN *TPattern);
+DBL image_pattern(const Vector3d& EPoint, const BasicPattern* pPattern);
 bool image_map(const Vector3d& EPoint, const PIGMENT *Pigment, Colour& colour);
 TEXTURE *material_map(const Vector3d& IPoint, const TEXTURE *Texture);
 void bump_map(const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& normal);
