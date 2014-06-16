@@ -389,7 +389,7 @@ ImagePattern::~ImagePattern()
 
 DBL ImagePattern::operator()(const Vector3d& EPoint, const Intersection *Isection, const Ray *ray, TraceThreadData *Thread) const
 {
-	throw POV_EXCEPTION_STRING("Internal Error: ImagePattern::operator() called.");
+    return image_pattern(EPoint, this);
 }
 
 
