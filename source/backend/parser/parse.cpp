@@ -3164,10 +3164,6 @@ ObjectPtr Parser::Parse_Light_Source ()
     MATRIX Local_Matrix;
     TRANSFORM Local_Trans;
     LightSource *Object;
-    /* NK phmap */
-    BLEND_MAP *Map;
-    SNGL Value;
-    int i;
     /* NK ---- */
 
     Parse_Begin ();
@@ -3186,15 +3182,12 @@ ObjectPtr Parser::Parse_Light_Source ()
     EXPECT
         /* NK phmap */
         CASE (COLOUR_MAP_TOKEN)
-            Destroy_Blend_Map(Object->blend_map);
-            Map = Object->blend_map = Parse_Colour_Map ();
-
-            Object->colour.clear();
-            for (i = 0; i < Map->Number_Of_Entries; i++)
-            {
-                Value = Map->Blend_Map_Entries[i].value;
-                Object->colour += Value * RGBColour(Map->Blend_Map_Entries[i].Vals.colour);
-            }
+            // TODO - apparently this undocumented syntax was once intended to do something related to dispersion,
+            //        but in 3.7 is dysfunctional, doing nothing except provide an undocumented means of averaging
+            //        different colours. Can we safely drop it?
+            Warning(0, "Undocumented syntax ignored (colour_map in light_source);"
+                       " future versions of POV-Ray may drop support for it entirely.");
+            (void)Parse_Colour_Map<ColourBlendMap> ();
         END_CASE
 
         CASE(PHOTONS_TOKEN)
@@ -8680,7 +8673,7 @@ int Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTR
         END_CASE
 
         CASE (COLOUR_MAP_TOKEN)
-            Temp_Data  = reinterpret_cast<void *>(Parse_Colour_Map ());
+            Temp_Data  = reinterpret_cast<void *>(new ColourBlendMapPtr(Parse_Colour_Map<ColourBlendMap> ()));
             *NumberPtr = COLOUR_MAP_ID_TOKEN;
             Test_Redefine(Previous,NumberPtr,*DataPtr, allow_redefine);
             *DataPtr   = Temp_Data;
@@ -8688,7 +8681,7 @@ int Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTR
         END_CASE
 
         CASE (PIGMENT_MAP_TOKEN)
-            Temp_Data  = reinterpret_cast<void *>(Parse_Blend_Map (PIGMENT_TYPE,NO_PATTERN));
+            Temp_Data  = reinterpret_cast<void *>(new PigmentBlendMapPtr(Parse_Blend_Map<PigmentBlendMap> (PIGMENT_TYPE,NO_PATTERN)));
             *NumberPtr = PIGMENT_MAP_ID_TOKEN;
             Test_Redefine(Previous,NumberPtr,*DataPtr, allow_redefine);
             *DataPtr   = Temp_Data;
@@ -8707,7 +8700,7 @@ int Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTR
         END_CASE
 
         CASE (DENSITY_MAP_TOKEN)
-            Temp_Data  = reinterpret_cast<void *>(Parse_Blend_Map (DENSITY_TYPE,NO_PATTERN));
+            Temp_Data  = reinterpret_cast<void *>(new PigmentBlendMapPtr(Parse_Blend_Map<PigmentBlendMap> (DENSITY_TYPE,NO_PATTERN)));
             *NumberPtr = DENSITY_MAP_ID_TOKEN;
             Test_Redefine(Previous,NumberPtr,*DataPtr, allow_redefine);
             *DataPtr   = Temp_Data;
@@ -8715,7 +8708,7 @@ int Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTR
         END_CASE
 
         CASE (SLOPE_MAP_TOKEN)
-            Temp_Data  = reinterpret_cast<void *>(Parse_Blend_Map (SLOPE_TYPE,NO_PATTERN));
+            Temp_Data  = reinterpret_cast<void *>(new UnifiedNormalBlendMapPtr(Parse_Blend_Map<UnifiedNormalBlendMap> (SLOPE_TYPE,NO_PATTERN)));
             *NumberPtr = SLOPE_MAP_ID_TOKEN;
             Test_Redefine(Previous,NumberPtr,*DataPtr, allow_redefine);
             *DataPtr   = Temp_Data;
@@ -8723,7 +8716,7 @@ int Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTR
         END_CASE
 
         CASE (TEXTURE_MAP_TOKEN)
-            Temp_Data  = reinterpret_cast<void *>(Parse_Blend_Map (TEXTURE_TYPE,NO_PATTERN));
+            Temp_Data  = reinterpret_cast<void *>(new TextureBlendMapPtr(Parse_Blend_Map<TextureBlendMap> (TEXTURE_TYPE,NO_PATTERN)));
             *NumberPtr = TEXTURE_MAP_ID_TOKEN;
             Test_Redefine(Previous,NumberPtr,*DataPtr, allow_redefine);
             *DataPtr   = Temp_Data;
@@ -8731,7 +8724,7 @@ int Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTR
         END_CASE
 
         CASE (NORMAL_MAP_TOKEN)
-            Temp_Data  = reinterpret_cast<void *>(Parse_Blend_Map (NORMAL_TYPE,NO_PATTERN));
+            Temp_Data  = reinterpret_cast<void *>(new UnifiedNormalBlendMapPtr(Parse_Blend_Map<UnifiedNormalBlendMap> (NORMAL_TYPE,NO_PATTERN)));
             *NumberPtr = NORMAL_MAP_ID_TOKEN;
             Test_Redefine(Previous,NumberPtr,*DataPtr, allow_redefine);
             *DataPtr   = Temp_Data;
@@ -8915,12 +8908,18 @@ void Parser::Destroy_Ident_Data(void *Data, int Type)
             Destroy_Object(reinterpret_cast<ObjectPtr>(Data));
             break;
         case COLOUR_MAP_ID_TOKEN:
+            delete reinterpret_cast<ColourBlendMapPtr *>(Data);
+            break;
         case PIGMENT_MAP_ID_TOKEN:
-        case SLOPE_MAP_ID_TOKEN:
-        case TEXTURE_MAP_ID_TOKEN:
-        case NORMAL_MAP_ID_TOKEN:
         case DENSITY_MAP_ID_TOKEN:
-            Destroy_Blend_Map(reinterpret_cast<BLEND_MAP *>(Data));
+            delete reinterpret_cast<PigmentBlendMapPtr *>(Data);
+            break;
+        case SLOPE_MAP_ID_TOKEN:
+        case NORMAL_MAP_ID_TOKEN:
+            delete reinterpret_cast<UnifiedNormalBlendMap *>(Data);
+            break;
+        case TEXTURE_MAP_ID_TOKEN:
+            delete reinterpret_cast<TextureBlendMap *>(Data);
             break;
         case TRANSFORM_ID_TOKEN:
             Destroy_Transform(reinterpret_cast<TRANSFORM *>(Data));
@@ -9983,12 +9982,18 @@ void *Parser::Copy_Identifier (void *Data, int Type)
             New = reinterpret_cast<void *>(Copy_Object(reinterpret_cast<ObjectPtr>(Data)));
             break;
         case COLOUR_MAP_ID_TOKEN:
+            New = reinterpret_cast<void *>(new ColourBlendMapPtr(Copy_Blend_Map(*(reinterpret_cast<ColourBlendMapPtr *>(Data)))));
+            break;
         case PIGMENT_MAP_ID_TOKEN:
-        case SLOPE_MAP_ID_TOKEN:
-        case TEXTURE_MAP_ID_TOKEN:
-        case NORMAL_MAP_ID_TOKEN:
         case DENSITY_MAP_ID_TOKEN:
-            New = reinterpret_cast<void *>(Copy_Blend_Map(reinterpret_cast<BLEND_MAP *>(Data)));
+            New = reinterpret_cast<void *>(new PigmentBlendMapPtr(Copy_Blend_Map(*(reinterpret_cast<PigmentBlendMapPtr *>(Data)))));
+            break;
+        case SLOPE_MAP_ID_TOKEN:
+        case NORMAL_MAP_ID_TOKEN:
+            New = reinterpret_cast<void *>(new UnifiedNormalBlendMapPtr(Copy_Blend_Map(*(reinterpret_cast<UnifiedNormalBlendMapPtr *>(Data)))));
+            break;
+        case TEXTURE_MAP_ID_TOKEN:
+            New = reinterpret_cast<void *>(new TextureBlendMapPtr(Copy_Blend_Map(*(reinterpret_cast<TextureBlendMapPtr *>(Data)))));
             break;
         case TRANSFORM_ID_TOKEN:
             New = reinterpret_cast<void *>(Copy_Transform(reinterpret_cast<TRANSFORM *>(Data)));
@@ -10058,9 +10063,6 @@ void *Parser::Copy_Identifier (void *Data, int Type)
 /* NK layers - 1999 June 10 - for backwards compatiblity with layered textures */
 void Parser::Convert_Filter_To_Transmit(PIGMENT *Pigment)
 {
-    int i;
-    BLEND_MAP *Map;
-
     if (Pigment==NULL) return;
 
     switch (Pigment->Type)
@@ -10072,28 +10074,26 @@ void Parser::Convert_Filter_To_Transmit(PIGMENT *Pigment)
 
         default:
             if (Pigment->Blend_Map != NULL)
-            {
-                Map = Pigment->Blend_Map;
-                /* go through blend map */
-                if ((Map->Type == PIGMENT_TYPE) || (Map->Type == DENSITY_TYPE))
-                {
-                    for (i = 0; i < Map->Number_Of_Entries; i++)
-                    {
-                        Convert_Filter_To_Transmit(Map->Blend_Map_Entries[i].Vals.Pigment);
-                    }
-                }
-                else
-                {
-                    for (i = 0; i < Map->Number_Of_Entries; i++)
-                    {
-                        Map->Blend_Map_Entries[i].Vals.colour[pTRANSM] += Map->Blend_Map_Entries[i].Vals.colour[pFILTER];
-                        Map->Blend_Map_Entries[i].Vals.colour[pFILTER] = 0;
-                    }
-                }
-
-            }
-
+                Pigment->Blend_Map->ConvertFilterToTransmit();
             break;
+    }
+}
+
+void PigmentBlendMap::ConvertFilterToTransmit()
+{
+    assert ((Type == PIGMENT_TYPE) || (Type == DENSITY_TYPE));
+    for (Vector::iterator i = Blend_Map_Entries.begin(); i != Blend_Map_Entries.end(); i++)
+    {
+        Parser::Convert_Filter_To_Transmit(i->Vals);
+    }
+}
+
+void ColourBlendMap::ConvertFilterToTransmit()
+{
+    for (Vector::iterator i = Blend_Map_Entries.begin(); i != Blend_Map_Entries.end(); i++)
+    {
+        i->Vals[pTRANSM] += i->Vals[pFILTER];
+        i->Vals[pFILTER] = 0;
     }
 }
 

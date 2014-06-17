@@ -1,45 +1,48 @@
-/*******************************************************************************
- * colour_old.cpp
- *
- * This module implements legacy routines to manipulate colours.
- *
- * ---------------------------------------------------------------------------
- * Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
- * Copyright 1991-2013 Persistence of Vision Raytracer Pty. Ltd.
- *
- * POV-Ray is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * POV-Ray is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------------
- * POV-Ray is based on the popular DKB raytracer version 2.12.
- * DKBTrace was originally written by David K. Buck.
- * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
- * ---------------------------------------------------------------------------
- * $File: //depot/povray/smp/source/backend/colour/colour_old.cpp $
- * $Revision: #1 $
- * $Change: 6113 $
- * $DateTime: 2013/11/20 20:39:54 $
- * $Author: clipka $
- *******************************************************************************/
+//******************************************************************************
+///
+/// @file backend/colour/colour_old.cpp
+///
+/// This module implements legacy routines to manipulate colours.
+///
+/// @copyright
+/// @parblock
+///
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
+/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+///
+/// POV-Ray is free software: you can redistribute it and/or modify
+/// it under the terms of the GNU Affero General Public License as
+/// published by the Free Software Foundation, either version 3 of the
+/// License, or (at your option) any later version.
+///
+/// POV-Ray is distributed in the hope that it will be useful,
+/// but WITHOUT ANY WARRANTY; without even the implied warranty of
+/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+/// GNU Affero General Public License for more details.
+///
+/// You should have received a copy of the GNU Affero General Public License
+/// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+///
+/// ----------------------------------------------------------------------------
+///
+/// POV-Ray is based on the popular DKB raytracer version 2.12.
+/// DKBTrace was originally written by David K. Buck.
+/// DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
+///
+/// @endparblock
+///
+//*******************************************************************************
+
+#include <algorithm>
 
 // frame.h must always be the first POV file included (pulls in platform config)
 #include "backend/frame.h"
 #include "backend/colour/colour_old.h"
+
 #include "backend/texture/texture.h"
 #include "backend/texture/pigment.h"
 #include "backend/texture/normal.h"
 #include "backend/math/vector.h"
-
-#include <algorithm>
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -75,15 +78,15 @@ namespace pov
 * FUNCTION
 *
 * INPUT
-*   
+*
 * OUTPUT
-*   
+*
 * RETURNS
-*   
+*
 * AUTHOR
 *
 *   POV-Ray Team
-*   
+*
 * DESCRIPTION
 *
 *   -
@@ -96,13 +99,13 @@ namespace pov
 
 COLOUR *Create_Colour ()
 {
-	COLOUR *New;
+    COLOUR *New;
 
-	New = reinterpret_cast<COLOUR *>(POV_MALLOC(sizeof (COLOUR), "color"));
+    New = reinterpret_cast<COLOUR *>(POV_MALLOC(sizeof (COLOUR), "color"));
 
-	Make_ColourA (*New, 0.0, 0.0, 0.0, 0.0, 0.0);
+    Make_ColourA (*New, 0.0, 0.0, 0.0, 0.0, 0.0);
 
-	return (New);
+    return (New);
 }
 
 
@@ -112,15 +115,15 @@ COLOUR *Create_Colour ()
 * FUNCTION
 *
 * INPUT
-*   
+*
 * OUTPUT
-*   
+*
 * RETURNS
-*   
+*
 * AUTHOR
 *
 *   POV-Ray Team
-*   
+*
 * DESCRIPTION
 *
 *   -
@@ -133,55 +136,20 @@ COLOUR *Create_Colour ()
 
 COLOUR *Copy_Colour (const COLOUR Old)
 {
-	COLOUR *New;
+    COLOUR *New;
 
-	if (Old != NULL)
-	{
-		New = Create_Colour ();
+    if (Old != NULL)
+    {
+        New = Create_Colour ();
 
-		Assign_Colour(*New,Old);
-	}
-	else
-	{
-		New = NULL;
-	}
+        Assign_Colour(*New,Old);
+    }
+    else
+    {
+        New = NULL;
+    }
 
-	return (New);
-}
-
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*   
-* OUTPUT
-*   
-* RETURNS
-*   
-* AUTHOR
-*
-*   POV-Ray Team
-*   
-* DESCRIPTION
-*
-*   -
-*
-* CHANGES
-*
-*   Aug 1995 : Use POV_CALLOC to initialize entries. [DB]
-*
-******************************************************************************/
-
-BLEND_MAP_ENTRY *Create_BMap_Entries (int Map_Size)
-{
-	BLEND_MAP_ENTRY *New;
-
-	New = reinterpret_cast<BLEND_MAP_ENTRY *>(POV_CALLOC(Map_Size, sizeof (BLEND_MAP_ENTRY), "blend map entry"));
-
-	return (New);
+    return (New);
 }
 
 
@@ -193,15 +161,15 @@ BLEND_MAP_ENTRY *Create_BMap_Entries (int Map_Size)
 *   Create_Blend_Map
 *
 * INPUT
-*   
+*
 * OUTPUT
-*   
+*
 * RETURNS
-*   
+*
 * AUTHOR
 *
 *   POV-Ray Team
-*   
+*
 * DESCRIPTION
 *
 *   -
@@ -212,26 +180,33 @@ BLEND_MAP_ENTRY *Create_BMap_Entries (int Map_Size)
 *
 ******************************************************************************/
 
-BLEND_MAP *Create_Blend_Map ()
+template<>
+ColourBlendMapPtr Create_Blend_Map<ColourBlendMap> (int type)
 {
-	BLEND_MAP *New;
-
-	New = reinterpret_cast<BLEND_MAP *>(POV_MALLOC(sizeof (BLEND_MAP), "blend map"));
-
-	New->Users = 1;
-
-	New->Number_Of_Entries = 0;
-
-	New->Type = COLOUR_TYPE;
-
-	New->Blend_Map_Entries = NULL;
-
-	New->Transparency_Flag = false;
-
-	return (New);
+    assert (type == COLOUR_TYPE);
+    return ColourBlendMapPtr (new ColourBlendMap);
 }
 
+template<>
+PigmentBlendMapPtr Create_Blend_Map<PigmentBlendMap> (int type)
+{
+    assert ((type == PIGMENT_TYPE) || (type == DENSITY_TYPE));
+    return PigmentBlendMapPtr (new PigmentBlendMap(type));
+}
 
+template<>
+UnifiedNormalBlendMapPtr Create_Blend_Map<UnifiedNormalBlendMap> (int type)
+{
+    assert ((type == SLOPE_TYPE) || (type == NORMAL_TYPE));
+    return UnifiedNormalBlendMapPtr (new UnifiedNormalBlendMap(type));
+}
+
+template<>
+TextureBlendMapPtr Create_Blend_Map<TextureBlendMap> (int type)
+{
+    assert (type == TEXTURE_TYPE);
+    return TextureBlendMapPtr (new TextureBlendMap);
+}
 
 /*****************************************************************************
 *
@@ -240,15 +215,15 @@ BLEND_MAP *Create_Blend_Map ()
 *   Copy_Blend_Map
 *
 * INPUT
-*   
+*
 * OUTPUT
 *
 * RETURNS
-*   
+*
 * AUTHOR
 *
 *   POV-Ray Team
-*   
+*
 * DESCRIPTION
 *
 *   -
@@ -259,28 +234,16 @@ BLEND_MAP *Create_Blend_Map ()
 *
 ******************************************************************************/
 
-BLEND_MAP *Copy_Blend_Map (BLEND_MAP *Old)
+template<typename MAP_T>
+shared_ptr<MAP_T> Copy_Blend_Map (shared_ptr<MAP_T>& Old)
 {
-	BLEND_MAP *New;
-
-	New = Old;
-
-	/* 
-	 * Do not increase the users field if it is negative.
-	 *
-	 * A negative users field incicates a reference to a static
-	 * or global memory area in the data segment, not on the heap!
-	 * Thus it must not be deleted later.
-	 */
-
-	if ((New != NULL) && (New->Users >= 0))
-	{
-		New->Users++;
-	}
-
-	return (New);
+    return shared_ptr<MAP_T>(Old);
 }
 
+template ColourBlendMapPtr          Copy_Blend_Map (ColourBlendMapPtr& Old);
+template PigmentBlendMapPtr         Copy_Blend_Map (PigmentBlendMapPtr& Old);
+template UnifiedNormalBlendMapPtr   Copy_Blend_Map (UnifiedNormalBlendMapPtr& Old);
+template TextureBlendMapPtr         Copy_Blend_Map (TextureBlendMapPtr& Old);
 
 
 /*****************************************************************************
@@ -290,15 +253,15 @@ BLEND_MAP *Copy_Blend_Map (BLEND_MAP *Old)
 *   Destroy_Blend_Map
 *
 * INPUT
-*   
+*
 * OUTPUT
-*   
+*
 * RETURNS
-*   
+*
 * AUTHOR
 *
 *   POV-Ray Team
-*   
+*
 * DESCRIPTION
 *
 *   -
@@ -309,37 +272,24 @@ BLEND_MAP *Copy_Blend_Map (BLEND_MAP *Old)
 *
 ******************************************************************************/
 
-void Destroy_Blend_Map (BLEND_MAP *BMap)
+template<typename DATA_T>
+BlendMap<DATA_T>::BlendMap(int type) : Type(type) {}
+
+template BlendMap<ColourBlendMapData>::BlendMap(int type);
+template BlendMap<PigmentBlendMapData>::BlendMap(int type);
+template BlendMap<UnifiedNormalBlendMapData>::BlendMap(int type);
+template BlendMap<TexturePtr>::BlendMap(int type);
+
+template<typename DATA_T>
+void BlendMap<DATA_T>::Set(const Vector& data)
 {
-	int i;
-	
-	if (BMap != NULL)
-	{
-		if ((BMap->Users > 0) && (--(BMap->Users) == 0))
-		{
-			for (i = 0; i < BMap->Number_Of_Entries; i++)
-			{
-				switch (BMap->Type)
-				{
-					case PIGMENT_TYPE:
-					case DENSITY_TYPE:
-						Destroy_Pigment(BMap->Blend_Map_Entries[i].Vals.Pigment);
-						break;
-
-					case NORMAL_TYPE:
-						Destroy_Tnormal(BMap->Blend_Map_Entries[i].Vals.Tnormal);
-						break;
-
-					case TEXTURE_TYPE:
-						Destroy_Textures(BMap->Blend_Map_Entries[i].Vals.Texture);
-				}
-			}
-
-			POV_FREE (BMap->Blend_Map_Entries);
-
-			POV_FREE (BMap);
-		}
-	}
+    Blend_Map_Entries.reserve(data.size());
+    Blend_Map_Entries.assign(data.begin(), data.end());
 }
+
+template void BlendMap<ColourBlendMapData>::Set(const Vector& data);
+template void BlendMap<PigmentBlendMapData>::Set(const Vector& data);
+template void BlendMap<UnifiedNormalBlendMapData>::Set(const Vector& data);
+template void BlendMap<TexturePtr>::Set(const Vector& data);
 
 }

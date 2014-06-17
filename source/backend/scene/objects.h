@@ -280,7 +280,6 @@ class LightSource : public CompoundObject
         int Area_Size1, Area_Size2;
         int Adaptive_Level;
         ObjectPtr Projected_Through_Object;
-        BLEND_MAP *blend_map;// NK for dispersion
 
         unsigned Light_Type : 8;
         bool Area_Light : 1;

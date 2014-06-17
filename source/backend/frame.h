@@ -123,6 +123,13 @@ typedef const ObjectBase * ConstObjectPtr;
 
 class CompoundObject;
 
+class Intersection;
+class Ray;
+
+// TODO FIXME
+class SceneThreadData;
+typedef SceneThreadData TraceThreadData;
+
 /// @}
 ///
 //******************************************************************************
@@ -937,10 +944,6 @@ struct Transform_Struct
 #pragma mark * Blend Map
 #endif
 
-const int MAX_BLEND_MAP_ENTRIES = 256;
-
-typedef struct Blend_Map_Entry BLEND_MAP_ENTRY;
-typedef struct Blend_Map_Struct BLEND_MAP;
 typedef struct Pattern_Struct TPATTERN;
 typedef struct Texture_Struct TEXTURE;
 typedef struct Pigment_Struct PIGMENT;
@@ -951,34 +954,127 @@ typedef struct Warps_Struct WARP;
 typedef struct Spline_Entry SPLINE_ENTRY;
 typedef struct Spline_Struct SPLINE;
 
-struct Blend_Map_Entry
+typedef TEXTURE* TexturePtr;
+
+template<typename DATA_T>
+struct BlendMapEntry
 {
-    SNGL value;
-    unsigned char Same;
-    union
-    {
-        COLOUR colour;
-        PIGMENT *Pigment;
-        TNORMAL *Tnormal;
-        TEXTURE *Texture;
-        UV_VECT Point_Slope;
-    } Vals;
+    SNGL    value;
+    DATA_T  Vals;
 };
 
-struct Blend_Map_Struct
+union UnifiedNormalBlendMapData
 {
-    int Users;                              ///< -1 for default blend maps (prevents them from being destroyed)
-    short Number_Of_Entries;
-    char Transparency_Flag, Type;
-    BLEND_MAP_ENTRY *Blend_Map_Entries;
+    TNORMAL *Tnormal;
+    UV_VECT Point_Slope;
 };
 
-inline void Make_Blend_Map_Entry(BLEND_MAP_ENTRY& entry, SNGL v, unsigned char s, COLC r, COLC g, COLC b, COLC a, COLC t)
+template<typename DATA_T>
+class BlendMap
 {
-    entry.value = v;
-    entry.Same = s;
-    Make_ColourA(entry.Vals.colour, r, g, b, a, t);
-}
+    public:
+
+        typedef DATA_T                      Data;
+        typedef BlendMapEntry<DATA_T>       Entry;
+        typedef Entry*                      EntryPtr;
+        typedef const Entry*                EntryConstPtr;
+        typedef vector<Entry>               Vector;
+
+        BlendMap(int type);
+        virtual ~BlendMap() {}
+
+        void Set(const Vector& data);
+        void Search(DBL value, EntryConstPtr& rpPrev, EntryConstPtr& rpNext, DBL& rPrevWeight, DBL& rNextWeight) const;
+
+    // protected:
+
+        unsigned char   Type;
+        Vector          Blend_Map_Entries;
+};
+
+class GenericPigmentBlendMapInterface
+{
+    public:
+        virtual bool Compute(Colour& colour, DBL value, const Vector3d& IPoint, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread) = 0;
+        virtual void ComputeAverage(Colour& colour, const Vector3d& EPoint, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread) = 0;
+        virtual bool ComputeUVMapped(Colour& colour, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread) = 0;
+        virtual void ConvertFilterToTransmit() = 0; ///< @deprecated Only used for backward compatibility with version 3.10 or earlier.
+        virtual void Post(bool& rHasFilter) = 0;
+};
+
+class ColourBlendMap : public BlendMap<COLOUR>, public GenericPigmentBlendMapInterface
+{
+    public:
+
+        ColourBlendMap();
+        ColourBlendMap(int n, const Entry aEntries[]);
+
+        virtual bool Compute(Colour& colour, DBL value, const Vector3d& IPoint, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread);
+        virtual void ComputeAverage(Colour& colour, const Vector3d& EPoint, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread);
+        virtual bool ComputeUVMapped(Colour& colour, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread);
+        virtual void ConvertFilterToTransmit(); ///< @deprecated Only used for backward compatibility with version 3.10 or earlier.
+        virtual void Post(bool& rHasFilter);
+};
+
+class PigmentBlendMap : public BlendMap<PIGMENT*>, public GenericPigmentBlendMapInterface
+{
+    public:
+
+        PigmentBlendMap(int type);
+        virtual ~PigmentBlendMap();
+
+        virtual bool Compute(Colour& colour, DBL value, const Vector3d& IPoint, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread);
+        virtual void ComputeAverage(Colour& colour, const Vector3d& EPoint, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread);
+        virtual bool ComputeUVMapped(Colour& colour, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread);
+        virtual void ConvertFilterToTransmit(); ///< @deprecated Only used for backward compatibility with version 3.10 or earlier.
+        virtual void Post(bool& rHasFilter);
+};
+
+class UnifiedNormalBlendMap : public BlendMap<UnifiedNormalBlendMapData>
+{
+    public:
+
+        UnifiedNormalBlendMap(int type);
+        virtual ~UnifiedNormalBlendMap();
+
+        virtual void Post(bool dontScaleBumps);
+        virtual void ComputeAverage (const Vector3d& EPoint, Vector3d& normal, Intersection *Inter, const Ray *ray, TraceThreadData *Thread);
+};
+
+class TextureBlendMap : public BlendMap<TexturePtr>
+{
+    public:
+
+        TextureBlendMap();
+        ~TextureBlendMap();
+};
+
+typedef shared_ptr<GenericPigmentBlendMapInterface>         GenericPigmentBlendMapPtr;
+typedef shared_ptr<const GenericPigmentBlendMapInterface>   GenericPigmentBlendMapConstPtr;
+
+typedef PIGMENT*                                    PigmentBlendMapData;
+typedef BlendMapEntry<PigmentBlendMapData>          PigmentBlendMapEntry;
+typedef shared_ptr<PigmentBlendMap>                 PigmentBlendMapPtr;
+typedef shared_ptr<const PigmentBlendMap>           PigmentBlendMapConstPtr;
+
+typedef COLOUR                                      ColourBlendMapData;
+typedef BlendMapEntry<ColourBlendMapData>           ColourBlendMapEntry;
+typedef shared_ptr<ColourBlendMap>                  ColourBlendMapPtr;
+typedef shared_ptr<const ColourBlendMap>            ColourBlendMapConstPtr;
+
+typedef BlendMapEntry<UnifiedNormalBlendMapData>    UnifiedNormalBlendMapEntry;
+typedef shared_ptr<UnifiedNormalBlendMap>           UnifiedNormalBlendMapPtr;
+typedef shared_ptr<const UnifiedNormalBlendMap>     UnifiedNormalBlendMapConstPtr;
+
+typedef UnifiedNormalBlendMapData                   SlopeBlendMapData;
+typedef UnifiedNormalBlendMapEntry                  SlopeBlendMapEntry;
+typedef UnifiedNormalBlendMap                       SlopeBlendMap;
+typedef shared_ptr<UnifiedNormalBlendMap>           SlopeBlendMapPtr;
+typedef shared_ptr<const UnifiedNormalBlendMap>     SlopeBlendMapConstPtr;
+
+typedef BlendMapEntry<TexturePtr>                   TextureBlendMapEntry;
+typedef shared_ptr<TextureBlendMap>                 TextureBlendMapPtr;
+typedef shared_ptr<const TextureBlendMap>           TextureBlendMapConstPtr;
 
 /// @}
 ///
@@ -1166,23 +1262,25 @@ struct Pattern_Struct
     unsigned short Type;
     unsigned short Flags;
     PatternPtr pattern;
-    BLEND_MAP *Blend_Map;
 };
 
 struct Pigment_Struct : public Pattern_Struct
 {
+    shared_ptr<GenericPigmentBlendMapInterface> Blend_Map;
     Colour colour;       // may have a filter/transmit component
     Colour Quick_Colour; // may have a filter/transmit component    // TODO - can't we decide between regular colour and quick_colour at parse time already?
 };
 
 struct Tnormal_Struct : public Pattern_Struct
 {
+    UnifiedNormalBlendMapPtr Blend_Map;
     SNGL Amount;
     SNGL Delta; // NK delta
 };
 
 struct Texture_Struct : public Pattern_Struct
 {
+    TextureBlendMapPtr Blend_Map;
     int References;
     TEXTURE *Next;
     PIGMENT *Pigment;
@@ -1249,10 +1347,6 @@ struct Material_Struct
 #ifndef DUMP_OBJECT_DATA
 #define DUMP_OBJECT_DATA 0
 #endif
-
-// TODO FIXME
-class SceneThreadData;
-typedef SceneThreadData TraceThreadData;
 
 class LightSource;
 // These fields are common to all objects.

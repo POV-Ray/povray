@@ -310,6 +310,8 @@ class Parser : public Task
         int Debug_Info(const char *format,...);
         void FlushDebugMessageBuffer();
 
+        static void Convert_Filter_To_Transmit(PIGMENT *Pigment); // NK layers - 1999 July 10 - for backwards compatiblity with layered textures
+
         // tokenize.h/tokenize.cpp
         void Get_Token (void);
         void Unget_Token (void);
@@ -353,10 +355,13 @@ class Parser : public Task
         void Parse_Colour (COLOUR colour, bool expectFT = true);
         void Parse_Colour (Colour& colour);
         void Parse_Colour (RGBColour& colour);
-        BLEND_MAP *Parse_Blend_Map (int Blend_Type, int Pat_Type);
-        BLEND_MAP *Parse_Colour_Map (void);
-        BLEND_MAP *Parse_Blend_List (int Count, const BLEND_MAP *Def_Map, int Blend_Type);
-        BLEND_MAP *Parse_Item_Into_Blend_List (int Blend_Type);
+        template<typename DATA_T> void Parse_BlendMapData (int Blend_Type, DATA_T& rData);
+        template<typename MAP_T> shared_ptr<MAP_T> Parse_Blend_Map (int Blend_Type, int Pat_Type);
+        template<typename MAP_T> shared_ptr<MAP_T> Parse_Colour_Map (void);
+        template<typename DATA_T> void Parse_BlendListData (int Blend_Type, DATA_T& rData);
+        template<typename DATA_T> void Parse_BlendListData_Default (const ColourBlendMapData& Def_Entry, int Blend_Type, DATA_T& rData);
+        template<typename MAP_T> shared_ptr<MAP_T> Parse_Blend_List (int Count, ColourBlendMapConstPtr Def_Map, int Blend_Type);
+        template<typename MAP_T> shared_ptr<MAP_T> Parse_Item_Into_Blend_List (int Blend_Type);
         SPLINE *Parse_Spline (void);
 
         /// Parses a FLOAT.
@@ -574,8 +579,6 @@ class Parser : public Task
         void Set_CSG_Children_Flag(ObjectPtr, unsigned int, unsigned int, unsigned int);
         void Set_CSG_Tree_Flag(ObjectPtr, unsigned int, int);
 
-        void Convert_Filter_To_Transmit(PIGMENT *Pigment); // NK layers - 1999 July 10 - for backwards compatiblity with layered textures
-
         ObjectPtr Parse_Isosurface(void);
         ObjectPtr Parse_Parametric(void);
 
@@ -627,7 +630,7 @@ class Parser : public Task
         void Parse_Image_Pattern (TPATTERN *TPattern);
         void Parse_Bump_Map (TNORMAL *Tnormal);
         void Parse_Image_Map (PIGMENT *Pigment);
-        void Parse_Pattern (TPATTERN *New, int TPat_Type);
+        template<typename MAP_T, typename PATTERN_T> void Parse_Pattern (PATTERN_T *New, int TPat_Type);
         TEXTURE *Parse_Vers1_Texture (void);
         TEXTURE *Parse_Tiles (void);
         TEXTURE *Parse_Material_Map (void);

@@ -81,138 +81,123 @@ static RandomDoubleSequence gPatternRands(0.0, 1.0, 32768);
 static int gaBinomialCoefficients[((kFractalMaxExponent+1)*(kFractalMaxExponent+2))/2]; // GLOBAL VARIABLE
 static int gaCrackleCubeTable[81*3];
 
-// NB: gaDefaultBlendMapEntries_* should be static const in theory, but that complicates matters when referencing them
-// in gDefaultBlendMap_*.
 
-static BLEND_MAP_ENTRY gaDefaultBlendMapEntries_BlackWhite[2] =
-    {{0.0, false, {{0.0, 0.0, 0.0, 0.0, 0.0}}},
-     {1.0, false, {{1.0, 1.0, 1.0, 0.0, 0.0}}}};
+static const ColourBlendMapEntry gaDefaultBlendMapEntries_BlackWhite[2] =
+    {{0.0, {0.0, 0.0, 0.0, 0.0, 0.0}},
+     {1.0, {1.0, 1.0, 1.0, 0.0, 0.0}}};
 
-static const BLEND_MAP gDefaultBlendMap_Gray =
-    { -1,  2,  false, COLOUR_TYPE,  gaDefaultBlendMapEntries_BlackWhite};
+static ColourBlendMapConstPtr gpDefaultBlendMap_Gray (new ColourBlendMap(2, gaDefaultBlendMapEntries_BlackWhite));
 
 
-static BLEND_MAP_ENTRY gaDefaultBlendMapEntries_Agate[6] =
-    {{0.0, false, {{1.0,  1.0,  1.0,  0.0, 0.0}}},
-     {0.5, false, {{0.95, 0.75, 0.5,  0.0, 0.0}}},
-     {0.5, false, {{0.9,  0.7,  0.5,  0.0, 0.0}}},
-     {0.6, false, {{0.9,  0.7,  0.4,  0.0, 0.0}}},
-     {0.6, false, {{1.0,  0.7,  0.4,  0.0, 0.0}}},
-     {1.0, false, {{0.6,  0.3,  0.0,  0.0, 0.0}}}};
+static const ColourBlendMapEntry gaDefaultBlendMapEntries_Agate[6] =
+    {{0.0, {1.0,  1.0,  1.0,  0.0, 0.0}},
+     {0.5, {0.95, 0.75, 0.5,  0.0, 0.0}},
+     {0.5, {0.9,  0.7,  0.5,  0.0, 0.0}},
+     {0.6, {0.9,  0.7,  0.4,  0.0, 0.0}},
+     {0.6, {1.0,  0.7,  0.4,  0.0, 0.0}},
+     {1.0, {0.6,  0.3,  0.0,  0.0, 0.0}}};
 
-static const BLEND_MAP gDefaultBlendMap_Agate =
-    { -1,  6,  false, COLOUR_TYPE,  gaDefaultBlendMapEntries_Agate};
-
-
-static BLEND_MAP_ENTRY gaDefaultBlendMapEntries_Bozo[6] =
-    {{0.4, false, {{1.0, 1.0, 1.0, 0.0, 0.0}}},
-     {0.4, false, {{0.0, 1.0, 0.0, 0.0, 0.0}}},
-     {0.6, false, {{0.0, 1.0, 0.0, 0.0, 0.0}}},
-     {0.6, false, {{0.0, 0.0, 1.0, 0.0, 0.0}}},
-     {0.8, false, {{0.0, 0.0, 1.0, 0.0, 0.0}}},
-     {0.8, false, {{1.0, 0.0, 0.0, 0.0, 0.0}}}};
-
-static const BLEND_MAP gDefaultBlendMap_Bozo =
-    { -1,  6,  false, COLOUR_TYPE,  gaDefaultBlendMapEntries_Bozo};
+static ColourBlendMapConstPtr gpDefaultBlendMap_Agate (new ColourBlendMap(6, gaDefaultBlendMapEntries_Agate));
 
 
-static BLEND_MAP_ENTRY gaDefaultBlendMapEntries_Brick[2] =
-    {{0.0, false, {{0.5, 0.5,  0.5,  0.0, 0.0}}},
-     {1.0, false, {{0.6, 0.15, 0.15, 0.0, 0.0}}}};
+static const ColourBlendMapEntry gaDefaultBlendMapEntries_Bozo[6] =
+    {{0.4, {1.0, 1.0, 1.0, 0.0, 0.0}},
+     {0.4, {0.0, 1.0, 0.0, 0.0, 0.0}},
+     {0.6, {0.0, 1.0, 0.0, 0.0, 0.0}},
+     {0.6, {0.0, 0.0, 1.0, 0.0, 0.0}},
+     {0.8, {0.0, 0.0, 1.0, 0.0, 0.0}},
+     {0.8, {1.0, 0.0, 0.0, 0.0, 0.0}}};
 
-static const BLEND_MAP gDefaultBlendMap_Brick =
-    { -1,  2,  false, COLOUR_TYPE,  gaDefaultBlendMapEntries_Brick};
-
-
-static BLEND_MAP_ENTRY gaDefaultBlendMapEntries_Checker[2] =
-    {{0.0, false, {{0.0, 0.0, 1.0, 0.0, 0.0}}},
-     {1.0, false, {{0.0, 1.0, 0.0, 0.0, 0.0}}}};
-
-static const BLEND_MAP gDefaultBlendMap_Checker =
-    { -1, 2,  false, COLOUR_TYPE,  gaDefaultBlendMapEntries_Checker};
+static ColourBlendMapConstPtr gpDefaultBlendMap_Bozo (new ColourBlendMap(6, gaDefaultBlendMapEntries_Bozo));
 
 
-static BLEND_MAP_ENTRY gaDefaultBlendMapEntries_Cubic[6] =
-    {{0.0, false, {{1.0, 0.0, 0.0, 0.0, 0.0}}},
-     {1.0, false, {{0.0, 1.0, 0.0, 0.0, 0.0}}}, // TODO FIXME - duplicate entry for 1.0
-     {1.0, false, {{0.0, 0.0, 1.0, 0.0, 0.0}}}, // TODO FIXME - duplicate entry for 1.0
-     {1.0, false, {{1.0, 1.0, 0.0, 0.0, 0.0}}}, // TODO FIXME - duplicate entry for 1.0
-     {1.0, false, {{0.0, 1.0, 1.0, 0.0, 0.0}}}, // TODO FIXME - duplicate entry for 1.0
-     {2.0, false, {{1.0, 0.0, 1.0, 0.0, 0.0}}}};
+static const ColourBlendMapEntry gaDefaultBlendMapEntries_Brick[2] =
+    {{0.0, {0.5, 0.5,  0.5,  0.0, 0.0}},
+     {1.0, {0.6, 0.15, 0.15, 0.0, 0.0}}};
 
-static const BLEND_MAP gDefaultBlendMap_Cubic =
-    { -1, 6,  false, COLOUR_TYPE,  gaDefaultBlendMapEntries_Cubic};
+static ColourBlendMapConstPtr gpDefaultBlendMap_Brick (new ColourBlendMap(2, gaDefaultBlendMapEntries_Brick));
 
 
-static BLEND_MAP_ENTRY gaDefaultBlendMapEntries_Hexagon[3] =
-    {{0.0, false, {{0.0, 0.0, 1.0, 0.0, 0.0}}},
-     {1.0, false, {{0.0, 1.0, 0.0, 0.0, 0.0}}},
-     {2.0, false, {{1.0, 0.0, 0.0, 0.0, 0.0}}}};
+static const ColourBlendMapEntry gaDefaultBlendMapEntries_Checker[2] =
+    {{0.0, {0.0, 0.0, 1.0, 0.0, 0.0}},
+     {1.0, {0.0, 1.0, 0.0, 0.0, 0.0}}};
 
-static const BLEND_MAP gDefaultBlendMap_Hexagon =
-    { -1,  3,  false, COLOUR_TYPE,  gaDefaultBlendMapEntries_Hexagon};
+static ColourBlendMapConstPtr gpDefaultBlendMap_Checker (new ColourBlendMap(2, gaDefaultBlendMapEntries_Checker));
 
 
-static BLEND_MAP_ENTRY gaDefaultBlendMapEntries_Mandel[5] =
-    {{0.001, false, {{0.0, 0.0, 0.0, 0.0, 0.0}}},
-     {0.001, false, {{0.0, 1.0, 1.0, 0.0, 0.0}}},
-     {0.012, false, {{1.0, 1.0, 0.0, 0.0, 0.0}}},
-     {0.015, false, {{1.0, 0.0, 1.0, 0.0, 0.0}}},
-     {0.1,   false, {{0.0, 1.0, 1.0, 0.0, 0.0}}}};
+static const ColourBlendMapEntry gaDefaultBlendMapEntries_Cubic[6] =
+    {{0.0, {1.0, 0.0, 0.0, 0.0, 0.0}},
+     {1.0, {0.0, 1.0, 0.0, 0.0, 0.0}},
+     {1.0, {0.0, 0.0, 1.0, 0.0, 0.0}},
+     {1.0, {1.0, 1.0, 0.0, 0.0, 0.0}},
+     {1.0, {0.0, 1.0, 1.0, 0.0, 0.0}},
+     {2.0, {1.0, 0.0, 1.0, 0.0, 0.0}}};
 
-static const BLEND_MAP gDefaultBlendMap_Mandel =
-    { -1,  5,  false, COLOUR_TYPE,  gaDefaultBlendMapEntries_Mandel};
-
-
-static BLEND_MAP_ENTRY gaDefaultBlendMapEntries_Marble[3] =
-    {{0.0, false, {{0.9, 0.8,  0.8,  0.0, 0.0}}},
-     {0.9, false, {{0.9, 0.08, 0.08, 0.0, 0.0}}},
-     {0.9, false, {{0.0, 0.0, 0.0, 0.0, 0.0}}}};
-
-static const BLEND_MAP gDefaultBlendMap_Marble =
-    { -1,  3,  false, COLOUR_TYPE,  gaDefaultBlendMapEntries_Marble};
+static ColourBlendMapConstPtr gpDefaultBlendMap_Cubic (new ColourBlendMap(6, gaDefaultBlendMapEntries_Cubic));
 
 
-static BLEND_MAP_ENTRY gaDefaultBlendMapEntries_Radial[4] =
-    {{0.0,   false, {{0.0, 1.0, 1.0, 0.0, 0.0}}},
-     {0.333, false, {{1.0, 1.0, 0.0, 0.0, 0.0}}},
-     {0.666, false, {{1.0, 0.0, 1.0, 0.0, 0.0}}},
-     {1.0,   false, {{0.0, 1.0, 1.0, 0.0, 0.0}}}};
+static const ColourBlendMapEntry gaDefaultBlendMapEntries_Hexagon[3] =
+    {{0.0, {0.0, 0.0, 1.0, 0.0, 0.0}},
+     {1.0, {0.0, 1.0, 0.0, 0.0, 0.0}},
+     {2.0, {1.0, 0.0, 0.0, 0.0, 0.0}}};
 
-static const BLEND_MAP gDefaultBlendMap_Radial =
-    { -1,  4,  false, COLOUR_TYPE,  gaDefaultBlendMapEntries_Radial};
+static ColourBlendMapConstPtr gpDefaultBlendMap_Hexagon (new ColourBlendMap(3, gaDefaultBlendMapEntries_Hexagon));
 
 
-static BLEND_MAP_ENTRY gaDefaultBlendMapEntries_Square[6] =
-    {{0.0, false, {{1.0, 0.0, 0.0, 0.0, 0.0}}},
-     {1.0, false, {{0.0, 1.0, 0.0, 0.0, 0.0}}}, // TODO FIXME - duplicate entry for 1.0
-     {1.0, false, {{0.0, 0.0, 1.0, 0.0, 0.0}}}, // TODO FIXME - duplicate entry for 1.0
-     {1.0, false, {{1.0, 1.0, 0.0, 0.0, 0.0}}}, // TODO FIXME - duplicate entry for 1.0
-     {1.0, false, {{0.0, 1.0, 1.0, 0.0, 0.0}}}, // TODO FIXME - unused duplicate entry for 1.0
-     {2.0, false, {{1.0, 0.0, 1.0, 0.0, 0.0}}}}; // TODO FIXME - unused entry (kept around until we've clarified the duplicate entries for 1.0)
+static const ColourBlendMapEntry gaDefaultBlendMapEntries_Mandel[5] =
+    {{0.001, {0.0, 0.0, 0.0, 0.0, 0.0}},
+     {0.001, {0.0, 1.0, 1.0, 0.0, 0.0}},
+     {0.012, {1.0, 1.0, 0.0, 0.0, 0.0}},
+     {0.015, {1.0, 0.0, 1.0, 0.0, 0.0}},
+     {0.1,   {0.0, 1.0, 1.0, 0.0, 0.0}}};
 
-static const BLEND_MAP gDefaultBlendMap_Square =
-    { -1, 4,  false, COLOUR_TYPE,  gaDefaultBlendMapEntries_Square};
+static ColourBlendMapConstPtr gpDefaultBlendMap_Mandel (new ColourBlendMap(5, gaDefaultBlendMapEntries_Mandel));
 
 
-static BLEND_MAP_ENTRY gaDefaultBlendMapEntries_Triangular[6] =
-    {{0.0, false, {{1.0, 0.0, 0.0, 0.0, 0.0}}},
-     {1.0, false, {{0.0, 1.0, 0.0, 0.0, 0.0}}}, // TODO FIXME - duplicate entry for 1.0
-     {1.0, false, {{0.0, 0.0, 1.0, 0.0, 0.0}}}, // TODO FIXME - duplicate entry for 1.0
-     {1.0, false, {{1.0, 1.0, 0.0, 0.0, 0.0}}}, // TODO FIXME - duplicate entry for 1.0
-     {1.0, false, {{0.0, 1.0, 1.0, 0.0, 0.0}}}, // TODO FIXME - duplicate entry for 1.0
-     {2.0, false, {{1.0, 0.0, 1.0, 0.0, 0.0}}}};
+static const ColourBlendMapEntry gaDefaultBlendMapEntries_Marble[3] =
+    {{0.0, {0.9, 0.8,  0.8,  0.0, 0.0}},
+     {0.9, {0.9, 0.08, 0.08, 0.0, 0.0}},
+     {0.9, {0.0, 0.0,  0.0,  0.0, 0.0}}};
 
-static const BLEND_MAP gDefaultBlendMap_Triangular =
-    { -1, 6,  false, COLOUR_TYPE,  gaDefaultBlendMapEntries_Triangular};
+static ColourBlendMapConstPtr gpDefaultBlendMap_Marble (new ColourBlendMap(3, gaDefaultBlendMapEntries_Marble));
 
 
-static BLEND_MAP_ENTRY gaDefaultBlendMapEntries_Wood[2] =
-    {{0.6, false, {{0.666, 0.312,  0.2,   0.0, 0.0}}},
-     {0.6, false, {{0.4,   0.1333, 0.066, 0.0, 0.0}}}};
+static const ColourBlendMapEntry gaDefaultBlendMapEntries_Radial[4] =
+    {{0.0,   {0.0, 1.0, 1.0, 0.0, 0.0}},
+     {0.333, {1.0, 1.0, 0.0, 0.0, 0.0}},
+     {0.666, {1.0, 0.0, 1.0, 0.0, 0.0}},
+     {1.0,   {0.0, 1.0, 1.0, 0.0, 0.0}}};
 
-static const BLEND_MAP gDefaultBlendMap_Wood =
-    { -1,  2,  false, COLOUR_TYPE,  gaDefaultBlendMapEntries_Wood};
+static ColourBlendMapConstPtr gpDefaultBlendMap_Radial (new ColourBlendMap(4, gaDefaultBlendMapEntries_Radial));
+
+
+static const ColourBlendMapEntry gaDefaultBlendMapEntries_Square[6] =
+    {{0.0, {1.0, 0.0, 0.0, 0.0, 0.0}},
+     {1.0, {0.0, 1.0, 0.0, 0.0, 0.0}},
+     {1.0, {0.0, 0.0, 1.0, 0.0, 0.0}},
+     {1.0, {1.0, 1.0, 0.0, 0.0, 0.0}},
+     {1.0, {0.0, 1.0, 1.0, 0.0, 0.0}},
+     {2.0, {1.0, 0.0, 1.0, 0.0, 0.0}}};
+
+static ColourBlendMapConstPtr gpDefaultBlendMap_Square (new ColourBlendMap(4, gaDefaultBlendMapEntries_Square));
+
+
+static const ColourBlendMapEntry gaDefaultBlendMapEntries_Triangular[6] =
+    {{0.0, {1.0, 0.0, 0.0, 0.0, 0.0}},
+     {1.0, {0.0, 1.0, 0.0, 0.0, 0.0}},
+     {1.0, {0.0, 0.0, 1.0, 0.0, 0.0}},
+     {1.0, {1.0, 1.0, 0.0, 0.0, 0.0}},
+     {1.0, {0.0, 1.0, 1.0, 0.0, 0.0}},
+     {2.0, {1.0, 0.0, 1.0, 0.0, 0.0}}};
+
+static ColourBlendMapConstPtr gpDefaultBlendMap_Triangular (new ColourBlendMap(6, gaDefaultBlendMapEntries_Triangular));
+
+
+static const ColourBlendMapEntry gaDefaultBlendMapEntries_Wood[2] =
+    {{0.6, {0.666, 0.312,  0.2,   0.0, 0.0}},
+     {0.6, {0.4,   0.1333, 0.066, 0.0, 0.0}}};
+
+static ColourBlendMapConstPtr gpDefaultBlendMap_Wood (new ColourBlendMap(2, gaDefaultBlendMapEntries_Wood));
 
 
 /*****************************************************************************
@@ -297,7 +282,7 @@ int BasicPattern::GetNoiseGen(const TraceThreadData *pThread) const
     return noise_gen;
 }
 
-const BLEND_MAP* BasicPattern::GetDefaultBlendMap() const { return &gDefaultBlendMap_Gray; }
+ColourBlendMapConstPtr BasicPattern::GetDefaultBlendMap() const { return gpDefaultBlendMap_Gray; }
 
 
 ContinuousPattern::ContinuousPattern() :
@@ -359,17 +344,17 @@ unsigned int ContinuousPattern::NumDiscreteBlendMapEntries() const { return 0; }
 unsigned int PlainPattern::NumDiscreteBlendMapEntries() const { return 1; }
 
 
-const BLEND_MAP* AgatePattern::GetDefaultBlendMap() const { return &gDefaultBlendMap_Agate; }
+ColourBlendMapConstPtr AgatePattern::GetDefaultBlendMap() const { return gpDefaultBlendMap_Agate; }
 
-const BLEND_MAP* BozoPattern::GetDefaultBlendMap() const { return &gDefaultBlendMap_Bozo; }
+ColourBlendMapConstPtr BozoPattern::GetDefaultBlendMap() const { return gpDefaultBlendMap_Bozo; }
 
-const BLEND_MAP* BrickPattern::GetDefaultBlendMap() const { return &gDefaultBlendMap_Brick; }
+ColourBlendMapConstPtr BrickPattern::GetDefaultBlendMap() const { return gpDefaultBlendMap_Brick; }
 unsigned int BrickPattern::NumDiscreteBlendMapEntries() const { return 2; }
 
-const BLEND_MAP* CheckerPattern::GetDefaultBlendMap() const { return &gDefaultBlendMap_Checker; }
+ColourBlendMapConstPtr CheckerPattern::GetDefaultBlendMap() const { return gpDefaultBlendMap_Checker; }
 unsigned int CheckerPattern::NumDiscreteBlendMapEntries() const { return 2; }
 
-const BLEND_MAP* CubicPattern::GetDefaultBlendMap() const { return &gDefaultBlendMap_Cubic; }
+ColourBlendMapConstPtr CubicPattern::GetDefaultBlendMap() const { return gpDefaultBlendMap_Cubic; }
 unsigned int CubicPattern::NumDiscreteBlendMapEntries() const { return 6; }
 
 
@@ -417,7 +402,7 @@ FunctionPattern::~FunctionPattern()
 }
 
 
-const BLEND_MAP* HexagonPattern::GetDefaultBlendMap() const { return &gDefaultBlendMap_Hexagon; }
+ColourBlendMapConstPtr HexagonPattern::GetDefaultBlendMap() const { return gpDefaultBlendMap_Hexagon; }
 unsigned int HexagonPattern::NumDiscreteBlendMapEntries() const { return 3; }
 
 
@@ -445,7 +430,7 @@ DBL ImagePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsect
 }
 
 
-const BLEND_MAP* MarblePattern::GetDefaultBlendMap() const { return &gDefaultBlendMap_Marble; }
+ColourBlendMapConstPtr MarblePattern::GetDefaultBlendMap() const { return gpDefaultBlendMap_Marble; }
 
 
 ObjectPattern::ObjectPattern() :
@@ -466,7 +451,7 @@ ObjectPattern::~ObjectPattern()
         Destroy_Object(pObject);
 }
 
-const BLEND_MAP* ObjectPattern::GetDefaultBlendMap() const { return &gDefaultBlendMap_Checker; } // sic!
+ColourBlendMapConstPtr ObjectPattern::GetDefaultBlendMap() const { return gpDefaultBlendMap_Checker; } // sic!
 unsigned int ObjectPattern::NumDiscreteBlendMapEntries() const { return 2; }
 
 
@@ -489,15 +474,15 @@ PigmentPattern::~PigmentPattern()
 }
 
 
-const BLEND_MAP* RadialPattern::GetDefaultBlendMap() const { return &gDefaultBlendMap_Radial; }
+ColourBlendMapConstPtr RadialPattern::GetDefaultBlendMap() const { return gpDefaultBlendMap_Radial; }
 
-const BLEND_MAP* SquarePattern::GetDefaultBlendMap() const { return &gDefaultBlendMap_Square; }
+ColourBlendMapConstPtr SquarePattern::GetDefaultBlendMap() const { return gpDefaultBlendMap_Square; }
 unsigned int SquarePattern::NumDiscreteBlendMapEntries() const { return 4; }
 
-const BLEND_MAP* TriangularPattern::GetDefaultBlendMap() const { return &gDefaultBlendMap_Triangular; }
+ColourBlendMapConstPtr TriangularPattern::GetDefaultBlendMap() const { return gpDefaultBlendMap_Triangular; }
 unsigned int TriangularPattern::NumDiscreteBlendMapEntries() const { return 6; }
 
-const BLEND_MAP* WoodPattern::GetDefaultBlendMap() const { return &gDefaultBlendMap_Wood; }
+ColourBlendMapConstPtr WoodPattern::GetDefaultBlendMap() const { return gpDefaultBlendMap_Wood; }
 
 
 JuliaPattern::JuliaPattern() :
@@ -553,7 +538,7 @@ Mandel2Pattern::Mandel2Pattern(const MandelPattern& obj) :
     MandelPattern(obj)
 {}
 
-const BLEND_MAP* Mandel2Pattern::GetDefaultBlendMap() const { return &gDefaultBlendMap_Mandel; }
+ColourBlendMapConstPtr Mandel2Pattern::GetDefaultBlendMap() const { return gpDefaultBlendMap_Mandel; }
 
 
 Mandel3Pattern::Mandel3Pattern() :
@@ -649,7 +634,6 @@ void Init_TPat_Fields (TPATTERN *Tpat)
 {
     Tpat->Type       = NO_PATTERN;
     Tpat->Flags      = NO_FLAGS;
-    Tpat->Blend_Map  = NULL;
 }
 
 
@@ -674,8 +658,6 @@ void Init_TPat_Fields (TPATTERN *Tpat)
 void Copy_TPat_Fields (TPATTERN *New, const TPATTERN *Old)
 {
     *New = *Old;
-
-    New->Blend_Map = Copy_Blend_Map(Old->Blend_Map);
 
     if (Old->pattern)
         New->pattern = Old->pattern->Clone();
@@ -704,8 +686,6 @@ void Copy_TPat_Fields (TPATTERN *New, const TPATTERN *Old)
 
 void Destroy_TPat_Fields(TPATTERN *Tpat)
 {
-    Destroy_Blend_Map(Tpat->Blend_Map);
-
     if (Tpat->pattern)
         Tpat->pattern.reset();
 }
@@ -919,36 +899,54 @@ void Transform_Tpattern(TPATTERN *Tpattern, const TRANSFORM *Trans)
 *
 ******************************************************************************/
 
-void Search_Blend_Map (DBL value, const BLEND_MAP *Blend_Map, const BLEND_MAP_ENTRY **Prev, const BLEND_MAP_ENTRY **Cur)
+template<typename DATA_T>
+void BlendMap<DATA_T>::Search (DBL value, EntryConstPtr& rpPrev, EntryConstPtr& rpNext, DBL& rPrevWeight, DBL& rNextWeight) const
 {
-    BLEND_MAP_ENTRY *P, *C;
-    int Max_Ent=Blend_Map->Number_Of_Entries-1;
+    size_t Max_Ent = Blend_Map_Entries.size()-1;
 
-    /* if greater than last, use last. */
-
-    if (value >= Blend_Map->Blend_Map_Entries[Max_Ent].value)
+    if (value >= Blend_Map_Entries[Max_Ent].value)
     {
-        P = C = &(Blend_Map->Blend_Map_Entries[Max_Ent]);
+        /* if greater than last, use last. */
+
+        rpPrev = rpNext = &(Blend_Map_Entries[Max_Ent]);
+        rPrevWeight = 0.0;
+        rNextWeight = 1.0;
     }
     else
     {
-        P = C = &(Blend_Map->Blend_Map_Entries[0]);
+        // TODO - we might use a binary search instead
 
-        while (value > C->value)
+        vector<Entry>::const_iterator iP;
+        vector<Entry>::const_iterator iN;
+
+        iP = iN = Blend_Map_Entries.begin();
+
+        while (value > iN->value)
         {
-            P = C++;
+            iP = iN;
+            iN++;
+        }
+
+        if ((value == iN->value) || (iP == iN))
+        {
+            rpPrev = rpNext = &(*iN);
+            rPrevWeight = 0.0;
+            rNextWeight = 1.0;
+        }
+        else
+        {
+            rpPrev = &(*iP);
+            rpNext = &(*iN);
+            rPrevWeight = (iN->value - value) / (iN->value - iP->value);
+            rNextWeight = 1.0 - rPrevWeight;
         }
     }
-
-    if (value == C->value)
-    {
-        P = C;
-    }
-
-    *Prev = P;
-    *Cur  = C;
 }
 
+template void BlendMap<COLOUR>                      ::Search (DBL value, EntryConstPtr& rpPrev, EntryConstPtr& rpNext, DBL& rPrevWeight, DBL& rNextWeight) const;
+template void BlendMap<PIGMENT*>                    ::Search (DBL value, EntryConstPtr& rpPrev, EntryConstPtr& rpNext, DBL& rPrevWeight, DBL& rNextWeight) const;
+template void BlendMap<UnifiedNormalBlendMapData>   ::Search (DBL value, EntryConstPtr& rpPrev, EntryConstPtr& rpNext, DBL& rPrevWeight, DBL& rNextWeight) const;
+template void BlendMap<TexturePtr>                  ::Search (DBL value, EntryConstPtr& rpPrev, EntryConstPtr& rpNext, DBL& rPrevWeight, DBL& rNextWeight) const;
 
 /*****************************************************************************
 *

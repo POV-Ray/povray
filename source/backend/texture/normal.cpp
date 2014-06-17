@@ -43,13 +43,15 @@
 // frame.h must always be the first POV file included (pulls in platform config)
 #include "backend/frame.h"
 #include "backend/texture/normal.h"
-#include "backend/texture/texture.h"
-#include "backend/texture/pigment.h"
-#include "backend/support/imageutil.h"
+
+#include "base/pov_err.h"
+#include "backend/colour/colour_old.h"
+#include "backend/math/vector.h"
 #include "backend/scene/objects.h"
 #include "backend/scene/threaddata.h"
-#include "backend/math/vector.h"
-#include "base/pov_err.h"
+#include "backend/support/imageutil.h"
+#include "backend/texture/pigment.h"
+#include "backend/texture/texture.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -89,7 +91,7 @@ static void dents (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& nor
 static void wrinkles (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& normal);
 static void quilted (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& normal);
 static DBL Hermite_Cubic (DBL T1, const UV_VECT UV1, const UV_VECT UV2);
-static DBL Do_Slope_Map (DBL value, const BLEND_MAP *Blend_Map);
+static DBL Do_Slope_Map (DBL value, const UnifiedNormalBlendMap *Blend_Map);
 static void Do_Average_Normals (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& normal, Intersection *Inter, const Ray *ray, TraceThreadData *Thread);
 static void facets (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& normal, TraceThreadData *Thread);
 
@@ -588,6 +590,7 @@ TNORMAL *Create_Tnormal ()
     New = new TNORMAL;
 
     Init_TPat_Fields(New);
+    New->Blend_Map  = NULL;
 
     New->Amount = 0.5;
 
@@ -621,7 +624,7 @@ TNORMAL *Create_Tnormal ()
 *
 ******************************************************************************/
 
-TNORMAL *Copy_Tnormal (const TNORMAL *Old)
+TNORMAL *Copy_Tnormal (TNORMAL *Old)
 {
     TNORMAL *New;
 
@@ -630,6 +633,7 @@ TNORMAL *Copy_Tnormal (const TNORMAL *Old)
         New = Create_Tnormal();
 
         Copy_TPat_Fields (New, Old);
+        New->Blend_Map = Copy_Blend_Map(Old->Blend_Map);
 
         New->Amount = Old->Amount;
         New->Delta = Old->Delta;
@@ -702,8 +706,7 @@ void Destroy_Tnormal(TNORMAL *Tnormal)
 
 void Post_Tnormal (TNORMAL *Tnormal)
 {
-    int i;
-    BLEND_MAP *Map;
+    UnifiedNormalBlendMapPtr Map;
 
     if (Tnormal != NULL)
     {
@@ -721,41 +724,29 @@ void Post_Tnormal (TNORMAL *Tnormal)
 
         if ((Map = Tnormal->Blend_Map) != NULL)
         {
-            for (i = 0; i < Map->Number_Of_Entries; i++)
-            {
-                switch (Map->Type)
-                {
-                    case PIGMENT_TYPE:
+            Map->Post((Tnormal->Flags & DONT_SCALE_BUMPS_FLAG) != 0);
+        }
+    }
+}
 
-                        Post_Pigment(Map->Blend_Map_Entries[i].Vals.Pigment);
+void UnifiedNormalBlendMap::Post(bool dontScaleBumps)
+{
+    for(Vector::iterator i = Blend_Map_Entries.begin(); i != Blend_Map_Entries.end(); i++)
+    {
+        switch (Type)
+        {
+            case NORMAL_TYPE:
+                if (dontScaleBumps)
+                    i->Vals.Tnormal->Flags |= DONT_SCALE_BUMPS_FLAG;
+                Post_Tnormal(i->Vals.Tnormal);
+                break;
 
-                        break;
+            case SLOPE_TYPE:
+                break;
 
-                    case NORMAL_TYPE:
-                        Map->Blend_Map_Entries[i].Vals.Tnormal->Flags |=
-                            (Tnormal->Flags & DONT_SCALE_BUMPS_FLAG);
+            default:
 
-                        Post_Tnormal(Map->Blend_Map_Entries[i].Vals.Tnormal);
-
-                        break;
-
-                    case TEXTURE_TYPE:
-
-                        Post_Textures(Map->Blend_Map_Entries[i].Vals.Texture);
-
-                        break;
-
-                    case SLOPE_TYPE:
-                    case COLOUR_TYPE:
-                    case PATTERN_TYPE:
-
-                        break;
-
-                    default:
-
-                        throw POV_EXCEPTION_STRING("Unknown pattern type in Post_Tnormal.");
-                }
-            }
+                throw POV_EXCEPTION_STRING("Unknown or unexpected pattern type in Post_Tnormal.");
         }
     }
 }
@@ -788,10 +779,11 @@ void Post_Tnormal (TNORMAL *Tnormal)
 void Perturb_Normal(Vector3d& Layer_Normal, const TNORMAL *Tnormal, const Vector3d& EPoint, Intersection *Intersection, const Ray *ray, TraceThreadData *Thread)
 {
     Vector3d TPoint,P1;
-    DBL value1,value2,Amount;
+    DBL value1,Amount;
+    DBL prevWeight, curWeight;
     int i;
-    const BLEND_MAP *Blend_Map;
-    const BLEND_MAP_ENTRY *Prev, *Cur;
+    UnifiedNormalBlendMapConstPtr Blend_Map;
+    const UnifiedNormalBlendMapEntry *Prev, *Cur;
 
     if (Tnormal==NULL)
     {
@@ -800,9 +792,10 @@ void Perturb_Normal(Vector3d& Layer_Normal, const TNORMAL *Tnormal, const Vector
 
     /* If normal_map present, use it and return */
 
-    if ((Blend_Map=Tnormal->Blend_Map) != NULL)
+    Blend_Map = Tnormal->Blend_Map;
+    if ((Blend_Map != NULL) && (Blend_Map->Type == NORMAL_TYPE))
     {
-        if ((Blend_Map->Type == NORMAL_TYPE) && (Tnormal->Type == UV_MAP_PATTERN))
+        if (Tnormal->Type == UV_MAP_PATTERN)
         {
             Vector2d UV_Coords;
 
@@ -820,13 +813,13 @@ void Perturb_Normal(Vector3d& Layer_Normal, const TNORMAL *Tnormal, const Vector
 
             return;
         }
-        else if ((Blend_Map->Type == NORMAL_TYPE) && (Tnormal->Type != AVERAGE_PATTERN))
+        else if (Tnormal->Type != AVERAGE_PATTERN)
         {
             /* NK 19 Nov 1999 added Warp_EPoint */
             Warp_EPoint (TPoint, EPoint, Tnormal);
             value1 = Evaluate_TPat(Tnormal, TPoint, Intersection, ray, Thread);
 
-            Search_Blend_Map (value1,Blend_Map,&Prev,&Cur);
+            Blend_Map->Search (value1,Prev,Cur,prevWeight,curWeight);
 
             Warp_Normal(Layer_Normal,Layer_Normal, Tnormal, Test_Flag(Tnormal,DONT_SCALE_BUMPS_FLAG));
             P1 = Layer_Normal;
@@ -839,10 +832,7 @@ void Perturb_Normal(Vector3d& Layer_Normal, const TNORMAL *Tnormal, const Vector
             {
                 Perturb_Normal(P1,Prev->Vals.Tnormal,TPoint,Intersection,ray,Thread);
 
-                value2 = (value1-Prev->value)/(Cur->value-Prev->value);
-                value1 = 1.0-value2;
-
-                Layer_Normal = value1 * P1 + value2 * Layer_Normal;
+                Layer_Normal = prevWeight * P1 + curWeight * Layer_Normal;
             }
 
             UnWarp_Normal(Layer_Normal,Layer_Normal, Tnormal, Test_Flag(Tnormal,DONT_SCALE_BUMPS_FLAG));
@@ -887,6 +877,7 @@ void Perturb_Normal(Vector3d& Layer_Normal, const TNORMAL *Tnormal, const Vector
         Warp_Normal(Layer_Normal,Layer_Normal, Tnormal,
                     Test_Flag(Tnormal,DONT_SCALE_BUMPS_FLAG));
 
+        // TODO FIXME - two magic fudge factors
         Amount=Tnormal->Amount * -5.0; /*fudge factor*/
         Amount*=0.02/Tnormal->Delta; /* NK delta */
 
@@ -896,7 +887,7 @@ void Perturb_Normal(Vector3d& Layer_Normal, const TNORMAL *Tnormal, const Vector
         for(i=0; i<=3; i++)
         {
             P1 = TPoint + (DBL)Tnormal->Delta * Pyramid_Vect[i]; /* NK delta */
-            value1 = Do_Slope_Map(Evaluate_TPat(Tnormal, P1, Intersection, ray, Thread), Blend_Map);
+            value1 = Do_Slope_Map(Evaluate_TPat(Tnormal, P1, Intersection, ray, Thread), Blend_Map.get());
             Layer_Normal += (value1*Amount) * Pyramid_Vect[i];
         }
 
@@ -929,26 +920,24 @@ void Perturb_Normal(Vector3d& Layer_Normal, const TNORMAL *Tnormal, const Vector
 *
 ******************************************************************************/
 
-static DBL Do_Slope_Map (DBL value, const BLEND_MAP *Blend_Map)
+static DBL Do_Slope_Map (DBL value, const SlopeBlendMap *Blend_Map)
 {
-    DBL Result;
-    const BLEND_MAP_ENTRY *Prev, *Cur;
+    DBL prevWeight, curWeight;
+    const SlopeBlendMapEntry *Prev, *Cur;
 
     if (Blend_Map == NULL)
     {
         return(value);
     }
 
-    Search_Blend_Map (value,Blend_Map,&Prev,&Cur);
+    Blend_Map->Search (value, Prev, Cur, prevWeight, curWeight);
 
     if (Prev == Cur)
     {
         return(Cur->Vals.Point_Slope[0]);
     }
 
-    Result = (value-Prev->value)/(Cur->value-Prev->value);
-
-    return(Hermite_Cubic(Result, Prev->Vals.Point_Slope, Cur->Vals.Point_Slope));
+    return(Hermite_Cubic(curWeight, Prev->Vals.Point_Slope, Cur->Vals.Point_Slope));
 }
 
 
@@ -1007,21 +996,50 @@ static DBL Hermite_Cubic(DBL T1, const UV_VECT UV1, const UV_VECT UV2)
 
 static void Do_Average_Normals (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& normal, Intersection *Inter, const Ray *ray, TraceThreadData *Thread)
 {
-    int i;
-    BLEND_MAP *Map = Tnormal->Blend_Map;
+    Tnormal->Blend_Map->ComputeAverage(EPoint, normal, Inter, ray, Thread);
+}
+
+
+//******************************************************************************
+
+UnifiedNormalBlendMap::UnifiedNormalBlendMap(int type) : BlendMap(type) {}
+
+UnifiedNormalBlendMap::~UnifiedNormalBlendMap()
+{
+    for (Vector::iterator i = Blend_Map_Entries.begin(); i != Blend_Map_Entries.end(); i++)
+    {
+        switch (Type)
+        {
+            case SLOPE_TYPE:
+                break;
+
+            case NORMAL_TYPE:
+                Destroy_Tnormal(i->Vals.Tnormal);
+                break;
+
+            default:
+                assert(false);
+        }
+    }
+}
+
+void UnifiedNormalBlendMap::ComputeAverage (const Vector3d& EPoint, Vector3d& normal, Intersection *Inter, const Ray *ray, TraceThreadData *Thread)
+{
     SNGL Value;
     SNGL Total = 0.0;
     Vector3d V1,V2;
 
+    assert (Type == NORMAL_TYPE);
+
     V1 = Vector3d(0.0, 0.0, 0.0);
 
-    for (i = 0; i < Map->Number_Of_Entries; i++)
+    for(Vector::const_iterator i = Blend_Map_Entries.begin(); i != Blend_Map_Entries.end(); i++)
     {
-        Value = Map->Blend_Map_Entries[i].value;
+        Value = i->value;
 
         V2 = normal;
 
-        Perturb_Normal(V2,Map->Blend_Map_Entries[i].Vals.Tnormal,EPoint,Inter,ray,Thread);
+        Perturb_Normal(V2,i->Vals.Tnormal,EPoint,Inter,ray,Thread);
 
         V1 += (DBL)Value * V2;
 
@@ -1030,5 +1048,6 @@ static void Do_Average_Normals (const Vector3d& EPoint, const TNORMAL *Tnormal, 
 
     normal = V1 / Total;
 }
+
 
 }

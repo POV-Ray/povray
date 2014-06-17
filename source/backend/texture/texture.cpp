@@ -49,11 +49,13 @@
 // frame.h must always be the first POV file included (pulls in platform config)
 #include "backend/frame.h"
 #include "backend/texture/texture.h"
+
+#include "base/pov_err.h"
+#include "backend/colour/colour_old.h"
+#include "backend/math/vector.h"
+#include "backend/support/imageutil.h"
 #include "backend/texture/pigment.h"
 #include "backend/texture/normal.h"
-#include "backend/support/imageutil.h"
-#include "backend/math/vector.h"
-#include "base/pov_err.h"
 
 #if defined(USE_AVX_FMA4_FOR_NOISE)
     #include "avxfma4check.h"
@@ -1261,6 +1263,7 @@ TEXTURE *Create_Texture()
     New = new TEXTURE;
 
     Init_TPat_Fields(New);
+    New->Blend_Map  = NULL;
 
     New->Next = NULL;
     New->References = 1;
@@ -1331,10 +1334,10 @@ TEXTURE *Copy_Texture_Pointer(TEXTURE *Texture)
 *
 ******************************************************************************/
 
-TEXTURE *Copy_Textures(const TEXTURE *Textures)
+TEXTURE *Copy_Textures(TEXTURE *Textures)
 {
     TEXTURE *New, *First, *Previous;
-    const TEXTURE *Layer;
+    TEXTURE *Layer;
 
     Previous = First = NULL;
 
@@ -1342,6 +1345,7 @@ TEXTURE *Copy_Textures(const TEXTURE *Textures)
     {
         New = Create_Texture();
         Copy_TPat_Fields (New, Layer);
+        New->Blend_Map = Copy_Blend_Map<TextureBlendMap>(Layer->Blend_Map);
 
         /*  Mesh copies a texture pointer that already has multiple
             references.  We just want a clean copy, not a copy
@@ -1421,6 +1425,7 @@ void Destroy_Textures(TEXTURE *Textures)
     while (Layer != NULL)
     {
         Destroy_TPat_Fields(Layer);
+        Layer->Blend_Map.reset();
 
         // Theoretically these should only be non-NULL for PLAIN_PATTERN, but let's clean them up either way.
         Destroy_Pigment(Layer->Pigment);
@@ -1462,8 +1467,7 @@ void Destroy_Textures(TEXTURE *Textures)
 void Post_Textures(TEXTURE *Textures)
 {
     TEXTURE *Layer;
-    int i;
-    BLEND_MAP *Map;
+    TextureBlendMap *Map;
 
     if (Textures == NULL)
     {
@@ -1497,13 +1501,13 @@ void Post_Textures(TEXTURE *Textures)
                     break;
             }
 
-            if ((Map=Layer->Blend_Map) != NULL)
+            if ((Map=Layer->Blend_Map.get()) != NULL)
             {
-                for (i = 0; i < Map->Number_Of_Entries; i++)
+                for(vector<TextureBlendMapEntry>::iterator i = Map->Blend_Map_Entries.begin(); i != Map->Blend_Map_Entries.end(); i++)
                 {
-                    Map->Blend_Map_Entries[i].Vals.Texture->Flags |=
+                    i->Vals->Flags |=
                         (Layer->Flags & DONT_SCALE_BUMPS_FLAG);
-                    Post_Textures(Map->Blend_Map_Entries[i].Vals.Texture);
+                    Post_Textures(i->Vals);
                 }
             }
             else
@@ -2315,5 +2319,15 @@ void AVX_FMA4_DNoise(Vector3d& result, const Vector3d& EPoint)
 
 #endif
 
+
+//******************************************************************************
+
+TextureBlendMap::TextureBlendMap() : BlendMap(TEXTURE_TYPE) {}
+
+TextureBlendMap::~TextureBlendMap()
+{
+    for (Vector::iterator i = Blend_Map_Entries.begin(); i != Blend_Map_Entries.end(); i++)
+        Destroy_Textures(i->Vals);
+}
 
 }
