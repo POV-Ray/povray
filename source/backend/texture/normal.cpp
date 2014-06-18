@@ -173,7 +173,7 @@ static void waves (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& nor
     register DBL length, scalar, index, sinValue ;
     Vector3d point;
 
-    RipplesPattern* pPat = dynamic_cast<RipplesPattern*>(Tnormal->pattern.get());
+    WavesPattern* pPat = dynamic_cast<WavesPattern*>(Tnormal->pattern.get());
     if (pPat == NULL)
         throw POV_EXCEPTION_STRING("Invalid pattern type.");
 
