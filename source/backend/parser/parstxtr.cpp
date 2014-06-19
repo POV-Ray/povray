@@ -943,7 +943,7 @@ void Parser::Parse_Pigment (PIGMENT **Pigment_Ptr)
         END_CASE
     END_EXPECT    /* End pigment_id */
 
-    Parse_Pattern<GenericPigmentBlendMapInterface>(*Pigment_Ptr,PIGMENT_TYPE);
+    Parse_Pattern<GenericPigmentBlendMap>(*Pigment_Ptr,PIGMENT_TYPE);
 
     if (Not_In_Default && ((*Pigment_Ptr)->Type == NO_PATTERN))
     {
@@ -2283,7 +2283,7 @@ void Parser::Parse_Tnormal (TNORMAL **Tnormal_Ptr)
             *Tnormal_Ptr = Create_Tnormal ();
         }
     }
-    Parse_Pattern<UnifiedNormalBlendMap>(*Tnormal_Ptr,NORMAL_TYPE);
+    Parse_Pattern<GenericNormalBlendMap>(*Tnormal_Ptr,NORMAL_TYPE);
 }
 
 
@@ -3906,7 +3906,7 @@ void Parser::Parse_Media_Density_Pattern(PIGMENT** Density)
         END_CASE
     END_EXPECT
 
-    Parse_Pattern<GenericPigmentBlendMapInterface>(*Density,DENSITY_TYPE);
+    Parse_Pattern<GenericPigmentBlendMap>(*Density,DENSITY_TYPE);
 }
 
 void Parser::Parse_Media_Density_Pattern(vector<PIGMENT*>& Density)

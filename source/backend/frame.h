@@ -138,15 +138,9 @@ typedef SceneThreadData TraceThreadData;
 ///
 /// @{
 
-typedef DBL UV_VECT[2];   ///< @deprecated Use @ref pov::Vector2d instead.
-                          ///< @todo       Get entirely rid of this.
 typedef DBL VECTOR_4D[4]; ///< @todo       Make this obsolete.
 typedef DBL MATRIX[4][4]; ///< @todo       Make this obsolete.
 typedef DBL EXPRESS[5];   ///< @todo       Make this obsolete.
-typedef COLC COLOUR[5];   ///< @deprecated Use @ref pov_base::Colour instead.
-                          ///< @todo       Get entirely rid of this.
-typedef COLC RGB[3];      ///< @deprecated Use @ref pov_base::RGBColour instead.
-                          ///< @todo       Get entirely rid of this.
 
 /// 2D Vector array elements.
 /// @deprecated When using @ref pov::GenericVector2d, call the x() and y() access functions
@@ -182,64 +176,12 @@ enum
     pTRANSM = 4
 };
 
-/// @deprecated See @ref pov::UV_VECT.
-inline void Assign_UV_Vect(UV_VECT d, const UV_VECT s)
-{
-    d[X] = s[X];
-    d[Y] = s[Y];
-}
-
 inline void Assign_Vector_4D(VECTOR_4D d, const VECTOR_4D s)
 {
     d[X] = s[X];
     d[Y] = s[Y];
     d[Z] = s[Z];
     d[T] = s[T];
-}
-
-/// @deprecated See @ref pov::COLOUR.
-inline void Assign_Colour(COLOUR d, const COLOUR s)
-{
-    d[pRED] = s[pRED];
-    d[pGREEN] = s[pGREEN];
-    d[pBLUE] = s[pBLUE];
-    d[pFILTER] = s[pFILTER];
-    d[pTRANSM] = s[pTRANSM];
-}
-
-inline void Assign_Colour_Express(COLOUR d, const EXPRESS s)
-{
-    d[pRED] = s[pRED];
-    d[pGREEN] = s[pGREEN];
-    d[pBLUE] = s[pBLUE];
-    d[pFILTER] = s[pFILTER];
-    d[pTRANSM] = s[pTRANSM];
-}
-
-inline void Assign_Express(EXPRESS d, const EXPRESS s)
-{
-    d[pRED] = s[pRED];
-    d[pGREEN] = s[pGREEN];
-    d[pBLUE] = s[pBLUE];
-    d[pFILTER] = s[pFILTER];
-    d[pTRANSM] = s[pTRANSM];
-}
-
-/// @deprecated See @ref pov::COLOUR.
-inline void Make_ColourA(COLOUR c, COLC r, COLC g, COLC b, COLC a, COLC t)
-{
-    c[pRED] = r;
-    c[pGREEN] = g;
-    c[pBLUE] = b;
-    c[pFILTER] = a;
-    c[pTRANSM] = t;
-}
-
-/// @deprecated See @ref pov::UV_VECT.
-inline void Make_UV_Vector(UV_VECT v, DBL a, DBL b)
-{
-    v[U] = a;
-    v[V] = b;
 }
 
 inline void Destroy_Float(DBL *x)
@@ -254,11 +196,10 @@ inline void Destroy_Vector_4D(VECTOR_4D *x)
         POV_FREE(x);
 }
 
-/// @deprecated See @ref pov::COLOUR.
-inline void Destroy_Colour(COLOUR *x)
+inline void Destroy_Colour(Colour *x)
 {
     if(x != NULL)
-        POV_FREE(x);
+        delete x;
 }
 
 #if 0
@@ -297,7 +238,7 @@ class GenericVector2d
             vect[Y] = y;
         }
 
-        explicit GenericVector2d(const UV_VECT vi)
+        explicit GenericVector2d(const EXPRESS vi)
         {
             vect[X] = T(vi[X]);
             vect[Y] = T(vi[Y]);
@@ -937,7 +878,7 @@ struct Transform_Struct
 ///
 //******************************************************************************
 ///
-/// @name Colour Map Stuff
+/// @name Blend Map Stuff
 /// @{
 
 #if 0
@@ -963,22 +904,17 @@ struct BlendMapEntry
     DATA_T  Vals;
 };
 
-union UnifiedNormalBlendMapData
-{
-    TNORMAL *Tnormal;
-    UV_VECT Point_Slope;
-};
-
+/// Template for blend maps classes.
 template<typename DATA_T>
 class BlendMap
 {
     public:
 
-        typedef DATA_T                      Data;
-        typedef BlendMapEntry<DATA_T>       Entry;
-        typedef Entry*                      EntryPtr;
-        typedef const Entry*                EntryConstPtr;
-        typedef vector<Entry>               Vector;
+        typedef DATA_T                  Data;
+        typedef BlendMapEntry<DATA_T>   Entry;
+        typedef Entry*                  EntryPtr;
+        typedef const Entry*            EntryConstPtr;
+        typedef vector<Entry>           Vector;
 
         BlendMap(int type);
         virtual ~BlendMap() {}
@@ -992,9 +928,19 @@ class BlendMap
         Vector          Blend_Map_Entries;
 };
 
-class GenericPigmentBlendMapInterface
+
+/// Common interface for pigment-like blend maps.
+/// 
+/// This purely abstract class provides the common interface for both pigment and colour blend maps.
+///
+/// @note   This class is used in a multiple inheritance hierarchy, and therefore must continue to be purely abstract.
+///
+class GenericPigmentBlendMap
 {
     public:
+
+        virtual ~GenericPigmentBlendMap() {}
+
         virtual bool Compute(Colour& colour, DBL value, const Vector3d& IPoint, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread) = 0;
         virtual void ComputeAverage(Colour& colour, const Vector3d& EPoint, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread) = 0;
         virtual bool ComputeUVMapped(Colour& colour, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread) = 0;
@@ -1002,7 +948,8 @@ class GenericPigmentBlendMapInterface
         virtual void Post(bool& rHasFilter) = 0;
 };
 
-class ColourBlendMap : public BlendMap<COLOUR>, public GenericPigmentBlendMapInterface
+/// Colour blend map.
+class ColourBlendMap : public BlendMap<Colour>, public GenericPigmentBlendMap
 {
     public:
 
@@ -1016,7 +963,8 @@ class ColourBlendMap : public BlendMap<COLOUR>, public GenericPigmentBlendMapInt
         virtual void Post(bool& rHasFilter);
 };
 
-class PigmentBlendMap : public BlendMap<PIGMENT*>, public GenericPigmentBlendMapInterface
+/// Pigment blend map.
+class PigmentBlendMap : public BlendMap<PIGMENT*>, public GenericPigmentBlendMap
 {
     public:
 
@@ -1030,17 +978,47 @@ class PigmentBlendMap : public BlendMap<PIGMENT*>, public GenericPigmentBlendMap
         virtual void Post(bool& rHasFilter);
 };
 
-class UnifiedNormalBlendMap : public BlendMap<UnifiedNormalBlendMapData>
+
+/// Common interface for normal-like blend maps.
+/// 
+/// This purely abstract class provides the common interface for both normal and slope blend maps.
+///
+/// @note   This class is used in a multiple inheritance hierarchy, and therefore must continue to be purely abstract.
+///
+class GenericNormalBlendMap
 {
     public:
 
-        UnifiedNormalBlendMap(int type);
-        virtual ~UnifiedNormalBlendMap();
+        virtual ~GenericNormalBlendMap() {}
+
+        virtual void Post(bool dontScaleBumps) = 0;
+        virtual void ComputeAverage (const Vector3d& EPoint, Vector3d& normal, Intersection *Inter, const Ray *ray, TraceThreadData *Thread) = 0;
+};
+
+class SlopeBlendMap : public BlendMap<Vector2d>, public GenericNormalBlendMap
+{
+    public:
+
+        SlopeBlendMap();
+        virtual ~SlopeBlendMap();
 
         virtual void Post(bool dontScaleBumps);
         virtual void ComputeAverage (const Vector3d& EPoint, Vector3d& normal, Intersection *Inter, const Ray *ray, TraceThreadData *Thread);
 };
 
+class NormalBlendMap : public BlendMap<TNORMAL*>, public GenericNormalBlendMap
+{
+    public:
+
+        NormalBlendMap();
+        virtual ~NormalBlendMap();
+
+        virtual void Post(bool dontScaleBumps);
+        virtual void ComputeAverage (const Vector3d& EPoint, Vector3d& normal, Intersection *Inter, const Ray *ray, TraceThreadData *Thread);
+};
+
+
+/// Texture blend map.
 class TextureBlendMap : public BlendMap<TexturePtr>
 {
     public:
@@ -1049,28 +1027,31 @@ class TextureBlendMap : public BlendMap<TexturePtr>
         ~TextureBlendMap();
 };
 
-typedef shared_ptr<GenericPigmentBlendMapInterface>         GenericPigmentBlendMapPtr;
-typedef shared_ptr<const GenericPigmentBlendMapInterface>   GenericPigmentBlendMapConstPtr;
+typedef shared_ptr<GenericPigmentBlendMap>          GenericPigmentBlendMapPtr;
+typedef shared_ptr<const GenericPigmentBlendMap>    GenericPigmentBlendMapConstPtr;
 
 typedef PIGMENT*                                    PigmentBlendMapData;
 typedef BlendMapEntry<PigmentBlendMapData>          PigmentBlendMapEntry;
 typedef shared_ptr<PigmentBlendMap>                 PigmentBlendMapPtr;
 typedef shared_ptr<const PigmentBlendMap>           PigmentBlendMapConstPtr;
 
-typedef COLOUR                                      ColourBlendMapData;
+typedef Colour                                      ColourBlendMapData;
 typedef BlendMapEntry<ColourBlendMapData>           ColourBlendMapEntry;
 typedef shared_ptr<ColourBlendMap>                  ColourBlendMapPtr;
 typedef shared_ptr<const ColourBlendMap>            ColourBlendMapConstPtr;
 
-typedef BlendMapEntry<UnifiedNormalBlendMapData>    UnifiedNormalBlendMapEntry;
-typedef shared_ptr<UnifiedNormalBlendMap>           UnifiedNormalBlendMapPtr;
-typedef shared_ptr<const UnifiedNormalBlendMap>     UnifiedNormalBlendMapConstPtr;
+typedef shared_ptr<GenericNormalBlendMap>           GenericNormalBlendMapPtr;
+typedef shared_ptr<const GenericNormalBlendMap>     GenericNormalBlendMapConstPtr;
 
-typedef UnifiedNormalBlendMapData                   SlopeBlendMapData;
-typedef UnifiedNormalBlendMapEntry                  SlopeBlendMapEntry;
-typedef UnifiedNormalBlendMap                       SlopeBlendMap;
-typedef shared_ptr<UnifiedNormalBlendMap>           SlopeBlendMapPtr;
-typedef shared_ptr<const UnifiedNormalBlendMap>     SlopeBlendMapConstPtr;
+typedef Vector2d                                    SlopeBlendMapData;
+typedef BlendMapEntry<SlopeBlendMapData>            SlopeBlendMapEntry;
+typedef shared_ptr<SlopeBlendMap>                   SlopeBlendMapPtr;
+typedef shared_ptr<const SlopeBlendMap>             SlopeBlendMapConstPtr;
+
+typedef TNORMAL*                                    NormalBlendMapData;
+typedef BlendMapEntry<NormalBlendMapData>           NormalBlendMapEntry;
+typedef shared_ptr<NormalBlendMap>                  NormalBlendMapPtr;
+typedef shared_ptr<const NormalBlendMap>            NormalBlendMapConstPtr;
 
 typedef BlendMapEntry<TexturePtr>                   TextureBlendMapEntry;
 typedef shared_ptr<TextureBlendMap>                 TextureBlendMapPtr;
@@ -1266,14 +1247,14 @@ struct Pattern_Struct
 
 struct Pigment_Struct : public Pattern_Struct
 {
-    shared_ptr<GenericPigmentBlendMapInterface> Blend_Map;
+    shared_ptr<GenericPigmentBlendMap> Blend_Map;
     Colour colour;       // may have a filter/transmit component
     Colour Quick_Colour; // may have a filter/transmit component    // TODO - can't we decide between regular colour and quick_colour at parse time already?
 };
 
 struct Tnormal_Struct : public Pattern_Struct
 {
-    UnifiedNormalBlendMapPtr Blend_Map;
+    GenericNormalBlendMapPtr Blend_Map;
     SNGL Amount;
     SNGL Delta; // NK delta
 };

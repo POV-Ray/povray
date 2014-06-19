@@ -68,7 +68,6 @@ class GenericColour
 {
     public:
         typedef DBL EXPRESS[5];
-        typedef COLC COLOUR[5];
         typedef T DATA[5];
 
         enum
@@ -118,15 +117,6 @@ class GenericColour
             colour[BLUE] = nblue;
             colour[FILTER] = nfilter;
             colour[TRANSM] = ntransm;
-        }
-
-        explicit GenericColour(const COLOUR col)
-        {
-            colour[RED] = col[RED];
-            colour[GREEN] = col[GREEN];
-            colour[BLUE] = col[BLUE];
-            colour[FILTER] = col[FILTER];
-            colour[TRANSM] = col[TRANSM];
         }
 
         explicit GenericColour(const EXPRESS col)
@@ -397,7 +387,7 @@ template<typename T>
 class GenericRGBColour
 {
     public:
-        typedef COLC RGB[3];
+
         typedef T DATA[3];
 
         enum
@@ -426,13 +416,6 @@ class GenericRGBColour
             colour[RED] = nred;
             colour[GREEN] = ngreen;
             colour[BLUE] = nblue;
-        }
-
-        explicit GenericRGBColour(const RGB col)
-        {
-            colour[RED] = col[RED];
-            colour[GREEN] = col[GREEN];
-            colour[BLUE] = col[BLUE];
         }
 
         explicit GenericRGBColour(const GenericColour<T>& col)

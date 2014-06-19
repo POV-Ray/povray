@@ -352,8 +352,7 @@ class Parser : public Task
         void Parse_PatternFunction(TPATTERN *);
 
         // express.h/express.cpp
-        void Parse_Colour (COLOUR colour, bool expectFT = true);
-        void Parse_Colour (Colour& colour);
+        void Parse_Colour (Colour& colour, bool expectFT = true);
         void Parse_Colour (RGBColour& colour);
         template<typename DATA_T> void Parse_BlendMapData (int Blend_Type, DATA_T& rData);
         template<typename MAP_T> shared_ptr<MAP_T> Parse_Blend_Map (int Blend_Type, int Pat_Type);
@@ -372,7 +371,6 @@ class Parser : public Task
 
         int Allow_Vector (Vector3d& Vect);
         void Parse_UV_Vect (Vector2d& UV_Vect);
-        inline void Parse_UV_Vect (UV_VECT UV_Vect) { Vector2d temp; Parse_UV_Vect(temp); Assign_UV_Vect(UV_Vect, *temp); }
         void Parse_Vector (Vector3d& Vector);
         void Parse_Vector4D (VECTOR_4D Vector);
         int Parse_Unknown_Vector (EXPRESS Express, bool allow_identifier = false, bool *had_identifier = NULL);

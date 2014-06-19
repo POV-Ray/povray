@@ -8392,7 +8392,7 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
 int Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTRY *sym, bool ParFlag, bool SemiFlag, bool is_local, bool allow_redefine, int old_table_index)
 {
     EXPRESS Local_Express;
-    COLOUR *Local_Colour;
+    Colour *Local_Colour;
     PIGMENT *Local_Pigment;
     TNORMAL *Local_Tnormal;
     FINISH *Local_Finish;
@@ -8592,7 +8592,7 @@ int Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTR
                         *NumberPtr    = COLOUR_ID_TOKEN;
                         Test_Redefine(Previous,NumberPtr,*DataPtr, allow_redefine);
                         *DataPtr      = reinterpret_cast<void *>(Create_Colour());
-                        Assign_Colour_Express(reinterpret_cast<COLC *>(*DataPtr), Local_Express);
+                        *(reinterpret_cast<Colour *>(*DataPtr)) = Colour(Local_Express);
                         break;
                 }
             }
@@ -8708,7 +8708,7 @@ int Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTR
         END_CASE
 
         CASE (SLOPE_MAP_TOKEN)
-            Temp_Data  = reinterpret_cast<void *>(new UnifiedNormalBlendMapPtr(Parse_Blend_Map<UnifiedNormalBlendMap> (SLOPE_TYPE,NO_PATTERN)));
+            Temp_Data  = reinterpret_cast<void *>(new SlopeBlendMapPtr(Parse_Blend_Map<SlopeBlendMap> (SLOPE_TYPE,NO_PATTERN)));
             *NumberPtr = SLOPE_MAP_ID_TOKEN;
             Test_Redefine(Previous,NumberPtr,*DataPtr, allow_redefine);
             *DataPtr   = Temp_Data;
@@ -8724,7 +8724,7 @@ int Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTR
         END_CASE
 
         CASE (NORMAL_MAP_TOKEN)
-            Temp_Data  = reinterpret_cast<void *>(new UnifiedNormalBlendMapPtr(Parse_Blend_Map<UnifiedNormalBlendMap> (NORMAL_TYPE,NO_PATTERN)));
+            Temp_Data  = reinterpret_cast<void *>(new NormalBlendMapPtr(Parse_Blend_Map<NormalBlendMap> (NORMAL_TYPE,NO_PATTERN)));
             *NumberPtr = NORMAL_MAP_ID_TOKEN;
             Test_Redefine(Previous,NumberPtr,*DataPtr, allow_redefine);
             *DataPtr   = Temp_Data;
@@ -8868,7 +8868,7 @@ void Parser::Destroy_Ident_Data(void *Data, int Type)
     switch(Type)
     {
         case COLOUR_ID_TOKEN:
-            Destroy_Colour(reinterpret_cast<COLOUR *>(Data));
+            Destroy_Colour(reinterpret_cast<Colour *>(Data));
             break;
         case VECTOR_ID_TOKEN:
             delete reinterpret_cast<Vector3d *>(Data);
@@ -8915,11 +8915,13 @@ void Parser::Destroy_Ident_Data(void *Data, int Type)
             delete reinterpret_cast<PigmentBlendMapPtr *>(Data);
             break;
         case SLOPE_MAP_ID_TOKEN:
+            delete reinterpret_cast<SlopeBlendMapPtr *>(Data);
+            break;
         case NORMAL_MAP_ID_TOKEN:
-            delete reinterpret_cast<UnifiedNormalBlendMap *>(Data);
+            delete reinterpret_cast<NormalBlendMapPtr *>(Data);
             break;
         case TEXTURE_MAP_ID_TOKEN:
-            delete reinterpret_cast<TextureBlendMap *>(Data);
+            delete reinterpret_cast<TextureBlendMapPtr *>(Data);
             break;
         case TRANSFORM_ID_TOKEN:
             Destroy_Transform(reinterpret_cast<TRANSFORM *>(Data));
@@ -9934,7 +9936,7 @@ void *Parser::Copy_Identifier (void *Data, int Type)
     switch (Type)
     {
         case COLOUR_ID_TOKEN:
-            New = reinterpret_cast<void *>(Copy_Colour(*reinterpret_cast<COLOUR *>(Data)));
+            New = reinterpret_cast<void *>(Copy_Colour(reinterpret_cast<Colour *>(Data)));
             break;
         case VECTOR_ID_TOKEN:
             vp = new Vector3d();
@@ -9989,8 +9991,10 @@ void *Parser::Copy_Identifier (void *Data, int Type)
             New = reinterpret_cast<void *>(new PigmentBlendMapPtr(Copy_Blend_Map(*(reinterpret_cast<PigmentBlendMapPtr *>(Data)))));
             break;
         case SLOPE_MAP_ID_TOKEN:
+            New = reinterpret_cast<void *>(new SlopeBlendMapPtr(Copy_Blend_Map(*(reinterpret_cast<SlopeBlendMapPtr *>(Data)))));
+            break;
         case NORMAL_MAP_ID_TOKEN:
-            New = reinterpret_cast<void *>(new UnifiedNormalBlendMapPtr(Copy_Blend_Map(*(reinterpret_cast<UnifiedNormalBlendMapPtr *>(Data)))));
+            New = reinterpret_cast<void *>(new NormalBlendMapPtr(Copy_Blend_Map(*(reinterpret_cast<NormalBlendMapPtr *>(Data)))));
             break;
         case TEXTURE_MAP_ID_TOKEN:
             New = reinterpret_cast<void *>(new TextureBlendMapPtr(Copy_Blend_Map(*(reinterpret_cast<TextureBlendMapPtr *>(Data)))));
@@ -10092,8 +10096,8 @@ void ColourBlendMap::ConvertFilterToTransmit()
 {
     for (Vector::iterator i = Blend_Map_Entries.begin(); i != Blend_Map_Entries.end(); i++)
     {
-        i->Vals[pTRANSM] += i->Vals[pFILTER];
-        i->Vals[pFILTER] = 0;
+        i->Vals.transm() += i->Vals.filter();
+        i->Vals.filter() = 0;
     }
 }
 

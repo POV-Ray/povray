@@ -2380,7 +2380,7 @@ void Parser::Parse_Scale_Vector (Vector3d& Vector)
 *
 ******************************************************************************/
 
-void Parser::Parse_Colour (COLOUR colour, bool expectFT)
+void Parser::Parse_Colour (Colour& colour, bool expectFT)
 {
     EXPRESS Express;
     int Terms;
@@ -2395,7 +2395,7 @@ void Parser::Parse_Colour (COLOUR colour, bool expectFT)
         Express[Terms] = 0.0;
     }
 
-    Make_ColourA (colour, 0.0, 0.0, 0.0, 0.0, 0.0);
+    colour.clear();
 
     bool startedParsing = false;
 
@@ -2410,26 +2410,26 @@ void Parser::Parse_Colour (COLOUR colour, bool expectFT)
                     /* missing break deliberate */
 
                 case FILTER_TOKEN:
-                    colour[pFILTER] = (COLC)Parse_Float();
-                    if (!expectFT && (colour[pFILTER] != 0))
+                    colour.filter() = (COLC)Parse_Float();
+                    if (!expectFT && (colour.filter() != 0))
                         Warning(0, "Expected pure RGB color expression, unexpected filter component will have no effect.");
                     break;
 
                 case BLUE_TOKEN:
-                    colour[pBLUE] = (COLC)Parse_Float();
+                    colour.blue() = (COLC)Parse_Float();
                     break;
 
                 case GREEN_TOKEN:
-                    colour[pGREEN] = (COLC)Parse_Float();
+                    colour.green() = (COLC)Parse_Float();
                     break;
 
                 case RED_TOKEN:
-                    colour[pRED] = (COLC)Parse_Float();
+                    colour.red() = (COLC)Parse_Float();
                     break;
 
                 case TRANSMIT_TOKEN:
-                    colour[pTRANSM] = (COLC)Parse_Float();
-                    if (!expectFT && (colour[pTRANSM] != 0))
+                    colour.transm() = (COLC)Parse_Float();
+                    if (!expectFT && (colour.transm() != 0))
                         Warning(0, "Expected pure RGB color expression, unexpected transmit component will have no effect.");
                     break;
 
@@ -2464,7 +2464,7 @@ void Parser::Parse_Colour (COLOUR colour, bool expectFT)
                             Warning(0, "Suspicious expression after rgbf.");
                         for (i=0;i<Terms;i++)
                             colour[i]=(COLC)Express[i];
-                        if (!expectFT && (colour[pFILTER] != 0))
+                        if (!expectFT && (colour.filter() != 0))
                             Warning(0, "Expected pure RGB color expression, unexpected filter component will have no effect.");
                     }
                     break;
@@ -2483,9 +2483,9 @@ void Parser::Parse_Colour (COLOUR colour, bool expectFT)
                             Warning(0, "Suspicious expression after rgbt.");
                         for (i=0;i<Terms;i++)
                             colour[i]=(COLC)Express[i];
-                        colour[pTRANSM]=colour[pFILTER];
-                        colour[pFILTER]=0.0;
-                        if (!expectFT && (colour[pTRANSM] != 0))
+                        colour.transm()=colour.filter();
+                        colour.filter()=0.0;
+                        if (!expectFT && (colour.transm() != 0))
                             Warning(0, "Expected pure RGB color expression, unexpected transmit component will have no effect.");
                     }
                     break;
@@ -2504,7 +2504,7 @@ void Parser::Parse_Colour (COLOUR colour, bool expectFT)
                             Warning(0, "Suspicious expression after rgbft.");
                         for (i=0;i<Terms;i++)
                             colour[i]=(COLC)Express[i];
-                        if (!expectFT && ((colour[pFILTER] != 0) || (colour[pTRANSM] != 0)))
+                        if (!expectFT && ((colour.filter() != 0) || (colour.transm() != 0)))
                             Warning(0, "Expected pure RGB color expression, unexpected filter and transmit components will have no effect.");
                     }
                     break;
@@ -2513,19 +2513,19 @@ void Parser::Parse_Colour (COLOUR colour, bool expectFT)
                 case SBLUE_TOKEN:
                     if (!sceneData->workingGammaToSRGB)
                         Error("Cannot parse sRGB colors before assumed_gamma has been set.");
-                    colour[pBLUE] = sceneData->workingGammaToSRGB->Decode((COLC)Parse_Float());
+                    colour.blue() = sceneData->workingGammaToSRGB->Decode((COLC)Parse_Float());
                     break;
 
                 case SGREEN_TOKEN:
                     if (!sceneData->workingGammaToSRGB)
                         Error("Cannot parse sRGB colors before assumed_gamma has been set.");
-                    colour[pGREEN] = sceneData->workingGammaToSRGB->Decode((COLC)Parse_Float());
+                    colour.green() = sceneData->workingGammaToSRGB->Decode((COLC)Parse_Float());
                     break;
 
                 case SRED_TOKEN:
                     if (!sceneData->workingGammaToSRGB)
                         Error("Cannot parse sRGB colors before assumed_gamma has been set.");
-                    colour[pRED] = sceneData->workingGammaToSRGB->Decode((COLC)Parse_Float());
+                    colour.red() = sceneData->workingGammaToSRGB->Decode((COLC)Parse_Float());
                     break;
 #endif
 
@@ -2568,7 +2568,7 @@ void Parser::Parse_Colour (COLOUR colour, bool expectFT)
                             colour[i]=(COLC)Express[i];
                         for (i=0;i<3;i++)
                             colour[i]=sceneData->workingGammaToSRGB->Decode(colour[i]);
-                        if (!expectFT && (colour[pFILTER] != 0))
+                        if (!expectFT && (colour.filter() != 0))
                             Warning(0, "Expected pure RGB color expression, unexpected filter component will have no effect.");
                     }
                     break;
@@ -2589,11 +2589,11 @@ void Parser::Parse_Colour (COLOUR colour, bool expectFT)
                             Warning(0, "Suspicious expression after srgbt.");
                         for (i=0;i<Terms;i++)
                             colour[i]=(COLC)Express[i];
-                        colour[pTRANSM]=colour[pFILTER];
-                        colour[pFILTER]=0.0;
+                        colour.transm()=colour.filter();
+                        colour.filter()=0.0;
                         for (i=0;i<3;i++)
                             colour[i]=sceneData->workingGammaToSRGB->Decode(colour[i]);
-                        if (!expectFT && (colour[pTRANSM] != 0))
+                        if (!expectFT && (colour.transm() != 0))
                             Warning(0, "Expected pure RGB color expression, unexpected transmit component will have no effect.");
                     }
                     break;
@@ -2616,7 +2616,7 @@ void Parser::Parse_Colour (COLOUR colour, bool expectFT)
                             colour[i]=(COLC)Express[i];
                         for (i=0;i<3;i++)
                             colour[i]=sceneData->workingGammaToSRGB->Decode(colour[i]);
-                        if (!expectFT && ((colour[pFILTER] != 0) || (colour[pTRANSM] != 0)))
+                        if (!expectFT && ((colour.filter() != 0) || (colour.transm() != 0)))
                             Warning(0, "Expected pure RGB color expression, unexpected filter and transmit components will have no effect.");
                     }
                     break;
@@ -2639,7 +2639,7 @@ void Parser::Parse_Colour (COLOUR colour, bool expectFT)
                 Parse_Express(Express,&Terms);
                 for (i=0;i<Terms;i++)
                     colour[i]=(COLC)Express[i];
-                if (!expectFT && ((colour[pFILTER] != 0) || (colour[pTRANSM] != 0)))
+                if (!expectFT && ((colour.filter() != 0) || (colour.transm() != 0)))
                     Warning(0, "Expected pure RGB color expression, unexpected filter and transmit components will have no effect.");
                 startedParsing = true;
             }
@@ -2664,7 +2664,7 @@ void Parser::Parse_Colour (COLOUR colour, bool expectFT)
                     Error("RGB color expression expected but float or vector expression found.");
                 for (i=0;i<Terms;i++)
                     colour[i]=(COLC)Express[i];
-                if (!expectFT && ((colour[pFILTER] != 0) || (colour[pTRANSM] != 0)))
+                if (!expectFT && ((colour.filter() != 0) || (colour.transm() != 0)))
                     Warning(0, "Expected pure RGB color expression, unexpected filter and transmit components will have no effect.");
                 startedParsing = true;
             }
@@ -2679,15 +2679,10 @@ void Parser::Parse_Colour (COLOUR colour, bool expectFT)
     Allow_Identifier_In_Call = old_allow_id;
 }
 
-void Parser::Parse_Colour (Colour& colour)
-{
-    Parse_Colour (*colour, true);
-}
-
 void Parser::Parse_Colour (RGBColour& colour)
 {
     Colour tempColour;
-    Parse_Colour (*tempColour, false);
+    Parse_Colour (tempColour, false);
     colour = RGBColour(tempColour);
 }
 
@@ -2720,16 +2715,8 @@ void Parser::Parse_Colour (RGBColour& colour)
 template<>
 void Parser::Parse_BlendMapData<ColourBlendMapData> (int Blend_Type, ColourBlendMapData& rData)
 {
-    switch (Blend_Type)
-    {
-        case COLOUR_TYPE:
-            Error("Type not implemented yet.");
-            break;
-
-        default:
-            assert(false);
-            break;
-    }
+    assert (Blend_Type == COLOUR_TYPE);
+    Error("Type not implemented yet.");
 }
 
 template<>
@@ -2754,23 +2741,18 @@ void Parser::Parse_BlendMapData<PigmentBlendMapData> (int Blend_Type, PigmentBle
 }
 
 template<>
-void Parser::Parse_BlendMapData<UnifiedNormalBlendMapData> (int Blend_Type, UnifiedNormalBlendMapData& rData)
+void Parser::Parse_BlendMapData<SlopeBlendMapData> (int Blend_Type, SlopeBlendMapData& rData)
 {
-    switch (Blend_Type)
-    {
-        case NORMAL_TYPE:
-            rData.Tnormal=Copy_Tnormal(Default_Texture->Tnormal);
-            Parse_Tnormal(&(rData.Tnormal));
-            break;
+    assert (Blend_Type == SLOPE_TYPE);
+    Parse_UV_Vect(rData);
+}
 
-        case SLOPE_TYPE:
-            Parse_UV_Vect(rData.Point_Slope);
-            break;
-
-        default:
-            assert(false);
-            break;
-    }
+template<>
+void Parser::Parse_BlendMapData<NormalBlendMapData> (int Blend_Type, NormalBlendMapData& rData)
+{
+    assert (Blend_Type == NORMAL_TYPE);
+    rData=Copy_Tnormal(Default_Texture->Tnormal);
+    Parse_Tnormal(&(rData));
 }
 
 template<>
@@ -2846,7 +2828,7 @@ shared_ptr<MAP_T> Parser::Parse_Blend_Map (int Blend_Type,int Pat_Type)
     return (New);
 }
 
-template<> GenericPigmentBlendMapPtr Parser::Parse_Blend_Map<GenericPigmentBlendMapInterface> (int Blend_Type,int Pat_Type)
+template<> GenericPigmentBlendMapPtr Parser::Parse_Blend_Map<GenericPigmentBlendMap> (int Blend_Type,int Pat_Type)
 {
     switch (Blend_Type)
     {
@@ -2861,10 +2843,25 @@ template<> GenericPigmentBlendMapPtr Parser::Parse_Blend_Map<GenericPigmentBlend
     }
 }
 
-template ColourBlendMapPtr          Parser::Parse_Blend_Map<ColourBlendMap>         (int Blend_Type,int Pat_Type);
-template PigmentBlendMapPtr         Parser::Parse_Blend_Map<PigmentBlendMap>        (int Blend_Type,int Pat_Type);
-template UnifiedNormalBlendMapPtr   Parser::Parse_Blend_Map<UnifiedNormalBlendMap>  (int Blend_Type,int Pat_Type);
-template TextureBlendMapPtr         Parser::Parse_Blend_Map<TextureBlendMap>        (int Blend_Type,int Pat_Type);
+template<> GenericNormalBlendMapPtr Parser::Parse_Blend_Map<GenericNormalBlendMap> (int Blend_Type,int Pat_Type)
+{
+    switch (Blend_Type)
+    {
+        case SLOPE_TYPE:
+            return Parse_Blend_Map<SlopeBlendMap> (Blend_Type, Pat_Type);
+        case NORMAL_TYPE:
+            return Parse_Blend_Map<NormalBlendMap> (Blend_Type, Pat_Type);
+        default:
+            assert(false);
+            return NULL;
+    }
+}
+
+template ColourBlendMapPtr  Parser::Parse_Blend_Map<ColourBlendMap>     (int Blend_Type,int Pat_Type);
+template PigmentBlendMapPtr Parser::Parse_Blend_Map<PigmentBlendMap>    (int Blend_Type,int Pat_Type);
+template SlopeBlendMapPtr   Parser::Parse_Blend_Map<SlopeBlendMap>      (int Blend_Type,int Pat_Type);
+template NormalBlendMapPtr  Parser::Parse_Blend_Map<NormalBlendMap>     (int Blend_Type,int Pat_Type);
+template TextureBlendMapPtr Parser::Parse_Blend_Map<TextureBlendMap>    (int Blend_Type,int Pat_Type);
 
 /*****************************************************************************
 *
@@ -2887,16 +2884,8 @@ template TextureBlendMapPtr         Parser::Parse_Blend_Map<TextureBlendMap>    
 template<>
 void Parser::Parse_BlendListData<ColourBlendMapData> (int Blend_Type, ColourBlendMapData& rData)
 {
-    switch (Blend_Type)
-    {
-        case COLOUR_TYPE:
-            Parse_Colour (rData);
-            break;
-
-        default:
-            assert(false);
-            break;
-    }
+    assert (Blend_Type == COLOUR_TYPE);
+    Parse_Colour (rData);
 }
 
 template<>
@@ -2921,23 +2910,18 @@ void Parser::Parse_BlendListData<PigmentBlendMapData> (int Blend_Type, PigmentBl
 }
 
 template<>
-void Parser::Parse_BlendListData<UnifiedNormalBlendMapData> (int Blend_Type, UnifiedNormalBlendMapData& rData)
+void Parser::Parse_BlendListData<SlopeBlendMapData> (int Blend_Type, SlopeBlendMapData& rData)
 {
-    switch (Blend_Type)
-    {
-        case NORMAL_TYPE:
-            rData.Tnormal=Copy_Tnormal(Default_Texture->Tnormal);
-            Parse_Tnormal(&(rData.Tnormal));
-            break;
+    assert (Blend_Type == SLOPE_TYPE);
+    Error("Type not implemented yet.");
+}
 
-        case SLOPE_TYPE:
-            Error("Type not implemented yet.");
-            break;
-
-        default:
-            assert(false);
-            break;
-    }
+template<>
+void Parser::Parse_BlendListData<NormalBlendMapData> (int Blend_Type, NormalBlendMapData& rData)
+{
+    assert (Blend_Type == NORMAL_TYPE);
+    rData=Copy_Tnormal(Default_Texture->Tnormal);
+    Parse_Tnormal(&(rData));
 }
 
 template<>
@@ -2951,16 +2935,8 @@ void Parser::Parse_BlendListData<TexturePtr> (int Blend_Type, TexturePtr& rData)
 template<>
 void Parser::Parse_BlendListData_Default<ColourBlendMapData> (const ColourBlendMapData& rDefData, int Blend_Type, ColourBlendMapData& rData)
 {
-    switch (Blend_Type)
-    {
-        case COLOUR_TYPE:
-            Assign_Colour(rData, rDefData);
-            break;
-
-        default:
-            assert(false);
-            break;
-    }
+    assert (Blend_Type == COLOUR_TYPE);
+    rData = rDefData;
 }
 
 template<>
@@ -2983,22 +2959,17 @@ void Parser::Parse_BlendListData_Default<PigmentBlendMapData> (const ColourBlend
 }
 
 template<>
-void Parser::Parse_BlendListData_Default<UnifiedNormalBlendMapData> (const ColourBlendMapData& rDefData, int Blend_Type, UnifiedNormalBlendMapData& rData)
+void Parser::Parse_BlendListData_Default<SlopeBlendMapData> (const ColourBlendMapData& rDefData, int Blend_Type, SlopeBlendMapData& rData)
 {
-    switch (Blend_Type)
-    {
-        case NORMAL_TYPE:
-            rData.Tnormal=Copy_Tnormal(Default_Texture->Tnormal);
-            break;
+    assert (Blend_Type == SLOPE_TYPE);
+    Error("Type not implemented yet.");
+}
 
-        case SLOPE_TYPE:
-            Error("Type not implemented yet.");
-            break;
-
-        default:
-            assert(false);
-            break;
-    }
+template<>
+void Parser::Parse_BlendListData_Default<NormalBlendMapData> (const ColourBlendMapData& rDefData, int Blend_Type, NormalBlendMapData& rData)
+{
+    assert (Blend_Type == NORMAL_TYPE);
+    rData=Copy_Tnormal(Default_Texture->Tnormal);
 }
 
 template<>
@@ -3140,9 +3111,9 @@ shared_ptr<MAP_T> Parser::Parse_Blend_List (int Count, ColourBlendMapConstPtr De
 }
 
 template<>
-shared_ptr<GenericPigmentBlendMapInterface> Parser::Parse_Blend_List<GenericPigmentBlendMapInterface> (int Count, ColourBlendMapConstPtr Def_Map, int Blend_Type)
+shared_ptr<GenericPigmentBlendMap> Parser::Parse_Blend_List<GenericPigmentBlendMap> (int Count, ColourBlendMapConstPtr Def_Map, int Blend_Type)
 {
-    shared_ptr<GenericPigmentBlendMapInterface> New;
+    shared_ptr<GenericPigmentBlendMap> New;
     assert (Blend_Type == PIGMENT_TYPE);
     EXPECT
         CASE(PIGMENT_TOKEN)
@@ -3160,10 +3131,31 @@ shared_ptr<GenericPigmentBlendMapInterface> Parser::Parse_Blend_List<GenericPigm
     return New;
 }
 
-template ColourBlendMapPtr          Parser::Parse_Blend_List<ColourBlendMap>        (int Count, ColourBlendMapConstPtr Def_Map, int Blend_Type);
-template PigmentBlendMapPtr         Parser::Parse_Blend_List<PigmentBlendMap>       (int Count, ColourBlendMapConstPtr Def_Map, int Blend_Type);
-template UnifiedNormalBlendMapPtr   Parser::Parse_Blend_List<UnifiedNormalBlendMap> (int Count, ColourBlendMapConstPtr Def_Map, int Blend_Type);
-template TextureBlendMapPtr         Parser::Parse_Blend_List<TextureBlendMap>       (int Count, ColourBlendMapConstPtr Def_Map, int Blend_Type);
+template<>
+shared_ptr<GenericNormalBlendMap> Parser::Parse_Blend_List<GenericNormalBlendMap> (int Count, ColourBlendMapConstPtr Def_Map, int Blend_Type)
+{
+    shared_ptr<GenericNormalBlendMap> New;
+    switch (Blend_Type)
+    {
+        case SLOPE_TYPE:
+            New = Parse_Blend_List<SlopeBlendMap> (Count, Def_Map, Blend_Type);
+            break;
+
+        case NORMAL_TYPE:
+            New = Parse_Blend_List<NormalBlendMap> (Count, Def_Map, Blend_Type);
+            break;
+
+        default:
+            assert (false);
+    }
+    return New;
+}
+
+template ColourBlendMapPtr  Parser::Parse_Blend_List<ColourBlendMap>    (int Count, ColourBlendMapConstPtr Def_Map, int Blend_Type);
+template PigmentBlendMapPtr Parser::Parse_Blend_List<PigmentBlendMap>   (int Count, ColourBlendMapConstPtr Def_Map, int Blend_Type);
+template SlopeBlendMapPtr   Parser::Parse_Blend_List<SlopeBlendMap>     (int Count, ColourBlendMapConstPtr Def_Map, int Blend_Type);
+template NormalBlendMapPtr  Parser::Parse_Blend_List<NormalBlendMap>    (int Count, ColourBlendMapConstPtr Def_Map, int Blend_Type);
+template TextureBlendMapPtr Parser::Parse_Blend_List<TextureBlendMap>   (int Count, ColourBlendMapConstPtr Def_Map, int Blend_Type);
 
 /*****************************************************************************
 *
@@ -3217,7 +3209,7 @@ shared_ptr<MAP_T> Parser::Parse_Item_Into_Blend_List (int Blend_Type)
     return (New);
 }
 
-template<> GenericPigmentBlendMapPtr  Parser::Parse_Item_Into_Blend_List<GenericPigmentBlendMapInterface> (int Blend_Type)
+template<> GenericPigmentBlendMapPtr  Parser::Parse_Item_Into_Blend_List<GenericPigmentBlendMap> (int Blend_Type)
 {
     switch (Blend_Type)
     {
@@ -3231,10 +3223,25 @@ template<> GenericPigmentBlendMapPtr  Parser::Parse_Item_Into_Blend_List<Generic
     }
 }
 
-template ColourBlendMapPtr          Parser::Parse_Item_Into_Blend_List<ColourBlendMap>          (int Blend_Type);
-template PigmentBlendMapPtr         Parser::Parse_Item_Into_Blend_List<PigmentBlendMap>         (int Blend_Type);
-template UnifiedNormalBlendMapPtr   Parser::Parse_Item_Into_Blend_List<UnifiedNormalBlendMap>   (int Blend_Type);
-template TextureBlendMapPtr         Parser::Parse_Item_Into_Blend_List<TextureBlendMap>         (int Blend_Type);
+template<> GenericNormalBlendMapPtr  Parser::Parse_Item_Into_Blend_List<GenericNormalBlendMap> (int Blend_Type)
+{
+    switch (Blend_Type)
+    {
+        case SLOPE_TYPE:
+            return Parse_Item_Into_Blend_List<SlopeBlendMap> (Blend_Type);
+        case NORMAL_TYPE:
+            return Parse_Item_Into_Blend_List<NormalBlendMap> (Blend_Type);
+        default:
+            assert(false);
+            return NULL;
+    }
+}
+
+template ColourBlendMapPtr  Parser::Parse_Item_Into_Blend_List<ColourBlendMap>  (int Blend_Type);
+template PigmentBlendMapPtr Parser::Parse_Item_Into_Blend_List<PigmentBlendMap> (int Blend_Type);
+template SlopeBlendMapPtr   Parser::Parse_Item_Into_Blend_List<SlopeBlendMap>   (int Blend_Type);
+template NormalBlendMapPtr  Parser::Parse_Item_Into_Blend_List<NormalBlendMap>  (int Blend_Type);
+template TextureBlendMapPtr Parser::Parse_Item_Into_Blend_List<TextureBlendMap> (int Blend_Type);
 
 /*****************************************************************************
 *
@@ -3369,7 +3376,7 @@ ColourBlendMapPtr Parser::Parse_Colour_Map<ColourBlendMap> ()
 }
 
 template<>
-GenericPigmentBlendMapPtr Parser::Parse_Colour_Map<GenericPigmentBlendMapInterface> ()
+GenericPigmentBlendMapPtr Parser::Parse_Colour_Map<GenericPigmentBlendMap> ()
 {
     return Parse_Colour_Map<ColourBlendMap>();
 }
@@ -3382,7 +3389,21 @@ PigmentBlendMapPtr Parser::Parse_Colour_Map<PigmentBlendMap> ()
 }
 
 template<>
-UnifiedNormalBlendMapPtr Parser::Parse_Colour_Map<UnifiedNormalBlendMap> ()
+GenericNormalBlendMapPtr Parser::Parse_Colour_Map<GenericNormalBlendMap> ()
+{
+    Error("Internal Error: Parse_Colour_Map called for non-colour blend map");
+    return NULL;
+}
+
+template<>
+SlopeBlendMapPtr Parser::Parse_Colour_Map<SlopeBlendMap> ()
+{
+    Error("Internal Error: Parse_Colour_Map called for non-colour blend map");
+    return NULL;
+}
+
+template<>
+NormalBlendMapPtr Parser::Parse_Colour_Map<NormalBlendMap> ()
 {
     Error("Internal Error: Parse_Colour_Map called for non-colour blend map");
     return NULL;

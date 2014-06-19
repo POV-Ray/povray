@@ -161,7 +161,7 @@ PIGMENT *Copy_Pigment (PIGMENT *Old)
         New = Create_Pigment ();
 
         Copy_TPat_Fields (New, Old);
-        New->Blend_Map = shared_ptr<GenericPigmentBlendMapInterface> (Old->Blend_Map);
+        New->Blend_Map = shared_ptr<GenericPigmentBlendMap> (Old->Blend_Map);
 
         if (Old->Type == PLAIN_PATTERN)
             New->colour = Old->colour;
@@ -290,7 +290,7 @@ void Post_Pigment(PIGMENT *Pigment, bool* pHasFilter)
                         break;
 
                     default:
-                        Pigment->Blend_Map = tr1::static_pointer_cast<GenericPigmentBlendMapInterface, ColourBlendMap>(
+                        Pigment->Blend_Map = tr1::static_pointer_cast<GenericPigmentBlendMap, ColourBlendMap>(
                                                  tr1::const_pointer_cast<ColourBlendMap, const ColourBlendMap>(
                                                      Pigment->pattern->GetDefaultBlendMap()));
                         break;
@@ -318,7 +318,7 @@ void Post_Pigment(PIGMENT *Pigment, bool* pHasFilter)
             hasFilter = true;
     }
 
-    GenericPigmentBlendMapInterface* Map = Pigment->Blend_Map.get();
+    GenericPigmentBlendMap* Map = Pigment->Blend_Map.get();
 
     if (Map != NULL)
     {
@@ -337,7 +337,7 @@ void ColourBlendMap::Post(bool& rHasFilter)
 {
     for(Vector::const_iterator i = Blend_Map_Entries.begin(); i != Blend_Map_Entries.end(); i++)
     {
-        if ((fabs(i->Vals[pFILTER])>EPSILON) || (fabs(i->Vals[pTRANSM])>EPSILON))
+        if ((fabs(i->Vals.filter())>EPSILON) || (fabs(i->Vals.transm())>EPSILON))
         {
             rHasFilter = true;
             break;
@@ -464,8 +464,8 @@ bool Compute_Pigment (Colour& colour, const PIGMENT *Pigment, const Vector3d& EP
 
 bool ColourBlendMap::Compute(Colour& colour, DBL value, const Vector3d& TPoint, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread)
 {
-    const BlendMapEntry<COLOUR>* Prev;
-    const BlendMapEntry<COLOUR>* Cur;
+    const BlendMapEntry<Colour>* Prev;
+    const BlendMapEntry<Colour>* Cur;
     DBL prevWeight;
     DBL curWeight;
     Search (value, Prev, Cur, prevWeight, curWeight);

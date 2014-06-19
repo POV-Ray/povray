@@ -97,15 +97,9 @@ namespace pov
 *
 ******************************************************************************/
 
-COLOUR *Create_Colour ()
+Colour *Create_Colour ()
 {
-    COLOUR *New;
-
-    New = reinterpret_cast<COLOUR *>(POV_MALLOC(sizeof (COLOUR), "color"));
-
-    Make_ColourA (*New, 0.0, 0.0, 0.0, 0.0, 0.0);
-
-    return (New);
+    return new Colour (0.0, 0.0, 0.0, 0.0, 0.0);
 }
 
 
@@ -134,22 +128,12 @@ COLOUR *Create_Colour ()
 *
 ******************************************************************************/
 
-COLOUR *Copy_Colour (const COLOUR Old)
+Colour *Copy_Colour (const Colour* Old)
 {
-    COLOUR *New;
-
     if (Old != NULL)
-    {
-        New = Create_Colour ();
-
-        Assign_Colour(*New,Old);
-    }
+        return new Colour(*Old);
     else
-    {
-        New = NULL;
-    }
-
-    return (New);
+        return NULL;
 }
 
 
@@ -195,10 +179,17 @@ PigmentBlendMapPtr Create_Blend_Map<PigmentBlendMap> (int type)
 }
 
 template<>
-UnifiedNormalBlendMapPtr Create_Blend_Map<UnifiedNormalBlendMap> (int type)
+SlopeBlendMapPtr Create_Blend_Map<SlopeBlendMap> (int type)
 {
-    assert ((type == SLOPE_TYPE) || (type == NORMAL_TYPE));
-    return UnifiedNormalBlendMapPtr (new UnifiedNormalBlendMap(type));
+    assert (type == SLOPE_TYPE);
+    return SlopeBlendMapPtr (new SlopeBlendMap());
+}
+
+template<>
+NormalBlendMapPtr Create_Blend_Map<NormalBlendMap> (int type)
+{
+    assert (type == NORMAL_TYPE);
+    return NormalBlendMapPtr (new NormalBlendMap());
 }
 
 template<>
@@ -242,7 +233,9 @@ shared_ptr<MAP_T> Copy_Blend_Map (shared_ptr<MAP_T>& Old)
 
 template ColourBlendMapPtr          Copy_Blend_Map (ColourBlendMapPtr& Old);
 template PigmentBlendMapPtr         Copy_Blend_Map (PigmentBlendMapPtr& Old);
-template UnifiedNormalBlendMapPtr   Copy_Blend_Map (UnifiedNormalBlendMapPtr& Old);
+template GenericNormalBlendMapPtr   Copy_Blend_Map (GenericNormalBlendMapPtr& Old);
+template SlopeBlendMapPtr           Copy_Blend_Map (SlopeBlendMapPtr& Old);
+template NormalBlendMapPtr          Copy_Blend_Map (NormalBlendMapPtr& Old);
 template TextureBlendMapPtr         Copy_Blend_Map (TextureBlendMapPtr& Old);
 
 
@@ -277,7 +270,8 @@ BlendMap<DATA_T>::BlendMap(int type) : Type(type) {}
 
 template BlendMap<ColourBlendMapData>::BlendMap(int type);
 template BlendMap<PigmentBlendMapData>::BlendMap(int type);
-template BlendMap<UnifiedNormalBlendMapData>::BlendMap(int type);
+template BlendMap<SlopeBlendMapData>::BlendMap(int type);
+template BlendMap<NormalBlendMapData>::BlendMap(int type);
 template BlendMap<TexturePtr>::BlendMap(int type);
 
 template<typename DATA_T>
@@ -289,7 +283,8 @@ void BlendMap<DATA_T>::Set(const Vector& data)
 
 template void BlendMap<ColourBlendMapData>::Set(const Vector& data);
 template void BlendMap<PigmentBlendMapData>::Set(const Vector& data);
-template void BlendMap<UnifiedNormalBlendMapData>::Set(const Vector& data);
+template void BlendMap<SlopeBlendMapData>::Set(const Vector& data);
+template void BlendMap<NormalBlendMapData>::Set(const Vector& data);
 template void BlendMap<TexturePtr>::Set(const Vector& data);
 
 }

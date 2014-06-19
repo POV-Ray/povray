@@ -1047,7 +1047,7 @@ void Trace::ComputeLightedTexture(Colour& resultcolour, const TEXTURE *texture, 
             resultcolour.red()   += attCol.red()   * rfrCol.red();
             resultcolour.green() += attCol.green() * rfrCol.green();
             resultcolour.blue()  += attCol.blue()  * rfrCol.blue();
-            // NOTE: pTRANSM (alpha channel) stays zero
+            // NOTE: transm() (alpha channel) stays zero
         }
         else
         {
