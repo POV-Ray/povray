@@ -941,7 +941,7 @@ void PhotonTrace::addSurfacePhoton(const Vector3d& Point, const Vector3d& Origin
     Photon = map->AllocatePhoton();
 
     // convert photon from three floats to 4 bytes
-    colour2photonRgbe(Photon->colour, LightCol2);
+    Photon->colour = PhotonColour(LightCol2);
 
     // store the location
     Photon->Loc = PhotonVector3d(Point);
@@ -1027,7 +1027,7 @@ void PhotonMediaFunction::addMediaPhoton(const Vector3d& Point, const Vector3d& 
     Photon = threadData->mediaPhotonMap->AllocatePhoton();
 
     // convert photon from three floats to 4 bytes
-    colour2photonRgbe(Photon->colour, LightCol2);
+    Photon->colour = PhotonColour(LightCol2);
 
     // store the location
     Photon->Loc = PhotonVector3d(Point);

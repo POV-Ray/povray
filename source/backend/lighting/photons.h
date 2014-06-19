@@ -164,7 +164,7 @@ struct Photon
     }
 
     PhotonVector3d Loc;     /* location */
-    SMALL_COLOUR colour;    /* color & intensity (flux) */
+    PhotonColour colour;    /* color & intensity (flux) */
     unsigned char info;     /* info byte for kd-tree */
     signed char theta, phi; /* incoming direction */
 };

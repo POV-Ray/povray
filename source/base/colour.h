@@ -47,6 +47,9 @@ namespace pov_base
 template<typename T>
 class GenericRGBColour;
 
+template<int BIAS>
+class GenericRGBEColour;
+
 /// @name Colour Channel Luminance
 /// @{
 /// @remark    These do not exactly match CCIR Recommendation 601-1, which specifies 0.299, 0.587 and
@@ -440,6 +443,15 @@ class GenericRGBColour
             colour[BLUE] = col[BLUE];
         }
 
+        template<int BIAS>
+        explicit GenericRGBColour(const GenericRGBEColour<BIAS>& col)
+        {
+            double exponent = ldexp(1.0,col.data[GenericRGBEColour<BIAS>::EXP]-(int)(BIAS+8));
+            colour[RED]   = (col.data[GenericRGBEColour<BIAS>::RED]   + 0.5) * exponent;
+            colour[GREEN] = (col.data[GenericRGBEColour<BIAS>::GREEN] + 0.5) * exponent;
+            colour[BLUE]  = (col.data[GenericRGBEColour<BIAS>::BLUE]  + 0.5) * exponent;
+        }
+
         GenericRGBColour& operator=(const GenericRGBColour& col)
         {
             colour[RED] = col[RED];
@@ -554,7 +566,7 @@ class GenericRGBColour
         ///
         T weightMaxAbs() const
         {
-            return max3(fabs(colour[RED]), fabs(colour[GREEN]), fabs(colour[BLUE]));
+            return maxAbs();
         }
 
         /// Computes the intensity of the colour channel with the greatest value.
@@ -565,6 +577,16 @@ class GenericRGBColour
         T max() const
         {
             return max3(colour[RED], colour[GREEN], colour[BLUE]);
+        }
+
+        /// Computes the intensity of the colour channel with the greatest magnitude.
+        ///
+        /// @note       Do _not_ use this function if you want to compute some kind of weight;
+        ///             that's what @ref weightMaxAbs() is for.
+        ///
+        T maxAbs() const
+        {
+            return max3(fabs(colour[RED]), fabs(colour[GREEN]), fabs(colour[BLUE]));
         }
 
         bool isZero() const { return (colour[RED] == 0) && (colour[GREEN] == 0) && (colour[BLUE] == 0); }
@@ -705,7 +727,9 @@ class GenericRGBColour
             colour[BLUE] /= b;
             return *this;
         }
+
     private:
+
         DATA colour;
 };
 
@@ -805,6 +829,138 @@ typedef GenericColour<COLC>    Colour;          ///< Single-Precision RGBFT Colo
 typedef GenericColour<DBL>     DblColour;       ///< Double-Precision RGBFT Colour.
 typedef GenericRGBColour<COLC> RGBColour;       ///< Single-Precision RGB Colour.
 typedef GenericRGBColour<DBL>  DblRGBColour;    ///< Double-Precision RGB Colour.
+
+
+/// Generic template class to store a RGB colour in four bytes (RGBE).
+///
+/// This class uses RGBE format for compact storage of high dynamic range colours, as originally
+/// proposed by Greg Ward.
+///
+/// @author Christoph Lipka
+/// @author Based on MegaPOV HDR code written by Mael and Christoph Hormann
+///
+/// @tparam BIAS    Bias to use for the exponent.
+///                 A value of 128 matches Greg Ward's original proposal.
+///
+template<int BIAS>
+class GenericRGBEColour
+{
+    public:
+
+        enum
+        {
+            RED    = 0,
+            GREEN  = 1,
+            BLUE   = 2,
+            EXP    = 3
+        };
+
+        template<typename COLC_T2> friend class GenericRGBColour;
+
+        typedef unsigned char COLC_T;
+        typedef COLC_T DATA[4];
+
+        GenericRGBEColour()
+        {
+            data[RED]   = 0;
+            data[GREEN] = 0;
+            data[BLUE]  = 0;
+            data[EXP]   = 0;
+        }
+
+        GenericRGBEColour(const GenericRGBEColour& col)
+        {
+            data[RED]   = col.data[RED];
+            data[GREEN] = col.data[GREEN];
+            data[BLUE]  = col.data[BLUE];
+            data[EXP]   = col.data[EXP];
+        }
+
+        explicit GenericRGBEColour(COLC red, COLC green, COLC blue)
+        {
+            RGBColour col (red, green, blue);
+            double scaleFactor;
+            if (ComputeExponent(col, data[EXP], scaleFactor))
+            {
+                data[RED]   = clipToType<COLC_T>(floor(col.red()   * scaleFactor));
+                data[GREEN] = clipToType<COLC_T>(floor(col.green() * scaleFactor));
+                data[BLUE]  = clipToType<COLC_T>(floor(col.blue()  * scaleFactor));
+            }
+            else
+            {
+                data[RED] = data[GREEN] = data[BLUE] = data[EXP] = 0;
+            }
+        }
+
+        explicit GenericRGBEColour(const RGBColour& col)
+        {
+            double scaleFactor;
+            if (ComputeExponent(col, data[EXP], scaleFactor))
+            {
+                data[RED]   = clipToType<COLC_T>(floor(col.red()   * scaleFactor));
+                data[GREEN] = clipToType<COLC_T>(floor(col.green() * scaleFactor));
+                data[BLUE]  = clipToType<COLC_T>(floor(col.blue()  * scaleFactor));
+            }
+            else
+            {
+                data[RED] = data[GREEN] = data[BLUE] = data[EXP] = 0;
+            }
+        }
+
+        explicit GenericRGBEColour(const RGBColour& col, const RGBColour& dither)
+        {
+            double scaleFactor;
+            if (ComputeExponent(col, data[EXP], scaleFactor))
+            {
+                data[RED]   = clip<COLC_T>(floor(col.red()   * scaleFactor + dither.red()));
+                data[GREEN] = clip<COLC_T>(floor(col.green() * scaleFactor + dither.green()));
+                data[BLUE]  = clip<COLC_T>(floor(col.blue()  * scaleFactor + dither.blue()));
+            }
+            else
+            {
+                data[RED] = data[GREEN] = data[BLUE] = data[EXP] = 0;
+            }
+        }
+
+        const DATA& operator*() const
+        {
+            return data;
+        }
+
+        DATA& operator*()
+        {
+            return data;
+        }
+
+    private:
+
+        DATA data;
+
+        static bool ComputeExponent(const RGBColour& col, COLC_T& biasedExponent, double& scaleFactor)
+        {
+            COLC maxChannel;
+            if (std::numeric_limits<COLC_T>::is_signed)
+                maxChannel = col.maxAbs();
+            else
+                maxChannel = col.max();
+
+            if(maxChannel <= 1.0e-32)
+                return false;
+
+            int exponent;
+            double maxChannelMantissa = frexp(maxChannel, &exponent);
+            biasedExponent = clipToType<COLC_T>(exponent + BIAS);
+
+            if (biasedExponent != exponent + BIAS)
+                maxChannelMantissa = ldexp(maxChannelMantissa, exponent + BIAS - biasedExponent);
+
+            scaleFactor = (std::numeric_limits<COLC_T>::max()) * maxChannelMantissa / maxChannel;
+            return true;
+        }
+};
+
+typedef GenericRGBEColour<128> RadianceHDRColour;   ///< RGBE format as originally proposed by Greg Ward.
+typedef GenericRGBEColour<250> PhotonColour;        ///< RGBE format as adapted by Nathan Kopp for photon mapping.
 
 }
 

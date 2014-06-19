@@ -1124,7 +1124,7 @@ void MediaFunction::ComputeMediaPhotons(MediaVector& medias, RGBColour& Te, cons
             int theta,phi;
 
             // convert small color to normal color
-            photonRgbe2colour(Light_Colour, photonGatherer->gatheredPhotons.photonGatherList[j]->colour);
+            Light_Colour = RGBColour(photonGatherer->gatheredPhotons.photonGatherList[j]->colour);
 
             // convert theta/phi to vector direction
             // Use a pre-computed array of sin/cos to avoid many calls to the

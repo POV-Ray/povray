@@ -67,6 +67,13 @@ inline T clip(T val, T minv, T maxv)
         return val;
 }
 
+// clip a value to the range of an integer type
+template<typename T, typename T2>
+inline T clipToType(T2 val)
+{
+    return (T)clip<T2>(val, std::numeric_limits<T>::min(), std::numeric_limits<T>::max());
+}
+
 // force a value's precision to a given type, even if computations are normally done with extended precision
 // (such as GNU Linux on 32-bit CPU, which uses 80-bit extended double precision)
 // TODO - we might make this code platform-specific

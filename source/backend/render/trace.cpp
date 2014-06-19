@@ -1478,7 +1478,7 @@ void Trace::ComputePhotonDiffuseLight(const FINISH *Finish, const Vector3d& IPoi
         bool backside = false;
 
         // convert small color to normal color
-        photonRgbe2colour(Light_Colour, gatherer.gatheredPhotons.photonGatherList[j]->colour);
+        Light_Colour = RGBColour(gatherer.gatheredPhotons.photonGatherList[j]->colour);
 
         // convert theta/phi to vector direction
         // Use a pre-computed array of sin/cos to avoid many calls to the
