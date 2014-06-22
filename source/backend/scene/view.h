@@ -153,7 +153,7 @@ class ViewData
          *                          data passed to whichever rendering thread the rectangle will be re-dispatched to.
          *                          If this value is NULL, the rectangle will not be re-dispatched.
          */
-        void CompletedRectangle(const POVRect& rect, unsigned int serial, const vector<Colour>& pixels, unsigned int size, bool final, float completion = 1.0, BlockInfo* blockInfo = NULL);
+        void CompletedRectangle(const POVRect& rect, unsigned int serial, const vector<RGBTColour>& pixels, unsigned int size, bool final, float completion = 1.0, BlockInfo* blockInfo = NULL);
 
         /**
          *  Called to (fully or partially) complete rendering of a specific sub-rectangle of the view.
@@ -171,7 +171,7 @@ class ViewData
          *                          data passed to whichever rendering thread the rectangle will be re-dispatched to.
          *                          If this value is NULL, the rectangle will not be re-dispatched.
          */
-        void CompletedRectangle(const POVRect& rect, unsigned int serial, const vector<Vector2d>& positions, const vector<Colour>& colors, unsigned int size, bool final, float completion = 1.0, BlockInfo* blockInfo = NULL);
+        void CompletedRectangle(const POVRect& rect, unsigned int serial, const vector<Vector2d>& positions, const vector<RGBTColour>& colors, unsigned int size, bool final, float completion = 1.0, BlockInfo* blockInfo = NULL);
 
         /**
          *  Called to (fully or partially) complete rendering of a specific sub-rectangle of the view without updating pixel data.
@@ -252,19 +252,19 @@ class ViewData
          *  Get the radiosity cache.
          *  @return                 Radiosity cache.
          */
-         RadiosityCache& GetRadiosityCache();
+        RadiosityCache& GetRadiosityCache();
 
         /**
          *  Get the value of the real-time raytracing option
          *  @return                 true if RTR was requested in render options
          */
-         bool GetRealTimeRaytracing() { return realTimeRaytracing; }
+        bool GetRealTimeRaytracing() { return realTimeRaytracing; }
 
         /**
          *  Return a pointer to the real-time raytracing data
          *  @return                 pointer to instance of class RTRData, or NULL if RTR is not enabled
          */
-         RTRData *GetRTRData() { return rtrData; }
+        RTRData *GetRTRData() { return rtrData; }
 
     private:
 

@@ -352,7 +352,8 @@ class Parser : public Task
         void Parse_PatternFunction(TPATTERN *);
 
         // express.h/express.cpp
-        void Parse_Colour (Colour& colour, bool expectFT = true);
+        void Parse_Colour (RGBFTColour& colour, bool expectFT = true);
+        void Parse_Colour (TransColour& colour, bool expectFT = true);
         void Parse_Colour (RGBColour& colour);
         template<typename DATA_T> void Parse_BlendMapData (int Blend_Type, DATA_T& rData);
         template<typename MAP_T> shared_ptr<MAP_T> Parse_Blend_Map (int Blend_Type, int Pat_Type);

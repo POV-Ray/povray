@@ -129,7 +129,7 @@ void Parser::Make_Pattern_Image(ImageData *image, FUNCTION_PTR fn, int token)
     }
     else if((token == VECTFUNCT_ID_TOKEN) && (f->return_size == 5))
     {
-        image->data =Image::Create(image->iwidth, image->iheight, Image::RGBA_Int16);
+        image->data =Image::Create(image->iwidth, image->iheight, Image::RGBA_Int16); // TODO - we should probably use a HDR format
         image->data->SetPremultiplied(false); // We're storing the data in non-premultiplied alpha format, as this preserves all the data we're getting from the function.
 
         point[Z] = 0;
@@ -149,11 +149,11 @@ void Parser::Make_Pattern_Image(ImageData *image, FUNCTION_PTR fn, int token)
                 (void)POVFPU_Run(fnVMContext, *fn);
 
                 image->data->SetRGBFTValue(j, i,
-                                          float(fnVMContext->GetLocal(pRED)),
-                                          float(fnVMContext->GetLocal(pGREEN)),
-                                          float(fnVMContext->GetLocal(pBLUE)),
-                                          float(fnVMContext->GetLocal(pFILTER)), // N.B. pFILTER component is currently ignored by SetRGBFTValue (matches 3.6 behavior)
-                                          float(fnVMContext->GetLocal(pTRANSM)));
+                                           float(fnVMContext->GetLocal(pRED)),
+                                           float(fnVMContext->GetLocal(pGREEN)),
+                                           float(fnVMContext->GetLocal(pBLUE)),
+                                           float(fnVMContext->GetLocal(pFILTER)), // N.B. pFILTER component is currently ignored by the RGBA_Int16 SetRGBFTValue (matches 3.6 behavior)
+                                           float(fnVMContext->GetLocal(pTRANSM)));
             }
         }
     }
@@ -2310,7 +2310,7 @@ void Parser::Parse_Tnormal (TNORMAL **Tnormal_Ptr)
 
 void Parser::Parse_Finish (FINISH **Finish_Ptr)
 {
-    Colour Temp_Colour;
+    TransColour Temp_Colour;
     FINISH *New;
     Vector3d Local_Vector;
     bool diffuseAdjust = false;
@@ -2421,7 +2421,7 @@ void Parser::Parse_Finish (FINISH **Finish_Ptr)
                                have no effect */
                             if(!found_second_color && New->Reflection_Type > 0)
                             {
-                                New->Reflection_Min.clear();
+                                New->Reflection_Min.Clear();
                             }
                         END_CASE
 

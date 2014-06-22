@@ -114,7 +114,7 @@ class SceneData
         /// atmospheric media
         vector<Media> atmosphere;
         /// background color - TODO - allow pattern here (useful for background image maps) [trf]
-        Colour backgroundColour; // may have a filter/transmit component (but filter is ignored)
+        TransColour backgroundColour; // may have a filter/transmit component (but filter is ignored)
         /// ambient light in scene
         RGBColour ambientLight;
         /// TODO - what is this again? [trf]

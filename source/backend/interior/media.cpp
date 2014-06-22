@@ -63,10 +63,10 @@ Media::Media()
     Max_Samples    = 1;
     Eccentricity   = 0.0;
 
-    Absorption.clear();
-    Emission.clear();
-    Extinction.clear();
-    Scattering.clear();
+    Absorption.Clear();
+    Emission.Clear();
+    Extinction.Clear();
+    Scattering.Clear();
 
     is_constant = false;
 
@@ -177,9 +177,9 @@ void Media::PostProcess()
 
     is_constant = Density.empty();
 
-    use_absorption = !Absorption.isZero();
-    use_emission   = !Emission.isZero();
-    use_scattering = !Scattering.isZero();
+    use_absorption = !Absorption.IsZero();
+    use_emission   = !Emission.IsZero();
+    use_scattering = !Scattering.IsZero();
     use_extinction = use_absorption || use_scattering;
 
     // Init sample threshold array.
@@ -223,7 +223,7 @@ MediaFunction::MediaFunction(TraceThreadData *td, Trace *t, PhotonGatherer *pg) 
 {
 }
 
-void MediaFunction::ComputeMedia(vector<Media>& mediasource, const Ray& ray, Intersection& isect, RGBColour& colour, COLC& transm)
+void MediaFunction::ComputeMedia(vector<Media>& mediasource, const Ray& ray, Intersection& isect, RGBColour& colour, ColourChannel& transm)
 {
     if(!mediasource.empty())
     {
@@ -241,7 +241,7 @@ void MediaFunction::ComputeMedia(vector<Media>& mediasource, const Ray& ray, Int
     }
 }
 
-void MediaFunction::ComputeMedia(const RayInteriorVector& mediasource, const Ray& ray, Intersection& isect, RGBColour& colour, COLC& transm)
+void MediaFunction::ComputeMedia(const RayInteriorVector& mediasource, const Ray& ray, Intersection& isect, RGBColour& colour, ColourChannel& transm)
 {
     if(!mediasource.empty())
     {
@@ -272,7 +272,7 @@ void MediaFunction::ComputeMedia(const RayInteriorVector& mediasource, const Ray
 *   Colour    - Color arriving at the end point
 ******************************************************************************/
 
-void MediaFunction::ComputeMedia(MediaVector& medias, const Ray& ray, Intersection& isect, RGBColour& colour, COLC& transm)
+void MediaFunction::ComputeMedia(MediaVector& medias, const Ray& ray, Intersection& isect, RGBColour& colour, ColourChannel& transm)
 {
     LightSourceEntryVector lights;
     LitIntervalVector litintervals;
@@ -398,9 +398,7 @@ void MediaFunction::ComputeMediaRegularSampling(MediaVector& medias, LightSource
                 Va = ((i->te2 * n) - Sqr(i->te * n)) * n;
 
                 // Take additional samples until variance is small enough.
-                while((Va.red() >= IMedia->Sample_Threshold[i->samples - 1]) ||
-                      (Va.green() >= IMedia->Sample_Threshold[i->samples - 1]) ||
-                      (Va.blue() >= IMedia->Sample_Threshold[i->samples - 1]))
+                while(!Va.IsNearZero(IMedia->Sample_Threshold[i->samples - 1]))
                 {
                     // Sample current interval again.
                     ComputeOneMediaSample(medias, lights, *i, ray, randomNumberGenerator(), C0, od0, 1, ignore_photons, use_scattering, false);
@@ -447,8 +445,8 @@ void MediaFunction::ComputeMediaAdaptiveSampling(MediaVector& medias, LightSourc
         ComputeOneMediaSample(medias, lights, *i, ray, dd * IMedia->Jitter * (randomNumberGenerator() - 0.5), C0, od0, 3, ignore_photons, use_scattering, false);
 
         // clear out od & te
-        i->te.clear();
-        i->od.clear();
+        i->te.Clear();
+        i->od.Clear();
 
         d0 = 0.0;
         for(j = 1; j <= subIntervalCount; j++)
@@ -461,7 +459,7 @@ void MediaFunction::ComputeMediaAdaptiveSampling(MediaVector& medias, LightSourc
             // keep a sum of the results
             // do some attenuation, too, since we are doing samples in order
             // TODO - we could do even better if we handled attenuation on a per-sample basis
-            i->te += Result * exp(-(i->od + ODResult * 0.5) * dd);
+            i->te += Result * Exp(-(i->od + ODResult * 0.5) * dd);
 
             // move c1 to c0 to go on to next sample/interval
             C0 = C1;
@@ -479,7 +477,7 @@ void MediaFunction::ComputeMediaAdaptiveSampling(MediaVector& medias, LightSourc
     }
 }
 
-void MediaFunction::ComputeMediaColour(MediaIntervalVector& mediaintervals, RGBColour& colour, COLC& transm)
+void MediaFunction::ComputeMediaColour(MediaIntervalVector& mediaintervals, RGBColour& colour, ColourChannel& transm)
 {
     RGBColour Od, Te;
     DBL n;
@@ -490,17 +488,17 @@ void MediaFunction::ComputeMediaColour(MediaIntervalVector& mediaintervals, RGBC
         n = 1.0 / (DBL)i->samples;
 
         // Add total emission.
-        Te += i->te * n * exp(-Od);
+        Te += i->te * n * Exp(-Od);
 
         // Add optical depth of ient interval.
         Od += i->od * n;
     }
 
     // Add contribution estimated for the participating media.
-    Od = exp(-Od);
+    Od = Exp(-Od);
 
     colour = colour * Od + Te;
-    transm *= Od.greyscale(); // TODO - in the long run, we should make transm a full-fledged RGB term
+    transm *= Od.Greyscale(); // TODO - in the long run, we should make transm a full-fledged RGB term
 }
 
 void MediaFunction::ComputeMediaSampleInterval(LitIntervalVector& litintervals, MediaIntervalVector& mediaintervals, const Media *media)
@@ -993,7 +991,7 @@ void MediaFunction::ComputeOneMediaSample(MediaVector& medias, LightSourceEntryV
     else
     {
         // NOTE: this assumes constant absorption+extinction over the length of the interval
-        Emission *=  mediainterval.ds * exp(-Extinction * d0);
+        Emission *=  mediainterval.ds * Exp(-Extinction * d0);
     }
 
     SampCol = Emission;
@@ -1042,7 +1040,7 @@ void MediaFunction::ComputeOneMediaSampleRecursive(MediaVector& medias, LightSou
     }
 
     // check if we should sample between points 1 and 2
-    if(colourDistance(C1, C2) > aa_threshold)
+    if(ColourDistance(C1, C2) > aa_threshold)
     {
         // recurse again
         ComputeOneMediaSampleRecursive(medias, lights, mediainterval, ray, d1, d2, Result2, C1, C2, ODResult2, od1, od2,
@@ -1068,7 +1066,7 @@ void MediaFunction::ComputeOneMediaSampleRecursive(MediaVector& medias, LightSou
     }
 
     // check if we should sample between points 2 and 3
-    if(colourDistance(C2, C3) > aa_threshold)
+    if(ColourDistance(C2, C3) > aa_threshold)
     {
         // recurse again
         ComputeOneMediaSampleRecursive(medias, lights, mediainterval, ray,  d2, d3, Result2, C2, C3, ODResult2, od2, od3,
@@ -1115,7 +1113,7 @@ void MediaFunction::ComputeMediaPhotons(MediaVector& medias, RGBColour& Te, cons
         else
             r = photonGatherer->gatherPhotonsAdaptive(&H, NULL, false);
 
-        Colour2.clear();
+        Colour2.Clear();
 
         // now go through these photons and add up their contribution
         for(j = 0; j < photonGatherer->gatheredPhotons.numFound; j++)

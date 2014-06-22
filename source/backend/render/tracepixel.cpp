@@ -274,11 +274,11 @@ void TracePixel::SetupCamera(const Camera& cam)
         focalBlurData = new FocalBlurData(camera, threadData);
 }
 
-void TracePixel::operator()(DBL x, DBL y, DBL width, DBL height, Colour& colour)
+void TracePixel::operator()(DBL x, DBL y, DBL width, DBL height, RGBTColour& colour)
 {
     if(useFocalBlur == false)
     {
-        colour.clear();
+        colour.Clear();
         int numTraced = 0;
         for (size_t rayno = 0; rayno < camera.Rays_Per_Pixel; rayno++)
         {
@@ -287,10 +287,10 @@ void TracePixel::operator()(DBL x, DBL y, DBL width, DBL height, Colour& colour)
 
             if (CreateCameraRay(ray, x, y, width, height, rayno) == true)
             {
-                Colour col;
+                TransColour col;
 
                 TraceRay(ray, col, 1.0, false, camera.Max_Ray_Distance);
-                colour += col;
+                colour += RGBTColour(col);
                 numTraced++;
             }
         }
@@ -945,7 +945,7 @@ void TracePixel::InitRayContainerStateTree(Ray& ray, BBOX_TREE *node)
     }
 }
 
-void TracePixel::TraceRayWithFocalBlur(Colour& colour, DBL x, DBL y, DBL width, DBL height)
+void TracePixel::TraceRayWithFocalBlur(RGBTColour& colour, DBL x, DBL y, DBL width, DBL height)
 {
     int nr;     // Number of current samples.
     int level;  // Index into number of samples list.
@@ -953,16 +953,16 @@ void TracePixel::TraceRayWithFocalBlur(Colour& colour, DBL x, DBL y, DBL width, 
     int dxi, dyi;
     int i;
     DBL dx, dy, n, randx, randy;
-    Colour C, V1, S1, S2;
+    RGBTColour C, V1, S1, S2;
     int seed = int(x * 313.0 + 11.0) + int(y * 311.0 + 17.0);
 
     TraceTicket ticket(maxTraceLevel, adcBailout, sceneData->outputAlpha);
     Ray ray(ticket);
 
-    colour.clear();
-    V1.clear();
-    S1.clear();
-    S2.clear();
+    colour.Clear();
+    V1.Clear();
+    S1.Clear();
+    S2.Clear();
 
     nr = 0;
     level = 0;
@@ -1004,27 +1004,22 @@ void TracePixel::TraceRayWithFocalBlur(Colour& colour, DBL x, DBL y, DBL width, 
             {
                 // Increase_Counter(stats[Number_Of_Samples]);
 
-                C.clear();
-                TraceRay(ray, C, 1.0, false, camera.Max_Ray_Distance);
+                TransColour tempC;
+                TraceRay(ray, tempC, 1.0, false, camera.Max_Ray_Distance);
+                C = RGBTColour(tempC);
 
                 colour += C;
             }
             else
-                C = Colour(0.0, 0.0, 0.0, 0.0, 1.0);
+                C = RGBTColour(0.0, 0.0, 0.0, 1.0);
 
             // Add color to color sum.
 
-            S1.red()    += C.red();
-            S1.green()  += C.green();
-            S1.blue()   += C.blue();
-            S1.transm() += C.transm();
+            S1 += C;
 
             // Add color to squared color sum.
 
-            S2.red()    += Sqr(C.red());
-            S2.green()  += Sqr(C.green());
-            S2.blue()   += Sqr(C.blue());
-            S2.transm() += Sqr(C.transm());
+            S2 += Sqr(C);
 
             nr++;
         }
@@ -1033,16 +1028,12 @@ void TracePixel::TraceRayWithFocalBlur(Colour& colour, DBL x, DBL y, DBL width, 
 
         n = (DBL)nr;
 
-        V1.red()    = (S2.red()    / n - Sqr(S1.red()    / n)) / n;
-        V1.green()  = (S2.green()  / n - Sqr(S1.green()  / n)) / n;
-        V1.blue()   = (S2.blue()   / n - Sqr(S1.blue()   / n)) / n;
-        V1.transm() = (S2.transm() / n - Sqr(S1.transm() / n)) / n;
+        V1 = (S2 / n - Sqr(S1 / n)) / n;
 
         // Exit if samples are likely too be good enough.
 
         if((nr >= camera.Blur_Samples_Min) &&
-           (V1.red()  < focalBlurData->Sample_Threshold[nr - 1]) && (V1.green()  < focalBlurData->Sample_Threshold[nr - 1]) &&
-           (V1.blue() < focalBlurData->Sample_Threshold[nr - 1]) && (V1.transm() < focalBlurData->Sample_Threshold[nr - 1]))
+           (V1.IsNearZero(focalBlurData->Sample_Threshold[nr - 1])))
             break;
     }
     while(nr < camera.Blur_Samples);
@@ -1115,13 +1106,13 @@ TracePixel::FocalBlurData::FocalBlurData(const Camera& camera, TraceThreadData* 
         for (int i = 0; i < camera.Blur_Samples; i++)
         {
             Vector2d v;
-            Colour c;
+            TransColour c;
             double weight;
             do
             {
                 v = (*vgen)();
                 Compute_Pigment(c, camera.Bokeh, Vector3d(v.x() + 0.5, v.y() + 0.5, 0.0), NULL, NULL, threadData);
-                weight = RGBColour(c).weightGreyscale();
+                weight = c.colour().Greyscale();
                 weightSum += weight;
                 weightMax = max(weightMax, weight);
                 weight += tries / max_tries; // safeguard against infinite loops

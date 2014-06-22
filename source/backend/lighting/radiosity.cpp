@@ -442,7 +442,7 @@ void RadiosityFunction::ComputeAmbient(const Vector3d& ipoint, const Vector3d& r
     ticket.radiosityQuality = min((float)(4*reuse)/recSettings.reuseCount, ticket.radiosityQuality);
 
     // note grey spelling:  american options structure with worldbeat calculations!
-    ambient_colour = (ambient_colour * (1.0f - settings.grayThreshold)) + (settings.grayThreshold * ambient_colour.greyscale());
+    ambient_colour = (ambient_colour * (1.0f - settings.grayThreshold)) + (settings.grayThreshold * ambient_colour.Greyscale());
 
     // Scale up by current brightness factor prior to return
     ambient_colour *= settings.brightness;
@@ -568,9 +568,9 @@ double RadiosityFunction::GatherLight(const Vector3d& ipoint, const Vector3d& ra
         ticket.radiosityImportanceQueried = (float)i / (float)(cur_sample_count-1);
         bool alphaBackground = ticket.alphaBackground;
         ticket.alphaBackground = false;
-        Colour temp_full_colour;
+        TransColour temp_full_colour;
         DBL depth = trace.TraceRay(nray, temp_full_colour, weight, false); // Go down in recursion, trace the result, and come back up
-        RGBColour temp_colour = RGBColour(temp_full_colour);
+        RGBColour temp_colour = temp_full_colour.colour();
         ticket.radiosityRecursionDepth--;
         ticket.alphaBackground = alphaBackground;
 
@@ -589,7 +589,7 @@ double RadiosityFunction::GatherLight(const Vector3d& ipoint, const Vector3d& ra
             // bright objects
             // changed lighting.c to ignore phong/specular if tracing radiosity beam
             // TODO FIXME - while the following line is required for backward compatibility, we might consider replacing .max() with .weight(), .weightMax() or .weightMaxAbs() for v3.7.x
-            COLC max_ill = temp_colour.max();
+            ColourChannel max_ill = temp_colour.Max();
 
             if((max_ill > settings.maxSample) && (settings.maxSample > 0.0))
                 temp_colour *= (settings.maxSample / max_ill);
@@ -924,7 +924,7 @@ bool RadiosityCache::Load(const Path& inputFile)
                         &depth,
                         &point[X], &point[Y], &point[Z],
                         normal_string,
-                        &illuminance[X], &illuminance[Y], &illuminance[Z],
+                        &illuminance.red(), &illuminance.green(), &illuminance.blue(),
                         &harmonic_mean,
                         &nearest, to_nearest_string
                     );

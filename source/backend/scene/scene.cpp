@@ -70,8 +70,15 @@ SceneData::SceneData() :
 {
     atmosphereIOR = 1.0;
     atmosphereDispersion = 0.0;
-    backgroundColour = Colour(0.0, 0.0, 0.0, 0.0, 1.0);
+    backgroundColour = TransColour(RGBFTColour(0.0, 0.0, 0.0, 0.0, 1.0));
     ambientLight = RGBColour(1.0);
+
+    // Approximate dominant wavelengths of primary hues.
+    // Source: 3D Computer Graphics by John Vince (Addison Wesely)
+    // These are user-adjustable with the irid_wavelength keyword.
+    // Red = 700 nm  Grn = 520 nm Blu = 480 nm
+    // Divided by 1000 gives: rwl = 0.70;  gwl = 0.52;  bwl = 0.48;
+    //
     iridWavelengths = RGBColour(0.70, 0.52, 0.48);
 
     languageVersion = OFFICIAL_VERSION_NUMBER;
@@ -458,7 +465,7 @@ void Scene::StartParser(POVMS_Object& parseOptions)
     if (!sceneData->outputAlpha)
         // if we're not outputting an alpha channel, precompose the scene background against a black "background behind the background"
         // (NB: Here, background color is still at its default of <0,0,0,0,1> = full transparency; we're changing that to opaque black.)
-        sceneData->backgroundColour = Colour(0.0);
+        sceneData->backgroundColour.Clear();
 
     // NB a value of '0' for any of the BSP parameters tells the BSP code to use its internal default
     sceneData->bspMaxDepth = parseOptions.TryGetInt(kPOVAttrib_BSP_MaxDepth, 0);

@@ -310,14 +310,24 @@ void AlphaUnPremultiply(RGBColour& colour, float fAlpha)
     AlphaUnPremultiply(colour.red(), colour.green(), colour.blue(), fAlpha);
 }
 
-void AlphaPremultiply(Colour& colour)
+void AlphaPremultiply(RGBFTColour& colour)
 {
     AlphaPremultiply(colour.red(), colour.green(), colour.blue(), colour.FTtoA());
 }
 
-void AlphaUnPremultiply(Colour& colour)
+void AlphaUnPremultiply(RGBFTColour& colour)
 {
     AlphaUnPremultiply(colour.red(), colour.green(), colour.blue(), colour.FTtoA());
+}
+
+void AlphaPremultiply(RGBTColour& colour)
+{
+    AlphaPremultiply(colour.red(), colour.green(), colour.blue(), colour.alpha());
+}
+
+void AlphaUnPremultiply(RGBTColour& colour)
+{
+    AlphaUnPremultiply(colour.red(), colour.green(), colour.blue(), colour.alpha());
 }
 
 
@@ -523,7 +533,7 @@ void GetEncodedRGBAValue(const Image* img, unsigned int x, unsigned int y, const
         // Clipping will happen /before/ re-multiplying with alpha (because the latter is done in the viewer), which is equivalent to clipping
         // pre-multiplied components to be no greater than alpha, thereby "killing" highlights on transparent objects;
         // compensate for this by boosting opacity of any exceptionally bright pixels.
-        float fBright = RGBColour(fRed, fGreen, fBlue).greyscale();
+        float fBright = RGBColour(fRed, fGreen, fBlue).Greyscale();
         if (fBright > fAlpha)
             fAlpha = min(1.0f, fBright);
         // Need to convert from premultiplied to non-premultiplied encoding.
@@ -535,7 +545,7 @@ void GetEncodedRGBAValue(const Image* img, unsigned int x, unsigned int y, const
         // Clipping will happen /before/ multiplying with alpha (because the latter is done in the viewer), which is equivalent to clipping
         // pre-multiplied components to be no greater than alpha, thereby "killing" highlights on transparent objects;
         // compensate for this by boosting opacity of any exceptionally bright pixels.
-        float fBright = RGBColour(fRed, fGreen, fBlue).greyscale();
+        float fBright = RGBColour(fRed, fGreen, fBlue).Greyscale();
         if (fBright > 1.0)
         {
             float fFactor = fBright;

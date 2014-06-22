@@ -1158,10 +1158,10 @@ FINISH *Create_Finish()
 
     New = reinterpret_cast<FINISH *>(POV_MALLOC(sizeof (FINISH), "finish"));
 
-    New->Ambient.set(0.1);
-    New->Emission.clear();
-    New->Reflection_Max.clear();
-    New->Reflection_Min.clear();
+    New->Ambient.Set(0.1);
+    New->Emission.Clear();
+    New->Reflection_Max.Clear();
+    New->Reflection_Min.Clear();
 
     New->Reflection_Type    = 0;
     New->Reflection_Falloff = 1;    /* Added by MBP 8/27/98 */
@@ -1192,8 +1192,8 @@ FINISH *Create_Finish()
     New->Conserve_Energy = false;
 
     New->UseSubsurface = false;
-    New->SubsurfaceTranslucency.clear();
-    New->SubsurfaceAnisotropy.clear();
+    New->SubsurfaceTranslucency.Clear();
+    New->SubsurfaceAnisotropy.Clear();
 
     return(New);
 }

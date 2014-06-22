@@ -82,14 +82,14 @@ class TraceTask : public RenderTask
             public:
                 SubdivisionBuffer(size_t s);
 
-                void SetSample(size_t x, size_t y, const Colour& col);
+                void SetSample(size_t x, size_t y, const RGBTColour& col);
                 bool Sampled(size_t x, size_t y);
 
-                Colour& operator()(size_t x, size_t y);
+                RGBTColour& operator()(size_t x, size_t y);
 
                 void Clear();
             private:
-                vector<Colour> colors;
+                vector<RGBTColour> colors;
                 vector<bool> sampled;
                 size_t size;
         };
@@ -117,9 +117,9 @@ class TraceTask : public RenderTask
         void NonAdaptiveSupersamplingM1();
         void AdaptiveSupersamplingM2();
 
-        void NonAdaptiveSupersamplingForOnePixel(DBL x, DBL y, Colour& leftcol, Colour& topcol, Colour& curcol, bool& sampleleft, bool& sampletop, bool& samplecurrent);
-        void SupersampleOnePixel(DBL x, DBL y, Colour& col);
-        void SubdivideOnePixel(DBL x, DBL y, DBL d, size_t bx, size_t by, size_t bstep, SubdivisionBuffer& buffer, Colour& result, int level);
+        void NonAdaptiveSupersamplingForOnePixel(DBL x, DBL y, RGBTColour& leftcol, RGBTColour& topcol, RGBTColour& curcol, bool& sampleleft, bool& sampletop, bool& samplecurrent);
+        void SupersampleOnePixel(DBL x, DBL y, RGBTColour& col);
+        void SubdivideOnePixel(DBL x, DBL y, DBL d, size_t bx, size_t by, size_t bstep, SubdivisionBuffer& buffer, RGBTColour& result, int level);
 };
 
 }

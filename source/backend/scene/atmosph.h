@@ -1,35 +1,38 @@
-/*******************************************************************************
- * atmosph.h
- *
- * This module contains all defines, typedefs, and prototypes for ATMOSPH.CPP.
- *
- * ---------------------------------------------------------------------------
- * Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
- * Copyright 1991-2013 Persistence of Vision Raytracer Pty. Ltd.
- *
- * POV-Ray is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * POV-Ray is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------------
- * POV-Ray is based on the popular DKB raytracer version 2.12.
- * DKBTrace was originally written by David K. Buck.
- * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
- * ---------------------------------------------------------------------------
- * $File: //depot/povray/smp/source/backend/scene/atmosph.h $
- * $Revision: #21 $
- * $Change: 6158 $
- * $DateTime: 2013/12/02 21:19:56 $
- * $Author: clipka $
- *******************************************************************************/
+//******************************************************************************
+///
+/// @file backend/scene/atmosph.h
+///
+/// This module contains all defines, typedefs, and prototypes for
+/// `atmosph.cpp`.
+///
+/// @copyright
+/// @parblock
+///
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
+/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+///
+/// POV-Ray is free software: you can redistribute it and/or modify
+/// it under the terms of the GNU Affero General Public License as
+/// published by the Free Software Foundation, either version 3 of the
+/// License, or (at your option) any later version.
+///
+/// POV-Ray is distributed in the hope that it will be useful,
+/// but WITHOUT ANY WARRANTY; without even the implied warranty of
+/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+/// GNU Affero General Public License for more details.
+///
+/// You should have received a copy of the GNU Affero General Public License
+/// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+///
+/// ----------------------------------------------------------------------------
+///
+/// POV-Ray is based on the popular DKB raytracer version 2.12.
+/// DKBTrace was originally written by David K. Buck.
+/// DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
+///
+/// @endparblock
+///
+//*******************************************************************************
 
 #ifndef ATMOSPH_H
 #define ATMOSPH_H
@@ -57,34 +60,34 @@ typedef struct Skysphere_Struct SKYSPHERE;
 
 struct Fog_Struct
 {
-	int Type;
-	DBL Distance;
-	DBL Alt;
-	DBL Offset;
-	Colour colour; // may have a filter/transmit component
-	Vector3d Up;
-	TURB *Turb;
-	SNGL Turb_Depth;
-	FOG *Next;
+    int Type;
+    DBL Distance;
+    DBL Alt;
+    DBL Offset;
+    TransColour colour; // may have a filter/transmit component
+    Vector3d Up;
+    TURB *Turb;
+    SNGL Turb_Depth;
+    FOG *Next;
 };
 
 struct Rainbow_Struct
 {
-	DBL Distance;
-	DBL Jitter;
-	DBL Angle, Width;
-	DBL Arc_Angle, Falloff_Angle, Falloff_Width;
-	Vector3d Antisolar_Vector;
-	Vector3d Up_Vector, Right_Vector;
-	PIGMENT *Pigment;
-	RAINBOW *Next;
+    DBL Distance;
+    DBL Jitter;
+    DBL Angle, Width;
+    DBL Arc_Angle, Falloff_Angle, Falloff_Width;
+    Vector3d Antisolar_Vector;
+    Vector3d Up_Vector, Right_Vector;
+    PIGMENT *Pigment;
+    RAINBOW *Next;
 };
 
 struct Skysphere_Struct
 {
-	RGBColour         Emission; ///< Brightness adjustment.
-	vector<PIGMENT *> Pigments; ///< Pigment(s) to use.
-	TRANSFORM *       Trans;    ///< Skysphere transformation.
+    RGBColour         Emission; ///< Brightness adjustment.
+    vector<PIGMENT *> Pigments; ///< Pigment(s) to use.
+    TRANSFORM *       Trans;    ///< Skysphere transformation.
 };
 
 /*****************************************************************************

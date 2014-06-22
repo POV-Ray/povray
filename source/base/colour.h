@@ -2,7 +2,8 @@
 ///
 /// @file base/colour.h
 ///
-/// Declarations related to colour storage and computations.
+/// Declarations and inline implementations related to colour storage and
+/// computations.
 ///
 /// @copyright
 /// @parblock
@@ -44,10 +45,19 @@
 namespace pov_base
 {
 
-template<typename T>
-class GenericRGBColour;
+typedef COLC ColourChannel;
+typedef DBL  PreciseColourChannel;
 
-template<int BIAS>
+template<typename T>
+class GenericRGBFTColour;
+
+template<typename T>
+class GenericRGBTColour;
+
+template<typename T>
+class GenericTransColour;
+
+template<int BIAS, typename T = unsigned char>
 class GenericRGBEColour;
 
 /// @name Colour Channel Luminance
@@ -57,332 +67,12 @@ class GenericRGBEColour;
 /// @todo      For linear RGB with sRGB primaries this should be 0.2126, 0.7152 and 0.0722
 ///            respectively.
 ///
-#define RED_INTENSITY   0.297
-#define GREEN_INTENSITY 0.589
-#define BLUE_INTENSITY  0.114
+const float kRedIntensity   = 0.297;
+const float kGreenIntensity = 0.589;
+const float kBlueIntensity  = 0.114;
 /// @}
 
-/// Generic template class to hold an RGB colour plus a Filter and Transmit component.
-///
-/// @tparam T   Floating-point type to use for the individual colour components.
-///
-template<typename T>
-class GenericColour
-{
-    public:
-        typedef DBL EXPRESS[5];
-        typedef T DATA[5];
-
-        enum
-        {
-            RED    = 0,
-            GREEN  = 1,
-            BLUE   = 2,
-            FILTER = 3,
-            TRANSM = 4
-        };
-
-        GenericColour()
-        {
-            colour[RED] = 0.0;
-            colour[GREEN] = 0.0;
-            colour[BLUE] = 0.0;
-            colour[FILTER] = 0.0;
-            colour[TRANSM] = 0.0;
-        }
-
-        explicit GenericColour(T grey)
-        {
-            colour[RED] = grey;
-            colour[GREEN] = grey;
-            colour[BLUE] = grey;
-            colour[FILTER] = 0.0;
-            colour[TRANSM] = 0.0;
-        }
-
-        explicit GenericColour(const GenericRGBColour<T>& col);
-
-        explicit GenericColour(const GenericRGBColour<T>& col, T nfilter, T ntransm);
-
-        GenericColour(T nred, T ngreen, T nblue)
-        {
-            colour[RED] = nred;
-            colour[GREEN] = ngreen;
-            colour[BLUE] = nblue;
-            colour[FILTER] = 0.0;
-            colour[TRANSM] = 0.0;
-        }
-
-        GenericColour(T nred, T ngreen, T nblue, T nfilter, T ntransm)
-        {
-            colour[RED] = nred;
-            colour[GREEN] = ngreen;
-            colour[BLUE] = nblue;
-            colour[FILTER] = nfilter;
-            colour[TRANSM] = ntransm;
-        }
-
-        explicit GenericColour(const EXPRESS col)
-        {
-            colour[RED] = col[RED];
-            colour[GREEN] = col[GREEN];
-            colour[BLUE] = col[BLUE];
-            colour[FILTER] = col[FILTER];
-            colour[TRANSM] = col[TRANSM];
-        }
-
-        GenericColour(const GenericColour& col)
-        {
-            colour[RED] = col[RED];
-            colour[GREEN] = col[GREEN];
-            colour[BLUE] = col[BLUE];
-            colour[FILTER] = col[FILTER];
-            colour[TRANSM] = col[TRANSM];
-        }
-
-        template<typename T2>
-        explicit GenericColour(const GenericColour<T2>& col)
-        {
-            colour[RED] = col[RED];
-            colour[GREEN] = col[GREEN];
-            colour[BLUE] = col[BLUE];
-            colour[FILTER] = col[FILTER];
-            colour[TRANSM] = col[TRANSM];
-        }
-
-        GenericColour& operator=(const GenericColour& col)
-        {
-            colour[RED] = col[RED];
-            colour[GREEN] = col[GREEN];
-            colour[BLUE] = col[BLUE];
-            colour[FILTER] = col[FILTER];
-            colour[TRANSM] = col[TRANSM];
-            return *this;
-        }
-
-        GenericColour& operator=(const T& col)
-        {
-            colour[RED] = col;
-            colour[GREEN] = col;
-            colour[BLUE] = col;
-            colour[FILTER] = 0.0f;
-            colour[TRANSM] = 0.0f;
-            return *this;
-        }
-
-        T operator[](int idx) const { return colour[idx]; }
-        T& operator[](int idx) { return colour[idx]; }
-
-        const DATA& operator*() const { return colour; }
-        DATA& operator*() { return colour; }
-
-        T red() const { return colour[RED]; }
-        T& red() { return colour[RED]; }
-
-        T green() const { return colour[GREEN]; }
-        T& green() { return colour[GREEN]; }
-
-        T blue() const { return colour[BLUE]; }
-        T& blue() { return colour[BLUE]; }
-
-        T filter() const { return colour[FILTER]; }
-        T& filter() { return colour[FILTER]; }
-
-        T transm() const { return colour[TRANSM]; }
-        T& transm() { return colour[TRANSM]; }
-
-        T opacity() const { return 1.0 - colour[FILTER] - colour[TRANSM]; }
-
-        T greyscale() const { return RED_INTENSITY * colour[RED] + GREEN_INTENSITY * colour[GREEN] + BLUE_INTENSITY * colour[BLUE]; }
-
-        // TODO: find a more correct way of handling alpha <-> filter/transmit
-        static void AtoFT(T alpha, T& f, T& t) { f = 0.0f; t = 1.0f - alpha; }
-        void AtoFT(T alpha) { colour[FILTER] = 0.0f; colour[TRANSM] = 1.0f - alpha; }
-        static T FTtoA(T /*f*/, T t) { return 1.0f - t; }
-        T FTtoA() const { return 1.0f - colour[TRANSM]; }
-
-        void clear()
-        {
-            colour[RED] = 0.0;
-            colour[GREEN] = 0.0;
-            colour[BLUE] = 0.0;
-            colour[FILTER] = 0.0;
-            colour[TRANSM] = 0.0;
-        }
-
-        void set(T grey)
-        {
-            colour[RED] = grey;
-            colour[GREEN] = grey;
-            colour[BLUE] = grey;
-            colour[FILTER] = 0.0;
-            colour[TRANSM] = 0.0;
-        }
-
-        void set(T nred, T ngreen, T nblue)
-        {
-            colour[RED] = nred;
-            colour[GREEN] = ngreen;
-            colour[BLUE] = nblue;
-            colour[FILTER] = 0.0;
-            colour[TRANSM] = 0.0;
-        }
-
-        void set(T nred, T ngreen, T nblue, T nfilter, T ntransm)
-        {
-            colour[RED] = nred;
-            colour[GREEN] = ngreen;
-            colour[BLUE] = nblue;
-            colour[FILTER] = nfilter;
-            colour[TRANSM] = ntransm;
-        }
-
-        /// Sets the RGB components, but leaves filter and transmit unchanged.
-        void setRGB(GenericRGBColour<T> rgb);
-
-        /// Adds to the RGB components, but leaves filter and transmit unchanged.
-        void addRGB(GenericRGBColour<T> rgb);
-
-        GenericColour clip(T minc, T maxc)
-        {
-            return GenericColour(pov_base::clip<T>(colour[RED], minc, maxc),
-                                 pov_base::clip<T>(colour[GREEN], minc, maxc),
-                                 pov_base::clip<T>(colour[BLUE], minc, maxc),
-                                 pov_base::clip<T>(colour[FILTER], minc, maxc),
-                                 pov_base::clip<T>(colour[TRANSM], minc, maxc));
-        }
-
-        inline GenericRGBColour<T> rgbTransm() const;
-
-        GenericColour operator+(const GenericColour& b) const
-        {
-            return GenericColour(colour[RED] + b[RED], colour[GREEN] + b[GREEN], colour[BLUE] + b[BLUE], colour[FILTER] + b[FILTER], colour[TRANSM] + b[TRANSM]);
-        }
-
-        GenericColour operator-(const GenericColour& b) const
-        {
-            return GenericColour(colour[RED] - b[RED], colour[GREEN] - b[GREEN], colour[BLUE] - b[BLUE], colour[FILTER] - b[FILTER], colour[TRANSM] - b[TRANSM]);
-        }
-
-        GenericColour operator*(const GenericColour& b) const
-        {
-            return GenericColour(colour[RED] * b[RED], colour[GREEN] * b[GREEN], colour[BLUE] * b[BLUE], colour[FILTER] * b[FILTER], colour[TRANSM] * b[TRANSM]);
-        }
-
-        GenericColour operator/(const GenericColour& b) const
-        {
-            return GenericColour(colour[RED] / b[RED], colour[GREEN] / b[GREEN], colour[BLUE] / b[BLUE], colour[FILTER] / b[FILTER], colour[TRANSM] / b[TRANSM]);
-        }
-
-        GenericColour& operator+=(const GenericColour& b)
-        {
-            colour[RED] += b[RED];
-            colour[GREEN] += b[GREEN];
-            colour[BLUE] += b[BLUE];
-            colour[FILTER] += b[FILTER];
-            colour[TRANSM] += b[TRANSM];
-            return *this;
-        }
-
-        GenericColour& operator-=(const GenericColour& b)
-        {
-            colour[RED] -= b[RED];
-            colour[GREEN] -= b[GREEN];
-            colour[BLUE] -= b[BLUE];
-            colour[FILTER] -= b[FILTER];
-            colour[TRANSM] -= b[TRANSM];
-            return *this;
-        }
-
-        GenericColour& operator*=(const GenericColour& b)
-        {
-            colour[RED] *= b[RED];
-            colour[GREEN] *= b[GREEN];
-            colour[BLUE] *= b[BLUE];
-            colour[FILTER] *= b[FILTER];
-            colour[TRANSM] *= b[TRANSM];
-            return *this;
-        }
-
-        GenericColour& operator/=(const GenericColour& b)
-        {
-            colour[RED] /= b[RED];
-            colour[GREEN] /= b[GREEN];
-            colour[BLUE] /= b[BLUE];
-            colour[FILTER] /= b[FILTER];
-            colour[TRANSM] /= b[TRANSM];
-            return *this;
-        }
-
-        GenericColour operator-() const
-        {
-            return GenericColour(-colour[RED], -colour[GREEN], -colour[BLUE], -colour[FILTER], -colour[TRANSM]);
-        }
-
-        GenericColour operator+(DBL b) const
-        {
-            return GenericColour(colour[RED] + b, colour[GREEN] + b, colour[BLUE] + b, colour[FILTER] + b, colour[TRANSM] + b);
-        }
-
-        GenericColour operator-(DBL b) const
-        {
-            return GenericColour(colour[RED] - b, colour[GREEN] - b, colour[BLUE] - b, colour[FILTER] - b, colour[TRANSM] - b);
-        }
-
-        GenericColour operator*(DBL b) const
-        {
-            return GenericColour(colour[RED] * b, colour[GREEN] * b, colour[BLUE] * b, colour[FILTER] * b, colour[TRANSM] * b);
-        }
-
-        GenericColour operator/(DBL b) const
-        {
-            return GenericColour(colour[RED] / b, colour[GREEN] / b, colour[BLUE] / b, colour[FILTER] / b, colour[TRANSM] / b);
-        }
-
-        GenericColour& operator+=(DBL b)
-        {
-            colour[RED] += b;
-            colour[GREEN] += b;
-            colour[BLUE] += b;
-            colour[FILTER] += b;
-            colour[TRANSM] += b;
-            return *this;
-        }
-
-        GenericColour& operator-=(DBL b)
-        {
-            colour[RED] -= b;
-            colour[GREEN] -= b;
-            colour[BLUE] -= b;
-            colour[FILTER] -= b;
-            colour[TRANSM] -= b;
-            return *this;
-        }
-
-        GenericColour& operator*=(DBL b)
-        {
-            colour[RED] *= b;
-            colour[GREEN] *= b;
-            colour[BLUE] *= b;
-            colour[FILTER] *= b;
-            colour[TRANSM] *= b;
-            return *this;
-        }
-
-        GenericColour& operator/=(DBL b)
-        {
-            colour[RED] /= b;
-            colour[GREEN] /= b;
-            colour[BLUE] /= b;
-            colour[FILTER] /= b;
-            colour[TRANSM] /= b;
-            return *this;
-        }
-    private:
-        DATA colour;
-};
-
-/// Generic template class to hold an RGB colour.
+/// Generic template class to hold and manipulate an RGB colour.
 ///
 /// @tparam T   Floating-point type to use for the individual colour components.
 ///
@@ -391,104 +81,107 @@ class GenericRGBColour
 {
     public:
 
+        template<typename T2>
+        friend class GenericRGBColour;
+
         typedef T DATA[3];
 
-        enum
+        /// Default constructor.
+        inline GenericRGBColour()
         {
-            RED    = 0,
-            GREEN  = 1,
-            BLUE   = 2
-        };
-
-        GenericRGBColour()
-        {
-            colour[RED] = 0.0;
-            colour[GREEN] = 0.0;
-            colour[BLUE] = 0.0;
+            mColour[RED]   = 0.0;
+            mColour[GREEN] = 0.0;
+            mColour[BLUE]  = 0.0;
         }
 
-        explicit GenericRGBColour(T grey)
+        /// Copy constructor.
+        inline GenericRGBColour(const GenericRGBColour& col)
         {
-            colour[RED] = grey;
-            colour[GREEN] = grey;
-            colour[BLUE] = grey;
-        }
-
-        GenericRGBColour(T nred, T ngreen, T nblue)
-        {
-            colour[RED] = nred;
-            colour[GREEN] = ngreen;
-            colour[BLUE] = nblue;
-        }
-
-        explicit GenericRGBColour(const GenericColour<T>& col)
-        {
-            colour[RED] = col[RED];
-            colour[GREEN] = col[GREEN];
-            colour[BLUE] = col[BLUE];
-        }
-
-        GenericRGBColour(const GenericRGBColour& col)
-        {
-            colour[RED] = col[RED];
-            colour[GREEN] = col[GREEN];
-            colour[BLUE] = col[BLUE];
+            mColour[RED]   = col.mColour[RED];
+            mColour[GREEN] = col.mColour[GREEN];
+            mColour[BLUE]  = col.mColour[BLUE];
         }
 
         template<typename T2>
-        explicit GenericRGBColour(const GenericRGBColour<T2>& col)
+        inline explicit GenericRGBColour(const GenericRGBColour<T2>& col)
         {
-            colour[RED] = col[RED];
-            colour[GREEN] = col[GREEN];
-            colour[BLUE] = col[BLUE];
+            mColour[RED]   = col.mColour[RED];
+            mColour[GREEN] = col.mColour[GREEN];
+            mColour[BLUE]  = col.mColour[BLUE];
         }
 
-        template<int BIAS>
-        explicit GenericRGBColour(const GenericRGBEColour<BIAS>& col)
+        inline explicit GenericRGBColour(T grey)
         {
-            double exponent = ldexp(1.0,col.data[GenericRGBEColour<BIAS>::EXP]-(int)(BIAS+8));
-            colour[RED]   = (col.data[GenericRGBEColour<BIAS>::RED]   + 0.5) * exponent;
-            colour[GREEN] = (col.data[GenericRGBEColour<BIAS>::GREEN] + 0.5) * exponent;
-            colour[BLUE]  = (col.data[GenericRGBEColour<BIAS>::BLUE]  + 0.5) * exponent;
+            mColour[RED]   = grey;
+            mColour[GREEN] = grey;
+            mColour[BLUE]  = grey;
         }
 
-        GenericRGBColour& operator=(const GenericRGBColour& col)
+        inline explicit GenericRGBColour(T red, T green, T blue)
         {
-            colour[RED] = col[RED];
-            colour[GREEN] = col[GREEN];
-            colour[BLUE] = col[BLUE];
+            mColour[RED]   = red;
+            mColour[GREEN] = green;
+            mColour[BLUE]  = blue;
+        }
+
+        inline explicit GenericRGBColour(const GenericRGBFTColour<T>& col)
+        {
+            mColour[RED]   = col.red();
+            mColour[GREEN] = col.green();
+            mColour[BLUE]  = col.blue();
+        }
+
+        inline explicit GenericRGBColour(const GenericTransColour<T>& col)
+        {
+            const GenericRGBColour& colour = col.colour();
+            mColour[RED]   = colour.mColour[RED];
+            mColour[GREEN] = colour.mColour[GREEN];
+            mColour[BLUE]  = colour.mColour[BLUE];
+        }
+
+        template<int BIAS, typename T2>
+        inline explicit GenericRGBColour(const GenericRGBEColour<BIAS,T2>& col)
+        {
+            double exponent = ldexp(1.0,col.mData[GenericRGBEColour<BIAS>::EXP]-(int)(BIAS+8));
+            mColour[RED]   = (col.mData[GenericRGBEColour<BIAS>::RED]   + 0.5) * exponent;
+            mColour[GREEN] = (col.mData[GenericRGBEColour<BIAS>::GREEN] + 0.5) * exponent;
+            mColour[BLUE]  = (col.mData[GenericRGBEColour<BIAS>::BLUE]  + 0.5) * exponent;
+        }
+
+        inline GenericRGBColour& operator=(const GenericRGBColour& col)
+        {
+            mColour[RED]   = col.mColour[RED];
+            mColour[GREEN] = col.mColour[GREEN];
+            mColour[BLUE]  = col.mColour[BLUE];
             return *this;
         }
 
-        GenericRGBColour& operator=(const T& col)
-        {
-            colour[RED] = col;
-            colour[GREEN] = col;
-            colour[BLUE] = col;
-            return *this;
-        }
+        inline T  operator[](int idx) const { return mColour[idx]; }
+        inline T& operator[](int idx)       { return mColour[idx]; }
 
-        T operator[](int idx) const { return colour[idx]; }
-        T& operator[](int idx) { return colour[idx]; }
+        inline T  red()   const { return mColour[RED]; }
+        inline T& red()         { return mColour[RED]; }
 
-        T red() const { return colour[RED]; }
-        T& red() { return colour[RED]; }
+        inline T  green() const { return mColour[GREEN]; }
+        inline T& green()       { return mColour[GREEN]; }
 
-        T green() const { return colour[GREEN]; }
-        T& green() { return colour[GREEN]; }
-
-        T blue() const { return colour[BLUE]; }
-        T& blue() { return colour[BLUE]; }
+        inline T  blue()  const { return mColour[BLUE]; }
+        inline T& blue()        { return mColour[BLUE]; }
 
         /// Computes the greyscale intensity of the colour.
         ///
         /// @note   Do _not_ use this function if you want to compute some kind of weight; that's
-        ///         what @ref weightGreyscale() is for.
+        ///         what @ref WeightGreyscale() is for.
         ///
-        T greyscale() const { return RED_INTENSITY * colour[RED] + GREEN_INTENSITY * colour[GREEN] + BLUE_INTENSITY * colour[BLUE]; }
+        inline T Greyscale() const
+        {
+            return kRedIntensity   * mColour[RED]   +
+                   kGreenIntensity * mColour[GREEN] +
+                   kBlueIntensity  * mColour[BLUE];
+        }
 
         /// Computes a generic measure for the weight of the colour.
-        T weight() const
+        inline T Weight() const
         {
             /// @remark This used to be implemented differently at different places in the code;
             ///         variations were:
@@ -514,34 +207,36 @@ class GenericRGBColour
             /// @remark [3] It might be argued that the individual colour components should be
             ///             weighted according to their perceived brightness; however, chroma is
             ///             also important and has entirely different weights per component.
-            /// @remark For backward compatibility, @ref weightMax(), @ref weightMaxAbs(),
-            ///         @ref weightGreyscale() and @ref weightGreyscaleAbs() are provided.
+            /// @remark For backward compatibility, @ref WeightMax(), @ref WeightMaxAbs(),
+            ///         @ref WeightGreyscale() and @ref WeightGreyscaleAbs() are provided.
 
-            return (fabs(colour[RED]) + fabs(colour[GREEN]) + fabs(colour[BLUE])) / 3.0;
+            return (fabs(mColour[RED])   +
+                    fabs(mColour[GREEN]) +
+                    fabs(mColour[BLUE])) / 3.0;
         }
 
         /// Computes a measure for the weight of the colour based on the magnitude of its greyscale
         /// value.
         ///
-        /// @deprecated Calls to this function should probably be replaced by calls to @ref weight()
+        /// @deprecated Calls to this function should probably be replaced by calls to @ref Weight()
         ///             for consistency of colour math.
         ///
-        T weightGreyscaleAbs() const
+        inline T WeightGreyscaleAbs() const
         {
-            return fabs(greyscale());
+            return fabs(Greyscale());
         }
 
         /// Computes a measure for the weight of the colour based on its greyscale value.
         ///
         /// @note       Do _not_ use this function if you absolutely want to know the greyscale
-        ///             intensity of the colour. For such cases, use @ref greyscale() instead.
+        ///             intensity of the colour. For such cases, use @ref Greyscale() instead.
         ///
         /// @deprecated Calls to this function should probably be replaced by calls to
-        ///             @ref weightGreyscaleAbs() or @ref weight() for consistency of colour math.
+        ///             @ref WeightGreyscaleAbs() or @ref Weight() for consistency of colour math.
         ///
-        T weightGreyscale() const
+        inline T WeightGreyscale() const
         {
-            return greyscale();
+            return Greyscale();
         }
 
         /// Computes a measure for the weight of the colour based on the colour channel with the
@@ -551,267 +246,298 @@ class GenericRGBColour
         ///             the strongest colour channel. For such cases, use @ref max() instead.
         ///
         /// @deprecated Calls to this function should probably be replaced by calls to
-        ///             @ref weightMaxAbs() or @ref weight() for consistency of colour math.
+        ///             @ref WeightMaxAbs() or @ref Weight() for consistency of colour math.
         ///
-        T weightMax() const
+        inline T WeightMax() const
         {
-            return max();
+            return Max();
         }
 
         /// Computes a measure for the weight of the colour based on the colour channel with the
         /// greatest magnitude.
         ///
-        /// @deprecated Calls to this function should probably be replaced by calls to @ref weight()
+        /// @deprecated Calls to this function should probably be replaced by calls to @ref Weight()
         ///             for consistency of colour math.
         ///
-        T weightMaxAbs() const
+        inline T WeightMaxAbs() const
         {
-            return maxAbs();
+            return MaxAbs();
         }
 
         /// Computes the intensity of the colour channel with the greatest value.
         ///
         /// @note       Do _not_ use this function if you want to compute some kind of weight;
-        ///             that's what @ref weightMax() is for.
+        ///             that's what @ref WeightMax() is for.
         ///
-        T max() const
+        inline T Max() const
         {
-            return max3(colour[RED], colour[GREEN], colour[BLUE]);
+            return max3(mColour[RED],
+                        mColour[GREEN],
+                        mColour[BLUE]);
         }
 
         /// Computes the intensity of the colour channel with the greatest magnitude.
         ///
         /// @note       Do _not_ use this function if you want to compute some kind of weight;
-        ///             that's what @ref weightMaxAbs() is for.
+        ///             that's what @ref WeightMaxAbs() is for.
         ///
-        T maxAbs() const
+        inline T MaxAbs() const
         {
-            return max3(fabs(colour[RED]), fabs(colour[GREEN]), fabs(colour[BLUE]));
+            return max3(fabs(mColour[RED]),
+                        fabs(mColour[GREEN]),
+                        fabs(mColour[BLUE]));
         }
 
-        bool isZero() const { return (colour[RED] == 0) && (colour[GREEN] == 0) && (colour[BLUE] == 0); }
-
-        void clear()
+        /// Computes the intensity of the colour channel with the smallest value.
+        ///
+        inline T Min() const
         {
-            colour[RED] = 0.0;
-            colour[GREEN] = 0.0;
-            colour[BLUE] = 0.0;
+            return min3(mColour[RED],
+                        mColour[GREEN],
+                        mColour[BLUE]);
         }
 
-        void set(T grey)
+        /// Test if all components of the colour are valid.
+        inline bool IsValid() const
         {
-            colour[RED] = grey;
-            colour[GREEN] = grey;
-            colour[BLUE] = grey;
+            // test whether any component is NaN, exploiting the property that
+            // a NaN always compares non-equal, even to itself
+            return ((mColour[RED]   == mColour[RED])   &&
+                    (mColour[GREEN] == mColour[GREEN]) &&
+                    (mColour[BLUE]  == mColour[BLUE]));
         }
 
-        void set(T nred, T ngreen, T nblue)
+        inline bool IsZero() const
         {
-            colour[RED] = nred;
-            colour[GREEN] = ngreen;
-            colour[BLUE] = nblue;
+            return (mColour[RED]   == 0) &&
+                   (mColour[GREEN] == 0) &&
+                   (mColour[BLUE]  == 0);
         }
 
-        GenericRGBColour clip(T minc, T maxc)
+        inline bool IsNearZero(T epsilon) const
         {
-            return GenericRGBColour(pov_base::clip<T>(colour[RED], minc, maxc),
-                                    pov_base::clip<T>(colour[GREEN], minc, maxc),
-                                    pov_base::clip<T>(colour[BLUE], minc, maxc));
+            return (fabs(mColour[RED])   < epsilon) &&
+                   (fabs(mColour[GREEN]) < epsilon) &&
+                   (fabs(mColour[BLUE])  < epsilon);
         }
 
-        GenericRGBColour operator+(const GenericRGBColour& b) const
+        inline void Clear()
         {
-            return GenericRGBColour(colour[RED] + b[RED], colour[GREEN] + b[GREEN], colour[BLUE] + b[BLUE]);
+            mColour[RED]   = 0.0;
+            mColour[GREEN] = 0.0;
+            mColour[BLUE]  = 0.0;
         }
 
-        GenericRGBColour operator-(const GenericRGBColour& b) const
+        inline void Invalidate()
         {
-            return GenericRGBColour(colour[RED] - b[RED], colour[GREEN] - b[GREEN], colour[BLUE] - b[BLUE]);
+            mColour[RED]   = std::numeric_limits<T>::quiet_NaN();
+            mColour[GREEN] = std::numeric_limits<T>::quiet_NaN();
+            mColour[BLUE]  = std::numeric_limits<T>::quiet_NaN();
         }
 
-        GenericRGBColour operator*(const GenericRGBColour& b) const
+        inline void Set(T grey)
         {
-            return GenericRGBColour(colour[RED] * b[RED], colour[GREEN] * b[GREEN], colour[BLUE] * b[BLUE]);
+            mColour[RED]   = grey;
+            mColour[GREEN] = grey;
+            mColour[BLUE]  = grey;
         }
 
-        GenericRGBColour operator/(const GenericRGBColour& b) const
+        inline void Set(T red, T green, T blue)
         {
-            return GenericRGBColour(colour[RED] / b[RED], colour[GREEN] / b[GREEN], colour[BLUE] / b[BLUE]);
+            mColour[RED]   = red;
+            mColour[GREEN] = green;
+            mColour[BLUE]  = blue;
         }
 
-        GenericRGBColour& operator+=(const GenericRGBColour& b)
+        inline GenericRGBColour Clipped(T minc, T maxc)
         {
-            colour[RED] += b[RED];
-            colour[GREEN] += b[GREEN];
-            colour[BLUE] += b[BLUE];
+            return GenericRGBColour(pov_base::clip<T>(mColour[RED],   minc, maxc),
+                                    pov_base::clip<T>(mColour[GREEN], minc, maxc),
+                                    pov_base::clip<T>(mColour[BLUE],  minc, maxc));
+        }
+
+        inline GenericRGBColour ClippedUpper(T maxc)
+        {
+            return GenericRGBColour(min(mColour[RED],   maxc),
+                                    min(mColour[GREEN], maxc),
+                                    min(mColour[BLUE],  maxc));
+        }
+
+        inline GenericRGBColour ClippedLower(T minc)
+        {
+            return GenericRGBColour(max(mColour[RED],   minc),
+                                    max(mColour[GREEN], minc),
+                                    max(mColour[BLUE],  minc));
+        }
+
+        inline GenericRGBColour operator+(const GenericRGBColour& b) const
+        {
+            return GenericRGBColour(mColour[RED]   + b.mColour[RED],
+                                    mColour[GREEN] + b.mColour[GREEN],
+                                    mColour[BLUE]  + b.mColour[BLUE]);
+        }
+
+        inline GenericRGBColour operator-(const GenericRGBColour& b) const
+        {
+            return GenericRGBColour(mColour[RED]   - b.mColour[RED],
+                                    mColour[GREEN] - b.mColour[GREEN],
+                                    mColour[BLUE]  - b.mColour[BLUE]);
+        }
+
+        inline GenericRGBColour operator*(const GenericRGBColour& b) const
+        {
+            return GenericRGBColour(mColour[RED]   * b.mColour[RED],
+                                    mColour[GREEN] * b.mColour[GREEN],
+                                    mColour[BLUE]  * b.mColour[BLUE]);
+        }
+
+        inline GenericRGBColour operator/(const GenericRGBColour& b) const
+        {
+            return GenericRGBColour(mColour[RED]   / b.mColour[RED],
+                                    mColour[GREEN] / b.mColour[GREEN],
+                                    mColour[BLUE]  / b.mColour[BLUE]);
+        }
+
+        inline GenericRGBColour& operator+=(const GenericRGBColour& b)
+        {
+            mColour[RED]   += b.mColour[RED];
+            mColour[GREEN] += b.mColour[GREEN];
+            mColour[BLUE]  += b.mColour[BLUE];
             return *this;
         }
 
-        GenericRGBColour& operator-=(const GenericRGBColour& b)
+        inline GenericRGBColour& operator-=(const GenericRGBColour& b)
         {
-            colour[RED] -= b[RED];
-            colour[GREEN] -= b[GREEN];
-            colour[BLUE] -= b[BLUE];
+            mColour[RED]   -= b.mColour[RED];
+            mColour[GREEN] -= b.mColour[GREEN];
+            mColour[BLUE]  -= b.mColour[BLUE];
             return *this;
         }
 
-        GenericRGBColour& operator*=(const GenericRGBColour& b)
+        inline GenericRGBColour& operator*=(const GenericRGBColour& b)
         {
-            colour[RED] *= b[RED];
-            colour[GREEN] *= b[GREEN];
-            colour[BLUE] *= b[BLUE];
+            mColour[RED]   *= b.mColour[RED];
+            mColour[GREEN] *= b.mColour[GREEN];
+            mColour[BLUE]  *= b.mColour[BLUE];
             return *this;
         }
 
-        GenericRGBColour& operator/=(const GenericRGBColour& b)
+        inline GenericRGBColour& operator/=(const GenericRGBColour& b)
         {
-            colour[RED] /= b[RED];
-            colour[GREEN] /= b[GREEN];
-            colour[BLUE] /= b[BLUE];
+            mColour[RED]   /= b.mColour[RED];
+            mColour[GREEN] /= b.mColour[GREEN];
+            mColour[BLUE]  /= b.mColour[BLUE];
             return *this;
         }
 
-        GenericRGBColour operator-() const
+        inline GenericRGBColour operator-() const
         {
-            return GenericRGBColour(-colour[RED], -colour[GREEN], -colour[BLUE]);
+            return GenericRGBColour(-mColour[RED],
+                                    -mColour[GREEN],
+                                    -mColour[BLUE]);
         }
 
-        GenericRGBColour operator+(DBL b) const
+        inline GenericRGBColour operator+(double b) const
         {
-            return GenericRGBColour(colour[RED] + b, colour[GREEN] + b, colour[BLUE] + b);
+            return GenericRGBColour(mColour[RED]   + b,
+                                    mColour[GREEN] + b,
+                                    mColour[BLUE]  + b);
         }
 
-        GenericRGBColour operator-(DBL b) const
+        inline GenericRGBColour operator-(double b) const
         {
-            return GenericRGBColour(colour[RED] - b, colour[GREEN] - b, colour[BLUE] - b);
+            return GenericRGBColour(mColour[RED]   - b,
+                                    mColour[GREEN] - b,
+                                    mColour[BLUE]  - b);
         }
 
-        GenericRGBColour operator*(DBL b) const
+        inline GenericRGBColour operator*(double b) const
         {
-            return GenericRGBColour(colour[RED] * b, colour[GREEN] * b, colour[BLUE] * b);
+            return GenericRGBColour(mColour[RED]   * b,
+                                    mColour[GREEN] * b,
+                                    mColour[BLUE]  * b);
         }
 
-        GenericRGBColour operator/(DBL b) const
+        inline GenericRGBColour operator/(double b) const
         {
-            return GenericRGBColour(colour[RED] / b, colour[GREEN] / b, colour[BLUE] / b);
+            return GenericRGBColour(mColour[RED]   / b,
+                                    mColour[GREEN] / b,
+                                    mColour[BLUE]  / b);
         }
 
-        GenericRGBColour& operator+=(DBL b)
+        inline GenericRGBColour& operator+=(double b)
         {
-            colour[RED] += b;
-            colour[GREEN] += b;
-            colour[BLUE] += b;
+            mColour[RED]   += b;
+            mColour[GREEN] += b;
+            mColour[BLUE]  += b;
             return *this;
         }
 
-        GenericRGBColour& operator-=(DBL b)
+        inline GenericRGBColour& operator-=(double b)
         {
-            colour[RED] -= b;
-            colour[GREEN] -= b;
-            colour[BLUE] -= b;
+            mColour[RED]   -= b;
+            mColour[GREEN] -= b;
+            mColour[BLUE]  -= b;
             return *this;
         }
 
-        GenericRGBColour& operator*=(DBL b)
+        inline GenericRGBColour& operator*=(double b)
         {
-            colour[RED] *= b;
-            colour[GREEN] *= b;
-            colour[BLUE] *= b;
+            mColour[RED]   *= b;
+            mColour[GREEN] *= b;
+            mColour[BLUE]  *= b;
             return *this;
         }
 
-        GenericRGBColour& operator/=(DBL b)
+        inline GenericRGBColour& operator/=(double b)
         {
-            colour[RED] /= b;
-            colour[GREEN] /= b;
-            colour[BLUE] /= b;
+            mColour[RED]   /= b;
+            mColour[GREEN] /= b;
+            mColour[BLUE]  /= b;
             return *this;
         }
 
     private:
 
-        DATA colour;
+        enum
+        {
+            RED    = 0,
+            GREEN  = 1,
+            BLUE   = 2
+        };
+
+        DATA mColour;
 };
-
-template<typename T>
-inline GenericColour<T>::GenericColour(const GenericRGBColour<T>& col)
-{
-    colour[RED] = col[RED];
-    colour[GREEN] = col[GREEN];
-    colour[BLUE] = col[BLUE];
-    colour[FILTER] = 0.0;
-    colour[TRANSM] = 0.0;
-}
-
-template<typename T>
-inline GenericColour<T>::GenericColour(const GenericRGBColour<T>& col, T nfilter, T ntransm)
-{
-    colour[RED] = col[RED];
-    colour[GREEN] = col[GREEN];
-    colour[BLUE] = col[BLUE];
-    colour[FILTER] = nfilter;
-    colour[TRANSM] = ntransm;
-}
-
-template<typename T>
-inline GenericRGBColour<T> GenericColour<T>::rgbTransm() const
-{
-    return GenericRGBColour<T>( colour[RED]   * colour[FILTER] + colour[TRANSM],
-                                colour[GREEN] * colour[FILTER] + colour[TRANSM],
-                                colour[BLUE]  * colour[FILTER] + colour[TRANSM] );
-}
-
-template<typename T>
-inline void GenericColour<T>::setRGB(GenericRGBColour<T> rgb)
-{
-    colour[RED]   = rgb.red();
-    colour[GREEN] = rgb.green();
-    colour[BLUE]  = rgb.blue();
-}
-
-template<typename T>
-inline void GenericColour<T>::addRGB(GenericRGBColour<T> rgb)
-{
-    colour[RED]   += rgb.red();
-    colour[GREEN] += rgb.green();
-    colour[BLUE]  += rgb.blue();
-}
-
-/// @relates GenericColour
-template<typename T>
-inline GenericColour<T> operator* (double a, const GenericColour<T>& b) { return b * a; }
 
 /// @relates GenericRGBColour
 template<typename T>
 inline GenericRGBColour<T> operator* (double a, const GenericRGBColour<T>& b) { return b * a; }
 
-/// @relates GenericColour
+/// @relates GenericRGBColour
 template<typename T>
-inline GenericColour<T> operator+ (double a, const GenericColour<T>& b) { return b + a; }
+inline GenericRGBColour<T> operator/ (double a, const GenericRGBColour<T>& b)
+{
+    return GenericRGBColour<T>(a / b.red(),
+                               a / b.green(),
+                               a / b.blue());
+}
 
 /// @relates GenericRGBColour
 template<typename T>
 inline GenericRGBColour<T> operator+ (double a, const GenericRGBColour<T>& b) { return b + a; }
 
-/// @relates GenericColour
-template<typename T>
-inline GenericColour<T> operator- (double a, const GenericColour<T>& b) { return GenericColour<T>(a) - b; }
-
 /// @relates GenericRGBColour
 template<typename T>
 inline GenericRGBColour<T> operator- (double a, const GenericRGBColour<T>& b) { return GenericRGBColour<T>(a) - b; }
 
-/// @relates GenericColour
-template<typename T>
-inline double colourDistance (const GenericColour<T>& a, const GenericColour<T>& b) { return fabs(a.red() - b.red()) + fabs(a.green() - b.green()) + fabs(a.blue() - b.blue()); }
-
 /// @relates GenericRGBColour
 template<typename T>
-inline double colourDistance (const GenericRGBColour<T>& a, const GenericRGBColour<T>& b) { return fabs(a.red() - b.red()) + fabs(a.green() - b.green()) + fabs(a.blue() - b.blue()); }
-
-/// @relates GenericColour
-template<typename T>
-inline double colourDistanceRGBT (const GenericColour<T>& a, const GenericColour<T>& b) { return colourDistance(a, b) + fabs(a.transm() - b.transm()); }
+inline T ColourDistance (const GenericRGBColour<T>& a, const GenericRGBColour<T>& b)
+{
+    return fabs(a.red()   - b.red())   +
+           fabs(a.green() - b.green()) +
+           fabs(a.blue()  - b.blue());
+}
 
 /// @relates GenericRGBColour
 template<typename T>
@@ -819,16 +545,895 @@ inline GenericRGBColour<T> Sqr(const GenericRGBColour<T>& a) { return a * a; }
 
 /// @relates GenericRGBColour
 template<typename T>
-inline GenericRGBColour<T> exp(const GenericRGBColour<T>& a) { return GenericRGBColour<T>(::exp(a.red()), ::exp(a.green()), ::exp(a.blue())); }
+inline GenericRGBColour<T> Exp(const GenericRGBColour<T>& a)
+{
+    return GenericRGBColour<T>(exp(a.red()),
+                               exp(a.green()),
+                               exp(a.blue()));
+}
 
 /// @relates GenericRGBColour
 template<typename T>
-inline GenericRGBColour<T> sqrt(const GenericRGBColour<T>& a) { return GenericRGBColour<T>(::sqrt(a.red()), ::sqrt(a.green()), ::sqrt(a.blue())); }
+inline GenericRGBColour<T> Pow(const GenericRGBColour<T>& a, T b)
+{
+    return GenericRGBColour<T>(pow(a.red(),   b),
+                               pow(a.green(), b),
+                               pow(a.blue(),  b));
+}
 
-typedef GenericColour<COLC>    Colour;          ///< Single-Precision RGBFT Colour.
-typedef GenericColour<DBL>     DblColour;       ///< Double-Precision RGBFT Colour.
-typedef GenericRGBColour<COLC> RGBColour;       ///< Single-Precision RGB Colour.
-typedef GenericRGBColour<DBL>  DblRGBColour;    ///< Double-Precision RGB Colour.
+/// @relates GenericRGBColour
+template<typename T>
+inline GenericRGBColour<T> Sqrt(const GenericRGBColour<T>& a)
+{
+    return GenericRGBColour<T>(sqrt(a.red()),
+                               sqrt(a.green()),
+                               sqrt(a.blue()));
+}
+
+/// @relates GenericRGBColour
+template<typename T>
+inline GenericRGBColour<T> Cos(const GenericRGBColour<T>& a)
+{
+    return GenericRGBColour<T>(cos(a.red()),
+                               cos(a.green()),
+                               cos(a.blue()));
+}
+
+typedef GenericRGBColour<ColourChannel>         RGBColour;          ///< Standard precision RGB colour.
+typedef GenericRGBColour<PreciseColourChannel>  PreciseRGBColour;   ///< High precision RGB colour.
+
+/*
+typedef GenericRGBColour<ColourChannel>         Colour;             ///< Standard precision colour.
+typedef GenericRGBColour<PreciseColourChannel>  PreciseColour;      ///< High precision colour.
+*/
+
+
+/// Generic template class to hold and manipulate an RGB colour plus a Filter and Transmit component.
+///
+/// @deprecated This colour type provides the legacy RGBFT transparent colour model exposed in the scene description
+///             language, and should not be used anywhere else. Instead, use @ref GenericTransColour in the render
+///             engine, and @ref GenericRGBTColour in the front-end.
+///
+/// @tparam T   Floating-point type to use for the individual colour components.
+///
+template<typename T>
+class GenericRGBFTColour
+{
+    public:
+
+        template<typename T2>
+        friend class GenericRGBFTColour;
+
+        typedef DBL EXPRESS[5];
+
+        /// Default constructor. 
+        inline GenericRGBFTColour() :
+            mColour(0.0),
+            mFilter(0.0),
+            mTransm(0.0)
+        {}
+
+        /// Copy constructor.
+        inline GenericRGBFTColour(const GenericRGBFTColour& col) :
+            mColour(col.mColour),
+            mFilter(col.mFilter),
+            mTransm(col.mTransm)
+        {}
+
+        template<typename T2>
+        inline explicit GenericRGBFTColour(const GenericRGBFTColour<T2>& col) :
+            mColour(col.mColour),
+            mFilter(col.mFilter),
+            mTransm(col.mTransm)
+        {}
+
+        inline explicit GenericRGBFTColour(const GenericRGBColour<T>& col) :
+            mColour(col),
+            mFilter(0.0),
+            mTransm(0.0)
+        {}
+
+        inline explicit GenericRGBFTColour(const GenericRGBColour<T>& col, T filter, T transm) :
+            mColour(col),
+            mFilter(filter),
+            mTransm(transm)
+        {}
+
+        inline explicit GenericRGBFTColour(const GenericRGBTColour<T>& col) :
+            mColour(col.rgb()),
+            mFilter(0.0),
+            mTransm(col.transm())
+        {}
+
+        inline explicit GenericRGBFTColour(T red, T green, T blue, T filter, T transm) :
+            mColour(red, green, blue),
+            mFilter(filter),
+            mTransm(transm)
+        {}
+
+        inline explicit GenericRGBFTColour(const EXPRESS expr) :
+            mColour(expr[0], expr[1], expr[2]),
+            mFilter(expr[3]),
+            mTransm(expr[4])
+        {}
+
+        inline explicit GenericRGBFTColour(const GenericTransColour<T>& col) :
+            mColour(col.colour()),
+            mFilter(col.filter()),
+            mTransm(col.transm())
+        {}
+
+        inline GenericRGBFTColour& operator=(const GenericRGBFTColour& col)
+        {
+            mColour = col.mColour;
+            mFilter = col.mFilter;
+            mTransm = col.mTransm;
+            return *this;
+        }
+
+        inline GenericRGBColour<T>  rgb() const { return mColour; }
+        inline GenericRGBColour<T>& rgb()       { return mColour; }
+
+        inline T  red()    const { return mColour.red(); }
+        inline T& red()          { return mColour.red(); }
+
+        inline T  green()  const { return mColour.green(); }
+        inline T& green()        { return mColour.green(); }
+
+        inline T  blue()   const { return mColour.blue(); }
+        inline T& blue()         { return mColour.blue(); }
+
+        inline T  filter() const { return mFilter; }
+        inline T& filter()       { return mFilter; }
+
+        inline T  transm() const { return mTransm; }
+        inline T& transm()       { return mTransm; }
+
+        inline T opacity() const { return 1.0 - mFilter - mTransm; }
+
+        inline T Greyscale() const
+        {
+            return mColour.Greyscale();
+        }
+
+        /// Test if all components of the colour are valid.
+        inline bool IsValid() const
+        {
+            // test whether any component is NaN, exploiting the property that
+            // a NaN always compares non-equal, even to itself
+            return ((mColour.IsValid())  &&
+                    (mFilter == mFilter) &&
+                    (mTransm == mTransm));
+        }
+
+        // TODO: find a more correct way of handling alpha <-> filter/transmit
+        inline static void AtoFT(T alpha, T& f, T& t) { f = 0.0f; t = 1.0f - alpha; }
+        inline void AtoFT(T alpha) { mFilter = 0.0f; mTransm = 1.0f - alpha; }
+        inline static T FTtoA(T /*f*/, T t) { return 1.0f - t; }
+        inline T FTtoA() const { return 1.0f - mTransm; }
+
+        inline void Clear()
+        {
+            mColour.Clear();
+            mFilter = 0.0;
+            mTransm = 0.0;
+        }
+
+        inline void Invalidate()
+        {
+            mColour.Invalidate();
+            mFilter = std::numeric_limits<T>::quiet_NaN();
+            mTransm = std::numeric_limits<T>::quiet_NaN();
+        }
+
+        inline void Get(EXPRESS expr, unsigned int n) const
+        {
+            if (n > 0) expr[0] = mColour.red();
+            if (n > 1) expr[1] = mColour.green();
+            if (n > 2) expr[2] = mColour.blue();
+            if (n > 3) expr[3] = mFilter;
+            if (n > 4) expr[4] = mTransm;
+        }
+
+        inline void Set(const EXPRESS expr, unsigned int n)
+        {
+            if (n > 0) mColour.red()   = expr[0];
+            if (n > 1) mColour.green() = expr[1];
+            if (n > 2) mColour.blue()  = expr[2];
+            if (n > 3) mFilter         = expr[3];
+            if (n > 4) mTransm         = expr[4];
+        }
+
+        inline GenericRGBFTColour Clipped(T minc, T maxc)
+        {
+            return GenericRGBFTColour(mColour.Clipped(minc, maxc),
+                                      pov_base::clip<T>(mFilter, minc, maxc),
+                                      pov_base::clip<T>(mTransm, minc, maxc));
+        }
+
+        inline GenericRGBColour<T> TransmittedColour() const
+        {
+            return mColour * mFilter + mTransm;
+        }
+
+        inline GenericRGBFTColour operator+(const GenericRGBFTColour& b) const
+        {
+            return GenericRGBFTColour(mColour + b.mColour,
+                                      mFilter + b.mFilter,
+                                      mTransm + b.mTransm);
+        }
+
+        inline GenericRGBFTColour operator-(const GenericRGBFTColour& b) const
+        {
+            return GenericRGBFTColour(mColour - b.mColour,
+                                      mFilter - b.mFilter,
+                                      mTransm - b.mTransm);
+        }
+
+        inline GenericRGBFTColour operator*(const GenericRGBFTColour& b) const
+        {
+            return GenericRGBFTColour(mColour * b.mColour,
+                                      mFilter * b.mFilter,
+                                      mTransm * b.mTransm);
+        }
+
+        inline GenericRGBFTColour operator/(const GenericRGBFTColour& b) const
+        {
+            return GenericRGBFTColour(mColour / b.mColour,
+                                      mFilter / b.mFilter,
+                                      mTransm / b.mTransm);
+        }
+
+        inline GenericRGBFTColour& operator+=(const GenericRGBFTColour& b)
+        {
+            mColour += b.mColour;
+            mFilter += b.mFilter;
+            mTransm += b.mTransm;
+            return *this;
+        }
+
+        inline GenericRGBFTColour& operator-=(const GenericRGBFTColour& b)
+        {
+            mColour -= b.mColour;
+            mFilter -= b.mFilter;
+            mTransm -= b.mTransm;
+            return *this;
+        }
+
+        inline GenericRGBFTColour& operator*=(const GenericRGBFTColour& b)
+        {
+            mColour *= b.mColour;
+            mFilter *= b.mFilter;
+            mTransm *= b.mTransm;
+            return *this;
+        }
+
+        inline GenericRGBFTColour& operator/=(const GenericRGBFTColour& b)
+        {
+            mColour /= b.mColour;
+            mFilter /= b.mFilter;
+            mTransm /= b.mTransm;
+            return *this;
+        }
+
+        inline GenericRGBFTColour operator-() const
+        {
+            return GenericRGBFTColour(-mColour,
+                                      -mFilter,
+                                      -mTransm);
+        }
+
+        inline GenericRGBFTColour operator+(double b) const
+        {
+            return GenericRGBFTColour(mColour + b,
+                                      mFilter + b,
+                                      mTransm + b);
+        }
+
+        inline GenericRGBFTColour operator-(double b) const
+        {
+            return GenericRGBFTColour(mColour - b,
+                                      mFilter - b,
+                                      mTransm - b);
+        }
+
+        inline GenericRGBFTColour operator*(double b) const
+        {
+            return GenericRGBFTColour(mColour * b,
+                                      mFilter * b,
+                                      mTransm * b);
+        }
+
+        inline GenericRGBFTColour operator/(double b) const
+        {
+            return GenericRGBFTColour(mColour / b,
+                                      mFilter / b,
+                                      mTransm / b);
+        }
+
+        inline GenericRGBFTColour& operator+=(double b)
+        {
+            mColour += b;
+            mFilter += b;
+            mTransm += b;
+            return *this;
+        }
+
+        inline GenericRGBFTColour& operator-=(double b)
+        {
+            mColour -= b;
+            mFilter -= b;
+            mTransm -= b;
+            return *this;
+        }
+
+        inline GenericRGBFTColour& operator*=(double b)
+        {
+            mColour *= b;
+            mFilter *= b;
+            mTransm *= b;
+            return *this;
+        }
+
+        inline GenericRGBFTColour& operator/=(double b)
+        {
+            mColour /= b;
+            mFilter /= b;
+            mTransm /= b;
+            return *this;
+        }
+
+    private:
+
+        GenericRGBColour<T> mColour;
+        T                   mFilter;
+        T                   mTransm;
+};
+
+/// @relates GenericRGBFTColour
+template<typename T>
+inline GenericRGBFTColour<T> operator* (double a, const GenericRGBFTColour<T>& b) { return b * a; }
+
+/// @relates GenericRGBFTColour
+template<typename T>
+inline GenericRGBFTColour<T> operator+ (double a, const GenericRGBFTColour<T>& b) { return b + a; }
+
+/// @relates GenericRGBFTColour
+template<typename T>
+inline GenericRGBFTColour<T> operator- (double a, const GenericRGBFTColour<T>& b) { return GenericRGBFTColour<T>(a) - b; }
+
+/// @relates GenericRGBFTColour
+template<typename T>
+inline T ColourDistanceRGBT (const GenericRGBFTColour<T>& a, const GenericRGBFTColour<T>& b)
+{
+    return ColourDistance(a.rgb(), b.rgb()) + fabs(a.transm() - b.transm());
+}
+
+typedef GenericRGBFTColour<ColourChannel>           RGBFTColour;        ///< Standard precision RGBFT colour.
+typedef GenericRGBFTColour<PreciseColourChannel>    PreciseRGBFTColour; ///< High precision RGBFT colour.
+
+
+/// Generic template class to hold and manipulate an RGB colour plus an unused component and a Transmit component.
+///
+/// @note       This colour type is provided solely for use in the front-end. Use @ref GenericTransColour in the render
+///             engine instead.
+///
+/// @tparam T   Floating-point type to use for the individual colour components.
+///
+template<typename T>
+class GenericRGBTColour
+{
+    public:
+
+        template<typename T2>
+        friend class GenericRGBTColour;
+
+        /// Default constructor. 
+        inline GenericRGBTColour() :
+            mColour(0.0),
+            mTransm(0.0)
+        {}
+
+        /// Copy constructor.
+        inline GenericRGBTColour(const GenericRGBTColour& col) :
+            mColour(col.mColour),
+            mTransm(col.mTransm)
+        {}
+
+        template<typename T2>
+        inline explicit GenericRGBTColour(const GenericRGBTColour<T2>& col) :
+            mColour(col.mColour),
+            mTransm(col.mTransm)
+        {}
+
+            inline explicit GenericRGBTColour(const GenericRGBColour<T>& col, T transm) :
+            mColour(col),
+            mTransm(transm)
+        {}
+
+        inline explicit GenericRGBTColour(T red, T green, T blue, T transm) :
+            mColour(red, green, blue),
+            mTransm(transm)
+        {}
+
+        inline explicit GenericRGBTColour(const GenericTransColour<T>& col) :
+            mColour(col.colour()),
+            mTransm(col.transm())
+        {}
+
+        inline GenericRGBTColour& operator=(const GenericRGBTColour& col)
+        {
+            mColour = col.mColour;
+            mTransm = col.mTransm;
+            return *this;
+        }
+
+        inline GenericRGBColour<T>  rgb() const { return mColour; }
+        inline GenericRGBColour<T>& rgb()       { return mColour; }
+
+        inline T  red()    const { return mColour.red(); }
+        inline T& red()          { return mColour.red(); }
+
+        inline T  green()  const { return mColour.green(); }
+        inline T& green()        { return mColour.green(); }
+
+        inline T  blue()   const { return mColour.blue(); }
+        inline T& blue()         { return mColour.blue(); }
+
+        inline T  transm() const { return mTransm; }
+        inline T& transm()       { return mTransm; }
+
+        inline T  alpha()  const { return 1.0 - mTransm; }
+
+        inline T Greyscale() const
+        {
+            return mColour.Greyscale();
+        }
+
+        /// Test if all components of the colour are valid.
+        inline bool IsValid() const
+        {
+            // test whether any component is NaN, exploiting the property that
+            // a NaN always compares non-equal, even to itself
+            return ((mColour.IsValid()) &&
+                    (mTransm == mTransm));
+        }
+
+        inline bool IsNearZero(T epsilon) const
+        {
+            return mColour.IsNearZero(epsilon) &&
+                   (fabs(mTransm) < epsilon);
+        }
+
+        inline void Clear()
+        {
+            mColour.Clear();
+            mTransm = 0.0;
+        }
+
+        inline void Invalidate()
+        {
+            mColour.Invalidate();
+            mTransm = std::numeric_limits<T>::quiet_NaN();
+        }
+
+        inline GenericRGBTColour Clipped(T minc, T maxc)
+        {
+            return GenericRGBTColour(mColour.Clipped(minc, maxc),
+                                     pov_base::clip<T>(mTransm, minc, maxc));
+        }
+
+        inline GenericRGBColour<T> TransmittedColour() const
+        {
+            return mColour * mFilter + mTransm;
+        }
+
+        inline GenericRGBTColour operator+(const GenericRGBTColour& b) const
+        {
+            return GenericRGBTColour(mColour + b.mColour,
+                                     mTransm + b.mTransm);
+        }
+
+        inline GenericRGBTColour operator-(const GenericRGBTColour& b) const
+        {
+            return GenericRGBTColour(mColour - b.mColour,
+                                     mTransm - b.mTransm);
+        }
+
+        inline GenericRGBTColour operator*(const GenericRGBTColour& b) const
+        {
+            return GenericRGBTColour(mColour * b.mColour,
+                                     mTransm * b.mTransm);
+        }
+
+        inline GenericRGBTColour operator/(const GenericRGBTColour& b) const
+        {
+            return GenericRGBTColour(mColour / b.mColour,
+                                     mTransm / b.mTransm);
+        }
+
+        inline GenericRGBTColour& operator+=(const GenericRGBTColour& b)
+        {
+            mColour += b.mColour;
+            mTransm += b.mTransm;
+            return *this;
+        }
+
+        inline GenericRGBTColour& operator-=(const GenericRGBTColour& b)
+        {
+            mColour -= b.mColour;
+            mTransm -= b.mTransm;
+            return *this;
+        }
+
+        inline GenericRGBTColour& operator*=(const GenericRGBTColour& b)
+        {
+            mColour *= b.mColour;
+            mTransm *= b.mTransm;
+            return *this;
+        }
+
+        inline GenericRGBTColour& operator/=(const GenericRGBTColour& b)
+        {
+            mColour /= b.mColour;
+            mTransm /= b.mTransm;
+            return *this;
+        }
+
+        inline GenericRGBTColour operator-() const
+        {
+            return GenericRGBTColour(-mColour,
+                                     -mTransm);
+        }
+
+        inline GenericRGBTColour operator+(double b) const
+        {
+            return GenericRGBTColour(mColour + b,
+                                     mTransm + b);
+        }
+
+        inline GenericRGBTColour operator-(double b) const
+        {
+            return GenericRGBTColour(mColour - b,
+                                     mTransm - b);
+        }
+
+        inline GenericRGBTColour operator*(double b) const
+        {
+            return GenericRGBTColour(mColour * b,
+                                     mTransm * b);
+        }
+
+        inline GenericRGBTColour operator/(double b) const
+        {
+            return GenericRGBTColour(mColour / b,
+                                     mTransm / b);
+        }
+
+        inline GenericRGBTColour& operator+=(double b)
+        {
+            mColour += b;
+            mTransm += b;
+            return *this;
+        }
+
+        inline GenericRGBTColour& operator-=(double b)
+        {
+            mColour -= b;
+            mTransm -= b;
+            return *this;
+        }
+
+        inline GenericRGBTColour& operator*=(double b)
+        {
+            mColour *= b;
+            mTransm *= b;
+            return *this;
+        }
+
+        inline GenericRGBTColour& operator/=(double b)
+        {
+            mColour /= b;
+            mTransm /= b;
+            return *this;
+        }
+
+    private:
+
+        GenericRGBColour<T> mColour;
+        T                   mTransm;
+};
+
+/// @relates GenericRGBTColour
+template<typename T>
+inline GenericRGBTColour<T> operator* (double a, const GenericRGBTColour<T>& b) { return b * a; }
+
+/// @relates GenericRGBTColour
+template<typename T>
+inline GenericRGBTColour<T> operator+ (double a, const GenericRGBTColour<T>& b) { return b + a; }
+
+/// @relates GenericRGBTColour
+template<typename T>
+inline GenericRGBTColour<T> operator- (double a, const GenericRGBTColour<T>& b) { return GenericRGBTColour<T>(a) - b; }
+
+/// @relates GenericRGBTColour
+template<typename T>
+inline T ColourDistanceRGBT (const GenericRGBTColour<T>& a, const GenericRGBTColour<T>& b)
+{
+    return ColourDistance(a.rgb(), b.rgb()) + fabs(a.transm() - b.transm());
+}
+
+/// @relates GenericRGBTColour
+template<typename T>
+inline GenericRGBTColour<T> Sqr(const GenericRGBTColour<T>& a) { return a * a; }
+
+typedef GenericRGBTColour<ColourChannel>        RGBTColour;         ///< Standard precision RGBxT colour.
+typedef GenericRGBTColour<PreciseColourChannel> PreciseRGBTColour;  ///< High precision RGBxT colour.
+
+
+/// Generic template class to hold and manipulate an RGB colour plus transparency information.
+///
+/// @note   The current implementation uses RGBFT format; future implementations may vary.
+///
+/// @tparam T   Floating-point type to use for the individual colour components.
+///
+template<typename T>
+class GenericTransColour
+{
+    public:
+
+        template<typename T2>
+        friend class GenericTransColour;
+
+        typedef DBL EXPRESS[5];
+
+        /// Default constructor. 
+        inline GenericTransColour() :
+            mColour(0.0),
+            mFilter(0.0),
+            mTransm(0.0)
+        {}
+
+        /// Copy constructor.
+        inline GenericTransColour(const GenericTransColour& col) :
+            mColour(col.mColour),
+            mFilter(col.mFilter),
+            mTransm(col.mTransm)
+        {}
+
+        template<typename T2>
+        inline explicit GenericTransColour(const GenericTransColour<T2>& col) :
+            mColour(col.mColour),
+            mFilter(col.mFilter),
+            mTransm(col.mTransm)
+        {}
+
+        inline explicit GenericTransColour(const GenericRGBColour<T>& col) :
+            mColour(col),
+            mFilter(0.0),
+            mTransm(0.0)
+        {}
+
+        inline explicit GenericTransColour(const GenericRGBFTColour<T>& col) :
+            mColour(col.rgb()),
+            mFilter(col.filter()),
+            mTransm(col.transm())
+        {}
+
+        inline GenericTransColour& operator=(const GenericTransColour& col)
+        {
+            mColour = col.mColour;
+            mFilter = col.mFilter;
+            mTransm = col.mTransm;
+            return *this;
+        }
+
+        inline GenericRGBColour<T>  colour() const { return mColour; }
+        inline GenericRGBColour<T>& colour()       { return mColour; }
+
+        inline T  filter() const { return mFilter; }
+        inline T& filter()       { return mFilter; }
+
+        inline T  transm() const { return mTransm; }
+        inline T& transm()       { return mTransm; }
+
+        inline T Opacity() const { return 1.0 - mFilter - mTransm; }
+
+        inline T Greyscale() const
+        {
+            return mColour.Greyscale();
+        }
+
+        /// Test if all components of the colour are valid.
+        inline bool IsValid() const
+        {
+            // test whether any component is NaN, exploiting the property that
+            // a NaN always compares non-equal, even to itself
+            return ((mColour.IsValid())  &&
+                    (mFilter == mFilter) &&
+                    (mTransm == mTransm));
+        }
+
+        inline void Clear()
+        {
+            mColour.Clear();
+            mFilter = 0.0;
+            mTransm = 0.0;
+        }
+
+        inline void Invalidate()
+        {
+            mColour.Invalidate();
+            mFilter = std::numeric_limits<T>::quiet_NaN();
+            mTransm = std::numeric_limits<T>::quiet_NaN();
+        }
+
+        inline GenericTransColour Clipped(T minc, T maxc)
+        {
+            return GenericTransColour(mColour.Clipped(minc, maxc),
+                                      pov_base::clip<T>(mFilter, minc, maxc),
+                                      pov_base::clip<T>(mTransm, minc, maxc));
+        }
+
+        inline GenericRGBColour<T> TransmittedColour() const
+        {
+            return mColour * mFilter + mTransm;
+        }
+
+        inline GenericTransColour operator+(const GenericTransColour& b) const
+        {
+            return GenericTransColour(mColour + b.mColour,
+                                      mFilter + b.mFilter,
+                                      mTransm + b.mTransm);
+        }
+
+        inline GenericTransColour operator-(const GenericTransColour& b) const
+        {
+            return GenericTransColour(mColour - b.mColour,
+                                      mFilter - b.mFilter,
+                                      mTransm - b.mTransm);
+        }
+
+        inline GenericTransColour operator*(const GenericTransColour& b) const
+        {
+            return GenericTransColour(mColour * b.mColour,
+                                      mFilter * b.mFilter,
+                                      mTransm * b.mTransm);
+        }
+
+        inline GenericTransColour operator/(const GenericTransColour& b) const
+        {
+            return GenericTransColour(mColour / b.mColour,
+                                      mFilter / b.mFilter,
+                                      mTransm / b.mTransm);
+        }
+
+        inline GenericTransColour& operator+=(const GenericTransColour& b)
+        {
+            mColour += b.mColour;
+            mFilter += b.mFilter;
+            mTransm += b.mTransm;
+            return *this;
+        }
+
+        inline GenericTransColour& operator-=(const GenericTransColour& b)
+        {
+            mColour -= b.mColour;
+            mFilter -= b.mFilter;
+            mTransm -= b.mTransm;
+            return *this;
+        }
+
+        inline GenericTransColour& operator*=(const GenericTransColour& b)
+        {
+            mColour *= b.mColour;
+            mFilter *= b.mFilter;
+            mTransm *= b.mTransm;
+            return *this;
+        }
+
+        inline GenericTransColour& operator/=(const GenericTransColour& b)
+        {
+            mColour /= b.mColour;
+            mFilter /= b.mFilter;
+            mTransm /= b.mTransm;
+            return *this;
+        }
+
+        inline GenericTransColour operator-() const
+        {
+            return GenericTransColour(-mColour,
+                                      -mFilter,
+                                      -mTransm);
+        }
+
+        inline GenericTransColour operator+(double b) const
+        {
+            return GenericTransColour(mColour + b,
+                                      mFilter + b,
+                                      mTransm + b);
+        }
+
+        inline GenericTransColour operator-(double b) const
+        {
+            return GenericTransColour(mColour - b,
+                                      mFilter - b,
+                                      mTransm - b);
+        }
+
+        inline GenericTransColour operator*(double b) const
+        {
+            return GenericTransColour(mColour * b,
+                                      mFilter * b,
+                                      mTransm * b);
+        }
+
+        inline GenericTransColour operator/(double b) const
+        {
+            return GenericTransColour(mColour / b,
+                                      mFilter / b,
+                                      mTransm / b);
+        }
+
+        inline GenericTransColour& operator+=(double b)
+        {
+            mColour += b;
+            mFilter += b;
+            mTransm += b;
+            return *this;
+        }
+
+        inline GenericTransColour& operator-=(double b)
+        {
+            mColour -= b;
+            mFilter -= b;
+            mTransm -= b;
+            return *this;
+        }
+
+        inline GenericTransColour& operator*=(double b)
+        {
+            mColour *= b;
+            mFilter *= b;
+            mTransm *= b;
+            return *this;
+        }
+
+        inline GenericTransColour& operator/=(double b)
+        {
+            mColour /= b;
+            mFilter /= b;
+            mTransm /= b;
+            return *this;
+        }
+
+    private:
+
+        GenericRGBColour<T> mColour;
+        T                   mFilter;
+        T                   mTransm;
+
+        inline explicit GenericTransColour(const GenericRGBColour<T>& col, T filter, T transm) :
+            mColour(col),
+            mFilter(filter),
+            mTransm(transm)
+        {}
+};
+
+/// @relates GenericTransColour
+template<typename T>
+inline GenericTransColour<T> operator* (double a, const GenericTransColour<T>& b) { return b * a; }
+
+/// @relates GenericTransColour
+template<typename T>
+inline GenericTransColour<T> operator+ (double a, const GenericTransColour<T>& b) { return b + a; }
+
+/// @relates GenericTransColour
+template<typename T>
+inline GenericTransColour<T> operator- (double a, const GenericTransColour<T>& b) { return GenericTransColour<T>(a) - b; }
+
+typedef GenericTransColour<ColourChannel>           TransColour;        ///< Standard precision RGBFT colour.
+typedef GenericTransColour<PreciseColourChannel>    PreciseTransColour; ///< High precision RGBFT colour.
 
 
 /// Generic template class to store a RGB colour in four bytes (RGBE).
@@ -841,11 +1446,15 @@ typedef GenericRGBColour<DBL>  DblRGBColour;    ///< Double-Precision RGB Colour
 ///
 /// @tparam BIAS    Bias to use for the exponent.
 ///                 A value of 128 matches Greg Ward's original proposal.
+/// @tparam T       Type to use for the colour components.
+///                 Defaults to unsigned char.
 ///
-template<int BIAS>
+template<int BIAS, typename T>
 class GenericRGBEColour
 {
     public:
+
+        template<typename T2> friend class GenericRGBColour;
 
         enum
         {
@@ -855,112 +1464,109 @@ class GenericRGBEColour
             EXP    = 3
         };
 
-        template<typename COLC_T2> friend class GenericRGBColour;
+        typedef T DATA[4];
 
-        typedef unsigned char COLC_T;
-        typedef COLC_T DATA[4];
-
-        GenericRGBEColour()
+        inline GenericRGBEColour()
         {
-            data[RED]   = 0;
-            data[GREEN] = 0;
-            data[BLUE]  = 0;
-            data[EXP]   = 0;
+            mData[RED]   = 0;
+            mData[GREEN] = 0;
+            mData[BLUE]  = 0;
+            mData[EXP]   = 0;
         }
 
-        GenericRGBEColour(const GenericRGBEColour& col)
+        inline GenericRGBEColour(const GenericRGBEColour& col)
         {
-            data[RED]   = col.data[RED];
-            data[GREEN] = col.data[GREEN];
-            data[BLUE]  = col.data[BLUE];
-            data[EXP]   = col.data[EXP];
+            mData[RED]   = col.mData[RED];
+            mData[GREEN] = col.mData[GREEN];
+            mData[BLUE]  = col.mData[BLUE];
+            mData[EXP]   = col.mData[EXP];
         }
 
-        explicit GenericRGBEColour(COLC red, COLC green, COLC blue)
+        inline explicit GenericRGBEColour(ColourChannel red, ColourChannel green, ColourChannel blue)
         {
             RGBColour col (red, green, blue);
             double scaleFactor;
-            if (ComputeExponent(col, data[EXP], scaleFactor))
+            if (ComputeExponent(col, mData[EXP], scaleFactor))
             {
-                data[RED]   = clipToType<COLC_T>(floor(col.red()   * scaleFactor));
-                data[GREEN] = clipToType<COLC_T>(floor(col.green() * scaleFactor));
-                data[BLUE]  = clipToType<COLC_T>(floor(col.blue()  * scaleFactor));
+                mData[RED]   = clipToType<T>(floor(col.red()   * scaleFactor));
+                mData[GREEN] = clipToType<T>(floor(col.green() * scaleFactor));
+                mData[BLUE]  = clipToType<T>(floor(col.blue()  * scaleFactor));
             }
             else
             {
-                data[RED] = data[GREEN] = data[BLUE] = data[EXP] = 0;
+                mData[RED] = mData[GREEN] = mData[BLUE] = mData[EXP] = 0;
             }
         }
 
-        explicit GenericRGBEColour(const RGBColour& col)
+        inline explicit GenericRGBEColour(const RGBColour& col)
         {
             double scaleFactor;
-            if (ComputeExponent(col, data[EXP], scaleFactor))
+            if (ComputeExponent(col, mData[EXP], scaleFactor))
             {
-                data[RED]   = clipToType<COLC_T>(floor(col.red()   * scaleFactor));
-                data[GREEN] = clipToType<COLC_T>(floor(col.green() * scaleFactor));
-                data[BLUE]  = clipToType<COLC_T>(floor(col.blue()  * scaleFactor));
+                mData[RED]   = clipToType<T>(floor(col.red()   * scaleFactor));
+                mData[GREEN] = clipToType<T>(floor(col.green() * scaleFactor));
+                mData[BLUE]  = clipToType<T>(floor(col.blue()  * scaleFactor));
             }
             else
             {
-                data[RED] = data[GREEN] = data[BLUE] = data[EXP] = 0;
+                mData[RED] = mData[GREEN] = mData[BLUE] = mData[EXP] = 0;
             }
         }
 
-        explicit GenericRGBEColour(const RGBColour& col, const RGBColour& dither)
+        inline explicit GenericRGBEColour(const RGBColour& col, const RGBColour& dither)
         {
             double scaleFactor;
-            if (ComputeExponent(col, data[EXP], scaleFactor))
+            if (ComputeExponent(col, mData[EXP], scaleFactor))
             {
-                data[RED]   = clip<COLC_T>(floor(col.red()   * scaleFactor + dither.red()));
-                data[GREEN] = clip<COLC_T>(floor(col.green() * scaleFactor + dither.green()));
-                data[BLUE]  = clip<COLC_T>(floor(col.blue()  * scaleFactor + dither.blue()));
+                mData[RED]   = clip<T>(floor(col.red()   * scaleFactor + dither.red()));
+                mData[GREEN] = clip<T>(floor(col.green() * scaleFactor + dither.green()));
+                mData[BLUE]  = clip<T>(floor(col.blue()  * scaleFactor + dither.blue()));
             }
             else
             {
-                data[RED] = data[GREEN] = data[BLUE] = data[EXP] = 0;
+                mData[RED] = mData[GREEN] = mData[BLUE] = mData[EXP] = 0;
             }
         }
 
-        const DATA& operator*() const
+        inline const DATA& operator*() const
         {
-            return data;
+            return mData;
         }
 
-        DATA& operator*()
+        inline DATA& operator*()
         {
-            return data;
+            return mData;
         }
 
     private:
 
-        DATA data;
+        DATA mData;
 
-        static bool ComputeExponent(const RGBColour& col, COLC_T& biasedExponent, double& scaleFactor)
+        inline static bool ComputeExponent(const RGBColour& col, T& biasedExponent, double& scaleFactor)
         {
-            COLC maxChannel;
-            if (std::numeric_limits<COLC_T>::is_signed)
-                maxChannel = col.maxAbs();
+            ColourChannel maxChannel;
+            if (std::numeric_limits<T>::is_signed)
+                maxChannel = col.MaxAbs();
             else
-                maxChannel = col.max();
+                maxChannel = col.Max();
 
-            if(maxChannel <= 1.0e-32)
+            if (maxChannel <= 1.0e-32) // TODO - magic number
                 return false;
 
             int exponent;
             double maxChannelMantissa = frexp(maxChannel, &exponent);
-            biasedExponent = clipToType<COLC_T>(exponent + BIAS);
+            biasedExponent = clipToType<T>(exponent + BIAS);
 
             if (biasedExponent != exponent + BIAS)
                 maxChannelMantissa = ldexp(maxChannelMantissa, exponent + BIAS - biasedExponent);
 
-            scaleFactor = (std::numeric_limits<COLC_T>::max()) * maxChannelMantissa / maxChannel;
+            scaleFactor = (std::numeric_limits<T>::max() + 1.0) * maxChannelMantissa / maxChannel;
             return true;
         }
 };
 
-typedef GenericRGBEColour<128> RadianceHDRColour;   ///< RGBE format as originally proposed by Greg Ward.
-typedef GenericRGBEColour<250> PhotonColour;        ///< RGBE format as adapted by Nathan Kopp for photon mapping.
+typedef GenericRGBEColour<128>  RadianceHDRColour;  ///< RGBE format as originally proposed by Greg Ward.
+typedef GenericRGBEColour<250>  PhotonColour;       ///< RGBE format as adapted by Nathan Kopp for photon mapping.
 
 }
 

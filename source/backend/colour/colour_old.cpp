@@ -97,9 +97,9 @@ namespace pov
 *
 ******************************************************************************/
 
-Colour *Create_Colour ()
+TransColour *Create_Colour ()
 {
-    return new Colour (0.0, 0.0, 0.0, 0.0, 0.0);
+    return new TransColour();
 }
 
 
@@ -128,10 +128,10 @@ Colour *Create_Colour ()
 *
 ******************************************************************************/
 
-Colour *Copy_Colour (const Colour* Old)
+TransColour *Copy_Colour (const TransColour* Old)
 {
     if (Old != NULL)
-        return new Colour(*Old);
+        return new TransColour(*Old);
     else
         return NULL;
 }

@@ -6637,9 +6637,7 @@ void Parser::Parse_Frame ()
                     {
                         // if we're not outputting an alpha channel, precompose the scene background against a black "background behind the background"
                         // (NB: We're deliberately ignoring filter here, as it would wind up being ignored anyway due to how the rendering code works.)
-                        sceneData->backgroundColour.red()    *= (1.0 - sceneData->backgroundColour.transm());
-                        sceneData->backgroundColour.green()  *= (1.0 - sceneData->backgroundColour.transm());
-                        sceneData->backgroundColour.blue()   *= (1.0 - sceneData->backgroundColour.transm());
+                        sceneData->backgroundColour.colour() *= (1.0 - sceneData->backgroundColour.transm());
                         sceneData->backgroundColour.filter() = 0.0f;
                         sceneData->backgroundColour.transm() = 0.0f;
                     }
@@ -7278,7 +7276,7 @@ ObjectPtr Parser::Parse_Object_Mods (ObjectPtr Object)
     TEXTURE *Local_Texture;
     TEXTURE *Local_Int_Texture;
     MATERIAL Local_Material;
-    Colour Local_Colour;
+    TransColour Local_Colour;
     char *s;
 
     EXPECT
@@ -8392,7 +8390,7 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
 int Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTRY *sym, bool ParFlag, bool SemiFlag, bool is_local, bool allow_redefine, int old_table_index)
 {
     EXPRESS Local_Express;
-    Colour *Local_Colour;
+    TransColour *Local_Colour;
     PIGMENT *Local_Pigment;
     TNORMAL *Local_Tnormal;
     FINISH *Local_Finish;
@@ -8592,7 +8590,7 @@ int Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTR
                         *NumberPtr    = COLOUR_ID_TOKEN;
                         Test_Redefine(Previous,NumberPtr,*DataPtr, allow_redefine);
                         *DataPtr      = reinterpret_cast<void *>(Create_Colour());
-                        *(reinterpret_cast<Colour *>(*DataPtr)) = Colour(Local_Express);
+                        *(reinterpret_cast<TransColour *>(*DataPtr)) = TransColour(RGBFTColour(Local_Express));
                         break;
                 }
             }
@@ -8868,7 +8866,7 @@ void Parser::Destroy_Ident_Data(void *Data, int Type)
     switch(Type)
     {
         case COLOUR_ID_TOKEN:
-            Destroy_Colour(reinterpret_cast<Colour *>(Data));
+            Destroy_Colour(reinterpret_cast<TransColour *>(Data));
             break;
         case VECTOR_ID_TOKEN:
             delete reinterpret_cast<Vector3d *>(Data);
@@ -9521,7 +9519,7 @@ void Parser::Post_Process (ObjectPtr Object, ObjectPtr Parent)
         }
 
         // If object has subsurface light transport enabled, precompute some necessary information
-        /* if(!Object->Texture->Finish->SubsurfaceTranslucency.isZero()) */
+        /* if(!Object->Texture->Finish->SubsurfaceTranslucency.IsZero()) */
         if (sceneData->useSubsurface)
         {
             Object->interior->subsurface = shared_ptr<SubsurfaceInterior>(new SubsurfaceInterior(Object->interior->IOR));
@@ -9936,7 +9934,7 @@ void *Parser::Copy_Identifier (void *Data, int Type)
     switch (Type)
     {
         case COLOUR_ID_TOKEN:
-            New = reinterpret_cast<void *>(Copy_Colour(reinterpret_cast<Colour *>(Data)));
+            New = reinterpret_cast<void *>(Copy_Colour(reinterpret_cast<TransColour *>(Data)));
             break;
         case VECTOR_ID_TOKEN:
             vp = new Vector3d();

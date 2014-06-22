@@ -83,119 +83,119 @@ static int gaCrackleCubeTable[81*3];
 
 
 static const ColourBlendMapEntry gaDefaultBlendMapEntries_BlackWhite[2] =
-    {{0.0, Colour(0.0, 0.0, 0.0, 0.0, 0.0)},
-     {1.0, Colour(1.0, 1.0, 1.0, 0.0, 0.0)}};
+    {{0.0, TransColour(RGBColour(0.0, 0.0, 0.0))},
+     {1.0, TransColour(RGBColour(1.0, 1.0, 1.0))}};
 
 static ColourBlendMapConstPtr gpDefaultBlendMap_Gray (new ColourBlendMap(2, gaDefaultBlendMapEntries_BlackWhite));
 
 
 static const ColourBlendMapEntry gaDefaultBlendMapEntries_Agate[6] =
-    {{0.0, Colour(1.0,  1.0,  1.0,  0.0, 0.0)},
-     {0.5, Colour(0.95, 0.75, 0.5,  0.0, 0.0)},
-     {0.5, Colour(0.9,  0.7,  0.5,  0.0, 0.0)},
-     {0.6, Colour(0.9,  0.7,  0.4,  0.0, 0.0)},
-     {0.6, Colour(1.0,  0.7,  0.4,  0.0, 0.0)},
-     {1.0, Colour(0.6,  0.3,  0.0,  0.0, 0.0)}};
+    {{0.0, TransColour(RGBColour(1.0,  1.0,  1.0))},
+     {0.5, TransColour(RGBColour(0.95, 0.75, 0.5))},
+     {0.5, TransColour(RGBColour(0.9,  0.7,  0.5))},
+     {0.6, TransColour(RGBColour(0.9,  0.7,  0.4))},
+     {0.6, TransColour(RGBColour(1.0,  0.7,  0.4))},
+     {1.0, TransColour(RGBColour(0.6,  0.3,  0.0))}};
 
 static ColourBlendMapConstPtr gpDefaultBlendMap_Agate (new ColourBlendMap(6, gaDefaultBlendMapEntries_Agate));
 
 
 static const ColourBlendMapEntry gaDefaultBlendMapEntries_Bozo[6] =
-    {{0.4, Colour(1.0, 1.0, 1.0, 0.0, 0.0)},
-     {0.4, Colour(0.0, 1.0, 0.0, 0.0, 0.0)},
-     {0.6, Colour(0.0, 1.0, 0.0, 0.0, 0.0)},
-     {0.6, Colour(0.0, 0.0, 1.0, 0.0, 0.0)},
-     {0.8, Colour(0.0, 0.0, 1.0, 0.0, 0.0)},
-     {0.8, Colour(1.0, 0.0, 0.0, 0.0, 0.0)}};
+    {{0.4, TransColour(RGBColour(1.0, 1.0, 1.0))},
+     {0.4, TransColour(RGBColour(0.0, 1.0, 0.0))},
+     {0.6, TransColour(RGBColour(0.0, 1.0, 0.0))},
+     {0.6, TransColour(RGBColour(0.0, 0.0, 1.0))},
+     {0.8, TransColour(RGBColour(0.0, 0.0, 1.0))},
+     {0.8, TransColour(RGBColour(1.0, 0.0, 0.0))}};
 
 static ColourBlendMapConstPtr gpDefaultBlendMap_Bozo (new ColourBlendMap(6, gaDefaultBlendMapEntries_Bozo));
 
 
 static const ColourBlendMapEntry gaDefaultBlendMapEntries_Brick[2] =
-    {{0.0, Colour(0.5, 0.5,  0.5,  0.0, 0.0)},
-     {1.0, Colour(0.6, 0.15, 0.15, 0.0, 0.0)}};
+    {{0.0, TransColour(RGBColour(0.5, 0.5,  0.5))},
+     {1.0, TransColour(RGBColour(0.6, 0.15, 0.15))}};
 
 static ColourBlendMapConstPtr gpDefaultBlendMap_Brick (new ColourBlendMap(2, gaDefaultBlendMapEntries_Brick));
 
 
 static const ColourBlendMapEntry gaDefaultBlendMapEntries_Checker[2] =
-    {{0.0, Colour(0.0, 0.0, 1.0, 0.0, 0.0)},
-     {1.0, Colour(0.0, 1.0, 0.0, 0.0, 0.0)}};
+    {{0.0, TransColour(RGBColour(0.0, 0.0, 1.0))},
+     {1.0, TransColour(RGBColour(0.0, 1.0, 0.0))}};
 
 static ColourBlendMapConstPtr gpDefaultBlendMap_Checker (new ColourBlendMap(2, gaDefaultBlendMapEntries_Checker));
 
 
 static const ColourBlendMapEntry gaDefaultBlendMapEntries_Cubic[6] =
-    {{0.0, Colour(1.0, 0.0, 0.0, 0.0, 0.0)},
-     {1.0, Colour(0.0, 1.0, 0.0, 0.0, 0.0)},
-     {1.0, Colour(0.0, 0.0, 1.0, 0.0, 0.0)},
-     {1.0, Colour(1.0, 1.0, 0.0, 0.0, 0.0)},
-     {1.0, Colour(0.0, 1.0, 1.0, 0.0, 0.0)},
-     {2.0, Colour(1.0, 0.0, 1.0, 0.0, 0.0)}};
+    {{0.0, TransColour(RGBColour(1.0, 0.0, 0.0))},
+     {1.0, TransColour(RGBColour(0.0, 1.0, 0.0))},
+     {1.0, TransColour(RGBColour(0.0, 0.0, 1.0))},
+     {1.0, TransColour(RGBColour(1.0, 1.0, 0.0))},
+     {1.0, TransColour(RGBColour(0.0, 1.0, 1.0))},
+     {2.0, TransColour(RGBColour(1.0, 0.0, 1.0))}};
 
 static ColourBlendMapConstPtr gpDefaultBlendMap_Cubic (new ColourBlendMap(6, gaDefaultBlendMapEntries_Cubic));
 
 
 static const ColourBlendMapEntry gaDefaultBlendMapEntries_Hexagon[3] =
-    {{0.0, Colour(0.0, 0.0, 1.0, 0.0, 0.0)},
-     {1.0, Colour(0.0, 1.0, 0.0, 0.0, 0.0)},
-     {2.0, Colour(1.0, 0.0, 0.0, 0.0, 0.0)}};
+    {{0.0, TransColour(RGBColour(0.0, 0.0, 1.0))},
+     {1.0, TransColour(RGBColour(0.0, 1.0, 0.0))},
+     {2.0, TransColour(RGBColour(1.0, 0.0, 0.0))}};
 
 static ColourBlendMapConstPtr gpDefaultBlendMap_Hexagon (new ColourBlendMap(3, gaDefaultBlendMapEntries_Hexagon));
 
 
 static const ColourBlendMapEntry gaDefaultBlendMapEntries_Mandel[5] =
-    {{0.001, Colour(0.0, 0.0, 0.0, 0.0, 0.0)},
-     {0.001, Colour(0.0, 1.0, 1.0, 0.0, 0.0)},
-     {0.012, Colour(1.0, 1.0, 0.0, 0.0, 0.0)},
-     {0.015, Colour(1.0, 0.0, 1.0, 0.0, 0.0)},
-     {0.1,   Colour(0.0, 1.0, 1.0, 0.0, 0.0)}};
+    {{0.001, TransColour(RGBColour(0.0, 0.0, 0.0))},
+     {0.001, TransColour(RGBColour(0.0, 1.0, 1.0))},
+     {0.012, TransColour(RGBColour(1.0, 1.0, 0.0))},
+     {0.015, TransColour(RGBColour(1.0, 0.0, 1.0))},
+     {0.1,   TransColour(RGBColour(0.0, 1.0, 1.0))}};
 
 static ColourBlendMapConstPtr gpDefaultBlendMap_Mandel (new ColourBlendMap(5, gaDefaultBlendMapEntries_Mandel));
 
 
 static const ColourBlendMapEntry gaDefaultBlendMapEntries_Marble[3] =
-    {{0.0, Colour(0.9, 0.8,  0.8,  0.0, 0.0)},
-     {0.9, Colour(0.9, 0.08, 0.08, 0.0, 0.0)},
-     {0.9, Colour(0.0, 0.0,  0.0,  0.0, 0.0)}};
+    {{0.0, TransColour(RGBColour(0.9, 0.8,  0.8))},
+     {0.9, TransColour(RGBColour(0.9, 0.08, 0.08))},
+     {0.9, TransColour(RGBColour(0.0, 0.0,  0.0))}};
 
 static ColourBlendMapConstPtr gpDefaultBlendMap_Marble (new ColourBlendMap(3, gaDefaultBlendMapEntries_Marble));
 
 
 static const ColourBlendMapEntry gaDefaultBlendMapEntries_Radial[4] =
-    {{0.0,   Colour(0.0, 1.0, 1.0, 0.0, 0.0)},
-     {0.333, Colour(1.0, 1.0, 0.0, 0.0, 0.0)},
-     {0.666, Colour(1.0, 0.0, 1.0, 0.0, 0.0)},
-     {1.0,   Colour(0.0, 1.0, 1.0, 0.0, 0.0)}};
+    {{0.0,   TransColour(RGBColour(0.0, 1.0, 1.0))},
+     {0.333, TransColour(RGBColour(1.0, 1.0, 0.0))},
+     {0.666, TransColour(RGBColour(1.0, 0.0, 1.0))},
+     {1.0,   TransColour(RGBColour(0.0, 1.0, 1.0))}};
 
 static ColourBlendMapConstPtr gpDefaultBlendMap_Radial (new ColourBlendMap(4, gaDefaultBlendMapEntries_Radial));
 
 
 static const ColourBlendMapEntry gaDefaultBlendMapEntries_Square[6] =
-    {{0.0, Colour(1.0, 0.0, 0.0, 0.0, 0.0)},
-     {1.0, Colour(0.0, 1.0, 0.0, 0.0, 0.0)},
-     {1.0, Colour(0.0, 0.0, 1.0, 0.0, 0.0)},
-     {1.0, Colour(1.0, 1.0, 0.0, 0.0, 0.0)},
-     {1.0, Colour(0.0, 1.0, 1.0, 0.0, 0.0)},
-     {2.0, Colour(1.0, 0.0, 1.0, 0.0, 0.0)}};
+    {{0.0, TransColour(RGBColour(1.0, 0.0, 0.0))},
+     {1.0, TransColour(RGBColour(0.0, 1.0, 0.0))},
+     {1.0, TransColour(RGBColour(0.0, 0.0, 1.0))},
+     {1.0, TransColour(RGBColour(1.0, 1.0, 0.0))},
+     {1.0, TransColour(RGBColour(0.0, 1.0, 1.0))},
+     {2.0, TransColour(RGBColour(1.0, 0.0, 1.0))}};
 
 static ColourBlendMapConstPtr gpDefaultBlendMap_Square (new ColourBlendMap(4, gaDefaultBlendMapEntries_Square));
 
 
 static const ColourBlendMapEntry gaDefaultBlendMapEntries_Triangular[6] =
-    {{0.0, Colour(1.0, 0.0, 0.0, 0.0, 0.0)},
-     {1.0, Colour(0.0, 1.0, 0.0, 0.0, 0.0)},
-     {1.0, Colour(0.0, 0.0, 1.0, 0.0, 0.0)},
-     {1.0, Colour(1.0, 1.0, 0.0, 0.0, 0.0)},
-     {1.0, Colour(0.0, 1.0, 1.0, 0.0, 0.0)},
-     {2.0, Colour(1.0, 0.0, 1.0, 0.0, 0.0)}};
+    {{0.0, TransColour(RGBColour(1.0, 0.0, 0.0))},
+     {1.0, TransColour(RGBColour(0.0, 1.0, 0.0))},
+     {1.0, TransColour(RGBColour(0.0, 0.0, 1.0))},
+     {1.0, TransColour(RGBColour(1.0, 1.0, 0.0))},
+     {1.0, TransColour(RGBColour(0.0, 1.0, 1.0))},
+     {2.0, TransColour(RGBColour(1.0, 0.0, 1.0))}};
 
 static ColourBlendMapConstPtr gpDefaultBlendMap_Triangular (new ColourBlendMap(6, gaDefaultBlendMapEntries_Triangular));
 
 
 static const ColourBlendMapEntry gaDefaultBlendMapEntries_Wood[2] =
-    {{0.6, Colour(0.666, 0.312,  0.2,   0.0, 0.0)},
-     {0.6, Colour(0.4,   0.1333, 0.066, 0.0, 0.0)}};
+    {{0.6, TransColour(RGBColour(0.666, 0.312,  0.2))},
+     {0.6, TransColour(RGBColour(0.4,   0.1333, 0.066))}};
 
 static ColourBlendMapConstPtr gpDefaultBlendMap_Wood (new ColourBlendMap(2, gaDefaultBlendMapEntries_Wood));
 
@@ -943,7 +943,7 @@ void BlendMap<DATA_T>::Search (DBL value, EntryConstPtr& rpPrev, EntryConstPtr& 
     }
 }
 
-template void BlendMap<Colour>      ::Search (DBL value, EntryConstPtr& rpPrev, EntryConstPtr& rpNext, DBL& rPrevWeight, DBL& rNextWeight) const;
+template void BlendMap<TransColour> ::Search (DBL value, EntryConstPtr& rpPrev, EntryConstPtr& rpNext, DBL& rPrevWeight, DBL& rNextWeight) const;
 template void BlendMap<PIGMENT*>    ::Search (DBL value, EntryConstPtr& rpPrev, EntryConstPtr& rpNext, DBL& rPrevWeight, DBL& rNextWeight) const;
 template void BlendMap<Vector2d>    ::Search (DBL value, EntryConstPtr& rpPrev, EntryConstPtr& rpNext, DBL& rPrevWeight, DBL& rNextWeight) const;
 template void BlendMap<TNORMAL*>    ::Search (DBL value, EntryConstPtr& rpPrev, EntryConstPtr& rpNext, DBL& rPrevWeight, DBL& rNextWeight) const;
@@ -7787,7 +7787,7 @@ DBL OnionPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsect
 DBL PigmentPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
     DBL value;
-    Colour Col;
+    TransColour Col;
     int colour_found=false;
 
     if (pPigment)
@@ -7797,7 +7797,7 @@ DBL PigmentPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIse
     if(!colour_found)
         value = 0.0;
     else
-        value = Col.greyscale();
+        value = Col.Greyscale();
 
     return value ;
 }

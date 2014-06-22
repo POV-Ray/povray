@@ -46,19 +46,6 @@ namespace pov
 ******************************************************************************/
 
 
-// Simple Scalar Square Macro
-// TODO FIXME - this should be somewhere else!
-inline DBL Sqr(DBL a)
-{
-    return a * a;
-}
-
-// TODO FIXME - this should be somewhere else!
-inline SNGL Sqr(SNGL a)
-{
-    return a * a;
-}
-
 // Evaluate a ray equation. [DB 7/94]
 //   IPoint = Origin + depth * Direction
 inline void VEvaluateRay(Vector3d& IPoint, const Vector3d& Origin, DBL depth, const Vector3d& Direction)

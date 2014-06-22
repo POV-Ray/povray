@@ -1212,26 +1212,28 @@ DBL f_noise_generator(FPUContext *ctx, DBL *ptr, unsigned int) // 78
 void f_pigment(FPUContext *ctx, DBL *ptr, unsigned int fn, unsigned int sp) // 0
 {
     Vector3d Vec = Vector3d(PARAM_N_X(5), PARAM_N_Y(5), PARAM_N_Z(5));
-    Colour Col;
+    TransColour Col;
+    RGBFTColour rgbftCol;
     FunctionCode *f = ctx->functionvm->GetFunction(fn);
 
     if(f->private_data == NULL)
     {
-        ctx->SetLocal(sp + pRED, 0.0);
-        ctx->SetLocal(sp + pGREEN, 0.0);
-        ctx->SetLocal(sp + pBLUE, 0.0);
+        ctx->SetLocal(sp + pRED,    0.0);
+        ctx->SetLocal(sp + pGREEN,  0.0);
+        ctx->SetLocal(sp + pBLUE,   0.0);
         ctx->SetLocal(sp + pFILTER, 0.0);
         ctx->SetLocal(sp + pTRANSM, 0.0);
         return;
     }
 
     Compute_Pigment(Col, reinterpret_cast<const PIGMENT *>(f->private_data), Vec, NULL, NULL, ctx->threaddata);
+    rgbftCol = RGBFTColour(Col);
 
-    ctx->SetLocal(sp + pRED, Col.red());
-    ctx->SetLocal(sp + pGREEN, Col.green());
-    ctx->SetLocal(sp + pBLUE, Col.blue());
-    ctx->SetLocal(sp + pFILTER, Col.filter());
-    ctx->SetLocal(sp + pTRANSM, Col.transm());
+    ctx->SetLocal(sp + pRED,    rgbftCol.red());
+    ctx->SetLocal(sp + pGREEN,  rgbftCol.green());
+    ctx->SetLocal(sp + pBLUE,   rgbftCol.blue());
+    ctx->SetLocal(sp + pFILTER, rgbftCol.filter());
+    ctx->SetLocal(sp + pTRANSM, rgbftCol.transm());
 }
 
 void f_transform(FPUContext *ctx, DBL *ptr, unsigned int fn, unsigned int sp) // 1

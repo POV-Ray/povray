@@ -62,8 +62,8 @@ namespace pov
 ******************************************************************************/
 
 // TODO - obsolete
-Colour *Create_Colour (void);
-Colour *Copy_Colour (const Colour* Old);
+TransColour *Create_Colour (void);
+TransColour *Copy_Colour (const TransColour* Old);
 
 template<typename MAP_T>
 shared_ptr<MAP_T> Create_Blend_Map (int type);

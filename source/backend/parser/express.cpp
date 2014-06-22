@@ -1262,8 +1262,7 @@ void Parser::Parse_Num_Factor (EXPRESS Express,int *Terms)
 
         CASE (COLOUR_ID_TOKEN)
             *Terms=5;
-            for (i=0; i<5; i++)
-                Express[i]=(DBL)(  (reinterpret_cast<COLC *>(Token.Data))[i]  );
+            RGBFTColour(*reinterpret_cast<TransColour *>(Token.Data)).Get(Express, *Terms);
             EXIT
         END_CASE
 
@@ -1446,7 +1445,7 @@ void Parser::Parse_Num_Factor (EXPRESS Express,int *Terms)
 
                         case GRAY_TOKEN:
                             *Terms=1;
-                            Express[0]=DblColour(Express).greyscale();
+                            Express[0]=PreciseRGBFTColour(Express).Greyscale();
                             return;
 
                         default:
@@ -2380,11 +2379,10 @@ void Parser::Parse_Scale_Vector (Vector3d& Vector)
 *
 ******************************************************************************/
 
-void Parser::Parse_Colour (Colour& colour, bool expectFT)
+void Parser::Parse_Colour (RGBFTColour& colour, bool expectFT)
 {
     EXPRESS Express;
     int Terms;
-    register int i;
     bool old_allow_id = Allow_Identifier_In_Call;
     Allow_Identifier_In_Call = false;
 
@@ -2395,7 +2393,7 @@ void Parser::Parse_Colour (Colour& colour, bool expectFT)
         Express[Terms] = 0.0;
     }
 
-    colour.clear();
+    colour.Clear();
 
     bool startedParsing = false;
 
@@ -2410,25 +2408,25 @@ void Parser::Parse_Colour (Colour& colour, bool expectFT)
                     /* missing break deliberate */
 
                 case FILTER_TOKEN:
-                    colour.filter() = (COLC)Parse_Float();
+                    colour.filter() = (ColourChannel)Parse_Float();
                     if (!expectFT && (colour.filter() != 0))
                         Warning(0, "Expected pure RGB color expression, unexpected filter component will have no effect.");
                     break;
 
                 case BLUE_TOKEN:
-                    colour.blue() = (COLC)Parse_Float();
+                    colour.blue() = (ColourChannel)Parse_Float();
                     break;
 
                 case GREEN_TOKEN:
-                    colour.green() = (COLC)Parse_Float();
+                    colour.green() = (ColourChannel)Parse_Float();
                     break;
 
                 case RED_TOKEN:
-                    colour.red() = (COLC)Parse_Float();
+                    colour.red() = (ColourChannel)Parse_Float();
                     break;
 
                 case TRANSMIT_TOKEN:
-                    colour.transm() = (COLC)Parse_Float();
+                    colour.transm() = (ColourChannel)Parse_Float();
                     if (!expectFT && (colour.transm() != 0))
                         Warning(0, "Expected pure RGB color expression, unexpected transmit component will have no effect.");
                     break;
@@ -2445,8 +2443,7 @@ void Parser::Parse_Colour (Colour& colour, bool expectFT)
                         Parse_Express(Express,&Terms);
                         if (Terms != 3)
                             Warning(0, "Suspicious expression after rgb.");
-                        for (i=0;i<Terms;i++)
-                            colour[i]=(COLC)Express[i];
+                        colour.Set(Express, Terms);
                     }
                     break;
 
@@ -2462,8 +2459,7 @@ void Parser::Parse_Colour (Colour& colour, bool expectFT)
                         Parse_Express(Express,&Terms);
                         if (Terms != 4)
                             Warning(0, "Suspicious expression after rgbf.");
-                        for (i=0;i<Terms;i++)
-                            colour[i]=(COLC)Express[i];
+                        colour.Set(Express, Terms);
                         if (!expectFT && (colour.filter() != 0))
                             Warning(0, "Expected pure RGB color expression, unexpected filter component will have no effect.");
                     }
@@ -2481,8 +2477,7 @@ void Parser::Parse_Colour (Colour& colour, bool expectFT)
                         Parse_Express(Express,&Terms);
                         if (Terms != 4)
                             Warning(0, "Suspicious expression after rgbt.");
-                        for (i=0;i<Terms;i++)
-                            colour[i]=(COLC)Express[i];
+                        colour.Set(Express, Terms);
                         colour.transm()=colour.filter();
                         colour.filter()=0.0;
                         if (!expectFT && (colour.transm() != 0))
@@ -2502,8 +2497,7 @@ void Parser::Parse_Colour (Colour& colour, bool expectFT)
                         Parse_Express(Express,&Terms);
                         if (Terms != 5)
                             Warning(0, "Suspicious expression after rgbft.");
-                        for (i=0;i<Terms;i++)
-                            colour[i]=(COLC)Express[i];
+                        colour.Set(Express, Terms);
                         if (!expectFT && ((colour.filter() != 0) || (colour.transm() != 0)))
                             Warning(0, "Expected pure RGB color expression, unexpected filter and transmit components will have no effect.");
                     }
@@ -2513,19 +2507,19 @@ void Parser::Parse_Colour (Colour& colour, bool expectFT)
                 case SBLUE_TOKEN:
                     if (!sceneData->workingGammaToSRGB)
                         Error("Cannot parse sRGB colors before assumed_gamma has been set.");
-                    colour.blue() = sceneData->workingGammaToSRGB->Decode((COLC)Parse_Float());
+                    colour.blue() = sceneData->workingGammaToSRGB->Decode((ColourChannel)Parse_Float());
                     break;
 
                 case SGREEN_TOKEN:
                     if (!sceneData->workingGammaToSRGB)
                         Error("Cannot parse sRGB colors before assumed_gamma has been set.");
-                    colour.green() = sceneData->workingGammaToSRGB->Decode((COLC)Parse_Float());
+                    colour.green() = sceneData->workingGammaToSRGB->Decode((ColourChannel)Parse_Float());
                     break;
 
                 case SRED_TOKEN:
                     if (!sceneData->workingGammaToSRGB)
                         Error("Cannot parse sRGB colors before assumed_gamma has been set.");
-                    colour.red() = sceneData->workingGammaToSRGB->Decode((COLC)Parse_Float());
+                    colour.red() = sceneData->workingGammaToSRGB->Decode((ColourChannel)Parse_Float());
                     break;
 #endif
 
@@ -2543,10 +2537,8 @@ void Parser::Parse_Colour (Colour& colour, bool expectFT)
                         Parse_Express(Express,&Terms);
                         if (Terms != 3)
                             Warning(0, "Suspicious expression after srgb.");
-                        for (i=0;i<Terms;i++)
-                            colour[i]=(COLC)Express[i];
-                        for (i=0;i<3;i++)
-                            colour[i]=sceneData->workingGammaToSRGB->Decode(colour[i]);
+                        colour.Set(Express, Terms);
+                        colour.rgb() = GammaCurve::Decode(sceneData->workingGammaToSRGB, colour.rgb());
                     }
                     break;
 
@@ -2564,10 +2556,8 @@ void Parser::Parse_Colour (Colour& colour, bool expectFT)
                         Parse_Express(Express,&Terms);
                         if (Terms != 4)
                             Warning(0, "Suspicious expression after srgbf.");
-                        for (i=0;i<Terms;i++)
-                            colour[i]=(COLC)Express[i];
-                        for (i=0;i<3;i++)
-                            colour[i]=sceneData->workingGammaToSRGB->Decode(colour[i]);
+                        colour.Set(Express, Terms);
+                        colour.rgb() = GammaCurve::Decode(sceneData->workingGammaToSRGB, colour.rgb());
                         if (!expectFT && (colour.filter() != 0))
                             Warning(0, "Expected pure RGB color expression, unexpected filter component will have no effect.");
                     }
@@ -2587,12 +2577,10 @@ void Parser::Parse_Colour (Colour& colour, bool expectFT)
                         Parse_Express(Express,&Terms);
                         if (Terms != 4)
                             Warning(0, "Suspicious expression after srgbt.");
-                        for (i=0;i<Terms;i++)
-                            colour[i]=(COLC)Express[i];
+                        colour.Set(Express, Terms);
                         colour.transm()=colour.filter();
                         colour.filter()=0.0;
-                        for (i=0;i<3;i++)
-                            colour[i]=sceneData->workingGammaToSRGB->Decode(colour[i]);
+                        colour.rgb() = GammaCurve::Decode(sceneData->workingGammaToSRGB, colour.rgb());
                         if (!expectFT && (colour.transm() != 0))
                             Warning(0, "Expected pure RGB color expression, unexpected transmit component will have no effect.");
                     }
@@ -2612,10 +2600,8 @@ void Parser::Parse_Colour (Colour& colour, bool expectFT)
                         Parse_Express(Express,&Terms);
                         if (Terms != 5)
                             Warning(0, "Suspicious expression after srgbft.");
-                        for (i=0;i<Terms;i++)
-                            colour[i]=(COLC)Express[i];
-                        for (i=0;i<3;i++)
-                            colour[i]=sceneData->workingGammaToSRGB->Decode(colour[i]);
+                        colour.Set(Express, Terms);
+                        colour.rgb() = GammaCurve::Decode(sceneData->workingGammaToSRGB, colour.rgb());
                         if (!expectFT && ((colour.filter() != 0) || (colour.transm() != 0)))
                             Warning(0, "Expected pure RGB color expression, unexpected filter and transmit components will have no effect.");
                     }
@@ -2637,8 +2623,7 @@ void Parser::Parse_Colour (Colour& colour, bool expectFT)
                 else
                     Terms = 3;
                 Parse_Express(Express,&Terms);
-                for (i=0;i<Terms;i++)
-                    colour[i]=(COLC)Express[i];
+                colour.Set(Express, Terms);
                 if (!expectFT && ((colour.filter() != 0) || (colour.transm() != 0)))
                     Warning(0, "Expected pure RGB color expression, unexpected filter and transmit components will have no effect.");
                 startedParsing = true;
@@ -2662,8 +2647,7 @@ void Parser::Parse_Colour (Colour& colour, bool expectFT)
                     Error("Color expression expected but float or vector expression found.");
                 else if (!expectFT && ((Terms < 3) || Terms > 5))
                     Error("RGB color expression expected but float or vector expression found.");
-                for (i=0;i<Terms;i++)
-                    colour[i]=(COLC)Express[i];
+                colour.Set(Express, Terms);
                 if (!expectFT && ((colour.filter() != 0) || (colour.transm() != 0)))
                     Warning(0, "Expected pure RGB color expression, unexpected filter and transmit components will have no effect.");
                 startedParsing = true;
@@ -2679,11 +2663,18 @@ void Parser::Parse_Colour (Colour& colour, bool expectFT)
     Allow_Identifier_In_Call = old_allow_id;
 }
 
+void Parser::Parse_Colour (TransColour& colour, bool expectFT)
+{
+    RGBFTColour tempColour;
+    Parse_Colour (tempColour, expectFT);
+    colour = TransColour(tempColour);
+}
+
 void Parser::Parse_Colour (RGBColour& colour)
 {
-    Colour tempColour;
+    TransColour tempColour;
     Parse_Colour (tempColour, false);
-    colour = RGBColour(tempColour);
+    colour = tempColour.colour();
 }
 
 /*****************************************************************************
@@ -3274,7 +3265,7 @@ template<>
 ColourBlendMapPtr Parser::Parse_Colour_Map<ColourBlendMap> ()
 {
     ColourBlendMapPtr New = NULL;
-    int c,p,ii;
+    int c,p;
     EXPRESS Express;
     int Terms;
     ColourBlendMapEntry Temp_Ent, Temp_Ent_2;
@@ -3317,8 +3308,9 @@ ColourBlendMapPtr Parser::Parse_Colour_Map<ColourBlendMap> ()
                             else
                                 if (Terms==5)
                                 {
-                                    for (ii=0;ii<5;ii++)
-                                        Temp_Ent.Vals[ii]=(COLC)Express[ii];
+                                    RGBFTColour rgbft;
+                                    rgbft.Set(Express, Terms);
+                                    Temp_Ent.Vals = TransColour (rgbft);
                                     tempList.push_back(Temp_Ent);
                                 }
                                 else
