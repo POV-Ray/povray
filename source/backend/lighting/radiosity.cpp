@@ -63,11 +63,12 @@
 
 // frame.h must always be the first POV file included (pulls in platform config)
 #include "backend/frame.h"
-#include "backend/scene/view.h"
-#include "backend/render/tracetask.h"
-#include "backend/lighting/photons.h"
 #include "backend/lighting/radiosity.h"
+
+#include "backend/lighting/photons.h"
 #include "backend/math/vector.h"
+#include "backend/render/tracetask.h"
+#include "backend/scene/view.h"
 #include "backend/support/fileutil.h"
 #include "backend/support/octree.h"
 
@@ -131,17 +132,17 @@ struct WT_AVG
 #endif
 };
 
-inline unsigned int GetRadiosityQualityFlags(const SceneRadiositySettings& rs, const unsigned int basicQualityFlags)
+inline QualityFlags GetRadiosityQualityFlags(const SceneRadiositySettings& rs, const QualityFlags& basicQualityFlags)
 {
-    unsigned int qf = basicQualityFlags;
+    QualityFlags qf = basicQualityFlags;
 
-    qf &= ~Q_AREA_LIGHT;
+    qf.areaLights = false; // TODO - in some cases we might want this anyway
 
     if(!rs.media)
-        qf &= ~Q_VOLUME;
+        qf.media = false;
 
     if(!rs.subsurface)
-        qf &= ~Q_SUBSURFACE;
+        qf.subsurface = false;
 
     return qf;
 }
@@ -283,7 +284,7 @@ RadiosityRecursionSettings* SceneRadiositySettings::GetRecursionSettings(bool fi
 RadiosityFunction::RadiosityFunction(shared_ptr<SceneData> sd, TraceThreadData *td, const SceneRadiositySettings& rs,
                                      RadiosityCache& rc, Trace::CooperateFunctor& cf, bool ft, const Vector3d& camera) :
     threadData(td),
-    trace(sd, td, GetRadiosityQualityFlags(rs, QUALITY_9), cf, media, *this), // TODO FIXME - we can only use hard-coded QUALITY_9 because Radiosity happens to be disabled at lower settings!
+    trace(sd, td, GetRadiosityQualityFlags(rs, QualityFlags(9)), cf, media, *this), // TODO FIXME - we can only use hard-coded Level-9 quality because Radiosity happens to be disabled at lower settings!
     media(td, &trace, &photonGatherer),
     photonGatherer(&sd->surfacePhotonMap, sd->photonSettings),
     radiosityCache(rc),

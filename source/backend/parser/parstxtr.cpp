@@ -281,7 +281,7 @@ ImageData *Parser::Parse_Image(int Legal, bool GammaCorrect)
         END_CASE
 
         CASE (TIFF_TOKEN)
-            Experimental_Flag |= EF_TIFF;
+            mExperimentalFlags.tiff = true;
             filetype = TIFF_FILE;
             Name = Parse_C_String(true);
             EXIT
@@ -462,7 +462,7 @@ ImageData *Parser::Parse_Image(int Legal, bool GammaCorrect)
             // note the second ':' gets passed since it's the option prefix
             // e.g. ":vidcap:source=/dev/video0:w=640:h=480:fps=5"
             image->data = image->VidCap->Init(Name + 7, options, true);
-            Beta_Feature_Flag |= BF_VIDCAP;
+            mBetaFeatureFlags.videoCapture = true;
 #else
             Error("Beta-test video capture feature not implemented on this platform.");
 #endif
@@ -1510,7 +1510,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, int TPat_Type)
                             }
                             else
                             {
-                                Experimental_Flag |= EF_SLOPEM; // this feature is experimental
+                                mExperimentalFlags.slopeAltitude = true; // this feature is experimental
                                 Parse_Vector (dynamic_cast<SlopePattern*>(New->pattern.get())->altitudeDirection);
 
                                 /* allow low alt, high alt */
@@ -2366,7 +2366,7 @@ void Parser::Parse_Finish (FINISH **Finish_Ptr)
             Parse_Comma();
             New->DiffuseBack = Allow_Float(0.0);
             if (New->DiffuseBack != 0.0)
-                Experimental_Flag |= EF_BACKILL;
+                mExperimentalFlags.backsideIllumination = true;
         END_CASE
 
         CASE (REFLECTION_TOKEN)
@@ -2557,7 +2557,7 @@ void Parser::Parse_Finish (FINISH **Finish_Ptr)
         END_CASE
 
         CASE (SUBSURFACE_TOKEN)
-            Experimental_Flag |= EF_SSLT;
+            mExperimentalFlags.subsurface = true;
             New->UseSubsurface = true;
             Parse_Begin();
             EXPECT

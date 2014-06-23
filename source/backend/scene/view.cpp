@@ -39,26 +39,25 @@
 
 // frame.h must always be the first POV file included (pulls in platform config)
 #include "backend/frame.h"
+#include "backend/scene/view.h"
 
-#include "base/timer.h"
 #include "base/povms.h"
 #include "base/povmscpp.h"
 #include "base/povmsgid.h"
+#include "base/timer.h"
 
 #include "backend/control/renderbackend.h"
 #include "backend/support/octree.h"
 #include "backend/math/matrices.h"
 #include "backend/math/vector.h"
-#include "backend/scene/view.h"
-#include "backend/render/tracetask.h"
 #include "backend/render/radiositytask.h"
-#include "backend/lighting/photons.h"
-#include "backend/lighting/radiosity.h"
-
+#include "backend/render/tracetask.h"
 #include "backend/lighting/photonestimationtask.h"
+#include "backend/lighting/photons.h"
 #include "backend/lighting/photonshootingtask.h"
 #include "backend/lighting/photonsortingtask.h"
 #include "backend/lighting/photonstrategytask.h"
+#include "backend/lighting/radiosity.h"
 
 #include "povray.h" // TODO
 
@@ -69,12 +68,6 @@
 
 namespace pov
 {
-
-const int QualityValues[10] =
-{
-    QUALITY_0, QUALITY_1, QUALITY_2, QUALITY_3, QUALITY_4,
-    QUALITY_5, QUALITY_6, QUALITY_7, QUALITY_8, QUALITY_9
-};
 
 inline unsigned int MakePowerOfTwo(unsigned int i)
 {
@@ -98,14 +91,9 @@ ViewData::ViewData(shared_ptr<SceneData> sd) :
     rtrData(NULL),
     renderArea(0, 0, 159, 119),
     radiosityCache(sd->radiositySettings),
-    sceneData(sd)
+    sceneData(sd),
+    qualityFlags(9)
 {
-    qualitySettings.Quality = 9;
-    qualitySettings.Quality_Flags = QUALITY_9;
-    qualitySettings.Tracing_Method = 1;
-    qualitySettings.AntialiasDepth = 3;
-    qualitySettings.Antialias_Threshold = 0.3;
-    qualitySettings.JitterScale = 1.0;
 }
 
 ViewData::~ViewData()
@@ -564,9 +552,9 @@ void ViewData::SetHighestTraceLevel(unsigned int htl)
     highestTraceLevel = max(highestTraceLevel, htl);
 }
 
-unsigned int ViewData::GetQualityFeatureFlags()
+const QualityFlags& ViewData::GetQualityFeatureFlags() const
 {
-    return qualitySettings.Quality_Flags;
+    return qualityFlags;
 }
 
 RadiosityCache& ViewData::GetRadiosityCache()
@@ -692,8 +680,7 @@ void View::StartRender(POVMS_Object& renderOptions)
         renderControlThread = new boost::thread(boost::bind(&View::RenderControlThread, this));
 #endif
 
-    viewData.qualitySettings.Quality = clip(renderOptions.TryGetInt(kPOVAttrib_Quality, 9), 0, 9);
-    viewData.qualitySettings.Quality_Flags = QualityValues[viewData.qualitySettings.Quality];
+    viewData.qualityFlags = QualityFlags(clip(renderOptions.TryGetInt(kPOVAttrib_Quality, 9), 0, 9));
 
     if(renderOptions.TryGetBool(kPOVAttrib_Antialias, false) == true)
         tracingmethod = clip(renderOptions.TryGetInt(kPOVAttrib_SamplingMethod, 1), 0, 2);
@@ -737,9 +724,9 @@ void View::StartRender(POVMS_Object& renderOptions)
      // TODO FIXME - all below is not implemented properly and not threadsafe [trf]
 
 
-    viewData.GetSceneData()->radiositySettings.radiosityEnabled = viewData.GetSceneData()->radiositySettings.radiosityEnabled && (viewData.qualitySettings.Quality_Flags & Q_ADVANCED_LIGHT);
-    viewData.GetSceneData()->photonSettings.photonsEnabled = viewData.GetSceneData()->photonSettings.photonsEnabled && (viewData.qualitySettings.Quality_Flags & Q_ADVANCED_LIGHT);
-    viewData.GetSceneData()->useSubsurface = viewData.GetSceneData()->useSubsurface && (viewData.qualitySettings.Quality_Flags & Q_SUBSURFACE);
+    viewData.GetSceneData()->radiositySettings.radiosityEnabled = viewData.GetSceneData()->radiositySettings.radiosityEnabled && viewData.qualityFlags.radiosity;
+    viewData.GetSceneData()->photonSettings.photonsEnabled = viewData.GetSceneData()->photonSettings.photonsEnabled && (viewData.qualityFlags.photons);
+    viewData.GetSceneData()->useSubsurface = viewData.GetSceneData()->useSubsurface && (viewData.qualityFlags.subsurface);
 
     if(viewData.GetSceneData()->photonSettings.Max_Trace_Level < 0)
         viewData.GetSceneData()->photonSettings.Max_Trace_Level = viewData.GetSceneData()->parsedMaxTraceLevel;

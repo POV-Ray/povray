@@ -45,8 +45,6 @@
 #include "backend/scene/camera.h"
 #include "backend/support/taskqueue.h"
 
-#include "povrayold.h" //TODO
-
 namespace pov
 {
 
@@ -246,7 +244,7 @@ class ViewData
          *  Get the render qualitiy features to use when rendering this view.
          *  @return                 Quality feature flags.
          */
-         unsigned int GetQualityFeatureFlags();
+        const QualityFlags& GetQualityFeatureFlags() const;
 
         /**
          *  Get the radiosity cache.
@@ -339,7 +337,7 @@ class ViewData
         /// adjusted step size for renderering (using clock arithmetic)
         unsigned int renderBlockStep;
 
-        QualitySettings qualitySettings; // TODO FIXME - put somewhere else or split up
+        QualityFlags qualityFlags; // TODO FIXME - put somewhere else or split up
 
         /**
          *  Create view data.

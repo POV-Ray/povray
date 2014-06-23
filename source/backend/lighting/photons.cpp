@@ -37,23 +37,24 @@
 
 // frame.h must always be the first POV file included (pulls in platform config)
 #include "backend/frame.h"
+#include "backend/lighting/photons.h"
+
+#include "backend/bounding/bbox.h"
+#include "backend/lighting/photonshootingstrategy.h"
+#include "backend/lighting/point.h"
 #include "backend/math/vector.h"
 #include "backend/math/matrices.h"
 #include "backend/scene/objects.h"
-#include "backend/shape/csg.h"
-#include "backend/support/octree.h"
-#include "backend/bounding/bbox.h"
-#include "backend/scene/threaddata.h"
 #include "backend/scene/scene.h"
+#include "backend/scene/threaddata.h"
 #include "backend/scene/view.h"
+#include "backend/shape/csg.h"
 #include "backend/support/msgutil.h"
-#include "backend/lighting/point.h"
-#include "backend/lighting/photons.h"
+#include "backend/support/octree.h"
 #include "backend/texture/normal.h"
 #include "backend/texture/pigment.h"
 #include "backend/texture/texture.h"
 #include "lightgrp.h"
-#include "backend/lighting/photonshootingstrategy.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -102,7 +103,7 @@ const int PHOTON_BLOCK_MASK = (PHOTON_BLOCK_SIZE-1);
 const int INITIAL_BASE_ARRAY_SIZE = 100;
 
 
-PhotonTrace::PhotonTrace(shared_ptr<SceneData> sd, TraceThreadData *td, unsigned int mtl, DBL adcb, unsigned int qf, Trace::CooperateFunctor& cf) :
+PhotonTrace::PhotonTrace(shared_ptr<SceneData> sd, TraceThreadData *td, unsigned int mtl, DBL adcb, const QualityFlags& qf, Trace::CooperateFunctor& cf) :
     Trace(sd, td, qf, cf, mediaPhotons, noRadiosity),
     mediaPhotons(sd, td, this, new PhotonGatherer(&sd->mediaPhotonMap, sd->photonSettings))
 {
@@ -268,37 +269,37 @@ void PhotonTrace::ComputeLightedTexture(TransColour& LightCol, const TEXTURE *Te
 
     // TODO FIXME - [CLi] for the sake of performance, this should be handled in the calling function, in case we're dealing with averaged textures!
     // Calculate participating media effects, and deposit photons in media as we go.
-    if((qualityFlags & Q_VOLUME) && (!ray.GetInteriors().empty()) && (ray.IsHollowRay() == true))
+    if(qualityFlags.media && !ray.GetInteriors().empty() && (ray.IsHollowRay() == true))
     {
         // Calculate effects of all media we're currently in.
 
-            MediaVector medialist;
+        MediaVector medialist;
 
-            for(RayInteriorVector::const_iterator i(ray.GetInteriors().begin()); i != ray.GetInteriors().end(); i++)
-            {
-                for(vector<Media>::iterator im((*i)->media.begin()); im != (*i)->media.end(); im++)
-                    medialist.push_back(&(*im));
-            }
+        for(RayInteriorVector::const_iterator i(ray.GetInteriors().begin()); i != ray.GetInteriors().end(); i++)
+        {
+            for(vector<Media>::iterator im((*i)->media.begin()); im != (*i)->media.end(); im++)
+                medialist.push_back(&(*im));
+        }
 
 /*  TODO FIXME lightgroups
-            if ((Trace_Level > 1) &&
-                !threadData->passThruPrev && sceneData->photonSettings.maxMediaSteps>0 &&
-                !Test_Flag(isect.Object,PH_IGNORE_PHOTONS_FLAG) &&
-                Check_Light_Group(isect.Object,photonOptions.Light))
+        if ((Trace_Level > 1) &&
+            !threadData->passThruPrev && sceneData->photonSettings.maxMediaSteps>0 &&
+            !Test_Flag(isect.Object,PH_IGNORE_PHOTONS_FLAG) &&
+            Check_Light_Group(isect.Object,photonOptions.Light))
 */
-            if(!medialist.empty())
+        if(!medialist.empty())
+        {
+            if((ray.GetTicket().traceLevel > 1) && !threadData->passThruPrev && (sceneData->photonSettings.maxMediaSteps > 0))
+                mediaPhotons.ComputeMediaAndDepositPhotons(medialist, ray, isect, LightCol);
+            else
             {
-                if((ray.GetTicket().traceLevel > 1) && !threadData->passThruPrev && (sceneData->photonSettings.maxMediaSteps > 0))
-                    mediaPhotons.ComputeMediaAndDepositPhotons(medialist, ray, isect, LightCol);
-                else
-                {
-                    // compute media WITHOUT depositing photons
-                    RGBColour tempLightCol(LightCol);
-                    ColourChannel tempLightTransm = RGBFTColour(LightCol).transm(); // TODO - get rid of this use of RGBFTColour
-                    mediaPhotons.ComputeMedia(medialist, ray, isect, tempLightCol, tempLightTransm);
-                    LightCol = TransColour(RGBFTColour(tempLightCol, RGBFTColour(LightCol).filter(), tempLightTransm)); // TODO - get rid of this use of RGBFTColour
-                }
+                // compute media WITHOUT depositing photons
+                RGBColour tempLightCol(LightCol);
+                ColourChannel tempLightTransm = RGBFTColour(LightCol).transm(); // TODO - get rid of this use of RGBFTColour
+                mediaPhotons.ComputeMedia(medialist, ray, isect, tempLightCol, tempLightTransm);
+                LightCol = TransColour(RGBFTColour(tempLightCol, RGBFTColour(LightCol).filter(), tempLightTransm)); // TODO - get rid of this use of RGBFTColour
             }
+        }
     }
 
     // Get distance based attenuation.
@@ -374,7 +375,7 @@ void PhotonTrace::ComputeLightedTexture(TransColour& LightCol, const TEXTURE *Te
         // Get perturbed surface normal.
         LayNormal = rawnormal;
 
-        if ((qualityFlags & Q_NORMAL) && (Layer->Tnormal != NULL))
+        if (qualityFlags.normals && (Layer->Tnormal != NULL))
         {
             for(vector<const TEXTURE *>::iterator i(warps.begin()); i != warps.end(); i++)
                 Warp_Normal(LayNormal, LayNormal, *i, Test_Flag(*i, DONT_SCALE_BUMPS_FLAG));
@@ -617,7 +618,7 @@ void PhotonTrace::ComputeLightedTexture(TransColour& LightCol, const TEXTURE *Te
 
     // If the surface is translucent a transmitted ray is traced
     // and its illunination is filtered by FilCol.
-    if (doRefraction && ((interior = isect.Object->interior) != NULL) && (Trans > ray.GetTicket().adcBailout) && (qualityFlags & Q_REFRACT))
+    if (doRefraction && ((interior = isect.Object->interior) != NULL) && (Trans > ray.GetTicket().adcBailout) && qualityFlags.refractions)
     {
         w1 = FilCol.WeightMax();
         New_Weight = weight * max(w1, 0.0);
@@ -645,7 +646,7 @@ void PhotonTrace::ComputeLightedTexture(TransColour& LightCol, const TEXTURE *Te
                        ( !Test_Flag(isect.Object, PH_RFL_OFF_FLAG) && (threadData->photonSourceLight->Flags & PH_RFL_ON_FLAG) ) ) &&
                      !threadData->passThruThis );
 
-    if(doReflection && (qualityFlags & Q_REFLECT))
+    if(doReflection && qualityFlags.reflections)
     {
         Layer = Texture;
         for (i = 0; i < layer_number; i++)

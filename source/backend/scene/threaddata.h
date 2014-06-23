@@ -41,10 +41,10 @@
 
 #include "base/types.h"
 #include "backend/frame.h"
-#include "backend/support/task.h"
-#include "backend/support/statistics.h"
-#include "backend/shape/mesh.h"
 #include "backend/pattern/pattern.h"
+#include "backend/shape/mesh.h"
+#include "backend/support/statistics.h"
+#include "backend/support/task.h"
 
 namespace pov
 {
@@ -155,7 +155,7 @@ class SceneThreadData : public Task::TaskData
         TimeType timeType;
         POV_LONG cpuTime;
         POV_LONG realTime;
-        unsigned int qualityFlags; // TODO FIXME - remove again
+        QualityFlags qualityFlags; // TODO FIXME - remove again
 
         inline shared_ptr<const SceneData> GetSceneData() const { return sceneData; }
 

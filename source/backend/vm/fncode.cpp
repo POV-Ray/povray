@@ -856,7 +856,7 @@ void FNCode::compile_member(char *name)
         compile_instruction(OPCODE_MULI, 0, 0, functionVM->AddConstant(1.0 / 255.0));
         compile_instruction(OPCODE_ADD, 0, 5, 0);
         compile_instruction(OPCODE_MULI, 0, 5, functionVM->AddConstant(0.996093));
-// TODO FIXME       Experimental_Flag |= EF_ISOFN;
+// TODO FIXME       mExperimentalFlags.functionHf = true;
     }
     else
         parser->Error("Invalid member access: Valid member names are x, y, z, t, u, v,\nred, green, blue, grey, filter and transmit.");

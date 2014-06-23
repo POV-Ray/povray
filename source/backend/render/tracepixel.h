@@ -62,7 +62,7 @@ struct ContainingInteriorsPointObjectCondition : public PointObjectCondition
 class TracePixel : public Trace
 {
     public:
-        TracePixel(ViewData *vd, TraceThreadData *td, unsigned int mtl, DBL adcb, unsigned int qf,
+        TracePixel(ViewData *vd, TraceThreadData *td, unsigned int mtl, DBL adcb, const QualityFlags& qf,
                    CooperateFunctor& cf, MediaFunctor& mf, RadiosityFunctor& af, bool pt = false);
         virtual ~TracePixel();
         void SetupCamera(const Camera& cam);

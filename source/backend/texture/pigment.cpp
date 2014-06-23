@@ -46,12 +46,10 @@
 
 #include "base/pov_err.h"
 #include "backend/colour/colour_old.h"
-#include "backend/scene/threaddata.h"
-#include "backend/support/imageutil.h"
 #include "backend/pattern/pattern.h"
 #include "backend/pattern/warps.h"
-
-#include "povrayold.h" // TODO FIXME
+#include "backend/scene/threaddata.h"
+#include "backend/support/imageutil.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -397,7 +395,7 @@ bool Compute_Pigment (TransColour& colour, const PIGMENT *Pigment, const Vector3
     Vector3d TPoint;
     DBL value;
 
-    if ((Thread->qualityFlags & Q_QUICKC) != 0 && Pigment->Quick_Colour.IsValid())
+    if (Thread->qualityFlags.quickColour && Pigment->Quick_Colour.IsValid())
     {
         colour = Pigment->Quick_Colour;
         return (true);

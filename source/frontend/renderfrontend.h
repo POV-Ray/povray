@@ -36,7 +36,6 @@
 #ifndef POVRAY_FRONTEND_RENDERFRONTEND_H
 #define POVRAY_FRONTEND_RENDERFRONTEND_H
 
-#include "base/image/image.h"
 #include "base/path.h"
 #include "base/povms.h"
 #include "base/povmscpp.h"
@@ -44,13 +43,12 @@
 #include "base/stringutilities.h"
 #include "base/textstreambuffer.h"
 #include "base/types.h"
+#include "base/image/image.h"
 
 #include "frontend/configfrontend.h"
 #include "frontend/console.h"
 #include "frontend/display.h"
 #include "frontend/imageprocessing.h"
-
-#undef DISPLAY // TODO FIXME - Macro from povrayold.h - remove this line once povrayold.h is gone!!! [trf]
 
 #include <string>
 #include <vector>

@@ -156,6 +156,38 @@ enum
 };
 
 
+struct ExperimentalFlags
+{
+    bool    backsideIllumination    : 1;
+    bool    functionHf              : 1;
+    bool    meshCamera              : 1;
+    bool    slopeAltitude           : 1;
+    bool    spline                  : 1;
+    bool    subsurface              : 1;
+    bool    tiff                    : 1;
+
+    ExperimentalFlags() :
+        backsideIllumination(false),
+        functionHf(false),
+        meshCamera(false),
+        slopeAltitude(false),
+        spline(false),
+        subsurface(false),
+        tiff(false)
+    {}
+};
+
+struct BetaFlags
+{
+    bool    realTimeRaytracing  : 1;
+    bool    videoCapture        : 1;
+
+    BetaFlags() :
+        realTimeRaytracing(false),
+        videoCapture(false)
+    {}
+};
+
 /*****************************************************************************
 * Global typedefs
 ******************************************************************************/
@@ -423,8 +455,8 @@ class Parser : public Task
         bool Had_Max_Trace_Level;
         int Max_Trace_Level;
 
-        int Experimental_Flag;
-        int Beta_Feature_Flag;
+        ExperimentalFlags mExperimentalFlags;
+        BetaFlags mBetaFeatureFlags;
 
         DBL clockValue;
         bool useClock;

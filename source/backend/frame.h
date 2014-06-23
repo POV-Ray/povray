@@ -51,22 +51,18 @@
 #include <cstdio>
 #include <cstring>
 #include <climits>
-
-#include <vector>
-#include <stack>
-
-// TODO - what is this conditional for?
-#ifndef MATH_H_INCLUDED
 #include <cmath>
-#endif
 
+#include <stack>
+#include <vector>
+
+#include "base/colour.h"
 #include "base/configbase.h"
 #include "base/types.h"
-#include "base/colour.h"
 
 #include "backend/configbackend.h"
-#include "backend/support/simplevector.h"
 #include "backend/colour/spectral.h"
+#include "backend/support/simplevector.h"
 
 #include "pov_mem.h"
 
@@ -1742,6 +1738,36 @@ class FractalRules
 };
 
 typedef shared_ptr<FractalRules> FractalRulesPtr;
+
+
+struct QualityFlags
+{
+    bool ambientOnly    : 1;
+    bool quickColour    : 1;
+    bool shadows        : 1;
+    bool areaLights     : 1;
+    bool refractions    : 1;
+    bool reflections    : 1;
+    bool normals        : 1;
+    bool media          : 1;
+    bool radiosity      : 1;
+    bool photons        : 1;
+    bool subsurface     : 1;
+
+    explicit QualityFlags(int level) :
+        ambientOnly (level <= 1),
+        quickColour (level <= 5),
+        shadows     (level >= 4),
+        areaLights  (level >= 5),
+        refractions (level >= 6),
+        reflections (level >= 8),
+        normals     (level >= 8),
+        media       (level >= 9),
+        radiosity   (level >= 9),
+        photons     (level >= 9),
+        subsurface  (level >= 9)
+    {}
+};
 
 
 // platform-specific headers should have provided DECLARE_THREAD_LOCAL_PTR.

@@ -41,8 +41,8 @@
 #include <boost/thread.hpp>
 
 #include "backend/frame.h"
-#include "backend/scene/atmosph.h"
 #include "backend/bounding/bbox.h"
+#include "backend/scene/atmosph.h"
 #include "backend/support/bsptree.h"
 #include "backend/support/randomsequences.h"
 
@@ -196,7 +196,7 @@ class Trace
                 virtual bool CheckRadiosityTraceLevel(const TraceTicket& ticket) { return false; }
         };
 
-        Trace(shared_ptr<SceneData> sd, TraceThreadData *td, unsigned int qf,
+        Trace(shared_ptr<SceneData> sd, TraceThreadData *td, const QualityFlags& qf,
               CooperateFunctor& cf, MediaFunctor& mf, RadiosityFunctor& af);
 
         virtual ~Trace();
@@ -286,7 +286,7 @@ class Trace
         /// Maximum trace recursion level found.
         unsigned int maxFoundTraceLevel;
         /// Various quality-related flags.
-        unsigned int qualityFlags;
+        QualityFlags qualityFlags;
 
         /// Bounding slabs priority queue.
         BBoxPriorityQueue priorityQueue;

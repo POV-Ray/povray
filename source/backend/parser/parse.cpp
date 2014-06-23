@@ -141,15 +141,13 @@ Parser::Parser(shared_ptr<SceneData> sd, bool useclk, DBL clk) :
     Current_Token_Count(0),
     token_count(0),
     line_count(10),
-    Experimental_Flag(0),
-    Beta_Feature_Flag(0),
     next_rand(NULL),
     Debug_Message_Buffer(sd->backendAddress, sd->frontendAddress, sd->sceneId),
     messageFactory(10, 370, "Parse", sd->backendAddress, sd->frontendAddress, sd->sceneId, 0) // TODO FIXME - Values need to come from the correct place!
 {
     pre_init_tokenizer();
     if (sceneData->realTimeRaytracing)
-        Beta_Feature_Flag |= BF_RTR;
+        mBetaFeatureFlags.realTimeRaytracing = true;
 }
 
 /* Parse the file. */
@@ -277,51 +275,44 @@ void Parser::Run()
     Brace_Stack = NULL;
 
     // Check for experimental features
-    if(Experimental_Flag)
-    {
-        char str[512] = "" ;
+    char str[512] = "" ;
 
-        if(Experimental_Flag & EF_SPLINE)
-            strcat(str, str [0] ? ", spline" : "spline") ;
-        if(Experimental_Flag & EF_SLOPEM)
-            strcat(str, str [0] ? ", slope pattern" : "slope pattern") ;
-        if(Experimental_Flag & EF_ISOFN)
-            strcat(str, str [0] ? ", function '.hf'" : "function '.hf'") ;
-        if(Experimental_Flag & EF_TIFF)
-            strcat(str, str [0] ? ", TIFF image support" : "TIFF image support") ;
-        if(Experimental_Flag & EF_BACKILL)
-            strcat(str, str [0] ? ", backside illumination" : "backside illumination") ;
-        if(Experimental_Flag & EF_MESHCAM)
-            strcat(str, str [0] ? ", mesh camera" : "mesh camera") ;
-        if(Experimental_Flag & EF_SSLT)
-            strcat(str, str [0] ? ", subsurface light transport" : "subsurface light transport") ;
+    if(mExperimentalFlags.backsideIllumination)
+        strcat(str, str [0] ? ", backside illumination" : "backside illumination") ;
+    if(mExperimentalFlags.functionHf)
+        strcat(str, str [0] ? ", function '.hf'" : "function '.hf'") ;
+    if(mExperimentalFlags.meshCamera)
+        strcat(str, str [0] ? ", mesh camera" : "mesh camera") ;
+    if(mExperimentalFlags.slopeAltitude)
+        strcat(str, str [0] ? ", slope pattern altitude" : "slope pattern altitude") ;
+    if(mExperimentalFlags.spline)
+        strcat(str, str [0] ? ", spline" : "spline") ;
+    if(mExperimentalFlags.subsurface)
+        strcat(str, str [0] ? ", subsurface light transport" : "subsurface light transport") ;
+    if(mExperimentalFlags.tiff)
+        strcat(str, str [0] ? ", TIFF image support" : "TIFF image support") ;
 
+    if (str[0] != '\0')
         Warning(0, "This rendering uses the following experimental feature(s): %s.\n"
                    "The design and implementation of these features is likely to change in future\n"
                    "versions of POV-Ray. Backward compatibility with the current implementation is\n"
                    "not guaranteed.",
                    str);
-    }
 
     // Check for beta features
-    if(Beta_Feature_Flag)
-    {
-        char str[512] = "" ;
+    str[0] = '\0';
 
-        if(Beta_Feature_Flag & BF_VIDCAP)
-            strcat(str, str [0] ? ", video capture" : "video capture") ;
-        if(Beta_Feature_Flag & BF_RTR)
-            strcat(str, str [0] ? ", real-time raytracing render loop" : "real-time raytracing render loop") ;
+    if(mBetaFeatureFlags.videoCapture)
+        strcat(str, str [0] ? ", video capture" : "video capture") ;
+    if(mBetaFeatureFlags.realTimeRaytracing)
+        strcat(str, str [0] ? ", real-time raytracing render loop" : "real-time raytracing render loop") ;
 
+    if (str[0] != '\0')
         Warning(0, "This rendering uses the following beta-test feature(s): %s.\n"
-                   "The implementation of these features is likely to change or be completely\n"
-                   "removed in subsequent beta-test versions of POV-Ray. There is no guarantee\n"
-                   "that they will be available in the next full release version.\n",
-                   str);
-    }
-
-    Experimental_Flag = 0;
-    Beta_Feature_Flag = 0;
+                    "The implementation of these features is likely to change or be completely\n"
+                    "removed in subsequent beta-test versions of POV-Ray. There is no guarantee\n"
+                    "that they will be available in the next full release version.\n",
+                    str);
 
     if ((sceneData->bspMaxDepth != 0) ||
         (sceneData->bspObjectIsectCost != 0.0f) || (sceneData->bspBaseAccessCost != 0.0f) ||
@@ -1429,7 +1420,7 @@ void Parser::Parse_Camera (Camera& Cam)
             END_CASE
 
             CASE (MESH_CAMERA_TOKEN)
-                Experimental_Flag |= EF_MESHCAM;
+                mExperimentalFlags.meshCamera = true;
                 Parse_Mesh_Camera(New);
             END_CASE
 
@@ -8687,7 +8678,7 @@ int Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTR
         END_CASE
 
         CASE (SPLINE_TOKEN)
-            Experimental_Flag |= EF_SPLINE;
+            mExperimentalFlags.spline = true;
             Parse_Begin();
             Temp_Data  = reinterpret_cast<void *>(Parse_Spline());
             Parse_End();

@@ -53,8 +53,6 @@
 #include "backend/scene/camera.h"
 #include "backend/support/taskqueue.h"
 
-#include "povrayold.h" // TODO
-
 namespace pov
 {
 

@@ -38,9 +38,9 @@
 #define PHOTONS_H
 
 #include "backend/frame.h"
-#include "backend/render/trace.h"
 #include "backend/colour/colutils.h"
 #include "backend/interior/media.h"
+#include "backend/render/trace.h"
 
 namespace pov
 {
@@ -313,7 +313,7 @@ class PhotonMediaFunction : public MediaFunction
 class PhotonTrace : public Trace
 {
     public:
-        PhotonTrace(shared_ptr<SceneData> sd, TraceThreadData *td, unsigned int mtl, DBL adcb, unsigned int qf, Trace::CooperateFunctor& cf);
+        PhotonTrace(shared_ptr<SceneData> sd, TraceThreadData *td, unsigned int mtl, DBL adcb, const QualityFlags& qf, Trace::CooperateFunctor& cf);
         ~PhotonTrace();
 
         virtual DBL TraceRay(Ray& ray, TransColour& colour, COLC weight, bool continuedRay, DBL maxDepth = 0.0);

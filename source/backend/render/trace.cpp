@@ -83,7 +83,7 @@ bool NoSomethingFlagRayObjectCondition::operator()(const Ray& ray, ConstObjectPt
     return true;
 }
 
-Trace::Trace(shared_ptr<SceneData> sd, TraceThreadData *td, unsigned int qf,
+Trace::Trace(shared_ptr<SceneData> sd, TraceThreadData *td, const QualityFlags& qf,
              CooperateFunctor& cf, MediaFunctor& mf, RadiosityFunctor& rf) :
     threadData(td),
     sceneData(sd),
@@ -177,7 +177,7 @@ double Trace::TraceRay(Ray& ray, TransColour& colour, COLC weight, bool continue
         ray.GetTicket().maxFoundTraceLevel = (unsigned int) max(ray.GetTicket().maxFoundTraceLevel, ray.GetTicket().traceLevel);
     }
 
-    if((qualityFlags & Q_VOLUME) && (ray.IsPhotonRay() == true) && (ray.IsHollowRay() == true))
+    if(qualityFlags.media && (ray.IsPhotonRay() == true) && (ray.IsHollowRay() == true))
     {
         // Note: this version of ComputeMedia does not deposit photons. This is
         // intentional.  Even though we're processing a photon ray, we don't want
@@ -194,7 +194,7 @@ double Trace::TraceRay(Ray& ray, TransColour& colour, COLC weight, bool continue
     else
         ComputeSky(ray, colour);
 
-    if((qualityFlags & Q_VOLUME) && (ray.IsPhotonRay() == false) && (ray.IsHollowRay() == true))
+    if(qualityFlags.media && (ray.IsPhotonRay() == false) && (ray.IsHollowRay() == true))
     {
         if((sceneData->rainbow != NULL) && (ray.IsShadowTestRay() == false))
             ComputeRainbow(ray, bestisect, colour);
@@ -571,7 +571,7 @@ void Trace::ComputeTextureColour(Intersection& isect, TransColour& colour, Ray& 
     // TODO - For photon rays we're still potentially doing double work on media.
     // TODO - For shadow rays we're still potentially doing double work on distance-based attenuation.
     // Calculate participating media effects.
-    if(!photonPass && (qualityFlags & Q_VOLUME) && (!ray.GetInteriors().empty()) && (ray.IsHollowRay() == true))
+    if(!photonPass && qualityFlags.media && (!ray.GetInteriors().empty()) && (ray.IsHollowRay() == true))
     {
         media.ComputeMedia(ray.GetInteriors(), ray, isect, tmpCol.colour(), tmpCol.transm());
     }
@@ -784,7 +784,7 @@ void Trace::ComputeLightedTexture(TransColour& resultcolour, const TEXTURE *text
         // Get perturbed surface normal.
         layNormal = rawnormal;
 
-        if((qualityFlags & Q_NORMAL) && (layer->Tnormal != NULL))
+        if(qualityFlags.normals && (layer->Tnormal != NULL))
         {
             for(vector<const TEXTURE *>::iterator i(warps.begin()); i != warps.end(); i++)
                 Warp_Normal(layNormal, layNormal, *i, Test_Flag(*i, DONT_SCALE_BUMPS_FLAG));
@@ -818,7 +818,7 @@ void Trace::ComputeLightedTexture(TransColour& resultcolour, const TEXTURE *text
         // see if we could eliminate passing a zillion parameters for no
         // good reason. [CY 1/95]
 
-        if(qualityFlags & Q_FULL_AMBIENT)
+        if(qualityFlags.ambientOnly)
         {
             // Only use top layer and kill transparency if low quality.
             resultcolour = layCol;
@@ -869,7 +869,7 @@ void Trace::ComputeLightedTexture(TransColour& resultcolour, const TEXTURE *text
             // now compute the BRDF or BSSRDF contribution
             tmpCol.Clear();
 
-            if(sceneData->useSubsurface && layer->Finish->UseSubsurface && (qualityFlags & Q_SUBSURFACE))
+            if(sceneData->useSubsurface && layer->Finish->UseSubsurface && qualityFlags.subsurface)
             {
                 // Add diffuse & single scattering contribution.
                 ComputeSubsurfaceScattering(layer->Finish, layCol.colour(), isect, ray, layNormal, tmpCol, att);
@@ -984,7 +984,7 @@ void Trace::ComputeLightedTexture(TransColour& resultcolour, const TEXTURE *text
     // filtering it by filCol.
     tir_occured = false;
 
-    if(((interior = isect.Object->interior) != NULL) && (trans > ray.GetTicket().adcBailout) && (qualityFlags & Q_REFRACT))
+    if(((interior = isect.Object->interior) != NULL) && (trans > ray.GetTicket().adcBailout) && qualityFlags.refractions)
     {
         // [CLi] changed filCol to RGB, as filter and transmit were always pinned to 1.0 and 0.0, respectively anyway
         // TODO CLARIFY - is this working properly if some filCol component is negative? (what would be the right thing then?)
@@ -1051,7 +1051,7 @@ void Trace::ComputeLightedTexture(TransColour& resultcolour, const TEXTURE *text
     //
     // If total internal reflection occured all reflections using
     // TopNormal are skipped.
-    if(qualityFlags & Q_REFLECT)
+    if(qualityFlags.reflections)
     {
         layer = texture;
         for(i = 0; i < layer_number; i++)
@@ -1113,7 +1113,7 @@ void Trace::ComputeShadowTexture(TransColour& filtercolour, const TEXTURE *textu
         {
             layer_Normal = rawnormal;
 
-            if((qualityFlags & Q_NORMAL) && (layer->Tnormal != NULL))
+            if(qualityFlags.normals && (layer->Tnormal != NULL))
             {
                 for(vector<const TEXTURE *>::iterator i(warps.begin()); i != warps.end(); i++)
                     Warp_Normal(layer_Normal, layer_Normal, *i, Test_Flag(*i, DONT_SCALE_BUMPS_FLAG));
@@ -1565,7 +1565,7 @@ void Trace::ComputeOneDiffuseLight(const LightSource &lightsource, const Vector3
 
     // If light source was not blocked by any intervening object, then
     // calculate it's contribution to the object's overall illumination.
-    if ((qualityFlags & Q_SHADOW) && ((lightsource.Projected_Through_Object != NULL) || (lightsource.Light_Type != FILL_LIGHT_SOURCE)))
+    if (qualityFlags.shadows && ((lightsource.Projected_Through_Object != NULL) || (lightsource.Light_Type != FILL_LIGHT_SOURCE)))
     {
         if (lightColorCacheIndex != -1 && light_index != -1)
         {
@@ -1586,7 +1586,7 @@ void Trace::ComputeOneDiffuseLight(const LightSource &lightsource, const Vector3
     if(!lightcolour.IsNearZero(EPSILON))
     {
         if(lightsource.Area_Light && lightsource.Use_Full_Area_Lighting &&
-            (qualityFlags & Q_AREA_LIGHT)) // JN2007: Full area lighting
+            qualityFlags.areaLights) // JN2007: Full area lighting
         {
             ComputeFullAreaDiffuseLight(lightsource, reye, finish, ipoint, eye,
                 layer_normal, layer_pigment_colour, colour, attenuation,
@@ -1773,7 +1773,7 @@ void Trace::ComputeOneLightRay(const LightSource &lightsource, double& lightsour
     lightcolour = lightsource.colour;
 
     // Attenuate light source color.
-    if (lightsource.Area_Light && lightsource.Use_Full_Area_Lighting && (qualityFlags & Q_AREA_LIGHT) && !forceAttenuate)
+    if (lightsource.Area_Light && lightsource.Use_Full_Area_Lighting && qualityFlags.areaLights && !forceAttenuate)
         // for full area lighting we apply distance- and angle-based attenuation to each "lightlet" individually later
         attenuation = 1.0;
     else
@@ -1809,7 +1809,7 @@ void Trace::TraceShadowRay(const LightSource &lightsource, double depth, Ray& li
     newray.SetFlags(Ray::OtherRay, true, false);
 
     // Get shadows from current light source.
-    if((lightsource.Area_Light) && (qualityFlags & Q_AREA_LIGHT))
+    if(lightsource.Area_Light && qualityFlags.areaLights)
         TraceAreaLightShadowRay(lightsource, newdepth, newray, point, colour);
     else
         TracePointLightShadowRay(lightsource, newdepth, newray, colour);
@@ -2206,7 +2206,7 @@ void Trace::ComputeShadowColour(const LightSource &lightsource, Intersection& is
 
     ipoint = isect.IPoint;
 
-    if(!(qualityFlags & Q_SHADOW))
+    if(!qualityFlags.shadows)
         // no shadow
         return;
 
@@ -2317,7 +2317,7 @@ void Trace::ComputeShadowColour(const LightSource &lightsource, Intersection& is
     // TODO - For photon rays we're still potentially doing double work on media.
     // TODO - For shadow rays we're still potentially doing double work on distance-based attenuation.
     // Calculate participating media effects.
-    if((qualityFlags & Q_VOLUME) && (!lightsourceray.GetInteriors().empty()) && (lightsourceray.IsHollowRay() == true))
+    if(qualityFlags.media && (!lightsourceray.GetInteriors().empty()) && (lightsourceray.IsHollowRay() == true))
     {
         media.ComputeMedia(lightsourceray.GetInteriors(), lightsourceray, isect, temp_Colour.colour(), temp_Colour.transm());
     }
@@ -2912,7 +2912,7 @@ void Trace::ComputeShadowMedia(Ray& light_source_ray, Intersection& isect, RGBCo
         return;
 
     // Calculate participating media effects.
-    if(media_attenuation_and_interaction && (qualityFlags & Q_VOLUME) && ((light_source_ray.IsHollowRay() == true) || (isect.Object != NULL && isect.Object->interior != NULL)))
+    if(media_attenuation_and_interaction && qualityFlags.media && ((light_source_ray.IsHollowRay() == true) || (isect.Object != NULL && isect.Object->interior != NULL)))
     {
         // we're using general-purpose media and fog handling code, which insists on computing a transmissive component (for alpha channel)
         ColourChannel tmpTransm = 0.0;
@@ -3043,7 +3043,7 @@ bool Trace::TestShadow(const LightSource &lightsource, double& depth, Ray& light
     }
 
     // Test for shadows.
-    if((qualityFlags & Q_SHADOW) && ((lightsource.Projected_Through_Object != NULL) || (lightsource.Light_Type != FILL_LIGHT_SOURCE)))
+    if(qualityFlags.shadows && ((lightsource.Projected_Through_Object != NULL) || (lightsource.Light_Type != FILL_LIGHT_SOURCE)))
     {
         TraceShadowRay(lightsource, depth, light_source_ray, p, colour);
 
@@ -3261,7 +3261,7 @@ void Trace::ComputeOneSingleScatteringContribution(const LightSource& lightsourc
 
     // If light source was not blocked by any intervening object, then
     // calculate it's contribution to the object's overall illumination.
-    if ((qualityFlags & Q_SHADOW) && ((lightsource.Projected_Through_Object != NULL) || (lightsource.Light_Type != FILL_LIGHT_SOURCE)))
+    if (qualityFlags.shadows && ((lightsource.Projected_Through_Object != NULL) || (lightsource.Light_Type != FILL_LIGHT_SOURCE)))
     {
         // [CLi] Not using lightColorCache because it's unsuited for BSSRDF
         TraceShadowRay(lightsource, lightsourcedepth, lightsourceray, xi.IPoint, lightcolour);
@@ -3478,7 +3478,7 @@ void Trace::ComputeDiffuseContribution1(const LightSource& lightsource, const In
 
     // If light source was not blocked by any intervening object, then
     // calculate it's contribution to the object's overall illumination.
-    if ((qualityFlags & Q_SHADOW) && ((lightsource.Projected_Through_Object != NULL) || (lightsource.Light_Type != FILL_LIGHT_SOURCE)))
+    if (qualityFlags.shadows && ((lightsource.Projected_Through_Object != NULL) || (lightsource.Light_Type != FILL_LIGHT_SOURCE)))
     {
         // [CLi] Not using lightColorCache because it's unsuited for BSSRDF
         TraceShadowRay(lightsource, lightsourcedepth, lightsourceray, in.IPoint, lightcolour);

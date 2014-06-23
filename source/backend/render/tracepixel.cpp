@@ -193,7 +193,7 @@ bool ContainingInteriorsPointObjectCondition::operator()(const Vector3d& point, 
 }
 
 
-TracePixel::TracePixel(ViewData *vd, TraceThreadData *td, unsigned int mtl, DBL adcb, unsigned int qf,
+TracePixel::TracePixel(ViewData *vd, TraceThreadData *td, unsigned int mtl, DBL adcb, const QualityFlags& qf,
                        CooperateFunctor& cf, MediaFunctor& mf, RadiosityFunctor& af, bool pt) :
                        Trace(vd->GetSceneData(), td, qf, cf, mf, af),
                        sceneData(vd->GetSceneData()),
