@@ -146,10 +146,19 @@ class GenericRGBColour
         template<int BIAS, typename T2>
         inline explicit GenericRGBColour(const GenericRGBEColour<BIAS,T2>& col)
         {
-            double exponent = ldexp(1.0,col.mData[GenericRGBEColour<BIAS>::EXP]-(int)(BIAS+8));
-            mColour[RED]   = (col.mData[GenericRGBEColour<BIAS>::RED]   + 0.5) * exponent;
-            mColour[GREEN] = (col.mData[GenericRGBEColour<BIAS>::GREEN] + 0.5) * exponent;
-            mColour[BLUE]  = (col.mData[GenericRGBEColour<BIAS>::BLUE]  + 0.5) * exponent;
+            if (col.mData[GenericRGBEColour<BIAS,T2>::EXP] > std::numeric_limits<T2>::min())
+            {
+                double expFactor = ldexp(1.0,(int)col.mData[GenericRGBEColour<BIAS,T2>::EXP]-(int)(BIAS+8));
+                mColour[RED]   = (col.mData[GenericRGBEColour<BIAS,T2>::RED])   * expFactor;
+                mColour[GREEN] = (col.mData[GenericRGBEColour<BIAS,T2>::GREEN]) * expFactor;
+                mColour[BLUE]  = (col.mData[GenericRGBEColour<BIAS,T2>::BLUE])  * expFactor;
+            }
+            else
+            {
+                mColour[RED]   = 0.0;
+                mColour[GREEN] = 0.0;
+                mColour[BLUE]  = 0.0;
+            }
         }
 /*
         inline explicit GenericRGBColour(const GenericColour<T>& col)
@@ -2107,7 +2116,8 @@ class GenericRGBEColour
             }
             else
             {
-                mData[RED] = mData[GREEN] = mData[BLUE] = mData[EXP] = 0;
+                mData[RED] = mData[GREEN] = mData[BLUE] = 0;
+                mData[EXP] = std::numeric_limits<T>::min();
             }
         }
 
@@ -2116,13 +2126,14 @@ class GenericRGBEColour
             double scaleFactor;
             if (ComputeExponent(col, mData[EXP], scaleFactor))
             {
-                mData[RED]   = clipToType<T>(floor(col.red()   * scaleFactor));
-                mData[GREEN] = clipToType<T>(floor(col.green() * scaleFactor));
-                mData[BLUE]  = clipToType<T>(floor(col.blue()  * scaleFactor));
+                mData[RED]   = clipToType<T>(floor(col.red()   * scaleFactor + 0.5));
+                mData[GREEN] = clipToType<T>(floor(col.green() * scaleFactor + 0.5));
+                mData[BLUE]  = clipToType<T>(floor(col.blue()  * scaleFactor + 0.5));
             }
             else
             {
-                mData[RED] = mData[GREEN] = mData[BLUE] = mData[EXP] = 0;
+                mData[RED] = mData[GREEN] = mData[BLUE] = 0;
+                mData[EXP] = std::numeric_limits<T>::min();
             }
         }
 
@@ -2131,13 +2142,14 @@ class GenericRGBEColour
             double scaleFactor;
             if (ComputeExponent(col, mData[EXP], scaleFactor))
             {
-                mData[RED]   = clip<T>(floor(col.red()   * scaleFactor + dither.red()));
-                mData[GREEN] = clip<T>(floor(col.green() * scaleFactor + dither.green()));
-                mData[BLUE]  = clip<T>(floor(col.blue()  * scaleFactor + dither.blue()));
+                mData[RED]   = clip<T>(floor(col.red()   * scaleFactor + 0.5 + dither.red()));
+                mData[GREEN] = clip<T>(floor(col.green() * scaleFactor + 0.5 + dither.green()));
+                mData[BLUE]  = clip<T>(floor(col.blue()  * scaleFactor + 0.5 + dither.blue()));
             }
             else
             {
-                mData[RED] = mData[GREEN] = mData[BLUE] = mData[EXP] = 0;
+                mData[RED] = mData[GREEN] = mData[BLUE] = 0;
+                mData[EXP] = std::numeric_limits<T>::min();
             }
         }
 
