@@ -37,11 +37,15 @@
 #include "backend/frame.h"
 #include "backend/colour/spectral.h"
 
+#include "base/colour.h"
+
 // this must be the last file included
 #include "base/povdebug.h"
 
 namespace pov
 {
+
+#if (NUM_COLOUR_CHANNELS == 3)
 
 // Table of RGB colors by wavelength
 // (integrated over wavelength)
@@ -369,12 +373,14 @@ static RGBColour SpectralHueIntegral[SPECTRAL_HUE_TABLE_SIZE] = {
 };
 #endif
 
-RGBColour SpectralBand::GetHueIntegral(double wavelength)
+MathColour SpectralBand::GetHueIntegral(double wavelength)
 {
     double tableOffset = clip((wavelength-SPECTRAL_HUE_TABLE_BASE)/SPECTRAL_HUE_TABLE_STEP, 0.0, SPECTRAL_HUE_TABLE_SIZE-1.0);
     int tableIndex = min((int)tableOffset, SPECTRAL_HUE_TABLE_SIZE-2);
     tableOffset -= tableIndex;
-    return (1.0-tableOffset) * SpectralHueIntegral[tableIndex] + tableOffset * SpectralHueIntegral[tableIndex+1];
+    return ToMathColour((1.0-tableOffset) * SpectralHueIntegral[tableIndex] + tableOffset * SpectralHueIntegral[tableIndex+1]);
 }
+
+#endif
 
 }

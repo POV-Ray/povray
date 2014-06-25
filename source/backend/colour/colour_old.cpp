@@ -97,9 +97,9 @@ namespace pov
 *
 ******************************************************************************/
 
-TransColour *Create_Colour ()
+RGBFTColour *Create_Colour ()
 {
-    return new TransColour();
+    return new RGBFTColour();
 }
 
 
@@ -128,10 +128,10 @@ TransColour *Create_Colour ()
 *
 ******************************************************************************/
 
-TransColour *Copy_Colour (const TransColour* Old)
+RGBFTColour *Copy_Colour (const RGBFTColour* Old)
 {
     if (Old != NULL)
-        return new TransColour(*Old);
+        return new RGBFTColour(*Old);
     else
         return NULL;
 }

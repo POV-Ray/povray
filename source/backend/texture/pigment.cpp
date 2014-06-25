@@ -270,8 +270,12 @@ void Post_Pigment(PIGMENT *Pigment, bool* pHasFilter)
 
     switch (Pigment->Type)
     {
-        case PLAIN_PATTERN:
         case NO_PATTERN:
+
+            assert(false); // should have been forced to PLAIN_PATTERN by now
+            break;
+
+        case PLAIN_PATTERN:
         case BITMAP_PATTERN:
 
             break;
@@ -302,8 +306,7 @@ void Post_Pigment(PIGMENT *Pigment, bool* pHasFilter)
 
     hasFilter = false;
 
-    if ((fabs(Pigment->colour.filter()) > EPSILON) ||
-        (fabs(Pigment->colour.transm()) > EPSILON))
+    if (!Pigment->colour.TransmittedColour().IsNearZero(EPSILON))
     {
         hasFilter = true;
     }
@@ -335,7 +338,7 @@ void ColourBlendMap::Post(bool& rHasFilter)
 {
     for(Vector::const_iterator i = Blend_Map_Entries.begin(); i != Blend_Map_Entries.end(); i++)
     {
-        if ((fabs(i->Vals.filter())>EPSILON) || (fabs(i->Vals.transm())>EPSILON))
+        if (!i->Vals.TransmittedColour().IsNearZero(EPSILON))
         {
             rHasFilter = true;
             break;
@@ -409,6 +412,7 @@ bool Compute_Pigment (TransColour& colour, const PIGMENT *Pigment, const Vector3
         {
             case NO_PATTERN:
 
+                assert(false); // should have been forced to PLAIN_PATTERN in Post_Pigment
                 colour.Clear();
 
                 break;
@@ -575,7 +579,7 @@ static void Do_Average_Pigments (TransColour& colour, const PIGMENT *Pigment, co
     Pigment->Blend_Map->ComputeAverage(colour, EPoint, Intersect, ray, Thread);
 }
 
-void Evaluate_Density_Pigment(vector<PIGMENT*>& Density, const Vector3d& p, RGBColour& c, TraceThreadData *ttd)
+void Evaluate_Density_Pigment(vector<PIGMENT*>& Density, const Vector3d& p, MathColour& c, TraceThreadData *ttd)
 {
     TransColour lc;
 

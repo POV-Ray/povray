@@ -193,7 +193,7 @@ inline void Destroy_Vector_4D(VECTOR_4D *x)
         POV_FREE(x);
 }
 
-inline void Destroy_Colour(TransColour *x)
+inline void Destroy_Colour(RGBFTColour *x)
 {
     if(x != NULL)
         delete x;
@@ -1077,10 +1077,10 @@ class Media
         DBL Jitter;
         DBL Eccentricity;
         DBL sc_ext;
-        RGBColour Absorption;
-        RGBColour Emission;
-        RGBColour Extinction;
-        RGBColour Scattering;
+        MathColour Absorption;
+        MathColour Emission;
+        MathColour Extinction;
+        MathColour Scattering;
 
         DBL Ratio;
         DBL Confidence;
@@ -1112,7 +1112,7 @@ class Interior
         SNGL IOR, Dispersion;
         SNGL Caustics, Old_Refract;
         SNGL Fade_Distance, Fade_Power;
-        RGBColour Fade_Colour;
+        MathColour Fade_Colour;
         vector<Media> media;
         shared_ptr<SubsurfaceInterior> subsurface;
 
@@ -1270,9 +1270,9 @@ struct Finish_Struct
     SNGL Irid, Irid_Film_Thickness, Irid_Turb;
     SNGL Temp_Caustics, Temp_IOR, Temp_Dispersion, Temp_Refract, Reflect_Exp;
     SNGL Crand, Metallic;
-    RGBColour Ambient, Emission, Reflection_Max, Reflection_Min;
-    RGBColour SubsurfaceTranslucency, SubsurfaceAnisotropy;
-    //RGBColour SigmaPrimeS, SigmaA;
+    MathColour Ambient, Emission, Reflection_Max, Reflection_Min;
+    MathColour SubsurfaceTranslucency, SubsurfaceAnisotropy;
+    //MathColour SigmaPrimeS, SigmaA;
     SNGL Reflection_Falloff;  // Added by MBP 8/27/98
     int Reflection_Type;  // Added by MBP 9/5/98
     SNGL Reflect_Metallic; // MBP

@@ -3352,7 +3352,7 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
 ***********************************************************************/
                 CASE (AMBIENT_TOKEN)
                     Warn_State(Token.Token_Id, FINISH_TOKEN);
-                    Finish->Ambient = RGBColour(Parse_Float ());
+                    Finish->Ambient = MathColour(Parse_Float ());
                 END_CASE
 
                 CASE (BRILLIANCE_TOKEN)
@@ -3367,7 +3367,7 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
 
                 CASE (REFLECTION_TOKEN)
                     Warn_State(Token.Token_Id, FINISH_TOKEN);
-                    Finish->Reflection_Max = RGBColour(Parse_Float ());
+                    Finish->Reflection_Max = MathColour(Parse_Float ());
                     Finish->Reflection_Min = Finish->Reflection_Max;
                     Finish->Reflection_Falloff = 1;
                 END_CASE

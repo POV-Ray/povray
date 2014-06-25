@@ -94,21 +94,22 @@ SubsurfaceInterior::PrecomputedReducedAlbedo::PrecomputedReducedAlbedo(float ior
     reducedAlbedo[0] = 0.0;
 }
 
-double SubsurfaceInterior::PrecomputedReducedAlbedo::operator()(double diffuseReflectance) const
+PreciseColourChannel SubsurfaceInterior::PrecomputedReducedAlbedo::operator()(PreciseColourChannel diffuseReflectance) const
 {
-    double Rd = clip(diffuseReflectance, 0.0, 1.0);
-    double i = diffuseReflectance * ReducedAlbedoSamples;
+    PreciseColourChannel Rd = clip(diffuseReflectance, 0.0, 1.0);
+    PreciseColourChannel i = diffuseReflectance * ReducedAlbedoSamples;
     int i0 = floor(i);
     int i1 = ceil(i);
-    double p = (i-i0);
+    PreciseColourChannel p = (i-i0);
     return (1-p)*reducedAlbedo[i0] + p*reducedAlbedo[i1];
 }
 
-PreciseRGBColour SubsurfaceInterior::GetReducedAlbedo(const RGBColour& diffuseReflectance) const
+PreciseMathColour SubsurfaceInterior::GetReducedAlbedo(const MathColour& diffuseReflectance) const
 {
-    return PreciseRGBColour(((const PrecomputedReducedAlbedo&)precomputedReducedAlbedo)(diffuseReflectance.red()),
-                            ((const PrecomputedReducedAlbedo&)precomputedReducedAlbedo)(diffuseReflectance.green()),
-                            ((const PrecomputedReducedAlbedo&)precomputedReducedAlbedo)(diffuseReflectance.blue()));
+    PreciseMathColour result;
+    for (int i = 0; i < MathColour::channels; i ++)
+        result[i] = (precomputedReducedAlbedo.get())(diffuseReflectance[i]);
+    return result;
 }
 
 } // end of namespace

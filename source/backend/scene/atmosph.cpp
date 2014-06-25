@@ -366,7 +366,7 @@ SKYSPHERE *Create_Skysphere()
 
     New = new SKYSPHERE;
 
-    New->Emission = RGBColour(1.0);
+    New->Emission = MathColour(1.0);
 
     New->Trans = Create_Transform();
 

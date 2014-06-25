@@ -114,9 +114,9 @@ class SceneData
         /// background color - TODO - allow pattern here (useful for background image maps) [trf]
         TransColour backgroundColour; // may have a filter/transmit component (but filter is ignored)
         /// ambient light in scene
-        RGBColour ambientLight;
+        MathColour ambientLight;
         /// TODO - what is this again? [trf]
-        RGBColour iridWavelengths;
+        MathColour iridWavelengths;
         /// fog in scene
         Fog_Struct *fog;
         /// rainbow in scene

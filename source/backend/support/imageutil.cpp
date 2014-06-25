@@ -150,14 +150,14 @@ bool image_map(const Vector3d& EPoint, const PIGMENT *Pigment, TransColour& colo
 
     if(map_pos(EPoint, Pigment->pattern.get(), &xcoor, &ycoor))
     {
-        colour = TransColour(RGBFTColour(1.0, 1.0, 1.0, 0.0, 1.0));
+        colour = ToTransColour(RGBFTColour(1.0, 1.0, 1.0, 0.0, 1.0));
         return false;
     }
     else
     {
         RGBFTColour rgbft;
         image_colour_at(dynamic_cast<ImagePattern*>(Pigment->pattern.get())->pImage, xcoor, ycoor, rgbft, &reg_number, false);
-        colour = TransColour(rgbft);
+        colour = ToTransColour(rgbft);
         return true;
     }
 }

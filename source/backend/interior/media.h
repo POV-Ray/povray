@@ -59,9 +59,9 @@ class MediaFunction : public Trace::MediaFunctor
     public:
         MediaFunction(TraceThreadData *td, Trace *t, PhotonGatherer *pg);
 
-        virtual void ComputeMedia(vector<Media>& mediasource, const Ray& ray, Intersection& isect, RGBColour& colour, ColourChannel& transm);
-        virtual void ComputeMedia(const RayInteriorVector& mediasource, const Ray& ray, Intersection& isect, RGBColour& colour, ColourChannel& transm);
-        virtual void ComputeMedia(MediaVector& medias, const Ray& ray, Intersection& isect, RGBColour& colour, ColourChannel& transm);
+        virtual void ComputeMedia(vector<Media>& mediasource, const Ray& ray, Intersection& isect, MathColour& colour, ColourChannel& transm);
+        virtual void ComputeMedia(const RayInteriorVector& mediasource, const Ray& ray, Intersection& isect, MathColour& colour, ColourChannel& transm);
+        virtual void ComputeMedia(MediaVector& medias, const Ray& ray, Intersection& isect, MathColour& colour, ColourChannel& transm);
     protected:
         /// pseudo-random number sequence
         RandomDoubleSequence randomNumbers;
@@ -79,19 +79,19 @@ class MediaFunction : public Trace::MediaFunctor
                                          bool all_constant_and_light_ray);
         void ComputeMediaAdaptiveSampling(MediaVector& medias, LightSourceEntryVector& lights, MediaIntervalVector& mediaintervals,
                                           const Ray& ray, const Media *IMedia, DBL aa_threshold, int minsamples, bool ignore_photons, bool use_scattering);
-        void ComputeMediaColour(MediaIntervalVector& mediaintervals, RGBColour& colour, ColourChannel& transm);
+        void ComputeMediaColour(MediaIntervalVector& mediaintervals, MathColour& colour, ColourChannel& transm);
         void ComputeMediaSampleInterval(LitIntervalVector& litintervals, MediaIntervalVector& mediaintervals, const Media *media);
         void ComputeMediaLightInterval(LightSourceEntryVector& lights, LitIntervalVector& litintervals, const Ray& ray, const Intersection& isect);
         void ComputeOneMediaLightInterval(LightSource *light, LightSourceEntryVector&lights, const Ray& ray, const Intersection& isect);
         bool ComputeSpotLightInterval(const Ray &ray, const LightSource *Light, DBL *d1, DBL *d2);
         bool ComputeCylinderLightInterval(const Ray &ray, const LightSource *Light, DBL *d1, DBL *d2);
-        void ComputeOneMediaSample(MediaVector& medias, LightSourceEntryVector& lights, MediaInterval& mediainterval, const Ray &ray, DBL d0, RGBColour& SampCol,
-                                   RGBColour& SampOptDepth, int sample_method, bool ignore_photons, bool use_scattering, bool photonPass);
+        void ComputeOneMediaSample(MediaVector& medias, LightSourceEntryVector& lights, MediaInterval& mediainterval, const Ray &ray, DBL d0, MathColour& SampCol,
+                                   MathColour& SampOptDepth, int sample_method, bool ignore_photons, bool use_scattering, bool photonPass);
         void ComputeOneMediaSampleRecursive(MediaVector& medias, LightSourceEntryVector& lights, MediaInterval& mediainterval, const Ray& ray,
-                                            DBL d1, DBL d3, RGBColour& Result, const RGBColour& C1, const RGBColour& C3, RGBColour& ODResult, const RGBColour& od1, const RGBColour& od3,
+                                            DBL d1, DBL d3, MathColour& Result, const MathColour& C1, const MathColour& C3, MathColour& ODResult, const MathColour& od1, const MathColour& od3,
                                             int depth, DBL Jitter, DBL aa_threshold, bool ignore_photons, bool use_scattering, bool photonPass);
-        void ComputeMediaPhotons(MediaVector& medias, RGBColour& Te, const RGBColour& Sc, const BasicRay& ray, const Vector3d& H);
-        void ComputeMediaScatteringAttenuation(MediaVector& medias, RGBColour& OutputColor, const RGBColour& Sc, const RGBColour& Light_Colour, const BasicRay &ray, const BasicRay &Light_Ray);
+        void ComputeMediaPhotons(MediaVector& medias, MathColour& Te, const MathColour& Sc, const BasicRay& ray, const Vector3d& H);
+        void ComputeMediaScatteringAttenuation(MediaVector& medias, MathColour& OutputColor, const MathColour& Sc, const MathColour& Light_Colour, const BasicRay &ray, const BasicRay &Light_Ray);
 };
 
 }

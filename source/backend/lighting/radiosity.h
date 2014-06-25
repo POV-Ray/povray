@@ -177,7 +177,7 @@ class RadiosityCache
         long ra_reuse_count;
         long ra_gather_count;
 
-        RGBColour Gather_Total;
+        MathColour Gather_Total;
         long Gather_Total_Count;
 
         #ifdef RADSTATS
@@ -196,10 +196,10 @@ class RadiosityCache
         bool Load(const Path& inputFile);
         void InitAutosave(const Path& outputFile, bool append);
 
-        DBL FindReusableBlock(RenderStatistics& stats, DBL errorbound, const Vector3d& ipoint, const Vector3d& snormal, RGBColour& illuminance, int recursionDepth, int pretraceStep, int tileId);
+        DBL FindReusableBlock(RenderStatistics& stats, DBL errorbound, const Vector3d& ipoint, const Vector3d& snormal, MathColour& illuminance, int recursionDepth, int pretraceStep, int tileId);
         BlockPool* AcquireBlockPool();
         void AddBlock(BlockPool* pool, RenderStatistics* stats, const Vector3d& Point, const Vector3d& S_Normal, const Vector3d& To_Nearest_Surface,
-                      const RGBColour& dx, const RGBColour& dy, const RGBColour& dz, const RGBColour& Illuminance,
+                      const MathColour& dx, const MathColour& dy, const MathColour& dz, const MathColour& Illuminance,
                       DBL Harmonic_Mean_Distance, DBL Nearest_Distance, DBL Quality, int Bounce_Depth, int pretraceStep, int tileId);
         void ReleaseBlockPool(BlockPool* pool);
 
@@ -260,7 +260,7 @@ class RadiosityFunction : public Trace::RadiosityFunctor
         //      layer_normal    - texture-pertubed normal
         //      ambient_colour  - (output) the ambient color at this point
         //      weight          - the base "weight" of the traced ray (used to compare againgst ADC bailout)
-        virtual void ComputeAmbient(const Vector3d& ipoint, const Vector3d& raw_normal, const Vector3d& layer_normal, RGBColour& ambient_colour, DBL weight, TraceTicket& ticket);
+        virtual void ComputeAmbient(const Vector3d& ipoint, const Vector3d& raw_normal, const Vector3d& layer_normal, MathColour& ambient_colour, DBL weight, TraceTicket& ticket);
 
         // checks whether the specified recursion depth is still within the configured limits
         virtual bool CheckRadiosityTraceLevel(const TraceTicket& ticket);
@@ -333,7 +333,7 @@ class RadiosityFunction : public Trace::RadiosityFunctor
         float topLevelReuse;
         int tileId;
 
-        double GatherLight(const Vector3d& IPoint, const Vector3d& Raw_Normal, const Vector3d& LayNormal, RGBColour& Illuminance, TraceTicket& ticket);
+        double GatherLight(const Vector3d& IPoint, const Vector3d& Raw_Normal, const Vector3d& LayNormal, MathColour& Illuminance, TraceTicket& ticket);
 };
 
 } // end of namespace

@@ -106,17 +106,17 @@ const int PRETRACE_STEP_LOADED = SCHAR_MAX; // dummy value to use instead of pre
 // structure used to gather weighted average during tree traversal
 struct WT_AVG
 {
-    RGBColour Weights_Times_Illuminances; // Aggregates during traversal
-    DBL Weights;                          // Aggregates during traversal
-    int Weights_Count;                    // Count of points used, aggregates during trav
-    int Good_Count;                       // Count of points used, aggregates during trav
-    Vector3d P, N;                        // Point and Normal:  input to traverse
-    DBL Current_Error_Bound;              // see Radiosity_Error_Bound
-    int Pass;                             // Current pass (FINAL_TRACE for final render)
-    int TileId;                           // Current tile
+    MathColour Weights_Times_Illuminances;  // Aggregates during traversal
+    DBL Weights;                            // Aggregates during traversal
+    int Weights_Count;                      // Count of points used, aggregates during trav
+    int Good_Count;                         // Count of points used, aggregates during trav
+    Vector3d P, N;                          // Point and Normal:  input to traverse
+    DBL Current_Error_Bound;                // see Radiosity_Error_Bound
+    int Pass;                               // Current pass (FINAL_TRACE for final render)
+    int TileId;                             // Current tile
 
     /* [CLi] obsolete
-    RGBColour Weight_Times_Illuminance[MAX_NEAREST_COUNT];
+    MathColour Weight_Times_Illuminance[MAX_NEAREST_COUNT];
     DBL Weight[MAX_NEAREST_COUNT];
     DBL Distance[MAX_NEAREST_COUNT];
     */
@@ -372,7 +372,7 @@ void RadiosityFunction::AfterTile()
     cacheBlockPool = NULL;
 }
 
-void RadiosityFunction::ComputeAmbient(const Vector3d& ipoint, const Vector3d& raw_normal, const Vector3d& layer_normal, RGBColour& ambient_colour, DBL weight, TraceTicket& ticket)
+void RadiosityFunction::ComputeAmbient(const Vector3d& ipoint, const Vector3d& raw_normal, const Vector3d& layer_normal, MathColour& ambient_colour, DBL weight, TraceTicket& ticket)
 {
     DBL temp_error_bound = errorBound;
     const RecursionParameters& param = recursionParameters[ticket.radiosityRecursionDepth];
@@ -417,7 +417,7 @@ void RadiosityFunction::ComputeAmbient(const Vector3d& ipoint, const Vector3d& r
     }
     else
     {
-        RGBColour tmpColour;
+        MathColour tmpColour;
         double quality = GatherLight(ipoint, raw_normal, effectiveNormal, tmpColour, ticket);
 
         // If we already found samples nearby (and we just decided to take more), make use of them.
@@ -495,14 +495,14 @@ bool RadiosityFunction::CheckRadiosityTraceLevel(const TraceTicket& ticket)
 *
 ******************************************************************************/
 
-double RadiosityFunction::GatherLight(const Vector3d& ipoint, const Vector3d& raw_normal, const Vector3d& layer_normal, RGBColour& illuminance, TraceTicket& ticket)
+double RadiosityFunction::GatherLight(const Vector3d& ipoint, const Vector3d& raw_normal, const Vector3d& layer_normal, MathColour& illuminance, TraceTicket& ticket)
 {
     unsigned int cur_sample_count;
 
     Vector3d direction, up, min_dist_vec;
     int save_Max_Trace_Level;
-    RGBColour dxs, dys, dzs;
-    RGBColour colour_sums, temp_colour;
+    MathColour dxs, dys, dzs;
+    MathColour colour_sums, temp_colour;
     DBL inverse_distance_sum, mean_dist,
         smallest_dist,
         sum_of_inverse_dist, sum_of_dist, gradient_count;
@@ -569,9 +569,10 @@ double RadiosityFunction::GatherLight(const Vector3d& ipoint, const Vector3d& ra
         ticket.radiosityImportanceQueried = (float)i / (float)(cur_sample_count-1);
         bool alphaBackground = ticket.alphaBackground;
         ticket.alphaBackground = false;
-        TransColour temp_full_colour;
-        DBL depth = trace.TraceRay(nray, temp_full_colour, weight, false); // Go down in recursion, trace the result, and come back up
-        RGBColour temp_colour = temp_full_colour.colour();
+        MathColour temp_full_colour;
+        ColourChannel dummyTransm;
+        DBL depth = trace.TraceRay(nray, temp_full_colour, dummyTransm, weight, false); // Go down in recursion, trace the result, and come back up
+        MathColour temp_colour = temp_full_colour;
         ticket.radiosityRecursionDepth--;
         ticket.alphaBackground = alphaBackground;
 
@@ -888,8 +889,8 @@ bool RadiosityCache::Load(const Path& inputFile)
         Vector3d point;
         Vector3d normal;
         Vector3d to_nearest;
-        RGBColour dx, dy, dz;
-        RGBColour illuminance;
+        MathColour dx, dy, dz;
+        MathColour illuminance;
         double harmonic_mean;
         double nearest;
         int goodreads = 0;
@@ -921,14 +922,20 @@ bool RadiosityCache::Load(const Path& inputFile)
                 }
                 case 'C':
                 {
+#if (NUM_COLOUR_CHANNELS == 3)
+                    RGBColour tempCol;
                     count = sscanf(line, "C%d %lf %lf %lf %s %f %f %f %lf %lf %s\n", // tw
                         &depth,
                         &point[X], &point[Y], &point[Z],
                         normal_string,
-                        &illuminance.red(), &illuminance.green(), &illuminance.blue(),
+                        &tempCol.red(), &tempCol.green(), &tempCol.blue(),
                         &harmonic_mean,
                         &nearest, to_nearest_string
                     );
+                    illuminance = ToMathColour(tempCol);
+#else
+                    #error TODO!
+#endif
                     if ( count == 11 )
                     {
                         depth = depth - 1; // file format still uses 1-based bounce depth counting
@@ -1152,7 +1159,7 @@ RadiosityCache::BlockPool::~BlockPool()
 
 
 void RadiosityCache::AddBlock(BlockPool* pool, RenderStatistics* stats, const Vector3d& point, const Vector3d& normal, const Vector3d& toNearestSurface,
-                              const RGBColour& dx, const RGBColour& dy, const RGBColour& dz, const RGBColour& illuminance,
+                              const MathColour& dx, const MathColour& dy, const MathColour& dz, const MathColour& illuminance,
                               DBL harmonicMeanDistance, DBL nearestDistance, DBL quality, int bounceDepth, int pretraceStep, int tileId)
 {
     ot_block_struct*    block = pool->NewBlock();
@@ -1413,7 +1420,7 @@ void RadiosityCache::InsertBlock(ot_node_struct *node, ot_block_struct *block)
 *
 ******************************************************************************/
 
-DBL RadiosityCache::FindReusableBlock(RenderStatistics& stats, DBL errorbound, const Vector3d& ipoint, const Vector3d& snormal, RGBColour& illuminance, int recursionDepth, int pretraceStep, int tileId)
+DBL RadiosityCache::FindReusableBlock(RenderStatistics& stats, DBL errorbound, const Vector3d& ipoint, const Vector3d& snormal, MathColour& illuminance, int recursionDepth, int pretraceStep, int tileId)
 {
     if(octree.root != NULL)
     {
@@ -1673,12 +1680,7 @@ bool RadiosityCache::AverageNearBlock(ot_block_struct *block, void *void_info)
 
                         // This is the block where we use the gradient to improve the prediction
 #ifdef RAD_GRADIENT
-                        RGBColour d((block->dx * delta[X]) + (block->dy * delta[Y]) + (block->dz * delta[Z]));
-#else
-                        RGBColour d(0.0f);
-#endif
-
-                        RGBColour prediction;
+                        MathColour d((block->dx * delta[X]) + (block->dy * delta[Y]) + (block->dz * delta[Z]));
 
                         // NK 6-May-2003 removed clipping - not sure why it was here in the
                         // first place, but it sure causes problems for HDR scenes, and removing
@@ -1694,7 +1696,10 @@ bool RadiosityCache::AverageNearBlock(ot_block_struct *block, void *void_info)
                         if((d.blue() + block->Illuminance.blue() < 0.0) && (block->Illuminance.blue() > 0.0))
                             d.blue() = -block->Illuminance.blue();
 
-                        prediction = block->Illuminance + d;
+                        MathColour prediction = block->Illuminance + d;
+#else
+                        MathColour prediction = block->Illuminance;
+#endif
 
 #ifdef SHOW_SAMPLE_SPOTS
                         // TODO FIXME - distance_maximum no longer exists

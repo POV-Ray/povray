@@ -3533,7 +3533,7 @@ int Parser::Parse_Read_Value(DATA_FILE *User_File,int Previous,int *NumberPtr,vo
                         *NumberPtr    = COLOUR_ID_TOKEN;
                         Test_Redefine(Previous,NumberPtr,*DataPtr);
                         *DataPtr      = reinterpret_cast<void *>(Create_Colour());
-                        *(reinterpret_cast<TransColour *>(*DataPtr)) = TransColour(RGBFTColour(Express)); /* NK fix assign_colour bug */
+                        (*reinterpret_cast<RGBFTColour *>(*DataPtr)).Set(Express, 5); /* NK fix assign_colour bug */
                         break;
                 }
 

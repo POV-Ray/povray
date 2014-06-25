@@ -1125,7 +1125,11 @@ bool ot_write_block(OT_BLOCK *bl, void *fd) // must be passed as void * for comp
         (int)((bl->S_Normal[Y]+1.)*.5*254.+.499999),
         (int)((bl->S_Normal[Z]+1.)*.5*254.+.499999),
 
-        bl->Illuminance.red(), bl->Illuminance.green(), bl->Illuminance.blue(),
+#if (NUM_COLOUR_CHANNELS == 3)
+        bl->Illuminance.Red(), bl->Illuminance.Green(), bl->Illuminance.Blue(),
+#else
+        #error TODO!
+#endif
         bl->Harmonic_Mean_Distance,
 
         bl->Nearest_Distance,
@@ -1312,13 +1316,19 @@ bool ot_read_file(OT_NODE **root, IStream *fd, const OT_READ_PARAM* param, OT_RE
                 }
                 case 'C':
                 {
+#if (NUM_COLOUR_CHANNELS == 3)
+                    RGBColour tempCol;
                     count = sscanf(line, "C%d %lf %lf %lf %s %f %f %f %f %f %s\n", // tw
-                               &tempdepth,      // since you can't scan a short
-                               &bl.Point[X], &bl.Point[Y], &bl.Point[Z],
-                               normal_string,
-                               &bl.Illuminance.red(), &bl.Illuminance.green(), &bl.Illuminance.blue(),
-                               &bl.Harmonic_Mean_Distance,
-                               &bl.Nearest_Distance, to_nearest_string );
+                                   &tempdepth,      // since you can't scan a short
+                                   &bl.Point[X], &bl.Point[Y], &bl.Point[Z],
+                                   normal_string,
+                                   &tempCol.red(), &tempCol.green(), &tempCol.blue(),
+                                   &bl.Harmonic_Mean_Distance,
+                                   &bl.Nearest_Distance, to_nearest_string );
+                    bl.Illuminance = ToMathColour(tempCol);
+#else
+                    #error TODO!
+#endif
 
                     // TODO FIXME - read Quality
 

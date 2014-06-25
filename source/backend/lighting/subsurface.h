@@ -52,7 +52,7 @@ class SubsurfaceInterior {
     public:
 
         SubsurfaceInterior(double ior);
-        PreciseRGBColour GetReducedAlbedo(const RGBColour& diffuseReflectance) const;
+        PreciseMathColour GetReducedAlbedo(const MathColour& diffuseReflectance) const;
 
     protected:
 
@@ -62,7 +62,7 @@ class SubsurfaceInterior {
         struct PrecomputedReducedAlbedo {
             float reducedAlbedo[ReducedAlbedoSamples+1];
             PrecomputedReducedAlbedo(float ior);
-            double operator()(PreciseColourChannel diffuseReflectance) const;
+            PreciseColourChannel operator()(PreciseColourChannel diffuseReflectance) const;
         };
 
         flyweight<key_value<float,PrecomputedReducedAlbedo> > precomputedReducedAlbedo;

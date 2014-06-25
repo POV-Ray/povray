@@ -352,7 +352,8 @@ LightSource::LightSource() : CompoundObject(LIGHT_OBJECT)
 {
     Set_Flag(this, NO_SHADOW_FLAG);
 
-    colour = RGBColour(1.0);
+    colour = MathColour(1.0);
+
     Direction = Vector3d(0.0, 0.0, 0.0);
     Center    = Vector3d(0.0, 0.0, 0.0);
     Points_At = Vector3d(0.0, 0.0, 1.0);

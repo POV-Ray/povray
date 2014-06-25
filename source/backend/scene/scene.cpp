@@ -70,16 +70,10 @@ SceneData::SceneData() :
 {
     atmosphereIOR = 1.0;
     atmosphereDispersion = 0.0;
-    backgroundColour = TransColour(RGBFTColour(0.0, 0.0, 0.0, 0.0, 1.0));
-    ambientLight = RGBColour(1.0);
+    backgroundColour = ToTransColour(RGBFTColour(0.0, 0.0, 0.0, 0.0, 1.0));
+    ambientLight = MathColour(1.0);
 
-    // Approximate dominant wavelengths of primary hues.
-    // Source: 3D Computer Graphics by John Vince (Addison Wesely)
-    // These are user-adjustable with the irid_wavelength keyword.
-    // Red = 700 nm  Grn = 520 nm Blu = 480 nm
-    // Divided by 1000 gives: rwl = 0.70;  gwl = 0.52;  bwl = 0.48;
-    //
-    iridWavelengths = RGBColour(0.70, 0.52, 0.48);
+    iridWavelengths = MathColour::DefaultWavelengths();
 
     languageVersion = OFFICIAL_VERSION_NUMBER;
     languageVersionSet = false;

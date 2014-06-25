@@ -1262,7 +1262,7 @@ void Parser::Parse_Num_Factor (EXPRESS Express,int *Terms)
 
         CASE (COLOUR_ID_TOKEN)
             *Terms=5;
-            RGBFTColour(*reinterpret_cast<TransColour *>(Token.Data)).Get(Express, *Terms);
+            (*reinterpret_cast<RGBFTColour *>(Token.Data)).Get(Express, *Terms);
             EXIT
         END_CASE
 
@@ -2667,14 +2667,32 @@ void Parser::Parse_Colour (TransColour& colour, bool expectFT)
 {
     RGBFTColour tempColour;
     Parse_Colour (tempColour, expectFT);
-    colour = TransColour(tempColour);
+    colour = ToTransColour(tempColour);
 }
 
 void Parser::Parse_Colour (RGBColour& colour)
 {
+    RGBFTColour tempColour;
+    Parse_Colour (tempColour, false);
+    colour = tempColour.rgb();
+}
+
+void Parser::Parse_Colour (MathColour& colour)
+{
     TransColour tempColour;
     Parse_Colour (tempColour, false);
     colour = tempColour.colour();
+}
+
+void Parser::Parse_Wavelengths (MathColour& colour)
+{
+#if (NUM_COLOUR_CHANNELS == 3)
+    RGBFTColour tempColour;
+    Parse_Colour (tempColour, false);
+    colour = ToMathColour(tempColour.rgb());
+#else
+    #error TODO!
+#endif
 }
 
 /*****************************************************************************
@@ -3310,7 +3328,7 @@ ColourBlendMapPtr Parser::Parse_Colour_Map<ColourBlendMap> ()
                                 {
                                     RGBFTColour rgbft;
                                     rgbft.Set(Express, Terms);
-                                    Temp_Ent.Vals = TransColour (rgbft);
+                                    Temp_Ent.Vals = ToTransColour (rgbft);
                                     tempList.push_back(Temp_Ent);
                                 }
                                 else

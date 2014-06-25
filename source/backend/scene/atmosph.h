@@ -85,7 +85,7 @@ struct Rainbow_Struct
 
 struct Skysphere_Struct
 {
-    RGBColour         Emission; ///< Brightness adjustment.
+    MathColour        Emission; ///< Brightness adjustment.
     vector<PIGMENT *> Pigments; ///< Pigment(s) to use.
     TRANSFORM *       Trans;    ///< Skysphere transformation.
 };

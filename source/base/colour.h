@@ -42,6 +42,8 @@
 #include "base/configbase.h"
 #include "base/types.h"
 
+#define NUM_COLOUR_CHANNELS 3
+
 namespace pov_base
 {
 
@@ -53,6 +55,9 @@ class GenericRGBFTColour;
 
 template<typename T>
 class GenericRGBTColour;
+
+template<typename T>
+class GenericColour;
 
 template<typename T>
 class GenericTransColour;
@@ -74,6 +79,9 @@ const float kBlueIntensity  = 0.114;
 
 /// Generic template class to hold and manipulate an RGB colour.
 ///
+/// @note       This colour type is provided solely for use in the front-end and image handling code. Use
+///             @ref GenericColour in the render engine instead.
+///
 /// @tparam T   Floating-point type to use for the individual colour components.
 ///
 template<typename T>
@@ -84,7 +92,11 @@ class GenericRGBColour
         template<typename T2>
         friend class GenericRGBColour;
 
-        typedef T DATA[3];
+        friend class GenericColour<T>;
+        friend class GenericRGBTColour<T>;
+        friend class GenericRGBFTColour<T>;
+
+        friend GenericRGBColour ToRGBColour(const GenericColour<T>& col);
 
         /// Default constructor.
         inline GenericRGBColour()
@@ -131,14 +143,6 @@ class GenericRGBColour
             mColour[BLUE]  = col.blue();
         }
 
-        inline explicit GenericRGBColour(const GenericTransColour<T>& col)
-        {
-            const GenericRGBColour& colour = col.colour();
-            mColour[RED]   = colour.mColour[RED];
-            mColour[GREEN] = colour.mColour[GREEN];
-            mColour[BLUE]  = colour.mColour[BLUE];
-        }
-
         template<int BIAS, typename T2>
         inline explicit GenericRGBColour(const GenericRGBEColour<BIAS,T2>& col)
         {
@@ -147,7 +151,14 @@ class GenericRGBColour
             mColour[GREEN] = (col.mData[GenericRGBEColour<BIAS>::GREEN] + 0.5) * exponent;
             mColour[BLUE]  = (col.mData[GenericRGBEColour<BIAS>::BLUE]  + 0.5) * exponent;
         }
-
+/*
+        inline explicit GenericRGBColour(const GenericColour<T>& col)
+        {
+            mColour[RED]   = col.Red();
+            mColour[GREEN] = col.Green();
+            mColour[BLUE]  = col.Blue();
+        }
+*/
         inline GenericRGBColour& operator=(const GenericRGBColour& col)
         {
             mColour[RED]   = col.mColour[RED];
@@ -208,7 +219,7 @@ class GenericRGBColour
             ///             weighted according to their perceived brightness; however, chroma is
             ///             also important and has entirely different weights per component.
             /// @remark For backward compatibility, @ref WeightMax(), @ref WeightMaxAbs(),
-            ///         @ref WeightGreyscale() and @ref WeightGreyscaleAbs() are provided.
+            ///         @ref WeightGreyscale() and @ref WeightAbsGreyscale() are provided.
 
             return (fabs(mColour[RED])   +
                     fabs(mColour[GREEN]) +
@@ -221,7 +232,7 @@ class GenericRGBColour
         /// @deprecated Calls to this function should probably be replaced by calls to @ref Weight()
         ///             for consistency of colour math.
         ///
-        inline T WeightGreyscaleAbs() const
+        inline T WeightAbsGreyscale() const
         {
             return fabs(Greyscale());
         }
@@ -232,7 +243,7 @@ class GenericRGBColour
         ///             intensity of the colour. For such cases, use @ref Greyscale() instead.
         ///
         /// @deprecated Calls to this function should probably be replaced by calls to
-        ///             @ref WeightGreyscaleAbs() or @ref Weight() for consistency of colour math.
+        ///             @ref WeightAbsGreyscale() or @ref Weight() for consistency of colour math.
         ///
         inline T WeightGreyscale() const
         {
@@ -506,7 +517,18 @@ class GenericRGBColour
             BLUE   = 2
         };
 
-        DATA mColour;
+        T mColour[3];
+
+#if (NUM_COLOUR_CHANNELS == 3)
+        inline explicit GenericRGBColour(const GenericColour<T>& col)
+        {
+            mColour[RED]   = col.mColour[0];
+            mColour[GREEN] = col.mColour[1];
+            mColour[BLUE]  = col.mColour[2];
+        }
+#else
+        #error TODO!
+#endif
 };
 
 /// @relates GenericRGBColour
@@ -582,11 +604,6 @@ inline GenericRGBColour<T> Cos(const GenericRGBColour<T>& a)
 typedef GenericRGBColour<ColourChannel>         RGBColour;          ///< Standard precision RGB colour.
 typedef GenericRGBColour<PreciseColourChannel>  PreciseRGBColour;   ///< High precision RGB colour.
 
-/*
-typedef GenericRGBColour<ColourChannel>         Colour;             ///< Standard precision colour.
-typedef GenericRGBColour<PreciseColourChannel>  PreciseColour;      ///< High precision colour.
-*/
-
 
 /// Generic template class to hold and manipulate an RGB colour plus a Filter and Transmit component.
 ///
@@ -603,6 +620,8 @@ class GenericRGBFTColour
 
         template<typename T2>
         friend class GenericRGBFTColour;
+
+        friend GenericRGBFTColour ToRGBFTColour(const GenericTransColour<T>& col);
 
         typedef DBL EXPRESS[5];
 
@@ -655,12 +674,6 @@ class GenericRGBFTColour
             mColour(expr[0], expr[1], expr[2]),
             mFilter(expr[3]),
             mTransm(expr[4])
-        {}
-
-        inline explicit GenericRGBFTColour(const GenericTransColour<T>& col) :
-            mColour(col.colour()),
-            mFilter(col.filter()),
-            mTransm(col.transm())
         {}
 
         inline GenericRGBFTColour& operator=(const GenericRGBFTColour& col)
@@ -888,6 +901,12 @@ class GenericRGBFTColour
         GenericRGBColour<T> mColour;
         T                   mFilter;
         T                   mTransm;
+
+        inline explicit GenericRGBFTColour(const GenericTransColour<T>& col) :
+            mColour(col.colour())
+        {
+            col.GetFT(mFilter, mTransm);
+        }
 };
 
 /// @relates GenericRGBFTColour
@@ -913,7 +932,7 @@ typedef GenericRGBFTColour<ColourChannel>           RGBFTColour;        ///< Sta
 typedef GenericRGBFTColour<PreciseColourChannel>    PreciseRGBFTColour; ///< High precision RGBFT colour.
 
 
-/// Generic template class to hold and manipulate an RGB colour plus an unused component and a Transmit component.
+/// Generic template class to hold and manipulate an RGB colour plus a Transmit component.
 ///
 /// @note       This colour type is provided solely for use in the front-end. Use @ref GenericTransColour in the render
 ///             engine instead.
@@ -946,7 +965,7 @@ class GenericRGBTColour
             mTransm(col.mTransm)
         {}
 
-            inline explicit GenericRGBTColour(const GenericRGBColour<T>& col, T transm) :
+        inline explicit GenericRGBTColour(const GenericRGBColour<T>& col, T transm) :
             mColour(col),
             mTransm(transm)
         {}
@@ -956,10 +975,12 @@ class GenericRGBTColour
             mTransm(transm)
         {}
 
+/*
         inline explicit GenericRGBTColour(const GenericTransColour<T>& col) :
             mColour(col.colour()),
             mTransm(col.transm())
         {}
+*/
 
         inline GenericRGBTColour& operator=(const GenericRGBTColour& col)
         {
@@ -1171,7 +1192,574 @@ typedef GenericRGBTColour<ColourChannel>        RGBTColour;         ///< Standar
 typedef GenericRGBTColour<PreciseColourChannel> PreciseRGBTColour;  ///< High precision RGBxT colour.
 
 
-/// Generic template class to hold and manipulate an RGB colour plus transparency information.
+/// Generic template class to hold and manipulate a colour.
+///
+/// @tparam T   Floating-point type to use for the individual colour channels.
+///
+template<typename T>
+class GenericColour
+{
+    public:
+
+        static const int channels = NUM_COLOUR_CHANNELS;
+
+        template<typename T2>
+        friend class GenericColour;
+
+        friend class GenericRGBColour<T>;
+        friend class GenericRGBTColour<T>;
+        friend class GenericTransColour<T>;
+
+        friend GenericColour ToMathColour(const GenericRGBColour<T>& col);
+
+        /// Default constructor.
+        inline GenericColour()
+        {
+            for (int i = 0; i < channels; i ++)
+                mColour[i] = 0.0;
+        }
+
+        /// Copy constructor.
+        inline GenericColour(const GenericColour& col)
+        {
+            for (int i = 0; i < channels; i ++)
+                mColour[i] = col.mColour[i];
+        }
+
+        template<typename T2>
+        inline explicit GenericColour(const GenericColour<T2>& col)
+        {
+            for (int i = 0; i < channels; i ++)
+                mColour[i] = col.mColour[i];
+        }
+
+        inline explicit GenericColour(T grey)
+        {
+            for (int i = 0; i < channels; i ++)
+                mColour[i] = grey;
+        }
+
+        inline explicit GenericColour(const GenericTransColour<T>& col)
+        {
+            const GenericColour& colour = col.colour();
+            for (int i = 0; i < channels; i ++)
+                mColour[i] = colour.mColour[i];
+        }
+/*
+        template<int BIAS, typename T2>
+        inline explicit GenericColour(const GenericCompactColour<BIAS,T2>& col)
+        {
+            double exponent = ldexp(1.0,col.mData[channels]-(int)(BIAS+8));
+            for (int i = 0; i < channels; i ++)
+                mColour[i] = (col.mData[i] + 0.5) * exponent;
+        }
+*/
+        inline GenericColour& operator=(const GenericColour& col)
+        {
+            for (int i = 0; i < channels; i ++)
+                mColour[i] = col.mColour[i];
+            return *this;
+        }
+
+        inline T  operator[](int idx) const { return mColour[idx]; }
+        inline T& operator[](int idx)       { return mColour[idx]; }
+
+/*
+        inline T  red()   const { return mColour[RED]; }
+        inline T& red()         { return mColour[RED]; }
+
+        inline T  green() const { return mColour[GREEN]; }
+        inline T& green()       { return mColour[GREEN]; }
+
+        inline T  blue()  const { return mColour[BLUE]; }
+        inline T& blue()        { return mColour[BLUE]; }
+*/
+
+        inline T Red() const
+        {
+#if (NUM_COLOUR_CHANNELS == 3)
+            return mColour[0];
+#else
+            T result = 0.0;
+            for (int i = 0; i < channels; i ++)
+                result += GenericColour<T>::mkR[i] * mColour[i];
+            return result;
+#endif
+        }
+
+        inline T Green() const
+        {
+#if (NUM_COLOUR_CHANNELS == 3)
+            return mColour[1];
+#else
+            T result = 0.0;
+            for (int i = 0; i < channels; i ++)
+                result += GenericColour<T>::mkG[i] * mColour[i];
+            return result;
+#endif
+        }
+
+        inline T Blue() const
+        {
+#if (NUM_COLOUR_CHANNELS == 3)
+            return mColour[2];
+#else
+            T result = 0.0;
+            for (int i = 0; i < channels; i ++)
+                result += GenericColour<T>::mkB[i] * mColour[i];
+            return result;
+#endif
+        }
+
+        /// Computes the greyscale intensity of the colour.
+        ///
+        /// @note   Do _not_ use this function if you want to compute some kind of weight; that's
+        ///         what @ref WeightGreyscale() is for.
+        ///
+        inline T Greyscale() const
+        {
+#if (NUM_COLOUR_CHANNELS == 3)
+            return kRedIntensity   * mColour[0] +
+                   kGreenIntensity * mColour[1] +
+                   kBlueIntensity  * mColour[2];
+#else
+            T result;
+            for (int i = 0; i < channels; i ++)
+                result += mkY[i] * mColour[i];
+            return result;
+#endif
+        }
+
+        /// Computes a generic measure for the weight of the colour.
+        inline T Weight() const
+        {
+            /// @remark This used to be implemented differently at different places in the code;
+            ///         variations were:
+            ///           - `max3(r,g,b)`
+            ///           - `max3(fabs(r),fabs(g),fabs(b))`
+            ///           - `fabs(greyscale)` [1]
+            ///           - `max(0.0,greyscale)`
+            /// @remark [1] A variant of this was `max(0.0,fabs(greyscale))`; note the superfluous
+            ///             `max()`.
+            /// @remark The rationale for choosing the current implementation is as follows:
+            ///           - In general, the weight should scale proportionally with the colour
+            ///             brightness. [2]
+            ///           - White should have a weight of 1.0.
+            ///           - The weight should be non-negative in any case.
+            ///           - A change in any colour component should affect the weight, whether it is
+            ///             the brightest one or not.
+            ///           - Negative colour components should increase the weight.
+            ///           - The individual colour components should have the same weight. [3]
+            /// @remark [2] It might be argued that the weight should instead scale according to a
+            ///             power law, reflecting the human visual perception of brightness;
+            ///             however, this would make the weight meaningless for colour deltas.
+            ///             In addition, chroma is also important and doesn't follow a power law.
+            /// @remark [3] It might be argued that the individual colour components should be
+            ///             weighted according to their perceived brightness; however, chroma is
+            ///             also important and has entirely different weights per component.
+            /// @remark For backward compatibility, @ref WeightMax(), @ref WeightMaxAbs(),
+            ///         @ref WeightGreyscale() and @ref WeightAbsGreyscale() are provided.
+
+            return SumAbs() / 3.0;
+        }
+
+        /// Computes a measure for the weight of the colour based on the magnitude of its greyscale
+        /// value.
+        ///
+        /// @deprecated Calls to this function should probably be replaced by calls to @ref Weight()
+        ///             for consistency of colour math.
+        ///
+        inline T WeightAbsGreyscale() const
+        {
+            return fabs(Greyscale());
+        }
+
+        /// Computes a measure for the weight of the colour based on its greyscale value.
+        ///
+        /// @note       Do _not_ use this function if you absolutely want to know the greyscale
+        ///             intensity of the colour. For such cases, use @ref Greyscale() instead.
+        ///
+        /// @deprecated Calls to this function should probably be replaced by calls to
+        ///             @ref WeightAbsGreyscale() or @ref Weight() for consistency of colour math.
+        ///
+        inline T WeightGreyscale() const
+        {
+            return Greyscale();
+        }
+
+        /// Computes a measure for the weight of the colour based on the colour channel with the
+        /// greatest value.
+        ///
+        /// @note       Do _not_ use this function if you absolutely want to know the intensity of
+        ///             the strongest colour channel. For such cases, use @ref max() instead.
+        ///
+        /// @deprecated Calls to this function should probably be replaced by calls to
+        ///             @ref WeightMaxAbs() or @ref Weight() for consistency of colour math.
+        ///
+        inline T WeightMax() const
+        {
+            return Max();
+        }
+
+        /// Computes a measure for the weight of the colour based on the colour channel with the
+        /// greatest magnitude.
+        ///
+        /// @deprecated Calls to this function should probably be replaced by calls to @ref Weight()
+        ///             for consistency of colour math.
+        ///
+        inline T WeightMaxAbs() const
+        {
+            return MaxAbs();
+        }
+
+        /// Computes the sum of the channels' magnitudes.
+        inline T SumAbs() const
+        {
+            T result = 0.0;
+            for (int i = 0; i < channels; i ++)
+                result += fabs(mColour[i]);
+            return result;
+        }
+
+        /// Computes the intensity of the colour channel with the greatest value.
+        ///
+        /// @note       Do _not_ use this function if you want to compute some kind of weight;
+        ///             that's what @ref WeightMax() is for.
+        ///
+        inline T Max() const
+        {
+            T result = mColour[0];
+            for (int i = 1; i < channels; i ++)
+                result = max(result, mColour[i]);
+            return result;
+        }
+
+        /// Computes the intensity of the colour channel with the greatest magnitude.
+        ///
+        /// @note       Do _not_ use this function if you want to compute some kind of weight;
+        ///             that's what @ref WeightMaxAbs() is for.
+        ///
+        inline T MaxAbs() const
+        {
+            T result = mColour[0];
+            for (int i = 1; i < channels; i ++)
+                result = max(result, fabs(mColour[i]));
+            return result;
+        }
+
+        /// Computes the intensity of the colour channel with the smallest value.
+        ///
+        inline T Min() const
+        {
+            T result = mColour[0];
+            for (int i = 1; i < channels; i ++)
+                result = min(result, mColour[i]);
+            return result;
+        }
+
+        /// Test if all components of the colour are valid.
+        inline bool IsValid() const
+        {
+            // test whether any component is NaN, exploiting the property that
+            // a NaN always compares non-equal, even to itself
+            bool result = true;
+            for (int i = 0; i < channels; i ++)
+                result = result && (mColour[i] == mColour[i]);
+            return result;
+        }
+
+        inline bool IsZero() const
+        {
+            bool result = true;
+            for (int i = 0; i < channels; i ++)
+                result = result && (mColour[i] == 0.0);
+            return result;
+        }
+
+        inline bool IsNearZero(T epsilon) const
+        {
+            bool result = true;
+            for (int i = 0; i < channels; i ++)
+                result = result && (fabs(mColour[i]) < epsilon);
+            return result;
+        }
+
+        inline void Clear()
+        {
+            for (int i = 0; i < channels; i ++)
+                mColour[i] = 0.0;
+        }
+
+        inline void Invalidate()
+        {
+            for (int i = 0; i < channels; i ++)
+                mColour[i] = std::numeric_limits<T>::quiet_NaN();
+        }
+
+        inline void Set(T grey)
+        {
+            for (int i = 0; i < channels; i ++)
+                mColour[i] = grey;
+        }
+/*
+        inline void Set(T red, T green, T blue)
+        {
+            mColour[RED]   = red;
+            mColour[GREEN] = green;
+            mColour[BLUE]  = blue;
+        }
+*/
+        inline GenericColour Clipped(T minc, T maxc)
+        {
+            GenericColour result;
+            for (int i = 0; i < channels; i ++)
+                result.mColour[i] = pov_base::clip<T>(mColour[i], minc, maxc);
+            return result;
+        }
+
+        inline GenericColour ClippedUpper(T maxc)
+        {
+            GenericColour result;
+            for (int i = 0; i < channels; i ++)
+                result.mColour[i] = min(mColour[i], maxc);
+            return result;
+        }
+
+        inline GenericColour ClippedLower(T minc)
+        {
+            GenericColour result;
+            for (int i = 0; i < channels; i ++)
+                result.mColour[i] = max(mColour[i], minc);
+            return result;
+        }
+
+        inline GenericColour operator+(const GenericColour& b) const
+        {
+            GenericColour result = *this;
+            result += b;
+            return result;
+        }
+
+        inline GenericColour operator-(const GenericColour& b) const
+        {
+            GenericColour result = *this;
+            result -= b;
+            return result;
+        }
+
+        inline GenericColour operator*(const GenericColour& b) const
+        {
+            GenericColour result = *this;
+            result *= b;
+            return result;
+        }
+
+        inline GenericColour operator/(const GenericColour& b) const
+        {
+            GenericColour result = *this;
+            result /= b;
+            return result;
+        }
+
+        inline GenericColour& operator+=(const GenericColour& b)
+        {
+            for (int i = 0; i < channels; i ++)
+                mColour[i] += b.mColour[i];
+            return *this;
+        }
+
+        inline GenericColour& operator-=(const GenericColour& b)
+        {
+            for (int i = 0; i < channels; i ++)
+                mColour[i] -= b.mColour[i];
+            return *this;
+        }
+
+        inline GenericColour& operator*=(const GenericColour& b)
+        {
+            for (int i = 0; i < channels; i ++)
+                mColour[i] *= b.mColour[i];
+            return *this;
+        }
+
+        inline GenericColour& operator/=(const GenericColour& b)
+        {
+            for (int i = 0; i < channels; i ++)
+                mColour[i] /= b.mColour[i];
+            return *this;
+        }
+
+        inline GenericColour operator-() const
+        {
+            GenericColour result;
+            result -= *this;
+            return result;
+        }
+
+        inline GenericColour operator+(double b) const
+        {
+            GenericColour result = *this;
+            result += b;
+            return result;
+        }
+
+        inline GenericColour operator-(double b) const
+        {
+            GenericColour result = *this;
+            result -= b;
+            return result;
+        }
+
+        inline GenericColour operator*(double b) const
+        {
+            GenericColour result = *this;
+            result *= b;
+            return result;
+        }
+
+        inline GenericColour operator/(double b) const
+        {
+            GenericColour result = *this;
+            result /= b;
+            return result;
+        }
+
+        inline GenericColour& operator+=(double b)
+        {
+            for (int i = 0; i < channels; i ++)
+                mColour[i] += b;
+            return *this;
+        }
+
+        inline GenericColour& operator-=(double b)
+        {
+            for (int i = 0; i < channels; i ++)
+                mColour[i] -= b;
+            return *this;
+        }
+
+        inline GenericColour& operator*=(double b)
+        {
+            for (int i = 0; i < channels; i ++)
+                mColour[i] *= b;
+            return *this;
+        }
+
+        inline GenericColour& operator/=(double b)
+        {
+            for (int i = 0; i < channels; i ++)
+                mColour[i] /= b;
+            return *this;
+        }
+
+        inline GenericColour Exp() const
+        {
+            GenericColour result;
+            for (int i = 0; i < channels; i ++)
+                result.mColour[i] = exp(mColour[i]);
+            return result;
+        }
+
+        inline GenericColour Pow(double b) const
+        {
+            GenericColour result;
+            for (int i = 0; i < channels; i ++)
+                result.mColour[i] = pow(mColour[i], T(b));
+            return result;
+        }
+
+        inline GenericColour Cos() const
+        {
+            GenericColour result;
+            for (int i = 0; i < channels; i ++)
+                result.mColour[i] = cos(mColour[i]);
+            return result;
+        }
+
+        inline GenericColour Sqrt() const
+        {
+            GenericColour result;
+            for (int i = 0; i < channels; i ++)
+                result.mColour[i] = sqrt(mColour[i]);
+            return result;
+        }
+
+        inline static const GenericColour& DefaultWavelengths()
+        {
+            return mkDefaultWavelengths;
+        }
+
+    private:
+
+        static const GenericColour mkDefaultWavelengths;
+
+#if (NUM_COLOUR_CHANNELS != 3)
+
+        static const T mkY[channels];
+        static const GenericRGBColour<T> mkRGB[channels];
+
+#endif
+
+        T mColour[channels];
+
+#if (NUM_COLOUR_CHANNELS == 3)
+        inline explicit GenericColour(const GenericRGBColour<T>& col)
+        {
+            mColour[0] = col.red();
+            mColour[1] = col.green();
+            mColour[2] = col.blue();
+        }
+#else
+        #error TODO!
+#endif
+};
+
+
+/// @relates GenericColour
+template<typename T>
+inline GenericColour<T> operator* (double a, const GenericColour<T>& b) { return b * a; }
+
+/// @relates GenericColour
+template<typename T>
+inline GenericColour<T> operator/ (double a, const GenericColour<T>& b) { return GenericColour<T>(a) / b; }
+
+/// @relates GenericColour
+template<typename T>
+inline GenericColour<T> operator+ (double a, const GenericColour<T>& b) { return b + a; }
+
+/// @relates GenericColour
+template<typename T>
+inline GenericColour<T> operator- (double a, const GenericColour<T>& b) { return GenericColour<T>(a) - b; }
+
+/// @relates GenericColour
+template<typename T>
+inline T ColourDistance (const GenericColour<T>& a, const GenericColour<T>& b) { return (a - b).SumAbs(); }
+
+/// @relates GenericColour
+template<typename T>
+inline GenericColour<T> Sqr(const GenericColour<T>& a) { return a * a; }
+
+/// @relates GenericColour
+template<typename T>
+inline GenericColour<T> Exp(const GenericColour<T>& a) { return a.Exp(); }
+
+/// @relates GenericColour
+template<typename T>
+inline GenericColour<T> Pow(const GenericColour<T>& a, T b) { return a.Pow(b); }
+
+/// @relates GenericColour
+template<typename T>
+inline GenericColour<T> Sqrt(const GenericColour<T>& a) { return a.Sqrt(); }
+
+/// @relates GenericColour
+template<typename T>
+inline GenericColour<T> Cos(const GenericColour<T>& a) { return a.Cos(); }
+
+typedef GenericColour<ColourChannel>         MathColour;        ///< Standard precision colour.
+typedef GenericColour<PreciseColourChannel>  PreciseMathColour; ///< High precision colour.
+
+
+/// Generic template class to hold and manipulate a colour plus transparency information.
 ///
 /// @note   The current implementation uses RGBFT format; future implementations may vary.
 ///
@@ -1184,6 +1772,10 @@ class GenericTransColour
 
         template<typename T2>
         friend class GenericTransColour;
+
+        friend class GenericRGBFTColour<T>;
+
+        friend GenericTransColour ToTransColour(const GenericRGBFTColour<T>& col);
 
         typedef DBL EXPRESS[5];
 
@@ -1208,16 +1800,10 @@ class GenericTransColour
             mTransm(col.mTransm)
         {}
 
-        inline explicit GenericTransColour(const GenericRGBColour<T>& col) :
+        inline explicit GenericTransColour(const GenericColour<T>& col) :
             mColour(col),
             mFilter(0.0),
             mTransm(0.0)
-        {}
-
-        inline explicit GenericTransColour(const GenericRGBFTColour<T>& col) :
-            mColour(col.rgb()),
-            mFilter(col.filter()),
-            mTransm(col.transm())
         {}
 
         inline GenericTransColour& operator=(const GenericTransColour& col)
@@ -1228,16 +1814,24 @@ class GenericTransColour
             return *this;
         }
 
-        inline GenericRGBColour<T>  colour() const { return mColour; }
-        inline GenericRGBColour<T>& colour()       { return mColour; }
-
+        inline GenericColour<T>  colour() const { return mColour; }
+        inline GenericColour<T>& colour()       { return mColour; }
+/*
         inline T  filter() const { return mFilter; }
         inline T& filter()       { return mFilter; }
 
         inline T  transm() const { return mTransm; }
         inline T& transm()       { return mTransm; }
-
+*/
         inline T Opacity() const { return 1.0 - mFilter - mTransm; }
+
+        /// Legacy opacity computation.
+        ///
+        /// @deprecated This fomula was used instead of @ref Opacity() in POV-Ray 3.6 and earlier texture computations.
+        ///             Do not use it - it is bogus, and we're only keeping it around for compatibility with legacy
+        ///             scenes.
+        ///
+        inline T LegacyOpacity() const { return (1.0 - (mFilter * mColour.Max() + mTransm)); }
 
         inline T Greyscale() const
         {
@@ -1275,9 +1869,21 @@ class GenericTransColour
                                       pov_base::clip<T>(mTransm, minc, maxc));
         }
 
-        inline GenericRGBColour<T> TransmittedColour() const
+        inline GenericColour<T> TransmittedColour() const
         {
             return mColour * mFilter + mTransm;
+        }
+
+        inline void SetFT(ColourChannel f, ColourChannel t)
+        {
+            mFilter = f;
+            mTransm = t;
+        }
+
+        inline void GetFT(ColourChannel& f, ColourChannel& t) const
+        {
+            f = mFilter;
+            t = mTransm;
         }
 
         inline GenericTransColour operator+(const GenericTransColour& b) const
@@ -1409,15 +2015,21 @@ class GenericTransColour
 
     private:
 
-        GenericRGBColour<T> mColour;
+        GenericColour<T>    mColour;
         T                   mFilter;
         T                   mTransm;
 
-        inline explicit GenericTransColour(const GenericRGBColour<T>& col, T filter, T transm) :
+        inline explicit GenericTransColour(const GenericColour<T>& col, T filter, T transm) :
             mColour(col),
             mFilter(filter),
             mTransm(transm)
         {}
+
+        inline explicit GenericTransColour(const GenericRGBFTColour<T>& col) :
+            mColour(col.rgb())
+        {
+            SetFT(col.filter(), col.transm());
+        }
 };
 
 /// @relates GenericTransColour
@@ -1432,8 +2044,8 @@ inline GenericTransColour<T> operator+ (double a, const GenericTransColour<T>& b
 template<typename T>
 inline GenericTransColour<T> operator- (double a, const GenericTransColour<T>& b) { return GenericTransColour<T>(a) - b; }
 
-typedef GenericTransColour<ColourChannel>           TransColour;        ///< Standard precision RGBFT colour.
-typedef GenericTransColour<PreciseColourChannel>    PreciseTransColour; ///< High precision RGBFT colour.
+typedef GenericTransColour<ColourChannel>           TransColour;        ///< Standard precision transparent colour.
+typedef GenericTransColour<PreciseColourChannel>    PreciseTransColour; ///< High precision transparent colour.
 
 
 /// Generic template class to store a RGB colour in four bytes (RGBE).
@@ -1454,7 +2066,8 @@ class GenericRGBEColour
 {
     public:
 
-        template<typename T2> friend class GenericRGBColour;
+        template<typename T2>
+        friend class GenericRGBColour;
 
         enum
         {

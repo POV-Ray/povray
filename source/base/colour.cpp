@@ -43,8 +43,20 @@
 namespace pov_base
 {
 
-/// @file
-/// @note   All implementations related to colour storage and computations are currently defined inline in
-///         @ref base/colour.h for performance reasons.
+#if (NUM_COLOUR_CHANNELS == 3)
+
+    // Approximate dominant wavelengths of primary hues.
+    // Source: 3D Computer Graphics by John Vince (Addison Wesely)
+    // These are user-adjustable with the irid_wavelength keyword.
+    // Red = 700 nm  Grn = 520 nm Blu = 480 nm
+    // Divided by 1000 gives: rwl = 0.70;  gwl = 0.52;  bwl = 0.48;
+    const MathColour MathColour::mkDefaultWavelengths = MathColour(RGBColour(0.70, 0.52, 0.48));
+    const PreciseMathColour PreciseMathColour::mkDefaultWavelengths = PreciseMathColour(PreciseRGBColour(0.70, 0.52, 0.48));
+
+#else
+
+    #error TODO!
+
+#endif
 
 }

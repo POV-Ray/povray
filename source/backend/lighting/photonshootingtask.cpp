@@ -146,8 +146,9 @@ void PhotonShootingTask::Finish()
 
 void PhotonShootingTask::ShootPhotonsAtObject(LightTargetCombo& combo)
 {
-    RGBColour colour;              /* light color */
-    TransColour photonColour;      /* photon color */
+    MathColour colour;             /* light color */
+    MathColour photonColour;       /* photon color */
+    ColourChannel dummyTransm;
     int i;                         /* counter */
     DBL theta, phi;                /* rotation angles */
     DBL dphi;              /* deltas for theta and phi */
@@ -317,7 +318,7 @@ void PhotonShootingTask::ShootPhotonsAtObject(LightTargetCombo& combo)
 
                     /* compute photon color from light source & attenuation */
 
-                    photonColour = TransColour(colour * Attenuation);
+                    photonColour = colour * Attenuation;
 
                     if (Attenuation<0.00001) continue;
 
@@ -366,7 +367,7 @@ void PhotonShootingTask::ShootPhotonsAtObject(LightTargetCombo& combo)
                     //disp_nelems = 0; /* for dispersion */
 
                     ray.SetFlags(Ray::PrimaryRay, false, true);
-                    trace.TraceRay(ray, photonColour, 1.0, false);
+                    trace.TraceRay(ray, photonColour, dummyTransm, 1.0, false);
 
                     /* display here */
                     if ((i++%100) == 0)
