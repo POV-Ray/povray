@@ -446,10 +446,19 @@ class GenericRGBColour
         template<int BIAS>
         explicit GenericRGBColour(const GenericRGBEColour<BIAS>& col)
         {
-            double exponent = ldexp(1.0,col.data[GenericRGBEColour<BIAS>::EXP]-(int)(BIAS+8));
-            colour[RED]   = (col.data[GenericRGBEColour<BIAS>::RED]   + 0.5) * exponent;
-            colour[GREEN] = (col.data[GenericRGBEColour<BIAS>::GREEN] + 0.5) * exponent;
-            colour[BLUE]  = (col.data[GenericRGBEColour<BIAS>::BLUE]  + 0.5) * exponent;
+            if (col.data[GenericRGBEColour<BIAS>::EXP] > std::numeric_limits<GenericRGBEColour<BIAS>::COLC_T>::min())
+            {
+                double expFactor = ldexp(1.0,(int)col.data[GenericRGBEColour<BIAS>::EXP]-(int)(BIAS+8));
+                colour[RED]   = (col.data[GenericRGBEColour<BIAS>::RED])   * expFactor;
+                colour[GREEN] = (col.data[GenericRGBEColour<BIAS>::GREEN]) * expFactor;
+                colour[BLUE]  = (col.data[GenericRGBEColour<BIAS>::BLUE])  * expFactor;
+            }
+            else
+            {
+                colour[RED]   = 0.0;
+                colour[GREEN] = 0.0;
+                colour[BLUE]  = 0.0;
+            }
         }
 
         GenericRGBColour& operator=(const GenericRGBColour& col)
@@ -888,7 +897,8 @@ class GenericRGBEColour
             }
             else
             {
-                data[RED] = data[GREEN] = data[BLUE] = data[EXP] = 0;
+                data[RED] = data[GREEN] = data[BLUE] = 0;
+                data[EXP] = std::numeric_limits<COLC_T>::min();
             }
         }
 
@@ -897,13 +907,14 @@ class GenericRGBEColour
             double scaleFactor;
             if (ComputeExponent(col, data[EXP], scaleFactor))
             {
-                data[RED]   = clipToType<COLC_T>(floor(col.red()   * scaleFactor));
-                data[GREEN] = clipToType<COLC_T>(floor(col.green() * scaleFactor));
-                data[BLUE]  = clipToType<COLC_T>(floor(col.blue()  * scaleFactor));
+                data[RED]   = clipToType<COLC_T>(floor(col.red()   * scaleFactor + 0.5));
+                data[GREEN] = clipToType<COLC_T>(floor(col.green() * scaleFactor + 0.5));
+                data[BLUE]  = clipToType<COLC_T>(floor(col.blue()  * scaleFactor + 0.5));
             }
             else
             {
-                data[RED] = data[GREEN] = data[BLUE] = data[EXP] = 0;
+                data[RED] = data[GREEN] = data[BLUE] = 0;
+                data[EXP] = std::numeric_limits<COLC_T>::min();
             }
         }
 
@@ -912,13 +923,14 @@ class GenericRGBEColour
             double scaleFactor;
             if (ComputeExponent(col, data[EXP], scaleFactor))
             {
-                data[RED]   = clip<COLC_T>(floor(col.red()   * scaleFactor + dither.red()));
-                data[GREEN] = clip<COLC_T>(floor(col.green() * scaleFactor + dither.green()));
-                data[BLUE]  = clip<COLC_T>(floor(col.blue()  * scaleFactor + dither.blue()));
+                data[RED]   = clip<COLC_T>(floor(col.red()   * scaleFactor + 0.5 + dither.red()));
+                data[GREEN] = clip<COLC_T>(floor(col.green() * scaleFactor + 0.5 + dither.green()));
+                data[BLUE]  = clip<COLC_T>(floor(col.blue()  * scaleFactor + 0.5 + dither.blue()));
             }
             else
             {
-                data[RED] = data[GREEN] = data[BLUE] = data[EXP] = 0;
+                data[RED] = data[GREEN] = data[BLUE] = 0;
+                data[EXP] = std::numeric_limits<COLC_T>::min();
             }
         }
 
