@@ -37,21 +37,22 @@
 #include "backend/frame.h"
 #include "backend/parser/parse.h"
 
-#include "backend/math/vector.h"
+#include "base/image/image.h"
 #include "backend/colour/colour_old.h"
 #include "backend/interior/interior.h"
-#include "backend/math/matrices.h"
 #include "backend/interior/media.h"
+#include "backend/math/matrices.h"
+#include "backend/math/vector.h"
+#include "backend/scene/objects.h"
+#include "backend/scene/threaddata.h"
+#include "backend/shape/isosurf.h"
+#include "backend/support/fileutil.h"
+#include "backend/support/imageutil.h"
 #include "backend/texture/normal.h"
 #include "backend/texture/pigment.h"
 #include "backend/texture/texture.h"
-#include "backend/shape/isosurf.h"
 #include "backend/vm/fncode.h"
 #include "backend/vm/fnpovfpu.h"
-#include "backend/scene/objects.h"
-#include "base/image/image.h"
-#include "backend/support/imageutil.h"
-#include "backend/support/fileutil.h"
 
 #include "lightgrp.h" // TODO
 
@@ -128,7 +129,7 @@ void Parser::Make_Pattern_Image(ImageData *image, FUNCTION_PTR fn, int token)
     }
     else if((token == VECTFUNCT_ID_TOKEN) && (f->return_size == 5))
     {
-        image->data =Image::Create(image->iwidth, image->iheight, Image::RGBA_Int16);
+        image->data =Image::Create(image->iwidth, image->iheight, Image::RGBA_Int16); // TODO - we should probably use a HDR format
         image->data->SetPremultiplied(false); // We're storing the data in non-premultiplied alpha format, as this preserves all the data we're getting from the function.
 
         point[Z] = 0;
@@ -148,11 +149,11 @@ void Parser::Make_Pattern_Image(ImageData *image, FUNCTION_PTR fn, int token)
                 (void)POVFPU_Run(fnVMContext, *fn);
 
                 image->data->SetRGBFTValue(j, i,
-                                          float(fnVMContext->GetLocal(pRED)),
-                                          float(fnVMContext->GetLocal(pGREEN)),
-                                          float(fnVMContext->GetLocal(pBLUE)),
-                                          float(fnVMContext->GetLocal(pFILTER)), // N.B. pFILTER component is currently ignored by SetRGBFTValue (matches 3.6 behavior)
-                                          float(fnVMContext->GetLocal(pTRANSM)));
+                                           float(fnVMContext->GetLocal(pRED)),
+                                           float(fnVMContext->GetLocal(pGREEN)),
+                                           float(fnVMContext->GetLocal(pBLUE)),
+                                           float(fnVMContext->GetLocal(pFILTER)), // N.B. pFILTER component is currently ignored by the RGBA_Int16 SetRGBFTValue (matches 3.6 behavior)
+                                           float(fnVMContext->GetLocal(pTRANSM)));
             }
         }
     }
@@ -280,7 +281,7 @@ ImageData *Parser::Parse_Image(int Legal, bool GammaCorrect)
         END_CASE
 
         CASE (TIFF_TOKEN)
-            Experimental_Flag |= EF_TIFF;
+            mExperimentalFlags.tiff = true;
             filetype = TIFF_FILE;
             Name = Parse_C_String(true);
             EXIT
@@ -461,7 +462,7 @@ ImageData *Parser::Parse_Image(int Legal, bool GammaCorrect)
             // note the second ':' gets passed since it's the option prefix
             // e.g. ":vidcap:source=/dev/video0:w=640:h=480:fps=5"
             image->data = image->VidCap->Init(Name + 7, options, true);
-            Beta_Feature_Flag |= BF_VIDCAP;
+            mBetaFeatureFlags.videoCapture = true;
 #else
             Error("Beta-test video capture feature not implemented on this platform.");
 #endif
@@ -942,7 +943,7 @@ void Parser::Parse_Pigment (PIGMENT **Pigment_Ptr)
         END_CASE
     END_EXPECT    /* End pigment_id */
 
-    Parse_Pattern(*Pigment_Ptr,PIGMENT_TYPE);
+    Parse_Pattern<GenericPigmentBlendMap>(*Pigment_Ptr,PIGMENT_TYPE);
 
     if (Not_In_Default && ((*Pigment_Ptr)->Type == NO_PATTERN))
     {
@@ -972,7 +973,8 @@ void Parser::Parse_Pigment (PIGMENT **Pigment_Ptr)
 *
 ******************************************************************************/
 
-void Parser::Parse_Pattern (TPATTERN *New, int TPat_Type)
+template<typename MAP_T, typename PATTERN_T>
+void Parser::Parse_Pattern (PATTERN_T *New, int TPat_Type)
 {
     Vector3d Local_Vector;
     MATRIX Local_Matrix;
@@ -1208,16 +1210,14 @@ void Parser::Parse_Pattern (TPATTERN *New, int TPat_Type)
         CASE (UV_MAPPING_TOKEN)
             New->Type = UV_MAP_PATTERN;
             New->pattern = PatternPtr(new PlainPattern());
-            Destroy_Blend_Map(New->Blend_Map);
-            New->Blend_Map = Parse_Item_Into_Blend_List(TPat_Type);
+            New->Blend_Map = Parse_Item_Into_Blend_List<MAP_T>(TPat_Type);
             EXIT
         END_CASE
 
         CASE (CHECKER_TOKEN)
             New->Type = GENERIC_INTEGER_PATTERN;
             New->pattern = PatternPtr(new CheckerPattern());
-            Destroy_Blend_Map(New->Blend_Map);
-            New->Blend_Map = Parse_Blend_List(2,const_cast<BLEND_MAP *>(New->pattern->GetDefaultBlendMap()),TPat_Type);
+            New->Blend_Map = Parse_Blend_List<MAP_T>(2,New->pattern->GetDefaultBlendMap(),TPat_Type);
             if (TPat_Type == NORMAL_TYPE)
                 (reinterpret_cast<TNORMAL *>(New))->Delta = 0.02;
             EXIT
@@ -1233,8 +1233,7 @@ void Parser::Parse_Pattern (TPATTERN *New, int TPat_Type)
             New->Type = OBJECT_PATTERN;
             New->pattern = PatternPtr(new ObjectPattern());
             dynamic_cast<ObjectPattern*>(New->pattern.get())->pObject = tempObjects[0];
-            Destroy_Blend_Map(New->Blend_Map);
-            New->Blend_Map = Parse_Blend_List(2,const_cast<BLEND_MAP *>(New->pattern->GetDefaultBlendMap()),TPat_Type);
+            New->Blend_Map = Parse_Blend_List<MAP_T>(2,New->pattern->GetDefaultBlendMap(),TPat_Type);
             Parse_End();
             EXIT
         }
@@ -1254,8 +1253,7 @@ void Parser::Parse_Pattern (TPATTERN *New, int TPat_Type)
                 dynamic_cast<BrickPattern*>(New->pattern.get())->brickSize = Vector3d(8.0,3.0,4.5);
                 dynamic_cast<BrickPattern*>(New->pattern.get())->mortar=0.5-EPSILON*2.0;
             }
-            Destroy_Blend_Map(New->Blend_Map);
-            New->Blend_Map = Parse_Blend_List(2,const_cast<BLEND_MAP *>(New->pattern->GetDefaultBlendMap()),TPat_Type);
+            New->Blend_Map = Parse_Blend_List<MAP_T>(2,New->pattern->GetDefaultBlendMap(),TPat_Type);
             if (TPat_Type == NORMAL_TYPE)
                 (reinterpret_cast<TNORMAL *>(New))->Delta = 0.02;
             EXIT
@@ -1264,8 +1262,7 @@ void Parser::Parse_Pattern (TPATTERN *New, int TPat_Type)
         CASE (HEXAGON_TOKEN)
             New->Type = GENERIC_INTEGER_PATTERN;
             New->pattern = PatternPtr(new HexagonPattern());
-            Destroy_Blend_Map(New->Blend_Map);
-            New->Blend_Map = Parse_Blend_List(3,const_cast<BLEND_MAP *>(New->pattern->GetDefaultBlendMap()),TPat_Type);
+            New->Blend_Map = Parse_Blend_List<MAP_T>(3,New->pattern->GetDefaultBlendMap(),TPat_Type);
             if (TPat_Type == NORMAL_TYPE)
                 (reinterpret_cast<TNORMAL *>(New))->Delta = 0.02;
             EXIT
@@ -1274,8 +1271,7 @@ void Parser::Parse_Pattern (TPATTERN *New, int TPat_Type)
         CASE (SQUARE_TOKEN)
             New->Type = GENERIC_INTEGER_PATTERN;
             New->pattern = PatternPtr(new SquarePattern());
-            Destroy_Blend_Map(New->Blend_Map);
-            New->Blend_Map = Parse_Blend_List(4,const_cast<BLEND_MAP *>(New->pattern->GetDefaultBlendMap()),TPat_Type);
+            New->Blend_Map = Parse_Blend_List<MAP_T>(4,New->pattern->GetDefaultBlendMap(),TPat_Type);
             if (TPat_Type == NORMAL_TYPE)
                 (reinterpret_cast<TNORMAL *>(New))->Delta = 0.02;
             EXIT
@@ -1284,8 +1280,7 @@ void Parser::Parse_Pattern (TPATTERN *New, int TPat_Type)
         CASE (TRIANGULAR_TOKEN)
             New->Type = GENERIC_INTEGER_PATTERN;
             New->pattern = PatternPtr(new TriangularPattern());
-            Destroy_Blend_Map(New->Blend_Map);
-            New->Blend_Map = Parse_Blend_List(6,const_cast<BLEND_MAP *>(New->pattern->GetDefaultBlendMap()),TPat_Type);
+            New->Blend_Map = Parse_Blend_List<MAP_T>(6,New->pattern->GetDefaultBlendMap(),TPat_Type);
             if (TPat_Type == NORMAL_TYPE)
                 (reinterpret_cast<TNORMAL *>(New))->Delta = 0.02;
             EXIT
@@ -1295,8 +1290,7 @@ void Parser::Parse_Pattern (TPATTERN *New, int TPat_Type)
         CASE (CUBIC_TOKEN)
             New->Type = GENERIC_INTEGER_PATTERN;
             New->pattern = PatternPtr(new CubicPattern());
-            Destroy_Blend_Map(New->Blend_Map);
-            New->Blend_Map = Parse_Blend_List(6,const_cast<BLEND_MAP *>(New->pattern->GetDefaultBlendMap()),TPat_Type);
+            New->Blend_Map = Parse_Blend_List<MAP_T>(6,New->pattern->GetDefaultBlendMap(),TPat_Type);
             if (TPat_Type == NORMAL_TYPE)
                 (reinterpret_cast<TNORMAL *>(New))->Delta = 0.02;
             EXIT
@@ -1516,7 +1510,7 @@ void Parser::Parse_Pattern (TPATTERN *New, int TPat_Type)
                             }
                             else
                             {
-                                Experimental_Flag |= EF_SLOPEM; // this feature is experimental
+                                mExperimentalFlags.slopeAltitude = true; // this feature is experimental
                                 Parse_Vector (dynamic_cast<SlopePattern*>(New->pattern.get())->altitudeDirection);
 
                                 /* allow low alt, high alt */
@@ -1875,8 +1869,7 @@ void Parser::Parse_Pattern (TPATTERN *New, int TPat_Type)
             {
                 Error("Cannot use color_map with this pattern type.");
             }
-            Destroy_Blend_Map(New->Blend_Map);
-            New->Blend_Map = Parse_Colour_Map ();
+            New->Blend_Map = Parse_Colour_Map<MAP_T> ();
         END_CASE
 
         CASE (PIGMENT_MAP_TOKEN)
@@ -1890,8 +1883,7 @@ void Parser::Parse_Pattern (TPATTERN *New, int TPat_Type)
                 New->Type == OBJECT_PATTERN ||
                 New->Type == BITMAP_PATTERN)
                 Not_With ("pigment_map","this pigment type");
-            Destroy_Blend_Map(New->Blend_Map);
-            New->Blend_Map = Parse_Blend_Map (PIGMENT_TYPE,New->Type);
+            New->Blend_Map = Parse_Blend_Map<MAP_T> (PIGMENT_TYPE,New->Type);
         END_CASE
 
         CASE (DENSITY_MAP_TOKEN)
@@ -1905,8 +1897,7 @@ void Parser::Parse_Pattern (TPATTERN *New, int TPat_Type)
                 New->Type == OBJECT_PATTERN ||
                 New->Type == BITMAP_PATTERN)
                 Not_With ("density_map","this density type");
-            Destroy_Blend_Map(New->Blend_Map);
-            New->Blend_Map = Parse_Blend_Map (DENSITY_TYPE,New->Type);
+            New->Blend_Map = Parse_Blend_Map<MAP_T> (DENSITY_TYPE,New->Type);
         END_CASE
 
         CASE (SLOPE_MAP_TOKEN)
@@ -1921,8 +1912,7 @@ void Parser::Parse_Pattern (TPATTERN *New, int TPat_Type)
                 New->Type == OBJECT_PATTERN ||
                 New->Type == BITMAP_PATTERN)
                 Not_With ("slope_map","this normal type");
-            Destroy_Blend_Map(New->Blend_Map);
-            New->Blend_Map = Parse_Blend_Map (SLOPE_TYPE,New->Type);
+            New->Blend_Map = Parse_Blend_Map<MAP_T> (SLOPE_TYPE,New->Type);
         END_CASE
 
         CASE (NORMAL_MAP_TOKEN)
@@ -1937,8 +1927,7 @@ void Parser::Parse_Pattern (TPATTERN *New, int TPat_Type)
                 New->Type == OBJECT_PATTERN ||
                 New->Type == BITMAP_PATTERN)
                 Not_With ("normal_map","this normal type");
-            Destroy_Blend_Map(New->Blend_Map);
-            New->Blend_Map = Parse_Blend_Map (NORMAL_TYPE,New->Type);
+            New->Blend_Map = Parse_Blend_Map<MAP_T> (NORMAL_TYPE,New->Type);
         END_CASE
 
         CASE (TEXTURE_MAP_TOKEN)
@@ -1952,8 +1941,7 @@ void Parser::Parse_Pattern (TPATTERN *New, int TPat_Type)
                 New->Type == OBJECT_PATTERN ||
                 New->Type == BITMAP_PATTERN)
                 Not_With ("texture_map","this pattern type");
-            Destroy_Blend_Map(New->Blend_Map);
-            New->Blend_Map = Parse_Blend_Map (TEXTURE_TYPE,New->Type);
+            New->Blend_Map = Parse_Blend_Map<MAP_T> (TEXTURE_TYPE,New->Type);
         END_CASE
 
         CASE (QUICK_COLOUR_TOKEN)
@@ -2295,7 +2283,7 @@ void Parser::Parse_Tnormal (TNORMAL **Tnormal_Ptr)
             *Tnormal_Ptr = Create_Tnormal ();
         }
     }
-    Parse_Pattern(*Tnormal_Ptr,NORMAL_TYPE);
+    Parse_Pattern<GenericNormalBlendMap>(*Tnormal_Ptr,NORMAL_TYPE);
 }
 
 
@@ -2322,7 +2310,7 @@ void Parser::Parse_Tnormal (TNORMAL **Tnormal_Ptr)
 
 void Parser::Parse_Finish (FINISH **Finish_Ptr)
 {
-    Colour Temp_Colour;
+    TransColour Temp_Colour;
     FINISH *New;
     Vector3d Local_Vector;
     bool diffuseAdjust = false;
@@ -2378,7 +2366,7 @@ void Parser::Parse_Finish (FINISH **Finish_Ptr)
             Parse_Comma();
             New->DiffuseBack = Allow_Float(0.0);
             if (New->DiffuseBack != 0.0)
-                Experimental_Flag |= EF_BACKILL;
+                mExperimentalFlags.backsideIllumination = true;
         END_CASE
 
         CASE (REFLECTION_TOKEN)
@@ -2433,7 +2421,7 @@ void Parser::Parse_Finish (FINISH **Finish_Ptr)
                                have no effect */
                             if(!found_second_color && New->Reflection_Type > 0)
                             {
-                                New->Reflection_Min.clear();
+                                New->Reflection_Min.Clear();
                             }
                         END_CASE
 
@@ -2569,7 +2557,7 @@ void Parser::Parse_Finish (FINISH **Finish_Ptr)
         END_CASE
 
         CASE (SUBSURFACE_TOKEN)
-            Experimental_Flag |= EF_SSLT;
+            mExperimentalFlags.subsurface = true;
             New->UseSubsurface = true;
             Parse_Begin();
             EXPECT
@@ -2810,7 +2798,7 @@ TEXTURE *Parser::Parse_Texture ()
                 CASE (TILES_TOKEN)
                     Destroy_Textures (Texture);
                     Texture = Parse_Tiles();
-                    if (Texture->Blend_Map->Blend_Map_Entries[1].Vals.Texture == NULL)
+                    if (Texture->Blend_Map->Blend_Map_Entries[1].Vals == NULL)
                         Error("First texture missing from tiles");
                     Parse_Texture_Transform(Texture);
                     EXIT
@@ -2831,7 +2819,7 @@ TEXTURE *Parser::Parse_Texture ()
                     Texture->Pigment = NULL;
                     Texture->Tnormal = NULL;
                     Texture->Finish  = NULL;
-                    Parse_Pattern(Texture,TEXTURE_TYPE);
+                    Parse_Pattern<TextureBlendMap>(Texture,TEXTURE_TYPE);
                     /* if following is true, parsed "texture{}" so restore
                        default texture.
                      */
@@ -2873,7 +2861,6 @@ TEXTURE *Parser::Parse_Texture ()
 TEXTURE *Parser::Parse_Tiles()
 {
     TEXTURE *Texture, *Local_Texture;
-    BLEND_MAP_ENTRY *Entry;
 
     Parse_Begin ();
 
@@ -2887,16 +2874,12 @@ TEXTURE *Parser::Parse_Tiles()
     Texture->Type = GENERIC_INTEGER_PATTERN;
     Texture->pattern = PatternPtr(new CheckerPattern());
 
-    Texture->Blend_Map = Create_Blend_Map();
-    Texture->Blend_Map->Number_Of_Entries = 2;
-    Texture->Blend_Map->Blend_Map_Entries = Entry = Create_BMap_Entries (2);
-    Texture->Blend_Map->Type = TEXTURE_TYPE;
-    Entry[0].Vals.Texture=NULL;
-    Entry[0].value=0.0;
-    Entry[0].Same=false;
-    Entry[1].Vals.Texture=NULL;
-    Entry[1].value=1.0;
-    Entry[1].Same=false;
+    Texture->Blend_Map = Create_Blend_Map<TextureBlendMap> (TEXTURE_TYPE);
+    Texture->Blend_Map->Blend_Map_Entries.resize(2);
+    Texture->Blend_Map->Blend_Map_Entries[0].Vals=NULL;
+    Texture->Blend_Map->Blend_Map_Entries[0].value=0.0;
+    Texture->Blend_Map->Blend_Map_Entries[1].Vals=NULL;
+    Texture->Blend_Map->Blend_Map_Entries[1].value=1.0;
 
     /* Note first tile is 1, 2nd tile is 0 to keep compatible with old tiles */
 
@@ -2904,7 +2887,7 @@ TEXTURE *Parser::Parse_Tiles()
         CASE (TEXTURE_TOKEN)
             Parse_Begin ();
             Local_Texture = Parse_Texture ();
-            Link_Textures(&(Entry[1].Vals.Texture),Local_Texture);
+            Link_Textures(&(Texture->Blend_Map->Blend_Map_Entries[1].Vals),Local_Texture);
             Parse_End ();
         END_CASE
 
@@ -2920,7 +2903,7 @@ TEXTURE *Parser::Parse_Tiles()
         CASE (TEXTURE_TOKEN)
             Parse_Begin ();
             Local_Texture = Parse_Texture ();
-            Link_Textures(&(Entry[0].Vals.Texture),Local_Texture);
+            Link_Textures(&(Texture->Blend_Map->Blend_Map_Entries[0].Vals),Local_Texture);
             Parse_End ();
         END_CASE
 
@@ -3070,7 +3053,7 @@ TEXTURE *Parser::Parse_Vers1_Texture ()
     EXPECT                      /* Look for texture_body */
         CASE (TILES_TOKEN)
             Texture = Parse_Tiles();
-            if (Texture->Blend_Map->Blend_Map_Entries[1].Vals.Texture == NULL)
+            if (Texture->Blend_Map->Blend_Map_Entries[1].Vals == NULL)
                 Error("First texture missing from tiles");
             EXIT
         END_CASE
@@ -3219,32 +3202,28 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
                     Warn_State(Token.Token_Id, PIGMENT_TOKEN);
                     Pigment->Type = GENERIC_INTEGER_PATTERN;
                     Pigment->pattern = PatternPtr(new CheckerPattern());
-                    Destroy_Blend_Map(Pigment->Blend_Map);
-                    Pigment->Blend_Map = Parse_Blend_List(2,const_cast<BLEND_MAP *>(Pigment->pattern->GetDefaultBlendMap()),COLOUR_TYPE);
+                    Pigment->Blend_Map = Parse_Blend_List<ColourBlendMap>(2,Pigment->pattern->GetDefaultBlendMap(),COLOUR_TYPE);
                 END_CASE
 
                 CASE (HEXAGON_TOKEN)
                     Warn_State(Token.Token_Id, PIGMENT_TOKEN);
                     Pigment->Type = GENERIC_INTEGER_PATTERN;
                     Pigment->pattern = PatternPtr(new HexagonPattern());
-                    Destroy_Blend_Map(Pigment->Blend_Map);
-                    Pigment->Blend_Map = Parse_Blend_List(3,const_cast<BLEND_MAP *>(Pigment->pattern->GetDefaultBlendMap()),COLOUR_TYPE);
+                    Pigment->Blend_Map = Parse_Blend_List<ColourBlendMap>(3,Pigment->pattern->GetDefaultBlendMap(),COLOUR_TYPE);
                 END_CASE
 
                 CASE (SQUARE_TOKEN)
                     Warn_State(Token.Token_Id, PIGMENT_TOKEN);
                     Pigment->Type = GENERIC_INTEGER_PATTERN;
                     Pigment->pattern = PatternPtr(new SquarePattern());
-                    Destroy_Blend_Map(Pigment->Blend_Map);
-                    Pigment->Blend_Map = Parse_Blend_List(4,const_cast<BLEND_MAP *>(Pigment->pattern->GetDefaultBlendMap()),COLOUR_TYPE);
+                    Pigment->Blend_Map = Parse_Blend_List<ColourBlendMap>(4,Pigment->pattern->GetDefaultBlendMap(),COLOUR_TYPE);
                 END_CASE
 
                 CASE (TRIANGULAR_TOKEN)
                     Warn_State(Token.Token_Id, PIGMENT_TOKEN);
                     Pigment->Type = GENERIC_INTEGER_PATTERN;
                     Pigment->pattern = PatternPtr(new TriangularPattern());
-                    Destroy_Blend_Map(Pigment->Blend_Map);
-                    Pigment->Blend_Map = Parse_Blend_List(6,const_cast<BLEND_MAP *>(Pigment->pattern->GetDefaultBlendMap()),COLOUR_TYPE);
+                    Pigment->Blend_Map = Parse_Blend_List<ColourBlendMap>(6,Pigment->pattern->GetDefaultBlendMap(),COLOUR_TYPE);
                 END_CASE
 
                 CASE (IMAGE_MAP_TOKEN)
@@ -3266,8 +3245,7 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
                         Pigment->Type == PLAIN_PATTERN ||
                         Pigment->Type == BITMAP_PATTERN)
                         Warning(150, "Cannot use color map with this pigment type.");
-                    Destroy_Blend_Map(Pigment->Blend_Map);
-                    Pigment->Blend_Map = Parse_Colour_Map ();
+                    Pigment->Blend_Map = Parse_Colour_Map<ColourBlendMap> ();
                 END_CASE
 
                 CASE (QUICK_COLOUR_TOKEN)
@@ -3374,7 +3352,7 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
 ***********************************************************************/
                 CASE (AMBIENT_TOKEN)
                     Warn_State(Token.Token_Id, FINISH_TOKEN);
-                    Finish->Ambient = RGBColour(Parse_Float ());
+                    Finish->Ambient = MathColour(Parse_Float ());
                 END_CASE
 
                 CASE (BRILLIANCE_TOKEN)
@@ -3389,7 +3367,7 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
 
                 CASE (REFLECTION_TOKEN)
                     Warn_State(Token.Token_Id, FINISH_TOKEN);
-                    Finish->Reflection_Max = RGBColour(Parse_Float ());
+                    Finish->Reflection_Max = MathColour(Parse_Float ());
                     Finish->Reflection_Min = Finish->Reflection_Max;
                     Finish->Reflection_Falloff = 1;
                 END_CASE
@@ -3928,7 +3906,7 @@ void Parser::Parse_Media_Density_Pattern(PIGMENT** Density)
         END_CASE
     END_EXPECT
 
-    Parse_Pattern(*Density,DENSITY_TYPE);
+    Parse_Pattern<GenericPigmentBlendMap>(*Density,DENSITY_TYPE);
 }
 
 void Parser::Parse_Media_Density_Pattern(vector<PIGMENT*>& Density)
@@ -4175,7 +4153,7 @@ RAINBOW *Parser::Parse_Rainbow()
         CASE (COLOUR_MAP_TOKEN)
             // TODO FIXME - what if the user specifies multiple color maps?
             Rainbow->Pigment = Create_Pigment();
-            Rainbow->Pigment->Blend_Map = Parse_Colour_Map();
+            Rainbow->Pigment->Blend_Map = Parse_Colour_Map<ColourBlendMap>();
             Rainbow->Pigment->Type = GENERIC_PATTERN;
             Rainbow->Pigment->pattern = PatternPtr(new GradientPattern());
             dynamic_cast<GradientPattern*>(Rainbow->Pigment->pattern.get())->gradient = Vector3d(1.0,0.0,0.0);

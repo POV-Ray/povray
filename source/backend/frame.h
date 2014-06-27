@@ -51,23 +51,18 @@
 #include <cstdio>
 #include <cstring>
 #include <climits>
-
-#include <vector>
-#include <stack>
-
-// TODO - what is this conditional for?
-#ifndef MATH_H_INCLUDED
 #include <cmath>
-#endif
 
+#include <stack>
+#include <vector>
+
+#include "base/colour.h"
 #include "base/configbase.h"
 #include "base/types.h"
-#include "base/colour.h"
 
 #include "backend/configbackend.h"
-#include "backend/support/simplevector.h"
-#include "backend/control/messagefactory.h"
 #include "backend/colour/spectral.h"
+#include "backend/support/simplevector.h"
 
 #include "pov_mem.h"
 
@@ -124,6 +119,13 @@ typedef const ObjectBase * ConstObjectPtr;
 
 class CompoundObject;
 
+class Intersection;
+class Ray;
+
+// TODO FIXME
+class SceneThreadData;
+typedef SceneThreadData TraceThreadData;
+
 /// @}
 ///
 //******************************************************************************
@@ -132,17 +134,9 @@ class CompoundObject;
 ///
 /// @{
 
-typedef DBL UV_VECT[2];   ///< @deprecated Use @ref pov::Vector2d instead.
-                          ///< @todo       Get entirely rid of this.
-typedef DBL VECTOR[3];    ///< @deprecated Use @ref pov::Vector3d instead.
-                          ///< @todo       Get entirely rid of this.
 typedef DBL VECTOR_4D[4]; ///< @todo       Make this obsolete.
 typedef DBL MATRIX[4][4]; ///< @todo       Make this obsolete.
 typedef DBL EXPRESS[5];   ///< @todo       Make this obsolete.
-typedef COLC COLOUR[5];   ///< @deprecated Use @ref pov_base::Colour instead.
-                          ///< @todo       Get entirely rid of this.
-typedef COLC RGB[3];      ///< @deprecated Use @ref pov_base::RGBColour instead.
-                          ///< @todo       Get entirely rid of this.
 
 /// 2D Vector array elements.
 /// @deprecated When using @ref pov::GenericVector2d, call the x() and y() access functions
@@ -166,7 +160,8 @@ enum
 };
 
 /// RGB and RGBFT Colour array elements.
-/// @deprecated When using @ref pov_base::GenericColour or @ref pov_base::GenericRGBColour, call the
+/// @deprecated When using @ref pov_base::GenericRGBColour, @ref pov_base::GenericRGBTColour,
+///             @ref pov_base::GenericRGBFTColour or  @ref pov_base::GenericTransColour, call the
 ///             red(), green(), blue(), filter() and transm() access functions instead of using the
 ///             index operator with one of these as parameter.
 enum
@@ -178,80 +173,12 @@ enum
     pTRANSM = 4
 };
 
-/// @deprecated See @ref pov::VECTOR.
-inline void Assign_Vector(VECTOR d, const VECTOR s)
-{
-    d[X] = s[X];
-    d[Y] = s[Y];
-    d[Z] = s[Z];
-}
-
-/// @deprecated See @ref pov::UV_VECT.
-inline void Assign_UV_Vect(UV_VECT d, const UV_VECT s)
-{
-    d[X] = s[X];
-    d[Y] = s[Y];
-}
-
 inline void Assign_Vector_4D(VECTOR_4D d, const VECTOR_4D s)
 {
     d[X] = s[X];
     d[Y] = s[Y];
     d[Z] = s[Z];
     d[T] = s[T];
-}
-
-/// @deprecated See @ref pov::COLOUR.
-inline void Assign_Colour(COLOUR d, const COLOUR s)
-{
-    d[pRED] = s[pRED];
-    d[pGREEN] = s[pGREEN];
-    d[pBLUE] = s[pBLUE];
-    d[pFILTER] = s[pFILTER];
-    d[pTRANSM] = s[pTRANSM];
-}
-
-inline void Assign_Colour_Express(COLOUR d, const EXPRESS s)
-{
-    d[pRED] = s[pRED];
-    d[pGREEN] = s[pGREEN];
-    d[pBLUE] = s[pBLUE];
-    d[pFILTER] = s[pFILTER];
-    d[pTRANSM] = s[pTRANSM];
-}
-
-inline void Assign_Express(EXPRESS d, const EXPRESS s)
-{
-    d[pRED] = s[pRED];
-    d[pGREEN] = s[pGREEN];
-    d[pBLUE] = s[pBLUE];
-    d[pFILTER] = s[pFILTER];
-    d[pTRANSM] = s[pTRANSM];
-}
-
-/// @deprecated See @ref pov::COLOUR.
-inline void Make_ColourA(COLOUR c, COLC r, COLC g, COLC b, COLC a, COLC t)
-{
-    c[pRED] = r;
-    c[pGREEN] = g;
-    c[pBLUE] = b;
-    c[pFILTER] = a;
-    c[pTRANSM] = t;
-}
-
-/// @deprecated See @ref pov::VECTOR.
-inline void Make_Vector(VECTOR v, DBL a, DBL b, DBL c)
-{
-    v[X] = a;
-    v[Y] = b;
-    v[Z] = c;
-}
-
-/// @deprecated See @ref pov::UV_VECT.
-inline void Make_UV_Vector(UV_VECT v, DBL a, DBL b)
-{
-    v[U] = a;
-    v[V] = b;
 }
 
 inline void Destroy_Float(DBL *x)
@@ -266,11 +193,10 @@ inline void Destroy_Vector_4D(VECTOR_4D *x)
         POV_FREE(x);
 }
 
-/// @deprecated See @ref pov::COLOUR.
-inline void Destroy_Colour(COLOUR *x)
+inline void Destroy_Colour(RGBFTColour *x)
 {
     if(x != NULL)
-        POV_FREE(x);
+        delete x;
 }
 
 #if 0
@@ -291,180 +217,184 @@ class GenericVector2d
 
         typedef T UV_VECT_T[2];
 
-        GenericVector2d()
+        inline GenericVector2d()
         {
             vect[X] = 0.0;
             vect[Y] = 0.0;
         }
 
-        explicit GenericVector2d(T d)
+        inline explicit GenericVector2d(T d)
         {
             vect[X] = d;
             vect[Y] = d;
         }
 
-        GenericVector2d(T x, T y)
+        inline GenericVector2d(T x, T y)
         {
             vect[X] = x;
             vect[Y] = y;
         }
 
-        explicit GenericVector2d(const UV_VECT vi)
+        inline explicit GenericVector2d(const EXPRESS vi)
         {
             vect[X] = T(vi[X]);
             vect[Y] = T(vi[Y]);
         }
 
-        explicit GenericVector2d(const GenericVector3d<T>& b);
-
-        template<typename T2>
-        explicit GenericVector2d(const GenericVector2d<T2>& b)
-        {
-            vect[X] = T(b[X]);
-            vect[Y] = T(b[Y]);
-        }
-
-        GenericVector2d(const GenericVector2d& b)
+        inline explicit GenericVector2d(const GenericVector3d<T>& b)
         {
             vect[X] = b[X];
             vect[Y] = b[Y];
         }
 
-        GenericVector2d& operator=(const GenericVector2d& b)
+        template<typename T2>
+        inline explicit GenericVector2d(const GenericVector2d<T2>& b)
+        {
+            vect[X] = T(b[X]);
+            vect[Y] = T(b[Y]);
+        }
+
+        inline GenericVector2d(const GenericVector2d& b)
+        {
+            vect[X] = b[X];
+            vect[Y] = b[Y];
+        }
+
+        inline GenericVector2d& operator=(const GenericVector2d& b)
         {
             vect[X] = b[X];
             vect[Y] = b[Y];
             return *this;
         }
 
-        T operator[](int idx) const { return vect[idx]; }
-        T& operator[](int idx) { return vect[idx]; }
+        inline T operator[](int idx) const { return vect[idx]; }
+        inline T& operator[](int idx) { return vect[idx]; }
 
-        GenericVector2d operator+(const GenericVector2d& b) const
+        inline GenericVector2d operator+(const GenericVector2d& b) const
         {
             return GenericVector2d(vect[X] + b[X], vect[Y] + b[Y]);
         }
 
-        GenericVector2d operator-(const GenericVector2d& b) const
+        inline GenericVector2d operator-(const GenericVector2d& b) const
         {
             return GenericVector2d(vect[X] - b[X], vect[Y] - b[Y]);
         }
 
-        GenericVector2d operator*(const GenericVector2d& b) const
+        inline GenericVector2d operator*(const GenericVector2d& b) const
         {
             return GenericVector2d(vect[X] * b[X], vect[Y] * b[Y]);
         }
 
-        GenericVector2d operator/(const GenericVector2d& b) const
+        inline GenericVector2d operator/(const GenericVector2d& b) const
         {
             return GenericVector2d(vect[X] / b[X], vect[Y] / b[Y]);
         }
 
-        GenericVector2d& operator+=(const GenericVector2d& b)
+        inline GenericVector2d& operator+=(const GenericVector2d& b)
         {
             vect[X] += b[X];
             vect[Y] += b[Y];
             return *this;
         }
 
-        GenericVector2d& operator-=(const GenericVector2d& b)
+        inline GenericVector2d& operator-=(const GenericVector2d& b)
         {
             vect[X] -= b[X];
             vect[Y] -= b[Y];
             return *this;
         }
 
-        GenericVector2d& operator*=(const GenericVector2d& b)
+        inline GenericVector2d& operator*=(const GenericVector2d& b)
         {
             vect[X] *= b[X];
             vect[Y] *= b[Y];
             return *this;
         }
 
-        GenericVector2d& operator/=(const GenericVector2d& b)
+        inline GenericVector2d& operator/=(const GenericVector2d& b)
         {
             vect[X] /= b[X];
             vect[Y] /= b[Y];
             return *this;
         }
 
-        GenericVector2d operator-() const
+        inline GenericVector2d operator-() const
         {
             return GenericVector2d(-vect[X], -vect[Y]);
         }
 
-        GenericVector2d operator+(T b) const
+        inline GenericVector2d operator+(T b) const
         {
             return GenericVector2d(vect[X] + b, vect[Y] + b);
         }
 
-        GenericVector2d operator-(T b) const
+        inline GenericVector2d operator-(T b) const
         {
             return GenericVector2d(vect[X] - b, vect[Y] - b);
         }
 
-        GenericVector2d operator*(T b) const
+        inline GenericVector2d operator*(T b) const
         {
             return GenericVector2d(vect[X] * b, vect[Y] * b);
         }
 
-        GenericVector2d operator/(T b) const
+        inline GenericVector2d operator/(T b) const
         {
             return GenericVector2d(vect[X] / b, vect[Y] / b);
         }
 
-        GenericVector2d& operator+=(T b)
+        inline GenericVector2d& operator+=(T b)
         {
             vect[X] += b;
             vect[Y] += b;
             return *this;
         }
 
-        GenericVector2d& operator-=(T b)
+        inline GenericVector2d& operator-=(T b)
         {
             vect[X] -= b;
             vect[Y] -= b;
             return *this;
         }
 
-        GenericVector2d& operator*=(T b)
+        inline GenericVector2d& operator*=(T b)
         {
             vect[X] *= b;
             vect[Y] *= b;
             return *this;
         }
 
-        GenericVector2d& operator/=(T b)
+        inline GenericVector2d& operator/=(T b)
         {
             vect[X] /= b;
             vect[Y] /= b;
             return *this;
         }
 
-        const UV_VECT_T& operator*() const { return vect; }
-        UV_VECT_T& operator*() { return vect; }
+        inline const UV_VECT_T& operator*() const { return vect; }
+        inline UV_VECT_T& operator*() { return vect; }
 
-        T x() const { return vect[X]; }
-        T& x() { return vect[X]; }
+        inline T x() const { return vect[X]; }
+        inline T& x() { return vect[X]; }
 
-        T y() const { return vect[Y]; }
-        T& y() { return vect[Y]; }
+        inline T y() const { return vect[Y]; }
+        inline T& y() { return vect[Y]; }
 
-        T u() const { return vect[X]; }
-        T& u() { return vect[X]; }
+        inline T u() const { return vect[X]; }
+        inline T& u() { return vect[X]; }
 
-        T v() const { return vect[Y]; }
-        T& v() { return vect[Y]; }
+        inline T v() const { return vect[Y]; }
+        inline T& v() { return vect[Y]; }
 
-        T length() const
+        inline T length() const
         {
             return sqrt(vect[X] * vect[X] + vect[Y] * vect[Y]);
         }
-        T lengthSqr() const
+        inline T lengthSqr() const
         {
             return vect[X] * vect[X] + vect[Y] * vect[Y];
         }
-        GenericVector2d normalized() const
+        inline GenericVector2d normalized() const
         {
             T l = length();
             if (l != 0)
@@ -472,7 +402,7 @@ class GenericVector2d
             else
                 return *this;
         }
-        void normalize()
+        inline void normalize()
         {
             T l = length();
             if (l != 0)
@@ -500,28 +430,28 @@ class GenericVector3d
 
         typedef T VECTOR_T[3];
 
-        GenericVector3d()
+        inline GenericVector3d()
         {
             vect[X] = 0.0;
             vect[Y] = 0.0;
             vect[Z] = 0.0;
         }
 
-        explicit GenericVector3d(T d)
+        inline explicit GenericVector3d(T d)
         {
             vect[X] = d;
             vect[Y] = d;
             vect[Z] = d;
         }
 
-        GenericVector3d(T x, T y, T z)
+        inline GenericVector3d(T x, T y, T z)
         {
             vect[X] = x;
             vect[Y] = y;
             vect[Z] = z;
         }
 
-        explicit GenericVector3d(const VECTOR vi)
+        inline explicit GenericVector3d(const EXPRESS vi)
         {
             vect[X] = T(vi[X]);
             vect[Y] = T(vi[Y]);
@@ -529,21 +459,21 @@ class GenericVector3d
         }
 
         template<typename T2>
-        explicit GenericVector3d(const GenericVector3d<T2>& b)
+        inline explicit GenericVector3d(const GenericVector3d<T2>& b)
         {
             vect[X] = T(b[X]);
             vect[Y] = T(b[Y]);
             vect[Z] = T(b[Z]);
         }
 
-        GenericVector3d(const GenericVector3d& b)
+        inline GenericVector3d(const GenericVector3d& b)
         {
             vect[X] = b[X];
             vect[Y] = b[Y];
             vect[Z] = b[Z];
         }
 
-        GenericVector3d& operator=(const GenericVector3d& b)
+        inline GenericVector3d& operator=(const GenericVector3d& b)
         {
             vect[X] = b[X];
             vect[Y] = b[Y];
@@ -551,30 +481,30 @@ class GenericVector3d
             return *this;
         }
 
-        T operator[](int idx) const { return vect[idx]; }
-        T& operator[](int idx) { return vect[idx]; }
+        inline T operator[](int idx) const { return vect[idx]; }
+        inline T& operator[](int idx) { return vect[idx]; }
 
-        GenericVector3d operator+(const GenericVector3d& b) const
+        inline GenericVector3d operator+(const GenericVector3d& b) const
         {
             return GenericVector3d(vect[X] + b[X], vect[Y] + b[Y], vect[Z] + b[Z]);
         }
 
-        GenericVector3d operator-(const GenericVector3d& b) const
+        inline GenericVector3d operator-(const GenericVector3d& b) const
         {
             return GenericVector3d(vect[X] - b[X], vect[Y] - b[Y], vect[Z] - b[Z]);
         }
 
-        GenericVector3d operator*(const GenericVector3d& b) const
+        inline GenericVector3d operator*(const GenericVector3d& b) const
         {
             return GenericVector3d(vect[X] * b[X], vect[Y] * b[Y], vect[Z] * b[Z]);
         }
 
-        GenericVector3d operator/(const GenericVector3d& b) const
+        inline GenericVector3d operator/(const GenericVector3d& b) const
         {
             return GenericVector3d(vect[X] / b[X], vect[Y] / b[Y], vect[Z] / b[Z]);
         }
 
-        GenericVector3d& operator+=(const GenericVector3d& b)
+        inline GenericVector3d& operator+=(const GenericVector3d& b)
         {
             vect[X] += b[X];
             vect[Y] += b[Y];
@@ -582,7 +512,7 @@ class GenericVector3d
             return *this;
         }
 
-        GenericVector3d& operator-=(const GenericVector3d& b)
+        inline GenericVector3d& operator-=(const GenericVector3d& b)
         {
             vect[X] -= b[X];
             vect[Y] -= b[Y];
@@ -590,7 +520,7 @@ class GenericVector3d
             return *this;
         }
 
-        GenericVector3d& operator*=(const GenericVector3d& b)
+        inline GenericVector3d& operator*=(const GenericVector3d& b)
         {
             vect[X] *= b[X];
             vect[Y] *= b[Y];
@@ -598,7 +528,7 @@ class GenericVector3d
             return *this;
         }
 
-        GenericVector3d& operator/=(const GenericVector3d& b)
+        inline GenericVector3d& operator/=(const GenericVector3d& b)
         {
             vect[X] /= b[X];
             vect[Y] /= b[Y];
@@ -606,32 +536,32 @@ class GenericVector3d
             return *this;
         }
 
-        GenericVector3d operator-() const
+        inline GenericVector3d operator-() const
         {
             return GenericVector3d(-vect[X], -vect[Y], -vect[Z]);
         }
 
-        GenericVector3d operator+(T b) const
+        inline GenericVector3d operator+(T b) const
         {
             return GenericVector3d(vect[X] + b, vect[Y] + b, vect[Z] + b);
         }
 
-        GenericVector3d operator-(T b) const
+        inline GenericVector3d operator-(T b) const
         {
             return GenericVector3d(vect[X] - b, vect[Y] - b, vect[Z] - b);
         }
 
-        GenericVector3d operator*(T b) const
+        inline GenericVector3d operator*(T b) const
         {
             return GenericVector3d(vect[X] * b, vect[Y] * b, vect[Z] * b);
         }
 
-        GenericVector3d operator/(T b) const
+        inline GenericVector3d operator/(T b) const
         {
             return GenericVector3d(vect[X] / b, vect[Y] / b, vect[Z] / b);
         }
 
-        GenericVector3d& operator+=(T b)
+        inline GenericVector3d& operator+=(T b)
         {
             vect[X] += b;
             vect[Y] += b;
@@ -639,7 +569,7 @@ class GenericVector3d
             return *this;
         }
 
-        GenericVector3d& operator-=(T b)
+        inline GenericVector3d& operator-=(T b)
         {
             vect[X] -= b;
             vect[Y] -= b;
@@ -647,7 +577,7 @@ class GenericVector3d
             return *this;
         }
 
-        GenericVector3d& operator*=(T b)
+        inline GenericVector3d& operator*=(T b)
         {
             vect[X] *= b;
             vect[Y] *= b;
@@ -655,7 +585,7 @@ class GenericVector3d
             return *this;
         }
 
-        GenericVector3d& operator/=(T b)
+        inline GenericVector3d& operator/=(T b)
         {
             vect[X] /= b;
             vect[Y] /= b;
@@ -663,27 +593,27 @@ class GenericVector3d
             return *this;
         }
 
-        const VECTOR_T& operator*() const { return vect; }
-        VECTOR_T& operator*() { return vect; }
+        inline const VECTOR_T& operator*() const { return vect; }
+        inline VECTOR_T& operator*() { return vect; }
 
-        T x() const { return vect[X]; }
-        T& x() { return vect[X]; }
+        inline T x() const { return vect[X]; }
+        inline T& x() { return vect[X]; }
 
-        T y() const { return vect[Y]; }
-        T& y() { return vect[Y]; }
+        inline T y() const { return vect[Y]; }
+        inline T& y() { return vect[Y]; }
 
-        T z() const { return vect[Z]; }
-        T& z() { return vect[Z]; }
+        inline T z() const { return vect[Z]; }
+        inline T& z() { return vect[Z]; }
 
-        T length() const
+        inline T length() const
         {
             return sqrt(vect[X] * vect[X] + vect[Y] * vect[Y] + vect[Z] * vect[Z]);
         }
-        T lengthSqr() const
+        inline T lengthSqr() const
         {
             return vect[X] * vect[X] + vect[Y] * vect[Y] + vect[Z] * vect[Z];
         }
-        GenericVector3d normalized() const
+        inline GenericVector3d normalized() const
         {
             T l = length();
             if (l != 0)
@@ -691,14 +621,14 @@ class GenericVector3d
             else
                 return *this;
         }
-        void normalize()
+        inline void normalize()
         {
             T l = length();
             if (l != 0)
                 *this /= l;
             // no else
         }
-        void invert()
+        inline void invert()
         {
             vect[X] = -vect[X];
             vect[Y] = -vect[Y];
@@ -816,15 +746,6 @@ inline GenericVector3d<T> max(GenericVector3d<T>& a, const GenericVector3d<T>& b
                                std::max(a[Y], std::max(b[Y], std::max(c[Y], d[Y]))),
                                std::max(a[Z], std::max(b[Z], std::max(c[Z], d[Z]))) );
 }
-
-template<typename T>
-inline GenericVector2d<T>::GenericVector2d(const GenericVector3d<T>& b)
-{
-    vect[X] = b[X];
-    vect[Y] = b[Y];
-}
-
-typedef pov_base::Colour Colour;
 
 /// @}
 ///
@@ -949,17 +870,13 @@ struct Transform_Struct
 ///
 //******************************************************************************
 ///
-/// @name Colour Map Stuff
+/// @name Blend Map Stuff
 /// @{
 
 #if 0
 #pragma mark * Blend Map
 #endif
 
-const int MAX_BLEND_MAP_ENTRIES = 256;
-
-typedef struct Blend_Map_Entry BLEND_MAP_ENTRY;
-typedef struct Blend_Map_Struct BLEND_MAP;
 typedef struct Pattern_Struct TPATTERN;
 typedef struct Texture_Struct TEXTURE;
 typedef struct Pigment_Struct PIGMENT;
@@ -970,34 +887,167 @@ typedef struct Warps_Struct WARP;
 typedef struct Spline_Entry SPLINE_ENTRY;
 typedef struct Spline_Struct SPLINE;
 
-struct Blend_Map_Entry
+typedef TEXTURE* TexturePtr;
+
+template<typename DATA_T>
+struct BlendMapEntry
 {
-    SNGL value;
-    unsigned char Same;
-    union
-    {
-        COLOUR colour;
-        PIGMENT *Pigment;
-        TNORMAL *Tnormal;
-        TEXTURE *Texture;
-        UV_VECT Point_Slope;
-    } Vals;
+    SNGL    value;
+    DATA_T  Vals;
 };
 
-struct Blend_Map_Struct
+/// Template for blend maps classes.
+template<typename DATA_T>
+class BlendMap
 {
-    int Users;                              ///< -1 for default blend maps (prevents them from being destroyed)
-    short Number_Of_Entries;
-    char Transparency_Flag, Type;
-    BLEND_MAP_ENTRY *Blend_Map_Entries;
+    public:
+
+        typedef DATA_T                  Data;
+        typedef BlendMapEntry<DATA_T>   Entry;
+        typedef Entry*                  EntryPtr;
+        typedef const Entry*            EntryConstPtr;
+        typedef vector<Entry>           Vector;
+
+        BlendMap(int type);
+        virtual ~BlendMap() {}
+
+        void Set(const Vector& data);
+        void Search(DBL value, EntryConstPtr& rpPrev, EntryConstPtr& rpNext, DBL& rPrevWeight, DBL& rNextWeight) const;
+
+    // protected:
+
+        unsigned char   Type;
+        Vector          Blend_Map_Entries;
 };
 
-inline void Make_Blend_Map_Entry(BLEND_MAP_ENTRY& entry, SNGL v, unsigned char s, COLC r, COLC g, COLC b, COLC a, COLC t)
+
+/// Common interface for pigment-like blend maps.
+/// 
+/// This purely abstract class provides the common interface for both pigment and colour blend maps.
+///
+/// @note   This class is used in a multiple inheritance hierarchy, and therefore must continue to be purely abstract.
+///
+class GenericPigmentBlendMap
 {
-    entry.value = v;
-    entry.Same = s;
-    Make_ColourA(entry.Vals.colour, r, g, b, a, t);
-}
+    public:
+
+        virtual ~GenericPigmentBlendMap() {}
+
+        virtual bool Compute(TransColour& colour, DBL value, const Vector3d& IPoint, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread) = 0;
+        virtual void ComputeAverage(TransColour& colour, const Vector3d& EPoint, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread) = 0;
+        virtual bool ComputeUVMapped(TransColour& colour, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread) = 0;
+        virtual void ConvertFilterToTransmit() = 0; ///< @deprecated Only used for backward compatibility with version 3.10 or earlier.
+        virtual void Post(bool& rHasFilter) = 0;
+};
+
+/// Colour blend map.
+class ColourBlendMap : public BlendMap<TransColour>, public GenericPigmentBlendMap
+{
+    public:
+
+        ColourBlendMap();
+        ColourBlendMap(int n, const Entry aEntries[]);
+
+        virtual bool Compute(TransColour& colour, DBL value, const Vector3d& IPoint, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread);
+        virtual void ComputeAverage(TransColour& colour, const Vector3d& EPoint, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread);
+        virtual bool ComputeUVMapped(TransColour& colour, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread);
+        virtual void ConvertFilterToTransmit(); ///< @deprecated Only used for backward compatibility with version 3.10 or earlier.
+        virtual void Post(bool& rHasFilter);
+};
+
+/// Pigment blend map.
+class PigmentBlendMap : public BlendMap<PIGMENT*>, public GenericPigmentBlendMap
+{
+    public:
+
+        PigmentBlendMap(int type);
+        virtual ~PigmentBlendMap();
+
+        virtual bool Compute(TransColour& colour, DBL value, const Vector3d& IPoint, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread);
+        virtual void ComputeAverage(TransColour& colour, const Vector3d& EPoint, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread);
+        virtual bool ComputeUVMapped(TransColour& colour, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread);
+        virtual void ConvertFilterToTransmit(); ///< @deprecated Only used for backward compatibility with version 3.10 or earlier.
+        virtual void Post(bool& rHasFilter);
+};
+
+
+/// Common interface for normal-like blend maps.
+/// 
+/// This purely abstract class provides the common interface for both normal and slope blend maps.
+///
+/// @note   This class is used in a multiple inheritance hierarchy, and therefore must continue to be purely abstract.
+///
+class GenericNormalBlendMap
+{
+    public:
+
+        virtual ~GenericNormalBlendMap() {}
+
+        virtual void Post(bool dontScaleBumps) = 0;
+        virtual void ComputeAverage (const Vector3d& EPoint, Vector3d& normal, Intersection *Inter, const Ray *ray, TraceThreadData *Thread) = 0;
+};
+
+class SlopeBlendMap : public BlendMap<Vector2d>, public GenericNormalBlendMap
+{
+    public:
+
+        SlopeBlendMap();
+        virtual ~SlopeBlendMap();
+
+        virtual void Post(bool dontScaleBumps);
+        virtual void ComputeAverage (const Vector3d& EPoint, Vector3d& normal, Intersection *Inter, const Ray *ray, TraceThreadData *Thread);
+};
+
+class NormalBlendMap : public BlendMap<TNORMAL*>, public GenericNormalBlendMap
+{
+    public:
+
+        NormalBlendMap();
+        virtual ~NormalBlendMap();
+
+        virtual void Post(bool dontScaleBumps);
+        virtual void ComputeAverage (const Vector3d& EPoint, Vector3d& normal, Intersection *Inter, const Ray *ray, TraceThreadData *Thread);
+};
+
+
+/// Texture blend map.
+class TextureBlendMap : public BlendMap<TexturePtr>
+{
+    public:
+
+        TextureBlendMap();
+        ~TextureBlendMap();
+};
+
+typedef shared_ptr<GenericPigmentBlendMap>          GenericPigmentBlendMapPtr;
+typedef shared_ptr<const GenericPigmentBlendMap>    GenericPigmentBlendMapConstPtr;
+
+typedef PIGMENT*                                    PigmentBlendMapData;
+typedef BlendMapEntry<PigmentBlendMapData>          PigmentBlendMapEntry;
+typedef shared_ptr<PigmentBlendMap>                 PigmentBlendMapPtr;
+typedef shared_ptr<const PigmentBlendMap>           PigmentBlendMapConstPtr;
+
+typedef TransColour                                 ColourBlendMapData;
+typedef BlendMapEntry<ColourBlendMapData>           ColourBlendMapEntry;
+typedef shared_ptr<ColourBlendMap>                  ColourBlendMapPtr;
+typedef shared_ptr<const ColourBlendMap>            ColourBlendMapConstPtr;
+
+typedef shared_ptr<GenericNormalBlendMap>           GenericNormalBlendMapPtr;
+typedef shared_ptr<const GenericNormalBlendMap>     GenericNormalBlendMapConstPtr;
+
+typedef Vector2d                                    SlopeBlendMapData;
+typedef BlendMapEntry<SlopeBlendMapData>            SlopeBlendMapEntry;
+typedef shared_ptr<SlopeBlendMap>                   SlopeBlendMapPtr;
+typedef shared_ptr<const SlopeBlendMap>             SlopeBlendMapConstPtr;
+
+typedef TNORMAL*                                    NormalBlendMapData;
+typedef BlendMapEntry<NormalBlendMapData>           NormalBlendMapEntry;
+typedef shared_ptr<NormalBlendMap>                  NormalBlendMapPtr;
+typedef shared_ptr<const NormalBlendMap>            NormalBlendMapConstPtr;
+
+typedef BlendMapEntry<TexturePtr>                   TextureBlendMapEntry;
+typedef shared_ptr<TextureBlendMap>                 TextureBlendMapPtr;
+typedef shared_ptr<const TextureBlendMap>           TextureBlendMapConstPtr;
 
 /// @}
 ///
@@ -1027,10 +1077,10 @@ class Media
         DBL Jitter;
         DBL Eccentricity;
         DBL sc_ext;
-        RGBColour Absorption;
-        RGBColour Emission;
-        RGBColour Extinction;
-        RGBColour Scattering;
+        MathColour Absorption;
+        MathColour Emission;
+        MathColour Extinction;
+        MathColour Scattering;
 
         DBL Ratio;
         DBL Confidence;
@@ -1062,7 +1112,7 @@ class Interior
         SNGL IOR, Dispersion;
         SNGL Caustics, Old_Refract;
         SNGL Fade_Distance, Fade_Power;
-        RGBColour Fade_Colour;
+        MathColour Fade_Colour;
         vector<Media> media;
         shared_ptr<SubsurfaceInterior> subsurface;
 
@@ -1185,23 +1235,25 @@ struct Pattern_Struct
     unsigned short Type;
     unsigned short Flags;
     PatternPtr pattern;
-    BLEND_MAP *Blend_Map;
 };
 
 struct Pigment_Struct : public Pattern_Struct
 {
-    Colour colour;       // may have a filter/transmit component
-    Colour Quick_Colour; // may have a filter/transmit component    // TODO - can't we decide between regular colour and quick_colour at parse time already?
+    shared_ptr<GenericPigmentBlendMap> Blend_Map;
+    TransColour colour;       // may have a filter/transmit component
+    TransColour Quick_Colour; // may have a filter/transmit component    // TODO - can't we decide between regular colour and quick_colour at parse time already?
 };
 
 struct Tnormal_Struct : public Pattern_Struct
 {
+    GenericNormalBlendMapPtr Blend_Map;
     SNGL Amount;
     SNGL Delta; // NK delta
 };
 
 struct Texture_Struct : public Pattern_Struct
 {
+    TextureBlendMapPtr Blend_Map;
     int References;
     TEXTURE *Next;
     PIGMENT *Pigment;
@@ -1218,9 +1270,9 @@ struct Finish_Struct
     SNGL Irid, Irid_Film_Thickness, Irid_Turb;
     SNGL Temp_Caustics, Temp_IOR, Temp_Dispersion, Temp_Refract, Reflect_Exp;
     SNGL Crand, Metallic;
-    RGBColour Ambient, Emission, Reflection_Max, Reflection_Min;
-    RGBColour SubsurfaceTranslucency, SubsurfaceAnisotropy;
-    //RGBColour SigmaPrimeS, SigmaA;
+    MathColour Ambient, Emission, Reflection_Max, Reflection_Min;
+    MathColour SubsurfaceTranslucency, SubsurfaceAnisotropy;
+    //MathColour SigmaPrimeS, SigmaA;
     SNGL Reflection_Falloff;  // Added by MBP 8/27/98
     int Reflection_Type;  // Added by MBP 9/5/98
     SNGL Reflect_Metallic; // MBP
@@ -1269,14 +1321,7 @@ struct Material_Struct
 #define DUMP_OBJECT_DATA 0
 #endif
 
-// TODO FIXME
-class SceneThreadData;
-typedef SceneThreadData TraceThreadData;
-
 class LightSource;
-class Ray;
-class Intersection;
-
 // These fields are common to all objects.
 template<typename T>
 class RefPool
@@ -1326,10 +1371,6 @@ class Ref
         Ref(const Ref&);
         Ref& operator=(Ref&);
 };
-
-typedef stack<Intersection, vector<Intersection> > IStackData;
-typedef RefPool<IStackData> IStackPool;
-typedef Ref<IStackData> IStack;
 
 struct WeightedTexture
 {
@@ -1446,9 +1487,9 @@ class Intersection
         bool haveNormal;
         /// Flag to indicate whether LocalIPoint has already been computed.
         bool haveLocalIPoint;
-        /// Generic auxiliary integer data #1 (used by Sor, Prism, Lathe, Cones, Boxes)
+        /// Generic auxiliary integer data #1 (used by Sor, Prism, Isosurface, Lathe, Cones, Boxes)
         int i1;
-        /// Generic auxiliary integer data #2 (used by Sor, Prism)
+        /// Generic auxiliary integer data #2 (used by Sor, Prism, Isosurface)
         int i2;
         /// Generic auxiliary float data #1 (used by Prism, Lathe)
         DBL d1;
@@ -1510,6 +1551,10 @@ class Intersection
 
         ~Intersection() { }
 };
+
+typedef std::stack<Intersection, vector<Intersection> > IStackData;
+typedef RefPool<IStackData> IStackPool;
+typedef Ref<IStackData> IStack;
 
 /// @}
 ///
@@ -1693,6 +1738,36 @@ class FractalRules
 };
 
 typedef shared_ptr<FractalRules> FractalRulesPtr;
+
+
+struct QualityFlags
+{
+    bool ambientOnly    : 1;
+    bool quickColour    : 1;
+    bool shadows        : 1;
+    bool areaLights     : 1;
+    bool refractions    : 1;
+    bool reflections    : 1;
+    bool normals        : 1;
+    bool media          : 1;
+    bool radiosity      : 1;
+    bool photons        : 1;
+    bool subsurface     : 1;
+
+    explicit QualityFlags(int level) :
+        ambientOnly (level <= 1),
+        quickColour (level <= 5),
+        shadows     (level >= 4),
+        areaLights  (level >= 5),
+        refractions (level >= 6),
+        reflections (level >= 8),
+        normals     (level >= 8),
+        media       (level >= 9),
+        radiosity   (level >= 9),
+        photons     (level >= 9),
+        subsurface  (level >= 9)
+    {}
+};
 
 
 // platform-specific headers should have provided DECLARE_THREAD_LOCAL_PTR.

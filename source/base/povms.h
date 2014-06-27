@@ -1,41 +1,47 @@
-/*******************************************************************************
- * povms.h
- *
- * This module contains all defines, typedefs, and prototypes for povms.cpp.
- *
- * ---------------------------------------------------------------------------
- * Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
- * Copyright 1991-2013 Persistence of Vision Raytracer Pty. Ltd.
- *
- * POV-Ray is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * POV-Ray is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------------
- * POV-Ray is based on the popular DKB raytracer version 2.12.
- * DKBTrace was originally written by David K. Buck.
- * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
- * ---------------------------------------------------------------------------
- * $File: //depot/povray/smp/source/base/povms.h $
- * $Revision: #21 $
- * $Change: 6085 $
- * $DateTime: 2013/11/10 07:39:29 $
- * $Author: clipka $
- *******************************************************************************/
+//******************************************************************************
+///
+/// @file base/povms.h
+///
+/// Declarations for the C-style API of the POVMS message-passing framework.
+///
+/// @copyright
+/// @parblock
+///
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
+/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+///
+/// POV-Ray is free software: you can redistribute it and/or modify
+/// it under the terms of the GNU Affero General Public License as
+/// published by the Free Software Foundation, either version 3 of the
+/// License, or (at your option) any later version.
+///
+/// POV-Ray is distributed in the hope that it will be useful,
+/// but WITHOUT ANY WARRANTY; without even the implied warranty of
+/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+/// GNU Affero General Public License for more details.
+///
+/// You should have received a copy of the GNU Affero General Public License
+/// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+///
+/// ----------------------------------------------------------------------------
+///
+/// POV-Ray is based on the popular DKB raytracer version 2.12.
+/// DKBTrace was originally written by David K. Buck.
+/// DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
+///
+/// @endparblock
+///
+//******************************************************************************
 
 #ifndef POVMS_H
 #define POVMS_H
 
+/// @file
+/// @deprecated The API declared herein should not be used directly. Use the C++
+///             wrapper API declared in base/povmscpp.h instead.
+
 #ifndef POVMS_NO_DUMP_SUPPORT
-	#include <stdio.h>
+    #include <stdio.h>
 #endif
 
 /*****************************************************************************
@@ -45,85 +51,89 @@
 /* Note: This low level fatal error text output function is required.
    It defaults to printf if you do not overload it in config.h! */
 #ifndef POVMS_ASSERT_OUTPUT
-	#define POVMS_ASSERT_OUTPUT(s,f,l) fprintf(stderr, "POVMS_ASSERT failed in %s line %d: %s\n", f, (int)l, s)
+    #define POVMS_ASSERT_OUTPUT(s,f,l) fprintf(stderr, "POVMS_ASSERT failed in %s line %d: %s\n", f, (int)l, s)
 #endif
 
 #ifndef POVMS_LOG_OUTPUT
-	#define POVMS_LOG_OUTPUT(s)
+    #define POVMS_LOG_OUTPUT(s)
 #endif
 
 /* Note: POVMSType needs to be 32 bit! (unsigned), it will be composed
    of four characters, i.e. 'MyTp', 'any ', '4Mac', etc. */
 #ifndef POVMSType
-	#define POVMSType      unsigned int
+    #define POVMSType      unsigned int
 #endif
 
 #ifndef POVMSInt
-	#define POVMSInt       int
+    #define POVMSInt       int
 #endif
 
 #ifndef POVMSLong
-	#define POVMSLong      long long
+    #define POVMSLong      long long
 
-	#define SetPOVMSLong(v,h,l) *v = (((((POVMSLong)(h)) & 0x00000000ffffffff) << 32) | (((POVMSLong)(l)) & 0x00000000ffffffff))
-	#define GetPOVMSLong(h,l,v) *h = ((v) >> 32) & 0x00000000ffffffff; *l = (v) & 0x00000000ffffffff
+    #define SetPOVMSLong(v,h,l) *v = (((((POVMSLong)(h)) & 0x00000000ffffffff) << 32) | (((POVMSLong)(l)) & 0x00000000ffffffff))
+    #define GetPOVMSLong(h,l,v) *h = ((v) >> 32) & 0x00000000ffffffff; *l = (v) & 0x00000000ffffffff
 
-	#define POVMSLongToCDouble(x) double(x)
+    #define POVMSLongToCDouble(x) double(x)
 #endif
 
 #ifndef POVMSFloat
-	#define POVMSFloat     float
+    #define POVMSFloat     float
 #endif
 
 #ifndef POVMSBool
-	#define POVMSBool      int
+    #define POVMSBool      int
 #endif
 
 #ifndef POVMSUCS2
-	#define POVMSUCS2      unsigned short
+    #ifdef UCS2
+        #define POVMSUCS2  UCS2
+    #else
+        #define POVMSUCS2  unsigned short
+    #endif
 #endif
 
 #ifndef POVMSStream
-	#define POVMSStream    unsigned char
+    #define POVMSStream    unsigned char
 #endif
 
 #ifndef POVMS_NO_ORDERED_STREAM_DATA
-	#ifndef POVMSIEEEFloat
-		#define POVMSIEEEFloat float
+    #ifndef POVMSIEEEFloat
+        #define POVMSIEEEFloat float
 
-		#define POVMSFloatToPOVMSIEEEFloat(p, f) f = p
-		#define POVMSIEEEFloatToPOVMSFloat(f, p) p = f
+        #define POVMSFloatToPOVMSIEEEFloat(p, f) f = p
+        #define POVMSIEEEFloatToPOVMSFloat(f, p) p = f
 
-		#define HexToPOVMSIEEEFloat(h, f) *(reinterpret_cast<int *>(&f)) = h
-	#endif
+        #define HexToPOVMSIEEEFloat(h, f) *(reinterpret_cast<int *>(&f)) = h
+    #endif
 #else
-	// POVMSIEEEFloat does not have to be an IEEE 754 float
-	// if POVMS_NO_ORDERED_STREAM_DATA is off.  It only
-	// has to be 32 bit in size!
-	#ifndef POVMSIEEEFloat
-		#define POVMSIEEEFloat POVMSFloat
+    // POVMSIEEEFloat does not have to be an IEEE 754 float
+    // if POVMS_NO_ORDERED_STREAM_DATA is off.  It only
+    // has to be 32 bit in size!
+    #ifndef POVMSIEEEFloat
+        #define POVMSIEEEFloat POVMSFloat
 
-		#define POVMSFloatToPOVMSIEEEFloat(p, f) f = p
-		#define POVMSIEEEFloatToPOVMSFloat(f, p) p = f
-	#endif
+        #define POVMSFloatToPOVMSIEEEFloat(p, f) f = p
+        #define POVMSIEEEFloatToPOVMSFloat(f, p) p = f
+    #endif
 #endif
 
 /* Note: POVMSAddress needs work with the default copy constructor.
    Adjust it to fit your message addressing needs! */
 
 #ifndef POVMSAddress
-	#define POVMSAddress void *
-	#define POVMSInvalidAddress NULL
+    #define POVMSAddress void *
+    #define POVMSInvalidAddress NULL
 #endif
 
 /* Note: Use POVMS_EXPORT if you need a special export keyword
    in order to use the POVMS functions as part of a library. */
 #ifndef POVMS_EXPORT
-	#define POVMS_EXPORT
+    #define POVMS_EXPORT
 #endif
 
 #ifndef POVMS_CDECL
-	#define POVMS_CDECL
+    #define POVMS_CDECL
 #endif
 
 #undef POVMS_VERSION
@@ -137,38 +147,38 @@
 /* Note: All only upper case types are reserved for internal use. */
 enum
 {
-	kPOVMSObjectClassID         = 'OCLA',
-	kPOVMSMessageClassID        = 'MCLA',
-	kPOVMSMessageIdentID        = 'MIDE',
-	kPOVMSSourceAddressID       = 'MSRC',
-	kPOVMSDestinationAddressID  = 'MDST',
-	kPOVMSMessageTimeoutID      = 'TOUT',
-	kPOVMSMessageErrorID        = 'MERR',
-	kPOVMSMessageSequenceID     = 'MSEQ',
-	kPOVMSResultSequenceID      = 'RSEQ'
+    kPOVMSObjectClassID         = 'OCLA',
+    kPOVMSMessageClassID        = 'MCLA',
+    kPOVMSMessageIdentID        = 'MIDE',
+    kPOVMSSourceAddressID       = 'MSRC',
+    kPOVMSDestinationAddressID  = 'MDST',
+    kPOVMSMessageTimeoutID      = 'TOUT',
+    kPOVMSMessageErrorID        = 'MERR',
+    kPOVMSMessageSequenceID     = 'MSEQ',
+    kPOVMSResultSequenceID      = 'RSEQ'
 };
 
 enum
 {
-	kPOVMSType_Object           = 'OBJE',
-	kPOVMSType_LockedObject     = 'LOCK',
-	kPOVMSType_ResultObject     = 'RESU',
-	kPOVMSType_Address          = 'ADDR',
-	kPOVMSType_Null             = 'NULL',
-	kPOVMSType_WildCard         = '****',
-	kPOVMSType_CString          = 'CSTR',
-	kPOVMSType_UCS2String       = 'U2ST',
-	kPOVMSType_Int              = 'INT4',
-	kPOVMSType_Long             = 'INT8',
-	kPOVMSType_Float            = 'FLT4',
-	kPOVMSType_Double           = 'FLT8',
-	kPOVMSType_Bool             = 'BOOL',
-	kPOVMSType_Type             = 'TYPE',
-	kPOVMSType_List             = 'LIST',
-	kPOVMSType_VectorInt        = 'VIN4',
-	kPOVMSType_VectorLong       = 'VIN8',
-	kPOVMSType_VectorFloat      = 'VFL4',
-	kPOVMSType_VectorType       = 'VTYP',
+    kPOVMSType_Object           = 'OBJE',
+    kPOVMSType_LockedObject     = 'LOCK',
+    kPOVMSType_ResultObject     = 'RESU',
+    kPOVMSType_Address          = 'ADDR',
+    kPOVMSType_Null             = 'NULL',
+    kPOVMSType_WildCard         = '****',
+    kPOVMSType_CString          = 'CSTR',
+    kPOVMSType_UCS2String       = 'U2ST',
+    kPOVMSType_Int              = 'INT4',
+    kPOVMSType_Long             = 'INT8',
+    kPOVMSType_Float            = 'FLT4',
+    kPOVMSType_Double           = 'FLT8',
+    kPOVMSType_Bool             = 'BOOL',
+    kPOVMSType_Type             = 'TYPE',
+    kPOVMSType_List             = 'LIST',
+    kPOVMSType_VectorInt        = 'VIN4',
+    kPOVMSType_VectorLong       = 'VIN8',
+    kPOVMSType_VectorFloat      = 'VFL4',
+    kPOVMSType_VectorType       = 'VTYP',
 };
 
 typedef void * POVMSContext;
@@ -185,30 +195,30 @@ typedef struct POVMSNode POVMSNode;
 
 struct POVMSData
 {
-	POVMSType type;
-	int size;
-	union
-	{
-		void *ptr;
-		struct POVMSData *items;
-		struct POVMSNode *root;
-	};
+    POVMSType type;
+    int size;
+    union
+    {
+        void *ptr;
+        struct POVMSData *items;
+        struct POVMSNode *root;
+    };
 };
 
 struct POVMSNode
 {
-	struct POVMSNode *last;
-	struct POVMSNode *next;
-	POVMSType key;
-	struct POVMSData data;
+    struct POVMSNode *last;
+    struct POVMSNode *next;
+    POVMSType key;
+    struct POVMSData data;
 };
 
 enum
 {
-	kPOVMSSendMode_Invalid = 0,
-	kPOVMSSendMode_NoReply = 1,
-	kPOVMSSendMode_WaitReply = 2,
-	kPOVMSSendMode_WantReceipt = 3
+    kPOVMSSendMode_Invalid = 0,
+    kPOVMSSendMode_NoReply = 1,
+    kPOVMSSendMode_WaitReply = 2,
+    kPOVMSSendMode_WantReceipt = 3
 };
 
 
@@ -321,7 +331,7 @@ POVMS_EXPORT int POVMS_TraceDump                    ();
 #endif /* POVMS_H */
 
 #ifdef POVMSCPP_H
-	#define POVMS_EXPORT_STREAM_FUNCTIONS
+    #define POVMS_EXPORT_STREAM_FUNCTIONS
 #endif
 
 // Stream functions only available to the C++ interface

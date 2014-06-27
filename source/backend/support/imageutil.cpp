@@ -39,10 +39,11 @@
 // frame.h must always be the first POV file included (pulls in platform config)
 #include "backend/frame.h"
 #include "backend/support/imageutil.h"
+
+#include "base/pov_err.h"
 #include "backend/math/vector.h"
 #include "backend/pattern/pattern.h"
 #include "backend/support/fileutil.h"
-#include "base/pov_err.h"
 
 #ifdef SYS_IMAGE_HEADER
 #include SYS_IMAGE_HEADER
@@ -83,14 +84,14 @@ static int cylindrical_image_map(const Vector3d& EPoint, const ImageData *image,
 static int torus_image_map(const Vector3d& EPoint, const ImageData *image, DBL *u, DBL *v);
 static int spherical_image_map(const Vector3d& EPoint, const ImageData *image, DBL *u, DBL *v);
 static int planar_image_map(const Vector3d& EPoint, const ImageData *image, DBL *u, DBL *v);
-static void no_interpolation(const ImageData *image, DBL xcoor, DBL ycoor, Colour& colour, int *index, bool premul);
+static void no_interpolation(const ImageData *image, DBL xcoor, DBL ycoor, RGBFTColour& colour, int *index, bool premul);
 static void bilinear(DBL *factors, DBL x, DBL y);
 static void norm_dist(DBL *factors, DBL x, DBL y);
 static void cubic(DBL *factors, DBL x);
-static void Interp(const ImageData *image, DBL xcoor, DBL ycoor, Colour& colour, int *index, bool premul);
-static void InterpolateBicubic(const ImageData *image, DBL xcoor, DBL ycoor, Colour& colour, int *index, bool premul);
-static void image_colour_at(const ImageData *image, DBL xcoor, DBL ycoor, Colour& colour, int *index); // TODO ALPHA - caller should decide whether to prefer premultiplied or non-premultiplied alpha
-static void image_colour_at(const ImageData *image, DBL xcoor, DBL ycoor, Colour& colour, int *index, bool premul);
+static void Interp(const ImageData *image, DBL xcoor, DBL ycoor, RGBFTColour& colour, int *index, bool premul);
+static void InterpolateBicubic(const ImageData *image, DBL xcoor, DBL ycoor, RGBFTColour& colour, int *index, bool premul);
+static void image_colour_at(const ImageData *image, DBL xcoor, DBL ycoor, RGBFTColour& colour, int *index); // TODO ALPHA - caller should decide whether to prefer premultiplied or non-premultiplied alpha
+static void image_colour_at(const ImageData *image, DBL xcoor, DBL ycoor, RGBFTColour& colour, int *index, bool premul);
 static int map_pos(const Vector3d& EPoint, const BasicPattern* pPattern, DBL *xcoor, DBL *ycoor);
 
 /*
@@ -138,7 +139,7 @@ static int map_pos(const Vector3d& EPoint, const BasicPattern* pPattern, DBL *xc
 *
 ******************************************************************************/
 
-bool image_map(const Vector3d& EPoint, const PIGMENT *Pigment, Colour& colour)
+bool image_map(const Vector3d& EPoint, const PIGMENT *Pigment, TransColour& colour)
 {
     // TODO ALPHA - the caller does expect non-premultiplied data, but maybe he could profit from premultiplied data?
 
@@ -149,13 +150,16 @@ bool image_map(const Vector3d& EPoint, const PIGMENT *Pigment, Colour& colour)
 
     if(map_pos(EPoint, Pigment->pattern.get(), &xcoor, &ycoor))
     {
-        colour = Colour(1.0, 1.0, 1.0, 0.0, 1.0);
+        colour = ToTransColour(RGBFTColour(1.0, 1.0, 1.0, 0.0, 1.0));
         return false;
     }
     else
-        image_colour_at(dynamic_cast<ImagePattern*>(Pigment->pattern.get())->pImage, xcoor, ycoor, colour, &reg_number, false);
-
-    return true;
+    {
+        RGBFTColour rgbft;
+        image_colour_at(dynamic_cast<ImagePattern*>(Pigment->pattern.get())->pImage, xcoor, ycoor, rgbft, &reg_number, false);
+        colour = ToTransColour(rgbft);
+        return true;
+    }
 }
 
 
@@ -187,7 +191,7 @@ TEXTURE *material_map(const Vector3d& EPoint, const TEXTURE *Texture)
     int reg_number = -1;
     int Material_Number;
     DBL xcoor = 0.0, ycoor = 0.0;
-    Colour colour;
+    RGBFTColour colour;
 
     /*
      * Now we have transformed x, y, z we use image mapping routine to determine
@@ -236,7 +240,7 @@ void bump_map(const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& normal)
 {
     DBL xcoor = 0.0, ycoor = 0.0;
     int index = -1, index2 = -1, index3 = -1;
-    Colour colour1, colour2, colour3;
+    RGBFTColour colour1, colour2, colour3;
     Vector3d p1, p2, p3;
     Vector3d bump_normal;
     Vector3d xprime, yprime, zprime;
@@ -279,15 +283,15 @@ void bump_map(const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& normal)
     if(image->Use || (index == -1) || (index2 == -1) || (index3 == -1))
     {
         p1[X] = 0;
-        p1[Y] = Amount * colour1.greyscale();
+        p1[Y] = Amount * colour1.Greyscale();
         p1[Z] = 0;
 
         p2[X] = -1;
-        p2[Y] = Amount * colour2.greyscale();
+        p2[Y] = Amount * colour2.Greyscale();
         p2[Z] = 1;
 
         p3[X] = 1;
-        p3[Y] = Amount * colour3.greyscale();
+        p3[Y] = Amount * colour3.Greyscale();
         p3[Z] = 1;
     }
     else
@@ -362,11 +366,11 @@ DBL image_pattern(const Vector3d& EPoint, const BasicPattern* pPattern)
 {
     DBL xcoor = 0.0, ycoor = 0.0;
     int index = -1;
-    Colour colour;
+    RGBFTColour colour;
     const ImageData *image = dynamic_cast<const ImagePattern*>(pPattern)->pImage;
     DBL Value;
 
-    colour.clear();
+    colour.Clear();
 
     // going to have to change this
     // need to know if bump point is off of image for all 3 points
@@ -388,7 +392,7 @@ DBL image_pattern(const Vector3d& EPoint, const BasicPattern* pPattern)
         }
         else
             // use grey-scaled version of the color
-            Value = colour.greyscale();
+            Value = colour.Greyscale();
     }
     else
         Value = index / 255.0;
@@ -420,7 +424,7 @@ DBL image_pattern(const Vector3d& EPoint, const BasicPattern* pPattern)
 *
 ******************************************************************************/
 
-static void image_colour_at(const ImageData *image, DBL xcoor, DBL ycoor, Colour& colour, int *index)
+static void image_colour_at(const ImageData *image, DBL xcoor, DBL ycoor, RGBFTColour& colour, int *index)
 {
     // TODO ALPHA - caller should decide whether to prefer premultiplied or non-premultiplied alpha
 
@@ -429,7 +433,7 @@ static void image_colour_at(const ImageData *image, DBL xcoor, DBL ycoor, Colour
     image_colour_at(image, xcoor, ycoor, colour, index, image->data->IsPremultiplied());
 }
 
-static void image_colour_at(const ImageData *image, DBL xcoor, DBL ycoor, Colour& colour, int *index, bool premul)
+static void image_colour_at(const ImageData *image, DBL xcoor, DBL ycoor, RGBFTColour& colour, int *index, bool premul)
 {
     *index = -1;
 
@@ -453,7 +457,7 @@ static void image_colour_at(const ImageData *image, DBL xcoor, DBL ycoor, Colour
     if (!premul && getPremul)
     {
         // we fetched premultiplied data, but caller expects it non-premultiplied, so we need to fix that
-        AlphaUnPremultiply(colour);
+        AlphaUnPremultiply(colour.rgb(), colour.FTtoA());
     }
 }
 
@@ -499,7 +503,7 @@ HF_VAL image_height_at(const ImageData *image, int x, int y)
 
     // for images with high bit depth (>8 bit per color channel), use the float greyscale value (scaled to match short int range)
     if (image->data->GetMaxIntValue() > 255)
-        return ((HF_VAL) (colour.greyscale() * 65535.0f));
+        return ((HF_VAL) (colour.Greyscale() * 65535.0f));
 
     // for images with low bit depth (<=8 bit per color channel), compose from red (high byte) and green (low byte) channel.
     return ((HF_VAL) ((colour.red() * 256.0 + colour.green()) * 255.0));
@@ -945,7 +949,7 @@ static int map_pos(const Vector3d& EPoint, const BasicPattern* pPattern, DBL *xc
 *
 ******************************************************************************/
 
-static void no_interpolation(const ImageData *image, DBL xcoor, DBL ycoor, Colour& colour, int *index, bool premul)
+static void no_interpolation(const ImageData *image, DBL xcoor, DBL ycoor, RGBFTColour& colour, int *index, bool premul)
 {
     int iycoor, ixcoor;
 
@@ -1020,11 +1024,11 @@ static void no_interpolation(const ImageData *image, DBL xcoor, DBL ycoor, Colou
 
 // Interpolate color and filter values when mapping
 
-static void Interp(const ImageData *image, DBL xcoor, DBL ycoor, Colour& colour, int *index, bool premul)
+static void Interp(const ImageData *image, DBL xcoor, DBL ycoor, RGBFTColour& colour, int *index, bool premul)
 {
     int iycoor, ixcoor, i;
     int Corners_Index[4];
-    Colour Corner_Colour[4];
+    RGBFTColour Corner_Colour[4];
     DBL Corner_Factors[4];
 
     xcoor += 0.5;
@@ -1047,14 +1051,14 @@ static void Interp(const ImageData *image, DBL xcoor, DBL ycoor, Colour& colour,
     // which would otherwise lead to stray dot artifacts when clamped to [0..1] range for a color_map or similar.
     // (Note that strictly speaking we don't avoid such rounding errors, but rather make them small enough that
     // subsequent rounding to single precision will take care of them.)
-    DblColour temp_colour;
+    PreciseRGBFTColour temp_colour;
     DBL temp_index = 0;
     for (i = 0; i < 4; i ++)
     {
-        temp_colour += DblColour(Corner_Colour[i]) * Corner_Factors[i];
-        temp_index  += Corners_Index[i]            * Corner_Factors[i];
+        temp_colour += PreciseRGBFTColour(Corner_Colour[i]) * Corner_Factors[i];
+        temp_index  += Corners_Index[i]                     * Corner_Factors[i];
     }
-    colour = Colour(temp_colour);
+    colour = RGBFTColour(temp_colour);
     *index = (int)temp_index;
 }
 
@@ -1090,11 +1094,11 @@ static void cubic(DBL *factors, DBL x)
     factors[3] = -0.5 * q * p*p;
 }
 
-static void InterpolateBicubic(const ImageData *image, DBL xcoor, DBL  ycoor, Colour& colour, int *index, bool premul)
+static void InterpolateBicubic(const ImageData *image, DBL xcoor, DBL  ycoor, RGBFTColour& colour, int *index, bool premul)
 {
     int iycoor, ixcoor;
     int cornerIndex;
-    Colour cornerColour;
+    RGBFTColour cornerColour;
     DBL factor;
     DBL factorsX[4];
     DBL factorsY[4];
@@ -1114,20 +1118,20 @@ static void InterpolateBicubic(const ImageData *image, DBL xcoor, DBL  ycoor, Co
     // subsequent rounding to single precision will take care of them.)
     // (Note that bicubic interpolation may still give values outside the range [0..1] at high-contrast edges;
     // this is an inherent property of this interpolation method, and is therefore accepted here.)
-    DblColour tempColour;
+    PreciseRGBFTColour tempColour;
     DBL tempIndex = 0;
     for (int i = 0; i < 4; i ++)
     {
         for (int j = 0; j < 4; j ++)
         {
-            cornerColour.clear();
+            cornerColour.Clear();
             no_interpolation(image, (DBL)ixcoor + i-2, (DBL)iycoor + j-2, cornerColour, &cornerIndex, premul);
             factor = factorsX[i] * factorsY[j];
-            tempColour += DblColour(cornerColour) * factor;
-            tempIndex  += cornerIndex             * factor;
+            tempColour += PreciseRGBFTColour(cornerColour) * factor;
+            tempIndex  += cornerIndex                      * factor;
         }
     }
-    colour = Colour(tempColour);
+    colour = RGBFTColour(tempColour);
     *index = (int)tempIndex;
 }
 
