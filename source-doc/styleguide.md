@@ -28,7 +28,7 @@ POV-Ray is being developed with portability high in mind. In practice and at pre
     considered fair game:
       - Flyweights.
       - Threads.
-	  - Datetime.
+      - Datetime.
       .
     @todo   Make an inventory of what boost libraries we're actually using.
 
@@ -114,17 +114,18 @@ Naming Conventions
 Due to the age of the code, its C legacy, and the large number of contributors from early on, naming conventions in the
 POV-Ray project have been anything but consistent in the past. For new code however, we try to stick to the following
 scheme:
-  
+
   - Macro names should use `UPPER_CASE_WITH_UNDERSCORES`.
   - Class and struct names should use `MixedCase`.
   - Type names should use `MixedCase`. Pointer types should have a `Ptr` suffix, i.e. `MixedCasePtr`. `const` pointer
     types should have a `ConstPtr` suffix, i.e. `MixedCaseConstrPtr`.
-  - Method names (both public and protected) should use `MixedCase` as well.
+  - Method names (both public and protected) should generally use `MixedCase` as well. However, methods that simply
+    return a reference to a member variable may be named with `camelCase` instead.
   - Parameter and variable names should use `camelCase`.
-  
+
 Parameter and variable names might carry one or more additional prefixes. These should all be lowercase; e.g.
 `mpCamelCase`:
-  
+
   - Pointer names should have a `p` prefix. Pointers to pointers should have a `pp` prefix.
   - Non-const references should have a `r` prefix.
   - Arrays should have an `a` prefix.
@@ -186,7 +187,7 @@ Miscellaneous Coding Rules
 
   - **Memory Allocation**: When allocating dynamic memory, do not use C-style allocation (`malloc()`), but C++-style
     allocation using the `new` operator. Whenever responsibility for destruction of the allocated object is non-trivial,
-	make use of smart pointers.
+    make use of smart pointers.
 
 
 Code Documentation
@@ -248,8 +249,10 @@ tools. The following can be freely used:
 
   - **Automatic brief descriptions** (`JAVADOC_AUTOBRIEF=YES`): Please avoid using the `@``brief`
     tag.
-  - **Markdown**: (`MARKDOWN_SUPPORT= YES`). Please avoid tags wherever markdown is easier to read
+  - **Markdown**: (`MARKDOWN_SUPPORT=YES`). Please avoid tags wherever markdown is easier to read
     (e.g., use `_foo_` instead of `@``e foo` for emphasis).
+  - **Dot** (`HAVE_DOT=YES`; <http://www.graphviz.org/>): Please use doxygen's `@``msc` tag format for any message
+    sequence charts, both in source files as well as in markdown files.
   - **Mscgen** (<http://www.mcternan.me.uk/mscgen/>): Please use doxygen's `@``msc` tag format for
     any message sequence charts, both in source files as well as in markdown files.
   - **LaTeX formulae**.
