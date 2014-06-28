@@ -2774,9 +2774,9 @@ void Parser::Parse_BlendMapData<TexturePtr> (int Blend_Type, TexturePtr& rData)
 template<typename MAP_T>
 shared_ptr<MAP_T> Parser::Parse_Blend_Map (int Blend_Type,int Pat_Type)
 {
-    shared_ptr<MAP_T>   New;
-    MAP_T::Entry        Temp_Ent;
-    MAP_T::Vector       tempList;
+    shared_ptr<MAP_T>       New;
+    typename MAP_T::Entry   Temp_Ent;
+    typename MAP_T::Vector  tempList;
     bool old_allow_id = Allow_Identifier_In_Call;
     Allow_Identifier_In_Call = false;
 
@@ -2992,8 +2992,8 @@ void Parser::Parse_BlendListData_Default<TexturePtr> (const ColourBlendMapData& 
 template<typename MAP_T>
 shared_ptr<MAP_T> Parser::Parse_Blend_List (int Count, ColourBlendMapConstPtr Def_Map, int Blend_Type)
 {
-    shared_ptr<MAP_T>   New;
-    MAP_T::Vector       tempList;
+    shared_ptr<MAP_T>       New;
+    typename MAP_T::Vector  tempList;
     int i;
     bool old_allow_id = Allow_Identifier_In_Call;
     Allow_Identifier_In_Call = false;
@@ -3196,9 +3196,9 @@ template TextureBlendMapPtr Parser::Parse_Blend_List<TextureBlendMap>   (int Cou
 template<typename MAP_T>
 shared_ptr<MAP_T> Parser::Parse_Item_Into_Blend_List (int Blend_Type)
 {
-    shared_ptr<MAP_T>   New;
-    MAP_T::Entry        Temp_Ent;
-    MAP_T::Vector       tempList;
+    shared_ptr<MAP_T>       New;
+    typename MAP_T::Entry   Temp_Ent;
+    typename MAP_T::Vector  tempList;
     int Type;
     bool old_allow_id = Allow_Identifier_In_Call;
     Allow_Identifier_In_Call = false;
