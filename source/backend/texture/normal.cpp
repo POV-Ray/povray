@@ -590,7 +590,6 @@ TNORMAL *Create_Tnormal ()
     New = new TNORMAL;
 
     Init_TPat_Fields(New);
-    New->Blend_Map  = NULL;
 
     New->Amount = 0.5;
 

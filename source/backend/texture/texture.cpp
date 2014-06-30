@@ -1263,7 +1263,6 @@ TEXTURE *Create_Texture()
     New = new TEXTURE;
 
     Init_TPat_Fields(New);
-    New->Blend_Map  = NULL;
 
     New->Next = NULL;
     New->References = 1;

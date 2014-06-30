@@ -37,6 +37,7 @@
 #define POVRAY_BASE_TYPES_H
 
 #include <algorithm>
+#include <limits>
 #include <vector>
 
 #include "base/configbase.h"
