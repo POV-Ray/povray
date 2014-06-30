@@ -916,8 +916,8 @@ void BlendMap<DATA_T>::Search (DBL value, EntryConstPtr& rpPrev, EntryConstPtr& 
     {
         // TODO - we might use a binary search instead
 
-        vector<Entry>::const_iterator iP;
-        vector<Entry>::const_iterator iN;
+        typename vector<Entry>::const_iterator iP;
+        typename vector<Entry>::const_iterator iN;
 
         iP = iN = Blend_Map_Entries.begin();
 
