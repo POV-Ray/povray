@@ -114,11 +114,9 @@ PIGMENT *Create_Pigment ()
     New = new PIGMENT;
 
     Init_TPat_Fields(New);
-    New->Blend_Map  = NULL;
 
     New->colour.Clear();
     New->Quick_Colour.Invalidate();
-    New->Blend_Map = NULL;
 
     return (New);
 }

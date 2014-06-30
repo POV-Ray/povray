@@ -1586,7 +1586,7 @@ MeshIndex Mesh::mesh_hash(HASH_TABLE **Hash_Table, MeshIndex *Number, MeshIndex 
 
     if ((*Number) >= (*Max))
     {
-        if ((*Max) >= numeric_limits<MeshIndex>::max()/2)
+        if ((*Max) >= std::numeric_limits<MeshIndex>::max()/2)
         {
             throw POV_EXCEPTION_STRING("Too many normals/vertices in mesh.");
         }
@@ -1755,7 +1755,7 @@ MeshIndex Mesh::Mesh_Hash_Texture(MeshIndex *Number_Of_Textures, MeshIndex *Max_
     {
         if ((*Number_Of_Textures) >= (*Max_Textures))
         {
-            if ((*Max_Textures) >= numeric_limits<MeshIndex>::max()/2)
+            if ((*Max_Textures) >= std::numeric_limits<MeshIndex>::max()/2)
             {
                 throw POV_EXCEPTION_STRING("Too many textures in mesh.");
             }
@@ -1840,7 +1840,7 @@ MeshIndex Mesh::Mesh_Hash_UV(MeshIndex *Number, MeshIndex *Max, MeshUVVector **E
 
     if ((*Number) >= (*Max))
     {
-        if ((*Max) >= numeric_limits<MeshIndex>::max()/2)
+        if ((*Max) >= std::numeric_limits<MeshIndex>::max()/2)
         {
             throw POV_EXCEPTION_STRING("Too many normals/vertices in mesh.");
         }

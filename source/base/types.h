@@ -45,8 +45,34 @@
 namespace pov_base
 {
 
+// from <algorithm>; we don't want to always type the namespace for these.
 using std::min;
 using std::max;
+
+// from <cmath>; we don't want to always type the namespace for these.
+using std::abs;
+using std::acos;
+using std::asin;
+using std::atan;
+using std::atan2;
+using std::ceil;
+using std::cos;
+using std::cosh;
+using std::exp;
+using std::fabs;
+using std::floor;
+using std::fmod;
+using std::frexp;
+using std::ldexp;
+using std::log;
+using std::log10;
+using std::modf;
+using std::pow;
+using std::sin;
+using std::sinh;
+using std::sqrt;
+using std::tan;
+using std::tanh;
 
 // Get minimum/maximum of three values.
 template<typename T>
