@@ -598,9 +598,9 @@ void Evaluate_Density_Pigment(vector<PIGMENT*>& Density, const Vector3d& p, Math
 
 //******************************************************************************
 
-ColourBlendMap::ColourBlendMap() : BlendMap(COLOUR_TYPE) {}
+ColourBlendMap::ColourBlendMap() : BlendMap<TransColour>(COLOUR_TYPE) {}
 
-ColourBlendMap::ColourBlendMap(int n, const ColourBlendMap::Entry aEntries[]) : BlendMap(COLOUR_TYPE)
+ColourBlendMap::ColourBlendMap(int n, const ColourBlendMap::Entry aEntries[]) : BlendMap<TransColour>(COLOUR_TYPE)
 {
     Blend_Map_Entries.reserve(n);
     for (int i = 0; i < n; i ++)
@@ -608,7 +608,7 @@ ColourBlendMap::ColourBlendMap(int n, const ColourBlendMap::Entry aEntries[]) : 
 }
 
 
-PigmentBlendMap::PigmentBlendMap(int type) : BlendMap(type) {}
+PigmentBlendMap::PigmentBlendMap(int type) : BlendMap<PIGMENT*>(type) {}
 
 PigmentBlendMap::~PigmentBlendMap()
 {

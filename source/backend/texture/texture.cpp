@@ -2321,7 +2321,7 @@ void AVX_FMA4_DNoise(Vector3d& result, const Vector3d& EPoint)
 
 //******************************************************************************
 
-TextureBlendMap::TextureBlendMap() : BlendMap(TEXTURE_TYPE) {}
+TextureBlendMap::TextureBlendMap() : BlendMap<TexturePtr>(TEXTURE_TYPE) {}
 
 TextureBlendMap::~TextureBlendMap()
 {

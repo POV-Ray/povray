@@ -2849,7 +2849,8 @@ template<> GenericPigmentBlendMapPtr Parser::Parse_Blend_Map<GenericPigmentBlend
             return Parse_Blend_Map<PigmentBlendMap> (Blend_Type, Pat_Type);
         default:
             assert(false);
-            return GenericPigmentBlendMapPtr(NULL);
+            // unreachable code to satisfy the compiler's demands for a return value; an empty pointer will do
+            return GenericPigmentBlendMapPtr();
     }
 }
 
@@ -2863,7 +2864,8 @@ template<> GenericNormalBlendMapPtr Parser::Parse_Blend_Map<GenericNormalBlendMa
             return Parse_Blend_Map<NormalBlendMap> (Blend_Type, Pat_Type);
         default:
             assert(false);
-            return GenericNormalBlendMapPtr(NULL);
+            // unreachable code to satisfy the compiler's demands for a return value; an empty pointer will do
+            return GenericNormalBlendMapPtr(); 
     }
 }
 
@@ -3229,7 +3231,8 @@ template<> GenericPigmentBlendMapPtr Parser::Parse_Item_Into_Blend_List<GenericP
             return Parse_Item_Into_Blend_List<PigmentBlendMap> (Blend_Type);
         default:
             assert(false);
-            return GenericPigmentBlendMapPtr(NULL);
+            // unreachable code to satisfy the compiler's demands for a return value; an empty pointer will do
+            return GenericPigmentBlendMapPtr();
     }
 }
 
@@ -3243,7 +3246,8 @@ template<> GenericNormalBlendMapPtr Parser::Parse_Item_Into_Blend_List<GenericNo
             return Parse_Item_Into_Blend_List<NormalBlendMap> (Blend_Type);
         default:
             assert(false);
-            return GenericNormalBlendMapPtr(NULL);
+            // unreachable code to satisfy the compiler's demands for a return value; an empty pointer will do
+            return GenericNormalBlendMapPtr();
     }
 }
 
@@ -3396,35 +3400,40 @@ template<>
 PigmentBlendMapPtr Parser::Parse_Colour_Map<PigmentBlendMap> ()
 {
     Error("Internal Error: Parse_Colour_Map called for non-colour blend map");
-    return PigmentBlendMapPtr(NULL);
+    // unreachable code to satisfy the compiler's demands for a return value; an empty pointer will do
+    return PigmentBlendMapPtr();
 }
 
 template<>
 GenericNormalBlendMapPtr Parser::Parse_Colour_Map<GenericNormalBlendMap> ()
 {
     Error("Internal Error: Parse_Colour_Map called for non-colour blend map");
-    return GenericNormalBlendMapPtr(NULL);
+    // unreachable code to satisfy the compiler's demands for a return value; an empty pointer will do
+    return GenericNormalBlendMapPtr();
 }
 
 template<>
 SlopeBlendMapPtr Parser::Parse_Colour_Map<SlopeBlendMap> ()
 {
     Error("Internal Error: Parse_Colour_Map called for non-colour blend map");
-    return SlopeBlendMapPtr(NULL);
+    // unreachable code to satisfy the compiler's demands for a return value; an empty pointer will do
+    return SlopeBlendMapPtr();
 }
 
 template<>
 NormalBlendMapPtr Parser::Parse_Colour_Map<NormalBlendMap> ()
 {
     Error("Internal Error: Parse_Colour_Map called for non-colour blend map");
-    return NormalBlendMapPtr(NULL);
+    // unreachable code to satisfy the compiler's demands for a return value; an empty pointer will do
+    return NormalBlendMapPtr();
 }
 
 template<>
 TextureBlendMapPtr Parser::Parse_Colour_Map<TextureBlendMap> ()
 {
     Error("Internal Error: Parse_Colour_Map called for non-colour blend map");
-    return TextureBlendMapPtr(NULL);
+    // unreachable code to satisfy the compiler's demands for a return value; an empty pointer will do
+    return TextureBlendMapPtr();
 }
 
 
