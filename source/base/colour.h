@@ -51,6 +51,9 @@ namespace pov_base
 typedef COLC ColourChannel;
 typedef DBL  PreciseColourChannel;
 
+template<typename MODEL_T, typename CHANNEL_T, typename DERIVED_T>
+class GenericLinearColour;
+
 template<typename T>
 class GenericRGBFTColour;
 
@@ -109,6 +112,12 @@ struct ColourModelInternal
     static const unsigned int kChannels = NUM_COLOUR_CHANNELS;
 };
 
+const double kaColourConversionMatrixRGBtoXYZ[ColourModelRGB::kChannels * ColourModelXYZ::kChannels] = {
+    +3.2406, -1.5372, -0.4986,
+    -0.9689, +1.8758, +0.0415,
+    +0.0557, -0.2040, +1.0570
+};
+
 
 /// Generic template class to hold and manipulate a colour.
 ///
@@ -159,7 +168,7 @@ class GenericLinearColour
         inline explicit GenericLinearColour(const GenericCompactColour<Model,BIAS,CHANNEL_T2>& col)
         {
             typedef GenericCompactColour<Model,BIAS,CHANNEL_T2> CompactColour;
-            if (col.mData[CompactColour::kExp] > std::numeric_limits<CompactColour::Channel>::min())
+            if (col.mData[CompactColour::kExp] > std::numeric_limits<typename CompactColour::Channel>::min())
             {
                 double expFactor = ldexp(1.0,(int)col.mData[CompactColour::kExp]-(int)(CompactColour::kBias+8));
                 for (unsigned int i = 0; i < kChannels; i ++)
@@ -178,6 +187,18 @@ class GenericLinearColour
                 mColour[i] = grey;
         }
 
+        template<typename T2>
+        inline explicit GenericLinearColour(const T2& col, const double *pConversionMatrix)
+        {
+            const double *pMatrix = pConversionMatrix;
+            for (unsigned int i = 0; i < kChannels; i ++)
+            {
+                mColour[i] = 0.0;
+                for (unsigned int j = 0; j < T2::Model::kChannels; j ++)
+                    mColour[i] += *(pMatrix++) * col.mColour[j];
+            }
+        }
+
         inline GenericLinearColour& operator=(const GenericLinearColour& col)
         {
             for (unsigned int i = 0; i < kChannels; i ++)
@@ -187,6 +208,15 @@ class GenericLinearColour
 
         inline Channel  operator[](unsigned int idx) const { assert(idx < kChannels); return mColour[idx]; }
         inline Channel& operator[](unsigned int idx)       { assert(idx < kChannels); return mColour[idx]; }
+
+        /// Computes the sum of the channels' values.
+        inline Channel Sum() const
+        {
+            Channel result = 0.0;
+            for (unsigned int i = 0; i < kChannels; i ++)
+                result += mColour[i];
+            return result;
+        }
 
         /// Computes the sum of the channels' magnitudes.
         inline Channel SumAbs() const
@@ -477,20 +507,20 @@ class GenericLinearColour
 };
 
 /// @relates GenericLinearColour
-template<typename MT, typename CT, typename RT>
-inline RT operator* (double a, const GenericLinearColour<MT,CT,RT>& b) { return b * a; }
+template<typename MT, typename CT, typename RT, typename T>
+inline RT operator* (T a, const GenericLinearColour<MT,CT,RT>& b) { return b * a; }
 
 /// @relates GenericLinearColour
-template<typename MT, typename CT, typename RT>
-inline RT operator/ (double a, const GenericLinearColour<MT,CT,RT>& b) { return GenericLinearColour<MT,CT,RT>(a) / b; }
+template<typename MT, typename CT, typename RT, typename T>
+inline RT operator/ (T a, const GenericLinearColour<MT,CT,RT>& b) { return GenericLinearColour<MT,CT,RT>(a) / b; }
 
 /// @relates GenericLinearColour
-template<typename MT, typename CT, typename RT>
-inline RT operator+ (double a, const GenericLinearColour<MT,CT,RT>& b) { return b + a; }
+template<typename MT, typename CT, typename RT, typename T>
+inline RT operator+ (T a, const GenericLinearColour<MT,CT,RT>& b) { return b + a; }
 
 /// @relates GenericLinearColour
-template<typename MT, typename CT, typename RT>
-inline RT operator- (double a, const GenericLinearColour<MT,CT,RT>& b) { return GenericLinearColour<MT,CT,RT>(a) - b; }
+template<typename MT, typename CT, typename RT, typename T>
+inline RT operator- (T a, const GenericLinearColour<MT,CT,RT>& b) { return GenericLinearColour<MT,CT,RT>(a) - b; }
 
 /// @relates GenericLinearColour
 template<typename MT, typename CT, typename RT>
@@ -505,8 +535,8 @@ template<typename MT, typename CT, typename RT>
 inline RT Exp(const GenericLinearColour<MT,CT,RT>& a) { return a.Exp(); }
 
 /// @relates GenericLinearColour
-template<typename MT, typename CT, typename RT>
-inline RT Pow(const GenericLinearColour<MT,CT,RT>& a, CT b) { return a.Pow(b); }
+template<typename MT, typename CT, typename RT, typename T>
+inline RT Pow(const GenericLinearColour<MT,CT,RT>& a, T b) { return a.Pow(b); }
 
 /// @relates GenericLinearColour
 template<typename MT, typename CT, typename RT>
@@ -525,9 +555,13 @@ inline RT Cos(const GenericLinearColour<MT,CT,RT>& a) { return a.Cos(); }
 /// @tparam CHANNEL_T   Floating-point type to use for the individual colour components.
 ///
 template<typename CHANNEL_T>
-class GenericRGBColour : public GenericLinearColour<ColourModelRGB, CHANNEL_T, GenericRGBColour<CHANNEL_T>>
+class GenericRGBColour : public GenericLinearColour<ColourModelRGB, CHANNEL_T, GenericRGBColour<CHANNEL_T> >
 {
     public:
+
+        typedef CHANNEL_T           Channel;
+        typedef ColourModelRGB      Model;
+        typedef GenericRGBColour    DerivedColour;
 
         template<typename MODEL_T2, typename CHANNEL_T2, typename DERIVED_T2>
         friend class GenericLinearColour;
@@ -569,6 +603,9 @@ class GenericRGBColour : public GenericLinearColour<ColourModelRGB, CHANNEL_T, G
 
         template<int BIAS, typename CHANNEL_T2>
         inline explicit GenericRGBColour(const GenericCompactColour<Model,BIAS,CHANNEL_T2>& col) : GenericLinearColour(col) {}
+
+        template<typename DERIVED_T2>
+        inline explicit GenericRGBColour(const GenericLinearColour<ColourModelXYZ,Channel,DERIVED_T2>& col) : GenericLinearColour(col, kaColourConversionMatrixRGBtoXYZ) {}
 
         inline Channel  red()   const { return mColour[ColourModelRGB::kRed]; }
         inline Channel& red()         { return mColour[ColourModelRGB::kRed]; }
@@ -674,14 +711,7 @@ class GenericRGBColour : public GenericLinearColour<ColourModelRGB, CHANNEL_T, G
         {
             return MaxAbs();
         }
-/*
-        inline void Set(Channel red, Channel green, Channel blue)
-        {
-            mColour[ColourModelRGB::kRed]   = red;
-            mColour[ColourModelRGB::kGreen] = green;
-            mColour[ColourModelRGB::kBlue]  = blue;
-        }
-*/
+
 #if (NUM_COLOUR_CHANNELS == 3)
         inline explicit GenericRGBColour(const GenericColour<Channel>& col)
         {
@@ -698,76 +728,6 @@ class GenericRGBColour : public GenericLinearColour<ColourModelRGB, CHANNEL_T, G
         }
 #endif
 };
-
-/// @relates GenericRGBColour
-template<typename T>
-inline GenericRGBColour<T> operator* (double a, const GenericRGBColour<T>& b) { return b * a; }
-
-/// @relates GenericRGBColour
-template<typename T>
-inline GenericRGBColour<T> operator/ (double a, const GenericRGBColour<T>& b)
-{
-    return GenericRGBColour<T>(a / b.red(),
-                               a / b.green(),
-                               a / b.blue());
-}
-
-/// @relates GenericRGBColour
-template<typename T>
-inline GenericRGBColour<T> operator+ (double a, const GenericRGBColour<T>& b) { return b + a; }
-
-/// @relates GenericRGBColour
-template<typename T>
-inline GenericRGBColour<T> operator- (double a, const GenericRGBColour<T>& b) { return GenericRGBColour<T>(a) - b; }
-
-/// @relates GenericRGBColour
-template<typename T>
-inline T ColourDistance (const GenericRGBColour<T>& a, const GenericRGBColour<T>& b)
-{
-    return fabs(a.red()   - b.red())   +
-           fabs(a.green() - b.green()) +
-           fabs(a.blue()  - b.blue());
-}
-
-/// @relates GenericRGBColour
-template<typename T>
-inline GenericRGBColour<T> Sqr(const GenericRGBColour<T>& a) { return a * a; }
-
-/// @relates GenericRGBColour
-template<typename T>
-inline GenericRGBColour<T> Exp(const GenericRGBColour<T>& a)
-{
-    return GenericRGBColour<T>(exp(a.red()),
-                               exp(a.green()),
-                               exp(a.blue()));
-}
-
-/// @relates GenericRGBColour
-template<typename T>
-inline GenericRGBColour<T> Pow(const GenericRGBColour<T>& a, T b)
-{
-    return GenericRGBColour<T>(pow(a.red(),   b),
-                               pow(a.green(), b),
-                               pow(a.blue(),  b));
-}
-
-/// @relates GenericRGBColour
-template<typename T>
-inline GenericRGBColour<T> Sqrt(const GenericRGBColour<T>& a)
-{
-    return GenericRGBColour<T>(sqrt(a.red()),
-                               sqrt(a.green()),
-                               sqrt(a.blue()));
-}
-
-/// @relates GenericRGBColour
-template<typename T>
-inline GenericRGBColour<T> Cos(const GenericRGBColour<T>& a)
-{
-    return GenericRGBColour<T>(cos(a.red()),
-                               cos(a.green()),
-                               cos(a.blue()));
-}
 
 typedef GenericRGBColour<ColourChannel>         RGBColour;          ///< Standard precision RGB colour.
 typedef GenericRGBColour<PreciseColourChannel>  PreciseRGBColour;   ///< High precision RGB colour.
@@ -1360,12 +1320,76 @@ typedef GenericRGBTColour<ColourChannel>        RGBTColour;         ///< Standar
 typedef GenericRGBTColour<PreciseColourChannel> PreciseRGBTColour;  ///< High precision RGBxT colour.
 
 
+/// Generic template class to hold and manipulate an XYZ colour.
+///
+/// @tparam CHANNEL_T   Floating-point type to use for the individual colour components.
+///
+template<typename CHANNEL_T>
+class GenericXYZColour : public GenericLinearColour<ColourModelXYZ, CHANNEL_T, GenericXYZColour<CHANNEL_T> >
+{
+    public:
+
+        typedef CHANNEL_T           Channel;
+        typedef ColourModelXYZ      Model;
+        typedef GenericXYZColour    DerivedColour;
+
+        template<typename MODEL_T2, typename CHANNEL_T2, typename DERIVED_T2>
+        friend class GenericLinearColour;
+
+        template<typename T2>
+        friend class GenericXYZColour;
+
+        /// Default constructor.
+        inline GenericXYZColour() : GenericLinearColour() {}
+
+        /// Copy constructor.
+        inline GenericXYZColour(const GenericXYZColour& col) : GenericLinearColour(col) {}
+
+        inline explicit GenericXYZColour(const GenericLinearColour<Model,Channel,DerivedColour>& col) : GenericLinearColour(col) {}
+
+        template<typename CHANNEL_T2>
+        inline explicit GenericXYZColour(const GenericLinearColour<Model,CHANNEL_T2,DerivedColour>& col) : GenericLinearColour(col) {}
+
+        template<typename CHANNEL_T2>
+        inline explicit GenericXYZColour(const GenericXYZColour<CHANNEL_T2>& col) : GenericLinearColour(col) {}
+
+        inline explicit GenericXYZColour(Channel grey) : GenericLinearColour(grey) {}
+
+        inline explicit GenericXYZColour(Channel x, Channel y, Channel z) :
+            GenericLinearColour()
+        {
+            mColour[ColourModelXYZ::kX] = x;
+            mColour[ColourModelXYZ::kY] = y;
+            mColour[ColourModelXYZ::kZ] = z;
+        }
+
+        inline Channel  x() const { return mColour[ColourModelXYZ::kX]; }
+        inline Channel& x()       { return mColour[ColourModelXYZ::kX]; }
+
+        inline Channel  y() const { return mColour[ColourModelXYZ::kY]; }
+        inline Channel& y()       { return mColour[ColourModelXYZ::kY]; }
+
+        inline Channel  z() const { return mColour[ColourModelXYZ::kZ]; }
+        inline Channel& z()       { return mColour[ColourModelXYZ::kZ]; }
+
+        inline explicit GenericXYZColour(const GenericRGBColour<Channel>& col)
+        {
+            mColour[ColourModelXYZ::kX] =  * col.red() +  * col.green() +  * col.blue();
+            mColour[ColourModelXYZ::kY] = col.mColour[1];
+            mColour[ColourModelXYZ::kZ] = col.mColour[2];
+        }
+};
+
+typedef GenericXYZColour<ColourChannel>         XYZColour;          ///< Standard precision RGB colour.
+typedef GenericXYZColour<PreciseColourChannel>  PreciseXYZColour;   ///< High precision RGB colour.
+
+
 /// Generic template class to hold and manipulate a colour.
 ///
 /// @tparam CHANNEL_T   Floating-point type to use for the individual colour channels.
 ///
 template<typename CHANNEL_T>
-class GenericColour : public GenericLinearColour<ColourModelInternal,CHANNEL_T,GenericColour<CHANNEL_T>>
+class GenericColour : public GenericLinearColour<ColourModelInternal,CHANNEL_T,GenericColour<CHANNEL_T> >
 {
     public:
 
@@ -1408,7 +1432,7 @@ class GenericColour : public GenericLinearColour<ColourModelInternal,CHANNEL_T,G
             return mColour[0];
 #else
             Channel result = 0.0;
-            for (int i = 0; i < kChannels; i ++)
+            for (unsigned int i = 0; i < kChannels; i ++)
                 result += GenericColour<Channel>::mkR[i] * mColour[i];
             return result;
 #endif
@@ -1420,7 +1444,7 @@ class GenericColour : public GenericLinearColour<ColourModelInternal,CHANNEL_T,G
             return mColour[1];
 #else
             Channel result = 0.0;
-            for (int i = 0; i < kChannels; i ++)
+            for (unsigned int i = 0; i < kChannels; i ++)
                 result += GenericColour<Channel>::mkG[i] * mColour[i];
             return result;
 #endif
@@ -1432,7 +1456,7 @@ class GenericColour : public GenericLinearColour<ColourModelInternal,CHANNEL_T,G
             return mColour[2];
 #else
             Channel result = 0.0;
-            for (int i = 0; i < kChannels; i ++)
+            for (unsigned int i = 0; i < kChannels; i ++)
                 result += GenericColour<Channel>::mkB[i] * mColour[i];
             return result;
 #endif
@@ -1451,7 +1475,7 @@ class GenericColour : public GenericLinearColour<ColourModelInternal,CHANNEL_T,G
                    kBlueIntensity  * mColour[2];
 #else
             Channel result;
-            for (int i = 0; i < kChannels; i ++)
+            for (unsigned int i = 0; i < kChannels; i ++)
                 result += mkY[i] * mColour[i];
             return result;
 #endif
@@ -1558,7 +1582,7 @@ class GenericColour : public GenericLinearColour<ColourModelInternal,CHANNEL_T,G
         template<typename T2>
         inline explicit GenericColour(const T2* col)
         {
-            for (int i = 0; i < kChannels; i ++)
+            for (unsigned int i = 0; i < kChannels; i ++)
                 mColour[i] = (Channel)col[i];
         }
 
@@ -1571,48 +1595,6 @@ class GenericColour : public GenericLinearColour<ColourModelInternal,CHANNEL_T,G
         }
 #endif
 };
-
-/*
-/// @relates GenericColour
-template<typename T>
-inline GenericColour<T> operator* (double a, const GenericColour<T>& b) { return b * a; }
-
-/// @relates GenericColour
-template<typename T>
-inline GenericColour<T> operator/ (double a, const GenericColour<T>& b) { return GenericColour<T>(a) / b; }
-
-/// @relates GenericColour
-template<typename T>
-inline GenericColour<T> operator+ (double a, const GenericColour<T>& b) { return b + a; }
-
-/// @relates GenericColour
-template<typename T>
-inline GenericColour<T> operator- (double a, const GenericColour<T>& b) { return GenericColour<T>(a) - b; }
-
-/// @relates GenericColour
-template<typename T>
-inline T ColourDistance (const GenericColour<T>& a, const GenericColour<T>& b) { return (a - b).SumAbs(); }
-
-/// @relates GenericColour
-template<typename T>
-inline GenericColour<T> Sqr(const GenericColour<T>& a) { return a * a; }
-
-/// @relates GenericColour
-template<typename T>
-inline GenericColour<T> Exp(const GenericColour<T>& a) { return a.Exp(); }
-
-/// @relates GenericColour
-template<typename T>
-inline GenericColour<T> Pow(const GenericColour<T>& a, T b) { return a.Pow(b); }
-
-/// @relates GenericColour
-template<typename T>
-inline GenericColour<T> Sqrt(const GenericColour<T>& a) { return a.Sqrt(); }
-
-/// @relates GenericColour
-template<typename T>
-inline GenericColour<T> Cos(const GenericColour<T>& a) { return a.Cos(); }
-*/
 
 typedef GenericColour<ColourChannel>         MathColour;        ///< Standard precision colour.
 typedef GenericColour<PreciseColourChannel>  PreciseMathColour; ///< High precision colour.
@@ -1957,12 +1939,12 @@ class GenericCompactColour
             double scaleFactor;
             if (ComputeExponent(col, mData[kChannels], scaleFactor))
             {
-                for (unsigned int i = 0; i <= kChannels; i ++)
+                for (unsigned int i = 0; i < kChannels; i ++)
                     mData[i] = clipToType<Channel>(floor(col[i] * scaleFactor + 0.5 + dither));
             }
             else
             {
-                for (unsigned int i = 0; i <= kChannels; i ++)
+                for (unsigned int i = 0; i < kChannels; i ++)
                     mData[i] = 0;
             }
         }
@@ -1973,12 +1955,12 @@ class GenericCompactColour
             double scaleFactor;
             if (ComputeExponent(col, mData[EXP], scaleFactor))
             {
-                for (unsigned int i = 0; i <= kChannels; i ++)
+                for (unsigned int i = 0; i < kChannels; i ++)
                     mData[i] = clipToType<Channel>(floor(col[i] * scaleFactor + 0.5 + dither[i]));
             }
             else
             {
-                for (unsigned int i = 0; i <= kChannels; i ++)
+                for (unsigned int i = 0; i < kChannels; i ++)
                     mData[i] = 0;
             }
         }
