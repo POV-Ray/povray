@@ -107,7 +107,7 @@ PreciseColourChannel SubsurfaceInterior::PrecomputedReducedAlbedo::operator()(Pr
 PreciseMathColour SubsurfaceInterior::GetReducedAlbedo(const MathColour& diffuseReflectance) const
 {
     PreciseMathColour result;
-    for (int i = 0; i < MathColour::channels; i ++)
+    for (int i = 0; i < MathColour::kChannels; i ++)
         result[i] = (precomputedReducedAlbedo.get())(diffuseReflectance[i]);
     return result;
 }

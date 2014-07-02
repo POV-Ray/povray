@@ -1457,7 +1457,7 @@ void Trace::ComputePhotonDiffuseLight(const FINISH *Finish, const Vector3d& IPoi
         bool backside = false;
 
         // convert small color to normal color
-        Light_Colour = ToMathColour(RGBColour(gatherer.gatheredPhotons.photonGatherList[j]->colour));
+        Light_Colour = MathColour(gatherer.gatheredPhotons.photonGatherList[j]->colour);
 
         // convert theta/phi to vector direction
         // Use a pre-computed array of sin/cos to avoid many calls to the
@@ -3505,7 +3505,7 @@ void Trace::ComputeDiffuseContribution1(const LightSource& lightsource, const In
         return;
 
     lightcolour *= cos_in;
-    for (int j = 0; j < MathColour::channels; j++)
+    for (int j = 0; j < MathColour::kChannels; j++)
     {
         double sd;
         ComputeDiffuseContribution(out, vOut, in.IPoint, nIn, lightsourceray.Direction, sd, sigma_prime_s[j], sigma_a[j], eta);
@@ -3562,7 +3562,7 @@ void Trace::ComputeDiffuseAmbientContribution1(const Intersection& out, const Ve
     MathColour ambientcolour;
     // TODO FIXME - should support pertubed normals
     radiosity.ComputeAmbient(in.IPoint, in.INormal, in.INormal, ambientcolour, weight, ticket);
-    for (int j = 0; j < MathColour::channels; j++)
+    for (int j = 0; j < MathColour::kChannels; j++)
     {
         double sd;
         // Note: radiosity data is already cosine-weighted, so we're passing the surface normal as incident light direction
@@ -3723,7 +3723,7 @@ void Trace::ComputeSubsurfaceScattering(const FINISH *Finish, const MathColour& 
 
         for (int i = 0; i < NumSamplesSingle; i++)
         {
-            for (int j = 0; j < MathColour::channels; j ++)
+            for (int j = 0; j < MathColour::kChannels; j ++)
             {
                 MathColour temp;
                 ComputeSingleScatteringContribution(out, dist, theta_out, cos_out_prime, refractedEye, sigma_t_xo[j], sigma_s[j], temp, eta, Eye.GetTicket());

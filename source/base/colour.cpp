@@ -45,18 +45,35 @@ namespace pov_base
 
 #if (NUM_COLOUR_CHANNELS == 3)
 
-    // Approximate dominant wavelengths of primary hues.
+    // Approximate dominant wavelengths of primary hues in micrometers.
     // Source: 3D Computer Graphics by John Vince (Addison Wesely)
     // These are user-adjustable with the irid_wavelength keyword.
-    // Red = 700 nm  Grn = 520 nm Blu = 480 nm
-    // Divided by 1000 gives: rwl = 0.70;  gwl = 0.52;  bwl = 0.48;
-    template<> const MathColour MathColour::mkDefaultWavelengths = MathColour(RGBColour(0.70, 0.52, 0.48));
-    template<> const PreciseMathColour PreciseMathColour::mkDefaultWavelengths = PreciseMathColour(PreciseRGBColour(0.70, 0.52, 0.48));
+    // Red = 700 nm, Green = 520 nm, Blue = 480 nm
+    static const ColourChannel gaDefaultWavelengths[NUM_COLOUR_CHANNELS] = { 0.700, 0.520, 0.480 };
+
+#elif (NUM_COLOUR_CHANNELS == 4)
+
+    // Approximate dominant wavelengths of primary hues in micrometers.
+    static const ColourChannel gaDefaultWavelengths[NUM_COLOUR_CHANNELS] = { 0.6150, 0.5725, 0.5200, 0.4650 };
+
+    // Relative brightness of the primary hues.
+    template<> const ColourChannel MathColour::mkY[NUM_COLOUR_CHANNELS] =
+        { 0.2053179932, 0.3806513958, 0.3705274008, 0.0435032102 };
+
+    // Location of the primary hues in RGB space.
+    template<> const RGBColour MathColour::mkRGB[NUM_COLOUR_CHANNELS] =
+        { RGBColour( 0.0084075942,-0.0404444319, 0.9783939079),
+          RGBColour(-0.3789518761, 0.6301106785, 0.0062451983),
+          RGBColour( 0.4848742224, 0.3939794183, 0.0580130026),
+          RGBColour( 1.0905645527,-0.0353094890,-0.0175721295) };
 
 #else
 
     #error TODO!
 
 #endif
+
+    template<> const MathColour        MathColour::mkDefaultWavelengths        = MathColour(gaDefaultWavelengths);
+    template<> const PreciseMathColour PreciseMathColour::mkDefaultWavelengths = PreciseMathColour(gaDefaultWavelengths);
 
 }
