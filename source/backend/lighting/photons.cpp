@@ -1826,8 +1826,8 @@ void PhotonMap::sortAndSubdivide(int start, int end, int /*sorted*/)
 
     // loop and find greatest range
 
-    min = PhotonVector3d(1/EPSILON);  // TODO - should probably use  numeric_limits<PhotonScalar>::max() instead of  1/EPSILON
-    max = PhotonVector3d(-1/EPSILON); // TODO - should probably use -numeric_limits<PhotonScalar>::max() instead of -1/EPSILON
+    min = PhotonVector3d(1/EPSILON);  // TODO - should probably use  std::numeric_limits<PhotonScalar>::max() instead of  1/EPSILON
+    max = PhotonVector3d(-1/EPSILON); // TODO - should probably use -std::numeric_limits<PhotonScalar>::max() instead of -1/EPSILON
 
     for(i=start; i<=end; i++)
     {

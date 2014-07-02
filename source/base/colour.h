@@ -38,6 +38,7 @@
 #define POVRAY_BASE_COLOUR_H
 
 #include <cmath>
+#include <limits>
 
 #include "base/configbase.h"
 #include "base/types.h"
@@ -1055,7 +1056,7 @@ class GenericRGBTColour
 
         inline GenericRGBColour<T> TransmittedColour() const
         {
-            return mColour * mFilter + mTransm;
+            return GenericRGBColour<T>(mTransm);
         }
 
         inline GenericRGBTColour operator+(const GenericRGBTColour& b) const

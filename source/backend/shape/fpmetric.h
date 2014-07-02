@@ -77,7 +77,7 @@ class Parametric : public NonsolidObject
         DBL accuracy;
         DBL max_gradient;
 
-        auto_ptr<ContainedByShape> container;
+        shared_ptr<ContainedByShape> container;
 
         Parametric();
         virtual ~Parametric();

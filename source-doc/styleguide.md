@@ -145,7 +145,7 @@ Include Files
 -------------
 
   - Header files should be included in the following order:
-      - Standard C header files.
+      - C++ variants of standard C header files.
       - Standard C++ header files.
       - Boost header files.
       - Other 3rd party library header files, grouped by library.
@@ -154,8 +154,8 @@ Include Files
     Within each group, alphabetical order should be preferred. (Note however that certain other
     ordering constraints might apply for the POV-Ray header files.)
 
-  - In C++ source code, standard C header files should be included by their proper C++ names, e.g.
-    `<cstdio>` instead of `<stdio.h>`.
+  - C++ source code should _not_ include C standard header files; include the corresponding C++ header files instead
+    (e.g. `<cstdio>` instead of `<stdio.h>`).
 
   - Header files should be self-contained, i.e. include all files they depend on.
 

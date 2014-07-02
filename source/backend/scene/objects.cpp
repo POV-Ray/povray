@@ -1059,6 +1059,16 @@ void ContainedBySphere::Normal(const Vector3d& point, const TRANSFORM* pTrans, i
     }
 }
 
+ContainedByShape* ContainedByBox::Copy() const
+{
+    return new ContainedByBox(*this);
+}
+
+ContainedByShape* ContainedBySphere::Copy() const
+{
+    return new ContainedBySphere(*this);
+}
+
 
 template<int BX, int BY, int BZ>
 FORCEINLINE bool Intersect_BBox_Dir(const BoundingBox& bbox, const BBoxVector3d& origin, const BBoxVector3d& invdir, BBoxScalar mind, BBoxScalar maxd)

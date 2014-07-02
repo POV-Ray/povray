@@ -50,8 +50,8 @@ namespace pov_base
     // These are user-adjustable with the irid_wavelength keyword.
     // Red = 700 nm  Grn = 520 nm Blu = 480 nm
     // Divided by 1000 gives: rwl = 0.70;  gwl = 0.52;  bwl = 0.48;
-    const MathColour MathColour::mkDefaultWavelengths = MathColour(RGBColour(0.70, 0.52, 0.48));
-    const PreciseMathColour PreciseMathColour::mkDefaultWavelengths = PreciseMathColour(PreciseRGBColour(0.70, 0.52, 0.48));
+    template<> const MathColour MathColour::mkDefaultWavelengths = MathColour(RGBColour(0.70, 0.52, 0.48));
+    template<> const PreciseMathColour PreciseMathColour::mkDefaultWavelengths = PreciseMathColour(PreciseRGBColour(0.70, 0.52, 0.48));
 
 #else
 
