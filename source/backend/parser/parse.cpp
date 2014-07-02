@@ -2476,7 +2476,7 @@ ObjectPtr Parser::Parse_Isosurface()
                     switch(Token.Token_Id)
                     {
                         CASE(BOX_TOKEN)
-                            Object->container = auto_ptr<ContainedByShape>(new ContainedByBox());
+                            Object->container = shared_ptr<ContainedByShape>(new ContainedByBox());
 
                             Parse_Begin();
 
@@ -2512,7 +2512,7 @@ ObjectPtr Parser::Parse_Isosurface()
                         END_CASE
 
                         CASE(SPHERE_TOKEN)
-                            Object->container = auto_ptr<ContainedByShape>(new ContainedBySphere());
+                            Object->container = shared_ptr<ContainedByShape>(new ContainedBySphere());
 
                             Parse_Begin();
 
@@ -4856,7 +4856,7 @@ ObjectPtr Parser::Parse_Parametric(void)
                     switch(Token.Token_Id)
                     {
                         CASE(BOX_TOKEN)
-                            Object->container = auto_ptr<ContainedByShape>(new ContainedByBox());
+                            Object->container = shared_ptr<ContainedByShape>(new ContainedByBox());
 
                             Parse_Begin();
 
@@ -4892,7 +4892,7 @@ ObjectPtr Parser::Parse_Parametric(void)
                         END_CASE
 
                         CASE(SPHERE_TOKEN)
-                            Object->container = auto_ptr<ContainedByShape>(new ContainedBySphere());
+                            Object->container = shared_ptr<ContainedByShape>(new ContainedBySphere());
 
                             Parse_Begin();
 

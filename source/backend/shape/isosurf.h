@@ -99,7 +99,7 @@ class IsoSurface : public ObjectBase
         bool eval;
         bool isCopy;
 
-        auto_ptr<ContainedByShape> container;
+        shared_ptr<ContainedByShape> container;
 
         IsoSurface();
         virtual ~IsoSurface();

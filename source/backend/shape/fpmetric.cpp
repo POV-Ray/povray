@@ -654,6 +654,8 @@ ObjectPtr Parametric::Copy()
     New->Trans = Copy_Transform(Trans);
     New->PData = Copy_PrecompParVal();
 
+    New->container = shared_ptr<ContainedByShape>(container->Copy());
+
     return (New);
 }
 
@@ -718,7 +720,7 @@ Parametric::~Parametric()
 
 Parametric::Parametric() : NonsolidObject(PARAMETRIC_OBJECT)
 {
-    container = auto_ptr<ContainedByShape>(new ContainedByBox());
+    container = shared_ptr<ContainedByShape>(new ContainedByBox());
 
     Make_BBox(BBox, -1.0, -1.0, -1.0, 2.0, 2.0, 2.0);
 

@@ -512,7 +512,7 @@ void IsoSurface::Transform(const TRANSFORM* tr)
 
 IsoSurface::IsoSurface() : ObjectBase(ISOSURFACE_OBJECT)
 {
-    container = auto_ptr<ContainedByShape>(new ContainedByBox());
+    container = shared_ptr<ContainedByShape>(new ContainedByBox());
 
     Make_BBox(BBox, -1.0, -1.0, -1.0, 2.0, 2.0, 2.0);
 
@@ -584,6 +584,8 @@ ObjectPtr IsoSurface::Copy()
 
     // mark it as copy for use by max_gradient warning code
     New->isCopy = true;
+
+    New->container = shared_ptr<ContainedByShape>(container->Copy());
 
     return (New);
 }

@@ -3104,7 +3104,7 @@ shared_ptr<MAP_T> Parser::Parse_Blend_List (int Count, ColourBlendMapConstPtr De
 
     if ((Blend_Type==NORMAL_TYPE) && (i==0))
     {
-        return shared_ptr<MAP_T>(NULL);
+        return shared_ptr<MAP_T>(); // empty pointer
     }
 
     while (i < Count)
