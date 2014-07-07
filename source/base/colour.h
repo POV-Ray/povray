@@ -51,6 +51,23 @@ namespace pov_base
 typedef COLC ColourChannel;
 typedef DBL  PreciseColourChannel;
 
+#if defined(HAVE_NAN)
+    template<typename T>
+    inline bool ColourChannelIsValid(T c) { return !POV_ISNAN(c); }
+    template<typename T>
+    inline void ColourChannelInvalidate(T& c) { c = std::numeric_limits<T>::quiet_NaN(); }
+#elif defined(HAVE_INF)
+    template<typename T>
+    inline bool ColourChannelIsValid(T c) { return !POV_ISINF(c); }
+    template<typename T>
+    inline void ColourChannelInvalidate(T& c) { c = -std::numeric_limits<T>::infinity(); }
+#else
+    template<typename T>
+    inline bool ColourChannelIsValid(T c) { return c != -std::numeric_limits<ColourChannel>::max(); }
+    template<typename T>
+    inline void ColourChannelInvalidate(T& c) { c = -std::numeric_limits<ColourChannel>::max(); }
+#endif
+
 template<typename T>
 class GenericRGBFTColour;
 
@@ -318,14 +335,21 @@ class GenericRGBColour
                         mColour[BLUE]);
         }
 
-        /// Test if all components of the colour are valid.
+        /// Test whether the colour is valid.
+        ///
+        /// This function is used in combination with @ref Invalidate() -- which flags a colour as invalid -- to test
+        /// whether or not a colour has been flagged in this way.
+        ///
+        /// The current implementation of Invalidate() sets the first channel to a (quiet) NaN for this purpose;
+        /// if NaNs are unavailable or dysfunctional, the implementation falls back to using negative infinity;
+        /// if infinities are unavailable or dysfunctional as well, the implementation falls back to using the negative
+        /// of the maximum value representable by the @ref ColourChannel type.
+        ///
+        /// @return `false` if the colour has been flagged as invalid.
+        ///
         inline bool IsValid() const
         {
-            // test whether any component is NaN, exploiting the property that
-            // a NaN always compares non-equal, even to itself
-            return ((mColour[RED]   == mColour[RED])   &&
-                    (mColour[GREEN] == mColour[GREEN]) &&
-                    (mColour[BLUE]  == mColour[BLUE]));
+            return ColourChannelIsValid(mColour[0]);
         }
 
         inline bool IsZero() const
@@ -349,11 +373,18 @@ class GenericRGBColour
             mColour[BLUE]  = 0.0;
         }
 
+        /// Invalidate the colour.
+        ///
+        /// This function is used to flag a colour as invalid, which can later be tested for using @ref IsInvalid().
+        ///
+        /// The current implementation of Invalidate() sets the first channel to a (quiet) NaN for this purpose;
+        /// if NaNs are unavailable or dysfunctional, the implementation falls back to using negative infinity;
+        /// if infinities are unavailable or dysfunctional as well, the implementation falls back to using the negative
+        /// of the maximum value representable by the @ref ColourChannel type.
+        ///
         inline void Invalidate()
         {
-            mColour[RED]   = std::numeric_limits<T>::quiet_NaN();
-            mColour[GREEN] = std::numeric_limits<T>::quiet_NaN();
-            mColour[BLUE]  = std::numeric_limits<T>::quiet_NaN();
+            ColourChannelInvalidate(mColour[0]);
         }
 
         inline void Set(T grey)
@@ -719,16 +750,6 @@ class GenericRGBFTColour
             return mColour.Greyscale();
         }
 
-        /// Test if all components of the colour are valid.
-        inline bool IsValid() const
-        {
-            // test whether any component is NaN, exploiting the property that
-            // a NaN always compares non-equal, even to itself
-            return ((mColour.IsValid())  &&
-                    (mFilter == mFilter) &&
-                    (mTransm == mTransm));
-        }
-
         // TODO: find a more correct way of handling alpha <-> filter/transmit
         inline static void AtoFT(T alpha, T& f, T& t) { f = 0.0f; t = 1.0f - alpha; }
         inline void AtoFT(T alpha) { mFilter = 0.0f; mTransm = 1.0f - alpha; }
@@ -740,13 +761,6 @@ class GenericRGBFTColour
             mColour.Clear();
             mFilter = 0.0;
             mTransm = 0.0;
-        }
-
-        inline void Invalidate()
-        {
-            mColour.Invalidate();
-            mFilter = std::numeric_limits<T>::quiet_NaN();
-            mTransm = std::numeric_limits<T>::quiet_NaN();
         }
 
         inline void Get(EXPRESS expr, unsigned int n) const
@@ -1021,15 +1035,6 @@ class GenericRGBTColour
             return mColour.Greyscale();
         }
 
-        /// Test if all components of the colour are valid.
-        inline bool IsValid() const
-        {
-            // test whether any component is NaN, exploiting the property that
-            // a NaN always compares non-equal, even to itself
-            return ((mColour.IsValid()) &&
-                    (mTransm == mTransm));
-        }
-
         inline bool IsNearZero(T epsilon) const
         {
             return mColour.IsNearZero(epsilon) &&
@@ -1040,12 +1045,6 @@ class GenericRGBTColour
         {
             mColour.Clear();
             mTransm = 0.0;
-        }
-
-        inline void Invalidate()
-        {
-            mColour.Invalidate();
-            mTransm = std::numeric_limits<T>::quiet_NaN();
         }
 
         inline GenericRGBTColour Clipped(T minc, T maxc)
@@ -1467,15 +1466,9 @@ class GenericColour
             return result;
         }
 
-        /// Test if all components of the colour are valid.
         inline bool IsValid() const
         {
-            // test whether any component is NaN, exploiting the property that
-            // a NaN always compares non-equal, even to itself
-            bool result = true;
-            for (int i = 0; i < channels; i ++)
-                result = result && (mColour[i] == mColour[i]);
-            return result;
+            return ColourChannelIsValid(mColour[0]);
         }
 
         inline bool IsZero() const
@@ -1502,8 +1495,7 @@ class GenericColour
 
         inline void Invalidate()
         {
-            for (int i = 0; i < channels; i ++)
-                mColour[i] = std::numeric_limits<T>::quiet_NaN();
+            ColourChannelInvalidate(mColour[0]);
         }
 
         inline void Set(T grey)
@@ -1848,14 +1840,9 @@ class GenericTransColour
             return mColour.Greyscale();
         }
 
-        /// Test if all components of the colour are valid.
         inline bool IsValid() const
         {
-            // test whether any component is NaN, exploiting the property that
-            // a NaN always compares non-equal, even to itself
-            return ((mColour.IsValid())  &&
-                    (mFilter == mFilter) &&
-                    (mTransm == mTransm));
+            return (mColour.IsValid());
         }
 
         inline void Clear()
@@ -1868,8 +1855,6 @@ class GenericTransColour
         inline void Invalidate()
         {
             mColour.Invalidate();
-            mFilter = std::numeric_limits<T>::quiet_NaN();
-            mTransm = std::numeric_limits<T>::quiet_NaN();
         }
 
         inline GenericTransColour Clipped(T minc, T maxc)
