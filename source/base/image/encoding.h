@@ -64,7 +64,7 @@ class DitherHandler
             OffsetInfo(float r, float g, float b, float a) : red(r), green(g), blue(b), alpha(a) { }
             void clear() { red = 0.0f; green = 0.0f; blue = 0.0f; alpha = 0.0f; }
             void setAll(float v) { red = v; green = v; blue = v; alpha = v; }
-            void setRGB(RGBColour& v) { red = v.red(); green = v.green(); blue = v.blue(); alpha = 0.0; }
+            void setRGB(const RGBColour& v) { red = v.red(); green = v.green(); blue = v.blue(); alpha = 0.0; }
             RGBColour getRGB() { return RGBColour(red, green, blue); }
             OffsetInfo operator*(float b) const { return OffsetInfo(red*b, green*b, blue*b, alpha*b); }
             OffsetInfo operator+(const OffsetInfo& b) const { return OffsetInfo(red+b.red, green+b.green, blue+b.blue, alpha+b.alpha); }

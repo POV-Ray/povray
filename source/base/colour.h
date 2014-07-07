@@ -71,11 +71,17 @@ typedef DBL  PreciseColourChannel;
 template<typename MODEL_T, typename CHANNEL_T, typename DERIVED_T>
 class GenericLinearColour;
 
+template<typename CHANNEL_T>
+class GenericRGBColour;
+
 template<typename T>
 class GenericRGBFTColour;
 
 template<typename T>
 class GenericRGBTColour;
+
+template<typename CHANNEL_T>
+class GenericXYZColour;
 
 template<typename T>
 class GenericColour;
@@ -83,7 +89,7 @@ class GenericColour;
 template<typename T>
 class GenericTransColour;
 
-template<typename MODEL_T, unsigned int BIAS, typename CHANNEL_T = unsigned char>
+template<typename MODEL_T, typename BIAS_T, typename CHANNEL_T = unsigned char>
 class GenericCompactColour;
 
 /// @name Colour Channel Luminance
@@ -127,12 +133,44 @@ struct ColourModelInternal
     static const unsigned int kChannels = NUM_COLOUR_CHANNELS;
 };
 
-const double kaColourConversionMatrixRGBtoXYZ[ColourModelRGB::kChannels * ColourModelXYZ::kChannels] = {
-    +3.2406, -1.5372, -0.4986,
-    -0.9689, +1.8758, +0.0415,
-    +0.0557, -0.2040, +1.0570
+/// Matrix to convert from CIE XYZ colour space to linear sRGB.
+///
+/// @note   The matrix coefficients were re-computed from the primaries' xy coordinates and the whitepoint's xyY
+///         coordinates (rather than blindly relying on the contradicting values found on the internet) using the
+///         following [Sage](http://www.sagemath.org/) script:
+///         @include colour-matrices-srgb.sage
+///         Rounded to four decimals they match the coefficients from ITU-R BT.709, which uses the same primaries and
+///         white point as sRGB.
+///
+const ColourChannel kaColourConversionMatrixXYZtoRGB[ColourModelRGB::kChannels * ColourModelXYZ::kChannels] = {
+    3.24096994190452,   -1.53738317757009, -0.498610760293003,
+   -0.969243636280880,   1.87596750150772,  0.0415550574071757,
+    0.0556300796969937, -0.203976958888977, 1.05697151424288
 };
 
+/// Matrix to convert linear sRGB colour space to CIE XYZ.
+///
+/// @note   The matrix coefficients were re-computed from the primaries' xy coordinates and the whitepoint's xyY
+///         coordinates (rather than blindly relying on the -- partially contradicting -- values found on the internet)
+///         using the following [Sage](http://www.sagemath.org/) script:
+///         @include colour-matrices-srgb.sage
+///         Rounded to four decimals they match the coefficients from ITU-R BT.709, which uses the same primaries and
+///         white point as sRGB.
+///
+const ColourChannel kaColourConversionMatrixRGBtoXYZ[ColourModelXYZ::kChannels * ColourModelRGB::kChannels] = {
+    0.412390799265959,  0.357584339383878, 0.180480788401834,
+    0.212639005871510,  0.715168678767756, 0.0721923153607337,
+    0.0193308187155918, 0.119194779794626, 0.950532152249661
+};
+
+template<int BIAS>
+struct CompactColourBias
+{
+    static const unsigned int kBias = BIAS;
+};
+
+typedef CompactColourBias<250>  PhotonBias;
+typedef CompactColourBias<128>  RadianceHDRBias;
 
 /// Generic template class to hold and manipulate a colour.
 ///
@@ -141,7 +179,11 @@ const double kaColourConversionMatrixRGBtoXYZ[ColourModelRGB::kChannels * Colour
 /// @note   This colour type is provided solely for use in the front-end and image handling code. Use
 ///         @ref GenericColour in the render engine instead.
 ///
-/// @tparam MODEL_T     Colour model to use. This serves mainly to tag different instances of this template.
+/// @remark This class is mainly a collection of mathematical operations to be inherited by derived classes.
+///         In order for those operations to return the correct derived type, the Curiously Recurring Template Pattern
+///         (CRTP) is employed.
+///
+/// @tparam MODEL_T     Colour model to use.
 /// @tparam CHANNEL_T   Floating-point type to use for the individual colour components.
 /// @tparam DERIVED_T   Type that derives from this one.
 ///
@@ -179,10 +221,10 @@ class GenericLinearColour
                 mColour[i] = col.mColour[i];
         }
 
-        template<int BIAS, typename CHANNEL_T2>
-        inline explicit GenericLinearColour(const GenericCompactColour<Model,BIAS,CHANNEL_T2>& col)
+        template<typename BIAS_T2, typename CHANNEL_T2>
+        inline explicit GenericLinearColour(const GenericCompactColour<Model,BIAS_T2,CHANNEL_T2>& col)
         {
-            typedef GenericCompactColour<Model,BIAS,CHANNEL_T2> CompactColour;
+            typedef GenericCompactColour<Model,BIAS_T2,CHANNEL_T2> CompactColour;
             if (col.mData[CompactColour::kExp] > std::numeric_limits<typename CompactColour::Channel>::min())
             {
                 double expFactor = ldexp(1.0,(int)col.mData[CompactColour::kExp]-(int)(CompactColour::kBias+8));
@@ -203,14 +245,14 @@ class GenericLinearColour
         }
 
         template<typename T2>
-        inline explicit GenericLinearColour(const T2& col, const double *pConversionMatrix)
+        inline explicit GenericLinearColour(const T2& col, const ColourChannel *pConversionMatrix)
         {
-            const double *pMatrix = pConversionMatrix;
+            const ColourChannel *pMatrixElement = pConversionMatrix;
             for (unsigned int i = 0; i < kChannels; i ++)
             {
                 mColour[i] = 0.0;
                 for (unsigned int j = 0; j < T2::Model::kChannels; j ++)
-                    mColour[i] += *(pMatrix++) * col.mColour[j];
+                    mColour[i] += *(pMatrixElement++) * col.mColour[j];
             }
         }
 
@@ -588,9 +630,14 @@ class GenericRGBColour : public GenericLinearColour<ColourModelRGB, CHANNEL_T, G
 {
     public:
 
-        typedef CHANNEL_T           Channel;
+        typedef GenericLinearColour<ColourModelRGB, CHANNEL_T, GenericRGBColour<CHANNEL_T> > Parent;
         typedef ColourModelRGB      Model;
+        typedef CHANNEL_T           Channel;
         typedef GenericRGBColour    DerivedColour;
+        using Parent::kChannels;
+
+        using Parent::Max;
+        using Parent::MaxAbs;
 
         template<typename MODEL_T2, typename CHANNEL_T2, typename DERIVED_T2>
         friend class GenericLinearColour;
@@ -605,36 +652,36 @@ class GenericRGBColour : public GenericLinearColour<ColourModelRGB, CHANNEL_T, G
         friend GenericRGBColour ToRGBColour(const GenericColour<Channel>& col);
 
         /// Default constructor.
-        inline GenericRGBColour() : GenericLinearColour() {}
+        inline GenericRGBColour() : Parent() {}
 
         /// Copy constructor.
-        inline GenericRGBColour(const GenericRGBColour& col) : GenericLinearColour(col) {}
+        inline GenericRGBColour(const GenericRGBColour& col) : Parent(col) {}
 
-        inline explicit GenericRGBColour(const GenericLinearColour<Model,Channel,DerivedColour>& col) : GenericLinearColour(col) {}
-
-        template<typename CHANNEL_T2>
-        inline explicit GenericRGBColour(const GenericLinearColour<Model,CHANNEL_T2,DerivedColour>& col) : GenericLinearColour(col) {}
+        inline explicit GenericRGBColour(const GenericLinearColour<Model,Channel,DerivedColour>& col) : Parent(col) {}
 
         template<typename CHANNEL_T2>
-        inline explicit GenericRGBColour(const GenericRGBColour<CHANNEL_T2>& col) : GenericLinearColour(col) {}
+        inline explicit GenericRGBColour(const GenericLinearColour<Model,CHANNEL_T2,DerivedColour>& col) : Parent(col) {}
 
-        inline explicit GenericRGBColour(Channel grey) : GenericLinearColour(grey) {}
+        template<typename CHANNEL_T2>
+        inline explicit GenericRGBColour(const GenericRGBColour<CHANNEL_T2>& col) : Parent(col) {}
+
+        inline explicit GenericRGBColour(Channel grey) : Parent(grey) {}
 
         inline explicit GenericRGBColour(Channel red, Channel green, Channel blue) :
-            GenericLinearColour()
+            Parent()
         {
             mColour[ColourModelRGB::kRed]   = red;
             mColour[ColourModelRGB::kGreen] = green;
             mColour[ColourModelRGB::kBlue]  = blue;
         }
 
-        inline explicit GenericRGBColour(const GenericRGBFTColour<Channel>& col) : GenericLinearColour(col.rgb()) {}
+        inline explicit GenericRGBColour(const GenericRGBFTColour<Channel>& col) : Parent(col.rgb()) {}
 
-        template<int BIAS, typename CHANNEL_T2>
-        inline explicit GenericRGBColour(const GenericCompactColour<Model,BIAS,CHANNEL_T2>& col) : GenericLinearColour(col) {}
+        template<typename BIAS_T2, typename CHANNEL_T2>
+        inline explicit GenericRGBColour(const GenericCompactColour<Model,BIAS_T2,CHANNEL_T2>& col) : Parent(col) {}
 
         template<typename DERIVED_T2>
-        inline explicit GenericRGBColour(const GenericLinearColour<ColourModelXYZ,Channel,DERIVED_T2>& col) : GenericLinearColour(col, kaColourConversionMatrixRGBtoXYZ) {}
+        inline explicit GenericRGBColour(const GenericLinearColour<ColourModelXYZ,Channel,DERIVED_T2>& col) : Parent(col, kaColourConversionMatrixXYZtoRGB) {}
 
         inline Channel  red()   const { return mColour[ColourModelRGB::kRed]; }
         inline Channel& red()         { return mColour[ColourModelRGB::kRed]; }
@@ -756,6 +803,10 @@ class GenericRGBColour : public GenericLinearColour<ColourModelRGB, CHANNEL_T, G
             mColour[ColourModelRGB::kBlue]  = col.Blue();
         }
 #endif
+
+    protected:
+
+        using Parent::mColour;
 };
 
 typedef GenericRGBColour<ColourChannel>         RGBColour;          ///< Standard precision RGB colour.
@@ -1326,9 +1377,11 @@ class GenericXYZColour : public GenericLinearColour<ColourModelXYZ, CHANNEL_T, G
 {
     public:
 
-        typedef CHANNEL_T           Channel;
+        typedef GenericLinearColour<ColourModelXYZ, CHANNEL_T, GenericXYZColour<CHANNEL_T> > Parent;
         typedef ColourModelXYZ      Model;
+        typedef CHANNEL_T           Channel;
         typedef GenericXYZColour    DerivedColour;
+        using Parent::kChannels;
 
         template<typename MODEL_T2, typename CHANNEL_T2, typename DERIVED_T2>
         friend class GenericLinearColour;
@@ -1337,28 +1390,31 @@ class GenericXYZColour : public GenericLinearColour<ColourModelXYZ, CHANNEL_T, G
         friend class GenericXYZColour;
 
         /// Default constructor.
-        inline GenericXYZColour() : GenericLinearColour() {}
+        inline GenericXYZColour() : Parent() {}
 
         /// Copy constructor.
-        inline GenericXYZColour(const GenericXYZColour& col) : GenericLinearColour(col) {}
+        inline GenericXYZColour(const GenericXYZColour& col) : Parent(col) {}
 
-        inline explicit GenericXYZColour(const GenericLinearColour<Model,Channel,DerivedColour>& col) : GenericLinearColour(col) {}
-
-        template<typename CHANNEL_T2>
-        inline explicit GenericXYZColour(const GenericLinearColour<Model,CHANNEL_T2,DerivedColour>& col) : GenericLinearColour(col) {}
+        inline explicit GenericXYZColour(const GenericLinearColour<Model,Channel,DerivedColour>& col) : Parent(col) {}
 
         template<typename CHANNEL_T2>
-        inline explicit GenericXYZColour(const GenericXYZColour<CHANNEL_T2>& col) : GenericLinearColour(col) {}
+        inline explicit GenericXYZColour(const GenericLinearColour<Model,CHANNEL_T2,DerivedColour>& col) : Parent(col) {}
 
-        inline explicit GenericXYZColour(Channel grey) : GenericLinearColour(grey) {}
+        template<typename CHANNEL_T2>
+        inline explicit GenericXYZColour(const GenericXYZColour<CHANNEL_T2>& col) : Parent(col) {}
+
+        inline explicit GenericXYZColour(Channel grey) : Parent(grey) {}
 
         inline explicit GenericXYZColour(Channel x, Channel y, Channel z) :
-            GenericLinearColour()
+            Parent()
         {
             mColour[ColourModelXYZ::kX] = x;
             mColour[ColourModelXYZ::kY] = y;
             mColour[ColourModelXYZ::kZ] = z;
         }
+
+        template<typename DERIVED_T2>
+        inline explicit GenericXYZColour(const GenericLinearColour<ColourModelRGB,Channel,DERIVED_T2>& col) : Parent(col, kaColourConversionMatrixRGBtoXYZ) {}
 
         inline Channel  x() const { return mColour[ColourModelXYZ::kX]; }
         inline Channel& x()       { return mColour[ColourModelXYZ::kX]; }
@@ -1369,12 +1425,9 @@ class GenericXYZColour : public GenericLinearColour<ColourModelXYZ, CHANNEL_T, G
         inline Channel  z() const { return mColour[ColourModelXYZ::kZ]; }
         inline Channel& z()       { return mColour[ColourModelXYZ::kZ]; }
 
-        inline explicit GenericXYZColour(const GenericRGBColour<Channel>& col)
-        {
-            mColour[ColourModelXYZ::kX] =  * col.red() +  * col.green() +  * col.blue();
-            mColour[ColourModelXYZ::kY] = col.mColour[1];
-            mColour[ColourModelXYZ::kZ] = col.mColour[2];
-        }
+    protected:
+
+        using Parent::mColour;
 };
 
 typedef GenericXYZColour<ColourChannel>         XYZColour;          ///< Standard precision RGB colour.
@@ -1390,6 +1443,16 @@ class GenericColour : public GenericLinearColour<ColourModelInternal,CHANNEL_T,G
 {
     public:
 
+        typedef GenericLinearColour<ColourModelInternal, CHANNEL_T, GenericColour<CHANNEL_T> > Parent;
+        typedef ColourModelInternal Model;
+        typedef CHANNEL_T           Channel;
+        typedef GenericColour       DerivedColour;
+        using Parent::kChannels;
+
+        using Parent::SumAbs;
+        using Parent::Max;
+        using Parent::MaxAbs;
+
         template<typename MODEL_T2, typename CHANNEL_T2, typename DERIVED_T2>
         friend class GenericLinearColour;
 
@@ -1403,25 +1466,25 @@ class GenericColour : public GenericLinearColour<ColourModelInternal,CHANNEL_T,G
         friend GenericColour ToMathColour(const GenericRGBColour<Channel>& col);
 
         /// Default constructor.
-        inline GenericColour() : GenericLinearColour() {}
+        inline GenericColour() : Parent() {}
 
         /// Copy constructor.
-        inline GenericColour(const GenericColour& col) : GenericLinearColour(col) {}
+        inline GenericColour(const GenericColour& col) : Parent(col) {}
 
-        inline explicit GenericColour(const GenericLinearColour<Model,Channel,DerivedColour>& col) : GenericLinearColour(col) {}
-
-        template<typename CHANNEL_T2>
-        inline explicit GenericColour(const GenericLinearColour<Model,CHANNEL_T2,DerivedColour>& col) : GenericLinearColour(col) {}
+        inline explicit GenericColour(const GenericLinearColour<Model,Channel,DerivedColour>& col) : Parent(col) {}
 
         template<typename CHANNEL_T2>
-        inline explicit GenericColour(const GenericColour<CHANNEL_T2>& col) : GenericLinearColour(col) {}
+        inline explicit GenericColour(const GenericLinearColour<Model,CHANNEL_T2,DerivedColour>& col) : Parent(col) {}
 
-        inline explicit GenericColour(Channel grey) : GenericLinearColour(grey) {}
+        template<typename CHANNEL_T2>
+        inline explicit GenericColour(const GenericColour<CHANNEL_T2>& col) : Parent(col) {}
 
-        inline explicit GenericColour(const GenericTransColour<Channel>& col) : GenericLinearColour(col.colour()) {}
+        inline explicit GenericColour(Channel grey) : Parent(grey) {}
 
-        template<int BIAS, typename CHANNEL_T2>
-        inline explicit GenericColour(const GenericCompactColour<Model,BIAS,CHANNEL_T2>& col) : GenericLinearColour(col) {}
+        inline explicit GenericColour(const GenericTransColour<Channel>& col) : Parent(col.colour()) {}
+
+        template<typename BIAS_T2, typename CHANNEL_T2>
+        inline explicit GenericColour(const GenericCompactColour<Model,BIAS_T2,CHANNEL_T2>& col) : Parent(col) {}
 
         inline Channel Red() const
         {
@@ -1508,7 +1571,7 @@ class GenericColour : public GenericLinearColour<ColourModelInternal,CHANNEL_T,G
             /// @remark For backward compatibility, @ref WeightMax(), @ref WeightMaxAbs(),
             ///         @ref WeightGreyscale() and @ref WeightAbsGreyscale() are provided.
 
-            return SumAbs() / 3.0;
+            return SumAbs() / (Channel)kChannels;
         }
 
         /// Computes a measure for the weight of the colour based on the magnitude of its greyscale
@@ -1565,6 +1628,10 @@ class GenericColour : public GenericLinearColour<ColourModelInternal,CHANNEL_T,G
             return mkDefaultWavelengths;
         }
 
+    protected:
+
+        using Parent::mColour;
+
     private:
 
         static const GenericColour mkDefaultWavelengths;
@@ -1595,8 +1662,8 @@ class GenericColour : public GenericLinearColour<ColourModelInternal,CHANNEL_T,G
 #endif
 };
 
-typedef GenericColour<ColourChannel>         MathColour;        ///< Standard precision colour.
-typedef GenericColour<PreciseColourChannel>  PreciseMathColour; ///< High precision colour.
+typedef GenericColour<ColourChannel>        MathColour;         ///< Standard precision colour.
+typedef GenericColour<PreciseColourChannel> PreciseMathColour;  ///< High precision colour.
 
 
 /// Generic template class to hold and manipulate a colour plus transparency information.
@@ -1707,13 +1774,13 @@ class GenericTransColour
             return mColour * mFilter + mTransm;
         }
 
-        inline void SetFT(ColourChannel f, ColourChannel t)
+        inline void SetFT(T f, T t)
         {
             mFilter = f;
             mTransm = t;
         }
 
-        inline void GetFT(ColourChannel& f, ColourChannel& t) const
+        inline void GetFT(T& f, T& t) const
         {
             f = mFilter;
             t = mTransm;
@@ -1889,20 +1956,21 @@ typedef GenericTransColour<PreciseColourChannel>    PreciseTransColour; ///< Hig
 /// @author Christoph Lipka
 /// @author Based on MegaPOV HDR code written by Mael and Christoph Hormann
 ///
-/// @tparam MODEL_T     Colour model to use. This serves mainly to tag different instances of this template.
-/// @tparam BIAS        Bias to use for the exponent.
-///                     A value of 128 matches Greg Ward's original proposal.
+/// @tparam MODEL_T     Colour model to use.
+/// @tparam BIAS_T      Bias type to use for the exponent.
+///                     CompactColourBias<128> matches Greg Ward's original proposal.
 /// @tparam CHANNEL_T   Type to use for the colour components.
 ///                     Defaults to unsigned char.
 ///
-template<typename MODEL_T, unsigned int BIAS, typename CHANNEL_T>
+template<typename MODEL_T, typename BIAS_T, typename CHANNEL_T>
 class GenericCompactColour
 {
     public:
 
         typedef MODEL_T   Model;
+        typedef BIAS_T    Bias;
         typedef CHANNEL_T Channel;
-        static const unsigned int kBias         = BIAS;
+        static const unsigned int kBias         = Bias::kBias;
         static const unsigned int kChannels     = Model::kChannels;
         static const unsigned int kCoefficients = Model::kChannels + 1;
         static const unsigned int kExp          = Model::kChannels;
@@ -1929,7 +1997,7 @@ class GenericCompactColour
         inline explicit GenericCompactColour(const GenericLinearColour<Model,ColourChannel,DERIVED_T2>& col, ColourChannel dither = 0.0)
         {
             double scaleFactor;
-            if (ComputeExponent(col, mData[kChannels], scaleFactor))
+            if (ComputeExponent(col, mData[kExp], scaleFactor))
             {
                 for (unsigned int i = 0; i < kChannels; i ++)
                     mData[i] = clipToType<Channel>(floor(col[i] * scaleFactor + 0.5 + dither));
@@ -1945,7 +2013,7 @@ class GenericCompactColour
         inline explicit GenericCompactColour(const GenericLinearColour<Model,ColourChannel,DERIVED_T2>& col, const GenericLinearColour<Model,ColourChannel,DERIVED_T2>& dither)
         {
             double scaleFactor;
-            if (ComputeExponent(col, mData[EXP], scaleFactor))
+            if (ComputeExponent(col, mData[kExp], scaleFactor))
             {
                 for (unsigned int i = 0; i < kChannels; i ++)
                     mData[i] = clipToType<Channel>(floor(col[i] * scaleFactor + 0.5 + dither[i]));
@@ -1998,8 +2066,8 @@ class GenericCompactColour
         }
 };
 
-typedef GenericCompactColour<ColourModelRGB,128>        RadianceHDRColour;  ///< RGBE format as originally proposed by Greg Ward.
-typedef GenericCompactColour<ColourModelInternal,250>   PhotonColour;       ///< RGBE format as adapted by Nathan Kopp for photon mapping.
+typedef GenericCompactColour<ColourModelRGB,RadianceHDRBias>    RadianceHDRColour;  ///< RGBE format as originally proposed by Greg Ward.
+typedef GenericCompactColour<ColourModelInternal,PhotonBias>    PhotonColour;       ///< RGBE format as adapted by Nathan Kopp for photon mapping.
 
 }
 

@@ -1,25 +1,20 @@
-Colour Model
-============
+# Colour Model
 
 POV-Ray operates with different colour models internally (that is, in the rendering core) and externally (colours
 specified in the SDL or via input image files, and colours displayed in the render preview and written to output image
 files).
 
-@note   Implementation of this specification is still pending.
+@todo   Implementation of this specification is still pending.
 
 
-Input Colours
--------------
+@section in         Input Colours
 
 All input colour representations are based on the RGB colour model ubiquitous in computer graphics, more precisely a
-linear RGB model based on the _sRGB_ primaries.
+linear RGB model based on the _sRGB_ primaries and white point.
 
-### Primaries
+@subsection in_l        Light Sources
 
-@note   While the colour model is _based_ on the sRGB primaries, the primaries we use are not always _identical_ with
-        them. This is necessary to avoid user surprise.
-
-Light sources use the standard sRGB primaries:
+Light sources use the standard sRGB primaries and white point:
 
 | Colour               | x      | y      | Y      |
 |:---------------------|:-------|:-------|:-------|
@@ -29,25 +24,22 @@ Light sources use the standard sRGB primaries:
 |                      |        |        |        |
 | **Whitepoint** (D65) | 0.3127 | 0.3290 | 1.0000 |
 
-Note that the whitepoint does _not_ match equal energy (x=y=1/3); if we used these same primaries for pigments as well,
-a user specifying both the light source and object colour as "white" (`<1,1,1>`) would find that the object would _not_
-be rendered as sRGB white, but would be shifted towards blue instead; the effect would be even worse when using
-radiosity. To prevent this, we define that an RGB pigment colour specification means that the pigment _appears_ to have
-the specified colour _when illuminated with the sRGB standard illuminant (D65)_. This means that pigments effectively
-use the following primaries:
+This also applies to anything else that brings light into the scene, such as the texture and media `emission` effects.
 
-| Colour               | x      | y      | Y      |
-|:---------------------|:-------|:-------|:-------|
-| **Red**              | 0.6532 | 0.3201 | 0.2126 |
-| **Green**            | 0.3133 | 0.5956 | 0.7152 |
-| **Blue**             | 0.1673 | 0.0636 | 0.0722 |
-|                      |        |        |        |
-| **Whitepoint** (E)   | 0.3333 | 0.3333 | 1.0000 |
+@subsection in_p        Pigments
 
-@note   For the `emission` texture and media effects, sRGB primaries _are_ used, even though all the other texture and
-        media properties use the modified primaries.
+As the sRGB standard uses illuminant D65 as its whitepoint, but our internal colour model's whitepoint is necessarily
+based on illuminant E (equal energy, x=y=Y/3), care must be taken in handling of pigments. Naively converting the
+pigment colours in the same way as the light source colours would make a scene with straight "white" (`<1,1,1>`) light
+sources and object colours render in an off-white blueish hue, especially when radiosity would be involved. To prevent
+this, we interpret an RGB pigment colour specification in the sense that the pigment _appears_ to have the specified
+colour _when illuminated with the sRGB standard illuminant (D65)_.
 
-### Transparency
+Technically, this means that for any effects that modulate a light's colour -- such as `diffuse`, metallic reflections
+and highlights, or filtered transparency -- we're applying a simple scaling after conversion to the internal colour
+space.
+
+@subsection in_t        Transparency
 
 To represent transparency, the three primary colour channels are complemented with a pair of additional parameters
 called `filter` and `transmit` (abbreviated "F" and "T"). The effective transmitted colour can be computed as follows:
@@ -66,16 +58,14 @@ computed according to the following formula:
 @f]
 
 
-Output Colours
---------------
+@section out            Output Colours
 
 The interface between the render engine and the file output modules and GUI uses a linear high dynamic range RGB colour
 model based on the sRGB primaries, complemented with an additional single transparency channel. The latter uses
 _associated_ transparency mode.
 
 
-Internal Colours
-----------------
+@section int            Internal Colours
 
 Internally, colours are described in terms of _four_ spectral bands with the following parameters:
 
@@ -113,7 +103,7 @@ represents a pigment, coefficients outside the range [0..1] will be corrected by
 other ones accordingly (if at all possible); if the colour represents light intensity, only negative coefficients will
 be corrected in this manner.
 
-### Transparency
+@subsection int_t           Transparency
 
 Internally, transparency is represented as a full-fledged colour, using the same four-band colour model described above,
 in _associated_ mode. To convert this four-channel transparency to a single channel for output, a simple greyscale
