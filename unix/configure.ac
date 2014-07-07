@@ -959,6 +959,246 @@ AC_DEFINE_UNQUOTED([CXXFLAGS], ["$CXXFLAGS"], [Compiler flags.])
 
 ###############################################################################
 
+# NOTE: It is highly important that this block of tests is run AFTER compiler optimization settings have been chosen.
+
+AC_MSG_RESULT([
+Floating Point Features
+-----------------------])
+
+AC_CHECK_HEADERS([limits])
+
+AC_MSG_CHECKING([whether NaNs are supported])
+AC_RUN_IFELSE([
+  AC_LANG_PROGRAM([[
+    #ifdef HAVE_LIMITS
+    #include <limits>
+    #endif
+  ]],[[
+    if (!std::numeric_limits<double>::has_quiet_NaN) return 1;
+    if (!std::numeric_limits<float>::has_quiet_NaN)  return 2;
+  ]])
+],[
+  AC_MSG_RESULT([yes])
+
+  AC_CHECK_HEADERS([cmath])
+
+  AC_MSG_CHECKING([whether NaNs can be identified using std::isnan()])
+  AC_RUN_IFELSE([
+    AC_LANG_PROGRAM([[
+      #ifdef HAVE_CMATH
+      #include <cmath>
+      #endif
+      #ifdef HAVE_LIMITS
+      #include <limits>
+      #endif
+    ]],[[
+      volatile double d;
+      volatile float f;
+      d = std::numeric_limits<double>::quiet_NaN(); if (!std::isnan(d)) return 1;
+      f = d;                                        if (!std::isnan(f)) return 2;
+      f = std::numeric_limits<float>::quiet_NaN();  if (!std::isnan(f)) return 3;
+      d = f;                                        if (!std::isnan(d)) return 4;
+      d = 0.0; if (std::isnan(d)) return 5;
+      f = 0.0; if (std::isnan(f)) return 6;
+    ]])
+  ],[
+    AC_MSG_RESULT([yes])
+    AC_DEFINE([HAVE_NAN],      [],[NaN floating point values are supported])
+    AC_DEFINE([HAVE_STD_ISNAN],[],[NaNs can be identified using std::isnan()])
+  ],[
+    AC_MSG_RESULT([no])
+
+    AC_MSG_CHECKING([whether NaNs can be identified using global isnan()])
+    AC_RUN_IFELSE([
+      AC_LANG_PROGRAM([[
+        #ifdef HAVE_CMATH
+        #include <cmath>
+        #endif
+        #ifdef HAVE_LIMITS
+        #include <limits>
+        #endif
+      ]],[[
+        volatile double d;
+        volatile float f;
+        d = std::numeric_limits<double>::quiet_NaN(); if (!isnan(d)) return 1;
+        f = d;                                        if (!isnan(f)) return 2;
+        f = std::numeric_limits<float>::quiet_NaN();  if (!isnan(f)) return 3;
+        d = f;                                        if (!isnan(d)) return 4;
+        d = 0.0; if (isnan(d)) return 5;
+        f = 0.0; if (isnan(f)) return 6;
+      ]])
+    ],[
+      AC_MSG_RESULT([yes])
+      AC_DEFINE([HAVE_NAN],  [],[NaN floating point values are supported])
+      AC_DEFINE([HAVE_ISNAN],[],[NaNs can be identified using global isnan()])
+    ],[
+      AC_MSG_RESULT([no])
+
+      AC_MSG_CHECKING([whether NaNs can be identified by comparison to themselves])
+      AC_RUN_IFELSE([
+        AC_LANG_PROGRAM([[
+          #ifdef HAVE_LIMITS
+          #include <limits>
+          #endif
+          template<typename T> inline bool emulated_isnan(T x) { volatile T v = x; return (v != x); }
+        ]],[[
+          volatile double d;
+          volatile float f;
+          d = std::numeric_limits<double>::quiet_NaN(); if (!emulated_isnan(d)) return 1;
+          f = d;                                        if (!emulated_isnan(f)) return 2;
+          f = std::numeric_limits<float>::quiet_NaN();  if (!emulated_isnan(f)) return 3;
+          d = f;                                        if (!emulated_isnan(d)) return 4;
+          d = 0.0; if (emulated_isnan(d)) return 5;
+          f = 0.0; if (emulated_isnan(f)) return 6;
+        ]])
+      ],[
+        AC_MSG_RESULT([yes])
+        AC_DEFINE([HAVE_NAN],           [],[NaN floating point values are supported])
+        AC_DEFINE([HAVE_EMULATED_ISNAN],[],[NaNs can be identified by comparison to themselves])
+      ],[
+        # although double and float support NaN values, they are no use to us as we can't properly test for them,
+        # so we're not setting HAVE_NAN.
+        AC_MSG_RESULT([no])
+      ],[
+        AC_MSG_RESULT([cross-compiling])  # FIXME
+      ])
+    ],[
+      AC_MSG_RESULT([cross-compiling])  # FIXME
+    ])
+  ],[
+    AC_MSG_RESULT([cross-compiling])  # FIXME
+  ])
+],[
+  AC_MSG_RESULT([no])
+],[
+  AC_MSG_RESULT([cross-compiling])  # FIXME
+])
+
+AC_MSG_CHECKING([whether infinite values are supported])
+AC_RUN_IFELSE([
+  AC_LANG_PROGRAM([[
+    #ifdef HAVE_LIMITS
+    #include <limits>
+    #endif
+  ]],[[
+    if (!std::numeric_limits<double>::has_infinity) return 1;
+    if (!std::numeric_limits<float>::has_infinity)  return 2;
+  ]])
+],[
+  AC_MSG_RESULT([yes])
+
+  AC_CHECK_HEADERS([cmath])
+
+  AC_MSG_CHECKING([whether infinities can be identified using std::isinf()])
+  AC_RUN_IFELSE([
+    AC_LANG_PROGRAM([[
+      #ifdef HAVE_CMATH
+      #include <cmath>
+      #endif
+      #ifdef HAVE_LIMITS
+      #include <limits>
+      #endif
+    ]],[[
+      volatile double d;
+      volatile float f;
+      d = std::numeric_limits<double>::infinity();  if (!std::isinf(d)) return 1;
+      f = d;                                        if (!std::isinf(f)) return 2;
+      f = std::numeric_limits<float>::infinity();   if (!std::isinf(f)) return 3;
+      d = f;                                        if (!std::isinf(d)) return 4;
+      d = -std::numeric_limits<double>::infinity(); if (!std::isinf(d)) return 5;
+      f = d;                                        if (!std::isinf(f)) return 6;
+      f = -std::numeric_limits<float>::infinity();  if (!std::isinf(f)) return 7;
+      d = f;                                        if (!std::isinf(d)) return 8;
+      d = 0.0; if (std::isinf(d)) return 9;
+      f = 0.0; if (std::isinf(f)) return 10;
+    ]])
+  ],[
+    AC_MSG_RESULT([yes])
+    AC_DEFINE([HAVE_INF],      [],[infinite floating point values are supported])
+    AC_DEFINE([HAVE_STD_ISINF],[],[intinities can be identified using std::isinf()])
+  ],[
+    AC_MSG_RESULT([no])
+
+    AC_MSG_CHECKING([whether infinities can be identified using global isinf()])
+    AC_RUN_IFELSE([
+      AC_LANG_PROGRAM([[
+        #ifdef HAVE_CMATH
+        #include <cmath>
+        #endif
+        #ifdef HAVE_LIMITS
+        #include <limits>
+        #endif
+      ]],[[
+        volatile double d;
+        volatile float f;
+        d = std::numeric_limits<double>::infinity();  if (!isinf(d)) return 1;
+        f = d;                                        if (!isinf(f)) return 2;
+        f = std::numeric_limits<float>::infinity();   if (!isinf(f)) return 3;
+        d = f;                                        if (!isinf(d)) return 4;
+        d = -std::numeric_limits<double>::infinity(); if (!isinf(d)) return 5;
+        f = d;                                        if (!isinf(f)) return 6;
+        f = -std::numeric_limits<float>::infinity();  if (!isinf(f)) return 7;
+        d = f;                                        if (!isinf(d)) return 8;
+        d = 0.0; if (isinf(d)) return 9;
+        f = 0.0; if (isinf(f)) return 10;
+      ]])
+    ],[
+      AC_MSG_RESULT([yes])
+      AC_DEFINE([HAVE_INF],  [],[infinite floating point values are supported])
+      AC_DEFINE([HAVE_ISINF],[],[intinities can be identified using global isinf()])
+    ],[
+      AC_MSG_RESULT([no])
+
+      AC_MSG_CHECKING([whether infinities can be identified by comparison to the maximum value])
+      AC_RUN_IFELSE([
+        AC_LANG_PROGRAM([[
+          #ifdef HAVE_CMATH
+          #include <cmath>
+          #endif
+          #ifdef HAVE_LIMITS
+          #include <limits>
+          #endif
+          template<typename T> inline bool emulated_isinf(T x) { volatile T v = std::numeric_limits<T>::max(); return std::fabs(x) > v; }
+        ]],[[
+          volatile double d;
+          volatile float f;
+          d = std::numeric_limits<double>::infinity();  if (!emulated_isinf(d)) return 1;
+          f = d;                                        if (!emulated_isinf(f)) return 2;
+          f = std::numeric_limits<float>::infinity();   if (!emulated_isinf(f)) return 3;
+          d = f;                                        if (!emulated_isinf(d)) return 4;
+          d = -std::numeric_limits<double>::infinity(); if (!emulated_isinf(d)) return 5;
+          f = d;                                        if (!emulated_isinf(f)) return 6;
+          f = -std::numeric_limits<float>::infinity();  if (!emulated_isinf(f)) return 7;
+          d = f;                                        if (!emulated_isinf(d)) return 8;
+          d = 0.0; if (emulated_isinf(d)) return 9;
+          f = 0.0; if (emulated_isinf(f)) return 10;
+        ]])
+      ],[
+        AC_MSG_RESULT([yes])
+        AC_DEFINE([HAVE_INF],           [],[infinite floating point values are supported])
+        AC_DEFINE([HAVE_EMULATED_ISINF],[],[infinities can be identified by them comparing non-equal to themselves])
+      ],[
+        # although double and float support infinite values, they are no use to us as we can't properly test for them,
+        # so we're not setting HAVE_INF.
+        AC_MSG_RESULT([no])
+      ],[
+        AC_MSG_RESULT([cross-compiling])  # FIXME
+      ])
+    ],[
+      AC_MSG_RESULT([cross-compiling])  # FIXME
+    ])
+  ],[
+    AC_MSG_RESULT([cross-compiling])  # FIXME
+  ])
+],[
+  AC_MSG_RESULT([no])
+],[
+  AC_MSG_RESULT([cross-compiling])  # FIXME
+])
+
+
+###############################################################################
+
 AC_MSG_RESULT([
 Makefiles
 ---------])

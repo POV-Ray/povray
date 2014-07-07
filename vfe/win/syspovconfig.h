@@ -1,37 +1,39 @@
-/*******************************************************************************
- * syspovconfig.h
- *
- * This file contains most Windows specific defines for compiling the VFE.
- *
- * Author: Christopher J. Cason
- *
- * ---------------------------------------------------------------------------
- * Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
- * Copyright 1991-2013 Persistence of Vision Raytracer Pty. Ltd.
- *
- * POV-Ray is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * POV-Ray is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------------
- * POV-Ray is based on the popular DKB raytracer version 2.12.
- * DKBTrace was originally written by David K. Buck.
- * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
- * ---------------------------------------------------------------------------
- * $File: //depot/povray/smp/vfe/win/syspovconfig.h $
- * $Revision: #41 $
- * $Change: 6132 $
- * $DateTime: 2013/11/25 14:23:41 $
- * $Author: clipka $
- *******************************************************************************/
+//******************************************************************************
+///
+/// @file vfe/win/syspovconfig.h
+///
+/// This file contains most Windows specific defines for compiling the VFE.
+///
+/// @author Christopher J. Cason
+///
+/// @copyright
+/// @parblock
+///
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
+/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+///
+/// POV-Ray is free software: you can redistribute it and/or modify
+/// it under the terms of the GNU Affero General Public License as
+/// published by the Free Software Foundation, either version 3 of the
+/// License, or (at your option) any later version.
+///
+/// POV-Ray is distributed in the hope that it will be useful,
+/// but WITHOUT ANY WARRANTY; without even the implied warranty of
+/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+/// GNU Affero General Public License for more details.
+///
+/// You should have received a copy of the GNU Affero General Public License
+/// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+///
+/// ----------------------------------------------------------------------------
+///
+/// POV-Ray is based on the popular DKB raytracer version 2.12.
+/// DKBTrace was originally written by David K. Buck.
+/// DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
+///
+/// @endparblock
+///
+//******************************************************************************
 
 #ifndef __SYSPOVCONFIG_H__
 #define __SYSPOVCONFIG_H__
@@ -50,20 +52,26 @@
 // failure to do so will lead to link errors.
 // #define _CONSOLE
 
-#include <math.h>
+#include <cmath>
+#include <cstdarg>
+#include <cstdlib>
+
+#include <exception>
+#include <list>
+#include <stdexcept>
+#include <string>
+#include <vector>
+
+#include <boost/tr1/memory.hpp>
+
+#include <io.h>
+#include <fcntl.h>
 
 #ifndef STD_TYPES_DECLARED
 #define STD_TYPES_DECLARED
 
 // the following types are used extensively throughout the POV source and hence are
 // included and named here for reasons of clarity and convenience.
-
-#include <exception>
-#include <stdexcept>
-#include <string>
-#include <vector>
-#include <list>
-#include <boost/tr1/memory.hpp>
 
 // when we say 'string' we mean std::string
 using std::string;
@@ -144,11 +152,6 @@ using std::tr1::weak_ptr;
   typedef unsigned __int64  uint64;
   typedef __int64           int64;
 #endif
-
-#include <stdarg.h>
-#include <stdlib.h>
-#include <io.h>
-#include <fcntl.h>
 
 #ifdef __INTEL_COMPILER
 // Intel C++ whines about the lack of a return on RDTSC() for each and every file
@@ -301,5 +304,10 @@ namespace pov
   #define RTR_HACK
   #define RTR_SUPPORT
 #endif
+
+#define HAVE_NAN
+#define HAVE_INF
+#define POV_ISNAN(x) _isnan(x)
+#define POV_ISINF(x) _isinf(x)
 
 #endif // __SYSPOVCONFIG_H__
