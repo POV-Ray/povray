@@ -85,6 +85,10 @@ class SceneData
         // Scene needs access to the private scene data constructor!
         friend class Scene;
     public:
+
+        typedef std::map<string, string>         DeclaredVariablesMap;
+        typedef std::map<UCS2String, UCS2String> FilenameToFilenameMap;
+
         /**
          *  Destructor.
          */
@@ -212,7 +216,7 @@ class SceneData
         int defaultFileType;
 
         FrameSettings frameSettings; // TODO - move ???
-        map<string, string> declaredVariables; // TODO - move to parser
+        DeclaredVariablesMap declaredVariables; // TODO - move to parser
         Camera parsedCamera; // TODO - handle differently or move to parser
         bool clocklessAnimation; // TODO - this is support for an experimental feature and may be changed or removed
         vector<Camera> cameras; // TODO - this is support for an experimental feature and may be changed or removed
@@ -317,13 +321,13 @@ class SceneData
     private:
 #ifdef USE_SCENE_FILE_MAPPING
         /// maps scene file names to local file names
-        map<UCS2String, UCS2String> scene2LocalFiles;
+        FilenameToFilenameMap scene2LocalFiles;
         /// maps local file names to scene file names
-        map<UCS2String, UCS2String> local2SceneFiles;
+        FilenameToFilenameMap local2SceneFiles;
         /// maps scene file names to temporary file names
-        map<UCS2String, UCS2String> scene2TempFiles;
+        FilenameToFilenameMap scene2TempFiles;
         /// maps temporary file names to scene file names
-        map<UCS2String, UCS2String> temp2SceneFiles;
+        FilenameToFilenameMap temp2SceneFiles;
 #endif
 
         /**

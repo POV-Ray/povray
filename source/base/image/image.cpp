@@ -82,6 +82,8 @@
 namespace pov_base
 {
 
+using std::allocator;
+
 template<class Allocator = allocator<bool> >
 class BitMapImage : public Image
 {

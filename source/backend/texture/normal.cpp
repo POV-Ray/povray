@@ -784,7 +784,7 @@ void Perturb_Normal(Vector3d& Layer_Normal, const TNORMAL *Tnormal, const Vector
 
     /* If normal_map present, use it and return */
 
-    Blend_Map = tr1::dynamic_pointer_cast<NormalBlendMap, GenericNormalBlendMap>(Tnormal->Blend_Map);
+    Blend_Map = std::tr1::dynamic_pointer_cast<NormalBlendMap, GenericNormalBlendMap>(Tnormal->Blend_Map);
     if (Blend_Map != NULL)
     {
         if (Tnormal->Type == UV_MAP_PATTERN)
@@ -868,7 +868,7 @@ void Perturb_Normal(Vector3d& Layer_Normal, const TNORMAL *Tnormal, const Vector
     }
     else
     {
-        shared_ptr<SlopeBlendMap> slopeMap = tr1::dynamic_pointer_cast<SlopeBlendMap, GenericNormalBlendMap>(Tnormal->Blend_Map);
+        shared_ptr<SlopeBlendMap> slopeMap = std::tr1::dynamic_pointer_cast<SlopeBlendMap, GenericNormalBlendMap>(Tnormal->Blend_Map);
 
         Warp_Normal(Layer_Normal,Layer_Normal, Tnormal,
                     Test_Flag(Tnormal,DONT_SCALE_BUMPS_FLAG));
