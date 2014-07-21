@@ -1,39 +1,41 @@
-/*******************************************************************************
- * unixoptions.h
- *
- * Written by Christoph Hormann <chris_hormann@gmx.de>
- * based on unix.cpp Elements by Nicolas Calimet
- *
- * Processing system for options in povray.conf, command line
- * and environment variables.
- *
- * ---------------------------------------------------------------------------
- * Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
- * Copyright 1991-2013 Persistence of Vision Raytracer Pty. Ltd.
- *
- * POV-Ray is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * POV-Ray is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------------
- * POV-Ray is based on the popular DKB raytracer version 2.12.
- * DKBTrace was originally written by David K. Buck.
- * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
- * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/vfe/unix/unixoptions.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
- *******************************************************************************/
+//******************************************************************************
+///
+/// @file vfe/unix/unixoptions.h
+///
+/// Processing system for options in povray.conf, command line and environment
+/// variables.
+///
+/// @author Christoph Hormann <chris_hormann@gmx.de>
+/// @author based on unix.cpp Elements by Nicolas Calimet
+///
+/// @copyright
+/// @parblock
+///
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
+/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+///
+/// POV-Ray is free software: you can redistribute it and/or modify
+/// it under the terms of the GNU Affero General Public License as
+/// published by the Free Software Foundation, either version 3 of the
+/// License, or (at your option) any later version.
+///
+/// POV-Ray is distributed in the hope that it will be useful,
+/// but WITHOUT ANY WARRANTY; without even the implied warranty of
+/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+/// GNU Affero General Public License for more details.
+///
+/// You should have received a copy of the GNU Affero General Public License
+/// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+///
+/// ----------------------------------------------------------------------------
+///
+/// POV-Ray is based on the popular DKB raytracer version 2.12.
+/// DKBTrace was originally written by David K. Buck.
+/// DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
+///
+/// @endparblock
+///
+//*******************************************************************************
 
 #ifndef _OPTIONS_H
 #define _OPTIONS_H
@@ -68,286 +70,284 @@ using boost::to_lower_copy;
 
 namespace vfePlatform
 {
-	using namespace std;
+    /**
+        @brief Processing system for options in povray.conf, command line and environment variables.
 
-	/**
-		@brief Processing system for options in povray.conf, command line and environment variables.
+        @author Christoph Hormann <chris_hormann@gmx.de>
 
-		@author Christoph Hormann <chris_hormann@gmx.de>
+        @date June 2006
 
-		@date June 2006
+        This class wraps the processing of platform specific options set via
 
-		This class wraps the processing of platform specific options set via
+            - povray.conf files in the form:
 
-			- povray.conf files in the form:
+                [section]
+                name=value
 
-				[section]
-				name=value
+            - command line options (which have to be removed before the options vector
+                is passed to the core code for further processing)
 
-			- command line options (which have to be removed before the options vector 
-				is passed to the core code for further processing)
+            - environment variables
 
-			- environment variables
+        It provides access to the settings made with those options to other parts of
+        the code and allows subsystems like the display classes to register their own
+        options.
 
-		It provides access to the settings made with those options to other parts of 
-		the code and allows subsystems like the display classes to register their own
-		options.
+        Registering custom options:
 
-		Registering custom options:
+            even options not registered are read from povray.conf when present and
+            their values are made available.  To register an options the public method
+            Register() is provided.  It takes a vector of Option_Info structs containing
+            the option information.  See disp_text.cpp for an (empty) example.
 
-			even options not registered are read from povray.conf when present and 
-			their values are made available.  To register an options the public method
-			Register() is provided.  It takes a vector of Option_Info structs containing
-			the option information.  See disp_text.cpp for an (empty) example.
+        The option values are currently stored as strings and the system does not
+        distinguish between different types.
 
-		The option values are currently stored as strings and the system does not 
-		distinguish between different types.
+        Furthermore it processes the IO-restrictions settings and manages the povray.ini
+        locations.
 
-		Furthermore it processes the IO-restrictions settings and manages the povray.ini
-		locations.
+        Inner workings:
 
-		Inner workings:
+            The options are stored in the list m_user_options.
 
-			The options are stored in the list m_user_options.
+            The constructor sets up the locations of the configuration files
+            (previously unix_create_globals()), adds the standard options to the list
+            and processes the povray.conf files.  The io-restrictions settings from
+            those files are read with the old proven system and stored in their own
+            list (m_permitted_paths).  At the end these are transferred into the
+            corresponding vfeSession fields.  All unknown options in the povray.conf
+            files are read into a temporary list (m_custom_conf_options).
 
-			The constructor sets up the locations of the configuration files
-			(previously unix_create_globals()), adds the standard options to the list
-			and processes the povray.conf files.  The io-restrictions settings from 
-			those files are read with the old proven system and stored in their own 
-			list (m_permitted_paths).  At the end these are transferred into the 
-			corresponding vfeSession fields.  All unknown options in the povray.conf 
-			files are read into a temporary list (m_custom_conf_options).
+            The actual options processing is done in ProcessOptions(). There all
+            options from the povray.conf files are transferred into the list.  Then
+            the values of all options which can be set via command line and environment
+            variables are determined.  Environment variables override povray.conf
+            settings and command line options override environment variables.  The read
+            command line options are removed from the argument list like previously in
+            the xwindow code.
 
-			The actual options processing is done in ProcessOptions(). There all
-			options from the povray.conf files are transferred into the list.  Then
-			the values of all options which can be set via command line and environment 
-			variables are determined.  Environment variables override povray.conf 
-			settings and command line options override environment variables.  The read
-			command line options are removed from the argument list like previously in 
-			the xwindow code.
+        An instance of this class is part of vfeUnixSession and can be accesses through
+        vfeUnixSession::GetUnixOptions().
 
-		An instance of this class is part of vfeUnixSession and can be accesses through
-		vfeUnixSession::GetUnixOptions().
+    */
+    class UnixOptionsProcessor
+    {
+      public:
+        /*
+         * [NC] structures to handle configuration-related (povray.conf) code.
+         */
+        enum FileIO {IO_UNSET, IO_NONE, IO_READONLY, IO_RESTRICTED, IO_UNKNOWN};
+        enum ShellOut {SHL_UNSET, SHL_ALLOWED, SHL_FORBIDDEN, SHL_UNKNOWN};
 
-	*/
-	class UnixOptionsProcessor
-	{
-	  public:
-		/*
-		 * [NC] structures to handle configuration-related (povray.conf) code.
-		 */
-		enum FileIO {IO_UNSET, IO_NONE, IO_READONLY, IO_RESTRICTED, IO_UNKNOWN};
-		enum ShellOut {SHL_UNSET, SHL_ALLOWED, SHL_FORBIDDEN, SHL_UNKNOWN};
+        /// permission path for IO restrictions settings
+        struct UnixPath
+        {
+            string str;
+            bool descend, writable;
 
-		/// permission path for IO restrictions settings
-		struct UnixPath
-		{
-			string str;
-			bool descend, writable;
+            UnixPath(const string &s, bool desc = false, bool wrt = false) : str(s), descend(desc), writable(wrt) { }
+        };
 
-			UnixPath(const string &s, bool desc = false, bool wrt = false) : str(s), descend(desc), writable(wrt) { }
-		};
+        /**
+             Option of a povray.conf file of the form
+             [Section]
+             Name=Value
+        */
+        struct Conf_Option
+        {
+            string Section;
+            string Name;
+            string Value;
 
-		/**
-			 Option of a povray.conf file of the form
-			 [Section]
-			 Name=Value
-		*/
-		struct Conf_Option
-		{
-			string Section;
-			string Name;
-			string Value;
+            Conf_Option(const string &Sect, const string &Nm, const string &Val = "") : Section(Sect), Name(Nm), Value(Val) { }
+        };
 
-			Conf_Option(const string &Sect, const string &Nm, const string &Val = "") : Section(Sect), Name(Nm), Value(Val) { }
-		};
+        /**
+             A platform specific configuration option
+             with configuration file settings,
+             Command line option (optional) and
+             Environment variable (optional)
 
-		/**
-			 A platform specific configuration option
-			 with configuration file settings, 
-			 Command line option (optional) and 
-			 Environment variable (optional)
+             This stucture is used by the Display classes to
+             provide their own options and by the options
+             processor to store the option values
+        */
+        struct Option_Info
+        {
+            string Section;
+            string Name;
+            string Value;
+            string CmdOption;
+            string EnvVariable;
+            string Comment;
+            bool has_param;
 
-			 This stucture is used by the Display classes to 
-			 provide their own options and by the options 
-			 processor to store the option values
-		*/
-		struct Option_Info
-		{
-			string Section;
-			string Name;
-			string Value;
-			string CmdOption;
-			string EnvVariable;
-			string Comment;
-			bool has_param;
+            Option_Info(const string &Sect ,
+                                    const string &Nm,
+                                    const string &Val = "",
+                                    bool par = false,
+                                    const string &Cmd = "",
+                                    const string &Env = "",
+                                    const string &Comm = "")
+                : Section(Sect), Name(Nm), Value(Val), has_param(par), CmdOption(Cmd), EnvVariable(Env), Comment(Comm) { }
 
-			Option_Info(const string &Sect ,
-									const string &Nm, 
-									const string &Val = "", 
-									bool par = false, 
-									const string &Cmd = "", 
-									const string &Env = "", 
-									const string &Comm = "")
-				: Section(Sect), Name(Nm), Value(Val), has_param(par), CmdOption(Cmd), EnvVariable(Env), Comment(Comm) { }
+            /// only checks identity of the option, not of the selected value.
+            bool operator==(Option_Info const& other) const
+            {
+                return to_lower_copy(Section) == to_lower_copy(other.Section) && to_lower_copy(Name) == to_lower_copy(other.Name);
+            }
 
-			/// only checks identity of the option, not of the selected value.
-			bool operator==(Option_Info const& other) const
-			{
-				return to_lower_copy(Section) == to_lower_copy(other.Section) && to_lower_copy(Name) == to_lower_copy(other.Name);
-			}
+            /// compares sections (for sorting)
+            bool operator<(Option_Info const& other) const
+            {
+                if (to_lower_copy(other.Section) < to_lower_copy(Section))
+                    return true;
+                if (to_lower_copy(other.Section) == to_lower_copy(Section))
+                    if (to_lower_copy(other.Name) < to_lower_copy(Name))
+                        return true;
+                return false;
+            }
+        };
 
-			/// compares sections (for sorting)
-			bool operator<(Option_Info const& other) const
-			{
-				if (to_lower_copy(other.Section) < to_lower_copy(Section))
-					return true;
-				if (to_lower_copy(other.Section) == to_lower_copy(Section))
-					if (to_lower_copy(other.Name) < to_lower_copy(Name))
-						return true;
-				return false;
-			}
-		};
+        UnixOptionsProcessor(vfeSession *session);
+        virtual ~UnixOptionsProcessor() {} ;
 
-		UnixOptionsProcessor(vfeSession *session);
-		virtual ~UnixOptionsProcessor() {} ;
+        /**
+             called by the Display classes to register their custom options
 
-		/**
-			 called by the Display classes to register their custom options
+             @param options Vector of Option_Info structs containing the options
+        */
+        void Register(const Option_Info options[]);
 
-			 @param options Vector of Option_Info structs containing the options
-		*/
-		void Register(const Option_Info options[]);
- 
-		/**
-			 Converts a file path to standard form replacing 
-			 relative notations.
-		*/
-		string CanonicalizePath(const string &path);
- 
-		/**
-			 Finds out the default location for temporary files.
-			 Set by an option, alternatively '/tmp/'.
+        /**
+             Converts a file path to standard form replacing
+             relative notations.
+        */
+        string CanonicalizePath(const string &path);
 
-			 @returns temporary path including a trailing slash
-		*/
-		string GetTemporaryPath(void);
+        /**
+             Finds out the default location for temporary files.
+             Set by an option, alternatively '/tmp/'.
 
-		/**
-			 Finds the value of a certain option from
-			 either configuration file, command line
-			 or environment variable.
+             @returns temporary path including a trailing slash
+        */
+        string GetTemporaryPath(void);
 
-			 @param option The option to query
+        /**
+             Finds the value of a certain option from
+             either configuration file, command line
+             or environment variable.
 
-			 The value is returned in option.Value.
-		*/
-		void QueryOption(Option_Info &option);
+             @param option The option to query
 
-		/**
-			 Finds the value of a certain option via
-			 section and option name and returns it as
-			 a string.
-		*/
-		string QueryOptionString(const string &section, const string &name);
+             The value is returned in option.Value.
+        */
+        void QueryOption(Option_Info &option);
 
-		/**
-			 Finds the value of a certain option via
-			 section and option name and returns it as
-			 an int.  If the options value is not convertible 
-			 to int dflt is returned instead.
-		*/
-		int QueryOptionInt(const string &section, const string &name, const int dflt = 0);
+        /**
+             Finds the value of a certain option via
+             section and option name and returns it as
+             a string.
+        */
+        string QueryOptionString(const string &section, const string &name);
 
-		/**
-			 Finds the value of a certain option via
-			 section and option name and returns it as
-			 a float  If the options value is not convertible 
-			 to float dflt is returned instead..
-		*/
-		float QueryOptionFloat(const string &section, const string &name, const float dflt = 0.0);
+        /**
+             Finds the value of a certain option via
+             section and option name and returns it as
+             an int.  If the options value is not convertible
+             to int dflt is returned instead.
+        */
+        int QueryOptionInt(const string &section, const string &name, const int dflt = 0);
 
-		/**
-			 Check if a certain option has been set
-			 this is the case if a parameter free option is present of
-			 if the parameter is 'on', 'yes', 'true' or '1'.
+        /**
+             Finds the value of a certain option via
+             section and option name and returns it as
+             a float  If the options value is not convertible
+             to float dflt is returned instead..
+        */
+        float QueryOptionFloat(const string &section, const string &name, const float dflt = 0.0);
 
-			 @returns true if set, false otherwise
-		*/
-		bool isOptionSet(const Option_Info &option);
-		bool isOptionSet(const string &section, const string &name);
+        /**
+             Check if a certain option has been set
+             this is the case if a parameter free option is present of
+             if the parameter is 'on', 'yes', 'true' or '1'.
 
-		/**
-			 Adds the custom povray.conf options with their values
-			 to the main options list and reads the environment 
-			 variables and command line options where advised.
+             @returns true if set, false otherwise
+        */
+        bool isOptionSet(const Option_Info &option);
+        bool isOptionSet(const string &section, const string &name);
 
-			 The argument list is replaced with a version
-			 with the custom options removed.
-		*/
-		void ProcessOptions(int *argc, char **argv[]);
+        /**
+             Adds the custom povray.conf options with their values
+             to the main options list and reads the environment
+             variables and command line options where advised.
 
-		/**
-			 Search for povray.ini at standard locations
-			 and add it to opts.
-		*/
-		void Process_povray_ini(vfeRenderOptions &opts);
+             The argument list is replaced with a version
+             with the custom options removed.
+        */
+        void ProcessOptions(int *argc, char **argv[]);
 
-		/**
-			 Print all currrently registered command line 
-			 options in an option summary.
-		*/
-		void PrintOptions(void);
+        /**
+             Search for povray.ini at standard locations
+             and add it to opts.
+        */
+        void Process_povray_ini(vfeRenderOptions &opts);
 
-		/**
-			 Determines if IO restrictions are enabled at compile
-			 time and via povray.conf settings.
+        /**
+             Print all currrently registered command line
+             options in an option summary.
+        */
+        void PrintOptions(void);
 
-			 @param write if false and permissions are 'free read' returns false.
-		*/
-		bool isIORestrictionsEnabled(bool write);
+        /**
+             Determines if IO restrictions are enabled at compile
+             time and via povray.conf settings.
 
-		/**
-			 Prints an approriate error message if IO restrictions
-			 prevent access to a file.
+             @param write if false and permissions are 'free read' returns false.
+        */
+        bool isIORestrictionsEnabled(bool write);
 
-			 @param fnm File not permitted to access
-			 @param write If write acccess was requested
-			 @param is_user_setting if denial was due to user setting				 
-		*/
-		void IORestrictionsError(const string &fnm, bool write, bool is_user_setting);
+        /**
+             Prints an approriate error message if IO restrictions
+             prevent access to a file.
 
-		bool ShelloutPermitted(const string& command, const string& parameters) const { return m_shellout == SHL_ALLOWED; }
+             @param fnm File not permitted to access
+             @param write If write acccess was requested
+             @param is_user_setting if denial was due to user setting
+        */
+        void IORestrictionsError(const string &fnm, bool write, bool is_user_setting);
 
-	 protected:
-		/// list of standard options
-		static const Option_Info Standard_Options[];
+        bool ShelloutPermitted(const string& command, const string& parameters) const { return m_shellout == SHL_ALLOWED; }
 
-		string unix_getcwd(void);
-		string basename(const string &path);
-		string dirname(const string &path);
-		string unix_readlink(const string &path);
-		string pre_process_conf_line(const string &input);
-		void add_permitted_path(list<UnixPath> &paths, const string &input, const string &conf_name, unsigned long line_number);
-		void parse_conf_file(std::istream &Stream, const string &conf_name, bool user_mode);
-		void process_povray_conf(void);
-		void remove_arg(int *argc, char *argv[], int index);
-		bool file_exist(const string &name);
+     protected:
+        /// list of standard options
+        static const Option_Info Standard_Options[];
 
-		vfeSession *m_Session;
-		string  m_home;
-		string  m_user_dir;
-		string  m_sysconf;                // system conf filename
-		string  m_userconf;               // user conf filename
-		string  m_conf;                   // selected conf file
-		string  m_sysini, m_sysini_old;   // system ini filename
-		string  m_userini, m_userini_old; // user ini filename
-		FileIO  m_file_io;
-		ShellOut m_shellout;
-		list<UnixPath> m_permitted_paths;
-		list<Conf_Option> m_custom_conf_options;
-		list<Option_Info> m_user_options;
-	};
+        string unix_getcwd(void);
+        string basename(const string &path);
+        string dirname(const string &path);
+        string unix_readlink(const string &path);
+        string pre_process_conf_line(const string &input);
+        void add_permitted_path(list<UnixPath> &paths, const string &input, const string &conf_name, unsigned long line_number);
+        void parse_conf_file(std::istream &Stream, const string &conf_name, bool user_mode);
+        void process_povray_conf(void);
+        void remove_arg(int *argc, char *argv[], int index);
+        bool file_exist(const string &name);
+
+        vfeSession *m_Session;
+        string  m_home;
+        string  m_user_dir;
+        string  m_sysconf;                // system conf filename
+        string  m_userconf;               // user conf filename
+        string  m_conf;                   // selected conf file
+        string  m_sysini, m_sysini_old;   // system ini filename
+        string  m_userini, m_userini_old; // user ini filename
+        FileIO  m_file_io;
+        ShellOut m_shellout;
+        list<UnixPath> m_permitted_paths;
+        list<Conf_Option> m_custom_conf_options;
+        list<Option_Info> m_user_options;
+    };
 }
 
 #endif
