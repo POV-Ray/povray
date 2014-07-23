@@ -748,6 +748,9 @@ void Trace::ComputeLightedTexture(MathColour& resultColour, ColourChannel& resul
     bool tir_occured;
     std::auto_ptr<PhotonGatherer> surfacePhotonGatherer(NULL); // TODO FIXME - auto_ptr why?  [CLi] why, to auto-destruct it of course! (e.g. in case of exception)
 
+    double relativeIor;
+    ComputeRelativeIOR(ray, isect.Object->interior, relativeIor);
+
     WNRXVector listWNRX(wnrxPool); // "Weight, Normal, Reflectivity, eXponent"
     assert(listWNRX->empty()); // verify that the WNRXVector pulled from the pool is in a cleaned-up condition
 
@@ -842,31 +845,15 @@ void Trace::ComputeLightedTexture(MathColour& resultColour, ColourChannel& resul
             // angle-dependent reflectivity
             cos_Angle_Incidence = -dot(ray.Direction, layNormal);
 
-            if((isect.Object->interior != NULL) || (layer->Finish->Reflection_Type != 1))
-            {
-                ComputeReflectivity(listWNRX->back().weight, listWNRX->back().reflec,
-                                    layer->Finish->Reflection_Max, layer->Finish->Reflection_Min,
-                                    layer->Finish->Reflection_Type, layer->Finish->Reflection_Falloff,
-                                    cos_Angle_Incidence, ray, isect.Object->interior);
-            }
-            else
-                throw POV_EXCEPTION_STRING("Reflection_Type 1 used with no interior."); // TODO FIXME - wrong place to report this [trf]
+            if((isect.Object->interior == NULL) && layer->Finish->Reflection_Fresnel)
+                throw POV_EXCEPTION_STRING("fresnel reflection used with no interior."); // TODO FIXME - wrong place to report this [trf]
 
-            // for metallic reflection, apply the surface color using the fresnel equation
-            // (use the same equaltion as "metallic" in phong and specular
-            if(layer->Finish->Reflect_Metallic != 0.0)
-            {
-                double R_M = layer->Finish->Reflect_Metallic;
+            ComputeReflectivity(listWNRX->back().weight, listWNRX->back().reflec,
+                                layer->Finish->Reflection_Max, layer->Finish->Reflection_Min,
+                                layer->Finish->Reflection_Fresnel, layer->Finish->Reflection_Falloff,
+                                cos_Angle_Incidence, relativeIor);
 
-                double x = fabs(acos(cos_Angle_Incidence)) / M_PI_2;
-                double F = 0.014567225 / Sqr(x - 1.12) - 0.011612903;
-                F = min(1.0, max(0.0, F));
-
-                listWNRX->back().reflec *= (1.0 + R_M * (1.0 - F) * (layCol.colour() - 1.0));
-            }
-
-            // NK - I think we SHOULD do something like this: (to apply the layer's color) */
-            // listWNRX->back().reflec *= filCol;
+            ComputeMetallic(listWNRX->back().reflec, layer->Finish->Reflect_Metallic, layCol.colour(), cos_Angle_Incidence);
 
             // We need to reduce the layer's own brightness if it is transparent.
             if (sceneData->EffectiveLanguageVersion() < 370)
@@ -891,28 +878,43 @@ void Trace::ComputeLightedTexture(MathColour& resultColour, ColourChannel& resul
             // Add radiosity ambient contribution.
             if(radiosity_needed)
             {
+                DBL diffuse    = layer->Finish->Diffuse;
+                DBL brilliance = 1.0;
+
+                if (sceneData->radiositySettings.brilliance)
+                {
+                    diffuse    *= layer->Finish->BrillianceAdjustRad;
+                    brilliance =  layer->Finish->Brilliance;
+                }
+
                 // if radiosity calculation needed, but not yet done, do it now
                 // TODO FIXME - [CLi] with "normal on", shouldn't we compute radiosity for each layer separately (if it has pertubed normals)?
+                // TODO FIXME - [CLi] with "brilliance on", shouldn't we compute radiosity for each layer separately (if it has non-default brilliance)?
                 if(radiosity_done == false)
                 {
                     // calculate max possible contribution of radiosity, to see if calculating it is worthwhile
                     // TODO FIXME - other layers may see a higher weight!
                     // Maybe we should go along and compute *first* the total contribution radiosity will make,
                     // and at the *end* apply it.
-                    max_Radiosity_Contribution = (filCol * layCol.colour()).WeightGreyscale() * att * layer->Finish->RawDiffuse;
+                    max_Radiosity_Contribution = (filCol * layCol.colour()).WeightGreyscale() * att * diffuse;
 
                     if(max_Radiosity_Contribution > ray.GetTicket().adcBailout)
                     {
-                        radiosity.ComputeAmbient(isect.IPoint, rawnormal, layNormal, ambCol, weight * max_Radiosity_Contribution, ray.GetTicket());
+                        radiosity.ComputeAmbient(isect.IPoint, rawnormal, layNormal, brilliance, ambCol, weight * max_Radiosity_Contribution, ray.GetTicket());
                         radiosity_done = true;
                     }
                 }
 
                 // [CLi] moved multiplication with filCol to further below
-                tmpCol += (layCol.colour() * ambCol) * (att * layer->Finish->RawDiffuse);
+                MathColour radiosityContribution = (layCol.colour() * ambCol) * (att * diffuse);
+
+                diffuse = layer->Finish->DiffuseBack;
+                if (sceneData->radiositySettings.brilliance)
+                    diffuse *= layer->Finish->BrillianceAdjustRad;
 
                 // if backside radiosity calculation needed, but not yet done, do it now
                 // TODO FIXME - [CLi] with "normal on", shouldn't we compute radiosity for each layer separately (if it has pertubed normals)?
+                // TODO FIXME - [CLi] with "brilliance on", shouldn't we compute radiosity for each layer separately (if it has non-default brilliance)?
                 if(layer->Finish->DiffuseBack != 0.0)
                 {
                     if(radiosity_back_done == false)
@@ -921,18 +923,30 @@ void Trace::ComputeLightedTexture(MathColour& resultColour, ColourChannel& resul
                         // TODO FIXME - other layers may see a higher weight!
                         // Maybe we should go along and compute *first* the total contribution radiosity will make,
                         // and at the *end* apply it.
-                        max_Radiosity_Contribution = (filCol * layCol.colour()).WeightGreyscale() * att * layer->Finish->RawDiffuseBack;
+                        max_Radiosity_Contribution = (filCol * layCol.colour()).WeightGreyscale() * att * diffuse;
 
                         if(max_Radiosity_Contribution > ray.GetTicket().adcBailout)
                         {
-                            radiosity.ComputeAmbient(isect.IPoint, -rawnormal, -layNormal, ambBackCol, weight * max_Radiosity_Contribution, ray.GetTicket());
+                            radiosity.ComputeAmbient(isect.IPoint, -rawnormal, -layNormal, brilliance, ambBackCol, weight * max_Radiosity_Contribution, ray.GetTicket());
                             radiosity_back_done = true;
                         }
                     }
 
                     // [CLi] moved multiplication with filCol to further below
-                    tmpCol += (layCol.colour() * ambBackCol) * (att * layer->Finish->RawDiffuseBack);
+                    radiosityContribution += (layCol.colour() * ambBackCol) * (att * diffuse);
                 }
+
+                if((sceneData->radiositySettings.brilliance) && (layer->Finish->BrillianceOut != 1.0))
+                    radiosityContribution *= pow(fabs(cos_Angle_Incidence), layer->Finish->BrillianceOut-1.0) * (layer->Finish->BrillianceOut+7.0)/8.0;
+
+                if(layer->Finish->Fresnel)
+                {
+                    MathColour cs;
+                    ComputeFresnel(cs, MathColour(0.0), MathColour(1.0), cos_Angle_Incidence, relativeIor);
+                    radiosityContribution *= cs;
+                }
+
+                tmpCol += radiosityContribution;
             }
 
             // Add emissive ("classic" ambient) contribution.
@@ -952,14 +966,38 @@ void Trace::ComputeLightedTexture(MathColour& resultColour, ColourChannel& resul
             if(!ray.IsPretraceRay())
             {
                 if((layer->Finish->Diffuse != 0.0) || (layer->Finish->DiffuseBack != 0.0) || (layer->Finish->Specular != 0.0) || (layer->Finish->Phong != 0.0))
-                    ComputeDiffuseLight(layer->Finish, isect.IPoint, ray, layNormal, layCol.colour(), tmpCol, att, isect.Object);
+                {
+                    MathColour classicContribution;
+
+                    ComputeDiffuseLight(layer->Finish, isect.IPoint, ray, layNormal, layCol.colour(), classicContribution, att, isect.Object, relativeIor);
+
+                    if(layer->Finish->BrillianceOut != 1.0)
+                    {
+                        double cos_angle_of_incidence = dot(ray.Direction, layNormal);
+                        classicContribution *= pow(fabs(cos_angle_of_incidence), layer->Finish->BrillianceOut-1.0)* (layer->Finish->BrillianceOut+7.0)/8.0;
+                    }
+
+                    tmpCol += classicContribution;
+                }
             }
 
             if(sceneData->photonSettings.photonsEnabled && sceneData->surfacePhotonMap.numPhotons > 0)
             {
                 // NK phmap - now do the same for the photons in the area
                 if(!Test_Flag(isect.Object, PH_IGNORE_PHOTONS_FLAG))
-                    ComputePhotonDiffuseLight(layer->Finish, isect.IPoint, ray, layNormal, rawnormal, layCol.colour(), tmpCol, att, isect.Object, *surfacePhotonGatherer);
+                {
+                    MathColour photonsContribution;
+
+                    ComputePhotonDiffuseLight(layer->Finish, isect.IPoint, ray, layNormal, rawnormal, layCol.colour(), photonsContribution, att, isect.Object, relativeIor, *surfacePhotonGatherer);
+
+                    if(layer->Finish->BrillianceOut != 1.0)
+                    {
+                        double cos_angle_of_incidence = dot(ray.Direction, layNormal);
+                        photonsContribution *= pow(fabs(cos_angle_of_incidence), layer->Finish->BrillianceOut-1.0) * (layer->Finish->BrillianceOut+7.0)/8.0;
+                    }
+
+                    tmpCol += photonsContribution;
+                }
             }
 
             tmpCol *= filCol;
@@ -1393,7 +1431,7 @@ bool Trace::TraceRefractionRay(const FINISH* finish, const Vector3d& ipoint, Ray
 
 // see Diffuse in the 3.6 code (lighting.cpp)
 void Trace::ComputeDiffuseLight(const FINISH *finish, const Vector3d& ipoint, const Ray& eye, const Vector3d& layer_normal, const MathColour& layer_pigment_colour,
-                                MathColour& colour, double attenuation, ObjectPtr object)
+                                MathColour& colour, double attenuation, ObjectPtr object, double relativeIor)
 {
     Vector3d reye;
 
@@ -1405,19 +1443,19 @@ void Trace::ComputeDiffuseLight(const FINISH *finish, const Vector3d& ipoint, co
     if((object->Flags & NO_GLOBAL_LIGHTS_FLAG) != NO_GLOBAL_LIGHTS_FLAG)
     {
         for(int i = 0; i < threadData->lightSources.size(); i++)
-            ComputeOneDiffuseLight(*threadData->lightSources[i], reye, finish, ipoint, eye, layer_normal, layer_pigment_colour, colour, attenuation, object, i);
+            ComputeOneDiffuseLight(*threadData->lightSources[i], reye, finish, ipoint, eye, layer_normal, layer_pigment_colour, colour, attenuation, object, relativeIor, i);
     }
 
     // local light sources from a light group, if any
     if(!object->LLights.empty())
     {
         for(int i = 0; i < object->LLights.size(); i++)
-            ComputeOneDiffuseLight(*object->LLights[i], reye, finish, ipoint, eye, layer_normal, layer_pigment_colour, colour, attenuation, object);
+            ComputeOneDiffuseLight(*object->LLights[i], reye, finish, ipoint, eye, layer_normal, layer_pigment_colour, colour, attenuation, object, relativeIor);
     }
 }
 
 void Trace::ComputePhotonDiffuseLight(const FINISH *Finish, const Vector3d& IPoint, const Ray& Eye, const Vector3d& Layer_Normal, const Vector3d& Raw_Normal,
-                                      const MathColour& Layer_Pigment_Colour, MathColour& colour, double Attenuation, ConstObjectPtr Object, PhotonGatherer& gatherer)
+                                      const MathColour& Layer_Pigment_Colour, MathColour& colour, double Attenuation, ConstObjectPtr Object, double relativeIor, PhotonGatherer& gatherer)
 {
     double Cos_Shadow_Angle;
     Vector3d lightDirection;
@@ -1508,7 +1546,7 @@ void Trace::ComputePhotonDiffuseLight(const FINISH *Finish, const Vector3d& IPoi
             // (Diffuse contribution is not supported in combination with BSSRDF, to emphasize the fact that the BSSRDF
             // model is intended to provide for all the diffuse term by default. If users want to add some additional
             // surface-only diffuse term, they should use layered textures.
-            ComputeDiffuseColour(Finish, lightDirection, Layer_Normal, tmpCol2, Light_Colour, Layer_Pigment_Colour, Attenuation, backside);
+            ComputeDiffuseColour(Finish, lightDirection, Eye.Direction, Layer_Normal, tmpCol2, Light_Colour, Layer_Pigment_Colour, relativeIor, Attenuation, backside);
 
         // NK rad - don't compute highlights for radiosity gather rays, since this causes
         // problems with colors being far too bright
@@ -1517,11 +1555,11 @@ void Trace::ComputePhotonDiffuseLight(const FINISH *Finish, const Vector3d& IPoi
         {
             if (Finish->Phong > 0.0)
             {
-                ComputePhongColour(Finish, lightDirection, Eye.Direction, Layer_Normal, tmpCol2, Light_Colour, Layer_Pigment_Colour);
+                ComputePhongColour(Finish, lightDirection, Eye.Direction, Layer_Normal, tmpCol2, Light_Colour, Layer_Pigment_Colour, relativeIor);
             }
             if (Finish->Specular > 0.0)
             {
-                ComputeSpecularColour(Finish, lightDirection, -Eye.Direction, Layer_Normal, tmpCol2, Light_Colour, Layer_Pigment_Colour);
+                ComputeSpecularColour(Finish, lightDirection, -Eye.Direction, Layer_Normal, tmpCol2, Light_Colour, Layer_Pigment_Colour, relativeIor);
             }
         }
 
@@ -1542,7 +1580,7 @@ void Trace::ComputePhotonDiffuseLight(const FINISH *Finish, const Vector3d& IPoi
 
 // see Diffuse_One_Light in the 3.6 code (lighting.cpp)
 void Trace::ComputeOneDiffuseLight(const LightSource &lightsource, const Vector3d& reye, const FINISH *finish, const Vector3d& ipoint, const Ray& eye, const Vector3d& layer_normal,
-                                   const MathColour& layer_pigment_colour, MathColour& colour, double attenuation, ConstObjectPtr object, int light_index)
+                                   const MathColour& layer_pigment_colour, MathColour& colour, double attenuation, ConstObjectPtr object, double relativeIor, int light_index)
 {
     double lightsourcedepth, cos_shadow_angle;
     Ray lightsourceray(eye);
@@ -1599,7 +1637,7 @@ void Trace::ComputeOneDiffuseLight(const LightSource &lightsource, const Vector3
             ComputeFullAreaDiffuseLight(lightsource, reye, finish, ipoint, eye,
                 layer_normal, layer_pigment_colour, colour, attenuation,
                 lightsourcedepth, lightsourceray, lightcolour,
-                Test_Flag(object, DOUBLE_ILLUMINATE_FLAG));
+                object, relativeIor);
             return;
         }
 
@@ -1607,7 +1645,7 @@ void Trace::ComputeOneDiffuseLight(const LightSource &lightsource, const Vector3
             // (Diffuse contribution is not supported in combination with BSSRDF, to emphasize the fact that the BSSRDF
             // model is intended to provide for all the diffuse term by default. If users want to add some additional
             // surface-only diffuse term, they should use layered textures.
-            ComputeDiffuseColour(finish, lightsourceray.Direction, layer_normal, tmpCol, lightcolour, layer_pigment_colour, attenuation, backside);
+            ComputeDiffuseColour(finish, lightsourceray.Direction, eye.Direction, layer_normal, tmpCol, lightcolour, layer_pigment_colour, relativeIor, attenuation, backside);
 
         // NK rad - don't compute highlights for radiosity gather rays, since this causes
         // problems with colors being far too bright
@@ -1616,11 +1654,11 @@ void Trace::ComputeOneDiffuseLight(const LightSource &lightsource, const Vector3
         {
             if(finish->Phong > 0.0)
             {
-                ComputePhongColour(finish, lightsourceray.Direction, eye.Direction, layer_normal, tmpCol, lightcolour, layer_pigment_colour);
+                ComputePhongColour(finish, lightsourceray.Direction, eye.Direction, layer_normal, tmpCol, lightcolour, layer_pigment_colour, relativeIor);
             }
 
             if(finish->Specular > 0.0)
-                ComputeSpecularColour(finish, lightsourceray.Direction, -eye.Direction, layer_normal, tmpCol, lightcolour, layer_pigment_colour);
+                ComputeSpecularColour(finish, lightsourceray.Direction, -eye.Direction, layer_normal, tmpCol, lightcolour, layer_pigment_colour, relativeIor);
         }
 
         if(finish->Irid > 0.0)
@@ -1633,7 +1671,7 @@ void Trace::ComputeOneDiffuseLight(const LightSource &lightsource, const Vector3
 // JN2007: Full area lighting:
 void Trace::ComputeFullAreaDiffuseLight(const LightSource &lightsource, const Vector3d& reye, const FINISH *finish, const Vector3d& ipoint, const Ray& eye,
                                         const Vector3d& layer_normal, const MathColour& layer_pigment_colour, MathColour& colour, double attenuation,
-                                        double lightsourcedepth, Ray& lightsourceray, const MathColour& lightcolour, bool isDoubleIlluminated)
+                                        double lightsourcedepth, Ray& lightsourceray, const MathColour& lightcolour, ConstObjectPtr object, double relativeIor)
 {
     Vector3d temp;
     Vector3d axis1Temp, axis2Temp;
@@ -1731,7 +1769,7 @@ void Trace::ComputeFullAreaDiffuseLight(const LightSource &lightsource, const Ve
             attenuatedLightcolour = sampleLightcolour * Attenuate_Light(&lightsource, lsr, lightsourcedepth);
 
             // If not double-illuminated, check if the normal is pointing away:
-            if(!isDoubleIlluminated)
+            if(!Test_Flag(object, DOUBLE_ILLUMINATE_FLAG))
             {
                 cos_shadow_angle = dot(layer_normal, lsr.Direction);
                 if(cos_shadow_angle < EPSILON)
@@ -1747,7 +1785,7 @@ void Trace::ComputeFullAreaDiffuseLight(const LightSource &lightsource, const Ve
                 // (Diffuse contribution is not supported in combination with BSSRDF, to emphasize the fact that the BSSRDF
                 // model is intended to provide for all the diffuse term by default. If users want to add some additional
                 // surface-only diffuse term, they should use layered textures.
-                ComputeDiffuseColour(finish, lsr.Direction, layer_normal, tmpCol, attenuatedLightcolour, layer_pigment_colour, attenuation, backside);
+                ComputeDiffuseColour(finish, lsr.Direction, eye.Direction, layer_normal, tmpCol, attenuatedLightcolour, layer_pigment_colour, relativeIor, attenuation, backside);
 
             // NK rad - don't compute highlights for radiosity gather rays, since this causes
             // problems with colors being far too bright
@@ -1756,11 +1794,11 @@ void Trace::ComputeFullAreaDiffuseLight(const LightSource &lightsource, const Ve
             {
                 if(finish->Phong > 0.0)
                 {
-                    ComputePhongColour(finish, lsr.Direction, eye.Direction, layer_normal, tmpCol, attenuatedLightcolour, layer_pigment_colour);
+                    ComputePhongColour(finish, lsr.Direction, eye.Direction, layer_normal, tmpCol, attenuatedLightcolour, layer_pigment_colour, relativeIor);
                 }
 
                 if(finish->Specular > 0.0)
-                    ComputeSpecularColour(finish, lsr.Direction, -eye.Direction, layer_normal, tmpCol, attenuatedLightcolour, layer_pigment_colour);
+                    ComputeSpecularColour(finish, lsr.Direction, -eye.Direction, layer_normal, tmpCol, attenuatedLightcolour, layer_pigment_colour, relativeIor);
             }
 
             if(finish->Irid > 0.0)
@@ -2339,11 +2377,11 @@ void Trace::ComputeShadowColour(const LightSource &lightsource, Intersection& is
     ComputeShadowMedia(lightsourceray, isect, colour, (lightsource.Media_Interaction) && (lightsource.Media_Attenuation));
 }
 
-void Trace::ComputeDiffuseColour(const FINISH *finish, const Vector3d& lightDirection, const Vector3d& layer_normal, MathColour& colour, const MathColour& light_colour,
-                                 const MathColour& layer_pigment_colour, double attenuation, bool backside)
+void Trace::ComputeDiffuseColour(const FINISH *finish, const Vector3d& lightDirection, const Vector3d& eyeDirection, const Vector3d& layer_normal, MathColour& colour, const MathColour& light_colour,
+                                 const MathColour& layer_pigment_colour, double relativeIor, double attenuation, bool backside)
 {
     double cos_angle_of_incidence, intensity;
-    double diffuse = (backside? finish->DiffuseBack : finish->Diffuse);
+    double diffuse = (backside? finish->DiffuseBack : finish->Diffuse) * finish->BrillianceAdjust;
 
     if (diffuse <= 0.0)
         return;
@@ -2361,7 +2399,16 @@ void Trace::ComputeDiffuseColour(const FINISH *finish, const Vector3d& lightDire
     if(finish->Crand > 0.0)
         intensity -= POV_rand(crandRandomNumberGenerator) * finish->Crand;
 
-    colour += intensity * layer_pigment_colour * light_colour;
+    if (finish->Fresnel)
+    {
+        MathColour cs1, cs2;
+        ComputeFresnel(cs1, MathColour(0.0), MathColour(1.0), cos_angle_of_incidence, relativeIor);
+        cos_angle_of_incidence = -dot(layer_normal, eyeDirection);
+        ComputeFresnel(cs2, MathColour(0.0), MathColour(1.0), cos_angle_of_incidence, relativeIor);
+        colour += intensity * layer_pigment_colour * light_colour * cs1 * cs2;
+    }
+    else
+        colour += intensity * layer_pigment_colour * light_colour;
 }
 
 void Trace::ComputeIridColour(const FINISH *finish, const Vector3d& lightDirection, const Vector3d& eyeDirection, const Vector3d& layer_normal, const Vector3d& ipoint, MathColour& colour)
@@ -2399,12 +2446,10 @@ void Trace::ComputeIridColour(const FINISH *finish, const Vector3d& lightDirecti
 }
 
 void Trace::ComputePhongColour(const FINISH *finish, const Vector3d& lightDirection, const Vector3d& eyeDirection, const Vector3d& layer_normal, MathColour& colour, const MathColour& light_colour,
-                               const MathColour& layer_pigment_colour)
+                               const MathColour& layer_pigment_colour, double relativeIor)
 {
     double cos_angle_of_incidence, intensity;
     Vector3d reflect_direction;
-    double ndotl, x, f;
-    MathColour cs;
 
     cos_angle_of_incidence = -2.0 * dot(eyeDirection, layer_normal);
 
@@ -2415,39 +2460,29 @@ void Trace::ComputePhongColour(const FINISH *finish, const Vector3d& lightDirect
     if(cos_angle_of_incidence > 0.0)
     {
         if((finish->Phong_Size < 60) || (cos_angle_of_incidence > 0.0008)) // rgs
-            intensity = finish->Phong * pow(cos_angle_of_incidence, (double)finish->Phong_Size);
-        else
-            intensity = 0.0; // ad
-
-        if(finish->Metallic > 0.0)
         {
-            // Calculate the reflected color by interpolating between
-            // the light source color and the surface color according
-            // to the (empirical) Fresnel reflectivity function. [DB 9/94]
+            intensity = finish->Phong * pow(cos_angle_of_incidence, (double)finish->Phong_Size);
 
-            ndotl = dot(layer_normal, lightDirection);
-
-            x = fabs(acos(ndotl)) / M_PI_2;
-
-            f = 0.014567225 / Sqr(x - 1.12) - 0.011612903;
-
-            f = min(1.0, max(0.0, f));
-            cs = light_colour * ( 1.0 + (finish->Metallic * (1.0 - f)) * (layer_pigment_colour - 1.0) );
-
-            colour += intensity * cs;
+            if (finish->Fresnel || (finish->Metallic != 0.0))
+            {
+                MathColour cs(1.0);
+                double ndotl = dot(layer_normal, lightDirection);
+                if (finish->Fresnel)
+                    ComputeFresnel(cs, MathColour(1.0), MathColour(0.0), ndotl, relativeIor);
+                ComputeMetallic(cs, finish->Metallic, layer_pigment_colour, ndotl);
+                colour += intensity * light_colour * cs;
+            }
+            else
+                colour += intensity * light_colour;
         }
-        else
-            colour += intensity * light_colour;
     }
 }
 
 void Trace::ComputeSpecularColour(const FINISH *finish, const Vector3d& lightDirection, const Vector3d& reyeDirection, const Vector3d& layer_normal, MathColour& colour,
-                                  const MathColour& light_colour, const MathColour& layer_pigment_colour)
+                                  const MathColour& light_colour, const MathColour& layer_pigment_colour, double relativeIor)
 {
     double cos_angle_of_incidence, intensity, halfway_length;
     Vector3d halfway;
-    double ndotl, x, f;
-    MathColour cs;
 
     halfway = (reyeDirection + lightDirection) * 0.5;
 
@@ -2461,22 +2496,14 @@ void Trace::ComputeSpecularColour(const FINISH *finish, const Vector3d& lightDir
         {
             intensity = finish->Specular * pow(cos_angle_of_incidence, (double)finish->Roughness);
 
-            if(finish->Metallic > 0.0)
+            if (finish->Fresnel || (finish->Metallic != 0.0))
             {
-                // Calculate the reflected color by interpolating between
-                // the light source color and the surface color according
-                // to the (empirical) Fresnel reflectivity function. [DB 9/94]
-
-                ndotl = dot(layer_normal, lightDirection);
-
-                x = fabs(acos(ndotl)) / M_PI_2;
-
-                f = 0.014567225 / Sqr(x - 1.12) - 0.011612903;
-
-                f = min(1.0, max(0.0, f));
-                cs = light_colour * ( 1.0 + (finish->Metallic * (1.0 - f)) * (layer_pigment_colour - 1.0) );
-
-                colour += intensity * cs;
+                MathColour cs(1.0);
+                double ndotl = dot(halfway, lightDirection) / halfway_length;
+                if (finish->Fresnel)
+                    ComputeFresnel(cs, MathColour(1.0), MathColour(0.0), ndotl, relativeIor);
+                ComputeMetallic(cs, finish->Metallic, layer_pigment_colour, ndotl);
+                colour += intensity * light_colour * cs;
             }
             else
                 colour += intensity * light_colour;
@@ -2517,73 +2544,82 @@ void Trace::ComputeRelativeIOR(const Ray& ray, const Interior* interior, double&
 }
 
 void Trace::ComputeReflectivity(double& weight, MathColour& reflectivity, const MathColour& reflection_max, const MathColour& reflection_min,
-                                int reflection_type, double reflection_falloff, double cos_angle, const Ray& ray, const Interior* interior)
+                                bool fresnel, double reflection_falloff, double cos_angle, double relativeIor)
 {
     double temp_Weight_Min, temp_Weight_Max;
     double reflection_Frac;
-    double g, f;
-    double ior;
 
-    if(reflection_type == 1)
-        ComputeRelativeIOR(ray, interior, ior);
-
-    switch(reflection_type)
+    if (fresnel == false)
     {
-        case 0: // Standard reflection
-        {
-            temp_Weight_Max = reflection_max.WeightMax();
-            temp_Weight_Min = reflection_min.WeightMax();
-            weight = weight * max(temp_Weight_Max, temp_Weight_Min);
+        temp_Weight_Max = reflection_max.WeightMax();
+        temp_Weight_Min = reflection_min.WeightMax();
+        weight = weight * max(temp_Weight_Max, temp_Weight_Min);
 
-            if(fabs(reflection_falloff - 1.0) > EPSILON)
-                reflection_Frac = pow(1.0 - cos_angle, reflection_falloff);
-            else
-                reflection_Frac = 1.0 - cos_angle;
+        if(fabs(reflection_falloff - 1.0) > EPSILON)
+            reflection_Frac = pow(1.0 - cos_angle, reflection_falloff);
+        else
+            reflection_Frac = 1.0 - cos_angle;
 
-            if(fabs(reflection_Frac) < EPSILON)
-                reflectivity = reflection_min;
-            else if (fabs(reflection_Frac - 1.0)<EPSILON)
-                reflectivity = reflection_max;
-            else
-                reflectivity = reflection_Frac * reflection_max + (1.0 - reflection_Frac) * reflection_min;
-            break;
-        }
-        case 1:  // Fresnel
-        {
-            // NB: This is a special case of the Fresnel formula, presuming that incident light is unpolarized.
-            //
-            // The implemented formula is as follows:
-            //
-            //      1     ( g - cos Ti )^2           ( cos Ti (g + cos Ti) - 1 )^2
-            // R = --- * ------------------ * ( 1 + ------------------------------- )
-            //      2     ( g + cos Ti )^2           ( cos Ti (g - cos Ti) + 1 )^2
-            //
-            // where
-            //
-            //        /---------------------------
-            // g = -\/ (n1/n2)^2 + (cos Ti)^2 - 1
-
-            // Christoph's tweak to work around possible negative argument in sqrt
-            double sqx = Sqr(ior) + Sqr(cos_angle) - 1.0;
-
-            if(sqx > 0.0)
-            {
-                g = sqrt(sqx);
-                f = 0.5 * (Sqr(g - cos_angle) / Sqr(g + cos_angle));
-                f = f * (1.0 + Sqr(cos_angle * (g + cos_angle) - 1.0) / Sqr(cos_angle * (g - cos_angle) + 1.0));
-
-                f = min(1.0, max(0.0, f));
-                reflectivity = f * reflection_max + (1.0 - f) * reflection_min;
-            }
-            else
-                reflectivity = reflection_max;
-
-            weight = weight * reflectivity.WeightMax();
-            break;
-        }
-        default:
-            throw POV_EXCEPTION_STRING("Illegal reflection_type."); // TODO FIXME - wrong place to report this [trf]
+        if(fabs(reflection_Frac) < EPSILON)
+            reflectivity = reflection_min;
+        else if (fabs(reflection_Frac - 1.0)<EPSILON)
+            reflectivity = reflection_max;
+        else
+            reflectivity = reflection_Frac * reflection_max + (1.0 - reflection_Frac) * reflection_min;
     }
+    else
+    {
+        ComputeFresnel(reflectivity, reflection_max, reflection_min, cos_angle, relativeIor);
+        weight = weight * reflectivity.WeightMax();
+    }
+}
+
+void Trace::ComputeMetallic(MathColour& colour, double metallic, const MathColour& metallicColour, double cosAngle)
+{
+    // Calculate the reflected color by interpolating between
+    // the light source color and the surface color according
+    // to the (empirical) Fresnel reflectivity function. [DB 9/94]
+    if(metallic != 0.0)
+    {
+        double x = fabs(acos(cosAngle)) / M_PI_2;
+        double F = 0.014567225 / Sqr(x - 1.12) - 0.011612903;
+        F = min(1.0, max(0.0, F));
+
+        colour *= (1.0 + (metallic * (1.0 - F)) * (metallicColour - 1.0));
+    }
+}
+
+void Trace::ComputeFresnel(MathColour& reflectivity, const MathColour& rMax, const MathColour& rMin, double cos_angle, double ior)
+{
+    double g, f;
+
+    // NB: This is a special case of the Fresnel formula, presuming that incident light is unpolarized.
+    //
+    // The implemented formula is as follows:
+    //
+    //      1     ( g - cos Ti )^2           ( cos Ti (g + cos Ti) - 1 )^2
+    // R = --- * ------------------ * ( 1 + ------------------------------- )
+    //      2     ( g + cos Ti )^2           ( cos Ti (g - cos Ti) + 1 )^2
+    //
+    // where
+    //
+    //        /---------------------------
+    // g = -\/ (n1/n2)^2 + (cos Ti)^2 - 1
+
+    // Christoph's tweak to work around possible negative argument in sqrt
+    double sqx = Sqr(ior) + Sqr(cos_angle) - 1.0;
+
+    if(sqx > 0.0)
+    {
+        g = sqrt(sqx);
+        f = 0.5 * (Sqr(g - cos_angle) / Sqr(g + cos_angle));
+        f = f * (1.0 + Sqr(cos_angle * (g + cos_angle) - 1.0) / Sqr(cos_angle * (g - cos_angle) + 1.0));
+
+        f = min(1.0, max(0.0, f));
+        reflectivity = f * rMax + (1.0 - f) * rMin;
+    }
+    else
+        reflectivity = rMax;
 }
 
 void Trace::ComputeOneWhiteLightRay(const LightSource &lightsource, double& lightsourcedepth, Ray& lightsourceray, const Vector3d& ipoint, const Vector3d& jitter)
@@ -3113,13 +3149,6 @@ double Trace::ComputeFt(double phi, double eta)
     double  theta = asin(sin_theta);
 
     return 1 - 0.5 * (Sqr(sin(phi-theta)) / Sqr(sin(phi+theta)) + Sqr(tan(phi-theta)) / Sqr(tan(phi+theta)));
-#elif 0
-    /*
-    double x = fabs(acos(cos(phi))) / M_PI_2;
-
-    double Fr = 0.014567225 / Sqr(x - 1.12) - 0.011612903;
-    return 1.0 - Fr;
-    */
 #else
     double cos_angle = cos(phi);
     double g = sqrt(Sqr(eta) + Sqr(cos_angle) - 1);
@@ -3561,7 +3590,7 @@ void Trace::ComputeDiffuseAmbientContribution1(const Intersection& out, const Ve
 #else
     MathColour ambientcolour;
     // TODO FIXME - should support pertubed normals
-    radiosity.ComputeAmbient(in.IPoint, in.INormal, in.INormal, ambientcolour, weight, ticket);
+    radiosity.ComputeAmbient(in.IPoint, in.INormal, in.INormal, 1.0 /* TODO - brilliance */, ambientcolour, weight, ticket);
     for (int j = 0; j < MathColour::channels; j++)
     {
         double sd;
@@ -3606,7 +3635,7 @@ void Trace::ComputeSubsurfaceScattering(const FINISH *Finish, const MathColour& 
 
 #if 0
     // user setting specifies mean free path
-    PreciseMathColour   alpha_prime     = object->interior->subsurface->GetReducedAlbedo(layer_pigment_colour * Finish->RawDiffuse);
+    PreciseMathColour   alpha_prime     = object->interior->subsurface->GetReducedAlbedo(layer_pigment_colour * Finish->Diffuse);
     PreciseMathColour   sigma_tr        = 1.0 / PreciseMathColour(Finish->SubsurfaceTranslucency);
 
     PreciseMathColour   sigma_prime_t   = sigma_tr / sqrt(3*(1.0-alpha_prime));
@@ -3615,7 +3644,7 @@ void Trace::ComputeSubsurfaceScattering(const FINISH *Finish, const MathColour& 
     PreciseMathColour   sigma_tr_sqr    = sigma_tr * sigma_tr;
 #else
     // user setting specifies reduced scattering coefficient
-    PreciseMathColour   alpha_prime     = out.Object->interior->subsurface->GetReducedAlbedo(layer_pigment_colour * Finish->RawDiffuse);
+    PreciseMathColour   alpha_prime     = out.Object->interior->subsurface->GetReducedAlbedo(layer_pigment_colour * Finish->Diffuse);
     PreciseMathColour   sigma_prime_s   = 1.0 / PreciseMathColour(Finish->SubsurfaceTranslucency);
 
     PreciseMathColour   sigma_prime_t   = sigma_prime_s / alpha_prime;

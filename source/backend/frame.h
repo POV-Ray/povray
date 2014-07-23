@@ -1291,7 +1291,7 @@ struct Texture_Struct : public Pattern_Struct
 
 struct Finish_Struct
 {
-    SNGL Diffuse, DiffuseBack, RawDiffuse, RawDiffuseBack, Brilliance;
+    SNGL Diffuse, DiffuseBack, Brilliance, BrillianceOut, BrillianceAdjust, BrillianceAdjustRad;
     SNGL Specular, Roughness;
     SNGL Phong, Phong_Size;
     SNGL Irid, Irid_Film_Thickness, Irid_Turb;
@@ -1301,7 +1301,8 @@ struct Finish_Struct
     MathColour SubsurfaceTranslucency, SubsurfaceAnisotropy;
     //MathColour SigmaPrimeS, SigmaA;
     SNGL Reflection_Falloff;  // Added by MBP 8/27/98
-    int Reflection_Type;  // Added by MBP 9/5/98
+    bool Reflection_Fresnel;
+    bool Fresnel;
     SNGL Reflect_Metallic; // MBP
     int Conserve_Energy;  // added by NK Dec 19 1999
     bool UseSubsurface;   // whether to use subsurface light transport

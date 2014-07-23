@@ -7182,6 +7182,10 @@ void Parser::Parse_Global_Settings()
                     sceneData->radiositySettings.subsurface = ((int)Parse_Float() != 0);
                 END_CASE
 
+                CASE (BRILLIANCE_TOKEN)
+                    sceneData->radiositySettings.brilliance = ((int)Parse_Float() != 0);
+                END_CASE
+
                 OTHERWISE
                     UNGET
                     EXIT
