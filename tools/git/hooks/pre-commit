@@ -1,0 +1,64 @@
+#!/bin/sh
+
+########################################################################################################################
+#
+# Verify that all the version identifiers in the source tree match.
+
+ver_povray_h=`sed -n 's/#define [ ]*OFFICIAL_VERSION_STRING [ ]*"\([0-9]*\.[0-9]*\.[0-9]*\)"/\1/p' source/backend/povray.h`
+ver_povray_h_int=`sed -n 's/#define [ ]*OFFICIAL_VERSION_NUMBER [ ]*\([0-9]*\)/\1/p' source/backend/povray.h`
+ver_povray_h_hex=`sed -n 's/#define [ ]*OFFICIAL_VERSION_NUMBER_HEX [ ]*\(0x[0]*[0-9]*\)/\1/p' source/backend/povray.h`
+ver_VERSION=`cat unix/VERSION`
+
+echo "source/backend/povray.h identifies this as version:"
+echo "  $ver_povray_h"
+echo "  $ver_povray_h_int"
+echo "  $ver_povray_h_hex"
+
+if [ x"$ver_povray_h_int" != x"`echo $ver_povray_h | sed 's/\.//g'`" ]
+then
+  echo "MISMATCH."
+  exit 1
+fi
+
+if [ x"`echo $ver_povray_h_hex | sed 's/0x0*//g'`" != x"$ver_povray_h_int" ]
+then
+  echo "MISMATCH."
+  exit 1
+fi
+
+echo "unix/VERSION identifies this as version:"
+echo "  $ver_VERSION"
+
+if [ x"$ver_VERSION" != x"$ver_povray_h" ]
+then
+  echo "MISMATCH."
+  exit 1
+fi
+
+########################################################################################################################
+#
+# Update POV_RAY_REVISION if there is any change to the actual program code.
+# We're setting the revision to the number of minutes since 2000-01-01 00:00.
+
+if git diff --cached --name-only | grep -E "^source/|^vfe|^mac|^unix|^windows|^libraries" >/dev/null
+then
+  y2k=`date -u -d"2000-01-01" +"%s"`
+  timestamp=`date -u +"%s"`
+  revision=`expr \( "$timestamp" - "$y2k" \) / 60`
+  echo "changes to the POV-Ray code detected, updating POV_RAY_REVISION to $revision."
+  if git diff --name-only "source/backend/povray.h" | grep "source/backend/povray.h"  >/dev/null
+  then
+    echo "ERROR: Unstaged changes to source/backend/povray.h detected, can't safely update POV_RAY_REVISION."
+    exit 1
+  fi
+  sed -i 's/\(#define [ ]*POV_RAY_REVISION [ ]*\)"[^"]*"/\1"'$revision'"/g' source/backend/povray.h
+  git add source/backend/povray.h
+else
+  echo "changes are limited to accompanying files, no need to update POV_RAY_REVISION."
+fi
+
+########################################################################################################################
+#
+# Done.
+
+exit 0
