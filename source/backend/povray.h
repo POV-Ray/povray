@@ -1,39 +1,47 @@
-/*******************************************************************************
- * povray.h
- *
- * This file contains the interface to initialise and terminate all
- * POV-Ray threads. Beyond the functions in this file, no other
- * functions need to be called to run POV-Ray.
- * Rendering is controlled by the classes provided in the frontend
- * files.
- *
- * ---------------------------------------------------------------------------
- * Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
- * Copyright 1991-2013 Persistence of Vision Raytracer Pty. Ltd.
- *
- * POV-Ray is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * POV-Ray is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------------
- * POV-Ray is based on the popular DKB raytracer version 2.12.
- * DKBTrace was originally written by David K. Buck.
- * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
- * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/povray.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
- *******************************************************************************/
+//******************************************************************************
+///
+/// @file backend/povray.h
+///
+/// This file contains the interface to initialise and terminate all
+/// POV-Ray threads. Beyond the functions in this file, no other
+/// functions need to be called to run POV-Ray.
+/// Rendering is controlled by the classes provided in the frontend
+/// files.
+///
+/// This file also contains version information strings.
+///
+/// @copyright
+/// @parblock
+///
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
+/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+///
+/// POV-Ray is free software: you can redistribute it and/or modify
+/// it under the terms of the GNU Affero General Public License as
+/// published by the Free Software Foundation, either version 3 of the
+/// License, or (at your option) any later version.
+///
+/// POV-Ray is distributed in the hope that it will be useful,
+/// but WITHOUT ANY WARRANTY; without even the implied warranty of
+/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+/// GNU Affero General Public License for more details.
+///
+/// You should have received a copy of the GNU Affero General Public License
+/// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+///
+/// ----------------------------------------------------------------------------
+///
+/// POV-Ray is based on the popular DKB raytracer version 2.12.
+/// DKBTrace was originally written by David K. Buck.
+/// DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
+///
+/// @endparblock
+///
+//*******************************************************************************
+
+/// @file
+/// @todo   Maybe we want to move the version information stuff to a separate file,
+///         preferably in the `base` directory.
 
 #ifndef POVRAY_BACKEND_POVRAY_H
 #define POVRAY_BACKEND_POVRAY_H
@@ -47,25 +55,25 @@
 #include <boost/function.hpp>
 
 /**
- *	This function does essential initialisation that is required before
- *	POV-Ray can be used. It also starts the main render thread that
- *	receives and processes all messages received from the frontend.
- *	@param  addr  If not NULL, backend address on return.
+ *  This function does essential initialisation that is required before
+ *  POV-Ray can be used. It also starts the main render thread that
+ *  receives and processes all messages received from the frontend.
+ *  @param  addr  If not NULL, backend address on return.
  *  @return       Pointer to the thread resource created.
  */
 boost::thread *povray_init(const boost::function0<void>& threadExit, POVMSAddress *addr = NULL);
 
 /**
- *	This function shuts down the main render thread and after it has
- *	been called, all memory allocated by POV-Ray has been freed and
- *	all threads created by POV-Ray have been terminated.
+ *  This function shuts down the main render thread and after it has
+ *  been called, all memory allocated by POV-Ray has been freed and
+ *  all threads created by POV-Ray have been terminated.
  */
 void povray_terminate();
 
 /**
- *	Returns true if the main thread has terminated. It will return
- *	false if the main thread is not running because it has not yet
- *	been started.
+ *  Returns true if the main thread has terminated. It will return
+ *  false if the main thread is not running because it has not yet
+ *  been started.
  */
 bool povray_terminated();
 
@@ -80,7 +88,7 @@ bool povray_terminated();
 #define OFFICIAL_VERSION_NUMBER 370
 #define OFFICIAL_VERSION_NUMBER_HEX 0x0370
 
-#define POV_RAY_REVISION "7660690"
+#define POV_RAY_REVISION "7660768"
 
 #if POV_RAY_IS_OFFICIAL == 1
 #define POV_RAY_VERSION OFFICIAL_VERSION_STRING "." POV_RAY_REVISION
