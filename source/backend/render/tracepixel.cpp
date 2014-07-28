@@ -287,11 +287,11 @@ void TracePixel::operator()(DBL x, DBL y, DBL width, DBL height, RGBTColour& col
 
             if (CreateCameraRay(ray, x, y, width, height, rayno) == true)
             {
-                MathColour col;
+                LightColour col;
                 ColourChannel transm = 0.0;
 
                 TraceRay(ray, col, transm, 1.0, false, camera.Max_Ray_Distance);
-                colour += RGBTColour(ToRGBColour(col), transm);
+                colour += RGBTColour(RGBColour(col), transm);
                 numTraced++;
             }
         }
@@ -1005,10 +1005,10 @@ void TracePixel::TraceRayWithFocalBlur(RGBTColour& colour, DBL x, DBL y, DBL wid
             {
                 // Increase_Counter(stats[Number_Of_Samples]);
 
-                MathColour tempC;
+                LightColour tempC;
                 ColourChannel tempT = 0.0;
                 TraceRay(ray, tempC, tempT, 1.0, false, camera.Max_Ray_Distance);
-                C = RGBTColour(ToRGBColour(tempC), tempT);
+                C = RGBTColour(RGBColour(tempC), tempT);
 
                 colour += C;
             }

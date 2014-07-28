@@ -53,3 +53,6 @@ print M_rgb_to_XYZ
 print
 print "XYZ to sRGB:"
 print M_XYZ_to_rgb
+print
+print "Illuminant E in sRGB:"
+print M_XYZ_to_rgb * vector([1,1,1])

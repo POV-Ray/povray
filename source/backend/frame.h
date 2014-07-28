@@ -947,6 +947,11 @@ class BlendMap
         Vector          Blend_Map_Entries;
 };
 
+typedef PIGMENT*    PigmentBlendMapData;
+typedef TransColour ColourBlendMapData;
+typedef Vector2d    SlopeBlendMapData;
+typedef TNORMAL*    NormalBlendMapData;
+typedef TexturePtr  TextureBlendMapData;
 
 /// Common interface for pigment-like blend maps.
 /// 
@@ -968,7 +973,7 @@ class GenericPigmentBlendMap
 };
 
 /// Colour blend map.
-class ColourBlendMap : public BlendMap<TransColour>, public GenericPigmentBlendMap
+class ColourBlendMap : public BlendMap<ColourBlendMapData>, public GenericPigmentBlendMap
 {
     public:
 
@@ -983,7 +988,7 @@ class ColourBlendMap : public BlendMap<TransColour>, public GenericPigmentBlendM
 };
 
 /// Pigment blend map.
-class PigmentBlendMap : public BlendMap<PIGMENT*>, public GenericPigmentBlendMap
+class PigmentBlendMap : public BlendMap<PigmentBlendMapData>, public GenericPigmentBlendMap
 {
     public:
 
@@ -1014,7 +1019,7 @@ class GenericNormalBlendMap
         virtual void ComputeAverage (const Vector3d& EPoint, Vector3d& normal, Intersection *Inter, const Ray *ray, TraceThreadData *Thread) = 0;
 };
 
-class SlopeBlendMap : public BlendMap<Vector2d>, public GenericNormalBlendMap
+class SlopeBlendMap : public BlendMap<SlopeBlendMapData>, public GenericNormalBlendMap
 {
     public:
 
@@ -1025,7 +1030,7 @@ class SlopeBlendMap : public BlendMap<Vector2d>, public GenericNormalBlendMap
         virtual void ComputeAverage (const Vector3d& EPoint, Vector3d& normal, Intersection *Inter, const Ray *ray, TraceThreadData *Thread);
 };
 
-class NormalBlendMap : public BlendMap<TNORMAL*>, public GenericNormalBlendMap
+class NormalBlendMap : public BlendMap<NormalBlendMapData>, public GenericNormalBlendMap
 {
     public:
 
@@ -1038,7 +1043,7 @@ class NormalBlendMap : public BlendMap<TNORMAL*>, public GenericNormalBlendMap
 
 
 /// Texture blend map.
-class TextureBlendMap : public BlendMap<TexturePtr>
+class TextureBlendMap : public BlendMap<TextureBlendMapData>
 {
     public:
 
@@ -1049,12 +1054,10 @@ class TextureBlendMap : public BlendMap<TexturePtr>
 typedef shared_ptr<GenericPigmentBlendMap>          GenericPigmentBlendMapPtr;
 typedef shared_ptr<const GenericPigmentBlendMap>    GenericPigmentBlendMapConstPtr;
 
-typedef PIGMENT*                                    PigmentBlendMapData;
 typedef BlendMapEntry<PigmentBlendMapData>          PigmentBlendMapEntry;
 typedef shared_ptr<PigmentBlendMap>                 PigmentBlendMapPtr;
 typedef shared_ptr<const PigmentBlendMap>           PigmentBlendMapConstPtr;
 
-typedef TransColour                                 ColourBlendMapData;
 typedef BlendMapEntry<ColourBlendMapData>           ColourBlendMapEntry;
 typedef shared_ptr<ColourBlendMap>                  ColourBlendMapPtr;
 typedef shared_ptr<const ColourBlendMap>            ColourBlendMapConstPtr;
@@ -1062,17 +1065,15 @@ typedef shared_ptr<const ColourBlendMap>            ColourBlendMapConstPtr;
 typedef shared_ptr<GenericNormalBlendMap>           GenericNormalBlendMapPtr;
 typedef shared_ptr<const GenericNormalBlendMap>     GenericNormalBlendMapConstPtr;
 
-typedef Vector2d                                    SlopeBlendMapData;
 typedef BlendMapEntry<SlopeBlendMapData>            SlopeBlendMapEntry;
 typedef shared_ptr<SlopeBlendMap>                   SlopeBlendMapPtr;
 typedef shared_ptr<const SlopeBlendMap>             SlopeBlendMapConstPtr;
 
-typedef TNORMAL*                                    NormalBlendMapData;
 typedef BlendMapEntry<NormalBlendMapData>           NormalBlendMapEntry;
 typedef shared_ptr<NormalBlendMap>                  NormalBlendMapPtr;
 typedef shared_ptr<const NormalBlendMap>            NormalBlendMapConstPtr;
 
-typedef BlendMapEntry<TexturePtr>                   TextureBlendMapEntry;
+typedef BlendMapEntry<TextureBlendMapData>          TextureBlendMapEntry;
 typedef shared_ptr<TextureBlendMap>                 TextureBlendMapPtr;
 typedef shared_ptr<const TextureBlendMap>           TextureBlendMapConstPtr;
 
@@ -1104,10 +1105,10 @@ class Media
         DBL Jitter;
         DBL Eccentricity;
         DBL sc_ext;
-        MathColour Absorption;
-        MathColour Emission;
-        MathColour Extinction;
-        MathColour Scattering;
+        AttenuatingColour Absorption;
+        LightColour Emission;
+        AttenuatingColour Extinction;
+        AttenuatingColour Scattering;
 
         DBL Ratio;
         DBL Confidence;
@@ -1139,7 +1140,7 @@ class Interior
         SNGL IOR, Dispersion;
         SNGL Caustics, Old_Refract;
         SNGL Fade_Distance, Fade_Power;
-        MathColour Fade_Colour;
+        AttenuatingColour Fade_Colour;
         vector<Media> media;
         shared_ptr<SubsurfaceInterior> subsurface;
 
@@ -1297,9 +1298,11 @@ struct Finish_Struct
     SNGL Irid, Irid_Film_Thickness, Irid_Turb;
     SNGL Temp_Caustics, Temp_IOR, Temp_Dispersion, Temp_Refract, Reflect_Exp;
     SNGL Crand, Metallic;
-    MathColour Ambient, Emission, Reflection_Max, Reflection_Min;
-    MathColour SubsurfaceTranslucency, SubsurfaceAnisotropy;
-    //MathColour SigmaPrimeS, SigmaA;
+    AttenuatingColour Ambient;
+    LightColour Emission;
+    AttenuatingColour Reflection_Max, Reflection_Min;
+    PseudoColour SubsurfaceTranslucency, SubsurfaceAnisotropy;
+    //PseudoColour SigmaPrimeS, SigmaA;
     SNGL Reflection_Falloff;  // Added by MBP 8/27/98
     bool Reflection_Fresnel;
     bool Fresnel;

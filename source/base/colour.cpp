@@ -43,37 +43,109 @@
 namespace pov_base
 {
 
-#if (NUM_COLOUR_CHANNELS == 3)
+const LightColour IlluminantD65::Colour (ColourModelInternal::GetWhitepointVector<IlluminantD65>());
+const LightColour IlluminantE  ::Colour (ColourModelInternal::GetWhitepointVector<IlluminantE>());
 
-    // Approximate dominant wavelengths of primary hues in micrometers.
-    // Source: 3D Computer Graphics by John Vince (Addison Wesely)
-    // These are user-adjustable with the irid_wavelength keyword.
-    // Red = 700 nm, Green = 520 nm, Blue = 480 nm
-    static const ColourChannel gaDefaultWavelengths[NUM_COLOUR_CHANNELS] = { 0.700, 0.520, 0.480 };
+template<> const PseudoColour        PseudoColour       ::DominantWavelengths (ColourModelInternal::GetDominantWavelengths());
+template<> const PrecisePseudoColour PrecisePseudoColour::DominantWavelengths (ColourModelInternal::GetDominantWavelengths());
 
-#elif (NUM_COLOUR_CHANNELS == 4)
+template<typename CHANNEL_T, typename MODEL_FROM_T> void ColourModelInternal4::MetamericNormalize(CHANNEL_T* col)
+{
+    const ColourChannel* pWhitepoint = GetWhitepointVector<MODEL_FROM_T::Whitepoint>();
+    const ColourChannel *pNeutral    = GetMetamericNeutral();
 
-    // Approximate dominant wavelengths of primary hues in micrometers.
-    static const ColourChannel gaDefaultWavelengths[NUM_COLOUR_CHANNELS] = { 0.6150, 0.5725, 0.5200, 0.4650 };
+    CHANNEL_T minAdd, minSub, maxAdd, maxSub, adjust;
+    /*
+    // if we're in the red to green domain, boost yellow
+    if ((col[0] < col[1]) && (col[0] < col[2]) && (col[0] < col[3]))
+    {
+        CHANNEL_T upperDiff = pWhitepoint[2] - col[2];
+        if (upperDiff > 0)
+        {
+            adjust = upperDiff / pNeutral[2];
+            for (unsigned int i = 0; i < kChannels; i ++)
+                col[i] += adjust * pNeutral[i];
+        }
+    }
+    */
+    // force all channels below upper limit (if possible)
+    minAdd =  0.0;
+    minSub =  0.0;
+    maxAdd =  std::numeric_limits<CHANNEL_T>::max();
+    maxSub = -std::numeric_limits<CHANNEL_T>::max();
+    for (unsigned int i = 0; i < kChannels; i ++)
+    {
+        CHANNEL_T upperDiff = pWhitepoint[i] - col[i];
+        if (upperDiff < 0)
+        {
+            // channel needs to be adjusted downwards
+            CHANNEL_T adjust = upperDiff / pNeutral[i];
+            minAdd = max(minAdd, adjust);
+            minSub = min(minSub, adjust);
+        }
+        else
+        {
+            // no need to adjust channel, make sure to not over-adjust it for other channels
+            CHANNEL_T headroom = upperDiff / pNeutral[i];
+            if (headroom >= 0)
+                maxAdd = min(maxAdd, headroom);
+            if (headroom <= 0)
+                maxSub = max(maxSub, headroom);
+        }
+    }
+    if ((minAdd != 0.0) && (minSub == 0.0))
+        // we can compensate by adding neutral
+        adjust = min(minAdd, maxAdd);
+    else if ((minAdd == 0.0) && (minSub != 0.0))
+        // we can compensate by adding neutral
+        adjust = max(minSub, maxSub);
+    else
+        // we cannot compensate
+        adjust = 0.0;
+    if (adjust != 0.0)
+        for (unsigned int i = 0; i < kChannels; i ++)
+            col[i] += adjust * pNeutral[i];
 
-    // Relative brightness of the primary hues.
-    template<> const ColourChannel MathColour::mkY[NUM_COLOUR_CHANNELS] =
-        { 0.2053179932, 0.3806513958, 0.3705274008, 0.0435032102 };
+    // force all channels above lower limit (if possible)
+    minAdd =  0.0;
+    minSub =  0.0;
+    maxAdd =  std::numeric_limits<CHANNEL_T>::max();
+    maxSub = -std::numeric_limits<CHANNEL_T>::max();
+    for (unsigned int i = 0; i < kChannels; i ++)
+    {
+        CHANNEL_T lowerDiff = -col[i];
+        if (lowerDiff > 0)
+        {
+            // channel needs to be adjusted upwards
+            CHANNEL_T adjust = lowerDiff / pNeutral[i];
+            minAdd = max(minAdd, adjust);
+            minSub = min(minSub, adjust);
+        }
+        else
+        {
+            // no need to adjust channel, make sure to not over-adjust it for other channels
+            CHANNEL_T headroom = lowerDiff / pNeutral[i];
+            if (headroom >= 0)
+                maxAdd = min(maxAdd, headroom);
+            if (headroom <= 0)
+                maxSub = max(maxSub, headroom);
+        }
+    }
+    if ((minAdd != 0.0) && (minSub == 0.0))
+        // we can compensate by adding neutral
+        adjust = min(minAdd, maxAdd);
+    else if ((minAdd == 0.0) && (minSub != 0.0))
+        // we can compensate by adding neutral
+        adjust = max(minSub, maxSub);
+    else
+        // we cannot compensate
+        adjust = 0.0;
+    if (adjust != 0.0)
+        for (unsigned int i = 0; i < kChannels; i ++)
+            col[i] += adjust * pNeutral[i];
+}
 
-    // Location of the primary hues in RGB space.
-    template<> const RGBColour MathColour::mkRGB[NUM_COLOUR_CHANNELS] =
-        { RGBColour( 0.0084075942,-0.0404444319, 0.9783939079),
-          RGBColour(-0.3789518761, 0.6301106785, 0.0062451983),
-          RGBColour( 0.4848742224, 0.3939794183, 0.0580130026),
-          RGBColour( 1.0905645527,-0.0353094890,-0.0175721295) };
-
-#else
-
-    #error TODO!
-
-#endif
-
-    template<> const MathColour        MathColour::mkDefaultWavelengths        = MathColour(gaDefaultWavelengths);
-    template<> const PreciseMathColour PreciseMathColour::mkDefaultWavelengths = PreciseMathColour(gaDefaultWavelengths);
+template void ColourModelInternal4::MetamericNormalize<ColourChannel,        ColourModelRGB>(ColourChannel*        col);
+template void ColourModelInternal4::MetamericNormalize<PreciseColourChannel, ColourModelRGB>(PreciseColourChannel* col);
 
 }

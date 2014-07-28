@@ -146,8 +146,8 @@ void PhotonShootingTask::Finish()
 
 void PhotonShootingTask::ShootPhotonsAtObject(LightTargetCombo& combo)
 {
-    MathColour colour;             /* light color */
-    MathColour photonColour;       /* photon color */
+    LightColour colour;            /* light color */
+    LightColour photonColour;      /* photon color */
     ColourChannel dummyTransm;
     int i;                         /* counter */
     DBL theta, phi;                /* rotation angles */

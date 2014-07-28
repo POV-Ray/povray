@@ -366,7 +366,7 @@ SKYSPHERE *Create_Skysphere()
 
     New = new SKYSPHERE;
 
-    New->Emission = MathColour(1.0);
+    New->Emission = ColourModelRGB::Whitepoint::Colour; // TODO
 
     New->Trans = Create_Transform();
 

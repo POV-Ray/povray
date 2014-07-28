@@ -1117,6 +1117,8 @@ bool ot_save_tree(OT_NODE *root, OStream *fd)
 
 bool ot_write_block(OT_BLOCK *bl, void *fd) // must be passed as void * for compatibility
 {
+#if ((POV_COLOUR_MODEL == 0) || (POV_COLOUR_MODEL == 3))
+    RGBColour illuminance(bl->Illuminance);
     (reinterpret_cast<OStream *>(fd))->printf("C%d\t%g\t%g\t%g\t%02x%02x%02x\t%.4f\t%.4f\t%.4f\t%g\t%g\t%02x%02x%02x\n", // tw
         (int)(bl->Bounce_Depth + 1), // file format still uses 1-based bounce depth counting
 
@@ -1124,12 +1126,7 @@ bool ot_write_block(OT_BLOCK *bl, void *fd) // must be passed as void * for comp
         (int)((bl->S_Normal[X]+1.)*.5*254.+.499999),
         (int)((bl->S_Normal[Y]+1.)*.5*254.+.499999),
         (int)((bl->S_Normal[Z]+1.)*.5*254.+.499999),
-
-#if (NUM_COLOUR_CHANNELS == 3)
-        bl->Illuminance.Red(), bl->Illuminance.Green(), bl->Illuminance.Blue(),
-#else
-        #error TODO!
-#endif
+        illuminance.red(), illuminance.green(), illuminance.blue(),
         bl->Harmonic_Mean_Distance,
 
         bl->Nearest_Distance,
@@ -1139,6 +1136,9 @@ bool ot_write_block(OT_BLOCK *bl, void *fd) // must be passed as void * for comp
 
         // TODO - write Quality and Brilliance
     );
+#else
+    #error TODO!
+#endif
     return true;
 }
 
@@ -1316,16 +1316,16 @@ bool ot_read_file(OT_NODE **root, IStream *fd, const OT_READ_PARAM* param, OT_RE
                 }
                 case 'C':
                 {
-#if (NUM_COLOUR_CHANNELS == 3)
-                    RGBColour tempCol;
+#if ((POV_COLOUR_MODEL == 0) || (POV_COLOUR_MODEL == 3))
+                    RGBColour illuminance;
                     count = sscanf(line, "C%d %lf %lf %lf %s %f %f %f %f %f %s\n", // tw
                                    &tempdepth,      // since you can't scan a short
                                    &bl.Point[X], &bl.Point[Y], &bl.Point[Z],
                                    normal_string,
-                                   &tempCol.red(), &tempCol.green(), &tempCol.blue(),
+                                   &illuminance.red(), &illuminance.green(), &illuminance.blue(),
                                    &bl.Harmonic_Mean_Distance,
                                    &bl.Nearest_Distance, to_nearest_string );
-                    bl.Illuminance = ToMathColour(tempCol);
+                    bl.Illuminance = LightColour(illuminance);
 #else
                     #error TODO!
 #endif

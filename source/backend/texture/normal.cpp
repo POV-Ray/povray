@@ -998,7 +998,7 @@ static void Do_Average_Normals (const Vector3d& EPoint, const TNORMAL *Tnormal, 
 
 //******************************************************************************
 
-SlopeBlendMap::SlopeBlendMap() : BlendMap<Vector2d>(SLOPE_TYPE) {}
+SlopeBlendMap::SlopeBlendMap() : BlendMap<SlopeBlendMapData>(SLOPE_TYPE) {}
 
 SlopeBlendMap::~SlopeBlendMap()
 {
@@ -1006,7 +1006,7 @@ SlopeBlendMap::~SlopeBlendMap()
 }
 
 
-NormalBlendMap::NormalBlendMap() : BlendMap<TNORMAL*>(NORMAL_TYPE) {}
+NormalBlendMap::NormalBlendMap() : BlendMap<NormalBlendMapData>(NORMAL_TYPE) {}
 
 NormalBlendMap::~NormalBlendMap()
 {

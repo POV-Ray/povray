@@ -135,6 +135,14 @@
 #define DEFAULT_WORKING_GAMMA       1.0
 #define DEFAULT_WORKING_GAMMA_TEXT  "1.0"
 
+/// The internal colour model to use.
+///
+///   - 0: naive scRGB-based colour model
+///   - 3: 3-channel colour model
+///   - 4: 4-channel colour model
+///
+#define POV_COLOUR_MODEL 0
+
 // boost 1.50 changed TIME_UTC to TIME_UTC_ to avoid a clash with C11, which has
 // TIME_UTC as a define (in boost it's an enum). To allow compilation with earlier
 // versions of boost we now use POV_TIME_UTC in the code and define that here.

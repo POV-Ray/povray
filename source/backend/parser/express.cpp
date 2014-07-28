@@ -1446,7 +1446,7 @@ void Parser::Parse_Num_Factor (EXPRESS Express,int *Terms)
 
                         case GRAY_TOKEN:
                             *Terms=1;
-                            Express[0]=PreciseRGBFTColour(Express).Greyscale();
+                            Express[0]=PreciseRGBFTColour(Express).rgb().Greyscale();
                             return;
 
                         default:
@@ -2380,12 +2380,10 @@ void Parser::Parse_Scale_Vector (Vector3d& Vector)
 *
 ******************************************************************************/
 
-void Parser::Parse_Colour (RGBFTColour& colour, bool expectFT)
+void Parser::Parse_RGBFT_Colour (RGBFTColour& colour, bool expectFT)
 {
     EXPRESS Express;
     int Terms;
-    bool old_allow_id = Allow_Identifier_In_Call;
-    Allow_Identifier_In_Call = false;
 
     /* Initialize expression. [DB 12/94] */
 
@@ -2397,8 +2395,6 @@ void Parser::Parse_Colour (RGBFTColour& colour, bool expectFT)
     colour.Clear();
 
     bool startedParsing = false;
-
-    ALLOW(COLOUR_TOKEN)
 
     EXPECT
         CASE (COLOUR_KEY_TOKEN)
@@ -2660,40 +2656,121 @@ void Parser::Parse_Colour (RGBFTColour& colour, bool expectFT)
             EXIT
         END_CASE
     END_EXPECT
+}
 
+void Parser::Parse_Colour (RGBFTColour& colour, bool expectFT)
+{
+    bool old_allow_id = Allow_Identifier_In_Call;
+    Allow_Identifier_In_Call = false;
+    RGBFTColour rgbft;
+    ALLOW(COLOUR_TOKEN)
+    EXPECT
+        CASE (COLOUR_KEY_TOKEN)
+        CASE (COLOUR_ID_TOKEN)
+        CASE_VECTOR
+            UNGET
+            Parse_RGBFT_Colour(colour, expectFT);
+            EXIT
+        END_CASE
+
+        // TODO - other ways of specifying a colour should go here.
+
+    END_EXPECT
     Allow_Identifier_In_Call = old_allow_id;
 }
 
-void Parser::Parse_Colour (TransColour& colour, bool expectFT)
+void Parser::Parse_Colour (LightColour& colour, LightColour* whitepoint, FilterTransm* trans)
 {
-    RGBFTColour tempColour;
-    Parse_Colour (tempColour, expectFT);
-    colour = ToTransColour(tempColour);
+    bool old_allow_id = Allow_Identifier_In_Call;
+    Allow_Identifier_In_Call = false;
+    RGBFTColour rgbft;
+    ALLOW(COLOUR_TOKEN)
+    EXPECT
+        CASE (COLOUR_KEY_TOKEN)
+        CASE (COLOUR_ID_TOKEN)
+        CASE_VECTOR
+            UNGET
+            Parse_RGBFT_Colour(rgbft, (trans != NULL));
+            colour = LightColour(rgbft.rgb());
+            if (whitepoint)
+                *whitepoint = ColourModelRGB::Whitepoint::Colour;
+            if (trans)
+                *trans = rgbft.trans();
+            EXIT
+        END_CASE
+
+        // TODO - other ways of specifying a colour should go here.
+
+    END_EXPECT
+    Allow_Identifier_In_Call = old_allow_id;
 }
 
-void Parser::Parse_Colour (RGBColour& colour)
+void Parser::Parse_Colour_Coefficients (PseudoColour& colour)
 {
-    RGBFTColour tempColour;
-    Parse_Colour (tempColour, false);
-    colour = tempColour.rgb();
+    bool old_allow_id = Allow_Identifier_In_Call;
+    Allow_Identifier_In_Call = false;
+    RGBFTColour rgbft;
+    ALLOW(COLOUR_TOKEN)
+    EXPECT
+        CASE (COLOUR_KEY_TOKEN)
+        CASE (COLOUR_ID_TOKEN)
+        CASE_VECTOR
+            UNGET
+            Parse_RGBFT_Colour(rgbft, false);
+            colour = PseudoColour(rgbft.rgb());
+            EXIT
+        END_CASE
+
+        // TODO - other ways of specifying a (pseudo-) colour should go here.
+
+    END_EXPECT
+    Allow_Identifier_In_Call = old_allow_id;
 }
 
-void Parser::Parse_Colour (MathColour& colour)
+
+void Parser::Parse_Colour (RGBFTColour& colour)
 {
-    TransColour tempColour;
-    Parse_Colour (tempColour, false);
-    colour = tempColour.colour();
+    Parse_Colour (colour, true);
 }
 
-void Parser::Parse_Wavelengths (MathColour& colour)
+void Parser::Parse_Colour (LightColour& colour)
 {
-#if (NUM_COLOUR_CHANNELS == 3)
-    RGBFTColour tempColour;
-    Parse_Colour (tempColour, false);
-    colour = ToMathColour(tempColour.rgb());
-#else
-    #error TODO!
-#endif
+    Parse_Colour (colour, NULL, NULL);
+}
+
+void Parser::Parse_Colour (AttenuatingColour& colour, ColourChannel& filter, ColourChannel& transm)
+{
+    LightColour tmpColour;
+    LightColour tmpWhitepoint;
+    FilterTransm tmpTrans;
+    Parse_Colour (tmpColour, &tmpWhitepoint, &tmpTrans);
+    colour = tmpColour / tmpWhitepoint;
+    filter = tmpTrans.filter();
+    transm = tmpTrans.transm();
+}
+
+void Parser::Parse_Colour (AttenuatingColour& colour, LightColour& whitepoint, FilterTransm& trans)
+{
+    LightColour tmpColour;
+    LightColour tmpWhitepoint;
+    Parse_Colour (tmpColour, &tmpWhitepoint, &trans);
+    colour = tmpColour / tmpWhitepoint;
+}
+
+void Parser::Parse_Colour (AttenuatingColour& colour)
+{
+    LightColour tmpColour;
+    LightColour tmpWhitepoint;
+    Parse_Colour (tmpColour, &tmpWhitepoint, NULL);
+    colour = tmpColour / tmpWhitepoint;
+}
+
+void Parser::Parse_Colour (TransColour& colour)
+{
+    LightColour tmpColour;
+    LightColour tmpWhitepoint;
+    Parse_Colour (tmpColour, &tmpWhitepoint, &colour.trans());
+    colour.colour() = tmpColour / tmpWhitepoint;
 }
 
 /*****************************************************************************
@@ -2865,7 +2942,7 @@ template<> GenericNormalBlendMapPtr Parser::Parse_Blend_Map<GenericNormalBlendMa
         default:
             assert(false);
             // unreachable code to satisfy the compiler's demands for a return value; an empty pointer will do
-            return GenericNormalBlendMapPtr(); 
+            return GenericNormalBlendMapPtr();
     }
 }
 
@@ -3333,7 +3410,7 @@ ColourBlendMapPtr Parser::Parse_Colour_Map<ColourBlendMap> ()
                                 {
                                     RGBFTColour rgbft;
                                     rgbft.Set(Express, Terms);
-                                    Temp_Ent.Vals = ToTransColour (rgbft);
+                                    Temp_Ent.Vals = TransColour (rgbft);
                                     tempList.push_back(Temp_Ent);
                                 }
                                 else

@@ -112,7 +112,7 @@ class SceneThreadData : public Task::TaskData
         LightSource *photonSourceLight;
         ObjectPtr photonTargetObject;
         bool litObjectIgnoresPhotons;
-        MathColour GFilCol;
+        AttenuatingColour GFilCol; // TODO FIXME - eliminate this abomination
         int hitObject;    // did we hit the target object? (for autostop)
         DBL photonSpread; // photon spread (in radians)
         DBL photonDepth;  // total distance from light to intersection

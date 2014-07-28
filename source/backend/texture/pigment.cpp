@@ -464,10 +464,10 @@ bool Compute_Pigment (TransColour& colour, const PIGMENT *Pigment, const Vector3
 
 bool ColourBlendMap::Compute(TransColour& colour, DBL value, const Vector3d& TPoint, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread)
 {
-    const BlendMapEntry<TransColour>* Prev;
-    const BlendMapEntry<TransColour>* Cur;
-    DBL prevWeight;
-    DBL curWeight;
+    const ColourBlendMapEntry* Prev;
+    const ColourBlendMapEntry* Cur;
+    double prevWeight;
+    double curWeight;
     Search (value, Prev, Cur, prevWeight, curWeight);
     if (Prev == Cur)
     {
@@ -482,10 +482,10 @@ bool ColourBlendMap::Compute(TransColour& colour, DBL value, const Vector3d& TPo
 
 bool PigmentBlendMap::Compute(TransColour& colour, DBL value, const Vector3d& TPoint, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread)
 {
-    const BlendMapEntry<PIGMENT*>* Prev;
-    const BlendMapEntry<PIGMENT*>* Cur;
-    DBL prevWeight;
-    DBL curWeight;
+    const PigmentBlendMapEntry* Prev;
+    const PigmentBlendMapEntry* Cur;
+    double prevWeight;
+    double curWeight;
     bool found = false;
     Search (value, Prev, Cur, prevWeight, curWeight);
     if (Compute_Pigment(colour, Cur->Vals, TPoint, Intersect, ray, Thread))
@@ -532,7 +532,7 @@ void PigmentBlendMap::ComputeAverage(TransColour& colour, const Vector3d& EPoint
 
 bool ColourBlendMap::ComputeUVMapped(TransColour& colour, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread)
 {
-    colour = TransColour(Blend_Map_Entries[0].Vals);
+    colour = Blend_Map_Entries[0].Vals;
     return true;
 }
 
@@ -540,7 +540,7 @@ bool PigmentBlendMap::ComputeUVMapped(TransColour& colour, const Intersection *I
 {
     Vector2d UV_Coords;
     Vector3d TPoint;
-    const BlendMapEntry<PIGMENT*>* Cur = &(Blend_Map_Entries[0]);
+    const PigmentBlendMapEntry* Cur = &(Blend_Map_Entries[0]);
 
     /* Don't bother warping, simply get the UV vect of the intersection */
     Intersect->Object->UVCoord(UV_Coords, Intersect, Thread);
@@ -577,11 +577,11 @@ static void Do_Average_Pigments (TransColour& colour, const PIGMENT *Pigment, co
     Pigment->Blend_Map->ComputeAverage(colour, EPoint, Intersect, ray, Thread);
 }
 
-void Evaluate_Density_Pigment(vector<PIGMENT*>& Density, const Vector3d& p, MathColour& c, TraceThreadData *ttd)
+void Evaluate_Density_Pigment(vector<PIGMENT*>& Density, const Vector3d& p, AttenuatingColour& c, TraceThreadData *ttd)
 {
     TransColour lc;
 
-    c.Set(1.0);
+    c = AttenuatingColour(1.0);
 
     // TODO - Reverse iterator may be less performant than forward iterator; we might want to
     //        compare performance with using forward iterators and decrement, or using random access.
@@ -598,9 +598,9 @@ void Evaluate_Density_Pigment(vector<PIGMENT*>& Density, const Vector3d& p, Math
 
 //******************************************************************************
 
-ColourBlendMap::ColourBlendMap() : BlendMap<TransColour>(COLOUR_TYPE) {}
+ColourBlendMap::ColourBlendMap() : BlendMap<ColourBlendMapData>(COLOUR_TYPE) {}
 
-ColourBlendMap::ColourBlendMap(int n, const ColourBlendMap::Entry aEntries[]) : BlendMap<TransColour>(COLOUR_TYPE)
+ColourBlendMap::ColourBlendMap(int n, const ColourBlendMap::Entry aEntries[]) : BlendMap<ColourBlendMapData>(COLOUR_TYPE)
 {
     Blend_Map_Entries.reserve(n);
     for (int i = 0; i < n; i ++)
@@ -608,7 +608,7 @@ ColourBlendMap::ColourBlendMap(int n, const ColourBlendMap::Entry aEntries[]) : 
 }
 
 
-PigmentBlendMap::PigmentBlendMap(int type) : BlendMap<PIGMENT*>(type) {}
+PigmentBlendMap::PigmentBlendMap(int type) : BlendMap<PigmentBlendMapData>(type) {}
 
 PigmentBlendMap::~PigmentBlendMap()
 {

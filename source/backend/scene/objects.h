@@ -273,7 +273,7 @@ class LightSource : public CompoundObject
 {
     public:
         size_t index;
-        MathColour colour;
+        LightColour colour;
         Vector3d Direction, Center, Points_At, Axis1, Axis2;
         DBL Coeff, Radius, Falloff;
         DBL Fade_Distance, Fade_Power;

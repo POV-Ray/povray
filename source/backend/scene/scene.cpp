@@ -70,10 +70,11 @@ SceneData::SceneData() :
 {
     atmosphereIOR = 1.0;
     atmosphereDispersion = 0.0;
-    backgroundColour = ToTransColour(RGBFTColour(0.0, 0.0, 0.0, 0.0, 1.0));
-    ambientLight = MathColour(1.0);
+    backgroundTrans  = FilterTransm(0.0, 1.0);
+    ambientLight = ColourModelRGB::Whitepoint::Colour;
+    generalWhitepoint = ColourModelRGB::Whitepoint::Colour;
 
-    iridWavelengths = MathColour::DefaultWavelengths();
+    iridWavelengths = PseudoColour::DominantWavelengths;
 
     languageVersion = OFFICIAL_VERSION_NUMBER;
     languageVersionSet = false;
@@ -459,7 +460,7 @@ void Scene::StartParser(POVMS_Object& parseOptions)
     if (!sceneData->outputAlpha)
         // if we're not outputting an alpha channel, precompose the scene background against a black "background behind the background"
         // (NB: Here, background color is still at its default of <0,0,0,0,1> = full transparency; we're changing that to opaque black.)
-        sceneData->backgroundColour.Clear();
+        sceneData->backgroundTrans.Clear();
 
     // NB a value of '0' for any of the BSP parameters tells the BSP code to use its internal default
     sceneData->bspMaxDepth = parseOptions.TryGetInt(kPOVAttrib_BSP_MaxDepth, 0);

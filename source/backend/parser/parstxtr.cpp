@@ -2310,7 +2310,6 @@ void Parser::Parse_Tnormal (TNORMAL **Tnormal_Ptr)
 
 void Parser::Parse_Finish (FINISH **Finish_Ptr)
 {
-    TransColour Temp_Colour;
     FINISH *New;
     Vector3d Local_Vector;
     bool diffuseAdjust = false;
@@ -2564,10 +2563,10 @@ void Parser::Parse_Finish (FINISH **Finish_Ptr)
             Parse_Begin();
             EXPECT
                 CASE (ANISOTROPY_TOKEN)
-                    Parse_Colour(New->SubsurfaceAnisotropy);
+                    Parse_Colour_Coefficients(New->SubsurfaceAnisotropy);
                 END_CASE
                 CASE (TRANSLUCENCY_TOKEN)
-                    Parse_Colour(New->SubsurfaceTranslucency);
+                    Parse_Colour_Coefficients(New->SubsurfaceTranslucency);
                 END_CASE
                 OTHERWISE
                     UNGET
@@ -3357,7 +3356,7 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
 ***********************************************************************/
                 CASE (AMBIENT_TOKEN)
                     Warn_State(Token.Token_Id, FINISH_TOKEN);
-                    Finish->Ambient = MathColour(Parse_Float ());
+                    Finish->Ambient = AttenuatingColour(Parse_Float ());
                 END_CASE
 
                 CASE (BRILLIANCE_TOKEN)
@@ -3372,7 +3371,7 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
 
                 CASE (REFLECTION_TOKEN)
                     Warn_State(Token.Token_Id, FINISH_TOKEN);
-                    Finish->Reflection_Max = MathColour(Parse_Float ());
+                    Finish->Reflection_Max = AttenuatingColour(Parse_Float ());
                     Finish->Reflection_Min = Finish->Reflection_Max;
                     Finish->Reflection_Falloff = 1;
                 END_CASE
@@ -3973,7 +3972,7 @@ FOG *Parser::Parse_Fog()
 
     EXPECT
         CASE_COLOUR
-            Parse_Colour(Fog->colour);
+            Parse_Colour(Fog->colour, Fog->filter, Fog->transm);
         END_CASE
 
         CASE (DISTANCE_TOKEN)

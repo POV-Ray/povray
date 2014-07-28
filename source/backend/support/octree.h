@@ -84,8 +84,8 @@ struct ot_block_struct
 	Vector3d    Point;
 	Vector3d    S_Normal;
 	Vector3d    To_Nearest_Surface;
-	MathColour  dx, dy, dz; // gradients, not colors, but used only to manipulate colors [trf]
-	MathColour  Illuminance;
+	LightColour dx, dy, dz; // gradients, not colors, but used only to manipulate colors [trf]
+	LightColour Illuminance;
     SNGL        Brilliance; // surface brilliance for which the sample was computed
 	SNGL        Harmonic_Mean_Distance;
 	SNGL        Nearest_Distance;
@@ -119,7 +119,7 @@ struct ot_read_param_struct
 // These are informations the octree reader generates
 struct ot_read_info_struct
 {
-	MathColour  Gather_Total;
+	LightColour Gather_Total;
 	long        Gather_Total_Count;
 	DBL         Brightness;
 	bool        FirstRadiosityPass;

@@ -300,14 +300,14 @@ class PhotonMediaFunction : public MediaFunction
     public:
         PhotonMediaFunction(shared_ptr<SceneData> sd, TraceThreadData *td, Trace *t, PhotonGatherer *pg);
 
-        void ComputeMediaAndDepositPhotons(MediaVector& medias, const Ray& ray, const Intersection& isect, MathColour& colour);
+        void ComputeMediaAndDepositPhotons(LightColour& colour, MediaVector& medias, const Ray& ray, const Intersection& isect);
     protected:
-        void DepositMediaPhotons(MathColour& colour, MediaVector& medias, LightSourceEntryVector& lights, MediaIntervalVector& mediaintervals,
+        void DepositMediaPhotons(LightColour& colour, MediaVector& medias, LightSourceEntryVector& lights, MediaIntervalVector& mediaintervals,
                                  const Ray& ray, int minsamples, bool ignore_photons, bool use_scattering, bool all_constant_and_light_ray);
     private:
         shared_ptr<SceneData> sceneData;
 
-        void addMediaPhoton(const Vector3d& Point, const Vector3d& Origin, const MathColour& LightCol, DBL depthDiff);
+        void addMediaPhoton(const Vector3d& Point, const Vector3d& Origin, const LightColour& LightCol, DBL depthDiff);
 };
 
 class PhotonTrace : public Trace
@@ -316,16 +316,16 @@ class PhotonTrace : public Trace
         PhotonTrace(shared_ptr<SceneData> sd, TraceThreadData *td, unsigned int mtl, DBL adcb, const QualityFlags& qf, Trace::CooperateFunctor& cf);
         ~PhotonTrace();
 
-        virtual DBL TraceRay(Ray& ray, MathColour& colour, ColourChannel&, COLC weight, bool continuedRay, DBL maxDepth = 0.0);
+        virtual DBL TraceRay(Ray& ray, LightColour& colour, ColourChannel&, COLC weight, bool continuedRay, DBL maxDepth = 0.0);
     protected:
-        virtual void ComputeLightedTexture(MathColour& LightCol, ColourChannel&, const TEXTURE *Texture, vector<const TEXTURE *>& warps, const Vector3d& ipoint, const Vector3d& rawnormal, Ray& ray, COLC weight, Intersection& isect);
-        bool ComputeRefractionForPhotons(const FINISH* finish, Interior *interior, const Vector3d& ipoint, Ray& ray, const Vector3d& normal, const Vector3d& rawnormal, MathColour& colour, COLC weight);
-        bool TraceRefractionRayForPhotons(const FINISH* finish, const Vector3d& ipoint, Ray& ray, Ray& nray, DBL ior, DBL n, const Vector3d& normal, const Vector3d& rawnormal, const Vector3d& localnormal, MathColour& colour, COLC weight);
+        virtual void ComputeLightedTexture(LightColour&, ColourChannel&, const LightColour& lightColour, const TEXTURE *Texture, vector<const TEXTURE *>& warps, const Vector3d& ipoint, const Vector3d& rawnormal, Ray& ray, COLC weight, Intersection& isect);
+        bool ComputeRefractionForPhotons(const FINISH* finish, Interior *interior, const Vector3d& ipoint, Ray& ray, const Vector3d& normal, const Vector3d& rawnormal, LightColour& colour, COLC weight);
+        bool TraceRefractionRayForPhotons(const FINISH* finish, const Vector3d& ipoint, Ray& ray, Ray& nray, DBL ior, DBL n, const Vector3d& normal, const Vector3d& rawnormal, const Vector3d& localnormal, LightColour& colour, COLC weight);
     private:
         PhotonMediaFunction mediaPhotons;
         RadiosityFunctor noRadiosity;
 
-        void addSurfacePhoton(const Vector3d& Point, const Vector3d& Origin, const MathColour& LightCol);
+        void addSurfacePhoton(const Vector3d& Point, const Vector3d& Origin, const LightColour& LightCol);
 };
 
 // foward declaration

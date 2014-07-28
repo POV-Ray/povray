@@ -1158,7 +1158,7 @@ FINISH *Create_Finish()
 
     New = reinterpret_cast<FINISH *>(POV_MALLOC(sizeof (FINISH), "finish"));
 
-    New->Ambient.Set(0.1);
+    New->Ambient = AttenuatingColour(0.1);
     New->Emission.Clear();
     New->Reflection_Max.Clear();
     New->Reflection_Min.Clear();
@@ -2323,7 +2323,7 @@ void AVX_FMA4_DNoise(Vector3d& result, const Vector3d& EPoint)
 
 //******************************************************************************
 
-TextureBlendMap::TextureBlendMap() : BlendMap<TexturePtr>(TEXTURE_TYPE) {}
+TextureBlendMap::TextureBlendMap() : BlendMap<TextureBlendMapData>(TEXTURE_TYPE) {}
 
 TextureBlendMap::~TextureBlendMap()
 {

@@ -586,7 +586,7 @@ class ColourMapImage : public Image
         void SetRGBTValue(unsigned int x, unsigned int y, const RGBTColour& col)
         {
             CHECK_BOUNDS(x, y);
-            pixels[x + y * size_t(width)] = RGBA2Map(col.red(), col.green(), col.blue(), col.alpha());
+            pixels[x + y * size_t(width)] = RGBA2Map(col.red(), col.green(), col.blue(), col.Alpha());
         }
         void SetRGBFTValue(unsigned int x, unsigned int y, float red, float green, float blue, float filter, float transm)
         {
@@ -1177,7 +1177,7 @@ class GrayAImage : public Image
         }
         void SetRGBTValue(unsigned int x, unsigned int y, const RGBTColour& col)
         {
-            SetGrayAValue(x, y, RGB2Gray(col.red(), col.green(), col.blue()), col.alpha());
+            SetGrayAValue(x, y, RGB2Gray(col.red(), col.green(), col.blue()), col.Alpha());
         }
         void SetRGBFTValue(unsigned int x, unsigned int y, float red, float green, float blue, float filter, float transm)
         {
@@ -1664,7 +1664,7 @@ class RGBAImage : public Image
             pixels[(x + y * size_t(width)) * 4]     = T(col.red()   * float(TMAX));
             pixels[(x + y * size_t(width)) * 4 + 1] = T(col.green() * float(TMAX));
             pixels[(x + y * size_t(width)) * 4 + 2] = T(col.blue()  * float(TMAX));
-            pixels[(x + y * size_t(width)) * 4 + 3] = T(col.alpha() * float(TMAX));
+            pixels[(x + y * size_t(width)) * 4 + 3] = T(col.Alpha() * float(TMAX));
         }
         void SetRGBFTValue(unsigned int x, unsigned int y, float red, float green, float blue, float filter, float transm)
         {
@@ -2393,7 +2393,7 @@ class NonlinearGrayAImage : public Image
         }
         void SetRGBTValue(unsigned int x, unsigned int y, const RGBTColour& col)
         {
-            SetGrayAValue(x, y, RGB2Gray(col.red(), col.green(), col.blue()), col.alpha());
+            SetGrayAValue(x, y, RGB2Gray(col.red(), col.green(), col.blue()), col.Alpha());
         }
         void SetRGBFTValue(unsigned int x, unsigned int y, float red, float green, float blue, float filter, float transm)
         {
@@ -2894,7 +2894,7 @@ class NonlinearRGBAImage : public Image
             pixels[(x + y * size_t(width)) * 4]     = T(col.red());
             pixels[(x + y * size_t(width)) * 4 + 1] = T(col.green());
             pixels[(x + y * size_t(width)) * 4 + 2] = T(col.blue());
-            pixels[(x + y * size_t(width)) * 4 + 3] = T(col.alpha());
+            pixels[(x + y * size_t(width)) * 4 + 3] = T(col.Alpha());
         }
         void SetRGBFTValue(unsigned int x, unsigned int y, float red, float green, float blue, float filter, float transm)
         {

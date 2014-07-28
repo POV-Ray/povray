@@ -1227,7 +1227,7 @@ void f_pigment(FPUContext *ctx, DBL *ptr, unsigned int fn, unsigned int sp) // 0
     }
 
     Compute_Pigment(Col, reinterpret_cast<const PIGMENT *>(f->private_data), Vec, NULL, NULL, ctx->threaddata);
-    rgbftCol = ToRGBFTColour(Col);
+    rgbftCol = RGBFTColour(Col);
 
     ctx->SetLocal(sp + pRED,    rgbftCol.red());
     ctx->SetLocal(sp + pGREEN,  rgbftCol.green());

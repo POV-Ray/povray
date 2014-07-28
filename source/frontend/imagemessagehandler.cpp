@@ -117,7 +117,7 @@ void ImageMessageHandler::DrawPixelSet(const SceneData& sd, const ViewData& vd, 
         rgba.red   = IntEncode(gamma, gcol.red(),   255, dither);
         rgba.green = IntEncode(gamma, gcol.green(), 255, dither);
         rgba.blue  = IntEncode(gamma, gcol.blue(),  255, dither);
-        rgba.alpha = IntEncode(       gcol.alpha(), 255, dither);
+        rgba.alpha = IntEncode(       gcol.Alpha(), 255, dither);
 
         if(psize == 1)
         {
@@ -190,7 +190,7 @@ void ImageMessageHandler::DrawPixelBlockSet(const SceneData& sd, const ViewData&
         rgba.red   = IntEncode(gamma, gcol.red(),   255, dither);
         rgba.green = IntEncode(gamma, gcol.green(), 255, dither);
         rgba.blue  = IntEncode(gamma, gcol.blue(),  255, dither);
-        rgba.alpha = IntEncode(       gcol.alpha(), 255, dither);
+        rgba.alpha = IntEncode(       gcol.Alpha(), 255, dither);
 
         cols.push_back(col);
         rgbas.push_back(rgba);

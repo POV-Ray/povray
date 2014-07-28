@@ -77,15 +77,15 @@ struct MediaInterval
     int samples;
     double s0, s1, ds;
     size_t l0, l1;
-    MathColour od;
-    MathColour te;
-    MathColour te2;
+    AttenuatingColour od;
+    LightColour te;
+    PseudoColour te2;
 
     MediaInterval() :
         lit(false), samples(0), s0(0.0), s1(0.0), ds(0.0), l0(0), l1(0) { }
     MediaInterval(bool nlit, int nsamples, double ns0, double ns1, double nds, size_t nl0, size_t nl1) :
         lit(nlit), samples(nsamples), s0(ns0), s1(ns1), ds(nds), l0(nl0), l1(nl1) { }
-    MediaInterval(bool nlit, int nsamples, double ns0, double ns1, double nds, size_t nl0, size_t nl1, const MathColour& nod, const MathColour& nte, const MathColour& nte2) :
+    MediaInterval(bool nlit, int nsamples, double ns0, double ns1, double nds, size_t nl0, size_t nl1, const AttenuatingColour& nod, const LightColour& nte, const PseudoColour& nte2) :
         lit(nlit), samples(nsamples), s0(ns0), s1(ns1), ds(nds), l0(nl0), l1(nl1), od(nod), te(nte), te2(nte2) { }
 
     bool operator<(const MediaInterval& other) const { return (s0 < other.s0); }
@@ -184,15 +184,15 @@ class Trace
         class MediaFunctor
         {
             public:
-                virtual void ComputeMedia(vector<Media>&, const Ray&, Intersection&, MathColour&, ColourChannel&) { }
-                virtual void ComputeMedia(const RayInteriorVector&, const Ray&, Intersection&, MathColour&, ColourChannel&) { }
-                virtual void ComputeMedia(MediaVector&, const Ray&, Intersection&, MathColour&, ColourChannel&) { }
+                virtual void ComputeMedia(LightColour&, ColourChannel&, vector<Media>&, const Ray&, Intersection&) { }
+                virtual void ComputeMedia(LightColour&, ColourChannel&, const RayInteriorVector&, const Ray&, Intersection&) { }
+                virtual void ComputeMedia(LightColour&, ColourChannel&, MediaVector&, const Ray&, Intersection&) { }
         };
 
         class RadiosityFunctor
         {
             public:
-                virtual void ComputeAmbient(const Vector3d& ipoint, const Vector3d& raw_normal, const Vector3d& layer_normal, double brilliance, MathColour& ambient_colour, double weight, TraceTicket& ticket) { }
+                virtual void ComputeAmbient(LightColour& ambient_colour, const Vector3d& ipoint, const Vector3d& raw_normal, const Vector3d& layer_normal, double brilliance, double weight, TraceTicket& ticket) { }
                 virtual bool CheckRadiosityTraceLevel(const TraceTicket& ticket) { return false; }
         };
 
@@ -215,7 +215,7 @@ class Trace
         ///                                 < EPSILON).
         /// @return                         The distance to the nearest object hit.
         ///
-        virtual double TraceRay(Ray& ray, MathColour& colour, ColourChannel& transm, COLC weight, bool continuedRay, DBL maxDepth = 0.0);
+        virtual double TraceRay(Ray& ray, LightColour& colour, ColourChannel& transm, COLC weight, bool continuedRay, DBL maxDepth = 0.0);
 /*
         /// Trace a ray.
         ///
@@ -230,7 +230,7 @@ class Trace
         ///                                 < EPSILON).
         /// @return                         The distance to the nearest object hit.
         ///
-        virtual double TraceRay(Ray& ray, MathColour& colour, COLC weight, bool continuedRay, DBL maxDepth = 0.0);
+        virtual double TraceRay(Ray& ray, LightColour& colour, COLC weight, bool continuedRay, DBL maxDepth = 0.0);
 */
         bool FindIntersection(Intersection& isect, const Ray& ray);
         bool FindIntersection(Intersection& isect, const Ray& ray, const RayObjectCondition& precondition, const RayObjectCondition& postcondition);
@@ -239,7 +239,7 @@ class Trace
 
         unsigned int GetHighestTraceLevel();
 
-        bool TestShadow(const LightSource &light, double& depth, Ray& light_source_ray, const Vector3d& p, MathColour& colour); // TODO FIXME - this should not be exposed here
+        bool TestShadow(LightColour& colour, double& depth, const LightSource &light, Ray& light_source_ray, const Vector3d& p); // TODO FIXME - this should not be exposed here
 
     protected: // TODO FIXME - should be private
 
@@ -248,10 +248,10 @@ class Trace
         {
             double weight;
             Vector3d normal;
-            MathColour reflec;
+            AttenuatingColour reflec;
             SNGL reflex;
 
-            WNRX(DBL w, const Vector3d& n, const MathColour& r, SNGL x) :
+            WNRX(DBL w, const Vector3d& n, const AttenuatingColour& r, SNGL x) :
                 weight(w), normal(n), reflec(r), reflex(x) { }
         };
 
@@ -267,7 +267,7 @@ class Trace
         struct LightColorCache
         {
             bool        tested;
-            MathColour  colour;
+            LightColour colour;
         };
 
         typedef vector<LightColorCache> LightColorCacheList;
@@ -294,7 +294,7 @@ class Trace
         /// BSP tree mailbox.
         BSPTree::Mailbox mailbox;
         /// Area light grid buffer.
-        vector<MathColour> lightGrid;
+        vector<LightColour> lightGrid;
         /// Fast stack pool.
         IStackPool stackPool;
         /// Fast texture list pool.
@@ -339,32 +339,33 @@ class Trace
         ///
         /// Computations include any media effects between the ray's origin and the point of intersection.
         ///
-        /// @remark         The computed contribution is _added_ to the value passed in `colour` (does not apply to
-        ///                 photon pass).
+        /// @remark         The computed contribution is _added_ to the values passed in `resultColour` and
+        ///                 `resultTransm`.
         ///
         /// @todo           Some input parameters are non-const references.
         ///
-        /// @param[in]      isect           Intersection information.
-        /// @param[in,out]  resultColour    Computed colour [in,out]; during photon pass: light colour [in].
+        /// @param[in,out]  resultColour    Computed colour; undefined during photon pass.
         /// @param[in,out]  resultTransm    Computed transparency; not used during photon pass.
+        /// @param[in]      lightColour     Light colour; only used during photon pass or shadow computations.
         /// @param[in,out]  ray             Ray and associated information.
         /// @param[in]      weight          Importance of this computation.
+        /// @param[in]      isect           Intersection information.
         /// @param[in]      photonpass      Whether to deposit photons instead of computing a colour
         ///
-        void ComputeTextureColour(Intersection& isect, MathColour& resultColour, ColourChannel& resultTransm, Ray& ray, COLC weight, bool photonpass);
+        void ComputeTextureColour(LightColour& resultColour, ColourChannel& resultTransm, const LightColour& lightColour, Ray& ray, COLC weight, Intersection& isect, bool photonpass);
 
         /// Compute the effective colour of an arbitrarily complex texture, or deposits photons.
         ///
-        /// @remark         The computed contribution _overwrites_ any value passed in `colour` (does not apply to
-        ///                 photon pass).
+        /// @remark         The computed contribution _overwrites_ any value passed in `resultColour`.
         ///
         /// @remark         Computations do _not_ include media effects between the ray's origin and the point of
         ///                 intersection any longer.
         ///
         /// @todo           Some input parameters are non-const references or pointers.
         ///
-        /// @param[in,out]  resultColour    Computed colour [out]; during photon pass: light colour [in].
+        /// @param[out]     resultColour    Computed colour; undefined during photon pass.
         /// @param[out]     resultTransm    Computed transparency; not used during photon pass.
+        /// @param[in]      lightColour     Light colour; only used during photon pass or shadow computations.
         /// @param[in]      texture         Texture.
         /// @param[in]      warps           Stack of warps to be applied.
         /// @param[in]      ipoint          Intersection point (possibly with earlier warps already applied).
@@ -375,22 +376,22 @@ class Trace
         /// @param[in]      shadowflag      Whether to perform only computations necessary for shadow testing.
         /// @param[in]      photonpass      Whether to deposit photons instead of computing a colour.
         ///
-        void ComputeOneTextureColour(MathColour& resultColour, ColourChannel& resultTransm, const TEXTURE *texture, vector<const TEXTURE *>& warps,
+        void ComputeOneTextureColour(LightColour& resultColour, ColourChannel& resultTransm, const LightColour& lightColour, const TEXTURE *texture, vector<const TEXTURE *>& warps,
                                      const Vector3d& ipoint, const Vector3d& rawnormal, Ray& ray, COLC weight,
                                      Intersection& isect, bool shadowflag, bool photonpass);
 
         /// Compute the effective colour of an averaged texture, or deposits photons.
         ///
-        /// @remark         The computed contribution _overwrites_ any value passed in `colour` (does not apply to
-        ///                 photon pass).
+        /// @remark         The computed contribution _overwrites_ any value passed in `resultColour`.
         ///
         /// @remark         Computations do _not_ include media effects between the ray's origin and the point of
         ///                 intersection any longer.
         ///
         /// @todo           Some input parameters are non-const references or pointers.
         ///
-        /// @param[in,out]  resultColour    Computed colour [out]; during photon pass: light colour [in].
+        /// @param[out]     resultColour    Computed colour; undefined during photon pass.
         /// @param[out]     resultTransm    Computed transparency; not used during photon pass.
+        /// @param[in]      lightColour     Light colour; only used during photon pass or shadow computations.
         /// @param[in]      texture         Texture.
         /// @param[in]      warps           Stack of warps to be applied.
         /// @param[in]      ipoint          Intersection point (possibly with earlier warps already applied).
@@ -401,7 +402,7 @@ class Trace
         /// @param[in]      shadowflag      Whether to perform only computations necessary for shadow testing.
         /// @param[in]      photonpass      Whether to deposit photons instead of computing a colour.
         ///
-        void ComputeAverageTextureColours(MathColour& resultColour, ColourChannel& resultTransm, const TEXTURE *texture, vector<const TEXTURE *>& warps,
+        void ComputeAverageTextureColours(LightColour& resultColour, ColourChannel& resultTransm, const LightColour& lightColour, const TEXTURE *texture, vector<const TEXTURE *>& warps,
                                           const Vector3d& ipoint, const Vector3d& rawnormal, Ray& ray, COLC weight,
                                           Intersection& isect, bool shadowflag, bool photonpass);
 
@@ -409,7 +410,7 @@ class Trace
         ///
         /// Computations include secondary rays.
         ///
-        /// @remark         The computed contribution _overwrites_ any value passed in `colour`.
+        /// @remark         The computed contribution _overwrites_ any value passed in `resultColour`.
         ///
         /// @remark         Computations do _not_ include media effects between the ray's origin and the point of
         ///                 intersection any longer.
@@ -418,8 +419,9 @@ class Trace
         ///
         /// @todo           Some input parameters are non-const references or pointers.
         ///
-        /// @param[in,out]  resultColour    Computed colour [out]; during photon pass: light colour [in].
+        /// @param[out]     resultColour    Computed colour; undefined during photon pass.
         /// @param[out]     resultTransm    Computed transparency; not used during photon pass.
+        /// @param[in]      lightColour     Light colour; only used during photon pass.
         /// @param[in]      texture         Texture.
         /// @param[in]      warps           Stack of warps to be applied.
         /// @param[in]      ipoint          Intersection point (possibly with earlier warps already applied).
@@ -428,20 +430,21 @@ class Trace
         /// @param[in]      weight          Importance of this computation.
         /// @param[in]      isect           Intersection information.
         ///
-        virtual void ComputeLightedTexture(MathColour& resultColour, ColourChannel& resultTransm, const TEXTURE *texture, vector<const TEXTURE *>& warps,
+        virtual void ComputeLightedTexture(LightColour& resultColour, ColourChannel& resultTransm, const LightColour& lightColour, const TEXTURE *texture, vector<const TEXTURE *>& warps,
                                            const Vector3d& ipoint, const Vector3d& rawnormal, Ray& ray, COLC weight,
                                            Intersection& isect);
 
         /// Compute the effective filtering effect of a simple or layered texture.
         ///
-        /// @remark         The computed contribution _overwrites_ any value passed in `colour`.
+        /// @remark         The computed contribution _overwrites_ any value passed in `resultColour`.
         ///
         /// @remark         Computations do _not_ include media effects between the ray's origin and the point of
         ///                 intersection any longer.
         ///
         /// @todo           Some input parameters are non-const references or pointers.
         ///
-        /// @param[out]     filtercolour    Computed filter colour.
+        /// @param[out]     resultColour    Computed colour.
+        /// @param[in]      lightColour     Light colour.
         /// @param[in]      texture         Texture.
         /// @param[in]      warps           Stack of warps to be applied.
         /// @param[in]      ipoint          Intersection point (possibly with earlier warps already applied).
@@ -449,7 +452,7 @@ class Trace
         /// @param[in,out]  ray             Ray and associated information.
         /// @param[in]      isect           Intersection information.
         ///
-        void ComputeShadowTexture(MathColour& filtercolour, const TEXTURE *texture, vector<const TEXTURE *>& warps,
+        void ComputeShadowTexture(LightColour& resultColour, const LightColour& lightColour, const TEXTURE *texture, vector<const TEXTURE *>& warps,
                                   const Vector3d& ipoint, const Vector3d& rawnormal, const Ray& ray,
                                   Intersection& isect);
 
@@ -469,39 +472,41 @@ class Trace
         ///
         /// @remark         The computed contribution _overwrites_ any value passed in `colour`.
         ///
+        /// @param[out]     colour          Computed colour.
         /// @param[in]      finish          Object's finish.
         /// @param[in]      ipoint          Intersection point.
         /// @param[in,out]  ray             Ray and associated information.
         /// @param[in]      normal          Effective (possibly pertubed) surface normal.
         /// @param[in]      rawnormal       Geometric (possibly smoothed) surface normal.
-        /// @param[out]     colour          Computed colour.
         /// @param[in]      weight          Importance of this computation.
         ///
-        void ComputeReflection(const FINISH* finish, const Vector3d& ipoint, Ray& ray, const Vector3d& normal,
-                               const Vector3d& rawnormal, MathColour& colour, COLC weight);
+        void ComputeReflection(LightColour& colour, const FINISH* finish, const Vector3d& ipoint, Ray& ray, const Vector3d& normal,
+                               const Vector3d& rawnormal, COLC weight);
 
         /// Compute the refraction contribution.
         ///
         /// @remark         The computed contribution _overwrites_ any value passed in `colour`.
         ///
+        /// @param[out]     colour          Computed colour.
+        /// @param[out]     transm          Computed transmittance.
         /// @param[in]      finish          Object's finish.
         /// @param[in]      interior        Stack of currently effective interiors.
         /// @param[in]      ipoint          Intersection point.
         /// @param[in,out]  ray             Ray and associated information.
         /// @param[in]      normal          Effective (possibly pertubed) surface normal.
         /// @param[in]      rawnormal       Geometric (possibly smoothed) surface normal.
-        /// @param[out]     colour          Computed colour.
-        /// @param[out]     transm          Computed transmittance.
         /// @param[in]      weight          Importance of this computation.
         /// @return                         `true` if total internal reflection _did_ occur.
         ///
-        bool ComputeRefraction(const FINISH* finish, Interior *interior, const Vector3d& ipoint, Ray& ray,
-                               const Vector3d& normal, const Vector3d& rawnormal, MathColour& colour, ColourChannel& transm, COLC weight);
+        bool ComputeRefraction(LightColour& colour, ColourChannel& transm, const FINISH* finish, Interior *interior, const Vector3d& ipoint, Ray& ray,
+                               const Vector3d& normal, const Vector3d& rawnormal, COLC weight);
 
         /// Compute the contribution of a single refracted ray.
         ///
         /// @remark         The computed contribution _overwrites_ any value passed in `colour`.
         ///
+        /// @param[out]     colour          Computed colour.
+        /// @param[out]     transm          Computed transmittance.
         /// @param[in]      finish          object's finish.
         /// @param[in]      ipoint          Intersection point.
         /// @param[in,out]  ray             Original ray and associated information.
@@ -511,14 +516,12 @@ class Trace
         /// @param[in]      normal          Effective (possibly pertubed) surface normal.
         /// @param[in]      rawnormal       Geometric (possibly smoothed) surface normal.
         /// @param[in]      localnormal     Effective surface normal, possibly flipped to match ray.
-        /// @param[out]     colour          Computed colour.
-        /// @param[out]     transm          Computed transmittance.
         /// @param[in]      weight          Importance of this computation.
         /// @return                         `true` if total internal reflection _did_ occur.
         ///
-        bool TraceRefractionRay(const FINISH* finish, const Vector3d& ipoint, Ray& ray, Ray& nray, double ior, double n,
+        bool TraceRefractionRay(LightColour& colour, ColourChannel& transm, const FINISH* finish, const Vector3d& ipoint, Ray& ray, Ray& nray, double ior, double n,
                                 const Vector3d& normal, const Vector3d& rawnormal, const Vector3d& localnormal,
-                                MathColour& colour, ColourChannel& transm, COLC weight);
+                                COLC weight);
 
     ///
     /// @}
@@ -532,39 +535,97 @@ class Trace
     /// @{
     ///
 
+        /// Compute the classic-illumination contribution of a finish for all light sources combined.
+        ///
         /// @todo The name is misleading, as it computes all contributions of classic lighting, including highlights.
-        void ComputeDiffuseLight(const FINISH *finish, const Vector3d& ipoint, const  Ray& eye, const Vector3d& layer_normal, const MathColour& layer_pigment_colour,
-                                 MathColour& colour, double attenuation, ObjectPtr object, double relativeIor);
+        ///
+        /// @remark         The computed contribution is _added_ to the value passed in `colour`.
+        ///
+        /// @param[in,out]  colour          Effective surface colour.
+        /// @param[in]      finish          Finish.
+        /// @param[in]      ipoint          Intersection point.
+        /// @param[in]      eyeRay          Ray from observer.
+        /// @param[in]      layerNormal     Effective (possibly pertubed) surface normal.
+        /// @param[in]      layerColour     Nominal pigment colour.
+        /// @param[in]      attenuation     Attenuation factor to account for partial transparency.
+        /// @param[in]      object          The object to compute for.
+        ///
+        void ComputeDiffuseLight(LightColour& colour, const FINISH *finish, const Vector3d& ipoint, const  Ray& eyeRay, const Vector3d& layerNormal, const AttenuatingColour& layerColour,
+                                 double attenuation, ObjectPtr object, double relativeIor);
+
+        /// Compute the classic-illumination contribution of a finish for a single light source.
+        ///
         /// @todo The name is misleading, as it computes all contributions of classic lighting, including highlights.
-        void ComputeOneDiffuseLight(const LightSource &lightsource, const Vector3d& reye, const FINISH *finish, const Vector3d& ipoint, const Ray& eye,
-                                    const Vector3d& layer_normal, const MathColour& Layer_Pigment_Colour, MathColour& colour, double Attenuation, ConstObjectPtr Object, double relativeIor, int light_index = -1);
+        ///
+        /// @remark         The computed contribution is _added_ to the value passed in `colour`.
+        ///
+        /// @param[in,out]  colour          Effective surface colour.
+        /// @param[in]      lightSource     Light source.
+        /// @param[in]      finish          Finish.
+        /// @param[in]      ipoint          Intersection point.
+        /// @param[in]      eyeRay          Ray from observer.
+        /// @param[in]      layerNormal     Effective (possibly pertubed) surface normal.
+        /// @param[in]      layerColour     Nominal pigment colour.
+        /// @param[in]      attenuation     Attenuation factor to account for partial transparency.
+        /// @param[in]      object          The object to compute for.
+        ///
+        void ComputeOneDiffuseLight(LightColour& colour, const LightSource &lightsource, const FINISH *finish, const Vector3d& ipoint, const Ray& eyeRay,
+                                    const Vector3d& layerNormal, const AttenuatingColour& pigmentColour, double attenuation, ConstObjectPtr Object, double relativeIor, int light_index = -1);
+
         /// @todo The name is misleading, as it computes all contributions of classic lighting, including highlights.
-        void ComputeFullAreaDiffuseLight(const LightSource &lightsource, const Vector3d& reye, const FINISH *finish, const Vector3d& ipoint, const Ray& eye,
-                                         const Vector3d& layer_normal, const MathColour& layer_pigment_colour, MathColour& colour, double attenuation,
-                                         double lightsourcedepth, Ray& lightsourceray, const MathColour& lightcolour,
+        void ComputeFullAreaDiffuseLight(LightColour& colour, const LightColour& lightcolour, const LightSource &lightsource, const FINISH *finish, const Vector3d& ipoint, const Ray& eye,
+                                         const Vector3d& layer_normal, const AttenuatingColour& layer_pigment_colour, double attenuation,
+                                         double lightsourcedepth, Ray& lightsourceray,
                                          ConstObjectPtr object, double relativeIor); // JN2007: Full area lighting
 
         /// Compute the direction, distance and unshadowed brightness of an unshadowed light source.
         ///
         /// Computations include spotlight falloff and distance-based attenuation.
         ///
-        /// @param[in]      lightsource         Light source.
-        /// @param[out]     lightsourcedepth    Distance to the light source.
-        /// @param[in,out]  lightsourceray      Ray to the light source.
+        /// @param[out]     lightColour         Effective brightness.
+        /// @param[out]     lightSourceDepth    Distance to the light source.
+        /// @param[in]      lightSource         Light source.
+        /// @param[in,out]  lightSourceRay      Ray to the light source.
         /// @param[in]      ipoint              Intersection point.
-        /// @param[out]     lightcolour         Effective brightness.
         /// @param[in]      forceAttenuate      `true` to immediately apply distance-based attenuation even for full
         ///                                     area lights.
         ///
-        void ComputeOneLightRay(const LightSource &lightsource, double& lightsourcedepth, Ray& lightsourceray,
-                                const Vector3d& ipoint, MathColour& lightcolour, bool forceAttenuate = false);
+        void ComputeOneLightRay(LightColour& lightColour, double& lightSourceDepth, const LightSource &lightSource, Ray& lightSourceRay,
+                                const Vector3d& ipoint, bool forceAttenuate = false);
 
-        void TraceShadowRay(const LightSource &light, double depth, Ray& lightsourceray, const Vector3d& point, MathColour& colour);
-        void TracePointLightShadowRay(const LightSource &lightsource, double& lightsourcedepth, Ray& lightsourceray, MathColour& lightcolour);
-        void TraceAreaLightShadowRay(const LightSource &lightsource, double& lightsourcedepth, Ray& lightsourceray,
-                                     const Vector3d& ipoint, MathColour& lightcolour);
-        void TraceAreaLightSubsetShadowRay(const LightSource &lightsource, double& lightsourcedepth, Ray& lightsourceray,
-                                           const Vector3d& ipoint, MathColour& lightcolour, int u1, int  v1, int  u2, int  v2, int level, const Vector3d& axis1, const Vector3d& axis2);
+        /// Compute the filtering effect of the scene on incident light from a particular light ray.
+        ///
+        /// @param[in,out]  colour              Incident light.
+        /// @param[in]      lightSource         Light source.
+        /// @param[in]      lightSourceDepth    Distance to the light source.
+        /// @param[in,out]  lightSourceRay      Ray to the light source.
+        /// @param[in]      ipoint              Intersection point.
+        ///
+        void TraceShadowRay(LightColour& colour, const LightSource &lightSource, double lightSourceDepth, Ray& lightSourceRay, const Vector3d& ipoint);
+
+        /// @param[in,out]  colour              Incident light.
+        /// @param[in]      lightSource         Light source.
+        /// @param[in]      lightSourceDepth    Distance to the light source.
+        /// @param[in,out]  lightSourceRay      Ray to the light source.
+        ///
+        void TracePointLightShadowRay(LightColour& colour, const LightSource &lightSource, double lightSourceDepth, Ray& lightSourceRay);
+
+        /// @param[in,out]  colour              Incident light.
+        /// @param[in]      lightSource         Light source.
+        /// @param[in]      lightSourceDepth    Distance to the light source.
+        /// @param[in,out]  lightSourceRay      Ray to the light source.
+        ///
+        void TraceAreaLightShadowRay(LightColour& colour, const LightSource &lightSource, double lightSourceDepth, Ray& lightSourceRay,
+                                     const Vector3d& ipoint);
+
+        /// @param[in,out]  colour              Incident light.
+        /// @param[in]      lightSource         Light source.
+        /// @param[in]      lightSourceDepth    Distance to the light source.
+        /// @param[in,out]  lightSourceRay      Ray to the light source.
+        /// @param[in]      ipoint              Intersection point.
+        ///
+        void TraceAreaLightSubsetShadowRay(LightColour& colour, const LightSource &lightSource, double lightSourceDepth, Ray& lightSourceRay,
+                                           const Vector3d& ipoint, int u1, int  v1, int  u2, int  v2, int level, const Vector3d& axis1, const Vector3d& axis2);
 
         /// Compute the filtering effect of an object on incident light from a particular light source.
         ///
@@ -572,13 +633,12 @@ class Trace
         ///
         /// @todo           Some input parameters are non-const references.
         ///
+        /// @param[in,out]  colour          Incident light.
         /// @param[in]      lightsource     Light source.
         /// @param[in]      isect           Intersection information.
         /// @param[in,out]  lightsourceray  Ray to the light source.
-        /// @param[in,out]  colour          Computed effect on the incident light.
         ///
-        void ComputeShadowColour(const LightSource &lightsource, Intersection& isect, Ray& lightsourceray,
-                                 MathColour& colour);
+        void ComputeShadowColour(LightColour& colour, const LightSource &lightsource, Intersection& isect, Ray& lightsourceray);
 
         /// Compute the direction and distance of a single light source to a given intersection
         /// point.
@@ -589,13 +649,13 @@ class Trace
         ///
         /// @todo           The name is misleading, as it just computes direction and distance.
         ///
-        /// @param[in]      lightsource         Light source.
         /// @param[out]     lightsourcedepth    Distance to the light source.
         /// @param[in,out]  lightsourceray      Ray to the light source.
+        /// @param[in]      lightsource         Light source.
         /// @param[in]      ipoint              Intersection point.
         /// @param[in]      jitter              Jitter to apply to the light source.
         ///
-        void ComputeOneWhiteLightRay(const LightSource &lightsource, double& lightsourcedepth, Ray& lightsourceray,
+        void ComputeOneWhiteLightRay(BasicRay& lightsourceray, double& lightsourcedepth, const LightSource &lightsource,
                                      const Vector3d& ipoint, const Vector3d& jitter = Vector3d());
 
     ///
@@ -611,8 +671,8 @@ class Trace
     ///
 
         /// @todo The name is misleading, as it computes all contributions of classic lighting, including highlights.
-        void ComputePhotonDiffuseLight(const FINISH *Finish, const Vector3d& IPoint, const Ray& Eye, const Vector3d& Layer_Normal, const Vector3d& Raw_Normal,
-                                       const MathColour& Layer_Pigment_Colour, MathColour& colour, double Attenuation,
+        void ComputePhotonDiffuseLight(LightColour& colour, const FINISH *Finish, const Vector3d& IPoint, const Ray& Eye, const Vector3d& Layer_Normal, const Vector3d& Raw_Normal,
+                                       const AttenuatingColour& Layer_Pigment_Colour, double Attenuation,
                                        ConstObjectPtr Object, double relativeIor, PhotonGatherer& renderer);
 
     ///
@@ -627,38 +687,44 @@ class Trace
     /// @{
     ///
 
+        /// Compute the classic contribution of a finish illuminated by light from a given direction.
+        ///
+        /// @remark         The computed contribution is _added_ to the value passed in `colour`.
+        ///
+        /// @param[in,out]  colour          Effective contribution.
+        /// @param[in]      lightColour     Effective light colour.
+        /// @param[in]      pigmentColour   Nominal pigment colour.
+        /// @param[in]      fromEye         Direction from observer.
+        /// @param[in]      toLight         Direction to light source.
+        /// @param[in]      normal          Effective (possibly pertubed) surface normal.
+        /// @param[in]      finish          Finish.
+        /// @param[in]      ipoint          Intersection point (possibly with earlier warps already applied).
+        /// @param[in]      attenuation     Attenuation factor to account for partial transparency.
+        /// @param[in]      backside        Whether to use backside instead of frontside diffuse brightness factor.
+        /// @param[in]      doHighlights    Whether to compute highlights. Set to `false` e.g. for fill lights and
+        ///                                 during radiosity sampling.
+        ///
+        void ComputeClassicColour(LightColour& colour, const LightColour& lightColour, const AttenuatingColour& pigmentColour,
+                                  const Vector3d& fromEye, const Vector3d& toLight, const Vector3d& normal,
+                                  const FINISH *finish, const Vector3d& ipoint, double relativeIor, double attenuation, bool backside, bool doHighlights);
+
         /// Compute the diffuse contribution of a finish illuminated by light from a given direction.
         ///
         /// @remark         The computed contribution is _added_ to the value passed in `colour`.
         ///
-        /// @param[in]      finish                  Finish.
-        /// @param[in]      lightDirection          Direction of incoming light.
-        /// @param[in]      eyeDirection            Direction from observer.
-        /// @param[in]      layer_normal            Effective (possibly pertubed) surface normal.
-        /// @param[in,out]  colour                  Effective surface colour.
-        /// @param[in]      light_colour            Effective light colour.
-        /// @param[in]      layer_pigment_colour    Nominal pigment colour.
-        /// @param[in]      attenuation             Attenuation factor to account for partial transparency.
-        /// @param[in]      backside                Whether to use backside instead of frontside diffuse brightness
-        ///                                         factor.
-        ///
-        void ComputeDiffuseColour(const FINISH *finish, const Vector3d& lightDirection, const Vector3d& eyeDirection, const Vector3d& layer_normal,
-                                  MathColour& colour, const MathColour& light_colour,
-                                  const MathColour& layer_pigment_colour, double relativeIor, double attenuation, bool backside);
-
-        /// Compute the iridescence contribution of a finish illuminated by light from a given direction.
-        ///
-        /// @remark         The computed contribution is _added_ to the value passed in `colour`.
-        ///
+        /// @param[in,out]  colour          Effective contribution.
+        /// @param[in]      lightColour     Effective light colour.
+        /// @param[in]      pigmentColour   Nominal pigment colour.
+        /// @param[in]      fromEye         Direction from observer.
+        /// @param[in]      toLight         Direction to light source.
+        /// @param[in]      normal          Effective (possibly pertubed) surface normal.
         /// @param[in]      finish          Finish.
-        /// @param[in]      lightDirection  Direction of incoming light.
-        /// @param[in]      eyeDirection    Direction from observer.
-        /// @param[in]      layer_normal    Effective (possibly pertubed) surface normal.
-        /// @param[in]      ipoint          Intersection point (possibly with earlier warps already applied).
-        /// @param[in,out]  colour          Effective surface colour.
+        /// @param[in]      attenuation     Attenuation factor to account for partial transparency.
+        /// @param[in]      backside        Whether to use backside instead of frontside diffuse brightness factor.
         ///
-        void ComputeIridColour(const FINISH *finish, const Vector3d& lightDirection, const Vector3d& eyeDirection,
-                               const Vector3d& layer_normal, const Vector3d& ipoint, MathColour& colour);
+        void ComputeDiffuseColour(LightColour& colour, const LightColour& lightColour, const AttenuatingColour& pigmentColour,
+                                  const Vector3d& fromEye, const Vector3d& toLight, const Vector3d& normal,
+                                  const FINISH *finish, double relativeIor, double attenuation, bool backside);
 
         /// Compute the Phong highlight contribution of a finish illuminated by light from a given direction.
         ///
@@ -668,18 +734,17 @@ class Trace
         ///
         /// @remark         The computed contribution is _added_ to the value passed in `colour`.
         ///
-        /// @param[in]      finish                  Finish.
-        /// @param[in]      lightDirection          Direction of ray from light source.
-        /// @param[in]      eyeDirection            Direction from observer.
-        /// @param[in]      layer_normal            Effective (possibly pertubed) surface normal.
-        /// @param[in,out]  colour                  Effective surface colour.
-        /// @param[in]      light_colour            Effective light colour.
-        /// @param[in]      layer_pigment_colour    Nominal pigment colour.
-        /// @param[in]      fresnel                 Whether to apply fresnel-based attenuation.
+        /// @param[in,out]  colour          Effective contribution.
+        /// @param[in]      lightColour     Effective light colour.
+        /// @param[in]      pigmentColour   Nominal pigment colour.
+        /// @param[in]      fromEye         Direction from observer.
+        /// @param[in]      toLight         Direction to light source.
+        /// @param[in]      normal          Effective (possibly pertubed) surface normal.
+        /// @param[in]      finish          Finish.
         ///
-        void ComputePhongColour(const FINISH *finish, const Vector3d& lightDirection, const Vector3d& eyeDirection,
-                                const Vector3d& layer_normal, MathColour& colour, const MathColour& light_colour,
-                                const MathColour& layer_pigment_colour, double relativeIor);
+        void ComputePhongColour(LightColour& colour, const LightColour& lightColour, const AttenuatingColour& pigmentColour,
+                                const Vector3d& fromEye, const Vector3d& toLight, const Vector3d& normal,
+                                const FINISH *finish, double relativeIor);
 
         /// Compute the specular highlight contribution of a finish illuminated by light from a given direction.
         ///
@@ -689,18 +754,32 @@ class Trace
         ///
         /// @remark     The computed contribution is _added_ to the value passed in `colour`.
         ///
-        /// @param[in]      finish                  Finish.
-        /// @param[in]      lightDirection          Direction of ray from light source.
-        /// @param[in]      eyeDirection            Direction from observer.
-        /// @param[in]      layer_normal            Effective (possibly pertubed) surface normal.
-        /// @param[in,out]  colour                  Effective surface colour.
-        /// @param[in]      light_colour            Effective light colour.
-        /// @param[in]      layer_pigment_colour    Nominal pigment colour.
-        /// @param[in]      fresnel                 Whether to apply fresnel-based attenuation.
+        /// @param[in,out]  colour          Effective contribution.
+        /// @param[in]      lightColour     Effective light colour.
+        /// @param[in]      pigmentColour   Nominal pigment colour.
+        /// @param[in]      fromEye         Direction from observer.
+        /// @param[in]      toLight         Direction to light source.
+        /// @param[in]      normal          Effective (possibly pertubed) surface normal.
+        /// @param[in]      finish          Finish.
         ///
-        void ComputeSpecularColour(const FINISH *finish, const Vector3d& lightDirection, const Vector3d& eyeDirection,
-                                   const Vector3d& layer_normal, MathColour& colour, const MathColour& light_colour,
-                                   const MathColour& layer_pigment_colour, double relativeIor);
+        void ComputeSpecularColour(LightColour& colour, const LightColour& lightColour, const AttenuatingColour& pigmentColour,
+                                   const Vector3d& fromEye, const Vector3d& toLight, const Vector3d& normal,
+                                   const FINISH *finish, double relativeIor);
+
+        /// Compute the iridescence contribution of a finish illuminated by light from a given direction.
+        ///
+        /// @remark         The computed contribution _overwrites_ the value passed in `colour`.
+        ///
+        /// @param[in,out]  colour          Effective contribution.
+        /// @param[in]      fromEye         Direction from observer.
+        /// @param[in]      toLight         Direction to light source.
+        /// @param[in]      normal          Effective (possibly pertubed) surface normal.
+        /// @param[in]      finish          Finish.
+        /// @param[in]      ipoint          Intersection point (possibly with earlier warps already applied).
+        ///
+        void ComputeIridColour(LightColour& colour,
+                               const Vector3d& fromEye, const Vector3d& toLight, const Vector3d& normal,
+                               const FINISH *finish, const Vector3d& ipoint);
 
     ///
     /// @}
@@ -716,30 +795,30 @@ class Trace
         /// @remark         In Fresnel mode, light is presumed to be unpolarized on average, using
         ///                 @f$ R = \frac{1}{2} \left( R_s + R_p \right) @f$.
         ///
-        void ComputeReflectivity(double& weight, MathColour& reflectivity, const MathColour& reflection_max,
-                                 const MathColour& reflection_min, bool fresnel, double reflection_falloff,
+        void ComputeReflectivity(double& weight, AttenuatingColour& reflectivity, const AttenuatingColour& reflection_max,
+                                 const AttenuatingColour& reflection_min, bool fresnel, double reflection_falloff,
                                  double cos_angle, double relativeIor);
 
         /// Compute metallic attenuation
-        void ComputeMetallic(MathColour& colour, double metallic, const MathColour& metallicColour, double cosAngle);
+        void ComputeMetallic(AttenuatingColour& colour, double metallic, const AttenuatingColour& metallicColour, double cosAngle);
 
         /// Compute fresnel-based reflectivity.
-        void ComputeFresnel(MathColour& colour, const MathColour& rMax, const MathColour& rMin, double cos_angle, double relativeIor);
+        void ComputeFresnel(AttenuatingColour& colour, const AttenuatingColour& rMax, const AttenuatingColour& rMin, double cos_angle, double relativeIor);
 
         /// Compute Sky & Background Colour.
         ///
         /// @remark         The computed colour _overwrites_ any value passed in `colour` and `transm`.
         ///
-        /// @param[in]      ray             Ray.
         /// @param[out]     colour          Computed sky/background colour.
         /// @param[out]     transm          Computed transmittance.
+        /// @param[in]      ray             Ray.
         ///
-        void ComputeSky(const Ray& ray, MathColour& colour, ColourChannel& transm);
+        void ComputeSky(LightColour& colour, ColourChannel& transm, const Ray& ray);
 
-        void ComputeFog(const Ray& ray, const Intersection& isect, MathColour& colour, ColourChannel& transm);
+        void ComputeFog(LightColour& colour, ColourChannel& transm, const Ray& ray, const Intersection& isect);
         double ComputeConstantFogDepth(const Ray &ray, double depth, double width, const FOG *fog);
         double ComputeGroundFogDepth(const Ray& ray, double depth, double width, const FOG *fog);
-        void ComputeRainbow(const Ray& ray, const Intersection& isect, MathColour& colour, ColourChannel& transm);
+        void ComputeRainbow(LightColour& colour, ColourChannel& transm, const Ray& ray, const Intersection& isect);
 
         /// Compute media effect on traversing light rays.
         ///
@@ -749,7 +828,7 @@ class Trace
         ///                   .
         ///                 In other words, you can't skip this whole thing, because the entry/exit is important.
         ///
-        void ComputeShadowMedia(Ray& light_source_ray, Intersection& isect, MathColour& resultcolour,
+        void ComputeShadowMedia(LightColour& resultcolour, Ray& light_source_ray, Intersection& isect,
                                 bool media_attenuation_and_interaction);
 
         /// Test whether an object is part of (or identical to) a given other object.
@@ -780,14 +859,14 @@ class Trace
         void ComputeSSLTNormal (Intersection& Ray_Intersection);
         bool IsSameSSLTObject(ConstObjectPtr obj1, ConstObjectPtr obj2);
         void ComputeDiffuseSampleBase(Vector3d& basePoint, const Intersection& out, const Vector3d& vOut, double avgFreeDist, TraceTicket& ticket);
-        void ComputeDiffuseSamplePoint(const Vector3d& basePoint, Intersection& in, double& sampleArea, TraceTicket& ticket);
-        void ComputeDiffuseContribution(const Intersection& out, const Vector3d& vOut, const Vector3d& pIn, const Vector3d& nIn, const Vector3d& vIn, double& sd, double sigma_prime_s, double sigma_a, double eta);
-        void ComputeDiffuseContribution1(const LightSource& lightsource, const Intersection& out, const Vector3d& vOut, const Intersection& in, MathColour& Total_Colour, const PreciseMathColour& sigma_prime_s, const PreciseMathColour& sigma_a, double eta, double weight, TraceTicket& ticket);
-        void ComputeDiffuseAmbientContribution1(const Intersection& out, const Vector3d& vOut, const Intersection& in, MathColour& Total_Colour, const PreciseMathColour& sigma_prime_s, const PreciseMathColour& sigma_a, double eta, double weight, TraceTicket& ticket);
-        void ComputeOneSingleScatteringContribution(const LightSource& lightsource, const Intersection& out, double sigma_t_xo, double sigma_s, double s_prime_out, MathColour& Lo, double eta, const Vector3d& bend_point, double phi_out, double cos_out_prime, TraceTicket& ticket);
-        void ComputeSingleScatteringContribution(const Intersection& out, double dist, double theta_out, double cos_out_prime, const Vector3d& refractedREye, double sigma_t_xo, double sigma_s, MathColour& Lo, double eta, TraceTicket& ticket);
-        void ComputeSubsurfaceScattering (const FINISH *Finish, const MathColour& layer_pigment_colour, const Intersection& isect, Ray& Eye, const Vector3d& Layer_Normal, MathColour& colour, double Attenuation);
+        void ComputeDiffuseSamplePoint(Intersection& in, double& sampleArea, const Vector3d& basePoint, TraceTicket& ticket);
         bool SSLTComputeRefractedDirection(const Vector3d& v, const Vector3d& n, double eta, Vector3d& refracted);
+        void ComputeDiffuseContribution(double& sd, const Intersection& out, const Vector3d& vOut, const Vector3d& pIn, const Vector3d& nIn, const Vector3d& vIn, double sigma_prime_s, double sigma_a, double eta);
+        void ComputeDiffuseContribution1(LightColour& Total_Colour, const LightSource& lightsource, const Intersection& out, const Vector3d& vOut, const Intersection& in, const PrecisePseudoColour& sigma_prime_s, const PrecisePseudoColour& sigma_a, double eta, double weight, TraceTicket& ticket);
+        void ComputeDiffuseAmbientContribution1(LightColour& Total_Colour, const Intersection& out, const Vector3d& vOut, const Intersection& in, const PrecisePseudoColour& sigma_prime_s, const PrecisePseudoColour& sigma_a, double eta, double weight, TraceTicket& ticket);
+        void ComputeOneSingleScatteringContribution(LightColour& Lo, const LightSource& lightsource, const Intersection& out, double sigma_t_xo, double sigma_s, double s_prime_out, double eta, const Vector3d& bend_point, double phi_out, double cos_out_prime, TraceTicket& ticket);
+        void ComputeSingleScatteringContribution(LightColour& Lo, const Intersection& out, double dist, double theta_out, double cos_out_prime, const Vector3d& refractedREye, double sigma_t_xo, double sigma_s, double eta, TraceTicket& ticket);
+        void ComputeSubsurfaceScattering(LightColour& colour, const FINISH *Finish, const AttenuatingColour& layer_pigment_colour, const Intersection& isect, Ray& Eye, const Vector3d& Layer_Normal, double Attenuation);
 
     ///
     /// @}

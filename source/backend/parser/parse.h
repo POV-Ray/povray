@@ -384,11 +384,30 @@ class Parser : public Task
         void Parse_PatternFunction(TPATTERN *);
 
         // express.h/express.cpp
-        void Parse_Colour (RGBFTColour& colour, bool expectFT = true);
-        void Parse_Colour (TransColour& colour, bool expectFT = true);
-        void Parse_Colour (RGBColour& colour);
-        void Parse_Colour (MathColour& colour);
-        void Parse_Wavelengths (MathColour& colour);
+
+        /// Parse a COLOUR in RGB[F][T] format.
+        void Parse_RGBFT_Colour (RGBFTColour& colour, bool expectFT);
+
+        /// Parse a COLOUR.
+        void Parse_Colour (RGBFTColour& colour, bool expectFT);
+        /// Parse a COLOUR.
+        void Parse_Colour (LightColour& colour, LightColour* whitepoint, FilterTransm* trans);
+        /// Parse a COLOUR that isn't actually a colour but some other per-colour-channel data.
+        void Parse_Colour_Coefficients (PseudoColour& colour);
+
+        /// Parse a COLOUR.
+        void Parse_Colour (RGBFTColour& colour);
+        /// Parse a COLOUR, ignoring filter and transmit.
+        void Parse_Colour (LightColour& colour);
+        /// Parse a COLOUR.
+        void Parse_Colour (AttenuatingColour& colour, ColourChannel& filter, ColourChannel& transm);
+        /// Parse a COLOUR.
+        void Parse_Colour (AttenuatingColour& colour, LightColour& whitepoint, FilterTransm& trans);
+        /// Parse a COLOUR, ignoring filter and transmit.
+        void Parse_Colour (AttenuatingColour& colour);
+        /// Parse a COLOUR.
+        void Parse_Colour (TransColour& colour);
+
         template<typename DATA_T> void Parse_BlendMapData (int Blend_Type, DATA_T& rData);
         template<typename MAP_T> shared_ptr<MAP_T> Parse_Blend_Map (int Blend_Type, int Pat_Type);
         template<typename MAP_T> shared_ptr<MAP_T> Parse_Colour_Map (void);

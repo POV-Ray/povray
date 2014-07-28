@@ -6613,21 +6613,21 @@ void Parser::Parse_Frame ()
 
             CASE (BACKGROUND_TOKEN)
                 Parse_Begin();
-                Parse_Colour (sceneData->backgroundColour);
+                Parse_Colour (sceneData->backgroundColour, sceneData->backgroundWhitepoint, sceneData->backgroundTrans);
                 if (sceneData->EffectiveLanguageVersion() < 370)
                 {
                     if (sceneData->outputAlpha)
-                        sceneData->backgroundColour.SetFT(0.0f, 1.0f);
+                        sceneData->backgroundTrans = FilterTransm(0.0f, 1.0f);
                     else
-                        sceneData->backgroundColour.SetFT(0.0f, 0.0f);
+                        sceneData->backgroundTrans = FilterTransm(0.0f, 0.0f);
                 }
                 else
                 {
                     if (!sceneData->outputAlpha)
                     {
                         // if we're not outputting an alpha channel, precompose the scene background against a black "background behind the background"
-                        sceneData->backgroundColour.colour() *= sceneData->backgroundColour.Opacity();
-                        sceneData->backgroundColour.SetFT(0.0f, 0.0f);
+                        sceneData->backgroundColour *= sceneData->backgroundTrans.Opacity(sceneData->backgroundColour);
+                        sceneData->backgroundTrans = FilterTransm(0.0f, 0.0f);
                     }
                 }
                 Parse_End();
@@ -6765,7 +6765,7 @@ void Parser::Parse_Global_Settings()
     Parse_Begin();
     EXPECT
         CASE (IRID_WAVELENGTH_TOKEN)
-            Parse_Wavelengths (sceneData->iridWavelengths);
+            Parse_Colour_Coefficients (sceneData->iridWavelengths);
         END_CASE
         CASE (CHARSET_TOKEN)
             EXPECT
@@ -10062,7 +10062,7 @@ void Parser::Convert_Filter_To_Transmit(PIGMENT *Pigment)
     switch (Pigment->Type)
     {
         case PLAIN_PATTERN:
-            Pigment->colour.SetFT(0.0, 1.0 - Pigment->colour.Opacity());
+            Pigment->colour.trans() = FilterTransm(0.0, 1.0 - Pigment->colour.Opacity());
             break;
 
         default:
@@ -10085,7 +10085,7 @@ void ColourBlendMap::ConvertFilterToTransmit()
 {
     for (Vector::iterator i = Blend_Map_Entries.begin(); i != Blend_Map_Entries.end(); i++)
     {
-        i->Vals.SetFT(0.0, 1.0 - i->Vals.Opacity());
+        i->Vals.trans() = FilterTransm(0.0, 1.0 - i->Vals.Opacity());
     }
 }
 

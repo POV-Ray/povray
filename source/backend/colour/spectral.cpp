@@ -45,7 +45,7 @@
 namespace pov
 {
 
-#if (NUM_COLOUR_CHANNELS == 3)
+#if ((POV_COLOUR_MODEL == 0) || (POV_COLOUR_MODEL == 3))
 
 // Table of RGB colors by wavelength
 // (integrated over wavelength)
@@ -373,12 +373,12 @@ static RGBColour SpectralHueIntegral[SPECTRAL_HUE_TABLE_SIZE] = {
 };
 #endif
 
-MathColour SpectralBand::GetHueIntegral(double wavelength)
+AttenuatingColour SpectralBand::GetHueIntegral(double wavelength)
 {
     double tableOffset = clip((wavelength-SPECTRAL_HUE_TABLE_BASE)/SPECTRAL_HUE_TABLE_STEP, 0.0, SPECTRAL_HUE_TABLE_SIZE-1.0);
     int tableIndex = min((int)tableOffset, SPECTRAL_HUE_TABLE_SIZE-2);
     tableOffset -= tableIndex;
-    return ToMathColour((1.0-tableOffset) * SpectralHueIntegral[tableIndex] + tableOffset * SpectralHueIntegral[tableIndex+1]);
+    return AttenuatingColour((1.0-tableOffset) * SpectralHueIntegral[tableIndex] + tableOffset * SpectralHueIntegral[tableIndex+1]);
 }
 
 #endif

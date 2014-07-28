@@ -322,12 +322,12 @@ void AlphaUnPremultiply(RGBFTColour& colour)
 
 void AlphaPremultiply(RGBTColour& colour)
 {
-    AlphaPremultiply(colour.red(), colour.green(), colour.blue(), colour.alpha());
+    AlphaPremultiply(colour.red(), colour.green(), colour.blue(), colour.Alpha());
 }
 
 void AlphaUnPremultiply(RGBTColour& colour)
 {
-    AlphaUnPremultiply(colour.red(), colour.green(), colour.blue(), colour.alpha());
+    AlphaUnPremultiply(colour.red(), colour.green(), colour.blue(), colour.Alpha());
 }
 
 

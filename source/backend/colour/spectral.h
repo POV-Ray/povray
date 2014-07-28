@@ -90,9 +90,9 @@ class SpectralBand
         }
 
         /// Get hue
-        MathColour GetHue() const
+        AttenuatingColour GetHue() const
         {
-#if (NUM_COLOUR_CHANNELS == 3)
+#if ((POV_COLOUR_MODEL == 0) || (POV_COLOUR_MODEL == 3))
             return (GetHueIntegral(wavelength+bandwidth/2) - GetHueIntegral(wavelength-bandwidth/2)) * (SPECTRAL_BANDWIDTH/bandwidth);
 #else
             #error TODO!
@@ -105,44 +105,10 @@ class SpectralBand
         /// Nominal bandwidth.
         float bandwidth;
 
-#if (NUM_COLOUR_CHANNELS == 3)
-        static MathColour GetHueIntegral(double wavelength);
+#if ((POV_COLOUR_MODEL == 0) || (POV_COLOUR_MODEL == 3))
+        static AttenuatingColour GetHueIntegral(double wavelength);
 #endif
 };
-
-}
-
-namespace pov_base
-{
-
-#if (NUM_COLOUR_CHANNELS == 3)
-
-inline RGBColour ToRGBColour(const MathColour& col)
-{
-    return RGBColour(col);
-}
-
-inline MathColour ToMathColour(const RGBColour& col)
-{
-    return MathColour(col);
-}
-
-inline TransColour ToTransColour(const RGBFTColour& col)
-{
-    return TransColour(col);
-}
-
-inline RGBFTColour ToRGBFTColour(const TransColour& col)
-{
-    return RGBFTColour(col);
-}
-
-#else
-
-RGBColour ToRGB(const MathColour& col);
-RGBColour FromRGB(const MathColour& col);
-
-#endif
 
 }
 

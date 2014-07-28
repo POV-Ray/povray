@@ -76,7 +76,7 @@ void Copy_Pigments (vector<PIGMENT*>& New, const vector<PIGMENT*>& Old);
 void Destroy_Pigment(PIGMENT *Pigment);
 void Post_Pigment(PIGMENT *Pigment, bool* pHasFilter = NULL);
 bool Compute_Pigment(TransColour& colour, const PIGMENT *Pigment, const Vector3d& IPoint, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread);
-void Evaluate_Density_Pigment(vector<PIGMENT*>& Density, const Vector3d& p, MathColour& c, TraceThreadData *ttd);
+void Evaluate_Density_Pigment(vector<PIGMENT*>& Density, const Vector3d& p, AttenuatingColour& c, TraceThreadData *ttd);
 
 }
 

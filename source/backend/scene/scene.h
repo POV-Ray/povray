@@ -115,12 +115,18 @@ class SceneData
         DBL atmosphereDispersion;
         /// atmospheric media
         vector<Media> atmosphere;
+        /// background whitepoint
+        LightColour backgroundWhitepoint;
         /// background color - TODO - allow pattern here (useful for background image maps) [trf]
-        TransColour backgroundColour; // may have a filter/transmit component (but filter is ignored)
+        AttenuatingColour backgroundColour;
+        /// background transparency - TODO - allow pattern here (useful for background image maps) [trf]
+        FilterTransm backgroundTrans;
         /// ambient light in scene
-        MathColour ambientLight;
+        LightColour ambientLight;
+        /// ambient light in scene
+        LightColour generalWhitepoint;
         /// TODO - what is this again? [trf]
-        MathColour iridWavelengths;
+        PseudoColour iridWavelengths;
         /// fog in scene
         Fog_Struct *fog;
         /// rainbow in scene

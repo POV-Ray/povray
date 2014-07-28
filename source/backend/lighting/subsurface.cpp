@@ -57,7 +57,7 @@ SubsurfaceInterior::SubsurfaceInterior(double ior) :
     precomputedReducedAlbedo(ior)
 {}
 
-SubsurfaceInterior::PrecomputedReducedAlbedo::PrecomputedReducedAlbedo(float ior)
+SubsurfaceInterior::PrecomputedReducedAlbedo::PrecomputedReducedAlbedo(ColourChannel ior)
 {
     reducedAlbedo[ReducedAlbedoSamples] = 1.0;
     double Fdr = FresnelDiffuseReflectance(ior);
@@ -104,10 +104,10 @@ PreciseColourChannel SubsurfaceInterior::PrecomputedReducedAlbedo::operator()(Pr
     return (1-p)*reducedAlbedo[i0] + p*reducedAlbedo[i1];
 }
 
-PreciseMathColour SubsurfaceInterior::GetReducedAlbedo(const MathColour& diffuseReflectance) const
+PrecisePseudoColour SubsurfaceInterior::GetReducedAlbedo(const AttenuatingColour& diffuseReflectance) const
 {
-    PreciseMathColour result;
-    for (int i = 0; i < MathColour::kChannels; i ++)
+    PrecisePseudoColour result;
+    for (int i = 0; i < ColourModelInternal::kChannels; i ++)
         result[i] = (precomputedReducedAlbedo.get())(diffuseReflectance[i]);
     return result;
 }

@@ -52,7 +52,7 @@ class SubsurfaceInterior {
     public:
 
         SubsurfaceInterior(double ior);
-        PreciseMathColour GetReducedAlbedo(const MathColour& diffuseReflectance) const;
+        PrecisePseudoColour GetReducedAlbedo(const AttenuatingColour& diffuseReflectance) const;
 
     protected:
 
@@ -61,7 +61,7 @@ class SubsurfaceInterior {
         // precomputed reduced albedo for selected values of diffuse reflectance
         struct PrecomputedReducedAlbedo {
             float reducedAlbedo[ReducedAlbedoSamples+1];
-            PrecomputedReducedAlbedo(float ior);
+            PrecomputedReducedAlbedo(ColourChannel ior);
             PreciseColourChannel operator()(PreciseColourChannel diffuseReflectance) const;
         };
 

@@ -150,14 +150,14 @@ bool image_map(const Vector3d& EPoint, const PIGMENT *Pigment, TransColour& colo
 
     if(map_pos(EPoint, Pigment->pattern.get(), &xcoor, &ycoor))
     {
-        colour = ToTransColour(RGBFTColour(1.0, 1.0, 1.0, 0.0, 1.0));
+        colour = TransColour(RGBFTColour(1.0, 1.0, 1.0, 0.0, 1.0));
         return false;
     }
     else
     {
         RGBFTColour rgbft;
         image_colour_at(dynamic_cast<ImagePattern*>(Pigment->pattern.get())->pImage, xcoor, ycoor, rgbft, &reg_number, false);
-        colour = ToTransColour(rgbft);
+        colour = TransColour(rgbft);
         return true;
     }
 }
@@ -283,15 +283,15 @@ void bump_map(const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& normal)
     if(image->Use || (index == -1) || (index2 == -1) || (index3 == -1))
     {
         p1[X] = 0;
-        p1[Y] = Amount * colour1.Greyscale();
+        p1[Y] = Amount * colour1.rgb().Greyscale();
         p1[Z] = 0;
 
         p2[X] = -1;
-        p2[Y] = Amount * colour2.Greyscale();
+        p2[Y] = Amount * colour2.rgb().Greyscale();
         p2[Z] = 1;
 
         p3[X] = 1;
-        p3[Y] = Amount * colour3.Greyscale();
+        p3[Y] = Amount * colour3.rgb().Greyscale();
         p3[Z] = 1;
     }
     else
@@ -392,7 +392,7 @@ DBL image_pattern(const Vector3d& EPoint, const BasicPattern* pPattern)
         }
         else
             // use grey-scaled version of the color
-            Value = colour.Greyscale();
+            Value = colour.rgb().Greyscale();
     }
     else
         Value = index / 255.0;

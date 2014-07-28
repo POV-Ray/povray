@@ -63,11 +63,6 @@ Media::Media()
     Max_Samples    = 1;
     Eccentricity   = 0.0;
 
-    Absorption.Clear();
-    Emission.Clear();
-    Extinction.Clear();
-    Scattering.Clear();
-
     is_constant = false;
 
     use_absorption = false;
@@ -223,7 +218,7 @@ MediaFunction::MediaFunction(TraceThreadData *td, Trace *t, PhotonGatherer *pg) 
 {
 }
 
-void MediaFunction::ComputeMedia(vector<Media>& mediasource, const Ray& ray, Intersection& isect, MathColour& colour, ColourChannel& transm)
+void MediaFunction::ComputeMedia(LightColour& colour, ColourChannel& transm, vector<Media>& mediasource, const Ray& ray, Intersection& isect)
 {
     if(!mediasource.empty())
     {
@@ -237,11 +232,11 @@ void MediaFunction::ComputeMedia(vector<Media>& mediasource, const Ray& ray, Int
         // to deposit photons in the infinite atmosphere, only in contained
         // media, which is processed later (in ComputeLightedTexture).  [nk]
         if(!medialist.empty())
-            ComputeMedia(medialist, ray, isect, colour, transm);
+            ComputeMedia(colour, transm, medialist, ray, isect);
     }
 }
 
-void MediaFunction::ComputeMedia(const RayInteriorVector& mediasource, const Ray& ray, Intersection& isect, MathColour& colour, ColourChannel& transm)
+void MediaFunction::ComputeMedia(LightColour& colour, ColourChannel& transm, const RayInteriorVector& mediasource, const Ray& ray, Intersection& isect)
 {
     if(!mediasource.empty())
     {
@@ -258,7 +253,7 @@ void MediaFunction::ComputeMedia(const RayInteriorVector& mediasource, const Ray
         // to deposit photons in the infinite atmosphere, only in contained
         // media, which is processed later (in ComputeLightedTexture).  [nk]
         if(!medialist.empty())
-            ComputeMedia(medialist, ray, isect, colour, transm);
+            ComputeMedia(colour, transm, medialist, ray, isect);
     }
 }
 
@@ -272,7 +267,7 @@ void MediaFunction::ComputeMedia(const RayInteriorVector& mediasource, const Ray
 *   Colour    - Color arriving at the end point
 ******************************************************************************/
 
-void MediaFunction::ComputeMedia(MediaVector& medias, const Ray& ray, Intersection& isect, MathColour& colour, ColourChannel& transm)
+void MediaFunction::ComputeMedia(LightColour& colour, ColourChannel& transm, MediaVector& medias, const Ray& ray, Intersection& isect)
 {
     LightSourceEntryVector lights;
     LitIntervalVector litintervals;
@@ -356,10 +351,10 @@ void MediaFunction::ComputeMediaRegularSampling(MediaVector& medias, LightSource
 {
     int j;
     DBL n;
-    MathColour Va;
+    PseudoColour Va;
     DBL d0;
-    MathColour C0;
-    MathColour od0;
+    LightColour C0;
+    AttenuatingColour od0;
 
     threadData->Stats()[Media_Intervals] += mediaintervals.size();
     for(MediaIntervalVector::iterator i(mediaintervals.begin()); i != mediaintervals.end(); i++)
@@ -395,6 +390,7 @@ void MediaFunction::ComputeMediaRegularSampling(MediaVector& medias, LightSource
                 // Get variance of samples.
                 n = 1.0 / (DBL)i->samples;
 
+                // TODO FIXME - this seems to ignore the absorbing components
                 Va = ((i->te2 * n) - Sqr(i->te * n)) * n;
 
                 // Take additional samples until variance is small enough.
@@ -410,6 +406,7 @@ void MediaFunction::ComputeMediaRegularSampling(MediaVector& medias, LightSource
                     // Get variance of samples.
                     n = 1.0 / (DBL)i->samples;
 
+                    // TODO FIXME - this seems to ignore the absorbing components
                     Va = ((i->te2 * n) - Sqr(i->te * n)) * n;
                 }
             }
@@ -424,9 +421,9 @@ void MediaFunction::ComputeMediaAdaptiveSampling(MediaVector& medias, LightSourc
     int subIntervalCount;
     int j;
     DBL d0, d1, dd;
-    MathColour C0, C1, Result;
-    MathColour ODResult;
-    MathColour od0, od1;
+    LightColour C0, C1, Result;
+    AttenuatingColour ODResult;
+    AttenuatingColour od0, od1;
 
     for(MediaIntervalVector::iterator i(mediaintervals.begin()); i != mediaintervals.end(); i++)
     {
@@ -477,28 +474,30 @@ void MediaFunction::ComputeMediaAdaptiveSampling(MediaVector& medias, LightSourc
     }
 }
 
-void MediaFunction::ComputeMediaColour(MediaIntervalVector& mediaintervals, MathColour& colour, ColourChannel& transm)
+void MediaFunction::ComputeMediaColour(MediaIntervalVector& mediaintervals, LightColour& colour, ColourChannel& transm)
 {
-    MathColour Od, Te;
+    AttenuatingColour attenuation(1.0);
+    LightColour emission;
     DBL n;
 
-    // Sum the influences of all intervals.
+    // Accumulate the influences of all intervals.
     for(MediaIntervalVector::iterator i(mediaintervals.begin()); i != mediaintervals.end(); i++)
     {
         n = 1.0 / (DBL)i->samples;
 
-        // Add total emission.
-        Te += i->te * n * Exp(-Od);
+        // Accumulate intervals' emissions, each attenuated as per the previous intervals.
+        emission += i->te * n * attenuation;
 
-        // Add optical depth of ient interval.
-        Od += i->od * n;
+        // Accumulate intervals' attenuating effects.
+        attenuation *= Exp(- i->od * n);
     }
 
-    // Add contribution estimated for the participating media.
-    Od = Exp(-Od);
+    // Apply attenuating effects
+    colour *= attenuation;
+    transm *= attenuation.Greyscale(); // TODO - in the long run, we should make transm a full-fledged RGB term
 
-    colour = colour * Od + Te;
-    transm *= Od.Greyscale(); // TODO - in the long run, we should make transm a full-fledged RGB term
+    // Apply emissive effects
+    colour += emission;
 }
 
 void MediaFunction::ComputeMediaSampleInterval(LitIntervalVector& litintervals, MediaIntervalVector& mediaintervals, const Media *media)
@@ -901,14 +900,16 @@ bool MediaFunction::ComputeCylinderLightInterval(const Ray &ray, const LightSour
 *   Col          - color of current sample
 ******************************************************************************/
 
-void MediaFunction::ComputeOneMediaSample(MediaVector& medias, LightSourceEntryVector& lights, MediaInterval& mediainterval, const Ray &ray, DBL d0, MathColour& SampCol,
-                                          MathColour& SampOptDepth, int sample_method, bool ignore_photons, bool use_scattering, bool photonPass)
+void MediaFunction::ComputeOneMediaSample(MediaVector& medias, LightSourceEntryVector& lights, MediaInterval& mediainterval, const Ray &ray, DBL d0, LightColour& SampCol,
+                                          AttenuatingColour& SampOptDepth, int sample_method, bool ignore_photons, bool use_scattering, bool photonPass)
 {
     // NK samples - moved d0 to parameter list
     DBL d1, len;
     Vector3d P, H;
-    MathColour C0, Light_Colour;
-    MathColour Emission, Extinction, Scattering;
+    AttenuatingColour C0;
+    LightColour Light_Colour;
+    LightColour Emission;
+    AttenuatingColour Extinction, Scattering;
     Ray Light_Ray(ray);
 
     threadData->Stats()[Media_Samples]++;
@@ -968,7 +969,7 @@ void MediaFunction::ComputeOneMediaSample(MediaVector& medias, LightSourceEntryV
                 // Use light only if active and within it's boundaries.
                 if((d1 >= lights[i].s0) && (d1 <= lights[i].s1))
                 {
-                    if(!(trace->TestShadow(*lights[i].light, len, Light_Ray, P, Light_Colour)))
+                    if(!(trace->TestShadow(Light_Colour, len, *lights[i].light, Light_Ray, P)))
                         ComputeMediaScatteringAttenuation(medias, Emission, Scattering, Light_Colour, ray, Light_Ray);
                 }
             }
@@ -1007,11 +1008,12 @@ void MediaFunction::ComputeOneMediaSample(MediaVector& medias, LightSourceEntryV
 }
 
 void MediaFunction::ComputeOneMediaSampleRecursive(MediaVector& medias, LightSourceEntryVector& lights, MediaInterval& mediainterval, const Ray& ray,
-                                                   DBL d1, DBL d3, MathColour& Result, const MathColour& C1, const MathColour& C3, MathColour& ODResult, const MathColour& od1, const MathColour& od3,
+                                                   DBL d1, DBL d3, LightColour& Result, const LightColour& C1, const LightColour& C3,
+                                                   AttenuatingColour& ODResult, const AttenuatingColour& od1, const AttenuatingColour& od3,
                                                    int depth, DBL Jitter, DBL aa_threshold, bool ignore_photons, bool use_scattering, bool photonPass)
 {
-    MathColour C2, Result2;
-    MathColour od2, ODResult2;
+    LightColour C2, Result2;
+    AttenuatingColour od2, ODResult2;
     DBL d2, jdist;
 
     // d2 is between d1 and d3 (all in range of 0..1
@@ -1093,13 +1095,13 @@ void MediaFunction::ComputeOneMediaSampleRecursive(MediaVector& medias, LightSou
 }
 
 
-void MediaFunction::ComputeMediaPhotons(MediaVector& medias, MathColour& Te, const MathColour& Sc, const BasicRay& ray, const Vector3d& H)
+void MediaFunction::ComputeMediaPhotons(MediaVector& medias, LightColour& Te, const AttenuatingColour& Sc, const BasicRay& ray, const Vector3d& H)
 {
     BasicRay Light_Ray;
     DBL r;
     int j;
-    MathColour Light_Colour;
-    MathColour Colour2;
+    LightColour Light_Colour;
+    LightColour Colour2;
 
     if((photonGatherer != NULL) && (photonGatherer->map->numPhotons > 0))
     {
@@ -1122,7 +1124,7 @@ void MediaFunction::ComputeMediaPhotons(MediaVector& medias, MathColour& Te, con
             int theta,phi;
 
             // convert small color to normal color
-            Light_Colour = MathColour(photonGatherer->gatheredPhotons.photonGatherList[j]->colour);
+            Light_Colour = LightColour(photonGatherer->gatheredPhotons.photonGatherList[j]->colour);
 
             // convert theta/phi to vector direction
             // Use a pre-computed array of sin/cos to avoid many calls to the
@@ -1149,7 +1151,7 @@ void MediaFunction::ComputeMediaPhotons(MediaVector& medias, MathColour& Te, con
     }
 }
 
-void MediaFunction::ComputeMediaScatteringAttenuation(MediaVector& medias, MathColour& OutputColor, const MathColour& Sc, const MathColour& Light_Colour, const BasicRay& ray, const BasicRay& Light_Ray)
+void MediaFunction::ComputeMediaScatteringAttenuation(MediaVector& medias, LightColour& OutputColor, const AttenuatingColour& Sc, const LightColour& Light_Colour, const BasicRay& ray, const BasicRay& Light_Ray)
 {
     DBL k = 0.0, g = 0.0, g2 = 0.0, alpha = 0.0;
 

@@ -64,7 +64,9 @@ struct Fog_Struct
     DBL Distance;
     DBL Alt;
     DBL Offset;
-    TransColour colour; // may have a filter/transmit component
+    AttenuatingColour colour;
+    ColourChannel filter; // filter and transmit have a special meaning in fog
+    ColourChannel transm; // filter and transmit have a special meaning in fog
     Vector3d Up;
     TURB *Turb;
     SNGL Turb_Depth;
@@ -85,7 +87,7 @@ struct Rainbow_Struct
 
 struct Skysphere_Struct
 {
-    MathColour        Emission; ///< Brightness adjustment.
+    LightColour       Emission; ///< Brightness adjustment.
     vector<PIGMENT *> Pigments; ///< Pigment(s) to use.
     TRANSFORM *       Trans;    ///< Skysphere transformation.
 };
