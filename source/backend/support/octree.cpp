@@ -1137,7 +1137,7 @@ bool ot_write_block(OT_BLOCK *bl, void *fd) // must be passed as void * for comp
         (int)((bl->To_Nearest_Surface[Y]+1.)*.5*254.+.499999),
         (int)((bl->To_Nearest_Surface[Z]+1.)*.5*254.+.499999)
 
-        // TODO - write Quality
+        // TODO - write Quality and Brilliance
     );
     return true;
 }
@@ -1330,7 +1330,7 @@ bool ot_read_file(OT_NODE **root, IStream *fd, const OT_READ_PARAM* param, OT_RE
                     #error TODO!
 #endif
 
-                    // TODO FIXME - read Quality
+                    // TODO FIXME - read Quality and Brilliance
 
                     if ( count == 11 )
                     {

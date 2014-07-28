@@ -611,8 +611,8 @@ void MediaFunction::ComputeMediaLightInterval(LightSourceEntryVector& lights, Li
             s0.push_back(i->s0);
             s1.push_back(i->s1);
         }
-        sort(s0.begin(), s0.end());
-        sort(s1.begin(), s1.end());
+        std::sort(s0.begin(), s0.end());
+        std::sort(s1.begin(), s1.end());
 
         if (s0[0] > 0.0)
             litintervals.push_back(LitInterval(false, 0.0, s0[0], 0, lights.size() - 1));

@@ -555,7 +555,7 @@ esac
 # Language constructs.
 
 AC_HEADER_TIME
-AC_CHECK_HEADERS([time.h limits.h sys/resource.h sys/time.h unistd.h])
+AC_CHECK_HEADERS([time.h limits.h sys/resource.h sys/time.h sys/wait.h unistd.h])
 
 AC_TYPE_SIZE_T
 AC_STRUCT_TM

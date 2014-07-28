@@ -119,6 +119,7 @@ class SceneRadiositySettings
         bool    vainPretrace;               // whether to use full quality during pretrace even where it doesn't matter, to give the user a nice show
         float   defaultImportance;
         bool    subsurface;                 // whether to use subsurface scattering for radiosity sampling rays
+        bool    brilliance;                 // whether to respect brilliance in radiosity computations
 
         SceneRadiositySettings() {
             radiosityEnabled    = false;
@@ -145,6 +146,7 @@ class SceneRadiositySettings
             vainPretrace        = false;
             defaultImportance   = 1.0;
             subsurface          = false;
+            brilliance          = false;
         }
 
         RadiosityRecursionSettings* GetRecursionSettings (bool final) const;
@@ -196,9 +198,9 @@ class RadiosityCache
         bool Load(const Path& inputFile);
         void InitAutosave(const Path& outputFile, bool append);
 
-        DBL FindReusableBlock(RenderStatistics& stats, DBL errorbound, const Vector3d& ipoint, const Vector3d& snormal, MathColour& illuminance, int recursionDepth, int pretraceStep, int tileId);
+        DBL FindReusableBlock(RenderStatistics& stats, DBL errorbound, const Vector3d& ipoint, const Vector3d& snormal, DBL brilliance, MathColour& illuminance, int recursionDepth, int pretraceStep, int tileId);
         BlockPool* AcquireBlockPool();
-        void AddBlock(BlockPool* pool, RenderStatistics* stats, const Vector3d& Point, const Vector3d& S_Normal, const Vector3d& To_Nearest_Surface,
+        void AddBlock(BlockPool* pool, RenderStatistics* stats, const Vector3d& Point, const Vector3d& S_Normal, DBL brilliance, const Vector3d& To_Nearest_Surface,
                       const MathColour& dx, const MathColour& dy, const MathColour& dz, const MathColour& Illuminance,
                       DBL Harmonic_Mean_Distance, DBL Nearest_Distance, DBL Quality, int Bounce_Depth, int pretraceStep, int tileId);
         void ReleaseBlockPool(BlockPool* pool);
@@ -258,9 +260,10 @@ class RadiosityFunction : public Trace::RadiosityFunctor
         //      ipoint          - point on the surface
         //      raw_normal      - the geometry raw norml at this pont
         //      layer_normal    - texture-pertubed normal
+        //      brilliance      - brilliance
         //      ambient_colour  - (output) the ambient color at this point
         //      weight          - the base "weight" of the traced ray (used to compare againgst ADC bailout)
-        virtual void ComputeAmbient(const Vector3d& ipoint, const Vector3d& raw_normal, const Vector3d& layer_normal, MathColour& ambient_colour, DBL weight, TraceTicket& ticket);
+        virtual void ComputeAmbient(const Vector3d& ipoint, const Vector3d& raw_normal, const Vector3d& layer_normal, DBL brilliance, MathColour& ambient_colour, DBL weight, TraceTicket& ticket);
 
         // checks whether the specified recursion depth is still within the configured limits
         virtual bool CheckRadiosityTraceLevel(const TraceTicket& ticket);
@@ -281,7 +284,7 @@ class RadiosityFunction : public Trace::RadiosityFunctor
                 /// Called before each tile
                 void Reset(unsigned int samplePoolCount);
                 /// Called before each sample
-                void InitSequence(unsigned int& sample_count, const Vector3d& raw_normal, const Vector3d& layer_normal, bool use_raw_normal);
+                void InitSequence(unsigned int& sample_count, const Vector3d& raw_normal, const Vector3d& layer_normal, bool use_raw_normal, DBL brilliance);
                 /// Called to get the next sampling ray direction
                 bool GetDirection(Vector3d& direction);
             protected:
@@ -291,6 +294,8 @@ class RadiosityFunction : public Trace::RadiosityFunctor
                 bool rawNormalMode;
                 /// the raw surface normal // TODO FIXME - for smooth triangles etc. this *should* be *really* raw, but it isn't!
                 Vector3d rawNormal;
+                /// the surface brilliance for which to generate sample rays
+                DBL brilliance;
                 /// direction we'll map the precomputed sample directions' X axis to
                 Vector3d frameX;
                 /// direction we'll map the precomputed sample directions' Y axis to (the effective normal vector)
@@ -333,7 +338,7 @@ class RadiosityFunction : public Trace::RadiosityFunctor
         float topLevelReuse;
         int tileId;
 
-        double GatherLight(const Vector3d& IPoint, const Vector3d& Raw_Normal, const Vector3d& LayNormal, MathColour& Illuminance, TraceTicket& ticket);
+        double GatherLight(const Vector3d& IPoint, const Vector3d& Raw_Normal, const Vector3d& LayNormal, DBL brilliance, MathColour& Illuminance, TraceTicket& ticket);
 };
 
 } // end of namespace

@@ -86,6 +86,7 @@ struct ot_block_struct
 	Vector3d    To_Nearest_Surface;
 	MathColour  dx, dy, dz; // gradients, not colors, but used only to manipulate colors [trf]
 	MathColour  Illuminance;
+    SNGL        Brilliance; // surface brilliance for which the sample was computed
 	SNGL        Harmonic_Mean_Distance;
 	SNGL        Nearest_Distance;
 	SNGL        Quality;    // quality of the data from which this sample was aggregated

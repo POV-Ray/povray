@@ -2349,6 +2349,8 @@ void Parser::Parse_Finish (FINISH **Finish_Ptr)
 
         CASE (BRILLIANCE_TOKEN)
             New->Brilliance = Parse_Float ();
+            Parse_Comma();
+            New->BrillianceOut = Allow_Float(1.0);
         END_CASE
 
         CASE (DIFFUSE_TOKEN)
@@ -2378,7 +2380,7 @@ void Parser::Parse_Finish (FINISH **Finish_Ptr)
                     Parse_Colour(New->Reflection_Max);
                     New->Reflection_Min = New->Reflection_Max;
                     New->Reflection_Falloff = 1;
-                    New->Reflection_Type = 0;
+                    New->Reflection_Fresnel = false;
                     EXIT
                 END_CASE
 
@@ -2410,16 +2412,12 @@ void Parser::Parse_Finish (FINISH **Finish_Ptr)
                     /* look for a other options */
                     EXPECT
                         CASE(FRESNEL_TOKEN)
-                            New->Reflection_Type = (int) Allow_Float(1.0);
-                            if (New->Reflection_Type < 0 || New->Reflection_Type > 1)
-                            {
-                                Error("fresnel must be true or false");
-                            }
+                            New->Reflection_Fresnel = ((int) Allow_Float(1.0) != 0);
 
                             /* for fresnel reflectivity, if the user didn't specify a min & max,
                                then we will set the min to zero - otherwise, this setting would
                                have no effect */
-                            if(!found_second_color && New->Reflection_Type > 0)
+                            if(!found_second_color && New->Reflection_Fresnel)
                             {
                                 New->Reflection_Min.Clear();
                             }
@@ -2515,6 +2513,10 @@ void Parser::Parse_Finish (FINISH **Finish_Ptr)
             END_EXPECT
         END_CASE
 
+        CASE(FRESNEL_TOKEN)
+            New->Fresnel = ((int) Allow_Float(1.0) != 0);
+        END_CASE
+
         CASE (CRAND_TOKEN)
             New->Crand = Parse_Float();
         END_CASE
@@ -2600,12 +2602,15 @@ void Parser::Parse_Finish (FINISH **Finish_Ptr)
     // adjust diffuse, phong and/or specular intensity parameters
     // so that a user-specified value of 1.0 corresponds to a
     // backscattering of 100% of the incoming light
-    New->RawDiffuse     = New->Diffuse;
-    New->RawDiffuseBack = New->DiffuseBack;
     if (diffuseAdjust)
     {
-        New->Diffuse     *= (New->Brilliance + 1.0) / 2.0;
-        New->DiffuseBack *= (New->Brilliance + 1.0) / 2.0;
+        New->BrillianceAdjust    = (New->Brilliance + 1.0) / 2.0;
+        New->BrillianceAdjustRad = 1.0;
+    }
+    else
+    {
+        New->BrillianceAdjust    = 1.0;
+        New->BrillianceAdjustRad = 2.0 / (New->Brilliance + 1.0);
     }
     if (phongAdjust)
         New->Phong *= (New->Phong_Size + 1.0) / 2.0;

@@ -192,7 +192,7 @@ class Trace
         class RadiosityFunctor
         {
             public:
-                virtual void ComputeAmbient(const Vector3d& ipoint, const Vector3d& raw_normal, const Vector3d& layer_normal, MathColour& ambient_colour, double weight, TraceTicket& ticket) { }
+                virtual void ComputeAmbient(const Vector3d& ipoint, const Vector3d& raw_normal, const Vector3d& layer_normal, double brilliance, MathColour& ambient_colour, double weight, TraceTicket& ticket) { }
                 virtual bool CheckRadiosityTraceLevel(const TraceTicket& ticket) { return false; }
         };
 
@@ -534,15 +534,15 @@ class Trace
 
         /// @todo The name is misleading, as it computes all contributions of classic lighting, including highlights.
         void ComputeDiffuseLight(const FINISH *finish, const Vector3d& ipoint, const  Ray& eye, const Vector3d& layer_normal, const MathColour& layer_pigment_colour,
-                                 MathColour& colour, double attenuation, ObjectPtr object);
+                                 MathColour& colour, double attenuation, ObjectPtr object, double relativeIor);
         /// @todo The name is misleading, as it computes all contributions of classic lighting, including highlights.
         void ComputeOneDiffuseLight(const LightSource &lightsource, const Vector3d& reye, const FINISH *finish, const Vector3d& ipoint, const Ray& eye,
-                                    const Vector3d& layer_normal, const MathColour& Layer_Pigment_Colour, MathColour& colour, double Attenuation, ConstObjectPtr Object, int light_index = -1);
+                                    const Vector3d& layer_normal, const MathColour& Layer_Pigment_Colour, MathColour& colour, double Attenuation, ConstObjectPtr Object, double relativeIor, int light_index = -1);
         /// @todo The name is misleading, as it computes all contributions of classic lighting, including highlights.
         void ComputeFullAreaDiffuseLight(const LightSource &lightsource, const Vector3d& reye, const FINISH *finish, const Vector3d& ipoint, const Ray& eye,
                                          const Vector3d& layer_normal, const MathColour& layer_pigment_colour, MathColour& colour, double attenuation,
                                          double lightsourcedepth, Ray& lightsourceray, const MathColour& lightcolour,
-                                         bool isDoubleIlluminated); // JN2007: Full area lighting
+                                         ConstObjectPtr object, double relativeIor); // JN2007: Full area lighting
 
         /// Compute the direction, distance and unshadowed brightness of an unshadowed light source.
         ///
@@ -613,7 +613,7 @@ class Trace
         /// @todo The name is misleading, as it computes all contributions of classic lighting, including highlights.
         void ComputePhotonDiffuseLight(const FINISH *Finish, const Vector3d& IPoint, const Ray& Eye, const Vector3d& Layer_Normal, const Vector3d& Raw_Normal,
                                        const MathColour& Layer_Pigment_Colour, MathColour& colour, double Attenuation,
-                                       ConstObjectPtr Object, PhotonGatherer& renderer);
+                                       ConstObjectPtr Object, double relativeIor, PhotonGatherer& renderer);
 
     ///
     /// @}
@@ -633,6 +633,7 @@ class Trace
         ///
         /// @param[in]      finish                  Finish.
         /// @param[in]      lightDirection          Direction of incoming light.
+        /// @param[in]      eyeDirection            Direction from observer.
         /// @param[in]      layer_normal            Effective (possibly pertubed) surface normal.
         /// @param[in,out]  colour                  Effective surface colour.
         /// @param[in]      light_colour            Effective light colour.
@@ -641,9 +642,9 @@ class Trace
         /// @param[in]      backside                Whether to use backside instead of frontside diffuse brightness
         ///                                         factor.
         ///
-        void ComputeDiffuseColour(const FINISH *finish, const Vector3d& lightDirection, const Vector3d& layer_normal,
+        void ComputeDiffuseColour(const FINISH *finish, const Vector3d& lightDirection, const Vector3d& eyeDirection, const Vector3d& layer_normal,
                                   MathColour& colour, const MathColour& light_colour,
-                                  const MathColour& layer_pigment_colour, double attenuation, bool backside);
+                                  const MathColour& layer_pigment_colour, double relativeIor, double attenuation, bool backside);
 
         /// Compute the iridescence contribution of a finish illuminated by light from a given direction.
         ///
@@ -674,10 +675,11 @@ class Trace
         /// @param[in,out]  colour                  Effective surface colour.
         /// @param[in]      light_colour            Effective light colour.
         /// @param[in]      layer_pigment_colour    Nominal pigment colour.
+        /// @param[in]      fresnel                 Whether to apply fresnel-based attenuation.
         ///
         void ComputePhongColour(const FINISH *finish, const Vector3d& lightDirection, const Vector3d& eyeDirection,
                                 const Vector3d& layer_normal, MathColour& colour, const MathColour& light_colour,
-                                const MathColour& layer_pigment_colour);
+                                const MathColour& layer_pigment_colour, double relativeIor);
 
         /// Compute the specular highlight contribution of a finish illuminated by light from a given direction.
         ///
@@ -694,10 +696,11 @@ class Trace
         /// @param[in,out]  colour                  Effective surface colour.
         /// @param[in]      light_colour            Effective light colour.
         /// @param[in]      layer_pigment_colour    Nominal pigment colour.
+        /// @param[in]      fresnel                 Whether to apply fresnel-based attenuation.
         ///
         void ComputeSpecularColour(const FINISH *finish, const Vector3d& lightDirection, const Vector3d& eyeDirection,
                                    const Vector3d& layer_normal, MathColour& colour, const MathColour& light_colour,
-                                   const MathColour& layer_pigment_colour);
+                                   const MathColour& layer_pigment_colour, double relativeIor);
 
     ///
     /// @}
@@ -714,8 +717,14 @@ class Trace
         ///                 @f$ R = \frac{1}{2} \left( R_s + R_p \right) @f$.
         ///
         void ComputeReflectivity(double& weight, MathColour& reflectivity, const MathColour& reflection_max,
-                                 const MathColour& reflection_min, int reflection_type, double reflection_falloff,
-                                 double cos_angle, const Ray& ray, const Interior *interior);
+                                 const MathColour& reflection_min, bool fresnel, double reflection_falloff,
+                                 double cos_angle, double relativeIor);
+
+        /// Compute metallic attenuation
+        void ComputeMetallic(MathColour& colour, double metallic, const MathColour& metallicColour, double cosAngle);
+
+        /// Compute fresnel-based reflectivity.
+        void ComputeFresnel(MathColour& colour, const MathColour& rMax, const MathColour& rMin, double cos_angle, double relativeIor);
 
         /// Compute Sky & Background Colour.
         ///

@@ -249,6 +249,9 @@ void PhotonTrace::ComputeLightedTexture(MathColour& LightCol, ColourChannel&, co
     DBL Cos_Angle_Incidence;
     int TIR_occured;
 
+    double relativeIor;
+    ComputeRelativeIOR(ray, isect.Object->interior, relativeIor);
+
     WNRXVector listWNRX(wnrxPool);
     assert(listWNRX->empty()); // verify that the WNRXVector pulled from the pool is in a cleaned-up condition
 
@@ -420,33 +423,15 @@ void PhotonTrace::ComputeLightedTexture(MathColour& LightCol, ColourChannel&, co
         // angle-dependent reflectivity
         Cos_Angle_Incidence = -dot(ray.Direction, LayNormal);
 
-        if ((isect.Object->interior != NULL) ||
-            (Layer->Finish->Reflection_Type != 1))
-        {
-            ComputeReflectivity (listWNRX->back().weight, listWNRX->back().reflec,
-                                 Layer->Finish->Reflection_Max, Layer->Finish->Reflection_Min,
-                                 Layer->Finish->Reflection_Type, Layer->Finish->Reflection_Falloff,
-                                 Cos_Angle_Incidence, ray, isect.Object->interior);
-        }
-        else
-        {
-            throw POV_EXCEPTION_STRING("Reflection_Type 1 used with no interior."); // TODO FIXME - wrong place to report this [trf]
-        }
+        if ((isect.Object->interior == NULL) && Layer->Finish->Reflection_Fresnel)
+            throw POV_EXCEPTION_STRING("fresnel reflection used with no interior."); // TODO FIXME - wrong place to report this [trf]
 
-        // Added by MBP for metallic reflection
-        if (Layer->Finish->Reflect_Metallic != 0.0)
-        {
-            DBL R_M=Layer->Finish->Reflect_Metallic;
+        ComputeReflectivity (listWNRX->back().weight, listWNRX->back().reflec,
+                             Layer->Finish->Reflection_Max, Layer->Finish->Reflection_Min,
+                             Layer->Finish->Reflection_Fresnel, Layer->Finish->Reflection_Falloff,
+                             Cos_Angle_Incidence, relativeIor);
 
-            DBL x = fabs(acos(Cos_Angle_Incidence)) / M_PI_2;
-            DBL F = 0.014567225 / Sqr(x - 1.12) - 0.011612903;
-            F=min(1.0,max(0.0,F));
-
-            listWNRX->back().reflec *= (1.0 + R_M * (1.0 - F) * (LayCol.colour() - 1.0));
-        }
-
-        // NK - I think we SHOULD do something like this: (to apply the layer's color)
-        //listWNRX->back().reflec *= FilCol;
+        ComputeMetallic (listWNRX->back().reflec, Layer->Finish->Reflect_Metallic, LayCol.colour(), Cos_Angle_Incidence);
 
         // Get new filter color.
         if (colour_found)
@@ -483,7 +468,7 @@ void PhotonTrace::ComputeLightedTexture(MathColour& LightCol, ColourChannel&, co
         diffuseWeight = ResCol.WeightAbsGreyscale();
         // use top-layer finish only
         if(Texture->Finish)
-            diffuseWeight*=Texture->Finish->Diffuse;
+            diffuseWeight*=Texture->Finish->Diffuse * Texture->Finish->BrillianceAdjust;
         refractionWeight = Trans;
         // reflection only for top layer!!!!!!
         // TODO is "rend()" the top layer or the bottom layer???

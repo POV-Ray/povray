@@ -1,53 +1,51 @@
-/*******************************************************************************
- * pvengine.cpp
- *
- * This file implements Windows specific routines, WinMain, and message loops.
- *
- * Primary author: Christopher J. Cason.
- *
- * ---------------------------------------------------------------------------
- * Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
- * Copyright 1991-2013 Persistence of Vision Raytracer Pty. Ltd.
- *
- * POV-Ray is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * POV-Ray is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------------
- * POV-Ray is based on the popular DKB raytracer version 2.12.
- * DKBTrace was originally written by David K. Buck.
- * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
- * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/windows/pvengine.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
- *******************************************************************************/
+//******************************************************************************
+///
+/// @file windows/pvengine.cpp
+///
+/// This file implements Windows specific routines, WinMain, and message loops.
+///
+/// @author Christopher J. Cason (primary author).
+///
+/// @copyright
+/// @parblock
+///
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
+/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+///
+/// POV-Ray is free software: you can redistribute it and/or modify
+/// it under the terms of the GNU Affero General Public License as
+/// published by the Free Software Foundation, either version 3 of the
+/// License, or (at your option) any later version.
+///
+/// POV-Ray is distributed in the hope that it will be useful,
+/// but WITHOUT ANY WARRANTY; without even the implied warranty of
+/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+/// GNU Affero General Public License for more details.
+///
+/// You should have received a copy of the GNU Affero General Public License
+/// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+///
+/// ----------------------------------------------------------------------------
+///
+/// POV-Ray is based on the popular DKB raytracer version 2.12.
+/// DKBTrace was originally written by David K. Buck.
+/// DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
+///
+/// @endparblock
+///
+//******************************************************************************
 
-/*****************************************************************************/
-/* NOTICE                                                                    */
-/*                                                                           */
-/* Much of this source code (all of pvengine.exe) should be considered on    */
-/* its last legs. The base code was originally written back in early 1995    */
-/* (with some of the code even predating that), and targeted at Win32s under */
-/* Windows 3.1. An additional constraint was a desire for the code to  be    */
-/* able to be compiled on a DEC Alpha under NT for the Alpha using only a    */
-/* 'C' compiler, and for it to be able to run with or without the editor.    */
-/*                                                                           */
-/* With the introduction of VFE in version 3.7, creating a new UI for POVWIN */
-/* should be a lot less painful as almost all of the bindings with the core  */
-/* POV-Ray renderer have been abstracted into the above class library.       */
-/*                                                                           */
-/*****************************************************************************/
+/// @file
+/// @deprecated Much of this source code (all of pvengine.exe) should be considered on
+///             its last legs. The base code was originally written back in early 1995
+///             (with some of the code even predating that), and targeted at Win32s under
+///             Windows 3.1. An additional constraint was a desire for the code to be
+///             able to be compiled on a DEC Alpha under NT for the Alpha using only a
+///             'C' compiler, and for it to be able to run with or without the editor.
+///
+/// @par        With the introduction of VFE in version 3.7, creating a new UI for POVWIN
+///             should be a lot less painful as almost all of the bindings with the core
+///             POV-Ray renderer have been abstracted into the above class library.
 
 #define POVWIN_FILE
 #define _WIN32_IE COMMONCTRL_VERSION
@@ -75,8 +73,8 @@
 
 // #define DEVELOPMENT
 
-#include <stdlib.h>
-#include <stdio.h>
+#include <cstdlib>
+#include <cstdio>
 #include <tchar.h>
 #include "pvengine.h"
 #include "resource.h"
@@ -142,6 +140,10 @@ void GenerateDumpMeta(bool brief);
 
 namespace povwin
 {
+
+using std::map;
+using std::set;
+using std::pair;
 
 typedef struct
 {
@@ -2475,8 +2477,8 @@ void render_stopped (void)
   }
 
   // update the mapping of included files to source files
-  const set<string>& rf = Session.GetReadFiles();
-  for (set<string>::const_iterator it = rf.begin(); it != rf.end(); it++)
+  const vfeWinSession::FilenameSet& rf = Session.GetReadFiles();
+  for (vfeWinSession::FilenameSet::const_iterator it = rf.begin(); it != rf.end(); it++)
   {
     if (_stricmp(it->c_str(), InputFileName.c_str()) == 0)
       continue;
@@ -5341,7 +5343,7 @@ int PASCAL WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
 #endif
 
   GenerateDumpMeta(false);
-  set_new_handler(newhandler) ;
+  std::set_new_handler(newhandler) ;
   SetUnhandledExceptionFilter(ExceptionHandler);
 
   // need this now to set virtual_screen_width etc., in case we display a dialog

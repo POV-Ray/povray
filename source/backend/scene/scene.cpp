@@ -192,7 +192,7 @@ UCS2String SceneData::FindFile(POVMSContext ctx, const UCS2String& filename, uns
     // see if the file is available locally
     for(vector<UCS2String>::const_iterator i(filenames.begin()); i != filenames.end(); i++)
     {
-        map<UCS2String, UCS2String>::iterator ilocalfile(scene2LocalFiles.find(*i));
+        FilenameToFilenameMap::iterator ilocalfile(scene2LocalFiles.find(*i));
 
         if(ilocalfile != scene2LocalFiles.end())
             return *i;
@@ -201,7 +201,7 @@ UCS2String SceneData::FindFile(POVMSContext ctx, const UCS2String& filename, uns
     // see if the file is available as temporary file
     for(vector<UCS2String>::const_iterator i(filenames.begin()); i != filenames.end(); i++)
     {
-        map<UCS2String, UCS2String>::iterator itempfile(scene2TempFiles.find(*i));
+        FilenameToFilenameMap::iterator itempfile(scene2TempFiles.find(*i));
 
         if(itempfile != scene2TempFiles.end())
             return *i;
@@ -222,7 +222,7 @@ IStream *SceneData::ReadFile(POVMSContext ctx, const UCS2String& origname, const
 
 #ifdef USE_SCENE_FILE_MAPPING
     // see if the file is available locally
-    map<UCS2String, UCS2String>::iterator ilocalfile(scene2LocalFiles.find(scenefile));
+    FilenameToFilenameMap::iterator ilocalfile(scene2LocalFiles.find(scenefile));
 
     // if available locally, open it end return
     if(ilocalfile != scene2LocalFiles.end())
@@ -233,7 +233,7 @@ IStream *SceneData::ReadFile(POVMSContext ctx, const UCS2String& origname, const
         return NewIStream(ilocalfile->second.c_str(), stype);
 
     // see if the file is available as temporary file
-    map<UCS2String, UCS2String>::iterator itempfile(scene2TempFiles.find(scenefile));
+    FilenameToFilenameMap::iterator itempfile(scene2TempFiles.find(scenefile));
 
     // if available as temporary file, open it end return
     if(itempfile != scene2TempFiles.end())
@@ -300,14 +300,14 @@ IStream *SceneData::ReadFile(POVMSContext ctx, const UCS2String& filename, unsig
     UCS2String fileurl;
 
     // see if the file is available locally
-    map<UCS2String, UCS2String>::iterator ilocalfile(scene2LocalFiles.find(scenefile));
+    FilenameToFilenameMap::iterator ilocalfile(scene2LocalFiles.find(scenefile));
 
     // if available locally, open it end return
     if(ilocalfile != scene2LocalFiles.end())
         return NewIStream(ilocalfile->second.c_str(), stype);
 
     // see if the file is available as temporary file
-    map<UCS2String, UCS2String>::iterator itempfile(scene2TempFiles.find(scenefile));
+    FilenameToFilenameMap::iterator itempfile(scene2TempFiles.find(scenefile));
 
     // if available as temporary file, open it end return
     if(itempfile != scene2TempFiles.end())
@@ -366,7 +366,7 @@ OStream *SceneData::CreateFile(POVMSContext ctx, const UCS2String& filename, uns
 
 #ifdef USE_SCENE_FILE_MAPPING
     // see if the file is available as temporary file
-    map<UCS2String, UCS2String>::iterator itempfile(scene2TempFiles.find(scenefile));
+    FilenameToFilenameMap::iterator itempfile(scene2TempFiles.find(scenefile));
 
     // if available as temporary file, open it end return
     if(itempfile != scene2TempFiles.end())
@@ -477,7 +477,7 @@ void Scene::StartParser(POVMS_Object& parseOptions)
         parseOptions.Get(kPOVAttrib_Declare, ds);
         for(int i = 1; i <= ds.GetListSize(); i++)
         {
-            ostringstream sstr;
+            std::ostringstream sstr;
             POVMS_Attribute a;
             POVMS_Object d;
 

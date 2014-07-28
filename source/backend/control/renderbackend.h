@@ -114,10 +114,16 @@ class RenderBackend : public POVMS_MessageReceiver
         SceneId scenecounter;
         ViewId viewcounter;
 
-        std::map<SceneId, shared_ptr<Scene> > scenes;
-        std::map<ViewId, shared_ptr<View> > views;
-        std::map<SceneId, std::set<ViewId> > scene2views;
-        std::map<ViewId, SceneId> view2scene;
+        typedef std::set<ViewId>                        ViewIdSet;
+        typedef std::map<SceneId, shared_ptr<Scene> >   SceneMap;
+        typedef std::map<ViewId,  shared_ptr<View> >    ViewMap;
+        typedef std::map<SceneId, ViewIdSet>            Scene2ViewsMap;
+        typedef std::map<ViewId,  SceneId>              View2SceneMap;
+
+        SceneMap        scenes;
+        ViewMap         views;
+        Scene2ViewsMap  scene2views;
+        View2SceneMap   view2scene;
 
         bool ValidateFrontendAddress(POVMSAddress addr, POVMS_Message& result);
 

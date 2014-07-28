@@ -290,8 +290,8 @@ void Post_Pigment(PIGMENT *Pigment, bool* pHasFilter)
                         break;
 
                     default:
-                        Pigment->Blend_Map = tr1::static_pointer_cast<GenericPigmentBlendMap, ColourBlendMap>(
-                                                 tr1::const_pointer_cast<ColourBlendMap, const ColourBlendMap>(
+                        Pigment->Blend_Map = std::tr1::static_pointer_cast<GenericPigmentBlendMap, ColourBlendMap>(
+                                                 std::tr1::const_pointer_cast<ColourBlendMap, const ColourBlendMap>(
                                                      Pigment->pattern->GetDefaultBlendMap()));
                         break;
                 }
