@@ -251,7 +251,7 @@
 
 // RAL 8xxx - BROWN TONES
 
-//#declare RAL_8000=CLab2RGB_D65(<?????, ?????, ?????>); // Grünbraun         // Green brown      // als "Gelbbraun" 1941 für das Deutsche Afrikakorps der Wehrmacht eingeführt
+#declare RAL_8000 = CLab2RGB_D65(<49.48,  5.14, 28.64>); // Grünbraun         // Green brown      // als "Gelbbraun" 1941 für das Deutsche Afrikakorps der Wehrmacht eingeführt
 #declare RAL_8001 = CLab2RGB_D65(<50.62, 17.02, 31.31>); // Ockerbraun        // Ochre brown
 #declare RAL_8002 = CLab2RGB_D65(<41.88, 14.45, 13.31>); // Signalbraun       // Signal brown
 #declare RAL_8003 = CLab2RGB_D65(<42.56, 15.59, 21.67>); // Lehmbraun         // Clay brown
