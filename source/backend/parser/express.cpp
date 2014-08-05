@@ -2776,10 +2776,13 @@ template<typename MAP_T>
 shared_ptr<MAP_T> Parser::Parse_Blend_Map (int Blend_Type,int Pat_Type)
 {
     shared_ptr<MAP_T>       New;
+    GenericPigmentBlendMapPtr pigmentBlendMap;
     typename MAP_T::Entry   Temp_Ent;
     typename MAP_T::Vector  tempList;
     bool old_allow_id = Allow_Identifier_In_Call;
     Allow_Identifier_In_Call = false;
+    int blendMode = 0;
+    GammaCurvePtr blendGamma;
 
     Parse_Begin ();
 
@@ -2792,6 +2795,38 @@ shared_ptr<MAP_T> Parser::Parse_Blend_Map (int Blend_Type,int Pat_Type)
                 Error("Wrong identifier type");
             }
             EXIT
+        END_CASE
+
+        CASE(BLEND_MODE_TOKEN)
+            switch (Blend_Type)
+            {
+                case PIGMENT_TYPE:
+                case COLOUR_TYPE:
+                    blendMode = Parse_Float();
+                    if ((blendMode < 0) || (blendMode > 3))
+                        Error("blend_mode must be in the range 0 to 3");
+                    break;
+
+                default:
+                    Only_In("blend_mode", "colour_map or pigment_map");
+                    break;
+            }
+        END_CASE
+
+        CASE(BLEND_GAMMA_TOKEN)
+            switch (Blend_Type)
+            {
+                case PIGMENT_TYPE:
+                case COLOUR_TYPE:
+                    if (!sceneData->workingGamma)
+                            Error("blend_gamma requires that assumed_gamma has been set.");
+                    blendGamma = Parse_Gamma();
+                    break;
+
+                default:
+                    Only_In("blend_gamma", "colour_map or pigment_map");
+                    break;
+            }
         END_CASE
 
         OTHERWISE
@@ -2824,6 +2859,14 @@ shared_ptr<MAP_T> Parser::Parse_Blend_Map (int Blend_Type,int Pat_Type)
                         Error ("Must have at least one entry in map.");
                     New = Create_Blend_Map<MAP_T> (Blend_Type);
                     New->Set(tempList);
+                    pigmentBlendMap = std::tr1::dynamic_pointer_cast<GenericPigmentBlendMap, MAP_T>(New);
+                    if (pigmentBlendMap)
+                    {
+                        pigmentBlendMap->blendMode = blendMode;
+                        if (blendGamma == NULL)
+                            blendGamma = PowerLawGammaCurve::GetByDecodingGamma(2.5);
+                        pigmentBlendMap->blendGamma = GammaCurvePtr(TranscodingGammaCurve::Get(sceneData->workingGamma, blendGamma));
+                    }
                     EXIT
                 END_CASE
             END_EXPECT
@@ -2865,7 +2908,7 @@ template<> GenericNormalBlendMapPtr Parser::Parse_Blend_Map<GenericNormalBlendMa
         default:
             assert(false);
             // unreachable code to satisfy the compiler's demands for a return value; an empty pointer will do
-            return GenericNormalBlendMapPtr(); 
+            return GenericNormalBlendMapPtr();
     }
 }
 

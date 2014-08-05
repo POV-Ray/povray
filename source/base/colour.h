@@ -1808,6 +1808,12 @@ class GenericTransColour
             mTransm(0.0)
         {}
 
+        inline explicit GenericTransColour(const GenericColour<T>& col, T filter, T transm) :
+            mColour(col),
+            mFilter(filter),
+            mTransm(transm)
+        {}
+
         inline GenericTransColour& operator=(const GenericTransColour& col)
         {
             mColour = col.mColour;
@@ -1818,13 +1824,13 @@ class GenericTransColour
 
         inline GenericColour<T>  colour() const { return mColour; }
         inline GenericColour<T>& colour()       { return mColour; }
-/*
+
         inline T  filter() const { return mFilter; }
         inline T& filter()       { return mFilter; }
 
         inline T  transm() const { return mTransm; }
         inline T& transm()       { return mTransm; }
-*/
+
         inline T Opacity() const { return 1.0 - mFilter - mTransm; }
 
         /// Legacy opacity computation.
@@ -2013,12 +2019,6 @@ class GenericTransColour
         GenericColour<T>    mColour;
         T                   mFilter;
         T                   mTransm;
-
-        inline explicit GenericTransColour(const GenericColour<T>& col, T filter, T transm) :
-            mColour(col),
-            mFilter(filter),
-            mTransm(transm)
-        {}
 
         inline explicit GenericTransColour(const GenericRGBFTColour<T>& col) :
             mColour(col.rgb())

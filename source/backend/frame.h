@@ -59,6 +59,7 @@
 #include "base/colour.h"
 #include "base/configbase.h"
 #include "base/types.h"
+#include "base/image/colourspace.h"
 
 #include "backend/configbackend.h"
 #include "backend/colour/spectral.h"
@@ -950,14 +951,16 @@ class BlendMap
 
 /// Common interface for pigment-like blend maps.
 /// 
-/// This purely abstract class provides the common interface for both pigment and colour blend maps.
-///
-/// @note   This class is used in a multiple inheritance hierarchy, and therefore must continue to be purely abstract.
+/// This class provides the common interface for both pigment and colour blend maps.
 ///
 class GenericPigmentBlendMap
 {
     public:
 
+        int             blendMode;
+        GammaCurvePtr   blendGamma;
+
+        GenericPigmentBlendMap() : blendMode(0), blendGamma() {}
         virtual ~GenericPigmentBlendMap() {}
 
         virtual bool Compute(TransColour& colour, DBL value, const Vector3d& IPoint, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread) = 0;
@@ -965,6 +968,8 @@ class GenericPigmentBlendMap
         virtual bool ComputeUVMapped(TransColour& colour, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread) = 0;
         virtual void ConvertFilterToTransmit() = 0; ///< @deprecated Only used for backward compatibility with version 3.10 or earlier.
         virtual void Post(bool& rHasFilter) = 0;
+
+        void Blend(TransColour& result, const TransColour& colour1, DBL weight1, const TransColour& colour2, DBL weight2, TraceThreadData *thread);
 };
 
 /// Colour blend map.

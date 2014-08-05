@@ -48,6 +48,7 @@
 #include "backend/colour/colour_old.h"
 #include "backend/pattern/pattern.h"
 #include "backend/pattern/warps.h"
+#include "backend/scene/scene.h"
 #include "backend/scene/threaddata.h"
 #include "backend/support/imageutil.h"
 
@@ -462,6 +463,66 @@ bool Compute_Pigment (TransColour& colour, const PIGMENT *Pigment, const Vector3
 }
 
 
+void GenericPigmentBlendMap::Blend(TransColour& result, const TransColour& colour1, DBL weight1, const TransColour& colour2, DBL weight2, TraceThreadData *thread)
+{
+    switch (blendMode)
+    {
+        case 1:
+            // linear blending
+            if (GammaCurve::IsNeutral(thread->GetSceneData()->workingGamma))
+                result = colour1 * weight1 + colour2 * weight2;
+            else
+            {
+                result = GammaCurve::Encode(thread->GetSceneData()->workingGamma,
+                                            GammaCurve::Decode(thread->GetSceneData()->workingGamma, colour1) * weight1
+                                          + GammaCurve::Decode(thread->GetSceneData()->workingGamma, colour2) * weight2);
+            }
+            break;
+
+        case 2:
+            // gamma blending (except for filter and transm, which are blended linearly)
+            if (GammaCurve::IsNeutral(blendGamma))
+                result = colour1 * weight1 + colour2 * weight2;
+            else
+            {
+                result.filter() = GammaCurve::Encode(thread->GetSceneData()->workingGamma,
+                                                     GammaCurve::Decode(thread->GetSceneData()->workingGamma, colour1.filter()) * weight1
+                                                   + GammaCurve::Decode(thread->GetSceneData()->workingGamma, colour2.filter()) * weight2);
+                result.transm() = GammaCurve::Encode(thread->GetSceneData()->workingGamma,
+                                                     GammaCurve::Decode(thread->GetSceneData()->workingGamma, colour1.transm()) * weight1
+                                                   + GammaCurve::Decode(thread->GetSceneData()->workingGamma, colour2.transm()) * weight2);
+                result.colour() = GammaCurve::Decode(blendGamma,
+                                                     GammaCurve::Encode(blendGamma, colour1.colour()) * weight1
+                                                   + GammaCurve::Encode(blendGamma, colour2.colour()) * weight2);
+            }
+            break;
+
+        case 3:
+            // linear blending of colours combined with gamma blending of brightness
+            if (GammaCurve::IsNeutral(blendGamma) && GammaCurve::IsNeutral(thread->GetSceneData()->workingGamma))
+                result = colour1 * weight1 + colour2 * weight2;
+            else
+            {
+                ColourChannel targetBrightness = GammaCurve::Decode(blendGamma,
+                                                                    GammaCurve::Encode(blendGamma, colour1.colour().Greyscale()) * weight1
+                                                                  + GammaCurve::Encode(blendGamma, colour2.colour().Greyscale()) * weight2);
+                result = GammaCurve::Encode(thread->GetSceneData()->workingGamma,
+                                            GammaCurve::Decode(thread->GetSceneData()->workingGamma, colour1) * weight1
+                                          + GammaCurve::Decode(thread->GetSceneData()->workingGamma, colour2) * weight2);
+                ColourChannel actualBrightness = result.colour().Greyscale();
+                if (fabs(actualBrightness) >= EPSILON)
+                    result.colour() *= targetBrightness / actualBrightness;
+            }
+            break;
+
+        default:
+            // blend in working gamma space
+            result = colour1 * weight1 + colour2 * weight2;
+            break;
+    }
+}
+
+
 bool ColourBlendMap::Compute(TransColour& colour, DBL value, const Vector3d& TPoint, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread)
 {
     const BlendMapEntry<TransColour>* Prev;
@@ -475,7 +536,7 @@ bool ColourBlendMap::Compute(TransColour& colour, DBL value, const Vector3d& TPo
     }
     else
     {
-        colour = Prev->Vals * prevWeight + Cur->Vals * curWeight;
+        Blend(colour, Prev->Vals, prevWeight, Cur->Vals, curWeight, Thread);
     }
     return true;
 }
@@ -495,7 +556,7 @@ bool PigmentBlendMap::Compute(TransColour& colour, DBL value, const Vector3d& TP
         TransColour Temp_Colour;
         if (Compute_Pigment(Temp_Colour, Prev->Vals, TPoint, Intersect, ray, Thread))
             found = true;
-        colour = Temp_Colour * prevWeight + colour * curWeight;
+        Blend(colour, Temp_Colour, prevWeight, colour, curWeight, Thread);
     }
     return found;
 }
