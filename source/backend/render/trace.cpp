@@ -692,6 +692,7 @@ void Trace::ComputeAverageTextureColours(MathColour& resultColour, ColourChannel
     if(photonPass == false)
     {
         resultColour.Clear();
+        resultTransm = 0.0;
 
         for(vector<TextureBlendMapEntry>::const_iterator i = bmap->Blend_Map_Entries.begin(); i != bmap->Blend_Map_Entries.end(); i++)
         {
