@@ -1,44 +1,46 @@
-/*******************************************************************************
- * pvedit.cpp
- *
- * This file contains editor support code.
- *
- * Author: Christopher J. Cason.
- *
- * ---------------------------------------------------------------------------
- * Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
- * Copyright 1991-2013 Persistence of Vision Raytracer Pty. Ltd.
- *
- * POV-Ray is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * POV-Ray is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------------
- * POV-Ray is based on the popular DKB raytracer version 2.12.
- * DKBTrace was originally written by David K. Buck.
- * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
- * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/windows/pvedit.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
- *******************************************************************************/
+//******************************************************************************
+///
+/// @file windows/pvedit.cpp
+///
+/// This file contains editor support code.
+///
+/// @author Christopher J. Cason.
+///
+/// @copyright
+/// @parblock
+///
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
+/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+///
+/// POV-Ray is free software: you can redistribute it and/or modify
+/// it under the terms of the GNU Affero General Public License as
+/// published by the Free Software Foundation, either version 3 of the
+/// License, or (at your option) any later version.
+///
+/// POV-Ray is distributed in the hope that it will be useful,
+/// but WITHOUT ANY WARRANTY; without even the implied warranty of
+/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+/// GNU Affero General Public License for more details.
+///
+/// You should have received a copy of the GNU Affero General Public License
+/// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+///
+/// ----------------------------------------------------------------------------
+///
+/// POV-Ray is based on the popular DKB raytracer version 2.12.
+/// DKBTrace was originally written by David K. Buck.
+/// DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
+///
+/// @endparblock
+///
+//*******************************************************************************
 
 #define POVWIN_FILE
 #define _WIN32_IE COMMONCTRL_VERSION
 
 #include <windows.h>
 #include <shellapi.h>
-#include <string.h>
+#include <cstring>
 #include <sys/stat.h>
 #include "pvengine.h"
 #include "pvedit.h"
@@ -56,7 +58,7 @@ namespace povwin
 {
 
 using namespace pov;
-  
+
 HINSTANCE               hLibPovEdit ;
 
 extern bool             debugging ;
@@ -205,7 +207,7 @@ bool LoadEditorDLL (char *path, bool errorOK)
                       "you to its download page.",
                       "Could not load internal editor - download it?",
                       MB_ICONQUESTION | MB_YESNO) == IDYES)
-                        ShellExecute (NULL, NULL, "http://www.povray.org/download/wineditdll/" POV_RAY_VERSION COMPILER_VER "." PVENGINE_VER, NULL, NULL, SW_SHOWNORMAL) ;
+                        ShellExecute (NULL, NULL, "http://www.povray.org/download/wineditdll/" OFFICIAL_VERSION_STRING COMPILER_VER "." PVENGINE_VER, NULL, NULL, SW_SHOWNORMAL) ;
 #endif
     }
     return (false) ;

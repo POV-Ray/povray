@@ -163,6 +163,59 @@ class GammaCurve
                 return RGBTColour(p->Encode(c.red()), p->Encode(c.green()), p->Encode(c.blue()), c.transm());
         }
 
+        /// Convenience function to apply encoding according to a given gamma curve pointer.
+        ///
+        /// @note           If an empty gamma curve pointer is passed, neutral encoding is applied.
+        ///
+        /// @param[in]  p   The gamma curve pointer to use for encoding.
+        /// @param[in]  c   The colour to encode, typically in the range from 0.0 to 1.0.
+        /// @return         The encoded colour, typically in the range from 0.0 to 1.0.
+        ///
+        static AttenuatingColour Encode(const GammaCurvePtr& p, const AttenuatingColour& c)
+        {
+            if (IsNeutral(p))
+                return c;
+            else
+            {
+                AttenuatingColour result;
+                for (unsigned int i = 0; i < c.kChannels; i ++)
+                    result[i] = p->Encode(c[i]);
+                return result;
+            }
+        }
+
+        /// Convenience function to apply encoding according to a given gamma curve pointer.
+        ///
+        /// @note           If an empty gamma curve pointer is passed, neutral encoding is applied.
+        ///
+        /// @param[in]  p   The gamma curve pointer to use for encoding.
+        /// @param[in]  c   The colour to encode, typically in the range from 0.0 to 1.0.
+        /// @return         The encoded colour, typically in the range from 0.0 to 1.0.
+        ///
+        static TransColour Encode(const GammaCurvePtr& p, const TransColour& c)
+        {
+            if (IsNeutral(p))
+                return c;
+            else
+                return TransColour(Encode(p, c.colour()), Encode(p, c.trans()));
+        }
+
+        /// Convenience function to apply encoding according to a given gamma curve pointer.
+        ///
+        /// @note           If an empty gamma curve pointer is passed, neutral encoding is applied.
+        ///
+        /// @param[in]  p   The gamma curve pointer to use for encoding.
+        /// @param[in]  c   The colour to encode, typically in the range from 0.0 to 1.0.
+        /// @return         The encoded colour, typically in the range from 0.0 to 1.0.
+        ///
+        static FilterTransm Encode(const GammaCurvePtr& p, const FilterTransm& c)
+        {
+            if (IsNeutral(p))
+                return c;
+            else
+                return FilterTransm(Encode(p, c.filter()), Encode(p, c.transm()));
+        }
+
         /// Convenience function to apply decoding according to a given gamma curve pointer.
         ///
         /// @note           If an empty gamma curve pointer is passed, neutral decoding is applied.
@@ -173,7 +226,7 @@ class GammaCurve
         ///
         static float Decode(const GammaCurvePtr& p, float x) { if (IsNeutral(p)) return x; else return p->Decode(x); }
 
-        /// Convenience function to apply encoding according to a given gamma curve pointer.
+        /// Convenience function to apply decoding according to a given gamma curve pointer.
         ///
         /// @note           If an empty gamma curve pointer is passed, neutral decoding is applied.
         ///
@@ -189,7 +242,7 @@ class GammaCurve
                 return RGBColour(p->Decode(c.red()), p->Decode(c.green()), p->Decode(c.blue()));
         }
 
-        /// Convenience function to apply encoding according to a given gamma curve pointer.
+        /// Convenience function to apply decoding according to a given gamma curve pointer.
         ///
         /// @note           If an empty gamma curve pointer is passed, neutral decoding is applied.
         ///
@@ -203,6 +256,59 @@ class GammaCurve
                 return c;
             else
                 return RGBTColour(p->Decode(c.red()), p->Decode(c.green()), p->Decode(c.blue()), c.transm());
+        }
+
+        /// Convenience function to apply decoding according to a given gamma curve pointer.
+        ///
+        /// @note           If an empty gamma curve pointer is passed, neutral decoding is applied.
+        ///
+        /// @param[in]  p   The gamma curve pointer to use for decoding.
+        /// @param[in]  c   The colour to decode, typically in the range from 0.0 to 1.0.
+        /// @return         The decoded colour, typically in the range from 0.0 to 1.0.
+        ///
+        static AttenuatingColour Decode(const GammaCurvePtr& p, const AttenuatingColour& c)
+        {
+            if (IsNeutral(p))
+                return c;
+            else
+            {
+                AttenuatingColour result;
+                for (unsigned int i = 0; i < c.kChannels; i ++)
+                    result[i] = p->Decode(c[i]);
+                return result;
+            }
+        }
+
+        /// Convenience function to apply decoding according to a given gamma curve pointer.
+        ///
+        /// @note           If an empty gamma curve pointer is passed, neutral decoding is applied.
+        ///
+        /// @param[in]  p   The gamma curve pointer to use for decoding.
+        /// @param[in]  c   The colour to decode, typically in the range from 0.0 to 1.0.
+        /// @return         The decoded colour, typically in the range from 0.0 to 1.0.
+        ///
+        static TransColour Decode(const GammaCurvePtr& p, const TransColour& c)
+        {
+            if (IsNeutral(p))
+                return c;
+            else
+                return TransColour(Decode(p, c.colour()), Decode(p, c.trans()));
+        }
+
+        /// Convenience function to apply decoding according to a given gamma curve pointer.
+        ///
+        /// @note           If an empty gamma curve pointer is passed, neutral decoding is applied.
+        ///
+        /// @param[in]  p   The gamma curve pointer to use for decoding.
+        /// @param[in]  c   The colour to decode, typically in the range from 0.0 to 1.0.
+        /// @return         The decoded colour, typically in the range from 0.0 to 1.0.
+        ///
+        static FilterTransm Decode(const GammaCurvePtr& p, const FilterTransm& c)
+        {
+            if (IsNeutral(p))
+                return c;
+            else
+                return FilterTransm(Decode(p, c.filter()), Decode(p, c.transm()));
         }
 
     protected:

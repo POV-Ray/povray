@@ -613,9 +613,12 @@ DBL Attenuate_Light (const LightSource *Light, const Ray &ray, DBL Distance)
     {
         /* Attenuate light due to light source distance. */
 
-        if ((Light->Fade_Power > 0.0) && (fabs(Light->Fade_Distance) > EPSILON))
+        if (Light->Fade_Power > 0.0)
         {
-            Attenuation *= 2.0 / (1.0 + pow(Distance / Light->Fade_Distance, Light->Fade_Power));
+            if (fabs(Light->Fade_Distance) >= EPSILON)
+                Attenuation *= 2.0 / (1.0 + pow(Distance / Light->Fade_Distance, Light->Fade_Power));
+            else
+                Attenuation *= pow(Distance, -Light->Fade_Power);
         }
     }
 
