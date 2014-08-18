@@ -803,7 +803,7 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
 									continue;
 
 								// now all we need to do is convert the barycentric co-ordinates back to a point in 3d space which is on the surface of the face
-								ray.Origin = Vector3d(mesh->Data->Vertices[tr->P1][X] * B1 + mesh->Data->Vertices[tr->P2][X] * B2 + mesh->Data->Vertices[tr->P3][X] * B3);
+								ray.Origin = Vector3d(mesh->Data->Vertices[tr->P1] * B1 + mesh->Data->Vertices[tr->P2] * B2 + mesh->Data->Vertices[tr->P3] * B3);
 
 								// we use the one normal for any location on the face, unless smooth is set
 								ray.Direction = Vector3d(mesh->Data->Normals[tr->Normal_Ind]);
