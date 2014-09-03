@@ -2,7 +2,7 @@
 #define BOOST_ARCHIVE_ITERATORS_HEAD_ITERATOR_HPP
 
 // MS compatible compilers support #pragma once
-#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+#if defined(_MSC_VER)
 # pragma once
 #endif
 
@@ -42,8 +42,8 @@ private:
     > super_t;
 
     typedef head_iterator<Predicate, Base> this_t;
-    typedef BOOST_DEDUCED_TYPENAME super_t::value_type value_type;
-    typedef BOOST_DEDUCED_TYPENAME super_t::reference reference_type;
+    typedef super_t::value_type value_type;
+    typedef super_t::reference reference_type;
 
     reference_type dereference_impl(){
         if(! m_end){

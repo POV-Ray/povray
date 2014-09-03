@@ -6,7 +6,7 @@
  * Boost Software License, Version 1.0. (See accompanying
  * file LICENSE_1_0.txt or http://www.boost.org/LICENSE_1_0.txt)
  * Author: Jeff Garland, Bart Garst
- * $Date: 2010-01-10 14:17:23 -0500 (Sun, 10 Jan 2010) $
+ * $Date$
  */
 
 
@@ -57,7 +57,15 @@ namespace date_time {
       static std::tm* localtime(const std::time_t* t, std::tm* result)
       {
         // localtime_r() not in namespace std???
+ 	#if defined(__VMS) && __INITIAL_POINTER_SIZE == 64
+ 	std::tm tmp;
+ 	if(!localtime_r(t,&tmp))
+            result = 0;
+	else
+            *result = tmp;	
+ 	#else
         result = localtime_r(t, result);
+	#endif
         if (!result)
           boost::throw_exception(std::runtime_error("could not convert calendar time to local time"));
         return result;
@@ -67,12 +75,20 @@ namespace date_time {
       static std::tm* gmtime(const std::time_t* t, std::tm* result)
       {
         // gmtime_r() not in namespace std???
+ 	#if defined(__VMS) && __INITIAL_POINTER_SIZE == 64
+ 	std::tm tmp;
+ 	if(!gmtime_r(t,&tmp))
+          result = 0;
+        else
+          *result = tmp;	
+	#else
         result = gmtime_r(t, result);
+	#endif
         if (!result)
           boost::throw_exception(std::runtime_error("could not convert calendar time to UTC time"));
         return result;
       }
-#else // BOOST_HAS_THREADS
+#else // BOOST_DATE_TIME_HAS_REENTRANT_STD_FUNCTIONS
 
 #if (defined(_MSC_VER) && (_MSC_VER >= 1400))
 #pragma warning(push) // preserve warning settings
@@ -100,7 +116,7 @@ namespace date_time {
 #pragma warning(pop) // restore warnings to previous state
 #endif // _MSC_VER >= 1400
 
-#endif // BOOST_HAS_THREADS
+#endif // BOOST_DATE_TIME_HAS_REENTRANT_STD_FUNCTIONS
   };
 }} // namespaces
 

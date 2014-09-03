@@ -16,7 +16,6 @@
 #define BOOST_SIGNALS_SIGNAL_TEMPLATE_HEADER_INCLUDED
 #  include <boost/config.hpp>
 #  include <boost/signals/connection.hpp>
-#  include <boost/utility.hpp>
 #  include <boost/ref.hpp>
 #  include <boost/signals/slot.hpp>
 #  include <boost/last_value.hpp>
@@ -210,13 +209,6 @@ namespace boost {
             BOOST_SIGNALS_NAMESPACE::connect_position at
               = BOOST_SIGNALS_NAMESPACE::at_back);
 
-#if BOOST_WORKAROUND(BOOST_MSVC, <= 1300)
-    // MSVC 6.0 and 7.0 don't handle the is_convertible test well
-    void disconnect(const group_type& group)
-    {
-      impl->disconnect(group);
-    }
-#else
     template<typename T>
     void disconnect(const T& t)
     {
@@ -242,7 +234,6 @@ namespace boost {
         if (s == f) i->first.disconnect();
       }
     }
-#endif
 
   public:
 
@@ -345,8 +336,8 @@ namespace boost {
 #endif // BOOST_SIGNALS_NUM_ARGS > 0
     call_bound_slot f(&args);
 
-    typedef typename call_bound_slot::result_type result_type;
-    optional<result_type> cache;
+    typedef typename call_bound_slot::result_type call_result_type;
+    optional<call_result_type> cache;
     // Let the combiner call the slots via a pair of input iterators
     return combiner()(slot_call_iterator(notification.impl->slots_.begin(),
                                          impl->slots_.end(), f, cache),
@@ -386,8 +377,8 @@ namespace boost {
 
     call_bound_slot f(&args);
 
-    typedef typename call_bound_slot::result_type result_type;
-    optional<result_type> cache;
+    typedef typename call_bound_slot::result_type call_result_type;
+    optional<call_result_type> cache;
 
     // Let the combiner call the slots via a pair of input iterators
     return combiner()(slot_call_iterator(notification.impl->slots_.begin(),

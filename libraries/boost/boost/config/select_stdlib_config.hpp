@@ -14,7 +14,11 @@
 // First include <cstddef> to determine if some version of STLport is in use as the std lib
 // (do not rely on this header being included since users can short-circuit this header 
 //  if they know whose std lib they are using.)
-#include <cstddef>
+#ifdef __cplusplus
+#  include <cstddef>
+#else
+#  include <stddef.h>
+#endif
 
 #if defined(__SGI_STL_PORT) || defined(_STLPORT_VERSION)
 // STLPort library; this _must_ come first, otherwise since
@@ -39,6 +43,10 @@
 #elif defined(__STD_RWCOMPILER_H__) || defined(_RWSTD_VER)
 // Rogue Wave library:
 #  define BOOST_STDLIB_CONFIG "boost/config/stdlib/roguewave.hpp"
+
+#elif defined(_LIBCPP_VERSION)
+// libc++
+#  define BOOST_STDLIB_CONFIG "boost/config/stdlib/libcpp.hpp"
 
 #elif defined(__GLIBCPP__) || defined(__GLIBCXX__)
 // GNU libstdc++ 3
@@ -73,5 +81,19 @@
 
 #endif
 
-
+#if 0
+//
+// This section allows dependency scanners to find all the files we *might* include:
+//
+#  include "boost/config/stdlib/stlport.hpp"
+#  include "boost/config/stdlib/libcomo.hpp"
+#  include "boost/config/stdlib/roguewave.hpp"
+#  include "boost/config/stdlib/libcpp.hpp"
+#  include "boost/config/stdlib/libstdcpp3.hpp"
+#  include "boost/config/stdlib/sgi.hpp"
+#  include "boost/config/stdlib/msl.hpp"
+#  include "boost/config/stdlib/vacpp.hpp"
+#  include "boost/config/stdlib/modena.hpp"
+#  include "boost/config/stdlib/dinkumware.hpp"
+#endif
 

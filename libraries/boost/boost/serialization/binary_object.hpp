@@ -2,7 +2,7 @@
 #define BOOST_SERIALIZATION_BINARY_OBJECT_HPP
 
 // MS compatible compilers support #pragma once
-#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+#if defined(_MSC_VER)
 # pragma once
 #endif
 
@@ -16,7 +16,7 @@
 
 //  See http://www.boost.org for updates, documentation, and revision history.
 
-#include <cassert>
+#include <boost/assert.hpp>
 
 #include <cstddef> // std::size_t
 #include <boost/config.hpp>

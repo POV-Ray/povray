@@ -1,4 +1,4 @@
-//  (C) Copyright John Maddock 2000. 
+//  (C) Copyright John Maddock 2000.
 //  Use, modification and distribution are subject to the Boost Software License,
 //  Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt).
@@ -32,10 +32,13 @@
 #include "boost/type_traits/has_nothrow_constructor.hpp"
 #include "boost/type_traits/has_nothrow_copy.hpp"
 #include "boost/type_traits/has_nothrow_destructor.hpp"
+#include <boost/type_traits/has_operator.hpp>
 #include "boost/type_traits/has_trivial_assign.hpp"
 #include "boost/type_traits/has_trivial_constructor.hpp"
 #include "boost/type_traits/has_trivial_copy.hpp"
 #include "boost/type_traits/has_trivial_destructor.hpp"
+#include "boost/type_traits/has_trivial_move_assign.hpp"
+#include "boost/type_traits/has_trivial_move_constructor.hpp"
 #include "boost/type_traits/has_virtual_destructor.hpp"
 #include "boost/type_traits/is_abstract.hpp"
 #include "boost/type_traits/is_arithmetic.hpp"
@@ -47,6 +50,7 @@
 #include "boost/type_traits/is_compound.hpp"
 #include "boost/type_traits/is_const.hpp"
 #include "boost/type_traits/is_convertible.hpp"
+#include "boost/type_traits/is_copy_constructible.hpp"
 #include "boost/type_traits/is_empty.hpp"
 #include "boost/type_traits/is_enum.hpp"
 #include "boost/type_traits/is_float.hpp"
@@ -58,6 +62,8 @@
 #include "boost/type_traits/is_member_function_pointer.hpp"
 #include "boost/type_traits/is_member_object_pointer.hpp"
 #include "boost/type_traits/is_member_pointer.hpp"
+#include "boost/type_traits/is_nothrow_move_assignable.hpp"
+#include "boost/type_traits/is_nothrow_move_constructible.hpp"
 #include "boost/type_traits/is_object.hpp"
 #include "boost/type_traits/is_pod.hpp"
 #include "boost/type_traits/is_polymorphic.hpp"
@@ -93,7 +99,3 @@
 #include "boost/type_traits/ice.hpp"
 
 #endif // BOOST_TYPE_TRAITS_HPP
-
-
-
-

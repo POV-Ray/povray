@@ -9,6 +9,8 @@
 //  config for libstdc++ v3
 //  not much to go in here:
 
+#define BOOST_GNU_STDLIB 1
+
 #ifdef __GLIBCXX__
 #define BOOST_STDLIB "GNU libstdc++ version " BOOST_STRINGIZE(__GLIBCXX__)
 #else
@@ -31,7 +33,10 @@
 
 #ifdef __GLIBCXX__ // gcc 3.4 and greater:
 #  if defined(_GLIBCXX_HAVE_GTHR_DEFAULT) \
-        || defined(_GLIBCXX__PTHREADS)
+        || defined(_GLIBCXX__PTHREADS) \
+        || defined(_GLIBCXX_HAS_GTHREADS) \
+        || defined(_WIN32) \
+        || defined(_AIX)
       //
       // If the std lib has thread support turned on, then turn it on in Boost
       // as well.  We do this because some gcc-3.4 std lib headers define _REENTANT
@@ -54,13 +59,22 @@
 #  define BOOST_HAS_THREADS
 #endif
 
-
 #if !defined(_GLIBCPP_USE_LONG_LONG) \
     && !defined(_GLIBCXX_USE_LONG_LONG)\
     && defined(BOOST_HAS_LONG_LONG)
 // May have been set by compiler/*.hpp, but "long long" without library
 // support is useless.
 #  undef BOOST_HAS_LONG_LONG
+#endif
+
+// Apple doesn't seem to reliably defined a *unix* macro
+#if !defined(CYGWIN) && (  defined(__unix__)  \
+                        || defined(__unix)    \
+                        || defined(unix)      \
+                        || defined(__APPLE__) \
+                        || defined(__APPLE)   \
+                        || defined(APPLE))
+#  include <unistd.h>
 #endif
 
 #if defined(__GLIBCXX__) || (defined(__GLIBCPP__) && __GLIBCPP__>=20020514) // GCC >= 3.1.0
@@ -92,43 +106,73 @@
 //  C++0x headers in GCC 4.3.0 and later
 //
 #if __GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 3) || !defined(__GXX_EXPERIMENTAL_CXX0X__)
-#  define BOOST_NO_0X_HDR_ARRAY
-#  define BOOST_NO_0X_HDR_RANDOM
-#  define BOOST_NO_0X_HDR_REGEX
-#  define BOOST_NO_0X_HDR_TUPLE
-#  define BOOST_NO_0X_HDR_TYPE_TRAITS
-#  define BOOST_NO_STD_UNORDERED  // deprecated; see following
-#  define BOOST_NO_0X_HDR_UNORDERED_MAP
-#  define BOOST_NO_0X_HDR_UNORDERED_SET
+#  define BOOST_NO_CXX11_HDR_ARRAY
+#  define BOOST_NO_CXX11_HDR_TUPLE
+#  define BOOST_NO_CXX11_HDR_UNORDERED_MAP
+#  define BOOST_NO_CXX11_HDR_UNORDERED_SET
+#  define BOOST_NO_CXX11_HDR_FUNCTIONAL
 #endif
 
 //  C++0x headers in GCC 4.4.0 and later
 //
 #if __GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 4) || !defined(__GXX_EXPERIMENTAL_CXX0X__)
-#  define BOOST_NO_0X_HDR_CHRONO
-#  define BOOST_NO_0X_HDR_CONDITION_VARIABLE
-#  define BOOST_NO_0X_HDR_FORWARD_LIST
-#  define BOOST_NO_0X_HDR_INITIALIZER_LIST
-#  define BOOST_NO_0X_HDR_MUTEX
-#  define BOOST_NO_0X_HDR_RATIO
-#  define BOOST_NO_0X_HDR_SYSTEM_ERROR
-#  define BOOST_NO_0X_HDR_THREAD
+#  define BOOST_NO_CXX11_HDR_CONDITION_VARIABLE
+#  define BOOST_NO_CXX11_HDR_FORWARD_LIST
+#  define BOOST_NO_CXX11_HDR_INITIALIZER_LIST
+#  define BOOST_NO_CXX11_HDR_MUTEX
+#  define BOOST_NO_CXX11_HDR_RATIO
+#  define BOOST_NO_CXX11_HDR_SYSTEM_ERROR
+#  define BOOST_NO_CXX11_SMART_PTR
+#else
+#  define BOOST_HAS_TR1_COMPLEX_INVERSE_TRIG 
+#  define BOOST_HAS_TR1_COMPLEX_OVERLOADS 
+#endif
+
+#if (!defined(_GLIBCXX_HAS_GTHREADS) || !defined(_GLIBCXX_USE_C99_STDINT_TR1)) && (!defined(BOOST_NO_CXX11_HDR_CONDITION_VARIABLE) || !defined(BOOST_NO_CXX11_HDR_MUTEX))
+#  define BOOST_NO_CXX11_HDR_CONDITION_VARIABLE
+#  define BOOST_NO_CXX11_HDR_MUTEX
 #endif
 
 //  C++0x features in GCC 4.5.0 and later
 //
 #if __GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 5) || !defined(__GXX_EXPERIMENTAL_CXX0X__)
-#  define BOOST_NO_NUMERIC_LIMITS_LOWEST
+#  define BOOST_NO_CXX11_NUMERIC_LIMITS
+#  define BOOST_NO_CXX11_HDR_FUTURE
+#  define BOOST_NO_CXX11_HDR_RANDOM
 #endif
 
-//  C++0x headers not yet implemented
+//  C++0x features in GCC 4.6.0 and later
 //
-#  define BOOST_NO_0X_HDR_CODECVT
-#  define BOOST_NO_0X_HDR_CONCEPTS
-#  define BOOST_NO_0X_HDR_CONTAINER_CONCEPTS
-#  define BOOST_NO_0X_HDR_FUTURE
-#  define BOOST_NO_0X_HDR_ITERATOR_CONCEPTS
-#  define BOOST_NO_0X_HDR_MEMORY_CONCEPTS
-#  define BOOST_NO_0X_HDR_TYPEINDEX
+#if __GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 6) || !defined(__GXX_EXPERIMENTAL_CXX0X__)
+#  define BOOST_NO_CXX11_HDR_TYPEINDEX
+#  define BOOST_NO_CXX11_ADDRESSOF
+#endif
+
+//  C++0x features in GCC 4.7.0 and later
+//
+#if __GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 7) || !defined(__GXX_EXPERIMENTAL_CXX0X__)
+// Note that although <chrono> existed prior to 4.7, "steady_clock" is spelled "monotonic_clock"
+// so 4.7.0 is the first truely conforming one.
+#  define BOOST_NO_CXX11_HDR_CHRONO
+#  define BOOST_NO_CXX11_ALLOCATOR
+#endif
+//  C++0x features in GCC 4.7.0 and later
+//
+#if __GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 8) || !defined(__GXX_EXPERIMENTAL_CXX0X__)
+// Note that although <atomic> existed prior to gcc 4.8 it was largely unimplemented for many types:
+#  define BOOST_NO_CXX11_HDR_ATOMIC
+#endif
+#if __GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 9) || !defined(__GXX_EXPERIMENTAL_CXX0X__)
+// Although <regex> is present and compilable against, the actual implementation is not functional
+// even for the simplest patterns such as "\d" or "[0-9]". This is the case at least in gcc up to 4.8, inclusively.
+#  define BOOST_NO_CXX11_HDR_REGEX
+#endif
+//  C++0x headers not yet (fully!) implemented
+//
+#  define BOOST_NO_CXX11_HDR_THREAD
+#  define BOOST_NO_CXX11_HDR_TYPE_TRAITS
+#  define BOOST_NO_CXX11_HDR_CODECVT
+#  define BOOST_NO_CXX11_ATOMIC_SMART_PTR
+#  define BOOST_NO_CXX11_STD_ALIGN
 
 //  --- end ---

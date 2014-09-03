@@ -8,6 +8,8 @@
 //  See http://www.boost.org/libs/utility/operators.htm for documentation.
 
 //  Revision History
+//  16 Dec 10 Limit warning suppression for 4284 to older versions of VC++
+//            (Matthew Bradbury, fixes #4432)
 //  07 Aug 08 Added "euclidean" spelling. (Daniel Frey)
 //  03 Apr 08 Make sure "convertible to bool" is sufficient
 //            for T::operator<, etc. (Daniel Frey)
@@ -88,21 +90,14 @@
 #   pragma set woff 1234
 #endif
 
-#if defined(BOOST_MSVC)
+#if BOOST_WORKAROUND(BOOST_MSVC, < 1600)
 #   pragma warning( disable : 4284 ) // complaint about return type of 
 #endif                               // operator-> not begin a UDT
 
 namespace boost {
 namespace detail {
 
-template <typename T> class empty_base {
-
-// Helmut Zeisel, empty base class optimization bug with GCC 3.0.0
-#if defined(__GNUC__) && __GNUC__==3 && __GNUC_MINOR__==0 && __GNU_PATCHLEVEL__==0
-  bool dummy; 
-#endif
-
-};
+template <typename T> class empty_base {};
 
 } // namespace detail
 } // namespace boost
@@ -709,7 +704,6 @@ struct random_access_iteratable
 // the xxxx, xxxx1, and xxxx2 templates, importing them into boost:: as
 // necessary.
 //
-#ifndef BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION
 
 // is_chained_base<> - a traits class used to distinguish whether an operator
 // template argument is being used for base class chaining, or is specifying a
@@ -807,24 +801,6 @@ BOOST_OPERATOR_TEMPLATE2(template_name##2)                         \
 BOOST_OPERATOR_TEMPLATE1(template_name##1)
 
 
-#else // BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION
-
-#  define BOOST_OPERATOR_TEMPLATE4(template_name4) \
-        BOOST_IMPORT_TEMPLATE4(template_name4)
-#  define BOOST_OPERATOR_TEMPLATE3(template_name3) \
-        BOOST_IMPORT_TEMPLATE3(template_name3)
-#  define BOOST_OPERATOR_TEMPLATE2(template_name2) \
-        BOOST_IMPORT_TEMPLATE2(template_name2)
-#  define BOOST_OPERATOR_TEMPLATE1(template_name1) \
-        BOOST_IMPORT_TEMPLATE1(template_name1)
-
-   // In this case we can only assume that template_name<> is equivalent to the
-   // more commonly needed template_name1<> form.
-#  define BOOST_OPERATOR_TEMPLATE(template_name)                   \
-   template <class T, class B = ::boost::detail::empty_base<T> >   \
-   struct template_name : template_name##1<T, B> {};
-
-#endif // BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION
 
 namespace boost {
     
@@ -895,14 +871,10 @@ struct operators2
     , bitwise2<T,U
       > > > {};
 
-#ifndef BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION
 template <class T, class U = T>
 struct operators : operators2<T, U> {};
 
 template <class T> struct operators<T, T>
-#else
-template <class T> struct operators
-#endif
     : totally_ordered<T
     , integer_arithmetic<T
     , bitwise<T
