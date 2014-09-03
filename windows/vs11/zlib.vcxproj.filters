@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source">
+      <UniqueIdentifier>{17f1b752-5736-4a40-ba6d-adc2140ed7f3}</UniqueIdentifier>
+      <Extensions>*.c</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\libraries\zlib\adler32.c">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libraries\zlib\compress.c">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libraries\zlib\crc32.c">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libraries\zlib\deflate.c">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libraries\zlib\inffast.c">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libraries\zlib\inflate.c">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libraries\zlib\inftrees.c">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libraries\zlib\trees.c">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libraries\zlib\uncompr.c">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libraries\zlib\zutil.c">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libraries\zlib\gzclose.c">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libraries\zlib\gzlib.c">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libraries\zlib\gzread.c">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libraries\zlib\gzwrite.c">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libraries\zlib\infback.c">
+      <Filter>Source</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

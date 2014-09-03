@@ -1,0 +1,95 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Frontend source">
+      <UniqueIdentifier>{0c69e0ec-801c-46f2-9743-e5449ef0a9c3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Frontend Headers">
+      <UniqueIdentifier>{58640af2-49b2-4046-bebc-2352377ade12}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\source\frontend\animationprocessing.cpp">
+      <Filter>Frontend source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\frontend\console.cpp">
+      <Filter>Frontend source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\frontend\defaultplatformbase.cpp">
+      <Filter>Frontend source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\frontend\display.cpp">
+      <Filter>Frontend source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\frontend\filemessagehandler.cpp">
+      <Filter>Frontend source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\frontend\imagemessagehandler.cpp">
+      <Filter>Frontend source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\frontend\imageprocessing.cpp">
+      <Filter>Frontend source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\frontend\parsermessagehandler.cpp">
+      <Filter>Frontend source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\frontend\processrenderoptions.cpp">
+      <Filter>Frontend source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\frontend\renderfrontend.cpp">
+      <Filter>Frontend source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\frontend\rendermessagehandler.cpp">
+      <Filter>Frontend source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\frontend\shelloutprocessing.cpp">
+      <Filter>Frontend source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\precomp.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\source\frontend\animationprocessing.h">
+      <Filter>Frontend Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\frontend\configfrontend.h">
+      <Filter>Frontend Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\frontend\console.h">
+      <Filter>Frontend Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\frontend\defaultplatformbase.h">
+      <Filter>Frontend Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\frontend\display.h">
+      <Filter>Frontend Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\frontend\filemessagehandler.h">
+      <Filter>Frontend Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\frontend\imagemessagehandler.h">
+      <Filter>Frontend Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\frontend\imageprocessing.h">
+      <Filter>Frontend Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\frontend\parsermessagehandler.h">
+      <Filter>Frontend Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\frontend\processrenderoptions.h">
+      <Filter>Frontend Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\frontend\renderfrontend.h">
+      <Filter>Frontend Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\frontend\rendermessagehandler.h">
+      <Filter>Frontend Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\frontend\shelloutprocessing.h">
+      <Filter>Frontend Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\frontend\simplefrontend.h">
+      <Filter>Frontend Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\precomp.h" />
+  </ItemGroup>
+</Project>

@@ -5,7 +5,7 @@ namespace vfePlatform
   // hence it is not provided with the AGPL POV-Ray source distribution. if you are getting
   // a compile error in this file you are compiling with POV_RAY_IS_OFFICIAL set to 1 (which
   // should never be the case for any build other than internal ones made by the POV team).
-  #include "../../../legacy-license/misc/cpuinfo.cpp"
+  #include "../../../official/windows/cpuinfo.cpp"
 #else
   // GetCPUCount should provide the total available logical CPU's, total available CPU cores, and
   // total physical CPU's in the system. if this information is not available or is not accurate, it
