@@ -2,7 +2,7 @@
 #define BOOST_ARCHIVE_BINARY_IPRIMITIVE_HPP
 
 // MS compatible compilers support #pragma once
-#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+#if defined(_MSC_VER)
 # pragma once
 #endif
 
@@ -28,7 +28,7 @@
 //  See http://www.boost.org for updates, documentation, and revision history.
 
 #include <iosfwd>
-#include <cassert>
+#include <boost/assert.hpp>
 #include <locale>
 #include <cstring> // std::memcpy
 #include <cstddef> // std::size_t
@@ -95,7 +95,7 @@ public:
     void load(bool & t){
         load_binary(& t, sizeof(t));
         int i = t;
-        assert(0 == i || 1 == i);
+        BOOST_ASSERT(0 == i || 1 == i);
         (void)i; // warning suppression for release builds.
     }
     BOOST_ARCHIVE_OR_WARCHIVE_DECL(void)
@@ -126,7 +126,7 @@ public:
         template <class T>  
         #if defined(BOOST_NO_DEPENDENT_NESTED_DERIVATIONS)  
             struct apply {  
-                typedef BOOST_DEDUCED_TYPENAME boost::serialization::is_bitwise_serializable< T >::type type;  
+                typedef typename boost::serialization::is_bitwise_serializable< T >::type type;  
             };
         #else
             struct apply : public boost::serialization::is_bitwise_serializable< T > {};  
@@ -151,7 +151,7 @@ basic_binary_iprimitive<Archive, Elem, Tr>::load_binary(
     std::size_t count
 ){
     // note: an optimizer should eliminate the following for char files
-    assert(
+    BOOST_ASSERT(
         static_cast<std::streamsize>(count / sizeof(Elem)) 
         <= boost::integer_traits<std::streamsize>::const_max
     );
@@ -165,7 +165,7 @@ basic_binary_iprimitive<Archive, Elem, Tr>::load_binary(
             archive_exception(archive_exception::input_stream_error)
         );
     // note: an optimizer should eliminate the following for char files
-    assert(count % sizeof(Elem) <= boost::integer_traits<std::streamsize>::const_max);
+    BOOST_ASSERT(count % sizeof(Elem) <= boost::integer_traits<std::streamsize>::const_max);
     s = static_cast<std::streamsize>(count % sizeof(Elem));
     if(0 < s){
 //        if(is.fail())
@@ -178,7 +178,7 @@ basic_binary_iprimitive<Archive, Elem, Tr>::load_binary(
             boost::serialization::throw_exception(
                 archive_exception(archive_exception::input_stream_error)
             );
-        std::memcpy(static_cast<char*>(address) + (count - s), &t, s);
+        std::memcpy(static_cast<char*>(address) + (count - s), &t, static_cast<std::size_t>(s));
     }
 }
 

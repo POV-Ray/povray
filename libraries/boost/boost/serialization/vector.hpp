@@ -2,7 +2,7 @@
 #define BOOST_SERIALIZATION_VECTOR_HPP
 
 // MS compatible compilers support #pragma once
-#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+#if defined(_MSC_VER)
 # pragma once
 #endif
 
@@ -33,6 +33,14 @@
 // default is being compatible with version 1.34.1 files, not 1.35 files
 #ifndef BOOST_SERIALIZATION_VECTOR_VERSIONED
 #define BOOST_SERIALIZATION_VECTOR_VERSIONED(V) (V==4 || V==5)
+#endif
+
+// function specializations must be defined in the appropriate
+// namespace - boost::serialization
+#if defined(__SGI_STL_PORT) || defined(_STLPORT_VERSION)
+#define STD _STLP_STD
+#else
+#define STD std
 #endif
 
 namespace boost { 
@@ -113,9 +121,9 @@ inline void save(
     const std::vector<U, Allocator> &t,
     const unsigned int file_version
 ){
-    typedef BOOST_DEDUCED_TYPENAME 
+    typedef typename 
     boost::serialization::use_array_optimization<Archive>::template apply<
-        BOOST_DEDUCED_TYPENAME remove_const<U>::type 
+        typename remove_const<U>::type 
     >::type use_optimized;
     save(ar,t,file_version, use_optimized());
 }
@@ -133,9 +141,9 @@ inline void load(
       return;
     }
 #endif
-    typedef BOOST_DEDUCED_TYPENAME 
+    typedef typename 
     boost::serialization::use_array_optimization<Archive>::template apply<
-        BOOST_DEDUCED_TYPENAME remove_const<U>::type 
+        typename remove_const<U>::type 
     >::type use_optimized;
     load(ar,t,file_version, use_optimized());
 }
@@ -150,8 +158,6 @@ inline void serialize(
 ){
     boost::serialization::split_free(ar, t, file_version);
 }
-
-#if ! BOOST_WORKAROUND(BOOST_MSVC, <= 1300)
 
 /////////1/////////2/////////3/////////4/////////5/////////6/////////7/////////8
 // vector<bool>
@@ -199,13 +205,12 @@ inline void serialize(
     boost::serialization::split_free(ar, t, file_version);
 }
 
-#endif // BOOST_WORKAROUND
-
 } // serialization
 } // namespace boost
 
 #include <boost/serialization/collection_traits.hpp>
 
 BOOST_SERIALIZATION_COLLECTION_TRAITS(std::vector)
+#undef STD
 
 #endif // BOOST_SERIALIZATION_VECTOR_HPP

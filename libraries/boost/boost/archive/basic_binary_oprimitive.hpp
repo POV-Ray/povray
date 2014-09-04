@@ -2,7 +2,7 @@
 #define BOOST_ARCHIVE_BASIC_BINARY_OPRIMITIVE_HPP
 
 // MS compatible compilers support #pragma once
-#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+#if defined(_MSC_VER)
 # pragma once
 #endif
 
@@ -24,7 +24,7 @@
 // ON PLATFORM APART FROM THE ONE THEY ARE CREATE ON
 
 #include <iosfwd>
-#include <cassert>
+#include <boost/assert.hpp>
 #include <locale>
 #include <streambuf> // basic_streambuf
 #include <string>
@@ -58,8 +58,7 @@ namespace archive {
 // class basic_binary_oprimitive - binary output of prmitives
 
 template<class Archive, class Elem, class Tr>
-class basic_binary_oprimitive
-{
+class basic_binary_oprimitive {
 #ifndef BOOST_NO_MEMBER_TEMPLATE_FRIENDS
     friend class save_access;
 protected:
@@ -88,7 +87,7 @@ public:
     // trap usage of invalid uninitialized boolean which would
     // otherwise crash on load.
     void save(const bool t){
-        assert(0 == static_cast<int>(t) || 1 == static_cast<int>(t));
+        BOOST_ASSERT(0 == static_cast<int>(t) || 1 == static_cast<int>(t));
         save_binary(& t, sizeof(t));
     }
     BOOST_ARCHIVE_OR_WARCHIVE_DECL(void)
@@ -122,7 +121,7 @@ public:
         template <class T>  
         #if defined(BOOST_NO_DEPENDENT_NESTED_DERIVATIONS)  
             struct apply {  
-                typedef BOOST_DEDUCED_TYPENAME boost::serialization::is_bitwise_serializable< T >::type type;  
+                typedef typename boost::serialization::is_bitwise_serializable< T >::type type;  
             };
         #else
             struct apply : public boost::serialization::is_bitwise_serializable< T > {};  
@@ -146,7 +145,7 @@ basic_binary_oprimitive<Archive, Elem, Tr>::save_binary(
     const void *address, 
     std::size_t count
 ){
-    //assert(
+    //BOOST_ASSERT(
     //    static_cast<std::size_t>((std::numeric_limits<std::streamsize>::max)()) >= count
     //);
     // note: if the following assertions fail
@@ -160,7 +159,7 @@ basic_binary_oprimitive<Archive, Elem, Tr>::save_binary(
     // figure number of elements to output - round up
     count = ( count + sizeof(Elem) - 1) 
         / sizeof(Elem);
-    assert(count <= std::size_t(boost::integer_traits<std::streamsize>::const_max));
+    BOOST_ASSERT(count <= std::size_t(boost::integer_traits<std::streamsize>::const_max));
     std::streamsize scount = m_sb.sputn(
         static_cast<const Elem *>(address), 
         static_cast<std::streamsize>(count)
@@ -170,10 +169,10 @@ basic_binary_oprimitive<Archive, Elem, Tr>::save_binary(
             archive_exception(archive_exception::output_stream_error)
         );
     //os.write(
-    //    static_cast<const BOOST_DEDUCED_TYPENAME OStream::char_type *>(address), 
+    //    static_cast<const typename OStream::char_type *>(address), 
     //    count
     //);
-    //assert(os.good());
+    //BOOST_ASSERT(os.good());
 }
 
 } //namespace boost 

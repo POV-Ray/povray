@@ -5,6 +5,12 @@
 //  1.0. (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 //
+// Acknowledgements:
+// aschoedl contributed an improvement to the determination
+// of the Reference type parameter.
+//
+// Leonid Gershanovich reported Trac ticket 7376 about the dereference operator
+// requiring identical reference types due to using the ternary if.
 //
 // For more information, see http://www.boost.org/libs/range/
 //
@@ -20,7 +26,11 @@
 #include <boost/range/empty.hpp>
 #include <boost/range/detail/demote_iterator_traversal_tag.hpp>
 #include <boost/range/value_type.hpp>
-#include <boost/utility.hpp>
+#include <boost/type_traits/add_const.hpp>
+#include <boost/type_traits/add_reference.hpp>
+#include <boost/type_traits/remove_const.hpp>
+#include <boost/type_traits/remove_reference.hpp>
+#include <boost/next_prior.hpp>
 
 namespace boost
 {
@@ -68,7 +78,9 @@ public:
 
     Reference dereference(unsigned int selected) const
     {
-        return selected ? *m_it2 : *m_it1;
+        if (selected)
+            return *m_it2;
+        return *m_it1;
     }
 
     bool equal(const join_iterator_union& other, unsigned int selected) const
@@ -108,7 +120,8 @@ public:
         return *m_it;
     }
 
-    bool equal(const join_iterator_union& other, unsigned int selected) const
+    bool equal(const join_iterator_union& other,
+               unsigned int /*selected*/) const
     {
         return m_it == other.m_it;
     }
@@ -120,7 +133,32 @@ private:
 template<typename Iterator1
        , typename Iterator2
        , typename ValueType = typename iterator_value<Iterator1>::type
-       , typename Reference = typename iterator_reference<Iterator1>::type
+       // find least demanding, commonly supported reference type, in the order &, const&, and by-value:
+       , typename Reference = typename mpl::if_c<
+                !is_reference<typename iterator_reference<Iterator1>::type>::value
+             || !is_reference<typename iterator_reference<Iterator2>::type>::value,
+                        typename remove_const<
+                            typename remove_reference<
+                                typename iterator_reference<Iterator1>::type
+                            >::type
+                        >::type,
+                        typename mpl::if_c<
+                            is_const<
+                                typename remove_reference<
+                                    typename iterator_reference<Iterator1>::type
+                                >::type
+                            >::value
+                            || is_const<
+                                typename remove_reference<
+                                    typename iterator_reference<Iterator2>::type
+                                >::type
+                            >::value,
+                            typename add_const<
+                                typename iterator_reference<Iterator1>::type
+                            >::type,
+                            typename iterator_reference<Iterator1>::type
+                        >::type
+                    >::type
        , typename Traversal = typename demote_iterator_traversal_tag<
                                   typename iterator_traversal<Iterator1>::type
                                 , typename iterator_traversal<Iterator2>::type>::type

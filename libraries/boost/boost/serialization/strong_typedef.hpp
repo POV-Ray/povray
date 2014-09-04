@@ -2,7 +2,7 @@
 #define BOOST_SERIALIZATION_STRONG_TYPEDEF_HPP
 
 // MS compatible compilers support #pragma once
-#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+#if defined(_MSC_VER)
 # pragma once
 #endif
 
@@ -34,7 +34,7 @@
     {                                                               \
         T t;                                                        \
         explicit D(const T t_) : t(t_) {};                          \
-        D(){};                                                      \
+        D(): t() {};                                                \
         D(const D & t_) : t(t_.t){}                                 \
         D & operator=(const D & rhs) { t = rhs.t; return *this;}    \
         D & operator=(const T & rhs) { t = rhs; return *this;}      \
@@ -52,7 +52,7 @@
     {                                                               \
         T t;                                                        \
         explicit D(const T t_) : t(t_) {};                          \
-        D(){};                                                      \
+        D() : t(){};                                                \
         D(const D & t_) : t(t_.t){}                                 \
         D & operator=(const D & rhs) { t = rhs.t; return *this;}    \
         D & operator=(const T & rhs) { t = rhs; return *this;}      \
