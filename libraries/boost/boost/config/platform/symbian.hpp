@@ -18,11 +18,8 @@
 // Open C / C++ plugin was introdused in this SDK, earlier versions don't have CRT / STL
 #  define BOOST_S60_3rd_EDITION_FP2_OR_LATER_SDK
 // make sure we have __GLIBC_PREREQ if available at all
-#ifdef __cplusplus
-#include <cstdlib>
-#else
-#include <stdlib.h>
-#endif// boilerplate code:
+#  include <cstdlib>
+// boilerplate code:
 #  define BOOST_HAS_UNISTD_H
 #  include <boost/config/posix_features.hpp>
 // S60 SDK defines _POSIX_VERSION as POSIX.1

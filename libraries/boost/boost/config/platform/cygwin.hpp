@@ -39,9 +39,6 @@
 #define BOOST_HAS_STDINT_H
 #endif
 
-/// Cygwin has no fenv.h
-#define BOOST_NO_FENV_H
-
 // boilerplate code:
 #include <boost/config/posix_features.hpp>
 

@@ -14,7 +14,7 @@
 #include <boost/config.hpp>
 
 #ifdef BOOST_NO_LIMITS
-#  error "There is no std::numeric_limits suppport available."
+# include <boost/detail/limits.hpp>
 #else
 # include <limits>
 #endif

@@ -81,7 +81,7 @@ void instantiate_ptr_serialization(Serializable*, int, adl_tag ) {}
 namespace boost { namespace archive { namespace detail {                \
                                                                         \
 template <class Serializable>                                           \
-typename _ptr_serialization_support<Archive, Serializable>::type  \
+BOOST_DEDUCED_TYPENAME _ptr_serialization_support<Archive, Serializable>::type  \
 instantiate_ptr_serialization( Serializable*, Archive*, adl_tag );              \
                                                                         \
 }}}

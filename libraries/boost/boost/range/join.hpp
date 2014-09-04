@@ -36,9 +36,6 @@ public:
 
     } // namespace range_detail
 
-namespace range
-{
-
 template<class SinglePassRange1, class SinglePassRange2>
 class joined_range
     : public range_detail::joined_type<SinglePassRange1, SinglePassRange2>::type
@@ -80,11 +77,6 @@ join(SinglePassRange1& r1, SinglePassRange2& r2)
 
     return joined_range<SinglePassRange1, SinglePassRange2>(r1, r2);
 }
-
-} // namespace range
-
-using ::boost::range::joined_range;
-using ::boost::range::join;
 
 } // namespace boost
 

@@ -23,7 +23,6 @@
 #include <boost/range/iterator.hpp>
 #include <boost/range/value_type.hpp>
 #include <boost/range/detail/misc_concept.hpp>
-#include <boost/type_traits/remove_reference.hpp>
 
 /*!
  * \file
@@ -64,7 +63,6 @@ namespace boost {
 #ifndef BOOST_RANGE_ENABLE_CONCEPT_ASSERT
 
 // List broken compiler versions here:
-#ifndef __clang__
     #ifdef __GNUC__
         // GNUC 4.2 has strange issues correctly detecting compliance with the Concepts
         // hence the least disruptive approach is to turn-off the concept checking for
@@ -73,14 +71,6 @@ namespace boost {
             #define BOOST_RANGE_ENABLE_CONCEPT_ASSERT 0
         #endif
     #endif
-
-    #ifdef __GCCXML__
-        // GCC XML, unsurprisingly, has the same issues
-        #if __GCCXML_GNUC__ == 4 && __GCCXML_GNUC_MINOR__ == 2
-            #define BOOST_RANGE_ENABLE_CONCEPT_ASSERT 0
-        #endif
-    #endif
-#endif
 
     #ifdef __BORLANDC__
         #define BOOST_RANGE_ENABLE_CONCEPT_ASSERT 0
@@ -108,9 +98,8 @@ namespace boost {
         // classes:
         //
         // The Range algorithms often do not require that the iterators are
-        // Assignable or default constructable, but the correct standard
-        // conformant iterators do require the iterators to be a model of the
-        // Assignable concept.
+        // Assignable, but the correct standard conformant iterators
+        // do require the iterators to be a model of the Assignable concept.
         // Iterators that contains a functor that is not assignable therefore
         // are not correct models of the standard iterator concepts,
         // despite being adequate for most algorithms. An example of this
@@ -152,26 +141,6 @@ namespace boost {
                     BOOST_DEDUCED_TYPENAME SinglePassIteratorConcept::traversal_category,
                     single_pass_traversal_tag
                 >));
-
-            BOOST_CONCEPT_USAGE(SinglePassIteratorConcept)
-            {
-                Iterator i2(++i);
-                boost::ignore_unused_variable_warning(i2);
-
-                // deliberately we are loose with the postfix version for the single pass
-                // iterator due to the commonly poor adherence to the specification means that
-                // many algorithms would be unusable, whereas actually without the check they
-                // work
-                (void)(i++);
-
-                BOOST_DEDUCED_TYPENAME boost::detail::iterator_traits<Iterator>::reference r1(*i);
-                boost::ignore_unused_variable_warning(r1);
-
-                BOOST_DEDUCED_TYPENAME boost::detail::iterator_traits<Iterator>::reference r2(*(++i));
-                boost::ignore_unused_variable_warning(r2);
-            }
-        private:
-            Iterator i;
 #endif
         };
 
@@ -191,20 +160,6 @@ namespace boost {
                     BOOST_DEDUCED_TYPENAME ForwardIteratorConcept::traversal_category,
                     forward_traversal_tag
                 >));
-
-            BOOST_CONCEPT_USAGE(ForwardIteratorConcept)
-            {
-                // See the above note in the SinglePassIteratorConcept about the handling of the
-                // postfix increment. Since with forward and better iterators there is no need
-                // for a proxy, we can sensibly require that the dereference result
-                // is convertible to reference.
-                Iterator i2(i++);
-                boost::ignore_unused_variable_warning(i2);
-                BOOST_DEDUCED_TYPENAME boost::detail::iterator_traits<Iterator>::reference r(*(i++));
-                boost::ignore_unused_variable_warning(r);
-            }
-        private:
-            Iterator i;
 #endif
          };
 
@@ -263,51 +218,41 @@ namespace boost {
     struct SinglePassRangeConcept
     {
 #if BOOST_RANGE_ENABLE_CONCEPT_ASSERT
-        // A few compilers don't like the rvalue reference T types so just
-        // remove it.
-        typedef BOOST_DEDUCED_TYPENAME remove_reference<T>::type Rng;
+         typedef BOOST_DEDUCED_TYPENAME range_iterator<T const>::type  const_iterator;
+         typedef BOOST_DEDUCED_TYPENAME range_iterator<T>::type        iterator;
 
-        typedef BOOST_DEDUCED_TYPENAME range_iterator<
-            Rng const
-        >::type const_iterator;
+         BOOST_RANGE_CONCEPT_ASSERT((range_detail::SinglePassIteratorConcept<iterator>));
+         BOOST_RANGE_CONCEPT_ASSERT((range_detail::SinglePassIteratorConcept<const_iterator>));
 
-        typedef BOOST_DEDUCED_TYPENAME range_iterator<Rng>::type iterator;
-
-        BOOST_RANGE_CONCEPT_ASSERT((
-                range_detail::SinglePassIteratorConcept<iterator>));
-
-        BOOST_RANGE_CONCEPT_ASSERT((
-                range_detail::SinglePassIteratorConcept<const_iterator>));
-
-        BOOST_CONCEPT_USAGE(SinglePassRangeConcept)
-        {
+         BOOST_CONCEPT_USAGE(SinglePassRangeConcept)
+         {
             // This has been modified from assigning to this->i
             // (where i was a member variable) to improve
             // compatibility with Boost.Lambda
             iterator i1 = boost::begin(*m_range);
             iterator i2 = boost::end(*m_range);
 
-            boost::ignore_unused_variable_warning(i1);
-            boost::ignore_unused_variable_warning(i2);
+            ignore_unused_variable_warning(i1);
+            ignore_unused_variable_warning(i2);
 
             const_constraints(*m_range);
         }
 
     private:
-        void const_constraints(const Rng& const_range)
+        void const_constraints(const T& const_range)
         {
             const_iterator ci1 = boost::begin(const_range);
             const_iterator ci2 = boost::end(const_range);
 
-            boost::ignore_unused_variable_warning(ci1);
-            boost::ignore_unused_variable_warning(ci2);
+            ignore_unused_variable_warning(ci1);
+            ignore_unused_variable_warning(ci2);
         }
 
        // Rationale:
        // The type of m_range is T* rather than T because it allows
        // T to be an abstract class. The other obvious alternative of
        // T& produces a warning on some compilers.
-       Rng* m_range;
+       T* m_range;
 #endif
     };
 
@@ -321,11 +266,11 @@ namespace boost {
 #endif
     };
 
-    template<class T>
+    template<class Range>
     struct WriteableRangeConcept
     {
 #if BOOST_RANGE_ENABLE_CONCEPT_ASSERT
-        typedef BOOST_DEDUCED_TYPENAME range_iterator<T>::type iterator;
+        typedef BOOST_DEDUCED_TYPENAME range_iterator<Range>::type iterator;
 
         BOOST_CONCEPT_USAGE(WriteableRangeConcept)
         {
@@ -333,7 +278,7 @@ namespace boost {
         }
     private:
         iterator i;
-        BOOST_DEDUCED_TYPENAME range_value<T>::type v;
+        BOOST_DEDUCED_TYPENAME range_value<Range>::type v;
 #endif
     };
 
@@ -350,8 +295,8 @@ namespace boost {
     struct BidirectionalRangeConcept : ForwardRangeConcept<T>
     {
 #if BOOST_RANGE_ENABLE_CONCEPT_ASSERT
-        BOOST_RANGE_CONCEPT_ASSERT((range_detail::BidirectionalIteratorConcept<BOOST_DEDUCED_TYPENAME BidirectionalRangeConcept::iterator>));
-        BOOST_RANGE_CONCEPT_ASSERT((range_detail::BidirectionalIteratorConcept<BOOST_DEDUCED_TYPENAME BidirectionalRangeConcept::const_iterator>));
+        BOOST_RANGE_CONCEPT_ASSERT((BidirectionalIteratorConcept<BOOST_DEDUCED_TYPENAME BidirectionalRangeConcept::iterator>));
+        BOOST_RANGE_CONCEPT_ASSERT((BidirectionalIteratorConcept<BOOST_DEDUCED_TYPENAME BidirectionalRangeConcept::const_iterator>));
 #endif
     };
 
@@ -368,8 +313,8 @@ namespace boost {
     struct RandomAccessRangeConcept : BidirectionalRangeConcept<T>
     {
 #if BOOST_RANGE_ENABLE_CONCEPT_ASSERT
-        BOOST_RANGE_CONCEPT_ASSERT((range_detail::RandomAccessIteratorConcept<BOOST_DEDUCED_TYPENAME RandomAccessRangeConcept::iterator>));
-        BOOST_RANGE_CONCEPT_ASSERT((range_detail::RandomAccessIteratorConcept<BOOST_DEDUCED_TYPENAME RandomAccessRangeConcept::const_iterator>));
+        BOOST_RANGE_CONCEPT_ASSERT((RandomAccessIteratorConcept<BOOST_DEDUCED_TYPENAME RandomAccessRangeConcept::iterator>));
+        BOOST_RANGE_CONCEPT_ASSERT((RandomAccessIteratorConcept<BOOST_DEDUCED_TYPENAME RandomAccessRangeConcept::const_iterator>));
 #endif
     };
 

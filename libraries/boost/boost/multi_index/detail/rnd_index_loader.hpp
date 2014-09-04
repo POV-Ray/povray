@@ -1,4 +1,4 @@
-/* Copyright 2003-2013 Joaquin M Lopez Munoz.
+/* Copyright 2003-2008 Joaquin M Lopez Munoz.
  * Distributed under the Boost Software License, Version 1.0.
  * (See accompanying file LICENSE_1_0.txt or copy at
  * http://www.boost.org/LICENSE_1_0.txt)
@@ -9,7 +9,7 @@
 #ifndef BOOST_MULTI_INDEX_DETAIL_RND_INDEX_LOADER_HPP
 #define BOOST_MULTI_INDEX_DETAIL_RND_INDEX_LOADER_HPP
 
-#if defined(_MSC_VER)
+#if defined(_MSC_VER)&&(_MSC_VER>=1200)
 #pragma once
 #endif
 
@@ -17,6 +17,7 @@
 #include <algorithm>
 #include <boost/detail/allocator_utilities.hpp>
 #include <boost/multi_index/detail/auto_space.hpp>
+#include <boost/multi_index/detail/prevent_eti.hpp>
 #include <boost/multi_index/detail/rnd_index_ptr_array.hpp>
 #include <boost/noncopyable.hpp>
 #include <cstddef>
@@ -44,12 +45,15 @@ template<typename Allocator>
 class random_access_index_loader_base:private noncopyable
 {
 protected:
-  typedef random_access_index_node_impl<
-    typename boost::detail::allocator::rebind_to<
-      Allocator,
-      char
-    >::type
-  >                                                 node_impl_type;
+  typedef typename prevent_eti<
+    Allocator,
+    random_access_index_node_impl<
+      typename boost::detail::allocator::rebind_to<
+        Allocator,
+        char
+      >::type
+    >
+  >::type                                           node_impl_type;
   typedef typename node_impl_type::pointer          node_impl_pointer;
   typedef random_access_index_ptr_array<Allocator>  ptr_array;
 
@@ -82,14 +86,14 @@ protected:
     }
   }
 
-  void rearrange(node_impl_pointer position_,node_impl_pointer x)
+  void rearrange(node_impl_pointer position,node_impl_pointer x)
   {
     preprocess(); /* only incur this penalty if rearrange() is ever called */
-    if(position_==node_impl_pointer(0))position_=header;
+    if(position==node_impl_pointer(0))position=header;
     next(prev(x))=next(x);
     prev(next(x))=prev(x);
-    prev(x)=position_;
-    next(x)=next(position_);
+    prev(x)=position;
+    next(x)=next(position);
     next(prev(x))=prev(next(x))=x;
   }
 
@@ -157,10 +161,9 @@ public:
     super(al_,ptrs_)
   {}
 
-  void rearrange(Node* position_,Node *x)
+  void rearrange(Node* position,Node *x)
   {
-    super::rearrange(
-      position_?position_->impl():node_impl_pointer(0),x->impl());
+    super::rearrange(position?position->impl():node_impl_pointer(0),x->impl());
   }
 };
 

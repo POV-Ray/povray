@@ -20,17 +20,7 @@
 //  are available.
 //
 
-#ifndef BOOST_SP_NO_SYNC
-
-#if defined( __GCC_HAVE_SYNC_COMPARE_AND_SWAP_4 )
-
-# define BOOST_SP_HAS_SYNC
-
-#elif defined( __IBMCPP__ ) && ( __IBMCPP__ >= 1210 )
-
-# define BOOST_SP_HAS_SYNC
-
-#elif defined( __GNUC__ ) && ( __GNUC__ * 100 + __GNUC_MINOR__ >= 401 )
+#if defined(__GNUC__) && ( __GNUC__ * 100 + __GNUC_MINOR__ >= 401 )
 
 #define BOOST_SP_HAS_SYNC
 
@@ -46,24 +36,14 @@
 #undef BOOST_SP_HAS_SYNC
 #endif
 
-#if defined( __sh__ )
-#undef BOOST_SP_HAS_SYNC
-#endif
-
 #if defined( __sparc__ )
 #undef BOOST_SP_HAS_SYNC
 #endif
 
-#if defined( __INTEL_COMPILER ) && !defined( __ia64__ ) && ( __INTEL_COMPILER < 1110 )
+#if defined( __INTEL_COMPILER ) && !defined( __ia64__ ) && ( __INTEL_COMPILER < 1100 )
 #undef BOOST_SP_HAS_SYNC
 #endif
 
-#if defined(__PATHSCALE__) && ((__PATHCC__ == 4) && (__PATHCC_MINOR__ < 9)) 
-#undef BOOST_SP_HAS_SYNC
-#endif
-
-#endif
-
-#endif // #ifndef BOOST_SP_NO_SYNC
+#endif // __GNUC__ * 100 + __GNUC_MINOR__ >= 401
 
 #endif // #ifndef BOOST_SMART_PTR_DETAIL_SP_HAS_SYNC_HPP_INCLUDED

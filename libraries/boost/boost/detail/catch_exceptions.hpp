@@ -24,7 +24,11 @@
 #include <exception>          // for exception, bad_exception
 #include <stdexcept>          // for std exception hierarchy
 #include <boost/cstdlib.hpp>  // for exit codes
-#include <ostream>         // for ostream
+# if __GNUC__ != 2 || __GNUC_MINOR__ > 96
+#   include <ostream>         // for ostream
+# else
+#   include <iostream> // workaround GNU missing ostream header
+# endif
 
 # if defined(__BORLANDC__) && (__BORLANDC__ <= 0x0551)
 #   define BOOST_BUILT_IN_EXCEPTIONS_MISSING_WHAT 

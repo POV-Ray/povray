@@ -7,7 +7,7 @@
  *
  * See http://www.boost.org for most recent version including documentation.
  *
- * $Id$
+ * $Id: inversive_congruential.hpp 60755 2010-03-22 00:45:06Z steven_watanabe $
  *
  * Revision history
  *  2001-02-18  moved to individual header files
@@ -16,26 +16,20 @@
 #ifndef BOOST_RANDOM_INVERSIVE_CONGRUENTIAL_HPP
 #define BOOST_RANDOM_INVERSIVE_CONGRUENTIAL_HPP
 
-#include <iosfwd>
+#include <iostream>
+#include <cassert>
 #include <stdexcept>
-#include <boost/assert.hpp>
 #include <boost/config.hpp>
-#include <boost/cstdint.hpp>
-#include <boost/integer/static_log2.hpp>
+#include <boost/static_assert.hpp>
 #include <boost/random/detail/config.hpp>
 #include <boost/random/detail/const_mod.hpp>
-#include <boost/random/detail/seed.hpp>
-#include <boost/random/detail/operators.hpp>
-#include <boost/random/detail/seed_impl.hpp>
-
-#include <boost/random/detail/disable_warnings.hpp>
 
 namespace boost {
 namespace random {
 
 // Eichenauer and Lehn 1986
 /**
- * Instantiations of class template @c inversive_congruential_engine model a
+ * Instantiations of class template @c inversive_congruential model a
  * \pseudo_random_number_generator. It uses the inversive congruential
  * algorithm (ICG) described in
  *
@@ -63,185 +57,103 @@ namespace random {
  * not optimal for calculating the multiplicative inverse.
  * @endxmlnote
  */
-template<class IntType, IntType a, IntType b, IntType p>
-class inversive_congruential_engine
+template<class IntType, IntType a, IntType b, IntType p, IntType val>
+class inversive_congruential
 {
 public:
-    typedef IntType result_type;
-    BOOST_STATIC_CONSTANT(bool, has_fixed_range = false);
+  typedef IntType result_type;
+#ifndef BOOST_NO_INCLASS_MEMBER_INITIALIZATION
+  static const bool has_fixed_range = true;
+  static const result_type min_value = (b == 0 ? 1 : 0);
+  static const result_type max_value = p-1;
+#else
+  BOOST_STATIC_CONSTANT(bool, has_fixed_range = false);
+#endif
+  BOOST_STATIC_CONSTANT(result_type, multiplier = a);
+  BOOST_STATIC_CONSTANT(result_type, increment = b);
+  BOOST_STATIC_CONSTANT(result_type, modulus = p);
 
-    BOOST_STATIC_CONSTANT(result_type, multiplier = a);
-    BOOST_STATIC_CONSTANT(result_type, increment = b);
-    BOOST_STATIC_CONSTANT(result_type, modulus = p);
-    BOOST_STATIC_CONSTANT(IntType, default_seed = 1);
+  result_type min BOOST_PREVENT_MACRO_SUBSTITUTION () const { return b == 0 ? 1 : 0; }
+  result_type max BOOST_PREVENT_MACRO_SUBSTITUTION () const { return p-1; }
 
-    static result_type min BOOST_PREVENT_MACRO_SUBSTITUTION () { return b == 0 ? 1 : 0; }
-    static result_type max BOOST_PREVENT_MACRO_SUBSTITUTION () { return p-1; }
-    
-    /**
-     * Constructs an @c inversive_congruential_engine, seeding it with
-     * the default seed.
-     */
-    inversive_congruential_engine() { seed(); }
+  /**
+   * Constructs an inversive_congruential generator with
+   * @c y0 as the initial state.
+   */
+  explicit inversive_congruential(IntType y0 = 1) : value(y0)
+  {
+    BOOST_STATIC_ASSERT(b >= 0);
+    BOOST_STATIC_ASSERT(p > 1);
+    BOOST_STATIC_ASSERT(a >= 1);
+    if(b == 0) 
+      assert(y0 > 0); 
+  }
+  template<class It> inversive_congruential(It& first, It last)
+  { seed(first, last); }
 
-    /**
-     * Constructs an @c inversive_congruential_engine, seeding it with @c x0.
-     */
-    BOOST_RANDOM_DETAIL_ARITHMETIC_CONSTRUCTOR(inversive_congruential_engine,
-                                               IntType, x0)
-    { seed(x0); }
-    
-    /**
-     * Constructs an @c inversive_congruential_engine, seeding it with values
-     * produced by a call to @c seq.generate().
-     */
-    BOOST_RANDOM_DETAIL_SEED_SEQ_CONSTRUCTOR(inversive_congruential_engine,
-                                             SeedSeq, seq)
-    { seed(seq); }
-    
-    /**
-     * Constructs an @c inversive_congruential_engine, seeds it
-     * with values taken from the itrator range [first, last),
-     * and adjusts first to point to the element after the last one
-     * used.  If there are not enough elements, throws @c std::invalid_argument.
-     *
-     * first and last must be input iterators.
-     */
-    template<class It> inversive_congruential_engine(It& first, It last)
-    { seed(first, last); }
+  /** Changes the current state to y0. */
+  void seed(IntType y0 = 1) { value = y0; if(b == 0) assert(y0 > 0); }
+  template<class It> void seed(It& first, It last)
+  {
+    if(first == last)
+      throw std::invalid_argument("inversive_congruential::seed");
+    value = *first++;
+  }
+  IntType operator()()
+  {
+    typedef const_mod<IntType, p> do_mod;
+    value = do_mod::mult_add(a, do_mod::invert(value), b);
+    return value;
+  }
 
-    /**
-     * Calls seed(default_seed)
-     */
-    void seed() { seed(default_seed); }
-  
-    /**
-     * If c mod m is zero and x0 mod m is zero, changes the current value of
-     * the generator to 1. Otherwise, changes it to x0 mod m. If c is zero,
-     * distinct seeds in the range [1,m) will leave the generator in distinct
-     * states. If c is not zero, the range is [0,m).
-     */
-    BOOST_RANDOM_DETAIL_ARITHMETIC_SEED(inversive_congruential_engine, IntType, x0)
-    {
-        // wrap _x if it doesn't fit in the destination
-        if(modulus == 0) {
-            _value = x0;
-        } else {
-            _value = x0 % modulus;
-        }
-        // handle negative seeds
-        if(_value <= 0 && _value != 0) {
-            _value += modulus;
-        }
-        // adjust to the correct range
-        if(increment == 0 && _value == 0) {
-            _value = 1;
-        }
-        BOOST_ASSERT(_value >= (min)());
-        BOOST_ASSERT(_value <= (max)());
-    }
+  static bool validation(result_type x) { return val == x; }
 
-    /**
-     * Seeds an @c inversive_congruential_engine using values from a SeedSeq.
-     */
-    BOOST_RANDOM_DETAIL_SEED_SEQ_SEED(inversive_congruential_engine, SeedSeq, seq)
-    { seed(detail::seed_one_int<IntType, modulus>(seq)); }
-    
-    /**
-     * seeds an @c inversive_congruential_engine with values taken
-     * from the itrator range [first, last) and adjusts @c first to
-     * point to the element after the last one used.  If there are
-     * not enough elements, throws @c std::invalid_argument.
-     *
-     * @c first and @c last must be input iterators.
-     */
-    template<class It> void seed(It& first, It last)
-    { seed(detail::get_one_int<IntType, modulus>(first, last)); }
+#ifndef BOOST_NO_OPERATORS_IN_NAMESPACE
 
-    /** Returns the next output of the generator. */
-    IntType operator()()
-    {
-        typedef const_mod<IntType, p> do_mod;
-        _value = do_mod::mult_add(a, do_mod::invert(_value), b);
-        return _value;
-    }
-  
-    /** Fills a range with random values */
-    template<class Iter>
-    void generate(Iter first, Iter last)
-    { detail::generate_from_int(*this, first, last); }
+#ifndef BOOST_RANDOM_NO_STREAM_OPERATORS
+  template<class CharT, class Traits>
+  friend std::basic_ostream<CharT,Traits>&
+  operator<<(std::basic_ostream<CharT,Traits>& os, inversive_congruential x)
+  { os << x.value; return os; }
 
-    /** Advances the state of the generator by @c z. */
-    void discard(boost::uintmax_t z)
-    {
-        for(boost::uintmax_t j = 0; j < z; ++j) {
-            (*this)();
-        }
-    }
+  template<class CharT, class Traits>
+  friend std::basic_istream<CharT,Traits>&
+  operator>>(std::basic_istream<CharT,Traits>& is, inversive_congruential& x)
+  { is >> x.value; return is; }
+#endif
 
-    /**
-     * Writes the textual representation of the generator to a @c std::ostream.
-     */
-    BOOST_RANDOM_DETAIL_OSTREAM_OPERATOR(os, inversive_congruential_engine, x)
-    {
-        os << x._value;
-        return os;
-    }
-
-    /**
-     * Reads the textual representation of the generator from a @c std::istream.
-     */
-    BOOST_RANDOM_DETAIL_ISTREAM_OPERATOR(is, inversive_congruential_engine, x)
-    {
-        is >> x._value;
-        return is;
-    }
-
-    /**
-     * Returns true if the two generators will produce identical
-     * sequences of outputs.
-     */
-    BOOST_RANDOM_DETAIL_EQUALITY_OPERATOR(inversive_congruential_engine, x, y)
-    { return x._value == y._value; }
-
-    /**
-     * Returns true if the two generators will produce different
-     * sequences of outputs.
-     */
-    BOOST_RANDOM_DETAIL_INEQUALITY_OPERATOR(inversive_congruential_engine)
-
+  friend bool operator==(inversive_congruential x, inversive_congruential y)
+  { return x.value == y.value; }
+  friend bool operator!=(inversive_congruential x, inversive_congruential y)
+  { return !(x == y); }
+#else
+  // Use a member function; Streamable concept not supported.
+  bool operator==(inversive_congruential rhs) const
+  { return value == rhs.value; }
+  bool operator!=(inversive_congruential rhs) const
+  { return !(*this == rhs); }
+#endif
 private:
-    IntType _value;
+  IntType value;
 };
 
 #ifndef BOOST_NO_INCLASS_MEMBER_INITIALIZATION
 //  A definition is required even for integral static constants
-template<class IntType, IntType a, IntType b, IntType p>
-const bool inversive_congruential_engine<IntType, a, b, p>::has_fixed_range;
-template<class IntType, IntType a, IntType b, IntType p>
-const typename inversive_congruential_engine<IntType, a, b, p>::result_type inversive_congruential_engine<IntType, a, b, p>::multiplier;
-template<class IntType, IntType a, IntType b, IntType p>
-const typename inversive_congruential_engine<IntType, a, b, p>::result_type inversive_congruential_engine<IntType, a, b, p>::increment;
-template<class IntType, IntType a, IntType b, IntType p>
-const typename inversive_congruential_engine<IntType, a, b, p>::result_type inversive_congruential_engine<IntType, a, b, p>::modulus;
-template<class IntType, IntType a, IntType b, IntType p>
-const typename inversive_congruential_engine<IntType, a, b, p>::result_type inversive_congruential_engine<IntType, a, b, p>::default_seed;
+template<class IntType, IntType a, IntType b, IntType p, IntType val>
+const bool inversive_congruential<IntType, a, b, p, val>::has_fixed_range;
+template<class IntType, IntType a, IntType b, IntType p, IntType val>
+const typename inversive_congruential<IntType, a, b, p, val>::result_type inversive_congruential<IntType, a, b, p, val>::min_value;
+template<class IntType, IntType a, IntType b, IntType p, IntType val>
+const typename inversive_congruential<IntType, a, b, p, val>::result_type inversive_congruential<IntType, a, b, p, val>::max_value;
+template<class IntType, IntType a, IntType b, IntType p, IntType val>
+const typename inversive_congruential<IntType, a, b, p, val>::result_type inversive_congruential<IntType, a, b, p, val>::multiplier;
+template<class IntType, IntType a, IntType b, IntType p, IntType val>
+const typename inversive_congruential<IntType, a, b, p, val>::result_type inversive_congruential<IntType, a, b, p, val>::increment;
+template<class IntType, IntType a, IntType b, IntType p, IntType val>
+const typename inversive_congruential<IntType, a, b, p, val>::result_type inversive_congruential<IntType, a, b, p, val>::modulus;
 #endif
 
-/// \cond show_deprecated
-
-// provided for backwards compatibility
-template<class IntType, IntType a, IntType b, IntType p, IntType val = 0>
-class inversive_congruential : public inversive_congruential_engine<IntType, a, b, p>
-{
-    typedef inversive_congruential_engine<IntType, a, b, p> base_type;
-public:
-    inversive_congruential(IntType x0 = 1) : base_type(x0) {}
-    template<class It>
-    inversive_congruential(It& first, It last) : base_type(first, last) {}
-};
-
-/// \endcond
+} // namespace random
 
 /**
  * The specialization hellekalek1995 was suggested in
@@ -253,15 +165,9 @@ public:
  *  (editors), 1995, pp. 255-262. ftp://random.mat.sbg.ac.at/pub/data/wsc95.ps
  *  @endblockquote
  */
-typedef inversive_congruential_engine<uint32_t, 9102, 2147483647-36884165,
-  2147483647> hellekalek1995;
-
-} // namespace random
-
-using random::hellekalek1995;
+typedef random::inversive_congruential<int32_t, 9102, 2147483647-36884165,
+  2147483647, 0> hellekalek1995;
 
 } // namespace boost
-
-#include <boost/random/detail/enable_warnings.hpp>
 
 #endif // BOOST_RANDOM_INVERSIVE_CONGRUENTIAL_HPP

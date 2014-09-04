@@ -11,7 +11,7 @@
 #ifndef BOOST_RANGE_AS_LITERAL_HPP
 #define BOOST_RANGE_AS_LITERAL_HPP
 
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) && (_MSC_VER >= 1200)
 # pragma once
 #endif
 
@@ -74,7 +74,7 @@ namespace boost
 #endif
 
         template< class T >
-        inline long is_char_ptr( const T& /* r */ )
+        inline long is_char_ptr( T /* r */ )
         {
             return 0L;
         }

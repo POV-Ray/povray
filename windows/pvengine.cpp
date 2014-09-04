@@ -1695,7 +1695,7 @@ char *GetExceptionDescription (DWORD code)
 // this pulls in the code for update checks and crash dump submission.
 // it is only used in official releases made by the POV-Ray developers,
 // so the source is not included in the public distribution.
-#include "../../official/windows/official.h"
+#include "official.h"
 #else
 LONG WINAPI ExceptionHandler(struct _EXCEPTION_POINTERS* ExceptionInfo)
 {

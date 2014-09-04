@@ -14,7 +14,6 @@
 #include <iterator>
 #include <algorithm> // for find
 #include <stdexcept>
-#include <boost/throw_exception.hpp>
 
 #ifdef BOOST_NO_STDC_NAMESPACE
 namespace std {
@@ -42,7 +41,7 @@ struct string_generator {
     template <typename ch, typename char_traits, typename alloc>
     uuid operator()(std::basic_string<ch, char_traits, alloc> const& s) const {
         return operator()(s.begin(), s.end());
-    }
+    };
 
     uuid operator()(char const*const s) const {
         return operator()(s, s+std::strlen(s));
@@ -175,7 +174,7 @@ private:
     }
     
     void throw_invalid() const {
-        BOOST_THROW_EXCEPTION(std::runtime_error("invalid uuid string"));
+        throw std::runtime_error("invalid uuid string");
     }
 };
 

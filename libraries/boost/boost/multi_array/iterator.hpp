@@ -20,6 +20,7 @@
 
 #include "boost/multi_array/base.hpp"
 #include "boost/iterator/iterator_facade.hpp"
+#include "boost/mpl/aux_/msvc_eti_base.hpp"
 #include <algorithm>
 #include <cstddef>
 #include <iterator>
@@ -43,28 +44,32 @@ struct operator_arrow_proxy
   mutable T value_;
 };
 
-template <typename T, typename TPtr, typename NumDims, typename Reference,
-          typename IteratorCategory>
+template <typename T, typename TPtr, typename NumDims, typename Reference>
 class array_iterator;
 
-template <typename T, typename TPtr, typename NumDims, typename Reference,
-          typename IteratorCategory>
+template <typename T, typename TPtr, typename NumDims, typename Reference>
 class array_iterator
   : public
     iterator_facade<
-        array_iterator<T,TPtr,NumDims,Reference,IteratorCategory>
+        array_iterator<T,TPtr,NumDims,Reference>
       , typename associated_types<T,NumDims>::value_type
-      , IteratorCategory
+      , boost::random_access_traversal_tag
       , Reference
     >
     , private
+#if BOOST_WORKAROUND(BOOST_MSVC, < 1300)
+      mpl::aux::msvc_eti_base<typename 
+#endif 
           value_accessor_generator<T,NumDims>::type
+#if BOOST_WORKAROUND(BOOST_MSVC, < 1300)
+      >::type
+#endif 
 {
   friend class iterator_core_access;
   typedef detail::multi_array::associated_types<T,NumDims> access_t;
 
   typedef iterator_facade<
-            array_iterator<T,TPtr,NumDims,Reference,IteratorCategory>
+        array_iterator<T,TPtr,NumDims,Reference>
       , typename detail::multi_array::associated_types<T,NumDims>::value_type
       , boost::random_access_traversal_tag
       , Reference
@@ -74,7 +79,7 @@ class array_iterator
   typedef typename access_t::size_type size_type;
 
 #ifndef BOOST_NO_MEMBER_TEMPLATE_FRIENDS
-  template <typename, typename, typename, typename, typename>
+  template <typename, typename, typename, typename>
     friend class array_iterator;
 #else
  public:
@@ -100,9 +105,9 @@ public:
     idx_(idx), base_(base), extents_(extents),
     strides_(strides), index_base_(index_base) { }
 
-  template <typename OPtr, typename ORef, typename Cat>
+  template <typename OPtr, typename ORef>
   array_iterator(
-      const array_iterator<T,OPtr,NumDims,ORef,Cat>& rhs
+      const array_iterator<T,OPtr,NumDims,ORef>& rhs
     , typename boost::enable_if_convertible<OPtr,TPtr>::type* = 0
   )
     : idx_(rhs.idx_), base_(rhs.base_), extents_(rhs.extents_),

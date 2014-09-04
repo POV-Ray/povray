@@ -46,7 +46,7 @@ class unit
         unit(const this_type&) { }
         //~unit() { }  
        
-        this_type& operator=(const this_type&) { return *this; }
+        this_type& operator=(const this_type&) { }
         
         // sun will ignore errors resulting from templates
         // instantiated in the return type of a function.

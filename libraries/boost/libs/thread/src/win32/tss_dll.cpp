@@ -5,7 +5,6 @@
 
 #include <boost/thread/detail/config.hpp>
 
-
 #if defined(BOOST_HAS_WINTHREADS) && defined(BOOST_THREAD_BUILD_DLL)
 
     #include <boost/thread/detail/tss_hooks.hpp>

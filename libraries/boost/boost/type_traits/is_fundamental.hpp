@@ -22,7 +22,7 @@ namespace detail {
 
 template <typename T> 
 struct is_fundamental_impl
-    : public ::boost::type_traits::ice_or< 
+    : ::boost::type_traits::ice_or< 
           ::boost::is_arithmetic<T>::value
         , ::boost::is_void<T>::value
         >

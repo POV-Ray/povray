@@ -11,6 +11,9 @@
 #ifndef BOOST_UNITS_SI_AREA_HPP
 #define BOOST_UNITS_SI_AREA_HPP
 
+#include <iostream>
+#include <boost/units/io.hpp>
+
 #include <boost/units/systems/si/base.hpp>
 #include <boost/units/physical_dimensions/area.hpp>
 

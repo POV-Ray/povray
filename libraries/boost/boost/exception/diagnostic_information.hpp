@@ -5,7 +5,7 @@
 
 #ifndef UUID_0552D49838DD11DD90146B8956D89593
 #define UUID_0552D49838DD11DD90146B8956D89593
-#if (__GNUC__*100+__GNUC_MINOR__>301) && !defined(BOOST_EXCEPTION_ENABLE_WARNINGS)
+#if defined(__GNUC__) && !defined(BOOST_EXCEPTION_ENABLE_WARNINGS)
 #pragma GCC system_header
 #endif
 #if defined(_MSC_VER) && !defined(BOOST_EXCEPTION_ENABLE_WARNINGS)
@@ -14,11 +14,10 @@
 
 #include <boost/config.hpp>
 #include <boost/exception/get_error_info.hpp>
-#include <boost/exception/info.hpp>
 #include <boost/utility/enable_if.hpp>
-//#ifndef BOOST_NO_RTTI
-//#include <boost/units/detail/utility.hpp>
-//#endif
+#ifndef BOOST_NO_RTTI
+#include <boost/units/detail/utility.hpp>
+#endif
 #include <exception>
 #include <sstream>
 #include <string>
@@ -31,17 +30,17 @@ boost
     namespace
     exception_detail
         {
-        std::string diagnostic_information_impl( boost::exception const *, std::exception const *, bool, bool );
+        std::string diagnostic_information_impl( boost::exception const *, std::exception const *, bool );
         }
 
     inline
     std::string
-    current_exception_diagnostic_information( bool verbose=true)
+    current_exception_diagnostic_information()
         {
         boost::exception const * be=current_exception_cast<boost::exception const>();
         std::exception const * se=current_exception_cast<std::exception const>();
         if( be || se )
-            return exception_detail::diagnostic_information_impl(be,se,true,verbose);
+            return exception_detail::diagnostic_information_impl(be,se,true);
         else
             return "No diagnostic information available.";
         }
@@ -86,28 +85,24 @@ boost
         char const *
         get_diagnostic_information( exception const & x, char const * header )
             {
+            if( error_info_container * c=x.data_.get() )
 #ifndef BOOST_NO_EXCEPTIONS
-            try
-                {
+                try
+                    {
 #endif
-                error_info_container * c=x.data_.get();
-                if( !c )
-                    x.data_.adopt(c=new exception_detail::error_info_container_impl);
-                char const * di=c->diagnostic_information(header);
-                BOOST_ASSERT(di!=0);
-                return di;
+                    return c->diagnostic_information(header);
 #ifndef BOOST_NO_EXCEPTIONS
-                }
-            catch(...)
-                {
-                return 0;
-                }
+                    }
+                catch(...)
+                    {
+                    }
 #endif
+            return 0;
             }
 
         inline
         std::string
-        diagnostic_information_impl( boost::exception const * be, std::exception const * se, bool with_what, bool verbose )
+        diagnostic_information_impl( boost::exception const * be, std::exception const * se, bool with_what )
             {
             if( !be && !se )
                 return "Unknown exception.";
@@ -125,65 +120,53 @@ boost
                     return wh;
                 }
             std::ostringstream tmp;
-            if( be && verbose )
+            if( be )
                 {
-                char const * const * f=get_error_info<throw_file>(*be);
-                int const * l=get_error_info<throw_line>(*be);
-                char const * const * fn=get_error_info<throw_function>(*be);
-                if( !f && !l && !fn )
-                    tmp << "Throw location unknown (consider using BOOST_THROW_EXCEPTION)\n";
-                else
+                if( char const * const * f=get_error_info<throw_file>(*be) )
                     {
-                    if( f )
-                        {
-                        tmp << *f;
-                        if( int const * l=get_error_info<throw_line>(*be) )
-                            tmp << '(' << *l << "): ";
-                        }
-                    tmp << "Throw in function ";
-                    if( char const * const * fn=get_error_info<throw_function>(*be) )
-                        tmp << *fn;
-                    else
-                        tmp << "(unknown)";
-                    tmp << '\n';
+                    tmp << *f;
+                    if( int const * l=get_error_info<throw_line>(*be) )
+                        tmp << '(' << *l << "): ";
                     }
+                tmp << "Throw in function ";
+                if( char const * const * fn=get_error_info<throw_function>(*be) )
+                    tmp << *fn;
+                else
+                    tmp << "(unknown)";
+                tmp << '\n';
                 }
 #ifndef BOOST_NO_RTTI
-            if ( verbose )
-                tmp << std::string("Dynamic exception type: ") <<
-                    /*units::detail::demangle*/((be?(BOOST_EXCEPTION_DYNAMIC_TYPEID(*be)):(BOOST_EXCEPTION_DYNAMIC_TYPEID(*se))).type_->name()) << '\n';
+            tmp << std::string("Dynamic exception type: ") <<
+                units::detail::demangle((be?BOOST_EXCEPTION_DYNAMIC_TYPEID(*be):BOOST_EXCEPTION_DYNAMIC_TYPEID(*se)).type_.name()) << '\n';
 #endif
-            if( with_what && se && verbose )
+            if( with_what && se )
                 tmp << "std::exception::what: " << wh << '\n';
             if( be )
                 if( char const * s=exception_detail::get_diagnostic_information(*be,tmp.str().c_str()) )
                     if( *s )
-                        return std::string(s);
+                        return s;
             return tmp.str();
             }
         }
 
     template <class T>
     std::string
-    diagnostic_information( T const & e, bool verbose=true )
+    diagnostic_information( T const & e )
         {
-        return exception_detail::diagnostic_information_impl(exception_detail::get_boost_exception(&e),exception_detail::get_std_exception(&e),true,verbose);
+        return exception_detail::diagnostic_information_impl(exception_detail::get_boost_exception(&e),exception_detail::get_std_exception(&e),true);
         }
 
     inline
     char const *
-    diagnostic_information_what( exception const & e, bool verbose=true ) throw()
+    diagnostic_information_what( exception const & e ) throw()
         {
         char const * w=0;
 #ifndef BOOST_NO_EXCEPTIONS
         try
             {
 #endif
-            (void) exception_detail::diagnostic_information_impl(&e,0,false,verbose);
-            if( char const * di=exception_detail::get_diagnostic_information(e,0) )
-                return di;
-            else
-                return "Failed to produce boost::diagnostic_information_what()";
+            (void) exception_detail::diagnostic_information_impl(&e,0,false);
+            return exception_detail::get_diagnostic_information(e,0);
 #ifndef BOOST_NO_EXCEPTIONS
             }
         catch(

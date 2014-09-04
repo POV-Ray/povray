@@ -12,7 +12,6 @@
 #define BOOST_RANGE_ADAPTOR_UNIQUED_IMPL_HPP
 
 #include <boost/range/adaptor/adjacent_filtered.hpp>
-#include <boost/range/concepts.hpp>
 
 namespace boost
 {
@@ -33,37 +32,35 @@ namespace boost
         };
 
         template<class ForwardRng>
-        class uniqued_range : public adjacent_filtered_range<unique_not_equal_to, ForwardRng, true>
+        class unique_range : public adjacent_filter_range<unique_not_equal_to, ForwardRng, true>
         {
-            typedef adjacent_filtered_range<unique_not_equal_to, ForwardRng, true> base;
+            typedef adjacent_filter_range<unique_not_equal_to, ForwardRng, true> base;
         public:
-            explicit uniqued_range(ForwardRng& rng)
+            explicit unique_range(ForwardRng& rng)
                 : base(unique_not_equal_to(), rng)
             {
             }
         };
 
         template< class ForwardRng >
-        inline uniqued_range<ForwardRng>
+        inline unique_range<ForwardRng>
         operator|( ForwardRng& r,
                    unique_forwarder )
         {
-            BOOST_RANGE_CONCEPT_ASSERT((ForwardRangeConcept<ForwardRng>));
-            return uniqued_range<ForwardRng>(r);
+            return unique_range<ForwardRng>(r);
         }
 
         template< class ForwardRng >
-        inline uniqued_range<const ForwardRng>
+        inline unique_range<const ForwardRng>
         operator|( const ForwardRng& r,
                    unique_forwarder )
         {
-            BOOST_RANGE_CONCEPT_ASSERT((ForwardRangeConcept<const ForwardRng>));
-            return uniqued_range<const ForwardRng>(r);
+            return unique_range<const ForwardRng>(r);
         }
 
     } // 'range_detail'
 
-    using range_detail::uniqued_range;
+    using range_detail::unique_range;
 
     namespace adaptors
     {
@@ -74,21 +71,17 @@ namespace boost
         }
 
         template<class ForwardRange>
-        inline uniqued_range<ForwardRange>
+        inline unique_range<ForwardRange>
         unique(ForwardRange& rng)
         {
-            BOOST_RANGE_CONCEPT_ASSERT((ForwardRangeConcept<ForwardRange>));
-            return uniqued_range<ForwardRange>(rng);
+            return unique_range<ForwardRange>(rng);
         }
 
         template<class ForwardRange>
-        inline uniqued_range<const ForwardRange>
+        inline unique_range<const ForwardRange>
         unique(const ForwardRange& rng)
         {
-            BOOST_RANGE_CONCEPT_ASSERT((
-                ForwardRangeConcept<const ForwardRange>));
-
-            return uniqued_range<const ForwardRange>(rng);
+            return unique_range<const ForwardRange>(rng);
         }
     } // 'adaptors'
 

@@ -17,10 +17,8 @@
 #include <boost/range/begin.hpp>
 #include <boost/range/end.hpp>
 #include <boost/range/value_type.hpp>
-#include <boost/range/concepts.hpp>
 #include <boost/iterator/iterator_adaptor.hpp>
 #include <boost/iterator/transform_iterator.hpp>
-#include <boost/optional/optional.hpp>
 
 namespace boost
 {
@@ -33,36 +31,19 @@ namespace boost
             typedef const Value& result_type;
             typedef const Value& first_argument_type;
 
-            // Rationale:
-            // The default constructor is required to allow the transform
-            // iterator to properly model the iterator concept.
-            replace_value()
-            {
-            }
-
             replace_value(const Value& from, const Value& to)
-                :   m_impl(data(from, to))
+                :   m_from(from), m_to(to)
             {
             }
 
             const Value& operator()(const Value& x) const
             {
-                return (x == m_impl->m_from) ? m_impl->m_to : x;
+                return (x == m_from) ? m_to : x;
             }
 
         private:
-            struct data
-            {
-                data(const Value& from, const Value& to)
-                    : m_from(from)
-                    , m_to(to)
-                {
-                }
-
-                Value m_from;
-                Value m_to;
-            };
-            boost::optional<data> m_impl;
+            Value m_from;
+            Value m_to;
         };
 
         template< class R >
@@ -101,30 +82,20 @@ namespace boost
             void operator=(const replace_holder&);
         };
 
-        template< class SinglePassRange >
-        inline replaced_range<SinglePassRange>
-        operator|(
-            SinglePassRange& r,
-            const replace_holder<
-                BOOST_DEDUCED_TYPENAME range_value<SinglePassRange>::type>& f )
+        template< class InputRng >
+        inline replaced_range<InputRng>
+        operator|( InputRng& r,
+                   const replace_holder<BOOST_DEDUCED_TYPENAME range_value<InputRng>::type>& f )
         {
-            BOOST_RANGE_CONCEPT_ASSERT((
-                SinglePassRangeConcept<SinglePassRange>));
-
-            return replaced_range<SinglePassRange>(r, f.val1, f.val2);
+            return replaced_range<InputRng>(r, f.val1, f.val2);
         }
 
-        template< class SinglePassRange >
-        inline replaced_range<const SinglePassRange>
-        operator|(
-            const SinglePassRange& r,
-            const replace_holder<
-                BOOST_DEDUCED_TYPENAME range_value<SinglePassRange>::type>& f)
+        template< class InputRng >
+        inline replaced_range<const InputRng>
+        operator|( const InputRng& r,
+                   const replace_holder<BOOST_DEDUCED_TYPENAME range_value<InputRng>::type>& f )
         {
-            BOOST_RANGE_CONCEPT_ASSERT((
-                SinglePassRangeConcept<const SinglePassRange>));
-
-            return replaced_range<const SinglePassRange>(r, f.val1, f.val2);
+            return replaced_range<const InputRng>(r, f.val1, f.val2);
         }
     } // 'range_detail'
 
@@ -139,28 +110,22 @@ namespace boost
                     range_detail::forwarder2<range_detail::replace_holder>();
         }
 
-        template<class SinglePassRange>
-        inline replaced_range<SinglePassRange>
-        replace(SinglePassRange& rng,
-                BOOST_DEDUCED_TYPENAME range_value<SinglePassRange>::type from,
-                BOOST_DEDUCED_TYPENAME range_value<SinglePassRange>::type to)
+        template<class InputRange>
+        inline replaced_range<InputRange>
+        replace(InputRange& rng,
+                BOOST_DEDUCED_TYPENAME range_value<InputRange>::type from,
+                BOOST_DEDUCED_TYPENAME range_value<InputRange>::type to)
         {
-            BOOST_RANGE_CONCEPT_ASSERT((
-                SinglePassRangeConcept<SinglePassRange>));
-
-            return replaced_range<SinglePassRange>(rng, from, to);
+            return replaced_range<InputRange>(rng, from, to);
         }
 
-        template<class SinglePassRange>
-        inline replaced_range<const SinglePassRange>
-        replace(const SinglePassRange& rng,
-                BOOST_DEDUCED_TYPENAME range_value<SinglePassRange>::type from,
-                BOOST_DEDUCED_TYPENAME range_value<SinglePassRange>::type to)
+        template<class InputRange>
+        inline replaced_range<const InputRange>
+        replace(const InputRange& rng,
+                BOOST_DEDUCED_TYPENAME range_value<const InputRange>::type from,
+                BOOST_DEDUCED_TYPENAME range_value<const InputRange>::type to)
         {
-            BOOST_RANGE_CONCEPT_ASSERT((
-                SinglePassRangeConcept<const SinglePassRange>));
-
-            return replaced_range<const SinglePassRange>(rng, from ,to);
+            return replaced_range<const InputRange>(rng, from ,to);
         }
 
     } // 'adaptors'

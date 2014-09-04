@@ -73,10 +73,16 @@ struct iterator_writability_disabled
 // Convert an iterator_facade's traversal category, Value parameter,
 // and ::reference type to an appropriate old-style category.
 //
-// Due to changeset 21683, this now never results in a category convertible
-// to output_iterator_tag.
+// If writability has been disabled per the above metafunction, the
+// result will not be convertible to output_iterator_tag.
 //
-// Change at: https://svn.boost.org/trac/boost/changeset/21683
+// Otherwise, if Traversal == single_pass_traversal_tag, the following
+// conditions will result in a tag that is convertible both to
+// input_iterator_tag and output_iterator_tag:
+//
+//    1. Reference is a reference to non-const
+//    2. Reference is not a reference and is convertible to Value
+//
 template <class Traversal, class ValueParam, class Reference>
 struct iterator_facade_default_category
   : mpl::eval_if<

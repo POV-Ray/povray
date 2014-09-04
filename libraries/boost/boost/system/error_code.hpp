@@ -14,6 +14,7 @@
 #include <boost/system/config.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/assert.hpp>
+#include <boost/operators.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <ostream>
@@ -22,17 +23,13 @@
 #include <functional>
 
 // TODO: undef these macros if not already defined
-#include <boost/cerrno.hpp>
+#include <boost/cerrno.hpp> 
 
 #if !defined(BOOST_POSIX_API) && !defined(BOOST_WINDOWS_API)
 #  error BOOST_POSIX_API or BOOST_WINDOWS_API must be defined
 #endif
 
 #include <boost/config/abi_prefix.hpp> // must be the last #include
-
-#ifndef BOOST_SYSTEM_NOEXCEPT
-#define BOOST_SYSTEM_NOEXCEPT BOOST_NOEXCEPT
-#endif
 
 namespace boost
 {
@@ -187,17 +184,17 @@ namespace boost
     public:
       virtual ~error_category(){}
 
-      virtual const char *     name() const BOOST_SYSTEM_NOEXCEPT = 0;
+      virtual const char *     name() const = 0;
       virtual std::string      message( int ev ) const = 0;
-      inline virtual error_condition  default_error_condition( int ev ) const  BOOST_SYSTEM_NOEXCEPT;
-      inline virtual bool             equivalent( int code,
-                                           const error_condition & condition ) const  BOOST_SYSTEM_NOEXCEPT;
-      inline virtual bool             equivalent( const error_code & code,
-                                           int condition ) const  BOOST_SYSTEM_NOEXCEPT;
+      virtual error_condition  default_error_condition( int ev ) const;
+      virtual bool             equivalent( int code, 
+                                           const error_condition & condition ) const;
+      virtual bool             equivalent( const error_code & code,
+                                           int condition ) const;
 
-      bool operator==(const error_category & rhs) const BOOST_SYSTEM_NOEXCEPT { return this == &rhs; }
-      bool operator!=(const error_category & rhs) const BOOST_SYSTEM_NOEXCEPT { return this != &rhs; }
-      bool operator<( const error_category & rhs ) const BOOST_SYSTEM_NOEXCEPT
+      bool operator==(const error_category & rhs) const { return this == &rhs; }
+      bool operator!=(const error_category & rhs) const { return this != &rhs; }
+      bool operator<( const error_category & rhs ) const
       {
         return std::less<const error_category*>()( this, &rhs );
       }
@@ -205,13 +202,9 @@ namespace boost
 
     //  predefined error categories  -----------------------------------------//
 
-# ifdef BOOST_ERROR_CODE_HEADER_ONLY
-    inline const error_category &  system_category() BOOST_SYSTEM_NOEXCEPT;
-    inline const error_category &  generic_category() BOOST_SYSTEM_NOEXCEPT;
-#else
-    BOOST_SYSTEM_DECL const error_category &  system_category() BOOST_SYSTEM_NOEXCEPT;
-    BOOST_SYSTEM_DECL const error_category &  generic_category() BOOST_SYSTEM_NOEXCEPT;
-#endif
+    BOOST_SYSTEM_DECL const error_category &  system_category();
+    BOOST_SYSTEM_DECL const error_category &  generic_category();
+
     //  deprecated synonyms --------------------------------------------------//
 
 # ifndef BOOST_SYSTEM_NO_DEPRECATED
@@ -232,52 +225,52 @@ namespace boost
     public:
 
       // constructors:
-      error_condition() BOOST_SYSTEM_NOEXCEPT : m_val(0), m_cat(&generic_category()) {}
-      error_condition( int val, const error_category & cat ) BOOST_SYSTEM_NOEXCEPT : m_val(val), m_cat(&cat) {}
+      error_condition() : m_val(0), m_cat(&generic_category()) {}
+      error_condition( int val, const error_category & cat ) : m_val(val), m_cat(&cat) {}
 
       template <class ErrorConditionEnum>
         error_condition(ErrorConditionEnum e,
-          typename boost::enable_if<is_error_condition_enum<ErrorConditionEnum> >::type* = 0) BOOST_SYSTEM_NOEXCEPT
+          typename boost::enable_if<is_error_condition_enum<ErrorConditionEnum> >::type* = 0)
       {
         *this = make_error_condition(e);
       }
 
       // modifiers:
 
-      void assign( int val, const error_category & cat ) BOOST_SYSTEM_NOEXCEPT
-      {
+      void assign( int val, const error_category & cat )
+      { 
         m_val = val;
         m_cat = &cat;
       }
-
+                                             
       template<typename ErrorConditionEnum>
         typename boost::enable_if<is_error_condition_enum<ErrorConditionEnum>, error_condition>::type &
-          operator=( ErrorConditionEnum val ) BOOST_SYSTEM_NOEXCEPT
-      {
+          operator=( ErrorConditionEnum val )
+      { 
         *this = make_error_condition(val);
         return *this;
       }
 
-      void clear() BOOST_SYSTEM_NOEXCEPT
+      void clear()
       {
         m_val = 0;
         m_cat = &generic_category();
       }
 
       // observers:
-      int                     value() const BOOST_SYSTEM_NOEXCEPT    { return m_val; }
-      const error_category &  category() const BOOST_SYSTEM_NOEXCEPT { return *m_cat; }
+      int                     value() const    { return m_val; }
+      const error_category &  category() const { return *m_cat; }
       std::string             message() const  { return m_cat->message(value()); }
 
       typedef void (*unspecified_bool_type)();
       static void unspecified_bool_true() {}
 
-      operator unspecified_bool_type() const BOOST_SYSTEM_NOEXCEPT  // true if error
-      {
+      operator unspecified_bool_type() const  // true if error
+      { 
         return m_val == 0 ? 0 : unspecified_bool_true;
       }
 
-      bool operator!() const BOOST_SYSTEM_NOEXCEPT  // true if no error
+      bool operator!() const  // true if no error
       {
         return m_val == 0;
       }
@@ -286,13 +279,13 @@ namespace boost
       //  the more symmetrical non-member syntax allows enum
       //  conversions work for both rhs and lhs.
       inline friend bool operator==( const error_condition & lhs,
-                                     const error_condition & rhs ) BOOST_SYSTEM_NOEXCEPT
+                                     const error_condition & rhs )
       {
         return lhs.m_cat == rhs.m_cat && lhs.m_val == rhs.m_val;
-      }
+      }                  
 
       inline friend bool operator<( const error_condition & lhs,
-                                    const error_condition & rhs ) BOOST_SYSTEM_NOEXCEPT
+                                    const error_condition & rhs )
         //  the more symmetrical non-member syntax allows enum
         //  conversions work for both rhs and lhs.
       {
@@ -319,59 +312,59 @@ namespace boost
     public:
 
       // constructors:
-      error_code() BOOST_SYSTEM_NOEXCEPT : m_val(0), m_cat(&system_category()) {}
-      error_code( int val, const error_category & cat ) BOOST_SYSTEM_NOEXCEPT : m_val(val), m_cat(&cat) {}
+      error_code() : m_val(0), m_cat(&system_category()) {}
+      error_code( int val, const error_category & cat ) : m_val(val), m_cat(&cat) {}
 
       template <class ErrorCodeEnum>
         error_code(ErrorCodeEnum e,
-          typename boost::enable_if<is_error_code_enum<ErrorCodeEnum> >::type* = 0) BOOST_SYSTEM_NOEXCEPT
+          typename boost::enable_if<is_error_code_enum<ErrorCodeEnum> >::type* = 0)
       {
         *this = make_error_code(e);
       }
 
       // modifiers:
-      void assign( int val, const error_category & cat ) BOOST_SYSTEM_NOEXCEPT
-      {
+      void assign( int val, const error_category & cat )
+      { 
         m_val = val;
         m_cat = &cat;
       }
-
+                                             
       template<typename ErrorCodeEnum>
         typename boost::enable_if<is_error_code_enum<ErrorCodeEnum>, error_code>::type &
-          operator=( ErrorCodeEnum val ) BOOST_SYSTEM_NOEXCEPT
-      {
+          operator=( ErrorCodeEnum val )
+      { 
         *this = make_error_code(val);
         return *this;
       }
 
-      void clear() BOOST_SYSTEM_NOEXCEPT
+      void clear()
       {
         m_val = 0;
         m_cat = &system_category();
       }
 
       // observers:
-      int                     value() const  BOOST_SYSTEM_NOEXCEPT   { return m_val; }
-      const error_category &  category() const BOOST_SYSTEM_NOEXCEPT { return *m_cat; }
-      error_condition         default_error_condition() const BOOST_SYSTEM_NOEXCEPT  { return m_cat->default_error_condition(value()); }
+      int                     value() const    { return m_val; }
+      const error_category &  category() const { return *m_cat; }
+      error_condition         default_error_condition() const  { return m_cat->default_error_condition(value()); }
       std::string             message() const  { return m_cat->message(value()); }
 
       typedef void (*unspecified_bool_type)();
       static void unspecified_bool_true() {}
 
-      operator unspecified_bool_type() const  BOOST_SYSTEM_NOEXCEPT // true if error
-      {
+      operator unspecified_bool_type() const  // true if error
+      { 
         return m_val == 0 ? 0 : unspecified_bool_true;
       }
 
-      bool operator!() const  BOOST_SYSTEM_NOEXCEPT // true if no error
+      bool operator!() const  // true if no error
       {
         return m_val == 0;
       }
 
       // relationals:
       inline friend bool operator==( const error_code & lhs,
-                                     const error_code & rhs ) BOOST_SYSTEM_NOEXCEPT
+                                     const error_code & rhs )
         //  the more symmetrical non-member syntax allows enum
         //  conversions work for both rhs and lhs.
       {
@@ -379,15 +372,15 @@ namespace boost
       }
 
       inline friend bool operator<( const error_code & lhs,
-                                    const error_code & rhs ) BOOST_SYSTEM_NOEXCEPT
+                                    const error_code & rhs )
         //  the more symmetrical non-member syntax allows enum
         //  conversions work for both rhs and lhs.
       {
         return lhs.m_cat < rhs.m_cat
           || (lhs.m_cat == rhs.m_cat && lhs.m_val < rhs.m_val);
       }
-
-    private:
+                  
+      private:
       int                     m_val;
       const error_category *  m_cat;
 
@@ -421,43 +414,43 @@ namespace boost
     //  non-member functions  ------------------------------------------------//
 
     inline bool operator!=( const error_code & lhs,
-                            const error_code & rhs ) BOOST_SYSTEM_NOEXCEPT
+                            const error_code & rhs )
     {
       return !(lhs == rhs);
     }
 
     inline bool operator!=( const error_condition & lhs,
-                            const error_condition & rhs ) BOOST_SYSTEM_NOEXCEPT
+                            const error_condition & rhs )
     {
       return !(lhs == rhs);
     }
 
     inline bool operator==( const error_code & code,
-                            const error_condition & condition ) BOOST_SYSTEM_NOEXCEPT
+                            const error_condition & condition )
     {
       return code.category().equivalent( code.value(), condition )
         || condition.category().equivalent( code, condition.value() );
     }
-
+                
     inline bool operator!=( const error_code & lhs,
-                            const error_condition & rhs ) BOOST_SYSTEM_NOEXCEPT
+                            const error_condition & rhs )
     {
       return !(lhs == rhs);
     }
-
+                
     inline bool operator==( const error_condition & condition,
-                            const error_code & code ) BOOST_SYSTEM_NOEXCEPT
+                            const error_code & code )
     {
       return condition.category().equivalent( code, condition.value() )
         || code.category().equivalent( code.value(), condition );
     }
-
+                
     inline bool operator!=( const error_condition & lhs,
-                            const error_code & rhs ) BOOST_SYSTEM_NOEXCEPT
+                            const error_code & rhs )
     {
       return !(lhs == rhs);
     }
-
+                  
     // TODO: both of these may move elsewhere, but the LWG hasn't spoken yet.
 
     template <class charT, class traits>
@@ -479,29 +472,29 @@ namespace boost
     namespace errc
     {
       //  explicit conversion:
-      inline error_code make_error_code( errc_t e ) BOOST_SYSTEM_NOEXCEPT
+      inline error_code make_error_code( errc_t e )
         { return error_code( e, generic_category() ); }
 
       //  implicit conversion:
-      inline error_condition make_error_condition( errc_t e ) BOOST_SYSTEM_NOEXCEPT
+      inline error_condition make_error_condition( errc_t e )
         { return error_condition( e, generic_category() ); }
     }
 
     //  error_category default implementation  -------------------------------//
 
-    error_condition error_category::default_error_condition( int ev ) const BOOST_SYSTEM_NOEXCEPT
-    {
+    inline error_condition error_category::default_error_condition( int ev ) const
+    { 
       return error_condition( ev, *this );
     }
 
-    bool error_category::equivalent( int code,
-      const error_condition & condition ) const BOOST_SYSTEM_NOEXCEPT
+    inline bool error_category::equivalent( int code,
+      const error_condition & condition ) const
     {
       return default_error_condition( code ) == condition;
     }
 
-    bool error_category::equivalent( const error_code & code,
-      int condition ) const BOOST_SYSTEM_NOEXCEPT
+    inline bool error_category::equivalent( const error_code & code,
+      int condition ) const
     {
       return *this == code.category() && code.value() == condition;
     }
@@ -512,7 +505,7 @@ namespace boost
 #include <boost/config/abi_suffix.hpp> // pops abi_prefix.hpp pragmas
 
 # ifdef BOOST_ERROR_CODE_HEADER_ONLY
-#   include <boost/system/detail/error_code.ipp>
+#   include <boost/../libs/system/src/error_code.cpp>
 # endif
 
 #endif // BOOST_ERROR_CODE_HPP

@@ -20,11 +20,5 @@
     <ClCompile Include="..\..\libraries\boost\libs\thread\src\win32\tss_pe.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\libraries\boost\libs\thread\src\future.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\libraries\boost\libs\thread\src\tss_null.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
 </Project>

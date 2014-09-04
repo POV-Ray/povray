@@ -168,7 +168,7 @@ namespace boost
         typedef boost::iterator_range<
             BOOST_DEDUCED_TYPENAME range_iterator<SinglePassRange>::type > type;
 
-        static type pack(BOOST_DEDUCED_TYPENAME range_iterator<SinglePassRange>::type,
+        static type pack(BOOST_DEDUCED_TYPENAME range_iterator<SinglePassRange>::type found,
                          SinglePassRange& rng)
         {
             return type(boost::begin(rng), boost::end(rng));

@@ -9,7 +9,7 @@
 #ifndef BOOST_FLYWEIGHT_STATIC_HOLDER_HPP
 #define BOOST_FLYWEIGHT_STATIC_HOLDER_HPP
 
-#if defined(_MSC_VER)
+#if defined(_MSC_VER)&&(_MSC_VER>=1200)
 #pragma once
 #endif
 

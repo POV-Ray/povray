@@ -37,7 +37,8 @@ namespace std{ namespace tr1{
 #endif  // BOOST_HAS_TR1_REFERENCE_WRAPPER
 
 #if !defined(BOOST_HAS_TR1_RESULT_OF)\
-   && !defined(BOOST_NO_SFINAE)
+   && !defined(BOOST_NO_SFINAE) && \
+   !defined(BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION)
 
 //
 // we can only actually include result_of.hpp if the compiler
@@ -102,6 +103,7 @@ namespace std{ namespace tr1{
 #include <boost/detail/workaround.hpp>
 
 #if !BOOST_WORKAROUND(__BORLANDC__, < 0x582) \
+    && !BOOST_WORKAROUND(BOOST_MSVC, < 1310) \
     && !defined(BOOST_FUNCTION_NO_FUNCTION_TYPE_SYNTAX)
 namespace std{ namespace tr1{
 
@@ -126,12 +128,7 @@ template <class T> struct hash;
 }
 
 namespace std{ namespace tr1{
-   //using ::boost::hash;
-
-   template <class T>
-   struct hash : public boost::hash<T>
-   {
-   };
+   using ::boost::hash;
 
 }}
 

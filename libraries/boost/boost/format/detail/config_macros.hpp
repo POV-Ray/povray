@@ -49,6 +49,12 @@
 #define BOOST_NO_OVERLOAD_FOR_NON_CONST
 #endif
 
+// gcc-2.95's native stringstream is not usable
+#if BOOST_WORKAROUND(__GNUC__, < 3) && !defined(__SGI_STL_PORT) && !defined(_STLPORT_VERSION)
+#define BOOST_FORMAT_IGNORE_STRINGSTREAM  
+#endif
+
+
 // **** Workaround for io streams, stlport and msvc.
 #ifdef BOOST_IO_NEEDS_USING_DECLARATION
 namespace boost {
@@ -73,10 +79,6 @@ namespace boost {
 }
   // -end N.S. boost
 #endif // needs_using_declaration
-
-#if ! defined(BOOST_NO_STD_LOCALE)
-#include <locale>
-#endif
 
 
 // ***  hide std::locale if it doesnt exist. 

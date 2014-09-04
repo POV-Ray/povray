@@ -12,7 +12,6 @@
 #define BOOST_RANGE_ADAPTOR_INDIRECTED_HPP
 
 #include <boost/range/iterator_range.hpp>
-#include <boost/range/concepts.hpp>
 #include <boost/iterator/indirect_iterator.hpp>
 
 namespace boost
@@ -20,7 +19,7 @@ namespace boost
     namespace range_detail
     {
         template< class R >
-        struct indirected_range :
+        struct indirect_range :
             public boost::iterator_range<
                         boost::indirect_iterator<
                             BOOST_DEDUCED_TYPENAME range_iterator<R>::type
@@ -36,36 +35,30 @@ namespace boost
                 base;
 
         public:
-            explicit indirected_range( R& r )
+            explicit indirect_range( R& r )
                 : base( r )
             { }
         };
 
         struct indirect_forwarder {};
 
-        template< class SinglePassRange >
-        inline indirected_range<SinglePassRange>
-        operator|( SinglePassRange& r, indirect_forwarder )
+        template< class InputRng >
+        inline indirect_range<InputRng>
+        operator|( InputRng& r, indirect_forwarder )
         {
-            BOOST_RANGE_CONCEPT_ASSERT((
-                SinglePassRangeConcept<SinglePassRange>));
-
-            return indirected_range<SinglePassRange>( r );
+            return indirect_range<InputRng>( r );
         }
 
-        template< class SinglePassRange >
-        inline indirected_range<const SinglePassRange>
-        operator|( const SinglePassRange& r, indirect_forwarder )
+        template< class InputRng >
+        inline indirect_range<const InputRng>
+        operator|( const InputRng& r, indirect_forwarder )
         {
-            BOOST_RANGE_CONCEPT_ASSERT((
-                SinglePassRangeConcept<const SinglePassRange>));
-
-            return indirected_range<const SinglePassRange>( r );
+            return indirect_range<const InputRng>( r );
         }
 
     } // 'range_detail'
 
-    using range_detail::indirected_range;
+    using range_detail::indirect_range;
 
     namespace adaptors
     {
@@ -75,23 +68,18 @@ namespace boost
                                             range_detail::indirect_forwarder();
         }
 
-        template<class SinglePassRange>
-        inline indirected_range<SinglePassRange>
-        indirect(SinglePassRange& rng)
+        template<class InputRange>
+        inline indirect_range<InputRange>
+        indirect(InputRange& rng)
         {
-            BOOST_RANGE_CONCEPT_ASSERT((
-                SinglePassRangeConcept<SinglePassRange>));
-            return indirected_range<SinglePassRange>(rng);
+            return indirect_range<InputRange>(rng);
         }
 
-        template<class SinglePassRange>
-        inline indirected_range<const SinglePassRange>
-        indirect(const SinglePassRange& rng)
+        template<class InputRange>
+        inline indirect_range<const InputRange>
+        indirect(const InputRange& rng)
         {
-            BOOST_RANGE_CONCEPT_ASSERT((
-                SinglePassRangeConcept<const SinglePassRange>));
-
-            return indirected_range<const SinglePassRange>(rng);
+            return indirect_range<const InputRange>(rng);
         }
     } // 'adaptors'
 
