@@ -40,11 +40,11 @@ struct use_default_tag {};
 //   X(something, *(predicate))
 //   X(something, (int))
 
-template <class T, class Args>
+template <class T>
 struct cast;
 
-template <class Args>
-struct cast<void*, Args>
+template <>
+struct cast<void*>
 {
     static use_default_tag execute(use_default_tag)
     {
@@ -73,39 +73,27 @@ struct cast<void*, Args>
 
 typedef void* voidstar;
 
-template <class T, class Args>
-struct cast<voidstar(T), Args>
-  : cast<void*, Args>
+template <class T>
+struct cast<voidstar(T)>
+  : cast<void*>
 {
 };
 
 #else
 
-template <class T, class Args>
-struct cast<void*(T), Args>
-  : cast<void*, Args>
+template <class T>
+struct cast<void*(T)>
+  : cast<void*>
 {
 };
 
 #endif
 
-// This is a hack used in cast<> to turn the user supplied type,
-// which may or may not be a placeholder expression into one, so
-// that it will be properly evaluated by mpl::apply.
-template <class T, class Dummy = mpl::_1>
-struct as_placeholder_expr
+template <class T>
+struct cast<void(T)>
 {
-    typedef T type;
-};
-
-template <class T, class Args>
-struct cast<void(T), Args>
-{
-    typedef typename mpl::apply2<
-        as_placeholder_expr<T>, Args, Args>::type type0;
-
     typedef typename boost::add_reference<
-        typename boost::remove_const<type0>::type 
+        typename boost::remove_const<T>::type 
     >::type reference;
 
     static use_default_tag execute(use_default_tag)
@@ -118,7 +106,7 @@ struct cast<void(T), Args>
         return use_default_tag();
     }
 
-    static type0 execute(type0 value)
+    static T execute(T value)
     {
         return value;
     }
@@ -130,9 +118,9 @@ struct cast<void(T), Args>
     }
 };
 
-#  define BOOST_PARAMETER_FUNCTION_CAST(value, predicate, args) \
-    boost::parameter::aux::cast<void predicate, args>::remove_const( \
-        boost::parameter::aux::cast<void predicate, args>::execute(value) \
+#  define BOOST_PARAMETER_FUNCTION_CAST(value, predicate) \
+    boost::parameter::aux::cast<void predicate>::remove_const( \
+        boost::parameter::aux::cast<void predicate>::execute(value) \
     )
 
 # endif

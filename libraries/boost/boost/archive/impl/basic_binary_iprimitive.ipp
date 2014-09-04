@@ -8,7 +8,7 @@
 
 //  See http://www.boost.org for updates, documentation, and revision history.
 
-#include <boost/assert.hpp>
+#include <cassert>
 #include <cstddef> // size_t, NULL
 #include <cstring> // memcpy
 
@@ -28,7 +28,6 @@ namespace std{
 #include <boost/archive/archive_exception.hpp>
 #include <boost/archive/codecvt_null.hpp>
 #include <boost/archive/add_facet.hpp>
-#include <boost/archive/basic_binary_iprimitive.hpp> 
 
 namespace boost {
 namespace archive {

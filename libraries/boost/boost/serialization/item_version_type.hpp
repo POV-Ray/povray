@@ -12,7 +12,7 @@
 #include <boost/serialization/is_bitwise_serializable.hpp>
 
 // fixes broken example build on x86_64-linux-gnu-gcc-4.6.0
-#include <boost/assert.hpp>
+#include <cassert>
 
 namespace boost { 
 namespace serialization {
@@ -30,7 +30,7 @@ public:
     // should be private - but MPI fails if it's not!!!
     item_version_type(): t(0) {};
     explicit item_version_type(const unsigned int t_) : t(t_){
-        BOOST_ASSERT(t_ <= boost::integer_traits<base_type>::const_max);
+        assert(t_ <= boost::integer_traits<base_type>::const_max);
     }
     item_version_type(const item_version_type & t_) : 
         t(t_.t)

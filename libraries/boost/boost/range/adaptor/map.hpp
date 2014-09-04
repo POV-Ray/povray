@@ -14,8 +14,6 @@
 #include <boost/range/adaptor/transformed.hpp>
 #include <boost/range/iterator_range.hpp>
 #include <boost/range/value_type.hpp>
-#include <boost/range/reference.hpp>
-#include <boost/range/concepts.hpp>
 
 namespace boost
 {
@@ -27,10 +25,11 @@ namespace boost
         template< class Map >
         struct select_first
         {
-            typedef BOOST_DEDUCED_TYPENAME range_reference<const Map>::type argument_type;
-            typedef const BOOST_DEDUCED_TYPENAME range_value<const Map>::type::first_type& result_type;
+            typedef BOOST_DEDUCED_TYPENAME range_value<Map>::type pair_t;
+            typedef const BOOST_DEDUCED_TYPENAME pair_t::first_type&
+                result_type;
 
-            result_type operator()( argument_type r ) const
+            result_type operator()( const pair_t& r ) const
             {
                 return r.first;
             }
@@ -39,10 +38,10 @@ namespace boost
         template< class Map >
         struct select_second_mutable
         {
-            typedef BOOST_DEDUCED_TYPENAME range_reference<Map>::type argument_type;
-            typedef BOOST_DEDUCED_TYPENAME range_value<Map>::type::second_type& result_type;
+            typedef BOOST_DEDUCED_TYPENAME range_value<Map>::type pair_t;
+            typedef BOOST_DEDUCED_TYPENAME pair_t::second_type& result_type;
 
-            result_type operator()( argument_type r ) const
+            result_type operator()( pair_t& r ) const
             {
                 return r.second;
             }
@@ -51,10 +50,11 @@ namespace boost
         template< class Map >
         struct select_second_const
         {
-            typedef BOOST_DEDUCED_TYPENAME range_reference<const Map>::type argument_type;
-            typedef const BOOST_DEDUCED_TYPENAME range_value<const Map>::type::second_type& result_type;
+            typedef BOOST_DEDUCED_TYPENAME range_value<Map>::type pair_t;
+            typedef const BOOST_DEDUCED_TYPENAME pair_t::second_type&
+                result_type;
 
-            result_type operator()( argument_type r ) const
+            result_type operator()( const pair_t& r ) const
             {
                 return r.second;
             }
@@ -62,11 +62,11 @@ namespace boost
 
         template<class StdPairRng>
         class select_first_range
-            : public transformed_range<
+            : public transform_range<
                         select_first<StdPairRng>,
                         const StdPairRng>
         {
-            typedef transformed_range<select_first<StdPairRng>, const StdPairRng> base;
+            typedef transform_range<select_first<StdPairRng>, const StdPairRng> base;
         public:
             typedef select_first<StdPairRng> transform_fn_type;
             typedef const StdPairRng source_range_type;
@@ -81,11 +81,11 @@ namespace boost
 
         template<class StdPairRng>
         class select_second_mutable_range
-            : public transformed_range<
+            : public transform_range<
                         select_second_mutable<StdPairRng>,
                         StdPairRng>
         {
-            typedef transformed_range<select_second_mutable<StdPairRng>, StdPairRng> base;
+            typedef transform_range<select_second_mutable<StdPairRng>, StdPairRng> base;
         public:
             typedef select_second_mutable<StdPairRng> transform_fn_type;
             typedef StdPairRng source_range_type;
@@ -100,11 +100,11 @@ namespace boost
 
         template<class StdPairRng>
         class select_second_const_range
-            : public transformed_range<
+            : public transform_range<
                         select_second_const<StdPairRng>,
                         const StdPairRng>
         {
-            typedef transformed_range<select_second_const<StdPairRng>, const StdPairRng> base;
+            typedef transform_range<select_second_const<StdPairRng>, const StdPairRng> base;
         public:
             typedef select_second_const<StdPairRng> transform_fn_type;
             typedef const StdPairRng source_range_type;
@@ -121,32 +121,24 @@ namespace boost
         inline select_first_range<StdPairRng>
         operator|( const StdPairRng& r, map_keys_forwarder )
         {
-            BOOST_RANGE_CONCEPT_ASSERT((
-                SinglePassRangeConcept<const StdPairRng>));
-
             return operator|( r,
-                boost::adaptors::transformed( select_first<StdPairRng>() ) );
+              boost::adaptors::transformed( select_first<StdPairRng>() ) );
         }
 
         template< class StdPairRng >
         inline select_second_mutable_range<StdPairRng>
         operator|( StdPairRng& r, map_values_forwarder )
         {
-            BOOST_RANGE_CONCEPT_ASSERT((SinglePassRangeConcept<StdPairRng>));
-
             return operator|( r,
-                boost::adaptors::transformed( select_second_mutable<StdPairRng>() ) );
+          boost::adaptors::transformed( select_second_mutable<StdPairRng>() ) );
         }
 
         template< class StdPairRng >
         inline select_second_const_range<StdPairRng>
         operator|( const StdPairRng& r, map_values_forwarder )
         {
-            BOOST_RANGE_CONCEPT_ASSERT((
-                SinglePassRangeConcept<const StdPairRng>));
-
             return operator|( r,
-                boost::adaptors::transformed( select_second_const<StdPairRng>() ) );
+           boost::adaptors::transformed( select_second_const<StdPairRng>() ) );
         }
 
     } // 'range_detail'
@@ -170,9 +162,6 @@ namespace boost
         inline select_first_range<StdPairRange>
         keys(const StdPairRange& rng)
         {
-            BOOST_RANGE_CONCEPT_ASSERT((
-                SinglePassRangeConcept<const StdPairRange>));
-
             return select_first_range<StdPairRange>(
                 range_detail::select_first<StdPairRange>(), rng );
         }
@@ -181,9 +170,6 @@ namespace boost
         inline select_second_const_range<StdPairRange>
         values(const StdPairRange& rng)
         {
-            BOOST_RANGE_CONCEPT_ASSERT((
-                SinglePassRangeConcept<const StdPairRange>));
-
             return select_second_const_range<StdPairRange>(
                 range_detail::select_second_const<StdPairRange>(), rng );
         }
@@ -192,8 +178,6 @@ namespace boost
         inline select_second_mutable_range<StdPairRange>
         values(StdPairRange& rng)
         {
-            BOOST_RANGE_CONCEPT_ASSERT((SinglePassRangeConcept<StdPairRange>));
-
             return select_second_mutable_range<StdPairRange>(
                 range_detail::select_second_mutable<StdPairRange>(), rng );
         }

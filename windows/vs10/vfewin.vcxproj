@@ -127,7 +127,7 @@
       <Optimization>Disabled</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <AdditionalIncludeDirectories>..\..\libraries\boost;..\..\vfe\win\;..\..\vfe;..\..\source;..\..\source\base;..\..\source\backend;..\..\source\frontend;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>BOOST_ALL_NO_LIB;_DEBUG;WIN32;WIN32_LEAN_AND_MEAN;_WINDOWS;WINVER=0x0500;_WIN32_WINNT=0x0500;COMMONCTRL_VERSION=0x500;CLASSLIB_DEFS_H;NOMINMAX;ISOLATION_AWARE_ENABLED;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;_HAS_ITERATOR_DEBUGGING=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BOOST_ALL_NO_LIB;_DEBUG;WIN32;WIN32_LEAN_AND_MEAN;_WINDOWS;WINVER=0x0500;_WIN32_WINNT=0x0500;COMMONCTRL_VERSION=0x500;CLASSLIB_DEFS_H;NOMINMAX;ISOLATION_AWARE_ENABLED;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;_HAS_ITERATOR_DEBUGGING=0;_HAS_CPP0X=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <MinimalRebuild>true</MinimalRebuild>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -176,7 +176,7 @@
       <Optimization>Disabled</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <AdditionalIncludeDirectories>..\..\libraries\boost;..\..\vfe\win\;..\..\vfe;..\..\source;..\..\source\base;..\..\source\backend;..\..\source\frontend;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>BOOST_ALL_NO_LIB;_DEBUG;WIN32;WIN32_LEAN_AND_MEAN;_WINDOWS;CLASSLIB_DEFS_H;NOMINMAX;ISOLATION_AWARE_ENABLED;_CRT_SECURE_NO_DEPRECATE;_HAS_ITERATOR_DEBUGGING=0;BUILDING_AMD64=1;COMMONCTRL_VERSION=0x500;_WIN32_WINNT=0x0500;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BOOST_ALL_NO_LIB;_DEBUG;WIN32;WIN32_LEAN_AND_MEAN;_WINDOWS;CLASSLIB_DEFS_H;NOMINMAX;ISOLATION_AWARE_ENABLED;_CRT_SECURE_NO_DEPRECATE;_HAS_ITERATOR_DEBUGGING=0;_HAS_CPP0X=0;BUILDING_AMD64=1;COMMONCTRL_VERSION=0x500;_WIN32_WINNT=0x0500;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <MinimalRebuild>true</MinimalRebuild>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -227,7 +227,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>true</WholeProgramOptimization>
       <AdditionalIncludeDirectories>..\..\libraries\boost;..\..\vfe\win\;..\..\vfe;..\..\source;..\..\source\base;..\..\source\backend;..\..\source\frontend;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>BOOST_ALL_NO_LIB;NDEBUG;WIN32;WIN32_LEAN_AND_MEAN;_WINDOWS;COMMONCTRL_VERSION=0x500;CLASSLIB_DEFS_H;WINVER=0x0500;_WIN32_WINNT=0x0500;NOMINMAX;ISOLATION_AWARE_ENABLED;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BOOST_ALL_NO_LIB;NDEBUG;WIN32;WIN32_LEAN_AND_MEAN;_WINDOWS;COMMONCTRL_VERSION=0x500;CLASSLIB_DEFS_H;WINVER=0x0500;_WIN32_WINNT=0x0500;NOMINMAX;ISOLATION_AWARE_ENABLED;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;_SECURE_SCL=0;_HAS_CPP0X=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <MinimalRebuild>true</MinimalRebuild>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -276,7 +276,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <AdditionalIncludeDirectories>..\..\libraries\boost;..\..\vfe\win\;..\..\vfe;..\..\source;..\..\source\base;..\..\source\backend;..\..\source\frontend;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>BOOST_ALL_NO_LIB;NDEBUG;WIN32;WIN32_LEAN_AND_MEAN;_WINDOWS;CLASSLIB_DEFS_H;NOMINMAX;ISOLATION_AWARE_ENABLED;_CRT_SECURE_NO_DEPRECATE;_SECURE_SCL=0;BUILDING_AMD64=1;COMMONCTRL_VERSION=0x500;_WIN32_WINNT=0x0500;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BOOST_ALL_NO_LIB;NDEBUG;WIN32;WIN32_LEAN_AND_MEAN;_WINDOWS;CLASSLIB_DEFS_H;NOMINMAX;ISOLATION_AWARE_ENABLED;_CRT_SECURE_NO_DEPRECATE;_SECURE_SCL=0;BUILDING_AMD64=1;COMMONCTRL_VERSION=0x500;_WIN32_WINNT=0x0500;_HAS_CPP0X=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <MinimalRebuild>true</MinimalRebuild>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -326,7 +326,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>true</WholeProgramOptimization>
       <AdditionalIncludeDirectories>..\..\libraries\boost;..\..\vfe\win\;..\..\vfe;..\..\source;..\..\source\base;..\..\source\backend;..\..\source\frontend;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>BOOST_ALL_NO_LIB;NDEBUG;WIN32;WIN32_LEAN_AND_MEAN;_WINDOWS;COMMONCTRL_VERSION=0x500;CLASSLIB_DEFS_H;WINVER=0x0500;_WIN32_WINNT=0x0500;NOMINMAX;ISOLATION_AWARE_ENABLED;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BOOST_ALL_NO_LIB;NDEBUG;WIN32;WIN32_LEAN_AND_MEAN;_WINDOWS;COMMONCTRL_VERSION=0x500;CLASSLIB_DEFS_H;WINVER=0x0500;_WIN32_WINNT=0x0500;NOMINMAX;ISOLATION_AWARE_ENABLED;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;_SECURE_SCL=0;_HAS_CPP0X=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <MinimalRebuild>true</MinimalRebuild>
       <ExceptionHandling>Sync</ExceptionHandling>

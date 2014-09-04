@@ -13,7 +13,7 @@
 
 #include <boost/detail/iterator.hpp>
 #include <boost/range/value_type.hpp>
-#include <boost/range/iterator_range_core.hpp>
+#include <boost/range/iterator_range.hpp>
 #include <boost/range/as_literal.hpp>
 
 #include <boost/algorithm/string/detail/formatter.hpp>
@@ -36,10 +36,10 @@ namespace boost {
 
         //! Constant formatter
         /*!
-            Constructs a \c const_formatter. Const formatter always returns
+            Construct the \c const_formatter. Const formatter always returns
             the same value, regardless of the parameter.
 
-            \param Format A predefined value used as a result for formatting
+            \param Format A predefined value used as a result for formating
             \return An instance of the \c const_formatter object.
         */
         template<typename RangeT>
@@ -55,7 +55,7 @@ namespace boost {
 
         //! Identity formatter
         /*!
-            Constructs an \c identity_formatter. Identity formatter always returns
+            Construct the \c identity_formatter. Identity formatter always returns
             the parameter.
 
             \return An instance of the \c identity_formatter object.
@@ -73,7 +73,7 @@ namespace boost {
 
         //! Empty formatter
         /*!
-            Constructs an \c empty_formatter. Empty formatter always returns an empty
+            Construct the \c empty_formatter. Empty formatter always returns an empty
             sequence. 
 
             \param Input container used to select a correct value_type for the
@@ -89,22 +89,6 @@ namespace boost {
                 BOOST_STRING_TYPENAME range_value<RangeT>::type>();
         }
 
-        //! Empty formatter
-        /*!
-            Constructs a \c dissect_formatter. Dissect formatter uses a specified finder
-            to extract a portion of the formatted sequence. The first finder's match is returned 
-            as a result
-
-            \param Finder a finder used to select a portion of the formatted sequence
-            \return An instance of the \c dissect_formatter object.
-        */
-        template<typename FinderT>
-        inline detail::dissect_formatF< FinderT >
-        dissect_formatter(const FinderT& Finder)
-        {
-            return detail::dissect_formatF<FinderT>(Finder);
-        }
-
 
     } // namespace algorithm
 
@@ -112,7 +96,6 @@ namespace boost {
     using algorithm::const_formatter;
     using algorithm::identity_formatter;
     using algorithm::empty_formatter;
-    using algorithm::dissect_formatter;
 
 } // namespace boost
 

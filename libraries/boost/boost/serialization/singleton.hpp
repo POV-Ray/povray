@@ -30,11 +30,11 @@
 //
 
 // MS compatible compilers support #pragma once
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) && (_MSC_VER >= 1020)
 # pragma once
 #endif 
 
-#include <boost/assert.hpp>
+#include <cassert>
 #include <boost/config.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/serialization/force_include.hpp>
@@ -128,13 +128,13 @@ private:
         static detail::singleton_wrapper< T > t;
         // refer to instance, causing it to be instantiated (and
         // initialized at startup on working compilers)
-        BOOST_ASSERT(! detail::singleton_wrapper< T >::m_is_destroyed);
+        assert(! detail::singleton_wrapper< T >::m_is_destroyed);
         use(instance);
         return static_cast<T &>(t);
     }
 public:
     BOOST_DLLEXPORT static T & get_mutable_instance(){
-        BOOST_ASSERT(! is_locked());
+        assert(! is_locked());
         return get_instance();
     }
     BOOST_DLLEXPORT static const T & get_const_instance(){

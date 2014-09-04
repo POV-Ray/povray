@@ -2,7 +2,7 @@
 #define BOOST_ARCHIVE_ITERATORS_BINARY_FROM_BASE64_HPP
 
 // MS compatible compilers support #pragma once
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) && (_MSC_VER >= 1020)
 # pragma once
 #endif
 
@@ -16,8 +16,9 @@
 
 //  See http://www.boost.org for updates, documentation, and revision history.
 
-#include <boost/assert.hpp>
+#include <cassert>
 
+#include <boost/config.hpp> // for BOOST_DEDUCED_TYPENAME
 #include <boost/serialization/throw_exception.hpp>
 #include <boost/serialization/pfto.hpp>
 #include <boost/static_assert.hpp>
@@ -38,11 +39,11 @@ template<class CharType>
 struct to_6_bit {
     typedef CharType result_type;
     CharType operator()(CharType t) const{
-        const signed char lookup_table[] = {
+        const char lookup_table[] = {
             -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
             -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
             -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,62,-1,-1,-1,63,
-            52,53,54,55,56,57,58,59,60,61,-1,-1,-1, 0,-1,-1, // render '=' as 0
+            52,53,54,55,56,57,58,59,60,61,-1,-1,-1,-1,-1,-1,
             -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14,
             15,16,17,18,19,20,21,22,23,24,25,-1,-1,-1,-1,-1,
             -1,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,
@@ -66,7 +67,7 @@ struct to_6_bit {
 } // namespace detail
 
 // note: what we would like to do is
-// template<class Base, class CharType = typename Base::value_type>
+// template<class Base, class CharType = BOOST_DEDUCED_TYPENAME Base::value_type>
 //  typedef transform_iterator<
 //      from_6_bit<CharType>,
 //      transform_width<Base, 6, sizeof(Base::value_type) * 8, CharType>
@@ -80,7 +81,7 @@ struct to_6_bit {
 
 template<
     class Base, 
-    class CharType = typename boost::iterator_value<Base>::type
+    class CharType = BOOST_DEDUCED_TYPENAME boost::iterator_value<Base>::type
 >
 class binary_from_base64 : public
     transform_iterator<

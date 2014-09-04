@@ -5,7 +5,7 @@
 
 #ifndef UUID_618474C2DE1511DEB74A388C56D89593
 #define UUID_618474C2DE1511DEB74A388C56D89593
-#if (__GNUC__*100+__GNUC_MINOR__>301) && !defined(BOOST_EXCEPTION_ENABLE_WARNINGS)
+#if defined(__GNUC__) && !defined(BOOST_EXCEPTION_ENABLE_WARNINGS)
 #pragma GCC system_header
 #endif
 #if defined(_MSC_VER) && !defined(BOOST_EXCEPTION_ENABLE_WARNINGS)
@@ -20,54 +20,17 @@
 #include <boost/exception/info.hpp>
 #include <boost/exception/diagnostic_information.hpp>
 #include <boost/exception/detail/type_info.hpp>
-#include <boost/exception/detail/clone_current_exception.hpp>
-//#ifndef BOOST_NO_RTTI
-//#include <boost/units/detail/utility.hpp>
-//#endif
 #include <boost/shared_ptr.hpp>
 #include <stdexcept>
 #include <new>
 #include <ios>
-#include <stdlib.h>
 
 namespace
 boost
     {
-    class exception_ptr;
-    BOOST_NORETURN void rethrow_exception( exception_ptr const & );
-    exception_ptr current_exception();
+    typedef shared_ptr<exception_detail::clone_base const> exception_ptr;
 
-    class
-    exception_ptr
-        {
-        typedef boost::shared_ptr<exception_detail::clone_base const> impl;
-        impl ptr_;
-        friend void rethrow_exception( exception_ptr const & );
-        typedef exception_detail::clone_base const * (impl::*unspecified_bool_type)() const;
-        public:
-        exception_ptr()
-            {
-            }
-        explicit
-        exception_ptr( impl const & ptr ):
-            ptr_(ptr)
-            {
-            }
-        bool
-        operator==( exception_ptr const & other ) const
-            {
-            return ptr_==other.ptr_;
-            }
-        bool
-        operator!=( exception_ptr const & other ) const
-            {
-            return ptr_!=other.ptr_;
-            }
-        operator unspecified_bool_type() const
-            {
-            return ptr_?&impl::get:0;
-            }
-        };
+    exception_ptr current_exception();
 
     template <class T>
     inline
@@ -92,7 +55,7 @@ boost
     std::string
     to_string( original_exception_type const & x )
         {
-        return /*units::detail::demangle*/(x.value()->name());
+        return x.value()->name();
         }
 #endif
 
@@ -104,51 +67,35 @@ boost
             boost::exception,
             std::bad_alloc
                 {
-                ~bad_alloc_() throw() { }
                 };
 
-        struct
-        bad_exception_:
-            boost::exception,
-            std::bad_exception
-                {
-                ~bad_exception_() throw() { }
-                };
-
-        template <class Exception>
+        template <int Dummy>
         exception_ptr
-        get_static_exception_object()
+        get_bad_alloc()
             {
-            Exception ba;
-            exception_detail::clone_impl<Exception> c(ba);
-#ifndef BOOST_EXCEPTION_DISABLE
+            bad_alloc_ ba;
+            exception_detail::clone_impl<bad_alloc_> c(ba);
             c <<
                 throw_function(BOOST_CURRENT_FUNCTION) <<
                 throw_file(__FILE__) <<
                 throw_line(__LINE__);
-#endif
-            static exception_ptr ep(shared_ptr<exception_detail::clone_base const>(new exception_detail::clone_impl<Exception>(c)));
+            static exception_ptr ep(new exception_detail::clone_impl<bad_alloc_>(c));
             return ep;
             }
 
-        template <class Exception>
+        template <int Dummy>
         struct
-        exception_ptr_static_exception_object
+        exception_ptr_bad_alloc
             {
             static exception_ptr const e;
             };
 
-        template <class Exception>
+        template <int Dummy>
         exception_ptr const
-        exception_ptr_static_exception_object<Exception>::
-        e = get_static_exception_object<Exception>();
+        exception_ptr_bad_alloc<Dummy>::
+        e = get_bad_alloc<Dummy>();
         }
 
-#if defined(__GNUC__)
-# if (__GNUC__ == 4 && __GNUC_MINOR__ >= 1) || (__GNUC__ > 4)
-#  pragma GCC visibility push (default)
-# endif
-#endif
     class
     unknown_exception:
         public boost::exception,
@@ -188,11 +135,6 @@ boost
 #endif
             }
         };
-#if defined(__GNUC__)
-# if (__GNUC__ == 4 && __GNUC_MINOR__ >= 1) || (__GNUC__ > 4)
-#  pragma GCC visibility pop
-# endif
-#endif
 
     namespace
     exception_detail
@@ -302,131 +244,101 @@ boost
         exception_ptr
         current_exception_impl()
             {
-            exception_detail::clone_base const * e=0;
-            switch(
-            exception_detail::clone_current_exception(e) )
+            try
                 {
-                case exception_detail::clone_current_exception_result::
-                success:
-                    {
-                    BOOST_ASSERT(e!=0);
-                    return exception_ptr(shared_ptr<exception_detail::clone_base const>(e));
-                    }
-                case exception_detail::clone_current_exception_result::
-                bad_alloc:
-                    {
-                    BOOST_ASSERT(!e);
-                    return exception_detail::exception_ptr_static_exception_object<bad_alloc_>::e;
-                    }
-                case exception_detail::clone_current_exception_result::
-                bad_exception:
-                    {
-                    BOOST_ASSERT(!e);
-                    return exception_detail::exception_ptr_static_exception_object<bad_exception_>::e;
-                    }
-                default:
-                    BOOST_ASSERT(0);
-                case exception_detail::clone_current_exception_result::
-                not_supported:
-                    {
-                    BOOST_ASSERT(!e);
-                    try
-                        {
-                        throw;
-                        }
-                    catch(
-                    exception_detail::clone_base & e )
-                        {
-                        return exception_ptr(shared_ptr<exception_detail::clone_base const>(e.clone()));
-                        }
-                    catch(
-                    std::domain_error & e )
-                        {
-                        return exception_detail::current_exception_std_exception(e);
-                        }
-                    catch(
-                    std::invalid_argument & e )
-                        {
-                        return exception_detail::current_exception_std_exception(e);
-                        }
-                    catch(
-                    std::length_error & e )
-                        {
-                        return exception_detail::current_exception_std_exception(e);
-                        }
-                    catch(
-                    std::out_of_range & e )
-                        {
-                        return exception_detail::current_exception_std_exception(e);
-                        }
-                    catch(
-                    std::logic_error & e )
-                        {
-                        return exception_detail::current_exception_std_exception(e);
-                        }
-                    catch(
-                    std::range_error & e )
-                        {
-                        return exception_detail::current_exception_std_exception(e);
-                        }
-                    catch(
-                    std::overflow_error & e )
-                        {
-                        return exception_detail::current_exception_std_exception(e);
-                        }
-                    catch(
-                    std::underflow_error & e )
-                        {
-                        return exception_detail::current_exception_std_exception(e);
-                        }
-                    catch(
-                    std::ios_base::failure & e )
-                        {
-                        return exception_detail::current_exception_std_exception(e);
-                        }
-                    catch(
-                    std::runtime_error & e )
-                        {
-                        return exception_detail::current_exception_std_exception(e);
-                        }
-                    catch(
-                    std::bad_alloc & e )
-                        {
-                        return exception_detail::current_exception_std_exception(e);
-                        }
+                throw;
+                }
+            catch(
+            exception_detail::clone_base & e )
+                {
+                return exception_ptr(e.clone());
+                }
+            catch(
+            std::domain_error & e )
+                {
+                return exception_detail::current_exception_std_exception(e);
+                }
+            catch(
+            std::invalid_argument & e )
+                {
+                return exception_detail::current_exception_std_exception(e);
+                }
+            catch(
+            std::length_error & e )
+                {
+                return exception_detail::current_exception_std_exception(e);
+                }
+            catch(
+            std::out_of_range & e )
+                {
+                return exception_detail::current_exception_std_exception(e);
+                }
+            catch(
+            std::logic_error & e )
+                {
+                return exception_detail::current_exception_std_exception(e);
+                }
+            catch(
+            std::range_error & e )
+                {
+                return exception_detail::current_exception_std_exception(e);
+                }
+            catch(
+            std::overflow_error & e )
+                {
+                return exception_detail::current_exception_std_exception(e);
+                }
+            catch(
+            std::underflow_error & e )
+                {
+                return exception_detail::current_exception_std_exception(e);
+                }
+            catch(
+            std::ios_base::failure & e )
+                {
+                return exception_detail::current_exception_std_exception(e);
+                }
+            catch(
+            std::runtime_error & e )
+                {
+                return exception_detail::current_exception_std_exception(e);
+                }
+            catch(
+            std::bad_alloc & e )
+                {
+                return exception_detail::current_exception_std_exception(e);
+                }
 #ifndef BOOST_NO_TYPEID
-                    catch(
-                    std::bad_cast & e )
-                        {
-                        return exception_detail::current_exception_std_exception(e);
-                        }
-                    catch(
-                    std::bad_typeid & e )
-                        {
-                        return exception_detail::current_exception_std_exception(e);
-                        }
+            catch(
+            std::bad_cast & e )
+                {
+                return exception_detail::current_exception_std_exception(e);
+                }
+            catch(
+            std::bad_typeid & e )
+                {
+                return exception_detail::current_exception_std_exception(e);
+                }
 #endif
-                    catch(
-                    std::bad_exception & e )
-                        {
-                        return exception_detail::current_exception_std_exception(e);
-                        }
-                    catch(
-                    std::exception & e )
-                        {
-                        return exception_detail::current_exception_unknown_std_exception(e);
-                        }
-                    catch(
-                    boost::exception & e )
-                        {
-                        return exception_detail::current_exception_unknown_boost_exception(e);
-                        }
-                    catch(
-                    ... )
-                        {
-                        return exception_detail::current_exception_unknown_exception();
-                        }
-                    }
+            catch(
+            std::bad_exception & e )
+                {
+                return exception_detail::current_exception_std_exception(e);
+                }
+            catch(
+            std::exception & e )
+                {
+                return exception_detail::current_exception_unknown_std_exception(e);
+                }
+            catch(
+            boost::exception & e )
+                {
+                return exception_detail::current_exception_unknown_boost_exception(e);
+                }
+            catch(
+            ... )
+                {
+                return exception_detail::current_exception_unknown_exception();
                 }
             }
         }
@@ -436,6 +348,7 @@ boost
     current_exception()
         {
         exception_ptr ret;
+        BOOST_ASSERT(!ret);
         try
             {
             ret=exception_detail::current_exception_impl();
@@ -443,36 +356,41 @@ boost
         catch(
         std::bad_alloc & )
             {
-            ret=exception_detail::exception_ptr_static_exception_object<exception_detail::bad_alloc_>::e;
+            ret=exception_detail::exception_ptr_bad_alloc<42>::e;
             }
         catch(
         ... )
             {
-            ret=exception_detail::exception_ptr_static_exception_object<exception_detail::bad_exception_>::e;
+            try
+                {
+                ret=exception_detail::current_exception_std_exception(std::bad_exception());
+                }
+            catch(
+            std::bad_alloc & )
+                {
+                ret=exception_detail::exception_ptr_bad_alloc<42>::e;
+                }
+            catch(
+            ... )
+                {
+                BOOST_ASSERT(0);
+                }
             }
         BOOST_ASSERT(ret);
         return ret;
         }
 
-    BOOST_NORETURN
     inline
     void
     rethrow_exception( exception_ptr const & p )
         {
         BOOST_ASSERT(p);
-        p.ptr_->rethrow();
-        BOOST_ASSERT(0);
-        #if defined(UNDER_CE)
-            // some CE platforms don't define ::abort()
-            exit(-1);
-        #else
-            abort();
-        #endif
+        p->rethrow();
         }
 
     inline
     std::string
-    diagnostic_information( exception_ptr const & p, bool verbose=true )
+    diagnostic_information( exception_ptr const & p )
         {
         if( p )
             try
@@ -482,7 +400,7 @@ boost
             catch(
             ... )
                 {
-                return current_exception_diagnostic_information(verbose);
+                return current_exception_diagnostic_information();
                 }
         return "<empty>";
         }

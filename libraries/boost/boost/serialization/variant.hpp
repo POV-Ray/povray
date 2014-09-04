@@ -2,8 +2,12 @@
 #define BOOST_SERIALIZATION_VARIANT_HPP
 
 // MS compatible compilers support #pragma once
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) && (_MSC_VER >= 1020)
 # pragma once
+#endif
+
+#if defined(_MSC_VER) && (_MSC_VER <= 1020)
+#  pragma warning (disable : 4786) // too long name, harmless warning
 #endif
 
 /////////1/////////2/////////3/////////4/////////5/////////6/////////7/////////8
@@ -66,7 +70,7 @@ void save(
 ){
     int which = v.which();
     ar << BOOST_SERIALIZATION_NVP(which);
-    typedef typename  boost::variant<BOOST_VARIANT_ENUM_PARAMS(T)>::types types;
+    typedef BOOST_DEDUCED_TYPENAME  boost::variant<BOOST_VARIANT_ENUM_PARAMS(T)>::types types;
     variant_save_visitor<Archive> visitor(ar);
     v.apply_visitor(visitor);
 }
@@ -97,14 +101,14 @@ struct variant_impl {
                 // necessary has to copy the value.  This wouldn't be necessary
                 // with an implementation that de-serialized to the address of the
                 // aligned storage included in the variant.
-                typedef typename mpl::front<S>::type head_type;
+                typedef BOOST_DEDUCED_TYPENAME mpl::front<S>::type head_type;
                 head_type value;
                 ar >> BOOST_SERIALIZATION_NVP(value);
                 v = value;
                 ar.reset_object_address(& boost::get<head_type>(v), & value);
                 return;
             }
-            typedef typename mpl::pop_front<S>::type type;
+            typedef BOOST_DEDUCED_TYPENAME mpl::pop_front<S>::type type;
             variant_impl<type>::load(ar, which - 1, v, version);
         }
     };
@@ -116,7 +120,7 @@ struct variant_impl {
         V & v,
         const unsigned int version
     ){
-        typedef typename mpl::eval_if<mpl::empty<S>,
+        typedef BOOST_DEDUCED_TYPENAME mpl::eval_if<mpl::empty<S>,
             mpl::identity<load_null>,
             mpl::identity<load_impl>
         >::type typex;
@@ -132,7 +136,7 @@ void load(
     const unsigned int version
 ){
     int which;
-    typedef typename boost::variant<BOOST_VARIANT_ENUM_PARAMS(T)>::types types;
+    typedef BOOST_DEDUCED_TYPENAME boost::variant<BOOST_VARIANT_ENUM_PARAMS(T)>::types types;
     ar >> BOOST_SERIALIZATION_NVP(which);
     if(which >=  mpl::size<types>::value)
         // this might happen if a type was removed from the list of variant types

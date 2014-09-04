@@ -72,44 +72,20 @@ struct propagate_cv< const volatile From, To >
 { typedef To const volatile type; };
 
 /*******************************************************************************
- * struct is_integral_or_enum<T>
+ * struct is_signable_integral<T>
  *
  * This metafunction determines if T is an integral type which can be made
  * signed or unsigned.
  ******************************************************************************/
 
 template< class T >
-struct is_integral_or_enum
-    : public mpl::or_< is_integral<T>, is_enum<T> >
+struct is_signable_integral
+    : mpl::or_< is_integral<T>, is_enum<T> >
 { };
 template<>
-struct is_integral_or_enum< bool >
-    : public false_type
+struct is_signable_integral< bool >
+    : false_type
 { };
-
-/*******************************************************************************
- * struct make_unsigned_soft<T>
- * struct make_signed_soft<T>
- *
- * These metafunction are identical to make_unsigned and make_signed,
- * respectively, except for special-casing bool.
- ******************************************************************************/
-
-template< class T >
-struct make_unsigned_soft
-    : public make_unsigned<T>
-{ };
-template<>
-struct make_unsigned_soft< bool >
-{ typedef bool type; };
-
-template< class T >
-struct make_signed_soft
-    : public make_signed<T>
-{ };
-template<>
-struct make_signed_soft< bool >
-{ typedef bool type; };
 
 /*******************************************************************************
  * struct sizeof_t<N>
@@ -151,7 +127,7 @@ yes_type rvalue_test(...);
 
 template< class First, class Last, std::size_t Index >
 struct conversion_test_overloads_iterate
-    : public conversion_test_overloads_iterate<
+    : conversion_test_overloads_iterate<
           typename mpl::next< First >::type, Last, Index + 1
       >
 {
@@ -168,7 +144,7 @@ struct conversion_test_overloads_iterate< Last, Last, Index >
 
 template< class Sequence >
 struct conversion_test_overloads
-    : public conversion_test_overloads_iterate<
+    : conversion_test_overloads_iterate<
           typename mpl::begin< Sequence >::type,
           typename mpl::end< Sequence >::type,
           0
@@ -187,7 +163,7 @@ template<
     int N = mpl::size< Sequence >::value
 >
 struct select
-    : public mpl::at_c< Sequence, Index >
+    : mpl::at_c< Sequence, Index >
 { };
 template< class Sequence, int N >
 struct select< Sequence, N, N >
@@ -209,21 +185,12 @@ struct select< Sequence, N, N >
  *             { V*, W*, V'*, W'* }
  *           where V' is V with whatever cv-qualifiers are on W, and W' is W
  *           with whatever cv-qualifiers are on V
- *     else if T' and U' are both integral or enum types, then:
+ *     else T' and U' are both "signable integral types" (integral and enum
+ *       types excepting bool), then:
  *         define the set of NominalCandidates to be
- *             {
- *                 unsigned_soft(T'),
- *                 unsigned_soft(U'),
- *                 signed_soft(T'),
- *                 signed_soft(U'),
- *                 T',
- *                 U',
- *                 unsigned int,
- *                 int
- *             }
- *           where unsigned_soft(X) is make_unsigned_soft<X>::type and
- *           signed_soft(X) is make_signed_soft<X>::type (these are all
- *           generally necessary to cover the various integral promotion cases)
+ *             { unsigned(T'), unsigned(U'), signed(T'), signed(U') }
+ *           where unsigned(X) is make_unsigned<X>::type and signed(X) is
+ *           make_signed<X>::type
  *     else
  *         define the set of NominalCandidates to be
  *             { T', U' }
@@ -264,20 +231,22 @@ template<
     class T, class U,
     class V = typename remove_cv< typename remove_reference<T>::type >::type,
     class W = typename remove_cv< typename remove_reference<U>::type >::type,
-    bool = is_integral_or_enum<V>::value && is_integral_or_enum<W>::value
+    bool = is_signable_integral<V>::value && is_signable_integral<W>::value
 >
-struct nominal_candidates
+struct nominal_candidates;
+
+template< class T, class U, class V, class W >
+struct nominal_candidates< T, U, V, W, false >
 { typedef mpl::vector2<V,W> type; };
 
 template< class T, class U, class V, class W >
 struct nominal_candidates< T, U, V, W, true >
 {
-    typedef boost::mpl::vector8<
-        typename make_unsigned_soft<V>::type,
-        typename make_unsigned_soft<W>::type,
-        typename make_signed_soft<V>::type,
-        typename make_signed_soft<W>::type,
-        V, W, unsigned int, int
+    typedef mpl::vector4<
+        typename make_unsigned<V>::type,
+        typename make_unsigned<W>::type,
+        typename make_signed<V>::type,
+        typename make_signed<W>::type
     > type;
 };
 
@@ -293,7 +262,7 @@ struct nominal_candidates< T, U, V*, W*, false >
 
 template<class T, class U, bool b>
 struct common_type_dispatch_on_rvalueness
-    : public deduce_common_type< T, U, typename nominal_candidates<T,U>::type >
+    : deduce_common_type< T, U, typename nominal_candidates<T,U>::type >
 { };
 
 template< class T, class U >
@@ -316,7 +285,7 @@ public:
 
 template< class T, class U >
 struct common_type_impl
-    : public common_type_dispatch_on_rvalueness<T,U, sizeof( ::boost::detail_type_traits_common_type::rvalue_test(
+    : common_type_dispatch_on_rvalueness<T,U, sizeof( ::boost::detail_type_traits_common_type::rvalue_test(
         declval< bool >() ? declval<T>() : declval<U>() ) ) == sizeof( yes_type ) >
 { };
 

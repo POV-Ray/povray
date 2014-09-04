@@ -649,55 +649,17 @@ inline void do_print(std::basic_ostream<Char, Traits>& os, const char* s)
 
 // For automatically applying the appropriate prefixes.
 
-}
-
-#ifdef BOOST_UNITS_DOXYGEN
-
-/// ADL customization point for automatic prefixing.
-/// Returns a non-negative value.  Implemented as std::abs
-/// for built-in types.
-template<class T>
-double autoprefix_norm(const T& arg);
-
-#else
-
-template<class T, bool C = boost::is_arithmetic<T>::value>
-struct autoprefix_norm_impl;
-
-template<class T>
-struct autoprefix_norm_impl<T, true>
-{
-    typedef double type;
-    static double call(const T& arg) { return std::abs(arg); }
-};
-
-template<class T>
-struct autoprefix_norm_impl<T, false>
-{
-    typedef one type;
-    static one call(const T&) { return one(); }
-};
-
-template<class T>
-typename autoprefix_norm_impl<T>::type autoprefix_norm(const T& arg)
-{
-    return autoprefix_norm_impl<T>::call(arg);
-}
-
-#endif
-
-namespace detail {
-
 template<class End, class Prev, class T, class F>
-bool find_matching_scale_impl(End, End, Prev, T, double, F)
+bool find_matching_scale_impl(End, End, Prev, T, F)
 {
     return false;
 }
 
 template<class Begin, class End, class Prev, class T, class F>
-bool find_matching_scale_impl(Begin, End end, Prev prev, T t, double x, F f)
+bool find_matching_scale_impl(Begin, End end, Prev prev, T t, F f)
 {
-    if(Begin::item::value() > x) {
+    using std::abs;
+    if(Begin::item::value() > abs(t)) {
         f(prev, t);
         return true;
     } else {
@@ -706,32 +668,32 @@ bool find_matching_scale_impl(Begin, End end, Prev prev, T t, double x, F f)
             end,
             typename Begin::item(),
             t,
-            x,
             f
         );
     }
 }
 
 template<class End, class T, class F>
-bool find_matching_scale_i(End, End, T, double, F)
+bool find_matching_scale_i(End, End, T, F)
 {
     return false;
 }
 
 template<class Begin, class End, class T, class F>
-bool find_matching_scale_i(Begin, End end, T t, double x, F f)
+bool find_matching_scale_i(Begin, End end, T t, F f)
 {
-    if(Begin::item::value() > x) {
+    using std::abs;
+    if(Begin::item::value() > abs(t)) {
         return false;
     } else {
-        return detail::find_matching_scale_impl(typename Begin::next(), end, typename Begin::item(), t, x, f);
+        return detail::find_matching_scale_impl(typename Begin::next(), end, typename Begin::item(), t, f);
     }
 }
 
 template<class Scales, class T, class F>
-bool find_matching_scale(T t, double x, F f)
+bool find_matching_scale(T t, F f)
 {
-    return detail::find_matching_scale_i(Scales(), dimensionless_type(), t, x, f);
+    return detail::find_matching_scale_i(Scales(), dimensionless_type(), t, f);
 }
 
 typedef list<scale<10, static_rational<-24> >,
@@ -852,7 +814,7 @@ template<class Prefixes, class CharT, class Traits, class Unit, class T, class F
 void do_print_prefixed_impl(std::basic_ostream<CharT, Traits>& os, const quantity<Unit, T>& q, F default_)
 {
     bool prefixed;
-    if(detail::find_matching_scale<Prefixes>(q.value(), autoprefix_norm(q.value()), detail::print_scale(os, prefixed))) {
+    if(detail::find_matching_scale<Prefixes>(q.value(), detail::print_scale(os, prefixed))) {
         if(prefixed) {
             switch(units::get_format(os)) {
                 case symbol_fmt: do_print(os, maybe_parenthesize(Unit(), format_symbol_impl())); break;
@@ -961,21 +923,6 @@ void do_print_prefixed(std::basic_ostream<CharT, Traits>& os, const quantity<Uni
     detail::print_default(os, q)();
 }
 
-template<class Prefixes, class CharT, class Traits, class Unit, class T>
-void maybe_print_prefixed(std::basic_ostream<CharT, Traits>& os, const quantity<Unit, T>& q, mpl::true_)
-{
-    detail::do_print_prefixed<Prefixes>(os, q);
-}
-
-template<class Prefixes, class CharT, class Traits, class Unit, class T>
-void maybe_print_prefixed(std::basic_ostream<CharT, Traits>& os, const quantity<Unit, T>& q, mpl::false_)
-{
-    detail::print_default(os, q)();
-}
-
-inline mpl::true_ test_norm(double) { return mpl::true_(); }
-inline mpl::false_ test_norm(one) { return mpl::false_(); }
-
 } // namespace detail
 
 template<class Dimension,class System>
@@ -1047,11 +994,11 @@ inline std::basic_ostream<Char, Traits>& operator<<(std::basic_ostream<Char, Tra
     }
     else if (units::get_autoprefix(os) == autoprefix_engineering)
     {
-        detail::maybe_print_prefixed<detail::engineering_prefixes>(os, q, detail::test_norm(autoprefix_norm(q.value())));
+        detail::do_print_prefixed<detail::engineering_prefixes>(os, q);
     }
     else if (units::get_autoprefix(os) == autoprefix_binary)
     {
-        detail::maybe_print_prefixed<detail::binary_prefixes>(os, q, detail::test_norm(autoprefix_norm(q.value())));
+        detail::do_print_prefixed<detail::binary_prefixes>(os, q);
     }
     else
     {

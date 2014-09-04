@@ -14,7 +14,9 @@
 #ifndef BOOST_MSVC_DISAMBIGUATER_HPP
 #define BOOST_MSVC_DISAMBIGUATER_HPP
 
-#if BOOST_WORKAROUND(__DECCXX_VER, BOOST_TESTED_AT(60590042))
+#if BOOST_WORKAROUND( BOOST_MSVC, <= 1300) || \
+    BOOST_WORKAROUND(__DECCXX_VER, BOOST_TESTED_AT(60590042))
+   // this whole header is specifically for msvc up to 7.0
 
 #include <boost/format/group.hpp>
 #include <ostream>
@@ -49,6 +51,6 @@ struct disambiguater
 } // namespace io
 } // namespace boost
 
-#endif // -__DECCXX_VER
+#endif // -BOOST_MSVC
 
 #endif // -BOOST_MSVC_DISAMBIGUATER_HPP

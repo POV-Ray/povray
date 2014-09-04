@@ -28,21 +28,18 @@
 //  28 Nov 2009 - disabled deprecated warnings for MSVC
 //  30 Nov 2009 - used BOOST_STATIC_CONSTANT
 //  02 Dec 2009 - removed BOOST_STATIC_CONSTANT - not all compilers like it
-//  29 Apr 2013 - added support for noexcept and constexpr, added optimizations for SSE/AVX
 
 #ifndef BOOST_UUID_HPP
 #define BOOST_UUID_HPP
 
-#include <cstddef>
+#include <boost/config.hpp>
+#include <stddef.h>
 #include <boost/cstdint.hpp>
-#include <boost/uuid/detail/config.hpp>
+#include <algorithm>
+#include <boost/config.hpp> // for static assert
 #ifndef BOOST_UUID_NO_TYPE_TRAITS
 #include <boost/type_traits/is_pod.hpp>
 #include <boost/type_traits/integral_constant.hpp>
-#endif
-
-#ifdef BOOST_HAS_PRAGMA_ONCE
-#pragma once
 #endif
 
 #if defined(_MSC_VER)
@@ -72,20 +69,28 @@ public:
     typedef std::ptrdiff_t difference_type;
 
     // This does not work on some compilers
-    // They seem to want the variable definec in
+    // They seem to want the variable definec in 
     // a cpp file
     //BOOST_STATIC_CONSTANT(size_type, static_size = 16);
-    static BOOST_CONSTEXPR size_type static_size() BOOST_NOEXCEPT { return 16; }
+    static size_type static_size() { return 16; }
 
 public:
-    iterator begin() BOOST_NOEXCEPT { return data; }
-    const_iterator begin() const BOOST_NOEXCEPT { return data; }
-    iterator end() BOOST_NOEXCEPT { return data+size(); }
-    const_iterator end() const BOOST_NOEXCEPT { return data+size(); }
+    iterator begin() { return data; } /* throw() */
+    const_iterator begin() const { return data; } /* throw() */
+    iterator end() { return data+size(); } /* throw() */
+    const_iterator end() const { return data+size(); } /* throw() */
 
-    BOOST_CONSTEXPR size_type size() const BOOST_NOEXCEPT { return static_size(); }
+    size_type size() const { return static_size(); } /* throw() */
 
-    bool is_nil() const BOOST_NOEXCEPT;
+    bool is_nil() const /* throw() */
+    {
+        for(size_t i=0; i<static_size(); i++) {
+            if (data[i] != 0U) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     enum variant_type
     {
@@ -94,7 +99,7 @@ public:
         variant_microsoft, // Microsoft Corporation backward compatibility
         variant_future // future definition
     };
-    variant_type variant() const BOOST_NOEXCEPT
+    variant_type variant() const /* throw() */
     {
         // variant is stored in octet 7
         // which is index 8, since indexes count backwards
@@ -110,8 +115,8 @@ public:
             return variant_future;
         }
     }
-
-    enum version_type
+    
+    enum version_type 
     {
         version_unknown = -1,
         version_time_based = 1,
@@ -120,11 +125,11 @@ public:
         version_random_number_based = 4,
         version_name_based_sha1 = 5
     };
-    version_type version() const BOOST_NOEXCEPT
+    version_type version() const /* throw() */
     {
-        // version is stored in octet 9
+        //version is stored in octet 9
         // which is index 6, since indexes count backwards
-        uint8_t octet9 = data[6];
+        unsigned char octet9 = data[6];
         if ( (octet9 & 0xF0) == 0x10 ) {
             return version_time_based;
         } else if ( (octet9 & 0xF0) == 0x20 ) {
@@ -141,45 +146,55 @@ public:
     }
 
     // note: linear complexity
-    void swap(uuid& rhs) BOOST_NOEXCEPT;
+    void swap(uuid& rhs) /* throw() */
+    {
+        std::swap_ranges(begin(), end(), rhs.begin());
+    }
 
 public:
     // or should it be array<uint8_t, 16>
     uint8_t data[16];
 };
 
-bool operator== (uuid const& lhs, uuid const& rhs) BOOST_NOEXCEPT;
-bool operator< (uuid const& lhs, uuid const& rhs) BOOST_NOEXCEPT;
+inline bool operator==(uuid const& lhs, uuid const& rhs) /* throw() */
+{
+    return std::equal(lhs.begin(), lhs.end(), rhs.begin());
+}
 
-inline bool operator!=(uuid const& lhs, uuid const& rhs) BOOST_NOEXCEPT
+inline bool operator!=(uuid const& lhs, uuid const& rhs) /* throw() */
 {
     return !(lhs == rhs);
 }
 
-inline bool operator>(uuid const& lhs, uuid const& rhs) BOOST_NOEXCEPT
+inline bool operator<(uuid const& lhs, uuid const& rhs) /* throw() */
+{
+    return std::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+}
+
+inline bool operator>(uuid const& lhs, uuid const& rhs) /* throw() */
 {
     return rhs < lhs;
 }
-inline bool operator<=(uuid const& lhs, uuid const& rhs) BOOST_NOEXCEPT
+inline bool operator<=(uuid const& lhs, uuid const& rhs) /* throw() */
 {
     return !(rhs < lhs);
 }
 
-inline bool operator>=(uuid const& lhs, uuid const& rhs) BOOST_NOEXCEPT
+inline bool operator>=(uuid const& lhs, uuid const& rhs) /* throw() */
 {
     return !(lhs < rhs);
 }
 
-inline void swap(uuid& lhs, uuid& rhs) BOOST_NOEXCEPT
+inline void swap(uuid& lhs, uuid& rhs) /* throw() */
 {
     lhs.swap(rhs);
 }
 
 // This is equivalent to boost::hash_range(u.begin(), u.end());
-inline std::size_t hash_value(uuid const& u) BOOST_NOEXCEPT
+inline std::size_t hash_value(uuid const& u) /* throw() */
 {
     std::size_t seed = 0;
-    for(uuid::const_iterator i=u.begin(), e=u.end(); i != e; ++i)
+    for(uuid::const_iterator i=u.begin(); i != u.end(); ++i)
     {
         seed ^= static_cast<std::size_t>(*i) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
     }
@@ -197,12 +212,6 @@ template <>
 struct is_pod<uuids::uuid> : true_type {};
 
 } // namespace boost
-#endif
-
-#if defined(BOOST_UUID_USE_SSE2)
-#include <boost/uuid/detail/uuid_x86.hpp>
-#else
-#include <boost/uuid/detail/uuid_generic.hpp>
 #endif
 
 #if defined(_MSC_VER)

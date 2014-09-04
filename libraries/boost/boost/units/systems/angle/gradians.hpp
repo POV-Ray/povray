@@ -14,6 +14,7 @@
 #include <boost/config/no_tr1/cmath.hpp>
 
 #include <boost/units/conversion.hpp>
+#include <boost/units/io.hpp>
 #include <boost/units/quantity.hpp>
 #include <boost/units/static_constant.hpp>
 #include <boost/units/make_system.hpp>

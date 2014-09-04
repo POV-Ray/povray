@@ -11,7 +11,7 @@
 #ifndef BOOST_RANGE_RESULT_ITERATOR_HPP
 #define BOOST_RANGE_RESULT_ITERATOR_HPP
 
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) && (_MSC_VER >= 1020)
 # pragma once
 #endif
 

@@ -8,7 +8,7 @@
 #ifndef PROGRAM_OPTIONS_VP_2003_05_19
 #define PROGRAM_OPTIONS_VP_2003_05_19
 
-#if defined(_MSC_VER)
+#if _MSC_VER >= 1020
 #pragma once
 #endif
 

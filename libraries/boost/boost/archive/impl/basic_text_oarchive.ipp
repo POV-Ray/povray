@@ -8,10 +8,10 @@
 
 //  See http://www.boost.org for updates, documentation, and revision history.
 #include <string>
-#include <boost/assert.hpp>
+#include <cassert>
 #include <cstring>
 
-#include <boost/config.hpp>
+#include <boost/config.hpp> // for BOOST_DEDUCED_TYPENAME
 #if defined(BOOST_NO_STDC_NAMESPACE)
 namespace std{ 
     using ::memcpy; 
@@ -32,7 +32,7 @@ basic_text_oarchive<Archive>::newtoken()
 {
     switch(delimiter){
     default:
-        BOOST_ASSERT(false);
+        assert(false);
         break;
     case eol:
         this->This()->put('\n');

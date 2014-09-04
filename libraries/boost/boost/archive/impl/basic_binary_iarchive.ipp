@@ -8,11 +8,11 @@
 
 //  See http://www.boost.org for updates, documentation, and revision history.
 #include <string>
-#include <boost/assert.hpp>
+#include <cassert>
 #include <algorithm>
 #include <cstring>
 
-#include <boost/config.hpp>
+#include <boost/config.hpp> // for BOOST_DEDUCED_TYPENAME
 #if defined(BOOST_NO_STDC_NAMESPACE)
 namespace std{ 
     using ::memcpy; 
@@ -51,8 +51,6 @@ BOOST_ARCHIVE_OR_WARCHIVE_DECL(void)
 basic_binary_iarchive<Archive>::init(){
     // read signature in an archive version independent manner
     std::string file_signature;
-    
-    #if 0 // commented out since it interfers with derivation
     try {
         std::size_t l;
         this->This()->load(l);
@@ -71,11 +69,6 @@ basic_binary_iarchive<Archive>::init(){
         // will cause invalid_signature archive exception to be thrown below
         file_signature = "";   
     }
-    #else
-    // https://svn.boost.org/trac/boost/ticket/7301
-    * this->This() >> file_signature;
-    #endif
-
     if(file_signature != BOOST_ARCHIVE_SIGNATURE())
         boost::serialization::throw_exception(
             archive_exception(archive_exception::invalid_signature)
@@ -120,7 +113,10 @@ basic_binary_iarchive<Archive>::init(){
     #if BOOST_WORKAROUND(__MWERKS__, BOOST_TESTED_AT(0x3205))
     this->set_library_version(input_library_version);
     #else
-    detail::basic_iarchive::set_library_version(input_library_version);
+    #if ! BOOST_WORKAROUND(BOOST_MSVC, <= 1200)
+    detail::
+    #endif
+    basic_iarchive::set_library_version(input_library_version);
     #endif
     
     if(BOOST_ARCHIVE_VERSION() < input_library_version)

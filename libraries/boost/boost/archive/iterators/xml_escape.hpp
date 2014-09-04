@@ -2,7 +2,7 @@
 #define BOOST_ARCHIVE_ITERATORS_XML_ESCAPE_HPP
 
 // MS compatible compilers support #pragma once
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) && (_MSC_VER >= 1020)
 # pragma once
 #endif
 
@@ -16,8 +16,11 @@
 
 //  See http://www.boost.org for updates, documentation, and revision history.
 
-#include <boost/assert.hpp>
+#include <cassert>
+
+#include <boost/config.hpp> // for BOOST_DEDUCED_TYPENAME
 #include <boost/serialization/pfto.hpp>
+
 #include <boost/archive/iterators/escape.hpp>
 
 namespace boost { 

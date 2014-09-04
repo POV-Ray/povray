@@ -9,7 +9,6 @@
 #include <cstddef>
 
 #if (defined(__GNUC__) && !(defined(linux) || defined(__linux) || defined(__linux__))) \
-   || (!defined(__FreeBSD__) && defined(__GNUC__)) \
    || (!defined(_AIX) && defined(__IBMCPP__)  && (__IBMCPP__ >= 800)) 
    // Disable use of #include_next on Linux as typically we are installed in a 
    // directory that is searched *after* the std lib include path.
@@ -49,7 +48,7 @@
 #define BOOST_TR1_HEADER(name) <BOOST_TR1_PATH(name)>
 
 // Can't use BOOST_WORKAROUND here, it leads to recursive includes:
-#if (defined(__BORLANDC__) && (__BORLANDC__ <= 0x600))
+#if (defined(__BORLANDC__) && (__BORLANDC__ <= 0x600)) || (defined(_MSC_VER) && (_MSC_VER < 1310))
 #  define BOOST_TR1_USE_OLD_TUPLE
 #endif
 
@@ -138,7 +137,7 @@
 // this here, in addition the feature pack for VC9
 // provides a more or less full TR1 implementation:
 //
-#  if (defined(_HAS_TR1) && (_HAS_TR1 + 0)) || (_CPPLIB_VER >= 540)
+#  if defined(_HAS_TR1) && (_HAS_TR1 + 0)
 #    define BOOST_HAS_TR1_ARRAY
 #    define BOOST_HAS_TR1_REFERENCE_WRAPPER
 #    define BOOST_HAS_TR1_RESULT_OF
@@ -160,9 +159,6 @@
 #  if _MSC_VER >= 1600
 #     define BOOST_HAS_CPP_0X
 #  endif
-#  if _MSC_VER >= 1700 
-#     define BOOST_HAS_TR1_COMPLEX_OVERLOADS 
-#  endif 
 #endif
 
 #include <boost/config.hpp>

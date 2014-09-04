@@ -2,7 +2,7 @@
 #define BOOST_ARCHIVE_BASIC_XML_OARCHIVE_HPP
 
 // MS compatible compilers support #pragma once
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) && (_MSC_VER >= 1020)
 # pragma once
 #endif
 
@@ -36,29 +36,24 @@
 namespace boost {
 namespace archive {
 
-namespace detail {
-    template<class Archive> class interface_oarchive;
-} // namespace detail
-
 //////////////////////////////////////////////////////////////////////
 // class basic_xml_oarchive - write serialized objects to a xml output stream
 template<class Archive>
 class basic_xml_oarchive :
     public detail::common_oarchive<Archive>
 {
-#ifdef BOOST_NO_MEMBER_TEMPLATE_FRIENDS
-public:
-#else
 protected:
-#endif
-#if BOOST_WORKAROUND(BOOST_MSVC, < 1500)
+#if BOOST_WORKAROUND(BOOST_MSVC, <= 1300)
+public:
+#elif defined(BOOST_MSVC)
     // for some inexplicable reason insertion of "class" generates compile erro
     // on msvc 7.1
     friend detail::interface_oarchive<Archive>;
+    friend class save_access;
 #else
     friend class detail::interface_oarchive<Archive>;
-#endif
     friend class save_access;
+#endif
     // special stuff for xml output
     unsigned int depth;
     bool indent_next;

@@ -9,7 +9,6 @@
 //  See http://www.boost.org for updates, documentation, and revision history.
 
 #include <cstddef> // NULL
-#include <algorithm> // std::copy
 #include <boost/serialization/pfto.hpp>
 
 #include <boost/archive/basic_text_oprimitive.hpp>
@@ -31,7 +30,7 @@ basic_text_oprimitive<OStream>::save_binary(
     const void *address, 
     std::size_t count
 ){
-    typedef typename OStream::char_type CharType;
+    typedef BOOST_DEDUCED_TYPENAME OStream::char_type CharType;
     
     if(0 == count)
         return;
@@ -52,7 +51,7 @@ basic_text_oprimitive<OStream>::save_binary(
                     8
                 >
             > 
-            ,76
+            ,72
             ,const char // cwpro8 needs this
         > 
         base64_text;
@@ -91,7 +90,7 @@ basic_text_oprimitive<OStream>::basic_text_oprimitive(
         archive_locale.reset(
             add_facet(
                 std::locale::classic(), 
-                new codecvt_null<typename OStream::char_type>
+                new codecvt_null<BOOST_DEDUCED_TYPENAME OStream::char_type>
             )
         );
         os.imbue(* archive_locale);

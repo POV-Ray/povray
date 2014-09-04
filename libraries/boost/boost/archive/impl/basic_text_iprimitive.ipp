@@ -30,10 +30,10 @@ namespace std{
 #include <boost/archive/iterators/binary_from_base64.hpp>
 #include <boost/archive/iterators/transform_width.hpp>
 
-namespace boost {
+namespace boost { 
 namespace archive {
 
-namespace detail {
+namespace {
     template<class CharType>
     bool is_whitespace(CharType c);
 
@@ -48,7 +48,7 @@ namespace detail {
         return 0 != std::iswspace(t);
     }
     #endif
-} // detail
+}
 
 // translate base64 text into binary and copy into buffer
 // until buffer is full.
@@ -58,12 +58,12 @@ basic_text_iprimitive<IStream>::load_binary(
     void *address, 
     std::size_t count
 ){
-    typedef typename IStream::char_type CharType;
+    typedef BOOST_DEDUCED_TYPENAME IStream::char_type CharType;
     
     if(0 == count)
         return;
         
-    BOOST_ASSERT(
+    assert(
         static_cast<std::size_t>((std::numeric_limits<std::streamsize>::max)())
         > (count + sizeof(CharType) - 1)/sizeof(CharType)
     );
@@ -73,7 +73,7 @@ basic_text_iprimitive<IStream>::load_binary(
             archive_exception(archive_exception::input_stream_error)
         );
     // convert from base64 to binary
-    typedef typename
+    typedef BOOST_DEDUCED_TYPENAME
         iterators::transform_width<
             iterators::binary_from_base64<
                 iterators::remove_whitespace<
@@ -86,31 +86,33 @@ basic_text_iprimitive<IStream>::load_binary(
             ,CharType
         > 
         binary;
-        
-    binary i = binary(
+
+    binary ti_begin = binary(
         BOOST_MAKE_PFTO_WRAPPER(
             iterators::istream_iterator<CharType>(is)
         )
     );
-
+                
     char * caddr = static_cast<char *>(address);
     
     // take care that we don't increment anymore than necessary
-    while(count-- > 0){
-        *caddr++ = static_cast<char>(*i++);
+    while(--count > 0){
+        *caddr++ = static_cast<char>(*ti_begin);
+        ++ti_begin;
     }
-
-    // skip over any excess input
+    *caddr++ = static_cast<char>(*ti_begin);
+    
+    iterators::istream_iterator<CharType> i;
     for(;;){
-        typename IStream::int_type r;
+        BOOST_DEDUCED_TYPENAME IStream::int_type r;
         r = is.get();
         if(is.eof())
             break;
-        if(detail::is_whitespace(static_cast<CharType>(r)))
+        if(is_whitespace(static_cast<CharType>(r)))
             break;
     }
 }
-    
+
 template<class IStream>
 BOOST_ARCHIVE_OR_WARCHIVE_DECL(BOOST_PP_EMPTY())
 basic_text_iprimitive<IStream>::basic_text_iprimitive(
@@ -128,7 +130,7 @@ basic_text_iprimitive<IStream>::basic_text_iprimitive(
         archive_locale.reset(
             add_facet(
                 std::locale::classic(), 
-                new codecvt_null<typename IStream::char_type>
+                new codecvt_null<BOOST_DEDUCED_TYPENAME IStream::char_type>
             )
         );
         is.imbue(* archive_locale);

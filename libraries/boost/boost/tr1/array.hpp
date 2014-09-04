@@ -39,6 +39,7 @@ using ::boost::swap;
 // [6.2.2.5] Tuple interface to class template array
 template <class T> struct tuple_size; // forward declaration
 template <int I, class T> struct tuple_element; // forward declaration
+#ifndef BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION
 template <class T, size_t N>
 struct tuple_size< ::boost::array<T, N> >
    : public ::boost::integral_constant< ::std::size_t, N>{};
@@ -53,6 +54,7 @@ struct tuple_element<I, ::boost::array<T, N> >
 #endif
    typedef T type;
 };
+#endif
 template <int I, class T, size_t N>
 T& get( ::boost::array<T, N>& a)
 {

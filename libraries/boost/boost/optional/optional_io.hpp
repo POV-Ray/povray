@@ -12,21 +12,35 @@
 #ifndef BOOST_OPTIONAL_OPTIONAL_IO_FLC_19NOV2002_HPP
 #define BOOST_OPTIONAL_OPTIONAL_IO_FLC_19NOV2002_HPP
 
-#include <istream>
-#include <ostream>
+#if defined __GNUC__
+#  if (__GNUC__ == 2 && __GNUC_MINOR__ <= 97) 
+#    define BOOST_OPTIONAL_NO_TEMPLATED_STREAMS
+#  endif
+#endif // __GNUC__
 
-#include <boost/none.hpp>
-#include <boost/assert.hpp>
+#if defined BOOST_OPTIONAL_NO_TEMPLATED_STREAMS
+#  include <iostream>
+#else 
+#  include <istream>
+#  include <ostream>
+#endif  
+
+
 #include "boost/optional/optional.hpp"
 #include "boost/utility/value_init.hpp"
 
 namespace boost
 {
 
+#if defined (BOOST_NO_TEMPLATED_STREAMS)
+template<class T>
+inline std::ostream& operator<<(std::ostream& out, optional<T> const& v)
+#else
 template<class CharType, class CharTrait, class T>
 inline
 std::basic_ostream<CharType, CharTrait>&
 operator<<(std::basic_ostream<CharType, CharTrait>& out, optional<T> const& v)
+#endif
 {
   if ( out.good() )
   {
@@ -38,35 +52,27 @@ operator<<(std::basic_ostream<CharType, CharTrait>& out, optional<T> const& v)
   return out;
 }
 
+#if defined (BOOST_NO_TEMPLATED_STREAMS)
+template<class T>
+inline std::istream& operator>>(std::istream& in, optional<T>& v)
+#else
 template<class CharType, class CharTrait, class T>
 inline
 std::basic_istream<CharType, CharTrait>&
 operator>>(std::basic_istream<CharType, CharTrait>& in, optional<T>& v)
+#endif
 {
-  if (in.good())
+  if ( in.good() )
   {
     int d = in.get();
-    if (d == ' ')
+    if ( d == ' ' )
     {
-      T x;
+      T x ;
       in >> x;
-      v = x;
+      v = x ;
     }
     else
-    {
-      if (d == '-')
-      {
-        d = in.get();
-
-        if (d == '-')
-        {
-          v = none;
-          return in;
-        }
-      }
-
-      in.setstate( std::ios::failbit );
-    }
+      v = optional<T>() ;
   }
 
   return in;

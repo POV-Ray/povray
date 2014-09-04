@@ -2,7 +2,7 @@
 #define BOOST_ARCHIVE_TEXT_OARCHIVE_HPP
 
 // MS compatible compilers support #pragma once
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) && (_MSC_VER >= 1020)
 # pragma once
 #endif
 
@@ -42,10 +42,6 @@ namespace std{
 namespace boost { 
 namespace archive {
 
-namespace detail {
-    template<class Archive> class interface_oarchive;
-} // namespace detail
-
 template<class Archive>
 class text_oarchive_impl : 
      /* protected ? */ public basic_text_oprimitive<std::ostream>,
@@ -54,18 +50,10 @@ class text_oarchive_impl :
 #ifdef BOOST_NO_MEMBER_TEMPLATE_FRIENDS
 public:
 #else
+    friend class detail::interface_oarchive<Archive>;
+    friend class basic_text_oarchive<Archive>;
+    friend class save_access;
 protected:
-    #if BOOST_WORKAROUND(BOOST_MSVC, < 1500)
-        // for some inexplicable reason insertion of "class" generates compile erro
-        // on msvc 7.1
-        friend detail::interface_oarchive<Archive>;
-        friend basic_text_oarchive<Archive>;
-        friend save_access;
-    #else
-        friend class detail::interface_oarchive<Archive>;
-        friend class basic_text_oarchive<Archive>;
-        friend class save_access;
-    #endif
 #endif
     template<class T>
     void save(const T & t){
@@ -92,8 +80,7 @@ protected:
     #endif
     BOOST_ARCHIVE_DECL(BOOST_PP_EMPTY()) 
     text_oarchive_impl(std::ostream & os, unsigned int flags);
-    // don't import inline definitions! leave this as a reminder.
-    //BOOST_ARCHIVE_DECL(BOOST_PP_EMPTY()) 
+    BOOST_ARCHIVE_DECL(BOOST_PP_EMPTY()) 
     ~text_oarchive_impl(){};
 public:
     BOOST_ARCHIVE_DECL(void) 
@@ -113,6 +100,8 @@ public:
     {}
     ~text_oarchive(){}
 };
+
+typedef text_oarchive naked_text_oarchive;
 
 } // namespace archive
 } // namespace boost

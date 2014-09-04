@@ -23,8 +23,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\libraries\boost\libs\thread\src\future.cpp" />
-    <ClCompile Include="..\..\libraries\boost\libs\thread\src\tss_null.cpp" />
     <ClCompile Include="..\..\libraries\boost\libs\thread\src\win32\thread.cpp" />
     <ClCompile Include="..\..\libraries\boost\libs\thread\src\win32\tss_dll.cpp" />
     <ClCompile Include="..\..\libraries\boost\libs\thread\src\win32\tss_pe.cpp" />
@@ -112,7 +110,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>BOOST_ALL_NO_LIB=1;BOOST_All_STATIC_LINK=1;BOOST_CHRONO_STATIC_LINK=1;BOOST_SYSTEM_NO_DEPRECATED;BOOST_SYSTEM_STATIC_LINK=1;BOOST_THREAD_BUILD_LIB=1;BOOST_THREAD_USES_CHRONO;DATE_TIME_INLINE;WIN32;WIN32_LEAN_AND_MEAN;_DEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_HAS_ITERATOR_DEBUGGING=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;WIN32_LEAN_AND_MEAN;_DEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_HAS_ITERATOR_DEBUGGING=0;BOOST_THREAD_BUILD_LIB=1;BOOST_ALL_NO_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\libraries\boost;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
@@ -133,7 +131,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>BOOST_ALL_NO_LIB=1;BOOST_All_STATIC_LINK=1;BOOST_CHRONO_STATIC_LINK=1;BOOST_SYSTEM_NO_DEPRECATED;BOOST_SYSTEM_STATIC_LINK=1;BOOST_THREAD_BUILD_LIB=1;BOOST_THREAD_USES_CHRONO;DATE_TIME_INLINE;WIN32;WIN32_LEAN_AND_MEAN;_DEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_HAS_ITERATOR_DEBUGGING=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;WIN32_LEAN_AND_MEAN;_DEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_HAS_ITERATOR_DEBUGGING=0;BOOST_THREAD_BUILD_LIB=1;BOOST_ALL_NO_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\libraries\boost;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
@@ -158,7 +156,7 @@
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>false</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>BOOST_ALL_NO_LIB=1;BOOST_All_STATIC_LINK=1;BOOST_CHRONO_STATIC_LINK=1;BOOST_SYSTEM_NO_DEPRECATED;BOOST_SYSTEM_STATIC_LINK=1;BOOST_THREAD_BUILD_LIB=1;BOOST_THREAD_USES_CHRONO;DATE_TIME_INLINE;WIN32;WIN32_LEAN_AND_MEAN;NDEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;WIN32_LEAN_AND_MEAN;NDEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;BOOST_THREAD_BUILD_LIB=1;BOOST_ALL_NO_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\libraries\boost;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -183,7 +181,7 @@
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>false</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>BOOST_ALL_NO_LIB=1;BOOST_All_STATIC_LINK=1;BOOST_CHRONO_STATIC_LINK=1;BOOST_SYSTEM_NO_DEPRECATED;BOOST_SYSTEM_STATIC_LINK=1;BOOST_THREAD_BUILD_LIB=1;BOOST_THREAD_USES_CHRONO;DATE_TIME_INLINE;WIN32;WIN32_LEAN_AND_MEAN;NDEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;WIN32_LEAN_AND_MEAN;NDEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;BOOST_THREAD_BUILD_LIB=1;BOOST_ALL_NO_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\libraries\boost;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -208,7 +206,7 @@
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>false</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>BOOST_ALL_NO_LIB=1;BOOST_All_STATIC_LINK=1;BOOST_CHRONO_STATIC_LINK=1;BOOST_SYSTEM_NO_DEPRECATED;BOOST_SYSTEM_STATIC_LINK=1;BOOST_THREAD_BUILD_LIB=1;BOOST_THREAD_USES_CHRONO;DATE_TIME_INLINE;WIN32;WIN32_LEAN_AND_MEAN;NDEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;WIN32_LEAN_AND_MEAN;NDEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;BOOST_THREAD_BUILD_LIB=1;BOOST_ALL_NO_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\libraries\boost;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>

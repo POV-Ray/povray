@@ -103,7 +103,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>..\..\libraries\openexr\IlmImf;..\..\libraries\openexr\config.windows;..\..\libraries\ilmbase\Half;..\..\libraries\ilmbase\Iex;..\..\libraries\ilmbase\IlmThread;..\..\libraries\ilmbase\Imath;..\..\libraries\ilmbase\config.windows;..\..\libraries\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;WIN32_LEAN_AND_MEAN;_DEBUG;_WINDOWS;_HAS_ITERATOR_DEBUGGING=0;ILMIMF_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;WIN32_LEAN_AND_MEAN;_DEBUG;_WINDOWS;_HAS_ITERATOR_DEBUGGING=0;_HAS_CPP0X=0;ILMIMF_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -125,7 +125,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>..\..\libraries\openexr\IlmImf;..\..\libraries\openexr\config.windows;..\..\libraries\ilmbase\Half;..\..\libraries\ilmbase\Iex;..\..\libraries\ilmbase\IlmThread;..\..\libraries\ilmbase\Imath;..\..\libraries\ilmbase\config.windows;..\..\libraries\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;WIN32_LEAN_AND_MEAN;_DEBUG;_WINDOWS;_HAS_ITERATOR_DEBUGGING=0;ILMIMF_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;WIN32_LEAN_AND_MEAN;_DEBUG;_WINDOWS;_HAS_ITERATOR_DEBUGGING=0;_HAS_CPP0X=0;ILMIMF_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
@@ -147,7 +147,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <AdditionalIncludeDirectories>..\..\libraries\openexr\IlmImf;..\..\libraries\openexr\config.windows;..\..\libraries\ilmbase\Half;..\..\libraries\ilmbase\Iex;..\..\libraries\ilmbase\IlmThread;..\..\libraries\ilmbase\Imath;..\..\libraries\ilmbase\config.windows;..\..\libraries\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;WIN32_LEAN_AND_MEAN;NDEBUG;_WINDOWS;ILMIMF_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;WIN32_LEAN_AND_MEAN;NDEBUG;_WINDOWS;_HAS_CPP0X=0;ILMIMF_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
@@ -172,7 +172,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>..\..\libraries\openexr\IlmImf;..\..\libraries\openexr\config.windows;..\..\libraries\ilmbase\Half;..\..\libraries\ilmbase\Iex;..\..\libraries\ilmbase\IlmThread;..\..\libraries\ilmbase\Imath;..\..\libraries\ilmbase\config.windows;..\..\libraries\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;WIN32_LEAN_AND_MEAN;NDEBUG;_WINDOWS;ILMIMF_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;WIN32_LEAN_AND_MEAN;NDEBUG;_WINDOWS;_HAS_CPP0X=0;ILMIMF_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
@@ -197,7 +197,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release-SSE2|Win32'">
     <ClCompile>
       <AdditionalIncludeDirectories>..\..\libraries\openexr\IlmImf;..\..\libraries\openexr\config.windows;..\..\libraries\ilmbase\Half;..\..\libraries\ilmbase\Iex;..\..\libraries\ilmbase\IlmThread;..\..\libraries\ilmbase\Imath;..\..\libraries\ilmbase\config.windows;..\..\libraries\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;WIN32_LEAN_AND_MEAN;NDEBUG;_WINDOWS;ILMIMF_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;WIN32_LEAN_AND_MEAN;NDEBUG;_WINDOWS;_HAS_CPP0X=0;ILMIMF_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>

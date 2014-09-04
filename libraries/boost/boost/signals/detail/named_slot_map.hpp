@@ -13,6 +13,7 @@
 #include <boost/signals/detail/config.hpp>
 #include <boost/signals/detail/signals_common.hpp>
 #include <boost/signals/connection.hpp>
+#include <boost/utility.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/function/function2.hpp>
 #include <boost/iterator/iterator_facade.hpp>
@@ -31,10 +32,10 @@ class stored_group
  public:
   enum storage_kind { sk_empty, sk_front, sk_back, sk_group };
 
-  stored_group(storage_kind p_kind = sk_empty) : kind(p_kind), group() { }
+  stored_group(storage_kind kind = sk_empty) : kind(kind), group() { }
 
   template<typename T>
-  stored_group(const T& p_group) : kind(sk_group), group(new T(p_group)) { }
+  stored_group(const T& group) : kind(sk_group), group(new T(group)) { }
 
   bool is_front() const { return kind == sk_front; }
   bool is_back() const { return kind == sk_back; }
@@ -126,18 +127,18 @@ public:
         || slot_ == other.slot_));
   }
 
-#if BOOST_WORKAROUND(_MSC_VER, <= 1900)
+#if BOOST_WORKAROUND(_MSC_VER, <= 1600)
   void decrement();
   void advance(difference_type);
 #endif
 
 private:
-  named_slot_map_iterator(group_iterator giter, group_iterator last) :
-    group(giter), last_group(last), slot_assigned(false)
+  named_slot_map_iterator(group_iterator group, group_iterator last) :
+    group(group), last_group(last), slot_assigned(false)
   { init_next_group(); }
-  named_slot_map_iterator(group_iterator giter, group_iterator last,
+  named_slot_map_iterator(group_iterator group, group_iterator last,
                           slot_pair_iterator slot) :
-    group(giter), last_group(last), slot_(slot), slot_assigned(true)
+    group(group), last_group(last), slot_(slot), slot_assigned(true)
   { }
 
   void init_next_group()

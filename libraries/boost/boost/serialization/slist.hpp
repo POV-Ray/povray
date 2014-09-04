@@ -2,7 +2,7 @@
 #define BOOST_SERIALIZATION_SLIST_HPP
 
 // MS compatible compilers support #pragma once
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) && (_MSC_VER >= 1020)
 # pragma once
 #endif
 
@@ -70,7 +70,7 @@ inline void load(
     boost::serialization::detail::stack_construct<Archive, U> u(ar, item_version);
     ar >> boost::serialization::make_nvp("item", u.reference());
     t.push_front(u.reference());
-    typename BOOST_STD_EXTENSION_NAMESPACE::slist<U, Allocator>::iterator last;
+    BOOST_DEDUCED_TYPENAME BOOST_STD_EXTENSION_NAMESPACE::slist<U, Allocator>::iterator last;
     last = t.begin();
     while(--count > 0){
         boost::serialization::detail::stack_construct<Archive, U> 
