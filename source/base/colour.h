@@ -9,7 +9,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -87,12 +87,14 @@ class GenericRGBEColour;
 /// @{
 /// @remark    These do not exactly match CCIR Recommendation 601-1, which specifies 0.299, 0.587 and
 ///            0.114 respectively.
+/// @remark    We choose a high-precision type for these because otherwise Greyscale(<1,1,1>) won't
+///            properly sum up to 1 on some systems.
 /// @todo      For linear RGB with sRGB primaries this should be 0.2126, 0.7152 and 0.0722
 ///            respectively.
 ///
-const float kRedIntensity   = 0.297;
-const float kGreenIntensity = 0.589;
-const float kBlueIntensity  = 0.114;
+const PreciseColourChannel kRedIntensity   = 0.297;
+const PreciseColourChannel kGreenIntensity = 0.589;
+const PreciseColourChannel kBlueIntensity  = 0.114;
 /// @}
 
 /// Generic template class to hold and manipulate an RGB colour.
