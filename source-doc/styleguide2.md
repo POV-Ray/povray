@@ -1,5 +1,4 @@
-Coding Styleguide Part 2
-========================
+# Coding Styleguide Part 2
 
 To avoid boring you to death with coding rules, we decided to not include the following in our main coding styleguide
 for one or more of the following reasons:

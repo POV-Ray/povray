@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -6515,36 +6515,6 @@ void Parser::Parse_Default ()
         CASE (CAMERA_TOKEN)
             Parse_Camera (Default_Camera);
         END_CASE
-
-#if 0 // TODO - find a better syntax for this before re-enabling it
-        CASE (IMAGE_MAP_TOKEN)
-            Parse_Begin ();
-            EXPECT
-                CASE (GAMMA_TOKEN)
-                    sceneData->inputFileGamma = Parse_Gamma ();
-                    if ((sceneData->gammaMode != kPOVList_GammaMode_AssumedGamma36) && (sceneData->gammaMode != kPOVList_GammaMode_AssumedGamma37))
-                    {
-                        if (sceneData->gammaMode == kPOVList_GammaMode_None)
-                        {
-                            Warning(0, "Use of the default image_map gamma feature requires gamma correction to be on.\n"
-                                       "Therefore, despite this scene requesting compatibility with a pre-3.7 version\n"
-                                       "of POV-Ray and not specifying assumed_gamma, gamma correction is enabled with\n"
-                                       "assumed_gamma defaulting to " DEFAULT_WORKING_GAMMA_TEXT ".\n");
-                        }
-                        sceneData->gammaMode = kPOVList_GammaMode_AssumedGamma37Implied;
-                        sceneData->workingGamma = GetGammaCurve(DEFAULT_WORKING_GAMMA_TYPE, DEFAULT_WORKING_GAMMA);
-                        sceneData->workingGammaToSRGB = TranscodingGammaCurve::Get(sceneData->workingGamma, SRGBGammaCurve::Get());
-                    }
-                    sceneData->inputFileGammaSet = true;
-                END_CASE
-                OTHERWISE
-                    UNGET
-                    EXIT
-                END_CASE
-            END_EXPECT
-            Parse_End ();
-        END_CASE
-#endif
 
         OTHERWISE
             UNGET

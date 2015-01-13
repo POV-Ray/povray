@@ -1,5 +1,4 @@
-Coding Styleguide
-=================
+# Coding Styleguide
 
 C++ code can be written in a lot of different ways, and every code author has their personal preferences. However, in
 a project like POV-Ray with multiple contributors, we feel that a consistent coding style will help a lot to find your
@@ -8,8 +7,16 @@ guidelines presented here. Note that we find some of these rules important enoug
 non-compliant contributions.
 
 
-Language Standard
------------------
+@section rlm        Role Models
+
+If, rather than read a prose styleguide for the POV-Ray project, you prefer to see examples, we suggest to look
+primarily at the following files:
+
+  - `source/backend/render/trace.h`
+  - `source/backend/pattern/pattern.h` and `.../pattern.cpp`
+
+
+@section lng        Language Standard
 
 POV-Ray is being developed with portability high in mind. In practice and at present, this means:
 
@@ -33,8 +40,7 @@ POV-Ray is being developed with portability high in mind. In practice and at pre
     @todo   Make an inventory of what boost libraries we're actually using.
 
 
-Code Formatting
----------------
+@section fmt        Code Formatting
 
 Even pure cosmetics can have a significant impact on how easily code can be read and understood.
 In the POV-Ray project, we are using the following formatting style for new code, and are in the process of
@@ -108,8 +114,7 @@ transitioning existing code to these coventions:
         }
 
 
-Naming Conventions
-------------------
+@section nam        Naming Conventions
 
 Due to the age of the code, its C legacy, and the large number of contributors from early on, naming conventions in the
 POV-Ray project have been anything but consistent in the past. For new code however, we try to stick to the following
@@ -141,8 +146,7 @@ Parameter and variable names might carry one or more additional prefixes. These 
   - Name collisions with identifiers in an outer scope ("shadowing") should be avoided.
 
 
-Include Files
--------------
+@section inc        Include Files
 
   - Header files should be included in the following order:
       - C++ variants of standard C header files.
@@ -160,8 +164,7 @@ Include Files
   - Header files should be self-contained, i.e. include all files they depend on.
 
 
-Miscellaneous Coding Rules
---------------------------
+@section msc        Miscellaneous Coding Rules
 
   - **Unions**: They're evil. Use polymorphism instead, unless you have an exceptionally strong reason for it. Make sure
     to document that reason.
@@ -190,14 +193,13 @@ Miscellaneous Coding Rules
     make use of smart pointers.
 
 
-Code Documentation
-------------------
+@section doc        Code Documentation
 
 In order to help contributors find their way around the code, all relevant information -- from
 software architecture to interfaces to implementation -- should be documented liberally, in a
 standardized manner.
 
-### Implementation Documentation
+@subsection doc_imp     Implementation Documentation
 
 The POV-Ray project follows the idea that, as far as implementation goes, the source code itself is
 the most precise -- and therefore best -- documentation. However, wherever it is not immediately
@@ -207,7 +209,7 @@ source code with comments.
 @note   Known bugs or limitations of an implementation should be placed in the interface
         documentation.
 
-### Interface Documentation
+@subsection doc_int     Interface Documentation
 
 The interface provided by any source file should be documented in the respective header file, using
 a format compatible with Doxygen 1.8. For consistency, please use JavaDoc-style comments (`/// ...`
@@ -216,24 +218,28 @@ or `/** ... */`; the general rules for comments apply) and JavaDoc-style tags (`
 @note   Platform-specific modules may mandate a different tag style, such as (hypothetically) DocXML
         style for the Windows GUI modules.
 
-### Other Documentation
+@subsection doc_msc     Other Documentation
 
 Any other information relevant for developers that is not specific to a particular source file
 should be documented in Doxygen 1.8-compatible markdown files named `source-doc/foo.md`.
 
-### Notes and Warnings
+@subsection doc_naw     Notes and Warnings
 
 Doxygen provides various tags to draw attention to a particular paragraph. To help you choose between these, use the
 following guidelines:
 
-  - **Remarks**: Use the `@remark` tag for information that the reader may be surprised about, but doesn't really need
-    to be aware of.
-  - **Notes**: Use the `@note` tag for information the reader should be aware of.
-  - **Warnings**: Use the `@warning` tag for information about potential pitfalls.
-  - **Attention**: Use the `@attention` tag for information about pitfalls that may come as a big surprise to the
-    reader.
+  - **Remark**: Use the `@``remark` tag when documenting information that may be surprising but not really necessary to
+    know.
+  - **Note**: Use the `@``note` tag when documenting general information that the reader should be aware of.
+  - **Warning**: Use the `@``warning` tag when documenting potential pitfalls.
+  - **Attention**: Use the `@``attention` tag when documenting pitfalls that may come as a big surprise to the reader or
+    have grave effects when not avoided.
 
-### Images
+  - **To-Do**: Use the `@``todo` tag when documenting that something is still unfinished and needs more work.
+  - **Deprecated**: Use the `@``deprecated` tag when documenting that somehting is only kept around for backward
+    compatibility and should no longer be used in new code.
+
+@subsection doc_img     Images
 
 Images should be used sparingly, as they are more difficult to keep up to date with source code
 changes; where extended Doxygen features can do the trick, please use those instead (see below).
@@ -242,26 +248,23 @@ If they cannot be avoided, images accompanying the documentation of `foo.cpp` or
 placed in a directory named `source-doc/foo/`. Same goes for images referenced from
 `source-doc/foo.md`.
 
-### Doxygen Extensions
+@subsection doc_dox     Doxygen Extensions
 
 Some Doxygen syntax features require particular Doxygen configuration settings, or even external
 tools. The following can be freely used:
 
   - **Automatic brief descriptions** (`JAVADOC_AUTOBRIEF=YES`): Please avoid using the `@``brief`
     tag.
-  - **Markdown**: (`MARKDOWN_SUPPORT=YES`). Please avoid tags wherever markdown is easier to read
+  - **Markdown** (`MARKDOWN_SUPPORT=YES`): Please avoid tags wherever markdown is easier to read
     (e.g., use `_foo_` instead of `@``e foo` for emphasis).
-  - **Dot** (`HAVE_DOT=YES`; <http://www.graphviz.org/>): Please use doxygen's `@``msc` tag format for any message
-    sequence charts, both in source files as well as in markdown files.
+  - **Dot** (`HAVE_DOT=YES`; <http://www.graphviz.org/>): Please use doxygen's `@``dot` tag format for any graphs,
+    both in source files as well as in markdown files.
   - **Mscgen** (<http://www.mcternan.me.uk/mscgen/>): Please use doxygen's `@``msc` tag format for
     any message sequence charts, both in source files as well as in markdown files.
-  - **LaTeX formulae**.
-
-We are open to adding more extensions to the list; if you can make a case, please let us know.
+  - **LaTeX formulae**: Please use doxygen's `@``f$` / `@``f[` / `@``f{` tag format for any non-trivial formulae.
 
 
-Dealing with Legacy Coding Style
---------------------------------
+@section leg        Legacy Coding Style
 
 Sometimes you may run across legacy code that violates the above rules. The following should give
 you an idea of how to proceed:

@@ -1,13 +1,11 @@
-POVMS Interface
-===============
+# POVMS Interface
 
 
-Getting Started with POVMS
---------------------------
+@section strt       Getting Started with POVMS
 
 @todo   This section dates back to 2003 and may need an overhaul.
 
-### The POVMS Concept
+@subsection strt_con    The POVMS Concept
 
 POVMS is a layer below POV-Ray and on top of the host operating system. It abstracts all input and output of POV-Ray.
 That is, rendering options are set using POVMS, and status messages are generated using POVMS. The abstraction allows
@@ -20,7 +18,7 @@ exclusively uses POVMS to control POV-Ray and receive output from POV-Ray.
 Throughout this document, remember that the core concept behind POVMS is a simple asynchronous message driven
 communication. POVMS handles all the abstraction for you. It can even deal with different byte orders automatically.
 
-### Basic Types
+@subsection strt_typ    Basic Types
 
 @todo   The contents of this sub-section should probably be moved to the `povms.cpp` header file.
 
@@ -79,7 +77,7 @@ There are a bunch of basic data types and helper functions you may need to adjus
 :   When debugging, define this function to e.g. write the string it gets to some file. By default this macro simply
     does nothing.
 
-### Message Queue Configuration
+@subsection strt_que    Message Queue Configuration
 
 @todo   The contents of this sub-section should probably be moved to the `povms.cpp` header file.
 
@@ -101,7 +99,7 @@ So, if you want e.g. a thread-safe or interprocess message queue, you will have 
 `POVMSAddress`
 :   A POD or POD-only struct that can be send around and uniquely describes a particular POVMS message queue in a
     particular process and thread.
-    
+
 `POVMSAddress POVMS_Sys_QueueToAddress(POVMS_Sys_Queue_Type q)`
 :   Returns the `POVMSAddress` corresponding to a system specific message queue.
 
@@ -119,7 +117,7 @@ So, if you want e.g. a thread-safe or interprocess message queue, you will have 
     parameter is true, this function does not have to block! If you got the message from the queue in some special way
     (that is, not simply a pointer put on the queue using `POVMS_Sys_QueueSend`), note that POVMS will use
     `POVMS_Sys_Free` to free the memory.
-    
+
 `int POVMS_Sys_QueueSend` (POVMS_Sys_Queue_Type q, void *message, int bytes)
 :   Adds a message to the message queue. The message consists of bytes in memory. `POVMS_Sys_QueueSend` gets ownership
     of the pointer passed to it and has to make sure it is properly freed using `POVMS_Sys_Free`, e.g. by simply putting
@@ -129,7 +127,7 @@ So, if you want e.g. a thread-safe or interprocess message queue, you will have 
 :   Returns current time in seconds. It does not have to follow any particular timebase as long as time values return
     increase monotonously.
 
-### Support Function Configuration
+@subsection strt_sup    Support Function Configuration
 
 @todo   The contents of this sub-section should probably be moved to the `povms.cpp` header file.
 
@@ -158,7 +156,7 @@ amount of memory around a few kilobytes if memory is full from the perspective o
 `POVMS_Sys_Free(p)`
 :   C-like free function. Defaults to free.
 
-### Initializing POVMS
+@subsection strt_init   Initializing POVMS
 
 The following assumes you are in a multi-thread environment and the render engine core and the GUI are running in two
 different threads. It uses the core POVMS concept of a "context", which is essentially a single POVMS message queue that
@@ -169,7 +167,7 @@ In your render engine core thread function, you will need something like this:
     extern POVMSContext POVMS_Render_Context;
     volatile POVMSAddress renderthreadaddress = POVMSInvalidAddress;
     volatile bool threadstopflag = false;
-    
+
     void renderthread()
     {
         (void)povray_init();
@@ -192,11 +190,11 @@ create another POVMS context such that it will receive output messages. So it wi
 
     POVMSAddress frontendthreadaddress = POVMSInvalidAddress;
     POVMSContext frontendcontext;
-    
+
     void init_guipovms()
     {
         int err;
-        
+
         err = POVMS_OpenContext(&frontendcontext);
         if(err == 0)
             err = POVMS_InstallReceiver(frontendcontext, receivehandler, kPOVMsgClass_Miscellaneous,
@@ -206,7 +204,7 @@ create another POVMS context such that it will receive output messages. So it wi
                                         kPOVMSType_WildCard);
         if(err == 0)
             err = POVMS_GetContextAddress(frontendcontext, (POVMSAddress *)(& frontendthreadaddress));
-                                          
+
         return err;
     }
 
@@ -230,7 +228,7 @@ decode messages, going to explained by then...
         int s = 0;
         int ret = 0;
         int line;
-        
+
         ret = POVMSObject_Get(msg, &attr, kPOVMSMessageIdentID);
         if(ret == 0)
         {
@@ -274,7 +272,7 @@ decode messages, going to explained by then...
                     break;
             }
         }
-        
+
         return ret;
     }
 
@@ -293,7 +291,7 @@ And then you would need a function like:
 
 This is sufficient to let the render engine send all messages to the address specified by FRONTEND_ADDRESS. That is it!
 
-### Controlling Rendering
+@subsection strt_ctl    Controlling Rendering
 
 Here is the simplest possible way to control rendering. These three functions allow you to set the options that will be
 used, to start rendering the whole image, and to abort rendering. Note that due to the asynchronous way of
@@ -305,7 +303,7 @@ rendering. You are not supposed to shut it down unless you end the application.
     {
         POVMSObject msg;
         int err = 0;
-        
+
         err = POVMSObject_New(&msg, kPOVMSType_WildCard);
         if(err == 0)
             err = POVMSMsg_SetupMessage(&msg, kPOVMsgClass_RenderControl, kPOVMsgIdent_RenderAll);
@@ -313,7 +311,7 @@ rendering. You are not supposed to shut it down unless you end the application.
             err = POVMSMsg_SetDestinationAddress(&msg, renderthreadaddress);
         if(err == 0)
             err = POVMS_Send(frontendcontext, &msg, NULL, kPOVMSSendMode_NoReply);
-                             
+
         return err;
     }
 
@@ -321,7 +319,7 @@ rendering. You are not supposed to shut it down unless you end the application.
     {
         POVMSObject msg;
         int err = 0;
-        
+
         err = POVMSObject_New(&msg, kPOVMSType_WildCard);
         if(err == 0)
             err = POVMSMsg_SetupMessage(&msg, kPOVMsgClass_RenderControl, kPOVMsgIdent_RenderStop);
@@ -329,7 +327,7 @@ rendering. You are not supposed to shut it down unless you end the application.
             err = POVMSMsg_SetDestinationAddress(&msg, renderthreadaddress);
         if(err == 0)
             err = POVMS_Send(frontendcontext, &msg, NULL, kPOVMSSendMode_NoReply);
-        
+
         return err;
     }
 
@@ -354,8 +352,7 @@ rendering. You are not supposed to shut it down unless you end the application.
     }
 
 
-Message Sequences
------------------
+@section seq        Message Sequences
 
 A simple rendering session might look as follows:
 

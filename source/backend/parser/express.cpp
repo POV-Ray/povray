@@ -9,7 +9,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -2819,7 +2819,7 @@ shared_ptr<MAP_T> Parser::Parse_Blend_Map (int Blend_Type,int Pat_Type)
                 case PIGMENT_TYPE:
                 case COLOUR_TYPE:
                     if (!sceneData->workingGamma)
-                            Error("blend_gamma requires that assumed_gamma has been set.");
+                        Error("blend_gamma requires that assumed_gamma has been set.");
                     blendGamma = Parse_Gamma();
                     break;
 
