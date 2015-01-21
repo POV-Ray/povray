@@ -262,7 +262,7 @@ struct BasicPattern
     ///
     /// @return     The pattern's default blend map.
     ///
-    virtual const BLEND_MAP* GetDefaultBlendMap() const;
+    virtual ColourBlendMapConstPtr GetDefaultBlendMap() const;
 
     /// Number of discrete colours, textures, or whatever, from which the pattern will select.
     /// 
@@ -372,7 +372,7 @@ struct AgatePattern : public ContinuousPattern
 
     virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
     virtual DBL EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const;
-    virtual const BLEND_MAP* GetDefaultBlendMap() const;
+    virtual ColourBlendMapConstPtr GetDefaultBlendMap() const;
 };
 
 /// Implements the `aoi` pattern.
@@ -400,7 +400,7 @@ struct BrickPattern : public DiscretePattern
 
     virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
     virtual DBL Evaluate(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const;
-    virtual const BLEND_MAP* GetDefaultBlendMap() const;
+    virtual ColourBlendMapConstPtr GetDefaultBlendMap() const;
     virtual unsigned int NumDiscreteBlendMapEntries() const;
 };
 
@@ -416,7 +416,7 @@ struct CheckerPattern : public DiscretePattern
 {
     virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
     virtual DBL Evaluate(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const;
-    virtual const BLEND_MAP* GetDefaultBlendMap() const;
+    virtual ColourBlendMapConstPtr GetDefaultBlendMap() const;
     virtual unsigned int NumDiscreteBlendMapEntries() const;
 };
 
@@ -437,7 +437,7 @@ struct CubicPattern : public DiscretePattern
 {
     virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
     virtual DBL Evaluate(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const;
-    virtual const BLEND_MAP* GetDefaultBlendMap() const;
+    virtual ColourBlendMapConstPtr GetDefaultBlendMap() const;
     virtual unsigned int NumDiscreteBlendMapEntries() const;
 };
 
@@ -592,7 +592,7 @@ struct HexagonPattern : public DiscretePattern
 {
     virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
     virtual DBL Evaluate(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const;
-    virtual const BLEND_MAP* GetDefaultBlendMap() const;
+    virtual ColourBlendMapConstPtr GetDefaultBlendMap() const;
     virtual unsigned int NumDiscreteBlendMapEntries() const;
 };
 
@@ -623,7 +623,7 @@ struct MarblePattern : public ContinuousPattern
 {
     virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
     virtual DBL EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const;
-    virtual const BLEND_MAP* GetDefaultBlendMap() const;
+    virtual ColourBlendMapConstPtr GetDefaultBlendMap() const;
 };
 
 /// Base class for the noise-based patterns.
@@ -646,7 +646,7 @@ struct ObjectPattern : public DiscretePattern
     virtual ~ObjectPattern();
     virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
     virtual DBL Evaluate(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const;
-    virtual const BLEND_MAP* GetDefaultBlendMap() const;
+    virtual ColourBlendMapConstPtr GetDefaultBlendMap() const;
     virtual unsigned int NumDiscreteBlendMapEntries() const;
 };
 
@@ -714,7 +714,7 @@ struct RadialPattern : public ContinuousPattern
 {
     virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
     virtual DBL EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const;
-    virtual const BLEND_MAP* GetDefaultBlendMap() const;
+    virtual ColourBlendMapConstPtr GetDefaultBlendMap() const;
 };
 
 /// Implements the `ripples` pattern.
@@ -767,7 +767,7 @@ struct SquarePattern : public DiscretePattern
 {
     virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
     virtual DBL Evaluate(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const;
-    virtual const BLEND_MAP* GetDefaultBlendMap() const;
+    virtual ColourBlendMapConstPtr GetDefaultBlendMap() const;
     virtual unsigned int NumDiscreteBlendMapEntries() const;
 };
 
@@ -789,7 +789,7 @@ struct TriangularPattern : public DiscretePattern
 {
     virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
     virtual DBL Evaluate(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const;
-    virtual const BLEND_MAP* GetDefaultBlendMap() const;
+    virtual ColourBlendMapConstPtr GetDefaultBlendMap() const;
     virtual unsigned int NumDiscreteBlendMapEntries() const;
 };
 
@@ -805,7 +805,7 @@ struct WoodPattern : public ContinuousPattern
 {
     virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
     virtual DBL EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const;
-    virtual const BLEND_MAP* GetDefaultBlendMap() const;
+    virtual ColourBlendMapConstPtr GetDefaultBlendMap() const;
 };
 
 /// Implements the `wrinkles` pattern.
@@ -874,7 +874,7 @@ struct Mandel2Pattern : public MandelPattern
     Mandel2Pattern(const MandelPattern& obj);
     virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
     virtual DBL EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const;
-    virtual const BLEND_MAP* GetDefaultBlendMap() const;
+    virtual ColourBlendMapConstPtr GetDefaultBlendMap() const;
 };
 
 /// Provides an implementation of the `mandel` pattern optimized for `exponent 3`.
@@ -941,7 +941,7 @@ struct Magnet2JPattern : public JuliaPattern
 struct BozoPattern : public NoisePattern
 {
     virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
-    virtual const BLEND_MAP* GetDefaultBlendMap() const;
+    virtual ColourBlendMapConstPtr GetDefaultBlendMap() const;
 };
 
 /// Implements the `bumps` pattern.
@@ -1044,8 +1044,6 @@ void Rotate_Tpattern (TPATTERN *Tpattern, const Vector3d& Vector);
 void Scale_Tpattern (TPATTERN *Tpattern, const Vector3d& Vector);
 void Transform_Tpattern (TPATTERN *Tpattern, const TRANSFORM *Trans);
 DBL quilt_cubic (DBL t,DBL p1,DBL p2);
-void Search_Blend_Map (DBL value, const BLEND_MAP *Blend_Map,
-                       const BLEND_MAP_ENTRY **Prev, const BLEND_MAP_ENTRY **Cur);
 int GetNoiseGen (const TPATTERN *TPat, const TraceThreadData *Thread);
 
 DENSITY_FILE *Create_Density_File ();

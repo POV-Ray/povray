@@ -2,9 +2,9 @@
 // To view a copy of this license, visit http://creativecommons.org/licenses/by-sa/3.0/ or send a
 // letter to Creative Commons, 444 Castro Street, Suite 900, Mountain View, California, 94041, USA.
 
-//    Persistence of Vision Ray Tracer version 3.5 Include File
+//    Persistence of Vision Ray Tracer version 3.7 Include File
 //    File: colors.inc
-//    Last updated: 2012.5.23
+//    Last updated: 2014-08-05
 //    Description: This file contains pre-defined colors and color-manipulation macros.
 
 #ifndef(Colors_Inc_Temp)
@@ -269,6 +269,80 @@
    #local H = CRGB2H (<R,G,B>, Max, Span);
    #local S = 0; #if (Max!=0) #local S = Span/Max; #end
    <H,S,Max,(RGBFT.filter),(RGBFT.transmit)>
+#end
+
+// Converts a color in CIE XYZ color space to a color in RGB color space (using sRGB primaries and whitepoint).
+// Input:  < X, Y, Z, Filter, Transmit >
+// Output: < R, G, B, Filter, Transmit >
+#macro CXYZ2RGB(Color)
+   #local XYZFT = color Color;
+   #local XYZ = <(XYZFT.red),(XYZFT.green),(XYZFT.blue)>;
+   #local R = vdot(XYZ, <3.24096994190452,   -1.53738317757009, -0.498610760293003>);
+   #local G = vdot(XYZ, <-0.969243636280880,  1.87596750150772,  0.0415550574071757>);
+   #local B = vdot(XYZ, <0.0556300796969937, -0.203976958888977, 1.05697151424288>);
+   <R,G,B,(XYZFT.filter),(XYZFT.transmit)>
+#end
+
+// Converts a color in RGB color space (using sRGB primaries and whitepoint) to a color in CIE XYZ color space.
+// Input:  < R, G, B, Filter, Transmit >
+// Output: < X, Y, Z, Filter, Transmit >
+#macro CRGB2XYZ(Color)
+   #local RGBFT = color Color;
+   #local RGB = <(RGBFT.red),(RGBFT.green),(RGBFT.blue)>;
+   #local X = vdot(RGB, <0.412390799265959,  0.357584339383878, 0.180480788401834>);
+   #local Y = vdot(RGB, <0.212639005871510,  0.715168678767756, 0.0721923153607337>);
+   #local Z = vdot(RGB, <0.0193308187155918, 0.119194779794626, 0.950532152249661>);
+   <X,Y,Z,(RGBFT.filter),(RGBFT.transmit)>
+#end
+
+// helper function for the CLab2RGB macro
+#declare CLab2RGB_f = function(x) { select(x-6/29, (108/841)*(x-4/29), pow(x,3)) }
+
+// Converts a color in CIE L*a*b* color space to a color in RGB color space (using sRGB primaries and whitepoint).
+// Input:  < L*, a*, b*, Filter, Transmit >, <L*a*b* Reference White XYZ>
+// Output: < R, G, B, Filter, Transmit >
+#macro CLab2RGB(Color,WhiteXYZ)
+   #local D65 = <0.95043, 1.00000, 1.08890>;
+   #local LabFT = color Color;
+   #local L = (LabFT.red);
+   #local a = (LabFT.green);
+   #local b = (LabFT.blue);
+   #local Lterm = (L+16)/116;
+   #local X = (WhiteXYZ.x) * CLab2RGB_f(Lterm + a/500);
+   #local Y = (WhiteXYZ.y) * CLab2RGB_f(Lterm);
+   #local Z = (WhiteXYZ.z) * CLab2RGB_f(Lterm - b/200);
+   CXYZ2RGB(<X,Y,Z,(LabFT.filter),(LabFT.transmit)>)
+#end
+
+// Converts a color in CIE L*a*b* color space (with D65 reference white) to a color in RGB color space (using sRGB primaries).
+// Input:  < L*, a*, b*, Filter, Transmit >
+// Output: < R, G, B, Filter, Transmit >
+#macro CLab2RGB_D65(Color)
+   CLab2RGB(Color,<0.95043, 1.00000, 1.08890>)
+#end
+
+// helper function for the CRGB2Lab macro
+#declare CRGB2Lab_f = function(x) { select(x-216/24389, (841/108)*x+4/29, pow(x,1/3)) }
+
+// Converts a color in RGB color space (using sRGB primaries) to a color in CIE L*a*b* color space (with D65 reference white) .
+// Input:  < R, G, B, Filter, Transmit >, <L*a*b* Reference White XYZ>
+// Output: < L*, a*, b*, Filter, Transmit >
+#macro CRGB2Lab(Color,WhiteXYZ)
+   #local XYZFT = CRGB2XYZ(Color);
+   #local fX = CRGB2Lab_f( (XYZFT.red)   / (WhiteXYZ.x) );
+   #local fY = CRGB2Lab_f( (XYZFT.green) / (WhiteXYZ.y) );
+   #local fZ = CRGB2Lab_f( (XYZFT.blue)  / (WhiteXYZ.z) );
+   #local L = 116 * fY - 16;
+   #local a = 500 * (fX-fY);
+   #local b = 200 * (fY-fZ);
+   <L,a,b,(XYZFT.filter),(XYZFT.transmit)>
+#end
+
+// Converts a color in RGB color space (using sRGB primaries) to a color in CIE L*a*b* color space (with D65 reference white) .
+// Input:  < R, G, B, Filter, Transmit >, <L*a*b* Reference White XYZ>
+// Output: < L*, a*, b*, Filter, Transmit >
+#macro CRGB2Lab_D65(Color)
+   CRGB2Lab(Color,<0.95043, 1.00000, 1.08890>)
 #end
 
 #version Colors_Inc_Temp;

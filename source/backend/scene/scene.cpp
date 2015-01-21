@@ -40,6 +40,7 @@
 
 // frame.h must always be the first POV file included (pulls in platform config)
 #include "backend/frame.h"
+#include "backend/scene/scene.h"
 
 #include "base/timer.h"
 #include "base/povmsgid.h"
@@ -47,7 +48,6 @@
 #include "base/fileinputoutput.h"
 
 #include "backend/control/renderbackend.h"
-#include "backend/scene/scene.h"
 #include "backend/scene/objects.h"
 #include "backend/parser/parse.h"
 #include "backend/bounding/boundingtask.h"
@@ -70,25 +70,10 @@ SceneData::SceneData() :
 {
     atmosphereIOR = 1.0;
     atmosphereDispersion = 0.0;
-    backgroundColour = Colour(0.0, 0.0, 0.0, 0.0, 1.0);
-    ambientLight = RGBColour(1.0);
-    iridWavelengths = RGBColour(0.70, 0.52, 0.48);
+    backgroundColour = ToTransColour(RGBFTColour(0.0, 0.0, 0.0, 0.0, 1.0));
+    ambientLight = MathColour(1.0);
 
-    // These default settings are low quality.
-    // For relatively high quality, use:
-    //   parsedRadiositySettings.Nearest_Count = 8;
-    //   parsedRadiositySettings.Count = 100;
-    //   parsedRadiositySettings.Recursion_Limit = 5;
-    // Only these variables should need adjustment!
-
-    parsedRadiositySettings.Quality = 6;     // Q-flag value for light gathering
-    parsedRadiositySettings.File_ReadOnContinue = 1;
-    parsedRadiositySettings.File_SaveWhileRendering = 1;
-    parsedRadiositySettings.File_AlwaysReadAtStart = 0;
-    parsedRadiositySettings.File_KeepOnAbort = 1;
-    parsedRadiositySettings.File_KeepAlways = 0;
-    parsedRadiositySettings.Load_File_Name = NULL;
-    parsedRadiositySettings.Save_File_Name = NULL;
+    iridWavelengths = MathColour::DefaultWavelengths();
 
     languageVersion = OFFICIAL_VERSION_NUMBER;
     languageVersionSet = false;
@@ -207,7 +192,7 @@ UCS2String SceneData::FindFile(POVMSContext ctx, const UCS2String& filename, uns
     // see if the file is available locally
     for(vector<UCS2String>::const_iterator i(filenames.begin()); i != filenames.end(); i++)
     {
-        map<UCS2String, UCS2String>::iterator ilocalfile(scene2LocalFiles.find(*i));
+        FilenameToFilenameMap::iterator ilocalfile(scene2LocalFiles.find(*i));
 
         if(ilocalfile != scene2LocalFiles.end())
             return *i;
@@ -216,7 +201,7 @@ UCS2String SceneData::FindFile(POVMSContext ctx, const UCS2String& filename, uns
     // see if the file is available as temporary file
     for(vector<UCS2String>::const_iterator i(filenames.begin()); i != filenames.end(); i++)
     {
-        map<UCS2String, UCS2String>::iterator itempfile(scene2TempFiles.find(*i));
+        FilenameToFilenameMap::iterator itempfile(scene2TempFiles.find(*i));
 
         if(itempfile != scene2TempFiles.end())
             return *i;
@@ -237,7 +222,7 @@ IStream *SceneData::ReadFile(POVMSContext ctx, const UCS2String& origname, const
 
 #ifdef USE_SCENE_FILE_MAPPING
     // see if the file is available locally
-    map<UCS2String, UCS2String>::iterator ilocalfile(scene2LocalFiles.find(scenefile));
+    FilenameToFilenameMap::iterator ilocalfile(scene2LocalFiles.find(scenefile));
 
     // if available locally, open it end return
     if(ilocalfile != scene2LocalFiles.end())
@@ -248,7 +233,7 @@ IStream *SceneData::ReadFile(POVMSContext ctx, const UCS2String& origname, const
         return NewIStream(ilocalfile->second.c_str(), stype);
 
     // see if the file is available as temporary file
-    map<UCS2String, UCS2String>::iterator itempfile(scene2TempFiles.find(scenefile));
+    FilenameToFilenameMap::iterator itempfile(scene2TempFiles.find(scenefile));
 
     // if available as temporary file, open it end return
     if(itempfile != scene2TempFiles.end())
@@ -315,14 +300,14 @@ IStream *SceneData::ReadFile(POVMSContext ctx, const UCS2String& filename, unsig
     UCS2String fileurl;
 
     // see if the file is available locally
-    map<UCS2String, UCS2String>::iterator ilocalfile(scene2LocalFiles.find(scenefile));
+    FilenameToFilenameMap::iterator ilocalfile(scene2LocalFiles.find(scenefile));
 
     // if available locally, open it end return
     if(ilocalfile != scene2LocalFiles.end())
         return NewIStream(ilocalfile->second.c_str(), stype);
 
     // see if the file is available as temporary file
-    map<UCS2String, UCS2String>::iterator itempfile(scene2TempFiles.find(scenefile));
+    FilenameToFilenameMap::iterator itempfile(scene2TempFiles.find(scenefile));
 
     // if available as temporary file, open it end return
     if(itempfile != scene2TempFiles.end())
@@ -381,7 +366,7 @@ OStream *SceneData::CreateFile(POVMSContext ctx, const UCS2String& filename, uns
 
 #ifdef USE_SCENE_FILE_MAPPING
     // see if the file is available as temporary file
-    map<UCS2String, UCS2String>::iterator itempfile(scene2TempFiles.find(scenefile));
+    FilenameToFilenameMap::iterator itempfile(scene2TempFiles.find(scenefile));
 
     // if available as temporary file, open it end return
     if(itempfile != scene2TempFiles.end())
@@ -474,7 +459,7 @@ void Scene::StartParser(POVMS_Object& parseOptions)
     if (!sceneData->outputAlpha)
         // if we're not outputting an alpha channel, precompose the scene background against a black "background behind the background"
         // (NB: Here, background color is still at its default of <0,0,0,0,1> = full transparency; we're changing that to opaque black.)
-        sceneData->backgroundColour = Colour(0.0);
+        sceneData->backgroundColour.Clear();
 
     // NB a value of '0' for any of the BSP parameters tells the BSP code to use its internal default
     sceneData->bspMaxDepth = parseOptions.TryGetInt(kPOVAttrib_BSP_MaxDepth, 0);
@@ -492,7 +477,7 @@ void Scene::StartParser(POVMS_Object& parseOptions)
         parseOptions.Get(kPOVAttrib_Declare, ds);
         for(int i = 1; i <= ds.GetListSize(); i++)
         {
-            ostringstream sstr;
+            std::ostringstream sstr;
             POVMS_Attribute a;
             POVMS_Object d;
 

@@ -33,19 +33,22 @@
 ///
 //******************************************************************************
 
+#include <limits>
+
 // frame.h must always be the first POV file included (pulls in platform config)
 #include "backend/frame.h"
 #include "backend/scene/threaddata.h"
-#include "backend/scene/view.h"
-#include "backend/scene/scene.h"
+
+#include "backend/bounding/bcyl.h"
 #include "backend/scene/objects.h"
-#include "backend/shape/fractal.h"
+#include "backend/scene/scene.h"
+#include "backend/scene/view.h"
 #include "backend/shape/blob.h"
+#include "backend/shape/fractal.h"
 #include "backend/shape/isosurf.h"
+#include "backend/support/statistics.h"
 #include "backend/texture/texture.h"
 #include "backend/vm/fnpovfpu.h"
-#include "backend/bounding/bcyl.h"
-#include "backend/support/statistics.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -53,7 +56,7 @@
 namespace pov
 {
 
-SceneThreadData::SceneThreadData(shared_ptr<SceneData> sd): sceneData(sd)
+SceneThreadData::SceneThreadData(shared_ptr<SceneData> sd): sceneData(sd), qualityFlags(9)
 {
     for(int i = 0 ; i < 4 ; i++)
         Fractal_IStack[i] = NULL;
@@ -85,8 +88,6 @@ SceneThreadData::SceneThreadData(shared_ptr<SceneData> sd): sceneData(sd)
     timeType = kUnknownTime;
     cpuTime = 0;
     realTime = 0;
-
-    qualityFlags = QUALITY_9;
 
     for(vector<LightSource *>::iterator it = sceneData->lightSources.begin(); it != sceneData->lightSources.end(); it++)
         lightSources.push_back(static_cast<LightSource *> (Copy_Object(*it))) ;

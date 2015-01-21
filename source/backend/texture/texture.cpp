@@ -49,11 +49,13 @@
 // frame.h must always be the first POV file included (pulls in platform config)
 #include "backend/frame.h"
 #include "backend/texture/texture.h"
+
+#include "base/pov_err.h"
+#include "backend/colour/colour_old.h"
+#include "backend/math/vector.h"
+#include "backend/support/imageutil.h"
 #include "backend/texture/pigment.h"
 #include "backend/texture/normal.h"
-#include "backend/support/imageutil.h"
-#include "backend/math/vector.h"
-#include "base/pov_err.h"
 
 #if defined(USE_AVX_FMA4_FOR_NOISE)
     #include "avxfma4check.h"
@@ -1156,26 +1158,28 @@ FINISH *Create_Finish()
 
     New = reinterpret_cast<FINISH *>(POV_MALLOC(sizeof (FINISH), "finish"));
 
-    New->Ambient.set(0.1);
-    New->Emission.clear();
-    New->Reflection_Max.clear();
-    New->Reflection_Min.clear();
+    New->Ambient.Set(0.1);
+    New->Emission.Clear();
+    New->Reflection_Max.Clear();
+    New->Reflection_Min.Clear();
 
-    New->Reflection_Type    = 0;
-    New->Reflection_Falloff = 1;    /* Added by MBP 8/27/98 */
-    New->Diffuse            = 0.6;
-    New->DiffuseBack        = 0.0;
-    New->RawDiffuse         = New->Diffuse;
-    New->RawDiffuseBack     = New->DiffuseBack;
-    New->Brilliance         = 1.0;
-    New->Phong              = 0.0;
-    New->Phong_Size         = 40.0;
-    New->Specular           = 0.0;
-    New->Roughness          = 1.0 / 0.05;
+    New->Reflection_Fresnel     = false;
+    New->Reflection_Falloff     = 1;    /* Added by MBP 8/27/98 */
+    New->Diffuse                = 0.6;
+    New->DiffuseBack            = 0.0;
+    New->Brilliance             = 1.0;
+    New->BrillianceOut          = 1.0;
+    New->BrillianceAdjust       = 1.0;
+    New->BrillianceAdjustRad    = 1.0;
+    New->Phong                  = 0.0;
+    New->Phong_Size             = 40.0;
+    New->Specular               = 0.0;
+    New->Roughness              = 1.0 / 0.05;
 
     New->Crand = 0.0;
 
     New->Metallic = 0.0;
+    New->Fresnel  = false;
 
     New->Irid                = 0.0;
     New->Irid_Film_Thickness = 0.0;
@@ -1190,8 +1194,8 @@ FINISH *Create_Finish()
     New->Conserve_Energy = false;
 
     New->UseSubsurface = false;
-    New->SubsurfaceTranslucency.clear();
-    New->SubsurfaceAnisotropy.clear();
+    New->SubsurfaceTranslucency.Clear();
+    New->SubsurfaceAnisotropy.Clear();
 
     return(New);
 }
@@ -1331,10 +1335,10 @@ TEXTURE *Copy_Texture_Pointer(TEXTURE *Texture)
 *
 ******************************************************************************/
 
-TEXTURE *Copy_Textures(const TEXTURE *Textures)
+TEXTURE *Copy_Textures(TEXTURE *Textures)
 {
     TEXTURE *New, *First, *Previous;
-    const TEXTURE *Layer;
+    TEXTURE *Layer;
 
     Previous = First = NULL;
 
@@ -1342,6 +1346,7 @@ TEXTURE *Copy_Textures(const TEXTURE *Textures)
     {
         New = Create_Texture();
         Copy_TPat_Fields (New, Layer);
+        New->Blend_Map = Copy_Blend_Map<TextureBlendMap>(Layer->Blend_Map);
 
         /*  Mesh copies a texture pointer that already has multiple
             references.  We just want a clean copy, not a copy
@@ -1421,6 +1426,7 @@ void Destroy_Textures(TEXTURE *Textures)
     while (Layer != NULL)
     {
         Destroy_TPat_Fields(Layer);
+        Layer->Blend_Map.reset();
 
         // Theoretically these should only be non-NULL for PLAIN_PATTERN, but let's clean them up either way.
         Destroy_Pigment(Layer->Pigment);
@@ -1462,8 +1468,7 @@ void Destroy_Textures(TEXTURE *Textures)
 void Post_Textures(TEXTURE *Textures)
 {
     TEXTURE *Layer;
-    int i;
-    BLEND_MAP *Map;
+    TextureBlendMap *Map;
 
     if (Textures == NULL)
     {
@@ -1497,13 +1502,13 @@ void Post_Textures(TEXTURE *Textures)
                     break;
             }
 
-            if ((Map=Layer->Blend_Map) != NULL)
+            if ((Map=Layer->Blend_Map.get()) != NULL)
             {
-                for (i = 0; i < Map->Number_Of_Entries; i++)
+                for(vector<TextureBlendMapEntry>::iterator i = Map->Blend_Map_Entries.begin(); i != Map->Blend_Map_Entries.end(); i++)
                 {
-                    Map->Blend_Map_Entries[i].Vals.Texture->Flags |=
+                    i->Vals->Flags |=
                         (Layer->Flags & DONT_SCALE_BUMPS_FLAG);
-                    Post_Textures(Map->Blend_Map_Entries[i].Vals.Texture);
+                    Post_Textures(i->Vals);
                 }
             }
             else
@@ -2315,5 +2320,15 @@ void AVX_FMA4_DNoise(Vector3d& result, const Vector3d& EPoint)
 
 #endif
 
+
+//******************************************************************************
+
+TextureBlendMap::TextureBlendMap() : BlendMap<TexturePtr>(TEXTURE_TYPE) {}
+
+TextureBlendMap::~TextureBlendMap()
+{
+    for (Vector::iterator i = Blend_Map_Entries.begin(); i != Blend_Map_Entries.end(); i++)
+        Destroy_Textures(i->Vals);
+}
 
 }
