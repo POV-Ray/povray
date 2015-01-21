@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -106,7 +106,7 @@ const unsigned int gUTF8Offsets[6] =
 char *Parser::Parse_C_String(bool pathname)
 {
     UCS2 *str = Parse_String(pathname);
-    char *New = UCS2_To_String(str, pathname);
+    char *New = UCS2_To_String(str);
 
     POV_FREE(str);
 
@@ -139,7 +139,7 @@ UCS2 *Parser::Parse_String(bool pathname, bool require)
 
     EXPECT
         CASE(STRING_LITERAL_TOKEN)
-            New = String_To_UCS2(Token.Token_String, pathname);
+            New = String_Literal_To_UCS2(Token.Token_String, pathname);
             EXIT
         END_CASE
 
@@ -269,7 +269,7 @@ UCS2 *Parser::Parse_Str(bool pathname)
             strcpy(temp4, "<invalid>");
     }
 
-    return String_To_UCS2(temp4, pathname);
+    return String_To_UCS2(temp4);
 }
 
 
@@ -355,13 +355,13 @@ UCS2 *Parser::Parse_VStr(bool pathname)
     *p = '\0';
 
     sprintf(temp4, temp3, Express[X]);
-    New = String_To_UCS2(temp4, pathname);       // add first component
+    New = String_To_UCS2(temp4);       // add first component
 
     for(Terms = 1; Terms < Dim; Terms++)
     {
         New = UCS2_strcat(New, str);   // add separator
         sprintf(temp4, temp3, Express[Terms]);
-        str2 = String_To_UCS2(temp4, pathname);
+        str2 = String_To_UCS2(temp4);
         New = UCS2_strcat(New, str2);  // add component
         POV_FREE(str2);
     }
@@ -543,7 +543,7 @@ UCS2 *Parser::Parse_Datetime(bool pathname)
     if (vlen == 0)
         Error("Invalid formatting code in format string, or resulting string too long.");
 
-    return String_To_UCS2(val, pathname);
+    return String_To_UCS2(val);
 }
 
 
@@ -678,7 +678,80 @@ UCS2 *Parser::Parse_Strlwr(bool pathname)
  *
 ******************************************************************************/
 
-UCS2 *Parser::String_To_UCS2(const char *str, bool pathname)
+UCS2 *Parser::String_To_UCS2(const char *str)
+{
+    UCS2 *char_string = NULL;
+    UCS2 *char_array = NULL;
+    int char_array_size = 0;
+    int utf8arraysize = 0;
+    unsigned char *utf8array = NULL;
+    int index_in = 0;
+    int index_out = 0;
+    char buffer[8];
+    char *dummy_ptr = NULL;
+    int i = 0;
+
+    if(strlen(str) == 0)
+    {
+        char_string = reinterpret_cast<UCS2 *>(POV_MALLOC(sizeof(UCS2), "UCS2 String"));
+        char_string[0] = 0;
+
+        return char_string;
+    }
+
+    switch(sceneData->stringEncoding)
+    {
+        case 0: // ASCII
+            char_array_size = (int)strlen(str);
+            char_array = reinterpret_cast<UCS2 *>(POV_MALLOC(char_array_size * sizeof(UCS2), "Character Array"));
+            for(i = 0; i < char_array_size; i++)
+            {
+                if(sceneData->languageVersion < 350)
+                    char_array[i] = (unsigned char)(str[i]);
+                else
+                {
+                    char_array[i] = str[i] & 0x007F;
+                    if(char_array[i] != str[i])
+                    {
+                        char_array[i] = ' ';
+                        PossibleError("Non-ASCII character has been replaced by space character.");
+                    }
+                }
+            }
+            break;
+        case 1: // UTF8
+            char_array = Convert_UTF8_To_UCS2(reinterpret_cast<const unsigned char *>(str), (int)strlen(str), &char_array_size);
+            break;
+        case 2: // System Specific
+            char_array = POV_CONVERT_TEXT_TO_UCS2(reinterpret_cast<const unsigned char *>(str), strlen(str), &char_array_size);
+            if(char_array == NULL)
+                Error("Cannot convert system specific text format to Unicode.");
+            break;
+        default:
+            Error("Unsupported text encoding format.");
+            break;
+    }
+
+    if(char_array == NULL)
+        Error("Cannot convert text to UCS2 format.");
+
+    char_string = reinterpret_cast<UCS2 *>(POV_MALLOC((char_array_size + 1) * sizeof(UCS2), "UCS2 String"));
+    for(index_in = 0, index_out = 0; index_in < char_array_size; index_in++, index_out++)
+        char_string[index_out] = char_array[index_in];
+
+    char_string[index_out] = 0;
+    index_out++;
+
+    if(char_array != NULL)
+        POV_FREE(char_array);
+
+    return char_string;
+}
+
+
+/*****************************************************************************/
+
+UCS2 *Parser::String_Literal_To_UCS2(const char *str, bool pathname)
 {
     UCS2 *char_string = NULL;
     UCS2 *char_array = NULL;
@@ -738,8 +811,20 @@ UCS2 *Parser::String_To_UCS2(const char *str, bool pathname)
     char_string = reinterpret_cast<UCS2 *>(POV_MALLOC((char_array_size + 1) * sizeof(UCS2), "UCS2 String"));
     for(index_in = 0, index_out = 0; index_in < char_array_size; index_in++, index_out++)
     {
-        if((char_array[index_in] == '\\') && (pathname == false))
+        if((char_array[index_in] == '\\') && (sceneData->languageVersion >= 371 || !pathname))
         {
+            // Historically, escape sequences were ignored when parsing for a filename.
+            // As of POV-Ray 3.71, this has been changed.
+
+#if (FILENAME_SEPARATOR == '\\')
+            if (pathname)
+            {
+                Warning(0, "Backslash encountered while parsing for a filename."
+                           " As of version 3.71, this is interpreted as an escape sequence just like in any other string literal."
+                           " If this is supposed to be a path separator, use a forward slash instead.");
+            }
+#endif
+
             index_in++;
 
             switch(char_array[index_in])
@@ -766,13 +851,13 @@ UCS2 *Parser::String_To_UCS2(const char *str, bool pathname)
                     char_string[index_out] = 0x0b;
                     break;
                 case '\0':
-                    char_string[index_out] = 0x5c;
+                    // [CLi] shouldn't happen, as having a backslash as the last character of a string literal would invalidate the string terminator
+                    Error("Unexpected end of escape sequence in text string.");
                     break;
                 case '\'':
-                    char_string[index_out] = 0x27;
-                    break;
+                case '\"':
                 case '\\':
-                    char_string[index_out] = '\\';
+                    char_string[index_out] = char_array[index_in];
                     break;
                 case 'u':
                     if(index_in + 4 >= char_array_size)
@@ -796,7 +881,24 @@ UCS2 *Parser::String_To_UCS2(const char *str, bool pathname)
             }
         }
         else
+        {
+            if ((char_array[index_in] == '\\') && pathname)
+            {
+                // Historically, escape sequences were ignored when parsing for a filename.
+                // As of POV-Ray 3.71, this has been changed.
+
+#if (FILENAME_SEPARATOR == '\\')
+                Warning(0, "Backslash encountered while parsing for a filename."
+                           " In legacy (pre-3.71) scenes, this is NOT interpreted as the start of an escape sequence."
+                           " However, for future compatibility it is recommended to use a forward slash as path separator instead.");
+#else
+                Warning(0, "Backslash encountered while parsing for a filename."
+                           " In legacy (pre-3.71) scenes, this is NOT interpreted as the start of an escape sequence.");
+#endif
+            }
+
             char_string[index_out] = char_array[index_in];
+        }
     }
 
     char_string[index_out] = 0;
@@ -829,7 +931,7 @@ UCS2 *Parser::String_To_UCS2(const char *str, bool pathname)
  *
 ******************************************************************************/
 
-char *Parser::UCS2_To_String(const UCS2 *str, bool)
+char *Parser::UCS2_To_String(const UCS2 *str)
 {
     char *str_out;
     char *strp;

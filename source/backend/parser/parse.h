@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -347,7 +347,7 @@ class Parser : public Task
         // tokenize.h/tokenize.cpp
         void Get_Token (void);
         void Unget_Token (void);
-        void Parse_String_Literal(void);
+        void Read_String_Literal(void);
         void Where_Error (POVMSObjectPtr msg);
         void Where_Warning (POVMSObjectPtr msg);
         void Parse_Directive (int After_Hash);
@@ -429,8 +429,9 @@ class Parser : public Task
         char *Parse_C_String(bool pathname = false);
         UCS2 *Parse_String(bool pathname = false, bool require = true);
 
-        UCS2 *String_To_UCS2(const char *str, bool pathname = false);
-        char *UCS2_To_String(const UCS2 *str, bool pathname = false);
+        UCS2 *String_Literal_To_UCS2(const char *str, bool pathname = false);
+        UCS2 *String_To_UCS2(const char *str);
+        char *UCS2_To_String(const UCS2 *str);
 
         UCS2 *UCS2_strcat(UCS2 *s1, const UCS2 *s2);
         int UCS2_strlen(const UCS2 *str);
@@ -708,7 +709,7 @@ class Parser : public Task
         void Parse_Rel_Term (EXPRESS Express, int *Terms);
 
         /// Parses a REL_TERM comparing two strings.
-        void Parse_Rel_String_Term (const UCS2* lhs, EXPRESS Express, int Terms);
+        void Parse_Rel_String_Term (const UCS2 *lhs, EXPRESS Express, int Terms);
 
         /// Parses a LOGICAL_EXPRESSION (including FLOAT) or VECTOR.
         void Parse_Logical (EXPRESS Express, int *Terms);

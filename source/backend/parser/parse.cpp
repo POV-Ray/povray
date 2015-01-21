@@ -187,7 +187,7 @@ void Parser::Run()
                 {
                     string tmp(i->second, 1, i->second.length() - 2);
                     Temp_Entry = Add_Symbol(1, const_cast<char *>(i->first.c_str()), STRING_ID_TOKEN);
-                    Temp_Entry->Data = String_To_UCS2(const_cast<char *>(tmp.c_str()), false);
+                    Temp_Entry->Data = String_Literal_To_UCS2(const_cast<char *>(tmp.c_str()), false);
                 }
                 else
                 {
