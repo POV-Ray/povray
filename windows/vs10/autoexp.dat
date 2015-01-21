@@ -1,0 +1,37 @@
+; AutoExp.Dat - templates for automatically expanding data
+
+; >>> POV-RAY
+; Modifications for the POV-Ray project.
+; Copyright(c) Persistence of Vision Raytracer Pty. Ltd.
+;
+; For easier viewing of common POV-Ray data structures, insert these snippets
+; into the following file of your Visual Studio installation:
+; C:\Program Files\Microsoft Visual Studio 10.0\Common7\Packages\Debugger\autoexp.dat
+; (or wherever you happen to have installed Visual Studio)
+; <<< POV-RAY
+
+[AutoExpand]
+
+; >>> POV-RAY
+; Insert this snippet into the [AutoExpand] section.
+pov::GenericVector2d<*> =<vect[0],f>; <vect[1],f>
+pov::GenericVector3d<*> =<vect[0],f>; <vect[1],f>; <vect[2],f>
+pov_base::GenericRGBColour<*> =<mColour[0],f>; <mColour[1],f>; <mColour[2],f>
+pov_base::GenericRGBTColour<*> =<mColour.mColour[0],f>; <mColour.mColour[1],f>; <mColour.mColour[2],f>; T=<mTransm,f>
+pov_base::GenericRGBFTColour<*> =<mColour.mColour[0],f>; <mColour.mColour[1],f>; <mColour.mColour[2],f>; F=<mTrans.mFilter,f>; T=<mTrans.mTransm,f>
+; <<< POV-RAY
+
+[Visualizer]
+
+; >>> POV-RAY
+; Insert this snippet into the [Visualizer] section.
+; (Nothing here for now.)
+; <<< POV-RAY
+
+[hresult]
+
+; >>> POV-RAY
+; Insert this snippet into the [hresult] section.
+; (Nothing here for now.)
+; <<< POV-RAY
+

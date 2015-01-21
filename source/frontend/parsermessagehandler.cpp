@@ -153,7 +153,7 @@ void ParserMessageHandler::Statistics(Console *console, POVMS_Object& obj, bool 
 
 void ParserMessageHandler::Progress(Console *console, POVMS_Object& obj, bool verbose)
 {
-	ostringstream sstr;
+	std::ostringstream sstr;
 
 	switch(obj.GetType(kPOVMSObjectClassID))
 	{

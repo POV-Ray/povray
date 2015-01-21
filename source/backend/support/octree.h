@@ -84,8 +84,9 @@ struct ot_block_struct
 	Vector3d    Point;
 	Vector3d    S_Normal;
 	Vector3d    To_Nearest_Surface;
-	RGBColour   dx, dy, dz; // gradients, not colors, but used only to manipulate colors [trf]
-	RGBColour   Illuminance;
+	MathColour  dx, dy, dz; // gradients, not colors, but used only to manipulate colors [trf]
+	MathColour  Illuminance;
+    SNGL        Brilliance; // surface brilliance for which the sample was computed
 	SNGL        Harmonic_Mean_Distance;
 	SNGL        Nearest_Distance;
 	SNGL        Quality;    // quality of the data from which this sample was aggregated
@@ -118,10 +119,10 @@ struct ot_read_param_struct
 // These are informations the octree reader generates
 struct ot_read_info_struct
 {
-	RGBColour Gather_Total;
-	long      Gather_Total_Count;
-	DBL       Brightness;
-	bool      FirstRadiosityPass;
+	MathColour  Gather_Total;
+	long        Gather_Total_Count;
+	DBL         Brightness;
+	bool        FirstRadiosityPass;
 };
 
 /*****************************************************************************

@@ -1,48 +1,51 @@
-/*******************************************************************************
- * atmosph.cpp
- *
- * This module contains all functions for atmospheric effects.
- *
- * ---------------------------------------------------------------------------
- * Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
- * Copyright 1991-2013 Persistence of Vision Raytracer Pty. Ltd.
- *
- * POV-Ray is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * POV-Ray is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------------
- * POV-Ray is based on the popular DKB raytracer version 2.12.
- * DKBTrace was originally written by David K. Buck.
- * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
- * ---------------------------------------------------------------------------
- * $File: //depot/povray/smp/source/backend/scene/atmosph.cpp $
- * $Revision: #27 $
- * $Change: 6158 $
- * $DateTime: 2013/12/02 21:19:56 $
- * $Author: clipka $
- *******************************************************************************/
+//******************************************************************************
+///
+/// @file backend/scene/atmosph.cpp
+///
+/// This module contains all functions for atmospheric effects.
+///
+/// @copyright
+/// @parblock
+///
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
+/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+///
+/// POV-Ray is free software: you can redistribute it and/or modify
+/// it under the terms of the GNU Affero General Public License as
+/// published by the Free Software Foundation, either version 3 of the
+/// License, or (at your option) any later version.
+///
+/// POV-Ray is distributed in the hope that it will be useful,
+/// but WITHOUT ANY WARRANTY; without even the implied warranty of
+/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+/// GNU Affero General Public License for more details.
+///
+/// You should have received a copy of the GNU Affero General Public License
+/// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+///
+/// ----------------------------------------------------------------------------
+///
+/// POV-Ray is based on the popular DKB raytracer version 2.12.
+/// DKBTrace was originally written by David K. Buck.
+/// DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
+///
+/// @endparblock
+///
+//*******************************************************************************
+
+#include <algorithm>
 
 // frame.h must always be the first POV file included (pulls in platform config)
 #include "backend/frame.h"
 #include "backend/scene/atmosph.h"
-#include "backend/texture/texture.h"
-#include "backend/texture/pigment.h"
-#include "backend/pattern/warps.h"
-#include "backend/math/vector.h"
+
 #include "backend/math/matrices.h"
+#include "backend/math/vector.h"
+#include "backend/pattern/warps.h"
+#include "backend/texture/pigment.h"
+#include "backend/texture/texture.h"
 
 #include "povray.h" // TODO
-
-#include <algorithm>
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -80,26 +83,26 @@ namespace pov
 
 FOG *Create_Fog()
 {
-	FOG *New;
+    FOG *New;
 
-	New = new FOG;
+    New = new FOG;
 
-	New->Type = ORIG_FOG;
+    New->Type = ORIG_FOG;
 
-	New->Distance = 0.0;
-	New->Alt      = 0.0;
-	New->Offset   = 0.0;
+    New->Distance = 0.0;
+    New->Alt      = 0.0;
+    New->Offset   = 0.0;
 
-	New->colour.clear();
+    New->colour.Clear();
 
-	New->Up = Vector3d(0.0, 1.0, 0.0);
+    New->Up = Vector3d(0.0, 1.0, 0.0);
 
-	New->Turb = NULL;
-	New->Turb_Depth = 0.5;
+    New->Turb = NULL;
+    New->Turb_Depth = 0.5;
 
-	New->Next = NULL;
+    New->Next = NULL;
 
-	return (New);
+    return (New);
 }
 
 
@@ -136,15 +139,15 @@ FOG *Create_Fog()
 
 FOG *Copy_Fog(const FOG *Old)
 {
-	FOG *New;
+    FOG *New;
 
-	New = Create_Fog();
+    New = Create_Fog();
 
-	*New = *Old;
+    *New = *Old;
 
-	New->Turb = reinterpret_cast<TURB *>(Copy_Warps((reinterpret_cast<WARP *>(Old->Turb))));
+    New->Turb = reinterpret_cast<TURB *>(Copy_Warps((reinterpret_cast<WARP *>(Old->Turb))));
 
-	return (New);
+    return (New);
 }
 
 
@@ -179,12 +182,12 @@ FOG *Copy_Fog(const FOG *Old)
 
 void Destroy_Fog(FOG *Fog)
 {
-	if (Fog != NULL)
-	{
-		Destroy_Turb(Fog->Turb);
+    if (Fog != NULL)
+    {
+        Destroy_Turb(Fog->Turb);
 
-		delete Fog;
-	}
+        delete Fog;
+    }
 }
 
 
@@ -219,29 +222,29 @@ void Destroy_Fog(FOG *Fog)
 
 RAINBOW *Create_Rainbow()
 {
-	RAINBOW *New;
+    RAINBOW *New;
 
-	New = new RAINBOW;
+    New = new RAINBOW;
 
-	New->Distance = MAX_DISTANCE;
-	New->Jitter   = 0.0;
-	New->Angle    = 0.0;
-	New->Width    = 0.0;
+    New->Distance = MAX_DISTANCE;
+    New->Jitter   = 0.0;
+    New->Angle    = 0.0;
+    New->Width    = 0.0;
 
-	New->Falloff_Width  = 0.0;
-	New->Arc_Angle      = 180.0;
-	New->Falloff_Angle  = 180.0;
+    New->Falloff_Width  = 0.0;
+    New->Arc_Angle      = 180.0;
+    New->Falloff_Angle  = 180.0;
 
-	New->Pigment = NULL;
+    New->Pigment = NULL;
 
-	New->Antisolar_Vector = Vector3d(0.0, 0.0, 0.0);
+    New->Antisolar_Vector = Vector3d(0.0, 0.0, 0.0);
 
-	New->Right_Vector = Vector3d(1.0, 0.0, 0.0);
-	New->Up_Vector = Vector3d(0.0, 1.0, 0.0);
+    New->Right_Vector = Vector3d(1.0, 0.0, 0.0);
+    New->Up_Vector = Vector3d(0.0, 1.0, 0.0);
 
-	New->Next = NULL;
+    New->Next = NULL;
 
-	return (New);
+    return (New);
 }
 
 
@@ -278,13 +281,13 @@ RAINBOW *Create_Rainbow()
 
 RAINBOW *Copy_Rainbow(const RAINBOW *Old)
 {
-	RAINBOW *New;
+    RAINBOW *New;
 
-	New = Create_Rainbow();
+    New = Create_Rainbow();
 
-	*New = *Old;
+    *New = *Old;
 
-	return (New);
+    return (New);
 }
 
 
@@ -319,12 +322,12 @@ RAINBOW *Copy_Rainbow(const RAINBOW *Old)
 
 void Destroy_Rainbow(RAINBOW *Rainbow)
 {
-	if (Rainbow != NULL)
-	{
-		Destroy_Pigment(Rainbow->Pigment);
+    if (Rainbow != NULL)
+    {
+        Destroy_Pigment(Rainbow->Pigment);
 
-		delete Rainbow;
-	}
+        delete Rainbow;
+    }
 }
 
 
@@ -359,15 +362,15 @@ void Destroy_Rainbow(RAINBOW *Rainbow)
 
 SKYSPHERE *Create_Skysphere()
 {
-	SKYSPHERE *New;
+    SKYSPHERE *New;
 
-	New = new SKYSPHERE;
+    New = new SKYSPHERE;
 
-	New->Emission = RGBColour(1.0);
+    New->Emission = MathColour(1.0);
 
-	New->Trans = Create_Transform();
+    New->Trans = Create_Transform();
 
-	return (New);
+    return (New);
 }
 
 
@@ -404,24 +407,24 @@ SKYSPHERE *Create_Skysphere()
 
 SKYSPHERE *Copy_Skysphere(const SKYSPHERE *Old)
 {
-	SKYSPHERE *New;
+    SKYSPHERE *New;
 
-	New = Create_Skysphere();
+    New = Create_Skysphere();
 
-	Destroy_Transform(New->Trans);
+    Destroy_Transform(New->Trans);
 
-	*New = *Old;
+    *New = *Old;
 
-	New->Trans = Copy_Transform(Old->Trans);
+    New->Trans = Copy_Transform(Old->Trans);
 
-	// The standard assignment operator of SKYSPHERE has created a shallow copy of the Pigments vector, but we need a
-	// deep copy in case Old gets destroyed.
-	for (vector<PIGMENT*>::iterator i = New->Pigments.begin(); i != New->Pigments.end(); ++ i)
-	{
-		*i = Copy_Pigment(*i);
-	}
+    // The standard assignment operator of SKYSPHERE has created a shallow copy of the Pigments vector, but we need a
+    // deep copy in case Old gets destroyed.
+    for (vector<PIGMENT*>::iterator i = New->Pigments.begin(); i != New->Pigments.end(); ++ i)
+    {
+        *i = Copy_Pigment(*i);
+    }
 
-	return (New);
+    return (New);
 }
 
 
@@ -456,17 +459,17 @@ SKYSPHERE *Copy_Skysphere(const SKYSPHERE *Old)
 
 void Destroy_Skysphere(SKYSPHERE *Skysphere)
 {
-	if (Skysphere != NULL)
-	{
-		for (vector<PIGMENT*>::iterator i = Skysphere->Pigments.begin(); i != Skysphere->Pigments.end(); ++ i)
-		{
-			Destroy_Pigment(*i);
-		}
+    if (Skysphere != NULL)
+    {
+        for (vector<PIGMENT*>::iterator i = Skysphere->Pigments.begin(); i != Skysphere->Pigments.end(); ++ i)
+        {
+            Destroy_Pigment(*i);
+        }
 
-		Destroy_Transform(Skysphere->Trans);
+        Destroy_Transform(Skysphere->Trans);
 
-		delete Skysphere;
-	}
+        delete Skysphere;
+    }
 }
 
 
@@ -503,11 +506,11 @@ void Destroy_Skysphere(SKYSPHERE *Skysphere)
 
 void Rotate_Skysphere(SKYSPHERE *Skysphere, const Vector3d& Vector)
 {
-	TRANSFORM Trans;
+    TRANSFORM Trans;
 
-	Compute_Rotation_Transform(&Trans, Vector);
+    Compute_Rotation_Transform(&Trans, Vector);
 
-	Transform_Skysphere(Skysphere, &Trans);
+    Transform_Skysphere(Skysphere, &Trans);
 }
 
 
@@ -544,11 +547,11 @@ void Rotate_Skysphere(SKYSPHERE *Skysphere, const Vector3d& Vector)
 
 void Scale_Skysphere(SKYSPHERE *Skysphere, const Vector3d& Vector)
 {
-	TRANSFORM Trans;
+    TRANSFORM Trans;
 
-	Compute_Scaling_Transform(&Trans, Vector);
+    Compute_Scaling_Transform(&Trans, Vector);
 
-	Transform_Skysphere(Skysphere, &Trans);
+    Transform_Skysphere(Skysphere, &Trans);
 }
 
 
@@ -585,11 +588,11 @@ void Scale_Skysphere(SKYSPHERE *Skysphere, const Vector3d& Vector)
 
 void Translate_Skysphere(SKYSPHERE *Skysphere, const Vector3d& Vector)
 {
-	TRANSFORM Trans;
+    TRANSFORM Trans;
 
-	Compute_Translation_Transform(&Trans, Vector);
+    Compute_Translation_Transform(&Trans, Vector);
 
-	Transform_Skysphere(Skysphere, &Trans);
+    Transform_Skysphere(Skysphere, &Trans);
 }
 
 
@@ -626,12 +629,12 @@ void Translate_Skysphere(SKYSPHERE *Skysphere, const Vector3d& Vector)
 
 void Transform_Skysphere(SKYSPHERE *Skysphere, const TRANSFORM *Trans)
 {
-	if (Skysphere->Trans == NULL)
-	{
-		Skysphere->Trans = Create_Transform();
-	}
+    if (Skysphere->Trans == NULL)
+    {
+        Skysphere->Trans = Create_Transform();
+    }
 
-	Compose_Transforms(Skysphere->Trans, Trans);
+    Compose_Transforms(Skysphere->Trans, Trans);
 }
 
 }

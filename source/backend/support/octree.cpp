@@ -1,37 +1,39 @@
-/*******************************************************************************
- * octree.cpp
- *
- * This module contains all oct-tree functions for radiosity.
- *
- * This file was written by Jim McElhiney.
- *
- * ---------------------------------------------------------------------------
- * Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
- * Copyright 1991-2013 Persistence of Vision Raytracer Pty. Ltd.
- *
- * POV-Ray is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * POV-Ray is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------------
- * POV-Ray is based on the popular DKB raytracer version 2.12.
- * DKBTrace was originally written by David K. Buck.
- * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
- * ---------------------------------------------------------------------------
- * $File: //depot/povray/smp/source/backend/support/octree.cpp $
- * $Revision: #31 $
- * $Change: 6085 $
- * $DateTime: 2013/11/10 07:39:29 $
- * $Author: clipka $
- *******************************************************************************/
+//******************************************************************************
+///
+/// @file backend/support/octree.cpp
+///
+/// This module contains all oct-tree functions for radiosity.
+///
+/// @author Originally written by Jim McElhiney.
+///
+/// @copyright
+/// @parblock
+///
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
+/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+///
+/// POV-Ray is free software: you can redistribute it and/or modify
+/// it under the terms of the GNU Affero General Public License as
+/// published by the Free Software Foundation, either version 3 of the
+/// License, or (at your option) any later version.
+///
+/// POV-Ray is distributed in the hope that it will be useful,
+/// but WITHOUT ANY WARRANTY; without even the implied warranty of
+/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+/// GNU Affero General Public License for more details.
+///
+/// You should have received a copy of the GNU Affero General Public License
+/// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+///
+/// ----------------------------------------------------------------------------
+///
+/// POV-Ray is based on the popular DKB raytracer version 2.12.
+/// DKBTrace was originally written by David K. Buck.
+/// DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
+///
+/// @endparblock
+///
+//*******************************************************************************
 
 /************************************************************************
 *  Oct-tree routines.  Used by Radiosity calculation routines.
@@ -52,14 +54,15 @@
 *  All standard POV distribution rights granted.  All other rights reserved.
 *************************************************************************/
 
+#include <algorithm>
+
 // frame.h must always be the first POV file included (pulls in platform config)
 #include "backend/frame.h"
+#include "backend/support/octree.h"
+
+#include "base/pov_err.h"
 #include "backend/povray.h"
 #include "backend/math/vector.h"
-#include "backend/support/octree.h"
-#include "base/pov_err.h"
-
-#include <algorithm>
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -99,92 +102,92 @@ namespace pov
 // compiler / target platform sanity checks
 // (note that these don't necessarily catch all possible quirks; they should be quite reliable though)
 #ifndef FLT_RADIX
-#include <float.h>
+#include <cfloat>
 #endif
 #if(C99_COMPATIBLE_RADIOSITY == 0)
-	#if( (INT_MAX != 2147483647) || (INT_MIN < (-2147483647 - 1)) )
-		#error 'int' is not 32 bit or uses non-straightforward encoding; try a different C99_COMPATIBLE_RADIOSITY setting in config.h
-	#endif
-	#if(FLT_RADIX != 2)
-		#error 'float' does not conform to IEEE 754 single-precision format; try a different C99_COMPATIBLE_RADIOSITY setting in config.h
-	#endif
-	#if(FLT_MANT_DIG != 24)
-		#error 'float' does not conform to IEEE 754 single-precision format; try a different C99_COMPATIBLE_RADIOSITY setting in config.h
-	#endif
-	#if(FLT_MAX_EXP != 128)
-		#error 'float' does not conform to IEEE 754 single-precision format; try a different C99_COMPATIBLE_RADIOSITY setting in config.h
-	#endif
-	#if(FLT_MIN_EXP != -125)
-		#error 'float' does not conform to IEEE 754 single-precision format; try a different C99_COMPATIBLE_RADIOSITY setting in config.h
-	#endif
+    #if( (INT_MAX != 2147483647) || (INT_MIN < (-2147483647 - 1)) )
+        #error 'int' is not 32 bit or uses non-straightforward encoding; try a different C99_COMPATIBLE_RADIOSITY setting in config.h
+    #endif
+    #if(FLT_RADIX != 2)
+        #error 'float' does not conform to IEEE 754 single-precision format; try a different C99_COMPATIBLE_RADIOSITY setting in config.h
+    #endif
+    #if(FLT_MANT_DIG != 24)
+        #error 'float' does not conform to IEEE 754 single-precision format; try a different C99_COMPATIBLE_RADIOSITY setting in config.h
+    #endif
+    #if(FLT_MAX_EXP != 128)
+        #error 'float' does not conform to IEEE 754 single-precision format; try a different C99_COMPATIBLE_RADIOSITY setting in config.h
+    #endif
+    #if(FLT_MIN_EXP != -125)
+        #error 'float' does not conform to IEEE 754 single-precision format; try a different C99_COMPATIBLE_RADIOSITY setting in config.h
+    #endif
 #else
-	#if(FLT_RADIX != 2)
-		// logb family of functions will not work as expected
-		#error floating point arithmetic uses an uncommon radix; this file will not compile on your machine
-	#endif
+    #if(FLT_RADIX != 2)
+        // logb family of functions will not work as expected
+        #error floating point arithmetic uses an uncommon radix; this file will not compile on your machine
+    #endif
 #endif
 
 #if(C99_COMPATIBLE_RADIOSITY == 0)
-	// hacks exploiting IEEE standard float encoding properties
-	#define POW2OP_DECLARE() \
-		union { float f; int l; } nodesize_hack; // MUST be float, NOT DBL
-	// This hex operation does a floor to next lower power of 2, by clearing
-	// all of the mantissa bits.  Works only on IEEE single precision floats
-	#define POW2OP_FLOOR(dest,src) \
-		nodesize_hack.f = (float)(src); \
-		nodesize_hack.l &= 0xff800000; \
-		(dest) = (DBL)nodesize_hack.f;
-	// This magic hex operation extracts the exponent, which gives us an
-	// integer number suitable for labelling a range of a power of 2.  In IEEE
-	// format, value = pow(2,exponent-127). Therefore, if our index is, say,
-	// 129, then the item has a maximum extent of (2 to the (129-127)), or
-	// about 4 space units.
-	#define POW2OP_ENCODE(dest,src) \
-		nodesize_hack.f = (float) (src); \
-		(dest) = (nodesize_hack.l & 0x7f800000) >> 23;
-	#define POW2OP_DECODE(dest,src) \
-		nodesize_hack.l = (src) << 23; \
-		(dest) = (DBL) (size).f;
+    // hacks exploiting IEEE standard float encoding properties
+    #define POW2OP_DECLARE() \
+        union { float f; int l; } nodesize_hack; // MUST be float, NOT DBL
+    // This hex operation does a floor to next lower power of 2, by clearing
+    // all of the mantissa bits.  Works only on IEEE single precision floats
+    #define POW2OP_FLOOR(dest,src) \
+        nodesize_hack.f = (float)(src); \
+        nodesize_hack.l &= 0xff800000; \
+        (dest) = (DBL)nodesize_hack.f;
+    // This magic hex operation extracts the exponent, which gives us an
+    // integer number suitable for labelling a range of a power of 2.  In IEEE
+    // format, value = pow(2,exponent-127). Therefore, if our index is, say,
+    // 129, then the item has a maximum extent of (2 to the (129-127)), or
+    // about 4 space units.
+    #define POW2OP_ENCODE(dest,src) \
+        nodesize_hack.f = (float) (src); \
+        (dest) = (nodesize_hack.l & 0x7f800000) >> 23;
+    #define POW2OP_DECODE(dest,src) \
+        nodesize_hack.l = (src) << 23; \
+        (dest) = (DBL) (size).f;
 #elif(C99_COMPATIBLE_RADIOSITY == 1)
-	#define POW2OP_DECLARE() // nothing
-	#define POW2OP_FLOOR(dest,src) \
-		(dest) = pow(2.0, logbf(src)); \
-		(dest) = copysign((dest), (src));
-	#define POW2OP_ENCODE(dest,src) \
-		(dest) = ((int)logbf(src)) + 127;
-	#define POW2OP_DECODE(dest,src) \
-		if( (src) >= 127 ) (dest) = (DBL)(1 << ((src) - 127)); \
-		else (dest) = 1.0 / (DBL)(1 << (127 - (src)));
+    #define POW2OP_DECLARE() // nothing
+    #define POW2OP_FLOOR(dest,src) \
+        (dest) = pow(2.0, logbf(src)); \
+        (dest) = copysign((dest), (src));
+    #define POW2OP_ENCODE(dest,src) \
+        (dest) = ((int)logbf(src)) + 127;
+    #define POW2OP_DECODE(dest,src) \
+        if( (src) >= 127 ) (dest) = (DBL)(1 << ((src) - 127)); \
+        else (dest) = 1.0 / (DBL)(1 << (127 - (src)));
 #elif(C99_COMPATIBLE_RADIOSITY == 2)
-	#define POW2OP_DECLARE() // nothing
-	#define POW2OP_FLOOR(dest,src) \
-		(dest) = (DBL)(1 << ilogbf(src)); \
-		(dest) = copysign((dest), (src));
-	#define POW2OP_ENCODE(dest,src) \
-		(dest) = ilogbf(src) + 127;
-	#define POW2OP_DECODE(dest,src) \
-		if( (src) >= 127 ) (dest) = (DBL)(1 << ((src) - 127)); \
-		else (dest) = 1.0 / (DBL)(1 << (127 - (src)));
+    #define POW2OP_DECLARE() // nothing
+    #define POW2OP_FLOOR(dest,src) \
+        (dest) = (DBL)(1 << ilogbf(src)); \
+        (dest) = copysign((dest), (src));
+    #define POW2OP_ENCODE(dest,src) \
+        (dest) = ilogbf(src) + 127;
+    #define POW2OP_DECODE(dest,src) \
+        if( (src) >= 127 ) (dest) = (DBL)(1 << ((src) - 127)); \
+        else (dest) = 1.0 / (DBL)(1 << (127 - (src)));
 #elif(C99_COMPATIBLE_RADIOSITY == 3)
-	#define POW2OP_DECLARE() // nothing
-	#define POW2OP_FLOOR(dest,src) \
-		(dest) = pow(2.0, logb(src)); \
-		(dest) = copysign((dest), (src));
-	#define POW2OP_ENCODE(dest,src) \
-		(dest) = ((int)logb(src)) + 127;
-	#define POW2OP_DECODE(dest,src) \
-		if( (src) >= 127 ) (dest) = (DBL)(1 << ((src) - 127)); \
-		else (dest) = 1.0 / (DBL)(1 << (127 - (src)));
+    #define POW2OP_DECLARE() // nothing
+    #define POW2OP_FLOOR(dest,src) \
+        (dest) = pow(2.0, logb(src)); \
+        (dest) = copysign((dest), (src));
+    #define POW2OP_ENCODE(dest,src) \
+        (dest) = ((int)logb(src)) + 127;
+    #define POW2OP_DECODE(dest,src) \
+        if( (src) >= 127 ) (dest) = (DBL)(1 << ((src) - 127)); \
+        else (dest) = 1.0 / (DBL)(1 << (127 - (src)));
 #else
-	#define POW2OP_DECLARE() // nothing
-	#define POW2OP_FLOOR(dest,src) \
-		(dest) = (DBL)(1 << ilogb(src)); \
-		(dest) = copysign((dest), (src));
-	#define POW2OP_ENCODE(dest,src) \
-		(dest) = ilogb(src) + 127;
-	#define POW2OP_DECODE(dest,src) \
-		if( (src) >= 127 ) (dest) = (DBL)(1 << ((src) - 127)); \
-		else (dest) = 1.0 / (DBL)(1 << (127 - (src)));
+    #define POW2OP_DECLARE() // nothing
+    #define POW2OP_FLOOR(dest,src) \
+        (dest) = (DBL)(1 << ilogb(src)); \
+        (dest) = copysign((dest), (src));
+    #define POW2OP_ENCODE(dest,src) \
+        (dest) = ilogb(src) + 127;
+    #define POW2OP_DECODE(dest,src) \
+        if( (src) >= 127 ) (dest) = (DBL)(1 << ((src) - 127)); \
+        else (dest) = 1.0 / (DBL)(1 << (127 - (src)));
 #endif
 
 
@@ -204,17 +207,17 @@ bool ot_point_in_node (const Vector3d& point, const OT_ID *node);
 *
 * INPUT
 *   The octree
-*   The data to store 
-*   The oct-tree node id at which to store 
+*   The data to store
+*   The oct-tree node id at which to store
 *
 * OUTPUT
-*   
+*
 * RETURNS
-*   
+*
 * AUTHOUR
 *
 *   Jim McElhiney
-*   
+*
 * DESCRIPTION
 *
 *   Called with a pointer to the root pointer, because this routine can
@@ -242,128 +245,128 @@ bool ot_point_in_node (const Vector3d& point, const OT_ID *node);
 ******************************************************************************/
 void ot_ins(OT_NODE **root_ptr, OT_BLOCK *new_block, const OT_ID *new_id)
 {
-	int target_size, dx, dy, dz, index;
-	OT_NODE *temp_node, *this_node;
-	OT_ID temp_id;
+    int target_size, dx, dy, dz, index;
+    OT_NODE *temp_node, *this_node;
+    OT_ID temp_id;
 
 #ifdef RADSTATS
-	ot_inscount++;
+    ot_inscount++;
 #endif
 
-	// If there is no root yet, create one.  This is a first-time-through
+    // If there is no root yet, create one.  This is a first-time-through
 
-	if (*root_ptr == NULL)
-	{
+    if (*root_ptr == NULL)
+    {
 // CLi moved C99_COMPATIBLE_RADIOSITY check from ot_newroot() to ot_ins() NULL root handling section
 // (no need to do this again and again for every new node inserted)
 #if(C99_COMPATIBLE_RADIOSITY == 0)
-		if((sizeof(int) != 4) || (sizeof(float) != 4))
-		{
-			throw POV_EXCEPTION_STRING("Radiosity is not available in this unofficial version because\n"
-			                           "the person who made this unofficial version available did not\n"
-			                           "properly check for compatibility on your platform.\n"
-			                           "Look for C99_COMPATIBLE_RADIOSITY in the source code to find\n"
-			                           "out how to correct this.");
-		}
+        if((sizeof(int) != 4) || (sizeof(float) != 4))
+        {
+            throw POV_EXCEPTION_STRING("Radiosity is not available in this unofficial version because\n"
+                                       "the person who made this unofficial version available did not\n"
+                                       "properly check for compatibility on your platform.\n"
+                                       "Look for C99_COMPATIBLE_RADIOSITY in the source code to find\n"
+                                       "out how to correct this.");
+        }
 #endif
 
-		*root_ptr = reinterpret_cast<OT_NODE *>(POV_CALLOC(1, sizeof(OT_NODE), "octree node"));
+        *root_ptr = reinterpret_cast<OT_NODE *>(POV_CALLOC(1, sizeof(OT_NODE), "octree node"));
 
 #ifdef RADSTATS
-		ot_nodecount = 1;
+        ot_nodecount = 1;
 #endif
 
-		// Might as well make it the right size for our first data block
+        // Might as well make it the right size for our first data block
 
-		(*root_ptr)->Id = *new_id;
-	}
+        (*root_ptr)->Id = *new_id;
+    }
 
-	// What if the thing we're inserting is bigger than the biggest node in the
-	// existing tree?  Add a new top to the tree till it's big enough.
+    // What if the thing we're inserting is bigger than the biggest node in the
+    // existing tree?  Add a new top to the tree till it's big enough.
 
-	while ((*root_ptr)->Id.Size < new_id->Size)
-	{
-		// root too small
+    while ((*root_ptr)->Id.Size < new_id->Size)
+    {
+        // root too small
 
-		ot_newroot(root_ptr);
-	}
+        ot_newroot(root_ptr);
+    }
 
-	// What if the new block is the right size, but for an area of space which
-	// does not overlap with the current tree?  New bigger root, until the
-	// areas overlap.
+    // What if the new block is the right size, but for an area of space which
+    // does not overlap with the current tree?  New bigger root, until the
+    // areas overlap.
 
-	// Build a temp id, like a cursor to move around with
+    // Build a temp id, like a cursor to move around with
 
-	temp_id = *new_id;
+    temp_id = *new_id;
 
-	// First, find the parent of our new node which is as big as root
+    // First, find the parent of our new node which is as big as root
 
-	while (temp_id.Size < (*root_ptr)->Id.Size)
-	{
-		ot_parent(&temp_id, &temp_id);
-	}
+    while (temp_id.Size < (*root_ptr)->Id.Size)
+    {
+        ot_parent(&temp_id, &temp_id);
+    }
 
-	while((temp_id.x != (*root_ptr)->Id.x) ||
-	      (temp_id.y != (*root_ptr)->Id.y) ||
-	      (temp_id.z != (*root_ptr)->Id.z))
-	{
-		// while separate subtrees...
+    while((temp_id.x != (*root_ptr)->Id.x) ||
+          (temp_id.y != (*root_ptr)->Id.y) ||
+          (temp_id.z != (*root_ptr)->Id.z))
+    {
+        // while separate subtrees...
 
-		ot_newroot(root_ptr);       // create bigger root
+        ot_newroot(root_ptr);       // create bigger root
 
-		ot_parent(&temp_id, &temp_id);      // and move cursor up one, too
-	}
+        ot_parent(&temp_id, &temp_id);      // and move cursor up one, too
+    }
 
-	// At this point, the new node is known to fit under the current tree
-	// somewhere.  Go back down the tree to the right level, making new nodes
-	// as you go.
+    // At this point, the new node is known to fit under the current tree
+    // somewhere.  Go back down the tree to the right level, making new nodes
+    // as you go.
 
-	this_node = *root_ptr;        // start at the root
+    this_node = *root_ptr;        // start at the root
 
-	while (this_node->Id.Size > new_id->Size)
-	{
-		// First, pick the node id of the child we are talking about
+    while (this_node->Id.Size > new_id->Size)
+    {
+        // First, pick the node id of the child we are talking about
 
-		target_size = this_node->Id.Size - 1;       // this is the size we want
+        target_size = this_node->Id.Size - 1;       // this is the size we want
 
-		temp_id = *new_id;  // start with the new one
+        temp_id = *new_id;  // start with the new one
 
-		while (temp_id.Size < target_size)
-		{
-			ot_parent(&temp_id, &temp_id);    // climb up till one below here
-		}
+        while (temp_id.Size < target_size)
+        {
+            ot_parent(&temp_id, &temp_id);    // climb up till one below here
+        }
 
-		// Now we have to pick which child number we are talking about
+        // Now we have to pick which child number we are talking about
 
-		dx = (temp_id.x & 1) * 4;
-		dy = (temp_id.y & 1) * 2;
-		dz = (temp_id.z & 1);
+        dx = (temp_id.x & 1) * 4;
+        dy = (temp_id.y & 1) * 2;
+        dz = (temp_id.z & 1);
 
-		index = dx + dy + dz;
+        index = dx + dy + dz;
 
-		if (this_node->Kids[index] == NULL)
-		{
-			// Next level down doesn't exist yet, so create it
-			temp_node = reinterpret_cast<OT_NODE *>(POV_CALLOC(1, sizeof(OT_NODE), "octree node"));
+        if (this_node->Kids[index] == NULL)
+        {
+            // Next level down doesn't exist yet, so create it
+            temp_node = reinterpret_cast<OT_NODE *>(POV_CALLOC(1, sizeof(OT_NODE), "octree node"));
 
 #ifdef RADSTATS
-			ot_nodecount++;
+            ot_nodecount++;
 #endif
 
-			// Fill in the data
-			temp_node->Id = temp_id;
-			// (all other data fields are automatically zeroed by the allocation function)
+            // Fill in the data
+            temp_node->Id = temp_id;
+            // (all other data fields are automatically zeroed by the allocation function)
 
-			// Add it onto the tree
-			this_node->Kids[index] = temp_node;
-		}
+            // Add it onto the tree
+            this_node->Kids[index] = temp_node;
+        }
 
-		// Now follow it down and repeat
-		this_node = this_node->Kids[index];
-	}
+        // Now follow it down and repeat
+        this_node = this_node->Kids[index];
+    }
 
-	// Finally, we're in the right place, so insert the new value
-	ot_list_insert(&(this_node->Values), new_block);
+    // Finally, we're in the right place, so insert the new value
+    ot_list_insert(&(this_node->Values), new_block);
 }
 
 
@@ -375,15 +378,15 @@ void ot_ins(OT_NODE **root_ptr, OT_BLOCK *new_block, const OT_ID *new_id)
 *   ot_list_insert
 *
 * INPUT
-*   
+*
 * OUTPUT
-*   
+*
 * RETURNS
-*   
+*
 * AUTHOUR
 *
 *   Jim McElhiney
-*   
+*
 * DESCRIPTION
 *
 *   -
@@ -409,9 +412,9 @@ void ot_ins(OT_NODE **root_ptr, OT_BLOCK *new_block, const OT_ID *new_id)
 
 void ot_list_insert(OT_BLOCK **list_head, OT_BLOCK *new_block)
 {
-	new_block->next = *list_head; // copy addr of old first block
+    new_block->next = *list_head; // copy addr of old first block
 
-	*list_head = new_block;
+    *list_head = new_block;
 }
 
 
@@ -423,15 +426,15 @@ void ot_list_insert(OT_BLOCK **list_head, OT_BLOCK *new_block)
 *   ot_newroot
 *
 * INPUT
-*   
+*
 * OUTPUT
-*   
+*
 * RETURNS
-*   
+*
 * AUTHOUR
 *
 *   Jim McElhiney
-*   
+*
 * DESCRIPTION
 *
 *   Modify a tree so that it has a bigger root, owning the old root passed in.
@@ -454,30 +457,30 @@ void ot_list_insert(OT_BLOCK **list_head, OT_BLOCK *new_block)
 
 void ot_newroot(OT_NODE **root_ptr)
 {
-	OT_NODE *newroot;
-	int dx, dy, dz, index;
+    OT_NODE *newroot;
+    int dx, dy, dz, index;
 
-	newroot = reinterpret_cast<OT_NODE *>(POV_CALLOC(1, sizeof(OT_NODE), "octree node"));
+    newroot = reinterpret_cast<OT_NODE *>(POV_CALLOC(1, sizeof(OT_NODE), "octree node"));
 
 #ifdef RADSTATS
-	ot_nodecount++;
+    ot_nodecount++;
 #endif
-	ot_parent(&newroot->Id, &((*root_ptr)->Id));  // sets the x/y/z/size id
+    ot_parent(&newroot->Id, &((*root_ptr)->Id));  // sets the x/y/z/size id
 
-	// Function:  decide which child of the new root the old root is. Theory:
-	// x,y,z values are measured in block sizes, and are a factor of 2 smaller
-	// at each level higher.  The parent of both (3,4,5,k) and (2,5,4,k) is
-	// (1,2,2,k+1), so the oddness of the child's ordinates determines which
-	// child it is, and hence the value of the index into the parent's array of
-	// children.  First half of array (4 entries) is kids with low/even x;
-	// First half of those is kids with low/even y (2 entries), and the very
-	// first entry is the one with low/even everything.
-	dx = ((*root_ptr)->Id.x & 1) * 4;
-	dy = ((*root_ptr)->Id.y & 1) * 2;
-	dz = ((*root_ptr)->Id.z & 1);
-	index = dx + dy + dz;
-	newroot->Kids[index] = *root_ptr;
-	*root_ptr = newroot;
+    // Function:  decide which child of the new root the old root is. Theory:
+    // x,y,z values are measured in block sizes, and are a factor of 2 smaller
+    // at each level higher.  The parent of both (3,4,5,k) and (2,5,4,k) is
+    // (1,2,2,k+1), so the oddness of the child's ordinates determines which
+    // child it is, and hence the value of the index into the parent's array of
+    // children.  First half of array (4 entries) is kids with low/even x;
+    // First half of those is kids with low/even y (2 entries), and the very
+    // first entry is the one with low/even everything.
+    dx = ((*root_ptr)->Id.x & 1) * 4;
+    dy = ((*root_ptr)->Id.y & 1) * 2;
+    dz = ((*root_ptr)->Id.z & 1);
+    index = dx + dy + dz;
+    newroot->Kids[index] = *root_ptr;
+    *root_ptr = newroot;
 
 // CLi moved C99_COMPATIBLE_RADIOSITY check from ot_newroot() to ot_ins() NULL root handling section
 // (no need to do this again and again for every new node inserted)
@@ -492,15 +495,15 @@ void ot_newroot(OT_NODE **root_ptr)
 *   ot_dist_traverse
 *
 * INPUT
-*   
+*
 * OUTPUT
-*   
+*
 * RETURNS
-*   
+*
 * AUTHOUR
 *
 *   Jim McElhiney
-*   
+*
 * DESCRIPTION
 *
 *   Call "function(&node, handle)" for every node which is less than a node
@@ -550,57 +553,57 @@ bool ot_dist_traverse(OT_NODE *subtree, const Vector3d& point, int bounce_depth,
 // only those blocks with this recur depth
 {
 #ifdef RADSTATS
-	extern long ot_seenodecount, ot_seeblockcount;
+    extern long ot_seenodecount, ot_seeblockcount;
 #endif
 
-	int i;
-	OT_NODE *this_node;
-	OT_BLOCK *this_block;
+    int i;
+    OT_NODE *this_node;
+    OT_BLOCK *this_block;
 
 #ifdef RADSTATS
-	ot_seenodecount++;
+    ot_seenodecount++;
 #endif
 
-	// First, recurse to the child nodes
-	for (i = 0; i < 8 ; i++)
-	{     // for each potential kid
-		this_node = subtree->Kids[i];
-		if (this_node != NULL)
-		{   // ...which exists
-			if (ot_point_in_node(point, &this_node->Id))
-			{ // ...and in range
-				if(!ot_dist_traverse(this_node, point, bounce_depth, function, handle))
-					return false;
-			}
-		}
-	}
+    // First, recurse to the child nodes
+    for (i = 0; i < 8 ; i++)
+    {     // for each potential kid
+        this_node = subtree->Kids[i];
+        if (this_node != NULL)
+        {   // ...which exists
+            if (ot_point_in_node(point, &this_node->Id))
+            { // ...and in range
+                if(!ot_dist_traverse(this_node, point, bounce_depth, function, handle))
+                    return false;
+            }
+        }
+    }
 
-	// Now, call the specified routine for each data block hung off this tree
-	// node
+    // Now, call the specified routine for each data block hung off this tree
+    // node
 
-	// if ( ot_point_in_node(point, &subtree->Id) )
-	{
-		this_block = subtree->Values;
-		while (this_block != NULL)
-		{
+    // if ( ot_point_in_node(point, &subtree->Id) )
+    {
+        this_block = subtree->Values;
+        while (this_block != NULL)
+        {
 #ifdef RADSTATS
-			if (subtree->Id.Size < 100 || subtree->Id.Size > 140 )
-			{
-				Debug_Info("bounds error, unreasonable size %d\n", subtree->Id.Size);
-			}
-			ot_seeblockcount++;
+            if (subtree->Id.Size < 100 || subtree->Id.Size > 140 )
+            {
+                Debug_Info("bounds error, unreasonable size %d\n", subtree->Id.Size);
+            }
+            ot_seeblockcount++;
 #endif
-			if ((int)this_block->Bounce_Depth == bounce_depth)
-			{
-				//oksofar = (*function) (this_block, handle);
-				if (!( (*function) (this_block, handle)))
-					return false;
-			}
-			this_block = this_block->next;
-		}
-	}
+            if ((int)this_block->Bounce_Depth == bounce_depth)
+            {
+                //oksofar = (*function) (this_block, handle);
+                if (!( (*function) (this_block, handle)))
+                    return false;
+            }
+            this_block = this_block->next;
+        }
+    }
 
-	return true;
+    return true;
 }
 
 
@@ -611,15 +614,15 @@ bool ot_dist_traverse(OT_NODE *subtree, const Vector3d& point, int bounce_depth,
 *   ot_traverse - call a function for every block in the tree.
 *
 * INPUT
-*   
+*
 * OUTPUT
-*   
+*
 * RETURNS
-*   
+*
 * AUTHOUR
 *
 *   Jim McElhiney
-*   
+*
 * DESCRIPTION
 *
 * Call "function(&block, handle)" for every block hanging off every node.
@@ -667,34 +670,34 @@ bool ot_dist_traverse(OT_NODE *subtree, const Vector3d& point, int bounce_depth,
 
 bool ot_traverse(OT_NODE *subtree, bool (*function)(OT_BLOCK * bl, void * handle1), void *handle)
 {
-	int i = 0;
-	bool oksofar = true;
-	OT_NODE *this_node = NULL;
-	OT_BLOCK *this_block = NULL;
+    int i = 0;
+    bool oksofar = true;
+    OT_NODE *this_node = NULL;
+    OT_BLOCK *this_block = NULL;
 
 
-	// First, recurse to the child nodes
-	if (subtree!=NULL)
-	{
-		for (i=0; i<8 && oksofar; i++ )     // for each potential kid
-		{
-			this_node = subtree->Kids[i];
-			if ( this_node != NULL )          // ...which exists
-			{
-				oksofar = ot_traverse(this_node, function, handle);
-			}
-		}
+    // First, recurse to the child nodes
+    if (subtree!=NULL)
+    {
+        for (i=0; i<8 && oksofar; i++ )     // for each potential kid
+        {
+            this_node = subtree->Kids[i];
+            if ( this_node != NULL )          // ...which exists
+            {
+                oksofar = ot_traverse(this_node, function, handle);
+            }
+        }
 
-		// Now, call the specified routine for each data block hung off this tree node
-		this_block = subtree->Values;
-		while ( oksofar  &&  (this_block != NULL) )
-		{
-			oksofar = (*function)(this_block, handle);
-			this_block = this_block->next;
-		}
-	}
+        // Now, call the specified routine for each data block hung off this tree node
+        this_block = subtree->Values;
+        while ( oksofar  &&  (this_block != NULL) )
+        {
+            oksofar = (*function)(this_block, handle);
+            this_block = this_block->next;
+        }
+    }
 
-	return oksofar;
+    return oksofar;
 }
 
 
@@ -706,15 +709,15 @@ bool ot_traverse(OT_NODE *subtree, bool (*function)(OT_BLOCK * bl, void * handle
 *   ot_point_in_node
 *
 * INPUT
-*   
+*
 * OUTPUT
-*   
+*
 * RETURNS
-*   
+*
 * AUTHOUR
 *
 *   Jim McElhiney
-*   
+*
 * DESCRIPTION
 *
 *   Returns true if the specified point is inside the max extent of the node
@@ -733,29 +736,29 @@ bool ot_traverse(OT_NODE *subtree, bool (*function)(OT_BLOCK * bl, void * handle
 
 inline bool ot_point_in_node(const Vector3d& point, const OT_ID *id)
 {
-	DBL sized;
+    DBL sized;
 
-	// sized = 2.0^(size-127)
+    // sized = 2.0^(size-127)
 #if(C99_COMPATIBLE_RADIOSITY == 0)
-	// speed hack exploiting standard IEEE float binary representation
-	union
-	{
-		float f; // MUST be float, NOT DBL
-		int l;
-	} size;
-	size.l = id->Size << 23;
-	sized = (DBL) size.f;
+    // speed hack exploiting standard IEEE float binary representation
+    union
+    {
+        float f; // MUST be float, NOT DBL
+        int l;
+    } size;
+    size.l = id->Size << 23;
+    sized = (DBL) size.f;
 #else
-	// can't use speed hack, do it the official way
-	if( id->Size >= 127 ) sized = (DBL)(1 << (id->Size - 127));
-	else sized = 1.0 / (DBL)(1 << (127 - id->Size));
+    // can't use speed hack, do it the official way
+    if( id->Size >= 127 ) sized = (DBL)(1 << (id->Size - 127));
+    else sized = 1.0 / (DBL)(1 << (127 - id->Size));
 #endif
 
-	if (fabs(point.x() + OT_BIAS - ((DBL) id->x + 0.5) * sized) >= sized) return false;
-	if (fabs(point.y() + OT_BIAS - ((DBL) id->y + 0.5) * sized) >= sized) return false;
-	if (fabs(point.z() + OT_BIAS - ((DBL) id->z + 0.5) * sized) >= sized) return false;
+    if (fabs(point.x() + OT_BIAS - ((DBL) id->x + 0.5) * sized) >= sized) return false;
+    if (fabs(point.y() + OT_BIAS - ((DBL) id->y + 0.5) * sized) >= sized) return false;
+    if (fabs(point.z() + OT_BIAS - ((DBL) id->z + 0.5) * sized) >= sized) return false;
 
-	return true;
+    return true;
 }
 
 
@@ -767,15 +770,15 @@ inline bool ot_point_in_node(const Vector3d& point, const OT_ID *id)
 *   ot_index_sphere
 *
 * INPUT
-*   
+*
 * OUTPUT
-*   
+*
 * RETURNS
-*   
+*
 * AUTHOUR
 *
 *   Jim McElhiney
-*   
+*
 * DESCRIPTION
 *
 *   Return the oct-tree index for an object with the specified bounding
@@ -796,22 +799,22 @@ inline bool ot_point_in_node(const Vector3d& point, const OT_ID *id)
 
 void ot_index_sphere(const Vector3d& point, DBL radius, OT_ID *id)
 {
-	Vector3d min_point, max_point;
+    Vector3d min_point, max_point;
 
-	min_point = point - radius;
-	max_point = point + radius;
+    min_point = point - radius;
+    max_point = point + radius;
 
-	ot_index_box(min_point, max_point, id);
+    ot_index_box(min_point, max_point, id);
 
 #ifdef RADSTATS
-	if (id->Size < ot_minsize)
-	{
-		ot_minsize = id->Size;
-	}
-	if (id->Size > ot_maxsize)
-	{
-		ot_maxsize = id->Size;
-	}
+    if (id->Size < ot_minsize)
+    {
+        ot_minsize = id->Size;
+    }
+    if (id->Size > ot_maxsize)
+    {
+        ot_maxsize = id->Size;
+    }
 #endif
 }
 
@@ -825,15 +828,15 @@ void ot_index_sphere(const Vector3d& point, DBL radius, OT_ID *id)
 *   ot_index_box
 *
 * INPUT
-*   
+*
 * OUTPUT
-*   
+*
 * RETURNS
-*   
+*
 * AUTHOUR
 *
 *   Jim McElhiney
-*   
+*
 * DESCRIPTION
 *
 *   Return the oct-tree index for an object with the specified bounding box.
@@ -867,83 +870,83 @@ void ot_index_box(const Vector3d& min_point, const Vector3d& max_point, OT_ID *i
 {
 // TODO OPTIMIZE
 
-	DBL dx, dy, dz, desiredSize;
-	DBL bsized, maxord;
-	POW2OP_DECLARE()
+    DBL dx, dy, dz, desiredSize;
+    DBL bsized, maxord;
+    POW2OP_DECLARE()
 
-	// Calculate the absolute minimum required size of the node, assuming it is perfectly centered within the node;
-	// Node size must be a power of 2, and be large enough to accomodate box's biggest dimensions with maximum overhang to all sides
+    // Calculate the absolute minimum required size of the node, assuming it is perfectly centered within the node;
+    // Node size must be a power of 2, and be large enough to accomodate box's biggest dimensions with maximum overhang to all sides
 
-	// compute ideal size of the node for a perfect fit without any overhang
-	dx = max_point.x() - min_point.x();
-	dy = max_point.y() - min_point.y();
-	dz = max_point.z() - min_point.z();
-	desiredSize = max3(dx, dy, dz);
+    // compute ideal size of the node for a perfect fit without any overhang
+    dx = max_point.x() - min_point.x();
+    dy = max_point.y() - min_point.y();
+    dz = max_point.z() - min_point.z();
+    desiredSize = max3(dx, dy, dz);
 
-	// compute ideal size of the node for a perfect fit with full overhang to all sides
-	// desiredSize /= (1 + 2 * 0.5);
+    // compute ideal size of the node for a perfect fit with full overhang to all sides
+    // desiredSize /= (1 + 2 * 0.5);
 
-	// compute best-matching power-of-two size for a perfect fit with overhang
-	// (Note: theoretically this might pick a size larger than required if desiredSize is already a power of two)
-	// desiredSize *= 2.0;
-	POW2OP_FLOOR(bsized,desiredSize)
+    // compute best-matching power-of-two size for a perfect fit with overhang
+    // (Note: theoretically this might pick a size larger than required if desiredSize is already a power of two)
+    // desiredSize *= 2.0;
+    POW2OP_FLOOR(bsized,desiredSize)
 
-	// avoid divisions by zero
-	if(bsized == 0.0)
-		bsized = 1.0;
+    // avoid divisions by zero
+    if(bsized == 0.0)
+        bsized = 1.0;
 
 #ifdef SAFE_METHOD
 
-	// This block checks for the case where the node id would cause integer
-	// overflow, since it is a small buffer far away
-	maxord = max3(fabs(min_point[X]), fabs(min_point[Y]), fabs(min_point[Z]));
-	maxord += OT_BIAS;
-	while (maxord / bsized > 1000000000.0)
-	{
+    // This block checks for the case where the node id would cause integer
+    // overflow, since it is a small buffer far away
+    maxord = max3(fabs(min_point[X]), fabs(min_point[Y]), fabs(min_point[Z]));
+    maxord += OT_BIAS;
+    while (maxord / bsized > 1000000000.0)
+    {
 #ifdef RADSTATS
-		overflows++;
+        overflows++;
 #endif
-		bsized *= 2.0;
-	}
+        bsized *= 2.0;
+    }
 #endif // SAFE_METHOD
 
-	// The node we chose so far would be ideal for a box of identical size positioned at the node's center,
-	// but the actual box is probably somewhat off-center and therefore may have excessive overhang in some directions;
-	// check and possibly fix this.
+    // The node we chose so far would be ideal for a box of identical size positioned at the node's center,
+    // but the actual box is probably somewhat off-center and therefore may have excessive overhang in some directions;
+    // check and possibly fix this.
 
-	Vector3d center = (min_point + max_point) / 2;
-	id->x = (int) floor((center[X] + OT_BIAS) / bsized);
-	id->y = (int) floor((center[Y] + OT_BIAS) / bsized);
-	id->z = (int) floor((center[Z] + OT_BIAS) / bsized);
-	POW2OP_ENCODE(id->Size, bsized)
+    Vector3d center = (min_point + max_point) / 2;
+    id->x = (int) floor((center[X] + OT_BIAS) / bsized);
+    id->y = (int) floor((center[Y] + OT_BIAS) / bsized);
+    id->z = (int) floor((center[Z] + OT_BIAS) / bsized);
+    POW2OP_ENCODE(id->Size, bsized)
 
 #ifdef RADSTATS
-	thisloops = 0;
+    thisloops = 0;
 #endif
-	while (!ot_point_in_node(min_point, id) || !ot_point_in_node(max_point, id))
-	{
-		// Debug_Info("looping %d,%d,%d,%d  min=%d, max=%d\n", test_id.x, test_id.y,
-		// test_id.z, test_id.Size, ot_point_in_node(min_point, &test_id),
-		// ot_point_in_node(max_point, &test_id));
-		ot_parent(id, id);
+    while (!ot_point_in_node(min_point, id) || !ot_point_in_node(max_point, id))
+    {
+        // Debug_Info("looping %d,%d,%d,%d  min=%d, max=%d\n", test_id.x, test_id.y,
+        // test_id.z, test_id.Size, ot_point_in_node(min_point, &test_id),
+        // ot_point_in_node(max_point, &test_id));
+        ot_parent(id, id);
 #ifdef RADSTATS
-		totloops++;
-		thisloops++;
+        totloops++;
+        thisloops++;
 #endif
-	}
+    }
 #ifdef RADSTATS
-	if (thisloops < minloops)
-		minloops = thisloops;
-	if (thisloops > maxloops)
-		maxloops = thisloops;
+    if (thisloops < minloops)
+        minloops = thisloops;
+    if (thisloops > maxloops)
+        maxloops = thisloops;
 #endif
 
 #ifdef OT_DEBUG
-	if (id->Size > 139)
-	{
-		Debug_Info("unusually large id, maxdel=%.4f, bsized=%.4f, isize=%d\n",
-		           maxdel, bsized, id->Size);
-	}
+    if (id->Size > 139)
+    {
+        Debug_Info("unusually large id, maxdel=%.4f, bsized=%.4f, isize=%d\n",
+                   maxdel, bsized, id->Size);
+    }
 #endif
 }
 
@@ -956,15 +959,15 @@ void ot_index_box(const Vector3d& min_point, const Vector3d& max_point, OT_ID *i
 *   ot_parent
 *
 * INPUT
-*   
+*
 * OUTPUT
-*   
+*
 * RETURNS
-*   
+*
 * AUTHOUR
 *
 *   Jim McElhiney
-*   
+*
 * DESCRIPTION
 *
 *   Set the x/y/z/size block ID info of dad = the parent ID of kid
@@ -988,22 +991,22 @@ void ot_index_box(const Vector3d& min_point, const Vector3d& max_point, OT_ID *i
 
 void ot_parent(OT_ID *dad_id, OT_ID  *kid_id)
 {
-	dad_id->Size = kid_id->Size + 1;
-	// Theoretically, (0:1) should be parented by (0), while (-2:-1) should be parented by (-1).
-	// In practice, parenting both by (0) makes the code more robust in case we ever encounter
-	// that region, because otherwise we would enter an infinite loop trying to find a common parent.
-	// (That doesn't mean that all is well in that region; we're just avoiding a catastrophe.)
+    dad_id->Size = kid_id->Size + 1;
+    // Theoretically, (0:1) should be parented by (0), while (-2:-1) should be parented by (-1).
+    // In practice, parenting both by (0) makes the code more robust in case we ever encounter
+    // that region, because otherwise we would enter an infinite loop trying to find a common parent.
+    // (That doesn't mean that all is well in that region; we're just avoiding a catastrophe.)
 #if 1
-	//  This is the code found in 3.7.0.beta.29;
-	//  note that it parents (-2:-1) by (0)
-	dad_id->x = (kid_id->x >= 0) ? (kid_id->x >> 1) : (kid_id->x + 1) / 2;
-	dad_id->y = (kid_id->y >= 0) ? (kid_id->y >> 1) : (kid_id->y + 1) / 2;
-	dad_id->z = (kid_id->z >= 0) ? (kid_id->z >> 1) : (kid_id->z + 1) / 2;
+    //  This is the code found in 3.7.0.beta.29;
+    //  note that it parents (-2:-1) by (0)
+    dad_id->x = (kid_id->x >= 0) ? (kid_id->x >> 1) : (kid_id->x + 1) / 2;
+    dad_id->y = (kid_id->y >= 0) ? (kid_id->y >> 1) : (kid_id->y + 1) / 2;
+    dad_id->z = (kid_id->z >= 0) ? (kid_id->z >> 1) : (kid_id->z + 1) / 2;
 #else
-	//  To parent (-2:-1) by (-1), this code would be used:
-	dad_id->x = (kid_id->x >= 0) ? (kid_id->x >> 1) : (kid_id->x - 1) / 2;
-	dad_id->y = (kid_id->y >= 0) ? (kid_id->y >> 1) : (kid_id->y - 1) / 2;
-	dad_id->z = (kid_id->z >= 0) ? (kid_id->z >> 1) : (kid_id->z - 1) / 2;
+    //  To parent (-2:-1) by (-1), this code would be used:
+    dad_id->x = (kid_id->x >= 0) ? (kid_id->x >> 1) : (kid_id->x - 1) / 2;
+    dad_id->y = (kid_id->y >= 0) ? (kid_id->y >> 1) : (kid_id->y - 1) / 2;
+    dad_id->z = (kid_id->z >= 0) ? (kid_id->z >> 1) : (kid_id->z - 1) / 2;
 #endif
 }
 
@@ -1016,15 +1019,15 @@ void ot_parent(OT_ID *dad_id, OT_ID  *kid_id)
 *   ot_save_tree
 *
 * INPUT
-*   
+*
 * OUTPUT
-*   
+*
 * RETURNS 1 for success, 0 for failure.
-*   
+*
 * AUTHOUR
 *
 *   Jim McElhiney
-*   
+*
 * DESCRIPTION
 *
 *   Given the root pointer of the in-memory cache tree, and a file descriptor
@@ -1074,14 +1077,14 @@ void ot_parent(OT_ID *dad_id, OT_ID  *kid_id)
 
 bool ot_save_tree(OT_NODE *root, OStream *fd)
 {
-	bool retval = false;
+    bool retval = false;
 
-	if(fd != NULL)
-		retval = ot_traverse(root, ot_write_block, reinterpret_cast<void *>(fd));
-	else
+    if(fd != NULL)
+        retval = ot_traverse(root, ot_write_block, reinterpret_cast<void *>(fd));
+    else
 ;// TODO MESSAGE    Warning(0, "Bad radiosity cache file handle");
 
-	return retval;
+    return retval;
 }
 
 
@@ -1093,15 +1096,15 @@ bool ot_save_tree(OT_NODE *root, OStream *fd)
 *   ot_write_block
 *
 * INPUT
-*   
+*
 * OUTPUT
-*   
+*
 * RETURNS
-*   
+*
 * AUTHOUR
 *
 *   Jim McElhiney
-*   
+*
 * DESCRIPTION
 *
 *   Write one block (not a node) from the memory cache to the cache file.
@@ -1114,25 +1117,29 @@ bool ot_save_tree(OT_NODE *root, OStream *fd)
 
 bool ot_write_block(OT_BLOCK *bl, void *fd) // must be passed as void * for compatibility
 {
-	(reinterpret_cast<OStream *>(fd))->printf("C%d\t%g\t%g\t%g\t%02x%02x%02x\t%.4f\t%.4f\t%.4f\t%g\t%g\t%02x%02x%02x\n", // tw
-		(int)(bl->Bounce_Depth + 1), // file format still uses 1-based bounce depth counting
+    (reinterpret_cast<OStream *>(fd))->printf("C%d\t%g\t%g\t%g\t%02x%02x%02x\t%.4f\t%.4f\t%.4f\t%g\t%g\t%02x%02x%02x\n", // tw
+        (int)(bl->Bounce_Depth + 1), // file format still uses 1-based bounce depth counting
 
-		bl->Point[X], bl->Point[Y], bl->Point[Z],
-		(int)((bl->S_Normal[X]+1.)*.5*254.+.499999),
-		(int)((bl->S_Normal[Y]+1.)*.5*254.+.499999),
-		(int)((bl->S_Normal[Z]+1.)*.5*254.+.499999),
+        bl->Point[X], bl->Point[Y], bl->Point[Z],
+        (int)((bl->S_Normal[X]+1.)*.5*254.+.499999),
+        (int)((bl->S_Normal[Y]+1.)*.5*254.+.499999),
+        (int)((bl->S_Normal[Z]+1.)*.5*254.+.499999),
 
-		bl->Illuminance[X], bl->Illuminance[Y], bl->Illuminance[Z],
-		bl->Harmonic_Mean_Distance,
+#if (NUM_COLOUR_CHANNELS == 3)
+        bl->Illuminance.Red(), bl->Illuminance.Green(), bl->Illuminance.Blue(),
+#else
+        #error TODO!
+#endif
+        bl->Harmonic_Mean_Distance,
 
-		bl->Nearest_Distance,
-		(int)((bl->To_Nearest_Surface[X]+1.)*.5*254.+.499999),
-		(int)((bl->To_Nearest_Surface[Y]+1.)*.5*254.+.499999),
-		(int)((bl->To_Nearest_Surface[Z]+1.)*.5*254.+.499999)
+        bl->Nearest_Distance,
+        (int)((bl->To_Nearest_Surface[X]+1.)*.5*254.+.499999),
+        (int)((bl->To_Nearest_Surface[Y]+1.)*.5*254.+.499999),
+        (int)((bl->To_Nearest_Surface[Z]+1.)*.5*254.+.499999)
 
-		// TODO - write Quality
-	);
-	return true;
+        // TODO - write Quality and Brilliance
+    );
+    return true;
 }
 
 
@@ -1144,13 +1151,13 @@ bool ot_write_block(OT_BLOCK *bl, void *fd) // must be passed as void * for comp
 *   and zero the pointer to its root.
 *
 * INPUT - pointer to the tree root pointer.
-*   
+*
 * RETURNS - success 1, failure 0
-*   
+*
 * AUTHOUR
 *
 *   Jim McElhiney
-*   
+*
 * DESCRIPTION
 *
 *   Free a complete radiosity cache tree, and all of its nodes and blocks.
@@ -1171,11 +1178,11 @@ bool ot_write_block(OT_BLOCK *bl, void *fd) // must be passed as void * for comp
 
 bool ot_free_tree(OT_NODE **ppRoot)
 {
-	bool all_ok = ot_free_subtree(*ppRoot);
+    bool all_ok = ot_free_subtree(*ppRoot);
 
-	*ppRoot = NULL;
+    *ppRoot = NULL;
 
-	return all_ok;
+    return all_ok;
 }
 
 
@@ -1187,18 +1194,18 @@ bool ot_free_tree(OT_NODE **ppRoot)
 *   hanging off those nodes, and then free the node which was passed.
 *
 * INPUT
-*   
+*
 * OUTPUT
-*   
+*
 * RETURNS
-*   
+*
 * AUTHOUR
 *
 *   Jim McElhiney
-*   
+*
 * DESCRIPTION
 *
-*   Free this subtree.  That is, free all of its daughters, then 
+*   Free this subtree.  That is, free all of its daughters, then
 *   free all of the blocks hanging off this node, then free this node itself.
 *
 *   Returns false if problems were encountered anywhere in the tree.
@@ -1217,22 +1224,22 @@ bool ot_free_tree(OT_NODE **ppRoot)
 
 bool ot_free_subtree(OT_NODE *subtree)
 {
-	int i;
-	OT_NODE *this_node;
+    int i;
+    OT_NODE *this_node;
 
-	// First, recurse to the child nodes
-	for (i = 0; i < 8; i++)   // for each potential kid
-	{
-		this_node = subtree->Kids[i];
-		if ( this_node != NULL ) {      // ...which exists
-			ot_free_subtree(this_node);
-		}
-	}
+    // First, recurse to the child nodes
+    for (i = 0; i < 8; i++)   // for each potential kid
+    {
+        this_node = subtree->Kids[i];
+        if ( this_node != NULL ) {      // ...which exists
+            ot_free_subtree(this_node);
+        }
+    }
 
-	// Finally, free this block itself
-	POV_FREE(subtree);
+    // Finally, free this block itself
+    POV_FREE(subtree);
 
-	return true;
+    return true;
 }
 
 
@@ -1244,15 +1251,15 @@ bool ot_free_subtree(OT_NODE *subtree)
 *
 * INPUT
 *   file descriptor handle of file (already opened) to read into memory.
-*   
+*
 * OUTPUT
-*   
+*
 * RETURNS - Success 1 / failure 0
-*   
+*
 * AUTHOUR
 *
 *   Jim McElhiney
-*   
+*
 * DESCRIPTION
 *
 *   Read in a radiosity cache file, building a tree from its values.
@@ -1270,118 +1277,124 @@ bool ot_free_subtree(OT_NODE *subtree)
 
 bool ot_read_file(OT_NODE **root, IStream *fd, const OT_READ_PARAM* param, OT_READ_INFO* info)
 {
-	bool retval, got_eof;
-	int line_num = 0;
-	int tempdepth, tx, ty, tz;
-	int goodreads = 0;
-	int count;
-	bool goodparse = true;
-	DBL brightness;
-	OT_BLOCK bl;
-	OT_BLOCK *new_block;
-	OT_ID id;
-	char normal_string[30], to_nearest_string[30];
-	char line[101];
+    bool retval, got_eof;
+    int line_num = 0;
+    int tempdepth, tx, ty, tz;
+    int goodreads = 0;
+    int count;
+    bool goodparse = true;
+    DBL brightness;
+    OT_BLOCK bl;
+    OT_BLOCK *new_block;
+    OT_ID id;
+    char normal_string[30], to_nearest_string[30];
+    char line[101];
 
-	memset(&bl, 0, sizeof(OT_BLOCK));
+    memset(&bl, 0, sizeof(OT_BLOCK));
 
-	if ( fd != NULL )
-	{
-		info->Gather_Total.clear();
-		info->Gather_Total_Count = 0;
+    if ( fd != NULL )
+    {
+        info->Gather_Total.Clear();
+        info->Gather_Total_Count = 0;
 
-		while (!(got_eof = fd->getline (line, 99).eof ()) && goodparse)
-		{
-			switch ( line[0] )
-			{
-				case 'B':    // the file contains the old radiosity_brightness value
-				{
-					if ( sscanf(line, "B%lf\n", &brightness) == 1 )
-					{
-						info->Brightness = brightness;
-					}
-					break;
-				}
-				case 'P':    // the file made it to the point that the Preview was done
-				{
-					info->FirstRadiosityPass = true;
-					break;
-				}
-				case 'C':
-				{
-					count = sscanf(line, "C%d %lf %lf %lf %s %f %f %f %f %f %s\n", // tw
-					           &tempdepth,      // since you can't scan a short
-					           &bl.Point[X], &bl.Point[Y], &bl.Point[Z],
-					           normal_string,
-					           &bl.Illuminance[X], &bl.Illuminance[Y], &bl.Illuminance[Z],
-					           &bl.Harmonic_Mean_Distance,
-					           &bl.Nearest_Distance, to_nearest_string );
+        while (!(got_eof = fd->getline (line, 99).eof ()) && goodparse)
+        {
+            switch ( line[0] )
+            {
+                case 'B':    // the file contains the old radiosity_brightness value
+                {
+                    if ( sscanf(line, "B%lf\n", &brightness) == 1 )
+                    {
+                        info->Brightness = brightness;
+                    }
+                    break;
+                }
+                case 'P':    // the file made it to the point that the Preview was done
+                {
+                    info->FirstRadiosityPass = true;
+                    break;
+                }
+                case 'C':
+                {
+#if (NUM_COLOUR_CHANNELS == 3)
+                    RGBColour tempCol;
+                    count = sscanf(line, "C%d %lf %lf %lf %s %f %f %f %f %f %s\n", // tw
+                                   &tempdepth,      // since you can't scan a short
+                                   &bl.Point[X], &bl.Point[Y], &bl.Point[Z],
+                                   normal_string,
+                                   &tempCol.red(), &tempCol.green(), &tempCol.blue(),
+                                   &bl.Harmonic_Mean_Distance,
+                                   &bl.Nearest_Distance, to_nearest_string );
+                    bl.Illuminance = ToMathColour(tempCol);
+#else
+                    #error TODO!
+#endif
 
-					// TODO FIXME - read Quality
+                    // TODO FIXME - read Quality and Brilliance
 
-					if ( count == 11 )
-					{
-						bl.Bounce_Depth = (short)tempdepth - 1;
+                    if ( count == 11 )
+                    {
+                        bl.Bounce_Depth = (short)tempdepth - 1;
 
-						// normals aren't very critical for direction precision, so they are packed
-						sscanf(normal_string, "%02x%02x%02x", &tx, &ty, &tz);
-						bl.S_Normal[X] = ((double)tx * (1./ 254.))*2.-1.;
-						bl.S_Normal[Y] = ((double)ty * (1./ 254.))*2.-1.;
-						bl.S_Normal[Z] = ((double)tz * (1./ 254.))*2.-1.;
-						bl.S_Normal.normalize();
+                        // normals aren't very critical for direction precision, so they are packed
+                        sscanf(normal_string, "%02x%02x%02x", &tx, &ty, &tz);
+                        bl.S_Normal[X] = ((double)tx * (1./ 254.))*2.-1.;
+                        bl.S_Normal[Y] = ((double)ty * (1./ 254.))*2.-1.;
+                        bl.S_Normal[Z] = ((double)tz * (1./ 254.))*2.-1.;
+                        bl.S_Normal.normalize();
 
-						sscanf(to_nearest_string, "%02x%02x%02x", &tx, &ty, &tz);
-						bl.To_Nearest_Surface[X] = ((double)tx * (1./ 254.))*2.-1.;
-						bl.To_Nearest_Surface[Y] = ((double)ty * (1./ 254.))*2.-1.;
-						bl.To_Nearest_Surface[Z] = ((double)tz * (1./ 254.))*2.-1.;
-						bl.To_Nearest_Surface.normalize();
+                        sscanf(to_nearest_string, "%02x%02x%02x", &tx, &ty, &tz);
+                        bl.To_Nearest_Surface[X] = ((double)tx * (1./ 254.))*2.-1.;
+                        bl.To_Nearest_Surface[Y] = ((double)ty * (1./ 254.))*2.-1.;
+                        bl.To_Nearest_Surface[Z] = ((double)tz * (1./ 254.))*2.-1.;
+                        bl.To_Nearest_Surface.normalize();
 
-						line_num++;
+                        line_num++;
 
-						new_block = reinterpret_cast<OT_BLOCK *>(POV_MALLOC(sizeof (OT_BLOCK), "octree node from file"));
-						if ( new_block != NULL )
-						{
-							POV_MEMCPY(new_block, &bl, sizeof (OT_BLOCK));
+                        new_block = reinterpret_cast<OT_BLOCK *>(POV_MALLOC(sizeof (OT_BLOCK), "octree node from file"));
+                        if ( new_block != NULL )
+                        {
+                            POV_MEMCPY(new_block, &bl, sizeof (OT_BLOCK));
 
-							ot_index_sphere(bl.Point, bl.Harmonic_Mean_Distance * param->RealErrorBound, &id);
-							ot_ins(root, new_block, &id);
-							goodreads++;
-						}
-						else
-						{
-							goodparse = false;    // allocation error, better stop now
-						}
-					}
-					break;
-				}
+                            ot_index_sphere(bl.Point, bl.Harmonic_Mean_Distance * param->RealErrorBound, &id);
+                            ot_ins(root, new_block, &id);
+                            goodreads++;
+                        }
+                        else
+                        {
+                            goodparse = false;    // allocation error, better stop now
+                        }
+                    }
+                    break;
+                }
 
-				default:
-				{
-					// wrong leading character on line, just try again on next line
-				}
+                default:
+                {
+                    // wrong leading character on line, just try again on next line
+                }
 
-			}   // end switch
-		} // end while-reading loop
+            }   // end switch
+        } // end while-reading loop
 
-		if ( !got_eof  ||  !goodparse ) {
+        if ( !got_eof  ||  !goodparse ) {
 ;// TODO MESSAGE      PossibleError("Cannot process radiosity cache file at line %d.", (int)line_num);
-			retval = false;
-		}
-		else
-		{
-			if ( goodreads > 0 )
+            retval = false;
+        }
+        else
+        {
+            if ( goodreads > 0 )
 ;// TODO MESSAGE         Debug_Info("Reloaded %d values from radiosity cache file.\n", goodreads);
-			else
+            else
 ;// TODO MESSAGE         PossibleError("Unable to read any values from the radiosity cache file.");
-			retval = true;
-		}
-	}
-	else
-	{
-		retval = false;
-	}
+            retval = true;
+        }
+    }
+    else
+    {
+        retval = false;
+    }
 
-	return retval;
+    return retval;
 }
 
 } // end of namespace
