@@ -11,7 +11,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -212,19 +212,13 @@ inline void Assign_Vector_4D(VECTOR_4D d, const VECTOR_4D s)
 inline void Destroy_Float(DBL *x)
 {
     if(x != NULL)
-        POV_FREE(x);
+        delete x;
 }
 
 inline void Destroy_Vector_4D(VECTOR_4D *x)
 {
     if(x != NULL)
         POV_FREE(x);
-}
-
-inline void Destroy_Colour(RGBFTColour *x)
-{
-    if(x != NULL)
-        delete x;
 }
 
 #if 0
@@ -263,7 +257,7 @@ class GenericVector2d
             vect[Y] = y;
         }
 
-        inline explicit GenericVector2d(const EXPRESS vi)
+        inline explicit GenericVector2d(const EXPRESS& vi)
         {
             vect[X] = T(vi[X]);
             vect[Y] = T(vi[Y]);
@@ -479,7 +473,7 @@ class GenericVector3d
             vect[Z] = z;
         }
 
-        inline explicit GenericVector3d(const EXPRESS vi)
+        inline explicit GenericVector3d(const EXPRESS& vi)
         {
             vect[X] = T(vi[X]);
             vect[Y] = T(vi[Y]);
@@ -910,10 +904,6 @@ typedef struct Texture_Struct TEXTURE;
 typedef struct Pigment_Struct PIGMENT;
 typedef struct Tnormal_Struct TNORMAL;
 typedef struct Finish_Struct FINISH;
-typedef struct Turb_Struct TURB;
-typedef struct Warps_Struct WARP;
-typedef struct Spline_Entry SPLINE_ENTRY;
-typedef struct Spline_Struct SPLINE;
 
 typedef TEXTURE* TexturePtr;
 
@@ -950,7 +940,7 @@ class BlendMap
 
 
 /// Common interface for pigment-like blend maps.
-/// 
+///
 /// This class provides the common interface for both pigment and colour blend maps.
 ///
 class GenericPigmentBlendMap
@@ -1004,7 +994,7 @@ class PigmentBlendMap : public BlendMap<PIGMENT*>, public GenericPigmentBlendMap
 
 
 /// Common interface for normal-like blend maps.
-/// 
+///
 /// This purely abstract class provides the common interface for both normal and slope blend maps.
 ///
 /// @note   This class is used in a multiple inheritance hierarchy, and therefore must continue to be purely abstract.
@@ -1139,7 +1129,6 @@ class SubsurfaceInterior;
 class Interior
 {
     public:
-        int References;
         int  hollow, Disp_NElems;
         SNGL IOR, Dispersion;
         SNGL Caustics, Old_Refract;
@@ -1159,42 +1148,8 @@ class Interior
         Interior& operator=(const Interior&);
 };
 
-/// @}
-///
-//******************************************************************************
-///
-/// @name Spline Stuff
-/// @{
-
-#if 0
-#pragma mark * Spline
-#endif
-
-struct Spline_Entry
-{
-    DBL par;      // Parameter
-    DBL vec[5];   // Value at the parameter
-    DBL coeff[5]; // Interpolating coefficients at the parameter
-};
-
-struct Spline_Struct
-{
-    int Number_Of_Entries, Type;
-    int Max_Entries;
-    SPLINE_ENTRY *SplineEntries;
-    int Coeffs_Computed;
-    int Terms;
-/* [JG] flyspray #294 : cache is not thread-safe
- * (and seems useless, as slower than without it)
-    bool Cache_Valid;
-    int Cache_Type;
-    DBL Cache_Point;
-    EXPRESS Cache_Data;
- */
-    int ref_count;
-};
-
-typedef struct Spline_Entry SPLINE_ENTRY;
+typedef shared_ptr<Interior> InteriorPtr;
+typedef shared_ptr<const Interior> ConstInteriorPtr;
 
 /// @}
 ///
@@ -1313,29 +1268,19 @@ struct Finish_Struct
     bool UseSubsurface;   // whether to use subsurface light transport
 };
 
-struct Warps_Struct
-{
-    unsigned short Warp_Type;
-    WARP *Prev_Warp;
-    WARP *Next_Warp;
-};
+struct GenericWarp;
 
-struct Turb_Struct : public Warps_Struct
-{
-    Vector3d Turbulence;
-    int Octaves;
-    SNGL Lambda, Omega;
-};
-
-#define Destroy_Finish(x) if ((x)!=NULL) POV_FREE(x)
+typedef GenericWarp* WarpPtr;
+typedef const GenericWarp* ConstWarpPtr;
+typedef vector<WarpPtr> WarpList;
 
 typedef struct Material_Struct MATERIAL;
 
 struct Material_Struct
 {
-   TEXTURE *Texture;
-   TEXTURE *Interior_Texture;
-   Interior *interior;
+    TEXTURE *Texture;
+    TEXTURE *Interior_Texture;
+    InteriorPtr interior;
 };
 
 /// @}
@@ -1435,6 +1380,8 @@ class ObjectDebugHelper
 };
 
 typedef struct BBox_Tree_Struct BBOX_TREE;
+typedef BBOX_TREE* BBoxTreePtr;
+typedef const BBOX_TREE* ConstBBoxTreePtr;
 
 struct BBox_Tree_Struct
 {

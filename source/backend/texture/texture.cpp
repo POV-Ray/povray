@@ -19,7 +19,7 @@
 /// ----------------------------------------------------------------------------
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -234,13 +234,13 @@ void Initialize_Noise()
     /* are - initialize Perlin style noise function */
     InitSolidNoise();
 
-    sintab = reinterpret_cast<DBL *>(POV_MALLOC(SINTABSIZE * sizeof(DBL), "sine table"));
+    sintab = new DBL[SINTABSIZE];
 
-    for(int i = 0 ; i < 267 ; i++)
+    for(int i = 0; i < 267; i++)
         RTable[(i * 2) + 1] = RTable[i * 2] * 0.5;
     //    Debug_Info("%.10f  %.10f\n", (DBL)(RTable[i * 2] - (DBL)((float)(RTable[i * 2]))), (DBL)(RTable[(i * 2) + 1] - (DBL)((float)(RTable[(i * 2) + 1]))));
 
-    for(int i = 0 ; i < SINTABSIZE ; i++)
+    for(int i = 0; i < SINTABSIZE; i++)
         sintab[i] = sin((DBL)i / SINTABSIZE * TWO_M_PI);
 }
 
@@ -251,7 +251,7 @@ void Initialize_Waves(vector<double>& waveFrequencies, vector<Vector3d>& waveSou
     waveFrequencies.clear();
     waveSources.clear();
 
-    for(int i = 0, next_rand = -560851967; i < numberOfWaves ; i++)
+    for(int i = 0, next_rand = -560851967; i < numberOfWaves; i++)
     {
         point = Vector3d((double)i,0.0,0.0);
         DNoise(point, point);
@@ -293,7 +293,7 @@ static void InitTextureTable()
     int next_rand = 0;
 
     #ifdef DYNAMIC_HASHTABLE
-        hashTable = reinterpret_cast<unsigned short *>(POV_MALLOC(8192*sizeof(unsigned short), "hash table"));
+        hashTable = new unsigned short[8192];
     #endif
 
     for(i = 0; i < 4096; i++)
@@ -342,13 +342,12 @@ void Free_Noise_Tables()
 {
     if (sintab != NULL)
     {
-        POV_FREE(sintab);
-
-        sintab       = NULL;
+        delete[] sintab;
+        sintab = NULL;
 
 #ifdef DYNAMIC_HASHTABLE
-        POV_FREE(hashTable);
-        hashTable    = NULL;
+        delete[] hashTable;
+        hashTable = NULL;
 #endif
     }
 }
@@ -888,7 +887,7 @@ SolidDNoise(const Vector3d& P, Vector3d& D)
 *
 ******************************************************************************/
 
-DBL Turbulence(const Vector3d& EPoint, const TURB *Turb, int noise_generator)
+DBL Turbulence(const Vector3d& EPoint, const GenericTurbulenceWarp *Turb, int noise_generator)
 {
     int i;
     DBL Lambda, Omega, l, o, value;
@@ -968,7 +967,7 @@ DBL Turbulence(const Vector3d& EPoint, const TURB *Turb, int noise_generator)
 ******************************************************************************/
 
 
-void DTurbulence(Vector3d& result, const Vector3d& EPoint, const TURB *Turb)
+void DTurbulence(Vector3d& result, const Vector3d& EPoint, const GenericTurbulenceWarp *Turb)
 {
     DBL Omega, Lambda;
     int i;
@@ -1030,7 +1029,7 @@ DBL cycloidal(DBL value)
 {
     if (value >= 0.0)
     {
-        return sin((DBL) (((value - floor(value)) * 50000.0)) / 50000.0 * TWO_M_PI)  ;
+        return sin((DBL) (((value - floor(value)) * 50000.0)) / 50000.0 * TWO_M_PI);
     }
     else
     {
@@ -1156,7 +1155,7 @@ FINISH *Create_Finish()
 {
     FINISH *New;
 
-    New = reinterpret_cast<FINISH *>(POV_MALLOC(sizeof (FINISH), "finish"));
+    New = new FINISH;
 
     New->Ambient.Set(0.1);
     New->Emission.Clear();
@@ -1425,13 +1424,11 @@ void Destroy_Textures(TEXTURE *Textures)
 
     while (Layer != NULL)
     {
-        Destroy_TPat_Fields(Layer);
-        Layer->Blend_Map.reset();
-
         // Theoretically these should only be non-NULL for PLAIN_PATTERN, but let's clean them up either way.
         Destroy_Pigment(Layer->Pigment);
         Destroy_Tnormal(Layer->Tnormal);
-        Destroy_Finish(Layer->Finish);
+        if (Layer->Finish)
+            delete Layer->Finish;
 
         // Theoretically these should only be non-empty for BITMAP_PATTERN, but let's clean them up either way.
         for(vector<TEXTURE*>::iterator i = Layer->Materials.begin(); i != Layer->Materials.end(); ++ i)

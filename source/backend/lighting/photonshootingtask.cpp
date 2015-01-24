@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -354,12 +354,12 @@ void PhotonShootingTask::ShootPhotonsAtObject(LightTargetCombo& combo)
 
                     /* As mike said, "fire photon torpedo!" */
                     //Initialize_Ray_Containers(&ray);
-                    ray.ClearInteriors () ;
+                    ray.ClearInteriors ();
 
                     for(vector<ObjectPtr>::iterator object = GetSceneData()->objects.begin(); object != GetSceneData()->objects.end(); object++)
                     {
                         if((*object)->Inside(ray.Origin, renderDataPtr) && ((*object)->interior != NULL))
-                            ray.AppendInterior((*object)->interior);
+                            ray.AppendInterior((*object)->interior.get());
                     }
 
                     notComputed = false;
