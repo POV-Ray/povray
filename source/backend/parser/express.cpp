@@ -1705,10 +1705,10 @@ void Parser::Parse_Rel_Factor (EXPRESS Express,int *Terms)
 *
 ******************************************************************************/
 
-void Parser::Parse_Rel_String_Term (const UCS2* lhs, EXPRESS Express, int Terms)
+void Parser::Parse_Rel_String_Term (const UCS2 *lhs, EXPRESS Express, int Terms)
 {
     int Val, i;
-    UCS2* rhs = NULL;
+    UCS2 *rhs = NULL;
 
     EXPECT_ONE
         CASE (LEFT_ANGLE_TOKEN)
@@ -1799,7 +1799,7 @@ void Parser::Parse_Rel_Term (EXPRESS Express,int *Terms)
     bool old_Ok_To_Declare = Ok_To_Declare;
     Ok_To_Declare=true;
 
-    UCS2* Local_String = Parse_String(false, false);
+    UCS2 *Local_String = Parse_String(false, false);
     if(Local_String != NULL)
     {
             Parse_Rel_String_Term(Local_String, Express, *Terms);
@@ -3338,6 +3338,8 @@ ColourBlendMapPtr Parser::Parse_Colour_Map<ColourBlendMap> ()
     vector<ColourBlendMapEntry> tempList;
     bool old_allow_id = Allow_Identifier_In_Call;
     Allow_Identifier_In_Call = false;
+    int blendMode = 0;
+    GammaCurvePtr blendGamma;
 
     Parse_Begin ();
 
@@ -3345,6 +3347,18 @@ ColourBlendMapPtr Parser::Parse_Colour_Map<ColourBlendMap> ()
         CASE (COLOUR_MAP_ID_TOKEN)
             New = *(reinterpret_cast<ColourBlendMapPtr *>(Token.Data));
             EXIT
+        END_CASE
+
+        CASE(BLEND_MODE_TOKEN)
+            blendMode = Parse_Float();
+            if ((blendMode < 0) || (blendMode > 3))
+                Error("blend_mode must be in the range 0 to 3");
+        END_CASE
+
+        CASE(BLEND_GAMMA_TOKEN)
+            if (!sceneData->workingGamma)
+                Error("blend_gamma requires that assumed_gamma has been set.");
+            blendGamma = Parse_Gamma();
         END_CASE
 
         OTHERWISE
@@ -3419,6 +3433,10 @@ ColourBlendMapPtr Parser::Parse_Colour_Map<ColourBlendMap> ()
                     tempList.resize(p);
                     New = ColourBlendMapPtr (new ColourBlendMap);
                     New->Set(tempList);
+                    New->blendMode = blendMode;
+                    if (blendGamma == NULL)
+                        blendGamma = PowerLawGammaCurve::GetByDecodingGamma(2.5);
+                    New->blendGamma = GammaCurvePtr(TranscodingGammaCurve::Get(sceneData->workingGamma, blendGamma));
                     EXIT
                 END_CASE
             END_EXPECT
