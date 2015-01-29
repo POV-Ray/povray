@@ -14,7 +14,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -542,7 +542,7 @@ void Parser::Get_Token ()
                 break;
 
             case '"' :
-                Parse_String_Literal ();
+                Read_String_Literal ();
                 break;
 
             case '0':
@@ -986,17 +986,22 @@ inline void Parser::End_String_Fast()
  *
  *   Parse a string from the input file into a token.
  *
+ *   Does NOT handle escape sequences EXCEPT that double quotes after an
+ *   odd number of backslashes (`\"`, `\\\"`, `\\\\\"` etc.) are treated as
+ *   regular characters rather than the end of the string.
+ *
  * CHANGES
  *
 ******************************************************************************/
 
-void Parser::Parse_String_Literal()
+void Parser::Read_String_Literal()
 {
     register int c;
     int col = Echo_Indx;
 
     Begin_String();
 
+    bool escaped = false;
     while(true)
     {
         c = Echo_getc();
@@ -1004,33 +1009,15 @@ void Parser::Parse_String_Literal()
         if(c == EOF)
             Error("No end quote for string.");
 
-        if(c == '\\')
-        {
-            switch(c = Echo_getc())
-            {
-                case '\n':
-                case '\r':
-                    Error("Unterminated string literal.");
-                    break;
-                case '\"':
-                    c = '\"';
-                    break;
-                case EOF:
-                    Error("No end quote for string.");
-                    break;
-                default:
-                    Stuff_Character('\\');
-            }
+        if((c == '"') && !escaped)
+            break;
 
-            Stuff_Character(c);
-        }
+        Stuff_Character(c);
+
+        if((c == '\\') && !escaped)
+            escaped = true;
         else
-        {
-            if(c != (int)'"')
-                Stuff_Character(c);
-            else
-                break;
-        }
+            escaped = false;
     }
 
     End_String();
@@ -1039,7 +1026,6 @@ void Parser::Parse_String_Literal()
 
     Token.Token_String = String;
 }
-
 
 
 /*****************************************************************************
@@ -3544,7 +3530,7 @@ int Parser::Parse_Read_Value(DATA_FILE *User_File,int Previous,int *NumberPtr,vo
             CASE(STRING_LITERAL_TOKEN)
                 *NumberPtr = STRING_ID_TOKEN;
                 Test_Redefine(Previous,NumberPtr,*DataPtr);
-                *DataPtr   = String_To_UCS2(Token.Token_String, false);
+                *DataPtr   = String_Literal_To_UCS2(Token.Token_String, false);
                 Parse_Comma(); // data file comma between 2 data items
                 EXIT
             END_CASE

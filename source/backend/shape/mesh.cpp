@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -931,7 +931,7 @@ bool Mesh::Compute_Mesh_Triangle(MESH_TRIANGLE *Triangle, bool Smooth, Vector3d&
 
     if (Smooth)
     {
-    //	compute_smooth_triangle(Triangle, P1, P2, P3);
+    //  compute_smooth_triangle(Triangle, P1, P2, P3);
         Triangle->Smooth = true;
     }
 
