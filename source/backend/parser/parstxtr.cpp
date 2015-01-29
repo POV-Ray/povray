@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -4126,7 +4126,7 @@ FOG *Parser::Parse_Fog()
 RAINBOW *Parser::Parse_Rainbow()
 {
     int Angle1, Angle2;
-    DBL dot;
+    DBL d;
     RAINBOW *Rainbow;
 
     Angle1 = Angle2 = false;
@@ -4228,16 +4228,16 @@ RAINBOW *Parser::Parse_Rainbow()
 
     /* Check for illegal vectors. */
 
-    dot = Rainbow->Antisolar_Vector.lengthSqr();
+    d = Rainbow->Antisolar_Vector.lengthSqr();
 
-    if (fabs(dot) < EPSILON)
+    if (fabs(d) < EPSILON)
     {
         Error("Rainbow's direction vector is zero.");
     }
 
-    dot = Rainbow->Up_Vector.lengthSqr();
+    d = Rainbow->Up_Vector.lengthSqr();
 
-    if (fabs(dot) < EPSILON)
+    if (fabs(d) < EPSILON)
     {
         Error("Rainbow's up vector is zero.");
     }
@@ -4245,9 +4245,9 @@ RAINBOW *Parser::Parse_Rainbow()
     Rainbow->Antisolar_Vector.normalize();
     Rainbow->Up_Vector.normalize();
 
-    dot = Rainbow->Up_Vector.lengthSqr();
+    d = dot(Rainbow->Up_Vector, Rainbow->Antisolar_Vector);
 
-    if (fabs(1.0 - fabs(dot)) < EPSILON)
+    if (fabs(1.0 - fabs(d)) < EPSILON)
     {
         Error("Rainbow's up and direction vector are co-linear.");
     }
