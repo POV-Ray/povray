@@ -9,7 +9,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -961,10 +961,10 @@ template<typename CHANNEL_T>
 class GenericFilterTransm
 {
     public:
-        
+
         typedef CHANNEL_T Channel;
 
-        /// Default constructor. 
+        /// Default constructor.
         inline GenericFilterTransm() :
             mFilter(0.0),
             mTransm(0.0)
@@ -1061,7 +1061,7 @@ class GenericTrans
 
         template<typename T2> friend class GenericTrans;
 
-        /// Default constructor. 
+        /// Default constructor.
         inline GenericTrans() :
             mData()
         {}
@@ -1103,7 +1103,7 @@ class GenericTrans
             return 1.0 - mData.Greyscale();
         }
 
-        inline Channel LegacyOpacity(const Colour&) const
+        inline Channel LegacyOpacity(const Colour& col) const
         {
             return Opacity(col);
         }
@@ -1501,7 +1501,7 @@ class GenericLightColour : public GenericLinearColour<ColourModelInternal,CHANNE
         template<typename CHANNEL_T2>
         inline explicit GenericLightColour(const GenericLightColour<CHANNEL_T2>& col) : Parent(col) {}
 
-        inline explicit GenericLightColour(const GenericRGBColour<Channel>& col) : 
+        inline explicit GenericLightColour(const GenericRGBColour<Channel>& col) :
 #if ((POV_COLOUR_MODEL == 0) || (POV_COLOUR_MODEL == 3))
             Parent(col)
         {}
@@ -1891,8 +1891,7 @@ class GenericTransColour
 
         inline explicit GenericTransColour(const Colour& col, Channel filter, Channel transm) :
             mColour(col),
-            mFilter(filter),
-            mTransm(transm)
+            mTrans(TransData(filter, transm))
         {}
 
         inline Colour     colour() const { return mColour; }

@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -51,7 +51,7 @@ template<> const PrecisePseudoColour PrecisePseudoColour::DominantWavelengths (C
 
 template<typename CHANNEL_T, typename MODEL_FROM_T> void ColourModelInternal4::MetamericNormalize(CHANNEL_T* col)
 {
-    const ColourChannel* pWhitepoint = GetWhitepointVector<MODEL_FROM_T::Whitepoint>();
+    const ColourChannel* pWhitepoint = GetWhitepointVector<typename MODEL_FROM_T::Whitepoint>();
     const ColourChannel *pNeutral    = GetMetamericNeutral();
 
     CHANNEL_T minAdd, minSub, maxAdd, maxSub, adjust;
