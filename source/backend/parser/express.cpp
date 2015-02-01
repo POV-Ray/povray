@@ -665,7 +665,7 @@ void Parser::Parse_Num_Factor (EXPRESS Express,int *Terms)
     IStream *f;
     POV_ARRAY *a;
     int Old_Ok=Ok_To_Declare;
-    DBL greater_val, less_val, equal_val ;
+    DBL greater_val, less_val, equal_val;
     PIGMENT *Pigment; // JN2007: Image map dimensions
 
     Ok_To_Declare=true;
@@ -684,12 +684,12 @@ void Parser::Parse_Num_Factor (EXPRESS Express,int *Terms)
                     Val = Parse_Float_Param();
                     if ( Val > 1.0 )
                     {
-                        Warning(0,"Domain error in acos.");
+                        Warning("Domain error in acos.");
                         Val = 1.0;
                     }
                     else if (Val < -1.0)
                     {
-                        Warning(0,"Domain error in acos.");
+                        Warning("Domain error in acos.");
                         Val = -1.0;
                     }
                     Val = acos(Val);
@@ -715,12 +715,12 @@ void Parser::Parse_Num_Factor (EXPRESS Express,int *Terms)
                     Val = Parse_Float_Param();
                     if ( Val > 1.0 )
                     {
-                        Warning(0,"Domain error in asin.");
+                        Warning("Domain error in asin.");
                         Val = 1.0;
                     }
                     else if (Val < -1.0)
                     {
-                        Warning(0,"Domain error in asin.");
+                        Warning("Domain error in asin.");
                         Val = -1.0;
                     }
                     Val = asin(Val);
@@ -1119,9 +1119,9 @@ void Parser::Parse_Num_Factor (EXPRESS Express,int *Terms)
                     Parse_Vector_Param(Vect2);
                     if((Vect2[X] == 0.0) && (Vect2[Y] == 0.0) && (Vect2[Z] == 0.0))
                     {
-                        if (sceneData->languageVersion >= 350)
+                        if (sceneData->EffectiveLanguageVersion() >= 350)
                             PossibleError("Normalizing zero-length vector.");
-                        Vect[X] = Vect[Y] = Vect[Z] = 0.0 ;
+                        Vect[X] = Vect[Y] = Vect[Z] = 0.0;
                     }
                     else
                         Vect = Vect2.normalized();
@@ -1598,7 +1598,7 @@ void Parser::Parse_Num_Term (EXPRESS Express,int *Terms)
                 if (Local_Express[i]==0.0) /* must be 0.0, not EPSILON */
                 {
                     Express[i]=HUGE_VAL;
-                    Warning(0,"Divide by zero.");
+                    Warning("Divide by zero.");
                 }
                 else
                 {
@@ -2026,7 +2026,7 @@ DBL Parser::Parse_Float ()
 
     Terms=1;
 
-    if (sceneData->languageVersion < 150)
+    if (sceneData->EffectiveLanguageVersion() < 150)
         Parse_Num_Factor(Express,&Terms);
     else
         Parse_Rel_Factor(Express,&Terms);
@@ -2155,7 +2155,7 @@ void Parser::Parse_Vector (Vector3d& Vector)
 
     Terms=3;
 
-    if (sceneData->languageVersion < 150)
+    if (sceneData->EffectiveLanguageVersion() < 150)
         Parse_Num_Factor(Express,&Terms);
     else
         Parse_Rel_Factor(Express,&Terms);
@@ -2205,7 +2205,7 @@ void Parser::Parse_Vector4D (VECTOR_4D Vector)
 
     Terms=Dim;
 
-    if (sceneData->languageVersion < 150)
+    if (sceneData->EffectiveLanguageVersion() < 150)
         Parse_Num_Factor(Express,&Terms);
     else
         Parse_Rel_Factor(Express,&Terms);
@@ -2256,7 +2256,7 @@ void Parser::Parse_UV_Vect (Vector2d& UV_Vect)
 
     Terms=2;
 
-    if (sceneData->languageVersion < 150)
+    if (sceneData->EffectiveLanguageVersion() < 150)
         Parse_Num_Factor(Express,&Terms);
     else
         Parse_Rel_Factor(Express,&Terms);
@@ -2307,7 +2307,7 @@ int Parser::Parse_Unknown_Vector(EXPRESS Express, bool allow_identifier, bool *h
 
     Terms=1;
 
-    if (sceneData->languageVersion < 150)
+    if (sceneData->EffectiveLanguageVersion() < 150)
         Parse_Num_Factor(Express,&Terms);
     else
         Parse_Rel_Factor(Express,&Terms);
@@ -2346,17 +2346,17 @@ void Parser::Parse_Scale_Vector (Vector3d& Vector)
     if (Vector[X] == 0.0)
     {
         Vector[X] = 1.0;
-        Warning(0, "Illegal Value: Scale X by 0.0. Changed to 1.0.");
+        Warning("Illegal Value: Scale X by 0.0. Changed to 1.0.");
     }
     if (Vector[Y] == 0.0)
     {
         Vector[Y] = 1.0;
-        Warning(0, "Illegal Value: Scale Y by 0.0. Changed to 1.0.");
+        Warning("Illegal Value: Scale Y by 0.0. Changed to 1.0.");
     }
     if (Vector[Z] == 0.0)
     {
         Vector[Z] = 1.0;
-        Warning(0, "Illegal Value: Scale Z by 0.0. Changed to 1.0.");
+        Warning("Illegal Value: Scale Z by 0.0. Changed to 1.0.");
     }
 }
 
@@ -2405,13 +2405,12 @@ void Parser::Parse_Colour (RGBFTColour& colour, bool expectFT)
             switch(Token.Function_Id)
             {
                 case ALPHA_TOKEN:
-                    Warning(155, "Keyword ALPHA discontinued. Use FILTER instead.");
-                    /* missing break deliberate */
-
+                    VersionWarning(155, "Keyword ALPHA discontinued. Use FILTER instead.");
+                    // FALLTHROUGH
                 case FILTER_TOKEN:
                     colour.filter() = (ColourChannel)Parse_Float();
                     if (!expectFT && (colour.filter() != 0))
-                        Warning(0, "Expected pure RGB color expression, unexpected filter component will have no effect.");
+                        Warning("Expected pure RGB color expression, unexpected filter component will have no effect.");
                     break;
 
                 case BLUE_TOKEN:
@@ -2429,7 +2428,7 @@ void Parser::Parse_Colour (RGBFTColour& colour, bool expectFT)
                 case TRANSMIT_TOKEN:
                     colour.transm() = (ColourChannel)Parse_Float();
                     if (!expectFT && (colour.transm() != 0))
-                        Warning(0, "Expected pure RGB color expression, unexpected transmit component will have no effect.");
+                        Warning("Expected pure RGB color expression, unexpected transmit component will have no effect.");
                     break;
 
                 case RGB_TOKEN:
@@ -2443,7 +2442,7 @@ void Parser::Parse_Colour (RGBFTColour& colour, bool expectFT)
                         Terms=3;
                         Parse_Express(Express,&Terms);
                         if (Terms != 3)
-                            Warning(0, "Suspicious expression after rgb.");
+                            Warning("Suspicious expression after rgb.");
                         colour.Set(Express, Terms);
                     }
                     break;
@@ -2459,10 +2458,10 @@ void Parser::Parse_Colour (RGBFTColour& colour, bool expectFT)
                         Terms=4;
                         Parse_Express(Express,&Terms);
                         if (Terms != 4)
-                            Warning(0, "Suspicious expression after rgbf.");
+                            Warning("Suspicious expression after rgbf.");
                         colour.Set(Express, Terms);
                         if (!expectFT && (colour.filter() != 0))
-                            Warning(0, "Expected pure RGB color expression, unexpected filter component will have no effect.");
+                            Warning("Expected pure RGB color expression, unexpected filter component will have no effect.");
                     }
                     break;
 
@@ -2477,12 +2476,12 @@ void Parser::Parse_Colour (RGBFTColour& colour, bool expectFT)
                         Terms=4;
                         Parse_Express(Express,&Terms);
                         if (Terms != 4)
-                            Warning(0, "Suspicious expression after rgbt.");
+                            Warning("Suspicious expression after rgbt.");
                         colour.Set(Express, Terms);
                         colour.transm()=colour.filter();
                         colour.filter()=0.0;
                         if (!expectFT && (colour.transm() != 0))
-                            Warning(0, "Expected pure RGB color expression, unexpected transmit component will have no effect.");
+                            Warning("Expected pure RGB color expression, unexpected transmit component will have no effect.");
                     }
                     break;
 
@@ -2497,10 +2496,10 @@ void Parser::Parse_Colour (RGBFTColour& colour, bool expectFT)
                         Terms=5;
                         Parse_Express(Express,&Terms);
                         if (Terms != 5)
-                            Warning(0, "Suspicious expression after rgbft.");
+                            Warning("Suspicious expression after rgbft.");
                         colour.Set(Express, Terms);
                         if (!expectFT && ((colour.filter() != 0) || (colour.transm() != 0)))
-                            Warning(0, "Expected pure RGB color expression, unexpected filter and transmit components will have no effect.");
+                            Warning("Expected pure RGB color expression, unexpected filter and transmit components will have no effect.");
                     }
                     break;
 
@@ -2537,7 +2536,7 @@ void Parser::Parse_Colour (RGBFTColour& colour, bool expectFT)
                         Terms=3;
                         Parse_Express(Express,&Terms);
                         if (Terms != 3)
-                            Warning(0, "Suspicious expression after srgb.");
+                            Warning("Suspicious expression after srgb.");
                         colour.Set(Express, Terms);
                         colour.rgb() = GammaCurve::Decode(sceneData->workingGammaToSRGB, colour.rgb());
                     }
@@ -2556,11 +2555,11 @@ void Parser::Parse_Colour (RGBFTColour& colour, bool expectFT)
                         Terms=4;
                         Parse_Express(Express,&Terms);
                         if (Terms != 4)
-                            Warning(0, "Suspicious expression after srgbf.");
+                            Warning("Suspicious expression after srgbf.");
                         colour.Set(Express, Terms);
                         colour.rgb() = GammaCurve::Decode(sceneData->workingGammaToSRGB, colour.rgb());
                         if (!expectFT && (colour.filter() != 0))
-                            Warning(0, "Expected pure RGB color expression, unexpected filter component will have no effect.");
+                            Warning("Expected pure RGB color expression, unexpected filter component will have no effect.");
                     }
                     break;
 
@@ -2577,13 +2576,13 @@ void Parser::Parse_Colour (RGBFTColour& colour, bool expectFT)
                         Terms=4;
                         Parse_Express(Express,&Terms);
                         if (Terms != 4)
-                            Warning(0, "Suspicious expression after srgbt.");
+                            Warning("Suspicious expression after srgbt.");
                         colour.Set(Express, Terms);
                         colour.transm()=colour.filter();
                         colour.filter()=0.0;
                         colour.rgb() = GammaCurve::Decode(sceneData->workingGammaToSRGB, colour.rgb());
                         if (!expectFT && (colour.transm() != 0))
-                            Warning(0, "Expected pure RGB color expression, unexpected transmit component will have no effect.");
+                            Warning("Expected pure RGB color expression, unexpected transmit component will have no effect.");
                     }
                     break;
 
@@ -2600,11 +2599,11 @@ void Parser::Parse_Colour (RGBFTColour& colour, bool expectFT)
                         Terms=5;
                         Parse_Express(Express,&Terms);
                         if (Terms != 5)
-                            Warning(0, "Suspicious expression after srgbft.");
+                            Warning("Suspicious expression after srgbft.");
                         colour.Set(Express, Terms);
                         colour.rgb() = GammaCurve::Decode(sceneData->workingGammaToSRGB, colour.rgb());
                         if (!expectFT && ((colour.filter() != 0) || (colour.transm() != 0)))
-                            Warning(0, "Expected pure RGB color expression, unexpected filter and transmit components will have no effect.");
+                            Warning("Expected pure RGB color expression, unexpected filter and transmit components will have no effect.");
                     }
                     break;
             }
@@ -2626,7 +2625,7 @@ void Parser::Parse_Colour (RGBFTColour& colour, bool expectFT)
                 Parse_Express(Express,&Terms);
                 colour.Set(Express, Terms);
                 if (!expectFT && ((colour.filter() != 0) || (colour.transm() != 0)))
-                    Warning(0, "Expected pure RGB color expression, unexpected filter and transmit components will have no effect.");
+                    Warning("Expected pure RGB color expression, unexpected filter and transmit components will have no effect.");
                 startedParsing = true;
             }
         END_CASE
@@ -2650,7 +2649,7 @@ void Parser::Parse_Colour (RGBFTColour& colour, bool expectFT)
                     Error("RGB color expression expected but float or vector expression found.");
                 colour.Set(Express, Terms);
                 if (!expectFT && ((colour.filter() != 0) || (colour.transm() != 0)))
-                    Warning(0, "Expected pure RGB color expression, unexpected filter and transmit components will have no effect.");
+                    Warning("Expected pure RGB color expression, unexpected filter and transmit components will have no effect.");
                 startedParsing = true;
             }
         END_CASE

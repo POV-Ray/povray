@@ -192,11 +192,9 @@ struct BetaFlags
 * Global typedefs
 ******************************************************************************/
 
-class Parser : public Task
+class Parser : public SceneTask
 {
     public:
-        MessageFactory messageFactory;
-
         class DebugTextStreamBuffer : public TextStreamBuffer
         {
             public:
@@ -314,7 +312,7 @@ class Parser : public Task
         void Warn_State (TOKEN Token_Id, TOKEN Type);
         void Only_In (const char *s1,const char *s2);
         void Not_With (const char *s1,const char *s2);
-        void Warn_Compat (int f, const char *sym);
+        void Warn_Compat (bool definite, const char *sym);
         void Link_Textures (TEXTURE **Old_Texture, TEXTURE *New_Texture);
 
         ObjectPtr Parse_Object_Mods (ObjectPtr Object);
@@ -335,7 +333,9 @@ class Parser : public Task
 
         void SendFatalError(Exception& e);
 
-        void Warning(unsigned int level, const char *format,...);
+        void Warning(const char *format,...);
+        void Warning(WarningLevel level, const char *format,...);
+        void VersionWarning(unsigned int sinceVersion, const char *format,...);
         void PossibleError(const char *format,...);
         void Error(const char *format,...);
 

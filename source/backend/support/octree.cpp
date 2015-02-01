@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -1082,7 +1082,7 @@ bool ot_save_tree(OT_NODE *root, OStream *fd)
     if(fd != NULL)
         retval = ot_traverse(root, ot_write_block, reinterpret_cast<void *>(fd));
     else
-;// TODO MESSAGE    Warning(0, "Bad radiosity cache file handle");
+;// TODO MESSAGE    Warning("Bad radiosity cache file handle");
 
     return retval;
 }

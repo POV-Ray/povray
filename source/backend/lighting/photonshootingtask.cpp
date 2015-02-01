@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -42,6 +42,7 @@
 #include "base/povms.h"
 #include "base/povmsgid.h"
 #include "backend/bounding/bbox.h"
+#include "backend/lighting/photonshootingstrategy.h"
 #include "backend/lighting/point.h"
 #include "backend/math/matrices.h"
 #include "backend/math/vector.h"
@@ -61,10 +62,9 @@ namespace pov
 {
 
 PhotonShootingTask::PhotonShootingTask(ViewData *vd, PhotonShootingStrategy* strategy) :
-    RenderTask(vd),
+    RenderTask(vd, "Photon"),
     trace(vd->GetSceneData(), GetViewDataPtr(), vd->GetSceneData()->photonSettings.Max_Trace_Level,
           vd->GetSceneData()->photonSettings.adcBailout, vd->GetQualityFeatureFlags(), cooperate),
-    messageFactory(10, 370, "Photon", vd->GetSceneData()->backendAddress, vd->GetSceneData()->frontendAddress, vd->GetSceneData()->sceneId, 0), // TODO FIXME - Values need to come from the correct place!
     rands(0.0, 1.0, 32768),
     randgen(&rands),
     strategy(strategy),

@@ -127,7 +127,7 @@ const DBL INFINITE_VOLUME = BOUND_HUGE;
 ******************************************************************************/
 
 Parser::Parser(shared_ptr<SceneData> sd, bool useclk, DBL clk) :
-    Task(new SceneThreadData(sd), boost::bind(&Parser::SendFatalError, this, _1)),
+    SceneTask(new SceneThreadData(sd), boost::bind(&Parser::SendFatalError, this, _1), "Parse", sd),
     sceneData(sd),
     clockValue(clk),
     useClock(useclk),
@@ -142,8 +142,7 @@ Parser::Parser(shared_ptr<SceneData> sd, bool useclk, DBL clk) :
     token_count(0),
     line_count(10),
     next_rand(NULL),
-    Debug_Message_Buffer(sd->backendAddress, sd->frontendAddress, sd->sceneId),
-    messageFactory(10, 370, "Parse", sd->backendAddress, sd->frontendAddress, sd->sceneId, 0) // TODO FIXME - Values need to come from the correct place!
+    Debug_Message_Buffer(sd->backendAddress, sd->frontendAddress, sd->sceneId)
 {
     pre_init_tokenizer();
     if (sceneData->realTimeRaytracing)
@@ -262,7 +261,7 @@ void Parser::Run()
 
     // validate scene contents
     if(sceneData->objects.empty())
-        Warning(0, "No objects in scene.");
+        Warning("No objects in scene.");
 
     Terminate_Tokenizer();
     Destroy_Textures(Default_Texture);
@@ -275,51 +274,51 @@ void Parser::Run()
     Brace_Stack = NULL;
 
     // Check for experimental features
-    char str[512] = "" ;
+    char str[512] = "";
 
     if(mExperimentalFlags.backsideIllumination)
-        strcat(str, str [0] ? ", backside illumination" : "backside illumination") ;
+        strcat(str, str [0] ? ", backside illumination" : "backside illumination");
     if(mExperimentalFlags.functionHf)
-        strcat(str, str [0] ? ", function '.hf'" : "function '.hf'") ;
+        strcat(str, str [0] ? ", function '.hf'" : "function '.hf'");
     if(mExperimentalFlags.meshCamera)
-        strcat(str, str [0] ? ", mesh camera" : "mesh camera") ;
+        strcat(str, str [0] ? ", mesh camera" : "mesh camera");
     if(mExperimentalFlags.slopeAltitude)
-        strcat(str, str [0] ? ", slope pattern altitude" : "slope pattern altitude") ;
+        strcat(str, str [0] ? ", slope pattern altitude" : "slope pattern altitude");
     if(mExperimentalFlags.spline)
-        strcat(str, str [0] ? ", spline" : "spline") ;
+        strcat(str, str [0] ? ", spline" : "spline");
     if(mExperimentalFlags.subsurface)
-        strcat(str, str [0] ? ", subsurface light transport" : "subsurface light transport") ;
+        strcat(str, str [0] ? ", subsurface light transport" : "subsurface light transport");
     if(mExperimentalFlags.tiff)
-        strcat(str, str [0] ? ", TIFF image support" : "TIFF image support") ;
+        strcat(str, str [0] ? ", TIFF image support" : "TIFF image support");
 
     if (str[0] != '\0')
-        Warning(0, "This rendering uses the following experimental feature(s): %s.\n"
-                   "The design and implementation of these features is likely to change in future\n"
-                   "versions of POV-Ray. Backward compatibility with the current implementation is\n"
-                   "not guaranteed.",
-                   str);
+        Warning("This rendering uses the following experimental feature(s): %s.\n"
+                "The design and implementation of these features is likely to change in future\n"
+                "versions of POV-Ray. Backward compatibility with the current implementation is\n"
+                "not guaranteed.",
+                str);
 
     // Check for beta features
     str[0] = '\0';
 
     if(mBetaFeatureFlags.videoCapture)
-        strcat(str, str [0] ? ", video capture" : "video capture") ;
+        strcat(str, str [0] ? ", video capture" : "video capture");
     if(mBetaFeatureFlags.realTimeRaytracing)
-        strcat(str, str [0] ? ", real-time raytracing render loop" : "real-time raytracing render loop") ;
+        strcat(str, str [0] ? ", real-time raytracing render loop" : "real-time raytracing render loop");
 
     if (str[0] != '\0')
-        Warning(0, "This rendering uses the following beta-test feature(s): %s.\n"
-                    "The implementation of these features is likely to change or be completely\n"
-                    "removed in subsequent beta-test versions of POV-Ray. There is no guarantee\n"
-                    "that they will be available in the next full release version.\n",
-                    str);
+        Warning("This rendering uses the following beta-test feature(s): %s.\n"
+                "The implementation of these features is likely to change or be completely\n"
+                "removed in subsequent beta-test versions of POV-Ray. There is no guarantee\n"
+                "that they will be available in the next full release version.\n",
+                str);
 
     if ((sceneData->bspMaxDepth != 0) ||
         (sceneData->bspObjectIsectCost != 0.0f) || (sceneData->bspBaseAccessCost != 0.0f) ||
         (sceneData->bspChildAccessCost != 0.0f) || (sceneData->bspMissChance != 0.0f))
     {
-        Warning(0, "You have overridden a default BSP tree cost constant. Note that these "
-                   "INI settings may be removed or changed prior to the final 3.7 release.\n");
+        Warning("You have overridden a default BSP tree cost constant. Note that these "
+                "INI settings may be removed or changed prior to the final 3.7 release.\n");
     }
 
     // TODO FIXME - review whole if-statement and line after it below [trf]
@@ -327,7 +326,8 @@ void Parser::Run()
     // be gained from disabling the defaulting of the noise generator to
     // something other than compatibilty mode.
     if (sceneData->explicitNoiseGenerator == false)
-        sceneData->noiseGenerator = sceneData->languageVersion < 350 ? kNoiseGen_Original : kNoiseGen_RangeCorrected;
+        sceneData->noiseGenerator = (sceneData->EffectiveLanguageVersion() < 350 ?
+                                     kNoiseGen_Original : kNoiseGen_RangeCorrected);
 
     if((sceneData->gammaMode != kPOVList_GammaMode_AssumedGamma36) && (sceneData->gammaMode != kPOVList_GammaMode_AssumedGamma37))
     {
@@ -336,8 +336,8 @@ void Parser::Run()
             sceneData->gammaMode = kPOVList_GammaMode_None;
             sceneData->workingGamma.reset();
             sceneData->workingGammaToSRGB.reset();
-            Warning(0, "assumed_gamma not specified, so gamma_correction is turned off for compatibility\n"
-                       "with this pre POV-Ray 3.7 scene. See the documentation for more details.");
+            Warning("assumed_gamma not specified, so gamma_correction is turned off for compatibility\n"
+                    "with this pre POV-Ray 3.7 scene. See the documentation for more details.");
         }
         else
         {
@@ -351,36 +351,35 @@ void Parser::Run()
         }
     }
 
-    if(sceneData->languageVersion < 350)
+    if(sceneData->EffectiveLanguageVersion() < 350)
     {
-        Warning(0, "The scene finished parsing with a language version set to 3.1 or earlier. Full\n"
-                   "backward compatibility with scenes requiring support for bugs in POV-Ray\n"
-                   "version 3.1 or earlier is not guaranteed. Please use POV-Ray 3.5 or earlier if\n"
-                   "your scene depends on rendering defects caused by these bugs.");
+        Warning("The scene finished parsing with a language version set to 3.1 or earlier. Full\n"
+                "backward compatibility with scenes requiring support for bugs in POV-Ray\n"
+                "version 3.1 or earlier is not guaranteed. Please use POV-Ray 3.5 or earlier if\n"
+                "your scene depends on rendering defects caused by these bugs.");
 
         sceneData->languageVersion = 350;
-        messageFactory.SetLanguageVersion(350);
     }
 
     if(sceneData->languageVersionLate)
     {
-        Warning(0, "This scene had other declarations preceding the first #version directive.\n"
-                   "Please be aware that as of POV-Ray 3.7, unless already specified via an INI\n"
-                   "option, a #version is expected as the first declaration in a scene file. If\n"
-                   "this is not done, POV-Ray may apply compatibility settings to some features\n"
-                   "that are intended to make pre-3.7 scenes render as designed. You are strongly\n"
-                   "encouraged to add a #version statement to the scene to make your intent clear.\n"
-                   "Future versions of POV-Ray may make the presence of a #version mandatory.");
+        Warning("This scene had other declarations preceding the first #version directive.\n"
+                "Please be aware that as of POV-Ray 3.7, unless already specified via an INI\n"
+                "option, a #version is expected as the first declaration in a scene file. If\n"
+                "this is not done, POV-Ray may apply compatibility settings to some features\n"
+                "that are intended to make pre-3.7 scenes render as designed. You are strongly\n"
+                "encouraged to add a #version statement to the scene to make your intent clear.\n"
+                "Future versions of POV-Ray may make the presence of a #version mandatory.");
     }
     else if(sceneData->languageVersionSet == false)
     {
-        Warning(0, "This scene did not contain a #version directive. Please be aware that as of\n"
-                   "POV-Ray 3.7, unless already specified via an INI option, a #version is\n"
-                   "expected as the first declaration in a scene file. POV-Ray may apply settings\n"
-                   "to some features that are intended to maintain compatibility with pre-3.7\n"
-                   "scenes. You are strongly encouraged to add a #version statement to the scene\n"
-                   "to make your intent clear. Future versions of POV-Ray may make the presence of\n"
-                   "a #version statement mandatory.");
+        Warning("This scene did not contain a #version directive. Please be aware that as of\n"
+                "POV-Ray 3.7, unless already specified via an INI option, a #version is\n"
+                "expected as the first declaration in a scene file. POV-Ray may apply settings\n"
+                "to some features that are intended to maintain compatibility with pre-3.7\n"
+                "scenes. You are strongly encouraged to add a #version statement to the scene\n"
+                "to make your intent clear. Future versions of POV-Ray may make the presence of\n"
+                "a #version statement mandatory.");
     }
 
     sceneData->parsedMaxTraceLevel = Max_Trace_Level;
@@ -389,13 +388,13 @@ void Parser::Run()
     {
         if (sceneData->cameras.size() < 2)
         {
-            Warning(0, "Need at least two cameras for a clockless animation loop - treating\nscene as single frame.");
+            Warning("Need at least two cameras for a clockless animation loop - treating\nscene as single frame.");
             sceneData->clocklessAnimation = false;
         }
         else
         {
+            Warning("Clockless animation: total of %d cameras will be used.", sceneData->cameras.size());
             sceneData->parsedCamera = sceneData->cameras[0];
-            Warning(0, "Clockless animation: total of %d cameras will be used.", sceneData->cameras.size());
         }
     }
 
@@ -407,16 +406,16 @@ void Parser::Run()
         if (!sceneData->radiositySettings.minimumReuseSet)
         {
             sceneData->radiositySettings.minimumReuse = sceneData->radiositySettings.maximumReuse * 0.5;
-            Warning(0, "Radiosity maximum_reuse should be significantly larger than minimum_reuse.\n"
-                       "Decreasing minimum_reuse to %lf instead of the default.",
-                       sceneData->radiositySettings.minimumReuse);
+            Warning("Radiosity maximum_reuse should be significantly larger than minimum_reuse.\n"
+                    "Decreasing minimum_reuse to %lf instead of the default.",
+                    sceneData->radiositySettings.minimumReuse);
         }
         else if (!sceneData->radiositySettings.maximumReuseSet)
         {
             sceneData->radiositySettings.maximumReuse = sceneData->radiositySettings.minimumReuse * 2.0;
-            Warning(0, "Radiosity maximum_reuse should be significantly larger than minimum_reuse.\n"
-                       "Increasing maximum_reuse to %lf instead of the default.",
-                       sceneData->radiositySettings.maximumReuse);
+            Warning("Radiosity maximum_reuse should be significantly larger than minimum_reuse.\n"
+                    "Increasing maximum_reuse to %lf instead of the default.",
+                    sceneData->radiositySettings.maximumReuse);
         }
         else if (sceneData->radiositySettings.minimumReuse >= sceneData->radiositySettings.maximumReuse)
         {
@@ -424,7 +423,7 @@ void Parser::Run()
         }
         else
         {
-            Warning(0, "Radiosity maximum_reuse should be significantly larger than minimum_reuse.\n");
+            Warning("Radiosity maximum_reuse should be significantly larger than minimum_reuse.\n");
         }
     }
 }
@@ -482,7 +481,7 @@ void Parser::Finish()
 /* Set up the fields in the frame to default values. */
 void Parser::Frame_Init()
 {
-    Destroying_Frame = false ;
+    Destroying_Frame = false;
     sceneData->parsedCamera = Default_Camera;
     sceneData->lightSources.clear();
     sceneData->atmosphereIOR = 1.0;
@@ -529,8 +528,8 @@ void Parser::Destroy_Frame()
     // This causes the currently-executing segment to be destroyed twice,
     // which is a Bad Thing(tm). [CJC 11/01]
     if (Destroying_Frame)
-        return ;
-    Destroying_Frame = true ;
+        return;
+    Destroying_Frame = true;
 
     /* Destroy fogs. [DB 12/94] */
 
@@ -602,7 +601,7 @@ void Parser::Parse_Begin ()
 
     if(++Brace_Index >= MAX_BRACES)
     {
-        Warning(0, "Too many nested '{' braces.");
+        Warning("Too many nested '{' braces.");
         Brace_Index--;
     }
 
@@ -648,7 +647,7 @@ void Parser::Parse_End ()
     {
         if(--Brace_Index < 0)
         {
-            Warning(0, "Possible '}' brace missmatch.");
+            Warning("Possible '}' brace missmatch.");
             Brace_Index = 0;
         }
         return;
@@ -692,7 +691,7 @@ ObjectPtr Parser::Parse_Bicubic_Patch ()
 
     EXPECT
         CASE_FLOAT
-            Warning(150, "Should use keywords for bicubic parameters.");
+            VersionWarning(150, "Should use keywords for bicubic parameters.");
             Object->Patch_Type = (int)Parse_Float();
             if (Object->Patch_Type == 2 ||
                 Object->Patch_Type == 3)
@@ -747,7 +746,7 @@ ObjectPtr Parser::Parse_Bicubic_Patch ()
     if (Object->Patch_Type > 1)
     {
         Object->Patch_Type = 1;
-        Warning(0, "Patch type no longer supported. Using type 1.");
+        Warning("Patch type no longer supported. Using type 1.");
     }
 
     if ((Object->Patch_Type < 0) || (Object->Patch_Type > MAX_PATCH_TYPE))
@@ -1205,7 +1204,7 @@ void Parser::Parse_Mesh_Camera (Camera& Cam)
     if (Cam.Face_Distribution_Method == 3)
     {
         if (Cam.Meshes.size() > 1)
-            Warning(0, "Additional meshes after the first are ignored for distribution method #3");
+            Warning("Additional meshes after the first are ignored for distribution method #3");
 
         // build a 10 row and 10 column index relating faces to UV co-ordinates. each face is represented
         // by a single bit at each node of the index. to determine which faces cover a given pair of
@@ -1279,7 +1278,7 @@ void Parser::Parse_Camera (Camera& Cam)
     EXPECT
         CASE (CAMERA_ID_TOKEN)
             Cam = *reinterpret_cast<Camera *>(Token.Data);
-            if (sceneData->languageVersion >= 350)
+            if (sceneData->EffectiveLanguageVersion() >= 350)
                 only_mods = true;
             EXIT
         END_CASE
@@ -1292,7 +1291,7 @@ void Parser::Parse_Camera (Camera& Cam)
 
     Camera& New = Cam;
 
-    if ((sceneData->languageVersion >= 350) && (only_mods == true))
+    if ((sceneData->EffectiveLanguageVersion() >= 350) && (only_mods == true))
     {
         // keep a copy and clear it because this is a copy of a camera
         // and this will prevent that transforms are applied twice [trf]
@@ -1340,7 +1339,7 @@ void Parser::Parse_Camera (Camera& Cam)
         New.Transform(New.Trans);
         Compose_Transforms(&Backup_Trans, New.Trans);
     }
-    else if (sceneData->languageVersion >= 350)
+    else if (sceneData->EffectiveLanguageVersion() >= 350)
     {
 
         /*
@@ -1680,8 +1679,8 @@ void Parser::Parse_Camera (Camera& Cam)
                (fabs(New.Right[Y]) < EPSILON) &&
                (fabs(New.Right[Z]) < EPSILON))
             {
-                Warning(0, "Camera location to look_at direction and sky direction should be different.\n"
-                           "Using default/supplied right vector instead.");
+                Warning("Camera location to look_at direction and sky direction should be different.\n"
+                        "Using default/supplied right vector instead.");
 
                 // Restore Right vector
                 New.Right = tempv;
@@ -1915,7 +1914,7 @@ void Parser::Parse_Camera (Camera& Cam)
                 if ((k1 > 0.0) && (k1 < 1.0))
                     New.Confidence = k1;
                 else
-                    Warning(0, "Illegal confidence value. Default is used.");
+                    Warning("Illegal confidence value. Default is used.");
             END_CASE
 
             CASE (VARIANCE_TOKEN)
@@ -1923,7 +1922,7 @@ void Parser::Parse_Camera (Camera& Cam)
                 if ((k1 >= 0.0) && (k1 <= 1.0))
                     New.Variance = k1;
                 else
-                    Warning(0, "Illegal variance value. Default is used.");
+                    Warning("Illegal variance value. Default is used.");
             END_CASE
 
             CASE (APERTURE_TOKEN)
@@ -1959,8 +1958,8 @@ void Parser::Parse_Camera (Camera& Cam)
 
     if ((fabs(k1) > EPSILON) || (fabs(k2) > EPSILON) || (fabs(k3) > EPSILON))
     {
-        Warning(0, "Camera vectors are not perpendicular.\n"
-                   "Making look_at the last statement may help.");
+        Warning("Camera vectors are not perpendicular.\n"
+                "Making look_at the last statement may help.");
     }
 }
 
@@ -2053,7 +2052,7 @@ bool Parser::Parse_Camera_Mods(Camera& New)
             if ((k1 > 0.0) && (k1 < 1.0))
                 New.Confidence = k1;
             else
-                Warning(0, "Illegal confidence value. Default is used.");
+                Warning("Illegal confidence value. Default is used.");
         END_CASE
 
         CASE (VARIANCE_TOKEN)
@@ -2061,7 +2060,7 @@ bool Parser::Parse_Camera_Mods(Camera& New)
             if ((k1 >= 0.0) && (k1 <= 1.0))
                 New.Variance = k1;
             else
-                Warning(0, "Illegal variance value. Default is used.");
+                Warning("Illegal variance value. Default is used.");
         END_CASE
 
         CASE (APERTURE_TOKEN)
@@ -2143,7 +2142,7 @@ ObjectPtr Parser::Parse_CSG(int CSG_Type)
     while((Local = Parse_Object()) != NULL)
     {
         if((CSG_Type & CSG_INTERSECTION_TYPE) && (Local->Type & PATCH_OBJECT))
-            Warning(0, "Patch objects not allowed in intersection.");
+            Warning("Patch objects not allowed in intersection.");
         Object_Count++;
 
         if((CSG_Type & CSG_DIFFERENCE_TYPE) && (Object_Count > 1))
@@ -2159,8 +2158,8 @@ ObjectPtr Parser::Parse_CSG(int CSG_Type)
     if(Light_Source_Union)
         Object->Type |= LT_SRC_UNION_OBJECT;
 
-    if((Object_Count < 2) && (sceneData->languageVersion >= 150))
-        Warning(150, "Should have at least 2 objects in csg.");
+    if(Object_Count < 2)
+        VersionWarning(150, "Should have at least 2 objects in csg.");
 
     Object->Compute_BBox();
 
@@ -2398,7 +2397,7 @@ ObjectPtr Parser::Parse_HField ()
     EXPECT
         CASE (WATER_LEVEL_TOKEN)
             Temp_Water_Level = Parse_Float();
-            if (sceneData->languageVersion < 200)
+            if (sceneData->EffectiveLanguageVersion() < 200)
                 Temp_Water_Level /=256.0;
             (reinterpret_cast<HField *>(Object))->bounding_corner1[Y] = 65536.0 * Temp_Water_Level;
         END_CASE
@@ -2587,22 +2586,22 @@ ObjectPtr Parser::Parse_Isosurface()
 
     if (Object->accuracy <= 0.0)
     {
-        Warning(0, "Isosurface 'accuracy' is not positive. Using 0.001 (default).");
+        Warning("Isosurface 'accuracy' is not positive. Using 0.001 (default).");
         Object->accuracy = 0.001;
     }
     if (Object->max_gradient <= 0.0)
     {
-        Warning(0, "Isosurface 'max_gradient' is not positive. Using 1.1 (default).");
+        Warning("Isosurface 'max_gradient' is not positive. Using 1.1 (default).");
         Object->max_gradient = 1.1;
     }
     if (Object->max_trace > ISOSURFACE_MAXTRACE)
     {
-        Warning(0, "Isosurface 'max_trace' exceeds maximum of %d. Using maximum.", (int)ISOSURFACE_MAXTRACE);
+        Warning("Isosurface 'max_trace' exceeds maximum of %d. Using maximum.", (int)ISOSURFACE_MAXTRACE);
         Object->max_trace = ISOSURFACE_MAXTRACE;
     }
     if (Object->max_trace < 1)
     {
-        Warning(0, "Isosurface 'max_trace' is not positive. Using 1 (default).");
+        Warning("Isosurface 'max_trace' is not positive. Using 1 (default).");
         Object->max_trace = 1;
     }
 
@@ -2939,7 +2938,7 @@ ObjectPtr Parser::Parse_Lathe()
     if (Object->Spline->BCyl->number > sceneData->Max_Bounding_Cylinders)
     {
         SceneThreadData *td = GetParserDataPtr();
-        sceneData->Max_Bounding_Cylinders = Object->Spline->BCyl->number ;
+        sceneData->Max_Bounding_Cylinders = Object->Spline->BCyl->number;
         td->BCyl_Intervals = POV_REALLOC (td->BCyl_Intervals, 4*sceneData->Max_Bounding_Cylinders*sizeof(BCYL_INT), "lathe intersection list");
         td->BCyl_RInt = POV_REALLOC (td->BCyl_RInt, 2*sceneData->Max_Bounding_Cylinders*sizeof(BCYL_INT), "lathe intersection list");
         td->BCyl_HInt = POV_REALLOC (td->BCyl_HInt, 2*sceneData->Max_Bounding_Cylinders*sizeof(BCYL_INT), "lathe intersection list");
@@ -3176,8 +3175,8 @@ ObjectPtr Parser::Parse_Light_Source ()
             // TODO - apparently this undocumented syntax was once intended to do something related to dispersion,
             //        but in 3.7 is dysfunctional, doing nothing except provide an undocumented means of averaging
             //        different colours. Can we safely drop it?
-            Warning(0, "Undocumented syntax ignored (colour_map in light_source);"
-                       " future versions of POV-Ray may drop support for it entirely.");
+            Warning("Undocumented syntax ignored (colour_map in light_source);"
+                    " future versions of POV-Ray may drop support for it entirely.");
             (void)Parse_Colour_Map<ColourBlendMap> ();
         END_CASE
 
@@ -3364,7 +3363,7 @@ ObjectPtr Parser::Parse_Light_Source ()
             Object->Orient = true;
             if (!(Object->Area_Light))
             {
-                Warning(0,"Orient only affects area_light");
+                Warning("Orient only affects area_light");
             }
         END_CASE
 
@@ -3373,7 +3372,7 @@ ObjectPtr Parser::Parse_Light_Source ()
             Object->Circular = true;
             if (!(Object->Area_Light))
             {
-                Warning(0,"Circular only affects area_light");
+                Warning("Circular only affects area_light");
             }
         END_CASE
 
@@ -3382,7 +3381,7 @@ ObjectPtr Parser::Parse_Light_Source ()
             Object->Use_Full_Area_Lighting = Allow_Float(1.0) > 0.0;
             if (!(Object->Area_Light))
             {
-                Warning(0,"Area_illumination only affects area_light");
+                Warning("Area_illumination only affects area_light");
             }
         END_CASE
 
@@ -3434,7 +3433,7 @@ ObjectPtr Parser::Parse_Light_Source ()
 
     if ((Object->Fade_Power != 0) && (fabs(Object->Fade_Distance) < EPSILON) && (sceneData->EffectiveLanguageVersion() < 371))
     {
-        Warning(0, "fade_power with fade_distance 0 is not supported in legacy (pre-3.71) scenes; fade_power is ignored.");
+        Warning("fade_power with fade_distance 0 is not supported in legacy (pre-3.71) scenes; fade_power is ignored.");
         Object->Fade_Power    = 0;
         Object->Fade_Distance = 0;
     }
@@ -3638,7 +3637,7 @@ ObjectPtr Parser::Parse_Mesh()
             {
                 N1[X] = 1.0;  // make it nonzero
                 if(!foundZeroNormal)
-                    Warning(0,"Normal vector in mesh cannot be zero - changing it to <1,0,0>.");
+                    Warning("Normal vector in mesh cannot be zero - changing it to <1,0,0>.");
                 foundZeroNormal = true;
             }
 
@@ -3648,7 +3647,7 @@ ObjectPtr Parser::Parse_Mesh()
             {
                 N2[X] = 1.0;  // make it nonzero
                 if(!foundZeroNormal)
-                    Warning(0,"Normal vector in mesh cannot be zero - changing it to <1,0,0>.");
+                    Warning("Normal vector in mesh cannot be zero - changing it to <1,0,0>.");
                 foundZeroNormal = true;
             }
 
@@ -3658,7 +3657,7 @@ ObjectPtr Parser::Parse_Mesh()
             {
                 N3[X] = 1.0;  // make it nonzero
                 if(!foundZeroNormal)
-                    Warning(0,"Normal vector in mesh cannot be zero - changing it to <1,0,0>.");
+                    Warning("Normal vector in mesh cannot be zero - changing it to <1,0,0>.");
                 foundZeroNormal = true;
             }
 
@@ -3985,7 +3984,7 @@ ObjectPtr Parser::Parse_Mesh2()
         CASE(VERTEX_VECTORS_TOKEN)
             if (number_of_vertices>0)
             {
-                Warning(0, "Duplicate vertex_vectors block; ignoring previous block.");
+                Warning("Duplicate vertex_vectors block; ignoring previous block.");
                 POV_FREE(Vertices);
             }
 
@@ -4010,7 +4009,7 @@ ObjectPtr Parser::Parse_Mesh2()
         CASE(NORMAL_VECTORS_TOKEN)
             if (number_of_normals>0)
             {
-                Warning(0, "Duplicate normal_vectors block; ignoring previous block.");
+                Warning("Duplicate normal_vectors block; ignoring previous block.");
                 POV_FREE(Normals);
             }
 
@@ -4029,7 +4028,7 @@ ObjectPtr Parser::Parse_Mesh2()
                     {
                         N1[X] = 1.0;  // make it nonzero
                         if(!foundZeroNormal)
-                            Warning(0,"Normal vector in mesh2 cannot be zero - changing it to <1,0,0>.");
+                            Warning("Normal vector in mesh2 cannot be zero - changing it to <1,0,0>.");
                         foundZeroNormal = true;
                     }
                     N1.normalize();
@@ -4043,7 +4042,7 @@ ObjectPtr Parser::Parse_Mesh2()
         CASE(UV_VECTORS_TOKEN)
             if (number_of_uvcoords>0)
             {
-                Warning(0, "Duplicate uv_vectors block; ignoring previous block.");
+                Warning("Duplicate uv_vectors block; ignoring previous block.");
                 POV_FREE(UVCoords);
             }
 
@@ -5203,7 +5202,7 @@ ObjectPtr Parser::Parse_Polygon()
 
     if (!closed)
     {
-        Warning(0, "Polygon not closed. Closing it.");
+        Warning("Polygon not closed. Closing it.");
 
         Points[Number] = P;
 
@@ -5496,13 +5495,13 @@ ObjectPtr Parser::Parse_Prism()
 
             Object->Number++;
 
-            Warning(0, "Linear prism not closed. Closing it.");
+            Warning("Linear prism not closed. Closing it.");
         }
         else
         {
             Set_Flag(Object, DEGENERATE_FLAG);
 
-            Warning(0, "Prism not closed. Ignoring it.");
+            Warning("Prism not closed. Ignoring it.");
         }
     }
 
@@ -5641,7 +5640,7 @@ ObjectPtr Parser::Parse_Smooth_Triangle ()
         degen = !Object->Compute_Triangle();
 
     if(degen)
-        Warning(0, "Degenerate triangle. Please remove.");
+        Warning("Degenerate triangle. Please remove.");
 
     Object->Compute_BBox();
 
@@ -5760,7 +5759,7 @@ ObjectPtr Parser::Parse_Sor()
     if (Object->Spline->BCyl->number > sceneData->Max_Bounding_Cylinders)
     {
         SceneThreadData *td = GetParserDataPtr();
-        sceneData->Max_Bounding_Cylinders = Object->Spline->BCyl->number ;
+        sceneData->Max_Bounding_Cylinders = Object->Spline->BCyl->number;
         td->BCyl_Intervals = POV_REALLOC (td->BCyl_Intervals, 4*sceneData->Max_Bounding_Cylinders*sizeof(BCYL_INT), "lathe intersection list");
         td->BCyl_RInt = POV_REALLOC (td->BCyl_RInt, 2*sceneData->Max_Bounding_Cylinders*sizeof(BCYL_INT), "lathe intersection list");
         td->BCyl_HInt = POV_REALLOC (td->BCyl_HInt, 2*sceneData->Max_Bounding_Cylinders*sizeof(BCYL_INT), "lathe intersection list");
@@ -6082,7 +6081,7 @@ ObjectPtr Parser::Parse_Triangle()
     /* Note that Compute_Triangle also computes the bounding box. */
 
     if(!Object->Compute_Triangle())
-        Warning(0, "Degenerate triangle. Please remove.");
+        Warning("Degenerate triangle. Please remove.");
 
     Parse_Object_Mods(reinterpret_cast<ObjectPtr>(Object));
 
@@ -6118,6 +6117,13 @@ ObjectPtr Parser::Parse_TrueType ()
     Vector3d offset;
     int builtin_font = 0;
     TRANSFORM Local_Trans;
+
+    if((sceneData->EffectiveLanguageVersion() < 350) && (sceneData->stringEncoding == 0))
+    {
+        PossibleError("Text may not be displayed as expected.\n"
+                      "Please refer to the user manual regarding changes\n"
+                      "in POV-Ray 3.5 and later.");
+    }
 
     Parse_Begin ();
 
@@ -6354,7 +6360,7 @@ ObjectPtr Parser::Parse_Object ()
         END_CASE
 
         CASE (COMPOSITE_TOKEN)
-            Warning(150, "Use union instead of composite.");
+            VersionWarning(150, "Use union instead of composite.");
             Object = Parse_CSG (CSG_UNION_TYPE);
             EXIT
         END_CASE
@@ -6568,11 +6574,11 @@ void Parser::Parse_Frame ()
                 Local_Skysphere = Parse_Skysphere();
                 if (sceneData->skysphere != NULL)
                 {
-                    Warning(0, "Only one sky-sphere allowed (last one will be used).");
+                    Warning("Only one sky-sphere allowed (last one will be used).");
                     Destroy_Skysphere(sceneData->skysphere);
                 }
                 sceneData->skysphere = Local_Skysphere;
-                for (vector<PIGMENT*>::iterator i = Local_Skysphere->Pigments.begin() ; i != Local_Skysphere->Pigments.end(); ++ i)
+                for (vector<PIGMENT*>::iterator i = Local_Skysphere->Pigments.begin(); i != Local_Skysphere->Pigments.end(); ++ i)
                 {
                     Post_Pigment(*i);
                 }
@@ -6611,12 +6617,12 @@ void Parser::Parse_Frame ()
             END_CASE
 
             CASE (CAMERA_TOKEN)
-                if (sceneData->languageVersion >= 350)
+                if (sceneData->EffectiveLanguageVersion() >= 350)
                 {
                     if (sceneData->clocklessAnimation == false)
                     {
                         if (had_camera == true)
-                            Warning(0, "More than one camera in scene. Ignoring previous camera(s).");
+                            Warning("More than one camera in scene. Ignoring previous camera(s).");
                     }
                     had_camera = true;
                     sceneData->parsedCamera = Default_Camera;
@@ -6629,13 +6635,13 @@ void Parser::Parse_Frame ()
 
             CASE (DECLARE_TOKEN)
                 UNGET
-                Warning(295,"Should have '#' before 'declare'.");
+                VersionWarning(295,"Should have '#' before 'declare'.");
                 Parse_Directive (false);
             END_CASE
 
             CASE (INCLUDE_TOKEN)
                 UNGET
-                Warning(295,"Should have '#' before 'include'.");
+                VersionWarning(295,"Should have '#' before 'include'.");
                 Parse_Directive (false);
             END_CASE
 
@@ -6656,7 +6662,7 @@ void Parser::Parse_Frame ()
             END_CASE
 
             CASE (MAX_TRACE_LEVEL_TOKEN)
-                if (sceneData->languageVersion >= 350)
+                if (sceneData->EffectiveLanguageVersion() >= 350)
                 {
                     PossibleError("'max_trace_level' should be in global_settings block.\n"
                                   "Future versions may not support 'max_trace_level' outside global_settings.");
@@ -6667,7 +6673,7 @@ void Parser::Parse_Frame ()
                 Had_Max_Trace_Level = true;
                 if(Max_Trace_Level > MAX_TRACE_LEVEL_LIMIT)
                 {
-                    Warning(0, "Maximum max_trace_level is %d but %d was specified.\n"
+                    Warning("Maximum max_trace_level is %d but %d was specified.\n"
                                "Going to use max_trace_level %d.",
                                MAX_TRACE_LEVEL_LIMIT, Max_Trace_Level, MAX_TRACE_LEVEL_LIMIT);
                     Max_Trace_Level = MAX_TRACE_LEVEL_LIMIT;
@@ -6676,8 +6682,7 @@ void Parser::Parse_Frame ()
 
             CASE (MAX_INTERSECTIONS_TOKEN)
                 Parse_Float();
-                if (sceneData->languageVersion >= 370)
-                    Warning(0, "'max_intersections' is no longer needed and has no effect in POV-Ray 3.7 or later.");
+                VersionWarning(370, "'max_intersections' is no longer needed and has no effect in POV-Ray 3.7 or later.");
             END_CASE
 
             CASE (DEFAULT_TOKEN)
@@ -6773,7 +6778,7 @@ void Parser::Parse_Global_Settings()
                     // they have explicitly set assumed_gamma, so we
                     // don't do any of the compatibility checks we normally do. issue a
                     // warning and continue on our way.
-                    Warning(0, "New instance of assumed_gamma ignored");
+                    Warning("New instance of assumed_gamma ignored");
                     Parse_Gamma();
                     break;
                 default:
@@ -6795,9 +6800,9 @@ void Parser::Parse_Global_Settings()
             Had_Max_Trace_Level = true;
             if(Max_Trace_Level > MAX_TRACE_LEVEL_LIMIT)
             {
-                Warning(0, "Maximum max_trace_level is %d but %d was specified.\n"
-                           "Going to use max_trace_level %d.",
-                           MAX_TRACE_LEVEL_LIMIT, Max_Trace_Level, MAX_TRACE_LEVEL_LIMIT);
+                Warning("Maximum max_trace_level is %d but %d was specified.\n"
+                        "Going to use max_trace_level %d.",
+                        MAX_TRACE_LEVEL_LIMIT, Max_Trace_Level, MAX_TRACE_LEVEL_LIMIT);
                 Max_Trace_Level = MAX_TRACE_LEVEL_LIMIT;
             }
         }
@@ -6812,7 +6817,7 @@ void Parser::Parse_Global_Settings()
                 int numberOfWaves = (int) Parse_Float ();
                 if(numberOfWaves <=0)
                 {
-                    Warning(0, "Illegal Value: number_of_waves must be greater than 0.\nChanged to 1.");
+                    Warning("Illegal Value: number_of_waves must be greater than 0.\nChanged to 1.");
                     numberOfWaves = 1;
                 }
                 sceneData->numberOfWaves = numberOfWaves;
@@ -6821,8 +6826,7 @@ void Parser::Parse_Global_Settings()
 
         CASE (MAX_INTERSECTIONS_TOKEN)
             Parse_Float();
-            if (sceneData->languageVersion >= 370)
-                Warning(0, "'max_intersections' is no longer needed and has no effect in POV-Ray 3.7 or later.");
+            VersionWarning(370, "'max_intersections' is no longer needed and has no effect in POV-Ray 3.7 or later.");
         END_CASE
 
         CASE (NOISE_GENERATOR_TOKEN)
@@ -6892,12 +6896,12 @@ void Parser::Parse_Global_Settings()
                     sceneData->photonSettings.minExpandCount = Parse_Float();
                     if (sceneData->photonSettings.expandTolerance < 0.0)
                     {
-                        Warning(100,"The first parameter of expand_thresholds must be greater than or equal to 0.\nSetting it to 0 now.");
+                        VersionWarning(100,"The first parameter of expand_thresholds must be greater than or equal to 0.\nSetting it to 0 now.");
                         sceneData->photonSettings.expandTolerance = 0.0;
                     }
                     if (sceneData->photonSettings.minExpandCount < 0)
                     {
-                        Warning(100,"The second parameter of expand_thresholds must be greater than or equal to 0.\nSetting it to 0 now.");
+                        VersionWarning(100,"The second parameter of expand_thresholds must be greater than or equal to 0.\nSetting it to 0 now.");
                         sceneData->photonSettings.minExpandCount = 0;
                     }
                 END_CASE
@@ -6932,9 +6936,9 @@ void Parser::Parse_Global_Settings()
                     if(sceneData->photonSettings.fileName)
                     {
                         if(sceneData->photonSettings.loadFile)
-                            Warning(100,"Filename already given, using new name");
+                            VersionWarning(100,"Filename already given, using new name");
                         else
-                            Warning(100,"Cannot both load and save photon map. Now switching to load mode.");
+                            VersionWarning(100,"Cannot both load and save photon map. Now switching to load mode.");
                         POV_FREE(sceneData->photonSettings.fileName);
                     }
                     sceneData->photonSettings.fileName = Parse_C_String(true);
@@ -6945,9 +6949,9 @@ void Parser::Parse_Global_Settings()
                     if(sceneData->photonSettings.fileName)
                     {
                         if(!sceneData->photonSettings.loadFile)
-                            Warning(100,"Filename already given, using new name");
+                            VersionWarning(100,"Filename already given, using new name");
                         else
-                            Warning(100,"Cannot both load and save photon map. Now switching to save mode.");
+                            VersionWarning(100,"Cannot both load and save photon map. Now switching to save mode.");
                         POV_FREE(sceneData->photonSettings.fileName);
                     }
                     sceneData->photonSettings.fileName = Parse_C_String(true);
@@ -6992,19 +6996,19 @@ void Parser::Parse_Global_Settings()
             if(sceneData->photonSettings.photonsEnabled == false)
             {
                 sceneData->photonSettings.photonsEnabled = false;
-                Warning(0, "A photons{}-block has been found but photons remain disabled because\n"
-                           "the output quality is set to 8 or less.");
+                Warning("A photons{}-block has been found but photons remain disabled because\n"
+                        "the output quality is set to 8 or less.");
             }
         END_CASE
 
 
         CASE (RADIOSITY_TOKEN)
             // enable radiosity only if the user includes a "radiosity" token
-            if((sceneData->radiositySettings.radiosityEnabled == false) && (sceneData->languageVersion < 350))
+            if((sceneData->radiositySettings.radiosityEnabled == false) && (sceneData->EffectiveLanguageVersion() < 350))
             {
-                Warning(0, "In POV-Ray 3.5 and later a radiosity{}-block will automatically\n"
-                           "turn on radiosity if the output quality is set to 9 or higher.\n"
-                           "Read the documentation to find out more about radiosity changes!");
+                Warning("In POV-Ray 3.5 and later a radiosity{}-block will automatically\n"
+                        "turn on radiosity if the output quality is set to 9 or higher.\n"
+                        "Read the documentation to find out more about radiosity changes!");
             }
             sceneData->radiositySettings.radiosityEnabled = true;
 
@@ -7345,7 +7349,7 @@ ObjectPtr Parser::Parse_Object_Mods (ObjectPtr Object)
 
         CASE_COLOUR
             Parse_Colour (Local_Colour);
-            if (sceneData->languageVersion < 150)
+            if (sceneData->EffectiveLanguageVersion() < 150)
             {
                 if (Object->Texture != NULL)
                 {
@@ -7356,7 +7360,7 @@ ObjectPtr Parser::Parse_Object_Mods (ObjectPtr Object)
                     }
                 }
             }
-            Warning(0, "Quick color belongs in texture. Color ignored.");
+            Warning("Quick color belongs in texture. Color ignored.");
         END_CASE
 
         CASE (TRANSLATE_TOKEN)
@@ -7513,7 +7517,7 @@ ObjectPtr Parser::Parse_Object_Mods (ObjectPtr Object)
 
         CASE (INVERSE_TOKEN)
             if (Object->Type & PATCH_OBJECT)
-                Warning (0, "Cannot invert a patch object.");
+                Warning("Cannot invert a patch object.");
 
             // warning: Object->Invert will change the pointer if Object is CSG
             Object = Object->Invert();
@@ -7603,9 +7607,9 @@ ObjectPtr Parser::Parse_Object_Mods (ObjectPtr Object)
         CASE(DEBUG_TAG_TOKEN)
             s = Parse_C_String ();
 #ifdef OBJECT_DEBUG_HELPER
-            Object->Debug.Tag = s ;
+            Object->Debug.Tag = s;
 #endif
-            POV_FREE (s) ;
+            POV_FREE (s);
         END_CASE
 
         OTHERWISE
@@ -7744,7 +7748,7 @@ void Parser::Parse_Matrix(MATRIX Matrix)
                 if (fabs(Matrix[0][i]) < EPSILON && fabs(Matrix[1][i]) < EPSILON &&
                     fabs(Matrix[2][i]) < EPSILON)
                 {
-                    Warning(0,"Illegal matrix column: Scale by 0.0. Changed to 1.0.");
+                    Warning("Illegal matrix column: Scale by 0.0. Changed to 1.0.");
                     Matrix[i][i] = 1.0;
                 }
             }
@@ -8090,13 +8094,13 @@ void Parser::Parse_Semi_Colon (bool force_semicolon)
     if (Token.Token_Id != SEMI_COLON_TOKEN)
     {
         UNGET;
-        if ((sceneData->languageVersion >= 350) && (force_semicolon == true))
+        if ((sceneData->EffectiveLanguageVersion() >= 350) && (force_semicolon == true))
         {
             Error("All #declares of float, vector, and color require semi-colon ';' at end if the\n"
                   "language version is set to 3.5 or higher.\n"
                   "Either add the semi-colon or set the language version to 3.1 or lower.");
         }
-        else if (sceneData->languageVersion >= 310)
+        else if (sceneData->EffectiveLanguageVersion() >= 310)
         {
             PossibleError("All #version and #declares of float, vector, and color require semi-colon ';' at end.");
         }
@@ -8217,7 +8221,7 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
 
     Ok_To_Declare = false;
 
-    if ((sceneData->languageVersion >= 350) && (after_hash == false))
+    if ((sceneData->EffectiveLanguageVersion() >= 350) && (after_hash == false))
     {
         PossibleError("'declare' should be changed to '#declare'.\n"
                       "Future versions may not support 'declare' and may require '#declare'.");
@@ -8423,7 +8427,7 @@ int Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTR
         END_CASE
 
         CASE_COLOUR
-            if((Token.Token_Id != COLOUR_ID_TOKEN) || (sceneData->languageVersion < 350))
+            if((Token.Token_Id != COLOUR_ID_TOKEN) || (sceneData->EffectiveLanguageVersion() < 350))
             {
                 Local_Colour  = Create_Colour();
                 Ok_To_Declare = false;
@@ -9006,17 +9010,17 @@ void Parser::Link_Textures (TEXTURE **Old_Textures, TEXTURE *New_Textures)
             Error("Cannot layer over a patterned texture.");
         }
     }
-    for (Layer = New_Textures ;
-         Layer->Next != NULL ;
+    for (Layer = New_Textures;
+         Layer->Next != NULL;
          Layer = Layer->Next)
     {
         /* NK layers - 1999 June 10 - for backwards compatiblity with layered textures */
-        if(sceneData->languageVersion<=310)
+        if(sceneData->EffectiveLanguageVersion() <= 310)
             Convert_Filter_To_Transmit(Layer->Pigment);
     }
 
     /* NK layers - 1999 Nov 16 - for backwards compatiblity with layered textures */
-    if ((sceneData->languageVersion<=310) && (*Old_Textures!=NULL))
+    if ((sceneData->EffectiveLanguageVersion() <= 310) && (*Old_Textures != NULL))
         Convert_Filter_To_Transmit(Layer->Pigment);
 
     Layer->Next = *Old_Textures;
@@ -9171,7 +9175,7 @@ void Parser::Warn_State(TOKEN Token_Id, TOKEN Type)
 {
     char *str;
 
-    if(sceneData->languageVersion >= 150)
+    if(sceneData->EffectiveLanguageVersion() >= 150)
         return;
 
     str = reinterpret_cast<char *>(POV_MALLOC(160, "global setting warning string"));
@@ -9181,7 +9185,7 @@ void Parser::Warn_State(TOKEN Token_Id, TOKEN Type)
     strcat(str, "' that should be in '");
     strcat(str, Get_Token_String (Type));
     strcat(str, "' statement.");
-    Warning(0, str);
+    Warning(str);
     POV_FREE(str);
 }
 
@@ -9382,7 +9386,7 @@ void Parser::Post_Process (ObjectPtr Object, ObjectPtr Parent)
             if(!Light->Circular)
             {
                 Light->Circular = true;
-                Warning(0,"Orient can only be used with circular area lights. This area light is now circular.");
+                Warning("Orient can only be used with circular area lights. This area light is now circular.");
             }
 
             len1 = Light->Axis1.length();
@@ -9390,7 +9394,7 @@ void Parser::Post_Process (ObjectPtr Object, ObjectPtr Parent)
 
             if(fabs(len1-len2)>EPSILON)
             {
-                Warning(0, "When using orient, the two axes of the area light must be of equal length.\nOnly the length of the first axis will be used.");
+                Warning("When using orient, the two axes of the area light must be of equal length.\nOnly the length of the first axis will be used.");
 
                 // the equalization is actually done in the lighting code, since only the length of
                 // Axis1 will be used
@@ -9399,7 +9403,7 @@ void Parser::Post_Process (ObjectPtr Object, ObjectPtr Parent)
 
             if(Light->Area_Size1 != Light->Area_Size2)
             {
-                Warning(0, "When using orient, the two sample sizes for the area light should be equal.");
+                Warning("When using orient, the two sample sizes for the area light should be equal.");
             }
         }
 
@@ -9408,7 +9412,7 @@ void Parser::Post_Process (ObjectPtr Object, ObjectPtr Parent)
         {
             if ((Light->Area_Size1 <= 1) || (Light->Area_Size2 <= 1))
             {
-                Warning(0, "Circular area lights must have more than one sample along each axis.");
+                Warning("Circular area lights must have more than one sample along each axis.");
                 Light->Circular = false;
             }
         }
@@ -9423,13 +9427,13 @@ void Parser::Post_Process (ObjectPtr Object, ObjectPtr Parent)
             {
                 Destroy_Interior((reinterpret_cast<LightSource *>(Object))->Projected_Through_Object->interior);
                 (reinterpret_cast<LightSource *>(Object))->Projected_Through_Object->interior=NULL;
-                Warning(0,"Projected through objects can not have interior, interior removed.");
+                Warning("Projected through objects can not have interior, interior removed.");
             }
             if ((reinterpret_cast<LightSource *>(Object))->Projected_Through_Object->Texture != NULL)
             {
                 Destroy_Textures((reinterpret_cast<LightSource *>(Object))->Projected_Through_Object->Texture);
                 (reinterpret_cast<LightSource *>(Object))->Projected_Through_Object->Texture = NULL;
-                Warning(0,"Projected through objects can not have texture, texture removed.");
+                Warning("Projected through objects can not have texture, texture removed.");
             }
         }
 
@@ -9587,7 +9591,7 @@ void Parser::Link_To_Frame(ObjectPtr Object)
             if(Object->Bound != Object->Clip)
                 Destroy_Object(Object->Bound);
             Object->Bound.clear();
-            Warning(0, "Unnecessary bounding object removed.");
+            Warning("Unnecessary bounding object removed.");
         }
     }
 
@@ -9658,12 +9662,12 @@ void Parser::Link_To_Frame(ObjectPtr Object)
         if (((finite == false) || (sceneData->splitUnions == false)) && ((Object->Type & LIGHT_GROUP_OBJECT) != LIGHT_GROUP_OBJECT))
         {
             if (finite)
-                Warning(0, "CSG union unnecessarily bounded.");
+                Warning("CSG union unnecessarily bounded.");
             Link(Object, sceneData->objects);
             return;
         }
 
-        Warning(0, "Bounded CSG union split.");
+        Warning("Bounded CSG union split.");
     }
 
     // Link all siblings of a union to the frame.
@@ -9728,13 +9732,13 @@ void Parser::Not_With(const char *s1, const char *s2)
     Error("Keyword '%s' cannot be used with %s.",s1,s2);
 }
 
-void Parser::Warn_Compat(int f, const char *syn)
+void Parser::Warn_Compat(bool definite, const char *syn)
 {
     char isNotText[] = "is not";
     char mayNotText[] = "may not be";
     char *text;
 
-    if (f)
+    if (definite)
     {
         text = isNotText;
     }
@@ -9743,10 +9747,10 @@ void Parser::Warn_Compat(int f, const char *syn)
         text = mayNotText;
     }
 
-    Warning(0,"%s\n"
-              "  Use of this syntax %s backwards compatable with earlier versions of POV-Ray.\n"
-              "  The #version directive or +MV switch will not help.",
-              syn, text);
+    Warning("%s\n"
+            "  Use of this syntax %s backwards compatable with earlier versions of POV-Ray.\n"
+            "  The #version directive or +MV switch will not help.",
+            syn, text);
 }
 
 /*****************************************************************************
@@ -9775,7 +9779,7 @@ void Parser::Global_Setting_Warn()
 
     str = reinterpret_cast<char *>(POV_MALLOC(strlen(Token.Token_String) + 80, "global setting warning string"));
 
-    if (sceneData->languageVersion >= 300)
+    if (sceneData->EffectiveLanguageVersion() >= 300)
     {
         strcpy(str, "'");
         strcat(str, Token.Token_String);
@@ -9810,7 +9814,7 @@ void Parser::Set_CSG_Children_Flag(ObjectPtr Object, unsigned int f, unsigned in
 {
     for(vector<ObjectPtr>::iterator Sib = (reinterpret_cast<CSG *>(Object))->children.begin(); Sib != (reinterpret_cast<CSG *>(Object))->children.end(); Sib++)
     {
-        ObjectPtr p = *Sib ;
+        ObjectPtr p = *Sib;
         if(!Test_Flag (p, set_flag))
         {
             if((dynamic_cast<CSGUnion *> (p) != NULL) || // FIXME
@@ -9853,7 +9857,7 @@ void Parser::Set_CSG_Tree_Flag(ObjectPtr Object, unsigned int f, int val)
 {
     for(vector<ObjectPtr>::iterator Sib = (reinterpret_cast<CSG *>(Object))->children.begin(); Sib != (reinterpret_cast<CSG *>(Object))->children.end(); Sib++)
     {
-        ObjectPtr p = *Sib ;
+        ObjectPtr p = *Sib;
         if((dynamic_cast<CSGUnion *>(p) != NULL) || // FIXME
            (dynamic_cast<CSGIntersection *>(p) != NULL) || // FIXME
            (dynamic_cast<CSGMerge *>(p) != NULL)) // FIXME
@@ -10100,8 +10104,18 @@ void Parser::SendFatalError(Exception& e)
     PossibleError("%s", e.what());
 }
 
-void Parser::Warning(unsigned int level, const char *format,...)
+void Parser::Warning(const char *format,...)
 {
+    va_list marker;
+    va_start(marker, format);
+    Warning(kWarningGeneral, format, marker);
+    va_end(marker);
+}
+
+void Parser::Warning(WarningLevel level, const char *format,...)
+{
+    assert (level >= kWarningGeneral);
+
     va_list marker;
     char localvsbuffer[1024];
 
@@ -10113,6 +10127,18 @@ void Parser::Warning(unsigned int level, const char *format,...)
         messageFactory.WarningAt(level, Token.FileHandle->name(), Token.Token_File_Pos.lineno, Token.Token_Col_No, Token.FileHandle->tellg().offset, "%s", localvsbuffer);
     else
         messageFactory.Warning(level, "%s", localvsbuffer);
+}
+
+void Parser::VersionWarning(unsigned int sinceVersion, const char *format,...)
+{
+    if(sceneData->EffectiveLanguageVersion() >= sinceVersion)
+    {
+        va_list marker;
+
+        va_start(marker, format);
+        Warning(kWarningLanguage, format, marker);
+        va_end(marker);
+    }
 }
 
 void Parser::PossibleError(const char *format,...)
@@ -10232,7 +10258,7 @@ void Parser::CheckPassThru(ObjectPtr o, int flag)
         switch (flag)
         {
             case PH_PASSTHRU_FLAG:
-                Warning(0, "Cannot use pass_through with refraction & target.\nTurning off refraction.");
+                Warning("Cannot use pass_through with refraction & target.\nTurning off refraction.");
                 Set_Flag(o, PH_RFR_OFF_FLAG);
                 Clear_Flag(o, PH_RFR_ON_FLAG);
                 break;
@@ -10240,19 +10266,19 @@ void Parser::CheckPassThru(ObjectPtr o, int flag)
             case PH_TARGET_FLAG:
                 if(Test_Flag(o, PH_RFR_ON_FLAG))
                 {
-                    Warning(0, "Cannot use pass_through with refraction & target.\nTurning off pass_through.");
+                    Warning("Cannot use pass_through with refraction & target.\nTurning off pass_through.");
                     Clear_Flag(o,PH_PASSTHRU_FLAG);
                 }
                 else
                 {
-                    Warning(0, "Cannot use pass_through with refraction & target.\nTurning off refraction.");
+                    Warning("Cannot use pass_through with refraction & target.\nTurning off refraction.");
                     Set_Flag(o, PH_RFR_OFF_FLAG);
                     Clear_Flag(o, PH_RFR_ON_FLAG);
                 }
                 break;
 
             case PH_RFR_ON_FLAG:
-                Warning(0, "Cannot use pass_through with refraction & target.\nTurning off pass_through.");
+                Warning("Cannot use pass_through with refraction & target.\nTurning off pass_through.");
                 Clear_Flag(o, PH_PASSTHRU_FLAG);
                 break;
         }

@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -2753,7 +2753,7 @@ void Trace::ComputeSky(const Ray& ray, MathColour& colour, ColourChannel& transm
         colour = colour * transColour + col;
         transm *= filterc_transm;
     }
-    else // i.e. sceneData->languageVersion >= 370
+    else // i.e. sceneData->EffectiveLanguageVersion() >= 370
     {
         // this gives the same results regarding sky sphere filter as a layered-texture genuine sphere
 

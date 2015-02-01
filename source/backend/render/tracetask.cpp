@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -216,7 +216,7 @@ void TraceTask::SubdivisionBuffer::Clear()
 }
 
 TraceTask::TraceTask(ViewData *vd, unsigned int tm, DBL js, DBL aat, unsigned int aad, GammaCurvePtr& aag, unsigned int ps, bool psc, bool final, bool hr) :
-    RenderTask(vd),
+    RenderTask(vd, "Trace"),
     trace(vd, GetViewDataPtr(), vd->GetSceneData()->parsedMaxTraceLevel, vd->GetSceneData()->parsedAdcBailout,
           vd->GetQualityFeatureFlags(), cooperate, media, radiosity),
     cooperate(*this),

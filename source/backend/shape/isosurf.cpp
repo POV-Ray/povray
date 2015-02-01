@@ -11,7 +11,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -678,7 +678,7 @@ void IsoSurface::DispatchShutdownMessages(MessageFactory& messageFactory)
 
                     if (((prop <= 0.9) && (diff <= -0.5)) || (((prop <= 0.95) || (diff <= -0.1)) && (mginfo->max_gradient < 10.0)))
                     {
-                        messageFactory.WarningAt(0, fn->filename, fn->filepos.lineno, 0, fn->filepos.offset,
+                        messageFactory.WarningAt(kWarningGeneral, fn->filename, fn->filepos.lineno, 0, fn->filepos.offset,
                                                  "The maximum gradient found was %0.3f, but max_gradient of the\n"
                                                  "isosurface was set to %0.3f. The isosurface may contain holes!\n"
                                                  "Adjust max_gradient to get a proper rendering of the isosurface.",
@@ -687,7 +687,7 @@ void IsoSurface::DispatchShutdownMessages(MessageFactory& messageFactory)
                     }
                     else if ((diff >= 10.0) || ((prop >= 1.1) && (diff >= 0.5)))
                     {
-                        messageFactory.WarningAt(0, fn->filename, fn->filepos.lineno, 0, fn->filepos.offset,
+                        messageFactory.WarningAt(kWarningGeneral, fn->filename, fn->filepos.lineno, 0, fn->filepos.offset,
                                                  "The maximum gradient found was %0.3f, but max_gradient of\n"
                                                  "the isosurface was set to %0.3f. Adjust max_gradient to\n"
                                                  "get a faster rendering of the isosurface.",
@@ -704,7 +704,7 @@ void IsoSurface::DispatchShutdownMessages(MessageFactory& messageFactory)
                 {
                     mginfo->eval_cnt = max(mginfo->eval_cnt, 1.0); // make sure it won't be zero
 
-                    messageFactory.WarningAt(0, fn->filename, fn->filepos.lineno, 0, fn->filepos.offset,
+                    messageFactory.WarningAt(kWarningGeneral, fn->filename, fn->filepos.lineno, 0, fn->filepos.offset,
                                              "Evaluate found a maximum gradient of %0.3f and an average\n"
                                              "gradient of %0.3f. The maximum gradient variation was %0.3f.\n",
                                              (float)(mginfo->eval_max),
