@@ -4,7 +4,7 @@
 ///
 /// This module contains all oct-tree functions for radiosity.
 ///
-/// @author Originally written by Jim McElhiney.
+/// @author Jim McElhiney.
 ///
 /// @copyright
 /// @parblock
@@ -60,9 +60,8 @@
 #include "backend/frame.h"
 #include "backend/support/octree.h"
 
+#include "base/fileinputoutput.h"
 #include "base/pov_err.h"
-#include "backend/povray.h"
-#include "backend/math/vector.h"
 
 // this must be the last file included
 #include "base/povdebug.h"

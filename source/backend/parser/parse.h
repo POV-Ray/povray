@@ -42,6 +42,8 @@
 #include "base/textstream.h"
 #include "base/textstreambuffer.h"
 #include "backend/control/messagefactory.h"
+#include "backend/math/matrices.h"
+#include "backend/math/vector.h"
 #include "backend/parser/reswords.h"
 #include "backend/pattern/warps.h"
 #include "backend/scene/atmosph.h"
@@ -49,6 +51,7 @@
 #include "backend/scene/scene.h"
 #include "backend/shape/blob.h"
 #include "backend/support/task.h"
+#include "backend/texture/pigment.h"
 
 namespace pov
 {
@@ -191,6 +194,9 @@ struct BetaFlags
 /*****************************************************************************
 * Global typedefs
 ******************************************************************************/
+
+typedef DBL EXPRESS[5];   ///< @todo       Make this obsolete.
+
 
 class Parser : public SceneTask
 {

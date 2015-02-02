@@ -41,11 +41,6 @@
 #include "backend/frame.h"
 #include "backend/scene/view.h"
 
-#include "base/povms.h"
-#include "base/povmscpp.h"
-#include "base/povmsgid.h"
-#include "base/timer.h"
-
 #include "backend/control/renderbackend.h"
 #include "backend/lighting/photonestimationtask.h"
 #include "backend/lighting/photons.h"
@@ -55,13 +50,17 @@
 #include "backend/lighting/photonstrategytask.h"
 #include "backend/lighting/radiosity.h"
 #include "backend/math/matrices.h"
-#include "backend/math/vector.h"
 #include "backend/render/radiositytask.h"
 #include "backend/render/tracetask.h"
+#include "backend/scene/scene.h"
 #include "backend/scene/threaddata.h"
 #include "backend/support/octree.h"
 
-#include "povray.h" // TODO
+#include "base/path.h"
+#include "base/povms.h"
+#include "base/povmscpp.h"
+#include "base/povmsgid.h"
+#include "base/timer.h"
 
 // this must be the last file included
 #include "base/povdebug.h"

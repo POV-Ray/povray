@@ -48,6 +48,7 @@
 #include "backend/math/splines.h"
 #include "backend/math/vector.h"
 #include "backend/pattern/pattern.h"
+#include "backend/render/ray.h"
 #include "backend/scene/objects.h"
 #include "backend/shape/hfield.h"
 #include "backend/support/fileutil.h"

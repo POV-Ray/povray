@@ -43,7 +43,6 @@
 #include "backend/lighting/photonshootingstrategy.h"
 #include "backend/lighting/point.h"
 #include "backend/math/matrices.h"
-#include "backend/math/vector.h"
 #include "backend/scene/objects.h"
 #include "backend/shape/csg.h"
 #include "backend/support/octree.h"

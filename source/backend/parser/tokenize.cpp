@@ -46,6 +46,7 @@
 #include "base/povmsgid.h"
 #include "base/stringutilities.h"
 #include "backend/parser/parse.h"
+#include "backend/pattern/pattern.h"
 #include "backend/colour/colour_old.h"
 #include "backend/texture/texture.h"
 #include "backend/math/matrices.h"

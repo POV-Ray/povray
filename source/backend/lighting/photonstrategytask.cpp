@@ -40,7 +40,6 @@
 #include "backend/lighting/photonstrategytask.h"
 
 #include "backend/bounding/bbox.h"
-#include "backend/math/vector.h"
 #include "backend/math/matrices.h"
 #include "backend/scene/objects.h"
 #include "backend/scene/scene.h"

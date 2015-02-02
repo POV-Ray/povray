@@ -37,12 +37,10 @@
 #include "backend/frame.h"
 #include "backend/parser/parse.h"
 
-#include "base/image/image.h"
 #include "backend/colour/colour_old.h"
 #include "backend/interior/interior.h"
 #include "backend/interior/media.h"
 #include "backend/math/matrices.h"
-#include "backend/math/vector.h"
 #include "backend/scene/objects.h"
 #include "backend/scene/threaddata.h"
 #include "backend/shape/isosurf.h"
@@ -53,6 +51,8 @@
 #include "backend/texture/texture.h"
 #include "backend/vm/fncode.h"
 #include "backend/vm/fnpovfpu.h"
+#include "base/image/image.h"
+#include "base/path.h"
 
 #include "lightgrp.h" // TODO
 

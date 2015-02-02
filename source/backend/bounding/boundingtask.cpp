@@ -43,7 +43,6 @@
 #include "backend/bounding/boundingtask.h"
 
 #include "backend/math/matrices.h"
-#include "backend/math/vector.h"
 #include "backend/scene/objects.h"
 #include "backend/scene/scene.h"
 #include "backend/scene/threaddata.h"

@@ -43,6 +43,8 @@
 #include "backend/frame.h"
 #include "backend/shape/isosurf.h"
 
+#include "backend/math/matrices.h"
+#include "backend/render/ray.h"
 #include "backend/scene/objects.h"
 #include "backend/scene/scene.h"
 #include "backend/scene/threaddata.h"
@@ -126,7 +128,7 @@ bool IsoSurface::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
 
         if(closed != false)
         {
-            VEvaluateRay(VTmp, Plocal, Depth1, Dlocal);
+            VTmp = Plocal + Depth1 * Dlocal;
             tmp = Vector_Function(Thread->functionContext, VTmp);
             if(Depth1 > accuracy)
             {
@@ -147,12 +149,12 @@ bool IsoSurface::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
                 if(tmp < (maxg * accuracy * 4.0))
                 {
                     Depth1 = accuracy * 5.0;
-                    VEvaluateRay(VTmp, Plocal, Depth1, Dlocal);
+                    VTmp = Plocal + Depth1 * Dlocal;
                     if(Vector_Function(Thread->functionContext, VTmp) < 0)
                         Thread->isosurfaceData->Inv3 = -1;
                     /* Change the sign of the function (IPoint is in the bounding shpae.)*/
                 }
-                VEvaluateRay(VTmp, Plocal, Depth2, Dlocal);
+                VTmp = Plocal + Depth2 * Dlocal;
                 if(Vector_Function(Thread->functionContext, VTmp) < 0.0)
                 {
                     IPoint = ray.Evaluate(Depth2);
@@ -178,11 +180,11 @@ bool IsoSurface::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
         if((Depth1 < accuracy) && (Thread->isosurfaceData->Inv3 == 1))
         {
             /* IPoint is on the isosurface */
-            VEvaluateRay(VTmp, Plocal, tmin, Dlocal);
+            VTmp = Plocal + tmin * Dlocal;
             if(fabs(Vector_Function(Thread->functionContext, VTmp)) < (maxg * accuracy * 4.0))
             {
                 tmin = accuracy * 5.0;
-                VEvaluateRay(VTmp, Plocal, tmin, Dlocal);
+                VTmp = Plocal + tmin * Dlocal;
                 if(Vector_Function(Thread->functionContext, VTmp) < 0)
                     Thread->isosurfaceData->Inv3 = -1;
                 /* change the sign and go into the isosurface */
@@ -792,10 +794,10 @@ bool IsoSurface::Function_Find_Root(ISO_ThreadData& itd, const Vector3d& PP, con
     if((itd.cache == true) && (itd.current == this))
     {
         itd.ctx->threaddata->Stats()[Ray_IsoSurface_Cache]++;
-        VEvaluateRay(VTmp, PP, *Depth1, DD);
+        VTmp = PP + *Depth1 * DD;
         VTmp -= itd.Pglobal;
         l_b = VTmp.length();
-        VEvaluateRay(VTmp, PP, *Depth2, DD);
+        VTmp = PP + *Depth2 * DD;
         VTmp -= itd.Dglobal;
         l_e = VTmp.length();
         if((itd.fmax - maxg * max(l_b, l_e)) > 0.0)
@@ -850,8 +852,8 @@ bool IsoSurface::Function_Find_Root(ISO_ThreadData& itd, const Vector3d& PP, con
     else if(!in_shadow_test)
     {
         itd.cache = true;
-        VEvaluateRay(itd.Pglobal, PP, EP1.t, DD);
-        VEvaluateRay(itd.Dglobal, PP, EP2.t, DD);
+        itd.Pglobal = PP + EP1.t * DD;
+        itd.Dglobal = PP + EP2.t * DD;
         itd.current = this;
 
         return false;
@@ -992,7 +994,7 @@ DBL IsoSurface::Float_Function(ISO_ThreadData& itd, DBL t) const
 {
     Vector3d VTmp;
 
-    VEvaluateRay(VTmp, itd.Pglobal, t, itd.Dglobal);
+    VTmp = itd.Pglobal + t * itd.Dglobal;
 
     return ((DBL)itd.Inv3 * (Evaluate_Function(itd.ctx, *Function, VTmp) - threshold));
 }

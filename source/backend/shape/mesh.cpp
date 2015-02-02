@@ -4,7 +4,7 @@
 ///
 /// This module implements primitives for mesh objects.
 ///
-/// This module was written by Dieter Bayer [DB].
+/// @author Dieter Bayer
 ///
 /// @copyright
 /// @parblock
@@ -66,7 +66,7 @@
 
 #include "backend/bounding/bbox.h"
 #include "backend/math/matrices.h"
-#include "backend/math/vector.h"
+#include "backend/render/ray.h"
 #include "backend/scene/objects.h"
 #include "backend/scene/threaddata.h"
 #include "backend/shape/triangle.h"

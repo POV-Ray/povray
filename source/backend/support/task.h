@@ -36,8 +36,8 @@
 #ifndef POVRAY_BACKEND_TASK_H
 #define POVRAY_BACKEND_TASK_H
 
-#include <vector>
 #include <queue>
+#include <vector>
 
 #include <boost/thread.hpp>
 #include <boost/function.hpp>
@@ -46,7 +46,6 @@
 
 #include "backend/control/messagefactory.h"
 #include "backend/control/renderbackend.h"
-#include "base/pov_err.h"
 #include "base/timer.h"
 
 namespace pov

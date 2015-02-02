@@ -4,10 +4,8 @@
 ///
 /// This module implements functions that manipulate blobs.
 ///
-/// The original file was written by Alexander Enzmann.
-/// He wrote the code for blobs and generously provided us these enhancements.
-///
-/// Modifications and enhancements by Dieter Bayer [DB].
+/// @author Alexander Enzmann (original file)
+/// @author Dieter Bayer (modifications and enhancements)
 ///
 /// @copyright
 /// @parblock
@@ -106,7 +104,7 @@
 #include "backend/bounding/bsphere.h"
 #include "backend/math/matrices.h"
 #include "backend/math/polysolv.h"
-#include "backend/math/vector.h"
+#include "backend/render/ray.h"
 #include "backend/scene/objects.h"
 #include "backend/scene/threaddata.h"
 #include "backend/texture/texture.h"

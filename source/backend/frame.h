@@ -5,13 +5,13 @@
 /// Generic header for all back-end modules.
 ///
 /// This header file is included by all C++ modules in the POV-Ray back-end.
-/// It defines all globally-accessible types and constants.
+/// It defines various ubiquitous types and constants.
 ///
 /// @copyright
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -56,14 +56,11 @@
 #include <stack>
 #include <vector>
 
-#include "base/colour.h"
 #include "base/configbase.h"
-#include "base/types.h"
-#include "base/image/colourspace.h"
-
 #include "backend/configbackend.h"
-#include "backend/colour/spectral.h"
-#include "backend/support/simplevector.h"
+
+#include "base/colour.h"
+#include "base/types.h"
 
 #include "pov_mem.h"
 
@@ -105,6 +102,8 @@ using std::tanh;
 /// @{
 ///
 /// These defines affect the maximum size of some types based on @ref pov::FixedSimpleVector.
+///
+/// @todo these sizes will need tweaking.
 
 #ifndef MEDIA_VECTOR_SIZE
 #define MEDIA_VECTOR_SIZE               256
@@ -154,6 +153,9 @@ class Ray;
 class SceneThreadData;
 typedef SceneThreadData TraceThreadData;
 
+typedef struct Transform_Struct TRANSFORM;
+
+
 /// @}
 ///
 //******************************************************************************
@@ -161,10 +163,6 @@ typedef SceneThreadData TraceThreadData;
 /// @name Scalar, Colour and Vector Stuff
 ///
 /// @{
-
-typedef DBL VECTOR_4D[4]; ///< @todo       Make this obsolete.
-typedef DBL MATRIX[4][4]; ///< @todo       Make this obsolete.
-typedef DBL EXPRESS[5];   ///< @todo       Make this obsolete.
 
 /// 2D Vector array elements.
 /// @deprecated When using @ref pov::GenericVector2d, call the x() and y() access functions
@@ -201,21 +199,7 @@ enum
     pTRANSM = 4
 };
 
-inline void Assign_Vector_4D(VECTOR_4D d, const VECTOR_4D s)
-{
-    d[X] = s[X];
-    d[Y] = s[Y];
-    d[Z] = s[Z];
-    d[T] = s[T];
-}
-
 inline void Destroy_Float(DBL *x)
-{
-    if(x != NULL)
-        POV_FREE(x);
-}
-
-inline void Destroy_Vector_4D(VECTOR_4D *x)
 {
     if(x != NULL)
         POV_FREE(x);
@@ -263,7 +247,7 @@ class GenericVector2d
             vect[Y] = y;
         }
 
-        inline explicit GenericVector2d(const EXPRESS vi)
+        inline explicit GenericVector2d(const T* vi)
         {
             vect[X] = T(vi[X]);
             vect[Y] = T(vi[Y]);
@@ -479,7 +463,7 @@ class GenericVector3d
             vect[Z] = z;
         }
 
-        inline explicit GenericVector3d(const EXPRESS vi)
+        inline explicit GenericVector3d(const T* vi)
         {
             vect[X] = T(vi[X]);
             vect[Y] = T(vi[Y]);
@@ -879,25 +863,6 @@ struct MinMaxBoundingBox
 ///
 //******************************************************************************
 ///
-/// @name Transformation Stuff
-/// @{
-
-#if 0
-#pragma mark * Transform
-#endif
-
-typedef struct Transform_Struct TRANSFORM;
-
-struct Transform_Struct
-{
-    MATRIX matrix;
-    MATRIX inverse;
-};
-
-/// @}
-///
-//******************************************************************************
-///
 /// @name Blend Map Stuff
 /// @{
 
@@ -947,139 +912,6 @@ class BlendMap
         unsigned char   Type;
         Vector          Blend_Map_Entries;
 };
-
-
-/// Common interface for pigment-like blend maps.
-/// 
-/// This class provides the common interface for both pigment and colour blend maps.
-///
-class GenericPigmentBlendMap
-{
-    public:
-
-        int             blendMode;
-        GammaCurvePtr   blendGamma;
-
-        GenericPigmentBlendMap() : blendMode(0), blendGamma() {}
-        virtual ~GenericPigmentBlendMap() {}
-
-        virtual bool Compute(TransColour& colour, DBL value, const Vector3d& IPoint, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread) = 0;
-        virtual void ComputeAverage(TransColour& colour, const Vector3d& EPoint, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread) = 0;
-        virtual bool ComputeUVMapped(TransColour& colour, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread) = 0;
-        virtual void ConvertFilterToTransmit() = 0; ///< @deprecated Only used for backward compatibility with version 3.10 or earlier.
-        virtual void Post(bool& rHasFilter) = 0;
-
-        void Blend(TransColour& result, const TransColour& colour1, DBL weight1, const TransColour& colour2, DBL weight2, TraceThreadData *thread);
-};
-
-/// Colour blend map.
-class ColourBlendMap : public BlendMap<TransColour>, public GenericPigmentBlendMap
-{
-    public:
-
-        ColourBlendMap();
-        ColourBlendMap(int n, const Entry aEntries[]);
-
-        virtual bool Compute(TransColour& colour, DBL value, const Vector3d& IPoint, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread);
-        virtual void ComputeAverage(TransColour& colour, const Vector3d& EPoint, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread);
-        virtual bool ComputeUVMapped(TransColour& colour, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread);
-        virtual void ConvertFilterToTransmit(); ///< @deprecated Only used for backward compatibility with version 3.10 or earlier.
-        virtual void Post(bool& rHasFilter);
-};
-
-/// Pigment blend map.
-class PigmentBlendMap : public BlendMap<PIGMENT*>, public GenericPigmentBlendMap
-{
-    public:
-
-        PigmentBlendMap(int type);
-        virtual ~PigmentBlendMap();
-
-        virtual bool Compute(TransColour& colour, DBL value, const Vector3d& IPoint, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread);
-        virtual void ComputeAverage(TransColour& colour, const Vector3d& EPoint, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread);
-        virtual bool ComputeUVMapped(TransColour& colour, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread);
-        virtual void ConvertFilterToTransmit(); ///< @deprecated Only used for backward compatibility with version 3.10 or earlier.
-        virtual void Post(bool& rHasFilter);
-};
-
-
-/// Common interface for normal-like blend maps.
-/// 
-/// This purely abstract class provides the common interface for both normal and slope blend maps.
-///
-/// @note   This class is used in a multiple inheritance hierarchy, and therefore must continue to be purely abstract.
-///
-class GenericNormalBlendMap
-{
-    public:
-
-        virtual ~GenericNormalBlendMap() {}
-
-        virtual void Post(bool dontScaleBumps) = 0;
-        virtual void ComputeAverage (const Vector3d& EPoint, Vector3d& normal, Intersection *Inter, const Ray *ray, TraceThreadData *Thread) = 0;
-};
-
-class SlopeBlendMap : public BlendMap<Vector2d>, public GenericNormalBlendMap
-{
-    public:
-
-        SlopeBlendMap();
-        virtual ~SlopeBlendMap();
-
-        virtual void Post(bool dontScaleBumps);
-        virtual void ComputeAverage (const Vector3d& EPoint, Vector3d& normal, Intersection *Inter, const Ray *ray, TraceThreadData *Thread);
-};
-
-class NormalBlendMap : public BlendMap<TNORMAL*>, public GenericNormalBlendMap
-{
-    public:
-
-        NormalBlendMap();
-        virtual ~NormalBlendMap();
-
-        virtual void Post(bool dontScaleBumps);
-        virtual void ComputeAverage (const Vector3d& EPoint, Vector3d& normal, Intersection *Inter, const Ray *ray, TraceThreadData *Thread);
-};
-
-
-/// Texture blend map.
-class TextureBlendMap : public BlendMap<TexturePtr>
-{
-    public:
-
-        TextureBlendMap();
-        ~TextureBlendMap();
-};
-
-typedef shared_ptr<GenericPigmentBlendMap>          GenericPigmentBlendMapPtr;
-typedef shared_ptr<const GenericPigmentBlendMap>    GenericPigmentBlendMapConstPtr;
-
-typedef PIGMENT*                                    PigmentBlendMapData;
-typedef BlendMapEntry<PigmentBlendMapData>          PigmentBlendMapEntry;
-typedef shared_ptr<PigmentBlendMap>                 PigmentBlendMapPtr;
-typedef shared_ptr<const PigmentBlendMap>           PigmentBlendMapConstPtr;
-
-typedef TransColour                                 ColourBlendMapData;
-typedef BlendMapEntry<ColourBlendMapData>           ColourBlendMapEntry;
-typedef shared_ptr<ColourBlendMap>                  ColourBlendMapPtr;
-typedef shared_ptr<const ColourBlendMap>            ColourBlendMapConstPtr;
-
-typedef shared_ptr<GenericNormalBlendMap>           GenericNormalBlendMapPtr;
-typedef shared_ptr<const GenericNormalBlendMap>     GenericNormalBlendMapConstPtr;
-
-typedef Vector2d                                    SlopeBlendMapData;
-typedef BlendMapEntry<SlopeBlendMapData>            SlopeBlendMapEntry;
-typedef shared_ptr<SlopeBlendMap>                   SlopeBlendMapPtr;
-typedef shared_ptr<const SlopeBlendMap>             SlopeBlendMapConstPtr;
-
-typedef TNORMAL*                                    NormalBlendMapData;
-typedef BlendMapEntry<NormalBlendMapData>           NormalBlendMapEntry;
-typedef shared_ptr<NormalBlendMap>                  NormalBlendMapPtr;
-typedef shared_ptr<const NormalBlendMap>            NormalBlendMapConstPtr;
-
-typedef BlendMapEntry<TexturePtr>                   TextureBlendMapEntry;
-typedef shared_ptr<TextureBlendMap>                 TextureBlendMapPtr;
-typedef shared_ptr<const TextureBlendMap>           TextureBlendMapConstPtr;
 
 /// @}
 ///
@@ -1269,31 +1101,6 @@ struct Pattern_Struct
     PatternPtr pattern;
 };
 
-struct Pigment_Struct : public Pattern_Struct
-{
-    shared_ptr<GenericPigmentBlendMap> Blend_Map;
-    TransColour colour;       // may have a filter/transmit component
-    TransColour Quick_Colour; // may have a filter/transmit component    // TODO - can't we decide between regular colour and quick_colour at parse time already?
-};
-
-struct Tnormal_Struct : public Pattern_Struct
-{
-    GenericNormalBlendMapPtr Blend_Map;
-    SNGL Amount;
-    SNGL Delta; // NK delta
-};
-
-struct Texture_Struct : public Pattern_Struct
-{
-    TextureBlendMapPtr Blend_Map;
-    int References;
-    TEXTURE *Next;
-    PIGMENT *Pigment;
-    TNORMAL *Tnormal;
-    FINISH *Finish;
-    vector<TEXTURE*> Materials; // used for BITMAP_PATTERN (and only there)
-};
-
 struct Finish_Struct
 {
     SNGL Diffuse, DiffuseBack, Brilliance, BrillianceOut, BrillianceAdjust, BrillianceAdjustRad;
@@ -1404,19 +1211,6 @@ class Ref
         Ref(const Ref&);
         Ref& operator=(Ref&);
 };
-
-struct WeightedTexture
-{
-    COLC weight;
-    TEXTURE *texture;
-
-    WeightedTexture(COLC w, TEXTURE *t) :
-        weight(w), texture(t) { }
-};
-
-// TODO: these sizes will need tweaking.
-typedef FixedSimpleVector<WeightedTexture, WEIGHTEDTEXTURE_VECTOR_SIZE> WeightedTextureVector;
-typedef FixedSimpleVector<Interior *, RAYINTERIOR_VECTOR_SIZE> RayInteriorVector;
 
 class ObjectDebugHelper
 {
@@ -1624,72 +1418,7 @@ struct BasicRay
 
 struct TraceTicket;
 
-class Ray : public BasicRay
-{
-    public:
-
-        enum RayType
-        {
-            OtherRay = 0,
-            PrimaryRay = 1,
-            ReflectionRay = 2,
-            RefractionRay = 3,
-            SubsurfaceRay = 4,  ///< Ray is shot from just below a surface; very close intersections shall not be suppressed.
-        };
-
-        Ray(TraceTicket& ticket, RayType rt = PrimaryRay, bool shadowTest = false, bool photon = false, bool radiosity = false, bool monochromatic = false, bool pretrace = false);
-        Ray(TraceTicket& ticket, const Vector3d& ov, const Vector3d& dv, RayType rt = PrimaryRay, bool shadowTest = false, bool photon = false, bool radiosity = false, bool monochromatic = false, bool pretrace = false);
-        ~Ray();
-
-        void AppendInterior(Interior *i);
-        void AppendInteriors(RayInteriorVector&);
-        bool RemoveInterior(const Interior *i);
-        void ClearInteriors() { interiors.clear(); }
-
-        bool IsInterior(const Interior *i) const;
-        const RayInteriorVector& GetInteriors() const { return interiors; }
-        RayInteriorVector& GetInteriors() { return interiors; }
-
-        void SetSpectralBand(const SpectralBand&);
-        const SpectralBand& GetSpectralBand() const;
-
-        void SetFlags(RayType rt, bool shadowTest = false, bool photon = false, bool radiosity = false, bool monochromatic = false, bool pretrace = false);
-        void SetFlags(RayType rt, const Ray& other);
-
-        bool IsPrimaryRay() const { return primaryRay; }
-        bool IsImageRay() const { return primaryRay || (refractionRay && !reflectionRay); }
-        bool IsReflectionRay() const { return reflectionRay; }
-        bool IsRefractionRay() const { return refractionRay; }
-        bool IsSubsurfaceRay() const { return subsurfaceRay; }
-        bool IsShadowTestRay() const { return shadowTestRay; }
-        bool IsPhotonRay() const { return photonRay; }
-        bool IsRadiosityRay() const { return radiosityRay; }
-        bool IsMonochromaticRay() const { return monochromaticRay; }
-        bool IsHollowRay() const { return hollowRay; }
-        bool IsPretraceRay() const { return pretraceRay; }
-
-        bool Inside(const BoundingBox& bbox) const { return Inside_BBox(Origin, bbox); }
-
-        inline TraceTicket& GetTicket() { return ticket; }
-        inline const TraceTicket& GetTicket() const { return ticket; }
-
-    private:
-
-        RayInteriorVector interiors;
-        SpectralBand spectralBand;
-        TraceTicket& ticket;
-
-        bool primaryRay : 1;
-        bool reflectionRay : 1;
-        bool refractionRay : 1;
-        bool subsurfaceRay : 1;
-        bool shadowTestRay : 1;
-        bool photonRay : 1;
-        bool radiosityRay : 1;
-        bool monochromaticRay : 1;
-        bool hollowRay : 1;
-        bool pretraceRay : 1;
-};
+class Ray;
 
 struct RayObjectCondition
 {

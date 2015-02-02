@@ -41,10 +41,11 @@
 
 #include "backend/bounding/bbox.h"
 #include "backend/math/matrices.h"
-#include "backend/math/vector.h"
+#include "backend/render/ray.h"
 #include "backend/scene/objects.h"
 #include "backend/scene/threaddata.h"
 #include "backend/shape/hfield.h"
+#include "backend/shape/planes.h"
 #include "backend/shape/quadrics.h"
 #include "lightgrp.h" // TODO
 

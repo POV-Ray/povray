@@ -4,7 +4,7 @@
 ///
 /// This module implements functions that manipulate polygons.
 ///
-/// This module was written by Dieter Bayer [DB].
+/// @author Dieter Bayer
 ///
 /// @copyright
 /// @parblock
@@ -65,7 +65,7 @@
 #include "backend/shape/polygon.h"
 
 #include "backend/math/matrices.h"
-#include "backend/math/vector.h"
+#include "backend/render/ray.h"
 #include "backend/scene/objects.h"
 #include "backend/scene/threaddata.h"
 #include "base/pov_err.h"

@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -50,6 +50,7 @@
 #endif
 
 #include "backend/frame.h"
+#include "backend/texture/pigment.h"
 #include "base/fileinputoutput.h"
 
 namespace pov
@@ -180,7 +181,7 @@ class ImageData;
 ///         avoid excessive changes to the parser and render engine during the refactoring process, and was deemed
 ///         acceptable because:
 ///           - These data fields do not represent any state information, but rather simple configuration parameters.
-///           - None of the current implementations stores any interim results computed from these parameters.    
+///           - None of the current implementations stores any interim results computed from these parameters.
 ///           .
 ///         Changing these parameters directly at run-time is therefore a safe operation.
 ///
@@ -214,7 +215,7 @@ struct BasicPattern
     int GetNoiseGen(const TraceThreadData *pThread) const;
 
     /// Generates an independent copy of this pattern.
-    /// 
+    ///
     /// This method effectively serves as a virtual copy constructor. Every derived class must override it with the
     /// following implementation:
     ///
@@ -265,7 +266,7 @@ struct BasicPattern
     virtual ColourBlendMapConstPtr GetDefaultBlendMap() const;
 
     /// Number of discrete colours, textures, or whatever, from which the pattern will select.
-    /// 
+    ///
     /// This function will be called by future parsers to determine the possible discrete values returned by this
     /// pattern, or whether the pattern is contiguous.
     ///
@@ -516,7 +517,7 @@ struct FractalPattern : public ContinuousPattern
     DBL exteriorFactor;
 
     /// A parameter to the algorithm for colouring the interior of the fractal.
-    DBL interiorFactor; 
+    DBL interiorFactor;
 
     /// Determines the algorithm to colour the exterior of the fractal.
     unsigned char exteriorType;

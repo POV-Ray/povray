@@ -1,44 +1,47 @@
-/*******************************************************************************
- * discs.cpp
- *
- * This module implements the disc primitive.
- * This file was written by Alexander Enzmann.  He wrote the code for
- * discs and generously provided us these enhancements.
- *
- * ---------------------------------------------------------------------------
- * Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
- * Copyright 1991-2013 Persistence of Vision Raytracer Pty. Ltd.
- *
- * POV-Ray is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * POV-Ray is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------------
- * POV-Ray is based on the popular DKB raytracer version 2.12.
- * DKBTrace was originally written by David K. Buck.
- * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
- * ---------------------------------------------------------------------------
- * $File: //depot/povray/smp/source/backend/shape/discs.cpp $
- * $Revision: #33 $
- * $Change: 6164 $
- * $DateTime: 2013/12/09 17:21:04 $
- * $Author: clipka $
- *******************************************************************************/
+//******************************************************************************
+///
+/// @file backend/shape/discs.cpp
+///
+/// This module implements the disc primitive.
+///
+/// @author Alexander Enzmann
+///
+/// @copyright
+/// @parblock
+///
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+///
+/// POV-Ray is free software: you can redistribute it and/or modify
+/// it under the terms of the GNU Affero General Public License as
+/// published by the Free Software Foundation, either version 3 of the
+/// License, or (at your option) any later version.
+///
+/// POV-Ray is distributed in the hope that it will be useful,
+/// but WITHOUT ANY WARRANTY; without even the implied warranty of
+/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+/// GNU Affero General Public License for more details.
+///
+/// You should have received a copy of the GNU Affero General Public License
+/// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+///
+/// ----------------------------------------------------------------------------
+///
+/// POV-Ray is based on the popular DKB raytracer version 2.12.
+/// DKBTrace was originally written by David K. Buck.
+/// DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
+///
+/// @endparblock
+///
+//******************************************************************************
 
 // frame.h must always be the first POV file included (pulls in platform config)
 #include "backend/frame.h"
-#include "backend/math/vector.h"
-#include "backend/bounding/bbox.h"
 #include "backend/shape/discs.h"
+
+#include "backend/bounding/bbox.h"
 #include "backend/math/matrices.h"
+#include "backend/render/ray.h"
 #include "backend/scene/objects.h"
 #include "backend/scene/threaddata.h"
 
@@ -57,15 +60,15 @@ const DBL DEPTH_TOLERANCE = 1.0e-6;
 *   All_Disc_Intersections
 *
 * INPUT
-*   
+*
 * OUTPUT
-*   
+*
 * RETURNS
-*   
+*
 * AUTHOR
 *
 *   Alexander Enzmann
-*   
+*
 * DESCRIPTION
 *
 *   -
@@ -78,26 +81,26 @@ const DBL DEPTH_TOLERANCE = 1.0e-6;
 
 bool Disc::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread)
 {
-	int Intersection_Found;
-	DBL Depth;
-	Vector3d IPoint;
+    int Intersection_Found;
+    DBL Depth;
+    Vector3d IPoint;
 
-	Intersection_Found = false;
+    Intersection_Found = false;
 
-	Thread->Stats()[Ray_Disc_Tests]++;
-	if (Intersect(ray, &Depth))
-	{
-		Thread->Stats()[Ray_Disc_Tests_Succeeded]++;
-		IPoint = ray.Evaluate(Depth);
+    Thread->Stats()[Ray_Disc_Tests]++;
+    if (Intersect(ray, &Depth))
+    {
+        Thread->Stats()[Ray_Disc_Tests_Succeeded]++;
+        IPoint = ray.Evaluate(Depth);
 
-		if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
-		{
-			Depth_Stack->push(Intersection(Depth,IPoint,this));
-			Intersection_Found = true;
-		}
-	}
+        if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
+        {
+            Depth_Stack->push(Intersection(Depth,IPoint,this));
+            Intersection_Found = true;
+        }
+    }
 
-	return (Intersection_Found);
+    return (Intersection_Found);
 }
 
 
@@ -130,39 +133,39 @@ bool Disc::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDat
 
 bool Disc::Intersect(const BasicRay& ray, DBL *Depth) const
 {
-	DBL t, u, v, r2, len;
-	Vector3d P, D;
+    DBL t, u, v, r2, len;
+    Vector3d P, D;
 
-	/* Transform the point into the discs space */
+    /* Transform the point into the discs space */
 
-	MInvTransPoint(P, ray.Origin, Trans);
-	MInvTransDirection(D, ray.Direction, Trans);
+    MInvTransPoint(P, ray.Origin, Trans);
+    MInvTransDirection(D, ray.Direction, Trans);
 
-	len = D.length();
-	D /= len;
+    len = D.length();
+    D /= len;
 
-	if (fabs(D[Z]) > EPSILON)
-	{
-		t = -P[Z] / D[Z];
+    if (fabs(D[Z]) > EPSILON)
+    {
+        t = -P[Z] / D[Z];
 
-		if (t >= 0.0)
-		{
-			u = P[X] + t * D[X];
-			v = P[Y] + t * D[Y];
+        if (t >= 0.0)
+        {
+            u = P[X] + t * D[X];
+            v = P[Y] + t * D[Y];
 
-			r2 = Sqr(u) + Sqr(v);
+            r2 = Sqr(u) + Sqr(v);
 
-			if ((r2 >= iradius2) && (r2 <= oradius2))
-			{
-				*Depth = t / len;
+            if ((r2 >= iradius2) && (r2 <= oradius2))
+            {
+                *Depth = t / len;
 
-				if ((*Depth > DEPTH_TOLERANCE) && (*Depth < MAX_DISTANCE))
-					return (true);
-			}
-		}
-	}
+                if ((*Depth > DEPTH_TOLERANCE) && (*Depth < MAX_DISTANCE))
+                    return (true);
+            }
+        }
+    }
 
-	return (false);
+    return (false);
 }
 
 
@@ -195,24 +198,24 @@ bool Disc::Intersect(const BasicRay& ray, DBL *Depth) const
 
 bool Disc::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 {
-	Vector3d New_Point;
+    Vector3d New_Point;
 
-	/* Transform the point into the discs space */
+    /* Transform the point into the discs space */
 
-	MInvTransPoint(New_Point, IPoint, Trans);
+    MInvTransPoint(New_Point, IPoint, Trans);
 
-	if (New_Point[Z] >= 0.0)
-	{
-		/* We are outside. */
+    if (New_Point[Z] >= 0.0)
+    {
+        /* We are outside. */
 
-		return (Test_Flag(this, INVERTED_FLAG));
-	}
-	else
-	{
-		/* We are inside. */
+        return (Test_Flag(this, INVERTED_FLAG));
+    }
+    else
+    {
+        /* We are inside. */
 
-		return (!Test_Flag(this, INVERTED_FLAG));
-	}
+        return (!Test_Flag(this, INVERTED_FLAG));
+    }
 }
 
 
@@ -245,7 +248,7 @@ bool Disc::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 
 void Disc::Normal(Vector3d& Result, Intersection *, TraceThreadData *) const
 {
-	Result = normal;
+    Result = normal;
 }
 
 
@@ -278,7 +281,7 @@ void Disc::Normal(Vector3d& Result, Intersection *, TraceThreadData *) const
 
 void Disc::Translate(const Vector3d&, const TRANSFORM *tr)
 {
-	Transform(tr);
+    Transform(tr);
 }
 
 
@@ -311,7 +314,7 @@ void Disc::Translate(const Vector3d&, const TRANSFORM *tr)
 
 void Disc::Rotate(const Vector3d&, const TRANSFORM *tr)
 {
-	Transform(tr);
+    Transform(tr);
 }
 
 
@@ -344,7 +347,7 @@ void Disc::Rotate(const Vector3d&, const TRANSFORM *tr)
 
 void Disc::Scale(const Vector3d&, const TRANSFORM *tr)
 {
-	Transform(tr);
+    Transform(tr);
 }
 
 
@@ -377,15 +380,15 @@ void Disc::Scale(const Vector3d&, const TRANSFORM *tr)
 
 void Disc::Transform(const TRANSFORM *tr)
 {
-	MTransNormal(normal, normal, tr);
+    MTransNormal(normal, normal, tr);
 
-	normal.normalize();
+    normal.normalize();
 
-	Compose_Transforms(Trans, tr);
+    Compose_Transforms(Trans, tr);
 
-	/* Recalculate the bounds */
+    /* Recalculate the bounds */
 
-	Compute_BBox();
+    Compute_BBox();
 }
 
 
@@ -418,19 +421,19 @@ void Disc::Transform(const TRANSFORM *tr)
 
 Disc::Disc() : ObjectBase(DISC_OBJECT)
 {
-	center = Vector3d(0.0, 0.0, 0.0);
-	normal = Vector3d(0.0, 0.0, 1.0);
+    center = Vector3d(0.0, 0.0, 0.0);
+    normal = Vector3d(0.0, 0.0, 1.0);
 
-	iradius2 = 0.0;
-	oradius2 = 1.0;
+    iradius2 = 0.0;
+    oradius2 = 1.0;
 
-	d = 0.0;
+    d = 0.0;
 
-	Trans = Create_Transform();
+    Trans = Create_Transform();
 
-	/* Default bounds */
+    /* Default bounds */
 
-	Make_BBox(BBox, -1.0, -1.0, -SMALL_TOLERANCE, 2.0,  2.0, 2.0 * SMALL_TOLERANCE);
+    Make_BBox(BBox, -1.0, -1.0, -SMALL_TOLERANCE, 2.0,  2.0, 2.0 * SMALL_TOLERANCE);
 }
 
 
@@ -463,12 +466,12 @@ Disc::Disc() : ObjectBase(DISC_OBJECT)
 
 ObjectPtr Disc::Copy()
 {
-	Disc *New = new Disc();
-	Destroy_Transform(New->Trans);
-	*New = *this;
-	New->Trans = Copy_Transform(Trans);
+    Disc *New = new Disc();
+    Destroy_Transform(New->Trans);
+    *New = *this;
+    New->Trans = Copy_Transform(Trans);
 
-	return (New);
+    return (New);
 }
 
 
@@ -501,7 +504,7 @@ ObjectPtr Disc::Copy()
 
 Disc::~Disc()
 {
-	Destroy_Transform(Trans);
+    Destroy_Transform(Trans);
 }
 
 
@@ -539,9 +542,9 @@ Disc::~Disc()
 
 void Disc::Compute_Disc()
 {
-	Compute_Coordinate_Transform(Trans, center, normal, 1.0, 1.0);
+    Compute_Coordinate_Transform(Trans, center, normal, 1.0, 1.0);
 
-	Compute_BBox();
+    Compute_BBox();
 }
 
 
@@ -578,13 +581,13 @@ void Disc::Compute_Disc()
 
 void Disc::Compute_BBox()
 {
-	DBL rad;
+    DBL rad;
 
-	rad = sqrt(oradius2);
+    rad = sqrt(oradius2);
 
-	Make_BBox(BBox, -rad, -rad, -SMALL_TOLERANCE, 2.0*rad, 2.0*rad, 2.0*SMALL_TOLERANCE);
+    Make_BBox(BBox, -rad, -rad, -SMALL_TOLERANCE, 2.0*rad, 2.0*rad, 2.0*SMALL_TOLERANCE);
 
-	Recompute_BBox(&BBox, Trans);
+    Recompute_BBox(&BBox, Trans);
 }
 
 }

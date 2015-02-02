@@ -1,44 +1,47 @@
-/*******************************************************************************
- * cones.cpp
- *
- * This module implements the cone primitive.
- * This file was written by Alexander Enzmann.    He wrote the code for
- * cones and generously provided us these enhancements.
- *
- * ---------------------------------------------------------------------------
- * Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
- * Copyright 1991-2013 Persistence of Vision Raytracer Pty. Ltd.
- *
- * POV-Ray is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * POV-Ray is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------------
- * POV-Ray is based on the popular DKB raytracer version 2.12.
- * DKBTrace was originally written by David K. Buck.
- * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
- * ---------------------------------------------------------------------------
- * $File: //depot/povray/smp/source/backend/shape/cones.cpp $
- * $Revision: #42 $
- * $Change: 6164 $
- * $DateTime: 2013/12/09 17:21:04 $
- * $Author: clipka $
- *******************************************************************************/
+//******************************************************************************
+///
+/// @file backend/shape/cones.cpp
+///
+/// This module implements the cone primitive.
+///
+/// @author Alexander Enzmann
+///
+/// @copyright
+/// @parblock
+///
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+///
+/// POV-Ray is free software: you can redistribute it and/or modify
+/// it under the terms of the GNU Affero General Public License as
+/// published by the Free Software Foundation, either version 3 of the
+/// License, or (at your option) any later version.
+///
+/// POV-Ray is distributed in the hope that it will be useful,
+/// but WITHOUT ANY WARRANTY; without even the implied warranty of
+/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+/// GNU Affero General Public License for more details.
+///
+/// You should have received a copy of the GNU Affero General Public License
+/// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+///
+/// ----------------------------------------------------------------------------
+///
+/// POV-Ray is based on the popular DKB raytracer version 2.12.
+/// DKBTrace was originally written by David K. Buck.
+/// DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
+///
+/// @endparblock
+///
+//******************************************************************************
 
 // frame.h must always be the first POV file included (pulls in platform config)
 #include "backend/frame.h"
-#include "backend/math/vector.h"
-#include "backend/bounding/bbox.h"
 #include "backend/shape/cones.h"
+
+#include "backend/bounding/bbox.h"
 #include "backend/math/matrices.h"
+#include "backend/render/ray.h"
 #include "backend/scene/objects.h"
 #include "backend/scene/threaddata.h"
 #include "base/pov_err.h"
@@ -72,15 +75,15 @@ const int SIDE_HIT = 3;
 *   All_Cone_Intersections
 *
 * INPUT
-*   
+*
 * OUTPUT
-*   
+*
 * RETURNS
-*   
+*
 * AUTHOR
 *
 *   Alexander Enzmann
-*   
+*
 * DESCRIPTION
 *
 *   -
@@ -93,27 +96,27 @@ const int SIDE_HIT = 3;
 
 bool Cone::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread)
 {
-	int Intersection_Found, cnt, i;
-	Vector3d IPoint;
-	CONE_INT I[4];
+    int Intersection_Found, cnt, i;
+    Vector3d IPoint;
+    CONE_INT I[4];
 
-	Intersection_Found = false;
+    Intersection_Found = false;
 
-	if ((cnt = Intersect(ray, I, Thread)) != 0)
-	{
-		for (i = 0; i < cnt; i++)
-		{
-			IPoint = ray.Evaluate(I[i].d);
+    if ((cnt = Intersect(ray, I, Thread)) != 0)
+    {
+        for (i = 0; i < cnt; i++)
+        {
+            IPoint = ray.Evaluate(I[i].d);
 
-			if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
-			{
-				Depth_Stack->push(Intersection(I[i].d,IPoint,this,I[i].t));
-				Intersection_Found = true;
-			}
-		}
-	}
+            if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
+            {
+                Depth_Stack->push(Intersection(I[i].d,IPoint,this,I[i].t));
+                Intersection_Found = true;
+            }
+        }
+    }
 
-	return (Intersection_Found);
+    return (Intersection_Found);
 }
 
 
@@ -125,15 +128,15 @@ bool Cone::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDat
 *   intersect_cone
 *
 * INPUT
-*   
+*
 * OUTPUT
-*   
+*
 * RETURNS
-*   
+*
 * AUTHOR
 *
 *   Alexander Enzmann
-*   
+*
 * DESCRIPTION
 *
 *   -
@@ -146,151 +149,151 @@ bool Cone::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDat
 
 int Cone::Intersect(const BasicRay& ray, CONE_INT *Intersection, TraceThreadData *Thread) const
 {
-	int i = 0;
-	DBL a, b, c, z, t1, t2, len;
-	DBL d;
-	Vector3d P, D;
+    int i = 0;
+    DBL a, b, c, z, t1, t2, len;
+    DBL d;
+    Vector3d P, D;
 
-	Thread->Stats()[Ray_Cone_Tests]++;
+    Thread->Stats()[Ray_Cone_Tests]++;
 
-	/* Transform the ray into the cones space */
+    /* Transform the ray into the cones space */
 
-	MInvTransPoint(P, ray.Origin, Trans);
-	MInvTransDirection(D, ray.Direction, Trans);
+    MInvTransPoint(P, ray.Origin, Trans);
+    MInvTransDirection(D, ray.Direction, Trans);
 
-	len = D.length();
-	D /= len;
+    len = D.length();
+    D /= len;
 
-	if (Test_Flag(this, CYLINDER_FLAG))
-	{
-		/* Solve intersections with a cylinder */
+    if (Test_Flag(this, CYLINDER_FLAG))
+    {
+        /* Solve intersections with a cylinder */
 
-		a = D[X] * D[X] + D[Y] * D[Y];
+        a = D[X] * D[X] + D[Y] * D[Y];
 
-		if (a > EPSILON)
-		{
-			b = P[X] * D[X] + P[Y] * D[Y];
+        if (a > EPSILON)
+        {
+            b = P[X] * D[X] + P[Y] * D[Y];
 
-			c = P[X] * P[X] + P[Y] * P[Y] - 1.0;
+            c = P[X] * P[X] + P[Y] * P[Y] - 1.0;
 
-			d = b * b - a * c;
+            d = b * b - a * c;
 
-			if (d >= 0.0)
-			{
-				d = sqrt(d);
+            if (d >= 0.0)
+            {
+                d = sqrt(d);
 
-				t1 = (-b + d) / a;
-				t2 = (-b - d) / a;
+                t1 = (-b + d) / a;
+                t2 = (-b - d) / a;
 
-				z = P[Z] + t1 * D[Z];
+                z = P[Z] + t1 * D[Z];
 
-				if ((t1 > Cone_Tolerance) && (t1 < MAX_DISTANCE) && (z >= 0.0) && (z <= 1.0))
-				{
-					Intersection[i].d   = t1 / len;
-					Intersection[i++].t = SIDE_HIT;
-				}
+                if ((t1 > Cone_Tolerance) && (t1 < MAX_DISTANCE) && (z >= 0.0) && (z <= 1.0))
+                {
+                    Intersection[i].d   = t1 / len;
+                    Intersection[i++].t = SIDE_HIT;
+                }
 
-				z = P[Z] + t2 * D[Z];
+                z = P[Z] + t2 * D[Z];
 
-				if ((t2 > Cone_Tolerance) && (t2 < MAX_DISTANCE) && (z >= 0.0) && (z <= 1.0))
-				{
-					Intersection[i].d   = t2 / len;
-					Intersection[i++].t = SIDE_HIT;
-				}
-			}
-		}
-	}
-	else
-	{
-		/* Solve intersections with a cone */
+                if ((t2 > Cone_Tolerance) && (t2 < MAX_DISTANCE) && (z >= 0.0) && (z <= 1.0))
+                {
+                    Intersection[i].d   = t2 / len;
+                    Intersection[i++].t = SIDE_HIT;
+                }
+            }
+        }
+    }
+    else
+    {
+        /* Solve intersections with a cone */
 
-		a = D[X] * D[X] + D[Y] * D[Y] - D[Z] * D[Z];
+        a = D[X] * D[X] + D[Y] * D[Y] - D[Z] * D[Z];
 
-		b = D[X] * P[X] + D[Y] * P[Y] - D[Z] * P[Z];
+        b = D[X] * P[X] + D[Y] * P[Y] - D[Z] * P[Z];
 
-		c = P[X] * P[X] + P[Y] * P[Y] - P[Z] * P[Z];
+        c = P[X] * P[X] + P[Y] * P[Y] - P[Z] * P[Z];
 
-		if (fabs(a) < EPSILON)
-		{
-			if (fabs(b) > EPSILON)
-			{
-				/* One intersection */
+        if (fabs(a) < EPSILON)
+        {
+            if (fabs(b) > EPSILON)
+            {
+                /* One intersection */
 
-				t1 = -0.5 * c / b;
+                t1 = -0.5 * c / b;
 
-				z = P[Z] + t1 * D[Z];
+                z = P[Z] + t1 * D[Z];
 
-				if ((t1 > Cone_Tolerance) && (t1 < MAX_DISTANCE) && (z >= dist) && (z <= 1.0))
-				{
-					Intersection[i].d   = t1 / len;
-					Intersection[i++].t = SIDE_HIT;
-				}
-			}
-		}
-		else
-		{
-			/* Check hits against the side of the cone */
+                if ((t1 > Cone_Tolerance) && (t1 < MAX_DISTANCE) && (z >= dist) && (z <= 1.0))
+                {
+                    Intersection[i].d   = t1 / len;
+                    Intersection[i++].t = SIDE_HIT;
+                }
+            }
+        }
+        else
+        {
+            /* Check hits against the side of the cone */
 
-			d = b * b - a * c;
+            d = b * b - a * c;
 
-			if (d >= 0.0)
-			{
-				d = sqrt(d);
+            if (d >= 0.0)
+            {
+                d = sqrt(d);
 
-				t1 = (-b - d) / a;
-				t2 = (-b + d) / a;
+                t1 = (-b - d) / a;
+                t2 = (-b + d) / a;
 
-				z = P[Z] + t1 * D[Z];
+                z = P[Z] + t1 * D[Z];
 
-				if ((t1 > Cone_Tolerance) && (t1 < MAX_DISTANCE) && (z >= dist) && (z <= 1.0))
-				{
-					Intersection[i].d   = t1 / len;
-					Intersection[i++].t = SIDE_HIT;
-				}
+                if ((t1 > Cone_Tolerance) && (t1 < MAX_DISTANCE) && (z >= dist) && (z <= 1.0))
+                {
+                    Intersection[i].d   = t1 / len;
+                    Intersection[i++].t = SIDE_HIT;
+                }
 
-				z = P[Z] + t2 * D[Z];
+                z = P[Z] + t2 * D[Z];
 
-				if ((t2 > Cone_Tolerance) && (t2 < MAX_DISTANCE) && (z >= dist) && (z <= 1.0))
-				{
-					Intersection[i].d   = t2 / len;
-					Intersection[i++].t = SIDE_HIT;
-				}
-			}
-		}
-	}
+                if ((t2 > Cone_Tolerance) && (t2 < MAX_DISTANCE) && (z >= dist) && (z <= 1.0))
+                {
+                    Intersection[i].d   = t2 / len;
+                    Intersection[i++].t = SIDE_HIT;
+                }
+            }
+        }
+    }
 
-	if (Test_Flag(this, CLOSED_FLAG) && (fabs(D[Z]) > EPSILON))
-	{
-		d = (1.0 - P[Z]) / D[Z];
+    if (Test_Flag(this, CLOSED_FLAG) && (fabs(D[Z]) > EPSILON))
+    {
+        d = (1.0 - P[Z]) / D[Z];
 
-		a = (P[X] + d * D[X]);
+        a = (P[X] + d * D[X]);
 
-		b = (P[Y] + d * D[Y]);
+        b = (P[Y] + d * D[Y]);
 
-		if (((Sqr(a) + Sqr(b)) <= 1.0) && (d > Cone_Tolerance) && (d < MAX_DISTANCE))
-		{
-			Intersection[i].d   = d / len;
-			Intersection[i++].t = CAP_HIT;
-		}
+        if (((Sqr(a) + Sqr(b)) <= 1.0) && (d > Cone_Tolerance) && (d < MAX_DISTANCE))
+        {
+            Intersection[i].d   = d / len;
+            Intersection[i++].t = CAP_HIT;
+        }
 
-		d = (dist - P[Z]) / D[Z];
+        d = (dist - P[Z]) / D[Z];
 
-		a = (P[X] + d * D[X]);
+        a = (P[X] + d * D[X]);
 
-		b = (P[Y] + d * D[Y]);
+        b = (P[Y] + d * D[Y]);
 
-		if ((Sqr(a) + Sqr(b)) <= (Test_Flag(this, CYLINDER_FLAG) ? 1.0 : Sqr(dist))
-			&& (d > Cone_Tolerance) && (d < MAX_DISTANCE))
-		{
-			Intersection[i].d   = d / len;
-			Intersection[i++].t = BASE_HIT;
-		}
-	}
+        if ((Sqr(a) + Sqr(b)) <= (Test_Flag(this, CYLINDER_FLAG) ? 1.0 : Sqr(dist))
+            && (d > Cone_Tolerance) && (d < MAX_DISTANCE))
+        {
+            Intersection[i].d   = d / len;
+            Intersection[i++].t = BASE_HIT;
+        }
+    }
 
-	if (i)
-		Thread->Stats()[Ray_Cone_Tests_Succeeded]++;
+    if (i)
+        Thread->Stats()[Ray_Cone_Tests_Succeeded]++;
 
-	return (i);
+    return (i);
 }
 
 
@@ -302,15 +305,15 @@ int Cone::Intersect(const BasicRay& ray, CONE_INT *Intersection, TraceThreadData
 *   Inside_Cone
 *
 * INPUT
-*   
+*
 * OUTPUT
-*   
+*
 * RETURNS
-*   
+*
 * AUTHOR
 *
 *   Alexander Enzmann
-*   
+*
 * DESCRIPTION
 *
 *   -
@@ -323,49 +326,49 @@ int Cone::Intersect(const BasicRay& ray, CONE_INT *Intersection, TraceThreadData
 
 bool Cone::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 {
-	DBL w2, z2, offset = (Test_Flag(this, CLOSED_FLAG) ? -EPSILON : EPSILON);
-	Vector3d New_Point;
+    DBL w2, z2, offset = (Test_Flag(this, CLOSED_FLAG) ? -EPSILON : EPSILON);
+    Vector3d New_Point;
 
-	/* Transform the point into the cones space */
+    /* Transform the point into the cones space */
 
-	MInvTransPoint(New_Point, IPoint, Trans);
+    MInvTransPoint(New_Point, IPoint, Trans);
 
-	/* Test to see if we are inside the cone */
+    /* Test to see if we are inside the cone */
 
-	w2 = New_Point[X] * New_Point[X] + New_Point[Y] * New_Point[Y];
+    w2 = New_Point[X] * New_Point[X] + New_Point[Y] * New_Point[Y];
 
-	if (Test_Flag(this, CYLINDER_FLAG))
-	{
-		/* Check to see if we are inside a cylinder */
+    if (Test_Flag(this, CYLINDER_FLAG))
+    {
+        /* Check to see if we are inside a cylinder */
 
-		if ((w2 > 1.0 + offset) ||
-		    (New_Point[Z] < 0.0 - offset) ||
-		    (New_Point[Z] > 1.0 + offset))
-		{
-			return (Test_Flag(this, INVERTED_FLAG));
-		}
-		else
-		{
-			return (!Test_Flag(this, INVERTED_FLAG));
-		}
-	}
-	else
-	{
-		/* Check to see if we are inside a cone */
+        if ((w2 > 1.0 + offset) ||
+            (New_Point[Z] < 0.0 - offset) ||
+            (New_Point[Z] > 1.0 + offset))
+        {
+            return (Test_Flag(this, INVERTED_FLAG));
+        }
+        else
+        {
+            return (!Test_Flag(this, INVERTED_FLAG));
+        }
+    }
+    else
+    {
+        /* Check to see if we are inside a cone */
 
-		z2 = New_Point[Z] * New_Point[Z];
+        z2 = New_Point[Z] * New_Point[Z];
 
-		if ((w2 > z2 + offset) ||
-		    (New_Point[Z] < dist - offset) ||
-		    (New_Point[Z] > 1.0+offset))
-		{
-			return (Test_Flag(this, INVERTED_FLAG));
-		}
-		else
-		{
-			return (!Test_Flag(this, INVERTED_FLAG));
-		}
-	}
+        if ((w2 > z2 + offset) ||
+            (New_Point[Z] < dist - offset) ||
+            (New_Point[Z] > 1.0+offset))
+        {
+            return (Test_Flag(this, INVERTED_FLAG));
+        }
+        else
+        {
+            return (!Test_Flag(this, INVERTED_FLAG));
+        }
+    }
 }
 
 
@@ -398,45 +401,45 @@ bool Cone::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 
 void Cone::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread) const
 {
-	/* Transform the point into the cones space */
+    /* Transform the point into the cones space */
 
-	MInvTransPoint(Result, Inter->IPoint, Trans);
+    MInvTransPoint(Result, Inter->IPoint, Trans);
 
-	/* Calculating the normal is real simple in canonical cone space */
+    /* Calculating the normal is real simple in canonical cone space */
 
-	switch (Inter->i1)
-	{
-		case SIDE_HIT:
+    switch (Inter->i1)
+    {
+        case SIDE_HIT:
 
-			if (Test_Flag(this, CYLINDER_FLAG))
-			{
-				Result[Z] = 0.0;
-			}
-			else
-			{
-				Result[Z] = -Result[Z];
-			}
+            if (Test_Flag(this, CYLINDER_FLAG))
+            {
+                Result[Z] = 0.0;
+            }
+            else
+            {
+                Result[Z] = -Result[Z];
+            }
 
-			break;
+            break;
 
-		case BASE_HIT:
+        case BASE_HIT:
 
-			Result = Vector3d(0.0, 0.0, -1.0);
+            Result = Vector3d(0.0, 0.0, -1.0);
 
-			break;
+            break;
 
-		case CAP_HIT:
+        case CAP_HIT:
 
-			Result = Vector3d(0.0, 0.0, 1.0);
+            Result = Vector3d(0.0, 0.0, 1.0);
 
-			break;
-	}
+            break;
+    }
 
-	/* Transform the point out of the cones space */
+    /* Transform the point out of the cones space */
 
-	MTransNormal(Result, Result, Trans);
+    MTransNormal(Result, Result, Trans);
 
-	Result.normalize();
+    Result.normalize();
 }
 
 
@@ -469,7 +472,7 @@ void Cone::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread
 
 void Cone::Translate(const Vector3d&, const TRANSFORM *tr)
 {
-	Transform(tr);
+    Transform(tr);
 }
 
 
@@ -502,7 +505,7 @@ void Cone::Translate(const Vector3d&, const TRANSFORM *tr)
 
 void Cone::Rotate(const Vector3d&, const TRANSFORM *tr)
 {
-	Transform(tr);
+    Transform(tr);
 }
 
 
@@ -535,7 +538,7 @@ void Cone::Rotate(const Vector3d&, const TRANSFORM *tr)
 
 void Cone::Scale(const Vector3d&, const TRANSFORM *tr)
 {
-	Transform(tr);
+    Transform(tr);
 }
 
 
@@ -568,9 +571,9 @@ void Cone::Scale(const Vector3d&, const TRANSFORM *tr)
 
 void Cone::Transform(const TRANSFORM *tr)
 {
-	Compose_Transforms(Trans, tr);
+    Compose_Transforms(Trans, tr);
 
-	Compute_BBox();
+    Compute_BBox();
 }
 
 
@@ -603,23 +606,23 @@ void Cone::Transform(const TRANSFORM *tr)
 
 Cone::Cone() : ObjectBase(CONE_OBJECT)
 {
-	apex = Vector3d(0.0, 0.0, 1.0);
-	base = Vector3d(0.0, 0.0, 0.0);
+    apex = Vector3d(0.0, 0.0, 1.0);
+    base = Vector3d(0.0, 0.0, 0.0);
 
-	apex_radius = 1.0;
-	base_radius = 0.0;
+    apex_radius = 1.0;
+    base_radius = 0.0;
 
-	dist = 0.0;
+    dist = 0.0;
 
-	Trans = Create_Transform();
+    Trans = Create_Transform();
 
-	/* Cone/Cylinder has capped ends by default. */
+    /* Cone/Cylinder has capped ends by default. */
 
-	Set_Flag(this, CLOSED_FLAG);
+    Set_Flag(this, CLOSED_FLAG);
 
-	/* Default bounds */
+    /* Default bounds */
 
-	Make_BBox(BBox, -1.0, -1.0, 0.0, 2.0, 2.0, 1.0);
+    Make_BBox(BBox, -1.0, -1.0, 0.0, 2.0, 2.0, 1.0);
 }
 
 
@@ -652,11 +655,11 @@ Cone::Cone() : ObjectBase(CONE_OBJECT)
 
 ObjectPtr Cone::Copy()
 {
-	Cone *New = new Cone();
-	Destroy_Transform(New->Trans);
-	*New = *this;
-	New->Trans = Copy_Transform(Trans);
-	return (New);
+    Cone *New = new Cone();
+    Destroy_Transform(New->Trans);
+    *New = *this;
+    New->Trans = Copy_Transform(Trans);
+    return (New);
 }
 
 
@@ -689,10 +692,10 @@ ObjectPtr Cone::Copy()
 
 void Cone::Cylinder()
 {
-	apex_radius = 1.0;
-	base_radius = 1.0;
+    apex_radius = 1.0;
+    base_radius = 1.0;
 
-	Set_Flag(this, CYLINDER_FLAG); // This is a cylinder.
+    Set_Flag(this, CYLINDER_FLAG); // This is a cylinder.
 }
 
 
@@ -725,75 +728,75 @@ void Cone::Cylinder()
 
 void Cone::Compute_Cone_Data()
 {
-	DBL tlen, len, tmpf;
-	Vector3d tmpv, axis, origin;
+    DBL tlen, len, tmpf;
+    Vector3d tmpv, axis, origin;
 
-	/* Process the primitive specific information */
+    /* Process the primitive specific information */
 
-	/* Find the axis and axis length */
+    /* Find the axis and axis length */
 
-	axis = apex - base;
+    axis = apex - base;
 
-	len = axis.length();
+    len = axis.length();
 
-	if (len < EPSILON)
-	{
-		throw POV_EXCEPTION_STRING("Degenerate cone/cylinder."); // TODO FIXME - should a possible error
-	}
-	else
-	{
-		axis /= len;
-	}
-	/* we need to trap that case first */
-	if (fabs(apex_radius - base_radius) < EPSILON)
-	{
-		/* What we are dealing with here is really a cylinder */
+    if (len < EPSILON)
+    {
+        throw POV_EXCEPTION_STRING("Degenerate cone/cylinder."); // TODO FIXME - should a possible error
+    }
+    else
+    {
+        axis /= len;
+    }
+    /* we need to trap that case first */
+    if (fabs(apex_radius - base_radius) < EPSILON)
+    {
+        /* What we are dealing with here is really a cylinder */
 
-		Set_Flag(this, CYLINDER_FLAG);
+        Set_Flag(this, CYLINDER_FLAG);
 
-		Compute_Cylinder_Data();
+        Compute_Cylinder_Data();
 
-		return;
-	}
+        return;
+    }
 
-	if (apex_radius < base_radius)
-	{
-		/* Want the bigger end at the top */
+    if (apex_radius < base_radius)
+    {
+        /* Want the bigger end at the top */
 
-		tmpv = base;
-		base = apex;
-		apex = tmpv;
+        tmpv = base;
+        base = apex;
+        apex = tmpv;
 
-		tmpf = base_radius;
-		base_radius = apex_radius;
-		apex_radius = tmpf;
-		axis.invert();
-	}
-	/* apex & base are different, yet, it might looks like a cylinder */
-	tmpf = base_radius * len / (apex_radius - base_radius);
+        tmpf = base_radius;
+        base_radius = apex_radius;
+        apex_radius = tmpf;
+        axis.invert();
+    }
+    /* apex & base are different, yet, it might looks like a cylinder */
+    tmpf = base_radius * len / (apex_radius - base_radius);
 
-	origin = base - axis * tmpf;
+    origin = base - axis * tmpf;
 
-	tlen = tmpf + len;
-	/* apex is always bigger here */
-	if (((apex_radius - base_radius)*len/tlen) < EPSILON)
-	{
-		/* What we are dealing with here is really a cylinder */
+    tlen = tmpf + len;
+    /* apex is always bigger here */
+    if (((apex_radius - base_radius)*len/tlen) < EPSILON)
+    {
+        /* What we are dealing with here is really a cylinder */
 
-		Set_Flag(this, CYLINDER_FLAG);
+        Set_Flag(this, CYLINDER_FLAG);
 
-		Compute_Cylinder_Data();
+        Compute_Cylinder_Data();
 
-		return;
-	}
+        return;
+    }
 
-	dist = tmpf / tlen;
-	/* Determine alignment */
-	Compute_Coordinate_Transform(Trans, origin, axis, apex_radius, tlen);
+    dist = tmpf / tlen;
+    /* Determine alignment */
+    Compute_Coordinate_Transform(Trans, origin, axis, apex_radius, tlen);
 
-	/* Recalculate the bounds */
+    /* Recalculate the bounds */
 
-	Compute_BBox();
+    Compute_BBox();
 }
 
 
@@ -826,29 +829,29 @@ void Cone::Compute_Cone_Data()
 
 void Cone::Compute_Cylinder_Data()
 {
-	DBL tmpf;
-	Vector3d axis;
+    DBL tmpf;
+    Vector3d axis;
 
-	axis = apex - base;
+    axis = apex - base;
 
-	tmpf = axis.length();
+    tmpf = axis.length();
 
-	if (tmpf < EPSILON)
-	{
-		throw POV_EXCEPTION_STRING("Degenerate cylinder, base point = apex point."); // TODO FIXME - should a possible error
-	}
-	else
-	{
-		axis /= tmpf;
+    if (tmpf < EPSILON)
+    {
+        throw POV_EXCEPTION_STRING("Degenerate cylinder, base point = apex point."); // TODO FIXME - should a possible error
+    }
+    else
+    {
+        axis /= tmpf;
 
-		Compute_Coordinate_Transform(Trans, base, axis, apex_radius, tmpf);
-	}
+        Compute_Coordinate_Transform(Trans, base, axis, apex_radius, tmpf);
+    }
 
-	dist = 0.0;
+    dist = 0.0;
 
-	/* Recalculate the bounds */
+    /* Recalculate the bounds */
 
-	Compute_BBox();
+    Compute_BBox();
 }
 
 
@@ -882,7 +885,7 @@ void Cone::Compute_Cylinder_Data()
 
 Cone::~Cone()
 {
-	Destroy_Transform(Trans);
+    Destroy_Transform(Trans);
 }
 
 
@@ -920,9 +923,9 @@ Cone::~Cone()
 
 void Cone::Compute_BBox()
 {
-	Make_BBox(BBox, -1.0, -1.0, dist, 2.0, 2.0, 1.0-dist);
+    Make_BBox(BBox, -1.0, -1.0, dist, 2.0, 2.0, 1.0-dist);
 
-	Recompute_BBox(&BBox, Trans);
+    Recompute_BBox(&BBox, Trans);
 }
 
 }

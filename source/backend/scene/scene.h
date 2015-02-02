@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -44,14 +44,12 @@
 
 #include "backend/frame.h"
 
-#include "base/fileinputoutput.h"
-#include "base/povmscpp.h"
-#include "base/stringutilities.h"
-#include "base/image/colourspace.h"
-#include "backend/control/renderbackend.h"
+#include "backend/lighting/photons.h"
 #include "backend/lighting/radiosity.h"
 #include "backend/scene/camera.h"
 #include "backend/support/taskqueue.h"
+#include "base/image/colourspace.h"
+#include "base/stringutilities.h"
 
 namespace pov
 {
@@ -147,9 +145,9 @@ class SceneData
         /// One of kPOVList_GammaMode_*.
         int gammaMode;
         /// Working gamma.
-        SimpleGammaCurvePtr workingGamma;
+        pov_base::SimpleGammaCurvePtr workingGamma;
         /// Working gamma to sRGB encoding/decoding.
-        GammaCurvePtr workingGammaToSRGB;
+        pov_base::GammaCurvePtr workingGammaToSRGB;
         /// Whether the user has explicitly specified a default input file gamma. [will be removed in 3.7x]
         bool inputFileGammaSet;
         /// Default assumed decoding gamma of input files.

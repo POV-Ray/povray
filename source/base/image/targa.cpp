@@ -1,37 +1,38 @@
-/*******************************************************************************
- * targa.cpp
- *
- * This module contains the code to read and write the Targa output file
- * format.
- *
- * ---------------------------------------------------------------------------
- * Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
- * Copyright 1991-2013 Persistence of Vision Raytracer Pty. Ltd.
- *
- * POV-Ray is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * POV-Ray is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------------
- * POV-Ray is based on the popular DKB raytracer version 2.12.
- * DKBTrace was originally written by David K. Buck.
- * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
- * ---------------------------------------------------------------------------
- * $File: N/A $
- * $Revision: N/A $
- * $Change: N/A $
- * $DateTime: N/A $
- * $Author: N/A $
- *******************************************************************************/
-
+//******************************************************************************
+///
+/// @file base/image/targa.cpp
+///
+/// This module contains the code to read and write the Targa output file
+/// format.
+///
+/// @copyright
+/// @parblock
+///
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+///
+/// POV-Ray is free software: you can redistribute it and/or modify
+/// it under the terms of the GNU Affero General Public License as
+/// published by the Free Software Foundation, either version 3 of the
+/// License, or (at your option) any later version.
+///
+/// POV-Ray is distributed in the hope that it will be useful,
+/// but WITHOUT ANY WARRANTY; without even the implied warranty of
+/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+/// GNU Affero General Public License for more details.
+///
+/// You should have received a copy of the GNU Affero General Public License
+/// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+///
+/// ----------------------------------------------------------------------------
+///
+/// POV-Ray is based on the popular DKB raytracer version 2.12.
+/// DKBTrace was originally written by David K. Buck.
+/// DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
+///
+/// @endparblock
+///
+//******************************************************************************
 
 /****************************************************************************
 *
@@ -74,10 +75,10 @@ namespace Targa
 
 typedef struct pix
 {
-	unsigned int b;
-	unsigned int g;
-	unsigned int r;
-	unsigned int a;
+    unsigned int b;
+    unsigned int g;
+    unsigned int r;
+    unsigned int a;
 } Pixel;
 
 typedef char Targa_footer[26];
@@ -107,341 +108,341 @@ typedef char Targa_extension[495];
 
 static Pixel *GetPix (const Image *image, int x, int y, Pixel *pixel, const GammaCurvePtr& gamma, DitherHandler& dither, bool premul)
 {
-	GetEncodedRGBAValue (image, x, y, gamma, 255, pixel->r, pixel->g, pixel->b, pixel->a, dither, premul);
-	return (pixel);
+    GetEncodedRGBAValue (image, x, y, gamma, 255, pixel->r, pixel->g, pixel->b, pixel->a, dither, premul);
+    return (pixel);
 }
 
 static void PutPix (vector<unsigned char>& line, const pix *pixel, bool opaque)
 {
-	line.push_back (pixel->b);
-	line.push_back (pixel->g);
-	line.push_back (pixel->r);
-	if (!opaque)
-		line.push_back (pixel->a);
+    line.push_back (pixel->b);
+    line.push_back (pixel->g);
+    line.push_back (pixel->r);
+    if (!opaque)
+        line.push_back (pixel->a);
 }
 
 void Write (OStream *file, const Image *image, const Image::WriteOptions& options)
 {
-	pix                     current;
-	pix                     next;
-	bool                    opaque = !options.alphachannel;
-	bool                    compress = options.compress > 0 ;
-	vector<unsigned char>   header;
-	vector<unsigned char>   line;
-	GammaCurvePtr           gamma;
-	Metadata                meta;
-	DitherHandler*          dither = options.dither.get();
+    pix                     current;
+    pix                     next;
+    bool                    opaque = !options.alphachannel;
+    bool                    compress = options.compress > 0 ;
+    vector<unsigned char>   header;
+    vector<unsigned char>   line;
+    GammaCurvePtr           gamma;
+    Metadata                meta;
+    DitherHandler*          dither = options.dither.get();
 
-	if (options.encodingGamma)
-		gamma = TranscodingGammaCurve::Get(options.workingGamma, options.encodingGamma);
-	else
-		gamma = TranscodingGammaCurve::Get(options.workingGamma, SRGBGammaCurve::Get());
+    if (options.encodingGamma)
+        gamma = TranscodingGammaCurve::Get(options.workingGamma, options.encodingGamma);
+    else
+        gamma = TranscodingGammaCurve::Get(options.workingGamma, SRGBGammaCurve::Get());
 
-	// TODO ALPHA - check if TGA should really keep presuming non-premultiplied alpha
-	// We presume non-premultiplied alpha, unless the user overrides
-	// (e.g. to handle a non-compliant file).
-	bool premul = false;
-	if (options.premultiplyOverride)
-		premul = options.premultiply;
+    // TODO ALPHA - check if TGA should really keep presuming non-premultiplied alpha
+    // We presume non-premultiplied alpha, unless the user overrides
+    // (e.g. to handle a non-compliant file).
+    bool premul = false;
+    if (options.premultiplyOverride)
+        premul = options.premultiply;
 
-	header.reserve (18);
-	header.push_back (0);
-	header.push_back (0);
+    header.reserve (18);
+    header.push_back (0);
+    header.push_back (0);
 
-	// byte 2 - targa file type (compressed/uncompressed)
-	header.push_back (options.compress ? 10 : 2);
+    // byte 2 - targa file type (compressed/uncompressed)
+    header.push_back (options.compress ? 10 : 2);
 
-	// Byte 3 - Index of first color map entry LSB
-	// Byte 4 - Index of first color map entry MSB
-	// Byte 5 - Color map length LSB
-	// Byte 6 - Color map legth MSB
-	// Byte 7 - Color map size
-	// x origin set to "First_Column" - Bytes 8, 9
-	// y origin set to "First_Line"   - Bytes 10, 11
-	for (int i = 0; i < 9; i++)
-		header.push_back (0);
+    // Byte 3 - Index of first color map entry LSB
+    // Byte 4 - Index of first color map entry MSB
+    // Byte 5 - Color map length LSB
+    // Byte 6 - Color map legth MSB
+    // Byte 7 - Color map size
+    // x origin set to "First_Column" - Bytes 8, 9
+    // y origin set to "First_Line"   - Bytes 10, 11
+    for (int i = 0; i < 9; i++)
+        header.push_back (0);
 
-	// write width and height - Bytes 12 - 15
-	unsigned int w = image->GetWidth();
-	unsigned int h = image->GetHeight();
-	header.push_back (w % 256);
-	header.push_back (w / 256);
-	header.push_back (h % 256);
-	header.push_back (h / 256);
+    // write width and height - Bytes 12 - 15
+    unsigned int w = image->GetWidth();
+    unsigned int h = image->GetHeight();
+    header.push_back (w % 256);
+    header.push_back (w / 256);
+    header.push_back (h % 256);
+    header.push_back (h / 256);
 
-	if (!opaque)
-	{
-		header.push_back(32);    /* 32 bits/pixel (BGRA) */
-		header.push_back(0x28);  /* Data starts at top left, 8 bits Alpha */
-	}
-	else
-	{
-		header.push_back(24);    /* 24 bits/pixel (BGR) */
-		header.push_back(0x20);  /* Data starts at top left, 0 bits Alpha */
-	}
+    if (!opaque)
+    {
+        header.push_back(32);    /* 32 bits/pixel (BGRA) */
+        header.push_back(0x28);  /* Data starts at top left, 8 bits Alpha */
+    }
+    else
+    {
+        header.push_back(24);    /* 24 bits/pixel (BGR) */
+        header.push_back(0x20);  /* Data starts at top left, 0 bits Alpha */
+    }
 
-	if (!file->write (&header[0], 18))
-		throw POV_EXCEPTION(kFileDataErr, "header write failed for targa file") ;
+    if (!file->write (&header[0], 18))
+        throw POV_EXCEPTION(kFileDataErr, "header write failed for targa file") ;
 
-	line.reserve (w * 4);
-	if (options.compress == 0)
-	{
-		Pixel pixel;
-		for (int row = 0; row  < h; row++)
-		{
-			line.clear ();
-			for (int col = 0; col < w; col++)
-				PutPix (line, GetPix (image, col, row, &pixel, gamma, *dither, premul), opaque);
-			if (!file->write (&line[0], line.size()))
-				throw POV_EXCEPTION(kFileDataErr, "row write failed for targa file") ;
-		}
-	}
-	else
-	{
-		// RLE compressed data
+    line.reserve (w * 4);
+    if (options.compress == 0)
+    {
+        Pixel pixel;
+        for (int row = 0; row  < h; row++)
+        {
+            line.clear ();
+            for (int col = 0; col < w; col++)
+                PutPix (line, GetPix (image, col, row, &pixel, gamma, *dither, premul), opaque);
+            if (!file->write (&line[0], line.size()))
+                throw POV_EXCEPTION(kFileDataErr, "row write failed for targa file") ;
+        }
+    }
+    else
+    {
+        // RLE compressed data
 
-		for (int row = 0; row  < h; row++)
-		{
-			line.clear ();
+        for (int row = 0; row  < h; row++)
+        {
+            line.clear ();
 
-			int llen = w;
-			int startx = 0;
-			int cnt = 1;
-			int ptype = 0;
-			bool writenow = false;
+            int llen = w;
+            int startx = 0;
+            int cnt = 1;
+            int ptype = 0;
+            bool writenow = false;
 
-			GetPix (image, 0, row, &current, gamma, *dither, premul);
-			while (true)
-			{
-				if (startx + cnt < llen)
-					GetPix (image, startx + cnt, row, &next, gamma, *dither, premul);
-				else
-					next = current;
-				if (memcmp (&current, &next, sizeof (pix)) == 0)
-				{
-					if (ptype == 0)
-					{
-						cnt++;
-						if ((cnt >= 128) || ((startx + cnt) >= llen))
-							writenow = true;
-					}
-					else
-					{
-						cnt--;
-						writenow = true;
-					}
-				}
-				else
-				{
-					if ((ptype == 1) || (cnt <= 1))
-					{
-						current = next;
-						ptype = 1;
-						cnt++;
-						if ((cnt >= 128) || ((startx + cnt) >= llen))
-							writenow = true;
-					}
-					else
-						writenow = true;
-				}
+            GetPix (image, 0, row, &current, gamma, *dither, premul);
+            while (true)
+            {
+                if (startx + cnt < llen)
+                    GetPix (image, startx + cnt, row, &next, gamma, *dither, premul);
+                else
+                    next = current;
+                if (memcmp (&current, &next, sizeof (pix)) == 0)
+                {
+                    if (ptype == 0)
+                    {
+                        cnt++;
+                        if ((cnt >= 128) || ((startx + cnt) >= llen))
+                            writenow = true;
+                    }
+                    else
+                    {
+                        cnt--;
+                        writenow = true;
+                    }
+                }
+                else
+                {
+                    if ((ptype == 1) || (cnt <= 1))
+                    {
+                        current = next;
+                        ptype = 1;
+                        cnt++;
+                        if ((cnt >= 128) || ((startx + cnt) >= llen))
+                            writenow = true;
+                    }
+                    else
+                        writenow = true;
+                }
 
-				if (writenow)
-				{
-					Pixel pixel;
-					/* This test SHOULD be unnecessary!  However, it isn't!  [CWM] */
-					if (startx + cnt > llen)
-						cnt = llen - startx;
-					if (ptype == 0)
-					{
-						line.push_back ((unsigned char) ((cnt - 1) | 0x80));
-						PutPix (line, &current, opaque);
-						current = next;
-					}
-					else
-					{
-						line.push_back ((unsigned char) cnt - 1);
-						for (int x = 0; x < cnt; x++)
-							PutPix (line, GetPix (image, startx + x, row, &pixel, gamma, *dither, premul), opaque);
-					}
-					startx += cnt;
-					writenow = false;
-					ptype = 0;
-					cnt = 1;
-					if (!file->write (&line[0], line.size()))
-						throw POV_EXCEPTION(kFileDataErr, "write failed for targa file") ;
-					if (startx >= llen)
-						break;
-					line.clear ();
-				}
-			}
-		}
-	}
+                if (writenow)
+                {
+                    Pixel pixel;
+                    /* This test SHOULD be unnecessary!  However, it isn't!  [CWM] */
+                    if (startx + cnt > llen)
+                        cnt = llen - startx;
+                    if (ptype == 0)
+                    {
+                        line.push_back ((unsigned char) ((cnt - 1) | 0x80));
+                        PutPix (line, &current, opaque);
+                        current = next;
+                    }
+                    else
+                    {
+                        line.push_back ((unsigned char) cnt - 1);
+                        for (int x = 0; x < cnt; x++)
+                            PutPix (line, GetPix (image, startx + x, row, &pixel, gamma, *dither, premul), opaque);
+                    }
+                    startx += cnt;
+                    writenow = false;
+                    ptype = 0;
+                    cnt = 1;
+                    if (!file->write (&line[0], line.size()))
+                        throw POV_EXCEPTION(kFileDataErr, "write failed for targa file") ;
+                    if (startx >= llen)
+                        break;
+                    line.clear ();
+                }
+            }
+        }
+    }
 
-	POV_LONG curpos;
-	Targa_extension ext;
-	Targa_footer foo;
+    POV_LONG curpos;
+    Targa_extension ext;
+    Targa_footer foo;
 
-	// A lot of "unused" get happy when filled with 0
-	memset(ext,0,sizeof(ext));
-	memset(foo,0,sizeof(foo));
-	curpos = file->tellg();
+    // A lot of "unused" get happy when filled with 0
+    memset(ext,0,sizeof(ext));
+    memset(foo,0,sizeof(foo));
+    curpos = file->tellg();
 
-	foo[FOO_EXT_OFF+3]= 0x0ff & (curpos >> 24);
-	foo[FOO_EXT_OFF+2]= 0x0ff & (curpos >> 16);
-	foo[FOO_EXT_OFF+1]= 0x0ff & (curpos >> 8);
-	foo[FOO_EXT_OFF]= 0x0ff & (curpos);
+    foo[FOO_EXT_OFF+3]= 0x0ff & (curpos >> 24);
+    foo[FOO_EXT_OFF+2]= 0x0ff & (curpos >> 16);
+    foo[FOO_EXT_OFF+1]= 0x0ff & (curpos >> 8);
+    foo[FOO_EXT_OFF]= 0x0ff & (curpos);
 
-	// fill signature, Reserved char & binary string terminator in one go
-	sprintf(&foo[FOO_SIG_OFF],"TRUEVISION-XFILE.");
+    // fill signature, Reserved char & binary string terminator in one go
+    sprintf(&foo[FOO_SIG_OFF],"TRUEVISION-XFILE.");
 
-	// let's prepare the Extension area, then write Extension then footer
-	ext[EXT_SIZE_OFF+1] = (unsigned char) ((495 >> 8) & 0xff);
-	ext[EXT_SIZE_OFF] = (unsigned char) (495 & 0xff);
-	string soft = meta.getSoftware().substr(0,EXT_SOFT_DIM-1);
-	sprintf(&ext[EXT_SOFT_OFF],"%s",soft.c_str());
+    // let's prepare the Extension area, then write Extension then footer
+    ext[EXT_SIZE_OFF+1] = (unsigned char) ((495 >> 8) & 0xff);
+    ext[EXT_SIZE_OFF] = (unsigned char) (495 & 0xff);
+    string soft = meta.getSoftware().substr(0,EXT_SOFT_DIM-1);
+    sprintf(&ext[EXT_SOFT_OFF],"%s",soft.c_str());
 
-	string com = meta.getComment1().substr(0,EXT_COMMENT_DIM-1);
-	if (!com.empty())
-		sprintf(&ext[EXT_COMMENT_OFF],"%s",com.c_str());
-	com = meta.getComment2().substr(0,EXT_COMMENT_DIM-1);
-	if (!com.empty())
-		sprintf(&ext[EXT_COMMENT_OFF+EXT_COMMENT_DIM],"%s",com.c_str());
-	com = meta.getComment3().substr(0,EXT_COMMENT_DIM-1);
-	if (!com.empty())
-		sprintf(&ext[EXT_COMMENT_OFF+EXT_COMMENT_DIM*2],"%s",com.c_str());
-	com = meta.getComment4().substr(0,EXT_COMMENT_DIM-1);
-	if (!com.empty())
-		sprintf(&ext[EXT_COMMENT_OFF+EXT_COMMENT_DIM*3],"%s",com.c_str());
+    string com = meta.getComment1().substr(0,EXT_COMMENT_DIM-1);
+    if (!com.empty())
+        sprintf(&ext[EXT_COMMENT_OFF],"%s",com.c_str());
+    com = meta.getComment2().substr(0,EXT_COMMENT_DIM-1);
+    if (!com.empty())
+        sprintf(&ext[EXT_COMMENT_OFF+EXT_COMMENT_DIM],"%s",com.c_str());
+    com = meta.getComment3().substr(0,EXT_COMMENT_DIM-1);
+    if (!com.empty())
+        sprintf(&ext[EXT_COMMENT_OFF+EXT_COMMENT_DIM*2],"%s",com.c_str());
+    com = meta.getComment4().substr(0,EXT_COMMENT_DIM-1);
+    if (!com.empty())
+        sprintf(&ext[EXT_COMMENT_OFF+EXT_COMMENT_DIM*3],"%s",com.c_str());
 
-	ext[EXT_DATE_OFF]    = meta.getMonth();
-	ext[EXT_DATE_OFF+1]  = 0;
-	ext[EXT_DATE_OFF+2]  = meta.getDay();
-	ext[EXT_DATE_OFF+3]  = 0;
-	ext[EXT_DATE_OFF+4]  = meta.getYear()%256;
-	ext[EXT_DATE_OFF+5]  = meta.getYear()/256;
-	ext[EXT_DATE_OFF+6]  = meta.getHour();
-	ext[EXT_DATE_OFF+7]  = 0;
-	ext[EXT_DATE_OFF+8]  = meta.getMin();
-	ext[EXT_DATE_OFF+9]  = 0;
-	ext[EXT_DATE_OFF+10] = meta.getSec();
-	ext[EXT_DATE_OFF+11] = 0;
+    ext[EXT_DATE_OFF]    = meta.getMonth();
+    ext[EXT_DATE_OFF+1]  = 0;
+    ext[EXT_DATE_OFF+2]  = meta.getDay();
+    ext[EXT_DATE_OFF+3]  = 0;
+    ext[EXT_DATE_OFF+4]  = meta.getYear()%256;
+    ext[EXT_DATE_OFF+5]  = meta.getYear()/256;
+    ext[EXT_DATE_OFF+6]  = meta.getHour();
+    ext[EXT_DATE_OFF+7]  = 0;
+    ext[EXT_DATE_OFF+8]  = meta.getMin();
+    ext[EXT_DATE_OFF+9]  = 0;
+    ext[EXT_DATE_OFF+10] = meta.getSec();
+    ext[EXT_DATE_OFF+11] = 0;
 
-	// we do not use the version field, but All 0 is not good enough
-	ext[EXT_VERSION_OFF]=0;
-	ext[EXT_VERSION_OFF+1]=0;
-	ext[EXT_VERSION_OFF+2]=' ';
+    // we do not use the version field, but All 0 is not good enough
+    ext[EXT_VERSION_OFF]=0;
+    ext[EXT_VERSION_OFF+1]=0;
+    ext[EXT_VERSION_OFF+2]=' ';
 
-	// scanline offset is 18 (as 4 bytes) as we did not fill image ID nor color map 
-	ext[EXT_SCAN_OFF] = 18;
+    // scanline offset is 18 (as 4 bytes) as we did not fill image ID nor color map
+    ext[EXT_SCAN_OFF] = 18;
 
-	// alpha handling
-	ext[EXT_ALPHA_OFF] = opaque ? 0:premul ?4:3; 
+    // alpha handling
+    ext[EXT_ALPHA_OFF] = opaque ? 0:premul ?4:3;
 
-	// gamma handling (range 0.0 to 10.0, on short, hard code a denominator to allow 10.0)
-	ext[EXT_GAMMA_OFF] = (int)(6553.0 * gamma->ApproximateDecodingGamma()) % 256;
-	ext[EXT_GAMMA_OFF+1] = (int)(6553.0 * gamma->ApproximateDecodingGamma()) / 256;
-	ext[EXT_GAMMA_OFF+2] = (unsigned char) (6553 % 256);
-	ext[EXT_GAMMA_OFF+3] = (unsigned char) (6553 / 256) ;
-	file->write(ext,sizeof(ext));
-	file->write(foo,sizeof(foo));
+    // gamma handling (range 0.0 to 10.0, on short, hard code a denominator to allow 10.0)
+    ext[EXT_GAMMA_OFF] = (int)(6553.0 * gamma->ApproximateDecodingGamma()) % 256;
+    ext[EXT_GAMMA_OFF+1] = (int)(6553.0 * gamma->ApproximateDecodingGamma()) / 256;
+    ext[EXT_GAMMA_OFF+2] = (unsigned char) (6553 % 256);
+    ext[EXT_GAMMA_OFF+3] = (unsigned char) (6553 / 256) ;
+    file->write(ext,sizeof(ext));
+    file->write(foo,sizeof(foo));
 }
 
 static void ConvertColor (Pixel *pixel, unsigned pixelsize, const unsigned char *bytes)
 {
-	unsigned char r;
-	unsigned char g;
-	unsigned char b;
-	unsigned char a = 255; // default to solid colour
+    unsigned char r;
+    unsigned char g;
+    unsigned char b;
+    unsigned char a = 255; // default to solid colour
 
-	switch (pixelsize)
-	{
-		case 8:
-			r = g = b = bytes[0];
-			break;
+    switch (pixelsize)
+    {
+        case 8:
+            r = g = b = bytes[0];
+            break;
 
-		case 15:
-			r = ((bytes[1] & 0x7c) << 1);
-			g = (((bytes[1] & 0x03) << 3) | ((bytes[0] & 0xe0) >> 5)) << 3;
-			b = (bytes[0] & 0x1f) << 3;
-			break;
+        case 15:
+            r = ((bytes[1] & 0x7c) << 1);
+            g = (((bytes[1] & 0x03) << 3) | ((bytes[0] & 0xe0) >> 5)) << 3;
+            b = (bytes[0] & 0x1f) << 3;
+            break;
 
-		case 16:
-			r = ((bytes[1] & 0x7c) << 1);
-			g = (((bytes[1] & 0x03) << 3) | ((bytes[0] & 0xe0) >> 5)) << 3;
-			b = (bytes[0] & 0x1f) << 3;
-			a = bytes[1] & 0x80 ? 255 : 0;
-			break;
+        case 16:
+            r = ((bytes[1] & 0x7c) << 1);
+            g = (((bytes[1] & 0x03) << 3) | ((bytes[0] & 0xe0) >> 5)) << 3;
+            b = (bytes[0] & 0x1f) << 3;
+            a = bytes[1] & 0x80 ? 255 : 0;
+            break;
 
-		case 24:
-			r = bytes[2];
-			g = bytes[1];
-			b = bytes[0];
-			break;
+        case 24:
+            r = bytes[2];
+            g = bytes[1];
+            b = bytes[0];
+            break;
 
-		case 32:
-			r = bytes[2];
-			g = bytes[1];
-			b = bytes[0];
-			a = bytes[3];
-			break;
+        case 32:
+            r = bytes[2];
+            g = bytes[1];
+            b = bytes[0];
+            a = bytes[3];
+            break;
 
-		default:
-			throw POV_EXCEPTION(kParamErr, "Bad pixelsize in targa color");
-	}
+        default:
+            throw POV_EXCEPTION(kParamErr, "Bad pixelsize in targa color");
+    }
 
-	pixel->r = r;
-	pixel->g = g;
-	pixel->b = b;
-	pixel->a = a;
+    pixel->r = r;
+    pixel->g = g;
+    pixel->b = b;
+    pixel->a = a;
 }
 
 static void ConvertColor (Image::RGBAMapEntry *pixel, unsigned pixelsize, const unsigned char *bytes, const GammaCurvePtr& gamma)
 {
-	unsigned char r;
-	unsigned char g;
-	unsigned char b;
-	unsigned char a = 255; // default to solid colour
+    unsigned char r;
+    unsigned char g;
+    unsigned char b;
+    unsigned char a = 255; // default to solid colour
 
-	switch (pixelsize)
-	{
-		case 8:
-			r = g = b = bytes[0];
-			break;
+    switch (pixelsize)
+    {
+        case 8:
+            r = g = b = bytes[0];
+            break;
 
-		case 15:
-			r = ((bytes[1] & 0x7c) << 1);
-			g = (((bytes[1] & 0x03) << 3) | ((bytes[0] & 0xe0) >> 5)) << 3;
-			b = (bytes[0] & 0x1f) << 3;
-			break;
+        case 15:
+            r = ((bytes[1] & 0x7c) << 1);
+            g = (((bytes[1] & 0x03) << 3) | ((bytes[0] & 0xe0) >> 5)) << 3;
+            b = (bytes[0] & 0x1f) << 3;
+            break;
 
-		case 16:
-			r = ((bytes[1] & 0x7c) << 1);
-			g = (((bytes[1] & 0x03) << 3) | ((bytes[0] & 0xe0) >> 5)) << 3;
-			b = (bytes[0] & 0x1f) << 3;
-			a = bytes[1] & 0x80 ? 255 : 0;
-			break;
+        case 16:
+            r = ((bytes[1] & 0x7c) << 1);
+            g = (((bytes[1] & 0x03) << 3) | ((bytes[0] & 0xe0) >> 5)) << 3;
+            b = (bytes[0] & 0x1f) << 3;
+            a = bytes[1] & 0x80 ? 255 : 0;
+            break;
 
-		case 24:
-			r = bytes[2];
-			g = bytes[1];
-			b = bytes[0];
-			break;
+        case 24:
+            r = bytes[2];
+            g = bytes[1];
+            b = bytes[0];
+            break;
 
-		case 32:
-			r = bytes[2];
-			g = bytes[1];
-			b = bytes[0];
-			a = bytes[3];
-			break;
+        case 32:
+            r = bytes[2];
+            g = bytes[1];
+            b = bytes[0];
+            a = bytes[3];
+            break;
 
-		default:
-			throw POV_EXCEPTION(kParamErr, "Bad pixelsize in targa color");
-	}
+        default:
+            throw POV_EXCEPTION(kParamErr, "Bad pixelsize in targa color");
+    }
 
-	pixel->red   = IntDecode(gamma, r, 255);
-	pixel->green = IntDecode(gamma, g, 255);
-	pixel->blue  = IntDecode(gamma, b, 255);
-	pixel->alpha = IntDecode(a, 255);
+    pixel->red   = IntDecode(gamma, r, 255);
+    pixel->green = IntDecode(gamma, g, 255);
+    pixel->blue  = IntDecode(gamma, b, 255);
+    pixel->alpha = IntDecode(a, 255);
 }
 
 /*****************************************************************************
@@ -451,15 +452,15 @@ static void ConvertColor (Image::RGBAMapEntry *pixel, unsigned pixelsize, const 
 *   Read_Targa_Image
 *
 * INPUT
-*   
+*
 * OUTPUT
-*   
+*
 * RETURNS
-*   
+*
 * AUTHOR
 *
 *   POV-Ray Team
-*   
+*
 * DESCRIPTION
 *
 *   Reads a Targa image into an RGB image buffer.  Handles 8, 16, 24, 32 bit
@@ -474,238 +475,238 @@ static void ConvertColor (Image::RGBAMapEntry *pixel, unsigned pixelsize, const 
 
 Image *Read (IStream *file, const Image::ReadOptions& options)
 {
-	int                   temp;
-	int                   h;
-	unsigned int          ftype;
-	unsigned int          idlen;
-	unsigned int          cmlen;
-	unsigned int          cmsiz;
-	unsigned int          cmsizB;
-	unsigned int          psize;
-	unsigned int          psizeB;
-	unsigned int          orien;
-	unsigned int          width;
-	unsigned int          height;
-	unsigned char         bytes[256];
-	unsigned char         tgaheader[18];
-	Pixel                 pixel;
-	Image                 *image ;
+    int                   temp;
+    int                   h;
+    unsigned int          ftype;
+    unsigned int          idlen;
+    unsigned int          cmlen;
+    unsigned int          cmsiz;
+    unsigned int          cmsizB;
+    unsigned int          psize;
+    unsigned int          psizeB;
+    unsigned int          orien;
+    unsigned int          width;
+    unsigned int          height;
+    unsigned char         bytes[256];
+    unsigned char         tgaheader[18];
+    Pixel                 pixel;
+    Image                 *image ;
 
-	// TARGA files have no clearly defined gamma by default.
-	// Since 1989, TARGA 2.0 defines gamma metadata which could be used if present.
-	// However, as of now (2009), such information seems to be rarely included, if at all.
-	// We're defaulting to sRGB because that's what we write, and the most common gamma appears to be 2.2
-	GammaCurvePtr gamma;
-	if (options.gammacorrect)
-	{
-		if (options.defaultGamma)
-			gamma = TranscodingGammaCurve::Get(options.workingGamma, options.defaultGamma);
-		else
-			gamma = TranscodingGammaCurve::Get(options.workingGamma, SRGBGammaCurve::Get());
-	}
+    // TARGA files have no clearly defined gamma by default.
+    // Since 1989, TARGA 2.0 defines gamma metadata which could be used if present.
+    // However, as of now (2009), such information seems to be rarely included, if at all.
+    // We're defaulting to sRGB because that's what we write, and the most common gamma appears to be 2.2
+    GammaCurvePtr gamma;
+    if (options.gammacorrect)
+    {
+        if (options.defaultGamma)
+            gamma = TranscodingGammaCurve::Get(options.workingGamma, options.defaultGamma);
+        else
+            gamma = TranscodingGammaCurve::Get(options.workingGamma, SRGBGammaCurve::Get());
+    }
 
-	// TODO ALPHA - check if TGA should really keep presuming non-premultiplied alpha
-	// We presume non-premultiplied alpha, so that's the preferred mode to use for the image container unless the user overrides
-	// (e.g. to handle a non-compliant file).
-	bool premul = false;
-	if (options.premultiplyOverride)
-		premul = options.premultiply;
+    // TODO ALPHA - check if TGA should really keep presuming non-premultiplied alpha
+    // We presume non-premultiplied alpha, so that's the preferred mode to use for the image container unless the user overrides
+    // (e.g. to handle a non-compliant file).
+    bool premul = false;
+    if (options.premultiplyOverride)
+        premul = options.premultiply;
 
-	if (!file->read (tgaheader, 18))
-		throw POV_EXCEPTION(kFileDataErr, "Cannot read targa file header");
+    if (!file->read (tgaheader, 18))
+        throw POV_EXCEPTION(kFileDataErr, "Cannot read targa file header");
 
-	/* Decipher the header information */
-	idlen  = tgaheader[ 0];
-	ftype  = tgaheader[ 2];
-	cmlen  = tgaheader[ 5] + (tgaheader[ 6] << 8);
-	cmsiz  = tgaheader[ 7];
-	width  = tgaheader[12] + (tgaheader[13] << 8);
-	height = tgaheader[14] + (tgaheader[15] << 8);
-	psize  = tgaheader[16];
-	orien  = tgaheader[17] & 0x20; /* Right side up ? */
+    /* Decipher the header information */
+    idlen  = tgaheader[ 0];
+    ftype  = tgaheader[ 2];
+    cmlen  = tgaheader[ 5] + (tgaheader[ 6] << 8);
+    cmsiz  = tgaheader[ 7];
+    width  = tgaheader[12] + (tgaheader[13] << 8);
+    height = tgaheader[14] + (tgaheader[15] << 8);
+    psize  = tgaheader[16];
+    orien  = tgaheader[17] & 0x20; /* Right side up ? */
 
-	cmsizB = (cmsiz+7)/8;
-	psizeB = (psize+7)/8;
+    cmsizB = (cmsiz+7)/8;
+    psizeB = (psize+7)/8;
 
-	bool opaque = (psize <= 24) && (psize != 16);
-	bool compressed = ftype == 9 || ftype == 10 || ftype == 11;
+    bool opaque = (psize <= 24) && (psize != 16);
+    bool compressed = ftype == 9 || ftype == 10 || ftype == 11;
 
-	/* Determine if this is a supported Targa type */
-	if (ftype < 1 || ftype > 11 || (ftype > 3 && ftype < 9))
-		throw POV_EXCEPTION(kFileDataErr, "Unsupported file type in targa image");
-	if (psize != 8 && psize != 15 && psize != 16 && psize != 24 && psize != 32)
-		throw POV_EXCEPTION(kFileDataErr, "Unsupported pixel size in targa image");
-	if (cmlen > 256)
-		throw POV_EXCEPTION(kFileDataErr, "Unsupported color map length in targa image");
+    /* Determine if this is a supported Targa type */
+    if (ftype < 1 || ftype > 11 || (ftype > 3 && ftype < 9))
+        throw POV_EXCEPTION(kFileDataErr, "Unsupported file type in targa image");
+    if (psize != 8 && psize != 15 && psize != 16 && psize != 24 && psize != 32)
+        throw POV_EXCEPTION(kFileDataErr, "Unsupported pixel size in targa image");
+    if (cmlen > 256)
+        throw POV_EXCEPTION(kFileDataErr, "Unsupported color map length in targa image");
 
-	/* Skip over the picture ID information */
-	if (idlen > 0)
-		if (!file->read (bytes, idlen))
-			throw POV_EXCEPTION(kFileDataErr, "Cannot read from targa image");
+    /* Skip over the picture ID information */
+    if (idlen > 0)
+        if (!file->read (bytes, idlen))
+            throw POV_EXCEPTION(kFileDataErr, "Cannot read from targa image");
 
-	/* Read in the the color map (if any) */
-	if (cmlen > 0)
-	{
-		if (psize != 8)
-			throw POV_EXCEPTION(kFileDataErr, "Unsupported color map bit depth in targa image");
+    /* Read in the the color map (if any) */
+    if (cmlen > 0)
+    {
+        if (psize != 8)
+            throw POV_EXCEPTION(kFileDataErr, "Unsupported color map bit depth in targa image");
 
-		vector<Image::RGBAMapEntry> colormap ;
-		Image::RGBAMapEntry entry;
-		for (int i = 0; i < cmlen; i++)
-		{
-			for (int j = 0; j < cmsizB; j++)
-			{
-				if ((temp = file->Read_Byte ()) == EOF)
-					throw POV_EXCEPTION(kFileDataErr, "Cannot read color map from targa image");
-				bytes[j] = (unsigned char) temp;
-			}
-			ConvertColor (&entry, cmsiz, bytes, gamma);
-			colormap.push_back(entry);
-		}
-		Image::ImageDataType imagetype = options.itype;
-		if (imagetype == Image::Undefined)
-			imagetype = Image::Colour_Map ;
-		image = Image::Create (width, height, imagetype, colormap) ;
-		image->SetPremultiplied(premul); // specify whether the color map data has premultiplied alpha
-		gamma.reset(); // gamma has been taken care of by transforming the color table.
-	}
-	else
-	{
-		Image::ImageDataType imagetype = options.itype;
-		if (imagetype == Image::Undefined)
-		{
-			if (GammaCurve::IsNeutral(gamma))
-				// No gamma correction required, raw values can be stored "as is".
-				imagetype = opaque ? Image::RGB_Int8 : Image::RGBA_Int8 ;
-			else
-				// Gamma correction required; use an image container that will take care of that.
-				imagetype = opaque ? Image::RGB_Gamma8 : Image::RGBA_Gamma8 ;
-		}
-		image = Image::Create (width, height, imagetype) ;
-		image->SetPremultiplied(premul); // set desired storage mode regarding alpha premultiplication
-		image->TryDeferDecoding(gamma, 255); // try to have gamma adjustment being deferred until image evaluation.
-	}
+        vector<Image::RGBAMapEntry> colormap ;
+        Image::RGBAMapEntry entry;
+        for (int i = 0; i < cmlen; i++)
+        {
+            for (int j = 0; j < cmsizB; j++)
+            {
+                if ((temp = file->Read_Byte ()) == EOF)
+                    throw POV_EXCEPTION(kFileDataErr, "Cannot read color map from targa image");
+                bytes[j] = (unsigned char) temp;
+            }
+            ConvertColor (&entry, cmsiz, bytes, gamma);
+            colormap.push_back(entry);
+        }
+        Image::ImageDataType imagetype = options.itype;
+        if (imagetype == Image::Undefined)
+            imagetype = Image::Colour_Map ;
+        image = Image::Create (width, height, imagetype, colormap) ;
+        image->SetPremultiplied(premul); // specify whether the color map data has premultiplied alpha
+        gamma.reset(); // gamma has been taken care of by transforming the color table.
+    }
+    else
+    {
+        Image::ImageDataType imagetype = options.itype;
+        if (imagetype == Image::Undefined)
+        {
+            if (GammaCurve::IsNeutral(gamma))
+                // No gamma correction required, raw values can be stored "as is".
+                imagetype = opaque ? Image::RGB_Int8 : Image::RGBA_Int8 ;
+            else
+                // Gamma correction required; use an image container that will take care of that.
+                imagetype = opaque ? Image::RGB_Gamma8 : Image::RGBA_Gamma8 ;
+        }
+        image = Image::Create (width, height, imagetype) ;
+        image->SetPremultiplied(premul); // set desired storage mode regarding alpha premultiplication
+        image->TryDeferDecoding(gamma, 255); // try to have gamma adjustment being deferred until image evaluation.
+    }
 
-	if (compressed)
-	{
-		/* RLE compressed images */
-		int x = 0;
-		int y = 0;
-		while (y < height)
-		{
-			int line = orien != 0 ? y : height - y - 1 ;
+    if (compressed)
+    {
+        /* RLE compressed images */
+        int x = 0;
+        int y = 0;
+        while (y < height)
+        {
+            int line = orien != 0 ? y : height - y - 1 ;
 
-			/* Grab a header */
-			if ((h = file->Read_Byte ()) == EOF)
-				throw POV_EXCEPTION(kFileDataErr, "Cannot read data from targa image");
-			if (h & 0x80)
-			{
-				h &= 0x7F;
-				if (cmlen == 0)
-				{
-					for (int k = 0; k < psizeB; k++)
-					{
-						if ((temp = file->Read_Byte ()) == EOF)
-							throw POV_EXCEPTION(kFileDataErr, "Cannot read data from targa image");
-						bytes[k] = (unsigned char) temp;
-					}
-					ConvertColor (&pixel, psize, bytes);
-					while (h-- >= 0)
-					{
-						SetEncodedRGBAValue (image, x, line, gamma, 255, pixel.r, pixel.g, pixel.b, pixel.a, premul);
-						if (++x == width)
-						{
-							y++;
-							x = 0;
-						}
-					}
-				}
-				else
-				{
-					if ((temp = file->Read_Byte ()) == EOF)
-						throw POV_EXCEPTION(kFileDataErr, "Cannot read data from targa image");
-					if ((unsigned char) temp >= cmlen)
-						throw POV_EXCEPTION(kFileDataErr, "Invalid color map index in targa image");
-					while (h-- >= 0)
-					{
-						image->SetIndexedValue (x, line, (unsigned char) temp) ;
-						if (++x == width)
-						{
-							y++;
-							x = 0;
-						}
-					}
-				}
+            /* Grab a header */
+            if ((h = file->Read_Byte ()) == EOF)
+                throw POV_EXCEPTION(kFileDataErr, "Cannot read data from targa image");
+            if (h & 0x80)
+            {
+                h &= 0x7F;
+                if (cmlen == 0)
+                {
+                    for (int k = 0; k < psizeB; k++)
+                    {
+                        if ((temp = file->Read_Byte ()) == EOF)
+                            throw POV_EXCEPTION(kFileDataErr, "Cannot read data from targa image");
+                        bytes[k] = (unsigned char) temp;
+                    }
+                    ConvertColor (&pixel, psize, bytes);
+                    while (h-- >= 0)
+                    {
+                        SetEncodedRGBAValue (image, x, line, gamma, 255, pixel.r, pixel.g, pixel.b, pixel.a, premul);
+                        if (++x == width)
+                        {
+                            y++;
+                            x = 0;
+                        }
+                    }
+                }
+                else
+                {
+                    if ((temp = file->Read_Byte ()) == EOF)
+                        throw POV_EXCEPTION(kFileDataErr, "Cannot read data from targa image");
+                    if ((unsigned char) temp >= cmlen)
+                        throw POV_EXCEPTION(kFileDataErr, "Invalid color map index in targa image");
+                    while (h-- >= 0)
+                    {
+                        image->SetIndexedValue (x, line, (unsigned char) temp) ;
+                        if (++x == width)
+                        {
+                            y++;
+                            x = 0;
+                        }
+                    }
+                }
 
-			}
-			else
-			{
-				/* Copy buffer */
-				while (h-- >= 0)
-				{
-					if (cmlen == 0)
-					{
-						for (int k = 0; k < psizeB; k++)
-						{
-							if ((temp = file->Read_Byte ()) == EOF)
-								throw POV_EXCEPTION(kFileDataErr, "Cannot read data from targa image");
-							bytes[k] = (unsigned char) temp;
-						}
-						ConvertColor (&pixel, psize, bytes);
-						SetEncodedRGBAValue (image, x, line, gamma, 255, pixel.r, pixel.g, pixel.b, pixel.a, premul);
-					}
-					else
-					{
-						if ((temp = file->Read_Byte ()) == EOF)
-							throw POV_EXCEPTION(kFileDataErr, "Cannot read data from targa image");
-						if ((unsigned char) temp >= cmlen)
-							throw POV_EXCEPTION(kFileDataErr, "Invalid color map index in targa image");
-						image->SetIndexedValue (x, line, (unsigned char) temp) ;
-					}
+            }
+            else
+            {
+                /* Copy buffer */
+                while (h-- >= 0)
+                {
+                    if (cmlen == 0)
+                    {
+                        for (int k = 0; k < psizeB; k++)
+                        {
+                            if ((temp = file->Read_Byte ()) == EOF)
+                                throw POV_EXCEPTION(kFileDataErr, "Cannot read data from targa image");
+                            bytes[k] = (unsigned char) temp;
+                        }
+                        ConvertColor (&pixel, psize, bytes);
+                        SetEncodedRGBAValue (image, x, line, gamma, 255, pixel.r, pixel.g, pixel.b, pixel.a, premul);
+                    }
+                    else
+                    {
+                        if ((temp = file->Read_Byte ()) == EOF)
+                            throw POV_EXCEPTION(kFileDataErr, "Cannot read data from targa image");
+                        if ((unsigned char) temp >= cmlen)
+                            throw POV_EXCEPTION(kFileDataErr, "Invalid color map index in targa image");
+                        image->SetIndexedValue (x, line, (unsigned char) temp) ;
+                    }
 
-					if (++x == width)
-					{
-						if (++y == height)
-							break ;
-						line = orien != 0 ? y : height - y - 1 ;
-						x = 0;
-					}
-				}
-			}
-		}
-	}
-	else
-	{
-		/* Simple raster image file, read in all of the pixels */
-		for (int y = 0; y < height; y++)
-		{
-			int line = orien != 0 ? y : height - y - 1 ;
-			for (int x = 0; x < width; x++)
-			{
-				if (cmlen == 0)
-				{
-					for (int z = 0; z < psizeB; z++)
-					{
-						if ((temp = file->Read_Byte ()) == EOF)
-							throw POV_EXCEPTION(kFileDataErr, "Cannot read data from targa image");
-						bytes[z] = (unsigned char) temp;
-					}
-					ConvertColor (&pixel, psize, bytes);
-					SetEncodedRGBAValue (image, x, line, gamma, 255, pixel.r, pixel.g, pixel.b, pixel.a, premul);
-				}
-				else
-				{
-					if ((temp = file->Read_Byte ()) == EOF)
-						throw POV_EXCEPTION(kFileDataErr, "Cannot read data from targa image");
-					if ((unsigned char) temp >= cmlen)
-						throw POV_EXCEPTION(kFileDataErr, "Invalid color map index in targa image");
-					image->SetIndexedValue (x, line, (unsigned char) temp) ;
-				}
-			}
-		}
-	}
+                    if (++x == width)
+                    {
+                        if (++y == height)
+                            break ;
+                        line = orien != 0 ? y : height - y - 1 ;
+                        x = 0;
+                    }
+                }
+            }
+        }
+    }
+    else
+    {
+        /* Simple raster image file, read in all of the pixels */
+        for (int y = 0; y < height; y++)
+        {
+            int line = orien != 0 ? y : height - y - 1 ;
+            for (int x = 0; x < width; x++)
+            {
+                if (cmlen == 0)
+                {
+                    for (int z = 0; z < psizeB; z++)
+                    {
+                        if ((temp = file->Read_Byte ()) == EOF)
+                            throw POV_EXCEPTION(kFileDataErr, "Cannot read data from targa image");
+                        bytes[z] = (unsigned char) temp;
+                    }
+                    ConvertColor (&pixel, psize, bytes);
+                    SetEncodedRGBAValue (image, x, line, gamma, 255, pixel.r, pixel.g, pixel.b, pixel.a, premul);
+                }
+                else
+                {
+                    if ((temp = file->Read_Byte ()) == EOF)
+                        throw POV_EXCEPTION(kFileDataErr, "Cannot read data from targa image");
+                    if ((unsigned char) temp >= cmlen)
+                        throw POV_EXCEPTION(kFileDataErr, "Invalid color map index in targa image");
+                    image->SetIndexedValue (x, line, (unsigned char) temp) ;
+                }
+            }
+        }
+    }
 
-	return (image);
+    return (image);
 }
 
 } // end of namespace Targa

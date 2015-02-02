@@ -40,10 +40,12 @@
 #include "backend/shape/truetype.h"
 
 #include "backend/bounding/bbox.h"
-#include "backend/math/vector.h"
 #include "backend/math/matrices.h"
+#include "backend/parser/parse.h"
+#include "backend/render/ray.h"
 #include "backend/scene/objects.h"
 #include "backend/scene/threaddata.h"
+#include "backend/shape/csg.h"
 #include "backend/support/fileutil.h"
 
 // this must be the last file included

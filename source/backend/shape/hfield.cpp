@@ -66,10 +66,11 @@
 #include "backend/frame.h"
 #include "backend/shape/hfield.h"
 
-#include "backend/math/vector.h"
 #include "backend/math/matrices.h"
+#include "backend/render/ray.h"
 #include "backend/scene/objects.h"
 #include "backend/scene/threaddata.h"
+#include "backend/shape/boxes.h"
 #include "backend/support/imageutil.h"
 #include "base/pov_err.h"
 

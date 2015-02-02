@@ -45,6 +45,7 @@
 #include "backend/parser/parse.h"
 
 #include "base/povmsgid.h"
+#include "backend/bounding/bcyl.h"
 #include "backend/bounding/bsphere.h"
 #include "backend/colour/colour_old.h"
 #include "backend/interior/interior.h"

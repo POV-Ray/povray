@@ -11,7 +11,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -39,11 +39,12 @@
 #ifndef TEXTURE_H
 #define TEXTURE_H
 
-#include "backend/pattern/pattern.h"
-#include "backend/pattern/warps.h"
+#include "backend/support/simplevector.h"
 
 namespace pov
 {
+
+typedef struct Turb_Struct TURB;
 
 /*****************************************************************************
 * Global preprocessor defines
@@ -63,6 +64,43 @@ namespace pov
 /*****************************************************************************
 * Global typedefs
 ******************************************************************************/
+
+struct WeightedTexture
+{
+    COLC weight;
+    TEXTURE *texture;
+
+    WeightedTexture(COLC w, TEXTURE *t) :
+        weight(w), texture(t) { }
+};
+
+typedef FixedSimpleVector<WeightedTexture, WEIGHTEDTEXTURE_VECTOR_SIZE> WeightedTextureVector;
+
+
+/// Texture blend map.
+class TextureBlendMap : public BlendMap<TexturePtr>
+{
+    public:
+
+        TextureBlendMap();
+        ~TextureBlendMap();
+};
+
+typedef BlendMapEntry<TexturePtr>                   TextureBlendMapEntry;
+typedef shared_ptr<TextureBlendMap>                 TextureBlendMapPtr;
+typedef shared_ptr<const TextureBlendMap>           TextureBlendMapConstPtr;
+
+struct Texture_Struct : public Pattern_Struct
+{
+    TextureBlendMapPtr Blend_Map;
+    int References;
+    TEXTURE *Next;
+    PIGMENT *Pigment;
+    TNORMAL *Tnormal;
+    FINISH *Finish;
+    vector<TEXTURE*> Materials; // used for BITMAP_PATTERN (and only there)
+};
+
 
 /*****************************************************************************
 * Global variables
