@@ -691,7 +691,7 @@ ObjectPtr Parser::Parse_Bicubic_Patch ()
     Object = new BicubicPatch();
 
     EXPECT
-        CASE_FLOAT
+        CASE_FLOAT_UNGET
             VersionWarning(150, "Should use keywords for bicubic parameters.");
             Object->Patch_Type = (int)Parse_Float();
             if (Object->Patch_Type == 2 ||
@@ -2329,7 +2329,7 @@ ObjectPtr Parser::Parse_Disc ()
     Object->oradius2 = tmpf * tmpf;
 
     EXPECT
-        CASE_FLOAT
+        CASE_FLOAT_UNGET
             tmpf = Parse_Float();
             Object->iradius2 = tmpf * tmpf;
         END_CASE
@@ -4163,7 +4163,7 @@ ObjectPtr Parser::Parse_Mesh2()
 
         /* look for a texture index */
         EXPECT
-            CASE_FLOAT
+            CASE_FLOAT_UNGET
                 Triangles[i].Texture = Parse_Float(); Parse_Comma();
                 if (Triangles[i].Texture >= number_of_textures ||
                     Triangles[i].Texture < 0)
@@ -4180,7 +4180,7 @@ ObjectPtr Parser::Parse_Mesh2()
         END_EXPECT
         /* look for a texture index */
         EXPECT
-            CASE_FLOAT
+            CASE_FLOAT_UNGET
                 Triangles[i].Texture2 = Parse_Float(); Parse_Comma();
                 if (Triangles[i].Texture2 >= number_of_textures ||
                     Triangles[i].Texture2 < 0)
@@ -4196,7 +4196,7 @@ ObjectPtr Parser::Parse_Mesh2()
         END_EXPECT
         /* look for a texture index */
         EXPECT
-            CASE_FLOAT
+            CASE_FLOAT_UNGET
                 Triangles[i].Texture3 = Parse_Float(); Parse_Comma();
                 if (Triangles[i].Texture3 >= number_of_textures ||
                     Triangles[i].Texture3 < 0)
@@ -7348,7 +7348,7 @@ ObjectPtr Parser::Parse_Object_Mods (ObjectPtr Object)
             Set_Flag(Object, CUTAWAY_TEXTURES_FLAG);
         END_CASE
 
-        CASE_COLOUR
+        CASE_COLOUR_UNGET
             Parse_Colour (Local_Colour);
             if (sceneData->EffectiveLanguageVersion() < 150)
             {
@@ -8427,7 +8427,7 @@ int Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTR
             EXIT
         END_CASE
 
-        CASE_COLOUR
+        CASE_COLOUR_UNGET
             if((Token.Token_Id != COLOUR_ID_TOKEN) || (sceneData->EffectiveLanguageVersion() < 350))
             {
                 Local_Colour  = Create_Colour();
@@ -8446,7 +8446,7 @@ int Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTR
             }
             // intentional to allow color dot expressions as macro parameters if #version is 3.5 or higher [trf]
 
-        CASE_VECTOR
+        CASE_VECTOR_UNGET
             // It seems very few people understand what is going on here, so let me try to
             // explain it. All comments below are mine and they are based on how I think it
             // works and understand it. As I didn't write most of the code I cannot really
@@ -8794,9 +8794,7 @@ int Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTR
             EXIT
         END_CASE
 
-        CASE5 (STRING_LITERAL_TOKEN,CHR_TOKEN,SUBSTR_TOKEN,STR_TOKEN,VSTR_TOKEN)
-        CASE4 (CONCAT_TOKEN,STRUPR_TOKEN,STRLWR_TOKEN,DATETIME_TOKEN)
-            UNGET
+        CASE_NONID_STRING_UNGET
             Temp_Data  = Parse_String();
             *NumberPtr = STRING_ID_TOKEN;
             Test_Redefine(Previous,NumberPtr,*DataPtr, allow_redefine);

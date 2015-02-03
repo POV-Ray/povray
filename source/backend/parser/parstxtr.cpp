@@ -198,7 +198,7 @@ ImageData *Parser::Parse_Image(int Legal, bool GammaCorrect)
     if(Legal & GRAD_FILE)
     {
         EXPECT
-            CASE_VECTOR
+            CASE_VECTOR_UNGET
                 VersionWarning(150, "Old style orientation vector or map type not supported. Ignoring value.");
                 Parse_Vector(Local_Vector);
             END_CASE
@@ -305,10 +305,8 @@ ImageData *Parser::Parse_Image(int Legal, bool GammaCorrect)
             EXIT
         END_CASE
 
-        CASE5 (STRING_LITERAL_TOKEN,CHR_TOKEN,SUBSTR_TOKEN,STR_TOKEN,VSTR_TOKEN)
-        CASE4 (CONCAT_TOKEN,STRUPR_TOKEN,STRLWR_TOKEN,DATETIME_TOKEN)
+        CASE_STRING_UNGET
             {
-                UNGET
                 Name = Parse_C_String(true);
                 UCS2String filename = ASCIItoUCS2String(Name);
                 UCS2String ext = GetFileExtension(Path(filename));
@@ -1196,7 +1194,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, int TPat_Type)
             EXIT
         END_CASE
 
-        CASE_COLOUR
+        CASE_COLOUR_UNGET
             if ((TPat_Type != PIGMENT_TYPE) && (TPat_Type != DENSITY_TYPE))
             {
                 Only_In("color","pigment or density");
@@ -2501,7 +2499,7 @@ void Parser::Parse_Finish (FINISH **Finish_Ptr)
         CASE (METALLIC_TOKEN)
             New->Metallic = 1.0;
             EXPECT
-                CASE_FLOAT
+                CASE_FLOAT_UNGET
                     New->Metallic = Parse_Float();
                     EXIT
                 END_CASE
@@ -3196,7 +3194,7 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
                     dynamic_cast<GradientPattern*>(Pigment->pattern.get())->gradient = Local_Vector;
                 END_CASE
 
-                CASE_COLOUR
+                CASE_COLOUR_UNGET
                     Warn_State(Token.Token_Id, PIGMENT_TOKEN);
                     Pigment->Type = PLAIN_PATTERN;
                     Pigment->pattern = PatternPtr(new PlainPattern());
@@ -3411,7 +3409,7 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
                     Finish->Crand = Parse_Float();
                 END_CASE
 
-                CASE_FLOAT
+                CASE_FLOAT_UNGET
                     Finish->Crand = Parse_Float();
                     VersionWarning(150, "Should use crand keyword in finish statement.");
                 END_CASE
@@ -3972,7 +3970,7 @@ FOG *Parser::Parse_Fog()
     END_EXPECT
 
     EXPECT
-        CASE_COLOUR
+        CASE_COLOUR_UNGET
             Parse_Colour(Fog->colour);
         END_CASE
 
@@ -3980,7 +3978,7 @@ FOG *Parser::Parse_Fog()
             Fog->Distance = Parse_Float();
         END_CASE
 
-        CASE_FLOAT
+        CASE_FLOAT_UNGET
             VersionWarning(150, "Should use distance keyword.");
             Fog->Distance = Parse_Float();
         END_CASE

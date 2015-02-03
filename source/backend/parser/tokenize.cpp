@@ -3603,7 +3603,7 @@ void Parser::Parse_Write(void)
                     case SINT32LE_TOKEN:                                     val_min = (-2147483647-1); val_max = 2147483647; num_bytes = 4; break; // -2^31 to 2^31-1 (using unconventional notation to avoid a warning with some compiler)
                 }
                 EXPECT
-                    CASE_VECTOR
+                    CASE_VECTOR_UNGET
                         Terms = Parse_Unknown_Vector (Express);
                         if ((Terms >= 1) && (Terms <= 5))
                         {
@@ -3643,9 +3643,7 @@ void Parser::Parse_Write(void)
             }
         END_CASE
 
-        CASE5 (STRING_LITERAL_TOKEN,CHR_TOKEN,SUBSTR_TOKEN,STR_TOKEN,VSTR_TOKEN)
-        CASE5 (CONCAT_TOKEN,STRUPR_TOKEN,STRLWR_TOKEN,DATETIME_TOKEN,STRING_ID_TOKEN)
-            UNGET
+        CASE_STRING_UNGET
             temp=Parse_C_String();
             if(strlen(temp) > 512)
             {
@@ -3657,7 +3655,7 @@ void Parser::Parse_Write(void)
             POV_FREE(temp);
         END_CASE
 
-        CASE_VECTOR
+        CASE_VECTOR_UNGET
             Terms = Parse_Unknown_Vector (Express);
             switch (Terms)
             {

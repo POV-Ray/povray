@@ -2631,8 +2631,7 @@ void Parser::Parse_Colour (RGBFTColour& colour, bool expectFT)
             }
         END_CASE
 
-        CASE_VECTOR
-            UNGET
+        CASE_VECTOR_UNGET
             if (startedParsing)
             {
                 EXIT
@@ -3372,7 +3371,7 @@ ColourBlendMapPtr Parser::Parse_Colour_Map<ColourBlendMap> ()
                         /* After [ must be a float. If 2nd thing found is another
                            float then this is an old style color_map.
                          */
-                        CASE_FLOAT
+                        CASE_FLOAT_UNGET
                             Terms=1;
                             Parse_Express(Express,&Terms);
                             if (Terms==1)
@@ -3398,7 +3397,7 @@ ColourBlendMapPtr Parser::Parse_Colour_Map<ColourBlendMap> ()
                             EXIT
                         END_CASE
 
-                        CASE_COLOUR
+                        CASE_COLOUR_UNGET
                             Parse_Colour (Temp_Ent.Vals);
                             tempList.push_back(Temp_Ent);
                             EXIT
@@ -3586,7 +3585,7 @@ SPLINE *Parser::Parse_Spline()
         New->Type = Type;
 
     EXPECT
-        CASE_FLOAT
+        CASE_FLOAT_UNGET
             /* Entry has the form float,vector */
             par = Parse_Float();
             Parse_Comma();
