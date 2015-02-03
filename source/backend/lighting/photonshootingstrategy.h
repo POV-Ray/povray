@@ -36,6 +36,8 @@
 #ifndef PHOTONSHOOTINGSTRATEGY_H
 #define PHOTONSHOOTINGSTRATEGY_H
 
+#include <boost/thread.hpp>
+
 #include "backend/frame.h"
 
 namespace pov

@@ -40,6 +40,7 @@
 #include "backend/frame.h"
 #include "backend/support/imageutil.h"
 
+#include "backend/colour/spectral.h"
 #include "backend/pattern/pattern.h"
 #include "backend/support/fileutil.h"
 #include "backend/texture/normal.h"
