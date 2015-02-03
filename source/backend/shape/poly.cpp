@@ -1,47 +1,49 @@
-/*******************************************************************************
- * poly.cpp
- *
- * This module implements the code for general 3 variable polynomial shapes
- *
- * This file was written by Alexander Enzmann.  He wrote the code for
- * 4th - 6th order shapes and generously provided us these enhancements.
- *
- * ---------------------------------------------------------------------------
- * Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
- * Copyright 1991-2013 Persistence of Vision Raytracer Pty. Ltd.
- *
- * POV-Ray is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * POV-Ray is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------------
- * POV-Ray is based on the popular DKB raytracer version 2.12.
- * DKBTrace was originally written by David K. Buck.
- * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
- * ---------------------------------------------------------------------------
- * $File: //depot/povray/smp/source/backend/shape/poly.cpp $
- * $Revision: #41 $
- * $Change: 6164 $
- * $DateTime: 2013/12/09 17:21:04 $
- * $Author: clipka $
- *******************************************************************************/
+//******************************************************************************
+///
+/// @file backend/shape/poly.cpp
+///
+/// This module implements general 3 variable polynomial shapes.
+///
+/// @author Alexander Enzmann
+///
+/// @copyright
+/// @parblock
+///
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+///
+/// POV-Ray is free software: you can redistribute it and/or modify
+/// it under the terms of the GNU Affero General Public License as
+/// published by the Free Software Foundation, either version 3 of the
+/// License, or (at your option) any later version.
+///
+/// POV-Ray is distributed in the hope that it will be useful,
+/// but WITHOUT ANY WARRANTY; without even the implied warranty of
+/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+/// GNU Affero General Public License for more details.
+///
+/// You should have received a copy of the GNU Affero General Public License
+/// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+///
+/// ----------------------------------------------------------------------------
+///
+/// POV-Ray is based on the popular DKB raytracer version 2.12.
+/// DKBTrace was originally written by David K. Buck.
+/// DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
+///
+/// @endparblock
+///
+//******************************************************************************
 
 // frame.h must always be the first POV file included (pulls in platform config)
 #include "backend/frame.h"
-#include "backend/math/vector.h"
-#include "backend/bounding/bbox.h"
-#include "backend/math/polysolv.h"
-#include "backend/math/matrices.h"
-#include "backend/scene/objects.h"
 #include "backend/shape/poly.h"
+
+#include "backend/bounding/bbox.h"
+#include "backend/math/matrices.h"
+#include "backend/math/polysolv.h"
+#include "backend/render/ray.h"
+#include "backend/scene/objects.h"
 #include "backend/scene/threaddata.h"
 
 // this must be the last file included
@@ -82,11 +84,11 @@ const DBL COEFF_LIMIT = 1.0e-20;
 #if (MAX_ORDER > 35)
 #error "Poly.cpp code would break loose due to a too short pascal triangle table."
 #endif
-/* this is a pascal's triangle : [k][j]=[k-1][j-1]+[k-1][j] ; 
-	                               [k][0]=1, [k][k]=1 
+/* this is a pascal's triangle : [k][j]=[k-1][j-1]+[k-1][j] ;
+                                   [k][0]=1, [k][k]=1
  */
-/* Max value in [35] is 0x8B18014C, so unsigned int is enough 
- * If you want to go down to from [36] to [69], 
+/* Max value in [35] is 0x8B18014C, so unsigned int is enough
+ * If you want to go down to from [36] to [69],
  *  a 64 bits unsigned long must be used
  */
 const unsigned int binomials[35][35] =
@@ -134,42 +136,42 @@ const unsigned int binomials[35][35] =
 */
 bool Poly::Set_Coeff(const unsigned int x, const unsigned int y, const unsigned int z, const DBL value)
 {
-	int a,b,c;
-	unsigned int pos;
-	a=Order-x;
-	b=Order-x-y;
-	c=Order-x-y-z;
-	/* a bit overprotective */
-	if ((x+y+z>Order)||(a<0)||(b<0)||(c<0))
-	{
-		return false;
-	}
-	/* pos = binomials[a+2][3]+binomials[b+1][2]+binomials[c][1];
-	 * rewriten to stay in bound (max is "Order", not Order+2)
-	 */
-	pos = 
-		// binomials[a+2][3]
-		//       binomials[a+1][3]
-		binomials[a][3]+binomials[a][2]
-		//      +binomials[a+1][2]
-		+binomials[a][2]+binomials[a][1]
-		// +binomials[b+1][2]
-		+binomials[b][1]+binomials[b][2]
-		+binomials[c][1];
-	/* It's magic 
-	 * Nah... a is the tetraedric sum to jump to get to the power of x index (first entry)
-	 * b is then the triangular sum to add to get to the power of y index (also first entry)
-	 * and c is the linear sum to add to get to the power of z index (that the one we want)
+    int a,b,c;
+    unsigned int pos;
+    a=Order-x;
+    b=Order-x-y;
+    c=Order-x-y-z;
+    /* a bit overprotective */
+    if ((x+y+z>Order)||(a<0)||(b<0)||(c<0))
+    {
+        return false;
+    }
+    /* pos = binomials[a+2][3]+binomials[b+1][2]+binomials[c][1];
+     * rewriten to stay in bound (max is "Order", not Order+2)
+     */
+    pos =
+        // binomials[a+2][3]
+        //       binomials[a+1][3]
+        binomials[a][3]+binomials[a][2]
+        //      +binomials[a+1][2]
+        +binomials[a][2]+binomials[a][1]
+        // +binomials[b+1][2]
+        +binomials[b][1]+binomials[b][2]
+        +binomials[c][1];
+    /* It's magic
+     * Nah... a is the tetraedric sum to jump to get to the power of x index (first entry)
+     * b is then the triangular sum to add to get to the power of y index (also first entry)
+     * and c is the linear sum to add to get to the power of z index (that the one we want)
    *
-	 * Notice that binomials[c][1] == c, but the formula would loose its magic use of
-	 * pascal triangle everywhere.
-	 * triangular sum are in the third ([2] column)
-	 * tetraedric sum are in the fourth ([3] column)
-	 *
-	 * (and yes, the 0 at the start of each column is useful)
-	 */
-	Coeffs[pos] = value;
-	return true;
+     * Notice that binomials[c][1] == c, but the formula would loose its magic use of
+     * pascal triangle everywhere.
+     * triangular sum are in the third ([2] column)
+     * tetraedric sum are in the fourth ([3] column)
+     *
+     * (and yes, the 0 at the start of each column is useful)
+     */
+    Coeffs[pos] = value;
+    return true;
 }
 
 
@@ -180,15 +182,15 @@ bool Poly::Set_Coeff(const unsigned int x, const unsigned int y, const unsigned 
 *   All_Poly_Intersections
 *
 * INPUT
-*   
+*
 * OUTPUT
-*   
+*
 * RETURNS
-*   
+*
 * AUTHOR
 *
 *   Alexander Enzmann
-*   
+*
 * DESCRIPTION
 *
 *   -
@@ -201,82 +203,82 @@ bool Poly::Set_Coeff(const unsigned int x, const unsigned int y, const unsigned 
 
 bool Poly::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread)
 {
-	DBL Depths[MAX_ORDER];
-	DBL len;
-	Vector3d IPoint;
-	int cnt, i, j, Intersection_Found, same_root;
-	BasicRay New_Ray;
+    DBL Depths[MAX_ORDER];
+    DBL len;
+    Vector3d IPoint;
+    int cnt, i, j, Intersection_Found, same_root;
+    BasicRay New_Ray;
 
-	/* Transform the ray into the polynomial's space */
+    /* Transform the ray into the polynomial's space */
 
-	MInvTransRay(New_Ray, ray, Trans);
+    MInvTransRay(New_Ray, ray, Trans);
 
-	len = New_Ray.Direction.length();
-	New_Ray.Direction /= len;
+    len = New_Ray.Direction.length();
+    New_Ray.Direction /= len;
 
-	Intersection_Found = false;
+    Intersection_Found = false;
 
-	Thread->Stats()[Ray_Poly_Tests]++;
+    Thread->Stats()[Ray_Poly_Tests]++;
 
-	switch (Order)
-	{
-		case 1:
+    switch (Order)
+    {
+        case 1:
 
-			cnt = intersect_linear(New_Ray, Coeffs, Depths);
+            cnt = intersect_linear(New_Ray, Coeffs, Depths);
 
-			break;
+            break;
 
-		case 2:
+        case 2:
 
-			cnt = intersect_quadratic(New_Ray, Coeffs, Depths);
+            cnt = intersect_quadratic(New_Ray, Coeffs, Depths);
 
-			break;
+            break;
 
-		default:
+        default:
 
-			cnt = intersect(New_Ray, Order, Coeffs, Test_Flag(this, STURM_FLAG), Depths, Thread);
-	}
+            cnt = intersect(New_Ray, Order, Coeffs, Test_Flag(this, STURM_FLAG), Depths, Thread);
+    }
 
-	if (cnt > 0)
-	{
-		Thread->Stats()[Ray_Poly_Tests_Succeeded]++;
-	}
+    if (cnt > 0)
+    {
+        Thread->Stats()[Ray_Poly_Tests_Succeeded]++;
+    }
 
-	for (i = 0; i < cnt; i++)
-	{
-		if (Depths[i] > DEPTH_TOLERANCE)
-		{
-			same_root = false;
+    for (i = 0; i < cnt; i++)
+    {
+        if (Depths[i] > DEPTH_TOLERANCE)
+        {
+            same_root = false;
 
-			for (j = 0; j < i; j++)
-			{
-				if (Depths[i] == Depths[j])
-				{
-					same_root = true;
+            for (j = 0; j < i; j++)
+            {
+                if (Depths[i] == Depths[j])
+                {
+                    same_root = true;
 
-					break;
-				}
-			}
+                    break;
+                }
+            }
 
-			if (!same_root)
-			{
-				IPoint = New_Ray.Evaluate(Depths[i]);
+            if (!same_root)
+            {
+                IPoint = New_Ray.Evaluate(Depths[i]);
 
-				/* Transform the point into world space */
+                /* Transform the point into world space */
 
-				MTransPoint(IPoint, IPoint, Trans);
+                MTransPoint(IPoint, IPoint, Trans);
 
-				if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
-				{
-					Depth_Stack->push(Intersection(Depths[i] / len,IPoint,this));
+                if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
+                {
+                    Depth_Stack->push(Intersection(Depths[i] / len,IPoint,this));
 
-					Intersection_Found = true;
-				}
-			}
-		}
-	}
+                    Intersection_Found = true;
+                }
+            }
+        }
+    }
 
-	return (Intersection_Found);
+    return (Intersection_Found);
 }
 
 
@@ -288,15 +290,15 @@ bool Poly::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDat
 *   evaluate_linear
 *
 * INPUT
-*   
+*
 * OUTPUT
-*   
+*
 * RETURNS
-*   
+*
 * AUTHOR
 *
 *   Alexander Enzmann
-*   
+*
 * DESCRIPTION
 *
 *   -
@@ -312,7 +314,7 @@ bool Poly::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDat
 /* unused
 DBL evaluate_linear(const Vector3d& P, DBL *a)
 {
-	return(a[0] * P[X]) + (a[1] * P[Y]) + (a[2] * P[Z]) + a[3];
+    return(a[0] * P[X]) + (a[1] * P[Y]) + (a[2] * P[Z]) + a[3];
 }
 */
 
@@ -325,15 +327,15 @@ DBL evaluate_linear(const Vector3d& P, DBL *a)
 *   evaluate_quadratic
 *
 * INPUT
-*   
+*
 * OUTPUT
-*   
+*
 * RETURNS
-*   
+*
 * AUTHOR
 *
 *   Alexander Enzmann
-*   
+*
 * DESCRIPTION
 *
 *   -
@@ -347,15 +349,15 @@ DBL evaluate_linear(const Vector3d& P, DBL *a)
 /*
 DBL evaluate_quadratic(const Vector3d& P, DBL *a)
 {
-	DBL x, y, z;
+    DBL x, y, z;
 
-	x = P[X];
-	y = P[Y];
-	z = P[Z];
+    x = P[X];
+    y = P[Y];
+    z = P[Z];
 
-	return(a[0] * x * x + a[1] * x * y + a[2] * x * z +
-	       a[3] * x     + a[4] * y * y + a[5] * y * z +
-	       a[6] * y     + a[7] * z * z + a[8] * z     + a[9]);
+    return(a[0] * x * x + a[1] * x * y + a[2] * x * z +
+           a[3] * x     + a[4] * y * y + a[5] * y * z +
+           a[6] * y     + a[7] * z * z + a[8] * z     + a[9]);
 }
 */
 
@@ -368,15 +370,15 @@ DBL evaluate_quadratic(const Vector3d& P, DBL *a)
 *   factor_out
 *
 * INPUT
-*   
+*
 * OUTPUT
-*   
+*
 * RETURNS
-*   
+*
 * AUTHOR
 *
 *   Alexander Enzmann
-*   
+*
 * DESCRIPTION
 *
 *   Remove all factors of i from n.
@@ -389,14 +391,14 @@ DBL evaluate_quadratic(const Vector3d& P, DBL *a)
 /*
 int Poly::factor_out(int n, int i, int *c, int *s)
 {
-	while (!(n % i))
-	{
-		n /= i;
+    while (!(n % i))
+    {
+        n /= i;
 
-		s[(*c)++] = i;
-	}
+        s[(*c)++] = i;
+    }
 
-	return(n);
+    return(n);
 }
 */
 
@@ -408,15 +410,15 @@ int Poly::factor_out(int n, int i, int *c, int *s)
 *   factor1
 *
 * INPUT
-*   
+*
 * OUTPUT
-*   
+*
 * RETURNS
-*   
+*
 * AUTHOR
 *
 *   Alexander Enzmann
-*   
+*
 * DESCRIPTION
 *
 *   Find all prime factors of n. (Note that n must be less than 2^15.
@@ -429,29 +431,29 @@ int Poly::factor_out(int n, int i, int *c, int *s)
 #if 0
 void Poly::factor1(int n, int *c, int *s)
 {
-	int i,k;
+    int i,k;
 
-	/* First factor out any 2s. */
+    /* First factor out any 2s. */
 
-	n = factor_out(n, 2, c, s);
+    n = factor_out(n, 2, c, s);
 
-	/* Now any odd factors. */
+    /* Now any odd factors. */
 
-	k = (int)sqrt((DBL)n) + 1;
+    k = (int)sqrt((DBL)n) + 1;
 
-	for (i = 3; (n > 1) && (i <= k); i += 2)
-	{
-		if (!(n % i))
-		{
-			n = factor_out(n, i, c, s);
-			k = (int)sqrt((DBL)n)+1;
-		}
-	}
+    for (i = 3; (n > 1) && (i <= k); i += 2)
+    {
+        if (!(n % i))
+        {
+            n = factor_out(n, i, c, s);
+            k = (int)sqrt((DBL)n)+1;
+        }
+    }
 
-	if (n > 1)
-	{
-		s[(*c)++] = n;
-	}
+    if (n > 1)
+    {
+        s[(*c)++] = n;
+    }
 }
 #endif
 
@@ -463,15 +465,15 @@ void Poly::factor1(int n, int *c, int *s)
 *   binomial
 *
 * INPUT
-*   
+*
 * OUTPUT
-*   
+*
 * RETURNS
-*   
+*
 * AUTHOR
 *
 *   Alexander Enzmann
-*   
+*
 * DESCRIPTION
 *
 *   Calculate the binomial coefficent of n, r.
@@ -484,70 +486,70 @@ void Poly::factor1(int n, int *c, int *s)
 #if 0
 int Poly::binomial(int n, int  r)
 {
-	int h,i,j,k,l;
-	unsigned int result;
-	int stack1[BINOMSIZE], stack2[BINOMSIZE];
+    int h,i,j,k,l;
+    unsigned int result;
+    int stack1[BINOMSIZE], stack2[BINOMSIZE];
 
-	if ((n < 0) || (r < 0) || (r > n))
-	{
-		result = 0L;
-	}
-	else
-	{
-		if (r == n)
-		{
-			result = 1L;
-		}
-		else
-		{
-			if ((r < 16) && (n < 16))
-			{
-				result = (int)binomials[n][r];
-			}
-			else
-			{
-				j = 0;
+    if ((n < 0) || (r < 0) || (r > n))
+    {
+        result = 0L;
+    }
+    else
+    {
+        if (r == n)
+        {
+            result = 1L;
+        }
+        else
+        {
+            if ((r < 16) && (n < 16))
+            {
+                result = (int)binomials[n][r];
+            }
+            else
+            {
+                j = 0;
 
-				for (i = r + 1; i <= n; i++)
-				{
-					stack1[j++] = i;
-				}
+                for (i = r + 1; i <= n; i++)
+                {
+                    stack1[j++] = i;
+                }
 
-				for (i = 2; i <= (n-r); i++)
-				{
-					h = 0;
+                for (i = 2; i <= (n-r); i++)
+                {
+                    h = 0;
 
-					factor1(i, &h, stack2);
+                    factor1(i, &h, stack2);
 
-					for (k = 0; k < h; k++)
-					{
-						for (l = 0; l < j; l++)
-						{
-							if (!(stack1[l] % stack2[k]))
-							{
-								stack1[l] /= stack2[k];
+                    for (k = 0; k < h; k++)
+                    {
+                        for (l = 0; l < j; l++)
+                        {
+                            if (!(stack1[l] % stack2[k]))
+                            {
+                                stack1[l] /= stack2[k];
 
-								goto l1;
-							}
-						}
-					}
+                                goto l1;
+                            }
+                        }
+                    }
 
-					// Error if we get here
-//					Debug_Info("Failed to factor\n");
+                    // Error if we get here
+//                  Debug_Info("Failed to factor\n");
 l1:;
-				}
+                }
 
-				result = 1;
+                result = 1;
 
-				for (i = 0; i < j; i++)
-				{
-					result *= stack1[i];
-				}
-			}
-		}
-	}
+                for (i = 0; i < j; i++)
+                {
+                    result *= stack1[i];
+                }
+            }
+        }
+    }
 
-	return(result);
+    return(result);
 }
 #endif
 
@@ -559,15 +561,15 @@ l1:;
 *   inside
 *
 * INPUT
-*   
+*
 * OUTPUT
-*   
+*
 * RETURNS
-*   
+*
 * AUTHOR
 *
 *   Alexander Enzmann
-*   
+*
 * DESCRIPTION
 *
 *   -
@@ -580,40 +582,40 @@ l1:;
 
 DBL Poly::inside(const Vector3d& IPoint, int Order, const DBL *Coeffs)
 {
-	DBL x[MAX_ORDER+1], y[MAX_ORDER+1], z[MAX_ORDER+1];
-	DBL c, Result;
-	int i, j, k, term;
+    DBL x[MAX_ORDER+1], y[MAX_ORDER+1], z[MAX_ORDER+1];
+    DBL c, Result;
+    int i, j, k, term;
 
-	x[0] = 1.0;       y[0] = 1.0;       z[0] = 1.0;
-	x[1] = IPoint[X]; y[1] = IPoint[Y]; z[1] = IPoint[Z];
+    x[0] = 1.0;       y[0] = 1.0;       z[0] = 1.0;
+    x[1] = IPoint[X]; y[1] = IPoint[Y]; z[1] = IPoint[Z];
 
-	for (i = 2; i <= Order; i++)
-	{
-		x[i] = x[1] * x[i-1];
-		y[i] = y[1] * y[i-1];
-		z[i] = z[1] * z[i-1];
-	}
+    for (i = 2; i <= Order; i++)
+    {
+        x[i] = x[1] * x[i-1];
+        y[i] = y[1] * y[i-1];
+        z[i] = z[1] * z[i-1];
+    }
 
-	Result = 0.0;
+    Result = 0.0;
 
-	term = 0;
+    term = 0;
 
-	for (i = Order; i >= 0; i--)
-	{
-		for (j=Order-i;j>=0;j--)
-		{
-			for (k=Order-(i+j);k>=0;k--)
-			{
-				if ((c = Coeffs[term]) != 0.0)
-				{
-					Result += c * x[i] * y[j] * z[k];
-				}
-				term++;
-			}
-		}
-	}
+    for (i = Order; i >= 0; i--)
+    {
+        for (j=Order-i;j>=0;j--)
+        {
+            for (k=Order-(i+j);k>=0;k--)
+            {
+                if ((c = Coeffs[term]) != 0.0)
+                {
+                    Result += c * x[i] * y[j] * z[k];
+                }
+                term++;
+            }
+        }
+    }
 
-	return(Result);
+    return(Result);
 }
 
 
@@ -625,15 +627,15 @@ DBL Poly::inside(const Vector3d& IPoint, int Order, const DBL *Coeffs)
 *   intersect
 *
 * INPUT
-*   
+*
 * OUTPUT
-*   
+*
 * RETURNS
-*   
+*
 * AUTHOR
 *
 *   Alexander Enzmann
-*   
+*
 * DESCRIPTION
 *
 *   Intersection of a ray and an arbitrary polynomial function.
@@ -646,122 +648,122 @@ DBL Poly::inside(const Vector3d& IPoint, int Order, const DBL *Coeffs)
 
 int Poly::intersect(const BasicRay &ray, int Order, const DBL *Coeffs, int Sturm_Flag, DBL *Depths, TraceThreadData *Thread)
 {
-	DBL eqn_v[3][MAX_ORDER+1], eqn_vt[3][MAX_ORDER+1];
-	DBL eqn[MAX_ORDER+1];
-	DBL t[3][MAX_ORDER+1];
-	Vector3d P, D;
-	DBL val;
-	int h, i, j, k, i1, j1, k1, term;
-	int offset;
+    DBL eqn_v[3][MAX_ORDER+1], eqn_vt[3][MAX_ORDER+1];
+    DBL eqn[MAX_ORDER+1];
+    DBL t[3][MAX_ORDER+1];
+    Vector3d P, D;
+    DBL val;
+    int h, i, j, k, i1, j1, k1, term;
+    int offset;
 
-	/* First we calculate the values of the individual powers
-	   of x, y, and z as they are represented by the ray */
+    /* First we calculate the values of the individual powers
+       of x, y, and z as they are represented by the ray */
 
-	P = ray.Origin;
-	D = ray.Direction;
+    P = ray.Origin;
+    D = ray.Direction;
 
-	for (i = 0; i < 3; i++)
-	{
-		eqn_v[i][0]  = 1.0;
-		eqn_vt[i][0] = 1.0;
-	}
+    for (i = 0; i < 3; i++)
+    {
+        eqn_v[i][0]  = 1.0;
+        eqn_vt[i][0] = 1.0;
+    }
 
-	eqn_v[0][1] = P[X];
-	eqn_v[1][1] = P[Y];
-	eqn_v[2][1] = P[Z];
+    eqn_v[0][1] = P[X];
+    eqn_v[1][1] = P[Y];
+    eqn_v[2][1] = P[Z];
 
-	eqn_vt[0][1] = D[X];
-	eqn_vt[1][1] = D[Y];
-	eqn_vt[2][1] = D[Z];
+    eqn_vt[0][1] = D[X];
+    eqn_vt[1][1] = D[Y];
+    eqn_vt[2][1] = D[Z];
 
-	for (i = 2; i <= Order; i++)
-	{
-		for (j=0;j<3;j++)
-		{
-			eqn_v[j][i]  = eqn_v[j][1] * eqn_v[j][i-1];
-			eqn_vt[j][i] = eqn_vt[j][1] * eqn_vt[j][i-1];
-		}
-	}
+    for (i = 2; i <= Order; i++)
+    {
+        for (j=0;j<3;j++)
+        {
+            eqn_v[j][i]  = eqn_v[j][1] * eqn_v[j][i-1];
+            eqn_vt[j][i] = eqn_vt[j][1] * eqn_vt[j][i-1];
+        }
+    }
 
-	for (i = 0; i <= Order; i++)
-	{
-		eqn[i] = 0.0;
-	}
+    for (i = 0; i <= Order; i++)
+    {
+        eqn[i] = 0.0;
+    }
 
-	/* Now walk through the terms of the polynomial.  As we go
-	   we substitute the ray equation for each of the variables. */
+    /* Now walk through the terms of the polynomial.  As we go
+       we substitute the ray equation for each of the variables. */
 
-	term = 0;
+    term = 0;
 
-	for (i = Order; i >= 0; i--)
-	{
-		for (h = 0; h <= i; h++)
-		{
-			t[0][h] = binomials[i][h] * eqn_vt[0][i-h] * eqn_v[0][h];
-		}
+    for (i = Order; i >= 0; i--)
+    {
+        for (h = 0; h <= i; h++)
+        {
+            t[0][h] = binomials[i][h] * eqn_vt[0][i-h] * eqn_v[0][h];
+        }
 
-		for (j = Order-i; j >= 0; j--)
-		{
-			for (h = 0; h <= j; h++)
-			{
-				t[1][h] = binomials[j][h] * eqn_vt[1][j-h] * eqn_v[1][h];
-			}
+        for (j = Order-i; j >= 0; j--)
+        {
+            for (h = 0; h <= j; h++)
+            {
+                t[1][h] = binomials[j][h] * eqn_vt[1][j-h] * eqn_v[1][h];
+            }
 
-			for (k = Order-(i+j); k >= 0; k--)
-			{
-				if (Coeffs[term] != 0)
-				{
-					for (h = 0; h <= k; h++)
-					{
-						t[2][h] = binomials[k][h] * eqn_vt[2][k-h] * eqn_v[2][h];
-					}
+            for (k = Order-(i+j); k >= 0; k--)
+            {
+                if (Coeffs[term] != 0)
+                {
+                    for (h = 0; h <= k; h++)
+                    {
+                        t[2][h] = binomials[k][h] * eqn_vt[2][k-h] * eqn_v[2][h];
+                    }
 
-					/* Multiply together the three polynomials. */
+                    /* Multiply together the three polynomials. */
 
-					offset = Order - (i + j + k);
+                    offset = Order - (i + j + k);
 
-					for (i1 = 0; i1 <= i; i1++)
-					{
-						for (j1=0;j1<=j;j1++)
-						{
-							for (k1=0;k1<=k;k1++)
-							{
-								h = offset + i1 + j1 + k1;
-								val = Coeffs[term];
-								val *= t[0][i1];
-								val *= t[1][j1];
-								val *= t[2][k1];
-								eqn[h] += val;
-							}
-						}
-					}
-				}
+                    for (i1 = 0; i1 <= i; i1++)
+                    {
+                        for (j1=0;j1<=j;j1++)
+                        {
+                            for (k1=0;k1<=k;k1++)
+                            {
+                                h = offset + i1 + j1 + k1;
+                                val = Coeffs[term];
+                                val *= t[0][i1];
+                                val *= t[1][j1];
+                                val *= t[2][k1];
+                                eqn[h] += val;
+                            }
+                        }
+                    }
+                }
 
-				term++;
-			}
-		}
-	}
+                term++;
+            }
+        }
+    }
 
-	for (i = 0, j = Order; i <= Order; i++)
-	{
-		if (eqn[i] != 0.0)
-		{
-			break;
-		}
-		else
-		{
-			j--;
-		}
-	}
+    for (i = 0, j = Order; i <= Order; i++)
+    {
+        if (eqn[i] != 0.0)
+        {
+            break;
+        }
+        else
+        {
+            j--;
+        }
+    }
 
-	if (j > 1)
-	{
-		return(Solve_Polynomial(j, &eqn[i], Depths, Sturm_Flag, ROOT_TOLERANCE, Thread));
-	}
-	else
-	{
-		return(0);
-	}
+    if (j > 1)
+    {
+        return(Solve_Polynomial(j, &eqn[i], Depths, Sturm_Flag, ROOT_TOLERANCE, Thread));
+    }
+    else
+    {
+        return(0);
+    }
 }
 
 
@@ -773,15 +775,15 @@ int Poly::intersect(const BasicRay &ray, int Order, const DBL *Coeffs, int Sturm
 *   intersect_linear
 *
 * INPUT
-*   
+*
 * OUTPUT
-*   
+*
 * RETURNS
-*   
+*
 * AUTHOR
 *
 *   Alexander Enzmann
-*   
+*
 * DESCRIPTION
 *
 *   Intersection of a ray and a quadratic.
@@ -794,22 +796,22 @@ int Poly::intersect(const BasicRay &ray, int Order, const DBL *Coeffs, int Sturm
 
 int Poly::intersect_linear(const BasicRay &ray, const DBL *Coeffs, DBL *Depths)
 {
-	DBL t0, t1;
-	const DBL *a = Coeffs;
+    DBL t0, t1;
+    const DBL *a = Coeffs;
 
-	t0 = a[0] * ray.Origin[X] + a[1] * ray.Origin[Y] + a[2] * ray.Origin[Z];
-	t1 = a[0] * ray.Direction[X] + a[1] * ray.Direction[Y] +
+    t0 = a[0] * ray.Origin[X] + a[1] * ray.Origin[Y] + a[2] * ray.Origin[Z];
+    t1 = a[0] * ray.Direction[X] + a[1] * ray.Direction[Y] +
 
-	a[2] * ray.Direction[Z];
+    a[2] * ray.Direction[Z];
 
-	if (fabs(t1) < EPSILON)
-	{
-		return(0);
-	}
+    if (fabs(t1) < EPSILON)
+    {
+        return(0);
+    }
 
-	Depths[0] = -(a[3] + t0) / t1;
+    Depths[0] = -(a[3] + t0) / t1;
 
-	return(1);
+    return(1);
 }
 
 
@@ -821,15 +823,15 @@ int Poly::intersect_linear(const BasicRay &ray, const DBL *Coeffs, DBL *Depths)
 *   intersect_quadratic
 *
 * INPUT
-*   
+*
 * OUTPUT
-*   
+*
 * RETURNS
-*   
+*
 * AUTHOR
 *
 *   Alexander Enzmann
-*   
+*
 * DESCRIPTION
 *
 *   Intersection of a ray and a quadratic.
@@ -842,71 +844,71 @@ int Poly::intersect_linear(const BasicRay &ray, const DBL *Coeffs, DBL *Depths)
 
 int Poly::intersect_quadratic(const BasicRay &ray, const DBL *Coeffs, DBL *Depths)
 {
-	DBL x, y, z, x2, y2, z2;
-	DBL xx, yy, zz, xx2, yy2, zz2, ac, bc, cc, d, t;
-	const DBL *a;
+    DBL x, y, z, x2, y2, z2;
+    DBL xx, yy, zz, xx2, yy2, zz2, ac, bc, cc, d, t;
+    const DBL *a;
 
-	x  = ray.Origin[X];
-	y  = ray.Origin[Y];
-	z  = ray.Origin[Z];
+    x  = ray.Origin[X];
+    y  = ray.Origin[Y];
+    z  = ray.Origin[Z];
 
-	xx = ray.Direction[X];
-	yy = ray.Direction[Y];
-	zz = ray.Direction[Z];
+    xx = ray.Direction[X];
+    yy = ray.Direction[Y];
+    zz = ray.Direction[Z];
 
-	x2  = x * x;    y2  = y * y;    z2 = z * z;
-	xx2 = xx * xx;  yy2 = yy * yy;  zz2 = zz * zz;
+    x2  = x * x;    y2  = y * y;    z2 = z * z;
+    xx2 = xx * xx;  yy2 = yy * yy;  zz2 = zz * zz;
 
-	a = Coeffs;
+    a = Coeffs;
 
-	/*
-	 * Determine the coefficients of t^n, where the line is represented
-	 * as (x,y,z) + (xx,yy,zz)*t.
-	 */
+    /*
+     * Determine the coefficients of t^n, where the line is represented
+     * as (x,y,z) + (xx,yy,zz)*t.
+     */
 
-	ac = (a[0]*xx2 + a[1]*xx*yy + a[2]*xx*zz + a[4]*yy2 + a[5]*yy*zz + a[7]*zz2);
+    ac = (a[0]*xx2 + a[1]*xx*yy + a[2]*xx*zz + a[4]*yy2 + a[5]*yy*zz + a[7]*zz2);
 
-	bc = (2*a[0]*x*xx + a[1]*(x*yy + xx*y) + a[2]*(x*zz + xx*z) +
-	      a[3]*xx + 2*a[4]*y*yy + a[5]*(y*zz + yy*z) + a[6]*yy +
-	      2*a[7]*z*zz + a[8]*zz);
+    bc = (2*a[0]*x*xx + a[1]*(x*yy + xx*y) + a[2]*(x*zz + xx*z) +
+          a[3]*xx + 2*a[4]*y*yy + a[5]*(y*zz + yy*z) + a[6]*yy +
+          2*a[7]*z*zz + a[8]*zz);
 
-	cc = a[0]*x2 + a[1]*x*y + a[2]*x*z + a[3]*x + a[4]*y2 +
-	     a[5]*y*z + a[6]*y + a[7]*z2 + a[8]*z + a[9];
+    cc = a[0]*x2 + a[1]*x*y + a[2]*x*z + a[3]*x + a[4]*y2 +
+         a[5]*y*z + a[6]*y + a[7]*z2 + a[8]*z + a[9];
 
-	if (fabs(ac) < COEFF_LIMIT)
-	{
-		if (fabs(bc) < COEFF_LIMIT)
-		{
-			return(0);
-		}
+    if (fabs(ac) < COEFF_LIMIT)
+    {
+        if (fabs(bc) < COEFF_LIMIT)
+        {
+            return(0);
+        }
 
-		Depths[0] = -cc / bc;
+        Depths[0] = -cc / bc;
 
-		return(1);
-	}
+        return(1);
+    }
 
-	/*
-	 * Solve the quadratic formula & return results that are
-	 * within the correct interval.
-	 */
+    /*
+     * Solve the quadratic formula & return results that are
+     * within the correct interval.
+     */
 
-	d = bc * bc - 4.0 * ac * cc;
+    d = bc * bc - 4.0 * ac * cc;
 
-	if (d < 0.0)
-	{
-		return(0);
-	}
+    if (d < 0.0)
+    {
+        return(0);
+    }
 
-	d = sqrt(d);
+    d = sqrt(d);
 
-	bc = -bc;
+    bc = -bc;
 
-	t = 2.0 * ac;
+    t = 2.0 * ac;
 
-	Depths[0] = (bc + d) / t;
-	Depths[1] = (bc - d) / t;
+    Depths[0] = (bc + d) / t;
+    Depths[1] = (bc - d) / t;
 
-	return(2);
+    return(2);
 }
 
 
@@ -918,15 +920,15 @@ int Poly::intersect_quadratic(const BasicRay &ray, const DBL *Coeffs, DBL *Depth
 *   normal0
 *
 * INPUT
-*   
+*
 * OUTPUT
-*   
+*
 * RETURNS
-*   
+*
 * AUTHOR
 *
 *   Alexander Enzmann
-*   
+*
 * DESCRIPTION
 *
 *   Normal to a polynomial (used for polynomials with order > 4).
@@ -939,60 +941,60 @@ int Poly::intersect_quadratic(const BasicRay &ray, const DBL *Coeffs, DBL *Depth
 
 void Poly::normal0(Vector3d& Result, int Order, const DBL *Coeffs, const Vector3d& IPoint)
 {
-	int i, j, k, term;
-	DBL x[MAX_ORDER+1], y[MAX_ORDER+1], z[MAX_ORDER+1];
-	DBL val;
-	const DBL *a;
+    int i, j, k, term;
+    DBL x[MAX_ORDER+1], y[MAX_ORDER+1], z[MAX_ORDER+1];
+    DBL val;
+    const DBL *a;
 
-	x[0] = 1.0;
-	y[0] = 1.0;
-	z[0] = 1.0;
+    x[0] = 1.0;
+    y[0] = 1.0;
+    z[0] = 1.0;
 
-	x[1] = IPoint[X];
-	y[1] = IPoint[Y];
-	z[1] = IPoint[Z];
+    x[1] = IPoint[X];
+    y[1] = IPoint[Y];
+    z[1] = IPoint[Z];
 
-	for (i = 2; i <= Order; i++)
-	{
-		x[i] = IPoint[X] * x[i-1];
-		y[i] = IPoint[Y] * y[i-1];
-		z[i] = IPoint[Z] * z[i-1];
-	}
+    for (i = 2; i <= Order; i++)
+    {
+        x[i] = IPoint[X] * x[i-1];
+        y[i] = IPoint[Y] * y[i-1];
+        z[i] = IPoint[Z] * z[i-1];
+    }
 
-	a = Coeffs;
+    a = Coeffs;
 
-	term = 0;
+    term = 0;
 
-	Result = Vector3d(0.0, 0.0, 0.0);
+    Result = Vector3d(0.0, 0.0, 0.0);
 
-	for (i = Order; i >= 0; i--)
-	{
-		for (j = Order-i; j >= 0; j--)
-		{
-			for (k = Order-(i+j); k >= 0; k--)
-			{
-				if (i >= 1)
-				{
-					val = x[i-1] * y[j] * z[k];
-					Result[X] += i * a[term] * val;
-				}
+    for (i = Order; i >= 0; i--)
+    {
+        for (j = Order-i; j >= 0; j--)
+        {
+            for (k = Order-(i+j); k >= 0; k--)
+            {
+                if (i >= 1)
+                {
+                    val = x[i-1] * y[j] * z[k];
+                    Result[X] += i * a[term] * val;
+                }
 
-				if (j >= 1)
-				{
-					val = x[i] * y[j-1] * z[k];
-					Result[Y] += j * a[term] * val;
-				}
+                if (j >= 1)
+                {
+                    val = x[i] * y[j-1] * z[k];
+                    Result[Y] += j * a[term] * val;
+                }
 
-				if (k >= 1)
-				{
-					val = x[i] * y[j] * z[k-1];
-					Result[Z] += k * a[term] * val;
-				}
+                if (k >= 1)
+                {
+                    val = x[i] * y[j] * z[k-1];
+                    Result[Z] += k * a[term] * val;
+                }
 
-				term++;
-			}
-		}
-	}
+                term++;
+            }
+        }
+    }
 }
 
 
@@ -1004,15 +1006,15 @@ void Poly::normal0(Vector3d& Result, int Order, const DBL *Coeffs, const Vector3
 *   nromal1
 *
 * INPUT
-*   
+*
 * OUTPUT
-*   
+*
 * RETURNS
-*   
+*
 * AUTHOR
 *
 *   Alexander Enzmann
-*   
+*
 * DESCRIPTION
 *
 *   Normal to a polynomial (for polynomials of order <= 4).
@@ -1025,70 +1027,70 @@ void Poly::normal0(Vector3d& Result, int Order, const DBL *Coeffs, const Vector3
 
 void Poly::normal1(Vector3d& Result, int Order, const DBL *Coeffs, const Vector3d& IPoint)
 {
-	DBL x, y, z, x2, y2, z2, x3, y3, z3;
-	const DBL *a;
+    DBL x, y, z, x2, y2, z2, x3, y3, z3;
+    const DBL *a;
 
-	a = Coeffs;
+    a = Coeffs;
 
-	x = IPoint[X];
-	y = IPoint[Y];
-	z = IPoint[Z];
+    x = IPoint[X];
+    y = IPoint[Y];
+    z = IPoint[Z];
 
-	switch (Order)
-	{
-		case 1:
+    switch (Order)
+    {
+        case 1:
 
-			/* Linear partial derivatives */
+            /* Linear partial derivatives */
 
-			Result = Vector3d(a[0], a[1], a[2]);
+            Result = Vector3d(a[0], a[1], a[2]);
 
-			break;
+            break;
 
-		case 2:
+        case 2:
 
-			/* Quadratic partial derivatives */
+            /* Quadratic partial derivatives */
 
-			Result[X] = 2*a[0]*x+a[1]*y+a[2]*z+a[3];
-			Result[Y] = a[1]*x+2*a[4]*y+a[5]*z+a[6];
-			Result[Z] = a[2]*x+a[5]*y+2*a[7]*z+a[8];
+            Result[X] = 2*a[0]*x+a[1]*y+a[2]*z+a[3];
+            Result[Y] = a[1]*x+2*a[4]*y+a[5]*z+a[6];
+            Result[Z] = a[2]*x+a[5]*y+2*a[7]*z+a[8];
 
-			break;
+            break;
 
-		case 3:
+        case 3:
 
-			x2 = x * x;  y2 = y * y;  z2 = z * z;
+            x2 = x * x;  y2 = y * y;  z2 = z * z;
 
-			/* Cubic partial derivatives */
+            /* Cubic partial derivatives */
 
-			Result[X] = 3*a[0]*x2 + 2*x*(a[1]*y + a[2]*z + a[3]) + a[4]*y2 +
-			            y*(a[5]*z + a[6]) + a[7]*z2 + a[8]*z + a[9];
-			Result[Y] = a[1]*x2 + x*(2*a[4]*y + a[5]*z + a[6]) + 3*a[10]*y2 +
-			            2*y*(a[11]*z + a[12]) + a[13]*z2 + a[14]*z + a[15];
-			Result[Z] = a[2]*x2 + x*(a[5]*y + 2*a[7]*z + a[8]) + a[11]*y2 +
-			            y*(2*a[13]*z + a[14]) + 3*a[16]*z2 + 2*a[17]*z + a[18];
+            Result[X] = 3*a[0]*x2 + 2*x*(a[1]*y + a[2]*z + a[3]) + a[4]*y2 +
+                        y*(a[5]*z + a[6]) + a[7]*z2 + a[8]*z + a[9];
+            Result[Y] = a[1]*x2 + x*(2*a[4]*y + a[5]*z + a[6]) + 3*a[10]*y2 +
+                        2*y*(a[11]*z + a[12]) + a[13]*z2 + a[14]*z + a[15];
+            Result[Z] = a[2]*x2 + x*(a[5]*y + 2*a[7]*z + a[8]) + a[11]*y2 +
+                        y*(2*a[13]*z + a[14]) + 3*a[16]*z2 + 2*a[17]*z + a[18];
 
-			break;
+            break;
 
-		case 4:
+        case 4:
 
-			/* Quartic partial derivatives */
+            /* Quartic partial derivatives */
 
-			x2 = x * x;  y2 = y * y;  z2 = z * z;
-			x3 = x * x2; y3 = y * y2; z3 = z * z2;
+            x2 = x * x;  y2 = y * y;  z2 = z * z;
+            x3 = x * x2; y3 = y * y2; z3 = z * z2;
 
-			Result[X] = 4*a[ 0]*x3+3*x2*(a[ 1]*y+a[ 2]*z+a[ 3])+
-			            2*x*(a[ 4]*y2+y*(a[ 5]*z+a[ 6])+a[ 7]*z2+a[ 8]*z+a[ 9])+
-			            a[10]*y3+y2*(a[11]*z+a[12])+y*(a[13]*z2+a[14]*z+a[15])+
-			            a[16]*z3+a[17]*z2+a[18]*z+a[19];
-			Result[Y] = a[ 1]*x3+x2*(2*a[ 4]*y+a[ 5]*z+a[ 6])+
-			            x*(3*a[10]*y2+2*y*(a[11]*z+a[12])+a[13]*z2+a[14]*z+a[15])+
-			            4*a[20]*y3+3*y2*(a[21]*z+a[22])+2*y*(a[23]*z2+a[24]*z+a[25])+
-			            a[26]*z3+a[27]*z2+a[28]*z+a[29];
-			Result[Z] = a[ 2]*x3+x2*(a[ 5]*y+2*a[ 7]*z+a[ 8])+
-			            x*(a[11]*y2+y*(2*a[13]*z+a[14])+3*a[16]*z2+2*a[17]*z+a[18])+
-			            a[21]*y3+y2*(2*a[23]*z+a[24])+y*(3*a[26]*z2+2*a[27]*z+a[28])+
-			            4*a[30]*z3+3*a[31]*z2+2*a[32]*z+a[33];
-	}
+            Result[X] = 4*a[ 0]*x3+3*x2*(a[ 1]*y+a[ 2]*z+a[ 3])+
+                        2*x*(a[ 4]*y2+y*(a[ 5]*z+a[ 6])+a[ 7]*z2+a[ 8]*z+a[ 9])+
+                        a[10]*y3+y2*(a[11]*z+a[12])+y*(a[13]*z2+a[14]*z+a[15])+
+                        a[16]*z3+a[17]*z2+a[18]*z+a[19];
+            Result[Y] = a[ 1]*x3+x2*(2*a[ 4]*y+a[ 5]*z+a[ 6])+
+                        x*(3*a[10]*y2+2*y*(a[11]*z+a[12])+a[13]*z2+a[14]*z+a[15])+
+                        4*a[20]*y3+3*y2*(a[21]*z+a[22])+2*y*(a[23]*z2+a[24]*z+a[25])+
+                        a[26]*z3+a[27]*z2+a[28]*z+a[29];
+            Result[Z] = a[ 2]*x3+x2*(a[ 5]*y+2*a[ 7]*z+a[ 8])+
+                        x*(a[11]*y2+y*(2*a[13]*z+a[14])+3*a[16]*z2+2*a[17]*z+a[18])+
+                        a[21]*y3+y2*(2*a[23]*z+a[24])+y*(3*a[26]*z2+2*a[27]*z+a[28])+
+                        4*a[30]*z3+3*a[31]*z2+2*a[32]*z+a[33];
+    }
 }
 
 
@@ -1100,11 +1102,11 @@ void Poly::normal1(Vector3d& Result, int Order, const DBL *Coeffs, const Vector3
 *   Inside_Poly
 *
 * INPUT
-*   
+*
 * OUTPUT
-*   
+*
 * RETURNS
-*   
+*
 * AUTHOR
 *
 *   Alexander Enzmann
@@ -1121,23 +1123,23 @@ void Poly::normal1(Vector3d& Result, int Order, const DBL *Coeffs, const Vector3
 
 bool Poly::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 {
-	Vector3d New_Point;
-	DBL Result;
+    Vector3d New_Point;
+    DBL Result;
 
-	/* Transform the point into polynomial's space */
+    /* Transform the point into polynomial's space */
 
-	MInvTransPoint(New_Point, IPoint, Trans);
+    MInvTransPoint(New_Point, IPoint, Trans);
 
-	Result = inside(New_Point, Order, Coeffs);
+    Result = inside(New_Point, Order, Coeffs);
 
-	if (Result < INSIDE_TOLERANCE)
-	{
-		return ((int)(!Test_Flag(this, INVERTED_FLAG)));
-	}
-	else
-	{
-		return ((int)Test_Flag(this, INVERTED_FLAG));
-	}
+    if (Result < INSIDE_TOLERANCE)
+    {
+        return ((int)(!Test_Flag(this, INVERTED_FLAG)));
+    }
+    else
+    {
+        return ((int)Test_Flag(this, INVERTED_FLAG));
+    }
 }
 
 
@@ -1149,15 +1151,15 @@ bool Poly::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 *   Poly_Normal
 *
 * INPUT
-*   
+*
 * OUTPUT
 *
 * RETURNS
-*   
+*
 * AUTHOR
 *
 *   Alexander Enzmann
-*   
+*
 * DESCRIPTION
 *
 *   Normal to a polynomial.
@@ -1170,40 +1172,40 @@ bool Poly::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 
 void Poly::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread) const
 {
-	DBL val;
-	Vector3d New_Point;
+    DBL val;
+    Vector3d New_Point;
 
-	/* Transform the point into the polynomials space. */
+    /* Transform the point into the polynomials space. */
 
-	MInvTransPoint(New_Point, Inter->IPoint, Trans);
+    MInvTransPoint(New_Point, Inter->IPoint, Trans);
 
-	if (Order > 4)
-	{
-		normal0(Result, Order, Coeffs, New_Point);
-	}
-	else
-	{
-		normal1(Result, Order, Coeffs, New_Point);
-	}
+    if (Order > 4)
+    {
+        normal0(Result, Order, Coeffs, New_Point);
+    }
+    else
+    {
+        normal1(Result, Order, Coeffs, New_Point);
+    }
 
-	/* Transform back to world space. */
+    /* Transform back to world space. */
 
-	MTransNormal(Result, Result, Trans);
+    MTransNormal(Result, Result, Trans);
 
-	/* Normalize (accounting for the possibility of a 0 length normal). */
+    /* Normalize (accounting for the possibility of a 0 length normal). */
 
-	val = Result.lengthSqr();
+    val = Result.lengthSqr();
 
-	if (val > 0.0)
-	{
-		val = 1.0 / sqrt(val);
+    if (val > 0.0)
+    {
+        val = 1.0 / sqrt(val);
 
-		Result *= val;
-	}
-	else
-	{
-		Result = Vector3d(1.0, 0.0, 0.0);
-	}
+        Result *= val;
+    }
+    else
+    {
+        Result = Vector3d(1.0, 0.0, 0.0);
+    }
 }
 
 
@@ -1215,15 +1217,15 @@ void Poly::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread
 *   Translate_Poly
 *
 * INPUT
-*   
+*
 * OUTPUT
-*   
+*
 * RETURNS
-*   
+*
 * AUTHOR
 *
 *   Alexander Enzmann
-*   
+*
 * DESCRIPTION
 *
 *   -
@@ -1236,7 +1238,7 @@ void Poly::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread
 
 void Poly::Translate(const Vector3d&, const TRANSFORM *tr)
 {
-	Transform(tr);
+    Transform(tr);
 }
 
 
@@ -1248,15 +1250,15 @@ void Poly::Translate(const Vector3d&, const TRANSFORM *tr)
 *   Rotate_Poly
 *
 * INPUT
-*   
+*
 * OUTPUT
-*   
+*
 * RETURNS
-*   
+*
 * AUTHOR
 *
 *   Alexander Enzmann
-*   
+*
 * DESCRIPTION
 *
 *   -
@@ -1269,7 +1271,7 @@ void Poly::Translate(const Vector3d&, const TRANSFORM *tr)
 
 void Poly::Rotate(const Vector3d&, const TRANSFORM *tr)
 {
-	Transform(tr);
+    Transform(tr);
 }
 
 
@@ -1281,15 +1283,15 @@ void Poly::Rotate(const Vector3d&, const TRANSFORM *tr)
 *   Scale_Poly
 *
 * INPUT
-*   
+*
 * OUTPUT
-*   
+*
 * RETURNS
-*   
+*
 * AUTHOR
 *
 *   Alexander Enzmann
-*   
+*
 * DESCRIPTION
 *
 *   -
@@ -1302,7 +1304,7 @@ void Poly::Rotate(const Vector3d&, const TRANSFORM *tr)
 
 void Poly::Scale(const Vector3d&, const TRANSFORM *tr)
 {
-	Transform(tr);
+    Transform(tr);
 }
 
 
@@ -1314,15 +1316,15 @@ void Poly::Scale(const Vector3d&, const TRANSFORM *tr)
 *   Transform_Poly
 *
 * INPUT
-*   
+*
 * OUTPUT
-*   
+*
 * RETURNS
-*   
+*
 * AUTHOR
 *
 *   Alexander Enzmann
-*   
+*
 * DESCRIPTION
 *
 *   -
@@ -1335,9 +1337,9 @@ void Poly::Scale(const Vector3d&, const TRANSFORM *tr)
 
 void Poly::Transform(const TRANSFORM *tr)
 {
-	Compose_Transforms(Trans, tr);
+    Compose_Transforms(Trans, tr);
 
-	Compute_BBox();
+    Compute_BBox();
 }
 
 
@@ -1349,15 +1351,15 @@ void Poly::Transform(const TRANSFORM *tr)
 *   Create_Poly
 *
 * INPUT
-*   
+*
 * OUTPUT
-*   
+*
 * RETURNS
-*   
+*
 * AUTHOR
 *
 *   Alexander Enzmann
-*   
+*
 * DESCRIPTION
 *
 *   -
@@ -1370,14 +1372,14 @@ void Poly::Transform(const TRANSFORM *tr)
 
 Poly::Poly(int order) : ObjectBase(POLY_OBJECT)
 {
-	Order = order;
+    Order = order;
 
-	Trans = Create_Transform();
+    Trans = Create_Transform();
 
-	Coeffs = reinterpret_cast<DBL *>(POV_MALLOC(term_counts(Order) * sizeof(DBL), "coefficients for POLY"));
+    Coeffs = reinterpret_cast<DBL *>(POV_MALLOC(term_counts(Order) * sizeof(DBL), "coefficients for POLY"));
 
-	for (int i = 0; i < term_counts(Order); i++)
-		Coeffs[i] = 0.0;
+    for (int i = 0; i < term_counts(Order); i++)
+        Coeffs[i] = 0.0;
 }
 
 
@@ -1389,15 +1391,15 @@ Poly::Poly(int order) : ObjectBase(POLY_OBJECT)
 *   Copy_Poly
 *
 * INPUT
-*   
+*
 * OUTPUT
-*   
+*
 * RETURNS
-*   
+*
 * AUTHOR
 *
 *   Alexander Enzmann
-*   
+*
 * DESCRIPTION
 *
 *   Make a copy of a polynomial object.
@@ -1410,19 +1412,19 @@ Poly::Poly(int order) : ObjectBase(POLY_OBJECT)
 
 ObjectPtr Poly::Copy()
 {
-	Poly *New = new Poly(Order);
-	DBL *tmpCoeffs = New->Coeffs;
-	int i;
+    Poly *New = new Poly(Order);
+    DBL *tmpCoeffs = New->Coeffs;
+    int i;
 
-	Destroy_Transform(New->Trans);
-	*New = *this;
-	New->Coeffs = tmpCoeffs;
-	New->Trans = Copy_Transform(Trans);
+    Destroy_Transform(New->Trans);
+    *New = *this;
+    New->Coeffs = tmpCoeffs;
+    New->Trans = Copy_Transform(Trans);
 
-	for(i = 0; i < term_counts(New->Order); i++)
-		New->Coeffs[i] = Coeffs[i];
+    for(i = 0; i < term_counts(New->Order); i++)
+        New->Coeffs[i] = Coeffs[i];
 
-	return New;
+    return New;
 }
 
 
@@ -1434,15 +1436,15 @@ ObjectPtr Poly::Copy()
 *   Destroy_Poly
 *
 * INPUT
-*   
+*
 * OUTPUT
-*   
+*
 * RETURNS
-*   
+*
 * AUTHOR
 *
 *   Alexander Enzmann
-*   
+*
 * DESCRIPTION
 *
 *   -
@@ -1455,9 +1457,9 @@ ObjectPtr Poly::Copy()
 
 Poly::~Poly()
 {
-	Destroy_Transform(Trans);
+    Destroy_Transform(Trans);
 
-	POV_FREE(Coeffs);
+    POV_FREE(Coeffs);
 }
 
 
@@ -1471,17 +1473,17 @@ Poly::~Poly()
 * INPUT
 *
 *   Poly - Poly
-*   
+*
 * OUTPUT
 *
 *   Poly
 *
 * RETURNS
-*   
+*
 * AUTHOR
 *
 *   Dieter Bayer
-*   
+*
 * DESCRIPTION
 *
 *   Calculate the bounding box of a poly.
@@ -1494,15 +1496,15 @@ Poly::~Poly()
 
 void Poly::Compute_BBox()
 {
-	Make_BBox(BBox, -BOUND_HUGE/2, -BOUND_HUGE/2, -BOUND_HUGE/2, BOUND_HUGE, BOUND_HUGE, BOUND_HUGE);
+    Make_BBox(BBox, -BOUND_HUGE/2, -BOUND_HUGE/2, -BOUND_HUGE/2, BOUND_HUGE, BOUND_HUGE, BOUND_HUGE);
 
-	if(!Clip.empty())
-		BBox = Clip[0]->BBox; // FIXME - does not seem to support more than one bounding object? [trf]
+    if(!Clip.empty())
+        BBox = Clip[0]->BBox; // FIXME - does not seem to support more than one bounding object? [trf]
 }
 
 bool Poly::Intersect_BBox(BBoxDirection, const BBoxVector3d&, const BBoxVector3d&, BBoxScalar) const
 {
-	return true;
+    return true;
 }
 
 }

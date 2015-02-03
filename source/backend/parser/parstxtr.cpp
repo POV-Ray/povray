@@ -37,12 +37,11 @@
 #include "backend/frame.h"
 #include "backend/parser/parse.h"
 
-#include "base/image/image.h"
 #include "backend/colour/colour_old.h"
 #include "backend/interior/interior.h"
 #include "backend/interior/media.h"
 #include "backend/math/matrices.h"
-#include "backend/math/vector.h"
+#include "backend/pattern/warps.h"
 #include "backend/scene/objects.h"
 #include "backend/scene/threaddata.h"
 #include "backend/shape/isosurf.h"
@@ -53,6 +52,8 @@
 #include "backend/texture/texture.h"
 #include "backend/vm/fncode.h"
 #include "backend/vm/fnpovfpu.h"
+#include "base/image/image.h"
+#include "base/path.h"
 
 #include "lightgrp.h" // TODO
 
@@ -199,7 +200,7 @@ ImageData *Parser::Parse_Image(int Legal, bool GammaCorrect)
     {
         EXPECT
             CASE_VECTOR
-                Warning(150, "Old style orientation vector or map type not supported. Ignoring value.");
+                VersionWarning(150, "Old style orientation vector or map type not supported. Ignoring value.");
                 Parse_Vector(Local_Vector);
             END_CASE
 
@@ -446,10 +447,10 @@ ImageData *Parser::Parse_Image(int Legal, bool GammaCorrect)
         {
             // context typically implies that gamma correction is not desired (e.g. height_field)
             if (options.gammacorrect && !options.gammaOverride)
-                Warning(0, "input image gamma not specified for height_field, bump_map or image_pattern;\n"
-                           "no gamma adjustment performed on input image; results may differ from intention\n"
-                           "in rare cases. See the documentation for details.\n"
-                           "To get rid of this warning, explicitly specify \"gamma 1.0\".");
+                Warning("input image gamma not specified for height_field, bump_map or image_pattern;\n"
+                        "no gamma adjustment performed on input image; results may differ from intention\n"
+                        "in rare cases. See the documentation for details.\n"
+                        "To get rid of this warning, explicitly specify \"gamma 1.0\".");
         }
 
         // beta-test feature
@@ -472,7 +473,7 @@ ImageData *Parser::Parse_Image(int Legal, bool GammaCorrect)
 
         if (!options.warnings.empty())
             for (vector<string>::iterator it = options.warnings.begin(); it != options.warnings.end(); it++)
-                Warning (0, "%s: %s", Name, it->c_str()) ;
+                Warning("%s: %s", Name, it->c_str());
 
         POV_FREE(Name);
     }
@@ -610,7 +611,7 @@ void Parser::Parse_Image_Map (PIGMENT *Pigment)
         END_CASE
 
         CASE (ALPHA_TOKEN)
-            Warning(155, "Keyword ALPHA discontinued. Use FILTER instead.");
+            VersionWarning(155, "Keyword ALPHA discontinued. Use FILTER instead.");
             // FALLTHROUGH
 
         CASE (COLOUR_KEY_TOKEN)
@@ -627,11 +628,11 @@ void Parser::Parse_Image_Map (PIGMENT *Pigment)
                                 {
                                     if (image->data->HasFilterTransmit() == false)
                                     {
-                                        vector<Image::RGBFTMapEntry> map ;
-                                        image->data->GetColourMap (map) ;
-                                        image->data->SetColourMap (map) ;
+                                        vector<Image::RGBFTMapEntry> map;
+                                        image->data->GetColourMap (map);
+                                        image->data->SetColourMap (map);
                                     }
-                                    for(reg = 0 ; reg < image->data->GetColourMapSize(); reg++)
+                                    for(reg = 0; reg < image->data->GetColourMapSize(); reg++)
                                     {
                                         float r, g, b, f, t;
 
@@ -657,9 +658,9 @@ void Parser::Parse_Image_Map (PIGMENT *Pigment)
 
                                 if (image->data->HasFilterTransmit() == false)
                                 {
-                                    vector<Image::RGBFTMapEntry> map ;
-                                    image->data->GetColourMap (map) ;
-                                    image->data->SetColourMap (map) ;
+                                    vector<Image::RGBFTMapEntry> map;
+                                    image->data->GetColourMap (map);
+                                    image->data->SetColourMap (map);
                                 }
                                 image->data->GetRGBFTIndexedValue(reg, r, g, b, f, t);
                                 image->data->SetRGBFTIndexedValue(reg, r, g, b, Parse_Float(), t);
@@ -682,11 +683,11 @@ void Parser::Parse_Image_Map (PIGMENT *Pigment)
                                 {
                                     if (image->data->HasFilterTransmit() == false)
                                     {
-                                        vector<Image::RGBFTMapEntry> map ;
-                                        image->data->GetColourMap (map) ;
-                                        image->data->SetColourMap (map) ;
+                                        vector<Image::RGBFTMapEntry> map;
+                                        image->data->GetColourMap (map);
+                                        image->data->SetColourMap (map);
                                     }
-                                    for(reg = 0 ; reg < image->data->GetColourMapSize(); reg++)
+                                    for(reg = 0; reg < image->data->GetColourMapSize(); reg++)
                                     {
                                         float r, g, b, f, t;
 
@@ -712,9 +713,9 @@ void Parser::Parse_Image_Map (PIGMENT *Pigment)
 
                                 if (image->data->HasFilterTransmit() == false)
                                 {
-                                    vector<Image::RGBFTMapEntry> map ;
-                                    image->data->GetColourMap (map) ;
-                                    image->data->SetColourMap (map) ;
+                                    vector<Image::RGBFTMapEntry> map;
+                                    image->data->GetColourMap (map);
+                                    image->data->SetColourMap (map);
                                 }
                                 image->data->GetRGBFTIndexedValue(reg, r, g, b, f, t);
                                 image->data->SetRGBFTIndexedValue(reg, r, g, b, f, Parse_Float());
@@ -947,7 +948,7 @@ void Parser::Parse_Pigment (PIGMENT **Pigment_Ptr)
 
     if (Not_In_Default && ((*Pigment_Ptr)->Type == NO_PATTERN))
     {
-        Warning(155, "Pigment type unspecified or not 1st item.");
+        VersionWarning(155, "Pigment type unspecified or not 1st item.");
     }
 }
 
@@ -979,7 +980,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, int TPat_Type)
     Vector3d Local_Vector;
     MATRIX Local_Matrix;
     TRANSFORM Local_Trans;
-    TURB *Local_Turb;
+    ClassicTurbulence *Local_Turb;
     unsigned short Old_Type=New->Type;
     ImageData *Old_Image = NULL;
     DENSITY_FILE *Old_Density_File = NULL;
@@ -1004,7 +1005,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, int TPat_Type)
         CASE (AGATE_TOKEN)
             New->Type = AGATE_PATTERN;
             New->pattern = PatternPtr(new AgatePattern());
-            Check_Turb(&(New->pattern->pWarps));
+            Check_Turb(New->pattern->warps, New->pattern->HasSpecialTurbulenceHandling());
             dynamic_cast<AgatePattern*>(New->pattern.get())->agateTurbScale = 1.0; // TODO this is a job for a constructor
             EXIT
         END_CASE
@@ -1494,7 +1495,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, int TPat_Type)
                     {
                         dynamic_cast<SlopePattern*>(New->pattern.get())->slopeModLow   = 0.0;
                         dynamic_cast<SlopePattern*>(New->pattern.get())->slopeModWidth = 0.0;
-                        Warning (0, "Zero gradient range, ignoring.");
+                        Warning("Zero gradient range, ignoring.");
                     }
                     else
                     {
@@ -1523,7 +1524,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, int TPat_Type)
                                 {
                                     dynamic_cast<SlopePattern*>(New->pattern.get())->altitudeModLow   = 0.0;
                                     dynamic_cast<SlopePattern*>(New->pattern.get())->altitudeModWidth = 0.0;
-                                    Warning (0, "Zero gradient range, ignoring.");
+                                    Warning("Zero gradient range, ignoring.");
                                 }
                                 else
                                 {
@@ -1746,8 +1747,8 @@ void Parser::Parse_Pattern (PATTERN_T *New, int TPat_Type)
                         {
                             New->Type = JULIA_PATTERN;
                             New->pattern = PatternPtr(new JuliaPattern(*dynamic_cast<JuliaPattern*>(New->pattern.get())));
-                            Warning(0, "Invalid julia pattern exponent found. Supported exponents are 2 to %i.\n"
-                                       "Using default exponent 2.", kFractalMaxExponent);
+                            Warning("Invalid julia pattern exponent found. Supported exponents are 2 to %i.\n"
+                                    "Using default exponent 2.", kFractalMaxExponent);
                         }
                         break;
                 }
@@ -1781,8 +1782,8 @@ void Parser::Parse_Pattern (PATTERN_T *New, int TPat_Type)
                         {
                             New->Type = MANDEL_PATTERN;
                             New->pattern = PatternPtr(new Mandel2Pattern(*dynamic_cast<MandelPattern*>(New->pattern.get())));
-                            Warning(0, "Invalid mandel pattern exponent found. Supported exponents are 2 to %i.\n"
-                                       "Using default exponent 2.", kFractalMaxExponent);
+                            Warning("Invalid mandel pattern exponent found. Supported exponents are 2 to %i.\n"
+                                    "Using default exponent 2.", kFractalMaxExponent);
                         }
                         break;
                 }
@@ -1790,22 +1791,17 @@ void Parser::Parse_Pattern (PATTERN_T *New, int TPat_Type)
         END_CASE
 
         CASE (COORDS_TOKEN)
-            if (New->Type != FACETS_PATTERN )
-            {
+            if (New->Type == FACETS_PATTERN )
+                dynamic_cast<FacetsPattern*>(New->pattern.get())->facetsCoords = Parse_Float();
+            else
                 Only_In("coords", "facets");
-            }
-            dynamic_cast<FacetsPattern*>(New->pattern.get())->facetsCoords = Parse_Float();
         END_CASE
 
         CASE (SIZE_TOKEN)
             if (New->Type == FACETS_PATTERN )
-            {
                 dynamic_cast<FacetsPattern*>(New->pattern.get())->facetsSize = Parse_Float();
-            }
             else
-            {
                 Only_In("size", "facets");
-            }
         END_CASE
 
         CASE (METRIC_TOKEN)
@@ -1822,36 +1818,27 @@ void Parser::Parse_Pattern (PATTERN_T *New, int TPat_Type)
                 dynamic_cast<CracklePattern*>(New->pattern.get())->crackleMetric = Local_Vector[X];
             }
             else
-            {
                 Only_In("metric", "facets or crackle");
-            }
         END_CASE
 
         CASE (FORM_TOKEN)
-            if ((New->Type != CRACKLE_PATTERN) && (New->Type != PAVEMENT_PATTERN))
-            {
-                Only_In("form", "crackle or pavement");
-            }
-            else if (New->Type == CRACKLE_PATTERN)
-            {
+            if (New->Type == CRACKLE_PATTERN)
                 Parse_Vector( dynamic_cast<CracklePattern*>(New->pattern.get())->crackleForm );
-            }
-            else
-            {
+            else if (New->Type == PAVEMENT_PATTERN)
                 dynamic_cast<PavementPattern*>(New->pattern.get())->Form = ((unsigned char)Parse_Float());
-            }
+            else
+                Only_In("form", "crackle or pavement");
         END_CASE
 
         CASE (OFFSET_TOKEN)
-            if (New->Type != CRACKLE_PATTERN )
-            {
+            if (New->Type == CRACKLE_PATTERN )
+                dynamic_cast<CracklePattern*>(New->pattern.get())->crackleOffset = Parse_Float();
+            else
                 Only_In("offset", "crackle");
-            }
-            dynamic_cast<CracklePattern*>(New->pattern.get())->crackleOffset = Parse_Float();
         END_CASE
 
         CASE (TURBULENCE_TOKEN)
-            Local_Turb=Check_Turb(&(New->pattern->pWarps));
+            Local_Turb=Check_Turb(New->pattern->warps, New->pattern->HasSpecialTurbulenceHandling());
             Parse_Vector(Local_Turb->Turbulence);
         END_CASE
 
@@ -1954,28 +1941,20 @@ void Parser::Parse_Pattern (PATTERN_T *New, int TPat_Type)
 
         CASE (CONTROL0_TOKEN)
             if (New->Type == QUILTED_PATTERN)
-            {
                 dynamic_cast<QuiltedPattern*>(New->pattern.get())->Control0 = Parse_Float ();
-            }
             else
-            {
                 Not_With ("control0","this pattern");
-            }
         END_CASE
 
         CASE (CONTROL1_TOKEN)
             if (New->Type == QUILTED_PATTERN)
-            {
                 dynamic_cast<QuiltedPattern*>(New->pattern.get())->Control1 = Parse_Float ();
-            }
             else
-            {
                 Not_With ("control1","this pattern");
-            }
         END_CASE
 
         CASE (OCTAVES_TOKEN)
-            Local_Turb=Check_Turb(&(New->pattern->pWarps));
+            Local_Turb=Check_Turb(New->pattern->warps, New->pattern->HasSpecialTurbulenceHandling());
             Local_Turb->Octaves = (int)Parse_Float();
             if(Local_Turb->Octaves < 1)
                 Local_Turb->Octaves = 1;
@@ -1984,12 +1963,12 @@ void Parser::Parse_Pattern (PATTERN_T *New, int TPat_Type)
         END_CASE
 
         CASE (OMEGA_TOKEN)
-            Local_Turb=Check_Turb(&(New->pattern->pWarps));
+            Local_Turb=Check_Turb(New->pattern->warps, New->pattern->HasSpecialTurbulenceHandling());
             Local_Turb->Omega = Parse_Float();
         END_CASE
 
         CASE (LAMBDA_TOKEN)
-            Local_Turb=Check_Turb(&(New->pattern->pWarps));
+            Local_Turb=Check_Turb(New->pattern->warps, New->pattern->HasSpecialTurbulenceHandling());
             Local_Turb->Lambda = Parse_Float();
         END_CASE
 
@@ -1999,7 +1978,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, int TPat_Type)
                 pContinuousPattern->waveFrequency = Parse_Float();
             else
             {
-                Warning(0,"frequrency has no effect on discrete patterns");
+                Warning("frequrency has no effect on discrete patterns");
                 Parse_Float();
             }
         END_CASE
@@ -2009,7 +1988,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, int TPat_Type)
             if (pContinuousPattern != NULL)
                 pContinuousPattern->waveType = kWaveType_Ramp;
             else
-                Warning(0,"ramp_wave has no effect on discrete patterns");
+                Warning("ramp_wave has no effect on discrete patterns");
         END_CASE
 
         CASE (TRIANGLE_WAVE_TOKEN)
@@ -2017,7 +1996,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, int TPat_Type)
             if (pContinuousPattern != NULL)
                 pContinuousPattern->waveType = kWaveType_Triangle;
             else
-                Warning(0,"triangle_wave has no effect on discrete patterns");
+                Warning("triangle_wave has no effect on discrete patterns");
         END_CASE
 
         CASE (SINE_WAVE_TOKEN)
@@ -2025,7 +2004,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, int TPat_Type)
             if (pContinuousPattern != NULL)
                 pContinuousPattern->waveType = kWaveType_Sine;
             else
-                Warning(0,"sine_wave has no effect on discrete patterns");
+                Warning("sine_wave has no effect on discrete patterns");
         END_CASE
 
         CASE (SCALLOP_WAVE_TOKEN)
@@ -2033,7 +2012,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, int TPat_Type)
             if (pContinuousPattern != NULL)
                 pContinuousPattern->waveType = kWaveType_Scallop;
             else
-                Warning(0,"scallop_wave has no effect on discrete patterns");
+                Warning("scallop_wave has no effect on discrete patterns");
         END_CASE
 
         CASE (CUBIC_WAVE_TOKEN)
@@ -2041,7 +2020,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, int TPat_Type)
             if (pContinuousPattern != NULL)
                 pContinuousPattern->waveType = kWaveType_Cubic;
             else
-                Warning(0,"cubic_wave has no effect on discrete patterns");
+                Warning("cubic_wave has no effect on discrete patterns");
         END_CASE
 
         CASE (POLY_WAVE_TOKEN)
@@ -2053,7 +2032,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, int TPat_Type)
             }
             else
             {
-                Warning(0,"poly_wave has no effect on discrete patterns");
+                Warning("poly_wave has no effect on discrete patterns");
                 Allow_Float(0.0);
             }
         END_CASE
@@ -2064,7 +2043,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, int TPat_Type)
                 pContinuousPattern->wavePhase = Parse_Float();
             else
             {
-                Warning(0,"phase has no effect on discrete patterns");
+                Warning("phase has no effect on discrete patterns");
                 Parse_Float();
             }
         END_CASE
@@ -2089,7 +2068,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, int TPat_Type)
             if (New->Type != AGATE_PATTERN)
                 Not_With ("agate_turb","non-agate");
             dynamic_cast<AgatePattern*>(New->pattern.get())->agateTurbScale = Parse_Float();
-            Check_Turb(&(New->pattern->pWarps));   /* agate needs Octaves, Lambda etc. */
+            Check_Turb(New->pattern->warps, New->pattern->HasSpecialTurbulenceHandling());   /* agate needs Octaves, Lambda etc. */
         END_CASE
 
         CASE (BRICK_SIZE_TOKEN)
@@ -2129,7 +2108,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, int TPat_Type)
         END_CASE
 
         CASE (WARP_TOKEN)
-            Parse_Warp(&(New->pattern->pWarps));
+            Parse_Warp(New->pattern->warps);
         END_CASE
 
         CASE (TRANSLATE_TOKEN)
@@ -2320,7 +2299,8 @@ void Parser::Parse_Finish (FINISH **Finish_Ptr)
 
     EXPECT        /* Look for zero or one finish_id */
         CASE (FINISH_ID_TOKEN)
-            Destroy_Finish(*Finish_Ptr);
+            if (*Finish_Ptr)
+                delete *Finish_Ptr;
             *Finish_Ptr = Copy_Finish (reinterpret_cast<FINISH *>(Token.Data));
             EXIT
         END_CASE
@@ -2494,7 +2474,7 @@ void Parser::Parse_Finish (FINISH **Finish_Ptr)
             if (New->Roughness != 0.0)
                 New->Roughness = 1.0/New->Roughness; /* CEY 12/92 */
             else
-                Warning(0, "Zero roughness used.");
+                Warning("Zero roughness used.");
         END_CASE
 
         CASE (METALLIC_TOKEN)
@@ -2544,17 +2524,17 @@ void Parser::Parse_Finish (FINISH **Finish_Ptr)
 
         CASE (IOR_TOKEN)
             New->Temp_IOR = Parse_Float();
-            Warn_Compat(0, "Index of refraction value should be specified in 'interior{...}' statement.");
+            Warn_Compat(false, "Index of refraction value should be specified in 'interior{...}' statement.");
         END_CASE
 
         CASE (CAUSTICS_TOKEN)
             New->Temp_Caustics = Parse_Float();
-            Warn_Compat(0, "Caustics value should be specified in 'interior{...}' statement.");
+            Warn_Compat(false, "Caustics value should be specified in 'interior{...}' statement.");
         END_CASE
 
         CASE (REFRACTION_TOKEN)
             New->Temp_Refract = Parse_Float();
-            Warn_Compat(0, "Refraction value unnecessary to turn on refraction.\nTo attenuate, the fade_power and fade_distance keywords should be specified in 'interior{...}' statement.");
+            Warn_Compat(false, "Refraction value unnecessary to turn on refraction.\nTo attenuate, the fade_power and fade_distance keywords should be specified in 'interior{...}' statement.");
         END_CASE
 
         CASE (SUBSURFACE_TOKEN)
@@ -2649,7 +2629,7 @@ TEXTURE *Parser::Parse_Texture ()
     TEXTURE *Texture;
     int Modified_Pnf;
 
-    if (sceneData->languageVersion < 300)
+    if (sceneData->EffectiveLanguageVersion() < 300)
     {
         return(Parse_Vers1_Texture());
     }
@@ -2698,7 +2678,8 @@ TEXTURE *Parser::Parse_Texture ()
 
             CASE (FINISH_ID_TOKEN)
                 Warn_State(Token.Token_Id, FINISH_TOKEN);
-                Destroy_Finish(Texture->Finish);
+                if (Texture->Finish)
+                    delete Texture->Finish;
                 Texture->Finish = Copy_Finish (reinterpret_cast<FINISH *>(Token.Data));
                 Modified_Pnf = true;
             END_CASE
@@ -2819,7 +2800,8 @@ TEXTURE *Parser::Parse_Texture ()
                     UNGET;
                     Destroy_Pigment(Texture->Pigment);
                     Destroy_Tnormal(Texture->Tnormal);
-                    Destroy_Finish(Texture->Finish);
+                    if (Texture->Finish)
+                        delete Texture->Finish;
                     Texture->Pigment = NULL;
                     Texture->Tnormal = NULL;
                     Texture->Finish  = NULL;
@@ -2871,7 +2853,8 @@ TEXTURE *Parser::Parse_Tiles()
     Texture = Create_Texture ();
     Destroy_Pigment(Texture->Pigment);
     Destroy_Tnormal(Texture->Tnormal);
-    Destroy_Finish(Texture->Finish);
+    if (Texture->Finish)
+        delete Texture->Finish;
     Texture->Pigment = NULL;
     Texture->Tnormal = NULL;
     Texture->Finish  = NULL;
@@ -2954,7 +2937,8 @@ TEXTURE *Parser::Parse_Material_Map()
     Texture = Create_Texture ();
     Destroy_Pigment(Texture->Pigment);
     Destroy_Tnormal(Texture->Tnormal);
-    Destroy_Finish(Texture->Finish);
+    if (Texture->Finish)
+        delete Texture->Finish;
     Texture->Pigment = NULL;
     Texture->Tnormal = NULL;
     Texture->Finish  = NULL;
@@ -3047,7 +3031,7 @@ TEXTURE *Parser::Parse_Vers1_Texture ()
     Vector3d Local_Vector;
     MATRIX Local_Matrix;
     TRANSFORM Local_Trans;
-    TURB *Local_Turb;
+    ClassicTurbulence *Local_Turb;
     TEXTURE *Texture;
     PIGMENT *Pigment;
     TNORMAL *Tnormal;
@@ -3094,7 +3078,8 @@ TEXTURE *Parser::Parse_Vers1_Texture ()
                 END_CASE
 
                 CASE (FINISH_ID_TOKEN)
-                    Destroy_Finish(Texture->Finish);
+                    if (Texture->Finish)
+                        delete Texture->Finish;
                     Texture->Finish = Copy_Finish (reinterpret_cast<FINISH *>(Token.Data));
                 END_CASE
 
@@ -3134,7 +3119,7 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
                     Pigment->Type = AGATE_PATTERN;
                     Pigment->pattern = PatternPtr(new AgatePattern());
                     dynamic_cast<AgatePattern*>(Pigment->pattern.get())->agateTurbScale = 1.0;
-                    Check_Turb(&(Pigment->pattern->pWarps));   /* agate needs Octaves, Lambda etc. */
+                    Check_Turb(Pigment->pattern->warps, Pigment->pattern->HasSpecialTurbulenceHandling()); // agate needs Octaves, Lambda etc., and handles the pattern itself
                 END_CASE
 
                 CASE (BOZO_TOKEN)
@@ -3239,7 +3224,7 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
                 END_CASE
 
                 CASE (TURBULENCE_TOKEN)
-                    Local_Turb=Check_Turb(&(Pigment->pattern->pWarps));
+                    Local_Turb=Check_Turb(Pigment->pattern->warps, Pigment->pattern->HasSpecialTurbulenceHandling());
                     Parse_Vector(Local_Turb->Turbulence);
                 END_CASE
 
@@ -3248,7 +3233,7 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
                     if (Pigment->Type == GENERIC_INTEGER_PATTERN ||
                         Pigment->Type == PLAIN_PATTERN ||
                         Pigment->Type == BITMAP_PATTERN)
-                        Warning(150, "Cannot use color map with this pigment type.");
+                        VersionWarning(150, "Cannot use color map with this pigment type.");
                     Pigment->Blend_Map = Parse_Colour_Map<ColourBlendMap> ();
                 END_CASE
 
@@ -3258,7 +3243,7 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
                 END_CASE
 
                 CASE (OCTAVES_TOKEN)
-                    Local_Turb=Check_Turb(&(Pigment->pattern->pWarps));
+                    Local_Turb=Check_Turb(Pigment->pattern->warps, Pigment->pattern->HasSpecialTurbulenceHandling());
                     Local_Turb->Octaves = (int)Parse_Float();
                     if(Local_Turb->Octaves < 1)
                         Local_Turb->Octaves = 1;
@@ -3267,12 +3252,12 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
                 END_CASE
 
                 CASE (OMEGA_TOKEN)
-                    Local_Turb=Check_Turb(&(Pigment->pattern->pWarps));
+                    Local_Turb=Check_Turb(Pigment->pattern->warps, Pigment->pattern->HasSpecialTurbulenceHandling());
                     Local_Turb->Omega = Parse_Float();
                 END_CASE
 
                 CASE (LAMBDA_TOKEN)
-                    Local_Turb=Check_Turb(&(Pigment->pattern->pWarps));
+                    Local_Turb=Check_Turb(Pigment->pattern->warps, Pigment->pattern->HasSpecialTurbulenceHandling());
                     Local_Turb->Lambda = Parse_Float();
                 END_CASE
 
@@ -3333,8 +3318,8 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
                     Warn_State(Token.Token_Id, TNORMAL_TOKEN);
                     ADD_TNORMAL
                     if (!(Tnormal->Type == RIPPLES_PATTERN || Tnormal->Type == WAVES_PATTERN))
-                        if (sceneData->languageVersion >= 150)
-                            Warning(150, "Cannot use frequency with this normal.");
+                        if (sceneData->EffectiveLanguageVersion() >= 150)
+                            VersionWarning(150, "Cannot use frequency with this normal.");
                     pContinuousPattern = dynamic_cast<ContinuousPattern*>(Tnormal->pattern.get());
                     pContinuousPattern->waveFrequency = Parse_Float();
                 END_CASE
@@ -3343,8 +3328,8 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
                     Warn_State(Token.Token_Id, TNORMAL_TOKEN);
                     ADD_TNORMAL
                     if (!(Tnormal->Type == RIPPLES_PATTERN || Tnormal->Type == WAVES_PATTERN))
-                        if (sceneData->languageVersion >= 150)
-                            Warning(150, "Cannot use phase with this normal.");
+                        if (sceneData->EffectiveLanguageVersion() >= 150)
+                            VersionWarning(150, "Cannot use phase with this normal.");
                     pContinuousPattern = dynamic_cast<ContinuousPattern*>(Tnormal->pattern.get());
                     pContinuousPattern->wavePhase = Parse_Float();
                 END_CASE
@@ -3397,7 +3382,7 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
                     if (Finish->Roughness != 0.0)
                         Finish->Roughness = 1.0/Finish->Roughness; /* CEY 12/92 */
                     else
-                        Warning(0, "Zero roughness used.");
+                        Warning("Zero roughness used.");
                 END_CASE
 
                 CASE (METALLIC_TOKEN)
@@ -3412,19 +3397,19 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
 
                 CASE_FLOAT
                     Finish->Crand = Parse_Float();
-                    Warning(150, "Should use crand keyword in finish statement.");
+                    VersionWarning(150, "Should use crand keyword in finish statement.");
                 END_CASE
 
                 CASE (IOR_TOKEN)
                     Warn_State(Token.Token_Id, INTERIOR_TOKEN);
                     Finish->Temp_IOR = Parse_Float();
-                    Warn_Compat(0, "Index of refraction value should be specified in 'interior{...}' statement.");
+                    Warn_Compat(false, "Index of refraction value should be specified in 'interior{...}' statement.");
                 END_CASE
 
                 CASE (REFRACTION_TOKEN)
                     Warn_State(Token.Token_Id, INTERIOR_TOKEN);
                     Finish->Temp_Refract = Parse_Float();
-                    Warn_Compat(0, "Refraction value unnecessary to turn on refraction.\nTo attenuate, the fade_power and fade_distance keywords should be specified in 'interior{...}' statement.");
+                    Warn_Compat(false, "Refraction value unnecessary to turn on refraction.\nTo attenuate, the fade_power and fade_distance keywords should be specified in 'interior{...}' statement.");
                 END_CASE
 
                 CASE (TRANSLATE_TOKEN)
@@ -3456,7 +3441,7 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
                 END_CASE
 
                 CASE (TEXTURE_ID_TOKEN)
-                    Warning(0, "Texture identifier overwriting previous values.");
+                    Warning("Texture identifier overwriting previous values.");
                     Destroy_Textures(Texture);
                     Texture = Copy_Textures(reinterpret_cast<TEXTURE *>(Token.Data));
                     Pigment = Texture->Pigment;
@@ -3474,7 +3459,7 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
             END_EXPECT
 
             if (Not_In_Default && (Texture->Pigment->Type == NO_PATTERN) &&
-                !(sceneData->languageVersion < 150))
+                (sceneData->EffectiveLanguageVersion() >= 150))
                 Parse_Error(PIGMENT_ID_TOKEN);
 
         }
@@ -3598,7 +3583,7 @@ void Parser::Parse_Media(vector<Media>& medialist)
         OTHERWISE
             UNGET
             /* with version 3.5+, the default media method is now 3 */
-            if(sceneData->languageVersion >= 350)
+            if(sceneData->EffectiveLanguageVersion() >= 350)
             {
                 IMedia->Intervals = 1;
                 IMedia->Min_Samples = 10;
@@ -3674,7 +3659,7 @@ void Parser::Parse_Media(vector<Media>& medialist)
             IMedia->Type = (int)Parse_Float();
             if ((IMedia->Type < 1) || (IMedia->Type > SCATTERING_TYPES))
             {
-                Warning(0, "Unknown atmospheric scattering type.");
+                Warning("Unknown atmospheric scattering type.");
             }
             Parse_Comma();
             Parse_Colour(IMedia->Scattering);
@@ -3791,19 +3776,16 @@ void Parser::Parse_Media(vector<Media>& medialist)
 *
 ******************************************************************************/
 
-void Parser::Parse_Interior(Interior **Interior_Ptr)
+void Parser::Parse_Interior(InteriorPtr& interior)
 {
-    Interior *interior = NULL;
-
     Parse_Begin();
 
     EXPECT
         CASE(INTERIOR_ID_TOKEN)
-            Destroy_Interior(*Interior_Ptr);
             if(Token.Data != NULL)
-                *Interior_Ptr = new Interior(*reinterpret_cast<Interior *>(Token.Data));
+                interior = InteriorPtr(new Interior(**reinterpret_cast<InteriorPtr *>(Token.Data)));
             else
-                *Interior_Ptr = new Interior();
+                interior = InteriorPtr(new Interior());
             EXIT
         END_CASE
 
@@ -3813,10 +3795,8 @@ void Parser::Parse_Interior(Interior **Interior_Ptr)
         END_CASE
     END_EXPECT
 
-    if(*Interior_Ptr == NULL)
-        *Interior_Ptr = new Interior();
-
-    interior = *Interior_Ptr;
+    if(!interior)
+        interior = InteriorPtr(new Interior());
 
     EXPECT
         CASE (IOR_TOKEN)
@@ -3855,7 +3835,7 @@ void Parser::Parse_Interior(Interior **Interior_Ptr)
 
         CASE (REFRACTION_TOKEN)
             interior->Old_Refract = Parse_Float();
-            Warn_Compat(0, "Refraction value unnecessary to turn on refraction.\nTo attenuate, the fade_power and fade_distance keywords should be specified in 'interior{...}' statement.");
+            Warn_Compat(false, "Refraction value unnecessary to turn on refraction.\nTo attenuate, the fade_power and fade_distance keywords should be specified in 'interior{...}' statement.");
         END_CASE
 
         OTHERWISE
@@ -3980,7 +3960,7 @@ FOG *Parser::Parse_Fog()
         END_CASE
 
         CASE_FLOAT
-            Warning(150, "Should use distance keyword.");
+            VersionWarning(150, "Should use distance keyword.");
             Fog->Distance = Parse_Float();
         END_CASE
 
@@ -3988,7 +3968,7 @@ FOG *Parser::Parse_Fog()
             Fog->Type = (int)Parse_Float();
             if ((Fog->Type < ORIG_FOG) || (Fog->Type > FOG_TYPES))
             {
-                Warning(0, "Unknown fog type.");
+                Warning("Unknown fog type.");
             }
         END_CASE
 
@@ -4010,17 +3990,13 @@ FOG *Parser::Parse_Fog()
 
         CASE (TURBULENCE_TOKEN)
             if (Fog->Turb == NULL)
-            {
-                Fog->Turb=reinterpret_cast<TURB *>(Create_Warp(CLASSIC_TURB_WARP));
-            }
+                Fog->Turb = new TurbulenceWarp();
             Parse_Vector(Fog->Turb->Turbulence);
         END_CASE
 
         CASE (OCTAVES_TOKEN)
             if (Fog->Turb == NULL)
-            {
-                Fog->Turb=reinterpret_cast<TURB *>(Create_Warp(CLASSIC_TURB_WARP));
-            }
+                Fog->Turb = new TurbulenceWarp();
             Fog->Turb->Octaves = (int)Parse_Float();
             if(Fog->Turb->Octaves < 1)
                 Fog->Turb->Octaves = 1;
@@ -4030,17 +4006,13 @@ FOG *Parser::Parse_Fog()
 
         CASE (OMEGA_TOKEN)
             if (Fog->Turb == NULL)
-            {
-                Fog->Turb=reinterpret_cast<TURB *>(Create_Warp(CLASSIC_TURB_WARP));
-            }
+                Fog->Turb = new TurbulenceWarp();
             Fog->Turb->Omega = Parse_Float();
         END_CASE
 
         CASE (LAMBDA_TOKEN)
             if (Fog->Turb == NULL)
-            {
-                Fog->Turb=reinterpret_cast<TURB *>(Create_Warp(CLASSIC_TURB_WARP));
-            }
+                Fog->Turb = new TurbulenceWarp();
             Fog->Turb->Lambda = Parse_Float();
         END_CASE
 
@@ -4058,7 +4030,7 @@ FOG *Parser::Parse_Fog()
 
         CASE (TRANSLATE_TOKEN)
             Parse_Vector(Vector);
-            Warning(0, "A fog's up vector can't be translated.");
+            Warning("A fog's up vector can't be translated.");
 /*
             Compute_Translation_Transform(&Trans, Vector);
             MTransDirection(Fog->Up, Fog->Up, &Trans);
@@ -4389,55 +4361,55 @@ SKYSPHERE *Parser::Parse_Skysphere()
 *
 ******************************************************************************/
 
-void Parser::Check_BH_Parameters (BLACK_HOLE *bh)
+void Parser::Check_BH_Parameters (BlackHoleWarp *bh)
 {
-    if (bh->Repeat == false) return ;
+    if (bh->Repeat == false) return;
 
     if (bh->Repeat_Vector [X] > 0.0)
     {
         if (bh->Center [X] < bh->Radius)
-            bh->Center [X] = bh->Radius ;
+            bh->Center [X] = bh->Radius;
         if (bh->Repeat_Vector [X] < bh->Center [X] + bh->Radius + bh->Uncertainty_Vector [X])
         {
-            bh->Repeat_Vector [X] = bh->Center [X] + bh->Radius + bh->Uncertainty_Vector [X] ;
-            Warning (0, "Black Hole repeat vector X too small ; increased to %g", bh->Repeat_Vector [X]) ;
+            bh->Repeat_Vector [X] = bh->Center [X] + bh->Radius + bh->Uncertainty_Vector [X];
+            Warning("Black Hole repeat vector X too small; increased to %g", bh->Repeat_Vector [X]);
         }
         if (bh->Repeat_Vector [X] < EPSILON)
         {
-            Warning (0,"Black Hole repeat vector X is less than %f ; ignored", (float) EPSILON) ;
-            bh->Repeat_Vector [X] = 0.0 ;
+            Warning("Black Hole repeat vector X is less than %f; ignored", (float) EPSILON);
+            bh->Repeat_Vector [X] = 0.0;
         }
     }
 
     if (bh->Repeat_Vector [Y] > 0.0)
     {
         if (bh->Center [Y] < bh->Radius)
-            bh->Center [Y] = bh->Radius ;
+            bh->Center [Y] = bh->Radius;
         if (bh->Repeat_Vector [Y] < bh->Center [Y] + bh->Radius + bh->Uncertainty_Vector [Y])
         {
-            bh->Repeat_Vector [Y] = bh->Center [Y] + bh->Radius + bh->Uncertainty_Vector [Y] ;
-            Warning (0, "Black Hole repeat vector Y too small ; increased to %g", bh->Repeat_Vector [Y]) ;
+            bh->Repeat_Vector [Y] = bh->Center [Y] + bh->Radius + bh->Uncertainty_Vector [Y];
+            Warning("Black Hole repeat vector Y too small; increased to %g", bh->Repeat_Vector [Y]);
         }
         if (bh->Repeat_Vector [Y] < EPSILON)
         {
-            Warning (0, "Black Hole repeat vector Y is less than %f ; ignored", (float) EPSILON) ;
-            bh->Repeat_Vector [Y] = 0.0 ;
+            Warning("Black Hole repeat vector Y is less than %f; ignored", (float) EPSILON);
+            bh->Repeat_Vector [Y] = 0.0;
         }
     }
 
     if (bh->Repeat_Vector [Z] > 0.0)
     {
         if (bh->Center [Z] < bh->Radius)
-            bh->Center [Z] = bh->Radius ;
+            bh->Center [Z] = bh->Radius;
         if (bh->Repeat_Vector [Z] < bh->Center [Z] + bh->Radius + bh->Uncertainty_Vector [Z])
         {
-            bh->Repeat_Vector [Z] = bh->Center [Z] + bh->Radius + bh->Uncertainty_Vector [Z] ;
-            Warning (0, "Black Hole repeat vector Z too small ; increased to %g", bh->Repeat_Vector [Z]) ;
+            bh->Repeat_Vector [Z] = bh->Center [Z] + bh->Radius + bh->Uncertainty_Vector [Z];
+            Warning("Black Hole repeat vector Z too small; increased to %g", bh->Repeat_Vector [Z]);
         }
         if (bh->Repeat_Vector [Z] < EPSILON)
         {
-            Warning (0, "Black Hole repeat vector Z is less than %f ; ignored", (float) EPSILON) ;
-            bh->Repeat_Vector [Z] = 0.0 ;
+            Warning("Black Hole repeat vector Z is less than %f; ignored", (float) EPSILON);
+            bh->Repeat_Vector [Z] = 0.0;
         }
     }
 }
@@ -4460,8 +4432,8 @@ void Parser::Check_BH_Parameters (BLACK_HOLE *bh)
 *
 * RETURNS
 *
-*   A pointer to the last warp in the chain which is guarenteed
-*   to be a classic turb.
+*   A pointer to the first warp in the list, which is guarenteed to be a
+*   classic turb.
 *
 * AUTHOR
 *
@@ -4480,29 +4452,17 @@ void Parser::Check_BH_Parameters (BLACK_HOLE *bh)
 *
 ******************************************************************************/
 
-TURB *Parser::Check_Turb (WARP **Warps_Ptr)
+ClassicTurbulence *Parser::Check_Turb (WarpList& warps, bool patternHandlesTurbulence)
 {
-    WARP *Temp=*Warps_Ptr;
-
-    if (Temp == NULL)
+    ClassicTurbulence* turb = NULL;
+    if (!warps.empty())
+        turb = dynamic_cast<ClassicTurbulence*>(warps.front());
+    if (!turb)
     {
-        *Warps_Ptr = Temp = Create_Warp(CLASSIC_TURB_WARP);
+        turb = new ClassicTurbulence(patternHandlesTurbulence);
+        warps.insert(warps.begin(), turb);
     }
-    else
-    {
-        while (Temp->Next_Warp != NULL)
-        {
-            Temp = Temp->Next_Warp;
-        }
-
-        if (Temp->Warp_Type != CLASSIC_TURB_WARP)
-        {
-            Temp->Next_Warp = Create_Warp(CLASSIC_TURB_WARP);
-            Temp->Next_Warp->Prev_Warp = Temp;
-            Temp = Temp->Next_Warp;
-        }
-    }
-    return(reinterpret_cast<TURB *>(Temp));
+    return turb;
 }
 
 
@@ -4524,28 +4484,27 @@ TURB *Parser::Check_Turb (WARP **Warps_Ptr)
 * DESCRIPTION
 *
 * CHANGES
-*    Talious 10/24/1998: Added SPherical/Cylindrical/Toroidaal warps
+*    Talious 10/24/1998: Added Spherical/Cylindrical/Toroidal warps
 *
 ******************************************************************************/
 
-void Parser::Parse_Warp (WARP **Warp_Ptr)
+void Parser::Parse_Warp (WarpList& warps)
 {
-    WARP *New = NULL;
-    TURB *Turb;
-    REPEAT *Repeat;
-    BLACK_HOLE *Black_Hole;
+    GenericWarp *New = NULL;
+    TurbulenceWarp *Turb;
+    RepeatWarp *Repeat;
+    BlackHoleWarp *Black_Hole;
     Vector3d Local_Vector;
-    CYLW *CylW;
-    SPHEREW *SphereW;
-    TOROIDAL *Toroidal;
-    PLANARW *PlanarW;
+    CylindricalWarp *CylW;
+    SphericalWarp *SphereW;
+    ToroidalWarp *Toroidal;
+    PlanarWarp *PlanarW;
 
     Parse_Begin();
 
     EXPECT
         CASE(TURBULENCE_TOKEN)
-            New=Create_Warp(EXTRA_TURB_WARP);
-            Turb=reinterpret_cast<TURB *>(New);
+            New = Turb = new TurbulenceWarp();
             Parse_Vector(Turb->Turbulence);
             EXPECT
                 CASE(OCTAVES_TOKEN)
@@ -4573,8 +4532,7 @@ void Parser::Parse_Warp (WARP **Warp_Ptr)
         END_CASE
 
         CASE(REPEAT_TOKEN)
-            New=Create_Warp(REPEAT_WARP);
-            Repeat=reinterpret_cast<REPEAT *>(New);
+            New = Repeat = new RepeatWarp();
             Parse_Vector(Local_Vector);
             Repeat->Axis=-1;
             if (Local_Vector[X]!=0.0)
@@ -4630,46 +4588,45 @@ void Parser::Parse_Warp (WARP **Warp_Ptr)
         END_CASE
 
         CASE(BLACK_HOLE_TOKEN)
-            New = Create_Warp(BLACK_HOLE_WARP) ;
-            Black_Hole = reinterpret_cast<BLACK_HOLE *>(New) ;
-            Parse_Vector (Local_Vector) ;
+            New = Black_Hole = new BlackHoleWarp();
+            Parse_Vector (Local_Vector);
             Black_Hole->Center = Local_Vector;
-            Parse_Comma () ;
-            Black_Hole->Radius = Parse_Float () ;
-            Black_Hole->Radius_Squared = Black_Hole->Radius * Black_Hole->Radius ;
+            Parse_Comma ();
+            Black_Hole->Radius = Parse_Float ();
+            Black_Hole->Radius_Squared = Black_Hole->Radius * Black_Hole->Radius;
             Black_Hole->Inverse_Radius = 1.0 / Black_Hole->Radius;
-            Black_Hole->Strength = 1.0 ;
-            Black_Hole->Power = 2.0 ;
-            Black_Hole->Inverted = false ;
-            Black_Hole->Type = 0 ;
+            Black_Hole->Strength = 1.0;
+            Black_Hole->Power = 2.0;
+            Black_Hole->Inverted = false;
+            Black_Hole->Type = 0;
 
             EXPECT
                 CASE(STRENGTH_TOKEN)
-                    Black_Hole->Strength = Parse_Float () ;
+                    Black_Hole->Strength = Parse_Float ();
                 END_CASE
 
                 CASE(FALLOFF_TOKEN)
-                    Black_Hole->Power = Parse_Float () ;
+                    Black_Hole->Power = Parse_Float ();
                 END_CASE
 
                 CASE(INVERSE_TOKEN)
-                    Black_Hole->Inverted = true ;
+                    Black_Hole->Inverted = true;
                 END_CASE
 
                 CASE(TYPE_TOKEN)
-                    Black_Hole->Type = (int) Parse_Float () ;
+                    Black_Hole->Type = (int) Parse_Float ();
                 END_CASE
 
                 CASE(REPEAT_TOKEN)
-                    Parse_Vector (Black_Hole->Repeat_Vector) ;
-                    Black_Hole->Repeat = true ;
-                    Check_BH_Parameters (Black_Hole) ;
+                    Parse_Vector (Black_Hole->Repeat_Vector);
+                    Black_Hole->Repeat = true;
+                    Check_BH_Parameters (Black_Hole);
                 END_CASE
 
                 CASE(TURBULENCE_TOKEN)
-                    Parse_Vector (Black_Hole->Uncertainty_Vector) ;
-                    Black_Hole->Uncertain = true ;
-                    Check_BH_Parameters (Black_Hole) ;
+                    Parse_Vector (Black_Hole->Uncertainty_Vector);
+                    Black_Hole->Uncertain = true;
+                    Check_BH_Parameters (Black_Hole);
                 END_CASE
 
                 OTHERWISE
@@ -4681,17 +4638,16 @@ void Parser::Parse_Warp (WARP **Warp_Ptr)
         END_CASE
 
         CASE(CYLINDRICAL_TOKEN)
-            New = Create_Warp(CYLINDRICAL_WARP);
-            CylW = reinterpret_cast<CYLW *>(New) ;
+            New = CylW = new CylindricalWarp();
             EXPECT
                 CASE(ORIENTATION_TOKEN)
-                    Parse_Vector (Local_Vector) ;
+                    Parse_Vector (Local_Vector);
                     Local_Vector.normalize();
                     CylW->Orientation_Vector = Local_Vector;
                 END_CASE
 
                 CASE(DIST_EXP_TOKEN)
-                    CylW->DistExp = Parse_Float () ;
+                    CylW->DistExp = Parse_Float ();
                 END_CASE
 
                 OTHERWISE
@@ -4703,17 +4659,16 @@ void Parser::Parse_Warp (WARP **Warp_Ptr)
         END_CASE
 
         CASE(SPHERICAL_TOKEN)
-            New = Create_Warp(SPHERICAL_WARP);
-            SphereW = reinterpret_cast<SPHEREW *>(New) ;
+            New = SphereW = new SphericalWarp();
             EXPECT
                 CASE(ORIENTATION_TOKEN)
-                    Parse_Vector (Local_Vector) ;
+                    Parse_Vector (Local_Vector);
                     Local_Vector.normalize();
                     SphereW->Orientation_Vector = Local_Vector;
                 END_CASE
 
                 CASE(DIST_EXP_TOKEN)
-                    SphereW->DistExp = Parse_Float () ;
+                    SphereW->DistExp = Parse_Float ();
                 END_CASE
 
                 OTHERWISE
@@ -4725,8 +4680,7 @@ void Parser::Parse_Warp (WARP **Warp_Ptr)
         END_CASE
 
         CASE(PLANAR_TOKEN)
-            New = Create_Warp(PLANAR_WARP);
-            PlanarW = reinterpret_cast<PLANARW *>(New) ;
+            New = PlanarW = new PlanarWarp();
             if(Allow_Vector(Local_Vector))
             {
                 Local_Vector.normalize();
@@ -4738,21 +4692,20 @@ void Parser::Parse_Warp (WARP **Warp_Ptr)
         END_CASE
 
         CASE(TOROIDAL_TOKEN)
-            New = Create_Warp(TOROIDAL_WARP);
-            Toroidal = reinterpret_cast<TOROIDAL *>(New) ;
+            New = Toroidal = new ToroidalWarp();
             EXPECT
                 CASE(ORIENTATION_TOKEN)
-                    Parse_Vector (Local_Vector) ;
+                    Parse_Vector (Local_Vector);
                     Local_Vector.normalize();
                     Toroidal->Orientation_Vector = Local_Vector;
                 END_CASE
 
                 CASE(DIST_EXP_TOKEN)
-                    Toroidal->DistExp = Parse_Float () ;
+                    Toroidal->DistExp = Parse_Float ();
                 END_CASE
 
                 CASE(MAJOR_RADIUS_TOKEN)
-                    Toroidal->MajorRadius = Parse_Float () ;
+                    Toroidal->MajorRadius = Parse_Float ();
                 END_CASE
 
                 OTHERWISE
@@ -4765,7 +4718,7 @@ void Parser::Parse_Warp (WARP **Warp_Ptr)
 
         // JN2007: Cubic warp
         CASE(CUBIC_TOKEN)
-            New = Create_Warp(CUBIC_WARP);
+            New = new CubicWarp();
             EXIT
         END_CASE
 
@@ -4779,10 +4732,7 @@ void Parser::Parse_Warp (WARP **Warp_Ptr)
         Error("Empty warp statement.");
     }
 
-    New->Next_Warp = *Warp_Ptr;
-    if(*Warp_Ptr != NULL)
-        (*Warp_Ptr)->Prev_Warp = New;
-    *Warp_Ptr = New;
+    warps.push_back(New);
 
     Parse_End();
 }
@@ -4806,9 +4756,8 @@ void Parser::Parse_Material(MATERIAL *Material)
             Int_Texture = Copy_Textures(Temp->Interior_Texture);
             Link_Textures(&(Material->Texture),Texture);
             Link_Textures(&(Material->Interior_Texture),Int_Texture);
-            Destroy_Interior(Material->interior);
             if (Temp->interior != NULL)
-                Material->interior = new Interior(*(Temp->interior));
+                Material->interior = InteriorPtr(new Interior(*(Temp->interior)));
             else
                 Material->interior = NULL;
             EXIT
@@ -4836,7 +4785,7 @@ void Parser::Parse_Material(MATERIAL *Material)
         END_CASE
 
         CASE (INTERIOR_TOKEN)
-            Parse_Interior(reinterpret_cast<Interior **>(&(Material->interior)));
+            Parse_Interior(Material->interior);
         END_CASE
 
         CASE (TRANSLATE_TOKEN)
@@ -4917,7 +4866,7 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
     Vector3d Local_Vector;
     MATRIX Local_Matrix;
     TRANSFORM Local_Trans;
-    TURB *Local_Turb;
+    ClassicTurbulence *Local_Turb;
     unsigned short Old_Type=New->Type;
     ImageData *Old_Image = NULL;
     DENSITY_FILE *Old_Density_File = NULL;
@@ -4930,7 +4879,7 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
         CASE (AGATE_TOKEN)
             New->Type = AGATE_PATTERN;
             New->pattern = PatternPtr(new AgatePattern());
-            Check_Turb(&(New->pattern->pWarps));
+            Check_Turb(New->pattern->warps, New->pattern->HasSpecialTurbulenceHandling());
             dynamic_cast<AgatePattern*>(New->pattern.get())->agateTurbScale = 1.0; // TODO this is a job for a constructor
             EXIT
         END_CASE
@@ -4960,7 +4909,7 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
             Parse_Pigment(&(dynamic_cast<PigmentPattern*>(New->pattern.get())->pPigment));
             Post_Pigment(dynamic_cast<PigmentPattern*>(New->pattern.get())->pPigment);
             Parse_End();
-            EXIT // TODO VERIFY - this was a fall-through to FUNCTION_TOKEN; was that intentional?
+            EXIT
         END_CASE
 
         CASE (GRANITE_TOKEN)
@@ -5187,7 +5136,7 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
 
         // TODO VERIFY - IMAGE_MAP_TOKEN is not accepted, is that ok?
 
-        // NUMP_MAP_TOKEN is not accepted, as it requires normal vector information, which can't be passed to a function
+        // BUMP_MAP_TOKEN is not accepted, as it requires normal vector information, which can't be passed to a function
 
         CASE (WAVES_TOKEN)
             New->Type = WAVES_PATTERN;
@@ -5305,6 +5254,7 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
         END_CASE
 
         CASE (EXTERIOR_TOKEN)
+            // TODO VERIFY - this differs from regular pattern parsing (PAVEMENT_PATTERN), is that ok?
             if(!((New->Type == MANDEL_PATTERN) || (New->Type == MANDEL3_PATTERN) ||
                  (New->Type == MANDEL4_PATTERN) || (New->Type == MANDELX_PATTERN) ||
                  (New->Type == JULIA_PATTERN) || (New->Type == JULIA3_PATTERN) ||
@@ -5315,7 +5265,6 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
                 Only_In("exterior", "mandel, julia or magnet");
             }
             dynamic_cast<FractalPattern*>(New->pattern.get())->exteriorType = (int)Parse_Float();
-            // TODO VERIFY - this differs from regular pattern parsing (max exterior type), is that ok?
             if((dynamic_cast<FractalPattern*>(New->pattern.get())->exteriorType < 0) || (dynamic_cast<FractalPattern*>(New->pattern.get())->exteriorType > 6))
                 Error("Invalid fractal pattern exterior type. Valid types are 0 to 6.");
             Parse_Comma();
@@ -5323,6 +5272,7 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
         END_CASE
 
         CASE (INTERIOR_TOKEN)
+            // TODO VERIFY - this differs from regular pattern parsing (PAVEMENT_PATTERN), is that ok?
             if(!((New->Type == MANDEL_PATTERN) || (New->Type == MANDEL3_PATTERN) ||
                  (New->Type == MANDEL4_PATTERN) || (New->Type == MANDELX_PATTERN) ||
                  (New->Type == JULIA_PATTERN) || (New->Type == JULIA3_PATTERN) ||
@@ -5377,8 +5327,8 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
                         {
                             New->Type = JULIA_PATTERN;
                             New->pattern = PatternPtr(new JuliaPattern(*dynamic_cast<JuliaPattern*>(New->pattern.get())));
-                            Warning(0, "Invalid julia pattern exponent found. Supported exponents are 2 to %i.\n"
-                                       "Using default exponent 2.", kFractalMaxExponent);
+                            Warning("Invalid julia pattern exponent found. Supported exponents are 2 to %i.\n"
+                                    "Using default exponent 2.", kFractalMaxExponent);
                         }
                         break;
                 }
@@ -5412,8 +5362,8 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
                         {
                             New->Type = MANDEL_PATTERN;
                             New->pattern = PatternPtr(new Mandel2Pattern(*dynamic_cast<MandelPattern*>(New->pattern.get())));
-                            Warning(0, "Invalid mandel pattern exponent found. Supported exponents are 2 to %i.\n"
-                                       "Using default exponent 2.", kFractalMaxExponent);
+                            Warning("Invalid mandel pattern exponent found. Supported exponents are 2 to %i.\n"
+                                    "Using default exponent 2.", kFractalMaxExponent);
                         }
                         break;
                 }
@@ -5440,6 +5390,8 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
             }
             else if ( New->Type == CRACKLE_PATTERN )
             {
+                // Vector for backwards compatibility
+                // the only component used was always X.
                 Parse_Vector(Local_Vector);
                 dynamic_cast<CracklePattern*>(New->pattern.get())->crackleMetric = Local_Vector[X];
             }
@@ -5448,6 +5400,7 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
         END_CASE
 
         CASE (FORM_TOKEN)
+            // TODO VERIFY - this differs from regular pattern parsing (PAVEMENT_PATTERN), is that ok?
             if (New->Type != CRACKLE_PATTERN )
                 Only_In("form", "crackle");
             Parse_Vector( dynamic_cast<CracklePattern*>(New->pattern.get())->crackleForm );
@@ -5460,9 +5413,21 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
         END_CASE
 
         CASE (TURBULENCE_TOKEN)
-            Local_Turb=Check_Turb(&(New->pattern->pWarps));
+            Local_Turb=Check_Turb(New->pattern->warps, New->pattern->HasSpecialTurbulenceHandling());
             Parse_Vector(Local_Turb->Turbulence);
         END_CASE
+
+        // TODO VERIFY - COLOUR_MAP is not accepted, is that ok?
+
+        // TODO VERIFY - PIGMENT_MAP is not accepted, is that ok?
+
+        // TODO VERIFY - DENSITY_MAP is not accepted, is that ok?
+
+        // TODO VERIFY - NORMAL_MAP is not accepted, is that ok?
+
+        // TODO VERIFY - TEXTURE_MAP is not accepted, is that ok?
+
+        // TODO VERIFY - QUICK_COLOUR is not accepted, is that ok?
 
         CASE (CONTROL0_TOKEN)
             if (New->Type != QUILTED_PATTERN)
@@ -5477,7 +5442,7 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
         END_CASE
 
         CASE (OCTAVES_TOKEN)
-            Local_Turb=Check_Turb(&(New->pattern->pWarps));
+            Local_Turb=Check_Turb(New->pattern->warps, New->pattern->HasSpecialTurbulenceHandling());
             Local_Turb->Octaves = (int)Parse_Float();
             if(Local_Turb->Octaves < 1)
                 Local_Turb->Octaves = 1;
@@ -5486,12 +5451,12 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
         END_CASE
 
         CASE (OMEGA_TOKEN)
-            Local_Turb=Check_Turb(&(New->pattern->pWarps));
+            Local_Turb=Check_Turb(New->pattern->warps, New->pattern->HasSpecialTurbulenceHandling());
             Local_Turb->Omega = Parse_Float();
         END_CASE
 
         CASE (LAMBDA_TOKEN)
-            Local_Turb=Check_Turb(&(New->pattern->pWarps));
+            Local_Turb=Check_Turb(New->pattern->warps, New->pattern->HasSpecialTurbulenceHandling());
             Local_Turb->Lambda = Parse_Float();
         END_CASE
 
@@ -5501,7 +5466,7 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
                 pContinuousPattern->waveFrequency = Parse_Float();
             else
             {
-                Warning(0,"frequrency has no effect on discrete patterns");
+                Warning("frequrency has no effect on discrete patterns");
                 Parse_Float();
             }
         END_CASE
@@ -5511,7 +5476,7 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
             if (pContinuousPattern != NULL)
                 pContinuousPattern->waveType = kWaveType_Ramp;
             else
-                Warning(0,"ramp_wave has no effect on discrete patterns");
+                Warning("ramp_wave has no effect on discrete patterns");
         END_CASE
 
         CASE (TRIANGLE_WAVE_TOKEN)
@@ -5519,7 +5484,7 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
             if (pContinuousPattern != NULL)
                 pContinuousPattern->waveType = kWaveType_Triangle;
             else
-                Warning(0,"triangle_wave has no effect on discrete patterns");
+                Warning("triangle_wave has no effect on discrete patterns");
         END_CASE
 
         CASE (SINE_WAVE_TOKEN)
@@ -5527,7 +5492,7 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
             if (pContinuousPattern != NULL)
                 pContinuousPattern->waveType = kWaveType_Sine;
             else
-                Warning(0,"sine_wave has no effect on discrete patterns");
+                Warning("sine_wave has no effect on discrete patterns");
         END_CASE
 
         CASE (SCALLOP_WAVE_TOKEN)
@@ -5535,7 +5500,7 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
             if (pContinuousPattern != NULL)
                 pContinuousPattern->waveType = kWaveType_Scallop;
             else
-                Warning(0,"scallop_wave has no effect on discrete patterns");
+                Warning("scallop_wave has no effect on discrete patterns");
         END_CASE
 
         CASE (CUBIC_WAVE_TOKEN)
@@ -5543,7 +5508,7 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
             if (pContinuousPattern != NULL)
                 pContinuousPattern->waveType = kWaveType_Cubic;
             else
-                Warning(0,"cubic_wave has no effect on discrete patterns");
+                Warning("cubic_wave has no effect on discrete patterns");
         END_CASE
 
         CASE (POLY_WAVE_TOKEN)
@@ -5555,7 +5520,7 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
             }
             else
             {
-                Warning(0,"poly_wave has no effect on discrete patterns");
+                Warning("poly_wave has no effect on discrete patterns");
                 Allow_Float(0.0);
             }
         END_CASE
@@ -5566,10 +5531,12 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
                 pContinuousPattern->wavePhase = Parse_Float();
             else
             {
-                Warning(0,"phase has no effect on discrete patterns");
+                Warning("phase has no effect on discrete patterns");
                 Parse_Float();
             }
         END_CASE
+
+        // TODO VERIFY - BUMP_SIZE is not accepted, is that ok?
 
         CASE (NOISE_GENERATOR_TOKEN)
         {
@@ -5585,7 +5552,7 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
             if (New->Type != AGATE_PATTERN)
                 Not_With ("agate_turb","non-agate");
             dynamic_cast<AgatePattern*>(New->pattern.get())->agateTurbScale = Parse_Float();
-            Check_Turb(&(New->pattern->pWarps));   /* agate needs Octaves, Lambda etc. */
+            Check_Turb(New->pattern->warps, New->pattern->HasSpecialTurbulenceHandling());   /* agate needs Octaves, Lambda etc. */
         END_CASE
 
         CASE (BRICK_SIZE_TOKEN)
@@ -5606,8 +5573,14 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
             dynamic_cast<DensityFilePattern*>(New->pattern.get())->densityFile->Interpolation = (int)Parse_Float();
         END_CASE
 
+        // TODO VERIFY - NUMBER_OF_SIDES is not accepted, is that ok?
+
+        // TODO VERIFY - NUMBER_OF_TILES is not accepted, is that ok?
+
+        // TODO VERIFY - PATTERN (PAVEMENT) is not accepted, is that ok?
+
         CASE (WARP_TOKEN)
-            Parse_Warp(&(New->pattern->pWarps));
+            Parse_Warp(New->pattern->warps);
         END_CASE
 
         CASE (TRANSLATE_TOKEN)

@@ -15,7 +15,7 @@
 /// ----------------------------------------------------------------------------
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -50,13 +50,15 @@
 #include "base/fileinputoutput.h"
 #include "backend/colour/colour_old.h"
 #include "backend/math/matrices.h"
-#include "backend/math/vector.h"
+#include "backend/pattern/warps.h"
+#include "backend/render/ray.h"
 #include "backend/scene/objects.h"
 #include "backend/scene/scene.h"
 #include "backend/scene/threaddata.h"
 #include "backend/support/fileutil.h"
 #include "backend/support/imageutil.h"
 #include "backend/support/randomsequences.h"
+#include "backend/texture/normal.h"
 #include "backend/texture/pigment.h"
 #include "backend/texture/texture.h"
 #include "backend/vm/fnpovfpu.h"
@@ -204,7 +206,7 @@ static ColourBlendMapConstPtr gpDefaultBlendMap_Wood (new ColourBlendMap(2, gaDe
 * Static functions
 ******************************************************************************/
 
-static const TURB *SearchForTurb(const WARP *pWarps);
+static const ClassicTurbulence* SearchForTurb(const WarpList warps);
 static unsigned short ReadUShort(IStream *pInFile);
 static unsigned int ReadUInt(IStream *pInFile);
 
@@ -256,23 +258,17 @@ int GetNoiseGen (const TPATTERN *TPat, const TraceThreadData *pThread)
 
 
 BasicPattern::BasicPattern() :
-    noiseGenerator(kNoiseGen_Default),
-    pWarps(NULL)
+    noiseGenerator(kNoiseGen_Default)
 {}
 
 BasicPattern::BasicPattern(const BasicPattern& obj) :
-    noiseGenerator(obj.noiseGenerator),
-    pWarps(NULL)
+    noiseGenerator(obj.noiseGenerator)
 {
-    if (obj.pWarps)
-        pWarps = Copy_Warps(obj.pWarps);
+    Copy_Warps(warps, obj.warps);
 }
 
 BasicPattern::~BasicPattern()
-{
-    if (pWarps)
-        Destroy_Warps(pWarps);
-}
+{}
 
 int BasicPattern::GetNoiseGen(const TraceThreadData *pThread) const
 {
@@ -283,6 +279,8 @@ int BasicPattern::GetNoiseGen(const TraceThreadData *pThread) const
 }
 
 ColourBlendMapConstPtr BasicPattern::GetDefaultBlendMap() const { return gpDefaultBlendMap_Gray; }
+
+bool BasicPattern::HasSpecialTurbulenceHandling() const { return false; }
 
 
 ContinuousPattern::ContinuousPattern() :
@@ -670,65 +668,6 @@ void Copy_TPat_Fields (TPATTERN *New, const TPATTERN *Old)
 *
 * FUNCTION
 *
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
-
-void Destroy_TPat_Fields(TPATTERN *Tpat)
-{
-    if (Tpat->pattern)
-        Tpat->pattern.reset();
-}
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
-
-TURB *Create_Turb()
-{
-    TURB *New;
-
-    New = reinterpret_cast<TURB *>(POV_MALLOC(sizeof(TURB),"turbulence struct"));
-
-    New->Turbulence = Vector3d(0.0, 0.0, 0.0);
-
-    New->Octaves = 6;
-    New->Omega = 0.5;
-    New->Lambda = 2.0;
-
-    return(New);
-}
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
 *   Translate_Tpattern
 *
 * INPUT
@@ -854,29 +793,17 @@ void Scale_Tpattern(TPATTERN *Tpattern, const Vector3d& Vector)
 
 void Transform_Tpattern(TPATTERN *Tpattern, const TRANSFORM *Trans)
 {
-    WARP *Temp;
-
     if ((Tpattern != NULL) && (Tpattern->pattern != NULL))
     {
-        if (Tpattern->pattern->pWarps == NULL)
+        TransformWarp* temp = NULL;
+        if (!Tpattern->pattern->warps.empty())
+            temp = dynamic_cast<TransformWarp*>(Tpattern->pattern->warps.back());
+        if (!temp)
         {
-            Tpattern->pattern->pWarps = Create_Warp(TRANSFORM_WARP);
+            temp = new TransformWarp();
+            Tpattern->pattern->warps.push_back(temp);
         }
-        else
-        {
-            if (Tpattern->pattern->pWarps->Warp_Type != TRANSFORM_WARP)
-            {
-                Temp = Tpattern->pattern->pWarps;
-
-                Tpattern->pattern->pWarps = Create_Warp(TRANSFORM_WARP);
-
-                Tpattern->pattern->pWarps->Next_Warp = Temp;
-                if(Tpattern->pattern->pWarps->Next_Warp != NULL)
-                    Tpattern->pattern->pWarps->Next_Warp->Prev_Warp = Tpattern->pattern->pWarps;
-            }
-        }
-
-        Compose_Transforms (&( (reinterpret_cast<TRANS *>(Tpattern->pattern->pWarps))->Trans), Trans);
+        Compose_Transforms (&temp->Trans, Trans);
     }
 }
 
@@ -967,24 +894,12 @@ template void BlendMap<TextureBlendMapData> ::Search (DBL value, EntryConstPtr& 
 *
 ******************************************************************************/
 
-static const TURB *SearchForTurb(const WARP *pWarps)
+static const ClassicTurbulence *SearchForTurb(const WarpList warps)
 {
-    const WARP* Temp=pWarps;
-
-    if (Temp!=NULL)
-    {
-        while (Temp->Next_Warp != NULL)
-        {
-            Temp=Temp->Next_Warp;
-        }
-
-        if (Temp->Warp_Type != CLASSIC_TURB_WARP)
-        {
-            Temp=NULL;
-        }
-    }
-
-    return (reinterpret_cast<const TURB *>(Temp));
+    if(warps.empty())
+        return NULL;
+    else
+        return dynamic_cast<const ClassicTurbulence*>(*warps.begin());
 }
 
 
@@ -996,6 +911,10 @@ DBL PlainPattern::Evaluate(const Vector3d& EPoint, const Intersection *pIsection
     return 0.0;
 }
 
+bool PlainPattern::HasSpecialTurbulenceHandling() const
+{
+    return true;
+}
 
 
 /* Tiling & Pavement */
@@ -1075,7 +994,7 @@ static DBL tiling_hexagon (const Vector3d& EPoint)
      */
     if (x > 1.5)
     {
-        x -= 1.5 ; /* translate */
+        x -= 1.5; /* translate */
         z = SQRT3_2 -z; /* mirror */
     }
     /*
@@ -1209,7 +1128,7 @@ static DBL tiling_rhombus (const Vector3d& EPoint)
     }
     if (x > 1.5)
     {
-        x -= 1.5 ; /* translate */
+        x -= 1.5; /* translate */
         z = SQRT3_2 -z; /* mirror */
         delta = 2 - delta;
     }
@@ -1461,8 +1380,8 @@ static DBL tiling_square_triangle (const Vector3d& EPoint)
         {
             x = 1.0 - x;
         }
-        dist1 = 2 + 2 * SQRT3 * fabs( x ) ;
-        dist2 = 2 + 2 * SQRT3 * fabs( z ) ;
+        dist1 = 2 + 2 * SQRT3 * fabs( x );
+        dist2 = 2 + 2 * SQRT3 * fabs( z );
         dist1 = min(dist1,3.0);
         dist2 = min(dist2,3.0);
         return (5.0000001-min(dist1,dist2))/3.0; // TODO FIXME - magic number! Should use nextafter()
@@ -1521,7 +1440,7 @@ static DBL tiling_hexa_triangle (const Vector3d& EPoint)
     {
         /* Hexagon */
         dist1 = 2 + 2* (z * SQRT3 );
-        dist2 = 2 + 2* ((SQRT3 * x + z - SQRT3_2) ) * SQRT3_2 ;
+        dist2 = 2 + 2* ((SQRT3 * x + z - SQRT3_2) ) * SQRT3_2;
         answer = 5.0-min(dist1,dist2);
         answer = max(answer,2.0000001); // TODO FIXME - magic number! Should use nextafter()
         answer /= 3.0;
@@ -1623,7 +1542,7 @@ static DBL tiling_square_rectangle (const Vector3d& EPoint)
         x = 2.0*fabs( x-0.5 );
         z = 2.0*fabs( z-0.5 );
     }
-    return ((max(x,z))+delta)/3.0 ;
+    return ((max(x,z))+delta)/3.0;
 }
 
 static DBL tiling_rectangle_square (const Vector3d& EPoint)
@@ -1701,7 +1620,7 @@ static DBL tiling_rectangle_square (const Vector3d& EPoint)
         x = 2.0*fabs( x-0.5 );
         z = 2.0*fabs( z-0.5 );
     }
-    return ((max(x,z))+delta)/3.0 ;
+    return ((max(x,z))+delta)/3.0;
 }
 
 static DBL tiling_square_internal (const Vector3d& EPoint)
@@ -1996,14 +1915,14 @@ static DBL tiling_hexa_square_triangle (const Vector3d& EPoint)
     {
         /* Triangle or square */
         /* rotate in the lower part */
-        z -= 0.5 + SQRT3_2 ;
-        x -= 1.0 + SQRT3_2 ;
+        z -= 0.5 + SQRT3_2;
+        x -= 1.0 + SQRT3_2;
         dist1 = ( x / 2.0 ) - ( z * SQRT3_2 );
         dist2 = ( z / 2.0 ) + ( x * SQRT3_2 );
         z = dist2;
         x = dist1;
-        z += 0.5 + SQRT3_2 ;
-        x += 1.0 + SQRT3_2 ;
+        z += 0.5 + SQRT3_2;
+        x += 1.0 + SQRT3_2;
         if (z < 0)
         {
             z *= -1;
@@ -2020,7 +1939,7 @@ static DBL tiling_hexa_square_triangle (const Vector3d& EPoint)
         x -= SQRT3_2;
         z= fabs(z);
         x= fabs(x);
-        dist1 = 2* z * SQRT3 ;
+        dist1 = 2* z * SQRT3;
         dist2 = ((SQRT3 * x + z ) ) * SQRT3 - 1.5;
         answer = 3.0-min(dist1,dist2);
         answer = max(answer,2.0000001); // TODO FIXME - magic number! Should use nextafter()
@@ -2108,14 +2027,14 @@ static DBL tiling_hexa_square_triangle_6 (const Vector3d& EPoint)
     {
         /* Triangle or square */
         /* rotate in the lower part */
-        z -= 0.5 + SQRT3_2 ;
-        x -= 1.0 + SQRT3_2 ;
+        z -= 0.5 + SQRT3_2;
+        x -= 1.0 + SQRT3_2;
         dist1 = ( x / 2.0 ) - ( z * SQRT3_2 );
         dist2 = ( z / 2.0 ) + ( x * SQRT3_2 );
         z = dist2;
         x = dist1;
-        z += 0.5 + SQRT3_2 ;
-        x += 1.0 + SQRT3_2 ;
+        z += 0.5 + SQRT3_2;
+        x += 1.0 + SQRT3_2;
         rota = 1 - rota;
         if (z < 0)
         {
@@ -2135,7 +2054,7 @@ static DBL tiling_hexa_square_triangle_6 (const Vector3d& EPoint)
         x -= SQRT3_2;
         z= fabs(z);
         x= fabs(x);
-        dist1 = 2* z * SQRT3 ;
+        dist1 = 2* z * SQRT3;
         dist2 = ((SQRT3 * x + z ) ) * SQRT3 - 1.5;
         answer = 6.0 - min(dist1,dist2);
         answer = max(answer,5.000001); // TODO FIXME - magic number! Should use nextafter()
@@ -2355,7 +2274,7 @@ static DBL tiling_hexa_tri_right (const Vector3d& EPoint)
         }
         /* Hexagon */
         dist1 = 2 + 2* (z * SQRT3 );
-        dist2 = 2 + 2* ((SQRT3 * x + z - SQRT3_2) ) * SQRT3_2 ;
+        dist2 = 2 + 2* ((SQRT3 * x + z - SQRT3_2) ) * SQRT3_2;
         answer = 5.0-min(dist1,dist2);
         answer = max(answer, 2.000001); // TODO FIXME - magic number! Should use nextafter()
         answer /= 3.0;
@@ -2454,7 +2373,7 @@ static DBL tiling_hexa_tri_left (const Vector3d& EPoint)
         }
         /* Hexagon */
         dist1 = 2 + 2* (z * SQRT3 );
-        dist2 = 2 + 2* ((SQRT3 * x + z - SQRT3_2) ) * SQRT3_2 ;
+        dist2 = 2 + 2* ((SQRT3 * x + z - SQRT3_2) ) * SQRT3_2;
         answer = 5.0-min(dist1,dist2);
         answer = max(answer, 2.000001); // TODO FIXME - magic number! Should use nextafter()
         answer /= 3.0;
@@ -2514,7 +2433,7 @@ static DBL tiling_square_tri (const Vector3d& EPoint)
             x = SQRT3_2 +0.5 - slop1;
             break;
         case 3: /* symmetry */
-            gamma = beta ? 0: 2 ;
+            gamma = beta ? 0: 2;
             x = SQRT3_2+0.5 -x;
             z = SQRT3_2+0.5 -z;
             break;
@@ -2593,8 +2512,8 @@ static DBL tiling_dodeca_tri (const Vector3d& EPoint)
     {
         tmpx = x;
         tmpz = z;
-        x = (1.0+SQRT3)/4.0 + 0.5 * tmpx - SQRT3_2 * tmpz ;
-        z = (3.0+SQRT3)/4.0 - SQRT3_2 * tmpx - 0.5 * tmpz ;
+        x = (1.0+SQRT3)/4.0 + 0.5 * tmpx - SQRT3_2 * tmpz;
+        z = (3.0+SQRT3)/4.0 - SQRT3_2 * tmpx - 0.5 * tmpz;
         dist2 *= -1.0;
     }
     dist1 = (z * 3.0 ); /* from the bottom line */
@@ -2654,8 +2573,8 @@ static DBL tiling_dodeca_hex (const Vector3d& EPoint)
     {
         tmpx = x;
         tmpz = z;
-        x = (3.0+SQRT3)/4.0 + 0.5 * tmpx - SQRT3_2 * tmpz ;
-        z = (3.0+3.0*SQRT3)/4.0 - SQRT3_2 * tmpx - 0.5 * tmpz ;
+        x = (3.0+SQRT3)/4.0 + 0.5 * tmpx - SQRT3_2 * tmpz;
+        z = (3.0+3.0*SQRT3)/4.0 - SQRT3_2 * tmpx - 0.5 * tmpz;
     }
     dist2 = x - SQRT3_2 - 2.5 + z * SQRT3;
     dist1 = (z * 2.0 ) - SQRT3; /* from the bottom line */
@@ -2754,8 +2673,8 @@ static DBL tiling_dodeca_hex_5 (const Vector3d& EPoint)
     {
         tmpx = x;
         tmpz = z;
-        x = (3.0+SQRT3)/4.0 + 0.5 * tmpx - SQRT3_2 * tmpz ;
-        z = (3.0+3.0*SQRT3)/4.0 - SQRT3_2 * tmpx - 0.5 * tmpz ;
+        x = (3.0+SQRT3)/4.0 + 0.5 * tmpx - SQRT3_2 * tmpz;
+        z = (3.0+3.0*SQRT3)/4.0 - SQRT3_2 * tmpx - 0.5 * tmpz;
     }
     dist2 = x - SQRT3_2 - 2.5 + z * SQRT3;
     dist1 = (z * 2.0 ) - SQRT3; /* from the bottom line */
@@ -3362,7 +3281,7 @@ DBL PavementPattern::tetragonal (const Vector3d& EPoint) const
                 case 6:
                 case 8:
                 case 9:
-                    xv %= 6; if (xv < 0) { xv += 6 ;}
+                    xv %= 6; if (xv < 0) { xv += 6; }
                     zv &= 0x01;
                     lng = 6;
                     break;
@@ -3371,7 +3290,7 @@ DBL PavementPattern::tetragonal (const Vector3d& EPoint) const
                 case 19:
                 case 20:
                     lng = 0;
-                    zv %= 6; if (zv <0) { zv += 6;}
+                    zv %= 6; if (zv <0) { zv += 6; }
                     xv += 5*zv;
                     xv %= 6; if (xv <0) { xv += 6; }
                     break;
@@ -3379,7 +3298,7 @@ DBL PavementPattern::tetragonal (const Vector3d& EPoint) const
                 case 18:
                 case 27:
                     lng = 0;
-                    zv %= 6; if (zv <0) { zv += 6;}
+                    zv %= 6; if (zv <0) { zv += 6; }
                     xv += zv;
                     xv %= 6; if (xv <0) { xv += 6; }
                     break;
@@ -3392,7 +3311,7 @@ DBL PavementPattern::tetragonal (const Vector3d& EPoint) const
                 case 26:
                     lng = 4;
                     xv &= 0x03;
-                    zv %= 3; if (zv<0) { zv += 3;}
+                    zv %= 3; if (zv<0) { zv += 3; }
                     break;
                 case 13:
                 case 32:
@@ -3412,23 +3331,23 @@ DBL PavementPattern::tetragonal (const Vector3d& EPoint) const
                     xv %= 6; if (xv < 0) { xv+= 6; }
                     zv += (xv/2);
                     xv &= 0x01;
-                    zv %= 3; if (zv<0) { zv += 3;}
+                    zv %= 3; if (zv<0) { zv += 3; }
                     break;
                 case 16:
                 case 17:
                     lng = 6;
-                    zv %= 12; if (zv <0) { zv+=12; }
+                    zv %= 12; if (zv <0) { zv += 12; }
                     xv += zv/2;
                     zv &= 0x01;
-                    xv %= 6; if (xv < 0) { xv+= 6; }
+                    xv %= 6; if (xv < 0) { xv += 6; }
                     break;
                 case 23:
                 case 28:
                     lng = 6;
-                    zv %= 12; if (zv <0) { zv+=12; }
+                    zv %= 12; if (zv <0) { zv += 12; }
                     xv += 4* (zv/2);
                     zv &= 0x01;
-                    xv %= 6; if (xv < 0) { xv+= 6; }
+                    xv %= 6; if (xv < 0) { xv += 6; }
                     break;
                 case 29:
                 case 30:
@@ -3436,23 +3355,23 @@ DBL PavementPattern::tetragonal (const Vector3d& EPoint) const
                     zv &= 0x03;
                     xv += 3* (zv/2);
                     zv &= 0x01;
-                    xv %= 6; if (xv < 0) { xv+= 6; }
+                    xv %= 6; if (xv < 0) { xv += 6; }
                     break;
                 case 31:
                     lng = 0;
-                    zv %= 3; if (zv <0) { zv+=3; }
+                    zv %= 3; if (zv <0) { zv += 3; }
                     xv += 4* zv;
-                    xv %= 6; if (xv < 0) { xv+= 6; }
+                    xv %= 6; if (xv < 0) { xv += 6; }
                     break;
                 case 33:
                     lng = 0;
-                    zv %= 12; if (zv < 0) { zv+= 12; }
+                    zv %= 12; if (zv < 0) { zv += 12; }
                     xv += 7*zv;
-                    xv %= 12; if (xv < 0) { xv+= 12; }
+                    xv %= 12; if (xv < 0) { xv += 12; }
                     break;
                 case 34:
                     lng = 4;
-                    zv %= 6; if (zv<0) { zv+=6;}
+                    zv %= 6; if (zv<0) { zv += 6;}
                     xv += 2 * (zv/3);
                     xv &= 0x03;
                     zv %= 3; if (zv<0) { zv += 3;}
@@ -3465,52 +3384,52 @@ DBL PavementPattern::tetragonal (const Vector3d& EPoint) const
             {
                 case 0:
                 case 1:
-                    xv %= 5; if (xv <0) { xv += 5 ; }
+                    xv %= 5; if (xv <0) { xv += 5; }
                     zv &= 0x01;
                     break;
                 case 2:
                 case 9:
-                    zv %= 10; if (zv <0) { zv += 10;}
+                    zv %= 10; if (zv <0) { zv += 10; }
                     xv += 3 * (zv/2);
-                    xv %= 5; if (xv <0) { xv += 5;  }
+                    xv %= 5; if (xv <0) { xv += 5; }
                     zv &= 0x01;
                     break;
                 case 10:
-                    zv %= 10; if (zv <0) { zv += 10;}
+                    zv %= 10; if (zv <0) { zv += 10; }
                     xv += 4*(zv/2);
-                    xv %= 5; if (xv <0) { xv += 5 ;  }
+                    xv %= 5; if (xv <0) { xv += 5; }
                     zv &= 0x01;
                     break;
                 case 3:
-                    zv %= 5; if (zv <0) { zv += 5;}
+                    zv %= 5; if (zv <0) { zv += 5; }
                     xv += 2*zv;
-                    xv %= 5; if (xv <0) { xv += 5 ;  }
+                    xv %= 5; if (xv <0) { xv += 5; }
                     zv = 0x0;
                     break;
                 case 4:
-                    zv %= 5; if (zv <0) { zv += 5;}
+                    zv %= 5; if (zv <0) { zv += 5; }
                     xv += 2 * zv;
-                    xv %= 5; if (xv <0) { xv += 5;  }
+                    xv %= 5; if (xv <0) { xv += 5; }
                     zv = 0x00;
                     break;
                 case 5:
                 case 6:
                 case 8:
-                    zv %= 10; if (zv <0) { zv += 10;}
+                    zv %= 10; if (zv <0) { zv += 10; }
                     xv += zv;
-                    xv %= 10; if (xv <0) { xv += 10;  }
+                    xv %= 10; if (xv <0) { xv += 10; }
                     zv = 0x00;
                     break;
                 case 11:
-                    zv %= 10; if (zv <0) { zv += 10;}
+                    zv %= 10; if (zv <0) { zv += 10; }
                     xv += 8* zv;
-                    xv %= 10; if (xv <0) { xv += 10;  }
+                    xv %= 10; if (xv <0) { xv += 10; }
                     zv = 0x00;
                     break;
                 case 7:
-                    zv %= 10; if (zv <0) { zv += 10;}
+                    zv %= 10; if (zv <0) { zv += 10; }
                     xv += 3*zv;
-                    xv %= 10; if (xv <0) { xv += 10;  }
+                    xv %= 10; if (xv <0) { xv += 10; }
                     zv = 0x00;
                     break;
             }
@@ -3980,13 +3899,13 @@ DBL PavementPattern::trigonal (const Vector3d& EPoint) const
                 case 2:
                     zv &= 0x01;
                     xv += 5*zv;
-                    xv %= 10; if (xv <0) { xv += 10 ;  }
+                    xv %= 10; if (xv <0) { xv += 10; }
                     zv = 0x00;
                     break;
                 case 3:
                     zv %= 10; if (zv <0) { zv += 10; }
                     xv += 3*zv;
-                    xv %= 10; if (xv <0) { xv += 10 ;  }
+                    xv %= 10; if (xv <0) { xv += 10; }
                     zv = 0x00;
                     break;
             }
@@ -4084,7 +4003,7 @@ DBL PavementPattern::trigonal (const Vector3d& EPoint) const
             if ((how & 0x86) == 0x00)
             {
                 dist1 = x - 1.0;
-                dist2 = z ;
+                dist2 = z;
                 dist3 = 1.0 - (sqrt((dist1*dist1+dist2*dist2)) *3.0);
                 return_value = max(return_value,dist3);
             }
@@ -4139,12 +4058,12 @@ DBL PavementPattern::trigonal (const Vector3d& EPoint) const
             }
             if  (((how & 0x06) == 0x06)&&(dist2>=0.0)&&(dist3>=0.0))
             {
-                value = fabs(SQRT3 * value1 - value2) * SQRT3 ;
+                value = fabs(SQRT3 * value1 - value2) * SQRT3;
                 return_value = min(1.0,value);
             }
             if  (((how & 0x05) == 0x05)&&(dist1>=0.0)&&(dist3>=0.0))
             {
-                value = fabs(SQRT3 * value1 + value2) * SQRT3  ;
+                value = fabs(SQRT3 * value1 + value2) * SQRT3;
                 return_value = min(1.0,value);
             }
             break;
@@ -4964,7 +4883,7 @@ DBL PavementPattern::hexagonal (const Vector3d& EPoint) const
             if (((how & 0x86) == 0x00)||((how & 0x1000) == 0x1000))
             {
                 dist1 = x - 1.0;
-                dist2 = z ;
+                dist2 = z;
                 dist3 = 1.0 - (sqrt((dist1*dist1+dist2*dist2)) *3.0);
                 return_value = max(return_value,dist3);
             }
@@ -5243,9 +5162,10 @@ DBL AgatePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsect
     int noise_generator = GetNoiseGen(pThread);
 
     register DBL noise, turb_val;
-    const TURB* Turb;
+    const ClassicTurbulence* Turb;
 
-    Turb=SearchForTurb(pWarps);
+    Turb=SearchForTurb(warps);
+    assert(Turb); // Parser must make sure that a pattern-associated classic turbulence warp exists.
 
     turb_val = agateTurbScale * Turbulence(EPoint,Turb,noise_generator);
 
@@ -6269,7 +6189,7 @@ DBL GranitePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIse
 
     tv1 = EPoint * 4.0;
 
-    for (i = 0; i < 6 ; freq *= 2.0, i++)
+    for (i = 0; i < 6; freq *= 2.0, i++)
     {
         tv2 = tv1 * freq;
 
@@ -7649,9 +7569,9 @@ DBL MandelXPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIse
 DBL MarblePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
     register DBL turb_val;
-    const TURB *Turb;
+    const ClassicTurbulence *Turb;
 
-    if ((Turb=SearchForTurb(pWarps)) != NULL)
+    if ((Turb=SearchForTurb(warps)) != NULL)
     {
         turb_val = Turb->Turbulence[X] * Turbulence(EPoint,Turb,GetNoiseGen(pThread));
     }
@@ -7663,6 +7583,10 @@ DBL MarblePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsec
     return(EPoint[X] + turb_val);
 }
 
+bool MarblePattern::HasSpecialTurbulenceHandling() const
+{
+    return true;
+}
 
 
 /*****************************************************************************/
@@ -7799,7 +7723,7 @@ DBL PigmentPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIse
     else
         value = Col.colour().Greyscale();
 
-    return value ;
+    return value;
 }
 
 
@@ -7969,7 +7893,7 @@ DBL RipplesPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIse
     DBL scalar =0.0;
     Vector3d point;
 
-    for (i = 0 ; i < pThread->numberOfWaves ; i++)
+    for (i = 0; i < pThread->numberOfWaves; i++)
     {
         point = EPoint - pThread->waveSources[i];
         length = point.length();
@@ -8201,9 +8125,9 @@ DBL Spiral1Pattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIse
     DBL x = EPoint[X];
     DBL y = EPoint[Y];
     DBL z = EPoint[Z];
-    const TURB *Turb;
+    const ClassicTurbulence *Turb;
 
-    if ((Turb=SearchForTurb(pWarps)) != NULL)
+    if ((Turb=SearchForTurb(warps)) != NULL)
     {
         turb_val = Turb->Turbulence[X] * Turbulence(EPoint,Turb,GetNoiseGen(pThread));
     }
@@ -8277,9 +8201,9 @@ DBL Spiral2Pattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIse
     DBL x = EPoint[X];
     DBL y = EPoint[Y];
     DBL z = EPoint[Z];
-    const TURB *Turb;
+    const ClassicTurbulence *Turb;
 
-    if ((Turb=SearchForTurb(pWarps)) != NULL)
+    if ((Turb=SearchForTurb(warps)) != NULL)
     {
         turb_val = Turb->Turbulence[X] * Turbulence(EPoint,Turb,GetNoiseGen(pThread));
     }
@@ -8397,7 +8321,7 @@ DBL WavesPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsect
     DBL scalar = 0.0;
     Vector3d point;
 
-    for (i = 0 ; i < pThread->numberOfWaves ; i++)
+    for (i = 0; i < pThread->numberOfWaves; i++)
     {
         point = EPoint - pThread->waveSources[i];
         length = point.length();
@@ -8455,9 +8379,9 @@ DBL WoodPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsecti
     Vector3d point;
     DBL x=EPoint[X];
     DBL y=EPoint[Y];
-    const TURB *Turb;
+    const ClassicTurbulence *Turb;
 
-    if ((Turb=SearchForTurb(pWarps)) != NULL)
+    if ((Turb=SearchForTurb(warps)) != NULL)
     {
         DTurbulence (WoodTurbulence, EPoint, Turb);
         point[X] = cycloidal((x + WoodTurbulence[X]) * Turb->Turbulence[X]);
@@ -8478,6 +8402,11 @@ DBL WoodPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsecti
     length = point.length();
 
     return(length);
+}
+
+bool WoodPattern::HasSpecialTurbulenceHandling() const
+{
+    return true;
 }
 
 
@@ -8878,11 +8807,11 @@ DENSITY_FILE *Create_Density_File()
 {
     DENSITY_FILE *New;
 
-    New = reinterpret_cast<DENSITY_FILE *>(POV_MALLOC(sizeof(DENSITY_FILE), "density file"));
+    New = new DENSITY_FILE;
 
     New->Interpolation = kDensityFileInterpolation_None;
 
-    New->Data = reinterpret_cast<DENSITY_FILE_DATA *>(POV_MALLOC(sizeof(DENSITY_FILE_DATA), "density file data"));
+    New->Data = new DENSITY_FILE_DATA;
 
     New->Data->References = 1;
 
@@ -8934,7 +8863,7 @@ DENSITY_FILE *Copy_Density_File(DENSITY_FILE *Old)
 
     if (Old != NULL)
     {
-        New = reinterpret_cast<DENSITY_FILE *>(POV_MALLOC(sizeof(DENSITY_FILE), "density file"));
+        New = new DENSITY_FILE;
 
         *New = *Old;
 
@@ -8985,21 +8914,21 @@ void Destroy_Density_File(DENSITY_FILE *Density_File)
 
             if(Density_File->Data->Type == 4)
             {
-                POV_FREE(Density_File->Data->Density32);
+                delete[] Density_File->Data->Density32;
             }
             else if(Density_File->Data->Type == 2)
             {
-                POV_FREE(Density_File->Data->Density16);
+                delete[] Density_File->Data->Density16;
             }
             else if(Density_File->Data->Type == 1)
             {
-                POV_FREE(Density_File->Data->Density8);
+                delete[] Density_File->Data->Density8;
             }
 
-            POV_FREE(Density_File->Data);
+            delete Density_File->Data;
         }
 
-        POV_FREE(Density_File);
+        delete Density_File;
     }
 }
 
@@ -9027,7 +8956,7 @@ void Read_Density_File(IStream *file, DENSITY_FILE *df)
         {
             df->Data->Type = 4;
 
-            unsigned int *map = reinterpret_cast<unsigned int *>(POV_MALLOC(sx * sy * sz * sizeof(unsigned int), "media density file data 32 bit"));
+            unsigned int *map = new unsigned int[sx * sy * sz];
 
             for (z = 0; z < sz; z++)
             {
@@ -9044,7 +8973,7 @@ void Read_Density_File(IStream *file, DENSITY_FILE *df)
         {
             df->Data->Type = 2;
 
-            unsigned short *map = reinterpret_cast<unsigned short *>(POV_MALLOC(sx * sy * sz * sizeof(unsigned short), "media density file data 16 bit"));
+            unsigned short *map = new unsigned short[sx * sy * sz];
 
             for (z = 0; z < sz; z++)
             {
@@ -9061,7 +8990,7 @@ void Read_Density_File(IStream *file, DENSITY_FILE *df)
         {
             df->Data->Type = 1;
 
-            unsigned char *map = reinterpret_cast<unsigned char *>(POV_MALLOC(sx * sy * sz * sizeof(unsigned char), "media density file data 8 bit"));
+            unsigned char *map = new unsigned char[sx * sy * sz];
 
             for (z = 0; z < sz; z++)
             {

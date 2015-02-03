@@ -706,7 +706,7 @@ UCS2 *Parser::String_To_UCS2(const char *str)
             char_array = reinterpret_cast<UCS2 *>(POV_MALLOC(char_array_size * sizeof(UCS2), "Character Array"));
             for(i = 0; i < char_array_size; i++)
             {
-                if(sceneData->languageVersion < 350)
+                if(sceneData->EffectiveLanguageVersion() < 350)
                     char_array[i] = (unsigned char)(str[i]);
                 else
                 {
@@ -779,7 +779,7 @@ UCS2 *Parser::String_Literal_To_UCS2(const char *str, bool pathname)
             char_array = reinterpret_cast<UCS2 *>(POV_MALLOC(char_array_size * sizeof(UCS2), "Character Array"));
             for(i = 0; i < char_array_size; i++)
             {
-                if(sceneData->languageVersion < 350)
+                if(sceneData->EffectiveLanguageVersion() < 350)
                     char_array[i] = (unsigned char)(str[i]);
                 else
                 {
@@ -811,7 +811,7 @@ UCS2 *Parser::String_Literal_To_UCS2(const char *str, bool pathname)
     char_string = reinterpret_cast<UCS2 *>(POV_MALLOC((char_array_size + 1) * sizeof(UCS2), "UCS2 String"));
     for(index_in = 0, index_out = 0; index_in < char_array_size; index_in++, index_out++)
     {
-        if((char_array[index_in] == '\\') && (sceneData->languageVersion >= 371 || !pathname))
+        if((char_array[index_in] == '\\') && (sceneData->EffectiveLanguageVersion() >= 371 || !pathname))
         {
             // Historically, escape sequences were ignored when parsing for a filename.
             // As of POV-Ray 3.71, this has been changed.
@@ -819,9 +819,9 @@ UCS2 *Parser::String_Literal_To_UCS2(const char *str, bool pathname)
 #if (FILENAME_SEPARATOR == '\\')
             if (pathname)
             {
-                Warning(0, "Backslash encountered while parsing for a filename."
-                           " As of version 3.71, this is interpreted as an escape sequence just like in any other string literal."
-                           " If this is supposed to be a path separator, use a forward slash instead.");
+                Warning("Backslash encountered while parsing for a filename."
+                        " As of version 3.71, this is interpreted as an escape sequence just like in any other string literal."
+                        " If this is supposed to be a path separator, use a forward slash instead.");
             }
 #endif
 
@@ -888,12 +888,12 @@ UCS2 *Parser::String_Literal_To_UCS2(const char *str, bool pathname)
                 // As of POV-Ray 3.71, this has been changed.
 
 #if (FILENAME_SEPARATOR == '\\')
-                Warning(0, "Backslash encountered while parsing for a filename."
-                           " In legacy (pre-3.71) scenes, this is NOT interpreted as the start of an escape sequence."
-                           " However, for future compatibility it is recommended to use a forward slash as path separator instead.");
+                Warning("Backslash encountered while parsing for a filename."
+                        " In legacy (pre-3.71) scenes, this is NOT interpreted as the start of an escape sequence."
+                        " However, for future compatibility it is recommended to use a forward slash as path separator instead.");
 #else
-                Warning(0, "Backslash encountered while parsing for a filename."
-                           " In legacy (pre-3.71) scenes, this is NOT interpreted as the start of an escape sequence.");
+                Warning("Backslash encountered while parsing for a filename."
+                        " In legacy (pre-3.71) scenes, this is NOT interpreted as the start of an escape sequence.");
 #endif
             }
 
@@ -940,7 +940,7 @@ char *Parser::UCS2_To_String(const UCS2 *str)
 
     for(strp = str_out; *str != 0; str++, strp++)
     {
-        if((*str > 127) && (sceneData->languageVersion >= 350))
+        if((*str > 127) && (sceneData->EffectiveLanguageVersion() >= 350))
             *strp = ' ';
         else
             *strp = (char)(*str);
@@ -1267,7 +1267,7 @@ void Parser::UCS2_strupr(UCS2 *str)
     }
 
     if(err == true)
-        Warning(0, "Non-ASCII charcater in string, strupr may not work as expected.");
+        Warning("Non-ASCII charcater in string, strupr may not work as expected.");
 }
 
 
@@ -1305,7 +1305,7 @@ void Parser::UCS2_strlwr(UCS2 *str)
     }
 
     if(err == true)
-        Warning(0, "Non-ASCII charcater in string, strlwr may not work as expected.");
+        Warning("Non-ASCII charcater in string, strlwr may not work as expected.");
 }
 
 UCS2 *Parser::UCS2_strdup(const UCS2 *s)

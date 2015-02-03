@@ -11,7 +11,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -39,36 +39,85 @@
 #ifndef PIGMENT_H
 #define PIGMENT_H
 
+#include "base/image/colourspace.h"
+
 namespace pov
 {
 
-/*****************************************************************************
-* Global preprocessor defines
-******************************************************************************/
+typedef TransColour ColourBlendMapData;
+typedef PIGMENT*    PigmentBlendMapData;
 
+/// Common interface for pigment-like blend maps.
+///
+/// This class provides the common interface for both pigment and colour blend maps.
+///
+class GenericPigmentBlendMap
+{
+    public:
 
+        int                     blendMode;
+        pov_base::GammaCurvePtr blendGamma;
 
+        GenericPigmentBlendMap() : blendMode(0), blendGamma() {}
+        virtual ~GenericPigmentBlendMap() {}
 
-/*****************************************************************************
-* Global typedefs
-******************************************************************************/
+        virtual bool Compute(TransColour& colour, DBL value, const Vector3d& IPoint, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread) = 0;
+        virtual void ComputeAverage(TransColour& colour, const Vector3d& EPoint, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread) = 0;
+        virtual bool ComputeUVMapped(TransColour& colour, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread) = 0;
+        virtual void ConvertFilterToTransmit() = 0; ///< @deprecated Only used for backward compatibility with version 3.10 or earlier.
+        virtual void Post(bool& rHasFilter) = 0;
 
+        void Blend(TransColour& result, const TransColour& colour1, DBL weight1, const TransColour& colour2, DBL weight2, TraceThreadData *thread);
+};
 
+/// Colour blend map.
+class ColourBlendMap : public BlendMap<ColourBlendMapData>, public GenericPigmentBlendMap
+{
+    public:
 
-/*****************************************************************************
-* Global variables
-******************************************************************************/
+        ColourBlendMap();
+        ColourBlendMap(int n, const Entry aEntries[]);
 
+        virtual bool Compute(TransColour& colour, DBL value, const Vector3d& IPoint, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread);
+        virtual void ComputeAverage(TransColour& colour, const Vector3d& EPoint, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread);
+        virtual bool ComputeUVMapped(TransColour& colour, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread);
+        virtual void ConvertFilterToTransmit(); ///< @deprecated Only used for backward compatibility with version 3.10 or earlier.
+        virtual void Post(bool& rHasFilter);
+};
 
+/// Pigment blend map.
+class PigmentBlendMap : public BlendMap<PigmentBlendMapData>, public GenericPigmentBlendMap
+{
+    public:
 
-/*****************************************************************************
-* Global constants
-******************************************************************************/
+        PigmentBlendMap(int type);
+        virtual ~PigmentBlendMap();
 
+        virtual bool Compute(TransColour& colour, DBL value, const Vector3d& IPoint, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread);
+        virtual void ComputeAverage(TransColour& colour, const Vector3d& EPoint, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread);
+        virtual bool ComputeUVMapped(TransColour& colour, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread);
+        virtual void ConvertFilterToTransmit(); ///< @deprecated Only used for backward compatibility with version 3.10 or earlier.
+        virtual void Post(bool& rHasFilter);
+};
 
-/*****************************************************************************
-* Global functions
-******************************************************************************/
+typedef shared_ptr<GenericPigmentBlendMap>          GenericPigmentBlendMapPtr;
+typedef shared_ptr<const GenericPigmentBlendMap>    GenericPigmentBlendMapConstPtr;
+
+typedef BlendMapEntry<PigmentBlendMapData>          PigmentBlendMapEntry;
+typedef shared_ptr<PigmentBlendMap>                 PigmentBlendMapPtr;
+typedef shared_ptr<const PigmentBlendMap>           PigmentBlendMapConstPtr;
+
+typedef BlendMapEntry<ColourBlendMapData>           ColourBlendMapEntry;
+typedef shared_ptr<ColourBlendMap>                  ColourBlendMapPtr;
+typedef shared_ptr<const ColourBlendMap>            ColourBlendMapConstPtr;
+
+struct Pigment_Struct : public Pattern_Struct
+{
+    shared_ptr<GenericPigmentBlendMap> Blend_Map;
+    TransColour colour;       // may have a filter/transmit component
+    TransColour Quick_Colour; // may have a filter/transmit component    // TODO - can't we decide between regular colour and quick_colour at parse time already?
+};
+
 
 PIGMENT *Create_Pigment();
 PIGMENT *Copy_Pigment(PIGMENT *Old);

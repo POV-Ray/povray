@@ -9,7 +9,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -39,7 +39,6 @@
 #include "backend/pattern/warps.h"
 #include "backend/pattern/pattern.h"
 #include "backend/texture/texture.h"
-#include "backend/math/vector.h"
 #include "backend/math/matrices.h"
 #include "backend/support/randomsequences.h"
 #include "base/pov_err.h"
@@ -56,18 +55,11 @@ namespace pov
 
 const DBL COORDINATE_LIMIT = 1.0e17;
 
-static RandomDoubleSequence WarpRands(0.0, 1.0, 32768);
-
 /*****************************************************************************
 * Static functions
 ******************************************************************************/
-static int warp_cylindrical(Vector3d& TPoint, const CYLW *Warp);
-static int warp_spherical(Vector3d& TPoint, const SPHEREW *Warp);
-static int warp_toroidal(Vector3d& TPoint, const TOROIDAL *Warp);
-static int warp_planar(Vector3d& TPoint, const PLANARW *Warp);
-static int warp_cubic(Vector3d& TPoint); // JN2007: Cubic warp
 
-
+static RandomDoubleSequence WarpRands(0.0, 1.0, 32768);
 
 /*****************************************************************************
 *
@@ -100,621 +92,110 @@ static int warp_cubic(Vector3d& TPoint); // JN2007: Cubic warp
 
 void Warp_EPoint (Vector3d& TPoint, const Vector3d& EPoint, const TPATTERN *TPat)
 {
-    Vector3d PTurbulence, RP;
-    int Axis,i;
-    int blockX = 0, blockY = 0, blockZ = 0 ;
-    SNGL BlkNum;
-    DBL  Length;
-    DBL  Strength;
-    WARP *Warp=TPat->pattern->pWarps;
-    TURB *Turb;
-    TRANS *Tr;
-    REPEAT *Repeat;
-    BLACK_HOLE *Black_Hole;
-    Vector3d Delta, Center;
+    WarpList& warps=TPat->pattern->warps;
 
     TPoint = EPoint;
 
-    while (Warp != NULL)
+    for (WarpList::reverse_iterator iWarp = warps.rbegin(); iWarp != warps.rend(); iWarp ++)
     {
-        switch(Warp->Warp_Type)
-        {
-            case CLASSIC_TURB_WARP:
-                if ((TPat->Type == MARBLE_PATTERN) ||
-                    (TPat->Type == NO_PATTERN)     ||
-                    (TPat->Type == WOOD_PATTERN))
-                {
-                    break;
-                }
-            /* If not a special type, fall through to next case */
-
-            case EXTRA_TURB_WARP:
-                Turb=reinterpret_cast<TURB *>(Warp);
-                DTurbulence (PTurbulence, TPoint, Turb);
-                TPoint += PTurbulence * Turb->Turbulence;
-                break;
-
-            case NO_WARP:
-                break;
-
-            case TRANSFORM_WARP:
-                Tr=reinterpret_cast<TRANS *>(Warp);
-                MInvTransPoint(TPoint, TPoint, &(Tr->Trans));
-                break;
-
-            case REPEAT_WARP:
-                Repeat=reinterpret_cast<REPEAT *>(Warp);
-                RP = TPoint;
-                Axis=Repeat->Axis;
-                BlkNum=(SNGL)floor(TPoint[Axis]/Repeat->Width);
-
-                RP[Axis]=TPoint[Axis]-BlkNum*Repeat->Width;
-
-                if (((int)BlkNum) & 1)
-                {
-                    RP *= Repeat->Flip;
-                    if ( Repeat->Flip[Axis] < 0 )
-                    {
-                        RP[Axis] = Repeat->Width+RP[Axis];
-                    }
-                }
-
-                RP += (DBL)BlkNum * Repeat->Offset;
-                TPoint = RP;
-                break;
-
-            case BLACK_HOLE_WARP:
-                Black_Hole = reinterpret_cast<BLACK_HOLE *>(Warp) ;
-                Center = Black_Hole->Center;
-
-                if (Black_Hole->Repeat)
-                {
-                    /* first, get the block number we're in for each dimension  */
-                    /* block numbers are (currently) calculated relative to 0   */
-                    /* we use floor () since it correctly returns -1 for the
-                       first block below 0 in each axis                         */
-                    /* one final point - we could run into overflow problems if
-                       the repeat vector was small and the scene very large.    */
-                    if (Black_Hole->Repeat_Vector [X] >= EPSILON)
-                        blockX = (int) floor (TPoint [X] / Black_Hole->Repeat_Vector [X]) ;
-
-                    if (Black_Hole->Repeat_Vector [Y] >= EPSILON)
-                        blockY = (int) floor (TPoint [Y] / Black_Hole->Repeat_Vector [Y]) ;
-
-                    if (Black_Hole->Repeat_Vector [Z] >= EPSILON)
-                        blockZ = (int) floor (TPoint [Z] / Black_Hole->Repeat_Vector [Z]) ;
-
-                    if (Black_Hole->Uncertain)
-                    {
-                        /* if the position is uncertain calculate the new one first */
-                        /* this will allow the same numbers to be returned by frand */
-
-                        int seed = Hash3d (blockX, blockY, blockZ);
-                        Center [X] += WarpRands(seed)     * Black_Hole->Uncertainty_Vector [X] ;
-                        Center [Y] += WarpRands(seed + 1) * Black_Hole->Uncertainty_Vector [Y] ;
-                        Center [Z] += WarpRands(seed + 2) * Black_Hole->Uncertainty_Vector [Z] ;
-                    }
-
-                    Center [X] += Black_Hole->Repeat_Vector [X] * blockX ;
-                    Center [Y] += Black_Hole->Repeat_Vector [Y] * blockY ;
-                    Center [Z] += Black_Hole->Repeat_Vector [Z] * blockZ ;
-                }
-
-                Delta = TPoint - Center;
-                Length = Delta.length();
-
-                /* Length is the distance from the centre of the black hole */
-                if (Length >= Black_Hole->Radius) break ;
-
-                if (Black_Hole->Type == 0)
-                {
-                    /* now convert the length to a proportion (0 to 1) that the point
-                       is from the edge of the black hole. a point on the perimeter
-                       of the black hole will be 0.0 ; a point at the centre will be
-                       1.0 ; a point exactly halfway will be 0.5, and so forth. */
-                    Length = (Black_Hole->Radius - Length) / Black_Hole->Radius ;
-
-                    /* Strength is the magnitude of the transformation effect. firstly,
-                       apply the Power variable to Length. this is meant to provide a
-                       means of controlling how fast the power of the Black Hole falls
-                       off from its centre. if Power is 2.0, then the effect is inverse
-                       square. increasing power will cause the Black Hole to be a lot
-                       weaker in its effect towards its perimeter.
-
-                       finally we multiply Strength with the Black Hole's Strength
-                       variable. if the resultant value exceeds 1.0 we clip it to 1.0.
-                       this means a point will never be transformed by more than its
-                       original distance from the centre. the result of this clipping
-                       is that you will have an 'exclusion' area near the centre of
-                       the black hole where all points whose final value exceeded or
-                       equalled 1.0 were moved by a fixed amount. this only happens
-                       if the Strength value of the Black Hole was greater than one. */
-
-                    Strength = pow (Length, Black_Hole->Power) * Black_Hole->Strength ;
-                    if (Strength > 1.0) Strength = 1.0 ;
-
-                    /* if the Black Hole is inverted, it gives the impression of 'push-
-                       ing' the pattern away from its centre. otherwise it sucks. */
-                    Delta *= (Black_Hole->Inverted ? -Strength : Strength);
-
-                    /* add the scaled Delta to the input point to end up with TPoint. */
-                    TPoint += Delta;
-                }
-                break;
-
-            /* 10/23/1998 Talious added SPherical Cylindrical and toroidal
-            warps */
-
-            case CYLINDRICAL_WARP:
-                warp_cylindrical(TPoint, reinterpret_cast<CYLW *>(Warp));
-                break;
-
-            case PLANAR_WARP:
-                warp_planar(TPoint, reinterpret_cast<PLANARW *>(Warp));
-                break;
-
-            case SPHERICAL_WARP:
-                warp_spherical(TPoint, reinterpret_cast<SPHEREW *>(Warp));
-                break;
-
-            case TOROIDAL_WARP:
-                warp_toroidal(TPoint, reinterpret_cast<TOROIDAL *>(Warp));
-                break;
-
-            case CUBIC_WARP:
-                warp_cubic(TPoint);
-                break;
-
-            default:
-                throw POV_EXCEPTION_STRING("Warp type not yet implemented.");
-        }
-        Warp=Warp->Next_Warp;
+        WarpPtr& warp = *iWarp;
+        warp->WarpPoint(TPoint);
     }
 
-    for (i=X; i<=Z; i++)
+    for (int i=X; i<=Z; i++)
+    {
         if (TPoint[i] > COORDINATE_LIMIT)
             TPoint[i]= COORDINATE_LIMIT;
-        else
-            if (TPoint[i] < -COORDINATE_LIMIT)
-                TPoint[i] = -COORDINATE_LIMIT;
-
+        else if (TPoint[i] < -COORDINATE_LIMIT)
+            TPoint[i] = -COORDINATE_LIMIT;
+    }
 }
 
-void Warp_Normal (Vector3d& TNorm, const Vector3d& ENorm, const TPATTERN *TPat, bool DontScaleBumps)
+bool BlackHoleWarp::WarpPoint(Vector3d& TPoint) const
 {
-    const WARP *Warp=TPat->pattern->pWarps;
-    const TRANS *Tr;
+    Vector3d C = Center;
 
-    if(!DontScaleBumps)
-        TNorm = ENorm.normalized();
-    else
-        TNorm = ENorm;
-
-    while(Warp != NULL)
+    if (Repeat)
     {
-        switch(Warp->Warp_Type)
+        int blockX = 0, blockY = 0, blockZ = 0;
+
+        /* first, get the block number we're in for each dimension  */
+        /* block numbers are (currently) calculated relative to 0   */
+        /* we use floor () since it correctly returns -1 for the
+            first block below 0 in each axis                         */
+        /* one final point - we could run into overflow problems if
+            the repeat vector was small and the scene very large.    */
+        if (Repeat_Vector[X] >= EPSILON)
+            blockX = (int) floor (TPoint[X] / Repeat_Vector[X]);
+
+        if (Repeat_Vector[Y] >= EPSILON)
+            blockY = (int) floor (TPoint[Y] / Repeat_Vector[Y]);
+
+        if (Repeat_Vector[Z] >= EPSILON)
+            blockZ = (int) floor (TPoint[Z] / Repeat_Vector[Z]);
+
+        if (Uncertain)
         {
-            default:
-            case NO_WARP:
-                break;
-            case TRANSFORM_WARP:
-                Tr=reinterpret_cast<const TRANS *>(Warp);
-                MInvTransNormal(TNorm, TNorm, &(Tr->Trans));
-                break;
-            /*
-            default:
-                Error("Warp type %d not yet implemented",Warp->Warp_Type);
-            */
+            /* if the position is uncertain calculate the new one first */
+            /* this will allow the same numbers to be returned by frand */
+
+            int seed = Hash3d (blockX, blockY, blockZ);
+            C[X] += WarpRands(seed)     * Uncertainty_Vector[X];
+            C[Y] += WarpRands(seed + 1) * Uncertainty_Vector[Y];
+            C[Z] += WarpRands(seed + 2) * Uncertainty_Vector[Z];
         }
-        Warp=Warp->Next_Warp;
+
+        C[X] += Repeat_Vector[X] * blockX;
+        C[Y] += Repeat_Vector[Y] * blockY;
+        C[Z] += Repeat_Vector[Z] * blockZ;
     }
 
-    if(!DontScaleBumps)
-        TNorm.normalize();
+    Vector3d Delta = TPoint - C;
+    DBL Length = Delta.length();
+
+    /* Length is the distance from the centre of the black hole */
+    if (Length >= Radius)
+        return true;
+
+    if (Type == 0)
+    {
+        /* now convert the length to a proportion (0 to 1) that the point
+            is from the edge of the black hole. a point on the perimeter
+            of the black hole will be 0.0; a point at the centre will be
+            1.0; a point exactly halfway will be 0.5, and so forth. */
+        Length = (Radius - Length) / Radius;
+
+        /* Strength is the magnitude of the transformation effect. firstly,
+            apply the Power variable to Length. this is meant to provide a
+            means of controlling how fast the power of the Black Hole falls
+            off from its centre. if Power is 2.0, then the effect is inverse
+            square. increasing power will cause the Black Hole to be a lot
+            weaker in its effect towards its perimeter.
+
+            finally we multiply Strength with the Black Hole's Strength
+            variable. if the resultant value exceeds 1.0 we clip it to 1.0.
+            this means a point will never be transformed by more than its
+            original distance from the centre. the result of this clipping
+            is that you will have an 'exclusion' area near the centre of
+            the black hole where all points whose final value exceeded or
+            equalled 1.0 were moved by a fixed amount. this only happens
+            if the Strength value of the Black Hole was greater than one. */
+
+        DBL S = pow (Length, Power) * Strength;
+        if (S > 1.0) S = 1.0;
+
+        /* if the Black Hole is inverted, it gives the impression of 'push-
+            ing' the pattern away from its centre. otherwise it sucks. */
+        Delta *= (Inverted ? -S : S);
+
+        /* add the scaled Delta to the input point to end up with TPoint. */
+        TPoint += Delta;
+    }
+
+    return true;
 }
 
-void UnWarp_Normal (Vector3d& TNorm, const Vector3d& ENorm, const TPATTERN *TPat, bool DontScaleBumps)
-{
-    const WARP *Warp = NULL;
-
-    if(!DontScaleBumps)
-        TNorm = ENorm.normalized();
-    else
-        TNorm = ENorm;
-
-    if(TPat->pattern->pWarps != NULL)
-    {
-        // go to the last entry
-        for(Warp = TPat->pattern->pWarps; Warp->Next_Warp != NULL; Warp = Warp->Next_Warp) ;
-
-        // walk backwards from the last entry
-        for(; Warp != NULL; Warp = Warp->Prev_Warp)
-        {
-            if(Warp->Warp_Type == TRANSFORM_WARP)
-                MTransNormal(TNorm, TNorm, &((reinterpret_cast<const TRANS *>(Warp))->Trans));
-        }
-    }
-
-    if(!DontScaleBumps)
-        TNorm.normalize();
-}
-
-/*****************************************************************************
-*
-* FUNCTION
-*    warp_planar
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR  Matthew Corey Brown (talious)
-*
-* DESCRIPTION
-*    Based on cylindrical_image_map from image.c
-*    Its a 3d version of that for warps
-*
-* CHANGES
-*
-******************************************************************************/
-
-static int warp_planar(Vector3d& EPoint, const PLANARW *Warp)
-{
-    DBL x = EPoint[X];
-    DBL z = Warp->OffSet;
-    DBL y = EPoint[Y];
-
-    if((Warp->Orientation_Vector[X] == 0.0) &&
-       (Warp->Orientation_Vector[Y] == 0.0) &&
-       (Warp->Orientation_Vector[Z] == 1.0))
-    {
-        EPoint[X] = x;
-        EPoint[Y] = y;
-        EPoint[Z] = z;
-    }
-    else
-    {
-        EPoint[X] = (Warp->Orientation_Vector[X] * z) +
-                    (Warp->Orientation_Vector[Y] * x) +
-                    (Warp->Orientation_Vector[Z] * x);
-        EPoint[Y] = (Warp->Orientation_Vector[X] * y) +
-                    (Warp->Orientation_Vector[Y] * -z) +
-                    (Warp->Orientation_Vector[Z] * y);
-        EPoint[Z] = (Warp->Orientation_Vector[X] * -x) +
-                    (Warp->Orientation_Vector[Y] * y) +
-                    (Warp->Orientation_Vector[Z] * z);
-    }
-
-    return 1;
-}
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*    warp_cylindrical
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR  Matthew Corey Brown (talious)
-*
-* DESCRIPTION
-*    Based on cylindrical_image_map from image.c
-*    Its a 3d version of that for warps
-*
-* CHANGES
-*
-******************************************************************************/
-
-static int warp_cylindrical(Vector3d& EPoint, const CYLW *Warp)
-{
-    DBL len, theta;
-    DBL x = EPoint[X];
-    DBL y = EPoint[Y];
-    DBL z = EPoint[Z];
-
-    // Determine its angle from the point (1, 0, 0) in the x-z plane.
-    len = sqrt(x * x + z * z);
-
-    if(len == 0.0)
-        return 0;
-    else
-    {
-        if(z == 0.0)
-        {
-            if(x > 0)
-                theta = 0.0;
-            else
-                theta = M_PI;
-        }
-        else
-        {
-            theta = acos(x / len);
-            if(z < 0.0)
-                theta = TWO_M_PI - theta;
-        }
-
-        theta /= TWO_M_PI;  // This will be from 0 to 1
-    }
-
-    if(Warp->DistExp == 1.0)
-        theta *= len;
-    else if (Warp->DistExp != 0.0)
-        theta *= pow(len,Warp->DistExp);
-
-    x = theta;
-    z = len;
-
-    if((Warp->Orientation_Vector[X] == 0.0) &&
-       (Warp->Orientation_Vector[Y] == 0.0) &&
-       (Warp->Orientation_Vector[Z] == 1.0))
-    {
-        EPoint[X] = x;
-        EPoint[Y] = y;
-        EPoint[Z] = z;
-    }
-    else
-    {
-        EPoint[X] = (Warp->Orientation_Vector[X] * z) +
-                    (Warp->Orientation_Vector[Y] * x) +
-                    (Warp->Orientation_Vector[Z] * x);
-        EPoint[Y] = (Warp->Orientation_Vector[X] * y) +
-                    (Warp->Orientation_Vector[Y] * -z) +
-                    (Warp->Orientation_Vector[Z] * y);
-        EPoint[Z] = (Warp->Orientation_Vector[X] * -x) +
-                    (Warp->Orientation_Vector[Y] * y) +
-                    (Warp->Orientation_Vector[Z] * z);
-    }
-
-    return 1;
-}
-
-/*****************************************************************************
-*
-* FUNCTION
-*        warp_toroidal(Vector3d& EPoint, TOROIDAL *Warp)
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR   Matthew Corey Brown (Talious)
-*
-*
-* DESCRIPTION
-* Warps a point on a torus centered on orgin to a 2 d plane in space
-* based on torus_image_map
-*
-* CHANGES
-*
-******************************************************************************/
-
-static int warp_toroidal(Vector3d& EPoint, const TOROIDAL *Warp)
-{
-    DBL len, phi, theta;
-    DBL r0;
-    DBL x = EPoint[X];
-    DBL y = EPoint[Y];
-    DBL z = EPoint[Z];
-
-    r0 = Warp->MajorRadius;
-
-    // Determine its angle from the x-axis.
-
-    len = sqrt(x * x + z * z);
-
-    if(len == 0.0)
-        return 0;
-    else
-    {
-        if(z == 0.0)
-        {
-            if(x > 0)
-                theta = 0.0;
-            else
-                theta = M_PI;
-        }
-        else
-        {
-            theta = acos(x / len);
-            if(z < 0.0)
-                theta = TWO_M_PI - theta;
-        }
-    }
-
-    theta = 0.0 - theta;
-
-    // Now rotate about the y-axis to get the point (x, y, z) into the x-y plane.
-
-    x = len - r0;
-    len = sqrt(x * x + y * y);
-    phi = acos(-x / len);
-    if (y > 0.0)
-        phi = TWO_M_PI - phi;
-
-    // Determine the parametric coordinates.
-
-    theta /= (-TWO_M_PI);
-
-    phi /= TWO_M_PI;
-
-    if (Warp->DistExp == 1.0)
-    {
-        theta *= len;
-        phi *= len;
-    }
-    else if (Warp->DistExp != 0.0)
-    {
-        theta *= pow(len,Warp->DistExp);
-        phi *= pow(len,Warp->DistExp);
-    }
-
-    x = theta;
-    z = len;
-    y = phi;
-
-    if((Warp->Orientation_Vector[X] == 0.0) &&
-       (Warp->Orientation_Vector[Y] == 0.0) &&
-       (Warp->Orientation_Vector[Z] == 1.0))
-    {
-        EPoint[X] = x;
-        EPoint[Y] = y;
-        EPoint[Z] = z;
-    }
-    else
-    {
-        EPoint[X] = (Warp->Orientation_Vector[X] * z) +
-                    (Warp->Orientation_Vector[Y] * x) +
-                    (Warp->Orientation_Vector[Z] * x);
-        EPoint[Y] = (Warp->Orientation_Vector[X] * y) +
-                    (Warp->Orientation_Vector[Y] * -z) +
-                    (Warp->Orientation_Vector[Z] * y);
-        EPoint[Z] = (Warp->Orientation_Vector[X] * -x) +
-                    (Warp->Orientation_Vector[Y] * y) +
-                    (Warp->Orientation_Vector[Z] * z);
-    }
-
-    return 1;
-}
-
-/*****************************************************************************
-*
-* FUNCTION
-*    warp_spherical
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR   Matthew Corey Brown (Talious)
-*
-*
-* DESCRIPTION
-* Warps a point on a sphere centered on orgin to a 2 d plane in space
-* based on spherical_image_map
-*
-* CHANGES
-*
-******************************************************************************/
-static int warp_spherical(Vector3d& EPoint, const SPHEREW *Warp)
-{
-    DBL len, phi, theta,dist;
-    DBL x = EPoint[X];
-    DBL y = EPoint[Y];
-    DBL z = EPoint[Z];
-
-    // Make sure this vector is on the unit sphere.
-
-    dist = sqrt(x * x + y * y + z * z);
-
-    if(dist == 0.0)
-        return 0;
-    else
-    {
-        x /= dist;
-        y /= dist;
-        z /= dist;
-    }
-
-    // Determine its angle from the x-z plane.
-    phi = 0.5 + asin(y) / M_PI; // This will be from 0 to 1
-
-    // Determine its angle from the point (1, 0, 0) in the x-z plane.
-    len = sqrt(x * x + z * z);
-    if(len == 0.0)
-    {
-        // This point is at one of the poles. Any value of xcoord will be ok...
-        theta = 0;
-    }
-    else
-    {
-        if(z == 0.0)
-        {
-            if(x > 0)
-                theta = 0.0;
-            else
-                theta = M_PI;
-        }
-        else
-        {
-            theta = acos(x / len);
-            if (z < 0.0)
-                theta = TWO_M_PI - theta;
-        }
-        theta /= TWO_M_PI;  /* This will be from 0 to 1 */
-    }
-
-    if(Warp->DistExp == 1.0)
-    {
-        theta *= dist;
-        phi *= dist;
-    }
-    else if(Warp->DistExp != 0.0)
-    {
-        theta *= pow(dist,Warp->DistExp);
-        phi *= pow(dist,Warp->DistExp);
-    }
-
-    x = theta;
-    z = dist;
-    y = phi;
-
-    if((Warp->Orientation_Vector[X] == 0.0) &&
-       (Warp->Orientation_Vector[Y] == 0.0) &&
-       (Warp->Orientation_Vector[Z] == 1.0))
-    {
-        EPoint[X] = x;
-        EPoint[Y] = y;
-        EPoint[Z] = z;
-    }
-    else
-    {
-        EPoint[X] = (Warp->Orientation_Vector[X] * z) +
-                    (Warp->Orientation_Vector[Y] * x) +
-                    (Warp->Orientation_Vector[Z] * x);
-        EPoint[Y] = (Warp->Orientation_Vector[X] * y) +
-                    (Warp->Orientation_Vector[Y] * -z) +
-                    (Warp->Orientation_Vector[Z] * y);
-        EPoint[Z] = (Warp->Orientation_Vector[X] * -x) +
-                    (Warp->Orientation_Vector[Y] * y) +
-                    (Warp->Orientation_Vector[Z] * z);
-    }
-
-    return 1;
-}
-
-/*****************************************************************************
-*
-* FUNCTION
-*    warp_cubic
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*  Nieminen Juha
-*
-* DESCRIPTION
-*   Warps a point from the surface of an origin-centered cube to the xy-plane,
-*   similar to how an uv-mapped box works.
-*
-* CHANGES
-*
-******************************************************************************/
-static int warp_cubic(Vector3d& EPoint)
+bool CubicWarp::WarpPoint(Vector3d& EPoint) const
 {
     DBL x = EPoint[X], y = EPoint[Y], z = EPoint[Z];
     const DBL ax = fabs(x), ay = fabs(y), az = fabs(z);
@@ -762,254 +243,443 @@ static int warp_cubic(Vector3d& EPoint)
     return 1;
 }
 
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
-
-WARP *Create_Warp (int Warp_Type)
+bool CylindricalWarp::WarpPoint(Vector3d& EPoint) const
 {
-    WARP *New;
-    TURB *TNew;
-    REPEAT *RNew;
-    TRANS *TRNew;
-    BLACK_HOLE *BNew;
-    TOROIDAL *TorNew;
-    SPHEREW *SNew;
-    CYLW *CNew;
-    PLANARW *PNew;
+    DBL len, theta;
+    DBL x = EPoint[X];
+    DBL y = EPoint[Y];
+    DBL z = EPoint[Z];
 
-    New = NULL;
+    // Determine its angle from the point (1, 0, 0) in the x-z plane.
+    len = sqrt(x * x + z * z);
 
-    switch (Warp_Type)
+    if(len == 0.0)
+        return false;
+    else
     {
-        case CLASSIC_TURB_WARP:
-        case EXTRA_TURB_WARP:
-
-            TNew = reinterpret_cast<TURB *>(POV_MALLOC(sizeof(TURB),"turbulence struct"));
-
-            TNew->Turbulence = Vector3d(0.0,0.0,0.0);
-
-            TNew->Octaves = 6;
-            TNew->Omega = 0.5;
-            TNew->Lambda = 2.0;
-
-            New = reinterpret_cast<WARP *>(TNew);
-
-            break;
-
-        case REPEAT_WARP:
-
-            RNew = reinterpret_cast<REPEAT *>(POV_MALLOC(sizeof(REPEAT),"repeat warp"));
-
-            RNew->Axis = -1;
-            RNew->Width = 0.0;
-
-            RNew->Offset = Vector3d(0.0,0.0,0.0);
-            RNew->Flip   = Vector3d(1.0,1.0,1.0);
-
-            New = reinterpret_cast<WARP *>(RNew);
-
-            break;
-
-        case BLACK_HOLE_WARP:
-            BNew = reinterpret_cast<BLACK_HOLE *>(POV_MALLOC (sizeof (BLACK_HOLE), "black hole warp")) ;
-            BNew->Center = Vector3d(0.0, 0.0, 0.0) ;
-            BNew->Repeat_Vector = Vector3d(0.0, 0.0, 0.0) ;
-            BNew->Uncertainty_Vector = Vector3d(0.0, 0.0, 0.0) ;
-            BNew->Strength = 1.0 ;
-            BNew->Power = 2.0 ;
-            BNew->Radius = 1.0 ;
-            BNew->Radius_Squared = 1.0 ;
-            BNew->Inverse_Radius = 1.0 ;
-            BNew->Inverted = false ;
-            BNew->Type = 0 ;
-            BNew->Repeat = false ;
-            BNew->Uncertain = false ;
-            New = reinterpret_cast<WARP *>(BNew) ;
-            break ;
-
-        case TRANSFORM_WARP:
-
-            TRNew = reinterpret_cast<TRANS *>(POV_MALLOC(sizeof(TRANS),"pattern transform"));
-
-            MIdentity (TRNew->Trans.matrix);
-            MIdentity (TRNew->Trans.inverse);
-
-            New = reinterpret_cast<WARP *>(TRNew);
-
-            break;
-
-        case SPHERICAL_WARP:
-            SNew = reinterpret_cast<SPHEREW *>(POV_MALLOC(sizeof(SPHEREW),"spherical warp"));
-            SNew->Orientation_Vector = Vector3d(0.0, 0.0, 1.0) ;
-            SNew->DistExp = 0.0;
-            New = reinterpret_cast<WARP *>(SNew);
-            break;
-
-        case PLANAR_WARP:
-            PNew = reinterpret_cast<PLANARW *>(POV_MALLOC(sizeof(PLANARW),"planar warp"));
-            PNew->Orientation_Vector = Vector3d(0.0, 0.0, 1.0) ;
-            PNew->OffSet = 0.0;
-            New = reinterpret_cast<WARP *>(PNew);
-            break;
-
-        case CYLINDRICAL_WARP:
-            CNew = reinterpret_cast<CYLW *>(POV_MALLOC(sizeof(CYLW),"cylindrical warp"));
-            CNew->Orientation_Vector = Vector3d(0.0, 0.0, 1.0) ;
-            CNew->DistExp = 0.0;
-            New = reinterpret_cast<WARP *>(CNew);
-            break;
-
-        case TOROIDAL_WARP:
-            TorNew = reinterpret_cast<TOROIDAL *>(POV_MALLOC(sizeof(TOROIDAL),"toroidal warp"));
-            TorNew->MajorRadius = 1.0 ;
-            TorNew->DistExp = 0.0;
-            TorNew->Orientation_Vector = Vector3d(0.0, 0.0, 1.0) ;
-            New = reinterpret_cast<WARP *>(TorNew);
-            break;
-
-        // JN2007: Cubic warp
-        case CUBIC_WARP:
-            New = reinterpret_cast<WARP *>(POV_MALLOC(sizeof(WARP),"cubic warp"));
-            break;
-
-        default:
-            throw POV_EXCEPTION_STRING("Unknown Warp type.");
-    }
-
-    New->Warp_Type = Warp_Type;
-    New->Prev_Warp = NULL;
-    New->Next_Warp = NULL;
-
-    return(New);
-}
-
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
-
-void Destroy_Warps (WARP *pWarps)
-{
-    WARP *Temp1 = pWarps;
-    WARP *Temp2;
-
-    while (Temp1!=NULL)
-    {
-        Temp2 = Temp1->Next_Warp;
-
-        POV_FREE(Temp1);
-
-        Temp1 = Temp2;
-    }
-}
-
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
-
-WARP *Copy_Warps (const WARP *Old)
-{
-    WARP *New;
-
-    if (Old != NULL)
-    {
-        New=Create_Warp(Old->Warp_Type);
-
-        switch (Old->Warp_Type)
+        if(z == 0.0)
         {
-            case CYLINDRICAL_WARP:
-                POV_MEMCPY(New,Old,sizeof(CYLW));
-                break;
-
-            case PLANAR_WARP:
-                POV_MEMCPY(New,Old,sizeof(PLANARW));
-                break;
-
-            case SPHERICAL_WARP:
-                POV_MEMCPY(New,Old,sizeof(SPHEREW));
-                break;
-
-            case TOROIDAL_WARP:
-                POV_MEMCPY(New,Old,sizeof(TOROIDAL));
-                break;
-
-            case CLASSIC_TURB_WARP:
-            case EXTRA_TURB_WARP:
-                POV_MEMCPY(New,Old,sizeof(TURB));
-                break;
-
-            case REPEAT_WARP:
-                POV_MEMCPY(New,Old,sizeof(REPEAT));
-                break;
-
-            case BLACK_HOLE_WARP:
-                POV_MEMCPY(New,Old,sizeof(BLACK_HOLE));
-                break;
-
-            case TRANSFORM_WARP:
-                POV_MEMCPY(New,Old,sizeof(TRANS));
-                break;
-
-            // JN2007: Cubic warp
-            case CUBIC_WARP:
-                POV_MEMCPY(New,Old,sizeof(WARP));
-                break;
+            if(x > 0)
+                theta = 0.0;
+            else
+                theta = M_PI;
         }
-        New->Next_Warp = Copy_Warps(Old->Next_Warp);
-        if(New->Next_Warp != NULL)
-            New->Next_Warp->Prev_Warp = New;
+        else
+        {
+            theta = acos(x / len);
+            if(z < 0.0)
+                theta = TWO_M_PI - theta;
+        }
+
+        theta /= TWO_M_PI;  // This will be from 0 to 1
+    }
+
+    if(DistExp == 1.0)
+        theta *= len;
+    else if (DistExp != 0.0)
+        theta *= pow(len, DistExp);
+
+    x = theta;
+    z = len;
+
+    if((Orientation_Vector[X] == 0.0) &&
+       (Orientation_Vector[Y] == 0.0) &&
+       (Orientation_Vector[Z] == 1.0))
+    {
+        EPoint[X] = x;
+        EPoint[Y] = y;
+        EPoint[Z] = z;
     }
     else
     {
-        New = NULL;
+        EPoint[X] = (Orientation_Vector[X] * z) +
+                    (Orientation_Vector[Y] * x) +
+                    (Orientation_Vector[Z] * x);
+        EPoint[Y] = (Orientation_Vector[X] * y) +
+                    (Orientation_Vector[Y] * -z) +
+                    (Orientation_Vector[Z] * y);
+        EPoint[Z] = (Orientation_Vector[X] * -x) +
+                    (Orientation_Vector[Y] * y) +
+                    (Orientation_Vector[Z] * z);
     }
-    return(New);
+
+    return true;
+}
+
+bool IdentityWarp::WarpPoint(Vector3d& TPoint) const
+{
+    return true;
+}
+
+bool PlanarWarp::WarpPoint(Vector3d& EPoint) const
+{
+    DBL x = EPoint[X];
+    DBL z = OffSet;
+    DBL y = EPoint[Y];
+
+    if((Orientation_Vector[X] == 0.0) &&
+       (Orientation_Vector[Y] == 0.0) &&
+       (Orientation_Vector[Z] == 1.0))
+    {
+        EPoint[X] = x;
+        EPoint[Y] = y;
+        EPoint[Z] = z;
+    }
+    else
+    {
+        EPoint[X] = (Orientation_Vector[X] * z) +
+                    (Orientation_Vector[Y] * x) +
+                    (Orientation_Vector[Z] * x);
+        EPoint[Y] = (Orientation_Vector[X] * y) +
+                    (Orientation_Vector[Y] * -z) +
+                    (Orientation_Vector[Z] * y);
+        EPoint[Z] = (Orientation_Vector[X] * -x) +
+                    (Orientation_Vector[Y] * y) +
+                    (Orientation_Vector[Z] * z);
+    }
+
+    return true;
+}
+
+bool RepeatWarp::WarpPoint(Vector3d& TPoint) const
+{
+    SNGL BlkNum = (SNGL)floor(TPoint[Axis]/Width);
+
+    TPoint[Axis] -= BlkNum*Width;
+
+    if (((int)BlkNum) & 1)
+    {
+        TPoint *= Flip;
+        if ( Flip[Axis] < 0 )
+            TPoint[Axis] += Width;
+    }
+
+    TPoint += (DBL)BlkNum * Offset;
+
+    return true;
+}
+
+bool SphericalWarp::WarpPoint(Vector3d& EPoint) const
+{
+    DBL len, phi, theta,dist;
+    DBL x = EPoint[X];
+    DBL y = EPoint[Y];
+    DBL z = EPoint[Z];
+
+    // Make sure this vector is on the unit sphere.
+
+    dist = sqrt(x * x + y * y + z * z);
+
+    if(dist == 0.0)
+        return 0;
+    else
+    {
+        x /= dist;
+        y /= dist;
+        z /= dist;
+    }
+
+    // Determine its angle from the x-z plane.
+    phi = 0.5 + asin(y) / M_PI; // This will be from 0 to 1
+
+    // Determine its angle from the point (1, 0, 0) in the x-z plane.
+    len = sqrt(x * x + z * z);
+    if(len == 0.0)
+    {
+        // This point is at one of the poles. Any value of xcoord will be ok...
+        theta = 0;
+    }
+    else
+    {
+        if(z == 0.0)
+        {
+            if(x > 0)
+                theta = 0.0;
+            else
+                theta = M_PI;
+        }
+        else
+        {
+            theta = acos(x / len);
+            if (z < 0.0)
+                theta = TWO_M_PI - theta;
+        }
+        theta /= TWO_M_PI;  /* This will be from 0 to 1 */
+    }
+
+    if(DistExp == 1.0)
+    {
+        theta *= dist;
+        phi *= dist;
+    }
+    else if(DistExp != 0.0)
+    {
+        theta *= pow(dist, DistExp);
+        phi *= pow(dist, DistExp);
+    }
+
+    x = theta;
+    z = dist;
+    y = phi;
+
+    if((Orientation_Vector[X] == 0.0) &&
+       (Orientation_Vector[Y] == 0.0) &&
+       (Orientation_Vector[Z] == 1.0))
+    {
+        EPoint[X] = x;
+        EPoint[Y] = y;
+        EPoint[Z] = z;
+    }
+    else
+    {
+        EPoint[X] = (Orientation_Vector[X] * z) +
+                    (Orientation_Vector[Y] * x) +
+                    (Orientation_Vector[Z] * x);
+        EPoint[Y] = (Orientation_Vector[X] * y) +
+                    (Orientation_Vector[Y] * -z) +
+                    (Orientation_Vector[Z] * y);
+        EPoint[Z] = (Orientation_Vector[X] * -x) +
+                    (Orientation_Vector[Y] * y) +
+                    (Orientation_Vector[Z] * z);
+    }
+
+    return 1;
+}
+
+bool ToroidalWarp::WarpPoint(Vector3d& EPoint) const
+{
+    DBL len, phi, theta;
+    DBL r0;
+    DBL x = EPoint[X];
+    DBL y = EPoint[Y];
+    DBL z = EPoint[Z];
+
+    r0 = MajorRadius;
+
+    // Determine its angle from the x-axis.
+
+    len = sqrt(x * x + z * z);
+
+    if(len == 0.0)
+        return false;
+    else
+    {
+        if(z == 0.0)
+        {
+            if(x > 0)
+                theta = 0.0;
+            else
+                theta = M_PI;
+        }
+        else
+        {
+            theta = acos(x / len);
+            if(z < 0.0)
+                theta = TWO_M_PI - theta;
+        }
+    }
+
+    theta = 0.0 - theta;
+
+    // Now rotate about the y-axis to get the point (x, y, z) into the x-y plane.
+
+    x = len - r0;
+    len = sqrt(x * x + y * y);
+    phi = acos(-x / len);
+    if (y > 0.0)
+        phi = TWO_M_PI - phi;
+
+    // Determine the parametric coordinates.
+
+    theta /= (-TWO_M_PI);
+
+    phi /= TWO_M_PI;
+
+    if (DistExp == 1.0)
+    {
+        theta *= len;
+        phi *= len;
+    }
+    else if (DistExp != 0.0)
+    {
+        theta *= pow(len, DistExp);
+        phi *= pow(len, DistExp);
+    }
+
+    x = theta;
+    z = len;
+    y = phi;
+
+    if((Orientation_Vector[X] == 0.0) &&
+       (Orientation_Vector[Y] == 0.0) &&
+       (Orientation_Vector[Z] == 1.0))
+    {
+        EPoint[X] = x;
+        EPoint[Y] = y;
+        EPoint[Z] = z;
+    }
+    else
+    {
+        EPoint[X] = (Orientation_Vector[X] * z) +
+                    (Orientation_Vector[Y] * x) +
+                    (Orientation_Vector[Z] * x);
+        EPoint[Y] = (Orientation_Vector[X] * y) +
+                    (Orientation_Vector[Y] * -z) +
+                    (Orientation_Vector[Z] * y);
+        EPoint[Z] = (Orientation_Vector[X] * -x) +
+                    (Orientation_Vector[Y] * y) +
+                    (Orientation_Vector[Z] * z);
+    }
+
+    return true;
+}
+
+bool TransformWarp::WarpPoint(Vector3d& TPoint) const
+{
+    MInvTransPoint(TPoint, TPoint, &Trans);
+    return true;
+}
+
+bool GenericTurbulenceWarp::WarpPoint(Vector3d& TPoint) const
+{
+    Vector3d PTurbulence;
+    DTurbulence (PTurbulence, TPoint, this);
+    TPoint += PTurbulence * Turbulence;
+    return true;
+}
+
+
+
+void Warp_Normal (Vector3d& TNorm, const Vector3d& ENorm, const TPATTERN *TPat, bool DontScaleBumps)
+{
+    const WarpList& warps = TPat->pattern->warps;
+
+    if(!DontScaleBumps)
+        TNorm = ENorm.normalized();
+    else
+        TNorm = ENorm;
+
+    for (WarpList::const_reverse_iterator iWarp = warps.rbegin(); iWarp != warps.rend(); iWarp ++)
+    {
+        const WarpPtr& warp = *iWarp;
+        warp->WarpNormal(TNorm);
+    }
+
+    if(!DontScaleBumps)
+        TNorm.normalize();
+}
+
+bool IdentityWarp::WarpNormal(Vector3d& TNorm) const
+{
+    return true;
+}
+
+bool TransformWarp::WarpNormal(Vector3d& TNorm) const
+{
+    MInvTransNormal(TNorm, TNorm, &Trans);
+    return true;
+}
+
+bool BlackHoleWarp::WarpNormal(Vector3d& TNorm) const           { /* Error("Black Hole Warp not yet implemented for normals"); */   return false; }
+bool CubicWarp::WarpNormal(Vector3d& TNorm) const               { /* Error("Cubic Warp not yet implemented for normals"); */        return false; }
+bool CylindricalWarp::WarpNormal(Vector3d& TNorm) const         { /* Error("Cylindrical Warp not yet implemented for normals"); */  return false; }
+bool PlanarWarp::WarpNormal(Vector3d& TNorm) const              { /* Error("Planar Warp not yet implemented for normals"); */       return false; }
+bool RepeatWarp::WarpNormal(Vector3d& TNorm) const              { /* Error("Repeat Warp not yet implemented for normals"); */       return false; }
+bool SphericalWarp::WarpNormal(Vector3d& TNorm) const           { /* Error("Spherical Warp not yet implemented for normals"); */    return false; }
+bool ToroidalWarp::WarpNormal(Vector3d& TNorm) const            { /* Error("Toroidal Warp not yet implemented for normals"); */     return false; }
+bool GenericTurbulenceWarp::WarpNormal(Vector3d& TNorm) const   { /* Error("Turbulence Warp not yet implemented for normals"); */   return false; }
+
+
+void UnWarp_Normal (Vector3d& TNorm, const Vector3d& ENorm, const TPATTERN *TPat, bool DontScaleBumps)
+{
+    const WarpList& warps = TPat->pattern->warps;
+
+    if(!DontScaleBumps)
+        TNorm = ENorm.normalized();
+    else
+        TNorm = ENorm;
+
+    for (WarpList::const_iterator iWarp = warps.begin(); iWarp != warps.end(); iWarp ++)
+    {
+        const WarpPtr& warp = *iWarp;
+        warp->UnwarpNormal(TNorm);
+    }
+
+    if(!DontScaleBumps)
+        TNorm.normalize();
+}
+
+bool IdentityWarp::UnwarpNormal(Vector3d& TNorm) const
+{
+    return true;
+}
+
+bool TransformWarp::UnwarpNormal(Vector3d& TNorm) const
+{
+    MTransNormal(TNorm, TNorm, &Trans);
+    return true;
+}
+
+bool BlackHoleWarp::UnwarpNormal(Vector3d& TNorm) const         { /* Error("Black Hole Warp not yet implemented for normals"); */   return false; }
+bool CubicWarp::UnwarpNormal(Vector3d& TNorm) const             { /* Error("Cubic Warp not yet implemented for normals"); */        return false; }
+bool CylindricalWarp::UnwarpNormal(Vector3d& TNorm) const       { /* Error("Cylindrical Warp not yet implemented for normals"); */  return false; }
+bool PlanarWarp::UnwarpNormal(Vector3d& TNorm) const            { /* Error("Planar Warp not yet implemented for normals"); */       return false; }
+bool RepeatWarp::UnwarpNormal(Vector3d& TNorm) const            { /* Error("Repeat Warp not yet implemented for normals"); */       return false; }
+bool SphericalWarp::UnwarpNormal(Vector3d& TNorm) const         { /* Error("Spherical Warp not yet implemented for normals"); */    return false; }
+bool ToroidalWarp::UnwarpNormal(Vector3d& TNorm) const          { /* Error("Toroidal Warp not yet implemented for normals"); */     return false; }
+bool GenericTurbulenceWarp::UnwarpNormal(Vector3d& TNorm) const { /* Error("Turbulence Warp not yet implemented for normals"); */   return false; }
+
+
+/*****************************************************************************
+*
+* FUNCTION
+*
+* INPUT
+*
+* OUTPUT
+*
+* RETURNS
+*
+* AUTHOR
+*
+* DESCRIPTION
+*
+* CHANGES
+*
+******************************************************************************/
+
+void Destroy_Warps (WarpList& warps)
+{
+    for (WarpList::iterator iWarp = warps.begin(); iWarp != warps.end(); iWarp ++)
+        delete *iWarp;
+    warps.clear();
+}
+
+
+
+/*****************************************************************************
+*
+* FUNCTION
+*
+* INPUT
+*
+* OUTPUT
+*
+* RETURNS
+*
+* AUTHOR
+*
+* DESCRIPTION
+*
+* CHANGES
+*
+******************************************************************************/
+
+void Copy_Warps (WarpList& rNew, const WarpList& old)
+{
+    rNew.reserve(old.size());
+    for (WarpList::const_iterator i = old.begin(); i != old.end(); i ++)
+        rNew.push_back((*i)->Clone());
 }
 
 }

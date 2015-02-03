@@ -1,10 +1,13 @@
-# Coding Styleguide
+# Coding Styleguide {#styleguide}
 
 C++ code can be written in a lot of different ways, and every code author has their personal preferences. However, in
 a project like POV-Ray with multiple contributors, we feel that a consistent coding style will help a lot to find your
 way around the code. Therefore, if you want to contribute to the POV-Ray development, we kindly ask you to follow the
 guidelines presented here. Note that we find some of these rules important enough for our project that we may reject
 non-compliant contributions.
+
+The following covers the rules we deem sufficiently important for everyone to read; if you want more, see @subpage
+styleguide2 for the boring stuff.
 
 
 @section rlm        Role Models
@@ -20,8 +23,9 @@ primarily at the following files:
 
 POV-Ray is being developed with portability high in mind. In practice and at present, this means:
 
-  - Source code should adhere to the ISO-IEC 14882-2003 standard (aka C++03), as we currently do _not_ expect C++11 to
-    be readily available everywhere yet. Source code shold not rely on any compiler- or platform-specific behaviour.
+  - Source code should adhere to the ISO-IEC 14882-2003 standard (aka C++03), as we currently do _not_ expect C++11
+    (let alone C++14) to be readily available everywhere yet. Also, source code shold not rely on any compiler- or
+    platform-specific behaviour except some essentials described in @ref compiler.
 
   - Source code should avoid potential conflicts with later standard extensions to the C++ language, most notably
     ISO-IEC DTR 19768 (aka TR1) and ISO-IEC 14882-2011 (aka C++11).
@@ -55,7 +59,8 @@ transitioning existing code to these coventions:
         }
         finalthing();
 
-  - Lines should be at most 120 characters long.
+  - Lines should be at most 120 characters long, to allow for sufficiently comfortable side-by-side viewing of code
+    changes on a single display.
 
   - When breaking parameter lists or expressions, the next line is indented to wherever the broken parameter list or
     (sub-)expression starts, e.g.:
@@ -122,8 +127,8 @@ scheme:
 
   - Macro names should use `UPPER_CASE_WITH_UNDERSCORES`.
   - Class and struct names should use `MixedCase`.
-  - Type names should use `MixedCase`. Pointer types should have a `Ptr` suffix, i.e. `MixedCasePtr`. `const` pointer
-    types should have a `ConstPtr` suffix, i.e. `MixedCaseConstrPtr`.
+  - Type names should use `MixedCase`. Pointer types should have a `Ptr` suffix, i.e. `MixedCasePtr`. pointers to
+    immutable data should have a `Const` prefix and `Ptr` suffix, i.e. `ConstMixedCasePtr`.
   - Method names (both public and protected) should generally use `MixedCase` as well. However, methods that simply
     return a reference to a member variable may be named with `camelCase` instead.
   - Parameter and variable names should use `camelCase`.
@@ -142,7 +147,8 @@ Parameter and variable names might carry one or more additional prefixes. These 
   .
 
   - Excessively generic names, such as `Data`, should be avoided; if you've ever tried to figure out where such an
-    entity is used in the project, you probably know why.
+    entity is used in the project, you probably know why. Reasonable exceptions can be made for entities with a very
+    limited visibility, such as private class members or local variables.
   - Name collisions with identifiers in an outer scope ("shadowing") should be avoided.
 
 
@@ -155,13 +161,16 @@ Parameter and variable names might carry one or more additional prefixes. These 
       - Other 3rd party library header files, grouped by library.
       - POV-Ray header files.
       .
-    Within each group, alphabetical order should be preferred. (Note however that certain other
-    ordering constraints might apply for the POV-Ray header files.)
+    Within each group, alphabetical order should be preferred. (Note however that certain other ordering constraints
+    might apply for the POV-Ray header files.)
 
   - C++ source code should _not_ include C standard header files; include the corresponding C++ header files instead
     (e.g. `<cstdio>` instead of `<stdio.h>`).
 
-  - Header files should be self-contained, i.e. include all files they depend on.
+  - Header files should be self-contained, i.e. include all files they depend on themselves. At the same time, their
+    include footprint should be kept to a minimum to simplify include hierarchy; most notably, if all you need from
+    another include file are type declarations, use forward declarations where possible instead of including the other
+    file.
 
 
 @section msc        Miscellaneous Coding Rules
@@ -169,8 +178,9 @@ Parameter and variable names might carry one or more additional prefixes. These 
   - **Unions**: They're evil. Use polymorphism instead, unless you have an exceptionally strong reason for it. Make sure
     to document that reason.
 
-  - **Type Casting**: Except for primitive types, only C++-style casts (e.g. `static_cast<T>(...)`) should be used, in
-    order to avoid accidental removal of a `const` qualifier, conversion to an incompatible type, or similar pitfalls.
+  - **Type Casting**: Except for primitive non-pointer types, only C++-style casts (e.g. `static_cast<T>(...)`) should
+    be used, in order to avoid accidental removal of a `const` qualifier, conversion to an incompatible type, or similar
+    pitfalls.
 
   - **Switch Fallthrough**: Intentional fall-through in a switch statement should generally be
     avoided. If used at all, it must be explicitly indicated with a `// FALLTHROUGH` comment.
@@ -192,6 +202,9 @@ Parameter and variable names might carry one or more additional prefixes. These 
     allocation using the `new` operator. Whenever responsibility for destruction of the allocated object is non-trivial,
     make use of smart pointers.
 
+  - **Output Parameters**: When declaring a function that is to modify any of its parameters, prefer references over
+    pointers.
+
 
 @section doc        Code Documentation
 
@@ -212,7 +225,7 @@ source code with comments.
 @subsection doc_int     Interface Documentation
 
 The interface provided by any source file should be documented in the respective header file, using
-a format compatible with Doxygen 1.8. For consistency, please use JavaDoc-style comments (`/// ...`
+a format compatible with Doxygen 1.8.8. For consistency, please use JavaDoc-style comments (`/// ...`
 or `/** ... */`; the general rules for comments apply) and JavaDoc-style tags (`@``foo`).
 
 @note   Platform-specific modules may mandate a different tag style, such as (hypothetically) DocXML
@@ -257,10 +270,11 @@ tools. The following can be freely used:
     tag.
   - **Markdown** (`MARKDOWN_SUPPORT=YES`): Please avoid tags wherever markdown is easier to read
     (e.g., use `_foo_` instead of `@``e foo` for emphasis).
-  - **Dot** (`HAVE_DOT=YES`; <http://www.graphviz.org/>): Please use doxygen's `@``dot` tag format for any graphs,
+  - **PlantUML** (<http://plantuml.sourceforge.net/>): Please use doxygen's `@``startuml` tag format for any UML
+    sequence or state diagrams, both in source files as well as in markdown files; for now, please try to avoid other
+    UML diagram types.
+  - **Dot** (`HAVE_DOT=YES`; <http://www.graphviz.org/>): Please use doxygen's `@``dot` tag format for any other graphs,
     both in source files as well as in markdown files.
-  - **Mscgen** (<http://www.mcternan.me.uk/mscgen/>): Please use doxygen's `@``msc` tag format for
-    any message sequence charts, both in source files as well as in markdown files.
   - **LaTeX formulae**: Please use doxygen's `@``f$` / `@``f[` / `@``f{` tag format for any non-trivial formulae.
 
 

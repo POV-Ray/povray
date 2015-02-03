@@ -9,7 +9,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -37,6 +37,8 @@
 #ifndef ATMOSPH_H
 #define ATMOSPH_H
 
+#include "backend/texture/pigment.h"
+
 namespace pov
 {
 
@@ -58,8 +60,12 @@ typedef struct Fog_Struct FOG;
 typedef struct Rainbow_Struct RAINBOW;
 typedef struct Skysphere_Struct SKYSPHERE;
 
+struct TurbulenceWarp; // full declaration in backend/pattern/warps.h
+
 struct Fog_Struct
 {
+    Fog_Struct() : Turb(NULL), Next(NULL) {}
+    ~Fog_Struct() { if (Turb) POV_FREE(Turb); }
     int Type;
     DBL Distance;
     DBL Alt;
@@ -68,13 +74,15 @@ struct Fog_Struct
     ColourChannel filter; // filter and transmit have a special meaning in fog
     ColourChannel transm; // filter and transmit have a special meaning in fog
     Vector3d Up;
-    TURB *Turb;
+    TurbulenceWarp *Turb;
     SNGL Turb_Depth;
     FOG *Next;
 };
 
 struct Rainbow_Struct
 {
+    Rainbow_Struct() : Pigment(NULL), Next(NULL) {}
+    ~Rainbow_Struct() { if (Pigment) delete Pigment; }
     DBL Distance;
     DBL Jitter;
     DBL Angle, Width;
@@ -87,6 +95,8 @@ struct Rainbow_Struct
 
 struct Skysphere_Struct
 {
+    Skysphere_Struct() : Trans(NULL) {}
+    ~Skysphere_Struct() { for (vector<PIGMENT*>::iterator i = Pigments.begin(); i != Pigments.end(); ++ i) delete *i; if (Trans) POV_FREE(Trans); }
     LightColour       Emission; ///< Brightness adjustment.
     vector<PIGMENT *> Pigments; ///< Pigment(s) to use.
     TRANSFORM *       Trans;    ///< Skysphere transformation.

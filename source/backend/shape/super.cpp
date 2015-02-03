@@ -4,14 +4,14 @@
 ///
 /// This module implements functions that manipulate superellipsoids.
 ///
-/// Original code written by Alexander Enzmann.
-/// Adaption to POV-Ray by Dieter Bayer [DB].
+/// @author Alexander Enzmann (original code)
+/// @author Dieter Bayer (adaption to POV-Ray)
 ///
 /// @copyright
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -65,11 +65,12 @@
 
 // frame.h must always be the first POV file included (pulls in platform config)
 #include "backend/frame.h"
-#include "backend/math/vector.h"
+#include "backend/shape/super.h"
+
 #include "backend/bounding/bbox.h"
 #include "backend/math/matrices.h"
+#include "backend/render/ray.h"
 #include "backend/scene/objects.h"
-#include "backend/shape/super.h"
 #include "backend/scene/threaddata.h"
 
 // this must be the last file included
@@ -250,7 +251,7 @@ bool Superellipsoid::Intersect(const BasicRay& ray, IStack& Depth_Stack, TraceTh
         return(false);
     }
 
-    VEvaluateRay(P0, P, dists[0], D);
+    P0 = P + dists[0] * D;
 
     v0 = evaluate_superellipsoid(P0);
 
@@ -271,7 +272,7 @@ bool Superellipsoid::Intersect(const BasicRay& ray, IStack& Depth_Stack, TraceTh
 
     for (i = 1; i < cnt; i++)
     {
-        VEvaluateRay(P1, P, dists[i], D);
+        P1 = P + dists[i] * D;
 
         v1 = evaluate_superellipsoid(P1);
 
@@ -1487,7 +1488,7 @@ bool Superellipsoid::check_hit2(const Vector3d& P, const Vector3d& D, DBL t0, Ve
 
     for (i = 0; (dt0 < t1) && (i < MAX_ITERATIONS); i++)
     {
-        VEvaluateRay(P1, P, dt1, D);
+        P1 = P + dt1 * D;
 
         v1 = evaluate_superellipsoid(P1);
 
@@ -1507,7 +1508,7 @@ bool Superellipsoid::check_hit2(const Vector3d& P, const Vector3d& D, DBL t0, Ve
         {
             if (fabs(v1) < ZERO_TOLERANCE)
             {
-                VEvaluateRay(Q, P, dt1, D);
+                Q = P + dt1 * D;
 
                 *t = dt1;
 

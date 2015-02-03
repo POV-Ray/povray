@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -41,24 +41,65 @@
 namespace pov
 {
 
-/*****************************************************************************
-* Global preprocessor defines
-******************************************************************************/
+typedef Vector2d    SlopeBlendMapData;
+typedef TNORMAL*    NormalBlendMapData;
 
+/// Common interface for normal-like blend maps.
+///
+/// This purely abstract class provides the common interface for both normal and slope blend maps.
+///
+/// @note   This class is used in a multiple inheritance hierarchy, and therefore must continue to be purely abstract.
+///
+class GenericNormalBlendMap
+{
+    public:
 
-/*****************************************************************************
-* Global typedefs
-******************************************************************************/
+        virtual ~GenericNormalBlendMap() {}
 
+        virtual void Post(bool dontScaleBumps) = 0;
+        virtual void ComputeAverage (const Vector3d& EPoint, Vector3d& normal, Intersection *Inter, const Ray *ray, TraceThreadData *Thread) = 0;
+};
 
-/*****************************************************************************
-* Global variables
-******************************************************************************/
+class SlopeBlendMap : public BlendMap<SlopeBlendMapData>, public GenericNormalBlendMap
+{
+    public:
 
+        SlopeBlendMap();
+        virtual ~SlopeBlendMap();
 
-/*****************************************************************************
-* Global functions
-******************************************************************************/
+        virtual void Post(bool dontScaleBumps);
+        virtual void ComputeAverage (const Vector3d& EPoint, Vector3d& normal, Intersection *Inter, const Ray *ray, TraceThreadData *Thread);
+};
+
+class NormalBlendMap : public BlendMap<NormalBlendMapData>, public GenericNormalBlendMap
+{
+    public:
+
+        NormalBlendMap();
+        virtual ~NormalBlendMap();
+
+        virtual void Post(bool dontScaleBumps);
+        virtual void ComputeAverage (const Vector3d& EPoint, Vector3d& normal, Intersection *Inter, const Ray *ray, TraceThreadData *Thread);
+};
+
+typedef shared_ptr<GenericNormalBlendMap>           GenericNormalBlendMapPtr;
+typedef shared_ptr<const GenericNormalBlendMap>     GenericNormalBlendMapConstPtr;
+
+typedef BlendMapEntry<SlopeBlendMapData>            SlopeBlendMapEntry;
+typedef shared_ptr<SlopeBlendMap>                   SlopeBlendMapPtr;
+typedef shared_ptr<const SlopeBlendMap>             SlopeBlendMapConstPtr;
+
+typedef BlendMapEntry<NormalBlendMapData>           NormalBlendMapEntry;
+typedef shared_ptr<NormalBlendMap>                  NormalBlendMapPtr;
+typedef shared_ptr<const NormalBlendMap>            NormalBlendMapConstPtr;
+
+struct Tnormal_Struct : public Pattern_Struct
+{
+    GenericNormalBlendMapPtr Blend_Map;
+    SNGL Amount;
+    SNGL Delta; // NK delta
+};
+
 
 TNORMAL *Create_Tnormal ();
 TNORMAL *Copy_Tnormal (TNORMAL *Old);

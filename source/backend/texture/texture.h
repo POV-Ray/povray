@@ -11,7 +11,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -39,11 +39,13 @@
 #ifndef TEXTURE_H
 #define TEXTURE_H
 
-#include "backend/pattern/pattern.h"
-#include "backend/pattern/warps.h"
+#include "backend/support/simplevector.h"
 
 namespace pov
 {
+
+typedef struct Turb_Struct TURB;
+struct GenericTurbulenceWarp;
 
 /*****************************************************************************
 * Global preprocessor defines
@@ -63,6 +65,44 @@ namespace pov
 /*****************************************************************************
 * Global typedefs
 ******************************************************************************/
+
+struct WeightedTexture
+{
+    COLC weight;
+    TEXTURE *texture;
+
+    WeightedTexture(COLC w, TEXTURE *t) :
+        weight(w), texture(t) { }
+};
+
+typedef FixedSimpleVector<WeightedTexture, WEIGHTEDTEXTURE_VECTOR_SIZE> WeightedTextureVector;
+
+typedef TexturePtr  TextureBlendMapData;
+
+/// Texture blend map.
+class TextureBlendMap : public BlendMap<TextureBlendMapData>
+{
+    public:
+
+        TextureBlendMap();
+        ~TextureBlendMap();
+};
+
+typedef BlendMapEntry<TextureBlendMapData>          TextureBlendMapEntry;
+typedef shared_ptr<TextureBlendMap>                 TextureBlendMapPtr;
+typedef shared_ptr<const TextureBlendMap>           TextureBlendMapConstPtr;
+
+struct Texture_Struct : public Pattern_Struct
+{
+    TextureBlendMapPtr Blend_Map;
+    int References;
+    TEXTURE *Next;
+    PIGMENT *Pigment;
+    TNORMAL *Tnormal;
+    FINISH *Finish;
+    vector<TEXTURE*> Materials; // used for BITMAP_PATTERN (and only there)
+};
+
 
 /*****************************************************************************
 * Global variables
@@ -94,8 +134,8 @@ INLINE_NOISE DBL Noise (const Vector3d& EPoint, int noise_generator);
 INLINE_NOISE void DNoise (Vector3d& result, const Vector3d& EPoint);
 #endif
 
-DBL Turbulence (const Vector3d& EPoint, const TURB *Turb, int noise_generator);
-void DTurbulence (Vector3d& result, const Vector3d& EPoint, const TURB *Turb);
+DBL Turbulence (const Vector3d& EPoint, const GenericTurbulenceWarp* Turb, int noise_generator);
+void DTurbulence (Vector3d& result, const Vector3d& EPoint, const GenericTurbulenceWarp* Turb);
 DBL cycloidal (DBL value);
 DBL Triangle_Wave (DBL value);
 void Transform_Textures (TEXTURE *Textures, const TRANSFORM *Trans);
@@ -107,7 +147,6 @@ TEXTURE *Copy_Texture_Pointer (TEXTURE *Texture);
 TEXTURE *Copy_Textures (TEXTURE *Textures);
 TEXTURE *Create_Texture (void);
 int Test_Opacity (const TEXTURE *Texture);
-TURB *Create_Turb (void);
 
 }
 

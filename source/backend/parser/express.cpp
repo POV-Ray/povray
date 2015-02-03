@@ -48,6 +48,8 @@
 #include "backend/math/splines.h"
 #include "backend/math/vector.h"
 #include "backend/pattern/pattern.h"
+#include "backend/pattern/warps.h"
+#include "backend/render/ray.h"
 #include "backend/scene/objects.h"
 #include "backend/shape/hfield.h"
 #include "backend/support/fileutil.h"
@@ -496,7 +498,7 @@ DBL Parser::Parse_Function_Call()
 *
 ******************************************************************************/
 
-void Parser::Parse_Vector_Function_Call(EXPRESS Express, int *Terms)
+void Parser::Parse_Vector_Function_Call(EXPRESS& Express, int *Terms)
 {
     FUNCTION_PTR fp = (FUNCTION_PTR )Token.Data;
     if (fp == NULL)
@@ -568,9 +570,9 @@ void Parser::Parse_Vector_Function_Call(EXPRESS Express, int *Terms)
 *
 ******************************************************************************/
 
-void Parser::Parse_Spline_Call(EXPRESS Express, int *Terms)
+void Parser::Parse_Spline_Call(EXPRESS& Express, int *Terms)
 {
-    SPLINE *spline = reinterpret_cast<SPLINE *>(Token.Data);
+    GenericSpline *spline = reinterpret_cast<GenericSpline *>(Token.Data);
     DBL Val;
 
     // NB while parsing the call parameters, the parser may drop out of the current scope (macro or include file)
@@ -595,21 +597,20 @@ void Parser::Parse_Spline_Call(EXPRESS Express, int *Terms)
         // we claimed dibs on the original spline, but since we've chosen to use a copy instead, we'll release the original
         Release_Spline_Reference(spline);
 
-        spline = Copy_Spline(spline);
         Get_Token();
         switch(Token.Token_Id)
         {
             case LINEAR_SPLINE_TOKEN:
-                spline->Type = LINEAR_SPLINE;
+                spline = new LinearSpline(*spline);
                 break;
             case QUADRATIC_SPLINE_TOKEN:
-                spline->Type = QUADRATIC_SPLINE;
+                spline = new QuadraticSpline(*spline);
                 break;
             case CUBIC_SPLINE_TOKEN:
-                spline->Type = CATMULL_ROM_SPLINE;
+                spline = new CatmullRomSpline(*spline);
                 break;
             case NATURAL_SPLINE_TOKEN:
-                spline->Type = NATURAL_SPLINE;
+                spline = new NaturalSpline(*spline);
                 break;
             default:
                 Error("linear_spline, quadratic_spline, natural_spline, or cubic_spline expected.");
@@ -650,7 +651,7 @@ void Parser::Parse_Spline_Call(EXPRESS Express, int *Terms)
 *
 ******************************************************************************/
 
-void Parser::Parse_Num_Factor (EXPRESS Express,int *Terms)
+void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
 {
     int i = 0;
     int l1,l2;
@@ -658,14 +659,14 @@ void Parser::Parse_Num_Factor (EXPRESS Express,int *Terms)
     Vector3d Vect,Vect2,Vect3;
     ObjectPtr Object;
     TRANSFORM Trans;
-    TURB Turb;
+    TurbulenceWarp Turb;
     UCS2 *Local_String, *Local_String2;
     char *Local_C_String;
     UCS2String ign;
     IStream *f;
     POV_ARRAY *a;
     int Old_Ok=Ok_To_Declare;
-    DBL greater_val, less_val, equal_val ;
+    DBL greater_val, less_val, equal_val;
     PIGMENT *Pigment; // JN2007: Image map dimensions
 
     Ok_To_Declare=true;
@@ -684,12 +685,12 @@ void Parser::Parse_Num_Factor (EXPRESS Express,int *Terms)
                     Val = Parse_Float_Param();
                     if ( Val > 1.0 )
                     {
-                        Warning(0,"Domain error in acos.");
+                        Warning("Domain error in acos.");
                         Val = 1.0;
                     }
                     else if (Val < -1.0)
                     {
-                        Warning(0,"Domain error in acos.");
+                        Warning("Domain error in acos.");
                         Val = -1.0;
                     }
                     Val = acos(Val);
@@ -715,12 +716,12 @@ void Parser::Parse_Num_Factor (EXPRESS Express,int *Terms)
                     Val = Parse_Float_Param();
                     if ( Val > 1.0 )
                     {
-                        Warning(0,"Domain error in asin.");
+                        Warning("Domain error in asin.");
                         Val = 1.0;
                     }
                     else if (Val < -1.0)
                     {
-                        Warning(0,"Domain error in asin.");
+                        Warning("Domain error in asin.");
                         Val = -1.0;
                     }
                     Val = asin(Val);
@@ -1119,9 +1120,9 @@ void Parser::Parse_Num_Factor (EXPRESS Express,int *Terms)
                     Parse_Vector_Param(Vect2);
                     if((Vect2[X] == 0.0) && (Vect2[Y] == 0.0) && (Vect2[Z] == 0.0))
                     {
-                        if (sceneData->languageVersion >= 350)
+                        if (sceneData->EffectiveLanguageVersion() >= 350)
                             PossibleError("Normalizing zero-length vector.");
-                        Vect[X] = Vect[Y] = Vect[Z] = 0.0 ;
+                        Vect[X] = Vect[Y] = Vect[Z] = 0.0;
                     }
                     else
                         Vect = Vect2.normalized();
@@ -1516,7 +1517,7 @@ void Parser::Parse_Num_Factor (EXPRESS Express,int *Terms)
    then set all terms to Express[0].  Otherwise pad extra terms with 0.0.
 */
 
-void Parser::Promote_Express(EXPRESS Express,int *Old_Terms,int New_Terms)
+void Parser::Promote_Express(EXPRESS& Express,int *Old_Terms,int New_Terms)
 {
     register int i;
 
@@ -1564,7 +1565,7 @@ void Parser::Promote_Express(EXPRESS Express,int *Old_Terms,int New_Terms)
 *
 ******************************************************************************/
 
-void Parser::Parse_Num_Term (EXPRESS Express,int *Terms)
+void Parser::Parse_Num_Term (EXPRESS& Express,int *Terms)
 {
     register int i;
     EXPRESS Local_Express;
@@ -1598,7 +1599,7 @@ void Parser::Parse_Num_Term (EXPRESS Express,int *Terms)
                 if (Local_Express[i]==0.0) /* must be 0.0, not EPSILON */
                 {
                     Express[i]=HUGE_VAL;
-                    Warning(0,"Divide by zero.");
+                    Warning("Divide by zero.");
                 }
                 else
                 {
@@ -1637,7 +1638,7 @@ void Parser::Parse_Num_Term (EXPRESS Express,int *Terms)
 *
 ******************************************************************************/
 
-void Parser::Parse_Rel_Factor (EXPRESS Express,int *Terms)
+void Parser::Parse_Rel_Factor (EXPRESS& Express,int *Terms)
 {
     register int i;
     EXPRESS Local_Express;
@@ -1705,7 +1706,7 @@ void Parser::Parse_Rel_Factor (EXPRESS Express,int *Terms)
 *
 ******************************************************************************/
 
-void Parser::Parse_Rel_String_Term (const UCS2 *lhs, EXPRESS Express, int Terms)
+void Parser::Parse_Rel_String_Term (const UCS2 *lhs, EXPRESS& Express, int Terms)
 {
     int Val, i;
     UCS2 *rhs = NULL;
@@ -1790,7 +1791,7 @@ void Parser::Parse_Rel_String_Term (const UCS2 *lhs, EXPRESS Express, int Terms)
 *
 ******************************************************************************/
 
-void Parser::Parse_Rel_Term (EXPRESS Express,int *Terms)
+void Parser::Parse_Rel_Term (EXPRESS& Express,int *Terms)
 {
     register int i;
     EXPRESS Local_Express;
@@ -1890,7 +1891,7 @@ void Parser::Parse_Rel_Term (EXPRESS Express,int *Terms)
 *
 ******************************************************************************/
 
-void Parser::Parse_Logical (EXPRESS Express,int *Terms)
+void Parser::Parse_Logical (EXPRESS& Express,int *Terms)
 {
     register int i;
     EXPRESS Local_Express;
@@ -1945,7 +1946,7 @@ void Parser::Parse_Logical (EXPRESS Express,int *Terms)
 *
 ******************************************************************************/
 
-void Parser::Parse_Express (EXPRESS Express,int *Terms)
+void Parser::Parse_Express (EXPRESS& Express,int *Terms)
 {
     EXPRESS Local_Express1, Local_Express2;
     EXPRESS *Chosen;
@@ -2026,7 +2027,7 @@ DBL Parser::Parse_Float ()
 
     Terms=1;
 
-    if (sceneData->languageVersion < 150)
+    if (sceneData->EffectiveLanguageVersion() < 150)
         Parse_Num_Factor(Express,&Terms);
     else
         Parse_Rel_Factor(Express,&Terms);
@@ -2155,7 +2156,7 @@ void Parser::Parse_Vector (Vector3d& Vector)
 
     Terms=3;
 
-    if (sceneData->languageVersion < 150)
+    if (sceneData->EffectiveLanguageVersion() < 150)
         Parse_Num_Factor(Express,&Terms);
     else
         Parse_Rel_Factor(Express,&Terms);
@@ -2205,7 +2206,7 @@ void Parser::Parse_Vector4D (VECTOR_4D Vector)
 
     Terms=Dim;
 
-    if (sceneData->languageVersion < 150)
+    if (sceneData->EffectiveLanguageVersion() < 150)
         Parse_Num_Factor(Express,&Terms);
     else
         Parse_Rel_Factor(Express,&Terms);
@@ -2256,7 +2257,7 @@ void Parser::Parse_UV_Vect (Vector2d& UV_Vect)
 
     Terms=2;
 
-    if (sceneData->languageVersion < 150)
+    if (sceneData->EffectiveLanguageVersion() < 150)
         Parse_Num_Factor(Express,&Terms);
     else
         Parse_Rel_Factor(Express,&Terms);
@@ -2290,7 +2291,7 @@ void Parser::Parse_UV_Vect (Vector2d& UV_Vect)
 *
 ******************************************************************************/
 
-int Parser::Parse_Unknown_Vector(EXPRESS Express, bool allow_identifier, bool *had_identifier)
+int Parser::Parse_Unknown_Vector(EXPRESS& Express, bool allow_identifier, bool *had_identifier)
 {
     int Terms;
     bool old_allow_id = Allow_Identifier_In_Call;
@@ -2307,7 +2308,7 @@ int Parser::Parse_Unknown_Vector(EXPRESS Express, bool allow_identifier, bool *h
 
     Terms=1;
 
-    if (sceneData->languageVersion < 150)
+    if (sceneData->EffectiveLanguageVersion() < 150)
         Parse_Num_Factor(Express,&Terms);
     else
         Parse_Rel_Factor(Express,&Terms);
@@ -2346,17 +2347,17 @@ void Parser::Parse_Scale_Vector (Vector3d& Vector)
     if (Vector[X] == 0.0)
     {
         Vector[X] = 1.0;
-        Warning(0, "Illegal Value: Scale X by 0.0. Changed to 1.0.");
+        Warning("Illegal Value: Scale X by 0.0. Changed to 1.0.");
     }
     if (Vector[Y] == 0.0)
     {
         Vector[Y] = 1.0;
-        Warning(0, "Illegal Value: Scale Y by 0.0. Changed to 1.0.");
+        Warning("Illegal Value: Scale Y by 0.0. Changed to 1.0.");
     }
     if (Vector[Z] == 0.0)
     {
         Vector[Z] = 1.0;
-        Warning(0, "Illegal Value: Scale Z by 0.0. Changed to 1.0.");
+        Warning("Illegal Value: Scale Z by 0.0. Changed to 1.0.");
     }
 }
 
@@ -2401,13 +2402,12 @@ void Parser::Parse_RGBFT_Colour (RGBFTColour& colour, bool expectFT)
             switch(Token.Function_Id)
             {
                 case ALPHA_TOKEN:
-                    Warning(155, "Keyword ALPHA discontinued. Use FILTER instead.");
-                    /* missing break deliberate */
-
+                    VersionWarning(155, "Keyword ALPHA discontinued. Use FILTER instead.");
+                    // FALLTHROUGH
                 case FILTER_TOKEN:
                     colour.filter() = (ColourChannel)Parse_Float();
                     if (!expectFT && (colour.filter() != 0))
-                        Warning(0, "Expected pure RGB color expression, unexpected filter component will have no effect.");
+                        Warning("Expected pure RGB color expression, unexpected filter component will have no effect.");
                     break;
 
                 case BLUE_TOKEN:
@@ -2425,7 +2425,7 @@ void Parser::Parse_RGBFT_Colour (RGBFTColour& colour, bool expectFT)
                 case TRANSMIT_TOKEN:
                     colour.transm() = (ColourChannel)Parse_Float();
                     if (!expectFT && (colour.transm() != 0))
-                        Warning(0, "Expected pure RGB color expression, unexpected transmit component will have no effect.");
+                        Warning("Expected pure RGB color expression, unexpected transmit component will have no effect.");
                     break;
 
                 case RGB_TOKEN:
@@ -2439,7 +2439,7 @@ void Parser::Parse_RGBFT_Colour (RGBFTColour& colour, bool expectFT)
                         Terms=3;
                         Parse_Express(Express,&Terms);
                         if (Terms != 3)
-                            Warning(0, "Suspicious expression after rgb.");
+                            Warning("Suspicious expression after rgb.");
                         colour.Set(Express, Terms);
                     }
                     break;
@@ -2455,10 +2455,10 @@ void Parser::Parse_RGBFT_Colour (RGBFTColour& colour, bool expectFT)
                         Terms=4;
                         Parse_Express(Express,&Terms);
                         if (Terms != 4)
-                            Warning(0, "Suspicious expression after rgbf.");
+                            Warning("Suspicious expression after rgbf.");
                         colour.Set(Express, Terms);
                         if (!expectFT && (colour.filter() != 0))
-                            Warning(0, "Expected pure RGB color expression, unexpected filter component will have no effect.");
+                            Warning("Expected pure RGB color expression, unexpected filter component will have no effect.");
                     }
                     break;
 
@@ -2473,12 +2473,12 @@ void Parser::Parse_RGBFT_Colour (RGBFTColour& colour, bool expectFT)
                         Terms=4;
                         Parse_Express(Express,&Terms);
                         if (Terms != 4)
-                            Warning(0, "Suspicious expression after rgbt.");
+                            Warning("Suspicious expression after rgbt.");
                         colour.Set(Express, Terms);
                         colour.transm()=colour.filter();
                         colour.filter()=0.0;
                         if (!expectFT && (colour.transm() != 0))
-                            Warning(0, "Expected pure RGB color expression, unexpected transmit component will have no effect.");
+                            Warning("Expected pure RGB color expression, unexpected transmit component will have no effect.");
                     }
                     break;
 
@@ -2493,10 +2493,10 @@ void Parser::Parse_RGBFT_Colour (RGBFTColour& colour, bool expectFT)
                         Terms=5;
                         Parse_Express(Express,&Terms);
                         if (Terms != 5)
-                            Warning(0, "Suspicious expression after rgbft.");
+                            Warning("Suspicious expression after rgbft.");
                         colour.Set(Express, Terms);
                         if (!expectFT && ((colour.filter() != 0) || (colour.transm() != 0)))
-                            Warning(0, "Expected pure RGB color expression, unexpected filter and transmit components will have no effect.");
+                            Warning("Expected pure RGB color expression, unexpected filter and transmit components will have no effect.");
                     }
                     break;
 
@@ -2533,7 +2533,7 @@ void Parser::Parse_RGBFT_Colour (RGBFTColour& colour, bool expectFT)
                         Terms=3;
                         Parse_Express(Express,&Terms);
                         if (Terms != 3)
-                            Warning(0, "Suspicious expression after srgb.");
+                            Warning("Suspicious expression after srgb.");
                         colour.Set(Express, Terms);
                         colour.rgb() = GammaCurve::Decode(sceneData->workingGammaToSRGB, colour.rgb());
                     }
@@ -2552,11 +2552,11 @@ void Parser::Parse_RGBFT_Colour (RGBFTColour& colour, bool expectFT)
                         Terms=4;
                         Parse_Express(Express,&Terms);
                         if (Terms != 4)
-                            Warning(0, "Suspicious expression after srgbf.");
+                            Warning("Suspicious expression after srgbf.");
                         colour.Set(Express, Terms);
                         colour.rgb() = GammaCurve::Decode(sceneData->workingGammaToSRGB, colour.rgb());
                         if (!expectFT && (colour.filter() != 0))
-                            Warning(0, "Expected pure RGB color expression, unexpected filter component will have no effect.");
+                            Warning("Expected pure RGB color expression, unexpected filter component will have no effect.");
                     }
                     break;
 
@@ -2573,13 +2573,13 @@ void Parser::Parse_RGBFT_Colour (RGBFTColour& colour, bool expectFT)
                         Terms=4;
                         Parse_Express(Express,&Terms);
                         if (Terms != 4)
-                            Warning(0, "Suspicious expression after srgbt.");
+                            Warning("Suspicious expression after srgbt.");
                         colour.Set(Express, Terms);
                         colour.transm()=colour.filter();
                         colour.filter()=0.0;
                         colour.rgb() = GammaCurve::Decode(sceneData->workingGammaToSRGB, colour.rgb());
                         if (!expectFT && (colour.transm() != 0))
-                            Warning(0, "Expected pure RGB color expression, unexpected transmit component will have no effect.");
+                            Warning("Expected pure RGB color expression, unexpected transmit component will have no effect.");
                     }
                     break;
 
@@ -2596,11 +2596,11 @@ void Parser::Parse_RGBFT_Colour (RGBFTColour& colour, bool expectFT)
                         Terms=5;
                         Parse_Express(Express,&Terms);
                         if (Terms != 5)
-                            Warning(0, "Suspicious expression after srgbft.");
+                            Warning("Suspicious expression after srgbft.");
                         colour.Set(Express, Terms);
                         colour.rgb() = GammaCurve::Decode(sceneData->workingGammaToSRGB, colour.rgb());
                         if (!expectFT && ((colour.filter() != 0) || (colour.transm() != 0)))
-                            Warning(0, "Expected pure RGB color expression, unexpected filter and transmit components will have no effect.");
+                            Warning("Expected pure RGB color expression, unexpected filter and transmit components will have no effect.");
                     }
                     break;
             }
@@ -2622,7 +2622,7 @@ void Parser::Parse_RGBFT_Colour (RGBFTColour& colour, bool expectFT)
                 Parse_Express(Express,&Terms);
                 colour.Set(Express, Terms);
                 if (!expectFT && ((colour.filter() != 0) || (colour.transm() != 0)))
-                    Warning(0, "Expected pure RGB color expression, unexpected filter and transmit components will have no effect.");
+                    Warning("Expected pure RGB color expression, unexpected filter and transmit components will have no effect.");
                 startedParsing = true;
             }
         END_CASE
@@ -2646,7 +2646,7 @@ void Parser::Parse_RGBFT_Colour (RGBFTColour& colour, bool expectFT)
                     Error("RGB color expression expected but float or vector expression found.");
                 colour.Set(Express, Terms);
                 if (!expectFT && ((colour.filter() != 0) || (colour.transm() != 0)))
-                    Warning(0, "Expected pure RGB color expression, unexpected filter and transmit components will have no effect.");
+                    Warning("Expected pure RGB color expression, unexpected filter and transmit components will have no effect.");
                 startedParsing = true;
             }
         END_CASE
@@ -3587,7 +3587,7 @@ TextureBlendMapPtr Parser::Parse_Colour_Map<TextureBlendMap> ()
 *
 * RETURNS
 *
-*   Pointer to newly created SPLINE
+*   Pointer to newly created Spline
 *
 * AUTHOR
 *
@@ -3604,11 +3604,11 @@ TextureBlendMapPtr Parser::Parse_Colour_Map<TextureBlendMap> ()
 *
 ******************************************************************************/
 
-SPLINE *Parser::Parse_Spline()
+GenericSpline *Parser::Parse_Spline()
 {
-    SPLINE * New = NULL;
+    GenericSpline * Old = NULL;
+    GenericSpline * New = NULL;
     int i = 0;
-    int Type = LINEAR_SPLINE;
     EXPRESS Express;
     int Terms, MaxTerms;
     DBL par;
@@ -3620,10 +3620,9 @@ SPLINE *Parser::Parse_Spline()
     /*Check for spline identifier*/
     EXPECT
         CASE(SPLINE_ID_TOKEN)
-            New = Copy_Spline(reinterpret_cast<SPLINE *>(Token.Data));
-            i = New->Number_Of_Entries;
-            MaxTerms = New->Terms;
-            Type = New->Type;
+            Old = reinterpret_cast<GenericSpline *>(Token.Data);
+            i = Old->SplineEntries.size();
+            MaxTerms = Old->Terms;
             EXIT
         END_CASE
 
@@ -3636,19 +3635,35 @@ SPLINE *Parser::Parse_Spline()
     /* Determine kind of spline */
     EXPECT
         CASE(LINEAR_SPLINE_TOKEN)
-            Type = LINEAR_SPLINE;
+            if (Old)
+                New = new LinearSpline(*Old);
+            else
+                New = new LinearSpline();
+            Old = New;
         END_CASE
 
         CASE(QUADRATIC_SPLINE_TOKEN)
-            Type = QUADRATIC_SPLINE;
+            if (Old)
+                New = new QuadraticSpline(*Old);
+            else
+                New = new QuadraticSpline();
+            Old = New;
         END_CASE
 
         CASE(CUBIC_SPLINE_TOKEN)
-            Type = CATMULL_ROM_SPLINE;
+            if (Old)
+                New = new CatmullRomSpline(*Old);
+            else
+                New = new CatmullRomSpline();
+            Old = New;
         END_CASE
 
         CASE(NATURAL_SPLINE_TOKEN)
-            Type = NATURAL_SPLINE;
+            if (Old)
+                New = new NaturalSpline(*Old);
+            else
+                New = new NaturalSpline();
+            Old = New;
         END_CASE
 
         OTHERWISE
@@ -3657,10 +3672,13 @@ SPLINE *Parser::Parse_Spline()
         END_CASE
     END_EXPECT
 
-    if(New == NULL)
-        New = Create_Spline(Type);
-    else
-        New->Type = Type;
+    if (!New)
+    {
+        if (Old)
+            New = new LinearSpline(*Old);
+        else
+            New = new LinearSpline();
+    }
 
     EXPECT
         CASE_FLOAT

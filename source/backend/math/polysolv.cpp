@@ -1,40 +1,44 @@
-/*******************************************************************************
- * polysolv.cpp
- *
- * This file was written by Alexander Enzmann.  He wrote the code for
- * 4th-6th order shapes and generously provided us these enhancements.
- *
- * ---------------------------------------------------------------------------
- * Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
- * Copyright 1991-2013 Persistence of Vision Raytracer Pty. Ltd.
- *
- * POV-Ray is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * POV-Ray is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------------
- * POV-Ray is based on the popular DKB raytracer version 2.12.
- * DKBTrace was originally written by David K. Buck.
- * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
- * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/math/polysolv.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
- *******************************************************************************/
+//******************************************************************************
+///
+/// @file backend/math/polysolv.cpp
+///
+/// This module contains code for solving polynomial equations.
+///
+/// @author Alexander Enzmann
+///
+/// @copyright
+/// @parblock
+///
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+///
+/// POV-Ray is free software: you can redistribute it and/or modify
+/// it under the terms of the GNU Affero General Public License as
+/// published by the Free Software Foundation, either version 3 of the
+/// License, or (at your option) any later version.
+///
+/// POV-Ray is distributed in the hope that it will be useful,
+/// but WITHOUT ANY WARRANTY; without even the implied warranty of
+/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+/// GNU Affero General Public License for more details.
+///
+/// You should have received a copy of the GNU Affero General Public License
+/// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+///
+/// ----------------------------------------------------------------------------
+///
+/// POV-Ray is based on the popular DKB raytracer version 2.12.
+/// DKBTrace was originally written by David K. Buck.
+/// DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
+///
+/// @endparblock
+///
+//******************************************************************************
 
 // frame.h must always be the first POV file included (pulls in platform config)
 #include "backend/frame.h"
 #include "backend/math/polysolv.h"
+
 #include "backend/scene/threaddata.h"
 
 // this must be the last file included
@@ -76,13 +80,13 @@ namespace pov
 */
 
 #ifndef FUDGE_FACTOR1
-	#define FUDGE_FACTOR1 1.0e12
+    #define FUDGE_FACTOR1 1.0e12
 #endif
 #ifndef FUDGE_FACTOR2
-	#define FUDGE_FACTOR2 -1.0e-5
+    #define FUDGE_FACTOR2 -1.0e-5
 #endif
 #ifndef FUDGE_FACTOR3
-	#define FUDGE_FACTOR3 1.0e-7
+    #define FUDGE_FACTOR3 1.0e-7
 #endif
 
 /* Constants. */
@@ -105,8 +109,8 @@ const DBL RELERROR = 1.0e-12;
 
 struct polynomial
 {
-	int ord;
-	DBL coef[MAX_ORDER+1];
+    int ord;
+    DBL coef[MAX_ORDER+1];
 };
 
 
@@ -135,15 +139,15 @@ static int difficult_coeffs (int n, const DBL *x);
 *   modp
 *
 * INPUT
-*   
+*
 * OUTPUT
-*   
+*
 * RETURNS
-*   
+*
 * AUTHOR
 *
 *   Alexander Enzmann
-*   
+*
 * DESCRIPTION
 *
 *   Calculates the modulus of u(x) / v(x) leaving it in r.
@@ -159,48 +163,48 @@ static int difficult_coeffs (int n, const DBL *x);
 
 static int modp(const polynomial *u, const polynomial *v, polynomial *r)
 {
-	int k, j;
+    int k, j;
 
-	*r = *u;
+    *r = *u;
 
-	if (v->coef[v->ord] < 0.0)
-	{
-		for (k = u->ord - v->ord - 1; k >= 0; k -= 2)
-		{
-			r->coef[k] = -r->coef[k];
-		}
+    if (v->coef[v->ord] < 0.0)
+    {
+        for (k = u->ord - v->ord - 1; k >= 0; k -= 2)
+        {
+            r->coef[k] = -r->coef[k];
+        }
 
-		for (k = u->ord - v->ord; k >= 0; k--)
-		{
-			for (j = v->ord + k - 1; j >= k; j--)
-			{
-				r->coef[j] = -r->coef[j] - r->coef[v->ord + k] * v->coef[j - k];
-			}
-		}
-	}
-	else
-	{
-		for (k = u->ord - v->ord; k >= 0; k--)
-		{
-			for (j = v->ord + k - 1; j >= k; j--)
-			{
-				r->coef[j] -= r->coef[v->ord + k] * v->coef[j - k];
-			}
-		}
-	}
+        for (k = u->ord - v->ord; k >= 0; k--)
+        {
+            for (j = v->ord + k - 1; j >= k; j--)
+            {
+                r->coef[j] = -r->coef[j] - r->coef[v->ord + k] * v->coef[j - k];
+            }
+        }
+    }
+    else
+    {
+        for (k = u->ord - v->ord; k >= 0; k--)
+        {
+            for (j = v->ord + k - 1; j >= k; j--)
+            {
+                r->coef[j] -= r->coef[v->ord + k] * v->coef[j - k];
+            }
+        }
+    }
 
-	k = v->ord - 1;
+    k = v->ord - 1;
 
-	while (k >= 0 && fabs(r->coef[k]) < SMALL_ENOUGH)
-	{
-		r->coef[k] = 0.0;
+    while (k >= 0 && fabs(r->coef[k]) < SMALL_ENOUGH)
+    {
+        r->coef[k] = 0.0;
 
-		k--;
-	}
+        k--;
+    }
 
-	r->ord = (k < 0) ? 0 : k;
+    r->ord = (k < 0) ? 0 : k;
 
-	return(r->ord);
+    return(r->ord);
 }
 
 
@@ -212,15 +216,15 @@ static int modp(const polynomial *u, const polynomial *v, polynomial *r)
 *   buildsturm
 *
 * INPUT
-*   
+*
 * OUTPUT
-*   
+*
 * RETURNS
-*   
+*
 * AUTHOR
 *
 *   Alexander Enzmann
-*   
+*
 * DESCRIPTION
 *
 *   Build the sturmian sequence for a polynomial.
@@ -233,45 +237,45 @@ static int modp(const polynomial *u, const polynomial *v, polynomial *r)
 
 static int buildsturm(int ord, polynomial *sseq)
 {
-	int i;
-	DBL f;
-	DBL *fp, *fc;
-	polynomial *sp;
+    int i;
+    DBL f;
+    DBL *fp, *fc;
+    polynomial *sp;
 
-	sseq[0].ord = ord;
-	sseq[1].ord = ord - 1;
+    sseq[0].ord = ord;
+    sseq[1].ord = ord - 1;
 
-	/* calculate the derivative and normalize the leading coefficient. */
+    /* calculate the derivative and normalize the leading coefficient. */
 
-	f = fabs(sseq[0].coef[ord] * ord);
+    f = fabs(sseq[0].coef[ord] * ord);
 
-	fp = sseq[1].coef;
-	fc = sseq[0].coef + 1;
+    fp = sseq[1].coef;
+    fc = sseq[0].coef + 1;
 
-	for (i = 1; i <= ord; i++)
-	{
-		*fp++ = *fc++ * i / f;
-	}
+    for (i = 1; i <= ord; i++)
+    {
+        *fp++ = *fc++ * i / f;
+    }
 
-	/* construct the rest of the Sturm sequence */
+    /* construct the rest of the Sturm sequence */
 
-	for (sp = sseq + 2; modp(sp - 2, sp - 1, sp); sp++)
-	{
-		/* reverse the sign and normalize */
+    for (sp = sseq + 2; modp(sp - 2, sp - 1, sp); sp++)
+    {
+        /* reverse the sign and normalize */
 
-		f = -fabs(sp->coef[sp->ord]);
+        f = -fabs(sp->coef[sp->ord]);
 
-		for (fp = &sp->coef[sp->ord]; fp >= sp->coef; fp--)
-		{
-			*fp /= f;
-		}
-	}
+        for (fp = &sp->coef[sp->ord]; fp >= sp->coef; fp--)
+        {
+            *fp /= f;
+        }
+    }
 
-	/* reverse the sign */
+    /* reverse the sign */
 
-	sp->coef[0] = -sp->coef[0];
+    sp->coef[0] = -sp->coef[0];
 
-	return(sp - sseq);
+    return(sp - sseq);
 }
 
 
@@ -283,15 +287,15 @@ static int buildsturm(int ord, polynomial *sseq)
 *   visible_roots
 *
 * INPUT
-*   
+*
 * OUTPUT
-*   
+*
 * RETURNS
 *
 * AUTHOR
 *
 *   Alexander Enzmann
-*   
+*
 * DESCRIPTION
 *
 *   Find out how many visible intersections there are.
@@ -304,48 +308,48 @@ static int buildsturm(int ord, polynomial *sseq)
 
 static int visible_roots(int np, const polynomial *sseq, int *atzer, int  *atpos)
 {
-	int atposinf, atzero;
-	const polynomial *s;
-	DBL f, lf;
+    int atposinf, atzero;
+    const polynomial *s;
+    DBL f, lf;
 
-	atposinf = atzero = 0;
+    atposinf = atzero = 0;
 
-	/* changes at positve infinity */
+    /* changes at positve infinity */
 
-	lf = sseq[0].coef[sseq[0].ord];
+    lf = sseq[0].coef[sseq[0].ord];
 
-	for (s = sseq + 1; s <= sseq + np; s++)
-	{
-		f = s->coef[s->ord];
+    for (s = sseq + 1; s <= sseq + np; s++)
+    {
+        f = s->coef[s->ord];
 
-		if (lf == 0.0 || lf * f < 0)
-		{
-			atposinf++;
-		}
+        if (lf == 0.0 || lf * f < 0)
+        {
+            atposinf++;
+        }
 
-		lf = f;
-	}
+        lf = f;
+    }
 
-	/* Changes at zero */
+    /* Changes at zero */
 
-	lf = sseq[0].coef[0];
+    lf = sseq[0].coef[0];
 
-	for (s = sseq+1; s <= sseq + np; s++)
-	{
-		f = s->coef[0];
+    for (s = sseq+1; s <= sseq + np; s++)
+    {
+        f = s->coef[0];
 
-		if (lf == 0.0 || lf * f < 0)
-		{
-			atzero++;
-		}
+        if (lf == 0.0 || lf * f < 0)
+        {
+            atzero++;
+        }
 
-		lf = f;
-	}
+        lf = f;
+    }
 
-	*atzer = atzero;
-	*atpos = atposinf;
+    *atzer = atzero;
+    *atpos = atposinf;
 
-	return(atzero - atposinf);
+    return(atzero - atposinf);
 }
 
 
@@ -357,15 +361,15 @@ static int visible_roots(int np, const polynomial *sseq, int *atzer, int  *atpos
 *   numchanges
 *
 * INPUT
-*   
+*
 * OUTPUT
-*   
+*
 * RETURNS
-*   
+*
 * AUTHOR
 *
 *   Alexander Enzmann
-*   
+*
 * DESCRIPTION
 *
 *   Return the number of sign changes in the Sturm sequence in
@@ -379,26 +383,26 @@ static int visible_roots(int np, const polynomial *sseq, int *atzer, int  *atpos
 
 static int numchanges(int np, const polynomial *sseq, DBL a)
 {
-	int changes;
-	DBL f, lf;
-	const polynomial *s;
-	changes = 0;
+    int changes;
+    DBL f, lf;
+    const polynomial *s;
+    changes = 0;
 
-	lf = polyeval(a, sseq[0].ord, sseq[0].coef);
+    lf = polyeval(a, sseq[0].ord, sseq[0].coef);
 
-	for (s = sseq + 1; s <= sseq + np; s++)
-	{
-		f = polyeval(a, s->ord, s->coef);
+    for (s = sseq + 1; s <= sseq + np; s++)
+    {
+        f = polyeval(a, s->ord, s->coef);
 
-		if (lf == 0.0 || lf * f < 0)
-		{
-			changes++;
-		}
+        if (lf == 0.0 || lf * f < 0)
+        {
+            changes++;
+        }
 
-		lf = f;
-	}
+        lf = f;
+    }
 
-	return(changes);
+    return(changes);
 }
 
 
@@ -410,15 +414,15 @@ static int numchanges(int np, const polynomial *sseq, DBL a)
 *   sbisect
 *
 * INPUT
-*   
+*
 * OUTPUT
-*   
+*
 * RETURNS
-*   
+*
 * AUTHOR
 *
 *   Alexander Enzmann
-*   
+*
 * DESCRIPTION
 *
 *   Uses a bisection based on the sturm sequence for the polynomial
@@ -438,134 +442,134 @@ static int numchanges(int np, const polynomial *sseq, DBL a)
 
 static int sbisect(int np, const polynomial *sseq, DBL min_value, DBL  max_value, int atmin, int  atmax, DBL *roots)
 {
-	DBL mid;
-	int n1, n2, its, atmid;
+    DBL mid;
+    int n1, n2, its, atmid;
 
-	if ((atmin - atmax) == 1)
-	{
-		/* first try using regula-falsa to find the root.  */
+    if ((atmin - atmax) == 1)
+    {
+        /* first try using regula-falsa to find the root.  */
 
-		if (regula_falsa(sseq->ord, sseq->coef, min_value, max_value, roots))
-		{
-			return(1);
-		}
-		else
-		{
-			/* That failed, so now find it by bisection */
+        if (regula_falsa(sseq->ord, sseq->coef, min_value, max_value, roots))
+        {
+            return(1);
+        }
+        else
+        {
+            /* That failed, so now find it by bisection */
 
-			for (its = 0; its < MAX_ITERATIONS; its++)
-			{
-				mid = (min_value + max_value) / 2;
+            for (its = 0; its < MAX_ITERATIONS; its++)
+            {
+                mid = (min_value + max_value) / 2;
 
-				atmid = numchanges(np, sseq, mid);
+                atmid = numchanges(np, sseq, mid);
 
-				/* The follow only happens if there is a bug.  And
-				   unfortunately, there is. CEY 04/97 
-				 */
-				if ((atmid<atmax) || (atmid>atmin))
-				{
-					return(0);
-				}
+                /* The follow only happens if there is a bug.  And
+                   unfortunately, there is. CEY 04/97
+                 */
+                if ((atmid<atmax) || (atmid>atmin))
+                {
+                    return(0);
+                }
 
-				if (fabs(mid) > RELERROR)
-				{
-					if (fabs((max_value - min_value) / mid) < RELERROR)
-					{
-						roots[0] = mid;
+                if (fabs(mid) > RELERROR)
+                {
+                    if (fabs((max_value - min_value) / mid) < RELERROR)
+                    {
+                        roots[0] = mid;
 
-						return(1);
-					}
-				}
-				else
-				{
-					if (fabs(max_value - min_value) < RELERROR)
-					{
-						roots[0] = mid;
+                        return(1);
+                    }
+                }
+                else
+                {
+                    if (fabs(max_value - min_value) < RELERROR)
+                    {
+                        roots[0] = mid;
 
-						return(1);
-					}
-				}
+                        return(1);
+                    }
+                }
 
-				if ((atmin - atmid) == 0)
-				{
-					min_value = mid;
-				}
-				else
-				{
-					max_value = mid;
-				}
-			}
+                if ((atmin - atmid) == 0)
+                {
+                    min_value = mid;
+                }
+                else
+                {
+                    max_value = mid;
+                }
+            }
 
-			/* Bisection took too long - just return what we got */
+            /* Bisection took too long - just return what we got */
 
-			roots[0] = mid;
+            roots[0] = mid;
 
-			return(1);
-		}
-	}
+            return(1);
+        }
+    }
 
-	/* There is more than one root in the interval.
-	   Bisect to find new intervals. */
+    /* There is more than one root in the interval.
+       Bisect to find new intervals. */
 
-	for (its = 0; its < MAX_ITERATIONS; its++)
-	{
-		mid = (min_value + max_value) / 2;
+    for (its = 0; its < MAX_ITERATIONS; its++)
+    {
+        mid = (min_value + max_value) / 2;
 
-		atmid = numchanges(np, sseq, mid);
+        atmid = numchanges(np, sseq, mid);
 
-		/* The follow only happens if there is a bug.  And
-		   unfortunately, there is. CEY 04/97 
-		 */
-		if ((atmid<atmax) || (atmid>atmin))
-		{
-			return(0);
-		}
+        /* The follow only happens if there is a bug.  And
+           unfortunately, there is. CEY 04/97
+         */
+        if ((atmid<atmax) || (atmid>atmin))
+        {
+            return(0);
+        }
 
-		if (fabs(mid) > RELERROR)
-		{
-			if (fabs((max_value - min_value) / mid) < RELERROR)
-			{
-				roots[0] = mid;
+        if (fabs(mid) > RELERROR)
+        {
+            if (fabs((max_value - min_value) / mid) < RELERROR)
+            {
+                roots[0] = mid;
 
-				return(1);
-			}
-		}
-		else
-		{
-			if (fabs(max_value - min_value) < RELERROR)
-			{
-				roots[0] = mid;
+                return(1);
+            }
+        }
+        else
+        {
+            if (fabs(max_value - min_value) < RELERROR)
+            {
+                roots[0] = mid;
 
-				return(1);
-			}
-		}
+                return(1);
+            }
+        }
 
-		n1 = atmin - atmid;
-		n2 = atmid - atmax;
+        n1 = atmin - atmid;
+        n2 = atmid - atmax;
 
-		if ((n1 != 0) && (n2 != 0))
-		{
-			n1 = sbisect(np, sseq, min_value, mid, atmin, atmid, roots);
-			n2 = sbisect(np, sseq, mid, max_value, atmid, atmax, &roots[n1]);
+        if ((n1 != 0) && (n2 != 0))
+        {
+            n1 = sbisect(np, sseq, min_value, mid, atmin, atmid, roots);
+            n2 = sbisect(np, sseq, mid, max_value, atmid, atmax, &roots[n1]);
 
-			return(n1 + n2);
-		}
+            return(n1 + n2);
+        }
 
-		if (n1 == 0)
-		{
-			min_value = mid;
-		}
-		else
-		{
-			max_value = mid;
-		}
-	}
+        if (n1 == 0)
+        {
+            min_value = mid;
+        }
+        else
+        {
+            max_value = mid;
+        }
+    }
 
-	/* Took too long to bisect.  Just return what we got. */
+    /* Took too long to bisect.  Just return what we got. */
 
-	roots[0] = mid;
+    roots[0] = mid;
 
-	return(1);
+    return(1);
 }
 
 
@@ -577,15 +581,15 @@ static int sbisect(int np, const polynomial *sseq, DBL min_value, DBL  max_value
 *   polyeval
 *
 * INPUT
-*   
+*
 * OUTPUT
-*   
+*
 * RETURNS
-*   
+*
 * AUTHOR
 *
 *   Alexander Enzmann
-*   
+*
 * DESCRIPTION
 *
 *   Evaluate the value of a polynomial at the given value x.
@@ -602,17 +606,17 @@ static int sbisect(int np, const polynomial *sseq, DBL min_value, DBL  max_value
 
 static DBL polyeval(DBL x, int n, const DBL *Coeffs)
 {
-	register int i;
-	DBL val;
+    register int i;
+    DBL val;
 
-	val = Coeffs[n];
+    val = Coeffs[n];
 
-	for (i = n-1; i >= 0; i--)
-	{
-		val = val * x + Coeffs[i];
-	}
+    for (i = n-1; i >= 0; i--)
+    {
+        val = val * x + Coeffs[i];
+    }
 
-	return(val);
+    return(val);
 }
 
 
@@ -624,7 +628,7 @@ static DBL polyeval(DBL x, int n, const DBL *Coeffs)
 *   regular_falsa
 *
 * INPUT
-*   
+*
 * OUTPUT
 *
 * RETURNS
@@ -645,122 +649,122 @@ static DBL polyeval(DBL x, int n, const DBL *Coeffs)
 
 static int regula_falsa(int order, const DBL *coef, DBL a, DBL b, DBL *val)
 {
-	int its;
-	DBL fa, fb, x, fx, lfx;
+    int its;
+    DBL fa, fb, x, fx, lfx;
 
-	fa = polyeval(a, order, coef);
-	fb = polyeval(b, order, coef);
+    fa = polyeval(a, order, coef);
+    fb = polyeval(b, order, coef);
 
-	if (fa * fb > 0.0)
-	{
-		return 0;
-	}
+    if (fa * fb > 0.0)
+    {
+        return 0;
+    }
 
-	if (fabs(fa) < SMALL_ENOUGH)
-	{
-		*val = a;
+    if (fabs(fa) < SMALL_ENOUGH)
+    {
+        *val = a;
 
-		return(1);
-	}
+        return(1);
+    }
 
-	if (fabs(fb) < SMALL_ENOUGH)
-	{
-		*val = b;
+    if (fabs(fb) < SMALL_ENOUGH)
+    {
+        *val = b;
 
-		return(1);
-	}
+        return(1);
+    }
 
-	lfx = fa;
+    lfx = fa;
 
-	for (its = 0; its < MAX_ITERATIONS; its++)
-	{
-		x = (fb * a - fa * b) / (fb - fa);
+    for (its = 0; its < MAX_ITERATIONS; its++)
+    {
+        x = (fb * a - fa * b) / (fb - fa);
 
-		fx = polyeval(x, order, coef);
+        fx = polyeval(x, order, coef);
 
-		if (fabs(x) > RELERROR)
-		{
-			if (fabs(fx / x) < RELERROR)
-			{
-				*val = x;
+        if (fabs(x) > RELERROR)
+        {
+            if (fabs(fx / x) < RELERROR)
+            {
+                *val = x;
 
-				return(1);
-			}
-		}
-		else
-		{
-			if (fabs(fx) < RELERROR)
-			{
-				*val = x;
+                return(1);
+            }
+        }
+        else
+        {
+            if (fabs(fx) < RELERROR)
+            {
+                *val = x;
 
-				return(1);
-			}
-		}
+                return(1);
+            }
+        }
 
-		if (fa < 0)
-		{
-			if (fx < 0)
-			{
-				a = x;
+        if (fa < 0)
+        {
+            if (fx < 0)
+            {
+                a = x;
 
-				fa = fx;
+                fa = fx;
 
-				if ((lfx * fx) > 0)
-				{
-					fb /= 2;
-				}
-			}
-			else
-			{
-				b = x;
+                if ((lfx * fx) > 0)
+                {
+                    fb /= 2;
+                }
+            }
+            else
+            {
+                b = x;
 
-				fb = fx;
+                fb = fx;
 
-				if ((lfx * fx) > 0)
-				{
-					fa /= 2;
-				}
-			}
-		}
-		else
-		{
-			if (fx < 0)
-			{
-				b = x;
+                if ((lfx * fx) > 0)
+                {
+                    fa /= 2;
+                }
+            }
+        }
+        else
+        {
+            if (fx < 0)
+            {
+                b = x;
 
-				fb = fx;
+                fb = fx;
 
-				if ((lfx * fx) > 0)
-				{
-					fa /= 2;
-				}
-			}
-			else
-			{
-				a = x;
+                if ((lfx * fx) > 0)
+                {
+                    fa /= 2;
+                }
+            }
+            else
+            {
+                a = x;
 
-				fa = fx;
+                fa = fx;
 
-				if ((lfx * fx) > 0)
-				{
-					fb /= 2;
-				}
-			}
-		}
+                if ((lfx * fx) > 0)
+                {
+                    fb /= 2;
+                }
+            }
+        }
 
-		/* Check for underflow in the domain */
+        /* Check for underflow in the domain */
 
-		if (fabs(b-a) < RELERROR)
-		{
-			*val = x;
+        if (fabs(b-a) < RELERROR)
+        {
+            *val = x;
 
-			return(1);
-		}
+            return(1);
+        }
 
-		lfx = fx;
-	}
+        lfx = fx;
+    }
 
-	return(0);
+    return(0);
 }
 
 
@@ -776,11 +780,11 @@ static int regula_falsa(int order, const DBL *coef, DBL a, DBL b, DBL *val)
 * OUTPUT
 *
 * RETURNS
-*   
+*
 * AUTHOR
 *
 *   Alexander Enzmann
-*   
+*
 * DESCRIPTION
 *
 *   Solve the quadratic equation:
@@ -798,55 +802,55 @@ static int regula_falsa(int order, const DBL *coef, DBL a, DBL b, DBL *val)
 
 static int solve_quadratic(const DBL *x, DBL *y)
 {
-	DBL d, t, a, b, c;
+    DBL d, t, a, b, c;
 
-	a = x[0];
-	b = -x[1];
-	c = x[2];
+    a = x[0];
+    b = -x[1];
+    c = x[2];
 
-	if (a == 0.0)
-	{
-		if (b == 0.0)
-		{
-			return(0);
-		}
+    if (a == 0.0)
+    {
+        if (b == 0.0)
+        {
+            return(0);
+        }
 
-		y[0] = c / b;
+        y[0] = c / b;
 
-		return(1);
-	}
+        return(1);
+    }
 
-	// normalize the coefficients
-	b /= a;
-	c /= a;
-	a  = 1.0;
+    // normalize the coefficients
+    b /= a;
+    c /= a;
+    a  = 1.0;
 
-	d = b * b - 4.0 * a * c;
+    d = b * b - 4.0 * a * c;
 
-	/* Treat values of d around 0 as 0. */
+    /* Treat values of d around 0 as 0. */
 
-	if ((d > -SMALL_ENOUGH) && (d < SMALL_ENOUGH))
-	{
-		y[0] = 0.5 * b / a;
+    if ((d > -SMALL_ENOUGH) && (d < SMALL_ENOUGH))
+    {
+        y[0] = 0.5 * b / a;
 
-		return(1);
-	}
-	else
-	{
-		if (d < 0.0)
-		{
-			return(0);
-		}
-	}
+        return(1);
+    }
+    else
+    {
+        if (d < 0.0)
+        {
+            return(0);
+        }
+    }
 
-	d = sqrt(d);
+    d = sqrt(d);
 
-	t = 2.0 * a;
+    t = 2.0 * a;
 
-	y[0] = (b + d) / t;
-	y[1] = (b - d) / t;
+    y[0] = (b + d) / t;
+    y[1] = (b - d) / t;
 
-	return(2);
+    return(2);
 }
 
 
@@ -858,15 +862,15 @@ static int solve_quadratic(const DBL *x, DBL *y)
 *   solve_cubic
 *
 * INPUT
-*   
+*
 * OUTPUT
-*   
+*
 * RETURNS
-*   
+*
 * AUTHOR
 *
 *   Alexander Enzmann
-*   
+*
 * DESCRIPTION
 *
 *
@@ -891,79 +895,79 @@ static int solve_quadratic(const DBL *x, DBL *y)
 
 static int solve_cubic(const DBL *x, DBL *y)
 {
-	DBL Q, R, Q3, R2, sQ, d, an, theta;
-	DBL A2, a0, a1, a2, a3;
+    DBL Q, R, Q3, R2, sQ, d, an, theta;
+    DBL A2, a0, a1, a2, a3;
 
-	a0 = x[0];
+    a0 = x[0];
 
-	if (a0 == 0.0)
-	{
-		return(solve_quadratic(&x[1], y));
-	}
-	else
-	{
-		if (a0 != 1.0)
-		{
-			a1 = x[1] / a0;
-			a2 = x[2] / a0;
-			a3 = x[3] / a0;
-		}
-		else
-		{
-			a1 = x[1];
-			a2 = x[2];
-			a3 = x[3];
-		}
-	}
+    if (a0 == 0.0)
+    {
+        return(solve_quadratic(&x[1], y));
+    }
+    else
+    {
+        if (a0 != 1.0)
+        {
+            a1 = x[1] / a0;
+            a2 = x[2] / a0;
+            a3 = x[3] / a0;
+        }
+        else
+        {
+            a1 = x[1];
+            a2 = x[2];
+            a3 = x[3];
+        }
+    }
 
-	A2 = a1 * a1;
+    A2 = a1 * a1;
 
-	Q = (A2 - 3.0 * a2) / 9.0;
+    Q = (A2 - 3.0 * a2) / 9.0;
 
-	/* Modified to save some multiplications and to avoid a floating point
-	   exception that occured with DJGPP and full optimization. [DB 8/94] */
+    /* Modified to save some multiplications and to avoid a floating point
+       exception that occured with DJGPP and full optimization. [DB 8/94] */
 
-	R = (a1 * (A2 - 4.5 * a2) + 13.5 * a3) / 27.0;
+    R = (a1 * (A2 - 4.5 * a2) + 13.5 * a3) / 27.0;
 
-	Q3 = Q * Q * Q;
+    Q3 = Q * Q * Q;
 
-	R2 = R * R;
+    R2 = R * R;
 
-	d = Q3 - R2;
+    d = Q3 - R2;
 
-	an = a1 / 3.0;
+    an = a1 / 3.0;
 
-	if (d >= 0.0)
-	{
-		/* Three real roots. */
+    if (d >= 0.0)
+    {
+        /* Three real roots. */
 
-		d = R / sqrt(Q3);
+        d = R / sqrt(Q3);
 
-		theta = acos(d) / 3.0;
+        theta = acos(d) / 3.0;
 
-		sQ = -2.0 * sqrt(Q);
+        sQ = -2.0 * sqrt(Q);
 
-		y[0] = sQ * cos(theta) - an;
-		y[1] = sQ * cos(theta + TWO_M_PI_3) - an;
-		y[2] = sQ * cos(theta + FOUR_M_PI_3) - an;
+        y[0] = sQ * cos(theta) - an;
+        y[1] = sQ * cos(theta + TWO_M_PI_3) - an;
+        y[2] = sQ * cos(theta + FOUR_M_PI_3) - an;
 
-		return(3);
-	}
-	else
-	{
-		sQ = pow(sqrt(R2 - Q3) + fabs(R), 1.0 / 3.0);
+        return(3);
+    }
+    else
+    {
+        sQ = pow(sqrt(R2 - Q3) + fabs(R), 1.0 / 3.0);
 
-		if (R < 0)
-		{
-			y[0] = (sQ + Q / sQ) - an;
-		}
-		else
-		{
-			y[0] = -(sQ + Q / sQ) - an;
-		}
+        if (R < 0)
+        {
+            y[0] = (sQ + Q / sQ) - an;
+        }
+        else
+        {
+            y[0] = -(sQ + Q / sQ) - an;
+        }
 
-		return(1);
-	}
+        return(1);
+    }
 }
 
 #ifdef USE_NEW_DIFFICULT_COEFFS
@@ -975,11 +979,11 @@ static int solve_cubic(const DBL *x, DBL *y)
 *   difficult_coeffs
 *
 * INPUT
-*   
+*
 * OUTPUT
-*   
+*
 * RETURNS
-*   
+*
 * AUTHOR
 *
 *   Alexander Enzmann
@@ -997,41 +1001,41 @@ static int solve_cubic(const DBL *x, DBL *y)
 
 static int difficult_coeffs(int n, DBL *x)
 {
-	int i, flag = 0;
-	DBL t, biggest;
+    int i, flag = 0;
+    DBL t, biggest;
 
-	biggest = fabs(x[0]);
+    biggest = fabs(x[0]);
 
-	for (i = 1; i <= n; i++)
-	{
-		t = fabs(x[i]);
+    for (i = 1; i <= n; i++)
+    {
+        t = fabs(x[i]);
 
-		if (t > biggest)
-		{
-			biggest = t;
-		}
-	}
+        if (t > biggest)
+        {
+            biggest = t;
+        }
+    }
 
-	/* Everything is zero no sense in doing any more */
+    /* Everything is zero no sense in doing any more */
 
-	if (biggest == 0.0)
-	{
-		return(0);
-	}
+    if (biggest == 0.0)
+    {
+        return(0);
+    }
 
-	for (i = 0; i <= n; i++)
-	{
-		if (x[i] != 0.0)
-		{
-			if (fabs(biggest / x[i]) > FUDGE_FACTOR1)
-			{
-				x[i] = 0.0;
-				flag = 1;
-			}
-		}
-	}
+    for (i = 0; i <= n; i++)
+    {
+        if (x[i] != 0.0)
+        {
+            if (fabs(biggest / x[i]) > FUDGE_FACTOR1)
+            {
+                x[i] = 0.0;
+                flag = 1;
+            }
+        }
+    }
 
-	return(flag);
+    return(flag);
 }
 #else
 /*****************************************************************************
@@ -1041,15 +1045,15 @@ static int difficult_coeffs(int n, DBL *x)
 *   difficult_coeffs
 *
 * INPUT
-*   
+*
 * OUTPUT
-*   
+*
 * RETURNS
-*   
+*
 * AUTHOR
 *
 *   Alexander Enzmann
-*   
+*
 * DESCRIPTION
 *
 *   Test to see if any coeffs are more than 6 orders of magnitude
@@ -1063,38 +1067,38 @@ static int difficult_coeffs(int n, DBL *x)
 
 static int difficult_coeffs(int n, const DBL *x)
 {
-	int i;
-	DBL biggest;
+    int i;
+    DBL biggest;
 
-	biggest = 0.0;
+    biggest = 0.0;
 
-	for (i = 0; i <= n; i++)
-	{
-		if (fabs(x[i]) > biggest)
-		{
-			biggest = x[i];
-		}
-	}
+    for (i = 0; i <= n; i++)
+    {
+        if (fabs(x[i]) > biggest)
+        {
+            biggest = x[i];
+        }
+    }
 
-	/* Everything is zero no sense in doing any more */
+    /* Everything is zero no sense in doing any more */
 
-	if (biggest == 0.0)
-	{
-		return(0);
-	}
+    if (biggest == 0.0)
+    {
+        return(0);
+    }
 
-	for (i = 0; i <= n; i++)
-	{
-		if (x[i] != 0.0)
-		{
-			if (fabs(biggest / x[i]) > FUDGE_FACTOR1)
-			{
-				return(1);
-			}
-		}
-	}
+    for (i = 0; i <= n; i++)
+    {
+        if (x[i] != 0.0)
+        {
+            if (fabs(biggest / x[i]) > FUDGE_FACTOR1)
+            {
+                return(1);
+            }
+        }
+    }
 
-	return(0);
+    return(0);
 }
 
 #endif
@@ -1107,11 +1111,11 @@ static int difficult_coeffs(int n, const DBL *x)
 *   solve_quartic
 *
 * INPUT
-*   
+*
 * OUTPUT
-*   
+*
 * RETURNS
-*   
+*
 * AUTHOR
 *
 *   Alexander Enzmann
@@ -1129,160 +1133,160 @@ static int difficult_coeffs(int n, const DBL *x)
 
 static int solve_quartic(const DBL *x, DBL *results)
 {
-	DBL cubic[4], roots[3];
-	DBL a0, a1, y, d1, x1, t1, t2;
-	DBL c0, c1, c2, c3, c4, d2, q1, q2;
-	int i;
+    DBL cubic[4], roots[3];
+    DBL a0, a1, y, d1, x1, t1, t2;
+    DBL c0, c1, c2, c3, c4, d2, q1, q2;
+    int i;
 
-	c0 = x[0];
+    c0 = x[0];
 
-	if (c0 != 1.0)
-	{
-		c1 = x[1] / c0;
-		c2 = x[2] / c0;
-		c3 = x[3] / c0;
-		c4 = x[4] / c0;
-	}
-	else
-	{
-		c1 = x[1];
-		c2 = x[2];
-		c3 = x[3];
-		c4 = x[4];
-	}
+    if (c0 != 1.0)
+    {
+        c1 = x[1] / c0;
+        c2 = x[2] / c0;
+        c3 = x[3] / c0;
+        c4 = x[4] / c0;
+    }
+    else
+    {
+        c1 = x[1];
+        c2 = x[2];
+        c3 = x[3];
+        c4 = x[4];
+    }
 
-	/* The first step is to take the original equation:
+    /* The first step is to take the original equation:
 
-	     x^4 + b*x^3 + c*x^2 + d*x + e = 0
+         x^4 + b*x^3 + c*x^2 + d*x + e = 0
 
-	   and rewrite it as:
+       and rewrite it as:
 
-	     x^4 + b*x^3 = -c*x^2 - d*x - e,
+         x^4 + b*x^3 = -c*x^2 - d*x - e,
 
-	   adding (b*x/2)^2 + (x^2 + b*x/2)y + y^2/4 to each side gives a
-	   perfect square on the lhs:
+       adding (b*x/2)^2 + (x^2 + b*x/2)y + y^2/4 to each side gives a
+       perfect square on the lhs:
 
-	     (x^2 + b*x/2 + y/2)^2 = (b^2/4 - c + y)x^2 + (b*y/2 - d)x + y^2/4 - e
+         (x^2 + b*x/2 + y/2)^2 = (b^2/4 - c + y)x^2 + (b*y/2 - d)x + y^2/4 - e
 
-	   By choosing the appropriate value for y, the rhs can be made a perfect
-	   square also.  This value is found when the rhs is treated as a quadratic
-	   in x with the discriminant equal to 0.  This will be true when:
+       By choosing the appropriate value for y, the rhs can be made a perfect
+       square also.  This value is found when the rhs is treated as a quadratic
+       in x with the discriminant equal to 0.  This will be true when:
 
-	     (b*y/2 - d)^2 - 4.0 * (b^2/4 - c*y)*(y^2/4 - e) = 0, or
+         (b*y/2 - d)^2 - 4.0 * (b^2/4 - c*y)*(y^2/4 - e) = 0, or
 
-	     y^3 - c*y^2 + (b*d - 4*e)*y - b^2*e + 4*c*e - d^2 = 0.
+         y^3 - c*y^2 + (b*d - 4*e)*y - b^2*e + 4*c*e - d^2 = 0.
 
-	   This is called the resolvent of the quartic equation.  */
+       This is called the resolvent of the quartic equation.  */
 
-	a0 = 4.0 * c4;
+    a0 = 4.0 * c4;
 
-	cubic[0] = 1.0;
-	cubic[1] = -1.0 * c2;
-	cubic[2] = c1 * c3 - a0;
-	cubic[3] = a0 * c2 - c1 * c1 * c4 - c3 * c3;
+    cubic[0] = 1.0;
+    cubic[1] = -1.0 * c2;
+    cubic[2] = c1 * c3 - a0;
+    cubic[3] = a0 * c2 - c1 * c1 * c4 - c3 * c3;
 
-	i = solve_cubic(&cubic[0], &roots[0]);
+    i = solve_cubic(&cubic[0], &roots[0]);
 
-	if (i > 0)
-	{
-		y = roots[0];
-	}
-	else
-	{
-		return(0);
-	}
+    if (i > 0)
+    {
+        y = roots[0];
+    }
+    else
+    {
+        return(0);
+    }
 
-	/* What we are left with is a quadratic squared on the lhs and a
-	   linear term on the right.  The linear term has one of two signs,
-	   take each and add it to the lhs.  The form of the quartic is now:
+    /* What we are left with is a quadratic squared on the lhs and a
+       linear term on the right.  The linear term has one of two signs,
+       take each and add it to the lhs.  The form of the quartic is now:
 
-	     a' = b^2/4 - c + y,    b' = b*y/2 - d, (from rhs quadritic above)
+         a' = b^2/4 - c + y,    b' = b*y/2 - d, (from rhs quadritic above)
 
-	     (x^2 + b*x/2 + y/2) = +sqrt(a'*(x + 1/2 * b'/a')^2), and
-	     (x^2 + b*x/2 + y/2) = -sqrt(a'*(x + 1/2 * b'/a')^2).
+         (x^2 + b*x/2 + y/2) = +sqrt(a'*(x + 1/2 * b'/a')^2), and
+         (x^2 + b*x/2 + y/2) = -sqrt(a'*(x + 1/2 * b'/a')^2).
 
-	   By taking the linear term from each of the right hand sides and
-	   adding to the appropriate part of the left hand side, two quadratic
-	   formulas are created.  By solving each of these the four roots of
-	   the quartic are determined.
-	*/
+       By taking the linear term from each of the right hand sides and
+       adding to the appropriate part of the left hand side, two quadratic
+       formulas are created.  By solving each of these the four roots of
+       the quartic are determined.
+    */
 
-	i = 0;
+    i = 0;
 
-	a0 = c1 / 2.0;
-	a1 = y / 2.0;
+    a0 = c1 / 2.0;
+    a1 = y / 2.0;
 
-	t1 = a0 * a0 - c2 + y;
+    t1 = a0 * a0 - c2 + y;
 
-	if (t1 < 0.0)
-	{
-		if (t1 > FUDGE_FACTOR2)
-		{
-			t1 = 0.0;
-		}
-		else
-		{
-			/* First Special case, a' < 0 means all roots are complex. */
+    if (t1 < 0.0)
+    {
+        if (t1 > FUDGE_FACTOR2)
+        {
+            t1 = 0.0;
+        }
+        else
+        {
+            /* First Special case, a' < 0 means all roots are complex. */
 
-			return(0);
-		 }
-	 }
+            return(0);
+         }
+     }
 
-	if (t1 < FUDGE_FACTOR3)
-	{
-		/* Second special case, the "x" term on the right hand side above
-		   has vanished.  In this case:
+    if (t1 < FUDGE_FACTOR3)
+    {
+        /* Second special case, the "x" term on the right hand side above
+           has vanished.  In this case:
 
-		     (x^2 + b*x/2 + y/2) = +sqrt(y^2/4 - e), and
-		     (x^2 + b*x/2 + y/2) = -sqrt(y^2/4 - e).  */
+             (x^2 + b*x/2 + y/2) = +sqrt(y^2/4 - e), and
+             (x^2 + b*x/2 + y/2) = -sqrt(y^2/4 - e).  */
 
-		t2 = a1 * a1 - c4;
+        t2 = a1 * a1 - c4;
 
-		if (t2 < 0.0)
-		{
-			return(0);
-		}
+        if (t2 < 0.0)
+        {
+            return(0);
+        }
 
-		x1 = 0.0;
-		d1 = sqrt(t2);
-	}
-	else
-	{
-		x1 = sqrt(t1);
-		d1 = 0.5 * (a0 * y - c3) / x1;
-	}
+        x1 = 0.0;
+        d1 = sqrt(t2);
+    }
+    else
+    {
+        x1 = sqrt(t1);
+        d1 = 0.5 * (a0 * y - c3) / x1;
+    }
 
-	/* Solve the first quadratic */
+    /* Solve the first quadratic */
 
-	q1 = -a0 - x1;
-	q2 = a1 + d1;
-	d2 = q1 * q1 - 4.0 * q2;
+    q1 = -a0 - x1;
+    q2 = a1 + d1;
+    d2 = q1 * q1 - 4.0 * q2;
 
-	if (d2 >= 0.0)
-	{
-		d2 = sqrt(d2);
+    if (d2 >= 0.0)
+    {
+        d2 = sqrt(d2);
 
-		results[0] = 0.5 * (q1 + d2);
-		results[1] = 0.5 * (q1 - d2);
+        results[0] = 0.5 * (q1 + d2);
+        results[1] = 0.5 * (q1 - d2);
 
-		i = 2;
-	}
+        i = 2;
+    }
 
-	/* Solve the second quadratic */
+    /* Solve the second quadratic */
 
-	q1 = q1 + x1 + x1;
-	q2 = a1 - d1;
-	d2 = q1 * q1 - 4.0 * q2;
+    q1 = q1 + x1 + x1;
+    q2 = a1 - d1;
+    d2 = q1 * q1 - 4.0 * q2;
 
-	if (d2 >= 0.0)
-	{
-		d2 = sqrt(d2);
+    if (d2 >= 0.0)
+    {
+        d2 = sqrt(d2);
 
-		results[i++] = 0.5 * (q1 + d2);
-		results[i++] = 0.5 * (q1 - d2);
-	}
+        results[i++] = 0.5 * (q1 + d2);
+        results[i++] = 0.5 * (q1 - d2);
+    }
 
-	return(i);
+    return(i);
 }
 #else
 /*****************************************************************************
@@ -1292,11 +1296,11 @@ static int solve_quartic(const DBL *x, DBL *results)
 *   solve_quartic
 *
 * INPUT
-*   
+*
 * OUTPUT
-*   
+*
 * RETURNS
-*   
+*
 * AUTHOR
 *
 *   Alexander Enzmann
@@ -1313,129 +1317,129 @@ static int solve_quartic(const DBL *x, DBL *results)
 
 static int solve_quartic(const DBL *x, DBL *results)
 {
-	DBL cubic[4];
-	DBL roots[3];
-	DBL c12, z, p, q, q1, q2, r, d1, d2;
-	DBL c0, c1, c2, c3, c4;
-	int i;
+    DBL cubic[4];
+    DBL roots[3];
+    DBL c12, z, p, q, q1, q2, r, d1, d2;
+    DBL c0, c1, c2, c3, c4;
+    int i;
 
-	/* Make sure the quartic has a leading coefficient of 1.0 */
+    /* Make sure the quartic has a leading coefficient of 1.0 */
 
-	c0 = x[0];
+    c0 = x[0];
 
-	if (c0 != 1.0)
-	{
-		c1 = x[1] / c0;
-		c2 = x[2] / c0;
-		c3 = x[3] / c0;
-		c4 = x[4] / c0;
-	}
-	else
-	{
-		c1 = x[1];
-		c2 = x[2];
-		c3 = x[3];
-		c4 = x[4];
-	}
+    if (c0 != 1.0)
+    {
+        c1 = x[1] / c0;
+        c2 = x[2] / c0;
+        c3 = x[3] / c0;
+        c4 = x[4] / c0;
+    }
+    else
+    {
+        c1 = x[1];
+        c2 = x[2];
+        c3 = x[3];
+        c4 = x[4];
+    }
 
-	/* Compute the cubic resolvant */
+    /* Compute the cubic resolvant */
 
-	c12 = c1 * c1;
-	p = -0.375 * c12 + c2;
-	q = 0.125 * c12 * c1 - 0.5 * c1 * c2 + c3;
-	r = -0.01171875 * c12 * c12 + 0.0625 * c12 * c2 - 0.25 * c1 * c3 + c4;
+    c12 = c1 * c1;
+    p = -0.375 * c12 + c2;
+    q = 0.125 * c12 * c1 - 0.5 * c1 * c2 + c3;
+    r = -0.01171875 * c12 * c12 + 0.0625 * c12 * c2 - 0.25 * c1 * c3 + c4;
 
-	cubic[0] = 1.0;
-	cubic[1] = -0.5 * p;
-	cubic[2] = -r;
-	cubic[3] = 0.5 * r * p - 0.125 * q * q;
+    cubic[0] = 1.0;
+    cubic[1] = -0.5 * p;
+    cubic[2] = -r;
+    cubic[3] = 0.5 * r * p - 0.125 * q * q;
 
-	i = solve_cubic(cubic, roots);
+    i = solve_cubic(cubic, roots);
 
-	if (i > 0)
-	{
-		z = roots[0];
-	}
-	else
-	{
-		return(0);
-	}
+    if (i > 0)
+    {
+        z = roots[0];
+    }
+    else
+    {
+        return(0);
+    }
 
-	d1 = 2.0 * z - p;
+    d1 = 2.0 * z - p;
 
-	if (d1 < 0.0)
-	{
-		if (d1 > -SMALL_ENOUGH)
-		{
-			d1 = 0.0;
-		}
-		else
-		{
-			return(0);
-		}
-	}
+    if (d1 < 0.0)
+    {
+        if (d1 > -SMALL_ENOUGH)
+        {
+            d1 = 0.0;
+        }
+        else
+        {
+            return(0);
+        }
+    }
 
-	if (d1 < SMALL_ENOUGH)
-	{
-		d2 = z * z - r;
+    if (d1 < SMALL_ENOUGH)
+    {
+        d2 = z * z - r;
 
-		if (d2 < 0.0)
-		{
-			return(0);
-		}
+        if (d2 < 0.0)
+        {
+            return(0);
+        }
 
-		d2 = sqrt(d2);
-	}
-	else
-	{
-		d1 = sqrt(d1);
-		d2 = 0.5 * q / d1;
-	}
+        d2 = sqrt(d2);
+    }
+    else
+    {
+        d1 = sqrt(d1);
+        d2 = 0.5 * q / d1;
+    }
 
-	/* Set up useful values for the quadratic factors */
+    /* Set up useful values for the quadratic factors */
 
-	q1 = d1 * d1;
-	q2 = -0.25 * c1;
+    q1 = d1 * d1;
+    q2 = -0.25 * c1;
 
-	i = 0;
+    i = 0;
 
-	/* Solve the first quadratic */
+    /* Solve the first quadratic */
 
-	p = q1 - 4.0 * (z - d2);
+    p = q1 - 4.0 * (z - d2);
 
-	if (p == 0)
-	{
-		results[i++] = -0.5 * d1 - q2;
-	}
-	else
-	{
-		if (p > 0)
-		{
-			p = sqrt(p);
-			results[i++] = -0.5 * (d1 + p) + q2;
-			results[i++] = -0.5 * (d1 - p) + q2;
-		}
-	}
+    if (p == 0)
+    {
+        results[i++] = -0.5 * d1 - q2;
+    }
+    else
+    {
+        if (p > 0)
+        {
+            p = sqrt(p);
+            results[i++] = -0.5 * (d1 + p) + q2;
+            results[i++] = -0.5 * (d1 - p) + q2;
+        }
+    }
 
-	/* Solve the second quadratic */
+    /* Solve the second quadratic */
 
-	p = q1 - 4.0 * (z + d2);
+    p = q1 - 4.0 * (z + d2);
 
-	if (p == 0)
-	{
-		results[i++] = 0.5 * d1 - q2;
-	}
-	else
-	{
-		if (p > 0)
-		{
-			p = sqrt(p);
-			results[i++] = 0.5 * (d1 + p) + q2;
-			results[i++] = 0.5 * (d1 - p) + q2;
-		}
-	}
+    if (p == 0)
+    {
+        results[i++] = 0.5 * d1 - q2;
+    }
+    else
+    {
+        if (p > 0)
+        {
+            p = sqrt(p);
+            results[i++] = 0.5 * (d1 + p) + q2;
+            results[i++] = 0.5 * (d1 - p) + q2;
+        }
+    }
 
-	return(i);
+    return(i);
 }
 #endif
 
@@ -1448,15 +1452,15 @@ static int solve_quartic(const DBL *x, DBL *results)
 *   polysolve
 *
 * INPUT
-*   
+*
 * OUTPUT
-*   
+*
 * RETURNS
-*   
+*
 * AUTHOR
 *
 *   Alexander Enzmann
-*   
+*
 * DESCRIPTION
 *
 *   Root solver based on the Sturm sequences for a polynomial.
@@ -1469,46 +1473,46 @@ static int solve_quartic(const DBL *x, DBL *results)
 
 static int polysolve(int order, const DBL *Coeffs, DBL *roots)
 {
-	polynomial sseq[MAX_ORDER+1];
-	DBL min_value, max_value;
-	int i, nroots, np, atmin, atmax;
+    polynomial sseq[MAX_ORDER+1];
+    DBL min_value, max_value;
+    int i, nroots, np, atmin, atmax;
 
-	/* Put the coefficients into the top of the stack. */
+    /* Put the coefficients into the top of the stack. */
 
-	for (i = 0; i <= order; i++)
-	{
-		sseq[0].coef[order-i] = Coeffs[i] / Coeffs[0];
-	}
+    for (i = 0; i <= order; i++)
+    {
+        sseq[0].coef[order-i] = Coeffs[i] / Coeffs[0];
+    }
 
-	/* Build the Sturm sequence */
+    /* Build the Sturm sequence */
 
-	np = buildsturm(order, &sseq[0]);
+    np = buildsturm(order, &sseq[0]);
 
-	/* Get the total number of visible roots */
+    /* Get the total number of visible roots */
 
-	if ((nroots = visible_roots(np, sseq, &atmin, &atmax)) == 0)
-	{
-		return(0);
-	}
+    if ((nroots = visible_roots(np, sseq, &atmin, &atmax)) == 0)
+    {
+        return(0);
+    }
 
-	/* Bracket the roots */
+    /* Bracket the roots */
 
-	min_value = 0.0;
-	max_value = MAX_DISTANCE;
+    min_value = 0.0;
+    max_value = MAX_DISTANCE;
 
-	atmin = numchanges(np, sseq, min_value);
-	atmax = numchanges(np, sseq, max_value);
+    atmin = numchanges(np, sseq, min_value);
+    atmax = numchanges(np, sseq, max_value);
 
-	nroots = atmin - atmax;
+    nroots = atmin - atmax;
 
-	if (nroots == 0)
-	{
-		return(0);
-	}
+    if (nroots == 0)
+    {
+        return(0);
+    }
 
-	/* perform the bisection. */
+    /* perform the bisection. */
 
-	return(sbisect(np, sseq, min_value, max_value, atmin, atmax, roots));
+    return(sbisect(np, sseq, min_value, max_value, atmin, atmax, roots));
 }
 
 
@@ -1526,19 +1530,19 @@ static int polysolve(int order, const DBL *Coeffs, DBL *roots)
 *   r       - roots
 *   sturm   - true, if sturm should be used for n=3,4
 *   epsilon - Tolerance to discard small root
-*   
+*
 * OUTPUT
 *
 *   r
-*   
+*
 * RETURNS
 *
 *   int - number of roots found
-*   
+*
 * AUTHOR
 *
 *   Dieter Bayer
-*   
+*
 * DESCRIPTION
 *
 *   Solve the polynomial equation
@@ -1573,146 +1577,146 @@ static int polysolve(int order, const DBL *Coeffs, DBL *roots)
 
 int Solve_Polynomial(int n, const DBL *c0, DBL *r, int sturm, DBL epsilon, TraceThreadData *Thread)
 {
-	int roots, i;
-	const DBL *c;
+    int roots, i;
+    const DBL *c;
 
-	Thread->Stats()[Polynomials_Tested]++;
+    Thread->Stats()[Polynomials_Tested]++;
 
-	roots = 0;
+    roots = 0;
 
-	/*
-	 * Determine the "real" order of the polynomial, i.e.
-	 * eliminate small leading coefficients.
-	 */
+    /*
+     * Determine the "real" order of the polynomial, i.e.
+     * eliminate small leading coefficients.
+     */
 
-	i = 0;
+    i = 0;
 
-	while ((fabs(c0[i]) < SMALL_ENOUGH) && (i < n))
-	{
-		i++;
-	}
+    while ((fabs(c0[i]) < SMALL_ENOUGH) && (i < n))
+    {
+        i++;
+    }
 
-	n -= i;
+    n -= i;
 
-	c = &c0[i];
+    c = &c0[i];
 
-	switch (n)
-	{
-		case 0:
+    switch (n)
+    {
+        case 0:
 
-			break;
+            break;
 
-		case 1:
+        case 1:
 
-			/* Solve linear polynomial. */
+            /* Solve linear polynomial. */
 
-			if (c[0] != 0.0)
-			{
-				r[roots++] = -c[1] / c[0];
-			}
+            if (c[0] != 0.0)
+            {
+                r[roots++] = -c[1] / c[0];
+            }
 
-			break;
+            break;
 
-		case 2:
+        case 2:
 
-			/* Solve quadratic polynomial. */
+            /* Solve quadratic polynomial. */
 
-			roots = solve_quadratic(c, r);
+            roots = solve_quadratic(c, r);
 
-			break;
+            break;
 
-		case 3:
+        case 3:
 
-			/* Root elimination? */
+            /* Root elimination? */
 
-			if (epsilon > 0.0)
-			{
-				if ((c[2] != 0.0) && (fabs(c[3]/c[2]) < epsilon))
-				{
-					Thread->Stats()[Roots_Eliminated]++;
+            if (epsilon > 0.0)
+            {
+                if ((c[2] != 0.0) && (fabs(c[3]/c[2]) < epsilon))
+                {
+                    Thread->Stats()[Roots_Eliminated]++;
 
-					roots = solve_quadratic(c, r);
+                    roots = solve_quadratic(c, r);
 
-					break;
-				}
-			}
+                    break;
+                }
+            }
 
-			/* Solve cubic polynomial. */
+            /* Solve cubic polynomial. */
 
-			if (sturm)
-			{
-				roots = polysolve(3, c, r);
-			}
-			else
-			{
-				roots = solve_cubic(c, r);
-			}
+            if (sturm)
+            {
+                roots = polysolve(3, c, r);
+            }
+            else
+            {
+                roots = solve_cubic(c, r);
+            }
 
-			break;
+            break;
 
-		case 4:
+        case 4:
 
-			/* Root elimination? */
+            /* Root elimination? */
 
-			if (epsilon > 0.0)
-			{
-				if ((c[3] != 0.0) && (fabs(c[4]/c[3]) < epsilon))
-				{
-					Thread->Stats()[Roots_Eliminated]++;
+            if (epsilon > 0.0)
+            {
+                if ((c[3] != 0.0) && (fabs(c[4]/c[3]) < epsilon))
+                {
+                    Thread->Stats()[Roots_Eliminated]++;
 
-					if (sturm)
-					{
-						roots = polysolve(3, c, r);
-					}
-					else
-					{
-						roots = solve_cubic(c, r);
-					}
+                    if (sturm)
+                    {
+                        roots = polysolve(3, c, r);
+                    }
+                    else
+                    {
+                        roots = solve_cubic(c, r);
+                    }
 
-					break;
-				}
-			}
+                    break;
+                }
+            }
 
-			/* Test for difficult coeffs. */
+            /* Test for difficult coeffs. */
 
-			if (difficult_coeffs(4, c))
-			{
-				sturm = true;
-			}
+            if (difficult_coeffs(4, c))
+            {
+                sturm = true;
+            }
 
-			/* Solve quartic polynomial. */
+            /* Solve quartic polynomial. */
 
-			if (sturm)
-			{
-				roots = polysolve(4, c, r);
-			}
-			else
-			{
-				roots = solve_quartic(c, r);
-			}
+            if (sturm)
+            {
+                roots = polysolve(4, c, r);
+            }
+            else
+            {
+                roots = solve_quartic(c, r);
+            }
 
-			break;
+            break;
 
-		default:
+        default:
 
-			if (epsilon > 0.0)
-			{
-				if ((c[n-1] != 0.0) && (fabs(c[n]/c[n-1]) < epsilon))
-				{
-					Thread->Stats()[Roots_Eliminated]++;
+            if (epsilon > 0.0)
+            {
+                if ((c[n-1] != 0.0) && (fabs(c[n]/c[n-1]) < epsilon))
+                {
+                    Thread->Stats()[Roots_Eliminated]++;
 
-					roots = polysolve(n-1, c, r);
-				}
-			}
+                    roots = polysolve(n-1, c, r);
+                }
+            }
 
-			/* Solve n-th order polynomial. */
+            /* Solve n-th order polynomial. */
 
-			roots = polysolve(n, c, r);
+            roots = polysolve(n, c, r);
 
-			break;
-	}
+            break;
+    }
 
-	return(roots);
+    return(roots);
 }
 
 }

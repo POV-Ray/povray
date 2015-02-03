@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -41,18 +41,18 @@
 #include <boost/thread.hpp>
 
 #include "backend/frame.h"
-#include "backend/bounding/bbox.h"
-#include "backend/scene/atmosph.h"
+#include "backend/render/ray.h"
 #include "backend/support/bsptree.h"
 #include "backend/support/randomsequences.h"
 
 namespace pov
 {
 
-class SceneData;
-class ViewData;
-class Task;
+typedef struct Fog_Struct FOG;
 class PhotonGatherer;
+class SceneData;
+class Task;
+class ViewData;
 
 struct NoSomethingFlagRayObjectCondition : public RayObjectCondition
 {

@@ -4,11 +4,13 @@
 ///
 /// This module implements the ovus primitive.
 ///
+/// @author Jerome Grimbert
+///
 /// @copyright
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -65,11 +67,12 @@
 
 // frame.h must always be the first POV file included (pulls in platform config)
 #include "backend/frame.h"
-#include "backend/math/vector.h"
-#include "backend/math/polysolv.h"
-#include "backend/math/matrices.h"
-#include "backend/scene/objects.h"
 #include "backend/shape/ovus.h"
+
+#include "backend/math/matrices.h"
+#include "backend/math/polysolv.h"
+#include "backend/render/ray.h"
+#include "backend/scene/objects.h"
 #include "backend/scene/threaddata.h"
 
 // this must be the last file included
@@ -128,12 +131,12 @@ void Ovus::Intersect_Ovus_Spheres(const Vector3d& P, const Vector3d& D,
 
             *Depth1 = t_Closest_Approach - Half_Chord;
             *Depth2 = t_Closest_Approach + Half_Chord;
-            VEvaluateRay(IPoint, P, *Depth1, D);
+            IPoint = P + *Depth1 * D;
             if (IPoint[Y] < BottomVertical)
             {
                 lcount++;
             }
-            VEvaluateRay(IPoint, P, *Depth2, D);
+            IPoint = P + *Depth2 * D;
             if (IPoint[Y] < BottomVertical)
             {
                 lcount++;
@@ -159,12 +162,12 @@ void Ovus::Intersect_Ovus_Spheres(const Vector3d& P, const Vector3d& D,
 
             *Depth3 = t_Closest_Approach - Half_Chord;
             *Depth4 = t_Closest_Approach + Half_Chord;
-            VEvaluateRay(IPoint, P, *Depth3, D);
+            IPoint = P + *Depth3 * D;
             if (IPoint[Y] > TopVertical)
             {
                 lcount++;
             }
-            VEvaluateRay(IPoint, P, *Depth4, D);
+            IPoint = P + *Depth4 * D;
             if (IPoint[Y] > TopVertical)
             {
                 lcount++;
@@ -206,7 +209,7 @@ void Ovus::Intersect_Ovus_Spheres(const Vector3d& P, const Vector3d& D,
         // with something which is faster than a 4th degree polynome,
         // please feel welcome to update and share...
 
-        VEvaluateRay(IPoint, P, r[n], D);
+        IPoint = P + r[n] * D;
 
         vertical = IPoint[Y];
         if ((vertical > BottomVertical) && (vertical < TopVertical))
@@ -279,7 +282,7 @@ bool Ovus::All_Intersections(const Ray& ray, IStack& Depth_Stack, SceneThreadDat
                            &Depth4, &Depth5, &Depth6, Thread);
     if (Depth1 > EPSILON)
     {
-        VEvaluateRay(IPoint, P, Depth1, D);
+        IPoint = P + Depth1 * D;
         if (IPoint[Y] < BottomVertical)
         {
             MTransPoint(Real_Pt, IPoint, Trans);
@@ -296,7 +299,7 @@ bool Ovus::All_Intersections(const Ray& ray, IStack& Depth_Stack, SceneThreadDat
 
     if (Depth2 > EPSILON)
     {
-        VEvaluateRay(IPoint, P, Depth2, D);
+        IPoint = P + Depth2 * D;
 
         if (IPoint[Y] < BottomVertical)
         {
@@ -314,7 +317,7 @@ bool Ovus::All_Intersections(const Ray& ray, IStack& Depth_Stack, SceneThreadDat
 
     if (Depth3 > EPSILON)
     {
-        VEvaluateRay(IPoint, P, Depth3, D);
+        IPoint = P + Depth3 * D;
 
         if (IPoint[Y] > TopVertical)
         {
@@ -333,7 +336,7 @@ bool Ovus::All_Intersections(const Ray& ray, IStack& Depth_Stack, SceneThreadDat
     }
     if (Depth4 > EPSILON)
     {
-        VEvaluateRay(IPoint, P, Depth4, D);
+        IPoint = P + Depth4 * D;
 
         if (IPoint[Y] > TopVertical)
         {
@@ -353,7 +356,7 @@ bool Ovus::All_Intersections(const Ray& ray, IStack& Depth_Stack, SceneThreadDat
 
     if (Depth5 > EPSILON)
     {
-        VEvaluateRay(IPoint, P, Depth5, D);
+        IPoint = P + Depth5 * D;
         MTransPoint(Real_Pt, IPoint, Trans);
 
         if (Clip.empty()||(Point_In_Clip(Real_Pt, Clip, Thread)))
@@ -373,7 +376,7 @@ bool Ovus::All_Intersections(const Ray& ray, IStack& Depth_Stack, SceneThreadDat
     }
     if (Depth6 > EPSILON)
     {
-        VEvaluateRay(IPoint, P, Depth6, D);
+        IPoint = P + Depth6 * D;
         MTransPoint(Real_Pt, IPoint, Trans);
 
         if (Clip.empty()||(Point_In_Clip(Real_Pt, Clip, Thread)))

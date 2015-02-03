@@ -11,7 +11,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -42,6 +42,7 @@
 #include "backend/frame.h"
 #include "backend/parser/parse.h"
 
+#include "backend/math/matrices.h"
 #include "backend/math/splines.h"
 #include "backend/texture/pigment.h"
 #include "backend/vm/fnpovfpu.h"
@@ -326,7 +327,7 @@ FUNCTION_PTR Parser::Parse_DeclareFunction(int *token_id, const char *fn_name, b
         function.private_data = reinterpret_cast<void *>(Parse_Spline());
         Parse_End();
 
-        function.return_size = (reinterpret_cast<SPLINE *>(function.private_data))->Terms; // returns a 2d, 3d, 4d or 5d vector!!!
+        function.return_size = (reinterpret_cast<GenericSpline *>(function.private_data))->Terms; // returns a 2d, 3d, 4d or 5d vector!!!
 
         // function type is vector function
         *token_id = VECTFUNCT_ID_TOKEN;

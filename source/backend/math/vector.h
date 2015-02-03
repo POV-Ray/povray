@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,21 +36,41 @@
 #ifndef VECTOR_H
 #define VECTOR_H
 
-#include "backend/frame.h"
-
 namespace pov
 {
+
+typedef DBL VECTOR_4D[4]; ///< @todo       Make this obsolete.
 
 /*****************************************************************************
 * Inline functions
 ******************************************************************************/
 
-
-// Evaluate a ray equation. [DB 7/94]
-//   IPoint = Origin + depth * Direction
-inline void VEvaluateRay(Vector3d& IPoint, const Vector3d& Origin, DBL depth, const Vector3d& Direction)
+inline VECTOR_4D *Create_Vector_4D ()
 {
-    IPoint = Origin + depth * Direction;
+    VECTOR_4D *New;
+
+    New = reinterpret_cast<VECTOR_4D *>(POV_MALLOC(sizeof (VECTOR_4D), "4d vector"));
+
+    (*New)[0]= 0.0;
+    (*New)[1]= 0.0;
+    (*New)[2]= 0.0;
+    (*New)[3]= 0.0;
+
+    return (New);
+}
+
+inline void Assign_Vector_4D(VECTOR_4D d, const VECTOR_4D s)
+{
+    d[X] = s[X];
+    d[Y] = s[Y];
+    d[Z] = s[Z];
+    d[T] = s[T];
+}
+
+inline void Destroy_Vector_4D(VECTOR_4D *x)
+{
+    if(x != NULL)
+        POV_FREE(x);
 }
 
 // Inverse Scale - Divide Vector by a Scalar
@@ -72,5 +92,3 @@ inline void V4D_Dot(DBL& a, const VECTOR_4D b, const VECTOR_4D c)
 }
 
 #endif
-
-

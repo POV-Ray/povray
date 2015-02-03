@@ -1,40 +1,44 @@
-/*******************************************************************************
- * fractal.h
- *
- * This module contains all defines, typedefs, and prototypes for FRACTAL.CPP.
- *
- * ---------------------------------------------------------------------------
- * Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
- * Copyright 1991-2013 Persistence of Vision Raytracer Pty. Ltd.
- *
- * POV-Ray is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * POV-Ray is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------------
- * POV-Ray is based on the popular DKB raytracer version 2.12.
- * DKBTrace was originally written by David K. Buck.
- * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
- * ---------------------------------------------------------------------------
- * $File: //depot/povray/smp/source/backend/shape/fractal.h $
- * $Revision: #27 $
- * $Change: 6164 $
- * $DateTime: 2013/12/09 17:21:04 $
- * $Author: clipka $
- *******************************************************************************/
+//******************************************************************************
+///
+/// @file backend/shape/fractal.h
+///
+/// This module contains all defines, typedefs, and prototypes for `fractal.cpp`.
+///
+/// @copyright
+/// @parblock
+///
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+///
+/// POV-Ray is free software: you can redistribute it and/or modify
+/// it under the terms of the GNU Affero General Public License as
+/// published by the Free Software Foundation, either version 3 of the
+/// License, or (at your option) any later version.
+///
+/// POV-Ray is distributed in the hope that it will be useful,
+/// but WITHOUT ANY WARRANTY; without even the implied warranty of
+/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+/// GNU Affero General Public License for more details.
+///
+/// You should have received a copy of the GNU Affero General Public License
+/// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+///
+/// ----------------------------------------------------------------------------
+///
+/// POV-Ray is based on the popular DKB raytracer version 2.12.
+/// DKBTrace was originally written by David K. Buck.
+/// DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
+///
+/// @endparblock
+///
+//******************************************************************************
 
 #ifndef FRACTAL_H
 #define FRACTAL_H
 
 #include "backend/scene/objects.h"
+#include "backend/math/matrices.h"
+#include "backend/math/vector.h"
 
 namespace pov
 {
@@ -82,43 +86,43 @@ class Fractal;
 
 struct Complex
 {
-	DBL x,y;
+    DBL x,y;
 };
 
 class Fractal : public ObjectBase
 {
-	public:
-		Vector3d Center;
-		VECTOR_4D Julia_Parm;
-		VECTOR_4D Slice;              /* vector perpendicular to slice plane */
-		DBL SliceDist;                /* distance from slice plane to origin */
-		DBL Exit_Value;
-		int Num_Iterations;           /* number of iterations */
-		DBL Precision;                /* Precision value */
-		int Algebra;                  /* Quaternion or Hypercomplex */
-		int Sub_Type;
-		Complex exponent;             /* exponent of power function */
-		DBL Radius_Squared;           /* For F_Bound(), if needed */
-		FractalRulesPtr Rules;
+    public:
+        Vector3d Center;
+        VECTOR_4D Julia_Parm;
+        VECTOR_4D Slice;              /* vector perpendicular to slice plane */
+        DBL SliceDist;                /* distance from slice plane to origin */
+        DBL Exit_Value;
+        int Num_Iterations;           /* number of iterations */
+        DBL Precision;                /* Precision value */
+        int Algebra;                  /* Quaternion or Hypercomplex */
+        int Sub_Type;
+        Complex exponent;             /* exponent of power function */
+        DBL Radius_Squared;           /* For F_Bound(), if needed */
+        FractalRulesPtr Rules;
 
-		Fractal();
-		virtual ~Fractal();
+        Fractal();
+        virtual ~Fractal();
 
-		virtual ObjectPtr Copy();
+        virtual ObjectPtr Copy();
 
-		virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
-		virtual bool Inside(const Vector3d&, TraceThreadData *) const;
-		virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const;
-		virtual void Translate(const Vector3d&, const TRANSFORM *);
-		virtual void Rotate(const Vector3d&, const TRANSFORM *);
-		virtual void Scale(const Vector3d&, const TRANSFORM *);
-		virtual void Transform(const TRANSFORM *);
-		virtual void Compute_BBox();
+        virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
+        virtual bool Inside(const Vector3d&, TraceThreadData *) const;
+        virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const;
+        virtual void Translate(const Vector3d&, const TRANSFORM *);
+        virtual void Rotate(const Vector3d&, const TRANSFORM *);
+        virtual void Scale(const Vector3d&, const TRANSFORM *);
+        virtual void Transform(const TRANSFORM *);
+        virtual void Compute_BBox();
 
-		static void Free_Iteration_Stack(DBL **IStack);
-		static void Allocate_Iteration_Stack(DBL **IStack, int Len);
+        static void Free_Iteration_Stack(DBL **IStack);
+        static void Allocate_Iteration_Stack(DBL **IStack, int Len);
 
-		int SetUp_Fractal(void);
+        int SetUp_Fractal(void);
 };
 
 /*****************************************************************************

@@ -1,37 +1,39 @@
-/*******************************************************************************
- * torus.cpp
- *
- * This module implements functions that manipulate torii.
- *
- * This module was written by Dieter Bayer [DB].
- *
- * ---------------------------------------------------------------------------
- * Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
- * Copyright 1991-2013 Persistence of Vision Raytracer Pty. Ltd.
- *
- * POV-Ray is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * POV-Ray is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------------
- * POV-Ray is based on the popular DKB raytracer version 2.12.
- * DKBTrace was originally written by David K. Buck.
- * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
- * ---------------------------------------------------------------------------
- * $File: //depot/povray/smp/source/backend/shape/torus.cpp $
- * $Revision: #35 $
- * $Change: 6164 $
- * $DateTime: 2013/12/09 17:21:04 $
- * $Author: clipka $
- *******************************************************************************/
+//******************************************************************************
+///
+/// @file backend/shape/torus.cpp
+///
+/// This module implements the torus primitive.
+///
+/// @author Dieter Bayer
+///
+/// @copyright
+/// @parblock
+///
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+///
+/// POV-Ray is free software: you can redistribute it and/or modify
+/// it under the terms of the GNU Affero General Public License as
+/// published by the Free Software Foundation, either version 3 of the
+/// License, or (at your option) any later version.
+///
+/// POV-Ray is distributed in the hope that it will be useful,
+/// but WITHOUT ANY WARRANTY; without even the implied warranty of
+/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+/// GNU Affero General Public License for more details.
+///
+/// You should have received a copy of the GNU Affero General Public License
+/// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+///
+/// ----------------------------------------------------------------------------
+///
+/// POV-Ray is based on the popular DKB raytracer version 2.12.
+/// DKBTrace was originally written by David K. Buck.
+/// DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
+///
+/// @endparblock
+///
+//******************************************************************************
 
 /****************************************************************************
 *
@@ -45,13 +47,13 @@
 
 // frame.h must always be the first POV file included (pulls in platform config)
 #include "backend/frame.h"
-#include "povray.h"
-#include "backend/math/vector.h"
-#include "backend/bounding/bbox.h"
-#include "backend/math/polysolv.h"
-#include "backend/math/matrices.h"
-#include "backend/scene/objects.h"
 #include "backend/shape/torus.h"
+
+#include "backend/bounding/bbox.h"
+#include "backend/math/matrices.h"
+#include "backend/math/polysolv.h"
+#include "backend/render/ray.h"
+#include "backend/scene/objects.h"
 #include "backend/scene/threaddata.h"
 
 // this must be the last file included
@@ -85,19 +87,19 @@ const DBL ROOT_TOLERANCE = 1.0e-4;
 *   Object      - Object
 *   Ray         - Ray
 *   Depth_Stack - Intersection stack
-*   
+*
 * OUTPUT
 *
 *   Depth_Stack
-*   
+*
 * RETURNS
 *
 *   int - true, if an intersection was found
-*   
+*
 * AUTHOR
 *
 *   Dieter Bayer
-*   
+*
 * DESCRIPTION
 *
 *   Determine ray/torus intersection and clip intersection found.
@@ -110,31 +112,31 @@ const DBL ROOT_TOLERANCE = 1.0e-4;
 
 bool Torus::All_Intersections(const Ray& ray, IStack& Depth_Stack, SceneThreadData *Thread)
 {
-	int i, max_i, Found;
-	DBL Depth[4];
-	Vector3d IPoint;
+    int i, max_i, Found;
+    DBL Depth[4];
+    Vector3d IPoint;
 
-	Found = false;
+    Found = false;
 
-	if ((max_i = Intersect(ray, Depth, Thread)) > 0)
-	{
-		for (i = 0; i < max_i; i++)
-		{
-			if ((Depth[i] > DEPTH_TOLERANCE) && (Depth[i] < MAX_DISTANCE))
-			{
-				IPoint = ray.Evaluate(Depth[i]);
+    if ((max_i = Intersect(ray, Depth, Thread)) > 0)
+    {
+        for (i = 0; i < max_i; i++)
+        {
+            if ((Depth[i] > DEPTH_TOLERANCE) && (Depth[i] < MAX_DISTANCE))
+            {
+                IPoint = ray.Evaluate(Depth[i]);
 
-				if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
-				{
-					Depth_Stack->push(Intersection(Depth[i], IPoint, this));
+                if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
+                {
+                    Depth_Stack->push(Intersection(Depth[i], IPoint, this));
 
-					Found = true;
-				}
-			}
-		}
-	}
+                    Found = true;
+                }
+            }
+        }
+    }
 
-	return(Found);
+    return(Found);
 }
 
 
@@ -150,19 +152,19 @@ bool Torus::All_Intersections(const Ray& ray, IStack& Depth_Stack, SceneThreadDa
 *   Ray   - Ray
 *   Torus - Torus
 *   Depth - Intersections found
-*   
+*
 * OUTPUT
 *
 *   Depth
-*   
+*
 * RETURNS
 *
 *   int - Number of intersections found
-*   
+*
 * AUTHOR
 *
 *   Dieter Bayer
-*   
+*
 * DESCRIPTION
 *
 *   Determine ray/torus intersection.
@@ -177,92 +179,92 @@ bool Torus::All_Intersections(const Ray& ray, IStack& Depth_Stack, SceneThreadDa
 
 int Torus::Intersect(const BasicRay& ray, DBL *Depth, SceneThreadData *Thread) const
 {
-	int i, n;
-	DBL len, R2, Py2, Dy2, PDy2, k1, k2;
-	DBL y1, y2, r1, r2;
-	DBL c[5];
-	DBL r[4];
-	Vector3d P, D;
-	DBL DistanceP;            // Distance from P to torus center (origo).
-	DBL BoundingSphereRadius; // Sphere fully (amply) enclosing torus.
-	DBL Closer;               // P is moved Closer*D closer to torus.
+    int i, n;
+    DBL len, R2, Py2, Dy2, PDy2, k1, k2;
+    DBL y1, y2, r1, r2;
+    DBL c[5];
+    DBL r[4];
+    Vector3d P, D;
+    DBL DistanceP;            // Distance from P to torus center (origo).
+    DBL BoundingSphereRadius; // Sphere fully (amply) enclosing torus.
+    DBL Closer;               // P is moved Closer*D closer to torus.
 
-	Thread->Stats()[Ray_Torus_Tests]++;
+    Thread->Stats()[Ray_Torus_Tests]++;
 
-	/* Transform the ray into the torus space. */
+    /* Transform the ray into the torus space. */
 
-	MInvTransPoint(P, ray.Origin, Trans);
+    MInvTransPoint(P, ray.Origin, Trans);
 
-	MInvTransDirection(D, ray.Direction, Trans);
+    MInvTransDirection(D, ray.Direction, Trans);
 
-	len = D.length();
+    len = D.length();
 
-	D /= len;
+    D /= len;
 
-	i = 0;
+    i = 0;
 
-	y1 = -MinorRadius;
-	y2 =  MinorRadius;
-	r1 = Sqr(MajorRadius - MinorRadius);
+    y1 = -MinorRadius;
+    y2 =  MinorRadius;
+    r1 = Sqr(MajorRadius - MinorRadius);
 
-	if ( MajorRadius < MinorRadius )
-		r1 = 0;
+    if ( MajorRadius < MinorRadius )
+        r1 = 0;
 
-	r2 = Sqr(MajorRadius + MinorRadius);
+    r2 = Sqr(MajorRadius + MinorRadius);
 
 #ifdef TORUS_EXTRA_STATS
-	Thread->Stats()[Torus_Bound_Tests]++;
+    Thread->Stats()[Torus_Bound_Tests]++;
 #endif
 
-	if (Test_Thick_Cylinder(P, D, y1, y2, r1, r2))
-	{
+    if (Test_Thick_Cylinder(P, D, y1, y2, r1, r2))
+    {
 #ifdef TORUS_EXTRA_STATS
-		Thread->Stats()[Torus_Bound_Tests_Succeeded]++;
+        Thread->Stats()[Torus_Bound_Tests_Succeeded]++;
 #endif
 
-		// Move P close to bounding sphere to have more precise root calculation.
-		// Bounding sphere radius is R + r, we add r once more to ensure
-		// that P is safely outside sphere.
-		BoundingSphereRadius = MajorRadius + MinorRadius + MinorRadius;
-		DistanceP = P.lengthSqr(); // Distance is currently squared.
-		Closer = 0.0;
-		if (DistanceP > Sqr(BoundingSphereRadius))
-		{
-			DistanceP = sqrt(DistanceP); // Now real distance.
-			Closer = DistanceP - BoundingSphereRadius;
-			P += Closer * D;
-		}
+        // Move P close to bounding sphere to have more precise root calculation.
+        // Bounding sphere radius is R + r, we add r once more to ensure
+        // that P is safely outside sphere.
+        BoundingSphereRadius = MajorRadius + MinorRadius + MinorRadius;
+        DistanceP = P.lengthSqr(); // Distance is currently squared.
+        Closer = 0.0;
+        if (DistanceP > Sqr(BoundingSphereRadius))
+        {
+            DistanceP = sqrt(DistanceP); // Now real distance.
+            Closer = DistanceP - BoundingSphereRadius;
+            P += Closer * D;
+        }
 
-		R2   = Sqr(MajorRadius);
-		r2   = Sqr(MinorRadius);
+        R2   = Sqr(MajorRadius);
+        r2   = Sqr(MinorRadius);
 
-		Py2  = P[Y] * P[Y];
-		Dy2  = D[Y] * D[Y];
-		PDy2 = P[Y] * D[Y];
+        Py2  = P[Y] * P[Y];
+        Dy2  = D[Y] * D[Y];
+        PDy2 = P[Y] * D[Y];
 
-		k1   = P[X] * P[X] + P[Z] * P[Z] + Py2 - R2 - r2;
-		k2   = P[X] * D[X] + P[Z] * D[Z] + PDy2;
+        k1   = P[X] * P[X] + P[Z] * P[Z] + Py2 - R2 - r2;
+        k2   = P[X] * D[X] + P[Z] * D[Z] + PDy2;
 
-		c[0] = 1.0;
+        c[0] = 1.0;
 
-		c[1] = 4.0 * k2;
+        c[1] = 4.0 * k2;
 
-		c[2] = 2.0 * (k1 + 2.0 * (k2 * k2 + R2 * Dy2));
+        c[2] = 2.0 * (k1 + 2.0 * (k2 * k2 + R2 * Dy2));
 
-		c[3] = 4.0 * (k2 * k1 + 2.0 * R2 * PDy2);
+        c[3] = 4.0 * (k2 * k1 + 2.0 * R2 * PDy2);
 
-		c[4] = k1 * k1 + 4.0 * R2 * (Py2 - r2);
+        c[4] = k1 * k1 + 4.0 * R2 * (Py2 - r2);
 
-		n = Solve_Polynomial(4, c, r, Test_Flag(this, STURM_FLAG), ROOT_TOLERANCE, Thread);
+        n = Solve_Polynomial(4, c, r, Test_Flag(this, STURM_FLAG), ROOT_TOLERANCE, Thread);
 
-		while(n--)
-			Depth[i++] = (r[n] + Closer) / len;
-	}
+        while(n--)
+            Depth[i++] = (r[n] + Closer) / len;
+    }
 
-	if (i)
-		Thread->Stats()[Ray_Torus_Tests_Succeeded]++;
+    if (i)
+        Thread->Stats()[Ray_Torus_Tests_Succeeded]++;
 
-	return(i);
+    return(i);
 }
 
 
@@ -277,17 +279,17 @@ int Torus::Intersect(const BasicRay& ray, DBL *Depth, SceneThreadData *Thread) c
 *
 *   IPoint - Intersection point
 *   Object - Object
-*   
+*
 * OUTPUT
-*   
+*
 * RETURNS
 *
 *   int - true if inside
-*   
+*
 * AUTHOR
 *
 *   Dieter Bayer
-*   
+*
 * DESCRIPTION
 *
 *   Test if a point lies inside the torus.
@@ -300,25 +302,25 @@ int Torus::Intersect(const BasicRay& ray, DBL *Depth, SceneThreadData *Thread) c
 
 bool Torus::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 {
-	DBL r, r2;
-	Vector3d P;
+    DBL r, r2;
+    Vector3d P;
 
-	/* Transform the point into the torus space. */
+    /* Transform the point into the torus space. */
 
-	MInvTransPoint(P, IPoint, Trans);
+    MInvTransPoint(P, IPoint, Trans);
 
-	r  = sqrt(Sqr(P[X]) + Sqr(P[Z]));
+    r  = sqrt(Sqr(P[X]) + Sqr(P[Z]));
 
-	r2 = Sqr(P[Y]) + Sqr(r - MajorRadius);
+    r2 = Sqr(P[Y]) + Sqr(r - MajorRadius);
 
-	if (r2 <= Sqr(MinorRadius))
-	{
-		return(!Test_Flag(this, INVERTED_FLAG));
-	}
-	else
-	{
-		return(Test_Flag(this, INVERTED_FLAG));
-	}
+    if (r2 <= Sqr(MinorRadius))
+    {
+        return(!Test_Flag(this, INVERTED_FLAG));
+    }
+    else
+    {
+        return(Test_Flag(this, INVERTED_FLAG));
+    }
 }
 
 
@@ -334,17 +336,17 @@ bool Torus::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 *   Result - Normal vector
 *   Object - Object
 *   Inter  - Intersection found
-*   
+*
 * OUTPUT
 *
 *   Result
-*   
+*
 * RETURNS
-*   
+*
 * AUTHOR
 *
 *   Dieter Bayer
-*   
+*
 * DESCRIPTION
 *
 *   Calculate the normal of the torus in a given point.
@@ -357,35 +359,35 @@ bool Torus::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 
 void Torus::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread) const
 {
-	DBL dist;
-	Vector3d P, N, M;
+    DBL dist;
+    Vector3d P, N, M;
 
-	/* Transform the point into the torus space. */
+    /* Transform the point into the torus space. */
 
-	MInvTransPoint(P, Inter->IPoint, Trans);
+    MInvTransPoint(P, Inter->IPoint, Trans);
 
-	/* Get normal from derivatives. */
+    /* Get normal from derivatives. */
 
-	dist = sqrt(P[X] * P[X] + P[Z] * P[Z]);
+    dist = sqrt(P[X] * P[X] + P[Z] * P[Z]);
 
-	if (dist > EPSILON)
-	{
-		M[X] = MajorRadius * P[X] / dist;
-		M[Y] = 0.0;
-		M[Z] = MajorRadius * P[Z] / dist;
-	}
-	else
-	{
-		M = Vector3d(0.0, 0.0, 0.0);
-	}
+    if (dist > EPSILON)
+    {
+        M[X] = MajorRadius * P[X] / dist;
+        M[Y] = 0.0;
+        M[Z] = MajorRadius * P[Z] / dist;
+    }
+    else
+    {
+        M = Vector3d(0.0, 0.0, 0.0);
+    }
 
-	N = P - M;
+    N = P - M;
 
-	/* Transform the normalt out of the torus space. */
+    /* Transform the normalt out of the torus space. */
 
-	MTransNormal(Result, N, Trans);
+    MTransNormal(Result, N, Trans);
 
-	Result.normalize();
+    Result.normalize();
 }
 
 
@@ -400,13 +402,13 @@ void Torus::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Threa
 *
 *   Object - Object
 *   Vector - Translation vector
-*   
+*
 * OUTPUT
 *
 *   Object
-*   
+*
 * RETURNS
-*   
+*
 * AUTHOR
 *
 *   Dieter Bayer
@@ -423,7 +425,7 @@ void Torus::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Threa
 
 void Torus::Translate(const Vector3d&, const TRANSFORM *tr)
 {
-	Transform(tr);
+    Transform(tr);
 }
 
 
@@ -438,17 +440,17 @@ void Torus::Translate(const Vector3d&, const TRANSFORM *tr)
 *
 *   Object - Object
 *   Vector - Rotation vector
-*   
+*
 * OUTPUT
 *
 *   Object
-*   
+*
 * RETURNS
-*   
+*
 * AUTHOR
 *
 *   Dieter Bayer
-*   
+*
 * DESCRIPTION
 *
 *   Rotate a torus.
@@ -461,7 +463,7 @@ void Torus::Translate(const Vector3d&, const TRANSFORM *tr)
 
 void Torus::Rotate(const Vector3d&, const TRANSFORM *tr)
 {
-	Transform(tr);
+    Transform(tr);
 }
 
 
@@ -476,17 +478,17 @@ void Torus::Rotate(const Vector3d&, const TRANSFORM *tr)
 *
 *   Object - Object
 *   Vector - Scaling vector
-*   
+*
 * OUTPUT
 *
 *   Object
-*   
+*
 * RETURNS
-*   
+*
 * AUTHOR
 *
 *   Dieter Bayer
-*   
+*
 * DESCRIPTION
 *
 *   Scale a torus.
@@ -499,7 +501,7 @@ void Torus::Rotate(const Vector3d&, const TRANSFORM *tr)
 
 void Torus::Scale(const Vector3d&, const TRANSFORM *tr)
 {
-	Transform(tr);
+    Transform(tr);
 }
 
 
@@ -514,17 +516,17 @@ void Torus::Scale(const Vector3d&, const TRANSFORM *tr)
 *
 *   Object - Object
 *   Trans  - Transformation to apply
-*   
+*
 * OUTPUT
 *
 *   Object
-*   
+*
 * RETURNS
-*   
+*
 * AUTHOR
 *
 *   Dieter Bayer
-*   
+*
 * DESCRIPTION
 *
 *   Transform a torus and recalculate its bounding box.
@@ -537,12 +539,12 @@ void Torus::Scale(const Vector3d&, const TRANSFORM *tr)
 
 void Torus::Transform(const TRANSFORM *tr)
 {
-	if(Trans == NULL)
-		Trans = Create_Transform();
+    if(Trans == NULL)
+        Trans = Create_Transform();
 
-	Compose_Transforms(Trans, tr);
+    Compose_Transforms(Trans, tr);
 
-	Compute_BBox();
+    Compute_BBox();
 }
 
 
@@ -554,17 +556,17 @@ void Torus::Transform(const TRANSFORM *tr)
 *   Create_Torus
 *
 * INPUT
-*   
+*
 * OUTPUT
-*   
+*
 * RETURNS
 *
 *   TORUS * - new torus
-*   
+*
 * AUTHOR
 *
 *   Dieter Bayer
-*   
+*
 * DESCRIPTION
 *
 *   Create a new torus.
@@ -577,10 +579,10 @@ void Torus::Transform(const TRANSFORM *tr)
 
 Torus::Torus() : ObjectBase(TORUS_OBJECT)
 {
-	Trans = Create_Transform();
+    Trans = Create_Transform();
 
-	MajorRadius = 0.0;
-	MinorRadius = 0.0;
+    MajorRadius = 0.0;
+    MinorRadius = 0.0;
 }
 
 
@@ -594,17 +596,17 @@ Torus::Torus() : ObjectBase(TORUS_OBJECT)
 * INPUT
 *
 *   Object - Object
-*   
+*
 * OUTPUT
-*   
+*
 * RETURNS
 *
 *   void * - New torus
-*   
+*
 * AUTHOR
 *
 *   Dieter Bayer
-*   
+*
 * DESCRIPTION
 *
 *   Copy a torus.
@@ -619,13 +621,13 @@ Torus::Torus() : ObjectBase(TORUS_OBJECT)
 
 ObjectPtr Torus::Copy()
 {
-	Torus *New = new Torus();
+    Torus *New = new Torus();
 
-	Destroy_Transform(New->Trans);
-	*New = *this;
-	New->Trans = Copy_Transform(Trans);
+    Destroy_Transform(New->Trans);
+    *New = *this;
+    New->Trans = Copy_Transform(Trans);
 
-	return (New);
+    return (New);
 }
 
 
@@ -639,17 +641,17 @@ ObjectPtr Torus::Copy()
 * INPUT
 *
 *   Object - Object
-*   
+*
 * OUTPUT
 *
 *   Object
-*   
+*
 * RETURNS
-*   
+*
 * AUTHOR
 *
 *   Dieter Bayer
-*   
+*
 * DESCRIPTION
 *
 *   Destroy a torus.
@@ -662,7 +664,7 @@ ObjectPtr Torus::Copy()
 
 Torus::~Torus()
 {
-	Destroy_Transform(Trans);
+    Destroy_Transform(Trans);
 }
 
 
@@ -676,17 +678,17 @@ Torus::~Torus()
 * INPUT
 *
 *   Torus - Torus
-*   
+*
 * OUTPUT
 *
 *   Torus
-*   
+*
 * RETURNS
-*   
+*
 * AUTHOR
 *
 *   Dieter Bayer
-*   
+*
 * DESCRIPTION
 *
 *   Calculate the bounding box of a torus.
@@ -699,14 +701,14 @@ Torus::~Torus()
 
 void Torus::Compute_BBox()
 {
-	DBL r1, r2;
+    DBL r1, r2;
 
-	r1 = MinorRadius;
-	r2 = MajorRadius + MinorRadius;
+    r1 = MinorRadius;
+    r2 = MajorRadius + MinorRadius;
 
-	Make_BBox(BBox, -r2, -r1, -r2, 2.0 * r2, 2.0 * r1, 2.0 * r2);
+    Make_BBox(BBox, -r2, -r1, -r2, 2.0 * r2, 2.0 * r1, 2.0 * r2);
 
-	Recompute_BBox(&BBox, Trans);
+    Recompute_BBox(&BBox, Trans);
 }
 
 
@@ -725,17 +727,17 @@ void Torus::Compute_BBox()
 *   h2 - Height 2
 *   r1 - Square of inner radius
 *   r2 - Square of outer radius
-*   
+*
 * OUTPUT
-*   
+*
 * RETURNS
 *
 *   int - true, if hit
-*   
+*
 * AUTHOR
 *
 *   Dieter Bayer
-*   
+*
 * DESCRIPTION
 *
 *   Test if a given ray defined in the lathe's coordinate system
@@ -749,131 +751,131 @@ void Torus::Compute_BBox()
 
 bool Torus::Test_Thick_Cylinder(const Vector3d& P, const Vector3d& D, DBL h1, DBL h2, DBL r1, DBL r2) const
 {
-	DBL a, b, c, d;
-	DBL u, v, k, r, h;
+    DBL a, b, c, d;
+    DBL u, v, k, r, h;
 
-	if (fabs(D[Y]) < EPSILON)
-	{
-		if ((P[Y] < h1) || (P[Y] > h2))
-		{
-			return(false);
-		}
-	}
-	else
-	{
-		/* Intersect ray with the cap-plane. */
+    if (fabs(D[Y]) < EPSILON)
+    {
+        if ((P[Y] < h1) || (P[Y] > h2))
+        {
+            return(false);
+        }
+    }
+    else
+    {
+        /* Intersect ray with the cap-plane. */
 
-		k = (h2 - P[Y]) / D[Y];
+        k = (h2 - P[Y]) / D[Y];
 
-		u = P[X] + k * D[X];
-		v = P[Z] + k * D[Z];
+        u = P[X] + k * D[X];
+        v = P[Z] + k * D[Z];
 
-		if ((k > EPSILON) && (k < MAX_DISTANCE))
-		{
-			r = u * u + v * v;
+        if ((k > EPSILON) && (k < MAX_DISTANCE))
+        {
+            r = u * u + v * v;
 
-			if ((r >= r1) && (r <= r2))
-			{
-				return(true);
-			}
-		}
+            if ((r >= r1) && (r <= r2))
+            {
+                return(true);
+            }
+        }
 
-		/* Intersectionersect ray with the base-plane. */
+        /* Intersectionersect ray with the base-plane. */
 
-		k = (h1 - P[Y]) / D[Y];
+        k = (h1 - P[Y]) / D[Y];
 
-		u = P[X] + k * D[X];
-		v = P[Z] + k * D[Z];
+        u = P[X] + k * D[X];
+        v = P[Z] + k * D[Z];
 
-		if ((k > EPSILON) && (k < MAX_DISTANCE))
-		{
-			r = u * u + v * v;
+        if ((k > EPSILON) && (k < MAX_DISTANCE))
+        {
+            r = u * u + v * v;
 
-			if ((r >= r1) && (r <= r2))
-			{
-				return(true);
-			}
-		}
-	}
+            if ((r >= r1) && (r <= r2))
+            {
+                return(true);
+            }
+        }
+    }
 
-	a = D[X] * D[X] + D[Z] * D[Z];
+    a = D[X] * D[X] + D[Z] * D[Z];
 
-	if (a > EPSILON)
-	{
-		/* Intersect with outer cylinder. */
+    if (a > EPSILON)
+    {
+        /* Intersect with outer cylinder. */
 
-		b = P[X] * D[X] + P[Z] * D[Z];
+        b = P[X] * D[X] + P[Z] * D[Z];
 
-		c = P[X] * P[X] + P[Z] * P[Z] - r2;
+        c = P[X] * P[X] + P[Z] * P[Z] - r2;
 
-		d = b * b - a * c;
+        d = b * b - a * c;
 
-		if (d >= 0.0)
-		{
-			d = sqrt(d);
+        if (d >= 0.0)
+        {
+            d = sqrt(d);
 
-			k = (-b + d) / a;
+            k = (-b + d) / a;
 
-			if ((k > EPSILON) && (k < MAX_DISTANCE))
-			{
-				h = P[Y] + k * D[Y];
+            if ((k > EPSILON) && (k < MAX_DISTANCE))
+            {
+                h = P[Y] + k * D[Y];
 
-				if ((h >= h1) && (h <= h2))
-				{
-					return(true);
-				}
-			}
+                if ((h >= h1) && (h <= h2))
+                {
+                    return(true);
+                }
+            }
 
-			k = (-b - d) / a;
+            k = (-b - d) / a;
 
-			if ((k > EPSILON) && (k < MAX_DISTANCE))
-			{
-				h = P[Y] + k * D[Y];
+            if ((k > EPSILON) && (k < MAX_DISTANCE))
+            {
+                h = P[Y] + k * D[Y];
 
-				if ((h >= h1) && (h <= h2))
-				{
-					return(true);
-				}
-			}
-		}
+                if ((h >= h1) && (h <= h2))
+                {
+                    return(true);
+                }
+            }
+        }
 
-		/* Intersect with inner cylinder. */
+        /* Intersect with inner cylinder. */
 
-		c = P[X] * P[X] + P[Z] * P[Z] - r1;
+        c = P[X] * P[X] + P[Z] * P[Z] - r1;
 
-		d = b * b - a * c;
+        d = b * b - a * c;
 
-		if (d >= 0.0)
-		{
-			d = sqrt(d);
+        if (d >= 0.0)
+        {
+            d = sqrt(d);
 
-			k = (-b + d) / a;
+            k = (-b + d) / a;
 
-			if ((k > EPSILON) && (k < MAX_DISTANCE))
-			{
-				h = P[Y] + k * D[Y];
+            if ((k > EPSILON) && (k < MAX_DISTANCE))
+            {
+                h = P[Y] + k * D[Y];
 
-				if ((h >= h1) && (h <= h2))
-				{
-					return(true);
-				}
-			}
+                if ((h >= h1) && (h <= h2))
+                {
+                    return(true);
+                }
+            }
 
-			k = (-b - d) / a;
+            k = (-b - d) / a;
 
-			if ((k > EPSILON) && (k < MAX_DISTANCE))
-			{
-				h = P[Y] + k * D[Y];
+            if ((k > EPSILON) && (k < MAX_DISTANCE))
+            {
+                h = P[Y] + k * D[Y];
 
-				if ((h >= h1) && (h <= h2))
-				{
-					return(true);
-				}
-			}
-		}
-	}
+                if ((h >= h1) && (h <= h2))
+                {
+                    return(true);
+                }
+            }
+        }
+    }
 
-	return(false);
+    return(false);
 }
 
 
@@ -884,13 +886,13 @@ bool Torus::Test_Thick_Cylinder(const Vector3d& P, const Vector3d& D, DBL h1, DB
 *   Torus_UVCoord
 *
 * INPUT
-*   
+*
 * OUTPUT
-*   
+*
 * RETURNS
-*   
+*
 * AUTHOR
-*   
+*
 * DESCRIPTION
 *
 *   -
@@ -903,7 +905,7 @@ bool Torus::Test_Thick_Cylinder(const Vector3d& P, const Vector3d& D, DBL h1, DB
 
 void Torus::UVCoord(Vector2d& Result, const Intersection *Inter, TraceThreadData *Thread) const
 {
-	CalcUV(Inter->IPoint, Result);
+    CalcUV(Inter->IPoint, Result);
 }
 
 
@@ -914,13 +916,13 @@ void Torus::UVCoord(Vector2d& Result, const Intersection *Inter, TraceThreadData
 *   CalcUV
 *
 * INPUT
-*   
+*
 * OUTPUT
-*   
+*
 * RETURNS
-*   
+*
 * AUTHOR
-*   
+*
 * DESCRIPTION
 *
 *   Calculate the u/v coordinate of a point on a torus
@@ -935,26 +937,26 @@ void Torus::UVCoord(Vector2d& Result, const Intersection *Inter, TraceThreadData
 
 void Torus::CalcUV(const Vector3d& IPoint, Vector2d& Result) const
 {
-	DBL len, v, u, x, y, z;
-	Vector3d P;
+    DBL len, v, u, x, y, z;
+    Vector3d P;
 
-	// Transform the ray into the torus space.
-	MInvTransPoint(P, IPoint, Trans);
-	x = P[X];
-	y = P[Y];
-	z = P[Z];
+    // Transform the ray into the torus space.
+    MInvTransPoint(P, IPoint, Trans);
+    x = P[X];
+    y = P[Y];
+    z = P[Z];
 
-	// Determine its angle from the y-axis.
-	u = (1.0 - (atan2(z, x) + M_PI) / TWO_M_PI);
+    // Determine its angle from the y-axis.
+    u = (1.0 - (atan2(z, x) + M_PI) / TWO_M_PI);
 
-	len = sqrt(x * x + z * z);
+    len = sqrt(x * x + z * z);
 
-	// Now rotate about the y-axis to get the point P into the x-z plane.
-	x = len - MajorRadius;
-	v = (atan2(y, x) + M_PI) / TWO_M_PI;
+    // Now rotate about the y-axis to get the point P into the x-z plane.
+    x = len - MajorRadius;
+    v = (atan2(y, x) + M_PI) / TWO_M_PI;
 
-	Result[U] = u;
-	Result[V] = v;
+    Result[U] = u;
+    Result[V] = v;
 }
 
 }

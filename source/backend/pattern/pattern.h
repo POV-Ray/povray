@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -50,6 +50,7 @@
 #endif
 
 #include "backend/frame.h"
+#include "backend/texture/pigment.h"
 #include "base/fileinputoutput.h"
 
 namespace pov
@@ -129,8 +130,6 @@ enum PATTERN_IDS
 #define POST_DONE             4
 #define DONT_SCALE_BUMPS_FLAG 8 /* scale bumps for normals */
 
-#define Destroy_Turb(t) if ((t)!=NULL) POV_FREE(t);
-
 enum WaveType
 {
     kWaveType_Ramp,     ///< Ramps up from 0 to 1, then drops sharply back to 0, and repeats.
@@ -180,7 +179,7 @@ class ImageData;
 ///         avoid excessive changes to the parser and render engine during the refactoring process, and was deemed
 ///         acceptable because:
 ///           - These data fields do not represent any state information, but rather simple configuration parameters.
-///           - None of the current implementations stores any interim results computed from these parameters.    
+///           - None of the current implementations stores any interim results computed from these parameters.
 ///           .
 ///         Changing these parameters directly at run-time is therefore a safe operation.
 ///
@@ -191,7 +190,7 @@ struct BasicPattern
     unsigned char noiseGenerator;
 
     /// List of warps applied to the pattern.
-    WARP *pWarps;
+    WarpList warps;
 
     /// Default constructor.
     BasicPattern();
@@ -214,7 +213,7 @@ struct BasicPattern
     int GetNoiseGen(const TraceThreadData *pThread) const;
 
     /// Generates an independent copy of this pattern.
-    /// 
+    ///
     /// This method effectively serves as a virtual copy constructor. Every derived class must override it with the
     /// following implementation:
     ///
@@ -265,7 +264,7 @@ struct BasicPattern
     virtual ColourBlendMapConstPtr GetDefaultBlendMap() const;
 
     /// Number of discrete colours, textures, or whatever, from which the pattern will select.
-    /// 
+    ///
     /// This function will be called by future parsers to determine the possible discrete values returned by this
     /// pattern, or whether the pattern is contiguous.
     ///
@@ -276,6 +275,12 @@ struct BasicPattern
     ///             evaluate to a value from the contiguous interval [0...1].
     ///
     virtual unsigned int NumDiscreteBlendMapEntries() const = 0;
+
+    /// Whether the pattern has its own special turbulence handling.
+    ///
+    /// @return     `true` if the pattern has its own special turbulence handling.
+    ///
+    virtual bool HasSpecialTurbulenceHandling() const;
 
 protected:
 
@@ -362,6 +367,7 @@ struct PlainPattern : public DiscretePattern
     virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
     virtual DBL Evaluate(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const;
     virtual unsigned int NumDiscreteBlendMapEntries() const;
+    virtual bool HasSpecialTurbulenceHandling() const;
 };
 
 /// Implements the `agate` pattern.
@@ -516,7 +522,7 @@ struct FractalPattern : public ContinuousPattern
     DBL exteriorFactor;
 
     /// A parameter to the algorithm for colouring the interior of the fractal.
-    DBL interiorFactor; 
+    DBL interiorFactor;
 
     /// Determines the algorithm to colour the exterior of the fractal.
     unsigned char exteriorType;
@@ -624,6 +630,7 @@ struct MarblePattern : public ContinuousPattern
     virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
     virtual DBL EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const;
     virtual ColourBlendMapConstPtr GetDefaultBlendMap() const;
+    virtual bool HasSpecialTurbulenceHandling() const;
 };
 
 /// Base class for the noise-based patterns.
@@ -806,6 +813,7 @@ struct WoodPattern : public ContinuousPattern
     virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
     virtual DBL EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const;
     virtual ColourBlendMapConstPtr GetDefaultBlendMap() const;
+    virtual bool HasSpecialTurbulenceHandling() const;
 };
 
 /// Implements the `wrinkles` pattern.
@@ -1038,7 +1046,6 @@ typedef boost::unordered_map<CrackleCellCoord, CrackleCacheEntry, boost::hash<Cr
 DBL Evaluate_TPat (const TPATTERN *TPat, const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread);
 void Init_TPat_Fields (TPATTERN *Tpat);
 void Copy_TPat_Fields (TPATTERN *New, const TPATTERN *Old);
-void Destroy_TPat_Fields (TPATTERN *Tpat);
 void Translate_Tpattern (TPATTERN *Tpattern, const Vector3d& Vector);
 void Rotate_Tpattern (TPATTERN *Tpattern, const Vector3d& Vector);
 void Scale_Tpattern (TPATTERN *Tpattern, const Vector3d& Vector);

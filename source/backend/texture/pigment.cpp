@@ -15,7 +15,7 @@
 /// ----------------------------------------------------------------------------
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -44,13 +44,13 @@
 #include "backend/frame.h"
 #include "backend/texture/pigment.h"
 
-#include "base/pov_err.h"
 #include "backend/colour/colour_old.h"
 #include "backend/pattern/pattern.h"
 #include "backend/pattern/warps.h"
 #include "backend/scene/scene.h"
 #include "backend/scene/threaddata.h"
 #include "backend/support/imageutil.h"
+#include "base/pov_err.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -209,11 +209,7 @@ void Copy_Pigments (vector<PIGMENT*>& New, const vector<PIGMENT*>& Old)
 void Destroy_Pigment (PIGMENT *Pigment)
 {
     if (Pigment != NULL)
-    {
-        Destroy_TPat_Fields (Pigment);
-
         delete Pigment;
-    }
 }
 
 
@@ -260,7 +256,7 @@ void Post_Pigment(PIGMENT *Pigment, bool* pHasFilter)
     {
         Pigment->Type = PLAIN_PATTERN;
 
-        Pigment->colour.Clear() ;
+        Pigment->colour.Clear();
 
 ;// TODO MESSAGE    Warning(150, "No pigment type given.");
     }
@@ -287,7 +283,7 @@ void Post_Pigment(PIGMENT *Pigment, bool* pHasFilter)
                 {
                     // NB: The const default blend maps are marked so that they will not be modified nor destroyed later.
                     case AVERAGE_PATTERN:
-                        // TODO MESSAGE Error("Missing pigment_map in average pigment"); 
+                        // TODO MESSAGE Error("Missing pigment_map in average pigment");
                         break;
 
                     default:

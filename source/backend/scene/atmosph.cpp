@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -40,12 +40,10 @@
 #include "backend/scene/atmosph.h"
 
 #include "backend/math/matrices.h"
-#include "backend/math/vector.h"
+#include "backend/pattern/pattern.h"
 #include "backend/pattern/warps.h"
 #include "backend/texture/pigment.h"
 #include "backend/texture/texture.h"
-
-#include "povray.h" // TODO
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -145,7 +143,7 @@ FOG *Copy_Fog(const FOG *Old)
 
     *New = *Old;
 
-    New->Turb = reinterpret_cast<TURB *>(Copy_Warps((reinterpret_cast<WARP *>(Old->Turb))));
+    New->Turb = new TurbulenceWarp();
 
     return (New);
 }
@@ -183,11 +181,7 @@ FOG *Copy_Fog(const FOG *Old)
 void Destroy_Fog(FOG *Fog)
 {
     if (Fog != NULL)
-    {
-        Destroy_Turb(Fog->Turb);
-
         delete Fog;
-    }
 }
 
 
@@ -323,11 +317,7 @@ RAINBOW *Copy_Rainbow(const RAINBOW *Old)
 void Destroy_Rainbow(RAINBOW *Rainbow)
 {
     if (Rainbow != NULL)
-    {
-        Destroy_Pigment(Rainbow->Pigment);
-
         delete Rainbow;
-    }
 }
 
 
@@ -460,16 +450,7 @@ SKYSPHERE *Copy_Skysphere(const SKYSPHERE *Old)
 void Destroy_Skysphere(SKYSPHERE *Skysphere)
 {
     if (Skysphere != NULL)
-    {
-        for (vector<PIGMENT*>::iterator i = Skysphere->Pigments.begin(); i != Skysphere->Pigments.end(); ++ i)
-        {
-            Destroy_Pigment(*i);
-        }
-
-        Destroy_Transform(Skysphere->Trans);
-
         delete Skysphere;
-    }
 }
 
 

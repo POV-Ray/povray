@@ -46,6 +46,7 @@
 #include "base/povmsgid.h"
 #include "base/stringutilities.h"
 #include "backend/parser/parse.h"
+#include "backend/pattern/pattern.h"
 #include "backend/colour/colour_old.h"
 #include "backend/texture/texture.h"
 #include "backend/math/matrices.h"
@@ -177,7 +178,7 @@ void Parser::pre_init_tokenizer ()
     Table_Index         = -1;
 
     Input_File = &Include_Files[0];
-    Include_Files[0].In_File = NULL ;
+    Include_Files[0].In_File = NULL;
 
     for(i = 0; i < LAST_TOKEN; i++)
     {
@@ -218,7 +219,7 @@ void Parser::pre_init_tokenizer ()
 
 void Parser::Terminate_Tokenizer()
 {
-    Token.FileHandle = NULL ;
+    Token.FileHandle = NULL;
 
     while(Table_Index >= 0)
     {
@@ -351,7 +352,7 @@ void Parser::Get_Token ()
                 Token.FileHandle = NULL;
 
             delete Input_File->In_File; /* added to fix open file buildup JLN 12/91 */
-            Input_File->In_File = NULL ;
+            Input_File->In_File = NULL;
             Got_EOF=false;
 
             Destroy_Table(Table_Index--);
@@ -1299,7 +1300,7 @@ void Parser::Read_Symbol()
                 {
                     if ((Temp_Entry->Flags & TF_DEPRECATED_ONCE) != 0)
                         Temp_Entry->Flags |= TF_DEPRECATED_SHOWN;
-                    Warning(0, "%s", Temp_Entry->Deprecation_Message);
+                    Warning("%s", Temp_Entry->Deprecation_Message);
                 }
 
                 if (Temp_Entry->Token_Number==MACRO_ID_TOKEN)
@@ -1429,7 +1430,7 @@ const char *Parser::Get_Token_String (TOKEN Token_Id)
 {
     register int i;
 
-    for (i = 0 ; i < LAST_TOKEN ; i++)
+    for (i = 0; i < LAST_TOKEN; i++)
         if (Reserved_Words[i].Token_Number == Token_Id)
             return (Reserved_Words[i].Token_Name);
     return ("");
@@ -1463,35 +1464,35 @@ const char *Parser::Get_Token_String (TOKEN Token_Id)
 
 char *Parser::Get_Reserved_Words (const char *additional_words)
 {
-    int length = 0 ;
-    int i ;
+    int length = 0;
+    int i;
 
     for (i = 0; i < LAST_TOKEN; i++)
     {
         if (!isalpha (Reserved_Words [i].Token_Name [0]))
-            continue ;
+            continue;
         if (strchr (Reserved_Words [i].Token_Name, ' ') != NULL)
-            continue ;
-        length += (int)strlen (Reserved_Words[i].Token_Name) + 1 ;
+            continue;
+        length += (int)strlen (Reserved_Words[i].Token_Name) + 1;
     }
 
-    length += (int)strlen (additional_words) ;
+    length += (int)strlen (additional_words);
 
-    char *result = reinterpret_cast<char *>(POV_MALLOC (++length, "Keyword List")) ;
-    strcpy (result, additional_words) ;
-    char *s = result + strlen (additional_words) ;
+    char *result = reinterpret_cast<char *>(POV_MALLOC (++length, "Keyword List"));
+    strcpy (result, additional_words);
+    char *s = result + strlen (additional_words);
 
-    for (i = 0 ; i < LAST_TOKEN ; i++)
+    for (i = 0; i < LAST_TOKEN; i++)
     {
         if (!isalpha (Reserved_Words [i].Token_Name [0]))
-            continue ;
+            continue;
         if (strchr (Reserved_Words [i].Token_Name, ' ') != NULL)
-            continue ;
-        s += sprintf (s, "%s\n", Reserved_Words[i].Token_Name) ;
+            continue;
+        s += sprintf (s, "%s\n", Reserved_Words[i].Token_Name);
     }
-    *--s = '\0' ;
+    *--s = '\0';
 
-    return (result) ;
+    return (result);
 }
 
 
@@ -1521,9 +1522,9 @@ int Parser::Echo_getc()
     {
         if (Got_EOF)
             return EOF;
-        Got_EOF = true ;
-        Echo_Indx = 0 ;
-        return ('\n') ;
+        Got_EOF = true;
+        Echo_Indx = 0;
+        return ('\n');
     }
 
     Echo_Indx++;
@@ -1652,7 +1653,7 @@ void Parser::Parse_Directive(int After_Hash)
     DBL Value, Value2;
     int Flag;
     char *ts;
-    POV_MACRO *PMac=NULL;
+    Macro *PMac=NULL;
     COND_TYPE Curr_Type = Cond_Stack[CS_Index].Cond_Type;
     POV_LONG Hash_Loc = Input_File->In_File->tellg().offset;
 
@@ -2172,9 +2173,9 @@ void Parser::Parse_Directive(int After_Hash)
                         else
                             Unget_Token();
                         sceneData->languageVersion = (int)(Parse_Float() * 100 + 0.5);
-                        messageFactory.SetLanguageVersion(sceneData->languageVersion);
                         if (sceneData->explicitNoiseGenerator == false)
-                            sceneData->noiseGenerator = sceneData->languageVersion >= 350 ? kNoiseGen_Original : kNoiseGen_RangeCorrected;
+                            sceneData->noiseGenerator = (sceneData->EffectiveLanguageVersion() >= 350 ?
+                                                         kNoiseGen_Original : kNoiseGen_RangeCorrected);
                         // [CLi] if assumed_gamma is not specified in a legacy (3.6.x or earlier) scene, gammaMode defaults to kPOVList_GammaMode_None;
                         // this is enforced later anyway after parsing, but we may need this information /now/ during parsing already
                         switch (sceneData->gammaMode)
@@ -2196,9 +2197,9 @@ void Parser::Parse_Directive(int After_Hash)
                         }
                         Parse_Semi_Colon(false);
 
-                        if (sceneData->languageVersion > OFFICIAL_VERSION_NUMBER)
+                        if (sceneData->EffectiveLanguageVersion() > OFFICIAL_VERSION_NUMBER)
                         {
-                            Error("Your scene file requires POV-Ray version %g or later!\n", (DBL)(sceneData->languageVersion / 100.0));
+                            Error("Your scene file requires POV-Ray version %g or later!\n", (DBL)(sceneData->EffectiveLanguageVersion() / 100.0));
                         }
 
                         Ok_To_Declare = true;
@@ -2234,7 +2235,7 @@ void Parser::Parse_Directive(int After_Hash)
                     ts[124] = ts[125] = ts[126] = '.';
                     ts[127] = 0;
                 }
-                Warning(0, "%s", ts);
+                Warning("%s", ts);
                 POV_FREE(ts);
             }
             EXIT
@@ -2264,7 +2265,7 @@ void Parser::Parse_Directive(int After_Hash)
    Both streams are now directed into the debug stream. */
         CASE(RENDER_TOKEN)
         CASE(STATISTICS_TOKEN)
-                Warning(0, "#render and #statistics streams are no longer available.\nRedirecting output to #debug stream.");
+            Warning("#render and #statistics streams are no longer available.\nRedirecting output to #debug stream.");
             // Intentional, redirect output to debug stream.
         CASE(DEBUG_TOKEN)
             if (Skipping)
@@ -2343,7 +2344,7 @@ void Parser::Parse_Directive(int After_Hash)
                 Ok_To_Declare = false;
                 EXPECT
                     CASE (IDENTIFIER_TOKEN)
-                        Warning(0,"Attempt to undef unknown identifier");
+                        Warning("Attempt to undef unknown identifier");
                         EXIT
                     END_CASE
 
@@ -2897,16 +2898,16 @@ void Parser::Remove_Symbol (int Index, const char *Name, bool is_array_elem, voi
 
 void Parser::Check_Macro_Vers(void)
 {
-    if (sceneData->languageVersion < 310)
+    if (sceneData->EffectiveLanguageVersion() < 310)
     {
         Error("Macros require #version 3.1 or later but #version %x.%02d is set.",
-               sceneData->languageVersion / 100, sceneData->languageVersion % 100);
+               sceneData->EffectiveLanguageVersion() / 100, sceneData->EffectiveLanguageVersion() % 100);
     }
 }
 
-Parser::POV_MACRO *Parser::Parse_Macro()
+Parser::Macro *Parser::Parse_Macro()
 {
-    POV_MACRO *New;
+    Macro *New;
     SYM_ENTRY *Table_Entry=NULL;
     int Old_Ok = Ok_To_Declare;
 
@@ -2931,13 +2932,12 @@ Parser::POV_MACRO *Parser::Parse_Macro()
         END_CASE
     END_EXPECT
 
-    New=reinterpret_cast<POV_MACRO *>(POV_MALLOC(sizeof(POV_MACRO),"macro"));
+    New = new Macro(Token.Token_String);
 
     Table_Entry->Data=reinterpret_cast<void *>(New);
 
     New->Macro_Filename = NULL;
     New->Num_Of_Pars=0;
-    New->Macro_Name=POV_STRDUP(Token.Token_String);
 
     EXPECT
         CASE (LEFT_PAREN_TOKEN )
@@ -3019,14 +3019,14 @@ Parser::POV_MACRO *Parser::Parse_Macro()
 
 void Parser::Invoke_Macro()
 {
-    POV_MACRO *PMac=reinterpret_cast<POV_MACRO *>(Token.Data);
+    Macro *PMac=reinterpret_cast<Macro *>(Token.Data);
     SYM_ENTRY **Table_Entries=NULL;
     int i,Local_Index;
 
     if(PMac == NULL)
     {
         if(Token.DataPtr!=NULL)
-            PMac = reinterpret_cast<POV_MACRO*>(*(Token.DataPtr));
+            PMac = reinterpret_cast<Macro*>(*(Token.DataPtr));
         else
             Error("Error in Invoke_Macro");
     }
@@ -3083,7 +3083,7 @@ void Parser::Invoke_Macro()
         UCS2String ign;
         /* Not in same file */
         Cond_Stack[CS_Index].Macro_Same_Flag=false;
-        Cond_Stack[CS_Index].Macro_File = Input_File->In_File ;
+        Cond_Stack[CS_Index].Macro_File = Input_File->In_File;
 //  POV_DELETE(Input_File->In_File, IStream);
         Got_EOF=false;
         Input_File->R_Flag=false;
@@ -3124,7 +3124,7 @@ void Parser::Return_From_Macro()
             Token.FileHandle = NULL;
         delete Input_File->In_File;
         Input_File->R_Flag=false;
-        Input_File->In_File = Cond_Stack[CS_Index].Macro_File ;
+        Input_File->In_File = Cond_Stack[CS_Index].Macro_File;
         if (Token.FileHandle == NULL)
             Token.FileHandle = Input_File->In_File;
     }
@@ -3140,26 +3140,26 @@ void Parser::Return_From_Macro()
     Destroy_Table(Table_Index--);
 }
 
-void Parser::Destroy_Macro(POV_MACRO *PMac)
+Parser::Macro::Macro(const char *s) :
+    Macro_Name(POV_STRDUP(s)),
+    Macro_Filename(NULL),
+    Num_Of_Pars(0)
+{}
+
+Parser::Macro::~Macro()
 {
     int i;
-    if (PMac==NULL)
+
+    POV_FREE(Macro_Name);
+    if (Macro_Filename!=NULL)
     {
-        return;
+        POV_FREE(Macro_Filename);
     }
 
-    POV_FREE(PMac->Macro_Name);
-    if (PMac->Macro_Filename!=NULL)
+    for (i=0; i < Num_Of_Pars; i++)
     {
-        POV_FREE(PMac->Macro_Filename);
+        POV_FREE(Par_Name[i]);
     }
-
-    for (i=0; i < PMac->Num_Of_Pars; i++)
-    {
-        POV_FREE(PMac->Par_Name[i]);
-    }
-
-    POV_FREE(PMac);
 }
 
 Parser::POV_ARRAY *Parser::Parse_Array_Declare (void)
@@ -3563,7 +3563,7 @@ int Parser::Parse_Read_Value(DATA_FILE *User_File,int Previous,int *NumberPtr,vo
     Input_File->In_File = Temp;
     Input_File->R_Flag = Temp_R_Flag;
 
-    return End_File ;
+    return End_File;
 }
 
 void Parser::Parse_Write(void)

@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -42,8 +42,9 @@
 #include "backend/bounding/bbox.h"
 #include "backend/lighting/photonshootingstrategy.h"
 #include "backend/lighting/point.h"
-#include "backend/math/vector.h"
 #include "backend/math/matrices.h"
+#include "backend/pattern/warps.h"
+#include "backend/render/ray.h"
 #include "backend/scene/objects.h"
 #include "backend/scene/scene.h"
 #include "backend/scene/threaddata.h"
@@ -252,7 +253,7 @@ void PhotonTrace::ComputeLightedTexture(LightColour&, ColourChannel&, const Ligh
     LightColour tempLightCol = lightColour;
 
     double relativeIor;
-    ComputeRelativeIOR(ray, isect.Object->interior, relativeIor);
+    ComputeRelativeIOR(ray, isect.Object->interior.get(), relativeIor);
 
     WNRXVector listWNRX(wnrxPool);
     assert(listWNRX->empty()); // verify that the WNRXVector pulled from the pool is in a cleaned-up condition
@@ -305,7 +306,7 @@ void PhotonTrace::ComputeLightedTexture(LightColour&, ColourChannel&, const Ligh
     }
 
     // Get distance based attenuation.
-    interior = isect.Object->interior;
+    interior = isect.Object->interior.get();
     AttCol = AttenuatingColour(interior->Old_Refract);
 
     if (interior != NULL)
@@ -603,7 +604,7 @@ void PhotonTrace::ComputeLightedTexture(LightColour&, ColourChannel&, const Ligh
 
     // If the surface is translucent a transmitted ray is traced
     // and its illunination is filtered by FilCol.
-    if (doRefraction && ((interior = isect.Object->interior) != NULL) && (Trans > ray.GetTicket().adcBailout) && qualityFlags.refractions)
+    if (doRefraction && ((interior = isect.Object->interior.get()) != NULL) && (Trans > ray.GetTicket().adcBailout) && qualityFlags.refractions)
     {
         w1 = FilCol.WeightMax();
         New_Weight = weight * max(w1, 0.0);
@@ -1236,8 +1237,8 @@ SinCosOptimizations::SinCosOptimizations()
 
     // create the sin/cos arrays for speed
     // range is -127..+127  =>  0..254
-    sinTheta = reinterpret_cast<DBL *>(POV_MALLOC(sizeof(DBL)*255, "Photon Map Info"));
-    cosTheta = reinterpret_cast<DBL *>(POV_MALLOC(sizeof(DBL)*255, "Photon Map Info"));
+    sinTheta = new DBL [255];
+    cosTheta = new DBL [255];
     for(i=0; i<255; i++)
     {
         theta = (double)(i-127)*M_PI/127.0;
@@ -1249,11 +1250,11 @@ SinCosOptimizations::SinCosOptimizations()
 SinCosOptimizations::~SinCosOptimizations()
 {
     if (sinTheta)
-        POV_FREE(sinTheta);
+        delete[] sinTheta;
     sinTheta = NULL;
 
     if (cosTheta)
-        POV_FREE(cosTheta);
+        delete[] cosTheta;
     cosTheta = NULL;
 }
 
