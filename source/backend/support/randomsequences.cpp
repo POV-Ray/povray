@@ -41,6 +41,7 @@
 #include <boost/random/uniform_int.hpp>
 #include <boost/random/uniform_real.hpp>
 #include <boost/random/variate_generator.hpp>
+#include <boost/thread.hpp>
 
 // frame.h must always be the first POV file included (pulls in platform config)
 #include "backend/frame.h"

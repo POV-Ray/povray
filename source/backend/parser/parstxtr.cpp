@@ -4760,7 +4760,7 @@ void Parser::Parse_Material(MATERIAL *Material)
             if (Temp->interior != NULL)
                 Material->interior = InteriorPtr(new Interior(*(Temp->interior)));
             else
-                Material->interior = NULL;
+                Material->interior.reset();
             EXIT
         END_CASE
 

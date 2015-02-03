@@ -741,7 +741,7 @@ ObjectPtr Copy_Object (ObjectPtr Old)
     if(Old->interior != NULL)
         New->interior = InteriorPtr(new Interior(*(Old->interior)));
     else
-        New->interior = NULL;
+        New->interior.reset();
 
     /* NK 1998 */
     New->UV_Trans = Copy_Transform(Old->UV_Trans);

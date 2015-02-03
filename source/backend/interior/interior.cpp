@@ -169,7 +169,7 @@ MATERIAL *Create_Material()
 
     New->Texture  = NULL;
     New->Interior_Texture  = NULL;
-    New->interior = NULL;
+    New->interior.reset();
 
     return(New);
 }
