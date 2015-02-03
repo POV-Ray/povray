@@ -178,7 +178,7 @@ class ObjectBase
         /// Construct object from scratch.
         ObjectBase(int t) :
             Type(t),
-            Texture(NULL), Interior_Texture(NULL), interior(NULL), Trans(NULL), UV_Trans(NULL),
+            Texture(NULL), Interior_Texture(NULL), interior(), Trans(NULL), UV_Trans(NULL),
             Ph_Density(0), RadiosityImportance(0.0), Flags(0)
         {
             Make_BBox(BBox, -BOUND_HUGE/2.0, -BOUND_HUGE/2.0, -BOUND_HUGE/2.0, BOUND_HUGE, BOUND_HUGE, BOUND_HUGE);
@@ -200,7 +200,7 @@ class ObjectBase
             {
                 o.Texture = NULL;
                 o.Interior_Texture = NULL;
-                o.interior = NULL;
+                o.interior.reset();
                 o.Trans = NULL;
                 o.UV_Trans = NULL;
                 o.Bound.clear();

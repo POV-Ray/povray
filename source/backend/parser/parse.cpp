@@ -9429,7 +9429,7 @@ void Parser::Post_Process (ObjectPtr Object, ObjectPtr Parent)
         {
             if ((reinterpret_cast<LightSource *>(Object))->Projected_Through_Object->interior != NULL)
             {
-                (reinterpret_cast<LightSource *>(Object))->Projected_Through_Object->interior = NULL;
+                (reinterpret_cast<LightSource *>(Object))->Projected_Through_Object->interior.reset();
                 Warning("Projected through objects can not have interior, interior removed.");
             }
             if ((reinterpret_cast<LightSource *>(Object))->Projected_Through_Object->Texture != NULL)
