@@ -60,7 +60,6 @@
 #include "backend/frame.h"
 #include "backend/support/octree.h"
 
-#include "backend/colour/spectral.h"
 #include "base/fileinputoutput.h"
 #include "base/pov_err.h"
 

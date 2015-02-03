@@ -38,6 +38,7 @@
 #include "backend/frame.h"
 #include "backend/bounding/bcyl.h"
 
+
 // this must be the last file included
 #include "base/povdebug.h"
 
@@ -60,9 +61,9 @@ namespace pov
 * Static functions
 ******************************************************************************/
 
-static int  intersect_thick_cylinder (const BCYL *BCyl, const BCYL_INT *rint, const BCYL_INT *hint, const BCYL_ENTRY *Entry, DBL *dist);
-static void insert_hit (const BCYL_INT *Element, BCYL_INT *intervals, int *cnt);
-static void intersect_bound_elements (const BCYL *BCyl, BCYL_INT *rint, BCYL_INT *hint, const Vector3d& P, const Vector3d& D);
+static int  intersect_thick_cylinder (const BCYL *BCyl, const vector<BCYL_INT>& rint, const vector<BCYL_INT>& hint, const BCYL_ENTRY *Entry, DBL *dist);
+static void insert_hit (const BCYL_INT *Element, vector<BCYL_INT>& intervals);
+static void intersect_bound_elements (const BCYL *BCyl, vector<BCYL_INT>& rint, vector<BCYL_INT>& hint, const Vector3d& P, const Vector3d& D);
 
 
 /*****************************************************************************
@@ -106,7 +107,7 @@ static void intersect_bound_elements (const BCYL *BCyl, BCYL_INT *rint, BCYL_INT
 *
 ******************************************************************************/
 
-static int intersect_thick_cylinder(const BCYL *BCyl, const BCYL_INT *rint, const BCYL_INT *hint, const BCYL_ENTRY *Entry, DBL *dist)
+static int intersect_thick_cylinder(const BCYL *BCyl, const vector<BCYL_INT>& rint, const vector<BCYL_INT>& hint, const BCYL_ENTRY *Entry, DBL *dist)
 {
     int i, j, n;
     DBL k, r, h;
@@ -236,7 +237,7 @@ static int intersect_thick_cylinder(const BCYL *BCyl, const BCYL_INT *rint, cons
 *
 ******************************************************************************/
 
-static void intersect_bound_elements(const BCYL *BCyl, BCYL_INT *rint, BCYL_INT *hint, const Vector3d& P, const Vector3d& D)
+static void intersect_bound_elements(const BCYL *BCyl, vector<BCYL_INT>& rint, vector<BCYL_INT>& hint, const Vector3d& P, const Vector3d& D)
 {
     int i;
     DBL a, b, bb, b2, c, d, k;
@@ -340,23 +341,15 @@ static void intersect_bound_elements(const BCYL *BCyl, BCYL_INT *rint, BCYL_INT 
 *
 ******************************************************************************/
 
-static void insert_hit(const BCYL_INT *element, BCYL_INT *intervals, int *cnt)
+static void insert_hit(const BCYL_INT *element, vector<BCYL_INT>& intervals)
 {
-    int k;
+    // TODO - a heap-based priority queue might be faster
 
-    intervals[*cnt] = *element;
+    vector<BCYL_INT>::iterator k = intervals.begin();
+    while ((k != intervals.end()) && (element->d[0] > k->d[0]))
+        k ++;
 
-    for (k = 0; element->d[0] > intervals[k].d[0]; k++);
-
-    if (k < *cnt)
-    {
-        // Note: this data structure may be worthwhile optimizing
-        POV_MEMMOVE(&intervals[k+1], &intervals[k], (*cnt-k)*sizeof(BCYL_INT));
-
-        intervals[k] = *element;
-    }
-
-    (*cnt)++;
+    intervals.insert(k, *element);
 }
 
 
@@ -395,14 +388,14 @@ static void insert_hit(const BCYL_INT *element, BCYL_INT *intervals, int *cnt)
 *
 ******************************************************************************/
 
-int Intersect_BCyl(const BCYL *BCyl, BCYL_INT *intervals, BCYL_INT *rint, BCYL_INT *hint, const Vector3d& P, const Vector3d& D)
+int Intersect_BCyl(const BCYL *BCyl, vector<BCYL_INT>& intervals, vector<BCYL_INT>& rint, vector<BCYL_INT>& hint, const Vector3d& P, const Vector3d& D)
 {
-    int i, cnt;
+    int i;
     DBL dist[8];
     BCYL_INT Inter;
     BCYL_ENTRY *Entry;
 
-    cnt = 0;
+    intervals.clear();
 
     Inter.d[1] = 0.0;
 
@@ -427,17 +420,14 @@ int Intersect_BCyl(const BCYL *BCyl, BCYL_INT *intervals, BCYL_INT *rint, BCYL_I
                     Inter.d[0] = dist[0];
                     Inter.n    = i;
 
-                    insert_hit(&Inter, intervals, &cnt);
+                    insert_hit(&Inter, intervals);
                 }
-                else
+                else if (dist[1] > EPSILON)
                 {
-                    if (dist[1] > EPSILON)
-                    {
-                        Inter.d[0] = 0.0;
-                        Inter.n    = i;
+                    Inter.d[0] = 0.0;
+                    Inter.n    = i;
 
-                        insert_hit(&Inter, intervals, &cnt);
-                    }
+                    insert_hit(&Inter, intervals);
                 }
 
                 break;
@@ -449,37 +439,28 @@ int Intersect_BCyl(const BCYL *BCyl, BCYL_INT *intervals, BCYL_INT *rint, BCYL_I
                     Inter.d[0] = dist[0];
                     Inter.n    = i;
 
-                    insert_hit(&Inter, intervals, &cnt);
+                    insert_hit(&Inter, intervals);
                 }
-                else
+                else if (dist[1] > EPSILON)
                 {
-                    if (dist[1] > EPSILON)
-                    {
-                        Inter.d[0] = 0.0;
-                        Inter.n    = i;
+                    Inter.d[0] = 0.0;
+                    Inter.n    = i;
 
-                        insert_hit(&Inter, intervals, &cnt);
-                    }
-                    else
-                    {
-                        if (dist[2] > EPSILON)
-                        {
-                            Inter.d[0] = dist[2];
-                            Inter.n    = i;
+                    insert_hit(&Inter, intervals);
+                }
+                else if (dist[2] > EPSILON)
+                {
+                    Inter.d[0] = dist[2];
+                    Inter.n    = i;
 
-                            insert_hit(&Inter, intervals, &cnt);
-                        }
-                        else
-                        {
-                            if (dist[3] > EPSILON)
-                            {
-                                Inter.d[0] = 0.0;
-                                Inter.n    = i;
+                    insert_hit(&Inter, intervals);
+                }
+                else if (dist[3] > EPSILON)
+                {
+                    Inter.d[0] = 0.0;
+                    Inter.n    = i;
 
-                                insert_hit(&Inter, intervals, &cnt);
-                            }
-                        }
-                    }
+                    insert_hit(&Inter, intervals);
                 }
 
                 break;
@@ -496,13 +477,13 @@ int Intersect_BCyl(const BCYL *BCyl, BCYL_INT *intervals, BCYL_INT *rint, BCYL_I
                 Inter.d[0] = dist[0];
                 Inter.n    = i;
 
-                insert_hit(&Inter, intervals, &cnt);
+                insert_hit(&Inter, intervals);
 
                 break;
         }
     }
 
-    return(cnt);
+    return(intervals.size());
 }
 
 
@@ -553,23 +534,23 @@ BCYL *Create_BCyl(int number, const DBL *tmp_r1, const DBL *tmp_r2, const DBL *t
 
     /* Allocate bounding cylinder. */
 
-    bcyl = reinterpret_cast<BCYL *>(POV_MALLOC(sizeof(BCYL), "bounding cylinder"));
+    bcyl = new BCYL;
 
     /* Allocate entries. */
 
     bcyl->number = number;
 
-    bcyl->entry = reinterpret_cast<BCYL_ENTRY *>(POV_MALLOC(bcyl->number*sizeof(BCYL_ENTRY), "bounding cylinder data"));
+    bcyl->entry = new BCYL_ENTRY[bcyl->number];
 
     /* Allocate temporary lists. */
 
-    tmp_r1_index = reinterpret_cast<int *>(POV_MALLOC(bcyl->number * sizeof(int), "temp lathe data"));
-    tmp_r2_index = reinterpret_cast<int *>(POV_MALLOC(bcyl->number * sizeof(int), "temp lathe data"));
-    tmp_h1_index = reinterpret_cast<int *>(POV_MALLOC(bcyl->number * sizeof(int), "temp lathe data"));
-    tmp_h2_index = reinterpret_cast<int *>(POV_MALLOC(bcyl->number * sizeof(int), "temp lathe data"));
+    tmp_r1_index = new int[bcyl->number];
+    tmp_r2_index = new int[bcyl->number];
+    tmp_h1_index = new int[bcyl->number];
+    tmp_h2_index = new int[bcyl->number];
 
-    tmp_radius = reinterpret_cast<DBL *>(POV_MALLOC(2 * bcyl->number * sizeof(DBL), "temp lathe data"));
-    tmp_height = reinterpret_cast<DBL *>(POV_MALLOC(2 * bcyl->number * sizeof(DBL), "temp lathe data"));
+    tmp_radius = new DBL[2 * bcyl->number];
+    tmp_height = new DBL[2 * bcyl->number];
 
     /* Get different bounding radii and heights. */
 
@@ -646,8 +627,8 @@ BCYL *Create_BCyl(int number, const DBL *tmp_r1, const DBL *tmp_r2, const DBL *t
 
     /* Copy lists into the lathe. */
 
-    bcyl->radius = reinterpret_cast<DBL *>(POV_MALLOC(nr * sizeof(DBL), "bounding cylinder data"));
-    bcyl->height = reinterpret_cast<DBL *>(POV_MALLOC(nh * sizeof(DBL), "bounding cylinder data"));
+    bcyl->radius = new DBL[nr];
+    bcyl->height = new DBL[nh];
 
     for (i = 0; i < nr; i++)
     {
@@ -679,12 +660,12 @@ BCYL *Create_BCyl(int number, const DBL *tmp_r1, const DBL *tmp_r2, const DBL *t
 
     /* Get rid of temp. memory. */
 
-    POV_FREE(tmp_height);
-    POV_FREE(tmp_radius);
-    POV_FREE(tmp_h2_index);
-    POV_FREE(tmp_h1_index);
-    POV_FREE(tmp_r2_index);
-    POV_FREE(tmp_r1_index);
+    delete[] tmp_height;
+    delete[] tmp_radius;
+    delete[] tmp_h2_index;
+    delete[] tmp_h1_index;
+    delete[] tmp_r2_index;
+    delete[] tmp_r1_index;
 
     return(bcyl);
 }
@@ -721,13 +702,13 @@ BCYL *Create_BCyl(int number, const DBL *tmp_r1, const DBL *tmp_r2, const DBL *t
 
 void Destroy_BCyl(BCYL *BCyl)
 {
-    POV_FREE(BCyl->entry);
+    delete[] BCyl->entry;
 
-    POV_FREE(BCyl->radius);
+    delete[] BCyl->radius;
 
-    POV_FREE(BCyl->height);
+    delete[] BCyl->height;
 
-    POV_FREE(BCyl);
+    delete BCyl;
 }
 
 }

@@ -209,11 +209,7 @@ void Copy_Pigments (vector<PIGMENT*>& New, const vector<PIGMENT*>& Old)
 void Destroy_Pigment (PIGMENT *Pigment)
 {
     if (Pigment != NULL)
-    {
-        Destroy_TPat_Fields (Pigment);
-
         delete Pigment;
-    }
 }
 
 
@@ -260,7 +256,7 @@ void Post_Pigment(PIGMENT *Pigment, bool* pHasFilter)
     {
         Pigment->Type = PLAIN_PATTERN;
 
-        Pigment->colour.Clear() ;
+        Pigment->colour.Clear();
 
 ;// TODO MESSAGE    Warning(150, "No pigment type given.");
     }

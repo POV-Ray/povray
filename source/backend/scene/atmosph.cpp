@@ -143,7 +143,7 @@ FOG *Copy_Fog(const FOG *Old)
 
     *New = *Old;
 
-    New->Turb = reinterpret_cast<TURB *>(Copy_Warps((reinterpret_cast<WARP *>(Old->Turb))));
+    New->Turb = new TurbulenceWarp();
 
     return (New);
 }
@@ -181,11 +181,7 @@ FOG *Copy_Fog(const FOG *Old)
 void Destroy_Fog(FOG *Fog)
 {
     if (Fog != NULL)
-    {
-        Destroy_Turb(Fog->Turb);
-
         delete Fog;
-    }
 }
 
 
@@ -321,11 +317,7 @@ RAINBOW *Copy_Rainbow(const RAINBOW *Old)
 void Destroy_Rainbow(RAINBOW *Rainbow)
 {
     if (Rainbow != NULL)
-    {
-        Destroy_Pigment(Rainbow->Pigment);
-
         delete Rainbow;
-    }
 }
 
 
@@ -458,16 +450,7 @@ SKYSPHERE *Copy_Skysphere(const SKYSPHERE *Old)
 void Destroy_Skysphere(SKYSPHERE *Skysphere)
 {
     if (Skysphere != NULL)
-    {
-        for (vector<PIGMENT*>::iterator i = Skysphere->Pigments.begin(); i != Skysphere->Pigments.end(); ++ i)
-        {
-            Destroy_Pigment(*i);
-        }
-
-        Destroy_Transform(Skysphere->Trans);
-
         delete Skysphere;
-    }
 }
 
 

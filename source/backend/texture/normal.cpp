@@ -127,7 +127,7 @@ static void ripples (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& n
     if (pPat == NULL)
         throw POV_EXCEPTION_STRING("Invalid pattern type.");
 
-    for (i = 0 ; i < Thread->numberOfWaves ; i++)
+    for (i = 0; i < Thread->numberOfWaves; i++)
     {
         point = EPoint - Thread->waveSources[i];
         length = point.length();
@@ -170,14 +170,14 @@ static void ripples (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& n
 static void waves (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& normal, const TraceThreadData *Thread)
 {
     register unsigned int i;
-    register DBL length, scalar, index, sinValue ;
+    register DBL length, scalar, index, sinValue;
     Vector3d point;
 
     WavesPattern* pPat = dynamic_cast<WavesPattern*>(Tnormal->pattern.get());
     if (pPat == NULL)
         throw POV_EXCEPTION_STRING("Invalid pattern type.");
 
-    for (i = 0 ; i < Thread->numberOfWaves ; i++)
+    for (i = 0; i < Thread->numberOfWaves; i++)
     {
         point = EPoint - Thread->waveSources[i];
 
@@ -672,11 +672,7 @@ TNORMAL *Copy_Tnormal (TNORMAL *Old)
 void Destroy_Tnormal(TNORMAL *Tnormal)
 {
     if (Tnormal != NULL)
-    {
-        Destroy_TPat_Fields (Tnormal);
-
         delete Tnormal;
-    }
 }
 
 

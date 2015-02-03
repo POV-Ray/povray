@@ -100,7 +100,7 @@ Media::Media(const Media& source)
 Media::~Media()
 {
     if(Sample_Threshold != NULL)
-        POV_FREE(Sample_Threshold);
+        delete[] Sample_Threshold;
 
     for (vector<PIGMENT*>::iterator i = Density.begin(); i != Density.end(); ++ i)
         Destroy_Pigment(*i);
@@ -135,7 +135,7 @@ Media& Media::operator=(const Media& source)
         AA_Level = source.AA_Level;
 
         if(Sample_Threshold != NULL)
-            POV_FREE(Sample_Threshold);
+            delete Sample_Threshold;
         Sample_Threshold = NULL;
 
         for (vector<PIGMENT*>::iterator i = Density.begin(); i != Density.end(); ++ i)
@@ -149,7 +149,7 @@ Media& Media::operator=(const Media& source)
         {
             if(Intervals > 0)
             {
-                Sample_Threshold = reinterpret_cast<DBL *>(POV_MALLOC(Intervals * sizeof(DBL), "sample threshold list"));
+                Sample_Threshold = new DBL[Intervals];
 
                 for(int i = 0; i < Intervals; i++)
                     Sample_Threshold[i] =  source.Sample_Threshold[i];
@@ -184,10 +184,10 @@ void Media::PostProcess()
 
     // Init sample threshold array.
     if(Sample_Threshold != NULL)
-        POV_FREE(Sample_Threshold);
+        delete Sample_Threshold;
 
     // Create list of thresholds for confidence test.
-    Sample_Threshold = reinterpret_cast<DBL *>(POV_MALLOC(Max_Samples*sizeof(DBL), "sample threshold list"));
+    Sample_Threshold = new DBL[Max_Samples];
 
     if(Max_Samples > 1)
     {
@@ -634,7 +634,7 @@ void MediaFunction::ComputeMediaLightInterval(LightSourceEntryVector& lights, Li
         if (litintervals.back().s1 < isect.Depth)
             litintervals.push_back(LitInterval(false, litintervals.back().s1, isect.Depth, 0, lights.size() - 1));
         for (LitIntervalVector::iterator i(litintervals.begin()); i != litintervals.end(); i++)
-            i->ds = i->s1 - i->s0 ;
+            i->ds = i->s1 - i->s0;
 #else
         // After sorting the following holds true for the whole array:
         // l[i].s <= l[i + 1].s

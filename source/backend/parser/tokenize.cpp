@@ -1653,7 +1653,7 @@ void Parser::Parse_Directive(int After_Hash)
     DBL Value, Value2;
     int Flag;
     char *ts;
-    POV_MACRO *PMac=NULL;
+    Macro *PMac=NULL;
     COND_TYPE Curr_Type = Cond_Stack[CS_Index].Cond_Type;
     POV_LONG Hash_Loc = Input_File->In_File->tellg().offset;
 
@@ -2905,9 +2905,9 @@ void Parser::Check_Macro_Vers(void)
     }
 }
 
-Parser::POV_MACRO *Parser::Parse_Macro()
+Parser::Macro *Parser::Parse_Macro()
 {
-    POV_MACRO *New;
+    Macro *New;
     SYM_ENTRY *Table_Entry=NULL;
     int Old_Ok = Ok_To_Declare;
 
@@ -2932,13 +2932,12 @@ Parser::POV_MACRO *Parser::Parse_Macro()
         END_CASE
     END_EXPECT
 
-    New=reinterpret_cast<POV_MACRO *>(POV_MALLOC(sizeof(POV_MACRO),"macro"));
+    New = new Macro(Token.Token_String);
 
     Table_Entry->Data=reinterpret_cast<void *>(New);
 
     New->Macro_Filename = NULL;
     New->Num_Of_Pars=0;
-    New->Macro_Name=POV_STRDUP(Token.Token_String);
 
     EXPECT
         CASE (LEFT_PAREN_TOKEN )
@@ -3020,14 +3019,14 @@ Parser::POV_MACRO *Parser::Parse_Macro()
 
 void Parser::Invoke_Macro()
 {
-    POV_MACRO *PMac=reinterpret_cast<POV_MACRO *>(Token.Data);
+    Macro *PMac=reinterpret_cast<Macro *>(Token.Data);
     SYM_ENTRY **Table_Entries=NULL;
     int i,Local_Index;
 
     if(PMac == NULL)
     {
         if(Token.DataPtr!=NULL)
-            PMac = reinterpret_cast<POV_MACRO*>(*(Token.DataPtr));
+            PMac = reinterpret_cast<Macro*>(*(Token.DataPtr));
         else
             Error("Error in Invoke_Macro");
     }
@@ -3141,26 +3140,26 @@ void Parser::Return_From_Macro()
     Destroy_Table(Table_Index--);
 }
 
-void Parser::Destroy_Macro(POV_MACRO *PMac)
+Parser::Macro::Macro(const char *s) :
+    Macro_Name(POV_STRDUP(s)),
+    Macro_Filename(NULL),
+    Num_Of_Pars(0)
+{}
+
+Parser::Macro::~Macro()
 {
     int i;
-    if (PMac==NULL)
+
+    POV_FREE(Macro_Name);
+    if (Macro_Filename!=NULL)
     {
-        return;
+        POV_FREE(Macro_Filename);
     }
 
-    POV_FREE(PMac->Macro_Name);
-    if (PMac->Macro_Filename!=NULL)
+    for (i=0; i < Num_Of_Pars; i++)
     {
-        POV_FREE(PMac->Macro_Filename);
+        POV_FREE(Par_Name[i]);
     }
-
-    for (i=0; i < PMac->Num_Of_Pars; i++)
-    {
-        POV_FREE(PMac->Par_Name[i]);
-    }
-
-    POV_FREE(PMac);
 }
 
 Parser::POV_ARRAY *Parser::Parse_Array_Declare (void)
@@ -3603,7 +3602,7 @@ void Parser::Parse_Write(void)
                     case SINT32LE_TOKEN:                                     val_min = (-2147483647-1); val_max = 2147483647; num_bytes = 4; break; // -2^31 to 2^31-1 (using unconventional notation to avoid a warning with some compiler)
                 }
                 EXPECT
-                    CASE_VECTOR_UNGET
+                    CASE_VECTOR
                         Terms = Parse_Unknown_Vector (Express);
                         if ((Terms >= 1) && (Terms <= 5))
                         {
@@ -3643,7 +3642,9 @@ void Parser::Parse_Write(void)
             }
         END_CASE
 
-        CASE_STRING_UNGET
+        CASE5 (STRING_LITERAL_TOKEN,CHR_TOKEN,SUBSTR_TOKEN,STR_TOKEN,VSTR_TOKEN)
+        CASE5 (CONCAT_TOKEN,STRUPR_TOKEN,STRLWR_TOKEN,DATETIME_TOKEN,STRING_ID_TOKEN)
+            UNGET
             temp=Parse_C_String();
             if(strlen(temp) > 512)
             {
@@ -3655,7 +3656,7 @@ void Parser::Parse_Write(void)
             POV_FREE(temp);
         END_CASE
 
-        CASE_VECTOR_UNGET
+        CASE_VECTOR
             Terms = Parse_Unknown_Vector (Express);
             switch (Terms)
             {

@@ -202,12 +202,6 @@ enum
 inline void Destroy_Float(DBL *x)
 {
     if(x != NULL)
-        POV_FREE(x);
-}
-
-inline void Destroy_Colour(RGBFTColour *x)
-{
-    if(x != NULL)
         delete x;
 }
 
@@ -247,7 +241,7 @@ class GenericVector2d
             vect[Y] = y;
         }
 
-        inline explicit GenericVector2d(const T* vi)
+        inline explicit GenericVector2d(const DBL* vi)
         {
             vect[X] = T(vi[X]);
             vect[Y] = T(vi[Y]);
@@ -463,7 +457,7 @@ class GenericVector3d
             vect[Z] = z;
         }
 
-        inline explicit GenericVector3d(const T* vi)
+        inline explicit GenericVector3d(const DBL* vi)
         {
             vect[X] = T(vi[X]);
             vect[Y] = T(vi[Y]);
@@ -786,15 +780,15 @@ struct BoundingBox
     BBoxVector3d lowerLeft;
     BBoxVector3d size;
 
-    SNGL GetMinX() const { return lowerLeft[X]; }
-    SNGL GetMinY() const { return lowerLeft[Y]; }
-    SNGL GetMinZ() const { return lowerLeft[Z]; }
+    SNGL GetMinX() const { return lowerLeft.x(); }
+    SNGL GetMinY() const { return lowerLeft.y(); }
+    SNGL GetMinZ() const { return lowerLeft.z(); }
 
-    SNGL GetMaxX() const { return lowerLeft[X] + size[X]; }
-    SNGL GetMaxY() const { return lowerLeft[Y] + size[Y]; }
-    SNGL GetMaxZ() const { return lowerLeft[Z] + size[Z]; }
+    SNGL GetMaxX() const { return lowerLeft.x() + size.x(); }
+    SNGL GetMaxY() const { return lowerLeft.y() + size.y(); }
+    SNGL GetMaxZ() const { return lowerLeft.z() + size.z(); }
 
-    bool isEmpty() const { return (size[X] < 0) || (size[Y] < 0) || (size[Z] < 0); }
+    bool isEmpty() const { return (size.x() < 0) || (size.y() < 0) || (size.z() < 0); }
 };
 
 /// @relates BoundingBox
@@ -835,17 +829,17 @@ inline void Make_min_max_from_BBox(Vector3d& mins, Vector3d& maxs, const Boundin
 /// @relates BoundingBox
 inline bool Inside_BBox(const Vector3d& point, const BoundingBox& bbox)
 {
-    if (point[X] < (DBL)bbox.lowerLeft[X])
+    if (point.y() < (DBL)bbox.lowerLeft.x())
         return(false);
-    if (point[Y] < (DBL)bbox.lowerLeft[Y])
+    if (point.y() < (DBL)bbox.lowerLeft.y())
         return(false);
-    if (point[Z] < (DBL)bbox.lowerLeft[Z])
+    if (point.z() < (DBL)bbox.lowerLeft.z())
         return(false);
-    if (point[X] > (DBL)bbox.lowerLeft[X] + (DBL)bbox.size[X])
+    if (point.y() > (DBL)bbox.lowerLeft.x() + (DBL)bbox.size.x())
         return(false);
-    if (point[Y] > (DBL)bbox.lowerLeft[Y] + (DBL)bbox.size[Y])
+    if (point.y() > (DBL)bbox.lowerLeft.y() + (DBL)bbox.size.y())
         return(false);
-    if (point[Z] > (DBL)bbox.lowerLeft[Z] + (DBL)bbox.size[Z])
+    if (point.z() > (DBL)bbox.lowerLeft.z() + (DBL)bbox.size.z())
         return(false);
 
     return(true);
@@ -875,10 +869,6 @@ typedef struct Texture_Struct TEXTURE;
 typedef struct Pigment_Struct PIGMENT;
 typedef struct Tnormal_Struct TNORMAL;
 typedef struct Finish_Struct FINISH;
-typedef struct Turb_Struct TURB;
-typedef struct Warps_Struct WARP;
-typedef struct Spline_Entry SPLINE_ENTRY;
-typedef struct Spline_Struct SPLINE;
 
 typedef TEXTURE* TexturePtr;
 
@@ -971,7 +961,6 @@ class SubsurfaceInterior;
 class Interior
 {
     public:
-        int References;
         int  hollow, Disp_NElems;
         SNGL IOR, Dispersion;
         SNGL Caustics, Old_Refract;
@@ -991,42 +980,8 @@ class Interior
         Interior& operator=(const Interior&);
 };
 
-/// @}
-///
-//******************************************************************************
-///
-/// @name Spline Stuff
-/// @{
-
-#if 0
-#pragma mark * Spline
-#endif
-
-struct Spline_Entry
-{
-    DBL par;      // Parameter
-    DBL vec[5];   // Value at the parameter
-    DBL coeff[5]; // Interpolating coefficients at the parameter
-};
-
-struct Spline_Struct
-{
-    int Number_Of_Entries, Type;
-    int Max_Entries;
-    SPLINE_ENTRY *SplineEntries;
-    int Coeffs_Computed;
-    int Terms;
-/* [JG] flyspray #294 : cache is not thread-safe
- * (and seems useless, as slower than without it)
-    bool Cache_Valid;
-    int Cache_Type;
-    DBL Cache_Point;
-    EXPRESS Cache_Data;
- */
-    int ref_count;
-};
-
-typedef struct Spline_Entry SPLINE_ENTRY;
+typedef shared_ptr<Interior> InteriorPtr;
+typedef shared_ptr<const Interior> ConstInteriorPtr;
 
 /// @}
 ///
@@ -1120,29 +1075,19 @@ struct Finish_Struct
     bool UseSubsurface;   // whether to use subsurface light transport
 };
 
-struct Warps_Struct
-{
-    unsigned short Warp_Type;
-    WARP *Prev_Warp;
-    WARP *Next_Warp;
-};
+struct GenericWarp;
 
-struct Turb_Struct : public Warps_Struct
-{
-    Vector3d Turbulence;
-    int Octaves;
-    SNGL Lambda, Omega;
-};
-
-#define Destroy_Finish(x) if ((x)!=NULL) POV_FREE(x)
+typedef GenericWarp* WarpPtr;
+typedef const GenericWarp* ConstWarpPtr;
+typedef vector<WarpPtr> WarpList;
 
 typedef struct Material_Struct MATERIAL;
 
 struct Material_Struct
 {
-   TEXTURE *Texture;
-   TEXTURE *Interior_Texture;
-   Interior *interior;
+    TEXTURE *Texture;
+    TEXTURE *Interior_Texture;
+    InteriorPtr interior;
 };
 
 /// @}
@@ -1229,6 +1174,8 @@ class ObjectDebugHelper
 };
 
 typedef struct BBox_Tree_Struct BBOX_TREE;
+typedef BBOX_TREE* BBoxTreePtr;
+typedef const BBOX_TREE* ConstBBoxTreePtr;
 
 struct BBox_Tree_Struct
 {

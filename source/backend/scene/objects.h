@@ -160,7 +160,7 @@ class ObjectBase
         int Type; // TODO - make obsolete
         TEXTURE *Texture;
         TEXTURE *Interior_Texture;
-        Interior *interior;
+        InteriorPtr interior;
         vector<ObjectPtr> Bound;
         vector<ObjectPtr> Clip;
         vector<LightSource *> LLights;  ///< Used for light groups.

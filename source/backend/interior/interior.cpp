@@ -51,8 +51,6 @@ namespace pov
 
 Interior::Interior()
 {
-    References = 1;
-
     IOR = 0.0;
     Old_Refract = 1.0;
 
@@ -71,7 +69,6 @@ Interior::Interior()
 
 Interior::Interior(const Interior& source)
 {
-    References = 1;
     Disp_NElems = source.Disp_NElems;
     Dispersion = source.Dispersion;
     Old_Refract = source.Old_Refract;
@@ -129,10 +126,9 @@ void Interior::PostProcess()
 *
 ******************************************************************************/
 
-void Destroy_Interior(Interior *interior)
+void Destroy_Interior(InteriorPtr& interior)
 {
-    if((interior != NULL) && (--(interior->References) == 0))
-        delete interior;
+    interior.reset();
 }
 
 /*****************************************************************************
@@ -165,21 +161,11 @@ void Destroy_Interior(Interior *interior)
 *
 ******************************************************************************/
 
-Interior *Copy_Interior_Pointer(Interior *Old)
-{
-    if (Old != NULL)
-    {
-        Old->References++;
-    }
-
-    return(Old);
-}
-
 MATERIAL *Create_Material()
 {
     MATERIAL *New;
 
-    New = reinterpret_cast<MATERIAL *>(POV_MALLOC(sizeof(MATERIAL), "material"));
+    New = new MATERIAL;
 
     New->Texture  = NULL;
     New->Interior_Texture  = NULL;
@@ -201,7 +187,7 @@ MATERIAL *Copy_Material(const MATERIAL *Old)
         New->Texture  = Copy_Textures(Old->Texture);
         New->Interior_Texture  = Copy_Textures(Old->Interior_Texture);
         if (Old->interior != NULL)
-            New->interior = new Interior(*(Old->interior));
+            New->interior = InteriorPtr(new Interior(*(Old->interior)));
 
         return(New);
     }
@@ -217,9 +203,8 @@ void Destroy_Material(MATERIAL *Material)
     {
         Destroy_Textures(Material->Texture);
         Destroy_Textures(Material->Interior_Texture);
-        Destroy_Interior(Material->interior);
 
-        POV_FREE(Material);
+        delete Material;
     }
 }
 

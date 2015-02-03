@@ -1448,7 +1448,7 @@ bool Mesh::intersect_bbox_tree(const BasicRay &ray, const BasicRay &Orig_Ray, DB
     Rayinfo rayinfo(ray);
 
     /* Start with an empty priority queue. */
-    Thread->Mesh_Queue.QSize = 0;
+    Thread->Mesh_Queue.Clear();
     found = false;
 
     Best = BOUND_HUGE;
@@ -1467,9 +1467,9 @@ bool Mesh::intersect_bbox_tree(const BasicRay &ray, const BasicRay &Orig_Ray, DB
 
     /* Check elements in the priority queue. */
 
-    while (Thread->Mesh_Queue.QSize != 0)
+    while (!Thread->Mesh_Queue.IsEmpty())
     {
-        Priority_Queue_Delete(Thread->Mesh_Queue, &Depth, &Node);
+        Thread->Mesh_Queue.RemoveMin(Depth, Node);
 
         /*
          * If current intersection is larger than the best intersection found
@@ -2369,7 +2369,7 @@ bool Mesh::inside_bbox_tree(const BasicRay &ray, TraceThreadData *Thread) const
     Rayinfo rayinfo(ray);
 
     /* Start with an empty priority queue. */
-    Thread->Mesh_Queue.QSize = 0;
+    Thread->Mesh_Queue.Clear();
     found = 0;
 
     Best = BOUND_HUGE;
@@ -2385,9 +2385,9 @@ bool Mesh::inside_bbox_tree(const BasicRay &ray, TraceThreadData *Thread) const
     Check_And_Enqueue(Thread->Mesh_Queue, Root, &Root->BBox, &rayinfo, Thread);
 
     /* Check elements in the priority queue. */
-    while (Thread->Mesh_Queue.QSize != 0)
+    while (!Thread->Mesh_Queue.IsEmpty())
     {
-        Priority_Queue_Delete(Thread->Mesh_Queue, &Depth, &Node);
+        Thread->Mesh_Queue.RemoveMin(Depth, Node);
 
         /* Check current node. */
         if (Node->Entries)

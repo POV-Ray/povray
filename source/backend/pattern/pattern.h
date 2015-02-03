@@ -130,8 +130,6 @@ enum PATTERN_IDS
 #define POST_DONE             4
 #define DONT_SCALE_BUMPS_FLAG 8 /* scale bumps for normals */
 
-#define Destroy_Turb(t) if ((t)!=NULL) POV_FREE(t);
-
 enum WaveType
 {
     kWaveType_Ramp,     ///< Ramps up from 0 to 1, then drops sharply back to 0, and repeats.
@@ -192,7 +190,7 @@ struct BasicPattern
     unsigned char noiseGenerator;
 
     /// List of warps applied to the pattern.
-    WARP *pWarps;
+    WarpList warps;
 
     /// Default constructor.
     BasicPattern();
@@ -277,6 +275,12 @@ struct BasicPattern
     ///             evaluate to a value from the contiguous interval [0...1].
     ///
     virtual unsigned int NumDiscreteBlendMapEntries() const = 0;
+
+    /// Whether the pattern has its own special turbulence handling.
+    ///
+    /// @return     `true` if the pattern has its own special turbulence handling.
+    ///
+    virtual bool HasSpecialTurbulenceHandling() const;
 
 protected:
 
@@ -363,6 +367,7 @@ struct PlainPattern : public DiscretePattern
     virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
     virtual DBL Evaluate(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const;
     virtual unsigned int NumDiscreteBlendMapEntries() const;
+    virtual bool HasSpecialTurbulenceHandling() const;
 };
 
 /// Implements the `agate` pattern.
@@ -625,6 +630,7 @@ struct MarblePattern : public ContinuousPattern
     virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
     virtual DBL EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const;
     virtual ColourBlendMapConstPtr GetDefaultBlendMap() const;
+    virtual bool HasSpecialTurbulenceHandling() const;
 };
 
 /// Base class for the noise-based patterns.
@@ -807,6 +813,7 @@ struct WoodPattern : public ContinuousPattern
     virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
     virtual DBL EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const;
     virtual ColourBlendMapConstPtr GetDefaultBlendMap() const;
+    virtual bool HasSpecialTurbulenceHandling() const;
 };
 
 /// Implements the `wrinkles` pattern.
@@ -1039,7 +1046,6 @@ typedef boost::unordered_map<CrackleCellCoord, CrackleCacheEntry, boost::hash<Cr
 DBL Evaluate_TPat (const TPATTERN *TPat, const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread);
 void Init_TPat_Fields (TPATTERN *Tpat);
 void Copy_TPat_Fields (TPATTERN *New, const TPATTERN *Old);
-void Destroy_TPat_Fields (TPATTERN *Tpat);
 void Translate_Tpattern (TPATTERN *Tpattern, const Vector3d& Vector);
 void Rotate_Tpattern (TPATTERN *Tpattern, const Vector3d& Vector);
 void Scale_Tpattern (TPATTERN *Tpattern, const Vector3d& Vector);

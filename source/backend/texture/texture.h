@@ -45,6 +45,7 @@ namespace pov
 {
 
 typedef struct Turb_Struct TURB;
+struct GenericTurbulenceWarp;
 
 /*****************************************************************************
 * Global preprocessor defines
@@ -132,8 +133,8 @@ INLINE_NOISE DBL Noise (const Vector3d& EPoint, int noise_generator);
 INLINE_NOISE void DNoise (Vector3d& result, const Vector3d& EPoint);
 #endif
 
-DBL Turbulence (const Vector3d& EPoint, const TURB *Turb, int noise_generator);
-void DTurbulence (Vector3d& result, const Vector3d& EPoint, const TURB *Turb);
+DBL Turbulence (const Vector3d& EPoint, const GenericTurbulenceWarp* Turb, int noise_generator);
+void DTurbulence (Vector3d& result, const Vector3d& EPoint, const GenericTurbulenceWarp* Turb);
 DBL cycloidal (DBL value);
 DBL Triangle_Wave (DBL value);
 void Transform_Textures (TEXTURE *Textures, const TRANSFORM *Trans);
@@ -145,7 +146,6 @@ TEXTURE *Copy_Texture_Pointer (TEXTURE *Texture);
 TEXTURE *Copy_Textures (TEXTURE *Textures);
 TEXTURE *Create_Texture (void);
 int Test_Opacity (const TEXTURE *Texture);
-TURB *Create_Turb (void);
 
 }
 

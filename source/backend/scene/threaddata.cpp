@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -58,7 +58,7 @@ namespace pov
 
 SceneThreadData::SceneThreadData(shared_ptr<SceneData> sd): sceneData(sd), qualityFlags(9)
 {
-    for(int i = 0 ; i < 4 ; i++)
+    for(int i = 0; i < 4; i++)
         Fractal_IStack[i] = NULL;
     Fractal::Allocate_Iteration_Stack(Fractal_IStack, sceneData->Fractal_Iteration_Stack_Length);
     Max_Blob_Queue_Size = 1;
@@ -79,9 +79,9 @@ SceneThreadData::SceneThreadData(shared_ptr<SceneData> sd): sceneData(sd), quali
     functionContext = sceneData->functionVM->NewContext(this);
     functionPatternContext.resize(sceneData->functionPatternCount);
 
-    BCyl_Intervals = POV_MALLOC (4*sceneData->Max_Bounding_Cylinders*sizeof(BCYL_INT), "lathe intersection list");
-    BCyl_RInt = POV_MALLOC (2*sceneData->Max_Bounding_Cylinders*sizeof(BCYL_INT), "lathe intersection list");
-    BCyl_HInt = POV_MALLOC (2*sceneData->Max_Bounding_Cylinders*sizeof(BCYL_INT), "lathe intersection list");
+    BCyl_Intervals.reserve(4*sceneData->Max_Bounding_Cylinders);
+    BCyl_RInt.reserve(2*sceneData->Max_Bounding_Cylinders);
+    BCyl_HInt.reserve(2*sceneData->Max_Bounding_Cylinders);
 
     Facets_Last_Seed = 0x80000000;
 
@@ -90,7 +90,7 @@ SceneThreadData::SceneThreadData(shared_ptr<SceneData> sd): sceneData(sd), quali
     realTime = 0;
 
     for(vector<LightSource *>::iterator it = sceneData->lightSources.begin(); it != sceneData->lightSources.end(); it++)
-        lightSources.push_back(static_cast<LightSource *> (Copy_Object(*it))) ;
+        lightSources.push_back(static_cast<LightSource *> (Copy_Object(*it)));
 
     // all of these are for photons
     LightSource *photonLight = NULL;
@@ -125,9 +125,6 @@ SceneThreadData::~SceneThreadData()
 {
     sceneData->functionVM->DeleteContext(functionContext);
 
-    POV_FREE(BCyl_HInt);
-    POV_FREE(BCyl_RInt);
-    POV_FREE(BCyl_Intervals);
     POV_FREE(Blob_Coefficients);
     POV_FREE(Blob_Queue);
     POV_FREE(isosurfaceData);

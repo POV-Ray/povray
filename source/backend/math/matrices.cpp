@@ -105,9 +105,9 @@ void MZero (MATRIX result)
 {
     register int i, j;
 
-    for (i = 0 ; i < 4 ; i++)
+    for (i = 0; i < 4; i++)
     {
-        for (j = 0 ; j < 4 ; j++)
+        for (j = 0; j < 4; j++)
         {
             result[i][j] = 0.0;
         }
@@ -149,9 +149,9 @@ void MIdentity (MATRIX result)
 {
     register int i, j;
 
-    for (i = 0 ; i < 4 ; i++)
+    for (i = 0; i < 4; i++)
     {
-        for (j = 0 ; j < 4 ; j++)
+        for (j = 0; j < 4; j++)
         {
             if (i == j)
             {
@@ -302,8 +302,8 @@ void MAdd (MATRIX result, MATRIX matrix1, MATRIX matrix2)
 {
     register int i, j;
 
-    for (i = 0 ; i < 4 ; i++)
-        for (j = 0 ; j < 4 ; j++)
+    for (i = 0; i < 4; i++)
+        for (j = 0; j < 4; j++)
             result[i][j] = (*matrix1)[i][j] + (*matrix2)[i][j];
 }
 
@@ -311,8 +311,8 @@ void MSub (MATRIX result, MATRIX matrix1, MATRIX matrix2)
 {
     register int i, j;
 
-    for (i = 0 ; i < 4 ; i++)
-        for (j = 0 ; j < 4 ; j++)
+    for (i = 0; i < 4; i++)
+        for (j = 0; j < 4; j++)
             result[i][j] = matrix1[i][j] - matrix2[i][j];
 }
 
@@ -320,8 +320,8 @@ void MScale (MATRIX result, MATRIX matrix1, DBL amount)
 {
     register int i, j;
 
-    for (i = 0 ; i < 4 ; i++)
-        for (j = 0 ; j < 4 ; j++)
+    for (i = 0; i < 4; i++)
+        for (j = 0; j < 4; j++)
             result[i][j] = matrix1[i][j] * amount;
 }
 ... up to here! */
@@ -372,9 +372,9 @@ void MTranspose (MATRIX result, const MATRIX matrix1)
 {
     register int i, j;
 
-    for (i = 0 ; i < 4 ; i++)
+    for (i = 0; i < 4; i++)
     {
-        for (j = 0 ; j < 4 ; j++)
+        for (j = 0; j < 4; j++)
         {
             result[i][j] = matrix1[j][i];
         }
@@ -413,7 +413,7 @@ void MTransPoint (Vector3d& result, const Vector3d& vector, const TRANSFORM *tra
 
     matrix = &transform->matrix;
 
-    for (i = 0 ; i < 3 ; i++)
+    for (i = 0; i < 3; i++)
     {
         answer_array[i] = vector[X] * (*matrix)[0][i] +
                           vector[Y] * (*matrix)[1][i] +
@@ -459,7 +459,7 @@ void MInvTransPoint (Vector3d& result, const Vector3d& vector, const TRANSFORM *
 
     matrix = &transform->inverse;
 
-    for (i = 0 ; i < 3 ; i++)
+    for (i = 0; i < 3; i++)
     {
         answer_array[i] = vector[X] * (*matrix)[0][i] +
                           vector[Y] * (*matrix)[1][i] +
@@ -505,7 +505,7 @@ void MTransDirection (Vector3d& result, const Vector3d& vector, const TRANSFORM 
 
     matrix = &transform->matrix;
 
-    for (i = 0 ; i < 3 ; i++)
+    for (i = 0; i < 3; i++)
     {
         answer_array[i] = vector[X] * (*matrix)[0][i] +
                           vector[Y] * (*matrix)[1][i] +
@@ -551,7 +551,7 @@ void MInvTransDirection (Vector3d& result, const Vector3d& vector, const TRANSFO
 
     matrix = &transform->inverse;
 
-    for (i = 0 ; i < 3 ; i++)
+    for (i = 0; i < 3; i++)
     {
         answer_array[i] = vector[X] * (*matrix)[0][i] +
                           vector[Y] * (*matrix)[1][i] +
@@ -597,7 +597,7 @@ void MTransNormal (Vector3d& result, const Vector3d& vector, const TRANSFORM*tra
 
     matrix = &transform->inverse;
 
-    for (i = 0 ; i < 3 ; i++)
+    for (i = 0; i < 3; i++)
     {
         answer_array[i] = vector[X] * (*matrix)[i][0] +
                           vector[Y] * (*matrix)[i][1] +
@@ -643,7 +643,7 @@ void MInvTransNormal (Vector3d& result, const Vector3d& vector, const TRANSFORM*
 
     matrix = &transform->matrix;
 
-    for (i = 0 ; i < 3 ; i++)
+    for (i = 0; i < 3; i++)
     {
         answer_array[i] = vector[X] * (*matrix)[i][0] +
                           vector[Y] * (*matrix)[i][1] +
@@ -1084,7 +1084,7 @@ TRANSFORM *Create_Transform()
 {
     TRANSFORM *New;
 
-    New = reinterpret_cast<TRANSFORM *>(POV_MALLOC(sizeof (TRANSFORM), "transform"));
+    New = new TRANSFORM;
 
     MIdentity (New->matrix);
     MIdentity (New->inverse);
@@ -1163,7 +1163,7 @@ TRANSFORM *Copy_Transform (const TRANSFORM*Old)
 void Destroy_Transform (TRANSFORM *Trans)
 {
     if(Trans != NULL)
-        POV_FREE(Trans);
+        delete Trans;
 }
 
 
@@ -1196,7 +1196,7 @@ DBL *Create_Float ()
 {
     DBL *New_Float;
 
-    New_Float = reinterpret_cast<DBL *>(POV_MALLOC(sizeof (DBL), "float"));
+    New_Float = new DBL;
 
     *New_Float = 0.0;
 

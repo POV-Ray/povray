@@ -188,7 +188,7 @@ bool HasInteriorPointObjectCondition::operator()(const Vector3d& point, ConstObj
 
 bool ContainingInteriorsPointObjectCondition::operator()(const Vector3d& point, ConstObjectPtr object) const
 {
-    containingInteriors.push_back(object->interior);
+    containingInteriors.push_back(object->interior.get());
     return true;
 }
 
@@ -886,13 +886,13 @@ void TracePixel::InitRayContainerState(Ray& ray, bool compute)
             // test infinite objects
             for(vector<ObjectPtr>::iterator object = sceneData->objects.begin() + sceneData->numberOfFiniteObjects; object != sceneData->objects.end(); object++)
                 if(((*object)->interior != NULL) && Inside_BBox(ray.Origin, (*object)->BBox) && (*object)->Inside(ray.Origin, threadData))
-                    containingInteriors.push_back((*object)->interior);
+                    containingInteriors.push_back((*object)->interior.get());
         }
         else if((sceneData->boundingMethod == 0) || (sceneData->boundingSlabs == NULL))
         {
             for(vector<ObjectPtr>::iterator object = sceneData->objects.begin(); object != sceneData->objects.end(); object++)
                 if(((*object)->interior != NULL) && Inside_BBox(ray.Origin, (*object)->BBox) && (*object)->Inside(ray.Origin, threadData))
-                    containingInteriors.push_back((*object)->interior);
+                    containingInteriors.push_back((*object)->interior.get());
         }
         else
         {
@@ -936,7 +936,7 @@ void TracePixel::InitRayContainerStateTree(Ray& ray, BBOX_TREE *node)
         /* This is a leaf so test contained object. */
         ObjectPtr object = ObjectPtr(node->Node);
         if((object->interior != NULL) && object->Inside(ray.Origin, threadData))
-            containingInteriors.push_back(object->interior);
+            containingInteriors.push_back(object->interior.get());
     }
     else
     {

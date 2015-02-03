@@ -354,12 +354,12 @@ void PhotonShootingTask::ShootPhotonsAtObject(LightTargetCombo& combo)
 
                     /* As mike said, "fire photon torpedo!" */
                     //Initialize_Ray_Containers(&ray);
-                    ray.ClearInteriors () ;
+                    ray.ClearInteriors ();
 
                     for(vector<ObjectPtr>::iterator object = GetSceneData()->objects.begin(); object != GetSceneData()->objects.end(); object++)
                     {
                         if((*object)->Inside(ray.Origin, renderDataPtr) && ((*object)->interior != NULL))
-                            ray.AppendInterior((*object)->interior);
+                            ray.AppendInterior((*object)->interior.get());
                     }
 
                     notComputed = false;

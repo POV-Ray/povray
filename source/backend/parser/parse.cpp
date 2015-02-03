@@ -691,7 +691,7 @@ ObjectPtr Parser::Parse_Bicubic_Patch ()
     Object = new BicubicPatch();
 
     EXPECT
-        CASE_FLOAT_UNGET
+        CASE_FLOAT
             VersionWarning(150, "Should use keywords for bicubic parameters.");
             Object->Patch_Type = (int)Parse_Float();
             if (Object->Patch_Type == 2 ||
@@ -2329,7 +2329,7 @@ ObjectPtr Parser::Parse_Disc ()
     Object->oradius2 = tmpf * tmpf;
 
     EXPECT
-        CASE_FLOAT_UNGET
+        CASE_FLOAT
             tmpf = Parse_Float();
             Object->iradius2 = tmpf * tmpf;
         END_CASE
@@ -2940,9 +2940,9 @@ ObjectPtr Parser::Parse_Lathe()
     {
         SceneThreadData *td = GetParserDataPtr();
         sceneData->Max_Bounding_Cylinders = Object->Spline->BCyl->number;
-        td->BCyl_Intervals = POV_REALLOC (td->BCyl_Intervals, 4*sceneData->Max_Bounding_Cylinders*sizeof(BCYL_INT), "lathe intersection list");
-        td->BCyl_RInt = POV_REALLOC (td->BCyl_RInt, 2*sceneData->Max_Bounding_Cylinders*sizeof(BCYL_INT), "lathe intersection list");
-        td->BCyl_HInt = POV_REALLOC (td->BCyl_HInt, 2*sceneData->Max_Bounding_Cylinders*sizeof(BCYL_INT), "lathe intersection list");
+        td->BCyl_Intervals.reserve(4*sceneData->Max_Bounding_Cylinders);
+        td->BCyl_RInt.reserve(2*sceneData->Max_Bounding_Cylinders);
+        td->BCyl_HInt.reserve(2*sceneData->Max_Bounding_Cylinders);
     }
 
     return (reinterpret_cast<ObjectPtr>(Object));
@@ -4163,7 +4163,7 @@ ObjectPtr Parser::Parse_Mesh2()
 
         /* look for a texture index */
         EXPECT
-            CASE_FLOAT_UNGET
+            CASE_FLOAT
                 Triangles[i].Texture = Parse_Float(); Parse_Comma();
                 if (Triangles[i].Texture >= number_of_textures ||
                     Triangles[i].Texture < 0)
@@ -4180,7 +4180,7 @@ ObjectPtr Parser::Parse_Mesh2()
         END_EXPECT
         /* look for a texture index */
         EXPECT
-            CASE_FLOAT_UNGET
+            CASE_FLOAT
                 Triangles[i].Texture2 = Parse_Float(); Parse_Comma();
                 if (Triangles[i].Texture2 >= number_of_textures ||
                     Triangles[i].Texture2 < 0)
@@ -4196,7 +4196,7 @@ ObjectPtr Parser::Parse_Mesh2()
         END_EXPECT
         /* look for a texture index */
         EXPECT
-            CASE_FLOAT_UNGET
+            CASE_FLOAT
                 Triangles[i].Texture3 = Parse_Float(); Parse_Comma();
                 if (Triangles[i].Texture3 >= number_of_textures ||
                     Triangles[i].Texture3 < 0)
@@ -5412,7 +5412,7 @@ ObjectPtr Parser::Parse_Prism()
                 break;
         }
 
-        for ( ; i < Object->Number; i++)
+        for (; i < Object->Number; i++)
         {
             closed = false;
 
@@ -5761,9 +5761,9 @@ ObjectPtr Parser::Parse_Sor()
     {
         SceneThreadData *td = GetParserDataPtr();
         sceneData->Max_Bounding_Cylinders = Object->Spline->BCyl->number;
-        td->BCyl_Intervals = POV_REALLOC (td->BCyl_Intervals, 4*sceneData->Max_Bounding_Cylinders*sizeof(BCYL_INT), "lathe intersection list");
-        td->BCyl_RInt = POV_REALLOC (td->BCyl_RInt, 2*sceneData->Max_Bounding_Cylinders*sizeof(BCYL_INT), "lathe intersection list");
-        td->BCyl_HInt = POV_REALLOC (td->BCyl_HInt, 2*sceneData->Max_Bounding_Cylinders*sizeof(BCYL_INT), "lathe intersection list");
+        td->BCyl_Intervals.reserve(4*sceneData->Max_Bounding_Cylinders);
+        td->BCyl_RInt.reserve(2*sceneData->Max_Bounding_Cylinders);
+        td->BCyl_HInt.reserve(2*sceneData->Max_Bounding_Cylinders);
     }
 
     return (reinterpret_cast<ObjectPtr>(Object));
@@ -6498,7 +6498,8 @@ void Parser::Parse_Default ()
         CASE (FINISH_TOKEN)
             Local_Finish = Copy_Finish((Default_Texture->Finish));
             Parse_Finish (&Local_Finish);
-            Destroy_Finish(Default_Texture->Finish);
+            if (Default_Texture->Finish)
+                delete Default_Texture->Finish;
             Default_Texture->Finish = Local_Finish;
         END_CASE
 
@@ -7348,7 +7349,7 @@ ObjectPtr Parser::Parse_Object_Mods (ObjectPtr Object)
             Set_Flag(Object, CUTAWAY_TEXTURES_FLAG);
         END_CASE
 
-        CASE_COLOUR_UNGET
+        CASE_COLOUR
             Parse_Colour (Local_Colour);
             if (sceneData->EffectiveLanguageVersion() < 150)
             {
@@ -7467,7 +7468,7 @@ ObjectPtr Parser::Parse_Object_Mods (ObjectPtr Object)
         END_CASE
 
         CASE (INTERIOR_TOKEN)
-            Parse_Interior(reinterpret_cast<Interior **>(&Object->interior));
+            Parse_Interior(Object->interior);
         END_CASE
 
         CASE (MATERIAL_TOKEN)
@@ -8374,7 +8375,7 @@ int Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTR
     Camera *Local_Camera;
     vector<Media> Local_Media;
     PIGMENT *Local_Density;
-    Interior *Local_Interior;
+    InteriorPtr* Local_Interior;
     MATERIAL *Local_Material;
     void *Temp_Data;
     POV_PARAM *New_Par;
@@ -8427,7 +8428,7 @@ int Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTR
             EXIT
         END_CASE
 
-        CASE_COLOUR_UNGET
+        CASE_COLOUR
             if((Token.Token_Id != COLOUR_ID_TOKEN) || (sceneData->EffectiveLanguageVersion() < 350))
             {
                 Local_Colour  = Create_Colour();
@@ -8446,7 +8447,7 @@ int Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTR
             }
             // intentional to allow color dot expressions as macro parameters if #version is 3.5 or higher [trf]
 
-        CASE_VECTOR_UNGET
+        CASE_VECTOR
             // It seems very few people understand what is going on here, so let me try to
             // explain it. All comments below are mine and they are based on how I think it
             // works and understand it. As I didn't write most of the code I cannot really
@@ -8740,8 +8741,8 @@ int Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTR
         END_CASE
 
         CASE (INTERIOR_TOKEN)
-            Local_Interior = NULL;
-            Parse_Interior(&Local_Interior);
+            Local_Interior = new InteriorPtr;
+            Parse_Interior(*Local_Interior);
             Temp_Data  = reinterpret_cast<void *>(Local_Interior);
             *NumberPtr = INTERIOR_ID_TOKEN;
             Test_Redefine(Previous,NumberPtr,*DataPtr, allow_redefine);
@@ -8794,7 +8795,9 @@ int Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTR
             EXIT
         END_CASE
 
-        CASE_NONID_STRING_UNGET
+        CASE5 (STRING_LITERAL_TOKEN,CHR_TOKEN,SUBSTR_TOKEN,STR_TOKEN,VSTR_TOKEN)
+        CASE4 (CONCAT_TOKEN,STRUPR_TOKEN,STRLWR_TOKEN,DATETIME_TOKEN)
+            UNGET
             Temp_Data  = Parse_String();
             *NumberPtr = STRING_ID_TOKEN;
             Test_Redefine(Previous,NumberPtr,*DataPtr, allow_redefine);
@@ -8838,7 +8841,7 @@ void Parser::Destroy_Ident_Data(void *Data, int Type)
     switch(Type)
     {
         case COLOUR_ID_TOKEN:
-            Destroy_Colour(reinterpret_cast<RGBFTColour *>(Data));
+            delete reinterpret_cast<RGBFTColour *>(Data);
             break;
         case VECTOR_ID_TOKEN:
             delete reinterpret_cast<Vector3d *>(Data);
@@ -8854,19 +8857,19 @@ void Parser::Destroy_Ident_Data(void *Data, int Type)
             break;
         case PIGMENT_ID_TOKEN:
         case DENSITY_ID_TOKEN:
-            Destroy_Pigment(reinterpret_cast<PIGMENT *>(Data));
+            delete reinterpret_cast<PIGMENT *>(Data);
             break;
         case TNORMAL_ID_TOKEN:
-            Destroy_Tnormal(reinterpret_cast<TNORMAL *>(Data));
+            delete reinterpret_cast<TNORMAL *>(Data);
             break;
         case FINISH_ID_TOKEN:
-            Destroy_Finish(Data);
+            delete reinterpret_cast<FINISH *>(Data);
             break;
         case MEDIA_ID_TOKEN:
-            delete (reinterpret_cast<Media *>(Data));
+            delete reinterpret_cast<Media *>(Data);
             break;
         case INTERIOR_ID_TOKEN:
-            Destroy_Interior(reinterpret_cast<Interior *>(Data));
+            delete reinterpret_cast<InteriorPtr *>(Data);
             break;
         case MATERIAL_ID_TOKEN:
             Destroy_Material(reinterpret_cast<MATERIAL *>(Data));
@@ -8900,29 +8903,31 @@ void Parser::Destroy_Ident_Data(void *Data, int Type)
             delete reinterpret_cast<Camera *>(Data);
             break;
         case RAINBOW_ID_TOKEN:
-            Destroy_Rainbow(reinterpret_cast<RAINBOW *>(Data));
+            delete reinterpret_cast<RAINBOW *>(Data);
             break;
         case FOG_ID_TOKEN:
-            Destroy_Fog(reinterpret_cast<FOG *>(Data));
+            delete reinterpret_cast<FOG *>(Data);
             break;
         case SKYSPHERE_ID_TOKEN:
-            Destroy_Skysphere(reinterpret_cast<SKYSPHERE *>(Data));
+            delete reinterpret_cast<SKYSPHERE *>(Data);
             break;
         case MACRO_ID_TOKEN:
         case TEMPORARY_MACRO_ID_TOKEN:
-            Destroy_Macro(reinterpret_cast<POV_MACRO *>(Data));
+            delete reinterpret_cast<Macro *>(Data);
             break;
         case STRING_ID_TOKEN:
-                POV_FREE(Data);
+            POV_FREE(Data);
             break;
         case ARRAY_ID_TOKEN:
             a = reinterpret_cast<POV_ARRAY *>(Data);
-            for(i=0; i<a->Total; i++)
-            {
-                Destroy_Ident_Data(a->DataPtrs[i], a->Type);
-            }
             if(a->DataPtrs != NULL)
+            {
+                for(i=0; i<a->Total; i++)
+                {
+                    Destroy_Ident_Data(a->DataPtrs[i], a->Type);
+                }
                 POV_FREE(a->DataPtrs);
+            }
             POV_FREE(a);
             break;
         case PARAMETER_ID_TOKEN:
@@ -8941,7 +8946,7 @@ void Parser::Destroy_Ident_Data(void *Data, int Type)
             Destroy_Function((FUNCTION_PTR)Data);
             break;
         case SPLINE_ID_TOKEN:
-            Destroy_Spline(reinterpret_cast<SPLINE *>(Data));
+            Destroy_Spline(reinterpret_cast<GenericSpline *>(Data));
             break;
         default:
             Error("Do not know how to free memory for identifier type %d", Type);
@@ -9271,7 +9276,7 @@ void Parser::Post_Process (ObjectPtr Object, ObjectPtr Parent)
         }
         if (Object->interior == NULL)
         {
-            Object->interior = Copy_Interior_Pointer(Parent->interior);
+            Object->interior = Parent->interior;
         }
 
         if (Test_Flag(Parent, NO_REFLECTION_FLAG))
@@ -9424,13 +9429,11 @@ void Parser::Post_Process (ObjectPtr Object, ObjectPtr Parent)
         {
             if ((reinterpret_cast<LightSource *>(Object))->Projected_Through_Object->interior != NULL)
             {
-                Destroy_Interior((reinterpret_cast<LightSource *>(Object))->Projected_Through_Object->interior);
-                (reinterpret_cast<LightSource *>(Object))->Projected_Through_Object->interior=NULL;
+                (reinterpret_cast<LightSource *>(Object))->Projected_Through_Object->interior = NULL;
                 Warning("Projected through objects can not have interior, interior removed.");
             }
             if ((reinterpret_cast<LightSource *>(Object))->Projected_Through_Object->Texture != NULL)
             {
-                Destroy_Textures((reinterpret_cast<LightSource *>(Object))->Projected_Through_Object->Texture);
                 (reinterpret_cast<LightSource *>(Object))->Projected_Through_Object->Texture = NULL;
                 Warning("Projected through objects can not have texture, texture removed.");
             }
@@ -9452,7 +9455,7 @@ void Parser::Post_Process (ObjectPtr Object, ObjectPtr Parent)
 
         if (Object->interior == NULL)
         {
-            Object->interior = new Interior();
+            Object->interior = InteriorPtr(new Interior());
         }
 
         // Promote hollow flag to interior.
@@ -10006,7 +10009,7 @@ void *Parser::Copy_Identifier (void *Data, int Type)
             New = reinterpret_cast<void *>(Copy_Function((FUNCTION_PTR )Data));
             break;
         case SPLINE_ID_TOKEN:
-            New = reinterpret_cast<void *>(Copy_Spline((SPLINE *)Data));
+            New = reinterpret_cast<void *>(Copy_Spline((GenericSpline *)Data));
             break;
         default:
             Error("Cannot copy identifier");

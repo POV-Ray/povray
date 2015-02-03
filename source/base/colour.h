@@ -713,7 +713,7 @@ class GenericRGBFTColour
             mTransm(transm)
         {}
 
-        inline explicit GenericRGBFTColour(const EXPRESS expr) :
+        inline explicit GenericRGBFTColour(const EXPRESS& expr) :
             mColour(expr[0], expr[1], expr[2]),
             mFilter(expr[3]),
             mTransm(expr[4])
@@ -765,7 +765,7 @@ class GenericRGBFTColour
             mTransm = 0.0;
         }
 
-        inline void Get(EXPRESS expr, unsigned int n) const
+        inline void Get(EXPRESS& expr, unsigned int n) const
         {
             if (n > 0) expr[0] = mColour.red();
             if (n > 1) expr[1] = mColour.green();
@@ -774,7 +774,7 @@ class GenericRGBFTColour
             if (n > 4) expr[4] = mTransm;
         }
 
-        inline void Set(const EXPRESS expr, unsigned int n)
+        inline void Set(const EXPRESS& expr, unsigned int n)
         {
             if (n > 0) mColour.red()   = expr[0];
             if (n > 1) mColour.green() = expr[1];

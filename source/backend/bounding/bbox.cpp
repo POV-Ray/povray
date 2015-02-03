@@ -64,18 +64,78 @@ void calc_bbox(BoundingBox *BBox, BBOX_TREE **Finite, ptrdiff_t first, ptrdiff_t
 void build_area_table(BBOX_TREE **Finite, ptrdiff_t a, ptrdiff_t b, DBL *areas);
 int sort_and_split(BBOX_TREE **Root, BBOX_TREE **&Finite, size_t *numOfFiniteObjects, ptrdiff_t first, ptrdiff_t last, size_t& maxfinitecount);
 
-void priority_queue_insert(BBoxPriorityQueue& Queue, DBL Depth, BBOX_TREE *Node);
-
 BBoxPriorityQueue::BBoxPriorityQueue()
 {
-    QSize = 0;
-    Queue = reinterpret_cast<Qelem *>(POV_MALLOC(INITIAL_PRIORITY_QUEUE_SIZE * sizeof(Qelem), "priority queue"));
-    Max_QSize = INITIAL_PRIORITY_QUEUE_SIZE;
+    mQueue.resize(1); // element 0 is reserved
 }
 
 BBoxPriorityQueue::~BBoxPriorityQueue()
+{}
+
+void BBoxPriorityQueue::Insert(DBL depth, ConstBBoxTreePtr node)
 {
-    POV_FREE(Queue);
+    vector<Qelem>::size_type size;
+    vector<Qelem>::size_type i;
+
+    size = mQueue.size();
+    mQueue.resize(size+1);
+
+    i = size;
+    while(i > 1 && depth < mQueue[i/2].depth)
+    {
+        mQueue[i] = mQueue[i/2];
+        i /= 2;
+    }
+    mQueue[i].depth = depth;
+    mQueue[i].node  = node;
+}
+
+bool BBoxPriorityQueue::RemoveMin(DBL& depth, ConstBBoxTreePtr& node)
+{
+    vector<Qelem>::size_type size = mQueue.size() - 1;
+    vector<Qelem>::size_type i, j;
+
+    if (size == 0)
+        return false;
+
+    depth = mQueue[1].depth;
+    node  = mQueue[1].node;
+
+    mQueue[1] = mQueue.back();
+    mQueue.pop_back();
+
+    i = 1;
+
+    while (2 * i <= (int)size)
+    {
+        if (2 * i == (int)size)
+            j = 2 * i;
+        else
+        {
+            if (mQueue[2*i].depth < mQueue[2*i+1].depth)
+                j = 2 * i;
+            else
+                j = 2 * i + 1;
+        }
+
+        if (mQueue[i].depth <= mQueue[j].depth)
+            break;
+
+        std::swap(mQueue[i], mQueue[j]);
+        i = j;
+    }
+
+    return true;
+}
+
+bool BBoxPriorityQueue::IsEmpty() const
+{
+    return (mQueue.size() == 1);
+}
+
+void BBoxPriorityQueue::Clear()
+{
+    mQueue.resize(1);
 }
 
 void Destroy_BBox_Tree(BBOX_TREE *Node)
@@ -297,11 +357,11 @@ void Build_Bounding_Slabs(BBOX_TREE **Root, vector<ObjectPtr>& objects, unsigned
     Finite = Infinite = NULL;
 
     if(numberOfFiniteObjects > 0)
-        Finite = reinterpret_cast<BBOX_TREE **>(POV_MALLOC(maxfinitecount*sizeof(BBOX_TREE *), "bounding boxes"));
+        Finite = new BBOX_TREE* [maxfinitecount];
 
     // Create array to hold pointers to infinite objects.
     if(numberOfInfiniteObjects > 0)
-        Infinite = reinterpret_cast<BBOX_TREE **>(POV_MALLOC(numberOfInfiniteObjects*sizeof(BBOX_TREE *), "bounding boxes"));
+        Infinite = new BBOX_TREE* [numberOfInfiniteObjects];
 
     // Init lists.
     for(int i = 0; i < numberOfFiniteObjects; i++)
@@ -351,10 +411,10 @@ void Build_Bounding_Slabs(BBOX_TREE **Root, vector<ObjectPtr>& objects, unsigned
 
     // Get rid of the Finite and Infinite arrays and just use Root.
     if(Finite != NULL)
-        POV_FREE(Finite);
+        delete[] Finite;
 
     if(Infinite != NULL)
-        POV_FREE(Infinite);
+        delete[] Infinite;
 }
 
 bool Intersect_BBox_Tree(BBoxPriorityQueue& pqueue, const BBOX_TREE *Root, const Ray& ray, Intersection *Best_Intersection, TraceThreadData *Thread)
@@ -368,7 +428,7 @@ bool Intersect_BBox_Tree(BBoxPriorityQueue& pqueue, const BBOX_TREE *Root, const
     Rayinfo rayinfo(ray);
 
     // Start with an empty priority queue.
-    pqueue.QSize = 0;
+    pqueue.Clear();
     New_Intersection.Object = NULL;
     found = false;
 
@@ -376,9 +436,9 @@ bool Intersect_BBox_Tree(BBoxPriorityQueue& pqueue, const BBOX_TREE *Root, const
     Check_And_Enqueue(pqueue, Root, &Root->BBox, &rayinfo, Thread);
 
     // Check elements in the priority queue.
-    while(pqueue.QSize != 0)
+    while(!pqueue.IsEmpty())
     {
-        Priority_Queue_Delete(pqueue, &Depth, &Node);
+        pqueue.RemoveMin(Depth, Node);
 
         // If current intersection is larger than the best intersection found
         // so far our task is finished, because all other bounding boxes in
@@ -421,7 +481,7 @@ bool Intersect_BBox_Tree(BBoxPriorityQueue& pqueue, const BBOX_TREE *Root, const
     Rayinfo rayinfo(ray);
 
     // Start with an empty priority queue.
-    pqueue.QSize = 0;
+    pqueue.Clear();
     New_Intersection.Object = NULL;
     found = false;
 
@@ -429,9 +489,9 @@ bool Intersect_BBox_Tree(BBoxPriorityQueue& pqueue, const BBOX_TREE *Root, const
     Check_And_Enqueue(pqueue, Root, &Root->BBox, &rayinfo, Thread);
 
     // Check elements in the priority queue.
-    while(pqueue.QSize != 0)
+    while(!pqueue.IsEmpty())
     {
-        Priority_Queue_Delete(pqueue, &Depth, &Node);
+        pqueue.RemoveMin(Depth, Node);
 
         // If current intersection is larger than the best intersection found
         // so far our task is finished, because all other bounding boxes in
@@ -464,127 +524,6 @@ bool Intersect_BBox_Tree(BBoxPriorityQueue& pqueue, const BBOX_TREE *Root, const
     }
 
     return (found);
-}
-
-static void priority_queue_insert(BBoxPriorityQueue& Queue, DBL Depth, const BBOX_TREE *Node)
-{
-    unsigned size;
-    int i;
-    //BBoxPriorityQueue::Qelem tmp;
-    BBoxPriorityQueue::Qelem *List;
-
-    Queue.QSize++;
-
-    size = Queue.QSize;
-
-    /* Reallocate priority queue if it's too small. */
-
-    if (size >= Queue.Max_QSize)
-    {
-        /*
-        if (size >= INT_MAX/2)
-        {
-// TODO FIXME           Error("Priority queue overflow.");
-        }
-        */
-
-        Queue.Max_QSize *= 2;
-
-        Queue.Queue = reinterpret_cast<BBoxPriorityQueue::Qelem *>(POV_REALLOC(Queue.Queue, Queue.Max_QSize*sizeof(BBoxPriorityQueue::Qelem), "priority queue"));
-    }
-
-    List = Queue.Queue;
-
-    /*
-     ***
-    List[size].depth = Depth;
-    List[size].node  = Node;
-
-    i = size;
-
-    while (i > 1 && List[i].depth < List[i / 2].depth)
-    {
-        tmp = List[i];
-
-        List[i] = List[i / 2];
-
-        List[i / 2] = tmp;
-
-        i = i / 2;
-    }
-    ***
-    */
-
-    i = size;
-    while(i > 1 && Depth < List[i/2].depth)
-    {
-        List[i] = List[i/2];
-        i /= 2;
-    }
-    List[i].depth = Depth;
-    List[i].node  = Node;
-}
-
-// Get an element from the priority queue.
-// NOTE: This element will always be the one closest to the ray origin.
-void Priority_Queue_Delete(BBoxPriorityQueue& Queue, DBL *Depth, const BBOX_TREE **Node)
-{
-    BBoxPriorityQueue::Qelem tmp;
-    BBoxPriorityQueue::Qelem *List;
-    int i, j;
-    unsigned size;
-
-    if (Queue.QSize == 0)
-    {
-// TODO FIXME       Error("priority queue is empty.");
-    }
-
-    List = Queue.Queue;
-
-    *Depth = List[1].depth;
-    *Node  = List[1].node;
-
-    List[1] = List[Queue.QSize];
-
-    Queue.QSize--;
-
-    size = Queue.QSize;
-
-    i = 1;
-
-    while (2 * i <= (int)size)
-    {
-        if (2 * i == (int)size)
-        {
-            j = 2 * i;
-        }
-        else
-        {
-            if (List[2*i].depth < List[2*i+1].depth)
-            {
-                j = 2 * i;
-            }
-            else
-            {
-                j = 2 * i + 1;
-            }
-        }
-
-        if (List[i].depth > List[j].depth)
-        {
-            tmp = List[i];
-
-            List[i] = List[j];
-
-            List[j] = tmp;
-
-            i = j;
-        }
-        else
-        {
-            break;
-        }
-    }
 }
 
 void Check_And_Enqueue(BBoxPriorityQueue& Queue, const BBOX_TREE *Node, const BoundingBox *BBox, const Rayinfo *rayinfo, TraceThreadData *Thread)
@@ -732,7 +671,7 @@ void Check_And_Enqueue(BBoxPriorityQueue& Queue, const BBOX_TREE *Node, const Bo
         // Set intersection depth to -Max_Distance.
         dmin = -MAX_DISTANCE;
 
-    priority_queue_insert(Queue, dmin, Node);
+    Queue.Insert(dmin, Node);
 }
 
 BBOX_TREE *create_bbox_node(int size)
@@ -954,8 +893,8 @@ int sort_and_split(BBOX_TREE **Root, BBOX_TREE **&Finite, size_t *numOfFiniteObj
     // area_right[i] holds the surface area of the box containing Finite
     // i through size-1.
 
-    area_left = reinterpret_cast<DBL *>(POV_MALLOC(size * sizeof(DBL), "bounding boxes"));
-    area_right = reinterpret_cast<DBL *>(POV_MALLOC(size * sizeof(DBL), "bounding boxes"));
+    area_left  = new DBL[size];
+    area_right = new DBL[size];
 
     // Precalculate the areas for speed.
     build_area_table(Finite, first, last - 1, area_left);
@@ -979,8 +918,8 @@ int sort_and_split(BBOX_TREE **Root, BBOX_TREE **&Finite, size_t *numOfFiniteObj
         }
     }
 
-    POV_FREE(area_left);
-    POV_FREE(area_right);
+    delete[] area_left;
+    delete[] area_right;
 
     // Stop splitting if the BUNCHING_FACTOR is reached or
     // if splitting stops being effective.

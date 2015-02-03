@@ -445,8 +445,8 @@ static int sort_and_split(BSPHERE_TREE **Root, BSPHERE_TREE ***Elements, int *nE
      * i through size-1.
      */
 
-    area_left  = reinterpret_cast<DBL *>(POV_MALLOC(size * sizeof(DBL), "blob bounding hierarchy"));
-    area_right = reinterpret_cast<DBL *>(POV_MALLOC(size * sizeof(DBL), "blob bounding hierarchy"));
+    area_left  = new DBL[size];
+    area_right = new DBL[size];
 
     /* Precalculate the areas for speed. */
 
@@ -475,8 +475,8 @@ static int sort_and_split(BSPHERE_TREE **Root, BSPHERE_TREE ***Elements, int *nE
         }
     }
 
-    POV_FREE(area_left);
-    POV_FREE(area_right);
+    delete[] area_left;
+    delete[] area_right;
 
     /*
      * Stop splitting if the BRANCHING_FACTOR is reached or

@@ -337,9 +337,9 @@ bool Sor::Intersect(const BasicRay& ray, IStack& Depth_Stack, TraceThreadData *T
     }
 
     /* Intersect all cylindrical bounds. */
-    BCYL_INT *intervals = reinterpret_cast<BCYL_INT *>(Thread->BCyl_Intervals) ;
-    BCYL_INT *rint = reinterpret_cast<BCYL_INT *>(Thread->BCyl_RInt) ;
-    BCYL_INT *hint = reinterpret_cast<BCYL_INT *>(Thread->BCyl_HInt) ;
+    vector<BCYL_INT>& intervals = Thread->BCyl_Intervals;
+    vector<BCYL_INT>& rint = Thread->BCyl_RInt;
+    vector<BCYL_INT>& hint = Thread->BCyl_HInt;
 
     if ((cnt = Intersect_BCyl(Spline->BCyl, intervals, rint, hint, P, D)) == 0)
     {
@@ -867,9 +867,9 @@ Sor::~Sor()
     {
         Destroy_BCyl(Spline->BCyl);
 
-        POV_FREE(Spline->Entry);
+        delete[] Spline->Entry;
 
-        POV_FREE(Spline);
+        delete Spline;
     }
 }
 
@@ -967,11 +967,11 @@ void Sor::Compute_Sor(Vector2d *P, TraceThreadData *Thread)
 
     if (Spline == NULL)
     {
-        Spline = reinterpret_cast<SOR_SPLINE *>(POV_MALLOC(sizeof(SOR_SPLINE), "spline segments of surface of revoluion"));
+        Spline = new SOR_SPLINE;
 
         Spline->References = 1;
 
-        Spline->Entry = reinterpret_cast<SOR_SPLINE_ENTRY *>(POV_MALLOC(Number*sizeof(SOR_SPLINE_ENTRY), "spline segments of surface of revoluion"));
+        Spline->Entry = new SOR_SPLINE_ENTRY[Number];
     }
     else
     {
@@ -980,10 +980,10 @@ void Sor::Compute_Sor(Vector2d *P, TraceThreadData *Thread)
 
     /* Allocate temporary lists. */
 
-    tmp_r1 = reinterpret_cast<DBL *>(POV_MALLOC(Number * sizeof(DBL), "temp lathe data"));
-    tmp_r2 = reinterpret_cast<DBL *>(POV_MALLOC(Number * sizeof(DBL), "temp lathe data"));
-    tmp_h1 = reinterpret_cast<DBL *>(POV_MALLOC(Number * sizeof(DBL), "temp lathe data"));
-    tmp_h2 = reinterpret_cast<DBL *>(POV_MALLOC(Number * sizeof(DBL), "temp lathe data"));
+    tmp_r1 = new DBL[Number];
+    tmp_r2 = new DBL[Number];
+    tmp_h1 = new DBL[Number];
+    tmp_h2 = new DBL[Number];
 
     /* We want to know the size of the overall bounding cylinder. */
 
@@ -1139,10 +1139,10 @@ void Sor::Compute_Sor(Vector2d *P, TraceThreadData *Thread)
 
     /* Get rid of temp. memory. */
 
-    POV_FREE(tmp_h2);
-    POV_FREE(tmp_h1);
-    POV_FREE(tmp_r2);
-    POV_FREE(tmp_r1);
+    delete[] tmp_h2;
+    delete[] tmp_h1;
+    delete[] tmp_r2;
+    delete[] tmp_r1;
 }
 
 

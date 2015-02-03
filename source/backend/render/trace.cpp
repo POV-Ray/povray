@@ -752,7 +752,7 @@ void Trace::ComputeLightedTexture(MathColour& resultColour, ColourChannel& resul
     std::auto_ptr<PhotonGatherer> surfacePhotonGatherer(NULL); // TODO FIXME - auto_ptr why?  [CLi] why, to auto-destruct it of course! (e.g. in case of exception)
 
     double relativeIor;
-    ComputeRelativeIOR(ray, isect.Object->interior, relativeIor);
+    ComputeRelativeIOR(ray, isect.Object->interior.get(), relativeIor);
 
     WNRXVector listWNRX(wnrxPool); // "Weight, Normal, Reflectivity, eXponent"
     assert(listWNRX->empty()); // verify that the WNRXVector pulled from the pool is in a cleaned-up condition
@@ -1033,7 +1033,7 @@ void Trace::ComputeLightedTexture(MathColour& resultColour, ColourChannel& resul
     // filtering it by filCol.
     tir_occured = false;
 
-    if(((interior = isect.Object->interior) != NULL) && (trans > ray.GetTicket().adcBailout) && qualityFlags.refractions)
+    if(((interior = isect.Object->interior.get()) != NULL) && (trans > ray.GetTicket().adcBailout) && qualityFlags.refractions)
     {
         // [CLi] changed filCol to RGB, as filter and transmit were always pinned to 1.0 and 0.0, respectively anyway
         // TODO CLARIFY - is this working properly if some filCol component is negative? (what would be the right thing then?)
@@ -1126,7 +1126,7 @@ void Trace::ComputeLightedTexture(MathColour& resultColour, ColourChannel& resul
 void Trace::ComputeShadowTexture(MathColour& filtercolour, const TEXTURE *texture, vector<const TEXTURE *>& warps, const Vector3d& ipoint,
                                  const Vector3d& rawnormal, const Ray& ray, Intersection& isect)
 {
-    Interior *interior = isect.Object->interior;
+    Interior *interior = isect.Object->interior.get();
     const TEXTURE *layer;
     double caustics, dotval, k;
     Vector3d layer_Normal;
@@ -2419,7 +2419,7 @@ void Trace::ComputeIridColour(const FINISH *finish, const Vector3d& lightDirecti
     double cos_angle_of_incidence_light, cos_angle_of_incidence_eye, interference;
     double film_thickness;
     double noise;
-    TURB turb;
+    TurbulenceWarp turb;
 
     film_thickness = finish->Irid_Film_Thickness;
 
@@ -2514,7 +2514,7 @@ void Trace::ComputeSpecularColour(const FINISH *finish, const Vector3d& lightDir
     }
 }
 
-void Trace::ComputeRelativeIOR(const Ray& ray, const Interior* interior, double& ior)
+void Trace::ComputeRelativeIOR(const Ray& ray, const Interior *interior, double& ior)
 {
     // Get ratio of iors depending on the interiors the ray is traversing.
     if (interior == NULL)
@@ -2982,8 +2982,8 @@ void Trace::ComputeShadowMedia(Ray& light_source_ray, Intersection& isect, MathC
 
     // If ray is entering from the atmosphere or the ray is currently *not* inside an object add it,
     // but if it is currently inside an object, the ray is leaving the current object and is removed
-    if((isect.Object != NULL) && ((light_source_ray.GetInteriors().empty()) || (light_source_ray.RemoveInterior(isect.Object->interior) == false)))
-        light_source_ray.AppendInterior(isect.Object->interior);
+    if((isect.Object != NULL) && ((light_source_ray.GetInteriors().empty()) || (light_source_ray.RemoveInterior(isect.Object->interior.get()) == false)))
+        light_source_ray.AppendInterior(isect.Object->interior.get());
 }
 
 
@@ -3634,7 +3634,7 @@ void Trace::ComputeSubsurfaceScattering(const FINISH *Finish, const MathColour& 
 
     double eta;
 
-    ComputeRelativeIOR(Eye, out.Object->interior, eta);
+    ComputeRelativeIOR(Eye, out.Object->interior.get(), eta);
 
 #if 0
     // user setting specifies mean free path

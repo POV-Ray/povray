@@ -2,7 +2,7 @@
 ///
 /// @file backend/bounding/bcyl.h
 ///
-/// This module contains all defines, typedefs, and prototypes for `bcyl.c`
+/// This module contains all defines, typedefs, and prototypes for `bcyl.cpp`.
 ///
 /// @copyright
 /// @parblock
@@ -94,7 +94,7 @@ struct BCyl_Struct
 BCYL *Create_BCyl (int, const DBL *, const DBL *, const DBL *, const DBL *);
 void Destroy_BCyl (BCYL *);
 
-int Intersect_BCyl (const BCYL *BCyl, BCYL_INT *Intervals, BCYL_INT *rint, BCYL_INT *hint, const Vector3d& P, const Vector3d& D);
+int Intersect_BCyl (const BCYL *BCyl, vector<BCYL_INT>& Intervals, vector<BCYL_INT>& rint, vector<BCYL_INT>& hint, const Vector3d& P, const Vector3d& D);
 
 }
 

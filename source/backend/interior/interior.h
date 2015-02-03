@@ -2,8 +2,7 @@
 ///
 /// @file backend/interior/interior.h
 ///
-/// This module contains all defines, typedefs, and prototypes for
-/// `interior.cpp`.
+/// This module contains all defines, typedefs, and prototypes for interior.cpp.
 ///
 /// @copyright
 /// @parblock
@@ -32,7 +31,7 @@
 ///
 /// @endparblock
 ///
-//******************************************************************************
+//*******************************************************************************
 
 #ifndef INTERIOR_H
 #define INTERIOR_H
@@ -62,8 +61,7 @@ namespace pov
 * Global functions
 ******************************************************************************/
 
-Interior *Copy_Interior_Pointer(Interior *);
-void Destroy_Interior(Interior *);
+void Destroy_Interior(InteriorPtr&);
 
 MATERIAL *Create_Material(void);
 MATERIAL *Copy_Material(const MATERIAL *);

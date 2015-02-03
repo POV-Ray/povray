@@ -281,9 +281,9 @@ bool Lathe::Intersect(const BasicRay& ray, IStack& Depth_Stack, TraceThreadData 
         return false;
 
     // Intersect all cylindrical bounds.
-    BCYL_INT *intervals = reinterpret_cast<BCYL_INT *>(Thread->BCyl_Intervals) ;
-    BCYL_INT *rint = reinterpret_cast<BCYL_INT *>(Thread->BCyl_RInt) ;
-    BCYL_INT *hint = reinterpret_cast<BCYL_INT *>(Thread->BCyl_HInt) ;
+    vector<BCYL_INT>& intervals = Thread->BCyl_Intervals;
+    vector<BCYL_INT>& rint = Thread->BCyl_RInt;
+    vector<BCYL_INT>& hint = Thread->BCyl_HInt;
 
     if((cnt = Intersect_BCyl(Spline->BCyl, intervals, rint, hint, P, D)) == 0)
         return false;
@@ -869,9 +869,9 @@ Lathe::~Lathe()
     {
         Destroy_BCyl(Spline->BCyl);
 
-        POV_FREE(Spline->Entry);
+        delete[] Spline->Entry;
 
-        POV_FREE(Spline);
+        delete Spline;
     }
 }
 
@@ -1001,13 +1001,13 @@ void Lathe::Compute_Lathe(Vector2d *P, TraceThreadData *Thread)
 
     if (Spline == NULL)
     {
-        Spline = reinterpret_cast<LATHE_SPLINE *>(POV_MALLOC(sizeof(LATHE_SPLINE), "spline segments of lathe"));
+        Spline = new LATHE_SPLINE;
 
         /* Init spline. */
 
         Spline->References = 1;
 
-        Spline->Entry = reinterpret_cast<LATHE_SPLINE_ENTRY *>(POV_MALLOC(number_of_segments*sizeof(LATHE_SPLINE_ENTRY), "spline segments of lathe"));
+        Spline->Entry = new LATHE_SPLINE_ENTRY[number_of_segments];
     }
     else
     {
@@ -1018,10 +1018,10 @@ void Lathe::Compute_Lathe(Vector2d *P, TraceThreadData *Thread)
 
     /* Allocate temporary lists. */
 
-    tmp_r1 = reinterpret_cast<DBL *>(POV_MALLOC(number_of_segments * sizeof(DBL), "temp lathe data"));
-    tmp_r2 = reinterpret_cast<DBL *>(POV_MALLOC(number_of_segments * sizeof(DBL), "temp lathe data"));
-    tmp_h1 = reinterpret_cast<DBL *>(POV_MALLOC(number_of_segments * sizeof(DBL), "temp lathe data"));
-    tmp_h2 = reinterpret_cast<DBL *>(POV_MALLOC(number_of_segments * sizeof(DBL), "temp lathe data"));
+    tmp_r1 = new DBL[number_of_segments];
+    tmp_r2 = new DBL[number_of_segments];
+    tmp_h1 = new DBL[number_of_segments];
+    tmp_h2 = new DBL[number_of_segments];
 
     /***************************************************************************
     * Calculate segments.
@@ -1240,10 +1240,10 @@ void Lathe::Compute_Lathe(Vector2d *P, TraceThreadData *Thread)
 
     /* Get rid of temp. memory. */
 
-    POV_FREE(tmp_h2);
-    POV_FREE(tmp_h1);
-    POV_FREE(tmp_r2);
-    POV_FREE(tmp_r1);
+    delete[] tmp_h2;
+    delete[] tmp_h1;
+    delete[] tmp_r2;
+    delete[] tmp_r1;
 }
 
 

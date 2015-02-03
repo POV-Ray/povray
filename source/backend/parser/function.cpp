@@ -327,7 +327,7 @@ FUNCTION_PTR Parser::Parse_DeclareFunction(int *token_id, const char *fn_name, b
         function.private_data = reinterpret_cast<void *>(Parse_Spline());
         Parse_End();
 
-        function.return_size = (reinterpret_cast<SPLINE *>(function.private_data))->Terms; // returns a 2d, 3d, 4d or 5d vector!!!
+        function.return_size = (reinterpret_cast<GenericSpline *>(function.private_data))->Terms; // returns a 2d, 3d, 4d or 5d vector!!!
 
         // function type is vector function
         *token_id = VECTFUNCT_ID_TOKEN;

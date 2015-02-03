@@ -2,7 +2,8 @@
 ///
 /// @file backend/math/splines.h
 ///
-/// This module contains all defines, typedefs, and prototypes for `splines.cpp`.
+/// This module contains all defines, typedefs, and prototypes for
+/// `splines.cpp`.
 ///
 /// @copyright
 /// @parblock
@@ -41,20 +42,73 @@
 
 namespace pov
 {
-#define INIT_SPLINE_SIZE     16
 
-#define LINEAR_SPLINE         1
-#define QUADRATIC_SPLINE      2
-#define NATURAL_SPLINE        3
-#define CATMULL_ROM_SPLINE    4
+struct SplineEntry
+{
+    DBL par;      // Parameter
+    EXPRESS vec;  // Value at the parameter
+    DBL coeff[5]; // Interpolating coefficients at the parameter
+};
 
-SPLINE * Create_Spline(int Type);
-SPLINE * Copy_Spline(const SPLINE * Old);
-void Acquire_Spline_Reference(SPLINE * Spline);
-void Release_Spline_Reference(SPLINE * Spline);
-void Destroy_Spline(SPLINE * Spline);
-void Insert_Spline_Entry(SPLINE * Spline, DBL p, const EXPRESS v);
-DBL Get_Spline_Val(SPLINE * sp, DBL p, EXPRESS v, int *Terms);
+typedef vector<SplineEntry> SplineEntryList;
+
+struct GenericSpline
+{
+    GenericSpline();
+    GenericSpline(const GenericSpline& o);
+    virtual ~GenericSpline();
+    SplineEntryList SplineEntries;
+    bool Coeffs_Computed;
+    int Terms;
+    int ref_count;
+
+    virtual void Get(DBL p, EXPRESS& v) = 0;
+    virtual GenericSpline* Clone() const = 0;
+    void AcquireReference();
+    void ReleaseReference();
+};
+
+struct LinearSpline : public GenericSpline
+{
+    LinearSpline();
+    LinearSpline(const GenericSpline& o);
+    virtual void Get(DBL p, EXPRESS& v);
+    virtual GenericSpline* Clone() const { return new LinearSpline(*this); }
+};
+
+struct QuadraticSpline : public GenericSpline
+{
+    QuadraticSpline();
+    QuadraticSpline(const GenericSpline& o);
+    virtual void Get(DBL p, EXPRESS& v);
+    virtual GenericSpline* Clone() const { return new QuadraticSpline(*this); }
+};
+
+struct NaturalSpline : public GenericSpline
+{
+    NaturalSpline();
+    NaturalSpline(const GenericSpline& o);
+    virtual void Get(DBL p, EXPRESS& v);
+    virtual GenericSpline* Clone() const { return new NaturalSpline(*this); }
+};
+
+struct CatmullRomSpline : public GenericSpline
+{
+    CatmullRomSpline();
+    CatmullRomSpline(const GenericSpline& o);
+    virtual void Get(DBL p, EXPRESS& v);
+    virtual GenericSpline* Clone() const { return new CatmullRomSpline(*this); }
+};
+
+
+// TODO FIXME - Some of the following are higher-level functions and should be moved to the parser, others should be made part of the class.
+
+GenericSpline* Copy_Spline(const GenericSpline* Old);
+void Acquire_Spline_Reference(GenericSpline* sp);
+void Release_Spline_Reference(GenericSpline* sp);
+void Destroy_Spline(GenericSpline* sp);
+void Insert_Spline_Entry(GenericSpline* sp, DBL p, const EXPRESS& v);
+DBL Get_Spline_Val(GenericSpline* sp, DBL p, EXPRESS& v, int *Terms);
 
 }
 

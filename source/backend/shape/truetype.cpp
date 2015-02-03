@@ -660,6 +660,8 @@ void TrueType::ProcessNewTTF(CSG *Object, const char *filename, const int font_i
     }
 
 #ifdef TTF_DEBUG
+    // TODO - text_string is an UCS2 strings, while Debug_Info will expect char strings.
+    #error broken code
     if (filename)
     {
         Debug_Info("TTF parsing of \"%s\" from %s complete\n", text_string, filename);
@@ -995,20 +997,20 @@ void FreeFontInfo(FontFileInfo *ffi)
             POV_FREE(oldfont->filename);
 
         if (oldfont->loca_table != NULL)
-            POV_FREE(oldfont->loca_table);
+            delete[] oldfont->loca_table;
 
         if (oldfont->hmtx_table != NULL)
-            POV_FREE(oldfont->hmtx_table);
+            delete[] oldfont->hmtx_table;
 
         if (oldfont->kerning_tables.nTables != 0)
         {
             for (i = 0; i < oldfont->kerning_tables.nTables; i++)
             {
                 if (oldfont->kerning_tables.tables[i].kern_pairs)
-                    POV_FREE(oldfont->kerning_tables.tables[i].kern_pairs);
+                    delete[] oldfont->kerning_tables.tables[i].kern_pairs;
             }
 
-            POV_FREE(oldfont->kerning_tables.tables);
+            delete[] oldfont->kerning_tables.tables;
         }
 
         for (glyphs = oldfont->glyphs; glyphs != NULL;)
@@ -1021,19 +1023,19 @@ void FreeFontInfo(FontFileInfo *ffi)
             }
 
             if (glyphs->contours != NULL)
-                POV_FREE(glyphs->contours);
+                delete[] glyphs->contours;
 
             tempglyph = glyphs;
             glyphs = glyphs->next;
-            POV_FREE(tempglyph);
+            delete tempglyph;
         }
 
         if (oldfont->segCount != 0)
         {
-            POV_FREE(oldfont->endCount);
-            POV_FREE(oldfont->startCount);
-            POV_FREE(oldfont->idDelta);
-            POV_FREE(oldfont->idRangeOffset);
+            delete[] oldfont->endCount;
+            delete[] oldfont->startCount;
+            delete[] oldfont->idDelta;
+            delete[] oldfont->idRangeOffset;
         }
 
         tempfont = oldfont;
@@ -1110,7 +1112,7 @@ void ProcessLocaTable(FontFileInfo *ffile, int loca_table_offset)
     /* Move to location of table in file */
     ffile->fp->seekg(loca_table_offset);
 
-    ffile->loca_table = reinterpret_cast<ULONG *>(POV_MALLOC((ffile->numGlyphs+1) * sizeof(ULONG), "ttf"));
+    ffile->loca_table = new ULONG[ffile->numGlyphs+1];
 
 #ifdef TTF_DEBUG
     Debug_Info("\nlocation table:\n");
@@ -1190,8 +1192,7 @@ void ProcessKernTable(FontFileInfo *ffile, int kern_table_offset)
     if (kern_table->nTables == 0)
         return;
 
-    kern_table->tables = reinterpret_cast<TTKernTable *>(POV_MALLOC(kern_table->nTables * sizeof(TTKernTable),
-                                                                    "ProcessKernTable"));
+    kern_table->tables = new TTKernTable[kern_table->nTables];
 
     for (i = 0; i < kern_table->nTables; i++)
     {
@@ -1230,8 +1231,7 @@ void ProcessKernTable(FontFileInfo *ffile, int kern_table_offset)
             temp16 = READUSHORT(ffile->fp);     /* entrySelector */
             temp16 = READUSHORT(ffile->fp);     /* rangeShift */
 
-            kern_table->tables[i].kern_pairs =
-            reinterpret_cast<KernData *>(POV_MALLOC(kern_table->tables[i].nPairs * sizeof(KernData), "Kern Pairs"));
+            kern_table->tables[i].kern_pairs = new KernData[kern_table->tables[i].nPairs];
 
             for (j = 0; j < kern_table->tables[i].nPairs; j++)
             {
@@ -1324,7 +1324,7 @@ void ProcessHmtxTable (FontFileInfo *ffile, int hmtx_table_offset)
 
     ffile->fp->seekg (hmtx_table_offset);
 
-    ffile->hmtx_table = reinterpret_cast<longHorMetric *>(POV_MALLOC(ffile->numGlyphs*sizeof(longHorMetric), "ttf"));
+    ffile->hmtx_table = new longHorMetric[ffile->numGlyphs];
 
     /*
      * Read in the total glyph width, and the left side offset.  There is
@@ -1661,10 +1661,10 @@ USHORT ProcessFormat4Glyph(FontFileInfo *ffile, unsigned int search_char)
 
         /* Now allocate and read in the segment arrays */
 
-        ffile->endCount = reinterpret_cast<USHORT *>(POV_MALLOC(ffile->segCount * sizeof(USHORT), "ttf"));
-        ffile->startCount = reinterpret_cast<USHORT *>(POV_MALLOC(ffile->segCount * sizeof(USHORT), "ttf"));
-        ffile->idDelta = reinterpret_cast<USHORT *>(POV_MALLOC(ffile->segCount * sizeof(USHORT), "ttf"));
-        ffile->idRangeOffset = reinterpret_cast<USHORT *>(POV_MALLOC(ffile->segCount * sizeof(USHORT), "ttf"));
+        ffile->endCount = new USHORT[ffile->segCount];
+        ffile->startCount = new USHORT[ffile->segCount];
+        ffile->idDelta = new USHORT[ffile->segCount];
+        ffile->idRangeOffset = new USHORT[ffile->segCount];
 
         for (i = 0; i < ffile->segCount; i++)
         {
@@ -2369,10 +2369,10 @@ GlyphPtr ConvertOutlineToGlyph(FontFileInfo *ffile, const GlyphOutline *ttglyph)
 
     /* Create storage for this glyph */
 
-    glyph = reinterpret_cast<Glyph *>(POV_MALLOC(sizeof(Glyph), "ttf"));
+    glyph = new Glyph;
     if (ttglyph->header.numContours > 0)
     {
-        glyph->contours = reinterpret_cast<Contour *>(POV_MALLOC(ttglyph->header.numContours * sizeof(Contour), "ttf"));
+        glyph->contours = new Contour[ttglyph->header.numContours];
     }
     else
     {
