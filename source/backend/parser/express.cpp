@@ -2752,9 +2752,8 @@ void Parser::Parse_Colour (AttenuatingColour& colour, ColourChannel& filter, Col
 void Parser::Parse_Colour (AttenuatingColour& colour, LightColour& whitepoint, FilterTransm& trans)
 {
     LightColour tmpColour;
-    LightColour tmpWhitepoint;
-    Parse_Colour (tmpColour, &tmpWhitepoint, &trans);
-    colour = tmpColour / tmpWhitepoint;
+    Parse_Colour (tmpColour, &whitepoint, &trans);
+    colour = tmpColour / whitepoint;
 }
 
 void Parser::Parse_Colour (AttenuatingColour& colour)
