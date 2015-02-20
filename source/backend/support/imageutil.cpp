@@ -718,33 +718,33 @@ static int torus_image_map(const Vector3d& EPoint, const ImageData *image, DBL *
 
 static int angular_image_map(const VECTOR EPoint, const ImageData *image, DBL *u, DBL  *v) 
 {
-  DBL len, r;
-  DBL x = EPoint[X];
-  DBL y = EPoint[Y];
-  DBL z = EPoint[Z];
-
-  /* Make sure this vector is on the unit sphere. */
-  len = sqrt(x * x + y * y + z * z);
-  if (len == 0.0)
-  {
-    return 0;
-  }
-  else
-  {
-    x /= len;
-    y /= len;
-    z /= len;
-  }
-
-  if ( (x==0) && (y==0) )
-    r=0;
-  else
-    r=(1/M_PI)*acos(z)/sqrt(x*x+y*y);
-
-  *u = (x*r+1)/2 * image->width;
-  *v = (y*r+1)/2 * image->height;
-
-  return 1;
+    DBL len, r;
+    DBL x = EPoint[X];
+    DBL y = EPoint[Y];
+    DBL z = EPoint[Z];
+  
+    /* Make sure this vector is on the unit sphere. */
+    len = sqrt(x * x + y * y + z * z);
+    if (len == 0.0)
+    {
+        return 0;
+    }
+    else
+    {
+        x /= len;
+        y /= len;
+        z /= len;
+    }
+  
+    if ( (x==0) && (y==0) )
+        r=0;
+    else
+        r=(1/M_PI)*acos(z)/sqrt(x*x+y*y);
+  
+    *u = (x*r+1)/2 * image->width;
+    *v = (y*r+1)/2 * image->height;
+  
+    return 1;
 }
 
 
