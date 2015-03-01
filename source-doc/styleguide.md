@@ -6,8 +6,8 @@ way around the code. Therefore, if you want to contribute to the POV-Ray develop
 guidelines presented here. Note that we find some of these rules important enough for our project that we may reject
 non-compliant contributions.
 
-The following covers the rules we deem sufficiently important for everyone to read; if you want more, see @subpage
-styleguide2 for the boring stuff.
+The following covers the rules we deem sufficiently important for everyone to read; if you want more, see
+@subpage styleguide2 for the boring stuff.
 
 
 @section rlm        Role Models
