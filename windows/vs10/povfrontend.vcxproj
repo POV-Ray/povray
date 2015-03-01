@@ -355,6 +355,7 @@
     <ClCompile Include="..\..\source\frontend\renderfrontend.cpp" />
     <ClCompile Include="..\..\source\frontend\rendermessagehandler.cpp" />
     <ClCompile Include="..\..\source\frontend\shelloutprocessing.cpp" />
+    <ClCompile Include="..\..\source\povmain.cpp" />
     <ClCompile Include="..\..\source\precomp.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

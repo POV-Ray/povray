@@ -351,7 +351,6 @@
     <ClCompile Include="..\..\source\backend\bounding\boundingtask.cpp" />
     <ClCompile Include="..\..\source\backend\bounding\bsphere.cpp" />
     <ClCompile Include="..\..\source\backend\colour\colour_old.cpp" />
-    <ClCompile Include="..\..\source\backend\colour\colutils.cpp" />
     <ClCompile Include="..\..\source\backend\colour\spectral.cpp" />
     <ClCompile Include="..\..\source\backend\control\benchmark.cpp" />
     <ClCompile Include="..\..\source\backend\control\messagefactory.cpp" />
@@ -385,6 +384,7 @@
     <ClCompile Include="..\..\source\backend\scene\camera.cpp" />
     <ClCompile Include="..\..\source\backend\scene\objects.cpp" />
     <ClCompile Include="..\..\source\backend\scene\scene.cpp" />
+    <ClCompile Include="..\..\source\backend\scene\scenedata.cpp" />
     <ClCompile Include="..\..\source\backend\scene\threaddata.cpp" />
     <ClCompile Include="..\..\source\backend\scene\view.cpp" />
     <ClCompile Include="..\..\source\backend\shape\bezier.cpp" />
@@ -459,7 +459,6 @@
     <ClInclude Include="..\..\source\backend\bounding\boundingtask.h" />
     <ClInclude Include="..\..\source\backend\bounding\bsphere.h" />
     <ClInclude Include="..\..\source\backend\colour\colour_old.h" />
-    <ClInclude Include="..\..\source\backend\colour\colutils.h" />
     <ClInclude Include="..\..\source\backend\colour\spectral.h" />
     <ClInclude Include="..\..\source\backend\control\benchmark.h" />
     <ClInclude Include="..\..\source\backend\control\messagefactory.h" />
@@ -488,6 +487,7 @@
     <ClInclude Include="..\..\source\backend\scene\camera.h" />
     <ClInclude Include="..\..\source\backend\scene\objects.h" />
     <ClInclude Include="..\..\source\backend\scene\scene.h" />
+    <ClInclude Include="..\..\source\backend\scene\scenedata.h" />
     <ClInclude Include="..\..\source\backend\scene\threaddata.h" />
     <ClInclude Include="..\..\source\backend\scene\view.h" />
     <ClInclude Include="..\..\source\backend\shape\bezier.h" />
@@ -542,7 +542,6 @@
     <ClInclude Include="..\..\source\backend\lighting\point.h" />
     <ClInclude Include="..\..\source\backend\lighting\radiosity.h" />
     <ClInclude Include="..\..\source\backend\lighting\subsurface.h" />
-    <ClInclude Include="..\..\source\povrayold.h" />
     <ClInclude Include="..\..\source\precomp.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

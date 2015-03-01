@@ -128,9 +128,6 @@
     <ClCompile Include="..\..\source\backend\colour\colour_old.cpp">
       <Filter>Backend Source\Colour</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\backend\colour\colutils.cpp">
-      <Filter>Backend Source\Colour</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\backend\colour\spectral.cpp">
       <Filter>Backend Source\Colour</Filter>
     </ClCompile>
@@ -228,6 +225,9 @@
       <Filter>Backend Source\Scene</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\backend\scene\scene.cpp">
+      <Filter>Backend Source\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\scene\scenedata.cpp">
       <Filter>Backend Source\Scene</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\backend\scene\threaddata.cpp">
@@ -425,9 +425,6 @@
     <ClInclude Include="..\..\source\backend\colour\colour_old.h">
       <Filter>Backend Headers\Colour</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\backend\colour\colutils.h">
-      <Filter>Backend Headers\Colour</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\backend\colour\spectral.h">
       <Filter>Backend Headers\Colour</Filter>
     </ClInclude>
@@ -510,6 +507,9 @@
       <Filter>Backend Headers\Scene</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\backend\scene\scene.h">
+      <Filter>Backend Headers\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\scene\scenedata.h">
       <Filter>Backend Headers\Scene</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\backend\scene\threaddata.h">
@@ -674,7 +674,6 @@
     <ClInclude Include="..\..\source\backend\lighting\subsurface.h">
       <Filter>Backend Headers\Lighting</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\povrayold.h" />
     <ClInclude Include="..\..\source\precomp.h" />
     <ClInclude Include="..\..\source\backend\texture\avxfma4check.h">
       <Filter>Backend Headers\Texture</Filter>
