@@ -10193,9 +10193,13 @@ void Parser::SendFatalError(Exception& e)
 void Parser::Warning(const char *format,...)
 {
     va_list marker;
+    char localvsbuffer[1024];
+
     va_start(marker, format);
-    Warning(kWarningGeneral, format, marker);
+    vsnprintf(localvsbuffer, 1023, format, marker);
     va_end(marker);
+
+    Warning(kWarningGeneral, localvsbuffer);
 }
 
 void Parser::Warning(WarningLevel level, const char *format,...)
@@ -10220,10 +10224,13 @@ void Parser::VersionWarning(unsigned int sinceVersion, const char *format,...)
     if(sceneData->EffectiveLanguageVersion() >= sinceVersion)
     {
         va_list marker;
+        char localvsbuffer[1024];
 
         va_start(marker, format);
-        Warning(kWarningLanguage, format, marker);
+        vsnprintf(localvsbuffer, 1023, format, marker);
         va_end(marker);
+
+        Warning(kWarningLanguage, localvsbuffer);
     }
 }
 
