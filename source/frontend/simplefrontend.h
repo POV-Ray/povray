@@ -270,11 +270,11 @@ State SimpleFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::Process()
                 if(animationProcessing != NULL)
                 {
                     options = animationProcessing->GetFrameRenderOptions();
-                    if (imageProcessing != NULL);
+                    if (imageProcessing != NULL)
                         options.SetUCS2String(kPOVAttrib_OutputFile, imageProcessing->GetOutputFilename(options, animationProcessing->GetFrameNumber(), animationProcessing->GetFrameNumberDigits()).c_str());
                 }
                 else
-                    if (imageProcessing != NULL);
+                    if (imageProcessing != NULL)
                         options.SetUCS2String(kPOVAttrib_OutputFile, imageProcessing->GetOutputFilename(options, 0, 0).c_str());
             }
             catch(pov_base::Exception&)
