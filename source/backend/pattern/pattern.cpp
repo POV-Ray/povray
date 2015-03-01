@@ -632,6 +632,7 @@ void Init_TPat_Fields (TPATTERN *Tpat)
 {
     Tpat->Type       = NO_PATTERN;
     Tpat->Flags      = NO_FLAGS;
+    Tpat->pattern    = PatternPtr(new PlainPattern());
 }
 
 
