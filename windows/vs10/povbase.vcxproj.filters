@@ -244,5 +244,11 @@
     <ClInclude Include="..\..\source\base\colour.h">
       <Filter>Base Headers</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\base\build.h">
+      <Filter>Base Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\base\version.h">
+      <Filter>Base Headers</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

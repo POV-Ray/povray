@@ -39,20 +39,14 @@
 ///
 //*******************************************************************************
 
-/// @file
-/// @todo   Maybe we want to move the version information stuff to a separate file,
-///         preferably in the `base` directory.
-
 #ifndef POVRAY_BACKEND_POVRAY_H
 #define POVRAY_BACKEND_POVRAY_H
 
-// Please put everything that isn't a preprocessor directive in this
-// file into SKIP_COMPLEX_OPTOUT_H sections like the one below! [trf]
-#ifndef SKIP_COMPLEX_OPTOUT_H
-
-#include "base/povms.h"
 #include <boost/thread.hpp>
 #include <boost/function.hpp>
+
+#include "base/povms.h"
+#include "base/version.h"
 
 /**
  *  This function does essential initialisation that is required before
@@ -77,38 +71,11 @@ void povray_terminate();
  */
 bool povray_terminated();
 
-#endif // SKIP_COMPLEX_OPTOUT_H
-
 #define DAYS(n)         (86400 * n)
 
 // POV-Ray version and copyright message macros
 
-#define POV_RAY_COPYRIGHT "Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd."
-#define OFFICIAL_VERSION_STRING "3.7.1"
-#define OFFICIAL_VERSION_NUMBER 371
-#define OFFICIAL_VERSION_NUMBER_HEX 0x0371
-
-#define POV_RAY_PRERELEASE "alpha.7974785"
-
 #if POV_RAY_IS_OFFICIAL == 1
-#ifdef POV_RAY_PRERELEASE
-#define POV_RAY_VERSION OFFICIAL_VERSION_STRING "-" POV_RAY_PRERELEASE
-#else
-#define POV_RAY_VERSION OFFICIAL_VERSION_STRING
-#endif
-#else
-#ifdef POV_RAY_PRERELEASE
-#define POV_RAY_VERSION OFFICIAL_VERSION_STRING "-" POV_RAY_PRERELEASE ".unofficial"
-#else
-#define POV_RAY_VERSION OFFICIAL_VERSION_STRING "-unofficial"
-#endif
-#endif
-
-#if POV_RAY_IS_OFFICIAL == 1
-
-#ifdef DISTRIBUTION_MESSAGE_2
-#undef DISTRIBUTION_MESSAGE_2
-#endif
 
 #define DISTRIBUTION_MESSAGE_1 "This is an official version prepared by the POV-Ray Team. See the"
 #define DISTRIBUTION_MESSAGE_2 " documentation on how to contact the authors or visit us on the"
@@ -116,13 +83,8 @@ bool povray_terminated();
 
 #else
 
-// Please set DISTRIBUTION_MESSAGE_2 to your real name to make unofficial versions distinguishable from each other.
-// We also recommend including an email or website address, then remove the #error directive to proceed with the build.
 #define DISTRIBUTION_MESSAGE_1 "This is an unofficial version compiled by:"
-#ifndef DISTRIBUTION_MESSAGE_2
-#error Please complete the following DISTRIBUTION_MESSAGE_2 definition
-#define DISTRIBUTION_MESSAGE_2 " FILL IN NAME HERE........................."
-#endif
+#define DISTRIBUTION_MESSAGE_2 " " BUILT_BY
 #define DISTRIBUTION_MESSAGE_3 " The POV-Ray Team is not responsible for supporting this version.\n"
 
 #endif

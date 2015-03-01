@@ -396,6 +396,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\source\base\build.h" />
     <ClInclude Include="..\..\source\base\colour.h" />
     <ClInclude Include="..\..\source\base\configbase.h" />
     <ClInclude Include="..\..\source\base\fileinputoutput.h" />
@@ -435,6 +436,7 @@
     <ClInclude Include="..\..\source\base\image\tiff_pov.h" />
     <ClInclude Include="..\..\source\base\animation\animation.h" />
     <ClInclude Include="..\..\source\base\animation\moov.h" />
+    <ClInclude Include="..\..\source\base\version.h" />
     <ClInclude Include="..\..\source\precomp.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
