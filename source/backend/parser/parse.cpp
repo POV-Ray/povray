@@ -8213,13 +8213,16 @@ ObjectPtr Parser::Parse_Object_Id ()
 
 void Parser::Parse_Declare(bool is_local, bool after_hash)
 {
+    vector<Token_Struct> lvalues;
     bool deprecated = false;
     bool deprecated_once = false;
     int Previous=-1;
-    int Local_Index,Local_Flag;
+    int Local_Index;
     SYM_ENTRY *Temp_Entry = NULL;
     bool allow_redefine = true;
     UCS2 *deprecation_message;
+    bool tupleDeclare = false;
+    bool lvectorDeclare = false;
 
     Ok_To_Declare = false;
 
@@ -8229,8 +8232,7 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
                       "Future versions may not support 'declare' and may require '#declare'.");
     }
 
-    Local_Flag=(Token.Token_Id==LOCAL_TOKEN);
-    if (Local_Flag)
+    if (is_local)
     {
         Local_Index=Table_Index;
     }
@@ -8242,117 +8244,199 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
     LValue_Ok = true;
 
     EXPECT_ONE
-        CASE (DEPRECATED_TOKEN)
-            deprecated = true;
-            ALLOW(ONCE_TOKEN);
-            if (Token.Token_Id == ONCE_TOKEN)
-                deprecated_once = true;
-            deprecation_message = Parse_String(false, false);
+        CASE (LEFT_PAREN_TOKEN)
+            tupleDeclare = true;
         END_CASE
-
+        CASE (LEFT_ANGLE_TOKEN)
+            lvectorDeclare = true;
+        END_CASE
         OTHERWISE
             UNGET
         END_CASE
     END_EXPECT
 
-    EXPECT
-        CASE (IDENTIFIER_TOKEN)
-            allow_redefine = !Token.is_array_elem;
-            Temp_Entry = Add_Symbol (Local_Index,Token.Token_String,IDENTIFIER_TOKEN);
-            Token.NumberPtr = &(Temp_Entry->Token_Number);
-            Token.DataPtr = &(Temp_Entry->Data);
-            Previous = Token.Token_Id;
-            if (deprecated)
-            {
-                Temp_Entry->Flags |= TF_DEPRECATED;
-                if (deprecated_once)
-                    Temp_Entry->Flags |= TF_DEPRECATED_ONCE;
-                if (deprecation_message != NULL)
+    for (bool more = true; more; /* body-controlled loop */)
+    {
+        EXPECT_ONE
+            CASE (DEPRECATED_TOKEN)
+                deprecated = true;
+                ALLOW(ONCE_TOKEN);
+                if (Token.Token_Id == ONCE_TOKEN)
+                    deprecated_once = true;
+                deprecation_message = Parse_String(false, false);
+            END_CASE
+
+            OTHERWISE
+                UNGET
+            END_CASE
+        END_EXPECT
+
+        EXPECT
+            CASE (IDENTIFIER_TOKEN)
+                allow_redefine = !Token.is_array_elem;
+                Temp_Entry = Add_Symbol (Local_Index,Token.Token_String,IDENTIFIER_TOKEN);
+                Token.NumberPtr = &(Temp_Entry->Token_Number);
+                Token.DataPtr = &(Temp_Entry->Data);
+                Previous = Token.Token_Id;
+                if (deprecated)
                 {
-                    UCS2String str(deprecation_message);
-                    POV_FREE(deprecation_message);
-                    Temp_Entry->Deprecation_Message = POV_STRDUP(UCS2toASCIIString(str).c_str());
+                    Temp_Entry->Flags |= TF_DEPRECATED;
+                    if (deprecated_once)
+                        Temp_Entry->Flags |= TF_DEPRECATED_ONCE;
+                    if (deprecation_message != NULL)
+                    {
+                        UCS2String str(deprecation_message);
+                        POV_FREE(deprecation_message);
+                        Temp_Entry->Deprecation_Message = POV_STRDUP(UCS2toASCIIString(str).c_str());
+                    }
+                    else
+                    {
+                        char str[256];
+                        sprintf(str, "Identifier '%.128s' was declared deprecated.", Token.Token_String);
+                        Temp_Entry->Deprecation_Message = POV_STRDUP(str);
+                    }
+                }
+                EXIT
+            END_CASE
+
+            CASE2 (FUNCT_ID_TOKEN, VECTFUNCT_ID_TOKEN)
+                if((!Token.is_array_elem) || (*(Token.DataPtr) != NULL))
+                    Error("Redeclaring functions is not allowed - #undef the function first!");
+                // fall through
+
+            // These are also used in Parse_Directive UNDEF_TOKEN section, Parse_Macro, and and Parse_For_Param_Start,
+            // and all these functions should accept exactly the same identifiers! [trf]
+            CASE4 (TNORMAL_ID_TOKEN, FINISH_ID_TOKEN, TEXTURE_ID_TOKEN, OBJECT_ID_TOKEN)
+            CASE4 (COLOUR_MAP_ID_TOKEN, TRANSFORM_ID_TOKEN, CAMERA_ID_TOKEN, PIGMENT_ID_TOKEN)
+            CASE4 (SLOPE_MAP_ID_TOKEN, NORMAL_MAP_ID_TOKEN, TEXTURE_MAP_ID_TOKEN, COLOUR_ID_TOKEN)
+            CASE4 (PIGMENT_MAP_ID_TOKEN, MEDIA_ID_TOKEN, STRING_ID_TOKEN, INTERIOR_ID_TOKEN)
+            CASE4 (DENSITY_MAP_ID_TOKEN, ARRAY_ID_TOKEN, DENSITY_ID_TOKEN, UV_ID_TOKEN)
+            CASE4 (VECTOR_4D_ID_TOKEN, RAINBOW_ID_TOKEN, FOG_ID_TOKEN, SKYSPHERE_ID_TOKEN)
+            CASE2 (MATERIAL_ID_TOKEN, SPLINE_ID_TOKEN )
+                allow_redefine  = !Token.is_array_elem;
+                if (is_local && (Token.Table_Index != Table_Index))
+                {
+                    Temp_Entry = Add_Symbol (Local_Index,Token.Token_String,IDENTIFIER_TOKEN);
+                    Token.NumberPtr = &(Temp_Entry->Token_Number);
+                    Token.DataPtr   = &(Temp_Entry->Data);
+                    Previous        = IDENTIFIER_TOKEN;
                 }
                 else
                 {
-                    char str[256];
-                    sprintf(str, "Identifier '%.128s' was declared deprecated.", Token.Token_String);
-                    Temp_Entry->Deprecation_Message = POV_STRDUP(str);
+                    Previous        = Token.Token_Id;
                 }
-            }
-            EXIT
-        END_CASE
+                EXIT
+            END_CASE
 
-        CASE2 (FUNCT_ID_TOKEN, VECTFUNCT_ID_TOKEN)
-            if((!Token.is_array_elem) || (*(Token.DataPtr) != NULL))
-                Error("Redeclaring functions is not allowed - #undef the function first!");
-            // fall through
+            CASE (EMPTY_ARRAY_TOKEN)
+                allow_redefine  = !Token.is_array_elem;
+                Previous = Token.Token_Id;
+                EXIT
+            END_CASE
 
-        // These are also used in Parse_Directive UNDEF_TOKEN section, Parse_Macro, and and Parse_For_Param_Start,
-        // and all these functions should accept exactly the same identifiers! [trf]
-        CASE4 (TNORMAL_ID_TOKEN, FINISH_ID_TOKEN, TEXTURE_ID_TOKEN, OBJECT_ID_TOKEN)
-        CASE4 (COLOUR_MAP_ID_TOKEN, TRANSFORM_ID_TOKEN, CAMERA_ID_TOKEN, PIGMENT_ID_TOKEN)
-        CASE4 (SLOPE_MAP_ID_TOKEN, NORMAL_MAP_ID_TOKEN, TEXTURE_MAP_ID_TOKEN, COLOUR_ID_TOKEN)
-        CASE4 (PIGMENT_MAP_ID_TOKEN, MEDIA_ID_TOKEN, STRING_ID_TOKEN, INTERIOR_ID_TOKEN)
-        CASE4 (DENSITY_MAP_ID_TOKEN, ARRAY_ID_TOKEN, DENSITY_ID_TOKEN, UV_ID_TOKEN)
-        CASE4 (VECTOR_4D_ID_TOKEN, RAINBOW_ID_TOKEN, FOG_ID_TOKEN, SKYSPHERE_ID_TOKEN)
-        CASE2 (MATERIAL_ID_TOKEN, SPLINE_ID_TOKEN )
-            allow_redefine  = !Token.is_array_elem;
-            if (Local_Flag && (Token.Table_Index != Table_Index))
-            {
-                Temp_Entry = Add_Symbol (Local_Index,Token.Token_String,IDENTIFIER_TOKEN);
-                Token.NumberPtr = &(Temp_Entry->Token_Number);
-                Token.DataPtr   = &(Temp_Entry->Data);
-                Previous        = IDENTIFIER_TOKEN;
-            }
-            else
-            {
-                Previous        = Token.Token_Id;
-            }
-            EXIT
-        END_CASE
+            CASE2 (VECTOR_FUNCT_TOKEN, FLOAT_FUNCT_TOKEN)
+                allow_redefine  = !Token.is_array_elem;
+                switch(Token.Function_Id)
+                {
+                    case VECTOR_ID_TOKEN:
+                    case FLOAT_ID_TOKEN:
+                        if (is_local && (Token.Table_Index != Table_Index))
+                        {
+                            Temp_Entry = Add_Symbol (Local_Index,Token.Token_String,IDENTIFIER_TOKEN);
+                            Token.NumberPtr = &(Temp_Entry->Token_Number);
+                            Token.DataPtr   = &(Temp_Entry->Data);
+                        }
+                        Previous           = Token.Function_Id;
+                        break;
 
-        CASE (EMPTY_ARRAY_TOKEN)
-            allow_redefine  = !Token.is_array_elem;
-            Previous = Token.Token_Id;
-            EXIT
-        END_CASE
+                    default:
+                        Parse_Error(IDENTIFIER_TOKEN);
+                        break;
+                }
+                EXIT
+            END_CASE
 
-        CASE2 (VECTOR_FUNCT_TOKEN, FLOAT_FUNCT_TOKEN)
-            allow_redefine  = !Token.is_array_elem;
-            switch(Token.Function_Id)
-            {
-                case VECTOR_ID_TOKEN:
-                case FLOAT_ID_TOKEN:
-                    if (Local_Flag && (Token.Table_Index != Table_Index))
-                    {
-                        Temp_Entry = Add_Symbol (Local_Index,Token.Token_String,IDENTIFIER_TOKEN);
-                        Token.NumberPtr = &(Temp_Entry->Token_Number);
-                        Token.DataPtr   = &(Temp_Entry->Data);
-                    }
-                    Previous           = Token.Function_Id;
-                    break;
+            OTHERWISE
+                allow_redefine  = !Token.is_array_elem;
+                Parse_Error(IDENTIFIER_TOKEN);
+            END_CASE
+        END_EXPECT
 
-                default:
-                    Parse_Error(IDENTIFIER_TOKEN);
-                    break;
-            }
-            EXIT
-        END_CASE
+        lvalues.push_back(Token);
 
-        OTHERWISE
-            allow_redefine  = !Token.is_array_elem;
-            Parse_Error(IDENTIFIER_TOKEN);
-        END_CASE
-    END_EXPECT
+        if (lvectorDeclare && lvalues.size() >= 5)
+            more = false;
+        else if (tupleDeclare || lvectorDeclare)
+        {
+            EXPECT_ONE
+                CASE (COMMA_TOKEN)
+                    more = true;
+                END_CASE
+
+                OTHERWISE
+                    more = false;
+                    UNGET
+                END_CASE
+            END_EXPECT
+
+        }
+        else
+            more = false;
+    }
+
+    if (tupleDeclare)
+    {
+        GET (RIGHT_PAREN_TOKEN)
+    }
+    else if (lvectorDeclare)
+    {
+        GET (RIGHT_ANGLE_TOKEN)
+    }
 
     LValue_Ok = false;
 
-    GET (EQUALS_TOKEN);
+    GET (EQUALS_TOKEN)
     Ok_To_Declare = true;
-    if (!Parse_RValue (Previous, Token.NumberPtr, Token.DataPtr, Temp_Entry, false, true, is_local, allow_redefine, MAX_NUMBER_OF_TABLES))
+
+    if (lvectorDeclare)
     {
-        Expectation_Error("RValue to declare");
+        EXPRESS expr;
+        int terms = 5;
+        Parse_Express(expr, &terms);
+        Promote_Express(expr,&terms,lvalues.size());
+        for (int i = 0; i < lvalues.size(); ++i)
+        {
+            Token_Struct& t = lvalues[i];
+
+            *t.NumberPtr = FLOAT_ID_TOKEN;
+            Test_Redefine(Previous,t.NumberPtr,*t.DataPtr, allow_redefine);
+            *t.DataPtr = reinterpret_cast<void *>(Create_Float());
+            *(reinterpret_cast<DBL *>(*t.DataPtr)) = expr[i];
+        }
+    }
+    else
+    {
+        if (tupleDeclare)
+        {
+            GET (LEFT_PAREN_TOKEN)
+        }
+        for (int i = 0; i < lvalues.size(); ++i)
+        {
+            Token_Struct& t = lvalues[i];
+
+            if (i > 0)
+            {
+                GET (COMMA_TOKEN)
+            }
+            if (!Parse_RValue (Previous, t.NumberPtr, t.DataPtr, Temp_Entry, false, !tupleDeclare, is_local, allow_redefine, MAX_NUMBER_OF_TABLES))
+            {
+                Expectation_Error("RValue to declare");
+            }
+        }
+        if (tupleDeclare)
+        {
+            GET (RIGHT_PAREN_TOKEN)
+        }
     }
     if ( after_hash )
     {
