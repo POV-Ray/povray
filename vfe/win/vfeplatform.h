@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file win/vfeplatform.h
+/// @file vfe/win/vfeplatform.h
 ///
 /// Defines a platform-specific session class derived from vfeSession.
 ///
@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -38,11 +38,14 @@
 #ifndef __VFEPLATFORM_H__
 #define __VFEPLATFORM_H__
 
+#include "frontend/shelloutprocessing.h"
+#include "vfesession.h"
+
 namespace vfePlatform
 {
   using namespace vfe;
 
-  class WinShelloutProcessing: public ShelloutProcessing
+  class WinShelloutProcessing: public pov_frontend::ShelloutProcessing
   {
   public:
     WinShelloutProcessing(POVMS_Object& opts, const string& scene, unsigned int width, unsigned int height);
