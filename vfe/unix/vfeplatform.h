@@ -40,13 +40,21 @@
 
 #include <boost/shared_ptr.hpp>
 
+#include "base/path.h"
+#include "base/stringutilities.h"
+
+#include "frontend/shelloutprocessing.h"
+
+#include "vfesession.h"
+
 namespace vfePlatform
 {
+    using namespace pov_base;
     using namespace vfe;
 
     class UnixOptionsProcessor;
 
-    class UnixShelloutProcessing: public ShelloutProcessing
+    class UnixShelloutProcessing: public pov_frontend::ShelloutProcessing
     {
         public:
             UnixShelloutProcessing(POVMS_Object& opts, const string& scene, unsigned int width, unsigned int height);

@@ -1,8 +1,8 @@
 //******************************************************************************
 ///
-/// @file base/version.h
+/// @file povms/povms.cpp
 ///
-/// This file contains version information.
+/// Dummy C++ file to allow compilation of @ref povms/povms.c as a C++ file.
 ///
 /// @copyright
 /// @parblock
@@ -33,32 +33,4 @@
 ///
 //******************************************************************************
 
-#ifndef POVRAY_BASE_VERSION_H
-#define POVRAY_BASE_VERSION_H
-
-#include "base/configbase.h"
-#include "base/build.h"
-
-// POV-Ray version and copyright message macros
-
-#define POV_RAY_COPYRIGHT "Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd."
-#define OFFICIAL_VERSION_STRING "3.7.1"
-#define OFFICIAL_VERSION_NUMBER 371
-
-#define POV_RAY_PRERELEASE "alpha.7978678"
-
-#if POV_RAY_IS_OFFICIAL == 1
-#ifdef POV_RAY_PRERELEASE
-#define POV_RAY_VERSION OFFICIAL_VERSION_STRING "-" POV_RAY_PRERELEASE
-#else
-#define POV_RAY_VERSION OFFICIAL_VERSION_STRING
-#endif
-#else
-#ifdef POV_RAY_PRERELEASE
-#define POV_RAY_VERSION OFFICIAL_VERSION_STRING "-" POV_RAY_PRERELEASE ".unofficial"
-#else
-#define POV_RAY_VERSION OFFICIAL_VERSION_STRING "-unofficial"
-#endif
-#endif
-
-#endif // POVRAY_BASE_VERSION_H
+#include "povms.c"

@@ -343,9 +343,7 @@
     </BuildLog>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\source\povms\povms.c">
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCpp</CompileAs>
-    </ClCompile>
+    <ClCompile Include="..\..\source\povms\povms.cpp" />
     <ClCompile Include="..\..\source\povms\povmscpp.cpp" />
     <ClCompile Include="..\..\source\povms\povmsutil.cpp" />
     <ClCompile Include="..\..\source\precomp.cpp">

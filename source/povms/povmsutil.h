@@ -42,8 +42,6 @@
 namespace pov
 {
 
-using namespace pov_base;
-
 int POVMSUtil_SetFormatString(POVMSObjectPtr object, POVMSType key, const char *format, ...); // Note: Strings may not contain \0 characters codes!
 
 int Send_Progress(const char *statusString, int progressState);

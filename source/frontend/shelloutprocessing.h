@@ -38,6 +38,8 @@
 
 #include <string>
 
+#include <boost/format.hpp>
+
 #include "povms/povmscpp.h"
 #include "povms/povmsid.h"
 

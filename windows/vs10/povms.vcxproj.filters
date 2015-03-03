@@ -16,7 +16,7 @@
     <ClCompile Include="..\..\source\povms\povmsutil.cpp">
       <Filter>POVMS Source</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\povms\povms.c">
+    <ClCompile Include="..\..\source\povms\povms.cpp">
       <Filter>POVMS Source</Filter>
     </ClCompile>
   </ItemGroup>
