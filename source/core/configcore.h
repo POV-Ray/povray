@@ -1,8 +1,10 @@
 //******************************************************************************
 ///
-/// @file base/version.h
+/// @file core/configcore.h
 ///
-/// This file contains version information.
+/// This header file defines all types that can be configured by platform
+/// specific code for core layer use. It further allows insertion of platform
+/// specific function prototypes making use of those types.
 ///
 /// @copyright
 /// @parblock
@@ -31,34 +33,11 @@
 ///
 /// @endparblock
 ///
-//******************************************************************************
+//*******************************************************************************
 
-#ifndef POVRAY_BASE_VERSION_H
-#define POVRAY_BASE_VERSION_H
+#ifndef POVRAY_CORE_CONFIGCORE_H
+#define POVRAY_CORE_CONFIGCORE_H
 
 #include "base/configbase.h"
-#include "base/build.h"
 
-// POV-Ray version and copyright message macros
-
-#define POV_RAY_COPYRIGHT "Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd."
-#define OFFICIAL_VERSION_STRING "3.7.1"
-#define OFFICIAL_VERSION_NUMBER 371
-
-#define POV_RAY_PRERELEASE "alpha.7977963"
-
-#if POV_RAY_IS_OFFICIAL == 1
-#ifdef POV_RAY_PRERELEASE
-#define POV_RAY_VERSION OFFICIAL_VERSION_STRING "-" POV_RAY_PRERELEASE
-#else
-#define POV_RAY_VERSION OFFICIAL_VERSION_STRING
-#endif
-#else
-#ifdef POV_RAY_PRERELEASE
-#define POV_RAY_VERSION OFFICIAL_VERSION_STRING "-" POV_RAY_PRERELEASE ".unofficial"
-#else
-#define POV_RAY_VERSION OFFICIAL_VERSION_STRING "-unofficial"
-#endif
-#endif
-
-#endif // POVRAY_BASE_VERSION_H
+#endif // POVRAY_CORE_CONFIGCORE_H
