@@ -92,12 +92,12 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\source\tests\tests_main.cpp" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="povbase.vcxproj">
       <Project>{c6d9b754-11eb-4fc3-8683-593b2377d043}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\tests\source\tests_main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
