@@ -582,6 +582,9 @@
       <Project>{c6d9b754-11eb-4fc3-8683-593bfd58c904}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
+    <ProjectReference Include="povms.vcxproj">
+      <Project>{b1e68128-84d7-4525-a3c1-e6c1077f2239}</Project>
+    </ProjectReference>
     <ProjectReference Include="rtrsupport.vcxproj">
       <Project>{851c772c-d7c2-4ee3-a90c-23386f0e9897}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>

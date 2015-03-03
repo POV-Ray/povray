@@ -37,10 +37,11 @@
 #ifndef PROCESSOPTIONS_H
 #define PROCESSOPTIONS_H
 
-#include "configbase.h"
+#include "base/configbase.h"
 
-#include "povms.h"
-#include "textstream.h"
+#include "povms/povms.h"
+
+#include "base/textstream.h"
 
 namespace pov_base
 {

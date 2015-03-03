@@ -351,8 +351,6 @@
     <ClCompile Include="..\..\source\base\font\timrom.cpp" />
     <ClCompile Include="..\..\source\base\path.cpp" />
     <ClCompile Include="..\..\source\base\pov_err.cpp" />
-    <ClCompile Include="..\..\source\base\povms.cpp" />
-    <ClCompile Include="..\..\source\base\povmscpp.cpp" />
     <ClCompile Include="..\..\source\base\processoptions.cpp" />
     <ClCompile Include="..\..\source\base\stringutilities.cpp" />
     <ClCompile Include="..\..\source\base\textstream.cpp" />
@@ -409,9 +407,6 @@
     <ClInclude Include="..\..\source\base\pointer.h" />
     <ClInclude Include="..\..\source\base\pov_err.h" />
     <ClInclude Include="..\..\source\base\povdebug.h" />
-    <ClInclude Include="..\..\source\base\povms.h" />
-    <ClInclude Include="..\..\source\base\povmscpp.h" />
-    <ClInclude Include="..\..\source\base\povmsgid.h" />
     <ClInclude Include="..\..\source\base\processoptions.h" />
     <ClInclude Include="..\..\source\base\safemath.h" />
     <ClInclude Include="..\..\source\base\stringutilities.h" />

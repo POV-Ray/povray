@@ -33,11 +33,13 @@
 ///
 //******************************************************************************
 
+#include <cstring>
+
 // configbase.h must always be the first POV file included within base *.cpp files
 #include "base/configbase.h"
-#include "base/povmscpp.h"
 #include "base/pov_err.h"
-#include <cstring>
+
+#include "povms/povmscpp.h"
 
 // this must be the last file included
 #include "base/povdebug.h"

@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file base/povms.cpp
+/// @file povms/povms.c
 ///
 /// This module contains POVMS data type handling and utility functions.
 ///
@@ -33,26 +33,23 @@
 ///
 //******************************************************************************
 
-#ifdef POVMS_DISCONNECTED
-    #include "cnfpovms.h"
-#else
-    #include <string.h>
-    #include <stdlib.h>
-    #include <stdio.h>
-
-    // configbase.h must always be the first POV file included within base *.cpp files
-    #include "configbase.h"
-#endif
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <time.h>
 
 // Note: Needed for function prototypes
 #define POVMS_EXPORT_STREAM_FUNCTIONS
-
-#include <time.h>
 #include "povms.h"
-#include "pov_err.h"
 
-// this must be the last file included
-#include "base/povdebug.h"
+#ifndef POVMS_DISCONNECTED
+    /// @file
+    /// @todo We shouldn't include this; instead, we should use our own error values (that _may_ be defined in terms of POV-Ray's error values in @ref povms/configpovms.h).
+    #include "base/pov_err.h"
+
+    // this must be the last file included
+    #include "base/povdebug.h"
+#endif
 
 using namespace pov_base;
 

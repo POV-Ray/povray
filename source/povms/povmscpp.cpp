@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file base/povmscpp.cpp
+/// @file povms/povmscpp.cpp
 ///
 /// This module contains the C++ interface version of `povms.cpp`.
 ///
@@ -38,12 +38,12 @@
 
 #include <zlib.h>
 
-// configbase.h must always be the first POV file included within base *.cpp files
-#include "configbase.h"
 #include "povmscpp.h"
 
-// this must be the last file included
-#include "base/povdebug.h"
+#ifndef POVMS_DISCONNECTED
+    // this must be the last file included
+    #include "base/povdebug.h"
+#endif
 
 const POVMSType kPOVMSRawStreamEncoding = 'RAWS';
 const POVMSType kPOVMSGZipStreamEncoding = 'GZIP';

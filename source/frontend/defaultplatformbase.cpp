@@ -33,13 +33,13 @@
 ///
 //******************************************************************************
 
-// configbase.h must always be the first POV file included within base *.cpp files
-#include "base/configbase.h"
+// configfrontend.h must always be the first POV file included within frontend *.cpp files
+#include "frontend/configfrontend.h"
+#include "frontend/defaultplatformbase.h"
 
-#include "defaultplatformbase.h"
+#include "povms/povms.h"
 
-#include "povms.h"
-#include "pov_err.h"
+#include "base/pov_err.h"
 
 // this must be the last file included
 #include "base/povdebug.h"

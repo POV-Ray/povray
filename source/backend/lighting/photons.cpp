@@ -39,6 +39,8 @@
 #include "backend/frame.h"
 #include "backend/lighting/photons.h"
 
+#include "povms/povmsutil.h"
+
 #include "backend/bounding/bbox.h"
 #include "backend/lighting/photonshootingstrategy.h"
 #include "backend/lighting/point.h"
@@ -50,11 +52,11 @@
 #include "backend/scene/threaddata.h"
 #include "backend/scene/view.h"
 #include "backend/shape/csg.h"
-#include "backend/support/msgutil.h"
 #include "backend/support/octree.h"
 #include "backend/texture/normal.h"
 #include "backend/texture/pigment.h"
 #include "backend/texture/texture.h"
+
 #include "lightgrp.h"
 
 // this must be the last file included

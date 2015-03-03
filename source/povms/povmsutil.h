@@ -1,10 +1,9 @@
 //******************************************************************************
 ///
-/// @file vfe/syspovprotobase.h
+/// @file povms/povmsutil.h
 ///
-/// Provides definitions that are used by both the windows and core code.
-///
-/// @author Christopher J. Cason
+/// This module contains all defines, typedefs, and prototypes for
+/// @ref povms/povmsutil.cpp.
 ///
 /// @copyright
 /// @parblock
@@ -35,44 +34,21 @@
 ///
 //******************************************************************************
 
-#ifndef __SYSPROTO_H__
-#define __SYSPROTO_H__
+#ifndef POV_POVMSUTIL_H
+#define POV_POVMSUTIL_H
 
-#include <cstddef>
-#include <vector>
-// FIXME #include <xmemory>
+#include "povms/povms.h"
 
-#include "povms/povmscpp.h"
-
-namespace pov_base
+namespace pov
 {
 
-void vfeSysThreadStartup();
-void vfeSysThreadCleanup();
-bool vfeParsePathString (const POVMSUCS2String& path, POVMSUCS2String& volume, vector<POVMSUCS2String>& components, POVMSUCS2String& filename);
+using namespace pov_base;
 
-class vfeTimer
-{
-    public:
-        vfeTimer(bool CPUTimeIsThreadOnly = false);
-        ~vfeTimer();
+int POVMSUtil_SetFormatString(POVMSObjectPtr object, POVMSType key, const char *format, ...); // Note: Strings may not contain \0 characters codes!
 
-        POV_LONG ElapsedRealTime(void) const ;
-        POV_LONG ElapsedCPUTime(void) const;
-        void Reset(void);
-        bool HasValidCPUTime() const;
-
-    private:
-        unsigned POV_LONG GetWallTime (void) const ;
-        unsigned POV_LONG GetCPUTime (void) const ;
-
-        unsigned POV_LONG m_WallTimeStart ;
-        unsigned POV_LONG m_CPUTimeStart ;
-        bool m_ThreadTimeOnly ;
-        void *m_ThreadHandle ;
-        bool m_IsNT ;
-};
+int Send_Progress(const char *statusString, int progressState);
+int Send_ProgressUpdate(int progressState, int timeDiff = 1);
 
 }
 
-#endif // __SYSPROTO_H__
+#endif // POV_POVMSUTIL_H

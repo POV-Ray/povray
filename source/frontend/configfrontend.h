@@ -38,6 +38,8 @@
 #ifndef CONFIGFRONTEND_H
 #define CONFIGFRONTEND_H
 
+#include "base/configbase.h"
+
 #include "syspovconfigfrontend.h"
 
 // The output file format used if the user doesn't specify one

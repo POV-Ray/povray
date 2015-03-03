@@ -39,10 +39,12 @@
 #include <map>
 #include <set>
 
-#include "backend/povray.h"
-#include "base/povms.h"
-#include "base/povmscpp.h"
+#include "povms/povms.h"
+#include "povms/povmscpp.h"
+
 #include "base/stringutilities.h"
+
+#include "backend/povray.h"
 
 namespace pov
 {

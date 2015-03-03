@@ -36,12 +36,6 @@
     <ClCompile Include="..\..\source\base\pov_err.cpp">
       <Filter>Base source</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\base\povms.cpp">
-      <Filter>Base source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\base\povmscpp.cpp">
-      <Filter>Base source</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\base\processoptions.cpp">
       <Filter>Base source</Filter>
     </ClCompile>
@@ -145,15 +139,6 @@
       <Filter>Base Headers</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\base\povdebug.h">
-      <Filter>Base Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\base\povms.h">
-      <Filter>Base Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\base\povmscpp.h">
-      <Filter>Base Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\base\povmsgid.h">
       <Filter>Base Headers</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\base\processoptions.h">

@@ -38,11 +38,13 @@
 
 // configbase.h must always be the first POV file included within base *.cpp files
 #include "base/configbase.h"
-#include "base/povmscpp.h"
 #include "base/processoptions.h"
-#include "base/stringutilities.h"
-#include "base/povmsgid.h"
+
+#include "povms/povmscpp.h"
+#include "povms/povmsid.h"
+
 #include "base/pov_err.h"
+#include "base/stringutilities.h"
 
 // this must be the last file included
 #include "base/povdebug.h"

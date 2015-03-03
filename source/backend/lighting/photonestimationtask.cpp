@@ -41,6 +41,10 @@
 #include "backend/frame.h"
 #include "backend/lighting/photonestimationtask.h"
 
+#include "povms/povms.h"
+#include "povms/povmsid.h"
+#include "povms/povmsutil.h"
+
 #include "backend/bounding/bbox.h"
 #include "backend/lighting/point.h"
 #include "backend/math/matrices.h"
@@ -49,10 +53,8 @@
 #include "backend/scene/threaddata.h"
 #include "backend/scene/view.h"
 #include "backend/shape/csg.h"
-#include "backend/support/msgutil.h"
 #include "backend/support/octree.h"
-#include "base/povms.h"
-#include "base/povmsgid.h"
+
 #include "lightgrp.h"
 
 // this must be the last file included

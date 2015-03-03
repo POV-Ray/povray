@@ -44,11 +44,11 @@
 
 #include "backend/frame.h"
 
-#include "backend/lighting/photons.h"
+#include "base/image/colourspace.h"
+
+#include "backend/control/renderbackend.h"
 #include "backend/lighting/radiosity.h"
 #include "backend/scene/camera.h"
-#include "base/image/colourspace.h"
-#include "base/msgutil.h"
 
 namespace pov
 {

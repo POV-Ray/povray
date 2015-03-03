@@ -41,6 +41,13 @@
 #include "backend/frame.h"
 #include "backend/scene/view.h"
 
+#include "povms/povms.h"
+#include "povms/povmscpp.h"
+#include "povms/povmsid.h"
+
+#include "base/path.h"
+#include "base/timer.h"
+
 #include "backend/control/renderbackend.h"
 #include "backend/lighting/photonestimationtask.h"
 #include "backend/lighting/photons.h"
@@ -55,12 +62,6 @@
 #include "backend/scene/scene.h"
 #include "backend/scene/threaddata.h"
 #include "backend/support/octree.h"
-
-#include "base/path.h"
-#include "base/povms.h"
-#include "base/povmscpp.h"
-#include "base/povmsgid.h"
-#include "base/timer.h"
 
 // this must be the last file included
 #include "base/povdebug.h"

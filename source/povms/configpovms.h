@@ -1,16 +1,16 @@
 //******************************************************************************
 ///
-/// @file backend/support/msgutil.cpp
+/// @file povms/configpovms.h
 ///
-/// This module implements misc utility functions.
-///
-/// @todo   Describe more precisely.
+/// This header file defines all types that can be configured by platform
+/// specific code for parser layer use. It further allows insertion of platform
+/// specific function prototypes making use of those types.
 ///
 /// @copyright
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -35,42 +35,13 @@
 ///
 //*******************************************************************************
 
-#include <cctype>
-#include <cstdarg>
+#ifndef POVMS_CONFIGPOVMS_H
+#define POVMS_CONFIGPOVMS_H
 
-// frame.h must always be the first POV file included (pulls in platform config)
-#include "backend/frame.h"
-#include "backend/support/msgutil.h"
+#ifdef POVMS_DISCONNECTED
+    #include "cnfpovms.h"
+#else
+    #include "base/configbase.h"
+#endif
 
-// this must be the last file included
-#include "base/povdebug.h"
-
-namespace pov
-{
-
-/*****************************************************************************
-*
-* FUNCTION
-*   POVMSUtil_SetFormatString
-*
-* DESCRIPTION
-*   Stores a string with format information in the given attribute.
-*
-* CHANGES
-*   -
-*
-******************************************************************************/
-
-int POVMSUtil_SetFormatString(POVMSObjectPtr object, POVMSType key, const char *format, ...) // Note: Strings may not contain \0 characters codes!
-{
-    va_list marker;
-    char buffer[1024];
-
-    va_start(marker, format);
-    vsprintf(buffer, format, marker);
-    va_end(marker);
-
-    return POVMSUtil_SetString(object, key, buffer);
-}
-
-}
+#endif // POVMS_CONFIGPOVMS_H

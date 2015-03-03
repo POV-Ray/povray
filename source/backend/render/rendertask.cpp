@@ -39,7 +39,8 @@
 // frame.h must always be the first POV file included (pulls in platform config)
 #include "backend/frame.h"
 
-#include "base/povmsgid.h"
+#include "povms/povmsid.h"
+
 #include "base/types.h"
 #include "base/timer.h"
 

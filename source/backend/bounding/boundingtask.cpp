@@ -42,6 +42,8 @@
 #include "backend/frame.h"
 #include "backend/bounding/boundingtask.h"
 
+#include "povms/povmsid.h"
+
 #include "backend/math/matrices.h"
 #include "backend/scene/objects.h"
 #include "backend/scene/scene.h"
@@ -50,7 +52,6 @@
 #include "backend/support/bsptree.h"
 #include "backend/texture/pigment.h"
 #include "backend/texture/texture.h"
-#include "base/povmsgid.h"
 
 // this must be the last file included
 #include "base/povdebug.h"

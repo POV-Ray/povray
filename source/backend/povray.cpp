@@ -42,16 +42,17 @@
 #include "backend/frame.h"
 #include "backend/povray.h"
 
-#include "base/types.h"
-#include "base/timer.h"
-#include "base/povms.h"
-#include "base/povmsgid.h"
-#include "base/pov_err.h"
+#include "povms/povms.h"
+#include "povms/povmsid.h"
+#include "povms/povmsutil.h"
+
 #include "base/platformbase.h"
+#include "base/pov_err.h"
+#include "base/timer.h"
+#include "base/types.h"
 
 #include "backend/control/renderbackend.h"
 #include "backend/pattern/pattern.h"
-#include "backend/support/msgutil.h"
 #include "backend/texture/texture.h"
 
 #ifndef DONT_SHOW_IMAGE_LIB_VERSIONS

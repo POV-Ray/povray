@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file base/povmsgid.h
+/// @file povms/povmsid.h
 ///
 /// This module contains all defines, typedefs, and prototypes for the POVMS
 /// interface.
@@ -34,8 +34,8 @@
 ///
 //******************************************************************************
 
-#ifndef POVMSGID_H
-#define POVMSGID_H
+#ifndef POVMSID_H
+#define POVMSID_H
 
 /*
  * The following instructions are an example of how to add a POVMS option
@@ -45,7 +45,7 @@
  *
  * Take a look at frontend/processrenderoptions.cpp, i.e. Final_Frame in the
  * RenderOptions_INI_Table table. As you see, apart from a name, you need a
- * enum for POVMS. Those are in base/povmsgid.h . Please note that the Enums
+ * enum for POVMS. Those are in povms/povmsid.h . Please note that the Enums
  * follow a strict convention there to allow easily tracing back a four
  * character code to the variable. The block size is part of the view/rendered,
  * so it goes into the section marked with the comment "// options handled by
@@ -819,4 +819,4 @@ enum
     kPOVList_DitherMethod_Bayer4x4,
 };
 
-#endif // POVMSGID_H
+#endif // POVMSID_H

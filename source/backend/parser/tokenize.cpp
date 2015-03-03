@@ -43,15 +43,18 @@
 
 // frame.h must always be the first POV file included (pulls in platform config)
 #include "backend/frame.h"
-#include "base/povmsgid.h"
-#include "base/stringutilities.h"
 #include "backend/parser/parse.h"
+
+#include "povms/povmsid.h"
+#include "povms/povmsutil.h"
+
+#include "base/stringutilities.h"
+
 #include "backend/pattern/pattern.h"
 #include "backend/colour/colour_old.h"
 #include "backend/texture/texture.h"
 #include "backend/math/matrices.h"
 #include "backend/support/fileutil.h"
-#include "backend/support/msgutil.h"
 
 // this must be the last file included
 #include "base/povdebug.h"

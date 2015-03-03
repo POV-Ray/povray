@@ -1,8 +1,10 @@
 //******************************************************************************
 ///
-/// @file backend/support/msgutil.h
+/// @file povms/povmsutil.cpp
 ///
-/// This module contains all defines, typedefs, and prototypes for `msgutil.cpp`.
+/// This module implements misc utility functions.
+///
+/// @todo   Describe more precisely.
 ///
 /// @copyright
 /// @parblock
@@ -31,23 +33,44 @@
 ///
 /// @endparblock
 ///
-//******************************************************************************
+//*******************************************************************************
 
-#ifndef POV_MSGUTIL_H
-#define POV_MSGUTIL_H
+#include <cctype>
+#include <cstdarg>
 
-#include "base/povms.h"
+#include "povms/povmsutil.h"
+
+#ifndef POVMS_DISCONNECTED
+    // this must be the last file included
+    #include "base/povdebug.h"
+#endif
 
 namespace pov
 {
 
-using namespace pov_base;
+/*****************************************************************************
+*
+* FUNCTION
+*   POVMSUtil_SetFormatString
+*
+* DESCRIPTION
+*   Stores a string with format information in the given attribute.
+*
+* CHANGES
+*   -
+*
+******************************************************************************/
 
-int POVMSUtil_SetFormatString(POVMSObjectPtr object, POVMSType key, const char *format, ...); // Note: Strings may not contain \0 characters codes!
+int POVMSUtil_SetFormatString(POVMSObjectPtr object, POVMSType key, const char *format, ...) // Note: Strings may not contain \0 characters codes!
+{
+    va_list marker;
+    char buffer[1024];
 
-int Send_Progress(const char *statusString, int progressState);
-int Send_ProgressUpdate(int progressState, int timeDiff = 1);
+    va_start(marker, format);
+    vsprintf(buffer, format, marker);
+    va_end(marker);
 
+    return POVMSUtil_SetString(object, key, buffer);
 }
 
-#endif
+}

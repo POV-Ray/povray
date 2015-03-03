@@ -323,9 +323,6 @@
     <ClCompile Include="..\..\source\backend\support\jitter.cpp">
       <Filter>Backend Source\Support</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\backend\support\msgutil.cpp">
-      <Filter>Backend Source\Support</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\backend\support\octree.cpp">
       <Filter>Backend Source\Support</Filter>
     </ClCompile>
@@ -606,9 +603,6 @@
       <Filter>Backend Headers\Support</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\backend\support\jitter.h">
-      <Filter>Backend Headers\Support</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\backend\support\msgutil.h">
       <Filter>Backend Headers\Support</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\backend\support\octree.h">

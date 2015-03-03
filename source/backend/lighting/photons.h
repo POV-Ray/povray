@@ -37,10 +37,11 @@
 #ifndef PHOTONS_H
 #define PHOTONS_H
 
+#include "povms/povms.h"
+
 #include "backend/frame.h"
 #include "backend/interior/media.h"
 #include "backend/render/trace.h"
-#include "base/povms.h"
 
 namespace pov
 {

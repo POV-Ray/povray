@@ -109,7 +109,7 @@ unstaged=`git diff --name-only`
 
 errors=""
 stage=""
-for fname in `git diff --cached --name-only | grep -E "^source/|^vfe/|^mac/|^unix/|^windows/" | grep -E '\.cpp$|\.h$'`
+for fname in `git diff --cached --name-only | grep -E "^source/|^vfe/|^mac/|^unix/|^windows/" | grep -E '\.c$|\.cpp$|\.h$'`
 do
 
   if [ -f "$fname" ]

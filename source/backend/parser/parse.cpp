@@ -44,7 +44,8 @@
 #include "backend/frame.h"
 #include "backend/parser/parse.h"
 
-#include "base/povmsgid.h"
+#include "povms/povmsid.h"
+
 #include "backend/bounding/bcyl.h"
 #include "backend/bounding/bsphere.h"
 #include "backend/colour/colour_old.h"

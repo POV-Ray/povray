@@ -40,23 +40,27 @@
 
 #include <cassert>
 
-#include "syspovconfigfrontend.h"
 #include <boost/format.hpp>
 #include <boost/thread.hpp>
 #include <boost/thread/condition.hpp>
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
-#include "base/povms.h"
-#include "base/povmsgid.h"
+
+#include "povms/povms.h"
+#include "povms/povmsid.h"
+
 #include "base/platformbase.h"
 #include "base/timer.h"
 #include "base/image/colourspace.h"
+
 #include "frontend/console.h"
 #include "frontend/simplefrontend.h"
 #include "frontend/processrenderoptions.h"
-#include "vfesession.h"
+
+#include "syspovconfigfrontend.h"
 #include "vfeplatform.h"
 #include "vfepovms.h"
+#include "vfesession.h"
 
 namespace vfe
 {

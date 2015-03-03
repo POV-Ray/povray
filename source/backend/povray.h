@@ -45,7 +45,8 @@
 #include <boost/thread.hpp>
 #include <boost/function.hpp>
 
-#include "base/povms.h"
+#include "povms/povms.h"
+
 #include "base/version.h"
 
 /**

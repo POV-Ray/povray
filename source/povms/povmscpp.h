@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file base/povmscpp.h
+/// @file povms/povmscpp.h
 ///
 /// This module contains all defines, typedefs, and prototypes for the
 /// C++ interface version of `povms.cpp`.
@@ -37,11 +37,14 @@
 #ifndef POVMSCPP_H
 #define POVMSCPP_H
 
-#include "base/povms.h"
-#include "base/pov_err.h"
-
 #include <string>
 #include <vector>
+
+#include "povms/povms.h"
+#include "base/pov_err.h"
+
+/// @file
+/// @todo We could place this in a namespace.
 
 class POVMS_Container;
 class POVMS_Attribute;

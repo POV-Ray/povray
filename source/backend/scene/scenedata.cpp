@@ -42,20 +42,11 @@
 #include "backend/frame.h"
 #include "backend/scene/scenedata.h"
 
-#include "backend/control/renderbackend.h"
-#include "backend/scene/objects.h"
-#include "backend/scene/threaddata.h"
-#include "backend/scene/view.h"
-#include "backend/parser/parse.h"
-#include "backend/bounding/boundingtask.h"
-#include "backend/texture/texture.h"
+#include "povms/povmsid.h"
+
+#include "backend/pattern/pattern.h"
 #include "backend/shape/truetype.h"
 #include "backend/vm/fnpovfpu.h"
-#include "backend/shape/mesh.h"
-#include "base/timer.h"
-#include "base/povmsgid.h"
-#include "base/platformbase.h"
-#include "base/fileinputoutput.h"
 
 // this must be the last file included
 #include "base/povdebug.h"

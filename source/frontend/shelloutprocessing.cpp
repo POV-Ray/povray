@@ -38,14 +38,14 @@
 #include <boost/format.hpp>
 #include <boost/algorithm/string.hpp>
 
-// configbase.h must always be the first POV file included within base *.cpp files
-#include "base/configbase.h"
-#include "base/types.h"
-#include "base/povmscpp.h"
-#include "base/povmsgid.h"
-
+// configfrontend.h must always be the first POV file included within frontend *.cpp files
 #include "frontend/configfrontend.h"
 #include "frontend/shelloutprocessing.h"
+
+#include "povms/povmscpp.h"
+#include "povms/povmsid.h"
+
+#include "base/types.h"
 
 // this must be the last file included
 #include "base/povdebug.h"

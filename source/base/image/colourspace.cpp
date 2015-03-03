@@ -40,8 +40,10 @@
 // configbase.h must always be the first POV file included within base *.cpp files
 #include "base/configbase.h"
 #include "base/image/colourspace.h"
+
+#include "povms/povmsid.h"
+
 #include "base/image/encoding.h"
-#include "base/povmsgid.h"
 
 // this must be the last file included
 #include "base/povdebug.h"

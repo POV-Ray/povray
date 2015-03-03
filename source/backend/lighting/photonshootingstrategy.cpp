@@ -35,9 +35,15 @@
 ///
 //******************************************************************************
 
+#include <algorithm>
+
 // frame.h must always be the first POV file included (pulls in platform config)
 #include "backend/frame.h"
 #include "backend/lighting/photonshootingstrategy.h"
+
+#include "povms/povms.h"
+#include "povms/povmsid.h"
+#include "povms/povmsutil.h"
 
 #include "backend/bounding/bbox.h"
 #include "backend/lighting/photons.h"
@@ -48,16 +54,12 @@
 #include "backend/scene/threaddata.h"
 #include "backend/scene/view.h"
 #include "backend/shape/csg.h"
-#include "backend/support/msgutil.h"
 #include "backend/support/octree.h"
 #include "backend/texture/normal.h"
 #include "backend/texture/pigment.h"
 #include "backend/texture/texture.h"
-#include "base/povms.h"
-#include "base/povmsgid.h"
-#include "lightgrp.h"
 
-#include <algorithm>
+#include "lightgrp.h"
 
 // this must be the last file included
 #include "base/povdebug.h"

@@ -36,11 +36,13 @@
 #ifndef POVRAY_BACKEND_MESSAGEFACTORY_H
 #define POVRAY_BACKEND_MESSAGEFACTORY_H
 
-#include "backend/control/renderbackend.h"
-#include "base/povms.h"
-#include "base/povmscpp.h"
-#include "base/povmsgid.h"
+#include "povms/povms.h"
+#include "povms/povmscpp.h"
+#include "povms/povmsid.h"
+
 #include "base/pov_err.h"
+
+#include "backend/control/renderbackend.h"
 
 namespace pov
 {

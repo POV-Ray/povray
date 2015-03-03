@@ -46,10 +46,11 @@
 #include <boost/function.hpp>
 #include <boost/scoped_ptr.hpp>
 
+#include "povms/povms.h"
+#include "povms/povmscpp.h"
+#include "povms/povmsid.h"
+
 #include "base/path.h"
-#include "base/povms.h"
-#include "base/povmscpp.h"
-#include "base/povmsgid.h"
 #include "base/stringutilities.h"
 #include "base/textstreambuffer.h"
 #include "base/types.h"

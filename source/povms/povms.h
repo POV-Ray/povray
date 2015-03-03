@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file base/povms.h
+/// @file povms/povms.h
 ///
 /// Declarations for the C-style API of the POVMS message-passing framework.
 ///
@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -38,7 +38,9 @@
 
 /// @file
 /// @deprecated The API declared herein should not be used directly. Use the C++
-///             wrapper API declared in base/povmscpp.h instead.
+///             wrapper API declared in @ref povms/povmscpp.h instead.
+
+#include "configpovms.h"
 
 #ifndef POVMS_NO_DUMP_SUPPORT
     #include <stdio.h>
@@ -329,6 +331,9 @@ POVMS_EXPORT int POVMS_TraceDump                    ();
 #endif
 
 #endif /* POVMS_H */
+
+/// @file
+/// @todo The stream functions are C++ specific, and therefore shouldn't be in here.
 
 #ifdef POVMSCPP_H
     #define POVMS_EXPORT_STREAM_FUNCTIONS

@@ -52,27 +52,29 @@
 // NOTE: this file throws exceptions from 'extern C' functions. be sure to enable
 // this in your compiler options (preferably for this file only).
 
-#include <boost/scoped_ptr.hpp>
-#include <boost/scoped_array.hpp>
-
-#include <string>
-
 // configbase.h must always be the first POV file included within base *.cpp files
 #include "base/configbase.h"
-#include "base/image/image.h"
-#include "base/fileinputoutput.h"
-#include "base/image/png_pov.h"
-#include "base/types.h"
-#include "base/povmsgid.h" // for kPOVList_GammaType_SRGB
 
 #ifndef LIBPNG_MISSING
 
+#include <string>
+
+#include <boost/scoped_ptr.hpp>
+#include <boost/scoped_array.hpp>
+
 #include <png.h>
-#include "metadata.h"
+
+#include "base/image/png_pov.h"
+
+#include "povms/povmsid.h" // for kPOVList_GammaType_SRGB
+
+#include "base/fileinputoutput.h"
+#include "base/types.h"
+#include "base/image/image.h"
+#include "base/image/metadata.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
-
 
 namespace pov_base
 {
