@@ -1,8 +1,11 @@
 //******************************************************************************
 ///
-/// @file base/version.h
+/// @file unix/povconfig/syspovconfig_gnu.h
 ///
-/// This file contains version information.
+/// GNU/Linux Unixoid flavor-specific POV-Ray compile-time configuration.
+///
+/// This header file configures aspects of POV-Ray for running properly on a
+/// GNU/Linux platform.
 ///
 /// @copyright
 /// @parblock
@@ -33,32 +36,27 @@
 ///
 //******************************************************************************
 
-#ifndef POVRAY_BASE_VERSION_H
-#define POVRAY_BASE_VERSION_H
+#ifndef POVRAY_UNIX_SYSPOVCONFIG_GNU_H
+#define POVRAY_UNIX_SYSPOVCONFIG_GNU_H
 
-#include "base/configbase.h"
-#include "base/build.h"
+#include <unistd.h>
 
-// POV-Ray version and copyright message macros
+// lseek64 is natively supported on GNU/Linux systems.
 
-#define POV_RAY_COPYRIGHT "Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd."
-#define OFFICIAL_VERSION_STRING "3.7.1"
-#define OFFICIAL_VERSION_NUMBER 371
-
-#define POV_RAY_PRERELEASE "alpha.7979161"
-
-#if POV_RAY_IS_OFFICIAL == 1
-#ifdef POV_RAY_PRERELEASE
-#define POV_RAY_VERSION OFFICIAL_VERSION_STRING "-" POV_RAY_PRERELEASE
+#if defined(_POSIX_V6_LPBIG_OFFBIG) || defined(_POSIX_V6_LP64_OFF64)
+    // long is at least 64 bits.
+    #define POV_LONG long
+#elif defined(_POSIX_V6_ILP32_OFFBIG) || defined(_POSIX_V6_ILP32_OFF32)
+    // long is 32 bits.
+    #define POV_LONG long long
 #else
-#define POV_RAY_VERSION OFFICIAL_VERSION_STRING
-#endif
-#else
-#ifdef POV_RAY_PRERELEASE
-#define POV_RAY_VERSION OFFICIAL_VERSION_STRING "-" POV_RAY_PRERELEASE ".unofficial"
-#else
-#define POV_RAY_VERSION OFFICIAL_VERSION_STRING "-unofficial"
-#endif
+    // Unable to detect long size at compile-time, assuming less than 64 bits.
+    #define POV_LONG long long
 #endif
 
-#endif // POVRAY_BASE_VERSION_H
+#define DECLARE_THREAD_LOCAL_PTR(ptrType, ptrName)                __thread ptrType *ptrName
+#define IMPLEMENT_THREAD_LOCAL_PTR(ptrType, ptrName, ignore)      __thread ptrType *ptrName
+#define GET_THREAD_LOCAL_PTR(ptrName)                             (ptrName)
+#define SET_THREAD_LOCAL_PTR(ptrName, ptrValue)                   (ptrName = ptrValue)
+
+#endif // POVRAY_UNIX_SYSPOVCONFIG_GNU_H

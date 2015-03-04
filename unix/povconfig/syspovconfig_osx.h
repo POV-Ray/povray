@@ -1,8 +1,11 @@
 //******************************************************************************
 ///
-/// @file vfe/unix/syspovconfigbackend.h
+/// @file unix/povconfig/syspovconfig_osx.h
 ///
-/// @todo   What's in here?
+/// Mac OS X Unix flavor-specific POV-Ray compile-time configuration.
+///
+/// This header file configures aspects of POV-Ray for running properly on a
+/// Mac OS X platform.
 ///
 /// @copyright
 /// @parblock
@@ -33,14 +36,32 @@
 ///
 //******************************************************************************
 
-#ifndef __SYSPOVCONFIGBACKEND_H__
-#define __SYSPOVCONFIGBACKEND_H__
+#ifndef POVRAY_UNIX_SYSPOVCONFIG_OSX_H
+#define POVRAY_UNIX_SYSPOVCONFIG_OSX_H
 
-#include "syspovconfig.h"
+#include <unistd.h>
 
-#define POVRAY_PLATFORM_NAME "Unix"
-#define ALTMAIN
-#define NEW_LINE_STRING "\n"  // default
-#define SYS_DEF_EXT     ""
+/// @file
+/// @todo Someone needs to verify that off_t is indeed always 64 bit on Mac OS X
+#define lseek64(handle,offset,whence) lseek(handle,offset,whence)
 
+/// @file
+/// @todo The POV_LONG stuff is just copied from the Posix settings; someone needs to test this on OS X.
+#if defined(_POSIX_V6_LPBIG_OFFBIG) || defined(_POSIX_V6_LP64_OFF64)
+    // long is at least 64 bits.
+    #define POV_LONG long
+#elif defined(_POSIX_V6_ILP32_OFFBIG) || defined(_POSIX_V6_ILP32_OFF32)
+    // long is 32 bits.
+    #define POV_LONG long long
+#else
+    // Unable to detect long size at compile-time, assuming less than 64 bits.
+    #define POV_LONG long long
 #endif
+
+// The following macros are deliberately left undefined; POV-Ray will use boost as a fallback there:
+//  DECLARE_THREAD_LOCAL_PTR(ptrType, ptrName)
+//  IMPLEMENT_THREAD_LOCAL_PTR(ptrType, ptrName, ignore)
+//  GET_THREAD_LOCAL_PTR(ptrName)
+//  SET_THREAD_LOCAL_PTR(ptrName, ptrValue)
+
+#endif // POVRAY_UNIX_SYSPOVCONFIG_OSX_H

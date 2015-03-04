@@ -672,5 +672,8 @@
     <ClInclude Include="..\..\source\backend\texture\avxfma4check.h">
       <Filter>Backend Headers\Texture</Filter>
     </ClInclude>
+    <ClInclude Include="..\povconfig\syspovconfigbackend.h">
+      <Filter>Backend Headers</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

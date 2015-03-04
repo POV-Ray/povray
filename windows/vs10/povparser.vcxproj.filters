@@ -17,6 +17,9 @@
     <ClInclude Include="..\..\source\parser\configparser.h">
       <Filter>Parser Headers</Filter>
     </ClInclude>
+    <ClInclude Include="..\povconfig\syspovconfigparser.h">
+      <Filter>Parser Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\precomp.cpp" />

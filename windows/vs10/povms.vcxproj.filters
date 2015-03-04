@@ -37,5 +37,8 @@
     <ClInclude Include="..\..\source\povms\povmsid.h">
       <Filter>POVMS Headers</Filter>
     </ClInclude>
+    <ClInclude Include="..\povconfig\syspovconfigpovms.h">
+      <Filter>POVMS Headers</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

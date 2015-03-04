@@ -1,8 +1,11 @@
 //******************************************************************************
 ///
-/// @file vfe/win/syspovconfig.h
+/// @file windows/povconfig/syspovconfig.h
 ///
-/// This file contains most Windows specific defines for compiling the VFE.
+/// Windows-specific general POV-Ray compile-time configuration.
+///
+/// This header file configures module-independent aspects of POV-Ray for
+/// running properly on a Unix platform.
 ///
 /// @author Christopher J. Cason
 ///
@@ -10,7 +13,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -35,8 +38,8 @@
 ///
 //******************************************************************************
 
-#ifndef __SYSPOVCONFIG_H__
-#define __SYSPOVCONFIG_H__
+#ifndef POVRAY_WINDOWS_SYSPOVCONFIG_H
+#define POVRAY_WINDOWS_SYSPOVCONFIG_H
 
 #ifdef BUILDING_AMD64
   #if !defined(_M_AMD64) && !defined(_M_X64)
@@ -109,13 +112,16 @@ using std::tr1::weak_ptr;
 #include "../vfeconf.h"
 
 #if defined(__MINGW32__)                    /* MinGW GCC */
-  #include "compilers/mingw32.h"
+  #error Currently not supported.
+  #include "syspovconfig_mingw32.h"
 #elif defined(__WATCOMC__)                  /* Watcom C/C++ C32 */
-  #include "compilers/watcom.h"
+  #error Currently not supported.
+  #include "syspovconfig_watcom.h"
 #elif defined(__BORLANDC__)                 /* Borland C/C++ */
-  #include "compilers/borland.h"
+  #error Currently not supported.
+  #include "syspovconfig_borland.h"
 #elif defined(_MSC_VER)                     /* Microsoft and Intel C++ */
-  #include "compilers/msvc.h"
+  #include "syspovconfig_msvc.h"
 #else
   #error unknown compiler configuration
 #endif
@@ -206,7 +212,7 @@ namespace pov_base
 }
 
 #define S_IRUSR                             _S_IREAD
-#define S_IWUSR								_S_IWRITE
+#define S_IWUSR                             _S_IWRITE
 
 #define ALTMAIN
 #define LITTLE_ENDIAN
@@ -310,4 +316,4 @@ namespace pov
 #define POV_ISNAN(x) _isnan(x)
 #define POV_ISINF(x) _isinf(x)
 
-#endif // __SYSPOVCONFIG_H__
+#endif // POVRAY_WINDOWS_SYSPOVCONFIG_H

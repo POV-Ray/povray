@@ -1,8 +1,11 @@
 //******************************************************************************
 ///
-/// @file vfe/win/compilers/msvc.h
+/// @file windows/povconfig/syspovconfig_msvc.h
 ///
-/// @todo   What's in here?
+/// MSVC compiler-specific POV-Ray compile-time configuration.
+///
+/// This header file configures aspects of POV-Ray for compiling properly in a
+/// Microsoft Visual C++ build environment.
 ///
 /// @copyright
 /// @parblock
@@ -33,8 +36,8 @@
 ///
 //******************************************************************************
 
-#ifndef __MSVC_H__
-#define __MSVC_H__
+#ifndef POVRAY_WINDOWS_SYSPOVCONFIG_MSVC_H
+#define POVRAY_WINDOWS_SYSPOVCONFIG_MSVC_H
 
 #if _MSC_VER < 1400
   #error minimum Visual C++ version supported is 14.0 (supplied with VS 2005)
@@ -198,4 +201,4 @@
 #define GET_THREAD_LOCAL_PTR(ptrName)                             (ptrName)
 #define SET_THREAD_LOCAL_PTR(ptrName, ptrValue)                   (ptrName = ptrValue)
 
-#endif
+#endif // POVRAY_WINDOWS_SYSPOVCONFIG_MSVC_H

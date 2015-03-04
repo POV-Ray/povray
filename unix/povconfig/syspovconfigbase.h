@@ -1,9 +1,11 @@
 //******************************************************************************
 ///
-/// @file vfe/unix/syspovconfig_linux.h
+/// @file unix/povconfig/syspovconfigbase.h
 ///
-/// This file contains Unix flavor-specific defines for compiling the VFE
-/// on GNU/Linux systems.
+/// Unix-specific POV-Ray base compile-time configuration.
+///
+/// This header file configures aspects of POV-Ray's base module for running
+/// properly on a Unix platform.
 ///
 /// @copyright
 /// @parblock
@@ -34,27 +36,16 @@
 ///
 //******************************************************************************
 
-#ifndef __SYSPOVCONFIG_LINUX_H__
-#define __SYSPOVCONFIG_LINUX_H__
+#ifndef POVRAY_UNIX_SYSPOVCONFIGBASE_H
+#define POVRAY_UNIX_SYSPOVCONFIGBASE_H
 
-#include <unistd.h>
+#include "syspovconfig.h"
 
-// lseek64 is natively supported on GNU/Linux systems.
+// added by C.H. - see source/base/timer.h:
+// uncomment to use default time if no platform specific implementation is provided.
+//#undef POV_TIMER
 
-#if defined(_POSIX_V6_LPBIG_OFFBIG) || defined(_POSIX_V6_LP64_OFF64)
-    // long is at least 64 bits.
-    #define POV_LONG long
-#elif defined(_POSIX_V6_ILP32_OFFBIG) || defined(_POSIX_V6_ILP32_OFF32)
-    // long is 32 bits.
-    #define POV_LONG long long
-#else
-    // Unable to detect long size at compile-time, assuming less than 64 bits.
-    #define POV_LONG long long
-#endif
+#define FILENAME_SEPARATOR '/'
+#define IFF_SWITCH_CAST (long)
 
-#define DECLARE_THREAD_LOCAL_PTR(ptrType, ptrName)                __thread ptrType *ptrName
-#define IMPLEMENT_THREAD_LOCAL_PTR(ptrType, ptrName, ignore)      __thread ptrType *ptrName
-#define GET_THREAD_LOCAL_PTR(ptrName)                             (ptrName)
-#define SET_THREAD_LOCAL_PTR(ptrName, ptrValue)                   (ptrName = ptrValue)
-
-#endif
+#endif // POVRAY_UNIX_SYSPOVCONFIGBASE_H

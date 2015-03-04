@@ -21,5 +21,8 @@
     <ClInclude Include="..\..\source\core\coretypes.h">
       <Filter>Core Headers</Filter>
     </ClInclude>
+    <ClInclude Include="..\povconfig\syspovconfigcore.h">
+      <Filter>Core Headers</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -1,8 +1,11 @@
 //******************************************************************************
 ///
-/// @file vfe/unix/syspovconfigfrontend.h
+/// @file unix/povconfig/syspovconfigbackend.h
 ///
-/// @todo   What's in here?
+/// Unix-specific POV-Ray backend compile-time configuration.
+///
+/// This header file configures aspects of POV-Ray's backend module for running
+/// properly on a Unix platform.
 ///
 /// @copyright
 /// @parblock
@@ -33,11 +36,14 @@
 ///
 //******************************************************************************
 
-#ifndef __SYSPOVCONFIGFRONTEND_H__
-#define __SYSPOVCONFIGFRONTEND_H__
+#ifndef POVRAY_UNIX_SYSPOVCONFIGBACKEND_H
+#define POVRAY_UNIX_SYSPOVCONFIGBACKEND_H
 
 #include "syspovconfig.h"
 
-#define SYS_HAS_GRAYSCALE       // grayscale output supported in SYS file type
+#define POVRAY_PLATFORM_NAME "Unix"
+#define ALTMAIN
+#define NEW_LINE_STRING "\n"  // default
+#define SYS_DEF_EXT     ""
 
-#endif
+#endif // POVRAY_UNIX_SYSPOVCONFIGBACKEND_H

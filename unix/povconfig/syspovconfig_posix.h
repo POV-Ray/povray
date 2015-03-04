@@ -1,9 +1,11 @@
 //******************************************************************************
 ///
-/// @file vfe/unix/syspovconfig_bsd.h
+/// @file unix/povconfig/syspovconfig_posix.h
 ///
-/// This file contains Unix flavor-specific defines for compiling the VFE
-/// on BSD-style Unix systems.
+/// POSIX Unix flavor-specific POV-Ray compile-time configuration.
+///
+/// This header file configures aspects of POV-Ray for running properly on a
+/// POSIX-conformant Unix platform.
 ///
 /// @copyright
 /// @parblock
@@ -34,8 +36,8 @@
 ///
 //******************************************************************************
 
-#ifndef __SYSPOVCONFIG_BSD_H__
-#define __SYSPOVCONFIG_BSD_H__
+#ifndef POVRAY_UNIX_SYSPOVCONFIG_POSIX_H
+#define POVRAY_UNIX_SYSPOVCONFIG_POSIX_H
 
 #include <unistd.h>
 
@@ -53,7 +55,6 @@
     #define lseek64(handle,offset,whence) lseek(handle,offset,whence)
 #endif
 
-// TODO - the POV_LONG stuff is just copied from the Posix settings; someone needs to verify universal BSD compatibility.
 #if defined(_POSIX_V6_LPBIG_OFFBIG) || defined(_POSIX_V6_LP64_OFF64)
     // long is at least 64 bits.
     #define POV_LONG long
@@ -65,10 +66,11 @@
     #define POV_LONG long long
 #endif
 
-// TODO - the TLS stuff is just copied from the Linux settings; someone needs to verify universal BSD compatibility.
+/// @file
+/// @todo The TLS stuff is just copied from the Linux settings; someone needs to check universal POSIX compatibility.
 #define DECLARE_THREAD_LOCAL_PTR(ptrType, ptrName)                __thread ptrType *ptrName
 #define IMPLEMENT_THREAD_LOCAL_PTR(ptrType, ptrName, ignore)      __thread ptrType *ptrName
 #define GET_THREAD_LOCAL_PTR(ptrName)                             (ptrName)
 #define SET_THREAD_LOCAL_PTR(ptrName, ptrValue)                   (ptrName = ptrValue)
 
-#endif
+#endif // POVRAY_UNIX_SYSPOVCONFIG_POSIX_H

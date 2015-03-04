@@ -235,5 +235,14 @@
     <ClInclude Include="..\..\source\base\version.h">
       <Filter>Base Headers</Filter>
     </ClInclude>
+    <ClInclude Include="..\povconfig\syspovconfigbase.h">
+      <Filter>Base Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\povconfig\syspovconfig.h">
+      <Filter>Base Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\povconfig\syspovconfig_msvc.h">
+      <Filter>Base Headers</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

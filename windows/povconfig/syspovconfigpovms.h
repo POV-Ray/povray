@@ -1,8 +1,11 @@
 //******************************************************************************
 ///
-/// @file vfe/unix/syspovconfigbase.h
+/// @file windows/povconfig/syspovconfigpovms.h
 ///
-/// @todo   What's in here?
+/// Windows-specific POV-Ray POVMS compile-time configuration.
+///
+/// This header file configures aspects of POV-Ray's POVMS module for running
+/// properly on a Windows platform.
 ///
 /// @copyright
 /// @parblock
@@ -33,16 +36,9 @@
 ///
 //******************************************************************************
 
-#ifndef __SYSPOVCONFIGBASE_H__
-#define __SYSPOVCONFIGBASE_H__
+#ifndef POVRAY_WINDOWS_SYSPOVCONFIGPOVMS_H
+#define POVRAY_WINDOWS_SYSPOVCONFIGPOVMS_H
 
 #include "syspovconfig.h"
 
-// added by C.H. - see source/base/timer.h:
-// uncomment to use default time if no platform specific implementation is provided.
-//#undef POV_TIMER
-
-#define FILENAME_SEPARATOR '/'
-#define IFF_SWITCH_CAST (long)
-
-#endif
+#endif // POVRAY_WINDOWS_SYSPOVCONFIGPOVMS_H

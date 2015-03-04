@@ -1,14 +1,17 @@
 //******************************************************************************
 ///
-/// @file vfe/unix/syspovconfig.h
+/// @file unix/povconfig/syspovconfig.h
 ///
-/// This file contains most unix-specific defines for compiling the VFE.
+/// Unix-specific general POV-Ray compile-time configuration.
+///
+/// This header file configures module-independent aspects of POV-Ray for
+/// running properly on a Unix platform.
 ///
 /// @copyright
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -33,8 +36,8 @@
 ///
 //******************************************************************************
 
-#ifndef __SYSPOVCONFIG_H__
-#define __SYSPOVCONFIG_H__
+#ifndef POVRAY_UNIX_SYSPOVCONFIG_H
+#define POVRAY_UNIX_SYSPOVCONFIG_H
 
 #define _FILE_OFFSET_BITS 64 // Required for some Unix flavors to get a 64-bit off_t type on 32-bit systems.
 
@@ -159,7 +162,7 @@ const int NULL=0;
     #include "syspovconfig_posix.h"
 #elif defined(__linux__)
     // GNU/Linux detected.
-    #include "syspovconfig_linux.h"
+    #include "syspovconfig_gnu.h"
 #elif defined(__APPLE__) && defined(__MACH__)
     // Apple Mac OS X detected.
     #include "syspovconfig_osx.h"
@@ -191,4 +194,4 @@ const int NULL=0;
     #include "syspovconfig_posix.h"
 #endif
 
-#endif
+#endif // POVRAY_UNIX_SYSPOVCONFIG_H

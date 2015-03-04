@@ -94,5 +94,8 @@
       <Filter>Frontend Headers</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\precomp.h" />
+    <ClInclude Include="..\povconfig\syspovconfigfrontend.h">
+      <Filter>Frontend Headers</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
