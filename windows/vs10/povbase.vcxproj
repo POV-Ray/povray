@@ -404,7 +404,6 @@
     <ClInclude Include="..\..\source\base\font\timrom.h" />
     <ClInclude Include="..\..\source\base\path.h" />
     <ClInclude Include="..\..\source\base\platformbase.h" />
-    <ClInclude Include="..\..\source\base\pointer.h" />
     <ClInclude Include="..\..\source\base\pov_err.h" />
     <ClInclude Include="..\..\source\base\povdebug.h" />
     <ClInclude Include="..\..\source\base\processoptions.h" />

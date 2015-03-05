@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -37,13 +37,14 @@
 #include <cstdarg>
 #include <cstring>
 
+#include <memory>
+
 // configbase.h must always be the first POV file included within base *.cpp files
 #include "base/configbase.h"
-
 #include "base/fileinputoutput.h"
+
 #include "base/stringutilities.h"
 #include "base/platformbase.h"
-#include "base/pointer.h"
 #include "base/pov_err.h"
 
 // All the builtin fonts must be declared here
@@ -278,7 +279,7 @@ IStream& IStream::getline(char *s, size_t buflen)
  */
 IMemStream::IMemStream(const int font_id):IStream(POV_File_Font_TTF)
 {
-  switch(font_id)
+    switch(font_id)
     {
         case 1:
             start = &font_timrom[0];
@@ -297,8 +298,8 @@ IMemStream::IMemStream(const int font_id):IStream(POV_File_Font_TTF)
             size = sizeof(font_povlogo);
             break;
     }
-  pos = 0;
-  fail= false;
+    pos = 0;
+    fail= false;
 }
 
 IMemStream::~IMemStream()
@@ -328,9 +329,9 @@ void OStream::printf(const char *format, ...)
 
 IStream *NewIStream(const Path& p, const unsigned int stype)
 {
-    Pointer<IStream> istreamptr(POV_PLATFORM_BASE.CreateIStream(stype));
+    std::auto_ptr<IStream> istreamptr(POV_PLATFORM_BASE.CreateIStream(stype));
 
-    if(istreamptr == NULL)
+    if(istreamptr.get() == NULL)
         return NULL;
 
     if (POV_ALLOW_FILE_READ(p().c_str(), stype) == false) // TODO FIXME - this is handled by the frontend, but that code isn't completely there yet [trf]
@@ -348,10 +349,10 @@ IStream *NewIStream(const Path& p, const unsigned int stype)
 
 OStream *NewOStream(const Path& p, const unsigned int stype, const bool sappend)
 {
-    Pointer<OStream> ostreamptr(POV_PLATFORM_BASE.CreateOStream(stype));
+    std::auto_ptr<OStream> ostreamptr(POV_PLATFORM_BASE.CreateOStream(stype));
     unsigned int Flags = IOBase::none;
 
-    if(ostreamptr == NULL)
+    if(ostreamptr.get() == NULL)
         return NULL;
 
     if(sappend)
@@ -416,6 +417,7 @@ POV_LONG GetFileLength(const Path& p)
 
     return result;
 }
+
 IOBase& IMemStream::read(void *buffer, size_t count)
 {
     if ((!fail)&&(pos+count<= size))
@@ -429,6 +431,7 @@ IOBase& IMemStream::read(void *buffer, size_t count)
     }
     return *this;
 }
+
 int IMemStream::Read_Byte()
 {
     int v;
@@ -446,15 +449,17 @@ int IMemStream::Read_Byte()
 
 IStream& IMemStream::UnRead_Byte(int c)
 {
-  pos--;
+    pos--;
     fail = !(pos<size);
-  return *this;
-}
-IStream& IMemStream::getline(char *s,size_t buflen)
-{
- // Not needed for font
     return *this;
 }
+
+IStream& IMemStream::getline(char *s,size_t buflen)
+{
+    // Not needed for font
+    return *this;
+}
+
 POV_LONG IMemStream::tellg()
 {
   return pos;
@@ -475,17 +480,19 @@ IOBase& IMemStream::seekg(POV_LONG posi, unsigned int whence)
             break;
     }
     fail = !(pos<size);
-  return *this;
+    return *this;
 }
+
 bool IMemStream::open(const UCS2String &name, unsigned int Flags)
 {
- // Not needed for font
+    // Not needed for font
     return true;
 }
 
 bool IMemStream::close()
 {
- // Not needed for font
+    // Not needed for font
     return true;
 }
+
 }

@@ -132,9 +132,6 @@
     <ClInclude Include="..\..\source\base\platformbase.h">
       <Filter>Base Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\base\pointer.h">
-      <Filter>Base Headers</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\base\pov_err.h">
       <Filter>Base Headers</Filter>
     </ClInclude>
