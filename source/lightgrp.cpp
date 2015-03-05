@@ -31,15 +31,16 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
 // frame.h must always be the first POV file included (pulls in platform config)
 #include "backend/frame.h"
 #include "lightgrp.h" // TODO
 
+#include "core/shape/csg.h"
+
 #include "backend/lighting/point.h"
 #include "backend/scene/objects.h"
-#include "backend/shape/csg.h"
 
 // this must be the last file included
 #include "base/povdebug.h"

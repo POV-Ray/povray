@@ -37,7 +37,7 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
 #include <cctype>
 
@@ -47,12 +47,13 @@
 
 #include "base/stringutilities.h"
 
+#include "core/material/pattern.h"
+#include "core/material/texture.h"
+
 #include "povms/povmsid.h"
 #include "povms/povmsutil.h"
 
-#include "backend/pattern/pattern.h"
 #include "backend/colour/colour_old.h"
-#include "backend/texture/texture.h"
 #include "backend/math/matrices.h"
 #include "backend/support/fileutil.h"
 

@@ -40,12 +40,12 @@
 #include <stack>
 
 #include "base/types.h"
-// frame.h must always be the first backend POV file included (pulls in platform config)
-#include "backend/frame.h"
 
+#include "core/material/pattern.h"
+#include "core/shape/mesh.h"
+
+#include "backend/frame.h"
 #include "backend/bounding/bcyl.h"
-#include "backend/pattern/pattern.h"
-#include "backend/shape/mesh.h"
 #include "backend/support/statistics.h"
 #include "backend/support/task.h"
 

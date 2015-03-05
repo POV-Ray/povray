@@ -34,13 +34,14 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
 #ifndef OBJECTS_H
 #define OBJECTS_H
 
+#include "core/material/texture.h"
+
 #include "backend/bounding/bbox.h"
-#include "backend/texture/texture.h"
 
 namespace pov
 {

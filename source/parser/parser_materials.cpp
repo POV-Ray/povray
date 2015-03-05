@@ -31,7 +31,7 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
 // configparser.h must always be the first POV file included in the parser (pulls in platform config)
 #include "parser/configparser.h"
@@ -40,23 +40,24 @@
 #include "base/image/image.h"
 #include "base/path.h"
 
+#include "core/material/interior.h"
+#include "core/material/media.h"
+#include "core/material/normal.h"
+#include "core/material/pigment.h"
+#include "core/material/texture.h"
+#include "core/material/warp.h"
+#include "core/shape/isosurface.h"
+
 #include "backend/colour/colour_old.h"
-#include "backend/interior/interior.h"
-#include "backend/interior/media.h"
 #include "backend/math/matrices.h"
-#include "backend/pattern/warps.h"
 #include "backend/scene/objects.h"
 #include "backend/scene/threaddata.h"
-#include "backend/shape/isosurf.h"
 #include "backend/support/fileutil.h"
 #include "backend/support/imageutil.h"
-#include "backend/texture/normal.h"
-#include "backend/texture/pigment.h"
-#include "backend/texture/texture.h"
 #include "backend/vm/fncode.h"
 #include "backend/vm/fnpovfpu.h"
 
-#include "lightgrp.h" // TODO
+#include "lightgrp.h"
 
 #ifdef SYS_IMAGE_HEADER
 #include SYS_IMAGE_HEADER

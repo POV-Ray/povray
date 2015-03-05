@@ -36,7 +36,7 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
 #include <algorithm>
 
@@ -44,13 +44,14 @@
 #include "backend/frame.h"
 #include "backend/vm/fnintern.h"
 
+#include "core/material/pigment.h"
+#include "core/material/texture.h"
+#include "core/material/warp.h"
+
 #include "backend/math/mathutil.h"
 #include "backend/math/matrices.h"
 #include "backend/math/splines.h"
-#include "backend/pattern/warps.h"
 #include "backend/scene/threaddata.h"
-#include "backend/texture/pigment.h"
-#include "backend/texture/texture.h"
 #include "backend/vm/fncode.h"
 #include "backend/vm/fnpovfpu.h"
 

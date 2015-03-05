@@ -42,10 +42,11 @@
 #include "backend/frame.h"
 #include "backend/scene/scenedata.h"
 
+#include "core/material/pattern.h"
+#include "core/shape/truetype.h"
+
 #include "povms/povmsid.h"
 
-#include "backend/pattern/pattern.h"
-#include "backend/shape/truetype.h"
 #include "backend/vm/fnpovfpu.h"
 
 // this must be the last file included

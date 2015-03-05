@@ -31,18 +31,18 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
 #ifndef POVRAY_BACKEND_RADIOSITY_H
 #define POVRAY_BACKEND_RADIOSITY_H
 
 #include <vector>
 
-#include "backend/frame.h"
+#include "core/material/media.h"   // TODO FIXME - make MediaFunction class visible only as a pointer
+#include "core/render/trace.h"     // TODO FIXME - make Trace class visible only as a pointer
 
-#include "backend/interior/media.h"   // TODO FIXME - make MediaFunction class visible only as a pointer
+#include "backend/frame.h"
 #include "backend/lighting/photons.h" // TODO FIXME - make PhotonGatherer class visible only as a pointer
-#include "backend/render/trace.h"     // TODO FIXME - make Trace class visible only as a pointer
 #include "backend/support/octree.h"   // TODO FIXME - this should only be included in radiosity.cpp
 #include "backend/support/statistics.h"
 

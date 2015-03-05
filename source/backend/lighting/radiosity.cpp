@@ -34,7 +34,7 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
 /************************************************************************
 *  Radiosity calculation routies.
@@ -68,15 +68,17 @@
 #include "backend/frame.h"
 #include "backend/lighting/radiosity.h"
 
+#include "base/fileinputoutput.h"
+
+#include "core/render/ray.h"
+
 #include "backend/lighting/photons.h"
-#include "backend/render/ray.h"
 #include "backend/render/tracetask.h"
 #include "backend/scene/scene.h"
 #include "backend/scene/threaddata.h"
 #include "backend/scene/view.h"
 #include "backend/support/fileutil.h"
 #include "backend/support/octree.h"
-#include "base/fileinputoutput.h"
 
 // this must be the last file included
 #include "base/povdebug.h"

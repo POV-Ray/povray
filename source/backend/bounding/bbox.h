@@ -38,6 +38,8 @@
 #ifndef BBOX_H
 #define BBOX_H
 
+#include "backend/frame.h"
+
 namespace pov
 {
 

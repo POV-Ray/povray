@@ -39,8 +39,8 @@
 #include "backend/frame.h"
 #include "backend/math/hcmplx.h"
 
-#include "backend/shape/fractal.h" // TODO - Where should hcmplx.h/hcmplx.cpp go? Are they really math? [trf]
-#include "backend/shape/spheres.h" // TODO - Move sphere intersection function to math code! [trf]
+#include "core/shape/fractal.h" // TODO - Where should hcmplx.h/hcmplx.cpp go? Are they really math? [trf]
+#include "core/shape/sphere.h" // TODO - Move sphere intersection function to math code! [trf]
 
 // this must be the last file included
 #include "base/povdebug.h"

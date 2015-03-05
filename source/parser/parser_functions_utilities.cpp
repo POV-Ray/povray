@@ -34,7 +34,7 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
 #include <climits>
 
@@ -42,9 +42,10 @@
 #include "parser/configparser.h"
 #include "parser/parser.h"
 
+#include "core/material/pigment.h"
+
 #include "backend/math/matrices.h"
 #include "backend/math/splines.h"
-#include "backend/texture/pigment.h"
 #include "backend/vm/fnpovfpu.h"
 
 // this must be the last file included

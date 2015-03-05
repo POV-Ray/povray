@@ -40,12 +40,14 @@
 #include "backend/frame.h"
 #include "backend/support/imageutil.h"
 
-#include "backend/colour/spectral.h"
-#include "backend/pattern/pattern.h"
-#include "backend/support/fileutil.h"
-#include "backend/texture/normal.h"
-#include "backend/texture/texture.h"
 #include "base/pov_err.h"
+
+#include "core/material/normal.h"
+#include "core/material/pattern.h"
+#include "core/material/texture.h"
+
+#include "backend/colour/spectral.h"
+#include "backend/support/fileutil.h"
 
 #ifdef SYS_IMAGE_HEADER
 #include SYS_IMAGE_HEADER

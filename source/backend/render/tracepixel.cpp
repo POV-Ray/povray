@@ -34,7 +34,7 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
 #include <vector>
 
@@ -45,17 +45,18 @@
 #include "backend/frame.h"
 #include "backend/render/tracepixel.h"
 
+#include "core/material/normal.h"
+#include "core/material/pigment.h"
+#include "core/render/ray.h"
+#include "core/render/trace.h"
+#include "core/shape/mesh.h"
+
 #include "backend/math/chi2.h"
 #include "backend/math/matrices.h"
-#include "backend/render/ray.h"
-#include "backend/render/trace.h"
 #include "backend/scene/objects.h"
 #include "backend/scene/scene.h"
 #include "backend/scene/view.h"
-#include "backend/shape/mesh.h"
 #include "backend/support/jitter.h"
-#include "backend/texture/normal.h"
-#include "backend/texture/pigment.h"
 
 // this must be the last file included
 #include "base/povdebug.h"

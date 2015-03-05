@@ -39,15 +39,16 @@
 #include "backend/frame.h"
 #include "backend/scene/threaddata.h"
 
+#include "core/material/texture.h"
+#include "core/shape/blob.h"
+#include "core/shape/fractal.h"
+#include "core/shape/isosurface.h"
+
 #include "backend/bounding/bcyl.h"
 #include "backend/scene/objects.h"
 #include "backend/scene/scene.h"
 #include "backend/scene/view.h"
-#include "backend/shape/blob.h"
-#include "backend/shape/fractal.h"
-#include "backend/shape/isosurf.h"
 #include "backend/support/statistics.h"
-#include "backend/texture/texture.h"
 #include "backend/vm/fnpovfpu.h"
 
 // this must be the last file included

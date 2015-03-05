@@ -32,7 +32,7 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
 #include <cctype>
 #include <algorithm>
@@ -42,24 +42,26 @@
 #include "parser/configparser.h"
 #include "parser/parser.h"
 
+#include "base/fileinputoutput.h"
+
+#include "core/material/normal.h"
+#include "core/material/pattern.h"
+#include "core/material/pigment.h"
+#include "core/material/texture.h"
+#include "core/material/warp.h"
+#include "core/render/ray.h"
+#include "core/shape/heightfield.h"
+
 #include "backend/colour/colour_old.h"
 #include "backend/math/mathutil.h"
 #include "backend/math/matrices.h"
 #include "backend/math/splines.h"
 #include "backend/math/vector.h"
-#include "backend/pattern/pattern.h"
-#include "backend/pattern/warps.h"
-#include "backend/render/ray.h"
 #include "backend/scene/objects.h"
-#include "backend/shape/hfield.h"
 #include "backend/support/fileutil.h"
 #include "backend/support/imageutil.h"
-#include "backend/texture/normal.h"
-#include "backend/texture/pigment.h"
-#include "backend/texture/texture.h"
 #include "backend/vm/fncode.h"
 #include "backend/vm/fnpovfpu.h"
-#include "base/fileinputoutput.h"
 
 // this must be the last file included
 #include "base/povdebug.h"

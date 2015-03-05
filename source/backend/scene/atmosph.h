@@ -32,12 +32,12 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
 #ifndef ATMOSPH_H
 #define ATMOSPH_H
 
-#include "backend/texture/pigment.h"
+#include "core/material/pigment.h"
 
 namespace pov
 {
@@ -60,7 +60,7 @@ typedef struct Fog_Struct FOG;
 typedef struct Rainbow_Struct RAINBOW;
 typedef struct Skysphere_Struct SKYSPHERE;
 
-struct TurbulenceWarp; // full declaration in backend/pattern/warps.h
+struct TurbulenceWarp; // full declaration in core/material/warp.h
 
 struct Fog_Struct
 {

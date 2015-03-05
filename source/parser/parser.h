@@ -31,7 +31,7 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
 #ifndef PARSE_H
 #define PARSE_H
@@ -42,6 +42,9 @@
 #include "base/textstream.h"
 #include "base/textstreambuffer.h"
 
+#include "core/material/pigment.h"
+#include "core/shape/blob.h"
+
 #include "parser/reservedwords.h"
 
 #include "backend/control/messagefactory.h"
@@ -50,9 +53,7 @@
 #include "backend/scene/atmosph.h"
 #include "backend/scene/camera.h"
 #include "backend/scene/scene.h"
-#include "backend/shape/blob.h"
 #include "backend/support/task.h"
-#include "backend/texture/pigment.h"
 
 namespace pov
 {
@@ -79,8 +80,8 @@ const int SYM_TABLE_SIZE = 257;
 struct FPUContext;
 class ImageData;
 struct GenericSpline;
-struct ClassicTurbulence; // full declaration in backend/pattern/warps.h
-struct BlackHoleWarp; // full declaration in backend/pattern/warps.h
+struct ClassicTurbulence; // full declaration in core/material/warp.h
+struct BlackHoleWarp; // full declaration in core/material/warp.h
 
 /*****************************************************************************
 * Global preprocessor defines

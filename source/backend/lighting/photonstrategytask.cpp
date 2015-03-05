@@ -31,13 +31,15 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
 #include <algorithm>
 
 // frame.h must always be the first POV file included (pulls in platform config)
 #include "backend/frame.h"
 #include "backend/lighting/photonstrategytask.h"
+
+#include "core/shape/csg.h"
 
 #include "povms/povms.h"
 #include "povms/povmsid.h"
@@ -49,7 +51,6 @@
 #include "backend/scene/scene.h"
 #include "backend/scene/threaddata.h"
 #include "backend/scene/view.h"
-#include "backend/shape/csg.h"
 #include "backend/support/octree.h"
 #include "backend/lighting/photonshootingstrategy.h"
 #include "backend/lighting/point.h"

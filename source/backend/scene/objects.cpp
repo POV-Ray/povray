@@ -31,7 +31,7 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
 #include <cassert>
 
@@ -39,14 +39,15 @@
 #include "backend/frame.h"
 #include "backend/scene/objects.h"
 
-#include "backend/interior/interior.h"
+#include "core/material/interior.h"
+#include "core/material/texture.h"
+#include "core/render/ray.h"
+#include "core/shape/box.h"
+#include "core/shape/csg.h"
+#include "core/shape/sphere.h"
+
 #include "backend/math/matrices.h"
-#include "backend/render/ray.h"
 #include "backend/scene/threaddata.h"
-#include "backend/shape/boxes.h"
-#include "backend/shape/csg.h"
-#include "backend/shape/spheres.h"
-#include "backend/texture/texture.h"
 
 // this must be the last file included
 #include "base/povdebug.h"

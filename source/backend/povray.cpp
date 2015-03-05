@@ -51,9 +51,10 @@
 #include "base/timer.h"
 #include "base/types.h"
 
+#include "core/material/pattern.h"
+#include "core/material/texture.h"
+
 #include "backend/control/renderbackend.h"
-#include "backend/pattern/pattern.h"
-#include "backend/texture/texture.h"
 
 #ifndef DONT_SHOW_IMAGE_LIB_VERSIONS
     // these are needed for copyright notices and version numbers

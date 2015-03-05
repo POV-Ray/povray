@@ -31,7 +31,7 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
 #include <algorithm>
 
@@ -39,9 +39,9 @@
 #include "backend/frame.h"
 #include "backend/colour/colour_old.h"
 
-#include "backend/texture/normal.h"
-#include "backend/texture/pigment.h"
-#include "backend/texture/texture.h"
+#include "core/material/normal.h"
+#include "core/material/pigment.h"
+#include "core/material/texture.h"
 
 // this must be the last file included
 #include "base/povdebug.h"

@@ -41,6 +41,11 @@
 #include "backend/frame.h"
 #include "backend/lighting/photonshootingstrategy.h"
 
+#include "core/material/normal.h"
+#include "core/material/pigment.h"
+#include "core/material/texture.h"
+#include "core/shape/csg.h"
+
 #include "povms/povms.h"
 #include "povms/povmsid.h"
 #include "povms/povmsutil.h"
@@ -53,11 +58,7 @@
 #include "backend/scene/scene.h"
 #include "backend/scene/threaddata.h"
 #include "backend/scene/view.h"
-#include "backend/shape/csg.h"
 #include "backend/support/octree.h"
-#include "backend/texture/normal.h"
-#include "backend/texture/pigment.h"
-#include "backend/texture/texture.h"
 
 #include "lightgrp.h"
 

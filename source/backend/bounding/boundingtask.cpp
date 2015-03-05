@@ -31,7 +31,7 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
 #include <set>
 
@@ -48,10 +48,7 @@
 #include "backend/scene/objects.h"
 #include "backend/scene/scene.h"
 #include "backend/scene/threaddata.h"
-#include "backend/shape/cones.h"
 #include "backend/support/bsptree.h"
-#include "backend/texture/pigment.h"
-#include "backend/texture/texture.h"
 
 // this must be the last file included
 #include "base/povdebug.h"

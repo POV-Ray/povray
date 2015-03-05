@@ -40,8 +40,8 @@
 #include "backend/frame.h"
 #include "backend/math/quatern.h"
 
-#include "backend/shape/fractal.h"
-#include "backend/shape/spheres.h"
+#include "core/shape/fractal.h"
+#include "core/shape/sphere.h"
 
 // this must be the last file included
 #include "base/povdebug.h"

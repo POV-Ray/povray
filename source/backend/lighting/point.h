@@ -36,6 +36,8 @@
 #ifndef POINT_H
 #define POINT_H
 
+#include "backend/frame.h"
+
 namespace pov
 {
 

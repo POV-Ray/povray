@@ -37,10 +37,11 @@
 #include "backend/frame.h"
 #include "backend/scene/camera.h"
 
+#include "core/material/normal.h"
+#include "core/material/pigment.h"
+
 #include "backend/math/matrices.h"
 #include "backend/scene/objects.h"
-#include "backend/texture/normal.h"
-#include "backend/texture/pigment.h"
 
 // this must be the last file included
 #include "base/povdebug.h"

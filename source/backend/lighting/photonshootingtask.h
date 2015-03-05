@@ -31,14 +31,15 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
 #ifndef PHOTONSHOOTINGTASK_H
 #define PHOTONSHOOTINGTASK_H
 
+#include "core/render/trace.h"
+
 #include "backend/frame.h"
 #include "backend/lighting/photons.h"
-#include "backend/render/trace.h"
 #include "backend/render/rendertask.h"
 
 namespace pov

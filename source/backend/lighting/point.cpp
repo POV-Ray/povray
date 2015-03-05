@@ -31,14 +31,15 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
 // frame.h must always be the first POV file included (pulls in platform config)
 #include "backend/frame.h"
 #include "backend/lighting/point.h"
 
+#include "core/render/ray.h"
+
 #include "backend/math/matrices.h"
-#include "backend/render/ray.h"
 #include "backend/scene/objects.h"
 
 // this must be the last file included

@@ -31,7 +31,7 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
 #include <algorithm>
 
@@ -39,11 +39,12 @@
 #include "backend/frame.h"
 #include "backend/scene/atmosph.h"
 
+#include "core/material/pattern.h"
+#include "core/material/warp.h"
+#include "core/material/pigment.h"
+#include "core/material/texture.h"
+
 #include "backend/math/matrices.h"
-#include "backend/pattern/pattern.h"
-#include "backend/pattern/warps.h"
-#include "backend/texture/pigment.h"
-#include "backend/texture/texture.h"
 
 // this must be the last file included
 #include "base/povdebug.h"

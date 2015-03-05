@@ -2,7 +2,8 @@
 ///
 /// @file lightgrp.h
 ///
-/// This module contains all defines, typedefs, and prototypes for `lightgrp.cpp`.
+/// This module contains all defines, typedefs, and prototypes for
+/// @ref lightgrp.cpp.
 ///
 /// @copyright
 /// @parblock
@@ -35,6 +36,8 @@
 
 #ifndef LIGHTGRP_H
 #define LIGHTGRP_H
+
+#include "backend/frame.h"
 
 namespace pov
 {

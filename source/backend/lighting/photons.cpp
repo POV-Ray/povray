@@ -31,7 +31,7 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
 #include <algorithm>
 
@@ -39,23 +39,24 @@
 #include "backend/frame.h"
 #include "backend/lighting/photons.h"
 
+#include "core/material/normal.h"
+#include "core/material/pigment.h"
+#include "core/material/texture.h"
+#include "core/material/warp.h"
+#include "core/render/ray.h"
+#include "core/shape/csg.h"
+
 #include "povms/povmsutil.h"
 
 #include "backend/bounding/bbox.h"
 #include "backend/lighting/photonshootingstrategy.h"
 #include "backend/lighting/point.h"
 #include "backend/math/matrices.h"
-#include "backend/pattern/warps.h"
-#include "backend/render/ray.h"
 #include "backend/scene/objects.h"
 #include "backend/scene/scene.h"
 #include "backend/scene/threaddata.h"
 #include "backend/scene/view.h"
-#include "backend/shape/csg.h"
 #include "backend/support/octree.h"
-#include "backend/texture/normal.h"
-#include "backend/texture/pigment.h"
-#include "backend/texture/texture.h"
 
 #include "lightgrp.h"
 

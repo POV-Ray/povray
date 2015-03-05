@@ -31,7 +31,7 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
 #include <vector>
 #include <list>
@@ -40,9 +40,10 @@
 #include "backend/frame.h"
 #include "backend/support/bsptree.h"
 
-#include "backend/render/ray.h"
-#include "backend/shape/boxes.h"
 #include "base/pov_err.h"
+
+#include "core/render/ray.h"
+#include "core/shape/box.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
