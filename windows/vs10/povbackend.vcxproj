@@ -364,14 +364,6 @@
     <ClCompile Include="..\..\source\backend\math\polysolv.cpp" />
     <ClCompile Include="..\..\source\backend\math\quatern.cpp" />
     <ClCompile Include="..\..\source\backend\math\splines.cpp" />
-    <ClCompile Include="..\..\source\backend\parser\express.cpp" />
-    <ClCompile Include="..\..\source\backend\parser\fnsyntax.cpp" />
-    <ClCompile Include="..\..\source\backend\parser\function.cpp" />
-    <ClCompile Include="..\..\source\backend\parser\parse.cpp" />
-    <ClCompile Include="..\..\source\backend\parser\parsestr.cpp" />
-    <ClCompile Include="..\..\source\backend\parser\parstxtr.cpp" />
-    <ClCompile Include="..\..\source\backend\parser\reswords.cpp" />
-    <ClCompile Include="..\..\source\backend\parser\tokenize.cpp" />
     <ClCompile Include="..\..\source\backend\pattern\pattern.cpp" />
     <ClCompile Include="..\..\source\backend\pattern\warps.cpp" />
     <ClCompile Include="..\..\source\backend\render\radiositytask.cpp" />
@@ -472,8 +464,6 @@
     <ClInclude Include="..\..\source\backend\math\quatern.h" />
     <ClInclude Include="..\..\source\backend\math\splines.h" />
     <ClInclude Include="..\..\source\backend\math\vector.h" />
-    <ClInclude Include="..\..\source\backend\parser\parse.h" />
-    <ClInclude Include="..\..\source\backend\parser\reswords.h" />
     <ClInclude Include="..\..\source\backend\pattern\pattern.h" />
     <ClInclude Include="..\..\source\backend\pattern\warps.h" />
     <ClInclude Include="..\..\source\backend\render\radiositytask.h" />

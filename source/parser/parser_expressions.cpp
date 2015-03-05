@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file backend/parser/express.cpp
+/// @file parser/parser_expressions.cpp
 ///
 /// This module implements an expression parser for the floats, vectors and
 /// colours in scene description files.
@@ -38,9 +38,9 @@
 #include <algorithm>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
-// frame.h must always be the first POV file included (pulls in platform config)
-#include "backend/frame.h"
-#include "backend/parser/parse.h"
+// configparser.h must always be the first POV file included in the parser (pulls in platform config)
+#include "parser/configparser.h"
+#include "parser/parser.h"
 
 #include "backend/colour/colour_old.h"
 #include "backend/math/mathutil.h"

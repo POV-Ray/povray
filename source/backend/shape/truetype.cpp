@@ -39,9 +39,10 @@
 #include "backend/frame.h"
 #include "backend/shape/truetype.h"
 
+#include "parser/parser.h" // TODO - avoid this (pulled in for ???)
+
 #include "backend/bounding/bbox.h"
 #include "backend/math/matrices.h"
-#include "backend/parser/parse.h"
 #include "backend/render/ray.h"
 #include "backend/scene/objects.h"
 #include "backend/scene/threaddata.h"

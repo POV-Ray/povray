@@ -38,7 +38,7 @@
 #define SPLINE_H
 /* Generic header for spline modules */
 
-#include "backend/parser/parse.h" // TODO - avoid this (pulled in for EXPRESS)
+#include "parser/parser.h" // TODO - avoid this (pulled in for EXPRESS)
 
 namespace pov
 {

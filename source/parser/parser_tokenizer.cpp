@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file backend/parser/tokenize.cpp
+/// @file parser/parser_tokenizer.cpp
 ///
 /// This module implements the first part of a two part parser for the scene
 /// description files.  This phase changes the input file into tokens.
@@ -41,14 +41,14 @@
 
 #include <cctype>
 
-// frame.h must always be the first POV file included (pulls in platform config)
-#include "backend/frame.h"
-#include "backend/parser/parse.h"
+// configparser.h must always be the first POV file included in the parser (pulls in platform config)
+#include "parser/configparser.h"
+#include "parser/parser.h"
+
+#include "base/stringutilities.h"
 
 #include "povms/povmsid.h"
 #include "povms/povmsutil.h"
-
-#include "base/stringutilities.h"
 
 #include "backend/pattern/pattern.h"
 #include "backend/colour/colour_old.h"

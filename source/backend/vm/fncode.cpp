@@ -46,7 +46,8 @@
 #include "backend/frame.h"
 #include "backend/vm/fncode.h"
 
-#include "backend/parser/parse.h"
+#include "parser/parser.h"
+
 #include "backend/vm/fnintern.h"
 #include "backend/vm/fnpovfpu.h"
 

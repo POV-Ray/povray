@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file backend/parser/parse.cpp
+/// @file parser/parser.cpp
 ///
 /// This module implements a parser for the scene description files.
 ///
@@ -31,7 +31,7 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
 #include <cctype>
 #include <cmath>
@@ -40,9 +40,9 @@
 
 #include <boost/bind.hpp>
 
-// frame.h must always be the first POV file included (pulls in platform config)
-#include "backend/frame.h"
-#include "backend/parser/parse.h"
+// configparser.h must always be the first POV file included in the parser (pulls in platform config)
+#include "parser/configparser.h"
+#include "parser/parser.h"
 
 #include "povms/povmsid.h"
 

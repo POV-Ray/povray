@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file backend/parser/reswords.cpp
+/// @file parser/reservedwords.cpp
 ///
 /// This file contains the list of reserved words as a global array. It is
 /// kept separate from the parser to allow it to be linked in with GUI's that
@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -35,10 +35,9 @@
 ///
 //******************************************************************************
 
-// frame.h must always be the first POV file included (pulls in platform config)
-#include "backend/frame.h"
-
-#include "backend/parser/reswords.h"
+// configparser.h must always be the first POV file included in the parser (pulls in platform config)
+#include "parser/configparser.h"
+#include "parser/reservedwords.h"
 
 // this must be the last file included
 #include "base/povdebug.h"

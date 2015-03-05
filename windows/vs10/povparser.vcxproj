@@ -343,6 +343,14 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\source\parser\parser.cpp" />
+    <ClCompile Include="..\..\source\parser\parser_expressions.cpp" />
+    <ClCompile Include="..\..\source\parser\parser_functions.cpp" />
+    <ClCompile Include="..\..\source\parser\parser_functions_utilities.cpp" />
+    <ClCompile Include="..\..\source\parser\parser_materials.cpp" />
+    <ClCompile Include="..\..\source\parser\parser_strings.cpp" />
+    <ClCompile Include="..\..\source\parser\parser_tokenizer.cpp" />
+    <ClCompile Include="..\..\source\parser\reservedwords.cpp" />
     <ClCompile Include="..\..\source\precomp.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -352,6 +360,8 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\source\parser\parser.h" />
+    <ClInclude Include="..\..\source\parser\reservedwords.h" />
     <ClInclude Include="..\..\source\parser\configparser.h" />
     <ClInclude Include="..\..\source\precomp.h" />
     <ClInclude Include="..\povconfig\syspovconfigparser.h" />

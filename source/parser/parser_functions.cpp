@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file backend/parser/fnsyntax.cpp
+/// @file parser/parser_functions.cpp
 ///
 /// This module implements the the function type used by iso surfaces and
 /// the function pattern.
@@ -11,7 +11,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -38,9 +38,9 @@
 
 #include <climits>
 
-// frame.h must always be the first POV file included (pulls in platform config)
-#include "backend/frame.h"
-#include "backend/parser/parse.h"
+// configparser.h must always be the first POV file included in the parser (pulls in platform config)
+#include "parser/configparser.h"
+#include "parser/parser.h"
 
 #include "backend/math/mathutil.h"
 #include "backend/vm/fnpovfpu.h"

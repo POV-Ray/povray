@@ -45,8 +45,9 @@
 #include "backend/frame.h"
 #include "backend/support/fileutil.h"
 
-#include "backend/parser/parse.h" // TODO FIXME HACK - used for hack below, need to remove [trf]
 #include "base/path.h"
+
+#include "parser/parser.h" // TODO FIXME HACK - used for hack below, need to remove [trf]
 
 // this must be the last file included
 #include "base/povdebug.h"

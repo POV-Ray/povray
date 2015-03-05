@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file backend/parser/parstxtr.cpp
+/// @file parser/parser_materials.cpp
 ///
 /// This module parses textures and atmosphere effects.
 ///
@@ -33,9 +33,12 @@
 ///
 //*******************************************************************************
 
-// frame.h must always be the first POV file included (pulls in platform config)
-#include "backend/frame.h"
-#include "backend/parser/parse.h"
+// configparser.h must always be the first POV file included in the parser (pulls in platform config)
+#include "parser/configparser.h"
+#include "parser/parser.h"
+
+#include "base/image/image.h"
+#include "base/path.h"
 
 #include "backend/colour/colour_old.h"
 #include "backend/interior/interior.h"
@@ -52,8 +55,6 @@
 #include "backend/texture/texture.h"
 #include "backend/vm/fncode.h"
 #include "backend/vm/fnpovfpu.h"
-#include "base/image/image.h"
-#include "base/path.h"
 
 #include "lightgrp.h" // TODO
 

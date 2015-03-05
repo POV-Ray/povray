@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file backend/parser/parse.h
+/// @file parser/parser.h
 ///
 /// This header file is included by all language parsing C++ modules in POV-Ray.
 ///
@@ -36,15 +36,17 @@
 #ifndef PARSE_H
 #define PARSE_H
 
-#include "backend/frame.h"
+#include "parser/configparser.h"
 
 #include "base/stringutilities.h"
 #include "base/textstream.h"
 #include "base/textstreambuffer.h"
+
+#include "parser/reservedwords.h"
+
 #include "backend/control/messagefactory.h"
 #include "backend/math/matrices.h"
 #include "backend/math/vector.h"
-#include "backend/parser/reswords.h"
 #include "backend/scene/atmosph.h"
 #include "backend/scene/camera.h"
 #include "backend/scene/scene.h"

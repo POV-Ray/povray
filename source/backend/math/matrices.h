@@ -37,6 +37,8 @@
 #ifndef MATRICES_H
 #define MATRICES_H
 
+#include "backend/frame.h"
+
 namespace pov
 {
 

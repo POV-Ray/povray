@@ -12,7 +12,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -40,7 +40,7 @@
 #ifndef FPMETRIC_H
 #define FPMETRIC_H
 
-#include "backend/parser/parse.h"
+#include "parser/parser.h" // TODO - avoid this (pulled in for function stuff)
 #include "backend/scene/objects.h"
 
 namespace pov

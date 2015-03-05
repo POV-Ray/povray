@@ -27,9 +27,6 @@
     <Filter Include="Backend Source\Math">
       <UniqueIdentifier>{bbe704ec-896e-49c8-aac5-66f87fe033a1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Backend Source\Parser">
-      <UniqueIdentifier>{2bb11f2b-4a0f-44c8-ae3e-cbea2924892d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Backend Source\Pattern">
       <UniqueIdentifier>{02d1f320-8476-430b-b670-abadac2dd15b}</UniqueIdentifier>
     </Filter>
@@ -71,9 +68,6 @@
     </Filter>
     <Filter Include="Backend Headers\Math">
       <UniqueIdentifier>{027db344-63f5-4471-97d3-9ea921b9e56c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Backend Headers\Parser">
-      <UniqueIdentifier>{ef10e793-77fb-49f7-b568-9a3fab091b6f}</UniqueIdentifier>
     </Filter>
     <Filter Include="Backend Headers\Pattern">
       <UniqueIdentifier>{f45f3252-4135-4335-803f-f56acec22852}</UniqueIdentifier>
@@ -166,30 +160,6 @@
     </ClCompile>
     <ClCompile Include="..\..\source\backend\math\splines.cpp">
       <Filter>Backend Source\Math</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\backend\parser\express.cpp">
-      <Filter>Backend Source\Parser</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\backend\parser\fnsyntax.cpp">
-      <Filter>Backend Source\Parser</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\backend\parser\function.cpp">
-      <Filter>Backend Source\Parser</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\backend\parser\parse.cpp">
-      <Filter>Backend Source\Parser</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\backend\parser\parsestr.cpp">
-      <Filter>Backend Source\Parser</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\backend\parser\parstxtr.cpp">
-      <Filter>Backend Source\Parser</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\backend\parser\reswords.cpp">
-      <Filter>Backend Source\Parser</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\backend\parser\tokenize.cpp">
-      <Filter>Backend Source\Parser</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\backend\pattern\pattern.cpp">
       <Filter>Backend Source\Pattern</Filter>
@@ -463,12 +433,6 @@
     </ClInclude>
     <ClInclude Include="..\..\source\backend\math\vector.h">
       <Filter>Backend Headers\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\backend\parser\parse.h">
-      <Filter>Backend Headers\Parser</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\backend\parser\reswords.h">
-      <Filter>Backend Headers\Parser</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\backend\pattern\pattern.h">
       <Filter>Backend Headers\Pattern</Filter>

@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file backend/parser/reswords.h
+/// @file parser/reservedwords.h
 ///
 /// This header file is included by all all language parsing C modules in
 /// POV-Ray.
@@ -9,7 +9,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as

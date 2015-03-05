@@ -39,8 +39,8 @@
 #define FNCODE_H
 
 #include "backend/frame.h"
-#include "backend/parser/parse.h"
 #include "base/textstream.h"
+#include "parser/parser.h"
 
 
 namespace pov

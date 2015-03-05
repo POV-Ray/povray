@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file backend/parser/function.cpp
+/// @file parser/parser_functions_utilities.cpp
 ///
 /// This module implements the the function type used by iso surfaces and the
 /// function pattern.
@@ -38,9 +38,9 @@
 
 #include <climits>
 
-// frame.h must always be the first POV file included (pulls in platform config)
-#include "backend/frame.h"
-#include "backend/parser/parse.h"
+// configparser.h must always be the first POV file included in the parser (pulls in platform config)
+#include "parser/configparser.h"
+#include "parser/parser.h"
 
 #include "backend/math/matrices.h"
 #include "backend/math/splines.h"

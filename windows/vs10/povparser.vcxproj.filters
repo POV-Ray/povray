@@ -20,8 +20,38 @@
     <ClInclude Include="..\povconfig\syspovconfigparser.h">
       <Filter>Parser Headers</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\parser\parser.h">
+      <Filter>Parser Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\parser\reservedwords.h">
+      <Filter>Parser Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\precomp.cpp" />
+    <ClCompile Include="..\..\source\parser\parser.cpp">
+      <Filter>Parser Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\parser\parser_tokenizer.cpp">
+      <Filter>Parser Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\parser\parser_strings.cpp">
+      <Filter>Parser Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\parser\parser_materials.cpp">
+      <Filter>Parser Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\parser\parser_functions_utilities.cpp">
+      <Filter>Parser Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\parser\parser_functions.cpp">
+      <Filter>Parser Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\parser\parser_expressions.cpp">
+      <Filter>Parser Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\parser\reservedwords.cpp">
+      <Filter>Parser Source</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -48,11 +48,12 @@
 #include "base/platformbase.h"
 #include "base/fileinputoutput.h"
 
+#include "parser/parser.h"
+
 #include "backend/control/renderbackend.h"
 #include "backend/scene/objects.h"
 #include "backend/scene/threaddata.h"
 #include "backend/scene/view.h"
-#include "backend/parser/parse.h"
 #include "backend/bounding/boundingtask.h"
 #include "backend/texture/texture.h"
 #include "backend/shape/truetype.h"

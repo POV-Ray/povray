@@ -38,8 +38,7 @@
 #include "backend/frame.h"
 #include "pov_mem.h"
 
-#include "backend/parser/parse.h"   // MAError()
-#include "povray.h"                 // stats[] global var
+#include "base/pov_err.h"
 
 // this must be the last file included
 #include "base/povdebug.h"

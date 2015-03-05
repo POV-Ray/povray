@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file backend/parser/parsestr.cpp
+/// @file parser/parser_strings.cpp
 ///
 /// This module implements parsing and conversion of string expressions.
 ///
@@ -38,9 +38,9 @@
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 
-// frame.h must always be the first POV file included (pulls in platform config)
-#include "backend/frame.h"
-#include "backend/parser/parse.h"
+// configparser.h must always be the first POV file included in the parser (pulls in platform config)
+#include "parser/configparser.h"
+#include "parser/parser.h"
 
 #include "pov_mem.h" // TODO
 
@@ -687,7 +687,6 @@ UCS2 *Parser::String_To_UCS2(const char *str)
     unsigned char *utf8array = NULL;
     int index_in = 0;
     int index_out = 0;
-    char buffer[8];
     char *dummy_ptr = NULL;
     int i = 0;
 

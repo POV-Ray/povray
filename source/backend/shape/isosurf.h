@@ -40,7 +40,7 @@
 #ifndef ISOSURF_H
 #define ISOSURF_H
 
-#include "backend/parser/parse.h"
+#include "parser/parser.h" // TODO - avoid this (pulled in for function stuff)
 #include "backend/scene/objects.h"
 
 namespace pov
