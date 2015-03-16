@@ -46,6 +46,9 @@
       <Filter>Frontend source</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\precomp.cpp" />
+    <ClCompile Include="..\..\source\povmain.cpp">
+      <Filter>Frontend source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\frontend\animationprocessing.h">
@@ -91,5 +94,8 @@
       <Filter>Frontend Headers</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\precomp.h" />
+    <ClInclude Include="..\povconfig\syspovconfigfrontend.h">
+      <Filter>Frontend Headers</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

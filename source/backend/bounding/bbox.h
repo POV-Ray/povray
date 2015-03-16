@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -37,6 +37,8 @@
 
 #ifndef BBOX_H
 #define BBOX_H
+
+#include "backend/frame.h"
 
 namespace pov
 {
@@ -109,20 +111,49 @@ enum BBoxDirection
 * Global functions
 ******************************************************************************/
 
-struct BBoxPriorityQueue
+/// Container for BBox subtrees prioritized by depth (distance to ray origin).
+///
+/// The current implementation is based on a so-called _min heap_ stored in a
+/// (resizable) array, obeying the following rules:
+///   - Element 0 is unused.
+///   - If both element N and element 2*N are non-empty, element N has the
+///     smaller depth of the two.
+///   - If both element N and element 2*N+1 are non-empty, element N has the
+///     smaller depth of the two.
+///   - If element N is empty, so is element N+1.
+/// This implementation guarantees execution time of O(log N) or better both
+/// for inserting a new element and for removing the one with the smallest
+/// depth.
+///
+/// @note   We're using a custom priority queue class for now rather than
+///         `std::priority_queue` becase we make use of Clear(), an operation
+///         which `std::priority_queue` does not support.
+///
+/// @todo   As we seem to be only reading from the queue after all elements
+///         have been inserted, a simple sort-based approach might actually
+///         be more efficient.
+///
+class BBoxPriorityQueue
 {
-    struct Qelem
-    {
-        DBL depth;
-        const BBOX_TREE *node;
-    };
+    public:
 
-    unsigned QSize;
-    unsigned Max_QSize;
-    Qelem *Queue;
+        BBoxPriorityQueue();
+        ~BBoxPriorityQueue();
 
-    BBoxPriorityQueue();
-    ~BBoxPriorityQueue();
+        void Insert(DBL depth, ConstBBoxTreePtr node);
+        bool RemoveMin(DBL& depth, ConstBBoxTreePtr& node);
+        bool IsEmpty() const;
+        void Clear();
+
+    protected:
+
+        struct Qelem
+        {
+            DBL depth;
+            ConstBBoxTreePtr node;
+        };
+
+        vector<Qelem> mQueue;
 };
 
 void Build_BBox_Tree(BBOX_TREE **Root, size_t numOfFiniteObjects, BBOX_TREE **&Finite, size_t numOfInfiniteObjects, BBOX_TREE **Infinite, size_t& maxfinitecount);
@@ -133,7 +164,6 @@ void Recompute_Inverse_BBox(BoundingBox *bbox, const TRANSFORM *trans);
 bool Intersect_BBox_Tree(BBoxPriorityQueue& pqueue, const BBOX_TREE *Root, const Ray& ray, Intersection *Best_Intersection, TraceThreadData *Thread);
 bool Intersect_BBox_Tree(BBoxPriorityQueue& pqueue, const BBOX_TREE *Root, const Ray& ray, Intersection *Best_Intersection, const RayObjectCondition& precondition, const RayObjectCondition& postcondition, TraceThreadData *Thread);
 void Check_And_Enqueue(BBoxPriorityQueue& Queue, const BBOX_TREE *Node, const BoundingBox *BBox, const Rayinfo *rayinfo, TraceThreadData *Thread);
-void Priority_Queue_Delete(BBoxPriorityQueue& Queue, DBL *key, const BBOX_TREE **Node);
 void Destroy_BBox_Tree(BBOX_TREE *Node);
 
 

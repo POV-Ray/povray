@@ -1,4 +1,4 @@
-# Coding Styleguide Part 2
+# Nitpicker's Coding Styleguide {#styleguide2}
 
 To avoid boring you to death with coding rules, we decided to not include the following in our main coding styleguide
 for one or more of the following reasons:
@@ -51,19 +51,19 @@ that our rules may differ substantially.)
     <!-- MISRA C++ 2008 document rule 0-4-2 (Use of floating-point arithmetic shall be documented)
          IGNORED: We're using floating-points virtually everywhere, and can't do without for obvious reasons. -->
     <!-- MISRA C++ 2008 document rule 0-4-3 (Floating-point implementations shall comply with a defined floating-point
-	     standard)
+         standard)
          IGNORED: This depends on the user's choice of compiler, and is therefore beyond the scope of any
-		 platform-independent project. -->
+         platform-independent project. -->
 
   - **Language Standard**: Source code should be written in C++ adhering to the ISO-IEC 14882-2003 standard (aka C++03).
     Compiler-specific language extensions may only be used in the dedicated headers intended to _hide_ compiler-specific
-	implementation details.
+    implementation details.
     <!-- MISRA C++ 2008 **required** rule 1-0-1 -->
 
     <!-- MISRA C++ 2008 document rule 1-0-2 (Multiple compilers shall only be used if they have a common, defined
-	     interface)
+         interface)
          IGNORED: This depends on the user's choice of compiler, and is therefore beyond the scope of any
-		 platform-independent project. -->
+         platform-independent project. -->
 
   - **Negative Integer Division**: Source code should avoid division or modulus operations on
     negative integers, or should not rely on a particular rounding mode (towards negative infinity
@@ -72,7 +72,7 @@ that our rules may differ substantially.)
 
   - **Character Encoding**: Source files should be plain vanilla ASCII, and should not use _universal character name
     notation_ (`\uXXXX` or `\UXXXXXXXX`). String literals should not encode any non-ASCII character by means of escape
-	sequences.
+    sequences.
     <!-- MISRA C++ 2008 document rule 2-2-1 -->
 
   - **Tri- and Digraphs**: Neither tri- nor digraphs should be used in the source code. Multiple
@@ -377,8 +377,8 @@ that our rules may differ substantially.)
   .
 
     <!-- MISRA C++ 2008 **required** rule 17-0-4 (All library code shall conform to MISRA C++)
-	     IGNORED: We're using MISRA C++ only as a guideline for our own code, presuming that authors of well-established
-		 3rd party libraries take their own reasonable measures to assure good code quality. -->
+         IGNORED: We're using MISRA C++ only as a guideline for our own code, presuming that authors of well-established
+         3rd party libraries take their own reasonable measures to assure good code quality. -->
 
   - **longjmp**: The `setjmp` macro and `longjmp` function are evil. Do not use them.
     <!-- MISRA C++ 2008 **required** rule 17-0-5 -->
@@ -402,7 +402,7 @@ that our rules may differ substantially.)
   .
 
     <!-- MISRA C++ 2008 **required** rule 18-4-1 (Dynamic heap memory allocation shall not be used)
-	     IGNORED: We're making heavy use of dynamic heap memory allocation and can't reasonably do without. -->
+         IGNORED: We're making heavy use of dynamic heap memory allocation and can't reasonably do without. -->
 
   .
   - (The signal handling facilities of <csignal> shall not be used) <!-- MISRA C++ 2008 **required** rule 18-7-1 -->

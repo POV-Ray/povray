@@ -11,7 +11,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -46,7 +46,8 @@
 #include "backend/frame.h"
 #include "backend/vm/fncode.h"
 
-#include "backend/parser/parse.h"
+#include "parser/parser.h"
+
 #include "backend/vm/fnintern.h"
 #include "backend/vm/fnpovfpu.h"
 
@@ -609,7 +610,7 @@ void FNCode::compile_recursive(Parser::ExprNode *expr)
                         if(i->child->number == 0.0)
                         {
                             compile_instruction(OPCODE_LOADI, 0, 5, functionVM->AddConstant(1.0));
-                            parser->Warning(0, "Zero power optimised to constant 1.0!");
+                            parser->Warning("Zero power optimised to constant 1.0!");
                             continue;
                         }
                         else if(i->child->number == 2.0)
@@ -1455,8 +1456,8 @@ void FNCode::compile_float_function_call(Parser::ExprNode *expr, FUNCTION fn, ch
 
     if(strcmp(name, function->name) == 0)
     {
-//      Warning(0, "Recursive function call may have unexpected side effects or not\n"
-//                 "work as expected! Make sure the recursion is not infinite!!!");
+//      Warning("Recursive function call may have unexpected side effects or not\n"
+//              "work as expected! Make sure the recursion is not infinite!!!");
         parser->PossibleError("Recursive function calls are not allowed!");
         // recursive calls may not increase the reference count [trf]
         f = function;
@@ -1613,8 +1614,8 @@ void FNCode::compile_vector_function_call(Parser::ExprNode *expr, FUNCTION fn, c
 
     if(strcmp(name, function->name) == 0)
     {
-//      Warning(0, "Recursive function call may have unexpected side effects or not\n"
-//                 "work as expected! Make sure the recursion is not infinite!!!");
+//      Warning("Recursive function call may have unexpected side effects or not\n"
+//              "work as expected! Make sure the recursion is not infinite!!!");
         parser->PossibleError("Recursive function calls are not allowed!");
         // recursive calls may not increase the reference count [trf]
         f = function;

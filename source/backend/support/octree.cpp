@@ -4,13 +4,13 @@
 ///
 /// This module contains all oct-tree functions for radiosity.
 ///
-/// @author Originally written by Jim McElhiney.
+/// @author Jim McElhiney.
 ///
 /// @copyright
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -60,9 +60,9 @@
 #include "backend/frame.h"
 #include "backend/support/octree.h"
 
+#include "backend/colour/spectral.h"
+#include "base/fileinputoutput.h"
 #include "base/pov_err.h"
-#include "backend/povray.h"
-#include "backend/math/vector.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -1082,7 +1082,7 @@ bool ot_save_tree(OT_NODE *root, OStream *fd)
     if(fd != NULL)
         retval = ot_traverse(root, ot_write_block, reinterpret_cast<void *>(fd));
     else
-;// TODO MESSAGE    Warning(0, "Bad radiosity cache file handle");
+;// TODO MESSAGE    Warning("Bad radiosity cache file handle");
 
     return retval;
 }

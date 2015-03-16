@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -43,6 +43,8 @@
 #include "backend/frame.h"
 #include "backend/support/task.h"
 
+#include "backend/control/messagefactory.h"
+#include "backend/scene/scene.h"
 #include "base/timer.h"
 #include "base/types.h"
 
@@ -255,5 +257,11 @@ void Task::TaskThread(const boost::function0<void>& completion)
 
     completion();
 }
+
+
+SceneTask::SceneTask(TaskData *td, const boost::function1<void, Exception&>& f, const char* sn, shared_ptr<SceneData> sd, RenderBackend::ViewId vid) :
+    Task(td, f),
+    messageFactory(sd->warningLevel, sn, sd->backendAddress, sd->frontendAddress, sd->sceneId, vid)
+{}
 
 }

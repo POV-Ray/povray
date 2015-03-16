@@ -1,43 +1,43 @@
-/*******************************************************************************
- * randomsequences.h
- *
- * ---------------------------------------------------------------------------
- * Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
- * Copyright 1991-2013 Persistence of Vision Raytracer Pty. Ltd.
- *
- * POV-Ray is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * POV-Ray is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------------
- * POV-Ray is based on the popular DKB raytracer version 2.12.
- * DKBTrace was originally written by David K. Buck.
- * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
- * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/support/randomsequences.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
- *******************************************************************************/
+//******************************************************************************
+///
+/// @file backend/support/randomsequences.h
+///
+/// @todo   What's in here?
+///
+/// @copyright
+/// @parblock
+///
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+///
+/// POV-Ray is free software: you can redistribute it and/or modify
+/// it under the terms of the GNU Affero General Public License as
+/// published by the Free Software Foundation, either version 3 of the
+/// License, or (at your option) any later version.
+///
+/// POV-Ray is distributed in the hope that it will be useful,
+/// but WITHOUT ANY WARRANTY; without even the implied warranty of
+/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+/// GNU Affero General Public License for more details.
+///
+/// You should have received a copy of the GNU Affero General Public License
+/// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+///
+/// ----------------------------------------------------------------------------
+///
+/// POV-Ray is based on the popular DKB raytracer version 2.12.
+/// DKBTrace was originally written by David K. Buck.
+/// DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
+///
+/// @endparblock
+///
+//******************************************************************************
 
 #ifndef POVRAY_BACKEND_RANDOMSEQUENCES_H
 #define POVRAY_BACKEND_RANDOMSEQUENCES_H
 
-#include <vector>
 #include <cctype>
-
-#include "base/configbase.h"
-#include "base/timer.h"
-#include "base/pov_err.h"
+#include <vector>
 
 namespace pov
 {
@@ -54,50 +54,50 @@ class Generator;
 
 class RandomIntSequence
 {
-		friend class Generator;
-	public:
-		RandomIntSequence(int minval, int maxval, size_t count);
+        friend class Generator;
+    public:
+        RandomIntSequence(int minval, int maxval, size_t count);
 
-		int operator()(size_t seedindex);
+        int operator()(size_t seedindex);
 
-		class Generator
-		{
-			public:
-				Generator(RandomIntSequence *seq, size_t seedindex = 0);
-				int operator()();
-				int operator()(size_t seedindex);
-				size_t GetSeed() const;
-				void SetSeed(size_t seedindex);
-			private:
-				RandomIntSequence *sequence;
-				size_t index;
-		};
-	private:
-		vector<int> values;
+        class Generator
+        {
+            public:
+                Generator(RandomIntSequence *seq, size_t seedindex = 0);
+                int operator()();
+                int operator()(size_t seedindex);
+                size_t GetSeed() const;
+                void SetSeed(size_t seedindex);
+            private:
+                RandomIntSequence *sequence;
+                size_t index;
+        };
+    private:
+        vector<int> values;
 };
 
 class RandomDoubleSequence
 {
-		friend class Generator;
-	public:
-		RandomDoubleSequence(double minval, double maxval, size_t count);
+        friend class Generator;
+    public:
+        RandomDoubleSequence(double minval, double maxval, size_t count);
 
-		double operator()(size_t seedindex);
+        double operator()(size_t seedindex);
 
-		class Generator
-		{
-			public:
-				Generator(RandomDoubleSequence *seq, size_t seedindex = 0);
-				double operator()();
-				double operator()(size_t seedindex);
-				size_t GetSeed() const;
-				void SetSeed(size_t seedindex);
-			private:
-				RandomDoubleSequence *sequence;
-				size_t index;
-		};
-	private:
-		vector<double> values;
+        class Generator
+        {
+            public:
+                Generator(RandomDoubleSequence *seq, size_t seedindex = 0);
+                double operator()();
+                double operator()(size_t seedindex);
+                size_t GetSeed() const;
+                void SetSeed(size_t seedindex);
+            private:
+                RandomDoubleSequence *sequence;
+                size_t index;
+        };
+    private:
+        vector<double> values;
 };
 
 
@@ -113,51 +113,51 @@ class RandomDoubleSequence
 template<class Type>
 class SequentialNumberGenerator
 {
-	public:
-		typedef Type result_type; // defined for compatibility with boost's NumberGenerator concept
-		/// Returns the next number from the sequence.
-		virtual Type operator()() = 0;
-		/// Returns the next N numbers from the sequence.
-		virtual shared_ptr<vector<Type> > GetSequence(size_t count)
-		{
-			shared_ptr<vector<Type> > data(new vector<Type>);
-			data->reserve(count);
-			for (size_t i = 0; i < count; i ++)
-				data->push_back((*this)());
-			return data;
-		}
-		/// Returns the number of values after which the generator must be expected to repeat (SIZE_MAX if unknown or pretty huge).
-		virtual size_t CycleLength() const = 0;
+    public:
+        typedef Type result_type; // defined for compatibility with boost's NumberGenerator concept
+        /// Returns the next number from the sequence.
+        virtual Type operator()() = 0;
+        /// Returns the next N numbers from the sequence.
+        virtual shared_ptr<vector<Type> > GetSequence(size_t count)
+        {
+            shared_ptr<vector<Type> > data(new vector<Type>);
+            data->reserve(count);
+            for (size_t i = 0; i < count; i ++)
+                data->push_back((*this)());
+            return data;
+        }
+        /// Returns the number of values after which the generator must be expected to repeat (SIZE_MAX if unknown or pretty huge).
+        virtual size_t CycleLength() const = 0;
 };
 
 /// Abstract class representing a generator for numbers that can be accessed sequentially and depend on some seed.
 template<class Type>
 class SeedableNumberGenerator : public SequentialNumberGenerator<Type>
 {
-	public:
-		/// Seeds the generator.
-		virtual void Seed(size_t seed) = 0;
+    public:
+        /// Seeds the generator.
+        virtual void Seed(size_t seed) = 0;
 };
 
 /// Abstract class representing a generator for numbers that can be accessed by index.
 template<class Type>
 class IndexedNumberGenerator
 {
-	public:
-		/// Returns a particular number from the sequence.
-		virtual Type operator[](size_t index) const = 0;
-		/// Returns a particular subsequence from the sequence.
-		virtual shared_ptr<vector<Type> > GetSequence(size_t index, size_t count) const
-		{
-			shared_ptr<vector<Type> > data(new vector<Type>);
-			data->reserve(count);
-			for (size_t i = 0; i < count; i ++)
-				data->push_back((*this)[index + i]);
-			return data;
-		}
-		/// Returns the maximum reasonable index.
-		/// While larger indices are allowed, they may be mapped internally to lower ones.
-		virtual size_t MaxIndex() const = 0;
+    public:
+        /// Returns a particular number from the sequence.
+        virtual Type operator[](size_t index) const = 0;
+        /// Returns a particular subsequence from the sequence.
+        virtual shared_ptr<vector<Type> > GetSequence(size_t index, size_t count) const
+        {
+            shared_ptr<vector<Type> > data(new vector<Type>);
+            data->reserve(count);
+            for (size_t i = 0; i < count; i ++)
+                data->push_back((*this)[index + i]);
+            return data;
+        }
+        /// Returns the maximum reasonable index.
+        /// While larger indices are allowed, they may be mapped internally to lower ones.
+        virtual size_t MaxIndex() const = 0;
 };
 
 /**

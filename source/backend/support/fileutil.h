@@ -9,7 +9,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -38,13 +38,20 @@
 #define POV_UTIL_H
 
 #include "base/stringutilities.h"
-#include "base/fileinputoutput.h"
-#include "backend/parser/parse.h"
+
+namespace pov_base
+{
+class IMemStream;
+class IStream;
+}
 
 namespace pov
 {
 
 using namespace pov_base;
+
+class Parser;
+class SceneData;
 
 IStream *Locate_File(Parser *p, shared_ptr<SceneData>& sd, const UCS2String& filename, unsigned int stype, UCS2String& buffer, bool err_flag = false);
 IMemStream *Internal_Font_File(const int font_id, UCS2String& buffer);

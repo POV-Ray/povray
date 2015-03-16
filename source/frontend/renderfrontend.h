@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,10 +36,21 @@
 #ifndef POVRAY_FRONTEND_RENDERFRONTEND_H
 #define POVRAY_FRONTEND_RENDERFRONTEND_H
 
+#include <list>
+#include <map>
+#include <set>
+#include <string>
+#include <vector>
+
+#include <boost/bind.hpp>
+#include <boost/function.hpp>
+#include <boost/scoped_ptr.hpp>
+
+#include "povms/povms.h"
+#include "povms/povmscpp.h"
+#include "povms/povmsid.h"
+
 #include "base/path.h"
-#include "base/povms.h"
-#include "base/povmscpp.h"
-#include "base/povmsgid.h"
 #include "base/stringutilities.h"
 #include "base/textstreambuffer.h"
 #include "base/types.h"
@@ -49,16 +60,6 @@
 #include "frontend/console.h"
 #include "frontend/display.h"
 #include "frontend/imageprocessing.h"
-
-#include <string>
-#include <vector>
-#include <list>
-#include <map>
-#include <set>
-
-#include <boost/scoped_ptr.hpp>
-#include <boost/function.hpp>
-#include <boost/bind.hpp>
 
 namespace pov_frontend
 {

@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -41,25 +41,27 @@
 #include "backend/frame.h"
 #include "backend/scene/view.h"
 
-#include "base/povms.h"
-#include "base/povmscpp.h"
-#include "base/povmsgid.h"
+#include "povms/povms.h"
+#include "povms/povmscpp.h"
+#include "povms/povmsid.h"
+
+#include "base/path.h"
 #include "base/timer.h"
 
 #include "backend/control/renderbackend.h"
-#include "backend/support/octree.h"
-#include "backend/math/matrices.h"
-#include "backend/math/vector.h"
-#include "backend/render/radiositytask.h"
-#include "backend/render/tracetask.h"
 #include "backend/lighting/photonestimationtask.h"
 #include "backend/lighting/photons.h"
+#include "backend/lighting/photonshootingstrategy.h"
 #include "backend/lighting/photonshootingtask.h"
 #include "backend/lighting/photonsortingtask.h"
 #include "backend/lighting/photonstrategytask.h"
 #include "backend/lighting/radiosity.h"
-
-#include "povray.h" // TODO
+#include "backend/math/matrices.h"
+#include "backend/render/radiositytask.h"
+#include "backend/render/tracetask.h"
+#include "backend/scene/scene.h"
+#include "backend/scene/threaddata.h"
+#include "backend/support/octree.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -914,8 +916,8 @@ void View::StartRender(POVMS_Object& renderOptions)
                (fabs(viewData.camera.Right[Y]) < EPSILON) &&
                (fabs(viewData.camera.Right[Z]) < EPSILON))
             {
-                // Warning(0, "Camera location to look_at direction and sky direction should be different.\n"
-                //            "Using default/supplied right vector instead.");
+                // Warning("Camera location to look_at direction and sky direction should be different.\n"
+                //         "Using default/supplied right vector instead.");
 
                 // Restore Right vector
                 viewData.camera.Right = tempv;
@@ -941,15 +943,15 @@ void View::StartRender(POVMS_Object& renderOptions)
     if(CheckCameraHollowObject(viewData.camera.Location))
     {
         // TODO FIXME
-        // Warning(0, "Camera is inside a non-hollow object. Fog and participating media may not work as expected.");
+        // Warning("Camera is inside a non-hollow object. Fog and participating media may not work as expected.");
     }
 
     // check for preview end size
     if((previewendsize > 1) && (tracingmethod == 0))
     {
         // TODO FIXME
-        // Warning(0, "In POV-Ray 3.7 and later it is recommended to set the mosaic preview end size to one for\n"
-        //              "maximum performance when rendering without anti-aliasing.");
+        // Warning("In POV-Ray 3.7 and later it is recommended to set the mosaic preview end size to one for\n"
+        //         "maximum performance when rendering without anti-aliasing.");
     }
 
     // do photons
@@ -1019,18 +1021,18 @@ void View::StartRender(POVMS_Object& renderOptions)
         if (endSize < 1.0)
         {
             endSize = 1.0;
-            // Warning(0, "Radiosity pretrace end too low for selected resolution. Pretrace will be\n"
-            //            "stopped early, corresponding to a value of %lf.\n"
-            //            "To avoid this warning, increase pretrace_end.", endSize / maxWidthHeight);
+            // Warning("Radiosity pretrace end too low for selected resolution. Pretrace will be\n"
+            //         "stopped early, corresponding to a value of %lf.\n"
+            //         "To avoid this warning, increase pretrace_end.", endSize / maxWidthHeight);
         }
         int steps = (int)floor(log(startSize/endSize)/log(2.0) + (1.0 - EPSILON)) + 1;
         if (steps > RadiosityFunction::PRETRACE_MAX - RadiosityFunction::PRETRACE_FIRST - 1)
         {
             steps = RadiosityFunction::PRETRACE_MAX - RadiosityFunction::PRETRACE_FIRST - 1;
             startSize = endSize * pow(2.0, (double)steps);
-            // Warning(0, "Too many radiosity pretrace steps. Pretrace will be started late,\n"
-            //            "corresponding to a value of %lf", startSize);
-            //            "To avoid this warning, decrease pretrace_start or increase pretrace_end.", endSize / maxWidthHeight);
+            // Warning("Too many radiosity pretrace steps. Pretrace will be started late,\n"
+            //         "corresponding to a value of %lf", startSize);
+            //         "To avoid this warning, decrease pretrace_start or increase pretrace_end.", endSize / maxWidthHeight);
         }
 
         if (highReproducibility)
@@ -1350,7 +1352,9 @@ bool View::Failed()
 
 void View::DispatchShutdownMessages(TaskQueue&)
 {
-    MessageFactory messageFactory(10, 370, "Shutdown", viewData.sceneData->backendAddress, viewData.sceneData->frontendAddress, viewData.sceneData->sceneId, viewData.viewId);
+    MessageFactory messageFactory(viewData.GetSceneData()->warningLevel, "Shutdown",
+                                  viewData.sceneData->backendAddress, viewData.sceneData->frontendAddress,
+                                  viewData.sceneData->sceneId, viewData.viewId);
 
     for (vector<ObjectPtr>::iterator it = viewData.sceneData->objects.begin(); it != viewData.sceneData->objects.end(); it++)
         (*it)->DispatchShutdownMessages(messageFactory);

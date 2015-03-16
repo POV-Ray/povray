@@ -36,12 +36,6 @@
     <ClCompile Include="..\..\source\base\pov_err.cpp">
       <Filter>Base source</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\base\povms.cpp">
-      <Filter>Base source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\base\povmscpp.cpp">
-      <Filter>Base source</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\base\processoptions.cpp">
       <Filter>Base source</Filter>
     </ClCompile>
@@ -138,22 +132,10 @@
     <ClInclude Include="..\..\source\base\platformbase.h">
       <Filter>Base Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\base\pointer.h">
-      <Filter>Base Headers</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\base\pov_err.h">
       <Filter>Base Headers</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\base\povdebug.h">
-      <Filter>Base Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\base\povms.h">
-      <Filter>Base Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\base\povmscpp.h">
-      <Filter>Base Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\base\povmsgid.h">
       <Filter>Base Headers</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\base\processoptions.h">
@@ -242,6 +224,21 @@
       <Filter>Base Headers\Font</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\base\colour.h">
+      <Filter>Base Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\base\build.h">
+      <Filter>Base Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\base\version.h">
+      <Filter>Base Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\povconfig\syspovconfigbase.h">
+      <Filter>Base Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\povconfig\syspovconfig.h">
+      <Filter>Base Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\povconfig\syspovconfig_msvc.h">
       <Filter>Base Headers</Filter>
     </ClInclude>
   </ItemGroup>
