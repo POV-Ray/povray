@@ -13,7 +13,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,7 +36,7 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
 #include <algorithm>
 
@@ -44,12 +44,14 @@
 #include "backend/frame.h"
 #include "backend/vm/fnintern.h"
 
+#include "core/material/pigment.h"
+#include "core/material/texture.h"
+#include "core/material/warp.h"
+
 #include "backend/math/mathutil.h"
+#include "backend/math/matrices.h"
 #include "backend/math/splines.h"
-#include "backend/math/vector.h"
 #include "backend/scene/threaddata.h"
-#include "backend/texture/pigment.h"
-#include "backend/texture/texture.h"
 #include "backend/vm/fncode.h"
 #include "backend/vm/fnpovfpu.h"
 
@@ -377,7 +379,7 @@ DBL f_comma(FPUContext *ctx, DBL *ptr, unsigned int) // 9
     r=sqrt( (PARAM_X + PARAM(0)*0.25)*(PARAM_X + PARAM(0)*0.25) + PARAM_Z*PARAM_Z);
     temp= cos(th*0.5) * PARAM(0)*0.5 -sqrt((r- PARAM(0)*0.75)*(r - PARAM(0)*0.75)+PARAM_Y*PARAM_Y);
     temp= min(PARAM_Z, temp);
-    r= PARAM(0)*0.5   - sqrt( (PARAM_X - PARAM(0)*0.5)*(PARAM_X - PARAM(0)*0.5) + PARAM_Z*PARAM_Z + PARAM_Y*PARAM_Y) ;
+    r= PARAM(0)*0.5   - sqrt( (PARAM_X - PARAM(0)*0.5)*(PARAM_X - PARAM(0)*0.5) + PARAM_Z*PARAM_Z + PARAM_Y*PARAM_Y);
     return(-(DBL)max(temp,r));
 }
 
@@ -456,7 +458,7 @@ DBL f_enneper(FPUContext *ctx, DBL *ptr, unsigned int) // 18
         PARAM_Z=0.2;
     r =((y2-x2)/(2*PARAM_Z)+2*z2/9+2/3);                  // TODO FIXME - was this supposed to be 2.0/3.0 ??
     r2=((y2-x2)/(4*PARAM_Z)-(1/4)*(x2+y2+(8/9)*z2)+2/9);  // TODO FIXME - was this supposed to be 1.0/4.0, 8.0/9.0 and 2.0/9.0 respectively ??
-    r=-( r*r*r -6*r2*r2) ;
+    r=-( r*r*r -6*r2*r2);
     return( min(10., max(PARAM(0)*r,-10.)) );
 }
 
@@ -1271,9 +1273,9 @@ void f_spline(FPUContext *ctx, DBL *ptr, unsigned int fn, unsigned int sp) // 2
         return;
     }
 
-    Terms = (reinterpret_cast<SPLINE *>(f->private_data))->Terms;
+    Terms = (reinterpret_cast<GenericSpline *>(f->private_data))->Terms;
 
-    Get_Spline_Val(reinterpret_cast<SPLINE *>(f->private_data), PARAM_N_X(Terms), Result, &Terms);
+    Get_Spline_Val(reinterpret_cast<GenericSpline *>(f->private_data), PARAM_N_X(Terms), Result, &Terms);
 
     ctx->SetLocal(sp + X, Result[X]);
     ctx->SetLocal(sp + Y, Result[Y]);

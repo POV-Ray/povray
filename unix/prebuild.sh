@@ -331,7 +331,7 @@ echo "make maintainer-clean" 1>&2  &&  make maintainer-clean 1>&2 ; \
   # Converting to "[tm]".
   echo "Copy licence files in ../doc/"
   perl -e 'while (<>) {s/\x99/[tm]/g; print;}' ../distribution/povlegal.doc \
-    > ../doc/povlegal.doc	|| echo "povlegal.doc not created !"
+    > ../doc/povlegal.doc || echo "povlegal.doc not created !"
   $cp_u -f ../distribution/agpl-3.0.txt ../doc/ \
     || echo "agpl-3.0.txt not copied !"
 
@@ -426,6 +426,7 @@ povray_SOURCES = \\
 
 # Include paths for headers.
 AM_CPPFLAGS = \\
+  -I\$(top_srcdir)/unix/povconfig \\
   -I\$(top_srcdir) \\
   -I\$(top_srcdir)/source \\
   -I\$(top_builddir)/source \\
@@ -790,6 +791,7 @@ libpovray_a_SOURCES = \\
 
 # Include paths for headers.
 AM_CPPFLAGS = \\
+  -I\$(top_srcdir)/unix/povconfig \\
   -I\$(top_srcdir) \\
   -I\$(top_srcdir)/source/backend \\
   -I\$(top_srcdir)/source/base \\
@@ -1327,6 +1329,7 @@ libvfe_a_SOURCES = \\
 
 # Include paths for headers.
 AM_CPPFLAGS = \\
+  -I\$(top_srcdir)/unix/povconfig \\
   -I\$(top_srcdir)/vfe/unix \\
   -I\$(top_srcdir)/unix \\
   -I\$(top_srcdir)/source \\

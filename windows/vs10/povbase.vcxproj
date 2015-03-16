@@ -118,7 +118,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>..\..\libraries\openexr\IlmImf;..\..\libraries\ilmbase\Half;..\..\libraries\ilmbase\Imath;..\..\libraries\ilmbase\Iex;..\..\libraries\boost;..\..\vfe\win;..\..\vfe;..\..\source;..\..\source\base;..\..\source\backend;..\..\source\frontend;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\windows\povconfig;..\..\libraries\openexr\IlmImf;..\..\libraries\ilmbase\Half;..\..\libraries\ilmbase\Imath;..\..\libraries\ilmbase\Iex;..\..\libraries\boost;..\..\vfe\win;..\..\vfe;..\..\source;..\..\source\base;..\..\source\backend;..\..\source\frontend;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>BOOST_ALL_NO_LIB;NON_UNIX_OPENEXR_HEADERS;_DEBUG;WIN32;WIN32_LEAN_AND_MEAN;_WINDOWS;WINVER=0x0500;_WIN32_WINNT=0x0500;COMMONCTRL_VERSION=0x500;CLASSLIB_DEFS_H;NOMINMAX;ISOLATION_AWARE_ENABLED;_CRT_SECURE_NO_DEPRECATE;_HAS_ITERATOR_DEBUGGING=0;_HAS_CPP0X=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -164,7 +164,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>..\..\libraries\openexr\IlmImf;..\..\libraries\ilmbase\Half;..\..\libraries\ilmbase\Imath;..\..\libraries\ilmbase\Iex;..\..\libraries\boost;..\..\vfe\win\;..\..\vfe\;..\..\source;..\..\source\base;..\..\source\backend;..\..\source\frontend;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\windows\povconfig;..\..\libraries\openexr\IlmImf;..\..\libraries\ilmbase\Half;..\..\libraries\ilmbase\Imath;..\..\libraries\ilmbase\Iex;..\..\libraries\boost;..\..\vfe\win\;..\..\vfe\;..\..\source;..\..\source\base;..\..\source\backend;..\..\source\frontend;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>BOOST_ALL_NO_LIB;NON_UNIX_OPENEXR_HEADERS;_DEBUG;WIN32;WIN32_LEAN_AND_MEAN;_WINDOWS;CLASSLIB_DEFS_H;NOMINMAX;ISOLATION_AWARE_ENABLED;_CRT_SECURE_NO_DEPRECATE;_HAS_ITERATOR_DEBUGGING=0;_HAS_CPP0X=0;BUILDING_AMD64=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -211,7 +211,7 @@
       <OmitFramePointers>false</OmitFramePointers>
       <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>..\..\libraries\openexr\IlmImf;..\..\libraries\ilmbase\Half;..\..\libraries\ilmbase\Imath;..\..\libraries\ilmbase\Iex;..\..\libraries\boost;..\..\vfe\win;..\..\vfe;..\..\source;..\..\source\base;..\..\source\backend;..\..\source\frontend;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\windows\povconfig;..\..\libraries\openexr\IlmImf;..\..\libraries\ilmbase\Half;..\..\libraries\ilmbase\Imath;..\..\libraries\ilmbase\Iex;..\..\libraries\boost;..\..\vfe\win;..\..\vfe;..\..\source;..\..\source\base;..\..\source\backend;..\..\source\frontend;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>BOOST_ALL_NO_LIB;NON_UNIX_OPENEXR_HEADERS;NDEBUG;WIN32;WIN32_LEAN_AND_MEAN;_WINDOWS;COMMONCTRL_VERSION=0x500;CLASSLIB_DEFS_H;WINVER=0x0500;_WIN32_WINNT=0x0500;NOMINMAX;ISOLATION_AWARE_ENABLED;_CRT_SECURE_NO_DEPRECATE;_SECURE_SCL=0;_HAS_CPP0X=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -261,7 +261,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>false</OmitFramePointers>
       <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
-      <AdditionalIncludeDirectories>..\..\libraries\openexr\IlmImf;..\..\libraries\ilmbase\Half;..\..\libraries\ilmbase\Imath;..\..\libraries\ilmbase\Iex;..\..\libraries\boost;..\..\vfe\win\;..\..\vfe\;..\..\source;..\..\source\base;..\..\source\backend;..\..\source\frontend;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\windows\povconfig;..\..\libraries\openexr\IlmImf;..\..\libraries\ilmbase\Half;..\..\libraries\ilmbase\Imath;..\..\libraries\ilmbase\Iex;..\..\libraries\boost;..\..\vfe\win\;..\..\vfe\;..\..\source;..\..\source\base;..\..\source\backend;..\..\source\frontend;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>BOOST_ALL_NO_LIB;NON_UNIX_OPENEXR_HEADERS;NDEBUG;WIN32;WIN32_LEAN_AND_MEAN;_WINDOWS;CLASSLIB_DEFS_H;NOMINMAX;ISOLATION_AWARE_ENABLED;_CRT_SECURE_NO_DEPRECATE;_SECURE_SCL=0;BUILDING_AMD64=1;_HAS_CPP0X=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -308,7 +308,7 @@
       <OmitFramePointers>false</OmitFramePointers>
       <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>..\..\libraries\openexr\IlmImf;..\..\libraries\ilmbase\Half;..\..\libraries\ilmbase\Imath;..\..\libraries\ilmbase\Iex;..\..\libraries\boost;..\..\vfe\win\;..\..\vfe\;..\..\source;..\..\source\base;..\..\source\backend;..\..\source\frontend;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\windows\povconfig;..\..\libraries\openexr\IlmImf;..\..\libraries\ilmbase\Half;..\..\libraries\ilmbase\Imath;..\..\libraries\ilmbase\Iex;..\..\libraries\boost;..\..\vfe\win\;..\..\vfe\;..\..\source;..\..\source\base;..\..\source\backend;..\..\source\frontend;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>BOOST_ALL_NO_LIB;NON_UNIX_OPENEXR_HEADERS;NDEBUG;WIN32;WIN32_LEAN_AND_MEAN;_WINDOWS;COMMONCTRL_VERSION=0x500;CLASSLIB_DEFS_H;WINVER=0x0500;_WIN32_WINNT=0x0500;NOMINMAX;ISOLATION_AWARE_ENABLED;_CRT_SECURE_NO_DEPRECATE;_SECURE_SCL=0;BUILD_SSE2=1;_HAS_CPP0X=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -351,8 +351,6 @@
     <ClCompile Include="..\..\source\base\font\timrom.cpp" />
     <ClCompile Include="..\..\source\base\path.cpp" />
     <ClCompile Include="..\..\source\base\pov_err.cpp" />
-    <ClCompile Include="..\..\source\base\povms.cpp" />
-    <ClCompile Include="..\..\source\base\povmscpp.cpp" />
     <ClCompile Include="..\..\source\base\processoptions.cpp" />
     <ClCompile Include="..\..\source\base\stringutilities.cpp" />
     <ClCompile Include="..\..\source\base\textstream.cpp" />
@@ -367,20 +365,20 @@
     <ClCompile Include="..\..\source\base\image\iff.cpp" />
     <ClCompile Include="..\..\source\base\image\image.cpp" />
     <ClCompile Include="..\..\source\base\image\jpeg.cpp">
-      <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Async</ExceptionHandling>
-      <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Async</ExceptionHandling>
-      <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Release-SSE2|Win32'">Async</ExceptionHandling>
-      <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Async</ExceptionHandling>
-      <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Async</ExceptionHandling>
+      <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">SyncCThrow</ExceptionHandling>
+      <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">SyncCThrow</ExceptionHandling>
+      <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Release-SSE2|Win32'">SyncCThrow</ExceptionHandling>
+      <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">SyncCThrow</ExceptionHandling>
+      <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Release|x64'">SyncCThrow</ExceptionHandling>
     </ClCompile>
     <ClCompile Include="..\..\source\base\image\openexr.cpp" />
     <ClCompile Include="..\..\source\base\image\pgm.cpp" />
     <ClCompile Include="..\..\source\base\image\png.cpp">
-      <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Async</ExceptionHandling>
-      <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Async</ExceptionHandling>
-      <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Release-SSE2|Win32'">Async</ExceptionHandling>
-      <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Async</ExceptionHandling>
-      <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Async</ExceptionHandling>
+      <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">SyncCThrow</ExceptionHandling>
+      <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">SyncCThrow</ExceptionHandling>
+      <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Release-SSE2|Win32'">SyncCThrow</ExceptionHandling>
+      <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">SyncCThrow</ExceptionHandling>
+      <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Release|x64'">SyncCThrow</ExceptionHandling>
     </ClCompile>
     <ClCompile Include="..\..\source\base\image\ppm.cpp" />
     <ClCompile Include="..\..\source\base\image\targa.cpp" />
@@ -396,6 +394,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\source\base\build.h" />
     <ClInclude Include="..\..\source\base\colour.h" />
     <ClInclude Include="..\..\source\base\configbase.h" />
     <ClInclude Include="..\..\source\base\fileinputoutput.h" />
@@ -405,12 +404,8 @@
     <ClInclude Include="..\..\source\base\font\timrom.h" />
     <ClInclude Include="..\..\source\base\path.h" />
     <ClInclude Include="..\..\source\base\platformbase.h" />
-    <ClInclude Include="..\..\source\base\pointer.h" />
     <ClInclude Include="..\..\source\base\pov_err.h" />
     <ClInclude Include="..\..\source\base\povdebug.h" />
-    <ClInclude Include="..\..\source\base\povms.h" />
-    <ClInclude Include="..\..\source\base\povmscpp.h" />
-    <ClInclude Include="..\..\source\base\povmsgid.h" />
     <ClInclude Include="..\..\source\base\processoptions.h" />
     <ClInclude Include="..\..\source\base\safemath.h" />
     <ClInclude Include="..\..\source\base\stringutilities.h" />
@@ -435,7 +430,11 @@
     <ClInclude Include="..\..\source\base\image\tiff_pov.h" />
     <ClInclude Include="..\..\source\base\animation\animation.h" />
     <ClInclude Include="..\..\source\base\animation\moov.h" />
+    <ClInclude Include="..\..\source\base\version.h" />
     <ClInclude Include="..\..\source\precomp.h" />
+    <ClInclude Include="..\povconfig\syspovconfig.h" />
+    <ClInclude Include="..\povconfig\syspovconfigbase.h" />
+    <ClInclude Include="..\povconfig\syspovconfig_msvc.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

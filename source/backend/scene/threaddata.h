@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -40,9 +40,12 @@
 #include <stack>
 
 #include "base/types.h"
+
+#include "core/material/pattern.h"
+#include "core/shape/mesh.h"
+
 #include "backend/frame.h"
-#include "backend/pattern/pattern.h"
-#include "backend/shape/mesh.h"
+#include "backend/bounding/bcyl.h"
 #include "backend/support/statistics.h"
 #include "backend/support/task.h"
 
@@ -90,9 +93,9 @@ class SceneThreadData : public Task::TaskData
         int Blob_Coefficient_Count;
         int Blob_Interval_Count;
         ISO_ThreadData *isosurfaceData;
-        void *BCyl_Intervals;
-        void *BCyl_RInt;
-        void *BCyl_HInt;
+        vector<BCYL_INT> BCyl_Intervals;
+        vector<BCYL_INT> BCyl_RInt;
+        vector<BCYL_INT> BCyl_HInt;
         IStackPool stackPool;
         FPUContext *functionContext;
         vector<FPUContext *> functionPatternContext;

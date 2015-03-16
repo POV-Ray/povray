@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -40,10 +40,11 @@
 #include "base/configbase.h"
 #include "base/textstreambuffer.h"
 
-#include "base/povms.h"
+#include "povms/povms.h"
+
 #include "base/pov_err.h"
-#include "base/types.h"
 #include "base/stringutilities.h"
+#include "base/types.h"
 
 // this must be the last file included
 #include "base/povdebug.h"

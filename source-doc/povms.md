@@ -1,4 +1,4 @@
-# POVMS Interface
+# POVMS Interface {#povms}
 
 
 @section strt       Getting Started with POVMS
@@ -24,58 +24,47 @@ communication. POVMS handles all the abstraction for you. It can even deal with 
 
 There are a bunch of basic data types and helper functions you may need to adjust. This list is a quick walk-through:
 
-`POVMSType`
-:   Needs to be 32 bit (unsigned); it will be composed of four characters, e.g. `'MyTp'`, `'any '`, `'4Mac'`, etc.
-    It defaults to `unsigned int`.
+  - **POVMSType**: Needs to be 32 bit (unsigned); it will be composed of four characters, e.g. `'MyTp'`, `'any '`,
+    `'4Mac'`, etc. It defaults to `unsigned int`.
 
-`POVMSInt`
-:   Defaults to `int`. Whatever the actual type, it has to be a four byte signed integer.
+  - **POVMSInt**: Defaults to `int`. Whatever the actual type, it has to be a four byte signed integer.
 
-`POVMSLong`
-:   Defaults to a special structure representing an eight byte signed integer. If you have some form of native 64-bit
-    data type, you should redefine it, as the default again assumes that `int` and `unsigned int` are four bytes each.
+  - **POVMSLong**: Defaults to a special structure representing an eight byte signed integer. If you have some form of
+    native 64-bit data type, you should redefine it, as the default again assumes that `int` and `unsigned int` are four
+    bytes each.
 
-`SetPOVMSLong(v,h,l)`
-:   Special function which is used to set an eight byte integer using two four byte integers for the upper and lower
-    four bytes.
+  - **SetPOVMSLong(v,h,l)**: Special function which is used to set an eight byte integer using two four byte integers
+    for the upper and lower four bytes.
 
-`GetPOVMSLong(h,l,v)`
-:   Special function which is used to get a two four byte integers for the upper and lower four bytes from the eight
-    byte integer.
+  - **GetPOVMSLong(h,l,v)**: Special function which is used to get a two four byte integers for the upper and lower four
+    bytes from the eight byte integer.
 
-`POVMSFloat`
-:   Defaults to `float`. It should offer IEEE 32-bit float precision.
+  - **POVMSFloat**: Defaults to `float`. It should offer IEEE 32-bit float precision.
 
-`POVMSBool`
-:   Defaults to `int`. Note that `bool` is most likely not a suitable type for it. Most likely you want to leave it as
-    is.
+  - **POVMSBool**: Defaults to `int`. Note that `bool` is most likely not a suitable type for it. Most likely you want
+    to leave it as is.
 
-`POVMSPixel`
-:   Defines a simple RGBA pixel with 8 bits per channel. Defaults to `unsigned char[4]`, which is the most appropriate.
-    Note that as of August 2003 it is not really supported...
+  - **POVMSPixel**: Defines a simple RGBA pixel with 8 bits per channel. Defaults to `unsigned char[4]`, which is the
+    most appropriate. Note that as of August 2003 it is not really supported...
 
-`POVMSStream`
-:   A single byte. Defaults to `unsigned char`.
+  - **POVMSStream**: A single byte. Defaults to `unsigned char`.
 
-`POVMSIEEEFloat`
-:   If your platform does not use the IEEE floating-point data format for its `float` data type, you will need to
-    provide such a representation.
+  - **POVMSIEEEFloat**: If your platform does not use the IEEE floating-point data format for its `float` data type, you
+    will need to provide such a representation.
 
-`POVMSFloatToPOVMSIEEEFloat(p, f)`
-:   Converts a native float type into a IEEE float type. Defaults to a simple assignment f = p.
+  - **POVMSFloatToPOVMSIEEEFloat(p, f)**: Converts a native float type into a IEEE float type. Defaults to a simple
+    assignment f = p.
 
-`POVMSIEEEFloatToPOVMSFloat(f, p)`
-:   Converts a IEEE float type into a native float type. Defaults to a simple assignment p = f.
+  - **POVMSIEEEFloatToPOVMSFloat(f, p)**: Converts a IEEE float type into a native float type. Defaults to a simple
+    assignment p = f.
 
-`POVMS_ASSERT_OUTPUT`
-:   As explained, POVMS is a layer below POV-Ray and thus when it fails, e.g. due to lack of memory, it needs to be able
-    to output a message. By default it takes a message string, filename string and line number integer and outputs the
-    message to `stderr` using `fprintf`. Of course, this should never happen, but be prepared and override this function
-    if you need a better user interface.
+  - **POVMS_ASSERT_OUTPUT**: As explained, POVMS is a layer below POV-Ray and thus when it fails, e.g. due to lack of
+    memory, it needs to be able to output a message. By default it takes a message string, filename string and line
+    number integer and outputs the message to `stderr` using `fprintf`. Of course, this should never happen, but be
+    prepared and override this function if you need a better user interface.
 
-`POVMS_LOG_OUTPUT`
-:   When debugging, define this function to e.g. write the string it gets to some file. By default this macro simply
-    does nothing.
+  - **POVMS_LOG_OUTPUT**: When debugging, define this function to e.g. write the string it gets to some file. By default
+    this macro simply does nothing.
 
 @subsection strt_que    Message Queue Configuration
 
@@ -92,40 +81,34 @@ Regardless of the way you use POVMS, if you want more than simple single-threade
 need to override a few methods. You do this the usual way using defines. Most important for POVMS are message queues.
 So, if you want e.g. a thread-safe or interprocess message queue, you will have to redefine these:
 
-`POVMS_Sys_Queue_Type`
-:   The data type of a system specific message queue. Note that this data type needs to support byte-by-byte copies of
-    itself.
+  - **POVMS_Sys_Queue_Type**: The data type of a system specific message queue. Note that this data type needs to
+    support byte-by-byte copies of itself.
 
-`POVMSAddress`
-:   A POD or POD-only struct that can be send around and uniquely describes a particular POVMS message queue in a
-    particular process and thread.
+  - **POVMSAddress**: A POD or POD-only struct that can be send around and uniquely describes a particular POVMS message
+    queue in a particular process and thread.
 
-`POVMSAddress POVMS_Sys_QueueToAddress(POVMS_Sys_Queue_Type q)`
-:   Returns the `POVMSAddress` corresponding to a system specific message queue.
+  - **POVMSAddress POVMS_Sys_QueueToAddress(POVMS_Sys_Queue_Type q)**: Returns the `POVMSAddress` corresponding to a
+    system specific message queue.
 
-`POVMS_Sys_Queue_Type POVMS_Sys_AddressToQueue(POVMSAddress a)`
-:   Returns the system specific message queue corresponding to a `POVMSAddress`.
+  - **POVMS_Sys_Queue_Type POVMS_Sys_AddressToQueue(POVMSAddress a)**: Returns the system specific message queue
+    corresponding to a `POVMSAddress`.
 
-`POVMS_Sys_Queue_Type POVMS_Sys_QueueOpen()`
-:   Creates a new message queue.
+  - **POVMS_Sys_Queue_Type POVMS_Sys_QueueOpen()**: Creates a new message queue.
 
-`int POVMS_Sys_QueueClose(POVMS_Sys_Queue_Type q)`
-:   Destroys a message queue.
+  - **int POVMS_Sys_QueueClose(POVMS_Sys_Queue_Type q)**: Destroys a message queue.
 
-`void *POVMS_Sys_QueueReceive (POVMS_Sys_Queue_Type q, int *bytes, bool blocking)`
-:   Gets the next message from the specified message queue. Note that the blocking is optional, that is even if the
-    parameter is true, this function does not have to block! If you got the message from the queue in some special way
-    (that is, not simply a pointer put on the queue using `POVMS_Sys_QueueSend`), note that POVMS will use
-    `POVMS_Sys_Free` to free the memory.
+  - **void *POVMS_Sys_QueueReceive (POVMS_Sys_Queue_Type q, int *bytes, bool blocking)**: Gets the next message from the
+    specified message queue. Note that the blocking is optional, that is even if the parameter is true, this function
+    does not have to block! If you got the message from the queue in some special way (that is, not simply a pointer put
+    on the queue using `POVMS_Sys_QueueSend`), note that POVMS will use `POVMS_Sys_Free` to free the memory.
 
-`int POVMS_Sys_QueueSend` (POVMS_Sys_Queue_Type q, void *message, int bytes)
-:   Adds a message to the message queue. The message consists of bytes in memory. `POVMS_Sys_QueueSend` gets ownership
-    of the pointer passed to it and has to make sure it is properly freed using `POVMS_Sys_Free`, e.g. by simply putting
-    the pointer on the queue and letting `POVMS_Sys_QueueReceive` free it.
+  - **int POVMS_Sys_QueueSend (POVMS_Sys_Queue_Type q, void *message, int bytes)**: Adds a message to the message queue.
+    The message consists of bytes in memory. `POVMS_Sys_QueueSend` gets ownership of the pointer passed to it and has to
+    make sure it is properly freed using `POVMS_Sys_Free`, e.g. by simply putting the pointer on the queue and letting
+    `POVMS_Sys_QueueReceive` free it.
 
-`unsigned int POVMS_Sys_Timer()`
-:   Returns current time in seconds. It does not have to follow any particular timebase as long as time values return
-    increase monotonously.
+  - **unsigned int POVMS_Sys_Timer()**: Returns current time in seconds. It does not have to follow any particular
+    timebase as long as time values return increase monotonously.
 
 @subsection strt_sup    Support Function Configuration
 
@@ -133,28 +116,22 @@ So, if you want e.g. a thread-safe or interprocess message queue, you will have 
 
 These low level functions allow building POVMS without a C library. Usually you do not have to override them:
 
-`POVMS_Sys_Strlen(p)`
-:   C strlen function. Defaults to strlen.
+  - **POVMS_Sys_Strlen(p)**: C strlen function. Defaults to strlen.
 
-`POVMS_Sys_Memmove(a, b, c)`
-:   C memmove function. Defaults to memmove.
+  - **POVMS_Sys_Memmove(a, b, c)**: C memmove function. Defaults to memmove.
 
 The following functions provide independent memory management to POVMS. Remember that the POVMS cannot use the standard
 `POV_MALLOC`, `POV_CALLOC`, `POV_REALLOC`, `POV_FREE` calls because it works on a level below those calls (e.g. POVMS
 needs to be able to report out of memory conditions). Thus, you may want to make sure POVMS can even allocate a basic
 amount of memory around a few kilobytes if memory is full from the perspective of `POV_MALLOC`.
 
-`POVMS_Sys_Malloc(s)`
-:   C-like malloc function. Defaults to malloc.
+  - **POVMS_Sys_Malloc(s)**: C-like malloc function. Defaults to malloc.
 
-`POVMS_Sys_Calloc(m,s)`
-:   C-like calloc function. Defaults to calloc.
+  - **POVMS_Sys_Calloc(m,s)**: C-like calloc function. Defaults to calloc.
 
-`POVMS_Sys_Realloc(p,s)`
-:   C-like realloc function. Defaults to realloc.
+  - **POVMS_Sys_Realloc(p,s)**: C-like realloc function. Defaults to realloc.
 
-`POVMS_Sys_Free(p)`
-:   C-like free function. Defaults to free.
+  - **POVMS_Sys_Free(p)**: C-like free function. Defaults to free.
 
 @subsection strt_init   Initializing POVMS
 
@@ -214,8 +191,8 @@ periodically. There you simply call:
     (void)POVMS_ProcessMessages(frontendcontext, false);
 
 This was it! Nothing more to do, you will now receive message from the render engine core. But where do the messages end
-up? Well, in the init_guipovms code above, a message receive callback is installed. It is actually installed twice, for
-general messages and for all render output messages. The basic handler could look like the one below. Of course, the
+up? Well, in the `init_guipovms` code above, a message receive callback is installed. It is actually installed twice,
+for general messages and for all render output messages. The basic handler could look like the one below. Of course, the
 individual message data will need to be extracted. There are (in September 2003) going to be functions to conveniently
 decode messages, going to explained by then...
 
@@ -356,54 +333,63 @@ rendering. You are not supposed to shut it down unless you end the application.
 
 A simple rendering session might look as follows:
 
-@msc
-    wordwraparcs="1";
+@startuml
+    participant Frontend
+    participant Backend
 
-    Frontend,   Backend;
-    Frontend -> Backend [label="kPOVMsgClass_RenderControl, kPOVMsgIdent_RenderOptions"];
-    Frontend -> Backend [label="kPOVMsgClass_RenderControl, kPOVMsgIdent_RenderAll"];
-    Frontend <- Backend [label="(render chunk)"];
-    Frontend <- Backend [label="(render chunk)"];
-    ...;
-    ---                 [label="all chunks finished"];
-    Frontend <- Backend [label="(done)"];
-@endmsc
+    Frontend ->> Backend: kPOVMsgClass_RenderControl, kPOVMsgIdent_RenderOptions
+    Frontend ->> Backend: kPOVMsgClass_RenderControl, kPOVMsgIdent_RenderAll
+    activate Backend
+    loop more chunks to render
+        Frontend <<- Backend: kPOVMsgClass_RenderOutput
+    end
+    Frontend <<- Backend: (done)
+    deactivate Backend
+@enduml
 
 Pausing a render:
 
-@msc
-    wordwraparcs="1";
+@startuml
+    participant Frontend
+    participant Backend
 
-    Frontend,   Backend;
-    ...;
-    Frontend -> Backend [label="kPOVMsgClass_RenderControl, kPOVMsgIdent_RenderAll"];
-    ...;
-    Frontend -> Backend [label="kPOVMsgClass_RenderControl, (pause)"];
-    Frontend <- Backend [label="(render chunk)"];
-    Frontend <- Backend [label="(render chunk)"];
-    ...;
-    ---                 [label="pending chunks finished"];
-    Frontend <- Backend [label="(pausing)"];
-    ...;
-    Frontend -> Backend [label="kPOVMsgClass_RenderControl, (continue)"];
-    Frontend <- Backend [label="(render chunk)"];
-    Frontend <- Backend [label="(render chunk)"];
-    ...;
-@endmsc
+    Frontend ->> Backend: kPOVMsgClass_RenderControl, kPOVMsgIdent_RenderOptions
+    Frontend ->> Backend: kPOVMsgClass_RenderControl, kPOVMsgIdent_RenderAll
+    activate Backend
+    loop
+        Frontend <<- Backend: kPOVMsgClass_RenderOutput
+    end
+    Frontend ->> Backend: kPOVMsgClass_RenderControl, (pause)
+    loop more chunks currently being rendered
+        Frontend <<- Backend: kPOVMsgClass_RenderOutput
+    end
+    Frontend <<- Backend: (pausing)
+    deactivate Backend
+    Frontend ->> Backend: kPOVMsgClass_RenderControl, (continue)
+    activate Backend
+    loop more chunks to render
+        Frontend <<- Backend: kPOVMsgClass_RenderOutput
+    end
+    Frontend <<- Backend: (done)
+    deactivate Backend
+@enduml
 
 Aborting a render:
 
-@msc
-    wordwraparcs="1";
+@startuml
+    participant Frontend
+    participant Backend
 
-    Frontend,   Backend;
-    ...;
-    Frontend -> Backend [label="kPOVMsgClass_RenderControl, kPOVMsgIdent_RenderAll"];
-    ...;
-    Frontend -> Backend [label="kPOVMsgClass_RenderControl, kPOVMsgIdent_RenderStop"];
-    Frontend <- Backend [label="(render chunk)"];
-    Frontend <- Backend [label="(render chunk)"];
-    ...;
-    ---                 [label="pending chunks finished"];
-    Frontend <- Backend [label="(aborted)"];
-@endmsc
+    Frontend ->> Backend: kPOVMsgClass_RenderControl, kPOVMsgIdent_RenderOptions
+    Frontend ->> Backend: kPOVMsgClass_RenderControl, kPOVMsgIdent_RenderAll
+    activate Backend
+    loop
+        Frontend <<- Backend: kPOVMsgClass_RenderOutput
+    end
+    Frontend ->> Backend: kPOVMsgClass_RenderControl, kPOVMsgIdent_RenderStop
+    loop more chunks currently being rendered
+        Frontend <<- Backend: kPOVMsgClass_RenderOutput
+    end
+    Frontend <<- Backend: (aborted)
+    deactivate Backend
+@enduml

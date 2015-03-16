@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -31,24 +31,25 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
 #ifndef POVRAY_BACKEND_RADIOSITY_H
 #define POVRAY_BACKEND_RADIOSITY_H
 
 #include <vector>
 
-#include "backend/frame.h"
+#include "core/material/media.h"   // TODO FIXME - make MediaFunction class visible only as a pointer
+#include "core/render/trace.h"     // TODO FIXME - make Trace class visible only as a pointer
 
-#include "base/fileinputoutput.h"
-#include "base/path.h"
-#include "backend/povray.h"
-#include "backend/interior/media.h"   // TODO FIXME - make MediaFunction class visible only as a pointer
+#include "backend/frame.h"
 #include "backend/lighting/photons.h" // TODO FIXME - make PhotonGatherer class visible only as a pointer
-#include "backend/render/trace.h"     // TODO FIXME - make Trace class visible only as a pointer
 #include "backend/support/octree.h"   // TODO FIXME - this should only be included in radiosity.cpp
-#include "backend/support/randomsequences.h"
 #include "backend/support/statistics.h"
+
+namespace pov_base
+{
+class Path;
+}
 
 namespace pov
 {

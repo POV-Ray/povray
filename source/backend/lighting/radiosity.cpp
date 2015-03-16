@@ -4,11 +4,14 @@
 ///
 /// This file contains radiosity computation task code.
 ///
+/// @author Jim McElhiney (original code)
+/// @author Christoph Lipka (revisions and updates for POV-Ray 3.7)
+///
 /// @copyright
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -31,7 +34,7 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
 /************************************************************************
 *  Radiosity calculation routies.
@@ -65,9 +68,14 @@
 #include "backend/frame.h"
 #include "backend/lighting/radiosity.h"
 
+#include "base/fileinputoutput.h"
+
+#include "core/render/ray.h"
+
 #include "backend/lighting/photons.h"
-#include "backend/math/vector.h"
 #include "backend/render/tracetask.h"
+#include "backend/scene/scene.h"
+#include "backend/scene/threaddata.h"
 #include "backend/scene/view.h"
 #include "backend/support/fileutil.h"
 #include "backend/support/octree.h"

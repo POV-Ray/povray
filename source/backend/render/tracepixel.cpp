@@ -11,7 +11,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -34,7 +34,7 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
 #include <vector>
 
@@ -45,17 +45,18 @@
 #include "backend/frame.h"
 #include "backend/render/tracepixel.h"
 
+#include "core/material/normal.h"
+#include "core/material/pigment.h"
+#include "core/render/ray.h"
+#include "core/render/trace.h"
+#include "core/shape/mesh.h"
+
 #include "backend/math/chi2.h"
 #include "backend/math/matrices.h"
-#include "backend/math/vector.h"
-#include "backend/render/trace.h"
 #include "backend/scene/objects.h"
 #include "backend/scene/scene.h"
 #include "backend/scene/view.h"
-#include "backend/shape/mesh.h"
 #include "backend/support/jitter.h"
-#include "backend/texture/normal.h"
-#include "backend/texture/pigment.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -188,7 +189,7 @@ bool HasInteriorPointObjectCondition::operator()(const Vector3d& point, ConstObj
 
 bool ContainingInteriorsPointObjectCondition::operator()(const Vector3d& point, ConstObjectPtr object) const
 {
-    containingInteriors.push_back(object->interior);
+    containingInteriors.push_back(object->interior.get());
     return true;
 }
 
@@ -886,13 +887,13 @@ void TracePixel::InitRayContainerState(Ray& ray, bool compute)
             // test infinite objects
             for(vector<ObjectPtr>::iterator object = sceneData->objects.begin() + sceneData->numberOfFiniteObjects; object != sceneData->objects.end(); object++)
                 if(((*object)->interior != NULL) && Inside_BBox(ray.Origin, (*object)->BBox) && (*object)->Inside(ray.Origin, threadData))
-                    containingInteriors.push_back((*object)->interior);
+                    containingInteriors.push_back((*object)->interior.get());
         }
         else if((sceneData->boundingMethod == 0) || (sceneData->boundingSlabs == NULL))
         {
             for(vector<ObjectPtr>::iterator object = sceneData->objects.begin(); object != sceneData->objects.end(); object++)
                 if(((*object)->interior != NULL) && Inside_BBox(ray.Origin, (*object)->BBox) && (*object)->Inside(ray.Origin, threadData))
-                    containingInteriors.push_back((*object)->interior);
+                    containingInteriors.push_back((*object)->interior.get());
         }
         else
         {
@@ -936,7 +937,7 @@ void TracePixel::InitRayContainerStateTree(Ray& ray, BBOX_TREE *node)
         /* This is a leaf so test contained object. */
         ObjectPtr object = ObjectPtr(node->Node);
         if((object->interior != NULL) && object->Inside(ray.Origin, threadData))
-            containingInteriors.push_back(object->interior);
+            containingInteriors.push_back(object->interior.get());
     }
     else
     {

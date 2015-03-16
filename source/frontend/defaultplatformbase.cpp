@@ -1,43 +1,45 @@
-/*******************************************************************************
- * defaultplatformbase.cpp
- *
- * This module contains the C++ DefaultPlatformBase class.
- *
- * ---------------------------------------------------------------------------
- * Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
- * Copyright 1991-2013 Persistence of Vision Raytracer Pty. Ltd.
- *
- * POV-Ray is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * POV-Ray is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------------
- * POV-Ray is based on the popular DKB raytracer version 2.12.
- * DKBTrace was originally written by David K. Buck.
- * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
- * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/frontend/defaultplatformbase.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
- *******************************************************************************/
+//******************************************************************************
+///
+/// @file frontend/defaultplatformbase.cpp
+///
+/// This module contains the C++ DefaultPlatformBase class.
+///
+/// @copyright
+/// @parblock
+///
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+///
+/// POV-Ray is free software: you can redistribute it and/or modify
+/// it under the terms of the GNU Affero General Public License as
+/// published by the Free Software Foundation, either version 3 of the
+/// License, or (at your option) any later version.
+///
+/// POV-Ray is distributed in the hope that it will be useful,
+/// but WITHOUT ANY WARRANTY; without even the implied warranty of
+/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+/// GNU Affero General Public License for more details.
+///
+/// You should have received a copy of the GNU Affero General Public License
+/// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+///
+/// ----------------------------------------------------------------------------
+///
+/// POV-Ray is based on the popular DKB raytracer version 2.12.
+/// DKBTrace was originally written by David K. Buck.
+/// DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
+///
+/// @endparblock
+///
+//******************************************************************************
 
-// configbase.h must always be the first POV file included within base *.cpp files
-#include "base/configbase.h"
+// configfrontend.h must always be the first POV file included within frontend *.cpp files
+#include "frontend/configfrontend.h"
+#include "frontend/defaultplatformbase.h"
 
-#include "defaultplatformbase.h"
+#include "povms/povms.h"
 
-#include "povms.h"
-#include "pov_err.h"
+#include "base/pov_err.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -55,42 +57,42 @@ DefaultPlatformBase::~DefaultPlatformBase()
 
 IStream *DefaultPlatformBase::CreateIStream(const unsigned int stype)
 {
-	return new IStream(stype);
+    return new IStream(stype);
 }
 
 OStream *DefaultPlatformBase::CreateOStream(const unsigned int stype)
 {
-	return new OStream(stype);
+    return new OStream(stype);
 }
 
 UCS2String DefaultPlatformBase::GetTemporaryPath()
 {
-	return ASCIItoUCS2String("/tmp/");
+    return ASCIItoUCS2String("/tmp/");
 }
 
 UCS2String DefaultPlatformBase::CreateTemporaryFile()
 {
-	static int cnt = 0;
-	char buffer[32];
+    static int cnt = 0;
+    char buffer[32];
 
-	cnt++;
-	sprintf(buffer, "/tmp/pov%08x.dat", cnt);
+    cnt++;
+    sprintf(buffer, "/tmp/pov%08x.dat", cnt);
 
-	FILE *f = fopen(buffer, "wb");
-	if(f != NULL)
-		fclose(f);
+    FILE *f = fopen(buffer, "wb");
+    if(f != NULL)
+        fclose(f);
 
-	return UCS2String(ASCIItoUCS2String(buffer));
+    return UCS2String(ASCIItoUCS2String(buffer));
 }
 
 void DefaultPlatformBase::DeleteTemporaryFile(const UCS2String& filename)
 {
-	remove(UCS2toASCIIString(filename).c_str());
+    remove(UCS2toASCIIString(filename).c_str());
 }
 
 bool DefaultPlatformBase::ReadFileFromURL(OStream *, const UCS2String&, const UCS2String&)
 {
-	return false;
+    return false;
 }
 
 

@@ -1,52 +1,80 @@
-/*******************************************************************************
- * chi2.cpp
- *
- * This module contains the function for the chi square distribution.
- *
- * This software is derived from the Cephes Math Library and is
- * incorporated herein by permission of the author, Stephen L. Moshier.
- *
- *   Cephes Math Library Release 2.0:  April, 1987
- *   Copyright 1984, 1987 by Stephen L. Moshier
- *
- * The author reserves the right to distribute this material elsewhere under
- * different terms. This file is provided within POV-Ray under the following
- * terms:
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- *  1. Redistributions of source code must retain the above copyright notice,
- *     this list of conditions and the following disclaimer.
- *  2. Redistributions in binary form must reproduce the above copyright notice,
- *     this list of conditions and the following disclaimer in the documentation
- *     and/or other materials provided with the distribution.
- *  3. Neither the names of the copyright holders nor the names of contributors
- *     may be used to endorse or promote products derived from this software
- *     without specific prior written permission.
- *
- *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- *  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- *  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- *  ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR CONTRIBUTORS BE
- *  LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- *  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- *  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- *  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- *  POSSIBILITY OF SUCH DAMAGE.
- * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/math/chi2.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
- *******************************************************************************/
+//******************************************************************************
+///
+/// @file backend/math/chi2.cpp
+///
+/// This module contains the function for the chi square distribution.
+///
+/// @author Stephen L. Moshier
+///
+/// @copyright
+/// @parblock
+///
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+///
+/// POV-Ray is free software: you can redistribute it and/or modify
+/// it under the terms of the GNU Affero General Public License as
+/// published by the Free Software Foundation, either version 3 of the
+/// License, or (at your option) any later version.
+///
+/// POV-Ray is distributed in the hope that it will be useful,
+/// but WITHOUT ANY WARRANTY; without even the implied warranty of
+/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+/// GNU Affero General Public License for more details.
+///
+/// You should have received a copy of the GNU Affero General Public License
+/// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+///
+/// ----------------------------------------------------------------------------
+///
+/// POV-Ray is based on the popular DKB raytracer version 2.12.
+/// DKBTrace was originally written by David K. Buck.
+/// DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
+///
+/// ----------------------------------------------------------------------------
+///
+/// This software is derived from the Cephes Math Library and is
+/// incorporated herein by permission of the author, Stephen L. Moshier.
+///
+///   Cephes Math Library Release 2.0:  April, 1987
+///   Copyright 1984, 1987 by Stephen L. Moshier
+///
+/// The author reserves the right to distribute this material elsewhere under
+/// different terms. This file is provided within POV-Ray under the following
+/// terms:
+///
+/// Redistribution and use in source and binary forms, with or without
+/// modification, are permitted provided that the following conditions are met:
+///
+///  1. Redistributions of source code must retain the above copyright notice,
+///     this list of conditions and the following disclaimer.
+///  2. Redistributions in binary form must reproduce the above copyright notice,
+///     this list of conditions and the following disclaimer in the documentation
+///     and/or other materials provided with the distribution.
+///  3. Neither the names of the copyright holders nor the names of contributors
+///     may be used to endorse or promote products derived from this software
+///     without specific prior written permission.
+///
+///  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+///  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+///  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+///  ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR CONTRIBUTORS BE
+///  LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+///  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+///  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+///  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+///  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+///  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+///  POSSIBILITY OF SUCH DAMAGE.
+///
+/// @endparblock
+///
+//******************************************************************************
 
 // frame.h must always be the first POV file included (pulls in platform config)
 #include "backend/frame.h"
 #include "backend/math/chi2.h"
+
 #include "base/pov_err.h"
 
 // this must be the last file included
@@ -79,32 +107,32 @@ const DBL LOGPI  = 1.14472988584940017414;
 
 const DBL A[] =
 {
-	 8.11614167470508450300E-4,
-	-5.95061904284301438324E-4,
-	 7.93650340457716943945E-4,
-	-2.77777777730099687205E-3,
-	 8.33333333333331927722E-2
+     8.11614167470508450300E-4,
+    -5.95061904284301438324E-4,
+     7.93650340457716943945E-4,
+    -2.77777777730099687205E-3,
+     8.33333333333331927722E-2
 };
 
 const DBL B[] =
 {
-	-1.37825152569120859100E3,
-	-3.88016315134637840924E4,
-	-3.31612992738871184744E5,
-	-1.16237097492762307383E6,
-	-1.72173700820839662146E6,
-	-8.53555664245765465627E5
+    -1.37825152569120859100E3,
+    -3.88016315134637840924E4,
+    -3.31612992738871184744E5,
+    -1.16237097492762307383E6,
+    -1.72173700820839662146E6,
+    -8.53555664245765465627E5
 };
 
 const DBL C[] =
 {
-	 1.00000000000000000000E0,
-	-3.51815701436523470549E2,
-	-1.70642106651881159223E4,
-	-2.20528590553854454839E5,
-	-1.13933444367982507207E6,
-	-2.53252307177582951285E6,
-	-2.01889141433532773231E6
+     1.00000000000000000000E0,
+    -3.51815701436523470549E2,
+    -1.70642106651881159223E4,
+    -2.20528590553854454839E5,
+    -1.13933444367982507207E6,
+    -2.53252307177582951285E6,
+    -2.01889141433532773231E6
 };
 
 /* log(sqrt(2pi)) */
@@ -119,24 +147,24 @@ const DBL s2pi = 2.50662827463100050242E0;
 
 const DBL P0[5] =
 {
-	-5.99633501014107895267E1,
-	 9.80010754185999661536E1,
-	-5.66762857469070293439E1,
-	 1.39312609387279679503E1,
-	-1.23916583867381258016E0,
+    -5.99633501014107895267E1,
+     9.80010754185999661536E1,
+    -5.66762857469070293439E1,
+     1.39312609387279679503E1,
+    -1.23916583867381258016E0,
 };
 
 const DBL Q0[8] =
 {
-/*	 1.00000000000000000000E0,*/
-	 1.95448858338141759834E0,
-	 4.67627912898881538453E0,
-	 8.63602421390890590575E1,
-	-2.25462687854119370527E2,
-	 2.00260212380060660359E2,
-	-8.20372256168333339912E1,
-	 1.59056225126211695515E1,
-	-1.18331621121330003142E0,
+/*   1.00000000000000000000E0,*/
+     1.95448858338141759834E0,
+     4.67627912898881538453E0,
+     8.63602421390890590575E1,
+    -2.25462687854119370527E2,
+     2.00260212380060660359E2,
+    -8.20372256168333339912E1,
+     1.59056225126211695515E1,
+    -1.18331621121330003142E0,
 };
 
 /*
@@ -146,28 +174,28 @@ const DBL Q0[8] =
 
 const DBL P1[9] =
 {
-	 4.05544892305962419923E0,
-	 3.15251094599893866154E1,
-	 5.71628192246421288162E1,
-	 4.40805073893200834700E1,
-	 1.46849561928858024014E1,
-	 2.18663306850790267539E0,
-	-1.40256079171354495875E-1,
-	-3.50424626827848203418E-2,
-	-8.57456785154685413611E-4,
+     4.05544892305962419923E0,
+     3.15251094599893866154E1,
+     5.71628192246421288162E1,
+     4.40805073893200834700E1,
+     1.46849561928858024014E1,
+     2.18663306850790267539E0,
+    -1.40256079171354495875E-1,
+    -3.50424626827848203418E-2,
+    -8.57456785154685413611E-4,
 };
 
 const DBL Q1[8] =
 {
-/*	 1.00000000000000000000E0,*/
-	 1.57799883256466749731E1,
-	 4.53907635128879210584E1,
-	 4.13172038254672030440E1,
-	 1.50425385692907503408E1,
-	 2.50464946208309415979E0,
-	-1.42182922854787788574E-1,
-	-3.80806407691578277194E-2,
-	-9.33259480895457427372E-4,
+/*   1.00000000000000000000E0,*/
+     1.57799883256466749731E1,
+     4.53907635128879210584E1,
+     4.13172038254672030440E1,
+     1.50425385692907503408E1,
+     2.50464946208309415979E0,
+    -1.42182922854787788574E-1,
+    -3.80806407691578277194E-2,
+    -9.33259480895457427372E-4,
 };
 
 /*
@@ -177,28 +205,28 @@ const DBL Q1[8] =
 
 const DBL P2[9] =
 {
-	3.23774891776946035970E0,
-	6.91522889068984211695E0,
-	3.93881025292474443415E0,
-	1.33303460815807542389E0,
-	2.01485389549179081538E-1,
-	1.23716634817820021358E-2,
-	3.01581553508235416007E-4,
-	2.65806974686737550832E-6,
-	6.23974539184983293730E-9,
+    3.23774891776946035970E0,
+    6.91522889068984211695E0,
+    3.93881025292474443415E0,
+    1.33303460815807542389E0,
+    2.01485389549179081538E-1,
+    1.23716634817820021358E-2,
+    3.01581553508235416007E-4,
+    2.65806974686737550832E-6,
+    6.23974539184983293730E-9,
 };
 
 const DBL Q2[8] =
 {
-/*	1.00000000000000000000E0,*/
-	6.02427039364742014255E0,
-	3.67983563856160859403E0,
-	1.37702099489081330271E0,
-	2.16236993594496635890E-1,
-	1.34204006088543189037E-2,
-	3.28014464682127739104E-4,
-	2.89247864745380683936E-6,
-	6.79019408009981274425E-9,
+/*  1.00000000000000000000E0,*/
+    6.02427039364742014255E0,
+    3.67983563856160859403E0,
+    1.37702099489081330271E0,
+    2.16236993594496635890E-1,
+    1.34204006088543189037E-2,
+    3.28014464682127739104E-4,
+    2.89247864745380683936E-6,
+    6.79019408009981274425E-9,
 };
 
 
@@ -259,18 +287,18 @@ static DBL ndtri (DBL y0);
 
 DBL chdtri(DBL df, DBL  y)
 {
-	DBL x;
+    DBL x;
 
-	if ((y < 0.0) || (y > 1.0) || (df < 1.0))
-	{
-		throw POV_EXCEPTION_STRING("Illegal values in chdtri().");
+    if ((y < 0.0) || (y > 1.0) || (df < 1.0))
+    {
+        throw POV_EXCEPTION_STRING("Illegal values in chdtri().");
 
-		return (0.0);
-	}
+        return (0.0);
+    }
 
-	x = igami(0.5 * df, y);
+    x = igami(0.5 * df, y);
 
-	return (2.0 * x);
+    return (2.0 * x);
 }
 
 
@@ -330,132 +358,132 @@ DBL chdtri(DBL df, DBL  y)
 
 static DBL lgam(DBL x, int *sgngam)
 {
-	DBL p, q, w, z;
-	int i;
+    DBL p, q, w, z;
+    int i;
 
-	*sgngam = 1;
+    *sgngam = 1;
 
-	if (x < -34.0)
-	{
-		q = -x;
-		w = lgam(q, sgngam);  /* note this modifies sgngam! */
-		p = floor(q);
+    if (x < -34.0)
+    {
+        q = -x;
+        w = lgam(q, sgngam);  /* note this modifies sgngam! */
+        p = floor(q);
 
-		if (p == q)
-		{
-			goto loverf;
-		}
+        if (p == q)
+        {
+            goto loverf;
+        }
 
-		i = p;
+        i = p;
 
-		if ((i & 1) == 0)
-		{
-			*sgngam = -1;
-		}
-		else
-		{
-			*sgngam = 1;
-		}
+        if ((i & 1) == 0)
+        {
+            *sgngam = -1;
+        }
+        else
+        {
+            *sgngam = 1;
+        }
 
-		z = q - p;
+        z = q - p;
 
-		if (z > 0.5)
-		{
-			p += 1.0;
+        if (z > 0.5)
+        {
+            p += 1.0;
 
-			z = p - q;
-		}
+            z = p - q;
+        }
 
-		z = q * sin(M_PI * z);
+        z = q * sin(M_PI * z);
 
-		if (z == 0.0)
-		{
-			goto loverf;
-		}
+        if (z == 0.0)
+        {
+            goto loverf;
+        }
 
-/*		z = log(M_PI) - log( z ) - w;*/
+/*      z = log(M_PI) - log( z ) - w;*/
 
-		z = LOGPI - log(z) - w;
+        z = LOGPI - log(z) - w;
 
-		return (z);
-	}
+        return (z);
+    }
 
-	if (x < 13.0)
-	{
-		z = 1.0;
+    if (x < 13.0)
+    {
+        z = 1.0;
 
-		while (x >= 3.0)
-		{
-			x -= 1.0;
+        while (x >= 3.0)
+        {
+            x -= 1.0;
 
-			z *= x;
-		}
+            z *= x;
+        }
 
-		while (x < 2.0)
-		{
-			if (x == 0.0)
-			{
-				goto loverf;
-			}
+        while (x < 2.0)
+        {
+            if (x == 0.0)
+            {
+                goto loverf;
+            }
 
-			z /= x;
+            z /= x;
 
-			x += 1.0;
-		}
+            x += 1.0;
+        }
 
-		if (z < 0.0)
-		{
-			*sgngam = -1;
+        if (z < 0.0)
+        {
+            *sgngam = -1;
 
-			z = -z;
-		}
-		else
-		{
-			*sgngam = 1;
-		}
+            z = -z;
+        }
+        else
+        {
+            *sgngam = 1;
+        }
 
-		if (x == 2.0)
-		{
-			return (log(z));
-		}
+        if (x == 2.0)
+        {
+            return (log(z));
+        }
 
-		x -= 2.0;
+        x -= 2.0;
 
-		p = x * polevl(x, B, 5) / p1evl(x, C, 6);
+        p = x * polevl(x, B, 5) / p1evl(x, C, 6);
 
-		return (log(z) + p);
-	}
+        return (log(z) + p);
+    }
 
-	if (x > MAXLGM)
-	{
-		loverf:
+    if (x > MAXLGM)
+    {
+        loverf:
 /*
-		mtherr("lgam", OVERFLOW);
+        mtherr("lgam", OVERFLOW);
 */
-		return (*sgngam * MAXNUM);
-	}
+        return (*sgngam * MAXNUM);
+    }
 
-	q = (x - 0.5) * log(x) - x + LS2PI;
+    q = (x - 0.5) * log(x) - x + LS2PI;
 
-	if (x > 1.0e8)
-	{
-		return (q);
-	}
+    if (x > 1.0e8)
+    {
+        return (q);
+    }
 
-	p = 1.0 / (x * x);
+    p = 1.0 / (x * x);
 
-	if (x >= 1000.0)
-	{
-		q += ((7.9365079365079365079365e-4 * p -
-		       2.7777777777777777777778e-3) * p +
-		       0.0833333333333333333333) / x;
-	}
-	else
-	{
-		q += polevl(p, A, 4) / x;
-	}
+    if (x >= 1000.0)
+    {
+        q += ((7.9365079365079365079365e-4 * p -
+               2.7777777777777777777778e-3) * p +
+               0.0833333333333333333333) / x;
+    }
+    else
+    {
+        q += polevl(p, A, 4) / x;
+    }
 
-	return (q);
+    return (q);
 }
 
 
@@ -508,84 +536,84 @@ static DBL lgam(DBL x, int *sgngam)
 
 static DBL igamc(DBL a, DBL  x)
 {
-	DBL ans, c, yc, ax, y, z;
-	DBL pk, pkm1, pkm2, qk, qkm1, qkm2;
-	DBL r, t;
-	int sgngam = 0;
+    DBL ans, c, yc, ax, y, z;
+    DBL pk, pkm1, pkm2, qk, qkm1, qkm2;
+    DBL r, t;
+    int sgngam = 0;
 
-	if ((x <= 0) || (a <= 0))
-	{
-		return (1.0);
-	}
+    if ((x <= 0) || (a <= 0))
+    {
+        return (1.0);
+    }
 
-	if ((x < 1.0) || (x < a))
-	{
-		return (1.0 - igam(a, x));
-	}
+    if ((x < 1.0) || (x < a))
+    {
+        return (1.0 - igam(a, x));
+    }
 
-	ax = a * log(x) - x - lgam(a, &sgngam);
+    ax = a * log(x) - x - lgam(a, &sgngam);
 
-	if (ax < -MAXLOG)
-	{
+    if (ax < -MAXLOG)
+    {
 /*
-		mtherr("igamc", UNDERFLOW);
+        mtherr("igamc", UNDERFLOW);
 */
-		return (0.0);
-	}
+        return (0.0);
+    }
 
-	ax = exp(ax);
+    ax = exp(ax);
 
 /* continued fraction */
 
-	y = 1.0 - a;
-	z = x + y + 1.0;
-	c = 0.0;
+    y = 1.0 - a;
+    z = x + y + 1.0;
+    c = 0.0;
 
-	pkm2 = 1.0;
-	qkm2 = x;
-	pkm1 = x + 1.0;
-	qkm1 = z * x;
+    pkm2 = 1.0;
+    qkm2 = x;
+    pkm1 = x + 1.0;
+    qkm1 = z * x;
 
-	ans = pkm1 / qkm1;
+    ans = pkm1 / qkm1;
 
-	do
-	{
-		c += 1.0;
-		y += 1.0;
-		z += 2.0;
+    do
+    {
+        c += 1.0;
+        y += 1.0;
+        z += 2.0;
 
-		yc = y * c;
+        yc = y * c;
 
-		pk = pkm1 * z - pkm2 * yc;
-		qk = qkm1 * z - qkm2 * yc;
+        pk = pkm1 * z - pkm2 * yc;
+        qk = qkm1 * z - qkm2 * yc;
 
-		if (qk != 0)
-		{
-			r = pk / qk;
-			t = fabs((ans - r) / r);
-			ans = r;
-		}
-		else
-		{
-			t = 1.0;
-		}
+        if (qk != 0)
+        {
+            r = pk / qk;
+            t = fabs((ans - r) / r);
+            ans = r;
+        }
+        else
+        {
+            t = 1.0;
+        }
 
-		pkm2 = pkm1;
-		pkm1 = pk;
-		qkm2 = qkm1;
-		qkm1 = qk;
+        pkm2 = pkm1;
+        pkm1 = pk;
+        qkm2 = qkm1;
+        qkm1 = qk;
 
-		if (fabs(pk) > BIG)
-		{
-			pkm2 /= BIG;
-			pkm1 /= BIG;
-			qkm2 /= BIG;
-			qkm1 /= BIG;
-		}
-	}
-	while (t > MACHEP);
+        if (fabs(pk) > BIG)
+        {
+            pkm2 /= BIG;
+            pkm1 /= BIG;
+            qkm2 /= BIG;
+            qkm1 /= BIG;
+        }
+    }
+    while (t > MACHEP);
 
-	return (ans * ax);
+    return (ans * ax);
 }
 
 
@@ -645,46 +673,46 @@ static DBL igamc(DBL a, DBL  x)
 
 static DBL igam(DBL a, DBL  x)
 {
-	DBL ans, ax, c, r;
-	int sgngam = 0;
+    DBL ans, ax, c, r;
+    int sgngam = 0;
 
-	if ((x <= 0) || (a <= 0))
-	{
-		return (0.0);
-	}
+    if ((x <= 0) || (a <= 0))
+    {
+        return (0.0);
+    }
 
-	if ((x > 1.0) && (x > a))
-	{
-		return (1.0 - igamc(a, x));
-	}
+    if ((x > 1.0) && (x > a))
+    {
+        return (1.0 - igamc(a, x));
+    }
 
 /* Compute  x**a * exp(-x) / gamma(a)  */
-	ax = a * log(x) - x - lgam(a, &sgngam);
+    ax = a * log(x) - x - lgam(a, &sgngam);
 
-	if (ax < -MAXLOG)
-	{
+    if (ax < -MAXLOG)
+    {
 /*
-		mtherr("igam", UNDERFLOW);
+        mtherr("igam", UNDERFLOW);
 */
-		return (0.0);
-	}
+        return (0.0);
+    }
 
-	ax = exp(ax);
+    ax = exp(ax);
 
 /* power series */
-	r = a;
-	c = 1.0;
-	ans = 1.0;
+    r = a;
+    c = 1.0;
+    ans = 1.0;
 
-	do
-	{
-		r += 1.0;
-		c *= x / r;
-		ans += c;
-	}
-	while (c / ans > MACHEP);
+    do
+    {
+        r += 1.0;
+        c *= x / r;
+        ans += c;
+    }
+    while (c / ans > MACHEP);
 
-	return (ans * ax / a);
+    return (ans * ax / a);
 }
 
 
@@ -739,67 +767,67 @@ static DBL igam(DBL a, DBL  x)
 
 static DBL igami(DBL a, DBL  y0)
 {
-	DBL d, y, x0, lgm;
-	int i;
-	int sgngam = 0;
+    DBL d, y, x0, lgm;
+    int i;
+    int sgngam = 0;
 
 /* approximation to inverse function */
-	d = 1.0 / (9.0 * a);
-	y = (1.0 - d - ndtri(y0) * sqrt(d));
+    d = 1.0 / (9.0 * a);
+    y = (1.0 - d - ndtri(y0) * sqrt(d));
 
-	x0 = a * y * y * y;
+    x0 = a * y * y * y;
 
-	lgm = lgam(a, &sgngam);
+    lgm = lgam(a, &sgngam);
 
-	for (i = 0; i < 10; i++)
-	{
-		if (x0 <= 0.0)
-		{
+    for (i = 0; i < 10; i++)
+    {
+        if (x0 <= 0.0)
+        {
 /*
-			mtherr("igami", UNDERFLOW);
+            mtherr("igami", UNDERFLOW);
 */
-			return (0.0);
-		}
+            return (0.0);
+        }
 
-		y = igamc(a, x0);
+        y = igamc(a, x0);
 
 /* compute the derivative of the function at this point */
-		d = (a - 1.0) * log(x0) - x0 - lgm;
+        d = (a - 1.0) * log(x0) - x0 - lgm;
 
-		if (d < -MAXLOG)
-		{
+        if (d < -MAXLOG)
+        {
 /*
-			mtherr("igami", UNDERFLOW);
+            mtherr("igami", UNDERFLOW);
 */
-			goto done;
-		}
+            goto done;
+        }
 
-		d = -exp(d);
+        d = -exp(d);
 
 /* compute the step to the next approximation of x */
-		if (d == 0.0)
-		{
-			goto done;
-		}
+        if (d == 0.0)
+        {
+            goto done;
+        }
 
-		d = (y - y0) / d;
+        d = (y - y0) / d;
 
-		x0 = x0 - d;
+        x0 = x0 - d;
 
-		if (i < 3)
-		{
-			continue;
-		}
+        if (i < 3)
+        {
+            continue;
+        }
 
-		if (fabs(d / x0) < 2.0 * MACHEP)
-		{
-			goto done;
-		}
-	}
+        if (fabs(d / x0) < 2.0 * MACHEP)
+        {
+            goto done;
+        }
+    }
 
 done:
 
-	return (x0);
+    return (x0);
 }
 
 
@@ -853,67 +881,67 @@ done:
 
 static DBL ndtri(DBL y0)
 {
-	DBL x, y, z, y2, x0, x1;
-	int code;
+    DBL x, y, z, y2, x0, x1;
+    int code;
 
-	if (y0 <= 0.0)
-	{
+    if (y0 <= 0.0)
+    {
 /*
-		mtherr("ndtri", DOMAIN);
+        mtherr("ndtri", DOMAIN);
 */
-		return (-MAXNUM);
-	}
+        return (-MAXNUM);
+    }
 
-	if (y0 >= 1.0)
-	{
+    if (y0 >= 1.0)
+    {
 /*
-		mtherr("ndtri", DOMAIN);
+        mtherr("ndtri", DOMAIN);
 */
-		return (MAXNUM);
-	}
+        return (MAXNUM);
+    }
 
-	code = 1;
+    code = 1;
 
-	y = y0;
+    y = y0;
 
-	if (y > (1.0 - 0.13533528323661269189)) /* 0.135... = exp(-2) */
-	{
-		y = 1.0 - y;
-		code = 0;
-	}
+    if (y > (1.0 - 0.13533528323661269189)) /* 0.135... = exp(-2) */
+    {
+        y = 1.0 - y;
+        code = 0;
+    }
 
-	if (y > 0.13533528323661269189)
-	{
-		y = y - 0.5;
-		y2 = y * y;
-		x = y + y * (y2 * polevl(y2, P0, 4) / p1evl(y2, Q0, 8));
-		x = x * s2pi;
+    if (y > 0.13533528323661269189)
+    {
+        y = y - 0.5;
+        y2 = y * y;
+        x = y + y * (y2 * polevl(y2, P0, 4) / p1evl(y2, Q0, 8));
+        x = x * s2pi;
 
-		return (x);
-	}
+        return (x);
+    }
 
-	x = sqrt(-2.0 * log(y));
-	x0 = x - log(x) / x;
+    x = sqrt(-2.0 * log(y));
+    x0 = x - log(x) / x;
 
-	z = 1.0 / x;
+    z = 1.0 / x;
 
-	if (x < 8.0)  /* y > exp(-32) = 1.2664165549e-14 */
-	{
-		x1 = z * polevl(z, P1, 8) / p1evl(z, Q1, 8);
-	}
-	else
-	{
-		x1 = z * polevl(z, P2, 8) / p1evl(z, Q2, 8);
-	}
+    if (x < 8.0)  /* y > exp(-32) = 1.2664165549e-14 */
+    {
+        x1 = z * polevl(z, P1, 8) / p1evl(z, Q1, 8);
+    }
+    else
+    {
+        x1 = z * polevl(z, P2, 8) / p1evl(z, Q2, 8);
+    }
 
-	x = x0 - x1;
+    x = x0 - x1;
 
-	if (code != 0)
-	{
-		x = -x;
-	}
+    if (code != 0)
+    {
+        x = -x;
+    }
 
-	return (x);
+    return (x);
 }
 
 
@@ -964,21 +992,21 @@ static DBL ndtri(DBL y0)
 
 static DBL polevl(DBL x, const DBL coef[], int N)
 {
-	DBL ans;
-	int i;
-	DBL const *p;
+    DBL ans;
+    int i;
+    DBL const *p;
 
-	p = coef;
-	ans = *p++;
-	i = N;
+    p = coef;
+    ans = *p++;
+    i = N;
 
-	do
-	{
-		ans = ans * x + *p++;
-	}
-	while (--i);
+    do
+    {
+        ans = ans * x + *p++;
+    }
+    while (--i);
 
-	return (ans);
+    return (ans);
 }
 
 /*              p1evl() */
@@ -989,21 +1017,21 @@ static DBL polevl(DBL x, const DBL coef[], int N)
 
 static DBL p1evl(DBL x, const DBL coef[], int N)
 {
-	DBL ans;
-	DBL const *p;
-	int i;
+    DBL ans;
+    DBL const *p;
+    int i;
 
-	p = coef;
-	ans = x + *p++;
-	i = N - 1;
+    p = coef;
+    ans = x + *p++;
+    i = N - 1;
 
-	do
-	{
-		ans = ans * x + *p++;
-	}
-	while (--i);
+    do
+    {
+        ans = ans * x + *p++;
+    }
+    while (--i);
 
-	return (ans);
+    return (ans);
 }
 
 }

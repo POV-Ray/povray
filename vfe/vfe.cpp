@@ -1,37 +1,39 @@
-/*******************************************************************************
- * vfe.cpp
- *
- * This module contains the C++ implementation for the virtual frontend.
- *
- * Author: Christopher J. Cason
- *
- * ---------------------------------------------------------------------------
- * Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
- * Copyright 1991-2013 Persistence of Vision Raytracer Pty. Ltd.
- *
- * POV-Ray is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * POV-Ray is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------------
- * POV-Ray is based on the popular DKB raytracer version 2.12.
- * DKBTrace was originally written by David K. Buck.
- * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
- * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/vfe/vfe.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
- *******************************************************************************/
+//******************************************************************************
+///
+/// @file vfe/vfe.cpp
+///
+/// This module contains the C++ implementation for the virtual frontend.
+///
+/// @author Christopher J. Cason
+///
+/// @copyright
+/// @parblock
+///
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+///
+/// POV-Ray is free software: you can redistribute it and/or modify
+/// it under the terms of the GNU Affero General Public License as
+/// published by the Free Software Foundation, either version 3 of the
+/// License, or (at your option) any later version.
+///
+/// POV-Ray is distributed in the hope that it will be useful,
+/// but WITHOUT ANY WARRANTY; without even the implied warranty of
+/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+/// GNU Affero General Public License for more details.
+///
+/// You should have received a copy of the GNU Affero General Public License
+/// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+///
+/// ----------------------------------------------------------------------------
+///
+/// POV-Ray is based on the popular DKB raytracer version 2.12.
+/// DKBTrace was originally written by David K. Buck.
+/// DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
+///
+/// @endparblock
+///
+//******************************************************************************
 
 #ifdef _MSC_VER
 #pragma warning(disable : 4244)
@@ -682,7 +684,7 @@ bool VirtualFrontEnd::Start(POVMS_Object& opts)
     // the same).
     imageProcessing.reset();
 
-    // TODO: update ImageProcessing with the means of accepting and caching 
+    // TODO: update ImageProcessing with the means of accepting and caching
     // blocks of pixels as opposed to individual ones, with a back-end that
     // can serialize completed rows to the final image output file.
     options = opts;
@@ -1097,7 +1099,7 @@ State VirtualFrontEnd::Process()
 
               /* [JG] the block here is a duplicate of actions done after
                * the post frame shellout (that won't be reached because
-               * the image was already there). 
+               * the image was already there).
                */
               try { renderFrontend.CloseView(viewId); }
               catch (pov_base::Exception&) { /* Ignore any error here! */ }
@@ -1232,7 +1234,7 @@ State VirtualFrontEnd::Process()
         }
         return state = kStopped;
       }
-      /* [JG] the actions hereafter should be also done 
+      /* [JG] the actions hereafter should be also done
        * when the image already existed: tidy up the data before next frame or stop
        */
       try { renderFrontend.CloseView(viewId); }

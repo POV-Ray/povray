@@ -11,7 +11,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -44,19 +44,13 @@
 
 #include <boost/thread.hpp>
 
-namespace pov
-{
-
-class FunctionVM;
-struct FPUContext;
-
-}
-
 #include "backend/frame.h"
 #include "backend/vm/fncode.h"
 
 namespace pov
 {
+
+class FunctionVM;
 
 #define MAX_CALL_STACK_SIZE 1024
 
@@ -110,8 +104,6 @@ enum
 
 typedef SYS_MATH_RETURN (*Sys1)(SYS_MATH_PARAM r0);
 typedef SYS_MATH_RETURN (*Sys2)(SYS_MATH_PARAM r0,SYS_MATH_PARAM r1);
-
-class FunctionVM;
 
 // WARNING: Do not change this structure without notice!!!
 // Platform specific code may depend on the exact layout and size! [trf]

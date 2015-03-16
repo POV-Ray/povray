@@ -1,38 +1,43 @@
-/*******************************************************************************
- * matrices.h
- *
- * This module contains all defines, typedefs, and prototypes for MATRICES.CPP.
- *
- * ---------------------------------------------------------------------------
- * Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
- * Copyright 1991-2013 Persistence of Vision Raytracer Pty. Ltd.
- *
- * POV-Ray is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * POV-Ray is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------------
- * POV-Ray is based on the popular DKB raytracer version 2.12.
- * DKBTrace was originally written by David K. Buck.
- * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
- * ---------------------------------------------------------------------------
- * $File: //depot/povray/smp/source/backend/math/matrices.h $
- * $Revision: #18 $
- * $Change: 6161 $
- * $DateTime: 2013/12/05 18:42:17 $
- * $Author: clipka $
- *******************************************************************************/
+//******************************************************************************
+///
+/// @file backend/math/matrices.h
+///
+/// This module contains all defines, typedefs, and prototypes for
+/// `matrices.cpp`.
+///
+/// @copyright
+/// @parblock
+///
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+///
+/// POV-Ray is free software: you can redistribute it and/or modify
+/// it under the terms of the GNU Affero General Public License as
+/// published by the Free Software Foundation, either version 3 of the
+/// License, or (at your option) any later version.
+///
+/// POV-Ray is distributed in the hope that it will be useful,
+/// but WITHOUT ANY WARRANTY; without even the implied warranty of
+/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+/// GNU Affero General Public License for more details.
+///
+/// You should have received a copy of the GNU Affero General Public License
+/// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+///
+/// ----------------------------------------------------------------------------
+///
+/// POV-Ray is based on the popular DKB raytracer version 2.12.
+/// DKBTrace was originally written by David K. Buck.
+/// DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
+///
+/// @endparblock
+///
+//******************************************************************************
 
 #ifndef MATRICES_H
 #define MATRICES_H
+
+#include "backend/frame.h"
 
 namespace pov
 {
@@ -48,7 +53,16 @@ namespace pov
 * Global typedefs
 ******************************************************************************/
 
+typedef DBL MATRIX[4][4]; ///< @todo       Make this obsolete.
 
+
+typedef struct Transform_Struct TRANSFORM;
+
+struct Transform_Struct
+{
+    MATRIX matrix;
+    MATRIX inverse;
+};
 
 
 /*****************************************************************************
@@ -95,7 +109,6 @@ void Compute_Coordinate_Transform (TRANSFORM *trans, const Vector3d& origin, Vec
 TRANSFORM *Create_Transform (void);
 TRANSFORM *Copy_Transform (const TRANSFORM *Old);
 void Destroy_Transform (TRANSFORM *Trans);
-VECTOR_4D *Create_Vector_4D (void);
 DBL *Create_Float (void);
 void MInvers (MATRIX r, const MATRIX m);
 int MInvers3(const Matrix3x3& inM, Matrix3x3& outM);

@@ -1,37 +1,40 @@
-/*******************************************************************************
- * vfesession.h
- *
- * This file contains declarations relating to the vfe session management class.
- *
- * Author: Christopher J. Cason
- *
- * ---------------------------------------------------------------------------
- * Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
- * Copyright 1991-2013 Persistence of Vision Raytracer Pty. Ltd.
- *
- * POV-Ray is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * POV-Ray is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------------
- * POV-Ray is based on the popular DKB raytracer version 2.12.
- * DKBTrace was originally written by David K. Buck.
- * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
- * ---------------------------------------------------------------------------
- * $File: //depot/povray/smp/vfe/vfesession.h $
- * $Revision: #33 $
- * $Change: 6132 $
- * $DateTime: 2013/11/25 14:23:41 $
- * $Author: clipka $
- *******************************************************************************/
+//******************************************************************************
+///
+/// @file vfe/vfesession.h
+///
+/// This file contains declarations relating to the vfe session management
+/// class.
+///
+/// @author: Christopher J. Cason
+///
+/// @copyright
+/// @parblock
+///
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+///
+/// POV-Ray is free software: you can redistribute it and/or modify
+/// it under the terms of the GNU Affero General Public License as
+/// published by the Free Software Foundation, either version 3 of the
+/// License, or (at your option) any later version.
+///
+/// POV-Ray is distributed in the hope that it will be useful,
+/// but WITHOUT ANY WARRANTY; without even the implied warranty of
+/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+/// GNU Affero General Public License for more details.
+///
+/// You should have received a copy of the GNU Affero General Public License
+/// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+///
+/// ----------------------------------------------------------------------------
+///
+/// POV-Ray is based on the popular DKB raytracer version 2.12.
+/// DKBTrace was originally written by David K. Buck.
+/// DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
+///
+/// @endparblock
+///
+//******************************************************************************
 
 #ifndef __VFESESSION_H__
 #define __VFESESSION_H__
@@ -535,7 +538,7 @@ namespace vfe
       // wants a preview window. The passed parameter is a DisplayCreator (see the
       // typedef earlier on in vfeSession and the example in CreateFrontend() and
       // WinDisplayCreator() of source/windows/pvfrontend.cpp).
-      // 
+      //
       // If this method is not called, the display creator defaults to
       // vfeSession::DefaultDisplayCreator().
       virtual void SetDisplayCreator(DisplayCreator creator) { m_DisplayCreator = creator; }
@@ -725,7 +728,7 @@ namespace vfe
       // clock changes by caching the last value your implementation returns
       // and adding an appropriate offset if you calculate a lower value later
       // in the session.
-      // 
+      //
       // NB this method is pure virtual.
       virtual POV_LONG GetTimestamp(void) const = 0;
 

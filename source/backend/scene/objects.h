@@ -11,7 +11,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -34,10 +34,12 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
 #ifndef OBJECTS_H
 #define OBJECTS_H
+
+#include "core/material/texture.h"
 
 #include "backend/bounding/bbox.h"
 
@@ -159,7 +161,7 @@ class ObjectBase
         int Type; // TODO - make obsolete
         TEXTURE *Texture;
         TEXTURE *Interior_Texture;
-        Interior *interior;
+        InteriorPtr interior;
         vector<ObjectPtr> Bound;
         vector<ObjectPtr> Clip;
         vector<LightSource *> LLights;  ///< Used for light groups.
@@ -177,7 +179,7 @@ class ObjectBase
         /// Construct object from scratch.
         ObjectBase(int t) :
             Type(t),
-            Texture(NULL), Interior_Texture(NULL), interior(NULL), Trans(NULL), UV_Trans(NULL),
+            Texture(NULL), Interior_Texture(NULL), interior(), Trans(NULL), UV_Trans(NULL),
             Ph_Density(0), RadiosityImportance(0.0), Flags(0)
         {
             Make_BBox(BBox, -BOUND_HUGE/2.0, -BOUND_HUGE/2.0, -BOUND_HUGE/2.0, BOUND_HUGE, BOUND_HUGE, BOUND_HUGE);
@@ -199,7 +201,7 @@ class ObjectBase
             {
                 o.Texture = NULL;
                 o.Interior_Texture = NULL;
-                o.interior = NULL;
+                o.interior.reset();
                 o.Trans = NULL;
                 o.UV_Trans = NULL;
                 o.Bound.clear();

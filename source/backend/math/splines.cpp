@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -74,13 +74,13 @@ namespace pov
 * Local functions
 ******************************************************************************/
 
-DBL linear_interpolate(const SPLINE_ENTRY * se, int i, int k, DBL p);
-DBL quadratic_interpolate(const SPLINE_ENTRY * se, int i, int k, DBL p);
-DBL natural_interpolate(const SPLINE_ENTRY * se, int i, int k, DBL p);
-DBL catmull_rom_interpolate(const SPLINE_ENTRY * se, int i, int k, DBL p);
-int findt(const SPLINE * sp, DBL Time);
-void mkfree(SPLINE * sp, int i);
-void Precompute_Cubic_Coeffs(SPLINE *sp);
+DBL linear_interpolate(const SplineEntryList& se, SplineEntryList::size_type i, int k, DBL p);
+DBL quadratic_interpolate(const SplineEntryList& se, SplineEntryList::size_type i, int k, DBL p);
+DBL natural_interpolate(const SplineEntryList& se, SplineEntryList::size_type i, int k, DBL p);
+DBL catmull_rom_interpolate(const SplineEntryList& se, SplineEntryList::size_type i, int k, DBL p);
+SplineEntryList::size_type findt(const GenericSpline * sp, DBL Time);
+void mkfree(GenericSpline * sp, SplineEntryList::size_type i);
+void Precompute_Cubic_Coeffs(GenericSpline *sp);
 
 /*****************************************************************************
 *
@@ -108,35 +108,37 @@ void Precompute_Cubic_Coeffs(SPLINE *sp);
 *
 ******************************************************************************/
 
-void Precompute_Cubic_Coeffs(SPLINE *sp)
+void Precompute_Cubic_Coeffs(GenericSpline *sp)
 {
-    int i, k;
+    SplineEntryList::size_type i, k;
     DBL *h;
     DBL *b;
     DBL *u;
     DBL *v;
 
-    h = reinterpret_cast<DBL *>(POV_MALLOC(sp->Number_Of_Entries*sizeof(DBL), "Spline coefficient storage"));
-    b = reinterpret_cast<DBL *>(POV_MALLOC(sp->Number_Of_Entries*sizeof(DBL), "Spline coefficient storage"));
-    u = reinterpret_cast<DBL *>(POV_MALLOC(sp->Number_Of_Entries*sizeof(DBL), "Spline coefficient storage"));
-    v = reinterpret_cast<DBL *>(POV_MALLOC(sp->Number_Of_Entries*sizeof(DBL), "Spline coefficient storage"));
+    SplineEntryList::size_type numEntries = sp->SplineEntries.size();
+
+    h = new DBL[numEntries];
+    b = new DBL[numEntries];
+    u = new DBL[numEntries];
+    v = new DBL[numEntries];
 
     for(k = 0; k < 5; k++)
     {
-        for(i = 0; i <= sp->Number_Of_Entries - 2; i++)
+        for(i = 0; i <= numEntries - 2; i++)
         {
             h[i] = sp->SplineEntries[i+1].par - sp->SplineEntries[i].par;
             b[i] = (sp->SplineEntries[i+1].vec[k] - sp->SplineEntries[i].vec[k])/h[i];
         }
         u[1] = 2*(h[0]+h[1]);
         v[1] = 6*(b[1]-b[0]);
-        for(i = 2; i <= sp->Number_Of_Entries - 2; i++)
+        for(i = 2; i <= numEntries - 2; i++)
         {
             u[i] = 2*(h[i]+h[i-1]) - (h[i-1]*h[i-1])/u[i-1];
             v[i] = 6*(b[i]-b[i-1]) - (h[i-1]*v[i-1])/u[i-1];
         }
-        sp->SplineEntries[sp->Number_Of_Entries-1].coeff[k] = 0;
-        for(i = sp->Number_Of_Entries-2; i > 0; i--)
+        sp->SplineEntries.back().coeff[k] = 0;
+        for(i = numEntries-2; i > 0; i--)
         {
             sp->SplineEntries[i].coeff[k] = (v[i] - h[i]*sp->SplineEntries[i+1].coeff[k])/u[i];
         }
@@ -144,10 +146,10 @@ void Precompute_Cubic_Coeffs(SPLINE *sp)
     }
     sp->Coeffs_Computed = true;
 
-    POV_FREE(h);
-    POV_FREE(b);
-    POV_FREE(u);
-    POV_FREE(v);
+    delete[] h;
+    delete[] b;
+    delete[] u;
+    delete[] v;
 }
 
 
@@ -180,7 +182,7 @@ void Precompute_Cubic_Coeffs(SPLINE *sp)
 *
 ******************************************************************************/
 
-DBL linear_interpolate(const SPLINE_ENTRY * se, int i, int k, DBL p)
+DBL linear_interpolate(const SplineEntryList& se, SplineEntryList::size_type i, int k, DBL p)
 {
     DBL p1, p2, v1, v2;
     p1 = se[i].par;
@@ -221,7 +223,7 @@ DBL linear_interpolate(const SPLINE_ENTRY * se, int i, int k, DBL p)
 *
 ******************************************************************************/
 
-DBL quadratic_interpolate(const SPLINE_ENTRY * se, int i, int k, DBL p)
+DBL quadratic_interpolate(const SplineEntryList& se, SplineEntryList::size_type i, int k, DBL p)
 {
     /* fit quadratic function to three point*/
     DBL n;
@@ -278,7 +280,7 @@ DBL quadratic_interpolate(const SPLINE_ENTRY * se, int i, int k, DBL p)
 *
 ******************************************************************************/
 
-DBL natural_interpolate(const SPLINE_ENTRY * se, int i, int k, DBL p)
+DBL natural_interpolate(const SplineEntryList& se, SplineEntryList::size_type i, int k, DBL p)
 {
     DBL h, tmp;
     h = se[i+1].par - se[i].par;
@@ -318,7 +320,7 @@ DBL natural_interpolate(const SPLINE_ENTRY * se, int i, int k, DBL p)
 *
 ******************************************************************************/
 
-DBL catmull_rom_interpolate(const SPLINE_ENTRY * se, int i, int k, DBL p)
+DBL catmull_rom_interpolate(const SplineEntryList& se, SplineEntryList::size_type i, int k, DBL p)
 {
     DBL dt = (se[i+1].par - se[i].par); /* Time between se[i] and se[i+1] */
     DBL u = (p - se[i].par)/dt;         /* Fractional time from se[i] to p */
@@ -361,22 +363,22 @@ DBL catmull_rom_interpolate(const SPLINE_ENTRY * se, int i, int k, DBL p)
 *
 ******************************************************************************/
 
-int findt(const SPLINE * sp, DBL Time)
+SplineEntryList::size_type findt(const GenericSpline * sp, DBL Time)
 {
-    int i, i2;
-    SPLINE_ENTRY * se;
-    se = sp->SplineEntries;
-    if(sp->Number_Of_Entries == 0) return 0;
+    SplineEntryList::size_type i, i2;
+    const SplineEntryList& se = sp->SplineEntries;
+    if(sp->SplineEntries.empty()) return 0;
+    SplineEntryList::size_type numEntries = se.size();
 
-    if(Time <= se[0].par) return 0;
+    if(Time <= se.front().par) return 0;
 
-    if(Time >= se[sp->Number_Of_Entries-1].par) return sp->Number_Of_Entries;
+    if(Time >= se.back().par) return numEntries;
 
-    i = sp->Number_Of_Entries / 2;
+    i = numEntries / 2;
     /* Bracket the proper entry */
     if( Time > se[i].par ) /* i is lower, i2 is upper */
     {
-        i2 = sp->Number_Of_Entries-1;
+        i2 = numEntries-1;
         while(i2 - i > 1)
         {
             if(Time > se[i+(i2-i)/2].par)
@@ -430,13 +432,13 @@ int findt(const SPLINE * sp, DBL Time)
 *
 ******************************************************************************/
 
-void mkfree(SPLINE * sp, int i)
+void mkfree(GenericSpline * sp, SplineEntryList::size_type i)
 {
-    int j;
-    SPLINE_ENTRY * se;
-    se = sp->SplineEntries;
+    SplineEntryList::size_type j;
+    SplineEntryList& se = sp->SplineEntries;
 
-    for (j=sp->Number_Of_Entries; j>i; j--)
+    se.resize(se.size()+1);
+    for (j=sp->SplineEntries.size()-1; j>i; j--)
         se[j] = se[j-1];
 }
 
@@ -472,26 +474,23 @@ void mkfree(SPLINE * sp, int i)
 *
 ******************************************************************************/
 
-SPLINE * Create_Spline(int Type)
-{
-    SPLINE * New;
-    New = reinterpret_cast<SPLINE *>(POV_MALLOC(sizeof(SPLINE), "spline"));
-    New->SplineEntries = reinterpret_cast<SPLINE_ENTRY *>(POV_MALLOC(INIT_SPLINE_SIZE*sizeof(SPLINE_ENTRY), "spline entry"));
-    New->Max_Entries = INIT_SPLINE_SIZE;
-    New->Number_Of_Entries = 0;
-    New->Type = Type;
-    New->Coeffs_Computed = false;
-    New->Terms = 2;
-    // New->Cache_Valid = false; [JG] flyspray #294, cache is not thread-safe
-    New->ref_count = 1;
-    int i;
-    for (i=0; i< New->Max_Entries; i++)
-    {
-        New->SplineEntries[i].par=-1e6;   //this should be a negative large number
-    }
+GenericSpline::GenericSpline() :
+    Coeffs_Computed(false),
+    Terms(2),
+    ref_count(1)
+{}
 
-    return New;
-}
+LinearSpline::LinearSpline() : GenericSpline()
+{}
+
+QuadraticSpline::QuadraticSpline() : GenericSpline()
+{}
+
+NaturalSpline::NaturalSpline() : GenericSpline()
+{}
+
+CatmullRomSpline::CatmullRomSpline() : GenericSpline()
+{}
 
 
 /*****************************************************************************
@@ -525,41 +524,55 @@ SPLINE * Create_Spline(int Type)
 *
 ******************************************************************************/
 
-SPLINE * Copy_Spline(const SPLINE * Old)
+GenericSpline::GenericSpline(const GenericSpline& o) :
+    SplineEntries(o.SplineEntries),
+    Coeffs_Computed(false),
+    Terms(o.Terms),
+    ref_count(1)
+{}
+
+LinearSpline::LinearSpline(const GenericSpline& o) : GenericSpline(o)
+{}
+
+QuadraticSpline::QuadraticSpline(const GenericSpline& o) : GenericSpline(o)
+{}
+
+NaturalSpline::NaturalSpline(const GenericSpline& o) : GenericSpline(o)
+{}
+
+CatmullRomSpline::CatmullRomSpline(const GenericSpline& o) : GenericSpline(o)
+{}
+
+GenericSpline * Copy_Spline(const GenericSpline * Old)
 {
-    SPLINE * New;
-    New = reinterpret_cast<SPLINE *>(POV_MALLOC(sizeof(SPLINE), "spline"));
-
-    New->SplineEntries = reinterpret_cast<SPLINE_ENTRY *>(POV_MALLOC(Old->Number_Of_Entries*sizeof(SPLINE_ENTRY), "spline entry"));
-    POV_MEMCPY(New->SplineEntries, Old->SplineEntries, Old->Number_Of_Entries*sizeof(SPLINE_ENTRY));
-
-    New->Max_Entries = Old->Number_Of_Entries;
-    New->Number_Of_Entries = Old->Number_Of_Entries;
-    New->Type = Old->Type;
-    New->Coeffs_Computed = Old->Coeffs_Computed;
-    New->Terms = Old->Terms;
-    //[JG] flyspray #294, cache is not thread-safe
-    // New->Cache_Valid = false; // we don't copy the cache so mark it as invalid
-    New->ref_count = 1;
-
-    return New;
+    return Old->Clone();
 }
 
 
-void Acquire_Spline_Reference(SPLINE * Spline)
+void GenericSpline::AcquireReference()
 {
-    if (Spline)
-    {
-        if (Spline->ref_count >= INT_MAX)
-            throw POV_EXCEPTION_STRING("Too many unresolved references to single spline\n");
-        Spline->ref_count ++;
-    }
+    if (ref_count >= INT_MAX)
+        throw POV_EXCEPTION_STRING("Too many unresolved references to single spline\n");
+    ref_count ++;
 }
 
-void Release_Spline_Reference(SPLINE * Spline)
+void Acquire_Spline_Reference(GenericSpline* sp)
 {
-    if (Spline)
-        Destroy_Spline(Spline);
+    if (sp)
+        sp->AcquireReference();
+}
+
+void GenericSpline::ReleaseReference()
+{
+    if (ref_count <= 0)
+        throw POV_EXCEPTION_STRING("Internal error: Invalid spline reference count\n");
+    ref_count --;
+}
+
+void Release_Spline_Reference(GenericSpline* sp)
+{
+    if (sp)
+        Destroy_Spline(sp);
 }
 
 /*****************************************************************************
@@ -588,17 +601,14 @@ void Release_Spline_Reference(SPLINE * Spline)
 *
 ******************************************************************************/
 
-void Destroy_Spline(SPLINE * Spline)
-{
-    if (Spline->ref_count <= 0)
-        throw POV_EXCEPTION_STRING("Internal error: Invalid spline reference count\n");
+GenericSpline::~GenericSpline()
+{}
 
-    Spline->ref_count --;
-    if (Spline->ref_count == 0)
-    {
-        POV_FREE(Spline->SplineEntries);
-        POV_FREE(Spline);
-    }
+void Destroy_Spline(GenericSpline* sp)
+{
+    sp->ReleaseReference();
+    if (sp->ref_count == 0)
+        delete sp;
 }
 
 
@@ -639,29 +649,19 @@ void Destroy_Spline(SPLINE * Spline)
 *
 ******************************************************************************/
 
-void Insert_Spline_Entry(SPLINE * sp, DBL p, const EXPRESS v)
+void Insert_Spline_Entry(GenericSpline * sp, DBL p, const EXPRESS& v)
 {
-    int i, k;
+    SplineEntryList::size_type i;
+    int k;
 
     /* Reset the Coeffs_Computed flag.  Inserting a new point invalidates
      *  pre-computed coefficients */
     sp->Coeffs_Computed = false;
-    // sp->Cache_Valid = false;[JG] flyspray #294, cache is not thread-safe
-    /* If all space is used, reallocate */
-    if(sp->Number_Of_Entries >= sp->Max_Entries)
-    {
-        sp->Max_Entries += INIT_SPLINE_SIZE;
-        sp->SplineEntries = reinterpret_cast<SPLINE_ENTRY *>(POV_REALLOC(sp->SplineEntries, sp->Max_Entries * sizeof(SPLINE_ENTRY), "Temporary Spline Entries"));
-        for (i = sp->Number_Of_Entries; i < sp->Max_Entries; i++)
-        {
-            sp->SplineEntries[i].par=-1e6;
-        }
-    }
     i = findt(sp, p);
     /* If p is already in spline, replace */
-    /* The clause after the || is needed because findt returns sp->Number_Of_Entries
+    /* The clause after the || is needed because findt returns sp->SplineEntries.size()
      * if p is greater than OR EQUAL TO the highest par in the spline */
-    if(sp->Number_Of_Entries != 0 && ((sp->SplineEntries[i].par == p) || (i == sp->Number_Of_Entries && sp->SplineEntries[i-1].par == p)))
+    if(!sp->SplineEntries.empty() && ((sp->SplineEntries[i].par == p) || (i == sp->SplineEntries.size() && sp->SplineEntries[i-1].par == p)))
     {
         for(k=0; k<5; k++)
             sp->SplineEntries[i].vec[k] = v[k];
@@ -673,8 +673,6 @@ void Insert_Spline_Entry(SPLINE * sp, DBL p, const EXPRESS v)
 
         for(k=0; k<5; k++)
             sp->SplineEntries[i].vec[k] = v[k];
-
-        sp->Number_Of_Entries += 1;
     }
 }
 
@@ -723,132 +721,112 @@ void Insert_Spline_Entry(SPLINE * sp, DBL p, const EXPRESS v)
 *
 ******************************************************************************/
 
-DBL Get_Spline_Val(SPLINE *sp, DBL p, EXPRESS v, int *Terms)
+void LinearSpline::Get(DBL p, EXPRESS& v)
 {
-    int i, k;
-    int last;
-    SPLINE_ENTRY * se;
-
-    *Terms = sp->Terms;
-
-    if(!sp->Coeffs_Computed)
+    if (SplineEntries.size() == 1)
+        memcpy(&v, &SplineEntries.front().vec, sizeof(EXPRESS));
+    else
     {
-        switch(sp->Type)
+        /* Find which spline segment we're in.  i is the control point at the end of the segment */
+        SplineEntryList::size_type i = findt(this, p);
+        for(int k=0; k<5; k++)
         {
-            case NATURAL_SPLINE:
-                Precompute_Cubic_Coeffs(sp);
-                break;
-            default:
-                break;
+            /* If outside spline range, return first or last point */
+            if(i == 0)
+                v[k] = SplineEntries.front().vec[k];
+            else if(i >= SplineEntries.size())
+                v[k] = SplineEntries.back().vec[k];
+            /* Else, normal case */
+            else
+                v[k] = linear_interpolate(SplineEntries, i-1, k, p);
         }
     }
-/* [JG] flyspray #294, cache is not thread-safe
-    // check if the value is in the cache
-    if((sp->Cache_Point == p) && (sp->Cache_Type == sp->Type))
+}
+
+void QuadraticSpline::Get(DBL p, EXPRESS& v)
+{
+    if (SplineEntries.size() == 1)
+        memcpy(&v, &SplineEntries.front().vec, sizeof(EXPRESS));
+    else
     {
-        if(sp->Cache_Valid == true) // doing this here is more efficient as it is rarely false [trf]
+        /* Find which spline segment we're in.  i is the control point at the end of the segment */
+        SplineEntryList::size_type i = findt(this, p);
+        for(int k=0; k<5; k++)
         {
-            Assign_Express(v, sp->Cache_Data);
-            return sp->Cache_Data[0];
-        }
-    }
-
-    // init some cache data
-    sp->Cache_Valid = false;
-    sp->Cache_Type = sp->Type;
-    sp->Cache_Point = p;
- */
-    last = sp->Number_Of_Entries-1;
-    se = sp->SplineEntries;
-
-    if(last == 0)
-    {/* if only one entry then return this */
-        for(k=0; k<5; k++)
-            v[k] = se[0].vec[k];
-        return se[0].vec[0];
-    }
-
-    /* Find which spline segment we're in.  i is the control point at the end of the segment */
-    i = findt(sp, p);
-
-    switch(sp->Type)
-    {
-        case LINEAR_SPLINE:
-            for(k=0; k<5; k++)
+            /* If outside the spline range, return the first or last point */
+            if(i == 0)
+                v[k] = SplineEntries.front().vec[k];
+            else if(i >= SplineEntries.size())
+                v[k] = SplineEntries.back().vec[k];
+            /* If not enough points, reduce order */
+            else if(SplineEntries.size() == 2)
+                v[k] = linear_interpolate(SplineEntries, i-1, k, p);
+            else
             {
-                /* If outside spline range, return first or last point */
-                if(i == 0)
-                    v[k] = se[0].vec[k];
-                else if(i > last)
-                    v[k] = se[last].vec[k];
-                /* Else, normal case */
-                else
-                    v[k] = linear_interpolate(se, i-1, k, p);
-            }
-            break;
-        case QUADRATIC_SPLINE:
-            for(k=0; k<5; k++)
-            {
-                /* If outside the spline range, return the first or last point */
-                if(i == 0)
-                    v[k] = se[0].vec[k];
-                else if(i > last)
-                    v[k] = se[last].vec[k];
-                /* If not enough points, reduce order */
-                else if(last == 1)
-                    v[k] = linear_interpolate(se, i-1, k, p);
                 /* Normal case: between the second and last points */
-                else if(i > 1)
-                {
-                    v[k] = quadratic_interpolate(se, i-1, k, p);
-                }
+                if(i > 1)
+                    v[k] = quadratic_interpolate(SplineEntries, i-1, k, p);
                 else /* Special case: between first and second points */
-                {
-                    v[k] = quadratic_interpolate(se, i, k, p);
-                }
+                    v[k] = quadratic_interpolate(SplineEntries, i, k, p);
             }
-            break;
-        case NATURAL_SPLINE:
-            for(k=0; k<5; k++)
-            {
-                /* If outside the spline range, return the first or last point */
-                if(i == 0)
-                    v[k] = se[0].vec[k];
-                else if(i > last)
-                    v[k] = se[last].vec[k];
-                /* Else, normal case.  cubic_interpolate can handle the case of not enough points */
-                else
-                    v[k] = natural_interpolate(se, i-1, k, p);
-            }
-            break;
-        case CATMULL_ROM_SPLINE:
-            for(k=0; k<5; k++)
-            {
-                /* If only two points, return their average */
-                if(last == 1)
-                    v[k] = (se[0].vec[k] + se[1].vec[k])/2.0;
-                /* Catmull-Rom: If only three points, return the second one */
-                /* Catmull-Rom: Can't interpolate before second point or after next-to-last */
-                else if(i < 2)
-                    v[k] = se[1].vec[k];
-                else if(i >= last)
-                    v[k] = se[last-1].vec[k];
-                /* Else, normal case */
-                else
-                    v[k] = catmull_rom_interpolate(se, i-1, k, p);
-            }
-            break;
-        default:
-            throw POV_EXCEPTION_STRING("Unknown spline type found.\n");
-
+        }
     }
+}
 
-/* [JG] flyspray #294, cache is not thread-safe
-    // put data in cache
-    Assign_Express(sp->Cache_Data, v);
-    sp->Cache_Valid = true;
- */
+void NaturalSpline::Get(DBL p, EXPRESS& v)
+{
+    if (SplineEntries.size() == 1)
+        memcpy(&v, &SplineEntries.front().vec, sizeof(EXPRESS));
+    else
+    {
+        if (!Coeffs_Computed)
+            Precompute_Cubic_Coeffs(this);
+        /* Find which spline segment we're in.  i is the control point at the end of the segment */
+        SplineEntryList::size_type i = findt(this, p);
+        for(int k=0; k<5; k++)
+        {
+            /* If outside the spline range, return the first or last point */
+            if(i == 0)
+                v[k] = SplineEntries.front().vec[k];
+            else if(i >= SplineEntries.size())
+                v[k] = SplineEntries.back().vec[k];
+            /* Else, normal case.  cubic_interpolate can handle the case of not enough points */
+            else
+                v[k] = natural_interpolate(SplineEntries, i-1, k, p);
+        }
+    }
+}
 
+void CatmullRomSpline::Get(DBL p, EXPRESS& v)
+{
+    if (SplineEntries.size() == 1)
+        memcpy(&v, &SplineEntries.front().vec, sizeof(EXPRESS));
+    else
+    {
+        /* Find which spline segment we're in.  i is the control point at the end of the segment */
+        SplineEntryList::size_type i = findt(this, p);
+        for(int k=0; k<5; k++)
+        {
+            /* If only two points, return their average */
+            if(SplineEntries.size() == 2)
+                v[k] = (SplineEntries[0].vec[k] + SplineEntries[1].vec[k])/2.0;
+            /* Catmull-Rom: If only three points, return the second one */
+            else if(i < 2)
+                v[k] = SplineEntries[1].vec[k];
+            /* Catmull-Rom: Can't interpolate before second point or after next-to-last */
+            else if(i >= SplineEntries.size()-1)
+                v[k] = SplineEntries[SplineEntries.size()-2].vec[k];
+            /* Else, normal case */
+            else
+                v[k] = catmull_rom_interpolate(SplineEntries, i-1, k, p);
+        }
+    }
+}
+
+DBL Get_Spline_Val(GenericSpline *sp, DBL p, EXPRESS& v, int *Terms)
+{
+    *Terms = sp->Terms;
+    sp->Get(p, v);
     return v[0];
 }
 

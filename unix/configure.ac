@@ -154,7 +154,7 @@ This is an unofficial version compiled by:
  $COMPILED_BY
 The POV-Ray Team(tm) is not responsible for supporting this version.])
 
-AC_DEFINE_UNQUOTED([DISTRIBUTION_MESSAGE_2], [" $COMPILED_BY"], [Who compiled this binary.])
+AC_DEFINE_UNQUOTED([BUILT_BY], [" $COMPILED_BY"], [Who compiled this binary.])
 
 
 ###############################################################################

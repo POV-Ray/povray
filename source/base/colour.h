@@ -9,7 +9,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -87,12 +87,14 @@ class GenericRGBEColour;
 /// @{
 /// @remark    These do not exactly match CCIR Recommendation 601-1, which specifies 0.299, 0.587 and
 ///            0.114 respectively.
+/// @remark    We choose a high-precision type for these because otherwise Greyscale(<1,1,1>) won't
+///            properly sum up to 1 on some systems.
 /// @todo      For linear RGB with sRGB primaries this should be 0.2126, 0.7152 and 0.0722
 ///            respectively.
 ///
-const float kRedIntensity   = 0.297;
-const float kGreenIntensity = 0.589;
-const float kBlueIntensity  = 0.114;
+const PreciseColourChannel kRedIntensity   = 0.297;
+const PreciseColourChannel kGreenIntensity = 0.589;
+const PreciseColourChannel kBlueIntensity  = 0.114;
 /// @}
 
 /// Generic template class to hold and manipulate an RGB colour.
@@ -666,7 +668,7 @@ class GenericRGBFTColour
 
         typedef DBL EXPRESS[5];
 
-        /// Default constructor. 
+        /// Default constructor.
         inline GenericRGBFTColour() :
             mColour(0.0),
             mFilter(0.0),
@@ -711,7 +713,7 @@ class GenericRGBFTColour
             mTransm(transm)
         {}
 
-        inline explicit GenericRGBFTColour(const EXPRESS expr) :
+        inline explicit GenericRGBFTColour(const EXPRESS& expr) :
             mColour(expr[0], expr[1], expr[2]),
             mFilter(expr[3]),
             mTransm(expr[4])
@@ -763,7 +765,7 @@ class GenericRGBFTColour
             mTransm = 0.0;
         }
 
-        inline void Get(EXPRESS expr, unsigned int n) const
+        inline void Get(EXPRESS& expr, unsigned int n) const
         {
             if (n > 0) expr[0] = mColour.red();
             if (n > 1) expr[1] = mColour.green();
@@ -772,7 +774,7 @@ class GenericRGBFTColour
             if (n > 4) expr[4] = mTransm;
         }
 
-        inline void Set(const EXPRESS expr, unsigned int n)
+        inline void Set(const EXPRESS& expr, unsigned int n)
         {
             if (n > 0) mColour.red()   = expr[0];
             if (n > 1) mColour.green() = expr[1];
@@ -971,7 +973,7 @@ class GenericRGBTColour
         template<typename T2>
         friend class GenericRGBTColour;
 
-        /// Default constructor. 
+        /// Default constructor.
         inline GenericRGBTColour() :
             mColour(0.0),
             mTransm(0.0)
@@ -1781,7 +1783,7 @@ class GenericTransColour
 
         typedef DBL EXPRESS[5];
 
-        /// Default constructor. 
+        /// Default constructor.
         inline GenericTransColour() :
             mColour(0.0),
             mFilter(0.0),

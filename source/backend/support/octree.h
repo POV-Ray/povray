@@ -1,44 +1,55 @@
-/*******************************************************************************
- * octree.h
- *
- * Oct-tree routine prototypes.  Use by Radiosity calculation routies.
- *
+//******************************************************************************
+///
+/// @file backend/support/octree.h
+///
+/// Oct-tree routine prototypes. Use by Radiosity calculation routies.
+///
+/// @author Jim McElhiney
+///
+/// @copyright
+/// @parblock
+///
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+///
+/// POV-Ray is free software: you can redistribute it and/or modify
+/// it under the terms of the GNU Affero General Public License as
+/// published by the Free Software Foundation, either version 3 of the
+/// License, or (at your option) any later version.
+///
+/// POV-Ray is distributed in the hope that it will be useful,
+/// but WITHOUT ANY WARRANTY; without even the implied warranty of
+/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+/// GNU Affero General Public License for more details.
+///
+/// You should have received a copy of the GNU Affero General Public License
+/// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+///
+/// ----------------------------------------------------------------------------
+///
+/// POV-Ray is based on the popular DKB raytracer version 2.12.
+/// DKBTrace was originally written by David K. Buck.
+/// DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
+///
+/// @endparblock
+///
+//******************************************************************************
+
+/*
  * Implemented by and (c) 1994 Jim McElhiney, mcelhiney@acm.org or cserve 71201,1326
  * All standard POV distribution rights granted.  All other rights reserved.
- *
- * ---------------------------------------------------------------------------
- * Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
- * Copyright 1991-2013 Persistence of Vision Raytracer Pty. Ltd.
- *
- * POV-Ray is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * POV-Ray is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------------
- * POV-Ray is based on the popular DKB raytracer version 2.12.
- * DKBTrace was originally written by David K. Buck.
- * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
- * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/backend/support/octree.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
- *******************************************************************************/
+*/
 
 #ifndef OCTREE_H
 #define OCTREE_H
 
 #include "backend/frame.h"
-#include "base/fileinputoutput.h"
+
+namespace pov_base
+{
+class IStream;
+class OStream;
+}
 
 namespace pov
 {
@@ -79,50 +90,50 @@ typedef struct ot_read_info_struct OT_READ_INFO;
 // Each node in the oct-tree has a (possibly null) linked list of these data blocks off it.
 struct ot_block_struct
 {
-	// TODO for memory efficiency we could probably use single-precision data types for the vector stuff
-	OT_BLOCK    *next;      // next block in the same node
-	Vector3d    Point;
-	Vector3d    S_Normal;
-	Vector3d    To_Nearest_Surface;
-	MathColour  dx, dy, dz; // gradients, not colors, but used only to manipulate colors [trf]
-	MathColour  Illuminance;
+    // TODO for memory efficiency we could probably use single-precision data types for the vector stuff
+    OT_BLOCK    *next;      // next block in the same node
+    Vector3d    Point;
+    Vector3d    S_Normal;
+    Vector3d    To_Nearest_Surface;
+    MathColour  dx, dy, dz; // gradients, not colors, but used only to manipulate colors [trf]
+    MathColour  Illuminance;
     SNGL        Brilliance; // surface brilliance for which the sample was computed
-	SNGL        Harmonic_Mean_Distance;
-	SNGL        Nearest_Distance;
-	SNGL        Quality;    // quality of the data from which this sample was aggregated
-	OT_TILE     TileId;     // tile in which this sample was taken
-	OT_PASS     Pass;       // pass during which this sample was taken (OT_PASS_FINAL for final render)
-	OT_DEPTH    Bounce_Depth;
+    SNGL        Harmonic_Mean_Distance;
+    SNGL        Nearest_Distance;
+    SNGL        Quality;    // quality of the data from which this sample was aggregated
+    OT_TILE     TileId;     // tile in which this sample was taken
+    OT_PASS     Pass;       // pass during which this sample was taken (OT_PASS_FINAL for final render)
+    OT_DEPTH    Bounce_Depth;
 };
 
 // This is the information necessary to name an oct-tree node.
 struct ot_id_struct
 {
-	int x, y, z;
-	int Size;
+    int x, y, z;
+    int Size;
 };
 
 // These are the structures that make up the oct-tree itself, known as nodes
 struct ot_node_struct
 {
-	OT_ID    Id;
-	OT_BLOCK *Values;
-	OT_NODE  *Kids[8];
+    OT_ID    Id;
+    OT_BLOCK *Values;
+    OT_NODE  *Kids[8];
 };
 
 // These are informations the octree reader needs to know
 struct ot_read_param_struct
 {
-	DBL       RealErrorBound;
+    DBL       RealErrorBound;
 };
 
 // These are informations the octree reader generates
 struct ot_read_info_struct
 {
-	MathColour  Gather_Total;
-	long        Gather_Total_Count;
-	DBL         Brightness;
-	bool        FirstRadiosityPass;
+    MathColour  Gather_Total;
+    long        Gather_Total_Count;
+    DBL         Brightness;
+    bool        FirstRadiosityPass;
 };
 
 /*****************************************************************************
