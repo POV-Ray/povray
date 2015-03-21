@@ -135,6 +135,13 @@ recommanded to generate a fully-featured POV-Ray executable.
   http://www.libsdl.org
 
 
+2.3 Compatibility issues
+    ====================
+
+- Boost version 1.46 has been reported to be unstable on the Raspberry Pi 2. We recommend using Boost version 1.50 on
+  this platform.
+
+
 ====================================================
 3. Configuring, building, and (un)installing POV-Ray
 ====================================================
