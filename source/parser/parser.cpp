@@ -8215,12 +8215,19 @@ ObjectPtr Parser::Parse_Object_Id ()
 
 void Parser::Parse_Declare(bool is_local, bool after_hash)
 {
-    vector<Token_Struct> lvalues;
+    struct LValue
+    {
+        Token_Struct token;
+        int          previous;
+        SYM_ENTRY*   tempEntry;
+        bool         allowRedefine;
+    };
+    vector<LValue> lvalues;
     bool deprecated = false;
     bool deprecated_once = false;
-    int Previous=-1;
+    int Previous;
     int Local_Index;
-    SYM_ENTRY *Temp_Entry = NULL;
+    SYM_ENTRY *Temp_Entry;
     bool allow_redefine = true;
     UCS2 *deprecation_message;
     bool tupleDeclare = false;
@@ -8272,6 +8279,9 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
                 UNGET
             END_CASE
         END_EXPECT
+
+        Previous = -1;
+        Temp_Entry = NULL;
 
         EXPECT
             CASE (IDENTIFIER_TOKEN)
@@ -8364,7 +8374,12 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
             END_CASE
         END_EXPECT
 
-        lvalues.push_back(Token);
+        LValue lvalue;
+        lvalue.token = Token;
+        lvalue.tempEntry = Temp_Entry;
+        lvalue.previous = Previous;
+        lvalue.allowRedefine = allow_redefine;
+        lvalues.push_back(lvalue);
 
         if (lvectorDeclare && lvalues.size() >= 5)
             more = false;
@@ -8408,7 +8423,10 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
         Promote_Express(expr,&terms,lvalues.size());
         for (int i = 0; i < lvalues.size(); ++i)
         {
-            Token_Struct& t = lvalues[i];
+            Token_Struct& t = lvalues[i].token;
+            Previous = lvalues[i].previous;
+            Temp_Entry = lvalues[i].tempEntry;
+            allow_redefine = lvalues[i].allowRedefine;
 
             *t.NumberPtr = FLOAT_ID_TOKEN;
             Test_Redefine(Previous,t.NumberPtr,*t.DataPtr, allow_redefine);
@@ -8424,7 +8442,10 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
         }
         for (int i = 0; i < lvalues.size(); ++i)
         {
-            Token_Struct& t = lvalues[i];
+            Token_Struct& t = lvalues[i].token;
+            Previous = lvalues[i].previous;
+            Temp_Entry = lvalues[i].tempEntry;
+            allow_redefine = lvalues[i].allowRedefine;
 
             if (i > 0)
             {
