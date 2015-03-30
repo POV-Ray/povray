@@ -8215,13 +8215,6 @@ ObjectPtr Parser::Parse_Object_Id ()
 
 void Parser::Parse_Declare(bool is_local, bool after_hash)
 {
-    struct LValue
-    {
-        Token_Struct token;
-        int          previous;
-        SYM_ENTRY*   tempEntry;
-        bool         allowRedefine;
-    };
     vector<LValue> lvalues;
     bool deprecated = false;
     bool deprecated_once = false;

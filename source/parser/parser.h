@@ -242,6 +242,14 @@ class Parser : public SceneTask
             bool is_array_elem;                             ///< true if token is actually an array element reference
         };
 
+        struct LValue
+        {
+            Token_Struct token; // TODO - we probably only need a small subset of the information
+            int          previous;
+            SYM_ENTRY*   tempEntry;
+            bool         allowRedefine;
+        };
+
         Token_Struct Token;
 
         struct Macro
