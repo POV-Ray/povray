@@ -90,6 +90,22 @@ class Torus : public ObjectBase
         void CalcUV(const Vector3d& IPoint, Vector2d& Result) const;
 };
 
+// @todo This class may need its own UVCoord() function.
+class SpindleTorus : public Torus
+{
+    public:
+        SpindleTorus();
+        virtual ~SpindleTorus();
+
+        virtual ObjectPtr Copy();
+
+        virtual bool Precompute();
+        virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const;
+
+    protected:
+        DBL mSpindleTipDistSqr;
+};
+
 }
 
 #endif

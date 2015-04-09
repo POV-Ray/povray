@@ -6019,6 +6019,8 @@ ObjectPtr Parser::Parse_Superellipsoid()
 ObjectPtr Parser::Parse_Torus()
 {
     Torus *Object;
+    DBL majorRadius, minorRadius;
+    bool invert = false;
 
     Parse_Begin();
 
@@ -6027,19 +6029,40 @@ ObjectPtr Parser::Parse_Torus()
         return(reinterpret_cast<ObjectPtr>(Object));
     }
 
-    Object = new Torus();
-
     /* Read in the two radii. */
 
-    Object->MajorRadius = Parse_Float(); /* Big radius */
+    majorRadius = Parse_Float(); /* Big radius */
+    if (majorRadius < 0)
+    {
+        Warning("Negative torus major radius has the effect of inverting the object; if this is intentional, use the 'inverse' keyword instead.");
+        majorRadius = -majorRadius;
+        invert = !invert;
+    }
 
     Parse_Comma();
 
-    Object->MinorRadius = Parse_Float(); /* Little radius */
+    minorRadius = Parse_Float(); /* Little radius */
+    if (minorRadius < 0)
+    {
+        Warning("Negative torus minor radius has the effect of inverting the object; if this is intentional, use the 'inverse' keyword instead.");
+        minorRadius = -minorRadius;
+        invert = !invert;
+    }
+
+    if (majorRadius >= minorRadius)
+        Object = new Torus();
+    else
+        Object = new SpindleTorus();
+
+    Object->MajorRadius = majorRadius;
+    Object->MinorRadius = minorRadius;
 
     Object->Compute_BBox();
 
     Parse_Object_Mods (reinterpret_cast<ObjectPtr>(Object));
+
+    if (invert)
+        Object = reinterpret_cast<Torus *>(Object->Invert());
 
     return (reinterpret_cast<ObjectPtr>(Object));
 }
@@ -6432,6 +6455,9 @@ ObjectPtr Parser::Parse_Object ()
             EXIT
         END_CASE
     END_EXPECT
+
+    if (Object && !Object->Precompute())
+        PossibleError("Invalid object paameters.");
 
     return (reinterpret_cast<ObjectPtr>(Object));
 }
