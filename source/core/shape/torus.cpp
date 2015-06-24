@@ -76,6 +76,19 @@ const DBL DEPTH_TOLERANCE = 1.0e-4;
 const DBL ROOT_TOLERANCE = 1.0e-4;
 
 
+//******************************************************************************
+
+bool SpindleTorus::Precompute()
+{
+    bool ok = Torus::Precompute();
+
+    mSpindleTipDistSqr = Sqr(MinorRadius) - Sqr(MajorRadius);
+    if (mSpindleTipDistSqr < 0)
+        ok = false;
+
+    return ok;
+}
+
 
 /*****************************************************************************
 *
@@ -391,6 +404,46 @@ void Torus::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Threa
     Result.normalize();
 }
 
+void SpindleTorus::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread) const
+{
+    DBL dist;
+    Vector3d P, N, M;
+    bool spindle = false;
+
+    // Transform the point into the torus space.
+    MInvTransPoint(P, Inter->IPoint, Trans);
+
+    // Get normal from derivatives.
+
+    dist = sqrt(P[X] * P[X] + P[Z] * P[Z]);
+
+    if (dist > EPSILON)
+    {
+        M[X] = MajorRadius * P[X] / dist;
+        M[Y] = 0.0;
+        M[Z] = MajorRadius * P[Z] / dist;
+    }
+    else
+    {
+        M = Vector3d(0.0, 0.0, 0.0);
+    }
+
+    // Points on the spindle need special attention
+    DBL distSqr = P.lengthSqr();
+    if (distSqr > mSpindleTipDistSqr)
+    {
+        N = P - M;
+    }
+    else
+    {
+        N = P + M;
+    }
+
+    // Transform the normalt out of the torus space.
+    MTransNormal(Result, N, Trans);
+    Result.normalize();
+}
+
 
 
 /*****************************************************************************
@@ -586,6 +639,9 @@ Torus::Torus() : ObjectBase(TORUS_OBJECT)
     MinorRadius = 0.0;
 }
 
+SpindleTorus::SpindleTorus() : Torus()
+{}
+
 
 
 /*****************************************************************************
@@ -631,6 +687,17 @@ ObjectPtr Torus::Copy()
     return (New);
 }
 
+ObjectPtr SpindleTorus::Copy()
+{
+    SpindleTorus *New = new SpindleTorus();
+
+    Destroy_Transform(New->Trans);
+    *New = *this;
+    New->Trans = Copy_Transform(Trans);
+
+    return (New);
+}
+
 
 
 /*****************************************************************************
@@ -667,6 +734,9 @@ Torus::~Torus()
 {
     Destroy_Transform(Trans);
 }
+
+SpindleTorus::~SpindleTorus()
+{}
 
 
 

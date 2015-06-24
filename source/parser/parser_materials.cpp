@@ -2800,7 +2800,7 @@ TEXTURE *Parser::Parse_Texture ()
                 END_CASE
 
                 OTHERWISE
-                    UNGET;
+                    UNGET
                     Destroy_Pigment(Texture->Pigment);
                     Destroy_Tnormal(Texture->Tnormal);
                     if (Texture->Finish)
