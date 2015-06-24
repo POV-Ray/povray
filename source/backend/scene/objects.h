@@ -213,6 +213,12 @@ class ObjectBase
 
         virtual ObjectPtr Copy() = 0;
 
+        /// Test the object parameters and precompute derived values.
+        ///
+        /// @return True if object parameters are within reasonable limits.
+        ///
+        virtual bool Precompute() { return true; };
+
         virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *) = 0; // could be "const", if it wasn't for isosurface max_gradient estimation stuff
         virtual bool Inside(const Vector3d&, TraceThreadData *) const = 0;
         virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const = 0;
