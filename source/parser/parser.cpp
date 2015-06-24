@@ -8089,13 +8089,16 @@ int Parser::Parse_Three_UVCoords(Vector2d& UV1, Vector2d& UV2, Vector2d& UV3)
 *
 ******************************************************************************/
 
-void Parser::Parse_Comma (void)
+bool Parser::Parse_Comma (void)
 {
     Get_Token();
     if (Token.Token_Id != COMMA_TOKEN)
     {
         UNGET
+        return false;
     }
+    else
+        return true;
 }
 
 
@@ -8567,7 +8570,7 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
     }
 }
 
-int Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTRY *sym, bool ParFlag, bool SemiFlag, bool is_local, bool allow_redefine, int old_table_index)
+bool Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTRY *sym, bool ParFlag, bool SemiFlag, bool is_local, bool allow_redefine, int old_table_index)
 {
     EXPRESS Local_Express;
     RGBFTColour *Local_Colour;
@@ -8584,7 +8587,7 @@ int Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTR
     MATERIAL *Local_Material;
     void *Temp_Data;
     POV_PARAM *New_Par;
-    int Found=true;
+    bool Found=true;
     int Temp_Count=3000000;
     int Old_Ok=Ok_To_Declare;
     int Terms;
@@ -8624,7 +8627,8 @@ int Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTR
         CASE (IDENTIFIER_TOKEN)
             if (ParFlag)
             {
-                Error("Cannot pass uninitialized identifier as macro parameter.\nInitialize identifier first.");
+                Found = false;
+                UNGET
             }
             else
             {

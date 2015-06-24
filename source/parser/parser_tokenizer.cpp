@@ -178,6 +178,8 @@ void Parser::pre_init_tokenizer ()
     Skipping            = false;
     Inside_Ifdef        = false;
     Inside_MacroDef     = false;
+    Inside_Local        = false;
+    Parsing_Directive   = false;
     Cond_Stack          = NULL;
     Table_Index         = -1;
 
@@ -622,6 +624,26 @@ void Parser::Get_Token ()
             case '_':
                 Echo_ungetc(c);
                 Read_Symbol ();
+                if (!Parsing_Directive && (Token.Token_Id == LOCAL_TOKEN))
+                {
+                    if (!Skip_Spaces())
+                        Error("Expected '(', end of file reached instead", c2);
+                    c2 = Echo_getc();
+                    if (c2 != '(')
+                        Error("Expected '(', found '%c' instead", c2);
+                    if (!Skip_Spaces())
+                        Error("Expected 'identifier', end of file reached instead", c2);
+
+                    Inside_Local = true;
+                    Read_Symbol();
+                    Inside_Local = false;
+
+                    if (!Skip_Spaces())
+                        Error("Expected ')', end of file reached instead", c2);
+                    c2 = Echo_getc();
+                    if (c2 != ')')
+                        Error("Expected ')', found '%c' instead", c2);
+                }
                 break;
             case '\t':
             case '\r':
@@ -1277,19 +1299,18 @@ void Parser::Read_Symbol()
 
     End_String_Fast();
 
-    if (Inside_Ifdef)
-    {
-        Token.Token_Id = IDENTIFIER_TOKEN;
-        Token.is_array_elem = false;
-
-        return;
-    }
-
     /* If its a reserved keyword, write it and return */
     if ( (Temp_Entry = Find_Symbol(0,String)) != NULL)
     {
-        Write_Token (Temp_Entry->Token_Number, Token.Token_Col_No);
-        return;
+        if (!Inside_Ifdef || ((sceneData->EffectiveLanguageVersion() >= 3.71) && (Temp_Entry->Token_Number == LOCAL_TOKEN)))
+        {
+            Write_Token (Temp_Entry->Token_Number, Token.Token_Col_No);
+            return;
+        }
+        else
+        {
+            Warning("Tried to test whether a reserved keyword is defined. Test result may not be what you expect.");
+        }
     }
 
     if (!Skipping)
@@ -1307,7 +1328,7 @@ void Parser::Read_Symbol()
                     Warning("%s", Temp_Entry->Deprecation_Message);
                 }
 
-                if (Temp_Entry->Token_Number==MACRO_ID_TOKEN)
+                if ((Temp_Entry->Token_Number==MACRO_ID_TOKEN) && (!Inside_Ifdef))
                 {
                     Token.Data = Temp_Entry->Data;
                     if (Ok_To_Declare)
@@ -1372,7 +1393,7 @@ void Parser::Read_Symbol()
                         Token.NumberPtr = &(a->Type);
                         Token.Token_Id = a->Type;
                         Token.is_array_elem = true;
-                        if (!LValue_Ok)
+                        if (!LValue_Ok && !Inside_Ifdef)
                         {
                             if (*Token.DataPtr == NULL)
                                 Error("Attempt to access uninitialized array element.");
@@ -1394,6 +1415,9 @@ void Parser::Read_Symbol()
                 Token.Table_Index = Local_Index;
                 return;
             }
+
+            if (Inside_Local)
+                break;
         }
     }
 
@@ -1689,8 +1713,11 @@ void Parser::Parse_Directive(int After_Hash)
         return;
     }
 
+    Parsing_Directive = true;
+
     EXPECT
         CASE(IFDEF_TOKEN)
+            Parsing_Directive = false;
             Inc_CS_Index();
 
             if (Skipping)
@@ -1714,6 +1741,7 @@ void Parser::Parse_Directive(int After_Hash)
         END_CASE
 
         CASE(IFNDEF_TOKEN)
+            Parsing_Directive = false;
             Inc_CS_Index();
 
             if (Skipping)
@@ -1737,6 +1765,7 @@ void Parser::Parse_Directive(int After_Hash)
         END_CASE
 
         CASE(IF_TOKEN)
+            Parsing_Directive = false;
             Inc_CS_Index();
 
             if (Skipping)
@@ -1762,6 +1791,7 @@ void Parser::Parse_Directive(int After_Hash)
         END_CASE
 
         CASE(WHILE_TOKEN)
+            Parsing_Directive = false;
             Inc_CS_Index();
 
             if (Skipping)
@@ -1790,6 +1820,7 @@ void Parser::Parse_Directive(int After_Hash)
         END_CASE
 
         CASE(FOR_TOKEN)
+            Parsing_Directive = false;
             Inc_CS_Index();
 
             if (Skipping)
@@ -1822,6 +1853,7 @@ void Parser::Parse_Directive(int After_Hash)
         END_CASE
 
         CASE(ELSE_TOKEN)
+            Parsing_Directive = false;
             switch (Curr_Type)
             {
                 case IF_TRUE_COND:
@@ -1857,6 +1889,7 @@ void Parser::Parse_Directive(int After_Hash)
         END_CASE
 
         CASE(ELSEIF_TOKEN)
+            Parsing_Directive = false;
             switch (Curr_Type)
             {
                 case IF_TRUE_COND:
@@ -1889,6 +1922,7 @@ void Parser::Parse_Directive(int After_Hash)
         END_CASE
 
         CASE(SWITCH_TOKEN)
+            Parsing_Directive = false;
             Inc_CS_Index();
 
             if (Skipping)
@@ -1943,12 +1977,14 @@ void Parser::Parse_Directive(int After_Hash)
         END_CASE
 
         CASE(BREAK_TOKEN)
+            Parsing_Directive = false;
             if (!Skipping)
                 Break();
             EXIT
         END_CASE
 
         CASE2(CASE_TOKEN,RANGE_TOKEN)
+            Parsing_Directive = false;
             switch(Curr_Type)
             {
                 case CASE_TRUE_COND:
@@ -1992,6 +2028,7 @@ void Parser::Parse_Directive(int After_Hash)
         END_CASE
 
         CASE(END_TOKEN)
+            Parsing_Directive = false;
             switch (Curr_Type)
             {
                 case INVOKING_MACRO_COND:
@@ -2093,6 +2130,7 @@ void Parser::Parse_Directive(int After_Hash)
         END_CASE
 
         CASE2 (DECLARE_TOKEN,LOCAL_TOKEN)
+            Parsing_Directive = false;
             if (Skipping)
             {
                 UNGET
@@ -2108,9 +2146,11 @@ void Parser::Parse_Directive(int After_Hash)
                     {
                         case HASH_TOKEN:
                             Token.Unget_Token=false;
+                            Parsing_Directive = true;
                             break;
 
                         case MACRO_ID_TOKEN:
+                            Parsing_Directive = true;
                             break;
 
                         default:
@@ -2125,6 +2165,7 @@ void Parser::Parse_Directive(int After_Hash)
         END_CASE
 
         CASE (DEFAULT_TOKEN)
+            Parsing_Directive = false;
             if ( Skipping )
             {
                 UNGET
@@ -2137,6 +2178,7 @@ void Parser::Parse_Directive(int After_Hash)
         END_CASE
 
         CASE (INCLUDE_TOKEN)
+            Parsing_Directive = false;
             if (Skipping)
             {
                 UNGET
@@ -2149,6 +2191,7 @@ void Parser::Parse_Directive(int After_Hash)
         END_CASE
 
         CASE (FLOAT_FUNCT_TOKEN)
+            Parsing_Directive = false;
             if (Skipping)
             {
                 UNGET
@@ -2211,6 +2254,7 @@ void Parser::Parse_Directive(int After_Hash)
                         if (Token.Unget_Token && (Token.Token_Id==HASH_TOKEN))
                         {
                             Token.Unget_Token=false;
+                            Parsing_Directive = true;
                         }
                         else
                         {
@@ -2227,6 +2271,7 @@ void Parser::Parse_Directive(int After_Hash)
         END_CASE
 
         CASE(WARNING_TOKEN)
+            Parsing_Directive = false;
             if (Skipping)
             {
                 UNGET
@@ -2246,6 +2291,7 @@ void Parser::Parse_Directive(int After_Hash)
         END_CASE
 
         CASE(ERROR_TOKEN)
+            Parsing_Directive = false;
             if (Skipping)
             {
                 UNGET
@@ -2272,6 +2318,7 @@ void Parser::Parse_Directive(int After_Hash)
             Warning("#render and #statistics streams are no longer available.\nRedirecting output to #debug stream.");
             // Intentional, redirect output to debug stream.
         CASE(DEBUG_TOKEN)
+            Parsing_Directive = false;
             if (Skipping)
             {
                 UNGET
@@ -2291,6 +2338,7 @@ void Parser::Parse_Directive(int After_Hash)
         END_CASE
 
         CASE(FOPEN_TOKEN)
+            Parsing_Directive = false;
             if (Skipping)
             {
                 UNGET
@@ -2303,6 +2351,7 @@ void Parser::Parse_Directive(int After_Hash)
         END_CASE
 
         CASE(FCLOSE_TOKEN)
+            Parsing_Directive = false;
             if (Skipping)
             {
                 UNGET
@@ -2315,6 +2364,7 @@ void Parser::Parse_Directive(int After_Hash)
         END_CASE
 
         CASE(READ_TOKEN)
+            Parsing_Directive = false;
             if (Skipping)
             {
                 UNGET
@@ -2327,6 +2377,7 @@ void Parser::Parse_Directive(int After_Hash)
         END_CASE
 
         CASE(WRITE_TOKEN)
+            Parsing_Directive = false;
             if (Skipping)
             {
                 UNGET
@@ -2339,6 +2390,7 @@ void Parser::Parse_Directive(int After_Hash)
         END_CASE
 
         CASE(UNDEF_TOKEN)
+            Parsing_Directive = false;
             if (Skipping)
             {
                 UNGET
@@ -2391,6 +2443,7 @@ void Parser::Parse_Directive(int After_Hash)
         END_CASE
 
         CASE (MACRO_ID_TOKEN)
+            Parsing_Directive = false;
             if (Skipping)
             {
                 UNGET
@@ -2403,6 +2456,7 @@ void Parser::Parse_Directive(int After_Hash)
         END_CASE
 
         CASE (MACRO_TOKEN)
+            Parsing_Directive = false;
             if (!Skipping)
             {
                 if (Inside_MacroDef)
@@ -2421,10 +2475,13 @@ void Parser::Parse_Directive(int After_Hash)
         END_CASE
 
         OTHERWISE
+            Parsing_Directive = false;
             UNGET
             EXIT
         END_CASE
     END_EXPECT
+
+    Parsing_Directive = false;
 
     if (Token.Unget_Token)
     {
@@ -2914,6 +2971,7 @@ Parser::Macro *Parser::Parse_Macro()
     Macro *New;
     SYM_ENTRY *Table_Entry=NULL;
     int Old_Ok = Ok_To_Declare;
+    MacroParameter newParameter;
 
     Check_Macro_Vers();
 
@@ -2941,7 +2999,6 @@ Parser::Macro *Parser::Parse_Macro()
     Table_Entry->Data=reinterpret_cast<void *>(New);
 
     New->Macro_Filename = NULL;
-    New->Num_Of_Pars=0;
 
     EXPECT
         CASE (LEFT_PAREN_TOKEN )
@@ -2952,11 +3009,16 @@ Parser::Macro *Parser::Parse_Macro()
         END_CASE
 
         OTHERWISE
-            Expectation_Error ("identifier or expression.");
+            Expectation_Error ("identifier");
         END_CASE
     END_EXPECT
 
+    newParameter.optional = false;
     EXPECT
+        CASE (OPTIONAL_TOKEN)
+            newParameter.optional = true;
+        END_CASE
+
         CASE3 (MACRO_ID_TOKEN, IDENTIFIER_TOKEN, PARAMETER_ID_TOKEN)
         CASE3 (FILE_ID_TOKEN,  FUNCT_ID_TOKEN, VECTFUNCT_ID_TOKEN)
         // These have to match Parse_Declare in parse.cpp! [trf]
@@ -2967,12 +3029,10 @@ Parser::Macro *Parser::Parse_Macro()
         CASE4 (DENSITY_ID_TOKEN, ARRAY_ID_TOKEN, DENSITY_MAP_ID_TOKEN, UV_ID_TOKEN)
         CASE4 (VECTOR_4D_ID_TOKEN,  RAINBOW_ID_TOKEN, FOG_ID_TOKEN, SKYSPHERE_ID_TOKEN)
         CASE2 (MATERIAL_ID_TOKEN, SPLINE_ID_TOKEN)
-            New->Par_Name[New->Num_Of_Pars] = POV_STRDUP(Token.Token_String);
-            if (++(New->Num_Of_Pars) == MAX_PARAMETER_LIST)
-            {
-                Error("Too many parameters");
-            }
+            newParameter.name = POV_STRDUP(Token.Token_String);
+            New->parameters.push_back(newParameter);
             Parse_Comma();
+            newParameter.optional = false;
         END_CASE
 
         CASE2 (VECTOR_FUNCT_TOKEN, FLOAT_FUNCT_TOKEN)
@@ -2980,22 +3040,22 @@ Parser::Macro *Parser::Parse_Macro()
             {
                 case VECTOR_ID_TOKEN:
                 case FLOAT_ID_TOKEN:
-                    New->Par_Name[New->Num_Of_Pars] = POV_STRDUP(Token.Token_String);
-                    if (++(New->Num_Of_Pars) == MAX_PARAMETER_LIST)
-                    {
-                        Error("Too many parameters");
-                    }
+                    newParameter.name = POV_STRDUP(Token.Token_String);
+                    New->parameters.push_back(newParameter);
                     Parse_Comma();
+                    newParameter.optional = false;
                     break;
 
                 default:
-                    Expectation_Error ("identifier or expression.");
+                    Expectation_Error ("identifier");
                     break;
             }
         END_CASE
 
         CASE(RIGHT_PAREN_TOKEN)
             UNGET
+            if (newParameter.optional)
+                Expectation_Error ("identifier");
             EXIT
         END_CASE
 
@@ -3004,7 +3064,7 @@ Parser::Macro *Parser::Parse_Macro()
         END_CASE
 
         OTHERWISE
-            Expectation_Error ("identifier or expression.");
+            Expectation_Error ("identifier");
         END_CASE
     END_EXPECT
 
@@ -3039,9 +3099,9 @@ void Parser::Invoke_Macro()
 
     GET(LEFT_PAREN_TOKEN);
 
-    if (PMac->Num_Of_Pars > 0)
+    if (PMac->parameters.size() > 0)
     {
-        Table_Entries = reinterpret_cast<SYM_ENTRY **>(POV_MALLOC(sizeof(SYM_ENTRY *)*PMac->Num_Of_Pars,"parameters"));
+        Table_Entries = reinterpret_cast<SYM_ENTRY **>(POV_MALLOC(sizeof(SYM_ENTRY *)*PMac->parameters.size(),"parameters"));
 
         /* We must parse all parameters before adding new symbol table
            or adding entries.  Otherwise recursion won't always work.
@@ -3049,14 +3109,48 @@ void Parser::Invoke_Macro()
 
         Local_Index = Table_Index;
 
-        for (i=0; i<PMac->Num_Of_Pars; i++)
+        bool properlyDelimited; // true if we found the previous parameter properly delimited with a comma
+
+        properlyDelimited = true;
+        for (i=0; i<PMac->parameters.size(); i++)
         {
-            Table_Entries[i]=Create_Entry(1,PMac->Par_Name[i],IDENTIFIER_TOKEN);
+            bool finalParameter = (i == PMac->parameters.size()-1);
+            Table_Entries[i]=Create_Entry(1,PMac->parameters[i].name,IDENTIFIER_TOKEN);
             if (!Parse_RValue(IDENTIFIER_TOKEN, &(Table_Entries[i]->Token_Number), &(Table_Entries[i]->Data), NULL, true, false, true, true, Local_Index))
             {
-                Error("Expected %d parameters but only %d found.",PMac->Num_Of_Pars,i);
+                EXPECT_ONE
+                    CASE (IDENTIFIER_TOKEN)
+                        // an uninitialized identifier was passed
+                        if (!PMac->parameters[i].optional)
+                            Error("Cannot pass uninitialized identifier as non-optional macro parameter.");
+                    END_CASE
+
+                    CASE (RIGHT_PAREN_TOKEN)
+                        if (!(finalParameter && properlyDelimited))
+                            // the parameter list was closed prematurely
+                            Error("Expected %d parameters but only %d found.",PMac->parameters.size(),i);
+                        // the parameter was left empty
+                        if (!PMac->parameters[i].optional)
+                            Error("Cannot omit non-optional macro parameter %d.",i+1);
+                        UNGET
+                    END_CASE
+
+                    CASE (COMMA_TOKEN)
+                        // the parameter was left empty
+                        if (!PMac->parameters[i].optional)
+                            Error("Cannot omit non-optional macro parameter %d.",i+1);
+                        UNGET
+                    END_CASE
+
+                    OTHERWISE
+                        Expectation_Error("macro parameter");
+                    END_CASE
+                END_EXPECT
+
+                Destroy_Entry(1,Table_Entries[i]);
+                Table_Entries[i] = NULL;
             }
-            Parse_Comma();
+            properlyDelimited = Parse_Comma();
         }
     }
 
@@ -3072,11 +3166,12 @@ void Parser::Invoke_Macro()
     /* Gotta have new symbol table in case #local is used */
     Add_Sym_Table();
 
-    if (PMac->Num_Of_Pars > 0)
+    if (PMac->parameters.size() > 0)
     {
-        for (i=0; i<PMac->Num_Of_Pars; i++)
+        for (i=0; i<PMac->parameters.size(); i++)
         {
-            Add_Entry(Table_Index,Table_Entries[i]);
+            if (Table_Entries[i] != NULL)
+                Add_Entry(Table_Index,Table_Entries[i]);
         }
 
         POV_FREE(Table_Entries);
@@ -3146,8 +3241,7 @@ void Parser::Return_From_Macro()
 
 Parser::Macro::Macro(const char *s) :
     Macro_Name(POV_STRDUP(s)),
-    Macro_Filename(NULL),
-    Num_Of_Pars(0)
+    Macro_Filename(NULL)
 {}
 
 Parser::Macro::~Macro()
@@ -3160,9 +3254,9 @@ Parser::Macro::~Macro()
         POV_FREE(Macro_Filename);
     }
 
-    for (i=0; i < Num_Of_Pars; i++)
+    for (i=0; i < parameters.size(); i++)
     {
-        POV_FREE(Par_Name[i]);
+        POV_FREE(parameters[i].name);
     }
 }
 
@@ -3746,15 +3840,9 @@ void Parser::Inc_CS_Index(void)
     Cond_Stack[CS_Index].Loop_Identifier = NULL;
 }
 
-int Parser::Parse_Ifdef_Param (void)
+bool Parser::Parse_Ifdef_Param ()
 {
-    int Local_Index;
-    SYM_ENTRY *Entry;
-    int retval = false;
-    int i,j,k;
-    register int c;
-    DBL val;
-    POV_ARRAY *a;
+    bool retval = false;
 
     GET(LEFT_PAREN_TOKEN)
     Inside_Ifdef=true;
@@ -3762,73 +3850,10 @@ int Parser::Parse_Ifdef_Param (void)
     String2 = POV_STRDUP(String);
     Inside_Ifdef=false;
 
-    /* Search tables from newest to oldest */
-    for (Local_Index=Table_Index; Local_Index > 0; Local_Index--)
-    {
-        Entry = Find_Symbol(Local_Index,String2);
-        if ( Entry != NULL)
-        {
-            Token.Token_Id  =   Entry->Token_Number;
-            Token.is_array_elem = false;
-            Token.NumberPtr = &(Entry->Token_Number);
-            Token.DataPtr   = &(Entry->Data);
-
-            if ( Token.Token_Id == PARAMETER_ID_TOKEN )
-            {
-                Token.NumberPtr = (reinterpret_cast<POV_PARAM *>(Entry->Data))->NumberPtr;
-                Token.DataPtr   = (reinterpret_cast<POV_PARAM *>(Entry->Data))->DataPtr;
-            }
-
-            if (Token.NumberPtr && *(Token.NumberPtr)==ARRAY_ID_TOKEN)
-            {
-                Skip_Spaces();
-                c = Echo_getc();
-                Echo_ungetc(c);
-
-                if (c!='[')
-                {
-                    retval = true;
-                    break;
-                }
-
-                a = reinterpret_cast<POV_ARRAY *>(*(Token.DataPtr));
-                j = 0;
-
-                for (i=0; i <= a->Dims; i++)
-                {
-                    GET(LEFT_SQUARE_TOKEN)
-                    val=Parse_Float();
-
-                    k=(int)(val + EPSILON);
-
-                    if (k<0.0)
-                    {
-                        Error("Negative subscript");
-                    }
-
-                    if (k>=a->Sizes[i])
-                    {
-                        Error("Array subscript out of range");
-                    }
-                    j += k * a->Mags[i];
-                    GET(RIGHT_SQUARE_TOKEN)
-                }
-
-                Token.DataPtr   = &(a->DataPtrs[j]);
-                Token.NumberPtr = &(a->Type);
-                Token.Token_Id = a->Type;
-                Token.is_array_elem = true;
-
-                retval = (*Token.DataPtr != NULL);
-                break;
-            }
-            else
-            {
-                retval = true;
-                break;
-            }
-        }
-    }
+    if (Token.is_array_elem)
+        retval = (*Token.DataPtr != NULL);
+    else
+        retval = (Token.Token_Id != IDENTIFIER_TOKEN);
 
     GET(RIGHT_PAREN_TOKEN)
 

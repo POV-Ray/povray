@@ -388,6 +388,7 @@ const RESERVED_WORD Reserved_Words[LAST_TOKEN] = {
     {ONION_TOKEN, "onion"},
     {ON_TOKEN, "on"},
     {OPEN_TOKEN, "open"},
+    {OPTIONAL_TOKEN, "optional"},
     {ORIENTATION_TOKEN, "orientation"},
     {ORIENT_TOKEN,"orient"},
     {ORTHOGRAPHIC_TOKEN, "orthographic"},

@@ -253,6 +253,12 @@ class Parser : public SceneTask
 
         Token_Struct Token;
 
+        struct MacroParameter
+        {
+            char*   name;
+            bool    optional;
+        };
+
         struct Macro
         {
             Macro(const char *);
@@ -261,8 +267,7 @@ class Parser : public SceneTask
             UCS2 *Macro_Filename;
             pov_base::ITextStream::FilePos Macro_File_Pos;
             POV_LONG Macro_End;
-            int Num_Of_Pars;
-            char *Par_Name[MAX_PARAMETER_LIST];
+            vector<MacroParameter> parameters;
         };
 
         struct POV_ARRAY
@@ -327,7 +332,7 @@ class Parser : public SceneTask
         void Found_Instead_Error (const char *exstr, const char *extokstr);
         void Parse_Begin (void);
         void Parse_End (void);
-        void Parse_Comma (void);
+        bool Parse_Comma (void);
         void Parse_Semi_Colon (bool force_semicolon);
         void Destroy_Frame (void);
         void MAError (const char *str, long size);
@@ -344,7 +349,7 @@ class Parser : public SceneTask
         void Parse_Declare (bool is_local, bool after_hash);
         void Parse_Matrix (MATRIX Matrix);
         void Destroy_Ident_Data (void *Data, int Type);
-        int Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTRY *sym, bool ParFlag, bool SemiFlag, bool is_local, bool allow_redefine, int old_table_index);
+        bool Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTRY *sym, bool ParFlag, bool SemiFlag, bool is_local, bool allow_redefine, int old_table_index);
         const char *Get_Token_String (TOKEN Token_Id);
         void Test_Redefine(TOKEN Previous, TOKEN *NumberPtr, void *Data, bool allow_redefine = true);
         void Expectation_Error(const char *);
@@ -384,7 +389,7 @@ class Parser : public SceneTask
         void Acquire_Entry_Reference (SYM_ENTRY *Entry);
         void Release_Entry_Reference (int Index, SYM_ENTRY *Entry);
         SYM_ENTRY *Destroy_Entry (int Index,SYM_ENTRY *Entry);
-        int Parse_Ifdef_Param (void);
+        bool Parse_Ifdef_Param ();
         int Parse_For_Param (char**, DBL*, DBL*);
 
         // parstxtr.h/parstxtr.cpp
@@ -567,7 +572,8 @@ class Parser : public SceneTask
         };
 
         CS_ENTRY *Cond_Stack;
-        int CS_Index, Skipping, Inside_Ifdef, Inside_MacroDef;
+        int CS_Index;
+        bool Skipping, Inside_Ifdef, Inside_MacroDef, Inside_Local, Parsing_Directive;
 
         int Got_EOF; // WARNING: Changes to the use of this variable are very dangerous as it is used in many places assuming certain non-obvious side effects! [trf]
 
