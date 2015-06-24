@@ -248,7 +248,8 @@ class Parser : public SceneTask
             void**       dataPtr;
             int          previous;
             SYM_ENTRY*   symEntry;
-            bool         allowRedefine;
+            bool         allowRedefine : 1;
+            bool         optional      : 1;
         };
 
         Token_Struct Token;
@@ -349,7 +350,7 @@ class Parser : public SceneTask
         void Parse_Declare (bool is_local, bool after_hash);
         void Parse_Matrix (MATRIX Matrix);
         void Destroy_Ident_Data (void *Data, int Type);
-        bool Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTRY *sym, bool ParFlag, bool SemiFlag, bool is_local, bool allow_redefine, int old_table_index);
+        bool Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTRY *sym, bool ParFlag, bool SemiFlag, bool is_local, bool allow_redefine, bool allowUndefined, int old_table_index);
         const char *Get_Token_String (TOKEN Token_Id);
         void Test_Redefine(TOKEN Previous, TOKEN *NumberPtr, void *Data, bool allow_redefine = true);
         void Expectation_Error(const char *);

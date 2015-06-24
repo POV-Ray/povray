@@ -3116,7 +3116,7 @@ void Parser::Invoke_Macro()
         {
             bool finalParameter = (i == PMac->parameters.size()-1);
             Table_Entries[i]=Create_Entry(1,PMac->parameters[i].name,IDENTIFIER_TOKEN);
-            if (!Parse_RValue(IDENTIFIER_TOKEN, &(Table_Entries[i]->Token_Number), &(Table_Entries[i]->Data), NULL, true, false, true, true, Local_Index))
+            if (!Parse_RValue(IDENTIFIER_TOKEN, &(Table_Entries[i]->Token_Number), &(Table_Entries[i]->Data), NULL, true, false, true, true, true, Local_Index))
             {
                 EXPECT_ONE
                     CASE (IDENTIFIER_TOKEN)
@@ -3316,7 +3316,7 @@ Parser::POV_ARRAY *Parser::Parse_Array_Declare (void)
     }
 
     EXPECT
-        CASE(LEFT_CURLY_TOKEN)
+        CASE2(LEFT_CURLY_TOKEN, OPTIONAL_TOKEN)
             UNGET
                 Parse_Initalizer(0,0,New);
             EXIT
@@ -3336,6 +3336,17 @@ Parser::POV_ARRAY *Parser::Parse_Array_Declare (void)
 void Parser::Parse_Initalizer (int Sub, int Base, POV_ARRAY *a)
 {
     int i;
+    bool optional = false;
+
+    EXPECT_ONE
+        CASE(OPTIONAL_TOKEN)
+            optional = true;
+        END_CASE
+
+        OTHERWISE
+            UNGET
+        END_CASE
+    END_EXPECT
 
     Parse_Begin();
     if (Sub < a->Dims)
@@ -3347,13 +3358,42 @@ void Parser::Parse_Initalizer (int Sub, int Base, POV_ARRAY *a)
     }
     else
     {
+        bool properlyDelimited = true;
         for(i=0; i < a->Sizes[Sub]; i++)
         {
-            if (!Parse_RValue (a->Type, &(a->Type), &(a->DataPtrs[Base+i]), NULL, false, false, true, false, MAX_NUMBER_OF_TABLES))
+            bool finalParameter = (i == a->Sizes[Sub]-1);
+            if (!Parse_RValue (a->Type, &(a->Type), &(a->DataPtrs[Base+i]), NULL, false, false, true, false, true, MAX_NUMBER_OF_TABLES))
             {
-                Error("Insufficent number of initializers");
+                EXPECT_ONE
+                    CASE (IDENTIFIER_TOKEN)
+                        // an uninitialized identifier was passed
+                        if(!optional)
+                            Error("Cannot pass uninitialized identifier to non-optional array initializer.");
+                    END_CASE
+
+                    CASE (RIGHT_CURLY_TOKEN)
+                        if (!(finalParameter && properlyDelimited))
+                            // the parameter list was closed prematurely
+                            Error("Expected %d initializers but only %d found.",a->Sizes[Sub],i);
+                        // the parameter was left empty
+                        if(!optional)
+                            Error("Cannot omit elements of non-optional array initializer.");
+                        UNGET
+                    END_CASE
+
+                    CASE (COMMA_TOKEN)
+                        // the parameter was left empty
+                        if(!optional)
+                            Error("Cannot omit elements of non-optional array initializer.");
+                        UNGET
+                    END_CASE
+
+                    OTHERWISE
+                        Expectation_Error("array initializer element");
+                    END_CASE
+                END_EXPECT
             }
-            Parse_Comma();
+            properlyDelimited = Parse_Comma();
         }
     }
     Parse_End();

@@ -8257,6 +8257,7 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
     bool larrayDeclare = false;
     int* numberPtr = NULL;
     void** dataPtr = NULL;
+    bool optional = false;
 
     Ok_To_Declare = false;
 
@@ -8298,8 +8299,9 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
         deprecated_once = false;
         numberPtr = NULL;
         dataPtr = NULL;
+        optional = false;
 
-        EXPECT_ONE
+        EXPECT
             CASE (DEPRECATED_TOKEN)
                 deprecated = true;
                 ALLOW(ONCE_TOKEN);
@@ -8308,8 +8310,13 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
                 deprecation_message = Parse_String(false, false);
             END_CASE
 
+            CASE (OPTIONAL_TOKEN)
+                optional = true;
+            END_CASE
+
             OTHERWISE
                 UNGET
+                EXIT
             END_CASE
         END_EXPECT
 
@@ -8417,6 +8424,7 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
                     Temp_Entry = Create_Entry (0, "", DUMMY_SYMBOL_TOKEN);
                     numberPtr = &(Temp_Entry->Token_Number);
                     dataPtr = &(Temp_Entry->Data);
+                    optional = true;
                     Previous = IDENTIFIER_TOKEN;
                     UNGET
                     END_CASE
@@ -8437,6 +8445,7 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
         lvalue.symEntry = Temp_Entry;
         lvalue.previous = Previous;
         lvalue.allowRedefine = allow_redefine;
+        lvalue.optional = optional;
         lvalues.push_back(lvalue);
 
         if (lvectorDeclare && (lvalues.size() >= 5))
@@ -8500,7 +8509,7 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
     else if (larrayDeclare)
     {
         SYM_ENTRY *rvalue = Create_Entry (0, "", DUMMY_SYMBOL_TOKEN);
-        if (!Parse_RValue (IDENTIFIER_TOKEN, &(rvalue->Token_Number), &(rvalue->Data), NULL, false, false, true, true, MAX_NUMBER_OF_TABLES) ||
+        if (!Parse_RValue (IDENTIFIER_TOKEN, &(rvalue->Token_Number), &(rvalue->Data), NULL, false, false, true, true, false, MAX_NUMBER_OF_TABLES) ||
             (rvalue->Token_Number != ARRAY_ID_TOKEN))
             Expectation_Error("array RValue");
         POV_ARRAY *a = reinterpret_cast<POV_ARRAY *>(rvalue->Data);
@@ -8540,14 +8549,43 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
             Previous = lvalues[i].previous;
             Temp_Entry = lvalues[i].symEntry;
             allow_redefine = lvalues[i].allowRedefine;
+            optional = lvalues[i].optional;
 
             if (i > 0)
             {
                 GET (COMMA_TOKEN)
             }
-            if (!Parse_RValue (Previous, numberPtr, dataPtr, Temp_Entry, false, !tupleDeclare, is_local, allow_redefine, MAX_NUMBER_OF_TABLES))
+            bool finalParameter = (i == lvalues.size()-1);
+            if (!Parse_RValue (Previous, numberPtr, dataPtr, Temp_Entry, false, !tupleDeclare, is_local, allow_redefine, true, MAX_NUMBER_OF_TABLES))
             {
-                Expectation_Error("RValue to declare");
+                EXPECT_ONE
+                    CASE (IDENTIFIER_TOKEN)
+                        // an uninitialized identifier was passed
+                        if (!optional)
+                            Error("Cannot pass uninitialized identifier to non-optional LValue.");
+                    END_CASE
+
+                    CASE (RIGHT_PAREN_TOKEN)
+                        if (!finalParameter)
+                            // the parameter list was closed prematurely
+                            Error("Expected %d RValues but only %d found.",lvalues.size(),i);
+                        // the parameter was left empty
+                        if (!optional)
+                            Error("Cannot omit RValue for non-optional LValue.");
+                        UNGET
+                    END_CASE
+
+                    CASE (COMMA_TOKEN)
+                        // the parameter was left empty
+                        if (!optional)
+                            Error("Cannot omit RValue for non-optional LValue.");
+                        UNGET
+                    END_CASE
+
+                    OTHERWISE
+                        Expectation_Error("RValue to declare");
+                    END_CASE
+                END_EXPECT
             }
         }
         if (tupleDeclare)
@@ -8572,7 +8610,7 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
     }
 }
 
-bool Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTRY *sym, bool ParFlag, bool SemiFlag, bool is_local, bool allow_redefine, int old_table_index)
+bool Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTRY *sym, bool ParFlag, bool SemiFlag, bool is_local, bool allow_redefine, bool allowUndefined, int old_table_index)
 {
     EXPRESS Local_Express;
     RGBFTColour *Local_Colour;
@@ -8627,7 +8665,7 @@ bool Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENT
         END_CASE
 
         CASE (IDENTIFIER_TOKEN)
-            if (ParFlag)
+            if (allowUndefined)
             {
                 Found = false;
                 UNGET
