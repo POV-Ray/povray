@@ -8294,6 +8294,8 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
 
     for (bool more = true; more; /* body-controlled loop */)
     {
+        deprecated = false;
+        deprecated_once = false;
         numberPtr = NULL;
         dataPtr = NULL;
 
