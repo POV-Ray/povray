@@ -8094,7 +8094,7 @@ void Parser::Parse_Comma (void)
     Get_Token();
     if (Token.Token_Id != COMMA_TOKEN)
     {
-        UNGET;
+        UNGET
     }
 }
 
@@ -8123,7 +8123,7 @@ void Parser::Parse_Semi_Colon (bool force_semicolon)
     Get_Token();
     if (Token.Token_Id != SEMI_COLON_TOKEN)
     {
-        UNGET;
+        UNGET
         if ((sceneData->EffectiveLanguageVersion() >= 350) && (force_semicolon == true))
         {
             Error("All #declares of float, vector, and color require semi-colon ';' at end if the\n"
@@ -8251,6 +8251,9 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
     UCS2 *deprecation_message;
     bool tupleDeclare = false;
     bool lvectorDeclare = false;
+    bool larrayDeclare = false;
+    int* numberPtr = NULL;
+    void** dataPtr = NULL;
 
     Ok_To_Declare = false;
 
@@ -8278,6 +8281,9 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
         CASE (LEFT_ANGLE_TOKEN)
             lvectorDeclare = true;
         END_CASE
+        CASE (LEFT_CURLY_TOKEN)
+            larrayDeclare = true;
+        END_CASE
         OTHERWISE
             UNGET
         END_CASE
@@ -8285,6 +8291,9 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
 
     for (bool more = true; more; /* body-controlled loop */)
     {
+        numberPtr = NULL;
+        dataPtr = NULL;
+
         EXPECT_ONE
             CASE (DEPRECATED_TOKEN)
                 deprecated = true;
@@ -8302,12 +8311,12 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
         Previous = -1;
         Temp_Entry = NULL;
 
-        EXPECT
+        EXPECT_ONE
             CASE (IDENTIFIER_TOKEN)
                 allow_redefine = !Token.is_array_elem;
                 Temp_Entry = Add_Symbol (Local_Index,Token.Token_String,IDENTIFIER_TOKEN);
-                Token.NumberPtr = &(Temp_Entry->Token_Number);
-                Token.DataPtr = &(Temp_Entry->Data);
+                numberPtr = &(Temp_Entry->Token_Number);
+                dataPtr = &(Temp_Entry->Data);
                 Previous = Token.Token_Id;
                 if (deprecated)
                 {
@@ -8327,7 +8336,6 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
                         Temp_Entry->Deprecation_Message = POV_STRDUP(str);
                     }
                 }
-                EXIT
             END_CASE
 
             CASE2 (FUNCT_ID_TOKEN, VECTFUNCT_ID_TOKEN)
@@ -8348,21 +8356,23 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
                 if (is_local && (Token.Table_Index != Table_Index))
                 {
                     Temp_Entry = Add_Symbol (Local_Index,Token.Token_String,IDENTIFIER_TOKEN);
-                    Token.NumberPtr = &(Temp_Entry->Token_Number);
-                    Token.DataPtr   = &(Temp_Entry->Data);
-                    Previous        = IDENTIFIER_TOKEN;
+                    numberPtr = &(Temp_Entry->Token_Number);
+                    dataPtr   = &(Temp_Entry->Data);
+                    Previous  = IDENTIFIER_TOKEN;
                 }
                 else
                 {
-                    Previous        = Token.Token_Id;
+                    numberPtr = Token.NumberPtr;
+                    dataPtr   = Token.DataPtr;
+                    Previous  = Token.Token_Id;
                 }
-                EXIT
             END_CASE
 
             CASE (EMPTY_ARRAY_TOKEN)
                 allow_redefine  = !Token.is_array_elem;
-                Previous = Token.Token_Id;
-                EXIT
+                numberPtr = Token.NumberPtr;
+                dataPtr   = Token.DataPtr;
+                Previous  = Token.Token_Id;
             END_CASE
 
             CASE2 (VECTOR_FUNCT_TOKEN, FLOAT_FUNCT_TOKEN)
@@ -8374,35 +8384,59 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
                         if (is_local && (Token.Table_Index != Table_Index))
                         {
                             Temp_Entry = Add_Symbol (Local_Index,Token.Token_String,IDENTIFIER_TOKEN);
-                            Token.NumberPtr = &(Temp_Entry->Token_Number);
-                            Token.DataPtr   = &(Temp_Entry->Data);
+                            numberPtr = &(Temp_Entry->Token_Number);
+                            dataPtr   = &(Temp_Entry->Data);
                         }
-                        Previous           = Token.Function_Id;
+                        else
+                        {
+                            numberPtr = Token.NumberPtr;
+                            dataPtr   = Token.DataPtr;
+                        }
+                        Previous  = Token.Function_Id;
                         break;
 
                     default:
                         Parse_Error(IDENTIFIER_TOKEN);
                         break;
                 }
-                EXIT
             END_CASE
 
+            CASE4 (COMMA_TOKEN, RIGHT_PAREN_TOKEN, RIGHT_ANGLE_TOKEN, RIGHT_CURLY_TOKEN)
+                if (tupleDeclare || lvectorDeclare || larrayDeclare)
+                {
+                    // when using tuple-style declare, it is legal to omit individual identifiers,
+                    // in which case we evaluate the corresponding expression element but ignore
+                    // the resulting value.
+                    // We do this by assigning the resulting value to a dummy symbol entry.
+                    allow_redefine  = true;
+                    Temp_Entry = Create_Entry (0, "", DUMMY_SYMBOL_TOKEN);
+                    numberPtr = &(Temp_Entry->Token_Number);
+                    dataPtr = &(Temp_Entry->Data);
+                    Previous = IDENTIFIER_TOKEN;
+                    UNGET
+                    END_CASE
+                }
+                // fall through
+
             OTHERWISE
-                allow_redefine  = !Token.is_array_elem;
                 Parse_Error(IDENTIFIER_TOKEN);
             END_CASE
         END_EXPECT
 
+        assert ((numberPtr != NULL) || (Token.NumberPtr == NULL));
+        assert ((dataPtr != NULL) || (Token.DataPtr == NULL));
+
         LValue lvalue;
-        lvalue.token = Token;
-        lvalue.tempEntry = Temp_Entry;
+        lvalue.numberPtr = numberPtr;
+        lvalue.dataPtr = dataPtr;
+        lvalue.symEntry = Temp_Entry;
         lvalue.previous = Previous;
         lvalue.allowRedefine = allow_redefine;
         lvalues.push_back(lvalue);
 
-        if (lvectorDeclare && lvalues.size() >= 5)
+        if (lvectorDeclare && (lvalues.size() >= 5))
             more = false;
-        else if (tupleDeclare || lvectorDeclare)
+        else if (tupleDeclare || lvectorDeclare || larrayDeclare)
         {
             EXPECT_ONE
                 CASE (COMMA_TOKEN)
@@ -8428,6 +8462,10 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
     {
         GET (RIGHT_ANGLE_TOKEN)
     }
+    else if (larrayDeclare)
+    {
+        GET (RIGHT_CURLY_TOKEN)
+    }
 
     LValue_Ok = false;
 
@@ -8442,16 +8480,47 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
         Promote_Express(expr,&terms,lvalues.size());
         for (int i = 0; i < lvalues.size(); ++i)
         {
-            Token_Struct& t = lvalues[i].token;
+            numberPtr = lvalues[i].numberPtr;
+            dataPtr = lvalues[i].dataPtr;
             Previous = lvalues[i].previous;
-            Temp_Entry = lvalues[i].tempEntry;
+            Temp_Entry = lvalues[i].symEntry;
             allow_redefine = lvalues[i].allowRedefine;
 
-            *t.NumberPtr = FLOAT_ID_TOKEN;
-            Test_Redefine(Previous,t.NumberPtr,*t.DataPtr, allow_redefine);
-            *t.DataPtr = reinterpret_cast<void *>(Create_Float());
-            *(reinterpret_cast<DBL *>(*t.DataPtr)) = expr[i];
+            *numberPtr = FLOAT_ID_TOKEN;
+            Test_Redefine(Previous, numberPtr, *dataPtr, allow_redefine);
+            *dataPtr = reinterpret_cast<void *>(Create_Float());
+            *(reinterpret_cast<DBL *>(*dataPtr)) = expr[i];
         }
+    }
+    else if (larrayDeclare)
+    {
+        SYM_ENTRY *rvalue = Create_Entry (0, "", DUMMY_SYMBOL_TOKEN);
+        if (!Parse_RValue (IDENTIFIER_TOKEN, &(rvalue->Token_Number), &(rvalue->Data), NULL, false, false, true, true, MAX_NUMBER_OF_TABLES) ||
+            (rvalue->Token_Number != ARRAY_ID_TOKEN))
+            Expectation_Error("array RValue");
+        POV_ARRAY *a = reinterpret_cast<POV_ARRAY *>(rvalue->Data);
+        if (lvalues.size() > a->Total)
+            Error ("array size mismatch");
+        if (a->DataPtrs == NULL)
+            Error ("cannot assign from uninitialized array");
+
+        for (int i = 0; i < lvalues.size(); ++i)
+        {
+            if (a->DataPtrs[i] == NULL)
+                Error ("cannot assign from partially uninitialized array");
+
+            numberPtr = lvalues[i].numberPtr;
+            dataPtr = lvalues[i].dataPtr;
+            Previous = lvalues[i].previous;
+            Temp_Entry = lvalues[i].symEntry;
+            allow_redefine = lvalues[i].allowRedefine;
+
+            *numberPtr = a->Type;
+            Test_Redefine(Previous, numberPtr, *dataPtr, allow_redefine);
+            *dataPtr = Copy_Identifier(a->DataPtrs[i], a->Type);
+        }
+
+        Destroy_Entry (0, rvalue);
     }
     else
     {
@@ -8461,16 +8530,17 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
         }
         for (int i = 0; i < lvalues.size(); ++i)
         {
-            Token_Struct& t = lvalues[i].token;
+            numberPtr = lvalues[i].numberPtr;
+            dataPtr = lvalues[i].dataPtr;
             Previous = lvalues[i].previous;
-            Temp_Entry = lvalues[i].tempEntry;
+            Temp_Entry = lvalues[i].symEntry;
             allow_redefine = lvalues[i].allowRedefine;
 
             if (i > 0)
             {
                 GET (COMMA_TOKEN)
             }
-            if (!Parse_RValue (Previous, t.NumberPtr, t.DataPtr, Temp_Entry, false, !tupleDeclare, is_local, allow_redefine, MAX_NUMBER_OF_TABLES))
+            if (!Parse_RValue (Previous, numberPtr, dataPtr, Temp_Entry, false, !tupleDeclare, is_local, allow_redefine, MAX_NUMBER_OF_TABLES))
             {
                 Expectation_Error("RValue to declare");
             }
@@ -8480,6 +8550,15 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
             GET (RIGHT_PAREN_TOKEN)
         }
     }
+
+    // discard any dummy symbol entries we may have created as stand-in for omitted identifiers
+    // in tuple-style declarations
+    for (vector<LValue>::iterator i = lvalues.begin(); i != lvalues.end(); ++i)
+    {
+        if ((i->symEntry != NULL) && (i->symEntry->Token_Number == DUMMY_SYMBOL_TOKEN))
+            Destroy_Entry (0, i->symEntry);
+    }
+
     if ( after_hash )
     {
         Ok_To_Declare = false;
@@ -8943,9 +9022,12 @@ int Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTR
             UNGET
             Local_Object = Parse_Object ();
             Found=(Local_Object!=NULL);
-            *NumberPtr   = OBJECT_ID_TOKEN;
-            Test_Redefine(Previous,NumberPtr,*DataPtr, allow_redefine);
-            *DataPtr     = reinterpret_cast<void *>(Local_Object);
+            if (Found)
+            {
+                *NumberPtr   = OBJECT_ID_TOKEN;
+                Test_Redefine(Previous,NumberPtr,*DataPtr, allow_redefine);
+                *DataPtr     = reinterpret_cast<void *>(Local_Object);
+            }
             EXIT
         END_CASE
 

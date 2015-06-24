@@ -199,6 +199,7 @@ const RESERVED_WORD Reserved_Words[LAST_TOKEN] = {
     {DIV_TOKEN, "div"},
     {DOLLAR_TOKEN, "$"},
     {DOUBLE_ILLUMINATE_TOKEN, "double_illuminate"},
+    {DUMMY_SYMBOL_TOKEN, "dummy symbol"},
     {ECCENTRICITY_TOKEN, "eccentricity"},
     {ELSE_TOKEN, "else"},
     {ELSEIF_TOKEN, "elseif"},

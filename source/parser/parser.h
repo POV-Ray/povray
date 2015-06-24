@@ -244,9 +244,10 @@ class Parser : public SceneTask
 
         struct LValue
         {
-            Token_Struct token; // TODO - we probably only need a small subset of the information
+            int*         numberPtr;
+            void**       dataPtr;
             int          previous;
-            SYM_ENTRY*   tempEntry;
+            SYM_ENTRY*   symEntry;
             bool         allowRedefine;
         };
 
