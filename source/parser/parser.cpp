@@ -6022,6 +6022,8 @@ ObjectPtr Parser::Parse_Torus()
     Torus *Object;
     DBL majorRadius, minorRadius;
     bool invert = false;
+    SpindleTorus::SpindleMode spindleMode = SpindleTorus::UnionSpindle;
+    bool spindleModeSet = false;
 
     Parse_Begin();
 
@@ -6050,10 +6052,41 @@ ObjectPtr Parser::Parse_Torus()
         invert = !invert;
     }
 
-    if (majorRadius >= minorRadius)
-        Object = new Torus();
+    bool spindleTorus = (majorRadius < minorRadius);
+
+    EXPECT_ONE
+        CASE(DIFFERENCE_TOKEN)
+            spindleMode = SpindleTorus::DifferenceSpindle;
+        END_CASE
+        CASE(INTERSECTION_TOKEN)
+            spindleMode = SpindleTorus::IntersectionSpindle;
+            if (!spindleTorus)
+            {
+                PossibleError("Intersection spindle mode specified on non-spindle torus.");
+                spindleTorus = true;
+            }
+        END_CASE
+        CASE(MERGE_TOKEN)
+            spindleMode = SpindleTorus::MergeSpindle;
+        END_CASE
+        CASE(UNION_TOKEN)
+            spindleMode = SpindleTorus::UnionSpindle;
+        END_CASE
+        OTHERWISE
+            UNGET
+        END_CASE
+    END_EXPECT
+
+    if (spindleTorus)
+    {
+        SpindleTorus* temp = new SpindleTorus();
+        temp->mSpindleMode = spindleMode;
+        Object = temp;
+    }
     else
-        Object = new SpindleTorus();
+    {
+        Object = new Torus();
+    }
 
     Object->MajorRadius = majorRadius;
     Object->MinorRadius = minorRadius;
@@ -6553,7 +6586,7 @@ ObjectPtr Parser::Parse_Object ()
     END_EXPECT
 
     if (Object && !Object->Precompute())
-        PossibleError("Invalid object paameters.");
+        PossibleError("Inconsistent object parameters.");
 
     return Object;
 }

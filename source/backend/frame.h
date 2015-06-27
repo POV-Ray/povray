@@ -1231,14 +1231,16 @@ class Intersection
         /// @note These values may be invalid or meaningless depending on the type of object intersected.
         /// @{
 
-        /// Point of the intersection in local coordinate space (used by Blob)
-        /// @note This value is invalid if haveLocalIPoint is false.
+        /// Point of the intersection in local coordinate space (used by Blob and SpindleTorus)
+        /// @note This value is invalid in Blob if haveLocalIPoint is false.
         Vector3d LocalIPoint;
         /// Flag to indicate whether INormal was computed during intersection testing (used by HField)
         /// @note Objects either always or never computing INormal during intersection testing don't use this flag.
-        bool haveNormal;
+        bool haveNormal : 1;
         /// Flag to indicate whether LocalIPoint has already been computed.
-        bool haveLocalIPoint;
+        bool haveLocalIPoint : 1;
+        /// Generic auxiliary boolean data #1 (used by SpindleTorus)
+        bool b1 : 1;
         /// Generic auxiliary integer data #1 (used by Sor, Prism, Isosurface, Lathe, Cones, Boxes)
         int i1;
         /// Generic auxiliary integer data #2 (used by Sor, Prism, Isosurface)
@@ -1299,6 +1301,10 @@ class Intersection
 
         Intersection(DBL d, const Vector3d& v, ObjectPtr o, int a, int b, DBL c) :
             Depth(d), Object(o), i1(a), i2(b), d1(c), IPoint(v), haveNormal(false), haveLocalIPoint(false), Csg(NULL)
+        {}
+
+        Intersection(DBL d, const Vector3d& v, ObjectPtr o, const Vector3d& lv, bool a) :
+            Depth(d), Object(o), b1(a), IPoint(v), LocalIPoint(lv), haveNormal(false), haveLocalIPoint(true), Csg(NULL)
         {}
 
         ~Intersection() { }

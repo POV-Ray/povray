@@ -90,20 +90,52 @@ class Torus : public ObjectBase
         void CalcUV(const Vector3d& IPoint, Vector2d& Result) const;
 };
 
-// @todo This class may need its own UVCoord() function.
+/// @todo This class may need its own UVCoord() function.
 class SpindleTorus : public Torus
 {
+    protected:
+
+        static const int SpindleVisible                 = 0x0001;
+        static const int NonSpindleVisible              = 0x0002;
+        static const int SpindleInside                  = 0x0004;
+        static const int NonSpindleInside               = 0x0008;
+        static const int SpindleRelevantForIntersection = 0x0010;
+        static const int SpindleRelevantForInside       = 0x0020;
+
+        static const int SpindleOnlyVisible             = SpindleRelevantForIntersection | SpindleVisible;
+        static const int NonSpindleOnlyVisible          = SpindleRelevantForIntersection | NonSpindleVisible;
+        static const int AllVisible                     = SpindleVisible | NonSpindleVisible;
+
+        static const int SpindleOnlyInside              = SpindleRelevantForInside | SpindleInside;
+        static const int NonSpindleOnlyInside           = SpindleRelevantForInside | NonSpindleInside;
+        static const int AllInside                      = SpindleInside | NonSpindleInside;
+
     public:
+
+        enum SpindleMode
+        {
+            UnionSpindle        = AllVisible            | AllInside,
+            MergeSpindle        = NonSpindleOnlyVisible | AllInside,
+            IntersectionSpindle = SpindleOnlyVisible    | SpindleOnlyInside,
+            DifferenceSpindle   = AllVisible            | NonSpindleOnlyInside,
+        };
+
+        SpindleMode mSpindleMode;
+
         SpindleTorus();
         virtual ~SpindleTorus();
 
         virtual ObjectPtr Copy();
 
         virtual bool Precompute();
+        virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
+        virtual bool Inside(const Vector3d&, TraceThreadData *) const;
         virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const;
+        virtual void Compute_BBox();
 
     protected:
-        DBL mSpindleTipDistSqr;
+
+        DBL mSpindleTipYSqr;
 };
 
 }

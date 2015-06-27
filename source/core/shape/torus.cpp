@@ -82,8 +82,8 @@ bool SpindleTorus::Precompute()
 {
     bool ok = Torus::Precompute();
 
-    mSpindleTipDistSqr = Sqr(MinorRadius) - Sqr(MajorRadius);
-    if (mSpindleTipDistSqr < 0)
+    mSpindleTipYSqr = Sqr(MinorRadius) - Sqr(MajorRadius);
+    if (mSpindleTipYSqr < 0)
         ok = false;
 
     return ok;
@@ -145,6 +145,47 @@ bool Torus::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDa
                     Depth_Stack->push(Intersection(Depth[i], IPoint, this));
 
                     Found = true;
+                }
+            }
+        }
+    }
+
+    return(Found);
+}
+
+bool SpindleTorus::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread)
+{
+    int i, max_i, Found;
+    DBL Depth[4];
+    Vector3d IPoint;
+
+    Found = false;
+
+    if ((max_i = Intersect(ray, Depth, Thread)) > 0)
+    {
+        for (i = 0; i < max_i; i++)
+        {
+            if ((Depth[i] > DEPTH_TOLERANCE) && (Depth[i] < MAX_DISTANCE))
+            {
+                IPoint = ray.Evaluate(Depth[i]);
+
+                if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
+                {
+                    // To test whether the point is on the spindle,
+                    // we test whether it is inside a sphere around the origin going through the spindle's tips.
+
+                    Vector3d P;
+                    MInvTransPoint(P, IPoint, Trans);
+                    bool onSpindle = (P.lengthSqr() < mSpindleTipYSqr);
+
+                    bool validIntersection = (onSpindle ? (mSpindleMode & SpindleVisible)
+                                                        : (mSpindleMode & NonSpindleVisible));
+
+                    if (validIntersection)
+                    {
+                        Depth_Stack->push(Intersection(Depth[i], IPoint, this, P, onSpindle));
+                        Found = true;
+                    }
                 }
             }
         }
@@ -337,6 +378,43 @@ bool Torus::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
     }
 }
 
+bool SpindleTorus::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
+{
+    DBL r, r2;
+    Vector3d P;
+    bool inside;
+
+    /* Transform the point into the torus space. */
+
+    MInvTransPoint(P, IPoint, Trans);
+
+    r  = sqrt(Sqr(P[X]) + Sqr(P[Z]));
+
+    r2 = Sqr(P[Y]) + Sqr(r - MajorRadius);
+
+    if (r2 <= Sqr(MinorRadius))
+    {
+        if (mSpindleMode & SpindleRelevantForInside)
+        {
+            bool insideSpindle = ( Sqr(P[Y]) + Sqr(r + MajorRadius) <= Sqr(MinorRadius) );
+            if (mSpindleMode & SpindleInside)
+                inside = insideSpindle;
+            else
+                inside = !insideSpindle;
+        }
+        else
+            inside = true;
+
+    }
+    else
+        inside = false;
+
+    if (inside)
+        return(!Test_Flag(this, INVERTED_FLAG));
+    else
+        return(Test_Flag(this, INVERTED_FLAG));
+}
+
 
 
 /*****************************************************************************
@@ -410,8 +488,8 @@ void SpindleTorus::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData
     Vector3d P, N, M;
     bool spindle = false;
 
-    // Transform the point into the torus space.
-    MInvTransPoint(P, Inter->IPoint, Trans);
+    // The point has already been transformed into the torus space.
+    P = Inter->LocalIPoint;
 
     // Get normal from derivatives.
 
@@ -428,16 +506,10 @@ void SpindleTorus::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData
         M = Vector3d(0.0, 0.0, 0.0);
     }
 
-    // Points on the spindle need special attention
-    DBL distSqr = P.lengthSqr();
-    if (distSqr > mSpindleTipDistSqr)
-    {
-        N = P - M;
-    }
-    else
-    {
+    if (Inter->b1) // Inter->b1 indicates whether the point is on the spindle (true) or not (false)
         N = P + M;
-    }
+    else
+        N = P - M;
 
     // Transform the normalt out of the torus space.
     MTransNormal(Result, N, Trans);
@@ -780,6 +852,39 @@ void Torus::Compute_BBox()
     Make_BBox(BBox, -r2, -r1, -r2, 2.0 * r2, 2.0 * r1, 2.0 * r2);
 
     Recompute_BBox(&BBox, Trans);
+}
+
+void SpindleTorus::Compute_BBox()
+{
+    DBL r1, r2;
+
+    if (mSpindleMode & NonSpindleVisible)
+    {
+        r1 = MinorRadius;
+        r2 = MajorRadius + MinorRadius;
+
+        Make_BBox(BBox, -r2, -r1, -r2, 2.0 * r2, 2.0 * r1, 2.0 * r2);
+
+        Recompute_BBox(&BBox, Trans);
+    }
+    else
+    {
+        Precompute(); // make sure mSpindleTipYSqr is properly set
+
+        if (mSpindleTipYSqr >= 0)
+        {
+            r1 = sqrt(mSpindleTipYSqr);
+            r2 = MinorRadius - MajorRadius;
+
+            Make_BBox(BBox, -r2, -r1, -r2, 2.0 * r2, 2.0 * r1, 2.0 * r2);
+
+            Recompute_BBox(&BBox, Trans);
+        }
+        else
+        {
+            Make_BBox(BBox, -BOUND_HUGE/2.0, -BOUND_HUGE/2.0, -BOUND_HUGE/2.0, BOUND_HUGE, BOUND_HUGE, BOUND_HUGE);
+        }
+    }
 }
 
 
