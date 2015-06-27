@@ -26,6 +26,9 @@
     <ClInclude Include="..\..\source\parser\reservedwords.h">
       <Filter>Parser Headers</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\parser\fncode.h">
+      <Filter>Parser Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\precomp.cpp" />
@@ -51,6 +54,9 @@
       <Filter>Parser Source</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\parser\reservedwords.cpp">
+      <Filter>Parser Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\parser\fncode.cpp">
       <Filter>Parser Source</Filter>
     </ClCompile>
   </ItemGroup>

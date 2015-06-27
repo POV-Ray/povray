@@ -40,8 +40,8 @@
 #pragma warning(disable : 4267)
 #endif
 
-#include "frame.h"
-#include "povray.h"
+#include "backend/frame.h"
+#include "backend/povray.h"
 #include "vfe.h"
 
 // this must be the last file included

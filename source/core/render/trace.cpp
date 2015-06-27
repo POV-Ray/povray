@@ -58,7 +58,7 @@
 #include "backend/render/tracetask.h"
 #include "backend/scene/atmosph.h"
 #include "backend/scene/objects.h"
-#include "backend/scene/scene.h"
+#include "backend/scene/scenedata.h"
 #include "backend/scene/threaddata.h"
 #include "backend/scene/view.h"
 #include "backend/support/bsptree.h"

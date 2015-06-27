@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file backend/scene/scene.h
+/// @file backend/control/scene.h
 ///
 /// @todo   What's in here?
 ///
@@ -31,7 +31,7 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
 #ifndef POVRAY_BACKEND_SCENE_H
 #define POVRAY_BACKEND_SCENE_H
@@ -42,15 +42,10 @@
 
 #include <boost/thread.hpp>
 
-#include "backend/frame.h"
-
+#include "backend/control/renderbackend.h"
 #include "backend/scene/scenedata.h"
-#include "backend/lighting/photons.h"
-#include "backend/lighting/radiosity.h"
-#include "backend/scene/camera.h"
+#include "backend/scene/threaddata.h"
 #include "backend/support/taskqueue.h"
-#include "base/image/colourspace.h"
-#include "base/stringutilities.h"
 
 namespace pov
 {
@@ -60,9 +55,10 @@ using namespace pov_base;
 class Parser;
 class View;
 
-/**
- *  Scene class representing a POV-Ray camera-independent scene.
- */
+/// Class governing the rendering of a scene.
+///
+/// @todo   Change the class name into something more expressive.
+///
 class Scene
 {
     public:
@@ -180,8 +176,8 @@ class Scene
     private:
         /// running and pending parser tasks for this scene
         TaskQueue parserTasks;
-        /// scene thread data (i.e. statistics)
-        vector<SceneThreadData *> sceneThreadData;
+        /// scene thread data (e.g. statistics)
+        vector<TraceThreadData *> sceneThreadData;
         /// scene data
         shared_ptr<SceneData> sceneData;
         /// stop request flag

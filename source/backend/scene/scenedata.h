@@ -31,7 +31,7 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
 #ifndef POVRAY_BACKEND_SCENEDATA_H
 #define POVRAY_BACKEND_SCENEDATA_H
@@ -46,6 +46,8 @@
 
 #include "base/image/colourspace.h"
 
+#include "core/shape/truetype.h"
+
 #include "backend/control/renderbackend.h"
 #include "backend/lighting/radiosity.h"
 #include "backend/scene/camera.h"
@@ -59,7 +61,6 @@ class BSPTree;
 class FunctionVM;
 
 struct Fog_Struct;
-struct FontFileInfo;
 struct Rainbow_Struct;
 struct Skysphere_Struct;
 
@@ -131,7 +132,7 @@ class SceneData
         /// warning level
         int warningLevel;
         /// string encoding of text
-        int stringEncoding;
+        StringEncoding stringEncoding;
         /// default noise generator to use
         int noiseGenerator;
         /// whether or not the noise generator was explicitly set by the scene - TODO FIXME remove [trf]
@@ -202,7 +203,8 @@ class SceneData
         ScenePhotonSettings photonSettings; // TODO FIXME - is modified! [trf]
 
         // TODO - decide if we want to keep this here
-        FontFileInfo *TTFonts;
+        // (we can't move it to the parser though, as part of the data needs to survive into rendering)
+        vector<TrueTypeFont*> TTFonts;
 
         // name of the parsed file
         UCS2String inputFile; // TODO - handle differently

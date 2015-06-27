@@ -31,7 +31,7 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
 #ifndef POVRAY_BACKEND_BOUNDINGTASK_H
 #define POVRAY_BACKEND_BOUNDINGTASK_H
@@ -47,7 +47,7 @@ namespace pov
 {
 
 class SceneData;
-class SceneThreadData;
+class TraceThreadData;
 
 class BoundingTask : public SceneTask
 {
@@ -61,7 +61,7 @@ class BoundingTask : public SceneTask
 
         void AppendObject(ObjectPtr p);
 
-        inline SceneThreadData *GetSceneDataPtr() { return reinterpret_cast<SceneThreadData *>(GetDataPtr()); }
+        inline TraceThreadData *GetSceneDataPtr() { return reinterpret_cast<TraceThreadData *>(GetDataPtr()); }
     private:
         shared_ptr<SceneData> sceneData;
         unsigned int boundingThreshold;

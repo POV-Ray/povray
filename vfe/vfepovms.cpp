@@ -43,7 +43,6 @@
 namespace vfe
 {
 
-using namespace pov;
 using namespace pov_base;
 
 class SysQNode

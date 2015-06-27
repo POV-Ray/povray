@@ -33,10 +33,11 @@
 ///
 //******************************************************************************
 
-#include <climits>
 #include <cmath>
 #include <cstdio>
 #include <cstring>
+
+#include <limits>
 
 // frame.h must always be the first POV file included (pulls in platform config)
 #include "backend/frame.h"
@@ -551,7 +552,7 @@ GenericSpline * Copy_Spline(const GenericSpline * Old)
 
 void GenericSpline::AcquireReference()
 {
-    if (ref_count >= INT_MAX)
+    if (ref_count >= std::numeric_limits<SplineRefCount>::max())
         throw POV_EXCEPTION_STRING("Too many unresolved references to single spline\n");
     ref_count ++;
 }

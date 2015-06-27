@@ -43,6 +43,7 @@
 #include "parser/parser.h"
 
 #include "backend/math/mathutil.h"
+#include "backend/scene/scenedata.h"
 #include "backend/vm/fnpovfpu.h"
 
 // this must be the last file included
@@ -59,7 +60,7 @@ struct ExprParserTableEntry
 {
     int stage;
     TOKEN token;
-    bool (Parser::*operation)(Parser::ExprNode *&, int, int);
+    bool (Parser::*operation)(ExprNode *&, int, int);
     int next;
     int op;
 };
@@ -171,7 +172,7 @@ const int START_LEFTMOST_PARSE_INDEX = 18;
 *
 ******************************************************************************/
 
-Parser::ExprNode *Parser::FNSyntax_ParseExpression()
+ExprNode *Parser::FNSyntax_ParseExpression()
 {
     ExprNode *expression = NULL;
 
@@ -212,7 +213,7 @@ Parser::ExprNode *Parser::FNSyntax_ParseExpression()
 *
 ******************************************************************************/
 
-Parser::ExprNode *Parser::FNSyntax_GetTrapExpression(unsigned int trap)
+ExprNode *Parser::FNSyntax_GetTrapExpression(unsigned int trap)
 {
     ExprNode *expression = NULL;
 
@@ -313,7 +314,7 @@ void Parser::FNSyntax_DeleteExpression(ExprNode *node)
 *
 ******************************************************************************/
 
-Parser::ExprNode *Parser::parse_expr()
+ExprNode *Parser::parse_expr()
 {
     ExprNode *current = NULL;
     ExprNode *node = NULL;
@@ -475,7 +476,7 @@ TOKEN Parser::expr_get_token()
 *
 ******************************************************************************/
 
-Parser::ExprNode *Parser::new_expr_node(int stage, int op)
+ExprNode *Parser::new_expr_node(int stage, int op)
 {
     ExprNode *node = NULL;
 

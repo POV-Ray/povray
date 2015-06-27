@@ -39,9 +39,12 @@
 #define BBOX_H
 
 #include "backend/frame.h"
+#include "backend/support/statistics.h"
 
 namespace pov
 {
+
+class TraceThreadData;
 
 /*****************************************************************************
 * Global preprocessor defines
@@ -163,7 +166,7 @@ void Recompute_BBox(BoundingBox *bbox, const TRANSFORM *trans);
 void Recompute_Inverse_BBox(BoundingBox *bbox, const TRANSFORM *trans);
 bool Intersect_BBox_Tree(BBoxPriorityQueue& pqueue, const BBOX_TREE *Root, const Ray& ray, Intersection *Best_Intersection, TraceThreadData *Thread);
 bool Intersect_BBox_Tree(BBoxPriorityQueue& pqueue, const BBOX_TREE *Root, const Ray& ray, Intersection *Best_Intersection, const RayObjectCondition& precondition, const RayObjectCondition& postcondition, TraceThreadData *Thread);
-void Check_And_Enqueue(BBoxPriorityQueue& Queue, const BBOX_TREE *Node, const BoundingBox *BBox, const Rayinfo *rayinfo, TraceThreadData *Thread);
+void Check_And_Enqueue(BBoxPriorityQueue& Queue, const BBOX_TREE *Node, const BoundingBox *BBox, const Rayinfo *rayinfo, RenderStatistics& Stats);
 void Destroy_BBox_Tree(BBOX_TREE *Node);
 
 

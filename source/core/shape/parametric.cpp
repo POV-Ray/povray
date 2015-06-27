@@ -45,7 +45,6 @@
 #include "backend/math/matrices.h"
 #include "backend/scene/objects.h"
 #include "backend/scene/threaddata.h"
-#include "backend/vm/fnpovfpu.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -181,7 +180,7 @@ bool Parametric::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
             hi = PData->Hi[0][SectorNum[i]];
         }
         else
-            Evaluate_Function_Interval_UV(Thread->functionContext, *(Function[0]), accuracy, low_vect, hi_vect, max_gradient, low, hi);
+            Evaluate_Function_Interval_UV(Function[0], Thread->functionContext, accuracy, low_vect, hi_vect, max_gradient, low, hi);
         /* fabs(D[X] *(T2-T1)) is not OK with new method */
 
         if (close(D[X], 0))
@@ -226,7 +225,7 @@ bool Parametric::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
             hi = PData->Hi[1][SectorNum[i]];
         }
         else
-            Evaluate_Function_Interval_UV(Thread->functionContext, *(Function[1]), accuracy, low_vect, hi_vect, max_gradient, low, hi);
+            Evaluate_Function_Interval_UV(Function[1], Thread->functionContext, accuracy, low_vect, hi_vect, max_gradient, low, hi);
 
         if (close(D[Y], 0))
         {
@@ -276,7 +275,7 @@ bool Parametric::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
             hi = PData->Hi[2][SectorNum[i]];
         }
         else
-            Evaluate_Function_Interval_UV(Thread->functionContext, *(Function[2]), accuracy, low_vect, hi_vect, max_gradient, low, hi);
+            Evaluate_Function_Interval_UV(Function[2], Thread->functionContext, accuracy, low_vect, hi_vect, max_gradient, low, hi);
 
         if (close(D[Z], 0))
         {
@@ -442,20 +441,20 @@ void Parametric::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *
 
     uv_vect[U] = Inter->Iuv[U];
     uv_vect[V] = Inter->Iuv[V];
-    RU[X] = RV[X] = -Evaluate_Function_UV(Thread->functionContext, *(Function[X]), uv_vect);
-    RU[Y] = RV[Y] = -Evaluate_Function_UV(Thread->functionContext, *(Function[Y]), uv_vect);
-    RU[Z] = RV[Z] = -Evaluate_Function_UV(Thread->functionContext, *(Function[Z]), uv_vect);
+    RU[X] = RV[X] = -Evaluate_Function_UV(Function[X], Thread->functionContext, uv_vect);
+    RU[Y] = RV[Y] = -Evaluate_Function_UV(Function[Y], Thread->functionContext, uv_vect);
+    RU[Z] = RV[Z] = -Evaluate_Function_UV(Function[Z], Thread->functionContext, uv_vect);
 
     uv_vect[U] += accuracy;
-    RU[X] += Evaluate_Function_UV(Thread->functionContext, *(Function[X]), uv_vect);
-    RU[Y] += Evaluate_Function_UV(Thread->functionContext, *(Function[Y]), uv_vect);
-    RU[Z] += Evaluate_Function_UV(Thread->functionContext, *(Function[Z]), uv_vect);
+    RU[X] += Evaluate_Function_UV(Function[X], Thread->functionContext, uv_vect);
+    RU[Y] += Evaluate_Function_UV(Function[Y], Thread->functionContext, uv_vect);
+    RU[Z] += Evaluate_Function_UV(Function[Z], Thread->functionContext, uv_vect);
 
     uv_vect[U] = Inter->Iuv[U];
     uv_vect[V] += accuracy;
-    RV[X] += Evaluate_Function_UV(Thread->functionContext, *(Function[X]), uv_vect);
-    RV[Y] += Evaluate_Function_UV(Thread->functionContext, *(Function[Y]), uv_vect);
-    RV[Z] += Evaluate_Function_UV(Thread->functionContext, *(Function[Z]), uv_vect);
+    RV[X] += Evaluate_Function_UV(Function[X], Thread->functionContext, uv_vect);
+    RV[Y] += Evaluate_Function_UV(Function[Y], Thread->functionContext, uv_vect);
+    RV[Z] += Evaluate_Function_UV(Function[Z], Thread->functionContext, uv_vect);
 
     Result = cross(RU, RV);
     if (Trans != NULL)
@@ -651,9 +650,9 @@ ObjectPtr Parametric::Copy()
     Destroy_Transform(New->Trans);
     *New = *this;
 
-    New->Function[0] = Parser::Copy_Function(vm, Function[0]);
-    New->Function[1] = Parser::Copy_Function(vm, Function[1]);
-    New->Function[2] = Parser::Copy_Function(vm, Function[2]);
+    New->Function[0] = Function[0]->Clone();
+    New->Function[1] = Function[1]->Clone();
+    New->Function[2] = Function[2]->Clone();
     New->Trans = Copy_Transform(Trans);
     New->PData = Copy_PrecompParVal();
 
@@ -690,9 +689,9 @@ ObjectPtr Parametric::Copy()
 Parametric::~Parametric()
 {
     Destroy_Transform(Trans);
-    Parser::Destroy_Function(vm, Function[0]);
-    Parser::Destroy_Function(vm, Function[1]);
-    Parser::Destroy_Function(vm, Function[2]);
+    delete Function[0];
+    delete Function[1];
+    delete Function[2];
     Destroy_PrecompParVal();
 }
 
@@ -796,7 +795,7 @@ void Parametric::UVCoord(Vector2d& Result, const Intersection *inter, TraceThrea
  *
  ******************************************************************************/
 
-void Parametric::Precomp_Par_Int(int depth, DBL umin, DBL vmin, DBL umax, DBL vmax, FPUContext *ctx)
+void Parametric::Precomp_Par_Int(int depth, DBL umin, DBL vmin, DBL umax, DBL vmax, GenericFunctionContextPtr ctx)
 {
     int j;
 
@@ -813,8 +812,8 @@ void Parametric::Precomp_Par_Int(int depth, DBL umin, DBL vmin, DBL umax, DBL vm
                 low[V] = vmin;
                 hi[V] = vmax;
 
-                Evaluate_Function_Interval_UV(ctx,
-                                              *Function[j],
+                Evaluate_Function_Interval_UV(Function[j],
+                                              ctx,
                                               accuracy,
                                               low,
                                               hi,
@@ -878,7 +877,7 @@ void Parametric::Precomp_Par_Int(int depth, DBL umin, DBL vmin, DBL umax, DBL vm
  *
  ******************************************************************************/
 
-void Parametric::Precompute_Parametric_Values(char flags, int depth, FPUContext *ctx)
+void Parametric::Precompute_Parametric_Values(char flags, int depth, GenericFunctionContextPtr ctx)
 {
     DBL * Last;
     const char* es = "precompute";
@@ -1029,12 +1028,13 @@ void Parametric::Destroy_PrecompParVal()
  *
  ******************************************************************************/
 
-DBL Parametric::Evaluate_Function_UV(FPUContext *ctx, FUNCTION funct, const Vector2d& fnvec)
+DBL Parametric::Evaluate_Function_UV(GenericScalarFunctionPtr pFn, GenericFunctionContextPtr ctx, const Vector2d& fnvec)
 {
-    ctx->SetLocal(U, fnvec[U]);
-    ctx->SetLocal(V, fnvec[V]);
+    pFn->InitArguments(ctx);
+    pFn->PushArgument(ctx, fnvec[U]);
+    pFn->PushArgument(ctx, fnvec[V]);
 
-    return POVFPU_Run(ctx, funct);
+    return pFn->Execute(ctx);
 }
 
 /*****************************************************************************
@@ -1101,7 +1101,7 @@ void Parametric::Interval(DBL dx, DBL a, DBL b, DBL max_gradient, DBL *Min, DBL 
  *
  ******************************************************************************/
 
-void Parametric::Evaluate_Function_Interval_UV(FPUContext *ctx, FUNCTION funct, DBL threshold, const Vector2d& fnvec_low, const Vector2d& fnvec_hi, DBL max_gradient, DBL& low, DBL& hi)
+void Parametric::Evaluate_Function_Interval_UV(GenericScalarFunctionPtr pFn, GenericFunctionContextPtr ctx, DBL threshold, const Vector2d& fnvec_low, const Vector2d& fnvec_hi, DBL max_gradient, DBL& low, DBL& hi)
 {
     DBL f_0_0, f_0_1, f_1_0, f_1_1;
     DBL f_0_min, f_0_max;
@@ -1109,25 +1109,30 @@ void Parametric::Evaluate_Function_Interval_UV(FPUContext *ctx, FUNCTION funct, 
     DBL junk;
 
     /* Calculate the values at each corner */
-    ctx->SetLocal(U, fnvec_low[U]);
-    ctx->SetLocal(V, fnvec_low[V]);
 
-    f_0_0 = POVFPU_Run(ctx, funct) - threshold;
+    pFn->InitArguments(ctx);
+    pFn->PushArgument(ctx, fnvec_low[U]);
+    pFn->PushArgument(ctx, fnvec_low[V]);
 
-    ctx->SetLocal(U, fnvec_low[U]);
-    ctx->SetLocal(V, fnvec_hi[V]);
+    f_0_0 = pFn->Execute(ctx) - threshold;
 
-    f_0_1 = POVFPU_Run(ctx, funct) - threshold;
+    pFn->InitArguments(ctx);
+    pFn->PushArgument(ctx, fnvec_low[U]);
+    pFn->PushArgument(ctx, fnvec_hi[V]);
 
-    ctx->SetLocal(U, fnvec_hi[U]);
-    ctx->SetLocal(V, fnvec_low[V]);
+    f_0_1 = pFn->Execute(ctx) - threshold;
 
-    f_1_0 = POVFPU_Run(ctx, funct) - threshold;
+    pFn->InitArguments(ctx);
+    pFn->PushArgument(ctx, fnvec_hi[U]);
+    pFn->PushArgument(ctx, fnvec_low[V]);
 
-    ctx->SetLocal(U, fnvec_hi[U]);
-    ctx->SetLocal(V, fnvec_hi[V]);
+    f_1_0 = pFn->Execute(ctx) - threshold;
 
-    f_1_1 = POVFPU_Run(ctx, funct) - threshold;
+    pFn->InitArguments(ctx);
+    pFn->PushArgument(ctx, fnvec_hi[U]);
+    pFn->PushArgument(ctx, fnvec_hi[V]);
+
+    f_1_1 = pFn->Execute(ctx) - threshold;
 
     /* Determine a min and a max along the left edge of the patch */
     Interval( fnvec_hi[V]-fnvec_low[V], f_0_0, f_0_1, max_gradient, &f_0_min, &f_0_max);

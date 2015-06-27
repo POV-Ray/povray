@@ -40,7 +40,8 @@
 #ifndef ISOSURF_H
 #define ISOSURF_H
 
-#include "parser/parser.h" // TODO - avoid this (pulled in for function stuff)
+#include "core/coretypes.h"
+
 #include "backend/scene/objects.h"
 
 namespace pov
@@ -59,7 +60,9 @@ namespace pov
 ******************************************************************************/
 
 class IsoSurface;
-struct FPUContext;
+class FPUContext;
+
+class FunctionVM;
 
 struct ISO_Pair { DBL t,f; };
 
@@ -73,7 +76,7 @@ struct ISO_Max_Gradient
 struct ISO_ThreadData
 {
     const IsoSurface *current;
-    FPUContext *ctx;
+    GenericFunctionContextPtr ctx;
     Vector3d Pglobal;
     Vector3d Dglobal;
     DBL Vlength;
@@ -87,8 +90,7 @@ class IsoSurface : public ObjectBase
 {
     public:
 
-        FunctionVM *vm;
-        FUNCTION_PTR Function;
+        GenericScalarFunctionPtr Function;
         volatile DBL max_gradient; // global in eval
         DBL gradient;
         DBL threshold;
@@ -118,12 +120,12 @@ class IsoSurface : public ObjectBase
         virtual void DispatchShutdownMessages(MessageFactory& messageFactory);
 
     protected:
-        bool Function_Find_Root(ISO_ThreadData& itd, const Vector3d&, const Vector3d&, DBL*, DBL*, DBL& max_gradient, bool in_shadow_test);
-        bool Function_Find_Root_R(ISO_ThreadData& itd, const ISO_Pair*, const ISO_Pair*, DBL, DBL, DBL, DBL& max_gradient);
+        bool Function_Find_Root(ISO_ThreadData& itd, const Vector3d&, const Vector3d&, DBL*, DBL*, DBL& max_gradient, bool in_shadow_test, TraceThreadData* pThreadData);
+        bool Function_Find_Root_R(ISO_ThreadData& itd, const ISO_Pair*, const ISO_Pair*, DBL, DBL, DBL, DBL& max_gradient, TraceThreadData* pThreadData);
 
-        inline DBL Vector_Function(FPUContext *ctx, const Vector3d& VPos) const;
+        inline DBL Vector_Function(GenericFunctionContextPtr ctx, const Vector3d& VPos) const;
         inline DBL Float_Function(ISO_ThreadData& itd, DBL t) const;
-        static inline DBL Evaluate_Function(FPUContext *ctx, FUNCTION funct, const Vector3d& fnvec);
+        static inline DBL Evaluate_Function(GenericScalarFunctionPtr funct, GenericFunctionContextPtr ctx, const Vector3d& fnvec);
     private:
         ISO_Max_Gradient *mginfo; // global, but just a statistic (read: not thread safe but we don't care) [trf]
 };

@@ -46,7 +46,7 @@
 
 #include "backend/math/matrices.h"
 #include "backend/scene/objects.h"
-#include "backend/scene/scene.h"
+#include "backend/scene/scenedata.h"
 #include "backend/scene/threaddata.h"
 #include "backend/support/bsptree.h"
 
@@ -134,7 +134,7 @@ class BSPProgress : public BSPTree::Progress
 };
 
 BoundingTask::BoundingTask(shared_ptr<SceneData> sd, unsigned int bt) :
-    SceneTask(new SceneThreadData(sd), boost::bind(&BoundingTask::SendFatalError, this, _1), "Bounding", sd),
+    SceneTask(new TraceThreadData(sd), boost::bind(&BoundingTask::SendFatalError, this, _1), "Bounding", sd),
     sceneData(sd),
     boundingThreshold(bt)
 {
@@ -198,7 +198,7 @@ void BoundingTask::Stopped()
 
 void BoundingTask::Finish()
 {
-    GetSceneDataPtr()->timeType = SceneThreadData::kBoundingTime;
+    GetSceneDataPtr()->timeType = TraceThreadData::kBoundingTime;
     GetSceneDataPtr()->realTime = ConsumedRealTime();
     GetSceneDataPtr()->cpuTime = ConsumedCPUTime();
 }

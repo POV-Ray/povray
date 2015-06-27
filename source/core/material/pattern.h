@@ -52,6 +52,7 @@
 
 #include "base/fileinputoutput.h"
 
+#include "core/coretypes.h"
 #include "core/material/pigment.h"
 
 namespace pov
@@ -561,14 +562,10 @@ protected:
 ///
 struct FunctionPattern : public ContinuousPattern
 {
-    /// The function to use for the pattern.
-    void *pFn;
+    GenericScalarFunctionPtr pFn;
 
     /// The index into the functionPatternContext list, identifying the context to use when calling the function.
     unsigned int contextId;
-
-    /// The virtual machine associated with the function.
-    FunctionVM *pVm;
 
     FunctionPattern();
     FunctionPattern(const FunctionPattern& obj);

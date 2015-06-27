@@ -759,7 +759,7 @@ int Poly::intersect(const BasicRay &ray, int Order, const DBL *Coeffs, int Sturm
 
     if (j > 1)
     {
-        return(Solve_Polynomial(j, &eqn[i], Depths, Sturm_Flag, ROOT_TOLERANCE, Thread));
+        return(Solve_Polynomial(j, &eqn[i], Depths, Sturm_Flag, ROOT_TOLERANCE, Thread->Stats()));
     }
     else
     {

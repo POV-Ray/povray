@@ -41,6 +41,7 @@
 
 #include "base/types.h"
 
+#include "core/coretypes.h"
 #include "core/material/pattern.h"
 #include "core/shape/mesh.h"
 
@@ -57,7 +58,7 @@ using namespace pov_base;
 class SceneData;
 class ViewData;
 class FunctionVM;
-struct FPUContext;
+class FPUContext;
 struct ISO_ThreadData;
 
 class PhotonMap;
@@ -66,7 +67,7 @@ struct Blob_Interval_Struct;
 /**
  *  Class holding parser thread specific data.
  */
-class SceneThreadData : public Task::TaskData
+class TraceThreadData : public Task::TaskData
 {
         friend class Scene;
         friend class Trace;
@@ -76,7 +77,7 @@ class SceneThreadData : public Task::TaskData
          *  Create thread local data.
          *  @param  sd              Scene data defining scene attributes.
          */
-        SceneThreadData(shared_ptr<SceneData> sd);
+        TraceThreadData(shared_ptr<SceneData> sd);
 
         /**
          *  Get the statistics.
@@ -97,8 +98,9 @@ class SceneThreadData : public Task::TaskData
         vector<BCYL_INT> BCyl_RInt;
         vector<BCYL_INT> BCyl_HInt;
         IStackPool stackPool;
-        FPUContext *functionContext;
-        vector<FPUContext *> functionPatternContext;
+        GenericFunctionContextPtr functionContext;
+        vector<GenericFunctionContextPtr> functionPatternContext; // TODO - the current mechanism uses one context per individual function pattern in the scene,
+                                                                  // but one context per recursion would suffice, and might also make implementation easier
         int Facets_Last_Seed;
         int Facets_CVC;
         Vector3d Facets_Cube[81];
@@ -170,13 +172,13 @@ class SceneThreadData : public Task::TaskData
 
     private:
         /// not available
-        SceneThreadData();
+        TraceThreadData();
 
         /// not available
-        SceneThreadData(const SceneThreadData&);
+        TraceThreadData(const TraceThreadData&);
 
         /// not available
-        SceneThreadData& operator=(const SceneThreadData&);
+        TraceThreadData& operator=(const TraceThreadData&);
 
         /// current number of Tiles to expire crackle cache entries after
         size_t CrCache_MaxAge;
@@ -188,13 +190,13 @@ class SceneThreadData : public Task::TaskData
         /**
          *  Destructor.
          */
-        ~SceneThreadData();
+        ~TraceThreadData();
 };
 
 /**
  *  Class holding render thread specific data.
  */
-class ViewThreadData : public SceneThreadData
+class ViewThreadData : public TraceThreadData
 {
         friend class Scene;
     public:

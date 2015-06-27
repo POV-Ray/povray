@@ -44,6 +44,8 @@
 namespace pov
 {
 
+class TraceThreadData;
+
 /// Common interface for normal-like blend maps.
 ///
 /// This purely abstract class provides the common interface for both normal and slope blend maps.

@@ -511,7 +511,7 @@ bool Blob::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDat
 
         /* Solve polynomial. */
 
-        root_count = Solve_Polynomial(4, coeffs, roots, Test_Flag(this, STURM_FLAG), 1.0e-11, Thread);
+        root_count = Solve_Polynomial(4, coeffs, roots, Test_Flag(this, STURM_FLAG), 1.0e-11, Thread->Stats());
 
         /* See if any of the roots are valid. */
 

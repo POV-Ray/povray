@@ -40,7 +40,7 @@
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
-#include "backend/povray.h"
+#include "base/version.h"
 
 namespace pov_base
 {

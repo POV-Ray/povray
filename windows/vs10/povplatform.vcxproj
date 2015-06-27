@@ -23,8 +23,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{F0304A28-E1C7-4F4F-BE1F-DF57936C9664}</ProjectGuid>
-    <RootNamespace>pov_parser</RootNamespace>
+    <ProjectGuid>{0C227B07-1830-4C5B-8D4E-2DEFFFD2792D}</ProjectGuid>
+    <RootNamespace>povplatform</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-SSE2|Win32'" Label="Configuration">
@@ -86,11 +86,11 @@
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release-SSE2|Win32'">bin32\lib\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release-SSE2|Win32'">build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">povparser32d</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">povparser32</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release-SSE2|Win32'">povparser32-sse2</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">povparser64d</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">povparser64</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">povplatform32d</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">povplatform32</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release-SSE2|Win32'">povplatform32-sse2</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">povplatform64d</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">povplatform64</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <BuildLog>
@@ -343,15 +343,8 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\source\parser\fncode.cpp" />
-    <ClCompile Include="..\..\source\parser\parser.cpp" />
-    <ClCompile Include="..\..\source\parser\parser_expressions.cpp" />
-    <ClCompile Include="..\..\source\parser\parser_functions.cpp" />
-    <ClCompile Include="..\..\source\parser\parser_functions_utilities.cpp" />
-    <ClCompile Include="..\..\source\parser\parser_materials.cpp" />
-    <ClCompile Include="..\..\source\parser\parser_strings.cpp" />
-    <ClCompile Include="..\..\source\parser\parser_tokenizer.cpp" />
-    <ClCompile Include="..\..\source\parser\reservedwords.cpp" />
+    <ClCompile Include="..\..\platform\x86\avxfma4noise.cpp" />
+    <ClCompile Include="..\..\platform\x86\cpuid.cpp" />
     <ClCompile Include="..\..\source\precomp.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -361,12 +354,9 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\source\parser\fncode.h" />
-    <ClInclude Include="..\..\source\parser\parser.h" />
-    <ClInclude Include="..\..\source\parser\reservedwords.h" />
-    <ClInclude Include="..\..\source\parser\configparser.h" />
+    <ClInclude Include="..\..\platform\x86\avxfma4noise.h" />
+    <ClInclude Include="..\..\platform\x86\cpuid.h" />
     <ClInclude Include="..\..\source\precomp.h" />
-    <ClInclude Include="..\povconfig\syspovconfigparser.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

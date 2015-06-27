@@ -31,7 +31,7 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
 #include <boost/thread.hpp>
 #include <boost/bind.hpp>
@@ -42,7 +42,8 @@
 
 #include "base/timer.h"
 #include "base/types.h"
-#include "backend/scene/scene.h"
+
+#include "backend/scene/scenedata.h"
 #include "backend/scene/threaddata.h"
 #include "backend/scene/view.h"
 
@@ -253,7 +254,7 @@ void RadiosityTask::Stopped()
 
 void RadiosityTask::Finish()
 {
-    GetViewDataPtr()->timeType = SceneThreadData::kRadiosityTime;
+    GetViewDataPtr()->timeType = TraceThreadData::kRadiosityTime;
     GetViewDataPtr()->realTime = ConsumedRealTime();
     GetViewDataPtr()->cpuTime = ConsumedCPUTime();
 }

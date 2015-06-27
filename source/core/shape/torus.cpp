@@ -124,7 +124,7 @@ bool SpindleTorus::Precompute()
 *
 ******************************************************************************/
 
-bool Torus::All_Intersections(const Ray& ray, IStack& Depth_Stack, SceneThreadData *Thread)
+bool Torus::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread)
 {
     int i, max_i, Found;
     DBL Depth[4];
@@ -191,7 +191,7 @@ bool Torus::All_Intersections(const Ray& ray, IStack& Depth_Stack, SceneThreadDa
 *
 ******************************************************************************/
 
-int Torus::Intersect(const BasicRay& ray, DBL *Depth, SceneThreadData *Thread) const
+int Torus::Intersect(const BasicRay& ray, DBL *Depth, TraceThreadData *Thread) const
 {
     int i, n;
     DBL len, R2, Py2, Dy2, PDy2, k1, k2;
@@ -269,7 +269,7 @@ int Torus::Intersect(const BasicRay& ray, DBL *Depth, SceneThreadData *Thread) c
 
         c[4] = k1 * k1 + 4.0 * R2 * (Py2 - r2);
 
-        n = Solve_Polynomial(4, c, r, Test_Flag(this, STURM_FLAG), ROOT_TOLERANCE, Thread);
+        n = Solve_Polynomial(4, c, r, Test_Flag(this, STURM_FLAG), ROOT_TOLERANCE, Thread->Stats());
 
         while(n--)
             Depth[i++] = (r[n] + Closer) / len;

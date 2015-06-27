@@ -41,11 +41,6 @@
 
 // configbase.h must always be the first POV file included within base *.cpp files
 #include "base/configbase.h"
-#include "base/image/image.h"
-#include "base/fileinputoutput.h"
-#include "base/image/openexr.h"
-#include "base/types.h"
-
 
 #ifndef OPENEXR_MISSING
 
@@ -64,7 +59,13 @@
 #include <OpenEXR/ImfArray.h>
 
 #endif
-#include "metadata.h"
+
+#include "base/image/openexr.h"
+
+#include "base/image/image.h"
+#include "base/image/metadata.h"
+#include "base/fileinputoutput.h"
+#include "base/types.h"
 
 // this must be the last file included
 #include "base/povdebug.h"

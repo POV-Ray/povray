@@ -149,10 +149,6 @@ class CompoundObject;
 class Intersection;
 class Ray;
 
-// TODO FIXME
-class SceneThreadData;
-typedef SceneThreadData TraceThreadData;
-
 typedef struct Transform_Struct TRANSFORM;
 
 
@@ -993,24 +989,6 @@ typedef shared_ptr<const Interior> ConstInteriorPtr;
 #if 0
 #pragma mark * Image
 #endif
-
-// Legal image attributes.
-
-#define NO_FILE         0x00000000
-#define GIF_FILE        0x00000001
-#define POT_FILE        0x00000002
-#define SYS_FILE        0x00000004
-#define IFF_FILE        0x00000008
-#define TGA_FILE        0x00000010
-#define GRAD_FILE       0x00000020
-#define PGM_FILE        0x00000040
-#define PPM_FILE        0x00000080
-#define PNG_FILE        0x00000100
-#define JPEG_FILE       0x00000200
-#define TIFF_FILE       0x00000400
-#define BMP_FILE        0x00000800
-#define EXR_FILE        0x00001000
-#define HDR_FILE        0x00002000
 
 // Image types.
 

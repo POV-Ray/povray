@@ -46,6 +46,7 @@
 
 #include "backend/math/matrices.h"
 #include "backend/math/splines.h"
+#include "backend/scene/scenedata.h"
 #include "backend/vm/fnpovfpu.h"
 
 // this must be the last file included
@@ -53,94 +54,6 @@
 
 namespace pov
 {
-
-/*****************************************************************************
- *
- * FUNCTION
- *
- *   Destroy_Function
- *
- * INPUT
- *
- * OUTPUT
- *
- * RETURNS
- *
- * AUTHOR
- *
- * DESCRIPTION
- *
- *   -
- *
- * CHANGES
- *
- *   -
- *
- ******************************************************************************/
-
-void Parser::Destroy_Function(FUNCTION_PTR Function)
-{
-    if(Function != NULL)
-    {
-        sceneData->functionVM->RemoveFunction(*Function);
-        POV_FREE(Function);
-    }
-}
-
-void Parser::Destroy_Function(FunctionVM *functionVM, FUNCTION_PTR Function)
-{
-    if(Function != NULL)
-    {
-        functionVM->RemoveFunction(*Function);
-        POV_FREE(Function);
-    }
-}
-
-
-/*****************************************************************************
- *
- * FUNCTION
- *
- *   Copy_Function
- *
- * INPUT
- *
- * OUTPUT
- *
- * RETURNS
- *
- * AUTHOR
- *
- * DESCRIPTION
- *
- *   -
- *
- * CHANGES
- *
- *   -
- *
- ******************************************************************************/
-
-FUNCTION_PTR Parser::Copy_Function(FUNCTION_PTR Function)
-{
-    FUNCTION_PTR ptr = (FUNCTION_PTR)POV_MALLOC(sizeof(FUNCTION), "Function ID");
-
-    (void)sceneData->functionVM->GetFunctionAndReference(*Function); // increase the reference count
-    *ptr = *Function;
-
-    return ptr;
-}
-
-FUNCTION_PTR Parser::Copy_Function(FunctionVM *functionVM, FUNCTION_PTR Function)
-{
-    FUNCTION_PTR ptr = (FUNCTION_PTR)POV_MALLOC(sizeof(FUNCTION), "Function ID");
-
-    functionVM->GetFunctionAndReference(*Function); // increase the reference count
-    *ptr = *Function;
-
-    return ptr;
-}
-
 
 /*****************************************************************************
 *

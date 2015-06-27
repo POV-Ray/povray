@@ -44,6 +44,8 @@
 
 #include "pov_mem.h" // TODO
 
+#include "backend/scene/scenedata.h"
+
 // this must be the last file included
 #include "base/povdebug.h"
 
@@ -700,7 +702,7 @@ UCS2 *Parser::String_To_UCS2(const char *str)
 
     switch(sceneData->stringEncoding)
     {
-        case 0: // ASCII
+        case kStringEncoding_ASCII:
             char_array_size = (int)strlen(str);
             char_array = reinterpret_cast<UCS2 *>(POV_MALLOC(char_array_size * sizeof(UCS2), "Character Array"));
             for(i = 0; i < char_array_size; i++)
@@ -718,10 +720,10 @@ UCS2 *Parser::String_To_UCS2(const char *str)
                 }
             }
             break;
-        case 1: // UTF8
+        case kStringEncoding_UTF8:
             char_array = Convert_UTF8_To_UCS2(reinterpret_cast<const unsigned char *>(str), (int)strlen(str), &char_array_size);
             break;
-        case 2: // System Specific
+        case kStringEncoding_System:
             char_array = POV_CONVERT_TEXT_TO_UCS2(reinterpret_cast<const unsigned char *>(str), strlen(str), &char_array_size);
             if(char_array == NULL)
                 Error("Cannot convert system specific text format to Unicode.");
@@ -773,7 +775,7 @@ UCS2 *Parser::String_Literal_To_UCS2(const char *str, bool pathname)
 
     switch(sceneData->stringEncoding)
     {
-        case 0: // ASCII
+        case kStringEncoding_ASCII:
             char_array_size = (int)strlen(str);
             char_array = reinterpret_cast<UCS2 *>(POV_MALLOC(char_array_size * sizeof(UCS2), "Character Array"));
             for(i = 0; i < char_array_size; i++)
@@ -791,10 +793,10 @@ UCS2 *Parser::String_Literal_To_UCS2(const char *str, bool pathname)
                 }
             }
             break;
-        case 1: // UTF8
+        case kStringEncoding_UTF8:
             char_array = Convert_UTF8_To_UCS2(reinterpret_cast<const unsigned char *>(str), (int)strlen(str), &char_array_size);
             break;
-        case 2: // System Specific
+        case kStringEncoding_System:
             char_array = POV_CONVERT_TEXT_TO_UCS2(reinterpret_cast<const unsigned char *>(str), strlen(str), &char_array_size);
             if(char_array == NULL)
                 Error("Cannot convert system specific text format to Unicode.");

@@ -52,15 +52,15 @@
 #include "core/render/ray.h"
 #include "core/shape/heightfield.h"
 
+#include "backend/frame.h"
 #include "backend/colour/colour_old.h"
 #include "backend/math/mathutil.h"
 #include "backend/math/matrices.h"
 #include "backend/math/splines.h"
 #include "backend/math/vector.h"
 #include "backend/scene/objects.h"
-#include "backend/support/fileutil.h"
+#include "backend/scene/scenedata.h"
 #include "backend/support/imageutil.h"
-#include "backend/vm/fncode.h"
 #include "backend/vm/fnpovfpu.h"
 
 // this must be the last file included
@@ -446,7 +446,7 @@ DBL Parser::Parse_Function_Call()
 
     unsigned int pmax = f->parameter_cnt - 1;
     unsigned int param = 0;
-    DBL params[MAX_PARAMETER_LIST];
+    DBL params[MAX_FUNCTION_PARAMETER_LIST];
 
     if(Parse_Call() == false)
     {
@@ -515,7 +515,7 @@ void Parser::Parse_Vector_Function_Call(EXPRESS& Express, int *Terms)
 
     unsigned int pmax = f->parameter_cnt - 1;
     unsigned int param = 0;
-    DBL params[MAX_PARAMETER_LIST];
+    DBL params[MAX_FUNCTION_PARAMETER_LIST];
 
     if(Parse_Call() == false)
     {
@@ -797,7 +797,7 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
 
                     Local_C_String=Parse_C_String();
 
-                    Val = ((f=Locate_File(this, sceneData, UCS2String(ASCIItoUCS2String(Local_C_String)),POV_File_Text_User,ign,false))==NULL) ? 0.0 : 1.0;
+                    Val = ((f=Locate_File(sceneData, UCS2String(ASCIItoUCS2String(Local_C_String)),POV_File_Text_User,ign,false))==NULL) ? 0.0 : 1.0;
                     if (f != NULL)
                         delete f;
 

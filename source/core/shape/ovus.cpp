@@ -99,7 +99,7 @@ const DBL ROOT_TOLERANCE = 1.0e-4;
 void Ovus::Intersect_Ovus_Spheres(const Vector3d& P, const Vector3d& D,
                                   DBL * Depth1, DBL * Depth2, DBL * Depth3,
                                   DBL * Depth4, DBL * Depth5, DBL * Depth6,
-                                  SceneThreadData *Thread) const
+                                  TraceThreadData *Thread) const
 {
     DBL OCSquared, t_Closest_Approach, Half_Chord, t_Half_Chord_Squared;
     Vector3d Padj;
@@ -200,7 +200,7 @@ void Ovus::Intersect_Ovus_Spheres(const Vector3d& P, const Vector3d& D,
 
     c[4] = k1 * k1 + 4.0 * R2 * (Py2 - r2);
 
-    n = Solve_Polynomial(4, c, r, Test_Flag(this, STURM_FLAG), ROOT_TOLERANCE, Thread);
+    n = Solve_Polynomial(4, c, r, Test_Flag(this, STURM_FLAG), ROOT_TOLERANCE, Thread->Stats());
     while (n--)
     {
         // here we only keep the 'lemon' inside the torus
@@ -265,7 +265,7 @@ void Ovus::Intersect_Ovus_Spheres(const Vector3d& P, const Vector3d& D,
 *
 ******************************************************************************/
 
-bool Ovus::All_Intersections(const Ray& ray, IStack& Depth_Stack, SceneThreadData *Thread)
+bool Ovus::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread)
 {
     bool Found = false;
     Vector3d Real_Normal, Real_Pt, INormal, IPoint;

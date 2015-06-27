@@ -341,7 +341,7 @@ bool Prism::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDa
                             x[1] = Entry->C[X] * D[Z] - Entry->C[Y] * D[X];
                             x[2] = D[Z] * (Entry->D[X] - P[X]) - D[X] * (Entry->D[Y] - P[Z]);
 
-                            n = Solve_Polynomial(2, x, y, false, 0.0, Thread);
+                            n = Solve_Polynomial(2, x, y, false, 0.0, Thread->Stats());
                             break;
 
                         case CUBIC_SPLINE :
@@ -357,7 +357,7 @@ bool Prism::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDa
                                 x[1] = Entry->B[X] * D[Z] - Entry->B[Y] * D[X];
                                 x[2] = Entry->C[X] * D[Z] - Entry->C[Y] * D[X];
                                 x[3] = D[Z] * (Entry->D[X] - P[X]) - D[X] * (Entry->D[Y] - P[Z]);
-                                n = Solve_Polynomial(3, x, y, Test_Flag(this, STURM_FLAG), 0.0, Thread);
+                                n = Solve_Polynomial(3, x, y, Test_Flag(this, STURM_FLAG), 0.0, Thread->Stats());
                             }
                             break;
                     }
@@ -512,7 +512,7 @@ bool Prism::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDa
                             x[1] = Entry->C[X] * k1 + Entry->C[Y] * k2;
                             x[2] = Entry->D[X] * k1 + Entry->D[Y] * k2 + k3;
 
-                            n = Solve_Polynomial(2, x, y, false, 0.0, Thread);
+                            n = Solve_Polynomial(2, x, y, false, 0.0, Thread->Stats());
                             break;
 
                         case CUBIC_SPLINE :
@@ -524,7 +524,7 @@ bool Prism::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDa
                             x[2] = Entry->C[X] * k1 + Entry->C[Y] * k2;
                             x[3] = Entry->D[X] * k1 + Entry->D[Y] * k2 + k3;
 
-                            n = Solve_Polynomial(3, x, y, Test_Flag(this, STURM_FLAG), 0.0, Thread);
+                            n = Solve_Polynomial(3, x, y, Test_Flag(this, STURM_FLAG), 0.0, Thread->Stats());
                             break;
                     }
 
@@ -1147,7 +1147,7 @@ int Prism::in_curve(DBL u, DBL v, TraceThreadData *Thread) const
                 x[2] = Entry.C[Y];
                 x[3] = Entry.D[Y] - v;
 
-                n = Solve_Polynomial(3, x, y, Test_Flag(this, STURM_FLAG), 0.0, Thread);
+                n = Solve_Polynomial(3, x, y, Test_Flag(this, STURM_FLAG), 0.0, Thread->Stats());
 
                 while (n--)
                 {
@@ -1530,7 +1530,7 @@ void Prism::Compute_Prism(Vector2d *P, TraceThreadData *Thread)
             c[1] = 2.0 * B[X];
             c[2] =       C[X];
 
-            n = Solve_Polynomial(2, c, r, false, 0.0, Thread);
+            n = Solve_Polynomial(2, c, r, false, 0.0, Thread->Stats());
 
             while (n--)
             {
@@ -1544,7 +1544,7 @@ void Prism::Compute_Prism(Vector2d *P, TraceThreadData *Thread)
             c[1] = 2.0 * B[Y];
             c[2] =       C[Y];
 
-            n = Solve_Polynomial(2, c, r, false, 0.0, Thread);
+            n = Solve_Polynomial(2, c, r, false, 0.0, Thread->Stats());
 
             while (n--)
             {

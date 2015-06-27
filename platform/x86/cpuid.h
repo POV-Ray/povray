@@ -1,8 +1,9 @@
 //******************************************************************************
 ///
-/// @file base/version.h
+/// @file platform/x86/cpuid.h
 ///
-/// This file contains version information.
+/// This file contains declarations related to probing the capabilities of the
+/// CPU.
 ///
 /// @copyright
 /// @parblock
@@ -33,32 +34,22 @@
 ///
 //******************************************************************************
 
-#ifndef POVRAY_BASE_VERSION_H
-#define POVRAY_BASE_VERSION_H
+#ifndef POVRAY_CPUID_H
+#define POVRAY_CPUID_H
 
-#include "base/configbase.h"
-#include "base/build.h"
+#include "syspovconfigbase.h"
 
-// POV-Ray version and copyright message macros
-
-#define POV_RAY_COPYRIGHT "Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd."
-#define OFFICIAL_VERSION_STRING "3.7.1"
-#define OFFICIAL_VERSION_NUMBER 371
-
-#define POV_RAY_PRERELEASE "alpha.8144917"
-
-#if POV_RAY_IS_OFFICIAL == 1
-#ifdef POV_RAY_PRERELEASE
-#define POV_RAY_VERSION OFFICIAL_VERSION_STRING "-" POV_RAY_PRERELEASE
+#if defined(LINUX)
+#define CPUID cpuid
 #else
-#define POV_RAY_VERSION OFFICIAL_VERSION_STRING
-#endif
-#else
-#ifdef POV_RAY_PRERELEASE
-#define POV_RAY_VERSION OFFICIAL_VERSION_STRING "-" POV_RAY_PRERELEASE ".unofficial"
-#else
-#define POV_RAY_VERSION OFFICIAL_VERSION_STRING "-unofficial"
-#endif
+#define CPUID __cpuid // TODO it's a bit naive to presume this intrinsic to exist on any non-Linux platform
 #endif
 
-#endif // POVRAY_BASE_VERSION_H
+#define CPUID_00000001_OSXSAVE_MASK    (0x1 << 27)
+#define CPUID_00000001_AVX_MASK        (0x1 << 28)
+#define CPUID_80000001_FMA4_MASK       (0x1 << 16)
+
+/// Tests whether AVX and FMA4 are supported.
+bool HaveAVXFMA4();
+
+#endif // POVRAY_CPUID_H

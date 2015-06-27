@@ -1,9 +1,8 @@
 //******************************************************************************
 ///
-/// @file backend/vm/fncode.cpp
+/// @file parser/fncode.cpp
 ///
-/// This module implements the the function type used by iso surfaces and
-/// the function pattern.
+/// This module implements the compiler for user-defined functions.
 ///
 /// This module is inspired by code by D. Skarda, T. Bily and R. Suzuki.
 ///
@@ -34,7 +33,7 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
 #include <climits>
 #include <cstdio>
@@ -44,12 +43,13 @@
 
 // frame.h must always be the first POV file included (pulls in platform config)
 #include "backend/frame.h"
-#include "backend/vm/fncode.h"
+#include "parser/fncode.h"
 
-#include "parser/parser.h"
-
+#include "backend/scene/scenedata.h"
 #include "backend/vm/fnintern.h"
 #include "backend/vm/fnpovfpu.h"
+
+#include "parser/parser.h"
 
 // this must be the last header file included
 #include "base/povdebug.h"
@@ -111,7 +111,7 @@ FNCode::FNCode(Parser *pa, FunctionCode *f, bool is_local, const char *n)
     function->return_size = 0; // zero implies return in register r0
     function->parameter_cnt = 0;
     function->localvar_cnt = 0;
-    for(i = 0; i < MAX_PARAMETER_LIST; i++)
+    for(i = 0; i < MAX_FUNCTION_PARAMETER_LIST; i++)
     {
         function->localvar_pos[i] = 0;
         function->localvar[i] = NULL;
@@ -119,16 +119,16 @@ FNCode::FNCode(Parser *pa, FunctionCode *f, bool is_local, const char *n)
     }
 
     if(n != NULL)
-        function->name = POV_STRDUP(n);
+        function->sourceInfo.name = POV_STRDUP(n);
     else
-        function->name = POV_STRDUP("");
-    function->filename = pa->UCS2_strdup(parser->Token.FileHandle->name());
+        function->sourceInfo.name = POV_STRDUP("");
+    function->sourceInfo.filename = pa->UCS2_strdup(parser->Token.FileHandle->name());
     if(parser->Token.FileHandle != NULL)
-        function->filepos = parser->Token.FileHandle->tellg();
+        function->sourceInfo.filepos = parser->Token.FileHandle->tellg();
     else
     {
-        function->filepos.lineno = 0;
-        function->filepos.offset = 0;
+        function->sourceInfo.filepos.lineno = 0;
+        function->sourceInfo.filepos.offset = 0;
     }
     function->flags = 0;
     function->private_copy_method = NULL;
@@ -174,7 +174,7 @@ void FNCode::Parameter()
     if(parser->Token.Token_Id == LEFT_PAREN_TOKEN)
     {
         for(function->parameter_cnt = 0;
-            ((parser->Token.Token_Id != RIGHT_PAREN_TOKEN) || (function->parameter_cnt == 0)) && (function->parameter_cnt < MAX_PARAMETER_LIST);
+            ((parser->Token.Token_Id != RIGHT_PAREN_TOKEN) || (function->parameter_cnt == 0)) && (function->parameter_cnt < MAX_FUNCTION_PARAMETER_LIST);
             function->parameter_cnt++)
         {
             parser->Get_Token();
@@ -234,7 +234,7 @@ void FNCode::Parameter()
 *
 ******************************************************************************/
 
-void FNCode::Compile(Parser::ExprNode *expression)
+void FNCode::Compile(ExprNode *expression)
 {
     unsigned int gpos = 0;
 
@@ -423,80 +423,6 @@ void FNCode_Copy(FunctionCode *f, FunctionCode *fnew)
 *
 * FUNCTION
 *
-*   FNCode_Delete
-*
-* INPUT
-*
-*   f - function to delete
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-*   Thorsten Froehlich
-*
-* DESCRIPTION
-*
-*   Delete a compiled function.
-*
-* CHANGES
-*
-*   -
-*
-******************************************************************************/
-
-void FNCode_Delete(FunctionCode *f)
-{
-    int i;
-
-    if(f->program != NULL)
-    {
-        POV_FREE(f->program);
-        f->program = NULL;
-    }
-    if(f->name != NULL)
-    {
-        POV_FREE(f->name);
-        f->name = NULL;
-    }
-    if(f->filename != NULL)
-    {
-        POV_FREE(f->filename);
-        f->filename = NULL;
-    }
-    for(i = 0; i < f->parameter_cnt; i++)
-    {
-        if(f->parameter[i] != NULL)
-        {
-            POV_FREE(f->parameter[i]);
-            f->parameter[i] = NULL;
-        }
-    }
-    for(i = 0; i < f->localvar_cnt; i++)
-    {
-        if(f->localvar[i] != NULL)
-        {
-            POV_FREE(f->localvar[i]);
-            f->localvar[i] = NULL;
-        }
-    }
-    if(f->private_data != NULL)
-    {
-        if(f->private_destroy_method != NULL)
-            f->private_destroy_method(f->private_data);
-        else
-            POV_FREE(f->private_data);
-        f->private_data = NULL;
-    }
-}
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
 *   FNCode::SetFlag
 *
 * INPUT
@@ -573,14 +499,14 @@ void FNCode::SetFlag(unsigned int flag, char *str)
 *
 ******************************************************************************/
 
-void FNCode::compile_recursive(Parser::ExprNode *expr)
+void FNCode::compile_recursive(ExprNode *expr)
 {
     unsigned int local_k = 0;
 
     if(expr->op <= OP_LEFTMOST)
         local_k = compile_push_result();
 
-    for(Parser::ExprNode *i = expr; i != NULL; i = i->next)
+    for(ExprNode *i = expr; i != NULL; i = i->next)
     {
         if(i->child != NULL)
         {
@@ -895,7 +821,7 @@ void FNCode::compile_member(char *name)
 *
 ******************************************************************************/
 
-void FNCode::compile_call(Parser::ExprNode *expr, FUNCTION fn, int token, char *name)
+void FNCode::compile_call(ExprNode *expr, FUNCTION fn, int token, char *name)
 {
     unsigned int domain_check = 0;
     unsigned int domain_check_2nd = 0;
@@ -1186,7 +1112,7 @@ void FNCode::compile_call(Parser::ExprNode *expr, FUNCTION fn, int token, char *
 *
 ******************************************************************************/
 
-void FNCode::compile_select(Parser::ExprNode *expr)
+void FNCode::compile_select(ExprNode *expr)
 {
     unsigned int greater_pos;
     unsigned int less_pos;
@@ -1267,7 +1193,7 @@ void FNCode::compile_select(Parser::ExprNode *expr)
 *
 ******************************************************************************/
 
-void FNCode::compile_seq_op(Parser::ExprNode *expr, unsigned int op, DBL neutral)
+void FNCode::compile_seq_op(ExprNode *expr, unsigned int op, DBL neutral)
 {
     unsigned int sum_k = 0;
     unsigned int local_k = 0;
@@ -1290,7 +1216,7 @@ void FNCode::compile_seq_op(Parser::ExprNode *expr, unsigned int op, DBL neutral
     }
 
     // create a local variable, the sum and its limit on the stack
-    if(function->localvar_cnt >= MAX_PARAMETER_LIST)
+    if(function->localvar_cnt >= MAX_FUNCTION_PARAMETER_LIST)
         parser->Error("Too many local variables!");
 
     // save r5 content
@@ -1411,10 +1337,10 @@ void FNCode::compile_seq_op(Parser::ExprNode *expr, unsigned int op, DBL neutral
 *
 ******************************************************************************/
 
-void FNCode::compile_float_function_call(Parser::ExprNode *expr, FUNCTION fn, char *name)
+void FNCode::compile_float_function_call(ExprNode *expr, FUNCTION fn, char *name)
 {
     FunctionCode *f = NULL;
-    Parser::ExprNode *i = NULL;
+    ExprNode *i = NULL;
     unsigned int cur_p = 0;
     unsigned int local_k = 0;
     unsigned int old_sp = 0;
@@ -1454,7 +1380,7 @@ void FNCode::compile_float_function_call(Parser::ExprNode *expr, FUNCTION fn, ch
     // |     Parameters     |
     // +--------------------+ <= Parameter Stack Pointer (parameter_stack_pointer)
 
-    if(strcmp(name, function->name) == 0)
+    if(strcmp(name, function->sourceInfo.name) == 0)
     {
 //      Warning("Recursive function call may have unexpected side effects or not\n"
 //              "work as expected! Make sure the recursion is not infinite!!!");
@@ -1566,10 +1492,10 @@ void FNCode::compile_float_function_call(Parser::ExprNode *expr, FUNCTION fn, ch
 *
 ******************************************************************************/
 
-void FNCode::compile_vector_function_call(Parser::ExprNode *expr, FUNCTION fn, char *name)
+void FNCode::compile_vector_function_call(ExprNode *expr, FUNCTION fn, char *name)
 {
     FunctionCode *f = NULL;
-    Parser::ExprNode *i = NULL;
+    ExprNode *i = NULL;
     unsigned int cur_p = 0;
     unsigned int local_k = 0;
     unsigned int old_sp = 0;
@@ -1612,7 +1538,7 @@ void FNCode::compile_vector_function_call(Parser::ExprNode *expr, FUNCTION fn, c
     // |     Parameters     |
     // +--------------------+ <= Parameter Stack Pointer (parameter_stack_pointer)
 
-    if(strcmp(name, function->name) == 0)
+    if(strcmp(name, function->sourceInfo.name) == 0)
     {
 //      Warning("Recursive function call may have unexpected side effects or not\n"
 //              "work as expected! Make sure the recursion is not infinite!!!");

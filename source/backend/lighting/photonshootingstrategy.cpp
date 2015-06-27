@@ -55,7 +55,6 @@
 #include "backend/lighting/point.h"
 #include "backend/math/matrices.h"
 #include "backend/scene/objects.h"
-#include "backend/scene/scene.h"
 #include "backend/scene/threaddata.h"
 #include "backend/scene/view.h"
 #include "backend/support/octree.h"

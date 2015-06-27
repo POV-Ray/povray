@@ -44,7 +44,7 @@
 #include "base/pov_err.h"
 
 #include "backend/povray.h"
-#include "backend/scene/scene.h"
+#include "backend/control/scene.h"
 #include "backend/scene/view.h"
 
 // this must be the last file included

@@ -107,7 +107,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>..\..\windows\povconfig;..\..\libraries\boost;..\..\vfe\win\;..\..\vfe\;..\..\source;..\..\source\base;..\..\source\backend;..\..\source\frontend;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\platform\x86;..\..\windows\povconfig;..\..\libraries\boost;..\..\vfe\win\;..\..\vfe\;..\..\source;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>BOOST_ALL_NO_LIB;_DEBUG;WIN32;WIN32_LEAN_AND_MEAN;_WINDOWS;WINVER=0x0500;_WIN32_WINNT=0x0500;COMMONCTRL_VERSION=0x500;CLASSLIB_DEFS_H;NOMINMAX;ISOLATION_AWARE_ENABLED;_CRT_SECURE_NO_DEPRECATE;_HAS_ITERATOR_DEBUGGING=0;_HAS_CPP0X=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -154,7 +154,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>..\..\windows\povconfig;..\..\libraries\boost;..\..\vfe\win\;..\..\vfe\;..\..\source;..\..\source\base;..\..\source\backend;..\..\source\frontend;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\platform\x86;..\..\windows\povconfig;..\..\libraries\boost;..\..\vfe\win\;..\..\vfe\;..\..\source;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>BOOST_ALL_NO_LIB;_DEBUG;WIN32;WIN32_LEAN_AND_MEAN;_WINDOWS;CLASSLIB_DEFS_H;NOMINMAX;ISOLATION_AWARE_ENABLED;_CRT_SECURE_NO_DEPRECATE;_HAS_ITERATOR_DEBUGGING=0;_HAS_CPP0X=0;BUILDING_AMD64=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -205,7 +205,7 @@
       <OmitFramePointers>false</OmitFramePointers>
       <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>..\..\windows\povconfig;..\..\libraries\boost;..\..\vfe\win\;..\..\vfe\;..\..\source;..\..\source\base;..\..\source\backend;..\..\source\frontend;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\platform\x86;..\..\windows\povconfig;..\..\libraries\boost;..\..\vfe\win\;..\..\vfe\;..\..\source;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>BOOST_ALL_NO_LIB;NDEBUG;WIN32;WIN32_LEAN_AND_MEAN;_WINDOWS;COMMONCTRL_VERSION=0x500;CLASSLIB_DEFS_H;WINVER=0x0500;_WIN32_WINNT=0x0500;NOMINMAX;ISOLATION_AWARE_ENABLED;_CRT_SECURE_NO_DEPRECATE;_SECURE_SCL=0;_HAS_CPP0X=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -258,7 +258,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>false</OmitFramePointers>
       <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
-      <AdditionalIncludeDirectories>..\..\windows\povconfig;..\..\libraries\boost;..\..\vfe\win\;..\..\vfe\;..\..\source;..\..\source\base;..\..\source\backend;..\..\source\frontend;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\platform\x86;..\..\windows\povconfig;..\..\libraries\boost;..\..\vfe\win\;..\..\vfe\;..\..\source;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>BOOST_ALL_NO_LIB;NDEBUG;WIN32;WIN32_LEAN_AND_MEAN;_WINDOWS;CLASSLIB_DEFS_H;NOMINMAX;ISOLATION_AWARE_ENABLED;_CRT_SECURE_NO_DEPRECATE;_SECURE_SCL=0;BUILDING_AMD64=1;_HAS_CPP0X=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -310,7 +310,7 @@
       <OmitFramePointers>false</OmitFramePointers>
       <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>..\..\windows\povconfig;..\..\libraries\boost;..\..\vfe\win\;..\..\vfe\;..\..\source;..\..\source\base;..\..\source\backend;..\..\source\frontend;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\platform\x86;..\..\windows\povconfig;..\..\libraries\boost;..\..\vfe\win\;..\..\vfe\;..\..\source;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>BOOST_ALL_NO_LIB;NDEBUG;WIN32;WIN32_LEAN_AND_MEAN;_WINDOWS;COMMONCTRL_VERSION=0x500;CLASSLIB_DEFS_H;WINVER=0x0500;_WIN32_WINNT=0x0500;NOMINMAX;ISOLATION_AWARE_ENABLED;_CRT_SECURE_NO_DEPRECATE;_SECURE_SCL=0;BUILD_SSE2=1;_HAS_CPP0X=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -355,6 +355,7 @@
     <ClCompile Include="..\..\source\backend\control\benchmark.cpp" />
     <ClCompile Include="..\..\source\backend\control\messagefactory.cpp" />
     <ClCompile Include="..\..\source\backend\control\renderbackend.cpp" />
+    <ClCompile Include="..\..\source\backend\control\scene.cpp" />
     <ClCompile Include="..\..\source\backend\math\chi2.cpp" />
     <ClCompile Include="..\..\source\backend\math\hcmplx.cpp" />
     <ClCompile Include="..\..\source\backend\math\mathutil.cpp" />
@@ -369,12 +370,10 @@
     <ClCompile Include="..\..\source\backend\scene\atmosph.cpp" />
     <ClCompile Include="..\..\source\backend\scene\camera.cpp" />
     <ClCompile Include="..\..\source\backend\scene\objects.cpp" />
-    <ClCompile Include="..\..\source\backend\scene\scene.cpp" />
     <ClCompile Include="..\..\source\backend\scene\scenedata.cpp" />
     <ClCompile Include="..\..\source\backend\scene\threaddata.cpp" />
     <ClCompile Include="..\..\source\backend\scene\view.cpp" />
     <ClCompile Include="..\..\source\backend\support\bsptree.cpp" />
-    <ClCompile Include="..\..\source\backend\support\fileutil.cpp" />
     <ClCompile Include="..\..\source\backend\support\imageutil.cpp" />
     <ClCompile Include="..\..\source\backend\support\jitter.cpp" />
     <ClCompile Include="..\..\source\backend\support\octree.cpp" />
@@ -382,7 +381,6 @@
     <ClCompile Include="..\..\source\backend\support\statistics.cpp" />
     <ClCompile Include="..\..\source\backend\support\task.cpp" />
     <ClCompile Include="..\..\source\backend\support\taskqueue.cpp" />
-    <ClCompile Include="..\..\source\backend\vm\fncode.cpp" />
     <ClCompile Include="..\..\source\backend\vm\fnintern.cpp" />
     <ClCompile Include="..\..\source\backend\vm\fnpovfpu.cpp" />
     <ClCompile Include="..\..\source\backend\lighting\photonestimationtask.cpp" />
@@ -404,7 +402,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\source\backend\texture\avxfma4check.h" />
     <ClInclude Include="..\..\source\lightgrp.h" />
     <ClInclude Include="..\..\source\pov_mem.h" />
     <ClInclude Include="..\..\source\statspov.h" />
@@ -420,6 +417,7 @@
     <ClInclude Include="..\..\source\backend\control\benchmark.h" />
     <ClInclude Include="..\..\source\backend\control\messagefactory.h" />
     <ClInclude Include="..\..\source\backend\control\renderbackend.h" />
+    <ClInclude Include="..\..\source\backend\control\scene.h" />
     <ClInclude Include="..\..\source\backend\math\chi2.h" />
     <ClInclude Include="..\..\source\backend\math\hcmplx.h" />
     <ClInclude Include="..\..\source\backend\math\mathutil.h" />
@@ -435,12 +433,10 @@
     <ClInclude Include="..\..\source\backend\scene\atmosph.h" />
     <ClInclude Include="..\..\source\backend\scene\camera.h" />
     <ClInclude Include="..\..\source\backend\scene\objects.h" />
-    <ClInclude Include="..\..\source\backend\scene\scene.h" />
     <ClInclude Include="..\..\source\backend\scene\scenedata.h" />
     <ClInclude Include="..\..\source\backend\scene\threaddata.h" />
     <ClInclude Include="..\..\source\backend\scene\view.h" />
     <ClInclude Include="..\..\source\backend\support\bsptree.h" />
-    <ClInclude Include="..\..\source\backend\support\fileutil.h" />
     <ClInclude Include="..\..\source\backend\support\fixedallocator.h" />
     <ClInclude Include="..\..\source\backend\support\imageutil.h" />
     <ClInclude Include="..\..\source\backend\support\jitter.h" />
@@ -450,7 +446,6 @@
     <ClInclude Include="..\..\source\backend\support\statistics.h" />
     <ClInclude Include="..\..\source\backend\support\task.h" />
     <ClInclude Include="..\..\source\backend\support\taskqueue.h" />
-    <ClInclude Include="..\..\source\backend\vm\fncode.h" />
     <ClInclude Include="..\..\source\backend\vm\fnintern.h" />
     <ClInclude Include="..\..\source\backend\vm\fnpovfpu.h" />
     <ClInclude Include="..\..\source\backend\lighting\photonestimationtask.h" />

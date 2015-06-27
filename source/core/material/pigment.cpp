@@ -50,7 +50,7 @@
 #include "core/material/warp.h"
 
 #include "backend/colour/colour_old.h"
-#include "backend/scene/scene.h"
+#include "backend/scene/scenedata.h"
 #include "backend/scene/threaddata.h"
 #include "backend/support/imageutil.h"
 

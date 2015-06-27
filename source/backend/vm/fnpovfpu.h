@@ -2,8 +2,8 @@
 ///
 /// @file backend/vm/fnpovfpu.h
 ///
-/// This module contains all defines, typedefs, and prototypes for
-/// `fnpovfpu.cpp`.
+/// This module contains declarations for the virtual machine executing
+/// render-time functions.
 ///
 /// This module is inspired by code by D. Skarda, T. Bily and R. Suzuki.
 ///
@@ -36,8 +36,8 @@
 ///
 //******************************************************************************
 
-#ifndef FNPOVFPU_H
-#define FNPOVFPU_H
+#ifndef POVRAY_BACKEND_FNPOVFPU_H
+#define POVRAY_BACKEND_FNPOVFPU_H
 
 #include <set>
 #include <vector>
@@ -45,7 +45,9 @@
 #include <boost/thread.hpp>
 
 #include "backend/frame.h"
-#include "backend/vm/fncode.h"
+#include "base/textstream.h"
+
+#include "core/coretypes.h"
 
 namespace pov
 {
@@ -53,6 +55,9 @@ namespace pov
 class FunctionVM;
 
 #define MAX_CALL_STACK_SIZE 1024
+#define INITIAL_DBL_STACK_SIZE 256
+
+#define MAX_K ((unsigned int)0x000fffff)
 
 enum
 {
@@ -105,6 +110,33 @@ enum
 typedef SYS_MATH_RETURN (*Sys1)(SYS_MATH_PARAM r0);
 typedef SYS_MATH_RETURN (*Sys2)(SYS_MATH_PARAM r0,SYS_MATH_PARAM r1);
 
+typedef unsigned int Instruction;
+
+const int MAX_FUNCTION_PARAMETER_LIST = 56;
+
+typedef void *(*FNCODE_PRIVATE_COPY_METHOD)(void *);
+typedef void (*FNCODE_PRIVATE_DESTROY_METHOD)(void *);
+
+struct FunctionCode
+{
+    Instruction *program;
+    unsigned int program_size;
+    unsigned char return_size;
+    unsigned char parameter_cnt;
+    unsigned char localvar_cnt;
+    unsigned int localvar_pos[MAX_FUNCTION_PARAMETER_LIST];
+    char *localvar[MAX_FUNCTION_PARAMETER_LIST];
+    char *parameter[MAX_FUNCTION_PARAMETER_LIST];
+    FunctionSourceInfo sourceInfo;
+    unsigned int flags;
+    FNCODE_PRIVATE_COPY_METHOD private_copy_method;
+    FNCODE_PRIVATE_DESTROY_METHOD private_destroy_method;
+    void *private_data;
+};
+
+typedef unsigned int FUNCTION;
+typedef FUNCTION * FUNCTION_PTR;
+
 // WARNING: Do not change this structure without notice!!!
 // Platform specific code may depend on the exact layout and size! [trf]
 struct FunctionEntry
@@ -127,19 +159,24 @@ struct StackFrame
 
 // WARNING: Do not change this structure without notice!!!
 // Platform specific code may depend on the exact layout and size! [trf]
-struct FPUContext
+class FPUContext : public GenericFunctionContext
 {
-    StackFrame *pstackbase;
-    DBL *dblstackbase;
-    unsigned int maxdblstacksize;
-    FunctionVM *functionvm;
-    TraceThreadData *threaddata;
-    #if (SYS_FUNCTIONS == 1)
-    DBL *dblstack;
-    #endif
+    public:
+        FPUContext(FunctionVM* pVm, TraceThreadData* pThreadData);
+        virtual ~FPUContext();
 
-    void SetLocal(unsigned int k, DBL v);
-    DBL GetLocal(unsigned int k);
+        StackFrame *pstackbase;
+        DBL *dblstackbase;
+        unsigned int maxdblstacksize;
+        FunctionVM *functionvm;
+        TraceThreadData *threaddata;
+        #if (SYS_FUNCTIONS == 1)
+        DBL *dblstack;
+        #endif
+        int nextArgument;
+
+        void SetLocal(unsigned int k, DBL v);
+        DBL GetLocal(unsigned int k);
 };
 
 
@@ -199,6 +236,11 @@ struct FPUContext
 #define OPCODE_DEBUG  OPCODE(15,1,5)
 #define OPCODE_NOP    OPCODE(15,3,7)
 
+#define MAKE_INSTRUCTION(op, k) ((((k) << 12) & 0xfffff000) | ((op) & 0x00000fff))
+
+#define GET_OP(w) ((w) & 0x00000fff)
+#define GET_K(w) (((w) >> 12) & 0x000fffff)
+
 extern const Opcode POVFPU_Opcodes[];
 
 extern const Sys1 POVFPU_Sys1Table[];
@@ -210,11 +252,30 @@ extern const unsigned int POVFPU_Sys2TableSize;
 void POVFPU_Exception(FPUContext *context, FUNCTION fn, const char *msg = NULL);
 DBL POVFPU_RunDefault(FPUContext *context, FUNCTION k);
 
+void FNCode_Delete(FunctionCode *);
+
 class FunctionVM
 {
         friend void POVFPU_Exception(FPUContext *, FUNCTION, const char *);
         friend DBL POVFPU_RunDefault(FPUContext *, FUNCTION);
     public:
+
+        class CustomFunction : public GenericScalarFunction
+        {
+            public:
+                CustomFunction(FunctionVM* pVm, FUNCTION_PTR pFn);
+                virtual ~CustomFunction();
+                virtual GenericFunctionContextPtr NewContext(TraceThreadData* pThreadData);
+                virtual void InitArguments(GenericFunctionContextPtr pContext);
+                virtual void PushArgument(GenericFunctionContextPtr pContext, DBL arg);
+                virtual DBL Execute(GenericFunctionContextPtr pContext);
+                virtual GenericScalarFunctionPtr Clone() const;
+                virtual const FunctionSourceInfo* GetSourceInfo() const;
+            protected:
+                FunctionVM *mpVm;
+                FUNCTION_PTR mpFn;
+        };
+
         FunctionVM();
         ~FunctionVM();
 
@@ -231,20 +292,17 @@ class FunctionVM
         FUNCTION AddFunction(FunctionCode *f);
         void RemoveFunction(FUNCTION fn);
 
-        FPUContext *NewContext(TraceThreadData *);
-        void DeleteContext(FPUContext *);
-    private:
+        FUNCTION_PTR CopyFunction(FUNCTION_PTR pK);
+        void DestroyFunction(FUNCTION_PTR pK);
 
-        typedef std::set<FPUContext *> FPUContextSet;
+    private:
 
         vector<FunctionEntry> functions;
         FUNCTION nextUnreferenced;
-        FPUContextSet contexts;
         vector<DBL> globals;
         vector<DBL> consts;
-        boost::recursive_mutex contextMutex;
 };
 
 }
 
-#endif
+#endif // POVRAY_BACKEND_FNPOVFPU_H

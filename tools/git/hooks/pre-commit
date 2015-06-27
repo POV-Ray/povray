@@ -58,7 +58,7 @@ fi
 # Update prerelease id (trailing numeric portion) if there is any change to the actual program code.
 # We're setting the prerelease id to the number of minutes since 2000-01-01 00:00.
 
-if git diff --cached --name-only | grep -E "^source/|^vfe/|^mac/|^unix/|^windows/|^libraries/" >/dev/null
+if git diff --cached --name-only | grep -E "^source/|^vfe/|^platform/|^mac/|^unix/|^windows/|^libraries/" >/dev/null
 then
   if [ x"$prerelease_povray_h" = x"" ]
   then
@@ -109,7 +109,7 @@ unstaged=`git diff --name-only`
 
 errors=""
 stage=""
-for fname in `git diff --cached --name-only | grep -E "^source/|^vfe/|^mac/|^unix/|^windows/" | grep -E '\.c$|\.cpp$|\.h$'`
+for fname in `git diff --cached --name-only | grep -E "^source/|^vfe/|^platform/|^mac/|^unix/|^windows/" | grep -E '\.c$|\.cpp$|\.h$'`
 do
 
   if [ -f "$fname" ]

@@ -57,12 +57,10 @@
 #include "backend/colour/colour_old.h"
 #include "backend/math/matrices.h"
 #include "backend/scene/objects.h"
-#include "backend/scene/scene.h"
+#include "backend/scene/scenedata.h"
 #include "backend/scene/threaddata.h"
-#include "backend/support/fileutil.h"
 #include "backend/support/imageutil.h"
 #include "backend/support/randomsequences.h"
-#include "backend/vm/fnpovfpu.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -383,21 +381,18 @@ DBL FacetsPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsec
 
 
 FunctionPattern::FunctionPattern() :
-    pFn(NULL), pVm(NULL), contextId(0)
+    pFn(NULL), contextId(0)
 {}
 
 FunctionPattern::FunctionPattern(const FunctionPattern& obj) :
     ContinuousPattern(obj),
-    pFn(NULL), pVm(obj.pVm), contextId(obj.contextId)
-{
-    if (obj.pFn)
-        pFn = reinterpret_cast<void *>(Parser::Copy_Function(obj.pVm, (FUNCTION_PTR)obj.pFn));
-}
+    pFn(obj.pFn->Clone()), contextId(obj.contextId)
+{}
 
 FunctionPattern::~FunctionPattern()
 {
     if (pFn)
-        Parser::Destroy_Function(pVm, (FUNCTION_PTR)pFn);
+        delete pFn;
 }
 
 
@@ -6089,15 +6084,16 @@ DBL FunctionPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIs
     DBL value;
 
     if(pThread->functionPatternContext[contextId] == NULL)
-        pThread->functionPatternContext[contextId] = pThread->functionContext->functionvm->NewContext(const_cast<TraceThreadData *>(pThread));
+        pThread->functionPatternContext[contextId] = pFn->NewContext(const_cast<TraceThreadData *>(pThread));
 
-    FPUContext *ctx = pThread->functionPatternContext[contextId];
+    GenericFunctionContextPtr ctx = pThread->functionPatternContext[contextId];
 
-    ctx->SetLocal(X, EPoint[X]);
-    ctx->SetLocal(Y, EPoint[Y]);
-    ctx->SetLocal(Z, EPoint[Z]);
+    pFn->InitArguments(ctx);
+    pFn->PushArgument(ctx, EPoint[X]);
+    pFn->PushArgument(ctx, EPoint[Y]);
+    pFn->PushArgument(ctx, EPoint[Z]);
 
-    value = POVFPU_Run(ctx, *(reinterpret_cast<const FUNCTION *>(pFn)));
+    value = pFn->Execute(ctx);
 
     return ((value > 1.0) ? fmod(value, 1.0) : value);
 }

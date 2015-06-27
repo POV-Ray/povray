@@ -41,7 +41,7 @@
 #endif
 
 #include "vfe.h"
-#include "povray.h"
+#include "backend/povray.h"
 
 static POVMSContext POVMS_Output_Context = NULL;
 

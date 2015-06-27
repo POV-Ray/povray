@@ -38,7 +38,7 @@
 #define SPLINE_H
 /* Generic header for spline modules */
 
-#include "parser/parser.h" // TODO - avoid this (pulled in for EXPRESS)
+#include "base/types.h"
 
 namespace pov
 {
@@ -52,6 +52,8 @@ struct SplineEntry
 
 typedef vector<SplineEntry> SplineEntryList;
 
+typedef int SplineRefCount;
+
 struct GenericSpline
 {
     GenericSpline();
@@ -60,7 +62,7 @@ struct GenericSpline
     SplineEntryList SplineEntries;
     bool Coeffs_Computed;
     int Terms;
-    int ref_count;
+    SplineRefCount ref_count;
 
     virtual void Get(DBL p, EXPRESS& v) = 0;
     virtual GenericSpline* Clone() const = 0;

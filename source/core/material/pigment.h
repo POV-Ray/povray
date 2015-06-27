@@ -48,6 +48,8 @@ namespace pov
 {
 using namespace pov_base;
 
+class TraceThreadData;
+
 /// Common interface for pigment-like blend maps.
 ///
 /// This class provides the common interface for both pigment and colour blend maps.

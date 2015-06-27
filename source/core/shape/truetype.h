@@ -39,12 +39,21 @@
 
 #include "backend/scene/objects.h"
 
+namespace pov_base
+{
+
+class IStream;
+
+}
+
 namespace pov
 {
 
 class CSG;
 class Parser;
 class SceneData;
+
+using pov_base::IStream;
 
 /*****************************************************************************
 * Global preprocessor defines
@@ -60,7 +69,18 @@ class SceneData;
 
 typedef struct GlyphStruct *GlyphPtr;
 
-struct FontFileInfo;
+struct TrueTypeInfo;
+
+struct TrueTypeFont
+{
+    TrueTypeFont(UCS2* fn, IStream* fp, StringEncoding te);
+    ~TrueTypeFont();
+
+    UCS2*           filename;
+    IStream*        fp;
+    StringEncoding  textEncoding;
+    TrueTypeInfo*   info;
+};
 
 class TrueType : public ObjectBase
 {
@@ -82,15 +102,13 @@ class TrueType : public ObjectBase
         virtual void Transform(const TRANSFORM *);
         virtual void Compute_BBox();
 
-        static void ProcessNewTTF(CSG *Object, const char *filename, const int font_id, const UCS2 *text_string, DBL depth, const Vector3d& offset, Parser *parser, shared_ptr<SceneData>& sceneData);
+        static void ProcessNewTTF(CSG *Object, TrueTypeFont* font, const UCS2 *text_string, DBL depth, const Vector3d& offset, Parser *parser, shared_ptr<SceneData>& sceneData);
     protected:
         bool Inside_Glyph(double x, double y, const GlyphStruct* glyph) const;
         int solve_quad(double *x, double *y, double mindist, DBL maxdist) const;
         void GetZeroOneHits(const GlyphStruct* glyph, const Vector3d& P, const Vector3d& D, DBL glyph_depth, double *t0, double *t1) const;
         bool GlyphIntersect(const Vector3d& P, const Vector3d& D, const GlyphStruct* glyph, DBL glyph_depth, const BasicRay &ray, IStack& Depth_Stack, TraceThreadData *Thread);
 };
-
-void FreeFontInfo(FontFileInfo *ffi);
 
 }
 

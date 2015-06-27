@@ -34,31 +34,14 @@
 ///
 //******************************************************************************
 
+#ifndef POVRAY_PARSER_RESERVEDWORDS_H
+#define POVRAY_PARSER_RESERVEDWORDS_H
+
 namespace pov
 {
 
 typedef struct Reserved_Word_Struct RESERVED_WORD;
 typedef int TOKEN;
-
-typedef struct Sym_Table_Entry SYM_ENTRY;
-
-#define TF_DEPRECATED               0x01
-#define TF_DEPRECATED_ONCE          0x02
-#define TF_DEPRECATED_SHOWN         0x04
-
-#define SYM_ENTRY_REF_MAX           USHRT_MAX
-
-/// Structure holding information about a symbol
-struct Sym_Table_Entry
-{
-    SYM_ENTRY *next;            ///< Reference to next symbol with same hash
-    char *Token_Name;           ///< Symbol name
-    char *Deprecation_Message;  ///< Warning to print if the symbol is deprecated
-    void *Data;                 ///< Reference to the symbol value
-    TOKEN Token_Number;         ///< Unique ID of this symbol
-    unsigned short Flags;       ///< various flags (see TF_*)
-    unsigned short ref_count;   ///< normally 1, but may be greater when passing symbols out of macros
-};
 
 struct Reserved_Word_Struct
 {
@@ -664,3 +647,5 @@ enum TOKEN_IDS
 extern const RESERVED_WORD Reserved_Words[LAST_TOKEN] ;
 
 }
+
+#endif // POVRAY_PARSER_RESERVEDWORDS_H

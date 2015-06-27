@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -31,7 +31,7 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
 #ifndef POVRAY_BASE_TYPES_H
 #define POVRAY_BASE_TYPES_H
@@ -73,6 +73,10 @@ using std::sinh;
 using std::sqrt;
 using std::tan;
 using std::tanh;
+
+/// 5-dimensional vector type shared between parser and splines.
+/// @todo Make this obsolete.
+typedef DBL EXPRESS[5];
 
 // Get minimum/maximum of three values.
 template<typename T>
@@ -185,6 +189,12 @@ class FloatSetting : public GenericSetting
         double operator()(double def) const { if (set) return data; else return def; }
     private:
         double  data;
+};
+
+enum StringEncoding {
+    kStringEncoding_ASCII  = 0,
+    kStringEncoding_UTF8   = 1,
+    kStringEncoding_System = 2
 };
 
 }

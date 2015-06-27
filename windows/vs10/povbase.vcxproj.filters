@@ -118,6 +118,9 @@
     <ClCompile Include="..\..\source\base\colour.cpp">
       <Filter>Base source</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\base\fileutil.cpp">
+      <Filter>Base source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\base\configbase.h">
@@ -230,6 +233,9 @@
       <Filter>Base Headers</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\base\version.h">
+      <Filter>Base Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\base\fileutil.h">
       <Filter>Base Headers</Filter>
     </ClInclude>
     <ClInclude Include="..\povconfig\syspovconfigbase.h">

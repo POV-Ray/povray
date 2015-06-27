@@ -2,8 +2,7 @@
 ///
 /// @file backend/vm/fnintern.h
 ///
-/// This module contains all defines, typedefs, and prototypes for
-/// `fnintern.cpp`.
+/// This module contains declarations for the built-in render-time functions.
 ///
 /// This module is inspired by code by D. Skarda, T. Bily and R. Suzuki.
 /// It includes functions based on code first introduced by many other
@@ -13,7 +12,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,15 +35,15 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
-#ifndef FNINTERN_H
-#define FNINTERN_H
+#ifndef POVRAY_BACKEND_FNINTERN_H
+#define POVRAY_BACKEND_FNINTERN_H
 
 namespace pov
 {
 
-struct FPUContext;
+class FPUContext;
 
 typedef struct
 {
@@ -66,4 +65,4 @@ extern const unsigned int POVFPU_TrapSTableSize;
 
 }
 
-#endif
+#endif // POVRAY_BACKEND_FNINTERN_H

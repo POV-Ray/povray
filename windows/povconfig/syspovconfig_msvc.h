@@ -43,9 +43,13 @@
   #error minimum Visual C++ version supported is 14.0 (supplied with VS 2005)
 #endif
 
-#undef USE_AVX_FMA4_FOR_NOISE
+#undef TRY_OPTIMIZED_NOISE
 #if _MSC_VER >= 1600
-  #define USE_AVX_FMA4_FOR_NOISE
+  #define TRY_OPTIMIZED_NOISE
+  #define OPTIMIZED_NOISE_SUPPORTED (AVXFMA4NoiseSupported())
+  #define OPTIMIZED_NOISE           AVXFMA4Noise
+  #define OPTIMIZED_DNOISE          AVXFMA4DNoise
+  #define OPTIMIZED_NOISE_H         "avxfma4noise.h"
 #endif
 
 #include <cstdio>

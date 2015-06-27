@@ -41,6 +41,8 @@
 
 #include <cctype>
 
+#include <limits>
+
 // configparser.h must always be the first POV file included in the parser (pulls in platform config)
 #include "parser/configparser.h"
 #include "parser/parser.h"
@@ -55,7 +57,7 @@
 
 #include "backend/colour/colour_old.h"
 #include "backend/math/matrices.h"
-#include "backend/support/fileutil.h"
+#include "backend/scene/scenedata.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -97,7 +99,7 @@ void Parser::Initialize_Tokenizer()
 
     pre_init_tokenizer ();
 
-    rfile = Locate_File(this, sceneData, sceneData->inputFile.c_str(),POV_File_Text_POV,b,true);
+    rfile = Locate_File(sceneData, sceneData->inputFile.c_str(),POV_File_Text_POV,b,true);
     if(rfile != NULL)
     {
         Input_File->In_File = new ITextStream(b.c_str(), rfile);
@@ -127,7 +129,7 @@ void Parser::Initialize_Tokenizer()
     /* ignore any leading characters if they have character codes above 127, this
        takes care of UTF-8 files with encoding info at the beginning of the file */
     for(c = Echo_getc(); c > 127; c = Echo_getc())
-        sceneData->stringEncoding = 1; // switch to UTF-8 automatically [trf]
+        sceneData->stringEncoding = kStringEncoding_UTF8; // switch to UTF-8 automatically [trf]
     Echo_ungetc(c);
 }
 
@@ -1321,10 +1323,9 @@ void Parser::Read_Symbol()
             /* See if it's a previously declared identifier. */
             if ((Temp_Entry = Find_Symbol(Local_Index,String)) != NULL)
             {
-                if ((Temp_Entry->Flags & (TF_DEPRECATED | TF_DEPRECATED_SHOWN)) == TF_DEPRECATED)
+                if (Temp_Entry->deprecated && !Temp_Entry->deprecatedShown)
                 {
-                    if ((Temp_Entry->Flags & TF_DEPRECATED_ONCE) != 0)
-                        Temp_Entry->Flags |= TF_DEPRECATED_SHOWN;
+                    Temp_Entry->deprecatedShown = Temp_Entry->deprecatedOnce;
                     Warning("%s", Temp_Entry->Deprecation_Message);
                 }
 
@@ -2543,7 +2544,7 @@ void Parser::Open_Include()
     // to free In_File if it's not NULL.
     Input_File->In_File = NULL;
 
-    IStream *is = Locate_File(this, sceneData, temp, POV_File_Text_INC, b, true);
+    IStream *is = Locate_File(sceneData, temp, POV_File_Text_INC, b, true);
     if(is == NULL)
     {
         Input_File->In_File = NULL;  /* Keeps from closing failed file. */
@@ -2797,7 +2798,9 @@ SYM_ENTRY *Parser::Create_Entry (int Index,const char *Name,TOKEN Number)
 
     New->Token_Number        = Number;
     New->Data                = NULL;
-    New->Flags               = 0;
+    New->deprecated          = false;
+    New->deprecatedOnce      = false;
+    New->deprecatedShown     = false;
     New->Deprecation_Message = NULL;
     New->ref_count           = 1;
     if (Index != 0)
@@ -2812,7 +2815,7 @@ void Parser::Acquire_Entry_Reference (SYM_ENTRY *Entry)
 {
     if (Entry == NULL)
         return;
-    if (Entry->ref_count >= SYM_ENTRY_REF_MAX)
+    if (Entry->ref_count >= std::numeric_limits<SymTableEntryRefCount>::max())
         Error("Too many unresolved references to symbol");
     Entry->ref_count ++;
 }
@@ -3186,7 +3189,7 @@ void Parser::Invoke_Macro()
 //  POV_DELETE(Input_File->In_File, IStream);
         Got_EOF=false;
         Input_File->R_Flag=false;
-        IStream *is = Locate_File (this, sceneData, PMac->Macro_Filename, POV_File_Text_Macro, ign, true);
+        IStream *is = Locate_File (sceneData, PMac->Macro_Filename, POV_File_Text_Macro, ign, true);
         if(is == NULL)
         {
             Input_File->In_File = NULL;  /* Keeps from closing failed file. */
@@ -3425,7 +3428,7 @@ void Parser::Parse_Fopen(void)
     EXPECT
         CASE(READ_TOKEN)
             New->R_Flag = true;
-            rfile = Locate_File(this, sceneData, temp.c_str(), POV_File_Text_User, ign, true);
+            rfile = Locate_File(sceneData, temp.c_str(), POV_File_Text_User, ign, true);
             if(rfile != NULL)
                 New->In_File = new ITextStream(temp.c_str(), rfile);
             else
@@ -4049,7 +4052,7 @@ void Parser::IncludeHeader(const UCS2String& temp)
 
     Input_File = &Include_Files[Include_File_Index];
     Input_File->In_File = NULL;
-    IStream *is = Locate_File (this, sceneData, temp.c_str(),POV_File_Text_INC,b,true);
+    IStream *is = Locate_File (sceneData, temp.c_str(),POV_File_Text_INC,b,true);
     if(is == NULL)
     {
         Input_File->In_File = NULL;  /* Keeps from closing failed file. */

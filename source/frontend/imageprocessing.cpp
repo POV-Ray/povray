@@ -55,8 +55,6 @@
 namespace pov_frontend
 {
 
-using namespace pov;
-
 enum
 {
     X = 0,

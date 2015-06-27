@@ -1,9 +1,9 @@
 //******************************************************************************
 ///
-/// @file backend/support/fileutil.h
+/// @file platform/x86/avxfma4noise.h
 ///
-/// This module contains all defines, typedefs, and prototypes for
-/// `fileutil.cpp`.
+/// This file contains declarations related to implementations of the noise
+/// generator optimized for the AVX and FMA4 instruction set.
 ///
 /// @copyright
 /// @parblock
@@ -32,30 +32,32 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
-#ifndef POV_UTIL_H
-#define POV_UTIL_H
+#ifndef POVRAY_AVXFMA4NOISE_H
+#define POVRAY_AVXFMA4NOISE_H
 
-#include "base/stringutilities.h"
+#include "syspovconfigbase.h"
+#include "backend/frame.h"
 
-namespace pov_base
-{
-class IMemStream;
-class IStream;
-}
+#ifdef TRY_OPTIMIZED_NOISE
 
 namespace pov
 {
 
-using namespace pov_base;
+bool AVXFMA4NoiseSupported();
 
-class Parser;
-class SceneData;
+/// FMA4 version of the Noise function.
+/// Optimized Noise function using AVX and FMA4 instructions.
+/// @author Optimized by AMD
+DBL AVXFMA4Noise(const Vector3d& EPoint, int noise_generator);
 
-IStream *Locate_File(Parser *p, shared_ptr<SceneData>& sd, const UCS2String& filename, unsigned int stype, UCS2String& buffer, bool err_flag = false);
-IMemStream *Internal_Font_File(const int font_id, UCS2String& buffer);
+/// Optimized DNoise function using AVX and FMA4 instructions.
+/// @author Optimized by AMD
+void AVXFMA4DNoise(Vector3d& result, const Vector3d& EPoint);
 
 }
 
-#endif
+#endif // TRY_OPTIMIZED_NOISE
+
+#endif // POVRAY_AVXFMA4NOISE_H

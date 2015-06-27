@@ -1465,7 +1465,7 @@ bool Mesh::intersect_bbox_tree(const BasicRay &ray, const BasicRay &Orig_Ray, DB
 
     /* Set the root object infinite to avoid a test. */
 
-    Check_And_Enqueue(Thread->Mesh_Queue, Root, &Root->BBox, &rayinfo, Thread);
+    Check_And_Enqueue(Thread->Mesh_Queue, Root, &Root->BBox, &rayinfo, Thread->Stats());
 
     /* Check elements in the priority queue. */
 
@@ -1495,7 +1495,7 @@ bool Mesh::intersect_bbox_tree(const BasicRay &ray, const BasicRay &Orig_Ray, DB
             /* This is a node containing leaves to be checked. */
 
             for (i = 0; i < Node->Entries; i++)
-                Check_And_Enqueue(Thread->Mesh_Queue, Node->Node[i], &Node->Node[i]->BBox, &rayinfo, Thread);
+                Check_And_Enqueue(Thread->Mesh_Queue, Node->Node[i], &Node->Node[i]->BBox, &rayinfo, Thread->Stats());
         }
         else
         {
@@ -2384,7 +2384,7 @@ bool Mesh::inside_bbox_tree(const BasicRay &ray, TraceThreadData *Thread) const
     Root = Data->Tree;
 
     /* Set the root object infinite to avoid a test. */
-    Check_And_Enqueue(Thread->Mesh_Queue, Root, &Root->BBox, &rayinfo, Thread);
+    Check_And_Enqueue(Thread->Mesh_Queue, Root, &Root->BBox, &rayinfo, Thread->Stats());
 
     /* Check elements in the priority queue. */
     while (!Thread->Mesh_Queue.IsEmpty())
@@ -2396,7 +2396,7 @@ bool Mesh::inside_bbox_tree(const BasicRay &ray, TraceThreadData *Thread) const
         {
             /* This is a node containing leaves to be checked. */
             for (i = 0; i < Node->Entries; i++)
-                Check_And_Enqueue(Thread->Mesh_Queue, Node->Node[i], &Node->Node[i]->BBox, &rayinfo, Thread);
+                Check_And_Enqueue(Thread->Mesh_Queue, Node->Node[i], &Node->Node[i]->BBox, &rayinfo, Thread->Stats());
         }
         else
         {

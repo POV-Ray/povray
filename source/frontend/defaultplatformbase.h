@@ -37,9 +37,8 @@
 #ifndef DEFAULTPLATFORMBASE_H
 #define DEFAULTPLATFORMBASE_H
 
-#include "configbase.h"
-
-#include "platformbase.h"
+#include "base/configbase.h"
+#include "base/platformbase.h"
 
 namespace pov_base
 {

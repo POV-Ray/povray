@@ -430,9 +430,6 @@ AM_CPPFLAGS = \\
   -I\$(top_srcdir) \\
   -I\$(top_srcdir)/source \\
   -I\$(top_builddir)/source \\
-  -I\$(top_srcdir)/source/backend \\
-  -I\$(top_srcdir)/source/base \\
-  -I\$(top_srcdir)/source/frontend \\
   -I\$(top_srcdir)/vfe \\
   -I\$(top_srcdir)/vfe/unix
 
@@ -793,9 +790,6 @@ libpovray_a_SOURCES = \\
 AM_CPPFLAGS = \\
   -I\$(top_srcdir)/unix/povconfig \\
   -I\$(top_srcdir) \\
-  -I\$(top_srcdir)/source/backend \\
-  -I\$(top_srcdir)/source/base \\
-  -I\$(top_srcdir)/source/frontend \\
   -I\$(top_srcdir)/unix \\
   -I\$(top_srcdir)/vfe \\
   -I\$(top_srcdir)/vfe/unix
@@ -1332,9 +1326,7 @@ AM_CPPFLAGS = \\
   -I\$(top_srcdir)/unix/povconfig \\
   -I\$(top_srcdir)/vfe/unix \\
   -I\$(top_srcdir)/unix \\
-  -I\$(top_srcdir)/source \\
-  -I\$(top_srcdir)/source/base \\
-  -I\$(top_srcdir)/source/backend
+  -I\$(top_srcdir)/source
 
 # Extra definitions for compiling.
 # They cannot be placed in config.h since they indirectly rely on \$prefix.

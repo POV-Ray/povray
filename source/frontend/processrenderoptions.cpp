@@ -44,6 +44,7 @@
 #include "povms/povmsid.h"
 
 #include "base/fileinputoutput.h"
+#include "base/fileutil.h"
 #include "base/pov_err.h"
 #include "base/stringutilities.h"
 #include "base/textstream.h"
@@ -961,10 +962,10 @@ ITextStream *ProcessRenderOptions::OpenINIFileStream(const char *filename, unsig
 
     for(i = 0; i < POV_FILE_EXTENSIONS_PER_TYPE; i++)
     {
-        if((l[i] = strlen(pov::gPOV_File_Extensions[stype].ext[i])) > 0)
+        if((l[i] = strlen(pov_base::gPOV_File_Extensions[stype].ext[i])) > 0)
         {
             strcpy(file_x[i], filename);
-            strcat(file_x[i], pov::gPOV_File_Extensions[stype].ext[i]);
+            strcat(file_x[i], pov_base::gPOV_File_Extensions[stype].ext[i]);
         }
     }
 
@@ -1047,7 +1048,7 @@ ITextStream *ProcessRenderOptions::OpenINIFileStream(const char *filename, unsig
     (void)POVMSAttrList_Delete(&attr);
 
     if(l[0])
-        ParseError("Could not find file '%s%s'", filename, pov::gPOV_File_Extensions[stype].ext[0]);
+        ParseError("Could not find file '%s%s'", filename, pov_base::gPOV_File_Extensions[stype].ext[0]);
     else
         ParseError("Could not find file '%s'", filename);
 

@@ -42,11 +42,14 @@
 #include "backend/frame.h"
 #include "backend/scene/scenedata.h"
 
+#include "base/fileutil.h"
+
 #include "core/material/pattern.h"
 #include "core/shape/truetype.h"
 
 #include "povms/povmsid.h"
 
+#include "backend/scene/atmosph.h"
 #include "backend/vm/fnpovfpu.h"
 
 // this must be the last file included
@@ -72,7 +75,7 @@ SceneData::SceneData() :
     languageVersionSet = false;
     languageVersionLate = false;
     warningLevel = 10; // all warnings
-    stringEncoding = 0; // ASCII
+    stringEncoding = kStringEncoding_ASCII;
     noiseGenerator = kNoiseGen_RangeCorrected;
     explicitNoiseGenerator = false; // scene has not set the noise generator explicitly
     numberOfWaves = 10;
@@ -102,8 +105,6 @@ SceneData::SceneData() :
     splitUnions = false;
     removeBounds = true;
 
-    TTFonts = NULL;
-
     tree = NULL;
 
     functionVM = new FunctionVM();
@@ -128,8 +129,8 @@ SceneData::~SceneData()
     }
     if(boundingSlabs != NULL)
         Destroy_BBox_Tree(boundingSlabs);
-    if(TTFonts != NULL)
-        FreeFontInfo(TTFonts);
+    for (vector<TrueTypeFont*>::iterator i = TTFonts.begin(); i != TTFonts.end(); ++i)
+        delete *i;
     // TODO: perhaps ObjectBase::~ObjectBase would be a better place
     //       to handle cleanup of individual objects ?
     Destroy_Object(objects);

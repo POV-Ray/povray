@@ -44,6 +44,8 @@
 #include "parser/configparser.h"
 #include "parser/parser.h"
 
+#include "base/fileutil.h"
+
 #include "core/material/interior.h"
 #include "core/material/normal.h"
 #include "core/material/pigment.h"
@@ -89,6 +91,7 @@
 #include "backend/math/vector.h"
 #include "backend/scene/atmosph.h"
 #include "backend/scene/objects.h"
+#include "backend/scene/scenedata.h"
 #include "backend/scene/threaddata.h"
 #include "backend/support/imageutil.h"
 #include "backend/support/octree.h"
@@ -130,11 +133,11 @@ const DBL INFINITE_VOLUME = BOUND_HUGE;
 ******************************************************************************/
 
 Parser::Parser(shared_ptr<SceneData> sd, bool useclk, DBL clk) :
-    SceneTask(new SceneThreadData(sd), boost::bind(&Parser::SendFatalError, this, _1), "Parse", sd),
+    SceneTask(new TraceThreadData(sd), boost::bind(&Parser::SendFatalError, this, _1), "Parse", sd),
     sceneData(sd),
     clockValue(clk),
     useClock(useclk),
-    fnVMContext(sd->functionVM->NewContext(GetParserDataPtr())),
+    fnVMContext(new FPUContext(sd->functionVM, GetParserDataPtr())),
     Destroying_Frame(false),
     String_Index(0),
     String_Buffer_Free(0),
@@ -433,7 +436,7 @@ void Parser::Run()
 
 void Parser::Cleanup()
 {
-    sceneData->functionVM->DeleteContext(fnVMContext);
+    delete fnVMContext;
 
     // TODO FIXME - cleanup [trf]
     Terminate_Tokenizer();
@@ -457,7 +460,7 @@ void Parser::Finish()
 {
     Cleanup();
 
-    GetParserDataPtr()->timeType = SceneThreadData::kParseTime;
+    GetParserDataPtr()->timeType = TraceThreadData::kParseTime;
     GetParserDataPtr()->realTime = ConsumedRealTime();
     GetParserDataPtr()->cpuTime = ConsumedCPUTime();
 }
@@ -2457,13 +2460,12 @@ ObjectPtr Parser::Parse_Isosurface()
         return (reinterpret_cast<ObjectPtr>(Object));
 
     Object = new IsoSurface();
-    Object->vm = sceneData->functionVM;
 
     Get_Token();
     if(Token.Token_Id != FUNCTION_TOKEN)
         Parse_Error(FUNCTION_TOKEN);
 
-    Object->Function = Parse_Function();
+    Object->Function = new FunctionVM::CustomFunction(sceneData->functionVM, Parse_Function());
 
     EXPECT
         CASE(CONTAINED_BY_TOKEN)
@@ -2789,7 +2791,7 @@ ObjectPtr Parser::Parse_Julia_Fractal ()
     if (num_iterations > sceneData->Fractal_Iteration_Stack_Length)
     {
         sceneData->Fractal_Iteration_Stack_Length = num_iterations;
-        SceneThreadData *td = GetParserDataPtr();
+        TraceThreadData *td = GetParserDataPtr();
         Fractal::Allocate_Iteration_Stack(td->Fractal_IStack, sceneData->Fractal_Iteration_Stack_Length);
     }
 
@@ -2940,7 +2942,7 @@ ObjectPtr Parser::Parse_Lathe()
 
     if (Object->Spline->BCyl->number > sceneData->Max_Bounding_Cylinders)
     {
-        SceneThreadData *td = GetParserDataPtr();
+        TraceThreadData *td = GetParserDataPtr();
         sceneData->Max_Bounding_Cylinders = Object->Spline->BCyl->number;
         td->BCyl_Intervals.reserve(4*sceneData->Max_Bounding_Cylinders);
         td->BCyl_RInt.reserve(2*sceneData->Max_Bounding_Cylinders);
@@ -4723,15 +4725,14 @@ ObjectPtr Parser::Parse_Parametric(void)
         return (reinterpret_cast<ObjectPtr>(Object));
 
     Object = new Parametric();
-    Object->vm = sceneData->functionVM;
 
     EXPECT
         CASE(FUNCTION_TOKEN)
-            Object->Function[0]= Parse_Function();
+            Object->Function[0] = new FunctionVM::CustomFunction(sceneData->functionVM, Parse_Function());
             EXIT
         END_CASE
         OTHERWISE
-            Object->Function[0]= Parse_FunctionContent();
+            Object->Function[0] = new FunctionVM::CustomFunction(sceneData->functionVM, Parse_FunctionContent());
             EXIT
         END_CASE
     END_EXPECT
@@ -4740,11 +4741,11 @@ ObjectPtr Parser::Parse_Parametric(void)
 
     EXPECT
         CASE(FUNCTION_TOKEN)
-            Object->Function[1]= Parse_Function();
+            Object->Function[1] = new FunctionVM::CustomFunction(sceneData->functionVM, Parse_Function());
             EXIT
         END_CASE
         OTHERWISE
-            Object->Function[1]= Parse_FunctionContent();
+            Object->Function[1] = new FunctionVM::CustomFunction(sceneData->functionVM, Parse_FunctionContent());
             EXIT
         END_CASE
     END_EXPECT
@@ -4753,11 +4754,11 @@ ObjectPtr Parser::Parse_Parametric(void)
 
     EXPECT
         CASE(FUNCTION_TOKEN)
-            Object->Function[2]= Parse_Function();
+            Object->Function[2] = new FunctionVM::CustomFunction(sceneData->functionVM, Parse_Function());
             EXIT
         END_CASE
         OTHERWISE
-            Object->Function[2]= Parse_FunctionContent();
+            Object->Function[2] = new FunctionVM::CustomFunction(sceneData->functionVM, Parse_FunctionContent());
             EXIT
         END_CASE
     END_EXPECT
@@ -5761,7 +5762,7 @@ ObjectPtr Parser::Parse_Sor()
 
     if (Object->Spline->BCyl->number > sceneData->Max_Bounding_Cylinders)
     {
-        SceneThreadData *td = GetParserDataPtr();
+        TraceThreadData *td = GetParserDataPtr();
         sceneData->Max_Bounding_Cylinders = Object->Spline->BCyl->number;
         td->BCyl_Intervals.reserve(4*sceneData->Max_Bounding_Cylinders);
         td->BCyl_RInt.reserve(2*sceneData->Max_Bounding_Cylinders);
@@ -6144,7 +6145,7 @@ ObjectPtr Parser::Parse_TrueType ()
     int builtin_font = 0;
     TRANSFORM Local_Trans;
 
-    if((sceneData->EffectiveLanguageVersion() < 350) && (sceneData->stringEncoding == 0))
+    if((sceneData->EffectiveLanguageVersion() < 350) && (sceneData->stringEncoding == kStringEncoding_ASCII))
     {
         PossibleError("Text may not be displayed as expected.\n"
                       "Please refer to the user manual regarding changes\n"
@@ -6184,9 +6185,12 @@ ObjectPtr Parser::Parse_TrueType ()
     /* Get the offset vector */
     Parse_Vector(offset);
 
+    /* Open the font file */
+    TrueTypeFont* font = OpenFontFile(filename, builtin_font);
+
     /* Process all this good info */
     Object = new CSGUnion();
-    TrueType::ProcessNewTTF(reinterpret_cast<CSG *>(Object), filename, builtin_font, text_string, depth, offset, this, sceneData);
+    TrueType::ProcessNewTTF(reinterpret_cast<CSG *>(Object), font, text_string, depth, offset, this, sceneData);
     if (filename)
     {
         /* Free up the filename  */
@@ -6210,6 +6214,98 @@ ObjectPtr Parser::Parse_TrueType ()
     return (reinterpret_cast<ObjectPtr>(Object));
 }
 
+
+/*****************************************************************************
+*
+* FUNCTION
+*
+*   OpenFontFile
+*
+* INPUT
+*
+* OUTPUT
+*
+* RETURNS
+*
+* AUTHOR
+*
+*   Alexander Ennzmann
+*
+* DESCRIPTION
+*
+*   -
+*
+* CHANGES
+*
+*   Added support for builtin fonts - Oct 2012 [JG]
+*
+******************************************************************************/
+TrueTypeFont *Parser::OpenFontFile(const char *asciifn, const int font_id)
+{
+    /* int i; */ /* tw, mtg */
+    TrueTypeFont *font = NULL;
+    UCS2String b, ign;
+    UCS2String filename;
+    if (asciifn)
+    {
+        filename = ASCIItoUCS2String(asciifn);
+
+        /* First look to see if we have already opened this font */
+
+        for(vector<TrueTypeFont*>::iterator iFont = sceneData->TTFonts.begin(); iFont != sceneData->TTFonts.end(); ++iFont)
+            if(UCS2_strcmp(filename.c_str(), (*iFont)->filename) == 0)
+            {
+                font = *iFont;
+                break;
+            }
+
+    }
+    if(font != NULL)
+    {
+        if(font->fp == NULL)
+        {
+            /* We have a match, use the previous information */
+            font->fp = Locate_File(sceneData, font->filename,POV_File_Font_TTF,ign,true);
+            if(font->fp == NULL)
+            {
+                throw POV_EXCEPTION(kCannotOpenFileErr, "Cannot open font file.");
+            }
+        }
+        else
+        {
+            #ifdef TTF_DEBUG
+            Debug_Info("Using cached font info for %s\n", font->filename);
+            #endif
+        }
+    }
+    else
+    {
+        /*
+         * We haven't looked at this font before, let's allocate a holder for the
+         * information and set some defaults
+         */
+
+        IStream* fp = NULL;
+
+        if (asciifn)
+        {
+            if((fp = Locate_File(sceneData, filename,POV_File_Font_TTF,b,true)) == NULL)
+            {
+                throw POV_EXCEPTION(kCannotOpenFileErr, "Cannot open font file.");
+            }
+        }
+        else
+        {
+            fp = Internal_Font_File(font_id,b);
+        }
+
+        font = new TrueTypeFont(UCS2_strdup(b.c_str()), fp, sceneData->stringEncoding);
+
+        sceneData->TTFonts.push_back(font);
+    }
+
+    return font;
+}
 
 
 /*****************************************************************************
@@ -6459,7 +6555,7 @@ ObjectPtr Parser::Parse_Object ()
     if (Object && !Object->Precompute())
         PossibleError("Invalid object paameters.");
 
-    return (reinterpret_cast<ObjectPtr>(Object));
+    return Object;
 }
 
 
@@ -6782,15 +6878,15 @@ void Parser::Parse_Global_Settings()
         CASE (CHARSET_TOKEN)
             EXPECT
                 CASE (ASCII_TOKEN)
-                    sceneData->stringEncoding = 0; // ASCII
+                    sceneData->stringEncoding = kStringEncoding_ASCII;
                     EXIT
                 END_CASE
                 CASE (UTF8_TOKEN)
-                    sceneData->stringEncoding = 1; // UTF8
+                    sceneData->stringEncoding = kStringEncoding_UTF8;
                     EXIT
                 END_CASE
                 CASE (SYS_TOKEN)
-                    sceneData->stringEncoding = 2; // System Specific
+                    sceneData->stringEncoding = kStringEncoding_System;
                     EXIT
                 END_CASE
                 OTHERWISE
@@ -8332,9 +8428,9 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
                 Previous = Token.Token_Id;
                 if (deprecated)
                 {
-                    Temp_Entry->Flags |= TF_DEPRECATED;
+                    Temp_Entry->deprecated = true;;
                     if (deprecated_once)
-                        Temp_Entry->Flags |= TF_DEPRECATED_ONCE;
+                        Temp_Entry->deprecatedOnce = true;
                     if (deprecation_message != NULL)
                     {
                         UCS2String str(deprecation_message);
@@ -9195,7 +9291,7 @@ void Parser::Destroy_Ident_Data(void *Data, int Type)
             break;
         case FUNCT_ID_TOKEN:
         case VECTFUNCT_ID_TOKEN:
-            Destroy_Function((FUNCTION_PTR)Data);
+            sceneData->functionVM->DestroyFunction((FUNCTION_PTR)Data);
             break;
         case SPLINE_ID_TOKEN:
             Destroy_Spline(reinterpret_cast<GenericSpline *>(Data));
@@ -10258,7 +10354,7 @@ void *Parser::Copy_Identifier (void *Data, int Type)
             break;
         case FUNCT_ID_TOKEN:
         case VECTFUNCT_ID_TOKEN:
-            New = reinterpret_cast<void *>(Copy_Function((FUNCTION_PTR )Data));
+            New = reinterpret_cast<void *>(sceneData->functionVM->CopyFunction((FUNCTION_PTR )Data));
             break;
         case SPLINE_ID_TOKEN:
             New = reinterpret_cast<void *>(Copy_Spline((GenericSpline *)Data));
@@ -10544,6 +10640,164 @@ void Parser::CheckPassThru(ObjectPtr o, int flag)
                 break;
         }
     }
+}
+
+/*****************************************************************************
+*
+* FUNCTION
+*
+*   Locate_File
+*
+* INPUT
+*
+* OUTPUT
+*
+* RETURNS
+*
+* AUTHOR
+*
+*   POV-Ray Team
+*
+* DESCRIPTION
+*
+*   Find a file in the search path.
+*
+* CHANGES
+*
+*   Apr 1996: Don't add trailing FILENAME_SEPARATOR if we are immediately
+*             following DRIVE_SEPARATOR because of Amiga probs.  [AED]
+*
+******************************************************************************/
+
+IStream *Parser::Locate_File(shared_ptr<SceneData>& sd, const UCS2String& filename, unsigned int stype, UCS2String& buffer, bool err_flag)
+{
+    UCS2String fn(filename);
+    UCS2String foundfile(sd->FindFile(GetPOVMSContext(), fn, stype));
+
+    if(foundfile.empty() == true)
+    {
+        if(err_flag == true)
+            PossibleError("Cannot find file '%s', even after trying to append file type extension.", UCS2toASCIIString(fn).c_str());
+
+        return NULL;
+    }
+
+    if(fn.find('.') == UCS2String::npos)
+    {
+        // the passed-in filename didn't have an extension, but a file has been found,
+        // which means one of the appended extensions worked. we need to work out which
+        // one and append it to the original filename so we can store it in the cache
+        // (since it's that name that the cache search routine looks for).
+        UCS2String ext = GetFileExtension(Path(foundfile));
+        if (ext.size() != 0)
+            fn += ext;
+    }
+
+    // ReadFile will store both fn and foundfile in the cache for next time round
+    IStream *result(sd->ReadFile(GetPOVMSContext(), fn, foundfile.c_str(), stype));
+
+    if((result == NULL) && (err_flag == true))
+        PossibleError("Cannot open file '%s'.", UCS2toASCIIString(foundfile).c_str());
+
+    buffer = foundfile;
+
+    return result;
+}
+/* TODO FIXME - code above should not be there, this is how it should work but this has bugs [trf]
+IStream *Parser::Locate_File(shared_ptr<SceneData>& sd, const UCS2String& filename, unsigned int stype, UCS2String& buffer, bool err_flag)
+{
+    UCS2String foundfile(sd->FindFile(GetPOVMSContext(), filename, stype));
+
+    if(foundfile.empty() == true)
+    {
+        if(err_flag == true)
+            PossibleError("Cannot find file '%s', even after trying to append file type extension.", UCS2toASCIIString(filename).c_str());
+
+        return NULL;
+    }
+
+    IStream *result(sd->ReadFile(GetPOVMSContext(), foundfile.c_str(), stype));
+
+    if((result == NULL) && (err_flag == true))
+        PossibleError("Cannot open file '%s'.", UCS2toASCIIString(foundfile).c_str());
+
+    buffer = foundfile;
+
+    return result;
+}
+*/
+/*****************************************************************************/
+
+Image *Parser::Read_Image(shared_ptr<SceneData>& sd, int filetype, const UCS2 *filename, const Image::ReadOptions& options)
+{
+    unsigned int stype;
+    Image::ImageFileType type;
+    UCS2String ign;
+
+    switch(filetype)
+    {
+        case GIF_FILE:
+            stype = POV_File_Image_GIF;
+            type = Image::GIF;
+            break;
+        case POT_FILE:
+            stype = POV_File_Image_GIF;
+            type = Image::POT;
+            break;
+        case SYS_FILE:
+            stype = POV_File_Image_System;
+            type = Image::SYS;
+            break;
+        case IFF_FILE:
+            stype = POV_File_Image_IFF;
+            type = Image::IFF;
+            break;
+        case TGA_FILE:
+            stype = POV_File_Image_Targa;
+            type = Image::TGA;
+            break;
+        case PGM_FILE:
+            stype = POV_File_Image_PGM;
+            type = Image::PGM;
+            break;
+        case PPM_FILE:
+            stype = POV_File_Image_PPM;
+            type = Image::PPM;
+            break;
+        case PNG_FILE:
+            stype = POV_File_Image_PNG;
+            type = Image::PNG;
+            break;
+        case JPEG_FILE:
+            stype = POV_File_Image_JPEG;
+            type = Image::JPEG;
+            break;
+        case TIFF_FILE:
+            stype = POV_File_Image_TIFF;
+            type = Image::TIFF;
+            break;
+        case BMP_FILE:
+            stype = POV_File_Image_BMP;
+            type = Image::BMP;
+            break;
+        case EXR_FILE:
+            stype = POV_File_Image_EXR;
+            type = Image::EXR;
+            break;
+        case HDR_FILE:
+            stype = POV_File_Image_HDR;
+            type = Image::HDR;
+            break;
+        default:
+            throw POV_EXCEPTION(kDataTypeErr, "Unknown file type.");
+    }
+
+    boost::scoped_ptr<IStream> file(Locate_File(sd, filename, stype, ign, true));
+
+    if(file == NULL)
+        throw POV_EXCEPTION(kCannotOpenFileErr, "Cannot find image file.");
+
+    return Image::Read(type, file.get(), options);
 }
 
 }

@@ -38,13 +38,16 @@
 
 #include "parser/configparser.h"
 
+#include "base/image/image.h"
 #include "base/stringutilities.h"
 #include "base/textstream.h"
 #include "base/textstreambuffer.h"
 
 #include "core/material/pigment.h"
 #include "core/shape/blob.h"
+#include "core/shape/truetype.h"
 
+#include "parser/fncode.h"
 #include "parser/reservedwords.h"
 
 #include "backend/control/messagefactory.h"
@@ -52,7 +55,6 @@
 #include "backend/math/vector.h"
 #include "backend/scene/atmosph.h"
 #include "backend/scene/camera.h"
-#include "backend/scene/scene.h"
 #include "backend/support/task.h"
 
 namespace pov
@@ -77,7 +79,24 @@ const int MAX_STRING_LEN_MASK = (MAX_STRING_LEN_FAST - 1);
 
 const int SYM_TABLE_SIZE = 257;
 
-struct FPUContext;
+typedef struct Sym_Table_Entry SYM_ENTRY;
+typedef unsigned short SymTableEntryRefCount;
+
+/// Structure holding information about a symbol
+struct Sym_Table_Entry
+{
+    SYM_ENTRY *next;            ///< Reference to next symbol with same hash
+    char *Token_Name;           ///< Symbol name
+    char *Deprecation_Message;  ///< Warning to print if the symbol is deprecated
+    void *Data;                 ///< Reference to the symbol value
+    TOKEN Token_Number;         ///< Unique ID of this symbol
+    bool deprecated      : 1;
+    bool deprecatedOnce  : 1;
+    bool deprecatedShown : 1;
+    SymTableEntryRefCount ref_count; ///< normally 1, but may be greater when passing symbols out of macros
+};
+
+class FPUContext;
 class ImageData;
 struct GenericSpline;
 struct ClassicTurbulence; // full declaration in core/material/warp.h
@@ -128,41 +147,6 @@ CASE_EXPRESS is a CASE_COLOUR w/o an UNGET and a CASE_VECTOR (w/unget)
 #define CASE_EXPRESS CASE3 (COLOUR_TOKEN,COLOUR_KEY_TOKEN,COLOUR_ID_TOKEN) \
     CASE_VECTOR /* NOTE this has an UNGET in it! */
 
-typedef unsigned int FUNCTION;
-typedef FUNCTION * FUNCTION_PTR;
-
-// Caution: The compiler depends on the order of these constants!
-enum
-{
-    OP_NONE = 0,    // 0
-
-    OP_CMP_EQ,      // 1
-    OP_CMP_NE,      // 2
-    OP_CMP_LT,      // 3
-    OP_CMP_LE,      // 4
-    OP_CMP_GT,      // 5
-    OP_CMP_GE,      // 6
-    OP_ADD,         // 7
-    OP_SUB,         // 8
-    OP_OR,          // 9
-    OP_MUL,         // 10
-    OP_DIV,         // 11
-    OP_AND,         // 12
-    OP_POW,         // 13
-    OP_NEG,         // 14
-    OP_NOT,         // 15
-
-    OP_LEFTMOST,    // 16
-    OP_FIRST,       // 17
-
-    OP_CONSTANT,    // 18
-    OP_VARIABLE,    // 19
-    OP_DOT,         // 20
-    OP_MEMBER,      // 21
-    OP_CALL,        // 22
-    OP_TRAP         // 23
-};
-
 
 struct ExperimentalFlags
 {
@@ -199,9 +183,6 @@ struct BetaFlags
 /*****************************************************************************
 * Global typedefs
 ******************************************************************************/
-
-typedef DBL EXPRESS[5];   ///< @todo       Make this obsolete.
-
 
 class Parser : public SceneTask
 {
@@ -293,31 +274,6 @@ class Parser : public SceneTask
             bool R_Flag;
         };
 
-        // fnsyntax.h/fnsyntax.cpp
-        struct ExprNode;
-
-        struct ExprNode
-        {
-            ExprNode *parent;
-            ExprNode *child;
-            ExprNode *prev;
-            ExprNode *next;
-            int stage;
-            int op;
-            union
-            {
-                char *variable;
-                struct
-                {
-                    char *name;
-                    TOKEN token;
-                    FUNCTION fn;
-                } call;
-                unsigned int trap;
-                DBL number;
-            };
-        };
-
         // constructor
         Parser(shared_ptr<SceneData> sd, bool useclock, DBL clock);
 
@@ -371,6 +327,9 @@ class Parser : public SceneTask
         void FlushDebugMessageBuffer();
 
         static void Convert_Filter_To_Transmit(PIGMENT *Pigment); // NK layers - 1999 July 10 - for backwards compatiblity with layered textures
+
+        IStream *Locate_File(shared_ptr<SceneData>& sd, const UCS2String& filename, unsigned int stype, UCS2String& buffer, bool err_flag = false);
+        Image *Read_Image(shared_ptr<SceneData>& sd, int filetype, const UCS2 *filename, const Image::ReadOptions& options);
 
         // tokenize.h/tokenize.cpp
         void Get_Token (void);
@@ -447,10 +406,6 @@ class Parser : public SceneTask
         FUNCTION_PTR Parse_Function(void);
         FUNCTION_PTR Parse_FunctionContent(void);
         FUNCTION_PTR Parse_DeclareFunction(int *token_id, const char *fn_name, bool is_loca);
-        void Destroy_Function(FUNCTION_PTR Function);
-        static void Destroy_Function(FunctionVM *, FUNCTION_PTR Function);
-        FUNCTION_PTR Copy_Function(FUNCTION_PTR Function);
-        static FUNCTION_PTR Copy_Function(FunctionVM *, FUNCTION_PTR Function);
 
         // parsestr.h/parsestr.cpp
         char *Parse_C_String(bool pathname = false);
@@ -625,6 +580,8 @@ class Parser : public SceneTask
         TEXTURE *Parse_Mesh_Texture(TEXTURE **t2, TEXTURE **t3);
         ObjectPtr Parse_TrueType(void);
         void Parse_Blob_Element_Mods(Blob_Element *Element);
+
+        TrueTypeFont *OpenFontFile(const char *asciifn, const int font_id);
 
         void Parse_Mesh_Camera (Camera& Cam);
         void Parse_Camera(Camera& Cam);

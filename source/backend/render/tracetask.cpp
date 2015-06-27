@@ -46,7 +46,7 @@
 
 #include "backend/math/chi2.h"
 #include "backend/math/matrices.h"
-#include "backend/scene/scene.h"
+#include "backend/scene/scenedata.h"
 #include "backend/scene/threaddata.h"
 #include "backend/scene/view.h"
 #include "backend/support/jitter.h"
@@ -311,7 +311,7 @@ void TraceTask::Stopped()
 
 void TraceTask::Finish()
 {
-    GetViewDataPtr()->timeType = SceneThreadData::kRenderTime;
+    GetViewDataPtr()->timeType = TraceThreadData::kRenderTime;
     GetViewDataPtr()->realTime = ConsumedRealTime();
     GetViewDataPtr()->cpuTime = ConsumedCPUTime();
 

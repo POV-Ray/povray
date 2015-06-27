@@ -46,7 +46,6 @@
 #include "backend/lighting/photons.h"
 #include "backend/lighting/point.h"
 #include "backend/math/chi2.h"
-#include "backend/scene/scene.h"
 #include "backend/scene/threaddata.h"
 
 // this must be the last file included

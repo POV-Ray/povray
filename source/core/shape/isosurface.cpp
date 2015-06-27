@@ -47,9 +47,7 @@
 
 #include "backend/math/matrices.h"
 #include "backend/scene/objects.h"
-#include "backend/scene/scene.h"
 #include "backend/scene/threaddata.h"
-#include "backend/vm/fnpovfpu.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -196,7 +194,7 @@ bool IsoSurface::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
 
         for (; itrace < max_trace; itrace++)
         {
-            if(Function_Find_Root(*(Thread->isosurfaceData), Plocal, Dlocal, &tmin, &tmax, maxg, in_shadow_test) == false)
+            if(Function_Find_Root(*(Thread->isosurfaceData), Plocal, Dlocal, &tmin, &tmax, maxg, in_shadow_test, Thread) == false)
                 break;
             else
             {
@@ -320,19 +318,19 @@ void IsoSurface::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *
             New_Point = Inter->IPoint;
 
         TPoint = New_Point;
-        funct = Evaluate_Function(Thread->functionContext, *Function, TPoint);
+        funct = Evaluate_Function(Function, Thread->functionContext, TPoint);
 
         TPoint = New_Point;
         TPoint[X] += accuracy;
-        Result[X] = Evaluate_Function(Thread->functionContext, *Function, TPoint) - funct;
+        Result[X] = Evaluate_Function(Function, Thread->functionContext, TPoint) - funct;
             TPoint = New_Point;
 
         TPoint[Y] += accuracy;
-        Result[Y] = Evaluate_Function(Thread->functionContext, *Function, TPoint) - funct;
+        Result[Y] = Evaluate_Function(Function, Thread->functionContext, TPoint) - funct;
             TPoint = New_Point;
 
         TPoint[Z] += accuracy;
-        Result[Z] = Evaluate_Function(Thread->functionContext, *Function, TPoint) - funct;
+        Result[Z] = Evaluate_Function(Function, Thread->functionContext, TPoint) - funct;
 
         if((Result[X] == 0) && (Result[Y] == 0) && (Result[Z] == 0))
             Result[X] = 1.0;
@@ -579,7 +577,7 @@ ObjectPtr IsoSurface::Copy()
     Destroy_Transform(New->Trans);
     *New = *this;
 
-    New->Function = Parser::Copy_Function(vm, Function);
+    New->Function = Function->Clone();
     New->Trans = Copy_Transform(Trans);
 
     New->mginfo = mginfo;
@@ -624,7 +622,7 @@ IsoSurface::~IsoSurface()
 {
     if(--mginfo->refcnt == 0)
         POV_FREE(mginfo);
-    Parser::Destroy_Function(vm, Function);
+    delete Function;
     Destroy_Transform(Trans);
 }
 
@@ -666,9 +664,9 @@ void IsoSurface::DispatchShutdownMessages(MessageFactory& messageFactory)
 
     if (isCopy == false)
     {
-        FunctionCode *fn = vm->GetFunction(*(Function));
+        const FunctionSourceInfo* fnInfo = Function->GetSourceInfo();
 
-        if (fn != NULL)
+        if (fnInfo != NULL)
         {
             if (eval == false)
             {
@@ -681,7 +679,7 @@ void IsoSurface::DispatchShutdownMessages(MessageFactory& messageFactory)
 
                     if (((prop <= 0.9) && (diff <= -0.5)) || (((prop <= 0.95) || (diff <= -0.1)) && (mginfo->max_gradient < 10.0)))
                     {
-                        messageFactory.WarningAt(kWarningGeneral, fn->filename, fn->filepos.lineno, 0, fn->filepos.offset,
+                        messageFactory.WarningAt(kWarningGeneral, fnInfo->filename, fnInfo->filepos.lineno, 0, fnInfo->filepos.offset,
                                                  "The maximum gradient found was %0.3f, but max_gradient of the\n"
                                                  "isosurface was set to %0.3f. The isosurface may contain holes!\n"
                                                  "Adjust max_gradient to get a proper rendering of the isosurface.",
@@ -690,7 +688,7 @@ void IsoSurface::DispatchShutdownMessages(MessageFactory& messageFactory)
                     }
                     else if ((diff >= 10.0) || ((prop >= 1.1) && (diff >= 0.5)))
                     {
-                        messageFactory.WarningAt(kWarningGeneral, fn->filename, fn->filepos.lineno, 0, fn->filepos.offset,
+                        messageFactory.WarningAt(kWarningGeneral, fnInfo->filename, fnInfo->filepos.lineno, 0, fnInfo->filepos.offset,
                                                  "The maximum gradient found was %0.3f, but max_gradient of\n"
                                                  "the isosurface was set to %0.3f. Adjust max_gradient to\n"
                                                  "get a faster rendering of the isosurface.",
@@ -707,7 +705,7 @@ void IsoSurface::DispatchShutdownMessages(MessageFactory& messageFactory)
                 {
                     mginfo->eval_cnt = max(mginfo->eval_cnt, 1.0); // make sure it won't be zero
 
-                    messageFactory.WarningAt(kWarningGeneral, fn->filename, fn->filepos.lineno, 0, fn->filepos.offset,
+                    messageFactory.WarningAt(kWarningGeneral, fnInfo->filename, fnInfo->filepos.lineno, 0, fnInfo->filepos.offset,
                                              "Evaluate found a maximum gradient of %0.3f and an average\n"
                                              "gradient of %0.3f. The maximum gradient variation was %0.3f.\n",
                                              (float)(mginfo->eval_max),
@@ -782,19 +780,19 @@ void IsoSurface::Compute_BBox()
 *
 ******************************************************************************/
 
-bool IsoSurface::Function_Find_Root(ISO_ThreadData& itd, const Vector3d& PP, const Vector3d& DD, DBL* Depth1, DBL* Depth2, DBL& maxg, bool in_shadow_test)
+bool IsoSurface::Function_Find_Root(ISO_ThreadData& itd, const Vector3d& PP, const Vector3d& DD, DBL* Depth1, DBL* Depth2, DBL& maxg, bool in_shadow_test, TraceThreadData* pThreadData)
 {
     DBL dt, t21, l_b, l_e, oldmg;
     ISO_Pair EP1, EP2;
     Vector3d VTmp;
 
-    itd.ctx->threaddata->Stats()[Ray_IsoSurface_Find_Root]++;
+    pThreadData->Stats()[Ray_IsoSurface_Find_Root]++;
 
     itd.Vlength = DD.length();
 
     if((itd.cache == true) && (itd.current == this))
     {
-        itd.ctx->threaddata->Stats()[Ray_IsoSurface_Cache]++;
+        pThreadData->Stats()[Ray_IsoSurface_Cache]++;
         VTmp = PP + *Depth1 * DD;
         VTmp -= itd.Pglobal;
         l_b = VTmp.length();
@@ -803,7 +801,7 @@ bool IsoSurface::Function_Find_Root(ISO_ThreadData& itd, const Vector3d& PP, con
         l_e = VTmp.length();
         if((itd.fmax - maxg * max(l_b, l_e)) > 0.0)
         {
-            itd.ctx->threaddata->Stats()[Ray_IsoSurface_Cache_Succeeded]++;
+            pThreadData->Stats()[Ray_IsoSurface_Cache_Succeeded]++;
             return false;
         }
     }
@@ -830,7 +828,7 @@ bool IsoSurface::Function_Find_Root(ISO_ThreadData& itd, const Vector3d& PP, con
     if((eval == true) && (oldmg > eval_param[0]))
         maxg = oldmg * eval_param[2];
     dt = maxg * itd.Vlength * t21;
-    if(Function_Find_Root_R(itd, &EP1, &EP2, dt, t21, 1.0 / (itd.Vlength * t21), maxg))
+    if(Function_Find_Root_R(itd, &EP1, &EP2, dt, t21, 1.0 / (itd.Vlength * t21), maxg, pThreadData))
     {
         if(eval == true)
         {
@@ -889,7 +887,7 @@ bool IsoSurface::Function_Find_Root(ISO_ThreadData& itd, const Vector3d& PP, con
 *
 ******************************************************************************/
 
-bool IsoSurface::Function_Find_Root_R(ISO_ThreadData& itd, const ISO_Pair* EP1, const ISO_Pair* EP2, DBL dt, DBL t21, DBL len, DBL& maxg)
+bool IsoSurface::Function_Find_Root_R(ISO_ThreadData& itd, const ISO_Pair* EP1, const ISO_Pair* EP2, DBL dt, DBL t21, DBL len, DBL& maxg, TraceThreadData* pThreadData)
 {
     ISO_Pair EPa;
     DBL temp;
@@ -923,8 +921,8 @@ bool IsoSurface::Function_Find_Root_R(ISO_ThreadData& itd, const ISO_Pair* EP1, 
         EPa.f = Float_Function(itd, EPa.t);
 
         itd.fmax = min(EPa.f, itd.fmax);
-        if(!Function_Find_Root_R(itd, EP1, &EPa, dt, t21, len * 2.0, maxg))
-            return (Function_Find_Root_R(itd, &EPa, EP2, dt, t21, len * 2.0,maxg));
+        if(!Function_Find_Root_R(itd, EP1, &EPa, dt, t21, len * 2.0, maxg, pThreadData))
+            return (Function_Find_Root_R(itd, &EPa, EP2, dt, t21, len * 2.0,maxg, pThreadData));
         else
             return true;
     }
@@ -959,9 +957,9 @@ bool IsoSurface::Function_Find_Root_R(ISO_ThreadData& itd, const ISO_Pair* EP1, 
 *
 ******************************************************************************/
 
-DBL IsoSurface::Vector_Function(FPUContext *ctx, const Vector3d& VPos) const
+DBL IsoSurface::Vector_Function(GenericFunctionContextPtr ctx, const Vector3d& VPos) const
 {
-    return Evaluate_Function(ctx, *Function, VPos) - threshold;
+    return Evaluate_Function(Function, ctx, VPos) - threshold;
 }
 
 
@@ -997,7 +995,7 @@ DBL IsoSurface::Float_Function(ISO_ThreadData& itd, DBL t) const
 
     VTmp = itd.Pglobal + t * itd.Dglobal;
 
-    return ((DBL)itd.Inv3 * (Evaluate_Function(itd.ctx, *Function, VTmp) - threshold));
+    return ((DBL)itd.Inv3 * (Evaluate_Function(Function, itd.ctx, VTmp) - threshold));
 }
 
 
@@ -1025,13 +1023,14 @@ DBL IsoSurface::Float_Function(ISO_ThreadData& itd, DBL t) const
  *
  ******************************************************************************/
 
-DBL IsoSurface::Evaluate_Function(FPUContext *ctx, FUNCTION funct, const Vector3d& fnvec)
+DBL IsoSurface::Evaluate_Function(GenericScalarFunctionPtr funct, GenericFunctionContextPtr ctx, const Vector3d& fnvec)
 {
-    ctx->SetLocal(X, fnvec[X]);
-    ctx->SetLocal(Y, fnvec[Y]);
-    ctx->SetLocal(Z, fnvec[Z]);
+    funct->InitArguments(ctx);
+    funct->PushArgument(ctx, fnvec[X]);
+    funct->PushArgument(ctx, fnvec[Y]);
+    funct->PushArgument(ctx, fnvec[Z]);
 
-    return POVFPU_Run(ctx, funct);
+    return funct->Execute(ctx);
 }
 
 }

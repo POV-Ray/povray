@@ -37,5 +37,44 @@
 #define POVRAY_CORE_CORETYPES_H
 
 #include "core/configcore.h"
+#include "base/textstream.h"
+
+namespace pov
+{
+
+class TraceThreadData;
+
+class GenericFunctionContext
+{
+    public:
+        virtual ~GenericFunctionContext() {}
+};
+
+typedef GenericFunctionContext* GenericFunctionContextPtr;
+
+struct FunctionSourceInfo
+{
+    char* name;
+    UCS2* filename;
+    pov_base::ITextStream::FilePos filepos;
+};
+
+template<typename RETURN_T, typename ARG_T>
+class GenericCustomFunction
+{
+    public:
+        virtual ~GenericCustomFunction() {}
+        virtual GenericFunctionContextPtr NewContext(TraceThreadData* pThreadData) = 0;
+        virtual void InitArguments(GenericFunctionContextPtr pContext) = 0;
+        virtual void PushArgument(GenericFunctionContextPtr pContext, ARG_T arg) = 0;
+        virtual RETURN_T Execute(GenericFunctionContextPtr pContext) = 0;
+        virtual GenericCustomFunction* Clone() const = 0;
+        virtual const FunctionSourceInfo* GetSourceInfo() const { return NULL; }
+};
+
+typedef GenericCustomFunction<double, double> GenericScalarFunction;
+typedef GenericScalarFunction* GenericScalarFunctionPtr;
+
+}
 
 #endif // POVRAY_CORE_CORETYPES_H

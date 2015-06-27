@@ -36,6 +36,8 @@
 #ifndef POLYSOLV_H
 #define POLYSOLV_H
 
+#include "backend/support/statistics.h"
+
 namespace pov
 {
 
@@ -63,7 +65,7 @@ namespace pov
 * Global functions
 ******************************************************************************/
 
-int Solve_Polynomial (int n, const DBL *c, DBL *r, int sturm, DBL epsilon, TraceThreadData *Thread);
+int Solve_Polynomial (int n, const DBL *c, DBL *r, int sturm, DBL epsilon, RenderStatistics& stats);
 
 }
 

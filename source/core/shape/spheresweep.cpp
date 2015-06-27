@@ -521,7 +521,7 @@ int SphereSweep::Intersect_Segment(const BasicRay &ray, const SPHSWEEP_SEG *Segm
             Coef[1] = 4.0 * d * e - 2.0 * b * c * d;
             Coef[2] = Sqr(e) - b * c * e + Sqr(b) * f;
 
-            Num_Poly_Roots = Solve_Polynomial(2, Coef, Root, true, 1e-10, Thread);
+            Num_Poly_Roots = Solve_Polynomial(2, Coef, Root, true, 1e-10, Thread->Stats());
             break;
         case 4:   // Third order polynomial
             Vector = ray.Origin - Segment->Center_Coef[0];
@@ -808,7 +808,7 @@ bool SphereSweep::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
                 Coef[2] -= Sqr(Segment[i].Radius_Coef[0]);
 
                 // Find roots
-                Num_Poly_Roots = Solve_Polynomial(2, Coef, Root, true, 1e-10, Thread);
+                Num_Poly_Roots = Solve_Polynomial(2, Coef, Root, true, 1e-10, Thread->Stats());
 
                 // Test for interval [0, 1]
                 for(j = 0; j < Num_Poly_Roots; j++)
@@ -1815,7 +1815,7 @@ int SphereSweep::bezier_01(int degree, const DBL* Coef, DBL* Roots, bool sturm, 
         non_positive = (non_positive && (d[degree - i] <= 0));
 
         if(!(non_negative || non_positive))
-            return Solve_Polynomial(degree, Coef, Roots, sturm, tolerance, Thread);
+            return Solve_Polynomial(degree, Coef, Roots, sturm, tolerance, Thread->Stats());
 
         for(j = 0; j < degree - i; ++j)
             d[j] += d[j+1];

@@ -31,7 +31,7 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
 #include <boost/thread.hpp>
 #include <boost/bind.hpp>
@@ -45,7 +45,7 @@
 #include "base/timer.h"
 
 #include "backend/render/rendertask.h"
-#include "backend/scene/scene.h"
+#include "backend/scene/scenedata.h"
 #include "backend/scene/threaddata.h"
 #include "backend/scene/view.h"
 

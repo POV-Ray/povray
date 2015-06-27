@@ -435,7 +435,7 @@ bool Intersect_BBox_Tree(BBoxPriorityQueue& pqueue, const BBOX_TREE *Root, const
     found = false;
 
     // Check top node.
-    Check_And_Enqueue(pqueue, Root, &Root->BBox, &rayinfo, Thread);
+    Check_And_Enqueue(pqueue, Root, &Root->BBox, &rayinfo, Thread->Stats());
 
     // Check elements in the priority queue.
     while(!pqueue.IsEmpty())
@@ -453,7 +453,7 @@ bool Intersect_BBox_Tree(BBoxPriorityQueue& pqueue, const BBOX_TREE *Root, const
         {
             // This is a node containing leaves to be checked.
             for (i = 0; i < Node->Entries; i++)
-                Check_And_Enqueue(pqueue, Node->Node[i], &Node->Node[i]->BBox, &rayinfo, Thread);
+                Check_And_Enqueue(pqueue, Node->Node[i], &Node->Node[i]->BBox, &rayinfo, Thread->Stats());
         }
         else
         {
@@ -488,7 +488,7 @@ bool Intersect_BBox_Tree(BBoxPriorityQueue& pqueue, const BBOX_TREE *Root, const
     found = false;
 
     // Check top node.
-    Check_And_Enqueue(pqueue, Root, &Root->BBox, &rayinfo, Thread);
+    Check_And_Enqueue(pqueue, Root, &Root->BBox, &rayinfo, Thread->Stats());
 
     // Check elements in the priority queue.
     while(!pqueue.IsEmpty())
@@ -506,7 +506,7 @@ bool Intersect_BBox_Tree(BBoxPriorityQueue& pqueue, const BBOX_TREE *Root, const
         {
             // This is a node containing leaves to be checked.
             for (i = 0; i < Node->Entries; i++)
-                Check_And_Enqueue(pqueue, Node->Node[i], &Node->Node[i]->BBox, &rayinfo, Thread);
+                Check_And_Enqueue(pqueue, Node->Node[i], &Node->Node[i]->BBox, &rayinfo, Thread->Stats());
         }
         else
         {
@@ -528,14 +528,14 @@ bool Intersect_BBox_Tree(BBoxPriorityQueue& pqueue, const BBOX_TREE *Root, const
     return (found);
 }
 
-void Check_And_Enqueue(BBoxPriorityQueue& Queue, const BBOX_TREE *Node, const BoundingBox *BBox, const Rayinfo *rayinfo, TraceThreadData *Thread)
+void Check_And_Enqueue(BBoxPriorityQueue& Queue, const BBOX_TREE *Node, const BoundingBox *BBox, const Rayinfo *rayinfo, RenderStatistics& Stats)
 {
     DBL tmin, tmax;
     DBL dmin, dmax;
 
     if(Node->Infinite == false)
     {
-        Thread->Stats()[nChecked]++;
+        Stats[nChecked]++;
 
         if(rayinfo->nonzero[X])
         {
@@ -667,7 +667,7 @@ void Check_And_Enqueue(BBoxPriorityQueue& Queue, const BBOX_TREE *Node, const Bo
             if((rayinfo->slab_num[Z] < BBox->lowerLeft[Z]) || (rayinfo->slab_num[Z] > BBox->size[Z] + BBox->lowerLeft[Z]))
                 return;
 
-        Thread->Stats()[nEnqueued]++;
+        Stats[nEnqueued]++;
     }
     else
         // Set intersection depth to -Max_Distance.

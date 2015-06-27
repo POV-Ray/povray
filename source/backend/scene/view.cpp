@@ -31,7 +31,7 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
 #include <boost/thread.hpp>
 #include <boost/bind.hpp>
@@ -59,7 +59,7 @@
 #include "backend/math/matrices.h"
 #include "backend/render/radiositytask.h"
 #include "backend/render/tracetask.h"
-#include "backend/scene/scene.h"
+#include "backend/scene/scenedata.h"
 #include "backend/scene/threaddata.h"
 #include "backend/support/octree.h"
 
@@ -1290,7 +1290,7 @@ void View::GetStatistics(POVMS_Object& renderStats)
         TimeData() : cpuTime(0), realTime(0), samples(0) { }
     };
 
-    TimeData timeData[SceneThreadData::kMaxTimeType];
+    TimeData timeData[TraceThreadData::kMaxTimeType];
 
     for(vector<ViewThreadData *>::iterator i(viewThreadData.begin()); i != viewThreadData.end(); i++)
     {
@@ -1299,7 +1299,7 @@ void View::GetStatistics(POVMS_Object& renderStats)
         timeData[(*i)->timeType].samples++;
     }
 
-    for(size_t i = SceneThreadData::kUnknownTime; i < SceneThreadData::kMaxTimeType; i++)
+    for(size_t i = TraceThreadData::kUnknownTime; i < TraceThreadData::kMaxTimeType; i++)
     {
         if(timeData[i].samples > 0)
         {
@@ -1311,13 +1311,13 @@ void View::GetStatistics(POVMS_Object& renderStats)
 
             switch(i)
             {
-                case SceneThreadData::kPhotonTime:
+                case TraceThreadData::kPhotonTime:
                     renderStats.Set(kPOVAttrib_PhotonTime, elapsedTime);
                     break;
-                case SceneThreadData::kRadiosityTime:
+                case TraceThreadData::kRadiosityTime:
                     renderStats.Set(kPOVAttrib_RadiosityTime, elapsedTime);
                     break;
-                case SceneThreadData::kRenderTime:
+                case TraceThreadData::kRenderTime:
                     renderStats.Set(kPOVAttrib_TraceTime, elapsedTime);
                     break;
             }

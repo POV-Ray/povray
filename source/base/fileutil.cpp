@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file backend/support/fileutil.cpp
+/// @file base/fileutil.cpp
 ///
 /// This module implements misc utility functions.
 ///
@@ -33,26 +33,22 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
-
-/// @file
-/// @todo   `fileutil.cpp` code is needed by front- and backend alike, so should be in "base" directory.
+//******************************************************************************
 
 #include <cctype>
 #include <cstdarg>
 
-// frame.h must always be the first POV file included (pulls in platform config)
-#include "backend/frame.h"
-#include "backend/support/fileutil.h"
+// configbase.h must always be the first POV file included within base *.cpp files
+#include "base/configbase.h"
+#include "base/fileutil.h"
 
+#include "base/fileinputoutput.h"
 #include "base/path.h"
-
-#include "parser/parser.h" // TODO FIXME HACK - used for hack below, need to remove [trf]
 
 // this must be the last file included
 #include "base/povdebug.h"
 
-namespace pov
+namespace pov_base
 {
 
 /*
@@ -107,7 +103,7 @@ POV_File_Restrictions gPOV_File_Restrictions[POV_File_Count] =
 #endif
 
 /// @todo   merge with @ref gFile_Type_To_Mask
-POV_File_Extensions gPOV_File_Extensions[POV_File_Count] = // TODO FIXME - belongs in backend
+POV_File_Extensions gPOV_File_Extensions[POV_File_Count] =
 {
     {{ "",      "",      "",      ""      }}, // POV_File_Unknown
     {{ ".tga",  ".TGA",  "",      ""      }}, // POV_File_Image_Targa
@@ -136,7 +132,7 @@ POV_File_Extensions gPOV_File_Extensions[POV_File_Count] = // TODO FIXME - belon
 };
 
 /// @todo   merge with @ref gPOV_File_Extensions
-const int gFile_Type_To_Mask [POV_File_Count] = // TODO FIXME - belongs in backend
+const int gFile_Type_To_Mask [POV_File_Count] =
 {
     NO_FILE,   // POV_File_Unknown
     TGA_FILE,  // POV_File_Image_Targa
@@ -164,7 +160,7 @@ const int gFile_Type_To_Mask [POV_File_Count] = // TODO FIXME - belongs in backe
     NO_FILE    // POV_File_Font_TTF
 };
 
-int InferFileTypeFromExt(const UCS2String& ext) // TODO FIXME - belongs in backend
+int InferFileTypeFromExt(const UCS2String& ext)
 {
     // TODO FIXME - better compare in the string domain
 
@@ -185,90 +181,6 @@ int InferFileTypeFromExt(const UCS2String& ext) // TODO FIXME - belongs in backe
     return NO_FILE;
 }
 
-/*****************************************************************************
-*
-* FUNCTION
-*
-*   Locate_File
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-*   POV-Ray Team
-*
-* DESCRIPTION
-*
-*   Find a file in the search path.
-*
-* CHANGES
-*
-*   Apr 1996: Don't add trailing FILENAME_SEPARATOR if we are immediately
-*             following DRIVE_SEPARATOR because of Amiga probs.  [AED]
-*
-******************************************************************************/
-
-IStream *Locate_File(Parser *p, shared_ptr<SceneData>& sd, const UCS2String& filename, unsigned int stype, UCS2String& buffer, bool err_flag)
-{
-    UCS2String fn(filename);
-    UCS2String foundfile(sd->FindFile(p->GetPOVMSContext(), fn, stype));
-
-    if(foundfile.empty() == true)
-    {
-        if(err_flag == true)
-            p->PossibleError("Cannot find file '%s', even after trying to append file type extension.", UCS2toASCIIString(fn).c_str());
-
-        return NULL;
-    }
-
-    if(fn.find('.') == UCS2String::npos)
-    {
-        // the passed-in filename didn't have an extension, but a file has been found,
-        // which means one of the appended extensions worked. we need to work out which
-        // one and append it to the original filename so we can store it in the cache
-        // (since it's that name that the cache search routine looks for).
-        UCS2String ext = GetFileExtension(Path(foundfile));
-        if (ext.size() != 0)
-            fn += ext;
-    }
-
-    // ReadFile will store both fn and foundfile in the cache for next time round
-    IStream *result(sd->ReadFile(p->GetPOVMSContext(), fn, foundfile.c_str(), stype));
-
-    if((result == NULL) && (err_flag == true))
-        p->PossibleError("Cannot open file '%s'.", UCS2toASCIIString(foundfile).c_str());
-
-    buffer = foundfile;
-
-    return result;
-}
-/* TODO FIXME - code above should not be there, this is how it should work but this has bugs [trf]
-IStream *Locate_File(Parser *p, shared_ptr<SceneData>& sd, const UCS2String& filename, unsigned int stype, UCS2String& buffer, bool err_flag)
-{
-    UCS2String foundfile(sd->FindFile(p->GetPOVMSContext(), filename, stype));
-
-    if(foundfile.empty() == true)
-    {
-        if(err_flag == true)
-            p->PossibleError("Cannot find file '%s', even after trying to append file type extension.", UCS2toASCIIString(filename).c_str());
-
-        return NULL;
-    }
-
-    IStream *result(sd->ReadFile(p->GetPOVMSContext(), foundfile.c_str(), stype));
-
-    if((result == NULL) && (err_flag == true))
-        p->PossibleError("Cannot open file '%s'.", UCS2toASCIIString(foundfile).c_str());
-
-    buffer = foundfile;
-
-    return result;
-}
-*/
 /*****************************************************************************
 *
 * FUNCTION

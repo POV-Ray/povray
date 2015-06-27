@@ -47,7 +47,6 @@
 #include "core/material/texture.h"
 
 #include "backend/colour/spectral.h"
-#include "backend/support/fileutil.h"
 
 #ifdef SYS_IMAGE_HEADER
 #include SYS_IMAGE_HEADER
@@ -1369,77 +1368,5 @@ void Destroy_Image(ImageData *image)
     POV_FREE(image);
 }
 
-
-Image *Read_Image(Parser *p, shared_ptr<SceneData>& sd, int filetype, const UCS2 *filename, const Image::ReadOptions& options)
-{
-    unsigned int stype;
-    Image::ImageFileType type;
-    UCS2String ign;
-
-    switch(filetype)
-    {
-        case GIF_FILE:
-            stype = POV_File_Image_GIF;
-            type = Image::GIF;
-            break;
-        case POT_FILE:
-            stype = POV_File_Image_GIF;
-            type = Image::POT;
-            break;
-        case SYS_FILE:
-            stype = POV_File_Image_System;
-            type = Image::SYS;
-            break;
-        case IFF_FILE:
-            stype = POV_File_Image_IFF;
-            type = Image::IFF;
-            break;
-        case TGA_FILE:
-            stype = POV_File_Image_Targa;
-            type = Image::TGA;
-            break;
-        case PGM_FILE:
-            stype = POV_File_Image_PGM;
-            type = Image::PGM;
-            break;
-        case PPM_FILE:
-            stype = POV_File_Image_PPM;
-            type = Image::PPM;
-            break;
-        case PNG_FILE:
-            stype = POV_File_Image_PNG;
-            type = Image::PNG;
-            break;
-        case JPEG_FILE:
-            stype = POV_File_Image_JPEG;
-            type = Image::JPEG;
-            break;
-        case TIFF_FILE:
-            stype = POV_File_Image_TIFF;
-            type = Image::TIFF;
-            break;
-        case BMP_FILE:
-            stype = POV_File_Image_BMP;
-            type = Image::BMP;
-            break;
-        case EXR_FILE:
-            stype = POV_File_Image_EXR;
-            type = Image::EXR;
-            break;
-        case HDR_FILE:
-            stype = POV_File_Image_HDR;
-            type = Image::HDR;
-            break;
-        default:
-            throw POV_EXCEPTION(kDataTypeErr, "Unknown file type.");
-    }
-
-    boost::scoped_ptr<IStream> file(Locate_File(p, sd, filename, stype, ign, true));
-
-    if(file == NULL)
-        throw POV_EXCEPTION(kCannotOpenFileErr, "Cannot find image file.");
-
-    return Image::Read(type, file.get(), options);
-}
 
 }

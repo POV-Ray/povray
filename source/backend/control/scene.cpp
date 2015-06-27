@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file backend/scene/scene.cpp
+/// @file backend/control/scene.cpp
 ///
 /// @todo   What's in here?
 ///
@@ -40,26 +40,12 @@
 
 // frame.h must always be the first POV file included (pulls in platform config)
 #include "backend/frame.h"
-#include "backend/scene/scene.h"
-
-#include "base/timer.h"
-#include "base/platformbase.h"
-#include "base/fileinputoutput.h"
-
-#include "core/material/texture.h"
-#include "core/shape/mesh.h"
-#include "core/shape/truetype.h"
-
-#include "povms/povmsid.h"
+#include "backend/control/scene.h"
 
 #include "parser/parser.h"
 
 #include "backend/bounding/boundingtask.h"
-#include "backend/control/renderbackend.h"
-#include "backend/scene/objects.h"
-#include "backend/scene/threaddata.h"
 #include "backend/scene/view.h"
-#include "backend/vm/fnpovfpu.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -87,7 +73,7 @@ Scene::~Scene()
         parserControlThread->join();
     delete parserControlThread;
 
-    for(vector<SceneThreadData *>::iterator i(sceneThreadData.begin()); i != sceneThreadData.end(); i++)
+    for(vector<TraceThreadData *>::iterator i(sceneThreadData.begin()); i != sceneThreadData.end(); i++)
         delete (*i);
     sceneThreadData.clear();
 }
@@ -172,14 +158,14 @@ void Scene::StartParser(POVMS_Object& parseOptions)
     }
 
     // do parsing
-    sceneThreadData.push_back(dynamic_cast<SceneThreadData *>(parserTasks.AppendTask(new Parser(sceneData, bool(parseOptions.Exist(kPOVAttrib_Clock)), parseOptions.TryGetFloat(kPOVAttrib_Clock, 0.0)))));
+    sceneThreadData.push_back(dynamic_cast<TraceThreadData *>(parserTasks.AppendTask(new Parser(sceneData, bool(parseOptions.Exist(kPOVAttrib_Clock)), parseOptions.TryGetFloat(kPOVAttrib_Clock, 0.0)))));
 
     // wait for parsing
     parserTasks.AppendSync();
 
     // do bounding - we always call this even if the bounding is turned off
     // because it also generates object statistics
-    sceneThreadData.push_back(dynamic_cast<SceneThreadData *>(parserTasks.AppendTask(new BoundingTask(sceneData, parseOptions.TryGetInt(kPOVAttrib_BoundingThreshold, 1)))));
+    sceneThreadData.push_back(dynamic_cast<TraceThreadData *>(parserTasks.AppendTask(new BoundingTask(sceneData, parseOptions.TryGetInt(kPOVAttrib_BoundingThreshold, 1)))));
 
     // wait for bounding
     parserTasks.AppendSync();
@@ -248,16 +234,16 @@ void Scene::GetStatistics(POVMS_Object& parserStats)
         TimeData() : cpuTime(0), realTime(0), samples(0) { }
     };
 
-    TimeData timeData[SceneThreadData::kMaxTimeType];
+    TimeData timeData[TraceThreadData::kMaxTimeType];
 
-    for(vector<SceneThreadData *>::iterator i(sceneThreadData.begin()); i != sceneThreadData.end(); i++)
+    for(vector<TraceThreadData *>::iterator i(sceneThreadData.begin()); i != sceneThreadData.end(); i++)
     {
         timeData[(*i)->timeType].realTime = max(timeData[(*i)->timeType].realTime, (*i)->realTime);
         timeData[(*i)->timeType].cpuTime += (*i)->cpuTime;
         timeData[(*i)->timeType].samples++;
     }
 
-    for(size_t i = SceneThreadData::kUnknownTime; i < SceneThreadData::kMaxTimeType; i++)
+    for(size_t i = TraceThreadData::kUnknownTime; i < TraceThreadData::kMaxTimeType; i++)
     {
         if(timeData[i].samples > 0)
         {
@@ -269,10 +255,10 @@ void Scene::GetStatistics(POVMS_Object& parserStats)
 
             switch(i)
             {
-                case SceneThreadData::kParseTime:
+                case TraceThreadData::kParseTime:
                     parserStats.Set(kPOVAttrib_ParseTime, elapsedTime);
                     break;
-                case SceneThreadData::kBoundingTime:
+                case TraceThreadData::kBoundingTime:
                     parserStats.Set(kPOVAttrib_BoundingTime, elapsedTime);
                     break;
             }
@@ -312,7 +298,7 @@ void Scene::SendStatistics(TaskQueue&)
 
     POVMS_SendMessage(parserStats);
 
-    for(vector<SceneThreadData *>::iterator i(sceneThreadData.begin()); i != sceneThreadData.end(); i++)
+    for(vector<TraceThreadData *>::iterator i(sceneThreadData.begin()); i != sceneThreadData.end(); i++)
         delete (*i);
     sceneThreadData.clear();
 }

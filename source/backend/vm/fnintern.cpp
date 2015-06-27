@@ -2,8 +2,7 @@
 ///
 /// @file backend/vm/fnintern.cpp
 ///
-/// This module implements the the function type used by iso surfaces and the
-/// function pattern.
+/// This module implements built-in render-time functions.
 ///
 /// This module is based on code by D. Skarda, T. Bily and R. Suzuki.
 /// It includes functions based on code first introduced by many other
@@ -51,8 +50,8 @@
 #include "backend/math/mathutil.h"
 #include "backend/math/matrices.h"
 #include "backend/math/splines.h"
+#include "backend/scene/scenedata.h"
 #include "backend/scene/threaddata.h"
-#include "backend/vm/fncode.h"
 #include "backend/vm/fnpovfpu.h"
 
 // this must be the last file included

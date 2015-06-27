@@ -9,7 +9,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -32,7 +32,7 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
 #ifndef FILEINPUTOUTPUT_H
 #define FILEINPUTOUTPUT_H
@@ -89,12 +89,6 @@ enum
     POV_File_Font_TTF,
     POV_File_Count
 };
-
-#define POV_FILE_EXTENSIONS_PER_TYPE 4
-typedef struct
-{
-    const char *ext[POV_FILE_EXTENSIONS_PER_TYPE];
-} POV_File_Extensions;
 
 class IOBase
 {
@@ -212,14 +206,6 @@ UCS2String GetFileName(const Path& p);
 bool CheckIfFileExists(const Path& p);
 POV_LONG GetFileLength(const Path& p);
 
-}
-
-namespace pov
-{
-    int InferFileTypeFromExt(const pov_base::UCS2String& ext); // TODO FIXME - belongs in backend
-
-    extern pov_base::POV_File_Extensions gPOV_File_Extensions[]; // TODO FIXME - belongs in backend
-    extern const int gFile_Type_To_Mask[]; // TODO FIXME - belongs in backend
 }
 
 #endif

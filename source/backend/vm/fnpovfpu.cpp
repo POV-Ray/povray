@@ -2,8 +2,7 @@
 ///
 /// @file backend/vm/fnpovfpu.cpp
 ///
-/// This module implements the function type used by iso surfaces and the
-/// function pattern.
+/// This module implements the virtual machine executing render-time functions.
 ///
 /// This module is inspired by code by D. Skarda, T. Bily and R. Suzuki.
 ///
@@ -11,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -34,7 +33,7 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
 /**
 
@@ -255,6 +254,8 @@ namespace pov
 /*****************************************************************************
 * Local preprocessor defines
 ******************************************************************************/
+
+#define MAX_FN MAX_K
 
 #define _OP_MATH_ABCOP(a,b,c,op) \
     case (a+b+0): r0 = r0 op c; break; \
@@ -682,13 +683,6 @@ void FunctionVM::Reset()
 
     functions.clear();
     nextUnreferenced = MAX_FN;
-
-    boost::recursive_mutex::scoped_lock lock(contextMutex);
-
-    while(contexts.empty() == false)
-        DeleteContext(*contexts.begin());
-
-    contexts.clear();
 }
 
 
@@ -730,7 +724,7 @@ void FPUContext::SetLocal(unsigned int k, DBL v)
         size_t diff = ((size_t)(dblstack)) - ((size_t)(dblstackbase));
         #endif
 
-        maxdblstacksize = max(k + 1, (unsigned int)256);
+        maxdblstacksize = max(k + 1, (unsigned int)INITIAL_DBL_STACK_SIZE);
         dblstackbase = reinterpret_cast<DBL *>(POV_REALLOC(dblstackbase, sizeof(DBL) * maxdblstacksize, "fn: stack"));
 
         #if (SYS_FUNCTIONS == 1)
@@ -1109,96 +1103,6 @@ void FunctionVM::RemoveFunction(FUNCTION fn)
 *
 * FUNCTION
 *
-*   POVFPU_NewContext
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-*   FPUContext - the created context
-*
-* AUTHOR
-*
-*   Thorsten Froehlich
-*
-* DESCRIPTION
-*
-*   Create a new context.
-*
-* CHANGES
-*
-*   -
-*
-******************************************************************************/
-
-FPUContext *FunctionVM::NewContext(TraceThreadData *td)
-{
-    boost::recursive_mutex::scoped_lock lock(contextMutex);
-
-    FPUContext *context = reinterpret_cast<FPUContext *>(POV_MALLOC(sizeof(FPUContext), "fn: context"));
-
-    context->maxdblstacksize = 256;
-    context->dblstackbase = reinterpret_cast<DBL *>(POV_MALLOC(sizeof(DBL) * context->maxdblstacksize, "fn: dblstack"));
-    context->pstackbase = reinterpret_cast<StackFrame *>(POV_MALLOC(sizeof(StackFrame) * MAX_CALL_STACK_SIZE, "fn: pstack"));
-    context->functionvm = this;
-    context->threaddata = td;
-
-    #if (SYS_FUNCTIONS == 1)
-    context->dblstack = context->dblstackbase;
-    #endif
-
-    contexts.insert(context);
-
-    return context;
-}
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-*   POVFPU_DeleteContext
-*
-* INPUT
-*
-*   FPUContext - the context to delete
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-*   Thorsten Froehlich
-*
-* DESCRIPTION
-*
-*   Delete a context.
-*
-* CHANGES
-*
-*   -
-*
-******************************************************************************/
-
-void FunctionVM::DeleteContext(FPUContext *context)
-{
-    boost::recursive_mutex::scoped_lock lock(contextMutex);
-
-    contexts.erase(context);
-
-    POV_FREE(context->dblstackbase);
-    POV_FREE(context->pstackbase);
-    POV_FREE(context);
-}
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
 *   POVFPU_Exception
 *
 * INPUT
@@ -1227,7 +1131,7 @@ void POVFPU_Exception(FPUContext *context, FUNCTION fn, const char *msg)
 {
     vector<FunctionEntry>& functions(context->functionvm->functions);
 
-    if(functions[fn].fn.name != NULL)
+    if(functions[fn].fn.sourceInfo.name != NULL)
     {
         if(msg != NULL)
 ;// TODO MESSAGE            ErrorAt(functions[fn].fn.filename, functions[fn].fn.filepos.lineno, functions[fn].fn.filepos.offset,
@@ -1457,7 +1361,7 @@ DBL POVFPU_RunDefault(FPUContext *context, FUNCTION fn)
                 }
                 else if(sp + k >= maxdblstacksize)
                 {
-                    maxdblstacksize = context->maxdblstacksize = context->maxdblstacksize + max(k + 1, (unsigned int)256);
+                    maxdblstacksize = context->maxdblstacksize = context->maxdblstacksize + max(k + 1, (unsigned int)INITIAL_DBL_STACK_SIZE);
                     dblstack = context->dblstackbase = reinterpret_cast<DBL *>(POV_REALLOC(dblstack, sizeof(DBL) * maxdblstacksize, "fn: stack"));
                 }
                 break;
@@ -1559,6 +1463,165 @@ DBL POVFPU_RunDefault(FPUContext *context, FUNCTION fn)
     printf("R2 = %8f   R6 = %8f\n", (float)r2, (float)r6);
     printf("R3 = %8f   R7 = %8f\n", (float)r3, (float)r7);
 #endif
+}
+
+/*****************************************************************************
+*
+* FUNCTION
+*
+*   FNCode_Delete
+*
+* INPUT
+*
+*   f - function to delete
+*
+* OUTPUT
+*
+* RETURNS
+*
+* AUTHOR
+*
+*   Thorsten Froehlich
+*
+* DESCRIPTION
+*
+*   Delete a compiled function.
+*
+* CHANGES
+*
+*   -
+*
+******************************************************************************/
+
+void FNCode_Delete(FunctionCode *f)
+{
+    int i;
+
+    if(f->program != NULL)
+    {
+        POV_FREE(f->program);
+        f->program = NULL;
+    }
+    if(f->sourceInfo.name != NULL)
+    {
+        POV_FREE(f->sourceInfo.name);
+        f->sourceInfo.name = NULL;
+    }
+    if(f->sourceInfo.filename != NULL)
+    {
+        POV_FREE(f->sourceInfo.filename);
+        f->sourceInfo.filename = NULL;
+    }
+    for(i = 0; i < f->parameter_cnt; i++)
+    {
+        if(f->parameter[i] != NULL)
+        {
+            POV_FREE(f->parameter[i]);
+            f->parameter[i] = NULL;
+        }
+    }
+    for(i = 0; i < f->localvar_cnt; i++)
+    {
+        if(f->localvar[i] != NULL)
+        {
+            POV_FREE(f->localvar[i]);
+            f->localvar[i] = NULL;
+        }
+    }
+    if(f->private_data != NULL)
+    {
+        if(f->private_destroy_method != NULL)
+            f->private_destroy_method(f->private_data);
+        else
+            POV_FREE(f->private_data);
+        f->private_data = NULL;
+    }
+}
+
+/*****************************************************************************/
+
+FUNCTION_PTR FunctionVM::CopyFunction(FUNCTION_PTR pK)
+{
+    if (pK == NULL)
+        return NULL;
+
+    FUNCTION_PTR ptr = (FUNCTION_PTR)POV_MALLOC(sizeof(FUNCTION), "Function ID");
+
+    GetFunctionAndReference(*pK); // increase the reference count
+    *ptr = *pK;
+
+    return ptr;
+}
+
+void FunctionVM::DestroyFunction(FUNCTION_PTR pK)
+{
+    if(pK != NULL)
+    {
+        RemoveFunction(*pK);
+        POV_FREE(pK);
+    }
+}
+
+/*****************************************************************************/
+
+FunctionVM::CustomFunction::CustomFunction(FunctionVM* pVm, FUNCTION_PTR pFn) :
+    mpVm(pVm),
+    mpFn(pFn)
+{}
+
+FunctionVM::CustomFunction::~CustomFunction()
+{}
+
+GenericFunctionContextPtr FunctionVM::CustomFunction::NewContext(TraceThreadData* pThreadData)
+{
+    return new FPUContext(mpVm, pThreadData);
+}
+
+void FunctionVM::CustomFunction::InitArguments(GenericFunctionContextPtr pContext)
+{
+    (dynamic_cast<FPUContext*>(pContext))->nextArgument = 0;
+}
+
+void FunctionVM::CustomFunction::PushArgument(GenericFunctionContextPtr pContext, DBL arg)
+{
+    (dynamic_cast<FPUContext*>(pContext))->SetLocal((dynamic_cast<FPUContext*>(pContext))->nextArgument++, arg);
+}
+
+DBL FunctionVM::CustomFunction::Execute(GenericFunctionContextPtr pContext)
+{
+    return POVFPU_Run(dynamic_cast<FPUContext*>(pContext), *mpFn);
+}
+
+GenericScalarFunctionPtr FunctionVM::CustomFunction::Clone() const
+{
+    return new CustomFunction(mpVm, mpVm->CopyFunction(mpFn));
+}
+
+const FunctionSourceInfo* FunctionVM::CustomFunction::GetSourceInfo() const
+{
+    return &(mpVm->GetFunction(*mpFn)->sourceInfo);
+}
+
+
+/*****************************************************************************/
+
+FPUContext::FPUContext(FunctionVM* pVm, TraceThreadData* pThreadData) :
+    maxdblstacksize(INITIAL_DBL_STACK_SIZE),
+    dblstackbase(reinterpret_cast<DBL *>(POV_MALLOC(sizeof(DBL) * INITIAL_DBL_STACK_SIZE, "fn: dblstack"))),
+    pstackbase(reinterpret_cast<StackFrame *>(POV_MALLOC(sizeof(StackFrame) * MAX_CALL_STACK_SIZE, "fn: pstack"))),
+    functionvm(pVm),
+    threaddata(pThreadData),
+    nextArgument(0)
+{
+    #if (SYS_FUNCTIONS == 1)
+    context->dblstack = context->dblstackbase;
+    #endif
+}
+
+FPUContext::~FPUContext()
+{
+    POV_FREE(dblstackbase);
+    POV_FREE(pstackbase);
 }
 
 }

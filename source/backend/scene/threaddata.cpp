@@ -46,7 +46,7 @@
 
 #include "backend/bounding/bcyl.h"
 #include "backend/scene/objects.h"
-#include "backend/scene/scene.h"
+#include "backend/scene/scenedata.h"
 #include "backend/scene/view.h"
 #include "backend/support/statistics.h"
 #include "backend/vm/fnpovfpu.h"
@@ -57,7 +57,7 @@
 namespace pov
 {
 
-SceneThreadData::SceneThreadData(shared_ptr<SceneData> sd): sceneData(sd), qualityFlags(9)
+TraceThreadData::TraceThreadData(shared_ptr<SceneData> sd): sceneData(sd), qualityFlags(9)
 {
     for(int i = 0; i < 4; i++)
         Fractal_IStack[i] = NULL;
@@ -77,7 +77,7 @@ SceneThreadData::SceneThreadData(shared_ptr<SceneData> sd): sceneData(sd), quali
     isosurfaceData->tl = 0.0;
     isosurfaceData->Vlength = 0.0;
 
-    functionContext = sceneData->functionVM->NewContext(this);
+    functionContext = new FPUContext(sceneData->functionVM, this);
     functionPatternContext.resize(sceneData->functionPatternCount);
 
     BCyl_Intervals.reserve(4*sceneData->Max_Bounding_Cylinders);
@@ -122,9 +122,11 @@ SceneThreadData::SceneThreadData(shared_ptr<SceneData> sd): sceneData(sd), quali
     Initialize_Waves(waveFrequencies, waveSources, numberOfWaves);
 }
 
-SceneThreadData::~SceneThreadData()
+TraceThreadData::~TraceThreadData()
 {
-    sceneData->functionVM->DeleteContext(functionContext);
+    delete functionContext;
+    for(vector<GenericFunctionContextPtr>::iterator i = functionPatternContext.begin(); i != functionPatternContext.end(); ++i)
+        delete *i;
 
     POV_FREE(Blob_Coefficients);
     POV_FREE(Blob_Queue);
@@ -137,7 +139,7 @@ SceneThreadData::~SceneThreadData()
         Destroy_Object(*it);
 }
 
-void SceneThreadData::AfterTile()
+void TraceThreadData::AfterTile()
 {
     CrackleCache::iterator it;
 
@@ -175,7 +177,7 @@ void SceneThreadData::AfterTile()
 }
 
 ViewThreadData::ViewThreadData(ViewData *vd) :
-    SceneThreadData(vd->GetSceneData()),
+    TraceThreadData(vd->GetSceneData()),
     viewData(vd)
 {
 }

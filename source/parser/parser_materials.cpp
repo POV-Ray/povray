@@ -37,6 +37,7 @@
 #include "parser/configparser.h"
 #include "parser/parser.h"
 
+#include "base/fileutil.h"
 #include "base/image/image.h"
 #include "base/path.h"
 
@@ -51,10 +52,9 @@
 #include "backend/colour/colour_old.h"
 #include "backend/math/matrices.h"
 #include "backend/scene/objects.h"
+#include "backend/scene/scenedata.h"
 #include "backend/scene/threaddata.h"
-#include "backend/support/fileutil.h"
 #include "backend/support/imageutil.h"
-#include "backend/vm/fncode.h"
 #include "backend/vm/fnpovfpu.h"
 
 #include "lightgrp.h"
@@ -163,7 +163,7 @@ void Parser::Make_Pattern_Image(ImageData *image, FUNCTION_PTR fn, int token)
     else
         Error("Unsupported function type in function image.");
 
-    Destroy_Function(fn);
+    sceneData->functionVM->DestroyFunction(fn);
 }
 
 /*****************************************************************************
@@ -471,7 +471,7 @@ ImageData *Parser::Parse_Image(int Legal, bool GammaCorrect)
 #endif
         }
         else
-            image->data = Read_Image(this, sceneData, filetype, filename.c_str(), options);
+            image->data = Read_Image(sceneData, filetype, filename.c_str(), options);
 
         if (!options.warnings.empty())
             for (vector<string>::iterator it = options.warnings.begin(); it != options.warnings.end(); it++)
@@ -1021,11 +1021,10 @@ void Parser::Parse_Pattern (PATTERN_T *New, int TPat_Type)
         CASE (FUNCTION_TOKEN)
             New->Type = GENERIC_PATTERN;
             New->pattern = PatternPtr(new FunctionPattern());
-            dynamic_cast<FunctionPattern*>(New->pattern.get())->pVm = sceneData->functionVM;
             dynamic_cast<FunctionPattern*>(New->pattern.get())->contextId = sceneData->functionPatternCount;
             sceneData->functionPatternCount++;
             GetParserDataPtr()->functionPatternContext.resize(sceneData->functionPatternCount);
-            dynamic_cast<FunctionPattern*>(New->pattern.get())->pFn = Parse_Function();
+            dynamic_cast<FunctionPattern*>(New->pattern.get())->pFn = new FunctionVM::CustomFunction(sceneData->functionVM, Parse_Function());
             EXIT
         END_CASE
 
@@ -1441,7 +1440,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, int TPat_Type)
             GET(DF3_TOKEN);
             dynamic_cast<DensityFilePattern*>(New->pattern.get())->densityFile->Data->Name = Parse_C_String(true);
             {
-                IStream *dfile = Locate_File(this, sceneData, ASCIItoUCS2String(dynamic_cast<DensityFilePattern*>(New->pattern.get())->densityFile->Data->Name).c_str(), POV_File_Data_DF3, ign, true);
+                IStream *dfile = Locate_File(sceneData, ASCIItoUCS2String(dynamic_cast<DensityFilePattern*>(New->pattern.get())->densityFile->Data->Name).c_str(), POV_File_Data_DF3, ign, true);
                 if(dfile == NULL)
                     Error("Cannot read media density file.");
                 Read_Density_File(dfile, dynamic_cast<DensityFilePattern*>(New->pattern.get())->densityFile);
@@ -4874,7 +4873,7 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
     ImageData *Old_Image = NULL;
     DENSITY_FILE *Old_Density_File = NULL;
     int i;
-    SceneThreadData *Thread = GetParserDataPtr();
+    TraceThreadData *Thread = GetParserDataPtr();
     UCS2String ign;
     ContinuousPattern* pContinuousPattern;
 
@@ -4896,11 +4895,10 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
         CASE (FUNCTION_TOKEN)
             New->Type = GENERIC_PATTERN;
             New->pattern = PatternPtr(new FunctionPattern());
-            dynamic_cast<FunctionPattern*>(New->pattern.get())->pVm = sceneData->functionVM;
             dynamic_cast<FunctionPattern*>(New->pattern.get())->contextId = sceneData->functionPatternCount;
             sceneData->functionPatternCount++;
             GetParserDataPtr()->functionPatternContext.resize(sceneData->functionPatternCount);
-            dynamic_cast<FunctionPattern*>(New->pattern.get())->pFn = Parse_Function();
+            dynamic_cast<FunctionPattern*>(New->pattern.get())->pFn = new FunctionVM::CustomFunction(sceneData->functionVM, Parse_Function());
             EXIT
         END_CASE
 
@@ -5225,7 +5223,7 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
             GET(DF3_TOKEN);
             dynamic_cast<DensityFilePattern*>(New->pattern.get())->densityFile->Data->Name = Parse_C_String(true);
             {
-                IStream *dfile = Locate_File(this, sceneData, ASCIItoUCS2String(dynamic_cast<DensityFilePattern*>(New->pattern.get())->densityFile->Data->Name).c_str(), POV_File_Data_DF3, ign, true);
+                IStream *dfile = Locate_File(sceneData, ASCIItoUCS2String(dynamic_cast<DensityFilePattern*>(New->pattern.get())->densityFile->Data->Name).c_str(), POV_File_Data_DF3, ign, true);
                 if(dfile == NULL)
                     Error("Cannot read media density file.");
                 Read_Density_File(dfile, dynamic_cast<DensityFilePattern*>(New->pattern.get())->densityFile);

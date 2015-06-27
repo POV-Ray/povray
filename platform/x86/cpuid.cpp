@@ -1,9 +1,8 @@
 //******************************************************************************
 ///
-/// @file backend/texture/avxfma4check.h
+/// @file platform/x86/cpuid.cpp
 ///
-/// This header file contains code to test whether the CPU supports the AVX and
-/// FMA4 instruction set.
+/// This file contains code for probing the capabilities of the CPU.
 ///
 /// @copyright
 /// @parblock
@@ -34,46 +33,15 @@
 ///
 //******************************************************************************
 
-#ifndef __AVXFMA4_H__
-#define __AVXFMA4_H__
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-*   CPU_FMA4_DETECT
-*
-* INPUT
-*
-*  None
-*
-* OUTPUT
-*
-* RETURNS
-*
-*   Returns the status of the AVX and FMA4 bits
-*
-* AUTHOR
-*
-*   AMD
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-*
-******************************************************************************/
-#define CPUID __cpuid
-
-#if defined(USE_AVX_FMA4_FOR_NOISE)
+#include "cpuid.h"
 
 #if defined(LINUX)
 #include <x86intrin.h>
 
-static void __cpuid(int *out, int in) __attribute__((noinline));
-static void __cpuid(int *out, int in)
+static void cpuid(int *out, int in) __attribute__((noinline));
+static void cpuid(int *out, int in)
 {
-    __asm__ __volatile__("    pushq %%rbx;          \
+    __asm__ __volatile__("pushq %%rbx;              \
                           xorq %%rax, %%rax;        \
                           movl %%esi, %%eax;        \
                           cpuid;                    \
@@ -85,28 +53,15 @@ static void __cpuid(int *out, int in)
                           : : "D" (out), "S" (in)   \
                           : "%rax", "%rcx", "%rdx" );
 }
-
 #endif
 
-static int CPU_FMA4_DETECT(void)
+bool HaveAVXFMA4()
 {
-    int avx = 0, fma4 = 0;
     int info[4];
     CPUID(info, 0x1);
-
-    if((info[2] & (0x1 << 27)) ? 1 : 0)  /* check for osxsave*/
-    {
-        avx = (info[2] & (0x1 << 28)) ? 1 : 0;
-        CPUID(info, 0x80000001);
-        fma4 = (info[2] & (1 << 16)) ? 1 : 0;
-        return (avx & fma4);
-    }
-    else
-    {
-        return 0;
-    }
+    bool osxsave = ((info[2] & CPUID_00000001_OSXSAVE_MASK) != 0);
+    bool avx     = ((info[2] & CPUID_00000001_AVX_MASK)     != 0);
+    CPUID(info, 0x80000001);
+    bool fma4    = ((info[2] & CPUID_80000001_FMA4_MASK)    != 0);
+    return (osxsave && avx && fma4);
 }
-
-#endif
-
-#endif //

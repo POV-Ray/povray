@@ -1,8 +1,9 @@
 //******************************************************************************
 ///
-/// @file base/version.h
+/// @file base/fileutil.h
 ///
-/// This file contains version information.
+/// This module contains all defines, typedefs, and prototypes for
+/// `fileutil.cpp`.
 ///
 /// @copyright
 /// @parblock
@@ -33,32 +34,49 @@
 ///
 //******************************************************************************
 
-#ifndef POVRAY_BASE_VERSION_H
-#define POVRAY_BASE_VERSION_H
+#ifndef POVRAY_BASE_FILEUTIL_H
+#define POVRAY_BASE_FILEUTIL_H
 
-#include "base/configbase.h"
-#include "base/build.h"
+#include "base/stringutilities.h"
+#include "base/fileinputoutput.h"
 
-// POV-Ray version and copyright message macros
+namespace pov_base
+{
 
-#define POV_RAY_COPYRIGHT "Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd."
-#define OFFICIAL_VERSION_STRING "3.7.1"
-#define OFFICIAL_VERSION_NUMBER 371
+class IMemStream;
+class IStream;
 
-#define POV_RAY_PRERELEASE "alpha.8144917"
+// Legal image file attributes.
 
-#if POV_RAY_IS_OFFICIAL == 1
-#ifdef POV_RAY_PRERELEASE
-#define POV_RAY_VERSION OFFICIAL_VERSION_STRING "-" POV_RAY_PRERELEASE
-#else
-#define POV_RAY_VERSION OFFICIAL_VERSION_STRING
-#endif
-#else
-#ifdef POV_RAY_PRERELEASE
-#define POV_RAY_VERSION OFFICIAL_VERSION_STRING "-" POV_RAY_PRERELEASE ".unofficial"
-#else
-#define POV_RAY_VERSION OFFICIAL_VERSION_STRING "-unofficial"
-#endif
-#endif
+#define NO_FILE         0x00000000
+#define GIF_FILE        0x00000001
+#define POT_FILE        0x00000002
+#define SYS_FILE        0x00000004
+#define IFF_FILE        0x00000008
+#define TGA_FILE        0x00000010
+#define GRAD_FILE       0x00000020
+#define PGM_FILE        0x00000040
+#define PPM_FILE        0x00000080
+#define PNG_FILE        0x00000100
+#define JPEG_FILE       0x00000200
+#define TIFF_FILE       0x00000400
+#define BMP_FILE        0x00000800
+#define EXR_FILE        0x00001000
+#define HDR_FILE        0x00002000
 
-#endif // POVRAY_BASE_VERSION_H
+#define POV_FILE_EXTENSIONS_PER_TYPE 4
+
+struct POV_File_Extensions
+{
+    const char *ext[POV_FILE_EXTENSIONS_PER_TYPE];
+};
+
+extern POV_File_Extensions gPOV_File_Extensions[];
+extern const int gFile_Type_To_Mask[];
+
+int InferFileTypeFromExt(const pov_base::UCS2String& ext);
+IMemStream *Internal_Font_File(const int font_id, UCS2String& buffer);
+
+}
+
+#endif // POVRAY_BASE_FILEUTIL_H

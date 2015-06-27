@@ -40,7 +40,8 @@
 #ifndef FPMETRIC_H
 #define FPMETRIC_H
 
-#include "parser/parser.h" // TODO - avoid this (pulled in for function stuff)
+#include "core/coretypes.h"
+
 #include "backend/scene/objects.h"
 
 namespace pov
@@ -67,12 +68,13 @@ struct PrecompParValues_Struct
     DBL *Low[3], *Hi[3];     /*  X,Y,Z  */
 };
 
+class FPUContext;
+
 class Parametric : public NonsolidObject
 {
     public:
 
-        FunctionVM *vm;
-        FUNCTION_PTR Function[3];
+        GenericScalarFunctionPtr Function[3];
         DBL umin, umax, vmin, vmax;
         DBL accuracy;
         DBL max_gradient;
@@ -94,14 +96,14 @@ class Parametric : public NonsolidObject
         virtual void Transform(const TRANSFORM *);
         virtual void Compute_BBox();
 
-        void Precompute_Parametric_Values(char flags, int depth, FPUContext *ctx);
+        void Precompute_Parametric_Values(char flags, int depth, GenericFunctionContextPtr ctx);
     protected:
-        void Precomp_Par_Int(int depth, DBL umin, DBL vmin, DBL umax, DBL vmax, FPUContext *ctx);
+        void Precomp_Par_Int(int depth, DBL umin, DBL vmin, DBL umax, DBL vmax, GenericFunctionContextPtr ctx);
         PRECOMP_PAR_DATA *Copy_PrecompParVal();
         void Destroy_PrecompParVal();
 
-        static inline DBL Evaluate_Function_UV(FPUContext *ctx, FUNCTION funct, const Vector2d& fnvec);
-        static inline void Evaluate_Function_Interval_UV(FPUContext *ctx, FUNCTION funct, DBL threshold, const Vector2d& fnvec_low, const Vector2d& fnvec_hi, DBL max_gradient, DBL& low, DBL& hi);
+        static inline DBL Evaluate_Function_UV(GenericScalarFunctionPtr pFn, GenericFunctionContextPtr ctx, const Vector2d& fnvec);
+        static inline void Evaluate_Function_Interval_UV(GenericScalarFunctionPtr pFn, GenericFunctionContextPtr ctx, DBL threshold, const Vector2d& fnvec_low, const Vector2d& fnvec_hi, DBL max_gradient, DBL& low, DBL& hi);
         static void Interval(DBL dx, DBL a, DBL b, DBL max_gradient, DBL *Min, DBL *Max);
     private:
         PRECOMP_PAR_DATA *PData;

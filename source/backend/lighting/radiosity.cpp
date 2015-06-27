@@ -74,10 +74,9 @@
 
 #include "backend/lighting/photons.h"
 #include "backend/render/tracetask.h"
-#include "backend/scene/scene.h"
+#include "backend/scene/scenedata.h"
 #include "backend/scene/threaddata.h"
 #include "backend/scene/view.h"
-#include "backend/support/fileutil.h"
 #include "backend/support/octree.h"
 
 // this must be the last file included

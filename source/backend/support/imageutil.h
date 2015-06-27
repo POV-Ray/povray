@@ -9,7 +9,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -107,9 +107,6 @@ class ImageData
 
 };
 
-class Parser;
-class SceneData;
-
 DBL image_pattern(const Vector3d& EPoint, const BasicPattern* pPattern);
 bool image_map(const Vector3d& EPoint, const PIGMENT *Pigment, TransColour& colour);
 TEXTURE *material_map(const Vector3d& IPoint, const TEXTURE *Texture);
@@ -119,7 +116,6 @@ bool is_image_opaque(const ImageData *image);
 ImageData *Copy_Image(ImageData *old);
 ImageData *Create_Image(void);
 void Destroy_Image(ImageData *image);
-Image *Read_Image(Parser *p, shared_ptr<SceneData>& sd, int filetype, const UCS2 *filename, const Image::ReadOptions& options);
 
 }
 

@@ -384,7 +384,7 @@ bool Sor::Intersect(const BasicRay& ray, IStack& Depth_Stack, TraceThreadData *T
 
         x[3] = P[Y] * (P[Y] * (Entry->A * P[Y] + Entry->B) + Entry->C) + Entry->D - P[X] * P[X] - P[Z] * P[Z];
 
-        n = Solve_Polynomial(3, x, y, Test_Flag(this, STURM_FLAG), 0.0, Thread);
+        n = Solve_Polynomial(3, x, y, Test_Flag(this, STURM_FLAG), 0.0, Thread->Stats());
 
         while (n--)
         {
@@ -1067,7 +1067,7 @@ void Sor::Compute_Sor(Vector2d *P, TraceThreadData *Thread)
         c[1] = 2.0 * B;
         c[2] = C;
 
-        n = Solve_Polynomial(2, c, r, false, 0.0, Thread);
+        n = Solve_Polynomial(2, c, r, false, 0.0, Thread->Stats());
 
         while (n--)
         {

@@ -43,10 +43,11 @@
 #include "backend/frame.h"
 #include "backend/support/task.h"
 
-#include "backend/control/messagefactory.h"
-#include "backend/scene/scene.h"
 #include "base/timer.h"
 #include "base/types.h"
+
+#include "backend/control/messagefactory.h"
+#include "backend/scene/scenedata.h"
 
 // this must be the last file included
 #include "base/povdebug.h"

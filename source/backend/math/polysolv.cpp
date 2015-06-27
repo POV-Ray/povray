@@ -39,8 +39,6 @@
 #include "backend/frame.h"
 #include "backend/math/polysolv.h"
 
-#include "backend/scene/threaddata.h"
-
 // this must be the last file included
 #include "base/povdebug.h"
 
@@ -1575,12 +1573,12 @@ static int polysolve(int order, const DBL *Coeffs, DBL *roots)
 *
 ******************************************************************************/
 
-int Solve_Polynomial(int n, const DBL *c0, DBL *r, int sturm, DBL epsilon, TraceThreadData *Thread)
+int Solve_Polynomial(int n, const DBL *c0, DBL *r, int sturm, DBL epsilon, RenderStatistics& stats)
 {
     int roots, i;
     const DBL *c;
 
-    Thread->Stats()[Polynomials_Tested]++;
+    stats[Polynomials_Tested]++;
 
     roots = 0;
 
@@ -1633,7 +1631,7 @@ int Solve_Polynomial(int n, const DBL *c0, DBL *r, int sturm, DBL epsilon, Trace
             {
                 if ((c[2] != 0.0) && (fabs(c[3]/c[2]) < epsilon))
                 {
-                    Thread->Stats()[Roots_Eliminated]++;
+                    stats[Roots_Eliminated]++;
 
                     roots = solve_quadratic(c, r);
 
@@ -1662,7 +1660,7 @@ int Solve_Polynomial(int n, const DBL *c0, DBL *r, int sturm, DBL epsilon, Trace
             {
                 if ((c[3] != 0.0) && (fabs(c[4]/c[3]) < epsilon))
                 {
-                    Thread->Stats()[Roots_Eliminated]++;
+                    stats[Roots_Eliminated]++;
 
                     if (sturm)
                     {
@@ -1703,7 +1701,7 @@ int Solve_Polynomial(int n, const DBL *c0, DBL *r, int sturm, DBL epsilon, Trace
             {
                 if ((c[n-1] != 0.0) && (fabs(c[n]/c[n-1]) < epsilon))
                 {
-                    Thread->Stats()[Roots_Eliminated]++;
+                    stats[Roots_Eliminated]++;
 
                     roots = polysolve(n-1, c, r);
                 }

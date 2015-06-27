@@ -113,6 +113,9 @@
     <ClCompile Include="..\..\source\backend\control\renderbackend.cpp">
       <Filter>Backend Source\Control</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\backend\control\scene.cpp">
+      <Filter>Backend Source\Control</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\source\backend\math\chi2.cpp">
       <Filter>Backend Source\Math</Filter>
     </ClCompile>
@@ -155,9 +158,6 @@
     <ClCompile Include="..\..\source\backend\scene\objects.cpp">
       <Filter>Backend Source\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\backend\scene\scene.cpp">
-      <Filter>Backend Source\Scene</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\backend\scene\scenedata.cpp">
       <Filter>Backend Source\Scene</Filter>
     </ClCompile>
@@ -168,9 +168,6 @@
       <Filter>Backend Source\Scene</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\backend\support\bsptree.cpp">
-      <Filter>Backend Source\Support</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\backend\support\fileutil.cpp">
       <Filter>Backend Source\Support</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\backend\support\imageutil.cpp">
@@ -193,9 +190,6 @@
     </ClCompile>
     <ClCompile Include="..\..\source\backend\support\taskqueue.cpp">
       <Filter>Backend Source\Support</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\backend\vm\fncode.cpp">
-      <Filter>Backend Source\VM</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\backend\vm\fnintern.cpp">
       <Filter>Backend Source\VM</Filter>
@@ -281,6 +275,9 @@
     <ClInclude Include="..\..\source\backend\control\renderbackend.h">
       <Filter>Backend Headers\Control</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\backend\control\scene.h">
+      <Filter>Backend Headers\Control</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\source\backend\math\chi2.h">
       <Filter>Backend Headers\Math</Filter>
     </ClInclude>
@@ -326,9 +323,6 @@
     <ClInclude Include="..\..\source\backend\scene\objects.h">
       <Filter>Backend Headers\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\backend\scene\scene.h">
-      <Filter>Backend Headers\Scene</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\backend\scene\scenedata.h">
       <Filter>Backend Headers\Scene</Filter>
     </ClInclude>
@@ -339,9 +333,6 @@
       <Filter>Backend Headers\Scene</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\backend\support\bsptree.h">
-      <Filter>Backend Headers\Support</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\backend\support\fileutil.h">
       <Filter>Backend Headers\Support</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\backend\support\fixedallocator.h">
@@ -370,9 +361,6 @@
     </ClInclude>
     <ClInclude Include="..\..\source\backend\support\taskqueue.h">
       <Filter>Backend Headers\Support</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\backend\vm\fncode.h">
-      <Filter>Backend Headers\VM</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\backend\vm\fnintern.h">
       <Filter>Backend Headers\VM</Filter>
@@ -408,9 +396,6 @@
       <Filter>Backend Headers\Lighting</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\precomp.h" />
-    <ClInclude Include="..\..\source\backend\texture\avxfma4check.h">
-      <Filter>Backend Headers\Texture</Filter>
-    </ClInclude>
     <ClInclude Include="..\povconfig\syspovconfigbackend.h">
       <Filter>Backend Headers</Filter>
     </ClInclude>

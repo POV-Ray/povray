@@ -50,7 +50,7 @@
 #include "backend/lighting/point.h"
 #include "backend/math/matrices.h"
 #include "backend/scene/objects.h"
-#include "backend/scene/scene.h"
+#include "backend/scene/scenedata.h"
 #include "backend/scene/threaddata.h"
 #include "backend/scene/view.h"
 #include "backend/support/octree.h"
@@ -137,7 +137,7 @@ void PhotonSortingTask::Stopped()
 
 void PhotonSortingTask::Finish()
 {
-    GetViewDataPtr()->timeType = SceneThreadData::kPhotonTime;
+    GetViewDataPtr()->timeType = TraceThreadData::kPhotonTime;
     GetViewDataPtr()->realTime = ConsumedRealTime();
     GetViewDataPtr()->cpuTime = ConsumedCPUTime();
 }

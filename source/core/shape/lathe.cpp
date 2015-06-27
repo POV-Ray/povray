@@ -323,7 +323,7 @@ bool Lathe::Intersect(const BasicRay& ray, IStack& Depth_Stack, TraceThreadData 
                 x1[0] = Entry->C[Y] * Entry->C[Y] * r - Entry->C[X] * Entry->C[X] * Dy2;
                 x1[1] = 2.0 * (Entry->C[Y] * ((Entry->D[Y] - P[Y]) * r + D[Y] * m) - Entry->C[X] * Entry->D[X] * Dy2);
                 x1[2] = (Entry->D[Y] - P[Y]) * ((Entry->D[Y] - P[Y]) * r + 2.0 * D[Y] * m) + Dy2 * (P[X] * P[X] + P[Z] * P[Z] - Entry->D[X] * Entry->D[X]);
-                n1 = Solve_Polynomial(2, x1, y1, false, 0.0, Thread);
+                n1 = Solve_Polynomial(2, x1, y1, false, 0.0, Thread->Stats());
                 break;
             // Quadratic spline
             case QUADRATIC_SPLINE:
@@ -333,7 +333,7 @@ bool Lathe::Intersect(const BasicRay& ray, IStack& Depth_Stack, TraceThreadData 
                 x1[2] = r * (2.0 * Entry->B[Y] * (Entry->D[Y] - P[Y]) + Entry->C[Y] * Entry->C[Y]) + 2.0 * Entry->B[Y] * D[Y] * m - (2.0 * Entry->B[X] * Entry->D[X] + Entry->C[X] * Entry->C[X]) * Dy2;
                 x1[3] = 2.0 * (Entry->C[Y] * ((Entry->D[Y] - P[Y]) * r + D[Y] * m) - Entry->C[X] * Entry->D[X] * Dy2);
                 x1[4] = (Entry->D[Y] - P[Y]) * ((Entry->D[Y] - P[Y]) * r + 2.0 * D[Y] * m) + Dy2 * (P[X] * P[X] + P[Z] * P[Z] - Entry->D[X] * Entry->D[X]);
-                n1 = Solve_Polynomial(4, x1, y1, Test_Flag(this, STURM_FLAG), 0.0, Thread);
+                n1 = Solve_Polynomial(4, x1, y1, Test_Flag(this, STURM_FLAG), 0.0, Thread->Stats());
                 break;
             // Cubic spline
             case BEZIER_SPLINE:
@@ -346,7 +346,7 @@ bool Lathe::Intersect(const BasicRay& ray, IStack& Depth_Stack, TraceThreadData 
                 x1[4] = (2.0 * Entry->B[Y] * (Entry->D[Y] - P[Y]) + Entry->C[Y] * Entry->C[Y]) * r + 2.0 * Entry->B[Y] * D[Y] * m - (2.0 * Entry->B[X] * Entry->D[X] + Entry->C[X] * Entry->C[X]) * Dy2;
                 x1[5] = 2.0 * (Entry->C[Y] * ((Entry->D[Y] - P[Y]) * r + D[Y] * m) - Entry->C[X] * Entry->D[X] * Dy2);
                 x1[6] = (Entry->D[Y] - P[Y]) * ((Entry->D[Y] - P[Y]) * r + 2.0 * D[Y] * m) + Dy2 * (P[X] * P[X] + P[Z] * P[Z] - Entry->D[X] * Entry->D[X]);
-                n1 = Solve_Polynomial(6, x1, y1, Test_Flag(this, STURM_FLAG), 0.0, Thread);
+                n1 = Solve_Polynomial(6, x1, y1, Test_Flag(this, STURM_FLAG), 0.0, Thread->Stats());
                 break;
         }
 
@@ -376,7 +376,7 @@ bool Lathe::Intersect(const BasicRay& ray, IStack& Depth_Stack, TraceThreadData 
                     x2[1] = 2.0 * m;
                     x2[2] = P[X] * P[X] + P[Z] * P[Z] - k * k;
 
-                    n2 = Solve_Polynomial(2, x2, y2, false, 0.0, Thread);
+                    n2 = Solve_Polynomial(2, x2, y2, false, 0.0, Thread->Stats());
                     while(n2--)
                     {
                         k = y2[n2];
@@ -471,7 +471,7 @@ bool Lathe::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
                     x[2] = Entry->C[Y];
                     x[3] = Entry->D[Y] - P[Y];
 
-                    n = Solve_Polynomial(3, x, y, Test_Flag(this, STURM_FLAG), 0.0, Thread);
+                    n = Solve_Polynomial(3, x, y, Test_Flag(this, STURM_FLAG), 0.0, Thread->Stats());
 
                     while (n--)
                     {
@@ -1158,7 +1158,7 @@ void Lathe::Compute_Lathe(Vector2d *P, TraceThreadData *Thread)
             c[1] = 2.0 * B[X];
             c[2] = C[X];
 
-            n = Solve_Polynomial(2, c, r, false, 0.0, Thread);
+            n = Solve_Polynomial(2, c, r, false, 0.0, Thread->Stats());
 
             while (n--)
             {
@@ -1172,7 +1172,7 @@ void Lathe::Compute_Lathe(Vector2d *P, TraceThreadData *Thread)
             c[1] = 2.0 * B[Y];
             c[2] = C[Y];
 
-            n = Solve_Polynomial(2, c, r, false, 0.0, Thread);
+            n = Solve_Polynomial(2, c, r, false, 0.0, Thread->Stats());
 
             while (n--)
             {

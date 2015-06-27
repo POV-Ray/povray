@@ -1,8 +1,9 @@
 //******************************************************************************
 ///
-/// @file backend/vm/fncode.h
+/// @file parser/fncode.h
 ///
-/// This module contains all defines, typedefs, and prototypes for `fncode.cpp`.
+/// This module contains declarations for the compiler for user-defined
+/// functions.
 ///
 /// This module is inspired by code by D. Skarda, T. Bily and R. Suzuki.
 ///
@@ -35,13 +36,12 @@
 ///
 //******************************************************************************
 
-#ifndef FNCODE_H
-#define FNCODE_H
+#ifndef POVRAY_PARSER_FNCODE_H
+#define POVRAY_PARSER_FNCODE_H
 
-#include "backend/frame.h"
-#include "base/textstream.h"
-#include "parser/parser.h"
+#include "parser/reservedwords.h"
 
+#include "backend/vm/fnpovfpu.h"
 
 namespace pov
 {
@@ -53,41 +53,64 @@ namespace pov
 #define FN_INLINE_FLAG 1
 #define FN_LOCAL_FLAG  2
 
-#define MAX_K ((unsigned int)0x000fffff)
-#define MAX_FN MAX_K
-
-#define MAKE_INSTRUCTION(op, k) ((((k) << 12) & 0xfffff000) | ((op) & 0x00000fff))
-
-#define GET_OP(w) ((w) & 0x00000fff)
-#define GET_K(w) (((w) >> 12) & 0x000fffff)
-
-
-typedef void *(*FNCODE_PRIVATE_COPY_METHOD)(void *);
-typedef void (*FNCODE_PRIVATE_DESTROY_METHOD)(void *);
-
-typedef unsigned int Instruction;
-
-struct FunctionCode
+// Caution: The compiler depends on the order of these constants!
+enum
 {
-    Instruction *program;
-    unsigned int program_size;
-    unsigned char return_size;
-    unsigned char parameter_cnt;
-    unsigned char localvar_cnt;
-    unsigned int localvar_pos[MAX_PARAMETER_LIST];
-    char *localvar[MAX_PARAMETER_LIST];
-    char *parameter[MAX_PARAMETER_LIST];
-    char *name;
-    UCS2 *filename;
-    pov_base::ITextStream::FilePos filepos;
-    unsigned int flags;
-    FNCODE_PRIVATE_COPY_METHOD private_copy_method;
-    FNCODE_PRIVATE_DESTROY_METHOD private_destroy_method;
-    void *private_data;
+    OP_NONE = 0,    // 0
+
+    OP_CMP_EQ,      // 1
+    OP_CMP_NE,      // 2
+    OP_CMP_LT,      // 3
+    OP_CMP_LE,      // 4
+    OP_CMP_GT,      // 5
+    OP_CMP_GE,      // 6
+    OP_ADD,         // 7
+    OP_SUB,         // 8
+    OP_OR,          // 9
+    OP_MUL,         // 10
+    OP_DIV,         // 11
+    OP_AND,         // 12
+    OP_POW,         // 13
+    OP_NEG,         // 14
+    OP_NOT,         // 15
+
+    OP_LEFTMOST,    // 16
+    OP_FIRST,       // 17
+
+    OP_CONSTANT,    // 18
+    OP_VARIABLE,    // 19
+    OP_DOT,         // 20
+    OP_MEMBER,      // 21
+    OP_CALL,        // 22
+    OP_TRAP         // 23
 };
 
+class Parser;
+class FunctionVM;
+
 void FNCode_Copy(FunctionCode *, FunctionCode *);
-void FNCode_Delete(FunctionCode *);
+
+struct ExprNode
+{
+    ExprNode *parent;
+    ExprNode *child;
+    ExprNode *prev;
+    ExprNode *next;
+    int stage;
+    int op;
+    union
+    {
+        char *variable;
+        struct
+        {
+            char *name;
+            TOKEN token;
+            FUNCTION fn;
+        } call;
+        unsigned int trap;
+        DBL number;
+    };
+};
 
 class FNCode
 {
@@ -95,7 +118,7 @@ class FNCode
         FNCode(Parser *, FunctionCode *, bool, const char *);
 
         void Parameter();
-        void Compile(Parser::ExprNode *);
+        void Compile(ExprNode *);
         void SetFlag(unsigned int, char *);
     private:
         FunctionCode *function;
@@ -119,13 +142,13 @@ class FNCode
         FNCode();
         FNCode(FNCode&);
 
-        void compile_recursive(Parser::ExprNode *expr);
+        void compile_recursive(ExprNode *expr);
         void compile_member(char *name);
-        void compile_call(Parser::ExprNode *expr, FUNCTION fn, int token, char *name);
-        void compile_select(Parser::ExprNode *expr);
-        void compile_seq_op(Parser::ExprNode *expr, unsigned int op, DBL neutral);
-        void compile_float_function_call(Parser::ExprNode *expr, FUNCTION fn, char *name);
-        void compile_vector_function_call(Parser::ExprNode *expr, FUNCTION fn, char *name);
+        void compile_call(ExprNode *expr, FUNCTION fn, int token, char *name);
+        void compile_select(ExprNode *expr);
+        void compile_seq_op(ExprNode *expr, unsigned int op, DBL neutral);
+        void compile_float_function_call(ExprNode *expr, FUNCTION fn, char *name);
+        void compile_vector_function_call(ExprNode *expr, FUNCTION fn, char *name);
         void compile_inline(FunctionCode *function);
         void compile_variable(char *name);
         void compile_parameters();
@@ -155,4 +178,4 @@ class FNCode
 
 }
 
-#endif
+#endif // POVRAY_PARSER_FNCODE_H
