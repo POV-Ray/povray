@@ -2222,7 +2222,7 @@ void Parser::Parse_Directive(int After_Hash)
                             Unget_Token();
                         sceneData->languageVersion = (int)(Parse_Float() * 100 + 0.5);
                         if (sceneData->explicitNoiseGenerator == false)
-                            sceneData->noiseGenerator = (sceneData->EffectiveLanguageVersion() >= 350 ?
+                            sceneData->noiseGenerator = (sceneData->EffectiveLanguageVersion() < 350 ?
                                                          kNoiseGen_Original : kNoiseGen_RangeCorrected);
                         // [CLi] if assumed_gamma is not specified in a legacy (3.6.x or earlier) scene, gammaMode defaults to kPOVList_GammaMode_None;
                         // this is enforced later anyway after parsing, but we may need this information /now/ during parsing already
