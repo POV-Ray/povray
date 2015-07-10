@@ -97,7 +97,7 @@ struct SceneData
 
     SceneState state;
 
-    mutable shared_ptr<Console> console;
+    mutable std::shared_ptr<Console> console;
 
     mutable list<POVMS_Object> readfiles;
     mutable list<POVMS_Object> createdfiles;
@@ -107,7 +107,7 @@ struct SceneData
 
     list<Path> searchpaths;
 
-    shared_ptr<TextStreamBuffer> streams[MAX_STREAMS];
+    std::shared_ptr<TextStreamBuffer> streams[MAX_STREAMS];
 
     UCS2String streamnames[MAX_STREAMS];
     bool consoleoutput[MAX_STREAMS];
@@ -140,9 +140,9 @@ struct ViewData
 
     ViewState state;
 
-    mutable shared_ptr<Image> image;
-    mutable shared_ptr<Display> display;
-    mutable shared_ptr<OStream> imageBackup;
+    mutable std::shared_ptr<Image> image;
+    mutable std::shared_ptr<Display> display;
+    mutable std::shared_ptr<OStream> imageBackup;
 
     Path imageBackupFile;
 };
@@ -223,12 +223,12 @@ class RenderFrontendBase : public POVMS_MessageReceiver
         RenderFrontendBase(POVMSContext);
         virtual ~RenderFrontendBase();
 
-        void ConnectToBackend(POVMSAddress, POVMS_Object&, POVMS_Object *, shared_ptr<Console>&);
+        void ConnectToBackend(POVMSAddress, POVMS_Object&, POVMS_Object *, std::shared_ptr<Console>&);
         void DisconnectFromBackend(POVMSAddress);
 
-        virtual shared_ptr<Console> GetConsole(SceneId) = 0;
-        virtual shared_ptr<Image> GetImage(ViewId) = 0;
-        virtual shared_ptr<Display> GetDisplay(ViewId) = 0;
+        virtual std::shared_ptr<Console> GetConsole(SceneId) = 0;
+        virtual std::shared_ptr<Image> GetImage(ViewId) = 0;
+        virtual std::shared_ptr<Display> GetDisplay(ViewId) = 0;
     protected:
 
         typedef std::set<POVMSAddress> BackendAddressSet;
@@ -298,7 +298,7 @@ class RenderFrontend : public RenderFrontendBase
         void ResumeParser(SceneId sid);
         void StopParser(SceneId sid);
 
-        ViewId CreateView(SceneId sid, POVMS_Object& obj, shared_ptr<ImageProcessing>& imageProcessing, boost::function<Display *(unsigned int, unsigned int, GammaCurvePtr)> fn);
+        ViewId CreateView(SceneId sid, POVMS_Object& obj, std::shared_ptr<ImageProcessing>& imageProcessing, boost::function<Display *(unsigned int, unsigned int, GammaCurvePtr)> fn);
         void CloseView(ViewId vid);
 
         ViewData::ViewState GetViewState(ViewId vid);
@@ -308,9 +308,9 @@ class RenderFrontend : public RenderFrontendBase
         void ResumeRender(ViewId vid);
         void StopRender(ViewId vid);
 
-        virtual shared_ptr<Console> GetConsole(SceneId sid);
-        virtual shared_ptr<Image> GetImage(ViewId vid);
-        virtual shared_ptr<Display> GetDisplay(ViewId vid);
+        virtual std::shared_ptr<Console> GetConsole(SceneId sid);
+        virtual std::shared_ptr<Image> GetImage(ViewId vid);
+        virtual std::shared_ptr<Display> GetDisplay(ViewId vid);
     protected:
         virtual void HandleParserMessage(SceneId sid, POVMSType ident, POVMS_Object& msg);
         virtual void HandleFileMessage(SceneId sid, POVMSType ident, POVMS_Object& msg, POVMS_Object& result);
@@ -357,7 +357,7 @@ RenderFrontendBase::SceneId RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_
 
         sid = RenderFrontendBase::CreateScene(sh.data, backendaddress, obj);
 
-        sh.data.console = shared_ptr<Console>(fn());
+        sh.data.console = std::shared_ptr<Console>(fn());
 
         scenehandler[sid] = sh;
         scene2views[sid] = ViewIdSet();
@@ -447,7 +447,7 @@ void RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::StopParser(SceneId
 }
 
 template<class PARSER_MH, class FILE_MH, class RENDER_MH, class IMAGE_MH>
-RenderFrontendBase::ViewId RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::CreateView(SceneId sid, POVMS_Object& obj, shared_ptr<ImageProcessing>& imageProcessing, boost::function<Display *(unsigned int,unsigned int,GammaCurvePtr)> fn)
+RenderFrontendBase::ViewId RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::CreateView(SceneId sid, POVMS_Object& obj, std::shared_ptr<ImageProcessing>& imageProcessing, boost::function<Display *(unsigned int,unsigned int,GammaCurvePtr)> fn)
 {
     typename SceneHandlerMap::iterator shi(scenehandler.find(sid));
 
@@ -543,7 +543,7 @@ RenderFrontendBase::ViewId RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_M
             {
                 if (imageProcessing == NULL)
                     throw POV_EXCEPTION(kNullPointerErr, "Internal error: output to file is set, but no ImageProcessing object supplied");
-                shared_ptr<Image> img(imageProcessing->GetImage());
+                std::shared_ptr<Image> img(imageProcessing->GetImage());
                 if(img != NULL)
                 {
                     if((img->GetWidth() != width) || (img->GetHeight() != height))
@@ -552,11 +552,11 @@ RenderFrontendBase::ViewId RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_M
                     vh.data.image = img;
                 }
                 else
-                    vh.data.image = shared_ptr<Image>(Image::Create(width, height, Image::RGBFT_Float));
+                    vh.data.image = std::shared_ptr<Image>(Image::Create(width, height, Image::RGBFT_Float));
             }
 
             if(obj.TryGetBool(kPOVAttrib_Display, true) == true)
-                vh.data.display = shared_ptr<Display>(fn(width, height, gamma));
+                vh.data.display = std::shared_ptr<Display>(fn(width, height, gamma));
 
             viewhandler[vid] = vh;
             view2scene[vid] = sid;
@@ -730,33 +730,33 @@ void RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::StopRender(ViewId 
 }
 
 template<class PARSER_MH, class FILE_MH, class RENDER_MH, class IMAGE_MH>
-shared_ptr<Console> RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::GetConsole(SceneId sid)
+std::shared_ptr<Console> RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::GetConsole(SceneId sid)
 {
     typename SceneHandlerMap::iterator shi(scenehandler.find(sid));
     if(shi != scenehandler.end())
         return shi->second.data.console;
     else
-        return shared_ptr<Console>();
+        return std::shared_ptr<Console>();
 }
 
 template<class PARSER_MH, class FILE_MH, class RENDER_MH, class IMAGE_MH>
-shared_ptr<Image> RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::GetImage(ViewId vid)
+std::shared_ptr<Image> RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::GetImage(ViewId vid)
 {
     typename ViewHandlerMap::iterator vhi(viewhandler.find(vid));
     if(vhi != viewhandler.end())
         return vhi->second.data.image;
     else
-        return shared_ptr<Image>();
+        return std::shared_ptr<Image>();
 }
 
 template<class PARSER_MH, class FILE_MH, class RENDER_MH, class IMAGE_MH>
-shared_ptr<Display> RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::GetDisplay(ViewId vid)
+std::shared_ptr<Display> RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::GetDisplay(ViewId vid)
 {
     typename ViewHandlerMap::iterator vhi(viewhandler.find(vid));
     if(vhi != viewhandler.end())
         return vhi->second.data.display;
     else
-        return shared_ptr<Display>();
+        return std::shared_ptr<Display>();
 }
 
 template<class PARSER_MH, class FILE_MH, class RENDER_MH, class IMAGE_MH>

@@ -81,7 +81,7 @@ PhotonShootingUnit* PhotonShootingStrategy::getNextUnit()
     return unit;
 }
 
-void PhotonShootingStrategy::createUnitsForCombo(ObjectPtr obj, LightSource* light, shared_ptr<SceneData> sceneData)
+void PhotonShootingStrategy::createUnitsForCombo(ObjectPtr obj, LightSource* light, std::shared_ptr<SceneData> sceneData)
 {
     PhotonShootingUnit* unit = new PhotonShootingUnit(light, obj);
     unit->lightAndObject.computeAnglesAndDeltas(sceneData);

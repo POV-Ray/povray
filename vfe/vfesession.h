@@ -519,7 +519,7 @@ namespace vfe
       // Returns a copy of the shared pointer containing the current instance
       // of a pov_frontend::Display-derived render preview instance, which may
       // be NULL.
-      virtual shared_ptr<Display> GetDisplay() const;
+      virtual std::shared_ptr<Display> GetDisplay() const;
 
       // If a VFE implementation has provided a display creator functor via
       // vfeSession::SetDisplayCreator(), this method will call it with the
@@ -1239,7 +1239,7 @@ namespace vfe
 
       static bool m_Initialized;
       static vfeSession *m_CurrentSessionTemporaryHack;
-      shared_ptr<Console> m_Console;
+      std::shared_ptr<Console> m_Console;
 
       virtual vfeDisplay *DefaultDisplayCreator (unsigned int width, unsigned int height, GammaCurvePtr gamma, vfeSession *session, bool visible);
       DisplayCreator m_DisplayCreator;

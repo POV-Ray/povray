@@ -195,3 +195,11 @@ unix/config/config.sub
 unix/config/depcomp
 unix/config/install-sh
 unix/config/missing
+libraries/ilmbase/Half/eLut.h
+libraries/ilmbase/Half/toFloat.h
+libraries/openexr/IlmImf/b44ExpLogTable.h
+libraries/png/pnglibconf.h
+libraries/tiff/libtiff/tiffconf.h
+libraries/tiff/libtiff/tif_config.h
+*.bsc
+windows/vs13/bin32/lib/cmedit32d.exp

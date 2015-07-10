@@ -90,7 +90,7 @@ class ShelloutProcessing
     friend class ShelloutAction;
 
 public:
-    typedef shared_ptr<ShelloutAction> ShelloutPtr;
+    typedef std::shared_ptr<ShelloutAction> ShelloutPtr;
 
     typedef enum
     {

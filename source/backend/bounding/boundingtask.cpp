@@ -133,8 +133,8 @@ class BSPProgress : public BSPTree::Progress
         BSPProgress();
 };
 
-BoundingTask::BoundingTask(shared_ptr<SceneData> sd, unsigned int bt) :
-    SceneTask(new TraceThreadData(sd), boost::bind(&BoundingTask::SendFatalError, this, _1), "Bounding", sd),
+BoundingTask::BoundingTask(std::shared_ptr<SceneData> sd, unsigned int bt) :
+    SceneTask(new TraceThreadData(sd), std::bind(&BoundingTask::SendFatalError, this, std::placeholders::_1), "Bounding", sd),
     sceneData(sd),
     boundingThreshold(bt)
 {

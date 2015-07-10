@@ -118,7 +118,7 @@ int main(int argc, char **argv)
 //  argv = nargv;
 
     // Init
-    povray_init(boost::bind(&BackendExitCallback), &backendAddress);
+    povray_init(std::bind(&BackendExitCallback), &backendAddress);
 
     if(err == kNoErr)
         err = POVMS_OpenContext(&frontendContext);
@@ -129,7 +129,7 @@ int main(int argc, char **argv)
         POVMS_Object backendMessage;
         SimpleFrontend<ParserMessageHandler, FileMessageHandler, RenderMessageHandler, ImageMessageHandler>
                        frontend(frontendContext, backendAddress, backendMessage,
-                       boost::bind(CreateDefaultConsole), boost::bind(CreateDefaultDisplay, _1, _2, _3));
+					   std::bind(CreateDefaultConsole), std::bind(CreateDefaultDisplay, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 
         // Print help screens
         if(argc == 1)

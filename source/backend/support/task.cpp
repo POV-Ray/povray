@@ -109,9 +109,9 @@ void Task::Start(const boost::function0<void>& completion)
 {
     if((done == false) && (taskThread == NULL))
 #ifndef USE_OFFICIAL_BOOST
-        taskThread = new boost::thread(boost::bind(&Task::TaskThread, this, completion), 1024 * 1024 * 2); // TODO - make stack size definable
+        taskThread = new boost::thread(std::bind(&Task::TaskThread, this, completion), 1024 * 1024 * 2); // TODO - make stack size definable
 #else
-        taskThread = new boost::thread(boost::bind(&Task::TaskThread, this, completion));
+        taskThread = new boost::thread(std::bind(&Task::TaskThread, this, completion));
 #endif
 }
 
@@ -260,7 +260,7 @@ void Task::TaskThread(const boost::function0<void>& completion)
 }
 
 
-SceneTask::SceneTask(TaskData *td, const boost::function1<void, Exception&>& f, const char* sn, shared_ptr<SceneData> sd, RenderBackend::ViewId vid) :
+SceneTask::SceneTask(TaskData *td, const boost::function1<void, Exception&>& f, const char* sn, std::shared_ptr<SceneData> sd, RenderBackend::ViewId vid) :
     Task(td, f),
     messageFactory(sd->warningLevel, sn, sd->backendAddress, sd->frontendAddress, sd->sceneId, vid)
 {}

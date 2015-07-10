@@ -156,7 +156,7 @@ Task::TaskData *TaskQueue::AppendTask(Task *task)
 
     failed = false;
 
-    queuedTasks.push(TaskEntry(shared_ptr<Task>(task)));
+    queuedTasks.push(TaskEntry(std::shared_ptr<Task>(task)));
 
     Notify();
 
@@ -222,7 +222,7 @@ bool TaskQueue::Process()
             case TaskEntry::kTask:
             {
                 activeTasks.push_back(queuedTasks.front());
-                queuedTasks.front().GetTask()->Start(boost::bind(&TaskQueue::Notify, this));
+                queuedTasks.front().GetTask()->Start(std::bind(&TaskQueue::Notify, this));
                 queuedTasks.pop();
                 break;
             }

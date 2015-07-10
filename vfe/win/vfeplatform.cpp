@@ -511,7 +511,7 @@ namespace vfePlatform
     startupInfo.dwFlags = pov_frontend::MinimizeShellouts() ? STARTF_USESHOWWINDOW : 0;
     startupInfo.wShowWindow = SW_SHOWMINNOACTIVE;
 
-    shared_ptr<char> buf(new char[params.size() + 1]);
+    std::shared_ptr<char> buf(new char[params.size() + 1]);
     strcpy(buf.get(), params.c_str());
     if ((m_ProcessRunning = CreateProcess(cmd.c_str(), buf.get(), NULL, NULL, false, 0, NULL, NULL, &startupInfo, &procInfo)))
     {

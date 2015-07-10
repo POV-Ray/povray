@@ -639,7 +639,12 @@ const RESERVED_WORD Reserved_Words[LAST_TOKEN] = {
     {XYZ_TOKEN, "xyz"},
     {YES_TOKEN, "yes"},
     {Y_TOKEN, "y"},
-    {Z_TOKEN, "z"}
+    {Z_TOKEN, "z"},
+
+	// 3D SBS rendering support:
+	{STEREOSCOPIC_TOKEN, "stereoscopic"},
+	{ZEROPARALLAX_TOKEN, "zeroparallax"},
+	{EYEOFFSET_TOKEN, "eyeoffset"},
 };
 
 } // end of pov namespace

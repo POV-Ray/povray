@@ -1,0 +1,250 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Core Source">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp</Extensions>
+    </Filter>
+    <Filter Include="Core Headers">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h</Extensions>
+    </Filter>
+    <Filter Include="Core Source\Shape">
+      <UniqueIdentifier>{f7a33702-7a7f-4306-aa9f-67c03872ef9a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core Headers\Shape">
+      <UniqueIdentifier>{7a9b8c40-020d-45d1-86e1-4bd85db7f00a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core Source\Material">
+      <UniqueIdentifier>{c23b2412-544e-4b7c-94d9-fa9d93b089fd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core Headers\Material">
+      <UniqueIdentifier>{b6ba5b2d-3c3d-4b83-8fc6-de656baaf2e3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core Source\Render">
+      <UniqueIdentifier>{97bdaec2-4a5c-4947-8c37-d2551b11d346}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core Headers\Render">
+      <UniqueIdentifier>{d4a077b2-598b-470c-9fa1-0d2de7c70925}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\source\precomp.cpp" />
+    <ClCompile Include="..\..\source\core\material\pattern.cpp">
+      <Filter>Core Source\Material</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\material\interior.cpp">
+      <Filter>Core Source\Material</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\material\media.cpp">
+      <Filter>Core Source\Material</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\material\normal.cpp">
+      <Filter>Core Source\Material</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\material\texture.cpp">
+      <Filter>Core Source\Material</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\material\pigment.cpp">
+      <Filter>Core Source\Material</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\shape\bezier.cpp">
+      <Filter>Core Source\Shape</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\shape\blob.cpp">
+      <Filter>Core Source\Shape</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\shape\csg.cpp">
+      <Filter>Core Source\Shape</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\shape\fractal.cpp">
+      <Filter>Core Source\Shape</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\shape\lathe.cpp">
+      <Filter>Core Source\Shape</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\shape\mesh.cpp">
+      <Filter>Core Source\Shape</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\shape\ovus.cpp">
+      <Filter>Core Source\Shape</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\shape\polygon.cpp">
+      <Filter>Core Source\Shape</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\shape\prism.cpp">
+      <Filter>Core Source\Shape</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\shape\sor.cpp">
+      <Filter>Core Source\Shape</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\shape\torus.cpp">
+      <Filter>Core Source\Shape</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\shape\triangle.cpp">
+      <Filter>Core Source\Shape</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\shape\box.cpp">
+      <Filter>Core Source\Shape</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\shape\cone.cpp">
+      <Filter>Core Source\Shape</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\shape\parametric.cpp">
+      <Filter>Core Source\Shape</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\shape\heightfield.cpp">
+      <Filter>Core Source\Shape</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\shape\isosurface.cpp">
+      <Filter>Core Source\Shape</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\shape\plane.cpp">
+      <Filter>Core Source\Shape</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\shape\polynomial.cpp">
+      <Filter>Core Source\Shape</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\shape\quadric.cpp">
+      <Filter>Core Source\Shape</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\shape\sphere.cpp">
+      <Filter>Core Source\Shape</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\shape\spheresweep.cpp">
+      <Filter>Core Source\Shape</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\shape\superellipsoid.cpp">
+      <Filter>Core Source\Shape</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\shape\truetype.cpp">
+      <Filter>Core Source\Shape</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\shape\disc.cpp">
+      <Filter>Core Source\Shape</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\material\warp.cpp">
+      <Filter>Core Source\Material</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\render\ray.cpp">
+      <Filter>Core Source\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\render\trace.cpp">
+      <Filter>Core Source\Render</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\source\precomp.h" />
+    <ClInclude Include="..\..\source\core\configcore.h">
+      <Filter>Core Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\coretypes.h">
+      <Filter>Core Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\povconfig\syspovconfigcore.h">
+      <Filter>Core Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\material\interior.h">
+      <Filter>Core Headers\Material</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\material\media.h">
+      <Filter>Core Headers\Material</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\material\pattern.h">
+      <Filter>Core Headers\Material</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\material\normal.h">
+      <Filter>Core Headers\Material</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\material\texture.h">
+      <Filter>Core Headers\Material</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\material\pigment.h">
+      <Filter>Core Headers\Material</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\shape\truetype.h">
+      <Filter>Core Headers\Shape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\shape\blob.h">
+      <Filter>Core Headers\Shape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\shape\csg.h">
+      <Filter>Core Headers\Shape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\shape\fractal.h">
+      <Filter>Core Headers\Shape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\shape\lathe.h">
+      <Filter>Core Headers\Shape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\shape\mesh.h">
+      <Filter>Core Headers\Shape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\shape\ovus.h">
+      <Filter>Core Headers\Shape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\shape\polygon.h">
+      <Filter>Core Headers\Shape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\shape\prism.h">
+      <Filter>Core Headers\Shape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\shape\sor.h">
+      <Filter>Core Headers\Shape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\shape\torus.h">
+      <Filter>Core Headers\Shape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\shape\triangle.h">
+      <Filter>Core Headers\Shape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\shape\box.h">
+      <Filter>Core Headers\Shape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\shape\cone.h">
+      <Filter>Core Headers\Shape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\shape\bezier.h">
+      <Filter>Core Headers\Shape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\shape\disc.h">
+      <Filter>Core Headers\Shape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\shape\parametric.h">
+      <Filter>Core Headers\Shape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\shape\heightfield.h">
+      <Filter>Core Headers\Shape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\shape\isosurface.h">
+      <Filter>Core Headers\Shape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\shape\plane.h">
+      <Filter>Core Headers\Shape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\shape\polynomial.h">
+      <Filter>Core Headers\Shape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\shape\quadric.h">
+      <Filter>Core Headers\Shape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\shape\sphere.h">
+      <Filter>Core Headers\Shape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\shape\spheresweep.h">
+      <Filter>Core Headers\Shape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\shape\superellipsoid.h">
+      <Filter>Core Headers\Shape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\material\warp.h">
+      <Filter>Core Headers\Material</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\render\ray.h">
+      <Filter>Core Headers\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\render\trace.h">
+      <Filter>Core Headers\Render</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

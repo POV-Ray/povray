@@ -589,9 +589,9 @@ boost::thread *povray_init(const boost::function0<void>& threadExit, POVMSAddres
         pov::InitializePatternGenerators();
 
 #ifndef USE_OFFICIAL_BOOST
-        POV_MainThread = new boost::thread(boost::bind(&MainThreadFunction, threadExit), 1024 * 64);
+        POV_MainThread = new boost::thread(std::bind(&MainThreadFunction, threadExit), 1024 * 64);
 #else
-        POV_MainThread = new boost::thread(boost::bind(&MainThreadFunction, threadExit));
+        POV_MainThread = new boost::thread(std::bind(&MainThreadFunction, threadExit));
 #endif
 
         // we can't depend on boost::thread::yield here since under windows it is not

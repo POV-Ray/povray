@@ -55,6 +55,7 @@
 
 #include <stack>
 #include <vector>
+#include <algorithm>
 
 #include "base/configbase.h"
 #include "backend/configbackend.h"
@@ -963,7 +964,7 @@ class Interior
         SNGL Fade_Distance, Fade_Power;
         MathColour Fade_Colour;
         vector<Media> media;
-        shared_ptr<SubsurfaceInterior> subsurface;
+        std::shared_ptr<SubsurfaceInterior> subsurface;
 
         Interior();
         Interior(const Interior&);
@@ -976,8 +977,8 @@ class Interior
         Interior& operator=(const Interior&);
 };
 
-typedef shared_ptr<Interior> InteriorPtr;
-typedef shared_ptr<const Interior> ConstInteriorPtr;
+typedef std::shared_ptr<Interior> InteriorPtr;
+typedef std::shared_ptr<const Interior> ConstInteriorPtr;
 
 /// @}
 ///
@@ -1023,8 +1024,8 @@ typedef shared_ptr<const Interior> ConstInteriorPtr;
 
 struct BasicPattern;
 
-typedef shared_ptr<BasicPattern> PatternPtr;
-typedef shared_ptr<const BasicPattern> ConstPatternPtr;
+typedef std::shared_ptr<BasicPattern> PatternPtr;
+typedef std::shared_ptr<const BasicPattern> ConstPatternPtr;
 
 
 struct Pattern_Struct
@@ -1430,7 +1431,7 @@ class FractalRules
         virtual bool Bound (const BasicRay&, const Fractal *, DBL *, DBL *) const = 0;
 };
 
-typedef shared_ptr<FractalRules> FractalRulesPtr;
+typedef std::shared_ptr<FractalRules> FractalRulesPtr;
 
 
 struct QualityFlags

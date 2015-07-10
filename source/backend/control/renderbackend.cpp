@@ -305,7 +305,7 @@ void RenderBackend::CreateScene(POVMS_Message& msg, POVMS_Message& result, int)
         if(err != kNoErr)
             throw POV_EXCEPTION_CODE (err);
 
-        shared_ptr<Scene> scene(new Scene(backendAddress, msg.GetSourceAddress(), scenecounter + 1));
+        std::shared_ptr<Scene> scene(new Scene(backendAddress, msg.GetSourceAddress(), scenecounter + 1));
 
         scenecounter++;
 
@@ -388,7 +388,7 @@ void RenderBackend::CreateView(POVMS_Message& msg, POVMS_Message& result, int)
         if(i == scenes.end())
             throw POV_EXCEPTION_CODE(kInvalidIdentifierErr);
 
-        shared_ptr<View> view(i->second->NewView(msg.TryGetInt(kPOVAttrib_Width, 160), msg.TryGetInt(kPOVAttrib_Height, 120), viewcounter + 1));
+        std::shared_ptr<View> view(i->second->NewView(msg.TryGetInt(kPOVAttrib_Width, 160), msg.TryGetInt(kPOVAttrib_Height, 120), viewcounter + 1));
 
         viewcounter++;
 

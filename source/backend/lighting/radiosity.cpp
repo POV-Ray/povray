@@ -291,7 +291,7 @@ RadiosityRecursionSettings* SceneRadiositySettings::GetRecursionSettings(bool fi
     return recSettings;
 }
 
-RadiosityFunction::RadiosityFunction(shared_ptr<SceneData> sd, TraceThreadData *td, const SceneRadiositySettings& rs,
+RadiosityFunction::RadiosityFunction(std::shared_ptr<SceneData> sd, TraceThreadData *td, const SceneRadiositySettings& rs,
                                      RadiosityCache& rc, Trace::CooperateFunctor& cf, bool ft, const Vector3d& camera) :
     threadData(td),
     trace(sd, td, GetRadiosityQualityFlags(rs, QualityFlags(9)), cf, media, *this), // TODO FIXME - we can only use hard-coded Level-9 quality because Radiosity happens to be disabled at lower settings!

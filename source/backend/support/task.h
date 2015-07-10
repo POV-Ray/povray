@@ -183,7 +183,7 @@ class Task
 class SceneTask : public Task
 {
     public:
-        SceneTask(TaskData *td, const boost::function1<void, Exception&>& f, const char* sn, shared_ptr<SceneData> sd, RenderBackend::ViewId vid = 0);
+        SceneTask(TaskData *td, const boost::function1<void, Exception&>& f, const char* sn, std::shared_ptr<SceneData> sd, RenderBackend::ViewId vid = 0);
 
     protected:
         MessageFactory messageFactory;

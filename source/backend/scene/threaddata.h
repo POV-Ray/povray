@@ -77,7 +77,7 @@ class TraceThreadData : public Task::TaskData
          *  Create thread local data.
          *  @param  sd              Scene data defining scene attributes.
          */
-        TraceThreadData(shared_ptr<SceneData> sd);
+        TraceThreadData(std::shared_ptr<SceneData> sd);
 
         /**
          *  Get the statistics.
@@ -162,11 +162,11 @@ class TraceThreadData : public Task::TaskData
         POV_LONG realTime;
         QualityFlags qualityFlags; // TODO FIXME - remove again
 
-        inline shared_ptr<const SceneData> GetSceneData() const { return sceneData; }
+        inline std::shared_ptr<const SceneData> GetSceneData() const { return sceneData; }
 
     protected:
         /// scene data
-        shared_ptr<SceneData> sceneData;
+        std::shared_ptr<SceneData> sceneData;
         /// render statistics
         RenderStatistics renderStats;
 

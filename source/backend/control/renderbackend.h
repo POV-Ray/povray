@@ -117,8 +117,8 @@ class RenderBackend : public POVMS_MessageReceiver
         ViewId viewcounter;
 
         typedef std::set<ViewId>                        ViewIdSet;
-        typedef std::map<SceneId, shared_ptr<Scene> >   SceneMap;
-        typedef std::map<ViewId,  shared_ptr<View> >    ViewMap;
+        typedef std::map<SceneId, std::shared_ptr<Scene> >   SceneMap;
+        typedef std::map<ViewId,  std::shared_ptr<View> >    ViewMap;
         typedef std::map<SceneId, ViewIdSet>            Scene2ViewsMap;
         typedef std::map<ViewId,  SceneId>              View2SceneMap;
 

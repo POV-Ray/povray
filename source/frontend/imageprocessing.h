@@ -59,12 +59,12 @@ class ImageProcessing
     public:
         ImageProcessing(unsigned int width, unsigned int height);
         ImageProcessing(POVMS_Object& ropts);
-        ImageProcessing(shared_ptr<Image>& img);
+        ImageProcessing(std::shared_ptr<Image>& img);
         virtual ~ImageProcessing();
 
         UCS2String WriteImage(POVMS_Object& ropts, POVMSInt frame = 0, int digits = 0);
 
-        shared_ptr<Image>& GetImage();
+        std::shared_ptr<Image>& GetImage();
 
         UCS2String GetOutputFilename(POVMS_Object& ropts, POVMSInt frame, int digits);
         bool OutputIsStdout(void) { return toStdout; }
@@ -73,7 +73,7 @@ class ImageProcessing
         virtual bool OutputIsStderr(POVMS_Object& ropts);
 
     protected:
-        shared_ptr<Image> image;
+        std::shared_ptr<Image> image;
         bool toStdout;
         bool toStderr;
 

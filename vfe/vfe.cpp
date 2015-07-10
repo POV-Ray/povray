@@ -584,7 +584,7 @@ void vfeProcessRenderOptions::WriteError(const char *format, ...)
 //
 ////////////////////////////////////////////////////////////////////////////////////////
 
-VirtualFrontEnd::VirtualFrontEnd(vfeSession& session, POVMSContext ctx, POVMSAddress addr, POVMS_Object& msg, POVMS_Object *result, shared_ptr<Console>& console) :
+VirtualFrontEnd::VirtualFrontEnd(vfeSession& session, POVMSContext ctx, POVMSAddress addr, POVMS_Object& msg, POVMS_Object *result, std::shared_ptr<Console>& console) :
   m_Session(&session), m_PlatformBase(session), renderFrontend (ctx)
 {
   backendAddress = addr ;
@@ -600,7 +600,7 @@ VirtualFrontEnd::~VirtualFrontEnd()
 {
   // file-backed images may require a reference to PlatformBase to delete temporary files
   // we need to explicitly delete it here since otherwise PlatformBase will have been destroyed
-  // before the shared_ptr does its cleanup
+  // before the std::shared_ptr does its cleanup
   imageProcessing.reset();
   if (backendAddress != POVMSInvalidAddress)
     renderFrontend.DisconnectFromBackend(backendAddress);
@@ -691,7 +691,7 @@ bool VirtualFrontEnd::Start(POVMS_Object& opts)
 
     if (m_Session->OutputToFileSet())
     {
-      imageProcessing = shared_ptr<ImageProcessing> (new ImageProcessing (opts));
+      imageProcessing = std::shared_ptr<ImageProcessing> (new ImageProcessing (opts));
       UCS2String filename = imageProcessing->GetOutputFilename (opts, 0, 0);
       options.SetUCS2String (kPOVAttrib_OutputFile, filename.c_str());
 
@@ -718,8 +718,8 @@ bool VirtualFrontEnd::Start(POVMS_Object& opts)
     opts.Set(kPOVAttrib_Declare, declares);
     imageProcessing.reset();
     if (m_Session->OutputToFileSet())
-      imageProcessing = shared_ptr<ImageProcessing> (new ImageProcessing (opts)) ;
-    animationProcessing = shared_ptr<AnimationProcessing> (new AnimationProcessing (opts)) ;
+      imageProcessing = std::shared_ptr<ImageProcessing> (new ImageProcessing (opts)) ;
+    animationProcessing = std::shared_ptr<AnimationProcessing> (new AnimationProcessing (opts)) ;
     options = animationProcessing->GetFrameRenderOptions () ;
   }
 
@@ -1031,7 +1031,7 @@ State VirtualFrontEnd::Process()
       }
 
       // now set up the scene in preparation for parsing, then start the parser
-      try { sceneId = renderFrontend.CreateScene(backendAddress, options, boost::bind(&vfe::VirtualFrontEnd::CreateConsole, this)); }
+      try { sceneId = renderFrontend.CreateScene(backendAddress, options, std::bind(&vfe::VirtualFrontEnd::CreateConsole, this)); }
       catch(pov_base::Exception& e)
       {
         m_Session->SetFailed();
@@ -1078,7 +1078,7 @@ State VirtualFrontEnd::Process()
             // case.
             return state;
           }
-          try { viewId = renderFrontend.CreateView(sceneId, options, imageProcessing, boost::bind(&vfe::VirtualFrontEnd::CreateDisplay, this, _1, _2, _3)); }
+		  try { viewId = renderFrontend.CreateView(sceneId, options, imageProcessing, std::bind(&vfe::VirtualFrontEnd::CreateDisplay, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)); }
           catch(pov_base::Exception& e)
           {
             m_Session->SetFailed();
@@ -1127,7 +1127,7 @@ State VirtualFrontEnd::Process()
           }
 
           // now we display the render window, if enabled
-          shared_ptr<Display> display(GetDisplay());
+          std::shared_ptr<Display> display(GetDisplay());
           if (display != NULL)
           {
             vfeDisplay *disp = dynamic_cast<vfeDisplay *>(display.get());

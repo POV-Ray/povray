@@ -54,7 +54,7 @@ class RenderTask : public SceneTask
         virtual void Run() = 0;
         virtual void Stopped() = 0;
 
-        shared_ptr<SceneData>& GetSceneData();
+        std::shared_ptr<SceneData>& GetSceneData();
         ViewData *GetViewData();
 
         inline ViewThreadData *GetViewDataPtr() { return reinterpret_cast<ViewThreadData *>(GetDataPtr()); }

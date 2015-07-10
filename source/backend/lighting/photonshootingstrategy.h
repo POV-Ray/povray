@@ -56,7 +56,7 @@ class PhotonShootingStrategy
 
         vector<PhotonShootingUnit*> units;
 
-        void createUnitsForCombo(ObjectPtr obj, LightSource* light, shared_ptr<SceneData> sceneData);
+        void createUnitsForCombo(ObjectPtr obj, LightSource* light, std::shared_ptr<SceneData> sceneData);
         void start();
         PhotonShootingUnit* getNextUnit();
 

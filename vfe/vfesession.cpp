@@ -78,7 +78,7 @@ vfeSession::vfeSession(int id)
   m_RequestFlag = rqNoRequest;
   m_RequestResult = 0;
   m_StartTime = 0;
-  m_DisplayCreator = boost::bind(&vfe::vfeSession::DefaultDisplayCreator, this, _1, _2, _3, _4, _5);
+  m_DisplayCreator = std::bind(&vfe::vfeSession::DefaultDisplayCreator, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5);
   Reset();
 }
 
@@ -542,10 +542,10 @@ const char *vfeSession::GetBackendStateName (void) const
 // Returns a copy of the shared pointer containing the current instance
 // of a pov_frontend::Display-derived render preview instance, which may
 // be NULL.
-shared_ptr<Display> vfeSession::GetDisplay() const
+std::shared_ptr<Display> vfeSession::GetDisplay() const
 {
   if (m_Frontend == NULL)
-    return (shared_ptr<Display>());
+    return (std::shared_ptr<Display>());
   return m_Frontend->GetDisplay();
 }
 
@@ -580,10 +580,10 @@ void vfeSession::WorkerThread()
     return;
   }
 
-  m_BackendThread = povray_init (boost::bind(&vfeSession::BackendThreadNotify, this), const_cast<void **>(&pov::RenderThreadAddr)) ;
+  m_BackendThread = povray_init (std::bind(&vfeSession::BackendThreadNotify, this), const_cast<void **>(&pov::RenderThreadAddr)) ;
   POVMS_Output_Context = pov::POVMS_GUI_Context ;
 
-  m_Console = shared_ptr<vfeConsole> (new vfeConsole(this, m_ConsoleWidth)) ;
+  m_Console = std::shared_ptr<vfeConsole> (new vfeConsole(this, m_ConsoleWidth)) ;
 
   POVMS_Object obj ;
   m_Frontend = new VirtualFrontEnd (*this, POVMS_Output_Context, (POVMSAddress) pov::RenderThreadAddr, obj, NULL, m_Console) ;

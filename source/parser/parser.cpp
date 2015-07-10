@@ -133,7 +133,7 @@ const DBL INFINITE_VOLUME = BOUND_HUGE;
 ******************************************************************************/
 
 Parser::Parser(shared_ptr<SceneData> sd, bool useclk, DBL clk) :
-    SceneTask(new TraceThreadData(sd), boost::bind(&Parser::SendFatalError, this, _1), "Parse", sd),
+SceneTask(new TraceThreadData(sd), std::bind(&Parser::SendFatalError, this, std::placeholders::_1), "Parse", sd),
     sceneData(sd),
     clockValue(clk),
     useClock(useclk),
@@ -1383,10 +1383,17 @@ void Parser::Parse_Camera (Camera& Cam)
         old_angle       = New.Angle;
         New.Angle       = HUGE_VAL;
 
-        EXPECT
+		New.Zero_Parallax = 2.5;
+		New.Eye_Offset    = 0.5/30.0;
+		
+		EXPECT
             CASE (PERSPECTIVE_TOKEN)
                 New.Type = PERSPECTIVE_CAMERA;
             END_CASE
+
+			CASE(STEREOSCOPIC_TOKEN)
+				New.Type = STEREOSCOPIC_CAMERA;
+			END_CASE
 
             CASE (ORTHOGRAPHIC_TOKEN)
                 New.Type = ORTHOGRAPHIC_CAMERA;
@@ -1438,6 +1445,26 @@ void Parser::Parse_Camera (Camera& Cam)
         switch(New.Type)
         {
             case PERSPECTIVE_CAMERA:
+                EXPECT
+                    CASE (ANGLE_TOKEN)
+                        New.Angle = Parse_Float();
+                        if (New.Angle < 0.0)
+                            Error("Negative viewing angle.");
+                    END_CASE
+
+                    CASE5(ORTHOGRAPHIC_TOKEN, FISHEYE_TOKEN, ULTRA_WIDE_ANGLE_TOKEN, OMNIMAX_TOKEN, PANORAMIC_TOKEN)
+                    CASE2(SPHERICAL_TOKEN, CYLINDER_TOKEN)
+                        Expectation_Error("perspective camera modifier");
+                    END_CASE
+
+                    OTHERWISE
+                        UNGET
+                        if(Parse_Camera_Mods(New) == false)
+                            EXIT
+                    END_CASE
+                END_EXPECT
+                break;
+			case STEREOSCOPIC_CAMERA:
                 EXPECT
                     CASE (ANGLE_TOKEN)
                         New.Angle = Parse_Float();
@@ -1639,7 +1666,7 @@ void Parser::Parse_Camera (Camera& Cam)
         // apply "angle"
         if (New.Angle != HUGE_VAL)
         {
-            if ((New.Type == PERSPECTIVE_CAMERA) || (New.Type == ORTHOGRAPHIC_CAMERA))
+			if ((New.Type == PERSPECTIVE_CAMERA) || (New.Type == ORTHOGRAPHIC_CAMERA) || (New.Type == STEREOSCOPIC_CAMERA))
             {
                 if (New.Angle >= 180.0)
                     Error("Viewing angle has to be smaller than 180 degrees.");
@@ -1749,6 +1776,10 @@ void Parser::Parse_Camera (Camera& Cam)
                 New.Type = PERSPECTIVE_CAMERA;
             END_CASE
 
+            CASE (STEREOSCOPIC_TOKEN)
+                New.Type = STEREOSCOPIC_CAMERA;
+            END_CASE
+
             CASE (ORTHOGRAPHIC_TOKEN)
                 New.Type = ORTHOGRAPHIC_CAMERA;
                 // resize right and up vector to get the same image
@@ -1800,7 +1831,7 @@ void Parser::Parse_Camera (Camera& Cam)
                 if (New.Angle < 0.0)
                     Error("Negative viewing angle.");
 
-                if (New.Type == PERSPECTIVE_CAMERA)
+				if (New.Type == PERSPECTIVE_CAMERA || New.Type == STEREOSCOPIC_CAMERA)
                 {
                     if (New.Angle >= 180.0)
                         Error("Viewing angle has to be smaller than 180 degrees.");
@@ -2076,6 +2107,14 @@ bool Parser::Parse_Camera_Mods(Camera& New)
         CASE (FOCAL_POINT_TOKEN)
             Parse_Vector(New.Focal_Point);
         END_CASE
+
+		CASE(EYEOFFSET_TOKEN)
+			New.Eye_Offset = Parse_Float();
+		END_CASE
+
+		CASE(ZEROPARALLAX_TOKEN)
+			New.Zero_Parallax = Parse_Float();
+		END_CASE
 
         CASE (BOKEH_TOKEN)
             Parse_Begin();

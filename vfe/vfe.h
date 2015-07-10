@@ -217,7 +217,7 @@ namespace vfe
   class VirtualFrontEnd
   {
     public:
-      VirtualFrontEnd(vfeSession& session, POVMSContext ctx, POVMSAddress addr, POVMS_Object& msg, POVMS_Object *result, shared_ptr<Console>& console) ;
+      VirtualFrontEnd(vfeSession& session, POVMSContext ctx, POVMSAddress addr, POVMS_Object& msg, POVMS_Object *result, std::shared_ptr<Console>& console) ;
       virtual ~VirtualFrontEnd() ;
 
       virtual bool Start(POVMS_Object& opts) ;
@@ -230,7 +230,7 @@ namespace vfe
       virtual bool IsPausable() ;
       virtual bool Paused() ;
       virtual bool PausePending() { return m_PauseRequested; }
-      virtual shared_ptr<Display> GetDisplay() { return renderFrontend.GetDisplay(viewId); }
+      virtual std::shared_ptr<Display> GetDisplay() { return renderFrontend.GetDisplay(viewId); }
 
       // TODO: take care of any pending messages (e.g. a thread waiting on a blocking send)
       virtual void InvalidateBackend() { backendAddress = POVMSInvalidAddress; }
@@ -248,9 +248,9 @@ namespace vfe
       POVMS_Object options;
       RenderFrontendBase::SceneId sceneId;
       RenderFrontendBase::ViewId viewId;
-      shared_ptr<AnimationProcessing> animationProcessing ;
-      shared_ptr<ImageProcessing> imageProcessing ;
-      shared_ptr<ShelloutProcessing> shelloutProcessing;
+      std::shared_ptr<AnimationProcessing> animationProcessing ;
+      std::shared_ptr<ImageProcessing> imageProcessing ;
+      std::shared_ptr<ShelloutProcessing> shelloutProcessing;
       Console **consoleResult;
       Display **displayResult;
       vfeSession* m_Session;

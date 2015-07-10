@@ -61,6 +61,6 @@
 #include <boost/scoped_ptr.hpp>
 #include <boost/thread.hpp>
 #include <boost/thread/condition.hpp>
-#include <boost/tr1/memory.hpp>
+#include <memory>
 #include <boost/unordered_map.hpp>
 
