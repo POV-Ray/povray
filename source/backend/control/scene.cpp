@@ -83,9 +83,9 @@ void Scene::StartParser(POVMS_Object& parseOptions)
     // A scene can only be parsed once
     if(parserControlThread == NULL)
 #ifndef USE_OFFICIAL_BOOST
-        parserControlThread = new boost::thread(boost::bind(&Scene::ParserControlThread, this), 1024 * 64);
+        parserControlThread = new boost::thread(std::bind(&Scene::ParserControlThread, this), 1024 * 64);
 #else
-        parserControlThread = new boost::thread(boost::bind(&Scene::ParserControlThread, this));
+        parserControlThread = new boost::thread(std::bind(&Scene::ParserControlThread, this));
 #endif
     else
         return;
@@ -174,10 +174,10 @@ void Scene::StartParser(POVMS_Object& parseOptions)
     parserTasks.AppendSync();
 
     // send statistics
-    parserTasks.AppendFunction(boost::bind(&Scene::SendStatistics, this, _1));
+	parserTasks.AppendFunction(std::bind(&Scene::SendStatistics, this, std::placeholders::_1));
 
     // send done message and compatibility data
-    parserTasks.AppendFunction(boost::bind(&Scene::SendDoneMessage, this, _1));
+	parserTasks.AppendFunction(std::bind(&Scene::SendDoneMessage, this, std::placeholders::_1));
 }
 
 void Scene::StopParser()

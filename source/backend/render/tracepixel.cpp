@@ -227,6 +227,9 @@ void TracePixel::SetupCamera(const Camera& cam)
     cameraLengthRight = cameraRight.length();
     cameraLengthUp = cameraUp.length();
 
+	Zero_Parallax = camera.Zero_Parallax;
+	Eye_Offset = camera.Eye_Offset;
+
     switch(camera.Type)
     {
         case CYL_1_CAMERA:
@@ -312,6 +315,9 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
     Vector3d V1;
     TRANSFORM Trans;
 
+	DBL half;
+	Vector3d tempv;
+
     // Move to center of pixel
     x += 0.5;
     y -= 0.5;
@@ -344,6 +350,53 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
             else
                 InitRayContainerState(ray);
             break;
+
+		// 3D SBS, Stereoscopic perspective camera
+		case STEREOSCOPIC_CAMERA: 
+
+			half = width / 2.0;
+			if (x < half)
+			{
+				// Normalised projection plane coordinates from -0.5 to 0.5.
+				x0 = x / half - 0.5;
+				y0 = ((height - 1) - y) / height - 0.5;
+
+				// Offset ray length
+				x0 -= Eye_Offset / (2 * Zero_Parallax * tan(camera.Angle * M_PI_360));
+
+				// Create primary ray
+				ray.Direction = cameraDirection + x0 * cameraRight + y0 * cameraUp;
+
+				// Offset the camera
+				ray.Origin = cameraLocation - Eye_Offset * cameraRight.normalized();
+			}
+			else
+			{
+				// Normalised projection plane coordinates from -0.5 to 0.5.
+				x0 = (x - half) / half - 0.5;
+				y0 = ((height - 1) - y) / height - 0.5;
+
+				// Offset ray length
+				x0 += Eye_Offset / (2 * Zero_Parallax * tan(camera.Angle * M_PI_360));
+
+				// Create primary ray
+				ray.Direction = cameraDirection + x0 * cameraRight + y0 * cameraUp;
+
+				// Offset the camera
+				ray.Origin = cameraLocation + Eye_Offset * cameraRight.normalized();
+			}
+
+			// Do focal blurring
+			if (useFocalBlur)
+			{
+				JitterCameraRay(ray, x, y, ray_number);
+				InitRayContainerState(ray, true);
+			}
+			else
+			{
+				InitRayContainerState(ray); // ,true?
+			}
+			break;
 
         // Orthographic projection.
         case ORTHOGRAPHIC_CAMERA:

@@ -300,14 +300,14 @@ class PhotonGatherer
 class PhotonMediaFunction : public MediaFunction
 {
     public:
-        PhotonMediaFunction(shared_ptr<SceneData> sd, TraceThreadData *td, Trace *t, PhotonGatherer *pg);
+        PhotonMediaFunction(std::shared_ptr<SceneData> sd, TraceThreadData *td, Trace *t, PhotonGatherer *pg);
 
         void ComputeMediaAndDepositPhotons(MediaVector& medias, const Ray& ray, const Intersection& isect, MathColour& colour);
     protected:
         void DepositMediaPhotons(MathColour& colour, MediaVector& medias, LightSourceEntryVector& lights, MediaIntervalVector& mediaintervals,
                                  const Ray& ray, int minsamples, bool ignore_photons, bool use_scattering, bool all_constant_and_light_ray);
     private:
-        shared_ptr<SceneData> sceneData;
+        std::shared_ptr<SceneData> sceneData;
 
         void addMediaPhoton(const Vector3d& Point, const Vector3d& Origin, const MathColour& LightCol, DBL depthDiff);
 };
@@ -315,7 +315,7 @@ class PhotonMediaFunction : public MediaFunction
 class PhotonTrace : public Trace
 {
     public:
-        PhotonTrace(shared_ptr<SceneData> sd, TraceThreadData *td, unsigned int mtl, DBL adcb, const QualityFlags& qf, Trace::CooperateFunctor& cf);
+        PhotonTrace(std::shared_ptr<SceneData> sd, TraceThreadData *td, unsigned int mtl, DBL adcb, const QualityFlags& qf, Trace::CooperateFunctor& cf);
         ~PhotonTrace();
 
         virtual DBL TraceRay(Ray& ray, MathColour& colour, ColourChannel&, COLC weight, bool continuedRay, DBL maxDepth = 0.0);
@@ -368,7 +368,7 @@ class LightTargetCombo
         ShootingDirection shootingDirection;
 
         int computeMergedFlags();
-        void computeAnglesAndDeltas(shared_ptr<SceneData> sceneData);
+        void computeAnglesAndDeltas(std::shared_ptr<SceneData> sceneData);
 };
 
 

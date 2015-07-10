@@ -107,7 +107,7 @@ const int PHOTON_BLOCK_MASK = (PHOTON_BLOCK_SIZE-1);
 const int INITIAL_BASE_ARRAY_SIZE = 100;
 
 
-PhotonTrace::PhotonTrace(shared_ptr<SceneData> sd, TraceThreadData *td, unsigned int mtl, DBL adcb, const QualityFlags& qf, Trace::CooperateFunctor& cf) :
+PhotonTrace::PhotonTrace(std::shared_ptr<SceneData> sd, TraceThreadData *td, unsigned int mtl, DBL adcb, const QualityFlags& qf, Trace::CooperateFunctor& cf) :
     Trace(sd, td, qf, cf, mediaPhotons, noRadiosity),
     mediaPhotons(sd, td, this, new PhotonGatherer(&sd->mediaPhotonMap, sd->photonSettings))
 {
@@ -932,7 +932,7 @@ void PhotonTrace::addSurfacePhoton(const Vector3d& Point, const Vector3d& Origin
 
 }
 
-PhotonMediaFunction::PhotonMediaFunction(shared_ptr<SceneData> sd, TraceThreadData *td, Trace *t, PhotonGatherer *pg) :
+PhotonMediaFunction::PhotonMediaFunction(std::shared_ptr<SceneData> sd, TraceThreadData *td, Trace *t, PhotonGatherer *pg) :
     MediaFunction(td, t, pg),
     sceneData(sd)
 {
@@ -2707,7 +2707,7 @@ int LightTargetCombo::computeMergedFlags()
 }
 
 
-void LightTargetCombo::computeAnglesAndDeltas(shared_ptr<SceneData> sceneData)
+void LightTargetCombo::computeAnglesAndDeltas(std::shared_ptr<SceneData> sceneData)
 {
     shootingDirection.compute();
 

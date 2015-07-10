@@ -56,15 +56,15 @@ namespace pov
 *   Translate_Camera
 *
 * INPUT
-*
+*   
 * OUTPUT
-*
+*   
 * RETURNS
-*
+*   
 * AUTHOR
 *
 *   POV-Ray Team
-*
+*   
 * DESCRIPTION
 *
 *   -
@@ -77,7 +77,7 @@ namespace pov
 
 void Camera::Translate(const Vector3d& Vector)
 {
-    Location += Vector;
+	Location += Vector;
 }
 
 
@@ -89,15 +89,15 @@ void Camera::Translate(const Vector3d& Vector)
 *   Rotate_Camera
 *
 * INPUT
-*
+*   
 * OUTPUT
-*
+*   
 * RETURNS
-*
+*   
 * AUTHOR
 *
 *   POV-Ray Team
-*
+*   
 * DESCRIPTION
 *
 *   -
@@ -110,10 +110,10 @@ void Camera::Translate(const Vector3d& Vector)
 
 void Camera::Rotate(const Vector3d& Vector)
 {
-    TRANSFORM Trans;
+	TRANSFORM Trans;
 
-    Compute_Rotation_Transform(&Trans, Vector);
-    Transform(&Trans);
+	Compute_Rotation_Transform(&Trans, Vector);
+	Transform(&Trans);
 }
 
 
@@ -125,15 +125,15 @@ void Camera::Rotate(const Vector3d& Vector)
 *   Scale_Camera
 *
 * INPUT
-*
+*   
 * OUTPUT
-*
+*   
 * RETURNS
-*
+*   
 * AUTHOR
 *
 *   POV-Ray Team
-*
+*   
 * DESCRIPTION
 *
 *   -
@@ -146,10 +146,10 @@ void Camera::Rotate(const Vector3d& Vector)
 
 void Camera::Scale(const Vector3d& Vector)
 {
-    TRANSFORM Trans;
+	TRANSFORM Trans;
 
-    Compute_Scaling_Transform(&Trans, Vector);
-    Transform(&Trans);
+	Compute_Scaling_Transform(&Trans, Vector);
+	Transform(&Trans);
 }
 
 
@@ -161,15 +161,15 @@ void Camera::Scale(const Vector3d& Vector)
 *   Transform_Camera
 *
 * INPUT
-*
+*   
 * OUTPUT
-*
+*   
 * RETURNS
-*
+*   
 * AUTHOR
 *
 *   POV-Ray Team
-*
+*   
 * DESCRIPTION
 *
 *   -
@@ -182,10 +182,10 @@ void Camera::Scale(const Vector3d& Vector)
 
 void Camera::Transform(const TRANSFORM *Trans)
 {
-    MTransPoint(Location, Location, Trans);
-    MTransDirection(Direction, Direction, Trans);
-    MTransDirection(Up, Up, Trans);
-    MTransDirection(Right, Right, Trans);
+	MTransPoint(Location, Location, Trans);
+	MTransDirection(Direction, Direction, Trans);
+	MTransDirection(Up, Up, Trans);
+	MTransDirection(Right, Right, Trans);
 }
 
 
@@ -197,15 +197,15 @@ void Camera::Transform(const TRANSFORM *Trans)
 *   Camera::Init
 *
 * INPUT
-*
+*   
 * OUTPUT
-*
+*   
 * RETURNS
-*
+*   
 * AUTHOR
 *
 *   POV-Ray Team
-*
+*   
 * DESCRIPTION
 *
 *   -
@@ -233,6 +233,9 @@ void Camera::Init()
     Variance            = 1.0 / 10000.0;
     Aperture            = 0.0;
     Focal_Distance      = -1.0;
+
+	Zero_Parallax		= 2.5;
+	Eye_Offset			= 0.5/30.0;
 
     /* Set default camera type and viewing angle. [DB 7/94] */
     Type = PERSPECTIVE_CAMERA;
@@ -262,15 +265,15 @@ void Camera::Init()
 *   Create_Camera
 *
 * INPUT
-*
+*   
 * OUTPUT
-*
+*   
 * RETURNS
-*
+*   
 * AUTHOR
 *
 *   POV-Ray Team
-*
+*   
 * DESCRIPTION
 *
 *   -
@@ -283,7 +286,7 @@ void Camera::Init()
 
 Camera::Camera()
 {
-    Init();
+	Init();
 }
 
 
@@ -316,13 +319,16 @@ Camera::Camera()
 
 Camera& Camera::operator=(const Camera& src)
 {
-    Location    = src.Location;
+	Location    = src.Location;
     Direction   = src.Direction;
     Up          = src.Up;
     Right       = src.Right;
     Sky         = src.Sky;
     Look_At     = src.Look_At;
     Focal_Point = src.Focal_Point;
+
+	Zero_Parallax = src.Zero_Parallax;
+	Eye_Offset = src.Eye_Offset;
 
     Focal_Distance = src.Focal_Distance;
     Aperture = src.Aperture;
@@ -367,10 +373,10 @@ Camera& Camera::operator=(const Camera& src)
 
 Camera::Camera(const Camera& src)
 {
-    Tnormal = NULL;
-    Trans = NULL;
-    Bokeh = NULL;
-    operator=(src);
+	Tnormal = NULL;
+	Trans = NULL;
+	Bokeh = NULL;
+	operator=(src);
 }
 
 /*****************************************************************************
@@ -401,12 +407,12 @@ Camera::Camera(const Camera& src)
 
 Camera::~Camera()
 {
-    Destroy_Tnormal(Tnormal);
-    Destroy_Transform(Trans);
-    Destroy_Pigment(Bokeh);
-    for (std::vector<ObjectPtr>::iterator it = Meshes.begin(); it != Meshes.end(); it++)
-        Destroy_Object(*it);
-    Meshes.clear();
+	Destroy_Tnormal(Tnormal);
+	Destroy_Transform(Trans);
+	Destroy_Pigment(Bokeh);
+	for (std::vector<ObjectPtr>::iterator it = Meshes.begin(); it != Meshes.end(); it++)
+		Destroy_Object(*it);
+	Meshes.clear();
 }
 
 }

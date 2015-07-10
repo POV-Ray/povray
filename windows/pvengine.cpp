@@ -125,7 +125,7 @@ char *WriteDump(struct _EXCEPTION_POINTERS *pExceptionInfo, bool full, long time
 
 namespace pov_frontend
 {
-  extern shared_ptr<Display> gDisplay;
+  extern std::shared_ptr<Display> gDisplay;
 }
 
 namespace vfePlatform

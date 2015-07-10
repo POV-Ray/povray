@@ -60,19 +60,19 @@ class TaskQueue
                 };
 
                 TaskEntry(EntryType et) : entryType(et) { }
-                TaskEntry(shared_ptr<Task> rt) : entryType(kTask), task(rt) { }
+                TaskEntry(std::shared_ptr<Task> rt) : entryType(kTask), task(rt) { }
                 TaskEntry(POVMS_Message& m) : entryType(kMessage), msg(m) { }
                 TaskEntry(const boost::function1<void, TaskQueue&>& f) : entryType(kFunction), fn(f) { }
                 ~TaskEntry() { }
 
-                shared_ptr<Task> GetTask() { return task; }
+                std::shared_ptr<Task> GetTask() { return task; }
                 POVMS_Message& GetMessage() { return msg; }
                 boost::function1<void, TaskQueue&>& GetFunction() { return fn; }
 
                 EntryType GetEntryType() { return entryType; }
             private:
                 EntryType entryType;
-                shared_ptr<Task> task;
+                std::shared_ptr<Task> task;
                 POVMS_Message msg;
                 boost::function1<void, TaskQueue&> fn;
         };

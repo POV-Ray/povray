@@ -118,9 +118,9 @@ class SequentialNumberGenerator
         /// Returns the next number from the sequence.
         virtual Type operator()() = 0;
         /// Returns the next N numbers from the sequence.
-        virtual shared_ptr<vector<Type> > GetSequence(size_t count)
+        virtual std::shared_ptr<vector<Type> > GetSequence(size_t count)
         {
-            shared_ptr<vector<Type> > data(new vector<Type>);
+            std::shared_ptr<vector<Type> > data(new vector<Type>);
             data->reserve(count);
             for (size_t i = 0; i < count; i ++)
                 data->push_back((*this)());
@@ -147,9 +147,9 @@ class IndexedNumberGenerator
         /// Returns a particular number from the sequence.
         virtual Type operator[](size_t index) const = 0;
         /// Returns a particular subsequence from the sequence.
-        virtual shared_ptr<vector<Type> > GetSequence(size_t index, size_t count) const
+        virtual std::shared_ptr<vector<Type> > GetSequence(size_t index, size_t count) const
         {
-            shared_ptr<vector<Type> > data(new vector<Type>);
+            std::shared_ptr<vector<Type> > data(new vector<Type>);
             data->reserve(count);
             for (size_t i = 0; i < count; i ++)
                 data->push_back((*this)[index + i]);
@@ -172,20 +172,20 @@ class IndexedNumberGenerator
  *  @{
  */
 
-typedef shared_ptr<SequentialNumberGenerator<int> >         SequentialIntGeneratorPtr;
-typedef shared_ptr<SequentialNumberGenerator<double> >      SequentialDoubleGeneratorPtr;
-typedef shared_ptr<SequentialNumberGenerator<Vector3d> >    SequentialVectorGeneratorPtr;
-typedef shared_ptr<SequentialNumberGenerator<Vector2d> >    SequentialVector2dGeneratorPtr;
+typedef std::shared_ptr<SequentialNumberGenerator<int> >         SequentialIntGeneratorPtr;
+typedef std::shared_ptr<SequentialNumberGenerator<double> >      SequentialDoubleGeneratorPtr;
+typedef std::shared_ptr<SequentialNumberGenerator<Vector3d> >    SequentialVectorGeneratorPtr;
+typedef std::shared_ptr<SequentialNumberGenerator<Vector2d> >    SequentialVector2dGeneratorPtr;
 
-typedef shared_ptr<SeedableNumberGenerator<int> >           SeedableIntGeneratorPtr;
-typedef shared_ptr<SeedableNumberGenerator<double> >        SeedableDoubleGeneratorPtr;
-typedef shared_ptr<SeedableNumberGenerator<Vector3d> >      SeedableVectorGeneratorPtr;
-typedef shared_ptr<SeedableNumberGenerator<Vector2d> >      SeedableVector2dGeneratorPtr;
+typedef std::shared_ptr<SeedableNumberGenerator<int> >           SeedableIntGeneratorPtr;
+typedef std::shared_ptr<SeedableNumberGenerator<double> >        SeedableDoubleGeneratorPtr;
+typedef std::shared_ptr<SeedableNumberGenerator<Vector3d> >      SeedableVectorGeneratorPtr;
+typedef std::shared_ptr<SeedableNumberGenerator<Vector2d> >      SeedableVector2dGeneratorPtr;
 
-typedef shared_ptr<IndexedNumberGenerator<int> const>       IndexedIntGeneratorPtr;
-typedef shared_ptr<IndexedNumberGenerator<double> const>    IndexedDoubleGeneratorPtr;
-typedef shared_ptr<IndexedNumberGenerator<Vector3d> const>  IndexedVectorGeneratorPtr;
-typedef shared_ptr<IndexedNumberGenerator<Vector2d> const>  IndexedVector2dGeneratorPtr;
+typedef std::shared_ptr<IndexedNumberGenerator<int> const>       IndexedIntGeneratorPtr;
+typedef std::shared_ptr<IndexedNumberGenerator<double> const>    IndexedDoubleGeneratorPtr;
+typedef std::shared_ptr<IndexedNumberGenerator<Vector3d> const>  IndexedVectorGeneratorPtr;
+typedef std::shared_ptr<IndexedNumberGenerator<Vector2d> const>  IndexedVector2dGeneratorPtr;
 
 /**
  *  @}

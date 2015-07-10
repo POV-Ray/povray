@@ -65,7 +65,7 @@
 #include <string>
 #include <vector>
 
-#include <boost/tr1/memory.hpp>
+#include <memory>
 
 #include <io.h>
 #include <fcntl.h>
@@ -90,8 +90,8 @@ using std::list;
 using std::runtime_error;
 
 // these may actually be the boost implementations, depending on what boost/tr1/memory.hpp has pulled in
-using std::tr1::shared_ptr;
-using std::tr1::weak_ptr;
+using std::shared_ptr;
+using std::weak_ptr;
 
 #endif // STD_POV_TYPES_DECLARED
 

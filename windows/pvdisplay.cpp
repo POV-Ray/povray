@@ -101,7 +101,7 @@ namespace pov_frontend
 
 using namespace povwin;
 
-shared_ptr<Display> gDisplay;
+std::shared_ptr<Display> gDisplay;
 
 BitmapInfo WinLegacyDisplay::m_BitmapTemplate;
 
@@ -161,6 +161,14 @@ bool WinLegacyDisplay::TakeOver(WinDisplay *display)
   return (true) ;
 }
 
+// Enumerates monitors. If we have more, we assume the second monitor is a 'second screen' that we want to render on.
+static BOOL CALLBACK MonitorEnum(HMONITOR hMon, HDC hdc, LPRECT lprcMonitor, LPARAM pData)
+{
+	WinLegacyDisplay* pThis = reinterpret_cast<WinLegacyDisplay*>(pData);
+	pThis->monitors.push_back(*lprcMonitor);
+	return TRUE;
+}
+
 bool WinLegacyDisplay::CreateRenderWindow (void)
 {
   int                   width ;
@@ -178,25 +186,50 @@ bool WinLegacyDisplay::CreateRenderWindow (void)
   rect.top = 0 ;
   rect.right = GetWidth() ;
   rect.bottom = GetHeight() ;
-  flags = WS_OVERLAPPEDWINDOW ;
-  AdjustWindowRectEx (&rect, flags, false, 0) ;
 
-  // left and top will probably be negative
-  width = m_MaxWidth = rect.right - rect.left ;
-  height = m_MaxHeight = rect.bottom - rect.top ;
+  // Check monitors:
+  monitors.clear();
+  EnumDisplayMonitors(0, 0, MonitorEnum, (LPARAM)this);
 
-  if (width > screen_width - 64)
-    width = screen_width - 64 ;
-  if (height > screen_height - 48)
-    height = screen_height - 48 ;
-  if (renderwin_left < screen_origin_x)
-    renderwin_left = screen_origin_x ;
-  if (renderwin_top < screen_origin_y)
-    renderwin_top = screen_origin_y ;
-  if (renderwin_left + width > virtual_screen_width + screen_origin_x)
-    renderwin_left = virtual_screen_width - width + screen_origin_x ;
-  if (renderwin_top + height > virtual_screen_height + screen_origin_y)
-    renderwin_top = virtual_screen_height - height + screen_origin_y ;
+  if (monitors.size() > 1)
+  {
+	  flags = WS_POPUP | WS_VISIBLE | WS_SYSMENU;
+	  
+		rect.top = monitors[1].top;
+		rect.left = monitors[1].left;
+		rect.bottom = monitors[1].bottom;
+		rect.right = monitors[1].right;
+
+		width = m_MaxWidth = rect.right - rect.left;
+		height = m_MaxHeight = rect.bottom - rect.top;
+
+		renderwin_top = rect.top;
+		renderwin_left = rect.left;
+  }
+  else
+  {
+	  flags = WS_OVERLAPPEDWINDOW;
+	  AdjustWindowRectEx(&rect, flags, false, 0);
+
+	  // left and top will probably be negative
+	  width = m_MaxWidth = rect.right - rect.left;
+	  height = m_MaxHeight = rect.bottom - rect.top;
+
+	  if (width > screen_width - 64)
+		  width = screen_width - 64;
+	  if (height > screen_height - 48)
+		  height = screen_height - 48;
+	  if (renderwin_left < screen_origin_x)
+		  renderwin_left = screen_origin_x;
+	  if (renderwin_top < screen_origin_y)
+		  renderwin_top = screen_origin_y;
+	  if (renderwin_left + width > virtual_screen_width + screen_origin_x)
+		  renderwin_left = virtual_screen_width - width + screen_origin_x;
+	  if (renderwin_top + height > virtual_screen_height + screen_origin_y)
+		  renderwin_top = virtual_screen_height - height + screen_origin_y;
+  }
+  // ---
+
 
   if (m_BitmapSurface != NULL)
   {
@@ -275,7 +308,7 @@ bool WinLegacyDisplay::CreateRenderWindow (void)
       SetWindowPos (m_Handle, main_window, 0, 0, 0, 0, flags) ;
     }
     else
-      renderwin_flags = WS_MINIMIZE ;
+		renderwin_flags = WS_OVERLAPPEDWINDOW | WS_MINIMIZE;
   }
 
   SetClassLongPtr (m_Handle, GCLP_HCURSOR, (LONG_PTR) LoadCursor (NULL, m_Rendering ? IDC_ARROW : IDC_CROSS)) ;
@@ -602,7 +635,7 @@ void WinLegacyDisplay::Clear()
     {
       for (int x = 0 ; x < m_Bitmap.header.biWidth ; x++)
       {
-        int colour = (x & 8) == (y & 8) ? 0xff : 0xc0 ;
+		int colour = 0xc0; // HACK. If you want a headache, try this in 3D SBS mode. Annoying blocks wth stereo: (x & 8) == (y & 8) ? 0xff : 0xc0;
         unsigned char *p = m_BitmapSurface + (m_Bitmap.header.biHeight - 1 - y) * m_BytesPerLine + x ;
         unsigned char dither = dither8x8 [((x & 7) << 3) | (y & 7)] ;
         *p = 20 + div51 [colour] + (mod51 [colour] > dither) +
@@ -620,11 +653,14 @@ void WinLegacyDisplay::Clear()
       {
         if (x + 8 <= m_Bitmap.header.biWidth)
         {
-          memset (p, (x & 8) == (y & 8) ? 0xff : 0xc0, 24) ;
+		  // HACK. If you want a headache, try this in 3D SBS mode. Annoying blocks wth stereo: (x & 8) == (y & 8) ? 0xff : 0xc0;
+          //memset (p, (x & 8) == (y & 8) ? 0xff : 0xc0, 24) ;
+		  memset(p, 0xc0, 24);
           p += 24 ;
         }
         else
-          memset (p, (x & 8) == (y & 8) ? 0xff : 0xc0, (m_Bitmap.header.biWidth - x) * 3) ;
+          // HACK: memset (p, (x & 8) == (y & 8) ? 0xff : 0xc0, (m_Bitmap.header.biWidth - x) * 3) ;
+		  memset(p, 0xc0, (m_Bitmap.header.biWidth - x) * 3);
       }
     }
   }
@@ -949,7 +985,7 @@ LRESULT WinLegacyDisplay::WindowProc (UINT message, WPARAM wParam, LPARAM lParam
          switch (wParam)
          {
            case SIZE_MINIMIZED :
-                renderwin_flags = WS_MINIMIZE ;
+			   renderwin_flags = WS_OVERLAPPEDWINDOW | WS_MINIMIZE;
                 return (0) ;
 
            case SIZE_MAXIMIZED :

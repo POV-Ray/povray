@@ -219,7 +219,7 @@ class ViewData
          *  Get the scene data for this view.
          *  @return                 Scene data.
          */
-        inline shared_ptr<SceneData>& GetSceneData() { return sceneData; }
+        inline std::shared_ptr<SceneData>& GetSceneData() { return sceneData; }
 
         /**
          *  Get the view id for this view.
@@ -318,7 +318,7 @@ class ViewData
         /// generated radiosity data
         RadiosityCache radiosityCache;
         /// scene data
-        shared_ptr<SceneData> sceneData;
+        std::shared_ptr<SceneData> sceneData;
         /// view id
         RenderBackend::ViewId viewId;
 
@@ -342,7 +342,7 @@ class ViewData
          *  Create view data.
          *  @param  sd              Scene data associated with the view data.
          */
-        ViewData(shared_ptr<SceneData> sd);
+        ViewData(std::shared_ptr<SceneData> sd);
 
         /**
          *  Destructor.
@@ -457,7 +457,7 @@ class View
          *  @param  vid             Id of this view to include with
          *                          POVMS messages sent to the frontend.
          */
-        explicit View(shared_ptr<SceneData> sd, unsigned int width, unsigned int height, RenderBackend::ViewId vid);
+        explicit View(std::shared_ptr<SceneData> sd, unsigned int width, unsigned int height, RenderBackend::ViewId vid);
 
         /// not available
         View& operator=(const View&);
@@ -481,7 +481,7 @@ class View
          *  @param  bsl             Block serial numbers to skip.
          *  @param  fs              First block to start with checking with serial number.
          */
-        void SetNextRectangle(TaskQueue& taskq, shared_ptr<ViewData::BlockIdSet> bsl, unsigned int fs);
+        void SetNextRectangle(TaskQueue& taskq, std::shared_ptr<ViewData::BlockIdSet> bsl, unsigned int fs);
 
         /**
          *  Thread controlling the render task queue.

@@ -64,7 +64,7 @@ enum
 
 ImageProcessing::ImageProcessing(unsigned int width, unsigned int height)
 {
-    image = shared_ptr<Image>(Image::Create(width, height, Image::RGBFT_Float));
+    image = std::shared_ptr<Image>(Image::Create(width, height, Image::RGBFT_Float));
     toStderr = toStdout = false;
 
     // TODO FIXME - find a better place for this
@@ -78,7 +78,7 @@ ImageProcessing::ImageProcessing(POVMS_Object& ropts)
     unsigned int blockSize(ropts.TryGetInt(kPOVAttrib_RenderBlockSize, 32));
     unsigned int maxBufferMem(ropts.TryGetInt(kPOVAttrib_MaxImageBufferMem, 128)); // number is megabytes
 
-    image = shared_ptr<Image>(Image::Create(width, height, Image::RGBFT_Float, maxBufferMem, blockSize * blockSize));
+    image = std::shared_ptr<Image>(Image::Create(width, height, Image::RGBFT_Float, maxBufferMem, blockSize * blockSize));
     toStdout = OutputIsStdout(ropts);
     toStderr = OutputIsStderr(ropts);
 
@@ -86,7 +86,7 @@ ImageProcessing::ImageProcessing(POVMS_Object& ropts)
     image->SetPremultiplied(true); // POV-Ray uses premultiplied opacity for its math, so that's what will end up in the image container
 }
 
-ImageProcessing::ImageProcessing(shared_ptr<Image>& img)
+ImageProcessing::ImageProcessing(std::shared_ptr<Image>& img)
 {
     image = img;
     toStderr = toStdout = false;
@@ -189,7 +189,7 @@ UCS2String ImageProcessing::WriteImage(POVMS_Object& ropts, POVMSInt frame, int 
         return UCS2String();
 }
 
-shared_ptr<Image>& ImageProcessing::GetImage()
+std::shared_ptr<Image>& ImageProcessing::GetImage()
 {
     return image;
 }

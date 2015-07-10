@@ -51,10 +51,10 @@ class GammaCurve;
 class SimpleGammaCurve;
 
 /// Class holding a shared reference to a gamma curve.
-typedef shared_ptr<GammaCurve> GammaCurvePtr;
+typedef std::shared_ptr<GammaCurve> GammaCurvePtr;
 
 /// Class holding a shared reference to a simple gamma curve.
-typedef shared_ptr<SimpleGammaCurve> SimpleGammaCurvePtr;
+typedef std::shared_ptr<SimpleGammaCurve> SimpleGammaCurvePtr;
 
 /// Abstract class representing an encoding gamma curve (or, more generally, transfer function).
 ///

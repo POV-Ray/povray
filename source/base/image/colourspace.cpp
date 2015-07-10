@@ -116,7 +116,7 @@ GammaCurvePtr GammaCurve::GetMatching(const GammaCurvePtr& newInstance)
         else if (oldInstance->Matches(newInstance))
         {
             // Found a matching curve in the cache, so use that instead, and (as far as we're concerned)
-            // just forget that the new instance ever existed (allowing the shared_ptr mechanism to garbage-collect it)
+            // just forget that the new instance ever existed (allowing the std::shared_ptr mechanism to garbage-collect it)
             return oldInstance;
         }
     }

@@ -170,7 +170,7 @@ void PhotonStrategyTask::Finish()
 
 void PhotonStrategyTask::SearchThroughObjectsCreateUnits(vector<ObjectPtr>& Objects, LightSource *Light)
 {
-    shared_ptr<SceneData> sceneData = GetSceneData();
+    std::shared_ptr<SceneData> sceneData = GetSceneData();
 
     /* check this object and all siblings */
     for(vector<ObjectPtr>::iterator Sib = Objects.begin(); Sib != Objects.end(); Sib++)

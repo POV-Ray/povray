@@ -98,6 +98,10 @@ class TracePixel : public Trace
         bool precomputeContainingInteriors;
         RayInteriorVector containingInteriors;
 
+		// 3D rendering support
+		DBL Zero_Parallax;				 /* Distance to zero parallax */
+		DBL Eye_Offset;					 /* + or - 1/2 eye separation */
+
         Vector3d cameraDirection;
         Vector3d cameraRight;
         Vector3d cameraUp;

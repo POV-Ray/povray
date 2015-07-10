@@ -95,7 +95,7 @@ class DitherHandler
         virtual void setError(unsigned int x, unsigned int y, const OffsetInfo& err) {}
 };
 
-typedef shared_ptr<DitherHandler> DitherHandlerPtr;
+typedef std::shared_ptr<DitherHandler> DitherHandlerPtr;
 
 ///
 //*****************************************************************************

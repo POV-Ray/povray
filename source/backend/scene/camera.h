@@ -59,6 +59,7 @@ namespace pov
 #define CYL_4_CAMERA           10
 #define SPHERICAL_CAMERA       11
 #define MESH_CAMERA            12
+#define STEREOSCOPIC_CAMERA    20
 
 /*****************************************************************************
 * Global typedefs
@@ -97,6 +98,10 @@ public:
     vector<unsigned int> V_Xref[10];        // used to speed up location of a matching face for distribution #3
     DBL Max_Ray_Distance;                   // if not 0.0, then maximum distance to look along the ray for an intersection
     // end of mesh camera declarations
+
+	// These are used for stereographic camera's:
+	DBL Zero_Parallax;             /* Distance to zero parallax */
+	DBL Eye_Offset;                /* + or - 1/2 eye separation */
 
     Camera();
     Camera(const Camera& src);

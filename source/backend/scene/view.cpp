@@ -81,7 +81,7 @@ inline unsigned int MakePowerOfTwo(unsigned int i)
     return 1 << ii;
 }
 
-ViewData::ViewData(shared_ptr<SceneData> sd) :
+ViewData::ViewData(std::shared_ptr<SceneData> sd) :
     nextBlock(0),
     completedFirstPass(false),
     highestTraceLevel(0),
@@ -565,7 +565,7 @@ RadiosityCache& ViewData::GetRadiosityCache()
     return radiosityCache;
 }
 
-View::View(shared_ptr<SceneData> sd, unsigned int width, unsigned int height, RenderBackend::ViewId vid) :
+View::View(std::shared_ptr<SceneData> sd, unsigned int width, unsigned int height, RenderBackend::ViewId vid) :
     viewData(sd),
     stopRequsted(false),
     mailbox(0),
@@ -627,7 +627,7 @@ bool View::CheckCameraHollowObject(const Vector3d& point, const BBOX_TREE *node)
 
 bool View::CheckCameraHollowObject(const Vector3d& point)
 {
-    shared_ptr<SceneData>& sd = viewData.GetSceneData();
+    std::shared_ptr<SceneData>& sd = viewData.GetSceneData();
 
     if(sd->boundingMethod == 2)
     {
@@ -674,13 +674,13 @@ void View::StartRender(POVMS_Object& renderOptions)
     unsigned int previewendsize = 0;
     unsigned int nextblock = 0;
     bool highReproducibility = false;
-    shared_ptr<ViewData::BlockIdSet> blockskiplist(new ViewData::BlockIdSet());
+    std::shared_ptr<ViewData::BlockIdSet> blockskiplist(new ViewData::BlockIdSet());
 
     if(renderControlThread == NULL)
 #ifndef USE_OFFICIAL_BOOST
-        renderControlThread = new thread(boost::bind(&View::RenderControlThread, this), 1024 * 64);
+        renderControlThread = new thread(std::bind(&View::RenderControlThread, this), 1024 * 64);
 #else
-        renderControlThread = new boost::thread(boost::bind(&View::RenderControlThread, this));
+        renderControlThread = new boost::thread(std::bind(&View::RenderControlThread, this));
 #endif
 
     viewData.qualityFlags = QualityFlags(clip(renderOptions.TryGetInt(kPOVAttrib_Quality, 9), 0, 9));
@@ -1054,7 +1054,7 @@ void View::StartRender(POVMS_Object& renderOptions)
                 renderTasks.AppendSync();
 
                 // reset block size counter and block skip list for next pretrace step
-                renderTasks.AppendFunction(boost::bind(&View::SetNextRectangle, this, _1, blockskiplist, nextblock));
+                renderTasks.AppendFunction(std::bind(&View::SetNextRectangle, this, std::placeholders::_1, blockskiplist, nextblock));
 
                 // wait for block size counter and block skip list reset to finish
                 renderTasks.AppendSync();
@@ -1073,7 +1073,7 @@ void View::StartRender(POVMS_Object& renderOptions)
             renderTasks.AppendSync();
 
             // reset block size counter and block skip list for final render
-            renderTasks.AppendFunction(boost::bind(&View::SetNextRectangle, this, _1, blockskiplist, nextblock));
+			renderTasks.AppendFunction(std::bind(&View::SetNextRectangle, this, std::placeholders::_1, blockskiplist, nextblock));
 
             // wait for block size counter and block skip list reset to finish
             renderTasks.AppendSync();
@@ -1095,7 +1095,7 @@ void View::StartRender(POVMS_Object& renderOptions)
             renderTasks.AppendSync();
 
             // reset block size counter and block skip list
-            renderTasks.AppendFunction(boost::bind(&View::SetNextRectangle, this, _1, blockskiplist, nextblock));
+            renderTasks.AppendFunction(std::bind(&View::SetNextRectangle, this, std::placeholders::_1, blockskiplist, nextblock));
 
             // wait for block size counter and block skip list reset to finish
             renderTasks.AppendSync();
@@ -1112,7 +1112,7 @@ void View::StartRender(POVMS_Object& renderOptions)
             renderTasks.AppendSync();
 
             // reset block size counter and block skip list
-            renderTasks.AppendFunction(boost::bind(&View::SetNextRectangle, this, _1, blockskiplist, nextblock));
+			renderTasks.AppendFunction(std::bind(&View::SetNextRectangle, this, std::placeholders::_1, blockskiplist, nextblock));
 
             // wait for block size counter and block skip list reset to finish
             renderTasks.AppendSync();
@@ -1132,13 +1132,13 @@ void View::StartRender(POVMS_Object& renderOptions)
     renderTasks.AppendSync();
 
     // send shutdown messages
-    renderTasks.AppendFunction(boost::bind(&View::DispatchShutdownMessages, this, _1));
+	renderTasks.AppendFunction(std::bind(&View::DispatchShutdownMessages, this, std::placeholders::_1));
 
     // wait for shutdown messages to be sent
     renderTasks.AppendSync();
 
     // send statistics
-    renderTasks.AppendFunction(boost::bind(&View::SendStatistics, this, _1));
+	renderTasks.AppendFunction(std::bind(&View::SendStatistics, this, std::placeholders::_1));
 
     // send done message
     POVMS_Message doneMessage(kPOVObjectClass_ResultData, kPOVMsgClass_ViewOutput, kPOVMsgIdent_Done);
@@ -1377,7 +1377,7 @@ void View::SendStatistics(TaskQueue&)
     viewThreadData.clear();
 }
 
-void View::SetNextRectangle(TaskQueue&, shared_ptr<ViewData::BlockIdSet> bsl, unsigned int fs)
+void View::SetNextRectangle(TaskQueue&, std::shared_ptr<ViewData::BlockIdSet> bsl, unsigned int fs)
 {
     viewData.SetNextRectangle(*bsl, fs);
 }

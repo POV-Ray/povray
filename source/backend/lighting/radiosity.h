@@ -253,7 +253,7 @@ class RadiosityFunction : public Trace::RadiosityFunctor
         //      cf      - the cooperate functor (whatever that is - some thing that handles inter-thread communication?)
         //      pts     - number of the current pretrace step (PRETRACE_FIRST to PRETRACE_MAX, or FINAL_TRACE for main render)
         //      camera  - position of the camera
-        RadiosityFunction(shared_ptr<SceneData> sd, TraceThreadData *td,
+        RadiosityFunction(std::shared_ptr<SceneData> sd, TraceThreadData *td,
                           const SceneRadiositySettings& rs, RadiosityCache& rc, Trace::CooperateFunctor& cf, bool ft, const Vector3d& camera);
         virtual ~RadiosityFunction();
 

@@ -77,10 +77,10 @@ class SimpleFrontend
         SimpleFrontend(POVMSContext ctx, POVMSAddress addr, POVMS_Object& msg,
                        boost::function<Console *()> cfn,
                        boost::function<Display *(unsigned int, unsigned int, GammaCurvePtr)> dfn,
-                       POVMS_Object *result = NULL, shared_ptr<Console> console = shared_ptr<Console>());
+                       POVMS_Object *result = NULL, std::shared_ptr<Console> console = std::shared_ptr<Console>());
         ~SimpleFrontend();
 
-        bool Start(POVMS_Object& opts, shared_ptr<Image> img = shared_ptr<Image>());
+        bool Start(POVMS_Object& opts, std::shared_ptr<Image> img = std::shared_ptr<Image>());
         bool Stop();
         bool Pause();
         bool Resume();
@@ -89,9 +89,9 @@ class SimpleFrontend
 
         State GetState() const;
 
-        shared_ptr<Console> GetConsole();
-        shared_ptr<Image> GetImage();
-        shared_ptr<Display> GetDisplay();
+        std::shared_ptr<Console> GetConsole();
+        std::shared_ptr<Image> GetImage();
+        std::shared_ptr<Display> GetDisplay();
     private:
         RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH> renderFrontend;
         POVMSAddress backendAddress;
@@ -99,9 +99,9 @@ class SimpleFrontend
         POVMS_Object options;
         RenderFrontendBase::SceneId sceneId;
         RenderFrontendBase::ViewId viewId;
-        shared_ptr<ImageProcessing> imageProcessing;
-        shared_ptr<AnimationProcessing> animationProcessing;
-        shared_ptr<ShelloutProcessing> shelloutProcessing;
+        std::shared_ptr<ImageProcessing> imageProcessing;
+        std::shared_ptr<AnimationProcessing> animationProcessing;
+        std::shared_ptr<ShelloutProcessing> shelloutProcessing;
         boost::function<Console *()> createConsole;
         boost::function<Display *(unsigned int, unsigned int, GammaCurvePtr)> createDisplay;
 };
@@ -110,7 +110,7 @@ template<class PARSER_MH, class FILE_MH, class RENDER_MH, class IMAGE_MH>
 SimpleFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::SimpleFrontend(POVMSContext ctx, POVMSAddress addr, POVMS_Object& msg,
                                                                         boost::function<Console *()> cfn,
                                                                         boost::function<Display *(unsigned int, unsigned int, GammaCurvePtr)> dfn,
-                                                                        POVMS_Object *result, shared_ptr<Console> console) :
+                                                                        POVMS_Object *result, std::shared_ptr<Console> console) :
     renderFrontend(ctx),
     backendAddress(addr),
     state(kReady),
@@ -128,7 +128,7 @@ SimpleFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::~SimpleFrontend()
 }
 
 template<class PARSER_MH, class FILE_MH, class RENDER_MH, class IMAGE_MH>
-bool SimpleFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::Start(POVMS_Object& opts, shared_ptr<Image> img)
+bool SimpleFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::Start(POVMS_Object& opts, std::shared_ptr<Image> img)
 {
     int width;
     int height;
@@ -155,16 +155,16 @@ bool SimpleFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::Start(POVMS_Object
     opts.Set(kPOVAttrib_Declare, declares);
 
     if(opts.TryGetInt(kPOVAttrib_FinalFrame, 0) > 0)
-        animationProcessing = shared_ptr<AnimationProcessing>(new AnimationProcessing(opts));
+        animationProcessing = std::shared_ptr<AnimationProcessing>(new AnimationProcessing(opts));
 
     options = opts;
 
     if(opts.TryGetBool(kPOVAttrib_OutputToFile, true))
     {
         if(img != NULL)
-            imageProcessing = shared_ptr<ImageProcessing>(new ImageProcessing(img));
+            imageProcessing = std::shared_ptr<ImageProcessing>(new ImageProcessing(img));
         else
-            imageProcessing = shared_ptr<ImageProcessing>(new ImageProcessing(options));
+            imageProcessing = std::shared_ptr<ImageProcessing>(new ImageProcessing(options));
     }
 
     Path ip (opts.TryGetString(kPOVAttrib_InputFile, ""));
@@ -436,19 +436,19 @@ State SimpleFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::GetState() const
 }
 
 template<class PARSER_MH, class FILE_MH, class RENDER_MH, class IMAGE_MH>
-shared_ptr<Console> SimpleFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::GetConsole()
+std::shared_ptr<Console> SimpleFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::GetConsole()
 {
     return renderFrontend.GetConsole(sceneId);
 }
 
 template<class PARSER_MH, class FILE_MH, class RENDER_MH, class IMAGE_MH>
-shared_ptr<Image> SimpleFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::GetImage()
+std::shared_ptr<Image> SimpleFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::GetImage()
 {
     return renderFrontend.GetImage(viewId);
 }
 
 template<class PARSER_MH, class FILE_MH, class RENDER_MH, class IMAGE_MH>
-shared_ptr<Display> SimpleFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::GetDisplay()
+std::shared_ptr<Display> SimpleFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::GetDisplay()
 {
     return renderFrontend.GetDisplay(viewId);
 }

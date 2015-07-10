@@ -57,7 +57,7 @@
 namespace pov
 {
 
-TraceThreadData::TraceThreadData(shared_ptr<SceneData> sd): sceneData(sd), qualityFlags(9)
+TraceThreadData::TraceThreadData(std::shared_ptr<SceneData> sd): sceneData(sd), qualityFlags(9)
 {
     for(int i = 0; i < 4; i++)
         Fractal_IStack[i] = NULL;

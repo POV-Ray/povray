@@ -58,7 +58,7 @@ namespace pov
 using namespace pov_base;
 
 RenderTask::RenderTask(ViewData *vd, const char* sn, RenderBackend::ViewId vid) :
-    SceneTask(new ViewThreadData(vd), boost::bind(&RenderTask::SendFatalError, this, _1), sn, vd->GetSceneData(), vid),
+    SceneTask(new ViewThreadData(vd), std::bind(&RenderTask::SendFatalError, this, std::placeholders::_1), sn, vd->GetSceneData(), vid),
     viewData(vd)
 {
 }
@@ -67,7 +67,7 @@ RenderTask::~RenderTask()
 {
 }
 
-shared_ptr<SceneData>& RenderTask::GetSceneData()
+std::shared_ptr<SceneData>& RenderTask::GetSceneData()
 {
     return viewData->GetSceneData();
 }

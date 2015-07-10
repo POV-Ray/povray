@@ -52,7 +52,7 @@ class TraceThreadData;
 class BoundingTask : public SceneTask
 {
     public:
-        BoundingTask(shared_ptr<SceneData> sd, unsigned int bt);
+        BoundingTask(std::shared_ptr<SceneData> sd, unsigned int bt);
         virtual ~BoundingTask();
 
         virtual void Run();
@@ -63,7 +63,7 @@ class BoundingTask : public SceneTask
 
         inline TraceThreadData *GetSceneDataPtr() { return reinterpret_cast<TraceThreadData *>(GetDataPtr()); }
     private:
-        shared_ptr<SceneData> sceneData;
+        std::shared_ptr<SceneData> sceneData;
         unsigned int boundingThreshold;
 
         void SendFatalError(pov_base::Exception& e);

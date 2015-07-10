@@ -42,7 +42,7 @@ namespace pov_frontend
   using namespace vfe;
   using namespace povwin;
 
-  extern shared_ptr<Display> gDisplay;
+  extern std::shared_ptr<Display> gDisplay;
 
   class WinDisplay : public vfeDisplay
   {
@@ -59,6 +59,8 @@ namespace pov_frontend
       virtual HWND GetHandle() { return m_Handle; }
       virtual void SetCaption(LPCTSTR Caption) { if (m_Handle != NULL) SetWindowText (m_Handle, Caption); }
       virtual void SetRenderState(bool IsRendering) = 0 ;
+
+	  std::vector<RECT> monitors; // Added by STEFAN DE BRUIJN
 
     protected:
       virtual LRESULT WindowProc (UINT message, WPARAM wParam, LPARAM lParam) = 0;

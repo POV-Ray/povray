@@ -39,6 +39,7 @@
 #include <algorithm>
 #include <limits>
 #include <vector>
+#include <algorithm>
 
 #include "base/configbase.h"
 
