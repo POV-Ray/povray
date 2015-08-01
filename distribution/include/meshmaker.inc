@@ -4,7 +4,7 @@
 
 // Persistence of Vision Ray Tracer Include File
 // File: meshmaker.inc
-// Vers: 3.5
+// Vers: 3.7
 // 
 // Desc: Macros and functions used in builing mesh2 objects.
 // Packed together and updated for POV-Ray 3.7 
@@ -16,15 +16,17 @@
 //                  Added the option to write *.pcm files, for Chris Colefax' Compressed Mesh Macros.
 //                  Added the option to write *.arr files, this writes only the arrays to a file.
 // Added SweepSpline1() and SweepSpline2() by Mike Williams, based on an idea by Greg M. Johnson.
+// Rev 2015/08/01 : Fixed the position of the #version statement.
 
 
 
-#version 3.5;
 #ifndef(makemesh_Inc_Temp)
-   #declare makemesh_Inc_Temp = version;
-   #ifdef(View_POV_Include_Stack)
-      #debug "including makemesh.inc\n"
-   #end
+#declare makemesh_Inc_Temp = version;
+#version 3.5;
+
+#ifdef(View_POV_Include_Stack)
+   #debug "including makemesh.inc\n"
+#end
 
 
 //====== Macros and Functions ======//
