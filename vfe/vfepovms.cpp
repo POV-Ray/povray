@@ -90,11 +90,6 @@ void *vfe_POVMS_Sys_Malloc(size_t size, const char *func, const char *file, int 
   return malloc (size) ;
 }
 
-void *vfe_POVMS_Sys_Calloc(size_t nitems, size_t size, const char *func, const char *file, int line)
-{
-  return calloc (nitems, size) ;
-}
-
 void *vfe_POVMS_Sys_Realloc(void *ptr, size_t size, const char *func, const char *file, int line)
 {
   return realloc (ptr, size) ;

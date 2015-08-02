@@ -72,11 +72,9 @@ namespace vfe
 
 #if defined _DEBUG
   void *vfe_POVMS_Sys_Malloc(size_t size, const char *func, const char *file, int line) ;
-  void *vfe_POVMS_Sys_Calloc(size_t nitems, size_t size, const char *func, const char *file, int line) ;
   void *vfe_POVMS_Sys_Realloc(void *ptr, size_t size, const char *func, const char *file, int line) ;
   void vfe_POVMS_Sys_Free(void *ptr, const char *func, const char *file, int line) ;
   void *vfe_POVMS_Sys_Malloc(size_t size) ;
-  void *vfe_POVMS_Sys_Calloc(size_t nitems, size_t size) ;
   void *vfe_POVMS_Sys_Realloc(void *ptr, size_t size) ;
   void vfe_POVMS_Sys_Free(void *ptr) ;
 #endif
@@ -85,7 +83,6 @@ namespace vfe
 // TODO: move these POVMS_Sys_* memory functions to their own heap
 #ifndef _DEBUG
   #define POVMS_Sys_Malloc(s)                 malloc(s)
-  #define POVMS_Sys_Calloc(m,s)               calloc(m,s)
   #define POVMS_Sys_Realloc(p,s)              realloc(p,s)
   #define POVMS_Sys_Free(p)                   free(p)
 #else
@@ -93,7 +90,6 @@ namespace vfe
   #define kDefaultTimeout                     100
 
   #define POVMS_Sys_Malloc(s)                 vfe::vfe_POVMS_Sys_Malloc(s, __FUNCTION__, __FILE__, __LINE__)
-  #define POVMS_Sys_Calloc(m,s)               vfe::vfe_POVMS_Sys_Calloc(m,s, __FUNCTION__, __FILE__, __LINE__)
   #define POVMS_Sys_Realloc(p,s)              vfe::vfe_POVMS_Sys_Realloc(p,s, __FUNCTION__, __FILE__, __LINE__)
   #define POVMS_Sys_Free(p)                   vfe::vfe_POVMS_Sys_Free(p, __FUNCTION__, __FILE__, __LINE__)
 #endif

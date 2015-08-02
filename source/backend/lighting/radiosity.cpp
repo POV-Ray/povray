@@ -1263,7 +1263,7 @@ ot_node_struct *RadiosityCache::GetNode(RenderStatistics* stats, const ot_id_str
         // (some other thread might have created it just as we were waiting to get the lock)
         if (octree.root == NULL)
         {
-            octree.root = reinterpret_cast<ot_node_struct *>(POV_CALLOC(1, sizeof(ot_node_struct), "octree node"));
+            octree.root = new ot_node_struct;
 #ifdef OCTREE_PERFORMANCE_DEBUG
             if (stats != NULL) (*stats)[Radiosity_OctreeNodes]++;
 #endif
@@ -1389,7 +1389,7 @@ ot_node_struct *RadiosityCache::GetNode(RenderStatistics* stats, const ot_id_str
             // We may have acquired the lock just now, so some other task may have changed the root since last time we looked
             if (this_node->Kids[index] == NULL)
             {
-                temp_node = reinterpret_cast<ot_node_struct *>(POV_CALLOC(1, sizeof(ot_node_struct), "octree node"));
+                temp_node = new ot_node_struct;
 #ifdef OCTREE_PERFORMANCE_DEBUG
                 if (stats!= NULL) (*stats)[Radiosity_OctreeNodes]++;
 #endif

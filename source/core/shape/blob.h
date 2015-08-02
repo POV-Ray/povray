@@ -125,7 +125,7 @@ class Blob : public ObjectBase
 {
     public:
         Blob_Data *Data;
-        TEXTURE **Element_Texture;
+        vector<TEXTURE*> Element_Texture;
 
         Blob();
         virtual ~Blob();

@@ -159,13 +159,9 @@ struct POVMS_Sys_QueueNode_Default
 #endif
 
 // Note: Remember that the POVMS cannot use the standard
-// POV_MALLOC, POV_CALLOC, POV_REALLOC, POV_FREE calls! */
+// POV_MALLOC, POV_REALLOC, POV_FREE calls! */
 #ifndef POVMS_Sys_Malloc
     #define POVMS_Sys_Malloc(s)           malloc(s)
-#endif
-
-#ifndef POVMS_Sys_Calloc
-    #define POVMS_Sys_Calloc(m,s)         calloc(m,s)
 #endif
 
 #ifndef POVMS_Sys_Realloc
@@ -178,12 +174,10 @@ struct POVMS_Sys_QueueNode_Default
 
 #ifdef _DEBUG_POVMS_TRACE_MEMORY_
     #undef POVMS_Sys_Malloc
-    #undef POVMS_Sys_Calloc
     #undef POVMS_Sys_Realloc
     #undef POVMS_Sys_Free
 
     #define POVMS_Sys_Malloc(s)           POVMS_Sys_Trace_Malloc(s, __LINE__)
-    #define POVMS_Sys_Calloc(m,s)         POVMS_Sys_Trace_Calloc(m,s, __LINE__)
     #define POVMS_Sys_Realloc(p,s)        POVMS_Sys_Trace_Realloc(p,s, __LINE__)
     #define POVMS_Sys_Free(p)             POVMS_Sys_Trace_Free(p, __LINE__)
 
@@ -286,7 +280,6 @@ int POVMS_Sys_AddressToStreamSize_Default                     (POVMSAddress a);
 
 #ifdef _DEBUG_POVMS_TRACE_MEMORY_
 void *POVMS_Sys_Trace_Malloc(size_t size, int line);
-void *POVMS_Sys_Trace_Calloc(size_t nmemb, size_t size, int line);
 void *POVMS_Sys_Trace_Realloc(void *iptr, size_t size, int line);
 void POVMS_Sys_Trace_Free(void *ptr, int line);
 void POVMS_Sys_Trace_Set_Guard(char *ptr);
@@ -4630,22 +4623,6 @@ void *POVMS_Sys_Trace_Malloc(size_t size, int line)
 
     ptr->line = line;
     ptr->size = size;
-
-    POVMS_Sys_Trace_Insert(ptr);
-
-    return (void *)(((char *)ptr) + sizeof(POVMSMemoryTraceHeader));
-}
-
-void *POVMS_Sys_Trace_Calloc(size_t nmemb, size_t size, int line)
-{
-    POVMSMemoryTraceHeader *ptr = (POVMSMemoryTraceHeader *)calloc((nmemb * size) + sizeof(POVMSMemoryTraceHeader) + (sizeof(char) * 8), 1);
-
-    POVMS_Sys_Trace_Set_Guard(&(ptr->magichead[0]));
-    POVMS_Sys_Trace_Set_Guard(&(ptr->magictrail[0]));
-    POVMS_Sys_Trace_Set_Guard(((char *)ptr) + size + sizeof(POVMSMemoryTraceHeader));
-
-    ptr->line = line;
-    ptr->size = (nmemb * size);
 
     POVMS_Sys_Trace_Insert(ptr);
 

@@ -12,7 +12,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -381,13 +381,13 @@ namespace vfePlatform
         size_t len;
 
         len = 256;  // default buffer size
-        char *tmp = (char *) calloc(len, 1);
+        char *tmp = new char[len];
 
         while(getcwd(tmp, len) == NULL)  // buffer is too small
         {
-            free(tmp);
+            delete[] tmp;
             len *= 2;  // double buffer size and try again
-            tmp = (char *) calloc(len, 1);
+            tmp = new char[len];
         }
 #else
         string tmp = getenv("PWD");  // must not be NULL; checked by configure
@@ -410,7 +410,7 @@ namespace vfePlatform
         string s = tmp + string("/");  // add final slash
 
 #ifdef HAVE_GETCWD
-        free(tmp);
+        delete[] tmp;
 #endif
 
         return s;
@@ -457,37 +457,39 @@ namespace vfePlatform
         int     status;
 
         len = 256;  // default buffer size
-        tmp = (char *) calloc(len, 1);  // init with '\0'
+        tmp = new char[len];  // init with '\0'
 
         while(true)
         {
             status = readlink(path.c_str(), tmp, len-1);  // without terminating '\0'
             if(status < 0)  // an error occured, return empty string
             {
-                free(tmp);
+                delete[] tmp;
                 return string("");
             }
             else if(status == len-1)  // the buffer is probably too small
             {
-                free(tmp);
+                delete[] tmp;
                 len *= 2;  // double buffer size and try again
-                tmp = (char *) calloc(len, 1);
+                tmp = new char[len];
             }
             else  // all right, let's go further
                 break;
         }
+        // add C string terminator
+        tmp[status] = '\0';
 
         // do we have an absolute path ?
         if(tmp[0] != '/')  // no; concatenate symlink to the path dirname
         {
             string s = dirname(path) + "/" + tmp;
-            free(tmp);
+            delete[] tmp;
             return s;
         }
         else  // yes; just resize buffer
         {
             string s = tmp;
-            free(tmp);
+            delete[] tmp;
             return s;
         }
 #else

@@ -1252,41 +1252,27 @@ static void norm_dist(DBL *factors, DBL x, DBL y)
 
 ImageData *Create_Image()
 {
-    ImageData *image;
+    return new ImageData;
+}
 
-    image = reinterpret_cast<ImageData *>(POV_CALLOC(1, sizeof(ImageData), "image file"));
-
-    image->References = 1;
-
-    image->Map_Type = PLANAR_MAP;
-
-    image->Interpolation_Type = NO_INTERPOLATION;
-
-    image->iwidth = image->iheight = 0;
-    image->width = image->height = 0.0;
-
-    image->Once_Flag = false;
-
-    image->Offset = Vector2d(0.0,0.0);
-
-    image->Use = USE_NONE;
-
-    image->Gradient = Vector3d(1.0, -1.0, 0.0);
-
-    image->AllFilter = 0;
-    image->AllTransmit = 0;
-
-    image->Object = NULL;
-
-    image->data = NULL;
-
+ImageData::ImageData() :
+    References(1),
+    Map_Type(PLANAR_MAP),
+    Interpolation_Type(NO_INTERPOLATION),
+    Once_Flag(false),
+    Use(USE_NONE),
+    Gradient(1.0,-1.0,0.0),
+    iwidth(0), iheight(0),
+    width(0.0), height(0.0),
+    Offset(0.0, 0.0),
+    AllFilter(0.0), AllTransmit(0.0),
+    Object(NULL),
+    data(NULL)
 #ifdef POV_VIDCAP_IMPL
     // beta-test feature
-    image->VidCap = NULL;
+    ,VidCap(NULL)
 #endif
-
-    return (image);
-}
+{}
 
 
 
@@ -1357,15 +1343,19 @@ void Destroy_Image(ImageData *image)
     if((image == NULL) || (--(image->References) > 0))
         return;
 
+    delete image;
+}
+
+ImageData::~ImageData()
+{
 #ifdef POV_VIDCAP_IMPL
     // beta-test feature
-    if(image->VidCap != NULL)
-        delete image->VidCap;
+    if(VidCap != NULL)
+        delete VidCap;
 #endif
 
-    delete image->data;
-
-    POV_FREE(image);
+    if(data != NULL)
+        delete data;
 }
 
 

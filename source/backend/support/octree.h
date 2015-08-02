@@ -111,6 +111,8 @@ struct ot_id_struct
 {
     int x, y, z;
     int Size;
+
+    ot_id_struct() : x(0), y(0), z(0), Size(0) {}
 };
 
 // These are the structures that make up the oct-tree itself, known as nodes
@@ -119,6 +121,8 @@ struct ot_node_struct
     OT_ID    Id;
     OT_BLOCK *Values;
     OT_NODE  *Kids[8];
+
+    ot_node_struct() : Id(), Values(NULL) { for(unsigned int i = 0; i < 8; i ++) { Kids[i] = NULL; } }
 };
 
 // These are informations the octree reader needs to know

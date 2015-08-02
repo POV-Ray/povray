@@ -33,7 +33,7 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
 /************************************************************************
 *  Oct-tree routines.  Used by Radiosity calculation routines.
@@ -270,7 +270,7 @@ void ot_ins(OT_NODE **root_ptr, OT_BLOCK *new_block, const OT_ID *new_id)
         }
 #endif
 
-        *root_ptr = reinterpret_cast<OT_NODE *>(POV_CALLOC(1, sizeof(OT_NODE), "octree node"));
+        *root_ptr = new OT_NODE;
 
 #ifdef RADSTATS
         ot_nodecount = 1;
@@ -347,7 +347,7 @@ void ot_ins(OT_NODE **root_ptr, OT_BLOCK *new_block, const OT_ID *new_id)
         if (this_node->Kids[index] == NULL)
         {
             // Next level down doesn't exist yet, so create it
-            temp_node = reinterpret_cast<OT_NODE *>(POV_CALLOC(1, sizeof(OT_NODE), "octree node"));
+            temp_node = new OT_NODE;
 
 #ifdef RADSTATS
             ot_nodecount++;
@@ -460,7 +460,7 @@ void ot_newroot(OT_NODE **root_ptr)
     OT_NODE *newroot;
     int dx, dy, dz, index;
 
-    newroot = reinterpret_cast<OT_NODE *>(POV_CALLOC(1, sizeof(OT_NODE), "octree node"));
+    newroot = new OT_NODE;
 
 #ifdef RADSTATS
     ot_nodecount++;
@@ -1237,7 +1237,7 @@ bool ot_free_subtree(OT_NODE *subtree)
     }
 
     // Finally, free this block itself
-    POV_FREE(subtree);
+    delete subtree;
 
     return true;
 }

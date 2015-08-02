@@ -1258,7 +1258,6 @@ int Blob::intersect_element(const Vector3d& P, const Vector3d& D, const Blob_Ele
 
 int Blob::determine_influences(const Vector3d& P, const Vector3d& D, DBL mindist, Blob_Interval_Struct *intervals, TraceThreadData *Thread) const
 {
-    int i;
     unsigned int cnt, size;
     DBL b, t, t0, t1;
     Vector3d V1;
@@ -1271,11 +1270,11 @@ int Blob::determine_influences(const Vector3d& P, const Vector3d& D, DBL mindist
     {
         /* There's no bounding hierarchy so just step through all elements. */
 
-        for (i = 0; i < Data->Number_Of_Components; i++)
+        for (vector<Blob_Element>::iterator i = Data->Entry.begin(); i != Data->Entry.end(); ++i)
         {
-            if (intersect_element(P, D, &Data->Entry[i], mindist, &t0, &t1, Thread))
+            if (intersect_element(P, D, &(*i), mindist, &t0, &t1, Thread))
             {
-                insert_hit(&Data->Entry[i], t0, t1, intervals, &cnt);
+                insert_hit(&(*i), t0, t1, intervals, &cnt);
             }
         }
     }
@@ -1306,7 +1305,7 @@ int Blob::determine_influences(const Vector3d& P, const Vector3d& D, DBL mindist
             {
                 /* Test all sub-nodes. */
 
-                for (i = 0; i < (int)Tree->Entries; i++)
+                for (int i = 0; i < (int)Tree->Entries; i++)
                 {
 #ifdef BLOB_EXTRA_STATS
                     Thread->Stats()[Blob_Bound_Tests]++;
@@ -1492,7 +1491,6 @@ DBL Blob::calculate_element_field(const Blob_Element *Element, const Vector3d& P
 
 DBL Blob::calculate_field_value(const Vector3d& P, TraceThreadData *Thread) const
 {
-    int i;
     unsigned int size;
     DBL density, rad2;
     Vector3d V1;
@@ -1505,9 +1503,9 @@ DBL Blob::calculate_field_value(const Vector3d& P, TraceThreadData *Thread) cons
     {
         /* There's no tree --> step through all elements. */
 
-        for (i = 0; i < Data->Number_Of_Components; i++)
+        for (vector<Blob_Element>::iterator i = Data->Entry.begin(); i != Data->Entry.end(); ++i)
         {
-            density += calculate_element_field(&Data->Entry[i], P);
+            density += calculate_element_field(&(*i), P);
         }
     }
     else
@@ -1532,7 +1530,7 @@ DBL Blob::calculate_field_value(const Vector3d& P, TraceThreadData *Thread) cons
             {
                 /* Test all sub-nodes. */
 
-                for (i = 0; i < (int)Tree->Entries; i++)
+                for (int i = 0; i < (int)Tree->Entries; i++)
                 {
                     /* Insert sub-node if we are inside. */
 
@@ -1805,9 +1803,9 @@ void Blob::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread
     {
         /* There's no tree --> step through all elements. */
 
-        for (i = 0; i < Data->Number_Of_Components; i++)
+        for (vector<Blob_Element>::iterator i = Data->Entry.begin(); i != Data->Entry.end(); ++i)
         {
-            element_normal(Result, New_Point, &(Data->Entry[i]));
+            element_normal(Result, New_Point, &(*i));
         }
     }
     else
@@ -2018,8 +2016,6 @@ void Blob::Scale(const Vector3d&, const TRANSFORM *tr)
 
 void Blob::Transform(const TRANSFORM *tr)
 {
-    int i;
-
     if(Trans == NULL)
         Trans = Create_Transform();
 
@@ -2027,8 +2023,8 @@ void Blob::Transform(const TRANSFORM *tr)
 
     Compose_Transforms(Trans, tr);
 
-    for(i = 0; i < Data->Number_Of_Components; i++)
-        Transform_Textures(Element_Texture[i], tr);
+    for(vector<TEXTURE*>::iterator i = Element_Texture.begin(); i != Element_Texture.end(); ++i)
+        Transform_Textures(*i, tr);
 }
 
 
@@ -2067,8 +2063,7 @@ Blob::Blob() : ObjectBase(BLOB_OBJECT)
 {
     Set_Flag(this, HIERARCHY_FLAG);
     Trans = NULL;
-    Element_Texture = NULL;
-    Data = NULL ;
+    Data = NULL;
 }
 
 /*****************************************************************************
@@ -2106,7 +2101,6 @@ Blob::Blob() : ObjectBase(BLOB_OBJECT)
 
 ObjectPtr Blob::Copy()
 {
-    int i;
     Blob *New = new Blob();
 
     /* Copy blob. */
@@ -2114,10 +2108,10 @@ ObjectPtr Blob::Copy()
     Destroy_Transform(New->Trans);
     *New = *this;
     New->Trans = Copy_Transform(Trans);
-    New->Data = Data->AcquireReference () ;
-    New->Element_Texture = reinterpret_cast<TEXTURE **>(POV_MALLOC(New->Data->Number_Of_Components*sizeof(TEXTURE *), "blob texture list"));
-    for (i = 0; i < New->Data->Number_Of_Components; i++)
-        New->Element_Texture[i] = Copy_Textures(Element_Texture[i]);
+    New->Data = Data->AcquireReference();
+    New->Element_Texture.reserve(Element_Texture.size());
+    for (vector<TEXTURE*>::iterator i = Element_Texture.begin(); i != Element_Texture.end(); ++i)
+        New->Element_Texture.push_back(Copy_Textures(*i));
     return (New);
 }
 
@@ -2197,9 +2191,8 @@ Blob_List_Struct *Blob::Create_Blob_List_Element()
 Blob::~Blob()
 {
     Destroy_Transform(Trans);
-    for (int i = 0; i < Data->Number_Of_Components; i++)
-        Destroy_Textures(Element_Texture[i]);
-    POV_FREE(Element_Texture);
+    for (vector<TEXTURE*>::iterator i = Element_Texture.begin(); i != Element_Texture.end(); ++i)
+        Destroy_Textures(*i);
     if (Data != NULL)
         Data->ReleaseReference () ;
 }
@@ -2236,18 +2229,17 @@ Blob::~Blob()
 
 void Blob::Compute_BBox()
 {
-    int i;
     DBL radius, radius2;
     Vector3d Center, Min, Max;
 
     Min = Vector3d(BOUND_HUGE);
     Max = Vector3d(-BOUND_HUGE);
 
-    for (i = 0; i < Data->Number_Of_Components; i++)
+    for (vector<Blob_Element>::iterator i = Data->Entry.begin(); i != Data->Entry.end(); ++i)
     {
-        if (Data->Entry[i].c[2] > 0.0)
+        if (i->c[2] > 0.0)
         {
-            get_element_bounding_sphere(&Data->Entry[i], Center, &radius2);
+            get_element_bounding_sphere(&(*i), Center, &radius2);
 
             radius = sqrt(radius2);
 
@@ -2412,8 +2404,7 @@ Blob_Data::Blob_Data (int Count)
 {
     References = 1;
     Tree = NULL;
-    Number_Of_Components = Count;
-    Entry.resize (Count) ;
+    Entry.resize(Count);
 }
 
 Blob_Data *Blob_Data::AcquireReference (void)
@@ -2434,9 +2425,9 @@ void Blob_Data::ReleaseReference (void)
          * are only used with cylindrical blobs. Thus it's
          * enough to ignore all cylinder caps.
          */
-        for (int i = 0; i < Number_Of_Components; i++)
-            if ((Entry[i].Type == BLOB_SPHERE) || (Entry[i].Type == BLOB_ELLIPSOID) || (Entry[i].Type == BLOB_CYLINDER))
-                Destroy_Transform(Entry[i].Trans);
+        for (vector<Blob_Element>::iterator i = Entry.begin(); i != Entry.end(); ++i)
+            if ((i->Type == BLOB_SPHERE) || (i->Type == BLOB_ELLIPSOID) || (i->Type == BLOB_CYLINDER))
+                Destroy_Transform(i->Trans);
 
         delete this ;
     }
@@ -2519,8 +2510,7 @@ int Blob::Make_Blob(DBL threshold, Blob_List_Struct *BlobList, int npoints, Trac
     /* Initialize the blob data. */
 
     Data->Threshold = threshold;
-    Data->Number_Of_Components = count;
-    Data->Entry.resize (count) ;
+    Data->Entry.resize(count) ;
 
     vector<Blob_Element>::iterator it = Data->Entry.begin() ;
     for (i = 0; i < npoints; i++)
@@ -2593,10 +2583,10 @@ int Blob::Make_Blob(DBL threshold, Blob_List_Struct *BlobList, int npoints, Trac
         Thread->Blob_Coefficients = reinterpret_cast<DBL *>(POV_MALLOC(sizeof(DBL) * Thread->Blob_Coefficient_Count, "Blob Coefficients"));
     }
 
-    if (Data->Number_Of_Components * 2 >= Thread->Blob_Interval_Count)
+    if (Data->Entry.size() * 2 >= Thread->Blob_Interval_Count)
     {
         delete[] Thread->Blob_Intervals;
-        Thread->Blob_Interval_Count = Data->Number_Of_Components * 5 / 2;
+        Thread->Blob_Interval_Count = Data->Entry.size() * 5 / 2;
         Thread->Blob_Intervals = new Blob_Interval_Struct [Thread->Blob_Interval_Count];
     }
 
@@ -2636,8 +2626,6 @@ int Blob::Make_Blob(DBL threshold, Blob_List_Struct *BlobList, int npoints, Trac
 
 void Blob::Test_Blob_Opacity()
 {
-    int i;
-
     /* Initialize opacity flag to the opacity of the object's texture. */
 
     if ((Texture == NULL) || (Test_Opacity(Texture)))
@@ -2647,13 +2635,13 @@ void Blob::Test_Blob_Opacity()
 
     if (Test_Flag(this, MULTITEXTURE_FLAG))
     {
-        for (i = 0; i < Data->Number_Of_Components; i++)
+        for (vector<TEXTURE*>::iterator i = Element_Texture.begin(); i != Element_Texture.end(); ++i)
         {
-            if (Element_Texture[i] != NULL)
+            if (*i != NULL)
             {
                 /* If component's texture isn't opaque the blob is neither. */
 
-                if (!Test_Opacity(Element_Texture[i]))
+                if (!Test_Opacity(*i))
                 {
                     Clear_Flag(this, OPAQUE_FLAG);
                 }
@@ -2695,7 +2683,7 @@ void Blob::build_bounding_hierarchy()
     int i, nElem, maxelements;
     BSPHERE_TREE **Elements;
 
-    nElem = (int)Data->Number_Of_Components;
+    nElem = (int)Data->Entry.size();
 
     maxelements = 2 * nElem;
 
@@ -2759,7 +2747,6 @@ void Blob::build_bounding_hierarchy()
 
 void Blob::Determine_Textures(Intersection *isect, bool hitinside, WeightedTextureVector& textures, TraceThreadData *Thread)
 {
-    int i;
     unsigned int size;
     DBL rad2;
     Vector3d V1, P;
@@ -2775,7 +2762,7 @@ void Blob::Determine_Textures(Intersection *isect, bool hitinside, WeightedTextu
     {
         /* There's no tree --> step through all elements. */
 
-        for (i = 0; i < Data->Number_Of_Components; i++)
+        for (int i = 0; i < Data->Entry.size(); i++)
         {
             Element = &Data->Entry[i];
             determine_element_texture(Element, Element_Texture[i], P, textures);
@@ -2803,7 +2790,7 @@ void Blob::Determine_Textures(Intersection *isect, bool hitinside, WeightedTextu
             {
                 /* Test all sub-nodes. */
 
-                for (i = 0; i < (int)Tree->Entries; i++)
+                for (int i = 0; i < (int)Tree->Entries; i++)
                 {
                     /* Insert sub-node if we are inside. */
 
@@ -3215,7 +3202,6 @@ void Blob::Create_Blob_Element_Texture_List(Blob_List_Struct *BlobList, int npoi
 {
     int i, count;
     Blob_List_Struct *bl;
-    TEXTURE **et ;
 
     if (npoints < 1)
         throw POV_EXCEPTION_STRING("Need at least one component in a blob.");
@@ -3234,7 +3220,7 @@ void Blob::Create_Blob_Element_Texture_List(Blob_List_Struct *BlobList, int npoi
     Data = new Blob_Data (count) ;
 
     /* Allocate memory for list. */
-    et = Element_Texture = reinterpret_cast<TEXTURE **>(POV_CALLOC(count,sizeof(TEXTURE *), "blob texture list"));
+    Element_Texture.reserve(count);
     for (i = 0, bl = BlobList; i < npoints; i++, bl = bl->next)
     {
         /*
@@ -3242,11 +3228,11 @@ void Blob::Create_Blob_Element_Texture_List(Blob_List_Struct *BlobList, int npoi
          * because individual textures have to be transformed too if
          * copies of the blob are transformed.
          */
-        *et++ = Copy_Textures(bl->elem.Texture);
+        Element_Texture.push_back(Copy_Textures(bl->elem.Texture));
         if (bl->elem.Type == BLOB_CYLINDER)
         {
-            *et++ = Copy_Textures(bl->elem.Texture);
-            *et++ = Copy_Textures(bl->elem.Texture);
+            Element_Texture.push_back(Copy_Textures(bl->elem.Texture));
+            Element_Texture.push_back(Copy_Textures(bl->elem.Texture));
         }
     }
 }

@@ -50,14 +50,10 @@
 /*
  * These functions define macros which do checking for memory allocation,
  * and can also do other things.  Check existing code before you change them,
- * since they aren't simply replacements for malloc, calloc, realloc, and free.
+ * since they aren't simply replacements for malloc, realloc, and free.
  */
 #ifndef POV_MALLOC
 #define POV_MALLOC(size,msg)        pov_malloc ((size), __FILE__, __LINE__, (msg))
-#endif
-
-#ifndef POV_CALLOC
-    #define POV_CALLOC(nitems,size,msg) pov_calloc ((nitems), (size), __FILE__, __LINE__, (msg))
 #endif
 
 #ifndef POV_REALLOC

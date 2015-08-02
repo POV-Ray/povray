@@ -105,6 +105,8 @@ class ImageData
         POV_VIDCAP_IMPL *VidCap;
 #endif
 
+        ImageData();
+        ~ImageData();
 };
 
 DBL image_pattern(const Vector3d& EPoint, const BasicPattern* pPattern);

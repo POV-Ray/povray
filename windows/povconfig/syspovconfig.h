@@ -175,8 +175,6 @@ namespace povwin
 #ifndef _CONSOLE
   void *win_malloc(size_t size);
   void *win_malloc(size_t size, const void *ptr, int line);
-  void *win_calloc(size_t nelem, size_t size);
-  void *win_calloc(size_t nelem, size_t size, const void *ptr, int line);
   void *win_realloc(void *p, size_t size);
   void *win_realloc(void *p, size_t size, const void *ptr, int line);
   void win_free(void *p);
@@ -245,7 +243,6 @@ namespace pov_base
 #ifdef _CONSOLE
 
 #define POV_MALLOC(size,msg)                malloc (size)
-#define POV_CALLOC(nitems,size,msg)         calloc ((nitems), (size))
 #define POV_REALLOC(ptr,size,msg)           realloc ((ptr), (size))
 #define POV_FREE(ptr)                       do { free (static_cast<void *>(ptr)); (ptr) = NULL; } while(false)
 #define POV_STRDUP(str)                     strdup(str)
@@ -261,13 +258,11 @@ namespace pov_base
 
 #ifdef _DEBUG
   #define POV_MALLOC(size,msg)              povwin::win_malloc ((size), __FILE__, __LINE__)
-  #define POV_CALLOC(nitems,size,msg)       povwin::win_calloc ((nitems), (size), __FILE__, __LINE__)
   #define POV_REALLOC(ptr,size,msg)         povwin::win_realloc ((ptr), (size), __FILE__, __LINE__)
   #define POV_FREE(ptr)                     do { povwin::win_free (static_cast<void *>(ptr), __FILE__, __LINE__); (ptr) = NULL; } while(false)
   #define POV_STRDUP(str)                   povwin::win_strdup(str, __FILE__, __LINE__)
 #else
   #define POV_MALLOC(size,msg)              povwin::win_malloc (size)
-  #define POV_CALLOC(nitems,size,msg)       povwin::win_calloc ((nitems), (size))
   #define POV_REALLOC(ptr,size,msg)         povwin::win_realloc ((ptr), (size))
   #define POV_FREE(ptr)                     do { povwin::win_free (static_cast<void *>(ptr)); (ptr) = NULL; } while(false)
   #define POV_STRDUP(str)                   povwin::win_strdup(str)

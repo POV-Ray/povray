@@ -216,16 +216,17 @@ typedef struct
     USHORT numberOfHMetrics;      /* number of hMetrics in the hmtx table */
 } sfnt_HorizHeader;
 
-typedef struct
+struct GlyphHeader
 {
     SHORT numContours;
     SHORT xMin;
     SHORT yMin;
     SHORT xMax;
     SHORT yMax;
-} GlyphHeader;
+    GlyphHeader() : numContours(0), xMin(0), yMin(0), xMax(0), yMax(0) {}
+};
 
-typedef struct
+struct GlyphOutline
 {
     GlyphHeader header;
     USHORT numPoints;
@@ -233,7 +234,24 @@ typedef struct
     BYTE *flags;
     DBL *x, *y;
     USHORT myMetrics;
-} GlyphOutline;
+
+    GlyphOutline() :
+        header(),
+        numPoints(0),
+        endPoints(NULL),
+        flags(NULL),
+        x(NULL), y(NULL),
+        myMetrics(0)
+    {}
+
+    ~GlyphOutline()
+    {
+        if (endPoints != NULL) POV_FREE(endPoints);
+        if (flags     != NULL) POV_FREE(flags);
+        if (x         != NULL) POV_FREE(x);
+        if (y         != NULL) POV_FREE(y);
+    }
+};
 
 typedef struct
 {
@@ -1668,14 +1686,7 @@ GlyphPtr ExtractGlyphInfo(TrueTypeFont *ffile, unsigned int glyph_index, unsigne
     /* Free up outline information */
 
     if (ttglyph)
-    {
-        if (ttglyph->y) POV_FREE(ttglyph->y);
-        if (ttglyph->x) POV_FREE(ttglyph->x);
-        if (ttglyph->endPoints) POV_FREE(ttglyph->endPoints);
-        if (ttglyph->flags) POV_FREE(ttglyph->flags);
-
-        POV_FREE(ttglyph);
-    }
+        delete ttglyph;
 
 #ifdef TTF_DEBUG3
     int i, j;
@@ -1787,7 +1798,7 @@ GlyphOutline *ExtractGlyphOutline(TrueTypeFont *ffile, unsigned int glyph_index,
     SHORT nc;
     GlyphOutline *ttglyph;
 
-    ttglyph = reinterpret_cast<GlyphOutline *>(POV_CALLOC(1, sizeof(GlyphOutline), "ttf"));
+    ttglyph = new GlyphOutline;
     ttglyph->myMetrics = glyph_index;
 
     /* Have to treat space characters differently */
@@ -2142,12 +2153,7 @@ GlyphOutline *ExtractGlyphOutline(TrueTypeFont *ffile, unsigned int glyph_index,
 
             /* Free up the sub glyph outline information */
 
-            if (sub_ttglyph->y) POV_FREE(sub_ttglyph->y);
-            if (sub_ttglyph->x) POV_FREE(sub_ttglyph->x);
-            if (sub_ttglyph->endPoints) POV_FREE(sub_ttglyph->endPoints);
-            if (sub_ttglyph->flags) POV_FREE(sub_ttglyph->flags);
-
-            POV_FREE(sub_ttglyph);
+            delete sub_ttglyph;
         } while (flags & MORE_COMPONENTS);
     }
 
