@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file backend/support/bsptree.h
+/// @file core/support/bsptree.h
 ///
 /// @todo   What's in here?
 ///
@@ -31,19 +31,16 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
-#ifndef POVRAY_BACKEND_BSPTREE_H
-#define POVRAY_BACKEND_BSPTREE_H
+#ifndef POVRAY_CORE_BSPTREE_H
+#define POVRAY_CORE_BSPTREE_H
 
 #include <vector>
 #include <list>
 #include <cstdio>
 
-#include "backend/frame.h"
-
-#include "base/stringutilities.h"
-#include "backend/bounding/bbox.h"
+#include "core/bounding/boundingbox.h"
 
 namespace pov
 {
@@ -313,4 +310,4 @@ class BSPInsideCondFunctor : public BSPTree::Inside
 
 }
 
-#endif // POVRAY_BACKEND_BSPTREE_H
+#endif // POVRAY_CORE_BSPTREE_H

@@ -38,7 +38,7 @@
 #ifndef OVUS_H
 #define OVUS_H
 
-#include "backend/scene/objects.h"
+#include "core/scene/object.h"
 
 namespace pov
 {

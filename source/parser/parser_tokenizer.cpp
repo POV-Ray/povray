@@ -49,15 +49,15 @@
 
 #include "base/stringutilities.h"
 
+#include "core/material/blendmap.h"
 #include "core/material/pattern.h"
 #include "core/material/texture.h"
+#include "core/math/matrix.h"
 
 #include "povms/povmsid.h"
 #include "povms/povmsutil.h"
 
-#include "backend/colour/colour_old.h"
-#include "backend/math/matrices.h"
-#include "backend/scene/scenedata.h"
+#include "backend/scene/backendscenedata.h"
 
 // this must be the last file included
 #include "base/povdebug.h"

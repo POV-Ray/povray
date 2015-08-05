@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file backend/lighting/point.h
+/// @file core/lighting/lightsource.h
 ///
 /// This module contains all defines, typedefs, and prototypes for `point.cpp`.
 ///
@@ -33,13 +33,14 @@
 ///
 //******************************************************************************
 
-#ifndef POINT_H
-#define POINT_H
-
-#include "backend/frame.h"
+#ifndef POVRAY_CORE_POINT_H
+#define POVRAY_CORE_POINT_H
 
 namespace pov
 {
+
+class LightSource;
+class Ray;
 
 /*****************************************************************************
 * Global preprocessor defines
@@ -68,4 +69,4 @@ DBL cubic_spline(DBL low,DBL high,DBL pos);
 
 }
 
-#endif
+#endif // POVRAY_CORE_POINT_H

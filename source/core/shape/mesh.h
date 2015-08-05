@@ -37,7 +37,7 @@
 #ifndef MESH_H
 #define MESH_H
 
-#include "backend/scene/objects.h"
+#include "core/scene/object.h"
 
 namespace pov
 {

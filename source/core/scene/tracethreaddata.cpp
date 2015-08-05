@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file backend/scene/threaddata.cpp
+/// @file core/scene/tracethreaddata.cpp
 ///
 /// @todo   What's in here?
 ///
@@ -35,21 +35,14 @@
 
 #include <limits>
 
-// frame.h must always be the first POV file included (pulls in platform config)
-#include "backend/frame.h"
-#include "backend/scene/threaddata.h"
+// configcore.h must always be the first POV file included in core *.cpp files (pulls in platform config)
+#include "core/configcore.h"
+#include "core/scene/tracethreaddata.h"
 
-#include "core/material/texture.h"
+#include "core/scene/scenedata.h"
 #include "core/shape/blob.h"
 #include "core/shape/fractal.h"
 #include "core/shape/isosurface.h"
-
-#include "backend/bounding/bcyl.h"
-#include "backend/scene/objects.h"
-#include "backend/scene/scenedata.h"
-#include "backend/scene/view.h"
-#include "backend/support/statistics.h"
-#include "backend/vm/fnpovfpu.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -77,7 +70,7 @@ TraceThreadData::TraceThreadData(shared_ptr<SceneData> sd): sceneData(sd), quali
     isosurfaceData->tl = 0.0;
     isosurfaceData->Vlength = 0.0;
 
-    functionContext = new FPUContext(sceneData->functionVM, this);
+    functionContext = sceneData->functionContextFactory->CreateFunctionContext(this);
     functionPatternContext.resize(sceneData->functionPatternCount);
 
     BCyl_Intervals.reserve(4*sceneData->Max_Bounding_Cylinders);
@@ -174,31 +167,6 @@ void TraceThreadData::AfterTile()
             it++;
         }
     }
-}
-
-ViewThreadData::ViewThreadData(ViewData *vd) :
-    TraceThreadData(vd->GetSceneData()),
-    viewData(vd)
-{
-}
-
-ViewThreadData::~ViewThreadData()
-{
-}
-
-unsigned int ViewThreadData::GetWidth() const
-{
-    return viewData->GetWidth();
-}
-
-unsigned int ViewThreadData::GetHeight() const
-{
-    return viewData->GetHeight();
-}
-
-const POVRect& ViewThreadData::GetRenderArea()
-{
-    return viewData->GetRenderArea();
 }
 
 }

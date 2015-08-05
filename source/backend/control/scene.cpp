@@ -42,6 +42,8 @@
 #include "backend/frame.h"
 #include "backend/control/scene.h"
 
+#include "core/scene/tracethreaddata.h"
+
 #include "parser/parser.h"
 
 #include "backend/bounding/boundingtask.h"
@@ -54,7 +56,7 @@ namespace pov
 {
 
 Scene::Scene(POVMSAddress backendAddr, POVMSAddress frontendAddr, RenderBackend::SceneId sid) :
-    sceneData(new SceneData()),
+    sceneData(new BackendSceneData()),
     stopRequsted(false),
     parserControlThread(NULL)
 {

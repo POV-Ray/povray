@@ -49,18 +49,17 @@
 
 #include "base/fileinputoutput.h"
 
+#include "core/material/blendmap.h"
 #include "core/material/pigment.h"
 #include "core/material/texture.h"
 #include "core/material/warp.h"
+#include "core/math/matrix.h"
+#include "core/math/randomsequence.h"
 #include "core/render/ray.h"
-
-#include "backend/colour/colour_old.h"
-#include "backend/math/matrices.h"
-#include "backend/scene/objects.h"
-#include "backend/scene/scenedata.h"
-#include "backend/scene/threaddata.h"
-#include "backend/support/imageutil.h"
-#include "backend/support/randomsequences.h"
+#include "core/scene/object.h"
+#include "core/scene/scenedata.h"
+#include "core/scene/tracethreaddata.h"
+#include "core/support/imageutil.h"
 
 // this must be the last file included
 #include "base/povdebug.h"

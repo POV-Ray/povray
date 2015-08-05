@@ -36,9 +36,6 @@
     <ClCompile Include="..\..\source\base\pov_err.cpp">
       <Filter>Base source</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\base\processoptions.cpp">
-      <Filter>Base source</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\base\stringutilities.cpp">
       <Filter>Base source</Filter>
     </ClCompile>
@@ -139,9 +136,6 @@
       <Filter>Base Headers</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\base\povdebug.h">
-      <Filter>Base Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\base\processoptions.h">
       <Filter>Base Headers</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\base\stringutilities.h">

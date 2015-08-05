@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file backend/scene/scenedata.h
+/// @file core/scene/scenedata.h
 ///
 /// @todo   What's in here?
 ///
@@ -33,24 +33,14 @@
 ///
 //******************************************************************************
 
-#ifndef POVRAY_BACKEND_SCENEDATA_H
-#define POVRAY_BACKEND_SCENEDATA_H
-
-#include <vector>
-#include <string>
-#include <map>
-
-#include <boost/thread.hpp>
-
-#include "backend/frame.h"
+#ifndef POVRAY_CORE_SCENEDATA_H
+#define POVRAY_CORE_SCENEDATA_H
 
 #include "base/image/colourspace.h"
 
+#include "core/lighting/radiosity.h"
+#include "core/scene/camera.h"
 #include "core/shape/truetype.h"
-
-#include "backend/control/renderbackend.h"
-#include "backend/lighting/radiosity.h"
-#include "backend/scene/camera.h"
 
 namespace pov
 {
@@ -58,7 +48,6 @@ namespace pov
 using namespace pov_base;
 
 class BSPTree;
-class FunctionVM;
 
 struct Fog_Struct;
 struct Rainbow_Struct;
@@ -78,24 +67,14 @@ struct Skysphere_Struct;
  */
 class SceneData
 {
-        // Scene needs access to the private scene data constructor!
-        friend class Scene;
     public:
 
         typedef std::map<string, string>         DeclaredVariablesMap;
-        typedef std::map<UCS2String, UCS2String> FilenameToFilenameMap;
 
         /**
          *  Destructor.
          */
         ~SceneData();
-
-        /// scene id
-        RenderBackend::SceneId sceneId;
-        /// backend address
-        POVMSAddress backendAddress;
-        /// frontend address
-        POVMSAddress frontendAddress;
 
         /// list of all shape objects
         vector<ObjectPtr> objects;
@@ -103,8 +82,8 @@ class SceneData
         vector<LightSource *> lightSources;
         /// list of all lights that are part of light groups
         vector<LightSource *> lightGroupLightSources;
-        /// function vm managing all functions in scene
-        FunctionVM *functionVM;
+        /// factory generating contexts for functions in scene
+        GenericFunctionContextFactory* functionContextFactory;
         /// atmosphere index of refraction
         DBL atmosphereIOR;
         /// atmosphere dispersion
@@ -139,9 +118,6 @@ class SceneData
         bool explicitNoiseGenerator;
         /// bounding method selector
         unsigned int boundingMethod;
-        /// What gamma mode to use.
-        /// One of kPOVList_GammaMode_*.
-        int gammaMode;
         /// Working gamma.
         pov_base::SimpleGammaCurvePtr workingGamma;
         /// Working gamma to sRGB encoding/decoding.
@@ -263,71 +239,6 @@ class SceneData
         }
 
         /**
-         *  Find a file for reading.
-         *  If the file is not available localy, the frontend will be queried.
-         *  Variants of the filename with extensions matching file type will
-         *  be tried. Only the first file found is returned.
-         *  @param  ctx             POVMS message context for the current thread.
-         *  @param  filename        Name and optional (partial) path.
-         *  @param  stype           File type.
-         *  @return                 Name of found file or empty string.
-         */
-        UCS2String FindFile(POVMSContext ctx, const UCS2String& filename, unsigned int stype);
-
-        /**
-         *  Open a file for reading.
-         *  If the file is not available localy, the frontend will be queried.
-         *  If the frontend has the file, it will be assigned a local temporary
-         *  name that is mapped to the specified file name (so repeated access
-         *  does not require contacting the frontend) and the file will be
-         *  transferred from the frontend to the local system as necessary.
-         *  Note that for their first access the frontend will always be asked
-         *  to provide the location of the file. Local files are only accessed
-         *  within the system specific temporary directory. This prevents
-         *  access to files on local systems in case of remote rendering.
-         *  Returns NULL if the file could not be found.
-         *  @param  ctx             POVMS message context for the current thread.
-         *  @param  origname        The original name of the file as in the scene file (could be relative). // TODO FIXME - not needed, just a hack, the source [trf]
-         *  @param  filename        Name and optional (partial) path.
-         *  @param  stype           File type.
-         *  @return                 Pointer to the file or NULL. The caller is
-         *                          responsible for freeing the pointer!
-         */
-        IStream *ReadFile(POVMSContext ctx, const UCS2String& origname, const UCS2String& filename, unsigned int stype); // TODO FIXME - see above and source code [trf]
-
-        /**
-         *  Open a file given by name and optional (partial) path for writing.
-         *  Rather than creating the file in the specified location, a temporary
-         *  file will be created and the specified name will be mapped to that
-         *  local file. Local files are only accessed within the system specific
-         *  temporary directory. This prevents access to fileson local systems
-         *  in case of remote rendering. For each neealy created file the
-         *  frontend is notified and after rendering the frontend can decide
-         *  which files to access. In addition, this allows parsing the same
-         *  scene simultaniously more than once as each scene manages its own
-         *  set of unique temporary files and thus at no time a file is written
-         *  to or read from by more than one scene.
-         *  @param  ctx             POVMS message context for the current thread.
-         *  @param  filename        Name and optional (partial) path.
-         *  @param  stype           File type.
-         *  @param  append          True to append data to the file, false otherwise.
-         *  @return                 Pointer to the file or NULL. The caller is
-         *                          responsible for freeing the pointer!
-         */
-        OStream *CreateFile(POVMSContext ctx, const UCS2String& filename, unsigned int stype, bool append);
-    private:
-#ifdef USE_SCENE_FILE_MAPPING
-        /// maps scene file names to local file names
-        FilenameToFilenameMap scene2LocalFiles;
-        /// maps local file names to scene file names
-        FilenameToFilenameMap local2SceneFiles;
-        /// maps scene file names to temporary file names
-        FilenameToFilenameMap scene2TempFiles;
-        /// maps temporary file names to scene file names
-        FilenameToFilenameMap temp2SceneFiles;
-#endif
-
-        /**
          *  Create new scene specific data.
          */
         SceneData();
@@ -341,4 +252,4 @@ class SceneData
 
 }
 
-#endif // POVRAY_BACKEND_SCENEDATA_H
+#endif // POVRAY_CORE_SCENEDATA_H

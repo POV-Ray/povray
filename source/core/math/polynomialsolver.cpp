@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file backend/math/polysolv.cpp
+/// @file core/math/polynomialsolver.cpp
 ///
 /// This module contains code for solving polynomial equations.
 ///
@@ -35,9 +35,11 @@
 ///
 //******************************************************************************
 
-// frame.h must always be the first POV file included (pulls in platform config)
-#include "backend/frame.h"
-#include "backend/math/polysolv.h"
+// configcore.h must always be the first POV file included in core *.cpp files (pulls in platform config)
+#include "core/configcore.h"
+#include "core/math/polynomialsolver.h"
+
+#include "core/support/statistics.h"
 
 // this must be the last file included
 #include "base/povdebug.h"

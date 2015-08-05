@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file backend/lighting/photons.h
+/// @file core/lighting/photons.h
 ///
 /// This module contains all defines, typedefs, and prototypes for
 /// `photons.cpp`.
@@ -34,15 +34,11 @@
 ///
 //******************************************************************************
 
-#ifndef PHOTONS_H
-#define PHOTONS_H
+#ifndef POVRAY_CORE_PHOTONS_H
+#define POVRAY_CORE_PHOTONS_H
 
 #include "core/material/media.h"
 #include "core/render/trace.h"
-
-#include "povms/povms.h"
-
-#include "backend/frame.h"
 
 namespace pov
 {
@@ -402,8 +398,7 @@ extern SinCosOptimizations sinCosData;
 /* for documentation of these functions, see photons.c */
 /* ------------------------------------------------------ */
 void ChooseRay(BasicRay &NewRay, const Vector3d& Normal, const Vector3d& Raw_Normal, int WhichRay);
-int GetPhotonStat(POVMSType a);
 
 }
 
-#endif
+#endif // POVRAY_CORE_PHOTONS_H

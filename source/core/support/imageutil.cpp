@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file backend/support/imageutil.cpp
+/// @file core/support/imageutil.cpp
 ///
 /// This module implements the mapped textures including image map, bump map
 /// and material map.
@@ -36,17 +36,16 @@
 
 #include <boost/scoped_ptr.hpp>
 
-// frame.h must always be the first POV file included (pulls in platform config)
-#include "backend/frame.h"
-#include "backend/support/imageutil.h"
+// configcore.h must always be the first POV file included in core *.cpp files (pulls in platform config)
+#include "core/configcore.h"
+#include "core/support/imageutil.h"
 
 #include "base/pov_err.h"
 
+#include "core/colour/spectral.h"
 #include "core/material/normal.h"
 #include "core/material/pattern.h"
 #include "core/material/texture.h"
-
-#include "backend/colour/spectral.h"
 
 #ifdef SYS_IMAGE_HEADER
 #include SYS_IMAGE_HEADER

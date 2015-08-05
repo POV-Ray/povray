@@ -92,6 +92,7 @@ using std::runtime_error;
 // these may actually be the boost implementations, depending on what boost/tr1/memory.hpp has pulled in
 using std::tr1::shared_ptr;
 using std::tr1::weak_ptr;
+using std::tr1::dynamic_pointer_cast;
 
 #endif // STD_POV_TYPES_DECLARED
 
@@ -227,7 +228,6 @@ namespace pov_base
 #define RENAME_FILE(orig,new)               rename(orig,new)
 #define DELETE_FILE(name)                   _unlink(name)
 #define NEW_LINE_STRING                     "\r\n"
-#define TEXTSTREAM_CRLF                     1
 #define POV_SYS_FILE_EXTENSION              ".bmp"
 #define SYS_TO_STANDARD                     BMP
 #define vsnprintf                           _vsnprintf

@@ -41,8 +41,6 @@
 #include "base/configbase.h"
 #include "base/image/colourspace.h"
 
-#include "povms/povmsid.h"
-
 #include "base/image/encoding.h"
 
 // this must be the last file included
@@ -253,7 +251,7 @@ SimpleGammaCurvePtr PowerLawGammaCurve::GetByEncodingGamma(float gamma)
 {
     if (IsNeutral(gamma))
         return NeutralGammaCurve::Get();
-    return std::tr1::dynamic_pointer_cast<SimpleGammaCurve,GammaCurve>(GetMatching(GammaCurvePtr(new PowerLawGammaCurve(gamma))));
+    return std::tr1::dynamic_pointer_cast<SimpleGammaCurve>(GetMatching(GammaCurvePtr(new PowerLawGammaCurve(gamma))));
 }
 SimpleGammaCurvePtr PowerLawGammaCurve::GetByDecodingGamma(float gamma)
 {
@@ -383,7 +381,7 @@ bool TranscodingGammaCurve::Matches(const GammaCurvePtr& p) const
 
 /*******************************************************************************/
 
-SimpleGammaCurvePtr GetGammaCurve(int type, float param)
+SimpleGammaCurvePtr GetGammaCurve(GammaTypeId type, float param)
 {
     switch (type)
     {

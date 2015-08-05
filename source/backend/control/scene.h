@@ -42,9 +42,10 @@
 
 #include <boost/thread.hpp>
 
+#include "core/scene/tracethreaddata.h"
+
 #include "backend/control/renderbackend.h"
-#include "backend/scene/scenedata.h"
-#include "backend/scene/threaddata.h"
+#include "backend/scene/backendscenedata.h"
 #include "backend/support/taskqueue.h"
 
 namespace pov
@@ -179,7 +180,7 @@ class Scene
         /// scene thread data (e.g. statistics)
         vector<TraceThreadData *> sceneThreadData;
         /// scene data
-        shared_ptr<SceneData> sceneData;
+        shared_ptr<BackendSceneData> sceneData;
         /// stop request flag
         bool stopRequsted;
         /// parser control thread

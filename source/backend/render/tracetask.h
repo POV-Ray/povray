@@ -42,10 +42,10 @@
 
 #include "base/image/colourspace.h"
 
+#include "core/lighting/radiosity.h"
 #include "core/material/media.h"
 
 #include "backend/frame.h"
-#include "backend/lighting/radiosity.h"
 #include "backend/render/rendertask.h"
 #include "backend/render/tracepixel.h"
 

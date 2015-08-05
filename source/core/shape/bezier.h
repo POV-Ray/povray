@@ -37,7 +37,7 @@
 #ifndef BEZIER_H
 #define BEZIER_H
 
-#include "backend/scene/objects.h"
+#include "core/scene/object.h"
 
 namespace pov
 {

@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file backend/support/randomsequences.h
+/// @file core/math/randomsequence.h
 ///
 /// @todo   What's in here?
 ///
@@ -33,11 +33,13 @@
 ///
 //******************************************************************************
 
-#ifndef POVRAY_BACKEND_RANDOMSEQUENCES_H
-#define POVRAY_BACKEND_RANDOMSEQUENCES_H
+#ifndef POVRAY_CORE_RANDOMSEQUENCES_H
+#define POVRAY_CORE_RANDOMSEQUENCES_H
 
 #include <cctype>
 #include <vector>
+
+#include "core/math/vector.h"
 
 namespace pov
 {
@@ -322,4 +324,4 @@ SequentialVector2dGeneratorPtr GetSubRandom2dGenerator(unsigned int id, double m
 
 } // end of namespace
 
-#endif // POVRAY_BACKEND_RANDOMSEQUENCES_H
+#endif // POVRAY_CORE_RANDOMSEQUENCES_H

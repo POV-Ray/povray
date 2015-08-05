@@ -43,9 +43,9 @@
 #include "base/timer.h"
 #include "base/types.h"
 
-#include "backend/scene/scenedata.h"
-#include "backend/scene/threaddata.h"
+#include "backend/scene/backendscenedata.h"
 #include "backend/scene/view.h"
+#include "backend/scene/viewthreaddata.h"
 
 // this must be the last file included
 #include "base/povdebug.h"

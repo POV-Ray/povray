@@ -44,6 +44,11 @@
 #include "base/textstreambuffer.h"
 
 #include "core/material/pigment.h"
+#include "core/material/warp.h"
+#include "core/math/matrix.h"
+#include "core/math/vector.h"
+#include "core/scene/atmosphere.h"
+#include "core/scene/camera.h"
 #include "core/shape/blob.h"
 #include "core/shape/truetype.h"
 
@@ -51,10 +56,6 @@
 #include "parser/reservedwords.h"
 
 #include "backend/control/messagefactory.h"
-#include "backend/math/matrices.h"
-#include "backend/math/vector.h"
-#include "backend/scene/atmosph.h"
-#include "backend/scene/camera.h"
 #include "backend/support/task.h"
 
 namespace pov
@@ -275,7 +276,7 @@ class Parser : public SceneTask
         };
 
         // constructor
-        Parser(shared_ptr<SceneData> sd, bool useclock, DBL clock);
+        Parser(shared_ptr<BackendSceneData> sd, bool useclock, DBL clock);
 
         void Run();
         void Stopped();
@@ -328,8 +329,8 @@ class Parser : public SceneTask
 
         static void Convert_Filter_To_Transmit(PIGMENT *Pigment); // NK layers - 1999 July 10 - for backwards compatiblity with layered textures
 
-        IStream *Locate_File(shared_ptr<SceneData>& sd, const UCS2String& filename, unsigned int stype, UCS2String& buffer, bool err_flag = false);
-        Image *Read_Image(shared_ptr<SceneData>& sd, int filetype, const UCS2 *filename, const Image::ReadOptions& options);
+        IStream *Locate_File(shared_ptr<BackendSceneData>& sd, const UCS2String& filename, unsigned int stype, UCS2String& buffer, bool err_flag = false);
+        Image *Read_Image(shared_ptr<BackendSceneData>& sd, int filetype, const UCS2 *filename, const Image::ReadOptions& options);
 
         // tokenize.h/tokenize.cpp
         void Get_Token (void);
@@ -375,13 +376,13 @@ class Parser : public SceneTask
         void Parse_Colour (RGBColour& colour);
         void Parse_Colour (MathColour& colour);
         void Parse_Wavelengths (MathColour& colour);
-        template<typename DATA_T> void Parse_BlendMapData (int Blend_Type, DATA_T& rData);
-        template<typename MAP_T> shared_ptr<MAP_T> Parse_Blend_Map (int Blend_Type, int Pat_Type);
+        template<typename DATA_T> void Parse_BlendMapData (BlendMapTypeId Blend_Type, DATA_T& rData);
+        template<typename MAP_T> shared_ptr<MAP_T> Parse_Blend_Map (BlendMapTypeId Blend_Type, int Pat_Type);
         template<typename MAP_T> shared_ptr<MAP_T> Parse_Colour_Map (void);
-        template<typename DATA_T> void Parse_BlendListData (int Blend_Type, DATA_T& rData);
-        template<typename DATA_T> void Parse_BlendListData_Default (const ColourBlendMapData& Def_Entry, int Blend_Type, DATA_T& rData);
-        template<typename MAP_T> shared_ptr<MAP_T> Parse_Blend_List (int Count, ColourBlendMapConstPtr Def_Map, int Blend_Type);
-        template<typename MAP_T> shared_ptr<MAP_T> Parse_Item_Into_Blend_List (int Blend_Type);
+        template<typename DATA_T> void Parse_BlendListData (BlendMapTypeId Blend_Type, DATA_T& rData);
+        template<typename DATA_T> void Parse_BlendListData_Default (const ColourBlendMapData& Def_Entry, BlendMapTypeId Blend_Type, DATA_T& rData);
+        template<typename MAP_T> shared_ptr<MAP_T> Parse_Blend_List (int Count, ColourBlendMapConstPtr Def_Map, BlendMapTypeId Blend_Type);
+        template<typename MAP_T> shared_ptr<MAP_T> Parse_Item_Into_Blend_List (BlendMapTypeId Blend_Type);
         GenericSpline *Parse_Spline (void);
 
         /// Parses a FLOAT.
@@ -433,7 +434,7 @@ class Parser : public SceneTask
         bool expr_ret(ExprNode *&current, int stage, int op);
         bool expr_err(ExprNode *&current, int stage, int op);
 
-        shared_ptr<SceneData> sceneData; // TODO FIXME HACK - make private again once Locate_Filename is fixed [trf]
+        shared_ptr<BackendSceneData> sceneData; // TODO FIXME HACK - make private again once Locate_Filename is fixed [trf]
     private:
         FPUContext *fnVMContext;
 
@@ -649,7 +650,7 @@ class Parser : public SceneTask
         void Parse_Image_Pattern (TPATTERN *TPattern);
         void Parse_Bump_Map (TNORMAL *Tnormal);
         void Parse_Image_Map (PIGMENT *Pigment);
-        template<typename MAP_T, typename PATTERN_T> void Parse_Pattern (PATTERN_T *New, int TPat_Type);
+        template<typename MAP_T, typename PATTERN_T> void Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type);
         TEXTURE *Parse_Vers1_Texture (void);
         TEXTURE *Parse_Tiles (void);
         TEXTURE *Parse_Material_Map (void);
@@ -726,6 +727,10 @@ class Parser : public SceneTask
 
         // [CLi] moved this from photons to parser
         void CheckPassThru(ObjectPtr o, int flag);
+
+        // TODO - obsolete
+        RGBFTColour *Create_Colour (void);
+        RGBFTColour *Copy_Colour (const RGBFTColour* Old);
 };
 
 }

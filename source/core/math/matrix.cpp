@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file backend/math/matrices.cpp
+/// @file core/math/matrix.cpp
 ///
 /// This module contains code to manipulate 4x4 matrices.
 ///
@@ -33,9 +33,9 @@
 ///
 //******************************************************************************
 
-// frame.h must always be the first POV file included (pulls in platform config)
-#include "backend/frame.h"
-#include "backend/math/matrices.h"
+// configcore.h must always be the first POV file included in core *.cpp files (pulls in platform config)
+#include "core/configcore.h"
+#include "core/math/matrix.h"
 
 #include "base/pov_err.h"
 

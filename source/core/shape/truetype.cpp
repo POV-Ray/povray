@@ -39,15 +39,13 @@
 #include "core/configcore.h"
 #include "core/shape/truetype.h"
 
-#include "core/render/ray.h"
-#include "core/shape/csg.h"
-
 #include "base/fileinputoutput.h"
 
-#include "backend/bounding/bbox.h"
-#include "backend/math/matrices.h"
-#include "backend/scene/objects.h"
-#include "backend/scene/threaddata.h"
+#include "core/bounding/boundingbox.h"
+#include "core/math/matrix.h"
+#include "core/render/ray.h"
+#include "core/scene/tracethreaddata.h"
+#include "core/shape/csg.h"
 
 // this must be the last file included
 #include "base/povdebug.h"

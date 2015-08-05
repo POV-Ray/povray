@@ -37,8 +37,8 @@
 #ifndef BLOB_H
 #define BLOB_H
 
-#include "backend/scene/objects.h"
-#include "backend/bounding/bsphere.h"
+#include "core/bounding/boundingsphere.h"
+#include "core/scene/object.h"
 
 namespace pov
 {

@@ -49,6 +49,8 @@
 #include "base/stringutilities.h"
 #include "base/textstream.h"
 #include "base/types.h"
+#include "base/image/colourspace.h"
+#include "base/image/encoding.h"
 
 // this must be the last file included
 #include "base/povdebug.h"

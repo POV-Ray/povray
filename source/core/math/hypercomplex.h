@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file backend/math/hcmplx.h
+/// @file core/math/hypercomplex.h
 ///
 /// This module contains all defines, typedefs, and prototypes for `hcmplx.cpp`.
 ///
@@ -33,8 +33,11 @@
 ///
 //******************************************************************************
 
-#ifndef HCMPLX_H
-#define HCMPLX_H
+#ifndef POVRAY_CORE_HYPERCOMPLEX_H
+#define POVRAY_CORE_HYPERCOMPLEX_H
+
+#include "core/coretypes.h"
+#include "core/math/vector.h"
 
 namespace pov
 {
@@ -127,4 +130,4 @@ void Complex_Div (Complex *target, const Complex *source1, const Complex *source
 
 }
 
-#endif
+#endif // POVRAY_CORE_HYPERCOMPLEX_H

@@ -254,7 +254,7 @@ DBL POVFPU_RunDefault(FPUContext *context, FUNCTION k);
 
 void FNCode_Delete(FunctionCode *);
 
-class FunctionVM
+class FunctionVM : public GenericFunctionContextFactory
 {
         friend void POVFPU_Exception(FPUContext *, FUNCTION, const char *);
         friend DBL POVFPU_RunDefault(FPUContext *, FUNCTION);
@@ -294,6 +294,8 @@ class FunctionVM
 
         FUNCTION_PTR CopyFunction(FUNCTION_PTR pK);
         void DestroyFunction(FUNCTION_PTR pK);
+
+        virtual GenericFunctionContextPtr CreateFunctionContext(TraceThreadData* pTd);
 
     private:
 

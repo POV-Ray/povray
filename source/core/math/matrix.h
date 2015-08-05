@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file backend/math/matrices.h
+/// @file core/math/matrix.h
 ///
 /// This module contains all defines, typedefs, and prototypes for
 /// `matrices.cpp`.
@@ -34,10 +34,13 @@
 ///
 //******************************************************************************
 
-#ifndef MATRICES_H
-#define MATRICES_H
+#ifndef POVRAY_CORE_MATRIX_H
+#define POVRAY_CORE_MATRIX_H
 
-#include "backend/frame.h"
+#include "core/configcore.h"
+
+#include "core/coretypes.h"
+#include "core/math/vector.h"
 
 namespace pov
 {
@@ -115,4 +118,4 @@ int MInvers3(const Matrix3x3& inM, Matrix3x3& outM);
 
 }
 
-#endif
+#endif // POVRAY_CORE_MATRIX_H

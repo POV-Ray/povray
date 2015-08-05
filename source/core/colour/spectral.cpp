@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file backend/colour/spectral.cpp
+/// @file core/colour/spectral.cpp
 ///
 /// This module implements routines to handle colour spectra.
 ///
@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -31,11 +31,11 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
-// frame.h must always be the first POV file included (pulls in platform config)
-#include "backend/frame.h"
-#include "backend/colour/spectral.h"
+// configcore.h must always be the first POV file included in core *.cpp files (pulls in platform config)
+#include "core/configcore.h"
+#include "core/colour/spectral.h"
 
 #include "base/colour.h"
 

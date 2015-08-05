@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -31,7 +31,7 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
 #ifndef POVRAY_BASE_COLOURSPACE_H
 #define POVRAY_BASE_COLOURSPACE_H
@@ -379,7 +379,7 @@ class SimpleGammaCurve : public GammaCurve
         {
             SimpleGammaCurve* simpleP = dynamic_cast<SimpleGammaCurve*>(p.get());
             if (simpleP)
-                return ((simpleP->GetTypeId() == this->GetTypeId()) && (simpleP->GetParam() == this->GetParam()));
+                return ((typeid(*simpleP) == typeid(*this)) && (simpleP->GetParam() == this->GetParam()));
             else
                 return false;
         }
@@ -409,7 +409,7 @@ class UniqueGammaCurve : public SimpleGammaCurve
         {
             UniqueGammaCurve* uniqueP = dynamic_cast<UniqueGammaCurve*>(p.get());
             if (uniqueP)
-                return (uniqueP->GetTypeId() == this->GetTypeId());
+                return (typeid(*uniqueP) == typeid(*this));
             else
                 return false;
         }
@@ -537,12 +537,20 @@ class TranscodingGammaCurve : public GammaCurve
         virtual bool Matches(const GammaCurvePtr&) const;
 };
 
+enum GammaTypeId
+{
+    kPOVList_GammaType_Unknown,
+    kPOVList_GammaType_Neutral,
+    kPOVList_GammaType_PowerLaw,
+    kPOVList_GammaType_SRGB
+};
+
 /// Generic transfer function factory.
 ///
 /// @param  typeId  transfer function type (one of kPOVList_GammaType_*)
 /// @param  param   parameter for parameterized transfer function (e.g. gamma of power-law function)
 ///
-SimpleGammaCurvePtr GetGammaCurve(int typeId, float param);
+SimpleGammaCurvePtr GetGammaCurve(GammaTypeId typeId, float param);
 
 }
 

@@ -45,8 +45,9 @@
 
 #include "base/fileinputoutput.h"
 #include "base/platformbase.h"
-#include "base/processoptions.h"
 #include "base/types.h"
+
+#include "frontend/processoptions.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -1897,10 +1898,6 @@ string GetProgressTime(POVMS_Object& obj, POVMSType key)
 
     return string(buffer);
 }
-
-#if 0
-#pragma mark -
-#endif
 
 void RenderDone(TextStreamBuffer *tsb, POVMSObjectPtr msg)
 {/*

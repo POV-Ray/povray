@@ -39,8 +39,6 @@
 #include "base/configbase.h"
 #include "base/pov_err.h"
 
-#include "povms/povmscpp.h"
-
 // this must be the last file included
 #include "base/povdebug.h"
 

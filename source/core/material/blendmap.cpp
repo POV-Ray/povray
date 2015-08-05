@@ -1,8 +1,8 @@
 //******************************************************************************
 ///
-/// @file backend/colour/colour_old.cpp
+/// @file core/material/blendmap.cpp
 ///
-/// This module implements legacy routines to manipulate colours.
+/// This module implements blend maps.
 ///
 /// @copyright
 /// @parblock
@@ -35,9 +35,9 @@
 
 #include <algorithm>
 
-// frame.h must always be the first POV file included (pulls in platform config)
-#include "backend/frame.h"
-#include "backend/colour/colour_old.h"
+// configcore.h must always be the first POV file included in core *.cpp files (pulls in platform config)
+#include "core/configcore.h"
+#include "core/material/blendmap.h"
 
 #include "core/material/normal.h"
 #include "core/material/pigment.h"
@@ -76,71 +76,6 @@ namespace pov
 *
 * FUNCTION
 *
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-*   POV-Ray Team
-*
-* DESCRIPTION
-*
-*   -
-*
-* CHANGES
-*
-*   -
-*
-******************************************************************************/
-
-RGBFTColour *Create_Colour ()
-{
-    return new RGBFTColour();
-}
-
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-*   POV-Ray Team
-*
-* DESCRIPTION
-*
-*   -
-*
-* CHANGES
-*
-*   -
-*
-******************************************************************************/
-
-RGBFTColour *Copy_Colour (const RGBFTColour* Old)
-{
-    if (Old != NULL)
-        return new RGBFTColour(*Old);
-    else
-        return NULL;
-}
-
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
 *   Create_Blend_Map
 *
 * INPUT
@@ -164,37 +99,37 @@ RGBFTColour *Copy_Colour (const RGBFTColour* Old)
 ******************************************************************************/
 
 template<>
-ColourBlendMapPtr Create_Blend_Map<ColourBlendMap> (int type)
+ColourBlendMapPtr Create_Blend_Map<ColourBlendMap> (BlendMapTypeId type)
 {
-    assert (type == COLOUR_TYPE);
+    assert (type == kBlendMapType_Colour);
     return ColourBlendMapPtr (new ColourBlendMap);
 }
 
 template<>
-PigmentBlendMapPtr Create_Blend_Map<PigmentBlendMap> (int type)
+PigmentBlendMapPtr Create_Blend_Map<PigmentBlendMap> (BlendMapTypeId type)
 {
-    assert ((type == PIGMENT_TYPE) || (type == DENSITY_TYPE));
+    assert ((type == kBlendMapType_Pigment) || (type == kBlendMapType_Density));
     return PigmentBlendMapPtr (new PigmentBlendMap(type));
 }
 
 template<>
-SlopeBlendMapPtr Create_Blend_Map<SlopeBlendMap> (int type)
+SlopeBlendMapPtr Create_Blend_Map<SlopeBlendMap> (BlendMapTypeId type)
 {
-    assert (type == SLOPE_TYPE);
+    assert (type == kBlendMapType_Slope);
     return SlopeBlendMapPtr (new SlopeBlendMap());
 }
 
 template<>
-NormalBlendMapPtr Create_Blend_Map<NormalBlendMap> (int type)
+NormalBlendMapPtr Create_Blend_Map<NormalBlendMap> (BlendMapTypeId type)
 {
-    assert (type == NORMAL_TYPE);
+    assert (type == kBlendMapType_Normal);
     return NormalBlendMapPtr (new NormalBlendMap());
 }
 
 template<>
-TextureBlendMapPtr Create_Blend_Map<TextureBlendMap> (int type)
+TextureBlendMapPtr Create_Blend_Map<TextureBlendMap> (BlendMapTypeId type)
 {
-    assert (type == TEXTURE_TYPE);
+    assert (type == kBlendMapType_Texture);
     return TextureBlendMapPtr (new TextureBlendMap);
 }
 
@@ -265,13 +200,13 @@ template TextureBlendMapPtr         Copy_Blend_Map (TextureBlendMapPtr& Old);
 ******************************************************************************/
 
 template<typename DATA_T>
-BlendMap<DATA_T>::BlendMap(int type) : Type(type) {}
+BlendMap<DATA_T>::BlendMap(BlendMapTypeId type) : Type(type) {}
 
-template BlendMap<ColourBlendMapData>::BlendMap(int type);
-template BlendMap<PigmentBlendMapData>::BlendMap(int type);
-template BlendMap<SlopeBlendMapData>::BlendMap(int type);
-template BlendMap<NormalBlendMapData>::BlendMap(int type);
-template BlendMap<TexturePtr>::BlendMap(int type);
+template BlendMap<ColourBlendMapData>::BlendMap(BlendMapTypeId type);
+template BlendMap<PigmentBlendMapData>::BlendMap(BlendMapTypeId type);
+template BlendMap<SlopeBlendMapData>::BlendMap(BlendMapTypeId type);
+template BlendMap<NormalBlendMapData>::BlendMap(BlendMapTypeId type);
+template BlendMap<TexturePtr>::BlendMap(BlendMapTypeId type);
 
 template<typename DATA_T>
 void BlendMap<DATA_T>::Set(const Vector& data)

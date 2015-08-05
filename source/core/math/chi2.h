@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file backend/math/chi2.h
+/// @file core/math/chi2.h
 ///
 /// This module contains all defines, typedefs, and prototypes for `chi2.cpp`.
 ///
@@ -33,8 +33,8 @@
 ///
 //******************************************************************************
 
-#ifndef CHI2_H
-#define CHI2_H
+#ifndef POVRAY_CORE_CHI2_H
+#define POVRAY_CORE_CHI2_H
 
 namespace pov
 {
@@ -59,4 +59,4 @@ DBL chdtri (DBL df, DBL x);
 
 }
 
-#endif
+#endif // POVRAY_CORE_CHI2_H

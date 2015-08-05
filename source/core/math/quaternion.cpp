@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file backend/math/quatern.cpp
+/// @file core/math/quaternion.cpp
 ///
 /// This module implements Quaternion algebra julia fractals.
 ///
@@ -36,9 +36,9 @@
 ///
 //******************************************************************************
 
-// frame.h must always be the first POV file included (pulls in platform config)
-#include "backend/frame.h"
-#include "backend/math/quatern.h"
+// configcore.h must always be the first POV file included in core *.cpp files (pulls in platform config)
+#include "core/configcore.h"
+#include "core/math/quaternion.h"
 
 #include "core/shape/fractal.h"
 #include "core/shape/sphere.h"

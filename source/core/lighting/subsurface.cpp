@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file backend/lighting/subsurface.cpp
+/// @file core/lighting/subsurface.cpp
 ///
 /// This module implements subsurface light transport.
 ///
@@ -31,11 +31,11 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
-// frame.h must always be the first POV file included (pulls in platform config)
-#include "backend/frame.h"
-#include "backend/lighting/subsurface.h"
+// configcore.h must always be the first POV file included in core *.cpp files (pulls in platform config)
+#include "core/configcore.h"
+#include "core/lighting/subsurface.h"
 
 // this must be the last file included
 #include "base/povdebug.h"

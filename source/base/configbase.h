@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -33,7 +33,7 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
 #ifndef CONFIGBASE_H
 #define CONFIGBASE_H
@@ -64,6 +64,22 @@
 #ifndef POV_LONG
     #define POV_LONG long long
     #define POV_ULONG unsigned long long
+#endif
+
+#ifndef POV_INT8
+    #define POV_INT8 signed char
+#endif
+
+#ifndef POV_INT16
+    #define POV_INT16 short
+#endif
+
+#ifndef POV_INT32
+    #define POV_INT32 int
+#endif
+
+#ifndef POV_INT64
+    #define POV_INT64 long long
 #endif
 
 #ifndef POV_ULONG
@@ -148,6 +164,18 @@
     #else
         #define POV_TIME_UTC boost::TIME_UTC
     #endif
+#endif
+
+#ifndef CDECL
+    #define CDECL
+#endif
+
+#ifndef ALIGN16
+    #define ALIGN16
+#endif
+
+#ifndef FORCEINLINE
+    #define FORCEINLINE inline
 #endif
 
 #endif

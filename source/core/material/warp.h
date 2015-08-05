@@ -39,7 +39,8 @@
 #ifndef WARP_H
 #define WARP_H
 
-#include "backend/math/matrices.h"
+#include "core/math/matrix.h"
+#include "core/math/vector.h"
 
 namespace pov
 {
@@ -56,6 +57,10 @@ struct GenericWarp
     virtual bool WarpNormal(Vector3d& rN) const = 0;
     virtual bool UnwarpNormal(Vector3d& rN) const = 0;
 };
+
+typedef GenericWarp* WarpPtr;
+typedef const GenericWarp* ConstWarpPtr;
+typedef vector<WarpPtr> WarpList;
 
 
 struct BlackHoleWarp : public GenericWarp

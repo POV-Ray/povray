@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file backend/scene/objects.cpp
+/// @file core/scene/object.cpp
 ///
 /// This module implements the methods for objects and composite objects.
 ///
@@ -35,19 +35,18 @@
 
 #include <cassert>
 
-// frame.h must always be the first POV file included (pulls in platform config)
-#include "backend/frame.h"
-#include "backend/scene/objects.h"
+// configcore.h must always be the first POV file included in core *.cpp files (pulls in platform config)
+#include "core/configcore.h"
+#include "core/scene/object.h"
 
 #include "core/material/interior.h"
 #include "core/material/texture.h"
+#include "core/math/matrix.h"
 #include "core/render/ray.h"
+#include "core/scene/tracethreaddata.h"
 #include "core/shape/box.h"
 #include "core/shape/csg.h"
 #include "core/shape/sphere.h"
-
-#include "backend/math/matrices.h"
-#include "backend/scene/threaddata.h"
 
 // this must be the last file included
 #include "base/povdebug.h"

@@ -1,9 +1,9 @@
 //******************************************************************************
 ///
-/// @file lightgrp.h
+/// @file core/lighting/lightgroup.h
 ///
 /// This module contains all defines, typedefs, and prototypes for
-/// @ref lightgrp.cpp.
+/// @ref core/lighting/lightgroup.cpp.
 ///
 /// @copyright
 /// @parblock
@@ -34,10 +34,10 @@
 ///
 //******************************************************************************
 
-#ifndef LIGHTGRP_H
-#define LIGHTGRP_H
+#ifndef POVRAY_CORE_LIGHTGROUP_H
+#define POVRAY_CORE_LIGHTGROUP_H
 
-#include "backend/frame.h"
+#include "core/coretypes.h"
 
 namespace pov
 {
@@ -49,4 +49,4 @@ bool Check_Photon_Light_Group(ConstObjectPtr Object);
 
 }
 
-#endif
+#endif // POVRAY_CORE_LIGHTGROUP_H

@@ -37,7 +37,7 @@
 #ifndef TORUS_H
 #define TORUS_H
 
-#include "backend/scene/objects.h"
+#include "core/scene/object.h"
 
 namespace pov
 {

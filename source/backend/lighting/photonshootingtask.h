@@ -36,10 +36,10 @@
 #ifndef PHOTONSHOOTINGTASK_H
 #define PHOTONSHOOTINGTASK_H
 
+#include "core/lighting/photons.h"
 #include "core/render/trace.h"
 
 #include "backend/frame.h"
-#include "backend/lighting/photons.h"
 #include "backend/render/rendertask.h"
 
 namespace pov

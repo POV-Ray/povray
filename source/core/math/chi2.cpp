@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file backend/math/chi2.cpp
+/// @file core/math/chi2.cpp
 ///
 /// This module contains the function for the chi square distribution.
 ///
@@ -71,9 +71,9 @@
 ///
 //******************************************************************************
 
-// frame.h must always be the first POV file included (pulls in platform config)
-#include "backend/frame.h"
-#include "backend/math/chi2.h"
+// configcore.h must always be the first POV file included in core *.cpp files (pulls in platform config)
+#include "core/configcore.h"
+#include "core/math/chi2.h"
 
 #include "base/pov_err.h"
 

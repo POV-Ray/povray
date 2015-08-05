@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file backend/lighting/radiosity.h
+/// @file core/lighting/radiosity.h
 ///
 /// This file contains radiosity computation classes and types.
 ///
@@ -33,18 +33,16 @@
 ///
 //******************************************************************************
 
-#ifndef POVRAY_BACKEND_RADIOSITY_H
-#define POVRAY_BACKEND_RADIOSITY_H
+#ifndef POVRAY_CORE_RADIOSITY_H
+#define POVRAY_CORE_RADIOSITY_H
 
 #include <vector>
 
+#include "core/lighting/photons.h" // TODO FIXME - make PhotonGatherer class visible only as a pointer
 #include "core/material/media.h"   // TODO FIXME - make MediaFunction class visible only as a pointer
 #include "core/render/trace.h"     // TODO FIXME - make Trace class visible only as a pointer
-
-#include "backend/frame.h"
-#include "backend/lighting/photons.h" // TODO FIXME - make PhotonGatherer class visible only as a pointer
-#include "backend/support/octree.h"   // TODO FIXME - this should only be included in radiosity.cpp
-#include "backend/support/statistics.h"
+#include "core/support/octree.h"   // TODO FIXME - this should only be included in radiosity.cpp
+#include "core/support/statistics.h"
 
 namespace pov_base
 {
@@ -344,4 +342,4 @@ class RadiosityFunction : public Trace::RadiosityFunctor
 
 } // end of namespace
 
-#endif // POVRAY_BACKEND_RADIOSITY_H
+#endif // POVRAY_CORE_RADIOSITY_H

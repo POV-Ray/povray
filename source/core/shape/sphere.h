@@ -37,7 +37,7 @@
 #ifndef SPHERES_H
 #define SPHERES_H
 
-#include "backend/scene/objects.h"
+#include "core/scene/object.h"
 
 namespace pov
 {

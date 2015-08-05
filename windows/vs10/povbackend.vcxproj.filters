@@ -15,9 +15,6 @@
     <Filter Include="Backend Source\Bounding">
       <UniqueIdentifier>{3ea739c5-294f-471c-a68b-70a28d905b60}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Backend Source\Colour">
-      <UniqueIdentifier>{925d90dc-061b-49d0-a019-392625146379}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Backend Source\Control">
       <UniqueIdentifier>{b22c9c92-48f1-4112-980c-e207ccad1c32}</UniqueIdentifier>
     </Filter>
@@ -45,9 +42,6 @@
     <Filter Include="Backend Headers\Bounding">
       <UniqueIdentifier>{00f8c35e-011c-4355-9c1d-da3cb3dd702d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Backend Headers\Colour">
-      <UniqueIdentifier>{0bdf61a0-a573-4bee-8f05-eab1024f1fdc}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Backend Headers\Control">
       <UniqueIdentifier>{b69d0461-17ec-477a-a1d2-2113a27f1922}</UniqueIdentifier>
     </Filter>
@@ -74,35 +68,11 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\source\lightgrp.cpp">
-      <Filter>Core source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\optout.cpp">
-      <Filter>Core source</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\pov_mem.cpp">
       <Filter>Core source</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\backend\povray.cpp">
       <Filter>Backend Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\backend\bounding\bbox.cpp">
-      <Filter>Backend Source\Bounding</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\backend\bounding\bcyl.cpp">
-      <Filter>Backend Source\Bounding</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\backend\bounding\boundingtask.cpp">
-      <Filter>Backend Source\Bounding</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\backend\bounding\bsphere.cpp">
-      <Filter>Backend Source\Bounding</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\backend\colour\colour_old.cpp">
-      <Filter>Backend Source\Colour</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\backend\colour\spectral.cpp">
-      <Filter>Backend Source\Colour</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\backend\control\benchmark.cpp">
       <Filter>Backend Source\Control</Filter>
@@ -116,22 +86,7 @@
     <ClCompile Include="..\..\source\backend\control\scene.cpp">
       <Filter>Backend Source\Control</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\backend\math\chi2.cpp">
-      <Filter>Backend Source\Math</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\backend\math\hcmplx.cpp">
-      <Filter>Backend Source\Math</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\backend\math\mathutil.cpp">
-      <Filter>Backend Source\Math</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\backend\math\matrices.cpp">
-      <Filter>Backend Source\Math</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\backend\math\polysolv.cpp">
-      <Filter>Backend Source\Math</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\backend\math\quatern.cpp">
       <Filter>Backend Source\Math</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\backend\math\splines.cpp">
@@ -149,40 +104,10 @@
     <ClCompile Include="..\..\source\backend\render\tracetask.cpp">
       <Filter>Backend Source\Render</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\backend\scene\atmosph.cpp">
-      <Filter>Backend Source\Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\backend\scene\camera.cpp">
-      <Filter>Backend Source\Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\backend\scene\objects.cpp">
-      <Filter>Backend Source\Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\backend\scene\scenedata.cpp">
-      <Filter>Backend Source\Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\backend\scene\threaddata.cpp">
-      <Filter>Backend Source\Scene</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\backend\scene\view.cpp">
       <Filter>Backend Source\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\backend\support\bsptree.cpp">
-      <Filter>Backend Source\Support</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\backend\support\imageutil.cpp">
-      <Filter>Backend Source\Support</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\backend\support\jitter.cpp">
-      <Filter>Backend Source\Support</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\backend\support\octree.cpp">
-      <Filter>Backend Source\Support</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\backend\support\randomsequences.cpp">
-      <Filter>Backend Source\Support</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\backend\support\statistics.cpp">
       <Filter>Backend Source\Support</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\backend\support\task.cpp">
@@ -200,9 +125,6 @@
     <ClCompile Include="..\..\source\backend\lighting\photonestimationtask.cpp">
       <Filter>Backend Source\Lighting</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\backend\lighting\photons.cpp">
-      <Filter>Backend Source\Lighting</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\backend\lighting\photonshootingstrategy.cpp">
       <Filter>Backend Source\Lighting</Filter>
     </ClCompile>
@@ -215,28 +137,22 @@
     <ClCompile Include="..\..\source\backend\lighting\photonstrategytask.cpp">
       <Filter>Backend Source\Lighting</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\backend\lighting\point.cpp">
-      <Filter>Backend Source\Lighting</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\backend\lighting\rad_data.cpp">
       <Filter>Backend Source\Lighting</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\backend\lighting\radiosity.cpp">
-      <Filter>Backend Source\Lighting</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\backend\lighting\subsurface.cpp">
-      <Filter>Backend Source\Lighting</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\precomp.cpp" />
+    <ClCompile Include="..\..\source\backend\bounding\boundingtask.cpp">
+      <Filter>Backend Source\Bounding</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\scene\viewthreaddata.cpp">
+      <Filter>Backend Source\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\scene\backendscenedata.cpp">
+      <Filter>Backend Source\Scene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\source\lightgrp.h">
-      <Filter>Core Headers</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\pov_mem.h">
-      <Filter>Core Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\statspov.h">
       <Filter>Core Headers</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\backend\configbackend.h">
@@ -247,24 +163,6 @@
     </ClInclude>
     <ClInclude Include="..\..\source\backend\povray.h">
       <Filter>Backend Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\backend\bounding\bbox.h">
-      <Filter>Backend Headers\Bounding</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\backend\bounding\bcyl.h">
-      <Filter>Backend Headers\Bounding</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\backend\bounding\boundingtask.h">
-      <Filter>Backend Headers\Bounding</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\backend\bounding\bsphere.h">
-      <Filter>Backend Headers\Bounding</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\backend\colour\colour_old.h">
-      <Filter>Backend Headers\Colour</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\backend\colour\spectral.h">
-      <Filter>Backend Headers\Colour</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\backend\control\benchmark.h">
       <Filter>Backend Headers\Control</Filter>
@@ -278,28 +176,10 @@
     <ClInclude Include="..\..\source\backend\control\scene.h">
       <Filter>Backend Headers\Control</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\backend\math\chi2.h">
-      <Filter>Backend Headers\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\backend\math\hcmplx.h">
-      <Filter>Backend Headers\Math</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\backend\math\mathutil.h">
       <Filter>Backend Headers\Math</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\backend\math\matrices.h">
-      <Filter>Backend Headers\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\backend\math\polysolv.h">
-      <Filter>Backend Headers\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\backend\math\quatern.h">
-      <Filter>Backend Headers\Math</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\backend\math\splines.h">
-      <Filter>Backend Headers\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\backend\math\vector.h">
       <Filter>Backend Headers\Math</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\backend\render\radiositytask.h">
@@ -314,46 +194,13 @@
     <ClInclude Include="..\..\source\backend\render\tracetask.h">
       <Filter>Backend Headers\Render</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\backend\scene\atmosph.h">
-      <Filter>Backend Headers\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\backend\scene\camera.h">
-      <Filter>Backend Headers\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\backend\scene\objects.h">
-      <Filter>Backend Headers\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\backend\scene\scenedata.h">
-      <Filter>Backend Headers\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\backend\scene\threaddata.h">
-      <Filter>Backend Headers\Scene</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\backend\scene\view.h">
       <Filter>Backend Headers\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\backend\support\bsptree.h">
-      <Filter>Backend Headers\Support</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\backend\support\fixedallocator.h">
       <Filter>Backend Headers\Support</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\backend\support\imageutil.h">
-      <Filter>Backend Headers\Support</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\backend\support\jitter.h">
-      <Filter>Backend Headers\Support</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\backend\support\octree.h">
-      <Filter>Backend Headers\Support</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\backend\support\randomsequences.h">
-      <Filter>Backend Headers\Support</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\backend\support\simplevector.h">
-      <Filter>Backend Headers\Support</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\backend\support\statistics.h">
       <Filter>Backend Headers\Support</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\backend\support\task.h">
@@ -371,9 +218,6 @@
     <ClInclude Include="..\..\source\backend\lighting\photonestimationtask.h">
       <Filter>Backend Headers\Lighting</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\backend\lighting\photons.h">
-      <Filter>Backend Headers\Lighting</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\backend\lighting\photonshootingstrategy.h">
       <Filter>Backend Headers\Lighting</Filter>
     </ClInclude>
@@ -386,18 +230,18 @@
     <ClInclude Include="..\..\source\backend\lighting\photonstrategytask.h">
       <Filter>Backend Headers\Lighting</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\backend\lighting\point.h">
-      <Filter>Backend Headers\Lighting</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\backend\lighting\radiosity.h">
-      <Filter>Backend Headers\Lighting</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\backend\lighting\subsurface.h">
-      <Filter>Backend Headers\Lighting</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\precomp.h" />
     <ClInclude Include="..\povconfig\syspovconfigbackend.h">
       <Filter>Backend Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\bounding\boundingtask.h">
+      <Filter>Backend Headers\Bounding</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\scene\viewthreaddata.h">
+      <Filter>Backend Headers\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\scene\backendscenedata.h">
+      <Filter>Backend Headers\Scene</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file backend/bounding/bbox.cpp
+/// @file core/bounding/boundingbox.cpp
 ///
 /// This module implements the bounding box calculations.
 ///
@@ -37,17 +37,16 @@
 ///
 //******************************************************************************
 
-// frame.h must always be the first POV file included (pulls in platform config)
-#include "backend/frame.h"
-#include "backend/bounding/bbox.h"
+// configcore.h must always be the first POV file included in core *.cpp files (pulls in platform config)
+#include "core/configcore.h"
+#include "core/bounding/boundingbox.h"
 
 #include "base/pov_err.h"
 
+#include "core/math/matrix.h"
 #include "core/render/ray.h"
-
-#include "backend/math/matrices.h"
-#include "backend/scene/objects.h"
-#include "backend/scene/threaddata.h"
+#include "core/scene/object.h"
+#include "core/scene/tracethreaddata.h"
 
 // this must be the last file included
 #include "base/povdebug.h"

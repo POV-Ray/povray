@@ -44,23 +44,23 @@
 
 #include "base/fileinputoutput.h"
 
+#include "core/material/blendmap.h"
 #include "core/material/normal.h"
 #include "core/material/pattern.h"
 #include "core/material/pigment.h"
 #include "core/material/texture.h"
 #include "core/material/warp.h"
+#include "core/math/matrix.h"
+#include "core/math/vector.h"
 #include "core/render/ray.h"
+#include "core/scene/object.h"
 #include "core/shape/heightfield.h"
+#include "core/support/imageutil.h"
 
 #include "backend/frame.h"
-#include "backend/colour/colour_old.h"
 #include "backend/math/mathutil.h"
-#include "backend/math/matrices.h"
 #include "backend/math/splines.h"
-#include "backend/math/vector.h"
-#include "backend/scene/objects.h"
-#include "backend/scene/scenedata.h"
-#include "backend/support/imageutil.h"
+#include "backend/scene/backendscenedata.h"
 #include "backend/vm/fnpovfpu.h"
 
 // this must be the last file included
@@ -442,7 +442,7 @@ DBL Parser::Parse_Function_Call()
     // in which case *fp will be destroyed, and an attempt made to drop the function. Therefore we copy *fp, and claim dibs on the function.
     // TODO - use smart pointers for this
     FUNCTION fn = *fp;
-    FunctionCode *f = sceneData->functionVM->GetFunctionAndReference(fn);
+    FunctionCode *f = dynamic_cast<FunctionVM*>(sceneData->functionContextFactory)->GetFunctionAndReference(fn);
 
     unsigned int pmax = f->parameter_cnt - 1;
     unsigned int param = 0;
@@ -451,7 +451,7 @@ DBL Parser::Parse_Function_Call()
     if(Parse_Call() == false)
     {
         // we claimed dibs on the function, so before we exit we must release it
-        sceneData->functionVM->RemoveFunction(fn);
+        dynamic_cast<FunctionVM*>(sceneData->functionContextFactory)->RemoveFunction(fn);
         return 0.0;
     }
 
@@ -473,7 +473,7 @@ DBL Parser::Parse_Function_Call()
     DBL result = POVFPU_Run(fnVMContext, fn);
 
     // we claimed dibs on the function, so now that we're done with it we must say so
-    sceneData->functionVM->RemoveFunction(fn);
+    dynamic_cast<FunctionVM*>(sceneData->functionContextFactory)->RemoveFunction(fn);
 
     return result;
 }
@@ -511,7 +511,7 @@ void Parser::Parse_Vector_Function_Call(EXPRESS& Express, int *Terms)
     // in which case *fp will be destroyed, and an attempt made to drop the function. Therefore we copy *fp, and claim dibs on the function.
     // TODO - use smart pointers for this
     FUNCTION fn = *fp;
-    FunctionCode *f = sceneData->functionVM->GetFunctionAndReference(fn);
+    FunctionCode *f = dynamic_cast<FunctionVM*>(sceneData->functionContextFactory)->GetFunctionAndReference(fn);
 
     unsigned int pmax = f->parameter_cnt - 1;
     unsigned int param = 0;
@@ -520,7 +520,7 @@ void Parser::Parse_Vector_Function_Call(EXPRESS& Express, int *Terms)
     if(Parse_Call() == false)
     {
         // we claimed dibs on the function, so before we exit we must release it
-        sceneData->functionVM->RemoveFunction(fn);
+        dynamic_cast<FunctionVM*>(sceneData->functionContextFactory)->RemoveFunction(fn);
         return;
     }
 
@@ -542,7 +542,7 @@ void Parser::Parse_Vector_Function_Call(EXPRESS& Express, int *Terms)
     (void)POVFPU_Run(fnVMContext, fn);
 
     // we claimed dibs on the function, so now that we're done with it we must say so
-    sceneData->functionVM->RemoveFunction(fn);
+    dynamic_cast<FunctionVM*>(sceneData->functionContextFactory)->RemoveFunction(fn);
 
     for(param = 0; param < f->return_size; param++)
         Express[param] = fnVMContext->GetLocal(param);
@@ -2725,23 +2725,23 @@ void Parser::Parse_Wavelengths (MathColour& colour)
 ******************************************************************************/
 
 template<>
-void Parser::Parse_BlendMapData<ColourBlendMapData> (int Blend_Type, ColourBlendMapData& rData)
+void Parser::Parse_BlendMapData<ColourBlendMapData> (BlendMapTypeId Blend_Type, ColourBlendMapData& rData)
 {
-    assert (Blend_Type == COLOUR_TYPE);
+    assert (Blend_Type == kBlendMapType_Colour);
     Error("Type not implemented yet.");
 }
 
 template<>
-void Parser::Parse_BlendMapData<PigmentBlendMapData> (int Blend_Type, PigmentBlendMapData& rData)
+void Parser::Parse_BlendMapData<PigmentBlendMapData> (BlendMapTypeId Blend_Type, PigmentBlendMapData& rData)
 {
     switch (Blend_Type)
     {
-        case PIGMENT_TYPE:
+        case kBlendMapType_Pigment:
             rData=Copy_Pigment(Default_Texture->Pigment);
             Parse_Pigment(&(rData));
             break;
 
-        case DENSITY_TYPE:
+        case kBlendMapType_Density:
             rData=NULL;
             Parse_Media_Density_Pattern (&(rData));
             break;
@@ -2753,29 +2753,29 @@ void Parser::Parse_BlendMapData<PigmentBlendMapData> (int Blend_Type, PigmentBle
 }
 
 template<>
-void Parser::Parse_BlendMapData<SlopeBlendMapData> (int Blend_Type, SlopeBlendMapData& rData)
+void Parser::Parse_BlendMapData<SlopeBlendMapData> (BlendMapTypeId Blend_Type, SlopeBlendMapData& rData)
 {
-    assert (Blend_Type == SLOPE_TYPE);
+    assert (Blend_Type == kBlendMapType_Slope);
     Parse_UV_Vect(rData);
 }
 
 template<>
-void Parser::Parse_BlendMapData<NormalBlendMapData> (int Blend_Type, NormalBlendMapData& rData)
+void Parser::Parse_BlendMapData<NormalBlendMapData> (BlendMapTypeId Blend_Type, NormalBlendMapData& rData)
 {
-    assert (Blend_Type == NORMAL_TYPE);
+    assert (Blend_Type == kBlendMapType_Normal);
     rData=Copy_Tnormal(Default_Texture->Tnormal);
     Parse_Tnormal(&(rData));
 }
 
 template<>
-void Parser::Parse_BlendMapData<TexturePtr> (int Blend_Type, TexturePtr& rData)
+void Parser::Parse_BlendMapData<TexturePtr> (BlendMapTypeId Blend_Type, TexturePtr& rData)
 {
-    assert (Blend_Type == TEXTURE_TYPE);
+    assert (Blend_Type == kBlendMapType_Texture);
     rData=Parse_Texture();
 }
 
 template<typename MAP_T>
-shared_ptr<MAP_T> Parser::Parse_Blend_Map (int Blend_Type,int Pat_Type)
+shared_ptr<MAP_T> Parser::Parse_Blend_Map (BlendMapTypeId Blend_Type,int Pat_Type)
 {
     shared_ptr<MAP_T>       New;
     GenericPigmentBlendMapPtr pigmentBlendMap;
@@ -2802,8 +2802,8 @@ shared_ptr<MAP_T> Parser::Parse_Blend_Map (int Blend_Type,int Pat_Type)
         CASE(BLEND_MODE_TOKEN)
             switch (Blend_Type)
             {
-                case PIGMENT_TYPE:
-                case COLOUR_TYPE:
+                case kBlendMapType_Pigment:
+                case kBlendMapType_Colour:
                     blendMode = Parse_Float();
                     if ((blendMode < 0) || (blendMode > 3))
                         Error("blend_mode must be in the range 0 to 3");
@@ -2818,8 +2818,8 @@ shared_ptr<MAP_T> Parser::Parse_Blend_Map (int Blend_Type,int Pat_Type)
         CASE(BLEND_GAMMA_TOKEN)
             switch (Blend_Type)
             {
-                case PIGMENT_TYPE:
-                case COLOUR_TYPE:
+                case kBlendMapType_Pigment:
+                case kBlendMapType_Colour:
                     if (!sceneData->workingGamma)
                         Error("blend_gamma requires that assumed_gamma has been set.");
                     blendGamma = Parse_Gamma();
@@ -2861,7 +2861,7 @@ shared_ptr<MAP_T> Parser::Parse_Blend_Map (int Blend_Type,int Pat_Type)
                         Error ("Must have at least one entry in map.");
                     New = Create_Blend_Map<MAP_T> (Blend_Type);
                     New->Set(tempList);
-                    pigmentBlendMap = std::tr1::dynamic_pointer_cast<GenericPigmentBlendMap, MAP_T>(New);
+                    pigmentBlendMap = std::tr1::dynamic_pointer_cast<GenericPigmentBlendMap>(New);
                     if (pigmentBlendMap)
                     {
                         pigmentBlendMap->blendMode = blendMode;
@@ -2883,14 +2883,14 @@ shared_ptr<MAP_T> Parser::Parse_Blend_Map (int Blend_Type,int Pat_Type)
     return (New);
 }
 
-template<> GenericPigmentBlendMapPtr Parser::Parse_Blend_Map<GenericPigmentBlendMap> (int Blend_Type,int Pat_Type)
+template<> GenericPigmentBlendMapPtr Parser::Parse_Blend_Map<GenericPigmentBlendMap> (BlendMapTypeId Blend_Type,int Pat_Type)
 {
     switch (Blend_Type)
     {
-        case COLOUR_TYPE:
+        case kBlendMapType_Colour:
             return Parse_Blend_Map<ColourBlendMap> (Blend_Type, Pat_Type);
-        case PIGMENT_TYPE:
-        case DENSITY_TYPE:
+        case kBlendMapType_Pigment:
+        case kBlendMapType_Density:
             return Parse_Blend_Map<PigmentBlendMap> (Blend_Type, Pat_Type);
         default:
             assert(false);
@@ -2899,13 +2899,13 @@ template<> GenericPigmentBlendMapPtr Parser::Parse_Blend_Map<GenericPigmentBlend
     }
 }
 
-template<> GenericNormalBlendMapPtr Parser::Parse_Blend_Map<GenericNormalBlendMap> (int Blend_Type,int Pat_Type)
+template<> GenericNormalBlendMapPtr Parser::Parse_Blend_Map<GenericNormalBlendMap> (BlendMapTypeId Blend_Type,int Pat_Type)
 {
     switch (Blend_Type)
     {
-        case SLOPE_TYPE:
+        case kBlendMapType_Slope:
             return Parse_Blend_Map<SlopeBlendMap> (Blend_Type, Pat_Type);
-        case NORMAL_TYPE:
+        case kBlendMapType_Normal:
             return Parse_Blend_Map<NormalBlendMap> (Blend_Type, Pat_Type);
         default:
             assert(false);
@@ -2914,11 +2914,11 @@ template<> GenericNormalBlendMapPtr Parser::Parse_Blend_Map<GenericNormalBlendMa
     }
 }
 
-template ColourBlendMapPtr  Parser::Parse_Blend_Map<ColourBlendMap>     (int Blend_Type,int Pat_Type);
-template PigmentBlendMapPtr Parser::Parse_Blend_Map<PigmentBlendMap>    (int Blend_Type,int Pat_Type);
-template SlopeBlendMapPtr   Parser::Parse_Blend_Map<SlopeBlendMap>      (int Blend_Type,int Pat_Type);
-template NormalBlendMapPtr  Parser::Parse_Blend_Map<NormalBlendMap>     (int Blend_Type,int Pat_Type);
-template TextureBlendMapPtr Parser::Parse_Blend_Map<TextureBlendMap>    (int Blend_Type,int Pat_Type);
+template ColourBlendMapPtr  Parser::Parse_Blend_Map<ColourBlendMap>     (BlendMapTypeId Blend_Type,int Pat_Type);
+template PigmentBlendMapPtr Parser::Parse_Blend_Map<PigmentBlendMap>    (BlendMapTypeId Blend_Type,int Pat_Type);
+template SlopeBlendMapPtr   Parser::Parse_Blend_Map<SlopeBlendMap>      (BlendMapTypeId Blend_Type,int Pat_Type);
+template NormalBlendMapPtr  Parser::Parse_Blend_Map<NormalBlendMap>     (BlendMapTypeId Blend_Type,int Pat_Type);
+template TextureBlendMapPtr Parser::Parse_Blend_Map<TextureBlendMap>    (BlendMapTypeId Blend_Type,int Pat_Type);
 
 /*****************************************************************************
 *
@@ -2939,23 +2939,23 @@ template TextureBlendMapPtr Parser::Parse_Blend_Map<TextureBlendMap>    (int Ble
 ******************************************************************************/
 
 template<>
-void Parser::Parse_BlendListData<ColourBlendMapData> (int Blend_Type, ColourBlendMapData& rData)
+void Parser::Parse_BlendListData<ColourBlendMapData> (BlendMapTypeId Blend_Type, ColourBlendMapData& rData)
 {
-    assert (Blend_Type == COLOUR_TYPE);
+    assert (Blend_Type == kBlendMapType_Colour);
     Parse_Colour (rData);
 }
 
 template<>
-void Parser::Parse_BlendListData<PigmentBlendMapData> (int Blend_Type, PigmentBlendMapData& rData)
+void Parser::Parse_BlendListData<PigmentBlendMapData> (BlendMapTypeId Blend_Type, PigmentBlendMapData& rData)
 {
     switch (Blend_Type)
     {
-        case PIGMENT_TYPE:
+        case kBlendMapType_Pigment:
             rData=Copy_Pigment(Default_Texture->Pigment);
             Parse_Pigment(&(rData));
             break;
 
-        case DENSITY_TYPE:
+        case kBlendMapType_Density:
             rData=NULL;
             Parse_Media_Density_Pattern (&(rData));
             break;
@@ -2967,45 +2967,45 @@ void Parser::Parse_BlendListData<PigmentBlendMapData> (int Blend_Type, PigmentBl
 }
 
 template<>
-void Parser::Parse_BlendListData<SlopeBlendMapData> (int Blend_Type, SlopeBlendMapData& rData)
+void Parser::Parse_BlendListData<SlopeBlendMapData> (BlendMapTypeId Blend_Type, SlopeBlendMapData& rData)
 {
-    assert (Blend_Type == SLOPE_TYPE);
+    assert (Blend_Type == kBlendMapType_Slope);
     Error("Type not implemented yet.");
 }
 
 template<>
-void Parser::Parse_BlendListData<NormalBlendMapData> (int Blend_Type, NormalBlendMapData& rData)
+void Parser::Parse_BlendListData<NormalBlendMapData> (BlendMapTypeId Blend_Type, NormalBlendMapData& rData)
 {
-    assert (Blend_Type == NORMAL_TYPE);
+    assert (Blend_Type == kBlendMapType_Normal);
     rData=Copy_Tnormal(Default_Texture->Tnormal);
     Parse_Tnormal(&(rData));
 }
 
 template<>
-void Parser::Parse_BlendListData<TexturePtr> (int Blend_Type, TexturePtr& rData)
+void Parser::Parse_BlendListData<TexturePtr> (BlendMapTypeId Blend_Type, TexturePtr& rData)
 {
-    assert (Blend_Type == TEXTURE_TYPE);
+    assert (Blend_Type == kBlendMapType_Texture);
     rData=Parse_Texture();
 }
 
 
 template<>
-void Parser::Parse_BlendListData_Default<ColourBlendMapData> (const ColourBlendMapData& rDefData, int Blend_Type, ColourBlendMapData& rData)
+void Parser::Parse_BlendListData_Default<ColourBlendMapData> (const ColourBlendMapData& rDefData, BlendMapTypeId Blend_Type, ColourBlendMapData& rData)
 {
-    assert (Blend_Type == COLOUR_TYPE);
+    assert (Blend_Type == kBlendMapType_Colour);
     rData = rDefData;
 }
 
 template<>
-void Parser::Parse_BlendListData_Default<PigmentBlendMapData> (const ColourBlendMapData& rDefData, int Blend_Type, PigmentBlendMapData& rData)
+void Parser::Parse_BlendListData_Default<PigmentBlendMapData> (const ColourBlendMapData& rDefData, BlendMapTypeId Blend_Type, PigmentBlendMapData& rData)
 {
     switch (Blend_Type)
     {
-        case PIGMENT_TYPE:
+        case kBlendMapType_Pigment:
             rData=Copy_Pigment(Default_Texture->Pigment);
             break;
 
-        case DENSITY_TYPE:
+        case kBlendMapType_Density:
             rData=NULL;
             break;
 
@@ -3016,29 +3016,29 @@ void Parser::Parse_BlendListData_Default<PigmentBlendMapData> (const ColourBlend
 }
 
 template<>
-void Parser::Parse_BlendListData_Default<SlopeBlendMapData> (const ColourBlendMapData& rDefData, int Blend_Type, SlopeBlendMapData& rData)
+void Parser::Parse_BlendListData_Default<SlopeBlendMapData> (const ColourBlendMapData& rDefData, BlendMapTypeId Blend_Type, SlopeBlendMapData& rData)
 {
-    assert (Blend_Type == SLOPE_TYPE);
+    assert (Blend_Type == kBlendMapType_Slope);
     Error("Type not implemented yet.");
 }
 
 template<>
-void Parser::Parse_BlendListData_Default<NormalBlendMapData> (const ColourBlendMapData& rDefData, int Blend_Type, NormalBlendMapData& rData)
+void Parser::Parse_BlendListData_Default<NormalBlendMapData> (const ColourBlendMapData& rDefData, BlendMapTypeId Blend_Type, NormalBlendMapData& rData)
 {
-    assert (Blend_Type == NORMAL_TYPE);
+    assert (Blend_Type == kBlendMapType_Normal);
     rData=Copy_Tnormal(Default_Texture->Tnormal);
 }
 
 template<>
-void Parser::Parse_BlendListData_Default<TexturePtr> (const ColourBlendMapData& rDefData, int Blend_Type, TexturePtr& rData)
+void Parser::Parse_BlendListData_Default<TexturePtr> (const ColourBlendMapData& rDefData, BlendMapTypeId Blend_Type, TexturePtr& rData)
 {
-    assert (Blend_Type == TEXTURE_TYPE);
+    assert (Blend_Type == kBlendMapType_Texture);
     rData=Copy_Textures(Default_Texture);
 }
 
 
 template<typename MAP_T>
-shared_ptr<MAP_T> Parser::Parse_Blend_List (int Count, ColourBlendMapConstPtr Def_Map, int Blend_Type)
+shared_ptr<MAP_T> Parser::Parse_Blend_List (int Count, ColourBlendMapConstPtr Def_Map, BlendMapTypeId Blend_Type)
 {
     shared_ptr<MAP_T>       New;
     typename MAP_T::Vector  tempList;
@@ -3052,7 +3052,7 @@ shared_ptr<MAP_T> Parser::Parse_Blend_List (int Count, ColourBlendMapConstPtr De
 
     switch(Blend_Type)
     {
-        case COLOUR_TYPE:
+        case kBlendMapType_Colour:
             EXPECT
                 CASE_EXPRESS
                     Parse_BlendListData(Blend_Type,tempList[i].Vals);
@@ -3069,7 +3069,7 @@ shared_ptr<MAP_T> Parser::Parse_Blend_List (int Count, ColourBlendMapConstPtr De
             END_EXPECT
             break;
 
-        case PIGMENT_TYPE:
+        case kBlendMapType_Pigment:
             EXPECT
                 CASE(PIGMENT_TOKEN)
                     Parse_Begin ();
@@ -3088,7 +3088,7 @@ shared_ptr<MAP_T> Parser::Parse_Blend_List (int Count, ColourBlendMapConstPtr De
             END_EXPECT
             break;
 
-        case NORMAL_TYPE:
+        case kBlendMapType_Normal:
             EXPECT
                 CASE(TNORMAL_TOKEN)
                     Parse_Begin ();
@@ -3107,7 +3107,7 @@ shared_ptr<MAP_T> Parser::Parse_Blend_List (int Count, ColourBlendMapConstPtr De
             END_EXPECT
             break;
 
-        case TEXTURE_TYPE:
+        case kBlendMapType_Texture:
             EXPECT
                 CASE(TEXTURE_TOKEN)
                     Parse_Begin ();
@@ -3126,7 +3126,7 @@ shared_ptr<MAP_T> Parser::Parse_Blend_List (int Count, ColourBlendMapConstPtr De
             END_EXPECT
             break;
 
-        case DENSITY_TYPE:
+        case kBlendMapType_Density:
             EXPECT
                 CASE(DENSITY_TOKEN)
                     Parse_Begin ();
@@ -3147,7 +3147,7 @@ shared_ptr<MAP_T> Parser::Parse_Blend_List (int Count, ColourBlendMapConstPtr De
 
     }
 
-    if ((Blend_Type==NORMAL_TYPE) && (i==0))
+    if ((Blend_Type==kBlendMapType_Normal) && (i==0))
     {
         return shared_ptr<MAP_T>(); // empty pointer
     }
@@ -3168,20 +3168,20 @@ shared_ptr<MAP_T> Parser::Parse_Blend_List (int Count, ColourBlendMapConstPtr De
 }
 
 template<>
-shared_ptr<GenericPigmentBlendMap> Parser::Parse_Blend_List<GenericPigmentBlendMap> (int Count, ColourBlendMapConstPtr Def_Map, int Blend_Type)
+shared_ptr<GenericPigmentBlendMap> Parser::Parse_Blend_List<GenericPigmentBlendMap> (int Count, ColourBlendMapConstPtr Def_Map, BlendMapTypeId Blend_Type)
 {
     shared_ptr<GenericPigmentBlendMap> New;
-    assert (Blend_Type == PIGMENT_TYPE);
+    assert (Blend_Type == kBlendMapType_Pigment);
     EXPECT
         CASE(PIGMENT_TOKEN)
             UNGET
-            New = Parse_Blend_List<PigmentBlendMap> (Count, Def_Map, PIGMENT_TYPE);
+            New = Parse_Blend_List<PigmentBlendMap> (Count, Def_Map, kBlendMapType_Pigment);
             EXIT
         END_CASE
 
         OTHERWISE
             UNGET
-            New = Parse_Blend_List<ColourBlendMap> (Count, Def_Map, COLOUR_TYPE);
+            New = Parse_Blend_List<ColourBlendMap> (Count, Def_Map, kBlendMapType_Colour);
             EXIT
         END_CASE
     END_EXPECT
@@ -3189,16 +3189,16 @@ shared_ptr<GenericPigmentBlendMap> Parser::Parse_Blend_List<GenericPigmentBlendM
 }
 
 template<>
-shared_ptr<GenericNormalBlendMap> Parser::Parse_Blend_List<GenericNormalBlendMap> (int Count, ColourBlendMapConstPtr Def_Map, int Blend_Type)
+shared_ptr<GenericNormalBlendMap> Parser::Parse_Blend_List<GenericNormalBlendMap> (int Count, ColourBlendMapConstPtr Def_Map, BlendMapTypeId Blend_Type)
 {
     shared_ptr<GenericNormalBlendMap> New;
     switch (Blend_Type)
     {
-        case SLOPE_TYPE:
+        case kBlendMapType_Slope:
             New = Parse_Blend_List<SlopeBlendMap> (Count, Def_Map, Blend_Type);
             break;
 
-        case NORMAL_TYPE:
+        case kBlendMapType_Normal:
             New = Parse_Blend_List<NormalBlendMap> (Count, Def_Map, Blend_Type);
             break;
 
@@ -3208,11 +3208,11 @@ shared_ptr<GenericNormalBlendMap> Parser::Parse_Blend_List<GenericNormalBlendMap
     return New;
 }
 
-template ColourBlendMapPtr  Parser::Parse_Blend_List<ColourBlendMap>    (int Count, ColourBlendMapConstPtr Def_Map, int Blend_Type);
-template PigmentBlendMapPtr Parser::Parse_Blend_List<PigmentBlendMap>   (int Count, ColourBlendMapConstPtr Def_Map, int Blend_Type);
-template SlopeBlendMapPtr   Parser::Parse_Blend_List<SlopeBlendMap>     (int Count, ColourBlendMapConstPtr Def_Map, int Blend_Type);
-template NormalBlendMapPtr  Parser::Parse_Blend_List<NormalBlendMap>    (int Count, ColourBlendMapConstPtr Def_Map, int Blend_Type);
-template TextureBlendMapPtr Parser::Parse_Blend_List<TextureBlendMap>   (int Count, ColourBlendMapConstPtr Def_Map, int Blend_Type);
+template ColourBlendMapPtr  Parser::Parse_Blend_List<ColourBlendMap>    (int Count, ColourBlendMapConstPtr Def_Map, BlendMapTypeId Blend_Type);
+template PigmentBlendMapPtr Parser::Parse_Blend_List<PigmentBlendMap>   (int Count, ColourBlendMapConstPtr Def_Map, BlendMapTypeId Blend_Type);
+template SlopeBlendMapPtr   Parser::Parse_Blend_List<SlopeBlendMap>     (int Count, ColourBlendMapConstPtr Def_Map, BlendMapTypeId Blend_Type);
+template NormalBlendMapPtr  Parser::Parse_Blend_List<NormalBlendMap>    (int Count, ColourBlendMapConstPtr Def_Map, BlendMapTypeId Blend_Type);
+template TextureBlendMapPtr Parser::Parse_Blend_List<TextureBlendMap>   (int Count, ColourBlendMapConstPtr Def_Map, BlendMapTypeId Blend_Type);
 
 /*****************************************************************************
 *
@@ -3242,12 +3242,12 @@ template TextureBlendMapPtr Parser::Parse_Blend_List<TextureBlendMap>   (int Cou
 ******************************************************************************/
 
 template<typename MAP_T>
-shared_ptr<MAP_T> Parser::Parse_Item_Into_Blend_List (int Blend_Type)
+shared_ptr<MAP_T> Parser::Parse_Item_Into_Blend_List (BlendMapTypeId Blend_Type)
 {
     shared_ptr<MAP_T>       New;
     typename MAP_T::Entry   Temp_Ent;
     typename MAP_T::Vector  tempList;
-    int Type;
+    BlendMapTypeId Type;
     bool old_allow_id = Allow_Identifier_In_Call;
     Allow_Identifier_In_Call = false;
 
@@ -3266,13 +3266,13 @@ shared_ptr<MAP_T> Parser::Parse_Item_Into_Blend_List (int Blend_Type)
     return (New);
 }
 
-template<> GenericPigmentBlendMapPtr Parser::Parse_Item_Into_Blend_List<GenericPigmentBlendMap> (int Blend_Type)
+template<> GenericPigmentBlendMapPtr Parser::Parse_Item_Into_Blend_List<GenericPigmentBlendMap> (BlendMapTypeId Blend_Type)
 {
     switch (Blend_Type)
     {
-        case COLOUR_TYPE:
+        case kBlendMapType_Colour:
             return Parse_Item_Into_Blend_List<ColourBlendMap> (Blend_Type);
-        case PIGMENT_TYPE:
+        case kBlendMapType_Pigment:
             return Parse_Item_Into_Blend_List<PigmentBlendMap> (Blend_Type);
         default:
             assert(false);
@@ -3281,13 +3281,13 @@ template<> GenericPigmentBlendMapPtr Parser::Parse_Item_Into_Blend_List<GenericP
     }
 }
 
-template<> GenericNormalBlendMapPtr Parser::Parse_Item_Into_Blend_List<GenericNormalBlendMap> (int Blend_Type)
+template<> GenericNormalBlendMapPtr Parser::Parse_Item_Into_Blend_List<GenericNormalBlendMap> (BlendMapTypeId Blend_Type)
 {
     switch (Blend_Type)
     {
-        case SLOPE_TYPE:
+        case kBlendMapType_Slope:
             return Parse_Item_Into_Blend_List<SlopeBlendMap> (Blend_Type);
-        case NORMAL_TYPE:
+        case kBlendMapType_Normal:
             return Parse_Item_Into_Blend_List<NormalBlendMap> (Blend_Type);
         default:
             assert(false);
@@ -3296,11 +3296,11 @@ template<> GenericNormalBlendMapPtr Parser::Parse_Item_Into_Blend_List<GenericNo
     }
 }
 
-template ColourBlendMapPtr  Parser::Parse_Item_Into_Blend_List<ColourBlendMap>  (int Blend_Type);
-template PigmentBlendMapPtr Parser::Parse_Item_Into_Blend_List<PigmentBlendMap> (int Blend_Type);
-template SlopeBlendMapPtr   Parser::Parse_Item_Into_Blend_List<SlopeBlendMap>   (int Blend_Type);
-template NormalBlendMapPtr  Parser::Parse_Item_Into_Blend_List<NormalBlendMap>  (int Blend_Type);
-template TextureBlendMapPtr Parser::Parse_Item_Into_Blend_List<TextureBlendMap> (int Blend_Type);
+template ColourBlendMapPtr  Parser::Parse_Item_Into_Blend_List<ColourBlendMap>  (BlendMapTypeId Blend_Type);
+template PigmentBlendMapPtr Parser::Parse_Item_Into_Blend_List<PigmentBlendMap> (BlendMapTypeId Blend_Type);
+template SlopeBlendMapPtr   Parser::Parse_Item_Into_Blend_List<SlopeBlendMap>   (BlendMapTypeId Blend_Type);
+template NormalBlendMapPtr  Parser::Parse_Item_Into_Blend_List<NormalBlendMap>  (BlendMapTypeId Blend_Type);
+template TextureBlendMapPtr Parser::Parse_Item_Into_Blend_List<TextureBlendMap> (BlendMapTypeId Blend_Type);
 
 /*****************************************************************************
 *

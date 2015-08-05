@@ -41,23 +41,23 @@
 #include "base/image/image.h"
 #include "base/path.h"
 
+#include "core/lighting/lightgroup.h"
+#include "core/material/blendmap.h"
 #include "core/material/interior.h"
 #include "core/material/media.h"
 #include "core/material/normal.h"
+#include "core/material/pattern.h"
 #include "core/material/pigment.h"
 #include "core/material/texture.h"
 #include "core/material/warp.h"
+#include "core/math/matrix.h"
+#include "core/scene/object.h"
+#include "core/scene/tracethreaddata.h"
 #include "core/shape/isosurface.h"
+#include "core/support/imageutil.h"
 
-#include "backend/colour/colour_old.h"
-#include "backend/math/matrices.h"
-#include "backend/scene/objects.h"
-#include "backend/scene/scenedata.h"
-#include "backend/scene/threaddata.h"
-#include "backend/support/imageutil.h"
+#include "backend/scene/backendscenedata.h"
 #include "backend/vm/fnpovfpu.h"
-
-#include "lightgrp.h"
 
 #ifdef SYS_IMAGE_HEADER
 #include SYS_IMAGE_HEADER
@@ -103,7 +103,7 @@ void Parser::Make_Pattern_Image(ImageData *image, FUNCTION_PTR fn, int token)
     int i = 0;
     int j = 0;
     DBL val = 0;
-    FunctionCode *f = sceneData->functionVM->GetFunction(*fn);
+    FunctionCode *f = dynamic_cast<FunctionVM*>(sceneData->functionContextFactory)->GetFunction(*fn);
     Vector3d point;
 
     image->iwidth  = image->width;
@@ -163,7 +163,7 @@ void Parser::Make_Pattern_Image(ImageData *image, FUNCTION_PTR fn, int token)
     else
         Error("Unsupported function type in function image.");
 
-    sceneData->functionVM->DestroyFunction(fn);
+    dynamic_cast<FunctionVM*>(sceneData->functionContextFactory)->DestroyFunction(fn);
 }
 
 /*****************************************************************************
@@ -946,7 +946,7 @@ void Parser::Parse_Pigment (PIGMENT **Pigment_Ptr)
         END_CASE
     END_EXPECT    /* End pigment_id */
 
-    Parse_Pattern<GenericPigmentBlendMap>(*Pigment_Ptr,PIGMENT_TYPE);
+    Parse_Pattern<GenericPigmentBlendMap>(*Pigment_Ptr,kBlendMapType_Pigment);
 
     if (Not_In_Default && ((*Pigment_Ptr)->Type == NO_PATTERN))
     {
@@ -977,7 +977,7 @@ void Parser::Parse_Pigment (PIGMENT **Pigment_Ptr)
 ******************************************************************************/
 
 template<typename MAP_T, typename PATTERN_T>
-void Parser::Parse_Pattern (PATTERN_T *New, int TPat_Type)
+void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
 {
     Vector3d Local_Vector;
     MATRIX Local_Matrix;
@@ -1024,7 +1024,8 @@ void Parser::Parse_Pattern (PATTERN_T *New, int TPat_Type)
             dynamic_cast<FunctionPattern*>(New->pattern.get())->contextId = sceneData->functionPatternCount;
             sceneData->functionPatternCount++;
             GetParserDataPtr()->functionPatternContext.resize(sceneData->functionPatternCount);
-            dynamic_cast<FunctionPattern*>(New->pattern.get())->pFn = new FunctionVM::CustomFunction(sceneData->functionVM, Parse_Function());
+            dynamic_cast<FunctionPattern*>(New->pattern.get())->pFn = new FunctionVM::CustomFunction(
+                dynamic_cast<FunctionVM*>(sceneData->functionContextFactory), Parse_Function());
             EXIT
         END_CASE
 
@@ -1199,7 +1200,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, int TPat_Type)
         END_CASE
 
         CASE_COLOUR
-            if ((TPat_Type != PIGMENT_TYPE) && (TPat_Type != DENSITY_TYPE))
+            if ((TPat_Type != kBlendMapType_Pigment) && (TPat_Type != kBlendMapType_Density))
             {
                 Only_In("color","pigment or density");
             }
@@ -1220,7 +1221,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, int TPat_Type)
             New->Type = GENERIC_INTEGER_PATTERN;
             New->pattern = PatternPtr(new CheckerPattern());
             New->Blend_Map = Parse_Blend_List<MAP_T>(2,New->pattern->GetDefaultBlendMap(),TPat_Type);
-            if (TPat_Type == NORMAL_TYPE)
+            if (TPat_Type == kBlendMapType_Normal)
                 (reinterpret_cast<TNORMAL *>(New))->Delta = 0.02;
             EXIT
         END_CASE
@@ -1256,7 +1257,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, int TPat_Type)
                 dynamic_cast<BrickPattern*>(New->pattern.get())->mortar=0.5-EPSILON*2.0;
             }
             New->Blend_Map = Parse_Blend_List<MAP_T>(2,New->pattern->GetDefaultBlendMap(),TPat_Type);
-            if (TPat_Type == NORMAL_TYPE)
+            if (TPat_Type == kBlendMapType_Normal)
                 (reinterpret_cast<TNORMAL *>(New))->Delta = 0.02;
             EXIT
         END_CASE
@@ -1265,7 +1266,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, int TPat_Type)
             New->Type = GENERIC_INTEGER_PATTERN;
             New->pattern = PatternPtr(new HexagonPattern());
             New->Blend_Map = Parse_Blend_List<MAP_T>(3,New->pattern->GetDefaultBlendMap(),TPat_Type);
-            if (TPat_Type == NORMAL_TYPE)
+            if (TPat_Type == kBlendMapType_Normal)
                 (reinterpret_cast<TNORMAL *>(New))->Delta = 0.02;
             EXIT
         END_CASE
@@ -1274,7 +1275,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, int TPat_Type)
             New->Type = GENERIC_INTEGER_PATTERN;
             New->pattern = PatternPtr(new SquarePattern());
             New->Blend_Map = Parse_Blend_List<MAP_T>(4,New->pattern->GetDefaultBlendMap(),TPat_Type);
-            if (TPat_Type == NORMAL_TYPE)
+            if (TPat_Type == kBlendMapType_Normal)
                 (reinterpret_cast<TNORMAL *>(New))->Delta = 0.02;
             EXIT
         END_CASE
@@ -1283,7 +1284,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, int TPat_Type)
             New->Type = GENERIC_INTEGER_PATTERN;
             New->pattern = PatternPtr(new TriangularPattern());
             New->Blend_Map = Parse_Blend_List<MAP_T>(6,New->pattern->GetDefaultBlendMap(),TPat_Type);
-            if (TPat_Type == NORMAL_TYPE)
+            if (TPat_Type == kBlendMapType_Normal)
                 (reinterpret_cast<TNORMAL *>(New))->Delta = 0.02;
             EXIT
         END_CASE
@@ -1293,13 +1294,13 @@ void Parser::Parse_Pattern (PATTERN_T *New, int TPat_Type)
             New->Type = GENERIC_INTEGER_PATTERN;
             New->pattern = PatternPtr(new CubicPattern());
             New->Blend_Map = Parse_Blend_List<MAP_T>(6,New->pattern->GetDefaultBlendMap(),TPat_Type);
-            if (TPat_Type == NORMAL_TYPE)
+            if (TPat_Type == kBlendMapType_Normal)
                 (reinterpret_cast<TNORMAL *>(New))->Delta = 0.02;
             EXIT
         END_CASE
 
         CASE (IMAGE_MAP_TOKEN)
-            if (TPat_Type != PIGMENT_TYPE)
+            if (TPat_Type != kBlendMapType_Pigment)
             {
                 Only_In("image_map","pigment");
             }
@@ -1317,7 +1318,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, int TPat_Type)
         END_CASE
 
         CASE (BUMP_MAP_TOKEN)
-            if (TPat_Type != NORMAL_TYPE)
+            if (TPat_Type != kBlendMapType_Normal)
             {
                 Only_In("bump_map","normal");
             }
@@ -1374,7 +1375,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, int TPat_Type)
         END_CASE
 
         CASE (FACETS_TOKEN)
-            if (TPat_Type != NORMAL_TYPE)
+            if (TPat_Type != kBlendMapType_Normal)
             {
                 Only_In("facets","normal");
             }
@@ -1637,7 +1638,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, int TPat_Type)
         Destroy_Density_File(Old_Density_File);
     }
 
-    if (TPat_Type == NORMAL_TYPE)
+    if (TPat_Type == kBlendMapType_Normal)
     {
         Parse_Comma();
         (reinterpret_cast<TNORMAL *>(New))->Amount = Allow_Float ((reinterpret_cast<TNORMAL *>(New))->Amount );
@@ -1645,7 +1646,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, int TPat_Type)
 
     EXPECT         /* Look for pattern_modifier */
         CASE (ACCURACY_TOKEN)
-            if(TPat_Type != NORMAL_TYPE)
+            if(TPat_Type != kBlendMapType_Normal)
             {
                 Error("accuracy can only be used with normal patterns.");
             }
@@ -1844,7 +1845,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, int TPat_Type)
         END_CASE
 
         CASE (COLOUR_MAP_TOKEN)
-            if ((TPat_Type != PIGMENT_TYPE) && (TPat_Type != DENSITY_TYPE))
+            if ((TPat_Type != kBlendMapType_Pigment) && (TPat_Type != kBlendMapType_Density))
             {
                 Only_In("color_map","pigment");
             }
@@ -1861,7 +1862,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, int TPat_Type)
         END_CASE
 
         CASE (PIGMENT_MAP_TOKEN)
-            if (TPat_Type != PIGMENT_TYPE)
+            if (TPat_Type != kBlendMapType_Pigment)
             {
                 Only_In("pigment_map","pigment");
             }
@@ -1871,11 +1872,11 @@ void Parser::Parse_Pattern (PATTERN_T *New, int TPat_Type)
                 New->Type == OBJECT_PATTERN ||
                 New->Type == BITMAP_PATTERN)
                 Not_With ("pigment_map","this pigment type");
-            New->Blend_Map = Parse_Blend_Map<MAP_T> (PIGMENT_TYPE,New->Type);
+            New->Blend_Map = Parse_Blend_Map<MAP_T> (kBlendMapType_Pigment,New->Type);
         END_CASE
 
         CASE (DENSITY_MAP_TOKEN)
-            if (TPat_Type != DENSITY_TYPE)
+            if (TPat_Type != kBlendMapType_Density)
             {
                 Only_In("density_map","density");
             }
@@ -1885,11 +1886,11 @@ void Parser::Parse_Pattern (PATTERN_T *New, int TPat_Type)
                 New->Type == OBJECT_PATTERN ||
                 New->Type == BITMAP_PATTERN)
                 Not_With ("density_map","this density type");
-            New->Blend_Map = Parse_Blend_Map<MAP_T> (DENSITY_TYPE,New->Type);
+            New->Blend_Map = Parse_Blend_Map<MAP_T> (kBlendMapType_Density,New->Type);
         END_CASE
 
         CASE (SLOPE_MAP_TOKEN)
-            if (TPat_Type != NORMAL_TYPE)
+            if (TPat_Type != kBlendMapType_Normal)
             {
                 Only_In("slope_map","normal");
             }
@@ -1900,11 +1901,11 @@ void Parser::Parse_Pattern (PATTERN_T *New, int TPat_Type)
                 New->Type == OBJECT_PATTERN ||
                 New->Type == BITMAP_PATTERN)
                 Not_With ("slope_map","this normal type");
-            New->Blend_Map = Parse_Blend_Map<MAP_T> (SLOPE_TYPE,New->Type);
+            New->Blend_Map = Parse_Blend_Map<MAP_T> (kBlendMapType_Slope,New->Type);
         END_CASE
 
         CASE (NORMAL_MAP_TOKEN)
-            if (TPat_Type != NORMAL_TYPE)
+            if (TPat_Type != kBlendMapType_Normal)
             {
                 Only_In("normal_map","normal");
             }
@@ -1915,11 +1916,11 @@ void Parser::Parse_Pattern (PATTERN_T *New, int TPat_Type)
                 New->Type == OBJECT_PATTERN ||
                 New->Type == BITMAP_PATTERN)
                 Not_With ("normal_map","this normal type");
-            New->Blend_Map = Parse_Blend_Map<MAP_T> (NORMAL_TYPE,New->Type);
+            New->Blend_Map = Parse_Blend_Map<MAP_T> (kBlendMapType_Normal,New->Type);
         END_CASE
 
         CASE (TEXTURE_MAP_TOKEN)
-            if (TPat_Type != TEXTURE_TYPE)
+            if (TPat_Type != kBlendMapType_Texture)
             {
                 Only_In("texture_map","texture");
             }
@@ -1929,11 +1930,11 @@ void Parser::Parse_Pattern (PATTERN_T *New, int TPat_Type)
                 New->Type == OBJECT_PATTERN ||
                 New->Type == BITMAP_PATTERN)
                 Not_With ("texture_map","this pattern type");
-            New->Blend_Map = Parse_Blend_Map<MAP_T> (TEXTURE_TYPE,New->Type);
+            New->Blend_Map = Parse_Blend_Map<MAP_T> (kBlendMapType_Texture,New->Type);
         END_CASE
 
         CASE (QUICK_COLOUR_TOKEN)
-            if (TPat_Type != PIGMENT_TYPE)
+            if (TPat_Type != kBlendMapType_Pigment)
             {
                 Only_In("quick_color","pigment");
             }
@@ -2050,7 +2051,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, int TPat_Type)
         END_CASE
 
         CASE (BUMP_SIZE_TOKEN)
-            if (TPat_Type != NORMAL_TYPE)
+            if (TPat_Type != kBlendMapType_Normal)
                 Only_In ("bump_size","normal");
             (reinterpret_cast<TNORMAL *>(New))->Amount = Parse_Float ();
         END_CASE
@@ -2152,7 +2153,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, int TPat_Type)
         Error("Average must have map.");
     }
 
-    if ((TPat_Type==TEXTURE_TYPE) && (New->Type!=PLAIN_PATTERN) &&
+    if ((TPat_Type==kBlendMapType_Texture) && (New->Type!=PLAIN_PATTERN) &&
         (New->Blend_Map==NULL))
     {
         Error("Patterned texture must have texture_map.");
@@ -2263,7 +2264,7 @@ void Parser::Parse_Tnormal (TNORMAL **Tnormal_Ptr)
             *Tnormal_Ptr = Create_Tnormal ();
         }
     }
-    Parse_Pattern<GenericNormalBlendMap>(*Tnormal_Ptr,NORMAL_TYPE);
+    Parse_Pattern<GenericNormalBlendMap>(*Tnormal_Ptr,kBlendMapType_Normal);
 }
 
 
@@ -2807,7 +2808,7 @@ TEXTURE *Parser::Parse_Texture ()
                     Texture->Pigment = NULL;
                     Texture->Tnormal = NULL;
                     Texture->Finish  = NULL;
-                    Parse_Pattern<TextureBlendMap>(Texture,TEXTURE_TYPE);
+                    Parse_Pattern<TextureBlendMap>(Texture,kBlendMapType_Texture);
                     /* if following is true, parsed "texture{}" so restore
                        default texture.
                      */
@@ -2863,7 +2864,7 @@ TEXTURE *Parser::Parse_Tiles()
     Texture->Type = GENERIC_INTEGER_PATTERN;
     Texture->pattern = PatternPtr(new CheckerPattern());
 
-    Texture->Blend_Map = Create_Blend_Map<TextureBlendMap> (TEXTURE_TYPE);
+    Texture->Blend_Map = Create_Blend_Map<TextureBlendMap> (kBlendMapType_Texture);
     Texture->Blend_Map->Blend_Map_Entries.resize(2);
     Texture->Blend_Map->Blend_Map_Entries[0].Vals=NULL;
     Texture->Blend_Map->Blend_Map_Entries[0].value=0.0;
@@ -3193,28 +3194,28 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
                     Warn_State(Token.Token_Id, PIGMENT_TOKEN);
                     Pigment->Type = GENERIC_INTEGER_PATTERN;
                     Pigment->pattern = PatternPtr(new CheckerPattern());
-                    Pigment->Blend_Map = Parse_Blend_List<ColourBlendMap>(2,Pigment->pattern->GetDefaultBlendMap(),COLOUR_TYPE);
+                    Pigment->Blend_Map = Parse_Blend_List<ColourBlendMap>(2,Pigment->pattern->GetDefaultBlendMap(),kBlendMapType_Colour);
                 END_CASE
 
                 CASE (HEXAGON_TOKEN)
                     Warn_State(Token.Token_Id, PIGMENT_TOKEN);
                     Pigment->Type = GENERIC_INTEGER_PATTERN;
                     Pigment->pattern = PatternPtr(new HexagonPattern());
-                    Pigment->Blend_Map = Parse_Blend_List<ColourBlendMap>(3,Pigment->pattern->GetDefaultBlendMap(),COLOUR_TYPE);
+                    Pigment->Blend_Map = Parse_Blend_List<ColourBlendMap>(3,Pigment->pattern->GetDefaultBlendMap(),kBlendMapType_Colour);
                 END_CASE
 
                 CASE (SQUARE_TOKEN)
                     Warn_State(Token.Token_Id, PIGMENT_TOKEN);
                     Pigment->Type = GENERIC_INTEGER_PATTERN;
                     Pigment->pattern = PatternPtr(new SquarePattern());
-                    Pigment->Blend_Map = Parse_Blend_List<ColourBlendMap>(4,Pigment->pattern->GetDefaultBlendMap(),COLOUR_TYPE);
+                    Pigment->Blend_Map = Parse_Blend_List<ColourBlendMap>(4,Pigment->pattern->GetDefaultBlendMap(),kBlendMapType_Colour);
                 END_CASE
 
                 CASE (TRIANGULAR_TOKEN)
                     Warn_State(Token.Token_Id, PIGMENT_TOKEN);
                     Pigment->Type = GENERIC_INTEGER_PATTERN;
                     Pigment->pattern = PatternPtr(new TriangularPattern());
-                    Pigment->Blend_Map = Parse_Blend_List<ColourBlendMap>(6,Pigment->pattern->GetDefaultBlendMap(),COLOUR_TYPE);
+                    Pigment->Blend_Map = Parse_Blend_List<ColourBlendMap>(6,Pigment->pattern->GetDefaultBlendMap(),kBlendMapType_Colour);
                 END_CASE
 
                 CASE (IMAGE_MAP_TOKEN)
@@ -3892,7 +3893,7 @@ void Parser::Parse_Media_Density_Pattern(PIGMENT** Density)
         END_CASE
     END_EXPECT
 
-    Parse_Pattern<GenericPigmentBlendMap>(*Density,DENSITY_TYPE);
+    Parse_Pattern<GenericPigmentBlendMap>(*Density,kBlendMapType_Density);
 }
 
 void Parser::Parse_Media_Density_Pattern(vector<PIGMENT*>& Density)
@@ -4898,7 +4899,7 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
             dynamic_cast<FunctionPattern*>(New->pattern.get())->contextId = sceneData->functionPatternCount;
             sceneData->functionPatternCount++;
             GetParserDataPtr()->functionPatternContext.resize(sceneData->functionPatternCount);
-            dynamic_cast<FunctionPattern*>(New->pattern.get())->pFn = new FunctionVM::CustomFunction(sceneData->functionVM, Parse_Function());
+            dynamic_cast<FunctionPattern*>(New->pattern.get())->pFn = new FunctionVM::CustomFunction(dynamic_cast<FunctionVM*>(sceneData->functionContextFactory), Parse_Function());
             EXIT
         END_CASE
 

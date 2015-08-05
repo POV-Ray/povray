@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file backend/scene/camera.cpp
+/// @file core/scene/camera.cpp
 ///
 /// This module implements methods for managing the viewpoint.
 ///
@@ -33,15 +33,14 @@
 ///
 //******************************************************************************
 
-// frame.h must always be the first POV file included (pulls in platform config)
-#include "backend/frame.h"
-#include "backend/scene/camera.h"
+// configcore.h must always be the first POV file included in core *.cpp files (pulls in platform config)
+#include "core/configcore.h"
+#include "core/scene/camera.h"
 
 #include "core/material/normal.h"
 #include "core/material/pigment.h"
-
-#include "backend/math/matrices.h"
-#include "backend/scene/objects.h"
+#include "core/math/matrix.h"
+#include "core/scene/object.h"
 
 // this must be the last file included
 #include "base/povdebug.h"

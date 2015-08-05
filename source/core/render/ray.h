@@ -36,12 +36,14 @@
 #ifndef RAY_H
 #define RAY_H
 
-#include "backend/frame.h"
-#include "backend/colour/spectral.h"
-#include "backend/support/simplevector.h"
+#include "core/bounding/boundingbox.h"
+#include "core/colour/spectral.h"
+#include "core/support/simplevector.h"
 
 namespace pov
 {
+
+class Interior;
 
 typedef FixedSimpleVector<Interior *, RAYINTERIOR_VECTOR_SIZE> RayInteriorVector;
 

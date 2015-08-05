@@ -39,7 +39,7 @@
 #ifndef SPHERE_SWEEP_H
 #define SPHERE_SWEEP_H
 
-#include "backend/scene/objects.h"
+#include "core/scene/object.h"
 
 namespace pov
 {

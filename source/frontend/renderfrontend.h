@@ -31,7 +31,7 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
 #ifndef POVRAY_FRONTEND_RENDERFRONTEND_H
 #define POVRAY_FRONTEND_RENDERFRONTEND_H
@@ -54,6 +54,7 @@
 #include "base/stringutilities.h"
 #include "base/textstreambuffer.h"
 #include "base/types.h"
+#include "base/image/colourspace.h"
 #include "base/image/image.h"
 
 #include "frontend/configfrontend.h"
@@ -118,7 +119,7 @@ struct SceneData
     {
         int legacyGammaMode;
         // TODO FIXME - conversion from working gamma to linear should be moved to back-end
-        int workingGammaType;
+        GammaTypeId workingGammaType;
         float workingGamma;
     } backwardCompatibilityData;
 };
@@ -506,8 +507,8 @@ RenderFrontendBase::ViewId RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_M
                     throw POV_EXCEPTION_STRING("Unknown gamma handling mode in CreateView()");
             }
 
-            int     dispGammaType   = obj.TryGetInt   (kPOVAttrib_DisplayGammaType, DEFAULT_DISPLAY_GAMMA_TYPE);
-            float   dispGamma       = obj.TryGetFloat (kPOVAttrib_DisplayGamma,     DEFAULT_DISPLAY_GAMMA);
+            GammaTypeId dispGammaType   = (GammaTypeId) obj.TryGetInt   (kPOVAttrib_DisplayGammaType, DEFAULT_DISPLAY_GAMMA_TYPE);
+            float       dispGamma       =               obj.TryGetFloat (kPOVAttrib_DisplayGamma,     DEFAULT_DISPLAY_GAMMA);
 
             switch (shi->second.data.backwardCompatibilityData.legacyGammaMode)
             {
@@ -843,7 +844,7 @@ template<class PARSER_MH, class FILE_MH, class RENDER_MH, class IMAGE_MH>
 void RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::GetBackwardCompatibilityData(SceneData& sd, POVMS_Object& msg)
 {
     sd.backwardCompatibilityData.legacyGammaMode = msg.TryGetInt(kPOVAttrib_LegacyGammaMode, kPOVList_GammaMode_None); // TODO FIXME - default shouldn't be hard-coded in here.
-    sd.backwardCompatibilityData.workingGammaType = msg.TryGetInt(kPOVAttrib_WorkingGammaType, DEFAULT_WORKING_GAMMA_TYPE);
+    sd.backwardCompatibilityData.workingGammaType = (GammaTypeId)msg.TryGetInt(kPOVAttrib_WorkingGammaType, DEFAULT_WORKING_GAMMA_TYPE);
     sd.backwardCompatibilityData.workingGamma = msg.TryGetFloat(kPOVAttrib_WorkingGamma, DEFAULT_WORKING_GAMMA);
 }
 

@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file backend/scene/threaddata.h
+/// @file core/scene/tracethreaddata.h
 ///
 /// @todo   What's in here?
 ///
@@ -33,8 +33,8 @@
 ///
 //******************************************************************************
 
-#ifndef POVRAY_BACKEND_THREADDATA_H
-#define POVRAY_BACKEND_THREADDATA_H
+#ifndef POVRAY_CORE_TRACETHREADDATA_H
+#define POVRAY_CORE_TRACETHREADDATA_H
 
 #include <vector>
 #include <stack>
@@ -42,12 +42,11 @@
 #include "base/types.h"
 
 #include "core/coretypes.h"
+#include "core/bounding/boundingcylinder.h"
 #include "core/material/pattern.h"
 #include "core/shape/mesh.h"
+#include "core/support/statistics.h"
 
-#include "backend/frame.h"
-#include "backend/bounding/bcyl.h"
-#include "backend/support/statistics.h"
 #include "backend/support/task.h"
 
 namespace pov
@@ -56,7 +55,6 @@ namespace pov
 using namespace pov_base;
 
 class SceneData;
-class ViewData;
 class FunctionVM;
 class FPUContext;
 struct ISO_ThreadData;
@@ -193,56 +191,6 @@ class TraceThreadData : public Task::TaskData
         ~TraceThreadData();
 };
 
-/**
- *  Class holding render thread specific data.
- */
-class ViewThreadData : public TraceThreadData
-{
-        friend class Scene;
-    public:
-        /**
-         *  Create thread local data.
-         *  @param  vd              View data defining view attributes
-         *                          as well as view output.
-         */
-        ViewThreadData(ViewData *vd);
-
-        /**
-         *  Get width of view.
-         *  @return                 Width.
-         */
-        unsigned int GetWidth() const;
-
-        /**
-         *  Get height of view.
-         *  @return                 Height.
-         */
-        unsigned int GetHeight() const;
-
-        /**
-         *  Get area of view to be rendered.
-         *  @return                 Area rectangle.
-         */
-        const POVRect& GetRenderArea();
-    protected:
-        /// view data
-        ViewData *viewData;
-    private:
-        /// not available
-        ViewThreadData();
-
-        /// not available
-        ViewThreadData(const ViewThreadData&);
-
-        /// not available
-        ViewThreadData& operator=(const ViewThreadData&);
-    public: // TODO FIXME - temporary workaround [trf]
-        /**
-         *  Destructor.
-         */
-        ~ViewThreadData();
-};
-
 }
 
-#endif // POVRAY_BACKEND_THREADDATA_H
+#endif // POVRAY_CORE_TRACETHREADDATA_H

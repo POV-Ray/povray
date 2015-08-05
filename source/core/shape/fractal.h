@@ -37,9 +37,9 @@
 #ifndef FRACTAL_H
 #define FRACTAL_H
 
-#include "backend/scene/objects.h"
-#include "backend/math/matrices.h"
-#include "backend/math/vector.h"
+#include "core/math/matrix.h"
+#include "core/math/vector.h"
+#include "core/scene/object.h"
 
 namespace pov
 {

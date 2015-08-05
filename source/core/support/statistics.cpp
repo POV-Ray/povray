@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file backend/support/statistics.cpp
+/// @file core/support/statistics.cpp
 ///
 /// @todo   What's in here?
 ///
@@ -36,9 +36,9 @@
 #include <cassert>
 #include <vector>
 
-// frame.h must always be the first POV file included (pulls in platform config)
-#include "backend/frame.h"
-#include "backend/support/statistics.h"
+// configcore.h must always be the first POV file included in core *.cpp files (pulls in platform config)
+#include "core/configcore.h"
+#include "core/support/statistics.h"
 
 #include "base/types.h"
 

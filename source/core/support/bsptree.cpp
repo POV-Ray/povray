@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file backend/support/bsptree.cpp
+/// @file core/support/bsptree.cpp
 ///
 /// @todo   What's in here?
 ///
@@ -36,9 +36,9 @@
 #include <vector>
 #include <list>
 
-// frame.h must always be the first POV file included (pulls in platform config)
-#include "backend/frame.h"
-#include "backend/support/bsptree.h"
+// configcore.h must always be the first POV file included in core *.cpp files (pulls in platform config)
+#include "core/configcore.h"
+#include "core/support/bsptree.h"
 
 #include "base/pov_err.h"
 

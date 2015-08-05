@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file backend/colour/spectral.h
+/// @file core/colour/spectral.h
 ///
 /// This module contains all defines, typedefs, and prototypes for
 /// `spectral.cpp`.
@@ -9,7 +9,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -34,8 +34,8 @@
 ///
 //******************************************************************************
 
-#ifndef SPECTRAL_H
-#define SPECTRAL_H
+#ifndef POVRAY_CORE_SPECTRAL_H
+#define POVRAY_CORE_SPECTRAL_H
 
 #include "base/colour.h"
 
@@ -146,4 +146,4 @@ RGBColour FromRGB(const MathColour& col);
 
 }
 
-#endif // SPECTRAL_H
+#endif // POVRAY_CORE_SPECTRAL_H

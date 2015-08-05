@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file base/processoptions.cpp
+/// @file frontend/processoptions.cpp
 ///
 /// This module contains the C++ interface for option processing.
 ///
@@ -36,9 +36,9 @@
 #include <cstdarg>
 #include <cctype>
 
-// configbase.h must always be the first POV file included within base *.cpp files
-#include "base/configbase.h"
-#include "base/processoptions.h"
+// configfrontend.h must always be the first POV file included in frontend sources (pulls in platform config)
+#include "frontend/configfrontend.h"
+#include "frontend/processoptions.h"
 
 #include "povms/povmscpp.h"
 #include "povms/povmsid.h"

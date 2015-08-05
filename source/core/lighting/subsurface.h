@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file backend/lighting/subsurface.h
+/// @file core/lighting/subsurface.h
 ///
 /// This module contains all defines, typedefs, and prototypes for
 /// `subsurface.cpp`.
@@ -9,7 +9,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -32,13 +32,15 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
-#ifndef SUBSURFACE_H
-#define SUBSURFACE_H
+#ifndef POVRAY_CORE_SUBSURFACE_H
+#define POVRAY_CORE_SUBSURFACE_H
 
 #include <boost/flyweight.hpp>
 #include <boost/flyweight/key_value.hpp>
+
+#include "core/coretypes.h"
 
 namespace pov
 {
@@ -87,4 +89,4 @@ inline double FresnelDiffuseReflectance(double eta)
 
 } // end of namespace
 
-#endif // SUBSURFACE_H
+#endif // POVRAY_CORE_SUBSURFACE_H

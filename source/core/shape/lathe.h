@@ -37,7 +37,7 @@
 #ifndef LATHE_H
 #define LATHE_H
 
-#include "backend/scene/objects.h"
+#include "core/scene/object.h"
 
 namespace pov
 {

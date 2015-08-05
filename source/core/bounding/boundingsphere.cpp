@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file backend/bounding/bsphere.cpp
+/// @file core/bounding/boundingsphere.cpp
 ///
 /// This module implements the bounding sphere calculations.
 ///
@@ -35,9 +35,11 @@
 
 #include <algorithm>
 
-// frame.h must always be the first POV file included (pulls in platform config)
-#include "backend/frame.h"
-#include "backend/bounding/bsphere.h"
+// configcore.h must always be the first POV file included in core *.cpp files (pulls in platform config)
+#include "core/configcore.h"
+#include "core/bounding/boundingsphere.h"
+
+#include "core/coretypes.h"
 
 // this must be the last file included
 #include "base/povdebug.h"

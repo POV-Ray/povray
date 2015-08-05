@@ -37,9 +37,8 @@
 #include "core/configcore.h"
 #include "core/material/interior.h"
 
+#include "core/lighting/subsurface.h"
 #include "core/material/texture.h"
-
-#include "backend/lighting/subsurface.h"
 
 // this must be the last file included
 #include "base/povdebug.h"

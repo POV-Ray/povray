@@ -37,8 +37,8 @@
 #ifndef QUADRICS_H
 #define QUADRICS_H
 
-#include "backend/scene/objects.h"
-#include "backend/math/matrices.h"
+#include "core/math/matrix.h"
+#include "core/scene/object.h"
 
 namespace pov
 {

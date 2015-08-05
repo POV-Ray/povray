@@ -42,13 +42,15 @@
 #include "backend/frame.h"
 #include "backend/bounding/boundingtask.h"
 
+#include "core/math/matrix.h"
+#include "core/scene/object.h"
+#include "core/scene/tracethreaddata.h"
+#include "core/support/bsptree.h"
+
 #include "povms/povmsid.h"
 
-#include "backend/math/matrices.h"
-#include "backend/scene/objects.h"
-#include "backend/scene/scenedata.h"
-#include "backend/scene/threaddata.h"
-#include "backend/support/bsptree.h"
+#include "backend/scene/backendscenedata.h"
+#include "backend/vm/fnpovfpu.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -133,8 +135,8 @@ class BSPProgress : public BSPTree::Progress
         BSPProgress();
 };
 
-BoundingTask::BoundingTask(shared_ptr<SceneData> sd, unsigned int bt) :
-    SceneTask(new TraceThreadData(sd), boost::bind(&BoundingTask::SendFatalError, this, _1), "Bounding", sd),
+BoundingTask::BoundingTask(shared_ptr<BackendSceneData> sd, unsigned int bt) :
+    SceneTask(new TraceThreadData(dynamic_pointer_cast<SceneData>(sd)), boost::bind(&BoundingTask::SendFatalError, this, _1), "Bounding", sd),
     sceneData(sd),
     boundingThreshold(bt)
 {

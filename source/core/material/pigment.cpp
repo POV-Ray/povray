@@ -46,13 +46,12 @@
 
 #include "base/pov_err.h"
 
+#include "core/material/blendmap.h"
 #include "core/material/pattern.h"
 #include "core/material/warp.h"
-
-#include "backend/colour/colour_old.h"
-#include "backend/scene/scenedata.h"
-#include "backend/scene/threaddata.h"
-#include "backend/support/imageutil.h"
+#include "core/scene/scenedata.h"
+#include "core/scene/tracethreaddata.h"
+#include "core/support/imageutil.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -657,9 +656,9 @@ void Evaluate_Density_Pigment(vector<PIGMENT*>& Density, const Vector3d& p, Math
 
 //******************************************************************************
 
-ColourBlendMap::ColourBlendMap() : BlendMap<TransColour>(COLOUR_TYPE) {}
+ColourBlendMap::ColourBlendMap() : BlendMap<TransColour>(kBlendMapType_Colour) {}
 
-ColourBlendMap::ColourBlendMap(int n, const ColourBlendMap::Entry aEntries[]) : BlendMap<TransColour>(COLOUR_TYPE)
+ColourBlendMap::ColourBlendMap(int n, const ColourBlendMap::Entry aEntries[]) : BlendMap<TransColour>(kBlendMapType_Colour)
 {
     Blend_Map_Entries.reserve(n);
     for (int i = 0; i < n; i ++)
@@ -667,7 +666,7 @@ ColourBlendMap::ColourBlendMap(int n, const ColourBlendMap::Entry aEntries[]) : 
 }
 
 
-PigmentBlendMap::PigmentBlendMap(int type) : BlendMap<PIGMENT*>(type) {}
+PigmentBlendMap::PigmentBlendMap(BlendMapTypeId type) : BlendMap<PIGMENT*>(type) {}
 
 PigmentBlendMap::~PigmentBlendMap()
 {

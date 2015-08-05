@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file backend/lighting/radiosity.cpp
+/// @file core/lighting/radiosity.cpp
 ///
 /// This file contains radiosity computation task code.
 ///
@@ -64,20 +64,17 @@
 #include <algorithm>
 #include <boost/thread.hpp>
 
-// frame.h must always be the first POV file included (pulls in platform config)
-#include "backend/frame.h"
-#include "backend/lighting/radiosity.h"
+// configcore.h must always be the first POV file included in core *.cpp files (pulls in platform config)
+#include "core/configcore.h"
+#include "core/lighting/radiosity.h"
 
 #include "base/fileinputoutput.h"
 
+#include "core/lighting/photons.h"
 #include "core/render/ray.h"
-
-#include "backend/lighting/photons.h"
-#include "backend/render/tracetask.h"
-#include "backend/scene/scenedata.h"
-#include "backend/scene/threaddata.h"
-#include "backend/scene/view.h"
-#include "backend/support/octree.h"
+#include "core/scene/scenedata.h"
+#include "core/scene/tracethreaddata.h"
+#include "core/support/octree.h"
 
 // this must be the last file included
 #include "base/povdebug.h"

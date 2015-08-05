@@ -36,8 +36,8 @@
 #ifndef POVRAY_FRONTEND_PROCESSRENDEROPTIONS_H
 #define POVRAY_FRONTEND_PROCESSRENDEROPTIONS_H
 
-#include "base/processoptions.h"
 #include "frontend/configfrontend.h"
+#include "frontend/processoptions.h"
 
 namespace pov_frontend
 {

@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file base/processoptions.h
+/// @file frontend/processoptions.h
 ///
 /// This module contains all defines, typedefs, and prototypes for the
 /// C++ interface of `processoptions.cpp`.

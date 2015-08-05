@@ -241,8 +241,9 @@ Density of instruction set: 916 / 1024 = 0.8945
 #include "backend/frame.h"
 #include "backend/vm/fnpovfpu.h"
 
+#include "core/scene/tracethreaddata.h"
+
 #include "backend/math/mathutil.h"
-#include "backend/scene/threaddata.h"
 #include "backend/vm/fnintern.h"
 
 // this must be the last file included
@@ -1600,6 +1601,11 @@ GenericScalarFunctionPtr FunctionVM::CustomFunction::Clone() const
 const FunctionSourceInfo* FunctionVM::CustomFunction::GetSourceInfo() const
 {
     return &(mpVm->GetFunction(*mpFn)->sourceInfo);
+}
+
+GenericFunctionContextPtr FunctionVM::CreateFunctionContext(TraceThreadData* pTd)
+{
+    return new FPUContext(this, pTd);
 }
 
 

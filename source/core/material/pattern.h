@@ -54,6 +54,7 @@
 
 #include "core/coretypes.h"
 #include "core/material/pigment.h"
+#include "core/material/warp.h"
 
 namespace pov
 {
@@ -166,9 +167,6 @@ const int kFractalMaxExponent = 33;
 
 //******************************************************************************
 // Forward declarations to avoid pulling in entire header files.
-
-// required by FunctionPattern (defined in backend/vm/fnpovfpu.h)
-class FunctionVM;
 
 // required by ImagePattern (defined in support/imageutil.h)
 class ImageData;

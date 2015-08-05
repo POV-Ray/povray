@@ -39,23 +39,22 @@
 #include "backend/frame.h"
 #include "backend/lighting/photonstrategytask.h"
 
+#include "core/bounding/boundingbox.h"
+#include "core/lighting/lightgroup.h"
+#include "core/lighting/lightsource.h"
+#include "core/math/matrix.h"
+#include "core/scene/object.h"
 #include "core/shape/csg.h"
+#include "core/support/octree.h"
 
 #include "povms/povms.h"
 #include "povms/povmsid.h"
 #include "povms/povmsutil.h"
 
-#include "backend/bounding/bbox.h"
-#include "backend/math/matrices.h"
-#include "backend/scene/objects.h"
-#include "backend/scene/scenedata.h"
-#include "backend/scene/threaddata.h"
-#include "backend/scene/view.h"
-#include "backend/support/octree.h"
 #include "backend/lighting/photonshootingstrategy.h"
-#include "backend/lighting/point.h"
-
-#include "lightgrp.h"
+#include "backend/scene/backendscenedata.h"
+#include "backend/scene/view.h"
+#include "backend/scene/viewthreaddata.h"
 
 // this must be the last file included
 #include "base/povdebug.h"

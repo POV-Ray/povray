@@ -39,15 +39,16 @@
 #ifndef PIGMENT_H
 #define PIGMENT_H
 
-#include "base/colour.h"
 #include "base/image/colourspace.h"
 
-#include "backend/frame.h"
+#include "core/coretypes.h"
+#include "core/material/blendmap.h"
 
 namespace pov
 {
-using namespace pov_base;
 
+class Intersection;
+class Ray;
 class TraceThreadData;
 
 /// Common interface for pigment-like blend maps.
@@ -93,7 +94,7 @@ class PigmentBlendMap : public BlendMap<PIGMENT*>, public GenericPigmentBlendMap
 {
     public:
 
-        PigmentBlendMap(int type);
+        PigmentBlendMap(BlendMapTypeId type);
         virtual ~PigmentBlendMap();
 
         virtual bool Compute(TransColour& colour, DBL value, const Vector3d& IPoint, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread);

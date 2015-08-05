@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file backend/math/hcmplx.cpp
+/// @file core/math/hypercomplex.cpp
 ///
 /// This module implements hypercomplex Julia fractals.
 ///
@@ -35,9 +35,9 @@
 ///
 //******************************************************************************
 
-// frame.h must always be the first POV file included (pulls in platform config)
-#include "backend/frame.h"
-#include "backend/math/hcmplx.h"
+// configcore.h must always be the first POV file included in core *.cpp files (pulls in platform config)
+#include "core/configcore.h"
+#include "core/math/hypercomplex.h"
 
 #include "core/shape/fractal.h" // TODO - Where should hcmplx.h/hcmplx.cpp go? Are they really math? [trf]
 #include "core/shape/sphere.h" // TODO - Move sphere intersection function to math code! [trf]

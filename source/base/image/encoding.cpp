@@ -38,8 +38,6 @@
 #include "base/configbase.h"
 #include "base/image/encoding.h"
 
-#include "povms/povmsid.h"
-
 #include "base/image/image.h"
 
 // this must be the last file included
@@ -246,7 +244,7 @@ void FloydSteinbergDither::setError(unsigned int x, unsigned int y, const Offset
 
 /*******************************************************************************/
 
-DitherHandlerPtr GetDitherHandler(int method, unsigned int imageWidth)
+DitherHandlerPtr GetDitherHandler(DitherMethodId method, unsigned int imageWidth)
 {
     switch (method)
     {

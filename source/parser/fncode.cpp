@@ -41,11 +41,11 @@
 #include <cstring>
 #include <algorithm>
 
-// frame.h must always be the first POV file included (pulls in platform config)
-#include "backend/frame.h"
+// configparser.h must always be the first POV file included in the parser (pulls in platform config)
+#include "parser/configparser.h"
 #include "parser/fncode.h"
 
-#include "backend/scene/scenedata.h"
+#include "backend/scene/backendscenedata.h"
 #include "backend/vm/fnintern.h"
 #include "backend/vm/fnpovfpu.h"
 
@@ -102,7 +102,7 @@ FNCode::FNCode(Parser *pa, FunctionCode *f, bool is_local, const char *n)
     parameter_stack_pointer = 0;
 
     parser = pa;
-    functionVM = parser->sceneData->functionVM;
+    functionVM = dynamic_cast<FunctionVM*>(parser->sceneData->functionContextFactory);
 
     function = f;
 

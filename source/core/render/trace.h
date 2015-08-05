@@ -33,17 +33,16 @@
 ///
 //******************************************************************************
 
-#ifndef POVRAY_BACKEND_TRACE_H
-#define POVRAY_BACKEND_TRACE_H
+#ifndef POVRAY_CORE_TRACE_H
+#define POVRAY_CORE_TRACE_H
 
 #include <vector>
 
 #include <boost/thread.hpp>
 
-#include "backend/frame.h"
+#include "core/math/randomsequence.h"
 #include "core/render/ray.h"
-#include "backend/support/bsptree.h"
-#include "backend/support/randomsequences.h"
+#include "core/support/bsptree.h"
 
 namespace pov
 {
@@ -799,4 +798,4 @@ class Trace
 
 }
 
-#endif // POVRAY_BACKEND_TRACE_H
+#endif // POVRAY_CORE_TRACE_H

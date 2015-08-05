@@ -41,8 +41,7 @@
 #define FPMETRIC_H
 
 #include "core/coretypes.h"
-
-#include "backend/scene/objects.h"
+#include "core/scene/object.h"
 
 namespace pov
 {

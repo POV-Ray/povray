@@ -351,6 +351,7 @@
     <ClCompile Include="..\..\source\frontend\imagemessagehandler.cpp" />
     <ClCompile Include="..\..\source\frontend\imageprocessing.cpp" />
     <ClCompile Include="..\..\source\frontend\parsermessagehandler.cpp" />
+    <ClCompile Include="..\..\source\frontend\processoptions.cpp" />
     <ClCompile Include="..\..\source\frontend\processrenderoptions.cpp" />
     <ClCompile Include="..\..\source\frontend\renderfrontend.cpp" />
     <ClCompile Include="..\..\source\frontend\rendermessagehandler.cpp" />
@@ -374,6 +375,7 @@
     <ClInclude Include="..\..\source\frontend\imagemessagehandler.h" />
     <ClInclude Include="..\..\source\frontend\imageprocessing.h" />
     <ClInclude Include="..\..\source\frontend\parsermessagehandler.h" />
+    <ClInclude Include="..\..\source\frontend\processoptions.h" />
     <ClInclude Include="..\..\source\frontend\processrenderoptions.h" />
     <ClInclude Include="..\..\source\frontend\renderfrontend.h" />
     <ClInclude Include="..\..\source\frontend\rendermessagehandler.h" />

@@ -42,13 +42,13 @@
 #include "backend/render/tracetask.h"
 
 #include "core/material/normal.h"
+#include "core/math/chi2.h"
+#include "core/math/matrix.h"
 #include "core/render/trace.h"
 
-#include "backend/math/chi2.h"
-#include "backend/math/matrices.h"
-#include "backend/scene/scenedata.h"
-#include "backend/scene/threaddata.h"
+#include "backend/scene/backendscenedata.h"
 #include "backend/scene/view.h"
+#include "backend/scene/viewthreaddata.h"
 #include "backend/support/jitter.h"
 
 #ifdef PROFILE_INTERSECTIONS

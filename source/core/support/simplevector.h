@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file backend/support/simplevector.h
+/// @file core/support/simplevector.h
 ///
 /// Very simple, basic vector-like classes containing just enough functionality
 /// for their intended uses within POV. Flexibility is sacrificed for
@@ -52,8 +52,8 @@
 ///
 //******************************************************************************
 
-#ifndef __SIMPLEVECTOR__
-#define __SIMPLEVECTOR__
+#ifndef POVRAY_CORE_SIMPLEVECTOR_H
+#define POVRAY_CORE_SIMPLEVECTOR_H
 
 #include <stdexcept>
 
@@ -563,4 +563,4 @@ private:
 
 }
 
-#endif
+#endif // POVRAY_CORE_SIMPLEVECTOR_H

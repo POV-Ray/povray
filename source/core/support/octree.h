@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file backend/support/octree.h
+/// @file core/support/octree.h
 ///
 /// Oct-tree routine prototypes. Use by Radiosity calculation routies.
 ///
@@ -40,10 +40,11 @@
  * All standard POV distribution rights granted.  All other rights reserved.
 */
 
-#ifndef OCTREE_H
-#define OCTREE_H
+#ifndef POVRAY_CORE_OCTREE_H
+#define POVRAY_CORE_OCTREE_H
 
-#include "backend/frame.h"
+#include "core/coretypes.h"
+#include "core/math/vector.h"
 
 namespace pov_base
 {
@@ -157,4 +158,4 @@ void ot_parent (OT_ID *dad, OT_ID *kid);
 
 }
 
-#endif
+#endif // POVRAY_CORE_OCTREE_H

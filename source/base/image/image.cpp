@@ -31,7 +31,7 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
 #include <cassert>
 #include <algorithm>
@@ -44,8 +44,6 @@
 // configbase.h must always be the first POV file included within base *.cpp files
 #include "base/configbase.h"
 #include "base/image/image.h"
-
-#include "povms/povmsid.h"
 
 #include "base/platformbase.h"
 #include "base/safemath.h"

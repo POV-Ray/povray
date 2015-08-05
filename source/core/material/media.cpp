@@ -39,14 +39,13 @@
 #include "core/configcore.h"
 #include "core/material/media.h"
 
+#include "core/lighting/lightsource.h"
+#include "core/lighting/photons.h"
 #include "core/material/pattern.h"
 #include "core/material/pigment.h"
+#include "core/math/chi2.h"
 #include "core/render/ray.h"
-
-#include "backend/lighting/photons.h"
-#include "backend/lighting/point.h"
-#include "backend/math/chi2.h"
-#include "backend/scene/threaddata.h"
+#include "core/scene/tracethreaddata.h"
 
 // this must be the last file included
 #include "base/povdebug.h"

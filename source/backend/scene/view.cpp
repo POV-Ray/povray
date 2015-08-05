@@ -41,27 +41,29 @@
 #include "backend/frame.h"
 #include "backend/scene/view.h"
 
+#include "base/path.h"
+#include "base/timer.h"
+
+#include "core/lighting/photons.h"
+#include "core/lighting/radiosity.h"
+#include "core/math/matrix.h"
+#include "core/support/octree.h"
+
 #include "povms/povms.h"
 #include "povms/povmscpp.h"
 #include "povms/povmsid.h"
 
-#include "base/path.h"
-#include "base/timer.h"
-
 #include "backend/control/renderbackend.h"
 #include "backend/lighting/photonestimationtask.h"
-#include "backend/lighting/photons.h"
 #include "backend/lighting/photonshootingstrategy.h"
 #include "backend/lighting/photonshootingtask.h"
 #include "backend/lighting/photonsortingtask.h"
 #include "backend/lighting/photonstrategytask.h"
-#include "backend/lighting/radiosity.h"
-#include "backend/math/matrices.h"
 #include "backend/render/radiositytask.h"
 #include "backend/render/tracetask.h"
-#include "backend/scene/scenedata.h"
-#include "backend/scene/threaddata.h"
-#include "backend/support/octree.h"
+#include "backend/scene/backendscenedata.h"
+#include "backend/scene/viewthreaddata.h"
+#include "backend/vm/fnpovfpu.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -81,7 +83,7 @@ inline unsigned int MakePowerOfTwo(unsigned int i)
     return 1 << ii;
 }
 
-ViewData::ViewData(shared_ptr<SceneData> sd) :
+ViewData::ViewData(shared_ptr<BackendSceneData> sd) :
     nextBlock(0),
     completedFirstPass(false),
     highestTraceLevel(0),
@@ -565,7 +567,7 @@ RadiosityCache& ViewData::GetRadiosityCache()
     return radiosityCache;
 }
 
-View::View(shared_ptr<SceneData> sd, unsigned int width, unsigned int height, RenderBackend::ViewId vid) :
+View::View(shared_ptr<BackendSceneData> sd, unsigned int width, unsigned int height, RenderBackend::ViewId vid) :
     viewData(sd),
     stopRequsted(false),
     mailbox(0),
@@ -627,7 +629,7 @@ bool View::CheckCameraHollowObject(const Vector3d& point, const BBOX_TREE *node)
 
 bool View::CheckCameraHollowObject(const Vector3d& point)
 {
-    shared_ptr<SceneData>& sd = viewData.GetSceneData();
+    shared_ptr<BackendSceneData>& sd = viewData.GetSceneData();
 
     if(sd->boundingMethod == 2)
     {

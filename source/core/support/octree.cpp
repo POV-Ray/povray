@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file backend/support/octree.cpp
+/// @file core/support/octree.cpp
 ///
 /// This module contains all oct-tree functions for radiosity.
 ///
@@ -56,13 +56,14 @@
 
 #include <algorithm>
 
-// frame.h must always be the first POV file included (pulls in platform config)
-#include "backend/frame.h"
-#include "backend/support/octree.h"
+// configcore.h must always be the first POV file included in core *.cpp files (pulls in platform config)
+#include "core/configcore.h"
+#include "core/support/octree.h"
 
-#include "backend/colour/spectral.h"
 #include "base/fileinputoutput.h"
 #include "base/pov_err.h"
+
+#include "core/colour/spectral.h"
 
 // this must be the last file included
 #include "base/povdebug.h"

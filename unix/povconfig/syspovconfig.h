@@ -92,6 +92,7 @@ using std::runtime_error;
 // these may actually be the boost implementations, depending on what boost/tr1/memory.hpp has pulled in
 using std::tr1::shared_ptr;
 using std::tr1::weak_ptr;
+using std::tr1::dynamic_pointer_cast;
 
 #endif // STD_POV_TYPES_DECLARED
 
@@ -146,6 +147,30 @@ const int NULL=0;
     #else
         #error Someone must have found an alternative way of identifying infinities but failed to implement it here.
     #endif
+#endif
+
+#if defined INT8_MAX || defined int8_t
+    #define POV_INT8 int8_t
+#else
+    // Autoconf is convinced that there's no integer type exactly 8 bits wide. We won't pick a type here.
+#endif
+
+#if defined INT16_MAX || defined int16_t
+    #define POV_INT16 int16_t
+#else
+    // Autoconf is convinced that there's no integer type exactly 16 bits wide. We won't pick a type here.
+#endif
+
+#if defined INT32_MAX || defined int32_t
+    #define POV_INT32 int32_t
+#else
+    // Autoconf is convinced that there's no integer type exactly 32 bits wide. We won't pick a type here.
+#endif
+
+#if defined INT64_MAX || defined int64_t
+    #define POV_INT64 int64_t
+#else
+    // Autoconf is convinced that there's no integer type exactly 64 bits wide. We won't pick a type here.
 #endif
 
 // Pull in additional settings depending on Unix flavor

@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file backend/scene/atmosph.h
+/// @file core/scene/atmosphere.h
 ///
 /// This module contains all defines, typedefs, and prototypes for
 /// `atmosph.cpp`.
@@ -34,8 +34,8 @@
 ///
 //******************************************************************************
 
-#ifndef ATMOSPH_H
-#define ATMOSPH_H
+#ifndef POVRAY_CORE_ATMOSPHERE_H
+#define POVRAY_CORE_ATMOSPHERE_H
 
 #include "core/material/pigment.h"
 
@@ -122,4 +122,4 @@ void Transform_Skysphere (SKYSPHERE *Skysphere, const TRANSFORM *Trans);
 
 }
 
-#endif
+#endif // POVRAY_CORE_ATMOSPHERE_H

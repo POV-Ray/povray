@@ -1,8 +1,9 @@
 //******************************************************************************
 ///
-/// @file statspov.h
+/// @file core/support/statisticids.h
 ///
-/// This module contains all defines, typedefs, and prototypes for `statspov.cpp`.
+/// This module contains identifiers for the various statistics gathered during
+/// rendering.
 ///
 /// @copyright
 /// @parblock
@@ -33,14 +34,65 @@
 ///
 //******************************************************************************
 
-#ifndef STATSPOV_H
-#define STATSPOV_H
+#ifndef POVRAY_CORE_STATISTICIDS_H
+#define POVRAY_CORE_STATISTICIDS_H
 
 #include "base/types.h"
-#include "backend/frame.h"
 
 namespace pov
 {
+
+// Add new stats ONLY at the end!!!
+enum
+{
+    kPOVList_Stat_BicubicTest = 1,
+    kPOVList_Stat_BlobTest,
+    kPOVList_Stat_BlobCpTest,
+    kPOVList_Stat_BlobBdTest,
+    kPOVList_Stat_BoxTest,
+    kPOVList_Stat_ConeCylTest,
+    kPOVList_Stat_CSGIntersectTest,
+    kPOVList_Stat_CSGMergeTest,
+    kPOVList_Stat_CSGUnionTest,
+    kPOVList_Stat_DiscTest,
+    kPOVList_Stat_FractalTest,
+    kPOVList_Stat_HFTest,
+    kPOVList_Stat_HFBoxTest,
+    kPOVList_Stat_HFTriangleTest,
+    kPOVList_Stat_HFBlockTest,
+    kPOVList_Stat_HFCellTest,
+    kPOVList_Stat_IsosurfaceTest,
+    kPOVList_Stat_IsosurfaceBdTest,
+    kPOVList_Stat_IsosurfaceCacheTest,
+    kPOVList_Stat_LatheTest,
+    kPOVList_Stat_LatheBdTest,
+    kPOVList_Stat_MeshTest,
+    kPOVList_Stat_PlaneTest,
+    kPOVList_Stat_PolygonTest,
+    kPOVList_Stat_PrismTest,
+    kPOVList_Stat_PrismBdTest,
+    kPOVList_Stat_ParametricTest,
+    kPOVList_Stat_ParametricBoxTest,
+    kPOVList_Stat_QuardicTest,
+    kPOVList_Stat_QuadPolyTest,
+    kPOVList_Stat_SphereTest,
+    kPOVList_Stat_SphereSweepTest,
+    kPOVList_Stat_SuperellipsTest,
+    kPOVList_Stat_SORTest,
+    kPOVList_Stat_SORBdTest,
+    kPOVList_Stat_TorusTest,
+    kPOVList_Stat_TorusBdTest,
+    kPOVList_Stat_TriangleTest,
+    kPOVList_Stat_TTFontTest,
+    kPOVList_Stat_BoundObjectTest,
+    kPOVList_Stat_ClipObjectTest,
+    kPOVList_Stat_BoundingBoxTest,
+    kPOVList_Stat_LightBufferTest,
+    kPOVList_Stat_VistaBufferTest,
+    kPOVList_Stat_RBezierTest,
+    kPOVList_Stat_OvusTest,
+    kPOVList_Stat_Last
+};
 
 typedef enum INTSTATS
 {
@@ -289,4 +341,4 @@ extern const INTERSECTION_STATS_INFO intersection_stats[];
 
 }
 
-#endif
+#endif // POVRAY_CORE_STATISTICIDS_H

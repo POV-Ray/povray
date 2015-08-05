@@ -52,13 +52,12 @@
 
 #include "base/pov_err.h"
 
+#include "core/material/blendmap.h"
 #include "core/material/pattern.h"
 #include "core/material/pigment.h"
 #include "core/material/normal.h"
 #include "core/material/warp.h"
-
-#include "backend/colour/colour_old.h"
-#include "backend/support/imageutil.h"
+#include "core/support/imageutil.h"
 
 #if defined(TRY_OPTIMIZED_NOISE)
     #include OPTIMIZED_NOISE_H
@@ -1678,7 +1677,7 @@ void Initialise_NoiseDispatch()
 
 //******************************************************************************
 
-TextureBlendMap::TextureBlendMap() : BlendMap<TexturePtr>(TEXTURE_TYPE) {}
+TextureBlendMap::TextureBlendMap() : BlendMap<TexturePtr>(kBlendMapType_Texture) {}
 
 TextureBlendMap::~TextureBlendMap()
 {

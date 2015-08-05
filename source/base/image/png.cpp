@@ -66,8 +66,6 @@
 
 #include "base/image/png_pov.h"
 
-#include "povms/povmsid.h" // for kPOVList_GammaType_SRGB
-
 #include "base/fileinputoutput.h"
 #include "base/types.h"
 #include "base/image/image.h"
@@ -775,7 +773,7 @@ void Write (OStream *file, const Image *image, const Image::WriteOptions& option
 #endif // PNG_WRITE_gAMA_SUPPORTED
 
 #if defined(PNG_WRITE_sRGB_SUPPORTED)
-    if (options.encodingGamma && options.encodingGamma->GetTypeId() == kPOVList_GammaType_SRGB)
+    if (options.encodingGamma && typeid(*options.encodingGamma) == typeid(SRGBGammaCurve))
         // gamma curve is sRGB transfer function; pretend that color space also matches sRGB
         png_set_sRGB(png_ptr, info_ptr, PNG_sRGB_INTENT_PERCEPTUAL); // we have to write *some* value; perceptual will probably be the most common
 #endif // PNG_WRITE_gAMA_SUPPORTED

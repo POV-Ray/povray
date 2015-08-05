@@ -39,8 +39,9 @@
 #ifndef TEXTURE_H
 #define TEXTURE_H
 
-#include "backend/frame.h"
-#include "backend/support/simplevector.h"
+#include "core/coretypes.h"
+#include "core/material/blendmap.h"
+#include "core/support/simplevector.h"
 
 namespace pov
 {

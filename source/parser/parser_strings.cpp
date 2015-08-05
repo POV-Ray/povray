@@ -44,7 +44,7 @@
 
 #include "pov_mem.h" // TODO
 
-#include "backend/scene/scenedata.h"
+#include "backend/scene/backendscenedata.h"
 
 // this must be the last file included
 #include "base/povdebug.h"

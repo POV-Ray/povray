@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file backend/scene/camera.h
+/// @file core/scene/camera.h
 ///
 /// This module contains all defines, typedefs, and prototypes for `camera.cpp`.
 ///
@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -31,12 +31,13 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
-#ifndef CAMERA_H
-#define CAMERA_H
+#ifndef POVRAY_CORE_CAMERA_H
+#define POVRAY_CORE_CAMERA_H
 
-#include "backend/frame.h"
+#include "core/math/vector.h"
+#include "core/material/normal.h"
 
 namespace pov
 {
@@ -113,4 +114,4 @@ private:
 
 }
 
-#endif
+#endif // POVRAY_CORE_CAMERA_H

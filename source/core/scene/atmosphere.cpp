@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file backend/scene/atmosph.cpp
+/// @file core/scene/atmosphere.cpp
 ///
 /// This module contains all functions for atmospheric effects.
 ///
@@ -35,16 +35,15 @@
 
 #include <algorithm>
 
-// frame.h must always be the first POV file included (pulls in platform config)
-#include "backend/frame.h"
-#include "backend/scene/atmosph.h"
+// configcore.h must always be the first POV file included in core *.cpp files (pulls in platform config)
+#include "core/configcore.h"
+#include "core/scene/atmosphere.h"
 
 #include "core/material/pattern.h"
 #include "core/material/warp.h"
 #include "core/material/pigment.h"
 #include "core/material/texture.h"
-
-#include "backend/math/matrices.h"
+#include "core/math/matrix.h"
 
 // this must be the last file included
 #include "base/povdebug.h"

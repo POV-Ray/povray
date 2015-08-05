@@ -1,8 +1,9 @@
 //******************************************************************************
 ///
-/// @file optout.cpp
+/// @file core/support/statisticids.cpp
 ///
-/// This module contains functions for credit, usage and options.
+/// This module contains plaintext labels for the various statistics gathered
+/// during rendering.
 ///
 /// @copyright
 /// @parblock
@@ -33,11 +34,9 @@
 ///
 //******************************************************************************
 
-// frame.h must always be the first POV file included (pulls in platform config)
-#include "backend/frame.h"
-#include "statspov.h"
-
-#include "povms/povmsid.h"
+// configcore.h must always be the first POV file included in core *.cpp files (pulls in platform config)
+#include "core/configcore.h"
+#include "core/support/statisticids.h"
 
 // this must be the last file included
 #include "base/povdebug.h"

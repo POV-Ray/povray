@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file backend/math/polysolv.h
+/// @file core/math/polynomialsolver.h
 ///
 /// This module contains all defines, typedefs, and prototypes for `polysolv.cpp`.
 ///
@@ -33,13 +33,13 @@
 ///
 //******************************************************************************
 
-#ifndef POLYSOLV_H
-#define POLYSOLV_H
-
-#include "backend/support/statistics.h"
+#ifndef POVRAY_POLYNOMIALSOLVER_H
+#define POVRAY_POLYNOMIALSOLVER_H
 
 namespace pov
 {
+
+class RenderStatistics;
 
 /*****************************************************************************
 * Global preprocessor defines
@@ -69,4 +69,4 @@ int Solve_Polynomial (int n, const DBL *c, DBL *r, int sturm, DBL epsilon, Rende
 
 }
 
-#endif
+#endif // POVRAY_POLYNOMIALSOLVER_H

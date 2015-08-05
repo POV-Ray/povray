@@ -39,11 +39,15 @@
 #ifndef NORMAL_H
 #define NORMAL_H
 
-#include "backend/frame.h"
+#include "core/coretypes.h"
+#include "core/material/blendmap.h"
+#include "core/math/vector.h"
 
 namespace pov
 {
 
+class Intersection;
+class Ray;
 class TraceThreadData;
 
 /// Common interface for normal-like blend maps.

@@ -646,58 +646,6 @@ enum
     kPOVAttrib_EndRow                = kPOVAttrib_Bottom
 };
 
-// Add new stats ONLY at the end!!!
-enum
-{
-    kPOVList_Stat_BicubicTest = 1,
-    kPOVList_Stat_BlobTest,
-    kPOVList_Stat_BlobCpTest,
-    kPOVList_Stat_BlobBdTest,
-    kPOVList_Stat_BoxTest,
-    kPOVList_Stat_ConeCylTest,
-    kPOVList_Stat_CSGIntersectTest,
-    kPOVList_Stat_CSGMergeTest,
-    kPOVList_Stat_CSGUnionTest,
-    kPOVList_Stat_DiscTest,
-    kPOVList_Stat_FractalTest,
-    kPOVList_Stat_HFTest,
-    kPOVList_Stat_HFBoxTest,
-    kPOVList_Stat_HFTriangleTest,
-    kPOVList_Stat_HFBlockTest,
-    kPOVList_Stat_HFCellTest,
-    kPOVList_Stat_IsosurfaceTest,
-    kPOVList_Stat_IsosurfaceBdTest,
-    kPOVList_Stat_IsosurfaceCacheTest,
-    kPOVList_Stat_LatheTest,
-    kPOVList_Stat_LatheBdTest,
-    kPOVList_Stat_MeshTest,
-    kPOVList_Stat_PlaneTest,
-    kPOVList_Stat_PolygonTest,
-    kPOVList_Stat_PrismTest,
-    kPOVList_Stat_PrismBdTest,
-    kPOVList_Stat_ParametricTest,
-    kPOVList_Stat_ParametricBoxTest,
-    kPOVList_Stat_QuardicTest,
-    kPOVList_Stat_QuadPolyTest,
-    kPOVList_Stat_SphereTest,
-    kPOVList_Stat_SphereSweepTest,
-    kPOVList_Stat_SuperellipsTest,
-    kPOVList_Stat_SORTest,
-    kPOVList_Stat_SORBdTest,
-    kPOVList_Stat_TorusTest,
-    kPOVList_Stat_TorusBdTest,
-    kPOVList_Stat_TriangleTest,
-    kPOVList_Stat_TTFontTest,
-    kPOVList_Stat_BoundObjectTest,
-    kPOVList_Stat_ClipObjectTest,
-    kPOVList_Stat_BoundingBoxTest,
-    kPOVList_Stat_LightBufferTest,
-    kPOVList_Stat_VistaBufferTest,
-    kPOVList_Stat_RBezierTest,
-    kPOVList_Stat_OvusTest,
-    kPOVList_Stat_Last
-};
-
 // Add new progress messages ONLY at the end!!!
 enum
 {
@@ -798,25 +746,6 @@ enum
      *  This is the default for POV-Ray 3.7 and later.
      */
     kPOVList_GammaMode_AssumedGamma37Implied,
-};
-
-enum
-{
-    kPOVList_GammaType_Unknown,
-    kPOVList_GammaType_Neutral,
-    kPOVList_GammaType_PowerLaw,
-    kPOVList_GammaType_SRGB
-};
-
-enum
-{
-    kPOVList_DitherMethod_None,
-    kPOVList_DitherMethod_Diffusion1D,
-    kPOVList_DitherMethod_Diffusion2D,
-    kPOVList_DitherMethod_FloydSteinberg,
-    kPOVList_DitherMethod_Bayer2x2,
-    kPOVList_DitherMethod_Bayer3x3,
-    kPOVList_DitherMethod_Bayer4x4,
 };
 
 #endif // POVMSID_H

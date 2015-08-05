@@ -197,6 +197,11 @@
 #define POV_LONG                            __int64
 #define FORCEINLINE                         __forceinline
 
+#define POV_INT8                            __int8
+#define POV_INT16                           __int16
+#define POV_INT32                           __int32
+#define POV_INT64                           __int64
+
 #undef ReturnAddress
 #define ReturnAddress()                     _ReturnAddress()
 

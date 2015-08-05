@@ -123,50 +123,6 @@
     #define POV_WHERE_ERROR(fn,ln,cl,ts)
 #endif
 
-// Default for Max_Trace_Level
-#ifndef MAX_TRACE_LEVEL_DEFAULT
-    #define MAX_TRACE_LEVEL_DEFAULT 5
-#endif
-
-// Upper bound for max_trace_level specified by the user
-#ifndef MAX_TRACE_LEVEL_LIMIT
-    #define MAX_TRACE_LEVEL_LIMIT 256
-#endif
-
-// Various numerical constants that are used in the calculations
-#ifndef EPSILON     // A small value used to see if a value is nearly zero
-    #define EPSILON 1.0e-10
-#endif
-
-#ifndef HUGE_VAL    // A very large value, can be considered infinity
-    #define HUGE_VAL 1.0e+17
-#endif
-
-/*
- * If the width of a bounding box in one dimension is greater than
- * the critical length, the bounding box should be set to infinite.
- */
-
-#ifndef CRITICAL_LENGTH
-    #define CRITICAL_LENGTH 1.0e+6
-#endif
-
-#ifndef BOUND_HUGE  // Maximum lengths of a bounding box.
-    #define BOUND_HUGE 2.0e+10
-#endif
-
-/*
- * These values determine the minimum and maximum distances
- * that qualify as ray-object intersections.
- */
-
-//#define SMALL_TOLERANCE 1.0e-6 // TODO FIXME #define SMALL_TOLERANCE 0.001
-//#define MAX_DISTANCE 1.0e+10 // TODO FIXME #define MAX_DISTANCE 1.0e7
-#define SMALL_TOLERANCE 0.001
-#define MAX_DISTANCE 1.0e7
-
-#define MIN_ISECT_DEPTH 1.0e-4
-
 #ifndef DBL_FORMAT_STRING
     #define DBL_FORMAT_STRING "%lf"
 #endif
@@ -223,18 +179,6 @@
     #define POV_SYS_THREAD_CLEANUP
 #endif
 
-#ifndef CDECL
-    #define CDECL
-#endif
-
-#ifndef ALIGN16
-    #define ALIGN16
-#endif
-
-#ifndef FORCEINLINE
-    #define FORCEINLINE inline
-#endif
-
 #ifndef INLINE_NOISE
     #define INLINE_NOISE
 #endif
@@ -244,7 +188,7 @@
 #endif
 
 #ifndef NEW_LINE_STRING
-    #define NEW_LINE_STRING "\n"
+    // NEW_LINE_STRING remains undefined, optimizing the code for "\n" as used internally
 #endif
 
 // If compiler version is undefined, then make it 'u' for unknown

@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file backend/lighting/photons.cpp
+/// @file core/lighting/photons.cpp
 ///
 /// This module implements Photon Mapping.
 ///
@@ -35,30 +35,24 @@
 
 #include <algorithm>
 
-// frame.h must always be the first POV file included (pulls in platform config)
-#include "backend/frame.h"
-#include "backend/lighting/photons.h"
+// configcore.h must always be the first POV file included in core *.cpp files (pulls in platform config)
+#include "core/configcore.h"
+#include "core/lighting/photons.h"
 
+#include "core/bounding/boundingbox.h"
+#include "core/lighting/lightgroup.h"
+#include "core/lighting/lightsource.h"
 #include "core/material/normal.h"
 #include "core/material/pigment.h"
 #include "core/material/texture.h"
 #include "core/material/warp.h"
+#include "core/math/matrix.h"
 #include "core/render/ray.h"
+#include "core/scene/object.h"
+#include "core/scene/scenedata.h"
+#include "core/scene/tracethreaddata.h"
 #include "core/shape/csg.h"
-
-#include "povms/povmsutil.h"
-
-#include "backend/bounding/bbox.h"
-#include "backend/lighting/photonshootingstrategy.h"
-#include "backend/lighting/point.h"
-#include "backend/math/matrices.h"
-#include "backend/scene/objects.h"
-#include "backend/scene/scenedata.h"
-#include "backend/scene/threaddata.h"
-#include "backend/scene/view.h"
-#include "backend/support/octree.h"
-
-#include "lightgrp.h"
+#include "core/support/octree.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -74,12 +68,6 @@ namespace pov
 /* global variables */
 /* ------------------------------------------------------ */
 SinCosOptimizations sinCosData;
-
-// statistics helpers
-//int gPhotonStat_i = 0;
-//int gPhotonStat_x_samples = 0;
-//int gPhotonStat_y_samples = 0;
-//int gPhotonStat_end = 0;
 
 /* ------------------------------------------------------ */
 /* external variables */
@@ -1848,7 +1836,6 @@ void PhotonMap::sortAndSubdivide(int start, int end, int /*sorted*/)
         // only display status every so often
         if(len > 1000)
         {
-            //gPhotonStat_end = end;
 //          Send_ProgressUpdate(PROGRESS_SORTING_PHOTONS);
         }
 
@@ -2635,29 +2622,6 @@ void ChooseRay(BasicRay &NewRay, const Vector3d& Normal, const Vector3d& Raw_Nor
 
     NewRay.Direction.normalize();
 }
-
-#if(0)
-int GetPhotonStat(POVMSType a)
-{
-    switch(a)
-    {
-        case kPOVAttrib_ObjectPhotonCount:
-            return gPhotonStat_i;
-        case kPOVAttrib_TotalPhotonCount:
-            return surfacePhotonMap.numPhotons;
-        case kPOVAttrib_MediaPhotonCount:
-            return mediaPhotonMap.numPhotons;
-        case kPOVAttrib_PhotonXSamples:
-            return gPhotonStat_x_samples;
-        case kPOVAttrib_PhotonYSamples:
-            return gPhotonStat_y_samples;
-        case kPOVAttrib_CurrentPhotonCount:
-            return gPhotonStat_end;
-    }
-
-    return 0;
-}
-#endif
 
 void GatheredPhotons::swapWith(GatheredPhotons& toCopy)
 {

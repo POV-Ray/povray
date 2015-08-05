@@ -1,9 +1,8 @@
 //******************************************************************************
 ///
-/// @file backend/colour/colour_old.h
+/// @file core/material/blendmap.h
 ///
-/// This module contains all defines, typedefs, and prototypes for
-/// `colour_old.cpp`.
+/// This module contains all defines, typedefs, and prototypes for blend maps.
 ///
 /// @note   `frame.h` contains other colour stuff.
 ///
@@ -11,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -34,13 +33,56 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
-#ifndef COLOUR_OLD_H
-#define COLOUR_OLD_H
+#ifndef POVRAY_CORE_BLENDMAP_H
+#define POVRAY_CORE_BLENDMAP_H
 
 namespace pov
 {
+
+enum BlendMapTypeId
+{
+    kBlendMapType_Pigment = 0,
+    kBlendMapType_Normal  = 1,
+    // kBlendMapType_Pattern = 2,
+    // TODO - where's type 3?
+    kBlendMapType_Texture = 4,
+    kBlendMapType_Colour  = 5,
+    kBlendMapType_Slope   = 6,
+    kBlendMapType_Density = 7
+};
+
+template<typename DATA_T>
+struct BlendMapEntry
+{
+    SNGL    value;
+    DATA_T  Vals;
+};
+
+/// Template for blend maps classes.
+template<typename DATA_T>
+class BlendMap
+{
+    public:
+
+        typedef DATA_T                  Data;
+        typedef BlendMapEntry<DATA_T>   Entry;
+        typedef Entry*                  EntryPtr;
+        typedef const Entry*            EntryConstPtr;
+        typedef vector<Entry>           Vector;
+
+        BlendMap(BlendMapTypeId type);
+        virtual ~BlendMap() {}
+
+        void Set(const Vector& data);
+        void Search(DBL value, EntryConstPtr& rpPrev, EntryConstPtr& rpNext, DBL& rPrevWeight, DBL& rNextWeight) const;
+
+    // protected:
+
+        BlendMapTypeId  Type;
+        Vector          Blend_Map_Entries;
+};
 
 /*****************************************************************************
 * Global preprocessor defines
@@ -61,12 +103,8 @@ namespace pov
 * Global functions
 ******************************************************************************/
 
-// TODO - obsolete
-RGBFTColour *Create_Colour (void);
-RGBFTColour *Copy_Colour (const RGBFTColour* Old);
-
 template<typename MAP_T>
-shared_ptr<MAP_T> Create_Blend_Map (int type);
+shared_ptr<MAP_T> Create_Blend_Map (BlendMapTypeId type);
 
 template<typename MAP_T>
 shared_ptr<MAP_T> Copy_Blend_Map (shared_ptr<MAP_T>& Old);
@@ -78,4 +116,4 @@ shared_ptr<MAP_T> Copy_Blend_Map (shared_ptr<MAP_T>& Old);
 
 }
 
-#endif
+#endif // POVRAY_CORE_BLENDMAP_H

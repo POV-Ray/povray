@@ -43,7 +43,7 @@
 #include "parser/parser.h"
 
 #include "backend/math/mathutil.h"
-#include "backend/scene/scenedata.h"
+#include "backend/scene/backendscenedata.h"
 #include "backend/vm/fnpovfpu.h"
 
 // this must be the last file included
@@ -272,7 +272,7 @@ void Parser::FNSyntax_DeleteExpression(ExprNode *node)
         else if(i->op == OP_CALL)
         {
             if((i->call.token == FUNCT_ID_TOKEN) || (i->call.token == VECTFUNCT_ID_TOKEN))
-                sceneData->functionVM->RemoveFunction(i->call.fn);
+                dynamic_cast<FunctionVM*>(sceneData->functionContextFactory)->RemoveFunction(i->call.fn);
             POV_FREE(i->call.name);
         }
 
@@ -672,7 +672,7 @@ bool Parser::expr_call(ExprNode *&current, int stage, int op)
     if(Token.Data != NULL)
     {
         node->call.fn = *((FUNCTION_PTR)Token.Data);
-        (void)sceneData->functionVM->GetFunctionAndReference(node->call.fn);
+        (void)dynamic_cast<FunctionVM*>(sceneData->functionContextFactory)->GetFunctionAndReference(node->call.fn);
     }
     else
         node->call.fn = 0;

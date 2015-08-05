@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file backend/bounding/bcyl.cpp
+/// @file core/bounding/boundingcylinder.cpp
 ///
 /// This file contains all functions for bounding cylinders used by lathe and
 /// sor objects.
@@ -34,10 +34,11 @@
 ///
 //******************************************************************************
 
-// frame.h must always be the first POV file included (pulls in platform config)
-#include "backend/frame.h"
-#include "backend/bounding/bcyl.h"
+// configcore.h must always be the first POV file included in core *.cpp files (pulls in platform config)
+#include "core/configcore.h"
+#include "core/bounding/boundingcylinder.h"
 
+#include "core/coretypes.h"
 
 // this must be the last file included
 #include "base/povdebug.h"

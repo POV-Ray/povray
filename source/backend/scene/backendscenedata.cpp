@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file backend/scene/scenedata.cpp
+/// @file backend/scene/backendscenedata.cpp
 ///
 /// @todo   What's in here?
 ///
@@ -40,17 +40,11 @@
 
 // frame.h must always be the first POV file included (pulls in platform config)
 #include "backend/frame.h"
-#include "backend/scene/scenedata.h"
+#include "backend/scene/backendscenedata.h"
 
 #include "base/fileutil.h"
 
-#include "core/material/pattern.h"
-#include "core/shape/truetype.h"
-
 #include "povms/povmsid.h"
-
-#include "backend/scene/atmosph.h"
-#include "backend/vm/fnpovfpu.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -58,89 +52,12 @@
 namespace pov
 {
 
-SceneData::SceneData() :
-    fog(NULL),
-    rainbow(NULL),
-    skysphere(NULL),
-    functionVM(NULL)
-{
-    atmosphereIOR = 1.0;
-    atmosphereDispersion = 0.0;
-    backgroundColour = ToTransColour(RGBFTColour(0.0, 0.0, 0.0, 0.0, 1.0));
-    ambientLight = MathColour(1.0);
+BackendSceneData::BackendSceneData() :
+    SceneData(),
+    gammaMode(kPOVList_GammaMode_None) // default setting for 3.62, which in turn is the default for the language
+{}
 
-    iridWavelengths = MathColour::DefaultWavelengths();
-
-    languageVersion = OFFICIAL_VERSION_NUMBER;
-    languageVersionSet = false;
-    languageVersionLate = false;
-    warningLevel = 10; // all warnings
-    stringEncoding = kStringEncoding_ASCII;
-    noiseGenerator = kNoiseGen_RangeCorrected;
-    explicitNoiseGenerator = false; // scene has not set the noise generator explicitly
-    numberOfWaves = 10;
-    parsedMaxTraceLevel = MAX_TRACE_LEVEL_DEFAULT;
-    parsedAdcBailout = 1.0 / 255.0; // adc bailout sufficient for displays
-    gammaMode = kPOVList_GammaMode_None; // default setting for 3.62, which in turn is the default for the language
-    workingGamma.reset();
-    workingGammaToSRGB.reset();
-    inputFileGammaSet = false; // TODO remove for 3.7x
-    inputFileGamma = SRGBGammaCurve::Get();
-
-    mmPerUnit = 10;
-    useSubsurface = false;
-    subsurfaceSamplesDiffuse = 50;
-    subsurfaceSamplesSingle = 50;
-    subsurfaceUseRadiosity = false;
-
-    bspMaxDepth = 0;
-    bspObjectIsectCost = bspBaseAccessCost = bspChildAccessCost = bspMissChance = 0.0f;
-
-    Fractal_Iteration_Stack_Length = 0;
-    Max_Blob_Components = 1000; // TODO FIXME - this gets set in the parser but allocated *before* that in the scene data, and if it is 0 here, a malloc may fail there because the memory requested is zero [trf]
-    Max_Bounding_Cylinders = 100; // TODO FIXME - see note for Max_Blob_Components
-    functionPatternCount = 0;
-    boundingSlabs = NULL;
-
-    splitUnions = false;
-    removeBounds = true;
-
-    tree = NULL;
-
-    functionVM = new FunctionVM();
-}
-
-SceneData::~SceneData()
-{
-    lightSources.clear();
-    lightGroupLightSources.clear();
-    Destroy_Skysphere(skysphere);
-    while (fog != NULL)
-    {
-        FOG *next = fog->Next;
-        Destroy_Fog(fog);
-        fog = next;
-    }
-    while (rainbow != NULL)
-    {
-        RAINBOW *next = rainbow->Next;
-        Destroy_Rainbow(rainbow);
-        rainbow = next;
-    }
-    if(boundingSlabs != NULL)
-        Destroy_BBox_Tree(boundingSlabs);
-    for (vector<TrueTypeFont*>::iterator i = TTFonts.begin(); i != TTFonts.end(); ++i)
-        delete *i;
-    // TODO: perhaps ObjectBase::~ObjectBase would be a better place
-    //       to handle cleanup of individual objects ?
-    Destroy_Object(objects);
-    delete functionVM;
-
-    if(tree != NULL)
-        delete tree;
-}
-
-UCS2String SceneData::FindFile(POVMSContext ctx, const UCS2String& filename, unsigned int stype)
+UCS2String BackendSceneData::FindFile(POVMSContext ctx, const UCS2String& filename, unsigned int stype)
 {
     vector<UCS2String> filenames;
     UCS2String foundfile;
@@ -208,7 +125,7 @@ UCS2String SceneData::FindFile(POVMSContext ctx, const UCS2String& filename, uns
     return foundfile;
 }
 
-IStream *SceneData::ReadFile(POVMSContext ctx, const UCS2String& origname, const UCS2String& filename, unsigned int stype)
+IStream *BackendSceneData::ReadFile(POVMSContext ctx, const UCS2String& origname, const UCS2String& filename, unsigned int stype)
 {
     UCS2String scenefile(filename);
     UCS2String localfile;
@@ -287,7 +204,7 @@ IStream *SceneData::ReadFile(POVMSContext ctx, const UCS2String& origname, const
 }
 
 /* TODO FIXME - this is the correct code but it has a bug. The code above is just a hack [trf]
-IStream *SceneData::ReadFile(POVMSContext ctx, const UCS2String& filename, unsigned int stype)
+IStream *BackendSceneData::ReadFile(POVMSContext ctx, const UCS2String& filename, unsigned int stype)
 {
     UCS2String scenefile(filename);
     UCS2String localfile;
@@ -354,7 +271,7 @@ IStream *SceneData::ReadFile(POVMSContext ctx, const UCS2String& filename, unsig
     return NULL;
 }
 */
-OStream *SceneData::CreateFile(POVMSContext ctx, const UCS2String& filename, unsigned int stype, bool append)
+OStream *BackendSceneData::CreateFile(POVMSContext ctx, const UCS2String& filename, unsigned int stype, bool append)
 {
     UCS2String scenefile(filename);
 

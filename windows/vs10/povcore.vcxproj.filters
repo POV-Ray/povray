@@ -27,6 +27,42 @@
     <Filter Include="Core Headers\Render">
       <UniqueIdentifier>{d4a077b2-598b-470c-9fa1-0d2de7c70925}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Core Headers\Lighting">
+      <UniqueIdentifier>{0e04ad67-fa32-44d2-9653-0837535d8336}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core Source\Lighting">
+      <UniqueIdentifier>{6f62b1e4-5f39-4399-a00c-cd92c423eb13}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core Headers\Scene">
+      <UniqueIdentifier>{ae2a96f5-84fd-4d80-a3e1-3b744a012aa5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core Source\Scene">
+      <UniqueIdentifier>{65a0cbe0-62b0-42de-a6d9-850161c76fb0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core Headers\Bounding">
+      <UniqueIdentifier>{ee4394f1-ebe6-42f8-80cf-6048be6befa6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core Source\Bounding">
+      <UniqueIdentifier>{ec2b1d34-202d-4ab2-a988-97bce76a7eaa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core Headers\Math">
+      <UniqueIdentifier>{66f4f3c5-54bc-42e5-a415-d91882176143}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core Source\Math">
+      <UniqueIdentifier>{59dc83e1-4074-46d1-9d3c-300e883d90da}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core Headers\Support">
+      <UniqueIdentifier>{ec847cf8-74ea-4ae2-a4f6-cb17c5156ee7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core Source\Support">
+      <UniqueIdentifier>{2bab727b-a915-405d-a7f3-f9e635d47711}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core Headers\Colour">
+      <UniqueIdentifier>{9c46a37d-860c-4ecf-9f0c-ef5b72122487}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core Source\Colour">
+      <UniqueIdentifier>{a4621dba-28c0-4b06-99b4-7f27ecfb4cfd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\precomp.cpp" />
@@ -131,6 +167,84 @@
     </ClCompile>
     <ClCompile Include="..\..\source\core\render\trace.cpp">
       <Filter>Core Source\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\lighting\lightgroup.cpp">
+      <Filter>Core Source\Lighting</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\scene\object.cpp">
+      <Filter>Core Source\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\lighting\lightsource.cpp">
+      <Filter>Core Source\Lighting</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\bounding\boundingbox.cpp">
+      <Filter>Core Source\Bounding</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\bounding\boundingcylinder.cpp">
+      <Filter>Core Source\Bounding</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\bounding\boundingsphere.cpp">
+      <Filter>Core Source\Bounding</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\math\matrix.cpp">
+      <Filter>Core Source\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\math\randomsequence.cpp">
+      <Filter>Core Source\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\material\blendmap.cpp">
+      <Filter>Core Source\Material</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\colour\spectral.cpp">
+      <Filter>Core Source\Colour</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\support\bsptree.cpp">
+      <Filter>Core Source\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\math\chi2.cpp">
+      <Filter>Core Source\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\math\hypercomplex.cpp">
+      <Filter>Core Source\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\math\quaternion.cpp">
+      <Filter>Core Source\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\math\polynomialsolver.cpp">
+      <Filter>Core Source\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\lighting\photons.cpp">
+      <Filter>Core Source\Lighting</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\lighting\radiosity.cpp">
+      <Filter>Core Source\Lighting</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\lighting\subsurface.cpp">
+      <Filter>Core Source\Lighting</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\support\octree.cpp">
+      <Filter>Core Source\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\support\imageutil.cpp">
+      <Filter>Core Source\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\scene\tracethreaddata.cpp">
+      <Filter>Core Source\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\support\statistics.cpp">
+      <Filter>Core Source\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\support\statisticids.cpp">
+      <Filter>Core Source\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\scene\atmosphere.cpp">
+      <Filter>Core Source\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\scene\scenedata.cpp">
+      <Filter>Core Source\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\scene\camera.cpp">
+      <Filter>Core Source\Scene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -245,6 +359,90 @@
     </ClInclude>
     <ClInclude Include="..\..\source\core\render\trace.h">
       <Filter>Core Headers\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\lighting\lightgroup.h">
+      <Filter>Core Headers\Lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\scene\object.h">
+      <Filter>Core Headers\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\lighting\lightsource.h">
+      <Filter>Core Headers\Lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\bounding\boundingbox.h">
+      <Filter>Core Headers\Bounding</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\bounding\boundingcylinder.h">
+      <Filter>Core Headers\Bounding</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\bounding\boundingsphere.h">
+      <Filter>Core Headers\Bounding</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\math\vector.h">
+      <Filter>Core Headers\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\math\matrix.h">
+      <Filter>Core Headers\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\math\randomsequence.h">
+      <Filter>Core Headers\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\support\simplevector.h">
+      <Filter>Core Headers\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\material\blendmap.h">
+      <Filter>Core Headers\Material</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\colour\spectral.h">
+      <Filter>Core Headers\Colour</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\support\bsptree.h">
+      <Filter>Core Headers\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\math\chi2.h">
+      <Filter>Core Headers\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\math\hypercomplex.h">
+      <Filter>Core Headers\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\math\quaternion.h">
+      <Filter>Core Headers\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\math\polynomialsolver.h">
+      <Filter>Core Headers\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\lighting\photons.h">
+      <Filter>Core Headers\Lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\lighting\radiosity.h">
+      <Filter>Core Headers\Lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\lighting\subsurface.h">
+      <Filter>Core Headers\Lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\support\octree.h">
+      <Filter>Core Headers\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\support\imageutil.h">
+      <Filter>Core Headers\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\scene\tracethreaddata.h">
+      <Filter>Core Headers\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\support\statistics.h">
+      <Filter>Core Headers\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\support\statisticids.h">
+      <Filter>Core Headers\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\scene\atmosphere.h">
+      <Filter>Core Headers\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\scene\scenedata.h">
+      <Filter>Core Headers\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\scene\camera.h">
+      <Filter>Core Headers\Scene</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

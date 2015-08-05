@@ -46,12 +46,12 @@
 #include "core/material/pigment.h"
 #include "core/material/texture.h"
 #include "core/material/warp.h"
+#include "core/math/matrix.h"
+#include "core/scene/scenedata.h"
+#include "core/scene/tracethreaddata.h"
 
 #include "backend/math/mathutil.h"
-#include "backend/math/matrices.h"
 #include "backend/math/splines.h"
-#include "backend/scene/scenedata.h"
-#include "backend/scene/threaddata.h"
 #include "backend/vm/fnpovfpu.h"
 
 // this must be the last file included

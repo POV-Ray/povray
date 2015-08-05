@@ -43,7 +43,7 @@
 
 #define POVRAY_PLATFORM_NAME "Unix"
 #define ALTMAIN
-#define NEW_LINE_STRING "\n"  // default
+// NEW_LINE_STRING remains undefined, optimizing the code for "\n" as used internally
 #define SYS_DEF_EXT     ""
 
 #endif // POVRAY_UNIX_SYSPOVCONFIGBACKEND_H

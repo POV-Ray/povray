@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file backend/lighting/point.cpp
+/// @file core/lighting/lightsource.cpp
 ///
 /// This module implements the point & spot light source primitive.
 ///
@@ -33,14 +33,13 @@
 ///
 //******************************************************************************
 
-// frame.h must always be the first POV file included (pulls in platform config)
-#include "backend/frame.h"
-#include "backend/lighting/point.h"
+// configcore.h must always be the first POV file included in core *.cpp files (pulls in platform config)
+#include "core/configcore.h"
+#include "core/lighting/lightsource.h"
 
+#include "core/math/matrix.h"
 #include "core/render/ray.h"
-
-#include "backend/math/matrices.h"
-#include "backend/scene/objects.h"
+#include "core/scene/object.h"
 
 // this must be the last file included
 #include "base/povdebug.h"

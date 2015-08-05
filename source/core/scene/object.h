@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file backend/scene/objects.h
+/// @file core/scene/object.h
 ///
 /// This module contains all defines, typedefs, and prototypes for
 /// `objects.cpp`.
@@ -36,12 +36,11 @@
 ///
 //******************************************************************************
 
-#ifndef OBJECTS_H
-#define OBJECTS_H
+#ifndef POVRAY_CORE_OBJECT_H
+#define POVRAY_CORE_OBJECT_H
 
+#include "core/bounding/boundingbox.h"
 #include "core/material/texture.h"
-
-#include "backend/bounding/bbox.h"
 
 namespace pov
 {
@@ -384,4 +383,4 @@ void Destroy_Single_Object(ObjectPtr *ObjectPtr);
 
 }
 
-#endif
+#endif // POVRAY_CORE_OBJECT_H

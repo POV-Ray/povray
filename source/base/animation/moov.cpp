@@ -31,15 +31,13 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
 #include <climits>
 
 // configbase.h must always be the first POV file included within base *.cpp files
 #include "base/configbase.h"
 #include "base/animation/moov.h"
-
-#include "povms/povms.h"
 
 #include "base/pov_err.h"
 #include "base/types.h"
@@ -51,7 +49,7 @@
 namespace pov_base
 {
 
-typedef POVMSType Type;
+typedef POV_INT32 Type; // TODO - this is a lousy type name
 
 struct PrivateData
 {
@@ -70,10 +68,10 @@ namespace Moov
 
 void WriteAtomHeader(OStream *file, Type type, POV_LONG size);
 void WriteType(OStream *file, Type data);
-void WriteInt2(OStream *file, POVMSInt data);
-void WriteInt4(OStream *file, POVMSInt data);
-void WriteInt8(OStream *file, POV_LONG data);
-void WriteN(OStream *file, size_t cnt, POVMSInt data);
+void WriteInt2(OStream *file, POV_INT16 data);
+void WriteInt4(OStream *file, POV_INT32 data);
+void WriteInt8(OStream *file, POV_INT64 data);
+void WriteN(OStream *file, size_t cnt, POV_INT8 data);
 
 void *ReadFileHeader(IStream *file, float& lengthinseconds, unsigned int& lengthinframes, Animation::CodecType& codec, unsigned int& w, unsigned int& h, const Animation::ReadOptions& options, vector<string>& warnings)
 {
@@ -434,13 +432,13 @@ void WriteType(OStream *file, Type data)
     file->Write_Byte(data & 255);
 }
 
-void WriteInt2(OStream *file, POVMSInt data)
+void WriteInt2(OStream *file, POV_INT16 data)
 {
     file->Write_Byte((data >> 8) & 255);
     file->Write_Byte(data & 255);
 }
 
-void WriteInt4(OStream *file, POVMSInt data)
+void WriteInt4(OStream *file, POV_INT32 data)
 {
     file->Write_Byte((data >> 24) & 255);
     file->Write_Byte((data >> 16) & 255);
@@ -448,7 +446,7 @@ void WriteInt4(OStream *file, POVMSInt data)
     file->Write_Byte(data & 255);
 }
 
-void WriteInt8(OStream *file, POV_LONG data)
+void WriteInt8(OStream *file, POV_INT64 data)
 {
     file->Write_Byte((data >> 56) & 255);
     file->Write_Byte((data >> 48) & 255);
@@ -460,10 +458,10 @@ void WriteInt8(OStream *file, POV_LONG data)
     file->Write_Byte(data & 255);
 }
 
-void WriteN(OStream *file, size_t cnt, POVMSInt data)
+void WriteN(OStream *file, size_t cnt, POV_INT8 data)
 {
     for(size_t i = 0; i < cnt; i++)
-        file->Write_Byte(data & 255);
+        file->Write_Byte(data);
 }
 
 }

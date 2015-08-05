@@ -147,13 +147,6 @@ inline T1 RoundDownToMultiple(T1 x, T2 base) { return x - (x % base); }
 template<typename T1, typename T2>
 inline T1 RoundUpToMultiple(T1 x, T2 base) { return RoundDownToMultiple (x + base - 1, base); }
 
-// Simple Scalar Square
-template<typename T>
-inline T Sqr(T a)
-{
-    return a * a;
-}
-
 struct POVRect
 {
     unsigned int top;

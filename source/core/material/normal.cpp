@@ -46,14 +46,13 @@
 
 #include "base/pov_err.h"
 
+#include "core/material/blendmap.h"
 #include "core/material/pigment.h"
 #include "core/material/texture.h"
 #include "core/material/warp.h"
-
-#include "backend/colour/colour_old.h"
-#include "backend/scene/objects.h"
-#include "backend/scene/threaddata.h"
-#include "backend/support/imageutil.h"
+#include "core/scene/object.h"
+#include "core/scene/tracethreaddata.h"
+#include "core/support/imageutil.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -728,12 +727,12 @@ void Post_Tnormal (TNORMAL *Tnormal)
 
 void SlopeBlendMap::Post(bool dontScaleBumps)
 {
-    assert (Type == SLOPE_TYPE);
+    assert (Type == kBlendMapType_Slope);
 }
 
 void NormalBlendMap::Post(bool dontScaleBumps)
 {
-    assert (Type == NORMAL_TYPE);
+    assert (Type == kBlendMapType_Normal);
     for(Vector::iterator i = Blend_Map_Entries.begin(); i != Blend_Map_Entries.end(); i++)
     {
         if (dontScaleBumps)
@@ -782,7 +781,7 @@ void Perturb_Normal(Vector3d& Layer_Normal, const TNORMAL *Tnormal, const Vector
 
     /* If normal_map present, use it and return */
 
-    Blend_Map = std::tr1::dynamic_pointer_cast<NormalBlendMap, GenericNormalBlendMap>(Tnormal->Blend_Map);
+    Blend_Map = std::tr1::dynamic_pointer_cast<NormalBlendMap>(Tnormal->Blend_Map);
     if (Blend_Map != NULL)
     {
         if (Tnormal->Type == UV_MAP_PATTERN)
@@ -866,7 +865,7 @@ void Perturb_Normal(Vector3d& Layer_Normal, const TNORMAL *Tnormal, const Vector
     }
     else
     {
-        shared_ptr<SlopeBlendMap> slopeMap = std::tr1::dynamic_pointer_cast<SlopeBlendMap, GenericNormalBlendMap>(Tnormal->Blend_Map);
+        shared_ptr<SlopeBlendMap> slopeMap = std::tr1::dynamic_pointer_cast<SlopeBlendMap>(Tnormal->Blend_Map);
 
         Warp_Normal(Layer_Normal,Layer_Normal, Tnormal,
                     Test_Flag(Tnormal,DONT_SCALE_BUMPS_FLAG));
@@ -996,19 +995,19 @@ static void Do_Average_Normals (const Vector3d& EPoint, const TNORMAL *Tnormal, 
 
 //******************************************************************************
 
-SlopeBlendMap::SlopeBlendMap() : BlendMap<Vector2d>(SLOPE_TYPE) {}
+SlopeBlendMap::SlopeBlendMap() : BlendMap<Vector2d>(kBlendMapType_Slope) {}
 
 SlopeBlendMap::~SlopeBlendMap()
 {
-    assert (Type == SLOPE_TYPE);
+    assert (Type == kBlendMapType_Slope);
 }
 
 
-NormalBlendMap::NormalBlendMap() : BlendMap<TNORMAL*>(NORMAL_TYPE) {}
+NormalBlendMap::NormalBlendMap() : BlendMap<TNORMAL*>(kBlendMapType_Normal) {}
 
 NormalBlendMap::~NormalBlendMap()
 {
-    assert (Type == NORMAL_TYPE);
+    assert (Type == kBlendMapType_Normal);
     for (Vector::iterator i = Blend_Map_Entries.begin(); i != Blend_Map_Entries.end(); i++)
         Destroy_Tnormal(i->Vals);
 }
@@ -1024,7 +1023,7 @@ void NormalBlendMap::ComputeAverage (const Vector3d& EPoint, Vector3d& normal, I
     SNGL Total = 0.0;
     Vector3d V1,V2;
 
-    assert (Type == NORMAL_TYPE);
+    assert (Type == kBlendMapType_Normal);
 
     V1 = Vector3d(0.0, 0.0, 0.0);
 

@@ -47,14 +47,15 @@
 
 #include "core/material/normal.h"
 #include "core/material/pigment.h"
+#include "core/math/chi2.h"
+#include "core/math/matrix.h"
 #include "core/render/ray.h"
 #include "core/render/trace.h"
+#include "core/scene/object.h"
+#include "core/scene/scenedata.h"
 #include "core/shape/mesh.h"
 
-#include "backend/math/chi2.h"
-#include "backend/math/matrices.h"
-#include "backend/scene/objects.h"
-#include "backend/scene/scenedata.h"
+#include "backend/scene/backendscenedata.h"
 #include "backend/scene/view.h"
 #include "backend/support/jitter.h"
 
@@ -196,8 +197,8 @@ bool ContainingInteriorsPointObjectCondition::operator()(const Vector3d& point, 
 
 TracePixel::TracePixel(ViewData *vd, TraceThreadData *td, unsigned int mtl, DBL adcb, const QualityFlags& qf,
                        CooperateFunctor& cf, MediaFunctor& mf, RadiosityFunctor& af, bool pt) :
-                       Trace(vd->GetSceneData(), td, qf, cf, mf, af),
-                       sceneData(vd->GetSceneData()),
+                       Trace(dynamic_pointer_cast<SceneData>(vd->GetSceneData()), td, qf, cf, mf, af),
+                       sceneData(dynamic_pointer_cast<SceneData>(vd->GetSceneData())),
                        threadData(td),
                        focalBlurData(NULL),
                        maxTraceLevel(mtl),

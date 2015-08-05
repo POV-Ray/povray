@@ -31,7 +31,7 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
 #ifndef POVRAY_BACKEND_TASK_H
 #define POVRAY_BACKEND_TASK_H
@@ -53,7 +53,7 @@ namespace pov
 
 using namespace pov_base;
 
-class SceneData;
+class BackendSceneData;
 
 
 class Task
@@ -183,7 +183,7 @@ class Task
 class SceneTask : public Task
 {
     public:
-        SceneTask(TaskData *td, const boost::function1<void, Exception&>& f, const char* sn, shared_ptr<SceneData> sd, RenderBackend::ViewId vid = 0);
+        SceneTask(TaskData *td, const boost::function1<void, Exception&>& f, const char* sn, shared_ptr<BackendSceneData> sd, RenderBackend::ViewId vid = 0);
 
     protected:
         MessageFactory messageFactory;

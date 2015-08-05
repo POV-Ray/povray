@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file backend/support/imageutil.h
+/// @file core/support/imageutil.h
 ///
 /// This module contains all defines, typedefs, and prototypes for
 /// `imageutil.cpp`.
@@ -34,10 +34,13 @@
 ///
 //******************************************************************************
 
-#ifndef IMAGE_H
-#define IMAGE_H
+#ifndef POVRAY_CORE_IMAGEUTIL_H
+#define POVRAY_CORE_IMAGEUTIL_H
 
 #include "base/image/image.h"
+
+#include "core/coretypes.h"
+#include "core/math/vector.h"
 
 namespace pov
 {
@@ -121,4 +124,4 @@ void Destroy_Image(ImageData *image);
 
 }
 
-#endif
+#endif // POVRAY_CORE_IMAGEUTIL_H

@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file backend/support/statistics.h
+/// @file core/support/statistics.h
 ///
 /// @todo   What's in here?
 ///
@@ -33,12 +33,12 @@
 ///
 //******************************************************************************
 
-#ifndef POVRAY_BACKEND_STATISTICS_H
-#define POVRAY_BACKEND_STATISTICS_H
+#ifndef POVRAY_CORE_STATISTICS_H
+#define POVRAY_CORE_STATISTICS_H
 
 #include <vector>
 
-#include "statspov.h"
+#include "core/support/statisticids.h"
 
 namespace pov
 {
@@ -110,4 +110,4 @@ protected:
 
 }
 
-#endif // POVRAY_BACKEND_STATISTICS_H
+#endif // POVRAY_CORE_STATISTICS_H

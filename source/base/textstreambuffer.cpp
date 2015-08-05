@@ -31,7 +31,7 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
 #include <cstring>
 #include <algorithm>
@@ -39,8 +39,6 @@
 // configbase.h must always be the first POV file included within base *.cpp files
 #include "base/configbase.h"
 #include "base/textstreambuffer.h"
-
-#include "povms/povms.h"
 
 #include "base/pov_err.h"
 #include "base/stringutilities.h"
@@ -58,7 +56,8 @@ TextStreamBuffer::TextStreamBuffer(size_t buffersize, unsigned int wrapwidth)
     bsize = buffersize;
     wrap = wrapwidth;
     curline = 0;
-    if(POVMSUtil_TempAlloc((void **)&buffer, bsize) != kNoErr)
+    buffer = new char[bsize];
+    if(buffer == NULL)
         throw POV_EXCEPTION_CODE(kOutOfMemoryErr);
 }
 
@@ -69,7 +68,7 @@ TextStreamBuffer::~TextStreamBuffer()
     wrap = 0;
     curline = 0;
     if(buffer != NULL)
-        (void)POVMSUtil_TempFree((void *)buffer);
+        delete[] buffer;
     buffer = NULL;
 }
 

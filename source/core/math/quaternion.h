@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file backend/math/quatern.h
+/// @file core/math/quaternion.h
 ///
 /// This module contains all defines, typedefs, and prototypes for `quatern.cpp`.
 ///
@@ -33,11 +33,17 @@
 ///
 //******************************************************************************
 
-#ifndef JULIA_H
-#define JULIA_H
+#ifndef POVRAY_CORE_QUATERNION_H
+#define POVRAY_CORE_QUATERNION_H
+
+#include "core/coretypes.h"
+#include "core/math/vector.h"
 
 namespace pov
 {
+
+struct BasicRay;
+class Fractal;
 
 /*****************************************************************************
 * Global preprocessor defines
@@ -82,4 +88,4 @@ class Z3FractalRules : public QuaternionFractalRules
 
 }
 
-#endif
+#endif // POVRAY_CORE_QUATERNION_H

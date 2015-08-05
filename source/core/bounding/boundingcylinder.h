@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file backend/bounding/bcyl.h
+/// @file core/bounding/boundingcylinder.h
 ///
 /// This module contains all defines, typedefs, and prototypes for `bcyl.cpp`.
 ///
@@ -33,8 +33,10 @@
 ///
 //******************************************************************************
 
-#ifndef BCYL_H
-#define BCYL_H
+#ifndef POVRAY_CORE_BOUNDINGCYLINDER_H
+#define POVRAY_CORE_BOUNDINGCYLINDER_H
+
+#include "core/math/vector.h"
 
 namespace pov
 {
@@ -98,4 +100,4 @@ int Intersect_BCyl (const BCYL *BCyl, vector<BCYL_INT>& Intervals, vector<BCYL_I
 
 }
 
-#endif
+#endif // POVRAY_CORE_BOUNDINGCYLINDER_H

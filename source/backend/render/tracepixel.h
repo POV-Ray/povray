@@ -41,9 +41,9 @@
 #include <boost/thread.hpp>
 
 #include "core/render/trace.h"
+#include "core/scene/camera.h"
 
 #include "backend/frame.h"
-#include "backend/scene/camera.h"
 
 namespace pov
 {

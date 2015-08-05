@@ -43,10 +43,10 @@
 #include "parser/parser.h"
 
 #include "core/material/pigment.h"
+#include "core/math/matrix.h"
 
-#include "backend/math/matrices.h"
 #include "backend/math/splines.h"
-#include "backend/scene/scenedata.h"
+#include "backend/scene/backendscenedata.h"
 #include "backend/vm/fnpovfpu.h"
 
 // this must be the last file included
@@ -99,7 +99,7 @@ FUNCTION_PTR Parser::Parse_Function(void)
 
     Parse_End();
 
-    *ptr = sceneData->functionVM->AddFunction(&function);
+    *ptr = dynamic_cast<FunctionVM*>(sceneData->functionContextFactory)->AddFunction(&function);
 
     return ptr;
 }
@@ -145,7 +145,7 @@ FUNCTION_PTR Parser::Parse_FunctionContent(void)
     f.Compile(expression);
     FNSyntax_DeleteExpression(expression);
 
-    *ptr = sceneData->functionVM->AddFunction(&function);
+    *ptr = dynamic_cast<FunctionVM*>(sceneData->functionContextFactory)->AddFunction(&function);
 
     return ptr;
 }
@@ -311,7 +311,7 @@ FUNCTION_PTR Parser::Parse_DeclareFunction(int *token_id, const char *fn_name, b
 
     Parse_End();
 
-    *ptr = sceneData->functionVM->AddFunction(&function);
+    *ptr = dynamic_cast<FunctionVM*>(sceneData->functionContextFactory)->AddFunction(&function);
 
     return ptr;
 }

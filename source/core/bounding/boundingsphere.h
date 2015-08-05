@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file backend/bounding/bsphere.h
+/// @file core/bounding/boundingsphere.h
 ///
 /// This module contains all defines, typedefs, and prototypes for
 /// `bsphere.cpp`.
@@ -34,8 +34,10 @@
 ///
 //******************************************************************************
 
-#ifndef BSPHERE_H
-#define BSPHERE_H
+#ifndef POVRAY_CORE_BOUNDINGSPHERE_H
+#define POVRAY_CORE_BOUNDINGSPHERE_H
+
+#include "core/math/vector.h"
 
 namespace pov
 {
@@ -77,4 +79,4 @@ void Destroy_Bounding_Sphere_Hierarchy (BSPHERE_TREE *Node);
 
 }
 
-#endif
+#endif // POVRAY_CORE_BOUNDINGSPHERE_H

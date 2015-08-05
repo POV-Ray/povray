@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file lightgrp.cpp
+/// @file core/lighting/lightgroup.cpp
 ///
 /// Implements light group utility functions.
 ///
@@ -33,14 +33,13 @@
 ///
 //******************************************************************************
 
-// frame.h must always be the first POV file included (pulls in platform config)
-#include "backend/frame.h"
-#include "lightgrp.h" // TODO
+// configcore.h must always be the first POV file included in core *.cpp files (pulls in platform config)
+#include "core/configcore.h"
+#include "core/lighting/lightgroup.h"
 
+#include "core/lighting/lightsource.h"
+#include "core/scene/object.h"
 #include "core/shape/csg.h"
-
-#include "backend/lighting/point.h"
-#include "backend/scene/objects.h"
 
 // this must be the last file included
 #include "base/povdebug.h"

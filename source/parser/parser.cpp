@@ -46,10 +46,24 @@
 
 #include "base/fileutil.h"
 
+#include "core/bounding/boundingcylinder.h"
+#include "core/bounding/boundingsphere.h"
+#include "core/lighting/lightgroup.h"
+#include "core/lighting/lightsource.h"
+#include "core/lighting/photons.h"
+#include "core/lighting/radiosity.h"
+#include "core/lighting/subsurface.h"
+#include "core/material/blendmap.h"
 #include "core/material/interior.h"
 #include "core/material/normal.h"
 #include "core/material/pigment.h"
 #include "core/material/texture.h"
+#include "core/math/matrix.h"
+#include "core/math/polynomialsolver.h"
+#include "core/math/vector.h"
+#include "core/scene/atmosphere.h"
+#include "core/scene/object.h"
+#include "core/scene/tracethreaddata.h"
 #include "core/shape/bezier.h"
 #include "core/shape/blob.h"
 #include "core/shape/box.h"
@@ -75,29 +89,14 @@
 #include "core/shape/torus.h"
 #include "core/shape/triangle.h"
 #include "core/shape/truetype.h"
+#include "core/support/imageutil.h"
+#include "core/support/octree.h"
 
 #include "povms/povmsid.h"
 
-#include "backend/bounding/bcyl.h"
-#include "backend/bounding/bsphere.h"
-#include "backend/colour/colour_old.h"
-#include "backend/lighting/photons.h"
-#include "backend/lighting/point.h"
-#include "backend/lighting/radiosity.h"
-#include "backend/lighting/subsurface.h"
-#include "backend/math/matrices.h"
-#include "backend/math/polysolv.h"
 #include "backend/math/splines.h"
-#include "backend/math/vector.h"
-#include "backend/scene/atmosph.h"
-#include "backend/scene/objects.h"
-#include "backend/scene/scenedata.h"
-#include "backend/scene/threaddata.h"
-#include "backend/support/imageutil.h"
-#include "backend/support/octree.h"
+#include "backend/scene/backendscenedata.h"
 #include "backend/vm/fnpovfpu.h"
-
-#include "lightgrp.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -132,12 +131,12 @@ const DBL INFINITE_VOLUME = BOUND_HUGE;
 *
 ******************************************************************************/
 
-Parser::Parser(shared_ptr<SceneData> sd, bool useclk, DBL clk) :
+Parser::Parser(shared_ptr<BackendSceneData> sd, bool useclk, DBL clk) :
     SceneTask(new TraceThreadData(sd), boost::bind(&Parser::SendFatalError, this, _1), "Parse", sd),
     sceneData(sd),
     clockValue(clk),
     useClock(useclk),
-    fnVMContext(new FPUContext(sd->functionVM, GetParserDataPtr())),
+    fnVMContext(new FPUContext(dynamic_cast<FunctionVM*>(sd->functionContextFactory), GetParserDataPtr())),
     Destroying_Frame(false),
     String_Index(0),
     String_Buffer_Free(0),
@@ -2465,7 +2464,7 @@ ObjectPtr Parser::Parse_Isosurface()
     if(Token.Token_Id != FUNCTION_TOKEN)
         Parse_Error(FUNCTION_TOKEN);
 
-    Object->Function = new FunctionVM::CustomFunction(sceneData->functionVM, Parse_Function());
+    Object->Function = new FunctionVM::CustomFunction(fnVMContext->functionvm, Parse_Function());
 
     EXPECT
         CASE(CONTAINED_BY_TOKEN)
@@ -3008,7 +3007,7 @@ ObjectPtr Parser::Parse_Light_Group()
         Link(Local, Object->children);
     }
 
-    Promote_Local_Lights(Object); // in lightgrp.cpp [trf]
+    Promote_Local_Lights(Object); // in core/lighting/lightgroup.cpp [trf]
 
     Object->Compute_BBox();
 
@@ -4728,11 +4727,11 @@ ObjectPtr Parser::Parse_Parametric(void)
 
     EXPECT
         CASE(FUNCTION_TOKEN)
-            Object->Function[0] = new FunctionVM::CustomFunction(sceneData->functionVM, Parse_Function());
+            Object->Function[0] = new FunctionVM::CustomFunction(fnVMContext->functionvm, Parse_Function());
             EXIT
         END_CASE
         OTHERWISE
-            Object->Function[0] = new FunctionVM::CustomFunction(sceneData->functionVM, Parse_FunctionContent());
+            Object->Function[0] = new FunctionVM::CustomFunction(fnVMContext->functionvm, Parse_FunctionContent());
             EXIT
         END_CASE
     END_EXPECT
@@ -4741,11 +4740,11 @@ ObjectPtr Parser::Parse_Parametric(void)
 
     EXPECT
         CASE(FUNCTION_TOKEN)
-            Object->Function[1] = new FunctionVM::CustomFunction(sceneData->functionVM, Parse_Function());
+            Object->Function[1] = new FunctionVM::CustomFunction(fnVMContext->functionvm, Parse_Function());
             EXIT
         END_CASE
         OTHERWISE
-            Object->Function[1] = new FunctionVM::CustomFunction(sceneData->functionVM, Parse_FunctionContent());
+            Object->Function[1] = new FunctionVM::CustomFunction(fnVMContext->functionvm, Parse_FunctionContent());
             EXIT
         END_CASE
     END_EXPECT
@@ -4754,11 +4753,11 @@ ObjectPtr Parser::Parse_Parametric(void)
 
     EXPECT
         CASE(FUNCTION_TOKEN)
-            Object->Function[2] = new FunctionVM::CustomFunction(sceneData->functionVM, Parse_Function());
+            Object->Function[2] = new FunctionVM::CustomFunction(fnVMContext->functionvm, Parse_Function());
             EXIT
         END_CASE
         OTHERWISE
-            Object->Function[2] = new FunctionVM::CustomFunction(sceneData->functionVM, Parse_FunctionContent());
+            Object->Function[2] = new FunctionVM::CustomFunction(fnVMContext->functionvm, Parse_FunctionContent());
             EXIT
         END_CASE
     END_EXPECT
@@ -6223,7 +6222,7 @@ ObjectPtr Parser::Parse_TrueType ()
 
     /* Process all this good info */
     Object = new CSGUnion();
-    TrueType::ProcessNewTTF(reinterpret_cast<CSG *>(Object), font, text_string, depth, offset, this, sceneData);
+    TrueType::ProcessNewTTF(reinterpret_cast<CSG *>(Object), font, text_string, depth, offset, this, dynamic_pointer_cast<SceneData>(sceneData));
     if (filename)
     {
         /* Free up the filename  */
@@ -9032,7 +9031,7 @@ bool Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENT
         END_CASE
 
         CASE (PIGMENT_MAP_TOKEN)
-            Temp_Data  = reinterpret_cast<void *>(new PigmentBlendMapPtr(Parse_Blend_Map<PigmentBlendMap> (PIGMENT_TYPE,NO_PATTERN)));
+            Temp_Data  = reinterpret_cast<void *>(new PigmentBlendMapPtr(Parse_Blend_Map<PigmentBlendMap> (kBlendMapType_Pigment,NO_PATTERN)));
             *NumberPtr = PIGMENT_MAP_ID_TOKEN;
             Test_Redefine(Previous,NumberPtr,*DataPtr, allow_redefine);
             *DataPtr   = Temp_Data;
@@ -9051,7 +9050,7 @@ bool Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENT
         END_CASE
 
         CASE (DENSITY_MAP_TOKEN)
-            Temp_Data  = reinterpret_cast<void *>(new PigmentBlendMapPtr(Parse_Blend_Map<PigmentBlendMap> (DENSITY_TYPE,NO_PATTERN)));
+            Temp_Data  = reinterpret_cast<void *>(new PigmentBlendMapPtr(Parse_Blend_Map<PigmentBlendMap> (kBlendMapType_Density,NO_PATTERN)));
             *NumberPtr = DENSITY_MAP_ID_TOKEN;
             Test_Redefine(Previous,NumberPtr,*DataPtr, allow_redefine);
             *DataPtr   = Temp_Data;
@@ -9059,7 +9058,7 @@ bool Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENT
         END_CASE
 
         CASE (SLOPE_MAP_TOKEN)
-            Temp_Data  = reinterpret_cast<void *>(new SlopeBlendMapPtr(Parse_Blend_Map<SlopeBlendMap> (SLOPE_TYPE,NO_PATTERN)));
+            Temp_Data  = reinterpret_cast<void *>(new SlopeBlendMapPtr(Parse_Blend_Map<SlopeBlendMap> (kBlendMapType_Slope,NO_PATTERN)));
             *NumberPtr = SLOPE_MAP_ID_TOKEN;
             Test_Redefine(Previous,NumberPtr,*DataPtr, allow_redefine);
             *DataPtr   = Temp_Data;
@@ -9067,7 +9066,7 @@ bool Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENT
         END_CASE
 
         CASE (TEXTURE_MAP_TOKEN)
-            Temp_Data  = reinterpret_cast<void *>(new TextureBlendMapPtr(Parse_Blend_Map<TextureBlendMap> (TEXTURE_TYPE,NO_PATTERN)));
+            Temp_Data  = reinterpret_cast<void *>(new TextureBlendMapPtr(Parse_Blend_Map<TextureBlendMap> (kBlendMapType_Texture,NO_PATTERN)));
             *NumberPtr = TEXTURE_MAP_ID_TOKEN;
             Test_Redefine(Previous,NumberPtr,*DataPtr, allow_redefine);
             *DataPtr   = Temp_Data;
@@ -9075,7 +9074,7 @@ bool Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENT
         END_CASE
 
         CASE (NORMAL_MAP_TOKEN)
-            Temp_Data  = reinterpret_cast<void *>(new NormalBlendMapPtr(Parse_Blend_Map<NormalBlendMap> (NORMAL_TYPE,NO_PATTERN)));
+            Temp_Data  = reinterpret_cast<void *>(new NormalBlendMapPtr(Parse_Blend_Map<NormalBlendMap> (kBlendMapType_Normal,NO_PATTERN)));
             *NumberPtr = NORMAL_MAP_ID_TOKEN;
             Test_Redefine(Previous,NumberPtr,*DataPtr, allow_redefine);
             *DataPtr   = Temp_Data;
@@ -9324,7 +9323,7 @@ void Parser::Destroy_Ident_Data(void *Data, int Type)
             break;
         case FUNCT_ID_TOKEN:
         case VECTFUNCT_ID_TOKEN:
-            sceneData->functionVM->DestroyFunction((FUNCTION_PTR)Data);
+            fnVMContext->functionvm->DestroyFunction((FUNCTION_PTR)Data);
             break;
         case SPLINE_ID_TOKEN:
             Destroy_Spline(reinterpret_cast<GenericSpline *>(Data));
@@ -10387,7 +10386,7 @@ void *Parser::Copy_Identifier (void *Data, int Type)
             break;
         case FUNCT_ID_TOKEN:
         case VECTFUNCT_ID_TOKEN:
-            New = reinterpret_cast<void *>(sceneData->functionVM->CopyFunction((FUNCTION_PTR )Data));
+            New = reinterpret_cast<void *>(fnVMContext->functionvm->CopyFunction((FUNCTION_PTR )Data));
             break;
         case SPLINE_ID_TOKEN:
             New = reinterpret_cast<void *>(Copy_Spline((GenericSpline *)Data));
@@ -10438,7 +10437,7 @@ void Parser::Convert_Filter_To_Transmit(PIGMENT *Pigment)
 
 void PigmentBlendMap::ConvertFilterToTransmit()
 {
-    assert ((Type == PIGMENT_TYPE) || (Type == DENSITY_TYPE));
+    assert ((Type == kBlendMapType_Pigment) || (Type == kBlendMapType_Density));
     for (Vector::iterator i = Blend_Map_Entries.begin(); i != Blend_Map_Entries.end(); i++)
     {
         Parser::Convert_Filter_To_Transmit(i->Vals);
@@ -10702,7 +10701,7 @@ void Parser::CheckPassThru(ObjectPtr o, int flag)
 *
 ******************************************************************************/
 
-IStream *Parser::Locate_File(shared_ptr<SceneData>& sd, const UCS2String& filename, unsigned int stype, UCS2String& buffer, bool err_flag)
+IStream *Parser::Locate_File(shared_ptr<BackendSceneData>& sd, const UCS2String& filename, unsigned int stype, UCS2String& buffer, bool err_flag)
 {
     UCS2String fn(filename);
     UCS2String foundfile(sd->FindFile(GetPOVMSContext(), fn, stype));
@@ -10761,7 +10760,7 @@ IStream *Parser::Locate_File(shared_ptr<SceneData>& sd, const UCS2String& filena
 */
 /*****************************************************************************/
 
-Image *Parser::Read_Image(shared_ptr<SceneData>& sd, int filetype, const UCS2 *filename, const Image::ReadOptions& options)
+Image *Parser::Read_Image(shared_ptr<BackendSceneData>& sd, int filetype, const UCS2 *filename, const Image::ReadOptions& options)
 {
     unsigned int stype;
     Image::ImageFileType type;
@@ -10831,6 +10830,23 @@ Image *Parser::Read_Image(shared_ptr<SceneData>& sd, int filetype, const UCS2 *f
         throw POV_EXCEPTION(kCannotOpenFileErr, "Cannot find image file.");
 
     return Image::Read(type, file.get(), options);
+}
+
+/*****************************************************************************/
+
+RGBFTColour *Parser::Create_Colour ()
+{
+    return new RGBFTColour();
+}
+
+/*****************************************************************************/
+
+RGBFTColour *Parser::Copy_Colour (const RGBFTColour* Old)
+{
+    if (Old != NULL)
+        return new RGBFTColour(*Old);
+    else
+        return NULL;
 }
 
 }

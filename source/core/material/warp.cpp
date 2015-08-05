@@ -42,9 +42,8 @@
 
 #include "core/material/pattern.h"
 #include "core/material/texture.h"
-
-#include "backend/math/matrices.h"
-#include "backend/support/randomsequences.h"
+#include "core/math/matrix.h"
+#include "core/math/randomsequence.h"
 
 // this must be the last file included
 #include "base/povdebug.h"

@@ -343,6 +343,16 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\source\core\bounding\boundingbox.cpp" />
+    <ClCompile Include="..\..\source\core\bounding\boundingcylinder.cpp" />
+    <ClCompile Include="..\..\source\core\bounding\boundingsphere.cpp" />
+    <ClCompile Include="..\..\source\core\colour\spectral.cpp" />
+    <ClCompile Include="..\..\source\core\lighting\lightgroup.cpp" />
+    <ClCompile Include="..\..\source\core\lighting\lightsource.cpp" />
+    <ClCompile Include="..\..\source\core\lighting\photons.cpp" />
+    <ClCompile Include="..\..\source\core\lighting\radiosity.cpp" />
+    <ClCompile Include="..\..\source\core\lighting\subsurface.cpp" />
+    <ClCompile Include="..\..\source\core\material\blendmap.cpp" />
     <ClCompile Include="..\..\source\core\material\interior.cpp" />
     <ClCompile Include="..\..\source\core\material\media.cpp" />
     <ClCompile Include="..\..\source\core\material\pattern.cpp" />
@@ -350,8 +360,19 @@
     <ClCompile Include="..\..\source\core\material\normal.cpp" />
     <ClCompile Include="..\..\source\core\material\pigment.cpp" />
     <ClCompile Include="..\..\source\core\material\texture.cpp" />
+    <ClCompile Include="..\..\source\core\math\chi2.cpp" />
+    <ClCompile Include="..\..\source\core\math\hypercomplex.cpp" />
+    <ClCompile Include="..\..\source\core\math\matrix.cpp" />
+    <ClCompile Include="..\..\source\core\math\polynomialsolver.cpp" />
+    <ClCompile Include="..\..\source\core\math\quaternion.cpp" />
+    <ClCompile Include="..\..\source\core\math\randomsequence.cpp" />
     <ClCompile Include="..\..\source\core\render\ray.cpp" />
     <ClCompile Include="..\..\source\core\render\trace.cpp" />
+    <ClCompile Include="..\..\source\core\scene\atmosphere.cpp" />
+    <ClCompile Include="..\..\source\core\scene\camera.cpp" />
+    <ClCompile Include="..\..\source\core\scene\object.cpp" />
+    <ClCompile Include="..\..\source\core\scene\scenedata.cpp" />
+    <ClCompile Include="..\..\source\core\scene\tracethreaddata.cpp" />
     <ClCompile Include="..\..\source\core\shape\bezier.cpp" />
     <ClCompile Include="..\..\source\core\shape\blob.cpp" />
     <ClCompile Include="..\..\source\core\shape\box.cpp" />
@@ -377,6 +398,11 @@
     <ClCompile Include="..\..\source\core\shape\torus.cpp" />
     <ClCompile Include="..\..\source\core\shape\triangle.cpp" />
     <ClCompile Include="..\..\source\core\shape\truetype.cpp" />
+    <ClCompile Include="..\..\source\core\support\bsptree.cpp" />
+    <ClCompile Include="..\..\source\core\support\imageutil.cpp" />
+    <ClCompile Include="..\..\source\core\support\octree.cpp" />
+    <ClCompile Include="..\..\source\core\support\statisticids.cpp" />
+    <ClCompile Include="..\..\source\core\support\statistics.cpp" />
     <ClCompile Include="..\..\source\precomp.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -386,8 +412,18 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\source\core\bounding\boundingbox.h" />
+    <ClInclude Include="..\..\source\core\bounding\boundingcylinder.h" />
+    <ClInclude Include="..\..\source\core\bounding\boundingsphere.h" />
+    <ClInclude Include="..\..\source\core\colour\spectral.h" />
     <ClInclude Include="..\..\source\core\configcore.h" />
     <ClInclude Include="..\..\source\core\coretypes.h" />
+    <ClInclude Include="..\..\source\core\lighting\lightgroup.h" />
+    <ClInclude Include="..\..\source\core\lighting\lightsource.h" />
+    <ClInclude Include="..\..\source\core\lighting\photons.h" />
+    <ClInclude Include="..\..\source\core\lighting\radiosity.h" />
+    <ClInclude Include="..\..\source\core\lighting\subsurface.h" />
+    <ClInclude Include="..\..\source\core\material\blendmap.h" />
     <ClInclude Include="..\..\source\core\material\interior.h" />
     <ClInclude Include="..\..\source\core\material\media.h" />
     <ClInclude Include="..\..\source\core\material\pattern.h" />
@@ -395,8 +431,20 @@
     <ClInclude Include="..\..\source\core\material\normal.h" />
     <ClInclude Include="..\..\source\core\material\pigment.h" />
     <ClInclude Include="..\..\source\core\material\texture.h" />
+    <ClInclude Include="..\..\source\core\math\chi2.h" />
+    <ClInclude Include="..\..\source\core\math\hypercomplex.h" />
+    <ClInclude Include="..\..\source\core\math\matrix.h" />
+    <ClInclude Include="..\..\source\core\math\polynomialsolver.h" />
+    <ClInclude Include="..\..\source\core\math\quaternion.h" />
+    <ClInclude Include="..\..\source\core\math\randomsequence.h" />
+    <ClInclude Include="..\..\source\core\math\vector.h" />
     <ClInclude Include="..\..\source\core\render\ray.h" />
     <ClInclude Include="..\..\source\core\render\trace.h" />
+    <ClInclude Include="..\..\source\core\scene\atmosphere.h" />
+    <ClInclude Include="..\..\source\core\scene\camera.h" />
+    <ClInclude Include="..\..\source\core\scene\object.h" />
+    <ClInclude Include="..\..\source\core\scene\scenedata.h" />
+    <ClInclude Include="..\..\source\core\scene\tracethreaddata.h" />
     <ClInclude Include="..\..\source\core\shape\bezier.h" />
     <ClInclude Include="..\..\source\core\shape\blob.h" />
     <ClInclude Include="..\..\source\core\shape\box.h" />
@@ -422,6 +470,12 @@
     <ClInclude Include="..\..\source\core\shape\torus.h" />
     <ClInclude Include="..\..\source\core\shape\triangle.h" />
     <ClInclude Include="..\..\source\core\shape\truetype.h" />
+    <ClInclude Include="..\..\source\core\support\bsptree.h" />
+    <ClInclude Include="..\..\source\core\support\imageutil.h" />
+    <ClInclude Include="..\..\source\core\support\octree.h" />
+    <ClInclude Include="..\..\source\core\support\simplevector.h" />
+    <ClInclude Include="..\..\source\core\support\statisticids.h" />
+    <ClInclude Include="..\..\source\core\support\statistics.h" />
     <ClInclude Include="..\..\source\precomp.h" />
     <ClInclude Include="..\povconfig\syspovconfigcore.h" />
   </ItemGroup>

@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file backend/bounding/bbox.h
+/// @file core/bounding/boundingbox.h
 ///
 /// This module contains all defines, typedefs, and prototypes for `bbox.cpp`.
 ///
@@ -35,15 +35,19 @@
 ///
 //******************************************************************************
 
-#ifndef BBOX_H
-#define BBOX_H
+#ifndef POVRAY_CORE_BOUNDINGBOX_H
+#define POVRAY_CORE_BOUNDINGBOX_H
 
-#include "backend/frame.h"
-#include "backend/support/statistics.h"
+#include "core/coretypes.h"
+#include "core/math/matrix.h"
 
 namespace pov
 {
 
+class Intersection;
+class Ray;
+struct RayObjectCondition;
+class RenderStatistics;
 class TraceThreadData;
 
 /*****************************************************************************
@@ -58,6 +62,107 @@ class TraceThreadData;
 /*****************************************************************************
 * Global typedefs
 ******************************************************************************/
+
+typedef SNGL BBoxScalar;
+typedef GenericVector3d<BBoxScalar> BBoxVector3d;
+
+/// Structure holding bounding box data.
+///
+/// @note       The current implementation stores the data in lowerLeft/size format.
+///
+/// @todo       The reliability of the bounding mechanism could probably be improved by storing the
+///             bounding data in min/max format rather than lowerLeft/size, and making sure
+///             high-precision values are rounded towards positive/negative infinity as appropriate.
+///
+struct BoundingBox
+{
+    BBoxVector3d lowerLeft;
+    BBoxVector3d size;
+
+    SNGL GetMinX() const { return lowerLeft.x(); }
+    SNGL GetMinY() const { return lowerLeft.y(); }
+    SNGL GetMinZ() const { return lowerLeft.z(); }
+
+    SNGL GetMaxX() const { return lowerLeft.x() + size.x(); }
+    SNGL GetMaxY() const { return lowerLeft.y() + size.y(); }
+    SNGL GetMaxZ() const { return lowerLeft.z() + size.z(); }
+
+    bool isEmpty() const { return (size.x() < 0) || (size.y() < 0) || (size.z() < 0); }
+};
+
+/// @relates BoundingBox
+inline void Make_BBox(BoundingBox& BBox, const BBoxScalar llx, const BBoxScalar lly, const BBoxScalar llz, const BBoxScalar lex, const BBoxScalar ley, const BBoxScalar lez)
+{
+    BBox.lowerLeft = BBoxVector3d(llx, lly, llz);
+    BBox.size      = BBoxVector3d(lex, ley, lez);
+}
+
+/// @relates BoundingBox
+inline void Make_BBox_from_min_max(BoundingBox& BBox, const BBoxVector3d& mins, const BBoxVector3d& maxs)
+{
+    BBox.lowerLeft = mins;
+    BBox.size      = maxs - mins;
+}
+
+/// @relates BoundingBox
+inline void Make_BBox_from_min_max(BoundingBox& BBox, const Vector3d& mins, const Vector3d& maxs)
+{
+    BBox.lowerLeft = BBoxVector3d(mins);
+    BBox.size      = BBoxVector3d(maxs - mins);
+}
+
+/// @relates BoundingBox
+inline void Make_min_max_from_BBox(BBoxVector3d& mins, BBoxVector3d& maxs, const BoundingBox& BBox)
+{
+    mins = BBox.lowerLeft;
+    maxs = mins + BBox.size;
+}
+
+/// @relates BoundingBox
+inline void Make_min_max_from_BBox(Vector3d& mins, Vector3d& maxs, const BoundingBox& BBox)
+{
+    mins = Vector3d(BBox.lowerLeft);
+    maxs = mins + Vector3d(BBox.size);
+}
+
+/// @relates BoundingBox
+inline bool Inside_BBox(const Vector3d& point, const BoundingBox& bbox)
+{
+    if (point.y() < (DBL)bbox.lowerLeft.x())
+        return(false);
+    if (point.y() < (DBL)bbox.lowerLeft.y())
+        return(false);
+    if (point.z() < (DBL)bbox.lowerLeft.z())
+        return(false);
+    if (point.y() > (DBL)bbox.lowerLeft.x() + (DBL)bbox.size.x())
+        return(false);
+    if (point.y() > (DBL)bbox.lowerLeft.y() + (DBL)bbox.size.y())
+        return(false);
+    if (point.z() > (DBL)bbox.lowerLeft.z() + (DBL)bbox.size.z())
+        return(false);
+
+    return(true);
+}
+
+/// Structure holding bounding box data in min/max format.
+///
+struct MinMaxBoundingBox
+{
+    BBoxVector3d pmin;
+    BBoxVector3d pmax;
+};
+
+typedef struct BBox_Tree_Struct BBOX_TREE;
+typedef BBOX_TREE* BBoxTreePtr;
+typedef const BBOX_TREE* ConstBBoxTreePtr;
+
+struct BBox_Tree_Struct
+{
+    short Infinite;   // Flag if node is infinite
+    short Entries;    // Number of sub-nodes in this node
+    BoundingBox BBox; // Bounding box of this node
+    BBOX_TREE **Node; // If node: children; if leaf: element
+};
 
 typedef bool VECTORB[3];
 
@@ -182,4 +287,4 @@ inline void BOUNDS_VOLUME(DBL& a, const BoundingBox& b)
 
 }
 
-#endif
+#endif // POVRAY_CORE_BOUNDINGBOX_H

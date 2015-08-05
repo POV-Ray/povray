@@ -47,7 +47,7 @@
 #include "base/types.h"
 
 #include "backend/control/messagefactory.h"
-#include "backend/scene/scenedata.h"
+#include "backend/scene/backendscenedata.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -260,7 +260,7 @@ void Task::TaskThread(const boost::function0<void>& completion)
 }
 
 
-SceneTask::SceneTask(TaskData *td, const boost::function1<void, Exception&>& f, const char* sn, shared_ptr<SceneData> sd, RenderBackend::ViewId vid) :
+SceneTask::SceneTask(TaskData *td, const boost::function1<void, Exception&>& f, const char* sn, shared_ptr<BackendSceneData> sd, RenderBackend::ViewId vid) :
     Task(td, f),
     messageFactory(sd->warningLevel, sn, sd->backendAddress, sd->frontendAddress, sd->sceneId, vid)
 {}
