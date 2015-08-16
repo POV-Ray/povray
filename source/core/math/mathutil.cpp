@@ -1,8 +1,8 @@
 //******************************************************************************
 ///
-/// @file backend/math/mathutil.h
+/// @file core/math/mathutil.cpp
 ///
-/// This module contains all defines, typedefs, and prototypes for `mathutil.cpp`.
+/// This module implements the utility functions for scalar math.
 ///
 /// @copyright
 /// @parblock
@@ -33,18 +33,39 @@
 ///
 //******************************************************************************
 
-#ifndef MATHUTIL_H
-#define MATHUTIL_H
+#include <cctype>
+#include <ctime>
+#include <algorithm>
+
+// configcore.h must always be the first POV file included in core *.cpp files (pulls in platform config)
+#include "core/configcore.h"
+#include "core/math/mathutil.h"
+
+// this must be the last file included
+#include "base/povdebug.h"
 
 namespace pov
 {
 
 #ifdef NEED_INVHYP
-DBL asinh(DBL x);
-DBL acosh(DBL x);
-DBL atanh(DBL x);
+DBL asinh(DBL x)
+{
+    return (x < 0 ? -1 : (x > 0 ? 1 : 0)) * log(fabs(x) + sqrt(1 + x * x));
+}
+
+DBL acosh(DBL x)
+{
+    if(x < 1.0)
+        return 0;
+    return log(x + sqrt(x * x - 1));
+}
+
+DBL atanh(DBL x)
+{
+    if(fabs(x) >= 1)
+        return 0;
+    return 0.5 * log((1 + x) / (1 - x));
+}
 #endif
 
 }
-
-#endif

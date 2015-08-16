@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file backend/support/jitter.cpp
+/// @file core/math/jitter.cpp
 ///
 /// @todo   What's in here?
 ///
@@ -33,9 +33,9 @@
 ///
 //******************************************************************************
 
-// frame.h must always be the first POV file included (pulls in platform config)
-#include "backend/frame.h"
-#include "backend/support/jitter.h"
+// configcore.h must always be the first POV file included in core *.cpp files (pulls in platform config)
+#include "core/configcore.h"
+#include "core/math/jitter.h"
 
 // this must be the last file included
 #include "base/povdebug.h"

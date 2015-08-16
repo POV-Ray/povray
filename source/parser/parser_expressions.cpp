@@ -50,7 +50,9 @@
 #include "core/material/pigment.h"
 #include "core/material/texture.h"
 #include "core/material/warp.h"
+#include "core/math/mathutil.h"
 #include "core/math/matrix.h"
+#include "core/math/spline.h"
 #include "core/math/vector.h"
 #include "core/render/ray.h"
 #include "core/scene/object.h"
@@ -58,8 +60,6 @@
 #include "core/support/imageutil.h"
 
 #include "backend/frame.h"
-#include "backend/math/mathutil.h"
-#include "backend/math/splines.h"
 #include "backend/scene/backendscenedata.h"
 #include "backend/vm/fnpovfpu.h"
 

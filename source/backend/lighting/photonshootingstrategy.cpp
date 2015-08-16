@@ -53,12 +53,6 @@
 #include "core/shape/csg.h"
 #include "core/support/octree.h"
 
-#include "povms/povms.h"
-#include "povms/povmsid.h"
-#include "povms/povmsutil.h"
-
-#include "backend/scene/view.h"
-
 // this must be the last file included
 #include "base/povdebug.h"
 

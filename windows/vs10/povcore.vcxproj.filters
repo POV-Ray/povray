@@ -246,6 +246,18 @@
     <ClCompile Include="..\..\source\core\scene\camera.cpp">
       <Filter>Core Source\Scene</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\core\math\mathutil.cpp">
+      <Filter>Core Source\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\math\spline.cpp">
+      <Filter>Core Source\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\math\jitter.cpp">
+      <Filter>Core Source\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\render\tracepixel.cpp">
+      <Filter>Core Source\Render</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\precomp.h" />
@@ -443,6 +455,18 @@
     </ClInclude>
     <ClInclude Include="..\..\source\core\scene\camera.h">
       <Filter>Core Headers\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\math\mathutil.h">
+      <Filter>Core Headers\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\math\spline.h">
+      <Filter>Core Headers\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\math\jitter.h">
+      <Filter>Core Headers\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\render\tracepixel.h">
+      <Filter>Core Headers\Render</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

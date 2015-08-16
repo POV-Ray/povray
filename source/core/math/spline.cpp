@@ -1,8 +1,16 @@
 //******************************************************************************
 ///
-/// @file backend/math/splines.cpp
+/// @file core/math/spline.cpp
 ///
-/// This module implements splines.
+/// Implementation of spline-related maths.
+///
+/// @note   This file currently contains only stuff for the SDL's function-alike
+///         spline feature; as such, it would naturally belong in the parser
+///         module. However, it is planned for the polymorphic type hierarchy
+///         herein to also absorb the spline-specific maths for the geometric
+///         primtitives (which is currently embedded in the respective
+///         primitives' code), and the file has already been moved to the core
+///         module in preparation.
 ///
 /// @copyright
 /// @parblock
@@ -39,9 +47,9 @@
 
 #include <limits>
 
-// frame.h must always be the first POV file included (pulls in platform config)
-#include "backend/frame.h"
-#include "backend/math/splines.h"
+// configcore.h must always be the first POV file included in core *.cpp files (pulls in platform config)
+#include "core/configcore.h"
+#include "core/math/spline.h"
 
 #include "base/pov_err.h"
 

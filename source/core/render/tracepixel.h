@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file backend/render/tracepixel.h
+/// @file core/render/tracepixel.h
 ///
 /// @todo   What's in here?
 ///
@@ -33,8 +33,8 @@
 ///
 //******************************************************************************
 
-#ifndef POVRAY_BACKEND_TRACEPIXEL_H
-#define POVRAY_BACKEND_TRACEPIXEL_H
+#ifndef POVRAY_CORE_TRACEPIXEL_H
+#define POVRAY_CORE_TRACEPIXEL_H
 
 #include <vector>
 
@@ -42,8 +42,7 @@
 
 #include "core/render/trace.h"
 #include "core/scene/camera.h"
-
-#include "backend/frame.h"
+#include "core/scene/scenedata.h"
 
 namespace pov
 {
@@ -63,7 +62,7 @@ struct ContainingInteriorsPointObjectCondition : public PointObjectCondition
 class TracePixel : public Trace
 {
     public:
-        TracePixel(ViewData *vd, TraceThreadData *td, unsigned int mtl, DBL adcb, const QualityFlags& qf,
+        TracePixel(shared_ptr<SceneData> sd, const Camera* cam, TraceThreadData *td, unsigned int mtl, DBL adcb, const QualityFlags& qf,
                    CooperateFunctor& cf, MediaFunctor& mf, RadiosityFunctor& af, bool pt = false);
         virtual ~TracePixel();
         void SetupCamera(const Camera& cam);
@@ -133,4 +132,4 @@ class TracePixel : public Trace
 
 }
 
-#endif // POVRAY_BACKEND_TRACEPIXEL_H
+#endif // POVRAY_CORE_TRACEPIXEL_H

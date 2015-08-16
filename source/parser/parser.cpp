@@ -60,6 +60,7 @@
 #include "core/material/texture.h"
 #include "core/math/matrix.h"
 #include "core/math/polynomialsolver.h"
+#include "core/math/spline.h"
 #include "core/math/vector.h"
 #include "core/scene/atmosphere.h"
 #include "core/scene/object.h"
@@ -94,7 +95,6 @@
 
 #include "povms/povmsid.h"
 
-#include "backend/math/splines.h"
 #include "backend/scene/backendscenedata.h"
 #include "backend/vm/fnpovfpu.h"
 

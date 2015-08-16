@@ -1,9 +1,16 @@
 //******************************************************************************
 ///
-/// @file backend/math/splines.h
+/// @file core/math/spline.h
 ///
-/// This module contains all defines, typedefs, and prototypes for
-/// `splines.cpp`.
+/// Declarations for spline-related maths.
+///
+/// @note   This file currently contains only stuff for the SDL's function-alike
+///         spline feature; as such, it would naturally belong in the parser
+///         module. However, it is planned for the polymorphic type hierarchy
+///         herein to also absorb the spline-specific maths for the geometric
+///         primtitives (which is currently embedded in the respective
+///         primitives' code), and the file has already been moved to the core
+///         module in preparation.
 ///
 /// @copyright
 /// @parblock
@@ -34,14 +41,14 @@
 ///
 //******************************************************************************
 
-#ifndef SPLINE_H
-#define SPLINE_H
+#ifndef POVRAY_CORE_SPLINE_H
+#define POVRAY_CORE_SPLINE_H
 /* Generic header for spline modules */
-
-#include "base/types.h"
 
 namespace pov
 {
+
+typedef DBL EXPRESS[5];
 
 struct SplineEntry
 {
@@ -114,5 +121,4 @@ DBL Get_Spline_Val(GenericSpline* sp, DBL p, EXPRESS& v, int *Terms);
 
 }
 
-#endif
-
+#endif // POVRAY_CORE_SPLINE_H

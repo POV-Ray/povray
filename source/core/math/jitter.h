@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file backend/support/jitter.h
+/// @file core/math/jitter.h
 ///
 /// @todo   What's in here?
 ///
@@ -33,10 +33,8 @@
 ///
 //******************************************************************************
 
-#ifndef POVRAY_BACKEND_JITTER_H
-#define POVRAY_BACKEND_JITTER_H
-
-#include "backend/frame.h"
+#ifndef POVRAY_CORE_JITTER_H
+#define POVRAY_CORE_JITTER_H
 
 namespace pov
 {
@@ -73,4 +71,4 @@ inline void Jitter2d(DBL x, DBL y, DBL& jx, DBL& jy)
 
 }
 
-#endif // POVRAY_BACKEND_JITTER_H
+#endif // POVRAY_CORE_JITTER_H

@@ -327,7 +327,6 @@ class PhotonTrace : public Trace
 };
 
 // foward declaration
-class PhotonShootingStrategy;
 class LightTargetCombo;
 
 /* ------------------------------------------------------ */

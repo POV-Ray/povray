@@ -42,7 +42,8 @@
 #include "parser/configparser.h"
 #include "parser/parser.h"
 
-#include "backend/math/mathutil.h"
+#include "core/math/mathutil.h"
+
 #include "backend/scene/backendscenedata.h"
 #include "backend/vm/fnpovfpu.h"
 

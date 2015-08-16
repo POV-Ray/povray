@@ -44,8 +44,8 @@
 
 #include "core/material/pigment.h"
 #include "core/math/matrix.h"
+#include "core/math/spline.h"
 
-#include "backend/math/splines.h"
 #include "backend/scene/backendscenedata.h"
 #include "backend/vm/fnpovfpu.h"
 

@@ -44,10 +44,10 @@
 
 #include "core/lighting/radiosity.h"
 #include "core/material/media.h"
+#include "core/render/tracepixel.h"
 
 #include "backend/frame.h"
 #include "backend/render/rendertask.h"
-#include "backend/render/tracepixel.h"
 
 namespace pov
 {

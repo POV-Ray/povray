@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file backend/render/tracepixel.cpp
+/// @file core/render/tracepixel.cpp
 ///
 /// This module implements the TracePixel class, which mostly pertains to
 /// setting up the camera, the initial ray for each pixel rendered, and calling
@@ -41,23 +41,20 @@
 #include <boost/thread.hpp>
 #include <boost/scoped_array.hpp>
 
-// frame.h must always be the first POV file included (pulls in platform config)
-#include "backend/frame.h"
-#include "backend/render/tracepixel.h"
+// configcore.h must always be the first POV file included in core *.cpp files (pulls in platform config)
+#include "core/configcore.h"
+#include "core/render/tracepixel.h"
 
 #include "core/material/normal.h"
 #include "core/material/pigment.h"
 #include "core/math/chi2.h"
+#include "core/math/jitter.h"
 #include "core/math/matrix.h"
 #include "core/render/ray.h"
 #include "core/render/trace.h"
 #include "core/scene/object.h"
 #include "core/scene/scenedata.h"
 #include "core/shape/mesh.h"
-
-#include "backend/scene/backendscenedata.h"
-#include "backend/scene/view.h"
-#include "backend/support/jitter.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -195,17 +192,17 @@ bool ContainingInteriorsPointObjectCondition::operator()(const Vector3d& point, 
 }
 
 
-TracePixel::TracePixel(ViewData *vd, TraceThreadData *td, unsigned int mtl, DBL adcb, const QualityFlags& qf,
+TracePixel::TracePixel(shared_ptr<SceneData> sd, const Camera* cam, TraceThreadData *td, unsigned int mtl, DBL adcb, const QualityFlags& qf,
                        CooperateFunctor& cf, MediaFunctor& mf, RadiosityFunctor& af, bool pt) :
-                       Trace(dynamic_pointer_cast<SceneData>(vd->GetSceneData()), td, qf, cf, mf, af),
-                       sceneData(dynamic_pointer_cast<SceneData>(vd->GetSceneData())),
+                       Trace(sd, td, qf, cf, mf, af),
+                       sceneData(sd),
                        threadData(td),
                        focalBlurData(NULL),
                        maxTraceLevel(mtl),
                        adcBailout(adcb),
                        pretrace(pt)
 {
-    SetupCamera(vd->GetCamera());
+    SetupCamera((cam == NULL) ? sd->parsedCamera : *cam);
 }
 
 TracePixel::~TracePixel()

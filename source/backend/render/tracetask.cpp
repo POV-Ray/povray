@@ -43,13 +43,13 @@
 
 #include "core/material/normal.h"
 #include "core/math/chi2.h"
+#include "core/math/jitter.h"
 #include "core/math/matrix.h"
 #include "core/render/trace.h"
 
 #include "backend/scene/backendscenedata.h"
 #include "backend/scene/view.h"
 #include "backend/scene/viewthreaddata.h"
-#include "backend/support/jitter.h"
 
 #ifdef PROFILE_INTERSECTIONS
 #include "base/image/image.h"
@@ -221,7 +221,7 @@ void TraceTask::SubdivisionBuffer::Clear()
 
 TraceTask::TraceTask(ViewData *vd, unsigned int tm, DBL js, DBL aat, unsigned int aad, pov_base::GammaCurvePtr& aag, unsigned int ps, bool psc, bool final, bool hr) :
     RenderTask(vd, "Trace"),
-    trace(vd, GetViewDataPtr(), vd->GetSceneData()->parsedMaxTraceLevel, vd->GetSceneData()->parsedAdcBailout,
+    trace(vd->GetSceneData(), &vd->GetCamera(), GetViewDataPtr(), vd->GetSceneData()->parsedMaxTraceLevel, vd->GetSceneData()->parsedAdcBailout,
           vd->GetQualityFeatureFlags(), cooperate, media, radiosity),
     cooperate(*this),
     tracingMethod(tm),

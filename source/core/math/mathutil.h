@@ -1,14 +1,14 @@
 //******************************************************************************
 ///
-/// @file backend/math/mathutil.cpp
+/// @file core/math/mathutil.h
 ///
-/// This module implements the utility functions for scalar math.
+/// This module contains all defines, typedefs, and prototypes for `mathutil.cpp`.
 ///
 /// @copyright
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -33,39 +33,18 @@
 ///
 //******************************************************************************
 
-#include <cctype>
-#include <ctime>
-#include <algorithm>
-
-// frame.h must always be the first POV file included (pulls in platform config)
-#include "backend/frame.h"
-#include "backend/math/mathutil.h"
-
-// this must be the last file included
-#include "base/povdebug.h"
+#ifndef POVRAY_CORE_MATHUTIL_H
+#define POVRAY_CORE_MATHUTIL_H
 
 namespace pov
 {
 
 #ifdef NEED_INVHYP
-DBL asinh(DBL x)
-{
-    return (x < 0 ? -1 : (x > 0 ? 1 : 0)) * log(fabs(x) + sqrt(1 + x * x));
-}
-
-DBL acosh(DBL x)
-{
-    if(x < 1.0)
-        return 0;
-    return log(x + sqrt(x * x - 1));
-}
-
-DBL atanh(DBL x)
-{
-    if(fabs(x) >= 1)
-        return 0;
-    return 0.5 * log((1 + x) / (1 - x));
-}
+DBL asinh(DBL x);
+DBL acosh(DBL x);
+DBL atanh(DBL x);
 #endif
 
 }
+
+#endif
