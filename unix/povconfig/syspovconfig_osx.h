@@ -58,6 +58,8 @@
     #define POV_LONG long long
 #endif
 
+#define POV_ULONG unsigned POV_LONG
+
 // The following macros are deliberately left undefined; POV-Ray will use boost as a fallback there:
 //  DECLARE_THREAD_LOCAL_PTR(ptrType, ptrName)
 //  IMPLEMENT_THREAD_LOCAL_PTR(ptrType, ptrName, ignore)

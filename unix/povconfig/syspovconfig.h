@@ -152,25 +152,49 @@ const int NULL=0;
 #if defined INT8_MAX || defined int8_t
     #define POV_INT8 int8_t
 #else
-    // Autoconf is convinced that there's no integer type exactly 8 bits wide. We won't pick a type here.
+    // Autoconf is convinced that there's no signed integer type exactly 8 bits wide. We won't pick a type here.
+#endif
+
+#if defined UINT8_MAX || defined uint8_t
+    #define POV_UINT8 uint8_t
+#else
+    // Autoconf is convinced that there's no unsigned integer type exactly 8 bits wide. We won't pick a type here.
 #endif
 
 #if defined INT16_MAX || defined int16_t
     #define POV_INT16 int16_t
 #else
-    // Autoconf is convinced that there's no integer type exactly 16 bits wide. We won't pick a type here.
+    // Autoconf is convinced that there's no signed integer type exactly 16 bits wide. We won't pick a type here.
+#endif
+
+#if defined UINT16_MAX || defined uint16_t
+    #define POV_UINT16 uint16_t
+#else
+    // Autoconf is convinced that there's no unsigned integer type exactly 16 bits wide. We won't pick a type here.
 #endif
 
 #if defined INT32_MAX || defined int32_t
     #define POV_INT32 int32_t
 #else
-    // Autoconf is convinced that there's no integer type exactly 32 bits wide. We won't pick a type here.
+    // Autoconf is convinced that there's no signed integer type exactly 32 bits wide. We won't pick a type here.
+#endif
+
+#if defined UINT32_MAX || defined uint32_t
+    #define POV_UINT32 uint32_t
+#else
+    // Autoconf is convinced that there's no unsigned integer type exactly 32 bits wide. We won't pick a type here.
 #endif
 
 #if defined INT64_MAX || defined int64_t
     #define POV_INT64 int64_t
 #else
-    // Autoconf is convinced that there's no integer type exactly 64 bits wide. We won't pick a type here.
+    // Autoconf is convinced that there's no signed integer type exactly 64 bits wide. We won't pick a type here.
+#endif
+
+#if defined UINT64_MAX || defined uint64_t
+    #define POV_UINT64 uint64_t
+#else
+    // Autoconf is convinced that there's no unsigned integer type exactly 64 bits wide. We won't pick a type here.
 #endif
 
 // Pull in additional settings depending on Unix flavor

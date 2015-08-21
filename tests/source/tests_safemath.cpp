@@ -48,28 +48,50 @@
 
 BOOST_AUTO_TEST_SUITE( SafeMath )
 
-    BOOST_AUTO_TEST_CASE( SafeUnsignedProduct )
-    {
-        int m = std::numeric_limits<short>::max();
-        int a;
-        int b = 2;
-        int c = 3;
-        int d = 4;
+    BOOST_AUTO_TEST_SUITE( SafeUnsignedProduct )
 
-        a = m/b;
-        BOOST_CHECK_EQUAL( a*b, pov_base::SafeUnsignedProduct<short>(a,b) );
-        a++;
-        EXPECT_POV_EXCEPTION ( pov_base::SafeUnsignedProduct<short>(a,b) );
+        // We use very fine-grained test cases here, as much of them is about throwing exceptions,
+        // and we don't want a stray unexpected exception to spoil the whole party.
 
-        a = m/(b*c);
-        BOOST_CHECK_EQUAL( a*b*c, pov_base::SafeUnsignedProduct<short>(a,b,c) );
-        a++;
-        EXPECT_POV_EXCEPTION ( pov_base::SafeUnsignedProduct<short>(a,b,c) );
+        BOOST_AUTO_TEST_CASE( SafeUnsignedProductShort2 )
+        {
+            int m = std::numeric_limits<short>::max();
+            int a;
+            int b = 2;
 
-        a = m/(b*c*d);
-        BOOST_CHECK_EQUAL( a*b*c*d, pov_base::SafeUnsignedProduct<short>(a,b,c,d) );
-        a++;
-        EXPECT_POV_EXCEPTION ( pov_base::SafeUnsignedProduct<short>(a,b,c,d) );
-    }
+            a = m/b; // largest value that, when multiplied with b, fits in our data type
+            BOOST_CHECK_EQUAL( a*b, pov_base::SafeUnsignedProduct<short>(a,b) );
+            a++; // now the product can't possibly fit
+            BOOST_CHECK_THROW( pov_base::SafeUnsignedProduct<short>(a,b), pov_base::Exception );
+        }
+
+        BOOST_AUTO_TEST_CASE( SafeUnsignedProductShort3 )
+        {
+            int m = std::numeric_limits<short>::max();
+            int a;
+            int b = 2;
+            int c = 3;
+
+            a = m/(b*c); // largest value that, when multiplied with b*c, fits in our data type
+            BOOST_CHECK_EQUAL( a*b*c, pov_base::SafeUnsignedProduct<short>(a,b,c) );
+            a++; // now the product can't possibly fit
+            BOOST_CHECK_THROW( pov_base::SafeUnsignedProduct<short>(a,b,c), pov_base::Exception );
+        }
+
+        BOOST_AUTO_TEST_CASE( SafeUnsignedProductShort4 )
+        {
+            int m = std::numeric_limits<short>::max();
+            int a;
+            int b = 2;
+            int c = 3;
+            int d = 4;
+
+            a = m/(b*c*d); // largest value that, when multiplied with b*c*d, fits in our data type
+            BOOST_CHECK_EQUAL( a*b*c*d, pov_base::SafeUnsignedProduct<short>(a,b,c,d) );
+            a++; // now the product can't possibly fit
+            BOOST_CHECK_THROW( pov_base::SafeUnsignedProduct<short>(a,b,c,d), pov_base::Exception );
+        }
+
+    BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE_END()

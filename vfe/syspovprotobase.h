@@ -63,11 +63,11 @@ class vfeTimer
         bool HasValidCPUTime() const;
 
     private:
-        unsigned POV_LONG GetWallTime (void) const ;
-        unsigned POV_LONG GetCPUTime (void) const ;
+        POV_ULONG GetWallTime (void) const ;
+        POV_ULONG GetCPUTime (void) const ;
 
-        unsigned POV_LONG m_WallTimeStart ;
-        unsigned POV_LONG m_CPUTimeStart ;
+        POV_ULONG m_WallTimeStart ;
+        POV_ULONG m_CPUTimeStart ;
         bool m_ThreadTimeOnly ;
         void *m_ThreadHandle ;
         bool m_IsNT ;

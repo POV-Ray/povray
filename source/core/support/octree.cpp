@@ -54,6 +54,9 @@
 *  All standard POV distribution rights granted.  All other rights reserved.
 *************************************************************************/
 
+#include <cfloat>
+#include <climits>
+
 #include <algorithm>
 
 // configcore.h must always be the first POV file included in core *.cpp files (pulls in platform config)
@@ -102,12 +105,9 @@ namespace pov
 
 // compiler / target platform sanity checks
 // (note that these don't necessarily catch all possible quirks; they should be quite reliable though)
-#ifndef FLT_RADIX
-#include <cfloat>
-#endif
 #if(C99_COMPATIBLE_RADIOSITY == 0)
-    #if( (INT_MAX != 2147483647) || (INT_MIN < (-2147483647 - 1)) )
-        #error 'int' is not 32 bit or uses non-straightforward encoding; try a different C99_COMPATIBLE_RADIOSITY setting in config.h
+    #if( (INT_MAX != SIGNED32_MAX) || (INT_MIN != SIGNED32_MIN) )
+        #error 'int' is not 32 bit or does not use two's complement encoding; try a different C99_COMPATIBLE_RADIOSITY setting in config.h
     #endif
     #if(FLT_RADIX != 2)
         #error 'float' does not conform to IEEE 754 single-precision format; try a different C99_COMPATIBLE_RADIOSITY setting in config.h

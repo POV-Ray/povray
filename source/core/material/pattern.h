@@ -469,9 +469,9 @@ struct DensityFilePattern : public ContinuousPattern
         int Type; ///< Type of data. Currently one of 1 (8 bit per voxel), 2 (16 bit per voxel) or 4 (32 bit per voxel).
         union
         {
-            unsigned char *Density8;
-            unsigned short *Density16;
-            unsigned int *Density32;
+            POV_UINT8 *Density8;
+            POV_UINT16 *Density16;
+            POV_UINT32 *Density32;
         };
     };
     /// @todo fix the members to match naming conventions

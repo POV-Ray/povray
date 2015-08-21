@@ -33,8 +33,6 @@
 ///
 //******************************************************************************
 
-#include <climits>
-
 // configbase.h must always be the first POV file included within base *.cpp files
 #include "base/configbase.h"
 #include "base/animation/moov.h"
@@ -411,7 +409,7 @@ void WriteAtomHeader(OStream *file, Type type, POV_LONG size)
         WriteType(file, type);
         WriteInt8(file, 0);
     }
-    else if(size > UINT_MAX) // size outside 32-bit range
+    else if(size > UNSIGNED32_MAX) // size outside 32-bit range
     {
         WriteInt4(file, 1);
         WriteType(file, type);

@@ -54,6 +54,8 @@
     #define POV_LONG long long
 #endif
 
+#define POV_ULONG unsigned POV_LONG
+
 #define DECLARE_THREAD_LOCAL_PTR(ptrType, ptrName)                __thread ptrType *ptrName
 #define IMPLEMENT_THREAD_LOCAL_PTR(ptrType, ptrName, ignore)      __thread ptrType *ptrName
 #define GET_THREAD_LOCAL_PTR(ptrName)                             (ptrName)

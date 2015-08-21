@@ -33,6 +33,7 @@
 ///
 //******************************************************************************
 
+#include <limits>
 #include <vector>
 
 #include <boost/thread.hpp>
@@ -64,7 +65,7 @@ namespace pov
 #ifdef PROFILE_INTERSECTIONS
     bool gDoneBSP;
     bool gDoneBVH;
-    POV_ULONG gMinVal = ULLONG_MAX ;
+    POV_ULONG gMinVal = std::numeric_limits<POV_ULONG>::max();
     POV_ULONG gMaxVal = 0;
     POV_ULONG gIntersectionTime;
     vector<vector<POV_ULONG> > gBSPIntersectionTimes;
@@ -374,7 +375,7 @@ void TraceTask::Finish()
             delete img;
         }
         gDoneBSP = gDoneBVH = false;
-        gMinVal = ULLONG_MAX;
+        gMinVal = std::numeric_limits<POV_ULONG>::max();
         gMaxVal = 0;
     }
 #endif
@@ -398,7 +399,7 @@ void TraceTask::SimpleSamplingM0()
             for(DBL x = DBL(rect.left); x <= DBL(rect.right); x++)
             {
 #ifdef PROFILE_INTERSECTIONS
-                POV_LONG it = ULLONG_MAX;
+                POV_LONG it = std::numeric_limits<POV_ULONG>::max();
                 for (int i = 0 ; i < 3 ; i++)
                 {
                     TransColour c;
@@ -461,7 +462,7 @@ void TraceTask::SimpleSamplingM0P()
                     continue;
 
 #ifdef PROFILE_INTERSECTIONS
-                POV_LONG it = ULLONG_MAX;
+                POV_LONG it = std::numeric_limits<POV_ULONG>::max();
                 for (int i = 0 ; i < 3 ; i++)
                 {
                     TransColour c;

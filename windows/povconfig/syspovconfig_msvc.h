@@ -194,13 +194,18 @@
 #endif
 
 #define QSORT(a,b,c,d)                      qsort(reinterpret_cast<void *>(a), (size_t) b, (size_t) c, d)
-#define POV_LONG                            __int64
+#define POV_LONG                            signed __int64
+#define POV_ULONG                           unsigned __int64
 #define FORCEINLINE                         __forceinline
 
-#define POV_INT8                            __int8
-#define POV_INT16                           __int16
-#define POV_INT32                           __int32
-#define POV_INT64                           __int64
+#define POV_INT8                            signed __int8
+#define POV_UINT8                           unsigned __int8
+#define POV_INT16                           signed __int16
+#define POV_UINT16                          unsigned __int16
+#define POV_INT32                           signed __int32
+#define POV_UINT32                          unsigned __int32
+#define POV_INT64                           signed __int64
+#define POV_UINT64                          unsigned __int64
 
 #undef ReturnAddress
 #define ReturnAddress()                     _ReturnAddress()

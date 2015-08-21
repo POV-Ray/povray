@@ -38,8 +38,4 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "base/types.h"
-
-#define EXPECT_POV_EXCEPTION( expr ) do try { expr; BOOST_ERROR( "Exception expected."); } catch (pov_base::Exception&) {} while(0)
-
 #endif // POVRAY_TESTS_H

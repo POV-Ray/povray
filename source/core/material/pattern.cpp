@@ -40,7 +40,7 @@
 ///
 //******************************************************************************
 
-#include <climits>
+#include <limits>
 #include <algorithm>
 
 // configcore.h must always be the first POV file included in core *.cpp files (pulls in platform config)
@@ -5863,11 +5863,11 @@ DBL DensityFilePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *
                     else
                     {
                         if(Data->Type == 4)
-                            density = (DBL)Data->Density32[z * Data->Sy * Data->Sx + y * Data->Sx + x] / (DBL)UINT_MAX;
+                            density = (DBL)Data->Density32[z * Data->Sy * Data->Sx + y * Data->Sx + x] / (DBL)UNSIGNED32_MAX;
                         else if(Data->Type==2)
-                            density = (DBL)Data->Density16[z * Data->Sy * Data->Sx + y * Data->Sx + x] / (DBL)USHRT_MAX;
+                            density = (DBL)Data->Density16[z * Data->Sy * Data->Sx + y * Data->Sx + x] / (DBL)UNSIGNED16_MAX;
                         else if(Data->Type == 1)
-                            density = (DBL)Data->Density8[z * Data->Sy * Data->Sx + y * Data->Sx + x] / (DBL)UCHAR_MAX;
+                            density = (DBL)Data->Density8[z * Data->Sy * Data->Sx + y * Data->Sx + x] / (DBL)UNSIGNED8_MAX;
                     }
                     break;
                 case kDensityFileInterpolation_Trilinear:
@@ -5892,36 +5892,36 @@ DBL DensityFilePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *
 
                     if(Data->Type == 4)
                     {
-                        f111 = (DBL)Data->Density32[z1 * Data->Sy * Data->Sx + y1 * Data->Sx + x1] / (DBL)UINT_MAX;
-                        f112 = (DBL)Data->Density32[z1 * Data->Sy * Data->Sx + y1 * Data->Sx + x2] / (DBL)UINT_MAX;
-                        f121 = (DBL)Data->Density32[z1 * Data->Sy * Data->Sx + y2 * Data->Sx + x1] / (DBL)UINT_MAX;
-                        f122 = (DBL)Data->Density32[z1 * Data->Sy * Data->Sx + y2 * Data->Sx + x2] / (DBL)UINT_MAX;
-                        f211 = (DBL)Data->Density32[z2 * Data->Sy * Data->Sx + y1 * Data->Sx + x1] / (DBL)UINT_MAX;
-                        f212 = (DBL)Data->Density32[z2 * Data->Sy * Data->Sx + y1 * Data->Sx + x2] / (DBL)UINT_MAX;
-                        f221 = (DBL)Data->Density32[z2 * Data->Sy * Data->Sx + y2 * Data->Sx + x1] / (DBL)UINT_MAX;
-                        f222 = (DBL)Data->Density32[z2 * Data->Sy * Data->Sx + y2 * Data->Sx + x2] / (DBL)UINT_MAX;
+                        f111 = (DBL)Data->Density32[z1 * Data->Sy * Data->Sx + y1 * Data->Sx + x1] / (DBL)UNSIGNED32_MAX;
+                        f112 = (DBL)Data->Density32[z1 * Data->Sy * Data->Sx + y1 * Data->Sx + x2] / (DBL)UNSIGNED32_MAX;
+                        f121 = (DBL)Data->Density32[z1 * Data->Sy * Data->Sx + y2 * Data->Sx + x1] / (DBL)UNSIGNED32_MAX;
+                        f122 = (DBL)Data->Density32[z1 * Data->Sy * Data->Sx + y2 * Data->Sx + x2] / (DBL)UNSIGNED32_MAX;
+                        f211 = (DBL)Data->Density32[z2 * Data->Sy * Data->Sx + y1 * Data->Sx + x1] / (DBL)UNSIGNED32_MAX;
+                        f212 = (DBL)Data->Density32[z2 * Data->Sy * Data->Sx + y1 * Data->Sx + x2] / (DBL)UNSIGNED32_MAX;
+                        f221 = (DBL)Data->Density32[z2 * Data->Sy * Data->Sx + y2 * Data->Sx + x1] / (DBL)UNSIGNED32_MAX;
+                        f222 = (DBL)Data->Density32[z2 * Data->Sy * Data->Sx + y2 * Data->Sx + x2] / (DBL)UNSIGNED32_MAX;
                     }
                     else if(Data->Type == 2)
                     {
-                        f111 = (DBL)Data->Density16[z1 * Data->Sy * Data->Sx + y1 * Data->Sx + x1] / (DBL)USHRT_MAX;
-                        f112 = (DBL)Data->Density16[z1 * Data->Sy * Data->Sx + y1 * Data->Sx + x2] / (DBL)USHRT_MAX;
-                        f121 = (DBL)Data->Density16[z1 * Data->Sy * Data->Sx + y2 * Data->Sx + x1] / (DBL)USHRT_MAX;
-                        f122 = (DBL)Data->Density16[z1 * Data->Sy * Data->Sx + y2 * Data->Sx + x2] / (DBL)USHRT_MAX;
-                        f211 = (DBL)Data->Density16[z2 * Data->Sy * Data->Sx + y1 * Data->Sx + x1] / (DBL)USHRT_MAX;
-                        f212 = (DBL)Data->Density16[z2 * Data->Sy * Data->Sx + y1 * Data->Sx + x2] / (DBL)USHRT_MAX;
-                        f221 = (DBL)Data->Density16[z2 * Data->Sy * Data->Sx + y2 * Data->Sx + x1] / (DBL)USHRT_MAX;
-                        f222 = (DBL)Data->Density16[z2 * Data->Sy * Data->Sx + y2 * Data->Sx + x2] / (DBL)USHRT_MAX;
+                        f111 = (DBL)Data->Density16[z1 * Data->Sy * Data->Sx + y1 * Data->Sx + x1] / (DBL)UNSIGNED16_MAX;
+                        f112 = (DBL)Data->Density16[z1 * Data->Sy * Data->Sx + y1 * Data->Sx + x2] / (DBL)UNSIGNED16_MAX;
+                        f121 = (DBL)Data->Density16[z1 * Data->Sy * Data->Sx + y2 * Data->Sx + x1] / (DBL)UNSIGNED16_MAX;
+                        f122 = (DBL)Data->Density16[z1 * Data->Sy * Data->Sx + y2 * Data->Sx + x2] / (DBL)UNSIGNED16_MAX;
+                        f211 = (DBL)Data->Density16[z2 * Data->Sy * Data->Sx + y1 * Data->Sx + x1] / (DBL)UNSIGNED16_MAX;
+                        f212 = (DBL)Data->Density16[z2 * Data->Sy * Data->Sx + y1 * Data->Sx + x2] / (DBL)UNSIGNED16_MAX;
+                        f221 = (DBL)Data->Density16[z2 * Data->Sy * Data->Sx + y2 * Data->Sx + x1] / (DBL)UNSIGNED16_MAX;
+                        f222 = (DBL)Data->Density16[z2 * Data->Sy * Data->Sx + y2 * Data->Sx + x2] / (DBL)UNSIGNED16_MAX;
                     }
                     else if(Data->Type == 1)
                     {
-                        f111 = (DBL)Data->Density8[z1 * Data->Sy * Data->Sx + y1 * Data->Sx + x1] / (DBL)UCHAR_MAX;
-                        f112 = (DBL)Data->Density8[z1 * Data->Sy * Data->Sx + y1 * Data->Sx + x2] / (DBL)UCHAR_MAX;
-                        f121 = (DBL)Data->Density8[z1 * Data->Sy * Data->Sx + y2 * Data->Sx + x1] / (DBL)UCHAR_MAX;
-                        f122 = (DBL)Data->Density8[z1 * Data->Sy * Data->Sx + y2 * Data->Sx + x2] / (DBL)UCHAR_MAX;
-                        f211 = (DBL)Data->Density8[z2 * Data->Sy * Data->Sx + y1 * Data->Sx + x1] / (DBL)UCHAR_MAX;
-                        f212 = (DBL)Data->Density8[z2 * Data->Sy * Data->Sx + y1 * Data->Sx + x2] / (DBL)UCHAR_MAX;
-                        f221 = (DBL)Data->Density8[z2 * Data->Sy * Data->Sx + y2 * Data->Sx + x1] / (DBL)UCHAR_MAX;
-                        f222 = (DBL)Data->Density8[z2 * Data->Sy * Data->Sx + y2 * Data->Sx + x2] / (DBL)UCHAR_MAX;
+                        f111 = (DBL)Data->Density8[z1 * Data->Sy * Data->Sx + y1 * Data->Sx + x1] / (DBL)UNSIGNED8_MAX;
+                        f112 = (DBL)Data->Density8[z1 * Data->Sy * Data->Sx + y1 * Data->Sx + x2] / (DBL)UNSIGNED8_MAX;
+                        f121 = (DBL)Data->Density8[z1 * Data->Sy * Data->Sx + y2 * Data->Sx + x1] / (DBL)UNSIGNED8_MAX;
+                        f122 = (DBL)Data->Density8[z1 * Data->Sy * Data->Sx + y2 * Data->Sx + x2] / (DBL)UNSIGNED8_MAX;
+                        f211 = (DBL)Data->Density8[z2 * Data->Sy * Data->Sx + y1 * Data->Sx + x1] / (DBL)UNSIGNED8_MAX;
+                        f212 = (DBL)Data->Density8[z2 * Data->Sy * Data->Sx + y1 * Data->Sx + x2] / (DBL)UNSIGNED8_MAX;
+                        f221 = (DBL)Data->Density8[z2 * Data->Sy * Data->Sx + y2 * Data->Sx + x1] / (DBL)UNSIGNED8_MAX;
+                        f222 = (DBL)Data->Density8[z2 * Data->Sy * Data->Sx + y2 * Data->Sx + x2] / (DBL)UNSIGNED8_MAX;
                     }
 
                     density = ((f111 * xi + f112 * xx) * yi + (f121 * xi + f122 * xx) * yy) * (1.0 - zz) +
@@ -5955,10 +5955,10 @@ DBL DensityFilePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *
                             {
                                 jj = zmax(j + y1 - 1, Data->Sy);
                                 intpd2[i][j] = intp3(zz,
-                                                     Data->Density32[k0 * Data->Sy * Data->Sx + jj * Data->Sx + ii] / (DBL)UINT_MAX,
-                                                     Data->Density32[k1 * Data->Sy * Data->Sx + jj * Data->Sx + ii] / (DBL)UINT_MAX,
-                                                     Data->Density32[k2 * Data->Sy * Data->Sx + jj * Data->Sx + ii] / (DBL)UINT_MAX,
-                                                     Data->Density32[k3 * Data->Sy * Data->Sx + jj * Data->Sx + ii] / (DBL)UINT_MAX);
+                                                     Data->Density32[k0 * Data->Sy * Data->Sx + jj * Data->Sx + ii] / (DBL)UNSIGNED32_MAX,
+                                                     Data->Density32[k1 * Data->Sy * Data->Sx + jj * Data->Sx + ii] / (DBL)UNSIGNED32_MAX,
+                                                     Data->Density32[k2 * Data->Sy * Data->Sx + jj * Data->Sx + ii] / (DBL)UNSIGNED32_MAX,
+                                                     Data->Density32[k3 * Data->Sy * Data->Sx + jj * Data->Sx + ii] / (DBL)UNSIGNED32_MAX);
                             }
                         }
                     }
@@ -5971,10 +5971,10 @@ DBL DensityFilePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *
                             {
                                 jj = zmax(j + y1 - 1, Data->Sy);
                                 intpd2[i][j] = intp3(zz,
-                                                     Data->Density16[k0 * Data->Sy * Data->Sx + jj * Data->Sx + ii] / (DBL)USHRT_MAX,
-                                                     Data->Density16[k1 * Data->Sy * Data->Sx + jj * Data->Sx + ii] / (DBL)USHRT_MAX,
-                                                     Data->Density16[k2 * Data->Sy * Data->Sx + jj * Data->Sx + ii] / (DBL)USHRT_MAX,
-                                                     Data->Density16[k3 * Data->Sy * Data->Sx + jj * Data->Sx + ii] / (DBL)USHRT_MAX);
+                                                     Data->Density16[k0 * Data->Sy * Data->Sx + jj * Data->Sx + ii] / (DBL)UNSIGNED16_MAX,
+                                                     Data->Density16[k1 * Data->Sy * Data->Sx + jj * Data->Sx + ii] / (DBL)UNSIGNED16_MAX,
+                                                     Data->Density16[k2 * Data->Sy * Data->Sx + jj * Data->Sx + ii] / (DBL)UNSIGNED16_MAX,
+                                                     Data->Density16[k3 * Data->Sy * Data->Sx + jj * Data->Sx + ii] / (DBL)UNSIGNED16_MAX);
                             }
                         }
                     }
@@ -5987,10 +5987,10 @@ DBL DensityFilePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *
                             {
                                 jj = zmax(j + y1 - 1, Data->Sy);
                                 intpd2[i][j] = intp3(zz,
-                                                     Data->Density8[k0 * Data->Sy * Data->Sx + jj * Data->Sx + ii] / (DBL)UCHAR_MAX,
-                                                     Data->Density8[k1 * Data->Sy * Data->Sx + jj * Data->Sx + ii] / (DBL)UCHAR_MAX,
-                                                     Data->Density8[k2 * Data->Sy * Data->Sx + jj * Data->Sx + ii] / (DBL)UCHAR_MAX,
-                                                     Data->Density8[k3 * Data->Sy * Data->Sx + jj * Data->Sx + ii] / (DBL)UCHAR_MAX);
+                                                     Data->Density8[k0 * Data->Sy * Data->Sx + jj * Data->Sx + ii] / (DBL)UNSIGNED8_MAX,
+                                                     Data->Density8[k1 * Data->Sy * Data->Sx + jj * Data->Sx + ii] / (DBL)UNSIGNED8_MAX,
+                                                     Data->Density8[k2 * Data->Sy * Data->Sx + jj * Data->Sx + ii] / (DBL)UNSIGNED8_MAX,
+                                                     Data->Density8[k3 * Data->Sy * Data->Sx + jj * Data->Sx + ii] / (DBL)UNSIGNED8_MAX);
                             }
                         }
                     }
@@ -8637,9 +8637,9 @@ static unsigned long int NewHash(long int tvx, long int tvy, long int tvz)
 
     r = tvx ^ tvy ^ tvz;
     seed = abs(r);
-    if (tvx<0) seed += LONG_MAX/2;
-    if (tvy<0) seed += LONG_MAX/4;
-    if (tvz<0) seed += LONG_MAX/8;
+    if (tvx<0) seed += std::numeric_limits<unsigned long>::max()/2;
+    if (tvy<0) seed += std::numeric_limits<unsigned long>::max()/4;
+    if (tvz<0) seed += std::numeric_limits<unsigned long>::max()/8;
 
     return (seed);
 }
@@ -8953,7 +8953,7 @@ void Read_Density_File(IStream *file, DENSITY_FILE *df)
         {
             df->Data->Type = 4;
 
-            unsigned int *map = new unsigned int[sx * sy * sz];
+            POV_UINT32 *map = new POV_UINT32[sx * sy * sz];
 
             for (z = 0; z < sz; z++)
             {
@@ -8970,7 +8970,7 @@ void Read_Density_File(IStream *file, DENSITY_FILE *df)
         {
             df->Data->Type = 2;
 
-            unsigned short *map = new unsigned short[sx * sy * sz];
+            POV_UINT16 *map = new POV_UINT16[sx * sy * sz];
 
             for (z = 0; z < sz; z++)
             {
@@ -8987,7 +8987,7 @@ void Read_Density_File(IStream *file, DENSITY_FILE *df)
         {
             df->Data->Type = 1;
 
-            unsigned char *map = new unsigned char[sx * sy * sz];
+            POV_UINT8 *map = new POV_UINT8[sx * sy * sz];
 
             for (z = 0; z < sz; z++)
             {

@@ -45,6 +45,93 @@
 namespace pov_base
 {
 
+/// A macro wrapping a sequence of statements into a single one.
+///
+/// This macro is intended to be used in the definition of other macros that should behave
+/// syntactically like a single statement, while evaluating to something that would not normally
+/// behave that way.
+///
+/// Example:
+///
+///     #declare FOO(x) SINGLE_STATEMENT( char buf[128]; foo(buf,x); )
+///     ...
+///     if (some_cond)
+///         FOO(a);
+///     else
+///         ...
+///
+#define SINGLE_STATEMENT( block ) do { block } while (false)
+
+//******************************************************************************
+///
+/// @name Theoretical Integer Limits
+///
+/// The following macros evaluate to the minimum and maximum values that could theoretically be
+/// stored in an integer of the specified width, presuming that two's complement format is used for
+/// negatives, regardless of what data type and negative number format the compiler and runtime
+/// environment actually support.
+///
+/// @{
+
+/// Maximum unsigned 8-bit integer value.
+#define UNSIGNED8_MAX   (0xFFu)
+
+/// Maximum unsigned 16-bit integer value.
+#define UNSIGNED16_MAX  (0xFFFFu)
+
+/// Maximum unsigned 32-bit integer value.
+#define UNSIGNED32_MAX  (0xFFFFFFFFul)
+
+/// Maximum unsigned 64-bit integer value.
+#define UNSIGNED64_MAX  (0xFFFFFFFFFFFFFFFFull)
+
+/// Maximum signed 8-bit integer value.
+#define SIGNED8_MAX     (0x7F)
+
+/// Maximum signed 16-bit integer value.
+#define SIGNED16_MAX    (0x7FFF)
+
+/// Maximum signed 32-bit integer value.
+#define SIGNED32_MAX    (0x7FFFFFFFl)
+
+/// Maximum signed 64-bit integer value.
+#define SIGNED64_MAX    (0x7FFFFFFFFFFFFFFFll)
+
+/// Minimum signed 8-bit two's complement integer value.
+#define SIGNED8_MIN     (-0x80)
+
+/// Minimum signed 16-bit two's complement integer value.
+/// Note that this is a long int, to accomodate for systems where int is only 16 bits wide and
+/// negative values don't use two's complement format, which would make them unable to represent
+/// this value in a regular int.
+#define SIGNED16_MIN    (-0x8000l)
+
+/// Maximum signed 32-bit two's complement integer value.
+/// Note that this is a long long, to accomodate for systems where long is only 32 bits wide and
+/// negative values don't use two's complement format, which would make them unable to represent
+/// this value in a long int.
+#define SIGNED32_MIN    (-0x80000000ll)
+
+/// @}
+///
+//******************************************************************************
+
+/// A macro that does nothing.
+///
+/// This macro is intended to be used in the definition of other macros that should behave
+/// syntactically like a single statement, while evaluating to a no-operation.
+///
+/// Example:
+///
+///     #declare MY_ASSERT(x) NO_OP
+///     ...
+///     if (some_cond)
+///         MY_ASSERT(some_test);
+///     else
+///         ...
+///
+#define NO_OP SINGLE_STATEMENT(;)
+
 // from <algorithm>; we don't want to always type the namespace for these.
 using std::min;
 using std::max;

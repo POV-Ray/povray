@@ -66,6 +66,8 @@
     #define POV_LONG long long
 #endif
 
+#define POV_ULONG unsigned POV_LONG
+
 /// @file
 /// @todo The TLS stuff is just copied from the Linux settings; someone needs to check universal POSIX compatibility.
 #define DECLARE_THREAD_LOCAL_PTR(ptrType, ptrName)                __thread ptrType *ptrName

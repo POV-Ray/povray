@@ -33,8 +33,57 @@
 ///
 //******************************************************************************
 
+#include <climits>
+#include <limits>
+
 #define BOOST_TEST_MODULE "POV-Ray Unit Tests"
 #include <boost/test/included/unit_test.hpp>
+
+// configbase.h must always be the first POV file included within base *.cpp files
+// (and as that's what we're testing, we should consider ourselves part of it);
+// tests.h must follow suite.
+#include "base/configbase.h"
+#include "tests.h"
+
+#include "base/types.h"
+
+// this must be the last file included
+#include "base/povdebug.h"
+
+#define BITS(t) (sizeof(t)*CHAR_BIT)
+
+#define POV_CHECK_MESSAGE(c,m) BOOST_CHECK_MESSAGE ( c, m << " POV-Ray will not work properly; fix your configuration.")
+#define POV_WARN_MESSAGE(c,m)  BOOST_WARN_MESSAGE  ( c, m << " Some pieces of code in POV-Ray may choke on this; use at your own risk.")
+
+#define TEST_TYPE_SIZE(t,w) SINGLE_STATEMENT( \
+    POV_CHECK_MESSAGE ( BITS(t) >= (w), #t << " has fewer than the required " << w << " bits." ); \
+    POV_WARN_MESSAGE  ( BITS(t) <= (w), #t << " has more than the expected "  << w << " bits." ); \
+    )
+
+#define TEST_TWOS_COMPLEMENT(st,ut) \
+    POV_WARN_MESSAGE ( (ut)((st)(-1)) == std::numeric_limits<ut>::max(), #st << " does not use 2's complement representation for negative values." )
+
+BOOST_AUTO_TEST_SUITE( Sanity )
+
+    BOOST_AUTO_TEST_CASE( TypeSizes )
+    {
+        TEST_TYPE_SIZE( POV_INT8,   8 );
+        TEST_TYPE_SIZE( POV_UINT8,  8 );
+        TEST_TYPE_SIZE( POV_INT16,  16 );
+        TEST_TYPE_SIZE( POV_UINT16, 16 );
+        TEST_TYPE_SIZE( POV_INT32,  32 );
+        TEST_TYPE_SIZE( POV_UINT32, 32 );
+        TEST_TYPE_SIZE( POV_INT64,  64 );
+        TEST_TYPE_SIZE( POV_UINT64, 64 );
+
+
+        TEST_TWOS_COMPLEMENT( POV_INT8,  POV_UINT8 );
+        TEST_TWOS_COMPLEMENT( POV_INT16, POV_UINT16 );
+        TEST_TWOS_COMPLEMENT( POV_INT32, POV_UINT32 );
+        TEST_TWOS_COMPLEMENT( POV_INT64, POV_UINT64 );
+    }
+
+BOOST_AUTO_TEST_SUITE_END()
 
 // That's all, folks!
 // All actual test cases reside in the other files.

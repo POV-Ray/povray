@@ -3575,7 +3575,7 @@ ObjectPtr Parser::Parse_Mesh()
             {
                 if (number_of_triangles >= max_triangles)
                 {
-                    if (max_triangles >= INT_MAX/2)
+                    if (max_triangles >= std::numeric_limits<int>::max()/2)
                     {
                         Error("Too many triangles in triangle mesh.");
                     }
@@ -3673,7 +3673,7 @@ ObjectPtr Parser::Parse_Mesh()
             {
                 if (number_of_triangles >= max_triangles)
                 {
-                    if (max_triangles >= INT_MAX/2)
+                    if (max_triangles >= std::numeric_limits<int>::max()/2)
                         Error("Too many triangles in triangle mesh.");
 
                     max_triangles *= 2;

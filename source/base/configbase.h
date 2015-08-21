@@ -41,70 +41,354 @@
 #include <boost/version.hpp>
 #include "syspovconfigbase.h"
 
+//******************************************************************************
+///
+/// @name Fundamental Data Types
+///
+/// The following macros define essential data types. It is recommended that system-specific
+/// configurations always override the defaults.
+///
+/// @{
+
+/// @def POV_INT8
+/// The smallest signed integer data type at least 8 bits wide.
+///
+/// @attention
+///     Some legacy portions of the code may rely on this type to be _exactly_ 8 bits wide.
+///
+#ifndef POV_INT8
+    #if defined INT8_MAX
+        // data type exactly matching the requirements, as defined in the C <stdint.h> or C++11 <cstdint> header.
+        #define POV_INT8 int8_t
+    #elif defined INT_LEAST8_MAX
+        // data type matching or exceeding the requirements, as defined in the C <stdint.h> or C++11 <cstdint> header.
+        #define POV_INT8 int_least8_t
+    #else
+        // char is the smallest type guaranteed by the C++ standard to be at least 8 bits wide
+        #define POV_INT8 signed char
+    #endif
+#endif
+
+/// @def POV_UINT8
+/// The smallest unsigned integer data type at least 8 bits wide.
+///
+/// @attention
+///     Some legacy portions of the code may rely on this type to be _exactly_ 8 bits wide.
+///
+#ifndef POV_UINT8
+    #if defined UINT8_MAX
+        // data type exactly matching the requirements, as defined in the C <stdint.h> or C++11 <cstdint> header.
+        #define POV_UINT8 uint8_t
+    #elif defined UINT_LEAST8_MAX
+        // data type matching or exceeding the requirements, as defined in the C <stdint.h> or C++11 <cstdint> header.
+        #define POV_UINT8 uint_least8_t
+    #else
+        // char is the smallest type guaranteed by the C++ standard to be at least 8 bits wide
+        #define POV_UINT8 unsigned char
+    #endif
+#endif
+
+/// @def POV_INT16
+/// The smallest signed integer data type at least 16 bits wide.
+///
+/// @attention
+///     Some legacy portions of the code may rely on this type to be _exactly_ 16 bits wide.
+///
+#ifndef POV_INT16
+    #if defined INT16_MAX
+        // data type exactly matching the requirements, as defined in the C <stdint.h> or C++11 <cstdint> header.
+        #define POV_INT16 int16_t
+    #elif defined INT_LEAST16_MAX
+        // data type matching or exceeding the requirements, as defined in the C <stdint.h> or C++11 <cstdint> header.
+        #define POV_INT16 int_least16_t
+    #else
+        // short is the smallest type guaranteed by the C++ standard to be at least 16 bits wide
+        #define POV_INT16 signed short
+    #endif
+#endif
+
+/// @def POV_UINT16
+/// The smallest unsigned integer data type at least 16 bits wide.
+///
+/// @attention
+///     Some legacy portions of the code may rely on this type to be _exactly_ 16 bits wide.
+///
+#ifndef POV_UINT16
+    #if defined UINT16_MAX
+        // data type exactly matching the requirements, as defined in the C <stdint.h> or C++11 <cstdint> header.
+        #define POV_UINT16 uint16_t
+    #elif defined UINT_LEAST16_MAX
+        // data type matching or exceeding the requirements, as defined in the C <stdint.h> or C++11 <cstdint> header.
+        #define POV_UINT16 uint_least16_t
+    #else
+        // short is the smallest type guaranteed by the C++ standard to be at least 16 bits wide
+        #define POV_UINT16 unsigned short
+    #endif
+#endif
+
+/// @def POV_INT32
+/// The smallest signed integer data type at least 32 bits wide.
+///
+/// @attention
+///     Some legacy portions of the code may rely on this type to be _exactly_ 32 bits wide.
+///
+#ifndef POV_INT32
+    #if defined INT32_MAX
+        // data type exactly matching the requirements, as defined in the C <stdint.h> or C++11 <cstdint> header.
+        #define POV_INT32 int32_t
+    #elif defined INT_LEAST32_MAX
+        // data type matching or exceeding the requirements, as defined in the C <stdint.h> or C++11 <cstdint> header.
+        #define POV_INT32 int_least32_t
+    #else
+        // long is the smallest type guaranteed by the C++ standard to be at least 32 bits wide
+        #define POV_INT32 signed long
+    #endif
+#endif
+
+/// @def POV_UINT32
+/// The smallest unsigned integer data type at least 32 bits wide.
+///
+/// @attention
+///     Some legacy portions of the code may rely on this type to be _exactly_ 32 bits wide.
+///
+#ifndef POV_UINT32
+    #if defined UINT32_MAX
+        // data type exactly matching the requirements, as defined in the C <stdint.h> or C++11 <cstdint> header.
+        #define POV_UINT32 uint32_t
+    #elif defined UINT_LEAST32_MAX
+        // data type matching or exceeding the requirements, as defined in the C <stdint.h> or C++11 <cstdint> header.
+        #define POV_UINT32 uint_least32_t
+    #else
+        // long is the smallest type guaranteed by the C++ standard to be at least 32 bits wide
+        #define POV_UINT32 unsigned long
+    #endif
+#endif
+
+/// @def POV_INT64
+/// The smallest signed integer data type at least 64 bits wide.
+///
+/// @attention
+///     Some legacy portions of the code may rely on this type to be _exactly_ 64 bits wide.
+///
+#ifndef POV_INT64
+    #if defined INT64_MAX
+        // data type exactly matching the requirements, as defined in the C <stdint.h> or C++11 <cstdint> header.
+        #define POV_INT64 int64_t
+    #elif defined INT_LEAST64_MAX
+        // data type matching or exceeding the requirements, as defined in the C <stdint.h> or C++11 <cstdint> header.
+        #define POV_INT64 int_least64_t
+    #else
+        // long long is the smallest type guaranteed by the C++ standard to be at least 64 bits wide
+        #define POV_INT64 signed long long
+    #endif
+#endif
+
+/// @def POV_UINT64
+/// The smallest unsigned integer data type at least 64 bits wide.
+///
+/// @attention
+///     Some legacy portions of the code may rely on this type to be _exactly_ 64 bits wide.
+///
+#ifndef POV_UINT64
+    #if defined UINT64_MAX
+        // data type exactly matching the requirements, as defined in the C <stdint.h> or C++11 <cstdint> header.
+        #define POV_UINT64 uint64_t
+    #elif defined UINT_LEAST64_MAX
+        // data type matching or exceeding the requirements, as defined in the C <stdint.h> or C++11 <cstdint> header.
+        #define POV_UINT64 uint_least64_t
+    #else
+        // long long is the smallest type guaranteed by the C++ standard to be at least 64 bits wide
+        #define POV_UINT64 unsigned long long
+    #endif
+#endif
+
+/// @def DBL
+/// A floating-point data type providing high precision.
+///
+/// It is recommended to use a data type providing at least the same range and precision as the
+/// IEEE 754 "double" type (15 decimal digits in the range from 1e-308 to 1e+308) and supporting
+/// both infinities and quiet NaN values.
+///
+/// @attention
+///     Many portions of the code currently presume this type to be an alias for `double`.
+///
 #ifndef DBL
     #define DBL double
 #endif
 
+/// @def SNGL
+/// A floating-point data type providing low memory consumption.
+///
+/// It is recommended to use a data type providing about the same range and precision as the
+/// IEEE 754 "single" type (7 decimal digits in the range from 1e-38 to 1e+38) and supporting
+/// both infinities and quiet NaN values.
+///
+/// @attention
+///     Many portions of the code currently presume this type to be an alias for `float`.
+///
 #ifndef SNGL
     #define SNGL float
 #endif
 
+/// @}
+///
+//******************************************************************************
+///
+/// @name Usage-Specific Data Types
+///
+/// The following macros define data types for particular uses. It is recommended that
+/// system-specific configurations leave these at their defaults, unless building a special binary
+/// to meet unusual requirements.
+///
+/// @{
+
+/// @def COLC
+/// Floating-point data type used to represent brightness.
+///
+/// This data type is used to represent monochromatic light intensity, or the light intensity of a
+/// single colour channel, in computation and storage.
+///
+/// It is recommended to use a fast data type providing about the same range and precision as the
+/// IEEE 754 "single" type (7 decimal digits in the range from 1e-38 to 1e+38) and supporting
+/// both infinities and quiet NaN values.
+///
+/// @note
+///     The "half" type might also suffice for this purpose, but you may want to make sure that the
+///     implementation on your target system provides adequate performance.
+///
+/// @todo
+///     Replace this type with one type for computation and another type for storage, allowing to
+///     choose a precise and/or fast type for the former and a compact one for the latter.
+///
 #ifndef COLC
     #define COLC float
 #endif
 
+/// @def UCS2
+/// Data type used to represent individual UCS2 characters.
+///
+/// This data type is used to represent characters from the UCS2 character set, i.e. the 16-bit
+/// Base Multilingual Plane subset of Unicode.
+///
+/// This should be an unsigned integer type at least 16 bits wide.
+///
+/// @note
+///     For clarity, this data type should _not_ be used as the base type for UTF-16 encoded
+///     full-fledged Unicode strings. Use @ref UTF16 instead.
+///
+/// @attention
+///     Some legacy portions of the code may improperly use this type where they should use
+///     @ref UCS2 instead.
+///
 #ifndef UCS2
-    #define UCS2 unsigned short
+    #define UCS2 POV_UINT16
 #endif
 
+/// @def UCS4
+/// Integer data type used to represent UCS4 or full-fledged Unicode characters.
+///
+/// This should be an unsigned integer type at least 21 (sic!) bits wide.
+///
 #ifndef UCS4
-    #define UCS4 unsigned int
+    #define UCS4 POV_UINT32
 #endif
 
+/// @def UTF16
+/// Integer data type used as the base type to represent UTF-16 encoded Unicode strings.
+/// This should be an unsigned integer type at least 16 bits wide.
+///
+/// @note
+///     For clarity, this data type should _not_ be used to store regular UCS2 characters
+///     (16-bit Base Multilingual Plane subset of Unicode). For that purpose, use @ref UCS2
+///     instead.
+///
+/// @attention
+///     Some legacy portions of the code may improperly use @ref UCS2 where they should use this
+///     type instead.
+///
+#ifndef UTF16
+    #define UTF16 POV_UINT16
+#endif
+
+/// @def POV_LONG
+///
+/// @deprecated
+///     This data type is used in many places for different purposes; use either POV_INT64 there
+///     or introduce some more specific type names.
+///
 #ifndef POV_LONG
-    #define POV_LONG long long
+    #define POV_LONG signed long long
+#endif
+
+/// @def POV_ULONG
+///
+/// @deprecated
+///     This data type is used in many places for different purposes; use either POV_INT64 there
+///     or introduce some more specific type names.
+///
+#ifndef POV_ULONG
     #define POV_ULONG unsigned long long
 #endif
 
-#ifndef POV_INT8
-    #define POV_INT8 signed char
-#endif
+/// @}
+///
+//******************************************************************************
+///
+/// @name Mathematical Constants
+///
+/// The following macros define mathematical constants to the precision provided by the @ref DBL
+/// data type. System-specific configurations providing a data type of higher precision than the
+/// IEEE 754 "double" type should override these with more precise values.
+///
+/// @{
 
-#ifndef POV_INT16
-    #define POV_INT16 short
-#endif
-
-#ifndef POV_INT32
-    #define POV_INT32 int
-#endif
-
-#ifndef POV_INT64
-    #define POV_INT64 long long
-#endif
-
-#ifndef POV_ULONG
-    #define POV_ULONG unsigned POV_LONG
-#endif
-
+/// @def M_PI
+/// The mathematical constant @f$ \pi @f$.
+///
 #ifndef M_PI
     #define M_PI   3.1415926535897932384626
 #endif
 
+/// @def M_PI_2
+/// The mathematical constant @f$ ^{\pi}/_{2} @f$.
+///
 #ifndef M_PI_2
     #define M_PI_2 1.57079632679489661923
 #endif
 
+/// @def TWO_M_PI
+/// The mathematical constant @f$ 2\pi @f$.
+///
 #ifndef TWO_M_PI
     #define TWO_M_PI 6.283185307179586476925286766560
 #endif
 
+/// @def M_PI_180
+/// The mathematical constant @f$ ^{\pi}/_{180} @f$.
+///
+/// This constant is used for converting from degrees to radians (or vice versa).
+///
 #ifndef M_PI_180
     #define M_PI_180 0.01745329251994329576
 #endif
 
+/// @def M_PI_360
+/// The mathematical constant @f$ ^{\pi}/_{360} @f$.
+///
+/// This constant is used for converting from degrees to radians (or vice versa) while at the
+/// same time multiplying (or dividing, respectively) by 2.
+///
 #ifndef M_PI_360
     #define M_PI_360 0.00872664625997164788
 #endif
+
+/// @}
+///
+//******************************************************************************
+///
+/// @name Miscellaneous
+///
+/// @{
 
 #ifndef POV_SYS_FILE_EXTENSION
     #define POV_SYS_FILE_EXTENSION ".tga"
@@ -151,21 +435,6 @@
 #define DEFAULT_WORKING_GAMMA       1.0
 #define DEFAULT_WORKING_GAMMA_TEXT  "1.0"
 
-// boost 1.50 changed TIME_UTC to TIME_UTC_ to avoid a clash with C11, which has
-// TIME_UTC as a define (in boost it's an enum). To allow compilation with earlier
-// versions of boost we now use POV_TIME_UTC in the code and define that here.
-// unfortunately we do have to hard-code the value.
-#if BOOST_VERSION >= 105000
-    #define POV_TIME_UTC boost::TIME_UTC_
-#else
-    #ifdef TIME_UTC
-        // clash between C11 and boost detected, need to hard-code
-        #define POV_TIME_UTC 1
-    #else
-        #define POV_TIME_UTC boost::TIME_UTC
-    #endif
-#endif
-
 #ifndef CDECL
     #define CDECL
 #endif
@@ -177,5 +446,38 @@
 #ifndef FORCEINLINE
     #define FORCEINLINE inline
 #endif
+
+/// @}
+///
+//******************************************************************************
+///
+/// @name Non-Configurable Macros
+///
+/// The following macros are configured automatically at compile-time; they cannot be overridden by
+/// system-specific configuration.
+///
+/// @{
+
+/// @def POV_TIME_UTC
+/// Alias for `boost::TIME_UTC` or `boost::TIME_UTC_`, whichever is applicable.
+///
+/// Boost 1.50 changed TIME_UTC to TIME_UTC_ to avoid a clash with C++11, which has
+/// TIME_UTC as a define (in boost it's an enum). To allow compilation with earlier
+/// versions of boost we now use POV_TIME_UTC in the code and define that here.
+///
+#if BOOST_VERSION >= 105000
+    #define POV_TIME_UTC boost::TIME_UTC_
+#else
+    #ifdef TIME_UTC
+        // clash between C++11 and boost detected, need to hard-code
+        #define POV_TIME_UTC 1
+    #else
+        #define POV_TIME_UTC boost::TIME_UTC
+    #endif
+#endif
+
+/// @}
+///
+//******************************************************************************
 
 #endif
