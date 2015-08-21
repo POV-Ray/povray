@@ -4,6 +4,15 @@ tab=`echo -e '\t'`
 nl='
 '
 
+# List of all the directories that contain files which may have an impact on the POV-Ray binary, and are under control
+# of the POV-Ray team, as a regular expression for grep -E to match file names.
+# Note that this does not include auxiliary source code such as unit tests (as they have no impact on the POV-Ray
+# binary), nor libraries (as they are not under control of the POV-Ray team).
+src_dir_pattern="^source/|^vfe/|^platform/|^mac/|^unix/|^windows/"
+
+# List of all the file extensions used for C/C++ source code, as a regular expression for grep -E to match file names.
+src_ext_pattern='\.c$|\.cpp$|\.h$|\.hpp$'
+
 ########################################################################################################################
 #
 # Verify that all the version identifiers in the source tree match.
@@ -58,7 +67,7 @@ fi
 # Update prerelease id (trailing numeric portion) if there is any change to the actual program code.
 # We're setting the prerelease id to the number of minutes since 2000-01-01 00:00.
 
-if git diff --cached --name-only | grep -E "^source/|^vfe/|^platform/|^mac/|^unix/|^windows/|^libraries/" >/dev/null
+if git diff --cached --name-only | grep -E "$src_dir_pattern|^libraries/" >/dev/null
 then
   if [ x"$prerelease_povray_h" = x"" ]
   then
@@ -109,7 +118,7 @@ unstaged=`git diff --name-only`
 
 errors=""
 stage=""
-for fname in `git diff --cached --name-only | grep -E "^source/|^vfe/|^platform/|^mac/|^unix/|^windows/" | grep -E '\.c$|\.cpp$|\.h$'`
+for fname in `git diff --cached --name-only | grep -E "$src_dir_pattern|^tests/source/" | grep -E "$src_ext_pattern"`
 do
 
   if [ -f "$fname" ]
