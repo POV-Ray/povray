@@ -1,8 +1,8 @@
 //******************************************************************************
 ///
-/// @file tests/source/tests_main.cpp
+/// @file tests/source/tests.h
 ///
-/// Unit tests for POV-Ray.
+/// Common declarations for POV-Ray unit tests.
 ///
 /// @copyright
 /// @parblock
@@ -33,8 +33,13 @@
 ///
 //******************************************************************************
 
-#define BOOST_TEST_MODULE "POV-Ray Unit Tests"
-#include <boost/test/included/unit_test.hpp>
+#ifndef POVRAY_TESTS_H
+#define POVRAY_TESTS_H
 
-// That's all, folks!
-// All actual test cases reside in the other files.
+#include <boost/test/unit_test.hpp>
+
+#include "base/types.h"
+
+#define EXPECT_POV_EXCEPTION( expr ) do try { expr; BOOST_ERROR( "Exception expected."); } catch (pov_base::Exception&) {} while(0)
+
+#endif // POVRAY_TESTS_H
