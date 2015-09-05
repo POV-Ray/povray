@@ -38,6 +38,8 @@
 
 #include "core/configcore.h"
 
+#include <stack>
+
 #include "base/colour.h"
 #include "base/types.h"
 #include "base/textstream.h"

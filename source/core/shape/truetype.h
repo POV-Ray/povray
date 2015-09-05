@@ -51,7 +51,6 @@ namespace pov
 
 class CSG;
 class Parser;
-class SceneData;
 
 using pov_base::IStream;
 
@@ -102,7 +101,7 @@ class TrueType : public ObjectBase
         virtual void Transform(const TRANSFORM *);
         virtual void Compute_BBox();
 
-        static void ProcessNewTTF(CSG *Object, TrueTypeFont* font, const UCS2 *text_string, DBL depth, const Vector3d& offset, Parser *parser, shared_ptr<SceneData>& sceneData);
+        static void ProcessNewTTF(CSG *Object, TrueTypeFont* font, const UCS2 *text_string, DBL depth, const Vector3d& offset, Parser *parser);
     protected:
         bool Inside_Glyph(double x, double y, const GlyphStruct* glyph) const;
         int solve_quad(double *x, double *y, double mindist, DBL maxdist) const;

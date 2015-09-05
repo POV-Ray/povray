@@ -42,6 +42,8 @@
 
 #include "base/configbase.h"
 
+#include "pov_mem.h"
+
 namespace pov_base
 {
 

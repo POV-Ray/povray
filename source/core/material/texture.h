@@ -115,6 +115,25 @@ struct Texture_Struct : public Pattern_Struct
     vector<TEXTURE*> Materials; // used for BITMAP_PATTERN (and only there)
 };
 
+struct Finish_Struct
+{
+    SNGL Diffuse, DiffuseBack, Brilliance, BrillianceOut, BrillianceAdjust, BrillianceAdjustRad;
+    SNGL Specular, Roughness;
+    SNGL Phong, Phong_Size;
+    SNGL Irid, Irid_Film_Thickness, Irid_Turb;
+    SNGL Temp_Caustics, Temp_IOR, Temp_Dispersion, Temp_Refract, Reflect_Exp;
+    SNGL Crand, Metallic;
+    MathColour Ambient, Emission, Reflection_Max, Reflection_Min;
+    MathColour SubsurfaceTranslucency, SubsurfaceAnisotropy;
+    //MathColour SigmaPrimeS, SigmaA;
+    SNGL Reflection_Falloff;  // Added by MBP 8/27/98
+    bool Reflection_Fresnel;
+    bool Fresnel;
+    SNGL Reflect_Metallic; // MBP
+    int Conserve_Energy;  // added by NK Dec 19 1999
+    bool UseSubsurface;   // whether to use subsurface light transport
+};
+
 
 /*****************************************************************************
 * Global variables

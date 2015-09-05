@@ -39,59 +39,13 @@
 #define CONFIGBACKEND_H
 
 #include "syspovconfigbackend.h"
+#include "base/configbase.h"
 
 /*
  * Platform name default.
  */
 #ifndef POVRAY_PLATFORM_NAME
     #define POVRAY_PLATFORM_NAME "Unknown Platform"
-#endif
-
-/*
- * These functions define macros which do checking for memory allocation,
- * and can also do other things.  Check existing code before you change them,
- * since they aren't simply replacements for malloc, realloc, and free.
- */
-#ifndef POV_MALLOC
-#define POV_MALLOC(size,msg)        pov_malloc ((size), __FILE__, __LINE__, (msg))
-#endif
-
-#ifndef POV_REALLOC
-    #define POV_REALLOC(ptr,size,msg)   pov_realloc ((ptr), (size), __FILE__, __LINE__, (msg))
-#endif
-
-#ifndef POV_FREE
-    #define POV_FREE(ptr)               do { pov_free (static_cast<void *>(ptr), __FILE__, __LINE__); (ptr) = NULL; } while(false)
-#endif
-
-#ifndef POV_MEM_INIT
-    #define POV_MEM_INIT()              mem_init()
-#endif
-
-#ifndef POV_MEM_RELEASE_ALL
-    #define POV_MEM_RELEASE_ALL()       mem_release_all()
-#endif
-
-#ifndef POV_STRDUP
-    #define POV_STRDUP(str)             pov_strdup(str)
-#endif
-
-// For those systems that don't have memmove, this can also be pov_memmove
-#ifndef POV_MEMMOVE
-    #define POV_MEMMOVE(dst,src,len)    pov_memmove((dst),(src),(len))
-#endif
-
-#ifndef POV_MEMCPY
-    #define POV_MEMCPY(dst,src,len)     memcpy((dst),(src),(len))
-#endif
-
-#ifndef POV_MEM_STATS
-    #define POV_MEM_STATS                       0
-    #define POV_GLOBAL_MEM_STATS(a,f,c,p,s,l)   (false)
-    #define POV_THREAD_MEM_STATS(a,f,c,p,s,l)   (false)
-    #define POV_MEM_STATS_RENDER_BEGIN()
-    #define POV_MEM_STATS_RENDER_END()
-    #define POV_MEM_STATS_COOKIE                void *
 #endif
 
 /*
@@ -179,14 +133,6 @@
     #define POV_SYS_THREAD_CLEANUP
 #endif
 
-#ifndef INLINE_NOISE
-    #define INLINE_NOISE
-#endif
-
-#ifndef USE_FASTER_NOISE
-    #define USE_FASTER_NOISE 0
-#endif
-
 #ifndef NEW_LINE_STRING
     // NEW_LINE_STRING remains undefined, optimizing the code for "\n" as used internally
 #endif
@@ -194,10 +140,6 @@
 // If compiler version is undefined, then make it 'u' for unknown
 #ifndef COMPILER_VER
     #define COMPILER_VER ".u"
-#endif
-
-#ifndef QSORT
-    #define QSORT(a,b,c,d) qsort((a),(b),(c),(d))
 #endif
 
 #ifndef POV_PARSE_PATH_STRING

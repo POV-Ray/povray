@@ -125,6 +125,18 @@ namespace pov
 
 #define MIN_ISECT_DEPTH 1.0e-4
 
+#ifndef INLINE_NOISE
+    #define INLINE_NOISE
+#endif
+
+#ifndef USE_FASTER_NOISE
+    #define USE_FASTER_NOISE 0
+#endif
+
+#ifndef QSORT
+    #define QSORT(a,b,c,d) qsort((a),(b),(c),(d))
+#endif
+
 }
 
 #endif // POVRAY_CORE_CONFIGCORE_H

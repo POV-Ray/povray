@@ -53,7 +53,6 @@
 #include <climits>
 #include <cmath>
 
-#include <stack>
 #include <vector>
 
 #include "base/configbase.h"
@@ -62,8 +61,6 @@
 
 #include "core/coretypes.h"
 #include "core/bounding/boundingbox.h"
-
-#include "pov_mem.h"
 
 #include "backend/configbackend.h"
 
@@ -188,36 +185,6 @@ inline void Destroy_Float(DBL *x)
 #define DEFAULT_FRACTAL_INTERIOR_TYPE 0
 #define DEFAULT_FRACTAL_EXTERIOR_FACTOR 1
 #define DEFAULT_FRACTAL_INTERIOR_FACTOR 1
-
-/// @}
-///
-//******************************************************************************
-///
-/// @name Pigment, Tnormal, Finish, Texture and Warps Stuff
-/// @{
-
-#if 0
-#pragma mark * Pigment, Normal, Finish, Texture, Warp
-#endif
-
-struct Finish_Struct
-{
-    SNGL Diffuse, DiffuseBack, Brilliance, BrillianceOut, BrillianceAdjust, BrillianceAdjustRad;
-    SNGL Specular, Roughness;
-    SNGL Phong, Phong_Size;
-    SNGL Irid, Irid_Film_Thickness, Irid_Turb;
-    SNGL Temp_Caustics, Temp_IOR, Temp_Dispersion, Temp_Refract, Reflect_Exp;
-    SNGL Crand, Metallic;
-    MathColour Ambient, Emission, Reflection_Max, Reflection_Min;
-    MathColour SubsurfaceTranslucency, SubsurfaceAnisotropy;
-    //MathColour SigmaPrimeS, SigmaA;
-    SNGL Reflection_Falloff;  // Added by MBP 8/27/98
-    bool Reflection_Fresnel;
-    bool Fresnel;
-    SNGL Reflect_Metallic; // MBP
-    int Conserve_Energy;  // added by NK Dec 19 1999
-    bool UseSubsurface;   // whether to use subsurface light transport
-};
 
 /// @}
 ///

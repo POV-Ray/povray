@@ -6222,7 +6222,7 @@ ObjectPtr Parser::Parse_TrueType ()
 
     /* Process all this good info */
     Object = new CSGUnion();
-    TrueType::ProcessNewTTF(reinterpret_cast<CSG *>(Object), font, text_string, depth, offset, this, dynamic_pointer_cast<SceneData>(sceneData));
+    TrueType::ProcessNewTTF(reinterpret_cast<CSG *>(Object), font, text_string, depth, offset, this);
     if (filename)
     {
         /* Free up the filename  */

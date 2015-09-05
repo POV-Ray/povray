@@ -38,6 +38,8 @@
 
 #include "core/configcore.h"
 
+#include "base/types.h"
+
 namespace pov
 {
 

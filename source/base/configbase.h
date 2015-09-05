@@ -386,6 +386,62 @@
 ///
 //******************************************************************************
 ///
+/// @name Memory Allocation
+///
+/// The following macros are used for memory allocation and related stuff. Check existing code
+/// before you change them, since they aren't simply replacements for malloc, realloc, and free.
+///
+/// @deprecated
+///     New code should instead use the C++ `new` and `delete` operators to allocate and release memory.
+///
+/// @{
+
+#ifndef POV_MALLOC
+    #define POV_MALLOC(size,msg)        pov_malloc ((size), __FILE__, __LINE__, (msg))
+#endif
+
+#ifndef POV_REALLOC
+    #define POV_REALLOC(ptr,size,msg)   pov_realloc ((ptr), (size), __FILE__, __LINE__, (msg))
+#endif
+
+#ifndef POV_FREE
+    #define POV_FREE(ptr)               do { pov_free (static_cast<void *>(ptr), __FILE__, __LINE__); (ptr) = NULL; } while(false)
+#endif
+
+#ifndef POV_MEM_INIT
+    #define POV_MEM_INIT()              mem_init()
+#endif
+
+#ifndef POV_MEM_RELEASE_ALL
+    #define POV_MEM_RELEASE_ALL()       mem_release_all()
+#endif
+
+#ifndef POV_STRDUP
+    #define POV_STRDUP(str)             pov_strdup(str)
+#endif
+
+// For those systems that don't have memmove, this can also be pov_memmove
+#ifndef POV_MEMMOVE
+    #define POV_MEMMOVE(dst,src,len)    pov_memmove((dst),(src),(len))
+#endif
+
+#ifndef POV_MEMCPY
+    #define POV_MEMCPY(dst,src,len)     memcpy((dst),(src),(len))
+#endif
+
+#ifndef POV_MEM_STATS
+    #define POV_MEM_STATS                       0
+    #define POV_GLOBAL_MEM_STATS(a,f,c,p,s,l)   (false)
+    #define POV_THREAD_MEM_STATS(a,f,c,p,s,l)   (false)
+    #define POV_MEM_STATS_RENDER_BEGIN()
+    #define POV_MEM_STATS_RENDER_END()
+    #define POV_MEM_STATS_COOKIE                void *
+#endif
+
+/// @}
+///
+//******************************************************************************
+///
 /// @name Miscellaneous
 ///
 /// @{
