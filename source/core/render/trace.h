@@ -38,8 +38,6 @@
 
 #include <vector>
 
-#include <boost/thread.hpp>
-
 #include "core/math/randomsequence.h"
 #include "core/render/ray.h"
 #include "core/support/bsptree.h"

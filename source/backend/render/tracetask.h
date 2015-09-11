@@ -38,8 +38,6 @@
 
 #include <vector>
 
-#include <boost/thread.hpp>
-
 #include "base/image/colourspace.h"
 
 #include "core/lighting/radiosity.h"

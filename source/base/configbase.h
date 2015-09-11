@@ -39,6 +39,7 @@
 #define CONFIGBASE_H
 
 #include <boost/version.hpp>
+
 #include "syspovconfigbase.h"
 
 //******************************************************************************
@@ -46,15 +47,21 @@
 /// @name Fundamental Data Types
 ///
 /// The following macros define essential data types. It is recommended that system-specific
-/// configurations always override the defaults.
+/// configurations always override the defaults; although POV-Ray will make a solid guess as to
+/// which type fits the requirements, the algorithm may fail on some exotic systems.
+///
+/// @compat
+///     The automatic type detection is almost certain fail on systems that employ padding bits
+///     and/or do not use two's complement format for negative values.
 ///
 /// @{
 
 /// @def POV_INT8
-/// The smallest signed integer data type at least 8 bits wide.
+/// The smallest integer data type that can handle values in the range from -2^7 to 2^7-1.
 ///
 /// @attention
-///     Some legacy portions of the code may rely on this type to be _exactly_ 8 bits wide.
+///     Some legacy portions of the code may rely on this type to be _exactly_ 8 bits wide,
+///     without padding, and use two's complement format for negative values.
 ///
 #ifndef POV_INT8
     #if defined INT8_MAX
@@ -70,10 +77,11 @@
 #endif
 
 /// @def POV_UINT8
-/// The smallest unsigned integer data type at least 8 bits wide.
+/// The smallest integer data type that can handle values in the range from 0 to 2^8-1.
 ///
 /// @attention
-///     Some legacy portions of the code may rely on this type to be _exactly_ 8 bits wide.
+///     Some legacy portions of the code may rely on this type to be _exactly_ 8 bits wide,
+///     and have no padding bits.
 ///
 #ifndef POV_UINT8
     #if defined UINT8_MAX
@@ -89,10 +97,11 @@
 #endif
 
 /// @def POV_INT16
-/// The smallest signed integer data type at least 16 bits wide.
+/// The smallest integer data type that can handle values in the range from -2^15 to 2^15-1.
 ///
 /// @attention
-///     Some legacy portions of the code may rely on this type to be _exactly_ 16 bits wide.
+///     Some legacy portions of the code may rely on this type to be _exactly_ 16 bits wide,
+///     have no padding bits, and use two's complement format for negative values.
 ///
 #ifndef POV_INT16
     #if defined INT16_MAX
@@ -108,10 +117,11 @@
 #endif
 
 /// @def POV_UINT16
-/// The smallest unsigned integer data type at least 16 bits wide.
+/// The smallest integer data type that can handle values in the range from 0 to 2^16-1.
 ///
 /// @attention
-///     Some legacy portions of the code may rely on this type to be _exactly_ 16 bits wide.
+///     Some legacy portions of the code may rely on this type to be _exactly_ 16 bits wide,
+///     and have no padding bits.
 ///
 #ifndef POV_UINT16
     #if defined UINT16_MAX
@@ -127,10 +137,11 @@
 #endif
 
 /// @def POV_INT32
-/// The smallest signed integer data type at least 32 bits wide.
+/// The smallest integer data type that can handle values in the range from -2^31 to 2^31-1.
 ///
 /// @attention
-///     Some legacy portions of the code may rely on this type to be _exactly_ 32 bits wide.
+///     Some legacy portions of the code may rely on this type to be _exactly_ 32 bits wide,
+///     have no padding bits, and use two's complement format for negative values.
 ///
 #ifndef POV_INT32
     #if defined INT32_MAX
@@ -146,10 +157,11 @@
 #endif
 
 /// @def POV_UINT32
-/// The smallest unsigned integer data type at least 32 bits wide.
+/// The smallest integer data type that can handle values in the range from 0 to 2^32-1.
 ///
 /// @attention
-///     Some legacy portions of the code may rely on this type to be _exactly_ 32 bits wide.
+///     Some legacy portions of the code may rely on this type to be _exactly_ 32 bits wide,
+///     and have no padding bits.
 ///
 #ifndef POV_UINT32
     #if defined UINT32_MAX
@@ -165,10 +177,11 @@
 #endif
 
 /// @def POV_INT64
-/// The smallest signed integer data type at least 64 bits wide.
+/// The smallest integer data type that can handle values in the range from -2^63 to 2^63-1.
 ///
 /// @attention
-///     Some legacy portions of the code may rely on this type to be _exactly_ 64 bits wide.
+///     Some legacy portions of the code may rely on this type to be _exactly_ 64 bits wide,
+///     have no padding bits, and use two's complement format for negative values.
 ///
 #ifndef POV_INT64
     #if defined INT64_MAX
@@ -184,10 +197,11 @@
 #endif
 
 /// @def POV_UINT64
-/// The smallest unsigned integer data type at least 64 bits wide.
+/// The smallest integer data type that can handle values in the range from 0 to 2^64-1.
 ///
 /// @attention
-///     Some legacy portions of the code may rely on this type to be _exactly_ 64 bits wide.
+///     Some legacy portions of the code may rely on this type to be _exactly_ 64 bits wide,
+///     and have no padding bits.
 ///
 #ifndef POV_UINT64
     #if defined UINT64_MAX
@@ -501,6 +515,15 @@
 
 #ifndef FORCEINLINE
     #define FORCEINLINE inline
+#endif
+
+/// @def SAFEMATH_DEBUG
+/// Enable run-time sanity checks for our safe integer mathematics mechanism (see @ref safemath.h).
+///
+/// Define as non-zero integer to enable, or zero to disable.
+///
+#ifndef SAFEMATH_DEBUG
+    #define SAFEMATH_DEBUG 0
 #endif
 
 /// @}

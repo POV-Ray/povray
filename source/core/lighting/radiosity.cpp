@@ -104,8 +104,8 @@ const DBL AVG_NEAR_EPSILON = 0.000001;
 const DBL RAD_EPSILON = 0.001;
 const DBL WEIGHT_ERROR_BOUND_OFFSET = 0.25;
 
-const int PRETRACE_STEP_FINAL  = 0;         // dummy value to use instead of pretrace step during final render
-const int PRETRACE_STEP_LOADED = SCHAR_MAX; // dummy value to use instead of pretrace step for samples loaded from file
+const int PRETRACE_STEP_FINAL  = 0;                                         // dummy value to use instead of pretrace step during final render
+const int PRETRACE_STEP_LOADED = std::numeric_limits<signed char>::max();   // dummy value to use instead of pretrace step for samples loaded from file
 
 #define BRILLIANCE_EPSILON 1e-5
 

@@ -73,46 +73,116 @@ namespace pov_base
 /// negatives, regardless of what data type and negative number format the compiler and runtime
 /// environment actually support.
 ///
+/// @impl
+/// @parblock
+///     Care must be taken when specifying negative integer constants. According to the C++ standard
+///     there is no such thing as a negative integer literal, only non-negative integer literals
+///     negated by applying the unary minus operator applied; this is ok as long as the value is
+///     given in decimal and the absolute value fits into a `long int` (which is guaranteed for
+///     values up to 2^31-1), in which case the standard mandates that the literal is automatically
+///     considered signed, and signed types must be able to hold negative values as least as small
+///     as the negative of the largest positive value they can represent. However, if the absolute
+///     value exceeds the capacity of a `long int` the behaviour is undefined, so the literal may
+///     be interpreted as an unsigned value. In that case applying the unary minus operator will
+///     still yield a positive result.
+///
+///     We work around this issue by first explicitly casting such literals to a fitting `POV_INTn`
+///     type before applying the unary minus operator. Properly configured, those types also
+///     guarantee that the expression (-POV_INTn(x)-1) does not overflow for positive x (as long as
+///     x fits in the type), which is not generally guaranteed for signed integer types.
+///
+///     Note that as a consequence, such constants can not be utilized in preprocessor statements.
+/// @endparblock
+///
 /// @{
 
 /// Maximum unsigned 8-bit integer value.
-#define UNSIGNED8_MAX   (0xFFu)
+/// @remark This value's type is unsigned.
+#define UNSIGNED8_MAX   (255u)
 
 /// Maximum unsigned 16-bit integer value.
-#define UNSIGNED16_MAX  (0xFFFFu)
+/// @remark This value's type is unsigned.
+#define UNSIGNED16_MAX  (65535u)
 
 /// Maximum unsigned 32-bit integer value.
-#define UNSIGNED32_MAX  (0xFFFFFFFFul)
+/// @remark This value's type is unsigned.
+#define UNSIGNED32_MAX  (4294967295u)
 
 /// Maximum unsigned 64-bit integer value.
-#define UNSIGNED64_MAX  (0xFFFFFFFFFFFFFFFFull)
+/// @remark This value's type is unsigned.
+#define UNSIGNED64_MAX  (18446744073709551615u)
 
 /// Maximum signed 8-bit integer value.
-#define SIGNED8_MAX     (0x7F)
+/// @remark
+///     As the C++ standard guarantees this value to fit into a `long int`, its type is signed despite the value
+///     being positive.
+#define SIGNED8_MAX     (127)
 
 /// Maximum signed 16-bit integer value.
-#define SIGNED16_MAX    (0x7FFF)
+/// @remark
+///     As the C++ standard guarantees this value to fit into a `long int`, its type is signed despite the value
+///     being positive.
+#define SIGNED16_MAX    (32767)
 
 /// Maximum signed 32-bit integer value.
-#define SIGNED32_MAX    (0x7FFFFFFFl)
+/// @remark
+///     As the C++ standard guarantees this value to fit into a `long int`, its type is signed despite the value
+///     being positive.
+#define SIGNED32_MAX    (2147483647)
 
 /// Maximum signed 64-bit integer value.
-#define SIGNED64_MAX    (0x7FFFFFFFFFFFFFFFll)
+/// @note
+///     This constant cannot be used in preprocessor statements.
+/// @remark
+///     This value's type is signed despite the value being positive.
+#define SIGNED64_MAX    ((POV_INT64)(9223372036854775807))
 
-/// Minimum signed 8-bit two's complement integer value.
-#define SIGNED8_MIN     (-0x80)
+/// Minimum two's complement signed 8-bit integer value.
+#define SIGNED8_MIN     (-128)
 
-/// Minimum signed 16-bit two's complement integer value.
-/// Note that this is a long int, to accomodate for systems where int is only 16 bits wide and
-/// negative values don't use two's complement format, which would make them unable to represent
-/// this value in a regular int.
-#define SIGNED16_MIN    (-0x8000l)
+/// Minimum two's complement signed 16-bit integer value.
+#define SIGNED16_MIN    (-32768)
 
-/// Maximum signed 32-bit two's complement integer value.
-/// Note that this is a long long, to accomodate for systems where long is only 32 bits wide and
-/// negative values don't use two's complement format, which would make them unable to represent
-/// this value in a long int.
-#define SIGNED32_MIN    (-0x80000000ll)
+/// Minimum two's complement signed 32-bit integer value.
+/// @note
+///     This constant cannot be used in preprocessor statements.
+#define SIGNED32_MIN    ((-(POV_INT32)(SIGNED32_MAX))-1)
+
+// (there's no SIGNED64_MIN because some systems may be entirely unable to represent that value.
+
+/// Modulus for unsigned 8-bit integer operations.
+/// @remark This value's type is unsigned.
+#define UNSIGNED8_MOD   (256u)
+
+/// Modulus for unsigned 16-bit integer operations.
+/// @remark This value's type is unsigned.
+#define UNSIGNED16_MOD  (65536u)
+
+/// Modulus for unsigned 32-bit integer operations.
+/// @remark This value's type is unsigned.
+#define UNSIGNED32_MOD  (4294967296u)
+
+// (there's no UNSIGNED64_MOD because some systems may be entirely unable to represent that value.
+
+/// (unsigned) 8-bit integer with only the bit set that indicates a negative value in signed
+/// interpretation.
+/// @remark This value's type is unsigned.
+#define INTEGER8_SIGN_MASK  (0x80u)
+
+/// (unsigned) 16-bit integer with only the bit set that indicates a negative value in signed
+/// interpretation.
+/// @remark This value's type is unsigned.
+#define INTEGER16_SIGN_MASK (0x8000u)
+
+/// (unsigned) 32-bit integer with only the bit set that indicates a negative value in signed
+/// interpretation.
+/// @remark This value's type is unsigned.
+#define INTEGER32_SIGN_MASK (0x80000000u)
+
+/// (unsigned) 64-bit integer with only the bit set that indicates a negative value in signed
+/// interpretation.
+/// @remark This value's type is unsigned.
+#define INTEGER64_SIGN_MASK (0x8000000000000000u)
 
 /// @}
 ///

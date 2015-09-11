@@ -36,8 +36,6 @@
 ///
 //******************************************************************************
 
-#include <climits>
-
 // configparser.h must always be the first POV file included in the parser (pulls in platform config)
 #include "parser/configparser.h"
 #include "parser/parser.h"

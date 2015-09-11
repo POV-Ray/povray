@@ -41,6 +41,9 @@
 
 #include <queue>
 
+#include <boost/thread.hpp>
+#include <boost/thread/condition.hpp>
+
 #include "base/image/colourspace.h"
 
 namespace vfe

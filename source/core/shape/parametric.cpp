@@ -33,7 +33,6 @@
 ///
 //******************************************************************************
 
-#include <climits>
 #include <algorithm>
 
 // configcore.h must always be the first POV file included in core *.cpp files (pulls in platform config)

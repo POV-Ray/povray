@@ -63,12 +63,31 @@
 #define TEST_TWOS_COMPLEMENT(st,ut) \
     POV_WARN_MESSAGE ( (ut)((st)(-1)) == std::numeric_limits<ut>::max(), #st << " does not use 2's complement representation for negative values." )
 
+#define TEST_UNSIGNED(t) \
+    POV_WARN_MESSAGE ( !std::numeric_limits<t>::is_signed, #t << " is a signed type." );
+
+#define TEST_SIGNED(t) \
+    POV_WARN_MESSAGE ( std::numeric_limits<t>::is_signed, #t << " is an unsigned type." );
+
+#define TEST_RANGE(t,mx) SINGLE_STATEMENT( \
+    if (std::numeric_limits<t>::is_signed) \
+    POV_CHECK_MESSAGE ( std::numeric_limits<t>::min() + (mx) <= (-1), #t << " does not support values as small as -" << mx << "-1" ); \
+    else \
+    POV_CHECK_MESSAGE ( std::numeric_limits<t>::min() <= (0),         #t << " does not support values as small as zero (WTF?!)." ); \
+    POV_CHECK_MESSAGE ( std::numeric_limits<t>::max() >= (mx),        #t << " does not support values as large as " << mx << "." ); \
+    if (std::numeric_limits<t>::is_signed) \
+    POV_WARN_MESSAGE  ( std::numeric_limits<t>::min() + (mx) >= (-1), #t << " supports values smaller than -" << mx << "-1" ); \
+    else \
+    POV_WARN_MESSAGE  ( std::numeric_limits<t>::min() >= (0),         #t << " supports values smaller than zero (WTF?!)." ); \
+    POV_WARN_MESSAGE  ( std::numeric_limits<t>::max() <= (mx),        #t << " supports values larger than " << mx << "." ); \
+    )
+
 BOOST_AUTO_TEST_SUITE( Sanity )
 
     BOOST_AUTO_TEST_CASE( TypeSizes )
     {
-        TEST_TYPE_SIZE( POV_INT8,   8 );
-        TEST_TYPE_SIZE( POV_UINT8,  8 );
+        TEST_TYPE_SIZE( POV_INT8,    8 );
+        TEST_TYPE_SIZE( POV_UINT8,   8 );
         TEST_TYPE_SIZE( POV_INT16,  16 );
         TEST_TYPE_SIZE( POV_UINT16, 16 );
         TEST_TYPE_SIZE( POV_INT32,  32 );
@@ -76,14 +95,19 @@ BOOST_AUTO_TEST_SUITE( Sanity )
         TEST_TYPE_SIZE( POV_INT64,  64 );
         TEST_TYPE_SIZE( POV_UINT64, 64 );
 
-
         TEST_TWOS_COMPLEMENT( POV_INT8,  POV_UINT8 );
         TEST_TWOS_COMPLEMENT( POV_INT16, POV_UINT16 );
         TEST_TWOS_COMPLEMENT( POV_INT32, POV_UINT32 );
         TEST_TWOS_COMPLEMENT( POV_INT64, POV_UINT64 );
+
+        TEST_RANGE( POV_INT8,                 0x7F );
+        TEST_RANGE( POV_UINT8,                0xFF );
+        TEST_RANGE( POV_INT16,              0x7FFF );
+        TEST_RANGE( POV_UINT16,             0xFFFF );
+        TEST_RANGE( POV_INT32,          0x7FFFFFFF );
+        TEST_RANGE( POV_UINT32,         0xFFFFFFFF );
+        TEST_RANGE( POV_INT64,  0x7FFFFFFFFFFFFFFF );
+        TEST_RANGE( POV_UINT64, 0xFFFFFFFFFFFFFFFF );
     }
 
 BOOST_AUTO_TEST_SUITE_END()
-
-// That's all, folks!
-// All actual test cases reside in the other files.

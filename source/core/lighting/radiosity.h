@@ -38,6 +38,8 @@
 
 #include <vector>
 
+#include <boost/thread.hpp>
+
 #include "core/lighting/photons.h" // TODO FIXME - make PhotonGatherer class visible only as a pointer
 #include "core/material/media.h"   // TODO FIXME - make MediaFunction class visible only as a pointer
 #include "core/render/trace.h"     // TODO FIXME - make Trace class visible only as a pointer

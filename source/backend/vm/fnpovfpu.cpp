@@ -228,7 +228,6 @@ Density of instruction set: 916 / 1024 = 0.8945
 
 */
 
-#include <climits>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>

@@ -38,8 +38,6 @@
 
 #include <vector>
 
-#include <boost/thread.hpp>
-
 #include "core/render/trace.h"
 #include "core/scene/camera.h"
 #include "core/scene/scenedata.h"

@@ -53,8 +53,6 @@
 #include "base/image/image.h"
 #include "base/image/gif.h"
 
-#include <boost/thread.hpp>
-
 // this must be the last file included
 #include "base/povdebug.h"
 

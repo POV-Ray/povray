@@ -43,6 +43,8 @@
 #ifndef POVRAY_CORE_OCTREE_H
 #define POVRAY_CORE_OCTREE_H
 
+#include <climits>
+
 #include "core/coretypes.h"
 #include "core/math/vector.h"
 

@@ -110,14 +110,13 @@ const int KERN_OVERRIDE      = 0x08;
 ******************************************************************************/
 
 /* Type definitions to match the TTF spec, makes code clearer */
-typedef char CHAR;
-typedef unsigned char BYTE;
-typedef short SHORT;
-typedef unsigned short USHORT;
-typedef int LONG;
-typedef unsigned int ULONG;
-typedef short FWord;
-typedef unsigned short uFWord;
+typedef POV_UINT8   BYTE;
+typedef POV_INT16   SHORT;
+typedef POV_UINT16  USHORT;
+typedef POV_INT32   LONG;
+typedef POV_UINT32  ULONG;
+typedef POV_INT16   FWord;
+typedef POV_UINT16  uFWord;
 
 #if !defined(TARGET_OS_MAC)
 typedef int Fixed;
@@ -371,26 +370,27 @@ GlyphPtr ExtractGlyphInfo(TrueTypeFont *ffile, unsigned int glyph_index, unsigne
 GlyphOutline *ExtractGlyphOutline(TrueTypeFont *ffile, unsigned int glyph_index, unsigned int c);
 GlyphPtr ConvertOutlineToGlyph(TrueTypeFont *ffile, const GlyphOutline *ttglyph);
 
-/*
- * The following work as macros if sizeof(short) == 16 bits and
- * sizeof(long) == 32 bits, but tend to break otherwise.  Making these
- * into error functions also allows file error checking.  Do not attempt to
- * "optimize" these functions - some architectures require them the way
- * that they are written.
- */
 SHORT readSHORT(IStream *infile, int line, const char *file)
 {
-    int i0, i1 = 0; /* To quiet warnings */
+    /// @impl
+    /// @parblock
 
-    if ((i0 = infile->Read_Byte ()) == EOF || (i1  = infile->Read_Byte ()) == EOF)
-    {
-        throw POV_EXCEPTION(kFileDataErr, "Cannot read TrueType font file.");
-    }
+    /// On platforms using non-2's-complement representation for negative numbers, any approach
+    /// starting with a signed interpretation of the data is doomed to fail over those
+    /// representations' property of having two representations for zero, and none for -2^(N-1).
+    /// We therefore must start off with an unsigned representation of the data.
+    USHORT u = readUSHORT(infile, line, file);
 
-    if (i0 & 0x80) /* Subtract 1 after value is negated to avoid overflow [AED] */
-        return -(((255 - i0) << 8) | (255 - i1)) - 1;
+    /// We go on by testing for a set signed bit, which in 2's complement format indicates that
+    /// the actual value we're looking for is the unsigned interpretation minus 2^N.
+    if (u | INTEGER16_SIGN_MASK)
+        /// To compute that value, we first discard the sign bit (which is equivalent to subtracting
+        /// 2^(N-1)), then add -2^(N-1). Finally we cram the result into the target type.
+        return (SHORT(u ^ INTEGER16_SIGN_MASK)) + SIGNED16_MIN;
     else
-        return (i0 << 8) | i1;
+        return SHORT(u);
+
+    /// @endparblock
 }
 
 USHORT readUSHORT(IStream *infile, int line, const char *file)
@@ -399,7 +399,7 @@ USHORT readUSHORT(IStream *infile, int line, const char *file)
 
     if ((i0  = infile->Read_Byte ()) == EOF || (i1  = infile->Read_Byte ()) == EOF)
     {
-        throw POV_EXCEPTION(kFileDataErr, "Cannot read TrueType font file.");
+        throw pov_base::Exception(__FUNCTION__, file, line, kFileDataErr, "Cannot read TrueType font file.");
     }
 
     return (USHORT)((((USHORT)i0) << 8) | ((USHORT)i1));
@@ -407,19 +407,25 @@ USHORT readUSHORT(IStream *infile, int line, const char *file)
 
 LONG readLONG(IStream *infile, int line, const char *file)
 {
-    LONG i0, i1 = 0, i2 = 0, i3 = 0; /* To quiet warnings */
+    /// @impl
+    /// @parblock
 
-    if ((i0 = infile->Read_Byte ()) == EOF || (i1 = infile->Read_Byte ()) == EOF ||
-        (i2 = infile->Read_Byte ()) == EOF || (i3 = infile->Read_Byte ()) == EOF)
-    {
-        throw POV_EXCEPTION(kFileDataErr, "Cannot read TrueType font file.");
-    }
+    /// On platforms using non-2's-complement representation for negative numbers, any approach
+    /// starting with a signed interpretation of the data is doomed to fail over those
+    /// representations' property of having two representations for zero, and none for -2^(N-1).
+    /// We therefore must start off with an unsigned representation of the data.
+    ULONG u = readULONG(infile, line, file);
 
-    if (i0 & 0x80) /* Subtract 1 after value is negated to avoid overflow [AED] */
-        return -(((255 - i0) << 24) | ((255 - i1) << 16) |
-                 ((255 - i2) << 8)  |  (255 - i3)) - 1;
+    /// We go on by testing for a set signed bit, which in 2's complement format indicates that
+    /// the actual value we're looking for is the unsigned interpretation minus 2^N.
+    if (u | INTEGER32_SIGN_MASK)
+        /// To compute that value, we first discard the sign bit (which is equivalent to subtracting
+        /// 2^(N-1)), then add -2^(N-1). Finally we cram the result into the target type.
+        return (LONG(u ^ INTEGER32_SIGN_MASK)) + SIGNED32_MIN;
     else
-        return (i0 << 24) | (i1 << 16) | (i2 << 8) | i3;
+        return LONG(u);
+
+    /// @endparblock
 }
 
 ULONG readULONG(IStream *infile, int line, const char *file)
@@ -429,7 +435,7 @@ ULONG readULONG(IStream *infile, int line, const char *file)
     if ((i0 = infile->Read_Byte ()) == EOF || (i1 = infile->Read_Byte ()) == EOF ||
         (i2 = infile->Read_Byte ()) == EOF || (i3 = infile->Read_Byte ()) == EOF)
     {
-        throw POV_EXCEPTION(kFileDataErr, "Cannot read TrueType font file.");
+        throw pov_base::Exception(__FUNCTION__, file, line, kFileDataErr, "Cannot read TrueType font file.");
     }
 
     return (ULONG) ((((ULONG) i0) << 24) | (((ULONG) i1) << 16) |
@@ -783,6 +789,8 @@ void ProcessFontFile(TrueTypeFont* ffile)
      * Read the initial directory header on the TTF.  The numTables variable
      * tells us how many tables are present in this file.
      */
+    /// @compat
+    /// This piece of code relies on BYTE having the same size as char.
     if (!ffile->fp->read(reinterpret_cast<char *>(&temp_tag), sizeof(BYTE) * 4))
     {
         throw POV_EXCEPTION(kFileDataErr, "Cannot read TrueType font file table tag");
@@ -830,6 +838,8 @@ void ProcessFontFile(TrueTypeFont* ffile)
 
     for (i = 0; i < OffsetTable.numTables && i < 40; i++)
     {
+        /// @compat
+        /// This piece of code relies on BYTE having the same size as char.
         if (!ffile->fp->read(reinterpret_cast<char *>(&Table.tag), sizeof(BYTE) * 4))
         {
             throw POV_EXCEPTION(kFileDataErr, "Cannot read TrueType font file table tag");
@@ -1453,6 +1463,8 @@ USHORT ProcessFormat0Glyph(TrueTypeFont *ffile, unsigned int search_char)
 
     ffile->fp->seekg ((int)search_char, POV_SEEK_CUR);
 
+    /// @compat
+    /// This piece of code relies on BYTE having the same size as char.
     if (!ffile->fp->read (reinterpret_cast<char *>(&temp_index), 1)) /* Each index is 1 byte */
     {
         throw POV_EXCEPTION(kFileDataErr, "Cannot read TrueType font file.");
@@ -1862,6 +1874,8 @@ GlyphOutline *ExtractGlyphOutline(TrueTypeFont *ffile, unsigned int glyph_index,
 
         for (i = 0; i < ttglyph->numPoints; i++)
         {
+            /// @compat
+            /// This piece of code relies on BYTE having the same size as char.
             if (!ffile->fp->read(reinterpret_cast<char *>(&ttglyph->flags[i]), sizeof(BYTE)))
             {
                 throw POV_EXCEPTION(kFileDataErr, "Cannot read TrueType font file.");
@@ -1869,6 +1883,8 @@ GlyphOutline *ExtractGlyphOutline(TrueTypeFont *ffile, unsigned int glyph_index,
 
             if (ttglyph->flags[i] & REPEAT_FLAGS)
             {
+                /// @compat
+                /// This piece of code relies on BYTE having the same size as char.
                 if (!ffile->fp->read(reinterpret_cast<char *>(&repeat_count), sizeof(BYTE)))
                 {
                     throw POV_EXCEPTION(kFileDataErr, "Cannot read TrueType font file.");
@@ -1909,6 +1925,8 @@ GlyphOutline *ExtractGlyphOutline(TrueTypeFont *ffile, unsigned int glyph_index,
             {
                 BYTE temp8;
 
+                /// @compat
+                /// This piece of code relies on BYTE having the same size as char.
                 if (!ffile->fp->read(reinterpret_cast<char *>(&temp8), 1))
                 {
                     throw POV_EXCEPTION(kFileDataErr, "Cannot read TrueType font file.");
@@ -1945,6 +1963,8 @@ GlyphOutline *ExtractGlyphOutline(TrueTypeFont *ffile, unsigned int glyph_index,
             {
                 BYTE temp8;
 
+                /// @compat
+                /// This piece of code relies on BYTE having the same size as char.
                 if (!ffile->fp->read(reinterpret_cast<char *>(&temp8), 1))
                 {
                     throw POV_EXCEPTION(kFileDataErr, "Cannot read TrueType font file.");

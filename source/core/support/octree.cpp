@@ -106,7 +106,7 @@ namespace pov
 // compiler / target platform sanity checks
 // (note that these don't necessarily catch all possible quirks; they should be quite reliable though)
 #if(C99_COMPATIBLE_RADIOSITY == 0)
-    #if( (INT_MAX != SIGNED32_MAX) || (INT_MIN != SIGNED32_MIN) )
+    #if( (INT_MAX != SIGNED32_MAX) || (INT_MIN + SIGNED32_MAX != -1) )
         #error 'int' is not 32 bit or does not use two's complement encoding; try a different C99_COMPATIBLE_RADIOSITY setting in config.h
     #endif
     #if(FLT_RADIX != 2)

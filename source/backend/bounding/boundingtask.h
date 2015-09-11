@@ -38,8 +38,6 @@
 
 #include <vector>
 
-#include <boost/thread.hpp>
-
 #include "backend/frame.h"
 #include "backend/render/rendertask.h"
 

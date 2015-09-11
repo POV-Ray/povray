@@ -7,7 +7,9 @@ While POV-Ray is being developed with portability high in mind, the C++ standard
 we consider too exotic to cater to. We therefore presume all compilers and runtime environments to adhere to the
 following additional restrictions:
 
-  - **Char Size**: The `char` data type is presumed to be exactly 8 bits wide.
+  - **Char Size**: The `char` data type is currently presumed to be exactly 8 bits wide.
+
+  - **Pointer Size**: All pointers are presumed to be of the same width.
 
   - **Character Encoding**: The compiler is presumed to accept ASCII-encoded source files; the _source character set_,
     as well as the _basic execution character set_ and its encoding, are presumed to be ASCII-compatible.

@@ -47,6 +47,7 @@
 #include "parser/configparser.h"
 #include "parser/parser.h"
 
+#include "base/version.h"
 #include "base/stringutilities.h"
 
 #include "core/material/blendmap.h"
@@ -3939,7 +3940,7 @@ int Parser::Parse_For_Param (char** IdentifierPtr, DBL* EndPtr, DBL* StepPtr)
         CASE4 (PIGMENT_MAP_ID_TOKEN, MEDIA_ID_TOKEN, STRING_ID_TOKEN, INTERIOR_ID_TOKEN)
         CASE4 (DENSITY_MAP_ID_TOKEN, ARRAY_ID_TOKEN, DENSITY_ID_TOKEN, UV_ID_TOKEN)
         CASE4 (VECTOR_4D_ID_TOKEN, RAINBOW_ID_TOKEN, FOG_ID_TOKEN, SKYSPHERE_ID_TOKEN)
-        CASE2 (MATERIAL_ID_TOKEN, SPLINE_ID_TOKEN )
+        CASE2 (MATERIAL_ID_TOKEN, SPLINE_ID_TOKEN)
             if (Token.is_array_elem)
                 Error("#for loop variable must not be an array element");
             if (Token.Table_Index != Table_Index)

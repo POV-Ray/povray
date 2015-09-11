@@ -38,7 +38,6 @@
 
 #include <vector>
 
-#include <boost/thread.hpp>
 #include <boost/scoped_array.hpp>
 
 // configcore.h must always be the first POV file included in core *.cpp files (pulls in platform config)

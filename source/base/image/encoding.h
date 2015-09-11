@@ -37,8 +37,6 @@
 #ifndef POVRAY_BASE_IMAGE_ENCODING_H
 #define POVRAY_BASE_IMAGE_ENCODING_H
 
-#include <boost/thread.hpp>
-
 #include "base/configbase.h"
 #include "base/types.h"
 #include "base/image/colourspace.h"

@@ -44,8 +44,6 @@
 
 #include "base/stringutilities.h"
 
-#include "backend/povray.h"
-
 namespace pov
 {
 

@@ -41,8 +41,6 @@
 #include <cassert>
 
 #include <boost/format.hpp>
-#include <boost/thread.hpp>
-#include <boost/thread/condition.hpp>
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
 
