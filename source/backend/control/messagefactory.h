@@ -31,7 +31,7 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
 #ifndef POVRAY_BACKEND_MESSAGEFACTORY_H
 #define POVRAY_BACKEND_MESSAGEFACTORY_H
@@ -57,11 +57,15 @@ enum WarningLevel
     kWarningLanguage = 6
 };
 
-class MessageFactory
+class MessageFactory : public CoreMessenger
 {
     public:
 
         MessageFactory(unsigned int wl, const char *sn, POVMSAddress saddr, POVMSAddress daddr, RenderBackend::SceneId sid, RenderBackend::ViewId vid);
+        virtual ~MessageFactory();
+
+        virtual void CoreMessage(CoreMessageClass mc, const char *format,...);
+        virtual void CoreMessageAt(CoreMessageClass mc, const UCS2 *filename, POV_LONG line, POV_LONG column, POV_LONG offset, const char *format, ...);
 
         void Warning(WarningLevel level, const char *format,...);
         void WarningAt(WarningLevel level, const UCS2 *filename, POV_LONG line, POV_LONG column, POV_LONG offset, const char *format, ...);

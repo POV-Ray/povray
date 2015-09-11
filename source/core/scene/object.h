@@ -151,8 +151,6 @@ namespace pov
 * Classes
 ******************************************************************************/
 
-class MessageFactory;
-
 /// Abstract base class for all geometric objects.
 class ObjectBase
 {
@@ -247,7 +245,7 @@ class ObjectBase
         /// at object destruction - e.g. IsoSurface max_gradient warnings. (object destruction isn't
         /// the place to do that anymore since a scene may persist between views).
         ///
-        virtual void DispatchShutdownMessages(MessageFactory& messageFactory) {};
+        virtual void DispatchShutdownMessages(CoreMessenger& messenger) {};
 
     protected:
         explicit ObjectBase(const ObjectBase&) { }
