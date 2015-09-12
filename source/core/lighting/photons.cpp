@@ -33,11 +33,10 @@
 ///
 //******************************************************************************
 
-#include <algorithm>
-
-// configcore.h must always be the first POV file included in core *.cpp files (pulls in platform config)
-#include "core/configcore.h"
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/lighting/photons.h"
+
+#include <algorithm>
 
 #include "core/bounding/boundingbox.h"
 #include "core/lighting/lightgroup.h"
@@ -1281,10 +1280,10 @@ SinCosOptimizations::~SinCosOptimizations()
 
 Photon* PhotonMap::AllocatePhoton()
 {
-    // mutex would be needed if we were allocating photons into the same map
+    // a mutex would be needed if we were allocating photons into the same map
     // from different threads...
     // but we have a different map for each thread, so there's no danger there...
-    //mutex::scoped_lock lock(allocatePhotonMutex);
+
     int i,j,k;
 
     // array mapping funciton

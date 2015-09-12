@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -32,6 +32,20 @@
 /// @endparblock
 ///
 //******************************************************************************
+
+/// @file
+/// @note
+/// @parblock
+///     This header file is _not_ explicitly included in any source file (except @ref precomp.cpp
+///     which is designed to allow for precompiling this header in the first place). To use
+///     precompiled headers, you will therefore have to make your build environment automatically
+///     inject this header at the start of every source file.
+///
+///     The rationale behind this is to keep the set of headers included in each source file at an
+///     absolute minimum when precompiled headers are _not_ used.
+/// @endparblock
+
+#include "base/configbase.h"
 
 #include <cassert>
 #include <cctype>
@@ -59,8 +73,10 @@
 #include <boost/functional/hash/hash.hpp>
 #include <boost/scoped_array.hpp>
 #include <boost/scoped_ptr.hpp>
+#if POV_MULTITHREADED
 #include <boost/thread.hpp>
 #include <boost/thread/condition.hpp>
+#endif
 #include <boost/tr1/memory.hpp>
 #include <boost/unordered_map.hpp>
 

@@ -37,6 +37,9 @@
 #ifndef POVRAY_CORE_PHOTONS_H
 #define POVRAY_CORE_PHOTONS_H
 
+// Module config header file must be the first file included within POV-Ray unit header files
+#include "core/configcore.h"
+
 #include "core/material/media.h"
 #include "core/render/trace.h"
 
@@ -204,7 +207,6 @@ class PhotonMap
         void setGatherOptions(ScenePhotonSettings& photonSettings, int mediaMap);
 
         Photon* AllocatePhoton();
-        //mutex allocatePhotonMutex;
 
         void mergeMap(PhotonMap* map);
 };

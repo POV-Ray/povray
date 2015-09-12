@@ -36,6 +36,9 @@
 #ifndef POVRAY_CORE_RANDOMSEQUENCES_H
 #define POVRAY_CORE_RANDOMSEQUENCES_H
 
+// Module config header file must be the first file included within POV-Ray unit header files
+#include "core/configcore.h"
+
 #include <cctype>
 #include <vector>
 

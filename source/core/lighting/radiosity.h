@@ -36,9 +36,14 @@
 #ifndef POVRAY_CORE_RADIOSITY_H
 #define POVRAY_CORE_RADIOSITY_H
 
+// Module config header file must be the first file included within POV-Ray unit header files
+#include "core/configcore.h"
+
 #include <vector>
 
+#if POV_MULTITHREADED
 #include <boost/thread.hpp>
+#endif
 
 #include "core/lighting/photons.h" // TODO FIXME - make PhotonGatherer class visible only as a pointer
 #include "core/material/media.h"   // TODO FIXME - make MediaFunction class visible only as a pointer
@@ -211,19 +216,25 @@ class RadiosityCache
         struct Octree
         {
             ot_node_struct *root;
+#if POV_MULTITHREADED
             boost::mutex treeMutex;   // lock this when adding nodes to the tree
             boost::mutex blockMutex;  // lock this when adding blocks to any node of the tree
+#endif
 
             Octree() : root(NULL) {}
         };
 
         vector<BlockPool*> blockPools;  // block pools ready to be re-used
+#if POV_MULTITHREADED
         boost::mutex blockPoolsMutex;   // lock this when accessing blockPools
+#endif
 
         Octree octree;
 
         OStream *ot_fd;
+#if POV_MULTITHREADED
         boost::mutex fileMutex;         // lock this when accessing ot_fd
+#endif
 
         RadiosityRecursionSettings* recursionSettings; // dynamically allocated array; use recursion depth as index
 

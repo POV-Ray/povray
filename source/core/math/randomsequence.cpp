@@ -33,6 +33,9 @@
 ///
 //******************************************************************************
 
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
+#include "core/math/randomsequence.h"
+
 #include <cassert>
 #include <stdexcept>
 #include <map>
@@ -41,11 +44,9 @@
 #include <boost/random/uniform_int.hpp>
 #include <boost/random/uniform_real.hpp>
 #include <boost/random/variate_generator.hpp>
+#if POV_MULTITHREADED
 #include <boost/thread.hpp>
-
-// configcore.h must always be the first POV file included in core *.cpp files (pulls in platform config)
-#include "core/configcore.h"
-#include "core/math/randomsequence.h"
+#endif
 
 #include "core/coretypes.h"
 
@@ -447,7 +448,9 @@ class NumberSequenceFactory
 
         GeneratorPtr        master;
         SequenceConstPtr    masterSequence;
+#if POV_MULTITHREADED
         boost::mutex        masterMutex;
+#endif
 };
 
 typedef NumberSequenceFactory<int>      IntSequenceFactory;
@@ -473,7 +476,9 @@ class NumberSequenceMetaFactory
         typedef std::map<typename GeneratorType::ParameterStruct, FactoryWeakPtr> FactoryTable;
 
         static  FactoryTable*   lookupTable;
+#if POV_MULTITHREADED
         static  boost::mutex    lookupMutex;
+#endif
 };
 
 typedef NumberSequenceMetaFactory<int,      Mt19937IntGenerator>                    Mt19937IntMetaFactory;
@@ -706,7 +711,9 @@ NumberSequenceFactory<Type>::NumberSequenceFactory(shared_ptr<SequentialNumberGe
 template<class Type>
 shared_ptr<vector<Type> const> NumberSequenceFactory<Type>::operator()(size_t count)
 {
+#if POV_MULTITHREADED
     boost::mutex::scoped_lock lock(masterMutex);
+#endif
     if (!masterSequence)
     {
         // No values pre-computed yet; do it now.
@@ -746,13 +753,17 @@ shared_ptr<vector<Type> const> NumberSequenceFactory<Type>::operator()(size_t co
 template<class ValueType, class GeneratorType>
 std::map<typename GeneratorType::ParameterStruct, weak_ptr<NumberSequenceFactory<ValueType> > >* NumberSequenceMetaFactory<ValueType, GeneratorType>::lookupTable;
 
+#if POV_MULTITHREADED
 template<class ValueType, class GeneratorType>
 boost::mutex NumberSequenceMetaFactory<ValueType, GeneratorType>::lookupMutex;
+#endif
 
 template<class ValueType, class GeneratorType>
 shared_ptr<NumberSequenceFactory<ValueType> > NumberSequenceMetaFactory<ValueType, GeneratorType>::GetFactory(const typename GeneratorType::ParameterStruct& param)
 {
+#if POV_MULTITHREADED
     boost::mutex::scoped_lock lock(lookupMutex);
+#endif
     if (!lookupTable)
         lookupTable = new FactoryTable();
     FactoryPtr factory = (*lookupTable)[param].lock();

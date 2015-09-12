@@ -36,11 +36,15 @@
 #ifndef POVRAY_BASE_COLOURSPACE_H
 #define POVRAY_BASE_COLOURSPACE_H
 
+// Module config header file must be the first file included within POV-Ray unit header files
+#include "base/configbase.h"
+
 #include <vector>
 
+#if POV_MULTITHREADED
 #include <boost/thread.hpp>
+#endif
 
-#include "base/configbase.h"
 #include "base/types.h"
 #include "base/colour.h"
 
@@ -295,8 +299,10 @@ class GammaCurve
         ///
         float* lookupTable16;
 
+#if POV_MULTITHREADED
         /// Mutex to guard access to @ref lookupTable8 and @ref lookupTable16.
         boost::mutex lutMutex;
+#endif
 
         /// Constructor.
         GammaCurve() : lookupTable8(NULL), lookupTable16(NULL) {}
@@ -328,8 +334,10 @@ class GammaCurve
         ///
         static list<weak_ptr<GammaCurve> > cache;
 
+#if POV_MULTITHREADED
         /// Mutex to guard access to `cache`.
         static boost::mutex cacheMutex;
+#endif
 
         /// Function to manage the gamma curve cache.
         ///

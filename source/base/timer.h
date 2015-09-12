@@ -36,6 +36,7 @@
 #ifndef POVRAY_BASE_TIMER_H
 #define POVRAY_BASE_TIMER_H
 
+// Module config header file must be the first file included within POV-Ray unit header files
 #include "base/configbase.h"
 
 #ifdef USE_SYSPROTO
@@ -45,11 +46,15 @@
 namespace pov_base
 {
 
+#if POV_MULTITHREADED
+
 /**
  *  Wait for the specified time.
  *  @param  msec  Milliseconds to wait.
  */
 void Delay(unsigned int msec);
+
+#endif // POV_MULTITHREADED
 
 
 #ifndef POV_TIMER
@@ -110,12 +115,7 @@ class TimerDefault
         boost::xtime cpuTimeStart;
 };
 
-#endif
-
-}
-
-namespace pov_base
-{
+#endif // POV_TIMER
 
 /// Millisecond-precision timer
 typedef POV_TIMER Timer;

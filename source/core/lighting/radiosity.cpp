@@ -60,13 +60,11 @@
 *  All standard POV distribution rights granted.  All other rights reserved.
 *************************************************************************/
 
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
+#include "core/lighting/radiosity.h"
+
 #include <cstring>
 #include <algorithm>
-#include <boost/thread.hpp>
-
-// configcore.h must always be the first POV file included in core *.cpp files (pulls in platform config)
-#include "core/configcore.h"
-#include "core/lighting/radiosity.h"
 
 #include "base/fileinputoutput.h"
 
@@ -1049,7 +1047,9 @@ RadiosityCache::~RadiosityCache()
     // TODO FIXME - I guess the mutexing shouldn't be necessary here
 
     { // mutex scope
+#if POV_MULTITHREADED
         boost::mutex::scoped_lock lock(fileMutex);
+#endif
         // finish up cache file
         if(ot_fd != NULL)
         {
@@ -1061,14 +1061,18 @@ RadiosityCache::~RadiosityCache()
     }
 
     { // mutex scope
+#if POV_MULTITHREADED
         boost::mutex::scoped_lock lockTree(octree.treeMutex);
         boost::mutex::scoped_lock lockBlock(octree.blockMutex);
+#endif
         if (octree.root != NULL)
             ot_free_tree(&octree.root);
     }
 
     { // mutex scope
+#if POV_MULTITHREADED
         boost::mutex::scoped_lock lock(blockPoolsMutex);
+#endif
         while (!blockPools.empty())
         {
             delete blockPools.back();
@@ -1082,7 +1086,9 @@ RadiosityCache::~RadiosityCache()
 
 RadiosityCache::BlockPool* RadiosityCache::AcquireBlockPool()
 {
+#if POV_MULTITHREADED
     boost::mutex::scoped_lock lock(blockPoolsMutex);
+#endif
     if (blockPools.empty())
         return new BlockPool();
     else
@@ -1096,12 +1102,16 @@ RadiosityCache::BlockPool* RadiosityCache::AcquireBlockPool()
 void RadiosityCache::ReleaseBlockPool(RadiosityCache::BlockPool* pool)
 {
     { // mutex scope
+#if POV_MULTITHREADED
         boost::mutex::scoped_lock lock(fileMutex);
+#endif
         pool->Save(ot_fd);
     }
 
     { // mutex scope
+#if POV_MULTITHREADED
         boost::mutex::scoped_lock lock(blockPoolsMutex);
+#endif
         blockPools.push_back(pool);
     }
 }
@@ -1231,7 +1241,9 @@ ot_node_struct *RadiosityCache::GetNode(RenderStatistics* stats, const ot_id_str
     ot_node_struct *temp_node, *this_node, *temp_root;
     ot_id_struct temp_id;
 
+#if POV_MULTITHREADED
     boost::mutex::scoped_lock treeLock(octree.treeMutex, boost::defer_lock_t()); // we may need to lock this mutex - but not now.
+#endif
 
 #ifdef RADSTATS
     ot_inscount++;
@@ -1254,7 +1266,9 @@ ot_node_struct *RadiosityCache::GetNode(RenderStatistics* stats, const ot_id_str
 #endif
 
         // now is the time to lock the tree for modification
+#if POV_MULTITHREADED
         treeLock.lock();
+#endif
 
         // Now that we have exclusive write access, make sure we REALLY don't have a root
         // (some other thread might have created it just as we were waiting to get the lock)
@@ -1292,8 +1306,10 @@ ot_node_struct *RadiosityCache::GetNode(RenderStatistics* stats, const ot_id_str
     if (octree.root->Id.Size < id.Size)
     {
         // now is the time to lock the tree for modification, in case we haven't yet
+#if POV_MULTITHREADED
         if (!treeLock.owns_lock())
             treeLock.lock();
+#endif
 
         // (Note that the following can't be a do...while() loop because we may not have had a lock when we first tested,
         // and some other task may have modified the root while we were not looking)
@@ -1324,6 +1340,7 @@ ot_node_struct *RadiosityCache::GetNode(RenderStatistics* stats, const ot_id_str
        (temp_id.y != temp_root->Id.y) ||
        (temp_id.z != temp_root->Id.z))
     {
+#if POV_MULTITHREADED
         // now is the time to lock the tree for modification, in case we haven't yet
         if (!treeLock.owns_lock())
         {
@@ -1335,6 +1352,7 @@ ot_node_struct *RadiosityCache::GetNode(RenderStatistics* stats, const ot_id_str
                 ot_parent(&temp_id, &temp_id);
             }
         }
+#endif
 
         // (Note that the following can't be a do...while() loop because we may not have had a lock when we first tested,
         // and some other task may have modified the root while we were not looking)
@@ -1379,9 +1397,11 @@ ot_node_struct *RadiosityCache::GetNode(RenderStatistics* stats, const ot_id_str
         {
             // Next level down doesn't exist yet, so create it
 
+#if POV_MULTITHREADED
             // now is the time to lock the tree for modification, in case we haven't yet
             if (!treeLock.owns_lock())
                 treeLock.lock();
+#endif
 
             // We may have acquired the lock just now, so some other task may have changed the root since last time we looked
             if (this_node->Kids[index] == NULL)
@@ -1414,7 +1434,9 @@ ot_node_struct *RadiosityCache::GetNode(RenderStatistics* stats, const ot_id_str
 
 void RadiosityCache::InsertBlock(ot_node_struct *node, ot_block_struct *block)
 {
+#if POV_MULTITHREADED
     boost::mutex::scoped_lock lock(octree.blockMutex);
+#endif
 
     block->next = node->Values;
     node->Values = block;

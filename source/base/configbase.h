@@ -38,9 +38,9 @@
 #ifndef CONFIGBASE_H
 #define CONFIGBASE_H
 
-#include <boost/version.hpp>
-
 #include "syspovconfigbase.h"
+
+#include <boost/version.hpp>
 
 //******************************************************************************
 ///
@@ -524,6 +524,16 @@
 ///
 #ifndef SAFEMATH_DEBUG
     #define SAFEMATH_DEBUG 0
+#endif
+
+/// @def POV_MULTITHREADED
+/// Enable multithreading in the core modules.
+///
+/// Define as non-zero integer to enable, or zero to disable.
+/// Defaults to enabled.
+///
+#ifndef POV_MULTITHREADED
+    #define POV_MULTITHREADED 1
 #endif
 
 /// @}

@@ -154,15 +154,21 @@ Parameter and variable names might carry one or more additional prefixes. These 
 
 @section inc        Include Files
 
-  - Header files should be included in the following order:
+  - Header files should generally be included in the following order:
+      - POV-Ray module configuration header file, if applicable (mandatory in any unit header file, i.e. any header
+        file with a `.cpp` of the same name; e.g. @ref core/configcore.h in @ref core/colourspace.h).
+      - POV-Ray unit header file, if applicable (mandatory in any `.cpp` file; e.g. @ref core/colourspace.h in
+        @ref core/colourspace.cpp).
       - C++ variants of standard C header files.
       - Standard C++ header files.
       - Boost header files.
       - Other 3rd party library header files, grouped by library.
       - POV-Ray header files.
+      - Debug header file (@ref base/povdebug.h), if applicable (mandatory in any `.cpp` file, _not_ allowed in any
+        other file).
       .
     Within each group, alphabetical order should be preferred. (Note however that certain other ordering constraints
-    might apply for the POV-Ray header files.)
+    might apply within platform-specific portions of the code.)
 
   - C++ source code should _not_ include C standard header files; include the corresponding C++ header files instead
     (e.g. `<cstdio>` instead of `<stdio.h>`).
@@ -191,7 +197,7 @@ Parameter and variable names might carry one or more additional prefixes. These 
 
   - **Const**: Make liberal use of the `const` qualifier where possible, especially in parameter declarations.
 
-  - **Member Visibility**: Except in structs -- which should only be used for stateless plain-old-data aggregates ---
+  - **Member Visibility**: Except in structs -- which should only be used for stateless plain-old-data aggregates --
     all member variables should be protected or private.
 
   - **Macros**: Avoid them wherever reasonably possible.
