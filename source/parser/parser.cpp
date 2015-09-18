@@ -39,6 +39,7 @@
 #include <algorithm>
 
 #include <boost/bind.hpp>
+#include <boost/scoped_ptr.hpp>
 
 // configparser.h must always be the first POV file included in the parser (pulls in platform config)
 #include "parser/configparser.h"
