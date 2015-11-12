@@ -2,7 +2,7 @@
 #define BOOST_ARCHIVE_XML_OARCHIVE_HPP
 
 // MS compatible compilers support #pragma once
-#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+#if defined(_MSC_VER)
 # pragma once
 #endif
 
@@ -42,18 +42,30 @@ namespace std{
 namespace boost {
 namespace archive {
 
+namespace detail {
+    template<class Archive> class interface_oarchive;
+} // namespace detail
+
 template<class Archive>
-class xml_oarchive_impl : 
+class BOOST_SYMBOL_VISIBLE xml_oarchive_impl : 
     public basic_text_oprimitive<std::ostream>,
     public basic_xml_oarchive<Archive>
 {
 #ifdef BOOST_NO_MEMBER_TEMPLATE_FRIENDS
 public:
 #else
-    friend class detail::interface_oarchive<Archive>;
-    friend class basic_xml_oarchive<Archive>;
-    friend class save_access;
 protected:
+    #if BOOST_WORKAROUND(BOOST_MSVC, < 1500)
+        // for some inexplicable reason insertion of "class" generates compile erro
+        // on msvc 7.1
+        friend detail::interface_oarchive<Archive>;
+        friend basic_xml_oarchive<Archive>;
+        friend save_access;
+    #else
+        friend class detail::interface_oarchive<Archive>;
+        friend class basic_xml_oarchive<Archive>;
+        friend class save_access;
+    #endif
 #endif
     //void end_preamble(){
     //    basic_xml_oarchive<Archive>::end_preamble();
@@ -70,19 +82,19 @@ protected:
     save(const boost::serialization::item_version_type & t){
         save(static_cast<const unsigned int>(t));
     }
-    BOOST_ARCHIVE_DECL(void) 
+    BOOST_ARCHIVE_DECL void 
     save(const char * t);
     #ifndef BOOST_NO_INTRINSIC_WCHAR_T
-    BOOST_ARCHIVE_DECL(void)
+    BOOST_ARCHIVE_DECL void
     save(const wchar_t * t);
     #endif
-    BOOST_ARCHIVE_DECL(void)
+    BOOST_ARCHIVE_DECL void
     save(const std::string &s);
     #ifndef BOOST_NO_STD_WSTRING
-    BOOST_ARCHIVE_DECL(void)
+    BOOST_ARCHIVE_DECL void
     save(const std::wstring &ws);
     #endif
-    BOOST_ARCHIVE_DECL(BOOST_PP_EMPTY()) 
+    BOOST_ARCHIVE_DECL 
     xml_oarchive_impl(std::ostream & os, unsigned int flags);
     ~xml_oarchive_impl(){}
 public:
@@ -106,7 +118,7 @@ public:
 // do not derive from this class.  If you want to extend this functionality
 // via inhertance, derived from xml_oarchive_impl instead.  This will
 // preserve correct static polymorphism.
-class xml_oarchive : 
+class BOOST_SYMBOL_VISIBLE xml_oarchive : 
     public xml_oarchive_impl<xml_oarchive>
 {
 public:
@@ -115,8 +127,6 @@ public:
     {}
     ~xml_oarchive(){}
 };
-
-typedef xml_oarchive naked_xml_oarchive;
 
 } // namespace archive
 } // namespace boost

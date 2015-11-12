@@ -13,7 +13,7 @@
 // <header_name> in order to prevent macro expansion within the header
 // name (for example "linux" is a macro on linux systems).
 
-#if defined(linux) || defined(__linux) || defined(__linux__) || defined(__GNU__) || defined(__GLIBC__) 
+#if (defined(linux) || defined(__linux) || defined(__linux__) || defined(__GNU__) || defined(__GLIBC__)) && !defined(_CRAYC)
 // linux, also other platforms (Hurd etc) that use GLIBC, should these really have their own config headers though?
 #  define BOOST_PLATFORM_CONFIG "boost/config/platform/linux.hpp"
 
@@ -40,6 +40,10 @@
 #elif defined(_WIN32) || defined(__WIN32__) || defined(WIN32)
 // win32:
 #  define BOOST_PLATFORM_CONFIG "boost/config/platform/win32.hpp"
+
+#elif defined(__HAIKU__)
+// Haiku
+#  define BOOST_PLATFORM_CONFIG "boost/config/platform/haiku.hpp"
 
 #elif defined(__BEOS__)
 // BeOS
@@ -69,6 +73,10 @@
 // Symbian: 
 #  define BOOST_PLATFORM_CONFIG "boost/config/platform/symbian.hpp" 
 
+#elif defined(_CRAYC)
+// Cray:
+#  define BOOST_PLATFORM_CONFIG "boost/config/platform/cray.hpp" 
+
 #elif defined(__VMS) 
 // VMS:
 #  define BOOST_PLATFORM_CONFIG "boost/config/platform/vms.hpp" 
@@ -97,5 +105,29 @@
 
 #endif
 
+#if 0
+//
+// This section allows dependency scanners to find all the files we *might* include:
+//
+#  include "boost/config/platform/linux.hpp"
+#  include "boost/config/platform/bsd.hpp"
+#  include "boost/config/platform/solaris.hpp"
+#  include "boost/config/platform/irix.hpp"
+#  include "boost/config/platform/hpux.hpp"
+#  include "boost/config/platform/cygwin.hpp"
+#  include "boost/config/platform/win32.hpp"
+#  include "boost/config/platform/beos.hpp"
+#  include "boost/config/platform/macos.hpp"
+#  include "boost/config/platform/aix.hpp"
+#  include "boost/config/platform/amigaos.hpp"
+#  include "boost/config/platform/qnxnto.hpp"
+#  include "boost/config/platform/vxworks.hpp"
+#  include "boost/config/platform/symbian.hpp" 
+#  include "boost/config/platform/cray.hpp" 
+#  include "boost/config/platform/vms.hpp" 
+#  include <boost/config/posix_features.hpp>
 
+
+
+#endif
 

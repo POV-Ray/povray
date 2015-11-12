@@ -13,7 +13,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\source\precomp.h" />
     <ClInclude Include="..\..\source\parser\configparser.h">
       <Filter>Parser Headers</Filter>
     </ClInclude>
@@ -29,9 +28,11 @@
     <ClInclude Include="..\..\source\parser\fncode.h">
       <Filter>Parser Headers</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\parser\precomp.h">
+      <Filter>Parser Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\source\precomp.cpp" />
     <ClCompile Include="..\..\source\parser\parser.cpp">
       <Filter>Parser Source</Filter>
     </ClCompile>
@@ -57,6 +58,9 @@
       <Filter>Parser Source</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\parser\fncode.cpp">
+      <Filter>Parser Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\parser\precomp.cpp">
       <Filter>Parser Source</Filter>
     </ClCompile>
   </ItemGroup>

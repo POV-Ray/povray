@@ -122,7 +122,6 @@
     <ClCompile Include="..\..\source\backend\lighting\rad_data.cpp">
       <Filter>Backend Source\Lighting</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\precomp.cpp" />
     <ClCompile Include="..\..\source\backend\bounding\boundingtask.cpp">
       <Filter>Backend Source\Bounding</Filter>
     </ClCompile>
@@ -131,6 +130,9 @@
     </ClCompile>
     <ClCompile Include="..\..\source\backend\scene\backendscenedata.cpp">
       <Filter>Backend Source\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\backend\precomp.cpp">
+      <Filter>Backend Source</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -197,7 +199,6 @@
     <ClInclude Include="..\..\source\backend\lighting\photonstrategytask.h">
       <Filter>Backend Headers\Lighting</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\precomp.h" />
     <ClInclude Include="..\povconfig\syspovconfigbackend.h">
       <Filter>Backend Headers</Filter>
     </ClInclude>
@@ -209,6 +210,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\backend\scene\backendscenedata.h">
       <Filter>Backend Headers\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\precomp.h">
+      <Filter>Backend Headers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

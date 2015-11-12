@@ -1,6 +1,6 @@
 //  Boost config.hpp configuration header file  ------------------------------//
 
-//  (C) Copyright John Maddock 2002. 
+//  (C) Copyright John Maddock 2002.
 //  Use, modification and distribution are subject to the 
 //  Boost Software License, Version 1.0. (See accompanying file 
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -20,6 +20,10 @@
 // if we don't have a user config, then use the default location:
 #if !defined(BOOST_USER_CONFIG) && !defined(BOOST_NO_USER_CONFIG)
 #  define BOOST_USER_CONFIG <boost/config/user.hpp>
+#if 0
+// For dependency trackers:
+#  include <boost/config/user.hpp>
+#endif
 #endif
 // include it first:
 #ifdef BOOST_USER_CONFIG
@@ -36,7 +40,7 @@
 #endif
 
 // if we don't have a std library config set, try and find one:
-#if !defined(BOOST_STDLIB_CONFIG) && !defined(BOOST_NO_STDLIB_CONFIG) && !defined(BOOST_NO_CONFIG)
+#if !defined(BOOST_STDLIB_CONFIG) && !defined(BOOST_NO_STDLIB_CONFIG) && !defined(BOOST_NO_CONFIG) && defined(__cplusplus)
 #  include <boost/config/select_stdlib_config.hpp>
 #endif
 // if we have a std library config, include it now:
@@ -56,15 +60,8 @@
 // get config suffix code:
 #include <boost/config/suffix.hpp>
 
+#ifdef BOOST_HAS_PRAGMA_ONCE
+#pragma once
+#endif
+
 #endif  // BOOST_CONFIG_HPP
-
-
-
-
-
-
-
-
-
-
-

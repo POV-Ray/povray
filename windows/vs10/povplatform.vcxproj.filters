@@ -13,7 +13,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\source\precomp.cpp" />
     <ClCompile Include="..\..\platform\x86\cpuid.cpp">
       <Filter>Platform Source</Filter>
     </ClCompile>
@@ -22,7 +21,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\source\precomp.h" />
     <ClInclude Include="..\..\platform\x86\cpuid.h">
       <Filter>Platform Headers</Filter>
     </ClInclude>

@@ -45,11 +45,13 @@
     <ClCompile Include="..\..\source\frontend\shelloutprocessing.cpp">
       <Filter>Frontend source</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\precomp.cpp" />
     <ClCompile Include="..\..\source\povmain.cpp">
       <Filter>Frontend source</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\frontend\processoptions.cpp">
+      <Filter>Frontend source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\frontend\precomp.cpp">
       <Filter>Frontend source</Filter>
     </ClCompile>
   </ItemGroup>
@@ -96,11 +98,13 @@
     <ClInclude Include="..\..\source\frontend\simplefrontend.h">
       <Filter>Frontend Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\precomp.h" />
     <ClInclude Include="..\povconfig\syspovconfigfrontend.h">
       <Filter>Frontend Headers</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\frontend\processoptions.h">
+      <Filter>Frontend Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\frontend\precomp.h">
       <Filter>Frontend Headers</Filter>
     </ClInclude>
   </ItemGroup>

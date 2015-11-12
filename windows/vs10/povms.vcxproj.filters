@@ -9,7 +9,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\source\precomp.cpp" />
     <ClCompile Include="..\..\source\povms\povmscpp.cpp">
       <Filter>POVMS Source</Filter>
     </ClCompile>
@@ -19,12 +18,14 @@
     <ClCompile Include="..\..\source\povms\povms.cpp">
       <Filter>POVMS Source</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\povms\precomp.cpp">
+      <Filter>POVMS Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\povms\configpovms.h">
       <Filter>POVMS Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\precomp.h" />
     <ClInclude Include="..\..\source\povms\povms.h">
       <Filter>POVMS Headers</Filter>
     </ClInclude>
@@ -38,6 +39,9 @@
       <Filter>POVMS Headers</Filter>
     </ClInclude>
     <ClInclude Include="..\povconfig\syspovconfigpovms.h">
+      <Filter>POVMS Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\povms\precomp.h">
       <Filter>POVMS Headers</Filter>
     </ClInclude>
   </ItemGroup>

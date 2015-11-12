@@ -17,9 +17,7 @@
 #include <boost/program_options/eof_iterator.hpp>
 
 #include <boost/detail/workaround.hpp>
-#if BOOST_WORKAROUND(__MWERKS__, BOOST_TESTED_AT(0x3202))
 #include <boost/program_options/detail/convert.hpp>
-#endif
 
 #if BOOST_WORKAROUND(__DECCXX_VER, BOOST_TESTED_AT(60590042))
 #include <istream> // std::getline
@@ -28,6 +26,11 @@
 #include <boost/static_assert.hpp>
 #include <boost/type_traits/is_same.hpp>
 #include <boost/shared_ptr.hpp>
+
+#ifdef BOOST_MSVC
+# pragma warning(push)
+# pragma warning(disable: 4251) // class XYZ needs to have dll-interface to be used by clients of class XYZ
+#endif
 
 
 
@@ -64,7 +67,7 @@ namespace boost { namespace program_options { namespace detail {
          TODO: maybe, we should just accept a pointer to options_description
          class.
      */    
-    class common_config_file_iterator 
+    class BOOST_PROGRAM_OPTIONS_DECL common_config_file_iterator
         : public eof_iterator<common_config_file_iterator, option>
     {
     public:
@@ -79,6 +82,11 @@ namespace boost { namespace program_options { namespace detail {
         
         void get();
         
+#if BOOST_WORKAROUND(_MSC_VER, <= 1900)
+        void decrement() {}
+        void advance(difference_type) {}
+#endif
+
     protected: // Stubs for derived classes
 
         // Obtains next line from the config file
@@ -178,5 +186,9 @@ namespace boost { namespace program_options { namespace detail {
     
 
 }}}
+
+#ifdef BOOST_MSVC
+# pragma warning(pop)
+#endif
 
 #endif

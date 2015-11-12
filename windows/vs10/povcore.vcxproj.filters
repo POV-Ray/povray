@@ -65,7 +65,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\source\precomp.cpp" />
     <ClCompile Include="..\..\source\core\material\pattern.cpp">
       <Filter>Core Source\Material</Filter>
     </ClCompile>
@@ -258,9 +257,11 @@
     <ClCompile Include="..\..\source\core\render\tracepixel.cpp">
       <Filter>Core Source\Render</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\core\precomp.cpp">
+      <Filter>Core Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\source\precomp.h" />
     <ClInclude Include="..\..\source\core\configcore.h">
       <Filter>Core Headers</Filter>
     </ClInclude>
@@ -467,6 +468,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\core\render\tracepixel.h">
       <Filter>Core Headers\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\precomp.h">
+      <Filter>Core Headers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

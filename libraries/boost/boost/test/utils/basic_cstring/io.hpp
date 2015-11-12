@@ -1,19 +1,19 @@
-//  (C) Copyright Gennadiy Rozental 2004-2008.
+//  (C) Copyright Gennadiy Rozental 2004-2014.
 //  Distributed under the Boost Software License, Version 1.0.
-//  (See accompanying file LICENSE_1_0.txt or copy at 
+//  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 //  See http://www.boost.org/libs/test for the library home page.
 //
 //  File        : $RCSfile$
 //
-//  Version     : $Revision: 49312 $
+//  Version     : $Revision$
 //
 //  Description : basic_cstring i/o implementation
 // ***************************************************************************
 
-#ifndef  BOOST_TEST_BASIC_CSTRING_IO_HPP_071894GER
-#define  BOOST_TEST_BASIC_CSTRING_IO_HPP_071894GER
+#ifndef BOOST_TEST_UTILS_BASIC_CSTRING_IO_HPP
+#define BOOST_TEST_UTILS_BASIC_CSTRING_IO_HPP
 
 // Boost.Test
 #include <boost/test/utils/basic_cstring/basic_cstring.hpp>

@@ -5,7 +5,7 @@
  * Subject to the Boost Software License, Version 1.0. 
  * (See accompanying file LICENSE_1_0.txt or http://www.boost.org/LICENSE_1_0.txt)
  * Author: Jeff Garland, Bart Garst
- * $Date: 2008-11-12 14:37:53 -0500 (Wed, 12 Nov 2008) $
+ * $Date$
  */
 
 #include <map>
@@ -167,10 +167,19 @@ namespace boost {
       tz_db_base() {}
 
       //! Process csv data file, may throw exceptions
+      /*! May throw bad_field_count exceptions */
+      void load_from_stream(std::istream &in)
+      {
+        std::string  buff;
+        while( std::getline(in, buff)) {
+          parse_string(buff);
+        }
+      }
+
+      //! Process csv data file, may throw exceptions
       /*! May throw data_not_accessible, or bad_field_count exceptions */
       void load_from_file(const std::string& pathspec)
       {
-        string_type in_str;
         std::string  buff;
         
         std::ifstream ifs(pathspec.c_str());
@@ -178,10 +187,7 @@ namespace boost {
           boost::throw_exception(data_not_accessible(pathspec));
         }
         std::getline(ifs, buff); // first line is column headings
-
-        while( std::getline(ifs, buff)) {
-          parse_string(buff);
-        }
+        this->load_from_stream(ifs);
       }
 
       //! returns true if record successfully added to map
@@ -254,8 +260,12 @@ namespace boost {
         e_wn = get_week_num(e_nth);
         
         
-        return new rule_type(start_rule(s_wn, s_d, s_m),
-                             end_rule(e_wn, e_d, e_m));
+        return new rule_type(start_rule(s_wn,
+                                        static_cast<unsigned short>(s_d),
+                                        static_cast<unsigned short>(s_m)),
+                             end_rule(e_wn,
+                                      static_cast<unsigned short>(e_d),
+                                      static_cast<unsigned short>(e_m)));
       }
       //! helper function for parse_rules()
       week_num get_week_num(int nth) const
@@ -294,7 +304,15 @@ namespace boost {
         const char_type sep_char[] = { ';', '\0'};
         char_separator_type sep(sep_char);
         tokenizer tokens(rule, sep); // 3 fields
-        
+
+        if ( std::distance ( tokens.begin(), tokens.end ()) != 3 ) {
+          std::ostringstream msg;
+          msg << "Expecting 3 fields, got " 
+              << std::distance ( tokens.begin(), tokens.end ()) 
+              << " fields in line: " << rule;
+          boost::throw_exception(bad_field_count(msg.str()));
+        }
+
         tokenizer_iterator tok_iter = tokens.begin(); 
         nth = std::atoi(tok_iter->c_str()); ++tok_iter;
         d   = std::atoi(tok_iter->c_str()); ++tok_iter;
