@@ -389,7 +389,9 @@
     <ClCompile Include="..\..\source\backend\lighting\subsurface.cpp">
       <Filter>Backend Source\Lighting</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\precomp.cpp" />
+    <ClCompile Include="..\..\source\backend\precomp.cpp">
+      <Filter>Backend Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\lightgrp.h">
@@ -675,9 +677,11 @@
       <Filter>Backend Headers\Lighting</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\povrayold.h" />
-    <ClInclude Include="..\..\source\precomp.h" />
     <ClInclude Include="..\..\source\backend\texture\avxfma4check.h">
       <Filter>Backend Headers\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\backend\precomp.h">
+      <Filter>Backend Headers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -217,9 +217,6 @@
     <ClInclude Include="..\pvmem.h">
       <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\pvtips.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
     <ClInclude Include="..\resource.h">
       <Filter>Headers</Filter>
     </ClInclude>

@@ -1,0 +1,53 @@
+version: 3.7+av{build}
+pull_requests:
+  do_not_increment_build_number: true
+branches:
+  except:
+  - coverity_scan
+
+image: Visual Studio 2015
+
+shallow_clone: true
+
+matrix:
+  fast_finish: true
+
+environment:
+  matrix:
+  - configuration: Release
+    platform: x64
+    bin_dir: bin64
+    artifact_suffix: -Win64
+    PlatformToolset: v140
+  - configuration: Release-SSE2
+    platform: Win32
+    bin_dir: bin32
+    artifact_suffix: -Win32-sse2
+    PlatformToolset: v140
+  - configuration: Release
+    platform: Win32
+    bin_dir: bin32
+    artifact_suffix: -Win32
+    PlatformToolset: v140
+
+before_build:
+- ps: |
+    $env:devenv = $env:VS140COMNTOOLS + '\..\IDE\devenv'
+    & $env:devenv windows\vs10\povray.sln /upgrade
+    $env:pov_autobuild_a = '#define POV_RAY_IS_AUTOBUILD 1'
+    $env:pov_autobuild_b = '#define POV_RAY_AUTOBUILD_ID "av' + $env:APPVEYOR_BUILD_NUMBER + '"'
+    (Get-Content source\base\build.h).replace('//{POV_AUTOBUILD_A}', $env:pov_autobuild_a) | Set-Content source\base\build.h
+    (Get-Content source\base\build.h).replace('//{POV_AUTOBUILD_B}', $env:pov_autobuild_b) | Set-Content source\base\build.h
+    (Get-Content source\base\build.h).replace('//{POV_AUTOBUILD_C}', $env:pov_autobuild_c) | Set-Content source\base\build.h
+    (Get-Content source\base\build.h).replace('//{POV_AUTOBUILD_1}', $env:pov_autobuild_1) | Set-Content source\base\build.h
+    (Get-Content source\base\build.h).replace('//{POV_AUTOBUILD_2}', $env:pov_autobuild_2) | Set-Content source\base\build.h
+    (Get-Content source\base\build.h).replace('//{POV_AUTOBUILD_3}', $env:pov_autobuild_3) | Set-Content source\base\build.h
+    (Get-Content source\base\build.h).replace('YOUR NAME (YOUR EMAIL)', $env:pov_authorized_by) | Set-Content source\base\build.h
+    (Get-Content source\base\build.h).replace('#error Please fill in BUILT_BY, then remove this line', '') | Set-Content source\base\build.h
+
+build:
+  project: windows/vs10/povray.sln
+  parallel: true
+  verbosity: minimal
+
+test: off

@@ -22,11 +22,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/frontend/shelloutprocessing.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/frontend/shelloutprocessing.h $
+ * $Revision: #9 $
+ * $Change: 6132 $
+ * $DateTime: 2013/11/25 14:23:41 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #ifndef POVRAY_FRONTEND_SHELLOUTPROCESSING_H
@@ -84,7 +84,7 @@ class ShelloutProcessing
 	friend class ShelloutAction;
 
 public:
-	typedef boost::shared_ptr<ShelloutAction> ShelloutPtr;
+	typedef shared_ptr<ShelloutAction> ShelloutPtr;
 
 	typedef enum
 	{

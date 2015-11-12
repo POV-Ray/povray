@@ -41,7 +41,7 @@ namespace program_options {
         are used only to validate input. Second affect interpretation of the
         option, for example default value for it or function that should be
         called  when the value is finally known. Routines which perform parsing
-        never use second kind of properties -- they are side effect free.
+        never use second kind of properties \-- they are side effect free.
         @sa options_description
     */
     class BOOST_PROGRAM_OPTIONS_DECL option_description {
@@ -61,8 +61,8 @@ namespace program_options {
 
             Alas, derived->base conversion for auto_ptr does not really work,
             see
-            http://anubis.dkuug.dk/jtc1/sc22/wg21/docs/papers/2000/n1232.pdf
-            http://std.dkuug.dk/jtc1/sc22/wg21/docs/cwg_defects.html#84
+            http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2000/n1232.pdf
+            http://www.open-std.org/jtc1/sc22/wg21/docs/cwg_defects.html#84
 
             So, we have to use plain old pointers. Besides, users are not
             expected to use the constructor directly.
@@ -71,7 +71,7 @@ namespace program_options {
             The 'name' parameter is interpreted by the following rules:
             - if there's no "," character in 'name', it specifies long name
             - otherwise, the part before "," specifies long name and the part
-            after -- short name.
+            after \-- short name.
         */
         option_description(const char* name,
                            const value_semantic* s);
@@ -101,6 +101,16 @@ namespace program_options {
             it's a short name with prepended '-'.
         */
         const std::string& key(const std::string& option) const;
+
+
+        /** Returns the canonical name for the option description to enable the user to
+            recognised a matching option.
+            1) For short options ('-', '/'), returns the short name prefixed.
+            2) For long options ('--' / '-') returns the long name prefixed
+            3) All other cases, returns the long name (if present) or the short name,
+                unprefixed.
+        */
+        std::string canonical_display_name(int canonical_option_style = 0) const;
 
         const std::string& long_name() const;
 
@@ -189,6 +199,10 @@ namespace program_options {
         */
         options_description& add(const options_description& desc);
 
+        /** Find the maximum width of the option column, including options 
+            in groups. */
+        unsigned get_option_column_width() const;
+
     public:
         /** Returns an object of implementation-defined type suitable for adding
             options to options_description. The returned object will
@@ -219,9 +233,14 @@ namespace program_options {
 
         /** Outputs 'desc' to the specified stream, calling 'f' to output each
             option_description element. */
-        void print(std::ostream& os) const;
+        void print(std::ostream& os, unsigned width = 0) const;
 
     private:
+#if BOOST_WORKAROUND(BOOST_MSVC, BOOST_TESTED_AT(1800))
+        // prevent warning C4512: assignment operator could not be generated
+        options_description& operator=(const options_description&);
+#endif
+
         typedef std::map<std::string, int>::const_iterator name2index_iterator;
         typedef std::pair<name2index_iterator, name2index_iterator> 
             approximation_range;

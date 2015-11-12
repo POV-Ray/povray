@@ -20,6 +20,9 @@
     <ClInclude Include="..\..\libraries\ilmbase\Half\halfLimits.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\libraries\ilmbase\Half\halfExport.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\libraries\ilmbase\Half\half.cpp">

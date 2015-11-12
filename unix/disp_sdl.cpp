@@ -26,11 +26,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/unix/disp_sdl.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/unix/disp_sdl.cpp $
+ * $Revision: #23 $
+ * $Change: 6132 $
+ * $DateTime: 2013/11/25 14:23:41 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #include "config.h"
@@ -51,7 +51,7 @@ namespace pov_frontend
 	using namespace vfe;
 	using namespace vfePlatform;
 
-	extern boost::shared_ptr<Display> gDisplay;
+	extern shared_ptr<Display> gDisplay;
 
 	const UnixOptionsProcessor::Option_Info UnixSDLDisplay::Options[] =
 	{

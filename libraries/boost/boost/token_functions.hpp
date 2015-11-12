@@ -1,6 +1,6 @@
 // Boost token_functions.hpp  ------------------------------------------------//
 
-// Copyright John R. Bandela 2001. 
+// Copyright John R. Bandela 2001.
 
 // Distributed under the Boost Software License, Version 1.0. (See
 // accompanying file LICENSE_1_0.txt or copy at
@@ -40,6 +40,7 @@
 #include <boost/assert.hpp>
 #include <boost/detail/workaround.hpp>
 #include <boost/mpl/if.hpp>
+#include <boost/throw_exception.hpp>
 #if !defined(BOOST_NO_CWCTYPE)
 #include <cwctype>
 #endif
@@ -77,12 +78,12 @@ namespace std{
 namespace boost{
   //===========================================================================
   // The escaped_list_separator class. Which is a model of TokenizerFunction
-  // An escaped list is a super-set of what is commonly known as a comma 
-  // separated value (csv) list.It is separated into fields by a comma or 
+  // An escaped list is a super-set of what is commonly known as a comma
+  // separated value (csv) list.It is separated into fields by a comma or
   // other character. If the delimiting character is inside quotes, then it is
   // counted as a regular character.To allow for embedded quotes in a field,
-  // there can be escape sequences using the \ much like C. 
-  // The role of the comma, the quotation mark, and the escape 
+  // there can be escape sequences using the \ much like C.
+  // The role of the comma, the quotation mark, and the escape
   // character (backslash \), can be assigned to other characters.
 
   struct escaped_list_error : public std::runtime_error{
@@ -125,7 +126,7 @@ namespace boost{
     template <typename iterator, typename Token>
     void do_escape(iterator& next,iterator end,Token& tok) {
       if (++next == end)
-        throw escaped_list_error(std::string("cannot end with escape"));
+        BOOST_THROW_EXCEPTION(escaped_list_error(std::string("cannot end with escape")));
       if (Traits::eq(*next,'n')) {
         tok+='\n';
         return;
@@ -143,7 +144,7 @@ namespace boost{
         return;
       }
       else
-        throw escaped_list_error(std::string("unknown escape sequence"));
+        BOOST_THROW_EXCEPTION(escaped_list_error(std::string("unknown escape sequence")));
     }
 
     public:
@@ -181,7 +182,7 @@ namespace boost{
             ++next;
             // The last character was a c, that means there is
             // 1 more blank field
-            last_ = true; 
+            last_ = true;
             return true;
           }
           else tok+=*next;
@@ -209,6 +210,36 @@ namespace boost{
   // Assuming that the conditional will always get optimized out in the function
   // implementations, argument types are not a problem since both forms of character classifiers
   // expect an int.
+
+#if !defined(BOOST_NO_CWCTYPE)
+  template<typename traits, int N>
+  struct traits_extension_details : public traits {
+    typedef typename traits::char_type char_type;
+    static bool isspace(char_type c)
+    {
+       return std::iswspace(c) != 0;
+    }
+    static bool ispunct(char_type c)
+    {
+       return std::iswpunct(c) != 0;
+    }
+  };
+
+  template<typename traits>
+  struct traits_extension_details<traits, 1> : public traits {
+    typedef typename traits::char_type char_type;
+    static bool isspace(char_type c)
+    {
+       return std::isspace(c) != 0;
+    }
+    static bool ispunct(char_type c)
+    {
+       return std::ispunct(c) != 0;
+    }
+  };
+#endif
+
+
   // In case there is no cwctype header, we implement the checks manually.
   // We make use of the fact that the tested categories should fit in ASCII.
   template<typename traits>
@@ -217,10 +248,7 @@ namespace boost{
     static bool isspace(char_type c)
     {
 #if !defined(BOOST_NO_CWCTYPE)
-      if (sizeof(char_type) == 1)
-        return std::isspace(c) != 0;
-      else
-        return std::iswspace(c) != 0;
+      return traits_extension_details<traits, sizeof(char_type)>::isspace(c);
 #else
       return static_cast< unsigned >(c) <= 255 && std::isspace(c) != 0;
 #endif
@@ -229,10 +257,7 @@ namespace boost{
     static bool ispunct(char_type c)
     {
 #if !defined(BOOST_NO_CWCTYPE)
-      if (sizeof(char_type) == 1)
-        return std::ispunct(c) != 0;
-      else
-        return std::iswpunct(c) != 0;
+      return traits_extension_details<traits, sizeof(char_type)>::ispunct(c);
 #else
       return static_cast< unsigned >(c) <= 255 && std::ispunct(c) != 0;
 #endif
@@ -254,22 +279,7 @@ namespace boost{
   struct assign_or_plus_equal {
     template<class Iterator, class Token>
     static void assign(Iterator b, Iterator e, Token &t) {
-
-#if BOOST_WORKAROUND(BOOST_MSVC, < 1300) &&\
-    BOOST_WORKAROUND(__SGI_STL_PORT, < 0x500) &&\
-    defined(_STLP_DEBUG) &&\
-    (defined(_STLP_USE_DYNAMIC_LIB) || defined(_DLL))
-    // Problem with string::assign for msvc-stlport in debug mode: the
-    // linker tries to import the templatized version of this memfun,
-    // which is obviously not exported.
-    // See http://www.stlport.com/dcforum/DCForumID6/1763.html for details.
-
-      t = Token();
-      while(b != e) t += *b++;
-#else
       t.assign(b, e);
-#endif
-
     }
 
     template<class Token, class Value>
@@ -285,8 +295,8 @@ namespace boost{
   template <>
   struct assign_or_plus_equal<std::input_iterator_tag> {
     template<class Iterator, class Token>
-    static void assign(Iterator b, Iterator e, Token &t) { }
-    template<class Token, class Value> 
+    static void assign(Iterator , Iterator , Token &) { }
+    template<class Token, class Value>
     static void plus_equal(Token &t, const Value &v) {
       t += v;
     }
@@ -420,7 +430,7 @@ namespace boost{
     typedef tokenizer_detail::traits_extension<Tr> Traits;
     typedef std::basic_string<Char,Tr> string_type;
   public:
-    explicit 
+    explicit
     char_separator(const Char* dropped_delims,
                    const Char* kept_delims = 0,
                    empty_token_policy empty_tokens = drop_empty_tokens)
@@ -487,7 +497,7 @@ namespace boost{
             m_output_done = true;
             assigner::assign(start,next,tok);
             return true;
-          } 
+          }
           else
             return false;
         }
@@ -500,10 +510,10 @@ namespace boost{
             ++next;
             m_output_done = false;
           }
-        } 
+        }
         else if (m_output_done == false && is_dropped(*next)) {
           m_output_done = true;
-        } 
+        }
         else {
           if (is_dropped(*next))
             start=++next;
@@ -594,7 +604,7 @@ namespace boost{
     }
 
   public:
-    explicit char_delimiters_separator(bool return_delims = false, 
+    explicit char_delimiters_separator(bool return_delims = false,
                                        const Char* returnable = 0,
                                        const Char* nonreturnable = 0)
       : returnable_(returnable ? returnable : string_type().c_str()),
@@ -612,7 +622,7 @@ namespace boost{
 
      // skip past all nonreturnable delims
      // skip past the returnable only if we are not returning delims
-     for (;next!=end && ( is_nonret(*next) || (is_ret(*next) 
+     for (;next!=end && ( is_nonret(*next) || (is_ret(*next)
        && !return_delims_ ) );++next) { }
 
      if (next == end) {

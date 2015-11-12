@@ -46,7 +46,7 @@
 
 namespace pov_frontend
 {
-	boost::shared_ptr<Display> gDisplay;
+	shared_ptr<Display> gDisplay;
 }
 
 using namespace vfe;

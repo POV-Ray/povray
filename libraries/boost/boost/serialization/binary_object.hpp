@@ -2,7 +2,7 @@
 #define BOOST_SERIALIZATION_BINARY_OBJECT_HPP
 
 // MS compatible compilers support #pragma once
-#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+#if defined(_MSC_VER)
 # pragma once
 #endif
 
@@ -16,7 +16,7 @@
 
 //  See http://www.boost.org for updates, documentation, and revision history.
 
-#include <cassert>
+#include <boost/assert.hpp>
 
 #include <cstddef> // std::size_t
 #include <boost/config.hpp>
@@ -68,10 +68,7 @@ struct binary_object :
 // just a little helper to support the convention that all serialization
 // wrappers follow the naming convention make_xxxxx
 inline 
-#ifndef BOOST_NO_FUNCTION_TEMPLATE_ORDERING
-const
-#endif
-binary_object 
+const binary_object
 make_binary_object(/* const */ void * t, std::size_t size){
     return binary_object(t, size);
 }

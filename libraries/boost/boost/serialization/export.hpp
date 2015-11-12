@@ -2,7 +2,7 @@
 #define BOOST_SERIALIZATION_EXPORT_HPP
 
 // MS compatible compilers support #pragma once
-#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+#if defined(_MSC_VER)
 # pragma once
 #endif
 
@@ -86,9 +86,6 @@ struct ptr_serialization_support
 {
 # if defined(BOOST_MSVC) || defined(__SUNPRO_CC)
     virtual BOOST_DLLEXPORT void instantiate() BOOST_USED;
-# elif defined(__BORLANDC__)   
-    static BOOST_DLLEXPORT void instantiate() BOOST_USED;
-    enum { x = sizeof(instantiate(),3) };
 # else
     static BOOST_DLLEXPORT void instantiate() BOOST_USED;
     typedef instantiate_function<
@@ -102,17 +99,11 @@ BOOST_DLLEXPORT void
 ptr_serialization_support<Archive,Serializable>::instantiate()
 {
     export_impl<Archive,Serializable>::enable_save(
-        #if ! defined(__BORLANDC__)
-        BOOST_DEDUCED_TYPENAME 
-        #endif
-        Archive::is_saving()
+        typename Archive::is_saving()
     );
 
     export_impl<Archive,Serializable>::enable_load(
-        #if ! defined(__BORLANDC__)
-        BOOST_DEDUCED_TYPENAME 
-        #endif
-        Archive::is_loading()
+        typename Archive::is_loading()
     );
 }
 
@@ -124,14 +115,14 @@ namespace extra_detail {
 
 template<class T>
 struct guid_initializer
-{  
+{
     void export_guid(mpl::false_) const {
         // generates the statically-initialized objects whose constructors
         // register the information allowing serialization of T objects
         // through pointers to their base classes.
         instantiate_ptr_serialization((T*)0, 0, adl_tag());
     }
-    const void export_guid(mpl::true_) const {
+    void export_guid(mpl::true_) const {
     }
     guid_initializer const & export_guid() const {
         BOOST_STATIC_WARNING(boost::is_polymorphic< T >::value);

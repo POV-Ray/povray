@@ -40,18 +40,22 @@
 //
 //-----------------------------------------------------------------------------
 
-#include <ImfCompressor.h>
+#include "ImfCompressor.h"
+#include "ImfNamespace.h"
+#include "ImfExport.h"
+#include "ImfForward.h"
 
-namespace Imf {
-
-class ChannelList;
+OPENEXR_IMF_INTERNAL_NAMESPACE_HEADER_ENTER
 
 
-class Pxr24Compressor: public Compressor
+class IMF_EXPORT Pxr24Compressor: public Compressor
 {
   public:
 
-    Pxr24Compressor (const Header &hdr, int maxScanLineSize, int numScanLines);
+    Pxr24Compressor (const Header &hdr, 
+                     size_t maxScanLineSize,
+                     size_t numScanLines);
+
     virtual ~Pxr24Compressor ();
 
     virtual int		numScanLines () const;
@@ -65,7 +69,7 @@ class Pxr24Compressor: public Compressor
                   
     virtual int		compressTile (const char *inPtr,
 				      int inSize,
-				      Imath::Box2i range,
+				      IMATH_NAMESPACE::Box2i range,
 				      const char *&outPtr);
 
     virtual int		uncompress (const char *inPtr,
@@ -75,18 +79,18 @@ class Pxr24Compressor: public Compressor
                     
     virtual int		uncompressTile (const char *inPtr,
 					int inSize,
-					Imath::Box2i range,
+					IMATH_NAMESPACE::Box2i range,
 					const char *&outPtr);
   private:
 
     int			compress (const char *inPtr,
 				  int inSize,
-				  Imath::Box2i range,
+				  IMATH_NAMESPACE::Box2i range,
 				  const char *&outPtr);
  
     int			uncompress (const char *inPtr,
 				    int inSize,
-				    Imath::Box2i range,
+				    IMATH_NAMESPACE::Box2i range,
 				    const char *&outPtr);
 
     int			_maxScanLineSize;
@@ -100,6 +104,6 @@ class Pxr24Compressor: public Compressor
 };
 
 
-} // namespace Imf
+OPENEXR_IMF_INTERNAL_NAMESPACE_HEADER_EXIT
 
 #endif

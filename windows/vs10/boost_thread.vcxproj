@@ -23,6 +23,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\libraries\boost\libs\thread\src\future.cpp" />
     <ClCompile Include="..\..\libraries\boost\libs\thread\src\win32\thread.cpp" />
     <ClCompile Include="..\..\libraries\boost\libs\thread\src\win32\tss_dll.cpp" />
     <ClCompile Include="..\..\libraries\boost\libs\thread\src\win32\tss_pe.cpp" />

@@ -24,11 +24,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/vfe/unix/syspovconfig.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/vfe/unix/syspovconfig.h $
+ * $Revision: #17 $
+ * $Change: 6133 $
+ * $DateTime: 2013/11/25 15:28:53 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #ifndef __SYSPOVCONFIG_H__
@@ -66,7 +66,7 @@ using std::min;
 #include <string>
 #include <vector>
 #include <list>
-#include <boost/shared_ptr.hpp>
+#include <boost/tr1/memory.hpp>
 
 // when we say 'string' we mean std::string
 using std::string;
@@ -81,8 +81,9 @@ using std::list;
 // to in a few other places.
 using std::runtime_error;
 
-// C++0x has a shared_ptr, but we currently use the boost one.
-using boost::shared_ptr;
+// these may actually be the boost implementations, depending on what boost/tr1/memory.hpp has pulled in
+using std::tr1::shared_ptr;
+using std::tr1::weak_ptr;
 
 #endif // STD_POV_TYPES_DECLARED
 

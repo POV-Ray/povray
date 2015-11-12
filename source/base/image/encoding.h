@@ -24,11 +24,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/source/base/image/encoding.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/source/base/image/encoding.h $
+ * $Revision: #6 $
+ * $Change: 6132 $
+ * $DateTime: 2013/11/25 14:23:41 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #ifndef POVRAY_BASE_IMAGE_ENCODING_H
@@ -77,7 +77,7 @@ class DitherHandler
 		virtual void setError(unsigned int x, unsigned int y, const OffsetInfo& err) {}
 };
 
-typedef boost::shared_ptr<DitherHandler> DitherHandlerPtr;
+typedef shared_ptr<DitherHandler> DitherHandlerPtr;
 
 /// Factory class to get a dithering rule and state.
 DitherHandlerPtr GetDitherHandler(int method, unsigned int imageWidth);
