@@ -45,12 +45,17 @@
 #include <ImfStdIO.h>
 #include <ImfXdr.h>
 #include <ImfVersion.h>
+#include "ImfNamespace.h"
 
-namespace Imf {
+OPENEXR_IMF_INTERNAL_NAMESPACE_SOURCE_ENTER
 
 
 bool
-isOpenExrFile (const char fileName[], bool &tiled)
+isOpenExrFile
+    (const char fileName[],
+     bool &tiled,
+     bool &deep,
+     bool &multiPart)
 {
     try
     {
@@ -61,6 +66,8 @@ isOpenExrFile (const char fileName[], bool &tiled)
 	Xdr::read <StreamIO> (is, version);
 
 	tiled = isTiled (version);
+        deep = isNonImage (version);
+        multiPart = isMultiPart (version);
 	return magic == MAGIC;
     }
     catch (...)
@@ -72,24 +79,62 @@ isOpenExrFile (const char fileName[], bool &tiled)
 
 
 bool
+isOpenExrFile (const char fileName[], bool &tiled, bool &deep)
+{
+    bool multiPart;
+    return isOpenExrFile (fileName, tiled, deep, multiPart);
+}
+
+
+bool
+isOpenExrFile (const char fileName[], bool &tiled)
+{
+    bool deep, multiPart;
+    return isOpenExrFile (fileName, tiled, deep, multiPart);
+}
+
+
+bool
 isOpenExrFile (const char fileName[])
 {
-    bool tiled;
-    return isOpenExrFile (fileName, tiled);
+    bool tiled, deep, multiPart;
+    return isOpenExrFile (fileName, tiled, deep, multiPart);
 }
 
 
 bool
 isTiledOpenExrFile (const char fileName[])
 {
-    bool exr, tiled;
-    exr = isOpenExrFile (fileName, tiled);
+    bool exr, tiled, deep, multiPart;
+    exr = isOpenExrFile (fileName, tiled, deep, multiPart);
     return exr && tiled;
 }
 
 
 bool
-isOpenExrFile (IStream &is, bool &tiled)
+isDeepOpenExrFile (const char fileName[])
+{
+    bool exr, tiled, deep, multiPart;
+    exr = isOpenExrFile (fileName, tiled, deep, multiPart);
+    return exr && deep;
+}
+
+
+bool
+isMultiPartOpenExrFile (const char fileName[])
+{
+    bool exr, tiled, deep, multiPart;
+    exr = isOpenExrFile (fileName, tiled, deep, multiPart);
+    return exr && multiPart;
+}
+
+
+bool
+isOpenExrFile
+    (IStream &is,
+     bool &tiled,
+     bool &deep,
+     bool &multiPart)
 {
     try
     {
@@ -105,6 +150,8 @@ isOpenExrFile (IStream &is, bool &tiled)
 	is.seekg (pos);
 
 	tiled = isTiled (version);
+	deep = isNonImage (version);
+	multiPart = isMultiPart (version);
 	return magic == MAGIC;
     }
     catch (...)
@@ -117,19 +164,53 @@ isOpenExrFile (IStream &is, bool &tiled)
 
 
 bool
-isOpenExrFile (IStream &is)
+isOpenExrFile (IStream &is, bool &tiled, bool &deep)
 {
-    bool tiled;
-    return isOpenExrFile (is, tiled);
+    bool multiPart;
+    return isOpenExrFile (is, tiled, deep, multiPart);
 }
 
 
 bool
-isTiledOpenExrFile (IStream &is)
+isOpenExrFile (IStream &is, bool &tiled)
 {
-    bool exr, tiled;
-    exr = isOpenExrFile (is, tiled);
+    bool deep, multiPart;
+    return isOpenExrFile (is, tiled, deep, multiPart);
+}
+
+
+bool
+isOpenExrFile (OPENEXR_IMF_INTERNAL_NAMESPACE::IStream &is)
+{
+    bool tiled, deep, multiPart;
+    return isOpenExrFile (is, tiled, deep, multiPart);
+}
+
+
+bool
+isTiledOpenExrFile (OPENEXR_IMF_INTERNAL_NAMESPACE::IStream &is)
+{
+    bool exr, tiled, deep, multiPart;
+    exr = isOpenExrFile (is, tiled, deep, multiPart);
     return exr && tiled;
 }
 
-} // namespace Imf
+
+bool
+isDeepOpenExrFile (OPENEXR_IMF_INTERNAL_NAMESPACE::IStream &is)
+{
+    bool exr, tiled, deep, multiPart;
+    exr = isOpenExrFile (is, tiled, deep, multiPart);
+    return exr && deep;
+}
+
+
+bool
+isMultiPartOpenExrFile (OPENEXR_IMF_INTERNAL_NAMESPACE::IStream &is)
+{
+    bool exr, tiled, deep, multiPart;
+    exr = isOpenExrFile (is, tiled, deep, multiPart);
+    return exr && multiPart;
+}
+
+OPENEXR_IMF_INTERNAL_NAMESPACE_SOURCE_EXIT

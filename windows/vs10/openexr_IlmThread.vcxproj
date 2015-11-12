@@ -230,7 +230,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\libraries\ilmbase\IlmThread\IlmThread.h" />
+    <ClInclude Include="..\..\libraries\ilmbase\IlmThread\IlmThreadExport.h" />
+    <ClInclude Include="..\..\libraries\ilmbase\IlmThread\IlmThreadForward.h" />
     <ClInclude Include="..\..\libraries\ilmbase\IlmThread\IlmThreadMutex.h" />
+    <ClInclude Include="..\..\libraries\ilmbase\IlmThread\IlmThreadNamespace.h" />
     <ClInclude Include="..\..\libraries\ilmbase\IlmThread\IlmThreadPool.h" />
     <ClInclude Include="..\..\libraries\ilmbase\IlmThread\IlmThreadSemaphore.h" />
   </ItemGroup>

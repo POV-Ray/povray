@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////
 //
-// Copyright (c) 2002, Industrial Light & Magic, a division of Lucas
+// Copyright (c) 2002-2012, Industrial Light & Magic, a division of Lucas
 // Digital Ltd. LLC
 // 
 // All rights reserved.
@@ -43,6 +43,7 @@
 //
 //----------------------------------------------------------------
 
+#include "ImathNamespace.h"
 #include <float.h>
 #include <limits.h>
 
@@ -59,7 +60,7 @@
     #endif
 #endif
 
-namespace Imath {
+IMATH_INTERNAL_NAMESPACE_HEADER_ENTER
 
 
 //-----------------------------------------------------------------
@@ -72,6 +73,8 @@ namespace Imath {
 //	max()		largest possible positive value of type T
 //
 //	smallest()	smallest possible positive value of type T
+//			(for float and double: smallest normalized
+//			positive value)
 //
 //	epsilon()	smallest possible e of type T, for which
 //			1 + e != 1
@@ -260,6 +263,6 @@ struct limits <long double>
 };
 
 
-} // namespace Imath
+IMATH_INTERNAL_NAMESPACE_HEADER_EXIT
 
-#endif
+#endif // INCLUDED_IMATHLIMITS_H

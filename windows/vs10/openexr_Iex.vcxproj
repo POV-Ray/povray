@@ -223,8 +223,11 @@
     <ClInclude Include="..\..\libraries\ilmbase\Iex\Iex.h" />
     <ClInclude Include="..\..\libraries\ilmbase\Iex\IexBaseExc.h" />
     <ClInclude Include="..\..\libraries\ilmbase\Iex\IexErrnoExc.h" />
+    <ClInclude Include="..\..\libraries\ilmbase\Iex\IexExport.h" />
+    <ClInclude Include="..\..\libraries\ilmbase\Iex\IexForward.h" />
     <ClInclude Include="..\..\libraries\ilmbase\Iex\IexMacros.h" />
     <ClInclude Include="..\..\libraries\ilmbase\Iex\IexMathExc.h" />
+    <ClInclude Include="..\..\libraries\ilmbase\Iex\IexNamespace.h" />
     <ClInclude Include="..\..\libraries\ilmbase\Iex\IexThrowErrnoExc.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

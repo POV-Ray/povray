@@ -40,14 +40,14 @@
     <IntDir>build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
     <TargetName>toFloat</TargetName>
     <TargetExt>.exe</TargetExt>
-    <CustomBuildAfterTargets>Manifest</CustomBuildAfterTargets>
+    <CustomBuildAfterTargets>Link</CustomBuildAfterTargets>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>build\$(ProjectName)\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
     <TargetName>toFloat</TargetName>
     <TargetExt>.exe</TargetExt>
-    <CustomBuildAfterTargets>Manifest</CustomBuildAfterTargets>
+    <CustomBuildAfterTargets>Link</CustomBuildAfterTargets>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>

@@ -84,6 +84,19 @@
             #endif
         }
     #endif
+    #ifndef OPENEXR_MISSING
+        #include <IlmBaseConfig.h>
+        #include <OpenEXRConfig.h>
+        // NOTE:
+        //  Versions of OpenEXR and IlmImf prior to 1.7.1 do not seem to have a way to get the version number,
+        //  nor do the official hard-coded Windows config headers.
+        #ifndef ILMBASE_PACKAGE_STRING
+            #define ILMBASE_PACKAGE_STRING "IlmBase"
+        #endif
+        #ifndef OPENEXR_PACKAGE_STRING
+            #define OPENEXR_PACKAGE_STRING "OpenEXR"
+        #endif
+    #endif
 
     // get boost version number. it isn't an image library but there's little point
     // in creating an entire new classification for it right now.
@@ -442,17 +455,13 @@ void BuildInitInfo(POVMSObjectPtr msg)
     }
 
 #ifndef OPENEXR_MISSING
-    // OpenEXR library version and copyright notice
-    // NOTE: The library does not seem to have a way to get the version number.
-    // Since we don't ship the library with our source tree, we can't hard-code
-    // the version number here, either, since we don't know what version will
-    // be linked with our source.
+    // OpenEXR and related libraries version and copyright notice
     if(err == kNoErr)
     {
         err = POVMSAttr_New(&attr);
         if(err == kNoErr)
         {
-            const char *tempstr = "OpenEXR, Copyright (c) 2004-2007, Industrial Light & Magic.";
+            const char *tempstr = OPENEXR_PACKAGE_STRING " and " ILMBASE_PACKAGE_STRING ", Copyright (c) 2002-2011 Industrial Light & Magic.";
             err = POVMSAttr_Set(&attr, kPOVMSType_CString, reinterpret_cast<const void *>(tempstr), (int) strlen(tempstr) + 1);
             if(err == kNoErr)
                 err = POVMSAttrList_Append(&attrlist, &attr);

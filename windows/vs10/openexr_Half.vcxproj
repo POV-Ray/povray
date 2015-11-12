@@ -220,6 +220,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\libraries\ilmbase\Half\half.h" />
+    <ClInclude Include="..\..\libraries\ilmbase\Half\halfExport.h" />
     <ClInclude Include="..\..\libraries\ilmbase\Half\halfFunction.h" />
     <ClInclude Include="..\..\libraries\ilmbase\Half\halfLimits.h" />
   </ItemGroup>

@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////
 //
-// Copyright (c) 2002, Industrial Light & Magic, a division of Lucas
+// Copyright (c) 2002-2012, Industrial Light & Magic, a division of Lucas
 // Digital Ltd. LLC
 // 
 // All rights reserved.
@@ -38,36 +38,27 @@
 
 //-------------------------------------------------------------------------
 //
-//      This file contains algorithms applied to or in conjunction with
-//	transformation matrices (Imath::Matrix33 and Imath::Matrix44).
-//	The assumption made is that these functions are called much less
-//	often than the basic point functions or these functions require
-//	more support classes.
+//  This file contains algorithms applied to or in conjunction with
+//  transformation matrices (Imath::Matrix33 and Imath::Matrix44).
+//  The assumption made is that these functions are called much less
+//  often than the basic point functions or these functions require
+//  more support classes.
 //
-//	This file also defines a few predefined constant matrices.
+//  This file also defines a few predefined constant matrices.
 //
 //-------------------------------------------------------------------------
 
+#include "ImathExport.h"
 #include "ImathMatrix.h"
 #include "ImathQuat.h"
 #include "ImathEuler.h"
 #include "ImathExc.h"
 #include "ImathVec.h"
+#include "ImathLimits.h"
+#include "ImathNamespace.h"
 #include <math.h>
 
-
-#ifdef OPENEXR_DLL
-    #ifdef IMATH_EXPORTS
-        #define IMATH_EXPORT_CONST extern __declspec(dllexport)
-    #else
-	#define IMATH_EXPORT_CONST extern __declspec(dllimport)
-    #endif
-#else
-    #define IMATH_EXPORT_CONST extern const
-#endif
-
-
-namespace Imath {
+IMATH_INTERNAL_NAMESPACE_HEADER_ENTER
 
 //------------------
 // Identity matrices
@@ -148,6 +139,11 @@ template <class T>  Matrix44<T> sansScalingAndShear
                                             (const Matrix44<T> &mat, 
 					     bool exc = true);
 
+template <class T>  void        sansScalingAndShear 
+                                            (Matrix44<T> &result,
+                                             const Matrix44<T> &mat, 
+					     bool exc = true);
+
 template <class T>  bool        removeScalingAndShear 
                                             (Matrix44<T> &mat,
 					     bool exc = true);
@@ -202,6 +198,11 @@ template <class T>  bool	checkForZeroScaleInRow
 					     const Vec3<T> &row,
 					     bool exc = true);
 
+template <class T>  Matrix44<T> outerProduct
+                                            ( const Vec4<T> &a,
+                                              const Vec4<T> &b);
+
+
 //
 // Returns a matrix that rotates "fromDirection" vector to "toDirection"
 // vector.
@@ -226,7 +227,7 @@ template <class T> Matrix44<T>	rotationMatrixWithUpDir
 
 
 //
-// Returns a matrix that rotates the z-axis so that it 
+// Constructs a matrix that rotates the z-axis so that it 
 // points towards "targetDir".  You must also specify 
 // that you want the up vector to be pointing in a 
 // certain direction "upDir".
@@ -238,9 +239,49 @@ template <class T> Matrix44<T>	rotationMatrixWithUpDir
 //        (b) when any of the given direction vectors have zero length
 //
 
-template <class T> Matrix44<T>	alignZAxisWithTargetDir 
-                                            (Vec3<T> targetDir, 
-					     Vec3<T> upDir);
+template <class T> void	alignZAxisWithTargetDir 
+                                            (Matrix44<T> &result,
+                                             Vec3<T>      targetDir, 
+					     Vec3<T>      upDir);
+
+
+// Compute an orthonormal direct frame from : a position, an x axis direction and a normal to the y axis
+// If the x axis and normal are perpendicular, then the normal will have the same direction as the z axis.
+// Inputs are : 
+//     -the position of the frame
+//     -the x axis direction of the frame
+//     -a normal to the y axis of the frame
+// Return is the orthonormal frame
+template <class T> Matrix44<T> computeLocalFrame( const Vec3<T>& p,
+                                                  const Vec3<T>& xDir,
+                                                  const Vec3<T>& normal);
+
+// Add a translate/rotate/scale offset to an input frame
+// and put it in another frame of reference
+// Inputs are :
+//     - input frame
+//     - translate offset
+//     - rotate    offset in degrees
+//     - scale     offset
+//     - frame of reference
+// Output is the offsetted frame
+template <class T> Matrix44<T> addOffset( const Matrix44<T>& inMat,
+                                          const Vec3<T>&     tOffset,
+                                          const Vec3<T>&     rOffset,
+                                          const Vec3<T>&     sOffset,
+                                          const Vec3<T>&     ref);
+
+// Compute Translate/Rotate/Scale matrix from matrix A with the Rotate/Scale of Matrix B
+// Inputs are :
+//      -keepRotateA : if true keep rotate from matrix A, use B otherwise
+//      -keepScaleA  : if true keep scale  from matrix A, use B otherwise
+//      -Matrix A
+//      -Matrix B
+// Return Matrix A with tweaked rotation/scale
+template <class T> Matrix44<T> computeRSMatrix( bool               keepRotateA,
+                                                bool               keepScaleA, 
+                                                const Matrix44<T>& A,
+                                                const Matrix44<T>& B);
 
 
 //----------------------------------------------------------------------
@@ -299,7 +340,9 @@ template <class T>  bool	checkForZeroScaleInRow
 					     const Vec2<T> &row,
 					     bool exc = true);
 
-
+template <class T>  Matrix33<T> outerProduct
+                                            ( const Vec3<T> &a,
+                                              const Vec3<T> &b);
 
 
 //-----------------------------------------------------------------------------
@@ -394,6 +437,18 @@ sansScalingAndShear (const Matrix44<T> &mat, bool exc)
 
 
 template <class T>
+void
+sansScalingAndShear (Matrix44<T> &result, const Matrix44<T> &mat, bool exc)
+{
+    Vec3<T> scl;
+    Vec3<T> shr;
+
+    if (! extractAndRemoveScalingAndShear (result, scl, shr, exc))
+	result = mat;
+}
+
+
+template <class T>
 bool
 removeScalingAndShear (Matrix44<T> &mat, bool exc)
 {
@@ -427,8 +482,8 @@ extractAndRemoveScalingAndShear (Matrix44<T> &mat,
     T maxVal = 0;
     for (int i=0; i < 3; i++)
 	for (int j=0; j < 3; j++)
-	    if (Imath::abs (row[i][j]) > maxVal)
-		maxVal = Imath::abs (row[i][j]);
+	    if (IMATH_INTERNAL_NAMESPACE::abs (row[i][j]) > maxVal)
+		maxVal = IMATH_INTERNAL_NAMESPACE::abs (row[i][j]);
 
     //
     // We normalize the 3x3 matrix here.
@@ -632,9 +687,9 @@ extractQuat (const Matrix44<T> &mat)
 
   // check the diagonal
   if (tr > 0.0) {
-     s = Math<T>::sqrt (tr + 1.0);
-     quat.r = s / 2.0;
-     s = 0.5 / s;
+     s = Math<T>::sqrt (tr + T(1.0));
+     quat.r = s / T(2.0);
+     s = T(0.5) / s;
 
      quat.v.x = (mat[1][2] - mat[2][1]) * s;
      quat.v.y = (mat[2][0] - mat[0][2]) * s;
@@ -650,11 +705,11 @@ extractQuat (const Matrix44<T> &mat)
     
      j = nxt[i];
      k = nxt[j];
-     s = Math<T>::sqrt ((mat[i][i] - (mat[j][j] + mat[k][k])) + 1.0);
+     s = Math<T>::sqrt ((mat[i][i] - (mat[j][j] + mat[k][k])) + T(1.0));
       
-     q[i] = s * 0.5;
-     if (s != 0.0) 
-        s = 0.5 / s;
+     q[i] = s * T(0.5);
+     if (s != T(0.0)) 
+        s = T(0.5) / s;
 
      q[3] = (mat[j][k] - mat[k][j]) * s;
      q[j] = (mat[i][j] + mat[j][i]) * s;
@@ -693,8 +748,8 @@ extractSHRT (const Matrix44<T> &mat,
 
     if (rOrder != Euler<T>::XYZ)
     {
-	Imath::Euler<T> eXYZ (r, Imath::Euler<T>::XYZ);
-	Imath::Euler<T> e (eXYZ, rOrder);
+	IMATH_INTERNAL_NAMESPACE::Euler<T> eXYZ (r, IMATH_INTERNAL_NAMESPACE::Euler<T>::XYZ);
+	IMATH_INTERNAL_NAMESPACE::Euler<T> e (eXYZ, rOrder);
 	r = e.toXYZVector ();
     }
 
@@ -710,7 +765,7 @@ extractSHRT (const Matrix44<T> &mat,
 	     Vec3<T> &t,
 	     bool exc)
 {
-    return extractSHRT(mat, s, h, r, t, exc, Imath::Euler<T>::XYZ);
+    return extractSHRT(mat, s, h, r, t, exc, IMATH_INTERNAL_NAMESPACE::Euler<T>::XYZ);
 }
 
 template <class T>
@@ -737,7 +792,7 @@ checkForZeroScaleInRow (const T& scl,
 	if ((abs (scl) < 1 && abs (row[i]) >= limits<T>::max() * abs (scl)))
 	{
 	    if (exc)
-		throw Imath::ZeroScaleExc ("Cannot remove zero scaling "
+		throw IMATH_INTERNAL_NAMESPACE::ZeroScaleExc ("Cannot remove zero scaling "
 					   "from matrix.");
 	    else
 		return false;
@@ -747,6 +802,15 @@ checkForZeroScaleInRow (const T& scl,
     return true;
 }
 
+template <class T>
+Matrix44<T>
+outerProduct (const Vec4<T> &a, const Vec4<T> &b )
+{
+    return Matrix44<T> (a.x*b.x, a.x*b.y, a.x*b.z, a.x*b.w,
+                        a.y*b.x, a.y*b.y, a.y*b.z, a.x*b.w,
+                        a.z*b.x, a.z*b.y, a.z*b.z, a.x*b.w,
+                        a.w*b.x, a.w*b.y, a.w*b.z, a.w*b.w);
+}
 
 template <class T>
 Matrix44<T>
@@ -778,12 +842,13 @@ rotationMatrixWithUpDir (const Vec3<T> &fromDir,
 
     else
     {
-	Matrix44<T> zAxis2FromDir  = alignZAxisWithTargetDir 
-	                                 (fromDir, Vec3<T> (0, 1, 0));
+	Matrix44<T> zAxis2FromDir( IMATH_INTERNAL_NAMESPACE::UNINITIALIZED );
+	alignZAxisWithTargetDir (zAxis2FromDir, fromDir, Vec3<T> (0, 1, 0));
 
 	Matrix44<T> fromDir2zAxis  = zAxis2FromDir.transposed ();
 	
-	Matrix44<T> zAxis2ToDir    = alignZAxisWithTargetDir (toDir, upDir);
+	Matrix44<T> zAxis2ToDir( IMATH_INTERNAL_NAMESPACE::UNINITIALIZED );
+	alignZAxisWithTargetDir (zAxis2ToDir, toDir, upDir);
 
 	return fromDir2zAxis * zAxis2ToDir;
     }
@@ -791,8 +856,8 @@ rotationMatrixWithUpDir (const Vec3<T> &fromDir,
 
 
 template <class T>
-Matrix44<T>
-alignZAxisWithTargetDir (Vec3<T> targetDir, Vec3<T> upDir)
+void
+alignZAxisWithTargetDir (Matrix44<T> &result, Vec3<T> targetDir, Vec3<T> upDir)
 {
     //
     // Ensure that the target direction is non-zero.
@@ -839,10 +904,136 @@ alignZAxisWithTargetDir (Vec3<T> targetDir, Vec3<T> upDir)
     row[1] = targetUpDir  .normalized ();
     row[2] = targetDir    .normalized ();
     
-    Matrix44<T> mat ( row[0][0],  row[0][1],  row[0][2],  0,
-		      row[1][0],  row[1][1],  row[1][2],  0,
-		      row[2][0],  row[2][1],  row[2][2],  0,
-		      0,          0,          0,          1 );
+    result.x[0][0] = row[0][0];
+    result.x[0][1] = row[0][1];
+    result.x[0][2] = row[0][2];
+    result.x[0][3] = (T)0;
+ 
+    result.x[1][0] = row[1][0];
+    result.x[1][1] = row[1][1];
+    result.x[1][2] = row[1][2];
+    result.x[1][3] = (T)0;
+ 
+    result.x[2][0] = row[2][0];
+    result.x[2][1] = row[2][1];
+    result.x[2][2] = row[2][2];
+    result.x[2][3] = (T)0;
+ 
+    result.x[3][0] = (T)0;
+    result.x[3][1] = (T)0;
+    result.x[3][2] = (T)0;
+    result.x[3][3] = (T)1;
+}
+
+
+// Compute an orthonormal direct frame from : a position, an x axis direction and a normal to the y axis
+// If the x axis and normal are perpendicular, then the normal will have the same direction as the z axis.
+// Inputs are : 
+//     -the position of the frame
+//     -the x axis direction of the frame
+//     -a normal to the y axis of the frame
+// Return is the orthonormal frame
+template <class T>
+Matrix44<T>
+computeLocalFrame( const Vec3<T>& p,
+                   const Vec3<T>& xDir,
+                   const Vec3<T>& normal)
+{
+    Vec3<T> _xDir(xDir);
+    Vec3<T> x = _xDir.normalize();
+    Vec3<T> y = (normal % x).normalize();
+    Vec3<T> z = (x % y).normalize();
+
+    Matrix44<T> L;
+    L[0][0] = x[0];
+    L[0][1] = x[1];
+    L[0][2] = x[2];
+    L[0][3] = 0.0;
+
+    L[1][0] = y[0];
+    L[1][1] = y[1];
+    L[1][2] = y[2];
+    L[1][3] = 0.0;
+
+    L[2][0] = z[0];
+    L[2][1] = z[1];
+    L[2][2] = z[2];
+    L[2][3] = 0.0;
+
+    L[3][0] = p[0];
+    L[3][1] = p[1];
+    L[3][2] = p[2];
+    L[3][3] = 1.0;
+    
+    return L;
+}
+
+// Add a translate/rotate/scale offset to an input frame
+// and put it in another frame of reference
+// Inputs are :
+//     - input frame
+//     - translate offset
+//     - rotate    offset in degrees
+//     - scale     offset
+//     - frame of reference
+// Output is the offsetted frame
+template <class T>
+Matrix44<T>
+addOffset( const Matrix44<T>& inMat,
+           const Vec3<T>&     tOffset,
+           const Vec3<T>&     rOffset,
+           const Vec3<T>&     sOffset,
+           const Matrix44<T>& ref)
+{
+    Matrix44<T> O;
+
+    Vec3<T> _rOffset(rOffset);
+    _rOffset *= M_PI / 180.0;
+    O.rotate (_rOffset);
+
+    O[3][0] = tOffset[0];
+    O[3][1] = tOffset[1];
+    O[3][2] = tOffset[2];
+
+    Matrix44<T> S;
+    S.scale (sOffset);
+
+    Matrix44<T> X = S * O * inMat * ref;
+
+    return X;
+}
+
+// Compute Translate/Rotate/Scale matrix from matrix A with the Rotate/Scale of Matrix B
+// Inputs are :
+//      -keepRotateA : if true keep rotate from matrix A, use B otherwise
+//      -keepScaleA  : if true keep scale  from matrix A, use B otherwise
+//      -Matrix A
+//      -Matrix B
+// Return Matrix A with tweaked rotation/scale
+template <class T>
+Matrix44<T>
+computeRSMatrix( bool               keepRotateA,
+                 bool               keepScaleA, 
+                 const Matrix44<T>& A, 
+                 const Matrix44<T>& B)
+{
+    Vec3<T> as, ah, ar, at;
+    extractSHRT (A, as, ah, ar, at);
+    
+    Vec3<T> bs, bh, br, bt;
+    extractSHRT (B, bs, bh, br, bt);
+
+    if (!keepRotateA)
+        ar = br;
+
+    if (!keepScaleA)
+        as = bs;
+
+    Matrix44<T> mat;
+    mat.makeIdentity();
+    mat.translate (at);
+    mat.rotate (ar);
+    mat.scale (as);
     
     return mat;
 }
@@ -965,8 +1156,8 @@ extractAndRemoveScalingAndShear (Matrix33<T> &mat,
     T maxVal = 0;
     for (int i=0; i < 2; i++)
 	for (int j=0; j < 2; j++)
-	    if (Imath::abs (row[i][j]) > maxVal)
-		maxVal = Imath::abs (row[i][j]);
+	    if (IMATH_INTERNAL_NAMESPACE::abs (row[i][j]) > maxVal)
+		maxVal = IMATH_INTERNAL_NAMESPACE::abs (row[i][j]);
 
     //
     // We normalize the 2x2 matrix here.
@@ -1090,25 +1281,145 @@ extractSHRT (const Matrix33<T> &mat,
 template <class T> 
 bool		
 checkForZeroScaleInRow (const T& scl, 
-			const Vec2<T> &row,
-			bool exc /* = true */ )
+                        const Vec2<T> &row,
+                        bool exc /* = true */ )
 {
     for (int i = 0; i < 2; i++)
     {
-	if ((abs (scl) < 1 && abs (row[i]) >= limits<T>::max() * abs (scl)))
-	{
-	    if (exc)
-		throw Imath::ZeroScaleExc ("Cannot remove zero scaling "
-					   "from matrix.");
-	    else
-		return false;
-	}
+        if ((abs (scl) < 1 && abs (row[i]) >= limits<T>::max() * abs (scl)))
+        {
+            if (exc)
+                throw IMATH_INTERNAL_NAMESPACE::ZeroScaleExc (
+                        "Cannot remove zero scaling from matrix.");
+            else
+                return false;
+        }
     }
 
     return true;
 }
 
 
-} // namespace Imath
+template <class T>
+Matrix33<T>
+outerProduct (const Vec3<T> &a, const Vec3<T> &b )
+{
+    return Matrix33<T> (a.x*b.x, a.x*b.y, a.x*b.z,
+                        a.y*b.x, a.y*b.y, a.y*b.z,
+                        a.z*b.x, a.z*b.y, a.z*b.z );
+}
 
-#endif
+
+// Computes the translation and rotation that brings the 'from' points
+// as close as possible to the 'to' points under the Frobenius norm.  
+// To be more specific, let x be the matrix of 'from' points and y be
+// the matrix of 'to' points, we want to find the matrix A of the form
+//    [ R t ]
+//    [ 0 1 ]
+// that minimizes
+//     || (A*x - y)^T * W * (A*x - y) ||_F
+// If doScaling is true, then a uniform scale is allowed also.
+template <typename T>
+IMATH_INTERNAL_NAMESPACE::M44d
+procrustesRotationAndTranslation (const IMATH_INTERNAL_NAMESPACE::Vec3<T>* A,  // From these
+                                  const IMATH_INTERNAL_NAMESPACE::Vec3<T>* B,  // To these
+                                  const T* weights, 
+                                  const size_t numPoints,
+                                  const bool doScaling = false);
+
+// Unweighted:
+template <typename T>
+IMATH_INTERNAL_NAMESPACE::M44d
+procrustesRotationAndTranslation (const IMATH_INTERNAL_NAMESPACE::Vec3<T>* A, 
+                                  const IMATH_INTERNAL_NAMESPACE::Vec3<T>* B, 
+                                  const size_t numPoints,
+                                  const bool doScaling = false);
+
+// Compute the SVD of a 3x3 matrix using Jacobi transformations.  This method
+// should be quite accurate (competitive with LAPACK) even for poorly
+// conditioned matrices, and because it has been written specifically for the
+// 3x3/4x4 case it is much faster than calling out to LAPACK.  
+//
+// The SVD of a 3x3/4x4 matrix A is defined as follows:
+//     A = U * S * V^T
+// where S is the diagonal matrix of singular values and both U and V are
+// orthonormal.  By convention, the entries S are all positive and sorted from
+// the largest to the smallest.  However, some uses of this function may
+// require that the matrix U*V^T have positive determinant; in this case, we
+// may make the smallest singular value negative to ensure that this is
+// satisfied.  
+//
+// Currently only available for single- and double-precision matrices.
+template <typename T>
+void
+jacobiSVD (const IMATH_INTERNAL_NAMESPACE::Matrix33<T>& A,
+           IMATH_INTERNAL_NAMESPACE::Matrix33<T>& U,
+           IMATH_INTERNAL_NAMESPACE::Vec3<T>& S,
+           IMATH_INTERNAL_NAMESPACE::Matrix33<T>& V,
+           const T tol = IMATH_INTERNAL_NAMESPACE::limits<T>::epsilon(),
+           const bool forcePositiveDeterminant = false);
+
+template <typename T>
+void
+jacobiSVD (const IMATH_INTERNAL_NAMESPACE::Matrix44<T>& A,
+           IMATH_INTERNAL_NAMESPACE::Matrix44<T>& U,
+           IMATH_INTERNAL_NAMESPACE::Vec4<T>& S,
+           IMATH_INTERNAL_NAMESPACE::Matrix44<T>& V,
+           const T tol = IMATH_INTERNAL_NAMESPACE::limits<T>::epsilon(),
+           const bool forcePositiveDeterminant = false);
+
+// Compute the eigenvalues (S) and the eigenvectors (V) of
+// a real symmetric matrix using Jacobi transformation.
+//
+// Jacobi transformation of a 3x3/4x4 matrix A outputs S and V:
+// 	A = V * S * V^T
+// where V is orthonormal and S is the diagonal matrix of eigenvalues.
+// Input matrix A must be symmetric. A is also modified during
+// the computation so that upper diagonal entries of A become zero. 
+//
+template <typename T>
+void
+jacobiEigenSolver (Matrix33<T>& A,
+                   Vec3<T>& S,
+                   Matrix33<T>& V,
+                   const T tol);
+
+template <typename T>
+inline
+void
+jacobiEigenSolver (Matrix33<T>& A,
+                   Vec3<T>& S,
+                   Matrix33<T>& V)
+{
+    jacobiEigenSolver(A,S,V,limits<T>::epsilon());
+}
+
+template <typename T>
+void
+jacobiEigenSolver (Matrix44<T>& A,
+                   Vec4<T>& S,
+                   Matrix44<T>& V,
+                   const T tol);
+
+template <typename T>
+inline
+void
+jacobiEigenSolver (Matrix44<T>& A,
+                   Vec4<T>& S,
+                   Matrix44<T>& V)
+{
+    jacobiEigenSolver(A,S,V,limits<T>::epsilon());
+}
+
+// Compute a eigenvector corresponding to the abs max/min eigenvalue
+// of a real symmetric matrix using Jacobi transformation.
+template <typename TM, typename TV>
+void
+maxEigenVector (TM& A, TV& S);
+template <typename TM, typename TV>
+void
+minEigenVector (TM& A, TV& S);
+
+IMATH_INTERNAL_NAMESPACE_HEADER_EXIT
+
+#endif // INCLUDED_IMATHMATRIXALGO_H

@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////
 //
-// Copyright (c) 2002, Industrial Light & Magic, a division of Lucas
+// Copyright (c) 2002-2012, Industrial Light & Magic, a division of Lucas
 // Digital Ltd. LLC
 // 
 // All rights reserved.
@@ -46,8 +46,9 @@
 #include "ImathVec.h"
 #include "ImathBox.h"
 #include "ImathLine.h"
+#include "ImathNamespace.h"
 
-namespace Imath {
+IMATH_INTERNAL_NAMESPACE_HEADER_ENTER
 
 template <class T>
 class Sphere3
@@ -119,13 +120,13 @@ bool Sphere3<T>::intersectT(const Line3<T> &line, T &t) const
     bool doesIntersect = true;
 
     Vec3<T> v = line.pos - center;
-    T B = 2.0 * (line.dir ^ v);
+    T B = T(2.0) * (line.dir ^ v);
     T C = (v ^ v) - (radius * radius);
 
     // compute discriminant
     // if negative, there is no intersection
 
-    T discr = B*B - 4.0*C;
+    T discr = B*B - T(4.0)*C;
 
     if (discr < 0.0)
     {
@@ -138,13 +139,13 @@ bool Sphere3<T>::intersectT(const Line3<T> &line, T &t) const
 	// t0: (-B - sqrt(B^2 - 4AC)) / 2A  (A = 1)
 
 	T sqroot = Math<T>::sqrt(discr);
-	t = (-B - sqroot) * 0.5;
+	t = (-B - sqroot) * T(0.5);
 
 	if (t < 0.0)
 	{
 	    // no intersection, try t1: (-B + sqrt(B^2 - 4AC)) / 2A  (A = 1)
 
-	    t = (-B + sqroot) * 0.5;
+	    t = (-B + sqroot) * T(0.5);
 	}
 
 	if (t < 0.0)
@@ -171,7 +172,6 @@ bool Sphere3<T>::intersect(const Line3<T> &line, Vec3<T> &intersection) const
     }
 }
 
+IMATH_INTERNAL_NAMESPACE_HEADER_EXIT
 
-} //namespace Imath
-
-#endif
+#endif // INCLUDED_IMATHSPHERE_H
