@@ -65,6 +65,13 @@ the compilers provided with it or with the platform SDK.
 The Visual Studio 2010 project is located in the "windows/vs10"
 subdirectory.
 
+Visual Studio 2015
+------------------
+
+The Visual Studio 2010 projects should also build fine in Visual Studio 2015
+after automatic conversion, as has been tested with the Visual Studio 2015
+Community edition.
+
 Earlier Versions of Visual Studio
 ---------------------------------
 
