@@ -517,15 +517,6 @@
     #define FORCEINLINE inline
 #endif
 
-/// @def SAFEMATH_DEBUG
-/// Enable run-time sanity checks for our safe integer mathematics mechanism (see @ref safemath.h).
-///
-/// Define as non-zero integer to enable, or zero to disable.
-///
-#ifndef SAFEMATH_DEBUG
-    #define SAFEMATH_DEBUG 0
-#endif
-
 /// @def POV_MULTITHREADED
 /// Enable multithreading in the core modules.
 ///
@@ -534,6 +525,54 @@
 ///
 #ifndef POV_MULTITHREADED
     #define POV_MULTITHREADED 1
+#endif
+
+/// @}
+///
+//******************************************************************************
+///
+/// @name Debug Settings.
+///
+/// The following settings enable or disable certain debugging aids, such as run-time sanity checks
+/// or additional log output.
+///
+/// Unless noted otherwise, a non-zero integer will enable the respective debugging aids, while a
+/// zero value will disable them.
+///
+/// It is recommended that system-specific configurations leave these settings undefined in release
+/// builds, in which case they will default to @ref POV_DEBUG unless noted otherwise.
+///
+/// @{
+
+/// @def POV_DEBUG
+/// Default setting for enabling or disabling debugging aids.
+///
+/// This setting specifies the default for all debugging switches throughout the entire POV-Ray
+/// project that are not explicitly enabled or disabled by system-specific configurations.
+///
+/// If left undefined by system-specific configurations, this setting defaults to zero, disabling
+/// any debugging aids not explicitly enabled by system-specific configurations.
+///
+#ifndef POV_DEBUG
+    #define POV_DEBUG 0
+#endif
+
+/// @def POV_MATHUTIL_DEBUG
+/// Enable run-time sanity checks for scalar maths utility functions.
+///
+/// Define as non-zero integer to enable, or zero to disable.
+///
+#ifndef POV_MATHUTIL_DEBUG
+    #define POV_MATHUTIL_DEBUG POV_DEBUG
+#endif
+
+/// @def POV_SAFEMATH_DEBUG
+/// Enable run-time sanity checks for safe integer maths.
+///
+/// Define as non-zero integer to enable, or zero to disable.
+///
+#ifndef POV_SAFEMATH_DEBUG
+    #define POV_SAFEMATH_DEBUG POV_DEBUG
 #endif
 
 /// @}
@@ -563,6 +602,18 @@
     #else
         #define POV_TIME_UTC boost::TIME_UTC
     #endif
+#endif
+
+#if POV_MATHUTIL_DEBUG
+    #define POV_MATHUTIL_ASSERT(expr) POV_ASSERT_HARD( expr )
+#else
+    #define POV_MATHUTIL_ASSERT(expr) NO_OP
+#endif
+
+#if POV_SAFEMATH_DEBUG
+    #define POV_SAFEMATH_ASSERT(expr) POV_ASSERT_HARD( expr )
+#else
+    #define POV_SAFEMATH_ASSERT(expr) NO_OP
 #endif
 
 /// @}

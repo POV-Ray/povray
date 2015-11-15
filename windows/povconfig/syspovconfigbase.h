@@ -41,4 +41,10 @@
 
 #include "syspovconfig.h"
 
+#ifdef _DEBUG
+    #define POV_DEBUG 1
+#else
+    #define POV_DEBUG 0
+#endif
+
 #endif // POVRAY_WINDOWS_SYSPOVCONFIGBASE_H

@@ -924,10 +924,6 @@ static int map_pos(const Vector3d& EPoint, const BasicPattern* pPattern, DBL *xc
     *xcoor = wrap( *xcoor, (DBL)(image->iwidth));
     *ycoor = wrap(-*ycoor, (DBL)(image->iheight)); // (Compensate for y coordinates on the images being upsidedown)
 
-    // sanity check; this should never kick in, unless wrap() has an implementation error.
-    assert ((*xcoor >= 0.0) && (*xcoor < (DBL)image->iwidth));
-    assert ((*ycoor >= 0.0) && (*ycoor < (DBL)image->iheight));
-
     return (0);
 }
 
@@ -982,11 +978,6 @@ static void no_interpolation(const ImageData *image, DBL xcoor, DBL ycoor, RGBFT
 
         ixcoor = (int)wrap(xcoor, (DBL)image->iwidth);
         iycoor = (int)wrap(ycoor, (DBL)image->iheight);
-
-        // sanity check; this should never kick in, unless wrap() has an implementation error,
-        // or there exists any positive int n such that (int)a < n does not hold true for all double a < (double)n
-        assert ((ixcoor >= 0) && (ixcoor < image->iwidth));
-        assert ((iycoor >= 0) && (iycoor < image->iheight));
     }
 
     image->data->GetRGBFTValue(ixcoor, iycoor, colour, premul);

@@ -45,13 +45,6 @@
 namespace pov_base
 {
 
-#if SAFEMATH_DEBUG
-    #define SAFEMATH_ASSERT(expr) assert(expr)
-#else
-    #define SAFEMATH_ASSERT(expr) NO_OP
-#endif
-
-
 /// Multiply four (unsigned integer) factors, throwing an exception in case of numerical overflow.
 template<typename T, typename T1, typename T2, typename T3, typename T4>
 static inline T SafeUnsignedProduct(T1 p1, T2 p2, T3 p3, T4 p4)
@@ -59,11 +52,11 @@ static inline T SafeUnsignedProduct(T1 p1, T2 p2, T3 p3, T4 p4)
     // the function is intended for use with unsigned integer parameters only
     // (NB: Instead of testing for (pN >= 0) we could also test for (!std::numeric_limits<TN>::is_signed),
     //  but this would make passing constant factors more cumbersome)
-    SAFEMATH_ASSERT(std::numeric_limits<T>::is_integer);
-    SAFEMATH_ASSERT(std::numeric_limits<T1>::is_integer && (p1 >= 0));
-    SAFEMATH_ASSERT(std::numeric_limits<T2>::is_integer && (p2 >= 0));
-    SAFEMATH_ASSERT(std::numeric_limits<T3>::is_integer && (p3 >= 0));
-    SAFEMATH_ASSERT(std::numeric_limits<T4>::is_integer && (p4 >= 0));
+    POV_SAFEMATH_ASSERT(std::numeric_limits<T>::is_integer);
+    POV_SAFEMATH_ASSERT(std::numeric_limits<T1>::is_integer && (p1 >= 0));
+    POV_SAFEMATH_ASSERT(std::numeric_limits<T2>::is_integer && (p2 >= 0));
+    POV_SAFEMATH_ASSERT(std::numeric_limits<T3>::is_integer && (p3 >= 0));
+    POV_SAFEMATH_ASSERT(std::numeric_limits<T4>::is_integer && (p4 >= 0));
 
     // avoid divide-by-zero issues
     if ((p1==0) || (p2==0) || (p3==0) || (p4==0))
@@ -97,8 +90,8 @@ template<typename T>
 static inline T SafeSignedProduct(T p1, T p2, T p3 = 1, T p4 = 1)
 {
     // the function is intended for use with signed integer types only
-    SAFEMATH_ASSERT(std::numeric_limits<T>::is_integer);
-    SAFEMATH_ASSERT(std::numeric_limits<T>::is_signed);
+    POV_SAFEMATH_ASSERT(std::numeric_limits<T>::is_integer);
+    POV_SAFEMATH_ASSERT(std::numeric_limits<T>::is_signed);
 
     // avoid divide-by-zero issues
     if ((p1==0) || (p2==0) || (p3==0) || (p4==0))

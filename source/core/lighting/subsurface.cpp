@@ -37,6 +37,8 @@
 #include "core/configcore.h"
 #include "core/lighting/subsurface.h"
 
+#include "base/mathutil.h"
+
 // this must be the last file included
 #include "base/povdebug.h"
 

@@ -38,6 +38,7 @@
 #define POVRAY_BASE_IMAGE_ENCODING_H
 
 #include "base/configbase.h"
+#include "base/mathutil.h"
 #include "base/types.h"
 #include "base/image/colourspace.h"
 

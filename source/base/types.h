@@ -204,6 +204,16 @@ namespace pov_base
 ///
 #define NO_OP SINGLE_STATEMENT(;)
 
+/// A macro that tests an expression and, if it evaluates false, throws an exception to allow the
+/// application to fail gracefully.
+///
+#define POV_ASSERT_SOFT(expr) SINGLE_STATEMENT( if(!(expr)) throw POV_EXCEPTION_CODE(kUncategorizedError); )
+
+/// A macro that tests an expression and, if it evaluates false, causes a hard crash to generate a
+/// core dump or break to a debugger.
+///
+#define POV_ASSERT_HARD(expr) assert( expr )
+
 // from <algorithm>; we don't want to always type the namespace for these.
 using std::min;
 using std::max;
@@ -236,75 +246,6 @@ using std::tanh;
 /// 5-dimensional vector type shared between parser and splines.
 /// @todo Make this obsolete.
 typedef DBL EXPRESS[5];
-
-// Get minimum/maximum of three values.
-template<typename T>
-inline T max3(T x, T y, T z) { return max(x, max(y, z)); }
-template<typename T>
-inline T min3(T x, T y, T z) { return min(x, min(y, z)); }
-
-template<typename T>
-inline T clip(T val, T minv, T maxv);
-
-template<typename T>
-inline T clip(T val, T minv, T maxv)
-{
-    if(val < minv)
-        return minv;
-    else if(val > maxv)
-        return maxv;
-    else
-        return val;
-}
-
-// clip a value to the range of an integer type
-template<typename T, typename T2>
-inline T clipToType(T2 val)
-{
-    return (T)clip<T2>(val, std::numeric_limits<T>::min(), std::numeric_limits<T>::max());
-}
-
-// force a value's precision to a given type, even if computations are normally done with extended precision
-// (such as GNU Linux on 32-bit CPU, which uses 80-bit extended double precision)
-// TODO - we might make this code platform-specific
-template<typename T>
-inline T forcePrecision(T val)
-{
-    volatile T tempVal;
-    tempVal = val;
-    return tempVal;
-}
-
-// wrap value into the range [0..upperLimit);
-// (this is equivalent to fmod() for positive values, but not for negative ones)
-template<typename T>
-inline T wrap(T val, T upperLimit)
-{
-    T tempVal = fmod(val, upperLimit);
-    // NB: The range of the value computed by fmod() should be in the range [0..upperLimit) already,
-    // but on some architectures may actually be in the range [0..upperLimit].
-
-    if (tempVal < T(0.0))
-    {
-        // For negative values, fmod() returns a value in the range [-upperLimit..0];
-        // transpose it into the range [0..upperLimit].
-        tempVal += upperLimit;
-    }
-
-    // for negative values (and also for positive values on systems that internally use higher precision
-    // than double for computations) we may end up with value equal to upperLimit (in double precision);
-    // make sure to wrap these special cases to the range [0..upperLimit) as well.
-    if (forcePrecision<double>(tempVal) >= upperLimit)
-        tempVal = T(0.0);
-
-    return tempVal;
-}
-
-// round up/down to a multiple of some value
-template<typename T1, typename T2>
-inline T1 RoundDownToMultiple(T1 x, T2 base) { return x - (x % base); }
-template<typename T1, typename T2>
-inline T1 RoundUpToMultiple(T1 x, T2 base) { return RoundDownToMultiple (x + base - 1, base); }
 
 struct POVRect
 {

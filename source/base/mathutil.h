@@ -36,6 +36,8 @@
 #ifndef POVRAY_BASE_MATHUTIL_H
 #define POVRAY_BASE_MATHUTIL_H
 
+#include <cassert>
+
 namespace pov_base
 {
 
@@ -45,6 +47,78 @@ DBL acosh(DBL x);
 DBL atanh(DBL x);
 #endif
 
+// Get minimum/maximum of three values.
+template<typename T>
+inline T max3(T x, T y, T z) { return max(x, max(y, z)); }
+template<typename T>
+inline T min3(T x, T y, T z) { return min(x, min(y, z)); }
+
+template<typename T>
+inline T clip(T val, T minv, T maxv);
+
+template<typename T>
+inline T clip(T val, T minv, T maxv)
+{
+    if(val < minv)
+        return minv;
+    else if(val > maxv)
+        return maxv;
+    else
+        return val;
 }
 
-#endif
+// clip a value to the range of an integer type
+template<typename T, typename T2>
+inline T clipToType(T2 val)
+{
+    return (T)clip<T2>(val, std::numeric_limits<T>::min(), std::numeric_limits<T>::max());
+}
+
+// force a value's precision to a given type, even if computations are normally done with extended precision
+// (such as GNU Linux on 32-bit CPU, which uses 80-bit extended double precision)
+// TODO - we might make this code platform-specific
+template<typename T>
+inline T forcePrecision(T val)
+{
+    volatile T tempVal;
+    tempVal = val;
+    return tempVal;
+}
+
+// wrap value into the range [0..upperLimit);
+// (this is equivalent to fmod() for positive values, but not for negative ones)
+template<typename T>
+inline T wrap(T val, T upperLimit)
+{
+    T tempVal = fmod(val, upperLimit);
+    // NB: The range of the value computed by fmod() should be in the range [0..upperLimit) already,
+    // but on some architectures may actually be in the range [0..upperLimit].
+
+    if (tempVal < T(0.0))
+    {
+        // For negative values, fmod() returns a value in the range [-upperLimit..0];
+        // transpose it into the range [0..upperLimit].
+        tempVal += upperLimit;
+    }
+
+    // for negative values (and also for positive values on systems that internally use higher precision
+    // than double for computations) we may end up with value equal to upperLimit (in double precision);
+    // make sure to wrap these special cases to the range [0..upperLimit) as well.
+    if (forcePrecision<double>(tempVal) >= upperLimit)
+        tempVal = T(0.0);
+
+    // sanity check; this should never kick in, unless wrap() has an implementation error.
+    POV_MATHUTIL_ASSERT((tempVal >= 0.0) && (tempVal < upperLimit));
+
+    return tempVal;
+}
+
+// round up/down to a multiple of some value
+template<typename T1, typename T2>
+inline T1 RoundDownToMultiple(T1 x, T2 base) { return x - (x % base); }
+template<typename T1, typename T2>
+inline T1 RoundUpToMultiple(T1 x, T2 base) { return RoundDownToMultiple (x + base - 1, base); }
+
+}
+
+#endif // POVRAY_BASE_MATHUTIL_H

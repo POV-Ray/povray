@@ -64,6 +64,7 @@
 #include "core/support/octree.h"
 
 #include "base/fileinputoutput.h"
+#include "base/mathutil.h"
 #include "base/pov_err.h"
 
 #include "core/colour/spectral.h"

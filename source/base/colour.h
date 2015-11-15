@@ -41,6 +41,7 @@
 #include <limits>
 
 #include "base/configbase.h"
+#include "base/mathutil.h"
 #include "base/types.h"
 
 #define NUM_COLOUR_CHANNELS 3

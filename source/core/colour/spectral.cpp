@@ -38,6 +38,7 @@
 #include "core/colour/spectral.h"
 
 #include "base/colour.h"
+#include "base/mathutil.h"
 
 // this must be the last file included
 #include "base/povdebug.h"

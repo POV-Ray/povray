@@ -39,6 +39,8 @@
 #include "core/configcore.h"
 #include "core/shape/triangle.h"
 
+#include "base/mathutil.h"
+
 #include "core/math/matrix.h"
 #include "core/render/ray.h"
 #include "core/scene/tracethreaddata.h"
