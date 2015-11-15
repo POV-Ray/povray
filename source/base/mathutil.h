@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file core/math/mathutil.h
+/// @file base/mathutil.h
 ///
 /// This module contains all defines, typedefs, and prototypes for `mathutil.cpp`.
 ///
@@ -33,10 +33,10 @@
 ///
 //******************************************************************************
 
-#ifndef POVRAY_CORE_MATHUTIL_H
-#define POVRAY_CORE_MATHUTIL_H
+#ifndef POVRAY_BASE_MATHUTIL_H
+#define POVRAY_BASE_MATHUTIL_H
 
-namespace pov
+namespace pov_base
 {
 
 #ifdef NEED_INVHYP

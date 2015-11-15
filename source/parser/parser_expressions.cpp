@@ -43,6 +43,7 @@
 #include "parser/parser.h"
 
 #include "base/fileinputoutput.h"
+#include "base/mathutil.h"
 
 #include "core/material/blendmap.h"
 #include "core/material/normal.h"
@@ -50,7 +51,6 @@
 #include "core/material/pigment.h"
 #include "core/material/texture.h"
 #include "core/material/warp.h"
-#include "core/math/mathutil.h"
 #include "core/math/matrix.h"
 #include "core/math/spline.h"
 #include "core/math/vector.h"

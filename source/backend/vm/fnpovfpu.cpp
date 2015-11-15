@@ -240,7 +240,8 @@ Density of instruction set: 916 / 1024 = 0.8945
 #include "backend/frame.h"
 #include "backend/vm/fnpovfpu.h"
 
-#include "core/math/mathutil.h"
+#include "base/mathutil.h"
+
 #include "core/scene/tracethreaddata.h"
 
 #include "backend/vm/fnintern.h"

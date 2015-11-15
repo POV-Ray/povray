@@ -350,6 +350,7 @@
     <ClCompile Include="..\..\source\base\font\cyrvetic.cpp" />
     <ClCompile Include="..\..\source\base\font\povlogo.cpp" />
     <ClCompile Include="..\..\source\base\font\timrom.cpp" />
+    <ClCompile Include="..\..\source\base\mathutil.cpp" />
     <ClCompile Include="..\..\source\base\path.cpp" />
     <ClCompile Include="..\..\source\base\pov_err.cpp" />
     <ClCompile Include="..\..\source\base\stringutilities.cpp" />
@@ -403,6 +404,7 @@
     <ClInclude Include="..\..\source\base\font\cyrvetic.h" />
     <ClInclude Include="..\..\source\base\font\povlogo.h" />
     <ClInclude Include="..\..\source\base\font\timrom.h" />
+    <ClInclude Include="..\..\source\base\mathutil.h" />
     <ClInclude Include="..\..\source\base\path.h" />
     <ClInclude Include="..\..\source\base\platformbase.h" />
     <ClInclude Include="..\..\source\base\pov_err.h" />

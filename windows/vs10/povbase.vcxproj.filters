@@ -120,6 +120,9 @@
     <ClCompile Include="..\..\source\base\precomp.cpp">
       <Filter>Base source</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\base\mathutil.cpp">
+      <Filter>Base source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\base\configbase.h">
@@ -243,6 +246,9 @@
       <Filter>Base Headers</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\base\precomp.h">
+      <Filter>Base Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\base\mathutil.h">
       <Filter>Base Headers</Filter>
     </ClInclude>
   </ItemGroup>

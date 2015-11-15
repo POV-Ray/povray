@@ -1,8 +1,8 @@
 //******************************************************************************
 ///
-/// @file core/math/mathutil.cpp
+/// @file base/mathutil.cpp
 ///
-/// This module implements the utility functions for scalar math.
+/// This module implements various utility functions for scalar math.
 ///
 /// @copyright
 /// @parblock
@@ -38,13 +38,13 @@
 #include <algorithm>
 
 // configcore.h must always be the first POV file included in core *.cpp files (pulls in platform config)
-#include "core/configcore.h"
-#include "core/math/mathutil.h"
+#include "base/configbase.h"
+#include "base/mathutil.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
 
-namespace pov
+namespace pov_base
 {
 
 #ifdef NEED_INVHYP

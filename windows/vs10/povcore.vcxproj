@@ -363,7 +363,6 @@
     <ClCompile Include="..\..\source\core\math\chi2.cpp" />
     <ClCompile Include="..\..\source\core\math\hypercomplex.cpp" />
     <ClCompile Include="..\..\source\core\math\jitter.cpp" />
-    <ClCompile Include="..\..\source\core\math\mathutil.cpp" />
     <ClCompile Include="..\..\source\core\math\matrix.cpp" />
     <ClCompile Include="..\..\source\core\math\polynomialsolver.cpp" />
     <ClCompile Include="..\..\source\core\math\quaternion.cpp" />
@@ -438,7 +437,6 @@
     <ClInclude Include="..\..\source\core\math\chi2.h" />
     <ClInclude Include="..\..\source\core\math\hypercomplex.h" />
     <ClInclude Include="..\..\source\core\math\jitter.h" />
-    <ClInclude Include="..\..\source\core\math\mathutil.h" />
     <ClInclude Include="..\..\source\core\math\matrix.h" />
     <ClInclude Include="..\..\source\core\math\polynomialsolver.h" />
     <ClInclude Include="..\..\source\core\math\quaternion.h" />
