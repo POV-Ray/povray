@@ -299,8 +299,6 @@ namespace pov
   #define MAX_PATH _MAX_PATH
 #endif
 
-#define NEED_INVHYP
-
 #ifndef NO_RTR
   #define RTR_HACK
   #define RTR_SUPPORT
