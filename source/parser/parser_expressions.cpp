@@ -2727,7 +2727,7 @@ void Parser::Parse_Wavelengths (MathColour& colour)
 template<>
 void Parser::Parse_BlendMapData<ColourBlendMapData> (BlendMapTypeId Blend_Type, ColourBlendMapData& rData)
 {
-    assert (Blend_Type == kBlendMapType_Colour);
+    POV_BLEND_MAP_ASSERT(Blend_Type == kBlendMapType_Colour);
     Error("Type not implemented yet.");
 }
 
@@ -2747,7 +2747,7 @@ void Parser::Parse_BlendMapData<PigmentBlendMapData> (BlendMapTypeId Blend_Type,
             break;
 
         default:
-            assert(false);
+            POV_PARSER_ASSERT(false);
             break;
     }
 }
@@ -2755,14 +2755,14 @@ void Parser::Parse_BlendMapData<PigmentBlendMapData> (BlendMapTypeId Blend_Type,
 template<>
 void Parser::Parse_BlendMapData<SlopeBlendMapData> (BlendMapTypeId Blend_Type, SlopeBlendMapData& rData)
 {
-    assert (Blend_Type == kBlendMapType_Slope);
+    POV_BLEND_MAP_ASSERT(Blend_Type == kBlendMapType_Slope);
     Parse_UV_Vect(rData);
 }
 
 template<>
 void Parser::Parse_BlendMapData<NormalBlendMapData> (BlendMapTypeId Blend_Type, NormalBlendMapData& rData)
 {
-    assert (Blend_Type == kBlendMapType_Normal);
+    POV_BLEND_MAP_ASSERT(Blend_Type == kBlendMapType_Normal);
     rData=Copy_Tnormal(Default_Texture->Tnormal);
     Parse_Tnormal(&(rData));
 }
@@ -2770,7 +2770,7 @@ void Parser::Parse_BlendMapData<NormalBlendMapData> (BlendMapTypeId Blend_Type, 
 template<>
 void Parser::Parse_BlendMapData<TexturePtr> (BlendMapTypeId Blend_Type, TexturePtr& rData)
 {
-    assert (Blend_Type == kBlendMapType_Texture);
+    POV_BLEND_MAP_ASSERT(Blend_Type == kBlendMapType_Texture);
     rData=Parse_Texture();
 }
 
@@ -2893,7 +2893,7 @@ template<> GenericPigmentBlendMapPtr Parser::Parse_Blend_Map<GenericPigmentBlend
         case kBlendMapType_Density:
             return Parse_Blend_Map<PigmentBlendMap> (Blend_Type, Pat_Type);
         default:
-            assert(false);
+            POV_BLEND_MAP_ASSERT(false);
             // unreachable code to satisfy the compiler's demands for a return value; an empty pointer will do
             return GenericPigmentBlendMapPtr();
     }
@@ -2908,7 +2908,7 @@ template<> GenericNormalBlendMapPtr Parser::Parse_Blend_Map<GenericNormalBlendMa
         case kBlendMapType_Normal:
             return Parse_Blend_Map<NormalBlendMap> (Blend_Type, Pat_Type);
         default:
-            assert(false);
+            POV_BLEND_MAP_ASSERT(false);
             // unreachable code to satisfy the compiler's demands for a return value; an empty pointer will do
             return GenericNormalBlendMapPtr();
     }
@@ -2941,7 +2941,7 @@ template TextureBlendMapPtr Parser::Parse_Blend_Map<TextureBlendMap>    (BlendMa
 template<>
 void Parser::Parse_BlendListData<ColourBlendMapData> (BlendMapTypeId Blend_Type, ColourBlendMapData& rData)
 {
-    assert (Blend_Type == kBlendMapType_Colour);
+    POV_BLEND_MAP_ASSERT(Blend_Type == kBlendMapType_Colour);
     Parse_Colour (rData);
 }
 
@@ -2961,7 +2961,7 @@ void Parser::Parse_BlendListData<PigmentBlendMapData> (BlendMapTypeId Blend_Type
             break;
 
         default:
-            assert(false);
+            POV_BLEND_MAP_ASSERT(false);
             break;
     }
 }
@@ -2969,14 +2969,14 @@ void Parser::Parse_BlendListData<PigmentBlendMapData> (BlendMapTypeId Blend_Type
 template<>
 void Parser::Parse_BlendListData<SlopeBlendMapData> (BlendMapTypeId Blend_Type, SlopeBlendMapData& rData)
 {
-    assert (Blend_Type == kBlendMapType_Slope);
+    POV_BLEND_MAP_ASSERT(Blend_Type == kBlendMapType_Slope);
     Error("Type not implemented yet.");
 }
 
 template<>
 void Parser::Parse_BlendListData<NormalBlendMapData> (BlendMapTypeId Blend_Type, NormalBlendMapData& rData)
 {
-    assert (Blend_Type == kBlendMapType_Normal);
+    POV_BLEND_MAP_ASSERT(Blend_Type == kBlendMapType_Normal);
     rData=Copy_Tnormal(Default_Texture->Tnormal);
     Parse_Tnormal(&(rData));
 }
@@ -2984,7 +2984,7 @@ void Parser::Parse_BlendListData<NormalBlendMapData> (BlendMapTypeId Blend_Type,
 template<>
 void Parser::Parse_BlendListData<TexturePtr> (BlendMapTypeId Blend_Type, TexturePtr& rData)
 {
-    assert (Blend_Type == kBlendMapType_Texture);
+    POV_BLEND_MAP_ASSERT(Blend_Type == kBlendMapType_Texture);
     rData=Parse_Texture();
 }
 
@@ -2992,7 +2992,7 @@ void Parser::Parse_BlendListData<TexturePtr> (BlendMapTypeId Blend_Type, Texture
 template<>
 void Parser::Parse_BlendListData_Default<ColourBlendMapData> (const ColourBlendMapData& rDefData, BlendMapTypeId Blend_Type, ColourBlendMapData& rData)
 {
-    assert (Blend_Type == kBlendMapType_Colour);
+    POV_BLEND_MAP_ASSERT(Blend_Type == kBlendMapType_Colour);
     rData = rDefData;
 }
 
@@ -3010,7 +3010,7 @@ void Parser::Parse_BlendListData_Default<PigmentBlendMapData> (const ColourBlend
             break;
 
         default:
-            assert(false);
+            POV_BLEND_MAP_ASSERT(false);
             break;
     }
 }
@@ -3018,21 +3018,21 @@ void Parser::Parse_BlendListData_Default<PigmentBlendMapData> (const ColourBlend
 template<>
 void Parser::Parse_BlendListData_Default<SlopeBlendMapData> (const ColourBlendMapData& rDefData, BlendMapTypeId Blend_Type, SlopeBlendMapData& rData)
 {
-    assert (Blend_Type == kBlendMapType_Slope);
+    POV_BLEND_MAP_ASSERT(Blend_Type == kBlendMapType_Slope);
     Error("Type not implemented yet.");
 }
 
 template<>
 void Parser::Parse_BlendListData_Default<NormalBlendMapData> (const ColourBlendMapData& rDefData, BlendMapTypeId Blend_Type, NormalBlendMapData& rData)
 {
-    assert (Blend_Type == kBlendMapType_Normal);
+    POV_BLEND_MAP_ASSERT(Blend_Type == kBlendMapType_Normal);
     rData=Copy_Tnormal(Default_Texture->Tnormal);
 }
 
 template<>
 void Parser::Parse_BlendListData_Default<TexturePtr> (const ColourBlendMapData& rDefData, BlendMapTypeId Blend_Type, TexturePtr& rData)
 {
-    assert (Blend_Type == kBlendMapType_Texture);
+    POV_BLEND_MAP_ASSERT(Blend_Type == kBlendMapType_Texture);
     rData=Copy_Textures(Default_Texture);
 }
 
@@ -3171,7 +3171,7 @@ template<>
 shared_ptr<GenericPigmentBlendMap> Parser::Parse_Blend_List<GenericPigmentBlendMap> (int Count, ColourBlendMapConstPtr Def_Map, BlendMapTypeId Blend_Type)
 {
     shared_ptr<GenericPigmentBlendMap> New;
-    assert (Blend_Type == kBlendMapType_Pigment);
+    POV_BLEND_MAP_ASSERT(Blend_Type == kBlendMapType_Pigment);
     EXPECT
         CASE(PIGMENT_TOKEN)
             UNGET
@@ -3203,7 +3203,7 @@ shared_ptr<GenericNormalBlendMap> Parser::Parse_Blend_List<GenericNormalBlendMap
             break;
 
         default:
-            assert (false);
+            POV_BLEND_MAP_ASSERT(false);
     }
     return New;
 }
@@ -3275,7 +3275,7 @@ template<> GenericPigmentBlendMapPtr Parser::Parse_Item_Into_Blend_List<GenericP
         case kBlendMapType_Pigment:
             return Parse_Item_Into_Blend_List<PigmentBlendMap> (Blend_Type);
         default:
-            assert(false);
+            POV_BLEND_MAP_ASSERT(false);
             // unreachable code to satisfy the compiler's demands for a return value; an empty pointer will do
             return GenericPigmentBlendMapPtr();
     }
@@ -3290,7 +3290,7 @@ template<> GenericNormalBlendMapPtr Parser::Parse_Item_Into_Blend_List<GenericNo
         case kBlendMapType_Normal:
             return Parse_Item_Into_Blend_List<NormalBlendMap> (Blend_Type);
         default:
-            assert(false);
+            POV_BLEND_MAP_ASSERT(false);
             // unreachable code to satisfy the compiler's demands for a return value; an empty pointer will do
             return GenericNormalBlendMapPtr();
     }

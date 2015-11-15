@@ -2173,7 +2173,7 @@ ObjectPtr Parser::Parse_CSG(int CSG_Type)
     // different than the passed one, though the object will still be an instance
     // of a CSG. we use dynamic_cast here to aid debugging since the overhead is small.
     Object = dynamic_cast<CSG *>(Parse_Object_Mods(reinterpret_cast<ObjectPtr>(Object)));
-    assert(Object != NULL);
+    POV_PARSER_ASSERT(Object != NULL);
 
     if(CSG_Type & CSG_DIFFERENCE_TYPE)
         Object->Type |= CSG_DIFFERENCE_OBJECT;
@@ -8565,8 +8565,8 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
             END_CASE
         END_EXPECT
 
-        assert ((numberPtr != NULL) || (Token.NumberPtr == NULL));
-        assert ((dataPtr != NULL) || (Token.DataPtr == NULL));
+        POV_PARSER_ASSERT((numberPtr != NULL) || (Token.NumberPtr == NULL));
+        POV_PARSER_ASSERT((dataPtr != NULL) || (Token.DataPtr == NULL));
 
         LValue lvalue;
         lvalue.numberPtr = numberPtr;
@@ -10438,7 +10438,7 @@ void Parser::Convert_Filter_To_Transmit(PIGMENT *Pigment)
 
 void PigmentBlendMap::ConvertFilterToTransmit()
 {
-    assert ((Type == kBlendMapType_Pigment) || (Type == kBlendMapType_Density));
+    POV_BLEND_MAP_ASSERT((Type == kBlendMapType_Pigment) || (Type == kBlendMapType_Density));
     for (Vector::iterator i = Blend_Map_Entries.begin(); i != Blend_Map_Entries.end(); i++)
     {
         Parser::Convert_Filter_To_Transmit(i->Vals);
@@ -10501,7 +10501,7 @@ void Parser::Warning(const char *format,...)
 
 void Parser::Warning(WarningLevel level, const char *format,...)
 {
-    assert (level >= kWarningGeneral);
+    POV_PARSER_ASSERT(level >= kWarningGeneral);
 
     va_list marker;
     char localvsbuffer[1024];

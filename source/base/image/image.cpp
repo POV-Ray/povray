@@ -66,7 +66,7 @@
 // this must be the last file included
 #include "base/povdebug.h"
 
-#define CHECK_BOUNDS(x,y) assert(((x) < width) && ((y) < height))
+#define CHECK_BOUNDS(x,y) POV_IMAGE_ASSERT(((x) < width) && ((y) < height))
 
 #define ALPHA_OPAQUE                (1.0f)
 #define ALPHA_OPAQUE_INT(MAX)       (MAX)

@@ -338,9 +338,9 @@ void RadiosityFunction::BeforeTile(int id, unsigned int pts)
     // TODO - find out why this assertion does not hold true when mosaic pretrace is enabled
     /*
     if (isFinalTrace)
-        assert( pts == FINAL_TRACE );
+        POV_RADIOSITY_ASSERT( pts == FINAL_TRACE );
     else
-        assert( (pts >= PRETRACE_FIRST) && (pts <= PRETRACE_MAX) );
+        POV_RADIOSITY_ASSERT( (pts >= PRETRACE_FIRST) && (pts <= PRETRACE_MAX) );
     */
 
     // different pretrace step than last tile
@@ -366,7 +366,7 @@ void RadiosityFunction::BeforeTile(int id, unsigned int pts)
     for (unsigned int depth = 0; depth < settings.recursionLimit; depth ++)
         recursionParameters[depth].directionGenerator.Reset(settings.directionPoolSize);
 
-    assert (cacheBlockPool == NULL);
+    POV_RADIOSITY_ASSERT(cacheBlockPool == NULL);
     cacheBlockPool = radiosityCache.AcquireBlockPool();
 }
 
@@ -1175,15 +1175,15 @@ void RadiosityCache::BlockPool::Save(OStream* fd)
     }
     else
     {
-        assert(savedHead == NULL);
-        assert(nextUnsavedBlock == 0);
+        POV_RADIOSITY_ASSERT(savedHead == NULL);
+        POV_RADIOSITY_ASSERT(nextUnsavedBlock == 0);
     }
 }
 
 RadiosityCache::BlockPool::~BlockPool()
 {
     // require that block has been saved by now
-    assert (head == NULL || ((savedHead == head->next) && (nextUnsavedBlock == nextFreeBlock)));
+    POV_RADIOSITY_ASSERT(head == NULL || ((savedHead == head->next) && (nextUnsavedBlock == nextFreeBlock)));
 
     while(head != NULL)
     {
@@ -1203,8 +1203,8 @@ void RadiosityCache::AddBlock(BlockPool* pool, RenderStatistics* stats, const Ve
     ot_node_struct*     node;
     const RadiosityRecursionSettings& recSettings = recursionSettings[bounceDepth];
 
-    assert((bounceDepth >= 0) && (bounceDepth  <= OT_DEPTH_MAX));
-    assert(((pretraceStep >= OT_PASS_FIRST) && (pretraceStep <= OT_PASS_MAX)) || (pretraceStep == OT_PASS_FINAL));
+    POV_RADIOSITY_ASSERT((bounceDepth >= 0) && (bounceDepth  <= OT_DEPTH_MAX));
+    POV_RADIOSITY_ASSERT(((pretraceStep >= OT_PASS_FIRST) && (pretraceStep <= OT_PASS_MAX)) || (pretraceStep == OT_PASS_FINAL));
     // An overflow in tileId will only impact reproducibility, so we're not asserting on it.
 
     block->Illuminance = illuminance;

@@ -268,7 +268,7 @@ void Post_Pigment(PIGMENT *Pigment, bool* pHasFilter)
     {
         case NO_PATTERN:
 
-            assert(false); // should have been forced to PLAIN_PATTERN by now
+            POV_PATTERN_ASSERT(false); // should have been forced to PLAIN_PATTERN by now
             break;
 
         case PLAIN_PATTERN:
@@ -408,7 +408,7 @@ bool Compute_Pigment (TransColour& colour, const PIGMENT *Pigment, const Vector3
         {
             case NO_PATTERN:
 
-                assert(false); // should have been forced to PLAIN_PATTERN in Post_Pigment
+                POV_PATTERN_ASSERT(false); // should have been forced to PLAIN_PATTERN in Post_Pigment
                 colour.Clear();
 
                 break;

@@ -139,7 +139,7 @@ bool CSGUnion::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThrea
     else
     {
         IStack Local_Stack(Thread->stackPool);
-        assert(Local_Stack->empty()); // verify that the IStack pulled from the pool is in a cleaned-up condition
+        POV_REFPOOL_ASSERT(Local_Stack->empty()); // verify that the IStack pulled from the pool is in a cleaned-up condition
 
         for(vector<ObjectPtr>::const_iterator Current_Sib = children.begin(); Current_Sib != children.end(); Current_Sib++)
         {
@@ -166,7 +166,7 @@ bool CSGUnion::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThrea
                 }
             }
         }
-        assert(Local_Stack->empty()); // verify that the IStack is in a cleaned-up condition (again)
+        POV_REFPOOL_ASSERT(Local_Stack->empty()); // verify that the IStack is in a cleaned-up condition (again)
     }
 
     if(Found)
@@ -207,7 +207,7 @@ bool CSGIntersection::All_Intersections(const Ray& ray, IStack& Depth_Stack, Tra
 {
     int Maybe_Found, Found;
     IStack Local_Stack(Thread->stackPool);
-    assert(Local_Stack->empty()); // verify that the IStack pulled from the pool is in a cleaned-up condition
+    POV_REFPOOL_ASSERT(Local_Stack->empty()); // verify that the IStack pulled from the pool is in a cleaned-up condition
 
     Thread->Stats()[Ray_CSG_Intersection_Tests]++;
 
@@ -259,7 +259,7 @@ bool CSGIntersection::All_Intersections(const Ray& ray, IStack& Depth_Stack, Tra
     if(Found)
         Thread->Stats()[Ray_CSG_Intersection_Tests_Succeeded]++;
 
-    assert(Local_Stack->empty()); // verify that the IStack is in a cleaned-up condition (again)
+    POV_REFPOOL_ASSERT(Local_Stack->empty()); // verify that the IStack is in a cleaned-up condition (again)
     return (Found);
 }
 
@@ -296,7 +296,7 @@ bool CSGMerge::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThrea
     int Found;
     bool inside_flag;
     IStack Local_Stack(Thread->stackPool);
-    assert(Local_Stack->empty()); // verify that the IStack pulled from the pool is in a cleaned-up condition
+    POV_REFPOOL_ASSERT(Local_Stack->empty()); // verify that the IStack pulled from the pool is in a cleaned-up condition
 
     Thread->Stats()[Ray_CSG_Merge_Tests]++;
 
@@ -357,7 +357,7 @@ bool CSGMerge::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThrea
     if (Found)
         Thread->Stats()[Ray_CSG_Merge_Tests_Succeeded]++;
 
-    assert(Local_Stack->empty()); // verify that the IStack is in a cleaned-up condition (again)
+    POV_REFPOOL_ASSERT(Local_Stack->empty()); // verify that the IStack is in a cleaned-up condition (again)
     return (Found);
 }
 
@@ -616,7 +616,7 @@ void CSG::Transform(const TRANSFORM *tr)
 ObjectPtr CSGUnion::Invert()
 {
     ObjectPtr p = CompoundObject::Invert();
-    assert(p == this);
+    POV_SHAPE_ASSERT(p == this);
 
     CSGIntersection *New = new CSGIntersection(false, *this, true);
     delete this;
@@ -626,7 +626,7 @@ ObjectPtr CSGUnion::Invert()
 ObjectPtr CSGIntersection::Invert()
 {
     ObjectPtr p = CompoundObject::Invert();
-    assert(p == this);
+    POV_SHAPE_ASSERT(p == this);
 
     CSGMerge *New = new CSGMerge(*this, true);
     delete this;

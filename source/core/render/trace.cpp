@@ -356,7 +356,7 @@ bool Trace::FindIntersection(ObjectPtr object, Intersection& isect, const Ray& r
         }
 
         IStack depthstack(stackPool);
-        assert(depthstack->empty()); // verify that the IStack pulled from the pool is in a cleaned-up condition
+        POV_REFPOOL_ASSERT(depthstack->empty()); // verify that the IStack pulled from the pool is in a cleaned-up condition
 
         if(object->All_Intersections(ray, depthstack, threadData))
         {
@@ -380,7 +380,7 @@ bool Trace::FindIntersection(ObjectPtr object, Intersection& isect, const Ray& r
             return (found == true);
         }
 
-        assert(depthstack->empty()); // verify that the IStack is in a cleaned-up condition (again)
+        POV_REFPOOL_ASSERT(depthstack->empty()); // verify that the IStack is in a cleaned-up condition (again)
     }
 
     return false;
@@ -409,7 +409,7 @@ bool Trace::FindIntersection(ObjectPtr object, Intersection& isect, const Ray& r
         }
 
         IStack depthstack(stackPool);
-        assert(depthstack->empty()); // verify that the IStack pulled from the pool is in a cleaned-up condition
+        POV_REFPOOL_ASSERT(depthstack->empty()); // verify that the IStack pulled from the pool is in a cleaned-up condition
 
         if(object->All_Intersections(ray, depthstack, threadData))
         {
@@ -433,7 +433,7 @@ bool Trace::FindIntersection(ObjectPtr object, Intersection& isect, const Ray& r
             return (found == true);
         }
 
-        assert(depthstack->empty()); // verify that the IStack is in a cleaned-up condition (again)
+        POV_REFPOOL_ASSERT(depthstack->empty()); // verify that the IStack is in a cleaned-up condition (again)
     }
 
     return false;
@@ -533,7 +533,7 @@ void Trace::ComputeTextureColour(Intersection& isect, MathColour& colour, Colour
     for(WeightedTextureVector::iterator i(wtextures.begin()); i != wtextures.end(); i++)
     {
         TextureVector warps(texturePool);
-        assert(warps->empty()); // verify that the TextureVector pulled from the pool is in a cleaned-up condition
+        POV_REFPOOL_ASSERT(warps->empty()); // verify that the TextureVector pulled from the pool is in a cleaned-up condition
 
         // if the contribution of this texture is neglectable skip ahead
         if((i->weight < ray.GetTicket().adcBailout) || (i->texture == NULL))
@@ -612,10 +612,10 @@ void Trace::ComputeOneTextureColour(MathColour& resultColour, ColourChannel& res
         switch(texture->Type)
         {
             case NO_PATTERN:
-                assert(false);  // in Create_Texture(), TEXTURE->Type is explicitly set to PLAIN_PATTERN (in deviation
-                                // from the default TPat settings), and there is no piece of code ever setting it to
-                                // NO_PATTERN (except during parsing of magnet patterns, but that code makes sure it
-                                // doesn't remain set to NO_PATTERN).
+                POV_PATTERN_ASSERT(false);  // in Create_Texture(), TEXTURE->Type is explicitly set to PLAIN_PATTERN (in deviation
+                                            // from the default TPat settings), and there is no piece of code ever setting it to
+                                            // NO_PATTERN (except during parsing of magnet patterns, but that code makes sure it
+                                            // doesn't remain set to NO_PATTERN).
                 resultColour.Clear();
                 resultTransm = 1.0;
                 break;
@@ -752,7 +752,7 @@ void Trace::ComputeLightedTexture(MathColour& resultColour, ColourChannel& resul
     ComputeRelativeIOR(ray, isect.Object->interior.get(), relativeIor);
 
     WNRXVector listWNRX(wnrxPool); // "Weight, Normal, Reflectivity, eXponent"
-    assert(listWNRX->empty()); // verify that the WNRXVector pulled from the pool is in a cleaned-up condition
+    POV_REFPOOL_ASSERT(listWNRX->empty()); // verify that the WNRXVector pulled from the pool is in a cleaned-up condition
 
     // resultColour builds up the apparent visible color of the point.
     // resultTransm builds up the apparent visible color of whatever is behind the point (presuming 100% white background).
@@ -2340,7 +2340,7 @@ void Trace::ComputeShadowColour(const LightSource &lightsource, Intersection& is
     for(WeightedTextureVector::iterator i(wtextures.begin()); i != wtextures.end(); i++)
     {
         TextureVector warps(texturePool);
-        assert(warps->empty()); // verify that the TextureVector pulled from the pool is in a cleaned-up condition
+        POV_REFPOOL_ASSERT(warps->empty()); // verify that the TextureVector pulled from the pool is in a cleaned-up condition
 
         // If contribution of this texture is neglectable skip ahead.
         if((i->weight < lightsourceray.GetTicket().adcBailout) || (i->texture == NULL))
@@ -3366,7 +3366,7 @@ void Trace::ComputeOneSingleScatteringContribution(const LightSource& lightsourc
     double factor = (sigma_s * F * p / sigma_tc) * eTerms;
     if (factor >= DBL_MAX)
         factor = DBL_MAX;
-    assert ((factor >= 0.0) && (factor <= DBL_MAX)); // verify factor is a non-negative, finite value (no #INF, no #IND, no #NAN)
+    POV_SUBSURFACE_ASSERT((factor >= 0.0) && (factor <= DBL_MAX)); // verify factor is a non-negative, finite value (no #INF, no #IND, no #NAN)
 
     lightcolour *= factor;
 
@@ -3486,7 +3486,7 @@ void Trace::ComputeDiffuseContribution(const Intersection& out, const Vector3d& 
     // NOTE: We're leaving out the 1/pi factor because in POV-Ray, by convention,
     // light intensity is normalized to imply this factor already.
     sd = F * Rd; // (normally this would be F*Rd/M_PI)
-    assert ((sd >= 0.0) && (sd <= DBL_MAX)); // verify sd is a non-negative, finite value (no #INF, no #IND, no #NAN)
+    POV_SUBSURFACE_ASSERT((sd >= 0.0) && (sd <= DBL_MAX)); // verify sd is a non-negative, finite value (no #INF, no #IND, no #NAN)
 }
 
 void Trace::ComputeDiffuseContribution1(const LightSource& lightsource, const Intersection& out, const Vector3d& vOut, const Intersection& in, MathColour& Total_Colour,
@@ -3539,7 +3539,7 @@ void Trace::ComputeDiffuseContribution1(const LightSource& lightsource, const In
         double sd;
         ComputeDiffuseContribution(out, vOut, in.IPoint, nIn, lightsourceray.Direction, sd, sigma_prime_s[j], sigma_a[j], eta);
         sd *= weight;
-        assert (sd >= 0);
+        POV_SUBSURFACE_ASSERT(sd >= 0);
         lightcolour[j] *= sd;
         Total_Colour[j] += lightcolour[j];
     }
@@ -3558,9 +3558,9 @@ void Trace::ComputeDiffuseAmbientContribution1(const Intersection& out, const Ve
     double cos_in = direction.y(); // cosine of angle between normal and random vector
     Vector3d vIn = in.INormal*cos_in + axisU*direction.x() + axisV*direction.z();
 
-    assert(fabs(dot(in.INormal, axisU)) < EPSILON);
-    assert(fabs(dot(in.INormal, axisV)) < EPSILON);
-    assert(fabs(dot(axisU, axisV)) < EPSILON);
+    POV_SUBSURFACE_ASSERT(fabs(dot(in.INormal, axisU)) < EPSILON);
+    POV_SUBSURFACE_ASSERT(fabs(dot(in.INormal, axisV)) < EPSILON);
+    POV_SUBSURFACE_ASSERT(fabs(dot(axisU, axisV)) < EPSILON);
 
     // [CLi] light coming in almost parallel to the surface is a problem
     if(cos_in < EPSILON)
@@ -3582,9 +3582,9 @@ void Trace::ComputeDiffuseAmbientContribution1(const Intersection& out, const Ve
         ComputeDiffuseContribution(out, vOut, in.IPoint, in.INormal,  vIn, sd, sigma_prime_s[j], sigma_a[j], eta);
         sd *= 0.5/cos_in; // the distribution is cosine-weighted, but sd was computed assuming neutral weighting, so compensate
         sd *= weight;
-        assert (sd >= 0);
+        POV_SUBSURFACE_ASSERT(sd >= 0);
         ambientcolour[j] *= sd;
-        assert (ambientcolour[j] >= 0);
+        POV_SUBSURFACE_ASSERT(ambientcolour[j] >= 0);
         Total_Colour[j] += ambientcolour[j];
     }
 #else
@@ -3597,9 +3597,9 @@ void Trace::ComputeDiffuseAmbientContribution1(const Intersection& out, const Ve
         // Note: radiosity data is already cosine-weighted, so we're passing the surface normal as incident light direction
         ComputeDiffuseContribution(out, vOut, in.IPoint, in.INormal, in.INormal, sd, sigma_prime_s[j], sigma_a[j], eta);
         sd *= weight;
-        assert (sd >= 0);
+        POV_SUBSURFACE_ASSERT(sd >= 0);
         ambientcolour[j] *= sd;
-        assert (ambientcolour[j] >= 0);
+        POV_SUBSURFACE_ASSERT(ambientcolour[j] >= 0);
         Total_Colour[j] += ambientcolour[j];
     }
 #endif

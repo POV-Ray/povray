@@ -244,7 +244,7 @@ void PhotonTrace::ComputeLightedTexture(MathColour& LightCol, ColourChannel&, co
     ComputeRelativeIOR(ray, isect.Object->interior.get(), relativeIor);
 
     WNRXVector listWNRX(wnrxPool);
-    assert(listWNRX->empty()); // verify that the WNRXVector pulled from the pool is in a cleaned-up condition
+    POV_REFPOOL_ASSERT(listWNRX->empty()); // verify that the WNRXVector pulled from the pool is in a cleaned-up condition
 
     // LightCol is the color of the light beam.
 

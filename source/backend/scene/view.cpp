@@ -390,7 +390,7 @@ void ViewData::CompletedRectangle(const POVRect& rect, unsigned int serial, cons
 {
     if (realTimeRaytracing == true)
     {
-        assert(pixels.size() == rect.GetArea());
+        POV_RTR_ASSERT(pixels.size() == rect.GetArea());
         int y = rect.top - 1;
         int x = rect.right;
         int offset;
@@ -398,7 +398,7 @@ void ViewData::CompletedRectangle(const POVRect& rect, unsigned int serial, cons
         {
             if (++x > rect.right)
                 offset = (++y * width + (x = rect.left)) * 5;
-            assert(rtrData->rtrPixels.size() >= offset + 5);
+            POV_RTR_ASSERT(rtrData->rtrPixels.size() >= offset + 5);
             rtrData->rtrPixels[offset++] = i->red();
             rtrData->rtrPixels[offset++] = i->green();
             rtrData->rtrPixels[offset++] = i->blue();

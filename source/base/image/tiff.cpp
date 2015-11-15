@@ -33,8 +33,9 @@
 ///
 //******************************************************************************
 
+#include <cassert>
+
 #include <vector>
-#include <assert.h>
 
 // configbase.h must always be the first POV file included within base *.cpp files
 #include "base/configbase.h"
@@ -217,7 +218,7 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
     }
 
     LineSize = TIFFScanlineSize(tif);
-    assert (SamplePerPixel == (int) (LineSize / width) / BytesPerSample);
+    POV_IMAGE_ASSERT(SamplePerPixel == (int) (LineSize / width) / BytesPerSample);
     // SamplePerPixel = (int)(LineSize / width);
 
 #if 0

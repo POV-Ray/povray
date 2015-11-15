@@ -101,35 +101,35 @@ namespace pov
 template<>
 ColourBlendMapPtr Create_Blend_Map<ColourBlendMap> (BlendMapTypeId type)
 {
-    assert (type == kBlendMapType_Colour);
+    POV_BLEND_MAP_ASSERT(type == kBlendMapType_Colour);
     return ColourBlendMapPtr (new ColourBlendMap);
 }
 
 template<>
 PigmentBlendMapPtr Create_Blend_Map<PigmentBlendMap> (BlendMapTypeId type)
 {
-    assert ((type == kBlendMapType_Pigment) || (type == kBlendMapType_Density));
+    POV_BLEND_MAP_ASSERT((type == kBlendMapType_Pigment) || (type == kBlendMapType_Density));
     return PigmentBlendMapPtr (new PigmentBlendMap(type));
 }
 
 template<>
 SlopeBlendMapPtr Create_Blend_Map<SlopeBlendMap> (BlendMapTypeId type)
 {
-    assert (type == kBlendMapType_Slope);
+    POV_BLEND_MAP_ASSERT(type == kBlendMapType_Slope);
     return SlopeBlendMapPtr (new SlopeBlendMap());
 }
 
 template<>
 NormalBlendMapPtr Create_Blend_Map<NormalBlendMap> (BlendMapTypeId type)
 {
-    assert (type == kBlendMapType_Normal);
+    POV_BLEND_MAP_ASSERT(type == kBlendMapType_Normal);
     return NormalBlendMapPtr (new NormalBlendMap());
 }
 
 template<>
 TextureBlendMapPtr Create_Blend_Map<TextureBlendMap> (BlendMapTypeId type)
 {
-    assert (type == kBlendMapType_Texture);
+    POV_BLEND_MAP_ASSERT(type == kBlendMapType_Texture);
     return TextureBlendMapPtr (new TextureBlendMap);
 }
 

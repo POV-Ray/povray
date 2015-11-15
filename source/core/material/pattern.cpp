@@ -5161,7 +5161,7 @@ DBL AgatePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsect
     const ClassicTurbulence* Turb;
 
     Turb=SearchForTurb(warps);
-    assert(Turb); // Parser must make sure that a pattern-associated classic turbulence warp exists.
+    POV_PATTERN_ASSERT(Turb != NULL); // Parser must make sure that a pattern-associated classic turbulence warp exists.
 
     turb_val = agateTurbScale * Turbulence(EPoint,Turb,noise_generator);
 

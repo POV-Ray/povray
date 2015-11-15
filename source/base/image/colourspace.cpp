@@ -64,7 +64,7 @@ GammaCurvePtr Rec1361GammaCurve::instance;
 
 float* GammaCurve::GetLookupTable(unsigned int max)
 {
-    assert(max == 255 || max == 65535); // shouldn't happen, but it won't hurt to check in debug versions
+    POV_COLOURSPACE_ASSERT(max == 255 || max == 65535); // shouldn't happen, but it won't hurt to check in debug versions
 
     // Get a reference to the lookup table pointer we're dealing with, so we don't need to duplicate all the remaining code.
     float*& lookupTable = (max == 255 ? lookupTable8 : lookupTable16);

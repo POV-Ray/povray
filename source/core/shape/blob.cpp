@@ -2436,7 +2436,7 @@ Blob_Data::~Blob_Data ()
     // NOTE: ReleaseReference will call "delete this" if References == 1, so
     //       we need to ensure we don't recurse when that happens. Only call
     //       ReleaseReference() if References > 0.
-    assert (References <= 1) ;
+    POV_SHAPE_ASSERT(References <= 1) ;
     if (References > 0)
         ReleaseReference () ;
 }
@@ -2514,7 +2514,7 @@ int Blob::Make_Blob(DBL threshold, Blob_List_Struct *BlobList, int npoints, Trac
     for (i = 0; i < npoints; i++)
     {
         temp = BlobList;
-        assert (it != Data->Entry.end()) ;
+        POV_SHAPE_ASSERT(it != Data->Entry.end()) ;
         Blob_Element* Entry = &*it++ ;
 
         if ((fabs(temp->elem.c[2]) < EPSILON) || (temp->elem.rad2 < EPSILON))

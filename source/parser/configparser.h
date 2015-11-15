@@ -33,12 +33,57 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
 #ifndef POVRAY_PARSER_CONFIGPARSER_H
 #define POVRAY_PARSER_CONFIGPARSER_H
 
 #include "base/configbase.h"
 #include "core/configcore.h"
+
+//******************************************************************************
+///
+/// @name Debug Settings.
+///
+/// The following settings enable or disable certain debugging aids, such as run-time sanity checks
+/// or additional log output.
+///
+/// Unless noted otherwise, a non-zero integer will enable the respective debugging aids, while a
+/// zero value will disable them.
+///
+/// It is recommended that system-specific configurations leave these settings undefined in release
+/// builds, in which case they will default to @ref POV_DEBUG unless noted otherwise.
+///
+/// @{
+
+/// @def POV_PARSER_DEBUG
+/// Enable run-time sanity checks for the parser.
+///
+/// Define as non-zero integer to enable, or zero to disable.
+///
+#ifndef POV_PARSER_DEBUG
+    #define POV_PARSER_DEBUG POV_DEBUG
+#endif
+
+/// @}
+///
+//******************************************************************************
+///
+/// @name Non-Configurable Macros
+///
+/// The following macros are configured automatically at compile-time; they cannot be overridden by
+/// system-specific configuration.
+///
+/// @{
+
+#if POV_PARSER_DEBUG
+    #define POV_PARSER_ASSERT(expr) POV_ASSERT_HARD(expr)
+#else
+    #define POV_PARSER_ASSERT(expr) NO_OP
+#endif
+
+/// @}
+///
+//******************************************************************************
 
 #endif // POVRAY_PARSER_CONFIGPARSER_H

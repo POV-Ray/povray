@@ -727,12 +727,12 @@ void Post_Tnormal (TNORMAL *Tnormal)
 
 void SlopeBlendMap::Post(bool dontScaleBumps)
 {
-    assert (Type == kBlendMapType_Slope);
+    POV_BLEND_MAP_ASSERT(Type == kBlendMapType_Slope);
 }
 
 void NormalBlendMap::Post(bool dontScaleBumps)
 {
-    assert (Type == kBlendMapType_Normal);
+    POV_BLEND_MAP_ASSERT(Type == kBlendMapType_Normal);
     for(Vector::iterator i = Blend_Map_Entries.begin(); i != Blend_Map_Entries.end(); i++)
     {
         if (dontScaleBumps)
@@ -999,7 +999,7 @@ SlopeBlendMap::SlopeBlendMap() : BlendMap<Vector2d>(kBlendMapType_Slope) {}
 
 SlopeBlendMap::~SlopeBlendMap()
 {
-    assert (Type == kBlendMapType_Slope);
+    POV_BLEND_MAP_ASSERT(Type == kBlendMapType_Slope);
 }
 
 
@@ -1007,14 +1007,14 @@ NormalBlendMap::NormalBlendMap() : BlendMap<TNORMAL*>(kBlendMapType_Normal) {}
 
 NormalBlendMap::~NormalBlendMap()
 {
-    assert (Type == kBlendMapType_Normal);
+    POV_BLEND_MAP_ASSERT(Type == kBlendMapType_Normal);
     for (Vector::iterator i = Blend_Map_Entries.begin(); i != Blend_Map_Entries.end(); i++)
         Destroy_Tnormal(i->Vals);
 }
 
 void SlopeBlendMap::ComputeAverage (const Vector3d& EPoint, Vector3d& normal, Intersection *Inter, const Ray *ray, TraceThreadData *Thread)
 {
-    assert (false);
+    POV_BLEND_MAP_ASSERT(false);
 }
 
 void NormalBlendMap::ComputeAverage (const Vector3d& EPoint, Vector3d& normal, Intersection *Inter, const Ray *ray, TraceThreadData *Thread)
@@ -1023,7 +1023,7 @@ void NormalBlendMap::ComputeAverage (const Vector3d& EPoint, Vector3d& normal, I
     SNGL Total = 0.0;
     Vector3d V1,V2;
 
-    assert (Type == kBlendMapType_Normal);
+    POV_BLEND_MAP_ASSERT(Type == kBlendMapType_Normal);
 
     V1 = Vector3d(0.0, 0.0, 0.0);
 

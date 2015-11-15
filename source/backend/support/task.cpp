@@ -144,13 +144,13 @@ void Task::Resume()
 
 POV_LONG Task::ElapsedRealTime() const
 {
-    assert(timer != NULL);
+    POV_TASK_ASSERT(timer != NULL);
     return timer->ElapsedRealTime();
 }
 
 POV_LONG Task::ElapsedCPUTime() const
 {
-    assert(timer != NULL);
+    POV_TASK_ASSERT(timer != NULL);
     return timer->ElapsedCPUTime();
 }
 

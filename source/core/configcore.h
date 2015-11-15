@@ -43,6 +43,8 @@
 namespace pov
 {
 
+//******************************************************************************
+///
 /// @name FixedSimpleVector Sizes
 /// @{
 ///
@@ -80,6 +82,7 @@ namespace pov
 
 /// @}
 ///
+//******************************************************************************
 
 // Default for Max_Trace_Level
 #ifndef MAX_TRACE_LEVEL_DEFAULT
@@ -136,6 +139,141 @@ namespace pov
 #ifndef QSORT
     #define QSORT(a,b,c,d) qsort((a),(b),(c),(d))
 #endif
+
+//******************************************************************************
+///
+/// @name Debug Settings.
+///
+/// The following settings enable or disable certain debugging aids, such as run-time sanity checks
+/// or additional log output.
+///
+/// Unless noted otherwise, a non-zero integer will enable the respective debugging aids, while a
+/// zero value will disable them.
+///
+/// It is recommended that system-specific configurations leave these settings undefined in release
+/// builds, in which case they will default to @ref POV_DEBUG unless noted otherwise.
+///
+/// @{
+
+/// @def POV_BLEND_MAP_DEBUG
+/// Enable run-time sanity checks for blend maps.
+///
+/// Define as non-zero integer to enable, or zero to disable.
+///
+#ifndef POV_BLEND_MAP_DEBUG
+    #define POV_BLEND_MAP_DEBUG POV_DEBUG
+#endif
+
+/// @def POV_SHAPE_DEBUG
+/// Enable run-time sanity checks for geometric shapes.
+///
+/// Define as non-zero integer to enable, or zero to disable.
+///
+#ifndef POV_SHAPE_DEBUG
+    #define POV_SHAPE_DEBUG POV_DEBUG
+#endif
+
+/// @def POV_PATTERN_DEBUG
+/// Enable run-time sanity checks for pattern handling.
+///
+/// Define as non-zero integer to enable, or zero to disable.
+///
+#ifndef POV_PATTERN_DEBUG
+    #define POV_PATTERN_DEBUG POV_DEBUG
+#endif
+
+/// @def POV_RADIOSITY_DEBUG
+/// Enable run-time sanity checks for radiosity.
+///
+/// Define as non-zero integer to enable, or zero to disable.
+///
+#ifndef POV_RADIOSITY_DEBUG
+    #define POV_RADIOSITY_DEBUG POV_DEBUG
+#endif
+
+/// @def POV_RANDOMSEQUENCE_DEBUG
+/// Enable run-time sanity checks for random sequence generation.
+///
+/// Define as non-zero integer to enable, or zero to disable.
+///
+#ifndef POV_RANDOMSEQUENCE_DEBUG
+    #define POV_RANDOMSEQUENCE_DEBUG POV_DEBUG
+#endif
+
+/// @def POV_REFPOOL_DEBUG
+/// Enable run-time sanity checks for reference pool mechanism.
+///
+/// Define as non-zero integer to enable, or zero to disable.
+///
+#ifndef POV_REFPOOL_DEBUG
+    #define POV_REFPOOL_DEBUG POV_DEBUG
+#endif
+
+/// @def POV_SUBSURFACE_DEBUG
+/// Enable run-time sanity checks for subsurface light transport.
+///
+/// Define as non-zero integer to enable, or zero to disable.
+///
+#ifndef POV_SUBSURFACE_DEBUG
+    #define POV_SUBSURFACE_DEBUG POV_DEBUG
+#endif
+
+/// @}
+///
+//******************************************************************************
+///
+/// @name Non-Configurable Macros
+///
+/// The following macros are configured automatically at compile-time; they cannot be overridden by
+/// system-specific configuration.
+///
+/// @{
+
+#if POV_BLEND_MAP_DEBUG
+    #define POV_BLEND_MAP_ASSERT(expr) POV_ASSERT_HARD(expr)
+#else
+    #define POV_BLEND_MAP_ASSERT(expr) NO_OP
+#endif
+
+#if POV_SHAPE_DEBUG
+    #define POV_SHAPE_ASSERT(expr) POV_ASSERT_HARD(expr)
+#else
+    #define POV_SHAPE_ASSERT(expr) NO_OP
+#endif
+
+#if POV_PATTERN_DEBUG
+    #define POV_PATTERN_ASSERT(expr) POV_ASSERT_HARD(expr)
+#else
+    #define POV_PATTERN_ASSERT(expr) NO_OP
+#endif
+
+#if POV_RADIOSITY_DEBUG
+    #define POV_RADIOSITY_ASSERT(expr) POV_ASSERT_HARD(expr)
+#else
+    #define POV_RADIOSITY_ASSERT(expr) NO_OP
+#endif
+
+#if POV_RANDOMSEQUENCE_DEBUG
+    #define POV_RANDOMSEQUENCE_ASSERT(expr) POV_ASSERT_HARD(expr)
+#else
+    #define POV_RANDOMSEQUENCE_ASSERT(expr) NO_OP
+#endif
+
+#if POV_REFPOOL_DEBUG
+    #define POV_REFPOOL_ASSERT(expr) POV_ASSERT_HARD(expr)
+#else
+    #define POV_REFPOOL_ASSERT(expr) NO_OP
+#endif
+
+#if POV_SUBSURFACE_DEBUG
+    #define POV_SUBSURFACE_ASSERT(expr) POV_ASSERT_HARD(expr)
+#else
+    #define POV_SUBSURFACE_ASSERT(expr) NO_OP
+#endif
+
+/// @}
+///
+//******************************************************************************
 
 }
 

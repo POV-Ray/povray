@@ -924,7 +924,7 @@ Vector3d HaltonUniformDirectionGenerator::operator[](size_t i) const
 
 SeedableIntGeneratorPtr GetRandomIntGenerator(int minval, int maxval, size_t count)
 {
-    assert (count > 0);
+    POV_RANDOMSEQUENCE_ASSERT(count > 0);
     Mt19937IntGenerator::ParameterStruct param(minval, maxval);
     shared_ptr<NumberSequenceFactory<int> > factory = Mt19937IntMetaFactory::GetFactory(param);
     SeedableIntGeneratorPtr generator(new PrecomputedIntGenerator(factory, count));
@@ -934,7 +934,7 @@ SeedableIntGeneratorPtr GetRandomIntGenerator(int minval, int maxval, size_t cou
 
 SeedableDoubleGeneratorPtr GetRandomDoubleGenerator(double minval, double maxval, size_t count)
 {
-    assert (count > 0);
+    POV_RANDOMSEQUENCE_ASSERT(count > 0);
     Mt19937DoubleGenerator::ParameterStruct param(minval, maxval);
     shared_ptr<NumberSequenceFactory<double> > factory(Mt19937DoubleMetaFactory::GetFactory(param));
     SeedableDoubleGeneratorPtr generator(new PrecomputedDoubleGenerator(factory, count));
@@ -952,7 +952,7 @@ SequentialDoubleGeneratorPtr GetRandomDoubleGenerator(double minval, double maxv
 
 IndexedDoubleGeneratorPtr GetIndexedRandomDoubleGenerator(double minval, double maxval, size_t count)
 {
-    assert (count > 0);
+    POV_RANDOMSEQUENCE_ASSERT(count > 0);
     Mt19937DoubleGenerator::ParameterStruct param(minval, maxval);
     shared_ptr<NumberSequenceFactory<double> > factory(Mt19937DoubleMetaFactory::GetFactory(param));
     return IndexedDoubleGeneratorPtr(new PrecomputedDoubleGenerator(factory, count));

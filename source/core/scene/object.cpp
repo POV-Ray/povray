@@ -129,7 +129,7 @@ bool Find_Intersection(Intersection *isect, ObjectPtr object, const Ray& ray, Tr
         }
 
         IStack depthstack(threadData->stackPool);
-        assert(depthstack->empty()); // verify that the IStack pulled from the pool is in a cleaned-up condition
+        POV_REFPOOL_ASSERT(depthstack->empty()); // verify that the IStack pulled from the pool is in a cleaned-up condition
 
         if(object->All_Intersections(ray, depthstack, threadData))
         {
@@ -153,7 +153,7 @@ bool Find_Intersection(Intersection *isect, ObjectPtr object, const Ray& ray, Tr
             return (found == true);
         }
 
-        assert(depthstack->empty()); // verify that the IStack is in a cleaned-up condition (again)
+        POV_REFPOOL_ASSERT(depthstack->empty()); // verify that the IStack is in a cleaned-up condition (again)
     }
 
     return false;
@@ -183,7 +183,7 @@ bool Find_Intersection(Intersection *isect, ObjectPtr object, const Ray& ray, co
         }
 
         IStack depthstack(threadData->stackPool);
-        assert(depthstack->empty()); // verify that the IStack pulled from the pool is in a cleaned-up condition
+        POV_REFPOOL_ASSERT(depthstack->empty()); // verify that the IStack pulled from the pool is in a cleaned-up condition
 
         if(object->All_Intersections(ray, depthstack, threadData))
         {
@@ -207,7 +207,7 @@ bool Find_Intersection(Intersection *isect, ObjectPtr object, const Ray& ray, co
             return (found == true);
         }
 
-        assert(depthstack->empty()); // verify that the IStack is in a cleaned-up condition (again)
+        POV_REFPOOL_ASSERT(depthstack->empty()); // verify that the IStack is in a cleaned-up condition (again)
     }
 
     return false;
@@ -229,7 +229,7 @@ bool Find_Intersection(Intersection *isect, ObjectPtr object, const Ray& ray, BB
         }
 
         IStack depthstack(threadData->stackPool);
-        assert(depthstack->empty()); // verify that the IStack pulled from the pool is in a cleaned-up condition
+        POV_REFPOOL_ASSERT(depthstack->empty()); // verify that the IStack pulled from the pool is in a cleaned-up condition
 
         if(object->All_Intersections(ray, depthstack, threadData))
         {
@@ -253,7 +253,7 @@ bool Find_Intersection(Intersection *isect, ObjectPtr object, const Ray& ray, BB
             return (found == true);
         }
 
-        assert(depthstack->empty()); // verify that the IStack is in a cleaned-up condition (again)
+        POV_REFPOOL_ASSERT(depthstack->empty()); // verify that the IStack is in a cleaned-up condition (again)
     }
 
     return false;
@@ -275,7 +275,7 @@ bool Find_Intersection(Intersection *isect, ObjectPtr object, const Ray& ray, BB
         }
 
         IStack depthstack(threadData->stackPool);
-        assert(depthstack->empty()); // verify that the IStack pulled from the pool is in a cleaned-up condition
+        POV_REFPOOL_ASSERT(depthstack->empty()); // verify that the IStack pulled from the pool is in a cleaned-up condition
 
         if(object->All_Intersections(ray, depthstack, threadData))
         {
@@ -299,7 +299,7 @@ bool Find_Intersection(Intersection *isect, ObjectPtr object, const Ray& ray, BB
             return (found == true);
         }
 
-        assert(depthstack->empty()); // verify that the IStack is in a cleaned-up condition (again)
+        POV_REFPOOL_ASSERT(depthstack->empty()); // verify that the IStack is in a cleaned-up condition (again)
     }
 
     return false;
@@ -1024,7 +1024,7 @@ void ContainedByBox::Normal(const Vector3d& point, const TRANSFORM* pTrans, int 
             rNormal = Vector3d( 0.0, 0.0, 1.0);
             break;
         default:
-            assert(false);
+            POV_SHAPE_ASSERT(false);
     }
 
     /* Transform the normal into the world space. */

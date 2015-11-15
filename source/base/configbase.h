@@ -557,6 +557,24 @@
     #define POV_DEBUG 0
 #endif
 
+/// @def POV_COLOURSPACE_DEBUG
+/// Enable run-time sanity checks for colour space handling.
+///
+/// Define as non-zero integer to enable, or zero to disable.
+///
+#ifndef POV_COLOURSPACE_DEBUG
+    #define POV_COLOURSPACE_DEBUG POV_DEBUG
+#endif
+
+/// @def POV_IMAGE_DEBUG
+/// Enable run-time sanity checks for image handling.
+///
+/// Define as non-zero integer to enable, or zero to disable.
+///
+#ifndef POV_IMAGE_DEBUG
+    #define POV_IMAGE_DEBUG POV_DEBUG
+#endif
+
 /// @def POV_MATHUTIL_DEBUG
 /// Enable run-time sanity checks for scalar maths utility functions.
 ///
@@ -604,14 +622,32 @@
     #endif
 #endif
 
+#if POV_DEBUG
+    #define POV_ASSERT(expr) POV_ASSERT_HARD(expr)
+#else
+    #define POV_ASSERT(expr) NO_OP
+#endif
+
+#if POV_COLOURSPACE_DEBUG
+    #define POV_COLOURSPACE_ASSERT(expr) POV_ASSERT_HARD(expr)
+#else
+    #define POV_COLOURSPACE_ASSERT(expr) NO_OP
+#endif
+
+#if POV_IMAGE_DEBUG
+    #define POV_IMAGE_ASSERT(expr) POV_ASSERT_HARD(expr)
+#else
+    #define POV_IMAGE_ASSERT(expr) NO_OP
+#endif
+
 #if POV_MATHUTIL_DEBUG
-    #define POV_MATHUTIL_ASSERT(expr) POV_ASSERT_HARD( expr )
+    #define POV_MATHUTIL_ASSERT(expr) POV_ASSERT_HARD(expr)
 #else
     #define POV_MATHUTIL_ASSERT(expr) NO_OP
 #endif
 
 #if POV_SAFEMATH_DEBUG
-    #define POV_SAFEMATH_ASSERT(expr) POV_ASSERT_HARD( expr )
+    #define POV_SAFEMATH_ASSERT(expr) POV_ASSERT_HARD(expr)
 #else
     #define POV_SAFEMATH_ASSERT(expr) NO_OP
 #endif
