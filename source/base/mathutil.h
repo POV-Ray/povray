@@ -38,6 +38,8 @@
 
 #include <cassert>
 
+#include "base/types.h"
+
 namespace pov_base
 {
 
