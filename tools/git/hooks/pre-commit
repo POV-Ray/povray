@@ -4,6 +4,45 @@ tab=`echo -e '\t'`
 nl='
 '
 
+########################################################################################################################
+#
+# Workarounds for quirks of particular runtime environments.
+
+# A single sed expression to fix line endings, passed to sed via the '-e' option as the last expression to process.
+# By default, this is a no-op expression.
+sed_newline_fix=''
+
+# A function to fix quirky behaviour of 'sed -i', called with a list of all files previously processed by 'sed -i'.
+# By default, this is a no-op function.
+sed_i_fix() { : ; }
+
+case "$(uname -s)" in
+
+   Darwin)
+     echo 'Running on Mac OS X'
+     # no known quirks to work around
+     ;;
+
+   Linux)
+     echo 'Running on Linux'
+     # no known quirks to work around
+     ;;
+
+   CYGWIN*|MINGW32*|MSYS*)
+     echo 'Running on MS Windows'
+     # 'sed' output has LF line endings, but we want CR+LF for consistency.
+     sed_newline_fix='s/$/\r/g'
+     # 'sed -i' sets the edited file to read-only.
+     sed_i_fix() { chmod u+w "$@" ; }
+     ;;
+
+   *)
+     echo 'Running on unidentified OS' 
+     # no known quirks to work around
+     ;;
+
+esac
+
 # List of all the directories that contain files which may have an impact on the POV-Ray binary, and are under control
 # of the POV-Ray team, as a regular expression for grep -E to match file names.
 # Note that this does not include auxiliary source code such as unit tests (as they have no impact on the POV-Ray
@@ -89,10 +128,14 @@ then
     fi
     sed -i \
       -e 's/\(#define [ ]*POV_RAY_PRERELEASE [ ]*".*[^0-9]\)[0-9][0-9]*"/\1'"$revision"'"/g' \
+      -e "$sed_newline_fix" \
       "$versionfile" >/dev/null 2>/dev/null
     sed -i \
       -e 's/\([^0-9]\)[0-9][0-9]*$/\1'"$revision"'/g' \
+      -e "$sed_newline_fix" \
       unix/VERSION >/dev/null 2>/dev/null
+
+    sed_i_fix "$versionfile" unix/VERSION
 
     # stage updates
     git add "$versionfile" unix/VERSION >/dev/null 2>/dev/null
@@ -145,6 +188,7 @@ do
         -e 's/^\t\t/        /g' \
         -e 's/^\t/    /g' \
         -e 's/ *$//g' \
+        -e "$sed_newline_fix" \
         "$fname" >/dev/null 2>/dev/null
 
       # mark updates for staging
@@ -184,6 +228,8 @@ do
   fi
 
 done
+
+sed_i_fix $stage
 
 if [ x"$errors" != x"" ]
 then
