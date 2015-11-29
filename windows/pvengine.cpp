@@ -1691,7 +1691,7 @@ char *GetExceptionDescription (DWORD code)
   }
 }
 
-#if POV_RAY_IS_OFFICIAL == 1
+#if POV_RAY_HAS_OFFICIAL_FEATURES == 1
 // this pulls in the code for update checks and crash dump submission.
 // it is only used in official releases made by the POV-Ray developers,
 // so the source is not included in the public distribution.
@@ -1740,7 +1740,7 @@ LONG WINAPI ExceptionHandler(struct _EXCEPTION_POINTERS* ExceptionInfo)
   ExitProcess (1) ;
   return (EXCEPTION_CONTINUE_SEARCH) ; // make compiler happy
 }
-#endif // POV_RAY_IS_OFFICIAL
+#endif // POV_RAY_HAS_OFFICIAL_FEATURES
 
 int execute_tool (char *s)
 {
@@ -3714,7 +3714,7 @@ bool handle_main_command (WPARAM wParam, LPARAM lParam)
          return (true) ;
 
     case CM_CHECKUPDATENOW:
-#if POV_RAY_IS_OFFICIAL == 1
+#if POV_RAY_HAS_OFFICIAL_FEATURES == 1
          ManualUpdateCheck();
 #endif
          return true;
@@ -4183,7 +4183,7 @@ LRESULT CALLBACK PovMainWndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM 
            break ;
          seconds++ ;
 
-#if POV_RAY_IS_OFFICIAL == 1
+#if POV_RAY_HAS_OFFICIAL_FEATURES == 1
          if (seconds % 600 == 0)
            DoUpdateCheck () ;
 #endif
@@ -6247,7 +6247,7 @@ int PASCAL WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
     }
   }
 
-#if POV_RAY_IS_OFFICIAL == 1
+#if POV_RAY_HAS_OFFICIAL_FEATURES == 1
   DoUpdateCheck () ;
 #endif
 

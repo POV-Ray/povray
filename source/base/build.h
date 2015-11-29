@@ -43,6 +43,14 @@
 
 #include "base/configbase.h"
 
+// Placeholders for macros injected during automated builds - do not remove or change!
+//{POV_AUTOBUILD_A}
+//{POV_AUTOBUILD_B}
+//{POV_AUTOBUILD_C}
+//{POV_AUTOBUILD_1}
+//{POV_AUTOBUILD_2}
+//{POV_AUTOBUILD_3}
+
 #ifndef BUILT_BY
 /// Specifies the person or organization responsible for this build.
 /// @attention Please set this to your real name, and/or include a working email or website address to contact you.
