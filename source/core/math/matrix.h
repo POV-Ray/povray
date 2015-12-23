@@ -90,12 +90,16 @@ void MScale (MATRIX result, const MATRIX matrix1, DBL amount);
 void MTranspose (MATRIX result);
 void MTranspose (MATRIX result, const MATRIX matrix1);
 
-void MTransPoint        (Vector3d& result, const Vector3d& vector, const TRANSFORM* trans);
-void MInvTransPoint     (Vector3d& result, const Vector3d& vector, const TRANSFORM* trans);
-void MTransDirection    (Vector3d& result, const Vector3d& vector, const TRANSFORM* trans);
-void MInvTransDirection (Vector3d& result, const Vector3d& vector, const TRANSFORM* trans);
-void MTransNormal       (Vector3d& result, const Vector3d& vector, const TRANSFORM* trans);
-void MInvTransNormal    (Vector3d& result, const Vector3d& vector, const TRANSFORM* trans);
+void MTransPoint        (Vector3d& result, const Vector3d& vector, const MATRIX *matrix);
+void MTransDirection    (Vector3d& result, const Vector3d& vector, const MATRIX *matrix);
+void MInvTransNormal    (Vector3d& result, const Vector3d& vector, const MATRIX *matrix);
+
+inline void MTransPoint        (Vector3d& result, const Vector3d& vector, const TRANSFORM* trans) { MTransPoint     (result, vector, &trans->matrix);  }
+inline void MInvTransPoint     (Vector3d& result, const Vector3d& vector, const TRANSFORM* trans) { MTransPoint     (result, vector, &trans->inverse); }
+inline void MTransDirection    (Vector3d& result, const Vector3d& vector, const TRANSFORM* trans) { MTransDirection (result, vector, &trans->matrix);  }
+inline void MInvTransDirection (Vector3d& result, const Vector3d& vector, const TRANSFORM* trans) { MTransDirection (result, vector, &trans->inverse); }
+inline void MTransNormal       (Vector3d& result, const Vector3d& vector, const TRANSFORM* trans) { MInvTransNormal (result, vector, &trans->inverse); }
+inline void MInvTransNormal    (Vector3d& result, const Vector3d& vector, const TRANSFORM* trans) { MInvTransNormal (result, vector, &trans->matrix);  }
 
 inline void MTransRay    (BasicRay& res, const BasicRay& r, const TRANSFORM* t) { MTransPoint    (res.Origin, r.Origin, t); MTransDirection    (res.Direction, r.Direction, t); }
 inline void MInvTransRay (BasicRay& res, const BasicRay& r, const TRANSFORM* t) { MInvTransPoint (res.Origin, r.Origin, t); MInvTransDirection (res.Direction, r.Direction, t); }

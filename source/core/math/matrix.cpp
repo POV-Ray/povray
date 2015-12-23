@@ -405,24 +405,18 @@ void MTranspose (MATRIX result, const MATRIX matrix1)
 *
 ******************************************************************************/
 
-void MTransPoint (Vector3d& result, const Vector3d& vector, const TRANSFORM *transform)
+void MTransPoint (Vector3d& result, const Vector3d& vector, const MATRIX *matrix)
 {
-    register int i;
-    DBL answer_array[4];
-    const MATRIX *matrix;
+    Vector3d temp; // needed in case vector and result refer to the same memory location
 
-    matrix = &transform->matrix;
-
-    for (i = 0; i < 3; i++)
+    for (register int i = 0; i < 3; i++)
     {
-        answer_array[i] = vector[X] * (*matrix)[0][i] +
-                          vector[Y] * (*matrix)[1][i] +
-                          vector[Z] * (*matrix)[2][i] + (*matrix)[3][i];
+        temp[i] = vector[X] * (*matrix)[0][i] +
+                  vector[Y] * (*matrix)[1][i] +
+                  vector[Z] * (*matrix)[2][i] + (*matrix)[3][i];
     }
 
-    result[X] = answer_array[0];
-    result[Y] = answer_array[1];
-    result[Z] = answer_array[2];
+    result = temp;
 }
 
 
@@ -451,116 +445,18 @@ void MTransPoint (Vector3d& result, const Vector3d& vector, const TRANSFORM *tra
 *
 ******************************************************************************/
 
-void MInvTransPoint (Vector3d& result, const Vector3d& vector, const TRANSFORM *transform)
+void MTransDirection (Vector3d& result, const Vector3d& vector, const MATRIX *matrix)
 {
-    register int i;
-    DBL answer_array[4];
-    const MATRIX *matrix;
+    Vector3d temp; // needed in case vector and result refer to the same memory location
 
-    matrix = &transform->inverse;
-
-    for (i = 0; i < 3; i++)
+    for (register int i = 0; i < 3; i++)
     {
-        answer_array[i] = vector[X] * (*matrix)[0][i] +
-                          vector[Y] * (*matrix)[1][i] +
-                          vector[Z] * (*matrix)[2][i] + (*matrix)[3][i];
+        temp[i] = vector[X] * (*matrix)[0][i] +
+                  vector[Y] * (*matrix)[1][i] +
+                  vector[Z] * (*matrix)[2][i];
     }
 
-    result[X] = answer_array[0];
-    result[Y] = answer_array[1];
-    result[Z] = answer_array[2];
-}
-
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-*   POV-Ray Team
-*
-* DESCRIPTION
-*
-*   -
-*
-* CHANGES
-*
-*   Sep 1994 : Modified to not calculate anser_array[3]. [DB]
-*
-******************************************************************************/
-
-void MTransDirection (Vector3d& result, const Vector3d& vector, const TRANSFORM *transform)
-{
-    register int i;
-    DBL answer_array[4];
-    const MATRIX *matrix;
-
-    matrix = &transform->matrix;
-
-    for (i = 0; i < 3; i++)
-    {
-        answer_array[i] = vector[X] * (*matrix)[0][i] +
-                          vector[Y] * (*matrix)[1][i] +
-                          vector[Z] * (*matrix)[2][i];
-    }
-
-    result[X] = answer_array[0];
-    result[Y] = answer_array[1];
-    result[Z] = answer_array[2];
-}
-
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-*   POV-Ray Team
-*
-* DESCRIPTION
-*
-*   -
-*
-* CHANGES
-*
-*   Sep 1994 : Modified to not calculate anser_array[3]. [DB]
-*
-******************************************************************************/
-
-void MInvTransDirection (Vector3d& result, const Vector3d& vector, const TRANSFORM*transform)
-{
-    register int i;
-    DBL answer_array[4];
-    const MATRIX *matrix;
-
-    matrix = &transform->inverse;
-
-    for (i = 0; i < 3; i++)
-    {
-        answer_array[i] = vector[X] * (*matrix)[0][i] +
-                          vector[Y] * (*matrix)[1][i] +
-                          vector[Z] * (*matrix)[2][i];
-    }
-
-    result[X] = answer_array[0];
-    result[Y] = answer_array[1];
-    result[Z] = answer_array[2];
+    result = temp;
 }
 
 
@@ -589,70 +485,18 @@ void MInvTransDirection (Vector3d& result, const Vector3d& vector, const TRANSFO
 *
 ******************************************************************************/
 
-void MTransNormal (Vector3d& result, const Vector3d& vector, const TRANSFORM*transform)
+void MInvTransNormal (Vector3d& result, const Vector3d& vector, const MATRIX* matrix)
 {
-    register int i;
-    DBL answer_array[3];
-    const MATRIX *matrix;
+    Vector3d temp; // needed in case vector and result refer to the same memory location
 
-    matrix = &transform->inverse;
-
-    for (i = 0; i < 3; i++)
+    for (register int i = 0; i < 3; i++)
     {
-        answer_array[i] = vector[X] * (*matrix)[i][0] +
-                          vector[Y] * (*matrix)[i][1] +
-                          vector[Z] * (*matrix)[i][2];
+        temp[i] = vector[X] * (*matrix)[i][0] +
+                  vector[Y] * (*matrix)[i][1] +
+                  vector[Z] * (*matrix)[i][2];
     }
 
-    result[X] = answer_array[0];
-    result[Y] = answer_array[1];
-    result[Z] = answer_array[2];
-}
-
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-*   POV-Ray Team
-*
-* DESCRIPTION
-*
-*   -
-*
-* CHANGES
-*
-*   -
-*
-******************************************************************************/
-
-void MInvTransNormal (Vector3d& result, const Vector3d& vector, const TRANSFORM*transform)
-{
-    register int i;
-    DBL answer_array[3];
-    const MATRIX *matrix;
-
-    matrix = &transform->matrix;
-
-    for (i = 0; i < 3; i++)
-    {
-        answer_array[i] = vector[X] * (*matrix)[i][0] +
-                          vector[Y] * (*matrix)[i][1] +
-                          vector[Z] * (*matrix)[i][2];
-    }
-
-    result[X] = answer_array[0];
-    result[Y] = answer_array[1];
-    result[Z] = answer_array[2];
+    result = temp;
 }
 
 
