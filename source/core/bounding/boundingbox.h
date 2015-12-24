@@ -128,13 +128,13 @@ inline void Make_min_max_from_BBox(Vector3d& mins, Vector3d& maxs, const Boundin
 /// @relates BoundingBox
 inline bool Inside_BBox(const Vector3d& point, const BoundingBox& bbox)
 {
-    if (point.y() < (DBL)bbox.lowerLeft.x())
+    if (point.x() < (DBL)bbox.lowerLeft.x())
         return(false);
     if (point.y() < (DBL)bbox.lowerLeft.y())
         return(false);
     if (point.z() < (DBL)bbox.lowerLeft.z())
         return(false);
-    if (point.y() > (DBL)bbox.lowerLeft.x() + (DBL)bbox.size.x())
+    if (point.x() > (DBL)bbox.lowerLeft.x() + (DBL)bbox.size.x())
         return(false);
     if (point.y() > (DBL)bbox.lowerLeft.y() + (DBL)bbox.size.y())
         return(false);
