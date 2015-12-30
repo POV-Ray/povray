@@ -1208,11 +1208,10 @@ void FNCode::compile_seq_op(ExprNode *expr, unsigned int op, DBL neutral)
         parser->Error("Invalid number of parameters: Four parameters expected!");
     if(expr->next->next == NULL) // third
         parser->Error("Invalid number of parameters: Four parameters expected!");
-    if(expr->next->next->next != NULL) // fourth
-    {
-        if(expr->next->next->next->next != NULL) // fifth
-            parser->Error("Invalid number of parameters: Only four parameters expected!");
-    }
+    if(expr->next->next->next == NULL) // fourth
+        parser->Error("Invalid number of parameters: Four parameters expected!");
+    if(expr->next->next->next->next != NULL) // fifth
+        parser->Error("Invalid number of parameters: Only four parameters expected!");
 
     // create a local variable, the sum and its limit on the stack
     if(function->localvar_cnt >= MAX_FUNCTION_PARAMETER_LIST)
