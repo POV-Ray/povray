@@ -230,16 +230,12 @@ enum BBoxDirection
 ///     smaller depth of the two.
 ///   - If element N is empty, so is element N+1.
 /// This implementation guarantees execution time of O(log N) or better both
-/// for inserting a new element and for removing the one with the smallest
+/// for inserting a new element and for extracting the one with the smallest
 /// depth.
 ///
 /// @note   We're using a custom priority queue class for now rather than
 ///         `std::priority_queue` becase we make use of Clear(), an operation
 ///         which `std::priority_queue` does not support.
-///
-/// @todo   As we seem to be only reading from the queue after all elements
-///         have been inserted, a simple sort-based approach might actually
-///         be more efficient.
 ///
 class BBoxPriorityQueue
 {

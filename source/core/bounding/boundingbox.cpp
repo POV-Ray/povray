@@ -57,6 +57,7 @@ namespace pov
 const int BUNCHING_FACTOR = 4;
 // Initial number of entries in a priority queue.
 const int INITIAL_PRIORITY_QUEUE_SIZE = 256;
+const int BBQ_FIRST_ELEMENT = 1;
 
 BBOX_TREE *create_bbox_node(int size);
 
@@ -67,7 +68,7 @@ int sort_and_split(BBOX_TREE **Root, BBOX_TREE **&Finite, size_t *numOfFiniteObj
 
 BBoxPriorityQueue::BBoxPriorityQueue()
 {
-    mQueue.resize(1); // element 0 is reserved
+    mQueue.resize(BBQ_FIRST_ELEMENT); // element 0 is reserved
 }
 
 BBoxPriorityQueue::~BBoxPriorityQueue()
@@ -82,7 +83,7 @@ void BBoxPriorityQueue::Insert(DBL depth, ConstBBoxTreePtr node)
     mQueue.resize(size+1);
 
     i = size;
-    while(i > 1 && depth < mQueue[i/2].depth)
+    while((i > BBQ_FIRST_ELEMENT) && (depth < mQueue[i/2].depth))
     {
         mQueue[i] = mQueue[i/2];
         i /= 2;
@@ -99,44 +100,39 @@ bool BBoxPriorityQueue::RemoveMin(DBL& depth, ConstBBoxTreePtr& node)
     if (size == 0)
         return false;
 
-    depth = mQueue[1].depth;
-    node  = mQueue[1].node;
+    depth = mQueue[BBQ_FIRST_ELEMENT].depth;
+    node  = mQueue[BBQ_FIRST_ELEMENT].node;
 
-    mQueue[1] = mQueue.back();
-    mQueue.pop_back();
+    i = BBQ_FIRST_ELEMENT;
 
-    i = 1;
-
-    while (2 * i <= (int)size)
+    while (i <= size/2) // equivalent to 2*i <= size, but more robust
     {
-        if (2 * i == (int)size)
-            j = 2 * i;
+        if ((2*i == size) || (mQueue[2*i].depth < mQueue[2*i+1].depth))
+            j = 2*i;
         else
-        {
-            if (mQueue[2*i].depth < mQueue[2*i+1].depth)
-                j = 2 * i;
-            else
-                j = 2 * i + 1;
-        }
+            j = 2*i+1;
 
-        if (mQueue[i].depth <= mQueue[j].depth)
+        if (mQueue[size].depth <= mQueue[j].depth)
             break;
 
-        std::swap(mQueue[i], mQueue[j]);
+        mQueue[i] = mQueue[j];
         i = j;
     }
+    if (i != size)
+        mQueue[i] = mQueue[size];
+    mQueue.pop_back();
 
     return true;
 }
 
 bool BBoxPriorityQueue::IsEmpty() const
 {
-    return (mQueue.size() == 1);
+    return (mQueue.size() == BBQ_FIRST_ELEMENT);
 }
 
 void BBoxPriorityQueue::Clear()
 {
-    mQueue.resize(1);
+    mQueue.resize(BBQ_FIRST_ELEMENT);
 }
 
 void Destroy_BBox_Tree(BBOX_TREE *Node)
