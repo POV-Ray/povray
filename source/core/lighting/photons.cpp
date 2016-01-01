@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -1524,7 +1524,7 @@ void ShootingDirection::recomputeForAreaLight(Ray& ray, int area_x, int area_y)
 void ShootingDirection::compute()
 {
     // find bounding sphere based on bounding box
-    v   = Vector3d(target->BBox.size) / 2.0;
+    Vector3d v = Vector3d(target->BBox.size) / 2.0;
     ctr = Vector3d(target->BBox.lowerLeft) + v;
     rad = v.length();
 

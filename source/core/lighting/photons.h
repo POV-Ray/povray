@@ -9,7 +9,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -342,7 +342,7 @@ class ShootingDirection
 
         LightSource* light;
         ObjectPtr target;
-        Vector3d up, left, ctr, toctr, v; /* vectors to determine direction of shot */
+        Vector3d up, left, ctr, toctr; /* vectors to determine direction of shot */
         DBL dist;                      /* distance from light to center of bounding sphere */
         DBL rad;                       /* radius of bounding sphere */
 

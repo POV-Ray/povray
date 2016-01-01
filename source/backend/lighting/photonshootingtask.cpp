@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -295,12 +295,12 @@ void PhotonShootingTask::ShootPhotonsAtObject(LightTargetCombo& combo)
                         st = sin(jittheta);
                         ct = cos(jittheta);
                         /* use fast rotation */
-                        shootingDirection.v = -st * shootingDirection.left + ct * shootingDirection.toctr;
+                        Vector3d v = -st * shootingDirection.left + ct * shootingDirection.toctr;
 
                         /* then rotate by phi around toctr */
                         /* use POV funcitons... slower but easy */
                         Compute_Axis_Rotation_Transform(&Trans,shootingDirection.toctr,jitphi);
-                        MTransPoint(ray.Direction, shootingDirection.v, &Trans);
+                        MTransPoint(ray.Direction, v, &Trans);
                     }
 
                     /* ------ attenuation for spot/cylinder (copied from point.c) ---- */
