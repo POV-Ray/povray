@@ -2,7 +2,7 @@
 ///
 /// @file core/lighting/photons.cpp
 ///
-/// This module implements Photon Mapping.
+/// Implementations related to Photon Mapping.
 ///
 /// @copyright
 /// @parblock
@@ -41,6 +41,7 @@
 #include "core/bounding/boundingbox.h"
 #include "core/lighting/lightgroup.h"
 #include "core/lighting/lightsource.h"
+#include "core/material/interior.h"
 #include "core/material/normal.h"
 #include "core/material/pigment.h"
 #include "core/material/texture.h"
@@ -671,9 +672,10 @@ bool PhotonTrace::ComputeRefractionForPhotons(const FINISH* finish, Interior *in
 {
     Ray nray(ray);
     Vector3d localnormal;
-    DBL n, ior, dispersion;
+    double n, ior, dispersion;
     unsigned int dispersionelements = interior->Disp_NElems;
-    bool havedispersion = (dispersionelements > 0);
+    POV_ASSERT(dispersionelements >= DISPERSION_ELEMENTS_MIN);
+    bool totalReflection = false;
 
     nray.SetFlags(Ray::RefractionRay, ray);
 
@@ -683,20 +685,19 @@ bool PhotonTrace::ComputeRefractionForPhotons(const FINISH* finish, Interior *in
     // Get ratio of iors depending on the interiors the ray is traversing.
 
     // Note:
-    // For the purpose of reflection, the space occupied by "nested" objects is considered to be "outside" the containing objects,
+    // For the purpose of refraction, the space occupied by "nested" objects is considered to be "outside" the containing objects,
     // i.e. when encountering (A (B B) A) we pretend that it's (A A|B B|A A).
     // (Here "(X" and "X)" denote the entering and leaving of object X, and "X|Y" denotes an interface between objects X and Y.)
     // In case of overlapping objects, the intersecting region is considered to be part of whatever object is encountered last,
     // i.e. when encountering (A (B A) B) we pretend that it's (A A|B B|B B).
 
-    if(ray.GetInteriors().empty())
+    if(nray.GetInteriors().empty())
     {
         // The ray is entering from the atmosphere.
         nray.AppendInterior(interior);
 
         ior = sceneData->atmosphereIOR / interior->IOR;
-        if(havedispersion == true)
-            dispersion = sceneData->atmosphereDispersion / interior->Dispersion;
+        dispersion = sceneData->atmosphereDispersion / interior->Dispersion;
     }
     else
     {
@@ -708,8 +709,7 @@ bool PhotonTrace::ComputeRefractionForPhotons(const FINISH* finish, Interior *in
             {
                 // The ray is leaving into the atmosphere
                 ior = interior->IOR / sceneData->atmosphereIOR;
-                if(havedispersion == true)
-                    dispersion = interior->Dispersion / sceneData->atmosphereDispersion;
+                dispersion = interior->Dispersion / sceneData->atmosphereDispersion;
             }
             else
             {
@@ -717,11 +717,8 @@ bool PhotonTrace::ComputeRefractionForPhotons(const FINISH* finish, Interior *in
                 // For the purpose of refraction, pretend that we weren't inside that other object,
                 // i.e. pretend that we didn't encounter (A (B B) ... but (A A|B B|A ...
                 ior = interior->IOR / nray.GetInteriors().back()->IOR;
-                if(havedispersion == true)
-                {
-                    dispersion = interior->Dispersion / nray.GetInteriors().back()->Dispersion;
-                    dispersionelements = max(dispersionelements, (unsigned int)(nray.GetInteriors().back()->Disp_NElems));
-                }
+                dispersion = interior->Dispersion / nray.GetInteriors().back()->Dispersion;
+                dispersionelements = max(dispersionelements, (unsigned int)(nray.GetInteriors().back()->Disp_NElems));
             }
         }
         else if(nray.RemoveInterior(interior) == true) // The ray is leaving the intersection of overlapping objects, i.e. (A (B A) ...
@@ -737,32 +734,26 @@ bool PhotonTrace::ComputeRefractionForPhotons(const FINISH* finish, Interior *in
             // For the purpose of refraction, pretend that we're leaving any containing objects,
             // i.e. pretend that we didn't encounter (A (B ... but (A A|B ...
             ior = nray.GetInteriors().back()->IOR / interior->IOR;
-            if(havedispersion == true)
-                dispersion = nray.GetInteriors().back()->Dispersion / interior->Dispersion;
+            dispersion = nray.GetInteriors().back()->Dispersion / interior->Dispersion;
 
             nray.AppendInterior(interior);
         }
     }
 
+    bool haveDispersion = (fabs(dispersion - 1.0) >= EPSILON);
+
     // Do the two mediums traversed have the same indices of refraction?
-    if((fabs(ior - 1.0) < EPSILON) && (fabs(dispersion - 1.0) < EPSILON))
+    if((fabs(ior - 1.0) < EPSILON) && !haveDispersion)
     {
         // Only transmit the ray.
         nray.Direction = ray.Direction;
         // Trace a transmitted ray.
         threadData->Stats()[Transmitted_Rays_Traced]++;
 
-        // photon:
-        //  added this block
-        //  changed 2nd variable in next line from color to lc
-        //  added return false
-        MathColour lc;
-        MathColour GFilCol = threadData->GFilCol;
-        lc = colour * GFilCol;
+        MathColour lc(colour * MathColour(threadData->GFilCol));
 
         ColourChannel dummyTransm;
         TraceRay(nray, lc, dummyTransm, weight, true);
-        return false;
     }
     else
     {
@@ -777,27 +768,28 @@ bool PhotonTrace::ComputeRefractionForPhotons(const FINISH* finish, Interior *in
         else
             localnormal = -normal;
 
-        if(fabs (dispersion - 1.0) < EPSILON)
-            return TraceRefractionRayForPhotons(finish, ipoint, ray, nray, ior, n, normal, rawnormal, localnormal, colour, weight);
-        else if(ray.IsMonochromaticRay() == true)
-            return TraceRefractionRayForPhotons(finish, ipoint, ray, nray, ray.GetSpectralBand().GetDispersionIOR(ior, dispersion), n, normal, rawnormal, localnormal, colour, weight);
+        if(!haveDispersion)
+            totalReflection = TraceRefractionRayForPhotons(finish, ipoint, ray, nray, ior, n, normal, rawnormal, localnormal, colour, weight);
+        else if(ray.IsMonochromaticRay())
+            totalReflection = TraceRefractionRayForPhotons(finish, ipoint, ray, nray, ray.GetSpectralBand().GetDispersionIOR(ior, dispersion), n, normal, rawnormal, localnormal, colour, weight);
         else
         {
             for(unsigned int i = 0; i < dispersionelements; i++)
             {
-                SpectralBand spectralBand(i, dispersionelements);
-                MathColour tempcolour;
-                tempcolour = colour * spectralBand.GetHue() / DBL(dispersionelements);
+                MathColour tempColour;
 
                 // NB setting the dispersion factor also causes the MonochromaticRay flag to be set
+                SpectralBand spectralBand(i, dispersionelements);
                 nray.SetSpectralBand(spectralBand);
 
-                (void)TraceRefractionRayForPhotons(finish, ipoint, ray, nray, spectralBand.GetDispersionIOR(ior, dispersion), n, normal, rawnormal, localnormal, tempcolour, weight);
+                tempColour = colour * spectralBand.GetHue() / DBL(dispersionelements);
+
+                (void)TraceRefractionRayForPhotons(finish, ipoint, ray, nray, spectralBand.GetDispersionIOR(ior, dispersion), n, normal, rawnormal, localnormal, tempColour, weight);
             }
         }
     }
 
-    return false;
+    return totalReflection;
 }
 
 bool PhotonTrace::TraceRefractionRayForPhotons(const FINISH* finish, const Vector3d& ipoint, Ray& ray, Ray& nray, DBL ior, DBL n, const Vector3d& normal, const Vector3d& rawnormal, const Vector3d& localnormal, MathColour& colour, COLC weight)

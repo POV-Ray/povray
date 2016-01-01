@@ -2,13 +2,13 @@
 ///
 /// @file core/material/interior.h
 ///
-/// This module contains all defines, typedefs, and prototypes for interior.cpp.
+/// Declarations related to interior.
 ///
 /// @copyright
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -33,10 +33,13 @@
 ///
 //******************************************************************************
 
-#ifndef INTERIOR_H
-#define INTERIOR_H
+#ifndef POVRAY_CORE_INTERIOR_H
+#define POVRAY_CORE_INTERIOR_H
 
-#include "core/material/media.h"
+// Module config header file must be the first file included within POV-Ray unit header files
+#include "core/configcore.h"
+
+#include "core/coretypes.h"
 
 namespace pov
 {
@@ -44,6 +47,12 @@ namespace pov
 /*****************************************************************************
 * Global preprocessor defines
 ******************************************************************************/
+
+/// Default number of subrays to trace for dispersive media.
+#define DISPERSION_ELEMENTS_DEFAULT 7
+
+/// Minimum number of subrays to trace for dispersive media.
+#define DISPERSION_ELEMENTS_MIN 2
 
 
 /*****************************************************************************
@@ -69,4 +78,4 @@ void Destroy_Material(MATERIAL *);
 
 }
 
-#endif
+#endif // POVRAY_CORE_INTERIOR_H

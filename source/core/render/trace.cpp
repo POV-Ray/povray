@@ -2,13 +2,13 @@
 ///
 /// @file core/render/trace.cpp
 ///
-/// Implementations related to the pov::Trace class.
+/// Implementations related to the @ref pov::Trace class.
 ///
 /// @copyright
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -33,17 +33,17 @@
 ///
 //******************************************************************************
 
-#include <boost/bind.hpp>
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
+#include "core/render/trace.h"
 
 #include <cfloat>
 
-// configcore.h must always be the first POV file included in core *.cpp files (pulls in platform config)
-#include "core/configcore.h"
-#include "core/render/trace.h"
+#include <boost/bind.hpp>
 
 #include "core/lighting/lightsource.h"
 #include "core/lighting/radiosity.h"
 #include "core/lighting/subsurface.h"
+#include "core/material/interior.h"
 #include "core/material/normal.h"
 #include "core/material/pattern.h"
 #include "core/material/pigment.h"
@@ -1268,7 +1268,8 @@ bool Trace::ComputeRefraction(const FINISH* finish, Interior *interior, const Ve
     Vector3d localnormal;
     double n, ior, dispersion;
     unsigned int dispersionelements = interior->Disp_NElems;
-    bool havedispersion = (dispersionelements > 0);
+    POV_ASSERT(dispersionelements >= DISPERSION_ELEMENTS_MIN);
+    bool totalReflection = false;
 
     nray.SetFlags(Ray::RefractionRay, ray);
 
@@ -1290,8 +1291,7 @@ bool Trace::ComputeRefraction(const FINISH* finish, Interior *interior, const Ve
         nray.AppendInterior(interior);
 
         ior = sceneData->atmosphereIOR / interior->IOR;
-        if(havedispersion == true)
-            dispersion = sceneData->atmosphereDispersion / interior->Dispersion;
+        dispersion = sceneData->atmosphereDispersion / interior->Dispersion;
     }
     else
     {
@@ -1303,8 +1303,7 @@ bool Trace::ComputeRefraction(const FINISH* finish, Interior *interior, const Ve
             {
                 // The ray is leaving into the atmosphere
                 ior = interior->IOR / sceneData->atmosphereIOR;
-                if(havedispersion == true)
-                    dispersion = interior->Dispersion / sceneData->atmosphereDispersion;
+                dispersion = interior->Dispersion / sceneData->atmosphereDispersion;
             }
             else
             {
@@ -1312,11 +1311,8 @@ bool Trace::ComputeRefraction(const FINISH* finish, Interior *interior, const Ve
                 // For the purpose of refraction, pretend that we weren't inside that other object,
                 // i.e. pretend that we didn't encounter (A (B B) ... but (A A|B B|A ...
                 ior = interior->IOR / nray.GetInteriors().back()->IOR;
-                if(havedispersion == true)
-                {
-                    dispersion = interior->Dispersion / nray.GetInteriors().back()->Dispersion;
-                    dispersionelements = max(dispersionelements, (unsigned int)(nray.GetInteriors().back()->Disp_NElems));
-                }
+                dispersion = interior->Dispersion / nray.GetInteriors().back()->Dispersion;
+                dispersionelements = max(dispersionelements, (unsigned int)(nray.GetInteriors().back()->Disp_NElems));
             }
         }
         else if(nray.RemoveInterior(interior) == true) // The ray is leaving the intersection of overlapping objects, i.e. (A (B A) ...
@@ -1332,15 +1328,16 @@ bool Trace::ComputeRefraction(const FINISH* finish, Interior *interior, const Ve
             // For the purpose of refraction, pretend that we're leaving any containing objects,
             // i.e. pretend that we didn't encounter (A (B ... but (A A|B ...
             ior = nray.GetInteriors().back()->IOR / interior->IOR;
-            if(havedispersion == true)
-                dispersion = nray.GetInteriors().back()->Dispersion / interior->Dispersion;
+            dispersion = nray.GetInteriors().back()->Dispersion / interior->Dispersion;
 
             nray.AppendInterior(interior);
         }
     }
 
+    bool haveDispersion = (fabs(dispersion - 1.0) >= EPSILON);
+
     // Do the two mediums traversed have the same indices of refraction?
-    if((fabs(ior - 1.0) < EPSILON) && (fabs(dispersion - 1.0) < EPSILON))
+    if((fabs(ior - 1.0) < EPSILON) && !haveDispersion)
     {
         // Only transmit the ray.
         nray.Direction = ray.Direction;
@@ -1366,10 +1363,10 @@ bool Trace::ComputeRefraction(const FINISH* finish, Interior *interior, const Ve
 
 
         // TODO FIXME: also for first radiosity pass ? (see line 3272 of v3.6 lighting.cpp)
-        if(fabs (dispersion - 1.0) < EPSILON) // TODO FIXME - radiosity: || (!isFinalTrace)
-            return TraceRefractionRay(finish, ipoint, ray, nray, ior, n, normal, rawnormal, localnormal, colour, transm, weight);
-        else if(ray.IsMonochromaticRay() == true)
-            return TraceRefractionRay(finish, ipoint, ray, nray, ray.GetSpectralBand().GetDispersionIOR(ior, dispersion), n, normal, rawnormal, localnormal, colour, transm, weight);
+        if(!haveDispersion) // TODO FIXME - radiosity: || (!isFinalTrace)
+            totalReflection = TraceRefractionRay(finish, ipoint, ray, nray, ior, n, normal, rawnormal, localnormal, colour, transm, weight);
+        else if(ray.IsMonochromaticRay())
+            totalReflection = TraceRefractionRay(finish, ipoint, ray, nray, ray.GetSpectralBand().GetDispersionIOR(ior, dispersion), n, normal, rawnormal, localnormal, colour, transm, weight);
         else
         {
             colour.Clear();
@@ -1395,7 +1392,7 @@ bool Trace::ComputeRefraction(const FINISH* finish, Interior *interior, const Ve
         }
     }
 
-    return false;
+    return totalReflection;
 }
 
 bool Trace::TraceRefractionRay(const FINISH* finish, const Vector3d& ipoint, Ray& ray, Ray& nray, double ior, double n, const Vector3d& normal, const Vector3d& rawnormal, const Vector3d& localnormal, MathColour& colour, ColourChannel& transm, COLC weight)

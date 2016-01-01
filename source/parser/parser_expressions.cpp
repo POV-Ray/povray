@@ -2,14 +2,13 @@
 ///
 /// @file parser/parser_expressions.cpp
 ///
-/// This module implements an expression parser for the floats, vectors and
-/// colours in scene description files.
+/// Implementations related to parsing of float, vector and colour expressions.
 ///
 /// @copyright
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -34,13 +33,14 @@
 ///
 //******************************************************************************
 
-#include <cctype>
-#include <algorithm>
-#include <boost/date_time/posix_time/posix_time.hpp>
-
-// configparser.h must always be the first POV file included in the parser (pulls in platform config)
-#include "parser/configparser.h"
+// Module config header file must be the first file included within POV-Ray unit header files
 #include "parser/parser.h"
+
+#include <cctype>
+
+#include <algorithm>
+
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 #include "base/fileinputoutput.h"
 #include "base/mathutil.h"
@@ -2040,6 +2040,35 @@ DBL Parser::Parse_Float ()
     Allow_Identifier_In_Call = old_allow_id;
 
     return (Express[0]);
+}
+
+int Parser::Parse_Int(const char* parameterName)
+{
+    DBL rawValue = Parse_Float();
+    int value = int(rawValue); // TODO - Maybe we want round-to-nearest here.
+    if (fabs(value - rawValue) >= EPSILON)
+    {
+        Warning("%s%sExpected integer; rounding down fractional value %lf to %i.",
+                (parameterName != NULL ? parameterName : ""),
+                (parameterName != NULL ? ": " : ""),
+                rawValue,
+                value);
+    }
+    return value;
+}
+
+int Parser::Parse_Int_With_Minimum(int minValue, const char* parameterName)
+{
+    int value = Parse_Int(parameterName);
+    if (value < minValue)
+    {
+        Error("%s%sExpected at least %i, but found %i instead.",
+              (parameterName != NULL ? parameterName : ""),
+              (parameterName != NULL ? ": " : ""),
+              minValue,
+              value);
+    }
+    return value;
 }
 
 

@@ -2,13 +2,13 @@
 ///
 /// @file core/material/interior.cpp
 ///
-/// This module contains all functions for interior stuff.
+/// Implementations related to interior.
 ///
 /// @copyright
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -33,8 +33,7 @@
 ///
 //******************************************************************************
 
-// configcore.h must always be the first POV file included in core *.cpp files (pulls in platform config)
-#include "core/configcore.h"
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/material/interior.h"
 
 #include "core/lighting/subsurface.h"
@@ -46,16 +45,13 @@
 namespace pov
 {
 
-/* How many subrays to trace for dispersive media */
-#define DEFAULT_DISP_NELEMS  7
-
 Interior::Interior()
 {
     IOR = 0.0;
     Old_Refract = 1.0;
 
     Dispersion  = 1.0;
-    Disp_NElems = DEFAULT_DISP_NELEMS;
+    Disp_NElems = DISPERSION_ELEMENTS_DEFAULT;
 
     Caustics = 0.0;
 

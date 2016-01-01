@@ -2,13 +2,15 @@
 ///
 /// @file parser/parser.h
 ///
-/// This header file is included by all language parsing C++ modules in POV-Ray.
+/// Declarations related to the parser.
+///
+//// This header file is included by virtually all parser C++ files in POV-Ray.
 ///
 /// @copyright
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -33,9 +35,10 @@
 ///
 //******************************************************************************
 
-#ifndef PARSE_H
-#define PARSE_H
+#ifndef POVRAY_PARSER_PARSE_H
+#define POVRAY_PARSER_PARSE_H
 
+// Module config header file must be the first file included within POV-Ray unit header files
 #include "parser/configparser.h"
 
 #include "base/image/image.h"
@@ -391,6 +394,12 @@ class Parser : public SceneTask
         /// Parses an optional FLOAT.
         DBL Allow_Float (DBL defval);
 
+        /// Parses a FLOAT as an integer value.
+        int Parse_Int(const char* parameterName = NULL);
+
+        /// Parses a FLOAT as an integer value with a given minimum.
+        int Parse_Int_With_Minimum(int minValue, const char* parameterName = NULL);
+
         int Allow_Vector (Vector3d& Vect);
         void Parse_UV_Vect (Vector2d& UV_Vect);
         void Parse_Vector (Vector3d& Vector);
@@ -735,4 +744,4 @@ class Parser : public SceneTask
 
 }
 
-#endif
+#endif // POVRAY_PARSER_PARSE_H

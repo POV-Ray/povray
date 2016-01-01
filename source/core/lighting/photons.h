@@ -2,8 +2,7 @@
 ///
 /// @file core/lighting/photons.h
 ///
-/// This module contains all defines, typedefs, and prototypes for
-/// `photons.cpp`.
+/// Declarations related to Photon Mapping.
 ///
 /// @copyright
 /// @parblock

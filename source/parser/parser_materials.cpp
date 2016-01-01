@@ -2,13 +2,13 @@
 ///
 /// @file parser/parser_materials.cpp
 ///
-/// This module parses textures and atmosphere effects.
+/// Implementations related to parsing of textures and atmospheric effects.
 ///
 /// @copyright
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -33,8 +33,7 @@
 ///
 //******************************************************************************
 
-// configparser.h must always be the first POV file included in the parser (pulls in platform config)
-#include "parser/configparser.h"
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "parser/parser.h"
 
 #include "base/fileutil.h"
@@ -3811,9 +3810,7 @@ void Parser::Parse_Interior(InteriorPtr& interior)
         END_CASE
 
         CASE (DISPERSION_SAMPLES_TOKEN)
-            interior->Disp_NElems = (int)Parse_Float();
-            if (interior->Disp_NElems < 2)
-                Error("Dispersion samples minimum is 2.");
+            interior->Disp_NElems = Parse_Int_With_Minimum(DISPERSION_ELEMENTS_MIN, "dispersion_samples");
         END_CASE
 
         CASE (CAUSTICS_TOKEN)
