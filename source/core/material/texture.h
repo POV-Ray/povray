@@ -2,16 +2,13 @@
 ///
 /// @file core/material/texture.h
 ///
-/// This module contains all defines, typedefs, and prototypes for
-/// @ref texture.cpp.
-///
-/// @note   @ref frame.h contains other pigment stuff.
+/// Declarations related to textures.
 ///
 /// @copyright
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,8 +33,11 @@
 ///
 //******************************************************************************
 
-#ifndef TEXTURE_H
-#define TEXTURE_H
+#ifndef POVRAY_CORE_TEXTURE_H
+#define POVRAY_CORE_TEXTURE_H
+
+// Module config header file must be the first file included within POV-Ray unit header files
+#include "core/configcore.h"
 
 #include "core/coretypes.h"
 #include "core/material/blendmap.h"
@@ -181,4 +181,4 @@ int Test_Opacity (const TEXTURE *Texture);
 
 }
 
-#endif
+#endif // POVRAY_CORE_TEXTURE_H

@@ -2,16 +2,13 @@
 ///
 /// @file core/material/pigment.h
 ///
-/// This module contains all defines, typedefs, and prototypes for
-/// @ref pigment.cpp.
-///
-/// @note   @ref frame.h contains other pigment stuff.
+/// Declarations related to pigments.
 ///
 /// @copyright
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,8 +33,11 @@
 ///
 //******************************************************************************
 
-#ifndef PIGMENT_H
-#define PIGMENT_H
+#ifndef POVRAY_CORE_PIGMENT_H
+#define POVRAY_CORE_PIGMENT_H
+
+// Module config header file must be the first file included within POV-Ray unit header files
+#include "core/configcore.h"
 
 #include "base/image/colourspace.h"
 
@@ -135,4 +135,4 @@ void Evaluate_Density_Pigment(vector<PIGMENT*>& Density, const Vector3d& p, Math
 
 }
 
-#endif
+#endif // POVRAY_CORE_PIGMENT_H

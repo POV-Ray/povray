@@ -2,14 +2,13 @@
 ///
 /// @file core/shape/lathe.h
 ///
-/// This module contains all defines, typedefs, and prototypes for
-/// @ref lathe.cpp.
+/// Declarations related to the lathe geometric primitive.
 ///
 /// @copyright
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -34,8 +33,11 @@
 ///
 //******************************************************************************
 
-#ifndef LATHE_H
-#define LATHE_H
+#ifndef POVRAY_CORE_LATHE_H
+#define POVRAY_CORE_LATHE_H
+
+// Module config header file must be the first file included within POV-Ray unit header files
+#include "core/configcore.h"
 
 #include "core/scene/object.h"
 
@@ -113,4 +115,4 @@ class Lathe : public ObjectBase
 
 }
 
-#endif
+#endif // POVRAY_CORE_LATHE_H

@@ -350,6 +350,7 @@
     <ClCompile Include="..\..\source\base\font\cyrvetic.cpp" />
     <ClCompile Include="..\..\source\base\font\povlogo.cpp" />
     <ClCompile Include="..\..\source\base\font\timrom.cpp" />
+    <ClCompile Include="..\..\source\base\image\metadata.cpp" />
     <ClCompile Include="..\..\source\base\mathutil.cpp" />
     <ClCompile Include="..\..\source\base\path.cpp" />
     <ClCompile Include="..\..\source\base\pov_err.cpp" />

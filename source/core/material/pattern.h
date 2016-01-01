@@ -33,8 +33,8 @@
 ///
 //******************************************************************************
 
-#ifndef POVRAY_CORE_MATERIAL_PATTERN_H
-#define POVRAY_CORE_MATERIAL_PATTERN_H
+#ifndef POVRAY_CORE_PATTERN_H
+#define POVRAY_CORE_PATTERN_H
 
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "core/configcore.h"
@@ -1051,4 +1051,4 @@ void InitializePatternGenerators(void);
 
 }
 
-#endif // POVRAY_CORE_MATERIAL_PATTERN_H
+#endif // POVRAY_CORE_PATTERN_H

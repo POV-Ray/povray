@@ -2,13 +2,13 @@
 ///
 /// @file base/image/colourspace.h
 ///
-/// This file contains code for handling colour space conversions.
+/// Declarations related to colour space conversions.
 ///
 /// @copyright
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -39,14 +39,17 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "base/configbase.h"
 
+// Standard C++ header files
 #include <vector>
 
+// Boost header files
 #if POV_MULTITHREADED
 #include <boost/thread.hpp>
 #endif
 
-#include "base/types.h"
+// POV-Ray base header files
 #include "base/colour.h"
+#include "base/types.h"
 
 namespace pov_base
 {

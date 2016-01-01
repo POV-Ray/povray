@@ -2,7 +2,7 @@
 ///
 /// @file core/lighting/radiosity.cpp
 ///
-/// This file contains radiosity computation task code.
+/// Implementation of radiosity.
 ///
 /// @author Jim McElhiney (original code)
 /// @author Christoph Lipka (revisions and updates for POV-Ray 3.7)
@@ -11,7 +11,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as

@@ -2,13 +2,13 @@
 ///
 /// @file base/image/metadata.h
 ///
-/// @todo   What's in here?
+/// Declarations related to image metadata.
 ///
 /// @copyright
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,11 +36,15 @@
 #ifndef POVRAY_BASE_METADATA_H
 #define POVRAY_BASE_METADATA_H
 
+// Module config header file must be the first file included within POV-Ray unit header files
+#include "base/configbase.h"
+
+// Standard C++ header files
 #include <string>
+
+// Boost header files
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
-
-#include "base/version.h"
 
 namespace pov_base
 {
@@ -49,21 +53,15 @@ namespace pov_base
 class Metadata
 {
     public:
-        Metadata()
-        {
-            boost::posix_time::ptime timestamp = boost::posix_time::second_clock::universal_time();
-            date = timestamp.date();
-            time = timestamp.time_of_day();
-        }
-
-        virtual ~Metadata(){}
+        Metadata();
+        ~Metadata();
 
         /**
          *  Get software string.
          *  @note   This method should return at most 40 ascii bytes, otherwise it may become truncated by some file formats.
          *          non-printable characters, line feeds and tabs are not allowed.
          */
-        static string getSoftware() { return "POV-Ray " POV_RAY_VERSION;}
+        string getSoftware() const;
 
         /* Up to 4 comments, each at most 80 ascii bytes, no line feed, no tab
          * if it's longer, it can either fit anyway or get truncated, it's the
@@ -75,78 +73,44 @@ class Metadata
          *  @note   This method should return at most 80 ascii bytes, otherwise it may become truncated by some file formats.
          *          non-printable characters, line feeds and tabs are not allowed.
          */
-        static string getComment1()
-        {
-#ifdef METADATA_PLATFORM_STRING
-            // METADATA_PLATFORM_STRING should be in a form similar to 'i686-pc-linux-gnu', 'i386-pc-win', etc.
-            return string("Platform: ") + METADATA_PLATFORM_STRING;
-#else
-            return string();
-#endif
-        }
+        string getComment1() const;
 
         /**
          *  Get comment string #2.
          *  @note   This method should return at most 80 ascii bytes, otherwise it may become truncated by some file formats.
          *          non-printable characters, line feeds and tabs are not allowed.
          */
-        static string getComment2()
-        {
-#ifdef METADATA_COMPILER_STRING
-            // METADATA_COMPILER_STRING should be in a form similar to 'g++ 4.4.3', 'msvc 10.0', etc.
-            return string("Compiler: ") + METADATA_COMPILER_STRING;
-#else
-            return string();
-#endif
-        }
+        string getComment2() const;
 
         /**
          *  Get comment string #3.
          *  @note   This method should return at most 80 ascii bytes, otherwise it may become truncated by some file formats.
          *          non-printable characters, line feeds and tabs are not allowed.
          */
-        static string getComment3()
-        {
-#ifdef METADATA_COMMENT_3
-            // NB it is legal for METADATA_COMMENT_3 to be a function returning string
-            // Note that it may be called more than once
-            return string(METADATA_COMMENT_3);
-#else
-            return string();
-#endif
-        }
+        string getComment3() const;
 
         /**
          *  Get comment string #4.
          *  @note   This method should return at most 80 ascii bytes, otherwise it may become truncated by some file formats.
          *          non-printable characters, line feeds and tabs are not allowed.
          */
-        static string getComment4()
-        {
-#ifdef METADATA_COMMENT_4
-            // NB it is legal for METADATA_COMMENT_4 to be a function returning string
-            // Note that it may be called more than once
-            return string(METADATA_COMMENT_4);
-#else
-            return string();
-#endif
-        }
+        string getComment4() const;
 
         /// Get date string in ISO 8601 format.
-        string getDateTime() const { return to_iso_extended_string(date) + " " + to_simple_string(time) + "Z"; }
+        string getDateTime() const;
 
         /// Get year (including full century)
-        int getYear() const { return date.year(); }
+        int getYear() const;
         /// Get month (1..12)
-        int getMonth() const { return date.month(); }
+        int getMonth() const;
         /// Get day of month (1..31)
-        int getDay() const { return date.day(); }
+        int getDay() const;
         /// Get hour of day (0..23)
-        int getHour() const { return time.hours(); }
+        int getHour() const;
         /// Get minute of hour (0..59)
-        int getMin() const { return time.minutes(); }
+        int getMin() const;
         /// Get second of minute (0..59)
-        int getSec() const { return time.seconds(); }
+        int getSec() const;
 
     protected:
         boost::gregorian::date              date;

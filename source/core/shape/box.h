@@ -2,14 +2,13 @@
 ///
 /// @file core/shape/box.h
 ///
-/// This module contains all defines, typedefs, and prototypes for
-/// @ref box.cpp.
+/// Declarations related to the box geometric primitive.
 ///
 /// @copyright
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -34,8 +33,11 @@
 ///
 //******************************************************************************
 
-#ifndef BOXES_H
-#define BOXES_H
+#ifndef POVRAY_CORE_BOX_H
+#define POVRAY_CORE_BOX_H
+
+// Module config header file must be the first file included within POV-Ray unit header files
+#include "core/configcore.h"
 
 #include "core/scene/object.h"
 
@@ -94,4 +96,4 @@ class Box : public ObjectBase
 
 }
 
-#endif
+#endif // POVRAY_CORE_BOX_H

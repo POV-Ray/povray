@@ -2,8 +2,7 @@
 ///
 /// @file core/shape/isosurface.h
 ///
-/// This module contains all defines, typedefs, and prototypes for
-/// @ref isosurface.cpp.
+/// Declarations related to the isosurface geometric primitive.
 ///
 /// This module was written by D.Skarda & T.Bily and modified by R.Suzuki.
 /// Ported to POV-Ray 3.5 by Thorsten Froehlich.
@@ -12,7 +11,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -37,8 +36,11 @@
 ///
 //******************************************************************************
 
-#ifndef ISOSURF_H
-#define ISOSURF_H
+#ifndef POVRAY_CORE_ISOSURFACE_H
+#define POVRAY_CORE_ISOSURFACE_H
+
+// Module config header file must be the first file included within POV-Ray unit header files
+#include "core/configcore.h"
 
 #include "core/coretypes.h"
 #include "core/scene/object.h"
@@ -131,5 +133,4 @@ class IsoSurface : public ObjectBase
 
 }
 
-#endif
-
+#endif // POVRAY_CORE_ISOSURFACE_H

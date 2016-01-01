@@ -2,7 +2,7 @@
 ///
 /// @file base/fileutil.cpp
 ///
-/// This module implements misc utility functions.
+/// Implementations related to file handling.
 ///
 /// @todo   Describe more precisely.
 ///
@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -35,14 +35,14 @@
 ///
 //******************************************************************************
 
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
+#include "base/fileutil.h"
+
+// C++ variants of standard C header files
 #include <cctype>
 #include <cstdarg>
 
-// configbase.h must always be the first POV file included within base *.cpp files
-#include "base/configbase.h"
-#include "base/fileutil.h"
-
-#include "base/fileinputoutput.h"
+// POV-Ray base header files
 #include "base/path.h"
 
 // this must be the last file included

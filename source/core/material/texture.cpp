@@ -2,9 +2,12 @@
 ///
 /// @file core/material/texture.cpp
 ///
-/// This module implements texturing functions such as noise, turbulence and
-/// texture transformation functions. The actual texture routines are in the
-/// files @ref pigment.cpp and @ref normal.cpp.
+/// Implementations related to textures.
+///
+/// The code in this file is mainly related to perturbations and transformations
+/// of textures. The implementation of unperturbed textures resides in
+/// @ref pigment.cpp (surface colouring) and @ref normal.cpp (surface normal
+/// perturbation), as well as in @ref trace.cpp (surface finish).
 ///
 /// The noise function used here is the one described by Ken Perlin in
 /// "Hypertexture", SIGGRAPH '89 Conference Proceedings page 253.
@@ -19,7 +22,7 @@
 /// ----------------------------------------------------------------------------
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -44,11 +47,10 @@
 ///
 //******************************************************************************
 
-#include <algorithm>
-
-// configcore.h must always be the first POV file included in core *.cpp files (pulls in platform config)
-#include "core/configcore.h"
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/material/texture.h"
+
+#include <algorithm>
 
 #include "base/pov_err.h"
 

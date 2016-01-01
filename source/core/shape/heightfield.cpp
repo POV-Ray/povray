@@ -2,22 +2,17 @@
 ///
 /// @file core/shape/heightfield.cpp
 ///
-/// This file implements the height field shape primitive.  The shape is
-/// implemented as a collection of triangles which are calculated as
-/// needed.  The basic intersection routine first computes the rays
-/// intersection with the box marking the limits of the shape, then
-/// follows the line from one intersection point to the other, testing the
-/// two triangles which form the pixel for an intersection with the ray at
-/// each step.
+/// Implementation of the height field geometric primitive.
 ///
-/// height field added by Doug Muir with lots of advice and support
-/// from David Buck and Drew Wells.
+/// @author Doug Muir
+/// @author David Buck
+/// @author Drew Wells
 ///
 /// @copyright
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -60,11 +55,10 @@
 *
 *****************************************************************************/
 
-#include <algorithm>
-
-// configcore.h must always be the first POV file included in core *.cpp files (pulls in platform config)
-#include "core/configcore.h"
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/shape/heightfield.h"
+
+#include <algorithm>
 
 #include "base/pov_err.h"
 

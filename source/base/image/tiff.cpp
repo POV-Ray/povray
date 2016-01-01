@@ -2,13 +2,13 @@
 ///
 /// @file base/image/tiff.cpp
 ///
-/// This module contains the code to read and write the TIFF file format.
+/// Implementation of Tagged Image File Format (TIFF) image file handling.
 ///
 /// @copyright
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -33,39 +33,37 @@
 ///
 //******************************************************************************
 
-#include <cassert>
-
-#include <vector>
-
-// configbase.h must always be the first POV file included within base *.cpp files
-#include "base/configbase.h"
-#include "base/image/image.h"
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "base/image/tiff_pov.h"
 
+#ifndef LIBTIFF_MISSING
+
+// Standard C++ header files
+#include <vector>
+
+// Boost header files
 #include <boost/scoped_array.hpp>
+
+// Other 3rd party header files
+extern "C"
+{
+#ifndef __STDC__
+#define __STDC__ (1) // TODO - check if this is really necessary
+#endif
+#ifndef AVOID_WIN32_FILEIO
+#define AVOID_WIN32_FILEIO // this stops the tiff headers from pulling in windows.h on win32/64
+#endif
+#include <tiffio.h>
+}
 
 // this must be the last file included other than tiffio.h
 #include "base/povdebug.h"
-
-#ifndef LIBTIFF_MISSING
 
 namespace pov_base
 {
 
 namespace Tiff
 {
-
-// TIFF Image loader
-extern "C"
-{
-    #ifndef __STDC__
-    #define __STDC__        (1)
-    #endif
-    #ifndef AVOID_WIN32_FILEIO
-    #define AVOID_WIN32_FILEIO // this stops the tiff headers from pulling in windows.h on win32/64
-    #endif
-    #include <tiffio.h>
-}
 
 /* Do any of the entries in the color map contain values larger than 255? */
 static int checkcmap(int n, const uint16* r, const uint16* g, const uint16* b)

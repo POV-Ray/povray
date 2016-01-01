@@ -2,7 +2,7 @@
 ///
 /// @file core/shape/ovus.h
 ///
-/// This module implements the header for the ovus primitive.
+/// Declarations related to the ovus geometric primitive.
 ///
 /// @author Jerome Grimbert
 ///
@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -35,8 +35,11 @@
 ///
 //******************************************************************************
 
-#ifndef OVUS_H
-#define OVUS_H
+#ifndef POVRAY_CORE_OVUS_H
+#define POVRAY_CORE_OVUS_H
+
+// Module config header file must be the first file included within POV-Ray unit header files
+#include "core/configcore.h"
 
 #include "core/scene/object.h"
 
@@ -100,4 +103,4 @@ class Ovus : public ObjectBase
 
 }
 
-#endif
+#endif // POVRAY_CORE_OVUS_H

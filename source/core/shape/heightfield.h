@@ -2,14 +2,13 @@
 ///
 /// @file core/shape/heightfield.h
 ///
-/// This module contains all defines, typedefs, and prototypes for
-/// @ref heightfield.cpp.
+/// Declarations related to the height field geometric primitive.
 ///
 /// @copyright
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -34,8 +33,11 @@
 ///
 //******************************************************************************
 
-#ifndef HFIELD_H
-#define HFIELD_H
+#ifndef POVRAY_CORE_HEIGHTFIELD_H
+#define POVRAY_CORE_HEIGHTFIELD_H
+
+// Module config header file must be the first file included within POV-Ray unit header files
+#include "core/configcore.h"
 
 #include "core/scene/object.h"
 
@@ -83,6 +85,14 @@ struct HField_Data_Struct
 
 class ImageData;
 
+/// Height field geometric primitive.
+///
+/// The shape is implemented as a collection of triangles which are calculated as needed.
+///
+/// The basic intersection routine first computes the ray's intersection with the box marking the limits of the shape,
+/// then follows the line from one intersection point to the other, testing the two triangles which form the pixel for
+/// an intersection with the ray at each step.
+///
 class HField : public ObjectBase
 {
     public:
@@ -117,4 +127,4 @@ class HField : public ObjectBase
 
 }
 
-#endif
+#endif // POVRAY_CORE_HEIGHTFIELD_H

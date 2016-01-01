@@ -2,16 +2,13 @@
 ///
 /// @file core/material/normal.h
 ///
-/// This module contains all defines, typedefs, and prototypes for
-/// @ref normal.cpp.
-///
-/// @note   @ref frame.h contains other normal stuff.
+/// Declarations related to surface normal perturbations.
 ///
 /// @copyright
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,8 +33,11 @@
 ///
 //******************************************************************************
 
-#ifndef NORMAL_H
-#define NORMAL_H
+#ifndef POVRAY_CORE_NORMAL_H
+#define POVRAY_CORE_NORMAL_H
+
+// Module config header file must be the first file included within POV-Ray unit header files
+#include "core/configcore.h"
 
 #include "core/coretypes.h"
 #include "core/material/blendmap.h"
@@ -117,4 +117,4 @@ void Perturb_Normal (Vector3d& Layer_Normal, const TNORMAL *Tnormal, const Vecto
 
 }
 
-#endif
+#endif // POVRAY_CORE_NORMAL_H

@@ -2,6 +2,8 @@
 ///
 /// @file core/support/simplevector.h
 ///
+/// Specialized replacements for `std::vector` optimized for speed.
+///
 /// Very simple, basic vector-like classes containing just enough functionality
 /// for their intended uses within POV. Flexibility is sacrificed for
 /// performance as these classes will typically be used in places where they may
@@ -27,7 +29,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -54,6 +56,9 @@
 
 #ifndef POVRAY_CORE_SIMPLEVECTOR_H
 #define POVRAY_CORE_SIMPLEVECTOR_H
+
+// Module config header file must be the first file included within POV-Ray unit header files
+#include "core/configcore.h"
 
 #include <stdexcept>
 

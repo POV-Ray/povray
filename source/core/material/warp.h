@@ -2,16 +2,13 @@
 ///
 /// @file core/material/warp.h
 ///
-/// This module contains all defines, typedefs, and prototypes for
-/// @ref warp.cpp.
-///
-/// @note   @ref frame.h contains other warp stuff.
+/// Declarations related to warps.
 ///
 /// @copyright
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,8 +33,11 @@
 ///
 //******************************************************************************
 
-#ifndef WARP_H
-#define WARP_H
+#ifndef POVRAY_CORE_WARP_H
+#define POVRAY_CORE_WARP_H
+
+// Module config header file must be the first file included within POV-Ray unit header files
+#include "core/configcore.h"
 
 #include "core/math/matrix.h"
 #include "core/math/vector.h"
@@ -297,4 +297,4 @@ void UnWarp_Normal (Vector3d& TNorm, const Vector3d& ENorm, const TPATTERN *TPat
 
 }
 
-#endif
+#endif // POVRAY_CORE_WARP_H

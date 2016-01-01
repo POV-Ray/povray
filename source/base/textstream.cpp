@@ -2,13 +2,13 @@
 ///
 /// @file base/textstream.cpp
 ///
-/// This module implements the classes handling text file input and output.
+/// Implementations related to text file input and output.
 ///
 /// @copyright
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -33,14 +33,15 @@
 ///
 //******************************************************************************
 
-#include <cstdlib>
-#include <cstdarg>
-#include <algorithm>
-
-// configbase.h must always be the first POV file included within base *.cpp files
-#include "configbase.h"
-
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "textstream.h"
+
+// C++ variants of standard C header files
+#include <cstdarg>
+#include <cstdlib>
+
+// Standard C++ header files
+#include <algorithm>
 
 // this must be the last file included
 #include "base/povdebug.h"

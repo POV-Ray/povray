@@ -2,13 +2,18 @@
 ///
 /// @file base/image/png.cpp
 ///
-/// This module contains the code to read and write the PNG output file.
+/// Implementation of Portable Network Graphics (PNG) image file handling.
+///
+/// @note
+///     Some functions implemented in this file throw exceptions from 'extern C'
+///     code. be sure to enable this in your compiler options (preferably for
+///     this file only).
 ///
 /// @copyright
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -33,42 +38,22 @@
 ///
 //******************************************************************************
 
-/*****************************************************************************
-*  This code requires the use of libpng, Group 42's PNG reference library.
-*  libpng is  Copyright (c) 1995 Guy Eric Schalnat, Group 42, Inc.
-*
-*  This code also requires the use of Zlib,
-*  Zlib is Copyright (C) 1995 Jean-loup Gailly and Mark Adler
-*
-*  The latest version of these libraries are available at ftp.uu.net as
-*
-*  /graphics/png/libpngXX.tar.gz.
-*  /archiver/zlib/zlib-XX.tar.gz.
-*
-*  where XX is the latest version of the library.
-*
-*****************************************************************************/
-
-// NOTE: this file throws exceptions from 'extern C' functions. be sure to enable
-// this in your compiler options (preferably for this file only).
-
-// configbase.h must always be the first POV file included within base *.cpp files
-#include "base/configbase.h"
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
+#include "base/image/png_pov.h"
 
 #ifndef LIBPNG_MISSING
 
 #include <string>
 
+// Boost header files
 #include <boost/scoped_ptr.hpp>
 #include <boost/scoped_array.hpp>
 
 #include <png.h>
 
-#include "base/image/png_pov.h"
-
+// POV-Ray base header files
 #include "base/fileinputoutput.h"
 #include "base/types.h"
-#include "base/image/image.h"
 #include "base/image/metadata.h"
 
 // this must be the last file included

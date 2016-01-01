@@ -2,7 +2,7 @@
 ///
 /// @file base/version.h
 ///
-/// This file contains version information.
+/// Version information.
 ///
 /// @copyright
 /// @parblock
@@ -45,7 +45,7 @@
 #define OFFICIAL_VERSION_STRING "3.7.1"
 #define OFFICIAL_VERSION_NUMBER 371
 
-#define POV_RAY_PRERELEASE "alpha.8416584"
+#define POV_RAY_PRERELEASE "alpha.8417868"
 
 #if (POV_RAY_IS_AUTOBUILD == 1) && ((POV_RAY_IS_OFFICIAL == 1) || (POV_RAY_IS_SEMI_OFFICIAL == 1))
 #ifdef POV_RAY_PRERELEASE

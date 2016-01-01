@@ -2,13 +2,29 @@
 ///
 /// @file base/safemath.h
 ///
-/// Functions to perform overflow-safe mathematical operations.
+/// Overflow-safe integer math operations.
+///
+/// The Functions in this file implement basic integer operations in a manner
+/// that is robust with respect to numeric limits, reporting overflow by
+/// throwing an exception.
+///
+/// The functions are designed for portability and robustness rather than
+/// performance, and should therefore be used sparingly.
+///
+/// The showcase scenario for these operations is the total size computation for
+/// some dynamic block of memory, which in case of a numeric overflow would
+/// inadvertently be computed too small, leading to accesses beyond the block's
+/// boundaries and potential data corruption or hard crashes further down the
+/// road. Computation of pointers into that memory block, on the other hand,
+/// would typically not need to be guarded in the same manner, as successful
+/// computation of the block's total size usually guarantees that corresponding
+/// computations of pointers will not overflow either.
 ///
 /// @copyright
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,10 +52,13 @@
 #ifndef POVRAY_BASE_SAFEMATH_H
 #define POVRAY_BASE_SAFEMATH_H
 
-#include <cassert>
+// Module config header file must be the first file included within POV-Ray unit header files
+#include "base/configbase.h"
+
+// Standard C++ header files
 #include <limits>
 
-#include "base/configbase.h"
+// POV-Ray base header files
 #include "base/pov_err.h"
 
 namespace pov_base

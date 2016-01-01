@@ -2,13 +2,13 @@
 ///
 /// @file base/pov_err.cpp
 ///
-/// @todo   What's in here?
+/// Implementation of message text generation for internal errors.
 ///
 /// @copyright
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -33,11 +33,11 @@
 ///
 //******************************************************************************
 
-#include <cstring>
-
-// configbase.h must always be the first POV file included within base *.cpp files
-#include "base/configbase.h"
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "base/pov_err.h"
+
+// C++ variants of standard C header files
+#include <cstring>
 
 // this must be the last file included
 #include "base/povdebug.h"

@@ -2,7 +2,7 @@
 ///
 /// @file core/support/octree.h
 ///
-/// Oct-tree routine prototypes. Use by Radiosity calculation routies.
+/// Declarations related to the radiosity sample octree.
 ///
 /// @author Jim McElhiney
 ///
@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -42,6 +42,9 @@
 
 #ifndef POVRAY_CORE_OCTREE_H
 #define POVRAY_CORE_OCTREE_H
+
+// Module config header file must be the first file included within POV-Ray unit header files
+#include "core/configcore.h"
 
 #include <climits>
 

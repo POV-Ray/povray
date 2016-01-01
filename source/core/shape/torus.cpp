@@ -2,7 +2,7 @@
 ///
 /// @file core/shape/torus.cpp
 ///
-/// This module implements the torus primitive.
+/// Implementation of the torus geometric primitive.
 ///
 /// @author Dieter Bayer
 ///
@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -45,8 +45,7 @@
 *
 *****************************************************************************/
 
-// configcore.h must always be the first POV file included in core *.cpp files (pulls in platform config)
-#include "core/configcore.h"
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/shape/torus.h"
 
 #include "core/bounding/boundingbox.h"

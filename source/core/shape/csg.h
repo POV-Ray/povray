@@ -2,14 +2,13 @@
 ///
 /// @file core/shape/csg.h
 ///
-/// This module contains all defines, typedefs, and prototypes for
-/// @ref csg.cpp.
+/// Declarations related to constructive solid geometry (csg) shapes.
 ///
 /// @copyright
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -34,8 +33,11 @@
 ///
 //******************************************************************************
 
-#ifndef CSG_H
-#define CSG_H
+#ifndef POVRAY_CORE_CSG_H
+#define POVRAY_CORE_CSG_H
+
+// Module config header file must be the first file included within POV-Ray unit header files
+#include "core/configcore.h"
 
 #include "core/scene/object.h"
 
@@ -121,4 +123,4 @@ class CSGIntersection : public CSG
 
 }
 
-#endif
+#endif // POVRAY_CORE_CSG_H
