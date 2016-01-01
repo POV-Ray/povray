@@ -2,8 +2,7 @@
 ///
 /// @file parser/fncode.h
 ///
-/// This module contains declarations for the compiler for user-defined
-/// functions.
+/// Declarations related to the compilation of user-defined functions.
 ///
 /// This module is inspired by code by D. Skarda, T. Bily and R. Suzuki.
 ///
@@ -11,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -38,6 +37,9 @@
 
 #ifndef POVRAY_PARSER_FNCODE_H
 #define POVRAY_PARSER_FNCODE_H
+
+// Module config header file must be the first file included within POV-Ray unit header files
+#include "parser/configparser.h"
 
 #include "parser/reservedwords.h"
 

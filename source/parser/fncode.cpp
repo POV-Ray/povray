@@ -2,7 +2,7 @@
 ///
 /// @file parser/fncode.cpp
 ///
-/// This module implements the compiler for user-defined functions.
+/// Implementations related to the compilation of user-defined functions.
 ///
 /// This module is inspired by code by D. Skarda, T. Bily and R. Suzuki.
 ///
@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -35,20 +35,19 @@
 ///
 //******************************************************************************
 
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
+#include "parser/fncode.h"
+
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <algorithm>
 
-// configparser.h must always be the first POV file included in the parser (pulls in platform config)
-#include "parser/configparser.h"
-#include "parser/fncode.h"
+#include "parser/parser.h"
 
 #include "backend/scene/backendscenedata.h"
 #include "backend/vm/fnintern.h"
 #include "backend/vm/fnpovfpu.h"
-
-#include "parser/parser.h"
 
 // this must be the last header file included
 #include "base/povdebug.h"
@@ -500,6 +499,8 @@ void FNCode::SetFlag(unsigned int flag, char *str)
 
 void FNCode::compile_recursive(ExprNode *expr)
 {
+    POV_ASSERT(expr != NULL);
+
     unsigned int local_k = 0;
 
     if(expr->op <= OP_LEFTMOST)

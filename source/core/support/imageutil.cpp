@@ -2,14 +2,13 @@
 ///
 /// @file core/support/imageutil.cpp
 ///
-/// This module implements the mapped textures including image map, bump map
-/// and material map.
+/// Implementation of mapped textures like image map, bump map and material map.
 ///
 /// @copyright
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -34,11 +33,10 @@
 ///
 //******************************************************************************
 
-#include <boost/scoped_ptr.hpp>
-
-// configcore.h must always be the first POV file included in core *.cpp files (pulls in platform config)
-#include "core/configcore.h"
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/support/imageutil.h"
+
+#include <boost/scoped_ptr.hpp>
 
 #include "base/pov_err.h"
 
@@ -1039,6 +1037,8 @@ static void Interp(const ImageData *image, DBL xcoor, DBL ycoor, RGBFTColour& co
         bilinear(Corner_Factors, xcoor, ycoor);
     else if(image->Interpolation_Type == NORMALIZED_DIST)
         norm_dist(Corner_Factors, xcoor, ycoor);
+    else
+        POV_ASSERT(false);
 
     // We're using double precision for the colors here to avoid higher-than-1.0 results due to rounding errors,
     // which would otherwise lead to stray dot artifacts when clamped to [0..1] range for a color_map or similar.

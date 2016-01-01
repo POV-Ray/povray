@@ -1061,7 +1061,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
         CASE (MANDEL_TOKEN)
             New->Type = MANDEL_PATTERN;
             New->pattern = PatternPtr(new Mandel2Pattern());
-            dynamic_cast<MandelPattern*>(New->pattern.get())->maxIterations = (int)Parse_Float();
+            dynamic_cast<MandelPattern*>(New->pattern.get())->maxIterations = Parse_Int_With_Minimum(1, "fractal iterations limit");
             dynamic_cast<MandelPattern*>(New->pattern.get())->interiorType = DEFAULT_FRACTAL_INTERIOR_TYPE;
             dynamic_cast<MandelPattern*>(New->pattern.get())->exteriorType = DEFAULT_FRACTAL_EXTERIOR_TYPE;
             dynamic_cast<MandelPattern*>(New->pattern.get())->exteriorFactor = DEFAULT_FRACTAL_EXTERIOR_FACTOR;
@@ -1074,7 +1074,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
             New->pattern = PatternPtr(new JuliaPattern());
             Parse_UV_Vect(dynamic_cast<JuliaPattern*>(New->pattern.get())->juliaCoord);
             Parse_Comma();
-            dynamic_cast<JuliaPattern*>(New->pattern.get())->maxIterations = (int)Parse_Float();
+            dynamic_cast<JuliaPattern*>(New->pattern.get())->maxIterations = Parse_Int_With_Minimum(1, "fractal iterations limit");
             dynamic_cast<JuliaPattern*>(New->pattern.get())->interiorType = DEFAULT_FRACTAL_INTERIOR_TYPE;
             dynamic_cast<JuliaPattern*>(New->pattern.get())->exteriorType = DEFAULT_FRACTAL_EXTERIOR_TYPE;
             dynamic_cast<JuliaPattern*>(New->pattern.get())->exteriorFactor = DEFAULT_FRACTAL_EXTERIOR_FACTOR;
@@ -1132,7 +1132,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
             dynamic_cast<FractalPattern*>(New->pattern.get())->exteriorType = DEFAULT_FRACTAL_EXTERIOR_TYPE;
             dynamic_cast<FractalPattern*>(New->pattern.get())->exteriorFactor = DEFAULT_FRACTAL_EXTERIOR_FACTOR;
             dynamic_cast<FractalPattern*>(New->pattern.get())->interiorFactor = DEFAULT_FRACTAL_INTERIOR_FACTOR;
-            dynamic_cast<FractalPattern*>(New->pattern.get())->maxIterations = (int)Parse_Float();
+            dynamic_cast<FractalPattern*>(New->pattern.get())->maxIterations = Parse_Int_With_Minimum(1, "fractal iterations limit");
             EXIT
         END_CASE
 
@@ -3152,7 +3152,7 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
                     Warn_State(Token.Token_Id, PIGMENT_TOKEN);
                     Pigment->Type = MANDEL_PATTERN;
                     Pigment->pattern = PatternPtr(new Mandel2Pattern());
-                    dynamic_cast<FractalPattern*>(Pigment->pattern.get())->maxIterations = (int)Parse_Float();
+                    dynamic_cast<FractalPattern*>(Pigment->pattern.get())->maxIterations = Parse_Int_With_Minimum(1, "fractal iterations limit");
                 END_CASE
 
                 CASE (ONION_TOKEN)
@@ -4933,7 +4933,7 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
         CASE (MANDEL_TOKEN)
             New->Type = MANDEL_PATTERN;
             New->pattern = PatternPtr(new Mandel2Pattern());
-            dynamic_cast<MandelPattern*>(New->pattern.get())->maxIterations = (int)Parse_Float();
+            dynamic_cast<MandelPattern*>(New->pattern.get())->maxIterations = Parse_Int_With_Minimum(1, "fractal iterations limit");
             dynamic_cast<MandelPattern*>(New->pattern.get())->interiorType = DEFAULT_FRACTAL_INTERIOR_TYPE;
             dynamic_cast<MandelPattern*>(New->pattern.get())->exteriorType = DEFAULT_FRACTAL_EXTERIOR_TYPE;
             dynamic_cast<MandelPattern*>(New->pattern.get())->exteriorFactor = DEFAULT_FRACTAL_EXTERIOR_FACTOR;
@@ -4946,7 +4946,7 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
             New->pattern = PatternPtr(new JuliaPattern());
             Parse_UV_Vect(dynamic_cast<JuliaPattern*>(New->pattern.get())->juliaCoord);
             Parse_Comma();
-            dynamic_cast<JuliaPattern*>(New->pattern.get())->maxIterations = (int)Parse_Float();
+            dynamic_cast<JuliaPattern*>(New->pattern.get())->maxIterations = Parse_Int_With_Minimum(1, "fractal iterations limit");
             dynamic_cast<JuliaPattern*>(New->pattern.get())->interiorType = DEFAULT_FRACTAL_INTERIOR_TYPE;
             dynamic_cast<JuliaPattern*>(New->pattern.get())->exteriorType = DEFAULT_FRACTAL_EXTERIOR_TYPE;
             dynamic_cast<JuliaPattern*>(New->pattern.get())->exteriorFactor = DEFAULT_FRACTAL_EXTERIOR_FACTOR;
@@ -5004,7 +5004,7 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
             dynamic_cast<FractalPattern*>(New->pattern.get())->exteriorType = DEFAULT_FRACTAL_EXTERIOR_TYPE;
             dynamic_cast<FractalPattern*>(New->pattern.get())->exteriorFactor = DEFAULT_FRACTAL_EXTERIOR_FACTOR;
             dynamic_cast<FractalPattern*>(New->pattern.get())->interiorFactor = DEFAULT_FRACTAL_INTERIOR_FACTOR;
-            dynamic_cast<FractalPattern*>(New->pattern.get())->maxIterations = (int)Parse_Float();
+            dynamic_cast<FractalPattern*>(New->pattern.get())->maxIterations = Parse_Int_With_Minimum(1, "fractal iterations limit");
             EXIT
         END_CASE
 

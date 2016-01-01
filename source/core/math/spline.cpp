@@ -16,7 +16,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -41,17 +41,17 @@
 ///
 //******************************************************************************
 
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
+#include "core/math/spline.h"
+
 #include <cmath>
 #include <cstdio>
 #include <cstring>
 
 #include <limits>
 
-// configcore.h must always be the first POV file included in core *.cpp files (pulls in platform config)
-#include "core/configcore.h"
-#include "core/math/spline.h"
-
 #include "base/pov_err.h"
+#include "base/types.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -126,6 +126,7 @@ void Precompute_Cubic_Coeffs(GenericSpline *sp)
     DBL *v;
 
     SplineEntryList::size_type numEntries = sp->SplineEntries.size();
+    POV_ASSERT(numEntries >= 2);
 
     h = new DBL[numEntries];
     b = new DBL[numEntries];

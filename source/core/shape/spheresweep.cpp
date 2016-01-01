@@ -2,7 +2,7 @@
 ///
 /// @file core/shape/spheresweep.cpp
 ///
-/// This module implements the sphere sweep primitive.
+/// Implementation of the sphere sweep geometric primitive.
 ///
 /// Idea: J.J. Van Wijk, "Raytracing Objects Defined by Sweeping a Sphere",
 /// Eurographics 1984.
@@ -13,7 +13,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -78,11 +78,10 @@
 *
 ******************************************************************************/
 
-#include <algorithm>
-
-// configcore.h must always be the first POV file included in core *.cpp files (pulls in platform config)
-#include "core/configcore.h"
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/shape/spheresweep.h"
+
+#include <algorithm>
 
 #include "core/bounding/boundingbox.h"
 #include "core/math/matrix.h"
@@ -521,7 +520,9 @@ int SphereSweep::Intersect_Segment(const BasicRay &ray, const SPHSWEEP_SEG *Segm
 
             Num_Poly_Roots = Solve_Polynomial(2, Coef, Root, true, 1e-10, Thread->Stats());
             break;
+
         case 4:   // Third order polynomial
+
             Vector = ray.Origin - Segment->Center_Coef[0];
 
             // a is always 1.0
@@ -594,6 +595,10 @@ int SphereSweep::Intersect_Segment(const BasicRay &ray, const SPHSWEEP_SEG *Segm
             Coef[10] = Sqr(k) - d * k * e + l * Sqr(d);
 
             Num_Poly_Roots = bezier_01(10, Coef, Root, true, 1e-10, Thread);
+            break;
+
+        default:
+            POV_ASSERT(false);
             break;
     }
 
