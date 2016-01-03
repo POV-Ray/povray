@@ -480,10 +480,6 @@ void Translate_Object (ObjectPtr Object, const Vector3d& Vector, const TRANSFORM
         Transform_Textures(Object->Interior_Texture, Trans);
     }
 
-    if(Object->UV_Trans == NULL)
-        Object->UV_Trans = Create_Transform();
-    Compose_Transforms(Object->UV_Trans, Trans);
-
     if(Object->interior != NULL)
         Object->interior->Transform(Trans);
 
@@ -543,10 +539,6 @@ void Rotate_Object (ObjectPtr Object, const Vector3d& Vector, const TRANSFORM *T
         Transform_Textures(Object->Interior_Texture, Trans);
     }
 
-    if (Object->UV_Trans == NULL)
-        Object->UV_Trans = Create_Transform();
-    Compose_Transforms(Object->UV_Trans, Trans);
-
     if(Object->interior != NULL)
         Object->interior->Transform(Trans);
 
@@ -603,10 +595,6 @@ void Scale_Object (ObjectPtr Object, const Vector3d& Vector, const TRANSFORM *Tr
         Transform_Textures(Object->Texture, Trans);
         Transform_Textures(Object->Interior_Texture, Trans);
     }
-
-    if (Object->UV_Trans == NULL)
-        Object->UV_Trans = Create_Transform();
-    Compose_Transforms(Object->UV_Trans, Trans);
 
     if(Object->interior != NULL)
         Object->interior->Transform(Trans);
@@ -666,10 +654,6 @@ void Transform_Object (ObjectPtr Object, const TRANSFORM *Trans)
         Transform_Textures(Object->Texture, Trans);
         Transform_Textures(Object->Interior_Texture, Trans);
     }
-
-    if (Object->UV_Trans == NULL)
-        Object->UV_Trans = Create_Transform();
-    Compose_Transforms(Object->UV_Trans, Trans);
 
     if(Object->interior != NULL)
         Object->interior->Transform(Trans);
@@ -740,10 +724,6 @@ ObjectPtr Copy_Object (ObjectPtr Old)
     else
         New->interior.reset();
 
-    /* NK 1998 */
-    New->UV_Trans = Copy_Transform(Old->UV_Trans);
-    /* NK ---- */
-
     // TODO: we really ought to decide whether or not it's useful to maintain
     //       the overhead of having multiple clip and bound objects ... it is
     //       after all possible for the user to use CSG and give us one object
@@ -807,9 +787,6 @@ void Destroy_Single_Object (ObjectPtr *objectPtr)
 
     Destroy_Object(object->Bound);
 
-    /* NK 1998 */
-    Destroy_Transform(object->UV_Trans);
-
     Destroy_Object(object->Bound);
 
     if(object->Bound != object->Clip)
@@ -836,8 +813,6 @@ void Destroy_Object(ObjectPtr Object)
         Destroy_Textures(Object->Texture);
         Destroy_Textures(Object->Interior_Texture);
         Destroy_Object(Object->Bound);
-
-        Destroy_Transform(Object->UV_Trans);
 
         if (DestroyClip)
             Destroy_Object(Object->Clip);

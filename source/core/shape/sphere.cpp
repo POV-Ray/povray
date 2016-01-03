@@ -375,6 +375,8 @@ ObjectPtr Sphere::Copy()
     *New = *this;
     New->Trans = Copy_Transform(Trans);
 
+    New->UV_Trans = Copy_Transform(UV_Trans);
+
     return(New);
 }
 
@@ -409,6 +411,10 @@ void Sphere::Translate(const Vector3d& Vector, const TRANSFORM *tr)
 {
     if(Trans == NULL)
     {
+        if(UV_Trans == NULL)
+            UV_Trans = Create_Transform();
+        Compose_Transforms(UV_Trans, tr);
+
         Center += Vector;
 
         Compute_BBox();
@@ -451,6 +457,10 @@ void Sphere::Rotate(const Vector3d&, const TRANSFORM *tr)
 {
     if(Trans == NULL)
     {
+        if (UV_Trans == NULL)
+            UV_Trans = Create_Transform();
+        Compose_Transforms(UV_Trans, tr);
+
         MTransPoint(Center, Center, tr);
 
         Compute_BBox();
@@ -503,6 +513,10 @@ void Sphere::Scale(const Vector3d& Vector, const TRANSFORM *tr)
 
     if (Trans == NULL)
     {
+        if (UV_Trans == NULL)
+            UV_Trans = Create_Transform();
+        Compose_Transforms(UV_Trans, tr);
+
         Center *= Vector[X];
 
         Radius *= fabs(Vector[X]);
@@ -543,15 +557,13 @@ void Sphere::Scale(const Vector3d& Vector, const TRANSFORM *tr)
 *
 ******************************************************************************/
 
-Sphere::Sphere() : ObjectBase(SPHERE_OBJECT)
-{
-    Center = Vector3d(0.0, 0.0, 0.0);
-
-    Radius = 1.0;
-
-    Trans = NULL;
-    Do_Ellipsoid = false; // FIXME
-}
+Sphere::Sphere() :
+    ObjectBase(SPHERE_OBJECT),
+    Center(0.0, 0.0, 0.0),
+    Radius(1.0),
+    UV_Trans(NULL),
+    Do_Ellipsoid(false) // FIXME
+{}
 
 /*****************************************************************************
 *
@@ -581,6 +593,10 @@ Sphere::Sphere() : ObjectBase(SPHERE_OBJECT)
 
 void Sphere::Transform(const TRANSFORM *tr)
 {
+    if (UV_Trans == NULL)
+        UV_Trans = Create_Transform();
+    Compose_Transforms(UV_Trans, tr);
+
     if(Trans == NULL)
     {
         Do_Ellipsoid = true;
@@ -634,6 +650,7 @@ Sphere::~Sphere()
 #endif
 
     Destroy_Transform(Trans);
+    Destroy_Transform(UV_Trans);
 }
 
 

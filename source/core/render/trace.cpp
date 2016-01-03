@@ -487,6 +487,7 @@ void Trace::ComputeTextureColour(Intersection& isect, MathColour& colour, Colour
     isect.INormal = rawnormal;
     isect.PNormal = rawnormal;
 
+    // now switch to UV mapping if we need to
     if(Test_Flag(isect.Object, UV_FLAG))
     {
         // TODO FIXME
@@ -498,11 +499,9 @@ void Trace::ComputeTextureColour(Intersection& isect, MathColour& colour, Colour
         isect.Object->UVCoord(uvcoords, &isect, threadData);
         // save the normal and UV coords into Intersection
         isect.Iuv = uvcoords;
-    }
 
-    // now switch to UV mapping if we need to
-    if(Test_Flag(isect.Object, UV_FLAG))
         ipoint = Vector3d(uvcoords.u(), uvcoords.v(), 0.0);
+    }
 
     bool isMultiTextured = Test_Flag(isect.Object, MULTITEXTURE_FLAG) ||
                            ((isect.Object->Texture == NULL) && Test_Flag(isect.Object, CUTAWAY_TEXTURES_FLAG));
@@ -2285,17 +2284,14 @@ void Trace::ComputeShadowColour(const LightSource &lightsource, Intersection& is
     // and save to intersection -hdf-
     isect.PNormal = raw_Normal;
 
+    // now switch to UV mapping if we need to
     if(Test_Flag(isect.Object, UV_FLAG))
     {
         // get the UV vect of the intersection
         isect.Object->UVCoord(uv_Coords, &isect, threadData);
         // save the normal and UV coords into Intersection
         isect.Iuv = uv_Coords;
-    }
 
-    // now switch to UV mapping if we need to
-    if(Test_Flag(isect.Object, UV_FLAG))
-    {
         ipoint[X] = uv_Coords[U];
         ipoint[Y] = uv_Coords[V];
         ipoint[Z] = 0;

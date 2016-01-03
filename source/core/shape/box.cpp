@@ -1037,9 +1037,6 @@ void Box::UVCoord(Vector2d& Result, const Intersection *Inter, TraceThreadData *
     /* this line normalizes the face offsets */
     P /= Box_Diff;
 
-    /* if no normalize above, then we should use Box->UV_Trans and also
-       inverse-transform the bounds */
-
     /* The following code does a variation of cube environment mapping. All the
        textures are not mirrored when the cube is viewed from outside. */
 

@@ -166,7 +166,6 @@ class ObjectBase
         vector<LightSource *> LLights;  ///< Used for light groups.
         BoundingBox BBox;
         TRANSFORM *Trans;
-        TRANSFORM *UV_Trans;
         SNGL Ph_Density;
         FloatSetting RadiosityImportance;
         unsigned int Flags;
@@ -178,7 +177,7 @@ class ObjectBase
         /// Construct object from scratch.
         ObjectBase(int t) :
             Type(t),
-            Texture(NULL), Interior_Texture(NULL), interior(), Trans(NULL), UV_Trans(NULL),
+            Texture(NULL), Interior_Texture(NULL), interior(), Trans(NULL),
             Ph_Density(0), RadiosityImportance(0.0), Flags(0)
         {
             Make_BBox(BBox, -BOUND_HUGE/2.0, -BOUND_HUGE/2.0, -BOUND_HUGE/2.0, BOUND_HUGE, BOUND_HUGE, BOUND_HUGE);
@@ -192,7 +191,7 @@ class ObjectBase
         ///
         ObjectBase(int t, ObjectBase& o, bool transplant) :
             Type(t),
-            Texture(o.Texture), Interior_Texture(o.Interior_Texture), interior(o.interior), Trans(o.Trans), UV_Trans(o.UV_Trans),
+            Texture(o.Texture), Interior_Texture(o.Interior_Texture), interior(o.interior), Trans(o.Trans),
             Ph_Density(o.Ph_Density), RadiosityImportance(o.RadiosityImportance), Flags(o.Flags),
             Bound(o.Bound), Clip(o.Clip), LLights(o.LLights), BBox(o.BBox)
         {
@@ -202,7 +201,6 @@ class ObjectBase
                 o.Interior_Texture = NULL;
                 o.interior.reset();
                 o.Trans = NULL;
-                o.UV_Trans = NULL;
                 o.Bound.clear();
                 o.Clip.clear();
                 o.LLights.clear();
