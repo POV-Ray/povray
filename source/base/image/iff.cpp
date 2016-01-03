@@ -85,7 +85,7 @@ static int read_byte(IStream *file)
     int c;
 
     if ((c = file->Read_Byte()) == EOF)
-        throw POV_EXCEPTION(kFileDataErr, "Unexpected EOF while reading IFF file");
+        throw POV_EXCEPTION(kFileDataErr, "Unexpected EOF while reading IFF-ILBM file");
     return (c);
 }
 
@@ -136,7 +136,7 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
         {
             case FORM:
                 if (read_long(file) != ILBM)
-                    throw POV_EXCEPTION(kFileDataErr, "Expected ILBM while reading IFF file");
+                    throw POV_EXCEPTION(kFileDataErr, "Expected ILBM while reading IFF-ILBM file");
                 break;
 
             case BMHD:
@@ -194,7 +194,7 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
                         image = Image::Create (width, height, imagetype);
                     else
                         image = Image::Create (width, height, imagetype, colormap);
-                    // NB: IFF files don't use alpha, so premultiplied vs. non-premultiplied is not an issue
+                    // NB: IFF-ILBM files don't use alpha, so premultiplied vs. non-premultiplied is not an issue
 
                     int rowlen = ((width + 15) / 16) * 2 ;
                     boost::scoped_array<unsigned char> row_bytes (new unsigned char [nPlanes * rowlen]);
@@ -276,7 +276,7 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
                                         break;
 
                                     default:
-                                        throw POV_EXCEPTION(kFileDataErr, "Invalid data in IFF file");
+                                        throw POV_EXCEPTION(kFileDataErr, "Invalid data in IFF-ILBM file");
                                 }
                                 image->SetRGBValue (col, row, r, g, b); // TODO FIXME - gamma!
                             }
@@ -292,7 +292,7 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
                                 else
                                 {
                                     if (creg >= colormap.size())
-                                        throw POV_EXCEPTION(kFileDataErr, "IFF color out of range in image");
+                                        throw POV_EXCEPTION(kFileDataErr, "IFF-ILBM color out of range in image");
                                     image->SetIndexedValue (col, row, creg);
                                 }
                             }
@@ -308,13 +308,13 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
                     }
                 }
                 else
-                    throw POV_EXCEPTION(kFileDataErr, "Invalid IFF file");
+                    throw POV_EXCEPTION(kFileDataErr, "Invalid IFF-ILBM file");
                 break;
 
             default:
                 for (int i = 0; (long)i < Chunk_Header.size; i++)
                     if (file->Read_Byte() == EOF)
-                        throw POV_EXCEPTION(kFileDataErr, "Unexpected EOF while reading IFF file");
+                        throw POV_EXCEPTION(kFileDataErr, "Unexpected EOF while reading IFF-ILBM file");
                 break;
         }
     }

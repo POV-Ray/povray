@@ -111,7 +111,7 @@ POV_File_Extensions gPOV_File_Extensions[POV_File_Count] =
     {{ ".ppm",  ".PPM",  "",      ""      }}, // POV_File_Image_PPM
     {{ ".pgm",  ".PGM",  "",      ""      }}, // POV_File_Image_PGM
     {{ ".gif",  ".GIF",  "",      ""      }}, // POV_File_Image_GIF
-    {{ ".iff",  ".IFF",  "",      ""      }}, // POV_File_Image_IFF
+    {{ ".iff",  ".IFF",  ".lbm",  ".LBM"  }}, // POV_File_Image_IFF
     {{ ".jpg",  ".JPG",  ".jpeg", ".JPEG" }}, // POV_File_Image_JPEG
     {{ ".tif",  ".TIF",  ".tiff", ".TIFF" }}, // POV_File_Image_TIFF
     {{ ".bmp",  ".BMP",  "",      ""      }}, // POV_File_Image_BMP
