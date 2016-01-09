@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -105,16 +105,6 @@ class Task
             }
         }
 
-        inline static void CurrentTaskCooperate()
-        {
-            TaskData *td = Task::GetTLSDataPtr();
-
-            if((td != NULL) && (td->task != NULL))
-                td->task->Cooperate();
-        }
-
-        inline static TaskData *GetTLSDataPtr() { return GET_THREAD_LOCAL_PTR(taskDataPtr); }
-
         inline TaskData *GetDataPtr() { return taskData; }
 
         inline POVMSContext GetPOVMSContext() { return povmsContext; }
@@ -134,8 +124,6 @@ class Task
 
         /// task data pointer
         TaskData *taskData;
-        /// task data pointer - TLS version
-        static DECLARE_THREAD_LOCAL_PTR(TaskData, taskDataPtr);
         /// task fatal error handler
         boost::function1<void, Exception&> fatalErrorHandler;
         /// stop request flag
@@ -175,8 +163,6 @@ class Task
         Task& operator=(const Task&);
 
         void TaskThread(const boost::function0<void>& completion);
-
-        static void TaskDataCleanup(Task::TaskData *) { }
 };
 
 

@@ -11,7 +11,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -136,42 +136,12 @@ inline void Destroy_Float(DBL *x)
         delete x;
 }
 
-#if 0
-#pragma mark * Vector2d
-#endif
-
-/// @}
-///
-//******************************************************************************
-///
-/// @name Bounding Box Stuff
-/// @{
-
-#if 0
-#pragma mark * Bounding
-#endif
-
-/// @}
-///
-//******************************************************************************
-///
-/// @name Media and Interior Stuff
-/// @{
-
-#if 0
-#pragma mark * Media, Interior
-#endif
-
 /// @}
 ///
 //******************************************************************************
 ///
 /// @name Image Stuff
 /// @{
-
-#if 0
-#pragma mark * Image
-#endif
 
 // Image types.
 
@@ -192,10 +162,6 @@ inline void Destroy_Float(DBL *x)
 /// @name Object Stuff
 ///
 /// @{
-
-#if 0
-#pragma mark * Object
-#endif
 
 #ifndef DUMP_OBJECT_DATA
 #define DUMP_OBJECT_DATA 0
@@ -228,15 +194,6 @@ struct Project_Tree_Node_Struct
 /// @}
 ///
 //******************************************************************************
-
-// platform-specific headers should have provided DECLARE_THREAD_LOCAL_PTR.
-// if not, we default to using the boost thread_specific_ptr class.
-#ifndef DECLARE_THREAD_LOCAL_PTR
-#define DECLARE_THREAD_LOCAL_PTR(ptrType, ptrName)                boost::thread_specific_ptr<ptrType> ptrName
-#define IMPLEMENT_THREAD_LOCAL_PTR(ptrType, ptrName, ptrCleanup)  boost::thread_specific_ptr<ptrType> ptrName(ptrCleanup)
-#define GET_THREAD_LOCAL_PTR(ptrName)                             (ptrName.get())
-#define SET_THREAD_LOCAL_PTR(ptrName, ptrValue)                   (ptrName.reset(ptrValue))
-#endif
 
 }
 

@@ -11,7 +11,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -67,12 +67,5 @@
 #endif
 
 #define POV_ULONG unsigned POV_LONG
-
-/// @file
-/// @todo The TLS stuff is just copied from the Linux settings; someone needs to check universal POSIX compatibility.
-#define DECLARE_THREAD_LOCAL_PTR(ptrType, ptrName)                __thread ptrType *ptrName
-#define IMPLEMENT_THREAD_LOCAL_PTR(ptrType, ptrName, ignore)      __thread ptrType *ptrName
-#define GET_THREAD_LOCAL_PTR(ptrName)                             (ptrName)
-#define SET_THREAD_LOCAL_PTR(ptrName, ptrValue)                   (ptrName = ptrValue)
 
 #endif // POVRAY_UNIX_SYSPOVCONFIG_POSIX_H

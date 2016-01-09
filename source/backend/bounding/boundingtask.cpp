@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -50,6 +50,7 @@
 #include "povms/povmsid.h"
 
 #include "backend/scene/backendscenedata.h"
+#include "backend/support/task.h"
 #include "backend/vm/fnpovfpu.h"
 
 // this must be the last file included
@@ -105,7 +106,8 @@ class SceneObjects : public BSPTree::Objects
 class BSPProgress : public BSPTree::Progress
 {
     public:
-        BSPProgress(RenderBackend::SceneId sid, POVMSAddress addr) :
+        BSPProgress(RenderBackend::SceneId sid, POVMSAddress addr, Task& task) :
+            mTask(task),
             sceneId(sid),
             frontendAddress(addr),
             lastProgressTime(0)
@@ -121,12 +123,13 @@ class BSPProgress : public BSPTree::Progress
                 obj.SetLong(kPOVAttrib_CurrentNodeCount, nodes);
                 RenderBackend::SendSceneOutput(sceneId, frontendAddress, kPOVMsgIdent_Progress, obj);
 
-                Task::CurrentTaskCooperate();
+                mTask.Cooperate();
 
                 lastProgressTime = timer.ElapsedRealTime();
             }
         }
     private:
+        Task& mTask;
         RenderBackend::SceneId sceneId;
         POVMSAddress frontendAddress;
         Timer timer;
@@ -168,7 +171,7 @@ void BoundingTask::Run()
         {
             // new BSP tree code
             SceneObjects objects(sceneData->objects);
-            BSPProgress progress(sceneData->sceneId, sceneData->frontendAddress);
+            BSPProgress progress(sceneData->sceneId, sceneData->frontendAddress, *this);
 
             sceneData->objects.clear();
             sceneData->objects.insert(sceneData->objects.end(), objects.finite.begin(), objects.finite.end());

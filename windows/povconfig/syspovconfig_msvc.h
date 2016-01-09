@@ -214,9 +214,4 @@
 #undef ReturnAddress
 #define ReturnAddress()                     _ReturnAddress()
 
-#define DECLARE_THREAD_LOCAL_PTR(ptrType, ptrName)                __declspec(thread) ptrType *ptrName
-#define IMPLEMENT_THREAD_LOCAL_PTR(ptrType, ptrName, ignore)      __declspec(thread) ptrType *ptrName
-#define GET_THREAD_LOCAL_PTR(ptrName)                             (ptrName)
-#define SET_THREAD_LOCAL_PTR(ptrName, ptrValue)                   (ptrName = ptrValue)
-
 #endif // POVRAY_WINDOWS_SYSPOVCONFIG_MSVC_H

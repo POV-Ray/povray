@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -57,8 +57,6 @@ namespace pov
 
 using namespace pov_base;
 
-IMPLEMENT_THREAD_LOCAL_PTR(Task::TaskData, Task::taskDataPtr, TaskDataCleanup);
-
 Task::Task(TaskData *td, const boost::function1<void, Exception&>& f) :
     taskData(td),
     fatalErrorHandler(f),
@@ -75,7 +73,6 @@ Task::Task(TaskData *td, const boost::function1<void, Exception&>& f) :
     if (td == NULL)
         throw POV_EXCEPTION_STRING("Internal error: TaskData is NULL in Task constructor");
     td->task = this;
-    SET_THREAD_LOCAL_PTR(taskDataPtr, td);
 }
 
 Task::~Task()
@@ -84,7 +81,6 @@ Task::~Task()
 
     // NOTE: Freeing taskData is the responsiblity of the task creator!
     taskData = NULL;
-    SET_THREAD_LOCAL_PTR(taskDataPtr, NULL);
 }
 
 int Task::FailureCode(int defval)
