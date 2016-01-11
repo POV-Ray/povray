@@ -373,8 +373,8 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
     // PNG is specified to use non-premultiplied alpha, so that's the preferred mode to use for the image container unless the user overrides
     // (e.g. to handle a non-compliant file).
     bool premul = false;
-    if (options.premultiplyOverride)
-        premul = options.premultiply;
+    if (options.premultipliedOverride)
+        premul = options.premultiplied;
 
     width = png_get_image_width(r_png_ptr, r_info_ptr);
     height = png_get_image_height(r_png_ptr, r_info_ptr);

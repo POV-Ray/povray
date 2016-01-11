@@ -169,6 +169,8 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
     uint16                PhotometricInterpretation;
     uint16                SamplePerPixel;
     uint16                Orientation;
+    uint16                ExtraSamples;
+    uint16*               ExtraSampleInfo;
     uint32                RowsPerStrip;
     unsigned int          width;
     unsigned int          height;
@@ -178,12 +180,6 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
     GammaCurvePtr gamma;
     if (options.gammacorrect && options.defaultGamma)
         gamma = TranscodingGammaCurve::Get(options.workingGamma, options.defaultGamma);
-
-    // [CLi] TIFF is specified to use associated (= premultiplied) alpha, so that's the preferred mode to use for the image container unless the user overrides
-    // (e.g. to handle a non-compliant file).
-    bool premul = true;
-    if (options.premultiplyOverride)
-        premul = options.premultiply;
 
     // Rather than have libTIFF complain about tags it doesn't understand,
     // we just suppress all the warnings.
@@ -198,7 +194,6 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
         return (NULL) ;
 
     // Get basic information about the image
-    int ExtraSamples, ExtraSampleInfo;
     TIFFGetField(tif, TIFFTAG_IMAGEWIDTH, &width);
     TIFFGetField(tif, TIFFTAG_IMAGELENGTH, &height);
     TIFFGetField(tif, TIFFTAG_BITSPERSAMPLE, &BitsPerSample);
@@ -207,6 +202,15 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
     TIFFGetField(tif, TIFFTAG_ORIENTATION, &Orientation);
     TIFFGetFieldDefaulted(tif, TIFFTAG_SAMPLESPERPIXEL, &SamplePerPixel);
     TIFFGetFieldDefaulted(tif, TIFFTAG_EXTRASAMPLES, &ExtraSamples, &ExtraSampleInfo);
+
+    // [CLi] TIFF provides alpha mode information in the TIFFTAG_EXTRASAMPLES field, so that's the preferred mode to use
+    // for the image container unless the user overrides (e.g. to handle a non-compliant file).
+    // If TIFFTAG_EXTRASAMPLES information is absent or inconclusive, we presume associated (= premultiplied) alpha.
+    bool premul = true;
+    if ((ExtraSamples > 0) && (ExtraSampleInfo[0] == EXTRASAMPLE_UNASSALPHA))
+        premul = false;
+    if (options.premultipliedOverride)
+        premul = options.premultiplied;
 
     // don't support more than 16 bits per sample
     if (BitsPerSample == 16)
@@ -246,7 +250,7 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
 
     //PhotometricInterpretation = 2 image is RGB
     //PhotometricInterpretation = 3 image have a color palette
-    if (PhotometricInterpretation == PHOTOMETRIC_PALETTE && (TIFFIsTiled(tif) == 0))
+    if ((PhotometricInterpretation == PHOTOMETRIC_PALETTE) && (TIFFIsTiled(tif) == 0))
     {
         uint16 *red, *green, *blue;
 

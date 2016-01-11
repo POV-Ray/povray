@@ -172,11 +172,11 @@ class Image
             SimpleGammaCurvePtr workingGamma;   // the working colour space gamma
             bool gammaOverride;                 // whether to apply defaultGamma even if the file indicates a different gamma
             bool gammacorrect;                  // whether to do any gamma correction at all; if false, raw encoded values are used
-            bool premultiplyOverride;           // whether to override file-format default for alpha premultiplication
-            bool premultiply;                   // whether to expect premultiplied ("associated") alpha or not ("straight alpha")
+            bool premultipliedOverride;         // whether to override file-format default for alpha premultiplication
+            bool premultiplied;                 // whether to expect premultiplied ("associated") alpha or not ("straight alpha")
             mutable vector<string> warnings;
 
-            ReadOptions() : itype(Undefined), gammaOverride(false), gammacorrect(false), premultiplyOverride(false), premultiply(false) { }
+            ReadOptions() : itype(Undefined), gammaOverride(false), gammacorrect(false), premultipliedOverride(false), premultiplied(false) { }
         };
 
         struct WriteOptions

@@ -428,8 +428,8 @@ ImageData *Parser::Parse_Image(int Legal, bool GammaCorrect)
             END_CASE
             CASE (PREMULTIPLIED_TOKEN)
                 // User wants to override alpha premultiplication setting for this particular file; let them have their will.
-                options.premultiplyOverride = true;
-                options.premultiply = ((int)Parse_Float() != 0);
+                options.premultipliedOverride = true;
+                options.premultiplied = ((int)Parse_Float() != 0);
             END_CASE
             OTHERWISE
                 UNGET
@@ -552,6 +552,8 @@ void Parser::Parse_Image_Map (PIGMENT *Pigment)
 
     image = Parse_Image (IMAGE_FILE, true);
     image->Use = USE_COLOUR; // was true [trf]
+
+    image->AllTransmitLegacyMode = (sceneData->EffectiveLanguageVersion() < 371);
 
     EXPECT                   /* Look for image_attribs */
         CASE (ONCE_TOKEN)

@@ -437,9 +437,15 @@ static void image_colour_at(const ImageData *image, DBL xcoor, DBL ycoor, RGBFTC
 {
     *index = -1;
 
-    // if either source or destination uses premultiplied alpha, make sure interpolation is done in premultiplied space
-    // as it makes the mathematical operations cleaner
-    bool getPremul = premul || image->data->IsPremultiplied();
+    bool doProperTransmitAll = image->data->HasTransparency() &&
+                               !image->AllTransmitLegacyMode &&
+                               !image->data->IsIndexed() && ( (image->AllTransmit != 0.0) || (image->AllFilter != 0.0) );
+
+    // If either source or destination uses premultiplied alpha, make sure interpolation is done in premultiplied space
+    // as it makes the mathematical operations cleaner -- unless the alpha channel is modulated by "transmit all" or
+    // "filter all", in which case we prefer non-premultiplied space.
+    bool getPremul = doProperTransmitAll ? (premul && image->data->IsPremultiplied()) :
+                                           (premul || image->data->IsPremultiplied());
 
     switch(image->Interpolation_Type)
     {
@@ -453,11 +459,43 @@ static void image_colour_at(const ImageData *image, DBL xcoor, DBL ycoor, RGBFTC
             Interp(image, xcoor, ycoor, colour, index, getPremul);
             break;
     }
+    bool havePremul = getPremul;
 
-    if (!premul && getPremul)
+    if (!premul && havePremul)
     {
-        // we fetched premultiplied data, but caller expects it non-premultiplied, so we need to fix that
+        // We fetched premultiplied data, but caller expects it non-premultiplied, so we need to fix that.
+        // As "transmit/filter all" handling also works best on non-premultiplied data, we're doing this now.
         AlphaUnPremultiply(colour.rgb(), colour.FTtoA());
+        havePremul = false;
+    }
+
+    if (doProperTransmitAll)
+    {
+        COLC imageAlpha = colour.FTtoA();
+
+        if (imageAlpha != 0.0)  // No need to apply "filter/transmit all" if the image is fully transparent here anyway.
+        {
+
+
+            colour.transm() += image->AllTransmit * imageAlpha;
+            colour.filter() += image->AllFilter   * imageAlpha;
+
+            if (havePremul)
+            {
+                // We have premultiplied data here, and the caller expects it to stay that way (otherwise we'd already
+                // have converted to non-premultiplied by now), so we need to fix the premultiplication of the colour
+                // according to our modifications to the transparency components.
+                COLC alphaCorrection = colour.FTtoA() / imageAlpha;
+                AlphaPremultiply(colour.rgb(), alphaCorrection);
+            }
+        }
+    }
+
+    if (premul && !havePremul)
+    {
+        // We have non-premultiplied data here, but caller expects it premultiplied, so we need to fix that
+        // As "transmit/filter all" handling works best on non-premultiplied data, we haven't done this earlier.
+        AlphaPremultiply(colour.rgb(), colour.FTtoA());
     }
 }
 
@@ -984,10 +1022,13 @@ static void no_interpolation(const ImageData *image, DBL xcoor, DBL ycoor, RGBFT
     {
         *index = -1;
 
-        // Note: Transmit_all supplements alpha channel
-        // TODO ALPHA - check how this affects premultiplied/non-premultiplied alpha considerations
-        colour.transm() += image->AllTransmit;
-        colour.filter() += image->AllFilter;
+        if (image->AllTransmitLegacyMode)
+        {
+            // Legacy versions applied "transmit/filter all" before interpolation,
+            // and with little respect to an image's inherent alpha information.
+            colour.transm() += image->AllTransmit;
+            colour.filter() += image->AllFilter;
+        }
     }
     else
         *index = image->data->GetIndexedValue(ixcoor, iycoor);
@@ -1250,6 +1291,7 @@ ImageData::ImageData() :
     Map_Type(PLANAR_MAP),
     Interpolation_Type(NO_INTERPOLATION),
     Once_Flag(false),
+    AllTransmitLegacyMode(false),
     Use(USE_NONE),
     Gradient(1.0,-1.0,0.0),
     iwidth(0), iheight(0),

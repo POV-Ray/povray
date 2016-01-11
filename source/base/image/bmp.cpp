@@ -547,8 +547,8 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
     // We presume non-premultiplied alpha, so that's the preferred mode to use for the image container unless the user overrides
     // (e.g. to handle a non-compliant file).
     bool premul = false;
-    if (options.premultiplyOverride)
-        premul = options.premultiply;
+    if (options.premultipliedOverride)
+        premul = options.premultiplied;
 
     if ((file->Read_Byte () != 'B') || (file->Read_Byte () !='M'))
         throw POV_EXCEPTION(kFileDataErr, "Error reading magic number of BMP image");

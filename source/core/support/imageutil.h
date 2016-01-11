@@ -93,13 +93,14 @@ class ImageData
         int References; // Keeps track of number of pointers to this structure
         int Map_Type;
         int Interpolation_Type;
-        bool Once_Flag;
+        bool Once_Flag : 1;
+        bool AllTransmitLegacyMode : 1;
         char Use;
         Vector3d Gradient;
         int iwidth, iheight;
         SNGL width, height;
         Vector2d Offset;
-        DBL AllFilter, AllTransmit;
+        COLC AllFilter, AllTransmit;
         void *Object;
         Image *data;
 

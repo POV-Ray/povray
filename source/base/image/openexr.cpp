@@ -182,8 +182,8 @@ Image *Read(IStream *file, const Image::ReadOptions& options)
     // OpenEXR officially uses premultiplied alpha, so that's the preferred mode to use for the image container unless the user overrides
     // (e.g. to handle a non-compliant file).
     bool premul = true;
-    if (options.premultiplyOverride)
-        premul = options.premultiply;
+    if (options.premultipliedOverride)
+        premul = options.premultiplied;
 
     // TODO: code this to observe the request for alpha in the input file type.
     POV_EXR_IStream is(*file);
