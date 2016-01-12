@@ -51,9 +51,6 @@
     <Filter Include="Backend Headers\Support">
       <UniqueIdentifier>{819550ea-076f-4b0b-b5e9-ff574bdb9261}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Backend Headers\Texture">
-      <UniqueIdentifier>{39577e8f-4ca6-413f-acaa-51e665721520}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Backend Headers\VM">
       <UniqueIdentifier>{e952c9e4-a8f8-422c-94b5-8a3c8bb6a30f}</UniqueIdentifier>
     </Filter>

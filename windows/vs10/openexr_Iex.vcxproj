@@ -24,7 +24,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{C46B9A53-86D8-4B7F-AB15-B2C04518A195}</ProjectGuid>
-    <ProjectName>Iex</ProjectName>
+    <ProjectName>OpenEXR IlmBase Iex</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">

@@ -24,7 +24,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{9EDB5C0F-BFD0-4A59-BB93-F06A52BB0128}</ProjectGuid>
-    <ProjectName>Half</ProjectName>
+    <ProjectName>OpenEXR IlmBase Half</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
