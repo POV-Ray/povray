@@ -14,7 +14,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -1689,7 +1689,8 @@ void Parser::Parse_Directive(int After_Hash)
 
     if (Curr_Type == INVOKING_MACRO_COND)
     {
-        if (Cond_Stack[CS_Index].PMac->Macro_End==Hash_Loc)
+        if ((Cond_Stack[CS_Index].PMac->Macro_End==Hash_Loc) &&
+            (UCS2_strcmp(Cond_Stack[CS_Index].PMac->Macro_Filename, Input_File->In_File->name()) == 0))
         {
             Return_From_Macro();
             if (--CS_Index < 0)
