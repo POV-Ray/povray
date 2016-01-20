@@ -2298,6 +2298,8 @@ void Parser::Parse_Finish (FINISH **Finish_Ptr)
     bool diffuseAdjust = false;
     bool phongAdjust = false;
     bool specularAdjust = false;
+    bool ambientSet = false;
+    bool emissionSet = false;
 
     Parse_Begin ();
 
@@ -2323,10 +2325,12 @@ void Parser::Parse_Finish (FINISH **Finish_Ptr)
         END_CASE
 
         CASE (AMBIENT_TOKEN)
+            ambientSet = true;
             Parse_Colour(New->Ambient);
         END_CASE
 
         CASE (EMISSION_TOKEN)
+            emissionSet = true;
             Parse_Colour(New->Emission);
         END_CASE
 
@@ -2580,6 +2584,27 @@ void Parser::Parse_Finish (FINISH **Finish_Ptr)
         END_CASE
     END_EXPECT    /* End of finish_mods */
 #endif
+
+    if ((sceneData->EffectiveLanguageVersion() >= 370) && ambientSet)
+    {
+        // As of version 3.7, use of "ambient" to model glowing materials is deprecated, and "emission" should be used
+        // instead.
+
+        // We can only guess what the user is trying to achieve with the "ambient" keyword. Our heuristic is based on
+        // the following assumptions:
+        // - When used properly to model non-radiosity ambient illumination, "ambient" values are typically around 0.1.
+        // - When misused to model glowing materials, "ambient" is often set to 1.0.
+        // - If the user also specifies "emission", they probably know what they are doing.
+
+        if ((New->Ambient.Greyscale() >= 0.3) && !emissionSet)
+        {
+            PossibleError("Suspiciously high 'ambient' value found. Are you trying to model a glowing material?"
+                          " As of version 3.7, 'ambient' is disabled when using radiosity, and its use to model glowing"
+                          " materials is generally deprecated; use 'emission' for this purpose instead."
+                          " If your intention is to model unusually high ambient illumination in a non-radiosity scene,"
+                          " you can avoid this warning by explicitly specifying 'emission 0'.");
+        }
+    }
 
     // If requested by the user via the "albedo" keyword,
     // adjust diffuse, phong and/or specular intensity parameters
