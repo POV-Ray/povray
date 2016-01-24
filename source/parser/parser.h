@@ -461,6 +461,9 @@ class Parser : public SceneTask
         short Ok_To_Declare;
         short LValue_Ok;
 
+        /// true if a #version statement is been parsed
+        bool parsingVersionDirective;
+
         TOKEN *Brace_Stack;
         int Brace_Index;
         bool Destroying_Frame;

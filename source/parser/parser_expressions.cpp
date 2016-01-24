@@ -1033,7 +1033,23 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                     break;
 
                 case VERSION_TOKEN:
-                    Val = sceneData->languageVersion / 100.0;
+                    if (!parsingVersionDirective)
+                    {
+                        // Normally, the `version` pseudo-variable needs to return the effective language version
+                        // (which is now fixed to 3.6.2 if not specified otherwise) so that include files can properly
+                        // switch back after temporarily overriding the `#version` setting.
+                        Val = sceneData->EffectiveLanguageVersion() / 100.0;
+                    }
+                    else
+                    {
+                        // When used inside a `#version` statement, special handling is needed to support the (now
+                        // deprecated) `#version version` idiom used in some 3.7.0 scenes to set the effective language
+                        // version to whatever version of POV-Ray is actually used.
+                        Warning("Use of the 'version' pseudo-variable in a '#version' directive is deprecated; "
+                                "to specify that your scene is compatible with POV-Ray 3.7.1 or later but provides its "
+                                "own mechanism of managing version compatibility, use '#version auto' instead.");
+                        Val = sceneData->languageVersion / 100.0;
+                    }
                     break;
 
                 case TRUE_TOKEN:

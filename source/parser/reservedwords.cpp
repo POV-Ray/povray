@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -90,6 +90,7 @@ const RESERVED_WORD Reserved_Words[LAST_TOKEN] = {
     {ATAN_TOKEN, "atan"},
     {AT_TOKEN, "@"},
     {AUTOSTOP_TOKEN, "autostop"},
+    {AUTO_TOKEN, "auto"},
     {AVERAGE_TOKEN, "average"},
     {BACKGROUND_TOKEN, "background"},
     {BACK_QUOTE_TOKEN, "`"},
@@ -596,6 +597,7 @@ const RESERVED_WORD Reserved_Words[LAST_TOKEN] = {
     {ULTRA_WIDE_ANGLE_TOKEN, "ultra_wide_angle"},
     {UNDEF_TOKEN, "undef"},
     {UNION_TOKEN, "union"},
+    {UNOFFICIAL_TOKEN, "unofficial"},
     {UP_TOKEN, "up"},
     {USE_ALPHA_TOKEN, "use_alpha"},
     {USE_COLOUR_TOKEN, "use_color"},

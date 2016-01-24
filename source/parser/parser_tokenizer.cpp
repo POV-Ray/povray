@@ -1686,6 +1686,7 @@ void Parser::Parse_Directive(int After_Hash)
     Macro *PMac=NULL;
     COND_TYPE Curr_Type = Cond_Stack[CS_Index].Cond_Type;
     POV_LONG Hash_Loc = Input_File->In_File->tellg().offset;
+    bool expectVersionNumber;
 
     if (Curr_Type == INVOKING_MACRO_COND)
     {
@@ -2205,63 +2206,93 @@ void Parser::Parse_Directive(int After_Hash)
                 switch(Token.Function_Id)
                 {
                     case VERSION_TOKEN:
-                        if (sceneData->languageVersionSet == false && token_count > 1)
-                            sceneData->languageVersionLate = true;
-                        sceneData->languageVersionSet = true;
-                        Ok_To_Declare = false;
-                        Get_Token();
-                        if (pov_stricmp(Token.Token_String,"unofficial") == 0)
                         {
+                            if (sceneData->languageVersionSet == false && token_count > 1)
+                                sceneData->languageVersionLate = true;
+                            Ok_To_Declare = false;
+                            bool wasParsingVersionDirective = parsingVersionDirective;
+                            parsingVersionDirective = true;
+                            expectVersionNumber = true;
+                            EXPECT_ONE
+                                CASE (AUTO_TOKEN)
+                                    expectVersionNumber = false;
+                                END_CASE
+                                CASE (UNOFFICIAL_TOKEN)
 #if POV_RAY_IS_OFFICIAL == 1
-                            Get_Token();
-                            Error("This file was created for an unofficial version and\ncannot work as-is with this official version.");
+                                    Get_Token();
+                                    Error("This file was created for an unofficial version and\ncannot work as-is with this official version.");
 #else
-                            // PATCH AUTHORS - you should not enable any extra features unless the
-                            // 'unofficial' keyword is set in the scene file.
+                                    // PATCH AUTHORS - you should not enable any extra features unless the
+                                    // 'unofficial' keyword is set in the scene file.
 #endif
-                        }
-                        else
-                            Unget_Token();
-                        sceneData->languageVersion = (int)(Parse_Float() * 100 + 0.5);
-                        if (sceneData->explicitNoiseGenerator == false)
-                            sceneData->noiseGenerator = (sceneData->EffectiveLanguageVersion() < 350 ?
-                                                         kNoiseGen_Original : kNoiseGen_RangeCorrected);
-                        // [CLi] if assumed_gamma is not specified in a legacy (3.6.x or earlier) scene, gammaMode defaults to kPOVList_GammaMode_None;
-                        // this is enforced later anyway after parsing, but we may need this information /now/ during parsing already
-                        switch (sceneData->gammaMode)
-                        {
-                            case kPOVList_GammaMode_None:
-                            case kPOVList_GammaMode_AssumedGamma37Implied:
-                                if (sceneData->EffectiveLanguageVersion() < 370)
-                                    sceneData->gammaMode = kPOVList_GammaMode_None;
-                                else
-                                    sceneData->gammaMode = kPOVList_GammaMode_AssumedGamma37Implied;
-                                break;
-                            case kPOVList_GammaMode_AssumedGamma36:
-                            case kPOVList_GammaMode_AssumedGamma37:
-                                if (sceneData->EffectiveLanguageVersion() < 370)
-                                    sceneData->gammaMode = kPOVList_GammaMode_AssumedGamma36;
-                                else
-                                    sceneData->gammaMode = kPOVList_GammaMode_AssumedGamma37;
-                                break;
-                        }
-                        Parse_Semi_Colon(false);
+                                END_CASE
+                                OTHERWISE
+                                    Unget_Token();
+                                END_CASE
+                            END_EXPECT
 
-                        if (sceneData->EffectiveLanguageVersion() > OFFICIAL_VERSION_NUMBER)
-                        {
-                            Error("Your scene file requires POV-Ray version %g or later!\n", (DBL)(sceneData->EffectiveLanguageVersion() / 100.0));
-                        }
+                            if (expectVersionNumber)
+                                sceneData->languageVersion = (int)(Parse_Float() * 100 + 0.5);
 
-                        Ok_To_Declare = true;
-                        Curr_Type = Cond_Stack[CS_Index].Cond_Type;
-                        if (Token.Unget_Token && (Token.Token_Id==HASH_TOKEN))
-                        {
-                            Token.Unget_Token=false;
-                            Parsing_Directive = true;
-                        }
-                        else
-                        {
-                            EXIT
+                            if ((sceneData->languageVersionLate) && sceneData->languageVersion >= 370)
+                            {
+                                // As of POV-Ray 3.7, all scene files are supposed to begin with a `#version` directive.
+                                // We no longer tolerate violation of that rule if the main scene file claims to be
+                                // compatible with POV-Ray 3.7 anywhere further down the road.
+                                // (We need to be more lax with include files though, as it may just as well be a
+                                // standard include file that happens to have been updated since the scene was
+                                // originally designed.)
+                                if (Include_File_Index == 0)
+                                    Error("As of POV-Ray 3.7, the '#version' directive must be the first non-comment "
+                                          "statement in the scene file.");
+                            }
+
+                            // NB: This must be set _after_ parsing the value, in order for the `#version version`
+                            // idiom to work properly, but _before_ any of the following code querying
+                            // `sceneData->EffectiveLanguageVersion()`.
+                            sceneData->languageVersionSet = true;
+
+                            if (sceneData->explicitNoiseGenerator == false)
+                                sceneData->noiseGenerator = (sceneData->EffectiveLanguageVersion() < 350 ?
+                                                             kNoiseGen_Original : kNoiseGen_RangeCorrected);
+                            // [CLi] if assumed_gamma is not specified in a legacy (3.6.x or earlier) scene, gammaMode defaults to kPOVList_GammaMode_None;
+                            // this is enforced later anyway after parsing, but we may need this information /now/ during parsing already
+                            switch (sceneData->gammaMode)
+                            {
+                                case kPOVList_GammaMode_None:
+                                case kPOVList_GammaMode_AssumedGamma37Implied:
+                                    if (sceneData->EffectiveLanguageVersion() < 370)
+                                        sceneData->gammaMode = kPOVList_GammaMode_None;
+                                    else
+                                        sceneData->gammaMode = kPOVList_GammaMode_AssumedGamma37Implied;
+                                    break;
+                                case kPOVList_GammaMode_AssumedGamma36:
+                                case kPOVList_GammaMode_AssumedGamma37:
+                                    if (sceneData->EffectiveLanguageVersion() < 370)
+                                        sceneData->gammaMode = kPOVList_GammaMode_AssumedGamma36;
+                                    else
+                                        sceneData->gammaMode = kPOVList_GammaMode_AssumedGamma37;
+                                    break;
+                            }
+                            Parse_Semi_Colon(false);
+
+                            if (sceneData->EffectiveLanguageVersion() > OFFICIAL_VERSION_NUMBER)
+                            {
+                                Error("Your scene file requires POV-Ray version %g or later!\n", (DBL)(sceneData->EffectiveLanguageVersion() / 100.0));
+                            }
+
+                            Ok_To_Declare = true;
+                            parsingVersionDirective = wasParsingVersionDirective;
+                            Curr_Type = Cond_Stack[CS_Index].Cond_Type;
+                            if (Token.Unget_Token && (Token.Token_Id==HASH_TOKEN))
+                            {
+                                Token.Unget_Token=false;
+                                Parsing_Directive = true;
+                            }
+                            else
+                            {
+                                EXIT
+                            }
                         }
                         break;
 

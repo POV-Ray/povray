@@ -9,7 +9,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -167,6 +167,7 @@ enum TOKEN_IDS
     ANISOTROPY_TOKEN,
     AREA_LIGHT_TOKEN,
     AT_TOKEN,
+    AUTO_TOKEN,
     BACK_QUOTE_TOKEN,
     BACK_SLASH_TOKEN,
     BAR_TOKEN,
@@ -344,6 +345,7 @@ enum TOKEN_IDS
     UINT16LE_TOKEN,
     UINT8_TOKEN,
     UNION_TOKEN,
+    UNOFFICIAL_TOKEN,
     UP_TOKEN,
     USE_COLOR_TOKEN,
     USE_COLOUR_TOKEN,
