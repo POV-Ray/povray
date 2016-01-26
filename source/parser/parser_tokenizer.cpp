@@ -1686,7 +1686,6 @@ void Parser::Parse_Directive(int After_Hash)
     Macro *PMac=NULL;
     COND_TYPE Curr_Type = Cond_Stack[CS_Index].Cond_Type;
     POV_LONG Hash_Loc = Input_File->In_File->tellg().offset;
-    bool expectVersionNumber;
 
     if (Curr_Type == INVOKING_MACRO_COND)
     {
@@ -2212,11 +2211,7 @@ void Parser::Parse_Directive(int After_Hash)
                             Ok_To_Declare = false;
                             bool wasParsingVersionDirective = parsingVersionDirective;
                             parsingVersionDirective = true;
-                            expectVersionNumber = true;
                             EXPECT_ONE
-                                CASE (AUTO_TOKEN)
-                                    expectVersionNumber = false;
-                                END_CASE
                                 CASE (UNOFFICIAL_TOKEN)
 #if POV_RAY_IS_OFFICIAL == 1
                                     Get_Token();
@@ -2231,8 +2226,7 @@ void Parser::Parse_Directive(int After_Hash)
                                 END_CASE
                             END_EXPECT
 
-                            if (expectVersionNumber)
-                                sceneData->languageVersion = (int)(Parse_Float() * 100 + 0.5);
+                            sceneData->languageVersion = (int)(Parse_Float() * 100 + 0.5);
 
                             if ((sceneData->languageVersionLate) && sceneData->languageVersion >= 370)
                             {

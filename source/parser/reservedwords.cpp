@@ -90,7 +90,6 @@ const RESERVED_WORD Reserved_Words[LAST_TOKEN] = {
     {ATAN_TOKEN, "atan"},
     {AT_TOKEN, "@"},
     {AUTOSTOP_TOKEN, "autostop"},
-    {AUTO_TOKEN, "auto"},
     {AVERAGE_TOKEN, "average"},
     {BACKGROUND_TOKEN, "background"},
     {BACK_QUOTE_TOKEN, "`"},
