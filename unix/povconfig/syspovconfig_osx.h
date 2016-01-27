@@ -11,7 +11,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -59,11 +59,5 @@
 #endif
 
 #define POV_ULONG unsigned POV_LONG
-
-// The following macros are deliberately left undefined; POV-Ray will use boost as a fallback there:
-//  DECLARE_THREAD_LOCAL_PTR(ptrType, ptrName)
-//  IMPLEMENT_THREAD_LOCAL_PTR(ptrType, ptrName, ignore)
-//  GET_THREAD_LOCAL_PTR(ptrName)
-//  SET_THREAD_LOCAL_PTR(ptrName, ptrValue)
 
 #endif // POVRAY_UNIX_SYSPOVCONFIG_OSX_H
