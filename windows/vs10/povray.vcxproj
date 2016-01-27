@@ -597,6 +597,9 @@
     <ProjectReference Include="povplatform.vcxproj">
       <Project>{0c227b07-1830-4c5b-8d4e-2defffd2792d}</Project>
     </ProjectReference>
+    <ProjectReference Include="povvm.vcxproj">
+      <Project>{e7a73e97-7106-4d4a-98ba-aa43fbd19db4}</Project>
+    </ProjectReference>
     <ProjectReference Include="rtrsupport.vcxproj">
       <Project>{851c772c-d7c2-4ee3-a90c-23386f0e9897}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>

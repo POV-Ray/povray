@@ -342,6 +342,9 @@
     <ProjectReference Include="povplatform.vcxproj">
       <Project>{0c227b07-1830-4c5b-8d4e-2defffd2792d}</Project>
     </ProjectReference>
+    <ProjectReference Include="povvm.vcxproj">
+      <Project>{e7a73e97-7106-4d4a-98ba-aa43fbd19db4}</Project>
+    </ProjectReference>
     <ProjectReference Include="tiff.vcxproj">
       <Project>{186baef6-cf24-42c1-8ce3-25590cb9f6e7}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
