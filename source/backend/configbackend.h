@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -85,45 +85,6 @@
 #ifndef SCANF_EOF
     #define SCANF_EOF EOF
 #endif
-
-// Adjust to match floating-point parameter(s) of functions in math.h/cmath
-#ifndef SYS_MATH_PARAM
-    #define SYS_MATH_PARAM double
-#endif
-
-// Adjust to match floating-point return value of functions in math.h/cmath
-#ifndef SYS_MATH_RETURN
-    #define SYS_MATH_RETURN double
-#endif
-
-// Function that executes functions, the parameter is the function index
-#ifndef POVFPU_Run
-    #define POVFPU_Run(ctx, fn) POVFPU_RunDefault(ctx, fn)
-#endif
-
-// Adjust to add system specific handling of functions like just-in-time compilation
-#if (SYS_FUNCTIONS == 0)
-
-// Note that if SYS_FUNCTIONS is 1, it will enable the field dblstack
-// in FPUContext_Struct and corresponding calculations in POVFPU_SetLocal
-// as well as POVFPU_NewContext.
-#define SYS_FUNCTIONS 0
-
-// Called after a function has been added, parameter is the function index
-#define SYS_ADD_FUNCTION(fe)
-// Called before a function is deleted, parameter is a pointer to the FunctionEntry_Struct
-#define SYS_DELETE_FUNCTION(fe)
-// Called inside POVFPU_Init after everything else has been inited
-#define SYS_INIT_FUNCTIONS()
-// Called inside POVFPU_Terminate before anything else is deleted
-#define SYS_TERM_FUNCTIONS()
-// Called inside POVFPU_Reset before anything else is reset
-#define SYS_RESET_FUNCTIONS()
-
-// Adjust to add system specific fields to FunctionEntry_Struct
-#define SYS_FUNCTION_ENTRY
-
-#endif // SYS_FUNCTIONS
 
 #ifndef POV_SYS_THREAD_STARTUP
     #define POV_SYS_THREAD_STARTUP

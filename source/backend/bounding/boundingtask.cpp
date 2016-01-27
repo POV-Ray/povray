@@ -51,7 +51,6 @@
 
 #include "backend/scene/backendscenedata.h"
 #include "backend/support/task.h"
-#include "backend/vm/fnpovfpu.h"
 
 // this must be the last file included
 #include "base/povdebug.h"

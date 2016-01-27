@@ -23,7 +23,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{C6D9B754-11EB-4FC3-8683-593B53E9AD1F}</ProjectGuid>
+    <ProjectGuid>{E7A73E97-7106-4D4A-98BA-AA43FBD19DB4}</ProjectGuid>
+    <RootNamespace>pov_vm</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-SSE2|Win32'" Label="Configuration">
@@ -85,11 +86,11 @@
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release-SSE2|Win32'">bin32\lib\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release-SSE2|Win32'">build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">povbackend32d</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">povbackend32</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release-SSE2|Win32'">povbackend32-sse2</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">povbackend64d</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">povbackend64</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">povvm32d</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">povvm32</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release-SSE2|Win32'">povvm32-sse2</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">povvm64d</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">povvm64</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <BuildLog>
@@ -107,7 +108,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>..\..\platform\x86;..\..\windows\povconfig;..\..\libraries\boost;..\..\vfe\win\;..\..\vfe\;..\..\source;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;..\..\libraries\ilmbase\config.windows;..\..\libraries\openexr\config.windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\platform\x86;..\..\windows\povconfig;..\..\libraries\boost;..\..\vfe\win\;..\..\vfe\;..\..\source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>BOOST_ALL_NO_LIB;_DEBUG;WIN32;WIN32_LEAN_AND_MEAN;_WINDOWS;WINVER=0x0500;_WIN32_WINNT=0x0500;COMMONCTRL_VERSION=0x500;CLASSLIB_DEFS_H;NOMINMAX;ISOLATION_AWARE_ENABLED;_CRT_SECURE_NO_DEPRECATE;_HAS_ITERATOR_DEBUGGING=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -154,7 +155,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>..\..\platform\x86;..\..\windows\povconfig;..\..\libraries\boost;..\..\vfe\win\;..\..\vfe\;..\..\source;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;..\..\libraries\ilmbase\config.windows;..\..\libraries\openexr\config.windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\platform\x86;..\..\windows\povconfig;..\..\libraries\boost;..\..\vfe\win\;..\..\vfe\;..\..\source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>BOOST_ALL_NO_LIB;_DEBUG;WIN32;WIN32_LEAN_AND_MEAN;_WINDOWS;CLASSLIB_DEFS_H;NOMINMAX;ISOLATION_AWARE_ENABLED;_CRT_SECURE_NO_DEPRECATE;_HAS_ITERATOR_DEBUGGING=0;BUILDING_AMD64=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -205,7 +206,7 @@
       <OmitFramePointers>false</OmitFramePointers>
       <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>..\..\platform\x86;..\..\windows\povconfig;..\..\libraries\boost;..\..\vfe\win\;..\..\vfe\;..\..\source;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;..\..\libraries\ilmbase\config.windows;..\..\libraries\openexr\config.windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\platform\x86;..\..\windows\povconfig;..\..\libraries\boost;..\..\vfe\win\;..\..\vfe\;..\..\source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>BOOST_ALL_NO_LIB;NDEBUG;WIN32;WIN32_LEAN_AND_MEAN;_WINDOWS;COMMONCTRL_VERSION=0x500;CLASSLIB_DEFS_H;WINVER=0x0500;_WIN32_WINNT=0x0500;NOMINMAX;ISOLATION_AWARE_ENABLED;_CRT_SECURE_NO_DEPRECATE;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -258,7 +259,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>false</OmitFramePointers>
       <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
-      <AdditionalIncludeDirectories>..\..\platform\x86;..\..\windows\povconfig;..\..\libraries\boost;..\..\vfe\win\;..\..\vfe\;..\..\source;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;..\..\libraries\ilmbase\config.windows;..\..\libraries\openexr\config.windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\platform\x86;..\..\windows\povconfig;..\..\libraries\boost;..\..\vfe\win\;..\..\vfe\;..\..\source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>BOOST_ALL_NO_LIB;NDEBUG;WIN32;WIN32_LEAN_AND_MEAN;_WINDOWS;CLASSLIB_DEFS_H;NOMINMAX;ISOLATION_AWARE_ENABLED;_CRT_SECURE_NO_DEPRECATE;_SECURE_SCL=0;BUILDING_AMD64=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -310,7 +311,7 @@
       <OmitFramePointers>false</OmitFramePointers>
       <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>..\..\platform\x86;..\..\windows\povconfig;..\..\libraries\boost;..\..\vfe\win\;..\..\vfe\;..\..\source;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;..\..\libraries\ilmbase\config.windows;..\..\libraries\openexr\config.windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\platform\x86;..\..\windows\povconfig;..\..\libraries\boost;..\..\vfe\win\;..\..\vfe\;..\..\source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>BOOST_ALL_NO_LIB;NDEBUG;WIN32;WIN32_LEAN_AND_MEAN;_WINDOWS;COMMONCTRL_VERSION=0x500;CLASSLIB_DEFS_H;WINVER=0x0500;_WIN32_WINNT=0x0500;NOMINMAX;ISOLATION_AWARE_ENABLED;_CRT_SECURE_NO_DEPRECATE;_SECURE_SCL=0;BUILD_SSE2=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -342,28 +343,9 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\source\backend\bounding\boundingtask.cpp" />
-    <ClCompile Include="..\..\source\backend\scene\backendscenedata.cpp" />
-    <ClCompile Include="..\..\source\backend\scene\viewthreaddata.cpp" />
-    <ClCompile Include="..\..\source\pov_mem.cpp" />
-    <ClCompile Include="..\..\source\backend\povray.cpp" />
-    <ClCompile Include="..\..\source\backend\control\benchmark.cpp" />
-    <ClCompile Include="..\..\source\backend\control\messagefactory.cpp" />
-    <ClCompile Include="..\..\source\backend\control\renderbackend.cpp" />
-    <ClCompile Include="..\..\source\backend\control\scene.cpp" />
-    <ClCompile Include="..\..\source\backend\render\radiositytask.cpp" />
-    <ClCompile Include="..\..\source\backend\render\rendertask.cpp" />
-    <ClCompile Include="..\..\source\backend\render\tracetask.cpp" />
-    <ClCompile Include="..\..\source\backend\scene\view.cpp" />
-    <ClCompile Include="..\..\source\backend\support\task.cpp" />
-    <ClCompile Include="..\..\source\backend\support\taskqueue.cpp" />
-    <ClCompile Include="..\..\source\backend\lighting\photonestimationtask.cpp" />
-    <ClCompile Include="..\..\source\backend\lighting\photonshootingstrategy.cpp" />
-    <ClCompile Include="..\..\source\backend\lighting\photonshootingtask.cpp" />
-    <ClCompile Include="..\..\source\backend\lighting\photonsortingtask.cpp" />
-    <ClCompile Include="..\..\source\backend\lighting\photonstrategytask.cpp" />
-    <ClCompile Include="..\..\source\backend\lighting\rad_data.cpp" />
-    <ClCompile Include="..\..\source\backend\precomp.cpp">
+    <ClCompile Include="..\..\source\vm\fnintern.cpp" />
+    <ClCompile Include="..\..\source\vm\fnpovfpu.cpp" />
+    <ClCompile Include="..\..\source\vm\precomp.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release-SSE2|Win32'">Create</PrecompiledHeader>
@@ -372,30 +354,11 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\source\backend\bounding\boundingtask.h" />
-    <ClInclude Include="..\..\source\backend\scene\backendscenedata.h" />
-    <ClInclude Include="..\..\source\backend\scene\viewthreaddata.h" />
-    <ClInclude Include="..\..\source\pov_mem.h" />
-    <ClInclude Include="..\..\source\backend\configbackend.h" />
-    <ClInclude Include="..\..\source\backend\frame.h" />
-    <ClInclude Include="..\..\source\backend\povray.h" />
-    <ClInclude Include="..\..\source\backend\control\benchmark.h" />
-    <ClInclude Include="..\..\source\backend\control\messagefactory.h" />
-    <ClInclude Include="..\..\source\backend\control\renderbackend.h" />
-    <ClInclude Include="..\..\source\backend\control\scene.h" />
-    <ClInclude Include="..\..\source\backend\render\radiositytask.h" />
-    <ClInclude Include="..\..\source\backend\render\rendertask.h" />
-    <ClInclude Include="..\..\source\backend\render\tracetask.h" />
-    <ClInclude Include="..\..\source\backend\scene\view.h" />
-    <ClInclude Include="..\..\source\backend\support\task.h" />
-    <ClInclude Include="..\..\source\backend\support\taskqueue.h" />
-    <ClInclude Include="..\..\source\backend\lighting\photonestimationtask.h" />
-    <ClInclude Include="..\..\source\backend\lighting\photonshootingstrategy.h" />
-    <ClInclude Include="..\..\source\backend\lighting\photonshootingtask.h" />
-    <ClInclude Include="..\..\source\backend\lighting\photonsortingtask.h" />
-    <ClInclude Include="..\..\source\backend\lighting\photonstrategytask.h" />
-    <ClInclude Include="..\..\source\backend\precomp.h" />
-    <ClInclude Include="..\povconfig\syspovconfigbackend.h" />
+    <ClInclude Include="..\..\source\vm\configvm.h" />
+    <ClInclude Include="..\..\source\vm\fnintern.h" />
+    <ClInclude Include="..\..\source\vm\fnpovfpu.h" />
+    <ClInclude Include="..\..\source\vm\precomp.h" />
+    <ClInclude Include="..\povconfig\syspovconfigvm.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

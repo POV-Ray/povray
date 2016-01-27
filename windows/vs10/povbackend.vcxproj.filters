@@ -27,9 +27,7 @@
     <Filter Include="Backend Source\Support">
       <UniqueIdentifier>{4eb01538-921e-45c5-80f5-523ea4298683}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Backend Source\VM">
-      <UniqueIdentifier>{c12878d9-42f7-4dc0-82c4-0c3ffa9524ce}</UniqueIdentifier>
-    </Filter>
+
     <Filter Include="Backend Source\Lighting">
       <UniqueIdentifier>{efe26d90-2df7-4436-9c9c-c96b2a613976}</UniqueIdentifier>
     </Filter>
@@ -50,9 +48,6 @@
     </Filter>
     <Filter Include="Backend Headers\Support">
       <UniqueIdentifier>{819550ea-076f-4b0b-b5e9-ff574bdb9261}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Backend Headers\VM">
-      <UniqueIdentifier>{e952c9e4-a8f8-422c-94b5-8a3c8bb6a30f}</UniqueIdentifier>
     </Filter>
     <Filter Include="Backend Headers\Lighting">
       <UniqueIdentifier>{7d2e4c81-3e0a-4c87-8ea2-1eb7ff86db26}</UniqueIdentifier>
@@ -94,12 +89,6 @@
     </ClCompile>
     <ClCompile Include="..\..\source\backend\support\taskqueue.cpp">
       <Filter>Backend Source\Support</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\backend\vm\fnintern.cpp">
-      <Filter>Backend Source\VM</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\backend\vm\fnpovfpu.cpp">
-      <Filter>Backend Source\VM</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\backend\lighting\photonestimationtask.cpp">
       <Filter>Backend Source\Lighting</Filter>
@@ -174,12 +163,6 @@
     </ClInclude>
     <ClInclude Include="..\..\source\backend\support\taskqueue.h">
       <Filter>Backend Headers\Support</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\backend\vm\fnintern.h">
-      <Filter>Backend Headers\VM</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\backend\vm\fnpovfpu.h">
-      <Filter>Backend Headers\VM</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\backend\lighting\photonestimationtask.h">
       <Filter>Backend Headers\Lighting</Filter>

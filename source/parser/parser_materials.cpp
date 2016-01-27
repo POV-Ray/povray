@@ -55,8 +55,9 @@
 #include "core/shape/isosurface.h"
 #include "core/support/imageutil.h"
 
+#include "vm/fnpovfpu.h"
+
 #include "backend/scene/backendscenedata.h"
-#include "backend/vm/fnpovfpu.h"
 
 #ifdef SYS_IMAGE_HEADER
 #include SYS_IMAGE_HEADER

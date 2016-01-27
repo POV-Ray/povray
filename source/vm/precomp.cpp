@@ -1,8 +1,8 @@
 //******************************************************************************
 ///
-/// @file base/version.h
+/// @file vm/precomp.cpp
 ///
-/// Version information.
+/// This file is used in header pre-compilation.
 ///
 /// @copyright
 /// @parblock
@@ -33,38 +33,4 @@
 ///
 //******************************************************************************
 
-#ifndef POVRAY_BASE_VERSION_H
-#define POVRAY_BASE_VERSION_H
-
-#include "base/configbase.h"
-#include "base/build.h"
-
-// POV-Ray version and copyright message macros
-
-#define POV_RAY_COPYRIGHT "Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd."
-#define OFFICIAL_VERSION_STRING "3.7.1"
-#define OFFICIAL_VERSION_NUMBER 371
-
-#define POV_RAY_PRERELEASE "alpha.8453605"
-
-#if (POV_RAY_IS_AUTOBUILD == 1) && ((POV_RAY_IS_OFFICIAL == 1) || (POV_RAY_IS_SEMI_OFFICIAL == 1))
-#ifdef POV_RAY_PRERELEASE
-#define POV_RAY_VERSION OFFICIAL_VERSION_STRING "-" POV_RAY_PRERELEASE "+" POV_RAY_AUTOBUILD_ID
-#else
-#define POV_RAY_VERSION OFFICIAL_VERSION_STRING "+" POV_RAY_AUTOBUILD_ID
-#endif
-#elif (POV_RAY_IS_OFFICIAL == 1)
-#ifdef POV_RAY_PRERELEASE
-#define POV_RAY_VERSION OFFICIAL_VERSION_STRING "-" POV_RAY_PRERELEASE
-#else
-#define POV_RAY_VERSION OFFICIAL_VERSION_STRING
-#endif
-#else
-#ifdef POV_RAY_PRERELEASE
-#define POV_RAY_VERSION OFFICIAL_VERSION_STRING "-" POV_RAY_PRERELEASE ".unofficial"
-#else
-#define POV_RAY_VERSION OFFICIAL_VERSION_STRING "-unofficial"
-#endif
-#endif
-
-#endif // POVRAY_BASE_VERSION_H
+#include "vm/precomp.h"

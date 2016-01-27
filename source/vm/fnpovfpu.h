@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file backend/vm/fnpovfpu.h
+/// @file vm/fnpovfpu.h
 ///
 /// This module contains declarations for the virtual machine executing
 /// render-time functions.
@@ -36,13 +36,15 @@
 ///
 //******************************************************************************
 
-#ifndef POVRAY_BACKEND_FNPOVFPU_H
-#define POVRAY_BACKEND_FNPOVFPU_H
+#ifndef POVRAY_VM_FNPOVFPU_H
+#define POVRAY_VM_FNPOVFPU_H
+
+// Module config header file must be the first file included within POV-Ray unit header files
+#include "vm/configvm.h"
 
 #include <set>
 #include <vector>
 
-#include "backend/frame.h"
 #include "base/textstream.h"
 
 #include "core/coretypes.h"
@@ -305,4 +307,4 @@ class FunctionVM : public GenericFunctionContextFactory
 
 }
 
-#endif // POVRAY_BACKEND_FNPOVFPU_H
+#endif // POVRAY_VM_FNPOVFPU_H

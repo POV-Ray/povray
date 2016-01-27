@@ -43,11 +43,12 @@
 #include <cstring>
 #include <algorithm>
 
+#include "vm/fnintern.h"
+#include "vm/fnpovfpu.h"
+
 #include "parser/parser.h"
 
 #include "backend/scene/backendscenedata.h"
-#include "backend/vm/fnintern.h"
-#include "backend/vm/fnpovfpu.h"
 
 // this must be the last header file included
 #include "base/povdebug.h"

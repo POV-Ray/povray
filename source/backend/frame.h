@@ -116,20 +116,6 @@ class Ray;
 ///
 /// @{
 
-/// RGB and RGBFT Colour array elements.
-/// @deprecated When using @ref pov_base::GenericRGBColour, @ref pov_base::GenericRGBTColour,
-///             @ref pov_base::GenericRGBFTColour or  @ref pov_base::GenericTransColour, call the
-///             red(), green(), blue(), filter() and transm() access functions instead of using the
-///             index operator with one of these as parameter.
-enum
-{
-    pRED    = 0,
-    pGREEN  = 1,
-    pBLUE   = 2,
-    pFILTER = 3,
-    pTRANSM = 4
-};
-
 inline void Destroy_Float(DBL *x)
 {
     if(x != NULL)

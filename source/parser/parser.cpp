@@ -94,10 +94,11 @@
 #include "core/support/imageutil.h"
 #include "core/support/octree.h"
 
+#include "vm/fnpovfpu.h"
+
 #include "povms/povmsid.h"
 
 #include "backend/scene/backendscenedata.h"
-#include "backend/vm/fnpovfpu.h"
 
 // this must be the last file included
 #include "base/povdebug.h"

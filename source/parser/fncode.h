@@ -41,15 +41,15 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "parser/configparser.h"
 
-#include "parser/reservedwords.h"
+#include "vm/fnpovfpu.h"
 
-#include "backend/vm/fnpovfpu.h"
+#include "parser/reservedwords.h"
 
 namespace pov
 {
 
 #ifndef DEBUG_FLOATFUNCTION
- #define DEBUG_FLOATFUNCTION 0
+    #define DEBUG_FLOATFUNCTION 0
 #endif
 
 #define FN_INLINE_FLAG 1

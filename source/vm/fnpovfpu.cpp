@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file backend/vm/fnpovfpu.cpp
+/// @file vm/fnpovfpu.cpp
 ///
 /// This module implements the virtual machine executing render-time functions.
 ///
@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -228,23 +228,20 @@ Density of instruction set: 916 / 1024 = 0.8945
 
 */
 
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
+#include "vm/fnpovfpu.h"
+
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+
 #include <algorithm>
-
-#define DEBUG_DEFAULTCPU 0
-#define SUPPORT_INTEGER_INSTRUCTIONS 0
-
-// frame.h must always be the first POV file included (pulls in platform config)
-#include "backend/frame.h"
-#include "backend/vm/fnpovfpu.h"
 
 #include "base/mathutil.h"
 
 #include "core/scene/tracethreaddata.h"
 
-#include "backend/vm/fnintern.h"
+#include "vm/fnintern.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -255,6 +252,9 @@ namespace pov
 /*****************************************************************************
 * Local preprocessor defines
 ******************************************************************************/
+
+#define DEBUG_DEFAULTCPU 0
+#define SUPPORT_INTEGER_INSTRUCTIONS 0
 
 #define MAX_FN MAX_K
 
@@ -1005,9 +1005,7 @@ unsigned int FunctionVM::AddConstant(DBL v)
 *
 * DESCRIPTION
 *
-*   Add a function to the virtual machine memory.  Note that using
-*   POV_REALLOC here is very inefficient, but functions have to be
-*   stored in one array for fastest access!
+*   Add a function to the virtual machine memory.
 *
 * CHANGES
 *

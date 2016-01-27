@@ -45,7 +45,7 @@
 #include "core/material/pattern.h"
 #include "core/scene/atmosphere.h"
 
-#include "backend/vm/fnpovfpu.h"
+#include "vm/fnpovfpu.h"
 
 // this must be the last file included
 #include "base/povdebug.h"

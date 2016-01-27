@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file backend/vm/fnintern.cpp
+/// @file vm/fnintern.cpp
 ///
 /// This module implements built-in render-time functions.
 ///
@@ -12,7 +12,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -37,11 +37,10 @@
 ///
 //******************************************************************************
 
-#include <algorithm>
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
+#include "vm/fnintern.h"
 
-// frame.h must always be the first POV file included (pulls in platform config)
-#include "backend/frame.h"
-#include "backend/vm/fnintern.h"
+#include <algorithm>
 
 #include "base/mathutil.h"
 
@@ -53,7 +52,7 @@
 #include "core/scene/scenedata.h"
 #include "core/scene/tracethreaddata.h"
 
-#include "backend/vm/fnpovfpu.h"
+#include "vm/fnpovfpu.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
