@@ -48,7 +48,7 @@
 #include "core/shape/csg.h"
 #include "core/support/octree.h"
 
-#include "povms/povms.h"
+#include "povms/povmscpp.h"
 #include "povms/povmsid.h"
 #include "povms/povmsutil.h"
 

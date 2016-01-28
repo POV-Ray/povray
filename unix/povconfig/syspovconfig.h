@@ -11,7 +11,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -62,6 +62,10 @@
 # include "config.h"
 #else
 # error "!!!!! config.h is required !!!!!"
+#endif
+
+#ifdef HAVE_STDINT_H
+#include "stdint.h"
 #endif
 
 // from directory "vfe"

@@ -51,7 +51,6 @@
 
 #include "vm/fnpovfpu.h"
 
-#include "povms/povms.h"
 #include "povms/povmscpp.h"
 #include "povms/povmsid.h"
 

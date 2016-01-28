@@ -37,7 +37,7 @@
 
 #include "vfe.h"
 
-#include "povms/povms.h"
+#include "povms/povmscpp.h"
 
 // this must be the last file included
 #include "syspovdebug.h"
