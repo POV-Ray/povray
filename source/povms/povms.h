@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -40,7 +40,11 @@
 /// @deprecated The API declared herein should not be used directly. Use the C++
 ///             wrapper API declared in @ref povms/povmscpp.h instead.
 
-#include "configpovms.h"
+#ifdef POVMS_DISCONNECTED
+    #include "cnfpovms.h"
+#else
+    #include "povms/configpovms.h"
+#endif
 
 #ifndef POVMS_NO_DUMP_SUPPORT
     #include <stdio.h>
@@ -50,70 +54,155 @@
 * Global preprocessor defines
 ******************************************************************************/
 
-/* Note: This low level fatal error text output function is required.
-   It defaults to printf if you do not overload it in config.h! */
+/// @def POVMS_ASSERT_OUTPUT(s,f,l)
+///
+/// Fatal error message output.
+///
+/// This macro is invoked when POVMS encounters a fatal error, e.g. lack of memory, to output a message. By default it
+/// outputs `POVMS_ASSERT failed in <f> line <l>: <s>` to `stderr` using `fprintf`. Of course, this should never happen,
+/// but be prepared and override this function if you need a better user interface.
+///
+/// @param[in]  s   Error message.
+/// @param[in]  f   Source file name.
+/// @param[in]  l   Source file line number.
+///
 #ifndef POVMS_ASSERT_OUTPUT
     #define POVMS_ASSERT_OUTPUT(s,f,l) fprintf(stderr, "POVMS_ASSERT failed in %s line %d: %s\n", f, (int)l, s)
 #endif
 
+/// @def POVMS_ASSERT_OUTPUT(s)
+/// Log file output.
+///
+/// This macro is invoked whenever a POVMS function is called, to allow for some basic debugging. By default it does
+/// nothing.
+///
+/// @param[in]  s   Function name.
+///
 #ifndef POVMS_LOG_OUTPUT
     #define POVMS_LOG_OUTPUT(s)
 #endif
 
-/* Note: POVMSType needs to be 32 bit! (unsigned), it will be composed
-   of four characters, i.e. 'MyTp', 'any ', '4Mac', etc. */
+/// @def POVMSType
+/// POVMS message type and attribute identifier type.
+///
+/// This type must be capable of holding 32 bit unsigned integers and will be used to store four-character identifier
+/// codes, e.g. `MyTp`, `any `, `4Mac`, etc.
+///
 #ifndef POVMSType
-    #define POVMSType      unsigned int
+    #define POVMSType           unsigned int
 #endif
 
+/// @def POVMSInt
+/// POVMS general purpose integer data type.
+///
+/// This type must be capable of holding 32 bit signed integers.
+///
 #ifndef POVMSInt
-    #define POVMSInt       int
+    #define POVMSInt            int
 #endif
 
+/// @def POVMSLong
+/// POVMS large value integer data type.
+///
+/// This type must be capable of holding 64 bit unsigned integers. It may be a compound data type.
+///
+/// @def SetPOVMSLong
+/// Macro to compose values of type @ref POVMSLong.
+///
+/// This macro must compose a 64 bit value from two 32 bit integers representing upper and lower half.
+///
+/// @def GetPOVMSLong
+/// Macro to decompose values of type @ref POVMSLong.
+///
+/// This macro must decompose a 64 bit value into two 32 bit integers representing upper and lower half.
+///
 #ifndef POVMSLong
-    #define POVMSLong      long long
+    #define POVMSLong           long long
 
     #define SetPOVMSLong(v,h,l) *v = (((((POVMSLong)(h)) & 0x00000000ffffffff) << 32) | (((POVMSLong)(l)) & 0x00000000ffffffff))
     #define GetPOVMSLong(h,l,v) *h = ((v) >> 32) & 0x00000000ffffffff; *l = (v) & 0x00000000ffffffff
-
-    #define POVMSLongToCDouble(x) double(x)
 #endif
 
+/// @def POVMSFloat
+/// POVMS general purpose floating point data type.
+///
+/// This type should provide at least the same precision as the IEEE 754 single precision floating point type.
+///
 #ifndef POVMSFloat
-    #define POVMSFloat     float
+    #define POVMSFloat          float
 #endif
 
+
+/// @def POVMSBool
+/// POVMS data type representing boolean (true or false) values.
 #ifndef POVMSBool
-    #define POVMSBool      int
+    #define POVMSBool           int
 #endif
 
+/// @def POVMSUCS2
+/// POVMS character data type.
+///
+/// This type must be capable of holding 16 bit character codes.
+///
 #ifndef POVMSUCS2
-    #ifdef UCS2
-        #define POVMSUCS2  UCS2
-    #else
-        #define POVMSUCS2  unsigned short
-    #endif
+    #define POVMSUCS2           unsigned short
 #endif
 
+/// @def POVMSStream
+/// POVMS byte stream data type.
+///
+/// This type must be suitable for holding an individual data unit of a byte stream.
+///
 #ifndef POVMSStream
-    #define POVMSStream    unsigned char
+    #define POVMSStream         unsigned char
 #endif
 
+/// @def POVMSIEEEFloat
+/// POVMS serialized floating point data type.
+///
+/// Unless @ref POVMS_NO_ORDERED_STREAM_DATA is defined, this type must be 4 bytes wide and able to hold floating point
+/// values encoded according to the IEEE 754 single precision format. No restrictions are placed on the byte ordering.
+///
+/// If @ref POVMS_NO_ORDERED_STREAM_DATA is defined (indicating that the sending and receiving systems use the very same
+/// number formats and byte ordering) the data type still needs to have the same width and should provide the same
+/// precision, but encoding may differ from IEEE 754.
+///
+/// @def POVMSFloatToPOVMSIEEEFloat(p,f)
+/// Macro to convert from @ref POVMSFloat to @ref POVMSIEEEFloat.
+///
+/// @param[in]  p   The @ref POVMSFloat input value.
+/// @param[out] f   The @ref POVMSIEEEFloat output value.
+///
+/// @def POVMSIEEEFloatToPOVMSFloat(f,p)
+/// Macro to convert from @ref POVMSIEEEFloat to @ref POVMSFloat.
+///
+/// @param[in]  f   The @ref POVMSIEEEFloat input value.
+/// @param[out] p   The @ref POVMSFloat output value.
+///
+/// @def HexToPOVMSIEEEFloat(h,f)
+/// Macro to convert from 32 bit unsigned integer to @ref POVMSIEEEFloat.
+///
+/// This macro must take an unsigned integer constant and, re-interpreting its binary representation according to the
+/// IEEE 754 single precision floating point format, convert it to @ref POVMSIEEEFloat.
+///
+/// This macro is only used in setting up POVMS byte ordering, and is not required if @ref POVMS_NO_ORDERED_STREAM_DATA
+/// is defined.
+///
+/// @param[in]  h   The unsigned integer input value.
+/// @param[out] f   The @ref POVMSIEEEFloat output value.
+///
 #ifndef POVMS_NO_ORDERED_STREAM_DATA
     #ifndef POVMSIEEEFloat
-        #define POVMSIEEEFloat float
+        #define POVMSIEEEFloat      float
 
         #define POVMSFloatToPOVMSIEEEFloat(p, f) f = p
         #define POVMSIEEEFloatToPOVMSFloat(f, p) p = f
 
-        #define HexToPOVMSIEEEFloat(h, f) *(reinterpret_cast<int *>(&f)) = h
+        #define HexToPOVMSIEEEFloat(h, f) *(reinterpret_cast<POVMSInt *>(&f)) = h
     #endif
 #else
-    // POVMSIEEEFloat does not have to be an IEEE 754 float
-    // if POVMS_NO_ORDERED_STREAM_DATA is off.  It only
-    // has to be 32 bit in size!
     #ifndef POVMSIEEEFloat
-        #define POVMSIEEEFloat POVMSFloat
+        #define POVMSIEEEFloat      POVMSFloat
 
         #define POVMSFloatToPOVMSIEEEFloat(p, f) f = p
         #define POVMSIEEEFloatToPOVMSFloat(f, p) p = f
@@ -123,8 +212,14 @@
 /* Note: POVMSAddress needs work with the default copy constructor.
    Adjust it to fit your message addressing needs! */
 
+/// @def POVMSAddress
+/// POVMS message queue identifier.
+///
+/// This type must be a POD type or POD-only struct that can be sent around and uniquely describes a particular
+/// POVMS message queue in a particular process and thread.
+///
 #ifndef POVMSAddress
-    #define POVMSAddress void *
+    #define POVMSAddress        void *
     #define POVMSInvalidAddress NULL
 #endif
 
@@ -136,6 +231,20 @@
 
 #ifndef POVMS_CDECL
     #define POVMS_CDECL
+#endif
+
+// Note: Remember that the POVMS cannot use the standard
+// POV_MALLOC, POV_REALLOC, POV_FREE calls!
+#ifndef POVMS_Sys_Malloc
+    #define POVMS_Sys_Malloc(s)           malloc(s)
+#endif
+
+#ifndef POVMS_Sys_Realloc
+    #define POVMS_Sys_Realloc(p,s)        realloc(p,s)
+#endif
+
+#ifndef POVMS_Sys_Free
+    #define POVMS_Sys_Free(p)             free(p)
 #endif
 
 #undef POVMS_VERSION

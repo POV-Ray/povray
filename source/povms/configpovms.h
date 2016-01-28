@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -33,20 +33,50 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
 #ifndef POVMS_CONFIGPOVMS_H
 #define POVMS_CONFIGPOVMS_H
 
-#ifdef POVMS_DISCONNECTED
-    #include "cnfpovms.h"
-#else
-    #if !defined(__cplusplus)
-        // When compiling as part of the POV-Ray project, povms.c must be compiled as a C++ file,
-        // due to potential C++-isms in the base/configbase.h header included via this file.
-        #error povms.c must be compiled as a C++ file when used as part of the POV-Ray project.
-    #endif
-    #include "base/configbase.h"
+#if !defined(__cplusplus)
+    // When compiling as part of the POV-Ray project, povms.c must be compiled as a C++ file,
+    // due to potential C++-isms in the base/configbase.h header included via this file.
+    #error povms.c must be compiled as a C++ file when used as part of the POV-Ray project.
 #endif
+
+#include "base/configbase.h"
+#include "syspovconfigpovms.h"
+
+//******************************************************************************
+// The following override the defaults in povms.h and povms.c, as those are
+// chosen for a C environment potentially detached from POV-Ray, while we have
+// C++ and the POV-Ray base configuration at our disposal.
+
+#ifndef POVMSType
+    #define POVMSType               POV_UINT32
+#endif
+
+#ifndef POVMSLong
+    #define POVMSLong               POV_INT64
+    #define SetPOVMSLong(v,h,l)     *v = (((((POVMSLong)(h)) & 0x00000000ffffffff) << 32) | (((POVMSLong)(l)) & 0x00000000ffffffff))
+    #define GetPOVMSLong(h,l,v)     *h = ((v) >> 32) & 0x00000000ffffffff; *l = (v) & 0x00000000ffffffff
+#endif
+
+#ifndef POVMSBool
+    #define POVMSBool               bool
+#endif
+
+#ifndef POVMSUCS2
+    #define POVMSUCS2               UCS2
+#endif
+
+#ifndef kDefaultTimeout
+    #ifdef _DEBUG
+        // a long timeout so we can break into the debugger
+        #define kDefaultTimeout         100
+    #endif
+#endif
+
+//******************************************************************************
 
 #endif // POVMS_CONFIGPOVMS_H

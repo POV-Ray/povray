@@ -38,8 +38,8 @@
 #ifndef POVRAY_BACKEND_CONFIGBACKEND_H
 #define POVRAY_BACKEND_CONFIGBACKEND_H
 
-#include "syspovconfigbackend.h"
 #include "base/configbase.h"
+#include "syspovconfigbackend.h"
 
 /*
  * Platform name default.

@@ -39,6 +39,7 @@
 #define POVRAY_VM_CONFIGVM_H
 
 #include "core/configcore.h"
+#include "syspovconfigvm.h"
 
 namespace pov
 {

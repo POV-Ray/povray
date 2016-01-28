@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -61,7 +61,7 @@ using namespace pov_base;
 // #define _DEBUG_POVMS_TRACE_MEMORY_
 
 #ifndef kDefaultTimeout
-#define kDefaultTimeout   10
+    #define kDefaultTimeout                 10
 #endif
 
 #ifndef POVMS_ASSERT
@@ -96,7 +96,7 @@ struct POVMS_Sys_QueueNode_Default
 #endif
 
 #ifndef POVMS_Sys_GetCurrentThread
-    #define POVMS_Sys_GetCurrentThread(q) POVMS_Sys_GetCurrentThread_Default(q)
+    #define POVMS_Sys_GetCurrentThread()  POVMS_Sys_GetCurrentThread_Default()
 #endif
 
 #ifndef POVMS_Sys_QueueToAddress
@@ -156,20 +156,6 @@ struct POVMS_Sys_QueueNode_Default
 // Note: Usually no need to change this one! */
 #ifndef POVMS_Sys_UCS2Strlen
     #define POVMS_Sys_UCS2Strlen(p)       POVMS_Sys_UCS2Strlen_Default(p)
-#endif
-
-// Note: Remember that the POVMS cannot use the standard
-// POV_MALLOC, POV_REALLOC, POV_FREE calls! */
-#ifndef POVMS_Sys_Malloc
-    #define POVMS_Sys_Malloc(s)           malloc(s)
-#endif
-
-#ifndef POVMS_Sys_Realloc
-    #define POVMS_Sys_Realloc(p,s)        realloc(p,s)
-#endif
-
-#ifndef POVMS_Sys_Free
-    #define POVMS_Sys_Free(p)             free(p)
 #endif
 
 #ifdef _DEBUG_POVMS_TRACE_MEMORY_
@@ -1027,7 +1013,7 @@ void POVMSStream_Init()
 
     data_int = 16909060;
     SetPOVMSLong(&data_long, 16909060, 84281096);
-    HexToPOVMSIEEEFloat(0x44663355, data_ieeefloat); // 0x44663355 equals 920.802063
+    HexToPOVMSIEEEFloat(0x44663355u, data_ieeefloat); // 0x44663355u corresponds to 920.802063
     data_type = '1234';
     data_ucs2 = 258;
 

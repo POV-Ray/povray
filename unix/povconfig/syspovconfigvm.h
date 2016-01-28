@@ -1,8 +1,12 @@
 //******************************************************************************
 ///
-/// @file base/version.h
+/// @file unix/povconfig/syspovconfigvm.h
 ///
-/// Version information.
+/// Unix-specific POV-Ray built-in render-time functions compile-time
+/// configuration.
+///
+/// This header file configures aspects of POV-Ray's VM module for running
+/// properly on a Unix platform.
 ///
 /// @copyright
 /// @parblock
@@ -33,38 +37,9 @@
 ///
 //******************************************************************************
 
-#ifndef POVRAY_BASE_VERSION_H
-#define POVRAY_BASE_VERSION_H
+#ifndef POVRAY_UNIX_SYSPOVCONFIGVM_H
+#define POVRAY_UNIX_SYSPOVCONFIGVM_H
 
-#include "base/configbase.h"
-#include "base/build.h"
+#include "syspovconfig.h"
 
-// POV-Ray version and copyright message macros
-
-#define POV_RAY_COPYRIGHT "Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd."
-#define OFFICIAL_VERSION_STRING "3.7.1"
-#define OFFICIAL_VERSION_NUMBER 371
-
-#define POV_RAY_PRERELEASE "alpha.8454276"
-
-#if (POV_RAY_IS_AUTOBUILD == 1) && ((POV_RAY_IS_OFFICIAL == 1) || (POV_RAY_IS_SEMI_OFFICIAL == 1))
-#ifdef POV_RAY_PRERELEASE
-#define POV_RAY_VERSION OFFICIAL_VERSION_STRING "-" POV_RAY_PRERELEASE "+" POV_RAY_AUTOBUILD_ID
-#else
-#define POV_RAY_VERSION OFFICIAL_VERSION_STRING "+" POV_RAY_AUTOBUILD_ID
-#endif
-#elif (POV_RAY_IS_OFFICIAL == 1)
-#ifdef POV_RAY_PRERELEASE
-#define POV_RAY_VERSION OFFICIAL_VERSION_STRING "-" POV_RAY_PRERELEASE
-#else
-#define POV_RAY_VERSION OFFICIAL_VERSION_STRING
-#endif
-#else
-#ifdef POV_RAY_PRERELEASE
-#define POV_RAY_VERSION OFFICIAL_VERSION_STRING "-" POV_RAY_PRERELEASE ".unofficial"
-#else
-#define POV_RAY_VERSION OFFICIAL_VERSION_STRING "-unofficial"
-#endif
-#endif
-
-#endif // POVRAY_BASE_VERSION_H
+#endif // POVRAY_UNIX_SYSPOVCONFIGVM_H

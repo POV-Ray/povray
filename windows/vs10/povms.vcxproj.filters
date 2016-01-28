@@ -21,6 +21,9 @@
     <ClCompile Include="..\..\source\povms\precomp.cpp">
       <Filter>POVMS Source</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\povms\povms.c">
+      <Filter>POVMS Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\povms\configpovms.h">
