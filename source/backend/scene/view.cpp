@@ -679,11 +679,7 @@ void View::StartRender(POVMS_Object& renderOptions)
     shared_ptr<ViewData::BlockIdSet> blockskiplist(new ViewData::BlockIdSet());
 
     if(renderControlThread == NULL)
-#ifndef USE_OFFICIAL_BOOST
-        renderControlThread = new thread(boost::bind(&View::RenderControlThread, this), 1024 * 64);
-#else
-        renderControlThread = new boost::thread(boost::bind(&View::RenderControlThread, this));
-#endif
+        renderControlThread = Task::NewBoostThread(boost::bind(&View::RenderControlThread, this), 1024 * 64);
 
     viewData.qualityFlags = QualityFlags(clip(renderOptions.TryGetInt(kPOVAttrib_Quality, 9), 0, 9));
 

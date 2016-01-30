@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -84,11 +84,7 @@ void Scene::StartParser(POVMS_Object& parseOptions)
 {
     // A scene can only be parsed once
     if(parserControlThread == NULL)
-#ifndef USE_OFFICIAL_BOOST
-        parserControlThread = new boost::thread(boost::bind(&Scene::ParserControlThread, this), 1024 * 64);
-#else
-        parserControlThread = new boost::thread(boost::bind(&Scene::ParserControlThread, this));
-#endif
+        parserControlThread = Task::NewBoostThread(boost::bind(&Scene::ParserControlThread, this), 1024 * 64);
     else
         return;
 

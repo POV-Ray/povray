@@ -104,11 +104,7 @@ POV_LONG Task::ConsumedCPUTime() const
 void Task::Start(const boost::function0<void>& completion)
 {
     if((done == false) && (taskThread == NULL))
-#ifndef USE_OFFICIAL_BOOST
-        taskThread = new boost::thread(boost::bind(&Task::TaskThread, this, completion), 1024 * 1024 * 2); // TODO - make stack size definable
-#else
-        taskThread = new boost::thread(boost::bind(&Task::TaskThread, this, completion));
-#endif
+        taskThread = NewBoostThread(boost::bind(&Task::TaskThread, this, completion), 1024 * 1024 * 2); // TODO - make stack size definable
 }
 
 void Task::RequestStop()

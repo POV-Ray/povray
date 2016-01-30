@@ -179,6 +179,15 @@
     #define POV_TASK_ASSERT(expr) NO_OP
 #endif
 
+/// @def HAVE_BOOST_THREAD_ATTRIBUTES
+/// Whether boost::thread::attributes is available (and can be used to set a thread's stack size).
+///
+#if BOOST_VERSION >= 105000
+    #define HAVE_BOOST_THREAD_ATTRIBUTES 1
+#else
+    #define HAVE_BOOST_THREAD_ATTRIBUTES 0
+#endif
+
 /// @}
 ///
 //******************************************************************************

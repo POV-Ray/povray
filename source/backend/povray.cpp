@@ -55,6 +55,7 @@
 #include "core/material/texture.h"
 
 #include "backend/control/renderbackend.h"
+#include "backend/support/task.h"
 
 #ifndef DONT_SHOW_IMAGE_LIB_VERSIONS
     // these are needed for copyright notices and version numbers
@@ -597,11 +598,7 @@ boost::thread *povray_init(const boost::function0<void>& threadExit, POVMSAddres
         Initialize_Noise();
         pov::InitializePatternGenerators();
 
-#ifndef USE_OFFICIAL_BOOST
-        POV_MainThread = new boost::thread(boost::bind(&MainThreadFunction, threadExit), 1024 * 64);
-#else
-        POV_MainThread = new boost::thread(boost::bind(&MainThreadFunction, threadExit));
-#endif
+        POV_MainThread = Task::NewBoostThread(boost::bind(&MainThreadFunction, threadExit), 1024 * 64);
 
         // we can't depend on boost::thread::yield here since under windows it is not
         // guaranteed to give up a time slice [see API docs for Sleep(0)]
