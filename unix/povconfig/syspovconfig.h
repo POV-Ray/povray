@@ -97,6 +97,8 @@ using std::runtime_error;
 using std::tr1::shared_ptr;
 using std::tr1::weak_ptr;
 using std::tr1::dynamic_pointer_cast;
+using std::tr1::static_pointer_cast;
+using std::tr1::const_pointer_cast;
 
 #endif // STD_POV_TYPES_DECLARED
 

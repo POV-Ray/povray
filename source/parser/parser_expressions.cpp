@@ -2904,7 +2904,7 @@ shared_ptr<MAP_T> Parser::Parse_Blend_Map (BlendMapTypeId Blend_Type,int Pat_Typ
                         Error ("Must have at least one entry in map.");
                     New = Create_Blend_Map<MAP_T> (Blend_Type);
                     New->Set(tempList);
-                    pigmentBlendMap = std::tr1::dynamic_pointer_cast<GenericPigmentBlendMap>(New);
+                    pigmentBlendMap = dynamic_pointer_cast<GenericPigmentBlendMap>(New);
                     if (pigmentBlendMap)
                     {
                         pigmentBlendMap->blendMode = blendMode;

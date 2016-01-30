@@ -13,7 +13,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -93,6 +93,8 @@ using std::runtime_error;
 using std::tr1::shared_ptr;
 using std::tr1::weak_ptr;
 using std::tr1::dynamic_pointer_cast;
+using std::tr1::static_pointer_cast;
+using std::tr1::const_pointer_cast;
 
 #endif // STD_POV_TYPES_DECLARED
 
