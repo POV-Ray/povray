@@ -45,6 +45,6 @@ script:
 notifications:
   email:
     recipients:
-    - {NOTIFICATION_EMAIL}
+    - ${NOTIFICATION_EMAIL}
     on_success: change
     on_failure: always
