@@ -277,7 +277,7 @@ class FunctionVM : public GenericFunctionContextFactory
         };
 
         FunctionVM();
-        ~FunctionVM();
+        virtual ~FunctionVM();
 
         void Reset();
 

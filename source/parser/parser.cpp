@@ -438,8 +438,6 @@ void Parser::Run()
 
 void Parser::Cleanup()
 {
-    delete fnVMContext;
-
     // TODO FIXME - cleanup [trf]
     Terminate_Tokenizer();
 
@@ -451,6 +449,9 @@ void Parser::Cleanup()
     Brace_Stack = NULL;
 
     Destroy_Random_Generators();
+
+    // NB: We need to keep fnVMContext around until all functions have been destroyed.
+    delete fnVMContext;
 }
 
 void Parser::Stopped()
@@ -10026,7 +10027,7 @@ void Parser::Link_To_Frame(ObjectPtr Object)
 
     if(!Object->Bound.empty())
     {
-        /* Test if all siblings are finite. */
+        /* Test if all children are finite. */
         bool finite = true;
         DBL Volume;
         for(vector<ObjectPtr>::iterator This_Sib = (reinterpret_cast<CSG *>(Object))->children.begin(); This_Sib != (reinterpret_cast<CSG *>(Object))->children.end(); This_Sib++)
@@ -10055,10 +10056,10 @@ void Parser::Link_To_Frame(ObjectPtr Object)
         Warning("Bounded CSG union split.");
     }
 
-    // Link all siblings of a union to the frame.
+    // Link all children of a union to the frame.
     for(vector<ObjectPtr>::iterator This_Sib = (reinterpret_cast<CSG *>(Object))->children.begin(); This_Sib != (reinterpret_cast<CSG *>(Object))->children.end(); This_Sib++)
     {
-        // Sibling is no longer inside a CSG object.
+        // Child is no longer inside a CSG object.
         (*This_Sib)->Type &= ~IS_CHILD_OBJECT;
         Link_To_Frame(*This_Sib);
     }
