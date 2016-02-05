@@ -75,11 +75,9 @@ deploy:
   tag: $(pov_version)
   release: Development build $(pov_version)
   description: |-
-    **Note:** This is a binary-only development release; to install, copy the binary into an existing POV-Ray 3.7
-    installation. (Make sure to backup the original binary first.)
+    **Note:** This is a binary-only development release; to install, copy the binary into an existing POV-Ray 3.7 installation. (Make sure to backup the original binary first.)
     
-    **Note:** The 64-bit binary may require Windows Vista or higher. To run this development release on an earlier
-    64-bit version of Windows, you may need to use the 32-bit SSE2 binary instead.
+    The 64-bit binary may require Windows Vista or higher. To run this development release on an earlier 64-bit version of Windows, you may need to use the 32-bit SSE2 binary instead.
 
   auth_token:
     secure: WkcFPXyr/SJ9TXixTQyivhfoR9FzlryIbc4deHeQ0eA6YRXL0wQopMYJ6XL1/FJK
