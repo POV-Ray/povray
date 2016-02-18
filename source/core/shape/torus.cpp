@@ -800,9 +800,7 @@ ObjectPtr SpindleTorus::Copy()
 ******************************************************************************/
 
 Torus::~Torus()
-{
-    Destroy_Transform(Trans);
-}
+{}
 
 SpindleTorus::~SpindleTorus()
 {}

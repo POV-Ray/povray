@@ -705,8 +705,6 @@ Mesh::~Mesh()
 {
     MeshIndex i;
 
-    Destroy_Transform(Trans);
-
     /* NK 1999 move texture outside of data block */
     if (Textures != NULL)
     {

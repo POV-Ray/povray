@@ -594,8 +594,6 @@ Polygon::~Polygon()
 
         POV_FREE (Data);
     }
-
-    Destroy_Transform(Trans);
 }
 
 

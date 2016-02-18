@@ -1297,8 +1297,6 @@ HField::~HField()
 {
     int i;
 
-    Destroy_Transform(Trans);
-
     if (--(Data->References) == 0)
     {
         if (Data->Map != NULL)

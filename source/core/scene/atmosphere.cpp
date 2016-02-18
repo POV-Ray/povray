@@ -452,6 +452,12 @@ void Destroy_Skysphere(SKYSPHERE *Skysphere)
         delete Skysphere;
 }
 
+Skysphere_Struct::~Skysphere_Struct()
+{
+	for (vector<PIGMENT*>::iterator i = Pigments.begin(); i != Pigments.end(); ++ i)
+		delete *i;
+	Destroy_Transform(Trans);
+}
 
 
 /*****************************************************************************

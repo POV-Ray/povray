@@ -619,7 +619,6 @@ IsoSurface::~IsoSurface()
     if(--mginfo->refcnt == 0)
         POV_FREE(mginfo);
     delete Function;
-    Destroy_Transform(Trans);
 }
 
 /*****************************************************************************

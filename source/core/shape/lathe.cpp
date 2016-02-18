@@ -862,8 +862,6 @@ ObjectPtr Lathe::Copy()
 
 Lathe::~Lathe()
 {
-    Destroy_Transform(Trans);
-
     if (--(Spline->References) == 0)
     {
         Destroy_BCyl(Spline->BCyl);

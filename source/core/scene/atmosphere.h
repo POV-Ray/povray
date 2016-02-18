@@ -96,7 +96,7 @@ struct Rainbow_Struct
 struct Skysphere_Struct
 {
     Skysphere_Struct() : Trans(NULL) {}
-    ~Skysphere_Struct() { for (vector<PIGMENT*>::iterator i = Pigments.begin(); i != Pigments.end(); ++ i) delete *i; if (Trans) POV_FREE(Trans); }
+    ~Skysphere_Struct();
     MathColour        Emission; ///< Brightness adjustment.
     vector<PIGMENT *> Pigments; ///< Pigment(s) to use.
     TRANSFORM *       Trans;    ///< Skysphere transformation.

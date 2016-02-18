@@ -2943,9 +2943,7 @@ TrueType::TrueType() : ObjectBase(TTF_OBJECT)
 }
 
 TrueType::~TrueType()
-{
-    Destroy_Transform(Trans);
-}
+{}
 
 
 

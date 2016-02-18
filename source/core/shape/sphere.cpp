@@ -649,7 +649,6 @@ Sphere::~Sphere()
     Debug_Info("}\n");
 #endif
 
-    Destroy_Transform(Trans);
     Destroy_Transform(UV_Trans);
 }
 

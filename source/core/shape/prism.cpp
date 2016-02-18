@@ -1031,8 +1031,6 @@ ObjectPtr Prism::Copy()
 
 Prism::~Prism()
 {
-    Destroy_Transform(Trans);
-
     if (--(Spline->References) == 0)
     {
         POV_FREE(Spline->Entry);

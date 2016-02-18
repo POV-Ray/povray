@@ -684,7 +684,6 @@ ObjectPtr Parametric::Copy()
 
 Parametric::~Parametric()
 {
-    Destroy_Transform(Trans);
     delete Function[0];
     delete Function[1];
     delete Function[2];

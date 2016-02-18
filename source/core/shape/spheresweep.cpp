@@ -1290,8 +1290,6 @@ void SphereSweep::Transform(const TRANSFORM *tr)
 
 SphereSweep::~SphereSweep()
 {
-    Destroy_Transform(Trans);
-
     POV_FREE(Modeling_Sphere);
     POV_FREE(Sphere);
     POV_FREE(Segment);

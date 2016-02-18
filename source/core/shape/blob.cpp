@@ -2187,7 +2187,6 @@ Blob_List_Struct *Blob::Create_Blob_List_Element()
 
 Blob::~Blob()
 {
-    Destroy_Transform(Trans);
     for (vector<TEXTURE*>::iterator i = Element_Texture.begin(); i != Element_Texture.end(); ++i)
         Destroy_Textures(*i);
     if (Data != NULL)

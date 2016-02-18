@@ -860,8 +860,6 @@ ObjectPtr Sor::Copy()
 
 Sor::~Sor()
 {
-    Destroy_Transform(Trans);
-
     if (--(Spline->References) == 0)
     {
         Destroy_BCyl(Spline->BCyl);

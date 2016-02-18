@@ -883,9 +883,7 @@ void Cone::Compute_Cylinder_Data()
 ******************************************************************************/
 
 Cone::~Cone()
-{
-    Destroy_Transform(Trans);
-}
+{}
 
 
 

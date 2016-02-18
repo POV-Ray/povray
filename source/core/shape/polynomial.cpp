@@ -1455,8 +1455,6 @@ ObjectPtr Poly::Copy()
 
 Poly::~Poly()
 {
-    Destroy_Transform(Trans);
-
     POV_FREE(Coeffs);
 }
 

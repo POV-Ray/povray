@@ -742,9 +742,7 @@ ObjectPtr Superellipsoid::Copy()
 ******************************************************************************/
 
 Superellipsoid::~Superellipsoid()
-{
-    Destroy_Transform(Trans);
-}
+{}
 
 
 

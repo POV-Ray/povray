@@ -824,6 +824,11 @@ void Destroy_Object(ObjectPtr Object)
     }
 }
 
+ObjectBase::~ObjectBase()
+{
+	Destroy_Transform(Trans);
+}
+
 
 /*****************************************************************************
 *

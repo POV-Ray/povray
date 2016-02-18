@@ -206,7 +206,7 @@ class ObjectBase
                 o.LLights.clear();
             }
         }
-        virtual ~ObjectBase() { }
+		virtual ~ObjectBase();
 
         virtual ObjectPtr Copy() = 0;
 
