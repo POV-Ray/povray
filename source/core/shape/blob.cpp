@@ -2103,7 +2103,6 @@ ObjectPtr Blob::Copy()
     /* Copy blob. */
 
     Destroy_Transform(New->Trans);
-    *New = *this;
     New->Trans = Copy_Transform(Trans);
     New->Data = Data->AcquireReference();
     New->Element_Texture.reserve(Element_Texture.size());
