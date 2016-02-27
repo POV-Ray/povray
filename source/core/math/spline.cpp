@@ -668,10 +668,22 @@ void Insert_Spline_Entry(GenericSpline * sp, DBL p, const EXPRESS& v)
      *  pre-computed coefficients */
     sp->Coeffs_Computed = false;
     i = findt(sp, p);
-    /* If p is already in spline, replace */
-    /* The clause after the || is needed because findt returns sp->SplineEntries.size()
-     * if p is greater than OR EQUAL TO the highest par in the spline */
-    if(!sp->SplineEntries.empty() && ((sp->SplineEntries[i].par == p) || (i == sp->SplineEntries.size() && sp->SplineEntries[i-1].par == p)))
+    // If p is already in the spline, replace it.
+    bool replace = false;
+    if (!sp->SplineEntries.empty())
+    {
+        // If p matches the _last_ spline entry, `findt()` is implemented to return `sp->SplineEntries.size()`
+        // instead of the index of the matching entry; this has some benefits in the other places `findt()` is used,
+        // but requires the following workaround here.
+        if (i == sp->SplineEntries.size() && (sp->SplineEntries[i-1].par == p))
+        {
+            --i;
+            replace = true;
+        }
+        else
+            replace = (sp->SplineEntries[i].par == p);
+    }
+    if(replace)
     {
         for(k=0; k<5; k++)
             sp->SplineEntries[i].vec[k] = v[k];
