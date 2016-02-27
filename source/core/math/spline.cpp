@@ -675,13 +675,13 @@ void Insert_Spline_Entry(GenericSpline * sp, DBL p, const EXPRESS& v)
         // If p matches the _last_ spline entry, `findt()` is implemented to return `sp->SplineEntries.size()`
         // instead of the index of the matching entry; this has some benefits in the other places `findt()` is used,
         // but requires the following workaround here.
-        if (i == sp->SplineEntries.size() && (sp->SplineEntries[i-1].par == p))
+        if (i < sp->SplineEntries.size())
+            replace = (sp->SplineEntries[i].par == p);
+        else if (sp->SplineEntries[i-1].par == p)
         {
             --i;
             replace = true;
         }
-        else
-            replace = (sp->SplineEntries[i].par == p);
     }
     if(replace)
     {
