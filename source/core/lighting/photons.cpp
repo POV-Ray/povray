@@ -1169,7 +1169,10 @@ void PhotonMediaFunction::DepositMediaPhotons(MathColour& colour, MediaVector& m
     {
         // Add optical depth of current interval.
 
-        Od += (*i).od / (DBL)(*i).samples;
+        if ((*i).samples > 0)
+            Od += (*i).od / (DBL)(*i).samples;
+        else
+            POV_ASSERT((*i).od.IsZero());
     }
 
     // Add contribution estimated for the participating media.
