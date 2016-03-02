@@ -473,18 +473,19 @@ class Parser : public SceneTask
         // tokenize.h/tokenize.cpp
         typedef enum cond_type
         {
-            ROOT_COND=0,
-            WHILE_COND,
-            FOR_COND,
-            IF_TRUE_COND,
-            IF_FALSE_COND,
-            ELSE_COND,
-            SWITCH_COND,
-            CASE_TRUE_COND,
-            CASE_FALSE_COND,
-            SKIP_TIL_END_COND,
-            INVOKING_MACRO_COND,
-            DECLARING_MACRO_COND
+            ROOT_COND=0,            ///< no conditionals, loops or macros pending
+            BUSY_COND,              ///< busy parsing the actual conditional or loop statement
+            WHILE_COND,             ///< executing a `#while` loop body
+            FOR_COND,               ///< executing a `#for` loop body
+            IF_TRUE_COND,           ///< executing an `#if` body
+            IF_FALSE_COND,          ///< skipping an `#if` body to execute any `#else` or `#elseif` body
+            ELSE_COND,              ///< executing an '#else` body
+            SWITCH_COND,            ///< executing a `#switch` body
+            CASE_TRUE_COND,         ///< executing a `#case` or `#range` body
+            CASE_FALSE_COND,        ///< skipping a `#case` or `#range` body to execute a later one
+            SKIP_TIL_END_COND,      ///< skipping a conditional or loop body until a matching `#end`
+            INVOKING_MACRO_COND,    ///< executing a `#macro` body
+            DECLARING_MACRO_COND    ///< skipping a `#macro` body during its declaration
         } COND_TYPE;
 
         struct SYM_TABLE
@@ -654,7 +655,7 @@ class Parser : public SceneTask
         void Check_Macro_Vers(void);
         DBL Parse_Cond_Param(void);
         void Parse_Cond_Param2(DBL *V1,DBL *V2);
-        void Inc_CS_Index(void);
+        void Inc_CS_Index();
 
         // parstxtr.h/parstxtr.cpp
         void Make_Pattern_Image(ImageData *image, FUNCTION_PTR fn, int token);

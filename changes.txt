@@ -14,6 +14,18 @@ Changelog information is available in the file revision.txt, which should be
 located in the same directory as this file is.
 ----------------------------------------------------------------------------
 
+-------------------------------
+Changes between 3.7.0 and 3.7.1
+-------------------------------
+
+    TODO
+
+Windows Crash Reports:
+----------------------
+
+   - Fix for crashes related to missing closing parentheses in `#if` and other
+     conditionals and loops, crash report #???, dump file #988
+
 ---------------------------------
 Changes between 3.7.RC7 and 3.7.0
 ---------------------------------
@@ -54,7 +66,6 @@ Windows Related:
    - remove old 4BPP toolbar icons as 16-color mode support isn't really
      relevant anymore
    - rename a few files in bitmaps directory whose names were upper-case
-   
 
 Static Code Analysis:
 ---------------------

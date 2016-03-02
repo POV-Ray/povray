@@ -1689,6 +1689,7 @@ void Parser::Parse_Directive(int After_Hash)
 
     if (Curr_Type == INVOKING_MACRO_COND)
     {
+        POV_PARSER_ASSERT(Cond_Stack[CS_Index].PMac != NULL);
         if ((Cond_Stack[CS_Index].PMac->Macro_End==Hash_Loc) &&
             (UCS2_strcmp(Cond_Stack[CS_Index].PMac->Macro_Filename, Input_File->In_File->name()) == 0))
         {
@@ -2035,6 +2036,7 @@ void Parser::Parse_Directive(int After_Hash)
             switch (Curr_Type)
             {
                 case INVOKING_MACRO_COND:
+                    POV_PARSER_ASSERT(false); // We should have identified the macro's proper `#end` at the beginning of this function.
                     Return_From_Macro();
                     if (--CS_Index < 0)
                     {
@@ -2485,6 +2487,7 @@ void Parser::Parse_Directive(int After_Hash)
 
         CASE (MACRO_TOKEN)
             Parsing_Directive = false;
+            Inc_CS_Index();
             if (!Skipping)
             {
                 if (Inside_MacroDef)
@@ -2495,7 +2498,6 @@ void Parser::Parse_Directive(int After_Hash)
                 PMac=Parse_Macro();
                 Inside_MacroDef=false;
             }
-            Inc_CS_Index();
             Cond_Stack[CS_Index].Cond_Type = DECLARING_MACRO_COND;
             Cond_Stack[CS_Index].PMac      = PMac;
             Skip_Tokens(DECLARING_MACRO_COND);
@@ -3117,6 +3119,8 @@ void Parser::Invoke_Macro()
     SYM_ENTRY **Table_Entries=NULL;
     int i,Local_Index;
 
+    Inc_CS_Index();
+
     if(PMac == NULL)
     {
         if(Token.DataPtr!=NULL)
@@ -3186,7 +3190,6 @@ void Parser::Invoke_Macro()
 
     GET(RIGHT_PAREN_TOKEN);
 
-    Inc_CS_Index();
     Cond_Stack[CS_Index].Cond_Type = INVOKING_MACRO_COND;
 
     Cond_Stack[CS_Index].File_Pos          = Input_File->In_File->tellg();
@@ -3897,12 +3900,13 @@ void Parser::Parse_Cond_Param2(DBL *V1,DBL *V2)
     Skipping      = Old_Sk;
 }
 
-void Parser::Inc_CS_Index(void)
+void Parser::Inc_CS_Index()
 {
     if (++CS_Index >= COND_STACK_SIZE)
     {
         Error("Too many nested conditionals or macros.");
     }
+    Cond_Stack[CS_Index].Cond_Type = COND_BUSY;
     Cond_Stack[CS_Index].Macro_File = NULL;
     Cond_Stack[CS_Index].Macro_Return_Name = NULL;
     Cond_Stack[CS_Index].PMac = NULL;
