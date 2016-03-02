@@ -3906,7 +3906,7 @@ void Parser::Inc_CS_Index()
     {
         Error("Too many nested conditionals or macros.");
     }
-    Cond_Stack[CS_Index].Cond_Type = COND_BUSY;
+    Cond_Stack[CS_Index].Cond_Type = BUSY_COND;
     Cond_Stack[CS_Index].Macro_File = NULL;
     Cond_Stack[CS_Index].Macro_Return_Name = NULL;
     Cond_Stack[CS_Index].PMac = NULL;
