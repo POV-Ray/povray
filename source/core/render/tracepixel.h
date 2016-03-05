@@ -68,6 +68,12 @@ class TracePixel : public Trace
         virtual ~TracePixel();
         void SetupCamera(const Camera& cam);
 
+        /// Trace a pixel or sub-pixel.
+        /// @param[in]  x       X-coordinate of the (sub-)pixel's center, typically ranging from 0.5 (left) to width-0.5 (right).
+        /// @param[in]  y       Y-coordinate of the (sub-)pixel's center, typically ranging from 0.5 (top) to height-0.5 (bottom).
+        /// @param[in]  width   Horizontal size of the image in pixels.
+        /// @param[in]  height  Vertical size of the image in pixels.
+        /// @param[out] colour  Computed colour of the (sub-)pixel.
         void operator()(DBL x, DBL y, DBL width, DBL height, RGBTColour& colour);
     private:
         // Focal blur data

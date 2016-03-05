@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -404,7 +404,7 @@ void TraceTask::SimpleSamplingM0()
                 {
                     TransColour c;
                     gIntersectionTime = 0;
-                    trace(x, y, GetViewData()->GetWidth(), GetViewData()->GetHeight(), c);
+                    trace(x+0.5, y+0.5, GetViewData()->GetWidth(), GetViewData()->GetHeight(), c);
                     if (gIntersectionTime < it)
                         it = gIntersectionTime;
                 }
@@ -416,7 +416,7 @@ void TraceTask::SimpleSamplingM0()
 #endif
                 RGBTColour col;
 
-                trace(x, y, GetViewData()->GetWidth(), GetViewData()->GetHeight(), col);
+                trace(x+0.5, y+0.5, GetViewData()->GetWidth(), GetViewData()->GetHeight(), col);
                 GetViewDataPtr()->Stats()[Number_Of_Pixels]++;
 
                 pixels.push_back(col);
@@ -467,7 +467,7 @@ void TraceTask::SimpleSamplingM0P()
                 {
                     TransColour c;
                     gIntersectionTime = 0;
-                    trace(x, y, GetViewData()->GetWidth(), GetViewData()->GetHeight(), c);
+                    trace(x+0.5, y+0.5, GetViewData()->GetWidth(), GetViewData()->GetHeight(), c);
                     if (gIntersectionTime < it)
                         it = gIntersectionTime;
                 }
@@ -479,7 +479,7 @@ void TraceTask::SimpleSamplingM0P()
 #endif
                 RGBTColour col;
 
-                trace(x, y, GetViewData()->GetWidth(), GetViewData()->GetHeight(), col);
+                trace(x+0.5, y+0.5, GetViewData()->GetWidth(), GetViewData()->GetHeight(), col);
                 GetViewDataPtr()->Stats()[Number_Of_Pixels]++;
 
                 pixelpositions.push_back(Vector2d(x, y));
@@ -515,7 +515,7 @@ void TraceTask::NonAdaptiveSupersamplingM1()
         // sample line above current block
         for(int x = rect.left; x <= rect.right; x++)
         {
-            trace(DBL(x), DBL(rect.top) - 1.0, GetViewData()->GetWidth(), GetViewData()->GetHeight(), pixels(x, rect.top - 1));
+            trace(x+0.5, rect.top-0.5, GetViewData()->GetWidth(), GetViewData()->GetHeight(), pixels(x, rect.top - 1));
             GetViewDataPtr()->Stats()[Number_Of_Pixels]++;
 
             // Cannot supersample this pixel, so just claim it was already supersampled! [trf]
@@ -527,7 +527,7 @@ void TraceTask::NonAdaptiveSupersamplingM1()
 
         for(int y = rect.top; y <= rect.bottom; y++)
         {
-            trace(DBL(rect.left) - 1.0, y, GetViewData()->GetWidth(), GetViewData()->GetHeight(), pixels(rect.left - 1, y)); // sample pixel left of current line in block
+            trace(rect.left-0.5, y+0.5, GetViewData()->GetWidth(), GetViewData()->GetHeight(), pixels(rect.left - 1, y)); // sample pixel left of current line in block
             GetViewDataPtr()->Stats()[Number_Of_Pixels]++;
 
             // Cannot supersample this pixel, so just claim it was already supersampled! [trf]
@@ -551,7 +551,7 @@ void TraceTask::NonAdaptiveSupersamplingM1()
             for(int x = rect.left; x <= rect.right; x++)
             {
                 // trace current pixel
-                trace(DBL(x), DBL(y), GetViewData()->GetWidth(), GetViewData()->GetHeight(), pixels(x, y));
+                trace(x+0.5, y+0.5, GetViewData()->GetWidth(), GetViewData()->GetHeight(), pixels(x, y));
                 GetViewDataPtr()->Stats()[Number_Of_Pixels]++;
 
                 Cooperate();
@@ -602,7 +602,7 @@ void TraceTask::AdaptiveSupersamplingM2()
             for(int x = rect.left; x <= rect.right + 1; x++)
             {
                 // trace upper-left corners of all pixels
-                trace(DBL(x) - 0.5, DBL(y) - 0.5, GetViewData()->GetWidth(), GetViewData()->GetHeight(), pixels(x, y));
+                trace(x-0.5, y-0.5, GetViewData()->GetWidth(), GetViewData()->GetHeight(), pixels(x, y));
                 GetViewDataPtr()->Stats()[Number_Of_Pixels]++;
 
                 Cooperate();
@@ -676,10 +676,10 @@ void TraceTask::SupersampleOnePixel(DBL x, DBL y, RGBTColour& col)
             if (jitterScale > 0.0)
             {
                 Jitter2d(x + xx, y + yy, rx, ry);
-                trace(x + xx + (rx * jitterScale), y + yy + (ry * jitterScale), GetViewData()->GetWidth(), GetViewData()->GetHeight(), tempcol);
+                trace(x+0.5 + xx + (rx * jitterScale), y+0.5 + yy + (ry * jitterScale), GetViewData()->GetWidth(), GetViewData()->GetHeight(), tempcol);
             }
             else
-                trace(x + xx, y + yy, GetViewData()->GetWidth(), GetViewData()->GetHeight(), tempcol);
+                trace(x+0.5 + xx, y+0.5 + yy, GetViewData()->GetWidth(), GetViewData()->GetHeight(), tempcol);
 
             col += tempcol;
             GetViewDataPtr()->Stats()[Number_Of_Samples]++;
@@ -740,10 +740,10 @@ void TraceTask::SubdivideOnePixel(DBL x, DBL y, DBL d, size_t bx, size_t by, siz
             if (jitterScale > 0.0)
             {
                 Jitter2d(x - d, y, rxcx0y1, rycx0y1);
-                trace(x - d + (rxcx0y1 * jitterScale), y + (rycx0y1 * jitterScale), GetViewData()->GetWidth(), GetViewData()->GetHeight(), col);
+                trace(x+0.5 - d + (rxcx0y1 * jitterScale), y+0.5 + (rycx0y1 * jitterScale), GetViewData()->GetWidth(), GetViewData()->GetHeight(), col);
             }
             else
-                trace(x - d, y, GetViewData()->GetWidth(), GetViewData()->GetHeight(), col);
+                trace(x+0.5 - d, y+0.5, GetViewData()->GetWidth(), GetViewData()->GetHeight(), col);
 
             buffer.SetSample(bx, by + bstephalf, col);
 
@@ -760,10 +760,10 @@ void TraceTask::SubdivideOnePixel(DBL x, DBL y, DBL d, size_t bx, size_t by, siz
             if (jitterScale > 0.0)
             {
                 Jitter2d(x, y - d, rxcx1y0, rycx1y0);
-                trace(x + (rxcx1y0 * jitterScale), y - d + (rycx1y0 * jitterScale), GetViewData()->GetWidth(), GetViewData()->GetHeight(), col);
+                trace(x+0.5 + (rxcx1y0 * jitterScale), y+0.5 - d + (rycx1y0 * jitterScale), GetViewData()->GetWidth(), GetViewData()->GetHeight(), col);
             }
             else
-                trace(x, y - d, GetViewData()->GetWidth(), GetViewData()->GetHeight(), col);
+                trace(x+0.5, y+0.5 - d, GetViewData()->GetWidth(), GetViewData()->GetHeight(), col);
 
             buffer.SetSample(bx + bstephalf, by, col);
 
@@ -780,10 +780,10 @@ void TraceTask::SubdivideOnePixel(DBL x, DBL y, DBL d, size_t bx, size_t by, siz
             if (jitterScale > 0.0)
             {
                 Jitter2d(x + d, y, rxcx2y1, rycx2y1);
-                trace(x + d + (rxcx2y1 * jitterScale), y + (rycx2y1 * jitterScale), GetViewData()->GetWidth(), GetViewData()->GetHeight(), col);
+                trace(x+0.5 + d + (rxcx2y1 * jitterScale), y+0.5 + (rycx2y1 * jitterScale), GetViewData()->GetWidth(), GetViewData()->GetHeight(), col);
             }
             else
-                trace(x + d, y, GetViewData()->GetWidth(), GetViewData()->GetHeight(), col);
+                trace(x+0.5 + d, y+0.5, GetViewData()->GetWidth(), GetViewData()->GetHeight(), col);
 
             buffer.SetSample(bx + bstep, by + bstephalf, col);
 
@@ -800,10 +800,10 @@ void TraceTask::SubdivideOnePixel(DBL x, DBL y, DBL d, size_t bx, size_t by, siz
             if (jitterScale > 0.0)
             {
                 Jitter2d(x, y + d, rxcx1y2, rycx1y2);
-                trace(x + (rxcx1y2 * jitterScale), y + d + (rycx1y2 * jitterScale), GetViewData()->GetWidth(), GetViewData()->GetHeight(), col);
+                trace(x+0.5 + (rxcx1y2 * jitterScale), y+0.5 + d + (rycx1y2 * jitterScale), GetViewData()->GetWidth(), GetViewData()->GetHeight(), col);
             }
             else
-                trace(x, y + d, GetViewData()->GetWidth(), GetViewData()->GetHeight(), col);
+                trace(x+0.5, y+0.5 + d, GetViewData()->GetWidth(), GetViewData()->GetHeight(), col);
 
             buffer.SetSample(bx + bstephalf, by + bstep, col);
 
@@ -820,10 +820,10 @@ void TraceTask::SubdivideOnePixel(DBL x, DBL y, DBL d, size_t bx, size_t by, siz
             if (jitterScale > 0.0)
             {
                 Jitter2d(x, y, rxcx1y1, rycx1y1);
-                trace(x + (rxcx1y1 * jitterScale), y + (rycx1y1 * jitterScale), GetViewData()->GetWidth(), GetViewData()->GetHeight(), col);
+                trace(x+0.5 + (rxcx1y1 * jitterScale), y+0.5 + (rycx1y1 * jitterScale), GetViewData()->GetWidth(), GetViewData()->GetHeight(), col);
             }
             else
-                trace(x, y, GetViewData()->GetWidth(), GetViewData()->GetHeight(), col);
+                trace(x+0.5, y+0.5, GetViewData()->GetWidth(), GetViewData()->GetHeight(), col);
 
             buffer.SetSample(bx + bstephalf, by + bstephalf, col);
 

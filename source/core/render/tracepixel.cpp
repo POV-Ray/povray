@@ -310,10 +310,6 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
     Vector3d V1;
     TRANSFORM Trans;
 
-    // Move to center of pixel
-    x += 0.5;
-    y -= 0.5;
-
     // Set ray flags
     ray.SetFlags(Ray::PrimaryRay, false, false, false, false, pretrace);
 
@@ -328,19 +324,16 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
             x0 = x / width - 0.5;
 
             // Convert the y coordinate to be a DBL from -0.5 to 0.5.
-            y0 = ((height - 1) - y) / height - 0.5;
+            y0 = 0.5 - y / height;
 
             // Create primary ray.
             ray.Direction = cameraDirection + x0 * cameraRight + y0 * cameraUp;
 
             // Do focal blurring (by Dan Farmer).
             if(useFocalBlur)
-            {
                 JitterCameraRay(ray, x, y, ray_number);
-                InitRayContainerState(ray, true);
-            }
-            else
-                InitRayContainerState(ray);
+
+            InitRayContainerState(ray, useFocalBlur);
             break;
 
         // Orthographic projection.
@@ -349,7 +342,7 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
             x0 = x / width - 0.5;
 
             // Convert the y coordinate to be a DBL from -0.5 to 0.5.
-            y0 = ((height - 1) - y) / height - 0.5;
+            y0 = 0.5 - y / height;
 
             // Create primary ray.
             ray.Direction = cameraDirection;
@@ -365,10 +358,10 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
         // Fisheye camera.
         case FISHEYE_CAMERA:
             // Convert the x coordinate to be a DBL from -1.0 to 1.0.
-            x0 = 2.0 * x / width - 1.0;
+            x0 = 2.0 * (x / width - 0.5);
 
             // Convert the y coordinate to be a DBL from -1.0 to 1.0.
-            y0 = 2.0 * ((height - 1) - y) / height - 1.0;
+            y0 = 2.0 * (0.5 - y / height);
 
             // This code would do what Warp wants
             x0 *= cameraLengthRight;
@@ -403,16 +396,16 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
             if(useFocalBlur)
                 JitterCameraRay(ray, x, y, ray_number);
 
-            InitRayContainerState(ray);
+            InitRayContainerState(ray, useFocalBlur);
             break;
 
         // Omnimax camera.
         case OMNIMAX_CAMERA:
             // Convert the x coordinate to be a DBL from -1.0 to 1.0.
-            x0 = 2.0 * x / width - 1.0;
+            x0 = 2.0 * (x / width - 0.5);
 
             // Convert the y coordinate to be a DBL from -1.0 to 1.0.
-            y0 = 2.0 * ((height - 1) - y) / height - 1.0;
+            y0 = 2.0 * (0.5 - y / height);
 
             // Get polar coordinates.
             if(aspectRatio > 1.0)
@@ -459,7 +452,7 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
             if(useFocalBlur)
                 JitterCameraRay(ray, x, y, ray_number);
 
-            InitRayContainerState(ray);
+            InitRayContainerState(ray, useFocalBlur);
             break;
 
         // Panoramic camera from Graphic Gems III.
@@ -468,7 +461,7 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
             x0 = x / width;
 
             // Convert the y coordinate to be a DBL from -1.0 to 1.0.
-            y0 = 2.0 * ((height - 1) - y) / height - 1.0;
+            y0 = 2.0 * (0.5 - y / height);
 
             // Get cylindrical coordinates.
             x0 = (1.0 - x0) * M_PI;
@@ -493,7 +486,7 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
             if(useFocalBlur)
                 JitterCameraRay(ray, x, y, ray_number);
 
-            InitRayContainerState(ray);
+            InitRayContainerState(ray, useFocalBlur);
             break;
 
         // Ultra wide angle camera written by Dan Farmer.
@@ -502,7 +495,7 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
             x0 = x / width - 0.5;
 
             // Convert the y coordinate to be a DBL from -0.5 to 0.5.
-            y0 = ((height - 1) - y) / height - 0.5;
+            y0 = 0.5 - y / height;
 
             // Create primary ray.
             x0 *= camera.Angle * M_PI_180; // NK 1998 - changed to M_PI_180
@@ -518,7 +511,7 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
             if(useFocalBlur)
                 JitterCameraRay(ray, x, y, ray_number);
 
-            InitRayContainerState(ray);
+            InitRayContainerState(ray, useFocalBlur);
             break;
 
         // Cylinder camera 1. Axis in "up" direction
@@ -527,7 +520,7 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
             x0 = x / width - 0.5;
 
             // Convert the y coordinate to be a DBL from -0.5 to 0.5.
-            y0 = ((height - 1) - y) / height - 0.5;
+            y0 = 0.5 - y / height;
 
             // Create primary ray.
             x0 *= camera.Angle * M_PI_180;
@@ -541,7 +534,7 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
             if(useFocalBlur)
                 JitterCameraRay(ray, x, y, ray_number);
 
-            InitRayContainerState(ray);
+            InitRayContainerState(ray, useFocalBlur);
             break;
 
         // Cylinder camera 2. Axis in "right" direction
@@ -550,7 +543,7 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
             x0 = x / width - 0.5;
 
             // Convert the y coordinate to be a DBL from -0.5 to 0.5.
-            y0 = ((height - 1) - y) / height - 0.5;
+            y0 = 0.5 - y / height;
 
             y0 *= camera.Angle * M_PI_180;
             x0 *= aspectRatio;
@@ -563,7 +556,7 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
             if(useFocalBlur)
                 JitterCameraRay(ray, x, y, ray_number);
 
-            InitRayContainerState(ray);
+            InitRayContainerState(ray, useFocalBlur);
             break;
 
         // Cylinder camera 3. Axis in "up" direction, orthogonal in "right"
@@ -572,7 +565,7 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
             x0 = x / width - 0.5;
 
             // Convert the y coordinate to be a DBL from -0.5 to 0.5.
-            y0 = ((height - 1) - y) / height - 0.5;
+            y0 = 0.5 - y / height;
 
             // Create primary ray.
             x0 *= camera.Angle * M_PI_180;
@@ -597,7 +590,7 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
             x0 = x / width - 0.5;
 
             // Convert the y coordinate to be a DBL from -0.5 to 0.5.
-            y0 = ((height - 1) - y) / height - 0.5;
+            y0 = 0.5 - y / height;
 
             // Create primary ray.
             y0 *= camera.Angle * M_PI_180;
@@ -622,7 +615,7 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
             x0 = x / width - 0.5;
 
             // Convert the y coordinate to be a DBL from -0.5 to 0.5.
-            y0 = ((height - 1) - y) / height - 0.5;
+            y0 = 0.5 - y / height;
 
             // get angle in radians
             y0 *= (camera.V_Angle / 360) * TWO_M_PI;
@@ -641,14 +634,17 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
             if(useFocalBlur)
                 JitterCameraRay(ray, x, y, ray_number);
 
-            InitRayContainerState(ray);
+            InitRayContainerState(ray, useFocalBlur);
             break;
 
         case MESH_CAMERA:
             // in the case of the mesh camera, we don't want any pixel co-ordinates that are outside
             // the logical image boundaries (and particularly no negative ones), so we clip them here.
-            x = max(0.0, min(x, width - 1.0));
-            y = max(0.0, min(y, height - 1.0));
+            if (camera.Face_Distribution_Method != 3)
+            {
+                x = max(0.0, min(floor(x), width - 1.0));
+                y = max(0.0, min(floor(y), height - 1.0));
+            }
 
             // Note: while it does not make sense to use AA with distribution methods 0, 1, or 2, we don't prohibit it.
             // The same goes for jitter and a few other non-mesh-camera specific effects. This is primarily because
@@ -693,7 +689,7 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
                 }
 
                 // we're done
-                InitRayContainerState(ray);
+                InitRayContainerState(ray, true);
             }
             else if (camera.Face_Distribution_Method == 1)
             {
@@ -735,7 +731,7 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
                             MTransPoint (ray.Origin, ray.Origin, mesh->Trans);
                             MTransNormal (ray.Direction, ray.Direction, mesh->Trans);
                         }
-                        InitRayContainerState(ray);
+                        InitRayContainerState(ray, true);
                         break;
                     }
                 }
@@ -770,7 +766,7 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
                     MTransPoint (ray.Origin, ray.Origin, mesh->Trans);
                     MTransNormal (ray.Direction, ray.Direction, mesh->Trans);
                 }
-                InitRayContainerState(ray);
+                InitRayContainerState(ray, true);
             }
             else if (camera.Face_Distribution_Method == 3)
             {
@@ -780,8 +776,8 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
                 // presumably have been constructed to scale the pixels evenly across all the faces.
 
                 // convert X and Y into UV co-ordinates
-                double u = (x - 0.5) / width;
-                double v = 1.0 - (y + 0.5) / height;
+                double u = x / width;
+                double v = 1.0 - y / height;
 
                 // now we need to find the first face that that those co-ordinates fall within.
                 // NB while it is of course possible for multiple faces to match a single UV co-ordinate,
@@ -846,7 +842,7 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
                     MTransPoint (ray.Origin, ray.Origin, mesh->Trans);
                     MTransNormal (ray.Direction, ray.Direction, mesh->Trans);
                 }
-                InitRayContainerState(ray);
+                InitRayContainerState(ray, true);
             }
             break;
 
@@ -954,7 +950,7 @@ void TracePixel::TraceRayWithFocalBlur(RGBTColour& colour, DBL x, DBL y, DBL wid
     int i;
     DBL dx, dy, n, randx, randy;
     RGBTColour C, V1, S1, S2;
-    int seed = int(x * 313.0 + 11.0) + int(y * 311.0 + 17.0);
+    int seed = int((x-0.5) * 313.0 + 11.0) + int((y-0.5) * 311.0 + 17.0);
 
     TraceTicket ticket(maxTraceLevel, adcBailout, sceneData->outputAlpha);
     Ray ray(ticket);
@@ -1064,7 +1060,7 @@ void TracePixel::JitterCameraRay(Ray& ray, DBL x, DBL y, size_t ray_number)
 
     deflection = temp_xperp - temp_yperp;
 
-    ray.Origin = camera.Location + deflection;
+    ray.Origin += deflection;
 
     // Deflect the direction of the ray in the opposite direction we deflected
     // the eye position.  This makes sure that we are looking at the same place

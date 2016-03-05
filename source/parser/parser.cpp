@@ -1449,7 +1449,7 @@ void Parser::Parse_Camera (Camera& Cam)
                     END_CASE
 
                     CASE5(ORTHOGRAPHIC_TOKEN, FISHEYE_TOKEN, ULTRA_WIDE_ANGLE_TOKEN, OMNIMAX_TOKEN, PANORAMIC_TOKEN)
-                    CASE2(SPHERICAL_TOKEN, CYLINDER_TOKEN)
+                    CASE3(SPHERICAL_TOKEN, CYLINDER_TOKEN, MESH_CAMERA_TOKEN)
                         Expectation_Error("perspective camera modifier");
                     END_CASE
 
@@ -1469,7 +1469,7 @@ void Parser::Parse_Camera (Camera& Cam)
                     END_CASE
 
                     CASE5(PERSPECTIVE_TOKEN, FISHEYE_TOKEN, ULTRA_WIDE_ANGLE_TOKEN, OMNIMAX_TOKEN, PANORAMIC_TOKEN)
-                    CASE2(SPHERICAL_TOKEN, CYLINDER_TOKEN)
+                    CASE3(SPHERICAL_TOKEN, CYLINDER_TOKEN, MESH_CAMERA_TOKEN)
                         Expectation_Error("orthographic camera modifier");
                     END_CASE
 
