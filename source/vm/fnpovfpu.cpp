@@ -1569,7 +1569,9 @@ FunctionVM::CustomFunction::CustomFunction(FunctionVM* pVm, FUNCTION_PTR pFn) :
 {}
 
 FunctionVM::CustomFunction::~CustomFunction()
-{}
+{
+    mpVm->DestroyFunction(mpFn);
+}
 
 GenericFunctionContextPtr FunctionVM::CustomFunction::NewContext(TraceThreadData* pThreadData)
 {
