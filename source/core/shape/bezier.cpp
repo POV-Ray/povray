@@ -262,6 +262,8 @@ BEZIER_NODE *BicubicPatch::bezier_tree_builder(const ControlPoints *Patch, DBL u
                 Vertices->uvbnds[2] = v0;
                 Vertices->uvbnds[3] = v1;
 
+                Node->Count = 0;
+
                 Node->Data_Ptr = reinterpret_cast<void *>(Vertices);
             }
             else
@@ -705,6 +707,7 @@ void BicubicPatch::bezier_bounding_sphere(const ControlPoints *Patch, Vector3d& 
     DBL r0, r1;
     Vector3d v0;
 
+    center = Vector3d(0.0);
     for (i = 0; i < 4; i++)
     {
         for (j = 0; j < 4; j++)
