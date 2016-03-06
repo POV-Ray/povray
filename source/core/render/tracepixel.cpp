@@ -200,7 +200,8 @@ TracePixel::TracePixel(shared_ptr<SceneData> sd, const Camera* cam, TraceThreadD
                        focalBlurData(NULL),
                        maxTraceLevel(mtl),
                        adcBailout(adcb),
-                       pretrace(pt)
+                       pretrace(pt),
+                       mpFunctionContext(NULL)
 {
     SetupCamera((cam == NULL) ? sd->parsedCamera : *cam);
 }
@@ -209,6 +210,8 @@ TracePixel::~TracePixel()
 {
     if(focalBlurData != NULL)
         delete focalBlurData;
+    if (mpFunctionContext != NULL)
+        delete mpFunctionContext;
 }
 
 void TracePixel::SetupCamera(const Camera& cam)
@@ -245,6 +248,10 @@ void TracePixel::SetupCamera(const Camera& cam)
         case FISHEYE_CAMERA:
             aspectRatio = cameraLengthRight / cameraLengthUp;
             normalise = true;
+            break;
+        case USER_DEFINED_CAMERA:
+            normalise = true;
+            mpFunctionContext = sceneData->functionContextFactory->CreateFunctionContext(threadData);
             break;
         default:
             aspectRatio = cameraLengthRight / cameraLengthUp;
@@ -844,6 +851,31 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
                 }
                 InitRayContainerState(ray, true);
             }
+            break;
+
+        case USER_DEFINED_CAMERA:
+            // Convert the x coordinate to be a DBL from -0.5 to 0.5.
+            x0 = x / width - 0.5;
+
+            // Convert the y coordinate to be a DBL from -0.5 to 0.5.
+            y0 = 0.5 - y / height;
+
+            for (unsigned int i = 0; i < 3; ++i)
+            {
+                if (camera.Location_Fn[i] != NULL)
+                    cameraLocation[i] = camera.Location_Fn[i]->Execute(mpFunctionContext, x0, y0);
+                if (camera.Direction_Fn[i] != NULL)
+                    cameraDirection[i] = camera.Direction_Fn[i]->Execute(mpFunctionContext, x0, y0);
+            }
+            if (cameraDirection.IsNearNull(EPSILON))
+                return false;
+            ray.Origin    = cameraLocation;
+            ray.Direction = cameraDirection;
+
+            if(useFocalBlur)
+                JitterCameraRay(ray, x, y, ray_number);
+
+            InitRayContainerState(ray, true);
             break;
 
         default:

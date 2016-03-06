@@ -307,6 +307,16 @@ class GenericVector2d
         {
             return vect[X] * vect[X] + vect[Y] * vect[Y];
         }
+        inline bool IsNull() const
+        {
+            return (vect[X] == 0.0) &&
+                   (vect[Y] == 0.0);
+        }
+        inline bool IsNearNull(T epsilon) const
+        {
+            return (abs(vect[X]) < epsilon) &&
+                   (abs(vect[Y]) < epsilon);
+        }
         inline GenericVector2d normalized() const
         {
             T l = length();
@@ -521,6 +531,18 @@ class GenericVector3d
         inline T lengthSqr() const
         {
             return vect[X] * vect[X] + vect[Y] * vect[Y] + vect[Z] * vect[Z];
+        }
+        inline bool IsNull() const
+        {
+            return (vect[X] == 0.0) &&
+                   (vect[Y] == 0.0) &&
+                   (vect[Z] == 0.0);
+        }
+        inline bool IsNearNull(T epsilon) const
+        {
+            return (abs(vect[X]) < epsilon) &&
+                   (abs(vect[Y]) < epsilon) &&
+                   (abs(vect[Z]) < epsilon);
         }
         inline GenericVector3d normalized() const
         {

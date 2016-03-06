@@ -251,6 +251,12 @@ void Camera::Init()
     Face_Distribution_Method = 0;
     Smooth = false;
     Max_Ray_Distance = 0.0;
+
+    for (unsigned int i = 0; i < 3; ++i)
+    {
+        Location_Fn[i]  = NULL;
+        Direction_Fn[i] = NULL;
+    }
 }
 
 /*****************************************************************************
@@ -360,6 +366,24 @@ Camera& Camera::operator=(const Camera& src)
     }
     Smooth = src.Smooth;
 
+    for (unsigned int i = 0; i < 3; ++i)
+    {
+        if (Location_Fn[i] != NULL)
+            delete Location_Fn[i];
+        if (src.Location_Fn[i] == NULL)
+            Location_Fn[i] = NULL;
+        else
+            Location_Fn[i] = src.Location_Fn[i]->Clone();
+
+        if (Direction_Fn[i] != NULL)
+            delete Direction_Fn[i];
+        if (src.Direction_Fn[i] == NULL)
+            Direction_Fn[i] = NULL;
+        else
+            Direction_Fn[i] = src.Direction_Fn[i]->Clone();
+
+    }
+
     return *this;
 }
 
@@ -368,6 +392,11 @@ Camera::Camera(const Camera& src)
     Tnormal = NULL;
     Trans = NULL;
     Bokeh = NULL;
+    for (unsigned int i = 0; i < 3; ++i)
+    {
+        Location_Fn[i]  = NULL;
+        Direction_Fn[i] = NULL;
+    }
     operator=(src);
 }
 
@@ -405,6 +434,13 @@ Camera::~Camera()
     for (std::vector<ObjectPtr>::iterator it = Meshes.begin(); it != Meshes.end(); it++)
         Destroy_Object(*it);
     Meshes.clear();
+    for (unsigned int i = 0; i < 3; ++i)
+    {
+        if (Location_Fn[i] != NULL)
+            delete Location_Fn[i];
+        if (Direction_Fn[i] != NULL)
+            delete Direction_Fn[i];
+    }
 }
 
 }

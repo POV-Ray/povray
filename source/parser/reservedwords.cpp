@@ -602,6 +602,7 @@ const RESERVED_WORD Reserved_Words[LAST_TOKEN] = {
     {USE_COLOUR_TOKEN, "use_color"},
     {USE_COLOUR_TOKEN, "use_colour"},
     {USE_INDEX_TOKEN, "use_index"},
+    {USER_DEFINED_TOKEN, "user_defined"},
     {UTF8_TOKEN, "utf8"},
     {UV_ID_TOKEN, "uv vector identifier"},
     {UV_INDICES_TOKEN, "uv_indices"},

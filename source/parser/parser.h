@@ -161,6 +161,7 @@ struct ExperimentalFlags
     bool    spline                  : 1;
     bool    subsurface              : 1;
     bool    tiff                    : 1;
+    bool    userDefinedCamera       : 1;
 
     ExperimentalFlags() :
         backsideIllumination(false),
@@ -169,7 +170,8 @@ struct ExperimentalFlags
         slopeAltitude(false),
         spline(false),
         subsurface(false),
-        tiff(false)
+        tiff(false),
+        userDefinedCamera(false)
     {}
 };
 
@@ -291,7 +293,7 @@ class Parser : public SceneTask
         // parse.h/parse.cpp
         void Parse_Error (TOKEN Token_Id);
         void Found_Instead_Error (const char *exstr, const char *extokstr);
-        void Parse_Begin (void);
+        bool Parse_Begin (bool mandatory = true);
         void Parse_End (void);
         bool Parse_Comma (void);
         void Parse_Semi_Colon (bool force_semicolon);
@@ -415,7 +417,9 @@ class Parser : public SceneTask
         // function.h/function.cpp
         FUNCTION_PTR Parse_Function(void);
         FUNCTION_PTR Parse_FunctionContent(void);
-        FUNCTION_PTR Parse_DeclareFunction(int *token_id, const char *fn_name, bool is_loca);
+        FUNCTION_PTR Parse_FunctionOrContent(void);
+        void Parse_FunctionOrContentList(GenericScalarFunctionPtr* apFn, unsigned int count);
+        FUNCTION_PTR Parse_DeclareFunction(int *token_id, const char *fn_name, bool is_local);
 
         // parsestr.h/parsestr.cpp
         char *Parse_C_String(bool pathname = false);
@@ -598,6 +602,7 @@ class Parser : public SceneTask
         TrueTypeFont *OpenFontFile(const char *asciifn, const int font_id);
 
         void Parse_Mesh_Camera (Camera& Cam);
+        void Parse_User_Defined_Camera (Camera& Cam);
         void Parse_Camera(Camera& Cam);
         bool Parse_Camera_Mods(Camera& Cam);
         void Parse_Frame();

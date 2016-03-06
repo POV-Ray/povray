@@ -298,6 +298,8 @@ void Parser::Run()
         strcat(str, str [0] ? ", subsurface light transport" : "subsurface light transport");
     if(mExperimentalFlags.tiff)
         strcat(str, str [0] ? ", TIFF image support" : "TIFF image support");
+    if(mExperimentalFlags.userDefinedCamera)
+        strcat(str, str [0] ? ", user-defined camera" : "user-defined camera");
 
     if (str[0] != '\0')
         Warning("This rendering uses the following experimental feature(s): %s.\n"
@@ -604,27 +606,32 @@ void Parser::Destroy_Frame()
 *
 ******************************************************************************/
 
-void Parser::Parse_Begin ()
+bool Parser::Parse_Begin (bool mandatory)
 {
-    const char *front;
-
-    if(++Brace_Index >= MAX_BRACES)
-    {
-        Warning("Too many nested '{' braces.");
-        Brace_Index--;
-    }
-
-    Brace_Stack[Brace_Index]=Token.Token_Id;
+    TOKEN tokenId = Token.Token_Id;
 
     Get_Token();
 
     if(Token.Token_Id == LEFT_CURLY_TOKEN)
     {
-        return;
-    }
+        if(++Brace_Index >= MAX_BRACES)
+            Error("Too many nested '{' braces.");
+        Brace_Stack[Brace_Index] = tokenId;
 
-    front = Get_Token_String(Brace_Stack[Brace_Index]);
-    Found_Instead_Error("Missing { after", front);
+        return true;
+    }
+    else
+    {
+        if (mandatory)
+        {
+            const char *front = Get_Token_String(Brace_Stack[Brace_Index]);
+            Found_Instead_Error("Missing { after", front);
+        }
+        else
+            Unget_Token();
+
+        return false;
+    }
 }
 
 
@@ -1254,6 +1261,60 @@ void Parser::Parse_Mesh_Camera (Camera& Cam)
     }
 }
 
+void Parser::Parse_User_Defined_Camera (Camera& Cam)
+{
+    Cam.Type = USER_DEFINED_CAMERA;
+
+    EXPECT
+        CASE (LOCATION_TOKEN)
+            if (Parse_Begin(false))
+            {
+                Cam.Location = Vector3d(0.0);
+                Parse_FunctionOrContentList(Cam.Location_Fn, 3);
+                Parse_End();
+            }
+            else
+            {
+                for(unsigned int i = 0; i < 3; ++i)
+                {
+                    if (Cam.Location_Fn[i] != NULL)
+                    {
+                        delete Cam.Location_Fn[i];
+                        Cam.Location_Fn[i] = NULL;
+                    }
+                }
+                Parse_Vector(Cam.Location);
+            }
+        END_CASE
+
+        CASE (DIRECTION_TOKEN)
+            if (Parse_Begin(false))
+            {
+                Cam.Direction = Vector3d(0.0);
+                Parse_FunctionOrContentList(Cam.Direction_Fn, 3);
+                Parse_End();
+            }
+            else
+            {
+                for(unsigned int i = 0; i < 3; ++i)
+                {
+                    if (Cam.Direction_Fn[i] != NULL)
+                    {
+                        delete Cam.Direction_Fn[i];
+                        Cam.Direction_Fn[i] = NULL;
+                    }
+                }
+                Parse_Vector(Cam.Direction);
+            }
+        END_CASE
+
+        OTHERWISE
+            UNGET
+            EXIT
+        END_CASE
+    END_EXPECT
+}
+
 /*****************************************************************************
 *
 * FUNCTION
@@ -1432,6 +1493,11 @@ void Parser::Parse_Camera (Camera& Cam)
                 Parse_Mesh_Camera(New);
             END_CASE
 
+            CASE (USER_DEFINED_TOKEN)
+                mExperimentalFlags.userDefinedCamera = true;
+                Parse_User_Defined_Camera(New);
+            END_CASE
+
             OTHERWISE
                 UNGET
                 EXIT
@@ -1449,7 +1515,7 @@ void Parser::Parse_Camera (Camera& Cam)
                     END_CASE
 
                     CASE5(ORTHOGRAPHIC_TOKEN, FISHEYE_TOKEN, ULTRA_WIDE_ANGLE_TOKEN, OMNIMAX_TOKEN, PANORAMIC_TOKEN)
-                    CASE3(SPHERICAL_TOKEN, CYLINDER_TOKEN, MESH_CAMERA_TOKEN)
+                    CASE4(SPHERICAL_TOKEN, CYLINDER_TOKEN, MESH_CAMERA_TOKEN, USER_DEFINED_TOKEN)
                         Expectation_Error("perspective camera modifier");
                     END_CASE
 
@@ -1469,7 +1535,7 @@ void Parser::Parse_Camera (Camera& Cam)
                     END_CASE
 
                     CASE5(PERSPECTIVE_TOKEN, FISHEYE_TOKEN, ULTRA_WIDE_ANGLE_TOKEN, OMNIMAX_TOKEN, PANORAMIC_TOKEN)
-                    CASE3(SPHERICAL_TOKEN, CYLINDER_TOKEN, MESH_CAMERA_TOKEN)
+                    CASE4(SPHERICAL_TOKEN, CYLINDER_TOKEN, MESH_CAMERA_TOKEN, USER_DEFINED_TOKEN)
                         Expectation_Error("orthographic camera modifier");
                     END_CASE
 
@@ -1489,7 +1555,7 @@ void Parser::Parse_Camera (Camera& Cam)
                     END_CASE
 
                     CASE5(PERSPECTIVE_TOKEN, ORTHOGRAPHIC_TOKEN, ULTRA_WIDE_ANGLE_TOKEN, OMNIMAX_TOKEN, PANORAMIC_TOKEN)
-                    CASE3(SPHERICAL_TOKEN, CYLINDER_TOKEN, MESH_CAMERA_TOKEN)
+                    CASE4(SPHERICAL_TOKEN, CYLINDER_TOKEN, MESH_CAMERA_TOKEN, USER_DEFINED_TOKEN)
                         Expectation_Error("fisheye camera modifier");
                     END_CASE
 
@@ -1509,7 +1575,7 @@ void Parser::Parse_Camera (Camera& Cam)
                     END_CASE
 
                     CASE5(PERSPECTIVE_TOKEN, ORTHOGRAPHIC_TOKEN, FISHEYE_TOKEN, OMNIMAX_TOKEN, PANORAMIC_TOKEN)
-                    CASE3(SPHERICAL_TOKEN, CYLINDER_TOKEN, MESH_CAMERA_TOKEN)
+                    CASE4(SPHERICAL_TOKEN, CYLINDER_TOKEN, MESH_CAMERA_TOKEN, USER_DEFINED_TOKEN)
                         Expectation_Error("ultra_wide_angle camera modifier");
                     END_CASE
 
@@ -1529,7 +1595,7 @@ void Parser::Parse_Camera (Camera& Cam)
                     END_CASE
 
                     CASE5(PERSPECTIVE_TOKEN, ORTHOGRAPHIC_TOKEN, FISHEYE_TOKEN, ULTRA_WIDE_ANGLE_TOKEN, PANORAMIC_TOKEN)
-                    CASE3(SPHERICAL_TOKEN, CYLINDER_TOKEN, MESH_CAMERA_TOKEN)
+                    CASE4(SPHERICAL_TOKEN, CYLINDER_TOKEN, MESH_CAMERA_TOKEN, USER_DEFINED_TOKEN)
                         Expectation_Error("omnimax camera modifier");
                     END_CASE
 
@@ -1549,7 +1615,7 @@ void Parser::Parse_Camera (Camera& Cam)
                     END_CASE
 
                     CASE5(PERSPECTIVE_TOKEN, ORTHOGRAPHIC_TOKEN, FISHEYE_TOKEN, ULTRA_WIDE_ANGLE_TOKEN, OMNIMAX_TOKEN)
-                    CASE3(SPHERICAL_TOKEN, CYLINDER_TOKEN, MESH_CAMERA_TOKEN)
+                    CASE4(SPHERICAL_TOKEN, CYLINDER_TOKEN, MESH_CAMERA_TOKEN, USER_DEFINED_TOKEN)
                         Expectation_Error("panoramic camera modifier");
                     END_CASE
 
@@ -1572,7 +1638,7 @@ void Parser::Parse_Camera (Camera& Cam)
                     END_CASE
 
                     CASE6(PERSPECTIVE_TOKEN, ORTHOGRAPHIC_TOKEN, FISHEYE_TOKEN, ULTRA_WIDE_ANGLE_TOKEN, OMNIMAX_TOKEN, PANORAMIC_TOKEN)
-                    CASE2(SPHERICAL_TOKEN, MESH_CAMERA_TOKEN)
+                    CASE3(SPHERICAL_TOKEN, MESH_CAMERA_TOKEN, USER_DEFINED_TOKEN)
                         Expectation_Error("cylinder camera modifier");
                     END_CASE
 
@@ -1596,7 +1662,7 @@ void Parser::Parse_Camera (Camera& Cam)
                     END_CASE
 
                     CASE6(PERSPECTIVE_TOKEN, ORTHOGRAPHIC_TOKEN, FISHEYE_TOKEN, ULTRA_WIDE_ANGLE_TOKEN, OMNIMAX_TOKEN, PANORAMIC_TOKEN)
-                    CASE2(CYLINDER_TOKEN, MESH_CAMERA_TOKEN)
+                    CASE3(CYLINDER_TOKEN, MESH_CAMERA_TOKEN, USER_DEFINED_TOKEN)
                         Expectation_Error("spherical camera modifier");
                     END_CASE
 
@@ -1610,8 +1676,23 @@ void Parser::Parse_Camera (Camera& Cam)
             case MESH_CAMERA:
                 EXPECT
                     CASE6(PERSPECTIVE_TOKEN, ORTHOGRAPHIC_TOKEN, FISHEYE_TOKEN, ULTRA_WIDE_ANGLE_TOKEN, OMNIMAX_TOKEN, PANORAMIC_TOKEN)
-                    CASE2(CYLINDER_TOKEN, SPHERICAL_TOKEN)
+                    CASE3(SPHERICAL_TOKEN, CYLINDER_TOKEN, USER_DEFINED_TOKEN)
                         Expectation_Error("mesh camera modifier");
+                    END_CASE
+
+                    OTHERWISE
+                        UNGET
+                        if(Parse_Camera_Mods(New) == false)
+                            EXIT
+                    END_CASE
+                END_EXPECT
+                break;
+            case USER_DEFINED_CAMERA:
+                EXPECT
+                    CASE (ANGLE_TOKEN)
+                    CASE6(PERSPECTIVE_TOKEN, ORTHOGRAPHIC_TOKEN, FISHEYE_TOKEN, ULTRA_WIDE_ANGLE_TOKEN, OMNIMAX_TOKEN, PANORAMIC_TOKEN)
+                    CASE3(SPHERICAL_TOKEN, CYLINDER_TOKEN, MESH_CAMERA_TOKEN)
+                        Expectation_Error("user-defined camera modifier");
                     END_CASE
 
                     OTHERWISE
@@ -1745,7 +1826,7 @@ void Parser::Parse_Camera (Camera& Cam)
         // apply camera transformations
         New.Transform(New.Trans);
     }
-    else // old style syntax [mesh camera not supported]
+    else // old style syntax [mesh camera and user-defined camera not supported]
     {
         EXPECT
             CASE (PERSPECTIVE_TOKEN)
@@ -1782,7 +1863,7 @@ void Parser::Parse_Camera (Camera& Cam)
                 New.Type = PANORAMIC_CAMERA;
             END_CASE
 
-            CASE (MESH_CAMERA_TOKEN)
+            CASE2 (MESH_CAMERA_TOKEN, USER_DEFINED_TOKEN)
                 Error("This camera type not supported for language version < 3.5");
             END_CASE
 
@@ -4729,42 +4810,7 @@ ObjectPtr Parser::Parse_Parametric(void)
 
     Object = new Parametric();
 
-    EXPECT
-        CASE(FUNCTION_TOKEN)
-            Object->Function[0] = new FunctionVM::CustomFunction(fnVMContext->functionvm, Parse_Function());
-            EXIT
-        END_CASE
-        OTHERWISE
-            Object->Function[0] = new FunctionVM::CustomFunction(fnVMContext->functionvm, Parse_FunctionContent());
-            EXIT
-        END_CASE
-    END_EXPECT
-
-    Parse_Comma();
-
-    EXPECT
-        CASE(FUNCTION_TOKEN)
-            Object->Function[1] = new FunctionVM::CustomFunction(fnVMContext->functionvm, Parse_Function());
-            EXIT
-        END_CASE
-        OTHERWISE
-            Object->Function[1] = new FunctionVM::CustomFunction(fnVMContext->functionvm, Parse_FunctionContent());
-            EXIT
-        END_CASE
-    END_EXPECT
-
-    Parse_Comma();
-
-    EXPECT
-        CASE(FUNCTION_TOKEN)
-            Object->Function[2] = new FunctionVM::CustomFunction(fnVMContext->functionvm, Parse_Function());
-            EXIT
-        END_CASE
-        OTHERWISE
-            Object->Function[2] = new FunctionVM::CustomFunction(fnVMContext->functionvm, Parse_FunctionContent());
-            EXIT
-        END_CASE
-    END_EXPECT
+    Parse_FunctionOrContentList(Object->Function, 3);
 
     Parse_UV_Vect(tempUV);
     Object->umin = tempUV[U];

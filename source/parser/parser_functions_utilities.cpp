@@ -150,6 +150,32 @@ FUNCTION_PTR Parser::Parse_FunctionContent(void)
 }
 
 
+FUNCTION_PTR Parser::Parse_FunctionOrContent(void)
+{
+    EXPECT
+        CASE(FUNCTION_TOKEN)
+            return Parse_Function();
+            EXIT
+        END_CASE
+        OTHERWISE
+            return Parse_FunctionContent();
+            EXIT
+        END_CASE
+    END_EXPECT
+}
+
+
+void Parser::Parse_FunctionOrContentList(GenericScalarFunctionPtr* apFn, unsigned int count)
+{
+    for (unsigned int i = 0; i < count; ++i)
+    {
+        if (i > 0)
+            Parse_Comma();
+        apFn[i] = new FunctionVM::CustomFunction(fnVMContext->functionvm, Parse_FunctionOrContent());
+    }
+}
+
+
 /*****************************************************************************
 *
 * FUNCTION

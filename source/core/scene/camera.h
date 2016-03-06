@@ -63,6 +63,7 @@ namespace pov
 #define CYL_4_CAMERA           10
 #define SPHERICAL_CAMERA       11
 #define MESH_CAMERA            12
+#define USER_DEFINED_CAMERA    13
 
 /*****************************************************************************
 * Global typedefs
@@ -90,6 +91,8 @@ public:
     TNORMAL *Tnormal;               // Primary ray pertubation.
     TRANSFORM *Trans;               // Used only to record the user's input
     PIGMENT *Bokeh;                 // Pigment to use for the bokeh
+    GenericScalarFunctionPtr Location_Fn[3];  // [USER_DEFINED_CAMERA] Set of functions defining the ray's origin for each screen position.
+    GenericScalarFunctionPtr Direction_Fn[3]; // [USER_DEFINED_CAMERA] Set of functions defining the ray's direction for each screen position.
 
     // the following declarations are used for the mesh camera
     unsigned int Face_Distribution_Method;  // how to associate a pixel to a face within a mesh

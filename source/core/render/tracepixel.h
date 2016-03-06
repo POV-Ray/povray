@@ -128,6 +128,9 @@ class TracePixel : public Trace
         /// whether this is just a pretrace, allowing some computations to be skipped
         bool pretrace;
 
+        /// Function execution context for user-defined camera
+        GenericFunctionContextPtr mpFunctionContext;
+
         bool CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, size_t ray_number);
 
         void InitRayContainerState(Ray& ray, bool compute = false);

@@ -566,6 +566,33 @@ class GenericCustomFunction
         virtual RETURN_T Execute(GenericFunctionContextPtr pContext) = 0;
         virtual GenericCustomFunction* Clone() const = 0;
         virtual const FunctionSourceInfo* GetSourceInfo() const { return NULL; }
+
+        template<typename T1>
+        inline RETURN_T Execute(GenericFunctionContextPtr pContext, T1 arg1)
+        {
+            InitArguments(pContext);
+            PushArgument(pContext, arg1);
+            return Execute(pContext);
+        }
+
+        template<typename T1, typename T2>
+        inline RETURN_T Execute(GenericFunctionContextPtr pContext, T1 arg1, T2 arg2)
+        {
+            InitArguments(pContext);
+            PushArgument(pContext, arg1);
+            PushArgument(pContext, arg2);
+            return Execute(pContext);
+        }
+
+        template<typename T1, typename T2, typename T3>
+        inline RETURN_T Execute(GenericFunctionContextPtr pContext, T1 arg1, T2 arg2, T3 arg3)
+        {
+            InitArguments(pContext);
+            PushArgument(pContext, arg1);
+            PushArgument(pContext, arg2);
+            PushArgument(pContext, arg3);
+            return Execute(pContext);
+        }
 };
 
 typedef GenericCustomFunction<double, double> GenericScalarFunction;
