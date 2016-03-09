@@ -2144,6 +2144,18 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
             Set_Flag(New, DONT_SCALE_BUMPS_FLAG);
         END_CASE
 
+        CASE (REPEAT_TOKEN)
+            if (!dynamic_cast<CracklePattern*>(New->pattern.get()))
+                Only_In("repeat","crackle");
+            Parse_Vector(Local_Vector);
+            dynamic_cast<CracklePattern*>(New->pattern.get())->repeat = IntVector3d(Local_Vector);
+            if((dynamic_cast<CracklePattern*>(New->pattern.get())->repeat.x() < 0) ||
+               (dynamic_cast<CracklePattern*>(New->pattern.get())->repeat.y() < 0) ||
+               (dynamic_cast<CracklePattern*>(New->pattern.get())->repeat.z() < 0))
+                Error("Repeat vector must be non-negative.");
+            EXIT
+        END_CASE
+
         OTHERWISE
             UNGET
             EXIT

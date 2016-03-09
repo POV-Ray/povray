@@ -425,6 +425,7 @@ struct CracklePattern : public ContinuousPattern
     DBL crackleMetric;
     DBL crackleOffset;
     short crackleIsSolid;
+    IntVector3d repeat;
 
     virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
     virtual DBL EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const;
@@ -972,8 +973,13 @@ class CrackleCellCoord
 {
 public:
 
-    CrackleCellCoord() : mX(0), mY(0), mZ(0) {}
-    CrackleCellCoord(int x, int y, int z) : mX(x), mY(y), mZ(z) {}
+    CrackleCellCoord() : mX(0), mY(0), mZ(0), mRepeatX(0), mRepeatY(0), mRepeatZ(0) {}
+    CrackleCellCoord(int x, int y, int z, int rx, int ry, int rz) : mX(x), mY(y), mZ(z), mRepeatX(rx), mRepeatY(ry), mRepeatZ(rz)
+    {
+        WrapCellCoordinate(mX, mRepeatX);
+        WrapCellCoordinate(mY, mRepeatY);
+        WrapCellCoordinate(mZ, mRepeatZ);
+    }
 
     bool operator==(CrackleCellCoord const& other) const
     {
@@ -1003,6 +1009,18 @@ protected:
     int mX;
     int mY;
     int mZ;
+    int mRepeatX;
+    int mRepeatY;
+    int mRepeatZ;
+
+    static inline void WrapCellCoordinate(int& v, int& repeat)
+    {
+        if (!repeat)
+            return;
+        v = wrapInt(v, repeat);
+        if ((v >= 2) && (v < repeat - 2))
+            repeat = 0;
+    }
 };
 
 /// Helper class to implement the crackle cache.

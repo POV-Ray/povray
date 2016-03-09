@@ -39,6 +39,8 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "base/configbase.h"
 
+#include <assert.h>
+
 #include "base/types.h"
 
 namespace pov_base
@@ -88,7 +90,7 @@ inline T forcePrecision(T val)
     return tempVal;
 }
 
-// wrap value into the range [0..upperLimit);
+// wrap floating-point value into the range [0..upperLimit);
 // (this is equivalent to fmod() for positive values, but not for negative ones)
 template<typename T>
 inline T wrap(T val, T upperLimit)
@@ -112,6 +114,26 @@ inline T wrap(T val, T upperLimit)
 
     // sanity check; this should never kick in, unless wrap() has an implementation error.
     POV_MATHUTIL_ASSERT((tempVal >= 0.0) && (tempVal < upperLimit));
+
+    return tempVal;
+}
+
+// wrap signed integer value into the range [0..upperLimit);
+// (this is equivalent to the modulus operator for positive values, but not for negative ones)
+template<typename T>
+inline T wrapInt(T val, T upperLimit)
+{
+    T tempVal = val % upperLimit;
+
+    if (tempVal < T(0))
+    {
+        // For negative values, the modulus operator may return a value in the range [1-upperLimit..-1];
+        // transpose such results into the range [1..upperLimit-1].
+        tempVal += upperLimit;
+    }
+
+    // sanity check; this should never kick in, unless wrapInt() has an implementation error.
+    POV_MATHUTIL_ASSERT((tempVal >= 0) && (tempVal < upperLimit));
 
     return tempVal;
 }

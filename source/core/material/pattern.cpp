@@ -5518,6 +5518,7 @@ static int IntPickInCube(int tvx, int tvy, int tvz, Vector3d& p1);
 
 DBL CracklePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
+    Vector3d tmpPoint = EPoint;
     DBL sum, minsum, minsum2, minsum3, tf;
     int minVecIdx = 0;
     Vector3d dv;
@@ -5527,22 +5528,29 @@ DBL CracklePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIse
     bool UseSquare = ( crackleMetric == 2);
     bool UseUnity  = ( crackleMetric == 1);
 
+    if (repeat.x())
+        tmpPoint.x() = wrap(tmpPoint.x(), DBL(repeat.x()));
+    if (repeat.y())
+        tmpPoint.y() = wrap(tmpPoint.y(), DBL(repeat.y()));
+    if (repeat.z())
+        tmpPoint.z() = wrap(tmpPoint.z(), DBL(repeat.z()));
+
     /*
      * This uses floor() not FLOOR, so it will not be a mirror
      * image about zero in the range -1.0 to 1.0. The viewer
      * won't see an artefact around the origin.
      */
 
-    flox = (int)floor(EPoint[X] - EPSILON);
-    floy = (int)floor(EPoint[Y] - EPSILON);
-    floz = (int)floor(EPoint[Z] - EPSILON);
+    flox = (int)floor(tmpPoint[X] - EPSILON);
+    floy = (int)floor(tmpPoint[Y] - EPSILON);
+    floz = (int)floor(tmpPoint[Z] - EPSILON);
 
     /*
      * Check to see if the input point is in the same unit cube as the last
      * call to this function, to use cache of cubelets for speed.
      */
 
-    CrackleCellCoord ccoord(flox, floy, floz);
+    CrackleCellCoord ccoord(flox, floy, floz, repeat.x(), repeat.y(), repeat.z());
     pThread->Stats()[CrackleCache_Tests]++;
 
     CrackleCacheEntry dummy_entry;
@@ -5580,7 +5588,32 @@ DBL CracklePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIse
         // see InitializeCrackleCubes() below.
         int *pc = gaCrackleCubeTable;
         for (int i = 0; i < 81; i++, pc += 3)
-            IntPickInCube(flox + pc[X], floy + pc[Y], floz + pc[Z], entry->aCellNuclei[i]);
+        {
+            Vector3d wrappingOffset(0.0);
+            int cacheX = flox + pc[X];
+            int cacheY = floy + pc[Y];
+            int cacheZ = floz + pc[Z];
+            if (repeat.x())
+            {
+                int wrapped = wrapInt(cacheX, repeat.x());
+                wrappingOffset.x() += (cacheX - wrapped);
+                cacheX = wrapped;
+            }
+            if (repeat.y())
+            {
+                int wrapped = wrapInt(cacheY, repeat.y());
+                wrappingOffset.y() += (cacheY - wrapped);
+                cacheY = wrapped;
+            }
+            if (repeat.z())
+            {
+                int wrapped = wrapInt(cacheZ, repeat.z());
+                wrappingOffset.z() += (cacheZ - wrapped);
+                cacheZ = wrapped;
+            }
+            IntPickInCube(cacheX, cacheY, cacheZ, entry->aCellNuclei[i]);
+            entry->aCellNuclei[i] += wrappingOffset;
+        }
     }
     else
     {
@@ -5590,26 +5623,26 @@ DBL CracklePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIse
 
     // Find the 3 points with the 3 shortest distances from the input point.
     // Set up the loop so the invariant is true:  minsum <= minsum2 <= minsum3
-    dv = entry->aCellNuclei[0] - EPoint;
+    dv = entry->aCellNuclei[0] - tmpPoint;
 
     if(UseSquare)
     {
         minsum = dv.lengthSqr();
 
-        dv = entry->aCellNuclei[1] - EPoint;
+        dv = entry->aCellNuclei[1] - tmpPoint;
         minsum2 = dv.lengthSqr();
 
-        dv = entry->aCellNuclei[2] - EPoint;
+        dv = entry->aCellNuclei[2] - tmpPoint;
         minsum3  = dv.lengthSqr();
     }
     else if(UseUnity)
     {
         minsum = fabs(dv[X]) + fabs(dv[Y]) + fabs(dv[Z]);
 
-        dv = entry->aCellNuclei[1] - EPoint;
+        dv = entry->aCellNuclei[1] - tmpPoint;
         minsum2 = fabs(dv[X]) + fabs(dv[Y]) + fabs(dv[Z]);
 
-        dv = entry->aCellNuclei[2] - EPoint;
+        dv = entry->aCellNuclei[2] - tmpPoint;
         minsum3 = fabs(dv[X]) + fabs(dv[Y]) + fabs(dv[Z]);
     }
     else
@@ -5618,12 +5651,12 @@ DBL CracklePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIse
                  pow(fabs(dv[Y]), crackleMetric) +
                  pow(fabs(dv[Z]), crackleMetric);
 
-        dv = entry->aCellNuclei[1] - EPoint;
+        dv = entry->aCellNuclei[1] - tmpPoint;
         minsum2 = pow(fabs(dv[X]), crackleMetric) +
                   pow(fabs(dv[Y]), crackleMetric) +
                   pow(fabs(dv[Z]), crackleMetric);
 
-        dv = entry->aCellNuclei[2] - EPoint;
+        dv = entry->aCellNuclei[2] - tmpPoint;
         minsum3 = pow(fabs(dv[X]), crackleMetric) +
                   pow(fabs(dv[Y]), crackleMetric) +
                   pow(fabs(dv[Z]), crackleMetric);
@@ -5650,7 +5683,7 @@ DBL CracklePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIse
     // Loop for the 81 cubelets to find closest and 2nd closest.
     for(int i = 3; i < 81; i++)
     {
-        dv = entry->aCellNuclei[i] - EPoint;
+        dv = entry->aCellNuclei[i] - tmpPoint;
 
         if(UseSquare)
             sum = dv.lengthSqr();

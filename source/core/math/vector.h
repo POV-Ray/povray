@@ -576,6 +576,7 @@ typedef GenericVector2d<SNGL> SnglVector2d; ///< Single-precision 2D vector.
 
 typedef GenericVector3d<DBL> Vector3d;      ///< Double-precision 3D vector.
 typedef GenericVector3d<SNGL> SnglVector3d; ///< Single-precision 3D vector.
+typedef GenericVector3d<int> IntVector3d;   ///< Integer 3D vector.
 
 typedef Vector3d Matrix3x3[3];              ///< Double-precision 3x3 matrix.
 
