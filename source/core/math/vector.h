@@ -314,8 +314,8 @@ class GenericVector2d
         }
         inline bool IsNearNull(T epsilon) const
         {
-            return (abs(vect[X]) < epsilon) &&
-                   (abs(vect[Y]) < epsilon);
+            return (fabs(vect[X]) < epsilon) &&
+                   (fabs(vect[Y]) < epsilon);
         }
         inline GenericVector2d normalized() const
         {
@@ -540,9 +540,9 @@ class GenericVector3d
         }
         inline bool IsNearNull(T epsilon) const
         {
-            return (abs(vect[X]) < epsilon) &&
-                   (abs(vect[Y]) < epsilon) &&
-                   (abs(vect[Z]) < epsilon);
+            return (fabs(vect[X]) < epsilon) &&
+                   (fabs(vect[Y]) < epsilon) &&
+                   (fabs(vect[Z]) < epsilon);
         }
         inline GenericVector3d normalized() const
         {
