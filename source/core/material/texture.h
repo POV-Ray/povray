@@ -118,6 +118,32 @@ struct Texture_Struct : public Pattern_Struct
 struct Finish_Struct
 {
     SNGL Diffuse, DiffuseBack, Brilliance, BrillianceOut, BrillianceAdjust, BrillianceAdjustRad;
+
+    /// How much of the diffuse contribution should be computed using the Lommel-Seeliger model.
+    ///
+    /// By default, POV-Ray uses a Lambertian-based diffuse reflectivity model. While this model is useful for
+    /// comparatively smooth surfaces, rough surfaces are better simulated using other models, one of the simplest
+    /// being the Lommel-Seeliger model. In astronomy, a weighted average of the Lambertian and Lommel-Seeliger models
+    /// is frequently used.
+    SNGL LommelSeeligerWeight;
+
+    /// @name Oren-Nayar diffuse model parameters.
+    ///
+    /// By default, POV-Ray uses a Lambertian-based diffuse reflectivity model. While this model is useful for
+    /// comparatively smooth surfaces, rough surfaces are better simulated using other models, one of which is the
+    /// (simplified) Oren-Nayar model, being a superset of the Lambertian model and governed by the following
+    /// parameters.
+    ///
+    /// @{
+
+    /// Factor A of the simplified Oren-Nayar model, defaulting to 1.0 for the Lambertian model.
+    SNGL OrenNayarA;
+
+    /// Factor B of the simplified Oren-Nayar model, defaulting to 0.0 for the Lambertian model.
+    SNGL OrenNayarB;
+
+    /// @}
+
     SNGL Specular, Roughness;
     SNGL Phong, Phong_Size;
     SNGL Irid, Irid_Film_Thickness, Irid_Turb;
@@ -129,9 +155,16 @@ struct Finish_Struct
     SNGL Reflection_Falloff;  // Added by MBP 8/27/98
     bool Reflection_Fresnel;
     bool Fresnel;
-    SNGL Reflect_Metallic; // MBP
-    int Conserve_Energy;  // added by NK Dec 19 1999
-    bool UseSubsurface;   // whether to use subsurface light transport
+    SNGL Reflect_Metallic;  // MBP
+    int Conserve_Energy;    // added by NK Dec 19 1999
+    bool UseSubsurface;     // whether to use subsurface light transport
+
+    void SetOrenNayarSigma(double sigma)
+    {
+        double sigmaSqr = sigma*sigma;
+        OrenNayarA = 1.0 - 0.50 * sigmaSqr / (sigmaSqr + 0.57);
+        OrenNayarB =       0.45 * sigmaSqr / (sigmaSqr + 0.09);
+    }
 };
 
 

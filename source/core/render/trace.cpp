@@ -2373,19 +2373,37 @@ void Trace::ComputeShadowColour(const LightSource &lightsource, Intersection& is
 void Trace::ComputeDiffuseColour(const FINISH *finish, const Vector3d& lightDirection, const Vector3d& eyeDirection, const Vector3d& layer_normal, MathColour& colour, const MathColour& light_colour,
                                  const MathColour& layer_pigment_colour, double relativeIor, double attenuation, bool backside)
 {
-    double cos_angle_of_incidence, intensity;
+    double cos_in, cos_out, intensity;
     double diffuse = (backside? finish->DiffuseBack : finish->Diffuse) * finish->BrillianceAdjust;
 
     if (diffuse <= 0.0)
         return;
 
-    cos_angle_of_incidence = dot(layer_normal, lightDirection);
+    cos_in = dot(layer_normal, lightDirection);
 
     // Brilliance is likely to be 1.0 (default value)
     if(finish->Brilliance != 1.0)
-        intensity = pow(fabs(cos_angle_of_incidence), (double) finish->Brilliance);
+        intensity = pow(fabs(cos_in), (double) finish->Brilliance);
     else
-        intensity = fabs(cos_angle_of_incidence);
+        intensity = fabs(cos_in);
+
+    if (finish->Fresnel || (finish->LommelSeeligerWeight != 0.0) || (finish->OrenNayarB != 0.0))
+        cos_out = -dot(layer_normal, eyeDirection);
+
+    if (finish->LommelSeeligerWeight != 0.0)
+        intensity *= (1.0 - finish->LommelSeeligerWeight + finish->LommelSeeligerWeight / (cos_in + cos_out));
+
+    if (finish->OrenNayarB != 0.0)
+    {
+        Vector3d projected_in  = lightDirection - layer_normal * cos_in;
+        Vector3d projected_out = -eyeDirection  - layer_normal * cos_out;
+        double cos_phi = dot(projected_in, projected_out);
+        double theta_in  = acos(cos_in);
+        double theta_out = acos(cos_out);
+        double alpha = max(theta_in, theta_out);
+        double beta  = min(theta_in, theta_out);
+        intensity *= (finish->OrenNayarA + finish->OrenNayarB*max(0.0,cos_phi)*sin(alpha)*tan(beta));
+    }
 
     intensity *= diffuse * attenuation;
 
@@ -2395,9 +2413,8 @@ void Trace::ComputeDiffuseColour(const FINISH *finish, const Vector3d& lightDire
     if (finish->Fresnel)
     {
         MathColour cs1, cs2;
-        ComputeFresnel(cs1, MathColour(0.0), MathColour(1.0), cos_angle_of_incidence, relativeIor);
-        cos_angle_of_incidence = -dot(layer_normal, eyeDirection);
-        ComputeFresnel(cs2, MathColour(0.0), MathColour(1.0), cos_angle_of_incidence, relativeIor);
+        ComputeFresnel(cs1, MathColour(0.0), MathColour(1.0), cos_in,  relativeIor);
+        ComputeFresnel(cs2, MathColour(0.0), MathColour(1.0), cos_out, relativeIor);
         colour += intensity * layer_pigment_colour * light_colour * cs1 * cs2;
     }
     else
