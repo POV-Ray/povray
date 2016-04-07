@@ -882,7 +882,7 @@ void Trace::ComputeLightedTexture(MathColour& resultColour, ColourChannel& resul
 
                 if (sceneData->radiositySettings.brilliance)
                 {
-                    diffuse    *= layer->Finish->BrillianceAdjustRad;
+                    diffuse    *= layer->Finish->DiffuseAlbedoAdjustRad;
                     brilliance =  layer->Finish->Brilliance;
                 }
 
@@ -909,7 +909,7 @@ void Trace::ComputeLightedTexture(MathColour& resultColour, ColourChannel& resul
 
                 diffuse = layer->Finish->DiffuseBack;
                 if (sceneData->radiositySettings.brilliance)
-                    diffuse *= layer->Finish->BrillianceAdjustRad;
+                    diffuse *= layer->Finish->DiffuseAlbedoAdjustRad;
 
                 // if backside radiosity calculation needed, but not yet done, do it now
                 // TODO FIXME - [CLi] with "normal on", shouldn't we compute radiosity for each layer separately (if it has pertubed normals)?
@@ -2374,35 +2374,40 @@ void Trace::ComputeDiffuseColour(const FINISH *finish, const Vector3d& lightDire
                                  const MathColour& layer_pigment_colour, double relativeIor, double attenuation, bool backside)
 {
     double cos_in, cos_out, intensity;
-    double diffuse = (backside? finish->DiffuseBack : finish->Diffuse) * finish->BrillianceAdjust;
+    double diffuse = (backside? finish->DiffuseBack : finish->Diffuse) * finish->DiffuseAlbedoAdjust;
 
     if (diffuse <= 0.0)
         return;
 
-    cos_in = dot(layer_normal, lightDirection);
+    cos_in = fabs(dot(layer_normal, lightDirection));
 
     // Brilliance is likely to be 1.0 (default value)
     if(finish->Brilliance != 1.0)
-        intensity = pow(fabs(cos_in), (double) finish->Brilliance);
+        intensity = pow(cos_in, (double) finish->Brilliance);
     else
-        intensity = fabs(cos_in);
+        intensity = cos_in;
 
     if (finish->Fresnel || (finish->LommelSeeligerWeight != 0.0) || (finish->OrenNayarB != 0.0))
-        cos_out = -dot(layer_normal, eyeDirection);
+        cos_out = fabs(dot(layer_normal, eyeDirection));
 
-    if (finish->LommelSeeligerWeight != 0.0)
-        intensity *= (1.0 - finish->LommelSeeligerWeight + finish->LommelSeeligerWeight / (cos_in + cos_out));
-
+    if (finish->OrenNayarA != 1.0)
+        intensity *= finish->OrenNayarA;
     if (finish->OrenNayarB != 0.0)
     {
-        Vector3d projected_in  = lightDirection - layer_normal * cos_in;
-        Vector3d projected_out = -eyeDirection  - layer_normal * cos_out;
+        Vector3d projected_in  = (lightDirection - layer_normal * cos_in ).normalized();
+        Vector3d projected_out = (-eyeDirection  - layer_normal * cos_out).normalized();
         double cos_phi = dot(projected_in, projected_out);
         double theta_in  = acos(cos_in);
         double theta_out = acos(cos_out);
         double alpha = max(theta_in, theta_out);
         double beta  = min(theta_in, theta_out);
-        intensity *= (finish->OrenNayarA + finish->OrenNayarB*max(0.0,cos_phi)*sin(alpha)*tan(beta));
+        intensity += finish->OrenNayarB * cos_in * max(0.0,cos_phi) * sin(alpha) * tan(beta);
+    }
+
+    if (finish->LommelSeeligerWeight != 0.0)
+    {
+        intensity *= (1.0 - finish->LommelSeeligerWeight);
+        intensity += finish->LommelSeeligerWeight * cos_in / (cos_in + cos_out);
     }
 
     intensity *= diffuse * attenuation;

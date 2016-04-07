@@ -117,7 +117,7 @@ struct Texture_Struct : public Pattern_Struct
 
 struct Finish_Struct
 {
-    SNGL Diffuse, DiffuseBack, Brilliance, BrillianceOut, BrillianceAdjust, BrillianceAdjustRad;
+    SNGL Diffuse, DiffuseBack, Brilliance, BrillianceOut, DiffuseAlbedoAdjust, DiffuseAlbedoAdjustRad;
 
     /// How much of the diffuse contribution should be computed using the Lommel-Seeliger model.
     ///

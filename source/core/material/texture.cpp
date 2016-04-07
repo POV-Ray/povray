@@ -1159,8 +1159,8 @@ FINISH *Create_Finish()
     New->DiffuseBack                = 0.0;
     New->Brilliance                 = 1.0;
     New->BrillianceOut              = 1.0;
-    New->BrillianceAdjust           = 1.0;
-    New->BrillianceAdjustRad        = 1.0;
+    New->DiffuseAlbedoAdjust        = 1.0;
+    New->DiffuseAlbedoAdjustRad     = 1.0;
     New->LommelSeeligerWeight       = 0.0;
     New->OrenNayarA                 = 1.0;
     New->OrenNayarB                 = 0.0;

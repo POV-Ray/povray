@@ -2616,10 +2616,6 @@ void Parser::Parse_Finish (FINISH **Finish_Ptr)
             PossibleError("Finish-level 'fresnel' keyword found in combination with the Oren-Nayar diffuse model."
                           " The interaction of these features has not been finalized yet, and is known to be bogus."
                           " Expect future versions of POV-Ray to render this scene differently without warning.");
-        if (diffuseAdjust)
-            PossibleError("'diffuse albedo' found in combination with the Oren-Nayar diffuse model."
-                          " The interaction of these features has not been finalized yet."
-                          " Expect future versions of POV-Ray to render this scene differently without warning.");
     }
 
     if (New->LommelSeeligerWeight != 0.0)
@@ -2627,10 +2623,6 @@ void Parser::Parse_Finish (FINISH **Finish_Ptr)
         if (New->Fresnel)
             PossibleError("Finish-level 'fresnel' keyword found in combination with the Lommel-Seeliger diffuse model."
                           " The interaction of these features has not been finalized yet, and is known to be bogus."
-                          " Expect future versions of POV-Ray to render this scene differently without warning.");
-        if (diffuseAdjust)
-            PossibleError("'diffuse albedo' found in combination with the Lommel_Seeliger diffuse model."
-                          " The interaction of these features has not been finalized yet."
                           " Expect future versions of POV-Ray to render this scene differently without warning.");
     }
 
@@ -2659,15 +2651,25 @@ void Parser::Parse_Finish (FINISH **Finish_Ptr)
     // adjust diffuse, phong and/or specular intensity parameters
     // so that a user-specified value of 1.0 corresponds to a
     // backscattering of 100% of the incoming light
+    double EffectiveBiHemisphericalAlbedo = 2.0 / (New->Brilliance + 1.0);
+    if (New->OrenNayarA != 1.0)
+        EffectiveBiHemisphericalAlbedo *= New->OrenNayarA;
+    if (New->OrenNayarB != 0.0)
+        EffectiveBiHemisphericalAlbedo += New->OrenNayarB * (2.0/3.0 - (64.0/45.0)*(1.0/M_PI));
+    if (New->LommelSeeligerWeight != 0.0)
+    {
+        EffectiveBiHemisphericalAlbedo *= (1.0 - New->LommelSeeligerWeight);
+        EffectiveBiHemisphericalAlbedo += New->LommelSeeligerWeight * ((8.0 * (1.0-log(2.0))) / 3.0);
+    }
     if (diffuseAdjust)
     {
-        New->BrillianceAdjust    = (New->Brilliance + 1.0) / 2.0;
-        New->BrillianceAdjustRad = 1.0;
+        New->DiffuseAlbedoAdjust    = 1.0 / EffectiveBiHemisphericalAlbedo;
+        New->DiffuseAlbedoAdjustRad = 1.0;
     }
     else
     {
-        New->BrillianceAdjust    = 1.0;
-        New->BrillianceAdjustRad = 2.0 / (New->Brilliance + 1.0);
+        New->DiffuseAlbedoAdjust    = 1.0;
+        New->DiffuseAlbedoAdjustRad = EffectiveBiHemisphericalAlbedo;
     }
     if (phongAdjust)
         New->Phong *= (New->Phong_Size + 1.0) / 2.0;
