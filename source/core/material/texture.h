@@ -161,7 +161,10 @@ struct Finish_Struct
 
     void SetOrenNayarSigma(double sigma)
     {
-        double sigmaSqr = sigma*sigma;
+        SetOrenNayarSigmaSqr(sigma*sigma);
+    }
+    void SetOrenNayarSigmaSqr(double sigmaSqr)
+    {
         OrenNayarA = 1.0 - 0.50 * sigmaSqr / (sigmaSqr + 0.57);
         OrenNayarB =       0.45 * sigmaSqr / (sigmaSqr + 0.09);
     }

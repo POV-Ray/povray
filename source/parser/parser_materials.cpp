@@ -2651,25 +2651,25 @@ void Parser::Parse_Finish (FINISH **Finish_Ptr)
     // adjust diffuse, phong and/or specular intensity parameters
     // so that a user-specified value of 1.0 corresponds to a
     // backscattering of 100% of the incoming light
-    double EffectiveBiHemisphericalAlbedo = 2.0 / (New->Brilliance + 1.0);
+    double EffectiveBihemisphericalReflectance = 2.0 / (New->Brilliance + 1.0);
     if (New->OrenNayarA != 1.0)
-        EffectiveBiHemisphericalAlbedo *= New->OrenNayarA;
+        EffectiveBihemisphericalReflectance *= New->OrenNayarA;
     if (New->OrenNayarB != 0.0)
-        EffectiveBiHemisphericalAlbedo += New->OrenNayarB * (2.0/3.0 - (64.0/45.0)*(1.0/M_PI));
+        EffectiveBihemisphericalReflectance += New->OrenNayarB * (2.0/3.0 - (64.0/45.0)*(1.0/M_PI));
     if (New->LommelSeeligerWeight != 0.0)
     {
-        EffectiveBiHemisphericalAlbedo *= (1.0 - New->LommelSeeligerWeight);
-        EffectiveBiHemisphericalAlbedo += New->LommelSeeligerWeight * ((8.0 * (1.0-log(2.0))) / 3.0);
+        EffectiveBihemisphericalReflectance *= (1.0 - New->LommelSeeligerWeight);
+        EffectiveBihemisphericalReflectance += New->LommelSeeligerWeight * ((8.0 * (1.0-log(2.0))) / 3.0);
     }
     if (diffuseAdjust)
     {
-        New->DiffuseAlbedoAdjust    = 1.0 / EffectiveBiHemisphericalAlbedo;
+        New->DiffuseAlbedoAdjust    = 1.0 / EffectiveBihemisphericalReflectance;
         New->DiffuseAlbedoAdjustRad = 1.0;
     }
     else
     {
         New->DiffuseAlbedoAdjust    = 1.0;
-        New->DiffuseAlbedoAdjustRad = EffectiveBiHemisphericalAlbedo;
+        New->DiffuseAlbedoAdjustRad = EffectiveBihemisphericalReflectance;
     }
     if (phongAdjust)
         New->Phong *= (New->Phong_Size + 1.0) / 2.0;
