@@ -290,6 +290,8 @@ void Parser::Run()
         strcat(str, str [0] ? ", function '.hf'" : "function '.hf'");
     if(mExperimentalFlags.meshCamera)
         strcat(str, str [0] ? ", mesh camera" : "mesh camera");
+    if(mExperimentalFlags.tonemapping)
+        strcat(str, str [0] ? ", tonemapping" : "tonemapping");
     if(mExperimentalFlags.slopeAltitude)
         strcat(str, str [0] ? ", slope pattern altitude" : "slope pattern altitude");
     if(mExperimentalFlags.spline)
@@ -7413,6 +7415,115 @@ void Parser::Parse_Global_Settings()
                     EXIT
                 END_CASE
             END_EXPECT
+            Parse_End();
+        END_CASE
+
+        CASE (TONEMAPPING_TOKEN)
+            mExperimentalFlags.tonemapping = true;
+            Parse_Begin();
+            {
+                unsigned int numChannels = 0;
+                unsigned int numParameters;
+                DataChannelId parameterId;
+                sceneData->tonemappingParameters.clear();
+                sceneData->tonemappingParameters.push_back(kDataChannelCurrent);
+                GenericScalarFunctionPtr pFn = NULL;
+                vector<GenericScalarFunctionPtr> apFn;
+                EXPECT
+                    CASE (PARAMETERS_TOKEN)
+                        sceneData->tonemappingParameters.clear();
+                        Parse_Begin();
+                        EXPECT
+                            CASE (COLOUR_KEY_TOKEN)
+                                switch(Token.Function_Id)
+                                {
+                                    case RED_TOKEN:         parameterId = kDataChannelRed;      break;
+                                    case GREEN_TOKEN:       parameterId = kDataChannelGreen;    break;
+                                    case BLUE_TOKEN:        parameterId = kDataChannelBlue;     break;
+                                    case GRAY_TOKEN:        parameterId = kDataChannelGray;     break;
+                                    case TRANSMIT_TOKEN:    parameterId = kDataChannelTransmit; break;
+                                    default:                parameterId = kDataChannelIdCount;  break;  // indicates an invalid keyword
+                                }
+                                if (parameterId == kDataChannelIdCount)
+                                {
+                                    UNGET
+                                    EXIT
+                                }
+                                sceneData->tonemappingParameters.push_back(parameterId);
+                                Parse_Comma();
+                            END_CASE
+                            CASE (VECTOR_FUNCT_TOKEN)
+                                switch(Token.Function_Id)
+                                {
+                                    case X_TOKEN:           parameterId = kDataChannelX;        break;
+                                    case Y_TOKEN:           parameterId = kDataChannelY;        break;
+                                    default:                parameterId = kDataChannelIdCount;  break;  // indicates an invalid keyword
+                                }
+                                if (parameterId == kDataChannelIdCount)
+                                {
+                                    UNGET
+                                    EXIT
+                                }
+                                sceneData->tonemappingParameters.push_back(parameterId);
+                                Parse_Comma();
+                            END_CASE
+                            CASE (CHANNEL_TOKEN)
+                                sceneData->tonemappingParameters.push_back(kDataChannelCurrent);
+                                Parse_Comma();
+                            END_CASE
+                            OTHERWISE
+                                UNGET
+                                EXIT
+                            END_CASE
+                        END_EXPECT
+                        Parse_End();
+                    END_CASE
+                    CASE (FUNCTION_TOKEN)
+                        apFn.push_back(new FunctionVM::CustomFunction(fnVMContext->functionvm, Parse_Function(true)));
+                    END_CASE
+                    OTHERWISE
+                        UNGET
+                        EXIT
+                    END_CASE
+                END_EXPECT
+                switch (apFn.size())
+                {
+                    case 0:
+                        Error("Must have at least one function in tonemapping.");
+                        break;
+                    case 1:
+                        // If a single function is supplied, it is applied to all colour channels.
+                        sceneData->tonemappingFunctions[kResultChannelRed]      = apFn[0];
+                        sceneData->tonemappingFunctions[kResultChannelGreen]    = apFn[0]->Clone();
+                        sceneData->tonemappingFunctions[kResultChannelBlue]     = apFn[0]->Clone();
+                        sceneData->tonemappingFunctions[kResultChannelTransmit] = NULL;
+                        break;
+                    case 2:
+                        // If two functions are supplied, the first one is applied to all colour channels and the second to the transmit channel.
+                        sceneData->tonemappingFunctions[kResultChannelRed]      = apFn[0];
+                        sceneData->tonemappingFunctions[kResultChannelGreen]    = apFn[0]->Clone();
+                        sceneData->tonemappingFunctions[kResultChannelBlue]     = apFn[0]->Clone();
+                        sceneData->tonemappingFunctions[kResultChannelTransmit] = apFn[1];
+                        break;
+                    case 3:
+                        // If three functions are supplied, they are applied to the colour channels.
+                        sceneData->tonemappingFunctions[kResultChannelRed]      = apFn[0];
+                        sceneData->tonemappingFunctions[kResultChannelGreen]    = apFn[1];
+                        sceneData->tonemappingFunctions[kResultChannelBlue]     = apFn[2];
+                        sceneData->tonemappingFunctions[kResultChannelTransmit] = NULL;
+                        break;
+                    case 4:
+                        // If four functions are supplied, the first three are applied to the colour channels and the last one to the transmit channel.
+                        sceneData->tonemappingFunctions[kResultChannelRed]      = apFn[0];
+                        sceneData->tonemappingFunctions[kResultChannelGreen]    = apFn[1];
+                        sceneData->tonemappingFunctions[kResultChannelBlue]     = apFn[2];
+                        sceneData->tonemappingFunctions[kResultChannelTransmit] = apFn[3];
+                        break;
+                    default:
+                        Error("Too many functions in tonemapping.");
+                        break;
+                }
+            }
             Parse_End();
         END_CASE
 

@@ -100,6 +100,9 @@ SceneData::SceneData() :
     removeBounds = true;
 
     tree = NULL;
+
+    for (unsigned int i = 0; i < kResultChannelIdCount; ++i)
+        tonemappingFunctions[i] = NULL;
 }
 
 SceneData::~SceneData()
@@ -130,6 +133,10 @@ SceneData::~SceneData()
 
     if(tree != NULL)
         delete tree;
+
+    for (unsigned int i = 0; i < kResultChannelIdCount; ++i)
+        if (tonemappingFunctions[i])
+            delete tonemappingFunctions[i];
 }
 
 }

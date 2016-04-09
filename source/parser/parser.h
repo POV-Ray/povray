@@ -157,6 +157,7 @@ struct ExperimentalFlags
     bool    backsideIllumination    : 1;
     bool    functionHf              : 1;
     bool    meshCamera              : 1;
+    bool    tonemapping             : 1;
     bool    slopeAltitude           : 1;
     bool    spline                  : 1;
     bool    subsurface              : 1;
@@ -167,6 +168,7 @@ struct ExperimentalFlags
         backsideIllumination(false),
         functionHf(false),
         meshCamera(false),
+        tonemapping(false),
         slopeAltitude(false),
         spline(false),
         subsurface(false),
@@ -415,7 +417,7 @@ class Parser : public SceneTask
         DBL Parse_Signed_Float(void);
 
         // function.h/function.cpp
-        FUNCTION_PTR Parse_Function(void);
+        FUNCTION_PTR Parse_Function(bool allowParameters = false);
         FUNCTION_PTR Parse_FunctionContent(void);
         FUNCTION_PTR Parse_FunctionOrContent(void);
         void Parse_FunctionOrContentList(GenericScalarFunctionPtr* apFn, unsigned int count);

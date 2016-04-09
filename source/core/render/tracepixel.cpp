@@ -54,6 +54,7 @@
 #include "core/render/trace.h"
 #include "core/scene/object.h"
 #include "core/scene/scenedata.h"
+#include "core/scene/tracethreaddata.h"
 #include "core/shape/mesh.h"
 
 // this must be the last file included
@@ -308,6 +309,55 @@ void TracePixel::operator()(DBL x, DBL y, DBL width, DBL height, RGBTColour& col
     }
     else
         TraceRayWithFocalBlur(colour, x, y, width, height);
+
+    RGBTColour computedColour(colour);
+    for (int iResultChannel = 0; iResultChannel < kResultChannelIdCount; ++iResultChannel)
+    {
+        if (sceneData->tonemappingFunctions[iResultChannel])
+        {
+            sceneData->tonemappingFunctions[iResultChannel]->InitArguments(threadData->functionContext);
+            for (vector<DataChannelId>::iterator iParameter = sceneData->tonemappingParameters.begin(); iParameter != sceneData->tonemappingParameters.end(); ++iParameter)
+            {
+                COLC data;
+                switch (*iParameter)
+                {
+                    case kDataChannelRed:
+                    case kDataChannelGreen:
+                    case kDataChannelBlue:
+                        data = computedColour.rgb()[*iParameter];
+                        break;
+                    case kDataChannelTransmit:
+                        data = computedColour.transm();
+                        break;
+                    case kDataChannelCurrent:
+                        data = computedColour.rgb()[iResultChannel];
+                        break;
+                    case kDataChannelGray:
+                        data = computedColour.Greyscale();
+                        break;
+                    case kDataChannelX:
+                        data = x/width;
+                        break;
+                    case kDataChannelY:
+                        data = y/height;
+                        break;
+                }
+                sceneData->tonemappingFunctions[iResultChannel]->PushArgument(threadData->functionContext, data);
+            }
+            COLC result = sceneData->tonemappingFunctions[iResultChannel]->Execute(threadData->functionContext);
+            switch (iResultChannel)
+            {
+                case kDataChannelRed:
+                case kDataChannelGreen:
+                case kDataChannelBlue:
+                    colour.rgb()[iResultChannel] = result;
+                    break;
+                case kDataChannelTransmit:
+                    colour.transm() = result;
+                    break;
+            }
+        }
+    }
 }
 
 bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, size_t ray_number)

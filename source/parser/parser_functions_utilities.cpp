@@ -82,15 +82,17 @@ namespace pov
 *
 ******************************************************************************/
 
-FUNCTION_PTR Parser::Parse_Function(void)
+FUNCTION_PTR Parser::Parse_Function(bool allowParameters)
 {
     FUNCTION_PTR ptr = (FUNCTION_PTR)POV_MALLOC(sizeof(FUNCTION), "Function ID");
     ExprNode *expression = NULL;
     FunctionCode function;
+    FNCode f(this, &function, false, NULL);
+
+    if (allowParameters)
+        f.Parameter();
 
     Parse_Begin();
-
-    FNCode f(this, &function, false, NULL);
 
     expression = FNSyntax_ParseExpression();
     f.Compile(expression);

@@ -50,6 +50,30 @@ namespace pov
 
 using namespace pov_base;
 
+enum ResultChannelId
+{
+    // first three must match RGBColour channels
+    kResultChannelRed,
+    kResultChannelGreen,
+    kResultChannelBlue,
+    kResultChannelTransmit,
+    kResultChannelIdCount
+};
+
+enum DataChannelId
+{
+    // first three must match RGBColour channels
+    kDataChannelRed,
+    kDataChannelGreen,
+    kDataChannelBlue,
+    kDataChannelTransmit,
+    kDataChannelCurrent,
+    kDataChannelGray,
+    kDataChannelX,
+    kDataChannelY,
+    kDataChannelIdCount
+};
+
 class BSPTree;
 
 struct Fog_Struct;
@@ -218,6 +242,9 @@ class SceneData
         // BSP statistics // TODO - not sure if this is the best place for stats
         unsigned int nodes, splitNodes, objectNodes, emptyNodes, maxObjects, maxDepth, aborts;
         float averageObjects, averageDepth, averageAborts, averageAbortObjects;
+
+        GenericScalarFunctionPtr tonemappingFunctions[kResultChannelIdCount];
+        vector<DataChannelId>    tonemappingParameters;
 
         // ********************************************************************************
         // ********************************************************************************
