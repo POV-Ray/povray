@@ -554,6 +554,7 @@ const RESERVED_WORD Reserved_Words[LAST_TOKEN] = {
     {TANH_TOKEN, "tanh"},
     {TAN_TOKEN, "tan"},
     {TARGET_TOKEN, "target"},
+    {TAU_TOKEN, "tau"},
     {TEMPORARY_MACRO_ID_TOKEN, "unfinished macro declaration"},
     {TEXTURE_ID_TOKEN, "texture identifier"},
     {TEXTURE_LIST_TOKEN, "texture_list"},
