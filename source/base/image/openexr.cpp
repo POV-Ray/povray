@@ -94,7 +94,7 @@ class POV_EXR_OStream : public Imf::OStream
 
         void write(const char *c, int n)
         {
-            if(os.write(c, n) == false)
+            if((bool)(os.write(c, n)) == false)
                 throw POV_EXCEPTION(kFileDataErr, "Error while writing EXR output");
         }
 
@@ -108,7 +108,7 @@ class POV_EXR_OStream : public Imf::OStream
 
         void seekp(Int64 pos)
         {
-            if(os.seekg((unsigned long)pos) == false)
+            if((bool)(os.seekg((unsigned long)pos)) == false)
                 throw POV_EXCEPTION(kFileDataErr, "Error when writing EXR output");
         }
     private:
@@ -135,7 +135,7 @@ class POV_EXR_IStream : public Imf::IStream
 
         bool read(char *c, int n)
         {
-            if(is.read(c, n) == false)
+            if((bool)(is.read(c, n)) == false)
                 throw POV_EXCEPTION(kFileDataErr, "Error while reading EXR file");
             return (is.tellg() < fsize);
         }
@@ -150,7 +150,7 @@ class POV_EXR_IStream : public Imf::IStream
 
         void seekg(Int64 pos)
         {
-            if(is.seekg((unsigned long)pos) == false)
+            if((bool)(is.seekg((unsigned long)pos)) == false)
                 throw POV_EXCEPTION(kFileDataErr, "Error while reading EXR file");
         }
     private:

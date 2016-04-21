@@ -618,7 +618,7 @@ void RenderFrontendBase::NewBackup(POVMS_Object& ropts, ViewData& vd, const Path
             throw POV_EXCEPTION(kCannotOpenFileErr, "Cannot create render state output file.");
         memcpy(hdr.sig, RENDER_STATE_SIG, sizeof(hdr.sig));
         memcpy(hdr.ver, RENDER_STATE_VER, sizeof(hdr.ver));
-        if(vd.imageBackup->write(&hdr, sizeof(hdr)) == false)
+        if((bool)(vd.imageBackup->write(&hdr, sizeof(hdr))) == false)
             throw POV_EXCEPTION(kFileDataErr, "Cannot write header to render state output file.");
         vd.imageBackup->flush();
 
@@ -671,7 +671,7 @@ void RenderFrontendBase::ContinueBackup(POVMS_Object& ropts, ViewData& vd, ViewI
             POV_LONG end = inbuffer->tellg();
             inbuffer->seekg (0, IOBase::seek_set);
 
-            if (inbuffer->read (&hdr, sizeof (hdr)) == false)
+            if ((bool)(inbuffer->read (&hdr, sizeof (hdr))) == false)
                 throw POV_EXCEPTION(kFileDataErr, "Cannot read header from render state file.");
             if (memcmp (hdr.sig, RENDER_STATE_SIG, sizeof (hdr.sig)) != 0)
                 throw POV_EXCEPTION(kFileDataErr, "Render state file header appears to be invalid.");
