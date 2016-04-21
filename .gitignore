@@ -186,6 +186,7 @@ $RECYCLE.BIN/
 /source/Makefile.in
 /unix/Makefile.am
 /unix/Makefile.in
+/unix/config/compile
 /unix/config/config.guess
 /unix/config/config.sub
 /unix/config/depcomp
