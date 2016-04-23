@@ -558,45 +558,98 @@ struct FunctionSourceInfo
 template<typename RETURN_T, typename ARG_T>
 class GenericCustomFunction
 {
-    public:
-        virtual ~GenericCustomFunction() {}
-        virtual GenericFunctionContextPtr NewContext(TraceThreadData* pThreadData) = 0;
-        virtual void InitArguments(GenericFunctionContextPtr pContext) = 0;
-        virtual void PushArgument(GenericFunctionContextPtr pContext, ARG_T arg) = 0;
-        virtual RETURN_T Execute(GenericFunctionContextPtr pContext) = 0;
-        virtual GenericCustomFunction* Clone() const = 0;
-        virtual const FunctionSourceInfo* GetSourceInfo() const { return NULL; }
-
-        template<typename T1>
-        inline RETURN_T Execute(GenericFunctionContextPtr pContext, T1 arg1)
-        {
-            InitArguments(pContext);
-            PushArgument(pContext, arg1);
-            return Execute(pContext);
-        }
-
-        template<typename T1, typename T2>
-        inline RETURN_T Execute(GenericFunctionContextPtr pContext, T1 arg1, T2 arg2)
-        {
-            InitArguments(pContext);
-            PushArgument(pContext, arg1);
-            PushArgument(pContext, arg2);
-            return Execute(pContext);
-        }
-
-        template<typename T1, typename T2, typename T3>
-        inline RETURN_T Execute(GenericFunctionContextPtr pContext, T1 arg1, T2 arg2, T3 arg3)
-        {
-            InitArguments(pContext);
-            PushArgument(pContext, arg1);
-            PushArgument(pContext, arg2);
-            PushArgument(pContext, arg3);
-            return Execute(pContext);
-        }
+public:
+    virtual ~GenericCustomFunction() {}
+    virtual GenericFunctionContextPtr AcquireContext(TraceThreadData* pThreadData) = 0;
+    virtual void ReleaseContext(GenericFunctionContextPtr pContext) = 0;
+    virtual void InitArguments(GenericFunctionContextPtr pContext) = 0;
+    virtual void PushArgument(GenericFunctionContextPtr pContext, ARG_T arg) = 0;
+    virtual RETURN_T Execute(GenericFunctionContextPtr pContext) = 0;
+    virtual GenericCustomFunction* Clone() const = 0;
+    virtual const FunctionSourceInfo* GetSourceInfo() const { return NULL; }
 };
 
 typedef GenericCustomFunction<double, double> GenericScalarFunction;
 typedef GenericScalarFunction* GenericScalarFunctionPtr;
+
+template<typename RETURN_T, typename ARG_T>
+class GenericCustomFunctionInstance
+{
+public:
+    inline GenericCustomFunctionInstance(GenericCustomFunction<RETURN_T,ARG_T>* pFn, TraceThreadData* pThreadData) :
+        mpFunction(pFn), mpContext(pFn->AcquireContext(pThreadData)), mReInit(true)
+    {
+        POV_ASSERT(mpFunction != NULL);
+        POV_ASSERT(mpContext  != NULL);
+    }
+
+    inline ~GenericCustomFunctionInstance()
+    {
+        mpFunction->ReleaseContext(mpContext);
+    }
+
+    inline void PushArgument(ARG_T arg)
+    {
+        if (mReInit)
+        {
+            mpFunction->InitArguments(mpContext);
+            mReInit = false;
+        }
+        mpFunction->PushArgument(mpContext, arg);
+    }
+
+    inline RETURN_T Evaluate()
+    {
+        RETURN_T result = mpFunction->Execute(mpContext);
+        mReInit = true;
+        return result;
+    }
+
+    template<typename T1>
+    inline RETURN_T Evaluate(T1 arg1)
+    {
+        PushArgument(arg1);
+        return Evaluate();
+    }
+
+    template<typename T1, typename T2>
+    inline RETURN_T Evaluate(T1 arg1, T2 arg2)
+    {
+        PushArgument(arg1);
+        PushArgument(arg2);
+        return Evaluate();
+    }
+
+    template<typename T1, typename T2, typename T3>
+    inline RETURN_T Evaluate(T1 arg1, T2 arg2, T3 arg3)
+    {
+        PushArgument(arg1);
+        PushArgument(arg2);
+        PushArgument(arg3);
+        return Evaluate();
+    }
+
+    inline RETURN_T Evaluate(const Vector2d& argV)
+    {
+        return Evaluate(argV.u(), argV.v());
+    }
+
+    inline RETURN_T Evaluate(const Vector3d& argV)
+    {
+        return Evaluate(argV.x(), argV.y(), argV.z());
+    }
+
+protected:
+    GenericCustomFunction<RETURN_T,ARG_T>*  mpFunction;
+    GenericFunctionContextPtr               mpContext;
+    bool                                    mReInit;
+
+private:
+    GenericCustomFunctionInstance();
+};
+
+typedef GenericCustomFunctionInstance<double, double> GenericScalarFunctionInstance;
+typedef GenericScalarFunctionInstance* GenericScalarFunctionInstancePtr;
 
 }
 

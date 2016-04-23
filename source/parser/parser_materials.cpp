@@ -1023,9 +1023,6 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
         CASE (FUNCTION_TOKEN)
             New->Type = GENERIC_PATTERN;
             New->pattern = PatternPtr(new FunctionPattern());
-            dynamic_cast<FunctionPattern*>(New->pattern.get())->contextId = sceneData->functionPatternCount;
-            sceneData->functionPatternCount++;
-            GetParserDataPtr()->functionPatternContext.resize(sceneData->functionPatternCount);
             dynamic_cast<FunctionPattern*>(New->pattern.get())->pFn = new FunctionVM::CustomFunction(
                 dynamic_cast<FunctionVM*>(sceneData->functionContextFactory), Parse_Function());
             EXIT
@@ -4933,9 +4930,6 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
         CASE (FUNCTION_TOKEN)
             New->Type = GENERIC_PATTERN;
             New->pattern = PatternPtr(new FunctionPattern());
-            dynamic_cast<FunctionPattern*>(New->pattern.get())->contextId = sceneData->functionPatternCount;
-            sceneData->functionPatternCount++;
-            GetParserDataPtr()->functionPatternContext.resize(sceneData->functionPatternCount);
             dynamic_cast<FunctionPattern*>(New->pattern.get())->pFn = new FunctionVM::CustomFunction(dynamic_cast<FunctionVM*>(sceneData->functionContextFactory), Parse_Function());
             EXIT
         END_CASE
