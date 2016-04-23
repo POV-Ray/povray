@@ -109,7 +109,7 @@ class SceneData
         vector<LightSource *> lightSources;
         /// list of all lights that are part of light groups
         vector<LightSource *> lightGroupLightSources;
-        /// factory generating contexts for functions in scene
+        /// factory generating contexts for legacy VM-based functions in scene
         GenericFunctionContextFactory* functionContextFactory;
         /// atmosphere index of refraction
         DBL atmosphereIOR;
@@ -224,8 +224,6 @@ class SceneData
         // this is for fractal support
         int Fractal_Iteration_Stack_Length; // TODO - move somewhere else
         int Max_Blob_Components; // TODO - move somewhere else
-        // function pattern support
-        unsigned int functionPatternCount; // TODO - move somewhere else
         // lathe and sor support (bounding cylinders)
         unsigned int Max_Bounding_Cylinders; // TODO - move somewhere else
         BBOX_TREE *boundingSlabs;

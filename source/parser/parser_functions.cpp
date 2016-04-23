@@ -413,6 +413,11 @@ TOKEN Parser::expr_get_token()
         Token.Token_Float = M_PI;
         return FLOAT_TOKEN;
     }
+    else if(Token.Function_Id == TAU_TOKEN)
+    {
+        Token.Token_Float = M_TAU;
+        return FLOAT_TOKEN;
+    }
     else if(Token.Function_Id == RED_TOKEN)
         return RED_TOKEN;
     else if(Token.Function_Id == GREEN_TOKEN)

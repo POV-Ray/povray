@@ -128,8 +128,10 @@ class TracePixel : public Trace
         /// whether this is just a pretrace, allowing some computations to be skipped
         bool pretrace;
 
-        /// Function execution context for user-defined camera
-        GenericFunctionContextPtr mpFunctionContext;
+        /// Thread-local instances of user-defined camera functions
+        GenericScalarFunctionInstancePtr mpCameraLocationFn[3];
+        GenericScalarFunctionInstancePtr mpCameraDirectionFn[3];
+        GenericScalarFunctionInstancePtr mpTonemappingFn[kResultChannelIdCount];
 
         bool CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, size_t ray_number);
 

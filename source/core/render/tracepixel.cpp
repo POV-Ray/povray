@@ -201,9 +201,17 @@ TracePixel::TracePixel(shared_ptr<SceneData> sd, const Camera* cam, TraceThreadD
                        focalBlurData(NULL),
                        maxTraceLevel(mtl),
                        adcBailout(adcb),
-                       pretrace(pt),
-                       mpFunctionContext(NULL)
+                       pretrace(pt)
 {
+    for (unsigned int i = 0; i < 3; ++i)
+    {
+        mpCameraLocationFn[i] = NULL;
+        mpCameraDirectionFn[i] = NULL;
+    }
+    for (int i = 0; i < kResultChannelIdCount; ++i)
+    {
+        mpTonemappingFn[i] = NULL;
+    }
     SetupCamera((cam == NULL) ? sd->parsedCamera : *cam);
 }
 
@@ -211,8 +219,18 @@ TracePixel::~TracePixel()
 {
     if(focalBlurData != NULL)
         delete focalBlurData;
-    if (mpFunctionContext != NULL)
-        delete mpFunctionContext;
+    for (unsigned int i = 0; i < 3; ++i)
+    {
+        if (mpCameraLocationFn[i] != NULL)
+            delete mpCameraLocationFn[i];
+        if (mpCameraDirectionFn[i] != NULL)
+            delete mpCameraDirectionFn[i];
+    }
+    for (int i = 0; i < kResultChannelIdCount; ++i)
+    {
+        if (mpTonemappingFn[i] != NULL)
+            delete mpTonemappingFn[i];
+    }
 }
 
 void TracePixel::SetupCamera(const Camera& cam)
@@ -252,11 +270,29 @@ void TracePixel::SetupCamera(const Camera& cam)
             break;
         case USER_DEFINED_CAMERA:
             normalise = true;
-            mpFunctionContext = sceneData->functionContextFactory->CreateFunctionContext(threadData);
+            for (unsigned int i = 0; i < 3; ++i)
+            {
+                if(mpCameraLocationFn[i] != NULL)
+                    delete mpCameraLocationFn[i];
+                if(camera.Location_Fn[i] != NULL)
+                    mpCameraLocationFn[i] = new GenericScalarFunctionInstance(camera.Location_Fn[i], threadData);
+                if(mpCameraDirectionFn[i] != NULL)
+                    delete mpCameraDirectionFn[i];
+                if(camera.Direction_Fn[i] != NULL)
+                    mpCameraDirectionFn[i] = new GenericScalarFunctionInstance(camera.Direction_Fn[i], threadData);
+            }
             break;
         default:
             aspectRatio = cameraLengthRight / cameraLengthUp;
             break;
+    }
+
+    for (int i = 0; i < kResultChannelIdCount; ++i)
+    {
+        if (mpTonemappingFn[i] != NULL)
+            delete mpTonemappingFn[i];
+        if (sceneData->tonemappingFunctions[i] != NULL)
+            mpTonemappingFn[i] = new GenericScalarFunctionInstance(sceneData->tonemappingFunctions[i], threadData);
     }
 
     if(normalise == true)
@@ -315,7 +351,7 @@ void TracePixel::operator()(DBL x, DBL y, DBL width, DBL height, RGBTColour& col
     {
         if (sceneData->tonemappingFunctions[iResultChannel])
         {
-            sceneData->tonemappingFunctions[iResultChannel]->InitArguments(threadData->functionContext);
+            GenericScalarFunctionInstance fn(sceneData->tonemappingFunctions[iResultChannel], threadData);
             for (vector<DataChannelId>::iterator iParameter = sceneData->tonemappingParameters.begin(); iParameter != sceneData->tonemappingParameters.end(); ++iParameter)
             {
                 COLC data;
@@ -342,9 +378,9 @@ void TracePixel::operator()(DBL x, DBL y, DBL width, DBL height, RGBTColour& col
                         data = y/height;
                         break;
                 }
-                sceneData->tonemappingFunctions[iResultChannel]->PushArgument(threadData->functionContext, data);
+                mpTonemappingFn[iResultChannel]->PushArgument(data);
             }
-            COLC result = sceneData->tonemappingFunctions[iResultChannel]->Execute(threadData->functionContext);
+            COLC result = mpTonemappingFn[iResultChannel]->Evaluate();
             switch (iResultChannel)
             {
                 case kDataChannelRed:
@@ -913,9 +949,9 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
             for (unsigned int i = 0; i < 3; ++i)
             {
                 if (camera.Location_Fn[i] != NULL)
-                    cameraLocation[i] = camera.Location_Fn[i]->Execute(mpFunctionContext, x0, y0);
+                    cameraLocation[i] = mpCameraLocationFn[i]->Evaluate(x0, y0);
                 if (camera.Direction_Fn[i] != NULL)
-                    cameraDirection[i] = camera.Direction_Fn[i]->Execute(mpFunctionContext, x0, y0);
+                    cameraDirection[i] = mpCameraDirectionFn[i]->Evaluate(x0, y0);
             }
             if (cameraDirection.IsNearNull(EPSILON))
                 return false;
