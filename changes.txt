@@ -1,30 +1,288 @@
-#----------------------------------------------------------------------------
-# Note: To view an original flyspray bug report (FS#xxx), replace the leading
-# FS# of the bug ID with the URL http://bugs.povray.org/.
-# For example, to read FS#270, visit http://bugs.povray.org/270.
-# To view a referenced newsgroup posting (<xxxxx@news.povray.org>), prefix
-# the message ID with the URL http://news.povray.org/.
-# For example, to read <42765ef3$1@news.povray.org>, visit:
-# http://news.povray.org/<42765ef3$1@news.povray.org>.
-# The '<' and '>' are optional (if using a shell you may want to omit them).
-#----------------------------------------------------------------------------
+------------------------------------------------------------------------------
+POV-Ray Changelog Digest
+------------------------------------------------------------------------------
+Notes:
 
-----------------------------------------------------------------------------
-Changelog information is available in the file revision.txt, which should be
-located in the same directory as this file is.
-----------------------------------------------------------------------------
+- To view a referenced GitHub issue (#xxx), replace the leading # of the
+  issue ID with the URL https://github.com/POV-Ray/povray/issues/.
+  For example, to read GitHub issue #58, visit:
+  https://github.com/POV-Ray/povray/issues/58
 
--------------------------------
-Changes between 3.7.0 and 3.7.1
--------------------------------
+- To view a referenced flyspray bug report (FS#xxx), replace the leading
+  FS# of the flyspray bug ID with the URL http://bugs.povray.org/.
+  For example, to read FS#270, visit:
+  http://bugs.povray.org/270
 
-    TODO
+- To view a referenced newsgroup posting (<xxxxx@news.povray.org>), prefix
+  the message ID with the URL http://news.povray.org/.
+  The '<' and '>' are optional (if using a shell you may want to omit them).
+  For example, to read <42765ef3$1@news.povray.org>, visit:
+  http://news.povray.org/42765ef3$1@news.povray.org
+------------------------------------------------------------------------------
+Detailed changelog information is available in the file `revision.txt`, which
+should be located in the same directory as this file is.
+------------------------------------------------------------------------------
 
-Windows Crash Reports:
-----------------------
+Changes between 3.7.0 and 3.7.1-TBD
+===================================
 
-   - Fix for crashes related to missing closing parentheses in `#if` and other
-     conditionals and loops, crash report #???, dump file #988
+This version is still under active development, and not finalized yet.
+
+The primary focus of this version has been on code refactoring in order to
+modularize the underlying architecture, but various new features as well as
+bugfixes have also been included.
+
+Work on our own Macintosh graphical user interface has been put on hold, and
+it may eventually end up on the scrapyard; our current hope for our Mac users
+rests on a 3rd party OS X front-end that we strive to adopt.
+
+To Do
+-----
+
+Prior to the release of 3.7.1, the following items still need urgent attention:
+
+- The new features need to be properly documented.
+
+- The Windows version's inbuilt help index needs to be fixed.
+
+New Features and Improvements
+-----------------------------
+
+- A new inbuilt constant, `tau`, has been added as shorthand for `2*pi`, in
+  support of the world-wide initiative to obsolete pi in favour of the new,
+  more intuitive constant.
+
+- Native support for repetition has been added to the `crackle` pattern to
+  avoid the discontinuities in the pattern caused by repeat warps.
+
+- A new function-based user-defined camera type, `user_defined`, has been
+  added.
+
+- The torus syntax has been extended to give more control over the spindle in
+  a self-intersecting torus.
+
+- The `#declare` and `#local` syntax has been extended to support tuple-style
+  assignments. The main purpose is to allow macros to return a set of values
+  rather than just a single one.
+
+- The macro syntax has been extended to allow for optional parameters.
+
+- POV-Ray for Windows now reports file names and line numbers of warnings.
+
+- Light sources' distance-based fading can now be set to obey an inverse-power
+  law at all distances.
+
+- Colour and pigment maps now support non-linear interpolation to achieve more
+  pleasing gradients.
+
+- CIE L*a*b* conversion macros have been added to `colors.inc`.
+
+- A new include file, `colors_ral.inc`, has been added, containing predefined
+  colours according to the RAL Classic standard.
+
+- Radiosity can now honor the `brilliance` setting of a surface.
+
+- The `brilliance` effect can now be applied not only to incoming light, but
+  also to outgoing light, making the effect phyiscally more realistic.
+
+- Fresnel angle-dependent attenuation can now also be applied to highlights
+  and the diffuse component for more physical realism.
+
+- Colour maps, pigment maps and the like are no longer limited to 256 entries.
+
+- The creation of a log for the `+C` render abort-continue feature can now be
+  suppressed using `-CC` to save disk space.
+
+- The number of components ber blob is no longer artificially limited.
+
+For more details on the new features, see the documentation.
+
+Changed Behaviour
+-----------------
+
+- The `version` pseudo-variable will now evaluate to the effective language
+  version at the time the expression is parsed, _except_ when used in a
+  `#version` directive, in which case the behaviour remains unchanged.
+
+- The requirement to start each scene with a `#version` statement is now more
+  strongly enforced for POV-Ray 3.7 scenes, by reporting a parse error if the
+  scene file does not begin with a `#version` directive but does have a
+  `#version 3.7` (or later) directive anywhere in the main scene file.
+
+- Using `ambient` with a suspiciously high value in a non-legacy scene will
+  now prompt a warning, unless an `emission` is also specified.
+
+- POV-Ray will now try to auto-detect whether an input TIFF file with alpha
+  channel uses premultiplied or non-premultiplied alpha mode, rather than
+  blindly presuming premultiplied alpha.
+
+- The interaction of `transmit all` and `filter all` with an image's alpha
+  channel has been changed to be more intuitive: rather than adding the
+  image's transparency to the user-specified transparency, the image's opacity
+  is now effectively multiplied with the user-specified opacity. (requires
+  `#version 3.71` or later)
+
+- The image file format previously referred to as "IFF" (now more precisely
+  referred to as "IFF-ILBM") is now associated with the `.lbm` file extension,
+  in addition to the `.iff` extension.
+
+- A long-standing undocumented inconsistency in the treatment of backslashes
+  in string literals, in which backslashes were essentially _not_ interpreted
+  as escape characters _if_ the parser expected a filename, has been cleaned
+  up, so that backslashes are now treated as escape characters in all string
+  literals. (requires `#version 3.71` or later)
+
+- Boost version 1.38 or later is now required.
+
+Compatibility Improvements
+--------------------------
+
+- Compatibility with modern compilers in general has been greatly improved.
+  Rather than trying to disable the compiler's C++11 support and work around
+  any resulting fallout, the code has been overhauled to eliminate any
+  conflicts with the C++11 standard in the first place, and should now compile
+  fine on any compiler conforming to either C++03, C++03 TR1, or C++11
+  (notwithstanding platform-specific issues).
+
+- Compatibility of the Unix build process with modern versions of the boost
+  libraries and automake tools has been improved, avoiding the need for
+  additional configure parameters or extra build steps on modern Linux
+  systems.
+
+- Compatibility with Visual Studio 2015 has been improved by streamlining the
+  Visual Studio 2010 project files and a few pieces of source, packing new
+  versions of the boost and openEXR libraries, and sorting out the generic
+  C++11-related issues. As a result, the Visual Studio 2010 projects now build
+  "out of the box" on Visual Studio 2015.
+
+- Thread stack size has been increased to avoid problems on some platforms.
+  (requires boost 1.50 or later)
+
+Fixed or Mitigated Bugs Reported by Static Code Analysis
+--------------------------------------------------------
+
+(none at present)
+
+Fixed or Mitigated Bugs
+-----------------------
+
+(Note: This list includes some bugs introduced after POV-Ray 3.7.0.)
+
+Reported via GitHub:
+
+- #5 ("prebuild.sh chmod errors: No such file or directory")
+- #6 ("Makefile.in does not get created")
+- #7 ("stat: illegal option -- c")
+- #8 ("reference to 'shared_ptr' is ambiguous")
+- #9 ("lseek64 is not present on all platforms")
+- #10 ("Possibly missng sys/types.h include?")
+- #21 ("configure attempts to link boost_system library even with boost 1.49 or earlier")
+- #24 ("Compile on debian jessie")
+- #29 ("master branch, failing to compile on linux on 28th June 2014")
+- #30 ("gcc-compiled povray of current master (2014-07-02) produces wrong output for benchmark")
+- #31 ("unknown type name 'shared_ptr'")
+- #32 ("need to include <sys/wait.h>")
+- #43 ("cannot build latest trunk")
+- #44 ("master branch has problem to compile with boost 1.55+")
+- #49 ("Latest version from Git won't build with MS Visual Studio 2015")
+- #50 ("Make error in Ubuntu 14.04")
+- #53 ("Standard include files may mess up the language version")
+
+Reported via FlySpray:
+
+- FS#254 ("Mesh_camera type 0 output seems to be incorrect")
+- FS#261 ("mesh_camera distribution type 3 output image is placed 0.5 pixels to wrong")
+- FS#270 ("render abort-continue (+C) sometimes skips blocks")
+- FS#313 ("radiosity.cpp pov::RadiosityFunction::BeforeTile assertion failed")
+- FS#314 ("reading Gif is bugged in 3.7")
+- FS#315 ("inverse keyword does not work properly with quadrics")
+- FS#316 ("inverse keyword does not work properly with fractals")
+- FS#317 ("problem with +D option at specific output file dimensions")
+- FS#318 ("method 3 (default) scattering media is too bright & causes artifacts when nested")
+
+Reported via the Newsgroups:
+
+- <53ea2dae@news.povray.org>
+  (2014-08-12, povray.binaries.images, "unexplained")
+  Precision issue led to `<1,1,1>.grey` not evaluating to 1 on sone systems.
+
+- <web.551e92b74514bfb213709ea20@news.povray.org>
+  (2015-04-03, povray.binaries.images, "An artifact when rendering torus(negative major_r)")
+  Spindle torus shading issues resulting from bogus surface normal
+  computations for points on the spindle.
+
+- <web.55aac094763dc3187a3e03fe0@news.povray.org>
+  (2015-07-18, povray.binaries.scene-files, "Where my background? Help me, please!")
+  Bug in meshmaker.inc that would scramble the SDL language version to use for
+  a scene.
+
+- <56cc274d$1@news.povray.org>
+  (2016-02-23, povray.beta-test, "double free or corruption")
+  Bug in the copying of multi-textured blobs.
+
+- <56cdaee5@news.povray.org>
+  (2016-02-24, povray.beta-test.binaries, "optics.pov 3.7.0 vs 3.7.1")
+  Bug in media photons.
+
+- <56d16f44$1@news.povray.org>
+  (2016-02-27, povray.beta-test, "splinefollow")
+  Bug in splines.
+
+- <56d15fb0$1@news.povray.org>
+  (2016-02-27, povray.beta-test.binaries, "reflection.ini")
+  Bug in `animations/reflection` sample scene INI file.
+
+- <web.56d342e38bb35b79fd6b6fe10@news.povray.org>
+  (2016-02-28, povray.bugreports, "#write")
+  Under certain circumstances, a missing closing parenthesis in the condition
+  of an `#if`, `#while` or similar statement would lead to a crash instead of
+  a parse error.
+
+- <56d48747$1@news.povray.org>
+  (2016-02-29, povray.beta-test, "cliche.pov")
+  Missing input image filename extension in `advanced/cliche`.
+
+- <56d5d924$1@news.povray.org>
+  (2016-03-01, povray.beta-test, "whiltile.pov")
+  Enabling a commented-out statement in the `advanced/whiltile.pov` scene
+  would result in the `#version` directive not being the first statement.
+
+Reported via Windows Crash Reports:
+
+- crash report #???, dump file #988
+  Under certain circumstances, a missing closing parenthesis in the condition
+  of an `#if`, `#while` or similar statement would lead to a crash instead of
+  a parse error.
+
+Miscellaneous:
+
+- Fixed mesh_camera-related flaws in the parser.
+- Fixed a family of bugs that could cause problems when using focal blur with
+  some camera types if the camera is very close to the surface of a media
+  container.
+- Fixed bug that could cause strange parse errors when including a file from
+  within macro.
+- Added a sanity check to the maximum interations parameter in fractals.
+- Fixed a hard crash when sum() was called with only three parameters.
+- Fixed bezier patch not honouring clipped_by statement.
+- Fixed crash when using turbulence parameters (lambda, omega etc.) without
+  specifying a pattern type.
+- Fixed bug in parser causing an error when no file type is specified and the
+  file name is specified using a variable.
+- Fixed unwarranted "Rainbow's up and direction vector are co-linear"
+  error message.
+- Fixed another bug in mesh_camera with distribution 3.
+- Fixed wrong rotation in `Round_Pyramid_N_in` in shapes3.inc.
+- Fixed some more bogosities related to media sampling method 3.
+- Minor robustness improvement in IFF image reading code.
+- Iridescence did not properly honor full area diffuse lighting.
+- Subsurface scattering did not play nice with non-default brilliance values.
+
+Other Noteworthy
+----------------
+
+- The Visual Studio 2010 project for a console-only Windows version has been
+  revived.
 
 ---------------------------------
 Changes between 3.7.RC7 and 3.7.0
@@ -208,9 +466,9 @@ Other Noteworthy:
     - Added Append_File +GP option, which allows users to append streamed
       console to existing console stream output file(s).
 
-----------------------------------------
-Changes between 3.7.beta.RC5 and 3.7.RC6
-----------------------------------------
+-----------------------------------
+Changes between 3.7.RC5 and 3.7.RC6
+-----------------------------------
 
    - This release candidate features continued refinements to the Windows
      installer, VS10 code (and other) cleanup and a few bug fixes.
@@ -254,9 +512,9 @@ Other Noteworthy
    - A minor fix for radiosity adc_bailout handling.
    - Corrected a formatting issue with radiosity statistics reporting.
  
-----------------------------------------
-Changes between 3.7.beta.RC4 and 3.7.RC5
-----------------------------------------
+-----------------------------------
+Changes between 3.7.RC4 and 3.7.RC5
+-----------------------------------
 
    - This release candidate primarily addresses the crash dump report #357
      triggered by non-closed SSLT-enabled mesh inside CSG. This fix also
@@ -276,9 +534,9 @@ http://bugs.povray.org/task/12    FS#12    (facets pattern in normal map)
 http://bugs.povray.org/task/196   FS#196   (More SSLT Caveats)
 http://bugs.povray.org/task/46    FS#239   (improper uid/gid handling)
 
-----------------------------------------
-Changes between 3.7.beta.RC3 and 3.7.RC4
-----------------------------------------
+-----------------------------------
+Changes between 3.7.RC3 and 3.7.RC4
+-----------------------------------
 
    - This release candidate primarily improves upon the SSLT code, but there
      are also some other noteworthy enhancements and/or additions.
@@ -493,9 +751,9 @@ Removed an obsolete directive that aborted the render:
 
 Removed obsolete comments (Library_Path limitation) from povray.ini
 
-----------------------------------------
-Changes between 3.7.beta.RC2 and 3.7.RC3
-----------------------------------------
+-----------------------------------
+Changes between 3.7.RC2 and 3.7.RC3
+-----------------------------------
 
 This release candidate is primarily to correct a bug in media that was causing
 crashes. It also improves a performance issue related to output file caching.
