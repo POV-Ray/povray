@@ -38,7 +38,7 @@
 
 #include <algorithm>
 
-#include <boost/array.hpp>
+#include <boost/tr1/array.hpp>
 
 #include "core/math/matrix.h"
 #include "core/render/ray.h"
