@@ -23,6 +23,7 @@ Detailed changelog information is available in the file `revision.txt`, which
 should be located in the same directory as this file is.
 ------------------------------------------------------------------------------
 
+
 Changes between 3.7.0 and 3.7.1-TBD
 ===================================
 
@@ -45,8 +46,8 @@ Prior to the release of 3.7.1, the following items still need urgent attention:
 
 - The Windows version's inbuilt help index needs to be fixed.
 
-New Features and Improvements
------------------------------
+New Features
+------------
 
 - A new inbuilt constant, `tau`, has been added as shorthand for `2*pi`, in
   support of the world-wide initiative to obsolete pi in favour of the new,
@@ -67,8 +68,6 @@ New Features and Improvements
 
 - The macro syntax has been extended to allow for optional parameters.
 
-- POV-Ray for Windows now reports file names and line numbers of warnings.
-
 - Light sources' distance-based fading can now be set to obey an inverse-power
   law at all distances.
 
@@ -88,14 +87,10 @@ New Features and Improvements
 - Fresnel angle-dependent attenuation can now also be applied to highlights
   and the diffuse component for more physical realism.
 
-- Colour maps, pigment maps and the like are no longer limited to 256 entries.
-
 - The creation of a log for the `+C` render abort-continue feature can now be
   suppressed using `-CC` to save disk space.
 
-- The number of components ber blob is no longer artificially limited.
-
-For more details on the new features, see the documentation.
+For more details on the above new features, see the documentation.
 
 Changed Behaviour
 -----------------
@@ -110,7 +105,7 @@ Changed Behaviour
   `#version 3.7` (or later) directive anywhere in the main scene file.
 
 - Using `ambient` with a suspiciously high value in a non-legacy scene will
-  now prompt a warning, unless an `emission` is also specified.
+  now prompt a warning, unless `emission` is also specified.
 
 - POV-Ray will now try to auto-detect whether an input TIFF file with alpha
   channel uses premultiplied or non-premultiplied alpha mode, rather than
@@ -157,6 +152,14 @@ Compatibility Improvements
 
 - Thread stack size has been increased to avoid problems on some platforms.
   (requires boost 1.50 or later)
+
+Miscellaneous Improvements
+--------------------------
+
+- Animation status messages now include the nominal frame number.
+- POV-Ray for Windows now reports file names and line numbers of warnings.
+- Colour maps, pigment maps and the like are no longer limited to 256 entries.
+- The number of components ber blob is no longer artificially limited.
 
 Fixed or Mitigated Bugs Reported by Static Code Analysis
 --------------------------------------------------------
@@ -256,6 +259,9 @@ Reported via Windows Crash Reports:
 
 Miscellaneous:
 
+- Animation status messages now consistently display a running frame count and
+  the total number of frames actually to be rendered, properly taking into
+  account the Frame_Step setting.
 - Fixed mesh_camera-related flaws in the parser.
 - Fixed a family of bugs that could cause problems when using focal blur with
   some camera types if the camera is very close to the surface of a media
@@ -283,6 +289,7 @@ Other Noteworthy
 
 - The Visual Studio 2010 project for a console-only Windows version has been
   revived.
+
 
 ---------------------------------
 Changes between 3.7.RC7 and 3.7.0

@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -293,8 +293,8 @@ bool ProcessSession (int delay)
       else if (msg.m_Type == vfeSession::mAnimationStatus)
       {
         buffer_stream_message (mDivider, "-");
-        SetStatusPanelItemText (IDC_STATUS_DATA_FRAME, "%d/%d", msg.m_Frame, msg.m_TotalFrames);
-        sprintf (status_buffer, "Rendering frame %d of %d", msg.m_Frame, msg.m_TotalFrames);
+        SetStatusPanelItemText (IDC_STATUS_DATA_FRAME, "%d/%d (#%d)", msg.m_Frame, msg.m_TotalFrames, msg.m_FrameId);
+        sprintf (status_buffer, "Rendering frame %d of %d (#%d)", msg.m_Frame, msg.m_TotalFrames, msg.m_FrameId);
       }
       else
       {
