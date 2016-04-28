@@ -156,6 +156,7 @@ Compatibility Improvements
 Miscellaneous Improvements
 --------------------------
 
+- Trailing whitespace in INI files no longer causes a warning.
 - Animation status messages now include the nominal frame number.
 - POV-Ray for Windows now reports file names and line numbers of warnings.
 - Colour maps, pigment maps and the like are no longer limited to 256 entries.
