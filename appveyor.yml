@@ -90,7 +90,7 @@ deploy:
 - provider: GitHub
   tag: $(pov_version)
   release: $(pov_build_title) $(pov_build_version)
-  description: $(env:pov_build_message)
+  description: $(pov_build_message)
 
   auth_token:
     secure: WkcFPXyr/SJ9TXixTQyivhfoR9FzlryIbc4deHeQ0eA6YRXL0wQopMYJ6XL1/FJK
