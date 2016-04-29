@@ -77,7 +77,7 @@ struct ISO_Max_Gradient
 struct ISO_ThreadData
 {
     const IsoSurface *current;
-    GenericFunctionContextPtr ctx;
+    GenericScalarFunctionInstance* pFn;
     Vector3d Pglobal;
     Vector3d Dglobal;
     DBL Vlength;
@@ -124,9 +124,7 @@ class IsoSurface : public ObjectBase
         bool Function_Find_Root(ISO_ThreadData& itd, const Vector3d&, const Vector3d&, DBL*, DBL*, DBL& max_gradient, bool in_shadow_test, TraceThreadData* pThreadData);
         bool Function_Find_Root_R(ISO_ThreadData& itd, const ISO_Pair*, const ISO_Pair*, DBL, DBL, DBL, DBL& max_gradient, TraceThreadData* pThreadData);
 
-        inline DBL Vector_Function(GenericFunctionContextPtr ctx, const Vector3d& VPos) const;
         inline DBL Float_Function(ISO_ThreadData& itd, DBL t) const;
-        static inline DBL Evaluate_Function(GenericScalarFunctionPtr funct, GenericFunctionContextPtr ctx, const Vector3d& fnvec);
     private:
         ISO_Max_Gradient *mginfo; // global, but just a statistic (read: not thread safe but we don't care) [trf]
 };

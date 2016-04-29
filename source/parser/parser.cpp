@@ -4998,7 +4998,7 @@ ObjectPtr Parser::Parse_Parametric(void)
     Parse_Object_Mods(reinterpret_cast<ObjectPtr>(Object));
 
     if(PrecompFlag != 0)
-        Object->Precompute_Parametric_Values(PrecompFlag, PrecompDepth, fnVMContext);
+        Object->Precompute_Parametric_Values(PrecompFlag, PrecompDepth, GetParserDataPtr());
 
     return (reinterpret_cast<ObjectPtr>(Object));
 }

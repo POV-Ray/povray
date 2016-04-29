@@ -93,7 +93,6 @@ SceneData::SceneData() :
     Fractal_Iteration_Stack_Length = 0;
     Max_Blob_Components = 1000; // TODO FIXME - this gets set in the parser but allocated *before* that in the scene data, and if it is 0 here, a malloc may fail there because the memory requested is zero [trf]
     Max_Bounding_Cylinders = 100; // TODO FIXME - see note for Max_Blob_Components
-    functionPatternCount = 0;
     boundingSlabs = NULL;
 
     splitUnions = false;

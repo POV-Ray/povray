@@ -1023,9 +1023,6 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
         CASE (FUNCTION_TOKEN)
             New->Type = GENERIC_PATTERN;
             New->pattern = PatternPtr(new FunctionPattern());
-            dynamic_cast<FunctionPattern*>(New->pattern.get())->contextId = sceneData->functionPatternCount;
-            sceneData->functionPatternCount++;
-            GetParserDataPtr()->functionPatternContext.resize(sceneData->functionPatternCount);
             dynamic_cast<FunctionPattern*>(New->pattern.get())->pFn = new FunctionVM::CustomFunction(
                 dynamic_cast<FunctionVM*>(sceneData->functionContextFactory), Parse_Function());
             EXIT
@@ -4971,9 +4968,6 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
         CASE (FUNCTION_TOKEN)
             New->Type = GENERIC_PATTERN;
             New->pattern = PatternPtr(new FunctionPattern());
-            dynamic_cast<FunctionPattern*>(New->pattern.get())->contextId = sceneData->functionPatternCount;
-            sceneData->functionPatternCount++;
-            GetParserDataPtr()->functionPatternContext.resize(sceneData->functionPatternCount);
             dynamic_cast<FunctionPattern*>(New->pattern.get())->pFn = new FunctionVM::CustomFunction(dynamic_cast<FunctionVM*>(sceneData->functionContextFactory), Parse_Function());
             EXIT
         END_CASE
@@ -5687,6 +5681,18 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
 
         CASE (NO_BUMP_SCALE_TOKEN)
             Set_Flag(New, DONT_SCALE_BUMPS_FLAG);
+        END_CASE
+
+        CASE (REPEAT_TOKEN)
+            if (!dynamic_cast<CracklePattern*>(New->pattern.get()))
+                Only_In("repeat","crackle");
+            Parse_Vector(Local_Vector);
+            dynamic_cast<CracklePattern*>(New->pattern.get())->repeat = IntVector3d(Local_Vector);
+            if((dynamic_cast<CracklePattern*>(New->pattern.get())->repeat.x() < 0) ||
+               (dynamic_cast<CracklePattern*>(New->pattern.get())->repeat.y() < 0) ||
+               (dynamic_cast<CracklePattern*>(New->pattern.get())->repeat.z() < 0))
+                Error("Repeat vector must be non-negative.");
+            EXIT
         END_CASE
 
         OTHERWISE

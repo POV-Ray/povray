@@ -94,14 +94,12 @@ class TraceThreadData : public Task::TaskData
         Blob_Interval_Struct *Blob_Intervals;
         int Blob_Coefficient_Count;
         int Blob_Interval_Count;
-        ISO_ThreadData *isosurfaceData;
+        ISO_ThreadData *isosurfaceData;     ///< @todo We may want to move this data block to the isosurface code as a local variable.
         vector<BCYL_INT> BCyl_Intervals;
         vector<BCYL_INT> BCyl_RInt;
         vector<BCYL_INT> BCyl_HInt;
         IStackPool stackPool;
-        GenericFunctionContextPtr functionContext;
-        vector<GenericFunctionContextPtr> functionPatternContext; // TODO - the current mechanism uses one context per individual function pattern in the scene,
-                                                                  // but one context per recursion would suffice, and might also make implementation easier
+        vector<FPUContext*> fpuContextPool;
         int Facets_Last_Seed;
         int Facets_CVC;
         Vector3d Facets_Cube[81];

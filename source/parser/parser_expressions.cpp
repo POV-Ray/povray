@@ -972,6 +972,10 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                     Val = M_PI;
                     break;
 
+                case TAU_TOKEN:
+                    Val = M_TAU;
+                    break;
+
                 case SQR_TOKEN:
                     Val = Parse_Float_Param();
                     Val = (Val*Val);

@@ -555,9 +555,6 @@ struct FunctionPattern : public ContinuousPattern
 {
     GenericScalarFunctionPtr pFn;
 
-    /// The index into the functionPatternContext list, identifying the context to use when calling the function.
-    unsigned int contextId;
-
     FunctionPattern();
     FunctionPattern(const FunctionPattern& obj);
     virtual ~FunctionPattern();
