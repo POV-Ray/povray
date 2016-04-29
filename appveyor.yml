@@ -55,7 +55,23 @@ build:
 after_build:
 - ps: |
     $env:pov_exe_version = (Get-Content unix\VERSION)
-    $env:pov_version = "v" + $env:pov_exe_version + '+av' + $env:APPVEYOR_BUILD_NUMBER
+    $env:pov_tag_version = 'v' + $env:pov_exe_version
+    $env:pov_build_version = $env:pov_tag_version + '+av' + $env:APPVEYOR_BUILD_NUMBER
+    $env:pov_build_message = ''
+    if ($env:pov_exe_version -match '^[0-9.]*-x') {
+      $env:pov_build_type = 'Experimental'
+      $env:pov_build_message += '**EXPERIMENTAL: This version of POV-Ray is not part of the official development branch!**'
+      $env:pov_build_message += "`n`n"
+    } elseif ($env:pov_exe_version -match '^[0-9.]*-') {
+      $env:pov_build_type = 'Development'
+    } else {
+      $env:pov_build_type = 'Automated'
+    }
+    $env:pov_release_type = ($env:pov_build_type).ToLower() + ' release'
+    $env:pov_build_title = $env:pov_build_type + ' build'
+    $env:pov_build_message += '**Note:** This is a binary-only ' + $env:pov_release_type + '; to install, copy the binary into an existing POV-Ray 3.7 installation. (Make sure to backup the original binary first.)'
+    $env:pov_build_message += "`n`n"
+    $env:pov_build_message += 'The 64-bit binary may require Windows Vista or higher. To run this ' + $env:pov_release_type + ' on an earlier 64-bit version of Windows, you may need to use the 32-bit SSE2 binary instead.'
     $env:pov_zipdir = "povray-" + $env:pov_exe_version + '-av' + $env:APPVEYOR_BUILD_NUMBER + $env:artifact_suffix
     $env:pov_binary = "Windows\vs10\" + $env:bin_dir + "\pvengine*.exe"
     $env:pov_zip = "artifacts\" + $env:pov_zipdir + ".7z"
@@ -73,11 +89,8 @@ artifacts:
 deploy:
 - provider: GitHub
   tag: $(pov_version)
-  release: Development build $(pov_version)
-  description: |-
-    **Note:** This is a binary-only development release; to install, copy the binary into an existing POV-Ray 3.7 installation. (Make sure to backup the original binary first.)
-    
-    The 64-bit binary may require Windows Vista or higher. To run this development release on an earlier 64-bit version of Windows, you may need to use the 32-bit SSE2 binary instead.
+  release: $(pov_build_title) $(pov_build_version)
+  description: $(env:pov_build_message)
 
   auth_token:
     secure: WkcFPXyr/SJ9TXixTQyivhfoR9FzlryIbc4deHeQ0eA6YRXL0wQopMYJ6XL1/FJK
