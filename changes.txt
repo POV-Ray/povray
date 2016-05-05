@@ -66,6 +66,9 @@ New Features
   assignments. The main purpose is to allow macros to return a set of values
   rather than just a single one.
 
+- `local()` and `global()` pseudo-functions have been added to specifically
+  refer to a local or global identifier, respectively.
+
 - The macro syntax has been extended to allow for optional parameters.
 
 - Light sources' distance-based fading can now be set to obey an inverse-power
