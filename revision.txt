@@ -30,6 +30,65 @@ Notes:
 POV-Ray v???
 ------------------------------------------------------------------------------
 
+Commit fad8dda on 2016-05-05 by Christoph Lipka
+
+    Forgot to include changes to `reservedwords.cpp` in previous
+    commit. Fixed.
+
+Commit 6eb488e on 2016-05-05 by Christoph Lipka
+
+    Added `global()` pseudo-function to match the earlier `local()`
+    pseudo-function.
+
+Commit de317f1 on 2016-05-05 by Christoph Lipka
+
+    [ci skip] Added sample scene to demonstrate spindle torus options.
+
+Commit c326111 on 2016-04-29 by Christoph Lipka
+
+    [ci skip] Another fix to the AppVeyor config.
+
+Commit 796039b on 2016-04-29 by Christoph Lipka
+
+    [ci skip] Fixed AppVeyor config.
+
+Commit e287133 on 2016-04-29 by Christoph Lipka
+
+    Updated AppVeyor config.
+
+    - Remove the `+avN` postfix from generated release tags.
+    - Automatically flag builds as experimental if their version number
+    has a prefix beginning with `-x`, e.g. `3.7.1-x.foo.8765432`.
+
+    Also updated the developers' documentation on version numbering.
+
+Commit a04e0ef on 2016-04-29 by Christoph Lipka
+
+    Changed INI file parser to no longer issue a warning on trailing
+    whitespace.
+
+    Also removed trailing whitespace from the `float1` sample animation's
+    INI file.
+
+------------------------------------------------------------------------------
+POV-Ray v3.7.1-alpha.8586521
+------------------------------------------------------------------------------
+
+Commit eeeb039 on 2016-04-28 by Christoph Lipka
+
+    Overhauled frame number handling in animation status messages.
+
+    Animation status messages now consistently display a running frame count
+    and the total number of frames actually to be rendered, properly taking
+    into account the Frame_Step setting.
+    Additionally, the status messages now also show the nominal frame number
+    as used in the `frame_number` variable and the output filename.
+
+Commit 8706877 on 2016-04-26 by Christoph Lipka
+
+    [ci skip] Updated `changes.txt` and `revision.txt`, and added a Unix
+    shell script to help keep the latter up to date.
+
 Commit be8158a on 2016-04-25 by Christoph Lipka
 
     Fixed wrong include for `std::tr1::array` in `parametric.cpp`.
