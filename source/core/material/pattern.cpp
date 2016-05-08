@@ -264,7 +264,9 @@ BasicPattern::BasicPattern(const BasicPattern& obj) :
 }
 
 BasicPattern::~BasicPattern()
-{}
+{
+    Destroy_Warps(warps);
+}
 
 int BasicPattern::GetNoiseGen(const TraceThreadData *pThread) const
 {
