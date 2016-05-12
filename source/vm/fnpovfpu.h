@@ -265,7 +265,8 @@ class FunctionVM : public GenericFunctionContextFactory
             public:
                 CustomFunction(FunctionVM* pVm, FUNCTION_PTR pFn);
                 virtual ~CustomFunction();
-                virtual GenericFunctionContextPtr NewContext(TraceThreadData* pThreadData);
+                virtual GenericFunctionContextPtr AcquireContext(TraceThreadData* pThreadData);
+                virtual void ReleaseContext(GenericFunctionContextPtr pContext);
                 virtual void InitArguments(GenericFunctionContextPtr pContext);
                 virtual void PushArgument(GenericFunctionContextPtr pContext, DBL arg);
                 virtual DBL Execute(GenericFunctionContextPtr pContext);

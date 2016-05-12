@@ -652,6 +652,8 @@
     #define POV_SAFEMATH_ASSERT(expr) NO_OP
 #endif
 
+#define M_TAU TWO_M_PI
+
 /// @}
 ///
 //******************************************************************************

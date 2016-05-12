@@ -259,9 +259,7 @@ const RESERVED_WORD Reserved_Words[LAST_TOKEN] = {
     {GIF_TOKEN, "gif"},
     {GLOBAL_LIGHTS_TOKEN, "global_lights"},
     {GLOBAL_SETTINGS_TOKEN, "global_settings" },
-#ifdef GLOBAL_PHOTONS
     {GLOBAL_TOKEN, "global"},
-#endif
     {GRADIENT_TOKEN, "gradient"},
     {GRANITE_TOKEN, "granite"},
     {GRAY_TOKEN, "gray"},
@@ -554,6 +552,7 @@ const RESERVED_WORD Reserved_Words[LAST_TOKEN] = {
     {TANH_TOKEN, "tanh"},
     {TAN_TOKEN, "tan"},
     {TARGET_TOKEN, "target"},
+    {TAU_TOKEN, "tau"},
     {TEMPORARY_MACRO_ID_TOKEN, "unfinished macro declaration"},
     {TEXTURE_ID_TOKEN, "texture identifier"},
     {TEXTURE_LIST_TOKEN, "texture_list"},

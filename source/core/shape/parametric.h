@@ -97,14 +97,13 @@ class Parametric : public NonsolidObject
         virtual void Transform(const TRANSFORM *);
         virtual void Compute_BBox();
 
-        void Precompute_Parametric_Values(char flags, int depth, GenericFunctionContextPtr ctx);
+        void Precompute_Parametric_Values(char flags, int depth, TraceThreadData *Thread);
     protected:
-        void Precomp_Par_Int(int depth, DBL umin, DBL vmin, DBL umax, DBL vmax, GenericFunctionContextPtr ctx);
+        void Precomp_Par_Int(int depth, DBL umin, DBL vmin, DBL umax, DBL vmax, GenericScalarFunctionInstance aFn[3]);
         PRECOMP_PAR_DATA *Copy_PrecompParVal();
         void Destroy_PrecompParVal();
 
-        static inline DBL Evaluate_Function_UV(GenericScalarFunctionPtr pFn, GenericFunctionContextPtr ctx, const Vector2d& fnvec);
-        static inline void Evaluate_Function_Interval_UV(GenericScalarFunctionPtr pFn, GenericFunctionContextPtr ctx, DBL threshold, const Vector2d& fnvec_low, const Vector2d& fnvec_hi, DBL max_gradient, DBL& low, DBL& hi);
+        static inline void Evaluate_Function_Interval_UV(GenericScalarFunctionInstance& fn, DBL threshold, const Vector2d& fnvec_low, const Vector2d& fnvec_hi, DBL max_gradient, DBL& low, DBL& hi);
         static void Interval(DBL dx, DBL a, DBL b, DBL max_gradient, DBL *Min, DBL *Max);
     private:
         PRECOMP_PAR_DATA *PData;

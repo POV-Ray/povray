@@ -280,6 +280,13 @@ class Parser : public SceneTask
             bool R_Flag;
         };
 
+        enum IdentifierMode
+        {
+            kIdentifierModeUndefined,
+            kIdentifierModeLocal,
+            kIdentifierModeGlobal,
+        };
+
         // constructor
         Parser(shared_ptr<BackendSceneData> sd, bool useclock, DBL clock);
 
@@ -547,7 +554,8 @@ class Parser : public SceneTask
 
         CS_ENTRY *Cond_Stack;
         int CS_Index;
-        bool Skipping, Inside_Ifdef, Inside_MacroDef, Inside_Local, Parsing_Directive;
+        bool Skipping, Inside_Ifdef, Inside_MacroDef, Parsing_Directive;
+        IdentifierMode Inside_IdentFn;
 
         int Got_EOF; // WARNING: Changes to the use of this variable are very dangerous as it is used in many places assuming certain non-obvious side effects! [trf]
 

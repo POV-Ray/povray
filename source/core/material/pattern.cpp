@@ -264,7 +264,9 @@ BasicPattern::BasicPattern(const BasicPattern& obj) :
 }
 
 BasicPattern::~BasicPattern()
-{}
+{
+    Destroy_Warps(warps);
+}
 
 int BasicPattern::GetNoiseGen(const TraceThreadData *pThread) const
 {
@@ -378,12 +380,12 @@ DBL FacetsPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsec
 
 
 FunctionPattern::FunctionPattern() :
-    pFn(NULL), contextId(0)
+    pFn(NULL)
 {}
 
 FunctionPattern::FunctionPattern(const FunctionPattern& obj) :
     ContinuousPattern(obj),
-    pFn(obj.pFn->Clone()), contextId(obj.contextId)
+    pFn(obj.pFn->Clone())
 {}
 
 FunctionPattern::~FunctionPattern()
@@ -6113,20 +6115,7 @@ DBL DentsPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsect
 
 DBL FunctionPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
-    DBL value;
-
-    if(pThread->functionPatternContext[contextId] == NULL)
-        pThread->functionPatternContext[contextId] = pFn->NewContext(const_cast<TraceThreadData *>(pThread));
-
-    GenericFunctionContextPtr ctx = pThread->functionPatternContext[contextId];
-
-    pFn->InitArguments(ctx);
-    pFn->PushArgument(ctx, EPoint[X]);
-    pFn->PushArgument(ctx, EPoint[Y]);
-    pFn->PushArgument(ctx, EPoint[Z]);
-
-    value = pFn->Execute(ctx);
-
+    DBL value = GenericScalarFunctionInstance(pFn, pThread).Evaluate(EPoint);
     return ((value > 1.0) ? fmod(value, 1.0) : value);
 }
 

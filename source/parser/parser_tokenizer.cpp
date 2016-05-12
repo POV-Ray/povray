@@ -181,7 +181,7 @@ void Parser::pre_init_tokenizer ()
     Skipping            = false;
     Inside_Ifdef        = false;
     Inside_MacroDef     = false;
-    Inside_Local        = false;
+    Inside_IdentFn      = kIdentifierModeUndefined;
     Parsing_Directive   = false;
     Cond_Stack          = NULL;
     Table_Index         = -1;
@@ -627,7 +627,7 @@ void Parser::Get_Token ()
             case '_':
                 Echo_ungetc(c);
                 Read_Symbol ();
-                if (!Parsing_Directive && (Token.Token_Id == LOCAL_TOKEN))
+                if (!Parsing_Directive && (Inside_IdentFn == kIdentifierModeUndefined) && ((Token.Token_Id == LOCAL_TOKEN) || (Token.Token_Id == GLOBAL_TOKEN)))
                 {
                     if (!Skip_Spaces())
                         Error("Expected '(', end of file reached instead", c2);
@@ -637,9 +637,9 @@ void Parser::Get_Token ()
                     if (!Skip_Spaces())
                         Error("Expected 'identifier', end of file reached instead", c2);
 
-                    Inside_Local = true;
+                    Inside_IdentFn = (Token.Token_Id == LOCAL_TOKEN) ? kIdentifierModeLocal : kIdentifierModeGlobal;
                     Read_Symbol();
-                    Inside_Local = false;
+                    Inside_IdentFn = kIdentifierModeUndefined;
 
                     if (!Skip_Spaces())
                         Error("Expected ')', end of file reached instead", c2);
@@ -1305,7 +1305,8 @@ void Parser::Read_Symbol()
     /* If its a reserved keyword, write it and return */
     if ( (Temp_Entry = Find_Symbol(0,String)) != NULL)
     {
-        if (!Inside_Ifdef || ((sceneData->EffectiveLanguageVersion() >= 3.71) && (Temp_Entry->Token_Number == LOCAL_TOKEN)))
+        if (!Inside_Ifdef || ((sceneData->EffectiveLanguageVersion() >= 3.71) &&
+                              ((Temp_Entry->Token_Number == LOCAL_TOKEN) || (Temp_Entry->Token_Number == GLOBAL_TOKEN))))
         {
             Write_Token (Temp_Entry->Token_Number, Token.Token_Col_No);
             return;
@@ -1319,7 +1320,15 @@ void Parser::Read_Symbol()
     if (!Skipping)
     {
         /* Search tables from newest to oldest */
-        for (Local_Index=Table_Index; Local_Index > 0; Local_Index--)
+        int firstIndex = Table_Index;
+        int lastIndex  = 1; // index 0 is reserved for reserved words, not identifiers
+        if (Inside_IdentFn == kIdentifierModeGlobal)
+            // if inside "global()" pseudo-function, just test the global table
+            firstIndex = 1;
+        else if (Inside_IdentFn == kIdentifierModeLocal)
+            // if inside "local()" pseudo-function, just test the most local table
+            lastIndex = Table_Index;
+        for (Local_Index = firstIndex; Local_Index >= lastIndex; Local_Index--)
         {
             /* See if it's a previously declared identifier. */
             if ((Temp_Entry = Find_Symbol(Local_Index,String)) != NULL)
@@ -1417,9 +1426,6 @@ void Parser::Read_Symbol()
                 Token.Table_Index = Local_Index;
                 return;
             }
-
-            if (Inside_Local)
-                break;
         }
     }
 
@@ -2442,7 +2448,7 @@ void Parser::Parse_Directive(int After_Hash)
                     CASE4 (SLOPE_MAP_ID_TOKEN, NORMAL_MAP_ID_TOKEN, TEXTURE_MAP_ID_TOKEN, COLOUR_ID_TOKEN)
                     CASE4 (PIGMENT_MAP_ID_TOKEN, MEDIA_ID_TOKEN, STRING_ID_TOKEN, INTERIOR_ID_TOKEN)
                     CASE4 (DENSITY_ID_TOKEN, ARRAY_ID_TOKEN, DENSITY_MAP_ID_TOKEN, UV_ID_TOKEN)
-                    CASE4 (VECTOR_4D_ID_TOKEN,  RAINBOW_ID_TOKEN, FOG_ID_TOKEN, SKYSPHERE_ID_TOKEN)
+                    CASE4 (VECTOR_4D_ID_TOKEN, RAINBOW_ID_TOKEN, FOG_ID_TOKEN, SKYSPHERE_ID_TOKEN)
                     CASE2 (MATERIAL_ID_TOKEN, SPLINE_ID_TOKEN)
                         Remove_Symbol (Token.Table_Index, Token.Token_String, Token.is_array_elem, Token.DataPtr, Token.Token_Id);
                         EXIT
@@ -3059,7 +3065,7 @@ Parser::Macro *Parser::Parse_Macro()
         CASE4 (SLOPE_MAP_ID_TOKEN, NORMAL_MAP_ID_TOKEN, TEXTURE_MAP_ID_TOKEN, COLOUR_ID_TOKEN)
         CASE4 (PIGMENT_MAP_ID_TOKEN, MEDIA_ID_TOKEN, STRING_ID_TOKEN, INTERIOR_ID_TOKEN)
         CASE4 (DENSITY_ID_TOKEN, ARRAY_ID_TOKEN, DENSITY_MAP_ID_TOKEN, UV_ID_TOKEN)
-        CASE4 (VECTOR_4D_ID_TOKEN,  RAINBOW_ID_TOKEN, FOG_ID_TOKEN, SKYSPHERE_ID_TOKEN)
+        CASE4 (VECTOR_4D_ID_TOKEN, RAINBOW_ID_TOKEN, FOG_ID_TOKEN, SKYSPHERE_ID_TOKEN)
         CASE2 (MATERIAL_ID_TOKEN, SPLINE_ID_TOKEN)
             newParameter.name = POV_STRDUP(Token.Token_String);
             New->parameters.push_back(newParameter);
@@ -3968,7 +3974,7 @@ int Parser::Parse_For_Param (char** IdentifierPtr, DBL* EndPtr, DBL* StepPtr)
         CASE4 (COLOUR_MAP_ID_TOKEN, TRANSFORM_ID_TOKEN, CAMERA_ID_TOKEN, PIGMENT_ID_TOKEN)
         CASE4 (SLOPE_MAP_ID_TOKEN, NORMAL_MAP_ID_TOKEN, TEXTURE_MAP_ID_TOKEN, COLOUR_ID_TOKEN)
         CASE4 (PIGMENT_MAP_ID_TOKEN, MEDIA_ID_TOKEN, STRING_ID_TOKEN, INTERIOR_ID_TOKEN)
-        CASE4 (DENSITY_MAP_ID_TOKEN, ARRAY_ID_TOKEN, DENSITY_ID_TOKEN, UV_ID_TOKEN)
+        CASE4 (DENSITY_ID_TOKEN, ARRAY_ID_TOKEN, DENSITY_MAP_ID_TOKEN, UV_ID_TOKEN)
         CASE4 (VECTOR_4D_ID_TOKEN, RAINBOW_ID_TOKEN, FOG_ID_TOKEN, SKYSPHERE_ID_TOKEN)
         CASE2 (MATERIAL_ID_TOKEN, SPLINE_ID_TOKEN)
             if (Token.is_array_elem)

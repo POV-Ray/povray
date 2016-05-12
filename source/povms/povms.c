@@ -1322,6 +1322,8 @@ POVMS_EXPORT int POVMS_CDECL POVMSStream_ReadType(POVMSType *data, POVMSStream *
     if(data == NULL)
         return 0;
 
+    *data = kPOVMSType_Null;
+
     if(*maxstreamsize < 4)
         return 0;
 

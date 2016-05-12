@@ -103,6 +103,8 @@ bool IsoSurface::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
     {
         Thread->Stats()[Ray_IsoSurface_Bound_Tests_Succeeded]++;
 
+        GenericScalarFunctionInstance fn(Function, Thread);
+
         in_shadow_test = ray.IsShadowTestRay();
 
         if(Depth1 < 0.0)
@@ -124,7 +126,7 @@ bool IsoSurface::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
         if(closed != false)
         {
             VTmp = Plocal + Depth1 * Dlocal;
-            tmp = Vector_Function(Thread->functionContext, VTmp);
+            tmp = fn.Evaluate(VTmp);
             if(Depth1 > accuracy)
             {
                 if(tmp < 0.0)                   /* The ray hits the bounding shape */
@@ -145,12 +147,12 @@ bool IsoSurface::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
                 {
                     Depth1 = accuracy * 5.0;
                     VTmp = Plocal + Depth1 * Dlocal;
-                    if(Vector_Function(Thread->functionContext, VTmp) < 0)
+                    if(fn.Evaluate(VTmp) < 0)
                         Thread->isosurfaceData->Inv3 = -1;
                     /* Change the sign of the function (IPoint is in the bounding shpae.)*/
                 }
                 VTmp = Plocal + Depth2 * Dlocal;
-                if(Vector_Function(Thread->functionContext, VTmp) < 0.0)
+                if(fn.Evaluate(VTmp) < 0.0)
                 {
                     IPoint = ray.Evaluate(Depth2);
                     if(Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
@@ -176,17 +178,17 @@ bool IsoSurface::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
         {
             /* IPoint is on the isosurface */
             VTmp = Plocal + tmin * Dlocal;
-            if(fabs(Vector_Function(Thread->functionContext, VTmp)) < (maxg * accuracy * 4.0))
+            if(fabs(fn.Evaluate(VTmp)) < (maxg * accuracy * 4.0))
             {
                 tmin = accuracy * 5.0;
                 VTmp = Plocal + tmin * Dlocal;
-                if(Vector_Function(Thread->functionContext, VTmp) < 0)
+                if(fn.Evaluate(VTmp) < 0)
                     Thread->isosurfaceData->Inv3 = -1;
                 /* change the sign and go into the isosurface */
             }
         }
 
-        Thread->isosurfaceData->ctx = Thread->functionContext;
+        Thread->isosurfaceData->pFn = &fn;
 
         for (; itrace < max_trace; itrace++)
         {
@@ -260,7 +262,7 @@ bool IsoSurface::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
     if(!container->Inside(New_Point))
         return (Test_Flag(this, INVERTED_FLAG));
 
-    if(Vector_Function(Thread->functionContext, New_Point) > 0)
+    if(GenericScalarFunctionInstance(Function, Thread).Evaluate(New_Point) > 0)
         return (Test_Flag(this, INVERTED_FLAG));
 
     /* Inside the box. */
@@ -307,6 +309,8 @@ void IsoSurface::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *
     }
     else
     {
+        GenericScalarFunctionInstance fn(Function, Thread);
+
         /* Transform the point into the isosurface space */
         if(Trans != NULL)
             MInvTransPoint(New_Point, Inter->IPoint, Trans);
@@ -314,19 +318,19 @@ void IsoSurface::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *
             New_Point = Inter->IPoint;
 
         TPoint = New_Point;
-        funct = Evaluate_Function(Function, Thread->functionContext, TPoint);
+        funct = fn.Evaluate(TPoint);
 
         TPoint = New_Point;
         TPoint[X] += accuracy;
-        Result[X] = Evaluate_Function(Function, Thread->functionContext, TPoint) - funct;
+        Result[X] = fn.Evaluate(TPoint) - funct;
             TPoint = New_Point;
 
         TPoint[Y] += accuracy;
-        Result[Y] = Evaluate_Function(Function, Thread->functionContext, TPoint) - funct;
+        Result[Y] = fn.Evaluate(TPoint) - funct;
             TPoint = New_Point;
 
         TPoint[Z] += accuracy;
-        Result[Z] = Evaluate_Function(Function, Thread->functionContext, TPoint) - funct;
+        Result[Z] = fn.Evaluate(TPoint) - funct;
 
         if((Result[X] == 0) && (Result[Y] == 0) && (Result[Z] == 0))
             Result[X] = 1.0;
@@ -930,38 +934,6 @@ bool IsoSurface::Function_Find_Root_R(ISO_ThreadData& itd, const ISO_Pair* EP1, 
 *
 * FUNCTION
 *
-*   Vector_IsoSurface_Function
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-*   R. Suzuki
-*
-* DESCRIPTION
-*
-*   -
-*
-* CHANGES
-*
-*   -
-*
-******************************************************************************/
-
-DBL IsoSurface::Vector_Function(GenericFunctionContextPtr ctx, const Vector3d& VPos) const
-{
-    return Evaluate_Function(Function, ctx, VPos) - threshold;
-}
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
 *   Float_IsoSurface_Function
 *
 * INPUT
@@ -990,42 +962,7 @@ DBL IsoSurface::Float_Function(ISO_ThreadData& itd, DBL t) const
 
     VTmp = itd.Pglobal + t * itd.Dglobal;
 
-    return ((DBL)itd.Inv3 * (Evaluate_Function(Function, itd.ctx, VTmp) - threshold));
-}
-
-
-/*****************************************************************************
- *
- * FUNCTION
- *
- *   Evaluate_Function
- *
- * INPUT
- *
- * OUTPUT
- *
- * RETURNS
- *
- * AUTHOR
- *
- * DESCRIPTION
- *
- *   -
- *
- * CHANGES
- *
- *   -
- *
- ******************************************************************************/
-
-DBL IsoSurface::Evaluate_Function(GenericScalarFunctionPtr funct, GenericFunctionContextPtr ctx, const Vector3d& fnvec)
-{
-    funct->InitArguments(ctx);
-    funct->PushArgument(ctx, fnvec[X]);
-    funct->PushArgument(ctx, fnvec[Y]);
-    funct->PushArgument(ctx, fnvec[Z]);
-
-    return funct->Execute(ctx);
+    return ((DBL)itd.Inv3 * (itd.pFn->Evaluate(VTmp) - threshold));
 }
 
 }

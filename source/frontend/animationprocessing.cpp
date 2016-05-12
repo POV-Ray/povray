@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -101,7 +101,8 @@ AnimationProcessing::AnimationProcessing(POVMS_Object& options) :
     oddFieldFlag = renderOptions.TryGetBool(kPOVAttrib_OddField, false);
 
     clockDelta = double(finalClock - initialClock) / double(finalFrame - initialFrame);
-    frameNumber = subsetStartFrame;
+    runningFrameNumber = 1;
+    nominalFrameNumber = subsetStartFrame;
     clockValue = POVMSFloat(double(clockDelta * double(subsetStartFrame - initialFrame)) + double(initialClock));
 
     frameNumberDigits = 1;
@@ -116,7 +117,7 @@ POVMS_Object AnimationProcessing::GetFrameRenderOptions()
     opts.SetFloat(kPOVAttrib_Clock, clockValue);
 
     // append to console files if not first frame (user can set this for first frame via command line to append all data to existing files, so don't set it to false)
-    if(frameNumber > subsetStartFrame)
+    if(nominalFrameNumber > subsetStartFrame)
         opts.SetBool(kPOVAttrib_AppendConsoleFiles, true);
 
     POVMS_List declares;
@@ -140,7 +141,7 @@ POVMS_Object AnimationProcessing::GetFrameRenderOptions()
 
     POVMS_Object frame_number(kPOVMSType_WildCard);
     frame_number.SetString(kPOVAttrib_Identifier, "frame_number");
-    frame_number.SetFloat(kPOVAttrib_Value, frameNumber);
+    frame_number.SetFloat(kPOVAttrib_Value, nominalFrameNumber);
     declares.Append(frame_number);
 
     POVMS_Object initial_clock(kPOVMSType_WildCard);
@@ -163,33 +164,39 @@ POVMS_Object AnimationProcessing::GetFrameRenderOptions()
 
 void AnimationProcessing::ComputeNextFrame()
 {
-    frameNumber+= frameStep;
-    clockValue = POVMSFloat(double(clockDelta * double(frameNumber - initialFrame)) + double(initialClock));
+    nominalFrameNumber+= frameStep;
+    ++runningFrameNumber;
+    clockValue = POVMSFloat(double(clockDelta * double(nominalFrameNumber - initialFrame)) + double(initialClock));
 }
 
 bool AnimationProcessing::MoreFrames()
 {
-    return (frameNumber+frameStep <= subsetEndFrame);
+    return (nominalFrameNumber+frameStep <= subsetEndFrame);
 }
 
-POVMSInt AnimationProcessing::GetFrameNumber()
+POVMSInt AnimationProcessing::GetNominalFrameNumber()
 {
-    return frameNumber;
+    return nominalFrameNumber;
 }
 
-POVMSInt AnimationProcessing::GetStartFrame()
+POVMSInt AnimationProcessing::GetRunningFrameNumber()
+{
+    return runningFrameNumber;
+}
+
+POVMSInt AnimationProcessing::GetSubsetStartFrame()
 {
     return subsetStartFrame;
 }
 
-POVMSInt AnimationProcessing::GetEndFrame()
+POVMSInt AnimationProcessing::GetSubsetEndFrame()
 {
     return subsetEndFrame;
 }
 
-POVMSInt AnimationProcessing::GetTotalFrames()
+POVMSInt AnimationProcessing::GetTotalFramesToRender()
 {
-    return subsetEndFrame - subsetStartFrame + 1;
+    return (subsetEndFrame - subsetStartFrame) / frameStep + 1;
 }
 
 POVMSFloat AnimationProcessing::GetClockValue()

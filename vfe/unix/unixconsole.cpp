@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -515,7 +515,7 @@ int main (int argc, char **argv)
         }
 
         if (flags & stAnimationStatus)
-            fprintf(stderr, "\nRendering frame %d of %d\n", session->GetCurrentFrame(), session->GetTotalFrames());
+            fprintf(stderr, "\nRendering frame %d of %d (#%d)\n", session->GetCurrentFrame(), session->GetTotalFrames(), session->GetCurrentFrameId());
         if (flags & stAnyMessage)
             PrintStatus (session);
         if (flags & stBackendStateChanged)

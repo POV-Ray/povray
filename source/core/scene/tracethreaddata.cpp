@@ -61,16 +61,13 @@ TraceThreadData::TraceThreadData(shared_ptr<SceneData> sd): sceneData(sd), quali
     Blob_Coefficients = reinterpret_cast<DBL *>(POV_MALLOC(sizeof(DBL) * Blob_Coefficient_Count, "Blob Coefficients"));
     Blob_Intervals = new Blob_Interval_Struct [Blob_Interval_Count];
     isosurfaceData = reinterpret_cast<ISO_ThreadData *>(POV_MALLOC(sizeof(ISO_ThreadData), "Isosurface Data"));
-    isosurfaceData->ctx = NULL;
+    isosurfaceData->pFn = NULL;
     isosurfaceData->current = NULL;
     isosurfaceData->cache = false;
     isosurfaceData->Inv3 = 1;
     isosurfaceData->fmax = 0.0;
     isosurfaceData->tl = 0.0;
     isosurfaceData->Vlength = 0.0;
-
-    functionContext = sceneData->functionContextFactory->CreateFunctionContext(this);
-    functionPatternContext.resize(sceneData->functionPatternCount);
 
     BCyl_Intervals.reserve(4*sceneData->Max_Bounding_Cylinders);
     BCyl_RInt.reserve(2*sceneData->Max_Bounding_Cylinders);
@@ -116,8 +113,7 @@ TraceThreadData::TraceThreadData(shared_ptr<SceneData> sd): sceneData(sd), quali
 
 TraceThreadData::~TraceThreadData()
 {
-    delete functionContext;
-    for(vector<GenericFunctionContextPtr>::iterator i = functionPatternContext.begin(); i != functionPatternContext.end(); ++i)
+    for(vector<FPUContext*>::iterator i = fpuContextPool.begin(); i != fpuContextPool.end(); ++i)
         delete *i;
 
     POV_FREE(Blob_Coefficients);

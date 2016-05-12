@@ -1573,9 +1573,25 @@ FunctionVM::CustomFunction::~CustomFunction()
     mpVm->DestroyFunction(mpFn);
 }
 
-GenericFunctionContextPtr FunctionVM::CustomFunction::NewContext(TraceThreadData* pThreadData)
+GenericFunctionContextPtr FunctionVM::CustomFunction::AcquireContext(TraceThreadData* pThreadData)
 {
-    return new FPUContext(mpVm, pThreadData);
+    FPUContext* pContext = NULL;
+    if (pThreadData->fpuContextPool.empty())
+        pContext = new FPUContext(mpVm, pThreadData);
+    else
+    {
+        pContext = pThreadData->fpuContextPool.back();
+        pThreadData->fpuContextPool.pop_back();
+    }
+    return pContext;
+}
+
+void FunctionVM::CustomFunction::ReleaseContext(GenericFunctionContextPtr pGenericContext)
+{
+    FPUContext* pContext = dynamic_cast<FPUContext*>(pGenericContext);
+    POV_ASSERT(pContext != NULL);
+    POV_ASSERT(pContext->threaddata != NULL);
+    pContext->threaddata->fpuContextPool.push_back(pContext);
 }
 
 void FunctionVM::CustomFunction::InitArguments(GenericFunctionContextPtr pContext)

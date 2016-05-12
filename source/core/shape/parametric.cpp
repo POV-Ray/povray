@@ -38,6 +38,8 @@
 
 #include <algorithm>
 
+#include <boost/tr1/array.hpp>
+
 #include "core/math/matrix.h"
 #include "core/render/ray.h"
 #include "core/scene/tracethreaddata.h"
@@ -132,6 +134,10 @@ bool Parametric::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
     if ((Depth1 += 4 * accuracy) > Depth2)
         return false;
 
+    GenericScalarFunctionInstance fn0(Function[0], Thread);
+    GenericScalarFunctionInstance fn1(Function[1], Thread);
+    GenericScalarFunctionInstance fn2(Function[2], Thread);
+
     Intervals_Low[INDEX_U][0] = umin;
     Intervals_Hi[INDEX_U][0] = umax;
 
@@ -176,7 +182,7 @@ bool Parametric::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
             hi = PData->Hi[0][SectorNum[i]];
         }
         else
-            Evaluate_Function_Interval_UV(Function[0], Thread->functionContext, accuracy, low_vect, hi_vect, max_gradient, low, hi);
+            Evaluate_Function_Interval_UV(fn0, accuracy, low_vect, hi_vect, max_gradient, low, hi);
         /* fabs(D[X] *(T2-T1)) is not OK with new method */
 
         if (close(D[X], 0))
@@ -221,7 +227,7 @@ bool Parametric::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
             hi = PData->Hi[1][SectorNum[i]];
         }
         else
-            Evaluate_Function_Interval_UV(Function[1], Thread->functionContext, accuracy, low_vect, hi_vect, max_gradient, low, hi);
+            Evaluate_Function_Interval_UV(fn1, accuracy, low_vect, hi_vect, max_gradient, low, hi);
 
         if (close(D[Y], 0))
         {
@@ -271,7 +277,7 @@ bool Parametric::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
             hi = PData->Hi[2][SectorNum[i]];
         }
         else
-            Evaluate_Function_Interval_UV(Function[2], Thread->functionContext, accuracy, low_vect, hi_vect, max_gradient, low, hi);
+            Evaluate_Function_Interval_UV(fn2, accuracy, low_vect, hi_vect, max_gradient, low, hi);
 
         if (close(D[Z], 0))
         {
@@ -435,22 +441,28 @@ void Parametric::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *
     Vector3d RU, RV;
     Vector2d uv_vect;
 
+    std::tr1::array<GenericScalarFunctionInstance,3> aFn = {
+        GenericScalarFunctionInstance(Function[0], Thread),
+        GenericScalarFunctionInstance(Function[1], Thread),
+        GenericScalarFunctionInstance(Function[2], Thread)
+    };
+
     uv_vect[U] = Inter->Iuv[U];
     uv_vect[V] = Inter->Iuv[V];
-    RU[X] = RV[X] = -Evaluate_Function_UV(Function[X], Thread->functionContext, uv_vect);
-    RU[Y] = RV[Y] = -Evaluate_Function_UV(Function[Y], Thread->functionContext, uv_vect);
-    RU[Z] = RV[Z] = -Evaluate_Function_UV(Function[Z], Thread->functionContext, uv_vect);
+    RU[X] = RV[X] = -aFn[X].Evaluate(uv_vect);
+    RU[Y] = RV[Y] = -aFn[Y].Evaluate(uv_vect);
+    RU[Z] = RV[Z] = -aFn[Z].Evaluate(uv_vect);
 
     uv_vect[U] += accuracy;
-    RU[X] += Evaluate_Function_UV(Function[X], Thread->functionContext, uv_vect);
-    RU[Y] += Evaluate_Function_UV(Function[Y], Thread->functionContext, uv_vect);
-    RU[Z] += Evaluate_Function_UV(Function[Z], Thread->functionContext, uv_vect);
+    RU[X] += aFn[X].Evaluate(uv_vect);
+    RU[Y] += aFn[Y].Evaluate(uv_vect);
+    RU[Z] += aFn[Z].Evaluate(uv_vect);
 
     uv_vect[U] = Inter->Iuv[U];
     uv_vect[V] += accuracy;
-    RV[X] += Evaluate_Function_UV(Function[X], Thread->functionContext, uv_vect);
-    RV[Y] += Evaluate_Function_UV(Function[Y], Thread->functionContext, uv_vect);
-    RV[Z] += Evaluate_Function_UV(Function[Z], Thread->functionContext, uv_vect);
+    RV[X] += aFn[X].Evaluate(uv_vect);
+    RV[Y] += aFn[Y].Evaluate(uv_vect);
+    RV[Z] += aFn[Z].Evaluate(uv_vect);
 
     Result = cross(RU, RV);
     if (Trans != NULL)
@@ -790,7 +802,7 @@ void Parametric::UVCoord(Vector2d& Result, const Intersection *inter, TraceThrea
  *
  ******************************************************************************/
 
-void Parametric::Precomp_Par_Int(int depth, DBL umin, DBL vmin, DBL umax, DBL vmax, GenericFunctionContextPtr ctx)
+void Parametric::Precomp_Par_Int(int depth, DBL umin, DBL vmin, DBL umax, DBL vmax, GenericScalarFunctionInstance aFn[3])
 {
     int j;
 
@@ -807,8 +819,7 @@ void Parametric::Precomp_Par_Int(int depth, DBL umin, DBL vmin, DBL umax, DBL vm
                 low[V] = vmin;
                 hi[V] = vmax;
 
-                Evaluate_Function_Interval_UV(Function[j],
-                                              ctx,
+                Evaluate_Function_Interval_UV(aFn[j],
                                               accuracy,
                                               low,
                                               hi,
@@ -822,13 +833,13 @@ void Parametric::Precomp_Par_Int(int depth, DBL umin, DBL vmin, DBL umax, DBL vm
     {
         if(umax - umin < vmax - vmin)
         {
-            Precomp_Par_Int(2 * depth, umin, vmin, umax, (vmin + vmax) / 2.0, ctx);
-            Precomp_Par_Int(2 * depth + 1, umin, (vmin + vmax) / 2.0, umax, vmax, ctx);
+            Precomp_Par_Int(2 * depth, umin, vmin, umax, (vmin + vmax) / 2.0, aFn);
+            Precomp_Par_Int(2 * depth + 1, umin, (vmin + vmax) / 2.0, umax, vmax, aFn);
         }
         else
         {
-            Precomp_Par_Int(2 * depth, umin, vmin, (umin + umax) / 2.0, vmax, ctx);
-            Precomp_Par_Int(2 * depth + 1, (umin + umax) / 2.0, vmin, umax, vmax, ctx);
+            Precomp_Par_Int(2 * depth, umin, vmin, (umin + umax) / 2.0, vmax, aFn);
+            Precomp_Par_Int(2 * depth + 1, (umin + umax) / 2.0, vmin, umax, vmax, aFn);
         }
         for(j = 0; j < 3; j++)
         {
@@ -872,7 +883,7 @@ void Parametric::Precomp_Par_Int(int depth, DBL umin, DBL vmin, DBL umax, DBL vm
  *
  ******************************************************************************/
 
-void Parametric::Precompute_Parametric_Values(char flags, int depth, GenericFunctionContextPtr ctx)
+void Parametric::Precompute_Parametric_Values(char flags, int depth, TraceThreadData *Thread)
 {
     DBL * Last;
     const char* es = "precompute";
@@ -908,7 +919,12 @@ void Parametric::Precompute_Parametric_Values(char flags, int depth, GenericFunc
         throw POV_EXCEPTION_STRING("Cannot allocate memory for parametric precomputation data.");
 
     PrecompLastDepth = 1 << (depth - 1);
-    Precomp_Par_Int(1, umin, vmin, umax, vmax, ctx);
+    std::tr1::array<GenericScalarFunctionInstance,3> aFn = {
+        GenericScalarFunctionInstance(Function[0], Thread),
+        GenericScalarFunctionInstance(Function[1], Thread),
+        GenericScalarFunctionInstance(Function[2], Thread)
+    };
+    Precomp_Par_Int(1, umin, vmin, umax, vmax, aFn.data());
 }
 
 
@@ -1003,39 +1019,6 @@ void Parametric::Destroy_PrecompParVal()
  *
  * FUNCTION
  *
- *   Evaluate_Function
- *
- * INPUT
- *
- * OUTPUT
- *
- * RETURNS
- *
- * AUTHOR
- *
- * DESCRIPTION
- *
- *   -
- *
- * CHANGES
- *
- *   -
- *
- ******************************************************************************/
-
-DBL Parametric::Evaluate_Function_UV(GenericScalarFunctionPtr pFn, GenericFunctionContextPtr ctx, const Vector2d& fnvec)
-{
-    pFn->InitArguments(ctx);
-    pFn->PushArgument(ctx, fnvec[U]);
-    pFn->PushArgument(ctx, fnvec[V]);
-
-    return pFn->Execute(ctx);
-}
-
-/*****************************************************************************
- *
- * FUNCTION
- *
  *   Interval
  *
  * INPUT
@@ -1096,7 +1079,7 @@ void Parametric::Interval(DBL dx, DBL a, DBL b, DBL max_gradient, DBL *Min, DBL 
  *
  ******************************************************************************/
 
-void Parametric::Evaluate_Function_Interval_UV(GenericScalarFunctionPtr pFn, GenericFunctionContextPtr ctx, DBL threshold, const Vector2d& fnvec_low, const Vector2d& fnvec_hi, DBL max_gradient, DBL& low, DBL& hi)
+void Parametric::Evaluate_Function_Interval_UV(GenericScalarFunctionInstance& fn, DBL threshold, const Vector2d& fnvec_low, const Vector2d& fnvec_hi, DBL max_gradient, DBL& low, DBL& hi)
 {
     DBL f_0_0, f_0_1, f_1_0, f_1_1;
     DBL f_0_min, f_0_max;
@@ -1105,29 +1088,10 @@ void Parametric::Evaluate_Function_Interval_UV(GenericScalarFunctionPtr pFn, Gen
 
     /* Calculate the values at each corner */
 
-    pFn->InitArguments(ctx);
-    pFn->PushArgument(ctx, fnvec_low[U]);
-    pFn->PushArgument(ctx, fnvec_low[V]);
-
-    f_0_0 = pFn->Execute(ctx) - threshold;
-
-    pFn->InitArguments(ctx);
-    pFn->PushArgument(ctx, fnvec_low[U]);
-    pFn->PushArgument(ctx, fnvec_hi[V]);
-
-    f_0_1 = pFn->Execute(ctx) - threshold;
-
-    pFn->InitArguments(ctx);
-    pFn->PushArgument(ctx, fnvec_hi[U]);
-    pFn->PushArgument(ctx, fnvec_low[V]);
-
-    f_1_0 = pFn->Execute(ctx) - threshold;
-
-    pFn->InitArguments(ctx);
-    pFn->PushArgument(ctx, fnvec_hi[U]);
-    pFn->PushArgument(ctx, fnvec_hi[V]);
-
-    f_1_1 = pFn->Execute(ctx) - threshold;
+    f_0_0 = fn.Evaluate(fnvec_low[U], fnvec_low[V]) - threshold;
+    f_0_1 = fn.Evaluate(fnvec_low[U], fnvec_hi[V])  - threshold;
+    f_1_0 = fn.Evaluate(fnvec_hi[U],  fnvec_low[V]) - threshold;
+    f_1_1 = fn.Evaluate(fnvec_hi[U],  fnvec_hi[V])  - threshold;
 
     /* Determine a min and a max along the left edge of the patch */
     Interval( fnvec_hi[V]-fnvec_low[V], f_0_0, f_0_1, max_gradient, &f_0_min, &f_0_max);

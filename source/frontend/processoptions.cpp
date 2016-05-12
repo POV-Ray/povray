@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -1178,6 +1178,10 @@ bool ProcessOptions::Parse_INI_String_Smartmode(ITextStream *file)
         // end of file
         case EOF:
             break; // return false, parsing more of the string simply is not possible
+        // end of line
+        case '\r':
+        case '\n':
+            break; // return false, this was just a case of trailing whitespace
         // INI file comment
         case ';':
         case '#':
