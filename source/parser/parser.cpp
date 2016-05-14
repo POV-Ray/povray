@@ -2911,7 +2911,7 @@ ObjectPtr Parser::Parse_Julia_Fractal ()
 
 ObjectPtr Parser::Parse_Lathe()
 {
-    int i;
+    int i, AlreadyWarned;
     Lathe *Object;
     Vector2d *Points;
 
@@ -2996,15 +2996,56 @@ ObjectPtr Parser::Parse_Lathe()
 
     /* Read points (x : radius; y : height; z : not used). */
 
+    AlreadyWarned = 0;
     for (i = 0; i < Object->Number; i++)
     {
         Parse_Comma();
 
         Parse_UV_Vect(Points[i]);
 
-        if ((i > 0) && (i < Object->Number - 1) && (Points[i][X] < 0.0))
+        switch (Object->Spline_Type)
         {
-            Error("Incorrect point in lathe.");
+           case LINEAR_SPLINE :
+
+              if (Points[i][X] < 0.0)
+              {
+                 Error("Lathe with linear spline has a point with an x value < 0.0.");
+              }
+
+              break;
+
+           case QUADRATIC_SPLINE :
+
+              if ((i > 0) && (Points[i][X] < 0.0))
+              {
+                 Error("Lathe with quadratic spline has a point with an x value < 0.0.");
+              }
+
+              break;
+
+           case CUBIC_SPLINE :
+
+              if ((i > 0) && (i < Object->Number - 1) && (Points[i][X] < 0.0))
+              {
+                 Error("Lathe with cubic spline has a point with an x value < 0.0.");
+              }
+
+              break;
+
+           case BEZIER_SPLINE :
+
+              if (((i%4 == 0) || (i%4 == 3)) && (Points[i][X] < 0.0))
+              {
+                 Error("Lathe with Bezier spline has a point with an x value < 0.0.");
+              }
+              else if ((AlreadyWarned == 0) && (i%4 != 0) && (i%4 != 3) && (Points[i][X] < 0.0))
+              {
+                 AlreadyWarned += 1;
+                 Warning("Lathe with negative Bezier spline control point potentially\n"
+                         "an issue for normal calculation and shape bounding.");
+              }
+
+              break;
         }
     }
 
