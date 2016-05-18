@@ -2911,7 +2911,8 @@ ObjectPtr Parser::Parse_Julia_Fractal ()
 
 ObjectPtr Parser::Parse_Lathe()
 {
-    int i, AlreadyWarned;
+    bool AlreadyWarned;
+    int i;
     Lathe *Object;
     Vector2d *Points;
 
@@ -2996,7 +2997,7 @@ ObjectPtr Parser::Parse_Lathe()
 
     /* Read points (x : radius; y : height; z : not used). */
 
-    AlreadyWarned = 0;
+    AlreadyWarned = false;
     for (i = 0; i < Object->Number; i++)
     {
         Parse_Comma();
@@ -3038,9 +3039,9 @@ ObjectPtr Parser::Parse_Lathe()
               {
                  Error("Lathe with Bezier spline has a point with an x value < 0.0.");
               }
-              else if ((AlreadyWarned == 0) && (i%4 != 0) && (i%4 != 3) && (Points[i][X] < 0.0))
+              else if (!AlreadyWarned && (i%4 != 0) && (i%4 != 3) && (Points[i][X] < 0.0))
               {
-                 AlreadyWarned += 1;
+                 AlreadyWarned = true;
                  Warning("Lathe with negative Bezier spline control point potentially\n"
                          "an issue for normal calculation and shape bounding.");
               }
