@@ -602,7 +602,7 @@ void TraceTask::AdaptiveSupersamplingM2()
             for(int x = rect.left; x <= rect.right + 1; x++)
             {
                 // trace upper-left corners of all pixels
-                trace(x-0.5, y-0.5, GetViewData()->GetWidth(), GetViewData()->GetHeight(), pixels(x, y));
+                trace(x, y, GetViewData()->GetWidth(), GetViewData()->GetHeight(), pixels(x, y));
                 GetViewDataPtr()->Stats()[Number_Of_Pixels]++;
 
                 Cooperate();
