@@ -43,6 +43,8 @@
 #include "core/shape/fractal.h"
 #include "core/shape/isosurface.h"
 
+#include "vm/fnpovfpu.h"
+
 // this must be the last file included
 #include "base/povdebug.h"
 
