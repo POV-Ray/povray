@@ -39,6 +39,8 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "base/configbase.h"
 
+#include <boost/thread/xtime.hpp>
+
 #ifdef USE_SYSPROTO
 #include "syspovprotobase.h"
 #endif
@@ -57,10 +59,7 @@ void Delay(unsigned int msec);
 #endif // POV_MULTITHREADED
 
 
-#ifndef POV_TIMER
-
-/// Use default time if no platform specific implementation is provided.
-#define POV_TIMER TimerDefault
+#if POV_TIMER_DEFAULT
 
 /**
  *  Default class for millisecond-precision timers.
@@ -115,7 +114,7 @@ class TimerDefault
         boost::xtime cpuTimeStart;
 };
 
-#endif // POV_TIMER
+#endif // POV_TIMER_DEFAULT
 
 /// Millisecond-precision timer
 typedef POV_TIMER Timer;

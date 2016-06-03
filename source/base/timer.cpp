@@ -50,7 +50,7 @@
 namespace pov_base
 {
 
-#ifndef POV_TIMER
+#if POV_TIMER_DEFAULT
 
 TimerDefault::TimerDefault(bool tctime) :
     threadCPUTimeOnly(tctime)
@@ -91,7 +91,7 @@ void TimerDefault::Reset()
     boost::xtime_get(&cpuTimeStart, POV_TIME_UTC);
 }
 
-#endif // POV_TIMER
+#endif // POV_TIMER_DEFAULT
 
 #if POV_MULTITHREADED && !defined(POV_DELAY_IMPLEMENTED)
 

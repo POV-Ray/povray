@@ -527,6 +527,19 @@
     #define POV_MULTITHREADED 1
 #endif
 
+/// @def POV_TIMER
+/// What class to use for millisecond-precision timers.
+#ifndef POV_TIMER
+    #define POV_TIMER TimerDefault
+    #define POV_TIMER_DEFAULT 1
+#endif
+
+/// @def POV_TIMER_DEFAULT
+/// Whether to provide the @ref TimerDefault millisecond-precision timer class.
+#ifndef POV_TIMER_DEFAULT
+    #define POV_TIMER_DEFAULT 0
+#endif
+
 /// @}
 ///
 //******************************************************************************
