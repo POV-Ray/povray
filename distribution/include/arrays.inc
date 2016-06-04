@@ -2,14 +2,14 @@
 // To view a copy of this license, visit http://creativecommons.org/licenses/by-sa/3.0/ or send a
 // letter to Creative Commons, 444 Castro Street, Suite 900, Mountain View, California, 94041, USA.
 
-// Persistence of Vision Ray Tracer version 3.5 Include File
+// Persistence of Vision Ray Tracer version 3.71 Include File
 // File: arrays.inc
-// Last updated: May 7 2002
+// Last updated: June 3 2016
 // Description: Array manipulation macros...sorting, resizing, etc.
 
 #ifndef(ARRAYS_INC_TEMP)
 #declare ARRAYS_INC_TEMP = version;
-#version 3.5;
+#version 3.71;
 
 #ifdef(View_POV_Include_Stack)
    #debug "including arrays.inc\n"
@@ -110,7 +110,7 @@
          #while(Sort_Compare(Array, FInd, J)) #local J = J-1; #end
          #local I = I+1;
          #while(Sort_Compare(Array, I, FInd)) #local I = I+1; #end
-         
+
          #if(I < J)
             Sort_Swap_Data(Array, I, J)
          #else
@@ -157,6 +157,15 @@
         #write(ARRAYS_Temp_File, uint16be ArrayItem * 65535)
       #else
         #write(ARRAYS_Temp_File, uint16be 0)
+      #end
+    #end
+  #break
+  #case (32)
+    #macro ARRAYS_Temp_WriteDF3(ArrayItem)
+      #ifdef (ArrayItem)
+        #write(ARRAYS_Temp_File, uint32be ArrayItem * 4294967295)
+      #else
+        #write(ARRAYS_Temp_File, uint32be 0)
       #end
     #end
   #break
