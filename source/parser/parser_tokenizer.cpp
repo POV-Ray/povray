@@ -3761,7 +3761,7 @@ void Parser::Parse_Write(void)
 
     EXPECT
         CASE5 (SINT8_TOKEN,SINT16BE_TOKEN,SINT16LE_TOKEN,SINT32BE_TOKEN,SINT32LE_TOKEN)
-        CASE3 (UINT8_TOKEN,UINT16BE_TOKEN,UINT16LE_TOKEN)
+        CASE5 (UINT8_TOKEN,UINT16BE_TOKEN,UINT16LE_TOKEN,UINT32BE_TOKEN,UINT32LE_TOKEN)
             {
                 signed long val_min;
                 signed long val_max;
@@ -3777,6 +3777,8 @@ void Parser::Parse_Write(void)
                     case UINT16LE_TOKEN:                                     val_min =               0; val_max =      65535; num_bytes = 2; break; //  0    to 2^16-1
                     case SINT32BE_TOKEN: big_endian = true; // FALLTHROUGH
                     case SINT32LE_TOKEN:                                     val_min = (-2147483647-1); val_max = 2147483647; num_bytes = 4; break; // -2^31 to 2^31-1 (using unconventional notation to avoid a warning with some compiler)
+                    case UINT32BE_TOKEN: big_endian = true; // FALLTHROUGH
+                    case UINT32LE_TOKEN:                                     val_min =               0; val_max = 4294967295; num_bytes = 4; break; //  0    to 2^32-1
                 }
                 EXPECT
                     CASE_VECTOR
