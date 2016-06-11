@@ -411,21 +411,21 @@ class GenericRGBColour
             mColour[BLUE]  = blue;
         }
 
-        inline GenericRGBColour Clipped(T minc, T maxc)
+        inline GenericRGBColour Clipped(T minc, T maxc) const
         {
             return GenericRGBColour(pov_base::clip<T>(mColour[RED],   minc, maxc),
                                     pov_base::clip<T>(mColour[GREEN], minc, maxc),
                                     pov_base::clip<T>(mColour[BLUE],  minc, maxc));
         }
 
-        inline GenericRGBColour ClippedUpper(T maxc)
+        inline GenericRGBColour ClippedUpper(T maxc) const
         {
             return GenericRGBColour(min(mColour[RED],   maxc),
                                     min(mColour[GREEN], maxc),
                                     min(mColour[BLUE],  maxc));
         }
 
-        inline GenericRGBColour ClippedLower(T minc)
+        inline GenericRGBColour ClippedLower(T minc) const
         {
             return GenericRGBColour(max(mColour[RED],   minc),
                                     max(mColour[GREEN], minc),
@@ -1535,7 +1535,7 @@ class GenericColour
             mColour[BLUE]  = blue;
         }
 */
-        inline GenericColour Clipped(T minc, T maxc)
+        inline GenericColour Clipped(T minc, T maxc) const
         {
             GenericColour result;
             for (int i = 0; i < channels; i ++)
@@ -1543,7 +1543,7 @@ class GenericColour
             return result;
         }
 
-        inline GenericColour ClippedUpper(T maxc)
+        inline GenericColour ClippedUpper(T maxc) const
         {
             GenericColour result;
             for (int i = 0; i < channels; i ++)
@@ -1551,7 +1551,7 @@ class GenericColour
             return result;
         }
 
-        inline GenericColour ClippedLower(T minc)
+        inline GenericColour ClippedLower(T minc) const
         {
             GenericColour result;
             for (int i = 0; i < channels; i ++)
