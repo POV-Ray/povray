@@ -254,6 +254,10 @@ Reported via the Newsgroups:
   Enabling a commented-out statement in the `advanced/whiltile.pov` scene
   would result in the `#version` directive not being the first statement.
 
+- <5762b6bf$1@news.povray.org>
+  (2016-06-16, povray.bugreports, "Function bug with POV-Ray 3.7.1-alpha.8638272 Ubuntu 14.04"
+  Bug in isosurfaces with non-zero threshold.
+
 Reported via Windows Crash Reports:
 
 - crash report #???, dump file #988

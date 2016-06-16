@@ -126,7 +126,7 @@ bool IsoSurface::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
         if(closed != false)
         {
             VTmp = Plocal + Depth1 * Dlocal;
-            tmp = fn.Evaluate(VTmp);
+            tmp = fn.Evaluate(VTmp) - threshold;
             if(Depth1 > accuracy)
             {
                 if(tmp < 0.0)                   /* The ray hits the bounding shape */
@@ -147,12 +147,12 @@ bool IsoSurface::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
                 {
                     Depth1 = accuracy * 5.0;
                     VTmp = Plocal + Depth1 * Dlocal;
-                    if(fn.Evaluate(VTmp) < 0)
+                    if(fn.Evaluate(VTmp) < threshold)
                         Thread->isosurfaceData->Inv3 = -1;
                     /* Change the sign of the function (IPoint is in the bounding shpae.)*/
                 }
                 VTmp = Plocal + Depth2 * Dlocal;
-                if(fn.Evaluate(VTmp) < 0.0)
+                if(fn.Evaluate(VTmp) < threshold)
                 {
                     IPoint = ray.Evaluate(Depth2);
                     if(Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
@@ -178,11 +178,11 @@ bool IsoSurface::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
         {
             /* IPoint is on the isosurface */
             VTmp = Plocal + tmin * Dlocal;
-            if(fabs(fn.Evaluate(VTmp)) < (maxg * accuracy * 4.0))
+            if(fabs(fn.Evaluate(VTmp) - threshold) < (maxg * accuracy * 4.0))
             {
                 tmin = accuracy * 5.0;
                 VTmp = Plocal + tmin * Dlocal;
-                if(fn.Evaluate(VTmp) < 0)
+                if(fn.Evaluate(VTmp) < threshold)
                     Thread->isosurfaceData->Inv3 = -1;
                 /* change the sign and go into the isosurface */
             }
@@ -262,7 +262,7 @@ bool IsoSurface::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
     if(!container->Inside(New_Point))
         return (Test_Flag(this, INVERTED_FLAG));
 
-    if(GenericScalarFunctionInstance(Function, Thread).Evaluate(New_Point) > 0)
+    if(GenericScalarFunctionInstance(Function, Thread).Evaluate(New_Point) > threshold)
         return (Test_Flag(this, INVERTED_FLAG));
 
     /* Inside the box. */
