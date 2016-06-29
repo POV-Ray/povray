@@ -44,6 +44,9 @@
 
 #include <limits>
 #include <algorithm>
+#ifdef AVX2_INTRINSICS
+#include <immintrin.h>
+#endif
 
 #include "base/fileinputoutput.h"
 
@@ -6014,6 +6017,62 @@ DBL CylindricalPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *
 *
 ******************************************************************************/
 
+inline DBL fblob(DBL v, DBL s)
+{
+  //-------- exp expensive in this DF3 interp usage so experimented some
+  //         with the following fast exp() method from:
+  // http://www.schraudolph.org/pubs/Schraudolph99.pdf
+  // https://gist.github.com/andersx/8057b2a6fd3d715d35eb <- less accurate, faster still
+  //         Below -17.8% in iso usage, but small inaccuracies visible.
+  //         Suppose inaccuracy might be OK for media applications or early
+  //         iso scene work but would need a DF3 SDL switch to control it.
+  // exp(x)=2^(x*log2(e))=2^(xi-xf) look up tables often used for xi,xf
+  // IEEE-745 (+-1)(1+m)2^(x-x0) where x0 is 1023, m=11bits, x=52bits.
+  // int(32bit)=A*x+B-C; A=S/ln(s); B=S*1023; C=60801; S=2^20;
+  // Pad 32bit int with another 32bit int to form 64bit set.
+  // Cast the 64bits to a double.
+  //
+  // double tmpDBL=(v*s);
+  // double S=pow(2,20);
+  // double A=S/log(2);
+  // double B=S*1023.0;
+  // long int tmpLInt = (long int) (A*tmpDBL+B-60801)*pow(2,32);
+  // return 1.0/reinterpret_cast<double&>(tmpLInt);
+  //
+  //         Perhaps with vectorization something like 2015 IBM paper would work & be faster.
+  // https://www.researchgate.net/profile/A_Cristiano_I_Malossi/publication/272178514_Fast_Exponential_Computation_on_SIMD_Architectures/links/54de344f0cf22a26721fbdc9.pdf
+  //         Also, glibc is to get a vectorized exp as part of fastmath optimization.
+  //
+  return 1.0/exp(v*s);
+}
+
+#ifdef AVX2_INTRINSICS
+// Needed only for AVX2 option of interpolation modes 3,4 and 5.
+inline void calcAllDiffsSqrd(double *aryd, double this_d, __m256i v_range)
+{  //---- Do all our dist calculations for axis
+   __m256d v_thisd    = _mm256_set1_pd(this_d);
+   __m256d v_rangexd1 = _mm256_cvtepi32_pd(_mm256_extracti128_si256(v_range,0b0));
+   __m256d v_rangexd2 = _mm256_cvtepi32_pd(_mm256_extracti128_si256(v_range,0b1));
+   __m256d v_diffx1   = _mm256_sub_pd(v_rangexd1,v_thisd);
+   __m256d v_diffx2   = _mm256_sub_pd(v_rangexd2,v_thisd);
+   __m256d v_diffx12  = _mm256_mul_pd(v_diffx1,v_diffx1);
+   __m256d v_diffx22  = _mm256_mul_pd(v_diffx2,v_diffx2);
+                        _mm256_store_pd(aryd,v_diffx12);
+                        _mm256_store_pd(&aryd[4],v_diffx22);
+}
+#else
+inline void calcAllDiffsSqrd(double *aryd, double this_d, size_t *ary)
+{  //---- Do all our dist calculations for axis at this point
+   size_t n;
+   DBL tmpVal;
+   for(n = 0; n<8; n++)
+   {
+       tmpVal=(DBL)ary[n]-this_d;
+       aryd[n]=tmpVal*tmpVal;
+   }
+}
+#endif
+
 inline float intp3(float t, float fa, float fb, float fc, float fd)
 {
     float b,d,e,f;
@@ -6045,13 +6104,23 @@ DBL DensityFilePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *
     size_t x1, y1, z1;
     size_t x2, y2, z2;
     DBL Ex, Ey, Ez;
+    DBL this_x, this_y, this_z;
     DBL xx, yy, zz;
     DBL xi, yi;
     DBL f111, f112, f121, f122, f211, f212, f221, f222;
     float intpd2[4][4];
     DBL density = 0.0;
     DENSITY_FILE_DATA *Data;
-    size_t k0, k1, k2, k3, i,j,ii,jj;
+    size_t k0, k1, k2, k3, i, j, k, ii, jj, kk;
+#ifndef AVX2_INTRINSICS
+    size_t rx[8],ry[8],rz[8];     // Not used if doing the avx2 method.
+#endif
+    DBL    rxd[8],ryd[8],rzd[8];
+    size_t startidx, stopidx;
+    DBL    runningval,strengthBias;
+    unsigned short tmpUshort;
+    unsigned int   tmpUint;
+    unsigned long  tmpUlong;
 
     Ex=EPoint[X];
     Ey=EPoint[Y];
@@ -6148,7 +6217,6 @@ DBL DensityFilePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *
                               ((f211 * xi + f212 * xx) * yi + (f221 * xi + f222 * xx) * yy) * zz;
                     break;
                 case kDensityFileInterpolation_Tricubic:
-                default:
                     xx = Ex * (DBL)(Data->Sx);
                     yy = Ey * (DBL)(Data->Sy);
                     zz = Ez * (DBL)(Data->Sz);
@@ -6220,6 +6288,138 @@ DBL DensityFilePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *
 
                     density = intp3(xx, intpd2[0][0], intpd2[0][1], intpd2[0][2], intpd2[0][3]);
                     break;
+                case kDensityFileInterpolation_BlobFour:
+                case kDensityFileInterpolation_BlobSix:
+                case kDensityFileInterpolation_BlobEight:
+                    this_x = Ex * (DBL)(Data->Sx );
+                    this_y = Ey * (DBL)(Data->Sy );
+                    this_z = Ez * (DBL)(Data->Sz );
+
+                    x1 = (size_t)this_x;
+                    y1 = (size_t)this_y;
+                    z1 = (size_t)this_z;
+
+                  #ifdef AVX2_INTRINSICS
+                  //-------------------- The AVX2 implementation ---------------------- (-14% intrp=5)
+                                                             // 7 6 5 4 3  2  1  0
+                    const __m256i v_avals    = _mm256_set_epi32(4,3,2,1,0,-1,-2,-3);
+                          __m256i v_xvals    = _mm256_set1_epi32(x1);
+                          __m256i v_yvals    = _mm256_set1_epi32(y1);
+                          __m256i v_zvals    = _mm256_set1_epi32(z1);
+                          __m256i v_rangex1  = _mm256_add_epi32(v_xvals,v_avals);
+                    const __m256i v_minvals  = _mm256_set1_epi32(0);
+                          __m256i v_rangex2  = _mm256_max_epi32 (v_minvals,v_rangex1);
+                          __m256i v_maxvalsx = _mm256_set1_epi32((Data->Sx)-1);
+                          __m256i v_rangex   = _mm256_min_epi32 (v_maxvalsx,v_rangex2);
+                          __m256i v_rangey1  = _mm256_add_epi32(v_yvals,v_avals);
+                          __m256i v_rangey2  = _mm256_max_epi32 (v_minvals,v_rangey1);
+                          __m256i v_maxvalsy = _mm256_set1_epi32((Data->Sy)-1);
+                          __m256i v_rangey   = _mm256_min_epi32 (v_maxvalsy,v_rangey2);
+                          __m256i v_rangez1  = _mm256_add_epi32(v_zvals,v_avals);
+                          __m256i v_rangez2  = _mm256_max_epi32 (v_minvals,v_rangez1);
+                          __m256i v_maxvalsz = _mm256_set1_epi32((Data->Sz)-1);
+                          __m256i v_rangez   = _mm256_min_epi32 (v_maxvalsz,v_rangez2);
+                    int* rx = (int*)&v_rangex;
+                    int* ry = (int*)&v_rangey;
+                    int* rz = (int*)&v_rangez;
+
+                    calcAllDiffsSqrd(rxd,this_x,v_rangex);
+                    calcAllDiffsSqrd(ryd,this_y,v_rangey);
+                    calcAllDiffsSqrd(rzd,this_z,v_rangez);
+                  //-------------------- The AVX2 implementation ----------------------
+                  #else
+                  //-------------------- A non-AVX2 implementation ---------------------- (+16.25% intrp=5)
+                    rx[3]=max(0,(int)x1);   ry[3]=max(0,(int)y1);   rz[3]=max(0,(int)z1);
+                    rx[2]=max(0,(int)x1-1); ry[2]=max(0,(int)y1-1); rz[2]=max(0,(int)z1-1);
+                    rx[1]=max(0,(int)x1-2); ry[1]=max(0,(int)y1-2); rz[1]=max(0,(int)z1-2);
+                    rx[0]=max(0,(int)x1-3); ry[0]=max(0,(int)y1-3); rz[0]=max(0,(int)z1-3);
+                    //---
+                    rx[4]=min(Data->Sx-1,x1+1); ry[4]=min(Data->Sy-1,y1+1); rz[4]=min(Data->Sz-1,z1+1);
+                    rx[5]=min(Data->Sx-1,x1+2); ry[5]=min(Data->Sy-1,y1+2); rz[5]=min(Data->Sz-1,z1+2);
+                    rx[6]=min(Data->Sx-1,x1+3); ry[6]=min(Data->Sy-1,y1+3); rz[6]=min(Data->Sz-1,z1+3);
+                    rx[7]=min(Data->Sx-1,x1+4); ry[7]=min(Data->Sy-1,y1+4); rz[7]=min(Data->Sz-1,z1+4);
+
+                    calcAllDiffsSqrd(rxd,this_x,rx);
+                    calcAllDiffsSqrd(ryd,this_y,ry);
+                    calcAllDiffsSqrd(rzd,this_z,rz);
+                  //-------------------- A non-AVX2 implementation ----------------------
+                  #endif
+                    switch (densityFile->Interpolation % 10) // TODO - why the modulus operation?? (As noted above too)
+                    {
+                        case kDensityFileInterpolation_BlobFour:
+                            startidx     = 2;
+                            stopidx      = 5;
+                            strengthBias = 1.4;
+                            break;
+                        case kDensityFileInterpolation_BlobSix:
+                            startidx = 1;
+                            stopidx  = 6;
+                            strengthBias = 1.1;
+                            break;
+                        case kDensityFileInterpolation_BlobEight:
+                        default:
+                            startidx = 0;
+                            stopidx  = 7;
+                            strengthBias = 0.8;
+                            break;
+                    }
+                    runningval=0.0;
+                    if(Data->Type == 4)
+                    {
+                        for(i = startidx; i <= stopidx; i++)
+                        {
+                            for(j = startidx; j <= stopidx; j++)
+                            {
+                                for(k = startidx; k <= stopidx; k++)
+                                {
+                                    tmpUlong=Data->Density32[rz[i] * Data->Sy * Data->Sx + ry[j] * Data->Sx + rx[k]];
+                                    if (tmpUlong)
+                                    {
+                                        f111 = 1.0/(1.0/(sqrt(2)*strengthBias))/((DBL)tmpUlong/(DBL)UNSIGNED32_MAX);
+                                        runningval+=fblob(rzd[i]+ryd[j]+rxd[k],f111);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    else if(Data->Type == 2)
+                    {
+                        for(i = startidx; i <= stopidx; i++)
+                        {
+                            for(j = startidx; j <= stopidx; j++)
+                            {
+                                for(k = startidx; k <= stopidx; k++)
+                                {
+                                    tmpUint=Data->Density16[rz[i] * Data->Sy * Data->Sx + ry[j] * Data->Sx + rx[k]];
+                                    if (tmpUint)
+                                    {
+                                        f111 = 1.0/(1.0/(sqrt(2)*strengthBias))/((DBL)tmpUint/(DBL)UNSIGNED16_MAX);
+                                        runningval+=fblob(rzd[i]+ryd[j]+rxd[k],f111);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    else if(Data->Type == 1)
+                    {
+                        for(i = startidx; i <= stopidx; i++)
+                        {
+                            for(j = startidx; j <= stopidx; j++)
+                            {
+                                for(k = startidx; k <= stopidx; k++)
+                                {
+                                    tmpUshort=Data->Density8[rz[i] * Data->Sy * Data->Sx + ry[j] * Data->Sx + rx[k]];
+                                    if (tmpUshort)
+                                    {
+                                        f111 = 1.0/(1.0/(sqrt(2)*strengthBias))/((DBL)tmpUshort/(DBL)UNSIGNED8_MAX);
+                                        runningval+=fblob(rzd[i]+ryd[j]+rxd[k],f111);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    density = min(1.0,runningval);
+                    break;  // Break for outter switch
             }
         }
         else

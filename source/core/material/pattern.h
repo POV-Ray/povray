@@ -127,7 +127,10 @@ enum DensityFileInterpolationType
 {
     kDensityFileInterpolation_None      = 0,
     kDensityFileInterpolation_Trilinear = 1,
-    kDensityFileInterpolation_Tricubic  = 2
+    kDensityFileInterpolation_Tricubic  = 2,
+    kDensityFileInterpolation_BlobFour  = 3,
+    kDensityFileInterpolation_BlobSix   = 4,
+    kDensityFileInterpolation_BlobEight = 5
 };
 
 /// Maximum `exponent` parameter value for fractal patterns.
