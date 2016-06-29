@@ -8,21 +8,20 @@
 //
 // +w900 +h450 +a0.1
 
-#version 3.71; // user_defined introduced with 3.71.
+#version 3.71;
 global_settings { assumed_gamma 1 }
 
 #include "shapes.inc"
-#declare Grey50 = srgbft <0.5,0.5,0.5,0,0>;
-background { color Grey50 }
-#declare Black = srgbft <0,0,0,0,0>;
-#declare OurText = "Round and Round and Round and Round and Round old Y we go."
-#declare Text00 = object {
+background { color rgb <0.5,0.5,0.5> }
+#declare OurText = "Round and round we go."
+#declare TextAboutY = object {
     Circle_Text_Valigned("crystal.ttf",OurText,
-         0.10,0.001,0.02,0.5,0,Align_Left,-5,90)
-    pigment { color Black }
+         0.275,0.001,0.02,0.5,0,Align_Left,-5,90)
+    pigment { color rgb <0,0,0> }
     rotate x*-90
+    translate <0,-0.05,0>
 }
-#declare CameraP = camera {
+#declare CameraPerspective = camera {
     perspective
     location <2.3,2.3,-2.301>
     sky <0,1,0>
@@ -30,10 +29,8 @@ background { color Grey50 }
     right x*(image_width/image_height)
     look_at <0,0,0>
 }
-#declare White = srgbft <1,1,1,0,0>;
-#declare Light00 = light_source { <50,150,-250>, White }
 #declare CylY = cylinder { <0,-1,0>, <0,1,0>, 0.01
-    texture { pigment { color White }
+    texture { pigment { color rgb <0.859,0.910,0.831> }
               finish { ambient 0 diffuse 0 emission 1 }
     }
 }
@@ -41,7 +38,7 @@ background { color Grey50 }
 #declare FnXrad = function (x) { (x+0.5)*tau }
 #declare FnX    = function (x) { cos(FnXrad(x)) }
 #declare FnZ    = function (x) { sin(FnXrad(x)) }
-#declare Camera00 = camera {
+#declare CameraUserDefined = camera {
     user_defined
     location {
       function { FnX(x) }
@@ -55,9 +52,8 @@ background { color Grey50 }
     }
 }
 //---
-  camera { Camera00 }
-//camera { CameraP  } // Use to see perspective view
-light_source { Light00 }
+  camera { CameraUserDefined }
+//camera { CameraPerspective } // Use for perspective scene view
 object { CylY }
-object { Text00 }
+object { TextAboutY }
 
