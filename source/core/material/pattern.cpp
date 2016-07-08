@@ -6023,9 +6023,8 @@ inline DBL fblob(DBL v, DBL s)
   //         with the following fast exp() method from:
   // http://www.schraudolph.org/pubs/Schraudolph99.pdf
   // https://gist.github.com/andersx/8057b2a6fd3d715d35eb <- less accurate, faster still
-  //         Below -17.8% in iso usage, but small inaccuracies visible.
-  //         Suppose inaccuracy might be OK for media applications or early
-  //         iso scene work but would need a DF3 SDL switch to control it.
+  //         Below +-17.8% in iso usage, small inaccuracies visible.
+  //         Suppose inaccuracy might be OK for media applications.
   // exp(x)=2^(x*log2(e))=2^(xi-xf) look up tables often used for xi,xf
   // IEEE-745 (+-1)(1+m)2^(x-x0) where x0 is 1023, m=11bits, x=52bits.
   // int(32bit)=A*x+B-C; A=S/ln(s); B=S*1023; C=60801; S=2^20;
@@ -6349,18 +6348,18 @@ DBL DensityFilePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *
                         case kDensityFileInterpolation_BlobFour:
                             startidx     = 2;
                             stopidx      = 5;
-                            strengthBias = 2.4748737341529163;      // Old 1.9798989873223332
+                            strengthBias = 2.4748737341529163;
                             break;
                         case kDensityFileInterpolation_BlobSix:
                             startidx = 1;
                             stopidx  = 6;
-                            strengthBias = 1.2374368670764582;      // Old 1.5556349186104048
+                            strengthBias = 1.2374368670764582;
                             break;
                         case kDensityFileInterpolation_BlobEight:
                         default:
                             startidx = 0;
                             stopidx  = 7;
-                            strengthBias = 0.6187184335382291;      // Old 1.1313708498984762
+                            strengthBias = 0.6187184335382291;
                             break;
                     }
                     runningval=0.0;
@@ -6375,7 +6374,7 @@ DBL DensityFilePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *
                                     tmpUlong=Data->Density32[rz[i] * Data->Sy * Data->Sx + ry[j] * Data->Sx + rx[k]];
                                     if (tmpUlong)
                                     {
-                                        f111 = 1.0/(1.0/strengthBias)/((DBL)tmpUlong/(DBL)UNSIGNED32_MAX);
+                                        f111 = strengthBias/((DBL)tmpUlong/(DBL)UNSIGNED32_MAX);
                                         runningval+=fblob(rzd[i]+ryd[j]+rxd[k],f111);
                                     }
                                 }
@@ -6393,7 +6392,7 @@ DBL DensityFilePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *
                                     tmpUint=Data->Density16[rz[i] * Data->Sy * Data->Sx + ry[j] * Data->Sx + rx[k]];
                                     if (tmpUint)
                                     {
-                                        f111 = 1.0/(1.0/strengthBias)/((DBL)tmpUint/(DBL)UNSIGNED16_MAX);
+                                        f111 = strengthBias/((DBL)tmpUint/(DBL)UNSIGNED16_MAX);
                                         runningval+=fblob(rzd[i]+ryd[j]+rxd[k],f111);
                                     }
                                 }
@@ -6411,7 +6410,7 @@ DBL DensityFilePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *
                                     tmpUshort=Data->Density8[rz[i] * Data->Sy * Data->Sx + ry[j] * Data->Sx + rx[k]];
                                     if (tmpUshort)
                                     {
-                                        f111 = 1.0/(1.0/strengthBias)/((DBL)tmpUshort/(DBL)UNSIGNED8_MAX);
+                                        f111 = strengthBias/((DBL)tmpUshort/(DBL)UNSIGNED8_MAX);
                                         runningval+=fblob(rzd[i]+ryd[j]+rxd[k],f111);
                                     }
                                 }
