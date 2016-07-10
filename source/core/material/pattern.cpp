@@ -6216,6 +6216,7 @@ DBL DensityFilePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *
                               ((f211 * xi + f212 * xx) * yi + (f221 * xi + f222 * xx) * yy) * zz;
                     break;
                 case kDensityFileInterpolation_Tricubic:
+                default:
                     xx = Ex * (DBL)(Data->Sx);
                     yy = Ey * (DBL)(Data->Sy);
                     zz = Ez * (DBL)(Data->Sz);
