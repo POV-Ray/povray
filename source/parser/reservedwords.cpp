@@ -139,9 +139,9 @@ const RESERVED_WORD Reserved_Words[LAST_TOKEN] = {
     {COLOUR_ID_TOKEN, "colour identifier"},
     {COLOUR_KEY_TOKEN, "color keyword"},
     {COLOUR_MAP_ID_TOKEN, "colour map identifier"},
-    {COLOUR_MAP_TOKEN, "color_map"},
+    {COLOUR_MAP_TOKEN, "color_map"}, // alternative spelling
     {COLOUR_MAP_TOKEN, "colour_map"},
-    {COLOUR_TOKEN, "color"},
+    {COLOUR_TOKEN, "color"}, // alternative spelling
     {COLOUR_TOKEN, "colour"},
     {COMMA_TOKEN, ", "},
     {COMPONENT_TOKEN, "component"},
@@ -220,8 +220,8 @@ const RESERVED_WORD Reserved_Words[LAST_TOKEN] = {
     {EXTINCTION_TOKEN, "extinction"},
     {FACETS_TOKEN, "facets"},
     {FACE_INDICES_TOKEN, "face_indices"},
+    {FADE_COLOUR_TOKEN, "fade_color"}, // alternative spelling
     {FADE_COLOUR_TOKEN, "fade_colour"},
-    {FADE_COLOUR_TOKEN, "fade_color"},
     {FADE_DISTANCE_TOKEN, "fade_distance"},
     {FADE_POWER_TOKEN, "fade_power"},
     {FALLOFF_ANGLE_TOKEN, "falloff_angle"},
@@ -263,7 +263,9 @@ const RESERVED_WORD Reserved_Words[LAST_TOKEN] = {
     {GRADIENT_TOKEN, "gradient"},
     {GRANITE_TOKEN, "granite"},
     {GRAY_TOKEN, "gray"},
+    {GRAY_TOKEN, "grey"}, // alternative spelling
     {GRAY_THRESHOLD_TOKEN, "gray_threshold" },
+    {GRAY_THRESHOLD_TOKEN, "grey_threshold" }, // alternative spelling
     {GREEN_TOKEN, "green"},
     {HASH_TOKEN, "#"},
     {HAT_TOKEN, "^"},
@@ -271,6 +273,7 @@ const RESERVED_WORD Reserved_Words[LAST_TOKEN] = {
     {HEIGHT_FIELD_TOKEN, "height_field"},
     {HEXAGON_TOKEN, "hexagon"},
     {HF_GRAY_16_TOKEN, "hf_gray_16" },
+    {HF_GRAY_16_TOKEN, "hf_grey_16" }, // alternative spelling
     {HIERARCHY_TOKEN, "hierarchy"},
     {HOLLOW_TOKEN, "hollow"},
     {HYPERCOMPLEX_TOKEN, "hypercomplex"},
@@ -438,7 +441,7 @@ const RESERVED_WORD Reserved_Words[LAST_TOKEN] = {
     {QUARTIC_TOKEN, "quartic"},
     {QUATERNION_TOKEN, "quaternion"},
     {QUESTION_TOKEN, "?"},
-    {QUICK_COLOUR_TOKEN, "quick_color"},
+    {QUICK_COLOUR_TOKEN, "quick_color"}, // alternative spelling
     {QUICK_COLOUR_TOKEN, "quick_colour"},
     {QUILTED_TOKEN, "quilted"},
     {RADIAL_TOKEN, "radial"},
@@ -598,7 +601,7 @@ const RESERVED_WORD Reserved_Words[LAST_TOKEN] = {
     {UNOFFICIAL_TOKEN, "unofficial"},
     {UP_TOKEN, "up"},
     {USE_ALPHA_TOKEN, "use_alpha"},
-    {USE_COLOUR_TOKEN, "use_color"},
+    {USE_COLOUR_TOKEN, "use_color"}, // alternative spelling
     {USE_COLOUR_TOKEN, "use_colour"},
     {USE_INDEX_TOKEN, "use_index"},
     {USER_DEFINED_TOKEN, "user_defined"},

@@ -178,7 +178,6 @@ namespace vfe
       virtual int ReadSpecialOptionHandler(INI_Parser_Table *, char *, POVMSObjectPtr);
       virtual int ReadSpecialSwitchHandler(Cmd_Parser_Table *, char *, POVMSObjectPtr, bool);
       virtual int WriteSpecialOptionHandler(INI_Parser_Table *, POVMSObjectPtr, OTextStream *);
-      virtual bool WriteOptionFilter(INI_Parser_Table *);
       virtual int ProcessUnknownString(char *, POVMSObjectPtr);
       virtual ITextStream *OpenFileForRead(const char *, POVMSObjectPtr);
       virtual OTextStream *OpenFileForWrite(const char *, POVMSObjectPtr);

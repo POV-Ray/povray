@@ -516,11 +516,6 @@ int vfeProcessRenderOptions::WriteSpecialOptionHandler(INI_Parser_Table *Table, 
   return ProcessRenderOptions::WriteSpecialOptionHandler (Table, Obj, S);
 }
 
-bool vfeProcessRenderOptions::WriteOptionFilter(INI_Parser_Table *Table)
-{
-  return ProcessRenderOptions::WriteOptionFilter (Table);
-}
-
 int vfeProcessRenderOptions::ProcessUnknownString(char *String, POVMSObjectPtr Obj)
 {
   return ProcessRenderOptions::ProcessUnknownString (String, Obj);

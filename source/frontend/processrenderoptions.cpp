@@ -102,7 +102,7 @@ struct ProcessOptions::INI_Parser_Table RenderOptions_INI_Table[] =
     { "Antialias_Gamma",     kPOVAttrib_AntialiasGamma,     kPOVMSType_Float },
     { "Append_File",         kPOVAttrib_AppendConsoleFiles, kPOVMSType_Bool },
 
-    { "Bits_Per_Color",      kPOVAttrib_BitsPerColor,       kPOVMSType_Int },
+    { "Bits_Per_Color",      kPOVAttrib_BitsPerColor,       kPOVMSType_Int,         kINIOptFlag_SuppressWrite },
     { "Bits_Per_Colour",     kPOVAttrib_BitsPerColor,       kPOVMSType_Int },
     { "Bounding",            kPOVAttrib_Bounding,           kPOVMSType_Bool },
     { "Bounding_Method",     kPOVAttrib_BoundingMethod,     kPOVMSType_Int },
@@ -147,6 +147,7 @@ struct ProcessOptions::INI_Parser_Table RenderOptions_INI_Table[] =
     { "Frame_Step",          kPOVAttrib_FrameStep,          kPOVMSType_Int },
 
     { "Grayscale_Output",    kPOVAttrib_GrayscaleOutput,    kPOVMSType_Bool },
+    { "Greyscale_Output",    kPOVAttrib_GrayscaleOutput,    kPOVMSType_Bool,        kINIOptFlag_SuppressWrite },
 
     { "Height",              kPOVAttrib_Height,             kPOVMSType_Int },
     { "High_Reproducibility",kPOVAttrib_HighReproducibility,kPOVMSType_Bool },
@@ -820,12 +821,6 @@ int ProcessRenderOptions::WriteSpecialOptionHandler(INI_Parser_Table *option, PO
     }
 
     return err;
-}
-
-bool ProcessRenderOptions::WriteOptionFilter(INI_Parser_Table *table)
-{
-    // So that we don't get both Bits_Per_Color and Bits_Per_Colour in the INI file.
-    return (strcmp(table->keyword, "Bits_Per_Colour") != 0);
 }
 
 int ProcessRenderOptions::ProcessUnknownString(char *str, POVMSObjectPtr obj)

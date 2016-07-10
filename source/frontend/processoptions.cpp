@@ -352,7 +352,7 @@ int ProcessOptions::WriteFile(OTextStream *ini_file, POVMSObjectPtr obj)
     // find the keyword
     while(table->keyword != NULL)
     {
-        if(WriteOptionFilter(table) == true)
+        if((table->flags | kINIOptFlag_SuppressWrite) == 0)
             Output_INI_Option(table, obj, ini_file);
         table++;
     }
@@ -572,12 +572,6 @@ int ProcessOptions::WriteSpecialOptionHandler(INI_Parser_Table *, POVMSObjectPtr
 {
     // do nothing by default
     return kNoErr;
-}
-
-bool ProcessOptions::WriteOptionFilter(INI_Parser_Table *)
-{
-    // filter nothing out by default
-    return true;
 }
 
 bool ProcessOptions::ProcessUnknownSwitch(char *, char *, POVMSObjectPtr)

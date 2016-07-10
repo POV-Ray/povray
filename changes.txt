@@ -49,6 +49,10 @@ Prior to the release of 3.7.1, the following items still need urgent attention:
 New Features
 ------------
 
+- All instances of `gray` in keywords or INI file options can now alternatively
+  be spelt `grey`. Previously this was only the case inside function
+  definitions (where it applied only to the `.gray` colour pseudo-component).
+
 - A new inbuilt constant, `tau`, has been added as shorthand for `2*pi`, in
   support of the world-wide initiative to obsolete pi in favour of the new,
   more intuitive constant.
@@ -255,7 +259,7 @@ Reported via the Newsgroups:
   would result in the `#version` directive not being the first statement.
 
 - <5762b6bf$1@news.povray.org>
-  (2016-06-16, povray.bugreports, "Function bug with POV-Ray 3.7.1-alpha.8638272 Ubuntu 14.04"
+  (2016-06-16, povray.bugreports, "Function bug with POV-Ray 3.7.1-alpha.8638272 Ubuntu 14.04")
   Bug in isosurfaces with non-zero threshold.
 
 Reported via Windows Crash Reports:

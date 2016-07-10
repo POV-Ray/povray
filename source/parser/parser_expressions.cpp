@@ -1471,7 +1471,7 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                             return;
 
                         default:
-                            Expectation_Error ("red, green, blue, filter, or transmit");
+                            Expectation_Error ("red, green, blue, filter, transmit, gray or vector component");
                     }
                     EXIT
                 END_CASE
@@ -1492,7 +1492,7 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                 END_CASE
 
                 OTHERWISE
-                    Expectation_Error ("x, y, z or color component");
+                    Expectation_Error ("x, y, z, u, v, t or color component");
                 END_CASE
             END_EXPECT
 

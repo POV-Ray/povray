@@ -135,6 +135,7 @@ enum TOKEN_IDS
     TRANSMIT_TOKEN,
     GRAY_TOKEN,
     GREEN_TOKEN,
+    GREY_TOKEN,             // placeholder for alternative spelling of GRAY_TOKEN
     RED_TOKEN,
     RGBF_TOKEN,
     RGBFT_TOKEN,
@@ -151,7 +152,7 @@ enum TOKEN_IDS
     SRGB_TOKEN,
     COLOUR_KEY_TOKEN, /*WARNING: All new keywords which may preceed a COLOUR must be placed  before COLOUR_KEY_TOKEN or the parser won't work right. */
 
-    COLOR_TOKEN,
+    COLOR_TOKEN,            // placeholder for alternative spelling of COLOUR_TOKEN
     COLOUR_TOKEN,
     COLOUR_ID_TOKEN, /*Note: Not 100% sure about the above tokens.  May move them up later. */
 
@@ -190,7 +191,7 @@ enum TOKEN_IDS
     CHECKER_TOKEN,
     CLIPPED_BY_TOKEN,
     COLON_TOKEN,
-    COLOR_MAP_TOKEN,
+    COLOR_MAP_TOKEN,        // placeholder for alternative spelling of COLOUR_MAP_TOKEN
     COLOUR_MAP_ID_TOKEN,
     COLOUR_MAP_TOKEN,
     COMMA_TOKEN,
@@ -287,7 +288,7 @@ enum TOKEN_IDS
     QUADRIC_TOKEN,
     QUARTIC_TOKEN,
     QUESTION_TOKEN,
-    QUICK_COLOR_TOKEN,
+    QUICK_COLOR_TOKEN,      // placeholder for alternative spelling of QUICK_COLOUR_TOKEN
     QUICK_COLOUR_TOKEN,
     RADIAL_TOKEN,
     RADIUS_TOKEN,
@@ -348,7 +349,7 @@ enum TOKEN_IDS
     UNION_TOKEN,
     UNOFFICIAL_TOKEN,
     UP_TOKEN,
-    USE_COLOR_TOKEN,
+    USE_COLOR_TOKEN,        // placeholder for alternative spelling of USE_COLOUR_TOKEN
     USE_COLOUR_TOKEN,
     USE_INDEX_TOKEN,
     USER_DEFINED_TOKEN,
@@ -429,7 +430,7 @@ enum TOKEN_IDS
     SKYSPHERE_ID_TOKEN,
     FADE_POWER_TOKEN,
     FADE_COLOUR_TOKEN,
-    FADE_COLOR_TOKEN,
+    FADE_COLOR_TOKEN,       // placeholder for alternative spelling of FADE_COLOUR_TOKEN
     FADE_DISTANCE_TOKEN,
     TURB_DEPTH_TOKEN,
     PPM_TOKEN,
@@ -475,12 +476,14 @@ enum TOKEN_IDS
     COUNT_TOKEN,
     ERROR_BOUND_TOKEN,
     GRAY_THRESHOLD_TOKEN,
+    GREY_THRESHOLD_TOKEN,   // placeholder for alternative spelling of GRAY_THRESHOLD_TOKEN
     LOW_ERROR_FACTOR_TOKEN,
     MAXIMUM_REUSE_TOKEN,
     MINIMUM_REUSE_TOKEN,
     NEAREST_COUNT_TOKEN,
     RECURSION_LIMIT_TOKEN,
     HF_GRAY_16_TOKEN,
+    HF_GREY_16_TOKEN,       // placeholder for alternative spelling of HF_GRAY_16_TOKEN
     GLOBAL_SETTINGS_TOKEN,
     ECCENTRICITY_TOKEN,
     HOLLOW_TOKEN,

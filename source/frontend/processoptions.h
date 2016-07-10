@@ -46,14 +46,19 @@
 namespace pov_base
 {
 
+enum {
+    kINIOptFlag_SuppressWrite = 0x0001,     ///< Suppress when writing complete list of options
+};
+
 class ProcessOptions
 {
     public:
         struct INI_Parser_Table
         {
-            const char *keyword;
-            POVMSType key;
-            POVMSType type;
+            const char  *keyword;
+            POVMSType   key;
+            POVMSType   type;
+            int         flags;
         };
 
         struct Cmd_Parser_Table
@@ -86,7 +91,6 @@ class ProcessOptions
         virtual int ReadSpecialOptionHandler(INI_Parser_Table *, char *, POVMSObjectPtr);
         virtual int ReadSpecialSwitchHandler(Cmd_Parser_Table *, char *, POVMSObjectPtr, bool);
         virtual int WriteSpecialOptionHandler(INI_Parser_Table *, POVMSObjectPtr, OTextStream *);
-        virtual bool WriteOptionFilter(INI_Parser_Table *);
         virtual bool ProcessUnknownSwitch(char *, char *, POVMSObjectPtr);
         virtual int ProcessUnknownString(char *, POVMSObjectPtr);
 
