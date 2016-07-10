@@ -6137,7 +6137,7 @@ DBL DensityFilePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *
 */
         if((Ex >= 0.0) && (Ex < 1.0) && (Ey >= 0.0) && (Ey < 1.0) && (Ez >= 0.0) && (Ez < 1.0))
         {
-            switch (densityFile->Interpolation % 10) // TODO - why the modulus operation??
+            switch (densityFile->Interpolation)
             {
                 case kDensityFileInterpolation_None:
                     x = (size_t)(Ex * (DBL)Data->Sx);
@@ -6344,7 +6344,7 @@ DBL DensityFilePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *
                     calcAllDiffsSqrd(rzd,this_z,rz);
                   //-------------------- A non-AVX2 implementation ----------------------
                   #endif
-                    switch (densityFile->Interpolation % 10) // TODO - why the modulus operation?? (As noted above too)
+                    switch (densityFile->Interpolation)
                     {
                         case kDensityFileInterpolation_BlobFour:
                             startidx     = 2;
