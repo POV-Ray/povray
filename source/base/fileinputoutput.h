@@ -50,18 +50,6 @@
 namespace pov_base
 {
 
-#ifndef POV_SEEK_SET
-    #define POV_SEEK_SET IOBase::seek_set
-#endif
-
-#ifndef POV_SEEK_CUR
-    #define POV_SEEK_CUR IOBase::seek_cur
-#endif
-
-#ifndef POV_SEEK_END
-    #define POV_SEEK_END IOBase::seek_end
-#endif
-
 // NOTE: Remember to modify gPOV_File_Extensions in fileinputoutput.cpp!
 enum
 {

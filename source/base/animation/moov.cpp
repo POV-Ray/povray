@@ -172,11 +172,11 @@ void PostWriteFrame(OStream *file, POV_LONG bytes, const Animation::WriteOptions
 
     // update mdat size
 
-    file->seekg(0, SEEK_END);
+    file->seekg(0, IOBase::seek_end);
     pd->mdatsize = file->tellg() + 16;
-    file->seekg(8, SEEK_SET);
+    file->seekg(8, IOBase::seek_set);
     WriteInt8(file, pd->mdatsize);
-    file->seekg(0, SEEK_END);
+    file->seekg(0, IOBase::seek_end);
 
     if(bytes > 2147483647) // 2^31 - 1
         throw POV_EXCEPTION(kInvalidDataSizeErr, "Cannot handle frame data larger than 2^31 bytes!");
@@ -387,9 +387,9 @@ void ReadAtomHeader(IStream *file, Type& type, POV_LONG& size)
         ReadType(file, type);
 
         POV_LONG t = file->tellg();
-        file->seekg(0, IOBase::SEEK_END);
+        file->seekg(0, IOBase::seek_end);
         size = file->tellg() - t + 8;
-        file->seekg(t, IOBase::SEEK_SET);
+        file->seekg(t, IOBase::seek_set);
     }
     else if(size == 1) // atom sizes is outside 32-bit range
     {

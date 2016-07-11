@@ -799,12 +799,12 @@ void ProcessFontFile(TrueTypeFont* ffile)
         READFIXED(ffile->fp); // header version - ignored [trf]
         READULONG(ffile->fp); // directory count - ignored [trf]
         // go to first font data block listed in the directory table entry [trf]
-        ffile->fp->seekg(READULONG(ffile->fp), SEEK_SET);
+        ffile->fp->seekg(READULONG(ffile->fp), IOBase::seek_set);
     }
     else
     {
         // if it is no TTC style file, it is a regular TTF style file
-        ffile->fp->seekg(0, SEEK_SET);
+        ffile->fp->seekg(0, IOBase::seek_set);
     }
 
     OffsetTable.version = READFIXED(ffile->fp);
@@ -1117,7 +1117,7 @@ void ProcessKernTable(TrueTypeFont *ffile, int kern_table_offset)
              * seekg to the end of this table, excluding the length of the version,
              * length, and coverage USHORTs, which we have already read.
              */
-            ffile->fp->seekg((int)(length - 6), POV_SEEK_CUR);
+            ffile->fp->seekg((int)(length - 6), IOBase::seek_cur);
             kern_table->tables[i].nPairs = 0;
         }
     }
@@ -1460,7 +1460,7 @@ USHORT ProcessFormat0Glyph(TrueTypeFont *ffile, unsigned int search_char)
 {
     BYTE temp_index;
 
-    ffile->fp->seekg ((int)search_char, POV_SEEK_CUR);
+    ffile->fp->seekg ((int)search_char, IOBase::seek_cur);
 
     /// @compat
     /// This piece of code relies on BYTE having the same size as char.
@@ -1641,7 +1641,7 @@ USHORT ProcessFormat6Glyph(TrueTypeFont *ffile, unsigned int search_char)
 
     if (search_char >= firstCode && search_char < firstCode + entryCount)
     {
-        ffile->fp->seekg (((int)(search_char - firstCode))*2, POV_SEEK_CUR);
+        ffile->fp->seekg (((int)(search_char - firstCode))*2, IOBase::seek_cur);
         glyph_index = READUSHORT(ffile->fp);
     }
     else
@@ -1855,7 +1855,7 @@ GlyphOutline *ExtractGlyphOutline(TrueTypeFont *ffile, unsigned int glyph_index,
 
         /* Skip over the instructions */
         temp16 = READUSHORT(ffile->fp);
-        ffile->fp->seekg (temp16, POV_SEEK_CUR);
+        ffile->fp->seekg (temp16, IOBase::seek_cur);
 #ifdef TTF_DEBUG
         Debug_Info("skipping instruction bytes: %d\n", temp16);
 #endif

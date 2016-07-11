@@ -236,7 +236,7 @@ extern "C"
         {
             num_bytes -= (long) bufptr->jsrc.bytes_in_buffer;
             bufptr->jsrc.bytes_in_buffer = 0;
-            bufptr->file->seekg(num_bytes, POV_SEEK_CUR);
+            bufptr->file->seekg(num_bytes, IOBase::seek_cur);
         }
         else
         {
