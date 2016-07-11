@@ -133,87 +133,32 @@ IFileStream::~IFileStream()
     close();
 }
 
-// TODO - trim down to the IStream-specific portions
-bool IFileStream::open(const UCS2String& name, unsigned int Flags /* = 0 */)
+bool IFileStream::open(const UCS2String& name)
 {
-    char mode[8];
-
     close();
     filename = name;
-
-    if((Flags & append) == 0)
-    {
-        switch(direction)
-        {
-            case input:
-                strcpy(mode, "r");
-                break;
-            case output:
-                strcpy(mode, "w");
-                break;
-            case io:
-                strcpy(mode, "w+");
-                break;
-            default:
-                return false;
-        }
-    }
-    else
-    {
-        // we cannot use append mode here, since "a" mode is totally incompatible with any
-        // output file format that requires in-place updates(i.e. writing to any location
-        // other than the end of the file). BMP files are in this category. In theory, "r+"
-        // can do anything "a" can do(with appropriate use of seek()) so append mode should
-        // not be needed.
-        strcpy(mode, "r+");
-    }
-
-    strcat(mode, "b");
 
     f = NULL;
     if(pov_stricmp(UCS2toASCIIString(name).c_str(), "stdin") == 0)
     {
-        if(direction != input ||(Flags & append) != 0)
-            return false;
         f = stdin;
     }
     else if(pov_stricmp(UCS2toASCIIString(name).c_str(), "stdout") == 0)
     {
-        if(direction != output ||(Flags & append) != 0)
-            return false;
-        f = stdout;
+        return false;
     }
     else if(pov_stricmp(UCS2toASCIIString(name).c_str(), "stderr") == 0)
     {
-        if(direction != output ||(Flags & append) != 0)
-            return false;
-        f = stderr;
+        return false;
     }
     else
     {
-        if((f = POV_UCS2_FOPEN(name, mode)) == NULL)
+        if((f = POV_UCS2_FOPEN(name, "rb")) == NULL)
         {
-            if((Flags & append) == 0)
-                return false;
-
-            // to maintain traditional POV +c(continue) mode compatibility, if
-            // the open for append of an existing file fails, we allow a new file
-            // to be created.
-            mode [0] = 'w';
-            if((f = POV_UCS2_FOPEN(name, mode)) == NULL)
-                return false;
-        }
-    }
-    fail = false;
-
-    if((Flags & append) != 0)
-    {
-        if(!seekg(0, seek_end))
-        {
-            close();
             return false;
         }
     }
+    fail = false;
 
     return true;
 }
@@ -236,8 +181,7 @@ bool IFileStream::close()
 // implies that only the input stream will be affected on streams opened for I/O
 // (which is not the case with fseek, since fseek moves the pointer for output too).
 // However, the macintosh code seems to need it to be called seekg, so it is ...
-// TODO - trim down to the IStream-specific portions
-IOBase& IFileStream::seekg(POV_LONG pos, unsigned int whence /* = seek_set */)
+IOBase& IFileStream::seekg(POV_LONG pos, unsigned int whence)
 {
     if(!fail)
         fail = fseek(f, pos, whence) != 0;
@@ -303,30 +247,16 @@ OStream::~OStream()
     close();
 }
 
-// TODO - trim down to the OStream-specific portions
-bool OStream::open(const UCS2String& name, unsigned int Flags /* = 0 */)
+bool OStream::open(const UCS2String& name, unsigned int Flags)
 {
-    char mode[8];
+    const char* mode;
 
     close();
     filename = name;
 
     if((Flags & append) == 0)
     {
-        switch(direction)
-        {
-            case input:
-                strcpy(mode, "r");
-                break;
-            case output:
-                strcpy(mode, "w");
-                break;
-            case io:
-                strcpy(mode, "w+");
-                break;
-            default:
-                return false;
-        }
+        mode = "wb";
     }
     else
     {
@@ -335,27 +265,23 @@ bool OStream::open(const UCS2String& name, unsigned int Flags /* = 0 */)
         // other than the end of the file). BMP files are in this category. In theory, "r+"
         // can do anything "a" can do(with appropriate use of seek()) so append mode should
         // not be needed.
-        strcpy(mode, "r+");
+        mode = "r+b";
     }
-
-    strcat(mode, "b");
 
     f = NULL;
     if(pov_stricmp(UCS2toASCIIString(name).c_str(), "stdin") == 0)
     {
-        if(direction != input ||(Flags & append) != 0)
-            return false;
-        f = stdin;
+        return false;
     }
     else if(pov_stricmp(UCS2toASCIIString(name).c_str(), "stdout") == 0)
     {
-        if(direction != output ||(Flags & append) != 0)
+        if((Flags & append) != 0)
             return false;
         f = stdout;
     }
     else if(pov_stricmp(UCS2toASCIIString(name).c_str(), "stderr") == 0)
     {
-        if(direction != output ||(Flags & append) != 0)
+        if((Flags & append) != 0)
             return false;
         f = stderr;
     }
@@ -369,7 +295,7 @@ bool OStream::open(const UCS2String& name, unsigned int Flags /* = 0 */)
             // to maintain traditional POV +c(continue) mode compatibility, if
             // the open for append of an existing file fails, we allow a new file
             // to be created.
-            mode [0] = 'w';
+            mode = "wb";
             if((f = POV_UCS2_FOPEN(name, mode)) == NULL)
                 return false;
         }
@@ -388,7 +314,6 @@ bool OStream::open(const UCS2String& name, unsigned int Flags /* = 0 */)
     return true;
 }
 
-// TODO - trim down to the OStream-specific portions
 bool OStream::close()
 {
     if(f != NULL)
@@ -401,7 +326,6 @@ bool OStream::close()
     return true;
 }
 
-// TODO - trim down to the OStream-specific portions
 OStream& OStream::flush()
 {
     if(f != NULL)
@@ -414,7 +338,6 @@ OStream& OStream::flush()
 // implies that only the input stream will be affected on streams opened for I/O
 // (which is not the case with fseek, since fseek moves the pointer for output too).
 // However, the macintosh code seems to need it to be called seekg, so it is ...
-// TODO - trim down to the OStream-specific portions
 IOBase& OStream::seekg(POV_LONG pos, unsigned int whence /* = seek_set */)
 {
     if(!fail)
@@ -622,7 +545,7 @@ IOBase& IMemStream::seekg(POV_LONG posi, unsigned int whence)
     return *this;
 }
 
-bool IMemStream::open(const UCS2String &, unsigned int)
+bool IMemStream::open(const UCS2String &)
 {
     pos = 0;
     fail = false;

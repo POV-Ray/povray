@@ -91,7 +91,6 @@ class IOBase
         enum { input, output, io };
         enum { seek_set = SEEK_SET, seek_cur = SEEK_CUR, seek_end = SEEK_END };
 
-        virtual bool open(const UCS2String& name, unsigned int Flags = 0) = 0;
         virtual bool close() = 0;
         virtual IOBase& seekg(POV_LONG pos, unsigned int whence = seek_set) = 0;
 
@@ -116,6 +115,7 @@ class IStream : public IOBase
         IStream(unsigned int type);
         virtual ~IStream();
 
+        virtual bool open(const UCS2String& name) = 0;
         virtual bool read(void *buffer, size_t count) = 0;
 
         virtual int Read_Byte() = 0;
@@ -143,7 +143,7 @@ class IFileStream : public IStream
         IFileStream(unsigned int type);
         virtual ~IFileStream();
 
-        virtual bool open(const UCS2String& name, unsigned int Flags = 0);
+        virtual bool open(const UCS2String& name);
         virtual bool close();
         virtual IOBase& seekg(POV_LONG pos, unsigned int whence = seek_set);
 
@@ -176,7 +176,7 @@ class IMemStream : public IStream
         ///     The pseudo file is always ready for reading; calling this method is purely optional,
         ///     and all it does is reset the pseudo file to the initial state. Any parameters
         ///     supplied are ignored.
-        virtual bool open(const UCS2String&, unsigned int = 0);
+        virtual bool open(const UCS2String&);
 
         /// Close the pseudo file.
         /// @note
@@ -198,7 +198,7 @@ class OStream : public IOBase
         OStream(unsigned int type);
         ~OStream();
 
-        virtual bool open(const UCS2String& name, unsigned int Flags = 0);
+        bool open(const UCS2String& name, unsigned int Flags = 0);
         virtual bool close();
         virtual IOBase& seekg(POV_LONG pos, unsigned int whence = seek_set);
 
