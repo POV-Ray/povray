@@ -49,8 +49,8 @@ class DefaultPlatformBase : public PlatformBase
         DefaultPlatformBase();
         ~DefaultPlatformBase();
 
-        virtual IStream *CreateIStream(const unsigned int stype);
-        virtual OStream *CreateOStream(const unsigned int stype);
+        virtual IStream *CreateIStream(unsigned int stype);
+        virtual OStream *CreateOStream(unsigned int stype);
 
         virtual UCS2String GetTemporaryPath();
         virtual UCS2String CreateTemporaryFile();

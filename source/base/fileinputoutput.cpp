@@ -69,10 +69,72 @@ IOBase::IOBase(unsigned int dir, unsigned int type)
 
 IOBase::~IOBase()
 {
+}
+
+IStream::IStream(unsigned int stype) : IOBase(input, stype)
+{
+}
+
+IStream::~IStream()
+{
+}
+
+IStream& IStream::UnRead_Byte(int c)
+{
+    if(!fail)
+        fail = ungetc(c, f) != c;
+    return *this;
+}
+
+IStream& IStream::getline(char *s, size_t buflen)
+{
+    int chr = 0;
+
+    if(feof(f) != 0)
+        fail = true;
+
+    if(!fail && buflen > 0)
+    {
+        while(buflen > 1)
+        {
+            chr = fgetc(f);
+            if(chr == EOF)
+                break;
+            else if(chr == 10)
+            {
+                chr = fgetc(f);
+                if(chr != 13)
+                    ungetc(chr, f);
+                break;
+            }
+            else if(chr == 13)
+            {
+                chr = fgetc(f);
+                if(chr != 10)
+                    ungetc(chr, f);
+                break;
+            }
+            *s = chr;
+            s++;
+            buflen--;
+        }
+        *s = 0;
+    }
+
+    return *this;
+}
+
+IFileStream::IFileStream(unsigned int stype) : IStream(stype)
+{
+}
+
+IFileStream::~IFileStream()
+{
     close();
 }
 
-bool IOBase::open(const UCS2String& name, unsigned int Flags /* = 0 */)
+// TODO - trim down to the IStream-specific portions
+bool IFileStream::open(const UCS2String& name, unsigned int Flags /* = 0 */)
 {
     char mode[8];
 
@@ -156,7 +218,8 @@ bool IOBase::open(const UCS2String& name, unsigned int Flags /* = 0 */)
     return true;
 }
 
-bool IOBase::close(void)
+// TODO - trim down to the IStream-specific portions
+bool IFileStream::close()
 {
     if(f != NULL)
     {
@@ -168,90 +231,29 @@ bool IOBase::close(void)
     return true;
 }
 
-IOBase& IOBase::flush(void)
-{
-    if(f != NULL)
-        fflush(f);
-    return *this;
-}
-
-IOBase& IOBase::read(void *buffer, size_t count)
-{
-    if(!fail && count > 0)
-        fail = fread(buffer, count, 1, f) != 1;
-    return *this;
-}
-
-IOBase& IOBase::write(const void *buffer, size_t count)
-{
-    if(!fail && count > 0)
-        fail = fwrite(buffer, count, 1, f) != 1;
-    return *this;
-}
-
 // Strictly speaking, this should -not- be called seekg, since 'seekg'(an iostreams
 // term) applies only to an input stream, and therefore the use of this name here
 // implies that only the input stream will be affected on streams opened for I/O
-//(which is not the case with fseek, since fseek moves the pointer for output too).
+// (which is not the case with fseek, since fseek moves the pointer for output too).
 // However, the macintosh code seems to need it to be called seekg, so it is ...
-IOBase& IOBase::seekg(POV_LONG pos, unsigned int whence /* = seek_set */)
+// TODO - trim down to the IStream-specific portions
+IOBase& IFileStream::seekg(POV_LONG pos, unsigned int whence /* = seek_set */)
 {
     if(!fail)
         fail = fseek(f, pos, whence) != 0;
     return *this;
 }
 
-IStream::IStream(unsigned int stype) : IOBase(input, stype)
+bool IFileStream::read(void *buffer, size_t count)
 {
+    if(!fail && count > 0)
+        fail = fread(buffer, count, 1, f) != 1;
+    return !fail;
 }
 
-IStream::~IStream()
+int IFileStream::Read_Byte()
 {
-}
-
-IStream& IStream::UnRead_Byte(int c)
-{
-    if(!fail)
-        fail = ungetc(c, f) != c;
-    return *this;
-}
-
-IStream& IStream::getline(char *s, size_t buflen)
-{
-    int chr = 0;
-
-    if(feof(f) != 0)
-        fail = true;
-
-    if(!fail && buflen > 0)
-    {
-        while(buflen > 1)
-        {
-            chr = fgetc(f);
-            if(chr == EOF)
-                break;
-            else if(chr == 10)
-            {
-                chr = fgetc(f);
-                if(chr != 13)
-                    ungetc(chr, f);
-                break;
-            }
-            else if(chr == 13)
-            {
-                chr = fgetc(f);
-                if(chr != 10)
-                    ungetc(chr, f);
-                break;
-            }
-            *s = chr;
-            s++;
-            buflen--;
-        }
-        *s = 0;
-    }
-
-    return *this;
+    return(fail ? EOF : fgetc(f));
 }
 
 /*
@@ -298,6 +300,133 @@ OStream::OStream(unsigned int stype) : IOBase(output, stype)
 
 OStream::~OStream()
 {
+    close();
+}
+
+// TODO - trim down to the OStream-specific portions
+bool OStream::open(const UCS2String& name, unsigned int Flags /* = 0 */)
+{
+    char mode[8];
+
+    close();
+    filename = name;
+
+    if((Flags & append) == 0)
+    {
+        switch(direction)
+        {
+            case input:
+                strcpy(mode, "r");
+                break;
+            case output:
+                strcpy(mode, "w");
+                break;
+            case io:
+                strcpy(mode, "w+");
+                break;
+            default:
+                return false;
+        }
+    }
+    else
+    {
+        // we cannot use append mode here, since "a" mode is totally incompatible with any
+        // output file format that requires in-place updates(i.e. writing to any location
+        // other than the end of the file). BMP files are in this category. In theory, "r+"
+        // can do anything "a" can do(with appropriate use of seek()) so append mode should
+        // not be needed.
+        strcpy(mode, "r+");
+    }
+
+    strcat(mode, "b");
+
+    f = NULL;
+    if(pov_stricmp(UCS2toASCIIString(name).c_str(), "stdin") == 0)
+    {
+        if(direction != input ||(Flags & append) != 0)
+            return false;
+        f = stdin;
+    }
+    else if(pov_stricmp(UCS2toASCIIString(name).c_str(), "stdout") == 0)
+    {
+        if(direction != output ||(Flags & append) != 0)
+            return false;
+        f = stdout;
+    }
+    else if(pov_stricmp(UCS2toASCIIString(name).c_str(), "stderr") == 0)
+    {
+        if(direction != output ||(Flags & append) != 0)
+            return false;
+        f = stderr;
+    }
+    else
+    {
+        if((f = POV_UCS2_FOPEN(name, mode)) == NULL)
+        {
+            if((Flags & append) == 0)
+                return false;
+
+            // to maintain traditional POV +c(continue) mode compatibility, if
+            // the open for append of an existing file fails, we allow a new file
+            // to be created.
+            mode [0] = 'w';
+            if((f = POV_UCS2_FOPEN(name, mode)) == NULL)
+                return false;
+        }
+    }
+    fail = false;
+
+    if((Flags & append) != 0)
+    {
+        if(!seekg(0, seek_end))
+        {
+            close();
+            return false;
+        }
+    }
+
+    return true;
+}
+
+// TODO - trim down to the OStream-specific portions
+bool OStream::close()
+{
+    if(f != NULL)
+    {
+        if (f != stdout && f != stderr && f != stdin)
+            fclose(f);
+        f = NULL;
+    }
+    fail = true;
+    return true;
+}
+
+// TODO - trim down to the OStream-specific portions
+OStream& OStream::flush()
+{
+    if(f != NULL)
+        fflush(f);
+    return *this;
+}
+
+// Strictly speaking, this should -not- be called seekg, since 'seekg'(an iostreams
+// term) applies only to an input stream, and therefore the use of this name here
+// implies that only the input stream will be affected on streams opened for I/O
+// (which is not the case with fseek, since fseek moves the pointer for output too).
+// However, the macintosh code seems to need it to be called seekg, so it is ...
+// TODO - trim down to the OStream-specific portions
+IOBase& OStream::seekg(POV_LONG pos, unsigned int whence /* = seek_set */)
+{
+    if(!fail)
+        fail = fseek(f, pos, whence) != 0;
+    return *this;
+}
+
+bool OStream::write(const void *buffer, size_t count)
+{
+    if(!fail && count > 0)
+        fail = fwrite(buffer, count, 1, f) != 1;
+    return !fail;
 }
 
 void OStream::printf(const char *format, ...)
@@ -309,7 +438,7 @@ void OStream::printf(const char *format, ...)
     vsnprintf(buffer, 1023, format, marker);
     va_end(marker);
 
-    *this << buffer;
+    write(reinterpret_cast<const void *>(buffer), strlen(buffer));
 }
 
 IStream *NewIStream(const Path& p, unsigned int stype)
@@ -403,7 +532,7 @@ POV_LONG GetFileLength(const Path& p)
     return result;
 }
 
-IOBase& IMemStream::read(void *buffer, size_t count)
+bool IMemStream::read(void *buffer, size_t count)
 {
     if (!fail)
     {
@@ -417,7 +546,7 @@ IOBase& IMemStream::read(void *buffer, size_t count)
             fail = true;
         }
     }
-    return *this;
+    return !fail;
 }
 
 int IMemStream::Read_Byte()

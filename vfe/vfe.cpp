@@ -229,12 +229,12 @@ vfePlatformBase::~vfePlatformBase()
 {
 }
 
-IStream *vfePlatformBase::CreateIStream(const unsigned int stype)
+IStream *vfePlatformBase::CreateIStream(unsigned int stype)
 {
-  return (new IStream (stype)) ;
+  return (new IFileStream (stype)) ;
 }
 
-OStream *vfePlatformBase::CreateOStream(const unsigned int stype)
+OStream *vfePlatformBase::CreateOStream(unsigned int stype)
 {
   return (new OStream (stype)) ;
 }

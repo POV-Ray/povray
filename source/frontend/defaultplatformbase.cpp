@@ -55,12 +55,12 @@ DefaultPlatformBase::~DefaultPlatformBase()
 {
 }
 
-IStream *DefaultPlatformBase::CreateIStream(const unsigned int stype)
+IStream *DefaultPlatformBase::CreateIStream(unsigned int stype)
 {
-    return new IStream(stype);
+    return new IFileStream(stype);
 }
 
-OStream *DefaultPlatformBase::CreateOStream(const unsigned int stype)
+OStream *DefaultPlatformBase::CreateOStream(unsigned int stype)
 {
     return new OStream(stype);
 }

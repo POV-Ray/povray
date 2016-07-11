@@ -91,14 +91,10 @@ class IOBase
         enum { input, output, io };
         enum { seek_set = SEEK_SET, seek_cur = SEEK_CUR, seek_end = SEEK_END };
 
-        virtual bool open(const UCS2String& name, unsigned int Flags = 0);
-        virtual bool close();
-        virtual IOBase& read(void *buffer, size_t count);
-        IOBase& write(const void *buffer, size_t count);
-        virtual IOBase& seekg(POV_LONG pos, unsigned int whence = seek_set);
+        virtual bool open(const UCS2String& name, unsigned int Flags = 0) = 0;
+        virtual bool close() = 0;
+        virtual IOBase& seekg(POV_LONG pos, unsigned int whence = seek_set) = 0;
 
-        inline unsigned int gettype() const { return(filetype); }
-        inline unsigned int getdirection() const { return(direction); }
         inline bool eof() { return(fail ? true : feof(f) != 0); }
         virtual inline POV_LONG tellg() { return(f == NULL ? -1 : ftell(f)); }
         inline IOBase& clearstate() { if(f != NULL) fail = false; return *this; }
@@ -109,7 +105,6 @@ class IOBase
     protected:
         bool fail;
         FILE *f;
-        IOBase& flush();
         unsigned int filetype;
         unsigned int direction;
         UCS2String filename;
@@ -121,28 +116,11 @@ class IStream : public IOBase
         IStream(unsigned int type);
         virtual ~IStream();
 
-        virtual inline int Read_Byte() { return(fail ? EOF : fgetc(f)); }
-        int Read_Short();
-        int Read_Int();
+        virtual bool read(void *buffer, size_t count) = 0;
+
+        virtual int Read_Byte() = 0;
         inline IStream& Read_Byte(char& c) { c =(char) Read_Byte(); return *this; }
         inline IStream& Read_Byte(unsigned char& c) { c =(unsigned char) Read_Byte(); return *this; }
-        /*
-        inline IStream& Read_Short(short& n) { n =(short) Read_Short(); return *this; }
-        inline IStream& Read_Short(unsigned short& n) { n =(unsigned short) Read_Short(); return *this; }
-        inline IStream& Read_Int(int& n) { n = Read_Int(); return *this; }
-        inline IStream& Read_Int(unsigned int& n) { n = Read_Int(); return *this; }
-        */
-
-        /*
-        inline IStream& operator>>(int& n) { read(&n, sizeof(n)); return *this; }
-        inline IStream& operator>>(short& n) { read(&n, sizeof(n)); return *this; }
-        */
-        inline IStream& operator>>(char& n) { read(&n, sizeof(n)); return *this; }
-        /*
-        inline IStream& operator>>(unsigned int& n) { read(&n, sizeof(n)); return *this; }
-        inline IStream& operator>>(unsigned short& n) { read(&n, sizeof(n)); return *this; }
-        */
-        inline IStream& operator>>(unsigned char& n) { read(&n, sizeof(n)); return *this; }
 
         /// Step back in the stream by a single byte.
         /// @attention
@@ -155,7 +133,25 @@ class IStream : public IOBase
         IStream& ignore(POV_LONG count) { seekg(count, seek_cur); return *this; }
 };
 
-/// Memory-backed pseudo input file.
+/// File-backed input stream.
+///
+/// This class provides file read access.
+///
+class IFileStream : public IStream
+{
+    public:
+        IFileStream(unsigned int type);
+        virtual ~IFileStream();
+
+        virtual bool open(const UCS2String& name, unsigned int Flags = 0);
+        virtual bool close();
+        virtual IOBase& seekg(POV_LONG pos, unsigned int whence = seek_set);
+
+        virtual bool read(void *buffer, size_t count);
+        virtual int Read_Byte();
+};
+
+/// Memory-backed input stream.
 ///
 /// This class provides read access to in-memory data in a manner compatible with regular input file
 /// access.
@@ -171,7 +167,7 @@ class IMemStream : public IStream
         virtual IStream& UnRead_Byte(int c);
         virtual IStream& getline(char *s, size_t buflen);
         virtual POV_LONG tellg();
-        virtual IOBase& read(void *buffer, size_t count);
+        virtual bool read(void *buffer, size_t count);
         virtual IOBase& seekg(POV_LONG pos, unsigned int whence = seek_set);
 
         /// Open the pseudo file.
@@ -202,25 +198,15 @@ class OStream : public IOBase
         OStream(unsigned int type);
         ~OStream();
 
+        virtual bool open(const UCS2String& name, unsigned int Flags = 0);
+        virtual bool close();
+        virtual IOBase& seekg(POV_LONG pos, unsigned int whence = seek_set);
+
+        bool write(const void *buffer, size_t count);
         void printf(const char *format, ...);
+        inline bool Write_Byte(unsigned char data) { if(!fail) fail = fputc(data, f) != data; return !fail; }
 
-        inline OStream& Write_Byte(unsigned char data) { if(!fail) fail = fputc(data, f) != data; return *this; }
-/*
-        inline OStream& Write_Short(unsigned short data) { write(&data, sizeof(data)); return *this; }
-        inline OStream& Write_Int(unsigned int data) { write(&data, sizeof(data)); return *this; }
-*/
-        inline OStream& flush(void) { IOBase::flush(); return *this; }
-
-        inline OStream& operator<<(const char *s) { write(reinterpret_cast<const void *>(s), (size_t) strlen(s)); return *this; }
-        inline OStream& operator<<(const unsigned char *s) { return operator<<(reinterpret_cast<const char *>(s)); }
-        inline OStream& operator<<(char c) { return(Write_Byte(c)); }
-        inline OStream& operator<<(unsigned char c) { return operator <<((char) c); }
-/*
-        inline OStream& operator<<(short n) { return(Write_Short(n)); }
-        inline OStream& operator<<(unsigned short n) { return operator <<((short) n); }
-        inline OStream& operator<<(int n) { return(Write_Int(n)); }
-        inline OStream& operator<<(unsigned int n) { return operator <<((int) n); }
-*/
+        OStream& flush();
 };
 
 IStream *NewIStream(const Path&, unsigned int);
