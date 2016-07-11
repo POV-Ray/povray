@@ -201,26 +201,12 @@ IOBase& IOBase::seekg(POV_LONG pos, unsigned int whence /* = seek_set */)
     return *this;
 }
 
-IStream::IStream(const unsigned int stype) : IOBase(input, stype)
+IStream::IStream(unsigned int stype) : IOBase(input, stype)
 {
 }
 
 IStream::~IStream()
 {
-}
-
-int IStream::Read_Short(void)
-{
-    short result;
-    read(&result, sizeof(short));
-    return result;
-}
-
-int IStream::Read_Int(void)
-{
-    int result;
-    read(&result, sizeof(int));
-    return result;
 }
 
 IStream& IStream::UnRead_Byte(int c)
@@ -276,9 +262,9 @@ IStream& IStream::getline(char *s, size_t buflen)
  *
  * To add a font, check first its license
  */
-IMemStream::IMemStream(const int font_id):IStream(POV_File_Font_TTF)
+IMemStream::IMemStream(unsigned int type, int fileId) : IStream(type)
 {
-    switch(font_id)
+    switch(fileId)
     {
         case 1:
             start = &font_timrom[0];
@@ -306,7 +292,7 @@ IMemStream::~IMemStream()
 // [jg] more to do here  (?)
 }
 
-OStream::OStream(const unsigned int stype) : IOBase(output, stype)
+OStream::OStream(unsigned int stype) : IOBase(output, stype)
 {
 }
 
@@ -326,7 +312,7 @@ void OStream::printf(const char *format, ...)
     *this << buffer;
 }
 
-IStream *NewIStream(const Path& p, const unsigned int stype)
+IStream *NewIStream(const Path& p, unsigned int stype)
 {
     std::auto_ptr<IStream> istreamptr(POV_PLATFORM_BASE.CreateIStream(stype));
 
@@ -346,7 +332,7 @@ IStream *NewIStream(const Path& p, const unsigned int stype)
     return istreamptr.release();
 }
 
-OStream *NewOStream(const Path& p, const unsigned int stype, const bool sappend)
+OStream *NewOStream(const Path& p, unsigned int stype, bool sappend)
 {
     std::auto_ptr<OStream> ostreamptr(POV_PLATFORM_BASE.CreateOStream(stype));
     unsigned int Flags = IOBase::none;
@@ -419,14 +405,17 @@ POV_LONG GetFileLength(const Path& p)
 
 IOBase& IMemStream::read(void *buffer, size_t count)
 {
-    if ((!fail)&&(pos+count<= size))
+    if (!fail)
     {
-        memcpy(buffer,&start[pos],count);
-        pos+= count;
-    }
-    else
-    {
-        fail = true;
+        if ((count <= size) && (pos <= size-count))
+        {
+            memcpy(buffer,&start[pos],count);
+            pos += count;
+        }
+        else
+        {
+            fail = true;
+        }
     }
     return *this;
 }
@@ -440,22 +429,30 @@ int IMemStream::Read_Byte()
     }
     else
     {
-        v = start[pos++];
-        fail = !(pos<size);
+        if (pos < size)
+            v = start[pos++];
+        else
+            fail = true;
     }
     return v;
 }
 
 IStream& IMemStream::UnRead_Byte(int c)
 {
-    pos--;
-    fail = !(pos<size);
+    if (!fail)
+    {
+        if (pos > 0)
+            pos--;
+        else
+            fail = true;
+    }
     return *this;
 }
 
 IStream& IMemStream::getline(char *s,size_t buflen)
 {
-    // Not needed for font
+    // Not needed for inbuilt fonts or scene file caching
+    throw POV_EXCEPTION_CODE(kParamErr);
     return *this;
 }
 
@@ -466,31 +463,47 @@ POV_LONG IMemStream::tellg()
 
 IOBase& IMemStream::seekg(POV_LONG posi, unsigned int whence)
 {
-    switch(whence)
+    if(!fail)
     {
-        case seek_set:
-            pos = posi;
-            break;
-        case seek_cur:
-            pos += posi;
-            break;
-        case seek_end:
-            pos = size - posi;
-            break;
+        switch(whence)
+        {
+            case seek_set:
+                if (posi <= size)
+                    pos = posi;
+                else
+                    fail = true;
+                break;
+            case seek_cur:
+                if ((posi <= size) && (pos <= size-posi))
+                    pos += posi;
+                else
+                    fail = true;
+                break;
+            case seek_end:
+                if (posi <= size)
+                    pos = size - posi;
+                else
+                    fail = true;
+                break;
+            default:
+                POV_ASSERT(false);
+                break;
+        }
     }
-    fail = !(pos<size);
     return *this;
 }
 
-bool IMemStream::open(const UCS2String &name, unsigned int Flags)
+bool IMemStream::open(const UCS2String &, unsigned int)
 {
-    // Not needed for font
+    pos = 0;
+    fail = false;
     return true;
 }
 
 bool IMemStream::close()
 {
-    // Not needed for font
+    pos = 0;
+    fail = false;
     return true;
 }
 

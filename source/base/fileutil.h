@@ -78,7 +78,7 @@ extern POV_File_Extensions gPOV_File_Extensions[];
 extern const int gFile_Type_To_Mask[];
 
 int InferFileTypeFromExt(const pov_base::UCS2String& ext);
-IMemStream *Internal_Font_File(const int font_id, UCS2String& buffer);
+IMemStream *Internal_Font_File(int font_id);
 
 }
 

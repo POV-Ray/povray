@@ -95,16 +95,16 @@ using namespace pov_base;
 void Parser::Initialize_Tokenizer()
 {
     IStream *rfile = NULL;
-    UCS2String b;
+    UCS2String actualFileName;
     int c;
 
     pre_init_tokenizer ();
 
-    rfile = Locate_File(sceneData, sceneData->inputFile.c_str(),POV_File_Text_POV,b,true);
+    rfile = Locate_File(sceneData, sceneData->inputFile.c_str(),POV_File_Text_POV,actualFileName,true);
     if(rfile != NULL)
     {
-        Input_File->In_File = new ITextStream(b.c_str(), rfile);
-        sceneData->inputFile = b;
+        Input_File->In_File = new ITextStream(sceneData->inputFile.c_str(), rfile);
+        sceneData->inputFile = actualFileName;
     }
 
     if (Input_File->In_File == NULL)
@@ -2551,16 +2551,16 @@ void Parser::Parse_Directive(int After_Hash)
 
 void Parser::Open_Include()
 {
-    char *tempascii;
-    UCS2String temp;
-    UCS2String b;
+    char *asciiFileName;
+    UCS2String formalFileName; // Name the file is known by to the user.
+    UCS2String actualFileName; // Name the file is known by on the local system.
 
     if (Skip_Spaces () != true)
         Error ("Expecting a string after INCLUDE.");
 
-    tempascii = Parse_C_String(true);
-    temp = ASCIItoUCS2String(tempascii);
-    POV_FREE(tempascii);
+    asciiFileName = Parse_C_String(true);
+    formalFileName = ASCIItoUCS2String(asciiFileName);
+    POV_FREE(asciiFileName);
 
     Include_File_Index++;
 
@@ -2579,14 +2579,14 @@ void Parser::Open_Include()
     // to free In_File if it's not NULL.
     Input_File->In_File = NULL;
 
-    IStream *is = Locate_File(sceneData, temp, POV_File_Text_INC, b, true);
+    IStream *is = Locate_File(sceneData, formalFileName, POV_File_Text_INC, actualFileName, true);
     if(is == NULL)
     {
         Input_File->In_File = NULL;  /* Keeps from closing failed file. */
-        Error ("Cannot open include file %s.", UCS2toASCIIString(temp).c_str());
+        Error ("Cannot open include file %s.", UCS2toASCIIString(formalFileName).c_str());
     }
     else
-        Input_File->In_File = new ITextStream(b.c_str(), is);
+        Input_File->In_File = new ITextStream(formalFileName.c_str(), is);
 
     Input_File->R_Flag=false;
 
@@ -3444,8 +3444,8 @@ void Parser::Parse_Fopen(void)
     IStream *rfile = NULL;
     OStream *wfile = NULL;
     DATA_FILE *New;
-    char *asciitemp;
-    UCS2String temp;
+    char *asciiFileName;
+    UCS2String fileName;
     UCS2String ign;
     SYM_ENTRY *Entry;
 
@@ -3457,47 +3457,47 @@ void Parser::Parse_Fopen(void)
     Entry = Add_Symbol (1,Token.Token_String,FILE_ID_TOKEN);
     Entry->Data=reinterpret_cast<void *>(New);
 
-    asciitemp = Parse_C_String(true);
-    temp = ASCIItoUCS2String(asciitemp);
-    POV_FREE(asciitemp);
+    asciiFileName = Parse_C_String(true);
+    fileName = ASCIItoUCS2String(asciiFileName);
+    POV_FREE(asciiFileName);
 
     EXPECT
         CASE(READ_TOKEN)
             New->R_Flag = true;
-            rfile = Locate_File(sceneData, temp.c_str(), POV_File_Text_User, ign, true);
+            rfile = Locate_File(sceneData, fileName.c_str(), POV_File_Text_User, ign, true);
             if(rfile != NULL)
-                New->In_File = new ITextStream(temp.c_str(), rfile);
+                New->In_File = new ITextStream(fileName.c_str(), rfile);
             else
                 New->In_File = NULL;
 
             if(New->In_File == NULL)
-                Error ("Cannot open user file %s (read).", UCS2toASCIIString(temp).c_str());
+                Error ("Cannot open user file %s (read).", UCS2toASCIIString(fileName).c_str());
             EXIT
         END_CASE
 
         CASE(WRITE_TOKEN)
             New->R_Flag = false;
-            wfile = sceneData->CreateFile(GetPOVMSContext(), temp.c_str(), POV_File_Text_User, false);
+            wfile = sceneData->CreateFile(GetPOVMSContext(), fileName.c_str(), POV_File_Text_User, false);
             if(wfile != NULL)
-                New->Out_File= new OTextStream(temp.c_str(), wfile);
+                New->Out_File= new OTextStream(fileName.c_str(), wfile);
             else
                 New->Out_File = NULL;
 
             if(New->Out_File == NULL)
-                Error ("Cannot open user file %s (write).", UCS2toASCIIString(temp).c_str());
+                Error ("Cannot open user file %s (write).", UCS2toASCIIString(fileName).c_str());
             EXIT
         END_CASE
 
         CASE(APPEND_TOKEN)
             New->R_Flag = false;
-            wfile = sceneData->CreateFile(GetPOVMSContext(), temp.c_str(), POV_File_Text_User, true);
+            wfile = sceneData->CreateFile(GetPOVMSContext(), fileName.c_str(), POV_File_Text_User, true);
             if(wfile != NULL)
-                New->Out_File= new OTextStream(temp.c_str(), wfile);
+                New->Out_File= new OTextStream(fileName.c_str(), wfile);
             else
                 New->Out_File = NULL;
 
             if(New->Out_File == NULL)
-                Error ("Cannot open user file %s (append).", UCS2toASCIIString(temp).c_str());
+                Error ("Cannot open user file %s (append).", UCS2toASCIIString(fileName).c_str());
             EXIT
         END_CASE
 
@@ -4072,11 +4072,11 @@ int Parser::Parse_For_Param (char** IdentifierPtr, DBL* EndPtr, DBL* StepPtr)
 *
 ******************************************************************************/
 
-void Parser::IncludeHeader(const UCS2String& temp)
+void Parser::IncludeHeader(const UCS2String& formalFileName)
 {
-    UCS2String b;
+    UCS2String actualFileName;
 
-    if (temp.empty())
+    if (formalFileName.empty())
         return;
 
     if (++Include_File_Index >= MAX_INCLUDE_FILES)
@@ -4089,14 +4089,14 @@ void Parser::IncludeHeader(const UCS2String& temp)
 
     Input_File = &Include_Files[Include_File_Index];
     Input_File->In_File = NULL;
-    IStream *is = Locate_File (sceneData, temp.c_str(),POV_File_Text_INC,b,true);
+    IStream *is = Locate_File (sceneData, formalFileName.c_str(),POV_File_Text_INC,actualFileName,true);
     if(is == NULL)
     {
         Input_File->In_File = NULL;  /* Keeps from closing failed file. */
-        Error ("Cannot open include header file %s.", UCS2toASCIIString(temp).c_str());
+        Error ("Cannot open include header file %s.", UCS2toASCIIString(formalFileName).c_str());
     }
     else
-        Input_File->In_File = new ITextStream(b.c_str(), is);
+        Input_File->In_File = new ITextStream(formalFileName.c_str(), is);
 
     Input_File->R_Flag=false;
 

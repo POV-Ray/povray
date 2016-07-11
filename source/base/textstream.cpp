@@ -73,7 +73,7 @@ ITextStream::ITextStream(const UCS2 *sname, unsigned int stype)
     RefillBuffer();
 }
 
-ITextStream::ITextStream(const UCS2 *sname, IStream *sstream)
+ITextStream::ITextStream(const UCS2 *sname, IStream *sstream, POV_LONG initialLine)
 {
     if(sname == NULL)
         throw POV_EXCEPTION_CODE(kParamErr);
@@ -82,7 +82,7 @@ ITextStream::ITextStream(const UCS2 *sname, IStream *sstream)
 
     stream = sstream;
     filename = UCS2String(sname);
-    lineno = 1;
+    lineno = initialLine;
     bufferoffset = 0;
     maxbufferoffset = 0;
     filelength = 0;

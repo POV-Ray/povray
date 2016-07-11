@@ -209,9 +209,9 @@ int InferFileTypeFromExt(const UCS2String& ext)
 *
 ******************************************************************************/
 
-IMemStream *Internal_Font_File(const int font_id, UCS2String& buffer)
+IMemStream *Internal_Font_File(int font_id)
 {
-    return new IMemStream(font_id);
+    return new IMemStream(POV_File_Font_TTF, font_id);
 }
 
 }

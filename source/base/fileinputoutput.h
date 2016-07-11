@@ -118,7 +118,7 @@ class IOBase
 class IStream : public IOBase
 {
     public:
-        IStream(const unsigned int Type);
+        IStream(unsigned int type);
         virtual ~IStream();
 
         virtual inline int Read_Byte() { return(fail ? EOF : fgetc(f)); }
@@ -126,30 +126,46 @@ class IStream : public IOBase
         int Read_Int();
         inline IStream& Read_Byte(char& c) { c =(char) Read_Byte(); return *this; }
         inline IStream& Read_Byte(unsigned char& c) { c =(unsigned char) Read_Byte(); return *this; }
+        /*
         inline IStream& Read_Short(short& n) { n =(short) Read_Short(); return *this; }
         inline IStream& Read_Short(unsigned short& n) { n =(unsigned short) Read_Short(); return *this; }
         inline IStream& Read_Int(int& n) { n = Read_Int(); return *this; }
         inline IStream& Read_Int(unsigned int& n) { n = Read_Int(); return *this; }
+        */
 
+        /*
         inline IStream& operator>>(int& n) { read(&n, sizeof(n)); return *this; }
         inline IStream& operator>>(short& n) { read(&n, sizeof(n)); return *this; }
+        */
         inline IStream& operator>>(char& n) { read(&n, sizeof(n)); return *this; }
+        /*
         inline IStream& operator>>(unsigned int& n) { read(&n, sizeof(n)); return *this; }
         inline IStream& operator>>(unsigned short& n) { read(&n, sizeof(n)); return *this; }
+        */
         inline IStream& operator>>(unsigned char& n) { read(&n, sizeof(n)); return *this; }
+
+        /// Step back in the stream by a single byte.
+        /// @attention
+        ///     Derived classes may rely on this function to be called at most once between consecutive read accesses.
+        /// @attention
+        ///     Derived classes may rely on the supplied parameter value to be identical to the last byte actually read.
         virtual IStream& UnRead_Byte(int c);
+
         virtual IStream& getline(char *s, size_t buflen);
         IStream& ignore(POV_LONG count) { seekg(count, seek_cur); return *this; }
 };
 
-/*
- * Fake a file from a compiled array of char, for Input only
- * Used for built-in fonts support.
- */
+/// Memory-backed pseudo input file.
+///
+/// This class provides read access to in-memory data in a manner compatible with regular input file
+/// access.
+///
+/// This class is used to support in-built fonts and cached macros.
+///
 class IMemStream : public IStream
 {
     public:
-        IMemStream(const int id);
+        IMemStream(unsigned int type, int fileId);
         virtual ~IMemStream();
         virtual int Read_Byte();
         virtual IStream& UnRead_Byte(int c);
@@ -157,9 +173,24 @@ class IMemStream : public IStream
         virtual POV_LONG tellg();
         virtual IOBase& read(void *buffer, size_t count);
         virtual IOBase& seekg(POV_LONG pos, unsigned int whence = seek_set);
-        virtual bool open(const UCS2String& name, unsigned int Flags = 0);
+
+        /// Open the pseudo file.
+        /// @note
+        ///     This method is provided primarily for compatibility with the @ref IStream interface.
+        ///     The pseudo file is always ready for reading; calling this method is purely optional,
+        ///     and all it does is reset the pseudo file to the initial state. Any parameters
+        ///     supplied are ignored.
+        virtual bool open(const UCS2String&, unsigned int = 0);
+
+        /// Close the pseudo file.
+        /// @note
+        ///     This method is provided for compatibility with the @ref IStream interface only.
+        ///     The pseudo file is always ready for reading; calling this method is purely optional,
+        ///     and all it does is reset the pseudo file to the initial state.
         virtual bool close();
+
     protected:
+
         size_t size;
         size_t pos;
         const unsigned char * start;
@@ -168,28 +199,32 @@ class IMemStream : public IStream
 class OStream : public IOBase
 {
     public:
-        OStream(const unsigned int Type);
-        virtual ~OStream();
+        OStream(unsigned int type);
+        ~OStream();
 
         void printf(const char *format, ...);
 
         inline OStream& Write_Byte(unsigned char data) { if(!fail) fail = fputc(data, f) != data; return *this; }
+/*
         inline OStream& Write_Short(unsigned short data) { write(&data, sizeof(data)); return *this; }
         inline OStream& Write_Int(unsigned int data) { write(&data, sizeof(data)); return *this; }
+*/
         inline OStream& flush(void) { IOBase::flush(); return *this; }
 
         inline OStream& operator<<(const char *s) { write(reinterpret_cast<const void *>(s), (size_t) strlen(s)); return *this; }
         inline OStream& operator<<(const unsigned char *s) { return operator<<(reinterpret_cast<const char *>(s)); }
         inline OStream& operator<<(char c) { return(Write_Byte(c)); }
         inline OStream& operator<<(unsigned char c) { return operator <<((char) c); }
+/*
         inline OStream& operator<<(short n) { return(Write_Short(n)); }
         inline OStream& operator<<(unsigned short n) { return operator <<((short) n); }
         inline OStream& operator<<(int n) { return(Write_Int(n)); }
         inline OStream& operator<<(unsigned int n) { return operator <<((int) n); }
+*/
 };
 
-IStream *NewIStream(const Path&, const unsigned int);
-OStream *NewOStream(const Path&, const unsigned int, const bool);
+IStream *NewIStream(const Path&, unsigned int);
+OStream *NewOStream(const Path&, unsigned int, bool);
 
 UCS2String GetFileExtension(const Path& p);
 UCS2String GetFileName(const Path& p);

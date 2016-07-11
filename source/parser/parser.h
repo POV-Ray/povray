@@ -341,7 +341,10 @@ class Parser : public SceneTask
 
         static void Convert_Filter_To_Transmit(PIGMENT *Pigment); // NK layers - 1999 July 10 - for backwards compatiblity with layered textures
 
-        IStream *Locate_File(shared_ptr<BackendSceneData>& sd, const UCS2String& filename, unsigned int stype, UCS2String& buffer, bool err_flag = false);
+        /// @param[in]  formalFileName  Name by which the file is known to the user.
+        /// @param[out] actualFileName  Name by which the file is known to the parsing computer.
+        IStream *Locate_File(shared_ptr<BackendSceneData>& sd, const UCS2String& formalFileName, unsigned int stype, UCS2String& actualFileName, bool err_flag = false);
+
         Image *Read_Image(shared_ptr<BackendSceneData>& sd, int filetype, const UCS2 *filename, const Image::ReadOptions& options);
 
         // tokenize.h/tokenize.cpp
@@ -436,14 +439,14 @@ class Parser : public SceneTask
         UCS2 *String_To_UCS2(const char *str);
         char *UCS2_To_String(const UCS2 *str);
 
-        UCS2 *UCS2_strcat(UCS2 *s1, const UCS2 *s2);
-        int UCS2_strlen(const UCS2 *str);
-        int UCS2_strcmp(const UCS2 *s1, const UCS2 *s2);
-        void UCS2_strcpy(UCS2 *s1, const UCS2 *s2);
-        void UCS2_strncpy(UCS2 *s1, const UCS2 *s2, int n);
-        void UCS2_strupr(UCS2 *str);
-        void UCS2_strlwr(UCS2 *str);
-        UCS2 *UCS2_strdup(const UCS2 *s);
+        static UCS2 *UCS2_strcat(UCS2 *s1, const UCS2 *s2);
+        static int UCS2_strlen(const UCS2 *str);
+        static int UCS2_strcmp(const UCS2 *s1, const UCS2 *s2);
+        static void UCS2_strcpy(UCS2 *s1, const UCS2 *s2);
+        static void UCS2_strncpy(UCS2 *s1, const UCS2 *s2, int n);
+        void UCS2_strupr(UCS2 *str); // not static because it may issue a parse warning
+        void UCS2_strlwr(UCS2 *str); // not static because it may issue a parse warning
+        static UCS2 *UCS2_strdup(const UCS2 *s);
 
         // fnsyntax.h/fnsyntax.cpp
         bool expr_noop(ExprNode *&current, int stage, int op);
