@@ -6109,7 +6109,7 @@ DBL DensityFilePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *
     DBL f111, f112, f121, f122, f211, f212, f221, f222;
     float intpd2[4][4];
     DBL density = 0.0;
-    DENSITY_FILE_DATA *Data;
+    DensityFilePattern::DensityFileDataStruct *Data;
     size_t k0, k1, k2, k3, i, j, k, ii, jj, kk;
 #ifndef AVX2_INTRINSICS
     size_t rx[8],ry[8],rz[8];     // Not used if doing the avx2 method.
@@ -6144,6 +6144,7 @@ DBL DensityFilePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *
                     y = (size_t)(Ey * (DBL)Data->Sy);
                     z = (size_t)(Ez * (DBL)Data->Sz);
 
+                    // TODO - Code safe, but think the conditional here redundant to outter most test on Ex,Ey,Ez
                     if ((x < 0) || (x >= Data->Sx) || (y < 0) || (y >= Data->Sy) || (z < 0) || (z >= Data->Sz))
                         density = 0.0;
                     else
@@ -6214,6 +6215,7 @@ DBL DensityFilePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *
 
                     density = ((f111 * xi + f112 * xx) * yi + (f121 * xi + f122 * xx) * yy) * (1.0 - zz) +
                               ((f211 * xi + f212 * xx) * yi + (f221 * xi + f222 * xx) * yy) * zz;
+                    if (density < 0.0) density = 0.0;
                     break;
                 case kDensityFileInterpolation_Tricubic:
                 default:
@@ -6287,6 +6289,7 @@ DBL DensityFilePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *
                         intpd2[0][i] = intp3(yy, intpd2[i][0], intpd2[i][1],  intpd2[i][2], intpd2[i][3]);
 
                     density = intp3(xx, intpd2[0][0], intpd2[0][1], intpd2[0][2], intpd2[0][3]);
+                    if (density < 0.0) density = 0.0;
                     break;
                 case kDensityFileInterpolation_BlobFour:
                 case kDensityFileInterpolation_BlobSix:
@@ -6426,8 +6429,6 @@ DBL DensityFilePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *
             density = 0.0;
     }
 
-    if (density < 0.0)
-        density = 0.0;
     return density;
 }
 
