@@ -609,7 +609,7 @@ void RenderFrontendBase::NewBackup(POVMS_Object& ropts, ViewData& vd, const Path
     MakeBackupPath(ropts, vd, outputpath);
     if(POV_ALLOW_FILE_WRITE(vd.imageBackupFile().c_str(), POV_File_Data_Backup) == false)
         throw POV_EXCEPTION(kCannotOpenFileErr, "Permission denied to create render state output file.");
-    vd.imageBackup = shared_ptr<OStream>(POV_PLATFORM_BASE.CreateOStream(POV_File_Data_Backup));
+    vd.imageBackup = shared_ptr<OStream>(POV_PLATFORM_BASE.CreateOStream());
     if(vd.imageBackup != NULL)
     {
         Backup_File_Header hdr;
@@ -649,7 +649,7 @@ void RenderFrontendBase::ContinueBackup(POVMS_Object& ropts, ViewData& vd, ViewI
     vd.imageBackup.reset();
     MakeBackupPath(ropts, vd, outputpath);
 
-    boost::scoped_ptr<IStream> inbuffer(POV_PLATFORM_BASE.CreateIStream(POV_File_Data_Backup));
+    boost::scoped_ptr<IStream> inbuffer(POV_PLATFORM_BASE.CreateIStream());
 
     size_t pos = sizeof(Backup_File_Header);
 
@@ -724,7 +724,7 @@ void RenderFrontendBase::ContinueBackup(POVMS_Object& ropts, ViewData& vd, ViewI
     // if there isn't going to be an output file, we don't write to the state file
     if(outputToFile == true)
     {
-        vd.imageBackup = shared_ptr<OStream>(POV_PLATFORM_BASE.CreateOStream(POV_File_Data_Backup));
+        vd.imageBackup = shared_ptr<OStream>(POV_PLATFORM_BASE.CreateOStream());
         if(vd.imageBackup != NULL)
         {
             if(vd.imageBackup->open(vd.imageBackupFile().c_str(), IOBase::append) == false)

@@ -135,7 +135,7 @@ void ReadOldLine(unsigned char *scanline, int width, IStream *file)
         if(*file == false)
             throw POV_EXCEPTION(kFileDataErr, "Invalid HDR file (unexpected EOF)");
 
-        if(file->Read_Byte(b).eof())
+        if(!file->Read_Byte(b))
             return;
 
         scanline[3] = b;

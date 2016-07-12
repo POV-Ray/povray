@@ -121,8 +121,8 @@ namespace vfe
       vfePlatformBase(vfeSession& session);
       virtual ~vfePlatformBase();
 
-      virtual pov_base::IStream *CreateIStream(unsigned int stype);
-      virtual pov_base::OStream *CreateOStream(unsigned int stype);
+      virtual pov_base::IStream *CreateIStream();
+      virtual pov_base::OStream *CreateOStream();
 
       virtual UCS2String GetTemporaryPath(void);
       virtual UCS2String CreateTemporaryFile(void);

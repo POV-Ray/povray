@@ -9,7 +9,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -49,8 +49,8 @@ class DefaultPlatformBase : public PlatformBase
         DefaultPlatformBase();
         ~DefaultPlatformBase();
 
-        virtual IStream *CreateIStream(unsigned int stype);
-        virtual OStream *CreateOStream(unsigned int stype);
+        virtual IStream *CreateIStream();
+        virtual OStream *CreateOStream();
 
         virtual UCS2String GetTemporaryPath();
         virtual UCS2String CreateTemporaryFile();

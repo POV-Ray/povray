@@ -229,14 +229,14 @@ vfePlatformBase::~vfePlatformBase()
 {
 }
 
-IStream *vfePlatformBase::CreateIStream(unsigned int stype)
+IStream *vfePlatformBase::CreateIStream()
 {
-  return (new IFileStream (stype)) ;
+  return new IFileStream();
 }
 
-OStream *vfePlatformBase::CreateOStream(unsigned int stype)
+OStream *vfePlatformBase::CreateOStream()
 {
-  return (new OStream (stype)) ;
+  return new OStream();
 }
 
 UCS2String vfePlatformBase::GetTemporaryPath(void)

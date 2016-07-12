@@ -55,14 +55,14 @@ DefaultPlatformBase::~DefaultPlatformBase()
 {
 }
 
-IStream *DefaultPlatformBase::CreateIStream(unsigned int stype)
+IStream *DefaultPlatformBase::CreateIStream()
 {
-    return new IFileStream(stype);
+    return new IFileStream();
 }
 
-OStream *DefaultPlatformBase::CreateOStream(unsigned int stype)
+OStream *DefaultPlatformBase::CreateOStream()
 {
-    return new OStream(stype);
+    return new OStream();
 }
 
 UCS2String DefaultPlatformBase::GetTemporaryPath()

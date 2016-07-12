@@ -59,19 +59,16 @@
 namespace pov_base
 {
 
-IOBase::IOBase(unsigned int dir, unsigned int type)
+IOBase::IOBase()
 {
-    filetype = type;
-    direction = dir;
     fail = true;
-    f = NULL;
 }
 
 IOBase::~IOBase()
 {
 }
 
-IStream::IStream(unsigned int stype) : IOBase(input, stype)
+IStream::IStream() : IOBase()
 {
 }
 
@@ -79,58 +76,20 @@ IStream::~IStream()
 {
 }
 
-IStream& IStream::UnRead_Byte(int c)
-{
-    if(!fail)
-        fail = ungetc(c, f) != c;
-    return *this;
-}
-
-IStream& IStream::getline(char *s, size_t buflen)
-{
-    int chr = 0;
-
-    if(feof(f) != 0)
-        fail = true;
-
-    if(!fail && buflen > 0)
-    {
-        while(buflen > 1)
-        {
-            chr = fgetc(f);
-            if(chr == EOF)
-                break;
-            else if(chr == 10)
-            {
-                chr = fgetc(f);
-                if(chr != 13)
-                    ungetc(chr, f);
-                break;
-            }
-            else if(chr == 13)
-            {
-                chr = fgetc(f);
-                if(chr != 10)
-                    ungetc(chr, f);
-                break;
-            }
-            *s = chr;
-            s++;
-            buflen--;
-        }
-        *s = 0;
-    }
-
-    return *this;
-}
-
-IFileStream::IFileStream(unsigned int stype) : IStream(stype)
+IFileStream::IFileStream() : IStream(), f(NULL)
 {
 }
 
 IFileStream::~IFileStream()
 {
     close();
+}
+
+bool IFileStream::UnRead_Byte(int c)
+{
+    if(!fail)
+        fail = ungetc(c, f) != c;
+    return !fail;
 }
 
 bool IFileStream::open(const UCS2String& name)
@@ -181,11 +140,11 @@ bool IFileStream::close()
 // implies that only the input stream will be affected on streams opened for I/O
 // (which is not the case with fseek, since fseek moves the pointer for output too).
 // However, the macintosh code seems to need it to be called seekg, so it is ...
-IOBase& IFileStream::seekg(POV_LONG pos, unsigned int whence)
+bool IFileStream::seekg(POV_LONG pos, unsigned int whence)
 {
     if(!fail)
         fail = fseek(f, pos, whence) != 0;
-    return *this;
+    return !fail;
 }
 
 bool IFileStream::read(void *buffer, size_t count)
@@ -200,6 +159,44 @@ int IFileStream::Read_Byte()
     return(fail ? EOF : fgetc(f));
 }
 
+bool IFileStream::getline(char *s, size_t buflen)
+{
+    int chr = 0;
+
+    if(feof(f) != 0)
+        fail = true;
+
+    if(!fail && buflen > 0)
+    {
+        while(buflen > 1)
+        {
+            chr = fgetc(f);
+            if(chr == EOF)
+                break;
+            else if(chr == 10)
+            {
+                chr = fgetc(f);
+                if(chr != 13)
+                    ungetc(chr, f);
+                break;
+            }
+            else if(chr == 13)
+            {
+                chr = fgetc(f);
+                if(chr != 10)
+                    ungetc(chr, f);
+                break;
+            }
+            *s = chr;
+            s++;
+            buflen--;
+        }
+        *s = 0;
+    }
+
+    return !fail;
+}
+
 /*
  * Default to povlogo.ttf (0)
  * 1 : TimeRoman (timrom.ttf), Serif
@@ -208,7 +205,7 @@ int IFileStream::Read_Byte()
  *
  * To add a font, check first its license
  */
-IMemStream::IMemStream(unsigned int type, int fileId) : IStream(type)
+IMemStream::IMemStream(int fileId) : IStream()
 {
     switch(fileId)
     {
@@ -238,7 +235,7 @@ IMemStream::~IMemStream()
 // [jg] more to do here  (?)
 }
 
-OStream::OStream(unsigned int stype) : IOBase(output, stype)
+OStream::OStream() : IOBase(), f(NULL)
 {
 }
 
@@ -338,11 +335,11 @@ OStream& OStream::flush()
 // implies that only the input stream will be affected on streams opened for I/O
 // (which is not the case with fseek, since fseek moves the pointer for output too).
 // However, the macintosh code seems to need it to be called seekg, so it is ...
-IOBase& OStream::seekg(POV_LONG pos, unsigned int whence /* = seek_set */)
+bool OStream::seekg(POV_LONG pos, unsigned int whence /* = seek_set */)
 {
     if(!fail)
         fail = fseek(f, pos, whence) != 0;
-    return *this;
+    return !fail;
 }
 
 bool OStream::write(const void *buffer, size_t count)
@@ -366,7 +363,7 @@ void OStream::printf(const char *format, ...)
 
 IStream *NewIStream(const Path& p, unsigned int stype)
 {
-    std::auto_ptr<IStream> istreamptr(POV_PLATFORM_BASE.CreateIStream(stype));
+    std::auto_ptr<IStream> istreamptr(POV_PLATFORM_BASE.CreateIStream());
 
     if(istreamptr.get() == NULL)
         return NULL;
@@ -386,7 +383,7 @@ IStream *NewIStream(const Path& p, unsigned int stype)
 
 OStream *NewOStream(const Path& p, unsigned int stype, bool sappend)
 {
-    std::auto_ptr<OStream> ostreamptr(POV_PLATFORM_BASE.CreateOStream(stype));
+    std::auto_ptr<OStream> ostreamptr(POV_PLATFORM_BASE.CreateOStream());
     unsigned int Flags = IOBase::none;
 
     if(ostreamptr.get() == NULL)
@@ -489,7 +486,7 @@ int IMemStream::Read_Byte()
     return v;
 }
 
-IStream& IMemStream::UnRead_Byte(int c)
+bool IMemStream::UnRead_Byte(int c)
 {
     if (!fail)
     {
@@ -498,22 +495,22 @@ IStream& IMemStream::UnRead_Byte(int c)
         else
             fail = true;
     }
-    return *this;
+    return !fail;
 }
 
-IStream& IMemStream::getline(char *s,size_t buflen)
+bool IMemStream::getline(char *s,size_t buflen)
 {
     // Not needed for inbuilt fonts or scene file caching
     throw POV_EXCEPTION_CODE(kParamErr);
-    return *this;
+    return !fail;
 }
 
-POV_LONG IMemStream::tellg()
+POV_LONG IMemStream::tellg() const
 {
   return pos;
 }
 
-IOBase& IMemStream::seekg(POV_LONG posi, unsigned int whence)
+bool IMemStream::seekg(POV_LONG posi, unsigned int whence)
 {
     if(!fail)
     {
@@ -542,7 +539,7 @@ IOBase& IMemStream::seekg(POV_LONG posi, unsigned int whence)
                 break;
         }
     }
-    return *this;
+    return !fail;
 }
 
 bool IMemStream::open(const UCS2String &)

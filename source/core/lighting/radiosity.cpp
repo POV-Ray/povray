@@ -927,7 +927,7 @@ bool RadiosityCache::Load(const Path& inputFile)
         //info->Gather_Total.clear();
         //info->Gather_Total_Count = 0;
 
-        while (!(got_eof = fd->getline (line, 99).eof ()) && goodparse)
+        while (!(got_eof = !fd->getline (line, 99)) && goodparse)
         {
             switch ( line[0] )
             {
