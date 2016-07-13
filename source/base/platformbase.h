@@ -59,9 +59,6 @@ class PlatformBase
         PlatformBase() { self = this; };
         virtual ~PlatformBase() { self = NULL; };
 
-        virtual IStream *CreateIStream() = 0;
-        virtual OStream *CreateOStream() = 0;
-
         virtual UCS2String GetTemporaryPath() = 0;
         virtual UCS2String CreateTemporaryFile() = 0;
         virtual void DeleteTemporaryFile(const UCS2String& filename) = 0;

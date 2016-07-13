@@ -121,9 +121,6 @@ namespace vfe
       vfePlatformBase(vfeSession& session);
       virtual ~vfePlatformBase();
 
-      virtual pov_base::IStream *CreateIStream();
-      virtual pov_base::OStream *CreateOStream();
-
       virtual UCS2String GetTemporaryPath(void);
       virtual UCS2String CreateTemporaryFile(void);
       virtual void DeleteTemporaryFile(const UCS2String& filename);

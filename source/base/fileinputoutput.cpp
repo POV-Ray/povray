@@ -59,9 +59,12 @@
 namespace pov_base
 {
 
-IOBase::IOBase()
+IOBase::IOBase() : filename(), fail(true)
 {
-    fail = true;
+}
+
+IOBase::IOBase(const UCS2String& name) : filename(name), fail(true)
+{
 }
 
 IOBase::~IOBase()
@@ -72,17 +75,39 @@ IStream::IStream() : IOBase()
 {
 }
 
+IStream::IStream(const UCS2String& name) : IOBase(name)
+{
+}
+
 IStream::~IStream()
 {
 }
 
-IFileStream::IFileStream() : IStream(), f(NULL)
+IFileStream::IFileStream(const UCS2String& name) : IStream(name), f(NULL)
 {
+    if(pov_stricmp(UCS2toASCIIString(name).c_str(), "stdin") == 0)
+    {
+        f = stdin;
+    }
+    else if((pov_stricmp(UCS2toASCIIString(name).c_str(), "stdout") == 0) ||
+            (pov_stricmp(UCS2toASCIIString(name).c_str(), "stderr") == 0))
+    {
+        f = NULL;
+    }
+    else
+    {
+        f = POV_UCS2_FOPEN(name, "rb");
+    }
+    fail = (f == NULL);
 }
 
 IFileStream::~IFileStream()
 {
-    close();
+    if(f != NULL)
+    {
+        if (f != stdout && f != stderr && f != stdin)
+            fclose(f);
+    }
 }
 
 bool IFileStream::UnRead_Byte(int c)
@@ -90,49 +115,6 @@ bool IFileStream::UnRead_Byte(int c)
     if(!fail)
         fail = ungetc(c, f) != c;
     return !fail;
-}
-
-bool IFileStream::open(const UCS2String& name)
-{
-    close();
-    filename = name;
-
-    f = NULL;
-    if(pov_stricmp(UCS2toASCIIString(name).c_str(), "stdin") == 0)
-    {
-        f = stdin;
-    }
-    else if(pov_stricmp(UCS2toASCIIString(name).c_str(), "stdout") == 0)
-    {
-        return false;
-    }
-    else if(pov_stricmp(UCS2toASCIIString(name).c_str(), "stderr") == 0)
-    {
-        return false;
-    }
-    else
-    {
-        if((f = POV_UCS2_FOPEN(name, "rb")) == NULL)
-        {
-            return false;
-        }
-    }
-    fail = false;
-
-    return true;
-}
-
-// TODO - trim down to the IStream-specific portions
-bool IFileStream::close()
-{
-    if(f != NULL)
-    {
-        if (f != stdout && f != stderr && f != stdin)
-            fclose(f);
-        f = NULL;
-    }
-    fail = true;
-    return true;
 }
 
 // Strictly speaking, this should -not- be called seekg, since 'seekg'(an iostreams
@@ -212,18 +194,22 @@ IMemStream::IMemStream(int fileId) : IStream()
         case 1:
             start = &font_timrom[0];
             size = sizeof(font_timrom);
+            filename = ASCIItoUCS2String("timrom.ttf");
             break;
         case 2:
             start = &font_cyrvetic[0];
             size = sizeof(font_cyrvetic);
+            filename = ASCIItoUCS2String("timrom.cyrvetic");
             break;
         case 3:
             start = &font_crystal[0];
             size = sizeof(font_crystal);
+            filename = ASCIItoUCS2String("crystal.ttf");
             break;
         default:
             start = &font_povlogo[0];
             size = sizeof(font_povlogo);
+            filename = ASCIItoUCS2String("povlogo.ttf");
             break;
     }
     pos = 0;
@@ -235,21 +221,9 @@ IMemStream::~IMemStream()
 // [jg] more to do here  (?)
 }
 
-OStream::OStream() : IOBase(), f(NULL)
-{
-}
-
-OStream::~OStream()
-{
-    close();
-}
-
-bool OStream::open(const UCS2String& name, unsigned int Flags)
+OStream::OStream(const UCS2String& name, unsigned int Flags) : IOBase(name), f(NULL)
 {
     const char* mode;
-
-    close();
-    filename = name;
 
     if((Flags & append) == 0)
     {
@@ -265,62 +239,64 @@ bool OStream::open(const UCS2String& name, unsigned int Flags)
         mode = "r+b";
     }
 
-    f = NULL;
     if(pov_stricmp(UCS2toASCIIString(name).c_str(), "stdin") == 0)
     {
-        return false;
+        f = NULL;
     }
     else if(pov_stricmp(UCS2toASCIIString(name).c_str(), "stdout") == 0)
     {
         if((Flags & append) != 0)
-            return false;
-        f = stdout;
+            f = NULL;
+        else
+            f = stdout;
     }
     else if(pov_stricmp(UCS2toASCIIString(name).c_str(), "stderr") == 0)
     {
         if((Flags & append) != 0)
-            return false;
-        f = stderr;
+            f = NULL;
+        else
+            f = stdout;
     }
     else
     {
-        if((f = POV_UCS2_FOPEN(name, mode)) == NULL)
+        f = POV_UCS2_FOPEN(name, mode);
+        if (f == NULL)
         {
             if((Flags & append) == 0)
-                return false;
-
-            // to maintain traditional POV +c(continue) mode compatibility, if
-            // the open for append of an existing file fails, we allow a new file
-            // to be created.
-            mode = "wb";
-            if((f = POV_UCS2_FOPEN(name, mode)) == NULL)
-                return false;
+                f = NULL;
+            else
+            {
+                // to maintain traditional POV +c(continue) mode compatibility, if
+                // the open for append of an existing file fails, we allow a new file
+                // to be created.
+                mode = "wb";
+                f = POV_UCS2_FOPEN(name, mode);
+            }
         }
-    }
-    fail = false;
 
-    if((Flags & append) != 0)
-    {
-        if(!seekg(0, seek_end))
+        if (f != NULL)
         {
-            close();
-            return false;
+            if((Flags & append) != 0)
+            {
+                if(!seekg(0, seek_end))
+                {
+                    fclose(f);
+                    f = NULL;
+                }
+            }
         }
     }
 
-    return true;
+    fail = (f == NULL);
 }
 
-bool OStream::close()
+OStream::~OStream()
 {
     if(f != NULL)
     {
         if (f != stdout && f != stderr && f != stdin)
             fclose(f);
-        f = NULL;
     }
-    fail = true;
-    return true;
 }
 
 OStream& OStream::flush()
@@ -363,11 +339,6 @@ void OStream::printf(const char *format, ...)
 
 IStream *NewIStream(const Path& p, unsigned int stype)
 {
-    std::auto_ptr<IStream> istreamptr(POV_PLATFORM_BASE.CreateIStream());
-
-    if(istreamptr.get() == NULL)
-        return NULL;
-
     if (POV_ALLOW_FILE_READ(p().c_str(), stype) == false) // TODO FIXME - this is handled by the frontend, but that code isn't completely there yet [trf]
     {
         string str ("IO Restrictions prohibit read access to '") ;
@@ -375,19 +346,13 @@ IStream *NewIStream(const Path& p, unsigned int stype)
         str += "'";
         throw POV_EXCEPTION(kCannotOpenFileErr, str);
     }
-    if(istreamptr->open(p().c_str()) == 0)
-        return NULL;
 
-    return istreamptr.release();
+    return new IFileStream(p().c_str());
 }
 
 OStream *NewOStream(const Path& p, unsigned int stype, bool sappend)
 {
-    std::auto_ptr<OStream> ostreamptr(POV_PLATFORM_BASE.CreateOStream());
     unsigned int Flags = IOBase::none;
-
-    if(ostreamptr.get() == NULL)
-        return NULL;
 
     if(sappend)
         Flags |= IOBase::append;
@@ -399,10 +364,8 @@ OStream *NewOStream(const Path& p, unsigned int stype, bool sappend)
         str += "'";
         throw POV_EXCEPTION(kCannotOpenFileErr, str);
     }
-    if(ostreamptr->open(p().c_str(), Flags) == 0)
-        return NULL;
 
-    return ostreamptr.release();
+    return new OStream(p().c_str(), Flags);
 }
 
 UCS2String GetFileExtension(const Path& p)
@@ -540,20 +503,6 @@ bool IMemStream::seekg(POV_LONG posi, unsigned int whence)
         }
     }
     return !fail;
-}
-
-bool IMemStream::open(const UCS2String &)
-{
-    pos = 0;
-    fail = false;
-    return true;
-}
-
-bool IMemStream::close()
-{
-    pos = 0;
-    fail = false;
-    return true;
 }
 
 }

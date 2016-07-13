@@ -1054,7 +1054,6 @@ RadiosityCache::~RadiosityCache()
         if(ot_fd != NULL)
         {
             // close cache file
-            ot_fd->close();
             delete ot_fd;
             ot_fd = NULL;
         }

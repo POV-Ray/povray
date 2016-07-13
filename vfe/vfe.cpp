@@ -229,16 +229,6 @@ vfePlatformBase::~vfePlatformBase()
 {
 }
 
-IStream *vfePlatformBase::CreateIStream()
-{
-  return new IFileStream();
-}
-
-OStream *vfePlatformBase::CreateOStream()
-{
-  return new OStream();
-}
-
 UCS2String vfePlatformBase::GetTemporaryPath(void)
 {
   return m_Session->GetTemporaryPath();

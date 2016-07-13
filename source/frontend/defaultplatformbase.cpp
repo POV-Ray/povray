@@ -55,16 +55,6 @@ DefaultPlatformBase::~DefaultPlatformBase()
 {
 }
 
-IStream *DefaultPlatformBase::CreateIStream()
-{
-    return new IFileStream();
-}
-
-OStream *DefaultPlatformBase::CreateOStream()
-{
-    return new OStream();
-}
-
 UCS2String DefaultPlatformBase::GetTemporaryPath()
 {
     return ASCIItoUCS2String("/tmp/");

@@ -609,12 +609,12 @@ void RenderFrontendBase::NewBackup(POVMS_Object& ropts, ViewData& vd, const Path
     MakeBackupPath(ropts, vd, outputpath);
     if(POV_ALLOW_FILE_WRITE(vd.imageBackupFile().c_str(), POV_File_Data_Backup) == false)
         throw POV_EXCEPTION(kCannotOpenFileErr, "Permission denied to create render state output file.");
-    vd.imageBackup = shared_ptr<OStream>(POV_PLATFORM_BASE.CreateOStream());
+    vd.imageBackup = shared_ptr<OStream>(new OStream(vd.imageBackupFile().c_str()));
     if(vd.imageBackup != NULL)
     {
         Backup_File_Header hdr;
 
-        if(vd.imageBackup->open(vd.imageBackupFile().c_str()) == false)
+        if(!*vd.imageBackup)
             throw POV_EXCEPTION(kCannotOpenFileErr, "Cannot create render state output file.");
         memcpy(hdr.sig, RENDER_STATE_SIG, sizeof(hdr.sig));
         memcpy(hdr.ver, RENDER_STATE_VER, sizeof(hdr.ver));
@@ -649,7 +649,7 @@ void RenderFrontendBase::ContinueBackup(POVMS_Object& ropts, ViewData& vd, ViewI
     vd.imageBackup.reset();
     MakeBackupPath(ropts, vd, outputpath);
 
-    boost::scoped_ptr<IStream> inbuffer(POV_PLATFORM_BASE.CreateIStream());
+    boost::scoped_ptr<IStream> inbuffer(new IFileStream(vd.imageBackupFile().c_str()));
 
     size_t pos = sizeof(Backup_File_Header);
 
@@ -657,7 +657,7 @@ void RenderFrontendBase::ContinueBackup(POVMS_Object& ropts, ViewData& vd, ViewI
     {
         Backup_File_Header hdr;
 
-        if(inbuffer->open(vd.imageBackupFile().c_str()) == true)
+        if(*inbuffer)
         {
             // IOBase::eof() only is based on feof() and will only return
             // true if we have attempted to read past the end of the file.
@@ -724,10 +724,10 @@ void RenderFrontendBase::ContinueBackup(POVMS_Object& ropts, ViewData& vd, ViewI
     // if there isn't going to be an output file, we don't write to the state file
     if(outputToFile == true)
     {
-        vd.imageBackup = shared_ptr<OStream>(POV_PLATFORM_BASE.CreateOStream());
+        vd.imageBackup = shared_ptr<OStream>(new OStream(vd.imageBackupFile().c_str(), IOBase::append));
         if(vd.imageBackup != NULL)
         {
-            if(vd.imageBackup->open(vd.imageBackupFile().c_str(), IOBase::append) == false)
+            if(!*vd.imageBackup)
                 throw POV_EXCEPTION(kCannotOpenFileErr, "Cannot append to state output file.");
 
             vd.imageBackup->seekg(0, IOBase::seek_end);

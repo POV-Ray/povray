@@ -85,12 +85,12 @@ class IOBase
 {
     public:
         IOBase();
+        IOBase(const UCS2String& name);
         virtual ~IOBase();
 
         enum { none = 0, append = 1 };
         enum { seek_set = SEEK_SET, seek_cur = SEEK_CUR, seek_end = SEEK_END };
 
-        virtual bool close() = 0;
         virtual bool seekg(POV_LONG pos, unsigned int whence = seek_set) = 0;
 
         virtual bool eof() const = 0;
@@ -110,9 +110,9 @@ class IStream : public IOBase
 {
     public:
         IStream();
+        IStream(const UCS2String& name);
         virtual ~IStream();
 
-        virtual bool open(const UCS2String& name) = 0;
         virtual bool read(void *buffer, size_t count) = 0;
 
         virtual int Read_Byte() = 0;
@@ -137,11 +137,9 @@ class IStream : public IOBase
 class IFileStream : public IStream
 {
     public:
-        IFileStream();
+        IFileStream(const UCS2String& name);
         virtual ~IFileStream();
 
-        virtual bool open(const UCS2String& name);
-        virtual bool close();
         virtual bool eof() const { return(fail ? true : feof(f) != 0); }
         virtual bool seekg(POV_LONG pos, unsigned int whence = seek_set);
         virtual POV_LONG tellg() const { return(f == NULL ? -1 : ftell(f)); }
@@ -177,21 +175,6 @@ class IMemStream : public IStream
         virtual bool seekg(POV_LONG pos, unsigned int whence = seek_set);
         virtual bool clearstate() { fail = false; return true; }
 
-        /// Open the pseudo file.
-        /// @note
-        ///     This method is provided primarily for compatibility with the @ref IStream interface.
-        ///     The pseudo file is always ready for reading; calling this method is purely optional,
-        ///     and all it does is reset the pseudo file to the initial state. Any parameters
-        ///     supplied are ignored.
-        virtual bool open(const UCS2String&);
-
-        /// Close the pseudo file.
-        /// @note
-        ///     This method is provided for compatibility with the @ref IStream interface only.
-        ///     The pseudo file is always ready for reading; calling this method is purely optional,
-        ///     and all it does is reset the pseudo file to the initial state.
-        virtual bool close();
-
         virtual bool eof() const { return fail; }
 
     protected:
@@ -204,11 +187,9 @@ class IMemStream : public IStream
 class OStream : public IOBase
 {
     public:
-        OStream();
+        OStream(const UCS2String& name, unsigned int Flags = 0);
         ~OStream();
 
-        bool open(const UCS2String& name, unsigned int Flags = 0);
-        virtual bool close();
         virtual bool seekg(POV_LONG pos, unsigned int whence = seek_set);
         virtual POV_LONG tellg() const { return(f == NULL ? -1 : ftell(f)); }
         inline bool clearstate() { if(f != NULL) fail = false; return !fail; }
