@@ -85,6 +85,8 @@ class ITextStream
         bool seekg(FilePos);
         FilePos tellg() const;
 
+        bool ReadRaw(unsigned char* buf, size_t size);
+
         /// Formal current line number of the file, e.g. to be displayed in error messages.
         POV_LONG line() const { return lineno; };
 

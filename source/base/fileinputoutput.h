@@ -165,8 +165,8 @@ class IFileStream : public IStream
 class IMemStream : public IStream
 {
     public:
-        IMemStream(const unsigned char* data, size_t size, const char* formalName);
-        IMemStream(const unsigned char* data, size_t size, const UCS2String& formalName);
+        IMemStream(const unsigned char* data, size_t size, const char* formalName, POV_LONG formalStart = 0);
+        IMemStream(const unsigned char* data, size_t size, const UCS2String& formalName, POV_LONG formalStart = 0);
         virtual ~IMemStream();
 
         virtual int Read_Byte();
@@ -183,6 +183,7 @@ class IMemStream : public IStream
 
         size_t size;
         size_t pos;
+        POV_LONG formalStart;
         const unsigned char * start;
 };
 

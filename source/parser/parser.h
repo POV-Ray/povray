@@ -254,8 +254,11 @@ class Parser : public SceneTask
             char *Macro_Name;
             UCS2 *Macro_Filename;
             pov_base::ITextStream::FilePos Macro_File_Pos;
-            POV_LONG Macro_End;
+            int Macro_File_Col;
+            POV_LONG Macro_End; ///< The position _after_ the `#` in the terminating `#end` directive.
             vector<MacroParameter> parameters;
+            unsigned char *Cache;
+            size_t CacheSize;
         };
 
         struct POV_ARRAY
@@ -546,6 +549,7 @@ class Parser : public SceneTask
             pov_base::ITextStream *Loop_File;
             pov_base::ITextStream *Macro_File;
             const UCS2 *Macro_Return_Name;
+            int Macro_Return_Col;
             bool Macro_Same_Flag;
             bool Switch_Case_Ok_Flag;
             Macro *PMac;

@@ -173,14 +173,14 @@ bool IFileStream::getline(char *s, size_t buflen)
     return !fail;
 }
 
-IMemStream::IMemStream(const unsigned char* data, size_t size, const char* formalName) :
-    IStream(ASCIItoUCS2String(formalName)), size(size), pos(0), start(data)
+IMemStream::IMemStream(const unsigned char* data, size_t size, const char* formalName, POV_LONG formalStart) :
+    IStream(ASCIItoUCS2String(formalName)), size(size), pos(0), start(data), formalStart(formalStart)
 {
     fail = false;
 }
 
-IMemStream::IMemStream(const unsigned char* data, size_t size, const UCS2String& formalName) :
-    IStream(formalName), size(size), pos(0), start(data)
+IMemStream::IMemStream(const unsigned char* data, size_t size, const UCS2String& formalName, POV_LONG formalStart) :
+    IStream(formalName), size(size), pos(0), start(data), formalStart(formalStart)
 {
     fail = false;
 }
@@ -438,7 +438,7 @@ bool IMemStream::getline(char *s,size_t buflen)
 
 POV_LONG IMemStream::tellg() const
 {
-  return pos;
+    return formalStart + pos;
 }
 
 bool IMemStream::seekg(POV_LONG posi, unsigned int whence)
@@ -448,8 +448,10 @@ bool IMemStream::seekg(POV_LONG posi, unsigned int whence)
         switch(whence)
         {
             case seek_set:
-                if (posi <= size)
-                    pos = posi;
+                if (posi < formalStart)
+                    fail = true;
+                else if (posi - formalStart <= size)
+                    pos = posi - formalStart;
                 else
                     fail = true;
                 break;

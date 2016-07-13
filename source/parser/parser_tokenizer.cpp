@@ -40,6 +40,7 @@
 //******************************************************************************
 
 #include <cctype>
+#include <climits>
 
 #include <limits>
 
@@ -2066,6 +2067,20 @@ void Parser::Parse_Directive(int After_Hash)
                         if ((PMac=Cond_Stack[CS_Index].PMac)!=NULL)
                         {
                             PMac->Macro_End=Hash_Loc;
+                            ITextStream::FilePos pos = Input_File->In_File->tellg();
+                            POV_LONG macroLength = pos.offset - PMac->Macro_File_Pos.offset;
+                            if (macroLength <= SIZE_MAX)
+                            {
+                                PMac->CacheSize = macroLength;
+                                PMac->Cache = new unsigned char[PMac->CacheSize];
+                                if (PMac->Cache)
+                                {
+                                    Input_File->In_File->seekg(PMac->Macro_File_Pos);
+                                    if (!Input_File->In_File->ReadRaw(PMac->Cache, PMac->CacheSize))
+                                        delete[] PMac->Cache;
+                                    Input_File->In_File->seekg(pos);
+                                }
+                            }
                         }
                     }
                     if (--CS_Index < 0)
@@ -3112,6 +3127,7 @@ Parser::Macro *Parser::Parse_Macro()
 
     New->Macro_Filename = UCS2_strdup(Input_File->In_File->name());
     New->Macro_File_Pos = Input_File->In_File->tellg();
+    New->Macro_File_Col = Echo_Indx;
 
     Check_Macro_Vers();
 
@@ -3199,6 +3215,7 @@ void Parser::Invoke_Macro()
     Cond_Stack[CS_Index].Cond_Type = INVOKING_MACRO_COND;
 
     Cond_Stack[CS_Index].File_Pos          = Input_File->In_File->tellg();
+    Cond_Stack[CS_Index].Macro_Return_Col  = Echo_Indx;
     Cond_Stack[CS_Index].Macro_Return_Name = Input_File->In_File->name();
     Cond_Stack[CS_Index].PMac              = PMac;
 
@@ -3225,7 +3242,11 @@ void Parser::Invoke_Macro()
 //  POV_DELETE(Input_File->In_File, IStream);
         Got_EOF=false;
         Input_File->R_Flag=false;
-        IStream *is = Locate_File (sceneData, PMac->Macro_Filename, POV_File_Text_Macro, ign, true);
+        IStream *is;
+        if (PMac->Cache)
+            is = new IMemStream(Cond_Stack[CS_Index].PMac->Cache, PMac->CacheSize, PMac->Macro_Filename, PMac->Macro_File_Pos.offset);
+        else
+            is = Locate_File (sceneData, PMac->Macro_Filename, POV_File_Text_Macro, ign, true);
         if(is == NULL)
         {
             Input_File->In_File = NULL;  /* Keeps from closing failed file. */
@@ -3244,6 +3265,7 @@ void Parser::Invoke_Macro()
     {
         Error("Unable to file seek in macro.");
     }
+    Echo_Indx = PMac->Macro_File_Col;
 
     Token.Token_Id = END_OF_FILE_TOKEN;
     Token.is_array_elem = false;
@@ -3274,13 +3296,16 @@ void Parser::Return_From_Macro()
         Error("Unable to file seek in return from macro.");
     }
 
+    Echo_Indx = Cond_Stack[CS_Index].Macro_Return_Col;
+
     // Always destroy macro locals
     Destroy_Table(Table_Index--);
 }
 
 Parser::Macro::Macro(const char *s) :
     Macro_Name(POV_STRDUP(s)),
-    Macro_Filename(NULL)
+    Macro_Filename(NULL),
+    Cache(NULL)
 {}
 
 Parser::Macro::~Macro()
@@ -3297,6 +3322,9 @@ Parser::Macro::~Macro()
     {
         POV_FREE(parameters[i].name);
     }
+
+    if (Cache != NULL)
+        delete[] Cache;
 }
 
 Parser::POV_ARRAY *Parser::Parse_Array_Declare (void)
