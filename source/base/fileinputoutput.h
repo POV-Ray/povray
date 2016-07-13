@@ -165,8 +165,10 @@ class IFileStream : public IStream
 class IMemStream : public IStream
 {
     public:
-        IMemStream(int fileId);
+        IMemStream(const unsigned char* data, size_t size, const char* formalName);
+        IMemStream(const unsigned char* data, size_t size, const UCS2String& formalName);
         virtual ~IMemStream();
+
         virtual int Read_Byte();
         virtual bool UnRead_Byte(int c);
         virtual bool getline(char *s, size_t buflen);

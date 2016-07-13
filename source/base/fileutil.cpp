@@ -45,6 +45,12 @@
 // POV-Ray base header files
 #include "base/path.h"
 
+// All the builtin fonts must be declared here
+#include "base/font/crystal.h"
+#include "base/font/cyrvetic.h"
+#include "base/font/povlogo.h"
+#include "base/font/timrom.h"
+
 // this must be the last file included
 #include "base/povdebug.h"
 
@@ -209,9 +215,23 @@ int InferFileTypeFromExt(const UCS2String& ext)
 *
 ******************************************************************************/
 
+/*
+ * Default to povlogo.ttf (0)
+ * 1 : TimeRoman (timrom.ttf), Serif
+ * 2 : Cyrvetita (cyrvetic.ttf), Sans-Serif
+ * 3 : Crystal (crystal.ttf), monospace sans serif
+ *
+ * To add a font, check first its license
+ */
 IMemStream *Internal_Font_File(int font_id)
 {
-    return new IMemStream(font_id);
+    switch(font_id)
+    {
+        case 1:     return new IMemStream(&font_timrom[0],   sizeof(font_timrom),   "timrom.ttf");
+        case 2:     return new IMemStream(&font_cyrvetic[0], sizeof(font_cyrvetic), "cyrvetic.ttf");
+        case 3:     return new IMemStream(&font_crystal[0],  sizeof(font_crystal),  "crystal.ttf");
+        default:    return new IMemStream(&font_povlogo[0],  sizeof(font_povlogo),  "povlogo.ttf");
+    }
 }
 
 }

@@ -47,12 +47,6 @@
 #include "base/platformbase.h"
 #include "base/pov_err.h"
 
-// All the builtin fonts must be declared here
-#include "base/font/crystal.h"
-#include "base/font/cyrvetic.h"
-#include "base/font/povlogo.h"
-#include "base/font/timrom.h"
-
 // this must be the last file included
 #include "base/povdebug.h"
 
@@ -179,46 +173,20 @@ bool IFileStream::getline(char *s, size_t buflen)
     return !fail;
 }
 
-/*
- * Default to povlogo.ttf (0)
- * 1 : TimeRoman (timrom.ttf), Serif
- * 2 : Cyrvetita (cyrvetic.ttf), Sans-Serif
- * 3 : Crystal (crystal.ttf), monospace sans serif
- *
- * To add a font, check first its license
- */
-IMemStream::IMemStream(int fileId) : IStream()
+IMemStream::IMemStream(const unsigned char* data, size_t size, const char* formalName) :
+    IStream(ASCIItoUCS2String(formalName)), size(size), pos(0), start(data)
 {
-    switch(fileId)
-    {
-        case 1:
-            start = &font_timrom[0];
-            size = sizeof(font_timrom);
-            filename = ASCIItoUCS2String("timrom.ttf");
-            break;
-        case 2:
-            start = &font_cyrvetic[0];
-            size = sizeof(font_cyrvetic);
-            filename = ASCIItoUCS2String("timrom.cyrvetic");
-            break;
-        case 3:
-            start = &font_crystal[0];
-            size = sizeof(font_crystal);
-            filename = ASCIItoUCS2String("crystal.ttf");
-            break;
-        default:
-            start = &font_povlogo[0];
-            size = sizeof(font_povlogo);
-            filename = ASCIItoUCS2String("povlogo.ttf");
-            break;
-    }
-    pos = 0;
-    fail= false;
+    fail = false;
+}
+
+IMemStream::IMemStream(const unsigned char* data, size_t size, const UCS2String& formalName) :
+    IStream(formalName), size(size), pos(0), start(data)
+{
+    fail = false;
 }
 
 IMemStream::~IMemStream()
 {
-// [jg] more to do here  (?)
 }
 
 OStream::OStream(const UCS2String& name, unsigned int Flags) : IOBase(name), f(NULL)
