@@ -624,7 +624,7 @@ bool Parser::Parse_Begin (bool mandatory)
     {
         if (mandatory)
         {
-            const char *front = Get_Token_String(Brace_Stack[Brace_Index]);
+            const char *front = Get_Token_String(tokenId);
             Found_Instead_Error("Missing { after", front);
         }
         else
