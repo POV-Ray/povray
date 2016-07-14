@@ -41,6 +41,13 @@
 #include "core/configcore.h"
 #include "syspovconfigparser.h"
 
+/// @def POV_PARSER_MAX_CACHED_MACRO_SIZE
+/// Default size limit for macros to be cached in memory.
+///
+#ifndef POV_PARSER_MAX_CACHED_MACRO_SIZE
+    #define POV_PARSER_MAX_CACHED_MACRO_SIZE 65536
+#endif
+
 //******************************************************************************
 ///
 /// @name Debug Settings.

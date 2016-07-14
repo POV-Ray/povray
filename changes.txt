@@ -49,6 +49,10 @@ Prior to the release of 3.7.1, the following items still need urgent attention:
 New Features
 ------------
 
+- Macros up to a certain size (currently hard-coded to 65536 characters per
+  macro) are now cached in memory, improving parsing speed of invocations,
+  especially when the macro in question is defined in a different file.
+
 - All instances of `gray` in keywords or INI file options can now alternatively
   be spelt `grey`. Previously this was only the case inside function
   definitions (where it applied only to the `.gray` colour pseudo-component).

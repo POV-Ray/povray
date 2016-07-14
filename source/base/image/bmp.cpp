@@ -96,7 +96,7 @@ static inline unsigned char Read_Safe_Char (IStream& in)
 {
     unsigned char ch;
 
-    in >> ch;
+    ch = in.Read_Byte();
     if (!in)
         throw POV_EXCEPTION(kFileDataErr, "Error reading data from BMP image.") ;
 
@@ -482,7 +482,8 @@ void Write (OStream *file, const Image *image, const Image::WriteOptions& option
 
     int count = (width * (alpha ? 32 : 24) + 31) / 32 * 4 * height;
 
-    *file << 'B' << 'M' ;
+    file->Write_Byte('B');
+    file->Write_Byte('M');
     Write_Long (file, 14 + 40 + count) ;
     Write_Short (file, 0) ;
     Write_Short (file, 0) ;
@@ -507,15 +508,15 @@ void Write (OStream *file, const Image *image, const Image::WriteOptions& option
                 GetEncodedRGBAValue (image, x, y, gamma, 255, r, g, b, a, *dither, premul);
             else
                 GetEncodedRGBValue (image, x, y, gamma, 255, r, g, b, *dither) ;
-            *file << (unsigned char) b;
-            *file << (unsigned char) g;
-            *file << (unsigned char) r;
+            file->Write_Byte((unsigned char) b);
+            file->Write_Byte((unsigned char) g);
+            file->Write_Byte((unsigned char) r);
             if (alpha)
-                *file << (unsigned char) a;
+                file->Write_Byte((unsigned char) a);
         }
         if (!alpha)
             for (int i = 0 ; i < pad; i++)
-                *file << (unsigned char) 0 ;
+                file->Write_Byte((unsigned char) 0);
     }
 
     if (!*file)

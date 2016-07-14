@@ -1298,7 +1298,7 @@ bool ot_read_file(OT_NODE **root, IStream *fd, const OT_READ_PARAM* param, OT_RE
         info->Gather_Total.Clear();
         info->Gather_Total_Count = 0;
 
-        while (!(got_eof = fd->getline (line, 99).eof ()) && goodparse)
+        while (!(got_eof = !fd->getline (line, 99)) && goodparse)
         {
             switch ( line[0] )
             {

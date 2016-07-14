@@ -73,7 +73,7 @@ ITextStream::ITextStream(const UCS2 *sname, unsigned int stype)
     RefillBuffer();
 }
 
-ITextStream::ITextStream(const UCS2 *sname, IStream *sstream)
+ITextStream::ITextStream(const UCS2 *sname, IStream *sstream, POV_LONG initialLine)
 {
     if(sname == NULL)
         throw POV_EXCEPTION_CODE(kParamErr);
@@ -82,16 +82,16 @@ ITextStream::ITextStream(const UCS2 *sname, IStream *sstream)
 
     stream = sstream;
     filename = UCS2String(sname);
-    lineno = 1;
+    lineno = initialLine;
     bufferoffset = 0;
     maxbufferoffset = 0;
     filelength = 0;
     ungetbuffer = EOF;
-    curpos = 0 ;
+    curpos = stream->tellg();
 
     stream->seekg(0, IOBase::seek_end);
     filelength = stream->tellg();
-    stream->seekg(0, IOBase::seek_set);
+    stream->seekg(curpos, IOBase::seek_set);
 
     RefillBuffer();
 }
@@ -205,6 +205,50 @@ ITextStream::FilePos ITextStream::tellg() const
         fp.offset--;
 
     return fp;
+}
+
+bool ITextStream::ReadRaw(unsigned char* buf, size_t size)
+{
+    unsigned char* p = buf;
+    size_t remain = size;
+
+    if (remain == 0)
+        return true;
+
+    // read from unget buffer first
+    if (ungetbuffer != EOF)
+    {
+        *(p++) = (unsigned char)ungetbuffer;
+        ungetbuffer = EOF;
+        if (--remain == 0)
+            return true;
+    }
+
+    // next read from the regular buffer
+    if (bufferoffset < maxbufferoffset)
+    {
+        size_t copyFromBuffer = min(remain, size_t(maxbufferoffset - bufferoffset));
+        memcpy(p, &(buffer[bufferoffset]), copyFromBuffer);
+        remain -= copyFromBuffer;
+        bufferoffset += copyFromBuffer;
+        p += copyFromBuffer;
+        if (remain == 0)
+            return true;
+    }
+
+    // if all buffers are depleted, read directly from stream
+    if (*stream)
+    {
+        if (stream->read(p, remain))
+        {
+            curpos += remain;
+            return true;
+        }
+        else
+            curpos = stream->tellg();
+    }
+
+    return false;
 }
 
 void ITextStream::RefillBuffer()

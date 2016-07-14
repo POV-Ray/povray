@@ -70,7 +70,12 @@ class ITextStream
         };
 
         ITextStream(const UCS2 *, unsigned int);
-        ITextStream(const UCS2 *, IStream *);
+
+        /// @param[in]  formalName  Name by which the file is known to the user.
+        /// @param[in]  byteStream  Underlying byte-oriented stream to read from.
+        /// @param[in]  initialLine First line number as known to the user.
+        ITextStream(const UCS2 *formalName, IStream *byteStream, POV_LONG initialLine = 1);
+
         virtual ~ITextStream();
 
         int getchar();
@@ -80,8 +85,12 @@ class ITextStream
         bool seekg(FilePos);
         FilePos tellg() const;
 
+        bool ReadRaw(unsigned char* buf, size_t size);
+
+        /// Formal current line number of the file, e.g. to be displayed in error messages.
         POV_LONG line() const { return lineno; };
 
+        /// Formal name of the file, e.g. to be displayed in error messages.
         const UCS2 *name() const { return filename.c_str(); };
     private:
         IStream *stream;
@@ -101,7 +110,11 @@ class OTextStream
 {
     public:
         OTextStream(const UCS2 *, unsigned int, bool append = false);
-        OTextStream(const UCS2 *, OStream *);
+
+        /// @param[in]  formalName  Name by which the file is known to the user.
+        /// @param[in]  byteStream  Underlying byte-oriented stream to write to.
+        OTextStream(const UCS2 *formalName, OStream *);
+
         virtual ~OTextStream();
 
         void putchar(int);
@@ -109,6 +122,7 @@ class OTextStream
         void printf(const char *, ...);
     void flush();
 
+        /// Formal name of the file, e.g. to be displayed in error messages.
         const UCS2 *name() const { return filename.c_str(); };
     private:
         OStream *stream;

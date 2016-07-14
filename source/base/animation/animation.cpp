@@ -279,7 +279,7 @@ Image *Animation::ReadFrame(IStream *file)
     else if(file->tellg() > (prepos + bytes))
         throw POV_EXCEPTION(kInvalidDataSizeErr, "Frame decompressor read more bytes than expected. The input file may be corrupted!");
 
-    file->seekg(prepos + bytes, SEEK_END);
+    file->seekg(prepos + bytes, IOBase::seek_end);
 
     switch(fileType)
     {

@@ -229,16 +229,6 @@ vfePlatformBase::~vfePlatformBase()
 {
 }
 
-IStream *vfePlatformBase::CreateIStream(const unsigned int stype)
-{
-  return (new IStream (stype)) ;
-}
-
-OStream *vfePlatformBase::CreateOStream(const unsigned int stype)
-{
-  return (new OStream (stype)) ;
-}
-
 UCS2String vfePlatformBase::GetTemporaryPath(void)
 {
   return m_Session->GetTemporaryPath();

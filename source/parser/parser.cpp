@@ -6366,18 +6366,18 @@ ObjectPtr Parser::Parse_TrueType ()
 ******************************************************************************/
 TrueTypeFont *Parser::OpenFontFile(const char *asciifn, const int font_id)
 {
-    /* int i; */ /* tw, mtg */
     TrueTypeFont *font = NULL;
-    UCS2String b, ign;
-    UCS2String filename;
+    UCS2String ign;
+    UCS2String formalFilename;
+
     if (asciifn)
     {
-        filename = ASCIItoUCS2String(asciifn);
+        formalFilename = ASCIItoUCS2String(asciifn);
 
         /* First look to see if we have already opened this font */
 
         for(vector<TrueTypeFont*>::iterator iFont = sceneData->TTFonts.begin(); iFont != sceneData->TTFonts.end(); ++iFont)
-            if(UCS2_strcmp(filename.c_str(), (*iFont)->filename) == 0)
+            if(UCS2_strcmp(formalFilename.c_str(), (*iFont)->filename) == 0)
             {
                 font = *iFont;
                 break;
@@ -6413,17 +6413,17 @@ TrueTypeFont *Parser::OpenFontFile(const char *asciifn, const int font_id)
 
         if (asciifn)
         {
-            if((fp = Locate_File(sceneData, filename,POV_File_Font_TTF,b,true)) == NULL)
+            if((fp = Locate_File(sceneData, formalFilename,POV_File_Font_TTF,ign,true)) == NULL)
             {
                 throw POV_EXCEPTION(kCannotOpenFileErr, "Cannot open font file.");
             }
         }
         else
         {
-            fp = Internal_Font_File(font_id,b);
+            fp = Internal_Font_File(font_id);
         }
 
-        font = new TrueTypeFont(UCS2_strdup(b.c_str()), fp, sceneData->stringEncoding);
+        font = new TrueTypeFont(UCS2_strdup(formalFilename.c_str()), fp, sceneData->stringEncoding);
 
         sceneData->TTFonts.push_back(font);
     }
