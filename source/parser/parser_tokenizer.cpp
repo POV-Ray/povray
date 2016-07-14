@@ -205,6 +205,9 @@ void Parser::pre_init_tokenizer ()
             }
         }
     }
+
+    // TODO - implement a mechanism to expose to user
+    MaxCachedMacroSize = POV_PARSER_MAX_CACHED_MACRO_SIZE;
 }
 
 
@@ -2069,7 +2072,7 @@ void Parser::Parse_Directive(int After_Hash)
                             PMac->Macro_End=Hash_Loc;
                             ITextStream::FilePos pos = Input_File->In_File->tellg();
                             POV_LONG macroLength = pos.offset - PMac->Macro_File_Pos.offset;
-                            if (macroLength <= std::numeric_limits<size_t>::max())
+                            if (macroLength <= MaxCachedMacroSize)
                             {
                                 PMac->CacheSize = macroLength;
                                 PMac->Cache = new unsigned char[PMac->CacheSize];
@@ -3233,7 +3236,7 @@ void Parser::Invoke_Macro()
         POV_FREE(Table_Entries);
     }
 
-    if (UCS2_strcmp(PMac->Macro_Filename,Input_File->In_File->name()))
+    if (PMac->Cache || UCS2_strcmp(PMac->Macro_Filename,Input_File->In_File->name()))
     {
         UCS2String ign;
         /* Not in same file */

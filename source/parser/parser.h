@@ -578,6 +578,8 @@ class Parser : public SceneTask
 
         bool Allow_Identifier_In_Call, Identifier_In_Call;
 
+        size_t MaxCachedMacroSize;
+
         // parse.h/parse.cpp
         void Frame_Init(void);
         void Parse_Coeffs(int order, DBL *Coeffs);
