@@ -40,7 +40,6 @@
 //******************************************************************************
 
 #include <cctype>
-#include <climits>
 
 #include <limits>
 
@@ -2070,7 +2069,7 @@ void Parser::Parse_Directive(int After_Hash)
                             PMac->Macro_End=Hash_Loc;
                             ITextStream::FilePos pos = Input_File->In_File->tellg();
                             POV_LONG macroLength = pos.offset - PMac->Macro_File_Pos.offset;
-                            if (macroLength <= SIZE_MAX)
+                            if (macroLength <= std::numeric_limits<size_t>::max())
                             {
                                 PMac->CacheSize = macroLength;
                                 PMac->Cache = new unsigned char[PMac->CacheSize];
