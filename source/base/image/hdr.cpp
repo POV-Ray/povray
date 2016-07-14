@@ -98,7 +98,7 @@ void GetRGBE(RGBE rgbe, const Image *image, int col, int row, const GammaCurvePt
     GetEncodedRGBValue(image, col, row, gamma, rgbColour);
 
     rgbColour += linOff.getRGB();
-    RadianceHDRColour rgbeColour(rgbColour);
+    RadianceHDRColour rgbeColour(rgbColour,encOff.getRGB());
     for (int i = 0; i < 4; i ++)
         rgbe[i] = (*rgbeColour)[i];
 
