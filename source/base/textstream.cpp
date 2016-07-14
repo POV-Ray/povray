@@ -166,6 +166,7 @@ bool ITextStream::seekg(ITextStream::FilePos fp)
 {
     bool result = true;
 
+    /*
     if((fp.offset < curpos) && ((curpos - fp.offset) < maxbufferoffset))
     {
         bufferoffset = maxbufferoffset - (curpos - fp.offset);
@@ -173,6 +174,7 @@ bool ITextStream::seekg(ITextStream::FilePos fp)
         ungetbuffer = EOF;
     }
     else
+    */
     {
         result = (stream->seekg(fp.offset) != 0);
 
