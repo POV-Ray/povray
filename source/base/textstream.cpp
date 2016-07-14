@@ -87,11 +87,11 @@ ITextStream::ITextStream(const UCS2 *sname, IStream *sstream, POV_LONG initialLi
     maxbufferoffset = 0;
     filelength = 0;
     ungetbuffer = EOF;
-    curpos = 0 ;
+    curpos = stream->tellg();
 
     stream->seekg(0, IOBase::seek_end);
     filelength = stream->tellg();
-    stream->seekg(0, IOBase::seek_set);
+    stream->seekg(curpos, IOBase::seek_set);
 
     RefillBuffer();
 }

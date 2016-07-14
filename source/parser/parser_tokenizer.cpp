@@ -1596,7 +1596,8 @@ void Parser::Echo_ungetc(int c)
     if(Echo_Indx > 0)
         Echo_Indx--;
 
-    Input_File->In_File->ungetchar(c);
+    if (!Got_EOF)
+        Input_File->In_File->ungetchar(c);
 }
 
 
