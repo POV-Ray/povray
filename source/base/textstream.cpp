@@ -166,7 +166,6 @@ bool ITextStream::seekg(ITextStream::FilePos fp)
 {
     bool result = true;
 
-    /*
     if((fp.offset < curpos) && ((curpos - fp.offset) < maxbufferoffset))
     {
         bufferoffset = maxbufferoffset - (curpos - fp.offset);
@@ -174,7 +173,6 @@ bool ITextStream::seekg(ITextStream::FilePos fp)
         ungetbuffer = EOF;
     }
     else
-    */
     {
         result = (stream->seekg(fp.offset) != 0);
 
@@ -241,7 +239,7 @@ bool ITextStream::ReadRaw(unsigned char* buf, size_t size)
     // if all buffers are depleted, read directly from stream
     if (*stream)
     {
-        if (stream->read(buf, remain))
+        if (stream->read(p, remain))
         {
             curpos += remain;
             return true;

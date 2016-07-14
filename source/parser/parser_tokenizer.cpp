@@ -2067,27 +2067,18 @@ void Parser::Parse_Directive(int After_Hash)
                         if ((PMac=Cond_Stack[CS_Index].PMac)!=NULL)
                         {
                             PMac->Macro_End=Hash_Loc;
-
-                            Debug_Info("  ends at %lx\n", (long)PMac->Macro_End);
-
                             ITextStream::FilePos pos = Input_File->In_File->tellg();
-
-                            Debug_Info("  now at %lx (%li,%li)\n", (long)pos.offset, (long)pos.lineno, (long)Echo_Indx);
-
                             POV_LONG macroLength = pos.offset - PMac->Macro_File_Pos.offset;
-                            if (macroLength < std::numeric_limits<size_t>::max())
+                            if (macroLength <= std::numeric_limits<size_t>::max())
                             {
                                 PMac->CacheSize = macroLength;
-                                PMac->Cache = new unsigned char[PMac->CacheSize+1];
+                                PMac->Cache = new unsigned char[PMac->CacheSize];
                                 if (PMac->Cache)
                                 {
                                     Input_File->In_File->seekg(PMac->Macro_File_Pos);
                                     if (!Input_File->In_File->ReadRaw(PMac->Cache, PMac->CacheSize))
                                         delete[] PMac->Cache;
                                     Input_File->In_File->seekg(pos);
-
-                                    PMac->Cache[PMac->CacheSize] = '\0';
-                                    Debug_Info("  content:\n-------->>>%s<<<\n--------\n", PMac->Cache);
                                 }
                             }
                         }
@@ -3137,13 +3128,6 @@ Parser::Macro *Parser::Parse_Macro()
     New->Macro_Filename = UCS2_strdup(Input_File->In_File->name());
     New->Macro_File_Pos = Input_File->In_File->tellg();
     New->Macro_File_Col = Echo_Indx;
-
-    Debug_Info("Parsing macro %s at %s(%li,%li,%lx)\n",
-               New->Macro_Name,
-               UCS2toASCIIString(New->Macro_Filename).c_str(),
-               (long)New->Macro_File_Pos.lineno,
-               (long)New->Macro_File_Col,
-               (long)New->Macro_File_Pos.offset);
 
     Check_Macro_Vers();
 
