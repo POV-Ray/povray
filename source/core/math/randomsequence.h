@@ -39,7 +39,6 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "core/configcore.h"
 
-#include <cctype>
 #include <vector>
 
 #include "core/math/vector.h"
@@ -131,7 +130,7 @@ class SequentialNumberGenerator
                 data->push_back((*this)());
             return data;
         }
-        /// Returns the number of values after which the generator must be expected to repeat (SIZE_MAX if unknown or pretty huge).
+        /// Returns the number of values after which the generator must be expected to repeat (maximum size_t value if unknown or pretty huge).
         virtual size_t CycleLength() const = 0;
 };
 

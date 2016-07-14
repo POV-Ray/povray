@@ -37,8 +37,10 @@
 #include "core/math/randomsequence.h"
 
 #include <cassert>
-#include <stdexcept>
+
+#include <limits>
 #include <map>
+#include <stdexcept>
 
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_int.hpp>
@@ -62,10 +64,6 @@ using boost::uniform_int;
 using boost::uniform_real;
 using boost::variate_generator;
 using boost::mt19937;
-
-#ifndef SIZE_MAX
-#define SIZE_MAX ((size_t)-1)
-#endif
 
 #define PRIME_TABLE_COUNT 25
 unsigned int primeTable[PRIME_TABLE_COUNT] = { 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97 };
@@ -251,7 +249,7 @@ class HybridNumberGenerator : public SeedableNumberGenerator<Type>, public Index
 /**
  *  Template class representing a generator for uniformly distributed numbers in a given range.
  */
-template<class Type, class BoostGenerator, class UniformType, size_t CYCLE_LENGTH = SIZE_MAX>
+template<class Type, class BoostGenerator, class UniformType, size_t CYCLE_LENGTH = 0>
 class UniformRandomNumberGenerator : public SequentialNumberGenerator<Type>
 {
     public:
@@ -626,7 +624,13 @@ Type UniformRandomNumberGenerator<Type,BoostGenerator,UniformType,CYCLE_LENGTH>:
 template<class Type, class BoostGenerator, class UniformType, size_t CYCLE_LENGTH>
 size_t UniformRandomNumberGenerator<Type,BoostGenerator,UniformType,CYCLE_LENGTH>::CycleLength() const
 {
-    return CYCLE_LENGTH;
+    if (CYCLE_LENGTH == 0)
+        // SIZE_MAX is not mandatory in C++03, and std::numeric_limits<size_t>::max() can't be used
+        // as a template parameter, so to indicate an "unknown or pretty huge" cycle length we're
+        // using a template parameter value of 0 instead to convey that information.
+        return std::numeric_limits<size_t>::max();
+    else
+        return CYCLE_LENGTH;
 }
 
 
@@ -728,9 +732,9 @@ shared_ptr<vector<Type> const> NumberSequenceFactory<Type>::operator()(size_t co
         size_t newCount = count;
         if (masterSequence->size() > newCount / 2)
         {
-            // make sure to pre-compute at least twice the already-computed size, so we don't waste too much space with
-            if (masterSequence->size() > SIZE_MAX / 2) // play it safe (though that'll have us run out of memory anyway)
-                newCount = SIZE_MAX;
+            // make sure to pre-compute at least twice the already-computed size
+            if (masterSequence->size() > std::numeric_limits<size_t>::max() / 2) // play it safe (though that'll have us run out of memory anyway)
+                newCount = std::numeric_limits<size_t>::max();
             else
                 newCount = masterSequence->size() * 2;
         }
