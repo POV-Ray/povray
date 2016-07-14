@@ -2071,6 +2071,9 @@ void Parser::Parse_Directive(int After_Hash)
                             Debug_Info("  ends at %lx\n", (long)PMac->Macro_End);
 
                             ITextStream::FilePos pos = Input_File->In_File->tellg();
+
+                            Debug_Info("  now at %lx (%li,%li)\n", (long)pos.offset, (long)pos.lineno, (long)Echo_Indx);
+
                             POV_LONG macroLength = pos.offset - PMac->Macro_File_Pos.offset;
                             if (macroLength < std::numeric_limits<size_t>::max())
                             {
