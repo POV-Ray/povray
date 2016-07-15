@@ -66,8 +66,8 @@ struct TurbulenceWarp; // full declaration in core/material/warp.h
 
 struct Fog_Struct
 {
-    Fog_Struct() : Turb(NULL), Next(NULL) {}
-    ~Fog_Struct() { if (Turb) POV_FREE(Turb); }
+    Fog_Struct();
+    ~Fog_Struct();
     int Type;
     DBL Distance;
     DBL Alt;

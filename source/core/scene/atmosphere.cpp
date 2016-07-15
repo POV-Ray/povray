@@ -50,6 +50,16 @@
 namespace pov
 {
 
+Fog_Struct::Fog_Struct() :
+    Turb(NULL),
+    Next(NULL)
+{}
+
+Fog_Struct::~Fog_Struct()
+{
+    if (Turb) delete Turb;
+}
+
 /*****************************************************************************
 *
 * FUNCTION
@@ -454,9 +464,9 @@ void Destroy_Skysphere(SKYSPHERE *Skysphere)
 
 Skysphere_Struct::~Skysphere_Struct()
 {
-	for (vector<PIGMENT*>::iterator i = Pigments.begin(); i != Pigments.end(); ++ i)
-		delete *i;
-	Destroy_Transform(Trans);
+    for (vector<PIGMENT*>::iterator i = Pigments.begin(); i != Pigments.end(); ++ i)
+        delete *i;
+    Destroy_Transform(Trans);
 }
 
 
