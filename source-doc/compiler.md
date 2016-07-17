@@ -1,7 +1,8 @@
 # Compiler Requirements {#compiler}
 
 
-@section exot   General Presumptions
+General Presumptions {#compiler_exot}
+====================
 
 While POV-Ray is being developed with portability high in mind, the C++ standard allows for some degrees of freedom that
 we consider too exotic to cater to. We therefore presume all compilers and runtime environments to adhere to the
@@ -18,10 +19,11 @@ following additional restrictions:
     separator, in include directives.
 
   - **Integer Division**: Integer division is presumed to round towards zero. This also implies that the remainder (as
-    computed by the modulus operator '%') is negative (or zero) if the dividend and divisor have different sign.
+    computed by the modulus operator `%`) is negative (or zero) if the dividend and divisor have different sign.
 
 
-@section povms  POVMS Additional Restrictions
+POVMS Additional Restrictions {#compiler_povms}
+=============================
 
 To support network rendering (a feature not yet implemented but planned) in a heterogenous network, the POVMS interface
 imposes the following additional restriction on the compiler:

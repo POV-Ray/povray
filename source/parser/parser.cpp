@@ -3315,6 +3315,7 @@ ObjectPtr Parser::Parse_Light_Source ()
             Parse_Begin();
             EXPECT
 #ifdef GLOBAL_PHOTONS
+                // TODO -- if we ever revive this, we need to choose a different keyword for this
                 CASE(GLOBAL_TOKEN)
                     Object->Ph_Density = Allow_Float(1.0);
                     if (Object->Ph_Density > 0)
@@ -7136,6 +7137,7 @@ void Parser::Parse_Global_Settings()
                 END_CASE
 
 #ifdef GLOBAL_PHOTONS
+                // TODO -- if we ever revive this, we need to choose a different keyword for this
                 CASE(GLOBAL_TOKEN)
                     sceneData->photonSettings.globalCount = (int)Parse_Float();
                 END_CASE

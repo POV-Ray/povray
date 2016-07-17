@@ -50,7 +50,7 @@ Even pure cosmetics can have a significant impact on how easily code can be read
 In the POV-Ray project, we are using the following formatting style for new code, and are in the process of
 transitioning existing code to these coventions:
 
-  - Indentation follows Allman style, with an indent of 4 spaces (no tabs), e.g.:
+  - Indentation of braces follows Allman style, with an indent of 4 spaces (no tabs), e.g.:
 
         while (x == y)
         {
@@ -233,6 +233,8 @@ source code with comments.
 The interface provided by any source file should be documented in the respective header file, using
 a format compatible with Doxygen 1.8.8. For consistency, please use JavaDoc-style comments (`/// ...`
 or `/** ... */`; the general rules for comments apply) and JavaDoc-style tags (`@``foo`).
+C++ single-line style comments should be preferred, as block comments may occasionally interfere with
+Doxygen's Markdown support.
 
 @note   Platform-specific modules may mandate a different tag style, such as (hypothetically) DocXML
         style for the Windows GUI modules.
@@ -253,6 +255,8 @@ following guidelines:
   - **Warning**: Use the `@``warning` tag when documenting potential pitfalls.
   - **Attention**: Use the `@``attention` tag when documenting pitfalls that may come as a big surprise to the reader or
     have grave effects when not avoided.
+
+However, always use the following instead if they are appropriate:
 
   - **To-Do**: Use the `@``todo` tag when documenting that something is still unfinished and needs more work.
   - **Deprecated**: Use the `@``deprecated` tag when documenting that somehting is only kept around for backward
