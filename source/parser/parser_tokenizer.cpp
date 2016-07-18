@@ -2080,7 +2080,10 @@ void Parser::Parse_Directive(int After_Hash)
                                 {
                                     Input_File->In_File->seekg(PMac->Macro_File_Pos);
                                     if (!Input_File->In_File->ReadRaw(PMac->Cache, PMac->CacheSize))
+                                    {
                                         delete[] PMac->Cache;
+                                        PMac->Cache = NULL;
+                                    }
                                     Input_File->In_File->seekg(pos);
                                 }
                             }
