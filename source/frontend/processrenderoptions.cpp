@@ -969,7 +969,7 @@ ITextStream *ProcessRenderOptions::OpenINIFileStream(const char *filename, unsig
 
     if((hasextension == true) && (CheckIfFileExists(filename) == true))
     {
-        return new ITextStream(ASCIItoUCS2String(filename).c_str(), stype);
+        return new IBufferedTextStream(ASCIItoUCS2String(filename).c_str(), stype);
     }
 
     for(i = 0; i < POV_FILE_EXTENSIONS_PER_TYPE; i++)
@@ -978,7 +978,7 @@ ITextStream *ProcessRenderOptions::OpenINIFileStream(const char *filename, unsig
         {
             if(CheckIfFileExists(file_x[i]) == true)
             {
-                return new ITextStream(ASCIItoUCS2String(file_x[i]).c_str(), stype);
+                return new IBufferedTextStream(ASCIItoUCS2String(file_x[i]).c_str(), stype);
             }
         }
     }
@@ -1023,7 +1023,7 @@ ITextStream *ProcessRenderOptions::OpenINIFileStream(const char *filename, unsig
         if((hasextension == true) && (CheckIfFileExists(pathname) == true))
         {
             (void)POVMSAttrList_Delete(&attr);
-            return new ITextStream(ASCIItoUCS2String(pathname).c_str(), stype);
+            return new IBufferedTextStream(ASCIItoUCS2String(pathname).c_str(), stype);
         }
 
         for(ii = 0; ii < POV_FILE_EXTENSIONS_PER_TYPE; ii++)
@@ -1035,7 +1035,7 @@ ITextStream *ProcessRenderOptions::OpenINIFileStream(const char *filename, unsig
                 if(CheckIfFileExists(pathname) == true)
                 {
                     (void)POVMSAttrList_Delete(&attr);
-                    return new ITextStream(ASCIItoUCS2String(pathname).c_str(), stype);
+                    return new IBufferedTextStream(ASCIItoUCS2String(pathname).c_str(), stype);
                 }
             }
         }

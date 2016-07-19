@@ -103,7 +103,7 @@ void Parser::Initialize_Tokenizer()
     rfile = Locate_File(sceneData, sceneData->inputFile.c_str(),POV_File_Text_POV,actualFileName,true);
     if(rfile != NULL)
     {
-        Input_File->In_File = new ITextStream(sceneData->inputFile.c_str(), rfile);
+        Input_File->In_File = new IBufferedTextStream(sceneData->inputFile.c_str(), rfile);
         sceneData->inputFile = actualFileName;
     }
 
@@ -2607,7 +2607,7 @@ void Parser::Open_Include()
         Error ("Cannot open include file %s.", UCS2toASCIIString(formalFileName).c_str());
     }
     else
-        Input_File->In_File = new ITextStream(formalFileName.c_str(), is);
+        Input_File->In_File = new IBufferedTextStream(formalFileName.c_str(), is);
 
     Input_File->R_Flag=false;
 
@@ -3250,16 +3250,20 @@ void Parser::Invoke_Macro()
         Input_File->R_Flag=false;
         IStream *is;
         if (PMac->Cache)
-            is = new IMemStream(Cond_Stack[CS_Index].PMac->Cache, PMac->CacheSize, PMac->Macro_Filename, PMac->Macro_File_Pos.offset);
-        else
-            is = Locate_File (sceneData, PMac->Macro_Filename, POV_File_Text_Macro, ign, true);
-        if(is == NULL)
         {
-            Input_File->In_File = NULL;  /* Keeps from closing failed file. */
-            Error ("Cannot open macro file '%s'.", UCS2toASCIIString(UCS2String(PMac->Macro_Filename)).c_str());
+            Input_File->In_File = new IMemTextStream(PMac->Macro_Filename, Cond_Stack[CS_Index].PMac->Cache, PMac->CacheSize, PMac->Macro_File_Pos);
         }
         else
-            Input_File->In_File = new ITextStream(PMac->Macro_Filename, is);
+        {
+            is = Locate_File (sceneData, PMac->Macro_Filename, POV_File_Text_Macro, ign, true);
+            if(is == NULL)
+            {
+                Input_File->In_File = NULL;  /* Keeps from closing failed file. */
+                Error ("Cannot open macro file '%s'.", UCS2toASCIIString(UCS2String(PMac->Macro_Filename)).c_str());
+            }
+            else
+                Input_File->In_File = new IBufferedTextStream(PMac->Macro_Filename, is);
+        }
     }
     else
     {
@@ -3500,7 +3504,7 @@ void Parser::Parse_Fopen(void)
             New->R_Flag = true;
             rfile = Locate_File(sceneData, fileName.c_str(), POV_File_Text_User, ign, true);
             if(rfile != NULL)
-                New->In_File = new ITextStream(fileName.c_str(), rfile);
+                New->In_File = new IBufferedTextStream(fileName.c_str(), rfile);
             else
                 New->In_File = NULL;
 
@@ -4130,7 +4134,7 @@ void Parser::IncludeHeader(const UCS2String& formalFileName)
         Error ("Cannot open include header file %s.", UCS2toASCIIString(formalFileName).c_str());
     }
     else
-        Input_File->In_File = new ITextStream(formalFileName.c_str(), is);
+        Input_File->In_File = new IBufferedTextStream(formalFileName.c_str(), is);
 
     Input_File->R_Flag=false;
 

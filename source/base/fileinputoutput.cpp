@@ -383,21 +383,36 @@ POV_LONG GetFileLength(const Path& p)
     return result;
 }
 
-bool IMemStream::read(void *buffer, size_t count)
+bool IMemStream::read(void *buffer, size_t maxCount)
 {
-    if (!fail)
+    size_t count = 0;
+
+    if (fail)
+        return false;
+
+    unsigned char* p = reinterpret_cast<unsigned char*>(buffer);
+
+    if (maxCount == 0)
+        return true;
+
+    // read from unget buffer first
+    if (mUngetBuffer != EOF)
     {
-        if ((count <= size) && (pos <= size-count))
-        {
-            memcpy(buffer,&start[pos],count);
-            pos += count;
-        }
-        else
-        {
-            fail = true;
-        }
+        *(p++) = (unsigned char)mUngetBuffer;
+        mUngetBuffer = EOF;
+        if (++count == maxCount)
+            return true;
     }
-    return !fail;
+
+    size_t copyFromBuffer = min(maxCount-count, size-pos);
+    memcpy(p, &(start[pos]), copyFromBuffer);
+    count += copyFromBuffer;
+    pos += copyFromBuffer;
+    if (count == maxCount)
+        return true;
+
+    fail = true;
+    return false;
 }
 
 int IMemStream::Read_Byte()
@@ -406,6 +421,11 @@ int IMemStream::Read_Byte()
     if (fail)
     {
         v = EOF;
+    }
+    else if (mUngetBuffer != EOF)
+    {
+        v = mUngetBuffer;
+        mUngetBuffer = EOF;
     }
     else
     {
@@ -419,14 +439,12 @@ int IMemStream::Read_Byte()
 
 bool IMemStream::UnRead_Byte(int c)
 {
-    if (!fail)
-    {
-        if (pos > 0)
-            pos--;
-        else
-            fail = true;
-    }
-    return !fail;
+    if (fail)
+        return false;
+
+    mUngetBuffer = c;
+
+    return true;
 }
 
 bool IMemStream::getline(char *s,size_t buflen)
@@ -438,13 +456,19 @@ bool IMemStream::getline(char *s,size_t buflen)
 
 POV_LONG IMemStream::tellg() const
 {
-    return formalStart + pos;
+    size_t physicalPos = pos;
+    if (mUngetBuffer != EOF)
+        ++physicalPos;
+    return formalStart + physicalPos;
 }
 
 bool IMemStream::seekg(POV_LONG posi, unsigned int whence)
 {
     if(!fail)
     {
+        // Any seek operation renders the unget buffer's content obsolete.
+        mUngetBuffer = EOF;
+
         switch(whence)
         {
             case seek_set:

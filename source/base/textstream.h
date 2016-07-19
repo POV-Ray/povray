@@ -69,29 +69,50 @@ class ITextStream
             POV_LONG lineno;
         };
 
-        ITextStream(const UCS2 *, unsigned int);
-
-        /// @param[in]  formalName  Name by which the file is known to the user.
-        /// @param[in]  byteStream  Underlying byte-oriented stream to read from.
-        /// @param[in]  initialLine First line number as known to the user.
-        ITextStream(const UCS2 *formalName, IStream *byteStream, POV_LONG initialLine = 1);
-
+        ITextStream();
         virtual ~ITextStream();
 
-        int getchar();
-        void ungetchar(int);
+        virtual int getchar() = 0;
+        virtual void ungetchar(int) = 0;
 
-        bool eof() const;
-        bool seekg(FilePos);
-        FilePos tellg() const;
+        virtual bool eof() const = 0;
+        virtual bool seekg(FilePos) = 0;
+        virtual FilePos tellg() const = 0;
 
-        bool ReadRaw(unsigned char* buf, size_t size);
+        virtual bool ReadRaw(unsigned char* buf, size_t size) = 0;
 
         /// Formal current line number of the file, e.g. to be displayed in error messages.
         POV_LONG line() const { return lineno; };
 
         /// Formal name of the file, e.g. to be displayed in error messages.
-        const UCS2 *name() const { return filename.c_str(); };
+        virtual const UCS2 *name() const = 0;
+    protected:
+        POV_LONG lineno;
+};
+
+class IBufferedTextStream : public ITextStream
+{
+    public:
+        IBufferedTextStream(const UCS2 *, unsigned int);
+
+        /// @param[in]  formalName  Name by which the file is known to the user.
+        /// @param[in]  byteStream  Underlying byte-oriented stream to read from.
+        /// @param[in]  initialLine First line number as known to the user.
+        IBufferedTextStream(const UCS2 *formalName, IStream *byteStream, POV_LONG initialLine = 1);
+
+        virtual ~IBufferedTextStream();
+
+        virtual int getchar();
+        virtual void ungetchar(int);
+
+        virtual bool eof() const;
+        virtual bool seekg(FilePos);
+        virtual FilePos tellg() const;
+
+        virtual bool ReadRaw(unsigned char* buf, size_t size);
+
+        /// Formal name of the file, e.g. to be displayed in error messages.
+        virtual const UCS2 *name() const { return filename.c_str(); };
     private:
         IStream *stream;
         unsigned char buffer[ITEXTSTREAM_BUFFER_SIZE];
@@ -100,10 +121,41 @@ class ITextStream
         POV_ULONG filelength;
         POV_ULONG curpos;
         UCS2String filename;
-        POV_LONG lineno;
         int ungetbuffer;
 
         void RefillBuffer();
+};
+
+class IMemTextStream : public ITextStream
+{
+    public:
+        /// @param[in]  formalName  Name by which the file is known to the user.
+        /// @param[in]  data        Underlying memory buffer to read from.
+        /// @param[in]  size        Size of underlying memory buffer.
+        /// @param[in]  formalStart File position of buffer start as known to the user.
+        IMemTextStream(const UCS2 *formalName, unsigned char* data, size_t size, const FilePos& formalStart);
+
+        virtual ~IMemTextStream();
+
+        virtual int getchar();
+        virtual void ungetchar(int);
+
+        virtual bool eof() const;
+        virtual bool seekg(FilePos);
+        virtual FilePos tellg() const;
+
+        virtual bool ReadRaw(unsigned char* buf, size_t size);
+
+        /// Formal name of the file, e.g. to be displayed in error messages.
+        virtual const UCS2 *name() const { return filename.c_str(); };
+    private:
+        unsigned char* buffer;
+        size_t bufferoffset;
+        size_t maxbufferoffset;
+        POV_ULONG mFormalStart;
+        UCS2String filename;
+        int ungetbuffer;
+        bool fail;
 };
 
 class OTextStream

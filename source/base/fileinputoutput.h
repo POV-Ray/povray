@@ -185,6 +185,7 @@ class IMemStream : public IStream
         size_t pos;
         POV_LONG formalStart;
         const unsigned char * start;
+        int mUngetBuffer;
 };
 
 class OStream : public IOBase
