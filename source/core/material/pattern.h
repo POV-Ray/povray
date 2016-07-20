@@ -125,12 +125,17 @@ const int kNoiseGen_Max = 3;
 /// Density file interpolation types
 enum DensityFileInterpolationType
 {
-    kDensityFileInterpolation_None      = 0,
-    kDensityFileInterpolation_Trilinear = 1,
-    kDensityFileInterpolation_Tricubic  = 2,
-    kDensityFileInterpolation_BlobFour  = 3,
-    kDensityFileInterpolation_BlobSix   = 4,
-    kDensityFileInterpolation_BlobEight = 5
+    kDensityFileInterpolation_None        = 0,
+    kDensityFileInterpolation_Trilinear   = 1,
+    kDensityFileInterpolation_Tricubic    = 2,
+    kDensityFileInterpolation_BlobFour    = 3,
+    kDensityFileInterpolation_BlobSix     = 4,
+    kDensityFileInterpolation_BlobEight   = 5,
+    kDensityFileInterpolation_Environment = 6,
+    kDensityFileInterpolation_GradientX   = 7,
+    kDensityFileInterpolation_GradientY   = 8,
+    kDensityFileInterpolation_GradientZ   = 9,
+    kDensityFileInterpolation_RotAboutYx  =10
 };
 
 /// Maximum `exponent` parameter value for fractal patterns.
