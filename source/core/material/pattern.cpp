@@ -6127,20 +6127,12 @@ DBL DensityFilePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *
     unsigned int   tmpUint;
     unsigned long  tmpUlong;
 
-    Ex=EPoint[X];
-    Ey=EPoint[Y];
-    Ez=EPoint[Z];
-
-    if((densityFile != NULL) && ((Data = densityFile->Data) != NULL) &&
-       (Data->Sx) && (Data->Sy) && (Data->Sz))
+    if((densityFile != NULL) && ((Data = densityFile->Data) != NULL))
     {
-/*      if(Data->Cyclic == true)
-        {
-            Ex -= floor(Ex);
-            Ey -= floor(Ey);
-            Ez -= floor(Ez);
-        }
-*/
+        Ex=EPoint[X];
+        Ey=EPoint[Y];
+        Ez=EPoint[Z];
+
         if((Ex >= 0.0) && (Ex < 1.0) && (Ey >= 0.0) && (Ey < 1.0) && (Ez >= 0.0) && (Ez < 1.0))
         {
             switch (densityFile->Interpolation)
@@ -6164,6 +6156,10 @@ DBL DensityFilePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *
                     }
                     break;
                 case kDensityFileInterpolation_Trilinear:
+                    Ex = max(0.0,Ex-(1.0/(DBL)Data->Sx/2.0));
+                    Ey = max(0.0,Ey-(1.0/(DBL)Data->Sy/2.0));
+                    Ez = max(0.0,Ez-(1.0/(DBL)Data->Sz/2.0));
+
                     xx = Ex * (DBL)(Data->Sx);
                     yy = Ey * (DBL)(Data->Sy);
                     zz = Ez * (DBL)(Data->Sz);
@@ -6225,6 +6221,10 @@ DBL DensityFilePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *
                     break;
                 case kDensityFileInterpolation_Tricubic:
                 default:
+                    Ex = max(0.0,Ex-(1.0/(DBL)Data->Sx/2.0));
+                    Ey = max(0.0,Ey-(1.0/(DBL)Data->Sy/2.0));
+                    Ez = max(0.0,Ez-(1.0/(DBL)Data->Sz/2.0));
+
                     xx = Ex * (DBL)(Data->Sx);
                     yy = Ey * (DBL)(Data->Sy);
                     zz = Ez * (DBL)(Data->Sz);
@@ -6314,12 +6314,26 @@ DBL DensityFilePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *
                     this_z = Ez-0.5;
                     density = sqrt(this_x*this_x+this_z*this_z)+0.5;
                     break;
+                case kDensityFileInterpolation_TwistZx:
+                    this_x = Ex-0.5;
+                    this_y = Ey-0.5;
+                    density = (this_x*cos(Ez*TWO_M_PI)+this_y*sin(Ez*TWO_M_PI))+0.5;
+                    break;
+                case kDensityFileInterpolation_TwistZy:
+                    this_x = Ex-0.5;
+                    this_y = Ey-0.5;
+                    density = (this_y*cos(Ez*TWO_M_PI)-this_x*sin(Ez*TWO_M_PI))+0.5;
+                    break;
                 case kDensityFileInterpolation_BlobFour:
                 case kDensityFileInterpolation_BlobSix:
                 case kDensityFileInterpolation_BlobEight:
-                    this_x = Ex * (DBL)(Data->Sx );
-                    this_y = Ey * (DBL)(Data->Sy );
-                    this_z = Ez * (DBL)(Data->Sz );
+                    Ex -= 1.0/(DBL)Data->Sx/2.0;
+                    Ey -= 1.0/(DBL)Data->Sy/2.0;
+                    Ez -= 1.0/(DBL)Data->Sz/2.0;
+
+                    this_x = Ex * (DBL)(Data->Sx);
+                    this_y = Ey * (DBL)(Data->Sy);
+                    this_z = Ez * (DBL)(Data->Sz);
 
                     x1 = (size_t)this_x;
                     y1 = (size_t)this_y;
@@ -9277,7 +9291,7 @@ DENSITY_FILE *Create_Density_File()
 
     New->Interpolation = kDensityFileInterpolation_None;
 
-    New->Data = new DENSITY_FILE_DATA;
+    New->Data = new DensityFilePattern::DensityFileDataStruct;
 
     New->Data->References = 1;
 
@@ -9411,9 +9425,6 @@ void Read_Density_File(IStream *file, DENSITY_FILE *df)
 
     size_t x, y, z, sx, sy, sz, len;
 
-    if (df == NULL)
-        return;
-
     /* Allocate and read density file. */
 
     if((df != NULL) && (df->Data->Name != NULL))
@@ -9421,6 +9432,10 @@ void Read_Density_File(IStream *file, DENSITY_FILE *df)
         sx = df->Data->Sx = ReadUShort(file);
         sy = df->Data->Sy = ReadUShort(file);
         sz = df->Data->Sz = ReadUShort(file);
+
+        // All could be zero and render clean. Check formally per point evaluation in density_pattern.
+        if (sx==0 || sy==0 || sz==0)
+            throw POV_EXCEPTION_STRING("Invalid density file. One or more dimensions is 0.");
 
         file->seekg(0, IOBase::seek_end);
         len = file->tellg() - 6;
@@ -9480,6 +9495,8 @@ void Read_Density_File(IStream *file, DENSITY_FILE *df)
 
         delete file;
     }
+    else
+        throw POV_EXCEPTION_STRING("Null density file data structure or file name");
 }
 
 static unsigned short ReadUShort(IStream *pInFile)

@@ -135,7 +135,9 @@ enum DensityFileInterpolationType
     kDensityFileInterpolation_GradientX   = 7,
     kDensityFileInterpolation_GradientY   = 8,
     kDensityFileInterpolation_GradientZ   = 9,
-    kDensityFileInterpolation_RotAboutYx  =10
+    kDensityFileInterpolation_RotAboutYx  =10,
+    kDensityFileInterpolation_TwistZx     =11,
+    kDensityFileInterpolation_TwistZy     =12
 };
 
 /// Maximum `exponent` parameter value for fractal patterns.
@@ -508,7 +510,6 @@ struct DensityFilePattern : public ContinuousPattern
     virtual DBL EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const;
 };
 typedef struct DensityFilePattern::DensityFileStruct     DENSITY_FILE;      ///< @deprecated @ref DensityFilePattern::DensityFileStruct should be used instead.
-typedef struct DensityFilePattern::DensityFileDataStruct DENSITY_FILE_DATA; ///< @deprecated @ref DensityFilePattern::DensityFileDataStruct should be used instead.
 
 /// Implements the `dents` pattern.
 struct DentsPattern : public ContinuousPattern
