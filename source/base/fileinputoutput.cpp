@@ -244,6 +244,8 @@ OStream::OStream(const UCS2String& name, unsigned int Flags) : IOBase(name), f(N
 
         if (f != NULL)
         {
+            fail = false;
+
             if((Flags & append) != 0)
             {
                 if(!seekg(0, seek_end))
