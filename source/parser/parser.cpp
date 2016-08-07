@@ -9908,6 +9908,7 @@ void Parser::Post_Process (ObjectPtr Object, ObjectPtr Parent)
             }
             if ((reinterpret_cast<LightSource *>(Object))->Projected_Through_Object->Texture != NULL)
             {
+                Destroy_Textures((reinterpret_cast<LightSource *>(Object))->Projected_Through_Object->Texture);
                 (reinterpret_cast<LightSource *>(Object))->Projected_Through_Object->Texture = NULL;
                 Warning("Projected through objects can not have texture, texture removed.");
             }
