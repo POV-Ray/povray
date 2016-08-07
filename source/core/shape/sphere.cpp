@@ -375,8 +375,6 @@ ObjectPtr Sphere::Copy()
     *New = *this;
     New->Trans = Copy_Transform(Trans);
 
-    New->UV_Trans = Copy_Transform(UV_Trans);
-
     return(New);
 }
 
@@ -409,20 +407,16 @@ ObjectPtr Sphere::Copy()
 
 void Sphere::Translate(const Vector3d& Vector, const TRANSFORM *tr)
 {
-    if(Trans == NULL)
+    if(!Do_Ellipsoid)
     {
-        if(UV_Trans == NULL)
-            UV_Trans = Create_Transform();
-        Compose_Transforms(UV_Trans, tr);
-
         Center += Vector;
-
-        Compute_BBox();
     }
     else
     {
-        Transform(tr);
+        Compose_Transforms(Trans, tr);
     }
+
+    Compute_BBox();
 }
 
 
@@ -455,20 +449,14 @@ void Sphere::Translate(const Vector3d& Vector, const TRANSFORM *tr)
 
 void Sphere::Rotate(const Vector3d&, const TRANSFORM *tr)
 {
-    if(Trans == NULL)
-    {
-        if (UV_Trans == NULL)
-            UV_Trans = Create_Transform();
-        Compose_Transforms(UV_Trans, tr);
+    if (Trans == NULL)
+        Trans = Create_Transform();
+    Compose_Transforms(Trans, tr);
 
+    if(!Do_Ellipsoid)
         MTransPoint(Center, Center, tr);
 
-        Compute_BBox();
-    }
-    else
-    {
-        Transform(tr);
-    }
+    Compute_BBox();
 }
 
 
@@ -503,30 +491,26 @@ void Sphere::Scale(const Vector3d& Vector, const TRANSFORM *tr)
 {
     if ((Vector[X] != Vector[Y]) || (Vector[X] != Vector[Z]))
     {
-        if (Trans == NULL)
+        if (!Do_Ellipsoid)
         {
             // treat sphere as ellipsoid as it's unevenly scaled
-            Do_Ellipsoid = true; // FIXME - parser needs to select sphere or ellipsoid
-            Trans = Create_Transform();
+            Do_Ellipsoid = true;
+            if (Trans == NULL)
+                Trans = Create_Transform();
         }
     }
 
-    if (Trans == NULL)
+    if (!Do_Ellipsoid)
     {
-        if (UV_Trans == NULL)
-            UV_Trans = Create_Transform();
-        Compose_Transforms(UV_Trans, tr);
-
         Center *= Vector[X];
-
         Radius *= fabs(Vector[X]);
-
-        Compute_BBox();
     }
     else
     {
-        Transform(tr);
+        Compose_Transforms(Trans, tr);
     }
+
+    Compute_BBox();
 }
 
 
@@ -561,7 +545,6 @@ Sphere::Sphere() :
     ObjectBase(SPHERE_OBJECT),
     Center(0.0, 0.0, 0.0),
     Radius(1.0),
-    UV_Trans(NULL),
     Do_Ellipsoid(false) // FIXME
 {}
 
@@ -593,16 +576,10 @@ Sphere::Sphere() :
 
 void Sphere::Transform(const TRANSFORM *tr)
 {
-    if (UV_Trans == NULL)
-        UV_Trans = Create_Transform();
-    Compose_Transforms(UV_Trans, tr);
+    Do_Ellipsoid = true;
 
     if(Trans == NULL)
-    {
-        Do_Ellipsoid = true;
         Trans = Create_Transform();
-    }
-
     Compose_Transforms(Trans, tr);
 
     Compute_BBox();
@@ -648,8 +625,6 @@ Sphere::~Sphere()
     Debug_Info("\t%f // Radius\n", (DBL)Radius);
     Debug_Info("}\n");
 #endif
-
-    Destroy_Transform(UV_Trans);
 }
 
 
@@ -688,7 +663,7 @@ void Sphere::Compute_BBox()
 {
     Make_BBox(BBox, Center[X] - Radius, Center[Y] - Radius,  Center[Z] - Radius, 2.0 * Radius, 2.0 * Radius, 2.0 * Radius);
 
-    if(Trans != NULL)
+    if(Do_Ellipsoid)
     {
         Recompute_BBox(&BBox, Trans);
     }
@@ -729,17 +704,15 @@ void Sphere::UVCoord(Vector2d& Result, const Intersection *Inter, TraceThreadDat
     Vector3d New_Point, New_Center;
 
     /* Transform the point into the sphere's space */
-    if (UV_Trans != NULL)
+    if (Trans != NULL)
     {
 
-        MInvTransPoint(New_Point, Inter->IPoint, UV_Trans);
+        MInvTransPoint(New_Point, Inter->IPoint, Trans);
 
-        if (Trans != NULL)
-            MTransPoint(New_Center, Center, Trans);
-        else
+        if (Do_Ellipsoid)
             New_Center = Center;
-
-        MInvTransPoint(New_Center, New_Center, UV_Trans);
+        else
+            MInvTransPoint(New_Center, Center, Trans);
     }
     else
     {

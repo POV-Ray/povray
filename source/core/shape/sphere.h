@@ -79,8 +79,7 @@ class Sphere : public ObjectBase
 
         static bool Intersect(const BasicRay& ray, const Vector3d& Center, DBL Radius2, DBL *Depth1, DBL  *Depth2);
     private:
-        bool Do_Ellipsoid; // TODO - parser needs to take care of this
-        TRANSFORM *UV_Trans;
+        bool Do_Ellipsoid;
 };
 
 }
