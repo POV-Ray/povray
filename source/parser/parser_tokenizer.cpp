@@ -174,7 +174,6 @@ void Parser::pre_init_tokenizer ()
     Echo_Indx=0;
 
     // make sure these are NULL otherwise cleanup() will crash if we terminate early
-    Default_Texture = NULL;
     Brace_Stack = NULL;
 
     CS_Index            = 0;

@@ -313,7 +313,7 @@ class Parser : public SceneTask
         void Only_In (const char *s1,const char *s2);
         void Not_With (const char *s1,const char *s2);
         void Warn_Compat (bool definite, const char *sym);
-        void Link_Textures (TEXTURE **Old_Texture, TEXTURE *New_Texture);
+        void Link_Textures (TextureData* Old_Texture, TextureData& New_Texture);
 
         ObjectPtr Parse_Object_Mods (ObjectPtr Object);
         ObjectPtr Parse_Object (void);
@@ -341,8 +341,6 @@ class Parser : public SceneTask
 
         int Debug_Info(const char *format,...);
         void FlushDebugMessageBuffer();
-
-        static void Convert_Filter_To_Transmit(PIGMENT *Pigment); // NK layers - 1999 July 10 - for backwards compatiblity with layered textures
 
         /// @param[in]  formalFileName  Name by which the file is known to the user.
         /// @param[out] actualFileName  Name by which the file is known to the parsing computer.
@@ -372,7 +370,7 @@ class Parser : public SceneTask
         int Parse_For_Param (char**, DBL*, DBL*);
 
         // parstxtr.h/parstxtr.cpp
-        TEXTURE *Parse_Texture (void);
+        TextureData Parse_Texture (void);
         void Parse_Pigment (PIGMENT **);
         void Parse_Tnormal (TNORMAL **);
         void Parse_Finish (FINISH **);
@@ -569,7 +567,7 @@ class Parser : public SceneTask
         TOKEN Conversion_Util_Table[LAST_TOKEN];
 
         // parstxtr.h/parstxtr.cpp
-        TEXTURE *Default_Texture;
+        TextureData Default_Texture;
 
         // express.h/express.cpp
         short Have_Vector;
@@ -612,7 +610,7 @@ class Parser : public SceneTask
         ObjectPtr Parse_Triangle();
         ObjectPtr Parse_Mesh();
         ObjectPtr Parse_Mesh2();
-        TEXTURE *Parse_Mesh_Texture(TEXTURE **t2, TEXTURE **t3);
+        TextureData Parse_Mesh_Texture(TextureData& t2, TextureData& t3);
         ObjectPtr Parse_TrueType(void);
         void Parse_Blob_Element_Mods(Blob_Element *Element);
 
@@ -686,10 +684,10 @@ class Parser : public SceneTask
         void Parse_Bump_Map (TNORMAL *Tnormal);
         void Parse_Image_Map (PIGMENT *Pigment);
         template<typename MAP_T, typename PATTERN_T> void Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type);
-        TEXTURE *Parse_Vers1_Texture (void);
-        TEXTURE *Parse_Tiles (void);
-        TEXTURE *Parse_Material_Map (void);
-        void Parse_Texture_Transform (TEXTURE *Texture);
+        TextureData Parse_Vers1_Texture (void);
+        TextureData Parse_Tiles (void);
+        TextureData Parse_Material_Map (void);
+        void Parse_Texture_Transform (TextureData& Texture);
         ClassicTurbulence *Check_Turb (WarpList& warps, bool patternHandlesTurbulence);
         void Parse_Warp (WarpList& warps);
         void Check_BH_Parameters (BlackHoleWarp *bh);

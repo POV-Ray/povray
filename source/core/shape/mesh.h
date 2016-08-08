@@ -121,7 +121,7 @@ class Mesh : public ObjectBase
     public:
         MESH_DATA *Data;                ///< Mesh data holding triangles.
         MeshIndex Number_Of_Textures;   ///< Number of textures in the mesh.
-        TEXTURE **Textures;             ///< Array of texture references.
+        TextureData *Textures;          ///< Array of texture references.
         bool has_inside_vector;
 
         Mesh();
@@ -149,7 +149,7 @@ class Mesh : public ObjectBase
         void Destroy_Mesh_Hash_Tables();
         MeshIndex Mesh_Hash_Vertex(MeshIndex *Number_Of_Vertices, MeshIndex *Max_Vertices, MeshVector **Vertices, const Vector3d& Vertex);
         MeshIndex Mesh_Hash_Normal(MeshIndex *Number_Of_Normals, MeshIndex *Max_Normals, MeshVector **Normals, const Vector3d& Normal);
-        MeshIndex Mesh_Hash_Texture(MeshIndex *Number_Of_Textures, MeshIndex *Max_Textures, TEXTURE ***Textures, TEXTURE *Texture);
+        MeshIndex Mesh_Hash_Texture(MeshIndex *Number_Of_Textures, MeshIndex *Max_Textures, TextureData **Textures, TextureData& Texture);
         MeshIndex Mesh_Hash_UV(MeshIndex *Number, MeshIndex *Max, MeshUVVector **Elements, const Vector2d& aPoint);
         void Smooth_Mesh_Normal(Vector3d& Result, const MESH_TRIANGLE *Triangle, const Vector3d& IPoint) const;
 
@@ -169,7 +169,7 @@ class Mesh : public ObjectBase
         void get_triangle_uvcoords(const MESH_TRIANGLE *Triangle, Vector2d& U1, Vector2d& U2, Vector2d& U3) const;
         static MeshIndex mesh_hash(HASH_TABLE **Hash_Table, MeshIndex *Number, MeshIndex *Max, MeshVector **Elements, const Vector3d& aPoint);
 
-private:
+    private:
         // these are used temporarily during parsing and are destroyed
         // when the parser has finished constructing the object
         static HASH_TABLE **Vertex_Hash_Table;

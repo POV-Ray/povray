@@ -85,7 +85,7 @@ class Blob_Element
         DBL len;          /* Cylinder's length                               */
         DBL rad2;         /* Sphere's/Cylinder's radius^2                    */
         DBL c[3];         /* Component's coeffs                              */
-        TEXTURE *Texture; /* Component's texture                             */
+        TextureData Texture; /* Component's texture                          */
         TRANSFORM *Trans; /* Component's transformation                      */
 
         Blob_Element();
@@ -127,7 +127,7 @@ class Blob : public ObjectBase
 {
     public:
         Blob_Data *Data;
-        vector<TEXTURE*> Element_Texture;
+        vector<TextureData> Element_Texture;
 
         Blob();
         virtual ~Blob();
@@ -172,7 +172,7 @@ class Blob : public ObjectBase
         static void get_element_bounding_sphere(const Blob_Element *Element, Vector3d& Center, DBL *Radius2);
         void build_bounding_hierarchy();
 
-        void determine_element_texture(const Blob_Element *Element, TEXTURE *Texture, const Vector3d& P, WeightedTextureVector&);
+        void determine_element_texture(const Blob_Element *Element, TextureData& Texture, const Vector3d& P, WeightedTextureVector&);
 
         static bool insert_node(BSPHERE_TREE *Node, unsigned int *size, TraceThreadData *Thread);
 

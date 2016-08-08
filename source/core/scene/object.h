@@ -158,8 +158,8 @@ class ObjectBase
 {
     public:
         int Type; // TODO - make obsolete
-        TEXTURE *Texture;
-        TEXTURE *Interior_Texture;
+        TextureData Texture;
+        TextureData Interior_Texture;
         InteriorPtr interior;
         vector<ObjectPtr> Bound;
         vector<ObjectPtr> Clip;
@@ -177,7 +177,7 @@ class ObjectBase
         /// Construct object from scratch.
         ObjectBase(int t) :
             Type(t),
-            Texture(NULL), Interior_Texture(NULL), interior(), Trans(NULL),
+            Texture(), Interior_Texture(), interior(), Trans(NULL),
             Ph_Density(0), RadiosityImportance(0.0), Flags(0)
         {
             Make_BBox(BBox, -BOUND_HUGE/2.0, -BOUND_HUGE/2.0, -BOUND_HUGE/2.0, BOUND_HUGE, BOUND_HUGE, BOUND_HUGE);
@@ -197,8 +197,8 @@ class ObjectBase
         {
             if (transplant)
             {
-                o.Texture = NULL;
-                o.Interior_Texture = NULL;
+                o.Texture.Kill();
+                o.Interior_Texture.Kill();
                 o.interior.reset();
                 o.Trans = NULL;
                 o.Bound.clear();
@@ -206,7 +206,7 @@ class ObjectBase
                 o.LLights.clear();
             }
         }
-		virtual ~ObjectBase();
+        virtual ~ObjectBase();
 
         virtual ObjectPtr Copy() = 0;
 

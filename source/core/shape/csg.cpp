@@ -992,7 +992,7 @@ void CSG::Determine_Textures(Intersection *isect, bool hitinside, WeightedTextur
             {
                 if(children[0]->Type & IS_COMPOUND_OBJECT)
                     children[0]->Determine_Textures(isect, hitinside, textures, threaddata);
-                else if(children[0]->Texture != NULL)
+                else if(!children[0]->Texture.IsEmpty())
                     textures.push_back(WeightedTexture(1.0, children[0]->Texture));
             }
         }
@@ -1006,7 +1006,7 @@ void CSG::Determine_Textures(Intersection *isect, bool hitinside, WeightedTextur
                 {
                     if((*Current_Sib)->Type & IS_COMPOUND_OBJECT)
                         (*Current_Sib)->Determine_Textures(isect, hitinside, textures, threaddata);
-                    else if((*Current_Sib)->Texture != NULL)
+                    else if(!(*Current_Sib)->Texture.IsEmpty())
                         textures.push_back(WeightedTexture(1.0, (*Current_Sib)->Texture));
                 }
             }

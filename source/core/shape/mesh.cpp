@@ -572,7 +572,7 @@ void Mesh::Transform(const TRANSFORM *tr)
     /* NK 1998 added if */
     if (!Test_Flag(this, UV_FLAG))
         for (i=0; i<Number_Of_Textures; i++)
-            Transform_Textures(Textures[i], tr);
+            Textures[i].Transform(*tr);
 }
 
 
@@ -665,9 +665,9 @@ ObjectPtr Mesh::Copy()
     /* NK 1999 copy textures */
     if(Textures != NULL)
     {
-        New->Textures = reinterpret_cast<TEXTURE **>(POV_MALLOC(Number_Of_Textures*sizeof(TEXTURE *), "triangle mesh data"));
+        New->Textures = reinterpret_cast<TextureData*>(POV_MALLOC(Number_Of_Textures*sizeof(TextureData), "triangle mesh data"));
         for (i = 0; i < Number_Of_Textures; i++)
-            New->Textures[i] = Copy_Textures(Textures[i]);
+            New->Textures[i].SetCopy(Textures[i]);
     }
 
     return(New);
@@ -710,7 +710,7 @@ Mesh::~Mesh()
     {
         for (i = 0; i < Number_Of_Textures; i++)
         {
-            Destroy_Textures(Textures[i]);
+            Textures[i].Destroy();
         }
 
         POV_FREE(Textures);
@@ -1729,11 +1729,11 @@ MeshIndex Mesh::Mesh_Hash_Normal(MeshIndex *Number_Of_Normals, MeshIndex *Max_No
 *
 ******************************************************************************/
 
-MeshIndex Mesh::Mesh_Hash_Texture(MeshIndex *Number_Of_Textures, MeshIndex *Max_Textures, TEXTURE ***Textures, TEXTURE *Texture)
+MeshIndex Mesh::Mesh_Hash_Texture(MeshIndex *Number_Of_Textures, MeshIndex *Max_Textures, TextureData **Textures, TextureData& Texture)
 {
     MeshIndex i;
 
-    if (Texture == NULL)
+    if (Texture.IsEmpty())
     {
         return(-1);
     }
@@ -1759,10 +1759,10 @@ MeshIndex Mesh::Mesh_Hash_Texture(MeshIndex *Number_Of_Textures, MeshIndex *Max_
 
             (*Max_Textures) *= 2;
 
-            (*Textures) = reinterpret_cast<TEXTURE **>(POV_REALLOC((*Textures), (*Max_Textures)*sizeof(TEXTURE *), "mesh data"));
+            (*Textures) = reinterpret_cast<TextureData *>(POV_REALLOC((*Textures), (*Max_Textures)*sizeof(TextureData), "mesh data"));
         }
 
-        (*Textures)[(*Number_Of_Textures)++] = Copy_Texture_Pointer(Texture);
+        (*Textures)[(*Number_Of_Textures)++].SetShallowCopy(Texture);
     }
 
     return(i);
@@ -2200,7 +2200,7 @@ void Mesh::Test_Mesh_Opacity()
 
     /* Initialize opacity flag to the opacity of the object's texture. */
 
-    if ((Texture == NULL) || (Test_Opacity(Texture)))
+    if (Texture.IsEmpty() || Texture.IsOpaque())
     {
         Set_Flag(this, OPAQUE_FLAG);
     }
@@ -2209,11 +2209,11 @@ void Mesh::Test_Mesh_Opacity()
     {
         for (i = 0; i < Number_Of_Textures; i++)
         {
-            if (Textures[i] != NULL)
+            if (!Textures[i].IsEmpty())
             {
                 /* If component's texture isn't opaque the mesh is neither. */
 
-                if (!Test_Opacity(Textures[i]))
+                if (!Textures[i].IsOpaque())
                 {
                     Clear_Flag(this, OPAQUE_FLAG);
                 }
@@ -2415,7 +2415,7 @@ void Mesh::Determine_Textures(Intersection *isect, bool hitinside, WeightedTextu
 {
     const MESH_TRIANGLE *tri = reinterpret_cast<const MESH_TRIANGLE *>(isect->Pointer);
 
-    if((Interior_Texture != NULL) && (hitinside == true)) // useful feature for checking mesh orientation and other effects [trf]
+    if(!Interior_Texture.IsEmpty() && (hitinside == true)) // useful feature for checking mesh orientation and other effects [trf]
         textures.push_back(WeightedTexture(1.0, Interior_Texture));
     else if(tri->ThreeTex)
     {
@@ -2445,7 +2445,7 @@ void Mesh::Determine_Textures(Intersection *isect, bool hitinside, WeightedTextu
     }
     else if(tri->Texture >= 0) // TODO FIXME - make sure there always is some valid texture, also for code above! [trf]
         textures.push_back(WeightedTexture(1.0, Textures[tri->Texture]));
-    else if(Texture != NULL)
+    else if(!Texture.IsEmpty())
         textures.push_back(WeightedTexture(1.0, Texture));
 }
 

@@ -205,7 +205,7 @@ template BlendMap<ColourBlendMapData>::BlendMap(BlendMapTypeId type);
 template BlendMap<PigmentBlendMapData>::BlendMap(BlendMapTypeId type);
 template BlendMap<SlopeBlendMapData>::BlendMap(BlendMapTypeId type);
 template BlendMap<NormalBlendMapData>::BlendMap(BlendMapTypeId type);
-template BlendMap<TexturePtr>::BlendMap(BlendMapTypeId type);
+template BlendMap<TextureData>::BlendMap(BlendMapTypeId type);
 
 template<typename DATA_T>
 void BlendMap<DATA_T>::Set(const Vector& data)
@@ -218,6 +218,6 @@ template void BlendMap<ColourBlendMapData>::Set(const Vector& data);
 template void BlendMap<PigmentBlendMapData>::Set(const Vector& data);
 template void BlendMap<SlopeBlendMapData>::Set(const Vector& data);
 template void BlendMap<NormalBlendMapData>::Set(const Vector& data);
-template void BlendMap<TexturePtr>::Set(const Vector& data);
+template void BlendMap<TextureData>::Set(const Vector& data);
 
 }

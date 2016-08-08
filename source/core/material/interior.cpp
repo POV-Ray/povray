@@ -163,8 +163,6 @@ MATERIAL *Create_Material()
 
     New = new MATERIAL;
 
-    New->Texture  = NULL;
-    New->Interior_Texture  = NULL;
     New->interior.reset();
 
     return(New);
@@ -180,8 +178,8 @@ MATERIAL *Copy_Material(const MATERIAL *Old)
 
         *New = *Old;
 
-        New->Texture  = Copy_Textures(Old->Texture);
-        New->Interior_Texture  = Copy_Textures(Old->Interior_Texture);
+        New->Texture.SetCopy(Old->Texture);
+        New->Interior_Texture.SetCopy(Old->Interior_Texture);
         if (Old->interior != NULL)
             New->interior = InteriorPtr(new Interior(*(Old->interior)));
 
@@ -197,8 +195,8 @@ void Destroy_Material(MATERIAL *Material)
 {
     if (Material != NULL)
     {
-        Destroy_Textures(Material->Texture);
-        Destroy_Textures(Material->Interior_Texture);
+        Material->Texture.Destroy();
+        Material->Interior_Texture.Destroy();
 
         delete Material;
     }

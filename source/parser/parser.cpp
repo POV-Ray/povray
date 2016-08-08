@@ -172,10 +172,10 @@ void Parser::Run()
         Brace_Stack = reinterpret_cast<TOKEN *>(POV_MALLOC(MAX_BRACES*sizeof (TOKEN), "brace stack"));
         Brace_Index = 0;
 
-        Default_Texture = Create_Texture ();
-        Default_Texture->Pigment = Create_Pigment();
-        Default_Texture->Tnormal = NULL;
-        Default_Texture->Finish  = Create_Finish();
+        Default_Texture.Create();
+        Default_Texture.FirstTexture()->Pigment = Create_Pigment();
+        Default_Texture.FirstTexture()->Tnormal = NULL;
+        Default_Texture.FirstTexture()->Finish  = Create_Finish();
 
         Not_In_Default = true;
         Ok_To_Declare = true;
@@ -243,8 +243,7 @@ void Parser::Run()
 
             // free up some memory before proceeding with error notification.
             Terminate_Tokenizer();
-            Destroy_Textures(Default_Texture);
-            Default_Texture = NULL;
+            Default_Texture.Destroy();
             POV_FREE (Brace_Stack);
             Brace_Stack = NULL;
             Destroy_Random_Generators();
@@ -272,13 +271,12 @@ void Parser::Run()
         Warning("No objects in scene.");
 
     Terminate_Tokenizer();
-    Destroy_Textures(Default_Texture);
+    Default_Texture.Destroy();
 
     POV_FREE (Brace_Stack);
 
     Destroy_Random_Generators();
 
-    Default_Texture = NULL;
     Brace_Stack = NULL;
 
     // Check for experimental features
@@ -443,8 +441,7 @@ void Parser::Cleanup()
     // TODO FIXME - cleanup [trf]
     Terminate_Tokenizer();
 
-    Destroy_Textures(Default_Texture);
-    Default_Texture = NULL;
+    Default_Texture.Destroy();
 
     if (Brace_Stack != NULL)
         POV_FREE (Brace_Stack);
@@ -981,7 +978,7 @@ ObjectPtr Parser::Parse_Blob()
 
     /* The blob's texture has to be processed before Make_Blob() is called. */
 
-    Post_Textures(Object->Texture);
+    Object->Texture.Post();
 
     /* Finally, process the information */
 
@@ -1025,7 +1022,7 @@ void Parser::Parse_Blob_Element_Mods(Blob_Element *Element)
     Vector3d Local_Vector;
     MATRIX Local_Matrix;
     TRANSFORM Local_Trans;
-    TEXTURE *Local_Texture;
+    TextureData Local_Texture;
 
     EXPECT
         CASE (TRANSLATE_TOKEN)
@@ -1061,33 +1058,33 @@ void Parser::Parse_Blob_Element_Mods(Blob_Element *Element)
         END_CASE
 
         CASE3 (PIGMENT_TOKEN, TNORMAL_TOKEN, FINISH_TOKEN)
-            if (Element->Texture == NULL)
+            if (Element->Texture.IsEmpty())
             {
-                Element->Texture = Copy_Textures(Default_Texture);
+                Element->Texture.SetCopy(Default_Texture);
             }
             else
             {
-                if (Element->Texture->Type != PLAIN_PATTERN)
+                if (Element->Texture.FirstTexture()->Type != PLAIN_PATTERN)
                 {
-                    Link_Textures(&Element->Texture, Copy_Textures(Default_Texture));
+                    Link_Textures(&Element->Texture, Default_Texture.GetCopy());
                 }
             }
             UNGET
             EXPECT
                 CASE (PIGMENT_TOKEN)
                     Parse_Begin ();
-                    Parse_Pigment(&Element->Texture->Pigment);
+                    Parse_Pigment(&Element->Texture.FirstTexture()->Pigment);
                     Parse_End ();
                 END_CASE
 
                 CASE (TNORMAL_TOKEN)
                     Parse_Begin ();
-                    Parse_Tnormal(&Element->Texture->Tnormal);
+                    Parse_Tnormal(&Element->Texture.FirstTexture()->Tnormal);
                     Parse_End ();
                 END_CASE
 
                 CASE (FINISH_TOKEN)
-                    Parse_Finish(&Element->Texture->Finish);
+                    Parse_Finish(&Element->Texture.FirstTexture()->Finish);
                 END_CASE
 
                 OTHERWISE
@@ -1107,7 +1104,7 @@ void Parser::Parse_Blob_Element_Mods(Blob_Element *Element)
 
     /* Postprocess to make sure that HAS_FILTER will be set correctly. */
 
-    Post_Textures(Element->Texture);
+    Element->Texture.Post();
 }
 
 
@@ -2166,7 +2163,7 @@ bool Parser::Parse_Camera_Mods(Camera& New)
 
             EXPECT
                 CASE (PIGMENT_TOKEN)
-                    Local_Pigment = Copy_Pigment(Default_Texture->Pigment);
+                    Local_Pigment = Copy_Pigment(Default_Texture.FirstTexture()->Pigment);
                     Parse_Begin();
                     Parse_Pigment(&Local_Pigment);
                     Parse_End();
@@ -3634,14 +3631,14 @@ ObjectPtr Parser::Parse_Mesh()
     Vector3d D1, D2, P1, P2, P3, N1, N2, N3, N;
     Vector2d UV1, UV2, UV3;
     MeshVector *Normals, *Vertices;
-    TEXTURE **Textures;
+    TextureData *Textures;
     MeshUVVector *UVCoords;
     Mesh *Object;
     MESH_TRIANGLE *Triangles;
     bool fully_textured=true;
     /* NK 1998 */
     Vector3d Inside_Vect;
-    TEXTURE *t2, *t3;
+    TextureData t2, t3;
     bool foundZeroNormal=false;
 
     Inside_Vect = Vector3d(0.0, 0.0, 0.0);
@@ -3667,7 +3664,7 @@ ObjectPtr Parser::Parse_Mesh()
 
     Normals = reinterpret_cast<MeshVector *>(POV_MALLOC(max_normals*sizeof(MeshVector), "temporary triangle mesh data"));
 
-    Textures = reinterpret_cast<TEXTURE **>(POV_MALLOC(max_textures*sizeof(TEXTURE *), "temporary triangle mesh data"));
+    Textures = reinterpret_cast<TextureData *>(POV_MALLOC(max_textures*sizeof(TextureData), "temporary triangle mesh data"));
 
     Triangles = reinterpret_cast<MESH_TRIANGLE *>(POV_MALLOC(max_triangles*sizeof(MESH_TRIANGLE), "temporary triangle mesh data"));
 
@@ -3731,11 +3728,10 @@ ObjectPtr Parser::Parse_Mesh()
                 /* NK */
                 /* read possibly three instead of only one texture */
                 /* read these before compute!!! */
-                t2 = t3 = NULL;
-                Triangles[number_of_triangles].Texture = Object->Mesh_Hash_Texture(&number_of_textures, &max_textures, &Textures, Parse_Mesh_Texture(&t2,&t3));
-                if (t2) Triangles[number_of_triangles].Texture2 = Object->Mesh_Hash_Texture(&number_of_textures, &max_textures, &Textures, t2);
-                if (t3) Triangles[number_of_triangles].Texture3 = Object->Mesh_Hash_Texture(&number_of_textures, &max_textures, &Textures, t3);
-                if (t2 || t3) Triangles[number_of_triangles].ThreeTex = true;
+                Triangles[number_of_triangles].Texture = Object->Mesh_Hash_Texture(&number_of_textures, &max_textures, &Textures, Parse_Mesh_Texture(t2,t3));
+                if (!t2.IsEmpty()) Triangles[number_of_triangles].Texture2 = Object->Mesh_Hash_Texture(&number_of_textures, &max_textures, &Textures, t2);
+                if (!t3.IsEmpty()) Triangles[number_of_triangles].Texture3 = Object->Mesh_Hash_Texture(&number_of_textures, &max_textures, &Textures, t3);
+                if (!t2.IsEmpty() || !t3.IsEmpty()) Triangles[number_of_triangles].ThreeTex = true;
 
                 Object->Compute_Mesh_Triangle(&Triangles[number_of_triangles], false, P1, P2, P3, N);
 
@@ -3752,9 +3748,8 @@ ObjectPtr Parser::Parse_Mesh()
                 /* parse the uv and texture info - even though we'll just throw it
                    away.  why?  if not we get a parse error - we should just ignore the
                    degenerate triangle */
-                t2=t3=NULL;
                 Parse_Three_UVCoords(UV1,UV2,UV3);
-                Parse_Mesh_Texture(&t2,&t3);
+                Parse_Mesh_Texture(t2,t3);
             }
 
             Parse_End();
@@ -3837,11 +3832,10 @@ ObjectPtr Parser::Parse_Mesh()
 
                 /* read possibly three instead of only one texture */
                 /* read these before compute!!! */
-                t2 = t3 = NULL;
-                Triangles[number_of_triangles].Texture = Object->Mesh_Hash_Texture(&number_of_textures, &max_textures, &Textures, Parse_Mesh_Texture(&t2,&t3));
-                if (t2) Triangles[number_of_triangles].Texture2 = Object->Mesh_Hash_Texture(&number_of_textures, &max_textures, &Textures, t2);
-                if (t3) Triangles[number_of_triangles].Texture3 = Object->Mesh_Hash_Texture(&number_of_textures, &max_textures, &Textures, t3);
-                if (t2 || t3) Triangles[number_of_triangles].ThreeTex = true;
+                Triangles[number_of_triangles].Texture = Object->Mesh_Hash_Texture(&number_of_textures, &max_textures, &Textures, Parse_Mesh_Texture(t2,t3));
+                if (!t2.IsEmpty()) Triangles[number_of_triangles].Texture2 = Object->Mesh_Hash_Texture(&number_of_textures, &max_textures, &Textures, t2);
+                if (!t3.IsEmpty()) Triangles[number_of_triangles].Texture3 = Object->Mesh_Hash_Texture(&number_of_textures, &max_textures, &Textures, t3);
+                if (!t2.IsEmpty() || !t3.IsEmpty()) Triangles[number_of_triangles].ThreeTex = true;
 
                 if ((fabs(l1) > EPSILON) || (fabs(l2) > EPSILON))
                 {
@@ -3875,9 +3869,8 @@ ObjectPtr Parser::Parse_Mesh()
                 /* parse the uv and texture info - even though we'll just throw it
                    away.  why?  if not we get a parse error - we should just ignore the
                    degenerate triangle */
-                t2=t3=NULL;
                 Parse_Three_UVCoords(UV1,UV2,UV3);
-                Parse_Mesh_Texture(&t2,&t3);
+                Parse_Mesh_Texture(t2,t3);
             }
 
             Parse_End();
@@ -3954,7 +3947,7 @@ ObjectPtr Parser::Parse_Mesh()
         Set_Flag(Object, MULTITEXTURE_FLAG);
 
         /* [LSK] Removed "Data->" */
-        Object->Textures = reinterpret_cast<TEXTURE **>(POV_MALLOC(number_of_textures*sizeof(TEXTURE *), "triangle mesh data"));
+        Object->Textures = reinterpret_cast<TextureData*>(POV_MALLOC(number_of_textures*sizeof(TextureData), "triangle mesh data"));
     }
 
     Object->Data->Triangles = reinterpret_cast<MESH_TRIANGLE *>(POV_MALLOC(number_of_triangles*sizeof(MESH_TRIANGLE), "triangle mesh data"));
@@ -3971,11 +3964,11 @@ ObjectPtr Parser::Parse_Mesh()
     for (i = 0; i < number_of_textures; i++)
     {
         /* [LSK] Removed "Data->" */
-        Object->Textures[i] = Copy_Textures(Textures[i]);
-        Post_Textures(Object->Textures[i]);
+        Object->Textures[i].SetCopy(Textures[i]);
+        Object->Textures[i].Post();
 
         /* now free the texture, in order to decrement the reference count */
-        Destroy_Textures(Textures[i]);
+        Textures[i].Destroy();
     }
 
     if (fully_textured)
@@ -4015,7 +4008,7 @@ ObjectPtr Parser::Parse_Mesh()
 /*
     Render_Info("Mesh: %ld bytes: %ld vertices, %ld normals, %ld textures, %ld triangles, %ld uv-coords\n",
         Object->Data->Number_Of_Normals*sizeof(MeshVector)+
-        Object->Number_Of_Textures*sizeof(TEXTURE *)+
+        Object->Number_Of_Textures*sizeof(TextureData)+
         Object->Data->Number_Of_Triangles*sizeof(MESH_TRIANGLE)+
         Object->Data->Number_Of_Vertices*sizeof(MeshVector)+
         Object->Data->Number_Of_UVCoords*sizeof(MeshUVVector),
@@ -4087,7 +4080,7 @@ ObjectPtr Parser::Parse_Mesh2()
     Vector2d UV1;
     MeshVector *Normals = NULL;
     MeshVector *Vertices = NULL;
-    TEXTURE **Textures = NULL;
+    TextureData *Textures = NULL;
     MeshUVVector *UVCoords = NULL;
     Mesh *Object;
     MESH_TRIANGLE *Triangles;
@@ -4209,18 +4202,18 @@ ObjectPtr Parser::Parse_Mesh2()
 
             if (number_of_textures>0)
             {
-                Textures = reinterpret_cast<TEXTURE **>(POV_MALLOC(number_of_textures*sizeof(TEXTURE *), "triangle mesh data"));
+                Textures = reinterpret_cast<TextureData *>(POV_MALLOC(number_of_textures*sizeof(TextureData), "triangle mesh data"));
 
                 for(i=0; i<number_of_textures; i++)
                 {
                     /*
                     GET(TEXTURE_ID_TOKEN)
-                    Textures[i] = Copy_Texture_Pointer((reinterpret_cast<EXTURE *>(Token.Data));
+                    Textures[i].SetShallowCopy(*(reinterpret_cast<TextureData*>(Token.Data));
                     */
                     GET(TEXTURE_TOKEN);
                     Parse_Begin();
                     Textures[i] = Parse_Texture();
-                    Post_Textures(Textures[i]);
+                    Textures[i].Post();
                     Parse_End();
                     Parse_Comma();
                 }
@@ -4634,7 +4627,7 @@ ObjectPtr Parser::Parse_Mesh2()
 /*
     Render_Info("Mesh2: %ld bytes: %ld vertices, %ld normals, %ld textures, %ld triangles, %ld uv-coords\n",
         Object->Data->Number_Of_Normals*sizeof(MeshVector)+
-        Object->Number_Of_Textures*sizeof(TEXTURE *)+
+        Object->Number_Of_Textures*sizeof(TextureData)+
         Object->Data->Number_Of_Triangles*sizeof(MESH_TRIANGLE)+
         Object->Data->Number_Of_Vertices*sizeof(MeshVector)+
         Object->Data->Number_Of_UVCoords*sizeof(MeshUVVector),
@@ -4677,11 +4670,9 @@ ObjectPtr Parser::Parse_Mesh2()
 *
 ******************************************************************************/
 
-TEXTURE *Parser::Parse_Mesh_Texture (TEXTURE **t2, TEXTURE **t3)
+TextureData Parser::Parse_Mesh_Texture (TextureData& t2, TextureData& t3)
 {
-    TEXTURE *Texture;
-
-    Texture = NULL;
+    TextureData Texture;
 
     EXPECT
         CASE(TEXTURE_TOKEN)
@@ -4689,7 +4680,9 @@ TEXTURE *Parser::Parse_Mesh_Texture (TEXTURE **t2, TEXTURE **t3)
 
             GET(TEXTURE_ID_TOKEN);
 
-            Texture = reinterpret_cast<TEXTURE *>(Token.Data);
+            Texture = *reinterpret_cast<TextureData*>(Token.Data);
+            t2.Kill();
+            t3.Kill();
 
             Parse_End();
         END_CASE
@@ -4699,17 +4692,17 @@ TEXTURE *Parser::Parse_Mesh_Texture (TEXTURE **t2, TEXTURE **t3)
             Parse_Begin();
 
             GET(TEXTURE_ID_TOKEN);
-            Texture = reinterpret_cast<TEXTURE *>(Token.Data);
+            Texture = *reinterpret_cast<TextureData*>(Token.Data);
 
             Parse_Comma();
 
             GET(TEXTURE_ID_TOKEN);
-            *t2 = reinterpret_cast<TEXTURE *>(Token.Data);
+            t2 = *reinterpret_cast<TextureData*>(Token.Data);
 
             Parse_Comma();
 
             GET(TEXTURE_ID_TOKEN);
-            *t3 = reinterpret_cast<TEXTURE *>(Token.Data);
+            t3 = *reinterpret_cast<TextureData*>(Token.Data);
 
             Parse_End();
             EXIT
@@ -6705,7 +6698,7 @@ ObjectPtr Parser::Parse_Object ()
 
 void Parser::Parse_Default ()
 {
-    TEXTURE *Local_Texture;
+    TextureData Local_Texture;
     PIGMENT *Local_Pigment;
     TNORMAL *Local_Tnormal;
     FINISH  *Local_Finish;
@@ -6719,37 +6712,37 @@ void Parser::Parse_Default ()
             Parse_Begin ();
             Default_Texture = Parse_Texture();
             Parse_End ();
-            if (Default_Texture->Type != PLAIN_PATTERN)
+            if (Default_Texture.FirstTexture()->Type != PLAIN_PATTERN)
                 Error("Default texture cannot be material map or tiles.");
-            if (Default_Texture->Next != NULL)
+            if (Default_Texture.IsLayered())
                 Error("Default texture cannot be layered.");
-            Destroy_Textures(Local_Texture);
+            Local_Texture.Destroy();
         END_CASE
 
         CASE (PIGMENT_TOKEN)
-            Local_Pigment = Copy_Pigment((Default_Texture->Pigment));
+            Local_Pigment = Copy_Pigment((Default_Texture.FirstTexture()->Pigment));
             Parse_Begin ();
             Parse_Pigment (&Local_Pigment);
             Parse_End ();
-            Destroy_Pigment(Default_Texture->Pigment);
-            Default_Texture->Pigment = Local_Pigment;
+            Destroy_Pigment(Default_Texture.FirstTexture()->Pigment);
+            Default_Texture.FirstTexture()->Pigment = Local_Pigment;
         END_CASE
 
         CASE (TNORMAL_TOKEN)
-            Local_Tnormal = Copy_Tnormal((Default_Texture->Tnormal));
+            Local_Tnormal = Copy_Tnormal((Default_Texture.FirstTexture()->Tnormal));
             Parse_Begin ();
             Parse_Tnormal (&Local_Tnormal);
             Parse_End ();
-            Destroy_Tnormal(Default_Texture->Tnormal);
-            Default_Texture->Tnormal = Local_Tnormal;
+            Destroy_Tnormal(Default_Texture.FirstTexture()->Tnormal);
+            Default_Texture.FirstTexture()->Tnormal = Local_Tnormal;
         END_CASE
 
         CASE (FINISH_TOKEN)
-            Local_Finish = Copy_Finish((Default_Texture->Finish));
+            Local_Finish = Copy_Finish((Default_Texture.FirstTexture()->Finish));
             Parse_Finish (&Local_Finish);
-            if (Default_Texture->Finish)
-                delete Default_Texture->Finish;
-            Default_Texture->Finish = Local_Finish;
+            if (Default_Texture.FirstTexture()->Finish)
+                delete Default_Texture.FirstTexture()->Finish;
+            Default_Texture.FirstTexture()->Finish = Local_Finish;
         END_CASE
 
         CASE (RADIOSITY_TOKEN)
@@ -7498,8 +7491,8 @@ ObjectPtr Parser::Parse_Object_Mods (ObjectPtr Object)
     MATRIX Local_Matrix;
     TRANSFORM Local_Trans;
     BoundingBox BBox;
-    TEXTURE *Local_Texture;
-    TEXTURE *Local_Int_Texture;
+    TextureData Local_Texture;
+    TextureData Local_Int_Texture;
     MATERIAL Local_Material;
     TransColour Local_Colour;
     char *s;
@@ -7508,7 +7501,7 @@ ObjectPtr Parser::Parse_Object_Mods (ObjectPtr Object)
         CASE(UV_MAPPING_TOKEN)
             /* if no texture than allow uv_mapping
                otherwise, warn user */
-            if (Object->Texture == NULL)
+            if (Object->Texture.IsEmpty())
             {
                 Set_Flag(Object, UV_FLAG);
             }
@@ -7603,11 +7596,11 @@ ObjectPtr Parser::Parse_Object_Mods (ObjectPtr Object)
             Parse_Colour (Local_Colour);
             if (sceneData->EffectiveLanguageVersion() < 150)
             {
-                if (Object->Texture != NULL)
+                if (!Object->Texture.IsEmpty())
                 {
-                    if (Object->Texture->Type == PLAIN_PATTERN)
+                    if (Object->Texture.FirstTexture()->Type == PLAIN_PATTERN)
                     {
-                        Object->Texture->Pigment->Quick_Colour = Local_Colour;
+                        Object->Texture.FirstTexture()->Pigment->Quick_Colour = Local_Colour;
                         END_CASE
                     }
                 }
@@ -7727,7 +7720,7 @@ ObjectPtr Parser::Parse_Object_Mods (ObjectPtr Object)
             Local_Material.interior = Object->interior;
             Parse_Material(&Local_Material);
             Object->Texture  = Local_Material.Texture;
-            if ( Object->Texture )
+            if (!Object->Texture.IsEmpty())
             {
                 Object->Type |= TEXTURED_OBJECT;
             }
@@ -7737,27 +7730,27 @@ ObjectPtr Parser::Parse_Object_Mods (ObjectPtr Object)
 
         CASE3 (PIGMENT_TOKEN, TNORMAL_TOKEN, FINISH_TOKEN)
             Object->Type |= TEXTURED_OBJECT;
-            if (Object->Texture == NULL)
-                Object->Texture = Copy_Textures(Default_Texture);
+            if (Object->Texture.IsEmpty())
+                Object->Texture.SetCopy(Default_Texture);
             else
-                if (Object->Texture->Type != PLAIN_PATTERN)
-                    Link_Textures(&(Object->Texture), Copy_Textures(Default_Texture));
+                if (Object->Texture.FirstTexture()->Type != PLAIN_PATTERN)
+                    Link_Textures(&(Object->Texture), Default_Texture.GetCopy());
             UNGET
             EXPECT
                 CASE (PIGMENT_TOKEN)
                     Parse_Begin ();
-                    Parse_Pigment ( &(Object->Texture->Pigment) );
+                    Parse_Pigment ( &(Object->Texture.FirstTexture()->Pigment) );
                     Parse_End ();
                 END_CASE
 
                 CASE (TNORMAL_TOKEN)
                     Parse_Begin ();
-                    Parse_Tnormal ( &(Object->Texture->Tnormal) );
+                    Parse_Tnormal ( &(Object->Texture.FirstTexture()->Tnormal) );
                     Parse_End ();
                 END_CASE
 
                 CASE (FINISH_TOKEN)
-                    Parse_Finish ( &(Object->Texture->Finish) );
+                    Parse_Finish ( &(Object->Texture.FirstTexture()->Finish) );
                 END_CASE
 
                 OTHERWISE
@@ -7946,8 +7939,8 @@ ObjectPtr Parser::Parse_Object_Mods (ObjectPtr Object)
         }
     }
 
-    if((Object->Texture ==NULL)&&(Object->Interior_Texture != NULL))
-            Error("Interior texture requires an exterior texture.");
+    if(Object->Texture.IsEmpty() && !Object->Interior_Texture.IsEmpty())
+        Error("Interior texture requires an exterior texture.");
 
     Parse_End ();
 
@@ -8839,7 +8832,7 @@ bool Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENT
     PIGMENT *Local_Pigment;
     TNORMAL *Local_Tnormal;
     FINISH *Local_Finish;
-    TEXTURE *Local_Texture, *Temp_Texture;
+    TextureData Local_Texture, Temp_Texture;
     TRANSFORM *Local_Trans;
     ObjectPtr Local_Object;
     Camera *Local_Camera;
@@ -9049,7 +9042,7 @@ bool Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENT
         END_CASE
 
         CASE (PIGMENT_TOKEN)
-            Local_Pigment = Copy_Pigment(Default_Texture->Pigment);
+            Local_Pigment = Copy_Pigment(Default_Texture.FirstTexture()->Pigment);
             Parse_Begin ();
             Parse_Pigment (&Local_Pigment);
             Parse_End ();
@@ -9060,7 +9053,7 @@ bool Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENT
         END_CASE
 
         CASE (TNORMAL_TOKEN)
-            Local_Tnormal = Copy_Tnormal(Default_Texture->Tnormal);
+            Local_Tnormal = Copy_Tnormal(Default_Texture.FirstTexture()->Tnormal);
             Parse_Begin ();
             Parse_Tnormal (&Local_Tnormal);
             Parse_End ();
@@ -9071,7 +9064,7 @@ bool Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENT
         END_CASE
 
         CASE (FINISH_TOKEN)
-            Local_Finish = Copy_Finish(Default_Texture->Finish);
+            Local_Finish = Copy_Finish(Default_Texture.FirstTexture()->Finish);
             Parse_Finish (&Local_Finish);
             *NumberPtr = FINISH_ID_TOKEN;
             Test_Redefine(Previous,NumberPtr,*DataPtr, allow_redefine);
@@ -9092,7 +9085,6 @@ bool Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENT
             Parse_Begin ();
             Local_Texture = Parse_Texture ();
             Parse_End ();
-            Temp_Texture=NULL;
             Link_Textures(&Temp_Texture, Local_Texture);
             Ok_To_Declare = false;
             EXPECT
@@ -9111,7 +9103,7 @@ bool Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENT
 
             *NumberPtr    = TEXTURE_ID_TOKEN;
             Test_Redefine(Previous,NumberPtr,*DataPtr, allow_redefine);
-            *DataPtr      = reinterpret_cast<void *>(Temp_Texture);
+            *DataPtr      = reinterpret_cast<void *>(new TextureData(Temp_Texture));
             Ok_To_Declare = true;
             EXIT
         END_CASE
@@ -9349,7 +9341,7 @@ void Parser::Destroy_Ident_Data(void *Data, int Type)
             Destroy_Material(reinterpret_cast<MATERIAL *>(Data));
             break;
         case TEXTURE_ID_TOKEN:
-            Destroy_Textures(reinterpret_cast<TEXTURE *>(Data));
+            reinterpret_cast<TextureData *>(Data)->Destroy();
             break;
         case OBJECT_ID_TOKEN:
             Destroy_Object(reinterpret_cast<ObjectPtr>(Data));
@@ -9474,40 +9466,25 @@ void Parser::Link(ObjectPtr New_Object, vector<ObjectPtr>& Object_List_Root)
 *
 ******************************************************************************/
 
-void Parser::Link_Textures (TEXTURE **Old_Textures, TEXTURE *New_Textures)
+void Parser::Link_Textures (TextureData* Old_Textures, TextureData& New_Textures)
 {
-    TEXTURE *Layer;
-
-    if (New_Textures == NULL)
+    if (New_Textures.IsEmpty())
         return;
 
-    if ((*Old_Textures) != NULL)
+    if (!Old_Textures->IsEmpty())
     {
-        if ((*Old_Textures)->Type != PLAIN_PATTERN)
+        if ((*Old_Textures).FirstTexture()->Type != PLAIN_PATTERN)
         {
             Error("Cannot layer over a patterned texture.");
         }
     }
-    for (Layer = New_Textures;
-         Layer->Next != NULL;
-         Layer = Layer->Next)
-    {
-        /* NK layers - 1999 June 10 - for backwards compatiblity with layered textures */
-        if(sceneData->EffectiveLanguageVersion() <= 310)
-            Convert_Filter_To_Transmit(Layer->Pigment);
-    }
 
-    /* NK layers - 1999 Nov 16 - for backwards compatiblity with layered textures */
-    if ((sceneData->EffectiveLanguageVersion() <= 310) && (*Old_Textures != NULL))
-        Convert_Filter_To_Transmit(Layer->Pigment);
-
-    Layer->Next = *Old_Textures;
-    *Old_Textures = New_Textures;
-
-    if ((New_Textures->Type != PLAIN_PATTERN) && (New_Textures->Next != NULL))
+    if ((New_Textures.FirstTexture()->Type != PLAIN_PATTERN) && New_Textures.IsLayered())
     {
         Error("Cannot layer a patterned texture over another.");
     }
+
+    Old_Textures->Link(New_Textures, sceneData->EffectiveLanguageVersion() <= 310);
 }
 
 /*****************************************************************************
@@ -9735,16 +9712,16 @@ void Parser::Post_Process (ObjectPtr Object, ObjectPtr Parent)
 
     if (Parent != NULL)
     {
-        if (Object->Texture == NULL)
+        if (Object->Texture.IsEmpty())
         {
-            Object->Texture = Copy_Texture_Pointer(Parent->Texture);
+            Object->Texture.SetCopy(Parent->Texture);
             // NK 1998 copy uv_mapping flag if and only if we copy the texture
             if (Test_Flag(Parent, UV_FLAG))
                 Set_Flag(Object, UV_FLAG);
         }
-        if (Object->Interior_Texture == NULL)
+        if (Object->Interior_Texture.IsEmpty())
         {
-            Object->Interior_Texture = Copy_Texture_Pointer(Parent->Interior_Texture);
+            Object->Interior_Texture.SetCopy(Parent->Interior_Texture);
             if(Test_Flag(Parent, UV_FLAG))
                 Set_Flag(Object, UV_FLAG);
         }
@@ -9825,7 +9802,7 @@ void Parser::Post_Process (ObjectPtr Object, ObjectPtr Parent)
     if(Object->interior != NULL)
         Object->interior->PostProcess();
 
-    if ((Object->Texture == NULL) &&
+    if (Object->Texture.IsEmpty() &&
         !(Object->Type & TEXTURED_OBJECT) &&
         !(Object->Type & LIGHT_SOURCE_OBJECT))
     {
@@ -9834,21 +9811,21 @@ void Parser::Post_Process (ObjectPtr Object, ObjectPtr Parent)
             if((dynamic_cast<CSGIntersection *>(Parent) == NULL) ||
                !Test_Flag(Parent, CUTAWAY_TEXTURES_FLAG))
             {
-                Object->Texture = Copy_Textures(Default_Texture);
+                Object->Texture.SetCopy(Default_Texture);
             }
         }
         else
-            Object->Texture = Copy_Textures(Default_Texture);
+            Object->Texture.SetCopy(Default_Texture);
     }
 
     if(!(Object->Type & LIGHT_GROUP_OBJECT) &&
        !(Object->Type & LIGHT_GROUP_LIGHT_OBJECT))
     {
-        Post_Textures(Object->Texture);  //moved cey 6/97
+        Object->Texture.Post();  //moved cey 6/97
 
-        if (Object->Interior_Texture)
+        if (!Object->Interior_Texture.IsEmpty())
         {
-            Post_Textures(Object->Interior_Texture);
+            Object->Interior_Texture.Post();
         }
     }
 
@@ -9906,9 +9883,9 @@ void Parser::Post_Process (ObjectPtr Object, ObjectPtr Parent)
                 (reinterpret_cast<LightSource *>(Object))->Projected_Through_Object->interior.reset();
                 Warning("Projected through objects can not have interior, interior removed.");
             }
-            if ((reinterpret_cast<LightSource *>(Object))->Projected_Through_Object->Texture != NULL)
+            if (!(reinterpret_cast<LightSource *>(Object))->Projected_Through_Object->Texture.IsEmpty())
             {
-                (reinterpret_cast<LightSource *>(Object))->Projected_Through_Object->Texture = NULL;
+                (reinterpret_cast<LightSource *>(Object))->Projected_Through_Object->Texture.Destroy();
                 Warning("Projected through objects can not have texture, texture removed.");
             }
         }
@@ -9938,11 +9915,11 @@ void Parser::Post_Process (ObjectPtr Object, ObjectPtr Parent)
 
         // Promote finish's IOR to interior IOR.
 
-        if (Object->Texture != NULL)
+        if (!Object->Texture.IsEmpty())
         {
-            if (Object->Texture->Type == PLAIN_PATTERN)
+            if (Object->Texture.FirstTexture()->Type == PLAIN_PATTERN)
             {
-                if ((Finish = Object->Texture->Finish) != NULL)
+                if ((Finish = Object->Texture.FirstTexture()->Finish) != NULL)
                 {
                     if (Finish->Temp_IOR >= 0.0)
                     {
@@ -9997,9 +9974,9 @@ void Parser::Post_Process (ObjectPtr Object, ObjectPtr Parent)
 
     if ((dynamic_cast<Blob *>(Object) == NULL) && // FIXME
         (dynamic_cast<Mesh *>(Object) == NULL) && // FIXME
-        (Test_Opacity(Object->Texture)) &&
-        ((Object->Interior_Texture==NULL) ||
-         Test_Opacity(Object->Interior_Texture)))
+        (Object->Texture.IsOpaque()) &&
+        (Object->Interior_Texture.IsEmpty() ||
+         Object->Interior_Texture.IsOpaque()))
     {
         Set_Flag(Object, OPAQUE_FLAG);
     }
@@ -10425,7 +10402,7 @@ void *Parser::Copy_Identifier (void *Data, int Type)
             New = reinterpret_cast<void *>(Copy_Material(reinterpret_cast<MATERIAL *>(Data)));
             break;
         case TEXTURE_ID_TOKEN:
-            New = reinterpret_cast<void *>(Copy_Textures(reinterpret_cast<TEXTURE *>(Data)));
+            New = reinterpret_cast<void *>(new TextureData(reinterpret_cast<TextureData *>(Data)->GetCopy()));
             break;
         case OBJECT_ID_TOKEN:
             New = reinterpret_cast<void *>(Copy_Object(reinterpret_cast<ObjectPtr>(Data)));
@@ -10489,61 +10466,6 @@ void *Parser::Copy_Identifier (void *Data, int Type)
             Error("Cannot copy identifier");
     }
     return(New);
-}
-
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
-
-/* NK layers - 1999 June 10 - for backwards compatiblity with layered textures */
-void Parser::Convert_Filter_To_Transmit(PIGMENT *Pigment)
-{
-    if (Pigment==NULL) return;
-
-    switch (Pigment->Type)
-    {
-        case PLAIN_PATTERN:
-            Pigment->colour.SetFT(0.0, 1.0 - Pigment->colour.Opacity());
-            break;
-
-        default:
-            if (Pigment->Blend_Map != NULL)
-                Pigment->Blend_Map->ConvertFilterToTransmit();
-            break;
-    }
-}
-
-void PigmentBlendMap::ConvertFilterToTransmit()
-{
-    POV_BLEND_MAP_ASSERT((Type == kBlendMapType_Pigment) || (Type == kBlendMapType_Density));
-    for (Vector::iterator i = Blend_Map_Entries.begin(); i != Blend_Map_Entries.end(); i++)
-    {
-        Parser::Convert_Filter_To_Transmit(i->Vals);
-    }
-}
-
-void ColourBlendMap::ConvertFilterToTransmit()
-{
-    for (Vector::iterator i = Blend_Map_Entries.begin(); i != Blend_Map_Entries.end(); i++)
-    {
-        i->Vals.SetFT(0.0, 1.0 - i->Vals.Opacity());
-    }
 }
 
 

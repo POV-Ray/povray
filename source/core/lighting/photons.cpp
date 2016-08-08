@@ -218,7 +218,7 @@ DBL PhotonTrace::TraceRay(Ray& ray, MathColour& colour, ColourChannel&, COLC wei
         return bestisect.Depth;
 }
 
-void PhotonTrace::ComputeLightedTexture(MathColour& LightCol, ColourChannel&, const TEXTURE *Texture, vector<const TEXTURE *>& warps, const Vector3d& ipoint, const Vector3d& rawnormal,
+void PhotonTrace::ComputeLightedTexture(MathColour& LightCol, ColourChannel&, const TextureData& Texture, vector<const TPATTERN *>& warps, const Vector3d& ipoint, const Vector3d& rawnormal,
                                         Ray& ray, COLC weight, Intersection& isect)
 {
     int i;
@@ -233,7 +233,7 @@ void PhotonTrace::ComputeLightedTexture(MathColour& LightCol, ColourChannel&, co
     MathColour AttCol, ResCol;
     MathColour TmpCol;
     Interior *interior;
-    const TEXTURE *Layer;
+    TextureData::const_iterator Layer;
     Ray NewRay(ray);
     int doReflection, doDiffuse, doRefraction;
     DBL reflectionWeight, refractionWeight, diffuseWeight, dieWeight, totalWeight;
@@ -363,16 +363,16 @@ void PhotonTrace::ComputeLightedTexture(MathColour& LightCol, ColourChannel&, co
     // Loop through the layers and compute the ambient, diffuse,
     // phong and specular for these textures.
     one_colour_found = false;
-    for (layer_number = 0, Layer = Texture;
-         (Layer != NULL) && (Trans > ray.GetTicket().adcBailout);
-         layer_number++, Layer = Layer->Next)
+    for (layer_number = 0, Layer = Texture.Begin();
+         (Layer != Texture.End()) && (Trans > ray.GetTicket().adcBailout);
+         ++layer_number, ++Layer)
     {
         // Get perturbed surface normal.
         LayNormal = rawnormal;
 
         if (qualityFlags.normals && (Layer->Tnormal != NULL))
         {
-            for(vector<const TEXTURE *>::iterator i(warps.begin()); i != warps.end(); i++)
+            for(vector<const TPATTERN *>::iterator i(warps.begin()); i != warps.end(); i++)
                 Warp_Normal(LayNormal, LayNormal, *i, Test_Flag(*i, DONT_SCALE_BUMPS_FLAG));
 
             Perturb_Normal(LayNormal, Layer->Tnormal, ipoint, &isect, &ray, threadData);
@@ -382,7 +382,7 @@ void PhotonTrace::ComputeLightedTexture(MathColour& LightCol, ColourChannel&, co
 
             // TODO - Reverse iterator may be less performant than forward iterator; we might want to
             //        compare performance with using forward iterators and decrement, or using random access.
-            for(vector<const TEXTURE *>::reverse_iterator i(warps.rbegin()); i != warps.rend(); i++)
+            for(vector<const TPATTERN *>::reverse_iterator i(warps.rbegin()); i != warps.rend(); i++)
                 UnWarp_Normal(LayNormal, LayNormal, *i, Test_Flag(*i, DONT_SCALE_BUMPS_FLAG));
         }
 
@@ -459,8 +459,8 @@ void PhotonTrace::ComputeLightedTexture(MathColour& LightCol, ColourChannel&, co
         // if photon is for global map, then decide which we want to do
         diffuseWeight = ResCol.WeightAbsGreyscale();
         // use top-layer finish only
-        if(Texture->Finish)
-            diffuseWeight*=Texture->Finish->Diffuse * Texture->Finish->BrillianceAdjust;
+        if(Texture.FirstTexture()->Finish)
+            diffuseWeight*=Texture.FirstTexture()->Finish->Diffuse * Texture.FirstTexture()->Finish->BrillianceAdjust;
         refractionWeight = Trans;
         // reflection only for top layer!!!!!!
         // TODO is "rend()" the top layer or the bottom layer???
@@ -608,7 +608,7 @@ void PhotonTrace::ComputeLightedTexture(MathColour& LightCol, ColourChannel&, co
         // Trace refracted ray.
         threadData->GFilCol = FilCol;
 
-        TIR_occured = ComputeRefractionForPhotons(Texture->Finish, interior, isect.IPoint, ray, TopNormal, rawnormal, LightCol, New_Weight);
+        TIR_occured = ComputeRefractionForPhotons(Texture.FirstTexture()->Finish, interior, isect.IPoint, ray, TopNormal, rawnormal, LightCol, New_Weight);
     }
 
     // Shoot reflected photons.
@@ -627,7 +627,7 @@ void PhotonTrace::ComputeLightedTexture(MathColour& LightCol, ColourChannel&, co
 
     if(doReflection && qualityFlags.reflections)
     {
-        Layer = Texture;
+        Layer = Texture.Begin();
         for (i = 0; i < layer_number; i++)
         {
             if ((!TIR_occured) ||
@@ -659,7 +659,7 @@ void PhotonTrace::ComputeLightedTexture(MathColour& LightCol, ColourChannel&, co
             if (threadData->photonTargetObject==NULL)
                 break;
 
-            Layer = Layer->Next;
+            ++Layer;
         }
     }
 

@@ -672,5 +672,58 @@ PigmentBlendMap::~PigmentBlendMap()
         Destroy_Pigment(i->Vals);
 }
 
+
+/*****************************************************************************
+*
+* FUNCTION
+*
+* INPUT
+*
+* OUTPUT
+*
+* RETURNS
+*
+* AUTHOR
+*
+* DESCRIPTION
+*
+* CHANGES
+*
+******************************************************************************/
+
+/* NK layers - 1999 June 10 - for backwards compatiblity with layered textures */
+void Convert_Filter_To_Transmit(PIGMENT *Pigment)
+{
+    if (Pigment==NULL) return;
+
+    switch (Pigment->Type)
+    {
+        case PLAIN_PATTERN:
+            Pigment->colour.SetFT(0.0, 1.0 - Pigment->colour.Opacity());
+            break;
+
+        default:
+            if (Pigment->Blend_Map != NULL)
+                Pigment->Blend_Map->ConvertFilterToTransmit();
+            break;
+    }
 }
 
+void PigmentBlendMap::ConvertFilterToTransmit()
+{
+    POV_BLEND_MAP_ASSERT((Type == kBlendMapType_Pigment) || (Type == kBlendMapType_Density));
+    for (Vector::iterator i = Blend_Map_Entries.begin(); i != Blend_Map_Entries.end(); i++)
+    {
+        Convert_Filter_To_Transmit(i->Vals);
+    }
+}
+
+void ColourBlendMap::ConvertFilterToTransmit()
+{
+    for (Vector::iterator i = Blend_Map_Entries.begin(); i != Blend_Map_Entries.end(); i++)
+    {
+        i->Vals.SetFT(0.0, 1.0 - i->Vals.Opacity());
+    }
+}
+
+}

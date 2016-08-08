@@ -79,20 +79,9 @@ const int NOISE_MINZ = NOISE_MINX;
 * Global typedefs
 ******************************************************************************/
 
-struct WeightedTexture
-{
-    COLC weight;
-    TEXTURE *texture;
-
-    WeightedTexture(COLC w, TEXTURE *t) :
-        weight(w), texture(t) { }
-};
-
-typedef FixedSimpleVector<WeightedTexture, WEIGHTEDTEXTURE_VECTOR_SIZE> WeightedTextureVector;
-
 
 /// Texture blend map.
-class TextureBlendMap : public BlendMap<TexturePtr>
+class TextureBlendMap : public BlendMap<TextureData>
 {
     public:
 
@@ -100,20 +89,11 @@ class TextureBlendMap : public BlendMap<TexturePtr>
         ~TextureBlendMap();
 };
 
-typedef BlendMapEntry<TexturePtr>                   TextureBlendMapEntry;
+typedef BlendMapEntry<TextureData>                  TextureBlendMapEntry;
 typedef shared_ptr<TextureBlendMap>                 TextureBlendMapPtr;
 typedef shared_ptr<const TextureBlendMap>           TextureBlendMapConstPtr;
 
-struct Texture_Struct : public Pattern_Struct
-{
-    TextureBlendMapPtr Blend_Map;
-    int References;
-    TEXTURE *Next;
-    PIGMENT *Pigment;
-    TNORMAL *Tnormal;
-    FINISH *Finish;
-    vector<TEXTURE*> Materials; // used for BITMAP_PATTERN (and only there)
-};
+struct Texture_Struct;
 
 struct Finish_Struct
 {
@@ -178,6 +158,114 @@ TEXTURE *Copy_Texture_Pointer (TEXTURE *Texture);
 TEXTURE *Copy_Textures (TEXTURE *Textures);
 TEXTURE *Create_Texture (void);
 int Test_Opacity (const TEXTURE *Texture);
+
+class TextureData
+{
+public:
+    class iterator {
+    public:
+        friend class TextureData;
+        friend class const_iterator;
+        inline iterator() : mTexture(NULL) {}
+        inline iterator& operator++();
+        inline iterator operator++(int) { TEXTURE* old = mTexture; ++*this; return iterator(old); }
+        inline TEXTURE* operator*() { return mTexture; }
+        inline TEXTURE* operator->() { return mTexture; }
+        inline bool operator==(const iterator& o) { return mTexture == o.mTexture; }
+        inline bool operator!=(const iterator& o) { return mTexture != o.mTexture; }
+    protected:
+        inline iterator(TEXTURE* t) : mTexture(t) {}
+        TEXTURE* mTexture;
+    };
+    class const_iterator {
+    public:
+        friend class TextureData;
+        inline const_iterator() : mTexture(NULL) {}
+        inline const_iterator(const iterator& o) : mTexture(o.mTexture) {}
+        inline const_iterator& operator++();
+        inline const_iterator operator++(int) { const TEXTURE* old = mTexture; ++*this; return const_iterator(old); }
+        inline const TEXTURE* operator*() { return mTexture; }
+        inline const TEXTURE* operator->() { return mTexture; }
+        inline bool operator==(const const_iterator& o) { return mTexture == o.mTexture; }
+        inline bool operator!=(const const_iterator& o) { return mTexture != o.mTexture; }
+    protected:
+        inline const_iterator(const TEXTURE* t) : mTexture(t) {}
+        const TEXTURE* mTexture;
+    };
+    friend struct WeightedTexture;
+    inline TextureData() : mTexture(NULL) {}
+    inline TextureData(const TextureData& o) : mTexture(o.mTexture) {}
+    inline ~TextureData() {}
+    inline void Kill() { mTexture = NULL; }
+    inline bool IsEmpty() const { return mTexture == NULL; }
+    inline bool IsLayered() const;
+    inline bool IsOpaque() const { return Test_Opacity(mTexture); }
+    inline void Transform(const Transform_Struct& trans) { Transform_Textures(mTexture, &trans); }
+    inline void Create() { mTexture = Create_Texture(); }
+    TextureData GetCopy() const { TextureData temp; temp.SetCopy(*this); return temp; }
+    inline void SetCopy(const TextureData& o) { mTexture = Copy_Textures(o.mTexture); }
+    inline void SetShallowCopy(const TextureData& o) { mTexture = Copy_Texture_Pointer(o.mTexture); }
+    inline void Destroy() { Destroy_Textures(mTexture); mTexture = NULL; }
+    inline TextureData& operator= (const TextureData& o) { mTexture = o.mTexture; return *this; }
+    inline void Post() { Post_Textures(mTexture); }
+    inline Texture_Struct* FirstTexture() { return mTexture; }
+    inline const Texture_Struct* FirstTexture() const { return mTexture; }
+    inline iterator Begin() { return iterator(mTexture); }
+    inline iterator End() { return iterator(NULL); }
+    inline const_iterator Begin() const { return iterator(mTexture); }
+    inline const_iterator End() const { return iterator(NULL); }
+    inline bool operator==(const TextureData& o) const { return mTexture == o.mTexture; }
+    inline bool operator!=(const TextureData& o) const { return mTexture != o.mTexture; }
+    void Link(TextureData& o, bool legacyMode);
+
+protected:
+    TEXTURE* mTexture;
+};
+
+struct WeightedTexture
+{
+    COLC weight;
+    TextureData texture;
+
+    WeightedTexture(COLC w, TextureData& t) :
+        weight(w), texture(t) { }
+};
+
+typedef FixedSimpleVector<WeightedTexture, WEIGHTEDTEXTURE_VECTOR_SIZE> WeightedTextureVector;
+
+struct Material_Struct
+{
+    TextureData Texture;
+    TextureData Interior_Texture;
+    InteriorPtr interior;
+};
+
+
+struct Texture_Struct : public Pattern_Struct
+{
+    TextureBlendMapPtr Blend_Map;
+    int References;
+    TEXTURE *Next;
+    PIGMENT *Pigment;
+    TNORMAL *Tnormal;
+    FINISH *Finish;
+    vector<TextureData> Materials; // used for BITMAP_PATTERN (and only there)
+};
+
+inline TextureData::iterator& TextureData::iterator::operator++()
+{
+    if (mTexture != NULL) mTexture = mTexture->Next; return *this;
+}
+
+inline TextureData::const_iterator& TextureData::const_iterator::operator++()
+{
+    if (mTexture != NULL) mTexture = mTexture->Next; return *this;
+}
+
+inline bool TextureData::IsLayered() const
+{
+    return (mTexture != NULL) && (mTexture->Next != NULL);
+}
 
 }
 

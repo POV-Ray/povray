@@ -255,9 +255,9 @@ class Trace
                 weight(w), normal(n), reflec(r), reflex(x) { }
         };
 
-        typedef vector<const TEXTURE *> TextureVectorData;
-        typedef RefPool<TextureVectorData> TextureVectorPool;
-        typedef Ref<TextureVectorData, RefClearContainer<TextureVectorData> > TextureVector;
+        typedef vector<const TPATTERN *> PatternVectorData;
+        typedef RefPool<PatternVectorData> PatternVectorPool;
+        typedef Ref<PatternVectorData, RefClearContainer<PatternVectorData> > PatternVector;
 
         typedef vector<WNRX> WNRXVectorData;
         typedef RefPool<WNRXVectorData> WNRXVectorPool;
@@ -297,8 +297,8 @@ class Trace
         vector<MathColour> lightGrid;
         /// Fast stack pool.
         IStackPool stackPool;
-        /// Fast texture list pool.
-        TextureVectorPool texturePool;
+        /// Fast TPATTERN list pool.
+        PatternVectorPool patternPool;
         /// Fast WNRX list pool.
         WNRXVectorPool wnrxPool;
         /// Light source shadow cache for shadow tests of first trace level intersections.
@@ -375,7 +375,7 @@ class Trace
         /// @param[in]      shadowflag      Whether to perform only computations necessary for shadow testing.
         /// @param[in]      photonpass      Whether to deposit photons instead of computing a colour.
         ///
-        void ComputeOneTextureColour(MathColour& resultColour, ColourChannel& resultTransm, const TEXTURE *texture, vector<const TEXTURE *>& warps,
+        void ComputeOneTextureColour(MathColour& resultColour, ColourChannel& resultTransm, const TextureData& texture, vector<const TPATTERN *>& warps,
                                      const Vector3d& ipoint, const Vector3d& rawnormal, Ray& ray, COLC weight,
                                      Intersection& isect, bool shadowflag, bool photonpass);
 
@@ -401,7 +401,7 @@ class Trace
         /// @param[in]      shadowflag      Whether to perform only computations necessary for shadow testing.
         /// @param[in]      photonpass      Whether to deposit photons instead of computing a colour.
         ///
-        void ComputeAverageTextureColours(MathColour& resultColour, ColourChannel& resultTransm, const TEXTURE *texture, vector<const TEXTURE *>& warps,
+        void ComputeAverageTextureColours(MathColour& resultColour, ColourChannel& resultTransm, const TextureData& texture, vector<const TPATTERN *>& warps,
                                           const Vector3d& ipoint, const Vector3d& rawnormal, Ray& ray, COLC weight,
                                           Intersection& isect, bool shadowflag, bool photonpass);
 
@@ -428,7 +428,7 @@ class Trace
         /// @param[in]      weight          Importance of this computation.
         /// @param[in]      isect           Intersection information.
         ///
-        virtual void ComputeLightedTexture(MathColour& resultColour, ColourChannel& resultTransm, const TEXTURE *texture, vector<const TEXTURE *>& warps,
+        virtual void ComputeLightedTexture(MathColour& resultColour, ColourChannel& resultTransm, const TextureData& texture, vector<const TPATTERN *>& warps,
                                            const Vector3d& ipoint, const Vector3d& rawnormal, Ray& ray, COLC weight,
                                            Intersection& isect);
 
@@ -449,7 +449,7 @@ class Trace
         /// @param[in,out]  ray             Ray and associated information.
         /// @param[in]      isect           Intersection information.
         ///
-        void ComputeShadowTexture(MathColour& filtercolour, const TEXTURE *texture, vector<const TEXTURE *>& warps,
+        void ComputeShadowTexture(MathColour& filtercolour, const TextureData& texture, vector<const TPATTERN *>& warps,
                                   const Vector3d& ipoint, const Vector3d& rawnormal, const Ray& ray,
                                   Intersection& isect);
 

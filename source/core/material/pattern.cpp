@@ -870,7 +870,7 @@ template void BlendMap<TransColour> ::Search (DBL value, EntryConstPtr& rpPrev, 
 template void BlendMap<PIGMENT*>    ::Search (DBL value, EntryConstPtr& rpPrev, EntryConstPtr& rpNext, DBL& rPrevWeight, DBL& rNextWeight) const;
 template void BlendMap<Vector2d>    ::Search (DBL value, EntryConstPtr& rpPrev, EntryConstPtr& rpNext, DBL& rPrevWeight, DBL& rNextWeight) const;
 template void BlendMap<TNORMAL*>    ::Search (DBL value, EntryConstPtr& rpPrev, EntryConstPtr& rpNext, DBL& rPrevWeight, DBL& rNextWeight) const;
-template void BlendMap<TexturePtr>  ::Search (DBL value, EntryConstPtr& rpPrev, EntryConstPtr& rpNext, DBL& rPrevWeight, DBL& rNextWeight) const;
+template void BlendMap<TextureData> ::Search (DBL value, EntryConstPtr& rpPrev, EntryConstPtr& rpNext, DBL& rPrevWeight, DBL& rNextWeight) const;
 
 /*****************************************************************************
 *

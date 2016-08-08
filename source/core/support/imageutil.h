@@ -118,7 +118,7 @@ class ImageData
 
 DBL image_pattern(const Vector3d& EPoint, const BasicPattern* pPattern);
 bool image_map(const Vector3d& EPoint, const PIGMENT *Pigment, TransColour& colour);
-TEXTURE *material_map(const Vector3d& IPoint, const TEXTURE *Texture);
+TextureData material_map(const Vector3d& IPoint, const TextureData& Texture);
 void bump_map(const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& normal);
 HF_VAL image_height_at(const ImageData *image, int x, int y);
 bool is_image_opaque(const ImageData *image);

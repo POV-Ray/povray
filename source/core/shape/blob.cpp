@@ -2020,8 +2020,8 @@ void Blob::Transform(const TRANSFORM *tr)
 
     Compose_Transforms(Trans, tr);
 
-    for(vector<TEXTURE*>::iterator i = Element_Texture.begin(); i != Element_Texture.end(); ++i)
-        Transform_Textures(*i, tr);
+    for(vector<TextureData>::iterator i = Element_Texture.begin(); i != Element_Texture.end(); ++i)
+        i->Transform(*tr);
 }
 
 
@@ -2106,8 +2106,8 @@ ObjectPtr Blob::Copy()
     New->Trans = Copy_Transform(Trans);
     New->Data = Data->AcquireReference();
     New->Element_Texture.reserve(Element_Texture.size());
-    for (vector<TEXTURE*>::iterator i = Element_Texture.begin(); i != Element_Texture.end(); ++i)
-        New->Element_Texture.push_back(Copy_Textures(*i));
+    for (vector<TextureData>::iterator i = Element_Texture.begin(); i != Element_Texture.end(); ++i)
+        New->Element_Texture.push_back(i->GetCopy());
     return (New);
 }
 
@@ -2186,8 +2186,8 @@ Blob_List_Struct *Blob::Create_Blob_List_Element()
 
 Blob::~Blob()
 {
-    for (vector<TEXTURE*>::iterator i = Element_Texture.begin(); i != Element_Texture.end(); ++i)
-        Destroy_Textures(*i);
+    for (vector<TextureData>::iterator i = Element_Texture.begin(); i != Element_Texture.end(); ++i)
+        i->Destroy();
     if (Data != NULL)
         Data->ReleaseReference () ;
 }
@@ -2387,7 +2387,6 @@ Blob_Element::Blob_Element (void)
     c[0] = 0.0;
     c[1] = 0.0;
     c[2] = 0.0;
-    Texture = NULL;
     Trans = NULL;
 }
 
@@ -2523,7 +2522,7 @@ int Blob::Make_Blob(DBL threshold, Blob_List_Struct *BlobList, int npoints, Trac
         *Entry = temp->elem;
 
         /* We have a multi-texture blob. */
-        if (Entry->Texture != NULL)
+        if (!Entry->Texture.IsEmpty())
             Set_Flag(this, MULTITEXTURE_FLAG);
 
         /* Store blob specific information. */
@@ -2555,7 +2554,7 @@ int Blob::Make_Blob(DBL threshold, Blob_List_Struct *BlobList, int npoints, Trac
         /* Get rid of texture non longer needed. */
 
         BlobList = BlobList->next;
-        Destroy_Textures(temp->elem.Texture);
+        temp->elem.Texture.Destroy();
         delete temp ;
     }
 
@@ -2623,20 +2622,20 @@ void Blob::Test_Blob_Opacity()
 {
     /* Initialize opacity flag to the opacity of the object's texture. */
 
-    if ((Texture == NULL) || (Test_Opacity(Texture)))
+    if (Texture.IsEmpty() || Texture.IsOpaque())
     {
         Set_Flag(this, OPAQUE_FLAG);
     }
 
     if (Test_Flag(this, MULTITEXTURE_FLAG))
     {
-        for (vector<TEXTURE*>::iterator i = Element_Texture.begin(); i != Element_Texture.end(); ++i)
+        for (vector<TextureData>::iterator i = Element_Texture.begin(); i != Element_Texture.end(); ++i)
         {
-            if (*i != NULL)
+            if (!i->IsEmpty())
             {
                 /* If component's texture isn't opaque the blob is neither. */
 
-                if (!Test_Opacity(*i))
+                if (!i->IsOpaque())
                 {
                     Clear_Flag(this, OPAQUE_FLAG);
                 }
@@ -2846,12 +2845,12 @@ void Blob::Determine_Textures(Intersection *isect, bool hitinside, WeightedTextu
 *
 ******************************************************************************/
 
-void Blob::determine_element_texture(const Blob_Element *Element, TEXTURE *ElementTex, const Vector3d& P, WeightedTextureVector& textures)
+void Blob::determine_element_texture(const Blob_Element *Element, TextureData& ElementTex, const Vector3d& P, WeightedTextureVector& textures)
 {
-        DBL density = fabs(calculate_element_field(Element, P));
+    DBL density = fabs(calculate_element_field(Element, P));
 
-        if(density > 0.0)
-                textures.push_back(WeightedTexture(density, ElementTex != NULL ? ElementTex : Texture));
+    if(density > 0.0)
+        textures.push_back(WeightedTexture(density, !ElementTex.IsEmpty() ? ElementTex : Texture));
 }
 
 
@@ -2898,7 +2897,7 @@ void Blob::Translate_Blob_Element(Blob_Element *Element, const Vector3d& Vector)
         /* This is a sphere component. */
 
         Element->O += Vector;
-        Transform_Textures(Element->Texture, &Trans);
+        Element->Texture.Transform(Trans);
     }
     else
     {
@@ -2952,7 +2951,7 @@ void Blob::Rotate_Blob_Element(Blob_Element *Element, const Vector3d& Vector)
         /* This is a sphere component. */
 
         MTransPoint(Element->O, Element->O, &Trans);
-        Transform_Textures(Element->Texture, &Trans);
+        Element->Texture.Transform(Trans);
     }
     else
     {
@@ -3021,7 +3020,7 @@ void Blob::Scale_Blob_Element(Blob_Element *Element, const Vector3d& Vector)
 
         Element->rad2 *= Sqr(Vector[X]);
 
-        Transform_Textures(Element->Texture, &Trans);
+        Element->Texture.Transform(Trans);
     }
     else
     {
@@ -3077,7 +3076,7 @@ void Blob::Transform_Blob_Element(Blob_Element *Element, const TRANSFORM *Trans)
 
     Compose_Transforms(Element->Trans, Trans);
 
-    Transform_Textures(Element->Texture, Trans);
+    Element->Texture.Transform(*Trans);
 }
 
 
@@ -3223,11 +3222,11 @@ void Blob::Create_Blob_Element_Texture_List(Blob_List_Struct *BlobList, int npoi
          * because individual textures have to be transformed too if
          * copies of the blob are transformed.
          */
-        Element_Texture.push_back(Copy_Textures(bl->elem.Texture));
+        Element_Texture.push_back(bl->elem.Texture.GetCopy());
         if (bl->elem.Type == BLOB_CYLINDER)
         {
-            Element_Texture.push_back(Copy_Textures(bl->elem.Texture));
-            Element_Texture.push_back(Copy_Textures(bl->elem.Texture));
+            Element_Texture.push_back(bl->elem.Texture.GetCopy());
+            Element_Texture.push_back(bl->elem.Texture.GetCopy());
         }
     }
 }

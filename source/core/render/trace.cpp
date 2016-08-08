@@ -504,16 +504,16 @@ void Trace::ComputeTextureColour(Intersection& isect, MathColour& colour, Colour
     }
 
     bool isMultiTextured = Test_Flag(isect.Object, MULTITEXTURE_FLAG) ||
-                           ((isect.Object->Texture == NULL) && Test_Flag(isect.Object, CUTAWAY_TEXTURES_FLAG));
+                           (isect.Object->Texture.IsEmpty() && Test_Flag(isect.Object, CUTAWAY_TEXTURES_FLAG));
 
     // get textures and weights
     if(isMultiTextured == true)
     {
         isect.Object->Determine_Textures(&isect, normaldirection > 0.0, wtextures, threadData);
     }
-    else if(isect.Object->Texture != NULL)
+    else if (!isect.Object->Texture.IsEmpty())
     {
-        if((normaldirection > 0.0) && (isect.Object->Interior_Texture != NULL))
+        if((normaldirection > 0.0) && !isect.Object->Interior_Texture.IsEmpty())
             wtextures.push_back(WeightedTexture(1.0, isect.Object->Interior_Texture)); /* Chris Huff: Interior Texture patch */
         else
             wtextures.push_back(WeightedTexture(1.0, isect.Object->Texture));
@@ -531,11 +531,11 @@ void Trace::ComputeTextureColour(Intersection& isect, MathColour& colour, Colour
 
     for(WeightedTextureVector::iterator i(wtextures.begin()); i != wtextures.end(); i++)
     {
-        TextureVector warps(texturePool);
+        PatternVector warps(patternPool);
         POV_REFPOOL_ASSERT(warps->empty()); // verify that the TextureVector pulled from the pool is in a cleaned-up condition
 
         // if the contribution of this texture is neglectable skip ahead
-        if((i->weight < ray.GetTicket().adcBailout) || (i->texture == NULL))
+        if((i->weight < ray.GetTicket().adcBailout) || i->texture.IsEmpty())
             continue;
 
         if(photonPass == true)
@@ -575,12 +575,12 @@ void Trace::ComputeTextureColour(Intersection& isect, MathColour& colour, Colour
     lightColorCacheIndex--;
 }
 
-void Trace::ComputeOneTextureColour(MathColour& resultColour, ColourChannel& resultTransm, const TEXTURE *texture, vector<const TEXTURE *>& warps, const Vector3d& ipoint,
+void Trace::ComputeOneTextureColour(MathColour& resultColour, ColourChannel& resultTransm, const TextureData& texture, vector<const TPATTERN *>& warps, const Vector3d& ipoint,
                                     const Vector3d& rawnormal, Ray& ray, COLC weight, Intersection& isect, bool shadowflag, bool photonPass)
 {
     // NOTE: this method is used by the photon pass to deposit photons on the surface
     // (and not, per se, to compute texture color)
-    const TextureBlendMapPtr& blendmap = texture->Blend_Map;
+    const TextureBlendMapPtr& blendmap = texture.FirstTexture()->Blend_Map;
     const TextureBlendMapEntry *prev, *cur;
     DBL prevWeight, curWeight;
     double value1; // TODO FIXME - choose better name!
@@ -589,7 +589,7 @@ void Trace::ComputeOneTextureColour(MathColour& resultColour, ColourChannel& res
     MathColour c2;
     ColourChannel t2;
 
-    switch(texture->Type)
+    switch(texture.FirstTexture()->Type)
     {
         case NO_PATTERN:
         case PLAIN_PATTERN:
@@ -598,7 +598,7 @@ void Trace::ComputeOneTextureColour(MathColour& resultColour, ColourChannel& res
         case UV_MAP_PATTERN:
         case BITMAP_PATTERN:
         default:
-            warps.push_back(texture);
+            warps.push_back(texture.FirstTexture());
             break;
     }
 
@@ -606,9 +606,9 @@ void Trace::ComputeOneTextureColour(MathColour& resultColour, ColourChannel& res
     // epoint - evaluation point
     // tpoint - turbulated/transformed point
 
-    if(texture->Type <= LAST_SPECIAL_PATTERN)
+    if(texture.FirstTexture()->Type <= LAST_SPECIAL_PATTERN)
     {
-        switch(texture->Type)
+        switch(texture.FirstTexture()->Type)
         {
             case NO_PATTERN:
                 POV_PATTERN_ASSERT(false);  // in Create_Texture(), TEXTURE->Type is explicitly set to PLAIN_PATTERN (in deviation
@@ -626,11 +626,11 @@ void Trace::ComputeOneTextureColour(MathColour& resultColour, ColourChannel& res
                 // Don't bother warping, simply get the UV vect of the intersection
                 isect.Object->UVCoord(uvcoords, &isect, threadData);
                 tpoint = Vector3d(uvcoords[U], uvcoords[V], 0.0);
-                cur = &(texture->Blend_Map->Blend_Map_Entries[0]);
+                cur = &(texture.FirstTexture()->Blend_Map->Blend_Map_Entries[0]);
                 ComputeOneTextureColour(resultColour, resultTransm, cur->Vals, warps, tpoint, rawnormal, ray, weight, isect, shadowflag, photonPass);
                 break;
             case BITMAP_PATTERN:
-                Warp_EPoint(tpoint, ipoint, texture);
+                Warp_EPoint(tpoint, ipoint, texture.FirstTexture());
                 ComputeOneTextureColour(resultColour, resultTransm, material_map(tpoint, texture), warps, tpoint, rawnormal, ray, weight, isect, shadowflag, photonPass);
                 break;
             case PLAIN_PATTERN:
@@ -647,8 +647,8 @@ void Trace::ComputeOneTextureColour(MathColour& resultColour, ColourChannel& res
     else
     {
         // NK 19 Nov 1999 added Warp_EPoint
-        Warp_EPoint(tpoint, ipoint, texture);
-        value1 = Evaluate_TPat(texture, tpoint, &isect, &ray, threadData);
+        Warp_EPoint(tpoint, ipoint, texture.FirstTexture());
+        value1 = Evaluate_TPat(texture.FirstTexture(), tpoint, &isect, &ray, threadData);
 
         blendmap->Search(value1, prev, cur, prevWeight, curWeight);
 
@@ -679,10 +679,10 @@ void Trace::ComputeOneTextureColour(MathColour& resultColour, ColourChannel& res
     }
 }
 
-void Trace::ComputeAverageTextureColours(MathColour& resultColour, ColourChannel& resultTransm, const TEXTURE *texture, vector<const TEXTURE *>& warps, const Vector3d& ipoint,
+void Trace::ComputeAverageTextureColours(MathColour& resultColour, ColourChannel& resultTransm, const TextureData& texture, vector<const TPATTERN *>& warps, const Vector3d& ipoint,
                                          const Vector3d& rawnormal, Ray& ray, COLC weight, Intersection& isect, bool shadowflag, bool photonPass)
 {
-    const TextureBlendMapPtr& bmap = texture->Blend_Map;
+    const TextureBlendMapPtr& bmap = texture.FirstTexture()->Blend_Map;
     SNGL total = 0.0;
     MathColour lc;
     ColourChannel lt;
@@ -721,11 +721,11 @@ void Trace::ComputeAverageTextureColours(MathColour& resultColour, ColourChannel
     }
 }
 
-void Trace::ComputeLightedTexture(MathColour& resultColour, ColourChannel& resultTransm, const TEXTURE *texture, vector<const TEXTURE *>& warps, const Vector3d& ipoint,
+void Trace::ComputeLightedTexture(MathColour& resultColour, ColourChannel& resultTransm, const TextureData& texture, vector<const TPATTERN *>& warps, const Vector3d& ipoint,
                                   const Vector3d& rawnormal, Ray& ray, COLC weight, Intersection& isect)
 {
     Interior *interior;
-    const TEXTURE *layer;
+    TextureData::const_iterator layer;
     int i;
     bool radiosity_done, radiosity_back_done, radiosity_needed;
     int layer_number;
@@ -791,14 +791,14 @@ void Trace::ComputeLightedTexture(MathColour& resultColour, ColourChannel& resul
     if(sceneData->photonSettings.photonsEnabled && sceneData->surfacePhotonMap.numPhotons > 0)
         surfacePhotonGatherer.reset(new PhotonGatherer(&sceneData->surfacePhotonMap, sceneData->photonSettings));
 
-    for(layer_number = 0, layer = texture; (layer != NULL) && (trans > ray.GetTicket().adcBailout); layer_number++, layer = layer->Next)
+    for(layer_number = 0, layer = texture.Begin(); (layer != texture.End()) && (trans > ray.GetTicket().adcBailout); ++layer_number, ++layer)
     {
         // Get perturbed surface normal.
         layNormal = rawnormal;
 
         if(qualityFlags.normals && (layer->Tnormal != NULL))
         {
-            for(vector<const TEXTURE *>::iterator i(warps.begin()); i != warps.end(); i++)
+            for(vector<const TPATTERN *>::iterator i(warps.begin()); i != warps.end(); i++)
                 Warp_Normal(layNormal, layNormal, *i, Test_Flag(*i, DONT_SCALE_BUMPS_FLAG));
 
             Perturb_Normal(layNormal, layer->Tnormal, ipoint, &isect, &ray, threadData);
@@ -808,7 +808,7 @@ void Trace::ComputeLightedTexture(MathColour& resultColour, ColourChannel& resul
 
             // TODO - Reverse iterator may be less performant than forward iterator; we might want to
             //        compare performance with using forward iterators and decrement, or using random access.
-            for(vector<const TEXTURE *>::reverse_iterator i(warps.rbegin()); i != warps.rend(); i++)
+            for(vector<const TPATTERN *>::reverse_iterator i(warps.rbegin()); i != warps.rend(); i++)
                 UnWarp_Normal(layNormal, layNormal, *i, Test_Flag(*i, DONT_SCALE_BUMPS_FLAG));
         }
 
@@ -1037,7 +1037,7 @@ void Trace::ComputeLightedTexture(MathColour& resultColour, ColourChannel& resul
         new_Weight = weight * w1;
 
         // Trace refracted ray.
-        tir_occured = ComputeRefraction(texture->Finish, interior, isect.IPoint, ray, topNormal, rawnormal, rfrCol, rfrTransm, new_Weight);
+        tir_occured = ComputeRefraction(texture.FirstTexture()->Finish, interior, isect.IPoint, ray, topNormal, rawnormal, rfrCol, rfrTransm, new_Weight);
 
         // Get distance based attenuation.
         // TODO - virtually the same code is used in ComputeShadowTexture().
@@ -1091,7 +1091,7 @@ void Trace::ComputeLightedTexture(MathColour& resultColour, ColourChannel& resul
     // TopNormal are skipped.
     if(qualityFlags.reflections)
     {
-        layer = texture;
+        layer = texture.Begin();
         for(i = 0; i < layer_number; i++)
         {
             if((!tir_occured) ||
@@ -1114,16 +1114,16 @@ void Trace::ComputeLightedTexture(MathColour& resultColour, ColourChannel& resul
                     }
                 }
             }
-            layer = layer->Next;
+            ++layer;
         }
     }
 }
 
-void Trace::ComputeShadowTexture(MathColour& filtercolour, const TEXTURE *texture, vector<const TEXTURE *>& warps, const Vector3d& ipoint,
+void Trace::ComputeShadowTexture(MathColour& filtercolour, const TextureData& texture, vector<const TPATTERN *>& warps, const Vector3d& ipoint,
                                  const Vector3d& rawnormal, const Ray& ray, Intersection& isect)
 {
     Interior *interior = isect.Object->interior.get();
-    const TEXTURE *layer;
+    TextureData::const_iterator layer;
     double caustics, dotval, k;
     Vector3d layer_Normal;
     MathColour refraction;
@@ -1134,7 +1134,7 @@ void Trace::ComputeShadowTexture(MathColour& filtercolour, const TEXTURE *textur
 
     one_colour_found = false;
 
-    for(layer = texture; layer != NULL; layer = layer->Next)
+    for(layer = texture.Begin(); layer != texture.End(); ++layer)
     {
         colour_found = Compute_Pigment(layer_Pigment_Colour, layer->Pigment, ipoint, &isect, &ray, threadData);
 
@@ -1152,7 +1152,7 @@ void Trace::ComputeShadowTexture(MathColour& filtercolour, const TEXTURE *textur
 
             if(qualityFlags.normals && (layer->Tnormal != NULL))
             {
-                for(vector<const TEXTURE *>::iterator i(warps.begin()); i != warps.end(); i++)
+                for(vector<const TPATTERN *>::iterator i(warps.begin()); i != warps.end(); i++)
                     Warp_Normal(layer_Normal, layer_Normal, *i, Test_Flag(*i, DONT_SCALE_BUMPS_FLAG));
 
                 Perturb_Normal(layer_Normal, layer->Tnormal, ipoint, &isect, &ray, threadData);
@@ -1162,7 +1162,7 @@ void Trace::ComputeShadowTexture(MathColour& filtercolour, const TEXTURE *textur
 
                 // TODO - Reverse iterator may be less performant than forward iterator; we might want to
                 //        compare performance with using forward iterators and decrement, or using random access.
-                for(vector<const TEXTURE *>::reverse_iterator i(warps.rbegin()); i != warps.rend(); i++)
+                for(vector<const TPATTERN *>::reverse_iterator i(warps.rbegin()); i != warps.rend(); i++)
                     UnWarp_Normal(layer_Normal, layer_Normal, *i, Test_Flag(*i, DONT_SCALE_BUMPS_FLAG));
             }
 
@@ -2306,16 +2306,16 @@ void Trace::ComputeShadowColour(const LightSource &lightsource, Intersection& is
     }
 
     bool isMultiTextured = Test_Flag(isect.Object, MULTITEXTURE_FLAG) ||
-                           ((isect.Object->Texture == NULL) && Test_Flag(isect.Object, CUTAWAY_TEXTURES_FLAG));
+                           (isect.Object->Texture.IsEmpty() && Test_Flag(isect.Object, CUTAWAY_TEXTURES_FLAG));
 
     // get textures and weights
     if(isMultiTextured == true)
     {
         isect.Object->Determine_Textures(&isect, normaldirection > 0.0, wtextures, threadData);
     }
-    else if(isect.Object->Texture != NULL)
+    else if(!isect.Object->Texture.IsEmpty())
     {
-        if((normaldirection > 0.0) && (isect.Object->Interior_Texture != NULL))
+        if((normaldirection > 0.0) && !isect.Object->Interior_Texture.IsEmpty())
             wtextures.push_back(WeightedTexture(1.0, isect.Object->Interior_Texture)); /* Chris Huff: Interior Texture patch */
         else
             wtextures.push_back(WeightedTexture(1.0, isect.Object->Texture));
@@ -2332,11 +2332,11 @@ void Trace::ComputeShadowColour(const LightSource &lightsource, Intersection& is
 
     for(WeightedTextureVector::iterator i(wtextures.begin()); i != wtextures.end(); i++)
     {
-        TextureVector warps(texturePool);
+        PatternVector warps(patternPool);
         POV_REFPOOL_ASSERT(warps->empty()); // verify that the TextureVector pulled from the pool is in a cleaned-up condition
 
         // If contribution of this texture is neglectable skip ahead.
-        if((i->weight < lightsourceray.GetTicket().adcBailout) || (i->texture == NULL))
+        if((i->weight < lightsourceray.GetTicket().adcBailout) || i->texture.IsEmpty())
             continue;
 
         ComputeOneTextureColour(fc1, ft1, i->texture, *warps, ipoint, raw_Normal, lightsourceray, 0.0, isect, true, false);

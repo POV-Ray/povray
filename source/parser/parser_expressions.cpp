@@ -2784,7 +2784,7 @@ void Parser::Parse_BlendMapData<PigmentBlendMapData> (BlendMapTypeId Blend_Type,
     switch (Blend_Type)
     {
         case kBlendMapType_Pigment:
-            rData=Copy_Pigment(Default_Texture->Pigment);
+            rData=Copy_Pigment(Default_Texture.FirstTexture()->Pigment);
             Parse_Pigment(&(rData));
             break;
 
@@ -2810,12 +2810,12 @@ template<>
 void Parser::Parse_BlendMapData<NormalBlendMapData> (BlendMapTypeId Blend_Type, NormalBlendMapData& rData)
 {
     POV_BLEND_MAP_ASSERT(Blend_Type == kBlendMapType_Normal);
-    rData=Copy_Tnormal(Default_Texture->Tnormal);
+    rData=Copy_Tnormal(Default_Texture.FirstTexture()->Tnormal);
     Parse_Tnormal(&(rData));
 }
 
 template<>
-void Parser::Parse_BlendMapData<TexturePtr> (BlendMapTypeId Blend_Type, TexturePtr& rData)
+void Parser::Parse_BlendMapData<TextureData> (BlendMapTypeId Blend_Type, TextureData& rData)
 {
     POV_BLEND_MAP_ASSERT(Blend_Type == kBlendMapType_Texture);
     rData=Parse_Texture();
@@ -2998,7 +2998,7 @@ void Parser::Parse_BlendListData<PigmentBlendMapData> (BlendMapTypeId Blend_Type
     switch (Blend_Type)
     {
         case kBlendMapType_Pigment:
-            rData=Copy_Pigment(Default_Texture->Pigment);
+            rData=Copy_Pigment(Default_Texture.FirstTexture()->Pigment);
             Parse_Pigment(&(rData));
             break;
 
@@ -3024,12 +3024,12 @@ template<>
 void Parser::Parse_BlendListData<NormalBlendMapData> (BlendMapTypeId Blend_Type, NormalBlendMapData& rData)
 {
     POV_BLEND_MAP_ASSERT(Blend_Type == kBlendMapType_Normal);
-    rData=Copy_Tnormal(Default_Texture->Tnormal);
+    rData=Copy_Tnormal(Default_Texture.FirstTexture()->Tnormal);
     Parse_Tnormal(&(rData));
 }
 
 template<>
-void Parser::Parse_BlendListData<TexturePtr> (BlendMapTypeId Blend_Type, TexturePtr& rData)
+void Parser::Parse_BlendListData<TextureData> (BlendMapTypeId Blend_Type, TextureData& rData)
 {
     POV_BLEND_MAP_ASSERT(Blend_Type == kBlendMapType_Texture);
     rData=Parse_Texture();
@@ -3049,7 +3049,7 @@ void Parser::Parse_BlendListData_Default<PigmentBlendMapData> (const ColourBlend
     switch (Blend_Type)
     {
         case kBlendMapType_Pigment:
-            rData=Copy_Pigment(Default_Texture->Pigment);
+            rData=Copy_Pigment(Default_Texture.FirstTexture()->Pigment);
             break;
 
         case kBlendMapType_Density:
@@ -3073,14 +3073,14 @@ template<>
 void Parser::Parse_BlendListData_Default<NormalBlendMapData> (const ColourBlendMapData& rDefData, BlendMapTypeId Blend_Type, NormalBlendMapData& rData)
 {
     POV_BLEND_MAP_ASSERT(Blend_Type == kBlendMapType_Normal);
-    rData=Copy_Tnormal(Default_Texture->Tnormal);
+    rData=Copy_Tnormal(Default_Texture.FirstTexture()->Tnormal);
 }
 
 template<>
-void Parser::Parse_BlendListData_Default<TexturePtr> (const ColourBlendMapData& rDefData, BlendMapTypeId Blend_Type, TexturePtr& rData)
+void Parser::Parse_BlendListData_Default<TextureData> (const ColourBlendMapData& rDefData, BlendMapTypeId Blend_Type, TextureData& rData)
 {
     POV_BLEND_MAP_ASSERT(Blend_Type == kBlendMapType_Texture);
-    rData=Copy_Textures(Default_Texture);
+    rData.SetCopy(Default_Texture);
 }
 
 

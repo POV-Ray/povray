@@ -1356,8 +1356,8 @@ TEXTURE *Copy_Textures(TEXTURE *Textures)
 
             case BITMAP_PATTERN:
                 New->Materials.reserve(Layer->Materials.size());
-                for (vector<TEXTURE*>::const_iterator i = Layer->Materials.begin(); i != Layer->Materials.end(); ++ i)
-                    New->Materials.push_back(Copy_Textures(*i));
+                for (vector<TextureData>::const_iterator i = Layer->Materials.begin(); i != Layer->Materials.end(); ++ i)
+                    New->Materials.push_back(i->GetCopy());
 
 //              Not needed. Copied by Copy_TPat_Fields:
 //              New->Vals.Image  = Copy_Image(Layer->Vals.Image);
@@ -1422,8 +1422,8 @@ void Destroy_Textures(TEXTURE *Textures)
             delete Layer->Finish;
 
         // Theoretically these should only be non-empty for BITMAP_PATTERN, but let's clean them up either way.
-        for(vector<TEXTURE*>::iterator i = Layer->Materials.begin(); i != Layer->Materials.end(); ++ i)
-            Destroy_Textures(*i);
+        for(vector<TextureData>::iterator i = Layer->Materials.begin(); i != Layer->Materials.end(); ++ i)
+            i->Destroy();
 
         Temp = Layer->Next;
         delete Layer;
@@ -1483,9 +1483,8 @@ void Post_Textures(TEXTURE *Textures)
 
                 case BITMAP_PATTERN:
 
-                    for (vector<TEXTURE*>::iterator i = Layer->Materials.begin(); i != Layer->Materials.end(); ++ i)
-
-                        Post_Textures(*i);
+                    for (vector<TextureData>::iterator i = Layer->Materials.begin(); i != Layer->Materials.end(); ++ i)
+                        i->Post();
 
                     break;
             }
@@ -1494,9 +1493,9 @@ void Post_Textures(TEXTURE *Textures)
             {
                 for(vector<TextureBlendMapEntry>::iterator i = Map->Blend_Map_Entries.begin(); i != Map->Blend_Map_Entries.end(); i++)
                 {
-                    i->Vals->Flags |=
+                    i->Vals.FirstTexture()->Flags |=
                         (Layer->Flags & DONT_SCALE_BUMPS_FLAG);
-                    Post_Textures(i->Vals);
+                    i->Vals.Post();
                 }
             }
             else
@@ -1594,9 +1593,9 @@ int Test_Opacity(const TEXTURE *Texture)
 
                 Help = true;
 
-                for (vector<TEXTURE*>::const_iterator i = Layer->Materials.begin(); i != Layer->Materials.end(); ++ i)
+                for (vector<TextureData>::const_iterator i = Layer->Materials.begin(); i != Layer->Materials.end(); ++ i)
                 {
-                    if (!Test_Opacity(*i))
+                    if (!i->IsOpaque())
                     {
                         /* Material is not opaque --> layer is not opaque. */
 
@@ -1679,12 +1678,33 @@ void Initialise_NoiseDispatch()
 
 //******************************************************************************
 
-TextureBlendMap::TextureBlendMap() : BlendMap<TexturePtr>(kBlendMapType_Texture) {}
+TextureBlendMap::TextureBlendMap() : BlendMap<TextureData>(kBlendMapType_Texture) {}
 
 TextureBlendMap::~TextureBlendMap()
 {
     for (Vector::iterator i = Blend_Map_Entries.begin(); i != Blend_Map_Entries.end(); i++)
-        Destroy_Textures(i->Vals);
+        i->Vals.Destroy();
+}
+
+
+//******************************************************************************
+
+void TextureData::Link(TextureData& o, bool legacyMode)
+{
+    TEXTURE* layer;
+    for (layer = o.mTexture; layer->Next != NULL; layer = layer->Next)
+    {
+        /* NK layers - 1999 June 10 - for backwards compatiblity with layered textures */
+        if(legacyMode)
+            Convert_Filter_To_Transmit(layer->Pigment);
+    }
+
+    /* NK layers - 1999 Nov 16 - for backwards compatiblity with layered textures */
+    if (legacyMode && (mTexture != NULL))
+        Convert_Filter_To_Transmit(layer->Pigment);
+
+    layer->Next = mTexture;
+    mTexture = o.mTexture;
 }
 
 }

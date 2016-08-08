@@ -476,8 +476,8 @@ void Translate_Object (ObjectPtr Object, const Vector3d& Vector, const TRANSFORM
     /* NK 1998 added if */
     if(!Test_Flag(Object, UV_FLAG))
     {
-        Transform_Textures(Object->Texture, Trans);
-        Transform_Textures(Object->Interior_Texture, Trans);
+        Object->Texture.Transform(*Trans);
+        Object->Interior_Texture.Transform(*Trans);
     }
 
     if(Object->interior != NULL)
@@ -535,8 +535,8 @@ void Rotate_Object (ObjectPtr Object, const Vector3d& Vector, const TRANSFORM *T
     /* NK 1998 added if */
     if (!Test_Flag(Object, UV_FLAG))
     {
-        Transform_Textures(Object->Texture, Trans);
-        Transform_Textures(Object->Interior_Texture, Trans);
+        Object->Texture.Transform(*Trans);
+        Object->Interior_Texture.Transform(*Trans);
     }
 
     if(Object->interior != NULL)
@@ -592,8 +592,8 @@ void Scale_Object (ObjectPtr Object, const Vector3d& Vector, const TRANSFORM *Tr
     /* NK 1998 added if */
     if (!Test_Flag(Object, UV_FLAG))
     {
-        Transform_Textures(Object->Texture, Trans);
-        Transform_Textures(Object->Interior_Texture, Trans);
+        Object->Texture.Transform(*Trans);
+        Object->Interior_Texture.Transform(*Trans);
     }
 
     if(Object->interior != NULL)
@@ -651,8 +651,8 @@ void Transform_Object (ObjectPtr Object, const TRANSFORM *Trans)
     /* NK 1998 added if */
     if (!Test_Flag(Object, UV_FLAG))
     {
-        Transform_Textures(Object->Texture, Trans);
-        Transform_Textures(Object->Interior_Texture, Trans);
+        Object->Texture.Transform(*Trans);
+        Object->Interior_Texture.Transform(*Trans);
     }
 
     if(Object->interior != NULL)
@@ -717,8 +717,8 @@ ObjectPtr Copy_Object (ObjectPtr Old)
     // TODO FIXME - An explanation WHY this is important would be nice [CLi]
     New->LLights.clear(); // important
 
-    New->Texture = Copy_Textures (Old->Texture);
-    New->Interior_Texture = Copy_Textures (Old->Interior_Texture);
+    New->Texture.SetCopy(Old->Texture);
+    New->Interior_Texture.SetCopy(Old->Interior_Texture);
     if(Old->interior != NULL)
         New->interior = InteriorPtr(new Interior(*(Old->interior)));
     else
@@ -783,7 +783,7 @@ void Destroy_Single_Object (ObjectPtr *objectPtr)
 {
     ObjectPtr object = *objectPtr;
 
-    Destroy_Textures(object->Texture);
+    object->Texture.Destroy();
 
     Destroy_Object(object->Bound);
 
@@ -810,8 +810,8 @@ void Destroy_Object(ObjectPtr Object)
         if (!Object->Bound.empty() && !Object->Clip.empty())
             if (*Object->Bound.begin() == *Object->Clip.begin())
                 DestroyClip = false;
-        Destroy_Textures(Object->Texture);
-        Destroy_Textures(Object->Interior_Texture);
+        Object->Texture.Destroy();
+        Object->Interior_Texture.Destroy();
         Destroy_Object(Object->Bound);
 
         if (DestroyClip)
@@ -826,7 +826,7 @@ void Destroy_Object(ObjectPtr Object)
 
 ObjectBase::~ObjectBase()
 {
-	Destroy_Transform(Trans);
+    Destroy_Transform(Trans);
 }
 
 
@@ -867,9 +867,9 @@ void ObjectBase::UVCoord(Vector2d& Result, const Intersection *Inter, TraceThrea
 
 void ObjectBase::Determine_Textures(Intersection *isect, bool hitinside, WeightedTextureVector& textures, TraceThreadData *threaddata)
 {
-    if((Interior_Texture != NULL) && (hitinside == true))
+    if(!Interior_Texture.IsEmpty() && (hitinside == true))
         textures.push_back(WeightedTexture(1.0, Interior_Texture));
-    else if(Texture != NULL)
+    else if(!Texture.IsEmpty())
         textures.push_back(WeightedTexture(1.0, Texture));
     else if(isect->Csg != NULL)
         isect->Csg->Determine_Textures(isect, hitinside, textures, threaddata);

@@ -130,7 +130,7 @@ typedef struct Pigment_Struct PIGMENT;
 typedef struct Tnormal_Struct TNORMAL;
 typedef struct Finish_Struct FINISH;
 
-typedef TEXTURE* TexturePtr;
+class TextureData;
 
 /// @}
 ///
@@ -219,12 +219,7 @@ struct Pattern_Struct
 
 typedef struct Material_Struct MATERIAL;
 
-struct Material_Struct
-{
-    TEXTURE *Texture;
-    TEXTURE *Interior_Texture;
-    InteriorPtr interior;
-};
+struct Material_Struct;
 
 class LightSource;
 
