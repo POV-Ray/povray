@@ -9473,15 +9473,15 @@ void Parser::Link_Textures (TextureData* Old_Textures, TextureData New_Textures)
 
     if (!Old_Textures->IsEmpty())
     {
-        if ((*Old_Textures).FirstTexture()->Type != PLAIN_PATTERN)
+        if (Old_Textures->FirstTexture()->Type != PLAIN_PATTERN)
         {
             Error("Cannot layer over a patterned texture.");
         }
-    }
 
-    if ((New_Textures.FirstTexture()->Type != PLAIN_PATTERN) && New_Textures.IsLayered())
-    {
-        Error("Cannot layer a patterned texture over another.");
+        if (New_Textures.FirstTexture()->Type != PLAIN_PATTERN)
+        {
+            Error("Cannot layer a patterned texture over another.");
+        }
     }
 
     Old_Textures->Link(New_Textures, sceneData->EffectiveLanguageVersion() <= 310);
