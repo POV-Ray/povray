@@ -9466,7 +9466,7 @@ void Parser::Link(ObjectPtr New_Object, vector<ObjectPtr>& Object_List_Root)
 *
 ******************************************************************************/
 
-void Parser::Link_Textures (TextureData* Old_Textures, TextureData& New_Textures)
+void Parser::Link_Textures (TextureData* Old_Textures, TextureData New_Textures)
 {
     if (New_Textures.IsEmpty())
         return;

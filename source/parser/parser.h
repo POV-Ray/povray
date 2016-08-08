@@ -313,7 +313,7 @@ class Parser : public SceneTask
         void Only_In (const char *s1,const char *s2);
         void Not_With (const char *s1,const char *s2);
         void Warn_Compat (bool definite, const char *sym);
-        void Link_Textures (TextureData* Old_Texture, TextureData& New_Texture);
+        void Link_Textures (TextureData* Old_Texture, TextureData New_Texture);
 
         ObjectPtr Parse_Object_Mods (ObjectPtr Object);
         ObjectPtr Parse_Object (void);

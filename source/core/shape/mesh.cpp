@@ -1729,7 +1729,7 @@ MeshIndex Mesh::Mesh_Hash_Normal(MeshIndex *Number_Of_Normals, MeshIndex *Max_No
 *
 ******************************************************************************/
 
-MeshIndex Mesh::Mesh_Hash_Texture(MeshIndex *Number_Of_Textures, MeshIndex *Max_Textures, TextureData **Textures, TextureData& Texture)
+MeshIndex Mesh::Mesh_Hash_Texture(MeshIndex *Number_Of_Textures, MeshIndex *Max_Textures, TextureData **Textures, const TextureData& Texture)
 {
     MeshIndex i;
 

@@ -1689,7 +1689,7 @@ TextureBlendMap::~TextureBlendMap()
 
 //******************************************************************************
 
-void TextureData::Link(TextureData& o, bool legacyMode)
+void TextureData::Link(TextureData o, bool legacyMode)
 {
     TEXTURE* layer;
     for (layer = o.mTexture; layer->Next != NULL; layer = layer->Next)

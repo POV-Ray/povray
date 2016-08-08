@@ -216,7 +216,7 @@ public:
     inline const_iterator End() const { return iterator(NULL); }
     inline bool operator==(const TextureData& o) const { return mTexture == o.mTexture; }
     inline bool operator!=(const TextureData& o) const { return mTexture != o.mTexture; }
-    void Link(TextureData& o, bool legacyMode);
+    void Link(TextureData o, bool legacyMode);
 
 protected:
     TEXTURE* mTexture;
