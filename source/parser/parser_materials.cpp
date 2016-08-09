@@ -73,9 +73,9 @@ namespace pov
 * Local preprocessor defines
 ******************************************************************************/
 
-#define ADD_TNORMAL if (Tnormal == NULL) {if ((Default_Texture.FirstTexture()->Tnormal) != NULL) \
-    Tnormal = Copy_Tnormal ((Default_Texture.FirstTexture()->Tnormal)); else Tnormal = Create_Tnormal ();\
-    Texture.FirstTexture()->Tnormal=Tnormal;};
+#define ADD_TNORMAL if (Tnormal == NULL) {if ((Default_Texture.FirstLayer()->Tnormal) != NULL) \
+    Tnormal = Copy_Tnormal ((Default_Texture.FirstLayer()->Tnormal)); else Tnormal = Create_Tnormal ();\
+    Texture.FirstLayer()->Tnormal=Tnormal;};
 
 
 /*****************************************************************************
@@ -2266,9 +2266,9 @@ void Parser::Parse_Tnormal (TNORMAL **Tnormal_Ptr)
 
     if (*Tnormal_Ptr == NULL)
     {
-        if ((Default_Texture.FirstTexture()->Tnormal) != NULL)
+        if ((Default_Texture.FirstLayer()->Tnormal) != NULL)
         {
-            *Tnormal_Ptr = Copy_Tnormal ((Default_Texture.FirstTexture()->Tnormal));
+            *Tnormal_Ptr = Copy_Tnormal ((Default_Texture.FirstLayer()->Tnormal));
         }
         else
         {
@@ -2698,28 +2698,28 @@ TextureData Parser::Parse_Texture ()
     */
 
     /* Look for [pnf_texture] */
-    if (Texture.FirstTexture()->Type == PLAIN_PATTERN)
+    if (Texture.PatternType() == PLAIN_PATTERN)
     {
         EXPECT   /* Look for [pnf_ids] */
             CASE (PIGMENT_ID_TOKEN)
                 Warn_State(Token.Token_Id, PIGMENT_TOKEN);
-                Destroy_Pigment(Texture.FirstTexture()->Pigment);
-                Texture.FirstTexture()->Pigment = Copy_Pigment (reinterpret_cast<PIGMENT *>(Token.Data));
+                Destroy_Pigment(Texture.FirstLayer()->Pigment);
+                Texture.FirstLayer()->Pigment = Copy_Pigment (reinterpret_cast<PIGMENT *>(Token.Data));
                 Modified_Pnf = true;
             END_CASE
 
             CASE (TNORMAL_ID_TOKEN)
                 Warn_State(Token.Token_Id, TNORMAL_TOKEN);
-                Destroy_Tnormal(Texture.FirstTexture()->Tnormal);
-                Texture.FirstTexture()->Tnormal = Copy_Tnormal (reinterpret_cast<TNORMAL *>(Token.Data));
+                Destroy_Tnormal(Texture.FirstLayer()->Tnormal);
+                Texture.FirstLayer()->Tnormal = Copy_Tnormal (reinterpret_cast<TNORMAL *>(Token.Data));
                 Modified_Pnf = true;
             END_CASE
 
             CASE (FINISH_ID_TOKEN)
                 Warn_State(Token.Token_Id, FINISH_TOKEN);
-                if (Texture.FirstTexture()->Finish)
-                    delete Texture.FirstTexture()->Finish;
-                Texture.FirstTexture()->Finish = Copy_Finish (reinterpret_cast<FINISH *>(Token.Data));
+                if (Texture.FirstLayer()->Finish)
+                    delete Texture.FirstLayer()->Finish;
+                Texture.FirstLayer()->Finish = Copy_Finish (reinterpret_cast<FINISH *>(Token.Data));
                 Modified_Pnf = true;
             END_CASE
 
@@ -2737,20 +2737,20 @@ TextureData Parser::Parse_Texture ()
         EXPECT   /* Modify previous pnf */
             CASE (PIGMENT_TOKEN)
                 Parse_Begin ();
-                Parse_Pigment ( &(Texture.FirstTexture()->Pigment) );
+                Parse_Pigment ( &(Texture.FirstLayer()->Pigment) );
                 Parse_End ();
                 Modified_Pnf = true;
             END_CASE
 
             CASE (TNORMAL_TOKEN)
                 Parse_Begin ();
-                Parse_Tnormal ( &(Texture.FirstTexture()->Tnormal) );
+                Parse_Tnormal ( &(Texture.FirstLayer()->Tnormal) );
                 Parse_End ();
                 Modified_Pnf = true;
             END_CASE
 
             CASE (FINISH_TOKEN)
-                Parse_Finish ( &(Texture.FirstTexture()->Finish) );
+                Parse_Finish ( &(Texture.FirstLayer()->Finish) );
                 Modified_Pnf = true;
             END_CASE
 
@@ -2788,7 +2788,7 @@ TextureData Parser::Parse_Texture ()
             END_CASE
 
             CASE (NO_BUMP_SCALE_TOKEN)
-                Set_Flag(Texture.FirstTexture(), DONT_SCALE_BUMPS_FLAG);
+                Texture.PatternFlags() |= DONT_SCALE_BUMPS_FLAG;
             END_CASE
 
             OTHERWISE
@@ -2822,7 +2822,7 @@ TextureData Parser::Parse_Texture ()
             CASE (TILES_TOKEN)
                 Texture.Destroy();
                 Texture = Parse_Tiles();
-                if (Texture.FirstTexture()->Blend_Map->Blend_Map_Entries[1].Vals.IsEmpty())
+                if (Texture.BlendMap()->Blend_Map_Entries[1].Vals.IsEmpty())
                     Error("First texture missing from tiles");
                 Parse_Texture_Transform(Texture);
                 EXIT
@@ -2837,18 +2837,18 @@ TextureData Parser::Parse_Texture ()
 
             OTHERWISE
                 UNGET
-                Destroy_Pigment(Texture.FirstTexture()->Pigment);
-                Destroy_Tnormal(Texture.FirstTexture()->Tnormal);
-                if (Texture.FirstTexture()->Finish)
-                    delete Texture.FirstTexture()->Finish;
-                Texture.FirstTexture()->Pigment = NULL;
-                Texture.FirstTexture()->Tnormal = NULL;
-                Texture.FirstTexture()->Finish  = NULL;
-                Parse_Pattern<TextureBlendMap>(Texture.FirstTexture(),kBlendMapType_Texture);
+                Destroy_Pigment(Texture.FirstLayer()->Pigment);
+                Destroy_Tnormal(Texture.FirstLayer()->Tnormal);
+                if (Texture.FirstLayer()->Finish)
+                    delete Texture.FirstLayer()->Finish;
+                Texture.FirstLayer()->Pigment = NULL;
+                Texture.FirstLayer()->Tnormal = NULL;
+                Texture.FirstLayer()->Finish  = NULL;
+                Parse_Pattern<TextureBlendMap>(Texture.Raw(),kBlendMapType_Texture);
                 /* if following is true, parsed "texture{}" so restore
                     default texture.
                     */
-                if (Texture.FirstTexture()->Type <= PLAIN_PATTERN)
+                if (Texture.PatternType() <= PLAIN_PATTERN)
                 {
                     Texture.Destroy();
                     Texture.SetCopy(Default_Texture);
@@ -2890,20 +2890,20 @@ TextureData Parser::Parse_Tiles()
     Parse_Begin ();
 
     Texture.Create();
-    Destroy_Pigment(Texture.FirstTexture()->Pigment);
-    Destroy_Tnormal(Texture.FirstTexture()->Tnormal);
-    if (Texture.FirstTexture()->Finish)
-        delete Texture.FirstTexture()->Finish;
-    Texture.FirstTexture()->Pigment = NULL;
-    Texture.FirstTexture()->Tnormal = NULL;
-    Texture.FirstTexture()->Finish  = NULL;
-    Texture.FirstTexture()->Type = GENERIC_INTEGER_PATTERN;
-    Texture.FirstTexture()->pattern = PatternPtr(new CheckerPattern());
+    Destroy_Pigment(Texture.FirstLayer()->Pigment);
+    Destroy_Tnormal(Texture.FirstLayer()->Tnormal);
+    if (Texture.FirstLayer()->Finish)
+        delete Texture.FirstLayer()->Finish;
+    Texture.FirstLayer()->Pigment = NULL;
+    Texture.FirstLayer()->Tnormal = NULL;
+    Texture.FirstLayer()->Finish  = NULL;
+    Texture.PatternType() = GENERIC_INTEGER_PATTERN;
+    Texture.Pattern()->pattern = PatternPtr(new CheckerPattern());
 
-    Texture.FirstTexture()->Blend_Map = Create_Blend_Map<TextureBlendMap> (kBlendMapType_Texture);
-    Texture.FirstTexture()->Blend_Map->Blend_Map_Entries.resize(2);
-    Texture.FirstTexture()->Blend_Map->Blend_Map_Entries[0].value=0.0;
-    Texture.FirstTexture()->Blend_Map->Blend_Map_Entries[1].value=1.0;
+    Texture.BlendMap() = Create_Blend_Map<TextureBlendMap> (kBlendMapType_Texture);
+    Texture.BlendMap()->Blend_Map_Entries.resize(2);
+    Texture.BlendMap()->Blend_Map_Entries[0].value=0.0;
+    Texture.BlendMap()->Blend_Map_Entries[1].value=1.0;
 
     /* Note first tile is 1, 2nd tile is 0 to keep compatible with old tiles */
 
@@ -2911,7 +2911,7 @@ TextureData Parser::Parse_Tiles()
         CASE (TEXTURE_TOKEN)
             Parse_Begin ();
             Local_Texture = Parse_Texture ();
-            Link_Textures(&(Texture.FirstTexture()->Blend_Map->Blend_Map_Entries[1].Vals),Local_Texture);
+            Link_Textures(&(Texture.BlendMap()->Blend_Map_Entries[1].Vals),Local_Texture);
             Parse_End ();
         END_CASE
 
@@ -2927,7 +2927,7 @@ TextureData Parser::Parse_Tiles()
         CASE (TEXTURE_TOKEN)
             Parse_Begin ();
             Local_Texture = Parse_Texture ();
-            Link_Textures(&(Texture.FirstTexture()->Blend_Map->Blend_Map_Entries[0].Vals),Local_Texture);
+            Link_Textures(&(Texture.BlendMap()->Blend_Map_Entries[0].Vals),Local_Texture);
             Parse_End ();
         END_CASE
 
@@ -2972,44 +2972,44 @@ TextureData Parser::Parse_Material_Map()
     Parse_Begin ();
 
     Texture.Create();
-    Destroy_Pigment(Texture.FirstTexture()->Pigment);
-    Destroy_Tnormal(Texture.FirstTexture()->Tnormal);
-    if (Texture.FirstTexture()->Finish)
-        delete Texture.FirstTexture()->Finish;
-    Texture.FirstTexture()->Pigment = NULL;
-    Texture.FirstTexture()->Tnormal = NULL;
-    Texture.FirstTexture()->Finish  = NULL;
-    Texture.FirstTexture()->Type = BITMAP_PATTERN;
-    Texture.FirstTexture()->pattern = PatternPtr(new ImagePattern());
+    Destroy_Pigment(Texture.FirstLayer()->Pigment);
+    Destroy_Tnormal(Texture.FirstLayer()->Tnormal);
+    if (Texture.FirstLayer()->Finish)
+        delete Texture.FirstLayer()->Finish;
+    Texture.FirstLayer()->Pigment = NULL;
+    Texture.FirstLayer()->Tnormal = NULL;
+    Texture.FirstLayer()->Finish  = NULL;
+    Texture.PatternType() = BITMAP_PATTERN;
+    Texture.Pattern()->pattern = PatternPtr(new ImagePattern());
 
-    dynamic_cast<ImagePattern*>(Texture.FirstTexture()->pattern.get())->pImage = Parse_Image(MATERIAL_FILE);
-    dynamic_cast<ImagePattern*>(Texture.FirstTexture()->pattern.get())->pImage->Use = USE_NONE; // was false [trf]
+    dynamic_cast<ImagePattern*>(Texture.Pattern()->pattern.get())->pImage = Parse_Image(MATERIAL_FILE);
+    dynamic_cast<ImagePattern*>(Texture.Pattern()->pattern.get())->pImage->Use = USE_NONE; // was false [trf]
 
     EXPECT
         CASE (ONCE_TOKEN)
-            dynamic_cast<ImagePattern*>(Texture.FirstTexture()->pattern.get())->pImage->Once_Flag=true;
+            dynamic_cast<ImagePattern*>(Texture.Pattern()->pattern.get())->pImage->Once_Flag=true;
         END_CASE
 
         CASE (INTERPOLATE_TOKEN)
-            dynamic_cast<ImagePattern*>(Texture.FirstTexture()->pattern.get())->pImage->Interpolation_Type=(int)Parse_Float();
+            dynamic_cast<ImagePattern*>(Texture.Pattern()->pattern.get())->pImage->Interpolation_Type=(int)Parse_Float();
         END_CASE
 
         CASE (MAP_TYPE_TOKEN)
-            dynamic_cast<ImagePattern*>(Texture.FirstTexture()->pattern.get())->pImage->Map_Type = (int) Parse_Float ();
+            dynamic_cast<ImagePattern*>(Texture.Pattern()->pattern.get())->pImage->Map_Type = (int) Parse_Float ();
         END_CASE
 
         CASE (REPEAT_TOKEN)
             Parse_UV_Vect (Repeat);
             if ((Repeat[0]<=0.0) || (Repeat[1]<=0.0))
                 Error("Zero or Negative Image Repeat Vector.");
-            dynamic_cast<ImagePattern*>(Texture.FirstTexture()->pattern.get())->pImage->width  =  (DBL)dynamic_cast<ImagePattern*>(Texture.FirstTexture()->pattern.get())->pImage->iwidth  * Repeat[0];
-            dynamic_cast<ImagePattern*>(Texture.FirstTexture()->pattern.get())->pImage->height =  (DBL)dynamic_cast<ImagePattern*>(Texture.FirstTexture()->pattern.get())->pImage->iheight * Repeat[1];
+            dynamic_cast<ImagePattern*>(Texture.Pattern()->pattern.get())->pImage->width  =  (DBL)dynamic_cast<ImagePattern*>(Texture.Pattern()->pattern.get())->pImage->iwidth  * Repeat[0];
+            dynamic_cast<ImagePattern*>(Texture.Pattern()->pattern.get())->pImage->height =  (DBL)dynamic_cast<ImagePattern*>(Texture.Pattern()->pattern.get())->pImage->iheight * Repeat[1];
         END_CASE
 
         CASE (OFFSET_TOKEN)
-            Parse_UV_Vect (dynamic_cast<ImagePattern*>(Texture.FirstTexture()->pattern.get())->pImage->Offset);
-            dynamic_cast<ImagePattern*>(Texture.FirstTexture()->pattern.get())->pImage->Offset[U] *= (DBL)-dynamic_cast<ImagePattern*>(Texture.FirstTexture()->pattern.get())->pImage->iwidth;
-            dynamic_cast<ImagePattern*>(Texture.FirstTexture()->pattern.get())->pImage->Offset[V] *= (DBL)-dynamic_cast<ImagePattern*>(Texture.FirstTexture()->pattern.get())->pImage->iheight;
+            Parse_UV_Vect (dynamic_cast<ImagePattern*>(Texture.Pattern()->pattern.get())->pImage->Offset);
+            dynamic_cast<ImagePattern*>(Texture.Pattern()->pattern.get())->pImage->Offset[U] *= (DBL)-dynamic_cast<ImagePattern*>(Texture.Pattern()->pattern.get())->pImage->iwidth;
+            dynamic_cast<ImagePattern*>(Texture.Pattern()->pattern.get())->pImage->Offset[V] *= (DBL)-dynamic_cast<ImagePattern*>(Texture.Pattern()->pattern.get())->pImage->iheight;
         END_CASE
 
         OTHERWISE
@@ -3020,13 +3020,13 @@ TextureData Parser::Parse_Material_Map()
 
     GET (TEXTURE_TOKEN)                /* First material */
     Parse_Begin();
-    Texture.FirstTexture()->Materials.push_back(Parse_Texture ());
+    Texture.Materials().push_back(Parse_Texture ());
     Parse_End();
 
     EXPECT                             /* Subsequent materials */
         CASE (TEXTURE_TOKEN)
             Parse_Begin();
-            Texture.FirstTexture()->Materials.push_back(Parse_Texture ());
+            Texture.Materials().push_back(Parse_Texture ());
             Parse_End();
         END_CASE
 
@@ -3078,7 +3078,7 @@ TextureData Parser::Parse_Vers1_Texture ()
     EXPECT                      /* Look for texture_body */
         CASE (TILES_TOKEN)
             Texture = Parse_Tiles();
-            if (Texture.FirstTexture()->Blend_Map->Blend_Map_Entries[1].Vals.IsEmpty())
+            if (Texture.BlendMap()->Blend_Map_Entries[1].Vals.IsEmpty())
                 Error("First texture missing from tiles");
             EXIT
         END_CASE
@@ -3101,23 +3101,23 @@ TextureData Parser::Parse_Vers1_Texture ()
     END_EXPECT
 
     /* Look for [pnf_texture] */
-    if (Texture.FirstTexture()->Type == PLAIN_PATTERN)
+    if (Texture.PatternType() == PLAIN_PATTERN)
         {
             EXPECT   /* Look for [pnf_ids] */
                 CASE (PIGMENT_ID_TOKEN)
-                    Destroy_Pigment(Texture.FirstTexture()->Pigment);
-                    Texture.FirstTexture()->Pigment = Copy_Pigment (reinterpret_cast<PIGMENT *>(Token.Data));
+                    Destroy_Pigment(Texture.FirstLayer()->Pigment);
+                    Texture.FirstLayer()->Pigment = Copy_Pigment (reinterpret_cast<PIGMENT *>(Token.Data));
                 END_CASE
 
                 CASE (TNORMAL_ID_TOKEN)
-                    Destroy_Tnormal(Texture.FirstTexture()->Tnormal);
-                    Texture.FirstTexture()->Tnormal = Copy_Tnormal (reinterpret_cast<TNORMAL *>(Token.Data));
+                    Destroy_Tnormal(Texture.FirstLayer()->Tnormal);
+                    Texture.FirstLayer()->Tnormal = Copy_Tnormal (reinterpret_cast<TNORMAL *>(Token.Data));
                 END_CASE
 
                 CASE (FINISH_ID_TOKEN)
-                    if (Texture.FirstTexture()->Finish)
-                        delete Texture.FirstTexture()->Finish;
-                    Texture.FirstTexture()->Finish = Copy_Finish (reinterpret_cast<FINISH *>(Token.Data));
+                    if (Texture.FirstLayer()->Finish)
+                        delete Texture.FirstLayer()->Finish;
+                    Texture.FirstLayer()->Finish = Copy_Finish (reinterpret_cast<FINISH *>(Token.Data));
                 END_CASE
 
                 OTHERWISE
@@ -3126,25 +3126,25 @@ TextureData Parser::Parse_Vers1_Texture ()
                 END_CASE
             END_EXPECT
 
-            Pigment = Texture.FirstTexture()->Pigment;
-            Tnormal = Texture.FirstTexture()->Tnormal;
-            Finish  = Texture.FirstTexture()->Finish;
+            Pigment = Texture.FirstLayer()->Pigment;
+            Tnormal = Texture.FirstLayer()->Tnormal;
+            Finish  = Texture.FirstLayer()->Finish;
 
             EXPECT
                 CASE (PIGMENT_TOKEN)
                     Parse_Begin ();
-                    Parse_Pigment ( &(Texture.FirstTexture()->Pigment) );
+                    Parse_Pigment ( &(Texture.FirstLayer()->Pigment) );
                     Parse_End ();
                 END_CASE
 
                 CASE (TNORMAL_TOKEN)
                     Parse_Begin ();
-                    Parse_Tnormal ( &(Texture.FirstTexture()->Tnormal) );
+                    Parse_Tnormal ( &(Texture.FirstLayer()->Tnormal) );
                     Parse_End ();
                 END_CASE
 
                 CASE (FINISH_TOKEN)
-                    Parse_Finish ( &(Texture.FirstTexture()->Finish) );
+                    Parse_Finish ( &(Texture.FirstLayer()->Finish) );
                 END_CASE
 
 /***********************************************************************
@@ -3481,9 +3481,9 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
                     Warning("Texture identifier overwriting previous values.");
                     Texture.Destroy();
                     Texture.SetCopy(*reinterpret_cast<TextureData*>(Token.Data));
-                    Pigment = Texture.FirstTexture()->Pigment;
-                    Tnormal = Texture.FirstTexture()->Tnormal;
-                    Finish  = Texture.FirstTexture()->Finish;
+                    Pigment = Texture.FirstLayer()->Pigment;
+                    Tnormal = Texture.FirstLayer()->Tnormal;
+                    Finish  = Texture.FirstLayer()->Finish;
                 END_CASE
 
                 OTHERWISE
@@ -3495,7 +3495,7 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
 
             END_EXPECT
 
-            if (Not_In_Default && (Texture.FirstTexture()->Pigment->Type == NO_PATTERN) &&
+            if (Not_In_Default && (Texture.FirstLayer()->Pigment->Type == NO_PATTERN) &&
                 (sceneData->EffectiveLanguageVersion() >= 150))
                 Parse_Error(PIGMENT_ID_TOKEN);
 
@@ -3564,7 +3564,7 @@ void Parser::Parse_Texture_Transform (TextureData& Texture)
         END_CASE
 
         CASE (NO_BUMP_SCALE_TOKEN)
-            Set_Flag(Texture.FirstTexture(), DONT_SCALE_BUMPS_FLAG);
+            Texture.PatternFlags() |= DONT_SCALE_BUMPS_FLAG;
         END_CASE
 
         OTHERWISE
@@ -5640,7 +5640,7 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
         END_CASE
 
         CASE (NO_BUMP_SCALE_TOKEN)
-            Set_Flag(New, DONT_SCALE_BUMPS_FLAG);
+            New->Flags |= DONT_SCALE_BUMPS_FLAG;
         END_CASE
 
         CASE (REPEAT_TOKEN)

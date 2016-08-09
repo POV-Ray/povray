@@ -2784,7 +2784,7 @@ void Parser::Parse_BlendMapData<PigmentBlendMapData> (BlendMapTypeId Blend_Type,
     switch (Blend_Type)
     {
         case kBlendMapType_Pigment:
-            rData=Copy_Pigment(Default_Texture.FirstTexture()->Pigment);
+            rData=Copy_Pigment(Default_Texture.FirstLayer()->Pigment);
             Parse_Pigment(&(rData));
             break;
 
@@ -2810,7 +2810,7 @@ template<>
 void Parser::Parse_BlendMapData<NormalBlendMapData> (BlendMapTypeId Blend_Type, NormalBlendMapData& rData)
 {
     POV_BLEND_MAP_ASSERT(Blend_Type == kBlendMapType_Normal);
-    rData=Copy_Tnormal(Default_Texture.FirstTexture()->Tnormal);
+    rData=Copy_Tnormal(Default_Texture.FirstLayer()->Tnormal);
     Parse_Tnormal(&(rData));
 }
 
@@ -2998,7 +2998,7 @@ void Parser::Parse_BlendListData<PigmentBlendMapData> (BlendMapTypeId Blend_Type
     switch (Blend_Type)
     {
         case kBlendMapType_Pigment:
-            rData=Copy_Pigment(Default_Texture.FirstTexture()->Pigment);
+            rData=Copy_Pigment(Default_Texture.FirstLayer()->Pigment);
             Parse_Pigment(&(rData));
             break;
 
@@ -3024,7 +3024,7 @@ template<>
 void Parser::Parse_BlendListData<NormalBlendMapData> (BlendMapTypeId Blend_Type, NormalBlendMapData& rData)
 {
     POV_BLEND_MAP_ASSERT(Blend_Type == kBlendMapType_Normal);
-    rData=Copy_Tnormal(Default_Texture.FirstTexture()->Tnormal);
+    rData=Copy_Tnormal(Default_Texture.FirstLayer()->Tnormal);
     Parse_Tnormal(&(rData));
 }
 
@@ -3049,7 +3049,7 @@ void Parser::Parse_BlendListData_Default<PigmentBlendMapData> (const ColourBlend
     switch (Blend_Type)
     {
         case kBlendMapType_Pigment:
-            rData=Copy_Pigment(Default_Texture.FirstTexture()->Pigment);
+            rData=Copy_Pigment(Default_Texture.FirstLayer()->Pigment);
             break;
 
         case kBlendMapType_Density:
@@ -3073,7 +3073,7 @@ template<>
 void Parser::Parse_BlendListData_Default<NormalBlendMapData> (const ColourBlendMapData& rDefData, BlendMapTypeId Blend_Type, NormalBlendMapData& rData)
 {
     POV_BLEND_MAP_ASSERT(Blend_Type == kBlendMapType_Normal);
-    rData=Copy_Tnormal(Default_Texture.FirstTexture()->Tnormal);
+    rData=Copy_Tnormal(Default_Texture.FirstLayer()->Tnormal);
 }
 
 template<>

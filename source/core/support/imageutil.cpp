@@ -198,11 +198,11 @@ TextureData material_map(const Vector3d& EPoint, const TextureData& Texture)
      * texture index.
      */
 
-    if(map_pos(EPoint, Texture.FirstTexture()->pattern.get(), &xcoor, &ycoor))
+    if(map_pos(EPoint, Texture.Pattern()->pattern.get(), &xcoor, &ycoor))
         Material_Number = 0;
     else
     {
-        image_colour_at(dynamic_cast<ImagePattern*>(Texture.FirstTexture()->pattern.get())->pImage, xcoor, ycoor, colour, &reg_number); // TODO ALPHA - we should decide whether we prefer premultiplied or non-premultiplied alpha
+        image_colour_at(dynamic_cast<ImagePattern*>(Texture.Pattern()->pattern.get())->pImage, xcoor, ycoor, colour, &reg_number); // TODO ALPHA - we should decide whether we prefer premultiplied or non-premultiplied alpha
 
         if(reg_number == -1)
             Material_Number = (int)(colour.red() * 255.0);
@@ -210,10 +210,10 @@ TextureData material_map(const Vector3d& EPoint, const TextureData& Texture)
             Material_Number = reg_number;
     }
 
-    if(Material_Number > Texture.FirstTexture()->Materials.size())
-        Material_Number %= Texture.FirstTexture()->Materials.size();
+    if(Material_Number > Texture.Materials().size())
+        Material_Number %= Texture.Materials().size();
 
-    return Texture.FirstTexture()->Materials[Material_Number % Texture.FirstTexture()->Materials.size()];
+    return Texture.Materials()[Material_Number % Texture.Materials().size()];
 }
 
 

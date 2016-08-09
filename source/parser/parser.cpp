@@ -173,9 +173,9 @@ void Parser::Run()
         Brace_Index = 0;
 
         Default_Texture.Create();
-        Default_Texture.FirstTexture()->Pigment = Create_Pigment();
-        Default_Texture.FirstTexture()->Tnormal = NULL;
-        Default_Texture.FirstTexture()->Finish  = Create_Finish();
+        Default_Texture.FirstLayer()->Pigment = Create_Pigment();
+        Default_Texture.FirstLayer()->Tnormal = NULL;
+        Default_Texture.FirstLayer()->Finish  = Create_Finish();
 
         Not_In_Default = true;
         Ok_To_Declare = true;
@@ -1064,7 +1064,7 @@ void Parser::Parse_Blob_Element_Mods(Blob_Element *Element)
             }
             else
             {
-                if (Element->Texture.FirstTexture()->Type != PLAIN_PATTERN)
+                if (Element->Texture.PatternType() != PLAIN_PATTERN)
                 {
                     Link_Textures(&Element->Texture, Default_Texture.GetCopy());
                 }
@@ -1073,18 +1073,18 @@ void Parser::Parse_Blob_Element_Mods(Blob_Element *Element)
             EXPECT
                 CASE (PIGMENT_TOKEN)
                     Parse_Begin ();
-                    Parse_Pigment(&Element->Texture.FirstTexture()->Pigment);
+                    Parse_Pigment(&Element->Texture.FirstLayer()->Pigment);
                     Parse_End ();
                 END_CASE
 
                 CASE (TNORMAL_TOKEN)
                     Parse_Begin ();
-                    Parse_Tnormal(&Element->Texture.FirstTexture()->Tnormal);
+                    Parse_Tnormal(&Element->Texture.FirstLayer()->Tnormal);
                     Parse_End ();
                 END_CASE
 
                 CASE (FINISH_TOKEN)
-                    Parse_Finish(&Element->Texture.FirstTexture()->Finish);
+                    Parse_Finish(&Element->Texture.FirstLayer()->Finish);
                 END_CASE
 
                 OTHERWISE
@@ -2163,7 +2163,7 @@ bool Parser::Parse_Camera_Mods(Camera& New)
 
             EXPECT
                 CASE (PIGMENT_TOKEN)
-                    Local_Pigment = Copy_Pigment(Default_Texture.FirstTexture()->Pigment);
+                    Local_Pigment = Copy_Pigment(Default_Texture.FirstLayer()->Pigment);
                     Parse_Begin();
                     Parse_Pigment(&Local_Pigment);
                     Parse_End();
@@ -6712,7 +6712,7 @@ void Parser::Parse_Default ()
             Parse_Begin ();
             Default_Texture = Parse_Texture();
             Parse_End ();
-            if (Default_Texture.FirstTexture()->Type != PLAIN_PATTERN)
+            if (Default_Texture.PatternType() != PLAIN_PATTERN)
                 Error("Default texture cannot be material map or tiles.");
             if (Default_Texture.IsLayered())
                 Error("Default texture cannot be layered.");
@@ -6720,29 +6720,29 @@ void Parser::Parse_Default ()
         END_CASE
 
         CASE (PIGMENT_TOKEN)
-            Local_Pigment = Copy_Pigment((Default_Texture.FirstTexture()->Pigment));
+            Local_Pigment = Copy_Pigment((Default_Texture.FirstLayer()->Pigment));
             Parse_Begin ();
             Parse_Pigment (&Local_Pigment);
             Parse_End ();
-            Destroy_Pigment(Default_Texture.FirstTexture()->Pigment);
-            Default_Texture.FirstTexture()->Pigment = Local_Pigment;
+            Destroy_Pigment(Default_Texture.FirstLayer()->Pigment);
+            Default_Texture.FirstLayer()->Pigment = Local_Pigment;
         END_CASE
 
         CASE (TNORMAL_TOKEN)
-            Local_Tnormal = Copy_Tnormal((Default_Texture.FirstTexture()->Tnormal));
+            Local_Tnormal = Copy_Tnormal((Default_Texture.FirstLayer()->Tnormal));
             Parse_Begin ();
             Parse_Tnormal (&Local_Tnormal);
             Parse_End ();
-            Destroy_Tnormal(Default_Texture.FirstTexture()->Tnormal);
-            Default_Texture.FirstTexture()->Tnormal = Local_Tnormal;
+            Destroy_Tnormal(Default_Texture.FirstLayer()->Tnormal);
+            Default_Texture.FirstLayer()->Tnormal = Local_Tnormal;
         END_CASE
 
         CASE (FINISH_TOKEN)
-            Local_Finish = Copy_Finish((Default_Texture.FirstTexture()->Finish));
+            Local_Finish = Copy_Finish((Default_Texture.FirstLayer()->Finish));
             Parse_Finish (&Local_Finish);
-            if (Default_Texture.FirstTexture()->Finish)
-                delete Default_Texture.FirstTexture()->Finish;
-            Default_Texture.FirstTexture()->Finish = Local_Finish;
+            if (Default_Texture.FirstLayer()->Finish)
+                delete Default_Texture.FirstLayer()->Finish;
+            Default_Texture.FirstLayer()->Finish = Local_Finish;
         END_CASE
 
         CASE (RADIOSITY_TOKEN)
@@ -7598,9 +7598,9 @@ ObjectPtr Parser::Parse_Object_Mods (ObjectPtr Object)
             {
                 if (!Object->Texture.IsEmpty())
                 {
-                    if (Object->Texture.FirstTexture()->Type == PLAIN_PATTERN)
+                    if (Object->Texture.PatternType() == PLAIN_PATTERN)
                     {
-                        Object->Texture.FirstTexture()->Pigment->Quick_Colour = Local_Colour;
+                        Object->Texture.FirstLayer()->Pigment->Quick_Colour = Local_Colour;
                         END_CASE
                     }
                 }
@@ -7733,24 +7733,24 @@ ObjectPtr Parser::Parse_Object_Mods (ObjectPtr Object)
             if (Object->Texture.IsEmpty())
                 Object->Texture.SetCopy(Default_Texture);
             else
-                if (Object->Texture.FirstTexture()->Type != PLAIN_PATTERN)
+                if (Object->Texture.PatternType() != PLAIN_PATTERN)
                     Link_Textures(&(Object->Texture), Default_Texture.GetCopy());
             UNGET
             EXPECT
                 CASE (PIGMENT_TOKEN)
                     Parse_Begin ();
-                    Parse_Pigment ( &(Object->Texture.FirstTexture()->Pigment) );
+                    Parse_Pigment ( &(Object->Texture.FirstLayer()->Pigment) );
                     Parse_End ();
                 END_CASE
 
                 CASE (TNORMAL_TOKEN)
                     Parse_Begin ();
-                    Parse_Tnormal ( &(Object->Texture.FirstTexture()->Tnormal) );
+                    Parse_Tnormal ( &(Object->Texture.FirstLayer()->Tnormal) );
                     Parse_End ();
                 END_CASE
 
                 CASE (FINISH_TOKEN)
-                    Parse_Finish ( &(Object->Texture.FirstTexture()->Finish) );
+                    Parse_Finish ( &(Object->Texture.FirstLayer()->Finish) );
                 END_CASE
 
                 OTHERWISE
@@ -9042,7 +9042,7 @@ bool Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENT
         END_CASE
 
         CASE (PIGMENT_TOKEN)
-            Local_Pigment = Copy_Pigment(Default_Texture.FirstTexture()->Pigment);
+            Local_Pigment = Copy_Pigment(Default_Texture.FirstLayer()->Pigment);
             Parse_Begin ();
             Parse_Pigment (&Local_Pigment);
             Parse_End ();
@@ -9053,7 +9053,7 @@ bool Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENT
         END_CASE
 
         CASE (TNORMAL_TOKEN)
-            Local_Tnormal = Copy_Tnormal(Default_Texture.FirstTexture()->Tnormal);
+            Local_Tnormal = Copy_Tnormal(Default_Texture.FirstLayer()->Tnormal);
             Parse_Begin ();
             Parse_Tnormal (&Local_Tnormal);
             Parse_End ();
@@ -9064,7 +9064,7 @@ bool Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENT
         END_CASE
 
         CASE (FINISH_TOKEN)
-            Local_Finish = Copy_Finish(Default_Texture.FirstTexture()->Finish);
+            Local_Finish = Copy_Finish(Default_Texture.FirstLayer()->Finish);
             Parse_Finish (&Local_Finish);
             *NumberPtr = FINISH_ID_TOKEN;
             Test_Redefine(Previous,NumberPtr,*DataPtr, allow_redefine);
@@ -9473,12 +9473,12 @@ void Parser::Link_Textures (TextureData* Old_Textures, TextureData New_Textures)
 
     if (!Old_Textures->IsEmpty())
     {
-        if (Old_Textures->FirstTexture()->Type != PLAIN_PATTERN)
+        if (Old_Textures->PatternType() != PLAIN_PATTERN)
         {
             Error("Cannot layer over a patterned texture.");
         }
 
-        if (New_Textures.FirstTexture()->Type != PLAIN_PATTERN)
+        if (New_Textures.PatternType() != PLAIN_PATTERN)
         {
             Error("Cannot layer a patterned texture over another.");
         }
@@ -9917,9 +9917,9 @@ void Parser::Post_Process (ObjectPtr Object, ObjectPtr Parent)
 
         if (!Object->Texture.IsEmpty())
         {
-            if (Object->Texture.FirstTexture()->Type == PLAIN_PATTERN)
+            if (Object->Texture.PatternType() == PLAIN_PATTERN)
             {
-                if ((Finish = Object->Texture.FirstTexture()->Finish) != NULL)
+                if ((Finish = Object->Texture.FirstLayer()->Finish) != NULL)
                 {
                     if (Finish->Temp_IOR >= 0.0)
                     {

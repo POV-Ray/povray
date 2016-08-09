@@ -317,7 +317,7 @@ class PhotonTrace : public Trace
 
         virtual DBL TraceRay(Ray& ray, MathColour& colour, ColourChannel&, COLC weight, bool continuedRay, DBL maxDepth = 0.0);
     protected:
-        virtual void ComputeLightedTexture(MathColour& LightCol, ColourChannel&, const TextureData& Texture, vector<const TPATTERN*>& warps, const Vector3d& ipoint, const Vector3d& rawnormal, Ray& ray, COLC weight, Intersection& isect);
+        virtual void ComputeLightedTexture(MathColour& LightCol, ColourChannel&, const TextureLayerList& Texture, vector<const TPATTERN*>& warps, const Vector3d& ipoint, const Vector3d& rawnormal, Ray& ray, COLC weight, Intersection& isect);
         bool ComputeRefractionForPhotons(const FINISH* finish, Interior *interior, const Vector3d& ipoint, Ray& ray, const Vector3d& normal, const Vector3d& rawnormal, MathColour& colour, COLC weight);
         bool TraceRefractionRayForPhotons(const FINISH* finish, const Vector3d& ipoint, Ray& ray, Ray& nray, DBL ior, DBL n, const Vector3d& normal, const Vector3d& rawnormal, const Vector3d& localnormal, MathColour& colour, COLC weight);
     private:

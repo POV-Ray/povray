@@ -52,6 +52,8 @@ typedef struct Fog_Struct FOG;
 class PhotonGatherer;
 class SceneData;
 class Task;
+struct TextureLayer;
+typedef vector<TextureLayer*> TextureLayerList;
 class ViewData;
 
 struct NoSomethingFlagRayObjectCondition : public RayObjectCondition
@@ -428,7 +430,7 @@ class Trace
         /// @param[in]      weight          Importance of this computation.
         /// @param[in]      isect           Intersection information.
         ///
-        virtual void ComputeLightedTexture(MathColour& resultColour, ColourChannel& resultTransm, const TextureData& texture, vector<const TPATTERN *>& warps,
+        virtual void ComputeLightedTexture(MathColour& resultColour, ColourChannel& resultTransm, const TextureLayerList& texture, vector<const TPATTERN *>& warps,
                                            const Vector3d& ipoint, const Vector3d& rawnormal, Ray& ray, COLC weight,
                                            Intersection& isect);
 
@@ -449,7 +451,7 @@ class Trace
         /// @param[in,out]  ray             Ray and associated information.
         /// @param[in]      isect           Intersection information.
         ///
-        void ComputeShadowTexture(MathColour& filtercolour, const TextureData& texture, vector<const TPATTERN *>& warps,
+        void ComputeShadowTexture(MathColour& filtercolour, const TextureLayerList& texture, vector<const TPATTERN *>& warps,
                                   const Vector3d& ipoint, const Vector3d& rawnormal, const Ray& ray,
                                   Intersection& isect);
 
