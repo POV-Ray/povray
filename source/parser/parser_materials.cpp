@@ -2150,7 +2150,6 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
                (dynamic_cast<CracklePattern*>(New->pattern.get())->repeat.y() < 0) ||
                (dynamic_cast<CracklePattern*>(New->pattern.get())->repeat.z() < 0))
                 Error("Repeat vector must be non-negative.");
-            EXIT
         END_CASE
 
         OTHERWISE
@@ -5652,7 +5651,6 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
                (dynamic_cast<CracklePattern*>(New->pattern.get())->repeat.y() < 0) ||
                (dynamic_cast<CracklePattern*>(New->pattern.get())->repeat.z() < 0))
                 Error("Repeat vector must be non-negative.");
-            EXIT
         END_CASE
 
         OTHERWISE
