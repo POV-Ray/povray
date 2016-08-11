@@ -78,7 +78,21 @@ class Sphere : public ObjectBase
         virtual bool Intersect_BBox(BBoxDirection, const BBoxVector3d&, const BBoxVector3d&, BBoxScalar) const;
 
         static bool Intersect(const BasicRay& ray, const Vector3d& Center, DBL Radius2, DBL *Depth1, DBL  *Depth2);
+
     private:
+
+        /// Ellipsoid mode flag.
+        ///
+        /// A value of `false` indicates that the primitive is in _spherical_ mode, while a value of `true` indicates
+        /// _ellipsoidal_ mode.
+        ///
+        /// **Spherical mode** uses the @ref Center and @ref Radius members to track all transformations to the
+        /// primitive, while the @ref Trans member only tracks rotations and is used exclusively for UV mapping.
+        /// If a transformation cannot be tracked in this manner, the primitive is switched to _ellipsoidal mode_.
+        ///
+        /// **Ellipsoidal mode** uses the @ref Trans member to track center, radius and all transformations, while the
+        /// @ref Center is pegged to the coordinate origin and the @radius to unity.
+        ///
         bool Do_Ellipsoid;
 };
 
