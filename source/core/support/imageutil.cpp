@@ -193,11 +193,6 @@ TextureData material_map(const Vector3d& EPoint, const TextureData& Texture)
     DBL xcoor = 0.0, ycoor = 0.0;
     RGBFTColour colour;
 
-    /*
-     * Now we have transformed x, y, z we use image mapping routine to determine
-     * texture index.
-     */
-
     if(map_pos(EPoint, Texture.Pattern()->pattern.get(), &xcoor, &ycoor))
         Material_Number = 0;
     else
@@ -208,12 +203,11 @@ TextureData material_map(const Vector3d& EPoint, const TextureData& Texture)
             Material_Number = (int)(colour.red() * 255.0);
         else
             Material_Number = reg_number;
+
+        Material_Number = wrapInt((size_t)Material_Number, Texture.BlendMap()->Blend_Map_Entries.size());
     }
 
-    if(Material_Number > Texture.Materials().size())
-        Material_Number %= Texture.Materials().size();
-
-    return Texture.Materials()[Material_Number % Texture.Materials().size()];
+    return Texture.BlendMap()->Blend_Map_Entries[Material_Number].Vals;
 }
 
 

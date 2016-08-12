@@ -95,23 +95,41 @@ typedef shared_ptr<const TextureBlendMap>           TextureBlendMapConstPtr;
 
 struct Texture_Struct;
 
-struct Finish_Struct
+struct FinishData : public CowBase<FinishData>
 {
+    struct TempData
+    {
+        SNGL caustics, ior, dispersion, refract;
+
+        TempData();
+        TempData(const TempData& o);
+    };
+    typedef OptionalDataPtr<TempData> TempDataPtr;
+
+    TempDataPtr tempData;
+
+    MathColour Ambient, Emission;
+    MathColour Reflection_Max, Reflection_Min;
+    MathColour SubsurfaceTranslucency, SubsurfaceAnisotropy;
+    //MathColour SigmaPrimeS, SigmaA;
     SNGL Diffuse, DiffuseBack, Brilliance, BrillianceOut, BrillianceAdjust, BrillianceAdjustRad;
     SNGL Specular, Roughness;
     SNGL Phong, Phong_Size;
+    SNGL Reflect_Exp;
+    SNGL Reflect_Metallic;
+    SNGL Reflection_Falloff;
     SNGL Irid, Irid_Film_Thickness, Irid_Turb;
-    SNGL Temp_Caustics, Temp_IOR, Temp_Dispersion, Temp_Refract, Reflect_Exp;
-    SNGL Crand, Metallic;
-    MathColour Ambient, Emission, Reflection_Max, Reflection_Min;
-    MathColour SubsurfaceTranslucency, SubsurfaceAnisotropy;
-    //MathColour SigmaPrimeS, SigmaA;
-    SNGL Reflection_Falloff;  // Added by MBP 8/27/98
-    bool Reflection_Fresnel;
-    bool Fresnel;
-    SNGL Reflect_Metallic; // MBP
-    int Conserve_Energy;  // added by NK Dec 19 1999
-    bool UseSubsurface;   // whether to use subsurface light transport
+    SNGL Crand;
+    SNGL Metallic;
+    bool Reflection_Fresnel : 1;
+    bool Fresnel            : 1;
+    bool Conserve_Energy    : 1;    // added by NK Dec 19 1999
+    bool UseSubsurface      : 1;    // whether to use subsurface light transport
+
+    FinishData();
+    FinishData(const FinishData& o);
+    virtual ~FinishData();
+    virtual FinishData* Clone() const { return new FinishData(*this); }
 };
 
 
@@ -152,12 +170,10 @@ DBL Triangle_Wave (DBL value);
 void Transform_Textures (TEXTURE *Textures, const TRANSFORM *Trans);
 void Destroy_Textures (TEXTURE *Textures);
 void Post_Textures (TEXTURE *Textures);
-FINISH *Create_Finish (void);
-FINISH *Copy_Finish (const FINISH *Old);
 TEXTURE *Copy_Texture_Pointer (TEXTURE *Texture);
 TEXTURE *Copy_Textures (TEXTURE *Textures);
 TEXTURE *Create_Texture (void);
-int Test_Opacity (const TEXTURE *Texture);
+bool Test_Opacity (const TEXTURE *Texture);
 
 struct TextureLayer;
 typedef vector<TextureLayer*> TextureLayerList;
@@ -198,13 +214,10 @@ public:
     inline TPATTERN* Pattern();
 
     inline const TextureBlendMapPtr& BlendMap() const;
-    inline TextureBlendMapPtr BlendMap();
+    inline TextureBlendMapPtr& BlendMap();
 
     inline const TextureLayerList& Layers() const;
     inline TextureLayerList& Layers();
-
-    inline const vector<TextureData>& Materials() const;
-    inline vector<TextureData>& Materials();
 
     inline const TEXTURE* Raw() const { return mTexture; }
     inline TEXTURE* Raw() { return mTexture; }
@@ -237,15 +250,14 @@ struct TextureLayer
     TextureLayer() : Pigment(NULL), Tnormal(NULL), Finish(NULL) {}
     PIGMENT *Pigment;
     TNORMAL *Tnormal;
-    FINISH *Finish;
+    FinishPtr Finish;
 };
 
 struct Texture_Struct : public Pattern_Struct
 {
     TextureBlendMapPtr Blend_Map;
-    int References;
     TextureLayerList layers;
-    vector<TextureData> Materials; // used for BITMAP_PATTERN (and only there)
+    int References;
 };
 
 inline bool TextureData::IsLayered() const
@@ -266,13 +278,10 @@ inline const TPATTERN* TextureData::Pattern() const { return mTexture; }
 inline TPATTERN* TextureData::Pattern() { return mTexture; }
 
 inline const TextureBlendMapPtr& TextureData::BlendMap() const { return mTexture->Blend_Map; }
-inline TextureBlendMapPtr TextureData::BlendMap() { return mTexture->Blend_Map; }
+inline TextureBlendMapPtr& TextureData::BlendMap() { return mTexture->Blend_Map; }
 
 inline const TextureLayerList& TextureData::Layers() const { return mTexture->layers; }
 inline TextureLayerList& TextureData::Layers() { return mTexture->layers; }
-
-inline const vector<TextureData>& TextureData::Materials() const { return mTexture->Materials; }
-inline vector<TextureData>& TextureData::Materials() { return mTexture->Materials; }
 
 }
 

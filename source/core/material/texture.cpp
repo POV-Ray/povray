@@ -1143,54 +1143,30 @@ void Transform_Textures(TEXTURE *Textures, const TRANSFORM *Trans)
 *
 ******************************************************************************/
 
-FINISH *Create_Finish()
-{
-    FINISH *New;
+FinishData::TempData::TempData() :
+    caustics(-1.0), ior(-1.0), dispersion(1.0), refract(1.0)
+{}
 
-    New = new FINISH;
-
-    New->Ambient.Set(0.1);
-    New->Emission.Clear();
-    New->Reflection_Max.Clear();
-    New->Reflection_Min.Clear();
-
-    New->Reflection_Fresnel     = false;
-    New->Reflection_Falloff     = 1;    /* Added by MBP 8/27/98 */
-    New->Diffuse                = 0.6;
-    New->DiffuseBack            = 0.0;
-    New->Brilliance             = 1.0;
-    New->BrillianceOut          = 1.0;
-    New->BrillianceAdjust       = 1.0;
-    New->BrillianceAdjustRad    = 1.0;
-    New->Phong                  = 0.0;
-    New->Phong_Size             = 40.0;
-    New->Specular               = 0.0;
-    New->Roughness              = 1.0 / 0.05;
-
-    New->Crand = 0.0;
-
-    New->Metallic = 0.0;
-    New->Fresnel  = false;
-
-    New->Irid                = 0.0;
-    New->Irid_Film_Thickness = 0.0;
-    New->Irid_Turb           = 0.0;
-    New->Temp_Caustics = -1.0;
-    New->Temp_IOR     = -1.0;
-    New->Temp_Dispersion  = 1.0;
-    New->Temp_Refract =  1.0;
-    New->Reflect_Exp  =  1.0;
-    New->Reflect_Metallic = 0.0;
-    /* Added Dec 19 1999 by NK */
-    New->Conserve_Energy = false;
-
-    New->UseSubsurface = false;
-    New->SubsurfaceTranslucency.Clear();
-    New->SubsurfaceAnisotropy.Clear();
-
-    return(New);
-}
-
+FinishData::FinishData() :
+    tempData(),
+    Ambient(0.1), Emission(0.0),
+    Reflection_Max(0.0), Reflection_Min(0.0),
+    SubsurfaceTranslucency(0.0), SubsurfaceAnisotropy(0.0),
+    Diffuse(0.6), DiffuseBack(0.0),
+    Brilliance(1.0), BrillianceOut(1.0), BrillianceAdjust(1.0), BrillianceAdjustRad(1.0),
+    Specular(0.0), Roughness(1.0/0.05),
+    Phong(0.0), Phong_Size(40.0),
+    Reflect_Exp(1.0),
+    Reflect_Metallic(0.0),
+    Reflection_Falloff(1),
+    Irid(0.0), Irid_Film_Thickness(0.0), Irid_Turb(0.0),
+    Crand(0.0),
+    Metallic(0.0),
+    Reflection_Fresnel(false),
+    Fresnel(false),
+    Conserve_Energy(false),
+    UseSubsurface(false)
+{}
 
 
 /*****************************************************************************
@@ -1213,20 +1189,38 @@ FINISH *Create_Finish()
 *
 ******************************************************************************/
 
-FINISH *Copy_Finish(const FINISH *Old)
-{
-    FINISH *New;
+FinishData::TempData::TempData(const TempData& o) :
+    caustics(o.caustics), ior(o.ior), dispersion(o.dispersion), refract(o.refract)
+{}
 
-    if (Old != NULL)
-    {
-        New = Create_Finish();
-        *New = *Old;
-    }
-    else
-        New = NULL;
-    return (New);
-}
+FinishData::FinishData(const FinishData& o) :
+    tempData(o.tempData),
+    Ambient(o.Ambient), Emission(o.Emission),
+    Reflection_Max(o.Reflection_Max), Reflection_Min(o.Reflection_Min),
+    SubsurfaceTranslucency(o.SubsurfaceTranslucency), SubsurfaceAnisotropy(o.SubsurfaceAnisotropy),
+    Diffuse(o.Diffuse), DiffuseBack(o.DiffuseBack),
+    Brilliance(o.Brilliance), BrillianceOut(o.BrillianceOut), BrillianceAdjust(o.BrillianceAdjust), BrillianceAdjustRad(o.BrillianceAdjustRad),
+    Specular(o.Specular), Roughness(o.Roughness),
+    Phong(o.Phong), Phong_Size(o.Phong_Size),
+    Reflect_Exp(o.Reflect_Exp),
+    Reflect_Metallic(o.Reflect_Metallic),
+    Reflection_Falloff(o.Reflection_Falloff),
+    Irid(o.Irid), Irid_Film_Thickness(o.Irid_Film_Thickness), Irid_Turb(o.Irid_Turb),
+    Crand(o.Crand),
+    Metallic(o.Metallic),
+    Reflection_Fresnel(o.Reflection_Fresnel),
+    Fresnel(o.Fresnel),
+    Conserve_Energy(o.Conserve_Energy),
+    UseSubsurface(o.UseSubsurface)
+{}
 
+
+/****************************************************************************/
+
+FinishData::~FinishData()
+{}
+
+const FinishData::TempData FinishData::TempDataPtr::kDefault;
 
 
 /*****************************************************************************
@@ -1349,18 +1343,12 @@ TEXTURE *Copy_Textures(TEXTURE *Textures)
                     New->layers[i] = new TextureLayer();
                 New->layers[i]->Pigment = Copy_Pigment(Textures->layers[i]->Pigment);
                 New->layers[i]->Tnormal = Copy_Tnormal(Textures->layers[i]->Tnormal);
-                New->layers[i]->Finish  = Copy_Finish(Textures->layers[i]->Finish);
+                New->layers[i]->Finish  = Textures->layers[i]->Finish;
             }
 
             break;
 
-        case BITMAP_PATTERN:
-            New->Materials.reserve(Textures->Materials.size());
-            for (vector<TextureData>::const_iterator i = Textures->Materials.begin(); i != Textures->Materials.end(); ++ i)
-                New->Materials.push_back(i->GetCopy());
-
-//          Not needed. Copied by Copy_TPat_Fields:
-//          New->Vals.Image  = Copy_Image(Textures->Vals.Image);
+        default:
 
             break;
     }
@@ -1402,13 +1390,8 @@ void Destroy_Textures(TEXTURE *Textures)
     {
         Destroy_Pigment((*i)->Pigment);
         Destroy_Tnormal((*i)->Tnormal);
-        if ((*i)->Finish)
-            delete (*i)->Finish;
+        delete *i;
     }
-
-    // Theoretically these should only be non-empty for BITMAP_PATTERN, but let's clean them up either way.
-    for(vector<TextureData>::iterator i = Textures->Materials.begin(); i != Textures->Materials.end(); ++ i)
-        i->Destroy();
 
     delete Textures;
 }
@@ -1463,11 +1446,7 @@ void Post_Textures(TEXTURE *Textures)
 
                 break;
 
-            case BITMAP_PATTERN:
-
-                for (vector<TextureData>::iterator i = Textures->Materials.begin(); i != Textures->Materials.end(); ++ i)
-                    i->Post();
-
+            default:
                 break;
         }
 
@@ -1506,7 +1485,7 @@ void Post_Textures(TEXTURE *Textures)
 *
 * RETURNS
 *
-*   int - true, if opaque
+*   bool - true, if opaque
 *
 * AUTHOR
 *
@@ -1527,27 +1506,21 @@ void Post_Textures(TEXTURE *Textures)
 *
 ******************************************************************************/
 
-int Test_Opacity(const TEXTURE *Texture)
+bool Test_Opacity(const TEXTURE *Texture)
 {
-    int Opaque, Help;
+    bool Opaque;
 
     if (Texture == NULL)
     {
         return(false);
     }
 
-    /* We assume that the object is not opaque. */
-
-    Opaque = false;
-
-    /* Test all layers. If at least one layer is opaque the object is opaque. */
-
     switch (Texture->Type)
     {
         case PLAIN_PATTERN:
 
-            /* Test image map for opacity. */
-
+            // Layered texture is opaque if at least one layer is opaque.
+            Opaque = false;
             for (TextureLayerList::const_iterator i = Texture->layers.begin(); i != Texture->layers.end(); ++i)
             {
                 if (!((*i)->Pigment->Flags & HAS_FILTER))
@@ -1556,42 +1529,20 @@ int Test_Opacity(const TEXTURE *Texture)
                     break;
                 }
             }
-
             break;
 
-        case BITMAP_PATTERN:
+        default:
 
-            /* Layer is not opaque if the image map is used just once. */
-
-            if (dynamic_cast<ImagePattern*>(Texture->pattern.get())->pImage != NULL)
+            // Patterned texture is opaque if all textures are opaque.
+            Opaque = true;
+            for (TextureBlendMap::Vector::const_iterator i = Texture->Blend_Map->Blend_Map_Entries.begin(); i != Texture->Blend_Map->Blend_Map_Entries.end(); ++i)
             {
-                if (dynamic_cast<ImagePattern*>(Texture->pattern.get())->pImage->Once_Flag)
+                if (!i->Vals.IsOpaque())
                 {
+                    Opaque = false;
                     break;
                 }
             }
-
-            /* Layer is opaque if all materials are opaque. */
-
-            Help = true;
-
-            for (vector<TextureData>::const_iterator i = Texture->Materials.begin(); i != Texture->Materials.end(); ++ i)
-            {
-                if (!i->IsOpaque())
-                {
-                    /* Material is not opaque --> layer is not opaque. */
-
-                    Help = false;
-
-                    break;
-                }
-            }
-
-            if (Help)
-            {
-                Opaque = true;
-            }
-
             break;
     }
 
@@ -1639,18 +1590,18 @@ void Initialise_NoiseDispatch()
 
     if(!cpu_detected)
     {
-            if(OPTIMIZED_NOISE_SUPPORTED)
-            {
-                Noise = OPTIMIZED_NOISE;
-                DNoise = OPTIMIZED_DNOISE;
-            }
-            else
-            {
-                Noise = PortableNoise;
-                DNoise = PortableDNoise;
-            }
+        if(OPTIMIZED_NOISE_SUPPORTED)
+        {
+            Noise = OPTIMIZED_NOISE;
+            DNoise = OPTIMIZED_DNOISE;
+        }
+        else
+        {
+            Noise = PortableNoise;
+            DNoise = PortableDNoise;
+        }
 
-            cpu_detected = true;
+        cpu_detected = true;
     }
 }
 

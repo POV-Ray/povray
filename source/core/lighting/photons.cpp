@@ -608,7 +608,7 @@ void PhotonTrace::ComputeLightedTexture(MathColour& LightCol, ColourChannel&, co
         // Trace refracted ray.
         threadData->GFilCol = FilCol;
 
-        TIR_occured = ComputeRefractionForPhotons(Texture[0]->Finish, interior, isect.IPoint, ray, TopNormal, rawnormal, LightCol, New_Weight);
+        TIR_occured = ComputeRefractionForPhotons(Texture[0]->Finish.Get(), interior, isect.IPoint, ray, TopNormal, rawnormal, LightCol, New_Weight);
     }
 
     // Shoot reflected photons.
@@ -651,7 +651,7 @@ void PhotonTrace::ComputeLightedTexture(MathColour& LightCol, ColourChannel&, co
 
                     TempWeight = (*listWNRX)[i].weight * (*listWNRX)[i].reflec.WeightMax();
 
-                    ComputeReflection((*Layer)->Finish, isect.IPoint, ray, LayNormal, rawnormal, TmpCol, TempWeight);
+                    ComputeReflection((*Layer)->Finish.Get(), isect.IPoint, ray, LayNormal, rawnormal, TmpCol, TempWeight);
                 }
             }
 
@@ -668,7 +668,7 @@ void PhotonTrace::ComputeLightedTexture(MathColour& LightCol, ColourChannel&, co
 }
 
 
-bool PhotonTrace::ComputeRefractionForPhotons(const FINISH* finish, Interior *interior, const Vector3d& ipoint, Ray& ray, const Vector3d& normal, const Vector3d& rawnormal, MathColour& colour, COLC weight)
+bool PhotonTrace::ComputeRefractionForPhotons(ConstFinishPtr finish, Interior *interior, const Vector3d& ipoint, Ray& ray, const Vector3d& normal, const Vector3d& rawnormal, MathColour& colour, COLC weight)
 {
     Ray nray(ray);
     Vector3d localnormal;
@@ -792,7 +792,7 @@ bool PhotonTrace::ComputeRefractionForPhotons(const FINISH* finish, Interior *in
     return totalReflection;
 }
 
-bool PhotonTrace::TraceRefractionRayForPhotons(const FINISH* finish, const Vector3d& ipoint, Ray& ray, Ray& nray, DBL ior, DBL n, const Vector3d& normal, const Vector3d& rawnormal, const Vector3d& localnormal, MathColour& colour, COLC weight)
+bool PhotonTrace::TraceRefractionRayForPhotons(ConstFinishPtr finish, const Vector3d& ipoint, Ray& ray, Ray& nray, DBL ior, DBL n, const Vector3d& normal, const Vector3d& rawnormal, const Vector3d& localnormal, MathColour& colour, COLC weight)
 {
     // Compute refrated ray direction using Heckbert's method.
     DBL t = 1.0 + Sqr(ior) * (Sqr(n) - 1.0);

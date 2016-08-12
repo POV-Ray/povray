@@ -1052,7 +1052,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
         END_CASE
 
         CASE (MARBLE_TOKEN)
-            New->Type = MARBLE_PATTERN;
+            New->Type = GENERIC_PATTERN;
             New->pattern = PatternPtr(new MarblePattern());
             dynamic_cast<MarblePattern*>(New->pattern.get())->waveType = kWaveType_Triangle;
             EXIT
@@ -1083,18 +1083,16 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
         END_CASE
 
         CASE (MAGNET_TOKEN)
-            New->Type = NO_PATTERN;
+            New->Type = MAGNET_PATTERN;
             i = (int)Parse_Float();
             EXPECT
                 CASE (MANDEL_TOKEN)
                     switch(i)
                     {
                         case 1:
-                            New->Type = MAGNET1M_PATTERN;
                             New->pattern = PatternPtr(new Magnet1MPattern());
                             break;
                         case 2:
-                            New->Type = MAGNET2M_PATTERN;
                             New->pattern = PatternPtr(new Magnet2MPattern());
                             break;
                         default:
@@ -1107,11 +1105,9 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
                     switch(i)
                     {
                         case 1:
-                            New->Type = MAGNET1J_PATTERN;
                             New->pattern = PatternPtr(new Magnet1JPattern());
                             break;
                         case 2:
-                            New->Type = MAGNET2J_PATTERN;
                             New->pattern = PatternPtr(new Magnet2JPattern());
                             break;
                         default:
@@ -1126,8 +1122,6 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
                     Error("Invalid magnet pattern found. Valid types are 'mandel' and 'julia'.");
                 END_CASE
             END_EXPECT
-            if (New->Type == NO_PATTERN)
-                Error("No magnet pattern found. Valid types are 'mandel' and 'julia'.");
             dynamic_cast<FractalPattern*>(New->pattern.get())->interiorType = DEFAULT_FRACTAL_INTERIOR_TYPE;
             dynamic_cast<FractalPattern*>(New->pattern.get())->exteriorType = DEFAULT_FRACTAL_EXTERIOR_TYPE;
             dynamic_cast<FractalPattern*>(New->pattern.get())->exteriorFactor = DEFAULT_FRACTAL_EXTERIOR_FACTOR;
@@ -1165,7 +1159,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
         END_CASE
 
         CASE (WOOD_TOKEN)
-            New->Type = WOOD_PATTERN;
+            New->Type = GENERIC_PATTERN;
             New->pattern = PatternPtr(new WoodPattern());
             dynamic_cast<WoodPattern*>(New->pattern.get())->waveType = kWaveType_Triangle;
             EXIT
@@ -1661,12 +1655,9 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
         END_CASE
 
         CASE (EXTERIOR_TOKEN)
-            if(!((New->Type == MANDEL_PATTERN) || (New->Type == MANDEL3_PATTERN) ||
-                 (New->Type == MANDEL4_PATTERN) || (New->Type == MANDELX_PATTERN) ||
-                 (New->Type == JULIA_PATTERN) || (New->Type == JULIA3_PATTERN) ||
-                 (New->Type == JULIA4_PATTERN) || (New->Type == JULIAX_PATTERN) ||
-                 (New->Type == MAGNET1M_PATTERN) || (New->Type == MAGNET2M_PATTERN) ||
-                 (New->Type == MAGNET1J_PATTERN) || (New->Type == MAGNET2J_PATTERN) ||
+            if(!((New->Type == MANDEL_PATTERN) ||
+                 (New->Type == JULIA_PATTERN) ||
+                 (New->Type == MAGNET_PATTERN) ||
                  (New->Type == PAVEMENT_PATTERN)))
             {
                 Only_In("exterior", "mandel, julia, magnet or pavement");
@@ -1686,12 +1677,9 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
         END_CASE
 
         CASE (INTERIOR_TOKEN)
-            if(!((New->Type == MANDEL_PATTERN) || (New->Type == MANDEL3_PATTERN) ||
-                 (New->Type == MANDEL4_PATTERN) || (New->Type == MANDELX_PATTERN) ||
-                 (New->Type == JULIA_PATTERN) || (New->Type == JULIA3_PATTERN) ||
-                 (New->Type == JULIA4_PATTERN) || (New->Type == JULIAX_PATTERN) ||
-                 (New->Type == MAGNET1M_PATTERN) || (New->Type == MAGNET2M_PATTERN) ||
-                 (New->Type == MAGNET1J_PATTERN) || (New->Type == MAGNET2J_PATTERN) ||
+            if(!((New->Type == MANDEL_PATTERN) ||
+                 (New->Type == JULIA_PATTERN) ||
+                 (New->Type == MAGNET_PATTERN) ||
                  (New->Type == PAVEMENT_PATTERN)))
             {
                 Only_In("exterior", "mandel, julia, magnet or pavement");
@@ -1711,42 +1699,34 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
         END_CASE
 
         CASE (EXPONENT_TOKEN)
-            if(!((New->Type == MANDEL_PATTERN) || (New->Type == MANDEL3_PATTERN) ||
-                 (New->Type == MANDEL4_PATTERN) || (New->Type == MANDELX_PATTERN) ||
-                 (New->Type == JULIA_PATTERN) || (New->Type == JULIA3_PATTERN) ||
-                 (New->Type == JULIA4_PATTERN) || (New->Type == JULIAX_PATTERN)))
+            if(!((New->Type == MANDEL_PATTERN) ||
+                 (New->Type == JULIA_PATTERN)))
             {
                 Only_In("exponent", "mandel or julia");
             }
 
-            if((New->Type == JULIA_PATTERN) || (New->Type == JULIA3_PATTERN) ||
-               (New->Type == JULIA4_PATTERN) || (New->Type == JULIAX_PATTERN))
+            if(New->Type == JULIA_PATTERN)
             {
                 i = (int)Parse_Float();
                 switch(i)
                 {
                     case 2:
-                        New->Type = JULIA_PATTERN;
                         New->pattern = PatternPtr(new JuliaPattern(*dynamic_cast<JuliaPattern*>(New->pattern.get())));
                         break;
                     case 3:
-                        New->Type = JULIA3_PATTERN;
                         New->pattern = PatternPtr(new Julia3Pattern(*dynamic_cast<JuliaPattern*>(New->pattern.get())));
                         break;
                     case 4:
-                        New->Type = JULIA4_PATTERN;
                         New->pattern = PatternPtr(new Julia4Pattern(*dynamic_cast<JuliaPattern*>(New->pattern.get())));
                         break;
                     default:
                         if((i > 4) && (i <= kFractalMaxExponent))
                         {
-                            New->Type = JULIAX_PATTERN;
                             New->pattern = PatternPtr(new JuliaXPattern(*dynamic_cast<JuliaPattern*>(New->pattern.get())));
                             dynamic_cast<JuliaXPattern*>(New->pattern.get())->fractalExponent = i;
                         }
                         else
                         {
-                            New->Type = JULIA_PATTERN;
                             New->pattern = PatternPtr(new JuliaPattern(*dynamic_cast<JuliaPattern*>(New->pattern.get())));
                             Warning("Invalid julia pattern exponent found. Supported exponents are 2 to %i.\n"
                                     "Using default exponent 2.", kFractalMaxExponent);
@@ -1754,34 +1734,28 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
                         break;
                 }
             }
-            else if((New->Type == MANDEL_PATTERN) || (New->Type == MANDEL3_PATTERN) ||
-                    (New->Type == MANDEL4_PATTERN) || (New->Type == MANDELX_PATTERN))
+            else if(New->Type == MANDEL_PATTERN)
             {
                 i = (int)Parse_Float();
                 switch(i)
                 {
                     case 2:
-                        New->Type = MANDEL_PATTERN;
                         New->pattern = PatternPtr(new Mandel2Pattern(*dynamic_cast<MandelPattern*>(New->pattern.get())));
                         break;
                     case 3:
-                        New->Type = MANDEL3_PATTERN;
                         New->pattern = PatternPtr(new Mandel3Pattern(*dynamic_cast<MandelPattern*>(New->pattern.get())));
                         break;
                     case 4:
-                        New->Type = MANDEL4_PATTERN;
                         New->pattern = PatternPtr(new Mandel4Pattern(*dynamic_cast<MandelPattern*>(New->pattern.get())));
                         break;
                     default:
                         if((i > 4) && (i <= kFractalMaxExponent))
                         {
-                            New->Type = MANDELX_PATTERN;
                             New->pattern = PatternPtr(new MandelXPattern(*dynamic_cast<MandelPattern*>(New->pattern.get())));
                             dynamic_cast<MandelXPattern*>(New->pattern.get())->fractalExponent = i;
                         }
                         else
                         {
-                            New->Type = MANDEL_PATTERN;
                             New->pattern = PatternPtr(new Mandel2Pattern(*dynamic_cast<MandelPattern*>(New->pattern.get())));
                             Warning("Invalid mandel pattern exponent found. Supported exponents are 2 to %i.\n"
                                     "Using default exponent 2.", kFractalMaxExponent);
@@ -2299,10 +2273,10 @@ void Parser::Parse_Tnormal (TNORMAL **Tnormal_Ptr)
 *
 ******************************************************************************/
 
-void Parser::Parse_Finish (FINISH **Finish_Ptr)
+void Parser::Parse_Finish (FinishPtr& pFinish)
 {
     TransColour Temp_Colour;
-    FINISH *New;
+    UniqueFinishPtr New;
     Vector3d Local_Vector;
     bool diffuseAdjust = false;
     bool phongAdjust = false;
@@ -2312,21 +2286,23 @@ void Parser::Parse_Finish (FINISH **Finish_Ptr)
 
     Parse_Begin ();
 
-    EXPECT        /* Look for zero or one finish_id */
+    // If the user specifies a finish ID, it will serve as a template.
+    // Otherwise, the currewnt content of pFinish will be used as a template.
+    EXPECT_ONE
         CASE (FINISH_ID_TOKEN)
-            if (*Finish_Ptr)
-                delete *Finish_Ptr;
-            *Finish_Ptr = Copy_Finish (reinterpret_cast<FINISH *>(Token.Data));
-            EXIT
+            pFinish = *(reinterpret_cast<FinishPtr *>(Token.Data));
         END_CASE
 
         OTHERWISE
             UNGET
-            EXIT
         END_CASE
-    END_EXPECT    /* End finish_id */
+    END_EXPECT
 
-    New = *Finish_Ptr;
+    // If nothing else is specified, we're happy with a shared copy of the template.
+    if(Parse_End(false))
+        return;
+
+    New = pFinish.GetUnique();
 
     EXPECT        /* Look for zero or more finish_body */
         CASE (CONSERVE_ENERGY_TOKEN)
@@ -2540,17 +2516,17 @@ void Parser::Parse_Finish (FINISH **Finish_Ptr)
         END_CASE
 
         CASE (IOR_TOKEN)
-            New->Temp_IOR = Parse_Float();
+            New->tempData.Set()->ior = Parse_Float();
             Warn_Compat(false, "Index of refraction value should be specified in 'interior{...}' statement.");
         END_CASE
 
         CASE (CAUSTICS_TOKEN)
-            New->Temp_Caustics = Parse_Float();
+            New->tempData.Set()->caustics = Parse_Float();
             Warn_Compat(false, "Caustics value should be specified in 'interior{...}' statement.");
         END_CASE
 
         CASE (REFRACTION_TOKEN)
-            New->Temp_Refract = Parse_Float();
+            New->tempData.Set()->refract = Parse_Float();
             Warn_Compat(false, "Refraction value unnecessary to turn on refraction.\nTo attenuate, the fade_power and fade_distance keywords should be specified in 'interior{...}' statement.");
         END_CASE
 
@@ -2716,9 +2692,7 @@ TextureData Parser::Parse_Texture ()
 
             CASE (FINISH_ID_TOKEN)
                 Warn_State(Token.Token_Id, FINISH_TOKEN);
-                if (Texture.FirstLayer()->Finish)
-                    delete Texture.FirstLayer()->Finish;
-                Texture.FirstLayer()->Finish = Copy_Finish (reinterpret_cast<FINISH *>(Token.Data));
+                Texture.FirstLayer()->Finish = *reinterpret_cast<FinishPtr *>(Token.Data);
                 Modified_Pnf = true;
             END_CASE
 
@@ -2749,7 +2723,7 @@ TextureData Parser::Parse_Texture ()
             END_CASE
 
             CASE (FINISH_TOKEN)
-                Parse_Finish ( &(Texture.FirstLayer()->Finish) );
+                Parse_Finish (Texture.FirstLayer()->Finish);
                 Modified_Pnf = true;
             END_CASE
 
@@ -2838,8 +2812,6 @@ TextureData Parser::Parse_Texture ()
                 UNGET
                 Destroy_Pigment(Texture.FirstLayer()->Pigment);
                 Destroy_Tnormal(Texture.FirstLayer()->Tnormal);
-                if (Texture.FirstLayer()->Finish)
-                    delete Texture.FirstLayer()->Finish;
                 Texture.FirstLayer()->Pigment = NULL;
                 Texture.FirstLayer()->Tnormal = NULL;
                 Texture.FirstLayer()->Finish  = NULL;
@@ -2891,8 +2863,6 @@ TextureData Parser::Parse_Tiles()
     Texture.Create();
     Destroy_Pigment(Texture.FirstLayer()->Pigment);
     Destroy_Tnormal(Texture.FirstLayer()->Tnormal);
-    if (Texture.FirstLayer()->Finish)
-        delete Texture.FirstLayer()->Finish;
     Texture.FirstLayer()->Pigment = NULL;
     Texture.FirstLayer()->Tnormal = NULL;
     Texture.FirstLayer()->Finish  = NULL;
@@ -2967,14 +2937,13 @@ TextureData Parser::Parse_Material_Map()
 {
     TextureData Texture;
     Vector2d Repeat;
+    TextureBlendMapEntry tempEntry;
 
     Parse_Begin ();
 
     Texture.Create();
     Destroy_Pigment(Texture.FirstLayer()->Pigment);
     Destroy_Tnormal(Texture.FirstLayer()->Tnormal);
-    if (Texture.FirstLayer()->Finish)
-        delete Texture.FirstLayer()->Finish;
     Texture.FirstLayer()->Pigment = NULL;
     Texture.FirstLayer()->Tnormal = NULL;
     Texture.FirstLayer()->Finish  = NULL;
@@ -3019,13 +2988,18 @@ TextureData Parser::Parse_Material_Map()
 
     GET (TEXTURE_TOKEN)                /* First material */
     Parse_Begin();
-    Texture.Materials().push_back(Parse_Texture ());
+    Texture.BlendMap() = TextureBlendMapPtr(new TextureBlendMap);
+    tempEntry.value = Texture.BlendMap()->Blend_Map_Entries.size();
+    tempEntry.Vals = Parse_Texture ();
+    Texture.BlendMap()->Blend_Map_Entries.push_back(tempEntry);
     Parse_End();
 
     EXPECT                             /* Subsequent materials */
         CASE (TEXTURE_TOKEN)
             Parse_Begin();
-            Texture.Materials().push_back(Parse_Texture ());
+            tempEntry.value = Texture.BlendMap()->Blend_Map_Entries.size();
+            tempEntry.Vals = Parse_Texture ();
+            Texture.BlendMap()->Blend_Map_Entries.push_back(tempEntry);
             Parse_End();
         END_CASE
 
@@ -3071,7 +3045,7 @@ TextureData Parser::Parse_Vers1_Texture ()
     TextureData Texture;
     PIGMENT *Pigment;
     TNORMAL *Tnormal;
-    FINISH *Finish;
+    FinishPtr Finish;
     ContinuousPattern* pContinuousPattern;
 
     EXPECT                      /* Look for texture_body */
@@ -3114,9 +3088,7 @@ TextureData Parser::Parse_Vers1_Texture ()
                 END_CASE
 
                 CASE (FINISH_ID_TOKEN)
-                    if (Texture.FirstLayer()->Finish)
-                        delete Texture.FirstLayer()->Finish;
-                    Texture.FirstLayer()->Finish = Copy_Finish (reinterpret_cast<FINISH *>(Token.Data));
+                    Texture.FirstLayer()->Finish = *reinterpret_cast<FinishPtr *>(Token.Data);
                 END_CASE
 
                 OTHERWISE
@@ -3143,7 +3115,7 @@ TextureData Parser::Parse_Vers1_Texture ()
                 END_CASE
 
                 CASE (FINISH_TOKEN)
-                    Parse_Finish ( &(Texture.FirstLayer()->Finish) );
+                    Parse_Finish (Texture.FirstLayer()->Finish);
                 END_CASE
 
 /***********************************************************************
@@ -3178,7 +3150,7 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
 
                 CASE (MARBLE_TOKEN)
                     Warn_State(Token.Token_Id, PIGMENT_TOKEN);
-                    Pigment->Type = MARBLE_PATTERN;
+                    Pigment->Type = GENERIC_PATTERN;
                     Pigment->pattern = PatternPtr(new MarblePattern());
                 END_CASE
 
@@ -3203,7 +3175,7 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
 
                 CASE (WOOD_TOKEN)
                     Warn_State(Token.Token_Id, PIGMENT_TOKEN);
-                    Pigment->Type = WOOD_PATTERN;
+                    Pigment->Type = GENERIC_PATTERN;
                     Pigment->pattern = PatternPtr(new WoodPattern());
                 END_CASE
 
@@ -3377,74 +3349,74 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
 ***********************************************************************/
                 CASE (AMBIENT_TOKEN)
                     Warn_State(Token.Token_Id, FINISH_TOKEN);
-                    Finish->Ambient = MathColour(Parse_Float ());
+                    Finish.GetUnique()->Ambient = MathColour(Parse_Float ());
                 END_CASE
 
                 CASE (BRILLIANCE_TOKEN)
                     Warn_State(Token.Token_Id, FINISH_TOKEN);
-                    Finish->Brilliance = Parse_Float ();
+                    Finish.GetUnique()->Brilliance = Parse_Float ();
                 END_CASE
 
                 CASE (DIFFUSE_TOKEN)
                     Warn_State(Token.Token_Id, FINISH_TOKEN);
-                    Finish->Diffuse = Parse_Float ();
+                    Finish.GetUnique()->Diffuse = Parse_Float ();
                 END_CASE
 
                 CASE (REFLECTION_TOKEN)
                     Warn_State(Token.Token_Id, FINISH_TOKEN);
-                    Finish->Reflection_Max = MathColour(Parse_Float ());
-                    Finish->Reflection_Min = Finish->Reflection_Max;
-                    Finish->Reflection_Falloff = 1;
+                    Finish.GetUnique()->Reflection_Max = MathColour(Parse_Float ());
+                    Finish.GetUnique()->Reflection_Min = Finish->Reflection_Max;
+                    Finish.GetUnique()->Reflection_Falloff = 1;
                 END_CASE
 
                 CASE (PHONG_TOKEN)
                     Warn_State(Token.Token_Id, FINISH_TOKEN);
-                    Finish->Phong = Parse_Float ();
+                    Finish.GetUnique()->Phong = Parse_Float ();
                 END_CASE
 
                 CASE (PHONG_SIZE_TOKEN)
                     Warn_State(Token.Token_Id, FINISH_TOKEN);
-                    Finish->Phong_Size = Parse_Float ();
+                    Finish.GetUnique()->Phong_Size = Parse_Float ();
                 END_CASE
 
                 CASE (SPECULAR_TOKEN)
                     Warn_State(Token.Token_Id, FINISH_TOKEN);
-                    Finish->Specular = Parse_Float ();
+                    Finish.GetUnique()->Specular = Parse_Float ();
                 END_CASE
 
                 CASE (ROUGHNESS_TOKEN)
                     Warn_State(Token.Token_Id, FINISH_TOKEN);
-                    Finish->Roughness = Parse_Float ();
-                    if (Finish->Roughness != 0.0)
-                        Finish->Roughness = 1.0/Finish->Roughness; /* CEY 12/92 */
+                    Finish.GetUnique()->Roughness = Parse_Float ();
+                    if (Finish.GetUnique()->Roughness != 0.0)
+                        Finish.GetUnique()->Roughness = 1.0/Finish->Roughness; /* CEY 12/92 */
                     else
                         Warning("Zero roughness used.");
                 END_CASE
 
                 CASE (METALLIC_TOKEN)
                     Warn_State(Token.Token_Id, FINISH_TOKEN);
-                    Finish->Metallic = 1.0;
+                    Finish.GetUnique()->Metallic = 1.0;
                 END_CASE
 
                 CASE (CRAND_TOKEN)
                     Warn_State(Token.Token_Id, FINISH_TOKEN);
-                    Finish->Crand = Parse_Float();
+                    Finish.GetUnique()->Crand = Parse_Float();
                 END_CASE
 
                 CASE_FLOAT
-                    Finish->Crand = Parse_Float();
+                    Finish.GetUnique()->Crand = Parse_Float();
                     VersionWarning(150, "Should use crand keyword in finish statement.");
                 END_CASE
 
                 CASE (IOR_TOKEN)
                     Warn_State(Token.Token_Id, INTERIOR_TOKEN);
-                    Finish->Temp_IOR = Parse_Float();
+                    Finish.GetUnique()->tempData.Set()->ior = Parse_Float();
                     Warn_Compat(false, "Index of refraction value should be specified in 'interior{...}' statement.");
                 END_CASE
 
                 CASE (REFRACTION_TOKEN)
                     Warn_State(Token.Token_Id, INTERIOR_TOKEN);
-                    Finish->Temp_Refract = Parse_Float();
+                    Finish.GetUnique()->tempData.Set()->refract = Parse_Float();
                     Warn_Compat(false, "Refraction value unnecessary to turn on refraction.\nTo attenuate, the fade_power and fade_distance keywords should be specified in 'interior{...}' statement.");
                 END_CASE
 
@@ -4955,7 +4927,7 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
         END_CASE
 
         CASE (MARBLE_TOKEN)
-            New->Type = MARBLE_PATTERN;
+            New->Type = GENERIC_PATTERN;
             New->pattern = PatternPtr(new MarblePattern());
             dynamic_cast<MarblePattern*>(New->pattern.get())->waveType = kWaveType_Triangle;
             EXIT
@@ -4986,18 +4958,16 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
         END_CASE
 
         CASE (MAGNET_TOKEN)
-            New->Type = NO_PATTERN;
+            New->Type = MAGNET_PATTERN;
             i = (int)Parse_Float();
             EXPECT
                 CASE (MANDEL_TOKEN)
                     switch(i)
                     {
                         case 1:
-                            New->Type = MAGNET1M_PATTERN;
                             New->pattern = PatternPtr(new Magnet1MPattern());
                             break;
                         case 2:
-                            New->Type = MAGNET2M_PATTERN;
                             New->pattern = PatternPtr(new Magnet2MPattern());
                             break;
                         default:
@@ -5010,11 +4980,9 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
                     switch(i)
                     {
                         case 1:
-                            New->Type = MAGNET1J_PATTERN;
                             New->pattern = PatternPtr(new Magnet1JPattern());
                             break;
                         case 2:
-                            New->Type = MAGNET2J_PATTERN;
                             New->pattern = PatternPtr(new Magnet2JPattern());
                             break;
                         default:
@@ -5029,8 +4997,6 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
                     Error("Invalid magnet pattern found. Valid types are 'mandel' and 'julia'.");
                 END_CASE
             END_EXPECT
-            if (New->Type == NO_PATTERN)
-                Error("No magnet pattern found. Valid types are 'mandel' and 'julia'.");
             dynamic_cast<FractalPattern*>(New->pattern.get())->interiorType = DEFAULT_FRACTAL_INTERIOR_TYPE;
             dynamic_cast<FractalPattern*>(New->pattern.get())->exteriorType = DEFAULT_FRACTAL_EXTERIOR_TYPE;
             dynamic_cast<FractalPattern*>(New->pattern.get())->exteriorFactor = DEFAULT_FRACTAL_EXTERIOR_FACTOR;
@@ -5068,7 +5034,7 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
         END_CASE
 
         CASE (WOOD_TOKEN)
-            New->Type = WOOD_PATTERN;
+            New->Type = GENERIC_PATTERN;
             New->pattern = PatternPtr(new WoodPattern());
             dynamic_cast<WoodPattern*>(New->pattern.get())->waveType = kWaveType_Triangle;
             EXIT
@@ -5285,12 +5251,9 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
 
         CASE (EXTERIOR_TOKEN)
             // TODO VERIFY - this differs from regular pattern parsing (PAVEMENT_PATTERN), is that ok?
-            if(!((New->Type == MANDEL_PATTERN) || (New->Type == MANDEL3_PATTERN) ||
-                 (New->Type == MANDEL4_PATTERN) || (New->Type == MANDELX_PATTERN) ||
-                 (New->Type == JULIA_PATTERN) || (New->Type == JULIA3_PATTERN) ||
-                 (New->Type == JULIA4_PATTERN) || (New->Type == JULIAX_PATTERN) ||
-                 (New->Type == MAGNET1M_PATTERN) || (New->Type == MAGNET2M_PATTERN) ||
-                 (New->Type == MAGNET1J_PATTERN) || (New->Type == MAGNET2J_PATTERN)))
+            if(!((New->Type == MANDEL_PATTERN) ||
+                 (New->Type == JULIA_PATTERN) ||
+                 (New->Type == MAGNET_PATTERN)))
             {
                 Only_In("exterior", "mandel, julia or magnet");
             }
@@ -5303,12 +5266,9 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
 
         CASE (INTERIOR_TOKEN)
             // TODO VERIFY - this differs from regular pattern parsing (PAVEMENT_PATTERN), is that ok?
-            if(!((New->Type == MANDEL_PATTERN) || (New->Type == MANDEL3_PATTERN) ||
-                 (New->Type == MANDEL4_PATTERN) || (New->Type == MANDELX_PATTERN) ||
-                 (New->Type == JULIA_PATTERN) || (New->Type == JULIA3_PATTERN) ||
-                 (New->Type == JULIA4_PATTERN) || (New->Type == JULIAX_PATTERN) ||
-                 (New->Type == MAGNET1M_PATTERN) || (New->Type == MAGNET2M_PATTERN) ||
-                 (New->Type == MAGNET1J_PATTERN) || (New->Type == MAGNET2J_PATTERN)))
+            if(!((New->Type == MANDEL_PATTERN) ||
+                 (New->Type == JULIA_PATTERN) ||
+                 (New->Type == MAGNET_PATTERN)))
             {
                 Only_In("exterior", "mandel, julia or magnet");
             }
@@ -5320,42 +5280,34 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
         END_CASE
 
         CASE (EXPONENT_TOKEN)
-            if(!((New->Type == MANDEL_PATTERN) || (New->Type == MANDEL3_PATTERN) ||
-                 (New->Type == MANDEL4_PATTERN) || (New->Type == MANDELX_PATTERN) ||
-                 (New->Type == JULIA_PATTERN) || (New->Type == JULIA3_PATTERN) ||
-                 (New->Type == JULIA4_PATTERN) || (New->Type == JULIAX_PATTERN)))
+            if(!((New->Type == MANDEL_PATTERN) ||
+                 (New->Type == JULIA_PATTERN)))
             {
                 Only_In("exponent", "mandel or julia");
             }
 
-            if((New->Type == JULIA_PATTERN) || (New->Type == JULIA3_PATTERN) ||
-               (New->Type == JULIA4_PATTERN) || (New->Type == JULIAX_PATTERN))
+            if(New->Type == JULIA_PATTERN)
             {
                 i = (int)Parse_Float();
                 switch(i)
                 {
                     case 2:
-                        New->Type = JULIA_PATTERN;
                         New->pattern = PatternPtr(new JuliaPattern(*dynamic_cast<JuliaPattern*>(New->pattern.get())));
                         break;
                     case 3:
-                        New->Type = JULIA3_PATTERN;
                         New->pattern = PatternPtr(new Julia3Pattern(*dynamic_cast<JuliaPattern*>(New->pattern.get())));
                         break;
                     case 4:
-                        New->Type = JULIA4_PATTERN;
                         New->pattern = PatternPtr(new Julia4Pattern(*dynamic_cast<JuliaPattern*>(New->pattern.get())));
                         break;
                     default:
                         if((i > 4) && (i <= kFractalMaxExponent))
                         {
-                            New->Type = JULIAX_PATTERN;
                             New->pattern = PatternPtr(new JuliaXPattern(*dynamic_cast<JuliaPattern*>(New->pattern.get())));
                             dynamic_cast<JuliaXPattern*>(New->pattern.get())->fractalExponent = i;
                         }
                         else
                         {
-                            New->Type = JULIA_PATTERN;
                             New->pattern = PatternPtr(new JuliaPattern(*dynamic_cast<JuliaPattern*>(New->pattern.get())));
                             Warning("Invalid julia pattern exponent found. Supported exponents are 2 to %i.\n"
                                     "Using default exponent 2.", kFractalMaxExponent);
@@ -5363,34 +5315,28 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
                         break;
                 }
             }
-            else if((New->Type == MANDEL_PATTERN) || (New->Type == MANDEL3_PATTERN) ||
-                    (New->Type == MANDEL4_PATTERN) || (New->Type == MANDELX_PATTERN))
+            else if(New->Type == MANDEL_PATTERN)
             {
                 i = (int)Parse_Float();
                 switch(i)
                 {
                     case 2:
-                        New->Type = MANDEL_PATTERN;
                         New->pattern = PatternPtr(new Mandel2Pattern(*dynamic_cast<MandelPattern*>(New->pattern.get())));
                         break;
                     case 3:
-                        New->Type = MANDEL3_PATTERN;
                         New->pattern = PatternPtr(new Mandel3Pattern(*dynamic_cast<MandelPattern*>(New->pattern.get())));
                         break;
                     case 4:
-                        New->Type = MANDEL4_PATTERN;
                         New->pattern = PatternPtr(new Mandel4Pattern(*dynamic_cast<MandelPattern*>(New->pattern.get())));
                         break;
                     default:
                         if((i > 4) && (i <= kFractalMaxExponent))
                         {
-                            New->Type = MANDELX_PATTERN;
                             New->pattern = PatternPtr(new MandelXPattern(*dynamic_cast<MandelPattern*>(New->pattern.get())));
                             dynamic_cast<MandelXPattern*>(New->pattern.get())->fractalExponent = i;
                         }
                         else
                         {
-                            New->Type = MANDEL_PATTERN;
                             New->pattern = PatternPtr(new Mandel2Pattern(*dynamic_cast<MandelPattern*>(New->pattern.get())));
                             Warning("Invalid mandel pattern exponent found. Supported exponents are 2 to %i.\n"
                                     "Using default exponent 2.", kFractalMaxExponent);

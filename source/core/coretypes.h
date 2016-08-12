@@ -40,6 +40,8 @@
 
 #include <stack>
 
+#include <boost/intrusive_ptr.hpp>
+
 #include "base/colour.h"
 #include "base/types.h"
 #include "base/textstream.h"
@@ -128,7 +130,6 @@ typedef struct Pattern_Struct TPATTERN;
 typedef struct Texture_Struct TEXTURE;
 typedef struct Pigment_Struct PIGMENT;
 typedef struct Tnormal_Struct TNORMAL;
-typedef struct Finish_Struct FINISH;
 
 class TextureData;
 
@@ -287,6 +288,114 @@ class ObjectDebugHelper
         static int ObjectIndex;
         ObjectDebugHelper(const ObjectDebugHelper& src) { Index = ObjectIndex++; IsCopy = true; Tag = src.Tag; }
 };
+
+template<typename DATA_T> class CowPtr;
+
+template<typename DERIVED_T>
+class CowBase
+{
+public:
+    friend class CowPtr<DERIVED_T>;
+    friend inline void intrusive_ptr_add_ref(const CowBase* p) { POV_ASSERT(p); ++p->mRefCount; } ///< @todo test for overflow
+    friend inline void intrusive_ptr_release(const CowBase* p) { POV_ASSERT(p && p->mRefCount != 0); if (--p->mRefCount == 0) delete p; } ///< @todo test for underflow
+    inline virtual ~CowBase() { POV_ASSERT(mRefCount == 0); }
+    inline virtual CowBase* Clone() const = 0;
+protected:
+    inline CowBase() : mRefCount(0) {}
+    inline CowBase(const CowBase&) : mRefCount(0) {}
+    inline CowBase& operator=(const CowBase&) { return *this; }
+    inline int IsUnique() const { return (mRefCount == 1); }
+    mutable size_t mRefCount;
+};
+
+
+/// Pointer-like type to aid in implementing copy-on-write behaviour.
+/// @note   This type is _not_ thread-safe.
+template<typename DATA_T>
+class CowPtr
+{
+public:
+
+    /// Helper type to implement safe conversion to conditional expression.
+    /// @note   This type is deliberately incomplete.
+    class ConditionalType;
+
+    inline CowPtr() : mpData(NULL) {}
+    inline CowPtr(const CowPtr& o) : mpData(o.mpData) {}
+    inline CowPtr(DATA_T* data) : mpData(data) {}
+    inline ~CowPtr() {}
+
+    inline CowPtr& operator=(const CowPtr& o) { mpData = o.mpData; return *this; }
+
+    /// Get pointer for reading.
+    inline const DATA_T* Get() const { return mpData.get(); }
+
+    /// Get pointer for editing the common copy.
+    /// @note   This method is intended for common processing that would be applied to each individual copy.
+    inline boost::intrusive_ptr<DATA_T> GetCommon() { return mpData; }
+
+    /// Acquire individual copy, and get pointer for editing it.
+    inline DATA_T* GetUnique() { if(!mpData->IsUnique()) { mpData = boost::intrusive_ptr<DATA_T>(mpData->Clone()); } return mpData.get(); }
+
+    inline const DATA_T& operator*() const { return mpData.operator*(); }
+    inline const DATA_T* operator->() const { return mpData.operator->(); }
+
+    inline bool operator!() const { return !mpData; }
+    inline operator const ConditionalType*() const { return reinterpret_cast<const ConditionalType*>(mpData.get()); }
+
+    inline bool operator== (const CowPtr& o) const { return mpData == o.mpData; }
+    inline bool operator!= (const CowPtr& o) const { return mpData != o.mpData; }
+    inline bool operator<  (const CowPtr& o) const { return mpData <  o.mpData; }
+    inline bool operator<= (const CowPtr& o) const { return mpData <= o.mpData; }
+    inline bool operator>  (const CowPtr& o) const { return mpData >  o.mpData; }
+    inline bool operator>= (const CowPtr& o) const { return mpData >= o.mpData; }
+
+protected:
+
+    boost::intrusive_ptr<DATA_T> mpData;
+};
+
+
+template<typename DATA_T>
+class OptionalDataPtr
+{
+public:
+    inline OptionalDataPtr() : mpData(NULL) {}
+    inline OptionalDataPtr(const OptionalDataPtr& o) : mpData(o.mpData ? new DATA_T(*o.mpData) : NULL) {}
+    inline ~OptionalDataPtr() { if (mpData) delete mpData; }
+    inline OptionalDataPtr& operator=(const OptionalDataPtr& o) { mpData = (o.mpData ? new DATA_T(o.mpData) : NULL); return *this; }
+    inline DATA_T* Set() { if(!mpData) mpData = new DATA_T(); return mpData; }
+    inline const DATA_T* operator->() const { if(mpData) return mpData; else return &kDefault; }
+    inline bool IsPresent() const { return (mpData); }
+protected:
+    DATA_T* mpData;
+    static const DATA_T kDefault;
+};
+
+template<typename DATA_T>
+class FauxOptionalDataPtr
+{
+public:
+    inline FauxOptionalDataPtr() : mData() {}
+    inline FauxOptionalDataPtr(const FauxOptionalDataPtr& o) : mData(o.mData) {}
+    inline ~FauxOptionalDataPtr() {}
+    inline FauxOptionalDataPtr& operator=(const FauxOptionalDataPtr& o) { mData = o.mData; return *this; }
+    inline DATA_T* Set() { return &mData; }
+    inline const DATA_T* operator->() const { return &mData; }
+    // IsPresent() method not supported
+protected:
+    DATA_T mData;
+    static const DATA_T kDefault; // for compatibility with genuine OptionalDataPtr
+};
+
+
+class FinishData;
+
+typedef const FinishData*                   ConstFinishPtr;
+typedef FinishData*                         UniqueFinishPtr;
+typedef boost::intrusive_ptr<FinishData>    CommonFinishPtr;
+typedef CowPtr<FinishData>                  FinishPtr;
+
 
 typedef unsigned short HF_VAL;
 

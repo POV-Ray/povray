@@ -304,7 +304,7 @@ class Parser : public SceneTask
         void Parse_Error (TOKEN Token_Id);
         void Found_Instead_Error (const char *exstr, const char *extokstr);
         bool Parse_Begin (bool mandatory = true);
-        void Parse_End (void);
+        bool Parse_End (bool mandatory = true);
         bool Parse_Comma (void);
         void Parse_Semi_Colon (bool force_semicolon);
         void Destroy_Frame (void);
@@ -373,7 +373,7 @@ class Parser : public SceneTask
         TextureData Parse_Texture (void);
         void Parse_Pigment (PIGMENT **);
         void Parse_Tnormal (TNORMAL **);
-        void Parse_Finish (FINISH **);
+        void Parse_Finish (FinishPtr&);
         void Parse_Media (vector<Media>&);
         void Parse_Interior (InteriorPtr&);
         void Parse_Media_Density_Pattern (PIGMENT **);

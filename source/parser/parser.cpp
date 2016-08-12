@@ -175,7 +175,7 @@ void Parser::Run()
         Default_Texture.Create();
         Default_Texture.FirstLayer()->Pigment = Create_Pigment();
         Default_Texture.FirstLayer()->Tnormal = NULL;
-        Default_Texture.FirstLayer()->Finish  = Create_Finish();
+        Default_Texture.FirstLayer()->Finish  = FinishPtr(new pov::FinishData());
 
         Not_In_Default = true;
         Ok_To_Declare = true;
@@ -650,7 +650,7 @@ bool Parser::Parse_Begin (bool mandatory)
 *
 ******************************************************************************/
 
-void Parser::Parse_End ()
+bool Parser::Parse_End (bool mandatory)
 {
     const char *front;
 
@@ -663,11 +663,20 @@ void Parser::Parse_End ()
             Warning("Possible '}' brace missmatch.");
             Brace_Index = 0;
         }
-        return;
+        return true;
     }
+    else
+    {
+        if (mandatory)
+        {
+            front = Get_Token_String (Brace_Stack[Brace_Index]);
+            Found_Instead_Error("No matching } in", front);
+        }
+        else
+            Unget_Token();
 
-    front = Get_Token_String (Brace_Stack[Brace_Index]);
-    Found_Instead_Error("No matching } in", front);
+        return false;
+    }
 }
 
 /*****************************************************************************
@@ -1084,7 +1093,7 @@ void Parser::Parse_Blob_Element_Mods(Blob_Element *Element)
                 END_CASE
 
                 CASE (FINISH_TOKEN)
-                    Parse_Finish(&Element->Texture.FirstLayer()->Finish);
+                    Parse_Finish(Element->Texture.FirstLayer()->Finish);
                 END_CASE
 
                 OTHERWISE
@@ -6701,7 +6710,7 @@ void Parser::Parse_Default ()
     TextureData Local_Texture;
     PIGMENT *Local_Pigment;
     TNORMAL *Local_Tnormal;
-    FINISH  *Local_Finish;
+    FinishPtr Local_Finish;
 
     Not_In_Default = false;
     Parse_Begin();
@@ -6738,11 +6747,7 @@ void Parser::Parse_Default ()
         END_CASE
 
         CASE (FINISH_TOKEN)
-            Local_Finish = Copy_Finish((Default_Texture.FirstLayer()->Finish));
-            Parse_Finish (&Local_Finish);
-            if (Default_Texture.FirstLayer()->Finish)
-                delete Default_Texture.FirstLayer()->Finish;
-            Default_Texture.FirstLayer()->Finish = Local_Finish;
+            Parse_Finish (Default_Texture.FirstLayer()->Finish);
         END_CASE
 
         CASE (RADIOSITY_TOKEN)
@@ -7750,7 +7755,7 @@ ObjectPtr Parser::Parse_Object_Mods (ObjectPtr Object)
                 END_CASE
 
                 CASE (FINISH_TOKEN)
-                    Parse_Finish ( &(Object->Texture.FirstLayer()->Finish) );
+                    Parse_Finish (Object->Texture.FirstLayer()->Finish);
                 END_CASE
 
                 OTHERWISE
@@ -8831,7 +8836,7 @@ bool Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENT
     RGBFTColour *Local_Colour;
     PIGMENT *Local_Pigment;
     TNORMAL *Local_Tnormal;
-    FINISH *Local_Finish;
+    FinishPtr *Local_Finish;
     TextureData Local_Texture, Temp_Texture;
     TRANSFORM *Local_Trans;
     ObjectPtr Local_Object;
@@ -9064,8 +9069,8 @@ bool Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENT
         END_CASE
 
         CASE (FINISH_TOKEN)
-            Local_Finish = Copy_Finish(Default_Texture.FirstLayer()->Finish);
-            Parse_Finish (&Local_Finish);
+            Local_Finish = new FinishPtr(Default_Texture.FirstLayer()->Finish);
+            Parse_Finish (*Local_Finish);
             *NumberPtr = FINISH_ID_TOKEN;
             Test_Redefine(Previous,NumberPtr,*DataPtr, allow_redefine);
             *DataPtr   = reinterpret_cast<void *>(Local_Finish);
@@ -9329,7 +9334,7 @@ void Parser::Destroy_Ident_Data(void *Data, int Type)
             delete reinterpret_cast<TNORMAL *>(Data);
             break;
         case FINISH_ID_TOKEN:
-            delete reinterpret_cast<FINISH *>(Data);
+            delete reinterpret_cast<FinishPtr *>(Data);
             break;
         case MEDIA_ID_TOKEN:
             delete reinterpret_cast<Media *>(Data);
@@ -9692,7 +9697,7 @@ void Parser::MAError (const char *, long)
 void Parser::Post_Process (ObjectPtr Object, ObjectPtr Parent)
 {
     DBL Volume;
-    FINISH *Finish;
+    CommonFinishPtr Finish;
 
     if (Object == NULL)
     {
@@ -9919,19 +9924,19 @@ void Parser::Post_Process (ObjectPtr Object, ObjectPtr Parent)
         {
             if (Object->Texture.PatternType() == PLAIN_PATTERN)
             {
-                if ((Finish = Object->Texture.FirstLayer()->Finish) != NULL)
+                if ((Finish = Object->Texture.FirstLayer()->Finish.GetCommon()) != NULL)
                 {
-                    if (Finish->Temp_IOR >= 0.0)
+                    if (Finish->tempData->ior >= 0.0)
                     {
-                        Object->interior->IOR = Finish->Temp_IOR;
-                        Object->interior->Dispersion = Finish->Temp_Dispersion;
+                        Object->interior->IOR = Finish->tempData->ior;
+                        Object->interior->Dispersion = Finish->tempData->dispersion;
                     }
-                    if (Finish->Temp_Caustics >= 0.0)
+                    if (Finish->tempData->caustics >= 0.0)
                     {
-                        Object->interior->Caustics = Finish->Temp_Caustics;
+                        Object->interior->Caustics = Finish->tempData->caustics;
                     }
 
-                    Object->interior->Old_Refract = Finish->Temp_Refract;
+                    Object->interior->Old_Refract = Finish->tempData->refract;
                 }
             }
         }
@@ -10390,7 +10395,7 @@ void *Parser::Copy_Identifier (void *Data, int Type)
             New = reinterpret_cast<void *>(Copy_Tnormal(reinterpret_cast<TNORMAL *>(Data)));
             break;
         case FINISH_ID_TOKEN:
-            New = reinterpret_cast<void *>(Copy_Finish(reinterpret_cast<FINISH *>(Data)));
+            New = reinterpret_cast<void *>(new FinishPtr(*(reinterpret_cast<FinishPtr *>(Data))));
             break;
         case MEDIA_ID_TOKEN:
             New = reinterpret_cast<void *>(new Media(*(reinterpret_cast<Media *>(Data))));

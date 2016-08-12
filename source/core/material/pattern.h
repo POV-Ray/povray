@@ -70,7 +70,7 @@ enum PATTERN_IDS
     PLAIN_PATTERN,
     AVERAGE_PATTERN,
     UV_MAP_PATTERN,
-    BITMAP_PATTERN,
+    BITMAP_PATTERN,             ///< `image_map` (pigment), `bump_map` (normal) or `material_map` (texture). @note not to be confused with @ref IMAGE_PATTERN.
 
     // The following former normal patterns require special handling.  They must be kept seperate for now.
 
@@ -93,28 +93,17 @@ enum PATTERN_IDS
 
     // The following patterns return float values.  They must be kept together and seperate from those above.
 
-    MARBLE_PATTERN,
-    WOOD_PATTERN,
     AGATE_PATTERN,
     JULIA_PATTERN,
-    JULIA3_PATTERN,
-    JULIA4_PATTERN,
-    JULIAX_PATTERN,
     MANDEL_PATTERN,
-    MANDEL3_PATTERN,
-    MANDEL4_PATTERN,
-    MANDELX_PATTERN,
-    MAGNET1M_PATTERN,
-    MAGNET1J_PATTERN,
-    MAGNET2M_PATTERN,
-    MAGNET2J_PATTERN,
+    MAGNET_PATTERN,
     CRACKLE_PATTERN,
     DENSITY_FILE_PATTERN,
-    IMAGE_PATTERN,
+    IMAGE_PATTERN,              ///< `image_pattern`. @note not to be confused with @ref IMAGE_PATTERN.
     PAVEMENT_PATTERN,
     TILING_PATTERN,
 
-    GENERIC_PATTERN     ///< Pattern does not need any legacy special handling anywhere
+    GENERIC_PATTERN             ///< Pattern does not need any legacy special handling anywhere
 };
 
 /* flags for patterned stuff */

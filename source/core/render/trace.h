@@ -479,7 +479,7 @@ class Trace
         /// @param[out]     colour          Computed colour.
         /// @param[in]      weight          Importance of this computation.
         ///
-        void ComputeReflection(const FINISH* finish, const Vector3d& ipoint, Ray& ray, const Vector3d& normal,
+        void ComputeReflection(ConstFinishPtr finish, const Vector3d& ipoint, Ray& ray, const Vector3d& normal,
                                const Vector3d& rawnormal, MathColour& colour, COLC weight);
 
         /// Compute the refraction contribution.
@@ -497,7 +497,7 @@ class Trace
         /// @param[in]      weight          Importance of this computation.
         /// @return                         `true` if total internal reflection _did_ occur.
         ///
-        bool ComputeRefraction(const FINISH* finish, Interior *interior, const Vector3d& ipoint, Ray& ray,
+        bool ComputeRefraction(ConstFinishPtr finish, Interior *interior, const Vector3d& ipoint, Ray& ray,
                                const Vector3d& normal, const Vector3d& rawnormal, MathColour& colour, ColourChannel& transm, COLC weight);
 
         /// Compute the contribution of a single refracted ray.
@@ -518,7 +518,7 @@ class Trace
         /// @param[in]      weight          Importance of this computation.
         /// @return                         `true` if total internal reflection _did_ occur.
         ///
-        bool TraceRefractionRay(const FINISH* finish, const Vector3d& ipoint, Ray& ray, Ray& nray, double ior, double n,
+        bool TraceRefractionRay(ConstFinishPtr finish, const Vector3d& ipoint, Ray& ray, Ray& nray, double ior, double n,
                                 const Vector3d& normal, const Vector3d& rawnormal, const Vector3d& localnormal,
                                 MathColour& colour, ColourChannel& transm, COLC weight);
 
@@ -535,13 +535,13 @@ class Trace
     ///
 
         /// @todo The name is misleading, as it computes all contributions of classic lighting, including highlights.
-        void ComputeDiffuseLight(const FINISH *finish, const Vector3d& ipoint, const  Ray& eye, const Vector3d& layer_normal, const MathColour& layer_pigment_colour,
+        void ComputeDiffuseLight(ConstFinishPtr finish, const Vector3d& ipoint, const  Ray& eye, const Vector3d& layer_normal, const MathColour& layer_pigment_colour,
                                  MathColour& colour, double attenuation, ObjectPtr object, double relativeIor);
         /// @todo The name is misleading, as it computes all contributions of classic lighting, including highlights.
-        void ComputeOneDiffuseLight(const LightSource &lightsource, const Vector3d& reye, const FINISH *finish, const Vector3d& ipoint, const Ray& eye,
+        void ComputeOneDiffuseLight(const LightSource &lightsource, const Vector3d& reye, ConstFinishPtr finish, const Vector3d& ipoint, const Ray& eye,
                                     const Vector3d& layer_normal, const MathColour& Layer_Pigment_Colour, MathColour& colour, double Attenuation, ConstObjectPtr Object, double relativeIor, int light_index = -1);
         /// @todo The name is misleading, as it computes all contributions of classic lighting, including highlights.
-        void ComputeFullAreaDiffuseLight(const LightSource &lightsource, const Vector3d& reye, const FINISH *finish, const Vector3d& ipoint, const Ray& eye,
+        void ComputeFullAreaDiffuseLight(const LightSource &lightsource, const Vector3d& reye, ConstFinishPtr finish, const Vector3d& ipoint, const Ray& eye,
                                          const Vector3d& layer_normal, const MathColour& layer_pigment_colour, MathColour& colour, double attenuation,
                                          double lightsourcedepth, Ray& lightsourceray, const MathColour& lightcolour,
                                          ConstObjectPtr object, double relativeIor); // JN2007: Full area lighting
@@ -613,7 +613,7 @@ class Trace
     ///
 
         /// @todo The name is misleading, as it computes all contributions of classic lighting, including highlights.
-        void ComputePhotonDiffuseLight(const FINISH *Finish, const Vector3d& IPoint, const Ray& Eye, const Vector3d& Layer_Normal, const Vector3d& Raw_Normal,
+        void ComputePhotonDiffuseLight(const ConstFinishPtr Finish, const Vector3d& IPoint, const Ray& Eye, const Vector3d& Layer_Normal, const Vector3d& Raw_Normal,
                                        const MathColour& Layer_Pigment_Colour, MathColour& colour, double Attenuation,
                                        ConstObjectPtr Object, double relativeIor, PhotonGatherer& renderer);
 
@@ -644,7 +644,7 @@ class Trace
         /// @param[in]      backside                Whether to use backside instead of frontside diffuse brightness
         ///                                         factor.
         ///
-        void ComputeDiffuseColour(const FINISH *finish, const Vector3d& lightDirection, const Vector3d& eyeDirection, const Vector3d& layer_normal,
+        void ComputeDiffuseColour(ConstFinishPtr finish, const Vector3d& lightDirection, const Vector3d& eyeDirection, const Vector3d& layer_normal,
                                   MathColour& colour, const MathColour& light_colour,
                                   const MathColour& layer_pigment_colour, double relativeIor, double attenuation, bool backside);
 
@@ -659,7 +659,7 @@ class Trace
         /// @param[in]      ipoint          Intersection point (possibly with earlier warps already applied).
         /// @param[in,out]  colour          Effective surface colour.
         ///
-        void ComputeIridColour(const FINISH *finish, const Vector3d& lightDirection, const Vector3d& eyeDirection,
+        void ComputeIridColour(ConstFinishPtr finish, const Vector3d& lightDirection, const Vector3d& eyeDirection,
                                const Vector3d& layer_normal, const Vector3d& ipoint, MathColour& colour);
 
         /// Compute the Phong highlight contribution of a finish illuminated by light from a given direction.
@@ -679,7 +679,7 @@ class Trace
         /// @param[in]      layer_pigment_colour    Nominal pigment colour.
         /// @param[in]      fresnel                 Whether to apply fresnel-based attenuation.
         ///
-        void ComputePhongColour(const FINISH *finish, const Vector3d& lightDirection, const Vector3d& eyeDirection,
+        void ComputePhongColour(ConstFinishPtr finish, const Vector3d& lightDirection, const Vector3d& eyeDirection,
                                 const Vector3d& layer_normal, MathColour& colour, const MathColour& light_colour,
                                 const MathColour& layer_pigment_colour, double relativeIor);
 
@@ -700,7 +700,7 @@ class Trace
         /// @param[in]      layer_pigment_colour    Nominal pigment colour.
         /// @param[in]      fresnel                 Whether to apply fresnel-based attenuation.
         ///
-        void ComputeSpecularColour(const FINISH *finish, const Vector3d& lightDirection, const Vector3d& eyeDirection,
+        void ComputeSpecularColour(ConstFinishPtr finish, const Vector3d& lightDirection, const Vector3d& eyeDirection,
                                    const Vector3d& layer_normal, MathColour& colour, const MathColour& light_colour,
                                    const MathColour& layer_pigment_colour, double relativeIor);
 
@@ -788,7 +788,7 @@ class Trace
         void ComputeDiffuseAmbientContribution1(const Intersection& out, const Vector3d& vOut, const Intersection& in, MathColour& Total_Colour, const PreciseMathColour& sigma_prime_s, const PreciseMathColour& sigma_a, double eta, double weight, TraceTicket& ticket);
         void ComputeOneSingleScatteringContribution(const LightSource& lightsource, const Intersection& out, double sigma_t_xo, double sigma_s, double s_prime_out, MathColour& Lo, double eta, const Vector3d& bend_point, double phi_out, double cos_out_prime, TraceTicket& ticket);
         void ComputeSingleScatteringContribution(const Intersection& out, double dist, double theta_out, double cos_out_prime, const Vector3d& refractedREye, double sigma_t_xo, double sigma_s, MathColour& Lo, double eta, TraceTicket& ticket);
-        void ComputeSubsurfaceScattering (const FINISH *Finish, const MathColour& layer_pigment_colour, const Intersection& isect, Ray& Eye, const Vector3d& Layer_Normal, MathColour& colour, double Attenuation);
+        void ComputeSubsurfaceScattering (ConstFinishPtr Finish, const MathColour& layer_pigment_colour, const Intersection& isect, Ray& Eye, const Vector3d& Layer_Normal, MathColour& colour, double Attenuation);
         bool SSLTComputeRefractedDirection(const Vector3d& v, const Vector3d& n, double eta, Vector3d& refracted);
 
     ///
