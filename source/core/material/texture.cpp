@@ -1220,8 +1220,6 @@ FinishData::FinishData(const FinishData& o) :
 FinishData::~FinishData()
 {}
 
-const FinishData::TempData OptionalDataPtr<FinishData::TempData>::kDefault;
-
 
 /*****************************************************************************
 *

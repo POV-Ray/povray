@@ -372,6 +372,9 @@ protected:
     static const DATA_T kDefault;
 };
 
+template<typename DATA_T> const DATA_T OptionalDataPtr<DATA_T>::kDefault = DATA_T();
+
+
 template<typename DATA_T>
 class FauxOptionalDataPtr
 {
