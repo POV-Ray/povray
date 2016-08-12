@@ -266,6 +266,10 @@ Reported via the Newsgroups:
   (2016-06-16, povray.bugreports, "Function bug with POV-Ray 3.7.1-alpha.8638272 Ubuntu 14.04")
   Bug in isosurfaces with non-zero threshold.
 
+- <web.57ad048990f06e6231fe18be0@news.povray.org>
+  (2016-08-11, povray.general, "Caustics not working with transparent background")
+  Bug causing radiosity to ignore refracted `no_image` objects.
+
 Reported via Windows Crash Reports:
 
 - crash report #???, dump file #988

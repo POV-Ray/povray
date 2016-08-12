@@ -83,7 +83,7 @@ class Ray : public BasicRay
         void SetFlags(RayType rt, const Ray& other);
 
         bool IsPrimaryRay() const { return primaryRay; }
-        bool IsImageRay() const { return primaryRay || (refractionRay && !reflectionRay); }
+        bool IsImageRay() const { return primaryRay || (refractionRay && !reflectionRay && !radiosityRay); }
         bool IsReflectionRay() const { return reflectionRay; }
         bool IsRefractionRay() const { return refractionRay; }
         bool IsSubsurfaceRay() const { return subsurfaceRay; }
