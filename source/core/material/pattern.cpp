@@ -44,9 +44,6 @@
 
 #include <limits>
 #include <algorithm>
-#ifdef AVX2_INTRINSICS
-#include <immintrin.h>
-#endif
 
 #include "base/fileinputoutput.h"
 
@@ -6051,21 +6048,6 @@ inline DBL fblob(DBL v, DBL s)
   return 1.0/exp(v*s);
 }
 
-#ifdef AVX2_INTRINSICS
-// Needed only for AVX2 option of interpolation modes 3,4 and 5.
-inline void calcAllDiffsSqrd(double *aryd, double this_d, __m256i v_range)
-{  //---- Do all our dist calculations for axis
-   __m256d v_thisd    = _mm256_set1_pd(this_d);
-   __m256d v_rangexd1 = _mm256_cvtepi32_pd(_mm256_extracti128_si256(v_range,0b0));
-   __m256d v_rangexd2 = _mm256_cvtepi32_pd(_mm256_extracti128_si256(v_range,0b1));
-   __m256d v_diffx1   = _mm256_sub_pd(v_rangexd1,v_thisd);
-   __m256d v_diffx2   = _mm256_sub_pd(v_rangexd2,v_thisd);
-   __m256d v_diffx12  = _mm256_mul_pd(v_diffx1,v_diffx1);
-   __m256d v_diffx22  = _mm256_mul_pd(v_diffx2,v_diffx2);
-                        _mm256_store_pd(aryd,v_diffx12);
-                        _mm256_store_pd(&aryd[4],v_diffx22);
-}
-#else
 inline void calcAllDiffsSqrd(double *aryd, double this_d, size_t *ary)
 {  //---- Do all our dist calculations for axis at this point
    size_t n;
@@ -6076,7 +6058,6 @@ inline void calcAllDiffsSqrd(double *aryd, double this_d, size_t *ary)
        aryd[n]=tmpVal*tmpVal;
    }
 }
-#endif
 
 inline float intp3(float t, float fa, float fb, float fc, float fd)
 {
@@ -6117,9 +6098,7 @@ DBL DensityFilePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *
     DBL density = 0.0;
     DensityFilePattern::DensityFileDataStruct *Data;
     size_t k0, k1, k2, k3, i, j, k, ii, jj, kk;
-#ifndef AVX2_INTRINSICS
-    size_t rx[8],ry[8],rz[8];     // Not used if doing the avx2 method.
-#endif
+    size_t rx[8],ry[8],rz[8];
     DBL    rxd[8],ryd[8],rzd[8];
     size_t startidx, stopidx;
     DBL    runningval,strengthBias;
@@ -6143,6 +6122,9 @@ DBL DensityFilePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *
                     z = (size_t)(Ez * (DBL)Data->Sz);
 
                     // TODO - Code safe, but think the conditional here redundant to outer most test on Ex,Ey,Ez
+                    //        and these tests considerably degrade the performance of interpolation 0.
+                    //        Believe the Data->Type tests should also be re-ordered most likely (1byte) to least (4byte)
+                    //
                     if ((x < 0) || (x >= Data->Sx) || (y < 0) || (y >= Data->Sy) || (z < 0) || (z >= Data->Sz))
                         density = 0.0;
                     else
@@ -6156,7 +6138,7 @@ DBL DensityFilePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *
                     }
                     break;
                 case kDensityFileInterpolation_Trilinear:
-                    Ex = max(0.0,Ex-(1.0/(DBL)Data->Sx/2.0));
+                    Ex = max(0.0,Ex-(1.0/(DBL)Data->Sx/2.0)); // Adjustment to voxel center
                     Ey = max(0.0,Ey-(1.0/(DBL)Data->Sy/2.0));
                     Ez = max(0.0,Ez-(1.0/(DBL)Data->Sz/2.0));
 
@@ -6217,11 +6199,11 @@ DBL DensityFilePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *
 
                     density = ((f111 * xi + f112 * xx) * yi + (f121 * xi + f122 * xx) * yy) * (1.0 - zz) +
                               ((f211 * xi + f212 * xx) * yi + (f221 * xi + f222 * xx) * yy) * zz;
-                    if (density < 0.0) density = 0.0;
+                    if (density < 0.0) density = 0.0; // Note - Clamp for >1.0 in pattern wave modification code.
                     break;
                 case kDensityFileInterpolation_Tricubic:
                 default:
-                    Ex = max(0.0,Ex-(1.0/(DBL)Data->Sx/2.0));
+                    Ex = max(0.0,Ex-(1.0/(DBL)Data->Sx/2.0)); // Adjustment to voxel center
                     Ey = max(0.0,Ey-(1.0/(DBL)Data->Sy/2.0));
                     Ez = max(0.0,Ez-(1.0/(DBL)Data->Sz/2.0));
 
@@ -6327,7 +6309,7 @@ DBL DensityFilePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *
                 case kDensityFileInterpolation_BlobFour:
                 case kDensityFileInterpolation_BlobSix:
                 case kDensityFileInterpolation_BlobEight:
-                    Ex -= 1.0/(DBL)Data->Sx/2.0;
+                    Ex -= 1.0/(DBL)Data->Sx/2.0; // Adjustment to voxel center
                     Ey -= 1.0/(DBL)Data->Sy/2.0;
                     Ez -= 1.0/(DBL)Data->Sz/2.0;
 
@@ -6339,36 +6321,6 @@ DBL DensityFilePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *
                     y1 = (size_t)this_y;
                     z1 = (size_t)this_z;
 
-                  #ifdef AVX2_INTRINSICS
-                  //-------------------- The AVX2 implementation ---------------------- (-14% intrp=5)
-                                                             // 7 6 5 4 3  2  1  0
-                    const __m256i v_avals    = _mm256_set_epi32(4,3,2,1,0,-1,-2,-3); // Note - intrinsic vars force this block last for clean compile.
-                          __m256i v_xvals    = _mm256_set1_epi32(x1);
-                          __m256i v_yvals    = _mm256_set1_epi32(y1);
-                          __m256i v_zvals    = _mm256_set1_epi32(z1);
-                          __m256i v_rangex1  = _mm256_add_epi32(v_xvals,v_avals);
-                    const __m256i v_minvals  = _mm256_set1_epi32(0);
-                          __m256i v_rangex2  = _mm256_max_epi32 (v_minvals,v_rangex1);
-                          __m256i v_maxvalsx = _mm256_set1_epi32((Data->Sx)-1);
-                          __m256i v_rangex   = _mm256_min_epi32 (v_maxvalsx,v_rangex2);
-                          __m256i v_rangey1  = _mm256_add_epi32(v_yvals,v_avals);
-                          __m256i v_rangey2  = _mm256_max_epi32 (v_minvals,v_rangey1);
-                          __m256i v_maxvalsy = _mm256_set1_epi32((Data->Sy)-1);
-                          __m256i v_rangey   = _mm256_min_epi32 (v_maxvalsy,v_rangey2);
-                          __m256i v_rangez1  = _mm256_add_epi32(v_zvals,v_avals);
-                          __m256i v_rangez2  = _mm256_max_epi32 (v_minvals,v_rangez1);
-                          __m256i v_maxvalsz = _mm256_set1_epi32((Data->Sz)-1);
-                          __m256i v_rangez   = _mm256_min_epi32 (v_maxvalsz,v_rangez2);
-                    int* rx = (int*)&v_rangex;
-                    int* ry = (int*)&v_rangey;
-                    int* rz = (int*)&v_rangez;
-
-                    calcAllDiffsSqrd(rxd,this_x,v_rangex);
-                    calcAllDiffsSqrd(ryd,this_y,v_rangey);
-                    calcAllDiffsSqrd(rzd,this_z,v_rangez);
-                  //-------------------- The AVX2 implementation ----------------------
-                  #else
-                  //-------------------- A non-AVX2 implementation ---------------------- (+16.25% intrp=5)
                     rx[3]=max(0,(int)x1);   ry[3]=max(0,(int)y1);   rz[3]=max(0,(int)z1);
                     rx[2]=max(0,(int)x1-1); ry[2]=max(0,(int)y1-1); rz[2]=max(0,(int)z1-1);
                     rx[1]=max(0,(int)x1-2); ry[1]=max(0,(int)y1-2); rz[1]=max(0,(int)z1-2);
@@ -6382,24 +6334,23 @@ DBL DensityFilePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *
                     calcAllDiffsSqrd(rxd,this_x,rx);
                     calcAllDiffsSqrd(ryd,this_y,ry);
                     calcAllDiffsSqrd(rzd,this_z,rz);
-                  //-------------------- A non-AVX2 implementation ----------------------
-                  #endif
+
                     switch (densityFile->Interpolation)
                     {
                         case kDensityFileInterpolation_BlobFour:
                             startidx     = 2;
                             stopidx      = 5;
-                            strengthBias = 2.4748737341529163;
+                            strengthBias = 2.4748737341529163; // Via manual tuning. Inexact due exp() & potential uses.
                             break;
                         case kDensityFileInterpolation_BlobSix:
-                            startidx = 1;
-                            stopidx  = 6;
+                            startidx     = 1;
+                            stopidx      = 6;
                             strengthBias = 1.2374368670764582;
                             break;
                         case kDensityFileInterpolation_BlobEight:
                         default:
-                            startidx = 0;
-                            stopidx  = 7;
+                            startidx     = 0;
+                            stopidx      = 7;
                             strengthBias = 0.6187184335382291;
                             break;
                     }
@@ -6459,7 +6410,7 @@ DBL DensityFilePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *
                         }
                     }
                     density = min(1.0,runningval);
-                    break;  // Break for last case in switch
+                    break;  // Break for last case in blob switch
             }
         }
         else
