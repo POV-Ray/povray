@@ -6121,21 +6121,13 @@ DBL DensityFilePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *
                     y = (size_t)(Ey * (DBL)Data->Sy);
                     z = (size_t)(Ez * (DBL)Data->Sz);
 
-                    // TODO - Code safe, but think the conditional here redundant to outer most test on Ex,Ey,Ez
-                    //        and these tests considerably degrade the performance of interpolation 0.
-                    //        Believe the Data->Type tests should also be re-ordered most likely (1byte) to least (4byte)
-                    //
-                    if ((x < 0) || (x >= Data->Sx) || (y < 0) || (y >= Data->Sy) || (z < 0) || (z >= Data->Sz))
-                        density = 0.0;
-                    else
-                    {
-                        if(Data->Type == 4)
-                            density = (DBL)Data->Density32[z * Data->Sy * Data->Sx + y * Data->Sx + x] / (DBL)UNSIGNED32_MAX;
-                        else if(Data->Type==2)
-                            density = (DBL)Data->Density16[z * Data->Sy * Data->Sx + y * Data->Sx + x] / (DBL)UNSIGNED16_MAX;
-                        else if(Data->Type == 1)
-                            density = (DBL)Data->Density8[z * Data->Sy * Data->Sx + y * Data->Sx + x] / (DBL)UNSIGNED8_MAX;
-                    }
+                    density = 0.0;
+                    if(Data->Type == 4)
+                        density = (DBL)Data->Density32[z * Data->Sy * Data->Sx + y * Data->Sx + x] / (DBL)UNSIGNED32_MAX;
+                    else if(Data->Type==2)
+                        density = (DBL)Data->Density16[z * Data->Sy * Data->Sx + y * Data->Sx + x] / (DBL)UNSIGNED16_MAX;
+                    else if(Data->Type == 1)
+                        density = (DBL)Data->Density8[z * Data->Sy * Data->Sx + y * Data->Sx + x] / (DBL)UNSIGNED8_MAX;
                     break;
                 case kDensityFileInterpolation_Trilinear:
                     Ex = max(0.0,Ex-(1.0/(DBL)Data->Sx/2.0)); // Adjustment to voxel center
