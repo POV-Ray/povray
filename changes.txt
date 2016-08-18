@@ -270,6 +270,10 @@ Reported via the Newsgroups:
   (2016-08-11, povray.general, "Caustics not working with transparent background")
   Bug causing radiosity to ignore refracted `no_image` objects.
 
+- <web.57b4b6c879df8923b488d9aa0@news.povray.org>
+  (2016-08-17, povray.binaries.scene-files, "Wrong normal direction on triangle{ }s")
+  Bug in flat trianges that could cause interior_texture to show on the wrong side.
+
 Reported via Windows Crash Reports:
 
 - crash report #???, dump file #988

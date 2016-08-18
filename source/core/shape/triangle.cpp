@@ -197,7 +197,7 @@ bool SmoothTriangle::Compute_Smooth_Triangle()
 
 bool SmoothTriangle::Compute_Triangle()
 {
-    int swap, degn;
+    bool swap, degn;
     Vector3d V1, V2, Temp;
     DBL Length;
 
@@ -310,7 +310,7 @@ bool SmoothTriangle::Compute_Triangle()
 
 bool Triangle::Compute_Triangle()
 {
-    int swap;
+    bool swap;
     Vector3d V1, V2, Temp;
     DBL Length;
 
@@ -318,6 +318,8 @@ bool Triangle::Compute_Triangle()
     V2 = P3 - P2;
 
     Normal_Vector = cross(V1, V2);
+    if (mPointOrderSwapped)
+        Normal_Vector = -Normal_Vector;
 
     Length = Normal_Vector.length();
 
@@ -380,6 +382,8 @@ bool Triangle::Compute_Triangle()
         Temp = P2;
         P2 = P1;
         P1 = Temp;
+
+        mPointOrderSwapped = !mPointOrderSwapped;
     }
 
     /* Build the bounding information from the vertices. */
@@ -921,6 +925,8 @@ Triangle::Triangle() : NonsolidObject(TRIANGLE_OBJECT)
     P1 = Vector3d(0.0, 0.0, 0.0);
     P2 = Vector3d(1.0, 0.0, 0.0);
     P3 = Vector3d(0.0, 1.0, 0.0);
+
+    mPointOrderSwapped = false;
 }
 
 Triangle::Triangle(int t) : NonsolidObject(t)
@@ -932,6 +938,8 @@ Triangle::Triangle(int t) : NonsolidObject(t)
     P1 = Vector3d(0.0, 0.0, 0.0);
     P2 = Vector3d(1.0, 0.0, 0.0);
     P3 = Vector3d(0.0, 1.0, 0.0);
+
+    mPointOrderSwapped = false;
 }
 
 
