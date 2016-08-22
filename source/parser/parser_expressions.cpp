@@ -1222,15 +1222,21 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                         // JN2007: Image map dimensions:
                         CASE (PIGMENT_ID_TOKEN)
                             Pigment = reinterpret_cast<PIGMENT *>(Token.Data);
-                            if(Pigment->Type != BITMAP_PATTERN)
+                            if((Pigment->Type != BITMAP_PATTERN) && (Pigment->Type != DENSITY_FILE_PATTERN))
                             {
-                                Error("The parameter to max_extent must be an image map pigment identifier");
+                                Error("The parameter to max_extent must be an image map or density_file pigment identifier");
                             }
-                            else
+                            else if(Pigment->Type == BITMAP_PATTERN)
                             {
                                 Vect[X] = dynamic_cast<ImagePattern*>(Pigment->pattern.get())->pImage->iwidth;
                                 Vect[Y] = dynamic_cast<ImagePattern*>(Pigment->pattern.get())->pImage->iheight;
                                 Vect[Z] = 0;
+                            }
+                            else if(Pigment->Type == DENSITY_FILE_PATTERN)
+                            {
+                                Vect[X] = dynamic_cast<DensityFilePattern*>(Pigment->pattern.get())->densityFile->Data->Sx;
+                                Vect[Y] = dynamic_cast<DensityFilePattern*>(Pigment->pattern.get())->densityFile->Data->Sy;
+                                Vect[Z] = dynamic_cast<DensityFilePattern*>(Pigment->pattern.get())->densityFile->Data->Sz;
                             }
                             EXIT
                         END_CASE
