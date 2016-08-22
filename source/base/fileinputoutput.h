@@ -2,14 +2,13 @@
 ///
 /// @file base/fileinputoutput.h
 ///
-/// This module contains all defines, typedefs, and prototypes for
-/// `fileinputoutput.cpp`.
+/// Declarations related to basic file input and output.
 ///
 /// @copyright
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -32,32 +31,24 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
-#ifndef FILEINPUTOUTPUT_H
-#define FILEINPUTOUTPUT_H
+#ifndef POVRAY_BASE_FILEINPUTOUTPUT_H
+#define POVRAY_BASE_FILEINPUTOUTPUT_H
 
+// Module config header file must be the first file included within POV-Ray unit header files
+#include "base/configbase.h"
+
+// C++ variants of standard C header files
+#include <cstring>
+
+// POV-Ray base header files
 #include "base/path.h"
 #include "base/stringutilities.h"
 #include "base/types.h"
 
-#include <string>
-#include <cstring>
-
 namespace pov_base
 {
-
-#ifndef POV_SEEK_SET
-    #define POV_SEEK_SET IOBase::seek_set
-#endif
-
-#ifndef POV_SEEK_CUR
-    #define POV_SEEK_CUR IOBase::seek_cur
-#endif
-
-#ifndef POV_SEEK_END
-    #define POV_SEEK_END IOBase::seek_end
-#endif
 
 // NOTE: Remember to modify gPOV_File_Extensions in fileinputoutput.cpp!
 enum
@@ -90,121 +81,136 @@ enum
     POV_File_Count
 };
 
-#define POV_FILE_EXTENSIONS_PER_TYPE 4
-typedef struct
-{
-    const char *ext[POV_FILE_EXTENSIONS_PER_TYPE];
-} POV_File_Extensions;
-
 class IOBase
 {
     public:
-        IOBase(unsigned int dir, unsigned int type);
+        IOBase();
+        IOBase(const UCS2String& name);
         virtual ~IOBase();
 
         enum { none = 0, append = 1 };
-        enum { input, output, io };
         enum { seek_set = SEEK_SET, seek_cur = SEEK_CUR, seek_end = SEEK_END };
 
-        virtual bool open(const UCS2String& name, unsigned int Flags = 0);
-        virtual bool close();
-        virtual IOBase& read(void *buffer, size_t count);
-        IOBase& write(const void *buffer, size_t count);
-        virtual IOBase& seekg(POV_LONG pos, unsigned int whence = seek_set);
+        virtual bool seekg(POV_LONG pos, unsigned int whence = seek_set) = 0;
 
-        inline unsigned int gettype() const { return(filetype); }
-        inline unsigned int getdirection() const { return(direction); }
-        inline bool eof() { return(fail ? true : feof(f) != 0); }
-        virtual inline POV_LONG tellg() { return(f == NULL ? -1 : ftell(f)); }
-        inline IOBase& clearstate() { if(f != NULL) fail = false; return *this; }
+        virtual bool eof() const = 0;
+        virtual POV_LONG tellg() const = 0;
+        virtual bool clearstate() = 0;
         inline const UCS2 *Name() const { return(filename.c_str()); }
 
         inline operator const void *() const { return(fail ? 0 :reinterpret_cast<const void *>(this)); }
         inline bool operator!() const { return(fail); }
+
     protected:
         bool fail;
-        FILE *f;
-        IOBase& flush();
-        unsigned int filetype;
-        unsigned int direction;
         UCS2String filename;
 };
 
 class IStream : public IOBase
 {
     public:
-        IStream(const unsigned int Type);
+        IStream();
+        IStream(const UCS2String& name);
         virtual ~IStream();
 
-        virtual inline int Read_Byte() { return(fail ? EOF : fgetc(f)); }
-        int Read_Short();
-        int Read_Int();
-        inline IStream& Read_Byte(char& c) { c =(char) Read_Byte(); return *this; }
-        inline IStream& Read_Byte(unsigned char& c) { c =(unsigned char) Read_Byte(); return *this; }
-        inline IStream& Read_Short(short& n) { n =(short) Read_Short(); return *this; }
-        inline IStream& Read_Short(unsigned short& n) { n =(unsigned short) Read_Short(); return *this; }
-        inline IStream& Read_Int(int& n) { n = Read_Int(); return *this; }
-        inline IStream& Read_Int(unsigned int& n) { n = Read_Int(); return *this; }
+        virtual bool read(void *buffer, size_t count) = 0;
 
-        inline IStream& operator>>(int& n) { read(&n, sizeof(n)); return *this; }
-        inline IStream& operator>>(short& n) { read(&n, sizeof(n)); return *this; }
-        inline IStream& operator>>(char& n) { read(&n, sizeof(n)); return *this; }
-        inline IStream& operator>>(unsigned int& n) { read(&n, sizeof(n)); return *this; }
-        inline IStream& operator>>(unsigned short& n) { read(&n, sizeof(n)); return *this; }
-        inline IStream& operator>>(unsigned char& n) { read(&n, sizeof(n)); return *this; }
-        virtual IStream& UnRead_Byte(int c);
-        virtual IStream& getline(char *s, size_t buflen);
-        IStream& ignore(POV_LONG count) { seekg(count, seek_cur); return *this; }
+        virtual int Read_Byte() = 0;
+        inline bool Read_Byte(char& c) { c =(char) Read_Byte(); return !fail; }
+        inline bool Read_Byte(unsigned char& c) { c =(unsigned char) Read_Byte(); return !fail; }
+
+        /// Step back in the stream by a single byte.
+        /// @attention
+        ///     Derived classes may rely on this function to be called at most once between consecutive read accesses.
+        /// @attention
+        ///     Derived classes may rely on the supplied parameter value to be identical to the last byte actually read.
+        virtual bool UnRead_Byte(int c) = 0;
+
+        virtual bool getline(char *s, size_t buflen) = 0;
+        inline bool ignore(POV_LONG count) { return seekg(count, seek_cur); }
 };
 
-/*
- * Fake a file from a compiled array of char, for Input only
- * Used for built-in fonts support.
- */
+/// File-backed input stream.
+///
+/// This class provides file read access.
+///
+class IFileStream : public IStream
+{
+    public:
+        IFileStream(const UCS2String& name);
+        virtual ~IFileStream();
+
+        virtual bool eof() const { return(fail ? true : feof(f) != 0); }
+        virtual bool seekg(POV_LONG pos, unsigned int whence = seek_set);
+        virtual POV_LONG tellg() const { return(f == NULL ? -1 : ftell(f)); }
+        virtual bool clearstate() { if(f != NULL) fail = false; return !fail; }
+
+        virtual bool read(void *buffer, size_t count);
+        virtual bool getline(char *s, size_t buflen);
+        virtual int Read_Byte();
+
+        virtual bool UnRead_Byte(int c);
+
+    protected:
+        FILE *f;
+};
+
+/// Memory-backed input stream.
+///
+/// This class provides read access to in-memory data in a manner compatible with regular input file
+/// access.
+///
+/// This class is used to support in-built fonts and cached macros.
+///
 class IMemStream : public IStream
 {
     public:
-        IMemStream(const int id);
+        IMemStream(const unsigned char* data, size_t size, const char* formalName, POV_LONG formalStart = 0);
+        IMemStream(const unsigned char* data, size_t size, const UCS2String& formalName, POV_LONG formalStart = 0);
         virtual ~IMemStream();
+
         virtual int Read_Byte();
-        virtual IStream& UnRead_Byte(int c);
-        virtual IStream& getline(char *s, size_t buflen);
-        virtual POV_LONG tellg();
-        virtual IOBase& read(void *buffer, size_t count);
-        virtual IOBase& seekg(POV_LONG pos, unsigned int whence = seek_set);
-        virtual bool open(const UCS2String& name, unsigned int Flags = 0);
-        virtual bool close();
+        virtual bool UnRead_Byte(int c);
+        virtual bool getline(char *s, size_t buflen);
+        virtual POV_LONG tellg() const;
+        virtual bool read(void *buffer, size_t count);
+        virtual bool seekg(POV_LONG pos, unsigned int whence = seek_set);
+        virtual bool clearstate() { fail = false; return true; }
+
+        virtual bool eof() const { return fail; }
+
     protected:
+
         size_t size;
         size_t pos;
+        POV_LONG formalStart;
         const unsigned char * start;
+        int mUngetBuffer;
 };
 
 class OStream : public IOBase
 {
     public:
-        OStream(const unsigned int Type);
-        virtual ~OStream();
+        OStream(const UCS2String& name, unsigned int Flags = 0);
+        ~OStream();
 
+        virtual bool seekg(POV_LONG pos, unsigned int whence = seek_set);
+        virtual POV_LONG tellg() const { return(f == NULL ? -1 : ftell(f)); }
+        inline bool clearstate() { if(f != NULL) fail = false; return !fail; }
+        virtual bool eof() const { return(fail ? true : feof(f) != 0); }
+
+        bool write(const void *buffer, size_t count);
         void printf(const char *format, ...);
+        inline bool Write_Byte(unsigned char data) { if(!fail) fail = fputc(data, f) != data; return !fail; }
 
-        inline OStream& Write_Byte(unsigned char data) { if(!fail) fail = fputc(data, f) != data; return *this; }
-        inline OStream& Write_Short(unsigned short data) { write(&data, sizeof(data)); return *this; }
-        inline OStream& Write_Int(unsigned int data) { write(&data, sizeof(data)); return *this; }
-        inline OStream& flush(void) { IOBase::flush(); return *this; }
+        OStream& flush();
 
-        inline OStream& operator<<(const char *s) { write(reinterpret_cast<const void *>(s), (size_t) strlen(s)); return *this; }
-        inline OStream& operator<<(const unsigned char *s) { return operator<<(reinterpret_cast<const char *>(s)); }
-        inline OStream& operator<<(char c) { return(Write_Byte(c)); }
-        inline OStream& operator<<(unsigned char c) { return operator <<((char) c); }
-        inline OStream& operator<<(short n) { return(Write_Short(n)); }
-        inline OStream& operator<<(unsigned short n) { return operator <<((short) n); }
-        inline OStream& operator<<(int n) { return(Write_Int(n)); }
-        inline OStream& operator<<(unsigned int n) { return operator <<((int) n); }
+    protected:
+        FILE *f;
 };
 
-IStream *NewIStream(const Path&, const unsigned int);
-OStream *NewOStream(const Path&, const unsigned int, const bool);
+IStream *NewIStream(const Path&, unsigned int);
+OStream *NewOStream(const Path&, unsigned int, bool);
 
 UCS2String GetFileExtension(const Path& p);
 UCS2String GetFileName(const Path& p);
@@ -214,12 +220,4 @@ POV_LONG GetFileLength(const Path& p);
 
 }
 
-namespace pov
-{
-    int InferFileTypeFromExt(const pov_base::UCS2String& ext); // TODO FIXME - belongs in backend
-
-    extern pov_base::POV_File_Extensions gPOV_File_Extensions[]; // TODO FIXME - belongs in backend
-    extern const int gFile_Type_To_Mask[]; // TODO FIXME - belongs in backend
-}
-
-#endif
+#endif // POVRAY_BASE_FILEINPUTOUTPUT_H

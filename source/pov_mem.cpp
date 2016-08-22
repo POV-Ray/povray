@@ -32,14 +32,13 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
 // frame.h must always be the first POV file included (pulls in platform config)
 #include "backend/frame.h"
 #include "pov_mem.h"
 
-#include "backend/parser/parse.h"   // MAError()
-#include "povray.h"                 // stats[] global var
+#include "base/pov_err.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -54,8 +53,8 @@ namespace pov
 *
 * DESCRIPTION
 *
-This module replaces the memory allocation calls malloc, calloc, realloc
-and free with the macros POV_MALLOC, POV_CALLOC, POV_REALLOC, and POV_FREE.
+This module replaces the memory allocation calls malloc, realloc
+and free with the macros POV_MALLOC, POV_REALLOC, and POV_FREE.
 These macros work the same as the standard C functions except that the
 POV_xALLOC functions also take a message as the last parameter and
 automatically call MAError(msg) if the allocation fails. That means that
@@ -139,10 +138,6 @@ number of calls to malloc/free and some other statistics.
 /****************************************************************************/
 #ifndef MALLOC
     #define MALLOC malloc
-#endif
-
-#ifndef CALLOC
-    #define CALLOC calloc
 #endif
 
 #ifndef REALLOC
@@ -413,30 +408,6 @@ void *pov_malloc(size_t size, const char *file, int line, const char *msg)
 #endif
 
     return reinterpret_cast<void *>(reinterpret_cast<char *>(block) + NODESIZE + MEM_GUARD_SIZE);
-}
-
-
-/****************************************************************************/
-void *pov_calloc(size_t nitems, size_t size, const char *file, int line, const char *msg)
-{
-    void *block;
-    size_t actsize;
-
-    actsize = nitems * size;
-
-#if defined(MEM_HEADER)
-    if (actsize == 0)
-    {
-// TODO MESSAGE     Error("Attempt to calloc zero size block (File: %s Line: %d).", file, line);
-    }
-#endif
-
-    block = reinterpret_cast<void *>(pov_malloc(actsize, file, line, msg));
-
-    if (block != NULL)
-        memset(block, 0, actsize);
-
-    return block;
 }
 
 

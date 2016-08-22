@@ -2,13 +2,13 @@
 ///
 /// @file base/animation/moov.cpp
 ///
-/// @todo   What's in here?
+/// Implementation of QuickTime (MooV) stream handling.
 ///
 /// @copyright
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -31,18 +31,15 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
-#include <climits>
-
-// configbase.h must always be the first POV file included within base *.cpp files
-#include "base/configbase.h"
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "base/animation/moov.h"
 
-#include "base/animation/animation.h"
-#include "base/povms.h"
+// POV-Ray base header files
 #include "base/pov_err.h"
 #include "base/types.h"
+#include "base/animation/animation.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -50,7 +47,7 @@
 namespace pov_base
 {
 
-typedef POVMSType Type;
+typedef POV_INT32 Type; // TODO - this is a lousy type name
 
 struct PrivateData
 {
@@ -69,10 +66,10 @@ namespace Moov
 
 void WriteAtomHeader(OStream *file, Type type, POV_LONG size);
 void WriteType(OStream *file, Type data);
-void WriteInt2(OStream *file, POVMSInt data);
-void WriteInt4(OStream *file, POVMSInt data);
-void WriteInt8(OStream *file, POV_LONG data);
-void WriteN(OStream *file, size_t cnt, POVMSInt data);
+void WriteInt2(OStream *file, POV_INT16 data);
+void WriteInt4(OStream *file, POV_INT32 data);
+void WriteInt8(OStream *file, POV_INT64 data);
+void WriteN(OStream *file, size_t cnt, POV_INT8 data);
 
 void *ReadFileHeader(IStream *file, float& lengthinseconds, unsigned int& lengthinframes, Animation::CodecType& codec, unsigned int& w, unsigned int& h, const Animation::ReadOptions& options, vector<string>& warnings)
 {
@@ -175,11 +172,11 @@ void PostWriteFrame(OStream *file, POV_LONG bytes, const Animation::WriteOptions
 
     // update mdat size
 
-    file->seekg(0, SEEK_END);
+    file->seekg(0, IOBase::seek_end);
     pd->mdatsize = file->tellg() + 16;
-    file->seekg(8, SEEK_SET);
+    file->seekg(8, IOBase::seek_set);
     WriteInt8(file, pd->mdatsize);
-    file->seekg(0, SEEK_END);
+    file->seekg(0, IOBase::seek_end);
 
     if(bytes > 2147483647) // 2^31 - 1
         throw POV_EXCEPTION(kInvalidDataSizeErr, "Cannot handle frame data larger than 2^31 bytes!");
@@ -390,9 +387,9 @@ void ReadAtomHeader(IStream *file, Type& type, POV_LONG& size)
         ReadType(file, type);
 
         POV_LONG t = file->tellg();
-        file->seekg(0, IOBase::SEEK_END);
+        file->seekg(0, IOBase::seek_end);
         size = file->tellg() - t + 8;
-        file->seekg(t, IOBase::SEEK_SET);
+        file->seekg(t, IOBase::seek_set);
     }
     else if(size == 1) // atom sizes is outside 32-bit range
     {
@@ -412,7 +409,7 @@ void WriteAtomHeader(OStream *file, Type type, POV_LONG size)
         WriteType(file, type);
         WriteInt8(file, 0);
     }
-    else if(size > UINT_MAX) // size outside 32-bit range
+    else if(size > UNSIGNED32_MAX) // size outside 32-bit range
     {
         WriteInt4(file, 1);
         WriteType(file, type);
@@ -433,13 +430,13 @@ void WriteType(OStream *file, Type data)
     file->Write_Byte(data & 255);
 }
 
-void WriteInt2(OStream *file, POVMSInt data)
+void WriteInt2(OStream *file, POV_INT16 data)
 {
     file->Write_Byte((data >> 8) & 255);
     file->Write_Byte(data & 255);
 }
 
-void WriteInt4(OStream *file, POVMSInt data)
+void WriteInt4(OStream *file, POV_INT32 data)
 {
     file->Write_Byte((data >> 24) & 255);
     file->Write_Byte((data >> 16) & 255);
@@ -447,7 +444,7 @@ void WriteInt4(OStream *file, POVMSInt data)
     file->Write_Byte(data & 255);
 }
 
-void WriteInt8(OStream *file, POV_LONG data)
+void WriteInt8(OStream *file, POV_INT64 data)
 {
     file->Write_Byte((data >> 56) & 255);
     file->Write_Byte((data >> 48) & 255);
@@ -459,10 +456,10 @@ void WriteInt8(OStream *file, POV_LONG data)
     file->Write_Byte(data & 255);
 }
 
-void WriteN(OStream *file, size_t cnt, POVMSInt data)
+void WriteN(OStream *file, size_t cnt, POV_INT8 data)
 {
     for(size_t i = 0; i < cnt; i++)
-        file->Write_Byte(data & 255);
+        file->Write_Byte(data);
 }
 
 }

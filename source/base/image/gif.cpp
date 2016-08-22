@@ -2,13 +2,14 @@
 ///
 /// @file base/image/gif.cpp
 ///
-/// This module contains the code to read the GIF file format.
+/// Implementation of Compuserve Graphics Interchange Format (GIF) image file
+/// handling.
 ///
 /// @copyright
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -46,14 +47,11 @@
  * in future portability!
  */
 
-#include <vector>
-
-// configbase.h must always be the first POV file included within base *.cpp files
-#include "base/configbase.h"
-#include "base/image/image.h"
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "base/image/gif.h"
 
-#include <boost/thread.hpp>
+// Standard C++ header files
+#include <vector>
 
 // this must be the last file included
 #include "base/povdebug.h"

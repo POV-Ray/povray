@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -35,19 +35,21 @@
 
 #include <cctype>
 
-// configbase.h must always be the first POV file included within base *.cpp files
-#include "base/configbase.h"
-#include "base/types.h"
-#include "base/povmscpp.h"
-#include "base/fileinputoutput.h"
-#include "base/stringutilities.h"
-#include "base/textstream.h"
-#include "base/povms.h"
-#include "base/povmsgid.h"
-#include "base/pov_err.h"
-
+// configfrontend.h must always be the first POV file included within frontend *.cpp files
 #include "frontend/configfrontend.h"
 #include "frontend/processrenderoptions.h"
+
+#include "povms/povmscpp.h"
+#include "povms/povmsid.h"
+
+#include "base/fileinputoutput.h"
+#include "base/fileutil.h"
+#include "base/pov_err.h"
+#include "base/stringutilities.h"
+#include "base/textstream.h"
+#include "base/types.h"
+#include "base/image/colourspace.h"
+#include "base/image/encoding.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -100,7 +102,7 @@ struct ProcessOptions::INI_Parser_Table RenderOptions_INI_Table[] =
     { "Antialias_Gamma",     kPOVAttrib_AntialiasGamma,     kPOVMSType_Float },
     { "Append_File",         kPOVAttrib_AppendConsoleFiles, kPOVMSType_Bool },
 
-    { "Bits_Per_Color",      kPOVAttrib_BitsPerColor,       kPOVMSType_Int },
+    { "Bits_Per_Color",      kPOVAttrib_BitsPerColor,       kPOVMSType_Int,         kINIOptFlag_SuppressWrite },
     { "Bits_Per_Colour",     kPOVAttrib_BitsPerColor,       kPOVMSType_Int },
     { "Bounding",            kPOVAttrib_Bounding,           kPOVMSType_Bool },
     { "Bounding_Method",     kPOVAttrib_BoundingMethod,     kPOVMSType_Int },
@@ -145,6 +147,7 @@ struct ProcessOptions::INI_Parser_Table RenderOptions_INI_Table[] =
     { "Frame_Step",          kPOVAttrib_FrameStep,          kPOVMSType_Int },
 
     { "Grayscale_Output",    kPOVAttrib_GrayscaleOutput,    kPOVMSType_Bool },
+    { "Greyscale_Output",    kPOVAttrib_GrayscaleOutput,    kPOVMSType_Bool,        kINIOptFlag_SuppressWrite },
 
     { "Height",              kPOVAttrib_Height,             kPOVMSType_Int },
     { "High_Reproducibility",kPOVAttrib_HighReproducibility,kPOVMSType_Bool },
@@ -820,12 +823,6 @@ int ProcessRenderOptions::WriteSpecialOptionHandler(INI_Parser_Table *option, PO
     return err;
 }
 
-bool ProcessRenderOptions::WriteOptionFilter(INI_Parser_Table *table)
-{
-    // So that we don't get both Bits_Per_Color and Bits_Per_Colour in the INI file.
-    return (strcmp(table->keyword, "Bits_Per_Colour") != 0);
-}
-
 int ProcessRenderOptions::ProcessUnknownString(char *str, POVMSObjectPtr obj)
 {
     POVMSAttributeList list;
@@ -961,10 +958,10 @@ ITextStream *ProcessRenderOptions::OpenINIFileStream(const char *filename, unsig
 
     for(i = 0; i < POV_FILE_EXTENSIONS_PER_TYPE; i++)
     {
-        if((l[i] = strlen(pov::gPOV_File_Extensions[stype].ext[i])) > 0)
+        if((l[i] = strlen(pov_base::gPOV_File_Extensions[stype].ext[i])) > 0)
         {
             strcpy(file_x[i], filename);
-            strcat(file_x[i], pov::gPOV_File_Extensions[stype].ext[i]);
+            strcat(file_x[i], pov_base::gPOV_File_Extensions[stype].ext[i]);
         }
     }
 
@@ -972,7 +969,7 @@ ITextStream *ProcessRenderOptions::OpenINIFileStream(const char *filename, unsig
 
     if((hasextension == true) && (CheckIfFileExists(filename) == true))
     {
-        return new ITextStream(ASCIItoUCS2String(filename).c_str(), stype);
+        return new IBufferedTextStream(ASCIItoUCS2String(filename).c_str(), stype);
     }
 
     for(i = 0; i < POV_FILE_EXTENSIONS_PER_TYPE; i++)
@@ -981,7 +978,7 @@ ITextStream *ProcessRenderOptions::OpenINIFileStream(const char *filename, unsig
         {
             if(CheckIfFileExists(file_x[i]) == true)
             {
-                return new ITextStream(ASCIItoUCS2String(file_x[i]).c_str(), stype);
+                return new IBufferedTextStream(ASCIItoUCS2String(file_x[i]).c_str(), stype);
             }
         }
     }
@@ -1026,7 +1023,7 @@ ITextStream *ProcessRenderOptions::OpenINIFileStream(const char *filename, unsig
         if((hasextension == true) && (CheckIfFileExists(pathname) == true))
         {
             (void)POVMSAttrList_Delete(&attr);
-            return new ITextStream(ASCIItoUCS2String(pathname).c_str(), stype);
+            return new IBufferedTextStream(ASCIItoUCS2String(pathname).c_str(), stype);
         }
 
         for(ii = 0; ii < POV_FILE_EXTENSIONS_PER_TYPE; ii++)
@@ -1038,7 +1035,7 @@ ITextStream *ProcessRenderOptions::OpenINIFileStream(const char *filename, unsig
                 if(CheckIfFileExists(pathname) == true)
                 {
                     (void)POVMSAttrList_Delete(&attr);
-                    return new ITextStream(ASCIItoUCS2String(pathname).c_str(), stype);
+                    return new IBufferedTextStream(ASCIItoUCS2String(pathname).c_str(), stype);
                 }
             }
         }
@@ -1047,7 +1044,7 @@ ITextStream *ProcessRenderOptions::OpenINIFileStream(const char *filename, unsig
     (void)POVMSAttrList_Delete(&attr);
 
     if(l[0])
-        ParseError("Could not find file '%s%s'", filename, pov::gPOV_File_Extensions[stype].ext[0]);
+        ParseError("Could not find file '%s%s'", filename, pov_base::gPOV_File_Extensions[stype].ext[0]);
     else
         ParseError("Could not find file '%s'", filename);
 

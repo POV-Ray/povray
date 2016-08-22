@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -38,6 +38,7 @@
 #ifndef CONFIGFRONTEND_H
 #define CONFIGFRONTEND_H
 
+#include "base/configbase.h"
 #include "syspovconfigfrontend.h"
 
 // The output file format used if the user doesn't specify one
@@ -62,6 +63,14 @@
 #endif
 #ifndef DEFAULT_FILE_GAMMA
     #define DEFAULT_FILE_GAMMA 2.2
+#endif
+
+/// @def POVMSLongToCDouble
+/// Macro to convert values of type @ref POVMSLong to `double`.
+/// This macro converts a `POVMSLong` 64 bit value to a double precision floating point value, to allow further
+/// processing of such values (albeit at potentially lower precision) even if it is a compound data type.
+#ifndef POVMSLongToCDouble
+    #define POVMSLongToCDouble(x) double(x)
 #endif
 
 #include "syspovprotofrontend.h"

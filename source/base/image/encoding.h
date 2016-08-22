@@ -9,7 +9,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -37,9 +37,11 @@
 #ifndef POVRAY_BASE_IMAGE_ENCODING_H
 #define POVRAY_BASE_IMAGE_ENCODING_H
 
-#include <boost/thread.hpp>
-
+// Module config header file must be the first file included within POV-Ray unit header files
 #include "base/configbase.h"
+
+// POV-Ray base header files
+#include "base/mathutil.h"
 #include "base/types.h"
 #include "base/image/colourspace.h"
 
@@ -47,6 +49,17 @@ namespace pov_base
 {
 
 class Image;
+
+enum DitherMethodId
+{
+    kPOVList_DitherMethod_None,
+    kPOVList_DitherMethod_Diffusion1D,
+    kPOVList_DitherMethod_Diffusion2D,
+    kPOVList_DitherMethod_FloydSteinberg,
+    kPOVList_DitherMethod_Bayer2x2,
+    kPOVList_DitherMethod_Bayer3x3,
+    kPOVList_DitherMethod_Bayer4x4,
+};
 
 /// Abstract class representing generic dithering rules and respective state information.
 ///
@@ -108,7 +121,7 @@ typedef shared_ptr<DitherHandler> DitherHandlerPtr;
 ///
 
 /// Factory to get a dithering rule and state.
-DitherHandlerPtr GetDitherHandler(int method, unsigned int imageWidth);
+DitherHandlerPtr GetDitherHandler(DitherMethodId method, unsigned int imageWidth);
 
 /// Factory to get a no-op dithering rule.
 DitherHandlerPtr GetNoOpDitherHandler();

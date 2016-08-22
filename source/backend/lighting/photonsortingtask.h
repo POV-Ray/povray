@@ -31,14 +31,15 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
 #ifndef PHOTONSORTINGTASK_H
 #define PHOTONSORTINGTASK_H
 
+#include "core/render/trace.h"
+
 #include "backend/frame.h"
 #include "backend/render/rendertask.h"
-#include "backend/render/trace.h"
 
 namespace pov
 {

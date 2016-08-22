@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -31,7 +31,7 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
 #include <boost/thread.hpp>
 #include <boost/bind.hpp>
@@ -40,9 +40,9 @@
 #include "backend/frame.h"
 #include "backend/control/messagefactory.h"
 
-#include "base/povms.h"
-#include "base/povmscpp.h"
-#include "base/povmsgid.h"
+#include "povms/povmscpp.h"
+#include "povms/povmsid.h"
+
 #include "base/pov_err.h"
 
 // this must be the last file included
@@ -58,7 +58,136 @@ MessageFactory::MessageFactory(unsigned int wl, const char *sn, POVMSAddress sad
     destinationAddress(daddr),
     sceneId(sid),
     viewId(vid)
+{}
+
+MessageFactory::~MessageFactory()
+{}
+
+void MessageFactory::CoreMessage(CoreMessageClass mc, const char *format, ...)
 {
+    va_list marker;
+    POVMSObject msg;
+    char localvsbuffer[1024];
+    WarningLevel level;
+    unsigned int msgClassId;
+
+    switch (mc)
+    {
+        case kCoreMessageClass_Debug:
+            sprintf(localvsbuffer, "%s Debug Info: ", stageName);
+            msgClassId = kPOVMsgIdent_Warning;
+            level = kWarningGeneral;
+            break;
+        case kCoreMessageClass_Info:
+            sprintf(localvsbuffer, "%s Info: ", stageName);
+            msgClassId = kPOVMsgIdent_Warning;
+            level = kWarningGeneral;
+            break;
+        case kCoreMessageClass_Warning:
+            if(warningLevel < kWarningGeneral)
+                return;
+            sprintf(localvsbuffer, "%s Warning: ", stageName);
+            msgClassId = kPOVMsgIdent_Warning;
+            level = kWarningGeneral;
+            break;
+        default:
+            break;
+    }
+
+    if ((msgClassId != kPOVMsgIdent_Warning) || (warningLevel >= level))
+    {
+        va_start(marker, format);
+        vsnprintf(localvsbuffer + strlen(localvsbuffer), 1023 - strlen(localvsbuffer), format, marker);
+        va_end(marker);
+
+        CleanupString(localvsbuffer);
+
+        (void)POVMSObject_New(&msg, kPOVObjectClass_ControlData);
+        (void)POVMSUtil_SetString(&msg, kPOVAttrib_EnglishText, localvsbuffer);
+        if (msgClassId == kPOVMsgIdent_Warning)
+            (void)POVMSUtil_SetInt(&msg, kPOVAttrib_Warning, level);
+
+        if(viewId != 0)
+            (void)POVMSUtil_SetInt(&msg, kPOVAttrib_ViewId, viewId);
+        else
+            (void)POVMSUtil_SetInt(&msg, kPOVAttrib_SceneId, sceneId);
+
+        if(viewId != 0)
+            (void)POVMSMsg_SetupMessage(&msg, kPOVMsgClass_ViewOutput, msgClassId);
+        else
+            (void)POVMSMsg_SetupMessage(&msg, kPOVMsgClass_SceneOutput, msgClassId);
+
+        (void)POVMSMsg_SetSourceAddress(&msg, sourceAddress);
+        (void)POVMSMsg_SetDestinationAddress(&msg, destinationAddress);
+
+        (void)POVMS_Send(NULL, &msg, NULL, kPOVMSSendMode_NoReply);
+    }
+}
+
+void MessageFactory::CoreMessageAt(CoreMessageClass mc, const UCS2 *filename, POV_LONG line, POV_LONG column, POV_LONG offset, const char *format, ...)
+{
+    va_list marker;
+    POVMSObject msg;
+    char localvsbuffer[1024];
+    WarningLevel level;
+    unsigned int msgClassId;
+
+    switch (mc)
+    {
+        case kCoreMessageClass_Debug:
+            sprintf(localvsbuffer, "%s Debug Info: ", stageName);
+            msgClassId = kPOVMsgIdent_Warning;
+            level = kWarningGeneral;
+            break;
+        case kCoreMessageClass_Info:
+            sprintf(localvsbuffer, "%s Info: ", stageName);
+            msgClassId = kPOVMsgIdent_Warning;
+            level = kWarningGeneral;
+            break;
+        case kCoreMessageClass_Warning:
+            if(warningLevel < kWarningGeneral)
+                return;
+            sprintf(localvsbuffer, "%s Warning: ", stageName);
+            msgClassId = kPOVMsgIdent_Warning;
+            level = kWarningGeneral;
+            break;
+        default:
+            break;
+    }
+
+    if ((msgClassId != kPOVMsgIdent_Warning) || (warningLevel >= level))
+    {
+        va_start(marker, format);
+        vsnprintf(localvsbuffer + strlen(localvsbuffer), 1023 - strlen(localvsbuffer), format, marker);
+        va_end(marker);
+
+        CleanupString(localvsbuffer);
+
+        (void)POVMSObject_New(&msg, kPOVObjectClass_ControlData);
+        (void)POVMSUtil_SetUCS2String(&msg, kPOVAttrib_FileName, filename);
+        (void)POVMSUtil_SetLong(&msg, kPOVAttrib_Line, line);
+        (void)POVMSUtil_SetLong(&msg, kPOVAttrib_Column, column);
+        (void)POVMSUtil_SetLong(&msg, kPOVAttrib_FilePosition, offset);
+
+        (void)POVMSUtil_SetString(&msg, kPOVAttrib_EnglishText, localvsbuffer);
+        if (msgClassId == kPOVMsgIdent_Warning)
+            (void)POVMSUtil_SetInt(&msg, kPOVAttrib_Warning, level);
+
+        if(viewId != 0)
+            (void)POVMSUtil_SetInt(&msg, kPOVAttrib_ViewId, viewId);
+        else
+            (void)POVMSUtil_SetInt(&msg, kPOVAttrib_SceneId, sceneId);
+
+        if(viewId != 0)
+            (void)POVMSMsg_SetupMessage(&msg, kPOVMsgClass_ViewOutput, msgClassId);
+        else
+            (void)POVMSMsg_SetupMessage(&msg, kPOVMsgClass_SceneOutput, msgClassId);
+
+        (void)POVMSMsg_SetSourceAddress(&msg, sourceAddress);
+        (void)POVMSMsg_SetDestinationAddress(&msg, destinationAddress);
+
+        (void)POVMS_Send(NULL, &msg, NULL, kPOVMSSendMode_NoReply);
+    }
 }
 
 void MessageFactory::Warning(WarningLevel level, const char *format,...)

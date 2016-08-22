@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -31,7 +31,7 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
 #ifndef POVRAY_BACKEND_TASK_H
 #define POVRAY_BACKEND_TASK_H
@@ -53,7 +53,7 @@ namespace pov
 
 using namespace pov_base;
 
-class SceneData;
+class BackendSceneData;
 
 
 class Task
@@ -105,19 +105,27 @@ class Task
             }
         }
 
-        inline static void CurrentTaskCooperate()
-        {
-            TaskData *td = Task::GetTLSDataPtr();
-
-            if((td != NULL) && (td->task != NULL))
-                td->task->Cooperate();
-        }
-
-        inline static TaskData *GetTLSDataPtr() { return GET_THREAD_LOCAL_PTR(taskDataPtr); }
-
         inline TaskData *GetDataPtr() { return taskData; }
 
         inline POVMSContext GetPOVMSContext() { return povmsContext; }
+
+        /// Start a new thread with a given stack size.
+        template<typename CALLABLE_T>
+        inline static boost::thread* NewBoostThread(CALLABLE_T func, int stackSize)
+        {
+#if HAVE_BOOST_THREAD_ATTRIBUTES
+            // boost 1.50 and later provide an official mechanism to set the stack size.
+            boost::thread::attributes attr;
+            attr.set_stack_size (stackSize);
+            return new boost::thread(attr, func);
+#elif !defined(USE_OFFICIAL_BOOST)
+            // Prior to boost 1.50, for some platforms we used an unofficial hacked version of boost to set the stack size.
+            return new boost::thread(func, stackSize);
+#else
+            // For some platforms the default stack size of older boost versions may suffice.
+            return new boost::thread(func);
+#endif
+        }
 
     protected:
 
@@ -134,8 +142,6 @@ class Task
 
         /// task data pointer
         TaskData *taskData;
-        /// task data pointer - TLS version
-        static DECLARE_THREAD_LOCAL_PTR(TaskData, taskDataPtr);
         /// task fatal error handler
         boost::function1<void, Exception&> fatalErrorHandler;
         /// stop request flag
@@ -175,15 +181,13 @@ class Task
         Task& operator=(const Task&);
 
         void TaskThread(const boost::function0<void>& completion);
-
-        static void TaskDataCleanup(Task::TaskData *) { }
 };
 
 
 class SceneTask : public Task
 {
     public:
-        SceneTask(TaskData *td, const boost::function1<void, Exception&>& f, const char* sn, shared_ptr<SceneData> sd, RenderBackend::ViewId vid = 0);
+        SceneTask(TaskData *td, const boost::function1<void, Exception&>& f, const char* sn, shared_ptr<BackendSceneData> sd, RenderBackend::ViewId vid = 0);
 
     protected:
         MessageFactory messageFactory;

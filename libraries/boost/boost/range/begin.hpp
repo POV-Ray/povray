@@ -11,7 +11,7 @@
 #ifndef BOOST_RANGE_BEGIN_HPP
 #define BOOST_RANGE_BEGIN_HPP
 
-#if defined(_MSC_VER) && (_MSC_VER >= 1200)
+#if defined(_MSC_VER)
 # pragma once
 #endif
 
@@ -26,9 +26,7 @@
 namespace boost
 {
 
-#if !BOOST_WORKAROUND(__BORLANDC__, BOOST_TESTED_AT(0x564)) && \
-    !BOOST_WORKAROUND(__GNUC__, < 3) \
-    /**/
+#if !BOOST_WORKAROUND(__BORLANDC__, BOOST_TESTED_AT(0x564))
 namespace range_detail
 {
 #endif
@@ -85,19 +83,20 @@ namespace range_detail
     }
 
 
-#if !BOOST_WORKAROUND(__BORLANDC__, BOOST_TESTED_AT(0x564)) && \
-    !BOOST_WORKAROUND(__GNUC__, < 3) \
-    /**/
+#if !BOOST_WORKAROUND(__BORLANDC__, BOOST_TESTED_AT(0x564))
 } // namespace 'range_detail'
 #endif
 
+// Use a ADL namespace barrier to avoid ambiguity with other unqualified
+// calls. This is particularly important with C++0x encouraging
+// unqualified calls to begin/end.
+namespace range_adl_barrier
+{
 
 template< class T >
 inline BOOST_DEDUCED_TYPENAME range_iterator<T>::type begin( T& r )
 {
-#if !BOOST_WORKAROUND(__BORLANDC__, BOOST_TESTED_AT(0x564)) && \
-    !BOOST_WORKAROUND(__GNUC__, < 3) \
-    /**/
+#if !BOOST_WORKAROUND(__BORLANDC__, BOOST_TESTED_AT(0x564))
     using namespace range_detail;
 #endif
     return range_begin( r );
@@ -106,27 +105,31 @@ inline BOOST_DEDUCED_TYPENAME range_iterator<T>::type begin( T& r )
 template< class T >
 inline BOOST_DEDUCED_TYPENAME range_iterator<const T>::type begin( const T& r )
 {
-#if !BOOST_WORKAROUND(__BORLANDC__, BOOST_TESTED_AT(0x564)) && \
-    !BOOST_WORKAROUND(__GNUC__, < 3) \
-    /**/
+#if !BOOST_WORKAROUND(__BORLANDC__, BOOST_TESTED_AT(0x564))
     using namespace range_detail;
 #endif
     return range_begin( r );
 }
 
+    } // namespace range_adl_barrier
 } // namespace boost
 
 #endif // BOOST_NO_FUNCTION_TEMPLATE_ORDERING
 
 namespace boost
 {
-    template< class T >
-    inline BOOST_DEDUCED_TYPENAME range_iterator<const T>::type
-    const_begin( const T& r )
+    namespace range_adl_barrier
     {
-        return boost::begin( r );
-    }
-}
+        template< class T >
+        inline BOOST_DEDUCED_TYPENAME range_iterator<const T>::type
+        const_begin( const T& r )
+        {
+            return boost::range_adl_barrier::begin( r );
+        }
+    } // namespace range_adl_barrier
+
+    using namespace range_adl_barrier;
+} // namespace boost
 
 #endif
 

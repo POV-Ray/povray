@@ -2,13 +2,13 @@
 ///
 /// @file base/stringutilities.cpp
 ///
-/// This module implements string utility functions.
+/// Implementations related to string handling.
 ///
 /// @copyright
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -31,19 +31,17 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
+#include "stringutilities.h"
+
+// C++ variants of standard C header files
 #include <cctype>
 #include <cstdarg>
-#include <cstring>
-#include <cstdlib>
 #include <cstdio>
-#include <cctype>
-
-// configbase.h must always be the first POV file included within base *.cpp files
-#include "configbase.h"
-
-#include "stringutilities.h"
+#include <cstdlib>
+#include <cstring>
 
 // this must be the last file included
 #include "base/povdebug.h"

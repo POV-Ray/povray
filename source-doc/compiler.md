@@ -1,13 +1,16 @@
 # Compiler Requirements {#compiler}
 
 
-@section exot   General Presumptions
+General Presumptions {#compiler_exot}
+====================
 
 While POV-Ray is being developed with portability high in mind, the C++ standard allows for some degrees of freedom that
 we consider too exotic to cater to. We therefore presume all compilers and runtime environments to adhere to the
 following additional restrictions:
 
-  - **Char Size**: The `char` data type is presumed to be exactly 8 bits wide.
+  - **Char Size**: The `char` data type is currently presumed to be exactly 8 bits wide.
+
+  - **Pointer Size**: All pointers are presumed to be of the same width.
 
   - **Character Encoding**: The compiler is presumed to accept ASCII-encoded source files; the _source character set_,
     as well as the _basic execution character set_ and its encoding, are presumed to be ASCII-compatible.
@@ -16,10 +19,11 @@ following additional restrictions:
     separator, in include directives.
 
   - **Integer Division**: Integer division is presumed to round towards zero. This also implies that the remainder (as
-    computed by the modulus operator '%') is negative (or zero) if the dividend and divisor have different sign.
+    computed by the modulus operator `%`) is negative (or zero) if the dividend and divisor have different sign.
 
 
-@section povms  POVMS Additional Restrictions
+POVMS Additional Restrictions {#compiler_povms}
+=============================
 
 To support network rendering (a feature not yet implemented but planned) in a heterogenous network, the POVMS interface
 imposes the following additional restriction on the compiler:

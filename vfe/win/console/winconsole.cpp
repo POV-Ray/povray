@@ -1,37 +1,43 @@
-/*******************************************************************************
- * winconsole.cpp
- *
- * This file contains a basic proof-of-concept POV implementation using VFE.
- *
- * Author: Christopher J. Cason
- *
- * ---------------------------------------------------------------------------
- * Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
- * Copyright 1991-2013 Persistence of Vision Raytracer Pty. Ltd.
- *
- * POV-Ray is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * POV-Ray is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------------
- * POV-Ray is based on the popular DKB raytracer version 2.12.
- * DKBTrace was originally written by David K. Buck.
- * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
- * ---------------------------------------------------------------------------
- * $File: //depot/povray/smp/vfe/win/console/winconsole.cpp $
- * $Revision: #12 $
- * $Change: 6075 $
- * $DateTime: 2013/11/09 16:27:09 $
- * $Author: clipka $
- *******************************************************************************/
+//******************************************************************************
+///
+/// @file vfe/win/console/winconsole.cpp
+///
+/// This file contains a basic proof-of-concept POV implementation using VFE.
+///
+/// @author Christopher J. Cason
+///
+/// @copyright
+/// @parblock
+///
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+///
+/// POV-Ray is free software: you can redistribute it and/or modify
+/// it under the terms of the GNU Affero General Public License as
+/// published by the Free Software Foundation, either version 3 of the
+/// License, or (at your option) any later version.
+///
+/// POV-Ray is distributed in the hope that it will be useful,
+/// but WITHOUT ANY WARRANTY; without even the implied warranty of
+/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+/// GNU Affero General Public License for more details.
+///
+/// You should have received a copy of the GNU Affero General Public License
+/// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+///
+/// ----------------------------------------------------------------------------
+///
+/// POV-Ray is based on the popular DKB raytracer version 2.12.
+/// DKBTrace was originally written by David K. Buck.
+/// DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
+///
+/// @endparblock
+///
+//******************************************************************************
+
+#include "base/version.h"
+
+#include "backend/povray.h"
 
 #include "vfe.h"
 
@@ -44,11 +50,11 @@ using namespace vfePlatform;
 
 namespace pov_frontend
 {
-	////////////////////////////////
-	// Called from the shellout code
-	////////////////////////////////
-	bool MinimizeShellouts(void) { return false; } // TODO
-	bool ShelloutsPermitted(void) { return false; } // TODO
+    ////////////////////////////////
+    // Called from the shellout code
+    ////////////////////////////////
+    bool MinimizeShellouts(void) { return false; } // TODO
+    bool ShelloutsPermitted(void) { return false; } // TODO
 }
 
 
@@ -93,7 +99,7 @@ int main (int argc, char **argv)
 
   fprintf(stderr,
           "This is an example of a minimal console build of POV-Ray under Windows.\n\n"
-          "Persistence of Vision Raytracer(tm) " POV_RAY_VERSION COMPILER_VER SSE2_INCLUDED "." PVENGINE_VER ".\n"
+          "Persistence of Vision(tm) Ray Tracer Version " POV_RAY_VERSION COMPILER_VER SSE2_INCLUDED "." POVRAY_PLATFORM_NAME ".\n"
           DISTRIBUTION_MESSAGE_1 "\n"
           DISTRIBUTION_MESSAGE_2 "\n"
           DISTRIBUTION_MESSAGE_3 "\n"

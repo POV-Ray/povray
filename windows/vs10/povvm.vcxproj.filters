@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\..\source\vm\fnintern.cpp">
+      <Filter>VM Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\vm\precomp.cpp">
+      <Filter>VM Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\vm\fnpovfpu.cpp">
+      <Filter>VM Source</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\source\vm\configvm.h">
+      <Filter>VM Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\vm\fnintern.h">
+      <Filter>VM Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\vm\fnpovfpu.h">
+      <Filter>VM Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\vm\precomp.h">
+      <Filter>VM Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\povconfig\syspovconfigvm.h">
+      <Filter>VM Headers</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="VM Source">
+      <UniqueIdentifier>{1ed2b62a-8949-4ceb-9276-fb90b8b89490}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="VM Headers">
+      <UniqueIdentifier>{0ffcd617-9a5a-4447-9b6b-e3a25e60d83c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

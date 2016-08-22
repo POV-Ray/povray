@@ -4,20 +4,22 @@ ACLOCAL_AMFLAGS = -I m4
 
 SUBDIRS = \
 	Half HalfTest \
-	Iex IexTest \
+	Iex IexMath IexTest \
 	Imath ImathTest \
 	IlmThread \
 	config
 
 DIST_SUBDIRS = \
-	$(SUBDIRS) \
-	vc
+	$(SUBDIRS) 
 
 
 EXTRA_DIST = \
 	AUTHORS COPYING ChangeLog INSTALL LICENSE NEWS \
-        README README.CVS README.OSX README.win32 bootstrap \
-	config.windows/IlmBaseConfig.h
+	README README.CVS README.OSX README.win32 \
+	README.cmake.txt README.namespacing README.git \
+	bootstrap \
+	config.windows/IlmBaseConfig.h \
+        CMakeLists.txt
 
 
 pkgconfigdir = $(libdir)/pkgconfig

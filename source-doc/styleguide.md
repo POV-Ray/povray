@@ -6,8 +6,8 @@ way around the code. Therefore, if you want to contribute to the POV-Ray develop
 guidelines presented here. Note that we find some of these rules important enough for our project that we may reject
 non-compliant contributions.
 
-The following covers the rules we deem sufficiently important for everyone to read; if you want more, see @subpage
-styleguide2 for the boring stuff.
+The following covers the rules we deem sufficiently important for everyone to read; if you want more, see
+@subpage styleguide2 for the boring stuff.
 
 
 @section rlm        Role Models
@@ -50,7 +50,7 @@ Even pure cosmetics can have a significant impact on how easily code can be read
 In the POV-Ray project, we are using the following formatting style for new code, and are in the process of
 transitioning existing code to these coventions:
 
-  - Indentation follows Allman style, with an indent of 4 spaces (no tabs), e.g.:
+  - Indentation of braces follows Allman style, with an indent of 4 spaces (no tabs), e.g.:
 
         while (x == y)
         {
@@ -154,15 +154,21 @@ Parameter and variable names might carry one or more additional prefixes. These 
 
 @section inc        Include Files
 
-  - Header files should be included in the following order:
+  - Header files should generally be included in the following order:
+      - POV-Ray module configuration header file, if applicable (mandatory in any unit header file, i.e. any header
+        file with a `.cpp` of the same name; e.g. @ref core/configcore.h in @ref core/colourspace.h).
+      - POV-Ray unit header file, if applicable (mandatory in any `.cpp` file; e.g. @ref core/colourspace.h in
+        @ref core/colourspace.cpp).
       - C++ variants of standard C header files.
       - Standard C++ header files.
       - Boost header files.
       - Other 3rd party library header files, grouped by library.
       - POV-Ray header files.
+      - Debug header file (@ref base/povdebug.h), if applicable (mandatory in any `.cpp` file, _not_ allowed in any
+        other file).
       .
     Within each group, alphabetical order should be preferred. (Note however that certain other ordering constraints
-    might apply for the POV-Ray header files.)
+    might apply within platform-specific portions of the code.)
 
   - C++ source code should _not_ include C standard header files; include the corresponding C++ header files instead
     (e.g. `<cstdio>` instead of `<stdio.h>`).
@@ -191,7 +197,7 @@ Parameter and variable names might carry one or more additional prefixes. These 
 
   - **Const**: Make liberal use of the `const` qualifier where possible, especially in parameter declarations.
 
-  - **Member Visibility**: Except in structs -- which should only be used for stateless plain-old-data aggregates ---
+  - **Member Visibility**: Except in structs -- which should only be used for stateless plain-old-data aggregates --
     all member variables should be protected or private.
 
   - **Macros**: Avoid them wherever reasonably possible.
@@ -227,6 +233,8 @@ source code with comments.
 The interface provided by any source file should be documented in the respective header file, using
 a format compatible with Doxygen 1.8.8. For consistency, please use JavaDoc-style comments (`/// ...`
 or `/** ... */`; the general rules for comments apply) and JavaDoc-style tags (`@``foo`).
+C++ single-line style comments should be preferred, as block comments may occasionally interfere with
+Doxygen's Markdown support.
 
 @note   Platform-specific modules may mandate a different tag style, such as (hypothetically) DocXML
         style for the Windows GUI modules.
@@ -247,6 +255,8 @@ following guidelines:
   - **Warning**: Use the `@``warning` tag when documenting potential pitfalls.
   - **Attention**: Use the `@``attention` tag when documenting pitfalls that may come as a big surprise to the reader or
     have grave effects when not avoided.
+
+However, always use the following instead if they are appropriate:
 
   - **To-Do**: Use the `@``todo` tag when documenting that something is still unfinished and needs more work.
   - **Deprecated**: Use the `@``deprecated` tag when documenting that somehting is only kept around for backward

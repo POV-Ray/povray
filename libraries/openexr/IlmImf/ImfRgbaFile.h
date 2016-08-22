@@ -47,26 +47,25 @@
 //
 //-----------------------------------------------------------------------------
 
-#include <ImfHeader.h>
-#include <ImfFrameBuffer.h>
-#include <ImfRgba.h>
+#include "ImfHeader.h"
+#include "ImfFrameBuffer.h"
+#include "ImfRgba.h"
 #include "ImathVec.h"
 #include "ImathBox.h"
 #include "half.h"
-#include <ImfThreading.h>
+#include "ImfThreading.h"
+#include <string>
+#include "ImfNamespace.h"
+#include "ImfForward.h"
 
-namespace Imf {
+OPENEXR_IMF_INTERNAL_NAMESPACE_HEADER_ENTER
 
-
-class OutputFile;
-class InputFile;
-struct PreviewRgba;
 
 //
 // RGBA output file.
 //
 
-class RgbaOutputFile
+class IMF_EXPORT RgbaOutputFile
 {
   public:
 
@@ -86,7 +85,7 @@ class RgbaOutputFile
     // automatically close the file.
     //----------------------------------------------------
 
-    RgbaOutputFile (OStream &os,
+    RgbaOutputFile (OPENEXR_IMF_INTERNAL_NAMESPACE::OStream &os,
 		    const Header &header,
 		    RgbaChannels rgbaChannels = WRITE_RGBA,
                     int numThreads = globalThreadCount());
@@ -98,11 +97,11 @@ class RgbaOutputFile
     //----------------------------------------------------------------
 
     RgbaOutputFile (const char name[],
-		    const Imath::Box2i &displayWindow,
-		    const Imath::Box2i &dataWindow = Imath::Box2i(),
+		    const IMATH_NAMESPACE::Box2i &displayWindow,
+		    const IMATH_NAMESPACE::Box2i &dataWindow = IMATH_NAMESPACE::Box2i(),
 		    RgbaChannels rgbaChannels = WRITE_RGBA,
 		    float pixelAspectRatio = 1,
-		    const Imath::V2f screenWindowCenter = Imath::V2f (0, 0),
+		    const IMATH_NAMESPACE::V2f screenWindowCenter = IMATH_NAMESPACE::V2f (0, 0),
 		    float screenWindowWidth = 1,
 		    LineOrder lineOrder = INCREASING_Y,
 		    Compression compression = PIZ_COMPRESSION,
@@ -120,7 +119,7 @@ class RgbaOutputFile
 		    int height,
 		    RgbaChannels rgbaChannels = WRITE_RGBA,
 		    float pixelAspectRatio = 1,
-		    const Imath::V2f screenWindowCenter = Imath::V2f (0, 0),
+		    const IMATH_NAMESPACE::V2f screenWindowCenter = IMATH_NAMESPACE::V2f (0, 0),
 		    float screenWindowWidth = 1,
 		    LineOrder lineOrder = INCREASING_Y,
 		    Compression compression = PIZ_COMPRESSION,
@@ -161,10 +160,10 @@ class RgbaOutputFile
 
     const Header &		header () const;
     const FrameBuffer &		frameBuffer () const;
-    const Imath::Box2i &	displayWindow () const;
-    const Imath::Box2i &	dataWindow () const;
+    const IMATH_NAMESPACE::Box2i &	displayWindow () const;
+    const IMATH_NAMESPACE::Box2i &	dataWindow () const;
     float			pixelAspectRatio () const;
-    const Imath::V2f		screenWindowCenter () const;
+    const IMATH_NAMESPACE::V2f		screenWindowCenter () const;
     float			screenWindowWidth () const;
     LineOrder			lineOrder () const;
     Compression			compression () const;
@@ -226,7 +225,7 @@ class RgbaOutputFile
 // RGBA input file
 //
 
-class RgbaInputFile
+class IMF_EXPORT RgbaInputFile
 {
   public:
 
@@ -245,7 +244,22 @@ class RgbaInputFile
     // close the file.
     //-----------------------------------------------------------
 
-    RgbaInputFile (IStream &is, int numThreads = globalThreadCount());
+    RgbaInputFile (OPENEXR_IMF_INTERNAL_NAMESPACE::IStream &is, int numThreads = globalThreadCount());
+
+
+    //--------------------------------------------------------------
+    // Constructors -- the same as the previous two, but the names
+    // of the red, green, blue, alpha, luminance and chroma channels
+    // are expected to be layerName.R, layerName.G, etc.
+    //--------------------------------------------------------------
+
+    RgbaInputFile (const char name[],
+		   const std::string &layerName,
+		   int numThreads = globalThreadCount());
+
+    RgbaInputFile (OPENEXR_IMF_INTERNAL_NAMESPACE::IStream &is,
+		   const std::string &layerName,
+		   int numThreads = globalThreadCount());
 
 
     //-----------
@@ -253,6 +267,7 @@ class RgbaInputFile
     //-----------
 
     virtual ~RgbaInputFile ();
+
 
     //-----------------------------------------------------
     // Define a frame buffer as the pixel data destination:
@@ -265,6 +280,16 @@ class RgbaInputFile
     void			setFrameBuffer (Rgba *base,
 						size_t xStride,
 						size_t yStride);
+
+
+    //----------------------------------------------------------------
+    // Switch to a different layer -- subsequent calls to readPixels()
+    // will read channels layerName.R, layerName.G, etc.
+    // After each call to setLayerName(), setFrameBuffer() must be
+    // called at least once before the next call to readPixels().
+    //----------------------------------------------------------------
+
+    void			setLayerName (const std::string &layerName);
 
 
     //-------------------------------------------
@@ -281,16 +306,17 @@ class RgbaInputFile
 
     const Header &		header () const;
     const FrameBuffer &		frameBuffer () const;
-    const Imath::Box2i &	displayWindow () const;
-    const Imath::Box2i &	dataWindow () const;
+    const IMATH_NAMESPACE::Box2i &	displayWindow () const;
+    const IMATH_NAMESPACE::Box2i &	dataWindow () const;
     float			pixelAspectRatio () const;
-    const Imath::V2f		screenWindowCenter () const;
+    const IMATH_NAMESPACE::V2f		screenWindowCenter () const;
     float			screenWindowWidth () const;
     LineOrder			lineOrder () const;
     Compression			compression () const;
     RgbaChannels		channels () const;
     const char *                fileName () const;
     bool			isComplete () const;
+
 
     //----------------------------------
     // Access to the file format version
@@ -307,9 +333,14 @@ class RgbaInputFile
 
     InputFile *			_inputFile;
     FromYca *			_fromYca;
+    std::string			_channelNamePrefix;
 };
 
 
-} // namespace Imf
+OPENEXR_IMF_INTERNAL_NAMESPACE_HEADER_EXIT
+
+
+
+
 
 #endif

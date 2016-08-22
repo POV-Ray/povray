@@ -31,7 +31,7 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
 #include <boost/thread.hpp>
 #include <boost/bind.hpp>
@@ -39,14 +39,15 @@
 // frame.h must always be the first POV file included (pulls in platform config)
 #include "backend/frame.h"
 
-#include "base/povmsgid.h"
+#include "povms/povmsid.h"
+
 #include "base/types.h"
 #include "base/timer.h"
 
 #include "backend/render/rendertask.h"
-#include "backend/scene/scene.h"
-#include "backend/scene/threaddata.h"
+#include "backend/scene/backendscenedata.h"
 #include "backend/scene/view.h"
+#include "backend/scene/viewthreaddata.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -66,7 +67,7 @@ RenderTask::~RenderTask()
 {
 }
 
-shared_ptr<SceneData>& RenderTask::GetSceneData()
+shared_ptr<BackendSceneData>& RenderTask::GetSceneData()
 {
     return viewData->GetSceneData();
 }

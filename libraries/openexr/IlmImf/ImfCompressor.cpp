@@ -40,16 +40,19 @@
 //
 //-----------------------------------------------------------------------------
 
-#include <ImfCompressor.h>
-#include <ImfRleCompressor.h>
-#include <ImfZipCompressor.h>
-#include <ImfPizCompressor.h>
-#include <ImfPxr24Compressor.h>
-#include <ImfB44Compressor.h>
+#include "ImfCompressor.h"
+#include "ImfRleCompressor.h"
+#include "ImfZipCompressor.h"
+#include "ImfPizCompressor.h"
+#include "ImfPxr24Compressor.h"
+#include "ImfB44Compressor.h"
+#include "ImfDwaCompressor.h"
+#include "ImfCheckedArithmetic.h"
+#include "ImfNamespace.h"
 
-namespace Imf {
+OPENEXR_IMF_INTERNAL_NAMESPACE_SOURCE_ENTER
 
-using Imath::Box2i;
+using IMATH_NAMESPACE::Box2i;
 
 
 Compressor::Compressor (const Header &hdr): _header (hdr) {}
@@ -98,6 +101,8 @@ isValidCompression (Compression c)
       case PXR24_COMPRESSION:
       case B44_COMPRESSION:
       case B44A_COMPRESSION:
+      case DWAA_COMPRESSION:
+      case DWAB_COMPRESSION:
 
 	return true;
 
@@ -107,9 +112,22 @@ isValidCompression (Compression c)
     }
 }
 
+bool isValidDeepCompression(Compression c)
+{
+  switch(c)
+  {
+      case NO_COMPRESSION:
+      case RLE_COMPRESSION:
+      case ZIPS_COMPRESSION:
+          return true;
+      default :
+          return false;
+  }
+}
+
 
 Compressor *
-newCompressor (Compression c, int maxScanLineSize, const Header &hdr)
+newCompressor (Compression c, size_t maxScanLineSize, const Header &hdr)
 {
     switch (c)
     {
@@ -141,6 +159,16 @@ newCompressor (Compression c, int maxScanLineSize, const Header &hdr)
 
 	return new B44Compressor (hdr, maxScanLineSize, 32, true);
 
+      case DWAA_COMPRESSION:
+
+	return new DwaCompressor (hdr, maxScanLineSize, 32, 
+                               DwaCompressor::STATIC_HUFFMAN);
+
+      case DWAB_COMPRESSION:
+
+	return new DwaCompressor (hdr, maxScanLineSize, 256, 
+                               DwaCompressor::STATIC_HUFFMAN);
+
       default:
 
 	return 0;
@@ -150,15 +178,15 @@ newCompressor (Compression c, int maxScanLineSize, const Header &hdr)
 
 Compressor *
 newTileCompressor (Compression c,
-		   int tileLineSize,
-		   int numTileLines,
+		   size_t tileLineSize,
+		   size_t numTileLines,
 		   const Header &hdr)
 {
     switch (c)
     {
       case RLE_COMPRESSION:
 
-	return new RleCompressor (hdr, tileLineSize * numTileLines);
+	return new RleCompressor (hdr, uiMult (tileLineSize, numTileLines));
 
       case ZIPS_COMPRESSION:
       case ZIP_COMPRESSION:
@@ -181,6 +209,12 @@ newTileCompressor (Compression c,
 
 	return new B44Compressor (hdr, tileLineSize, numTileLines, true);
 
+      case DWAA_COMPRESSION:
+      case DWAB_COMPRESSION:
+
+	return new DwaCompressor (hdr, tileLineSize, numTileLines, 
+                               DwaCompressor::DEFLATE);
+
       default:
 
 	return 0;
@@ -188,4 +222,5 @@ newTileCompressor (Compression c,
 }
 
 
-} // namespace Imf
+OPENEXR_IMF_INTERNAL_NAMESPACE_SOURCE_EXIT
+

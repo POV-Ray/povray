@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,8 +36,8 @@
 #ifndef POVRAY_FRONTEND_PROCESSRENDEROPTIONS_H
 #define POVRAY_FRONTEND_PROCESSRENDEROPTIONS_H
 
-#include "base/processoptions.h"
 #include "frontend/configfrontend.h"
+#include "frontend/processoptions.h"
 
 namespace pov_frontend
 {
@@ -53,7 +53,6 @@ class ProcessRenderOptions : public ProcessOptions
         virtual int ReadSpecialOptionHandler(INI_Parser_Table *, char *, POVMSObjectPtr);
         virtual int ReadSpecialSwitchHandler(Cmd_Parser_Table *, char *, POVMSObjectPtr, bool);
         virtual int WriteSpecialOptionHandler(INI_Parser_Table *, POVMSObjectPtr, OTextStream *);
-        virtual bool WriteOptionFilter(INI_Parser_Table *);
         virtual int ProcessUnknownString(char *, POVMSObjectPtr);
 
         virtual ITextStream *OpenFileForRead(const char *, POVMSObjectPtr);

@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -40,19 +40,22 @@
 
 // frame.h must always be the first POV file included (pulls in platform config)
 #include "backend/frame.h"
-
-#include "base/types.h"
-#include "base/timer.h"
-#include "base/povms.h"
-#include "base/povmsgid.h"
-#include "base/pov_err.h"
-#include "base/platformbase.h"
-
 #include "backend/povray.h"
+
+#include "povms/povmscpp.h"
+#include "povms/povmsid.h"
+#include "povms/povmsutil.h"
+
+#include "base/platformbase.h"
+#include "base/pov_err.h"
+#include "base/timer.h"
+#include "base/types.h"
+
+#include "core/material/pattern.h"
+#include "core/material/texture.h"
+
 #include "backend/control/renderbackend.h"
-#include "backend/pattern/pattern.h"
-#include "backend/support/msgutil.h"
-#include "backend/texture/texture.h"
+#include "backend/support/task.h"
 
 #ifndef DONT_SHOW_IMAGE_LIB_VERSIONS
     // these are needed for copyright notices and version numbers
@@ -82,6 +85,19 @@
             #endif
         }
     #endif
+    #ifndef OPENEXR_MISSING
+        #include <IlmBaseConfig.h>
+        #include <OpenEXRConfig.h>
+        // NOTE:
+        //  Versions of OpenEXR and IlmImf prior to 1.7.1 do not seem to have a way to get the version number,
+        //  nor do the official hard-coded Windows config headers.
+        #ifndef ILMBASE_PACKAGE_STRING
+            #define ILMBASE_PACKAGE_STRING "IlmBase"
+        #endif
+        #ifndef OPENEXR_PACKAGE_STRING
+            #define OPENEXR_PACKAGE_STRING "OpenEXR"
+        #endif
+    #endif
 
     // get boost version number. it isn't an image library but there's little point
     // in creating an entire new classification for it right now.
@@ -89,26 +105,12 @@
 
 #endif
 
+// this must be the last file included
+#include "base/povdebug.h"
+
 #ifndef POV_VALIDATE_FRONTEND
     #define POV_VALIDATE_FRONTEND(msg) true
 #endif
-
-#ifndef ALTMAIN
-
-#include "base/stringutilities.h"
-#include "base/textstreambuffer.h"
-#include "frontend/defaultplatformbase.h"
-#include "frontend/processrenderoptions.h"
-#include "frontend/renderfrontend.h"
-#include "frontend/simplefrontend.h"
-#include "frontend/imageprocessing.h"
-#include "frontend/console.h"
-#include "frontend/display.h"
-
-#endif
-
-// this must be the last file included
-#include "base/povdebug.h"
 
 /// Platform specific function interface self reference pointer
 pov_base::PlatformBase *pov_base::PlatformBase::self = NULL;
@@ -454,17 +456,13 @@ void BuildInitInfo(POVMSObjectPtr msg)
     }
 
 #ifndef OPENEXR_MISSING
-    // OpenEXR library version and copyright notice
-    // NOTE: The library does not seem to have a way to get the version number.
-    // Since we don't ship the library with our source tree, we can't hard-code
-    // the version number here, either, since we don't know what version will
-    // be linked with our source.
+    // OpenEXR and related libraries version and copyright notice
     if(err == kNoErr)
     {
         err = POVMSAttr_New(&attr);
         if(err == kNoErr)
         {
-            const char *tempstr = "OpenEXR, Copyright (c) 2004-2007, Industrial Light & Magic.";
+            const char *tempstr = OPENEXR_PACKAGE_STRING " and " ILMBASE_PACKAGE_STRING ", Copyright (c) 2002-2011 Industrial Light & Magic.";
             err = POVMSAttr_Set(&attr, kPOVMSType_CString, reinterpret_cast<const void *>(tempstr), (int) strlen(tempstr) + 1);
             if(err == kNoErr)
                 err = POVMSAttrList_Append(&attrlist, &attr);
@@ -600,11 +598,7 @@ boost::thread *povray_init(const boost::function0<void>& threadExit, POVMSAddres
         Initialize_Noise();
         pov::InitializePatternGenerators();
 
-#ifndef USE_OFFICIAL_BOOST
-        POV_MainThread = new boost::thread(boost::bind(&MainThreadFunction, threadExit), 1024 * 64);
-#else
-        POV_MainThread = new boost::thread(boost::bind(&MainThreadFunction, threadExit));
-#endif
+        POV_MainThread = Task::NewBoostThread(boost::bind(&MainThreadFunction, threadExit), 1024 * 64);
 
         // we can't depend on boost::thread::yield here since under windows it is not
         // guaranteed to give up a time slice [see API docs for Sleep(0)]
@@ -650,178 +644,3 @@ void povray_terminate()
 
     Free_Noise_Tables(); // TODO FIXME - don't add such calls here!
 }
-
-#ifndef ALTMAIN
-
-class DefaultConsole : public pov_frontend::Console
-{
-    public:
-        DefaultConsole() { }
-        ~DefaultConsole() { }
-        void Initialise() { }
-        void Output(const string& str) { std::printf("%s\n", str.c_str()); std::fflush(stdout); }
-};
-
-class DefaultDisplay : public pov_frontend::Display
-{
-    public:
-        DefaultDisplay(unsigned int w, unsigned int h, COLC g) : Display(w, h, g) { }
-        ~DefaultDisplay() { }
-        void Initialise() { }
-        void DrawPixel(unsigned int, unsigned int, const RGBA8&) { }
-};
-
-pov_frontend::Console *CreateDefaultConsole();
-pov_frontend::Display *CreateDefaultDisplay(unsigned int w, unsigned int h, COLC gf);
-
-pov_frontend::Console *CreateDefaultConsole()
-{
-    return new DefaultConsole();
-}
-
-pov_frontend::Display *CreateDefaultDisplay(unsigned int w, unsigned int h, COLC gf)
-{
-    return new DefaultDisplay(w, h, gf);
-}
-
-void BackendExitCallback()
-{
-}
-
-// NOTE: this code hasn't been tested in some time as all current official POV-Ray
-// implementations have their own main and frontend code - so YMMV.
-int main(int argc, char **argv)
-{
-    using namespace pov_base;
-    using namespace pov_frontend;
-
-    POVMSContext frontendContext = NULL;
-
-    DefaultPlatformBase platformbase;
-    POVMSAddress backendAddress = POVMSInvalidAddress;
-    int err = kNoErr;
-    int ret = 0;
-    int i = 0;
-
-    printf("Welcome to POV-Ray 3.7 SMP!\n");
-    fflush(stdout);
-
-//  char *nargv[2];
-//  nargv[0] = argv[0];
-//  nargv[1] = "'/Volumes/Iron/Official POV-Ray/POV-Ray 3.7 Source/benchmark.ini'";
-//  nargv[1] = "'/Volumes/Iron/Official POV-Ray/POV-Ray 3.7 Source/object7.ini'";
-//  argc = 2;
-//  argv = nargv;
-
-    // Init
-    povray_init(boost::bind(&BackendExitCallback), &backendAddress);
-
-    if(err == kNoErr)
-        err = POVMS_OpenContext(&frontendContext);
-    if(err != kNoErr)
-        (void)POVMS_ASSERT_OUTPUT("Creating POVMS output context failed.", "povray.cpp", 0);
-    else
-    {
-        POVMS_Object backendMessage;
-        SimpleFrontend<ParserMessageHandler, FileMessageHandler, RenderMessageHandler, ImageMessageHandler>
-                       frontend(frontendContext, backendAddress, backendMessage,
-                       boost::bind(CreateDefaultConsole), boost::bind(CreateDefaultDisplay, _1, _2, _3));
-
-        // Print help screens
-        if(argc == 1)
-        {
-            // TODO frontend.PrintHelpScreens();
-            return 0;
-        }
-        else if(argc == 2)
-        {
-            if((pov_stricmp(argv[1], "-h") == 0) ||
-               (pov_stricmp(argv[1], "-?") == 0) ||
-               (pov_stricmp(argv[1], "--help") == 0) ||
-               (pov_stricmp(argv[1], "-help") == 0))
-            {
-                // TODO frontend.PrintHelpScreens();
-                return 0;
-            }
-            else if(argv[1][0] == '-')
-            {
-                if(argv[1][1] == '?')
-                {
-                    // TODO frontend.PrintUsage(argv[1][2] - '0');
-                    return 0;
-                }
-                else if(strlen(argv[1]) == 6)
-                {
-                    if(((argv[1][1] == 'h') || (argv[1][1] == 'H')) &&
-                       ((argv[1][2] == 'e') || (argv[1][2] == 'E')) &&
-                       ((argv[1][3] == 'l') || (argv[1][3] == 'L')) &&
-                       ((argv[1][4] == 'p') || (argv[1][4] == 'P')))
-                    {
-                        // TODO frontend.PrintUsage(argv[1][5] - '0');
-                        return 0;
-                    }
-                }
-            }
-        }
-
-        try
-        {
-            ProcessRenderOptions renderoptions;
-            POVMSObject obj;
-            int l = 0;
-
-            err = POVMSObject_New(&obj, kPOVObjectClass_IniOptions);
-            if(err != kNoErr)
-                throw POV_EXCEPTION_CODE(err);
-
-            for(i = 1 ;i < argc; i++)
-            {
-                if(pov_stricmp(argv[i], "-povms") != 0)
-                {
-                    err = renderoptions.ParseString(argv[i], &obj, true);
-                    if(err != kNoErr)
-                        throw POV_EXCEPTION_CODE(err);
-                }
-            }
-
-            if(POVMSUtil_GetUCS2StringLength(&obj, kPOVAttrib_CreateIni, &l) == kNoErr)
-            {
-                UCS2 *outputini = new UCS2[l];
-                if(POVMSUtil_GetUCS2String(&obj, kPOVAttrib_CreateIni, outputini, &l) == kNoErr)
-                    renderoptions.WriteFile(UCS2toASCIIString(outputini).c_str(), &obj);
-            }
-
-            POVMS_Object optionsobj(obj);
-
-            frontend.Start(optionsobj);
-
-            while(frontend.Process() != pov_frontend::kReady)
-            {
-                while(POVMS_ProcessMessages((POVMSContext)frontendContext, true, true) == kFalseErr)
-                {
-                    if(frontend.Process() == pov_frontend::kReady)
-                        break;
-                }
-
-                Delay(100);
-            }
-        }
-        catch(pov_base::Exception& e)
-        {
-            fprintf(stderr, "%s\n Failed to render file!\n", e.what());
-            return -1;
-        }
-
-        // NOTE: It is important that 'frontend' be destroyed in this block scope because
-        // 'POVMS_CloseContext' will destroy its context too early otherwise!
-    }
-
-    // Finish
-    povray_terminate();
-
-    (void)POVMS_CloseContext(frontendContext);
-
-    return ret;
-}
-
-#endif

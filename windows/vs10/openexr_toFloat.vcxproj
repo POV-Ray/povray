@@ -14,7 +14,7 @@
     <ProjectGuid>{9801D5FF-C1E0-46C5-A73E-47DEECE99DDB}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>toFloat</RootNamespace>
-    <ProjectName>toFloat</ProjectName>
+    <ProjectName>OpenEXR IlmBase Half toFloat</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -40,14 +40,14 @@
     <IntDir>build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
     <TargetName>toFloat</TargetName>
     <TargetExt>.exe</TargetExt>
-    <CustomBuildAfterTargets>Manifest</CustomBuildAfterTargets>
+    <CustomBuildAfterTargets>Link</CustomBuildAfterTargets>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>build\$(ProjectName)\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
     <TargetName>toFloat</TargetName>
     <TargetExt>.exe</TargetExt>
-    <CustomBuildAfterTargets>Manifest</CustomBuildAfterTargets>
+    <CustomBuildAfterTargets>Link</CustomBuildAfterTargets>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>

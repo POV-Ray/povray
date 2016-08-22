@@ -86,46 +86,95 @@
 #  define BOOST_NO_STD_LOCALE
 #endif
 
+// Fix for VC++ 8.0 on up ( I do not have a previous version to test )
+// or clang-cl. If exceptions are off you must manually include the 
+// <exception> header before including the <typeinfo> header. Admittedly 
+// trying to use Boost libraries or the standard C++ libraries without 
+// exception support is not suggested but currently clang-cl ( v 3.4 ) 
+// does not support exceptions and must be compiled with exceptions off.
+#if !_HAS_EXCEPTIONS && ((defined(BOOST_MSVC) && BOOST_MSVC >= 1400) || (defined(__clang__) && defined(_MSC_VER)))
+#include <exception>
+#endif
 #include <typeinfo>
-#if !_HAS_EXCEPTIONS
-#  define BOOST_NO_STD_TYPEINFO    
+#if ( (!_HAS_EXCEPTIONS && !defined(__ghs__)) || (!_HAS_NAMESPACE && defined(__ghs__)) ) && !defined(__TI_COMPILER_VERSION__) && !defined(__VISUALDSPVERSION__)
+#  define BOOST_NO_STD_TYPEINFO
 #endif  
 
 //  C++0x headers implemented in 520 (as shipped by Microsoft)
 //
 #if !defined(_CPPLIB_VER) || _CPPLIB_VER < 520
-#  define BOOST_NO_0X_HDR_ARRAY
-#  define BOOST_NO_0X_HDR_CODECVT
-#  define BOOST_NO_0X_HDR_FORWARD_LIST
-#  define BOOST_NO_0X_HDR_INITIALIZER_LIST
-#  define BOOST_NO_0X_HDR_RANDOM
-#  define BOOST_NO_0X_HDR_REGEX
-#  define BOOST_NO_0X_HDR_SYSTEM_ERROR
-#  define BOOST_NO_0X_HDR_TYPE_TRAITS
-#  define BOOST_NO_STD_UNORDERED        // deprecated; see following
-#  define BOOST_NO_0X_HDR_UNORDERED_MAP
-#  define BOOST_NO_0X_HDR_UNORDERED_SET
-#  define BOOST_NO_0X_HDR_TUPLE
-#  define BOOST_NO_0X_HDR_TYPEINDEX
+#  define BOOST_NO_CXX11_HDR_ARRAY
+#  define BOOST_NO_CXX11_HDR_CODECVT
+#  define BOOST_NO_CXX11_HDR_FORWARD_LIST
+#  define BOOST_NO_CXX11_HDR_INITIALIZER_LIST
+#  define BOOST_NO_CXX11_HDR_RANDOM
+#  define BOOST_NO_CXX11_HDR_REGEX
+#  define BOOST_NO_CXX11_HDR_SYSTEM_ERROR
+#  define BOOST_NO_CXX11_HDR_UNORDERED_MAP
+#  define BOOST_NO_CXX11_HDR_UNORDERED_SET
+#  define BOOST_NO_CXX11_HDR_TUPLE
+#  define BOOST_NO_CXX11_HDR_TYPEINDEX
+#  define BOOST_NO_CXX11_HDR_FUNCTIONAL
+#  define BOOST_NO_CXX11_NUMERIC_LIMITS
+#  define BOOST_NO_CXX11_SMART_PTR
 #endif
 
-#if !defined(_HAS_TR1_IMPORTS) && !defined(BOOST_NO_0X_HDR_TUPLE)
-#  define BOOST_NO_0X_HDR_TUPLE
+#if ((!defined(_HAS_TR1_IMPORTS) || (_HAS_TR1_IMPORTS+0 == 0)) && !defined(BOOST_NO_CXX11_HDR_TUPLE)) \
+  && (!defined(_CPPLIB_VER) || _CPPLIB_VER < 610)
+#  define BOOST_NO_CXX11_HDR_TUPLE
 #endif
 
-//  C++0x headers not yet implemented
+//  C++0x headers implemented in 540 (as shipped by Microsoft)
 //
-#  define BOOST_NO_0X_HDR_CHRONO
-#  define BOOST_NO_0X_HDR_CONCEPTS
-#  define BOOST_NO_0X_HDR_CONDITION_VARIABLE
-#  define BOOST_NO_0X_HDR_CONTAINER_CONCEPTS
-#  define BOOST_NO_0X_HDR_FUTURE
-#  define BOOST_NO_0X_HDR_ITERATOR_CONCEPTS
-#  define BOOST_NO_0X_HDR_MEMORY_CONCEPTS
-#  define BOOST_NO_0X_HDR_MUTEX
-#  define BOOST_NO_0X_HDR_RATIO
-#  define BOOST_NO_0X_HDR_THREAD
-#  define BOOST_NO_NUMERIC_LIMITS_LOWEST
+#if !defined(_CPPLIB_VER) || _CPPLIB_VER < 540
+#  define BOOST_NO_CXX11_HDR_TYPE_TRAITS
+#  define BOOST_NO_CXX11_HDR_CHRONO
+#  define BOOST_NO_CXX11_HDR_CONDITION_VARIABLE
+#  define BOOST_NO_CXX11_HDR_FUTURE
+#  define BOOST_NO_CXX11_HDR_MUTEX
+#  define BOOST_NO_CXX11_HDR_RATIO
+#  define BOOST_NO_CXX11_HDR_THREAD
+#  define BOOST_NO_CXX11_ATOMIC_SMART_PTR
+#endif
+
+//  C++0x headers implemented in 610 (as shipped by Microsoft)
+//
+#if !defined(_CPPLIB_VER) || _CPPLIB_VER < 610
+#  define BOOST_NO_CXX11_HDR_INITIALIZER_LIST
+#  define BOOST_NO_CXX11_HDR_ATOMIC
+#  define BOOST_NO_CXX11_ALLOCATOR
+// 540 has std::align but it is not a conforming implementation
+#  define BOOST_NO_CXX11_STD_ALIGN
+#endif
+
+#if defined(__has_include)
+#if !__has_include(<shared_mutex>)
+#  define BOOST_NO_CXX14_HDR_SHARED_MUTEX
+#elif __cplusplus < 201402
+#  define BOOST_NO_CXX14_HDR_SHARED_MUTEX
+#endif
+#elif !defined(_CPPLIB_VER) || (_CPPLIB_VER < 650)
+#  define BOOST_NO_CXX14_HDR_SHARED_MUTEX
+#endif
+
+#if defined(BOOST_INTEL) && (BOOST_INTEL <= 1400)
+// Intel's compiler can't handle this header yet:
+#  define BOOST_NO_CXX11_HDR_ATOMIC
+#endif
+
+
+//  520..610 have std::addressof, but it doesn't support functions
+//
+#if !defined(_CPPLIB_VER) || _CPPLIB_VER < 650
+#  define BOOST_NO_CXX11_ADDRESSOF
+#endif
+
+// Bug specific to VC14, 
+// See https://connect.microsoft.com/VisualStudio/feedback/details/1348277/link-error-when-using-std-codecvt-utf8-utf16-char16-t
+// and discussion here: http://blogs.msdn.com/b/vcblog/archive/2014/11/12/visual-studio-2015-preview-now-available.aspx?PageIndex=2
+#if  _CPPLIB_VER == 650
+#  define BOOST_NO_CXX11_HDR_CODECVT
+#endif
 
 #ifdef _CPPLIB_VER
 #  define BOOST_DINKUMWARE_STDLIB _CPPLIB_VER
@@ -138,12 +187,3 @@
 #else
 #  define BOOST_STDLIB "Dinkumware standard library version 1.x"
 #endif
-
-
-
-
-
-
-
-
-

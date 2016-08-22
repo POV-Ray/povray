@@ -2,14 +2,13 @@
 ///
 /// @file base/textstream.h
 ///
-/// This module contains all defines, typedefs, and prototypes for the C++
-/// interface of `textstream.cpp`.
+/// Declarations related to text file input and output.
 ///
 /// @copyright
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -32,11 +31,15 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
 #ifndef TEXTSTREAM_H
 #define TEXTSTREAM_H
 
+// Module config header file must be the first file included within POV-Ray unit header files
+#include "base/configbase.h"
+
+// C++ variants of standard C header files
 #include <cstdio>
 
 // must nuke these since everyone's favourite monopoly's cstdio still defines
@@ -46,8 +49,7 @@
 #undef  getchar
 #undef  putchar
 
-#include "configbase.h"
-
+// POV-Ray base header files
 #include "base/fileinputoutput.h"
 #include "base/pov_err.h"
 #include "base/stringutilities.h"
@@ -67,20 +69,50 @@ class ITextStream
             POV_LONG lineno;
         };
 
-        ITextStream(const UCS2 *, unsigned int);
-        ITextStream(const UCS2 *, IStream *);
+        ITextStream();
         virtual ~ITextStream();
 
-        int getchar();
-        void ungetchar(int);
+        virtual int getchar() = 0;
+        virtual void ungetchar(int) = 0;
 
-        bool eof() const;
-        bool seekg(FilePos);
-        FilePos tellg() const;
+        virtual bool eof() const = 0;
+        virtual bool seekg(FilePos) = 0;
+        virtual FilePos tellg() const = 0;
 
+        virtual bool ReadRaw(unsigned char* buf, size_t size) = 0;
+
+        /// Formal current line number of the file, e.g. to be displayed in error messages.
         POV_LONG line() const { return lineno; };
 
-        const UCS2 *name() const { return filename.c_str(); };
+        /// Formal name of the file, e.g. to be displayed in error messages.
+        virtual const UCS2 *name() const = 0;
+    protected:
+        POV_LONG lineno;
+};
+
+class IBufferedTextStream : public ITextStream
+{
+    public:
+        IBufferedTextStream(const UCS2 *, unsigned int);
+
+        /// @param[in]  formalName  Name by which the file is known to the user.
+        /// @param[in]  byteStream  Underlying byte-oriented stream to read from.
+        /// @param[in]  initialLine First line number as known to the user.
+        IBufferedTextStream(const UCS2 *formalName, IStream *byteStream, POV_LONG initialLine = 1);
+
+        virtual ~IBufferedTextStream();
+
+        virtual int getchar();
+        virtual void ungetchar(int);
+
+        virtual bool eof() const;
+        virtual bool seekg(FilePos);
+        virtual FilePos tellg() const;
+
+        virtual bool ReadRaw(unsigned char* buf, size_t size);
+
+        /// Formal name of the file, e.g. to be displayed in error messages.
+        virtual const UCS2 *name() const { return filename.c_str(); };
     private:
         IStream *stream;
         unsigned char buffer[ITEXTSTREAM_BUFFER_SIZE];
@@ -89,17 +121,52 @@ class ITextStream
         POV_ULONG filelength;
         POV_ULONG curpos;
         UCS2String filename;
-        POV_LONG lineno;
         int ungetbuffer;
 
         void RefillBuffer();
+};
+
+class IMemTextStream : public ITextStream
+{
+    public:
+        /// @param[in]  formalName  Name by which the file is known to the user.
+        /// @param[in]  data        Underlying memory buffer to read from.
+        /// @param[in]  size        Size of underlying memory buffer.
+        /// @param[in]  formalStart File position of buffer start as known to the user.
+        IMemTextStream(const UCS2 *formalName, unsigned char* data, size_t size, const FilePos& formalStart);
+
+        virtual ~IMemTextStream();
+
+        virtual int getchar();
+        virtual void ungetchar(int);
+
+        virtual bool eof() const;
+        virtual bool seekg(FilePos);
+        virtual FilePos tellg() const;
+
+        virtual bool ReadRaw(unsigned char* buf, size_t size);
+
+        /// Formal name of the file, e.g. to be displayed in error messages.
+        virtual const UCS2 *name() const { return filename.c_str(); };
+    private:
+        unsigned char* buffer;
+        size_t bufferoffset;
+        size_t maxbufferoffset;
+        POV_ULONG mFormalStart;
+        UCS2String filename;
+        int ungetbuffer;
+        bool fail;
 };
 
 class OTextStream
 {
     public:
         OTextStream(const UCS2 *, unsigned int, bool append = false);
-        OTextStream(const UCS2 *, OStream *);
+
+        /// @param[in]  formalName  Name by which the file is known to the user.
+        /// @param[in]  byteStream  Underlying byte-oriented stream to write to.
+        OTextStream(const UCS2 *formalName, OStream *);
+
         virtual ~OTextStream();
 
         void putchar(int);
@@ -107,6 +174,7 @@ class OTextStream
         void printf(const char *, ...);
     void flush();
 
+        /// Formal name of the file, e.g. to be displayed in error messages.
         const UCS2 *name() const { return filename.c_str(); };
     private:
         OStream *stream;

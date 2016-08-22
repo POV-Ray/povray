@@ -9,7 +9,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -37,13 +37,22 @@
 #ifndef POVRAY_BASE_COLOUR_H
 #define POVRAY_BASE_COLOUR_H
 
+// Module config header file must be the first file included within POV-Ray unit header files
+#include "base/configbase.h"
+
+// C++ variants of standard C header files
+#include <cassert>
 #include <cmath>
+
+// Standard C++ header files
 #include <limits>
 
+// Boost header files
 #include <boost/utility.hpp>
 #include <boost/tr1/type_traits.hpp>
 
-#include "base/configbase.h"
+// POV-Ray base header files
+#include "base/mathutil.h"
 #include "base/types.h"
 
 namespace pov_base
@@ -348,15 +357,22 @@ template<> inline const ColourChannel* ColourModelInternal4::GetWhitepointVector
            inline const ColourChannel* ColourModelInternal4::GetDominantWavelengths()               { return kaColourVectorWavelengthsInternal4; }
 
 
-/// Generic template tagging type identifying the bias for a @ref GenericCompactColour specialization.
-template<int BIAS>
-struct CompactColourBias
+/// Generic template tagging type identifying the operating parameters for a @ref GenericCompactColour specialization.
+///
+/// @tparam BIAS                Bias to use for the exponent.
+///                             A value of 128 matches Greg Ward's original proposal.
+/// @tparam QUANTIZE_TO_NEAREST Whether quantization should use round-to-nearest mode, as opposed to rounding
+///                             towards zero and compensating upon decoding as in Greg Ward's original proposal.
+///
+template<int BIAS, bool QUANTIZE_TO_NEAREST>
+struct CompactColourParameters
 {
-    static const unsigned int kBias = BIAS;
+    static const unsigned int kBias              = BIAS;
+    static const bool         kQuantizeToNearest = QUANTIZE_TO_NEAREST;
 };
 
-typedef CompactColourBias<128>  RadianceHDRBias;    ///< Template tagging type identifying the bias used in the @ref GenericCompactColour specialization originally proposed by Gred Ward.
-typedef CompactColourBias<250>  PhotonBias;         ///< Template tagging type identifying the bias used in the @ref GenericCompactColour specialization for photons.
+typedef CompactColourParameters<128,false>  RadianceHDRMode;    ///< Template tagging type identifying the parameters used in the @ref GenericCompactColour specialization originally proposed by Gred Ward.
+typedef CompactColourParameters<250,true>   PhotonMode;         ///< Template tagging type identifying the parameters used in the @ref GenericCompactColour specialization for photons.
 
 
 /// Highly generic template class to hold and process colours.
@@ -425,15 +441,16 @@ class GenericLinearColour
         }
 
         /// Construct from shared-exponent format.
-        template<typename BIAS_T2, typename CHANNEL_T2>
-        inline explicit GenericLinearColour(const GenericCompactColour<Model,BIAS_T2,CHANNEL_T2>& col)
+        template<typename MODE_T2, typename CHANNEL_T2>
+        inline explicit GenericLinearColour(const GenericCompactColour<Model,MODE_T2,CHANNEL_T2>& col)
         {
-            typedef GenericCompactColour<Model,BIAS_T2,CHANNEL_T2> CompactColour;
+            typedef GenericCompactColour<Model,MODE_T2,CHANNEL_T2> CompactColour;
             if (col[CompactColour::kExp] > std::numeric_limits<typename CompactColour::Channel>::min())
             {
                 double expFactor = ldexp(1.0,(int)col[CompactColour::kExp]-(int)(CompactColour::kBias+8));
+                double quantizationFix = (CompactColour::kQuantizeToNearest? 0.0 : 0.5);
                 for (unsigned int i = 0; i < kChannels; i ++)
-                    mColour[i] = col[i] * expFactor;
+                    mColour[i] = (col.mData[i] + quantizationFix) * expFactor;
             }
             else
             {
@@ -1021,7 +1038,7 @@ class GenericFilterTransm
             return col * mFilter + COLOUR_T2(mTransm);
         }
 
-        inline GenericFilterTransm Clipped(Channel minc, Channel maxc)
+        inline GenericFilterTransm Clipped(Channel minc, Channel maxc) const
         {
             return GenericFilterTransm(pov_base::clip<Channel>(mFilter, minc, maxc),
                                        pov_base::clip<Channel>(mTransm, minc, maxc));
@@ -1120,7 +1137,7 @@ class GenericTrans
             return COLOUR_T2(mData);
         }
 
-        inline GenericTrans Clipped(Channel minc, Channel maxc)
+        inline GenericTrans Clipped(Channel minc, Channel maxc) const
         {
             return GenericTrans(mData.Clipped());
         }
@@ -1293,6 +1310,20 @@ class GenericRGBFTColour
 
 typedef GenericRGBFTColour<ColourChannel>           RGBFTColour;        ///< Standard precision RGBFT colour.
 typedef GenericRGBFTColour<PreciseColourChannel>    PreciseRGBFTColour; ///< High precision RGBFT colour.
+
+/// RGB and RGBFT Colour array elements.
+/// @deprecated When using @ref pov_base::GenericRGBColour, @ref pov_base::GenericRGBTColour,
+///             @ref pov_base::GenericRGBFTColour or  @ref pov_base::GenericTransColour, call the
+///             red(), green(), blue(), filter() and transm() access functions instead of using the
+///             index operator with one of these as parameter.
+enum
+{
+    pRED    = 0,
+    pGREEN  = 1,
+    pBLUE   = 2,
+    pFILTER = 3,
+    pTRANSM = 4
+};
 
 
 /// Generic template class to hold and process RGB colours with an associated Transmit component.
@@ -1943,36 +1974,40 @@ typedef GenericTransColour<PreciseColourChannel>    PreciseTransColour; ///< Hig
 /// @author Based on MegaPOV HDR code written by Mael and Christoph Hormann
 ///
 /// @tparam MODEL_T     Tagging type identifying the colour model to use.
-/// @tparam BIAS_T      Tagging type identifying the bias to use for the exponent.
-///                     Should be a specialization of @ref CompactColourBias.
+/// @tparam PARAM_T     Tagging type identifying the bias to use for the exponent and the mode to use for quantization.
+///                     Should be a specialization of @ref CompactColourParameters.
 /// @tparam CHANNEL_T   Type to use for the colour components.
 ///                     Defaults to unsigned char.
 ///
-/// @remark While it would at first seem possible and easier to parameterize this template by the bias value itself,
-///         there are some subtle pitfalls associated with using integer template parameters that would make life more
-///         difficult in other places, so we're using a type instead to identify the bias to use.
+/// @remark While it would at first seem possible and easier to parameterize this template by the bias value and
+///         quantization mode themselves, there are some subtle pitfalls associated with using integer template
+///         parameters that would make life more difficult in other places, so we're using a type instead to identify
+///         the set of parameters to use.
 ///
-template<typename MODEL_T, typename BIAS_T, typename CHANNEL_T>
+template<typename MODEL_T, typename PARAM_T, typename CHANNEL_T>
 class GenericCompactColour
 {
     public:
 
         typedef MODEL_T   Model;
-        typedef BIAS_T    Bias;
+        typedef PARAM_T   Parameters;
         typedef CHANNEL_T Channel;
-        static const unsigned int kBias         = Bias::kBias;
-        static const unsigned int kChannels     = Model::kChannels;
-        static const unsigned int kCoefficients = Model::kChannels + 1;
-        static const unsigned int kExp          = Model::kChannels;
+        typedef GenericLinearColour<MODEL_T,ColourChannel> ExpandedColour;
 
-        typedef Channel Data[kCoefficients+1];
+        friend class ExpandedColour;
+
+        static const unsigned int kBias              = Parameters::kBias;
+        static const bool         kQuantizeToNearest = Parameters::kQuantizeToNearest;
+        static const unsigned int kChannels          = Model::kChannels;
+        static const unsigned int kCoefficients      = Model::kChannels + 1;
+        static const unsigned int kExp               = Model::kChannels;
+
+        typedef Channel Data[kCoefficients];
 
         /// Default constructor.
         inline GenericCompactColour()
         {
-            for (unsigned int i = 0; i < kChannels; i ++)
-                mData[i] = 0;
-            mData[kExp] = std::numeric_limits<Channel>::min();
+            SetToZero(mData);
         }
 
         /// Copy constructor.
@@ -1983,35 +2018,35 @@ class GenericCompactColour
         }
 
         /// Construct from standard-precision colour.
-        inline explicit GenericCompactColour(const GenericLinearColour<Model,ColourChannel>& col, ColourChannel dither = 0.0)
+        inline explicit GenericCompactColour(const ExpandedColour& col)
         {
-            double scaleFactor;
-            if (ComputeExponent(col, mData[kExp], scaleFactor))
-            {
-                for (unsigned int i = 0; i < kChannels; i ++)
-                    mData[i] = clipToType<Channel>(floor(col.channel(i) * scaleFactor + 0.5 + dither));
-            }
+            if (kQuantizeToNearest)
+                Quantize(mData, col, ExpandedColour(0.5));
             else
-            {
-                for (unsigned int i = 0; i < kChannels; i ++)
-                    mData[i] = 0;
-            }
+                Quantize(mData, col);
         }
 
         /// Construct from standard-precision colour.
-        inline explicit GenericCompactColour(const GenericLinearColour<Model,ColourChannel>& col, const GenericLinearColour<Model,ColourChannel>& dither)
+        inline explicit GenericCompactColour(const ExpandedColour& col, ColourChannel dither)
         {
-            double scaleFactor;
-            if (ComputeExponent(col, mData[kExp], scaleFactor))
+            if (kQuantizeToNearest)
+                Quantize(mData, col, ExpandedColour(0.5 + dither));
+            else
+                Quantize(mData, col, ExpandedColour(dither));
+        }
+
+        /// Construct from standard-precision colour.
+        inline explicit GenericCompactColour(const ExpandedColour& col, const ExpandedColour& dither)
+        {
+            if (kQuantizeToNearest)
             {
+                ExpandedColour tmpDither = dither;
                 for (unsigned int i = 0; i < kChannels; i ++)
-                    mData[i] = clipToType<Channel>(floor(col.channel(i) * scaleFactor + 0.5 + dither.channel(i)));
+                    tmpDither.channel(i) += 0.5;
+                Quantize(mData, col, tmpDither);
             }
             else
-            {
-                for (unsigned int i = 0; i < kChannels; i ++)
-                    mData[i] = 0;
-            }
+                Quantize(mData, col, dither);
         }
 
         inline const Data& operator*() const { return mData; } ///< Get direct data access for reading.
@@ -2024,13 +2059,10 @@ class GenericCompactColour
 
         Data mData;
 
-        inline static bool ComputeExponent(const GenericLinearColour<Model,ColourChannel>& col, Channel& biasedExponent, double& scaleFactor)
+        inline static bool ComputeExponent(const ExpandedColour& col, Channel& biasedExponent, double& scaleFactor)
         {
-            ColourChannel maxChannel;
-            if (std::numeric_limits<Channel>::is_signed)
-                maxChannel = col.MaxAbs();
-            else
-                maxChannel = col.Max();
+            // Determine the magnitude of the colour value.
+            ColourChannel maxChannel = (std::numeric_limits<Channel>::is_signed ? col.MaxAbs() : col.Max());
 
             if (maxChannel <= 1.0e-32) // TODO - magic number
             {
@@ -2041,17 +2073,81 @@ class GenericCompactColour
             int exponent;
             double maxChannelMantissa = frexp(maxChannel, &exponent);
             biasedExponent = clipToType<Channel>(exponent + kBias);
-
-            if (biasedExponent != exponent + kBias)
-                maxChannelMantissa = ldexp(maxChannelMantissa, exponent + kBias - biasedExponent);
-
-            scaleFactor = (std::numeric_limits<Channel>::max() + 1.0) * maxChannelMantissa / maxChannel;
+            scaleFactor = ldexp(std::numeric_limits<Channel>::max() + 1.0, kBias-biasedExponent);
             return true;
+        }
+
+        inline static void ComputeMantissa(ExpandedColour& colMantissa, const ExpandedColour& col, ColourChannel scaleFactor, const ExpandedColour& encOff)
+        {
+            for (unsigned int i = 0; i < kChannels; i ++)
+                colMantissa.channel(i) = col.channel(i) * scaleFactor + encOff.channel(i);
+        }
+
+        inline static void SetToZero(Data& data)
+        {
+            for (unsigned int i = 0; i < kChannels; i ++)
+                data[i] = 0;
+            data[kExp] = std::numeric_limits<Channel>::min();
+        }
+
+        /// @param[out] data    The quantized data.
+        /// @param[in]  col     The colour to quantize.
+        inline static void Quantize(Data& data, const ExpandedColour& col)
+        {
+            double scaleFactor;
+            if (ComputeExponent(col, data[kExp], scaleFactor))
+            {
+                for (unsigned int i = 0; i < kChannels; i ++)
+                    data[i] = clipToType<Channel>(floor(col.channel(i) * scaleFactor));
+            }
+            else
+                SetToZero(data);
+        }
+
+        /// @param[out] data    The quantized data.
+        /// @param[in]  col     The colour to quantize.
+        /// @param[in]  encOff  An offset to add to the mantissa before quantization.
+        inline static void Quantize(Data& data, const ExpandedColour& col, const ExpandedColour& encOff)
+        {
+            double scaleFactor;
+            if (ComputeExponent(col, data[kExp], scaleFactor))
+            {
+                ExpandedColour colMantissa;
+                ComputeMantissa(colMantissa, col, scaleFactor, encOff);
+
+                // The additional encoding offset might have resulted in one of the mantissas to exceed the maximum,
+                // or make all drop below half the maximum; in both cases we want to adjust the exponent and mantissas
+                // accordingly.
+                ColourChannel maxChannel = (std::numeric_limits<Channel>::is_signed ? colMantissa.MaxAbs() : colMantissa.Max());
+                if (maxChannel > std::numeric_limits<Channel>::max())
+                {
+                    if (data[kExp] < std::numeric_limits<Channel>::max())
+                    {
+                        data[kExp] ++;
+                        scaleFactor *= 0.5;
+                        ComputeMantissa(colMantissa, col, scaleFactor, encOff);
+                    }
+                }
+                else if (maxChannel * 2.0 <= std::numeric_limits<Channel>::max())
+                {
+                    if (data[kExp] > std::numeric_limits<Channel>::min())
+                    {
+                        data[kExp] --;
+                        scaleFactor *= 2.0;
+                        ComputeMantissa(colMantissa, col, scaleFactor, encOff);
+                    }
+                }
+
+                for (unsigned int i = 0; i < kChannels; i ++)
+                    data[i] = clipToType<Channel>(floor(colMantissa.channel(i)));
+            }
+            else
+                SetToZero(data);
         }
 };
 
-typedef GenericCompactColour<ColourModelRGB,RadianceHDRBias>    RadianceHDRColour;  ///< RGBE format as originally proposed by Greg Ward.
-typedef GenericCompactColour<ColourModelInternal,PhotonBias>    PhotonColour;       ///< RGBE format as adapted by Nathan Kopp for photon mapping.
+typedef GenericCompactColour<ColourModelRGB,RadianceHDRMode>    RadianceHDRColour;  ///< RGBE format as originally proposed by Greg Ward.
+typedef GenericCompactColour<ColourModelInternal,PhotonMode>    PhotonColour;       ///< RGBE format as adapted by Nathan Kopp for photon mapping.
 
 }
 

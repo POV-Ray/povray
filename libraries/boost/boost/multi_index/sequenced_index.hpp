@@ -1,4 +1,4 @@
-/* Copyright 2003-2008 Joaquin M Lopez Munoz.
+/* Copyright 2003-2015 Joaquin M Lopez Munoz.
  * Distributed under the Boost Software License, Version 1.0.
  * (See accompanying file LICENSE_1_0.txt or copy at
  * http://www.boost.org/LICENSE_1_0.txt)
@@ -9,27 +9,32 @@
 #ifndef BOOST_MULTI_INDEX_SEQUENCED_INDEX_HPP
 #define BOOST_MULTI_INDEX_SEQUENCED_INDEX_HPP
 
-#if defined(_MSC_VER)&&(_MSC_VER>=1200)
+#if defined(_MSC_VER)
 #pragma once
 #endif
 
 #include <boost/config.hpp> /* keep it first to prevent nasty warns in MSVC */
+#include <boost/bind.hpp>
 #include <boost/call_traits.hpp>
 #include <boost/detail/allocator_utilities.hpp>
 #include <boost/detail/no_exceptions_support.hpp>
 #include <boost/detail/workaround.hpp>
+#include <boost/foreach_fwd.hpp>
 #include <boost/iterator/reverse_iterator.hpp>
+#include <boost/move/core.hpp>
+#include <boost/move/utility.hpp>
 #include <boost/mpl/bool.hpp>
 #include <boost/mpl/not.hpp>
 #include <boost/mpl/push_front.hpp>
 #include <boost/multi_index/detail/access_specifier.hpp>
 #include <boost/multi_index/detail/bidir_node_iterator.hpp>
+#include <boost/multi_index/detail/do_not_copy_elements_tag.hpp>
 #include <boost/multi_index/detail/index_node_base.hpp>
-#include <boost/multi_index/detail/safe_ctr_proxy.hpp>
 #include <boost/multi_index/detail/safe_mode.hpp>
 #include <boost/multi_index/detail/scope_guard.hpp>
 #include <boost/multi_index/detail/seq_index_node.hpp>
 #include <boost/multi_index/detail/seq_index_ops.hpp>
+#include <boost/multi_index/detail/vartempl_support.hpp>
 #include <boost/multi_index/sequenced_index_fwd.hpp>
 #include <boost/tuple/tuple.hpp>
 #include <boost/type_traits/is_integral.hpp>
@@ -37,16 +42,23 @@
 #include <functional>
 #include <utility>
 
+#if !defined(BOOST_NO_CXX11_HDR_INITIALIZER_LIST)
+#include<initializer_list>
+#endif
+
 #if !defined(BOOST_MULTI_INDEX_DISABLE_SERIALIZATION)
 #include <boost/bind.hpp>
 #endif
 
 #if defined(BOOST_MULTI_INDEX_ENABLE_INVARIANT_CHECKING)
-#define BOOST_MULTI_INDEX_SEQ_INDEX_CHECK_INVARIANT                          \
+#define BOOST_MULTI_INDEX_SEQ_INDEX_CHECK_INVARIANT_OF(x)                    \
   detail::scope_guard BOOST_JOIN(check_invariant_,__LINE__)=                 \
-    detail::make_obj_guard(*this,&sequenced_index::check_invariant_);        \
+    detail::make_obj_guard(x,&sequenced_index::check_invariant_);            \
   BOOST_JOIN(check_invariant_,__LINE__).touch();
+#define BOOST_MULTI_INDEX_SEQ_INDEX_CHECK_INVARIANT                          \
+  BOOST_MULTI_INDEX_SEQ_INDEX_CHECK_INVARIANT_OF(*this)
 #else
+#define BOOST_MULTI_INDEX_SEQ_INDEX_CHECK_INVARIANT_OF(x)
 #define BOOST_MULTI_INDEX_SEQ_INDEX_CHECK_INVARIANT
 #endif
 
@@ -63,15 +75,8 @@ class sequenced_index:
   BOOST_MULTI_INDEX_PROTECTED_IF_MEMBER_TEMPLATE_FRIENDS SuperMeta::type
 
 #if defined(BOOST_MULTI_INDEX_ENABLE_SAFE_MODE)
-#if BOOST_WORKAROUND(BOOST_MSVC,<1300)
-  ,public safe_ctr_proxy_impl<
-    bidir_node_iterator<
-      sequenced_index_node<typename SuperMeta::type::node_type> >,
-    sequenced_index<SuperMeta,TagList> >
-#else
   ,public safe_mode::safe_container<
     sequenced_index<SuperMeta,TagList> >
-#endif
 #endif
 
 { 
@@ -104,16 +109,9 @@ public:
   typedef typename allocator_type::const_reference    const_reference;
 
 #if defined(BOOST_MULTI_INDEX_ENABLE_SAFE_MODE)
-#if BOOST_WORKAROUND(BOOST_MSVC,<1300)
-  typedef safe_mode::safe_iterator<
-    bidir_node_iterator<node_type>,
-    safe_ctr_proxy<
-      bidir_node_iterator<node_type> > >              iterator;
-#else
   typedef safe_mode::safe_iterator<
     bidir_node_iterator<node_type>,
     sequenced_index>                                  iterator;
-#endif
 #else
   typedef bidir_node_iterator<node_type>              iterator;
 #endif
@@ -153,17 +151,17 @@ protected:
 
 private:
 #if defined(BOOST_MULTI_INDEX_ENABLE_SAFE_MODE)
-#if BOOST_WORKAROUND(BOOST_MSVC,<1300)
-  typedef safe_ctr_proxy_impl<
-    bidir_node_iterator<node_type>,
-    sequenced_index>                          safe_super;
-#else
   typedef safe_mode::safe_container<
     sequenced_index>                          safe_super;
 #endif
-#endif
 
   typedef typename call_traits<value_type>::param_type value_param_type;
+
+  /* Needed to avoid commas in BOOST_MULTI_INDEX_OVERLOADS_TO_VARTEMPL
+   * expansion.
+   */
+
+  typedef std::pair<iterator,bool>                     emplace_return_type;
 
 public:
 
@@ -179,11 +177,27 @@ public:
     return *this;
   }
 
+#if !defined(BOOST_NO_CXX11_HDR_INITIALIZER_LIST)
+  sequenced_index<SuperMeta,TagList>& operator=(
+    std::initializer_list<value_type> list)
+  {
+    this->final()=list;
+    return *this;
+  }
+#endif
+
   template <class InputIterator>
   void assign(InputIterator first,InputIterator last)
   {
     assign_iter(first,last,mpl::not_<is_integral<InputIterator> >());
   }
+
+#if !defined(BOOST_NO_CXX11_HDR_INITIALIZER_LIST)
+  void assign(std::initializer_list<value_type> list)
+  {
+    assign(list.begin(),list.end());
+  }
+#endif
 
   void assign(size_type n,value_param_type value)
   {
@@ -192,27 +206,37 @@ public:
     for(size_type i=0;i<n;++i)push_back(value);
   }
     
-  allocator_type get_allocator()const
+  allocator_type get_allocator()const BOOST_NOEXCEPT
   {
     return this->final().get_allocator();
   }
 
   /* iterators */
 
-  iterator               begin()
+  iterator  begin()BOOST_NOEXCEPT
     {return make_iterator(node_type::from_impl(header()->next()));}
-  const_iterator         begin()const
+  const_iterator begin()const BOOST_NOEXCEPT
     {return make_iterator(node_type::from_impl(header()->next()));}
-  iterator               end(){return make_iterator(header());}
-  const_iterator         end()const{return make_iterator(header());}
-  reverse_iterator       rbegin(){return make_reverse_iterator(end());}
-  const_reverse_iterator rbegin()const{return make_reverse_iterator(end());}
-  reverse_iterator       rend(){return make_reverse_iterator(begin());}
-  const_reverse_iterator rend()const{return make_reverse_iterator(begin());}
-  const_iterator         cbegin()const{return begin();}
-  const_iterator         cend()const{return end();}
-  const_reverse_iterator crbegin()const{return rbegin();}
-  const_reverse_iterator crend()const{return rend();}
+  iterator
+    end()BOOST_NOEXCEPT{return make_iterator(header());}
+  const_iterator
+    end()const BOOST_NOEXCEPT{return make_iterator(header());}
+  reverse_iterator
+    rbegin()BOOST_NOEXCEPT{return boost::make_reverse_iterator(end());}
+  const_reverse_iterator
+    rbegin()const BOOST_NOEXCEPT{return boost::make_reverse_iterator(end());}
+  reverse_iterator
+    rend()BOOST_NOEXCEPT{return boost::make_reverse_iterator(begin());}
+  const_reverse_iterator
+    rend()const BOOST_NOEXCEPT{return boost::make_reverse_iterator(begin());}
+  const_iterator
+    cbegin()const BOOST_NOEXCEPT{return begin();}
+  const_iterator
+    cend()const BOOST_NOEXCEPT{return end();}
+  const_reverse_iterator
+    crbegin()const BOOST_NOEXCEPT{return rbegin();}
+  const_reverse_iterator
+    crend()const BOOST_NOEXCEPT{return rend();}
 
   iterator iterator_to(const value_type& x)
   {
@@ -226,26 +250,25 @@ public:
 
   /* capacity */
 
-  bool      empty()const{return this->final_empty_();}
-  size_type size()const{return this->final_size_();}
-  size_type max_size()const{return this->final_max_size_();}
+  bool      empty()const BOOST_NOEXCEPT{return this->final_empty_();}
+  size_type size()const BOOST_NOEXCEPT{return this->final_size_();}
+  size_type max_size()const BOOST_NOEXCEPT{return this->final_max_size_();}
 
-  void resize(size_type n,value_param_type x=value_type())
+  void resize(size_type n)
+  {
+    BOOST_MULTI_INDEX_SEQ_INDEX_CHECK_INVARIANT;
+    if(n>size()){
+      for(size_type m=n-size();m--;)
+        this->final_emplace_(BOOST_MULTI_INDEX_NULL_PARAM_PACK);
+    }
+    else if(n<size()){for(size_type m=size()-n;m--;)pop_back();}
+  }
+
+  void resize(size_type n,value_param_type x)
   {
     BOOST_MULTI_INDEX_SEQ_INDEX_CHECK_INVARIANT;
     if(n>size())insert(end(),n-size(),x);
-    else if(n<size()){
-      iterator it;
-      if(n<=size()/2){
-        it=begin();
-        std::advance(it,n);
-      }
-      else{
-        it=end();
-        for(size_type m=size()-n;m--;--it){}
-      }
-      erase(it,end());
-    }   
+    else if(n<size())for(size_type m=size()-n;m--;)pop_back();
   }
 
   /* access: no non-const versions provided as sequenced_index
@@ -257,19 +280,45 @@ public:
 
   /* modifiers */
 
-  std::pair<iterator,bool> push_front(value_param_type x)
+  BOOST_MULTI_INDEX_OVERLOADS_TO_VARTEMPL(
+    emplace_return_type,emplace_front,emplace_front_impl)
+
+  std::pair<iterator,bool> push_front(const value_type& x)
                              {return insert(begin(),x);}
+  std::pair<iterator,bool> push_front(BOOST_RV_REF(value_type) x)
+                             {return insert(begin(),boost::move(x));}
   void                     pop_front(){erase(begin());}
-  std::pair<iterator,bool> push_back(value_param_type x)
+
+  BOOST_MULTI_INDEX_OVERLOADS_TO_VARTEMPL(
+    emplace_return_type,emplace_back,emplace_back_impl)
+
+  std::pair<iterator,bool> push_back(const value_type& x)
                              {return insert(end(),x);}
+  std::pair<iterator,bool> push_back(BOOST_RV_REF(value_type) x)
+                             {return insert(end(),boost::move(x));}
   void                     pop_back(){erase(--end());}
 
-  std::pair<iterator,bool> insert(iterator position,value_param_type x)
+  BOOST_MULTI_INDEX_OVERLOADS_TO_VARTEMPL_EXTRA_ARG(
+    emplace_return_type,emplace,emplace_impl,iterator,position)
+
+  std::pair<iterator,bool> insert(iterator position,const value_type& x)
   {
     BOOST_MULTI_INDEX_CHECK_VALID_ITERATOR(position);
     BOOST_MULTI_INDEX_CHECK_IS_OWNER(position,*this);
     BOOST_MULTI_INDEX_SEQ_INDEX_CHECK_INVARIANT;
     std::pair<final_node_type*,bool> p=this->final_insert_(x);
+    if(p.second&&position.get_node()!=header()){
+      relink(position.get_node(),p.first);
+    }
+    return std::pair<iterator,bool>(make_iterator(p.first),p.second);
+  }
+
+  std::pair<iterator,bool> insert(iterator position,BOOST_RV_REF(value_type) x)
+  {
+    BOOST_MULTI_INDEX_CHECK_VALID_ITERATOR(position);
+    BOOST_MULTI_INDEX_CHECK_IS_OWNER(position,*this);
+    BOOST_MULTI_INDEX_SEQ_INDEX_CHECK_INVARIANT;
+    std::pair<final_node_type*,bool> p=this->final_insert_rv_(x);
     if(p.second&&position.get_node()!=header()){
       relink(position.get_node(),p.first);
     }
@@ -289,6 +338,13 @@ public:
   {
     insert_iter(position,first,last,mpl::not_<is_integral<InputIterator> >());
   }
+
+#if !defined(BOOST_NO_CXX11_HDR_INITIALIZER_LIST)
+  void insert(iterator position,std::initializer_list<value_type> list)
+  {
+    insert(position,list.begin(),list.end());
+  }
+#endif
 
   iterator erase(iterator position)
   {
@@ -314,13 +370,23 @@ public:
     return first;
   }
 
-  bool replace(iterator position,value_param_type x)
+  bool replace(iterator position,const value_type& x)
   {
     BOOST_MULTI_INDEX_CHECK_VALID_ITERATOR(position);
     BOOST_MULTI_INDEX_CHECK_DEREFERENCEABLE_ITERATOR(position);
     BOOST_MULTI_INDEX_CHECK_IS_OWNER(position,*this);
     BOOST_MULTI_INDEX_SEQ_INDEX_CHECK_INVARIANT;
     return this->final_replace_(
+      x,static_cast<final_node_type*>(position.get_node()));
+  }
+
+  bool replace(iterator position,BOOST_RV_REF(value_type) x)
+  {
+    BOOST_MULTI_INDEX_CHECK_VALID_ITERATOR(position);
+    BOOST_MULTI_INDEX_CHECK_DEREFERENCEABLE_ITERATOR(position);
+    BOOST_MULTI_INDEX_CHECK_IS_OWNER(position,*this);
+    BOOST_MULTI_INDEX_SEQ_INDEX_CHECK_INVARIANT;
+    return this->final_replace_rv_(
       x,static_cast<final_node_type*>(position.get_node()));
   }
 
@@ -346,7 +412,7 @@ public:
   }
 
   template<typename Modifier,typename Rollback>
-  bool modify(iterator position,Modifier mod,Rollback back)
+  bool modify(iterator position,Modifier mod,Rollback back_)
   {
     BOOST_MULTI_INDEX_CHECK_VALID_ITERATOR(position);
     BOOST_MULTI_INDEX_CHECK_DEREFERENCEABLE_ITERATOR(position);
@@ -363,16 +429,17 @@ public:
 #endif
 
     return this->final_modify_(
-      mod,back,static_cast<final_node_type*>(position.get_node()));
+      mod,back_,static_cast<final_node_type*>(position.get_node()));
   }
 
   void swap(sequenced_index<SuperMeta,TagList>& x)
   {
     BOOST_MULTI_INDEX_SEQ_INDEX_CHECK_INVARIANT;
+    BOOST_MULTI_INDEX_SEQ_INDEX_CHECK_INVARIANT_OF(x);
     this->final_swap_(x.final());
   }
 
-  void clear()
+  void clear()BOOST_NOEXCEPT
   {
     BOOST_MULTI_INDEX_SEQ_INDEX_CHECK_INVARIANT;
     this->final_clear_();
@@ -450,7 +517,8 @@ public:
   void remove(value_param_type value)
   {
     sequenced_index_remove(
-      *this,std::bind2nd(std::equal_to<value_type>(),value));
+      *this,
+      ::boost::bind(std::equal_to<value_type>(),::boost::arg<1>(),value));
   }
 
   template<typename Predicate>
@@ -494,7 +562,7 @@ public:
     sequenced_index_sort(header(),comp);
   }
 
-  void reverse()
+  void reverse()BOOST_NOEXCEPT
   {
     BOOST_MULTI_INDEX_SEQ_INDEX_CHECK_INVARIANT;
     node_impl_type::reverse(header()->impl());
@@ -554,8 +622,19 @@ BOOST_MULTI_INDEX_PROTECTED_IF_MEMBER_TEMPLATE_FRIENDS:
 #endif
 
   {
-    /* The actual copying takes place in subsequent call to copy_().
-     */
+    /* the actual copying takes place in subsequent call to copy_() */
+  }
+
+  sequenced_index(
+    const sequenced_index<SuperMeta,TagList>& x,do_not_copy_elements_tag):
+    super(x,do_not_copy_elements_tag())
+
+#if defined(BOOST_MULTI_INDEX_ENABLE_SAFE_MODE)
+    ,safe_super()
+#endif
+
+  {
+    empty_initialize();
   }
 
   ~sequenced_index()
@@ -590,17 +669,21 @@ BOOST_MULTI_INDEX_PROTECTED_IF_MEMBER_TEMPLATE_FRIENDS:
     super::copy_(x,map);
   }
 
-  node_type* insert_(value_param_type v,node_type* x)
+  template<typename Variant>
+  final_node_type* insert_(
+    value_param_type v,final_node_type*& x,Variant variant)
   {
-    node_type* res=static_cast<node_type*>(super::insert_(v,x));
-    if(res==x)link(x);
+    final_node_type* res=super::insert_(v,x,variant);
+    if(res==x)link(static_cast<node_type*>(x));
     return res;
   }
 
-  node_type* insert_(value_param_type v,node_type* position,node_type* x)
+  template<typename Variant>
+  final_node_type* insert_(
+    value_param_type v,node_type* position,final_node_type*& x,Variant variant)
   {
-    node_type* res=static_cast<node_type*>(super::insert_(v,position,x));
-    if(res==x)link(x);
+    final_node_type* res=super::insert_(v,position,x,variant);
+    if(res==x)link(static_cast<node_type*>(x));
     return res;
   }
 
@@ -642,9 +725,19 @@ BOOST_MULTI_INDEX_PROTECTED_IF_MEMBER_TEMPLATE_FRIENDS:
     super::swap_(x);
   }
 
-  bool replace_(value_param_type v,node_type* x)
+  void swap_elements_(sequenced_index<SuperMeta,TagList>& x)
   {
-    return super::replace_(v,x);
+#if defined(BOOST_MULTI_INDEX_ENABLE_SAFE_MODE)
+    safe_super::swap(x);
+#endif
+
+    super::swap_elements_(x);
+  }
+
+  template<typename Variant>
+  bool replace_(value_param_type v,node_type* x,Variant variant)
+  {
+    return super::replace_(v,x,variant);
   }
 
   bool modify_(node_type* x)
@@ -694,7 +787,8 @@ BOOST_MULTI_INDEX_PROTECTED_IF_MEMBER_TEMPLATE_FRIENDS:
     Archive& ar,const unsigned int version,const index_loader_type& lm)
   {
     lm.load(
-      ::boost::bind(&sequenced_index::rearranger,this,_1,_2),
+      ::boost::bind(
+        &sequenced_index::rearranger,this,::boost::arg<1>(),::boost::arg<2>()),
       ar,version);
     super::load_(ar,version,lm);
   }
@@ -780,7 +874,7 @@ private:
   {
     BOOST_MULTI_INDEX_SEQ_INDEX_CHECK_INVARIANT;
     clear();
-    for(;first!=last;++first)push_back(*first);
+    for(;first!=last;++first)this->final_insert_ref_(*first);
   }
 
   void assign_iter(size_type n,value_param_type value,mpl::false_)
@@ -795,7 +889,13 @@ private:
     iterator position,InputIterator first,InputIterator last,mpl::true_)
   {
     BOOST_MULTI_INDEX_SEQ_INDEX_CHECK_INVARIANT;
-    for(;first!=last;++first)insert(position,*first);
+    for(;first!=last;++first){
+      std::pair<final_node_type*,bool> p=
+        this->final_insert_ref_(*first);
+      if(p.second&&position.get_node()!=header()){
+        relink(position.get_node(),p.first);
+      }
+    }
   }
 
   void insert_iter(
@@ -806,7 +906,36 @@ private:
     BOOST_MULTI_INDEX_SEQ_INDEX_CHECK_INVARIANT;
     for(size_type i=0;i<n;++i)insert(position,x);
   }
- 
+
+  template<BOOST_MULTI_INDEX_TEMPLATE_PARAM_PACK>
+  std::pair<iterator,bool> emplace_front_impl(
+    BOOST_MULTI_INDEX_FUNCTION_PARAM_PACK)
+  {
+    return emplace_impl(begin(),BOOST_MULTI_INDEX_FORWARD_PARAM_PACK);
+  }
+
+  template<BOOST_MULTI_INDEX_TEMPLATE_PARAM_PACK>
+  std::pair<iterator,bool> emplace_back_impl(
+    BOOST_MULTI_INDEX_FUNCTION_PARAM_PACK)
+  {
+    return emplace_impl(end(),BOOST_MULTI_INDEX_FORWARD_PARAM_PACK);
+  }
+
+  template<BOOST_MULTI_INDEX_TEMPLATE_PARAM_PACK>
+  std::pair<iterator,bool> emplace_impl(
+    iterator position,BOOST_MULTI_INDEX_FUNCTION_PARAM_PACK)
+  {
+    BOOST_MULTI_INDEX_CHECK_VALID_ITERATOR(position);
+    BOOST_MULTI_INDEX_CHECK_IS_OWNER(position,*this);
+    BOOST_MULTI_INDEX_SEQ_INDEX_CHECK_INVARIANT;
+    std::pair<final_node_type*,bool> p=
+      this->final_emplace_(BOOST_MULTI_INDEX_FORWARD_PARAM_PACK);
+    if(p.second&&position.get_node()!=header()){
+      relink(position.get_node(),p.first);
+    }
+    return std::pair<iterator,bool>(make_iterator(p.first),p.second);
+  }
+
 #if defined(BOOST_MULTI_INDEX_ENABLE_INVARIANT_CHECKING)&&\
     BOOST_WORKAROUND(__MWERKS__,<=0x3003)
 #pragma parse_mfunc_templ reset
@@ -917,6 +1046,17 @@ struct sequenced
 
 } /* namespace boost */
 
+/* Boost.Foreach compatibility */
+
+template<typename SuperMeta,typename TagList>
+inline boost::mpl::true_* boost_foreach_is_noncopyable(
+  boost::multi_index::detail::sequenced_index<SuperMeta,TagList>*&,
+  boost::foreach::tag)
+{
+  return 0;
+}
+
 #undef BOOST_MULTI_INDEX_SEQ_INDEX_CHECK_INVARIANT
+#undef BOOST_MULTI_INDEX_SEQ_INDEX_CHECK_INVARIANT_OF
 
 #endif

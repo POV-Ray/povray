@@ -3,16 +3,17 @@ POV-Ray 3.7 for UNIX/Linux - INSTALL file
 
 Compiling and installing POV-Ray for Unix from sources.
 
-Please report bugs via our bugtracker at http://bugs.povray.org/ or to our
-forum at news://news.povray.org/povray.unix/ or http://news.povray.org/povray.unix/
-
--------------------------------------------------------------------------------
-$File: //depot/povray/smp/unix/install.txt $
-$Revision: #9 $
-$Change: 6077 $
-$DateTime: 2013/11/10 05:50:00 $
-$Author: clipka $
+Please report bugs via our bugtracker at http://bugs.povray.org/ or to our forum
+at news://news.povray.org/povray.unix/ or http://news.povray.org/povray.unix/
 ===============================================================================
+
++----------------------------------------------------------------------------+
+| NOTE: If this file does not reside in the root directory of your POV-Ray   |
+| source package, you have received a platform-neutral package. In that case |
+| make sure to run the following command before you proceed:                 |
+|                                                                            |
+|   cd unix/ ; ./prebuild.sh ; cd ../                                        |
++----------------------------------------------------------------------------+
 
 Table of contents
   1. Quick start
@@ -133,6 +134,13 @@ recommanded to generate a fully-featured POV-Ray executable.
 
 - SDL version 1.2 or above (used for the display preview)
   http://www.libsdl.org
+
+
+2.3 Compatibility issues
+    ====================
+
+- Boost version 1.46 has been reported to be unstable on the Raspberry Pi 2. We recommend using Boost version 1.50 on
+  this platform.
 
 
 ====================================================

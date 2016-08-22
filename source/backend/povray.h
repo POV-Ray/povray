@@ -14,7 +14,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -37,22 +37,17 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
-
-/// @file
-/// @todo   Maybe we want to move the version information stuff to a separate file,
-///         preferably in the `base` directory.
+//******************************************************************************
 
 #ifndef POVRAY_BACKEND_POVRAY_H
 #define POVRAY_BACKEND_POVRAY_H
 
-// Please put everything that isn't a preprocessor directive in this
-// file into SKIP_COMPLEX_OPTOUT_H sections like the one below! [trf]
-#ifndef SKIP_COMPLEX_OPTOUT_H
-
-#include "base/povms.h"
 #include <boost/thread.hpp>
 #include <boost/function.hpp>
+
+#include "povms/povmscpp.h"
+
+#include "base/version.h"
 
 /**
  *  This function does essential initialisation that is required before
@@ -77,57 +72,45 @@ void povray_terminate();
  */
 bool povray_terminated();
 
-#endif // SKIP_COMPLEX_OPTOUT_H
-
 #define DAYS(n)         (86400 * n)
 
 // POV-Ray version and copyright message macros
 
-#define POV_RAY_COPYRIGHT "Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd."
-#define OFFICIAL_VERSION_STRING "3.7.1"
-#define OFFICIAL_VERSION_NUMBER 371
-#define OFFICIAL_VERSION_NUMBER_HEX 0x0371
-
-#define POV_RAY_PRERELEASE "alpha.7974983"
-
-#if POV_RAY_IS_OFFICIAL == 1
-#ifdef POV_RAY_PRERELEASE
-#define POV_RAY_VERSION OFFICIAL_VERSION_STRING "-" POV_RAY_PRERELEASE
-#else
-#define POV_RAY_VERSION OFFICIAL_VERSION_STRING
-#endif
-#else
-#ifdef POV_RAY_PRERELEASE
-#define POV_RAY_VERSION OFFICIAL_VERSION_STRING "-" POV_RAY_PRERELEASE ".unofficial"
-#else
-#define POV_RAY_VERSION OFFICIAL_VERSION_STRING "-unofficial"
-#endif
-#endif
-
 #if POV_RAY_IS_OFFICIAL == 1
 
-#ifdef DISTRIBUTION_MESSAGE_2
-#undef DISTRIBUTION_MESSAGE_2
-#endif
+#if POV_RAY_IS_AUTOBUILD == 1
+#define DISTRIBUTION_MESSAGE_1 "This is an official automated build authorized by the POV-Ray Team."
+#else // POV_RAY_IS_AUTOBUILD
+#define DISTRIBUTION_MESSAGE_1 "This is an official version prepared by the POV-Ray Team."
+#endif // POV_RAY_IS_AUTOBUILD
+#define DISTRIBUTION_MESSAGE_2 " See the documentation on how to contact the authors or visit us"
+#define DISTRIBUTION_MESSAGE_3 " on the internet at http://www.povray.org/\n"
 
-#define DISTRIBUTION_MESSAGE_1 "This is an official version prepared by the POV-Ray Team. See the"
-#define DISTRIBUTION_MESSAGE_2 " documentation on how to contact the authors or visit us on the"
-#define DISTRIBUTION_MESSAGE_3 " internet at http://www.povray.org/\n"
+#elif POV_RAY_IS_SEMI_OFFICIAL == 1
+
+#if POV_RAY_IS_AUTOBUILD == 1
+#define DISTRIBUTION_MESSAGE_1 "This is an automated development build authorized by:"
+#else // POV_RAY_IS_AUTOBUILD
+#define DISTRIBUTION_MESSAGE_1 "This is a development version compiled by:"
+#endif // POV_RAY_IS_AUTOBUILD
+#define DISTRIBUTION_MESSAGE_2 " " BUILT_BY
+#define DISTRIBUTION_MESSAGE_3 " The POV-Ray Team does not officially support this version.\n"
 
 #else
 
-// Please set DISTRIBUTION_MESSAGE_2 to your real name to make unofficial versions distinguishable from each other.
-// We also recommend including an email or website address, then remove the #error directive to proceed with the build.
 #define DISTRIBUTION_MESSAGE_1 "This is an unofficial version compiled by:"
-#ifndef DISTRIBUTION_MESSAGE_2
-#error Please complete the following DISTRIBUTION_MESSAGE_2 definition
-#define DISTRIBUTION_MESSAGE_2 " FILL IN NAME HERE........................."
-#endif
+#define DISTRIBUTION_MESSAGE_2 " " BUILT_BY
 #define DISTRIBUTION_MESSAGE_3 " The POV-Ray Team is not responsible for supporting this version.\n"
 
 #endif
 
 #define DISCLAIMER_MESSAGE_1 "This is free software; see the source for copying conditions.  There is NO"
 #define DISCLAIMER_MESSAGE_2 "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE."
+
+#if (POV_RAY_IS_OFFICIAL == 1) && (POV_RAY_IS_AUTOBUILD != 1)
+#define POV_RAY_HAS_OFFICIAL_FEATURES 1
+#else
+#define POV_RAY_HAS_OFFICIAL_FEATURES 0
+#endif
 
 #endif // POVRAY_BACKEND_POVRAY_H

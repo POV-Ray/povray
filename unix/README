@@ -4,6 +4,14 @@ POV-Ray 3.7 for UNIX/Linux - README file
 For the generic source distribution for UNIX/Linux
 ===============================================================================
 
++----------------------------------------------------------------------------+
+| NOTE: If this file does not reside in the root directory of your POV-Ray   |
+| source package, you have received a platform-neutral package. In that case |
+| make sure to run the following command before you proceed:                 |
+|                                                                            |
+|   cd unix/ ; ./prebuild.sh ; cd ../                                        |
++----------------------------------------------------------------------------+
+
 This is the README file for the generic UNIX/Linux distribution of the
 POV-Ray 3.7 source code.
 

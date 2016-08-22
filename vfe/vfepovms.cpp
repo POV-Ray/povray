@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -37,13 +37,14 @@
 
 #include "vfe.h"
 
+#include "povms/povmscpp.h"
+
 // this must be the last file included
 #include "syspovdebug.h"
 
 namespace vfe
 {
 
-using namespace pov;
 using namespace pov_base;
 
 class SysQNode
@@ -81,30 +82,6 @@ class SysQNode
 unsigned int SysQNode::QueueID ;
 
 extern volatile POVMSContext POVMS_Render_Context ;
-
-////////////////////////////////////////////////////////////////////
-// memory allocation for POVMS (need to move this to its own heap).
-////////////////////////////////////////////////////////////////////
-
-void *vfe_POVMS_Sys_Malloc(size_t size, const char *func, const char *file, int line)
-{
-  return malloc (size) ;
-}
-
-void *vfe_POVMS_Sys_Calloc(size_t nitems, size_t size, const char *func, const char *file, int line)
-{
-  return calloc (nitems, size) ;
-}
-
-void *vfe_POVMS_Sys_Realloc(void *ptr, size_t size, const char *func, const char *file, int line)
-{
-  return realloc (ptr, size) ;
-}
-
-void vfe_POVMS_Sys_Free(void *ptr, const char *func, const char *file, int line)
-{
-  free (ptr) ;
-}
 
 ////////////////////////////////////////////////////////////////////
 // error handling

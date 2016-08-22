@@ -2,13 +2,13 @@
 ///
 /// @file base/textstreambuffer.cpp
 ///
-/// This module contains the basic C++ text stream buffer.
+/// Implementations related to buffered text file output.
 ///
 /// @copyright
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -31,19 +31,21 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
-#include <cstring>
-#include <algorithm>
-
-// configbase.h must always be the first POV file included within base *.cpp files
-#include "base/configbase.h"
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "base/textstreambuffer.h"
 
-#include "base/povms.h"
+// C++ variants of standard C header files
+#include <cstring>
+
+// Standard C++ header files
+#include <algorithm>
+
+// POV-Ray base header files
 #include "base/pov_err.h"
-#include "base/types.h"
 #include "base/stringutilities.h"
+#include "base/types.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -57,7 +59,8 @@ TextStreamBuffer::TextStreamBuffer(size_t buffersize, unsigned int wrapwidth)
     bsize = buffersize;
     wrap = wrapwidth;
     curline = 0;
-    if(POVMSUtil_TempAlloc((void **)&buffer, bsize) != kNoErr)
+    buffer = new char[bsize];
+    if(buffer == NULL)
         throw POV_EXCEPTION_CODE(kOutOfMemoryErr);
 }
 
@@ -68,7 +71,7 @@ TextStreamBuffer::~TextStreamBuffer()
     wrap = 0;
     curline = 0;
     if(buffer != NULL)
-        (void)POVMSUtil_TempFree((void *)buffer);
+        delete[] buffer;
     buffer = NULL;
 }
 

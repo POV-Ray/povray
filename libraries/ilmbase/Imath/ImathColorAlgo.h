@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////
 //
-// Copyright (c) 2002, Industrial Light & Magic, a division of Lucas
+// Copyright (c) 2002-2012, Industrial Light & Magic, a division of Lucas
 // Digital Ltd. LLC
 // 
 // All rights reserved.
@@ -39,10 +39,12 @@
 
 
 #include "ImathColor.h"
+#include "ImathExport.h"
 #include "ImathMath.h"
 #include "ImathLimits.h"
+#include "ImathNamespace.h"
 
-namespace Imath {
+IMATH_INTERNAL_NAMESPACE_HEADER_ENTER
 
 
 //
@@ -50,14 +52,13 @@ namespace Imath {
 //	These routines eliminate type warnings under g++.
 //
 
-Vec3<double>	hsv2rgb_d(const Vec3<double> &hsv);
+IMATH_EXPORT Vec3<double>	hsv2rgb_d(const Vec3<double> &hsv);
 
-Color4<double>	hsv2rgb_d(const Color4<double> &hsv);
+IMATH_EXPORT Color4<double>	hsv2rgb_d(const Color4<double> &hsv);
 
+IMATH_EXPORT Vec3<double>	rgb2hsv_d(const Vec3<double> &rgb);
 
-Vec3<double>	rgb2hsv_d(const Vec3<double> &rgb);
-
-Color4<double>	rgb2hsv_d(const Color4<double> &rgb);
+IMATH_EXPORT Color4<double>	rgb2hsv_d(const Color4<double> &rgb);
 
 
 //
@@ -108,7 +109,7 @@ hsv2rgb(const Color4<T> &hsv)
     }
     else
     {
-	Color4<double> v = Color4<double>(hsv.r, hsv.g, hsv.g, hsv.a);
+	Color4<double> v = Color4<double>(hsv.r, hsv.g, hsv.b, hsv.a);
 	Color4<double> c = hsv2rgb_d(v);
 	return Color4<T>((T) c.r, (T) c.g, (T) c.b, (T) c.a);
     }
@@ -156,7 +157,7 @@ rgb2hsv(const Color4<T> &rgb)
     }
     else
     {
-	Color4<double> v = Color4<double>(rgb.r, rgb.g, rgb.g, rgb.a);
+	Color4<double> v = Color4<double>(rgb.r, rgb.g, rgb.b, rgb.a);
 	Color4<double> c = rgb2hsv_d(v);
 	return Color4<T>((T) c.r, (T) c.g, (T) c.b, (T) c.a);
     }
@@ -251,6 +252,6 @@ packed2rgb(PackedColor packed, Color4<T> &out)
 }
 
 
-} // namespace Imath
+IMATH_INTERNAL_NAMESPACE_HEADER_EXIT
 
-#endif  
+#endif // INCLUDED_IMATHCOLORALGO_H

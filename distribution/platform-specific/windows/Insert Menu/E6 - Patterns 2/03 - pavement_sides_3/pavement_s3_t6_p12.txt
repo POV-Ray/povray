@@ -1,0 +1,29 @@
+         pigment{ // ------------------------------------------------------------------------------
+            pavement  //  pavement pattern in the xz plane 
+            number_of_sides 3 //  3 triangle,  4 quadrat, 6 hexagon
+            number_of_tiles 6 //  (1 to 5 or 6): the number of basic tiles to combine together  to make one real tile
+            pattern 12 // maximum depends from  number_of_sides and  number_of_tiles
+              // Sides | Tiles: 1   2   3   4   5   6
+              //------------------------------------------
+              //  3   |        1   1   1   3   4   12 
+              //  4   |        1   1   2   5   12  35 
+              //  6   |        1   1   3   7   22   
+
+              // shape of the corners:  0 sharp, 1 = bevelled, 2 = rounded
+            exterior 0 //  0, 1 or 2; Not used for hexagon.  
+            interior 0  // 0, 1 or 2  
+         
+            form 0//  0, 1 or 2, (3 for square only) copies the look of interior for some additional variations. 
+
+            color_map{
+                       [ 0.00 color rgb<1.00, 1.00, 1.00> ] 
+                       [ 0.20 color rgb<1.00, 1.00, 1.00> ] 
+                       [ 0.20 color rgb<0.00, 0.00, 0.00> ] 
+                       [ 0.60 color rgb<0.00, 0.00, 0.00> ] 
+                       [ 0.60 color rgb<1.00, 0.60, 0.20> ] 
+                       [ 1.00 color rgb<1.00, 0.60, 0.20> ] 
+                     } // end color_map
+             // frequency 3  
+             // turbulence 0.2
+             scale 0.25
+         } // end pigment ------------------------------------------------------------------------  

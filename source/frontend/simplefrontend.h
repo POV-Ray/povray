@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -270,11 +270,11 @@ State SimpleFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::Process()
                 if(animationProcessing != NULL)
                 {
                     options = animationProcessing->GetFrameRenderOptions();
-                    if (imageProcessing != NULL);
-                        options.SetUCS2String(kPOVAttrib_OutputFile, imageProcessing->GetOutputFilename(options, animationProcessing->GetFrameNumber(), animationProcessing->GetFrameNumberDigits()).c_str());
+                    if (imageProcessing != NULL)
+                        options.SetUCS2String(kPOVAttrib_OutputFile, imageProcessing->GetOutputFilename(options, animationProcessing->GetNominalFrameNumber(), animationProcessing->GetFrameNumberDigits()).c_str());
                 }
                 else
-                    if (imageProcessing != NULL);
+                    if (imageProcessing != NULL)
                         options.SetUCS2String(kPOVAttrib_OutputFile, imageProcessing->GetOutputFilename(options, 0, 0).c_str());
             }
             catch(pov_base::Exception&)
@@ -374,7 +374,7 @@ State SimpleFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::Process()
                         try
                         {
                             if(animationProcessing != NULL)
-                                imageProcessing->WriteImage(options, animationProcessing->GetFrameNumber(), animationProcessing->GetFrameNumberDigits());
+                                imageProcessing->WriteImage(options, animationProcessing->GetNominalFrameNumber(), animationProcessing->GetFrameNumberDigits());
                             else
                                 imageProcessing->WriteImage(options);
                         }

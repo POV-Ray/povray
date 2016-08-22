@@ -2,13 +2,13 @@
 ///
 /// @file base/image/colourspace.h
 ///
-/// This file contains code for handling colour space conversions.
+/// Declarations related to colour space conversions.
 ///
 /// @copyright
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -31,18 +31,25 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
 #ifndef POVRAY_BASE_COLOURSPACE_H
 #define POVRAY_BASE_COLOURSPACE_H
 
+// Module config header file must be the first file included within POV-Ray unit header files
+#include "base/configbase.h"
+
+// Standard C++ header files
 #include <vector>
 
+// Boost header files
+#if POV_MULTITHREADED
 #include <boost/thread.hpp>
+#endif
 
-#include "base/configbase.h"
-#include "base/types.h"
+// POV-Ray base header files
 #include "base/colour.h"
+#include "base/types.h"
 
 namespace pov_base
 {
@@ -327,8 +334,10 @@ class GammaCurve
         ///
         float* lookupTable16;
 
+#if POV_MULTITHREADED
         /// Mutex to guard access to @ref lookupTable8 and @ref lookupTable16.
         boost::mutex lutMutex;
+#endif
 
         /// Constructor.
         GammaCurve() : lookupTable8(NULL), lookupTable16(NULL) {}
@@ -360,8 +369,10 @@ class GammaCurve
         ///
         static list<weak_ptr<GammaCurve> > cache;
 
+#if POV_MULTITHREADED
         /// Mutex to guard access to `cache`.
         static boost::mutex cacheMutex;
+#endif
 
         /// Function to manage the gamma curve cache.
         ///
@@ -411,7 +422,7 @@ class SimpleGammaCurve : public GammaCurve
         {
             SimpleGammaCurve* simpleP = dynamic_cast<SimpleGammaCurve*>(p.get());
             if (simpleP)
-                return ((simpleP->GetTypeId() == this->GetTypeId()) && (simpleP->GetParam() == this->GetParam()));
+                return ((typeid(*simpleP) == typeid(*this)) && (simpleP->GetParam() == this->GetParam()));
             else
                 return false;
         }
@@ -441,7 +452,7 @@ class UniqueGammaCurve : public SimpleGammaCurve
         {
             UniqueGammaCurve* uniqueP = dynamic_cast<UniqueGammaCurve*>(p.get());
             if (uniqueP)
-                return (uniqueP->GetTypeId() == this->GetTypeId());
+                return (typeid(*uniqueP) == typeid(*this));
             else
                 return false;
         }
@@ -569,12 +580,20 @@ class TranscodingGammaCurve : public GammaCurve
         virtual bool Matches(const GammaCurvePtr&) const;
 };
 
+enum GammaTypeId
+{
+    kPOVList_GammaType_Unknown,
+    kPOVList_GammaType_Neutral,
+    kPOVList_GammaType_PowerLaw,
+    kPOVList_GammaType_SRGB
+};
+
 /// Generic transfer function factory.
 ///
 /// @param  typeId  transfer function type (one of kPOVList_GammaType_*)
 /// @param  param   parameter for parameterized transfer function (e.g. gamma of power-law function)
 ///
-SimpleGammaCurvePtr GetGammaCurve(int typeId, float param);
+SimpleGammaCurvePtr GetGammaCurve(GammaTypeId typeId, float param);
 
 }
 

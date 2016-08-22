@@ -31,7 +31,7 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
 #ifndef POVRAY_BACKEND_RENDERTASK_H
 #define POVRAY_BACKEND_RENDERTASK_H
@@ -54,7 +54,7 @@ class RenderTask : public SceneTask
         virtual void Run() = 0;
         virtual void Stopped() = 0;
 
-        shared_ptr<SceneData>& GetSceneData();
+        shared_ptr<BackendSceneData>& GetSceneData();
         ViewData *GetViewData();
 
         inline ViewThreadData *GetViewDataPtr() { return reinterpret_cast<ViewThreadData *>(GetDataPtr()); }

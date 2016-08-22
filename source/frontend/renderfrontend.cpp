@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -35,18 +35,18 @@
 
 #include <boost/scoped_ptr.hpp>
 
-// configbase.h must always be the first POV file included within base *.cpp files
-#include "base/configbase.h"
-#include "base/types.h"
-#include "base/povms.h"
-#include "base/povmscpp.h"
-#include "base/povmsgid.h"
-#include "base/processoptions.h"
-#include "base/platformbase.h"
-#include "base/fileinputoutput.h"
-
+// configfrontend.h must always be the first POV file included within frontend *.cpp files
 #include "frontend/configfrontend.h"
 #include "frontend/renderfrontend.h"
+
+#include "povms/povmscpp.h"
+#include "povms/povmsid.h"
+
+#include "base/fileinputoutput.h"
+#include "base/platformbase.h"
+#include "base/types.h"
+
+#include "frontend/processoptions.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -609,12 +609,12 @@ void RenderFrontendBase::NewBackup(POVMS_Object& ropts, ViewData& vd, const Path
     MakeBackupPath(ropts, vd, outputpath);
     if(POV_ALLOW_FILE_WRITE(vd.imageBackupFile().c_str(), POV_File_Data_Backup) == false)
         throw POV_EXCEPTION(kCannotOpenFileErr, "Permission denied to create render state output file.");
-    vd.imageBackup = shared_ptr<OStream>(POV_PLATFORM_BASE.CreateOStream(POV_File_Data_Backup));
+    vd.imageBackup = shared_ptr<OStream>(new OStream(vd.imageBackupFile().c_str()));
     if(vd.imageBackup != NULL)
     {
         Backup_File_Header hdr;
 
-        if(vd.imageBackup->open(vd.imageBackupFile().c_str()) == false)
+        if(!*vd.imageBackup)
             throw POV_EXCEPTION(kCannotOpenFileErr, "Cannot create render state output file.");
         memcpy(hdr.sig, RENDER_STATE_SIG, sizeof(hdr.sig));
         memcpy(hdr.ver, RENDER_STATE_VER, sizeof(hdr.ver));
@@ -649,7 +649,7 @@ void RenderFrontendBase::ContinueBackup(POVMS_Object& ropts, ViewData& vd, ViewI
     vd.imageBackup.reset();
     MakeBackupPath(ropts, vd, outputpath);
 
-    boost::scoped_ptr<IStream> inbuffer(POV_PLATFORM_BASE.CreateIStream(POV_File_Data_Backup));
+    boost::scoped_ptr<IStream> inbuffer(new IFileStream(vd.imageBackupFile().c_str()));
 
     size_t pos = sizeof(Backup_File_Header);
 
@@ -657,7 +657,7 @@ void RenderFrontendBase::ContinueBackup(POVMS_Object& ropts, ViewData& vd, ViewI
     {
         Backup_File_Header hdr;
 
-        if(inbuffer->open(vd.imageBackupFile().c_str()) == true)
+        if(*inbuffer)
         {
             // IOBase::eof() only is based on feof() and will only return
             // true if we have attempted to read past the end of the file.
@@ -724,10 +724,10 @@ void RenderFrontendBase::ContinueBackup(POVMS_Object& ropts, ViewData& vd, ViewI
     // if there isn't going to be an output file, we don't write to the state file
     if(outputToFile == true)
     {
-        vd.imageBackup = shared_ptr<OStream>(POV_PLATFORM_BASE.CreateOStream(POV_File_Data_Backup));
+        vd.imageBackup = shared_ptr<OStream>(new OStream(vd.imageBackupFile().c_str(), IOBase::append));
         if(vd.imageBackup != NULL)
         {
-            if(vd.imageBackup->open(vd.imageBackupFile().c_str(), IOBase::append) == false)
+            if(!*vd.imageBackup)
                 throw POV_EXCEPTION(kCannotOpenFileErr, "Cannot append to state output file.");
 
             vd.imageBackup->seekg(0, IOBase::seek_end);
@@ -1897,10 +1897,6 @@ string GetProgressTime(POVMS_Object& obj, POVMSType key)
 
     return string(buffer);
 }
-
-#if 0
-#pragma mark -
-#endif
 
 void RenderDone(TextStreamBuffer *tsb, POVMSObjectPtr msg)
 {/*

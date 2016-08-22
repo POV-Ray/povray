@@ -13,9 +13,15 @@ libImath_la_SOURCES = ImathShear.cpp ImathMatrixAlgo.cpp ImathVec.cpp \
 		      ImathColor.h ImathRandom.h ImathRoots.h \
 		      ImathHalfLimits.h ImathInterval.h ImathGLU.h \
 		      ImathFrame.h ImathPlatform.h \
-		      ImathBox.cpp ImathRandom.cpp ImathInt64.h
+		      ImathBox.cpp ImathRandom.cpp ImathInt64.h \
+		      ImathFrustumTest.h
 
 libImath_la_LDFLAGS = -version-info @LIBTOOL_VERSION@ -no-undefined
+if LIB_SUFFIX_EXISTS
+libImath_la_LDFLAGS += -release @LIB_SUFFIX@
+endif
+
+
 libImath_la_LIBADD = ../Iex/libIex.la
 
 libImathincludedir = $(includedir)/OpenEXR
@@ -28,7 +34,11 @@ libImathinclude_HEADERS = ImathColorAlgo.h ImathMatrixAlgo.h ImathVec.h \
 			  ImathFrustum.h ImathMath.h ImathGL.h \
 			  ImathColor.h ImathRandom.h ImathRoots.h \
 			  ImathHalfLimits.h ImathInterval.h ImathGLU.h \
-			  ImathFrame.h ImathPlatform.h ImathInt64.h
+			  ImathFrame.h ImathPlatform.h ImathInt64.h \
+                          ImathNamespace.h ImathForward.h ImathExport.h \
+                          ImathFrustumTest.h
 
 INCLUDES = -I$(top_builddir) -I$(top_srcdir)/Iex -I$(top_srcdir)/Half \
 	   -I$(top_srcdir)/config
+
+EXTRA_DIST = CMakeLists.txt

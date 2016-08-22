@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -33,14 +33,15 @@
 ///
 //******************************************************************************
 
-// configbase.h must always be the first POV file included within base *.cpp files
-#include "base/configbase.h"
-
-#include <boost/thread.hpp>
-
-#ifndef POV_TIMER
-
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "base/timer.h"
+
+// Boost header files
+#if POV_MULTITHREADED
+#include <boost/thread.hpp>
+#endif
+
+// POV-Ray base header files
 #include "base/types.h"
 
 // this must be the last file included
@@ -48,6 +49,8 @@
 
 namespace pov_base
 {
+
+#if POV_TIMER_DEFAULT
 
 TimerDefault::TimerDefault(bool tctime) :
     threadCPUTimeOnly(tctime)
@@ -88,14 +91,9 @@ void TimerDefault::Reset()
     boost::xtime_get(&cpuTimeStart, POV_TIME_UTC);
 }
 
-}
+#endif // POV_TIMER_DEFAULT
 
-#endif
-
-#ifndef POV_DELAY_IMPLEMENTED
-
-namespace pov_base
-{
+#if POV_MULTITHREADED && !defined(POV_DELAY_IMPLEMENTED)
 
 void Delay(unsigned int msec)
 {
@@ -107,6 +105,6 @@ void Delay(unsigned int msec)
     boost::thread::sleep(t);
 }
 
-}
+#endif // POV_MULTITHREADED && !defined(POV_DELAY_IMPLEMENTED)
 
-#endif
+}

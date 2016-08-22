@@ -40,11 +40,12 @@
 
 #include <boost/scoped_ptr.hpp>
 
+#include "povms/povmscpp.h"
+#include "povms/povmsid.h"
+
 #include "base/fileinputoutput.h"
-#include "base/image/image.h"
-#include "base/povmscpp.h"
-#include "base/povmsgid.h"
 #include "base/stringutilities.h"
+#include "base/image/image.h"
 
 #include "frontend/configfrontend.h"
 

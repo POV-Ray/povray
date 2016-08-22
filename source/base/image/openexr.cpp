@@ -2,14 +2,13 @@
 ///
 /// @file base/image/openexr.cpp
 ///
-/// This module contains the code to read and write files via the openexr
-/// library.
+/// Implementation of Industrial Light & Magic OpenEXR image file handling.
 ///
 /// @copyright
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -34,37 +33,28 @@
 ///
 //******************************************************************************
 
-#include <boost/scoped_ptr.hpp>
-#include <boost/scoped_array.hpp>
-
-#include <string>
-
-// configbase.h must always be the first POV file included within base *.cpp files
-#include "base/configbase.h"
-#include "base/image/image.h"
-#include "base/fileinputoutput.h"
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "base/image/openexr.h"
-#include "base/types.h"
-
 
 #ifndef OPENEXR_MISSING
 
-#ifdef NON_UNIX_OPENEXR_HEADERS
+// Standard C++ header files
+#include <string>
 
+// Boost header files
+#include <boost/scoped_ptr.hpp>
+#include <boost/scoped_array.hpp>
+
+// Other 3rd party header files
 #include <ImfRgbaFile.h>
 #include <ImfStringAttribute.h>
 #include <ImfMatrixAttribute.h>
 #include <ImfArray.h>
 
-#else
-
-#include <OpenEXR/ImfRgbaFile.h>
-#include <OpenEXR/ImfStringAttribute.h>
-#include <OpenEXR/ImfMatrixAttribute.h>
-#include <OpenEXR/ImfArray.h>
-
-#endif
-#include "metadata.h"
+// POV-Ray base header files
+#include "base/fileinputoutput.h"
+#include "base/types.h"
+#include "base/image/metadata.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -192,8 +182,8 @@ Image *Read(IStream *file, const Image::ReadOptions& options)
     // OpenEXR officially uses premultiplied alpha, so that's the preferred mode to use for the image container unless the user overrides
     // (e.g. to handle a non-compliant file).
     bool premul = true;
-    if (options.premultiplyOverride)
-        premul = options.premultiply;
+    if (options.premultipliedOverride)
+        premul = options.premultiplied;
 
     // TODO: code this to observe the request for alpha in the input file type.
     POV_EXR_IStream is(*file);
