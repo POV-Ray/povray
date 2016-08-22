@@ -1994,7 +1994,7 @@ class GenericCompactColour
         typedef CHANNEL_T Channel;
         typedef GenericLinearColour<MODEL_T,ColourChannel> ExpandedColour;
 
-        friend class ExpandedColour;
+        friend class GenericLinearColour<MODEL_T,ColourChannel>;
 
         static const unsigned int kBias              = Parameters::kBias;
         static const bool         kQuantizeToNearest = Parameters::kQuantizeToNearest;
