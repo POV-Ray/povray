@@ -1597,11 +1597,11 @@ void Trace::ComputeOneDiffuseLight(LightColour& colour, const LightSource &light
         }
 
         ComputeClassicColour(colour, lightColour, layer_pigment_colour, eye.Direction, lightsourceray.Direction, layer_normal, finish, ipoint, relativeIor, attenuation, backside,
-            // NK rad - don't compute highlights for radiosity gather rays, since this causes
-            // problems with colors being far too bright
-            // TODO FIXME radiosity - is this really the right way to do it (speaking of realism)?
-            // don't compute highlights for diffuse backside illumination
-            (lightsource.Light_Type != FILL_LIGHT_SOURCE) && !eye.IsRadiosityRay() && !backside);
+                             // NK rad - don't compute highlights for radiosity gather rays, since this causes
+                             // problems with colors being far too bright
+                             // TODO FIXME radiosity - is this really the right way to do it (speaking of realism)?
+                             // don't compute highlights for diffuse backside illumination
+                             (lightsource.Light_Type != FILL_LIGHT_SOURCE) && !eye.IsRadiosityRay() && !backside);
     }
 }
 
@@ -1656,7 +1656,6 @@ void Trace::ComputeFullAreaDiffuseLight(LightColour& colour, const LightColour& 
             double jitter_u = (double)u;
             double jitter_v = (double)v;
             bool backside = false;
-            LightColour tmpCol;
 
             if(lightsource.Jitter)
             {
@@ -1719,11 +1718,11 @@ void Trace::ComputeFullAreaDiffuseLight(LightColour& colour, const LightColour& 
             }
 
             ComputeClassicColour(colour, attenuatedLightcolour, layer_pigment_colour, eye.Direction, lsr.Direction, layer_normal, finish, ipoint, relativeIor, attenuation, backside,
-                // NK rad - don't compute highlights for radiosity gather rays, since this causes
-                // problems with colors being far too bright
-                // TODO FIXME radiosity - is this really the right way to do it (speaking of realism)?
-                // don't compute highlights for diffuse backside illumination
-                (lightsource.Light_Type != FILL_LIGHT_SOURCE) && !eye.IsRadiosityRay() && !backside);
+                                 // NK rad - don't compute highlights for radiosity gather rays, since this causes
+                                 // problems with colors being far too bright
+                                 // TODO FIXME radiosity - is this really the right way to do it (speaking of realism)?
+                                 // don't compute highlights for diffuse backside illumination
+                                 (lightsource.Light_Type != FILL_LIGHT_SOURCE) && !eye.IsRadiosityRay() && !backside);
         }
     }
 }
@@ -2273,7 +2272,7 @@ void Trace::ComputeShadowColour(LightColour& colour, const LightSource &lightsou
     if(fabs(resultColour.Weight()) < lightsourceray.GetTicket().adcBailout)
     {
         // close enough to full shadow - bail out to avoid media computations
-        resultColour.Clear();
+        colour.Clear();
         return;
     }
 
@@ -2352,7 +2351,7 @@ void Trace::ComputeDiffuseColour(LightColour& colour, const LightColour& lightCo
         colour += intensity * pigmentColour * lightColour * cs1 * cs2;
     }
     else
-    colour += intensity * pigmentColour * lightColour;
+        colour += intensity * pigmentColour * lightColour;
 }
 
 void Trace::ComputePhongColour(LightColour& colour, const LightColour& lightColour, const AttenuatingColour& pigmentColour,
@@ -2361,7 +2360,6 @@ void Trace::ComputePhongColour(LightColour& colour, const LightColour& lightColo
 {
     double cos_angle_of_incidence, deviation, intensity;
     Vector3d reflectToLight;
-    AttenuatingColour cs;
 
     cos_angle_of_incidence = -dot(normal, fromEye);
 
@@ -2371,7 +2369,7 @@ void Trace::ComputePhongColour(LightColour& colour, const LightColour& lightColo
 
     if(deviation > 0.0)
     {
-        if((finish->Phong_Size < 60) || (cos_angle_of_incidence > 0.0008)) // rgs
+        if((finish->Phong_Size < 60) || (deviation > 0.0008)) // rgs
         {
             intensity = finish->Phong * pow(deviation, (double)finish->Phong_Size);
 
