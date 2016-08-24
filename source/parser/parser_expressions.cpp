@@ -1212,6 +1212,7 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                 case MAX_EXTENT_TOKEN:
                     GET (LEFT_PAREN_TOKEN);
                     EXPECT
+
                         CASE (OBJECT_ID_TOKEN)
                             Object = reinterpret_cast<ObjectPtr>(Token.Data);
                             if ( Object )
@@ -1220,17 +1221,24 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                         END_CASE
 
                         // JN2007: Image map dimensions:
-                        CASE (PIGMENT_ID_TOKEN)
+                        CASE3 (DENSITY_ID_TOKEN,PIGMENT_ID_TOKEN,TNORMAL_ID_TOKEN)
                             Pigment = reinterpret_cast<PIGMENT *>(Token.Data);
-                            if(Pigment->Type != BITMAP_PATTERN)
-                            {
-                                Error("The parameter to max_extent must be an image map pigment identifier");
-                            }
-                            else
+                            if(Pigment->Type == BITMAP_PATTERN)
                             {
                                 Vect[X] = dynamic_cast<ImagePattern*>(Pigment->pattern.get())->pImage->iwidth;
                                 Vect[Y] = dynamic_cast<ImagePattern*>(Pigment->pattern.get())->pImage->iheight;
                                 Vect[Z] = 0;
+                            }
+                            else if(Pigment->Type == DENSITY_FILE_PATTERN)
+                            {
+                                Vect[X] = dynamic_cast<DensityFilePattern*>(Pigment->pattern.get())->densityFile->Data->Sx;
+                                Vect[Y] = dynamic_cast<DensityFilePattern*>(Pigment->pattern.get())->densityFile->Data->Sy;
+                                Vect[Z] = dynamic_cast<DensityFilePattern*>(Pigment->pattern.get())->densityFile->Data->Sz;
+                            }
+                            else
+                            {
+                                Error("\rThe parameter to max_extent must be a bump_map, image map\r"
+                                      "or density_file form of a normal, pigment or density identifier.");
                             }
                             EXIT
                         END_CASE
