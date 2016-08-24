@@ -1212,7 +1212,6 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                 case MAX_EXTENT_TOKEN:
                     GET (LEFT_PAREN_TOKEN);
                     EXPECT
-
                         CASE (OBJECT_ID_TOKEN)
                             Object = reinterpret_cast<ObjectPtr>(Token.Data);
                             if ( Object )
@@ -1237,8 +1236,7 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                             }
                             else
                             {
-                                Error("\rThe parameter to max_extent must be a bump_map, image map\r"
-                                      "or density_file form of a normal, pigment or density identifier.");
+                                Error("A pigment, normal or density parameter to max_extent must be based on an image or density file.");
                             }
                             EXIT
                         END_CASE
