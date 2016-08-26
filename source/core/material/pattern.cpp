@@ -6271,33 +6271,6 @@ DBL DensityFilePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *
                     density = intp3(xx, intpd2[0][0], intpd2[0][1], intpd2[0][2], intpd2[0][3]);
                     if (density < 0.0) density = 0.0;
                     break;
-                case kDensityFileInterpolation_Environment:
-                    density = 1.0-(2.0*min(0.5,sqrt(pow(0.5-Ex,2)+pow(0.5-Ey,2)+pow(0.5-Ez,2))));
-                    break;
-                case kDensityFileInterpolation_GradientX:
-                    density = Ex;
-                    break;
-                case kDensityFileInterpolation_GradientY:
-                    density = Ey;
-                    break;
-                case kDensityFileInterpolation_GradientZ:
-                    density = Ez;
-                    break;
-                case kDensityFileInterpolation_RotAboutYx:
-                    this_x = Ex-0.5;
-                    this_z = Ez-0.5;
-                    density = sqrt(this_x*this_x+this_z*this_z)+0.5;
-                    break;
-                case kDensityFileInterpolation_TwistZx:
-                    this_x = Ex-0.5;
-                    this_y = Ey-0.5;
-                    density = (this_x*cos(Ez*TWO_M_PI)+this_y*sin(Ez*TWO_M_PI))+0.5;
-                    break;
-                case kDensityFileInterpolation_TwistZy:
-                    this_x = Ex-0.5;
-                    this_y = Ey-0.5;
-                    density = (this_y*cos(Ez*TWO_M_PI)-this_x*sin(Ez*TWO_M_PI))+0.5;
-                    break;
                 case kDensityFileInterpolation_BlobFour:
                 case kDensityFileInterpolation_BlobSix:
                 case kDensityFileInterpolation_BlobEight:
@@ -6406,18 +6379,7 @@ DBL DensityFilePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *
             }
         }
         else
-            switch (densityFile->Interpolation)
-            {
-                case kDensityFileInterpolation_Environment:
-                    if      (sqrt(pow(+1.0e17-Ex,2.0)+pow(-1.0e17-Ey,2.0)+pow(-1.0e17-Ez,2.0))<EPSILON) density = (DBL)(Data->Sx)/(DBL)UNSIGNED16_MAX;
-                    else if (sqrt(pow(-1.0e17-Ex,2.0)+pow(+1.0e17-Ey,2.0)+pow(-1.0e17-Ez,2.0))<EPSILON) density = (DBL)(Data->Sy)/(DBL)UNSIGNED16_MAX;
-                    else if (sqrt(pow(-1.0e17-Ex,2.0)+pow(-1.0e17-Ey,2.0)+pow(+1.0e17-Ez,2.0))<EPSILON) density = (DBL)(Data->Sz)/(DBL)UNSIGNED16_MAX;
-                    else density = 0.0;
-                    break;
-                default:
-                    density = 0.0;
-                    break;
-            }
+            density = 0.0;
     }
 
     return density;

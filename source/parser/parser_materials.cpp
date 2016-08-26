@@ -2079,13 +2079,6 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
                     case kDensityFileInterpolation_BlobFour:
                     case kDensityFileInterpolation_BlobSix:
                     case kDensityFileInterpolation_BlobEight:
-                    case kDensityFileInterpolation_Environment:
-                    case kDensityFileInterpolation_GradientX:
-                    case kDensityFileInterpolation_GradientY:
-                    case kDensityFileInterpolation_GradientZ:
-                    case kDensityFileInterpolation_RotAboutYx:
-                    case kDensityFileInterpolation_TwistZx:
-                    case kDensityFileInterpolation_TwistZy:
                         break;
                     default:
                         pattern->densityFile->Interpolation = kDensityFileInterpolation_Tricubic;
@@ -5449,13 +5442,6 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
                     case kDensityFileInterpolation_BlobFour:
                     case kDensityFileInterpolation_BlobSix:
                     case kDensityFileInterpolation_BlobEight:
-                    case kDensityFileInterpolation_Environment:
-                    case kDensityFileInterpolation_GradientX:
-                    case kDensityFileInterpolation_GradientY:
-                    case kDensityFileInterpolation_GradientZ:
-                    case kDensityFileInterpolation_RotAboutYx:
-                    case kDensityFileInterpolation_TwistZx:
-                    case kDensityFileInterpolation_TwistZy:
                         break;
                     default:
                         pattern->densityFile->Interpolation = kDensityFileInterpolation_Tricubic;
