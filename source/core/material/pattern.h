@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -125,12 +125,14 @@ const int kNoiseGen_Max = 3;
 /// Density file interpolation types
 enum DensityFileInterpolationType
 {
-    kDensityFileInterpolation_None        = 0,
-    kDensityFileInterpolation_Trilinear   = 1,
-    kDensityFileInterpolation_Tricubic    = 2,
-    kDensityFileInterpolation_BlobFour    = 3,
-    kDensityFileInterpolation_BlobSix     = 4,
-    kDensityFileInterpolation_BlobEight   = 5
+    kDensityFileInterpolation_None            = 0,
+    kDensityFileInterpolation_Trilinear       = 1,
+    kDensityFileInterpolation_Tricubic        = 2,
+    kDensityFileInterpolation_BlobFour        = 3,
+    kDensityFileInterpolation_BlobSix         = 4,
+    kDensityFileInterpolation_BlobEight       = 5,
+    kDensityFileInterpolation_Trilinear_Shftd = 11,
+    kDensityFileInterpolation_Tricubic_Shftd  = 12
 };
 
 /// Maximum `exponent` parameter value for fractal patterns.

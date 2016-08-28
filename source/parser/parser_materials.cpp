@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -2079,6 +2079,8 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
                     case kDensityFileInterpolation_BlobFour:
                     case kDensityFileInterpolation_BlobSix:
                     case kDensityFileInterpolation_BlobEight:
+                    case kDensityFileInterpolation_Trilinear_Shftd:
+                    case kDensityFileInterpolation_Tricubic_Shftd:
                         break;
                     default:
                         pattern->densityFile->Interpolation = kDensityFileInterpolation_Tricubic;
@@ -5442,6 +5444,8 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
                     case kDensityFileInterpolation_BlobFour:
                     case kDensityFileInterpolation_BlobSix:
                     case kDensityFileInterpolation_BlobEight:
+                    case kDensityFileInterpolation_Trilinear_Shftd:
+                    case kDensityFileInterpolation_Tricubic_Shftd:
                         break;
                     default:
                         pattern->densityFile->Interpolation = kDensityFileInterpolation_Tricubic;
