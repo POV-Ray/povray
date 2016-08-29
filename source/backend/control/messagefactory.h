@@ -39,7 +39,7 @@
 #include "povms/povmscpp.h"
 #include "povms/povmsid.h"
 
-#include "base/pov_err.h"
+#include "base/messenger.h"
 
 #include "backend/control/renderbackend.h"
 
@@ -48,48 +48,22 @@ namespace pov
 
 using namespace pov_base;
 
-enum WarningLevel
-{
-    /// Value used for general warnings.
-    kWarningGeneral  = 1,
-    /// Value used for general language version specific warning.
-    kWarningLanguage = 6
-};
-
-class MessageFactory : public CoreMessenger
+class MessageFactory : public GenericMessenger
 {
     public:
 
         MessageFactory(unsigned int wl, const char *sn, POVMSAddress saddr, POVMSAddress daddr, RenderBackend::SceneId sid, RenderBackend::ViewId vid);
         virtual ~MessageFactory();
 
-        virtual void CoreMessage(CoreMessageClass mc, const char *format,...);
-        virtual void CoreMessageAt(CoreMessageClass mc, const UCS2 *filename, POV_LONG line, POV_LONG column, POV_LONG offset, const char *format, ...);
-
-        void Warning(WarningLevel level, const char *format,...);
-        void WarningAt(WarningLevel level, const UCS2 *filename, POV_LONG line, POV_LONG column, POV_LONG offset, const char *format, ...);
-
-        void PossibleError(const char *format,...);
-        void PossibleErrorAt(const UCS2 *filename, POV_LONG line, POV_LONG column, POV_LONG offset, const char *format, ...);
-
-        void Error(const char *format,...);
-        void Error(const Exception& ex, const char *format,...);
-        void Error(Exception& ex, const char *format,...);
-        void ErrorAt(const UCS2 *filename, POV_LONG line, POV_LONG column, POV_LONG offset, const char *format, ...);
-        void ErrorAt(const Exception& ex, const UCS2 *filename, POV_LONG line, POV_LONG column, POV_LONG offset, const char *format, ...);
-        void ErrorAt(Exception& ex, const UCS2 *filename, POV_LONG line, POV_LONG column, POV_LONG offset, const char *format, ...);
-        void SetWarningLevel(unsigned int Val) { warningLevel = Val ; } // TODO FIXME - not here, not this way
-
     private:
-        unsigned int warningLevel;
-        const char *stageName;
+
         POVMSAddress sourceAddress;
         POVMSAddress destinationAddress;
         RenderBackend::SceneId sceneId;
         RenderBackend::ViewId viewId;
 
-        void CleanupString(char *str);
-        std::string SendError(const char *format, va_list arglist, const UCS2 *filename = NULL, POV_LONG line = -1, POV_LONG column = -1, POV_LONG offset = -1);
+        virtual void SendMessage(MessageClass mc, WarningLevel level, const char *text,
+                                 const UCS2 *filename = NULL, POV_LONG line = -1, POV_LONG column = -1, POV_LONG offset = -1);
 };
 
 }

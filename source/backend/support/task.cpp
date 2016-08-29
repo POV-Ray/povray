@@ -57,7 +57,7 @@ namespace pov
 
 using namespace pov_base;
 
-Task::Task(TaskData *td, const boost::function1<void, Exception&>& f) :
+Task::Task(ThreadData *td, const boost::function1<void, Exception&>& f) :
     taskData(td),
     fatalErrorHandler(f),
     stopRequested(false),
@@ -72,7 +72,6 @@ Task::Task(TaskData *td, const boost::function1<void, Exception&>& f) :
 {
     if (td == NULL)
         throw POV_EXCEPTION_STRING("Internal error: TaskData is NULL in Task constructor");
-    td->task = this;
 }
 
 Task::~Task()
@@ -252,7 +251,7 @@ void Task::TaskThread(const boost::function0<void>& completion)
 }
 
 
-SceneTask::SceneTask(TaskData *td, const boost::function1<void, Exception&>& f, const char* sn, shared_ptr<BackendSceneData> sd, RenderBackend::ViewId vid) :
+SceneTask::SceneTask(ThreadData *td, const boost::function1<void, Exception&>& f, const char* sn, shared_ptr<BackendSceneData> sd, RenderBackend::ViewId vid) :
     Task(td, f),
     messageFactory(sd->warningLevel, sn, sd->backendAddress, sd->frontendAddress, sd->sceneId, vid)
 {}

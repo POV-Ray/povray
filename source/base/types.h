@@ -284,10 +284,60 @@ class FloatSetting : public GenericSetting
         double  data;
 };
 
-enum StringEncoding {
+enum StringEncoding
+{
     kStringEncoding_ASCII  = 0,
     kStringEncoding_UTF8   = 1,
     kStringEncoding_System = 2
+};
+
+enum GammaMode
+{
+    /**
+     *  No gamma handling.
+     *  This model is based on the (wrong) presumption that image file pixel values are proportional to
+     *  physical light intensities.
+     *  This is the default for POV-Ray 3.6 and earlier.
+     */
+    kPOVList_GammaMode_None,
+    /**
+     *  Explicit assumed_gamma-based gamma handling model, 3.6 variant.
+     *  This model is based on the (wrong) presumption that render engine maths works equally well with
+     *  both linear and gamma-encoded light intensity values.
+     *  Using assumed_gamma=1.0 gives physically realistic results.
+     *  Input image files without implicit or explicit gamma information will be presumed to match assumed_gamma,
+     *  i.e. they will not be gamma corrected.
+     *  This is the mode used by POV-Ray 3.6 if assumed_gamma is specified.
+     */
+    kPOVList_GammaMode_AssumedGamma36,
+    /**
+     *  Explicit assumed_gamma-based gamma handling model, 3.7 variant.
+     *  This model is based on the (wrong) presumption that render engine maths works equally well with
+     *  both linear and gamma-encoded light intensity values.
+     *  Using assumed_gamma=1.0 gives physically realistic results.
+     *  Input image files without implicit or explicit gamma information will be presumed to match official
+     *  recommendations for the respective file format; files for which no official recommendations exists
+     *  will be presumed to match assumed_gamma.
+     *  This is the mode used by POV-Ray 3.7 if assumed_gamma is specified.
+     */
+    kPOVList_GammaMode_AssumedGamma37,
+    /**
+     *  Implicit assumed_gamma-based gamma handling model, 3.7 variant.
+     *  This model is functionally idential to kPOVList_GammaMode_AssumedGamma37 except that it also serves as a marker
+     *  that assumed_gamma has not been set explicitly.
+     *  This is the default for POV-Ray 3.7 and later.
+     */
+    kPOVList_GammaMode_AssumedGamma37Implied,
+};
+
+/// Common base class for all thread-specific data.
+///
+/// This class is used as the base for all thread-specific data to allow for safe dynamic casting.
+///
+class ThreadData
+{
+    public:
+        virtual ~ThreadData() { }
 };
 
 }

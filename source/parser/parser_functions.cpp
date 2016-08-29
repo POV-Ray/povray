@@ -42,9 +42,9 @@
 
 #include "base/mathutil.h"
 
-#include "vm/fnpovfpu.h"
+#include "core/scene/scenedata.h"
 
-#include "backend/scene/backendscenedata.h"
+#include "vm/fnpovfpu.h"
 
 // this must be the last file included
 #include "base/povdebug.h"

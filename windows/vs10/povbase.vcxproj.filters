@@ -126,6 +126,9 @@
     <ClCompile Include="..\..\source\base\image\metadata.cpp">
       <Filter>Base source\Image</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\base\messenger.cpp">
+      <Filter>Base source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\base\configbase.h">
@@ -252,6 +255,9 @@
       <Filter>Base Headers</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\base\mathutil.h">
+      <Filter>Base Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\base\messenger.h">
       <Filter>Base Headers</Filter>
     </ClInclude>
   </ItemGroup>

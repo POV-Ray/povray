@@ -96,8 +96,6 @@
 
 #include "vm/fnpovfpu.h"
 
-#include "povms/povmsid.h"
-
 #include "backend/scene/backendscenedata.h"
 
 // this must be the last file included
@@ -135,6 +133,7 @@ const DBL INFINITE_VOLUME = BOUND_HUGE;
 
 Parser::Parser(shared_ptr<BackendSceneData> sd, bool useclk, DBL clk) :
     SceneTask(new TraceThreadData(sd), boost::bind(&Parser::SendFatalError, this, _1), "Parse", sd),
+    backendSceneData(sd),
     sceneData(sd),
     clockValue(clk),
     useClock(useclk),
@@ -149,7 +148,7 @@ Parser::Parser(shared_ptr<BackendSceneData> sd, bool useclk, DBL clk) :
     token_count(0),
     line_count(10),
     next_rand(NULL),
-    Debug_Message_Buffer(sd->backendAddress, sd->frontendAddress, sd->sceneId)
+    Debug_Message_Buffer(messageFactory)
 {
     pre_init_tokenizer();
     if (sceneData->realTimeRaytracing)
@@ -458,7 +457,7 @@ void Parser::Cleanup()
 
 void Parser::Stopped()
 {
-    RenderBackend::SendSceneFailedResult(sceneData->sceneId, kUserAbortErr, sceneData->frontendAddress);
+    RenderBackend::SendSceneFailedResult(backendSceneData->sceneId, kUserAbortErr, backendSceneData->frontendAddress);
 }
 
 void Parser::Finish()
@@ -6390,7 +6389,7 @@ TrueTypeFont *Parser::OpenFontFile(const char *asciifn, const int font_id)
         if(font->fp == NULL)
         {
             /* We have a match, use the previous information */
-            font->fp = Locate_File(sceneData, font->filename,POV_File_Font_TTF,ign,true);
+            font->fp = Locate_File(font->filename,POV_File_Font_TTF,ign,true);
             if(font->fp == NULL)
             {
                 throw POV_EXCEPTION(kCannotOpenFileErr, "Cannot open font file.");
@@ -6414,7 +6413,7 @@ TrueTypeFont *Parser::OpenFontFile(const char *asciifn, const int font_id)
 
         if (asciifn)
         {
-            if((fp = Locate_File(sceneData, formalFilename,POV_File_Font_TTF,ign,true)) == NULL)
+            if((fp = Locate_File(formalFilename,POV_File_Font_TTF,ign,true)) == NULL)
             {
                 throw POV_EXCEPTION(kCannotOpenFileErr, "Cannot open font file.");
             }
@@ -10674,11 +10673,9 @@ void Parser::FlushDebugMessageBuffer()
     Debug_Message_Buffer.flush();
 }
 
-Parser::DebugTextStreamBuffer::DebugTextStreamBuffer(POVMSAddress ba, POVMSAddress fa, RenderBackend::SceneId sid) :
+Parser::DebugTextStreamBuffer::DebugTextStreamBuffer(GenericMessenger& m) :
     TextStreamBuffer (1024*8, 160),
-    backendAddress(ba),
-    frontendAddress(fa),
-    sceneId(sid)
+    mMessenger(m)
 {
     // do nothing
 }
@@ -10690,22 +10687,12 @@ Parser::DebugTextStreamBuffer::~DebugTextStreamBuffer()
 
 void Parser::DebugTextStreamBuffer::lineoutput(const char *str, unsigned int chars)
 {
-    POVMSObject msg;
     char buffer[256];
 
     buffer[0] = 0;
     strncat(buffer, str, min((unsigned int)255, chars));
 
-    (void)POVMSObject_New(&msg, kPOVObjectClass_ControlData);
-    (void)POVMSMsg_SetupMessage(&msg, kPOVMsgClass_SceneOutput, kPOVMsgIdent_Debug);
-
-    (void)POVMSUtil_SetString(&msg, kPOVAttrib_EnglishText, buffer);
-
-    (void)POVMSUtil_SetInt(&msg, kPOVAttrib_SceneId, sceneId);
-    (void)POVMSMsg_SetSourceAddress(&msg, backendAddress);
-    (void)POVMSMsg_SetDestinationAddress(&msg, frontendAddress);
-
-    (void)POVMS_Send(NULL, &msg, NULL, kPOVMSSendMode_NoReply);
+    mMessenger.UserDebug(buffer);
 }
 
 void Parser::DebugTextStreamBuffer::directoutput(const char *, unsigned int)
@@ -10796,10 +10783,10 @@ void Parser::CheckPassThru(ObjectPtr o, int flag)
 *
 ******************************************************************************/
 
-IStream *Parser::Locate_File(shared_ptr<BackendSceneData>& sd, const UCS2String& filename, unsigned int stype, UCS2String& buffer, bool err_flag)
+IStream *Parser::Locate_File(const UCS2String& filename, unsigned int stype, UCS2String& buffer, bool err_flag)
 {
     UCS2String fn(filename);
-    UCS2String foundfile(sd->FindFile(GetPOVMSContext(), fn, stype));
+    UCS2String foundfile(backendSceneData->FindFile(GetPOVMSContext(), fn, stype));
 
     if(foundfile.empty() == true)
     {
@@ -10821,7 +10808,7 @@ IStream *Parser::Locate_File(shared_ptr<BackendSceneData>& sd, const UCS2String&
     }
 
     // ReadFile will store both fn and foundfile in the cache for next time round
-    IStream *result(sd->ReadFile(GetPOVMSContext(), fn, foundfile.c_str(), stype));
+    IStream *result(backendSceneData->ReadFile(GetPOVMSContext(), fn, foundfile.c_str(), stype));
 
     if((result == NULL) && (err_flag == true))
         PossibleError("Cannot open file '%s'.", UCS2toASCIIString(foundfile).c_str());
@@ -10831,9 +10818,9 @@ IStream *Parser::Locate_File(shared_ptr<BackendSceneData>& sd, const UCS2String&
     return result;
 }
 /* TODO FIXME - code above should not be there, this is how it should work but this has bugs [trf]
-IStream *Parser::Locate_File(shared_ptr<SceneData>& sd, const UCS2String& filename, unsigned int stype, UCS2String& buffer, bool err_flag)
+IStream *Parser::Locate_File(const UCS2String& filename, unsigned int stype, UCS2String& buffer, bool err_flag)
 {
-    UCS2String foundfile(sd->FindFile(GetPOVMSContext(), filename, stype));
+    UCS2String foundfile(backendSceneData->FindFile(GetPOVMSContext(), filename, stype));
 
     if(foundfile.empty() == true)
     {
@@ -10853,9 +10840,17 @@ IStream *Parser::Locate_File(shared_ptr<SceneData>& sd, const UCS2String& filena
     return result;
 }
 */
+
 /*****************************************************************************/
 
-Image *Parser::Read_Image(shared_ptr<BackendSceneData>& sd, int filetype, const UCS2 *filename, const Image::ReadOptions& options)
+OStream *Parser::CreateFile(const UCS2String& filename, unsigned int stype, bool append)
+{
+    return backendSceneData->CreateFile(GetPOVMSContext(), filename, stype, append);
+}
+
+/*****************************************************************************/
+
+Image *Parser::Read_Image(int filetype, const UCS2 *filename, const Image::ReadOptions& options)
 {
     unsigned int stype;
     Image::ImageFileType type;
@@ -10919,7 +10914,7 @@ Image *Parser::Read_Image(shared_ptr<BackendSceneData>& sd, int filetype, const 
             throw POV_EXCEPTION(kDataTypeErr, "Unknown file type.");
     }
 
-    boost::scoped_ptr<IStream> file(Locate_File(sd, filename, stype, ign, true));
+    boost::scoped_ptr<IStream> file(Locate_File(filename, stype, ign, true));
 
     if(file == NULL)
         throw POV_EXCEPTION(kCannotOpenFileErr, "Cannot find image file.");
@@ -10942,6 +10937,14 @@ RGBFTColour *Parser::Copy_Colour (const RGBFTColour* Old)
         return new RGBFTColour(*Old);
     else
         return NULL;
+}
+
+void Parser::SignalProgress(POV_LONG elapsedTime, POV_LONG tokenCount)
+{
+    POVMS_Object obj(kPOVObjectClass_ParserProgress);
+    obj.SetLong(kPOVAttrib_RealTime, elapsedTime);
+    obj.SetLong(kPOVAttrib_CurrentTokenCount, tokenCount);
+    RenderBackend::SendSceneOutput(backendSceneData->sceneId, backendSceneData->frontendAddress, kPOVMsgIdent_Progress, obj);
 }
 
 }

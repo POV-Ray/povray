@@ -1576,12 +1576,13 @@ FunctionVM::CustomFunction::~CustomFunction()
 GenericFunctionContextPtr FunctionVM::CustomFunction::AcquireContext(TraceThreadData* pThreadData)
 {
     FPUContext* pContext = NULL;
-    if (pThreadData->fpuContextPool.empty())
+    if (pThreadData->functionContextPool.empty())
         pContext = new FPUContext(mpVm, pThreadData);
     else
     {
-        pContext = pThreadData->fpuContextPool.back();
-        pThreadData->fpuContextPool.pop_back();
+        pContext = dynamic_cast<FPUContext*>(pThreadData->functionContextPool.back());
+        POV_ASSERT(pContext != NULL);
+        pThreadData->functionContextPool.pop_back();
     }
     return pContext;
 }
@@ -1591,7 +1592,7 @@ void FunctionVM::CustomFunction::ReleaseContext(GenericFunctionContextPtr pGener
     FPUContext* pContext = dynamic_cast<FPUContext*>(pGenericContext);
     POV_ASSERT(pContext != NULL);
     POV_ASSERT(pContext->threaddata != NULL);
-    pContext->threaddata->fpuContextPool.push_back(pContext);
+    pContext->threaddata->functionContextPool.push_back(pContext);
 }
 
 void FunctionVM::CustomFunction::InitArguments(GenericFunctionContextPtr pContext)

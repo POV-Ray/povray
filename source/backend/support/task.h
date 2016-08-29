@@ -60,17 +60,7 @@ class Task
 {
     public:
 
-        class TaskData
-        {
-                friend class Task;
-            public:
-                TaskData() { }
-                virtual ~TaskData() { }
-            private:
-                Task *task;
-        };
-
-        Task(TaskData *td, const boost::function1<void, Exception&>& f);
+        Task(ThreadData *td, const boost::function1<void, Exception&>& f);
         virtual ~Task();
 
         inline bool IsPaused() { return !done && paused; }
@@ -105,7 +95,7 @@ class Task
             }
         }
 
-        inline TaskData *GetDataPtr() { return taskData; }
+        inline ThreadData *GetDataPtr() { return taskData; }
 
         inline POVMSContext GetPOVMSContext() { return povmsContext; }
 
@@ -141,7 +131,7 @@ class Task
     private:
 
         /// task data pointer
-        TaskData *taskData;
+        ThreadData *taskData;
         /// task fatal error handler
         boost::function1<void, Exception&> fatalErrorHandler;
         /// stop request flag
@@ -187,7 +177,7 @@ class Task
 class SceneTask : public Task
 {
     public:
-        SceneTask(TaskData *td, const boost::function1<void, Exception&>& f, const char* sn, shared_ptr<BackendSceneData> sd, RenderBackend::ViewId vid = 0);
+        SceneTask(ThreadData *td, const boost::function1<void, Exception&>& f, const char* sn, shared_ptr<BackendSceneData> sd, RenderBackend::ViewId vid = 0);
 
     protected:
         MessageFactory messageFactory;

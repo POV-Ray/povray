@@ -87,28 +87,6 @@ inline T Sqr(T a)
     return a * a;
 }
 
-/// @relates CoreMessenger
-enum CoreMessageClass
-{
-    kCoreMessageClass_Debug,    ///< Diagnostic information to help in POV-Ray development.
-    kCoreMessageClass_Info,     ///< Information that is no reason for alarm.
-    kCoreMessageClass_Warning,  ///< Information about a potentially undesired and/or unexpected situation.
-    // we don't have a value for errors, because those are signalled via exceptions.
-};
-
-/// Abstract class representing an object that can pass on messages from the core to the user.
-///
-/// @note
-///     Existing implementations are currently not necessarily thread-safe.
-///
-class CoreMessenger
-{
-public:
-    virtual ~CoreMessenger() {}
-    virtual void CoreMessage(CoreMessageClass mc, const char *format,...) = 0;
-    virtual void CoreMessageAt(CoreMessageClass mc, const UCS2 *filename, POV_LONG line, POV_LONG column, POV_LONG offset, const char *format, ...) = 0;
-};
-
 class ObjectBase;
 typedef ObjectBase * ObjectPtr;
 typedef const ObjectBase * ConstObjectPtr;

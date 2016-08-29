@@ -129,6 +129,9 @@ class SceneData
         bool inputFileGammaSet;
         /// Default assumed decoding gamma of input files.
         SimpleGammaCurvePtr inputFileGamma;
+        /// What gamma mode to use.
+        /// One of kPOVList_GammaMode_*.
+        int gammaMode;
 
         /// distance scaling factor for subsurface scattering effects
         DBL mmPerUnit;
@@ -242,7 +245,7 @@ class SceneData
         /**
          *  Create new scene specific data.
          */
-        SceneData();
+        SceneData(GenericFunctionContextFactory* fcf);
 
         /// not available
         SceneData(const SceneData&);
