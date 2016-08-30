@@ -20,17 +20,17 @@ environment:
     platform: Win32
     bin_dir: bin32
     artifact_suffix: -Win32
-    PlatformToolset: v100
+    PlatformToolset: v140_xp
   - configuration: Release-SSE2
     platform: Win32
     bin_dir: bin32
     artifact_suffix: -Win32-sse2
-    PlatformToolset: v100
+    PlatformToolset: v140_xp
   - configuration: Release
     platform: x64
     bin_dir: bin64
     artifact_suffix: -Win64
-    PlatformToolset: v140
+    PlatformToolset: v140_xp
 
 before_build:
 - ps: |
@@ -91,7 +91,6 @@ deploy:
   tag: $(pov_tag_version)
   release: $(pov_build_title) $(pov_build_version)
   description: $(pov_build_message)
-
   auth_token:
     secure: WkcFPXyr/SJ9TXixTQyivhfoR9FzlryIbc4deHeQ0eA6YRXL0wQopMYJ6XL1/FJK
   draft: true
