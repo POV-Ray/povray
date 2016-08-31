@@ -1,0 +1,41 @@
+env:
+  global:
+   # Required for Coverity Scan
+   - secure: "BT2A2IDJx9nlEUnE8ZYtJQk2XAYTGu3+BT4qTTmxrS94htpUl1c82cM0RceUW/rzKrcJ7JAvQ1YuqJLlUW7J2cIWOdrF8Mk4DtlZSV9KnMc5+h7hf3bGGPw/LnYGnhrWYtSQfjZJHeCBfJufb4e7YqDfRz3UKDQ6FZCsFFMWnCAmBymF1Zj+ip7jkUn+P2gP8/vPjZupvfEZ0h8CkCXm7kSqHmTj0l9gOBQ6OMzP0uFN3KcRD5B+DSxoTmRGe+1abOr2nxUhIQsJxQZ5Y/V0ItwgNnoevi8d35QD9A2FT7gtuDkhYu0Fb8Jz6mReXk51hM6hE1qmfW+n2Dau679WkAtm4c/2osWwtxc1dbvQNvnr/XEnj51c4pbyPugjAKWoa/B73hXAflbrq0FWm14JVG2kCJYqid12HRvkMvzGJtjgJy5jIlPx+cb+BZ6tYsoa9m7CO1rTuYxUyKsHGtXSYOMPKyc7RIePOi37ZBF9QAm/urJdP6c6pfsrLEKvNOHArmUIixjrC9ImdQdJDBcgVUgP1h4oFfWaHgrys8B0EviIMoBewmTF8dUkD9j5rbpAonfjSpX0RX0Rcqtx2Mr68W97+BSGCy+WNIBe4ACivHDjYzfUw44ruYjZqUeXKzhJUHJxCf9OnqpppJ8ru6n6Tc7kMKcEEfZGDdVICrsBuMs="
+
+before_install:
+      # Required(?) for Coverity Scan
+      - echo -n | openssl s_client -connect scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
+
+branches:
+  except:
+  - /^v[0-9]/
+
+os:
+- linux
+
+language: cpp
+
+compiler:
+- gcc
+
+addons:
+  apt:
+    packages:
+    - libboost-dev
+    - libboost-date-time-dev
+    - libboost-thread-dev
+    - libjpeg8-dev
+    - libopenexr-dev
+    - libpng12-dev
+    - libtiff4-dev
+    - zlib1g-dev
+  # Required for Coverity Scan
+  coverity_scan:
+    project:
+      name: "POV-Ray/povray"
+      description: "Linux build submitted via Travis CI"
+    notification_email: christoph@lipka-koeln.de
+    build_command_prepend: "cd unix ; ./prebuild.sh ; cd .. ; ./configure COMPILED_BY='Travis CI'"
+    build_command: "make"
+    branch_pattern: coverity_scan
