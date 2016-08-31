@@ -1,10 +1,8 @@
 //******************************************************************************
 ///
-/// @file vfe/syspovprotobase.h
+/// @file platform/windows/syspovtimer.h
 ///
-/// Provides definitions that are used by both the windows and core code.
-///
-/// @author Christopher J. Cason
+/// Declaration of the Windows-specific implementation of the @ref Timer class.
 ///
 /// @copyright
 /// @parblock
@@ -35,22 +33,44 @@
 ///
 //******************************************************************************
 
-#ifndef __SYSPROTO_H__
-#define __SYSPROTO_H__
+#ifndef POVRAY_WINDOWS_SYSPOVTIMER_H
+#define POVRAY_WINDOWS_SYSPOVTIMER_H
 
-#include <cstddef>
-#include <vector>
-// FIXME #include <xmemory>
-
-#include "povms/povmscpp.h"
+#include "base/configbase.h"
 
 namespace pov_base
 {
 
-void vfeSysThreadStartup();
-void vfeSysThreadCleanup();
-bool vfeParsePathString (const POVMSUCS2String& path, POVMSUCS2String& volume, vector<POVMSUCS2String>& components, POVMSUCS2String& filename);
+void Delay(unsigned int msec);
+
+class Timer
+{
+    public:
+        Timer();
+        ~Timer();
+
+        POV_LONG ElapsedRealTime() const;
+        POV_LONG ElapsedThreadCPUTime() const;
+        POV_LONG ElapsedProcessCPUTime() const;
+
+        void Reset();
+
+        bool HasValidThreadCPUTime() const;
+        bool HasValidProcessCPUTime() const;
+
+    private:
+
+        POV_ULONG   mWallTimeStart;
+        POV_ULONG   mThreadTimeStart;
+        POV_ULONG   mProcessTimeStart;
+        void*       mThreadHandle;
+        bool        mCPUTimeSupported   : 1;
+
+        POV_ULONG GetWallTime () const;
+        POV_ULONG GetThreadTime () const;
+        POV_ULONG GetProcessTime () const;
+};
 
 }
 
-#endif // __SYSPROTO_H__
+#endif // POVRAY_WINDOWS_SYSPOVTIMER_H

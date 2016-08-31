@@ -1,37 +1,39 @@
-/*******************************************************************************
- * platformbase.cpp
- *
- * This file implements code that is needed (and linked to) the base code.
- *
- * Author: Christopher J. Cason
- *
- * ---------------------------------------------------------------------------
- * Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
- * Copyright 1991-2013 Persistence of Vision Raytracer Pty. Ltd.
- *
- * POV-Ray is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * POV-Ray is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------------
- * POV-Ray is based on the popular DKB raytracer version 2.12.
- * DKBTrace was originally written by David K. Buck.
- * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
- * ---------------------------------------------------------------------------
- * $File: //depot/povray/smp/vfe/win/platformbase.cpp $
- * $Revision: #26 $
- * $Change: 6085 $
- * $DateTime: 2013/11/10 07:39:29 $
- * $Author: clipka $
- *******************************************************************************/
+//******************************************************************************
+///
+/// @file vfe/win/platformbase.cpp
+///
+/// This file implements code that is needed (and linked to) the base code.
+///
+/// @author Christopher J. Cason
+///
+/// @copyright
+/// @parblock
+///
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+///
+/// POV-Ray is free software: you can redistribute it and/or modify
+/// it under the terms of the GNU Affero General Public License as
+/// published by the Free Software Foundation, either version 3 of the
+/// License, or (at your option) any later version.
+///
+/// POV-Ray is distributed in the hope that it will be useful,
+/// but WITHOUT ANY WARRANTY; without even the implied warranty of
+/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+/// GNU Affero General Public License for more details.
+///
+/// You should have received a copy of the GNU Affero General Public License
+/// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+///
+/// ----------------------------------------------------------------------------
+///
+/// POV-Ray is based on the popular DKB raytracer version 2.12.
+/// DKBTrace was originally written by David K. Buck.
+/// DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
+///
+/// @endparblock
+///
+//******************************************************************************
 
 #include <windows.h>
 #include <time.h>
@@ -65,15 +67,6 @@ namespace vfePlatform
   // internal functions
   //
   ////////////////////////////////////////////////////////////////////////////////////////
-
-  static bool IsNT4 (void)
-  {
-    OSVERSIONINFO vi ;
-
-    vi.dwOSVersionInfoSize = sizeof (OSVERSIONINFO) ;
-    GetVersionEx (&vi) ;
-    return (vi.dwPlatformId == VER_PLATFORM_WIN32_NT && vi.dwMajorVersion >= 4) ;
-  }
 
   static int GetNumberofCPUs (void)
   {
@@ -167,16 +160,6 @@ namespace pov_base
 
   ////////////////////////////////////////////////////////////////////////////////////////
   //
-  // needed if we define POV_DELAY_IMPLEMENTED in config.h
-  //
-  ////////////////////////////////////////////////////////////////////////////////////////
-  void Delay(unsigned int msec)
-  {
-    Sleep (msec) ;
-  }
-
-  ////////////////////////////////////////////////////////////////////////////////////////
-  //
   // thread support
   //
   ////////////////////////////////////////////////////////////////////////////////////////
@@ -205,103 +188,6 @@ namespace pov_base
 
   ////////////////////////////////////////////////////////////////////////////////////////
   //
-  // class vfeTimer (OPTIONAL)
-  //
-  // if you don't want to supply this class, remove the definition for POV_TIMER from
-  // config.h. see the base code for documentation on the implementation requirements.
-  //
-  ////////////////////////////////////////////////////////////////////////////////////////
-
-  vfeTimer::vfeTimer (bool CPUTimeIsThreadOnly)
-  {
-    m_IsNT = vfePlatform::IsNT4 () ;
-    m_ThreadTimeOnly = CPUTimeIsThreadOnly ;
-    if (m_IsNT && m_ThreadTimeOnly)
-    {
-      if (!DuplicateHandle (GetCurrentProcess (), GetCurrentThread (), GetCurrentProcess (), &m_ThreadHandle, 0, TRUE, DUPLICATE_SAME_ACCESS))
-      {
-        assert (false) ;
-        m_ThreadHandle = NULL ;
-        m_ThreadTimeOnly = false ;
-      }
-    }
-    else
-      m_ThreadHandle = NULL ;
-    Reset () ;
-  }
-
-  vfeTimer::~vfeTimer ()
-  {
-    if (m_ThreadHandle != NULL)
-      CloseHandle (m_ThreadHandle) ;
-  }
-
-  unsigned __int64 vfeTimer::GetWallTime (void) const
-  {
-    struct timeb tb ;
-    ftime(&tb);
-    return ((unsigned __int64) tb.time * 1000 + tb.millitm) ;
-  }
-
-  unsigned __int64 vfeTimer::GetCPUTime (void) const
-  {
-    __int64     kt ;
-    __int64     ut ;
-    FILETIME    ct ;
-    FILETIME    et ;
-
-    if (!m_IsNT)
-      return (GetWallTime ()) ;
-
-    if (m_ThreadTimeOnly)
-    {
-      if (!GetThreadTimes (m_ThreadHandle, &ct, &et, reinterpret_cast<FILETIME *>(&kt), reinterpret_cast<FILETIME *>(&ut)))
-      {
-        assert (false) ;
-        return (0) ;
-      }
-    }
-    else
-    {
-      if (!GetProcessTimes (GetCurrentProcess (), &ct, &et, reinterpret_cast<FILETIME *>(&kt), reinterpret_cast<FILETIME *>(&ut)))
-      {
-        assert (false) ;
-        return (0) ;
-      }
-    }
-    return ((kt + ut) / 10000) ;
-  }
-
-  POV_LONG vfeTimer::ElapsedRealTime (void) const
-  {
-    struct timeb tb ;
-    ftime(&tb);
-    unsigned __int64 now = (unsigned __int64) tb.time * 1000 + tb.millitm;
-    return (now - m_WallTimeStart) ;
-  }
-
-  POV_LONG vfeTimer::ElapsedCPUTime (void) const
-  {
-    if (m_IsNT)
-      return (GetCPUTime () - m_CPUTimeStart) ;
-    return (GetWallTime () - m_WallTimeStart) ;
-  }
-
-  void vfeTimer::Reset (void)
-  {
-    struct timeb tb ;
-    ftime(&tb);
-    m_WallTimeStart = GetWallTime () ;
-    m_CPUTimeStart = GetCPUTime () ;
-  }
-
-  bool vfeTimer::HasValidCPUTime() const
-  {
-    return (m_IsNT) ;
-  }
-
-  ////////////////////////////////////////////////////////////////////////////////////////
-  //
   // path parsing
   //
   ////////////////////////////////////////////////////////////////////////////////////////
@@ -309,32 +195,32 @@ namespace pov_base
   ////////////////////////////////////////////////////////////////////////////////////////
   // The first argument is the input, a UCS2 string.
   //
-  // The second argument is the string you are supposed to return the "volume" 
-  // name with.  For DOS-style paths this implies i.e. "A:\" is the "volume". 
-  // Note that it is essential that the first "path" separator is also part of 
-  // the volume name.  If the path is relative, the "volume" name shall be empty. 
-  // 
-  // This trick is necessary so the code can account for the lack of volume names 
-  // in Unix-style paths: In Unix, the POV_PARSE_PATH_STRING function will have 
-  // to take a reading "/" or "~/" as "volume" name.  This makes it possible to 
-  // determine if a string is absolute or relative based on this 'virtual' 
+  // The second argument is the string you are supposed to return the "volume"
+  // name with.  For DOS-style paths this implies i.e. "A:\" is the "volume".
+  // Note that it is essential that the first "path" separator is also part of
+  // the volume name.  If the path is relative, the "volume" name shall be empty.
+  //
+  // This trick is necessary so the code can account for the lack of volume names
+  // in Unix-style paths: In Unix, the POV_PARSE_PATH_STRING function will have
+  // to take a reading "/" or "~/" as "volume" name.  This makes it possible to
+  // determine if a string is absolute or relative based on this 'virtual'
   // "volume" name rather than some flags.
-  // 
-  // The third is a vector of strings you have to return, each has to contain the 
+  //
+  // The third is a vector of strings you have to return, each has to contain the
   // folder name from left to right, without the path separator, of course.
-  // 
-  // The fourth argument shall contain the filename, if any was given in the 
+  //
+  // The fourth argument shall contain the filename, if any was given in the
   // source string. By definition if the source string does not contain a
   // trailing path separator, whatever comes after the last path separator
   // (or the start of the string if there is none) must be considered a filename,
   // even if it could be a directory (in other words, don't call a system function
   // to find out if it is a dir or not - see below).
-  // 
+  //
   // Please note that the function must not attempt to determine the validity of
-  // a string by accessing the filesystem.  It has to parse anything that it is 
-  // given.  If the string provided cannot be parsed for some reason (that is if 
-  // you can determine that a given path cannot possibly be valid i.e. because it 
-  // contains invalid characters), the function has to return false.  It may not 
+  // a string by accessing the filesystem.  It has to parse anything that it is
+  // given.  If the string provided cannot be parsed for some reason (that is if
+  // you can determine that a given path cannot possibly be valid i.e. because it
+  // contains invalid characters), the function has to return false.  It may not
   // throw exceptions.  The return value for success is true.
   ////////////////////////////////////////////////////////////////////////////////////////
 

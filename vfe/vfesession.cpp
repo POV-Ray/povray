@@ -911,6 +911,7 @@ vfeStatusFlags vfeSession::GetStatus(bool Clear, int WaitTime)
 
   if (WaitTime > 0)
   {
+    // TODO FIXME - boost::xtime has been deprecated since boost 1.34.
     boost::xtime t;
     boost::xtime_get (&t, POV_TIME_UTC);
     t.sec += WaitTime / 1000 ;
@@ -978,6 +979,7 @@ bool vfeSession::Pause()
 
   // we can't call pause directly since it will result in a thread context
   // error. pause must be called from the context of the worker thread.
+  // TODO FIXME - boost::xtime has been deprecated since boost 1.34.
   boost::xtime t;
   boost::xtime_get (&t, POV_TIME_UTC);
   t.sec += 3 ;
@@ -1001,6 +1003,7 @@ bool vfeSession::Resume()
 
   // we can't call resume directly since it will result in a thread context
   // error. it must be called from the context of the worker thread.
+  // TODO FIXME - boost::xtime has been deprecated since boost 1.34.
   boost::xtime t;
   boost::xtime_get (&t, POV_TIME_UTC);
   t.sec += 3 ;
@@ -1067,6 +1070,7 @@ int vfeSession::Initialize(vfeDestInfo *Dest, vfeAuthInfo *Auth)
   m_MessageCount = 0;
   m_LastError = vfeNoError;
 
+  // TODO FIXME - boost::xtime has been deprecated since boost 1.34.
   boost::xtime t;
   boost::xtime_get (&t, POV_TIME_UTC);
   t.sec += 3 ;

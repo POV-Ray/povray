@@ -49,6 +49,10 @@
 #include "backend/control/messagefactory.h"
 #include "backend/scene/backendscenedata.h"
 
+#ifdef USE_SYSPROTO
+#include "syspovprotobase.h"
+#endif
+
 // this must be the last file included
 #include "base/povdebug.h"
 
@@ -139,10 +143,10 @@ POV_LONG Task::ElapsedRealTime() const
     return timer->ElapsedRealTime();
 }
 
-POV_LONG Task::ElapsedCPUTime() const
+POV_LONG Task::ElapsedThreadCPUTime() const
 {
     POV_TASK_ASSERT(timer != NULL);
-    return timer->ElapsedCPUTime();
+    return timer->ElapsedThreadCPUTime();
 }
 
 void Task::TaskThread(const boost::function0<void>& completion)
@@ -159,7 +163,7 @@ void Task::TaskThread(const boost::function0<void>& completion)
 
     POV_SYS_THREAD_STARTUP
 
-    Timer tasktime(true); // only keep CPU time of this thread (if supported)
+    Timer tasktime;
 
     timer = &tasktime;
 
@@ -218,8 +222,8 @@ void Task::TaskThread(const boost::function0<void>& completion)
     }
 
     realTime = tasktime.ElapsedRealTime();
-    if(tasktime.HasValidCPUTime() == true)
-        cpuTime = tasktime.ElapsedCPUTime();
+    if(tasktime.HasValidThreadCPUTime() == true)
+        cpuTime = tasktime.ElapsedThreadCPUTime();
     else
         cpuTime = -1;
 

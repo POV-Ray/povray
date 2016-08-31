@@ -1,10 +1,8 @@
 //******************************************************************************
 ///
-/// @file vfe/syspovprotobase.h
+/// @file platform/windows/osversioninfo.h
 ///
-/// Provides definitions that are used by both the windows and core code.
-///
-/// @author Christopher J. Cason
+/// Declaration of functions to detect the Windows version at run-time.
 ///
 /// @copyright
 /// @parblock
@@ -35,22 +33,46 @@
 ///
 //******************************************************************************
 
-#ifndef __SYSPROTO_H__
-#define __SYSPROTO_H__
+#ifndef POVRAY_WINDOWS_OSVERSIONINFO_H
+#define POVRAY_WINDOWS_OSVERSIONINFO_H
 
-#include <cstddef>
-#include <vector>
-// FIXME #include <xmemory>
+#include "base/configbase.h"
 
-#include "povms/povmscpp.h"
+#include <windows.h>
 
 namespace pov_base
 {
 
-void vfeSysThreadStartup();
-void vfeSysThreadCleanup();
-bool vfeParsePathString (const POVMSUCS2String& path, POVMSUCS2String& volume, vector<POVMSUCS2String>& components, POVMSUCS2String& filename);
+class WindowsVersionDetector
+{
+    public:
+
+        WindowsVersionDetector();
+
+        /// Test whether the operating system uses NT technology.
+        ///
+        /// This function returns `true` if the Windows version is based on the NT operating system
+        /// architecture, which is the case for genuine Windows NT products, Windows 2000, and all
+        /// newer products of both the server and client lines.
+        ///
+        bool IsNT () const;
+
+        /// Test whether the operating system matches a given version number.
+        ///
+        /// This function returns `true` if the internal Windows version number is equal to or
+        /// higher than the version number specified.
+        ///
+        bool IsVersion (int major, int minor) const;
+
+        /// Test whether the operating system uses NT technology matching a given version number.
+        ///
+        inline bool IsNTVersion (int major, int minor) const { return IsNT() && IsVersion(4,0); }
+
+    private:
+
+        OSVERSIONINFO mVersionInfo;
+};
 
 }
 
-#endif // __SYSPROTO_H__
+#endif // POVRAY_WINDOWS_OSVERSIONINFO_H

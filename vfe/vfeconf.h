@@ -68,8 +68,7 @@ namespace vfe
 }
 
 #define USE_SYSPROTO                          1
-#define POV_DELAY_IMPLEMENTED                 1
-#define POV_TIMER                             pov_base::vfeTimer
+
 #define POV_SYS_THREAD_STARTUP                pov_base::vfeSysThreadStartup();
 #define POV_SYS_THREAD_CLEANUP                pov_base::vfeSysThreadCleanup();
 #define POV_PARSE_PATH_STRING(p,v,c,f)        pov_base::vfeParsePathString(p,v,c,f)

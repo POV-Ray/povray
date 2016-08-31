@@ -435,6 +435,7 @@ AM_CPPFLAGS = \\
   -I\$(top_srcdir) \\
   -I\$(top_srcdir)/source \\
   -I\$(top_builddir)/source \\
+  -I\$(top_srcdir)/platform/unix \\
   -I\$(top_srcdir)/vfe \\
   -I\$(top_srcdir)/vfe/unix
 
@@ -574,7 +575,7 @@ povowner = @povowner@
 povgroup = @povgroup@
 
 # Directories to build.
-SUBDIRS = source vfe unix
+SUBDIRS = source vfe unix platform/unix
 
 # Additional files to distribute.
 EXTRA_DIST = \\

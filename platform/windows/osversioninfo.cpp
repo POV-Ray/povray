@@ -1,10 +1,8 @@
 //******************************************************************************
 ///
-/// @file vfe/syspovprotobase.h
+/// @file platform/windows/osversioninfo.cpp
 ///
-/// Provides definitions that are used by both the windows and core code.
-///
-/// @author Christopher J. Cason
+/// Implementation of functions to detect the Windows version at run-time.
 ///
 /// @copyright
 /// @parblock
@@ -35,22 +33,30 @@
 ///
 //******************************************************************************
 
-#ifndef __SYSPROTO_H__
-#define __SYSPROTO_H__
+#include "osversioninfo.h"
 
-#include <cstddef>
-#include <vector>
-// FIXME #include <xmemory>
-
-#include "povms/povmscpp.h"
+#include <windows.h>
 
 namespace pov_base
 {
 
-void vfeSysThreadStartup();
-void vfeSysThreadCleanup();
-bool vfeParsePathString (const POVMSUCS2String& path, POVMSUCS2String& volume, vector<POVMSUCS2String>& components, POVMSUCS2String& filename);
-
+WindowsVersionDetector::WindowsVersionDetector ()
+{
+    mVersionInfo.dwOSVersionInfoSize = sizeof (mVersionInfo);
+    GetVersionEx (&mVersionInfo);
 }
 
-#endif // __SYSPROTO_H__
+bool WindowsVersionDetector::IsNT () const
+{
+    return (mVersionInfo.dwPlatformId == VER_PLATFORM_WIN32_NT);
+}
+
+bool WindowsVersionDetector::IsVersion (int major, int minor) const
+{
+    if (mVersionInfo.dwMajorVersion != major)
+        return (mVersionInfo.dwMajorVersion >= major);
+    else
+        return (mVersionInfo.dwMinorVersion >= minor);
+}
+
+}

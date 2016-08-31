@@ -126,7 +126,7 @@ class Task
         virtual void Finish() = 0;
 
         POV_LONG ElapsedRealTime() const;
-        POV_LONG ElapsedCPUTime() const;
+        POV_LONG ElapsedThreadCPUTime() const;
 
     private:
 

@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -55,28 +55,6 @@
 
 namespace pov_base
 {
-    ////////////////////////////////////////////////////////////////////////////////////////
-    //
-    // needed if we define POV_DELAY_IMPLEMENTED in config.h
-    //
-    ////////////////////////////////////////////////////////////////////////////////////////
-    void Delay(unsigned int msec)
-    {
-#ifdef HAVE_NANOSLEEP
-        timespec ts;
-        ts.tv_sec = msec / 1000;
-        ts.tv_nsec = (POV_ULONG) (1000000) * (msec % 1000);
-        nanosleep(&ts, NULL);
-#else
-        // taken from source/base/timer.cpp
-        boost::xtime t;
-        boost::xtime_get(&t, boost::TIME_UTC);
-        POV_ULONG ns = (POV_ULONG)(t.sec) * (POV_ULONG)(1000000000) + (POV_ULONG)(t.nsec) + (POV_ULONG)(msec) * (POV_ULONG)(1000000);
-        t.sec = (boost::xtime::xtime_sec_t)(ns / (POV_ULONG)(1000000000));
-        t.nsec = (boost::xtime::xtime_nsec_t)(ns % (POV_ULONG)(1000000000));
-        boost::thread::sleep(t);
-#endif
-    }
 
     ////////////////////////////////////////////////////////////////////////////////////////
     //
@@ -95,97 +73,6 @@ namespace pov_base
     // called by a worker thread just before it exits.
     void vfeSysThreadCleanup(void)
     {
-    }
-
-    ////////////////////////////////////////////////////////////////////////////////////////
-    //
-    // class vfeTimer (OPTIONAL)
-    //
-    // if you don't want to supply this class, remove the definition for POV_TIMER from
-    // config.h. see the base code for documentation on the implementation requirements.
-    //
-    ////////////////////////////////////////////////////////////////////////////////////////
-
-    vfeTimer::vfeTimer (bool CPUTimeIsThreadOnly)
-    {
-        m_ThreadTimeOnly = CPUTimeIsThreadOnly;
-        Reset();
-    }
-
-    vfeTimer::~vfeTimer ()
-    {
-    }
-
-    unsigned POV_LONG vfeTimer::GetWallTime (void) const
-    {
-#ifdef HAVE_CLOCK_GETTIME
-        struct timespec ts;
-        if (clock_gettime(CLOCK_REALTIME, &ts) == 0)
-            return (unsigned POV_LONG) (1000)*ts.tv_sec + ts.tv_nsec/1000000;
-#endif
-#ifdef HAVE_GETTIMEOFDAY
-        struct timeval tv;  // seconds + microseconds since the Epoch (1970-01-01)
-        if (gettimeofday(&tv, NULL) == 0)
-            return (unsigned POV_LONG) (1000)*tv.tv_sec + tv.tv_usec/1000;
-#endif
-        return 0;  // FIXME: add fallback, using ftime(), or time() + a counter for ms
-    }
-
-    unsigned POV_LONG vfeTimer::GetCPUTime (void) const
-    {
-#ifdef HAVE_CLOCK_GETTIME
-        struct timespec ts;
-#if defined (__FreeBSD__)
-        if (clock_gettime(m_ThreadTimeOnly ? CLOCK_THREAD_CPUTIME_ID : CLOCK_REALTIME, &ts) == 0)
-#else
-        if (clock_gettime(m_ThreadTimeOnly ? CLOCK_THREAD_CPUTIME_ID : CLOCK_PROCESS_CPUTIME_ID, &ts) == 0)
-#endif
-            return (unsigned POV_LONG) (1000)*ts.tv_sec + ts.tv_nsec/1000000;
-#endif
-#ifdef HAVE_GETRUSAGE
-        struct rusage ru;
-#if defined(__sun)
-        if (getrusage(m_ThreadTimeOnly ? RUSAGE_LWP : RUSAGE_SELF, &ru) == 0)
-#else
-        if (getrusage(RUSAGE_SELF, &ru) == 0)
-#endif
-            return (unsigned POV_LONG) (1000)*(ru.ru_utime.tv_sec + ru.ru_stime.tv_sec)
-                + (unsigned POV_LONG)(ru.ru_utime.tv_usec + ru.ru_stime.tv_usec)/1000;
-#endif
-        return GetWallTime();
-    }
-
-    POV_LONG vfeTimer::ElapsedRealTime (void) const
-    {
-        return GetWallTime() - m_WallTimeStart;
-    }
-
-    POV_LONG vfeTimer::ElapsedCPUTime (void) const
-    {
-        return GetCPUTime() - m_CPUTimeStart;
-    }
-
-    void vfeTimer::Reset (void)
-    {
-        m_WallTimeStart = GetWallTime();
-        m_CPUTimeStart = GetCPUTime();
-    }
-
-    bool vfeTimer::HasValidCPUTime() const
-    {
-#ifdef HAVE_CLOCK_GETTIME
-        struct timespec ts;
-        if (clock_gettime(CLOCK_THREAD_CPUTIME_ID, &ts) == 0)
-            return true;
-#endif
-#ifdef HAVE_GETRUSAGE
-#if defined(__sun)
-        struct rusage ru;
-        if (getrusage(RUSAGE_LWP, &ru) == 0)
-            return true;
-#endif
-#endif
-        return false;
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////
