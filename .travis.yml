@@ -38,6 +38,6 @@ addons:
       name: "POV-Ray/povray"
       description: "Linux build submitted via Travis CI"
     notification_email: christoph@lipka-koeln.de
-    build_command_prepend: "cd unix ; ./prebuild.sh ; cd .."
+    build_command_prepend: "cd unix ; ./prebuild.sh ; cd .. ; ./configure"
     build_command: "make"
     branch_pattern: coverity_scan
