@@ -331,7 +331,7 @@ echo "make maintainer-clean" 1>&2  &&  make maintainer-clean 1>&2 ; \
   # Converting to "[tm]".
   echo "Copy licence files in ../doc/"
   perl -e 'while (<>) {s/\x99/[tm]/g; print;}' ../distribution/povlegal.doc \
-    > ../doc/povlegal.doc	|| echo "povlegal.doc not created !"
+    > ../doc/povlegal.doc || echo "povlegal.doc not created !"
   $cp_u -f ../distribution/agpl-3.0.txt ../doc/ \
     || echo "agpl-3.0.txt not copied !"
 
@@ -353,8 +353,8 @@ echo "make maintainer-clean" 1>&2  &&  make maintainer-clean 1>&2 ; \
   for file in \
     AUTHORS ChangeLog configure.ac COPYING NEWS README VERSION \
     povray.1 povray.conf \
-    scripts/ \
-    ../distribution/ini/ ../distribution/include/ ../distribution/scenes/
+    scripts \
+    ../distribution/ini ../distribution/include ../distribution/scenes
   do
     out=`basename $file`
     echo "Create ../$out`test -d $file && echo /`"
@@ -724,7 +724,7 @@ aclocal -I .
 autoheader --warnings=all
 
 # Create all Makefile.in's from Makefile.am's
-automake --warnings=all ###--ignore-deps
+automake --add-missing --warnings=all
 
 # Create configure from configure.ac
 autoconf --warnings=all
@@ -1278,10 +1278,6 @@ case "$1" in
   ;;
 
   *)
-  if test -d $dir/boost; then
-    echo "Removing $dir/boost"
-    rm -rf $dir/boost
-  fi
   ;;
 esac
 
