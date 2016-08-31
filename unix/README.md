@@ -19,6 +19,8 @@ boost, zlib, libpng, libjpeg, libtiff, and openexr. We recommend you have the
 following packages pre-installed: 
 
     libboost-dev
+    libboost-date-time-dev
+    libboost-thread-dev
     zlib1g-dev
     libpng12-dev
     libjpeg8-dev
@@ -31,9 +33,9 @@ Generating configure and building the code
     % cd unix/
     % ./prebuild.sh
     % cd ../
-    % ./configure COMPILED_BY="your name <email@address>" 
+    % ./configure COMPILED_BY="your name <email@address>"
     % make
-    
+
 Note that the prebuild step will generate a few warnings as it still looks
 for some files no longer included in v3.7. This is harmless.
 
@@ -41,7 +43,7 @@ Installing
 ==========
 
     % make install
-    
+
 This above installs POV-Ray under system-wide directories and needs root privileges.
 Installing as non-privileged user is also possible. By default (i.e. as root), 'make
 install' installs the following components:

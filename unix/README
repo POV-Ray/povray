@@ -12,6 +12,14 @@ POV-Ray 3.7 source code.
 Source code package
 ===================
 
++----------------------------------------------------------------------------+
+| NOTE: If this file does not reside in the root directory of your POV-Ray   |
+| source package, you have received a platform-neutral package. In that case |
+| make sure to run the following command before you proceed:                 |
+|                                                                            |
+|   cd unix/ ; ./prebuild.sh ; cd ../                                        |
++----------------------------------------------------------------------------+
+
 This package contains the complete source code of POV-Ray for UNIX
 as well as its accompanying HTML documentation and supporting files.
 The package substructure is organized as follows:

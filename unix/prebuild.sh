@@ -40,12 +40,6 @@
 #
 # Note that the 'clean' and 'doc(s)(clean)' options are mutually exclusive.
 #
-# $File: //depot/public/povray/3.x/unix/prebuild.sh $
-# $Revision: #1 $
-# $Change: 6069 $
-# $DateTime: 2013/11/06 11:59:40 $
-# $Author: chrisc $
-# $Log$
 ###############################################################################
 
 umask 022
@@ -136,6 +130,11 @@ echo "make maintainer-clean" 1>&2  &&  make maintainer-clean 1>&2 ; \
     povray.ini.in scenes/ scripts/ VERSION
   do
     rm -r ../$file 2> /dev/null  &&  echo "Cleanup ../$file"
+  done
+  # cleanup stuff added by automake
+  for file in config.guess config.sub depcomp install-sh missing
+  do
+    rm config/$file 2> /dev/null  &&  echo "Cleanup config/$file"
   done
   ;;
 
@@ -331,7 +330,7 @@ echo "make maintainer-clean" 1>&2  &&  make maintainer-clean 1>&2 ; \
   # Converting to "[tm]".
   echo "Copy licence files in ../doc/"
   perl -e 'while (<>) {s/\x99/[tm]/g; print;}' ../distribution/povlegal.doc \
-    > ../doc/povlegal.doc	|| echo "povlegal.doc not created !"
+    > ../doc/povlegal.doc || echo "povlegal.doc not created !"
   $cp_u -f ../distribution/agpl-3.0.txt ../doc/ \
     || echo "agpl-3.0.txt not copied !"
 
@@ -353,8 +352,8 @@ echo "make maintainer-clean" 1>&2  &&  make maintainer-clean 1>&2 ; \
   for file in \
     AUTHORS ChangeLog configure.ac COPYING NEWS README VERSION \
     povray.1 povray.conf \
-    scripts/ \
-    ../distribution/ini/ ../distribution/include/ ../distribution/scenes/
+    scripts \
+    ../distribution/ini ../distribution/include ../distribution/scenes
   do
     out=`basename $file`
     echo "Create ../$out`test -d $file && echo /`"
@@ -724,7 +723,7 @@ aclocal -I .
 autoheader --warnings=all
 
 # Create all Makefile.in's from Makefile.am's
-automake --warnings=all ###--ignore-deps
+automake --add-missing --warnings=all
 
 # Create configure from configure.ac
 autoconf --warnings=all
@@ -1278,10 +1277,6 @@ case "$1" in
   ;;
 
   *)
-  if test -d $dir/boost; then
-    echo "Removing $dir/boost"
-    rm -rf $dir/boost
-  fi
   ;;
 esac
 
