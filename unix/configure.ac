@@ -166,7 +166,7 @@ Environment
 AC_CANONICAL_BUILD
 AC_CANONICAL_HOST
 
-AM_INIT_AUTOMAKE([1.9 dist-bzip2])
+AM_INIT_AUTOMAKE([1.9 dist-bzip2 subdir-objects])
 AM_MAINTAINER_MODE
 
 AX_FIX_INCORRECT_PATH(C_INCLUDE_PATH, ".", [pov_warn_path="$pov_warn_path C_INCLUDE_PATH"])
@@ -308,25 +308,40 @@ else
   LIBS="$BOOST_THREAD_LIB $LIBS"
 fi
 AC_MSG_CHECKING([whether the boost thread library is usable])
+SAVED_LIBS=$LIBS
+boost_thread_links=0
+for extralib in '' '-lboost_system'
+do
+  LIBS=$SAVED_LIBS
+  LIBS="$LIBS $extralib"
 AC_RUN_IFELSE(
   [AC_LANG_PROGRAM([[
 #include <boost/thread/thread.hpp>
     ]],
     [[boost::defer_lock_t(); return 0;]])],
-  [AC_MSG_RESULT([yes])],
   [
-    AC_MSG_RESULT([no])
-    AC_MSG_FAILURE([cannot link with the boost thread library])
-  ],
+    AC_MSG_RESULT([yes])
+    BOOST_THREAD_LIB="$BOOST_THREAD_LIB $extralib"
+    boost_thread_links=1
+  ],,
   [AC_MSG_RESULT([cross-compiling])]  # FIXME
 )
+  if test $boost_thread_links = '1'; then
+    break
+  fi
+done
+if test $boost_thread_links != '1'; then
+  AC_MSG_RESULT([no])
+  AC_MSG_FAILURE([cannot link with the boost thread library])
+fi
+
 AC_DEFINE([USE_OFFICIAL_BOOST], [], [Use the official Boost libraries.])
 
 # Intel Math Kernel library
 pov_save_ldflags="$LDFLAGS"
-test x"$with_libmkl" != x"" && LDFLAGS="-L$with_libmkl $LDFLAGS"
+test x"$with_libmkl" != x"" && test x"$with_libmkl" != x"no" && LDFLAGS="-L$with_libmkl $LDFLAGS"
 AC_CHECK_LIB([mkl], [sin]) 
-test x"ac_cv_lib_mkl_sin" = x"no" && LDFLAGS="$pov_save_ldflags"
+test x"$ac_cv_lib_mkl_sin" = x"no" && LDFLAGS="$pov_save_ldflags"
 
 # libm
 AC_CHECK_LIB([m], [sin])
@@ -710,6 +725,7 @@ AX_TEST_COMPILER_FLAGS([-Wno-multichar])
 AX_TEST_COMPILER_FLAGS([-Wno-write-strings])
 if test x"$pov_compiler_vendor" = x"gnu"; then
   AX_TEST_COMPILER_FLAGS([-fno-enforce-eh-specs])
+  AX_TEST_COMPILER_FLAGS([-Wno-non-template-friend])
 fi
 
 
@@ -986,8 +1002,8 @@ AC_DEFINE_UNQUOTED([BUILTIN_XWIN_DISPLAY], ["$pov_xwin_msg"], [X Window display.
 AC_DEFINE_UNQUOTED([BUILTIN_IMG_FORMATS], ["$pov_img_fmt_builtin $pov_img_fmt_enabled"], [Supported image formats.])
 AC_DEFINE_UNQUOTED([MISSING_IMG_FORMATS], ["$pov_img_fmt_disabled"], [Unsupported image formats.])
 
-povowner=`stat -c %u ${HOME}`
-povgroup=`stat -c %g ${HOME}`
+povowner=`stat --format=%u ${HOME} || stat -f %u ${HOME}`
+povgroup=`stat --format=%g ${HOME} || stat -f %g ${HOME}`
 AC_SUBST([povowner])
 AC_SUBST([povgroup])
 
