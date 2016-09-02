@@ -113,6 +113,8 @@ const INTERSECTION_STATS_INFO intersection_stats[kPOVList_Stat_Last] =
       "Lathe" },
     { kPOVList_Stat_LatheBdTest,        Lathe_Bound_Tests, Lathe_Bound_Tests_Succeeded,
       "Lathe Bound" },
+    { kPOVList_Stat_LemonTest,          Ray_Lemon_Tests, Ray_Lemon_Tests_Succeeded,
+      "Lemon" },
     { kPOVList_Stat_MeshTest,           Ray_Mesh_Tests, Ray_Mesh_Tests_Succeeded,
       "Mesh" },
     { kPOVList_Stat_OvusTest,           Ray_Ovus_Tests, Ray_Ovus_Tests_Succeeded,

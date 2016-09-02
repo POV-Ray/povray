@@ -311,6 +311,7 @@ const RESERVED_WORD Reserved_Words[LAST_TOKEN] = {
     {LEFT_CURLY_TOKEN, "{"},
     {LEFT_PAREN_TOKEN, "("},
     {LEFT_SQUARE_TOKEN, "["},
+    {LEMON_TOKEN, "lemon"},
     {LEOPARD_TOKEN, "leopard"},
     {LIGHT_GROUP_TOKEN, "light_group"},
     {LIGHT_SOURCE_TOKEN, "light_source"},

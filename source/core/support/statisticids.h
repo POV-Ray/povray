@@ -94,6 +94,7 @@ enum
     kPOVList_Stat_VistaBufferTest,
     kPOVList_Stat_RBezierTest,
     kPOVList_Stat_OvusTest,
+    kPOVList_Stat_LemonTest,
     kPOVList_Stat_Last
 };
 
@@ -156,6 +157,8 @@ typedef enum INTSTATS
     Ray_Lathe_Tests_Succeeded,
     Lathe_Bound_Tests,
     Lathe_Bound_Tests_Succeeded,
+    Ray_Lemon_Tests,
+    Ray_Lemon_Tests_Succeeded,
     Ray_Mesh_Tests,
     Ray_Mesh_Tests_Succeeded,
     Ray_Ovus_Tests,
