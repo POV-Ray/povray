@@ -65,6 +65,7 @@ enum WarningLevel
     kWarningLanguage =  6
 };
 
+/// Abstract class providing an interface to report textual messages to the user.
 class GenericMessenger
 {
     public:

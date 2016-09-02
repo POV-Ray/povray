@@ -257,6 +257,7 @@ bool LoadEditorDLL (char *path, bool errorOK)
   return (true) ;
 }
 
+// TODO FIXME - This is almost identical to Parser::Get_Reserved_Words() in parser/parser_tokenizer.cpp.
 char *Get_Reserved_Words (const char *additional_words)
 {
   int length = 0 ;
