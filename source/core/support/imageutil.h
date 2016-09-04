@@ -65,7 +65,8 @@ enum
     HYPERBOLIC_MAP   = 4,
     TORUS_MAP        = 5,
     PIRIFORM_MAP     = 6,
-    OLD_MAP          = 7
+    OLD_MAP          = 7,
+    ANGULAR_MAP      = 8
 };
 
 // Bit map interpolation types.

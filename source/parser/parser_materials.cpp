@@ -583,6 +583,7 @@ void Parser::Parse_Image_Map (PIGMENT *Pigment)
                 case SPHERICAL_MAP:
                 case CYLINDRICAL_MAP:
                 case TORUS_MAP:
+		        case ANGULAR_MAP:
                     break;
 
                 default:
