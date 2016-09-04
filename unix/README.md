@@ -11,15 +11,31 @@ releasing a source package.
 NB if you have improvements to the below instructions, please add a comment
 to issue #1, or (if you are working in a branch) send us a pull request.
 
+Dependencies
+============
+
+By default POV-Ray will attempt to build using system-supplied libraries for
+boost, zlib, libpng, libjpeg, libtiff, and openexr. We recommend you have the
+following packages pre-installed: 
+
+    libboost-dev
+    libboost-date-time-dev
+    libboost-thread-dev
+    zlib1g-dev
+    libpng12-dev
+    libjpeg8-dev
+    libtiff5-dev
+    libopenexr-dev
+    
 Generating configure and building the code
 ==========================================
 
     % cd unix/
     % ./prebuild.sh
     % cd ../
-    % ./configure COMPILED_BY="your name <email@address>" 
+    % ./configure COMPILED_BY="your name <email@address>"
     % make
-    
+
 Note that the prebuild step will generate a few warnings as it still looks
 for some files no longer included in v3.7. This is harmless.
 
@@ -27,7 +43,7 @@ Installing
 ==========
 
     % make install
-    
+
 This above installs POV-Ray under system-wide directories and needs root privileges.
 Installing as non-privileged user is also possible. By default (i.e. as root), 'make
 install' installs the following components:
@@ -42,17 +58,3 @@ of the user (or root) who is doing the installation.
 
 Please see [unix/install.txt](install.txt) for more details about available
 configuration options etc.
-
-Dependencies
-============
-
-By default POV-Ray will attempt to build using system-supplied libraries for
-boost, zlib, libpng, libjpeg, libtiff, and openexr. We recommend you have the
-following packages pre-installed: 
-
-    libboost-dev
-    zlib1g-dev
-    libpng12-dev
-    libjpeg8-dev
-    libtiff5-dev
-    libopenexr-dev

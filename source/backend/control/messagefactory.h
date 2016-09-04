@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -31,16 +31,17 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
 #ifndef POVRAY_BACKEND_MESSAGEFACTORY_H
 #define POVRAY_BACKEND_MESSAGEFACTORY_H
 
-#include "backend/control/renderbackend.h"
-#include "base/povms.h"
-#include "base/povmscpp.h"
-#include "base/povmsgid.h"
+#include "povms/povmscpp.h"
+#include "povms/povmsid.h"
+
 #include "base/pov_err.h"
+
+#include "backend/control/renderbackend.h"
 
 namespace pov
 {
@@ -55,11 +56,15 @@ enum WarningLevel
     kWarningLanguage = 6
 };
 
-class MessageFactory
+class MessageFactory : public CoreMessenger
 {
     public:
 
         MessageFactory(unsigned int wl, const char *sn, POVMSAddress saddr, POVMSAddress daddr, RenderBackend::SceneId sid, RenderBackend::ViewId vid);
+        virtual ~MessageFactory();
+
+        virtual void CoreMessage(CoreMessageClass mc, const char *format,...);
+        virtual void CoreMessageAt(CoreMessageClass mc, const UCS2 *filename, POV_LONG line, POV_LONG column, POV_LONG offset, const char *format, ...);
 
         void Warning(WarningLevel level, const char *format,...);
         void WarningAt(WarningLevel level, const UCS2 *filename, POV_LONG line, POV_LONG column, POV_LONG offset, const char *format, ...);

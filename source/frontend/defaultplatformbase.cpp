@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -33,13 +33,13 @@
 ///
 //******************************************************************************
 
-// configbase.h must always be the first POV file included within base *.cpp files
-#include "base/configbase.h"
+// configfrontend.h must always be the first POV file included within frontend *.cpp files
+#include "frontend/configfrontend.h"
+#include "frontend/defaultplatformbase.h"
 
-#include "defaultplatformbase.h"
+#include "povms/povmscpp.h"
 
-#include "povms.h"
-#include "pov_err.h"
+#include "base/pov_err.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -53,16 +53,6 @@ DefaultPlatformBase::DefaultPlatformBase()
 
 DefaultPlatformBase::~DefaultPlatformBase()
 {
-}
-
-IStream *DefaultPlatformBase::CreateIStream(const unsigned int stype)
-{
-    return new IStream(stype);
-}
-
-OStream *DefaultPlatformBase::CreateOStream(const unsigned int stype)
-{
-    return new OStream(stype);
 }
 
 UCS2String DefaultPlatformBase::GetTemporaryPath()

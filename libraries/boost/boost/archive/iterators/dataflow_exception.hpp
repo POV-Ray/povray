@@ -2,7 +2,7 @@
 #define BOOST_ARCHIVE_ITERATORS_DATAFLOW_EXCEPTION_HPP
 
 // MS compatible compilers support #pragma once
-#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+#if defined(_MSC_VER)
 # pragma once
 #endif
 
@@ -21,7 +21,7 @@
 #include <exception>
 #endif //BOOST_NO_EXCEPTIONS
 
-#include <cassert>
+#include <boost/assert.hpp>
 
 namespace boost {
 namespace archive {
@@ -66,7 +66,7 @@ public:
             msg = "invalid multbyte/wide char conversion";
             break;
         default:
-            assert(false);
+            BOOST_ASSERT(false);
             break;
         }
         return msg;

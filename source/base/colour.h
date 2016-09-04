@@ -9,7 +9,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -37,10 +37,17 @@
 #ifndef POVRAY_BASE_COLOUR_H
 #define POVRAY_BASE_COLOUR_H
 
+// Module config header file must be the first file included within POV-Ray unit header files
+#include "base/configbase.h"
+
+// C++ variants of standard C header files
 #include <cmath>
+
+// Standard C++ header files
 #include <limits>
 
-#include "base/configbase.h"
+// POV-Ray base header files
+#include "base/mathutil.h"
 #include "base/types.h"
 
 #define NUM_COLOUR_CHANNELS 3
@@ -80,7 +87,7 @@ class GenericColour;
 template<typename T>
 class GenericTransColour;
 
-template<int BIAS, typename T = unsigned char>
+template<int BIAS, bool QUANTIZE_TO_NEAREST, typename T = unsigned char>
 class GenericRGBEColour;
 
 /// @name Colour Channel Luminance
@@ -163,15 +170,16 @@ class GenericRGBColour
             mColour[BLUE]  = col.blue();
         }
 
-        template<int BIAS, typename T2>
-        inline explicit GenericRGBColour(const GenericRGBEColour<BIAS,T2>& col)
+        template<int BIAS, bool QUANTIZE_TO_NEAREST, typename T2>
+        inline explicit GenericRGBColour(const GenericRGBEColour<BIAS,QUANTIZE_TO_NEAREST,T2>& col)
         {
-            if (col.mData[GenericRGBEColour<BIAS,T2>::EXP] > std::numeric_limits<T2>::min())
+            if (col.mData[GenericRGBEColour<BIAS,QUANTIZE_TO_NEAREST,T2>::EXP] > std::numeric_limits<T2>::min())
             {
-                double expFactor = ldexp(1.0,(int)col.mData[GenericRGBEColour<BIAS,T2>::EXP]-(int)(BIAS+8));
-                mColour[RED]   = (col.mData[GenericRGBEColour<BIAS,T2>::RED])   * expFactor;
-                mColour[GREEN] = (col.mData[GenericRGBEColour<BIAS,T2>::GREEN]) * expFactor;
-                mColour[BLUE]  = (col.mData[GenericRGBEColour<BIAS,T2>::BLUE])  * expFactor;
+                double expFactor = ldexp(1.0,(int)col.mData[GenericRGBEColour<BIAS,QUANTIZE_TO_NEAREST,T2>::EXP]-(int)(BIAS+8));
+                double quantizationFix = (QUANTIZE_TO_NEAREST? 0.0 : 0.5);
+                mColour[RED]   = (col.mData[GenericRGBEColour<BIAS,QUANTIZE_TO_NEAREST,T2>::RED]   + quantizationFix) * expFactor;
+                mColour[GREEN] = (col.mData[GenericRGBEColour<BIAS,QUANTIZE_TO_NEAREST,T2>::GREEN] + quantizationFix) * expFactor;
+                mColour[BLUE]  = (col.mData[GenericRGBEColour<BIAS,QUANTIZE_TO_NEAREST,T2>::BLUE]  + quantizationFix) * expFactor;
             }
             else
             {
@@ -403,21 +411,21 @@ class GenericRGBColour
             mColour[BLUE]  = blue;
         }
 
-        inline GenericRGBColour Clipped(T minc, T maxc)
+        inline GenericRGBColour Clipped(T minc, T maxc) const
         {
             return GenericRGBColour(pov_base::clip<T>(mColour[RED],   minc, maxc),
                                     pov_base::clip<T>(mColour[GREEN], minc, maxc),
                                     pov_base::clip<T>(mColour[BLUE],  minc, maxc));
         }
 
-        inline GenericRGBColour ClippedUpper(T maxc)
+        inline GenericRGBColour ClippedUpper(T maxc) const
         {
             return GenericRGBColour(min(mColour[RED],   maxc),
                                     min(mColour[GREEN], maxc),
                                     min(mColour[BLUE],  maxc));
         }
 
-        inline GenericRGBColour ClippedLower(T minc)
+        inline GenericRGBColour ClippedLower(T minc) const
         {
             return GenericRGBColour(max(mColour[RED],   minc),
                                     max(mColour[GREEN], minc),
@@ -956,6 +964,20 @@ inline T ColourDistanceRGBT (const GenericRGBFTColour<T>& a, const GenericRGBFTC
 
 typedef GenericRGBFTColour<ColourChannel>           RGBFTColour;        ///< Standard precision RGBFT colour.
 typedef GenericRGBFTColour<PreciseColourChannel>    PreciseRGBFTColour; ///< High precision RGBFT colour.
+
+/// RGB and RGBFT Colour array elements.
+/// @deprecated When using @ref pov_base::GenericRGBColour, @ref pov_base::GenericRGBTColour,
+///             @ref pov_base::GenericRGBFTColour or  @ref pov_base::GenericTransColour, call the
+///             red(), green(), blue(), filter() and transm() access functions instead of using the
+///             index operator with one of these as parameter.
+enum
+{
+    pRED    = 0,
+    pGREEN  = 1,
+    pBLUE   = 2,
+    pFILTER = 3,
+    pTRANSM = 4
+};
 
 
 /// Generic template class to hold and manipulate an RGB colour plus a Transmit component.
@@ -1513,7 +1535,7 @@ class GenericColour
             mColour[BLUE]  = blue;
         }
 */
-        inline GenericColour Clipped(T minc, T maxc)
+        inline GenericColour Clipped(T minc, T maxc) const
         {
             GenericColour result;
             for (int i = 0; i < channels; i ++)
@@ -1521,7 +1543,7 @@ class GenericColour
             return result;
         }
 
-        inline GenericColour ClippedUpper(T maxc)
+        inline GenericColour ClippedUpper(T maxc) const
         {
             GenericColour result;
             for (int i = 0; i < channels; i ++)
@@ -1529,7 +1551,7 @@ class GenericColour
             return result;
         }
 
-        inline GenericColour ClippedLower(T minc)
+        inline GenericColour ClippedLower(T minc) const
         {
             GenericColour result;
             for (int i = 0; i < channels; i ++)
@@ -2053,12 +2075,14 @@ typedef GenericTransColour<PreciseColourChannel>    PreciseTransColour; ///< Hig
 /// @author Christoph Lipka
 /// @author Based on MegaPOV HDR code written by Mael and Christoph Hormann
 ///
-/// @tparam BIAS    Bias to use for the exponent.
-///                 A value of 128 matches Greg Ward's original proposal.
-/// @tparam T       Type to use for the colour components.
-///                 Defaults to unsigned char.
+/// @tparam BIAS                Bias to use for the exponent.
+///                             A value of 128 matches Greg Ward's original proposal.
+/// @tparam QUANTIZE_TO_NEAREST Whether quantization should use round-to-nearest mode, as opposed to rounding
+///                             towards zero and compensating upon decoding as in Greg Ward's original proposal.
+/// @tparam T                   Type to use for the colour components.
+///                             Defaults to unsigned char.
 ///
-template<int BIAS, typename T>
+template<int BIAS, bool QUANTIZE_TO_NEAREST, typename T>
 class GenericRGBEColour
 {
     public:
@@ -2078,10 +2102,7 @@ class GenericRGBEColour
 
         inline GenericRGBEColour()
         {
-            mData[RED]   = 0;
-            mData[GREEN] = 0;
-            mData[BLUE]  = 0;
-            mData[EXP]   = 0;
+            SetToZero(mData);
         }
 
         inline GenericRGBEColour(const GenericRGBEColour& col)
@@ -2094,51 +2115,26 @@ class GenericRGBEColour
 
         inline explicit GenericRGBEColour(ColourChannel red, ColourChannel green, ColourChannel blue)
         {
-            RGBColour col (red, green, blue);
-            double scaleFactor;
-            if (ComputeExponent(col, mData[EXP], scaleFactor))
-            {
-                mData[RED]   = clipToType<T>(floor(col.red()   * scaleFactor));
-                mData[GREEN] = clipToType<T>(floor(col.green() * scaleFactor));
-                mData[BLUE]  = clipToType<T>(floor(col.blue()  * scaleFactor));
-            }
+            if (QUANTIZE_TO_NEAREST)
+                Quantize(mData, RGBColour(red, green, blue), RGBColour(0.5));
             else
-            {
-                mData[RED] = mData[GREEN] = mData[BLUE] = 0;
-                mData[EXP] = std::numeric_limits<T>::min();
-            }
+                Quantize(mData, RGBColour(red, green, blue));
         }
 
         inline explicit GenericRGBEColour(const RGBColour& col)
         {
-            double scaleFactor;
-            if (ComputeExponent(col, mData[EXP], scaleFactor))
-            {
-                mData[RED]   = clipToType<T>(floor(col.red()   * scaleFactor + 0.5));
-                mData[GREEN] = clipToType<T>(floor(col.green() * scaleFactor + 0.5));
-                mData[BLUE]  = clipToType<T>(floor(col.blue()  * scaleFactor + 0.5));
-            }
+            if (QUANTIZE_TO_NEAREST)
+                Quantize(mData, col, RGBColour(0.5));
             else
-            {
-                mData[RED] = mData[GREEN] = mData[BLUE] = 0;
-                mData[EXP] = std::numeric_limits<T>::min();
-            }
+                Quantize(mData, col);
         }
 
         inline explicit GenericRGBEColour(const RGBColour& col, const RGBColour& dither)
         {
-            double scaleFactor;
-            if (ComputeExponent(col, mData[EXP], scaleFactor))
-            {
-                mData[RED]   = clip<T>(floor(col.red()   * scaleFactor + 0.5 + dither.red()));
-                mData[GREEN] = clip<T>(floor(col.green() * scaleFactor + 0.5 + dither.green()));
-                mData[BLUE]  = clip<T>(floor(col.blue()  * scaleFactor + 0.5 + dither.blue()));
-            }
+            if (QUANTIZE_TO_NEAREST)
+                Quantize(mData, col, RGBColour(0.5) + dither);
             else
-            {
-                mData[RED] = mData[GREEN] = mData[BLUE] = 0;
-                mData[EXP] = std::numeric_limits<T>::min();
-            }
+                Quantize(mData, col, dither);
         }
 
         inline const DATA& operator*() const
@@ -2157,11 +2153,8 @@ class GenericRGBEColour
 
         inline static bool ComputeExponent(const RGBColour& col, T& biasedExponent, double& scaleFactor)
         {
-            ColourChannel maxChannel;
-            if (std::numeric_limits<T>::is_signed)
-                maxChannel = col.MaxAbs();
-            else
-                maxChannel = col.Max();
+            // Determine the magnitude of the colour value.
+            ColourChannel maxChannel = (std::numeric_limits<T>::is_signed ? col.MaxAbs() : col.Max());
 
             if (maxChannel <= 1.0e-32) // TODO - magic number
                 return false;
@@ -2169,17 +2162,76 @@ class GenericRGBEColour
             int exponent;
             double maxChannelMantissa = frexp(maxChannel, &exponent);
             biasedExponent = clipToType<T>(exponent + BIAS);
-
-            if (biasedExponent != exponent + BIAS)
-                maxChannelMantissa = ldexp(maxChannelMantissa, exponent + BIAS - biasedExponent);
-
-            scaleFactor = (std::numeric_limits<T>::max() + 1.0) * maxChannelMantissa / maxChannel;
+            scaleFactor = ldexp(std::numeric_limits<T>::max() + 1.0, BIAS-biasedExponent);
             return true;
+        }
+
+        inline static void SetToZero(DATA& data)
+        {
+            data[RED] = data[GREEN] = data[BLUE] = 0;
+            data[EXP] = std::numeric_limits<T>::min();
+        }
+
+        /// @param[out] data    The quantized data.
+        /// @param[in]  col     The colour to quantize.
+        inline static void Quantize(DATA& data, const RGBColour& col)
+        {
+            double scaleFactor;
+            if (ComputeExponent(col, data[EXP], scaleFactor))
+            {
+                RGBColour colMantissa = col * scaleFactor;
+                data[RED]   = clipToType<T>(floor(colMantissa.red()));
+                data[GREEN] = clipToType<T>(floor(colMantissa.green()));
+                data[BLUE]  = clipToType<T>(floor(colMantissa.blue()));
+            }
+            else
+                SetToZero(data);
+        }
+
+        /// @param[out] data    The quantized data.
+        /// @param[in]  col     The colour to quantize.
+        /// @param[in]  encOff  An offset to add to the mantissa before quantization.
+        inline static void Quantize(DATA& data, const RGBColour& col, const RGBColour& encOff)
+        {
+            double scaleFactor;
+            if (ComputeExponent(col, data[EXP], scaleFactor))
+            {
+                RGBColour colMantissa = col * scaleFactor + encOff;
+
+                // The additional encoding offset might have resulted in one of the mantissas to exceed the maximum,
+                // or make all drop below half the maximum; in both cases we want to adjust the exponent and mantissas
+                // accordingly.
+                ColourChannel maxChannel = (std::numeric_limits<T>::is_signed ? colMantissa.MaxAbs() : colMantissa.Max());
+                if (maxChannel > std::numeric_limits<T>::max())
+                {
+                    if (data[EXP] < std::numeric_limits<T>::max())
+                    {
+                        data[EXP] ++;
+                        scaleFactor *= 0.5;
+                        colMantissa = col * scaleFactor + encOff;
+                    }
+                }
+                else if (maxChannel * 2.0 <= std::numeric_limits<T>::max())
+                {
+                    if (data[EXP] > std::numeric_limits<T>::min())
+                    {
+                        data[EXP] --;
+                        scaleFactor *= 2.0;
+                        colMantissa = col * scaleFactor + encOff;
+                    }
+                }
+
+                data[RED]   = clipToType<T>(floor(colMantissa.red()));
+                data[GREEN] = clipToType<T>(floor(colMantissa.green()));
+                data[BLUE]  = clipToType<T>(floor(colMantissa.blue()));
+            }
+            else
+                SetToZero(data);
         }
 };
 
-typedef GenericRGBEColour<128>  RadianceHDRColour;  ///< RGBE format as originally proposed by Greg Ward.
-typedef GenericRGBEColour<250>  PhotonColour;       ///< RGBE format as adapted by Nathan Kopp for photon mapping.
+typedef GenericRGBEColour<128,false>    RadianceHDRColour;  ///< RGBE format as originally proposed by Greg Ward.
+typedef GenericRGBEColour<250,true>     PhotonColour;       ///< RGBE format as adapted by Nathan Kopp for photon mapping.
 
 }
 

@@ -2,6 +2,8 @@
 ///
 /// @file base/povdebug.h
 ///
+/// Header file used to hook in debugging aids.
+///
 /// This header file is included by all C++ files in POV-Ray. It must be the
 /// last header file included (with the possible exception of files that do
 /// not declare anything that could clash with declarations in this file).
@@ -14,7 +16,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -39,10 +41,10 @@
 ///
 //******************************************************************************
 
-#ifndef POVDEBUG_H
-#define POVDEBUG_H
+#ifndef POVRAY_BASE_POVDEBUG_H
+#define POVRAY_BASE_POVDEBUG_H
 
 #include "syspovdebug.h"
 
-#endif // POVDEBUG_H
+#endif // POVRAY_BASE_POVDEBUG_H
 

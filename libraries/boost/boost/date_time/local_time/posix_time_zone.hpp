@@ -5,7 +5,7 @@
  * Subject to the Boost Software License, Version 1.0. (See accompanying
  * file LICENSE_1_0.txt or http://www.boost.org/LICENSE_1_0.txt)
  * Author: Jeff Garland, Bart Garst
- * $Date: 2010-06-10 13:24:38 -0400 (Thu, 10 Jun 2010) $
+ * $Date$
  */
 
 #include <string>
@@ -115,7 +115,7 @@ namespace local_time{
         calc_rules(dst_begin, dst_end);
       }
     }
-    virtual ~posix_time_zone_base() {};
+    virtual ~posix_time_zone_base() {}
     //!String for the zone when not in daylight savings (eg: EST)
     virtual string_type std_zone_abbrev()const
     {
@@ -430,9 +430,9 @@ namespace local_time{
       dst_calc_rules_ = shared_ptr<dst_calc_rule>(
         new partial_date_dst_rule(
           partial_date_dst_rule::start_rule(
-            sd, static_cast<date_time::months_of_year>(sm)),
+            static_cast<unsigned short>(sd), static_cast<date_time::months_of_year>(sm)),
           partial_date_dst_rule::end_rule(
-            ed, static_cast<date_time::months_of_year>(em))
+            static_cast<unsigned short>(ed), static_cast<date_time::months_of_year>(em))
           )
       );
     }

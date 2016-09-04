@@ -38,16 +38,19 @@
 //
 //	class V2iAttribute
 //	class V2fAttribute
+//	class V2dAttribute
 //	class V3iAttribute
 //	class V3fAttribute
+//	class V3dAttribute
 //
 //-----------------------------------------------------------------------------
 
 #include <ImfVecAttribute.h>
 
 
-namespace Imf {
+OPENEXR_IMF_INTERNAL_NAMESPACE_SOURCE_ENTER
 
+using namespace OPENEXR_IMF_INTERNAL_NAMESPACE;
 
 template <>
 const char *
@@ -59,7 +62,7 @@ V2iAttribute::staticTypeName ()
 
 template <>
 void
-V2iAttribute::writeValueTo (OStream &os, int version) const
+V2iAttribute::writeValueTo (OPENEXR_IMF_INTERNAL_NAMESPACE::OStream &os, int version) const
 {
     Xdr::write <StreamIO> (os, _value.x);
     Xdr::write <StreamIO> (os, _value.y);
@@ -68,7 +71,7 @@ V2iAttribute::writeValueTo (OStream &os, int version) const
 
 template <>
 void
-V2iAttribute::readValueFrom (IStream &is, int size, int version)
+V2iAttribute::readValueFrom (OPENEXR_IMF_INTERNAL_NAMESPACE::IStream &is, int size, int version)
 {
     Xdr::read <StreamIO> (is, _value.x);
     Xdr::read <StreamIO> (is, _value.y);
@@ -85,7 +88,7 @@ V2fAttribute::staticTypeName ()
 
 template <>
 void
-V2fAttribute::writeValueTo (OStream &os, int version) const
+V2fAttribute::writeValueTo (OPENEXR_IMF_INTERNAL_NAMESPACE::OStream &os, int version) const
 {
     Xdr::write <StreamIO> (os, _value.x);
     Xdr::write <StreamIO> (os, _value.y);
@@ -94,7 +97,33 @@ V2fAttribute::writeValueTo (OStream &os, int version) const
 
 template <>
 void
-V2fAttribute::readValueFrom (IStream &is, int size, int version)
+V2fAttribute::readValueFrom (OPENEXR_IMF_INTERNAL_NAMESPACE::IStream &is, int size, int version)
+{
+    Xdr::read <StreamIO> (is, _value.x);
+    Xdr::read <StreamIO> (is, _value.y);
+}
+
+
+template <>
+const char *
+V2dAttribute::staticTypeName ()
+{
+    return "v2d";
+}
+
+
+template <>
+void
+V2dAttribute::writeValueTo (OPENEXR_IMF_INTERNAL_NAMESPACE::OStream &os, int version) const
+{
+    Xdr::write <StreamIO> (os, _value.x);
+    Xdr::write <StreamIO> (os, _value.y);
+}
+
+
+template <>
+void
+V2dAttribute::readValueFrom (OPENEXR_IMF_INTERNAL_NAMESPACE::IStream &is, int size, int version)
 {
     Xdr::read <StreamIO> (is, _value.x);
     Xdr::read <StreamIO> (is, _value.y);
@@ -111,7 +140,7 @@ V3iAttribute::staticTypeName ()
 
 template <>
 void
-V3iAttribute::writeValueTo (OStream &os, int version) const
+V3iAttribute::writeValueTo (OPENEXR_IMF_INTERNAL_NAMESPACE::OStream &os, int version) const
 {
     Xdr::write <StreamIO> (os, _value.x);
     Xdr::write <StreamIO> (os, _value.y);
@@ -121,7 +150,7 @@ V3iAttribute::writeValueTo (OStream &os, int version) const
 
 template <>
 void
-V3iAttribute::readValueFrom (IStream &is, int size, int version)
+V3iAttribute::readValueFrom (OPENEXR_IMF_INTERNAL_NAMESPACE::IStream &is, int size, int version)
 {
     Xdr::read <StreamIO> (is, _value.x);
     Xdr::read <StreamIO> (is, _value.y);
@@ -139,7 +168,7 @@ V3fAttribute::staticTypeName ()
 
 template <>
 void
-V3fAttribute::writeValueTo (OStream &os, int version) const
+V3fAttribute::writeValueTo (OPENEXR_IMF_INTERNAL_NAMESPACE::OStream &os, int version) const
 {
     Xdr::write <StreamIO> (os, _value.x);
     Xdr::write <StreamIO> (os, _value.y);
@@ -149,7 +178,7 @@ V3fAttribute::writeValueTo (OStream &os, int version) const
 
 template <>
 void
-V3fAttribute::readValueFrom (IStream &is, int size, int version)
+V3fAttribute::readValueFrom (OPENEXR_IMF_INTERNAL_NAMESPACE::IStream &is, int size, int version)
 {
     Xdr::read <StreamIO> (is, _value.x);
     Xdr::read <StreamIO> (is, _value.y);
@@ -157,4 +186,32 @@ V3fAttribute::readValueFrom (IStream &is, int size, int version)
 }
 
 
-} // namespace Imf
+template <>
+const char *
+V3dAttribute::staticTypeName ()
+{
+    return "v3d";
+}
+
+
+template <>
+void
+V3dAttribute::writeValueTo (OPENEXR_IMF_INTERNAL_NAMESPACE::OStream &os, int version) const
+{
+    Xdr::write <StreamIO> (os, _value.x);
+    Xdr::write <StreamIO> (os, _value.y);
+    Xdr::write <StreamIO> (os, _value.z);
+}
+
+
+template <>
+void
+V3dAttribute::readValueFrom (OPENEXR_IMF_INTERNAL_NAMESPACE::IStream &is, int size, int version)
+{
+    Xdr::read <StreamIO> (is, _value.x);
+    Xdr::read <StreamIO> (is, _value.y);
+    Xdr::read <StreamIO> (is, _value.z);
+}
+
+
+OPENEXR_IMF_INTERNAL_NAMESPACE_SOURCE_EXIT 

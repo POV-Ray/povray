@@ -1,13 +1,11 @@
-// Boost.Range library
+//  Copyright Neil Groves 2010. Use, modification and
+//  distribution is subject to the Boost Software License, Version
+//  1.0. (See accompanying file LICENSE_1_0.txt or copy at
+//  http://www.boost.org/LICENSE_1_0.txt)
 //
-// Copyright Neil Groves 2008. Use, modification and
-// distribution is subject to the Boost Software Licence, Version
-// 1.0. (See accompanying file LICENSE_1_0.txt or copy at
-// http://www.boost.org/LICENSE_1_0.txt
 //
-// For more information, see http://www.boost.org/libs/range
+// For more information, see http://www.boost.org/libs/range/
 //
-
 #ifndef BOOST_RANGE_COUNTING_RANGE_HPP_INCLUDED
 #define BOOST_RANGE_COUNTING_RANGE_HPP_INCLUDED
 
@@ -19,12 +17,11 @@
 
 #include <boost/range/iterator_range_core.hpp>
 #include <boost/range/value_type.hpp>
+#include <boost/range/iterator.hpp>
 #include <boost/iterator/counting_iterator.hpp>
-#include <boost/utility.hpp>
 
 namespace boost
 {
-
     template<class Value>
     inline iterator_range<counting_iterator<Value> >
     counting_range(Value first, Value last)
@@ -36,29 +33,39 @@ namespace boost
     }
 
     template<class Range>
-    inline iterator_range<counting_iterator<BOOST_DEDUCED_TYPENAME range_value<const Range>::type> >
+    inline iterator_range<
+        counting_iterator<
+            BOOST_DEDUCED_TYPENAME range_iterator<const Range>::type
+        >
+    >
     counting_range(const Range& rng)
     {
-        typedef counting_iterator<BOOST_DEDUCED_TYPENAME range_value<const Range>::type> counting_iterator_t;
+        typedef counting_iterator<
+            BOOST_DEDUCED_TYPENAME range_iterator<const Range>::type
+        > counting_iterator_t;
+
         typedef iterator_range<counting_iterator_t> result_t;
-        return boost::empty(rng)
-            ? result_t()
-            : result_t(
-                counting_iterator_t(*boost::begin(rng)),
-                counting_iterator_t(*boost::prior(boost::end(rng))));
+
+        return result_t(counting_iterator_t(boost::begin(rng)),
+                        counting_iterator_t(boost::end(rng)));
     }
 
     template<class Range>
-    inline iterator_range<counting_iterator<BOOST_DEDUCED_TYPENAME range_value<Range>::type> >
+    inline iterator_range<
+        counting_iterator<
+            BOOST_DEDUCED_TYPENAME range_iterator<Range>::type
+        >
+    >
     counting_range(Range& rng)
     {
-        typedef counting_iterator<BOOST_DEDUCED_TYPENAME range_value<Range>::type> counting_iterator_t;
+        typedef counting_iterator<
+            BOOST_DEDUCED_TYPENAME range_iterator<Range>::type
+        > counting_iterator_t;
+
         typedef iterator_range<counting_iterator_t> result_t;
-        return boost::empty(rng)
-            ? result_t()
-            : result_t(
-                counting_iterator_t(*boost::begin(rng)),
-                counting_iterator_t(*boost::prior(boost::end(rng))));
+
+        return result_t(counting_iterator_t(boost::begin(rng)),
+                        counting_iterator_t(boost::end(rng)));
     }
 } // namespace boost
 

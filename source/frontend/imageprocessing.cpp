@@ -55,8 +55,6 @@
 namespace pov_frontend
 {
 
-using namespace pov;
-
 enum
 {
     X = 0,
@@ -159,18 +157,18 @@ UCS2String ImageProcessing::WriteImage(POVMS_Object& ropts, POVMSInt frame, int 
                 throw POV_EXCEPTION_STRING("Invalid file type for output");
         }
 
-        int gammaType = ropts.TryGetInt(kPOVAttrib_FileGammaType, DEFAULT_FILE_GAMMA_TYPE);
+        GammaTypeId gammaType = (GammaTypeId)ropts.TryGetInt(kPOVAttrib_FileGammaType, DEFAULT_FILE_GAMMA_TYPE);
         float gamma = ropts.TryGetFloat(kPOVAttrib_FileGamma, DEFAULT_FILE_GAMMA);
         wopts.encodingGamma = GetGammaCurve(gammaType, gamma);
         // NB: RenderFrontend<...>::CreateView should have dealt with kPOVAttrib_LegacyGammaMode already and updated kPOVAttrib_WorkingGammaType and kPOVAttrib_WorkingGamma to fit.
-        gammaType = ropts.TryGetInt(kPOVAttrib_WorkingGammaType, DEFAULT_WORKING_GAMMA_TYPE);
+        gammaType = (GammaTypeId)ropts.TryGetInt(kPOVAttrib_WorkingGammaType, DEFAULT_WORKING_GAMMA_TYPE);
         gamma = ropts.TryGetFloat(kPOVAttrib_WorkingGamma, DEFAULT_WORKING_GAMMA);
         wopts.workingGamma = GetGammaCurve(gammaType, gamma);
 
         bool dither = ropts.TryGetBool(kPOVAttrib_Dither, false);
-        int ditherMethod = kPOVList_DitherMethod_None;
+        DitherMethodId ditherMethod = kPOVList_DitherMethod_None;
         if (dither)
-            ditherMethod = ropts.TryGetInt(kPOVAttrib_DitherMethod, kPOVList_DitherMethod_FloydSteinberg);
+            ditherMethod = (DitherMethodId)ropts.TryGetInt(kPOVAttrib_DitherMethod, kPOVList_DitherMethod_FloydSteinberg);
         wopts.dither = GetDitherHandler(ditherMethod, image->GetWidth());
 
         // in theory this should always return a filename since the frontend code

@@ -2,7 +2,7 @@
 #define BOOST_ARCHIVE_BASIC_ARCHIVE_HPP
 
 // MS compatible compilers support #pragma once
-#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+#if defined(_MSC_VER)
 # pragma once
 #endif
 
@@ -15,8 +15,8 @@
 // http://www.boost.org/LICENSE_1_0.txt)
 
 //  See http://www.boost.org for updates, documentation, and revision history.
-
-#include <cassert>
+#include <cstring> // count
+#include <boost/assert.hpp>
 #include <boost/config.hpp>
 #include <boost/cstdint.hpp> // size_t
 #include <boost/noncopyable.hpp>
@@ -44,7 +44,7 @@ private:
 public:
     library_version_type(): t(0) {};
     explicit library_version_type(const unsigned int & t_) : t(t_){
-        assert(t_ <= boost::integer_traits<base_type>::const_max);
+        BOOST_ASSERT(t_ <= boost::integer_traits<base_type>::const_max);
     }
     library_version_type(const library_version_type & t_) : 
         t(t_.t)
@@ -69,7 +69,7 @@ public:
     }   
 };
 
-BOOST_ARCHIVE_DECL(library_version_type)
+BOOST_ARCHIVE_DECL library_version_type
 BOOST_ARCHIVE_VERSION();
 
 class version_type {
@@ -80,7 +80,7 @@ public:
     // should be private - but MPI fails if it's not!!!
     version_type(): t(0) {};
     explicit version_type(const unsigned int & t_) : t(t_){
-        assert(t_ <= boost::integer_traits<base_type>::const_max);
+        BOOST_ASSERT(t_ <= boost::integer_traits<base_type>::const_max);
     }
     version_type(const version_type & t_) : 
         t(t_.t)
@@ -113,10 +113,10 @@ public:
     // should be private - but then can't use BOOST_STRONG_TYPE below
     class_id_type() : t(0) {};
     explicit class_id_type(const int t_) : t(t_){
-        assert(t_ <= boost::integer_traits<base_type>::const_max);
+        BOOST_ASSERT(t_ <= boost::integer_traits<base_type>::const_max);
     }
     explicit class_id_type(const std::size_t t_) : t(t_){
- //       assert(t_ <= boost::integer_traits<base_type>::const_max);
+ //       BOOST_ASSERT(t_ <= boost::integer_traits<base_type>::const_max);
     }
     class_id_type(const class_id_type & t_) : 
         t(t_.t)
@@ -150,8 +150,9 @@ private:
     base_type t;
 public:
     object_id_type(): t(0) {};
-    explicit object_id_type(const unsigned int & t_) : t(t_){
-        assert(t_ <= boost::integer_traits<base_type>::const_max);
+    // note: presumes that size_t >= unsigned int.
+    explicit object_id_type(const std::size_t & t_) : t(t_){
+        BOOST_ASSERT(t_ <= boost::integer_traits<base_type>::const_max);
     }
     object_id_type(const object_id_type & t_) : 
         t(t_.t)
@@ -220,6 +221,9 @@ struct class_name_type :
     operator char * () {
         return t;
     }
+    std::size_t size() const {
+        return std::strlen(t);
+    }
     explicit class_name_type(const char *key_) 
     : t(const_cast<char *>(key_)){}
     explicit class_name_type(char *key_) 
@@ -238,7 +242,7 @@ enum archive_flags {
     flags_last = 8
 };
 
-BOOST_ARCHIVE_DECL(const char *)
+BOOST_ARCHIVE_DECL const char *
 BOOST_ARCHIVE_SIGNATURE();
 
 /* NOTE : Warning  : Warning : Warning : Warning : Warning
@@ -254,7 +258,7 @@ BOOST_ARCHIVE_SIGNATURE();
 #define BOOST_ARCHIVE_STRONG_TYPEDEF(T, D)         \
     class D : public T {                           \
     public:                                        \
-        explicit D(const T t) : T(t){}             \
+        explicit D(const T tt) : T(tt){}           \
     };                                             \
 /**/
 

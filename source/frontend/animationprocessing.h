@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -38,9 +38,10 @@
 
 #include <string>
 
+#include "povms/povmscpp.h"
+#include "povms/povmsid.h"
+
 #include "base/types.h"
-#include "base/povmscpp.h"
-#include "base/povmsgid.h"
 
 namespace pov_frontend
 {
@@ -56,10 +57,21 @@ class AnimationProcessing
         void ComputeNextFrame();
         bool MoreFrames();
 
-        POVMSInt GetFrameNumber();
-        POVMSInt GetStartFrame();
-        POVMSInt GetEndFrame();
-        POVMSInt GetTotalFrames();
+        /// Get nominal frame number.
+        POVMSInt GetNominalFrameNumber();
+
+        /// Get running frame number.
+        POVMSInt GetRunningFrameNumber();
+
+        /// Get subset start frame number.
+        POVMSInt GetSubsetStartFrame();
+
+        /// Get subset end frame number.
+        POVMSInt GetSubsetEndFrame();
+
+        /// Get the total number of frames to actually render.
+        POVMSInt GetTotalFramesToRender();
+
         POVMSFloat GetClockValue();
         int GetFrameNumberDigits();
     private:
@@ -78,7 +90,8 @@ class AnimationProcessing
         POVMSBool oddFieldFlag;
 
         POVMSFloat clockValue;
-        POVMSInt frameNumber;
+        POVMSInt runningFrameNumber;
+        POVMSInt nominalFrameNumber;
 
         POVMSInt frameStep;
 

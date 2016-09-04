@@ -4,11 +4,13 @@
 ///
 /// GIF-style LZW decoder.
 ///
+/// @author Steven A. Bennett
+///
 /// @copyright
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -31,69 +33,35 @@
 ///
 /// ----------------------------------------------------------------------------
 ///
-/// Portions of this module were written by Steve Bennett and are used here with
-/// his permission.
+/// Major portions of this module were written by Steve Bennett and are used
+/// here with his permission:
+///
+/// DECODER.C - An LZW decoder for GIF
+/// Copyright (C) 1987, by Steven A. Bennett
+///
+/// Permission is given by the author to freely redistribute and include
+/// this code in any program as long as this credit is given where due.
+///
+/// In accordance with the above, I want to credit Steve Wilhite who wrote
+/// the code which this is heavily inspired by...
+///
+/// GIF and 'Graphics Interchange Format' are trademarks (tm) of
+/// Compuserve, Incorporated, an H&R Block Company.
+///
+/// Release Notes: This file contains a decoder routine for GIF images
+/// which is similar, structurally, to the original routine by Steve Wilhite.
+/// It is, however, somewhat noticably faster in most cases.
+///
+/// This routine was modified for use in FRACTINT.
 ///
 /// @endparblock
 ///
 //******************************************************************************
 
-/*
-This module was freely borrowed from FRACTINT, so here is their entire
-copyright to keep them happy:
-*/
-
-/* DECODER.C - An LZW decoder for GIF
-* Copyright (C) 1987, by Steven A. Bennett
-*
-* Permission is given by the author to freely redistribute and include
-* this code in any program as long as this credit is given where due.
-*
-* In accordance with the above, I want to credit Steve Wilhite who wrote
-* the code which this is heavily inspired by...
-*
-* GIF and 'Graphics Interchange Format' are trademarks (tm) of
-* Compuserve, Incorporated, an H&R Block Company.
-*
-* Release Notes: This file contains a decoder routine for GIF images
-* which is similar, structurally, to the original routine by Steve Wilhite.
-* It is, however, somewhat noticably faster in most cases.
-*
-== This routine was modified for use in FRACTINT in two ways.
-==
-== 1) The original #includes were folded into the routine strictly to hold
-==    down the number of files we were dealing with.
-==
-== 2) The 'stack', 'suffix', 'prefix', and 'buf' arrays were changed from
-==    static and 'malloc()'ed to external only so that the assembler
-==    program could use the same array space for several independent
-==    chunks of code.  Also, 'stack' was renamed to 'dstack' for TASM
-==    compatibility.
-==
-== 3) The 'out_line()' external function has been changed to reference
-==    '*outln()' for flexibility (in particular, 3D transformations)
-==
-== 4) A call to 'keypressed()' has been added after the 'outln()' calls
-==    to check for the presenc of a key-press as a bail-out signal
-==
-== (Bert Tyler and Timothy Wegner)
-*/
-
-/*
-This routine was modified for Persistence of Vision(tm) Ray Tracer in the following ways:
-
-1)  Removed calls to buzzer() and keypressed() to get rid of ASM files.
-
-2)  The dstack, suffix, and prefix arrays were made STATIC once again.
-
-3)  Added the usual ANSI function prototypes, etc. in the Persistence of Vision(tm) Ray Tracer headers.
-*/
-
-// configbase.h must always be the first POV file included within base *.cpp files
-#include "base/configbase.h"
-#include "base/image/image.h"
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "base/image/gif.h"
 
+// Boost header files
 #include <boost/scoped_array.hpp>
 
 // this must be the last file included

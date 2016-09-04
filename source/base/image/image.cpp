@@ -2,13 +2,13 @@
 ///
 /// @file base/image/image.cpp
 ///
-/// @todo   What's in here?
+/// Implementation of image containers.
 ///
 /// @copyright
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -31,23 +31,22 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
-#include <cassert>
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
+#include "base/image/image.h"
+
+// Standard C++ header files
 #include <algorithm>
 #include <vector>
 
+// Standard POSIX header files
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 
-
-// configbase.h must always be the first POV file included within base *.cpp files
-#include "base/configbase.h"
-#include "base/image/image.h"
-
+// POV-Ray base header files
 #include "base/platformbase.h"
-#include "base/povmsgid.h"
 #include "base/safemath.h"
 #include "base/image/bmp.h"
 #include "base/image/gif.h"
@@ -65,7 +64,10 @@
 #include "syspovprotobase.h"
 #endif
 
-#define CHECK_BOUNDS(x,y) assert(((x) < width) && ((y) < height))
+// this must be the last file included
+#include "base/povdebug.h"
+
+#define CHECK_BOUNDS(x,y) POV_IMAGE_ASSERT(((x) < width) && ((y) < height))
 
 #define ALPHA_OPAQUE                (1.0f)
 #define ALPHA_OPAQUE_INT(MAX)       (MAX)
@@ -75,9 +77,6 @@
 
 #define IS_NONZERO_RGB(r,g,b)       ((r)*(g)*(b) != 0.0f) // TODO FIXME - [CLi] this tests whether *all* channels are nonzero - is this desired?
 #define IS_NONZERO_RGB_INT(r,g,b)   ((r)*(g)*(b) != 0)    // TODO FIXME - [CLi] this tests whether *all* channels are nonzero - is this desired?
-
-// this must be the last file included
-#include "base/povdebug.h"
 
 namespace pov_base
 {

@@ -11,7 +11,7 @@
 #include <boost/detail/workaround.hpp>
 #include <boost/noncopyable.hpp>
 
-#if BOOST_WORKAROUND(_MSC_VER, >= 1200)
+#if defined(_MSC_VER)
 #  pragma once
 #endif
 
@@ -104,17 +104,11 @@ template<>
 inline std::basic_string<char> get_default_indeterminate_name<char>()
 { return "indeterminate"; }
 
-#if BOOST_WORKAROUND(BOOST_MSVC, < 1300)
-// VC++ 6.0 chokes on the specialization below, so we're stuck without 
-// wchar_t support. What a pain. TODO: it might just need a the template 
-// parameter as function parameter...
-#else
-#  ifndef BOOST_NO_WCHAR_T
+#ifndef BOOST_NO_WCHAR_T
 /// Returns the wide character string L"indeterminate".
 template<>
 inline std::basic_string<wchar_t> get_default_indeterminate_name<wchar_t>()
 { return L"indeterminate"; }
-#  endif
 #endif
 
 // http://www.cantrip.org/locale.html
@@ -140,7 +134,8 @@ public:
   indeterminate_name() : name_(get_default_indeterminate_name<CharT>()) {}
 
   /// Construct the facet with the given name for the indeterminate value
-  explicit indeterminate_name(const string_type& name) : name_(name) {}
+  explicit indeterminate_name(const string_type& initial_name)
+  : name_(initial_name) {}
 
   /// Returns the name for the indeterminate value
   string_type name() const { return name_; }
@@ -284,9 +279,9 @@ operator>>(std::basic_istream<CharT, Traits>& in, tribool& x)
       bool falsename_ok = true, truename_ok = true, othername_ok = true;
 
       // Modeled after the code from Library DR 17
-      while (falsename_ok && pos < falsename.size()
-             || truename_ok && pos < truename.size()
-             || othername_ok && pos < othername.size()) {
+      while ((falsename_ok && pos < falsename.size())
+             || (truename_ok && pos < truename.size())
+             || (othername_ok && pos < othername.size())) {
         typename Traits::int_type c = in.get();
         if (c == Traits::eof())
           return in;

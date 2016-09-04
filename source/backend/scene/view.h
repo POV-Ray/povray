@@ -31,16 +31,17 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
 #ifndef POVRAY_BACKEND_VIEW_H
 #define POVRAY_BACKEND_VIEW_H
 
 #include <vector>
 
-#include "backend/lighting/radiosity.h"
-#include "backend/scene/camera.h"
-#include "backend/support/bsptree.h"
+#include "core/lighting/radiosity.h"
+#include "core/scene/camera.h"
+#include "core/support/bsptree.h"
+
 #include "backend/support/taskqueue.h"
 
 namespace pov
@@ -219,7 +220,7 @@ class ViewData
          *  Get the scene data for this view.
          *  @return                 Scene data.
          */
-        inline shared_ptr<SceneData>& GetSceneData() { return sceneData; }
+        inline shared_ptr<BackendSceneData>& GetSceneData() { return sceneData; }
 
         /**
          *  Get the view id for this view.
@@ -318,7 +319,7 @@ class ViewData
         /// generated radiosity data
         RadiosityCache radiosityCache;
         /// scene data
-        shared_ptr<SceneData> sceneData;
+        shared_ptr<BackendSceneData> sceneData;
         /// view id
         RenderBackend::ViewId viewId;
 
@@ -342,7 +343,7 @@ class ViewData
          *  Create view data.
          *  @param  sd              Scene data associated with the view data.
          */
-        ViewData(shared_ptr<SceneData> sd);
+        ViewData(shared_ptr<BackendSceneData> sd);
 
         /**
          *  Destructor.
@@ -457,7 +458,7 @@ class View
          *  @param  vid             Id of this view to include with
          *                          POVMS messages sent to the frontend.
          */
-        explicit View(shared_ptr<SceneData> sd, unsigned int width, unsigned int height, RenderBackend::ViewId vid);
+        explicit View(shared_ptr<BackendSceneData> sd, unsigned int width, unsigned int height, RenderBackend::ViewId vid);
 
         /// not available
         View& operator=(const View&);

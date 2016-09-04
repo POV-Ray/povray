@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -33,7 +33,7 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
 #include <algorithm>
 
@@ -41,19 +41,21 @@
 #include "backend/frame.h"
 #include "backend/lighting/photonestimationtask.h"
 
-#include "backend/bounding/bbox.h"
-#include "backend/lighting/point.h"
-#include "backend/math/matrices.h"
-#include "backend/scene/objects.h"
-#include "backend/scene/scene.h"
-#include "backend/scene/threaddata.h"
+#include "core/bounding/boundingbox.h"
+#include "core/lighting/lightgroup.h"
+#include "core/lighting/lightsource.h"
+#include "core/math/matrix.h"
+#include "core/scene/object.h"
+#include "core/shape/csg.h"
+#include "core/support/octree.h"
+
+#include "povms/povmscpp.h"
+#include "povms/povmsid.h"
+#include "povms/povmsutil.h"
+
+#include "backend/scene/backendscenedata.h"
 #include "backend/scene/view.h"
-#include "backend/shape/csg.h"
-#include "backend/support/msgutil.h"
-#include "backend/support/octree.h"
-#include "base/povms.h"
-#include "base/povmsgid.h"
-#include "lightgrp.h"
+#include "backend/scene/viewthreaddata.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -124,7 +126,7 @@ void PhotonEstimationTask::Stopped()
 
 void PhotonEstimationTask::Finish()
 {
-    GetViewDataPtr()->timeType = SceneThreadData::kPhotonTime;
+    GetViewDataPtr()->timeType = TraceThreadData::kPhotonTime;
     GetViewDataPtr()->realTime = ConsumedRealTime();
     GetViewDataPtr()->cpuTime = ConsumedCPUTime();
 }

@@ -45,7 +45,7 @@
 // frame.h must always be the first POV file included (pulls in platform config)
 #include "backend/frame.h"
 
-#include "backend/support/octree.h"
+#include "core/support/octree.h"
 
 // this must be the last file included
 #include "base/povdebug.h"

@@ -38,8 +38,10 @@
 
 #include <string>
 
-#include "base/povmscpp.h"
-#include "base/povmsgid.h"
+#include <boost/format.hpp>
+
+#include "povms/povmscpp.h"
+#include "povms/povmsid.h"
 
 namespace pov_frontend
 {

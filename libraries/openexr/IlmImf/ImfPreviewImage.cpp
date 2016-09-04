@@ -39,10 +39,12 @@
 //
 //-----------------------------------------------------------------------------
 
-#include <ImfPreviewImage.h>
+#include "ImfPreviewImage.h"
+#include "ImfCheckedArithmetic.h"
 #include "Iex.h"
+#include "ImfNamespace.h"
 
-namespace Imf {
+OPENEXR_IMF_INTERNAL_NAMESPACE_SOURCE_ENTER
 
 
 PreviewImage::PreviewImage (unsigned int width,
@@ -51,7 +53,8 @@ PreviewImage::PreviewImage (unsigned int width,
 {
     _width = width;
     _height = height;
-    _pixels = new PreviewRgba [_width * _height];
+    _pixels = new PreviewRgba
+        [checkArraySize (uiMult (_width, _height), sizeof (PreviewRgba))];
 
     if (pixels)
     {
@@ -98,4 +101,4 @@ PreviewImage::operator = (const PreviewImage &other)
 }
 
 
-} // namespace Imf
+OPENEXR_IMF_INTERNAL_NAMESPACE_SOURCE_EXIT

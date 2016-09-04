@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -31,14 +31,15 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
 #ifndef POVRAY_BASE_TIMER_H
 #define POVRAY_BASE_TIMER_H
 
-#include <boost/thread.hpp>
-
+// Module config header file must be the first file included within POV-Ray unit header files
 #include "base/configbase.h"
+
+#include <boost/thread/xtime.hpp>
 
 #ifdef USE_SYSPROTO
 #include "syspovprotobase.h"
@@ -47,17 +48,18 @@
 namespace pov_base
 {
 
+#if POV_MULTITHREADED
+
 /**
  *  Wait for the specified time.
  *  @param  msec  Milliseconds to wait.
  */
 void Delay(unsigned int msec);
 
+#endif // POV_MULTITHREADED
 
-#ifndef POV_TIMER
 
-/// Use default time if no platform specific implementation is provided.
-#define POV_TIMER TimerDefault
+#if POV_TIMER_DEFAULT
 
 /**
  *  Default class for millisecond-precision timers.
@@ -112,12 +114,7 @@ class TimerDefault
         boost::xtime cpuTimeStart;
 };
 
-#endif
-
-}
-
-namespace pov_base
-{
+#endif // POV_TIMER_DEFAULT
 
 /// Millisecond-precision timer
 typedef POV_TIMER Timer;

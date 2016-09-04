@@ -2,13 +2,13 @@
 ///
 /// @file base/image/colourspace.cpp
 ///
-/// @todo   What's in here?
+/// Implementation of colour space conversions.
 ///
 /// @copyright
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -33,15 +33,15 @@
 ///
 //******************************************************************************
 
-#include <vector>
-#include <algorithm>
-#include <cassert>
-
-// configbase.h must always be the first POV file included within base *.cpp files
-#include "base/configbase.h"
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "base/image/colourspace.h"
+
+// Standard C++ header files
+#include <algorithm>
+#include <vector>
+
+// POV-Ray base header files
 #include "base/image/encoding.h"
-#include "base/povmsgid.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -51,7 +51,9 @@ namespace pov_base
 
 // definitions of static GammaCurve member variables to satisfy the linker
 list<weak_ptr<GammaCurve> > GammaCurve::cache;
+#if POV_MULTITHREADED
 boost::mutex GammaCurve::cacheMutex;
+#endif
 
 // definitions of static GammaCurve-derivatives' member variables to satisfy the linker
 SimpleGammaCurvePtr NeutralGammaCurve::instance;
@@ -63,13 +65,15 @@ GammaCurvePtr Rec1361GammaCurve::instance;
 
 float* GammaCurve::GetLookupTable(unsigned int max)
 {
-    assert(max == 255 || max == 65535); // shouldn't happen, but it won't hurt to check in debug versions
+    POV_COLOURSPACE_ASSERT(max == 255 || max == 65535); // shouldn't happen, but it won't hurt to check in debug versions
 
     // Get a reference to the lookup table pointer we're dealing with, so we don't need to duplicate all the remaining code.
     float*& lookupTable = (max == 255 ? lookupTable8 : lookupTable16);
 
+#if POV_MULTITHREADED
     // Make sure we're not racing any other thread that might currently be busy creating the LUT.
     boost::mutex::scoped_lock lock(lutMutex);
+#endif
 
     // Create the LUT if it doesn't exist yet.
     if (!lookupTable)
@@ -93,8 +97,10 @@ GammaCurvePtr GammaCurve::GetMatching(const GammaCurvePtr& newInstance)
 
     // See if we have a matching gamma curve in our chache already
 
+#if POV_MULTITHREADED
     // make sure the cache doesn't get tampered with while we're working on it
     boost::mutex::scoped_lock lock(cacheMutex);
+#endif
 
     // Check if we already have created a matching gamma curve object; if so, return that object instead.
     // Also, make sure we get the new object stored (as we're using weak pointers, we may have stale entries;
@@ -251,7 +257,7 @@ SimpleGammaCurvePtr PowerLawGammaCurve::GetByEncodingGamma(float gamma)
 {
     if (IsNeutral(gamma))
         return NeutralGammaCurve::Get();
-    return std::tr1::dynamic_pointer_cast<SimpleGammaCurve,GammaCurve>(GetMatching(GammaCurvePtr(new PowerLawGammaCurve(gamma))));
+    return dynamic_pointer_cast<SimpleGammaCurve>(GetMatching(GammaCurvePtr(new PowerLawGammaCurve(gamma))));
 }
 SimpleGammaCurvePtr PowerLawGammaCurve::GetByDecodingGamma(float gamma)
 {
@@ -381,7 +387,7 @@ bool TranscodingGammaCurve::Matches(const GammaCurvePtr& p) const
 
 /*******************************************************************************/
 
-SimpleGammaCurvePtr GetGammaCurve(int type, float param)
+SimpleGammaCurvePtr GetGammaCurve(GammaTypeId type, float param)
 {
     switch (type)
     {

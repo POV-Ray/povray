@@ -2,7 +2,7 @@
 #define BOOST_ARCHIVE_DETAIL_COMMON_OARCHIVE_HPP
 
 // MS compatible compilers support #pragma once
-#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+#if defined(_MSC_VER)
 # pragma once
 #endif
 
@@ -65,7 +65,7 @@ private:
 protected:
     // default processing - invoke serialization library
     template<class T>
-    void save_override(T & t, BOOST_PFTO int){
+    void save_override(T & t){
         archive::save(* this->This(), t);
     }
     void save_start(const char * /*name*/){}

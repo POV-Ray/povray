@@ -31,14 +31,12 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
 #ifndef POVRAY_BACKEND_BOUNDINGTASK_H
 #define POVRAY_BACKEND_BOUNDINGTASK_H
 
 #include <vector>
-
-#include <boost/thread.hpp>
 
 #include "backend/frame.h"
 #include "backend/render/rendertask.h"
@@ -47,12 +45,12 @@ namespace pov
 {
 
 class SceneData;
-class SceneThreadData;
+class TraceThreadData;
 
 class BoundingTask : public SceneTask
 {
     public:
-        BoundingTask(shared_ptr<SceneData> sd, unsigned int bt);
+        BoundingTask(shared_ptr<BackendSceneData> sd, unsigned int bt);
         virtual ~BoundingTask();
 
         virtual void Run();
@@ -61,9 +59,9 @@ class BoundingTask : public SceneTask
 
         void AppendObject(ObjectPtr p);
 
-        inline SceneThreadData *GetSceneDataPtr() { return reinterpret_cast<SceneThreadData *>(GetDataPtr()); }
+        inline TraceThreadData *GetSceneDataPtr() { return reinterpret_cast<TraceThreadData *>(GetDataPtr()); }
     private:
-        shared_ptr<SceneData> sceneData;
+        shared_ptr<BackendSceneData> sceneData;
         unsigned int boundingThreshold;
 
         void SendFatalError(pov_base::Exception& e);

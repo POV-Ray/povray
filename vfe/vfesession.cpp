@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -41,7 +41,7 @@
 #endif
 
 #include "vfe.h"
-#include "povray.h"
+#include "backend/povray.h"
 
 static POVMSContext POVMS_Output_Context = NULL;
 
@@ -109,6 +109,7 @@ void vfeSession::Clear(bool Notify)
   m_PercentComplete = 0;
   m_PixelsRendered = 0;
   m_TotalPixels = 0;
+  m_CurrentFrameId = 0;
   m_CurrentFrame = 0;
   m_TotalFrames = 0;
   if (Notify)
@@ -296,14 +297,15 @@ void vfeSession::AppendStatusMessage (const boost::format& fmt, int RecommendedP
   NotifyEvent(stStatusMessage);
 }
 
-void vfeSession::AppendAnimationStatus (int Frame, int Total, const UCS2String& Filename)
+void vfeSession::AppendAnimationStatus (int FrameId, int SubsetFrame, int SubsetTotal, const UCS2String& Filename)
 {
   boost::mutex::scoped_lock lock(m_MessageMutex);
 
-  m_CurrentFrame = Frame;
-  m_TotalFrames = Total;
-  m_StatusQueue.push (StatusMessage (*this, Filename, Frame, Total));
-  m_StatusLineMessage = (boost::format("Rendering frame %d of %d") % Frame % Total).str();
+  m_CurrentFrameId = FrameId;
+  m_CurrentFrame = SubsetFrame;
+  m_TotalFrames = SubsetTotal;
+  m_StatusQueue.push (StatusMessage (*this, Filename, SubsetFrame, SubsetTotal, FrameId));
+  m_StatusLineMessage = (boost::format("Rendering frame %d of %d (#%d)") % SubsetFrame % SubsetTotal % FrameId).str();
   if (m_MaxStatusMessages != -1)
     while (m_StatusQueue.size() > m_MaxStatusMessages)
       m_StatusQueue.pop();

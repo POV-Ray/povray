@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -84,14 +84,14 @@
 #include "backend/control/benchmark.h"
 #include "pvdisplay.h"
 #include "syspovprotofrontend.h"
-#include "povray.h"
+#include "backend/povray.h"
 
 #ifdef RTR_SUPPORT
   #include "rtrsupport.h"
 #endif
 
-#if defined(USE_AVX_FMA4_FOR_NOISE)
-  #include "backend/texture/avxfma4check.h"
+#if defined(TRY_OPTIMIZED_NOISE)
+  #include OPTIMIZED_NOISE_H
 #endif
 
 // this must be the last file included
@@ -685,7 +685,7 @@ char *PPS_String (unsigned pixels, unsigned renderseconds)
 
   if (renderseconds == 0)
     return ("??? PPS") ;
-  
+
   if (pixels / renderseconds < 5)
   {
     if (pixels * 60 / renderseconds < 5)
@@ -873,29 +873,29 @@ DWORD GetDllVersion (LPCTSTR lpszDllName)
 {
   HINSTANCE hinstDll;
   DWORD dwVersion = 0;
-  
+
   hinstDll = LoadLibrary(lpszDllName) ;
-    
+
   if (hinstDll)
   {
     DLLGETVERSIONPROC pDllGetVersion;
-    
+
     pDllGetVersion = (DLLGETVERSIONPROC) GetProcAddress (hinstDll, "DllGetVersion");
-    
+
     if (pDllGetVersion)
     {
       DLLVERSIONINFO dvi;
       HRESULT hr;
-      
+
       ZeroMemory(&dvi, sizeof (dvi));
       dvi.cbSize = sizeof (dvi);
-      
+
       hr = (*pDllGetVersion) (&dvi);
-      
+
       if (SUCCEEDED (hr))
         dwVersion = MAKELONG (dvi.dwMajorVersion, dvi.dwMinorVersion);
     }
-    
+
     FreeLibrary (hinstDll);
   }
   return dwVersion;
@@ -1333,7 +1333,7 @@ bool inferHome (void)
   if ((s = findLastPathSeparator (exePath)) == NULL)
     return (false) ;
   *s = '\0' ;
-  
+
   // now step up one directory
   if ((s = findLastPathSeparator (exePath)) == NULL)
     return (false) ;
@@ -1691,7 +1691,7 @@ char *GetExceptionDescription (DWORD code)
   }
 }
 
-#if POV_RAY_IS_OFFICIAL == 1
+#if POV_RAY_HAS_OFFICIAL_FEATURES == 1
 // this pulls in the code for update checks and crash dump submission.
 // it is only used in official releases made by the POV-Ray developers,
 // so the source is not included in the public distribution.
@@ -1740,7 +1740,7 @@ LONG WINAPI ExceptionHandler(struct _EXCEPTION_POINTERS* ExceptionInfo)
   ExitProcess (1) ;
   return (EXCEPTION_CONTINUE_SEARCH) ; // make compiler happy
 }
-#endif // POV_RAY_IS_OFFICIAL
+#endif // POV_RAY_HAS_OFFICIAL_FEATURES
 
 int execute_tool (char *s)
 {
@@ -2161,7 +2161,7 @@ bool start_rendering (bool ignore_source_file)
     int result = Session.SetOptions (opts) ;
     if (result == vfeNoInputFile)
       throw POV_EXCEPTION_STRING("No source file specified, either directly or via an INI file.");
-    else if (result != vfeNoError)      
+    else if (result != vfeNoError)
       throw POV_EXCEPTION_STRING (Session.GetErrorString());
 
     // TODO FIXME - magic values
@@ -3714,7 +3714,7 @@ bool handle_main_command (WPARAM wParam, LPARAM lParam)
          return (true) ;
 
     case CM_CHECKUPDATENOW:
-#if POV_RAY_IS_OFFICIAL == 1
+#if POV_RAY_HAS_OFFICIAL_FEATURES == 1
          ManualUpdateCheck();
 #endif
          return true;
@@ -3771,12 +3771,12 @@ LRESULT CALLBACK PovMainWndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM 
          SendMessage (toolbar_cmdline, EM_SETSEL, 0, strlen (command_line)) ;
          SetFocus (toolbar_cmdline) ;
          return (true) ;
-    
+
     case WM_HELP :
          // we expect that whatever routine caused the WM_HELP would have set up the keyword
          HtmlHelp (NULL, engineHelpPath, HH_KEYWORD_LOOKUP, (DWORD_PTR) &hh_aklink) ;
          return (true) ;
-         
+
     case KEYWORD_LOOKUP_MESSAGE :
          hh_aklink.pszKeywords = (LPCSTR) lParam ;
          if (strncmp (hh_aklink.pszKeywords, "oooo", 4) == 0)
@@ -4183,7 +4183,7 @@ LRESULT CALLBACK PovMainWndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM 
            break ;
          seconds++ ;
 
-#if POV_RAY_IS_OFFICIAL == 1
+#if POV_RAY_HAS_OFFICIAL_FEATURES == 1
          if (seconds % 600 == 0)
            DoUpdateCheck () ;
 #endif
@@ -4774,7 +4774,7 @@ LRESULT CALLBACK PovAboutWndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM
          return (0) ;
 
     case WM_DRAWITEM :
-         lpdis = (LPDRAWITEMSTRUCT) lParam ; 
+         lpdis = (LPDRAWITEMSTRUCT) lParam ;
          for (button = 0 ; button < 3 ; button++)
            if (about_buttons [button] == lpdis->hwndItem)
              break ;
@@ -4788,7 +4788,7 @@ LRESULT CALLBACK PovAboutWndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM
          if (about_palette)
            SelectPalette (hdc, about_palette, true) ;
          hdcMemory = CreateCompatibleDC (hdc) ;
-         oldBmp = (HBITMAP) SelectObject (hdcMemory, hBmpAbout) ; 
+         oldBmp = (HBITMAP) SelectObject (hdcMemory, hBmpAbout) ;
          BitBlt (hdc, 0, 0, 165, 30, hdcMemory, offset, button * 30 + about_height, SRCCOPY) ;
          SelectObject (hdcMemory, oldBmp) ;
          DeleteDC (hdcMemory) ;
@@ -5191,7 +5191,7 @@ bool WriteDumpMeta(struct _EXCEPTION_POINTERS *ExceptionInfo, const char *filena
 char *WriteDump(struct _EXCEPTION_POINTERS *pExceptionInfo, bool full, long timestamp)
 {
   // firstly see if dbghelp.dll is around and has the function we need
-  // look next to the EXE first, as the one in System32 might be old 
+  // look next to the EXE first, as the one in System32 might be old
   // (e.g. Windows 2000)
   HMODULE hDll = NULL;
   static char szDbgHelpPath[_MAX_PATH];
@@ -6094,7 +6094,7 @@ int PASCAL WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
   buffer_message (mIDE, "Persistence of Vision Raytracer(tm) for Windows.\n") ;
   buffer_message (mIDE, "POV-Ray for Windows is part of the POV-Ray(tm) suite of programs.\n") ;
   buffer_message (mIDE, "  This is version " POV_RAY_VERSION COMPILER_VER SSE2_INCLUDED "." PVENGINE_VER ".\n") ;
-  buffer_message (mIDE, "Copyright 1991-2013 Persistence of Vision Raytracer Pty. Ltd.\n") ;
+  buffer_message (mIDE, POV_RAY_COPYRIGHT "\n") ;
   buffer_message (mIDE, "  " DISCLAIMER_MESSAGE_1 "\n") ;
   buffer_message (mIDE, "  " DISCLAIMER_MESSAGE_2 "\n") ;
   buffer_message (mIDE, "  Select Help|About (or press Alt+B) for more information and a copy of the license.\n") ;
@@ -6116,10 +6116,10 @@ int PASCAL WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
 #endif
   buffer_message (mDivider, "\n") ;
 
-#if defined(USE_AVX_FMA4_FOR_NOISE)
+#if defined(TRY_OPTIMIZED_NOISE)
   // technically we should ask the backend what it's using, but given this is not a remoted version
   // of POVWIN, we just call the test here.
-  if (CPU_FMA4_DETECT() != 0)
+  if (OPTIMIZED_NOISE_SUPPORTED)
   {
     buffer_message (mIDE, "FMA4 instruction support detected: using FMA4-optimized noise functions.\n") ;
     buffer_message (mDivider, "\n") ;
@@ -6247,7 +6247,7 @@ int PASCAL WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
     }
   }
 
-#if POV_RAY_IS_OFFICIAL == 1
+#if POV_RAY_HAS_OFFICIAL_FEATURES == 1
   DoUpdateCheck () ;
 #endif
 

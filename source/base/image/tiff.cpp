@@ -2,13 +2,13 @@
 ///
 /// @file base/image/tiff.cpp
 ///
-/// This module contains the code to read and write the TIFF file format.
+/// Implementation of Tagged Image File Format (TIFF) image file handling.
 ///
 /// @copyright
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -33,38 +33,37 @@
 ///
 //******************************************************************************
 
-#include <vector>
-#include <assert.h>
-
-// configbase.h must always be the first POV file included within base *.cpp files
-#include "base/configbase.h"
-#include "base/image/image.h"
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "base/image/tiff_pov.h"
 
+#ifndef LIBTIFF_MISSING
+
+// Standard C++ header files
+#include <vector>
+
+// Boost header files
 #include <boost/scoped_array.hpp>
+
+// Other 3rd party header files
+extern "C"
+{
+#ifndef __STDC__
+#define __STDC__ (1) // TODO - check if this is really necessary
+#endif
+#ifndef AVOID_WIN32_FILEIO
+#define AVOID_WIN32_FILEIO // this stops the tiff headers from pulling in windows.h on win32/64
+#endif
+#include <tiffio.h>
+}
 
 // this must be the last file included other than tiffio.h
 #include "base/povdebug.h"
-
-#ifndef LIBTIFF_MISSING
 
 namespace pov_base
 {
 
 namespace Tiff
 {
-
-// TIFF Image loader
-extern "C"
-{
-    #ifndef __STDC__
-    #define __STDC__        (1)
-    #endif
-    #ifndef AVOID_WIN32_FILEIO
-    #define AVOID_WIN32_FILEIO // this stops the tiff headers from pulling in windows.h on win32/64
-    #endif
-    #include <tiffio.h>
-}
 
 /* Do any of the entries in the color map contain values larger than 255? */
 static int checkcmap(int n, const uint16* r, const uint16* g, const uint16* b)
@@ -170,6 +169,8 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
     uint16                PhotometricInterpretation;
     uint16                SamplePerPixel;
     uint16                Orientation;
+    uint16                ExtraSamples;
+    uint16*               ExtraSampleInfo;
     uint32                RowsPerStrip;
     unsigned int          width;
     unsigned int          height;
@@ -179,12 +180,6 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
     GammaCurvePtr gamma;
     if (options.gammacorrect && options.defaultGamma)
         gamma = TranscodingGammaCurve::Get(options.workingGamma, options.defaultGamma);
-
-    // [CLi] TIFF is specified to use associated (= premultiplied) alpha, so that's the preferred mode to use for the image container unless the user overrides
-    // (e.g. to handle a non-compliant file).
-    bool premul = true;
-    if (options.premultiplyOverride)
-        premul = options.premultiply;
 
     // Rather than have libTIFF complain about tags it doesn't understand,
     // we just suppress all the warnings.
@@ -199,7 +194,6 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
         return (NULL) ;
 
     // Get basic information about the image
-    int ExtraSamples, ExtraSampleInfo;
     TIFFGetField(tif, TIFFTAG_IMAGEWIDTH, &width);
     TIFFGetField(tif, TIFFTAG_IMAGELENGTH, &height);
     TIFFGetField(tif, TIFFTAG_BITSPERSAMPLE, &BitsPerSample);
@@ -209,6 +203,15 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
     TIFFGetFieldDefaulted(tif, TIFFTAG_SAMPLESPERPIXEL, &SamplePerPixel);
     TIFFGetFieldDefaulted(tif, TIFFTAG_EXTRASAMPLES, &ExtraSamples, &ExtraSampleInfo);
 
+    // [CLi] TIFF provides alpha mode information in the TIFFTAG_EXTRASAMPLES field, so that's the preferred mode to use
+    // for the image container unless the user overrides (e.g. to handle a non-compliant file).
+    // If TIFFTAG_EXTRASAMPLES information is absent or inconclusive, we presume associated (= premultiplied) alpha.
+    bool premul = true;
+    if ((ExtraSamples > 0) && (ExtraSampleInfo[0] == EXTRASAMPLE_UNASSALPHA))
+        premul = false;
+    if (options.premultipliedOverride)
+        premul = options.premultiplied;
+
     // don't support more than 16 bits per sample
     if (BitsPerSample == 16)
     {
@@ -217,7 +220,7 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
     }
 
     LineSize = TIFFScanlineSize(tif);
-    assert (SamplePerPixel == (int) (LineSize / width) / BytesPerSample);
+    POV_IMAGE_ASSERT(SamplePerPixel == (int) (LineSize / width) / BytesPerSample);
     // SamplePerPixel = (int)(LineSize / width);
 
 #if 0
@@ -247,7 +250,7 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
 
     //PhotometricInterpretation = 2 image is RGB
     //PhotometricInterpretation = 3 image have a color palette
-    if (PhotometricInterpretation == PHOTOMETRIC_PALETTE && (TIFFIsTiled(tif) == 0))
+    if ((PhotometricInterpretation == PHOTOMETRIC_PALETTE) && (TIFFIsTiled(tif) == 0))
     {
         uint16 *red, *green, *blue;
 

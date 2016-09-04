@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////
 //
-// Copyright (c) 2002, Industrial Light & Magic, a division of Lucas
+// Copyright (c) 2002-2012, Industrial Light & Magic, a division of Lucas
 // Digital Ltd. LLC
 // 
 // All rights reserved.
@@ -36,11 +36,12 @@
 
 //----------------------------------------------------------------------------
 //
-//	Specializations of the Vec2<T> and Vec3<T> templates.
+//      Specializations of the Vec2<T> and Vec3<T> templates.
 //
 //----------------------------------------------------------------------------
 
 #include "ImathVec.h"
+#include "ImathExport.h"
 
 #if (defined _WIN32 || defined _WIN64) && defined _MSC_VER
 // suppress exception specification warnings
@@ -48,7 +49,7 @@
 #endif
 
 
-namespace Imath {
+IMATH_INTERNAL_NAMESPACE_SOURCE_ENTER
 
 namespace
 {
@@ -60,16 +61,16 @@ normalizeOrThrow(Vec2<T> &v)
     int axis = -1;
     for (int i = 0; i < 2; i ++)
     {
-	if (v[i] != 0)
-	{
-	    if (axis != -1)
-	    {
-		throw IntVecNormalizeExc ("Cannot normalize an integer "
-					  "vector unless it is parallel "
-					  "to a principal axis");
-	    }
-	    axis = i;
-	}
+        if (v[i] != 0)
+        {
+            if (axis != -1)
+            {
+                throw IntVecNormalizeExc ("Cannot normalize an integer "
+                                          "vector unless it is parallel "
+                                          "to a principal axis");
+            }
+            axis = i;
+        }
     }
     v[axis] = (v[axis] > 0) ? 1 : -1;
     return true;
@@ -83,16 +84,39 @@ normalizeOrThrow(Vec3<T> &v)
     int axis = -1;
     for (int i = 0; i < 3; i ++)
     {
-	if (v[i] != 0)
-	{
-	    if (axis != -1)
-	    {
-		throw IntVecNormalizeExc ("Cannot normalize an integer "
-					  "vector unless it is parallel "
-					  "to a principal axis");
-	    }
-	    axis = i;
-	}
+        if (v[i] != 0)
+        {
+            if (axis != -1)
+            {
+                throw IntVecNormalizeExc ("Cannot normalize an integer "
+                                          "vector unless it is parallel "
+                                          "to a principal axis");
+            }
+            axis = i;
+        }
+    }
+    v[axis] = (v[axis] > 0) ? 1 : -1;
+    return true;
+}
+
+
+template<class T>
+bool
+normalizeOrThrow(Vec4<T> &v)
+{
+    int axis = -1;
+    for (int i = 0; i < 4; i ++)
+    {
+        if (v[i] != 0)
+        {
+            if (axis != -1)
+            {
+                throw IntVecNormalizeExc ("Cannot normalize an integer "
+                                          "vector unless it is parallel "
+                                          "to a principal axis");
+            }
+            axis = i;
+        }
     }
     v[axis] = (v[axis] > 0) ? 1 : -1;
     return true;
@@ -104,15 +128,17 @@ normalizeOrThrow(Vec3<T> &v)
 // Vec2<short>
 
 template <> 
+IMATH_EXPORT
 short
 Vec2<short>::length () const
 {
-    float lenF = Math<float>::sqrt (dot (*this));
+    float lenF = Math<float>::sqrt ((float)dot (*this));
     short lenS = (short) (lenF + 0.5f);
     return lenS;
 }
 
 template <>
+IMATH_EXPORT
 const Vec2<short> &
 Vec2<short>::normalize ()
 {
@@ -121,17 +147,19 @@ Vec2<short>::normalize ()
 }
 
 template <>
+IMATH_EXPORT
 const Vec2<short> &
-Vec2<short>::normalizeExc () throw (Iex::MathExc)
+Vec2<short>::normalizeExc () throw (IEX_NAMESPACE::MathExc)
 {
     if ((x == 0) && (y == 0))
-	throw NullVecExc ("Cannot normalize null vector.");
+        throw NullVecExc ("Cannot normalize null vector.");
 
     normalizeOrThrow<short>(*this);
     return *this;
 }
 
 template <>
+IMATH_EXPORT
 const Vec2<short> &
 Vec2<short>::normalizeNonNull ()
 {
@@ -140,6 +168,7 @@ Vec2<short>::normalizeNonNull ()
 }
 
 template <>
+IMATH_EXPORT
 Vec2<short>
 Vec2<short>::normalized () const
 {
@@ -149,11 +178,12 @@ Vec2<short>::normalized () const
 }
 
 template <>
+IMATH_EXPORT
 Vec2<short>
-Vec2<short>::normalizedExc () const throw (Iex::MathExc)
+Vec2<short>::normalizedExc () const throw (IEX_NAMESPACE::MathExc)
 {
     if ((x == 0) && (y == 0))
-	throw NullVecExc ("Cannot normalize null vector.");
+        throw NullVecExc ("Cannot normalize null vector.");
 
     Vec2<short> v(*this);
     normalizeOrThrow<short>(v);
@@ -161,6 +191,7 @@ Vec2<short>::normalizedExc () const throw (Iex::MathExc)
 }
 
 template <>
+IMATH_EXPORT
 Vec2<short>
 Vec2<short>::normalizedNonNull () const
 {
@@ -173,15 +204,17 @@ Vec2<short>::normalizedNonNull () const
 // Vec2<int>
 
 template <> 
+IMATH_EXPORT
 int
 Vec2<int>::length () const
 {
-    float lenF = Math<float>::sqrt (dot (*this));
+    float lenF = Math<float>::sqrt ((float)dot (*this));
     int lenI = (int) (lenF + 0.5f);
     return lenI;
 }
 
 template <>
+IMATH_EXPORT
 const Vec2<int> &
 Vec2<int>::normalize ()
 {
@@ -190,17 +223,19 @@ Vec2<int>::normalize ()
 }
 
 template <>
+IMATH_EXPORT
 const Vec2<int> &
-Vec2<int>::normalizeExc () throw (Iex::MathExc)
+Vec2<int>::normalizeExc () throw (IEX_NAMESPACE::MathExc)
 {
     if ((x == 0) && (y == 0))
-	throw NullVecExc ("Cannot normalize null vector.");
+        throw NullVecExc ("Cannot normalize null vector.");
 
     normalizeOrThrow<int>(*this);
     return *this;
 }
 
 template <>
+IMATH_EXPORT
 const Vec2<int> &
 Vec2<int>::normalizeNonNull ()
 {
@@ -209,6 +244,7 @@ Vec2<int>::normalizeNonNull ()
 }
 
 template <>
+IMATH_EXPORT
 Vec2<int>
 Vec2<int>::normalized () const
 {
@@ -218,11 +254,12 @@ Vec2<int>::normalized () const
 }
 
 template <>
+IMATH_EXPORT
 Vec2<int>
-Vec2<int>::normalizedExc () const throw (Iex::MathExc)
+Vec2<int>::normalizedExc () const throw (IEX_NAMESPACE::MathExc)
 {
     if ((x == 0) && (y == 0))
-	throw NullVecExc ("Cannot normalize null vector.");
+        throw NullVecExc ("Cannot normalize null vector.");
 
     Vec2<int> v(*this);
     normalizeOrThrow<int>(v);
@@ -230,6 +267,7 @@ Vec2<int>::normalizedExc () const throw (Iex::MathExc)
 }
 
 template <>
+IMATH_EXPORT
 Vec2<int>
 Vec2<int>::normalizedNonNull () const
 {
@@ -242,15 +280,17 @@ Vec2<int>::normalizedNonNull () const
 // Vec3<short>
 
 template <> 
+IMATH_EXPORT
 short
 Vec3<short>::length () const
 {
-    float lenF = Math<float>::sqrt (dot (*this));
+    float lenF = Math<float>::sqrt ((float)dot (*this));
     short lenS = (short) (lenF + 0.5f);
     return lenS;
 }
 
 template <>
+IMATH_EXPORT
 const Vec3<short> &
 Vec3<short>::normalize ()
 {
@@ -259,17 +299,19 @@ Vec3<short>::normalize ()
 }
 
 template <>
+IMATH_EXPORT
 const Vec3<short> &
-Vec3<short>::normalizeExc () throw (Iex::MathExc)
+Vec3<short>::normalizeExc () throw (IEX_NAMESPACE::MathExc)
 {
     if ((x == 0) && (y == 0) && (z == 0))
-	throw NullVecExc ("Cannot normalize null vector.");
+        throw NullVecExc ("Cannot normalize null vector.");
 
     normalizeOrThrow<short>(*this);
     return *this;
 }
 
 template <>
+IMATH_EXPORT
 const Vec3<short> &
 Vec3<short>::normalizeNonNull ()
 {
@@ -278,6 +320,7 @@ Vec3<short>::normalizeNonNull ()
 }
 
 template <>
+IMATH_EXPORT
 Vec3<short>
 Vec3<short>::normalized () const
 {
@@ -287,11 +330,12 @@ Vec3<short>::normalized () const
 }
 
 template <>
+IMATH_EXPORT
 Vec3<short>
-Vec3<short>::normalizedExc () const throw (Iex::MathExc)
+Vec3<short>::normalizedExc () const throw (IEX_NAMESPACE::MathExc)
 {
     if ((x == 0) && (y == 0) && (z == 0))
-	throw NullVecExc ("Cannot normalize null vector.");
+        throw NullVecExc ("Cannot normalize null vector.");
 
     Vec3<short> v(*this);
     normalizeOrThrow<short>(v);
@@ -299,6 +343,7 @@ Vec3<short>::normalizedExc () const throw (Iex::MathExc)
 }
 
 template <>
+IMATH_EXPORT
 Vec3<short>
 Vec3<short>::normalizedNonNull () const
 {
@@ -311,15 +356,17 @@ Vec3<short>::normalizedNonNull () const
 // Vec3<int>
 
 template <> 
+IMATH_EXPORT
 int
 Vec3<int>::length () const
 {
-    float lenF = Math<float>::sqrt (dot (*this));
+    float lenF = Math<float>::sqrt ((float)dot (*this));
     int lenI = (int) (lenF + 0.5f);
     return lenI;
 }
 
 template <>
+IMATH_EXPORT
 const Vec3<int> &
 Vec3<int>::normalize ()
 {
@@ -328,17 +375,19 @@ Vec3<int>::normalize ()
 }
 
 template <>
+IMATH_EXPORT
 const Vec3<int> &
-Vec3<int>::normalizeExc () throw (Iex::MathExc)
+Vec3<int>::normalizeExc () throw (IEX_NAMESPACE::MathExc)
 {
     if ((x == 0) && (y == 0) && (z == 0))
-	throw NullVecExc ("Cannot normalize null vector.");
+        throw NullVecExc ("Cannot normalize null vector.");
 
     normalizeOrThrow<int>(*this);
     return *this;
 }
 
 template <>
+IMATH_EXPORT
 const Vec3<int> &
 Vec3<int>::normalizeNonNull ()
 {
@@ -347,6 +396,7 @@ Vec3<int>::normalizeNonNull ()
 }
 
 template <>
+IMATH_EXPORT
 Vec3<int>
 Vec3<int>::normalized () const
 {
@@ -356,11 +406,12 @@ Vec3<int>::normalized () const
 }
 
 template <>
+IMATH_EXPORT
 Vec3<int>
-Vec3<int>::normalizedExc () const throw (Iex::MathExc)
+Vec3<int>::normalizedExc () const throw (IEX_NAMESPACE::MathExc)
 {
     if ((x == 0) && (y == 0) && (z == 0))
-	throw NullVecExc ("Cannot normalize null vector.");
+        throw NullVecExc ("Cannot normalize null vector.");
 
     Vec3<int> v(*this);
     normalizeOrThrow<int>(v);
@@ -368,6 +419,7 @@ Vec3<int>::normalizedExc () const throw (Iex::MathExc)
 }
 
 template <>
+IMATH_EXPORT
 Vec3<int>
 Vec3<int>::normalizedNonNull () const
 {
@@ -377,4 +429,155 @@ Vec3<int>::normalizedNonNull () const
 }
 
 
-} // namespace Imath
+// Vec4<short>
+
+template <> 
+IMATH_EXPORT
+short
+Vec4<short>::length () const
+{
+    float lenF = Math<float>::sqrt ((float)dot (*this));
+    short lenS = (short) (lenF + 0.5f);
+    return lenS;
+}
+
+template <>
+IMATH_EXPORT
+const Vec4<short> &
+Vec4<short>::normalize ()
+{
+    normalizeOrThrow<short>(*this);
+    return *this;
+}
+
+template <>
+IMATH_EXPORT
+const Vec4<short> &
+Vec4<short>::normalizeExc () throw (IEX_NAMESPACE::MathExc)
+{
+    if ((x == 0) && (y == 0) && (z == 0) && (w == 0))
+        throw NullVecExc ("Cannot normalize null vector.");
+
+    normalizeOrThrow<short>(*this);
+    return *this;
+}
+
+template <>
+IMATH_EXPORT
+const Vec4<short> &
+Vec4<short>::normalizeNonNull ()
+{
+    normalizeOrThrow<short>(*this);
+    return *this;
+}
+
+template <>
+IMATH_EXPORT
+Vec4<short>
+Vec4<short>::normalized () const
+{
+    Vec4<short> v(*this);
+    normalizeOrThrow<short>(v);
+    return v;
+}
+
+template <>
+IMATH_EXPORT
+Vec4<short>
+Vec4<short>::normalizedExc () const throw (IEX_NAMESPACE::MathExc)
+{
+    if ((x == 0) && (y == 0) && (z == 0) && (w == 0))
+        throw NullVecExc ("Cannot normalize null vector.");
+
+    Vec4<short> v(*this);
+    normalizeOrThrow<short>(v);
+    return v;
+}
+
+template <>
+IMATH_EXPORT
+Vec4<short>
+Vec4<short>::normalizedNonNull () const
+{
+    Vec4<short> v(*this);
+    normalizeOrThrow<short>(v);
+    return v;
+}
+
+
+// Vec4<int>
+
+template <> 
+IMATH_EXPORT
+int
+Vec4<int>::length () const
+{
+    float lenF = Math<float>::sqrt ((float)dot (*this));
+    int lenI = (int) (lenF + 0.5f);
+    return lenI;
+}
+
+template <>
+IMATH_EXPORT
+const Vec4<int> &
+Vec4<int>::normalize ()
+{
+    normalizeOrThrow<int>(*this);
+    return *this;
+}
+
+template <>
+IMATH_EXPORT
+const Vec4<int> &
+Vec4<int>::normalizeExc () throw (IEX_NAMESPACE::MathExc)
+{
+    if ((x == 0) && (y == 0) && (z == 0) && (w == 0))
+        throw NullVecExc ("Cannot normalize null vector.");
+
+    normalizeOrThrow<int>(*this);
+    return *this;
+}
+
+template <>
+IMATH_EXPORT
+const Vec4<int> &
+Vec4<int>::normalizeNonNull ()
+{
+    normalizeOrThrow<int>(*this);
+    return *this;
+}
+
+template <>
+IMATH_EXPORT
+Vec4<int>
+Vec4<int>::normalized () const
+{
+    Vec4<int> v(*this);
+    normalizeOrThrow<int>(v);
+    return v;
+}
+
+template <>
+IMATH_EXPORT
+Vec4<int>
+Vec4<int>::normalizedExc () const throw (IEX_NAMESPACE::MathExc)
+{
+    if ((x == 0) && (y == 0) && (z == 0) && (w == 0))
+        throw NullVecExc ("Cannot normalize null vector.");
+
+    Vec4<int> v(*this);
+    normalizeOrThrow<int>(v);
+    return v;
+}
+
+template <>
+IMATH_EXPORT
+Vec4<int>
+Vec4<int>::normalizedNonNull () const
+{
+    Vec4<int> v(*this);
+    normalizeOrThrow<int>(v);
+    return v;
+}
+
+IMATH_INTERNAL_NAMESPACE_SOURCE_EXIT

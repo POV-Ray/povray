@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -31,7 +31,7 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
 #include <boost/thread.hpp>
 #include <boost/bind.hpp>
@@ -41,26 +41,29 @@
 #include "backend/frame.h"
 #include "backend/scene/view.h"
 
+#include "base/path.h"
+#include "base/timer.h"
+
+#include "core/lighting/photons.h"
+#include "core/lighting/radiosity.h"
+#include "core/math/matrix.h"
+#include "core/support/octree.h"
+
+#include "vm/fnpovfpu.h"
+
+#include "povms/povmscpp.h"
+#include "povms/povmsid.h"
+
 #include "backend/control/renderbackend.h"
 #include "backend/lighting/photonestimationtask.h"
-#include "backend/lighting/photons.h"
 #include "backend/lighting/photonshootingstrategy.h"
 #include "backend/lighting/photonshootingtask.h"
 #include "backend/lighting/photonsortingtask.h"
 #include "backend/lighting/photonstrategytask.h"
-#include "backend/lighting/radiosity.h"
-#include "backend/math/matrices.h"
 #include "backend/render/radiositytask.h"
 #include "backend/render/tracetask.h"
-#include "backend/scene/scene.h"
-#include "backend/scene/threaddata.h"
-#include "backend/support/octree.h"
-
-#include "base/path.h"
-#include "base/povms.h"
-#include "base/povmscpp.h"
-#include "base/povmsgid.h"
-#include "base/timer.h"
+#include "backend/scene/backendscenedata.h"
+#include "backend/scene/viewthreaddata.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -80,7 +83,7 @@ inline unsigned int MakePowerOfTwo(unsigned int i)
     return 1 << ii;
 }
 
-ViewData::ViewData(shared_ptr<SceneData> sd) :
+ViewData::ViewData(shared_ptr<BackendSceneData> sd) :
     nextBlock(0),
     completedFirstPass(false),
     highestTraceLevel(0),
@@ -387,7 +390,7 @@ void ViewData::CompletedRectangle(const POVRect& rect, unsigned int serial, cons
 {
     if (realTimeRaytracing == true)
     {
-        assert(pixels.size() == rect.GetArea());
+        POV_RTR_ASSERT(pixels.size() == rect.GetArea());
         int y = rect.top - 1;
         int x = rect.right;
         int offset;
@@ -395,7 +398,7 @@ void ViewData::CompletedRectangle(const POVRect& rect, unsigned int serial, cons
         {
             if (++x > rect.right)
                 offset = (++y * width + (x = rect.left)) * 5;
-            assert(rtrData->rtrPixels.size() >= offset + 5);
+            POV_RTR_ASSERT(rtrData->rtrPixels.size() >= offset + 5);
             rtrData->rtrPixels[offset++] = i->red();
             rtrData->rtrPixels[offset++] = i->green();
             rtrData->rtrPixels[offset++] = i->blue();
@@ -564,7 +567,7 @@ RadiosityCache& ViewData::GetRadiosityCache()
     return radiosityCache;
 }
 
-View::View(shared_ptr<SceneData> sd, unsigned int width, unsigned int height, RenderBackend::ViewId vid) :
+View::View(shared_ptr<BackendSceneData> sd, unsigned int width, unsigned int height, RenderBackend::ViewId vid) :
     viewData(sd),
     stopRequsted(false),
     mailbox(0),
@@ -626,7 +629,7 @@ bool View::CheckCameraHollowObject(const Vector3d& point, const BBOX_TREE *node)
 
 bool View::CheckCameraHollowObject(const Vector3d& point)
 {
-    shared_ptr<SceneData>& sd = viewData.GetSceneData();
+    shared_ptr<BackendSceneData>& sd = viewData.GetSceneData();
 
     if(sd->boundingMethod == 2)
     {
@@ -676,11 +679,7 @@ void View::StartRender(POVMS_Object& renderOptions)
     shared_ptr<ViewData::BlockIdSet> blockskiplist(new ViewData::BlockIdSet());
 
     if(renderControlThread == NULL)
-#ifndef USE_OFFICIAL_BOOST
-        renderControlThread = new thread(boost::bind(&View::RenderControlThread, this), 1024 * 64);
-#else
-        renderControlThread = new boost::thread(boost::bind(&View::RenderControlThread, this));
-#endif
+        renderControlThread = Task::NewBoostThread(boost::bind(&View::RenderControlThread, this), 1024 * 64);
 
     viewData.qualityFlags = QualityFlags(clip(renderOptions.TryGetInt(kPOVAttrib_Quality, 9), 0, 9));
 
@@ -1289,7 +1288,7 @@ void View::GetStatistics(POVMS_Object& renderStats)
         TimeData() : cpuTime(0), realTime(0), samples(0) { }
     };
 
-    TimeData timeData[SceneThreadData::kMaxTimeType];
+    TimeData timeData[TraceThreadData::kMaxTimeType];
 
     for(vector<ViewThreadData *>::iterator i(viewThreadData.begin()); i != viewThreadData.end(); i++)
     {
@@ -1298,7 +1297,7 @@ void View::GetStatistics(POVMS_Object& renderStats)
         timeData[(*i)->timeType].samples++;
     }
 
-    for(size_t i = SceneThreadData::kUnknownTime; i < SceneThreadData::kMaxTimeType; i++)
+    for(size_t i = TraceThreadData::kUnknownTime; i < TraceThreadData::kMaxTimeType; i++)
     {
         if(timeData[i].samples > 0)
         {
@@ -1310,13 +1309,13 @@ void View::GetStatistics(POVMS_Object& renderStats)
 
             switch(i)
             {
-                case SceneThreadData::kPhotonTime:
+                case TraceThreadData::kPhotonTime:
                     renderStats.Set(kPOVAttrib_PhotonTime, elapsedTime);
                     break;
-                case SceneThreadData::kRadiosityTime:
+                case TraceThreadData::kRadiosityTime:
                     renderStats.Set(kPOVAttrib_RadiosityTime, elapsedTime);
                     break;
-                case SceneThreadData::kRenderTime:
+                case TraceThreadData::kRenderTime:
                     renderStats.Set(kPOVAttrib_TraceTime, elapsedTime);
                     break;
             }

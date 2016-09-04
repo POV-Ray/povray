@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -42,7 +42,7 @@
 #include <vector>
 // FIXME #include <xmemory>
 
-#include "povmscpp.h"
+#include "povms/povmscpp.h"
 
 namespace pov_base
 {
@@ -63,11 +63,11 @@ class vfeTimer
         bool HasValidCPUTime() const;
 
     private:
-        unsigned POV_LONG GetWallTime (void) const ;
-        unsigned POV_LONG GetCPUTime (void) const ;
+        POV_ULONG GetWallTime (void) const ;
+        POV_ULONG GetCPUTime (void) const ;
 
-        unsigned POV_LONG m_WallTimeStart ;
-        unsigned POV_LONG m_CPUTimeStart ;
+        POV_ULONG m_WallTimeStart ;
+        POV_ULONG m_CPUTimeStart ;
         bool m_ThreadTimeOnly ;
         void *m_ThreadHandle ;
         bool m_IsNT ;

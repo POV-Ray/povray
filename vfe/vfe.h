@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -40,23 +40,25 @@
 
 #include <cassert>
 
-#include "syspovconfigfrontend.h"
 #include <boost/format.hpp>
-#include <boost/thread.hpp>
-#include <boost/thread/condition.hpp>
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
-#include "base/povms.h"
-#include "base/povmsgid.h"
+
+#include "povms/povmscpp.h"
+#include "povms/povmsid.h"
+
 #include "base/platformbase.h"
 #include "base/timer.h"
 #include "base/image/colourspace.h"
+
 #include "frontend/console.h"
 #include "frontend/simplefrontend.h"
 #include "frontend/processrenderoptions.h"
-#include "vfesession.h"
+
+#include "syspovconfigfrontend.h"
 #include "vfeplatform.h"
 #include "vfepovms.h"
+#include "vfesession.h"
 
 namespace vfe
 {
@@ -119,9 +121,6 @@ namespace vfe
       vfePlatformBase(vfeSession& session);
       virtual ~vfePlatformBase();
 
-      virtual pov_base::IStream *CreateIStream(const unsigned int stype);
-      virtual pov_base::OStream *CreateOStream(const unsigned int stype);
-
       virtual UCS2String GetTemporaryPath(void);
       virtual UCS2String CreateTemporaryFile(void);
       virtual void DeleteTemporaryFile(const UCS2String& filename);
@@ -176,7 +175,6 @@ namespace vfe
       virtual int ReadSpecialOptionHandler(INI_Parser_Table *, char *, POVMSObjectPtr);
       virtual int ReadSpecialSwitchHandler(Cmd_Parser_Table *, char *, POVMSObjectPtr, bool);
       virtual int WriteSpecialOptionHandler(INI_Parser_Table *, POVMSObjectPtr, OTextStream *);
-      virtual bool WriteOptionFilter(INI_Parser_Table *);
       virtual int ProcessUnknownString(char *, POVMSObjectPtr);
       virtual ITextStream *OpenFileForRead(const char *, POVMSObjectPtr);
       virtual OTextStream *OpenFileForWrite(const char *, POVMSObjectPtr);

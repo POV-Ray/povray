@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -40,8 +40,8 @@
 #pragma warning(disable : 4267)
 #endif
 
-#include "frame.h"
-#include "povray.h"
+#include "backend/frame.h"
+#include "backend/povray.h"
 #include "vfe.h"
 
 // this must be the last file included
@@ -227,16 +227,6 @@ vfePlatformBase::vfePlatformBase(vfeSession& session) : m_Session(&session), Pla
 
 vfePlatformBase::~vfePlatformBase()
 {
-}
-
-IStream *vfePlatformBase::CreateIStream(const unsigned int stype)
-{
-  return (new IStream (stype)) ;
-}
-
-OStream *vfePlatformBase::CreateOStream(const unsigned int stype)
-{
-  return (new OStream (stype)) ;
 }
 
 UCS2String vfePlatformBase::GetTemporaryPath(void)
@@ -514,11 +504,6 @@ int vfeProcessRenderOptions::ReadSpecialSwitchHandler(Cmd_Parser_Table *Table, c
 int vfeProcessRenderOptions::WriteSpecialOptionHandler(INI_Parser_Table *Table, POVMSObjectPtr Obj, OTextStream *S)
 {
   return ProcessRenderOptions::WriteSpecialOptionHandler (Table, Obj, S);
-}
-
-bool vfeProcessRenderOptions::WriteOptionFilter(INI_Parser_Table *Table)
-{
-  return ProcessRenderOptions::WriteOptionFilter (Table);
 }
 
 int vfeProcessRenderOptions::ProcessUnknownString(char *String, POVMSObjectPtr Obj)
@@ -920,22 +905,23 @@ State VirtualFrontEnd::Process()
         m_Session->SetSucceeded (false);
         if (animationProcessing != NULL)
         {
-          shelloutProcessing->SetFrameClock(animationProcessing->GetFrameNumber(), animationProcessing->GetClockValue());
+          shelloutProcessing->SetFrameClock(animationProcessing->GetNominalFrameNumber(), animationProcessing->GetClockValue());
           if (shelloutProcessing->SkipNextFrame() == false)
           {
             UCS2String filename;
-            int frame = animationProcessing->GetFrameNumber() - animationProcessing->GetStartFrame() ;
+            int frameId = animationProcessing->GetNominalFrameNumber();
+            int frame = animationProcessing->GetRunningFrameNumber();
             options = animationProcessing->GetFrameRenderOptions ();
             if (m_Session->OutputToFileSet())
             {
-              filename = imageProcessing->GetOutputFilename (options, animationProcessing->GetFrameNumber(), animationProcessing->GetFrameNumberDigits());
+              filename = imageProcessing->GetOutputFilename (options, frameId, animationProcessing->GetFrameNumberDigits());
               options.SetUCS2String (kPOVAttrib_OutputFile, filename.c_str());
 
               // test access permission now to avoid surprise later after waiting for
               // the render to complete.
               if (m_Session->TestAccessAllowed(filename, true) == false)
               {
-                string str ("IO Restrictions prohibit write access to '") ;
+                string str ("IO Restrictions prohibit write access to '");
                 str += UCS2toASCIIString(filename);
                 str += "'";
                 throw POV_EXCEPTION(kCannotOpenFileErr, str);
@@ -943,7 +929,7 @@ State VirtualFrontEnd::Process()
               shelloutProcessing->SetOutputFile(UCS2toASCIIString(filename));
               m_Session->AdviseOutputFilename (filename);
             }
-            m_Session->AppendAnimationStatus (frame + 1, animationProcessing->GetTotalFrames(), filename) ;
+            m_Session->AppendAnimationStatus (frameId, frame, animationProcessing->GetTotalFramesToRender(), filename);
           }
         }
 
@@ -1163,7 +1149,7 @@ State VirtualFrontEnd::Process()
             if (animationProcessing != NULL)
             {
               if (m_Session->OutputToFileSet())
-                m_Session->AdviseOutputFilename (imageProcessing->WriteImage(options, animationProcessing->GetFrameNumber(), animationProcessing->GetFrameNumberDigits()));
+                m_Session->AdviseOutputFilename (imageProcessing->WriteImage(options, animationProcessing->GetNominalFrameNumber(), animationProcessing->GetFrameNumberDigits()));
               m_Session->AdviseFrameCompleted();
             }
             else

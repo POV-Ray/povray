@@ -67,7 +67,6 @@ void mem_mark (void);
 void mem_release (void);
 void mem_release_all (void);
 void *pov_malloc (size_t size, const char *file, int line, const char *msg);
-void *pov_calloc (size_t nitems, size_t size, const char *file, int line, const char *msg);
 void *pov_realloc (void *ptr, size_t size, const char *file, int line, const char *msg);
 void pov_free (void *ptr, const char *file, int line);
 char *pov_strdup (const char *s);

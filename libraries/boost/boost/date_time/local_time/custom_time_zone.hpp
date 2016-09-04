@@ -2,10 +2,10 @@
 #define LOCAL_TIME_CUSTOM_TIME_ZONE_HPP__
 
 /* Copyright (c) 2003-2005 CrystalClear Software, Inc.
- * Subject to the Boost Software License, Version 1.0. 
+ * Subject to the Boost Software License, Version 1.0.
  * (See accompanying file LICENSE_1_0.txt or http://www.boost.org/LICENSE_1_0.txt)
  * Author: Jeff Garland, Bart Garst
- * $Date: 2008-02-27 15:00:24 -0500 (Wed, 27 Feb 2008) $
+ * $Date$
  */
 
 #include "boost/date_time/time_zone_base.hpp"
@@ -34,8 +34,8 @@ namespace local_time {
     typedef typename base_type::stringstream_type stringstream_type;
     typedef date_time::time_zone_names_base<CharT> time_zone_names;
     typedef CharT char_type;
-    
-    custom_time_zone_base(const time_zone_names& zone_names,   
+
+    custom_time_zone_base(const time_zone_names& zone_names,
                      const time_duration_type& utc_offset,
                      const dst_adjustment_offsets& dst_shift,
                      boost::shared_ptr<dst_calc_rule> calc_rule) :
@@ -43,8 +43,8 @@ namespace local_time {
       base_utc_offset_(utc_offset),
       dst_offsets_(dst_shift),
       dst_calc_rules_(calc_rule)
-    {};
-    virtual ~custom_time_zone_base() {};
+    {}
+    virtual ~custom_time_zone_base() {}
     virtual string_type dst_zone_abbrev() const
     {
       return zone_names_.dst_zone_abbrev();
@@ -64,7 +64,7 @@ namespace local_time {
     //! True if zone uses daylight savings adjustments
     virtual bool has_dst() const
     {
-      return (dst_calc_rules_); //if calc_rule is set the tz has dst
+      return (bool) dst_calc_rules_; //if calc_rule is set the tz has dst
     }
     //! Local time that DST starts -- NADT if has_dst is false
     virtual posix_time::ptime dst_local_start_time(gregorian::greg_year y) const

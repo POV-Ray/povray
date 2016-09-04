@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -42,10 +42,6 @@
 // POVMS support
 /////////////////////////////////////////////////////////////
 
-#define POVMSLong                             POV_LONG
-#define POVMSBool                             bool
-#define POVMSAddress                          void *
-#define POVMSInvalidAddress                   NULL
 #define POVMS_Sys_Thread_Type                 unsigned long
 
 #include <string>
@@ -55,8 +51,8 @@ namespace vfe
 {
   typedef struct SysQDataNode POVMS_Sys_QueueDataNode ;
   typedef class SysQNode POVMS_Sys_QueueNode ;
-  POVMSAddress vfe_POVMS_Sys_QueueToAddress (POVMS_Sys_QueueNode *q) ;
-  POVMS_Sys_QueueNode *vfe_POVMS_Sys_AddressToQueue (POVMSAddress a) ;
+  void* /*POVMSAddress*/ vfe_POVMS_Sys_QueueToAddress (POVMS_Sys_QueueNode *q) ;
+  POVMS_Sys_QueueNode *vfe_POVMS_Sys_AddressToQueue (void* /*POVMSAddress*/ a) ;
   POVMS_Sys_QueueNode *vfe_POVMS_Sys_QueueOpen (void) ;
   void vfe_POVMS_Sys_QueueClose (POVMS_Sys_QueueNode *q) ;
   void *vfe_POVMS_Sys_QueueReceive (POVMS_Sys_QueueNode *q, int *l, bool, bool) ;
@@ -69,34 +65,7 @@ namespace vfe
   void vfeAssert (const char *message, const char *filename, int line) ;
   FILE *vfeFOpen (const std::basic_string<unsigned short>& name, const char *mode);
   bool vfeRemove (const std::basic_string<unsigned short>& name);
-
-#if defined _DEBUG
-  void *vfe_POVMS_Sys_Malloc(size_t size, const char *func, const char *file, int line) ;
-  void *vfe_POVMS_Sys_Calloc(size_t nitems, size_t size, const char *func, const char *file, int line) ;
-  void *vfe_POVMS_Sys_Realloc(void *ptr, size_t size, const char *func, const char *file, int line) ;
-  void vfe_POVMS_Sys_Free(void *ptr, const char *func, const char *file, int line) ;
-  void *vfe_POVMS_Sys_Malloc(size_t size) ;
-  void *vfe_POVMS_Sys_Calloc(size_t nitems, size_t size) ;
-  void *vfe_POVMS_Sys_Realloc(void *ptr, size_t size) ;
-  void vfe_POVMS_Sys_Free(void *ptr) ;
-#endif
 }
-
-// TODO: move these POVMS_Sys_* memory functions to their own heap
-#ifndef _DEBUG
-  #define POVMS_Sys_Malloc(s)                 malloc(s)
-  #define POVMS_Sys_Calloc(m,s)               calloc(m,s)
-  #define POVMS_Sys_Realloc(p,s)              realloc(p,s)
-  #define POVMS_Sys_Free(p)                   free(p)
-#else
-  // a long timeout so we can break into the debugger
-  #define kDefaultTimeout                     100
-
-  #define POVMS_Sys_Malloc(s)                 vfe::vfe_POVMS_Sys_Malloc(s, __FUNCTION__, __FILE__, __LINE__)
-  #define POVMS_Sys_Calloc(m,s)               vfe::vfe_POVMS_Sys_Calloc(m,s, __FUNCTION__, __FILE__, __LINE__)
-  #define POVMS_Sys_Realloc(p,s)              vfe::vfe_POVMS_Sys_Realloc(p,s, __FUNCTION__, __FILE__, __LINE__)
-  #define POVMS_Sys_Free(p)                   vfe::vfe_POVMS_Sys_Free(p, __FUNCTION__, __FILE__, __LINE__)
-#endif
 
 #define USE_SYSPROTO                          1
 #define POV_DELAY_IMPLEMENTED                 1
@@ -119,15 +88,5 @@ namespace vfe
 #define POV_ALLOW_FILE_WRITE(f,t)             vfe::Allow_File_Write(f,t)
 #define POV_UCS2_FOPEN(n,m)                   vfe::vfeFOpen(n,m)
 #define POV_UCS2_REMOVE(n)                    vfe::vfeRemove(n)
-
-#ifndef SetPOVMSLong
-  #define SetPOVMSLong(v,h,l)                 *v = (((((POVMSLong)(h)) & 0x00000000ffffffff) << 32) | (((POVMSLong)(l)) & 0x00000000ffffffff))
-#endif
-#ifndef GetPOVMSLong
-  #define GetPOVMSLong(h,l,v)                 *h = ((v) >> 32) & 0x00000000ffffffff; *l = (v) & 0x00000000ffffffff
-#endif
-#ifndef POVMSLongToCDouble
-  #define POVMSLongToCDouble(x)               double(x)
-#endif
 
 #endif // __VFECONF_H__

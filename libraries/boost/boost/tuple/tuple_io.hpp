@@ -13,21 +13,10 @@
 #ifndef BOOST_TUPLE_IO_HPP
 #define BOOST_TUPLE_IO_HPP
 
-
-// add to boost/config.hpp
-// for now
-# if defined __GNUC__
-#   if (__GNUC__ == 2 && __GNUC_MINOR__ <= 97) 
-#define BOOST_NO_TEMPLATED_STREAMS
-#endif
-#endif // __GNUC__
-
-#if defined BOOST_NO_TEMPLATED_STREAMS
-#include <iostream>
-#else 
 #include <istream>
 #include <ostream>
-#endif  
+
+#include <sstream>
 
 #include "boost/tuple/tuple.hpp"
 
@@ -74,25 +63,6 @@ private:
 
 public:
 
-#if defined (BOOST_NO_TEMPLATED_STREAMS)
-   static char get_manipulator(std::ios& i, manipulator_type m) {
-     char c = static_cast<char>(i.iword(get_stream_index(m))); 
-     
-     // parentheses and space are the default manipulators
-     if (!c) {
-       switch(m) {
-         case detail::format_info::open : c = '('; break;
-         case detail::format_info::close : c = ')'; break;
-         case detail::format_info::delimiter : c = ' '; break;
-       }
-     }
-     return c;
-   }
-
-   static void set_manipulator(std::ios& i, manipulator_type m, char c) {
-      i.iword(get_stream_index(m)) = static_cast<long>(c);
-   }
-#else
    template<class CharType, class CharTrait>
    static CharType get_manipulator(std::basic_ios<CharType, CharTrait>& i, 
                                    manipulator_type m) {
@@ -122,7 +92,6 @@ public:
      // convertible long.
       i.iword(get_stream_index(m)) = static_cast<long>(c);
    }
-#endif // BOOST_NO_TEMPLATED_STREAMS
 };
 
 } // end of namespace detail
@@ -136,39 +105,12 @@ public:
                              const char c = 0)
      : mt(m), f_c(c) {}
   
-#if defined (BOOST_NO_TEMPLATED_STREAMS)
-  void set(std::ios &io) const {
-     detail::format_info::set_manipulator(io, mt, f_c);
-  }
-#else
-#if defined(BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION)
-   template<class CharType2, class CharTrait>
-  void set(std::basic_ios<CharType2, CharTrait> &io) const {
-     detail::format_info::set_manipulator(io, mt, f_c);
-  }
-#else
    template<class CharTrait>
   void set(std::basic_ios<CharType, CharTrait> &io) const {
      detail::format_info::set_manipulator(io, mt, f_c);
   }
-#endif // BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION
-#endif // BOOST_NO_TEMPLATED_STREAMS
 };
 
-#if defined (BOOST_NO_TEMPLATED_STREAMS)
-inline std::ostream&
-operator<<(std::ostream& o, const tuple_manipulator<char>& m) {
-  m.set(o);
-  return o;
-}
-
-inline std::istream&
-operator>>(std::istream& i, const tuple_manipulator<char>& m) {
-  m.set(i);
-  return i;
-}
-
-#else
 
 template<class CharType, class CharTrait>
 inline std::basic_ostream<CharType, CharTrait>&
@@ -184,7 +126,6 @@ operator>>(std::basic_istream<CharType, CharTrait>& i, const tuple_manipulator<C
   return i;
 }
 
-#endif   // BOOST_NO_TEMPLATED_STREAMS
    
 template<class CharType>
 inline tuple_manipulator<CharType> set_open(const CharType c) {
@@ -215,46 +156,12 @@ namespace detail {
 // Note: The order of the print functions is critical 
 // to let a conforming compiler  find and select the correct one.
 
-#if defined (BOOST_NO_TEMPLATED_STREAMS)
 
-#if !defined(BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION)
-template<class T1>
-inline std::ostream& print(std::ostream& o, const cons<T1, null_type>& t) {
-  return o << t.head;
-}
-#endif // BOOST_NO_TEMPLATED_STREAMS
- 
-inline std::ostream& print(std::ostream& o, const null_type&) { return o; }
-
-template<class T1, class T2>
-inline std::ostream& 
-print(std::ostream& o, const cons<T1, T2>& t) {
-  
-  const char d = format_info::get_manipulator(o, format_info::delimiter);
-   
-  o << t.head;
-
-#if defined(BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION)
-  if (tuples::length<T2>::value == 0)
-    return o;
-#endif  // BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION
-  o << d;
-  
-  return print(o, t.tail );
-
-}
-
-
-
-#else
-
-#if !defined(BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION)
 template<class CharType, class CharTrait, class T1>
 inline std::basic_ostream<CharType, CharTrait>& 
 print(std::basic_ostream<CharType, CharTrait>& o, const cons<T1, null_type>& t) {
   return o << t.head;
 }
-#endif  // !BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION
 
  
 template<class CharType, class CharTrait>
@@ -271,60 +178,38 @@ print(std::basic_ostream<CharType, CharTrait>& o, const cons<T1, T2>& t) {
    
   o << t.head;
 
-#if defined(BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION)
-  if (tuples::length<T2>::value == 0)
-    return o;
-#endif  // BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION
   o << d;
 
   return print(o, t.tail);
 }
 
-#endif  // BOOST_NO_TEMPLATED_STREAMS
+template<class CharT, class Traits, class T>
+inline bool handle_width(std::basic_ostream<CharT, Traits>& o, const T& t) {
+    std::streamsize width = o.width();
+    if(width == 0) return false;
+
+    std::basic_ostringstream<CharT, Traits> ss;
+
+    ss.copyfmt(o);
+    ss.tie(0);
+    ss.width(0);
+
+    ss << t;
+    o << ss.str();
+
+    return true;
+}
+
 
 } // namespace detail
 
-#if defined (BOOST_NO_TEMPLATED_STREAMS)
-
-inline std::ostream& operator<<(std::ostream& o, const null_type& t) {
-  if (!o.good() ) return o;
- 
-  const char l = 
-    detail::format_info::get_manipulator(o, detail::format_info::open);
-  const char r = 
-    detail::format_info::get_manipulator(o, detail::format_info::close);
-   
-  o << l;
-  o << r;
-
-  return o;
-}
-
-template<class T1, class T2>
-inline std::ostream& operator<<(std::ostream& o, const cons<T1, T2>& t) {
-  if (!o.good() ) return o;
- 
-  const char l = 
-    detail::format_info::get_manipulator(o, detail::format_info::open);
-  const char r = 
-    detail::format_info::get_manipulator(o, detail::format_info::close);
-   
-  o << l;
-  
-  detail::print(o, t);  
-
-  o << r;
-
-  return o;
-}
-
-#else
 
 template<class CharType, class CharTrait>
 inline std::basic_ostream<CharType, CharTrait>& 
 operator<<(std::basic_ostream<CharType, CharTrait>& o, 
            const null_type& t) {
   if (!o.good() ) return o;
+  if (detail::handle_width(o, t)) return o;
  
   const CharType l = 
     detail::format_info::get_manipulator(o, detail::format_info::open);
@@ -342,6 +227,7 @@ inline std::basic_ostream<CharType, CharTrait>&
 operator<<(std::basic_ostream<CharType, CharTrait>& o, 
            const cons<T1, T2>& t) {
   if (!o.good() ) return o;
+  if (detail::handle_width(o, t)) return o;
  
   const CharType l = 
     detail::format_info::get_manipulator(o, detail::format_info::open);
@@ -356,7 +242,6 @@ operator<<(std::basic_ostream<CharType, CharTrait>& o,
 
   return o;
 }
-#endif // BOOST_NO_TEMPLATED_STREAMS
 
    
 // -------------------------------------------------------------
@@ -364,97 +249,6 @@ operator<<(std::basic_ostream<CharType, CharTrait>& o,
 
 namespace detail {
 
-#if defined (BOOST_NO_TEMPLATED_STREAMS)
-
-inline std::istream& 
-extract_and_check_delimiter(
-  std::istream& is, format_info::manipulator_type del)
-{
-  const char d = format_info::get_manipulator(is, del);
-
-#if defined (BOOST_NO_STD_LOCALE)
-  const bool is_delimiter = !isspace(d);
-#else
-  const bool is_delimiter = (!std::isspace(d, is.getloc()) );            
-#endif
-
-  char c;
-  if (is_delimiter) { 
-    is >> c; 
-    if (is.good() && c!=d) {
-      is.setstate(std::ios::failbit);
-    } 
-  }
-  return is;
-}
-
-
-// Note: The order of the read functions is critical to let a 
-// (conforming?) compiler find and select the correct one.
-
-#if !defined(BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION)
-template<class T1>
-inline  std::istream & 
-read (std::istream &is, cons<T1, null_type>& t1) {
-
-  if (!is.good()) return is;   
-   
-  return is >> t1.head ;
-}
-#else
-inline std::istream& read(std::istream& i, const null_type&) { return i; }
-#endif // !BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION
-   
-template<class T1, class T2>
-inline std::istream& 
-read(std::istream &is, cons<T1, T2>& t1) {
-
-  if (!is.good()) return is;
-   
-  is >> t1.head;
-
-#if defined(BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION)
-  if (tuples::length<T2>::value == 0)
-    return is;
-#endif  // BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION
-
-  extract_and_check_delimiter(is, format_info::delimiter);
-
-  return read(is, t1.tail);
-}
-
-} // end namespace detail
-
-inline std::istream& 
-operator>>(std::istream &is, null_type&) {
-
-  if (!is.good() ) return is;
-
-  detail::extract_and_check_delimiter(is, detail::format_info::open);
-  detail::extract_and_check_delimiter(is, detail::format_info::close);
-
-  return is;
-}
-
-
-template<class T1, class T2>
-inline std::istream& 
-operator>>(std::istream& is, cons<T1, T2>& t1) {
-
-  if (!is.good() ) return is;
-
-  detail::extract_and_check_delimiter(is, detail::format_info::open);
-                      
-  detail::read(is, t1);
-   
-  detail::extract_and_check_delimiter(is, detail::format_info::close);
-
-  return is;
-}
-
-
-
-#else
 
 template<class CharType, class CharTrait>
 inline std::basic_istream<CharType, CharTrait>& 
@@ -478,12 +272,13 @@ extract_and_check_delimiter(
     if (is.good() && c!=d) { 
       is.setstate(std::ios::failbit);
     }
+  } else {
+    is >> std::ws;
   }
   return is;
 }
 
    
-#if !defined(BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION)
 template<class CharType, class CharTrait, class T1>
 inline  std::basic_istream<CharType, CharTrait> & 
 read (std::basic_istream<CharType, CharTrait> &is, cons<T1, null_type>& t1) {
@@ -492,12 +287,6 @@ read (std::basic_istream<CharType, CharTrait> &is, cons<T1, null_type>& t1) {
    
   return is >> t1.head; 
 }
-#else
-template<class CharType, class CharTrait>
-inline std::basic_istream<CharType, CharTrait>& 
-read(std::basic_istream<CharType, CharTrait>& i, const null_type&) { return i; }
-
-#endif // !BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION
 
 template<class CharType, class CharTrait, class T1, class T2>
 inline std::basic_istream<CharType, CharTrait>& 
@@ -507,10 +296,6 @@ read(std::basic_istream<CharType, CharTrait> &is, cons<T1, T2>& t1) {
    
   is >> t1.head;
 
-#if defined(BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION)
-  if (tuples::length<T2>::value == 0)
-    return is;
-#endif  // BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION
 
   extract_and_check_delimiter(is, format_info::delimiter);
 
@@ -547,7 +332,6 @@ operator>>(std::basic_istream<CharType, CharTrait>& is, cons<T1, T2>& t1) {
   return is;
 }
 
-#endif // BOOST_NO_TEMPLATED_STREAMS
 
 } // end of namespace tuples
 } // end of namespace boost

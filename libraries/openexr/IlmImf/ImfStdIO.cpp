@@ -28,7 +28,7 @@
 // DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.67
 //
 ///////////////////////////////////////////////////////////////////////////
 
@@ -45,8 +45,10 @@
 #include <errno.h>
 
 using namespace std;
+#include "ImfNamespace.h"
 
-namespace Imf {
+OPENEXR_IMF_INTERNAL_NAMESPACE_SOURCE_ENTER
+
 namespace {
 
 void
@@ -57,12 +59,18 @@ clearError ()
 
 
 bool
-checkError (istream &is)
+checkError (istream &is, streamsize expected = 0)
 {
     if (!is)
     {
 	if (errno)
-	    Iex::throwErrnoExc();
+	    IEX_NAMESPACE::throwErrnoExc();
+
+	if (is.gcount() < expected) 
+	{
+		THROW (IEX_NAMESPACE::InputExc, "Early end of file: read " << is.gcount() 
+			<< " out of " << expected << " requested bytes.");
+	}
 	return false;
     }
 
@@ -76,9 +84,9 @@ checkError (ostream &os)
     if (!os)
     {
 	if (errno)
-	    Iex::throwErrnoExc();
+	    IEX_NAMESPACE::throwErrnoExc();
 
-	throw Iex::ErrnoExc ("File output failed.");
+	throw IEX_NAMESPACE::ErrnoExc ("File output failed.");
     }
 }
 
@@ -86,20 +94,20 @@ checkError (ostream &os)
 
 
 StdIFStream::StdIFStream (const char fileName[]):
-    IStream (fileName),
+    OPENEXR_IMF_INTERNAL_NAMESPACE::IStream (fileName),
     _is (new ifstream (fileName, ios_base::binary)),
     _deleteStream (true)
 {
     if (!*_is)
     {
 	delete _is;
-	Iex::throwErrnoExc();
+	IEX_NAMESPACE::throwErrnoExc();
     }
 }
 
     
 StdIFStream::StdIFStream (ifstream &is, const char fileName[]):
-    IStream (fileName),
+    OPENEXR_IMF_INTERNAL_NAMESPACE::IStream (fileName),
     _is (&is),
     _deleteStream (false)
 {
@@ -118,11 +126,11 @@ bool
 StdIFStream::read (char c[/*n*/], int n)
 {
     if (!*_is)
-        throw Iex::InputExc ("Unexpected end of file.");
+        throw IEX_NAMESPACE::InputExc ("Unexpected end of file.");
 
     clearError();
     _is->read (c, n);
-    return checkError (*_is);
+    return checkError (*_is, n);
 }
 
 
@@ -149,20 +157,20 @@ StdIFStream::clear ()
 
 
 StdOFStream::StdOFStream (const char fileName[]):
-    OStream (fileName),
+    OPENEXR_IMF_INTERNAL_NAMESPACE::OStream (fileName),
     _os (new ofstream (fileName, ios_base::binary)),
     _deleteStream (true)
 {
     if (!*_os)
     {
 	delete _os;
-	Iex::throwErrnoExc();
+	IEX_NAMESPACE::throwErrnoExc();
     }
 }
 
 
 StdOFStream::StdOFStream (ofstream &os, const char fileName[]):
-    OStream (fileName),
+    OPENEXR_IMF_INTERNAL_NAMESPACE::OStream (fileName),
     _os (&os),
     _deleteStream (false)
 {
@@ -201,7 +209,7 @@ StdOFStream::seekp (Int64 pos)
 }
 
 
-StdOSStream::StdOSStream (): OStream ("(string)")
+StdOSStream::StdOSStream (): OPENEXR_IMF_INTERNAL_NAMESPACE::OStream ("(string)")
 {
     // empty
 }
@@ -231,4 +239,4 @@ StdOSStream::seekp (Int64 pos)
 }
 
 
-} // namespace Imf
+OPENEXR_IMF_INTERNAL_NAMESPACE_SOURCE_EXIT

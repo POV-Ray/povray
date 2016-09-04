@@ -2,8 +2,8 @@
 ///
 /// @file base/image/hdr.cpp
 ///
-/// This module contains the code to read and write files in Radiance HDRI format
-/// (sometimes known as 'RGBE' format).
+/// Implementation of Radiance RGBE High Dynamic Range (HDR) image file
+/// handling.
 ///
 /// @author Christopher Cason
 /// @author Christoph Lipka
@@ -13,7 +13,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,21 +36,22 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
+#include "base/image/hdr.h"
+
+// Standard C++ header files
+#include <string>
+
+// Boost header files
 #include <boost/scoped_ptr.hpp>
 #include <boost/scoped_array.hpp>
 
-#include <string>
-
-// configbase.h must always be the first POV file included within base *.cpp files
-#include "base/configbase.h"
-#include "base/image/hdr.h"
-
+// POV-Ray base header files
 #include "base/fileinputoutput.h"
-#include "base/image/image.h"
-#include "base/image/metadata.h"
 #include "base/types.h"
+#include "base/image/metadata.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -97,7 +98,7 @@ void GetRGBE(RGBE rgbe, const Image *image, int col, int row, const GammaCurvePt
     GetEncodedRGBValue(image, col, row, gamma, rgbColour);
 
     rgbColour += linOff.getRGB();
-    RadianceHDRColour rgbeColour(rgbColour);
+    RadianceHDRColour rgbeColour(rgbColour,encOff.getRGB());
     for (int i = 0; i < 4; i ++)
         rgbe[i] = (*rgbeColour)[i];
 
@@ -134,7 +135,7 @@ void ReadOldLine(unsigned char *scanline, int width, IStream *file)
         if(*file == false)
             throw POV_EXCEPTION(kFileDataErr, "Invalid HDR file (unexpected EOF)");
 
-        if(file->Read_Byte(b).eof())
+        if(!file->Read_Byte(b))
             return;
 
         scanline[3] = b;

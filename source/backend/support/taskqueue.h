@@ -39,7 +39,8 @@
 #include <boost/thread.hpp>
 #include <boost/thread/condition.hpp>
 
-#include "base/povmscpp.h"
+#include "povms/povmscpp.h"
+
 #include "backend/support/task.h"
 
 namespace pov

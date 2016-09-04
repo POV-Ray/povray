@@ -2,13 +2,14 @@
 ///
 /// @file base/image/iff.cpp
 ///
-/// This file implements a simple IFF format file reader.
+/// Implementation of Electronic Arts Interleaved Bitmap (IFF-ILBM) image file
+/// handling.
 ///
 /// @copyright
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -33,13 +34,13 @@
 ///
 //******************************************************************************
 
-#include <vector>
-
-// configbase.h must always be the first POV file included within base *.cpp files
-#include "base/configbase.h"
-#include "base/image/image.h"
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "base/image/iff.h"
 
+// Standard C++ header files
+#include <vector>
+
+// Boost header files
 #include <boost/scoped_array.hpp>
 
 // this must be the last file included
@@ -84,7 +85,7 @@ static int read_byte(IStream *file)
     int c;
 
     if ((c = file->Read_Byte()) == EOF)
-        throw POV_EXCEPTION(kFileDataErr, "Unexpected EOF while reading IFF file");
+        throw POV_EXCEPTION(kFileDataErr, "Unexpected EOF while reading IFF-ILBM file");
     return (c);
 }
 
@@ -135,7 +136,7 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
         {
             case FORM:
                 if (read_long(file) != ILBM)
-                    throw POV_EXCEPTION(kFileDataErr, "Expected ILBM while reading IFF file");
+                    throw POV_EXCEPTION(kFileDataErr, "Expected ILBM while reading IFF-ILBM file");
                 break;
 
             case BMHD:
@@ -193,7 +194,7 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
                         image = Image::Create (width, height, imagetype);
                     else
                         image = Image::Create (width, height, imagetype, colormap);
-                    // NB: IFF files don't use alpha, so premultiplied vs. non-premultiplied is not an issue
+                    // NB: IFF-ILBM files don't use alpha, so premultiplied vs. non-premultiplied is not an issue
 
                     int rowlen = ((width + 15) / 16) * 2 ;
                     boost::scoped_array<unsigned char> row_bytes (new unsigned char [nPlanes * rowlen]);
@@ -275,7 +276,7 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
                                         break;
 
                                     default:
-                                        throw POV_EXCEPTION(kFileDataErr, "Invalid data in IFF file");
+                                        throw POV_EXCEPTION(kFileDataErr, "Invalid data in IFF-ILBM file");
                                 }
                                 image->SetRGBValue (col, row, r, g, b); // TODO FIXME - gamma!
                             }
@@ -291,7 +292,7 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
                                 else
                                 {
                                     if (creg >= colormap.size())
-                                        throw POV_EXCEPTION(kFileDataErr, "IFF color out of range in image");
+                                        throw POV_EXCEPTION(kFileDataErr, "IFF-ILBM color out of range in image");
                                     image->SetIndexedValue (col, row, creg);
                                 }
                             }
@@ -307,13 +308,13 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
                     }
                 }
                 else
-                    throw POV_EXCEPTION(kFileDataErr, "Invalid IFF file");
+                    throw POV_EXCEPTION(kFileDataErr, "Invalid IFF-ILBM file");
                 break;
 
             default:
                 for (int i = 0; (long)i < Chunk_Header.size; i++)
                     if (file->Read_Byte() == EOF)
-                        throw POV_EXCEPTION(kFileDataErr, "Unexpected EOF while reading IFF file");
+                        throw POV_EXCEPTION(kFileDataErr, "Unexpected EOF while reading IFF-ILBM file");
                 break;
         }
     }

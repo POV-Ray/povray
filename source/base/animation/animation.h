@@ -2,13 +2,13 @@
 ///
 /// @file base/animation/animation.h
 ///
-/// @todo   What's in here?
+/// Declarations related to real-time rendering.
 ///
 /// @copyright
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -36,9 +36,13 @@
 #ifndef POVRAY_BASE_ANIMATION_H
 #define POVRAY_BASE_ANIMATION_H
 
+// Module config header file must be the first file included within POV-Ray unit header files
+#include "base/configbase.h"
+
+// Standard C++ header files
 #include <vector>
 
-#include "base/configbase.h"
+// POV-Ray base header files
 #include "base/fileinputoutput.h"
 #include "base/pov_err.h"
 #include "base/types.h"

@@ -2,14 +2,13 @@
 ///
 /// @file base/platformbase.h
 ///
-/// This module contains all defines, typedefs, and prototypes for the C++
-/// interface of the abstract `PlatformBase` class.
+/// Declarations related to the @ref pov_base::PlatformBase class.
 ///
 /// @copyright
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -32,30 +31,33 @@
 ///
 /// @endparblock
 ///
-//*******************************************************************************
+//******************************************************************************
 
-#ifndef PLATFORMBASE_H
-#define PLATFORMBASE_H
+#ifndef POVRAY_BASE_PLATFORMBASE_H
+#define POVRAY_BASE_PLATFORMBASE_H
 
-#include "base/types.h"
+// Module config header file must be the first file included within POV-Ray unit header files
+#include "base/configbase.h"
+
+// Standard C++ header files
+#include <string>
+
+// POV-Ray base header files
 #include "base/fileinputoutput.h"
 #include "base/stringutilities.h"
-
-#include <string>
+#include "base/types.h"
 
 namespace pov_base
 {
 
 #define POV_PLATFORM_BASE PlatformBase::GetPlatformBaseReference()
 
+/// Abstract class defining an interface to platform-specific services.
 class PlatformBase
 {
     public:
         PlatformBase() { self = this; };
         virtual ~PlatformBase() { self = NULL; };
-
-        virtual IStream *CreateIStream(const unsigned int stype) = 0;
-        virtual OStream *CreateOStream(const unsigned int stype) = 0;
 
         virtual UCS2String GetTemporaryPath() = 0;
         virtual UCS2String CreateTemporaryFile() = 0;
@@ -70,4 +72,4 @@ class PlatformBase
 
 }
 
-#endif
+#endif // POVRAY_BASE_PLATFORMBASE_H

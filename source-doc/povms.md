@@ -18,54 +18,6 @@ exclusively uses POVMS to control POV-Ray and receive output from POV-Ray.
 Throughout this document, remember that the core concept behind POVMS is a simple asynchronous message driven
 communication. POVMS handles all the abstraction for you. It can even deal with different byte orders automatically.
 
-@subsection strt_typ    Basic Types
-
-@todo   The contents of this sub-section should probably be moved to the `povms.cpp` header file.
-
-There are a bunch of basic data types and helper functions you may need to adjust. This list is a quick walk-through:
-
-  - **POVMSType**: Needs to be 32 bit (unsigned); it will be composed of four characters, e.g. `'MyTp'`, `'any '`,
-    `'4Mac'`, etc. It defaults to `unsigned int`.
-
-  - **POVMSInt**: Defaults to `int`. Whatever the actual type, it has to be a four byte signed integer.
-
-  - **POVMSLong**: Defaults to a special structure representing an eight byte signed integer. If you have some form of
-    native 64-bit data type, you should redefine it, as the default again assumes that `int` and `unsigned int` are four
-    bytes each.
-
-  - **SetPOVMSLong(v,h,l)**: Special function which is used to set an eight byte integer using two four byte integers
-    for the upper and lower four bytes.
-
-  - **GetPOVMSLong(h,l,v)**: Special function which is used to get a two four byte integers for the upper and lower four
-    bytes from the eight byte integer.
-
-  - **POVMSFloat**: Defaults to `float`. It should offer IEEE 32-bit float precision.
-
-  - **POVMSBool**: Defaults to `int`. Note that `bool` is most likely not a suitable type for it. Most likely you want
-    to leave it as is.
-
-  - **POVMSPixel**: Defines a simple RGBA pixel with 8 bits per channel. Defaults to `unsigned char[4]`, which is the
-    most appropriate. Note that as of August 2003 it is not really supported...
-
-  - **POVMSStream**: A single byte. Defaults to `unsigned char`.
-
-  - **POVMSIEEEFloat**: If your platform does not use the IEEE floating-point data format for its `float` data type, you
-    will need to provide such a representation.
-
-  - **POVMSFloatToPOVMSIEEEFloat(p, f)**: Converts a native float type into a IEEE float type. Defaults to a simple
-    assignment f = p.
-
-  - **POVMSIEEEFloatToPOVMSFloat(f, p)**: Converts a IEEE float type into a native float type. Defaults to a simple
-    assignment p = f.
-
-  - **POVMS_ASSERT_OUTPUT**: As explained, POVMS is a layer below POV-Ray and thus when it fails, e.g. due to lack of
-    memory, it needs to be able to output a message. By default it takes a message string, filename string and line
-    number integer and outputs the message to `stderr` using `fprintf`. Of course, this should never happen, but be
-    prepared and override this function if you need a better user interface.
-
-  - **POVMS_LOG_OUTPUT**: When debugging, define this function to e.g. write the string it gets to some file. By default
-    this macro simply does nothing.
-
 @subsection strt_que    Message Queue Configuration
 
 @todo   The contents of this sub-section should probably be moved to the `povms.cpp` header file.
@@ -83,9 +35,6 @@ So, if you want e.g. a thread-safe or interprocess message queue, you will have 
 
   - **POVMS_Sys_Queue_Type**: The data type of a system specific message queue. Note that this data type needs to
     support byte-by-byte copies of itself.
-
-  - **POVMSAddress**: A POD or POD-only struct that can be send around and uniquely describes a particular POVMS message
-    queue in a particular process and thread.
 
   - **POVMSAddress POVMS_Sys_QueueToAddress(POVMS_Sys_Queue_Type q)**: Returns the `POVMSAddress` corresponding to a
     system specific message queue.
