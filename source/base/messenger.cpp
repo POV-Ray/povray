@@ -36,6 +36,8 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "base/messenger.h"
 
+#include <cstring>
+
 #include "base/pov_err.h"
 
 // this must be the last file included
