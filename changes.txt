@@ -49,6 +49,9 @@ Prior to the release of 3.7.1, the following items still need urgent attention:
 New Features
 ------------
 
+- The `map_type` keyword now supports the Angular Map projection for light
+  probes, popularized by Paul Devebec, as type 7.
+
 - Macros up to a certain size (currently hard-coded to 65536 characters per
   macro) are now cached in memory, improving parsing speed of invocations,
   especially when the macro in question is defined in a different file.
