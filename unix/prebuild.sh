@@ -796,6 +796,7 @@ libpovray_a_SOURCES = \\
 AM_CPPFLAGS = \\
   -I\$(top_srcdir)/unix/povconfig \\
   -I\$(top_srcdir) \\
+  -I\$(top_srcdir)/platform/unix \\
   -I\$(top_srcdir)/unix \\
   -I\$(top_srcdir)/vfe \\
   -I\$(top_srcdir)/vfe/unix
@@ -1326,6 +1327,7 @@ libvfe_a_SOURCES = \\
 # Include paths for headers.
 AM_CPPFLAGS = \\
   -I\$(top_srcdir)/unix/povconfig \\
+  -I\$(top_srcdir)/platform/unix \\
   -I\$(top_srcdir)/vfe/unix \\
   -I\$(top_srcdir)/unix \\
   -I\$(top_srcdir)/source
