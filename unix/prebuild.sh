@@ -442,6 +442,7 @@ AM_CPPFLAGS = \\
 # Libraries to link with.
 # Beware: order does matter!
 LDADD = \\
+  \$(top_builddir)/platform/libplatform.a \\
   \$(top_builddir)/vfe/libvfe.a \\
   \$(top_builddir)/source/libpovray.a
 pbEOF
@@ -575,7 +576,7 @@ povowner = @povowner@
 povgroup = @povgroup@
 
 # Directories to build.
-SUBDIRS = source vfe unix platform/unix
+SUBDIRS = source vfe unix platform
 
 # Additional files to distribute.
 EXTRA_DIST = \\
@@ -1322,6 +1323,64 @@ noinst_LIBRARIES = libvfe.a
 
 # Source files.
 libvfe_a_SOURCES = \\
+`echo $files`
+
+# Include paths for headers.
+AM_CPPFLAGS = \\
+  -I\$(top_srcdir)/unix/povconfig \\
+  -I\$(top_srcdir)/platform/unix \\
+  -I\$(top_srcdir)/vfe/unix \\
+  -I\$(top_srcdir)/unix \\
+  -I\$(top_srcdir)/source
+
+# Extra definitions for compiling.
+# They cannot be placed in config.h since they indirectly rely on \$prefix.
+DEFS = \\
+  @DEFS@ \\
+  -DPOVLIBDIR=\"@datadir@/@PACKAGE@-@VERSION_BASE@\" \\
+  -DPOVCONFDIR=\"@sysconfdir@/@PACKAGE@/@VERSION_BASE@\" \\
+  -DPOVCONFDIR_BACKWARD=\"@sysconfdir@\"
+pbEOF
+  ;;
+esac
+
+
+
+
+##### Platform ################################################################
+
+###
+### ../platform/Makefile.am
+###
+
+dir="../platform"
+makefile="$dir/Makefile"
+
+case "$1" in
+  clean)
+  for file in $makefile.am $makefile.in; do
+    rm $file 2> /dev/null  &&  echo "Cleanup $file"
+  done
+  ;;
+
+  doc*)
+  ;;
+
+  *)
+  files=`find $dir/unix -name "*.cpp" -or -name "*.h" | sed s,"$dir/",,g`
+
+  echo "Create $makefile.am"
+  cat Makefile.header > $makefile.am
+  cat << pbEOF >> $makefile.am
+
+# Makefile.am for the source distribution of POV-Ray $pov_version_base for UNIX
+# Written by $pov_config_bugreport
+
+# Libraries to build.
+noinst_LIBRARIES = libplatform.a
+
+# Source files.
+libplatform_a_SOURCES = \\
 `echo $files`
 
 # Include paths for headers.
