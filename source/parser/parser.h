@@ -348,7 +348,7 @@ class Parser : public SceneTask
         /// @param[out] actualFileName  Name by which the file is known to the parsing computer.
         IStream *Locate_File(const UCS2String& formalFileName, unsigned int stype, UCS2String& actualFileName, bool err_flag = false);
 
-        OStream *Parser::CreateFile(const UCS2String& filename, unsigned int stype, bool append);
+        OStream *CreateFile(const UCS2String& filename, unsigned int stype, bool append);
         Image *Read_Image(int filetype, const UCS2 *filename, const Image::ReadOptions& options);
 
         // tokenize.h/tokenize.cpp
