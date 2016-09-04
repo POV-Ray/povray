@@ -84,6 +84,7 @@ static int cylindrical_image_map(const Vector3d& EPoint, const ImageData *image,
 static int torus_image_map(const Vector3d& EPoint, const ImageData *image, DBL *u, DBL *v);
 static int spherical_image_map(const Vector3d& EPoint, const ImageData *image, DBL *u, DBL *v);
 static int planar_image_map(const Vector3d& EPoint, const ImageData *image, DBL *u, DBL *v);
+static int angular_image_map(const Vector3d& EPoint, const ImageData *image, DBL *u, DBL  *v);
 static void no_interpolation(const ImageData *image, DBL xcoor, DBL ycoor, RGBFTColour& colour, int *index, bool premul);
 static void bilinear(DBL *factors, DBL x, DBL y);
 static void norm_dist(DBL *factors, DBL x, DBL y);
@@ -730,6 +731,58 @@ static int torus_image_map(const Vector3d& EPoint, const ImageData *image, DBL *
     return 1;
 }
 
+/*****************************************************************************
+*
+* FUNCTION
+*
+* INPUT
+*
+* OUTPUT
+*
+* RETURNS
+*
+* AUTHOR
+*
+* DESCRIPTION
+*
+*   Map a point (x, y, z) on a sphere of radius 1 to a 2-d image.
+*   This is stuff from MegaPov for doing P. Debevec mirrorball mapping
+*
+* CHANGES
+*
+******************************************************************************/
+
+static int angular_image_map(const Vector3d& EPoint, const ImageData *image, DBL *u, DBL  *v)
+{
+    DBL len, r;
+    DBL x = EPoint[X];
+    DBL y = EPoint[Y];
+    DBL z = EPoint[Z];
+
+    /* Make sure this vector is on the unit sphere. */
+    len = sqrt(x * x + y * y + z * z);
+    if (len == 0.0)
+    {
+        return 0;
+    }
+    else
+    {
+        x /= len;
+        y /= len;
+        z /= len;
+    }
+
+    if ( (x==0) && (y==0) )
+        r=0;
+    else
+        r=(1/M_PI)*acos(z)/sqrt(x*x+y*y);
+
+    *u = (x*r+1)/2 * image->width;
+    *v = (y*r+1)/2 * image->height;
+
+    return 1;
+}
+
 
 /*****************************************************************************
 *
@@ -940,6 +993,10 @@ static int map_pos(const Vector3d& EPoint, const BasicPattern* pPattern, DBL *xc
             if(!torus_image_map(EPoint, image, xcoor, ycoor))
                 return (1);
             break;
+        case ANGULAR_MAP:
+	        if(!angular_image_map(EPoint, image, xcoor, ycoor))
+		        return (1);
+	        break;
         default:
             if(!planar_image_map(EPoint, image, xcoor, ycoor))
                 return (1);
