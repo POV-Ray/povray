@@ -994,9 +994,9 @@ static int map_pos(const Vector3d& EPoint, const BasicPattern* pPattern, DBL *xc
                 return (1);
             break;
         case ANGULAR_MAP:
-	        if(!angular_image_map(EPoint, image, xcoor, ycoor))
-		        return (1);
-	        break;
+            if(!angular_image_map(EPoint, image, xcoor, ycoor))
+                return (1);
+            break;
         default:
             if(!planar_image_map(EPoint, image, xcoor, ycoor))
                 return (1);

@@ -597,6 +597,7 @@ class Parser : public SceneTask
         ObjectPtr Parse_Julia_Fractal(void);
         ObjectPtr Parse_HField(void);
         ObjectPtr Parse_Lathe(void);
+        ObjectPtr Parse_Lemon();
         ObjectPtr Parse_Light_Source();
         ObjectPtr Parse_Object_Id();
         ObjectPtr Parse_Ovus();

@@ -76,6 +76,7 @@
 #include "core/shape/heightfield.h"
 #include "core/shape/isosurface.h"
 #include "core/shape/lathe.h"
+#include "core/shape/lemon.h"
 #include "core/shape/mesh.h"
 #include "core/shape/ovus.h"
 #include "core/shape/parametric.h"
@@ -3077,6 +3078,73 @@ ObjectPtr Parser::Parse_Lathe()
     return (reinterpret_cast<ObjectPtr>(Object));
 }
 
+/*****************************************************************************
+*
+* FUNCTION
+*
+* INPUT
+*
+* OUTPUT
+*
+* RETURNS
+*
+* AUTHOR
+*
+* DESCRIPTION
+*
+* CHANGES
+*
+******************************************************************************/
+
+ObjectPtr Parser::Parse_Lemon ()
+{
+    Lemon *Object;
+    ObjectPtr ptr;
+
+    Parse_Begin ();
+
+    if ( (Object = reinterpret_cast<Lemon *>(Parse_Object_Id())) != NULL)
+        return (reinterpret_cast<ObjectPtr>(Object));
+
+    Object = new Lemon();
+
+    Parse_Vector(Object->apex);  Parse_Comma ();
+    Object->apex_radius = Parse_Float();  Parse_Comma ();
+
+    Parse_Vector(Object->base);  Parse_Comma ();
+    Object->base_radius = Parse_Float();
+
+    Parse_Comma ();
+
+    Object->inner_radius = Parse_Float();
+
+    if ((Object->apex_radius < 0)||(Object->base_radius < 0)||(Object->inner_radius < 0))
+    {
+        Error("All radii must be positive");
+    }
+
+    EXPECT
+        CASE(OPEN_TOKEN)
+            Clear_Flag(Object, CLOSED_FLAG);
+            EXIT
+        END_CASE
+
+        OTHERWISE
+            UNGET
+            EXIT
+        END_CASE
+    END_EXPECT
+
+    /* Compute run-time values for the lemon */
+    Object->Compute_Lemon_Data( messageFactory, Token.FileHandle, Token.Token_File_Pos, Token.Token_Col_No );
+
+    Object->Compute_BBox();
+    ptr = reinterpret_cast<ObjectPtr>(Object);
+
+    Parse_Object_Mods(ptr);
+
+    return (ptr);
+}
 
 
 /*****************************************************************************
@@ -6540,6 +6608,11 @@ ObjectPtr Parser::Parse_Object ()
 
         CASE (LATHE_TOKEN)
             Object = Parse_Lathe();
+            EXIT
+        END_CASE
+
+        CASE (LEMON_TOKEN)
+            Object = Parse_Lemon();
             EXIT
         END_CASE
 
