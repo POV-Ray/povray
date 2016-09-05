@@ -50,7 +50,21 @@
 namespace pov_base
 {
 
-#if POV_TIMER_DEFAULT
+#if POV_MULTITHREADED && POV_USE_DEFAULT_DELAY
+
+void Delay(unsigned int msec)
+{
+    boost::xtime t;
+    boost::xtime_get(&t, POV_TIME_UTC);
+    POV_ULONG ns = (POV_ULONG)(t.sec) * (POV_ULONG)(1000000000) + (POV_ULONG)(t.nsec) + (POV_ULONG)(msec) * (POV_ULONG)(1000000);
+    t.sec = (boost::xtime::xtime_sec_t)(ns / (POV_ULONG)(1000000000));
+    t.nsec = (boost::xtime::xtime_nsec_t)(ns % (POV_ULONG)(1000000000));
+    boost::thread::sleep(t);
+}
+
+#endif // POV_MULTITHREADED && POV_USE_DEFAULT_DELAY
+
+#if POV_USE_DEFAULT_TIMER
 
 TimerDefault::TimerDefault(bool tctime) :
     threadCPUTimeOnly(tctime)
@@ -71,40 +85,11 @@ POV_LONG TimerDefault::ElapsedRealTime() const
     return ((tt - st) / (POV_LONG)(1000000));
 }
 
-POV_LONG TimerDefault::ElapsedCPUTime() const
-{
-    boost::xtime t;
-    boost::xtime_get(&t, POV_TIME_UTC);
-    POV_LONG tt = (POV_LONG)(t.sec) * (POV_LONG)(1000000000) + (POV_LONG)(t.nsec);
-    POV_LONG st = (POV_LONG)(cpuTimeStart.sec) * (POV_LONG)(1000000000) + (POV_LONG)(cpuTimeStart.nsec);
-    return ((tt - st) / (POV_LONG)(1000000));
-}
-
-bool TimerDefault::HasValidCPUTime() const
-{
-    return false;
-}
-
 void TimerDefault::Reset()
 {
     boost::xtime_get(&realTimeStart, POV_TIME_UTC);
-    boost::xtime_get(&cpuTimeStart, POV_TIME_UTC);
 }
 
-#endif // POV_TIMER_DEFAULT
-
-#if POV_MULTITHREADED && !defined(POV_DELAY_IMPLEMENTED)
-
-void Delay(unsigned int msec)
-{
-    boost::xtime t;
-    boost::xtime_get(&t, POV_TIME_UTC);
-    POV_ULONG ns = (POV_ULONG)(t.sec) * (POV_ULONG)(1000000000) + (POV_ULONG)(t.nsec) + (POV_ULONG)(msec) * (POV_ULONG)(1000000);
-    t.sec = (boost::xtime::xtime_sec_t)(ns / (POV_ULONG)(1000000000));
-    t.nsec = (boost::xtime::xtime_nsec_t)(ns % (POV_ULONG)(1000000000));
-    boost::thread::sleep(t);
-}
-
-#endif // POV_MULTITHREADED && !defined(POV_DELAY_IMPLEMENTED)
+#endif // POV_USE_DEFAULT_TIMER
 
 }

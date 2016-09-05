@@ -118,7 +118,7 @@ class IsoSurface : public ObjectBase
         virtual void Transform(const TRANSFORM *);
         virtual void Compute_BBox();
 
-        virtual void DispatchShutdownMessages(CoreMessenger& messenger);
+        virtual void DispatchShutdownMessages(GenericMessenger& messenger);
 
     protected:
 

@@ -65,6 +65,7 @@ class Triangle : public NonsolidObject
         DBL             Distance;
         unsigned int    Dominant_Axis:2;
         unsigned int    vAxis:2;  /* used only for smooth triangles */
+        bool            mPointOrderSwapped:1; ///< Whether ordering of points had been swapped
 
         Triangle();
         Triangle(int t);

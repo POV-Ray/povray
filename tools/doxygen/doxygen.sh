@@ -1,10 +1,11 @@
 #!/bin/sh
 
 # PLANTUML_JAR_PATH='/usr/bin'
-POV_VER=`cat ../../unix/VERSION`
-doxygen doxygen.cfg
-cd latex
+cd ../..
+POV_VER=`cat unix/VERSION`
+doxygen tools/doxygen/source-doc.cfg
+cd tools/doxygen/source-doc/latex
 make pdf
-cd ..
+cd ../..
 mkdir pdf
-cp "latex/refman.pdf" "pdf/POV-Ray Developer's Manual.pdf"
+cp "source-doc/latex/refman.pdf" "source-doc/pdf/POV-Ray Developer Manual.pdf"

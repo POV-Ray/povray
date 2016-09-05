@@ -54,15 +54,14 @@
 #include "core/math/matrix.h"
 #include "core/math/spline.h"
 #include "core/math/vector.h"
+#include "core/render/trace.h"
 #include "core/render/ray.h"
 #include "core/scene/object.h"
+#include "core/scene/scenedata.h"
 #include "core/shape/heightfield.h"
 #include "core/support/imageutil.h"
 
 #include "vm/fnpovfpu.h"
-
-#include "backend/frame.h"
-#include "backend/scene/backendscenedata.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -801,7 +800,7 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
 
                     Local_C_String=Parse_C_String();
 
-                    Val = ((f=Locate_File(sceneData, UCS2String(ASCIItoUCS2String(Local_C_String)),POV_File_Text_User,ign,false))==NULL) ? 0.0 : 1.0;
+                    Val = ((f=Locate_File(UCS2String(ASCIItoUCS2String(Local_C_String)),POV_File_Text_User,ign,false))==NULL) ? 0.0 : 1.0;
                     if (f != NULL)
                         delete f;
 
@@ -1223,17 +1222,23 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                         END_CASE
 
                         // JN2007: Image map dimensions:
-                        CASE (PIGMENT_ID_TOKEN)
+                        CASE3 (DENSITY_ID_TOKEN,PIGMENT_ID_TOKEN,TNORMAL_ID_TOKEN)
                             Pigment = reinterpret_cast<PIGMENT *>(Token.Data);
-                            if(Pigment->Type != BITMAP_PATTERN)
-                            {
-                                Error("The parameter to max_extent must be an image map pigment identifier");
-                            }
-                            else
+                            if(Pigment->Type == BITMAP_PATTERN)
                             {
                                 Vect[X] = dynamic_cast<ImagePattern*>(Pigment->pattern.get())->pImage->iwidth;
                                 Vect[Y] = dynamic_cast<ImagePattern*>(Pigment->pattern.get())->pImage->iheight;
                                 Vect[Z] = 0;
+                            }
+                            else if(Pigment->Type == DENSITY_FILE_PATTERN)
+                            {
+                                Vect[X] = dynamic_cast<DensityFilePattern*>(Pigment->pattern.get())->densityFile->Data->Sx;
+                                Vect[Y] = dynamic_cast<DensityFilePattern*>(Pigment->pattern.get())->densityFile->Data->Sy;
+                                Vect[Z] = dynamic_cast<DensityFilePattern*>(Pigment->pattern.get())->densityFile->Data->Sz;
+                            }
+                            else
+                            {
+                                Error("A pigment, normal or density parameter to max_extent must be based on an image or density file.");
                             }
                             EXIT
                         END_CASE

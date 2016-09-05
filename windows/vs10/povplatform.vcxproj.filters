@@ -11,21 +11,45 @@
       <Extensions>
       </Extensions>
     </Filter>
+    <Filter Include="Platform Headers\x86">
+      <UniqueIdentifier>{791617f2-bcb2-4355-bf29-4bd742f2a536}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Platform Source\x86">
+      <UniqueIdentifier>{00e3a6fe-df51-4ea2-8da5-18c382ddf7d8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Platform Headers\Windows">
+      <UniqueIdentifier>{56a4c135-6afa-4b41-80d4-22ba6bfbc5ac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Platform Source\Windows">
+      <UniqueIdentifier>{ff80ac85-cb9a-486e-8338-307a06fa26fd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\platform\x86\cpuid.cpp">
-      <Filter>Platform Source</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\platform\x86\avxfma4noise.cpp">
-      <Filter>Platform Source</Filter>
+      <Filter>Platform Source\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\platform\x86\cpuid.cpp">
+      <Filter>Platform Source\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\platform\windows\syspovtimer.cpp">
+      <Filter>Platform Source\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\platform\windows\osversioninfo.cpp">
+      <Filter>Platform Source\Windows</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\platform\x86\cpuid.h">
-      <Filter>Platform Headers</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\platform\x86\avxfma4noise.h">
-      <Filter>Platform Headers</Filter>
+      <Filter>Platform Headers\x86</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\platform\x86\cpuid.h">
+      <Filter>Platform Headers\x86</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\platform\windows\syspovtimer.h">
+      <Filter>Platform Headers\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\platform\windows\osversioninfo.h">
+      <Filter>Platform Headers\Windows</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

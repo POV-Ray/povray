@@ -11,7 +11,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -41,11 +41,28 @@
 
 #include "syspovconfig.h"
 
-// added by C.H. - see source/base/timer.h:
-// uncomment to use default time if no platform specific implementation is provided.
-//#undef POV_TIMER
-
 #define FILENAME_SEPARATOR '/'
 #define IFF_SWITCH_CAST (long)
+
+// Our Unix-specific implementation of the Delay() function currently relies on the presence of
+// the nanosleep() or usleep() functions. If we have neither of those, we're falling back to
+// POV-Ray's platform-independent default implementation.
+#if defined(HAVE_NANOSLEEP) || defined(HAVE_USLEEP)
+    #define POV_USE_DEFAULT_DELAY 0
+#else
+    #define POV_USE_DEFAULT_DELAY 1
+#endif
+
+// Our Unix-specific implementation of the Timer class currently relies on the presence of the
+// clock_gettime() or gettimeofday() functions, in order to measure at least wall-clock time. If we
+// have neither of those, we're falling back to POV-Ray's platform-independent default
+// implementation.
+// (Note that when it comes to measuring CPU time, we're still as good as the default if we fall
+// back to reporting wall clock time.)
+#if defined(HAVE_CLOCK_GETTIME) || defined(HAVE_GETTIMEOFDAY)
+    #define POV_USE_DEFAULT_TIMER 0
+#else
+    #define POV_USE_DEFAULT_TIMER 1
+#endif
 
 #endif // POVRAY_UNIX_SYSPOVCONFIGBASE_H

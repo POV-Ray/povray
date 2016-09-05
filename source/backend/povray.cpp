@@ -148,6 +148,7 @@ const char *ContributingDevelopers[] =
     "Steve Anger",
     "Eric Barish",
     "Dieter Bayer",
+    "Denis Bodor",
     "David K. Buck",
     "Nicolas Calimet",
     "Chris Cason",

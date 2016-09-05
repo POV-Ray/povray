@@ -527,17 +527,32 @@
     #define POV_MULTITHREADED 1
 #endif
 
-/// @def POV_TIMER
-/// What class to use for millisecond-precision timers.
-#ifndef POV_TIMER
-    #define POV_TIMER TimerDefault
-    #define POV_TIMER_DEFAULT 1
+/// @def POV_USE_DEFAULT_DELAY
+/// Whether to use a default implementation for the millisecond-precision delay function.
+///
+/// Define as non-zero to use a default implementation for the @ref Delay() function, or zero if
+/// the platform provides its own implementation.
+///
+/// @note
+///     The default implementation is only provided as a last-ditch resort. Wherever possible,
+///     implementations should provide their own implementation.
+///
+#ifndef POV_USE_DEFAULT_DELAY
+    #define POV_USE_DEFAULT_DELAY 1
 #endif
 
-/// @def POV_TIMER_DEFAULT
-/// Whether to provide the @ref TimerDefault millisecond-precision timer class.
-#ifndef POV_TIMER_DEFAULT
-    #define POV_TIMER_DEFAULT 0
+/// @def POV_USE_DEFAULT_TIMER
+/// Whether to use a default implementation for the millisecond-precision timer.
+///
+/// Define as non-zero to use a default implementation for the @ref Timer class, or zero if the
+/// platform provides its own implementation.
+///
+/// @note
+///     The default implementation is only provided as a last-ditch resort. Wherever possible,
+///     implementations should provide their own implementation.
+///
+#ifndef POV_USE_DEFAULT_TIMER
+    #define POV_USE_DEFAULT_TIMER 1
 #endif
 
 /// @}

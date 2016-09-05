@@ -9,7 +9,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -707,45 +707,6 @@ enum
     kPOVList_FileType_RadianceHDR,
     kPOVList_FileType_System,
     kPOVList_FileType_CSV, // used for histogram file
-};
-
-enum
-{
-    /**
-     *  No gamma handling.
-     *  This model is based on the (wrong) presumption that image file pixel values are proportional to
-     *  physical light intensities.
-     *  This is the default for POV-Ray 3.6 and earlier.
-     */
-    kPOVList_GammaMode_None,
-    /**
-     *  Explicit assumed_gamma-based gamma handling model, 3.6 variant.
-     *  This model is based on the (wrong) presumption that render engine maths works equally well with
-     *  both linear and gamma-encoded light intensity values.
-     *  Using assumed_gamma=1.0 gives physically realistic results.
-     *  Input image files without implicit or explicit gamma information will be presumed to match assumed_gamma,
-     *  i.e. they will not be gamma corrected.
-     *  This is the mode used by POV-Ray 3.6 if assumed_gamma is specified.
-     */
-    kPOVList_GammaMode_AssumedGamma36,
-    /**
-     *  Explicit assumed_gamma-based gamma handling model, 3.7 variant.
-     *  This model is based on the (wrong) presumption that render engine maths works equally well with
-     *  both linear and gamma-encoded light intensity values.
-     *  Using assumed_gamma=1.0 gives physically realistic results.
-     *  Input image files without implicit or explicit gamma information will be presumed to match official
-     *  recommendations for the respective file format; files for which no official recommendations exists
-     *  will be presumed to match assumed_gamma.
-     *  This is the mode used by POV-Ray 3.7 if assumed_gamma is specified.
-     */
-    kPOVList_GammaMode_AssumedGamma37,
-    /**
-     *  Implicit assumed_gamma-based gamma handling model, 3.7 variant.
-     *  This model is functionally idential to kPOVList_GammaMode_AssumedGamma37 except that it also serves as a marker
-     *  that assumed_gamma has not been set explicitly.
-     *  This is the default for POV-Ray 3.7 and later.
-     */
-    kPOVList_GammaMode_AssumedGamma37Implied,
 };
 
 #endif // POVMSID_H

@@ -11,7 +11,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -46,5 +46,8 @@
 #else
     #define POV_DEBUG 0
 #endif
+
+#define POV_USE_DEFAULT_DELAY 0 // Windows provides a platform-specific mechanism to let a task wait for a specified time.
+#define POV_USE_DEFAULT_TIMER 0 // Windows provides platform-specific mechanisms to measure both wall-clock and CPU time.
 
 #endif // POVRAY_WINDOWS_SYSPOVCONFIGBASE_H

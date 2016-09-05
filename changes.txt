@@ -49,6 +49,9 @@ Prior to the release of 3.7.1, the following items still need urgent attention:
 New Features
 ------------
 
+- The `map_type` keyword now supports the Angular Map projection for light
+  probes, popularized by Paul Devebec, as type 7.
+
 - Macros up to a certain size (currently hard-coded to 65536 characters per
   macro) are now cached in memory, improving parsing speed of invocations,
   especially when the macro in question is defined in a different file.
@@ -269,6 +272,10 @@ Reported via the Newsgroups:
 - <web.57ad048990f06e6231fe18be0@news.povray.org>
   (2016-08-11, povray.general, "Caustics not working with transparent background")
   Bug causing radiosity to ignore refracted `no_image` objects.
+
+- <web.57b4b6c879df8923b488d9aa0@news.povray.org>
+  (2016-08-17, povray.binaries.scene-files, "Wrong normal direction on triangle{ }s")
+  Bug in flat trianges that could cause interior_texture to show on the wrong side.
 
 Reported via Windows Crash Reports:
 

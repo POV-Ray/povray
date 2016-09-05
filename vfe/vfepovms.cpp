@@ -167,6 +167,7 @@ void *SysQNode::Receive (int *pLen, bool Blocking)
       return (NULL);
 
     // TODO: have a shorter wait but loop, and check for system shutdown
+    // TODO FIXME - boost::xtime has been deprecated since boost 1.34.
     boost::xtime t;
     boost::xtime_get (&t, POV_TIME_UTC);
     t.nsec += 50000000 ;

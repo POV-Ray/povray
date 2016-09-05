@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -50,28 +50,6 @@ namespace pov_base
 void vfeSysThreadStartup();
 void vfeSysThreadCleanup();
 bool vfeParsePathString (const POVMSUCS2String& path, POVMSUCS2String& volume, vector<POVMSUCS2String>& components, POVMSUCS2String& filename);
-
-class vfeTimer
-{
-    public:
-        vfeTimer(bool CPUTimeIsThreadOnly = false);
-        ~vfeTimer();
-
-        POV_LONG ElapsedRealTime(void) const ;
-        POV_LONG ElapsedCPUTime(void) const;
-        void Reset(void);
-        bool HasValidCPUTime() const;
-
-    private:
-        POV_ULONG GetWallTime (void) const ;
-        POV_ULONG GetCPUTime (void) const ;
-
-        POV_ULONG m_WallTimeStart ;
-        POV_ULONG m_CPUTimeStart ;
-        bool m_ThreadTimeOnly ;
-        void *m_ThreadHandle ;
-        bool m_IsNT ;
-};
 
 }
 
