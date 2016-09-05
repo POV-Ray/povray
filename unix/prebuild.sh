@@ -441,10 +441,12 @@ AM_CPPFLAGS = \\
 
 # Libraries to link with.
 # Beware: order does matter!
+# TODO - Having vfe/libvfe.a twice in this list is a bit of a hackish way to cope with cyclic dependencies.
 LDADD = \\
-  \$(top_builddir)/platform/libplatform.a \\
   \$(top_builddir)/vfe/libvfe.a \\
-  \$(top_builddir)/source/libpovray.a
+  \$(top_builddir)/source/libpovray.a \\
+  \$(top_builddir)/vfe/libvfe.a \\
+  \$(top_builddir)/platform/libplatform.a
 pbEOF
   ;;
 esac
@@ -576,7 +578,7 @@ povowner = @povowner@
 povgroup = @povgroup@
 
 # Directories to build.
-SUBDIRS = source vfe unix platform
+SUBDIRS = source vfe platform unix
 
 # Additional files to distribute.
 EXTRA_DIST = \\
@@ -1387,6 +1389,7 @@ libplatform_a_SOURCES = \\
 AM_CPPFLAGS = \\
   -I\$(top_srcdir)/unix/povconfig \\
   -I\$(top_srcdir)/platform/unix \\
+  -I\$(top_srcdir)/vfe \\
   -I\$(top_srcdir)/vfe/unix \\
   -I\$(top_srcdir)/unix \\
   -I\$(top_srcdir)/source

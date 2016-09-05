@@ -49,6 +49,11 @@
 #include <sys/time.h>
 #endif
 
+#include "base/types.h"
+
+// this must be the last file included
+#include "base/povdebug.h"
+
 #if !defined(HAVE_CLOCKID_T)
 typedef int clockid_t;
 #endif
@@ -104,11 +109,11 @@ static inline bool ClockGettimeMillisec(POV_ULONG& result, clockid_t source)
 static inline bool GetrusageMillisec(POV_ULONG& result, int source)
 {
 #if defined(HAVE_GETRUSAGE)
-    bool success;
-    success = (getrusage(source, &ru) == 0);
+    struct rusage ru;
+    bool success = (getrusage(source, &ru) == 0);
     if (success)
-        result = static_cast<POV_ULONG>(ru.ru_utime.tv_sec)  + static_cast<POV_ULONG>(ru.ru_stime.tv_sec))  *1000
-               + static_cast<POV_ULONG>(ru.ru_utime.tv_usec) + static_cast<POV_ULONG>(ru.ru_stime.tv_usec)) /1000;
+        result = (static_cast<POV_ULONG>(ru.ru_utime.tv_sec)  + static_cast<POV_ULONG>(ru.ru_stime.tv_sec))  *1000
+               + (static_cast<POV_ULONG>(ru.ru_utime.tv_usec) + static_cast<POV_ULONG>(ru.ru_stime.tv_usec)) /1000;
     return success;
 #else
     return false;
@@ -131,7 +136,6 @@ static inline bool GettimeofdayMillisec(POV_ULONG& result)
 }
 
 Timer::Timer () :
-    mThreadTimeOnly (CPUTimeIsThreadOnly),
     mWallTimeUseClockGettimeMonotonic (false),
     mWallTimeUseClockGettimeRealtime (false),
     mWallTimeUseGettimeofday (false),
@@ -141,17 +145,17 @@ Timer::Timer () :
     mThreadTimeUseGetrusageThread (false),
     mThreadTimeUseGetrusageLwp (false),
     mThreadTimeUseClockGettimeThread (false),
-    mThreadTimeUseFallback (false),
+    mThreadTimeUseFallback (false)
 {
     // Figure out which timer source to use for wall clock time.
     bool haveWallTime = false;
-#if defined(HAVE_CLOCK_MONOTONIC)
+#if defined(HAVE_DECL_CLOCK_MONOTONIC) && HAVE_DECL_CLOCK_MONOTONIC
     if (!haveWallTime)
         haveWallTime = mWallTimeUseClockGettimeMonotonic = ClockGettimeMillisec(mWallTimeStart, CLOCK_MONOTONIC);
 #endif
     // we prefer CLOCK_MONOTONIC over CLOCK_REALTIME because the former will not be affected if someone adjusts the
     // system's real-time clock.
-#if defined(HAVE_CLOCK_REALTIME)
+#if defined(HAVE_DECL_CLOCK_REALTIME) && HAVE_DECL_CLOCK_REALTIME
     if (!haveWallTime)
         haveWallTime = mWallTimeUseClockGettimeRealtime = ClockGettimeMillisec(mWallTimeStart, CLOCK_REALTIME);
 #endif
@@ -168,15 +172,15 @@ Timer::Timer () :
 
     // Figure out which timer source to use for per-process CPU time.
     bool haveProcessTime = false;
-#if defined(HAVE_RUSAGE_SELF)
+#if defined(HAVE_DECL_RUSAGE_SELF) && HAVE_DECL_RUSAGE_SELF
     if (!haveProcessTime)
         haveProcessTime = mProcessTimeUseGetrusageSelf = GetrusageMillisec(mProcessTimeStart, RUSAGE_SELF);
 #endif
     // We prefer getrusage() over clock_gettime() because the latter may be inaccurate on systems
     // with multiple physical processors.
-#if defined(HAVE_CLOCK_PROCESS_CPUTIME_ID)
+#if defined(HAVE_DECL_CLOCK_PROCESS_CPUTIME_ID) && HAVE_DECL_CLOCK_PROCESS_CPUTIME_ID
     if (!haveProcessTime)
-        haveProcessTime = mProcessTimeUseGettimeProcess = ClockGettimeMillisec(mProcessTimeStart, CLOCK_PROCESS_CPUTIME_ID);
+        haveProcessTime = mProcessTimeUseClockGettimeProcess = ClockGettimeMillisec(mProcessTimeStart, CLOCK_PROCESS_CPUTIME_ID);
 #endif
     if (!haveProcessTime)
     {
@@ -186,20 +190,20 @@ Timer::Timer () :
 
     // Figure out which timer source to use for per-thread CPU time.
     bool haveThreadTime = false;
-#if defined(HAVE_RUSAGE_THREAD)
+#if defined(HAVE_DECL_RUSAGE_THREAD) && HAVE_DECL_RUSAGE_THREAD
     if (!haveThreadTime)
         haveThreadTime = mThreadTimeUseGetrusageThread = GetrusageMillisec(mThreadTimeStart, RUSAGE_THREAD);
-#elif defined(HAVE_RUSAGE_LWP) // should be alias of RUSAGE_THREAD on systems that support both
+#elif defined(HAVE_DECL_RUSAGE_LWP) && HAVE_DECL_RUSAGE_LWP // should be alias of RUSAGE_THREAD on systems that support both
     if (!haveThreadTime)
         haveThreadTime = mThreadTimeUseGetrusageLwp = GetrusageMillisec(mThreadTimeStart, RUSAGE_LWP);
 #endif
     // We prefer getrusage() over clock_gettime() because the latter may be inaccurate on systems
     // with multiple physical processors.
-#if defined(HAVE_CLOCK_THREAD_CPUTIME_ID)
+#if defined(HAVE_DECL_CLOCK_THREAD_CPUTIME_ID) && HAVE_DECL_CLOCK_THREAD_CPUTIME_ID
     if (!haveThreadTime)
-        haveThreadTime = mThreadTimeUseGettimeThread = ClockGettimeMillisec(mThreadTimeStart, CLOCK_THREAD_CPUTIME_ID);
+        haveThreadTime = mThreadTimeUseClockGettimeThread = ClockGettimeMillisec(mThreadTimeStart, CLOCK_THREAD_CPUTIME_ID);
 #endif
-    if (!haveProcessTime)
+    if (!haveThreadTime)
     {
         haveThreadTime = mThreadTimeUseFallback = haveProcessTime;
         mThreadTimeStart = mProcessTimeStart;
@@ -214,11 +218,11 @@ Timer::~Timer ()
 POV_ULONG Timer::GetWallTime () const
 {
     POV_ULONG result;
-#if defined(HAVE_CLOCK_MONOTONIC)
+#if defined(HAVE_DECL_CLOCK_MONOTONIC) && HAVE_DECL_CLOCK_MONOTONIC
     if (mWallTimeUseClockGettimeMonotonic)
         return (ClockGettimeMillisec(result, CLOCK_MONOTONIC) ? result : 0);
 #endif
-#if defined(HAVE_CLOCK_REALTIME)
+#if defined(HAVE_DECL_CLOCK_REALTIME) && HAVE_DECL_CLOCK_REALTIME
     if (mWallTimeUseClockGettimeRealtime)
         return (ClockGettimeMillisec(result, CLOCK_REALTIME) ? result : 0);
 #endif
@@ -227,15 +231,15 @@ POV_ULONG Timer::GetWallTime () const
     return 0;
 }
 
-POV_ULONG Timer::GetProcessCPUTime () const
+POV_ULONG Timer::GetProcessTime () const
 {
     POV_ULONG result;
-#if defined(HAVE_RUSAGE_SELF)
+#if defined(HAVE_DECL_RUSAGE_SELF) && HAVE_DECL_RUSAGE_SELF
     if (mProcessTimeUseGetrusageSelf)
         return (GetrusageMillisec(result, RUSAGE_SELF) ? result : 0);
 #endif
-#if defined(HAVE_CLOCK_PROCESS_CPUTIME_ID)
-    if (mProcessTimeUseGettimeProcess)
+#if defined(HAVE_DECL_CLOCK_PROCESS_CPUTIME_ID) && HAVE_DECL_CLOCK_PROCESS_CPUTIME_ID
+    if (mProcessTimeUseClockGettimeProcess)
         return (ClockGettimeMillisec(result, CLOCK_PROCESS_CPUTIME_ID) ? result : 0);
 #endif
     if (mProcessTimeUseFallback)
@@ -243,18 +247,18 @@ POV_ULONG Timer::GetProcessCPUTime () const
     return 0;
 }
 
-POV_ULONG Timer::GetThreadCPUTime () const
+POV_ULONG Timer::GetThreadTime () const
 {
     POV_ULONG result;
-#if defined(HAVE_RUSAGE_THREAD)
+#if defined(HAVE_DECL_RUSAGE_THREAD) && HAVE_DECL_RUSAGE_THREAD
     if (mThreadTimeUseGetrusageThread)
         return (GetrusageMillisec(result, RUSAGE_THREAD) ? result : 0);
 #endif
-#if defined(HAVE_RUSAGE_LWP)
+#if defined(HAVE_DECL_RUSAGE_LWP) && HAVE_DECL_RUSAGE_LWP
     if (mThreadTimeUseGetrusageLwp)
         return (GetrusageMillisec(result, RUSAGE_LWP) ? result : 0);
 #endif
-#if defined(HAVE_CLOCK_THREAD_CPUTIME_ID)
+#if defined(HAVE_DECL_CLOCK_THREAD_CPUTIME_ID) && HAVE_DECL_CLOCK_THREAD_CPUTIME_ID
     if (mThreadTimeUseClockGettimeThread)
         return (ClockGettimeMillisec(result, CLOCK_THREAD_CPUTIME_ID) ? result : 0);
 #endif
@@ -281,8 +285,8 @@ POV_LONG Timer::ElapsedThreadCPUTime () const
 void Timer::Reset ()
 {
     mWallTimeStart    = GetWallTime ();
-    mProcessTimeStart = (mProcessTimeUseFallback ? mWallTimeStart    : GetProcessTime ());
-    mThreadTimeStart  = (mThreadTimeUseFallback  ? mProcessTimeStart : GetThreadTime ());
+    mProcessTimeStart = GetProcessTime ();
+    mThreadTimeStart  = GetThreadTime ();
 }
 
 bool Timer::HasValidProcessCPUTime () const
