@@ -38,6 +38,8 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "core/shape/lemon.h"
 
+#include "base/messenger.h"
+
 #include "core/math/matrix.h"
 #include "core/math/polynomialsolver.h"
 #include "core/render/ray.h"
@@ -611,7 +613,7 @@ ObjectPtr Lemon::Copy()
 *
 ******************************************************************************/
 
-void Lemon::Compute_Lemon_Data(CoreMessenger& messenger, pov_base::ITextStream *FileHandle, pov_base::ITextStream::FilePos & Token_File_Pos, int Token_Col_No )
+void Lemon::Compute_Lemon_Data(GenericMessenger& messenger, pov_base::ITextStream *FileHandle, pov_base::ITextStream::FilePos & Token_File_Pos, int Token_Col_No )
 {
     DBL len;
     Vector3d axis;
@@ -665,7 +667,7 @@ void Lemon::Compute_Lemon_Data(CoreMessenger& messenger, pov_base::ITextStream *
         std::stringstream o;
         inner_radius = low;
         o << "Inner (last) radius of lemon is too small. Minimal would be "<< (inner_radius*len) << ". Value has been adjusted.";
-        messenger.CoreMessageAt(kCoreMessageClass_Warning, FileHandle->name(), Token_File_Pos.lineno, Token_Col_No, FileHandle->tellg().offset,"%s",o.str().c_str());
+        messenger.WarningAt(kWarningGeneral, FileHandle->name(), Token_File_Pos.lineno, Token_Col_No, FileHandle->tellg().offset,"%s",o.str().c_str());
     }
 
     DBL f = sqrt(-(base_radius*base_radius-2.0*base_radius*apex_radius+apex_radius*apex_radius-4.0*inner_radius*inner_radius+1.0)/(base_radius*base_radius-2.0*base_radius*apex_radius+apex_radius*apex_radius+1.0));

@@ -82,8 +82,7 @@ class Lemon : public ObjectBase
         virtual void Transform(const TRANSFORM *);
         virtual void Compute_BBox();
 
-    //  void Compute_Lemon_Data( MessageFactory & messageFactory, pov_base::ITextStream *FileHandle, pov_base::ITextStream::FilePos & Token_File_Pos, int Token_Col_No );
-        void Compute_Lemon_Data(CoreMessenger& messenger, pov_base::ITextStream *FileHandle, pov_base::ITextStream::FilePos & Token_File_Pos, int Token_Col_No );
+        void Compute_Lemon_Data(GenericMessenger& messenger, pov_base::ITextStream *FileHandle, pov_base::ITextStream::FilePos & Token_File_Pos, int Token_Col_No );
 
         Vector3d apex;          /* Center of the top of the lemon */
         Vector3d base;          /* Center of the bottom of the lemon */
