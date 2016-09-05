@@ -27,7 +27,6 @@
     <Filter Include="Backend Source\Support">
       <UniqueIdentifier>{4eb01538-921e-45c5-80f5-523ea4298683}</UniqueIdentifier>
     </Filter>
-
     <Filter Include="Backend Source\Lighting">
       <UniqueIdentifier>{efe26d90-2df7-4436-9c9c-c96b2a613976}</UniqueIdentifier>
     </Filter>

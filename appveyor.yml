@@ -6,8 +6,7 @@ branches:
   - /v[0-9]/
 skip_tags: true
 
-os:
-- Visual Studio 2015
+image: Visual Studio 2015
 
 shallow_clone: true
 
@@ -20,17 +19,17 @@ environment:
     platform: Win32
     bin_dir: bin32
     artifact_suffix: -Win32
-    PlatformToolset: v140_xp
+    PlatformToolset: v140
   - configuration: Release-SSE2
     platform: Win32
     bin_dir: bin32
     artifact_suffix: -Win32-sse2
-    PlatformToolset: v140_xp
+    PlatformToolset: v140
   - configuration: Release
     platform: x64
     bin_dir: bin64
     artifact_suffix: -Win64
-    PlatformToolset: v140_xp
+    PlatformToolset: v140
 
 before_build:
 - ps: |
@@ -48,7 +47,7 @@ before_build:
     (Get-Content source\base\build.h).replace('#error Please fill in BUILT_BY, then remove this line', '') | Set-Content source\base\build.h
 
 build:
-  project: windows\vs10\povray.sln
+  project: windows/vs10/povray.sln
   parallel: true
   verbosity: minimal
 
@@ -69,9 +68,13 @@ after_build:
     }
     $env:pov_release_type = ($env:pov_build_type).ToLower() + ' release'
     $env:pov_build_title = $env:pov_build_type + ' build'
-    $env:pov_build_message += '**Note:** This is a binary-only ' + $env:pov_release_type + '; to install, copy the binary into an existing POV-Ray 3.7 installation. (Make sure to backup the original binary first.)'
+    $env:pov_build_message += '**Note:** This is a binary-only ' + $env:pov_release_type + '; to install, copy the '
+    $env:pov_build_message += 'binary into an existing POV-Ray 3.7 installation. (Make sure to backup the original '
+    $env:pov_build_message += 'binary first.)'
     $env:pov_build_message += "`n`n"
-    $env:pov_build_message += 'The 64-bit binary may require Windows Vista or higher. To run this ' + $env:pov_release_type + ' on an earlier 64-bit version of Windows, you may need to use the 32-bit SSE2 binary instead.'
+    $env:pov_build_message += 'These binaries require Windows Vista or higher, due to limitations of our automated '
+    $env:pov_build_message += 'build system. Please contact us on http://news.povray.org/povray.beta-test if you need '
+    $env:pov_build_message += 'Windows XP-compatible binaries of this particular version.'
     $env:pov_zipdir = "povray-" + $env:pov_exe_version + '-av' + $env:APPVEYOR_BUILD_NUMBER + $env:artifact_suffix
     $env:pov_binary = "Windows\vs10\" + $env:bin_dir + "\pvengine*.exe"
     $env:pov_zip = "artifacts\" + $env:pov_zipdir + ".7z"
@@ -83,7 +86,7 @@ after_build:
 test: off
 
 artifacts:
-- path: artifacts\*.7z
+- path: artifacts/*.7z
   name: binaryOnly7z
 
 deploy:

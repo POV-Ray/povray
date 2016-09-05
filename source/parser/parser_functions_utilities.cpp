@@ -43,10 +43,9 @@
 #include "core/material/pigment.h"
 #include "core/math/matrix.h"
 #include "core/math/spline.h"
+#include "core/scene/scenedata.h"
 
 #include "vm/fnpovfpu.h"
-
-#include "backend/scene/backendscenedata.h"
 
 // this must be the last file included
 #include "base/povdebug.h"

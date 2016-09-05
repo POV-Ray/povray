@@ -41,6 +41,8 @@
 
 #include <algorithm>
 
+#include "base/messenger.h"
+
 #include "core/math/matrix.h"
 #include "core/render/ray.h"
 #include "core/scene/tracethreaddata.h"
@@ -652,7 +654,7 @@ IsoSurface::~IsoSurface()
 *
 ******************************************************************************/
 
-void IsoSurface::DispatchShutdownMessages(CoreMessenger& messenger)
+void IsoSurface::DispatchShutdownMessages(GenericMessenger& messenger)
 {
     // TODO FIXME - works around nasty gcc (found using 4.0.1) bug failing to honor casting
     // away of volatile on pass by value on template argument lookup [trf]
@@ -678,21 +680,21 @@ void IsoSurface::DispatchShutdownMessages(CoreMessenger& messenger)
 
                     if (((prop <= 0.9) && (diff <= -0.5)) || (((prop <= 0.95) || (diff <= -0.1)) && (mginfo->max_gradient < 10.0)))
                     {
-                        messenger.CoreMessageAt(kCoreMessageClass_Warning, fnInfo->filename, fnInfo->filepos.lineno, 0, fnInfo->filepos.offset,
-                                                 "The maximum gradient found was %0.3f, but max_gradient of the\n"
-                                                 "isosurface was set to %0.3f. The isosurface may contain holes!\n"
-                                                 "Adjust max_gradient to get a proper rendering of the isosurface.",
-                                                 (float)(mginfo->gradient),
-                                                 (float)(mginfo->max_gradient));
+                        messenger.WarningAt(kWarningGeneral, fnInfo->filename, fnInfo->filepos.lineno, 0, fnInfo->filepos.offset,
+                                            "The maximum gradient found was %0.3f, but max_gradient of the\n"
+                                            "isosurface was set to %0.3f. The isosurface may contain holes!\n"
+                                            "Adjust max_gradient to get a proper rendering of the isosurface.",
+                                            (float)(mginfo->gradient),
+                                            (float)(mginfo->max_gradient));
                     }
                     else if ((diff >= 10.0) || ((prop >= 1.1) && (diff >= 0.5)))
                     {
-                        messenger.CoreMessageAt(kCoreMessageClass_Warning, fnInfo->filename, fnInfo->filepos.lineno, 0, fnInfo->filepos.offset,
-                                                 "The maximum gradient found was %0.3f, but max_gradient of\n"
-                                                 "the isosurface was set to %0.3f. Adjust max_gradient to\n"
-                                                 "get a faster rendering of the isosurface.",
-                                                 (float)(mginfo->gradient),
-                                                 (float)(mginfo->max_gradient));
+                        messenger.WarningAt(kWarningGeneral, fnInfo->filename, fnInfo->filepos.lineno, 0, fnInfo->filepos.offset,
+                                            "The maximum gradient found was %0.3f, but max_gradient of\n"
+                                            "the isosurface was set to %0.3f. Adjust max_gradient to\n"
+                                            "get a faster rendering of the isosurface.",
+                                            (float)(mginfo->gradient),
+                                            (float)(mginfo->max_gradient));
                     }
                 }
             }
@@ -704,12 +706,12 @@ void IsoSurface::DispatchShutdownMessages(CoreMessenger& messenger)
                 {
                     mginfo->eval_cnt = max(mginfo->eval_cnt, 1.0); // make sure it won't be zero
 
-                    messenger.CoreMessageAt(kCoreMessageClass_Info, fnInfo->filename, fnInfo->filepos.lineno, 0, fnInfo->filepos.offset,
-                                             "Evaluate found a maximum gradient of %0.3f and an average\n"
-                                             "gradient of %0.3f. The maximum gradient variation was %0.3f.\n",
-                                             (float)(mginfo->eval_max),
-                                             (float)(mginfo->eval_gradient_sum / mginfo->eval_cnt),
-                                             (float)(mginfo->eval_var));
+                    messenger.InfoAt(fnInfo->filename, fnInfo->filepos.lineno, 0, fnInfo->filepos.offset,
+                                     "Evaluate found a maximum gradient of %0.3f and an average\n"
+                                     "gradient of %0.3f. The maximum gradient variation was %0.3f.\n",
+                                     (float)(mginfo->eval_max),
+                                     (float)(mginfo->eval_gradient_sum / mginfo->eval_cnt),
+                                     (float)(mginfo->eval_var));
                 }
             }
         }

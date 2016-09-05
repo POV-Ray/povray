@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -44,6 +44,8 @@
 
 #include "base/fileutil.h"
 
+#include "vm/fnpovfpu.h"
+
 #include "povms/povmsid.h"
 
 // this must be the last file included
@@ -53,8 +55,7 @@ namespace pov
 {
 
 BackendSceneData::BackendSceneData() :
-    SceneData(),
-    gammaMode(kPOVList_GammaMode_None) // default setting for 3.62, which in turn is the default for the language
+    SceneData(new FunctionVM())
 {}
 
 UCS2String BackendSceneData::FindFile(POVMSContext ctx, const UCS2String& filename, unsigned int stype)

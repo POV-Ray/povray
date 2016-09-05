@@ -54,11 +54,7 @@
 #include "core/material/pattern.h"
 #include "core/material/texture.h"
 #include "core/math/matrix.h"
-
-#include "povms/povmsid.h"
-#include "povms/povmsutil.h"
-
-#include "backend/scene/backendscenedata.h"
+#include "core/scene/scenedata.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -100,7 +96,7 @@ void Parser::Initialize_Tokenizer()
 
     pre_init_tokenizer ();
 
-    rfile = Locate_File(sceneData, sceneData->inputFile.c_str(),POV_File_Text_POV,actualFileName,true);
+    rfile = Locate_File(sceneData->inputFile.c_str(),POV_File_Text_POV,actualFileName,true);
     if(rfile != NULL)
     {
         Input_File->In_File = new IBufferedTextStream(sceneData->inputFile.c_str(), rfile);
@@ -672,10 +668,7 @@ void Parser::Get_Token ()
 
         if((ElapsedRealTime() - last_progress) > 1000) // update progress at most every second
         {
-            POVMS_Object obj(kPOVObjectClass_ParserProgress);
-            obj.SetLong(kPOVAttrib_RealTime, ElapsedRealTime());
-            obj.SetLong(kPOVAttrib_CurrentTokenCount, Current_Token_Count);
-            RenderBackend::SendSceneOutput(sceneData->sceneId, sceneData->frontendAddress, kPOVMsgIdent_Progress, obj);
+            SignalProgress(ElapsedRealTime(), Current_Token_Count);
 
             Cooperate();
 
@@ -2600,7 +2593,7 @@ void Parser::Open_Include()
     // to free In_File if it's not NULL.
     Input_File->In_File = NULL;
 
-    IStream *is = Locate_File(sceneData, formalFileName, POV_File_Text_INC, actualFileName, true);
+    IStream *is = Locate_File(formalFileName, POV_File_Text_INC, actualFileName, true);
     if(is == NULL)
     {
         Input_File->In_File = NULL;  /* Keeps from closing failed file. */
@@ -3255,7 +3248,7 @@ void Parser::Invoke_Macro()
         }
         else
         {
-            is = Locate_File (sceneData, PMac->Macro_Filename, POV_File_Text_Macro, ign, true);
+            is = Locate_File (PMac->Macro_Filename, POV_File_Text_Macro, ign, true);
             if(is == NULL)
             {
                 Input_File->In_File = NULL;  /* Keeps from closing failed file. */
@@ -3502,7 +3495,7 @@ void Parser::Parse_Fopen(void)
     EXPECT
         CASE(READ_TOKEN)
             New->R_Flag = true;
-            rfile = Locate_File(sceneData, fileName.c_str(), POV_File_Text_User, ign, true);
+            rfile = Locate_File(fileName.c_str(), POV_File_Text_User, ign, true);
             if(rfile != NULL)
                 New->In_File = new IBufferedTextStream(fileName.c_str(), rfile);
             else
@@ -3515,7 +3508,7 @@ void Parser::Parse_Fopen(void)
 
         CASE(WRITE_TOKEN)
             New->R_Flag = false;
-            wfile = sceneData->CreateFile(GetPOVMSContext(), fileName.c_str(), POV_File_Text_User, false);
+            wfile = CreateFile(fileName.c_str(), POV_File_Text_User, false);
             if(wfile != NULL)
                 New->Out_File= new OTextStream(fileName.c_str(), wfile);
             else
@@ -3528,7 +3521,7 @@ void Parser::Parse_Fopen(void)
 
         CASE(APPEND_TOKEN)
             New->R_Flag = false;
-            wfile = sceneData->CreateFile(GetPOVMSContext(), fileName.c_str(), POV_File_Text_User, true);
+            wfile = CreateFile(fileName.c_str(), POV_File_Text_User, true);
             if(wfile != NULL)
                 New->Out_File= new OTextStream(fileName.c_str(), wfile);
             else
@@ -4127,7 +4120,7 @@ void Parser::IncludeHeader(const UCS2String& formalFileName)
 
     Input_File = &Include_Files[Include_File_Index];
     Input_File->In_File = NULL;
-    IStream *is = Locate_File (sceneData, formalFileName.c_str(),POV_File_Text_INC,actualFileName,true);
+    IStream *is = Locate_File (formalFileName.c_str(),POV_File_Text_INC,actualFileName,true);
     if(is == NULL)
     {
         Input_File->In_File = NULL;  /* Keeps from closing failed file. */

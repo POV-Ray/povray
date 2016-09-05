@@ -168,6 +168,7 @@ const char *pov_tsprintf(const char *format,...)
 {
     va_list marker;
 
+    // TODO FIXME -- this is not thread-safe!
     static char pov_tsprintf_buffer[1024];
 
     va_start(marker, format);

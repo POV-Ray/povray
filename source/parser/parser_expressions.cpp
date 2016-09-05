@@ -54,15 +54,14 @@
 #include "core/math/matrix.h"
 #include "core/math/spline.h"
 #include "core/math/vector.h"
+#include "core/render/trace.h"
 #include "core/render/ray.h"
 #include "core/scene/object.h"
+#include "core/scene/scenedata.h"
 #include "core/shape/heightfield.h"
 #include "core/support/imageutil.h"
 
 #include "vm/fnpovfpu.h"
-
-#include "backend/frame.h"
-#include "backend/scene/backendscenedata.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -798,7 +797,7 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
 
                     Local_C_String=Parse_C_String();
 
-                    Val = ((f=Locate_File(sceneData, UCS2String(ASCIItoUCS2String(Local_C_String)),POV_File_Text_User,ign,false))==NULL) ? 0.0 : 1.0;
+                    Val = ((f=Locate_File(UCS2String(ASCIItoUCS2String(Local_C_String)),POV_File_Text_User,ign,false))==NULL) ? 0.0 : 1.0;
                     if (f != NULL)
                         delete f;
 

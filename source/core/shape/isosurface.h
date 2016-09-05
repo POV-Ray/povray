@@ -118,7 +118,7 @@ class IsoSurface : public ObjectBase
         virtual void Transform(const TRANSFORM *);
         virtual void Compute_BBox();
 
-        virtual void DispatchShutdownMessages(CoreMessenger& messenger);
+        virtual void DispatchShutdownMessages(GenericMessenger& messenger);
 
     protected:
         bool Function_Find_Root(ISO_ThreadData& itd, const Vector3d&, const Vector3d&, DBL*, DBL*, DBL& max_gradient, bool in_shadow_test, TraceThreadData* pThreadData);

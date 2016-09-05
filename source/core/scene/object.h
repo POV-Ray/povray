@@ -44,6 +44,11 @@
 #include "core/bounding/boundingbox.h"
 #include "core/material/texture.h"
 
+namespace pov_base
+{
+    class GenericMessenger;
+}
+
 namespace pov
 {
 
@@ -206,7 +211,7 @@ class ObjectBase
                 o.LLights.clear();
             }
         }
-		virtual ~ObjectBase();
+        virtual ~ObjectBase();
 
         virtual ObjectPtr Copy() = 0;
 
@@ -245,7 +250,7 @@ class ObjectBase
         /// at object destruction - e.g. IsoSurface max_gradient warnings. (object destruction isn't
         /// the place to do that anymore since a scene may persist between views).
         ///
-        virtual void DispatchShutdownMessages(CoreMessenger& messenger) {};
+        virtual void DispatchShutdownMessages(GenericMessenger& messenger) {};
 
     protected:
         explicit ObjectBase(const ObjectBase&) { }

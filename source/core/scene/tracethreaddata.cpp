@@ -43,8 +43,6 @@
 #include "core/shape/fractal.h"
 #include "core/shape/isosurface.h"
 
-#include "vm/fnpovfpu.h"
-
 // this must be the last file included
 #include "base/povdebug.h"
 
@@ -115,7 +113,7 @@ TraceThreadData::TraceThreadData(shared_ptr<SceneData> sd): sceneData(sd), quali
 
 TraceThreadData::~TraceThreadData()
 {
-    for(vector<FPUContext*>::iterator i = fpuContextPool.begin(); i != fpuContextPool.end(); ++i)
+    for(vector<GenericFunctionContext*>::iterator i = functionContextPool.begin(); i != functionContextPool.end(); ++i)
         delete *i;
 
     POV_FREE(Blob_Coefficients);

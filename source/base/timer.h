@@ -39,85 +39,147 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "base/configbase.h"
 
+#if POV_USE_DEFAULT_TIMER
 #include <boost/thread/xtime.hpp>
+#endif
 
-#ifdef USE_SYSPROTO
-#include "syspovprotobase.h"
+#if !POV_USE_DEFAULT_TIMER
+#include "syspovtimer.h"
 #endif
 
 namespace pov_base
 {
 
-#if POV_MULTITHREADED
+#if POV_MULTITHREADED && POV_USE_DEFAULT_DELAY
 
-/**
- *  Wait for the specified time.
- *  @param  msec  Milliseconds to wait.
- */
+/// Wait for the specified time.
+///
+/// This function puts the current thread into idle mode for the specified time.
+///
+/// @note
+///     This is a default implementation, provided only as a last-ditch resort for platforms that
+///     cannot provide a better implementation.
+///
+/// @todo
+///     The current implementation is baded on boost::xtime, which has been deprecated since
+///     boost 1.34.
+///
+/// @attention
+///     Due to possible limitations of platform-specific implementations, this function may only be
+///     called to wait for less than 1 second.
+///
+/// @attention
+///     Due to possible limitations of platform-specific implementations, callers must not rely on
+///     the duration to be exact, or even anywhere close. Most notably, the function may return
+///     prematurely in case the thread receives a signal.
+///
+/// @param[in]  msec    Time to wait in milliseconds (0..999).
+///
 void Delay(unsigned int msec);
 
-#endif // POV_MULTITHREADED
+#endif // POV_MULTITHREADED && POV_USE_DEFAULT_DELAY
 
+#if POV_USE_DEFAULT_TIMER
 
-#if POV_TIMER_DEFAULT
-
-/**
- *  Default class for millisecond-precision timers.
- */
-class TimerDefault
+/// Millisecond-precision timer.
+///
+/// @note
+///     This is a default implementation, provided only as a last-ditch resort for platforms that
+///     cannot provide a better implementation. It can neither guarantee millisecond precision, nor
+///     does it support measurement of CPU time.
+///
+/// @todo
+///     This implementation is based on boost::xtime, which has been deprecated since 1.34.
+///
+/// @impl
+///     Note that to measure per-process CPU time we're not resorting to `clock()` as a default
+///     implementation, as depending on the platform it may incorrectly report elapsed wall-clock
+///     time (sources on the internet report this for Solaris, and it is a well-documented fact for
+///     Windows), and/or may be limited to timespans in the order of an hour (any system with a
+///     32-bit `clock_t` and a standard `CLOCKS_PER_SEC` of 1,000,000).
+///
+class Timer
 {
     public:
-        /**
-         *  Create a new timer and start it.
-         *  @param  tctime  CPU time shall only be that consumed
-         *                  by the current thread (if supported).
-         */
-        TimerDefault(bool tctime = false);
 
-        /**
-         *  Destructor.
-         */
-        ~TimerDefault();
+        /// Create and start a new timer.
+        ///
+        Timer();
 
-        /**
-         *  Determine elapsed real time since creation or last reset.
-         *  @return         Elapsed real time in milliseconds.
-         */
+        /// Destroy the timer.
+        ///
+        ~Timer();
+
+        /// Report elapsed wall-clock time.
+        ///
+        /// This method reports the actual time in milliseconds that has elapsed since the timer's
+        /// creation or last call to @ref Reset().
+        ///
+        /// @return     Elapsed real time in milliseconds.
+        ///
         POV_LONG ElapsedRealTime() const;
 
-        /**
-         *  Determine elapsed CPU time since creation or last reset.
-         *  If not supported, return elapsed real time instead!
-         *  @return         Elapsed CPU time in milliseconds.
-         */
-        POV_LONG ElapsedCPUTime() const;
+        /// Report CPU time consumed by current process.
+        ///
+        /// This method reports the CPU time in milliseconds that the current process has consumed
+        /// since the timer's creation or last call to @ref Reset().
+        ///
+        /// @note
+        ///     Timer implementations that do not support per-process measurement of CPU time
+        ///     consumption should fall back to reporting wall-clock time.
+        ///
+        /// @return     Elapsed CPU time in milliseconds.
+        ///
+        inline POV_LONG ElapsedProcessCPUTime() const { return ElapsedRealTime(); }
 
-        /**
-         *  Reset the timer.
-         */
+        /// Report CPU time consumed by current thread.
+        ///
+        /// This method reports the CPU time in milliseconds that the current thread has consumed
+        /// since the timer's creation or last call to @ref Reset().
+        ///
+        /// @note
+        ///     If the timer was created or reset from a different thread, the result is undefined.
+        ///
+        /// @note
+        ///     Timer implementations that do not support per-thread measurement of CPU time
+        ///     consumption should fall back to reporting CPU time consumed by the process if
+        ///     supported, or elapsed wall-clock time otherwise.
+        ///
+        /// @return     Elapsed CPU time in milliseconds.
+        ///
+        inline POV_LONG ElapsedThreadCPUTime() const { return ElapsedProcessCPUTime(); }
+
+        /// Reset the timer.
+        ///
         void Reset();
 
-        /**
-         *  Determine if CPU time is supported for the current settings.
-         *  in particular this has to return false if keeping the CPU time
-         *  for the current thread is not supported but was requested!
-         *  @return         True if the CPU time is valid for the current
-         *                  requested settings, false otherwise.
-         */
-        bool HasValidCPUTime() const;
+        /// Report whether per-process measurement of CPU time is supported.
+        ///
+        /// This method reports whether the timer does indeed support per-process measurement of CPU
+        /// time consumption, or falls back to some other time measurement instead.
+        ///
+        /// @return     `true` if @ref ElapsedProcessCPUTime() does indeed report per-thread CPU time
+        ///             consumption.
+        ///
+        inline bool HasValidProcessCPUTime() const { return false; }
+
+        /// Report whether per-thread measurement of CPU time is supported.
+        ///
+        /// This method reports whether the timer does indeed support per-thread measurement of CPU
+        /// time consumption, or falls back to some other time measurement instead.
+        ///
+        /// @return     `true` if @ref ElapsedThreadCPUTime() does indeed report per-thread CPU time
+        ///             consumption.
+        ///
+        inline bool HasValidThreadCPUTime() const { return false; }
+
     private:
-        /// thread CPU time flag
-        bool threadCPUTimeOnly;
+
         /// real time at last reset
-        boost::xtime realTimeStart;
-        /// CPU time at last reset
-        boost::xtime cpuTimeStart;
+        boost::xtime mRealTimeStart;
 };
 
-#endif // POV_TIMER_DEFAULT
-
-/// Millisecond-precision timer
-typedef POV_TIMER Timer;
+#endif // POV_USE_DEFAULT_TIMER
 
 }
 

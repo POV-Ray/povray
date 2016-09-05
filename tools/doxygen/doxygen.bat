@@ -1,38 +1,73 @@
 @echo off
 
+if "%~1" == "" goto :PARAMETER_ERROR
+
 rem set PLANTUML_JAR_PATH=C:\Program Files\PlantUML
 set /p POV_VER= < "../../unix/VERSION"
 
 call :JAVA_SYMLINK_FIX
 
-call :DOXYGEN
-call :PDFLATEX
+pushd "../.."
+doxygen.exe "tools/doxygen/%~1.cfg"
+if errorlevel 1 goto :DOXYGEN_FAIL
+popd
+
+call :PDFLATEX "%~1" "%~2"
+call :HTMLHELP "%~1"
+
 echo.
 echo done.
 goto :EOF
 
-:DOXYGEN
-doxygen.exe doxygen.cfg
-if errorlevel 1 goto :DOXYGEN_FAIL
+:PARAMETER_ERROR
+echo This batch file is no longer intended to be run directly.
+echo To generate source documentation, run source-doc.bat instead.
+pause
 goto :EOF
 
 :DOXYGEN_FAIL
+popd
 echo *** FAILED TO GENERATE SOURCE DOCUMENTATION ***
 pause
-exit 1
+goto :EOF
+
+
+rem ------------------------------------------------------------------------------------------------
 
 :PDFLATEX
-cd latex
-call make.bat
-cd ..
-if not exist "latex\refman.pdf" goto :PDFLATEX_FAIL
-if not exist pdf mkdir pdf
-copy "latex\refman.pdf" "pdf\POV-Ray Developer's Manual.pdf"
+if "%~2" == "" goto :EOF
+call "%~1\latex\make.bat"
+if not exist "%~1\latex\refman.pdf" goto :PDFLATEX_FAIL
+if not exist "%~dp2" mkdir "%~dp2"
+copy "%~1\latex\refman.pdf" "%~2"
 goto :EOF
 
 :PDFLATEX_FAIL
 echo *** FAILED TO GENERATE PDF MANUAL ***
 pause
+goto :EOF
+
+
+rem ------------------------------------------------------------------------------------------------
+
+:HTMLHELP
+if not exist "%~1\html\index.hhp" goto :EOF
+call :CLEANUP_FILE "%~1\html\*.chm"
+hhc.exe "%~1\html\index.hhp"
+if not exist "%~1\html\*.chm" goto :HTMLHELP_FAIL
+goto :EOF
+
+:HTMLHELP_FAIL
+echo.
+echo *** FAILED TO GENERATE HTML HELP FILE ***
+pause
+goto :EOF
+
+
+rem ------------------------------------------------------------------------------------------------
+
+:CLEANUP_FILE
+if exist "%~1" del "%~1"
 goto :EOF
 
 
@@ -59,7 +94,7 @@ rem set JAVA_EXE_DIR to the directory in which the actual java.exe resides
 call :SET_DIR JAVA_EXE_DIR "%TRUE_JAVA_EXE%"
 rem prepend JAVA_EXE_DIR to the path variable
 set PATH=%JAVA_EXE_DIR%;%PATH%
- goto :EOF
+goto :EOF
 
 :FIND_IN_PATH
 set %1=%~dp$PATH:2%2

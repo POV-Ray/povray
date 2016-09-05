@@ -51,13 +51,12 @@
 #include "core/material/warp.h"
 #include "core/math/matrix.h"
 #include "core/scene/object.h"
+#include "core/scene/scenedata.h"
 #include "core/scene/tracethreaddata.h"
 #include "core/shape/isosurface.h"
 #include "core/support/imageutil.h"
 
 #include "vm/fnpovfpu.h"
-
-#include "backend/scene/backendscenedata.h"
 
 #ifdef SYS_IMAGE_HEADER
 #include SYS_IMAGE_HEADER
@@ -471,7 +470,7 @@ ImageData *Parser::Parse_Image(int Legal, bool GammaCorrect)
 #endif
         }
         else
-            image->data = Read_Image(sceneData, filetype, filename.c_str(), options);
+            image->data = Read_Image(filetype, filename.c_str(), options);
 
         if (!options.warnings.empty())
             for (vector<string>::iterator it = options.warnings.begin(); it != options.warnings.end(); it++)
@@ -584,6 +583,7 @@ void Parser::Parse_Image_Map (PIGMENT *Pigment)
                 case SPHERICAL_MAP:
                 case CYLINDRICAL_MAP:
                 case TORUS_MAP:
+                case ANGULAR_MAP:
                     break;
 
                 default:
@@ -1440,7 +1440,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
             GET(DF3_TOKEN);
             dynamic_cast<DensityFilePattern*>(New->pattern.get())->densityFile->Data->Name = Parse_C_String(true);
             {
-                IStream *dfile = Locate_File(sceneData, ASCIItoUCS2String(dynamic_cast<DensityFilePattern*>(New->pattern.get())->densityFile->Data->Name).c_str(), POV_File_Data_DF3, ign, true);
+                IStream *dfile = Locate_File(ASCIItoUCS2String(dynamic_cast<DensityFilePattern*>(New->pattern.get())->densityFile->Data->Name).c_str(), POV_File_Data_DF3, ign, true);
                 if(dfile == NULL)
                     Error("Cannot read media density file.");
                 Read_Density_File(dfile, dynamic_cast<DensityFilePattern*>(New->pattern.get())->densityFile);
@@ -5254,7 +5254,7 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
             GET(DF3_TOKEN);
             dynamic_cast<DensityFilePattern*>(New->pattern.get())->densityFile->Data->Name = Parse_C_String(true);
             {
-                IStream *dfile = Locate_File(sceneData, ASCIItoUCS2String(dynamic_cast<DensityFilePattern*>(New->pattern.get())->densityFile->Data->Name).c_str(), POV_File_Data_DF3, ign, true);
+                IStream *dfile = Locate_File(ASCIItoUCS2String(dynamic_cast<DensityFilePattern*>(New->pattern.get())->densityFile->Data->Name).c_str(), POV_File_Data_DF3, ign, true);
                 if(dfile == NULL)
                     Error("Cannot read media density file.");
                 Read_Density_File(dfile, dynamic_cast<DensityFilePattern*>(New->pattern.get())->densityFile);

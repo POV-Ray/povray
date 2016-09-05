@@ -45,19 +45,17 @@
 #include "core/material/pattern.h"
 #include "core/scene/atmosphere.h"
 
-#include "vm/fnpovfpu.h"
-
 // this must be the last file included
 #include "base/povdebug.h"
 
 namespace pov
 {
 
-SceneData::SceneData() :
+SceneData::SceneData(GenericFunctionContextFactory* fcf) :
     fog(NULL),
     rainbow(NULL),
     skysphere(NULL),
-    functionContextFactory(new FunctionVM())
+    functionContextFactory(fcf)
 {
     atmosphereIOR = 1.0;
     atmosphereDispersion = 0.0;
@@ -80,6 +78,7 @@ SceneData::SceneData() :
     workingGammaToSRGB.reset();
     inputFileGammaSet = false; // TODO remove for 3.7x
     inputFileGamma = SRGBGammaCurve::Get();
+    gammaMode = kPOVList_GammaMode_None; // default setting for 3.62, which in turn is the default for the language
 
     mmPerUnit = 10;
     useSubsurface = false;

@@ -52,8 +52,7 @@ namespace pov
 {
 
 MessageFactory::MessageFactory(unsigned int wl, const char *sn, POVMSAddress saddr, POVMSAddress daddr, RenderBackend::SceneId sid, RenderBackend::ViewId vid) :
-    warningLevel(wl),
-    stageName(sn),
+    GenericMessenger(wl, sn),
     sourceAddress(saddr),
     destinationAddress(daddr),
     sceneId(sid),
@@ -63,302 +62,14 @@ MessageFactory::MessageFactory(unsigned int wl, const char *sn, POVMSAddress sad
 MessageFactory::~MessageFactory()
 {}
 
-void MessageFactory::CoreMessage(CoreMessageClass mc, const char *format, ...)
+void MessageFactory::SendMessage(MessageClass mc, WarningLevel level, const char *text,
+                                 const UCS2 *filename, POV_LONG line, POV_LONG column, POV_LONG offset)
 {
-    va_list marker;
     POVMSObject msg;
-    char localvsbuffer[1024];
-    WarningLevel level;
-    unsigned int msgClassId;
-
-    switch (mc)
-    {
-        case kCoreMessageClass_Debug:
-            sprintf(localvsbuffer, "%s Debug Info: ", stageName);
-            msgClassId = kPOVMsgIdent_Warning;
-            level = kWarningGeneral;
-            break;
-        case kCoreMessageClass_Info:
-            sprintf(localvsbuffer, "%s Info: ", stageName);
-            msgClassId = kPOVMsgIdent_Warning;
-            level = kWarningGeneral;
-            break;
-        case kCoreMessageClass_Warning:
-            if(warningLevel < kWarningGeneral)
-                return;
-            sprintf(localvsbuffer, "%s Warning: ", stageName);
-            msgClassId = kPOVMsgIdent_Warning;
-            level = kWarningGeneral;
-            break;
-        default:
-            break;
-    }
-
-    if ((msgClassId != kPOVMsgIdent_Warning) || (warningLevel >= level))
-    {
-        va_start(marker, format);
-        vsnprintf(localvsbuffer + strlen(localvsbuffer), 1023 - strlen(localvsbuffer), format, marker);
-        va_end(marker);
-
-        CleanupString(localvsbuffer);
-
-        (void)POVMSObject_New(&msg, kPOVObjectClass_ControlData);
-        (void)POVMSUtil_SetString(&msg, kPOVAttrib_EnglishText, localvsbuffer);
-        if (msgClassId == kPOVMsgIdent_Warning)
-            (void)POVMSUtil_SetInt(&msg, kPOVAttrib_Warning, level);
-
-        if(viewId != 0)
-            (void)POVMSUtil_SetInt(&msg, kPOVAttrib_ViewId, viewId);
-        else
-            (void)POVMSUtil_SetInt(&msg, kPOVAttrib_SceneId, sceneId);
-
-        if(viewId != 0)
-            (void)POVMSMsg_SetupMessage(&msg, kPOVMsgClass_ViewOutput, msgClassId);
-        else
-            (void)POVMSMsg_SetupMessage(&msg, kPOVMsgClass_SceneOutput, msgClassId);
-
-        (void)POVMSMsg_SetSourceAddress(&msg, sourceAddress);
-        (void)POVMSMsg_SetDestinationAddress(&msg, destinationAddress);
-
-        (void)POVMS_Send(NULL, &msg, NULL, kPOVMSSendMode_NoReply);
-    }
-}
-
-void MessageFactory::CoreMessageAt(CoreMessageClass mc, const UCS2 *filename, POV_LONG line, POV_LONG column, POV_LONG offset, const char *format, ...)
-{
-    va_list marker;
-    POVMSObject msg;
-    char localvsbuffer[1024];
-    WarningLevel level;
-    unsigned int msgClassId;
-
-    switch (mc)
-    {
-        case kCoreMessageClass_Debug:
-            sprintf(localvsbuffer, "%s Debug Info: ", stageName);
-            msgClassId = kPOVMsgIdent_Warning;
-            level = kWarningGeneral;
-            break;
-        case kCoreMessageClass_Info:
-            sprintf(localvsbuffer, "%s Info: ", stageName);
-            msgClassId = kPOVMsgIdent_Warning;
-            level = kWarningGeneral;
-            break;
-        case kCoreMessageClass_Warning:
-            if(warningLevel < kWarningGeneral)
-                return;
-            sprintf(localvsbuffer, "%s Warning: ", stageName);
-            msgClassId = kPOVMsgIdent_Warning;
-            level = kWarningGeneral;
-            break;
-        default:
-            break;
-    }
-
-    if ((msgClassId != kPOVMsgIdent_Warning) || (warningLevel >= level))
-    {
-        va_start(marker, format);
-        vsnprintf(localvsbuffer + strlen(localvsbuffer), 1023 - strlen(localvsbuffer), format, marker);
-        va_end(marker);
-
-        CleanupString(localvsbuffer);
-
-        (void)POVMSObject_New(&msg, kPOVObjectClass_ControlData);
-        (void)POVMSUtil_SetUCS2String(&msg, kPOVAttrib_FileName, filename);
-        (void)POVMSUtil_SetLong(&msg, kPOVAttrib_Line, line);
-        (void)POVMSUtil_SetLong(&msg, kPOVAttrib_Column, column);
-        (void)POVMSUtil_SetLong(&msg, kPOVAttrib_FilePosition, offset);
-
-        (void)POVMSUtil_SetString(&msg, kPOVAttrib_EnglishText, localvsbuffer);
-        if (msgClassId == kPOVMsgIdent_Warning)
-            (void)POVMSUtil_SetInt(&msg, kPOVAttrib_Warning, level);
-
-        if(viewId != 0)
-            (void)POVMSUtil_SetInt(&msg, kPOVAttrib_ViewId, viewId);
-        else
-            (void)POVMSUtil_SetInt(&msg, kPOVAttrib_SceneId, sceneId);
-
-        if(viewId != 0)
-            (void)POVMSMsg_SetupMessage(&msg, kPOVMsgClass_ViewOutput, msgClassId);
-        else
-            (void)POVMSMsg_SetupMessage(&msg, kPOVMsgClass_SceneOutput, msgClassId);
-
-        (void)POVMSMsg_SetSourceAddress(&msg, sourceAddress);
-        (void)POVMSMsg_SetDestinationAddress(&msg, destinationAddress);
-
-        (void)POVMS_Send(NULL, &msg, NULL, kPOVMSSendMode_NoReply);
-    }
-}
-
-void MessageFactory::Warning(WarningLevel level, const char *format,...)
-{
-    if(warningLevel >= level)
-    {
-        va_list marker;
-        POVMSObject msg;
-        char localvsbuffer[1024];
-
-        sprintf(localvsbuffer, "%s Warning: ", stageName);
-
-        va_start(marker, format);
-        vsnprintf(localvsbuffer + strlen(localvsbuffer), 1023 - strlen(localvsbuffer), format, marker);
-        va_end(marker);
-
-        CleanupString(localvsbuffer);
-
-        (void)POVMSObject_New(&msg, kPOVObjectClass_ControlData);
-        (void)POVMSUtil_SetString(&msg, kPOVAttrib_EnglishText, localvsbuffer);
-        (void)POVMSUtil_SetInt(&msg, kPOVAttrib_Warning, level);
-
-        if(viewId != 0)
-            (void)POVMSUtil_SetInt(&msg, kPOVAttrib_ViewId, viewId);
-        else
-            (void)POVMSUtil_SetInt(&msg, kPOVAttrib_SceneId, sceneId);
-
-        if(viewId != 0)
-            (void)POVMSMsg_SetupMessage(&msg, kPOVMsgClass_ViewOutput, kPOVMsgIdent_Warning);
-        else
-            (void)POVMSMsg_SetupMessage(&msg, kPOVMsgClass_SceneOutput, kPOVMsgIdent_Warning);
-
-        (void)POVMSMsg_SetSourceAddress(&msg, sourceAddress);
-        (void)POVMSMsg_SetDestinationAddress(&msg, destinationAddress);
-
-        (void)POVMS_Send(NULL, &msg, NULL, kPOVMSSendMode_NoReply);
-    }
-}
-
-void MessageFactory::WarningAt(WarningLevel level, const UCS2 *filename, POV_LONG line, POV_LONG column, POV_LONG offset, const char *format, ...)
-{
-    if(warningLevel >= level)
-    {
-        va_list marker;
-        POVMSObject msg;
-        char localvsbuffer[1024];
-
-        sprintf(localvsbuffer, "%s Warning: ", stageName);
-
-        va_start(marker, format);
-        vsnprintf(localvsbuffer + strlen(localvsbuffer), 1023 - strlen(localvsbuffer), format, marker);
-        va_end(marker);
-
-        CleanupString(localvsbuffer);
-
-        (void)POVMSObject_New(&msg, kPOVObjectClass_ControlData);
-        (void)POVMSUtil_SetUCS2String(&msg, kPOVAttrib_FileName, filename);
-        (void)POVMSUtil_SetLong(&msg, kPOVAttrib_Line, line);
-        (void)POVMSUtil_SetLong(&msg, kPOVAttrib_Column, column);
-        (void)POVMSUtil_SetLong(&msg, kPOVAttrib_FilePosition, offset);
-
-        (void)POVMSUtil_SetString(&msg, kPOVAttrib_EnglishText, localvsbuffer);
-        (void)POVMSUtil_SetInt(&msg, kPOVAttrib_Warning, level);
-
-        if(viewId != 0)
-            (void)POVMSUtil_SetInt(&msg, kPOVAttrib_ViewId, viewId);
-        else
-            (void)POVMSUtil_SetInt(&msg, kPOVAttrib_SceneId, sceneId);
-
-        if(viewId != 0)
-            (void)POVMSMsg_SetupMessage(&msg, kPOVMsgClass_ViewOutput, kPOVMsgIdent_Warning);
-        else
-            (void)POVMSMsg_SetupMessage(&msg, kPOVMsgClass_SceneOutput, kPOVMsgIdent_Warning);
-
-        (void)POVMSMsg_SetSourceAddress(&msg, sourceAddress);
-        (void)POVMSMsg_SetDestinationAddress(&msg, destinationAddress);
-
-        (void)POVMS_Send(NULL, &msg, NULL, kPOVMSSendMode_NoReply);
-    }
-}
-
-void MessageFactory::PossibleError(const char *format,...)
-{
-    va_list marker;
-    POVMSObject msg;
-    char localvsbuffer[1024];
-
-    sprintf(localvsbuffer, "Possible %s Error: ", stageName);
-
-    va_start(marker, format);
-    vsnprintf(localvsbuffer + strlen(localvsbuffer), 1023 - strlen(localvsbuffer), format, marker);
-    va_end(marker);
-
-    CleanupString(localvsbuffer);
-
-    if(warningLevel == 0)
-        return;
+    unsigned int msgIdent;
 
     (void)POVMSObject_New(&msg, kPOVObjectClass_ControlData);
-    (void)POVMSUtil_SetString(&msg, kPOVAttrib_EnglishText, localvsbuffer);
-    (void)POVMSUtil_SetInt(&msg, kPOVAttrib_Error, 0);
 
-    if(viewId != 0)
-        (void)POVMSUtil_SetInt(&msg, kPOVAttrib_ViewId, viewId);
-    else
-        (void)POVMSUtil_SetInt(&msg, kPOVAttrib_SceneId, sceneId);
-
-    if(viewId != 0)
-        (void)POVMSMsg_SetupMessage(&msg, kPOVMsgClass_ViewOutput, kPOVMsgIdent_Error);
-    else
-        (void)POVMSMsg_SetupMessage(&msg, kPOVMsgClass_SceneOutput, kPOVMsgIdent_Error);
-
-    (void)POVMSMsg_SetSourceAddress(&msg, sourceAddress);
-    (void)POVMSMsg_SetDestinationAddress(&msg, destinationAddress);
-
-    (void)POVMS_Send(NULL, &msg, NULL, kPOVMSSendMode_NoReply);
-}
-
-void MessageFactory::PossibleErrorAt(const UCS2 *filename, POV_LONG line, POV_LONG column, POV_LONG offset, const char *format, ...)
-{
-    va_list marker;
-    POVMSObject msg;
-    char localvsbuffer[1024];
-
-    sprintf(localvsbuffer, "Possible %s Error: ", stageName);
-
-    va_start(marker, format);
-    vsnprintf(localvsbuffer + strlen(localvsbuffer), 1023 - strlen(localvsbuffer), format, marker);
-    va_end(marker);
-
-    CleanupString(localvsbuffer);
-
-    if(warningLevel == 0)
-        return;
-
-    (void)POVMSObject_New(&msg, kPOVObjectClass_ControlData);
-    (void)POVMSUtil_SetUCS2String(&msg, kPOVAttrib_FileName, filename);
-    (void)POVMSUtil_SetLong(&msg, kPOVAttrib_Line, line);
-    (void)POVMSUtil_SetLong(&msg, kPOVAttrib_Column, column);
-    (void)POVMSUtil_SetLong(&msg, kPOVAttrib_FilePosition, offset);
-
-    (void)POVMSUtil_SetString(&msg, kPOVAttrib_EnglishText, localvsbuffer);
-    (void)POVMSUtil_SetInt(&msg, kPOVAttrib_Error, 0);
-
-    if(viewId != 0)
-        (void)POVMSUtil_SetInt(&msg, kPOVAttrib_ViewId, viewId);
-    else
-        (void)POVMSUtil_SetInt(&msg, kPOVAttrib_SceneId, sceneId);
-
-    if(viewId != 0)
-        (void)POVMSMsg_SetupMessage(&msg, kPOVMsgClass_ViewOutput, kPOVMsgIdent_Error);
-    else
-        (void)POVMSMsg_SetupMessage(&msg, kPOVMsgClass_SceneOutput, kPOVMsgIdent_Error);
-
-    (void)POVMSMsg_SetSourceAddress(&msg, sourceAddress);
-    (void)POVMSMsg_SetDestinationAddress(&msg, destinationAddress);
-
-    (void)POVMS_Send(NULL, &msg, NULL, kPOVMSSendMode_NoReply);
-}
-
-// filename defaults to NULL, and line, column, and offset default to -1
-std::string MessageFactory::SendError(const char *format, va_list arglist, const UCS2 *filename, POV_LONG line, POV_LONG column, POV_LONG offset)
-{
-    POVMSObject msg;
-    char localvsbuffer[1024];
-
-    sprintf(localvsbuffer, "%s Error: ", stageName);
-    vsnprintf(localvsbuffer + strlen(localvsbuffer), 1023 - strlen(localvsbuffer), format, arglist);
-    CleanupString(localvsbuffer);
-
-    (void)POVMSObject_New(&msg, kPOVObjectClass_ControlData);
     if (filename != NULL)
         (void)POVMSUtil_SetUCS2String(&msg, kPOVAttrib_FileName, filename);
     if (line != -1)
@@ -367,133 +78,55 @@ std::string MessageFactory::SendError(const char *format, va_list arglist, const
         (void)POVMSUtil_SetLong(&msg, kPOVAttrib_Column, column);
     if (offset != -1)
         (void)POVMSUtil_SetLong(&msg, kPOVAttrib_FilePosition, offset);
-    (void)POVMSUtil_SetString(&msg, kPOVAttrib_EnglishText, localvsbuffer);
-    (void)POVMSUtil_SetInt(&msg, kPOVAttrib_Error, 0);
+
+    (void)POVMSUtil_SetString(&msg, kPOVAttrib_EnglishText, text);
+
+    switch(mc)
+    {
+        case kMessageClass_UserDebug:
+            msgIdent = kPOVMsgIdent_Debug;
+            break;
+
+        case kMessageClass_InternalDebug:
+            POV_ASSERT(false); // not yet implemented
+            break;
+
+        case kMessageClass_Info:
+        case kMessageClass_Warning:
+            msgIdent = kPOVMsgIdent_Warning;
+            (void)POVMSUtil_SetInt(&msg, kPOVAttrib_Warning, level);
+            break;
+
+        case kMessageClass_PossibleError:
+            msgIdent = kPOVMsgIdent_Error;
+            (void)POVMSUtil_SetInt(&msg, kPOVAttrib_Error, 0);
+            break;
+
+        case kMessageClass_Error:
+            msgIdent = kPOVMsgIdent_FatalError;
+            (void)POVMSUtil_SetInt(&msg, kPOVAttrib_Error, 0);
+            break;
+
+        default:
+            POV_ASSERT(false);
+            break;
+    }
 
     if(viewId != 0)
     {
         (void)POVMSUtil_SetInt(&msg, kPOVAttrib_ViewId, viewId);
-        (void)POVMSMsg_SetupMessage(&msg, kPOVMsgClass_ViewOutput, kPOVMsgIdent_FatalError);
+        (void)POVMSMsg_SetupMessage(&msg, kPOVMsgClass_ViewOutput, msgIdent);
     }
     else
     {
         (void)POVMSUtil_SetInt(&msg, kPOVAttrib_SceneId, sceneId);
-        (void)POVMSMsg_SetupMessage(&msg, kPOVMsgClass_SceneOutput, kPOVMsgIdent_FatalError);
+        (void)POVMSMsg_SetupMessage(&msg, kPOVMsgClass_SceneOutput, msgIdent);
     }
 
     (void)POVMSMsg_SetSourceAddress(&msg, sourceAddress);
     (void)POVMSMsg_SetDestinationAddress(&msg, destinationAddress);
 
     (void)POVMS_Send(NULL, &msg, NULL, kPOVMSSendMode_NoReply);
-
-    return std::string(localvsbuffer);
-}
-
-void MessageFactory::Error(const char *format, ...)
-{
-    va_list marker;
-
-    va_start(marker, format);
-    std::string text = SendError(format, marker);
-    va_end(marker);
-
-    // Terminate by throwing an exception with the notification flag already set
-    pov_base::Exception ex(__FUNCTION__, __FILE__, __LINE__, text);
-    ex.frontendnotified(true);
-    throw ex;
-}
-
-void MessageFactory::Error(const Exception& ex, const char *format, ...)
-{
-    va_list marker;
-
-    // if the front-end has been told about this exception already, we don't want to tell it again
-    // (we presume that the text given by format and its parameters relate to that exception)
-    // this form of frontendnotified() doesn't change the state of ex
-    if (ex.frontendnotified())
-        throw ex;
-
-    va_start(marker, format);
-    SendError(format, marker);
-    va_end(marker);
-
-    // now take a copy of ex and set its notification flag, then throw that.
-    pov_base::Exception local_ex(ex);
-    local_ex.frontendnotified(true);
-    throw local_ex;
-}
-
-void MessageFactory::Error(Exception& ex, const char *format, ...)
-{
-    va_list marker;
-
-    // if the front-end has been told about this exception already, we don't want to tell it again
-    // (we presume that the text given by format and its parameters relate to that exception)
-    // this form of frontendnotified() sets the notified state of ex
-    if (ex.frontendnotified(true))
-        throw ex;
-
-    va_start(marker, format);
-    SendError(format, marker);
-    va_end(marker);
-
-    // Terminate
-    throw ex;
-}
-
-void MessageFactory::ErrorAt(const UCS2 *filename, POV_LONG line, POV_LONG column, POV_LONG offset, const char *format, ...)
-{
-    va_list marker;
-
-    va_start(marker, format);
-    std::string text = SendError(format, marker, filename, line, column, offset);
-    va_end(marker);
-
-    // Terminate by throwing an exception with the notification flag already set
-    pov_base::Exception ex(__FUNCTION__, __FILE__, __LINE__, text);
-    ex.frontendnotified(true);
-
-    throw ex;
-}
-
-void MessageFactory::ErrorAt(const Exception& ex, const UCS2 *filename, POV_LONG line, POV_LONG column, POV_LONG offset, const char *format, ...)
-{
-    va_list marker;
-
-    if (ex.frontendnotified())
-        throw ex;
-
-    va_start(marker, format);
-    SendError(format, marker, filename, line, column, offset);
-    va_end(marker);
-
-    pov_base::Exception local_ex(ex);
-    local_ex.frontendnotified(true);
-    throw local_ex;
-}
-
-void MessageFactory::ErrorAt(Exception& ex, const UCS2 *filename, POV_LONG line, POV_LONG column, POV_LONG offset, const char *format, ...)
-{
-    va_list marker;
-
-    if (ex.frontendnotified(true))
-        throw ex;
-
-    va_start(marker, format);
-    SendError(format, marker, filename, line, column, offset);
-    va_end(marker);
-
-    throw ex;
-}
-
-void MessageFactory::CleanupString(char *str)
-{
-    while(*str != 0)
-    {
-        if(*str == '\n')
-            *str = ' ';
-        str++;
-    }
 }
 
 }
