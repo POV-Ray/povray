@@ -653,7 +653,7 @@ AC_CHECK_TYPES([clockid_t])
 
 # getrusage and related <sys/resource.h>
 AC_CHECK_FUNCS([getrusage])
-AC_CHECK_DECLS([RUSAGE_SELF, RUSAGE_THREAD, RUSAGE_LWP]
+AC_CHECK_DECLS([RUSAGE_SELF, RUSAGE_THREAD, RUSAGE_LWP],
   [], [], [[#include <sys/resource.h>]]
 )
 
