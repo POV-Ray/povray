@@ -90,7 +90,7 @@ const DBL CLOSE_TOLERANCE = 1.0e-6;
 *
 ******************************************************************************/
 
-bool Box::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread)
+bool Box::All_Intersections (const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread) const
 {
     int Intersection_Found;
     int Side1, Side2;
@@ -590,16 +590,16 @@ bool Box::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 *
 ******************************************************************************/
 
-void Box::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread) const
+void Box::Normal (Vector3d& geometricNormal, Vector3d& smoothNormal, Intersection *Inter, TraceThreadData *Thread) const
 {
     switch (Inter->i1)
     {
-        case kSideHit_X0: Result = Vector3d(-1.0,  0.0,  0.0); break;
-        case kSideHit_X1: Result = Vector3d( 1.0,  0.0,  0.0); break;
-        case kSideHit_Y0: Result = Vector3d( 0.0, -1.0,  0.0); break;
-        case kSideHit_Y1: Result = Vector3d( 0.0,  1.0,  0.0); break;
-        case kSideHit_Z0: Result = Vector3d( 0.0,  0.0, -1.0); break;
-        case kSideHit_Z1: Result = Vector3d( 0.0,  0.0,  1.0); break;
+        case kSideHit_X0: geometricNormal = Vector3d(-1.0,  0.0,  0.0); break;
+        case kSideHit_X1: geometricNormal = Vector3d( 1.0,  0.0,  0.0); break;
+        case kSideHit_Y0: geometricNormal = Vector3d( 0.0, -1.0,  0.0); break;
+        case kSideHit_Y1: geometricNormal = Vector3d( 0.0,  1.0,  0.0); break;
+        case kSideHit_Z0: geometricNormal = Vector3d( 0.0,  0.0, -1.0); break;
+        case kSideHit_Z1: geometricNormal = Vector3d( 0.0,  0.0,  1.0); break;
 
         default: throw POV_EXCEPTION_STRING("Unknown box side in Box_Normal().");
     }
@@ -608,10 +608,12 @@ void Box::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread)
 
     if (Trans != NULL)
     {
-        MTransNormal(Result, Result, Trans);
+        MTransNormal (geometricNormal, geometricNormal, Trans);
 
-        Result.normalize();
+        geometricNormal.normalize();
     }
+
+    smoothNormal = geometricNormal;
 }
 
 

@@ -1199,7 +1199,8 @@ DBL f_pattern(FPUContext *ctx, DBL *ptr, unsigned int fn) // 77
 
     Warp_EPoint (TPoint, Vec, reinterpret_cast<const TPATTERN *>(f->private_data));
 
-    return Evaluate_TPat(reinterpret_cast<const TPATTERN *>(f->private_data), TPoint, NULL, NULL, ctx->threaddata);
+    return Evaluate_TPat (reinterpret_cast<const TPATTERN *>(f->private_data), TPoint,
+                          NULL, NULL, NULL, ctx->threaddata);
 }
 
 DBL f_noise_generator(FPUContext *ctx, DBL *ptr, unsigned int) // 78
@@ -1227,7 +1228,8 @@ void f_pigment(FPUContext *ctx, DBL *ptr, unsigned int fn, unsigned int sp) // 0
         return;
     }
 
-    Compute_Pigment(Col, reinterpret_cast<const PIGMENT *>(f->private_data), Vec, NULL, NULL, ctx->threaddata);
+    Compute_Pigment (Col, reinterpret_cast<const PIGMENT *>(f->private_data), Vec,
+                     NULL, NULL, NULL, ctx->threaddata);
     rgbftCol = ToRGBFTColour(Col);
 
     ctx->SetLocal(sp + pRED,    rgbftCol.red());

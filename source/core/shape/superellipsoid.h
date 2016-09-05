@@ -66,16 +66,16 @@ class Superellipsoid : public ObjectBase
 
         virtual ObjectPtr Copy();
 
-        virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
+        virtual bool All_Intersections (const Ray&, IStack&, TraceThreadData *) const;
         virtual bool Inside(const Vector3d&, TraceThreadData *) const;
-        virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const;
+        virtual void Normal (Vector3d&, Vector3d&, Intersection *, TraceThreadData *) const;
         virtual void Translate(const Vector3d&, const TRANSFORM *);
         virtual void Rotate(const Vector3d&, const TRANSFORM *);
         virtual void Scale(const Vector3d&, const TRANSFORM *);
         virtual void Transform(const TRANSFORM *);
         virtual void Compute_BBox();
     protected:
-        bool Intersect(const BasicRay& ray, IStack& Depth_Stack, TraceThreadData *Thread);
+        bool Intersect (const BasicRay& ray, IStack& Depth_Stack, TraceThreadData *Thread) const;
         static bool intersect_box(const Vector3d& P, const Vector3d& D, DBL *dmin, DBL *dmax);
         static DBL power(DBL x, DBL e);
         static DBL evaluate_g(DBL x, DBL y, DBL e);
@@ -84,7 +84,7 @@ class Superellipsoid : public ObjectBase
         int find_ray_plane_points(const Vector3d& P, const Vector3d& D, int cnt, DBL *dists, DBL mindist, DBL maxdist) const;
         void solve_hit1(DBL v0, const Vector3d& tP0, DBL v1, const Vector3d& tP1, Vector3d& P) const;
         bool check_hit2(const Vector3d& P, const Vector3d& D, DBL t0, Vector3d& P0, DBL v0, DBL t1, DBL *t, Vector3d& Q) const;
-        bool insert_hit(const BasicRay& ray, DBL Depth, IStack& Depth_Stack, TraceThreadData *Thread);
+        bool insert_hit (const BasicRay& ray, DBL Depth, IStack& Depth_Stack, TraceThreadData *Thread) const;
 };
 
 }

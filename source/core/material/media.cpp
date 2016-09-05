@@ -583,7 +583,7 @@ void MediaFunction::ComputeMediaLightInterval(LightSourceEntryVector& lights, Li
             }
         }
 
-        for(vector<LightSource *>::iterator i(isect.Object->LLights.begin()); i != isect.Object->LLights.end(); i++)
+        for (vector<LightSource *>::const_iterator i(isect.Object->LLights.begin()); i != isect.Object->LLights.end(); i++)
         {
             if((*i)->Media_Interaction == true)
                 ComputeOneMediaLightInterval(*i, lights, ray, isect);

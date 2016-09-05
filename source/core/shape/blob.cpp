@@ -224,7 +224,7 @@ const int EXITING  = BLOB_ENTER_EXIT_FLAG;
 *
 ******************************************************************************/
 
-bool Blob::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread)
+bool Blob::All_Intersections (const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread) const
 {
     int i, j, cnt;
     int root_count, in_flag;
@@ -1780,7 +1780,8 @@ void Blob::element_normal(Vector3d& Result, const Vector3d& P, const Blob_Elemen
 *
 ******************************************************************************/
 
-void Blob::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread) const
+void Blob::Normal (Vector3d& geometricNormal, Vector3d& smoothNormal, Intersection *Inter,
+                   TraceThreadData *Thread) const
 {
     int i;
     unsigned int size;
@@ -1791,8 +1792,15 @@ void Blob::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread
 
     /* Transform the point into the blob space. */
     getLocalIPoint(New_Point, Inter);
+    // The blob-space coordinates may be of interest later in determining textures
+    if (!Inter->haveLocalIPoint)
+    {
+        Inter->haveLocalIPoint = true;
+        Inter->LocalIPoint = New_Point;
+    }
 
-    Result = Vector3d(0.0, 0.0, 0.0);
+
+    geometricNormal = Vector3d(0.0, 0.0, 0.0);
 
     /* For each component that contributes to this point, add its bit to the normal */
 
@@ -1802,7 +1810,7 @@ void Blob::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread
 
         for (vector<Blob_Element>::iterator i = Data->Entry.begin(); i != Data->Entry.end(); ++i)
         {
-            element_normal(Result, New_Point, &(*i));
+            element_normal (geometricNormal, New_Point, &(*i));
         }
     }
     else
@@ -1821,7 +1829,7 @@ void Blob::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread
 
             if (Tree->Entries <= 0)
             {
-                element_normal(Result, New_Point, reinterpret_cast<Blob_Element *>(Tree->Node));
+                element_normal (geometricNormal, New_Point, reinterpret_cast<Blob_Element *>(Tree->Node));
             }
             else
             {
@@ -1843,11 +1851,11 @@ void Blob::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread
         }
     }
 
-    val = Result.lengthSqr();
+    val = geometricNormal.lengthSqr();
 
     if (val == 0.0)
     {
-        Result = Vector3d(1.0, 0.0, 0.0);
+        geometricNormal = Vector3d(1.0, 0.0, 0.0);
     }
     else
     {
@@ -1855,17 +1863,19 @@ void Blob::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread
 
         val = 1.0 / sqrt(val);
 
-        Result *= val;
+        geometricNormal *= val;
     }
 
     /* Transform back to world space. */
 
     if (Trans != NULL)
     {
-        MTransNormal(Result, Result, Trans);
+        MTransNormal (geometricNormal, geometricNormal, Trans);
 
-        Result.normalize();
+        geometricNormal.normalize();
     }
+
+    smoothNormal = geometricNormal;
 }
 
 
@@ -2739,7 +2749,8 @@ void Blob::build_bounding_hierarchy()
 *
 ******************************************************************************/
 
-void Blob::Determine_Textures(Intersection *isect, bool hitinside, WeightedTextureVector& textures, TraceThreadData *Thread)
+void Blob::Determine_Textures (const Intersection *isect, bool hitinside, WeightedTextureVector& textures,
+                               TraceThreadData *Thread) const
 {
     unsigned int size;
     DBL rad2;
@@ -2845,7 +2856,8 @@ void Blob::Determine_Textures(Intersection *isect, bool hitinside, WeightedTextu
 *
 ******************************************************************************/
 
-void Blob::determine_element_texture(const Blob_Element *Element, TextureData& ElementTex, const Vector3d& P, WeightedTextureVector& textures)
+void Blob::determine_element_texture (const Blob_Element *Element, const TextureData& ElementTex, const Vector3d& P,
+                                      WeightedTextureVector& textures) const
 {
     DBL density = fabs(calculate_element_field(Element, P));
 
@@ -3233,19 +3245,14 @@ void Blob::Create_Blob_Element_Texture_List(Blob_List_Struct *BlobList, int npoi
 
 /*****************************************************************************/
 
-void Blob::getLocalIPoint(Vector3d& lip, Intersection *isect) const
+void Blob::getLocalIPoint (Vector3d& lip, const Intersection *isect) const
 {
-    if(isect->haveLocalIPoint == false)
-    {
-        if(Trans != NULL)
-            MInvTransPoint(isect->LocalIPoint, isect->IPoint, Trans);
-        else
-            isect->LocalIPoint = isect->IPoint;
-
-        isect->haveLocalIPoint = true;
-    }
-
-    lip = isect->LocalIPoint;
+    if(isect->haveLocalIPoint)
+        lip = isect->LocalIPoint;
+    else if(Trans != NULL)
+        MInvTransPoint (lip, isect->IPoint, Trans);
+    else
+        lip = isect->IPoint;
 }
 
 }

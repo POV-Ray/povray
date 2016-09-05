@@ -218,8 +218,9 @@ DBL PhotonTrace::TraceRay(Ray& ray, MathColour& colour, ColourChannel&, COLC wei
         return bestisect.Depth;
 }
 
-void PhotonTrace::ComputeLightedTexture(MathColour& LightCol, ColourChannel&, const TextureLayerList& Texture, vector<const TPATTERN *>& warps, const Vector3d& ipoint, const Vector3d& rawnormal,
-                                        Ray& ray, COLC weight, Intersection& isect)
+void PhotonTrace::ComputeLightedTexture (MathColour& LightCol, ColourChannel&, const TextureLayerList& Texture,
+                                         vector<const TPATTERN *>& warps, const Vector3d& ipoint,
+                                         ShaderFunctionParameters& param, Ray& ray, COLC weight, Intersection& isect)
 {
     int i;
     int layer_number;
@@ -227,7 +228,7 @@ void PhotonTrace::ComputeLightedTexture(MathColour& LightCol, ColourChannel&, co
     DBL w1;
     DBL New_Weight, TempWeight;
     DBL Att, Trans;
-    Vector3d LayNormal, TopNormal;
+    Vector3d TopNormal, bottomNormal;
     TransColour LayCol;
     MathColour FilCol;
     MathColour AttCol, ResCol;
@@ -368,10 +369,11 @@ void PhotonTrace::ComputeLightedTexture(MathColour& LightCol, ColourChannel&, co
          ++layer_number, ++Layer)
     {
         // Get perturbed surface normal.
-        LayNormal = rawnormal;
 
         if (qualityFlags.normals && ((*Layer)->Tnormal != NULL))
         {
+            Vector3d LayNormal = isect.smoothNormal;
+
             for(vector<const TPATTERN *>::iterator i(warps.begin()); i != warps.end(); i++)
                 Warp_Normal(LayNormal, LayNormal, *i, Test_Flag(*i, DONT_SCALE_BUMPS_FLAG));
 
@@ -384,17 +386,22 @@ void PhotonTrace::ComputeLightedTexture(MathColour& LightCol, ColourChannel&, co
             //        compare performance with using forward iterators and decrement, or using random access.
             for(vector<const TPATTERN *>::reverse_iterator i(warps.rbegin()); i != warps.rend(); i++)
                 UnWarp_Normal(LayNormal, LayNormal, *i, Test_Flag(*i, DONT_SCALE_BUMPS_FLAG));
+
+            param.SetNormal (LayNormal);
         }
+        else
+            param.SetNormal (isect.smoothNormal);
 
         // Store top layer normal.
         if (!layer_number)
         {
-            TopNormal = LayNormal;
+            TopNormal = param.GetNormal();
         }
+        bottomNormal = param.GetNormal();
 
         // Get surface colour.
         New_Weight = weight * Trans;
-        colour_found = Compute_Pigment(LayCol, (*Layer)->Pigment, ipoint, &isect, &ray, threadData);
+        colour_found = Compute_Pigment (LayCol, (*Layer)->Pigment, ipoint, &isect, &param.GetNormal(), &ray, threadData);
 
         Att = Trans * max(0.0, (DBL)LayCol.Opacity());
 
@@ -410,10 +417,10 @@ void PhotonTrace::ComputeLightedTexture(MathColour& LightCol, ColourChannel&, co
             one_colour_found = true;
         }
 
-        listWNRX->push_back(WNRX(New_Weight, LayNormal, MathColour(), (*Layer)->Finish->Reflect_Exp));
+        listWNRX->push_back (WNRX (New_Weight, param.GetNormal(), MathColour(), (*Layer)->Finish->Reflect_Exp));
 
         // angle-dependent reflectivity
-        Cos_Angle_Incidence = -dot(ray.Direction, LayNormal);
+        Cos_Angle_Incidence = param.GetCosOut();
 
         if ((isect.Object->interior == NULL) && (*Layer)->Finish->Reflection_Fresnel)
             throw POV_EXCEPTION_STRING("fresnel reflection used with no interior."); // TODO FIXME - wrong place to report this [trf]
@@ -569,8 +576,8 @@ void PhotonTrace::ComputeLightedTexture(MathColour& LightCol, ColourChannel&, co
 
     if (doDiffuse)
     {
-        //ChooseRay(Ray &NewRay, Vector3d& Normal, Vector3d& Raw_Normal, int WhichRay)
-        ChooseRay(NewRay, LayNormal, rawnormal, rand()%400); // TODO - magic number
+        // TODO - this only respects the bottom layer's normal perturbation!
+        ChooseRay (NewRay, bottomNormal, isect.geometricNormal, rand() % 400); // TODO - magic number
 
         MathColour CurLightCol;
         CurLightCol = LightCol * ResCol;
@@ -608,7 +615,9 @@ void PhotonTrace::ComputeLightedTexture(MathColour& LightCol, ColourChannel&, co
         // Trace refracted ray.
         threadData->GFilCol = FilCol;
 
-        TIR_occured = ComputeRefractionForPhotons(Texture[0]->Finish.Get(), interior, isect.IPoint, ray, TopNormal, rawnormal, LightCol, New_Weight);
+        param.SetNormal (TopNormal);
+        TIR_occured = ComputeRefractionForPhotons (Texture[0]->Finish.Get(), interior, isect.IPoint, ray, param,
+                                                   isect.geometricNormal, LightCol, New_Weight);
     }
 
     // Shoot reflected photons.
@@ -651,7 +660,10 @@ void PhotonTrace::ComputeLightedTexture(MathColour& LightCol, ColourChannel&, co
 
                     TempWeight = (*listWNRX)[i].weight * (*listWNRX)[i].reflec.WeightMax();
 
-                    ComputeReflection((*Layer)->Finish.Get(), isect.IPoint, ray, LayNormal, rawnormal, TmpCol, TempWeight);
+                    // TODO - shouldn't this be (*listWNRX)[i].normal instead of bottomNormal?
+                    param.SetNormal (bottomNormal);
+                    ComputeReflection ((*Layer)->Finish.Get(), isect.IPoint, ray, param, isect.geometricNormal, TmpCol,
+                                       TempWeight);
                 }
             }
 
@@ -668,7 +680,9 @@ void PhotonTrace::ComputeLightedTexture(MathColour& LightCol, ColourChannel&, co
 }
 
 
-bool PhotonTrace::ComputeRefractionForPhotons(ConstFinishPtr finish, Interior *interior, const Vector3d& ipoint, Ray& ray, const Vector3d& normal, const Vector3d& rawnormal, MathColour& colour, COLC weight)
+bool PhotonTrace::ComputeRefractionForPhotons (ConstFinishPtr finish, Interior *interior, const Vector3d& ipoint,
+                                               Ray& ray, ShaderFunctionParameters& param, const Vector3d& rawnormal,
+                                               MathColour& colour, COLC weight)
 {
     Ray nray(ray);
     Vector3d localnormal;
@@ -758,20 +772,24 @@ bool PhotonTrace::ComputeRefractionForPhotons(ConstFinishPtr finish, Interior *i
     else
     {
         // Refract the ray.
-        n = dot(ray.Direction, normal);
+        n = -param.GetCosOut();
 
         if(n <= 0.0)
         {
-            localnormal = normal;
+            localnormal = param.GetNormal();
             n = -n;
         }
         else
-            localnormal = -normal;
+            localnormal = -param.GetNormal();
 
         if(!haveDispersion)
-            totalReflection = TraceRefractionRayForPhotons(finish, ipoint, ray, nray, ior, n, normal, rawnormal, localnormal, colour, weight);
+            totalReflection = TraceRefractionRayForPhotons (finish, ipoint, ray, nray,
+                                                            ior,
+                                                            n, param, rawnormal, localnormal, colour, weight);
         else if(ray.IsMonochromaticRay())
-            totalReflection = TraceRefractionRayForPhotons(finish, ipoint, ray, nray, ray.GetSpectralBand().GetDispersionIOR(ior, dispersion), n, normal, rawnormal, localnormal, colour, weight);
+            totalReflection = TraceRefractionRayForPhotons (finish, ipoint, ray, nray,
+                                                            ray.GetSpectralBand().GetDispersionIOR(ior, dispersion),
+                                                            n, param, rawnormal, localnormal, colour, weight);
         else
         {
             for(unsigned int i = 0; i < dispersionelements; i++)
@@ -784,15 +802,22 @@ bool PhotonTrace::ComputeRefractionForPhotons(ConstFinishPtr finish, Interior *i
 
                 tempColour = colour * spectralBand.GetHue() / DBL(dispersionelements);
 
-                (void)TraceRefractionRayForPhotons(finish, ipoint, ray, nray, spectralBand.GetDispersionIOR(ior, dispersion), n, normal, rawnormal, localnormal, tempColour, weight);
+                (void)TraceRefractionRayForPhotons (finish, ipoint, ray, nray,
+                                                    spectralBand.GetDispersionIOR(ior, dispersion),
+                                                    n, param, rawnormal, localnormal, tempColour, weight);
             }
+
+            // TODO - we need to do something about totalReflection
         }
     }
 
     return totalReflection;
 }
 
-bool PhotonTrace::TraceRefractionRayForPhotons(ConstFinishPtr finish, const Vector3d& ipoint, Ray& ray, Ray& nray, DBL ior, DBL n, const Vector3d& normal, const Vector3d& rawnormal, const Vector3d& localnormal, MathColour& colour, COLC weight)
+bool PhotonTrace::TraceRefractionRayForPhotons (ConstFinishPtr finish, const Vector3d& ipoint, Ray& ray, Ray& nray,
+                                                DBL ior, DBL n, ShaderFunctionParameters& param,
+                                                const Vector3d& rawnormal, const Vector3d& localnormal,
+                                                MathColour& colour, COLC weight)
 {
     // Compute refrated ray direction using Heckbert's method.
     DBL t = 1.0 + Sqr(ior) * (Sqr(n) - 1.0);
@@ -801,7 +826,7 @@ bool PhotonTrace::TraceRefractionRayForPhotons(ConstFinishPtr finish, const Vect
     {
         // Total internal reflection occures.
         threadData->Stats()[Internal_Reflected_Rays_Traced]++;
-        ComputeReflection(finish, ipoint, ray, normal, rawnormal, colour, weight);
+        ComputeReflection (finish, ipoint, ray, param, rawnormal, colour, weight);
 
         return true;
     }

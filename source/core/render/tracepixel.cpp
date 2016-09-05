@@ -1159,7 +1159,8 @@ TracePixel::FocalBlurData::FocalBlurData(const Camera& camera, TraceThreadData* 
             do
             {
                 v = (*vgen)();
-                Compute_Pigment(c, camera.Bokeh, Vector3d(v.x() + 0.5, v.y() + 0.5, 0.0), NULL, NULL, threadData);
+                Compute_Pigment (c, camera.Bokeh, Vector3d(v.x() + 0.5, v.y() + 0.5, 0.0), NULL, NULL, NULL,
+                                 threadData);
                 weight = c.colour().Greyscale();
                 weightSum += weight;
                 weightMax = max(weightMax, weight);

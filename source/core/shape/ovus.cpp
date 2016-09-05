@@ -261,7 +261,7 @@ void Ovus::Intersect_Ovus_Spheres(const Vector3d& P, const Vector3d& D,
 *
 ******************************************************************************/
 
-bool Ovus::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread)
+bool Ovus::All_Intersections (const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread) const
 {
     bool Found = false;
     Vector3d Real_Normal, Real_Pt, INormal, IPoint;
@@ -500,9 +500,11 @@ bool Ovus::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 *
 ******************************************************************************/
 
-void Ovus::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread) const
+void Ovus::Normal (Vector3d& geometricNormal, Vector3d& smoothNormal, Intersection *Inter,
+                   TraceThreadData *Thread) const
 {
-    Result = Inter->INormal;
+    geometricNormal = Inter->geometricNormal;
+    smoothNormal    = Inter->smoothNormal;
 }
 
 

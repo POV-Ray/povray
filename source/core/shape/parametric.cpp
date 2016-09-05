@@ -94,7 +94,7 @@ const int OK_V     = 128;
  *
  ******************************************************************************/
 
-bool Parametric::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread)
+bool Parametric::All_Intersections (const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread) const
 {
     Vector3d P, D, IPoint;
     Vector2d low_vect, hi_vect, uv;
@@ -436,7 +436,8 @@ bool Parametric::Inside(const Vector3d&, TraceThreadData *Thread) const
  *
  ******************************************************************************/
 
-void Parametric::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread) const
+void Parametric::Normal (Vector3d& geometricNormal, Vector3d& smoothNormal, Intersection *Inter,
+                         TraceThreadData *Thread) const
 {
     Vector3d RU, RV;
     Vector2d uv_vect;
@@ -464,10 +465,13 @@ void Parametric::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *
     RV[Y] += aFn[Y].Evaluate(uv_vect);
     RV[Z] += aFn[Z].Evaluate(uv_vect);
 
-    Result = cross(RU, RV);
+    // TODO - If the parametric is precomputed, the geometric normal may presumably be different.
+    geometricNormal = cross(RU, RV);
     if (Trans != NULL)
-        MTransNormal(Result, Result, Trans);
-    Result.normalize();
+        MTransNormal (geometricNormal, geometricNormal, Trans);
+    geometricNormal.normalize();
+
+    smoothNormal = geometricNormal;
 }
 
 

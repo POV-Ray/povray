@@ -70,9 +70,9 @@ class Disc : public ObjectBase
 
         virtual ObjectPtr Copy();
 
-        virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
+        virtual bool All_Intersections (const Ray&, IStack&, TraceThreadData *) const;
         virtual bool Inside(const Vector3d&, TraceThreadData *) const;
-        virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const;
+        virtual void Normal (Vector3d&, Vector3d&, Intersection *, TraceThreadData *) const;
         // virtual void UVCoord(Vector2d&, const Intersection *, TraceThreadData *) const; // TODO FIXME - why is there no UV-mapping for this object?
         virtual void Translate(const Vector3d&, const TRANSFORM *);
         virtual void Rotate(const Vector3d&, const TRANSFORM *);

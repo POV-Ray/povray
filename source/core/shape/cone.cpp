@@ -93,7 +93,7 @@ const int SIDE_HIT = 3;
 *
 ******************************************************************************/
 
-bool Cone::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread)
+bool Cone::All_Intersections (const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread) const
 {
     int Intersection_Found, cnt, i;
     Vector3d IPoint;
@@ -398,11 +398,12 @@ bool Cone::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 *
 ******************************************************************************/
 
-void Cone::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread) const
+void Cone::Normal (Vector3d& geometricNormal, Vector3d& smoothNormal, Intersection *Inter,
+                   TraceThreadData *Thread) const
 {
     /* Transform the point into the cones space */
 
-    MInvTransPoint(Result, Inter->IPoint, Trans);
+    MInvTransPoint (geometricNormal, Inter->IPoint, Trans);
 
     /* Calculating the normal is real simple in canonical cone space */
 
@@ -412,33 +413,35 @@ void Cone::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread
 
             if (Test_Flag(this, CYLINDER_FLAG))
             {
-                Result[Z] = 0.0;
+                geometricNormal[Z] = 0.0;
             }
             else
             {
-                Result[Z] = -Result[Z];
+                geometricNormal[Z] = -geometricNormal[Z];
             }
 
             break;
 
         case BASE_HIT:
 
-            Result = Vector3d(0.0, 0.0, -1.0);
+            geometricNormal = Vector3d(0.0, 0.0, -1.0);
 
             break;
 
         case CAP_HIT:
 
-            Result = Vector3d(0.0, 0.0, 1.0);
+            geometricNormal = Vector3d(0.0, 0.0, 1.0);
 
             break;
     }
 
     /* Transform the point out of the cones space */
 
-    MTransNormal(Result, Result, Trans);
+    MTransNormal (geometricNormal, geometricNormal, Trans);
 
-    Result.normalize();
+    geometricNormal.normalize();
+
+    smoothNormal = geometricNormal;
 }
 
 

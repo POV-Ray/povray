@@ -8,7 +8,7 @@ While POV-Ray is being developed with portability high in mind, the C++ standard
 we consider too exotic to cater to. We therefore presume all compilers and runtime environments to adhere to the
 following additional restrictions:
 
-  - **Char Size**: The `char` data type is currently presumed to be exactly 8 bits wide.
+  - **Char Size**: The `char` data type is currently presumed to be _exactly_ 8 bits wide.
 
   - **Pointer Size**: All pointers are presumed to be of the same width.
 
@@ -20,6 +20,12 @@ following additional restrictions:
 
   - **Integer Division**: Integer division is presumed to round towards zero. This also implies that the remainder (as
     computed by the modulus operator `%`) is negative (or zero) if the dividend and divisor have different sign.
+
+We also refrain from catering to some other degrees of freedom for the sake of coding convenience, presuming that
+platforms not conforming to the following additional restrictions are probably fundamentally unsuited to run
+contemporary versions of POV-Ray anyway:
+
+  - **Integer Size**: The `int` data type is presumed to be at least 32 bits wide.
 
 
 POVMS Additional Restrictions {#compiler_povms}

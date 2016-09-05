@@ -134,16 +134,16 @@ class Blob : public ObjectBase
 
         virtual ObjectPtr Copy();
 
-        virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
+        virtual bool All_Intersections (const Ray&, IStack&, TraceThreadData *) const;
         virtual bool Inside(const Vector3d&, TraceThreadData *) const;
-        virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const;
+        virtual void Normal (Vector3d&, Vector3d&, Intersection *, TraceThreadData *) const;
         virtual void Translate(const Vector3d&, const TRANSFORM *);
         virtual void Rotate(const Vector3d&, const TRANSFORM *);
         virtual void Scale(const Vector3d&, const TRANSFORM *);
         virtual void Transform(const TRANSFORM *);
         virtual void Compute_BBox();
 
-        void Determine_Textures(Intersection *, bool, WeightedTextureVector&, TraceThreadData *);
+        void Determine_Textures (const Intersection *, bool, WeightedTextureVector&, TraceThreadData *) const;
 
         Blob_List_Struct *Create_Blob_List_Element();
         void Create_Blob_Element_Texture_List(Blob_List_Struct *BlobList, int npoints);
@@ -172,11 +172,12 @@ class Blob : public ObjectBase
         static void get_element_bounding_sphere(const Blob_Element *Element, Vector3d& Center, DBL *Radius2);
         void build_bounding_hierarchy();
 
-        void determine_element_texture(const Blob_Element *Element, TextureData& Texture, const Vector3d& P, WeightedTextureVector&);
+        void determine_element_texture (const Blob_Element *Element, const TextureData& Texture, const Vector3d& P,
+                                        WeightedTextureVector&) const;
 
         static bool insert_node(BSPHERE_TREE *Node, unsigned int *size, TraceThreadData *Thread);
 
-        void getLocalIPoint(Vector3d& lip, Intersection *isect) const;
+        void getLocalIPoint(Vector3d& lip, const Intersection *isect) const;
 };
 
 }

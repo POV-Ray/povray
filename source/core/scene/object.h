@@ -216,9 +216,9 @@ class ObjectBase
         ///
         virtual bool Precompute() { return true; };
 
-        virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *) = 0; // could be "const", if it wasn't for isosurface max_gradient estimation stuff
+        virtual bool All_Intersections (const Ray&, IStack&, TraceThreadData *) const = 0;
         virtual bool Inside(const Vector3d&, TraceThreadData *) const = 0;
-        virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const = 0;
+        virtual void Normal (Vector3d&, Vector3d&, Intersection *, TraceThreadData *) const = 0;
         virtual void UVCoord(Vector2d&, const Intersection *, TraceThreadData *) const;
         virtual void Translate(const Vector3d&, const TRANSFORM *) = 0;
         virtual void Rotate(const Vector3d&, const TRANSFORM *) = 0;
@@ -232,7 +232,8 @@ class ObjectBase
         virtual ObjectPtr Invert();
 
         virtual void Compute_BBox() = 0;
-        virtual void Determine_Textures(Intersection *, bool, WeightedTextureVector&, TraceThreadData *Thread); // could be "(const Intersection*...) const" if it wasn't for blob specials
+        virtual void Determine_Textures (const Intersection *, bool, WeightedTextureVector&,
+                                         TraceThreadData *Thread) const;
 
         /// Checks whether a given ray intersects the object's bounding box.
         /// Primitives with low-cost intersection tests may override this to always return true
@@ -303,9 +304,9 @@ class LightSource : public CompoundObject
 
         virtual ObjectPtr Copy();
 
-        virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
+        virtual bool All_Intersections (const Ray&, IStack&, TraceThreadData *) const;
         virtual bool Inside(const Vector3d&, TraceThreadData *) const;
-        virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const;
+        virtual void Normal (Vector3d&, Vector3d&, Intersection *, TraceThreadData *) const;
         virtual void UVCoord(Vector2d&, const Intersection *, TraceThreadData *) const;
         virtual void Translate(const Vector3d&, const TRANSFORM *);
         virtual void Rotate(const Vector3d&, const TRANSFORM *);

@@ -150,7 +150,7 @@ const DBL planes[PLANECOUNT][4] =
 *
 ******************************************************************************/
 
-bool Superellipsoid::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread)
+bool Superellipsoid::All_Intersections (const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread) const
 {
     Thread->Stats()[Ray_Superellipsoid_Tests]++;
 
@@ -199,7 +199,7 @@ bool Superellipsoid::All_Intersections(const Ray& ray, IStack& Depth_Stack, Trac
 *
 ******************************************************************************/
 
-bool Superellipsoid::Intersect(const BasicRay& ray, IStack& Depth_Stack, TraceThreadData *Thread)
+bool Superellipsoid::Intersect (const BasicRay& ray, IStack& Depth_Stack, TraceThreadData *Thread) const
 {
     int i, cnt, Found = false;
     DBL dists[PLANECOUNT+2];
@@ -437,7 +437,8 @@ bool Superellipsoid::Inside(const Vector3d& IPoint, TraceThreadData *Thread) con
 *
 ******************************************************************************/
 
-void Superellipsoid::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread) const
+void Superellipsoid::Normal (Vector3d& geometricNormal, Vector3d& smoothNormal, Intersection *Inter,
+                             TraceThreadData *Thread) const
 {
     Vector3d const& E = Power;
     Vector3d P;
@@ -470,9 +471,11 @@ void Superellipsoid::Normal(Vector3d& Result, Intersection *Inter, TraceThreadDa
         P[Z] *= (1 + r);
 
     /* Transform the normalt out of the superellipsoid space. */
-    MTransNormal(Result, P, Trans);
+    MTransNormal (geometricNormal, P, Trans);
 
-    Result.normalize();
+    geometricNormal.normalize();
+
+    smoothNormal = geometricNormal;
 }
 
 
@@ -1158,7 +1161,7 @@ DBL Superellipsoid::power(DBL x, DBL  e)
 *
 ******************************************************************************/
 
-bool Superellipsoid::insert_hit(const BasicRay &ray, DBL Depth, IStack& Depth_Stack, TraceThreadData *Thread)
+bool Superellipsoid::insert_hit (const BasicRay &ray, DBL Depth, IStack& Depth_Stack, TraceThreadData *Thread) const
 {
     Vector3d IPoint;
 

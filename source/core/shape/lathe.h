@@ -97,9 +97,9 @@ class Lathe : public ObjectBase
 
         virtual ObjectPtr Copy();
 
-        virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
+        virtual bool All_Intersections (const Ray&, IStack&, TraceThreadData *) const;
         virtual bool Inside(const Vector3d&, TraceThreadData *) const;
-        virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const;
+        virtual void Normal (Vector3d&, Vector3d&, Intersection *, TraceThreadData *) const;
         virtual void UVCoord(Vector2d&, const Intersection *, TraceThreadData *) const;
         virtual void Translate(const Vector3d&, const TRANSFORM *);
         virtual void Rotate(const Vector3d&, const TRANSFORM *);
@@ -109,8 +109,8 @@ class Lathe : public ObjectBase
 
         void Compute_Lathe(Vector2d *P, TraceThreadData *);
     protected:
-        bool Intersect(const BasicRay& ray, IStack& Depth_Stack, TraceThreadData *Thread);
-        bool test_hit(const BasicRay&, IStack&, DBL, DBL, int, TraceThreadData *Thread);
+        bool Intersect (const BasicRay& ray, IStack& Depth_Stack, TraceThreadData *Thread) const;
+        bool test_hit (const BasicRay&, IStack&, DBL, DBL, int, TraceThreadData *Thread) const;
 };
 
 }

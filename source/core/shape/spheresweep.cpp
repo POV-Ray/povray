@@ -163,7 +163,7 @@ const MATRIX B_Matrix =
 *
 ******************************************************************************/
 
-bool SphereSweep::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread)
+bool SphereSweep::All_Intersections (const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread) const
 {
     SPHSWEEP_INT    *Isect = reinterpret_cast<SPHSWEEP_INT *>(POV_MALLOC((sizeof(SPHSWEEP_INT) * SPHSWEEP_MAX_ISECT), "sphere sweep intersections"));
     SPHSWEEP_INT    *Sphere_Isect = reinterpret_cast<SPHSWEEP_INT *>(POV_MALLOC(sizeof(SPHSWEEP_INT) * 2 * Num_Spheres, "Sphere sweep sphere intersections"));
@@ -943,9 +943,11 @@ bool SphereSweep::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 *
 ******************************************************************************/
 
-void SphereSweep::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *) const
+void SphereSweep::Normal (Vector3d& geometricNormal, Vector3d& smoothNormal, Intersection *Inter,
+                          TraceThreadData *) const
 {
-    Result = Inter->INormal;
+    geometricNormal = Inter->geometricNormal;
+    smoothNormal    = Inter->smoothNormal;
 }
 
 

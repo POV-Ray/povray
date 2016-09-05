@@ -2441,11 +2441,11 @@ void Parser::Parse_Finish (FinishPtr& pFinish)
                 END_CASE
             END_EXPECT
 
-            New->Phong = Parse_Float ();
+            New->phongHighlights.intensity = Parse_Float ();
         END_CASE
 
         CASE (PHONG_SIZE_TOKEN)
-            New->Phong_Size = Parse_Float ();
+            New->phongHighlights.exponent = Parse_Float ();
         END_CASE
 
         CASE (SPECULAR_TOKEN)
@@ -2459,13 +2459,13 @@ void Parser::Parse_Finish (FinishPtr& pFinish)
                 END_CASE
             END_EXPECT
 
-            New->Specular = Parse_Float ();
+            New->blinnPhongHighlights.intensity = Parse_Float ();
         END_CASE
 
         CASE (ROUGHNESS_TOKEN)
-            New->Roughness = Parse_Float ();
-            if (New->Roughness != 0.0)
-                New->Roughness = 1.0/New->Roughness; /* CEY 12/92 */
+            New->blinnPhongHighlights.exponent = Parse_Float ();
+            if (New->blinnPhongHighlights.exponent != 0.0)
+                New->blinnPhongHighlights.exponent = 1.0/New->blinnPhongHighlights.exponent;
             else
                 Warning("Zero roughness used.");
         END_CASE
@@ -2606,9 +2606,10 @@ void Parser::Parse_Finish (FinishPtr& pFinish)
         New->BrillianceAdjustRad = 2.0 / (New->Brilliance + 1.0);
     }
     if (phongAdjust)
-        New->Phong *= (New->Phong_Size + 1.0) / 2.0;
+        New->phongHighlights.intensity *= (New->phongHighlights.exponent + 1.0) / 2.0;
     if (specularAdjust)
-        New->Specular *= (New->Roughness + 2.0) / (4.0 * ( 2.0 - pow( 2.0, -New->Roughness / 2.0 ) ) );
+        New->blinnPhongHighlights.intensity *= (New->blinnPhongHighlights.exponent + 2.0) /
+                                               (4.0 * ( 2.0 - pow( 2.0, -New->blinnPhongHighlights.exponent / 2.0 ) ) );
 
     Parse_End ();
 }
@@ -3371,24 +3372,24 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
 
                 CASE (PHONG_TOKEN)
                     Warn_State(Token.Token_Id, FINISH_TOKEN);
-                    Finish.GetUnique()->Phong = Parse_Float ();
+                    Finish.GetUnique()->phongHighlights.intensity = Parse_Float ();
                 END_CASE
 
                 CASE (PHONG_SIZE_TOKEN)
                     Warn_State(Token.Token_Id, FINISH_TOKEN);
-                    Finish.GetUnique()->Phong_Size = Parse_Float ();
+                    Finish.GetUnique()->phongHighlights.exponent = Parse_Float ();
                 END_CASE
 
                 CASE (SPECULAR_TOKEN)
                     Warn_State(Token.Token_Id, FINISH_TOKEN);
-                    Finish.GetUnique()->Specular = Parse_Float ();
+                    Finish.GetUnique()->blinnPhongHighlights.intensity = Parse_Float ();
                 END_CASE
 
                 CASE (ROUGHNESS_TOKEN)
                     Warn_State(Token.Token_Id, FINISH_TOKEN);
-                    Finish.GetUnique()->Roughness = Parse_Float ();
-                    if (Finish.GetUnique()->Roughness != 0.0)
-                        Finish.GetUnique()->Roughness = 1.0/Finish->Roughness; /* CEY 12/92 */
+                    Finish.GetUnique()->blinnPhongHighlights.exponent = Parse_Float ();
+                    if (Finish.GetUnique()->blinnPhongHighlights.exponent != 0.0)
+                        Finish.GetUnique()->blinnPhongHighlights.exponent = 1.0/Finish->blinnPhongHighlights.exponent;
                     else
                         Warning("Zero roughness used.");
                 END_CASE

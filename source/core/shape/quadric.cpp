@@ -107,7 +107,7 @@ const DBL DEPTH_TOLERANCE = 1.0e-6;
 *
 ******************************************************************************/
 
-bool Quadric::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread)
+bool Quadric::All_Intersections (const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread) const
 {
     DBL Depth1, Depth2;
     Vector3d IPoint;
@@ -288,40 +288,41 @@ bool Quadric::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 *
 ******************************************************************************/
 
-void Quadric::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread) const
+void Quadric::Normal (Vector3d& geometricNormal, Vector3d& smoothNormal, Intersection *Inter,
+                      TraceThreadData *Thread) const
 {
     DBL Len;
 
-    /* This is faster and shorter. [DB 7/94] */
+    geometricNormal[X] = 2.0 * QA * Inter->IPoint[X] +
+                               QB * Inter->IPoint[Y] +
+                               QC * Inter->IPoint[Z] +
+                               QD;
 
-    Result[X] = 2.0 * QA * Inter->IPoint[X] +
-                      QB * Inter->IPoint[Y] +
-                      QC * Inter->IPoint[Z] +
-                      QD;
+    geometricNormal[Y] =       QB * Inter->IPoint[X] +
+                         2.0 * QE * Inter->IPoint[Y] +
+                               QF * Inter->IPoint[Z] +
+                               QG;
 
-    Result[Y] =       QB * Inter->IPoint[X] +
-                2.0 * QE * Inter->IPoint[Y] +
-                      QF * Inter->IPoint[Z] +
-                      QG;
+    geometricNormal[Z] =       QC * Inter->IPoint[X] +
+                               QF * Inter->IPoint[Y] +
+                         2.0 * QH * Inter->IPoint[Z] +
+                               QI;
 
-    Result[Z] =       QC * Inter->IPoint[X] +
-                      QF * Inter->IPoint[Y] +
-                2.0 * QH * Inter->IPoint[Z] +
-                      QI;
-
-    Len = Result.length();
+    Len = geometricNormal.length();
 
     if (Len == 0.0)
     {
         /* The normal is not defined at this point of the surface. */
         /* Set it to any arbitrary direction. */
 
-        Result = Vector3d(1.0, 0.0, 0.0);
+        geometricNormal = Vector3d(1.0, 0.0, 0.0);
     }
     else
     {
-        Result /= Len;
+        geometricNormal /= Len;
     }
+
+    smoothNormal = geometricNormal;
 }
 
 

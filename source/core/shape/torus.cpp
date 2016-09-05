@@ -121,7 +121,7 @@ bool SpindleTorus::Precompute()
 *
 ******************************************************************************/
 
-bool Torus::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread)
+bool Torus::All_Intersections (const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread) const
 {
     int i, max_i, Found;
     DBL Depth[4];
@@ -150,7 +150,7 @@ bool Torus::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDa
     return(Found);
 }
 
-bool SpindleTorus::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread)
+bool SpindleTorus::All_Intersections (const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread) const
 {
     int i, max_i, Found;
     DBL Depth[4];
@@ -446,7 +446,8 @@ bool SpindleTorus::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 *
 ******************************************************************************/
 
-void Torus::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread) const
+void Torus::Normal (Vector3d& geometricNormal, Vector3d& smoothNormal, Intersection *Inter,
+                    TraceThreadData *Thread) const
 {
     DBL dist;
     Vector3d P, N, M;
@@ -474,12 +475,15 @@ void Torus::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Threa
 
     /* Transform the normalt out of the torus space. */
 
-    MTransNormal(Result, N, Trans);
+    MTransNormal (geometricNormal, N, Trans);
 
-    Result.normalize();
+    geometricNormal.normalize();
+
+    smoothNormal = geometricNormal;
 }
 
-void SpindleTorus::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread) const
+void SpindleTorus::Normal (Vector3d& geometricNormal, Vector3d& smoothNormal, Intersection *Inter,
+                           TraceThreadData *Thread) const
 {
     DBL dist;
     Vector3d P, N, M;
@@ -509,8 +513,10 @@ void SpindleTorus::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData
         N = P - M;
 
     // Transform the normalt out of the torus space.
-    MTransNormal(Result, N, Trans);
-    Result.normalize();
+    MTransNormal (geometricNormal, N, Trans);
+    geometricNormal.normalize();
+
+    smoothNormal = geometricNormal;
 }
 
 

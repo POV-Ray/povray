@@ -116,7 +116,7 @@ const DBL HFIELD_TOLERANCE = 1.0e-6;
 *
 ******************************************************************************/
 
-bool HField::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread)
+bool HField::All_Intersections (const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread) const
 {
     int Side1, Side2;
     Vector3d Start;
@@ -152,7 +152,7 @@ bool HField::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadD
 
     Start = Temp_Ray.Evaluate(depth1);
 
-    if (block_traversal(Temp_Ray, Start, Depth_Stack, ray, depth1, depth2, Thread))
+    if (block_traversal (Temp_Ray, Start, Depth_Stack, ray, depth1, depth2, Thread))
     {
         Thread->Stats()[Ray_HField_Tests_Succeeded]++;
 
@@ -284,7 +284,8 @@ bool HField::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 *
 ******************************************************************************/
 
-void HField::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread) const
+void HField::Normal (Vector3d& geometricNormal, Vector3d& smoothNormal, Intersection *Inter,
+                     TraceThreadData *Thread) const
 {
     int px,pz, i;
     DBL x,z,y1,y2,y3,u,v;
@@ -293,7 +294,8 @@ void HField::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thre
 
     if(Inter->haveNormal == true)
     {
-        Result = Inter->INormal;
+        geometricNormal = Inter->geometricNormal;
+        smoothNormal    = Inter->smoothNormal;
         return;
     }
 
@@ -309,6 +311,31 @@ void HField::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thre
 
     x = Local_Origin[X] - (DBL)px;
     z = Local_Origin[Z] - (DBL)pz;
+
+    if ((x+z) <= 1.0)
+    {
+        /* Lower triangle. */
+
+        y1 = Get_Height (px,   pz);
+        y2 = Get_Height (px+1, pz);
+        y3 = Get_Height (px,   pz+1);
+
+        geometricNormal = Vector3d(y1-y2, 1.0, y1-y3);
+    }
+    else
+    {
+        /* Upper triangle. */
+
+        y1 = Get_Height (px+1, pz+1);
+        y2 = Get_Height (px,   pz+1);
+        y3 = Get_Height (px+1, pz);
+
+        geometricNormal = Vector3d(y2-y1, 1.0, y3-y1);
+    }
+
+    geometricNormal.normalize();
+
+    MTransNormal (geometricNormal, geometricNormal, Trans);
 
     if (Test_Flag(this, SMOOTHED_FLAG))
     {
@@ -334,35 +361,14 @@ void HField::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thre
         u = (1.0 - x);
         v = (1.0 - z);
 
-        Result = v*(u*n[0] + x*n[1]) + z*(u*n[2] + x*n[3]);
+        smoothNormal = v*(u*n[0] + x*n[1]) + z*(u*n[2] + x*n[3]);
+
+        smoothNormal.normalize();
     }
     else
     {
-        if ((x+z) <= 1.0)
-        {
-            /* Lower triangle. */
-
-            y1 = Get_Height(px,   pz);
-            y2 = Get_Height(px+1, pz);
-            y3 = Get_Height(px,   pz+1);
-
-            Result = Vector3d(y1-y2, 1.0, y1-y3);
-        }
-        else
-        {
-            /* Upper triangle. */
-
-            y1 = Get_Height(px+1, pz+1);
-            y2 = Get_Height(px,   pz+1);
-            y3 = Get_Height(px+1, pz);
-
-            Result = Vector3d(y2-y1, 1.0, y3-y1);
-        }
-
-        MTransNormal(Result, Result, Trans);
+        smoothNormal = geometricNormal;
     }
-
-    Result.normalize();
 }
 
 
@@ -439,7 +445,9 @@ DBL HField::normalize(Vector3d& A, const Vector3d& B)
 *
 ******************************************************************************/
 
-bool HField::intersect_pixel(int x, int z, const BasicRay &ray, DBL height1, DBL height2, IStack& HField_Stack, const BasicRay &RRay, DBL mindist, DBL maxdist, TraceThreadData *Thread)
+bool HField::intersect_pixel (int x, int z, const BasicRay &ray, DBL height1, DBL height2,
+                              IStack& HField_Stack, const BasicRay &RRay, DBL mindist, DBL maxdist,
+                              TraceThreadData *Thread) const
 {
     int Found;
     DBL dot1, depth1, depth2;
@@ -1425,7 +1433,9 @@ void HField::Compute_BBox()
 *
 ******************************************************************************/
 
-bool HField::dda_traversal(const BasicRay &ray, const Vector3d& Start, const HFIELD_BLOCK *Block, IStack &HField_Stack, const BasicRay &RRay, DBL mindist, DBL maxdist, TraceThreadData *Thread)
+bool HField::dda_traversal (const BasicRay &ray, const Vector3d& Start, const HFIELD_BLOCK *Block,
+                            IStack &HField_Stack, const BasicRay &RRay, DBL mindist, DBL maxdist,
+                            TraceThreadData *Thread) const
 {
     const char *dda_msg = "Illegal grid value in dda_traversal().\n"
                           "The height field may contain dark spots. To eliminate them\n"
@@ -1838,7 +1848,8 @@ bool HField::dda_traversal(const BasicRay &ray, const Vector3d& Start, const HFI
 *
 ******************************************************************************/
 
-bool HField::block_traversal(const BasicRay &ray, const Vector3d& Start, IStack &HField_Stack, const BasicRay &RRay, DBL mindist, DBL maxdist, TraceThreadData *Thread)
+bool HField::block_traversal (const BasicRay &ray, const Vector3d& Start, IStack &HField_Stack,
+                              const BasicRay &RRay, DBL mindist, DBL maxdist, TraceThreadData *Thread) const
 {
     int xmax, zmax;
     int x, z, nx, nz, signx, signz;

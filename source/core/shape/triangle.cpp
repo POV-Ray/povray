@@ -417,7 +417,7 @@ bool Triangle::Compute_Triangle()
 *
 ******************************************************************************/
 
-bool Triangle::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread)
+bool Triangle::All_Intersections (const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread) const
 {
     DBL Depth;
     Vector3d IPoint;
@@ -629,9 +629,10 @@ bool Triangle::Inside(const Vector3d&, TraceThreadData *Thread) const
 *
 ******************************************************************************/
 
-void Triangle::Normal(Vector3d& Result, Intersection *, TraceThreadData *) const
+void Triangle::Normal (Vector3d& geometricNormal, Vector3d& smoothNormal, Intersection *, TraceThreadData *) const
 {
-    Result = Normal_Vector;
+    geometricNormal = Normal_Vector;
+    smoothNormal    = Normal_Vector;
 }
 
 
@@ -700,11 +701,14 @@ void Triangle::Normal(Vector3d& Result, Intersection *, TraceThreadData *) const
 *
 ******************************************************************************/
 
-void SmoothTriangle::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread) const
+void SmoothTriangle::Normal (Vector3d& geometricNormal, Vector3d& smoothNormal, Intersection *Inter,
+                             TraceThreadData *Thread) const
 {
     int Axis;
     DBL u, v;
     Vector3d PIMinusP1;
+
+    geometricNormal = Normal_Vector;
 
     PIMinusP1 = Inter->IPoint - P1;
 
@@ -712,7 +716,7 @@ void SmoothTriangle::Normal(Vector3d& Result, Intersection *Inter, TraceThreadDa
 
     if (u < EPSILON)
     {
-        Result = N1;
+        smoothNormal = N1;
 
         return;
     }
@@ -723,9 +727,9 @@ void SmoothTriangle::Normal(Vector3d& Result, Intersection *Inter, TraceThreadDa
 
     /* This is faster. [DB 8/94] */
 
-    Result = N1 + u * (N2 - N1 + v * (N3 - N2));
+    smoothNormal = N1 + u * (N2 - N1 + v * (N3 - N2));
 
-    Result.normalize();
+    smoothNormal.normalize();
 }
 
 

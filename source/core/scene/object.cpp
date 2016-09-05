@@ -865,7 +865,8 @@ void ObjectBase::UVCoord(Vector2d& Result, const Intersection *Inter, TraceThrea
     Result[V] = Inter->IPoint[Y];
 }
 
-void ObjectBase::Determine_Textures(Intersection *isect, bool hitinside, WeightedTextureVector& textures, TraceThreadData *threaddata)
+void ObjectBase::Determine_Textures (const Intersection *isect, bool hitinside, WeightedTextureVector& textures,
+                                     TraceThreadData *threaddata) const
 {
     if(!Interior_Texture.IsEmpty() && (hitinside == true))
         textures.push_back(WeightedTexture(1.0, Interior_Texture));

@@ -182,7 +182,7 @@ const DBL DEPTH_TOLERANCE = 1.0e-4;
 *
 ******************************************************************************/
 
-bool Lathe::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread)
+bool Lathe::All_Intersections (const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread) const
 {
     Thread->Stats()[Ray_Lathe_Tests]++;
 
@@ -235,7 +235,7 @@ bool Lathe::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDa
 *
 ******************************************************************************/
 
-bool Lathe::Intersect(const BasicRay& ray, IStack& Depth_Stack, TraceThreadData *Thread)
+bool Lathe::Intersect (const BasicRay& ray, IStack& Depth_Stack, TraceThreadData *Thread) const
 {
     int cnt;
     int found, j, n1, n2;
@@ -533,7 +533,8 @@ bool Lathe::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 *
 ******************************************************************************/
 
-void Lathe::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread) const
+void Lathe::Normal (Vector3d& geometricNormal, Vector3d& smoothNormal, Intersection *Inter,
+                    TraceThreadData *Thread) const
 {
     DBL r, dx, dy;
     Vector3d P, N;
@@ -571,9 +572,11 @@ void Lathe::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Threa
 
     /* Transform the normalt out of the lathe space. */
 
-    MTransNormal(Result, N, Trans);
+    MTransNormal (geometricNormal, N, Trans);
 
-    Result.normalize();
+    geometricNormal.normalize();
+
+    smoothNormal = geometricNormal;
 }
 
 
@@ -1277,7 +1280,7 @@ void Lathe::Compute_Lathe(Vector2d *P, TraceThreadData *Thread)
 *
 ******************************************************************************/
 
-bool Lathe::test_hit(const BasicRay &ray, IStack& Depth_Stack, DBL d, DBL w, int n, TraceThreadData *Thread)
+bool Lathe::test_hit (const BasicRay &ray, IStack& Depth_Stack, DBL d, DBL w, int n, TraceThreadData *Thread) const
 {
     Vector3d IPoint;
 

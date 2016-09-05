@@ -353,6 +353,7 @@
     <ClCompile Include="..\..\source\core\lighting\radiosity.cpp" />
     <ClCompile Include="..\..\source\core\lighting\subsurface.cpp" />
     <ClCompile Include="..\..\source\core\material\blendmap.cpp" />
+    <ClCompile Include="..\..\source\core\material\shader.cpp" />
     <ClCompile Include="..\..\source\core\material\interior.cpp" />
     <ClCompile Include="..\..\source\core\material\media.cpp" />
     <ClCompile Include="..\..\source\core\material\pattern.cpp" />
@@ -427,6 +428,7 @@
     <ClInclude Include="..\..\source\core\lighting\radiosity.h" />
     <ClInclude Include="..\..\source\core\lighting\subsurface.h" />
     <ClInclude Include="..\..\source\core\material\blendmap.h" />
+    <ClInclude Include="..\..\source\core\material\shader.h" />
     <ClInclude Include="..\..\source\core\material\interior.h" />
     <ClInclude Include="..\..\source\core\material\media.h" />
     <ClInclude Include="..\..\source\core\material\pattern.h" />

@@ -126,7 +126,7 @@ UV_HASH_TABLE **Mesh::UV_Hash_Table;
 *
 ******************************************************************************/
 
-bool Mesh::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread)
+bool Mesh::All_Intersections (const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread) const
 {
     Thread->Stats()[Ray_Mesh_Tests]++;
 
@@ -167,7 +167,7 @@ bool Mesh::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadDat
 *
 ******************************************************************************/
 
-bool Mesh::Intersect(const BasicRay& ray, IStack& Depth_Stack, TraceThreadData *Thread)
+bool Mesh::Intersect (const BasicRay& ray, IStack& Depth_Stack, TraceThreadData *Thread) const
 {
     MeshIndex i;
     bool found;
@@ -330,12 +330,22 @@ bool Mesh::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 *
 ******************************************************************************/
 
-void Mesh::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread) const
+void Mesh::Normal (Vector3d& geometricNormal, Vector3d& smoothNormal, Intersection *Inter,
+                   TraceThreadData *Thread) const
 {
     Vector3d IPoint;
     const MESH_TRIANGLE *Triangle;
 
     Triangle = reinterpret_cast<const MESH_TRIANGLE *>(Inter->Pointer);
+
+    geometricNormal = Vector3d(Data->Normals[Triangle->Normal_Ind]);
+
+    if (Trans != NULL)
+    {
+        MTransNormal (geometricNormal, geometricNormal, Trans);
+
+        geometricNormal.normalize();
+    }
 
     if (Triangle->Smooth)
     {
@@ -348,25 +358,21 @@ void Mesh::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread
             IPoint = Inter->IPoint;
         }
 
-        Smooth_Mesh_Normal(Result, Triangle, IPoint);
+        Smooth_Mesh_Normal (smoothNormal, Triangle, IPoint);
 
         if (Trans != NULL)
         {
-            MTransNormal(Result, Result, Trans);
+            MTransNormal (smoothNormal, smoothNormal, Trans);
         }
 
-        Result.normalize();
+        smoothNormal.normalize();
+
+        if (dot(geometricNormal, smoothNormal) < 0)
+            geometricNormal.invert();
     }
     else
     {
-        Result = Vector3d(Data->Normals[Triangle->Normal_Ind]);
-
-        if (Trans != NULL)
-        {
-            MTransNormal(Result, Result, Trans);
-
-            Result.normalize();
-        }
+        smoothNormal = geometricNormal;
     }
 }
 
@@ -1199,7 +1205,8 @@ void Mesh::MeshUV(const Vector3d& P, const MESH_TRIANGLE *Triangle, Vector2d& Re
 *
 ******************************************************************************/
 
-bool Mesh::test_hit(const MESH_TRIANGLE *Triangle, const BasicRay &OrigRay, DBL Depth, DBL len, IStack& Depth_Stack, TraceThreadData *Thread)
+bool Mesh::test_hit (const MESH_TRIANGLE *Triangle, const BasicRay &OrigRay, DBL Depth, DBL len, IStack& Depth_Stack,
+                     TraceThreadData *Thread) const
 {
     Vector3d IPoint;
     DBL world_dist = Depth / len;
@@ -1433,7 +1440,8 @@ void Mesh::Build_Mesh_BBox_Tree()
 *
 ******************************************************************************/
 
-bool Mesh::intersect_bbox_tree(const BasicRay &ray, const BasicRay &Orig_Ray, DBL len, IStack& Depth_Stack, TraceThreadData *Thread)
+bool Mesh::intersect_bbox_tree (const BasicRay &ray, const BasicRay &Orig_Ray, DBL len, IStack& Depth_Stack,
+                                TraceThreadData *Thread) const
 {
     bool found;
     MeshIndex i;
@@ -2411,7 +2419,8 @@ bool Mesh::inside_bbox_tree(const BasicRay &ray, TraceThreadData *Thread) const
     return ((found & 1) != 0);
 }
 
-void Mesh::Determine_Textures(Intersection *isect, bool hitinside, WeightedTextureVector& textures, TraceThreadData *Threaddata)
+void Mesh::Determine_Textures (const Intersection *isect, bool hitinside, WeightedTextureVector& textures,
+                               TraceThreadData *Threaddata) const
 {
     const MESH_TRIANGLE *tri = reinterpret_cast<const MESH_TRIANGLE *>(isect->Pointer);
 

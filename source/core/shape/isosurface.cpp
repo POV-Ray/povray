@@ -82,7 +82,7 @@ namespace pov
 *
 ******************************************************************************/
 
-bool IsoSurface::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread)
+bool IsoSurface::All_Intersections (const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread) const
 {
     int Side1 = 0, Side2 = 0, itrace = 0;
     DBL Depth1 = 0.0, Depth2 = 0.0;
@@ -90,6 +90,7 @@ bool IsoSurface::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
     Vector3d IPoint;
     Vector3d Plocal, Dlocal;
     DBL tmax = 0.0, tmin = 0.0, tmp = 0.0;
+    DBL g = gradient;
     DBL maxg = max_gradient;
     int i = 0 ; /* count of intervals in stack - 1      */
     int IFound = false;
@@ -192,7 +193,7 @@ bool IsoSurface::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
 
         for (; itrace < max_trace; itrace++)
         {
-            if(Function_Find_Root(*(Thread->isosurfaceData), Plocal, Dlocal, &tmin, &tmax, maxg, in_shadow_test, Thread) == false)
+            if (!Function_Find_Root (*(Thread->isosurfaceData), Plocal, Dlocal, &tmin, &tmax, g, maxg, in_shadow_test, Thread))
                 break;
             else
             {
@@ -213,11 +214,9 @@ bool IsoSurface::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
             Thread->Stats()[Ray_IsoSurface_Tests_Succeeded]++;
     }
 
-    if(eval == true)
-    {
-        DBL temp_max_gradient = max_gradient; // TODO FIXME - works around nasty gcc (found using 4.0.1) bug failing to honor casting away of volatile on pass by value on template argument lookup [trf]
-        max_gradient = max((DBL)temp_max_gradient, maxg); // TODO FIXME - This is not thread-safe but should be!!! [trf]
-    }
+    UpdateGradient (gradient, g);
+    if (eval)
+        UpdateGradient (max_gradient, maxg);
 
     return (IFound);
 }
@@ -297,7 +296,8 @@ bool IsoSurface::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 *
 ******************************************************************************/
 
-void IsoSurface::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread) const
+void IsoSurface::Normal (Vector3d& geometricNormal, Vector3d& smoothNormal, Intersection *Inter,
+                         TraceThreadData *Thread) const
 {
     Vector3d New_Point, TPoint;
     DBL funct;
@@ -305,7 +305,7 @@ void IsoSurface::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *
 
     if (containerHit)
     {
-        container->Normal(Inter->IPoint, Trans, Inter->i2, Result);
+        container->Normal (Inter->IPoint, Trans, Inter->i2, geometricNormal);
     }
     else
     {
@@ -322,28 +322,27 @@ void IsoSurface::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *
 
         TPoint = New_Point;
         TPoint[X] += accuracy;
-        Result[X] = fn.Evaluate(TPoint) - funct;
+        geometricNormal[X] = fn.Evaluate(TPoint) - funct;
             TPoint = New_Point;
 
         TPoint[Y] += accuracy;
-        Result[Y] = fn.Evaluate(TPoint) - funct;
+        geometricNormal[Y] = fn.Evaluate(TPoint) - funct;
             TPoint = New_Point;
 
         TPoint[Z] += accuracy;
-        Result[Z] = fn.Evaluate(TPoint) - funct;
+        geometricNormal[Z] = fn.Evaluate(TPoint) - funct;
 
-        if((Result[X] == 0) && (Result[Y] == 0) && (Result[Z] == 0))
-            Result[X] = 1.0;
-        Result.normalize();
+        if ((geometricNormal[X] == 0) && (geometricNormal[Y] == 0) && (geometricNormal[Z] == 0))
+             geometricNormal[X] = 1.0;
 
         /* Transform the point into the boxes space. */
         if(Trans != NULL)
-        {
-            MTransNormal(Result, Result, Trans);
+            MTransNormal (geometricNormal, geometricNormal, Trans);
 
-            Result.normalize();
-        }
+        geometricNormal.normalize();
     }
+
+    smoothNormal = geometricNormal;
 }
 
 
@@ -654,12 +653,8 @@ IsoSurface::~IsoSurface()
 
 void IsoSurface::DispatchShutdownMessages(CoreMessenger& messenger)
 {
-    // TODO FIXME - works around nasty gcc (found using 4.0.1) bug failing to honor casting
-    // away of volatile on pass by value on template argument lookup [trf]
-    DBL temp_max_gradient = max_gradient;
-
-    mginfo->gradient = max(gradient, mginfo->gradient);
-    mginfo->max_gradient = max((DBL)temp_max_gradient, mginfo->max_gradient);
+    mginfo->gradient = max(const_cast<DBL&>(gradient), mginfo->gradient);
+    mginfo->max_gradient = max(const_cast<DBL&>(max_gradient), mginfo->max_gradient);
 
     if (isCopy == false)
     {
@@ -779,7 +774,9 @@ void IsoSurface::Compute_BBox()
 *
 ******************************************************************************/
 
-bool IsoSurface::Function_Find_Root(ISO_ThreadData& itd, const Vector3d& PP, const Vector3d& DD, DBL* Depth1, DBL* Depth2, DBL& maxg, bool in_shadow_test, TraceThreadData* pThreadData)
+bool IsoSurface::Function_Find_Root (ISO_ThreadData& itd, const Vector3d& PP, const Vector3d& DD,
+                                     DBL* Depth1, DBL* Depth2, DBL& g, DBL& maxg, bool in_shadow_test,
+                                     TraceThreadData* pThreadData) const
 {
     DBL dt, t21, l_b, l_e, oldmg;
     ISO_Pair EP1, EP2;
@@ -827,7 +824,7 @@ bool IsoSurface::Function_Find_Root(ISO_ThreadData& itd, const Vector3d& PP, con
     if((eval == true) && (oldmg > eval_param[0]))
         maxg = oldmg * eval_param[2];
     dt = maxg * itd.Vlength * t21;
-    if(Function_Find_Root_R(itd, &EP1, &EP2, dt, t21, 1.0 / (itd.Vlength * t21), maxg, pThreadData))
+    if (Function_Find_Root_R (itd, &EP1, &EP2, dt, t21, 1.0 / (itd.Vlength * t21), g, maxg, pThreadData))
     {
         if(eval == true)
         {
@@ -886,14 +883,15 @@ bool IsoSurface::Function_Find_Root(ISO_ThreadData& itd, const Vector3d& PP, con
 *
 ******************************************************************************/
 
-bool IsoSurface::Function_Find_Root_R(ISO_ThreadData& itd, const ISO_Pair* EP1, const ISO_Pair* EP2, DBL dt, DBL t21, DBL len, DBL& maxg, TraceThreadData* pThreadData)
+bool IsoSurface::Function_Find_Root_R (ISO_ThreadData& itd, const ISO_Pair* EP1, const ISO_Pair* EP2,
+                                       DBL dt, DBL t21, DBL len, DBL& g, DBL& maxg, TraceThreadData* pThreadData) const
 {
     ISO_Pair EPa;
     DBL temp;
 
     temp = fabs((EP2->f - EP1->f) * len);
-    if(gradient < temp)
-        gradient = temp;
+    if (g < temp)
+        g = temp;
 
     if((eval == true) && (maxg < temp * eval_param[1]))
     {
@@ -920,8 +918,8 @@ bool IsoSurface::Function_Find_Root_R(ISO_ThreadData& itd, const ISO_Pair* EP1, 
         EPa.f = Float_Function(itd, EPa.t);
 
         itd.fmax = min(EPa.f, itd.fmax);
-        if(!Function_Find_Root_R(itd, EP1, &EPa, dt, t21, len * 2.0, maxg, pThreadData))
-            return (Function_Find_Root_R(itd, &EPa, EP2, dt, t21, len * 2.0,maxg, pThreadData));
+        if (!Function_Find_Root_R (itd, EP1, &EPa, dt, t21, len * 2.0, g, maxg, pThreadData))
+            return Function_Find_Root_R (itd, &EPa, EP2, dt, t21, len * 2.0, g, maxg, pThreadData);
         else
             return true;
     }
@@ -963,6 +961,18 @@ DBL IsoSurface::Float_Function(ISO_ThreadData& itd, DBL t) const
     VTmp = itd.Pglobal + t * itd.Dglobal;
 
     return ((DBL)itd.Inv3 * (itd.pFn->Evaluate(VTmp) - threshold));
+}
+
+/*****************************************************************************/
+
+inline void IsoSurface::UpdateGradient (volatile DBL& v, DBL g) const
+{
+    // NB:  The gradient members are global to all threads, so in theory we should protect them
+    //      with a mutex; however, since we can live with an occasional race condition, we choose
+    //      speed over thread-safety.
+
+    if (v < g)
+        v = g;
 }
 
 }

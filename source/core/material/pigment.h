@@ -65,9 +65,15 @@ class GenericPigmentBlendMap
         GenericPigmentBlendMap() : blendMode(0), blendGamma() {}
         virtual ~GenericPigmentBlendMap() {}
 
-        virtual bool Compute(TransColour& colour, DBL value, const Vector3d& IPoint, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread) = 0;
-        virtual void ComputeAverage(TransColour& colour, const Vector3d& EPoint, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread) = 0;
-        virtual bool ComputeUVMapped(TransColour& colour, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread) = 0;
+        virtual bool Compute (TransColour& colour, DBL value, const Vector3d& IPoint, const Intersection *Intersect,
+                              const Vector3d *pNormal, const Ray *ray, TraceThreadData *Thread) = 0;
+
+        virtual void ComputeAverage (TransColour& colour, const Vector3d& EPoint, const Intersection *Intersect,
+                                     const Vector3d *pNormal, const Ray *ray, TraceThreadData *Thread) = 0;
+
+        virtual bool ComputeUVMapped (TransColour& colour, const Intersection *Intersect,
+                                      const Vector3d *pNormal, const Ray *ray, TraceThreadData *Thread) = 0;
+
         virtual void ConvertFilterToTransmit() = 0; ///< @deprecated Only used for backward compatibility with version 3.10 or earlier.
         virtual void Post(bool& rHasFilter) = 0;
 
@@ -82,9 +88,15 @@ class ColourBlendMap : public BlendMap<TransColour>, public GenericPigmentBlendM
         ColourBlendMap();
         ColourBlendMap(int n, const Entry aEntries[]);
 
-        virtual bool Compute(TransColour& colour, DBL value, const Vector3d& IPoint, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread);
-        virtual void ComputeAverage(TransColour& colour, const Vector3d& EPoint, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread);
-        virtual bool ComputeUVMapped(TransColour& colour, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread);
+        virtual bool Compute (TransColour& colour, DBL value, const Vector3d& IPoint, const Intersection *Intersect,
+                              const Vector3d *pNormal, const Ray *ray, TraceThreadData *Thread);
+
+        virtual void ComputeAverage (TransColour& colour, const Vector3d& EPoint, const Intersection *Intersect,
+                                     const Vector3d *pNormal, const Ray *ray, TraceThreadData *Thread);
+
+        virtual bool ComputeUVMapped (TransColour& colour, const Intersection *Intersect,
+                                      const Vector3d *pNormal, const Ray *ray, TraceThreadData *Thread);
+
         virtual void ConvertFilterToTransmit(); ///< @deprecated Only used for backward compatibility with version 3.10 or earlier.
         virtual void Post(bool& rHasFilter);
 };
@@ -97,9 +109,15 @@ class PigmentBlendMap : public BlendMap<PIGMENT*>, public GenericPigmentBlendMap
         PigmentBlendMap(BlendMapTypeId type);
         virtual ~PigmentBlendMap();
 
-        virtual bool Compute(TransColour& colour, DBL value, const Vector3d& IPoint, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread);
-        virtual void ComputeAverage(TransColour& colour, const Vector3d& EPoint, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread);
-        virtual bool ComputeUVMapped(TransColour& colour, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread);
+        virtual bool Compute (TransColour& colour, DBL value, const Vector3d& IPoint, const Intersection *Intersect,
+                              const Vector3d *pNormal, const Ray *ray, TraceThreadData *Thread);
+
+        virtual void ComputeAverage (TransColour& colour, const Vector3d& EPoint, const Intersection *Intersect,
+                                     const Vector3d *pNormal, const Ray *ray, TraceThreadData *Thread);
+
+        virtual bool ComputeUVMapped (TransColour& colour, const Intersection *Intersect, const Vector3d *pNormal,
+                                      const Ray *ray, TraceThreadData *Thread);
+
         virtual void ConvertFilterToTransmit(); ///< @deprecated Only used for backward compatibility with version 3.10 or earlier.
         virtual void Post(bool& rHasFilter);
 };
@@ -130,7 +148,8 @@ PIGMENT *Copy_Pigment(PIGMENT *Old);
 void Copy_Pigments (vector<PIGMENT*>& New, const vector<PIGMENT*>& Old);
 void Destroy_Pigment(PIGMENT *Pigment);
 void Post_Pigment(PIGMENT *Pigment, bool* pHasFilter = NULL);
-bool Compute_Pigment(TransColour& colour, const PIGMENT *Pigment, const Vector3d& IPoint, const Intersection *Intersect, const Ray *ray, TraceThreadData *Thread);
+bool Compute_Pigment (TransColour& colour, const PIGMENT *Pigment, const Vector3d& IPoint,
+                      const Intersection *Intersect, const Vector3d *pNormal, const Ray *ray, TraceThreadData *Thread);
 void Evaluate_Density_Pigment(vector<PIGMENT*>& Density, const Vector3d& p, MathColour& c, TraceThreadData *ttd);
 void Convert_Filter_To_Transmit(PIGMENT *Pigment); // NK layers - 1999 July 10 - for backwards compatiblity with layered textures
 

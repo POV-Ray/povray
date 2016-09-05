@@ -265,11 +265,14 @@ void Parser::Parse_Trace(Vector3d& Res)
 
     Parse_Comma();
 
-    if ( Find_Intersection( &intersect, Object, ray, GetParserDataPtr()) )
+    if (Find_Intersection (&intersect, Object, ray, GetParserDataPtr()))
     {
         Res = intersect.IPoint;
 
-        intersect.Object->Normal( Local_Normal, &intersect, GetParserDataPtr());
+        Vector3d geometricNormal;
+
+        intersect.Object->Normal (geometricNormal, Local_Normal, &intersect, GetParserDataPtr());
+        // NOTE: geometricNormal is ignored; the user only sees the fake-smoothed normal.
 
         if (Test_Flag(intersect.Object,INVERTED_FLAG))
             Local_Normal.invert();

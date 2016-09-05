@@ -199,7 +199,7 @@ bool Poly::Set_Coeff(const unsigned int x, const unsigned int y, const unsigned 
 *
 ******************************************************************************/
 
-bool Poly::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread)
+bool Poly::All_Intersections (const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread) const
 {
     DBL Depths[MAX_ORDER];
     DBL len;
@@ -1168,7 +1168,8 @@ bool Poly::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 *
 ******************************************************************************/
 
-void Poly::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread) const
+void Poly::Normal (Vector3d& geometricNormal, Vector3d& smoothNormal, Intersection *Inter,
+                   TraceThreadData *Thread) const
 {
     DBL val;
     Vector3d New_Point;
@@ -1179,31 +1180,33 @@ void Poly::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread
 
     if (Order > 4)
     {
-        normal0(Result, Order, Coeffs, New_Point);
+        normal0 (geometricNormal, Order, Coeffs, New_Point);
     }
     else
     {
-        normal1(Result, Order, Coeffs, New_Point);
+        normal1 (geometricNormal, Order, Coeffs, New_Point);
     }
 
     /* Transform back to world space. */
 
-    MTransNormal(Result, Result, Trans);
+    MTransNormal (geometricNormal, geometricNormal, Trans);
 
     /* Normalize (accounting for the possibility of a 0 length normal). */
 
-    val = Result.lengthSqr();
+    val = geometricNormal.lengthSqr();
 
     if (val > 0.0)
     {
         val = 1.0 / sqrt(val);
 
-        Result *= val;
+        geometricNormal *= val;
     }
     else
     {
-        Result = Vector3d(1.0, 0.0, 0.0);
+        geometricNormal = Vector3d(1.0, 0.0, 0.0);
     }
+
+    smoothNormal = geometricNormal;
 }
 
 

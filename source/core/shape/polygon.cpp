@@ -121,7 +121,7 @@ const DBL ZERO_TOLERANCE = 1.0e-10;
 *
 ******************************************************************************/
 
-bool Polygon::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread)
+bool Polygon::All_Intersections (const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread) const
 {
     DBL Depth;
     Vector3d IPoint;
@@ -298,9 +298,10 @@ bool Polygon::Inside(const Vector3d&, TraceThreadData *Thread) const
 *
 ******************************************************************************/
 
-void Polygon::Normal(Vector3d& Result, Intersection *, TraceThreadData *) const
+void Polygon::Normal (Vector3d& geometricNormal, Vector3d& smoothNormal, Intersection *, TraceThreadData *) const
 {
-    Result = S_Normal;
+    geometricNormal = S_Normal;
+    smoothNormal    = S_Normal;
 }
 
 

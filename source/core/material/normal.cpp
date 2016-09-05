@@ -797,7 +797,6 @@ void Perturb_Normal(Vector3d& Layer_Normal, const TNORMAL *Tnormal, const Vector
 
             Perturb_Normal(Layer_Normal,Blend_Map->Blend_Map_Entries[0].Vals,TPoint,Intersection,ray,Thread);
             Layer_Normal.normalize();
-            Intersection->PNormal = Layer_Normal; /* -hdf- June 98 */
 
             return;
         }
@@ -808,11 +807,11 @@ void Perturb_Normal(Vector3d& Layer_Normal, const TNORMAL *Tnormal, const Vector
 
             /* NK 19 Nov 1999 added Warp_EPoint */
             Warp_EPoint (TPoint, EPoint, Tnormal);
-            value1 = Evaluate_TPat(Tnormal, TPoint, Intersection, ray, Thread);
+            value1 = Evaluate_TPat (Tnormal, TPoint, Intersection, &Layer_Normal, ray, Thread);
 
             Blend_Map->Search (value1,Prev,Cur,prevWeight,curWeight);
 
-            Warp_Normal(Layer_Normal,Layer_Normal, Tnormal, Test_Flag(Tnormal,DONT_SCALE_BUMPS_FLAG));
+            Warp_Normal (Layer_Normal, Layer_Normal, Tnormal, Test_Flag (Tnormal, DONT_SCALE_BUMPS_FLAG));
             P1 = Layer_Normal;
 
             Warp_EPoint (TPoint, EPoint, Tnormal);
@@ -826,11 +825,9 @@ void Perturb_Normal(Vector3d& Layer_Normal, const TNORMAL *Tnormal, const Vector
                 Layer_Normal = prevWeight * P1 + curWeight * Layer_Normal;
             }
 
-            UnWarp_Normal(Layer_Normal,Layer_Normal, Tnormal, Test_Flag(Tnormal,DONT_SCALE_BUMPS_FLAG));
+            UnWarp_Normal (Layer_Normal, Layer_Normal, Tnormal, Test_Flag (Tnormal, DONT_SCALE_BUMPS_FLAG));
 
             Layer_Normal.normalize();
-
-            Intersection->PNormal = Layer_Normal; /* -hdf- June 98 */
 
             return;
         }
@@ -881,7 +878,7 @@ void Perturb_Normal(Vector3d& Layer_Normal, const TNORMAL *Tnormal, const Vector
         for(i=0; i<=3; i++)
         {
             P1 = TPoint + (DBL)Tnormal->Delta * Pyramid_Vect[i]; /* NK delta */
-            value1 = Do_Slope_Map(Evaluate_TPat(Tnormal, P1, Intersection, ray, Thread), slopeMap.get());
+            value1 = Do_Slope_Map (Evaluate_TPat (Tnormal, P1, Intersection, &Layer_Normal, ray, Thread), slopeMap.get());
             Layer_Normal += (value1*Amount) * Pyramid_Vect[i];
         }
 
@@ -889,9 +886,6 @@ void Perturb_Normal(Vector3d& Layer_Normal, const TNORMAL *Tnormal, const Vector
                       Test_Flag(Tnormal,DONT_SCALE_BUMPS_FLAG));
 
     }
-
-    if ( Intersection )
-        Intersection->PNormal = Layer_Normal; /* -hdf- June 98 */
 }
 
 

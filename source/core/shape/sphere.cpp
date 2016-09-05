@@ -80,7 +80,7 @@ const DBL DEPTH_TOLERANCE = 1.0e-6;
 *
 ******************************************************************************/
 
-bool Sphere::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread)
+bool Sphere::All_Intersections (const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread) const
 {
     Thread->Stats()[Ray_Sphere_Tests]++;
 
@@ -321,7 +321,8 @@ bool Sphere::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 *
 ******************************************************************************/
 
-void Sphere::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread) const
+void Sphere::Normal (Vector3d& geometricNormal, Vector3d& smoothNormal, Intersection *Inter,
+                     TraceThreadData *Thread) const
 {
     if(Do_Ellipsoid)
     {
@@ -332,16 +333,18 @@ void Sphere::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thre
 
         // Compute the result in the sphere's space
         // (this is trivial since ellipsoidal mode is based on the unity sphere)
-        Result = New_Point;
+        geometricNormal = New_Point;
 
         // Transform the result back into regular space
-        MTransNormal(Result, Result, Trans);
-        Result.normalize();
+        MTransNormal (geometricNormal, geometricNormal, Trans);
+        geometricNormal.normalize();
     }
     else
     {
-        Result = (Inter->IPoint - Center) / Radius;
+        geometricNormal = (Inter->IPoint - Center) / Radius;
     }
+
+    smoothNormal = geometricNormal;
 }
 
 

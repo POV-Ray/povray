@@ -414,17 +414,17 @@ class Intersection
         DBL Depth;
         /// Point of the intersection in global coordinate space.
         Vector3d IPoint;
-        /// Unpertubed surface normal at the intersection point.
-        /// @attention This is not necessarily the true geometric surface normal, as it may include fake smoothing.
+        /// True geometric surface normal at the intersection point.
         /// @note This value is invalid if haveNormal is false.
-        /// @todo We should have two distinct vectors: A true geometric one, and a separate one for faked smoothing.
-        Vector3d INormal;
-        /// Perturbed normal vector (set during texture evaluation).
-        Vector3d PNormal;
+        Vector3d geometricNormal;
+        /// Unpertubed surface normal at the intersection point.
+        /// @note This may differ from the true geometric surface normal, as it may include fake smoothing.
+        /// @note This value is invalid if haveNormal is false.
+        Vector3d smoothNormal;
         /// UV texture coordinate.
         Vector2d Iuv;
         /// Intersected object.
-        ObjectPtr Object;
+        ConstObjectPtr Object;
 
         /// @name Object-Specific Auxiliary Data
         /// These members hold information specific to particular object types, typically generated during
@@ -454,61 +454,88 @@ class Intersection
         /// @}
 
         /// Root-level parent CSG object for cutaway textures.
-        ObjectPtr Csg;
+        ConstObjectPtr Csg;
 
         Intersection() :
             Depth(BOUND_HUGE), Object(NULL), Csg(NULL)
         {}
 
-        Intersection(DBL d, const Vector3d& v, ObjectPtr o) :
-            Depth(d), Object(o), IPoint(v), Iuv(v), haveNormal(false), haveLocalIPoint(false), Csg(NULL)
+        Intersection (DBL d, const Vector3d& v, ConstObjectPtr o) :
+            Depth(d), Object(o), IPoint(v), Iuv(v),
+            haveNormal(false), haveLocalIPoint(false), Csg(NULL)
         {}
 
-        Intersection(DBL d, const Vector3d& v, const Vector3d& n, ObjectPtr o) :
-            Depth(d), Object(o), IPoint(v), Iuv(v), INormal(n), haveNormal(true), haveLocalIPoint(false), Csg(NULL)
+        Intersection (DBL d, const Vector3d& v, const Vector3d& n, ConstObjectPtr o) :
+            Depth(d), Object(o), IPoint(v), Iuv(v), geometricNormal(n), smoothNormal(n),
+            haveNormal(true), haveLocalIPoint(false), Csg(NULL)
         {}
 
-        Intersection(DBL d, const Vector3d& v, const Vector2d& uv, ObjectPtr o) :
-            Depth(d), Object(o), IPoint(v), Iuv(uv), haveNormal(false), haveLocalIPoint(false), Csg(NULL)
+        Intersection (DBL d, const Vector3d& v, const Vector3d& n, const Vector3d& sn, ConstObjectPtr o) :
+            Depth(d), Object(o), IPoint(v), Iuv(v), geometricNormal(n), smoothNormal(sn),
+            haveNormal(true), haveLocalIPoint(false), Csg(NULL)
         {}
 
-        Intersection(DBL d, const Vector3d& v, const Vector3d& n, const Vector2d& uv, ObjectPtr o) :
-            Depth(d), Object(o), IPoint(v), INormal(n), Iuv(uv), haveNormal(true), haveLocalIPoint(false), Csg(NULL)
+        Intersection (DBL d, const Vector3d& v, const Vector2d& uv, ConstObjectPtr o) :
+            Depth(d), Object(o), IPoint(v), Iuv(uv),
+            haveNormal(false), haveLocalIPoint(false), Csg(NULL)
         {}
 
-        Intersection(DBL d, const Vector3d& v, ObjectPtr o, const void *a) :
-            Depth(d), Object(o), Pointer(a), IPoint(v), Iuv(v), haveNormal(false), haveLocalIPoint(false), Csg(NULL)
+        Intersection (DBL d, const Vector3d& v, const Vector3d& n, const Vector2d& uv, ConstObjectPtr o) :
+            Depth(d), Object(o), IPoint(v), geometricNormal(n), smoothNormal(n), Iuv(uv),
+            haveNormal(true), haveLocalIPoint(false), Csg(NULL)
         {}
 
-        Intersection(DBL d, const Vector3d& v, const Vector2d& uv, ObjectPtr o, const void *a) :
-            Depth(d), Object(o), Pointer(a), IPoint(v), Iuv(uv), haveNormal(false), haveLocalIPoint(false), Csg(NULL)
+        Intersection (DBL d, const Vector3d& v, const Vector3d& n, const Vector3d& sn, const Vector2d& uv, ConstObjectPtr o) :
+            Depth(d), Object(o), IPoint(v), geometricNormal(n), smoothNormal(sn), Iuv(uv),
+            haveNormal(true), haveLocalIPoint(false), Csg(NULL)
         {}
 
-        Intersection(DBL d, const Vector3d& v, ObjectPtr o, int a) :
-            Depth(d), Object(o), i1(a), IPoint(v), haveNormal(false), haveLocalIPoint(false), Csg(NULL)
+        Intersection (DBL d, const Vector3d& v, ConstObjectPtr o, const void *a) :
+            Depth(d), Object(o), Pointer(a), IPoint(v), Iuv(v),
+            haveNormal(false), haveLocalIPoint(false), Csg(NULL)
         {}
 
-        Intersection(DBL d, const Vector3d& v, ObjectPtr o, DBL a) :
-            Depth(d), Object(o), d1(a), IPoint(v), haveNormal(false), haveLocalIPoint(false), Csg(NULL)
+        Intersection (DBL d, const Vector3d& v, const Vector2d& uv, ConstObjectPtr o, const void *a) :
+            Depth(d), Object(o), Pointer(a), IPoint(v), Iuv(uv),
+            haveNormal(false), haveLocalIPoint(false), Csg(NULL)
         {}
 
-        Intersection(DBL d, const Vector3d& v, ObjectPtr o, int a, int b) :
-            Depth(d), Object(o), i1(a), i2(b), IPoint(v), haveNormal(false), haveLocalIPoint(false), Csg(NULL)
+        Intersection (DBL d, const Vector3d& v, ConstObjectPtr o, int a) :
+            Depth(d), Object(o), i1(a), IPoint(v),
+            haveNormal(false), haveLocalIPoint(false), Csg(NULL)
         {}
 
-        Intersection(DBL d, const Vector3d& v, ObjectPtr o, int a, DBL b) :
-            Depth(d), Object(o), i1(a), d1(b), IPoint(v), haveNormal(false), haveLocalIPoint(false), Csg(NULL)
+        Intersection (DBL d, const Vector3d& v, ConstObjectPtr o, DBL a) :
+            Depth(d), Object(o), d1(a), IPoint(v),
+            haveNormal(false), haveLocalIPoint(false), Csg(NULL)
         {}
 
-        Intersection(DBL d, const Vector3d& v, ObjectPtr o, int a, int b, DBL c) :
-            Depth(d), Object(o), i1(a), i2(b), d1(c), IPoint(v), haveNormal(false), haveLocalIPoint(false), Csg(NULL)
+        Intersection (DBL d, const Vector3d& v, ConstObjectPtr o, int a, int b) :
+            Depth(d), Object(o), i1(a), i2(b), IPoint(v),
+            haveNormal(false), haveLocalIPoint(false), Csg(NULL)
         {}
 
-        Intersection(DBL d, const Vector3d& v, ObjectPtr o, const Vector3d& lv, bool a) :
-            Depth(d), Object(o), b1(a), IPoint(v), LocalIPoint(lv), haveNormal(false), haveLocalIPoint(true), Csg(NULL)
+        Intersection (DBL d, const Vector3d& v, ConstObjectPtr o, int a, DBL b) :
+            Depth(d), Object(o), i1(a), d1(b), IPoint(v),
+            haveNormal(false), haveLocalIPoint(false), Csg(NULL)
         {}
 
-        ~Intersection() { }
+        Intersection (DBL d, const Vector3d& v, ConstObjectPtr o, int a, int b, DBL c) :
+            Depth(d), Object(o), i1(a), i2(b), d1(c), IPoint(v),
+            haveNormal(false), haveLocalIPoint(false), Csg(NULL)
+        {}
+
+        Intersection (DBL d, const Vector3d& v, ConstObjectPtr o, const Vector3d& lv) :
+            Depth(d), Object(o), IPoint(v), LocalIPoint(lv),
+            haveNormal(false), haveLocalIPoint(true), Csg(NULL)
+        {}
+
+        Intersection (DBL d, const Vector3d& v, ConstObjectPtr o, const Vector3d& lv, bool a) :
+            Depth(d), Object(o), b1(a), IPoint(v), LocalIPoint(lv),
+            haveNormal(false), haveLocalIPoint(true), Csg(NULL)
+        {}
+
+        ~Intersection() {}
 };
 
 typedef std::stack<Intersection, vector<Intersection> > IStackData;

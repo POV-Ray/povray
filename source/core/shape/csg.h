@@ -70,7 +70,7 @@ class CSG : public CompoundObject
 
         int do_split;
 
-        virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const { }
+        virtual void Normal (Vector3d&, Vector3d&, Intersection *, TraceThreadData *) const {}
         virtual void Translate(const Vector3d&, const TRANSFORM *);
         virtual void Rotate(const Vector3d&, const TRANSFORM *);
         virtual void Scale(const Vector3d&, const TRANSFORM *);
@@ -78,7 +78,8 @@ class CSG : public CompoundObject
         virtual ObjectPtr Invert() = 0;
         virtual void Compute_BBox();
 
-        void Determine_Textures(Intersection *isect, bool hitinside, WeightedTextureVector& textures, TraceThreadData *Threaddata);
+        void Determine_Textures (const Intersection *isect, bool hitinside, WeightedTextureVector& textures,
+                                 TraceThreadData *Threaddata) const;
 };
 
 class CSGUnion : public CSG
@@ -90,7 +91,7 @@ class CSGUnion : public CSG
 
         virtual ObjectPtr Copy();
 
-        virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
+        virtual bool All_Intersections (const Ray&, IStack&, TraceThreadData *) const;
         virtual bool Inside(const Vector3d&, TraceThreadData *) const;
         virtual ObjectPtr Invert();
 };
@@ -103,7 +104,7 @@ class CSGMerge : public CSGUnion
 
         virtual ObjectPtr Copy();
 
-        virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
+        virtual bool All_Intersections (const Ray&, IStack&, TraceThreadData *) const;
 };
 
 class CSGIntersection : public CSG
@@ -114,7 +115,7 @@ class CSGIntersection : public CSG
 
         virtual ObjectPtr Copy();
 
-        virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
+        virtual bool All_Intersections (const Ray&, IStack&, TraceThreadData *) const;
         virtual bool Inside(const Vector3d&, TraceThreadData *) const;
         virtual ObjectPtr Invert();
 

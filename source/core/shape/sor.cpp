@@ -171,7 +171,7 @@ const int MAX_INTERSECTIONS_PER_SEGMENT = 4;
 *
 ******************************************************************************/
 
-bool Sor::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread)
+bool Sor::All_Intersections (const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread) const
 {
     Thread->Stats()[Ray_Sor_Tests]++;
 
@@ -225,7 +225,7 @@ bool Sor::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadData
 *
 ******************************************************************************/
 
-bool Sor::Intersect(const BasicRay& ray, IStack& Depth_Stack, TraceThreadData *Thread)
+bool Sor::Intersect (const BasicRay& ray, IStack& Depth_Stack, TraceThreadData *Thread) const
 {
     int cnt;
     int found, j, n;
@@ -530,7 +530,8 @@ bool Sor::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 *
 ******************************************************************************/
 
-void Sor::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread) const
+void Sor::Normal (Vector3d& geometricNormal, Vector3d& smoothNormal, Intersection *Inter,
+                  TraceThreadData *Thread) const
 {
     DBL k;
     Vector3d P;
@@ -571,9 +572,11 @@ void Sor::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread)
 
     /* Transform the normal out of the surface of revolution space. */
 
-    MTransNormal(Result, N, Trans);
+    MTransNormal (geometricNormal, N, Trans);
 
-    Result.normalize();
+    geometricNormal.normalize();
+
+    smoothNormal = geometricNormal;
 }
 
 
@@ -1177,7 +1180,8 @@ void Sor::Compute_Sor(Vector2d *P, TraceThreadData *Thread)
 *
 ******************************************************************************/
 
-bool Sor::test_hit(const BasicRay &ray, IStack& Depth_Stack, DBL d, DBL k, int t, int n, TraceThreadData *Thread)
+bool Sor::test_hit (const BasicRay &ray, IStack& Depth_Stack, DBL d, DBL k, int t, int n,
+                    TraceThreadData *Thread) const
 {
     Vector3d IPoint;
 

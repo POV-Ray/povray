@@ -77,7 +77,7 @@ const DBL DEPTH_TOLERANCE = 1.0e-6;
 *
 ******************************************************************************/
 
-bool Disc::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread)
+bool Disc::All_Intersections (const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread) const
 {
     int Intersection_Found;
     DBL Depth;
@@ -244,9 +244,10 @@ bool Disc::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 *
 ******************************************************************************/
 
-void Disc::Normal(Vector3d& Result, Intersection *, TraceThreadData *) const
+void Disc::Normal (Vector3d& geometricNormal, Vector3d& smoothNormal, Intersection *, TraceThreadData *) const
 {
-    Result = normal;
+    geometricNormal = normal;
+    smoothNormal    = normal;
 }
 
 

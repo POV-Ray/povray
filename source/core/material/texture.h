@@ -41,6 +41,7 @@
 
 #include "core/coretypes.h"
 #include "core/material/blendmap.h"
+#include "core/material/shader.h"
 #include "core/support/simplevector.h"
 
 namespace pov
@@ -94,43 +95,6 @@ typedef shared_ptr<TextureBlendMap>                 TextureBlendMapPtr;
 typedef shared_ptr<const TextureBlendMap>           TextureBlendMapConstPtr;
 
 struct Texture_Struct;
-
-struct FinishData : public CowBase<FinishData>
-{
-    struct TempData
-    {
-        SNGL caustics, ior, dispersion, refract;
-
-        TempData();
-        TempData(const TempData& o);
-    };
-    typedef OptionalDataPtr<TempData> TempDataPtr;
-
-    TempDataPtr tempData;
-
-    MathColour Ambient, Emission;
-    MathColour Reflection_Max, Reflection_Min;
-    MathColour SubsurfaceTranslucency, SubsurfaceAnisotropy;
-    //MathColour SigmaPrimeS, SigmaA;
-    SNGL Diffuse, DiffuseBack, Brilliance, BrillianceOut, BrillianceAdjust, BrillianceAdjustRad;
-    SNGL Specular, Roughness;
-    SNGL Phong, Phong_Size;
-    SNGL Reflect_Exp;
-    SNGL Reflect_Metallic;
-    SNGL Reflection_Falloff;
-    SNGL Irid, Irid_Film_Thickness, Irid_Turb;
-    SNGL Crand;
-    SNGL Metallic;
-    bool Reflection_Fresnel : 1;
-    bool Fresnel            : 1;
-    bool Conserve_Energy    : 1;    // added by NK Dec 19 1999
-    bool UseSubsurface      : 1;    // whether to use subsurface light transport
-
-    FinishData();
-    FinishData(const FinishData& o);
-    virtual ~FinishData();
-    virtual FinishData* Clone() const { return new FinishData(*this); }
-};
 
 
 /*****************************************************************************
@@ -231,8 +195,8 @@ struct WeightedTexture
     COLC weight;
     TextureData texture;
 
-    WeightedTexture(COLC w, TextureData& t) :
-        weight(w), texture(t) { }
+    WeightedTexture(COLC w, const TextureData& t) :
+        weight(w), texture(t) {}
 };
 
 typedef FixedSimpleVector<WeightedTexture, WEIGHTEDTEXTURE_VECTOR_SIZE> WeightedTextureVector;

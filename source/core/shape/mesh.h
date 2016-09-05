@@ -129,9 +129,9 @@ class Mesh : public ObjectBase
 
         virtual ObjectPtr Copy();
 
-        virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
+        virtual bool All_Intersections (const Ray&, IStack&, TraceThreadData *) const;
         virtual bool Inside(const Vector3d&, TraceThreadData *) const;
-        virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const;
+        virtual void Normal (Vector3d&, Vector3d&, Intersection *, TraceThreadData *) const;
         virtual void UVCoord(Vector2d&, const Intersection *, TraceThreadData *) const;
         virtual void Translate(const Vector3d&, const TRANSFORM *);
         virtual void Rotate(const Vector3d&, const TRANSFORM *);
@@ -153,16 +153,16 @@ class Mesh : public ObjectBase
         MeshIndex Mesh_Hash_UV(MeshIndex *Number, MeshIndex *Max, MeshUVVector **Elements, const Vector2d& aPoint);
         void Smooth_Mesh_Normal(Vector3d& Result, const MESH_TRIANGLE *Triangle, const Vector3d& IPoint) const;
 
-        void Determine_Textures(Intersection *, bool, WeightedTextureVector&, TraceThreadData *);
+        void Determine_Textures (const Intersection *, bool, WeightedTextureVector&, TraceThreadData *) const;
     protected:
-        bool Intersect(const BasicRay& ray, IStack& Depth_Stack, TraceThreadData *Thread);
+        bool Intersect (const BasicRay& ray, IStack& Depth_Stack, TraceThreadData *Thread) const;
         void Compute_Mesh_BBox();
         void MeshUV(const Vector3d& P, const MESH_TRIANGLE *Triangle, Vector2d& Result) const;
         void compute_smooth_triangle(MESH_TRIANGLE *Triangle, const Vector3d& P1, const Vector3d& P2, const Vector3d& P3);
         bool intersect_mesh_triangle(const BasicRay& ray, const MESH_TRIANGLE *Triangle, DBL *Depth) const;
-        bool test_hit(const MESH_TRIANGLE *Triangle, const BasicRay& OrigRay, DBL Depth, DBL len, IStack& Depth_Stack, TraceThreadData *Thread);
+        bool test_hit (const MESH_TRIANGLE *Triangle, const BasicRay& OrigRay, DBL Depth, DBL len, IStack& Depth_Stack, TraceThreadData *Thread) const;
         void get_triangle_bbox(const MESH_TRIANGLE *Triangle, BoundingBox *BBox) const;
-        bool intersect_bbox_tree(const BasicRay& ray, const BasicRay& Orig_Ray, DBL len, IStack& Depth_Stack, TraceThreadData *Thread);
+        bool intersect_bbox_tree (const BasicRay& ray, const BasicRay& Orig_Ray, DBL len, IStack& Depth_Stack, TraceThreadData *Thread) const;
         bool inside_bbox_tree(const BasicRay& ray, TraceThreadData *Thread) const;
         void get_triangle_vertices(const MESH_TRIANGLE *Triangle, Vector3d& P1, Vector3d& P2, Vector3d& P3) const;
         void get_triangle_normals(const MESH_TRIANGLE *Triangle, Vector3d& N1, Vector3d& N2, Vector3d& N3) const;

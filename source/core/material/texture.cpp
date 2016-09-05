@@ -7,7 +7,7 @@
 /// The code in this file is mainly related to perturbations and transformations
 /// of textures. The implementation of unperturbed textures resides in
 /// @ref pigment.cpp (surface colouring) and @ref normal.cpp (surface normal
-/// perturbation), as well as in @ref trace.cpp (surface finish).
+/// perturbation), as well as in @ref shader.cpp (surface finish).
 ///
 /// The noise function used here is the one described by Ken Perlin in
 /// "Hypertexture", SIGGRAPH '89 Conference Proceedings page 253.
@@ -55,6 +55,7 @@
 #include "base/pov_err.h"
 
 #include "core/material/blendmap.h"
+#include "core/material/shader.h"
 #include "core/material/pattern.h"
 #include "core/material/pigment.h"
 #include "core/material/normal.h"
@@ -1119,106 +1120,6 @@ void Transform_Textures(TEXTURE *Textures, const TRANSFORM *Trans)
     }
 }
 
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-*   POV-Ray Team
-*
-* DESCRIPTION
-*
-* CHANGES
-*   6/27/98  MBP  Added initializers for reflection blur
-*   8/27/98  MBP  Added initializers for angle-based reflectivity
-*
-******************************************************************************/
-
-FinishData::TempData::TempData() :
-    caustics(-1.0), ior(-1.0), dispersion(1.0), refract(1.0)
-{}
-
-FinishData::FinishData() :
-    tempData(),
-    Ambient(0.1), Emission(0.0),
-    Reflection_Max(0.0), Reflection_Min(0.0),
-    SubsurfaceTranslucency(0.0), SubsurfaceAnisotropy(0.0),
-    Diffuse(0.6), DiffuseBack(0.0),
-    Brilliance(1.0), BrillianceOut(1.0), BrillianceAdjust(1.0), BrillianceAdjustRad(1.0),
-    Specular(0.0), Roughness(1.0/0.05),
-    Phong(0.0), Phong_Size(40.0),
-    Reflect_Exp(1.0),
-    Reflect_Metallic(0.0),
-    Reflection_Falloff(1),
-    Irid(0.0), Irid_Film_Thickness(0.0), Irid_Turb(0.0),
-    Crand(0.0),
-    Metallic(0.0),
-    Reflection_Fresnel(false),
-    Fresnel(false),
-    Conserve_Energy(false),
-    UseSubsurface(false)
-{}
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-* INPUT
-*
-* OUTPUT
-*
-* RETURNS
-*
-* AUTHOR
-*
-*   POV-Ray Team
-*
-* DESCRIPTION
-*
-* CHANGES
-*
-******************************************************************************/
-
-FinishData::TempData::TempData(const TempData& o) :
-    caustics(o.caustics), ior(o.ior), dispersion(o.dispersion), refract(o.refract)
-{}
-
-FinishData::FinishData(const FinishData& o) :
-    tempData(o.tempData),
-    Ambient(o.Ambient), Emission(o.Emission),
-    Reflection_Max(o.Reflection_Max), Reflection_Min(o.Reflection_Min),
-    SubsurfaceTranslucency(o.SubsurfaceTranslucency), SubsurfaceAnisotropy(o.SubsurfaceAnisotropy),
-    Diffuse(o.Diffuse), DiffuseBack(o.DiffuseBack),
-    Brilliance(o.Brilliance), BrillianceOut(o.BrillianceOut), BrillianceAdjust(o.BrillianceAdjust), BrillianceAdjustRad(o.BrillianceAdjustRad),
-    Specular(o.Specular), Roughness(o.Roughness),
-    Phong(o.Phong), Phong_Size(o.Phong_Size),
-    Reflect_Exp(o.Reflect_Exp),
-    Reflect_Metallic(o.Reflect_Metallic),
-    Reflection_Falloff(o.Reflection_Falloff),
-    Irid(o.Irid), Irid_Film_Thickness(o.Irid_Film_Thickness), Irid_Turb(o.Irid_Turb),
-    Crand(o.Crand),
-    Metallic(o.Metallic),
-    Reflection_Fresnel(o.Reflection_Fresnel),
-    Fresnel(o.Fresnel),
-    Conserve_Energy(o.Conserve_Energy),
-    UseSubsurface(o.UseSubsurface)
-{}
-
-
-/****************************************************************************/
-
-FinishData::~FinishData()
-{}
 
 
 /*****************************************************************************

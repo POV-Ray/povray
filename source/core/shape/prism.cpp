@@ -181,7 +181,7 @@ const int SPLINE_HIT = 3;
 *
 ******************************************************************************/
 
-bool Prism::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread)
+bool Prism::All_Intersections (const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread) const
 {
     bool Found = false ;
     Vector3d IPoint;
@@ -688,7 +688,8 @@ bool Prism::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 *
 ******************************************************************************/
 
-void Prism::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread) const
+void Prism::Normal (Vector3d& geometricNormal, Vector3d& smoothNormal, Intersection *Inter,
+                    TraceThreadData *Thread) const
 {
     Vector3d P;
     PRISM_SPLINE_ENTRY Entry;
@@ -733,9 +734,11 @@ void Prism::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Threa
 
     /* Transform the normalt out of the prism space. */
 
-    MTransNormal(Result, N, Trans);
+    MTransNormal (geometricNormal, N, Trans);
 
-    Result.normalize();
+    geometricNormal.normalize();
+
+    smoothNormal = geometricNormal;
 }
 
 

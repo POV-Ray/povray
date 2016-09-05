@@ -518,7 +518,10 @@ bool BicubicPatch::subpatch_normal(const Vector3d& v1, const Vector3d& v2, const
 *
 ******************************************************************************/
 
-bool BicubicPatch::intersect_subpatch(const BasicRay &ray, const TripleVector3d& V1, const DBL uu[3], const DBL vv[3], DBL *Depth, Vector3d& P, Vector3d& N, DBL *u, DBL *v) const
+bool BicubicPatch::intersect_subpatch (const BasicRay &ray, const TripleVector3d& V1,
+                                       const DBL uu[3], const DBL vv[3],
+                                       DBL *Depth, Vector3d& P,
+                                       Vector3d& geoN, Vector3d& smoothN, DBL *u, DBL *v) const
 {
     DBL squared_b0, squared_b1;
     DBL d, n, a, b, r;
@@ -584,30 +587,32 @@ bool BicubicPatch::intersect_subpatch(const BasicRay &ray, const TripleVector3d&
         return false;
     }
 
+    geoN = B[2];
+
     r = 1.0 - a - b;
 
     bezier_value(&Control_Points, uu[0], vv[0], T1, NN[0]);
     bezier_value(&Control_Points, uu[1], vv[1], T1, NN[1]);
     bezier_value(&Control_Points, uu[2], vv[2], T1, NN[2]);
 
-    N = NN[0] * r
-      + NN[1] * a
-      + NN[2] * b;
+    smoothN = NN[0] * r
+            + NN[1] * a
+            + NN[2] * b;
 
     *u = r * uu[0] + a * uu[1] + b * uu[2];
     *v = r * vv[0] + a * vv[1] + b * vv[2];
 
-    d = N.lengthSqr();
+    d = smoothN.lengthSqr();
 
     if (d > BEZIER_EPSILON)
     {
         d = 1.0 / sqrt(d);
 
-        N *= d;
+        smoothN *= d;
     }
     else
     {
-        N = Vector3d(1.0, 0.0, 0.0);
+        smoothN = Vector3d(1.0, 0.0, 0.0);
     }
 
     return true;
@@ -857,13 +862,15 @@ DBL BicubicPatch::point_plane_distance(const Vector3d& p, const Vector3d& n, DBL
 *
 ******************************************************************************/
 
-int BicubicPatch::bezier_subpatch_intersect(const BasicRay &ray, const ControlPoints *Patch, DBL u0, DBL  u1, DBL  v0, DBL  v1, IStack& Depth_Stack, TraceThreadData *Thread)
+int BicubicPatch::bezier_subpatch_intersect (const BasicRay &ray, const ControlPoints *Patch,
+                                             DBL u0, DBL  u1, DBL  v0, DBL  v1, IStack& Depth_Stack,
+                                             TraceThreadData *Thread) const
 {
     int cnt = 0;
     TripleVector3d V1;
     DBL u, v, Depth;
     DBL uu[3], vv[3];
-    Vector3d P, N;
+    Vector3d P, geoN, smoothN;
     Vector2d UV;
     Vector2d uv_point, tpoint;
 
@@ -874,7 +881,7 @@ int BicubicPatch::bezier_subpatch_intersect(const BasicRay &ray, const ControlPo
     uu[0] = u0; uu[1] = u0; uu[2] = u1;
     vv[0] = v0; vv[1] = v1; vv[2] = v1;
 
-    if (intersect_subpatch(ray, V1, uu, vv, &Depth, P, N, &u, &v))
+    if (intersect_subpatch (ray, V1, uu, vv, &Depth, P, geoN, smoothN, &u, &v))
     {
         if (Clip.empty() || Point_In_Clip(P, Clip, Thread))
         {
@@ -885,7 +892,7 @@ int BicubicPatch::bezier_subpatch_intersect(const BasicRay &ray, const ControlPo
 
             UV[U] = tpoint[0];
             UV[V] = tpoint[1];
-            Depth_Stack->push(Intersection(Depth, P, N, UV, this));
+            Depth_Stack->push (Intersection (Depth, P, geoN, smoothN, UV, this));
 
             cnt++;
         }
@@ -897,7 +904,7 @@ int BicubicPatch::bezier_subpatch_intersect(const BasicRay &ray, const ControlPo
     uu[1] = uu[2]; uu[2] = u1;
     vv[1] = vv[2]; vv[2] = v0;
 
-    if (intersect_subpatch(ray, V1, uu, vv, &Depth, P, N, &u, &v))
+    if (intersect_subpatch (ray, V1, uu, vv, &Depth, P, geoN, smoothN, &u, &v))
     {
         if (Clip.empty() || Point_In_Clip(P, Clip, Thread))
         {
@@ -908,7 +915,7 @@ int BicubicPatch::bezier_subpatch_intersect(const BasicRay &ray, const ControlPo
 
             UV[U] = tpoint[0];
             UV[V] = tpoint[1];
-            Depth_Stack->push(Intersection(Depth, P, N, UV, this));
+            Depth_Stack->push (Intersection (Depth, P, geoN, smoothN, UV, this));
 
             cnt++;
         }
@@ -1276,7 +1283,9 @@ bool BicubicPatch::flat_enough(const ControlPoints *Patch) const
 *
 ******************************************************************************/
 
-int BicubicPatch::bezier_subdivider(const BasicRay &ray, const ControlPoints *Patch, DBL u0, DBL  u1, DBL  v0, DBL  v1, int recursion_depth, IStack& Depth_Stack, TraceThreadData *Thread)
+int BicubicPatch::bezier_subdivider (const BasicRay &ray, const ControlPoints *Patch,
+                                     DBL u0, DBL u1, DBL v0, DBL v1, int recursion_depth, IStack& Depth_Stack,
+                                     TraceThreadData *Thread) const
 {
     int cnt = 0;
     DBL ut, vt, radiusSqr;
@@ -1439,12 +1448,13 @@ void BicubicPatch::bezier_tree_deleter(BEZIER_NODE *Node)
 *
 ******************************************************************************/
 
-int BicubicPatch::bezier_tree_walker(const BasicRay &ray, const BEZIER_NODE *Node, IStack& Depth_Stack, TraceThreadData *Thread)
+int BicubicPatch::bezier_tree_walker (const BasicRay &ray, const BEZIER_NODE *Node, IStack& Depth_Stack,
+                                      TraceThreadData *Thread) const
 {
     int i, cnt = 0;
     DBL Depth, u, v;
     DBL uu[3], vv[3];
-    Vector3d N, P;
+    Vector3d geoN, smoothN, P;
     TripleVector3d V1;
     Vector2d UV;
     Vector2d uv_point, tpoint;
@@ -1495,7 +1505,7 @@ int BicubicPatch::bezier_tree_walker(const BasicRay &ray, const BEZIER_NODE *Nod
          * intersections in the triangles.
          */
 
-        if (intersect_subpatch(ray, V1, uu, vv, &Depth, P, N, &u, &v))
+        if (intersect_subpatch (ray, V1, uu, vv, &Depth, P, geoN, smoothN, &u, &v))
         {
             if (Clip.empty() || Point_In_Clip(P, Clip, Thread))
             {
@@ -1506,7 +1516,7 @@ int BicubicPatch::bezier_tree_walker(const BasicRay &ray, const BEZIER_NODE *Nod
 
                 UV[U] = tpoint[0];
                 UV[V] = tpoint[1];
-                Depth_Stack->push(Intersection(Depth, P, N, UV, this));
+                Depth_Stack->push (Intersection (Depth, P, geoN, smoothN, UV, this));
 
                 cnt++;
             }
@@ -1518,7 +1528,7 @@ int BicubicPatch::bezier_tree_walker(const BasicRay &ray, const BEZIER_NODE *Nod
         uu[1] = uu[2]; uu[2] = Vertices->uvbnds[1];
         vv[1] = vv[2]; vv[2] = Vertices->uvbnds[2];
 
-        if (intersect_subpatch(ray, V1, uu, vv, &Depth, P, N, &u, &v))
+        if (intersect_subpatch (ray, V1, uu, vv, &Depth, P, geoN, smoothN, &u, &v))
         {
             if (Clip.empty() || Point_In_Clip(P, Clip, Thread))
             {
@@ -1529,7 +1539,7 @@ int BicubicPatch::bezier_tree_walker(const BasicRay &ray, const BEZIER_NODE *Nod
 
                 UV[U] = tpoint[0];
                 UV[V] = tpoint[1];
-                Depth_Stack->push(Intersection(Depth, P, N, UV, this));
+                Depth_Stack->push (Intersection(Depth, P, geoN, smoothN, UV, this));
 
                 cnt++;
             }
@@ -1571,7 +1581,7 @@ int BicubicPatch::bezier_tree_walker(const BasicRay &ray, const BEZIER_NODE *Nod
 *
 ******************************************************************************/
 
-int BicubicPatch::intersect_bicubic_patch0(const BasicRay &ray, IStack& Depth_Stack, TraceThreadData *Thread)
+int BicubicPatch::intersect_bicubic_patch0 (const BasicRay &ray, IStack& Depth_Stack, TraceThreadData *Thread) const
 {
     return (bezier_subdivider(ray, &Control_Points, 0.0, 1.0, 0.0, 1.0, 0, Depth_Stack, Thread));
 }
@@ -1604,7 +1614,7 @@ int BicubicPatch::intersect_bicubic_patch0(const BasicRay &ray, IStack& Depth_St
 *
 ******************************************************************************/
 
-bool BicubicPatch::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread)
+bool BicubicPatch::All_Intersections (const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread) const
 {
     int Found, cnt = 0;
 
@@ -1702,11 +1712,13 @@ bool BicubicPatch::Inside(const Vector3d&, TraceThreadData *) const
 *
 ******************************************************************************/
 
-void BicubicPatch::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread) const
+void BicubicPatch::Normal (Vector3d& geometricNormal, Vector3d& smoothNormal, Intersection *Inter,
+                           TraceThreadData *Thread) const
 {
     /* Use preocmputed normal. */
 
-    Result = Inter->INormal;
+    geometricNormal = Inter->geometricNormal;
+    smoothNormal    = Inter->smoothNormal;
 }
 
 

@@ -297,9 +297,10 @@ ContinuousPattern::ContinuousPattern(const ContinuousPattern& obj) :
     waveExponent(obj.waveExponent)
 {}
 
-DBL ContinuousPattern::Evaluate(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
+DBL ContinuousPattern::Evaluate (const Vector3d& EPoint, const Intersection *pIsection, const Vector3d *pNormal,
+                                 const Ray *pRay, TraceThreadData *pThread) const
 {
-    DBL value = EvaluateRaw(EPoint, pIsection, pRay, pThread);
+    DBL value = EvaluateRaw (EPoint, pIsection, pNormal, pRay, pThread);
 
     if(waveFrequency != 0.0)
         value = fmod(value * waveFrequency + wavePhase, 1.00001); // TODO FIXME - magic number! Should be 1.0+SOME_EPSILON (or maybe actually 1.0?)
@@ -373,7 +374,8 @@ DensityFilePattern::~DensityFilePattern()
 }
 
 
-DBL FacetsPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
+DBL FacetsPattern::EvaluateRaw (const Vector3d& EPoint, const Intersection *pIsection, const Vector3d *pNormal,
+                                const Ray *pRay, TraceThreadData *pThread) const
 {
     throw POV_EXCEPTION_STRING("Internal Error: FacetsPattern::EvaluateRaw() called.");
 }
@@ -417,7 +419,8 @@ ImagePattern::~ImagePattern()
         Destroy_Image(pImage);
 }
 
-DBL ImagePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
+DBL ImagePattern::EvaluateRaw (const Vector3d& EPoint, const Intersection *pIsection, const Vector3d *pNormal,
+                               const Ray *pRay, TraceThreadData *pThread) const
 {
     return image_pattern(EPoint, this);
 }
@@ -599,9 +602,10 @@ MandelXPattern::MandelXPattern(const MandelXPattern& obj) :
 *
 ******************************************************************************/
 
-DBL Evaluate_TPat (const TPATTERN *TPat, const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread)
+DBL Evaluate_TPat (const TPATTERN *TPat, const Vector3d& EPoint, const Intersection *pIsection, const Vector3d *pNormal,
+                   const Ray *pRay, TraceThreadData *pThread)
 {
-    return TPat->pattern->Evaluate(EPoint, pIsection, pRay, pThread);
+    return TPat->pattern->Evaluate (EPoint, pIsection, pNormal, pRay, pThread);
 }
 
 
@@ -902,7 +906,8 @@ static const ClassicTurbulence *SearchForTurb(const WarpList warps)
 /*****************************************************************************/
 
 
-DBL PlainPattern::Evaluate(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
+DBL PlainPattern::Evaluate (const Vector3d& EPoint, const Intersection *pIsection, const Vector3d *pNormal,
+                            const Ray *pRay, TraceThreadData *pThread) const
 {
     return 0.0;
 }
@@ -5043,7 +5048,8 @@ DBL PavementPattern::hexagonal (const Vector3d& EPoint) const
 *
 *
 ******************************************************************************/
-DBL TilingPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
+DBL TilingPattern::EvaluateRaw (const Vector3d& EPoint, const Intersection *pIsection, const Vector3d *pNormal,
+                                const Ray *pRay, TraceThreadData *pThread) const
 {
     switch(tilingType)
     {
@@ -5108,7 +5114,8 @@ DBL TilingPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsec
 *
 *
 ******************************************************************************/
-DBL PavementPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
+DBL PavementPattern::EvaluateRaw (const Vector3d& EPoint, const Intersection *pIsection, const Vector3d *pNormal,
+                                  const Ray *pRay, TraceThreadData *pThread) const
 {
     switch(Side)
     {
@@ -5153,7 +5160,8 @@ DBL PavementPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIs
 *
 ******************************************************************************/
 
-DBL AgatePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
+DBL AgatePattern::EvaluateRaw (const Vector3d& EPoint, const Intersection *pIsection, const Vector3d *pNormal,
+                               const Ray *pRay, TraceThreadData *pThread) const
 {
     int noise_generator = GetNoiseGen(pThread);
 
@@ -5212,7 +5220,8 @@ DBL AgatePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsect
 *
 ******************************************************************************/
 
-DBL BoxedPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
+DBL BoxedPattern::EvaluateRaw (const Vector3d& EPoint, const Intersection *pIsection, const Vector3d *pNormal,
+                               const Ray *pRay, TraceThreadData *pThread) const
 {
     register DBL value;
 
@@ -5253,7 +5262,8 @@ DBL BoxedPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsect
 *
 ******************************************************************************/
 
-DBL BrickPattern::Evaluate(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
+DBL BrickPattern::Evaluate (const Vector3d& EPoint, const Intersection *pIsection, const Vector3d *pNormal,
+                            const Ray *pRay, TraceThreadData *pThread) const
 {
     int ibrickx, ibricky, ibrickz;
     DBL brickheight, brickwidth, brickdepth;
@@ -5410,7 +5420,8 @@ DBL BrickPattern::Evaluate(const Vector3d& EPoint, const Intersection *pIsection
 *
 ******************************************************************************/
 
-DBL CellsPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
+DBL CellsPattern::EvaluateRaw (const Vector3d& EPoint, const Intersection *pIsection, const Vector3d *pNormal,
+                               const Ray *pRay, TraceThreadData *pThread) const
 {
     /* select a random value based on the cube from which this came. */
 
@@ -5449,7 +5460,8 @@ DBL CellsPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsect
 *
 ******************************************************************************/
 
-DBL CheckerPattern::Evaluate(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
+DBL CheckerPattern::Evaluate (const Vector3d& EPoint, const Intersection *pIsection, const Vector3d *pNormal,
+                              const Ray *pRay, TraceThreadData *pThread) const
 {
     int value;
 
@@ -5518,7 +5530,8 @@ DBL CheckerPattern::Evaluate(const Vector3d& EPoint, const Intersection *pIsecti
 ******************************************************************************/
 static int IntPickInCube(int tvx, int tvy, int tvz, Vector3d& p1);
 
-DBL CracklePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
+DBL CracklePattern::EvaluateRaw (const Vector3d& EPoint, const Intersection *pIsection, const Vector3d *pNormal,
+                                 const Ray *pRay, TraceThreadData *pThread) const
 {
     Vector3d tmpPoint = EPoint;
     DBL sum, minsum, minsum2, minsum3, tf;
@@ -5794,7 +5807,8 @@ DBL CracklePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIse
 *
 ******************************************************************************/
 
-DBL CylindricalPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
+DBL CylindricalPattern::EvaluateRaw (const Vector3d& EPoint, const Intersection *pIsection, const Vector3d *pNormal,
+                                     const Ray *pRay, TraceThreadData *pThread) const
 {
     register DBL value;
 
@@ -5854,7 +5868,8 @@ inline float intp3_2(float t, float fa, float fb, float fc, float fd)
 
 #define zmax(i,imax) (((i)<0)?(imax-1):((i) % (imax)))
 
-DBL DensityFilePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
+DBL DensityFilePattern::EvaluateRaw (const Vector3d& EPoint, const Intersection *pIsection, const Vector3d *pNormal,
+                                     const Ray *pRay, TraceThreadData *pThread) const
 {
     size_t x, y, z;
     size_t x1, y1, z1;
@@ -6076,7 +6091,8 @@ DBL DensityFilePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *
 *
 ******************************************************************************/
 
-DBL DentsPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
+DBL DentsPattern::EvaluateRaw (const Vector3d& EPoint, const Intersection *pIsection, const Vector3d *pNormal,
+                               const Ray *pRay, TraceThreadData *pThread) const
 {
     DBL noise;
 
@@ -6113,7 +6129,8 @@ DBL DentsPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsect
 *
 ******************************************************************************/
 
-DBL FunctionPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
+DBL FunctionPattern::EvaluateRaw (const Vector3d& EPoint, const Intersection *pIsection, const Vector3d *pNormal,
+                                  const Ray *pRay, TraceThreadData *pThread) const
 {
     DBL value = GenericScalarFunctionInstance(pFn, pThread).Evaluate(EPoint);
     return ((value > 1.0) ? fmod(value, 1.0) : value);
@@ -6155,7 +6172,8 @@ DBL FunctionPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIs
 *
 ******************************************************************************/
 
-DBL GradientPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
+DBL GradientPattern::EvaluateRaw (const Vector3d& EPoint, const Intersection *pIsection, const Vector3d *pNormal,
+                                  const Ray *pRay, TraceThreadData *pThread) const
 {
     DBL Result;
     Result = dot(EPoint, gradient);
@@ -6198,7 +6216,8 @@ DBL GradientPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIs
 *
 ******************************************************************************/
 
-DBL GranitePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
+DBL GranitePattern::EvaluateRaw (const Vector3d& EPoint, const Intersection *pIsection, const Vector3d *pNormal,
+                                 const Ray *pRay, TraceThreadData *pThread) const
 {
     int noise_generator = GetNoiseGen(pThread);
 
@@ -6281,7 +6300,8 @@ DBL GranitePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIse
 const DBL xfactor = 0.5;         /* each triangle is split in half for the grid */
 const DBL zfactor = 0.866025404; /* sqrt(3)/2 -- Height of an equilateral triangle */
 
-DBL HexagonPattern::Evaluate(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
+DBL HexagonPattern::Evaluate (const Vector3d& EPoint, const Intersection *pIsection, const Vector3d *pNormal,
+                              const Ray *pRay, TraceThreadData *pThread) const
 {
     int xm, zm;
     int brkindx;
@@ -6468,7 +6488,8 @@ DBL HexagonPattern::Evaluate(const Vector3d& EPoint, const Intersection *pIsecti
 *
 ******************************************************************************/
 
-DBL CubicPattern::Evaluate(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
+DBL CubicPattern::Evaluate (const Vector3d& EPoint, const Intersection *pIsection, const Vector3d *pNormal,
+                            const Ray *pRay, TraceThreadData *pThread) const
 {
     const DBL x = EPoint[X], y = EPoint[Y], z = EPoint[Z];
     const DBL ax = fabs(x), ay = fabs(y), az = fabs(z);
@@ -6509,7 +6530,8 @@ DBL CubicPattern::Evaluate(const Vector3d& EPoint, const Intersection *pIsection
 *
 ******************************************************************************/
 
-DBL SquarePattern::Evaluate(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
+DBL SquarePattern::Evaluate (const Vector3d& EPoint, const Intersection *pIsection, const Vector3d *pNormal,
+                             const Ray *pRay, TraceThreadData *pThread) const
 {
     int valueX,valueZ;
 
@@ -6568,7 +6590,8 @@ DBL SquarePattern::Evaluate(const Vector3d& EPoint, const Intersection *pIsectio
 *
 ******************************************************************************/
 
-DBL TriangularPattern::Evaluate(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
+DBL TriangularPattern::Evaluate (const Vector3d& EPoint, const Intersection *pIsection, const Vector3d *pNormal,
+                                 const Ray *pRay, TraceThreadData *pThread) const
 {
     DBL answer;
     DBL x,z;
@@ -6664,7 +6687,8 @@ DBL TriangularPattern::Evaluate(const Vector3d& EPoint, const Intersection *pIse
 *
 ******************************************************************************/
 
-DBL JuliaPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
+DBL JuliaPattern::EvaluateRaw (const Vector3d& EPoint, const Intersection *pIsection, const Vector3d *pNormal,
+                               const Ray *pRay, TraceThreadData *pThread) const
 {
     int it_max, col;
     DBL a, b, cf, a2, b2, dist2, mindist2,
@@ -6732,7 +6756,8 @@ DBL JuliaPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsect
 *
 ******************************************************************************/
 
-DBL Julia3Pattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
+DBL Julia3Pattern::EvaluateRaw (const Vector3d& EPoint, const Intersection *pIsection, const Vector3d *pNormal,
+                                const Ray *pRay, TraceThreadData *pThread) const
 {
     int it_max, col;
     DBL a, b, cf, a2, b2, dist2, mindist2,
@@ -6800,7 +6825,8 @@ DBL Julia3Pattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsec
 *
 ******************************************************************************/
 
-DBL Julia4Pattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
+DBL Julia4Pattern::EvaluateRaw (const Vector3d& EPoint, const Intersection *pIsection, const Vector3d *pNormal,
+                                const Ray *pRay, TraceThreadData *pThread) const
 {
     int it_max, col;
     DBL a, b, cf, a2, b2, dist2, mindist2,
@@ -6868,7 +6894,8 @@ DBL Julia4Pattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsec
 *
 ******************************************************************************/
 
-DBL JuliaXPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
+DBL JuliaXPattern::EvaluateRaw (const Vector3d& EPoint, const Intersection *pIsection, const Vector3d *pNormal,
+                                const Ray *pRay, TraceThreadData *pThread) const
 {
     int it_max, col;
     DBL a, b, cf=0, x, y, dist2, mindist2,
@@ -6948,7 +6975,8 @@ DBL JuliaXPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsec
 *
 ******************************************************************************/
 
-DBL LeopardPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
+DBL LeopardPattern::EvaluateRaw (const Vector3d& EPoint, const Intersection *pIsection, const Vector3d *pNormal,
+                                 const Ray *pRay, TraceThreadData *pThread) const
 {
     register DBL value, temp1, temp2, temp3;
 
@@ -6997,7 +7025,8 @@ DBL LeopardPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIse
 *
 ******************************************************************************/
 
-DBL Magnet1MPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
+DBL Magnet1MPattern::EvaluateRaw (const Vector3d& EPoint, const Intersection *pIsection, const Vector3d *pNormal,
+                                  const Ray *pRay, TraceThreadData *pThread) const
 {
     int it_max, col;
     DBL a, b, cf, a2, b2, x, y, tmp, tmp1r, tmp1i, tmp2r, tmp2i, dist2, mindist2;
@@ -7075,7 +7104,8 @@ DBL Magnet1MPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIs
 *
 ******************************************************************************/
 
-DBL Magnet1JPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
+DBL Magnet1JPattern::EvaluateRaw (const Vector3d& EPoint, const Intersection *pIsection, const Vector3d *pNormal,
+                                  const Ray *pRay, TraceThreadData *pThread) const
 {
     int it_max, col;
     DBL a, b, cf, a2, b2, tmp, tmp1r, tmp1i, tmp2r, tmp2i, dist2, mindist2,
@@ -7152,7 +7182,8 @@ DBL Magnet1JPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIs
 *
 ******************************************************************************/
 
-DBL Magnet2MPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
+DBL Magnet2MPattern::EvaluateRaw (const Vector3d& EPoint, const Intersection *pIsection, const Vector3d *pNormal,
+                                  const Ray *pRay, TraceThreadData *pThread) const
 {
     int it_max, col;
     DBL a, b, cf, a2, b2, x, y, tmp, tmp1r, tmp1i, tmp2r, tmp2i,
@@ -7235,7 +7266,8 @@ DBL Magnet2MPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIs
 *
 ******************************************************************************/
 
-DBL Magnet2JPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
+DBL Magnet2JPattern::EvaluateRaw (const Vector3d& EPoint, const Intersection *pIsection, const Vector3d *pNormal,
+                                  const Ray *pRay, TraceThreadData *pThread) const
 {
     int it_max, col;
     DBL a, b, cf, a2, b2, tmp, tmp1r, tmp1i, tmp2r, tmp2i, c1r,c2r,c1c2r,c1c2i,
@@ -7320,7 +7352,8 @@ DBL Magnet2JPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIs
 *
 ******************************************************************************/
 
-DBL Mandel2Pattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
+DBL Mandel2Pattern::EvaluateRaw (const Vector3d& EPoint, const Intersection *pIsection, const Vector3d *pNormal,
+                                 const Ray *pRay, TraceThreadData *pThread) const
 {
     int it_max, col;
     DBL a, b, cf, a2, b2, x, y, dist2, mindist2;
@@ -7387,7 +7420,8 @@ DBL Mandel2Pattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIse
 *
 ******************************************************************************/
 
-DBL Mandel3Pattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
+DBL Mandel3Pattern::EvaluateRaw (const Vector3d& EPoint, const Intersection *pIsection, const Vector3d *pNormal,
+                                 const Ray *pRay, TraceThreadData *pThread) const
 {
     int it_max, col;
     DBL a, b, cf, a2, b2, x, y, dist2, mindist2;
@@ -7454,7 +7488,8 @@ DBL Mandel3Pattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIse
 *
 ******************************************************************************/
 
-DBL Mandel4Pattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
+DBL Mandel4Pattern::EvaluateRaw (const Vector3d& EPoint, const Intersection *pIsection, const Vector3d *pNormal,
+                                 const Ray *pRay, TraceThreadData *pThread) const
 {
     int it_max, col;
     DBL a, b, cf, a2, b2, x, y, dist2, mindist2;
@@ -7521,7 +7556,8 @@ DBL Mandel4Pattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIse
 *
 ******************************************************************************/
 
-DBL MandelXPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
+DBL MandelXPattern::EvaluateRaw (const Vector3d& EPoint, const Intersection *pIsection, const Vector3d *pNormal,
+                                 const Ray *pRay, TraceThreadData *pThread) const
 {
     int it_max, col;
     DBL a, b, cf=0, x, y, dist2, mindist2;
@@ -7600,7 +7636,8 @@ DBL MandelXPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIse
 *
 ******************************************************************************/
 
-DBL MarblePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
+DBL MarblePattern::EvaluateRaw (const Vector3d& EPoint, const Intersection *pIsection, const Vector3d *pNormal,
+                                const Ray *pRay, TraceThreadData *pThread) const
 {
     register DBL turb_val;
     const ClassicTurbulence *Turb;
@@ -7626,7 +7663,8 @@ bool MarblePattern::HasSpecialTurbulenceHandling() const
 /*****************************************************************************/
 
 
-DBL NoisePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
+DBL NoisePattern::EvaluateRaw (const Vector3d& EPoint, const Intersection *pIsection, const Vector3d *pNormal,
+                               const Ray *pRay, TraceThreadData *pThread) const
 {
     return Noise(EPoint, GetNoiseGen(pThread));
 }
@@ -7659,7 +7697,8 @@ DBL NoisePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsect
 *
 ******************************************************************************/
 
-DBL ObjectPattern::Evaluate(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
+DBL ObjectPattern::Evaluate (const Vector3d& EPoint, const Intersection *pIsection, const Vector3d *pNormal,
+                             const Ray *pRay, TraceThreadData *pThread) const
 {
     if(pObject != NULL)
     {
@@ -7702,7 +7741,8 @@ DBL ObjectPattern::Evaluate(const Vector3d& EPoint, const Intersection *pIsectio
 *
 ******************************************************************************/
 
-DBL OnionPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
+DBL OnionPattern::EvaluateRaw (const Vector3d& EPoint, const Intersection *pIsection, const Vector3d *pNormal,
+                               const Ray *pRay, TraceThreadData *pThread) const
 {
     // TODO - The variable noise is not used as noise in this function
 
@@ -7742,7 +7782,8 @@ DBL OnionPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsect
 *
 ******************************************************************************/
 
-DBL PigmentPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
+DBL PigmentPattern::EvaluateRaw (const Vector3d& EPoint, const Intersection *pIsection, const Vector3d *pNormal,
+                                 const Ray *pRay, TraceThreadData *pThread) const
 {
     DBL value;
     TransColour Col;
@@ -7750,7 +7791,7 @@ DBL PigmentPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIse
 
     if (pPigment)
         // TODO ALPHA - we're discarding transparency information, so maybe we want to pre-multiply if there's alpha in there?
-        colour_found = Compute_Pigment(Col, pPigment, EPoint, pIsection, pRay, pThread);
+        colour_found = Compute_Pigment (Col, pPigment, EPoint, pIsection, pNormal, pRay, pThread);
 
     if(!colour_found)
         value = 0.0;
@@ -7792,7 +7833,8 @@ DBL PigmentPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIse
 *
 ******************************************************************************/
 
-DBL PlanarPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
+DBL PlanarPattern::EvaluateRaw (const Vector3d& EPoint, const Intersection *pIsection, const Vector3d *pNormal,
+                                const Ray *pRay, TraceThreadData *pThread) const
 {
     register DBL value = fabs(EPoint[Y]);
 
@@ -7824,7 +7866,8 @@ DBL PlanarPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsec
 *
 ******************************************************************************/
 
-DBL QuiltedPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
+DBL QuiltedPattern::EvaluateRaw (const Vector3d& EPoint, const Intersection *pIsection, const Vector3d *pNormal,
+                                 const Ray *pRay, TraceThreadData *pThread) const
 {
     Vector3d value;
     DBL t;
@@ -7872,7 +7915,8 @@ DBL QuiltedPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIse
 *
 ******************************************************************************/
 
-DBL RadialPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
+DBL RadialPattern::EvaluateRaw (const Vector3d& EPoint, const Intersection *pIsection, const Vector3d *pNormal,
+                                const Ray *pRay, TraceThreadData *pThread) const
 {
     register DBL value;
 
@@ -7920,7 +7964,8 @@ DBL RadialPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsec
 *
 ******************************************************************************/
 
-DBL RipplesPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
+DBL RipplesPattern::EvaluateRaw (const Vector3d& EPoint, const Intersection *pIsection, const Vector3d *pNormal,
+                                 const Ray *pRay, TraceThreadData *pThread) const
 {
     register unsigned int i;
     register DBL length, index;
@@ -7980,29 +8025,31 @@ DBL RipplesPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIse
 *
 ******************************************************************************/
 
-DBL SlopePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
+DBL SlopePattern::EvaluateRaw (const Vector3d& EPoint, const Intersection *pIsection, const Vector3d *pNormal,
+                               const Ray *pRay, TraceThreadData *pThread) const
 {
     DBL value, value1, value2;
 
-    if (pIsection == NULL) return 0.0; /* just in case ... */
+    if ((pIsection == NULL) || (pNormal == NULL))
+        return 0.0; // just in case
 
     if (pointAt)
     {
         Vector3d vect;
         vect = slopeDirection - pIsection->IPoint.normalized();
-        value1 = dot(pIsection->PNormal, vect);
+        value1 = dot(*pNormal, vect);
     }
     else
     {
         if (slopeAxis > 0)
             /* short case 1: slope vector in x, y or z direction */
-            value1 = pIsection->PNormal[slopeAxis - 1];
+            value1 = (*pNormal)[slopeAxis - 1];
         else if (slopeAxis < 0)
             /* short case 2: slope vector in negative x, y or z direction */
-            value1 = -pIsection->PNormal[-slopeAxis - 1];
+            value1 = -(*pNormal)[-slopeAxis - 1];
         else
             /* projection slope onto normal vector */
-            value1 = dot(pIsection->PNormal, slopeDirection);
+            value1 = dot(*pNormal, slopeDirection);
     }
 
     /* Clamp to 1.0. */
@@ -8099,16 +8146,17 @@ DBL SlopePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsect
 *
 ******************************************************************************/
 
-DBL AOIPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
+DBL AOIPattern::EvaluateRaw (const Vector3d& EPoint, const Intersection *pIsection, const Vector3d *pNormal,
+                             const Ray *pRay, TraceThreadData *pThread) const
 {
     Vector3d  a, b;
     DBL       cosAngle, angle;
 
-    if ((pIsection == NULL) || (pRay == NULL))
+    if ((pNormal == NULL) || (pRay == NULL))
         return 0.0;
 
-    a = pIsection->PNormal.normalized(); // TODO - shouldn't pIsection->PNormal be normalized already?
-    b = pRay->Direction.normalized();    // TODO - shouldn't pRay->Direction be normalized already?
+    a = *pNormal;
+    b = pRay->Direction;
     cosAngle = dot(a, b);
 
     // clip to [-1.0; 1.0], just to be sure
@@ -8153,7 +8201,8 @@ DBL AOIPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsectio
 *
 ******************************************************************************/
 
-DBL Spiral1Pattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
+DBL Spiral1Pattern::EvaluateRaw (const Vector3d& EPoint, const Intersection *pIsection, const Vector3d *pNormal,
+                                 const Ray *pRay, TraceThreadData *pThread) const
 {
     DBL rad, phi, turb_val;
     DBL x = EPoint[X];
@@ -8229,7 +8278,8 @@ DBL Spiral1Pattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIse
 *
 ******************************************************************************/
 
-DBL Spiral2Pattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
+DBL Spiral2Pattern::EvaluateRaw (const Vector3d& EPoint, const Intersection *pIsection, const Vector3d *pNormal,
+                                 const Ray *pRay, TraceThreadData *pThread) const
 {
     DBL rad, phi, turb_val;
     DBL x = EPoint[X];
@@ -8306,7 +8356,8 @@ DBL Spiral2Pattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIse
 *
 ******************************************************************************/
 
-DBL SphericalPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
+DBL SphericalPattern::EvaluateRaw (const Vector3d& EPoint, const Intersection *pIsection, const Vector3d *pNormal,
+                                   const Ray *pRay, TraceThreadData *pThread) const
 {
     register DBL value;
 
@@ -8348,7 +8399,8 @@ DBL SphericalPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pI
 *
 ******************************************************************************/
 
-DBL WavesPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
+DBL WavesPattern::EvaluateRaw (const Vector3d& EPoint, const Intersection *pIsection, const Vector3d *pNormal,
+                               const Ray *pRay, TraceThreadData *pThread) const
 {
     register unsigned int i;
     register DBL length, index;
@@ -8406,7 +8458,8 @@ DBL WavesPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsect
 *
 ******************************************************************************/
 
-DBL WoodPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
+DBL WoodPattern::EvaluateRaw (const Vector3d& EPoint, const Intersection *pIsection, const Vector3d *pNormal,
+                              const Ray *pRay, TraceThreadData *pThread) const
 {
     register DBL length;
     Vector3d WoodTurbulence;
@@ -8474,7 +8527,8 @@ bool WoodPattern::HasSpecialTurbulenceHandling() const
 *
 ******************************************************************************/
 
-DBL WrinklesPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
+DBL WrinklesPattern::EvaluateRaw (const Vector3d& EPoint, const Intersection *pIsection, const Vector3d *pNormal,
+                                  const Ray *pRay, TraceThreadData *pThread) const
 {
     int noise_generator = GetNoiseGen(pThread);
 

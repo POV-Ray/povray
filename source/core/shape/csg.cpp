@@ -111,7 +111,7 @@ inline bool Test_Ray_Flags_Shadow(const Ray& ray, ConstObjectPtr obj)
 *
 ******************************************************************************/
 
-bool CSGUnion::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread)
+bool CSGUnion::All_Intersections (const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread) const
 {
     int Found;
 
@@ -202,7 +202,7 @@ bool CSGUnion::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThrea
 *
 ******************************************************************************/
 
-bool CSGIntersection::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread)
+bool CSGIntersection::All_Intersections (const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread) const
 {
     int Maybe_Found, Found;
     IStack Local_Stack(Thread->stackPool);
@@ -290,7 +290,7 @@ bool CSGIntersection::All_Intersections(const Ray& ray, IStack& Depth_Stack, Tra
 *
 ******************************************************************************/
 
-bool CSGMerge::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread)
+bool CSGMerge::All_Intersections (const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread) const
 {
     int Found;
     bool inside_flag;
@@ -978,7 +978,8 @@ void CSG::Compute_BBox()
 *
 ******************************************************************************/
 
-void CSG::Determine_Textures(Intersection *isect, bool hitinside, WeightedTextureVector& textures, TraceThreadData *threaddata)
+void CSG::Determine_Textures (const Intersection *isect, bool hitinside, WeightedTextureVector& textures,
+                              TraceThreadData *threaddata) const
 {
     if(!children.empty())
     {

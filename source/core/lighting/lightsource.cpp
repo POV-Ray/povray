@@ -72,7 +72,7 @@ namespace pov
 *
 ******************************************************************************/
 
-bool LightSource::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread)
+bool LightSource::All_Intersections (const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread) const
 {
     if(!children.empty())
     {
@@ -153,10 +153,10 @@ bool LightSource::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 *
 ******************************************************************************/
 
-void LightSource::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread) const
+void LightSource::Normal (Vector3d& geometricNormal, Vector3d& smoothNormal, Intersection *Inter, TraceThreadData *Thread) const
 {
-    if(!children.empty())
-        children[0]->Normal(Result, Inter, Thread);
+    if (!children.empty())
+        children[0]->Normal (geometricNormal, smoothNormal, Inter, Thread);
 }
 
 

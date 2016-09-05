@@ -2622,7 +2622,8 @@ void TrueType::GetZeroOneHits(const GlyphStruct* glyph, const Vector3d& P, const
  * This is then solved using the quadratic formula.  Any solutions of s that are
  * between 0 and 1 (inclusive) are valid solutions.
  */
-bool TrueType::GlyphIntersect(const Vector3d& P, const Vector3d& D, const GlyphStruct* glyph, DBL glyph_depth, const BasicRay& ray, IStack& Depth_Stack, TraceThreadData *Thread)
+bool TrueType::GlyphIntersect (const Vector3d& P, const Vector3d& D, const GlyphStruct* glyph, DBL glyph_depth,
+                               const BasicRay& ray, IStack& Depth_Stack, TraceThreadData *Thread) const
 {
     Contour *contour;
     int i, j, k, l, n, m;
@@ -2843,7 +2844,7 @@ bool TrueType::GlyphIntersect(const Vector3d& P, const Vector3d& D, const GlyphS
     return Flag;
 }
 
-bool TrueType::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread)
+bool TrueType::All_Intersections (const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread) const
 {
     Vector3d P, D;
 
@@ -2888,11 +2889,13 @@ bool TrueType::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
         return (Test_Flag(this, INVERTED_FLAG));
 }
 
-void TrueType::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *Thread) const
+void TrueType::Normal (Vector3d& geometricNormal, Vector3d& smoothNormal, Intersection *Inter,
+                       TraceThreadData *Thread) const
 {
     /* Use precomputed normal. [ARE 11/94] */
 
-    Result = Inter->INormal;
+    geometricNormal = Inter->geometricNormal;
+    smoothNormal    = Inter->smoothNormal;
 }
 
 ObjectPtr TrueType::Copy()

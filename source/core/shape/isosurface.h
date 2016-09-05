@@ -92,8 +92,8 @@ class IsoSurface : public ObjectBase
     public:
 
         GenericScalarFunctionPtr Function;
-        volatile DBL max_gradient; // global in eval
-        DBL gradient;
+        mutable volatile DBL max_gradient; // global in eval
+        mutable volatile DBL gradient;
         DBL threshold;
         DBL accuracy;
         DBL eval_param[3];
@@ -109,9 +109,9 @@ class IsoSurface : public ObjectBase
 
         virtual ObjectPtr Copy();
 
-        virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
+        virtual bool All_Intersections (const Ray&, IStack&, TraceThreadData *) const;
         virtual bool Inside(const Vector3d&, TraceThreadData *) const;
-        virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const;
+        virtual void Normal (Vector3d&, Vector3d&, Intersection *, TraceThreadData *) const;
         virtual void Translate(const Vector3d&, const TRANSFORM *);
         virtual void Rotate(const Vector3d&, const TRANSFORM *);
         virtual void Scale(const Vector3d&, const TRANSFORM *);
@@ -121,11 +121,21 @@ class IsoSurface : public ObjectBase
         virtual void DispatchShutdownMessages(CoreMessenger& messenger);
 
     protected:
-        bool Function_Find_Root(ISO_ThreadData& itd, const Vector3d&, const Vector3d&, DBL*, DBL*, DBL& max_gradient, bool in_shadow_test, TraceThreadData* pThreadData);
-        bool Function_Find_Root_R(ISO_ThreadData& itd, const ISO_Pair*, const ISO_Pair*, DBL, DBL, DBL, DBL& max_gradient, TraceThreadData* pThreadData);
+
+        bool Function_Find_Root (ISO_ThreadData& itd, const Vector3d&, const Vector3d&, DBL*, DBL*,
+                                 DBL& gradient, DBL& max_gradient, bool in_shadow_test,
+                                 TraceThreadData* pThreadData) const;
+
+        bool Function_Find_Root_R (ISO_ThreadData& itd, const ISO_Pair*, const ISO_Pair*, DBL, DBL, DBL,
+                                   DBL& gradient, DBL& max_gradient,
+                                   TraceThreadData* pThreadData) const;
 
         inline DBL Float_Function(ISO_ThreadData& itd, DBL t) const;
+
+        inline void UpdateGradient (volatile DBL& v, DBL g) const;
+
     private:
+
         ISO_Max_Gradient *mginfo; // global, but just a statistic (read: not thread safe but we don't care) [trf]
 };
 

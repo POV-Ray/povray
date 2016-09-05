@@ -80,7 +80,7 @@ const DBL DEPTH_TOLERANCE = 1.0e-6;
 *
 ******************************************************************************/
 
-bool Plane::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread)
+bool Plane::All_Intersections (const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread) const
 {
     DBL Depth;
     Vector3d IPoint;
@@ -248,16 +248,18 @@ bool Plane::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 *
 ******************************************************************************/
 
-void Plane::Normal(Vector3d& Result, Intersection *, TraceThreadData *) const
+void Plane::Normal (Vector3d& geometricNormal, Vector3d& smoothNormal, Intersection *, TraceThreadData *) const
 {
-    Result = Normal_Vector;
+    geometricNormal = Normal_Vector;
 
     if(Trans != NULL)
     {
-        MTransNormal(Result, Result, Trans);
+        MTransNormal (geometricNormal, geometricNormal, Trans);
 
-        Result.normalize();
+        geometricNormal.normalize();
     }
+
+    smoothNormal = geometricNormal;
 }
 
 

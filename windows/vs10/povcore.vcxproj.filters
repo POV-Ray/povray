@@ -257,6 +257,9 @@
     <ClCompile Include="..\..\source\core\precomp.cpp">
       <Filter>Core Source</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\core\material\shader.cpp">
+      <Filter>Core Source\Material</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\core\configcore.h">
@@ -465,6 +468,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\core\precomp.h">
       <Filter>Core Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\material\shader.h">
+      <Filter>Core Headers\Material</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

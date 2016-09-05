@@ -110,7 +110,7 @@ const COMPLEX_FUNCTION_METHOD Complex_Function_List[] =
 *
 ******************************************************************************/
 
-bool Fractal::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread)
+bool Fractal::All_Intersections (const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread) const
 {
     bool Intersection_Found;
     bool LastIsInside = false;
@@ -390,9 +390,10 @@ bool Fractal::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
 *
 ******************************************************************************/
 
-void Fractal::Normal(Vector3d& Result, Intersection *Intersect, TraceThreadData *) const
+void Fractal::Normal (Vector3d& geometricNormal, Vector3d& smoothNormal, Intersection *Inter, TraceThreadData *) const
 {
-    Result = Intersect->INormal;
+    geometricNormal = Inter->geometricNormal;
+    smoothNormal    = Inter->smoothNormal;
 }
 
 /*****************************************************************************
