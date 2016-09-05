@@ -176,9 +176,6 @@ $RECYCLE.BIN/
 /configure
 /configure.ac
 /kde_install.sh
-/platform/Makefile
-/platform/Makefile.am
-/platform/Makefile.in
 /povray.1
 /povray.conf
 /povray.ini.in
