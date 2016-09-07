@@ -376,7 +376,6 @@
     <ClInclude Include="..\..\vfe\vfeconf.h" />
     <ClInclude Include="..\..\vfe\vfepovms.h" />
     <ClInclude Include="..\..\vfe\vfesession.h" />
-    <ClInclude Include="..\..\vfe\syspovdebug.h" />
     <ClInclude Include="..\..\vfe\win\syspovimage.h" />
     <ClInclude Include="..\..\vfe\win\vfeplatform.h" />
     <ClInclude Include="..\..\vfe\vfeprecomp.h" />
