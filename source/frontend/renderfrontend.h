@@ -50,6 +50,7 @@
 #include "povms/povmsid.h"
 
 #include "base/path.h"
+#include "base/platformbase.h"
 #include "base/stringutilities.h"
 #include "base/textstreambuffer.h"
 #include "base/types.h"

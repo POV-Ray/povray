@@ -40,6 +40,7 @@
 #include "base/configbase.h"
 
 // C++ variants of standard C header files
+#include <cstdio>
 #include <cstring>
 
 // POV-Ray base header files

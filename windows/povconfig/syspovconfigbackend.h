@@ -42,6 +42,7 @@
 #include "syspovconfig.h"
 
 // On the Windows platform, we're doing some special mojo at thread startup.
-#define POV_USE_DEFAULT_THREAD_INITIALIZATION 0
+#define POV_USE_DEFAULT_TASK_INITIALIZE 0
+#define POV_USE_DEFAULT_TASK_CLEANUP    0
 
 #endif // POVRAY_WINDOWS_SYSPOVCONFIGBACKEND_H
