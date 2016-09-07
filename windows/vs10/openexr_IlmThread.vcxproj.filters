@@ -48,6 +48,15 @@
     <ClInclude Include="..\..\libraries\ilmbase\IlmThread\IlmThreadPool.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\libraries\ilmbase\IlmThread\IlmThreadExport.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libraries\ilmbase\IlmThread\IlmThreadForward.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libraries\ilmbase\IlmThread\IlmThreadNamespace.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header Files">

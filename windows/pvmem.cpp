@@ -1,37 +1,39 @@
-/*******************************************************************************
- * pvmem.cpp
- *
- * This module implements windows-specific memory handling routines.
- *
- * Author: Christopher J. Cason.
- *
- * ---------------------------------------------------------------------------
- * Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
- * Copyright 1991-2013 Persistence of Vision Raytracer Pty. Ltd.
- *
- * POV-Ray is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * POV-Ray is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------------
- * POV-Ray is based on the popular DKB raytracer version 2.12.
- * DKBTrace was originally written by David K. Buck.
- * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
- * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/windows/pvmem.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
- *******************************************************************************/
+//******************************************************************************
+///
+/// @file windows/pvmem.cpp
+///
+/// This module implements windows-specific memory handling routines.
+///
+/// @author Christopher J. Cason
+///
+/// @copyright
+/// @parblock
+///
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+///
+/// POV-Ray is free software: you can redistribute it and/or modify
+/// it under the terms of the GNU Affero General Public License as
+/// published by the Free Software Foundation, either version 3 of the
+/// License, or (at your option) any later version.
+///
+/// POV-Ray is distributed in the hope that it will be useful,
+/// but WITHOUT ANY WARRANTY; without even the implied warranty of
+/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+/// GNU Affero General Public License for more details.
+///
+/// You should have received a copy of the GNU Affero General Public License
+/// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+///
+/// ----------------------------------------------------------------------------
+///
+/// POV-Ray is based on the popular DKB raytracer version 2.12.
+/// DKBTrace was originally written by David K. Buck.
+/// DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
+///
+/// @endparblock
+///
+//******************************************************************************
 
 #define POVWIN_FILE
 #define _WIN32_IE COMMONCTRL_VERSION
@@ -69,7 +71,7 @@ namespace povwin
 
 bool          TrackMem;
 __int64       PeakMem;
-               
+
 static WinHeap *gHeap = NULL;
 WinHeap *WinMemBlock::m_Heap = NULL;
 static WinMemStats gMemStats;
@@ -93,22 +95,6 @@ void *win_malloc(size_t size)
 void *win_malloc(size_t size, const void *data, int line)
 {
   void *result = malloc(size);
-  if (result == NULL)
-    throw std::bad_alloc();
-  return result;
-}
-
-void *win_calloc(size_t nelem, size_t size)
-{
-  void *result = calloc(nelem, size);
-  if (result == NULL)
-    throw std::bad_alloc();
-  return result;
-}
-
-void *win_calloc(size_t nelem, size_t size, const void *data, int line)
-{
-  void *result = calloc(nelem, size);
   if (result == NULL)
     throw std::bad_alloc();
   return result;
@@ -291,16 +277,6 @@ void win_free(void *p, const void *data, int line)
   delete block;
 }
 
-void *win_calloc(size_t nelem, size_t size, const void *data, int line)
-{
-  size_t count = size * nelem;
-  void *p = win_malloc(count, data, line);
-  if (p == NULL)
-    throw std::bad_alloc();
-  memset(p, 0, count);
-  return p;
-}
-
 char *win_strdup(const char *s, const void *data, int line)
 {
   char *p = (char *) win_malloc(strlen(s) + 1, data, line);
@@ -360,16 +336,6 @@ void win_free(void *p)
   gMemStats.RecordFree(len);
   if (!gHeap->Free(p))
     throw POV_EXCEPTION(kCannotHandleDataErr, "Bad memory block in free()");
-}
-
-void *win_calloc(size_t nelem, size_t size)
-{
-  size_t count = size * nelem;
-  void *p = win_malloc(count);
-  if (p == NULL)
-    return NULL;
-  memset(p, 0, count);
-  return p;
 }
 
 char *win_strdup(const char *s)

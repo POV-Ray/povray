@@ -1,58 +1,64 @@
-/*******************************************************************************
- * vfe.h
- *
- * Author: Christopher J. Cason
- *
- * ---------------------------------------------------------------------------
- * Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
- * Copyright 1991-2013 Persistence of Vision Raytracer Pty. Ltd.
- *
- * POV-Ray is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * POV-Ray is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------------
- * POV-Ray is based on the popular DKB raytracer version 2.12.
- * DKBTrace was originally written by David K. Buck.
- * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
- * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/vfe/vfe.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
- *******************************************************************************/
+//******************************************************************************
+///
+/// @file vfe/vfe.h
+///
+/// @todo   What's in here?
+///
+/// @author Christopher J. Cason
+///
+/// @copyright
+/// @parblock
+///
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+///
+/// POV-Ray is free software: you can redistribute it and/or modify
+/// it under the terms of the GNU Affero General Public License as
+/// published by the Free Software Foundation, either version 3 of the
+/// License, or (at your option) any later version.
+///
+/// POV-Ray is distributed in the hope that it will be useful,
+/// but WITHOUT ANY WARRANTY; without even the implied warranty of
+/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+/// GNU Affero General Public License for more details.
+///
+/// You should have received a copy of the GNU Affero General Public License
+/// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+///
+/// ----------------------------------------------------------------------------
+///
+/// POV-Ray is based on the popular DKB raytracer version 2.12.
+/// DKBTrace was originally written by David K. Buck.
+/// DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
+///
+/// @endparblock
+///
+//******************************************************************************
 
 #ifndef __VFE_H__
 #define __VFE_H__
 
 #include <cassert>
 
-#include "syspovconfigfrontend.h"
 #include <boost/format.hpp>
-#include <boost/thread.hpp>
-#include <boost/thread/condition.hpp>
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
-#include "base/povms.h"
-#include "base/povmsgid.h"
+
+#include "povms/povmscpp.h"
+#include "povms/povmsid.h"
+
 #include "base/platformbase.h"
 #include "base/timer.h"
 #include "base/image/colourspace.h"
+
 #include "frontend/console.h"
 #include "frontend/simplefrontend.h"
 #include "frontend/processrenderoptions.h"
-#include "vfesession.h"
+
+#include "syspovconfigfrontend.h"
 #include "vfeplatform.h"
 #include "vfepovms.h"
+#include "vfesession.h"
 
 namespace vfe
 {
@@ -115,13 +121,13 @@ namespace vfe
       vfePlatformBase(vfeSession& session);
       virtual ~vfePlatformBase();
 
-      virtual pov_base::IStream *CreateIStream(const unsigned int stype);
-      virtual pov_base::OStream *CreateOStream(const unsigned int stype);
-
       virtual UCS2String GetTemporaryPath(void);
       virtual UCS2String CreateTemporaryFile(void);
       virtual void DeleteTemporaryFile(const UCS2String& filename);
       virtual bool ReadFileFromURL(OStream *file, const UCS2String& url, const UCS2String& referrer = UCS2String());
+      virtual FILE* OpenLocalFile (const UCS2String& name, const char *mode);
+      virtual void DeleteLocalFile (const UCS2String& name);
+      virtual bool AllowLocalFileAccess (const UCS2String& name, const unsigned int fileType, bool write);
 
     protected:
       vfeSession* m_Session;
@@ -172,7 +178,6 @@ namespace vfe
       virtual int ReadSpecialOptionHandler(INI_Parser_Table *, char *, POVMSObjectPtr);
       virtual int ReadSpecialSwitchHandler(Cmd_Parser_Table *, char *, POVMSObjectPtr, bool);
       virtual int WriteSpecialOptionHandler(INI_Parser_Table *, POVMSObjectPtr, OTextStream *);
-      virtual bool WriteOptionFilter(INI_Parser_Table *);
       virtual int ProcessUnknownString(char *, POVMSObjectPtr);
       virtual ITextStream *OpenFileForRead(const char *, POVMSObjectPtr);
       virtual OTextStream *OpenFileForWrite(const char *, POVMSObjectPtr);
@@ -222,7 +227,7 @@ namespace vfe
       virtual bool IsPausable() ;
       virtual bool Paused() ;
       virtual bool PausePending() { return m_PauseRequested; }
-      virtual boost::shared_ptr<Display> GetDisplay() { return renderFrontend.GetDisplay(viewId); }
+      virtual shared_ptr<Display> GetDisplay() { return renderFrontend.GetDisplay(viewId); }
 
       // TODO: take care of any pending messages (e.g. a thread waiting on a blocking send)
       virtual void InvalidateBackend() { backendAddress = POVMSInvalidAddress; }

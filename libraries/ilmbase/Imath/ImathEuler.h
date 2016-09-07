@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////
 //
-// Copyright (c) 2002, Industrial Light & Magic, a division of Lucas
+// Copyright (c) 2002-2012, Industrial Light & Magic, a division of Lucas
 // Digital Ltd. LLC
 // 
 // All rights reserved.
@@ -130,9 +130,11 @@
 #include "ImathQuat.h"
 #include "ImathMatrix.h"
 #include "ImathLimits.h"
+#include "ImathNamespace.h"
+
 #include <iostream>
 
-namespace Imath {
+IMATH_INTERNAL_NAMESPACE_HEADER_ENTER
 
 #if (defined _WIN32 || defined _WIN64) && defined _MSC_VER
 // Disable MS VC++ warnings about conversion from double to float
@@ -204,10 +206,16 @@ class Euler : public Vec3<T>
 
     enum InputLayout { XYZLayout, IJKLayout };
 
-    //----------------------------------------------------------------
+    //--------------------------------------------------------------------
     //	Constructors -- all default to ZYX non-relative ala softimage
     //			(where there is no argument to specify it)
-    //----------------------------------------------------------------
+    //
+    // The Euler-from-matrix constructors assume that the matrix does
+    // not include shear or non-uniform scaling, but the constructors
+    // do not examine the matrix to verify this assumption.  If necessary,
+    // you can adjust the matrix by calling the removeScalingAndShear()
+    // function, defined in ImathMatrixAlgo.h.
+    //--------------------------------------------------------------------
 
     Euler();
     Euler(const Euler&);
@@ -243,12 +251,19 @@ class Euler : public Vec3<T>
 			    bool parityEven,
 			    bool firstRepeats);
 
-    //---------------------------------------------------------
+    //------------------------------------------------------------
     //	Conversions, toXYZVector() reorders the angles so that
     //  the X rotation comes first, followed by the Y and Z
     //  in cases like XYX ordering, the repeated angle will be
     //	in the "z" component
-    //---------------------------------------------------------
+    //
+    // The Euler-from-matrix extract() functions assume that the
+    // matrix does not include shear or non-uniform scaling, but
+    // the extract() functions do not examine the matrix to verify
+    // this assumption.  If necessary, you can adjust the matrix
+    // by calling the removeScalingAndShear() function, defined
+    // in ImathMatrixAlgo.h.
+    //------------------------------------------------------------
 
     void		extract(const Matrix33<T>&);
     void		extract(const Matrix44<T>&);
@@ -884,9 +899,17 @@ template <class T>
 void
 Euler<T>::makeNear (const Euler<T> &target)
 {
-    Vec3<T> xyzRot    = toXYZVector();
-    Euler<T> targetSameOrder = Euler<T>(target, order());
-    Vec3<T> targetXyz = targetSameOrder.toXYZVector();
+    Vec3<T> xyzRot = toXYZVector();
+    Vec3<T> targetXyz;
+    if (order() != target.order())
+    {
+        Euler<T> targetSameOrder = Euler<T>(target, order());
+        targetXyz = targetSameOrder.toXYZVector();
+    }
+    else
+    {
+        targetXyz = target.toXYZVector();
+    }
 
     nearestRotation(xyzRot, targetXyz, order());
 
@@ -897,7 +920,7 @@ Euler<T>::makeNear (const Euler<T> &target)
 #pragma warning(default:4244)
 #endif
 
-} // namespace Imath
+IMATH_INTERNAL_NAMESPACE_HEADER_EXIT
 
 
-#endif
+#endif // INCLUDED_IMATHEULER_H

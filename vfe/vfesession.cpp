@@ -1,37 +1,39 @@
-/*******************************************************************************
- * vfesession.cpp
- *
- * This module contains the default C++ interface for render frontend.
- *
- * Author: Christopher J. Cason
- *
- * ---------------------------------------------------------------------------
- * Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
- * Copyright 1991-2013 Persistence of Vision Raytracer Pty. Ltd.
- *
- * POV-Ray is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * POV-Ray is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------------
- * POV-Ray is based on the popular DKB raytracer version 2.12.
- * DKBTrace was originally written by David K. Buck.
- * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
- * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/vfe/vfesession.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
- *******************************************************************************/
+//******************************************************************************
+///
+/// @file vfe/vfesession.cpp
+///
+/// This module contains the default C++ interface for render frontend.
+///
+/// @author Christopher J. Cason
+///
+/// @copyright
+/// @parblock
+///
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+///
+/// POV-Ray is free software: you can redistribute it and/or modify
+/// it under the terms of the GNU Affero General Public License as
+/// published by the Free Software Foundation, either version 3 of the
+/// License, or (at your option) any later version.
+///
+/// POV-Ray is distributed in the hope that it will be useful,
+/// but WITHOUT ANY WARRANTY; without even the implied warranty of
+/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+/// GNU Affero General Public License for more details.
+///
+/// You should have received a copy of the GNU Affero General Public License
+/// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+///
+/// ----------------------------------------------------------------------------
+///
+/// POV-Ray is based on the popular DKB raytracer version 2.12.
+/// DKBTrace was originally written by David K. Buck.
+/// DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
+///
+/// @endparblock
+///
+//******************************************************************************
 
 #ifdef _MSC_VER
 #pragma warning(disable : 4244)
@@ -39,15 +41,15 @@
 #endif
 
 #include "vfe.h"
-#include "povray.h"
+#include "backend/povray.h"
 
-POVMSContext POVMS_Output_Context = NULL;
+static POVMSContext POVMS_Output_Context = NULL;
 
 namespace pov
 {
-  volatile POVMSContext POVMS_GUI_Context = NULL ;
-  volatile POVMSAddress RenderThreadAddr = POVMSInvalidAddress ;
-  volatile POVMSAddress GUIThreadAddr = POVMSInvalidAddress ;
+  static volatile POVMSContext POVMS_GUI_Context = NULL ;
+  static volatile POVMSAddress RenderThreadAddr = POVMSInvalidAddress ;
+  static volatile POVMSAddress GUIThreadAddr = POVMSInvalidAddress ;
 }
 
 namespace vfe
@@ -107,6 +109,7 @@ void vfeSession::Clear(bool Notify)
   m_PercentComplete = 0;
   m_PixelsRendered = 0;
   m_TotalPixels = 0;
+  m_CurrentFrameId = 0;
   m_CurrentFrame = 0;
   m_TotalFrames = 0;
   if (Notify)
@@ -294,14 +297,15 @@ void vfeSession::AppendStatusMessage (const boost::format& fmt, int RecommendedP
   NotifyEvent(stStatusMessage);
 }
 
-void vfeSession::AppendAnimationStatus (int Frame, int Total, const UCS2String& Filename)
+void vfeSession::AppendAnimationStatus (int FrameId, int SubsetFrame, int SubsetTotal, const UCS2String& Filename)
 {
   boost::mutex::scoped_lock lock(m_MessageMutex);
 
-  m_CurrentFrame = Frame;
-  m_TotalFrames = Total;
-  m_StatusQueue.push (StatusMessage (*this, Filename, Frame, Total));
-  m_StatusLineMessage = (boost::format("Rendering frame %d of %d") % Frame % Total).str();
+  m_CurrentFrameId = FrameId;
+  m_CurrentFrame = SubsetFrame;
+  m_TotalFrames = SubsetTotal;
+  m_StatusQueue.push (StatusMessage (*this, Filename, SubsetFrame, SubsetTotal, FrameId));
+  m_StatusLineMessage = (boost::format("Rendering frame %d of %d (#%d)") % SubsetFrame % SubsetTotal % FrameId).str();
   if (m_MaxStatusMessages != -1)
     while (m_StatusQueue.size() > m_MaxStatusMessages)
       m_StatusQueue.pop();
@@ -540,7 +544,7 @@ const char *vfeSession::GetBackendStateName (void) const
 // Returns a copy of the shared pointer containing the current instance
 // of a pov_frontend::Display-derived render preview instance, which may
 // be NULL.
-boost::shared_ptr<Display> vfeSession::GetDisplay() const
+shared_ptr<Display> vfeSession::GetDisplay() const
 {
   if (m_Frontend == NULL)
     return (shared_ptr<Display>());
@@ -907,6 +911,7 @@ vfeStatusFlags vfeSession::GetStatus(bool Clear, int WaitTime)
 
   if (WaitTime > 0)
   {
+    // TODO FIXME - boost::xtime has been deprecated since boost 1.34.
     boost::xtime t;
     boost::xtime_get (&t, POV_TIME_UTC);
     t.sec += WaitTime / 1000 ;
@@ -974,6 +979,7 @@ bool vfeSession::Pause()
 
   // we can't call pause directly since it will result in a thread context
   // error. pause must be called from the context of the worker thread.
+  // TODO FIXME - boost::xtime has been deprecated since boost 1.34.
   boost::xtime t;
   boost::xtime_get (&t, POV_TIME_UTC);
   t.sec += 3 ;
@@ -997,6 +1003,7 @@ bool vfeSession::Resume()
 
   // we can't call resume directly since it will result in a thread context
   // error. it must be called from the context of the worker thread.
+  // TODO FIXME - boost::xtime has been deprecated since boost 1.34.
   boost::xtime t;
   boost::xtime_get (&t, POV_TIME_UTC);
   t.sec += 3 ;
@@ -1063,6 +1070,7 @@ int vfeSession::Initialize(vfeDestInfo *Dest, vfeAuthInfo *Auth)
   m_MessageCount = 0;
   m_LastError = vfeNoError;
 
+  // TODO FIXME - boost::xtime has been deprecated since boost 1.34.
   boost::xtime t;
   boost::xtime_get (&t, POV_TIME_UTC);
   t.sec += 3 ;

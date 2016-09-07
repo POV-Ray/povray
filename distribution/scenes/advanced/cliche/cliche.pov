@@ -75,7 +75,7 @@ union {
       pigment {color rgb 2}
       finish {ChromeFinish}
    }
-// Tungue
+// Tongue
    blob {
       threshold 1
       #declare X = 0;
@@ -102,7 +102,7 @@ union {
    superellipsoid {
       0.15
       texture {
-         pigment {image_map {"sign"} scale 2 translate -1}
+         pigment {image_map {"sign.jpg"} scale 2 translate -1}
          finish {ambient 0.1 diffuse 0.8 phong 1}
       }
       texture { // dirt layer

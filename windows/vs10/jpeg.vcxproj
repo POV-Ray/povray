@@ -128,7 +128,7 @@
       </PrecompiledHeaderOutputFile>
       <BrowseInformation>true</BrowseInformation>
       <BrowseInformationFile>$(IntDir)</BrowseInformationFile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level2</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <PrecompiledHeaderFile>
@@ -165,7 +165,7 @@
       </PrecompiledHeaderOutputFile>
       <BrowseInformation>true</BrowseInformation>
       <BrowseInformationFile>$(IntDir)</BrowseInformationFile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level2</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
@@ -197,7 +197,7 @@
       </PrecompiledHeaderOutputFile>
       <BrowseInformation>true</BrowseInformation>
       <BrowseInformationFile>$(IntDir)</BrowseInformationFile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level2</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <PrecompiledHeaderFile>
@@ -233,7 +233,7 @@
       </PrecompiledHeaderOutputFile>
       <BrowseInformation>true</BrowseInformation>
       <BrowseInformationFile>$(IntDir)</BrowseInformationFile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level2</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
@@ -266,7 +266,7 @@
       </PrecompiledHeaderOutputFile>
       <BrowseInformation>true</BrowseInformation>
       <BrowseInformationFile>$(IntDir)</BrowseInformationFile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level2</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <PrecompiledHeaderFile>

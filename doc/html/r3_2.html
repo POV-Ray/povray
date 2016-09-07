@@ -1,0 +1,3377 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+
+<!--  This file copyright Persistence of Vision Raytracer Pty. Ltd. 2009-2011  -->
+
+<html lang="en">
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=windows-1252">
+<title>Reference Section 2</title>
+<link rel="StyleSheet" href="povray37.css" type="text/css">
+<link rel="shortcut icon" href="favicon.ico">
+
+<!--  NOTE: In order to help users find information about POV-Ray using web      -->
+<!--  search engines, we ask that you *not* let them index documentation         -->
+<!--  mirrors because effectively, when searching, users will get hundreds of    -->
+<!--  results containing the same information! For this reason, these meta tags  -->
+<!--  below disable archiving of this page by search engines.                    -->
+
+<meta name="robots" content="noarchive">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="expires" content="0">
+</head>
+<body>
+
+<div class="Page">
+
+<!-- NavPanel Begin -->
+<div class="NavPanel">
+<table class="NavTable">
+<tr>
+  <td class="FixedPanelHeading"><a title="3.2" href="#r3_2">Command-Line and INI-File Options</a></td>
+</tr>
+<tr>
+  <td><div class="divh2"><strong><a title="3.2.1" href="#r3_2_1">Animation Options</a></strong></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a title="3.2.1.1" href="#r3_2_1_1">External Animation Loop</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a title="3.2.1.2" href="#r3_2_1_2">Internal Animation Loop</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a title="3.2.1.3" href="#r3_2_1_3">Subsets of Animation Frames</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a title="3.2.1.4" href="#r3_2_1_4">Cyclic Animation</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a title="3.2.1.5" href="#r3_2_1_5">Field Rendering</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><strong><a title="3.2.2" href="#r3_2_2">General Output Options</a></strong></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a title="3.2.2.1" href="#r3_2_2_1">Height and Width of Output</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a title="3.2.2.2" href="#r3_2_2_2">Max Image Buffer Memory</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a title="3.2.2.3" href="#r3_2_2_3">Partial Output Options</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a title="3.2.2.4" href="#r3_2_2_4">Interrupting Options</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a title="3.2.2.5" href="#r3_2_2_5">Resuming Options</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><strong><a title="3.2.3" href="#r3_2_3">Display Output Options</a></strong></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a title="3.2.3.1" href="#r3_2_3_1">Display Hardware Settings</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a title="3.2.3.2" href="#r3_2_3_2">Setting your Display Gamma</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a title="3.2.3.3" href="#r3_2_3_3">Display Related Settings</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a title="3.2.3.4" href="#r3_2_3_4">Mosaic Preview</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><strong><a title="3.2.4" href="#r3_2_4">File Output Options</a></strong></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a title="3.2.4.1" href="#r3_2_4_1">Output File Type</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a title="3.2.4.2" href="#r3_2_4_2">Output File Name</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a title="3.2.4.3" href="#r3_2_4_3">Output File Buffer</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a title="3.2.4.4" href="#r3_2_4_4">Output File Dithering</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a title="3.2.4.5" href="#r3_2_4_5">Output File Gamma</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a title="3.2.4.6" href="#r3_2_4_6">CPU Utilization Histogram</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><strong><a title="3.2.5" href="#r3_2_5">Scene Parsing Options</a></strong></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a title="3.2.5.1" href="#r3_2_5_1">Constant</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a title="3.2.5.2" href="#r3_2_5_2">Input File Name</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a title="3.2.5.3" href="#r3_2_5_3">Include File Name</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a title="3.2.5.4" href="#r3_2_5_4">Library Paths</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a title="3.2.5.5" href="#r3_2_5_5">Language Version</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><strong><a title="3.2.6" href="#r3_2_6">Shell Command Options</a></strong></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a title="3.2.6.1" href="#r3_2_6_1">String Substitution in Shell Commands</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a title="3.2.6.2" href="#r3_2_6_2">Shell Command Sequencing</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a title="3.2.6.3" href="#r3_2_6_3">Shell Command Return Actions</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><strong><a title="3.2.7" href="#r3_2_7">Text Output Options</a></strong></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a title="3.2.7.1" href="#r3_2_7_1">Text Streams</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a title="3.2.7.2" href="#r3_2_7_2">Console Text Output</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a title="3.2.7.3" href="#r3_2_7_3">Directing Text Streams to Files</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a title="3.2.7.4" href="#r3_2_7_4">Warning Level</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a title="3.2.7.5" href="#r3_2_7_5">Help Screen Switches</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><strong><a title="3.2.8" href="#r3_2_8">Tracing Options</a></strong></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a title="3.2.8.1" href="#r3_2_8_1">Symmetric MultiProcessing</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a title="3.2.8.2" href="#r3_2_8_2">Render Block Size</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a title="3.2.8.2.1" href="#r3_2_8_2_1">Render Pattern</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a title="3.2.8.2.2" href="#r3_2_8_2_2">Render Block Step</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a title="3.2.8.3" href="#r3_2_8_3">Quality Settings</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a title="3.2.8.4" href="#r3_2_8_4">Automatic Bounding Control</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a title="3.2.8.5" href="#r3_2_8_5">Removing User Bounding</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a title="3.2.8.6" href="#r3_2_8_6">BSP Bounding</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a title="3.2.8.7" href="#r3_2_8_7">Anti-Aliasing Options</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a title="3.2.8.8" href="#r3_2_8_8">Radiosity Options</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a title="3.2.8.8.1" href="#r3_2_8_8_1">Radiosity High Reproducibility</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a title="3.2.8.8.2" href="#r3_2_8_8_2">Radiosity Load and Save</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a title="3.2.8.8.3" href="#r3_2_8_8_3">Radiosity Vain Pretrace</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh1">&nbsp;</div></td>
+</tr>
+<tr>
+  <td><div class="divh1">&nbsp;</div></td>
+</tr>
+</table>
+</div>
+<!-- NavPanel End -->
+
+<div class="Content">
+<table class="HeaderFooter" width="100%">
+<tr>
+  <td colspan=5 align="left" class="HeaderFooter">
+    POV-Ray for Unix <strong class="HeaderFooter">version 3.7</strong>
+  </td>
+</tr>
+<tr >
+  <td colspan=5>
+    <hr align="right" width="70%">
+  </td>
+</tr>
+<tr>
+  <td width="30%"></td>
+  <td class="NavBar"><a href="index.html" title="The Front Door">Home</a></td>
+  <td class="NavBar"><a href="u1_0.html" title="Unix Table of Contents">POV-Ray for Unix</a></td>
+  <td class="NavBar"><a href="t2_0.html" title="Tutorial Table of Contents">POV-Ray Tutorial</a></td>
+  <td class="NavBar"><a href="r3_0.html" title="Reference Table of Contents">POV-Ray Reference</a></td>
+</tr>
+</table>
+
+<a name="r3_2"></a>
+<div class="content-level-h2" contains="Command-Line and INI-File Options" id="r3_2">
+<h2>3.2 Command-Line and INI-File Options</h2>
+
+<p>This section describes the command line switches and INI file
+keywords that are used to set the options of POV-Ray. It is supposed to be
+used as a reference for looking up things. It does not contain detailed
+explanations on how scenes are written or how POV-Ray is used. It just
+explains all features, their syntax, applications, limits, drawbacks,
+etc.</p>
+
+<p>Options may be specified by switches
+or INI-style options. Almost all INI-style options have equivalent <code>
++</code>/ <code>-</code> switches and most switches have equivalent INI-style
+option. The following sections give a detailed description of each POV-Ray
+option. It includes both the INI-style settings and the <code> +</code>/
+<code>-</code> switches.</p>
+<p>
+The notation and terminology used is described in the tables below.</p>
+
+<table width="100%" class="option-list">
+<tr>
+<td width="30%"><code>Keyword=</code>bool</td>
+
+<td width="70%">Turn <code>Keyword</code> on if bool equals <code>true</code>, <code>
+yes</code>, <code>on</code> or <code>1</code> and Turn it off if it is any
+other value.</td>
+</tr>
+
+<tr>
+<td><code>Keyword=true</code></td>
+
+<td>Do this option if <code>true</code>, <code>yes</code>, <code> on</code>
+or <code>1</code> is specified.</td>
+</tr>
+
+<tr>
+<td><code>Keyword=false</code></td>
+
+<td>Do this option if <code>false</code>, <code>no</code>, <code>
+off</code> or <code>0</code> is specified.</td>
+</tr>
+
+<tr>
+<td><code>Keyword=</code>filename</td>
+
+<td>Set <code>Keyword</code> to filename where filename is any valid file
+name. 
+<p class="Note"><strong>Note:</strong> Some options prohibit the use of any of the above <code>
+true</code> or <code>false</code> values as a file name. They are noted in
+later sections.</p></td>
+</tr>
+
+<tr>
+<td>n</td>
+
+<td>Any integer such as in <code>+W320</code></td>
+</tr>
+
+<tr>
+<td>n.n</td>
+
+<td>Any float such as in <code>Clock=3.45</code></td>
+</tr>
+
+<tr>
+<td>0.n</td>
+
+<td>Any float &lt; 1.0 even if it has no leading 0</td>
+</tr>
+
+<tr>
+<td>s</td>
+
+<td>Any string of text</td>
+</tr>
+
+<tr>
+<td>x or y</td>
+
+<td>Any single character</td>
+</tr>
+
+<tr>
+<td>path</td>
+
+<td>Any directory name, drive optional, no final path separator
+(&quot;\&quot; or &quot;/&quot;, depending on the operating system)</td>
+</tr>
+</table>
+
+<p>Unless otherwise specifically noted, you may assume that either a plus or
+minus sign before a switch will produce the same results.</p></div>
+
+<a name="r3_2_1"></a>
+<div class="content-level-h3" contains="Animation Options" id="r3_2_1">
+<h3>3.2.1 Animation Options</h3>
+
+<p>Internal animation loop, automatic output file name numbering and the
+ability to shell out to the operating system to external utilities which can
+assemble individual frames into an animation, greatly improved the animation capability.
+The internal animation loop is simple yet flexible. You may still use external programs or batch files to
+create animations without the internal loop.</p>
+
+</div>
+<a name="r3_2_1_1"></a>
+<div class="content-level-h4" contains="External Animation Loop" id="r3_2_1_1">
+<h4>3.2.1.1 External Animation Loop</h4>
+<table width="100%" class="option-list">
+<tr>
+<td width="30%"><code>Clock=</code>n.n</td>
+
+<td width="70%">Sets <code><a href="r3_3.html#r3_3_1_5_6">clock</a></code> float identifier to n.n</td>
+</tr>
+
+<tr>
+<td><code>+K</code>n.n</td>
+
+<td>Same as <code>Clock=</code>n.n</td>
+</tr>
+</table>
+<p>The <code>Clock=</code><em>n.n</em> option or the <code>
++K</code><em>n.n</em> switch may be used to pass a single float value to the
+program for basic animation. The value is stored in the float identifier
+<code>clock</code>. If an object had a <code>rotate &lt;0,clock,0&gt;</code>
+attached then you could rotate the object by different amounts over different
+frames by setting <code> +K10.0</code>,<code>+K20.0</code>... etc. on
+successive renderings. It is up to the user to repeatedly invoke POV-Ray with
+a different <code> Clock</code> value and a different <code>
+Output_File_Name</code> for each frame.</p>
+
+</div>
+<a name="r3_2_1_2"></a>
+<div class="content-level-h4" contains="Internal Animation Loop" id="r3_2_1_2">
+<h4>3.2.1.2 Internal Animation Loop</h4>
+<table width="100%" class="option-list">
+<tr>
+<td width="30%"><code>Initial_Frame=</code>n</td><td width="70%">Sets initial frame number to n</td>
+</tr>
+
+<tr>
+<td><code>Final_Frame=</code>n</td><td>Sets final frame number to n</td>
+</tr>
+
+<tr>
+<td><code>Initial_Clock=</code>n.n</td><td>Sets initial clock value to n.n</td>
+</tr>
+
+<tr>
+<td><code>Final_Clock=</code>n.n</td><td>Sets final clock value to n.n</td>
+</tr>
+
+<tr>
+<td><code>+KFI</code>n</td><td>Same as <code>Initial_Frame=</code>n</td>
+</tr>
+
+<tr>
+<td><code>+KFF</code>n</td><td>Same as <code>Final_Frame=</code>n</td>
+</tr>
+
+<tr>
+<td><code>+KI</code>n.n</td><td>Same as <code>Initial_Clock=</code>n.n</td>
+</tr>
+
+<tr>
+<td><code>+KF</code>n.n</td>
+
+<td>Same as <code>Final_Clock=</code>n.n</td>
+</tr>
+</table>
+
+<p>The internal animation loop relieves the user of the
+task of generating complicated sets of batch files to invoke POV-Ray multiple
+times with different settings. While the multitude of options may look
+intimidating, the clever set of default values means that you will probably
+only need to specify the <code>Final_Frame</code>=<em>n</em> or the
+<code>+KFF</code><em>n</em> option to specify the number of frames. All other
+values may remain at their defaults.</p>
+<p>Any <code>Final_Frame</code> setting other than -1 will trigger POV-Ray's internal animation loop. For example <code>Final_Frame=10</code> or <code>+KFF10</code> causes POV-Ray to render your scene 10 times. If you specified <code><a href="r3_2.html#r3_2_4_2">Output_File_Name</a>=file.tga</code> then each frame would be output as <code>file01.tga</code>, <code>file02.tga</code>, <code>file03.tga</code> etc. The number of zero-padded digits in the file name depends upon the final frame number. For example <code>+KFF100</code> would generate <code>file001.tga</code> through <code>file100.tga</code>. The frame number may encroach upon the file name. On MS-DOS with an eight character limit, <code>myscene.pov</code> would render to <code>mysce001.tga</code> through
+<code>mysce100.tga</code>.</p>
+<p>
+The default <code>Initial_Frame=1</code> will probably never have to be
+changed. You would only change it if you were assembling a long animation
+sequence in pieces. One scene might run from frame 1 to 50 and the next from
+51 to 100. The <code>Initial_Frame</code>=<em>n</em> or <code>
++KFI</code><em>n</em> option is for this purpose.</p>
+<p class="Note"><strong>Note:</strong> If you wish to render a subset of frames such as 30 through 40 out
+of a 1 to 100 animation, you should not change <code>Initial_Frame</code> or
+<code>Final_Frame</code>. Instead you should use the subset commands
+described in section <a href="r3_2.html#r3_2_1_3">Subsets of Animation Frames</a>.</p>
+<p>
+Unlike some animation packages, the action in POV-Ray animated scenes does
+not depend upon the integer frame numbers. Rather you should design your
+scenes based upon the float identifier <code><a href="r3_3.html#r3_3_1_5_6">clock</a></code>. By default, the clock value is 0.0 for the initial frame and 1.0 for the final frame. All other frames are interpolated between these values. For example if your object is supposed to rotate one full turn over the course of the animation, you could specify <code>rotate 360*clock*y</code>. Then as clock runs from 0.0 to 1.0, the object rotates about the y-axis from 0 to 360 degrees.</p>
+<p>
+The major advantage of this system is that you can render a 10 frame
+animation or a 100 frame or 500 frame or 329 frame animation yet you still
+get one full 360 degree rotation. Test renders of a few frames work exactly
+like final renders of many frames.</p>
+<p>
+In effect you define the motion over a continuous float valued parameter
+(the clock) and you take discrete samples at some fixed intervals (the
+frames). If you take a movie or video tape of a real scene it works the same
+way. An object's actual motion depends only on time. It does not depend
+on the frame rate of your camera.</p>
+<p>
+Many users have already created scenes for POV-Ray 2 that expect clock
+values over a range other than the default 0.0 to 1.0. For this reason we
+provide the <code>Initial_Clock</code>=<em>n.n</em>
+or <code>+KI</code><em>n.n</em> and <code>Final_Clock</code>=<em>n.n</em>
+or <code>+KF</code><em>n.n</em> options. For example to run the clock from 25.0 to
+75.0 you would specify <code>Initial_Clock=25.0</code> and <code>Final_Clock=75.0</code>.
+Then the clock would be set to 25.0 for the initial frame and 75.0 for the final frame.
+In-between frames would have clock values interpolated from 25.0 through 75.0 proportionally.</p>
+<p>
+Users who are accustomed to using frame numbers rather than clock values
+could specify <code> Initial_Clock=1.0</code> and <code>Final_Clock=10.0</code>
+and <code>Frame_Final=10</code> for a 10 frame animation.</p>
+<p>
+For new scenes, we recommend you do not change the <code>
+Initial_Clock</code> or <code> Final_Clock</code> from their default 0.0 to
+1.0 values. If you want the clock to vary over a different range than the
+default 0.0 to 1.0, we recommend you handle this inside your scene file as
+follows...</p>
+<pre>
+#declare Start    = 25.0;
+#declare End      = 75.0;
+#declare My_Clock = Start+(End-Start)*clock;
+</pre>
+
+<p>Then use <code>My_Clock</code> in the scene description. This keeps the
+critical values 25.0 and 75.0 in your .pov file.</p>
+<p class="Note"><strong>Note:</strong> Details concerning the inner workings of the animation loop
+are in the section on shell-out operating system commands in section
+<a href="r3_2.html#r3_2_6">Shell-out to Operating System</a>.</p>
+
+</div>
+<a name="r3_2_1_3"></a>
+<div class="content-level-h4" contains="Subsets of Animation Frames" id="r3_2_1_3">
+<h4>3.2.1.3 Subsets of Animation Frames</h4>
+<table width="100%" class="option-list">
+<tr>
+<td width="30%"><code>Subset_Start_Frame=</code>n</td>
+
+<td width="70%">Set subset starting frame to n</td>
+</tr>
+
+<tr>
+<td><code>Subset_Start_Frame=</code>0.n</td>
+
+<td>Set subset starting frame to n percent</td>
+</tr>
+
+<tr>
+<td><code>Subset_End_Frame=</code>n</td>
+
+<td>Set subset ending frame to n</td>
+</tr>
+
+<tr>
+<td><code>Subset_End_Frame=</code>0.n</td>
+
+<td>Set subset ending frame to n percent</td>
+</tr>
+
+<tr>
+<td><code>Frame_Step=</code>n</td>
+<td>Set the increment to the frame number, default to 1</td>
+</tr>
+<tr>
+<td><code>+SF</code>0.n</td>
+
+<td>Same as <code>Subset_Start_Frame</code></td>
+</tr>
+
+<tr>
+<td><code>+EF</code>0.n</td>
+
+<td>Same as <code>Subset_End_Frame</code></td>
+</tr>
+<tr>
+<td><code>+STP</code>n</td>
+<td>Same as <code>Frame_Step</code></td>
+</tr>
+</table>
+
+<p>When creating a long animation, it may be handy to render only a portion
+of the animation to see what it looks like. Suppose you have 100 frames but
+only want to render frames 30 through 40. If you set <code>Initial_Frame=30</code>
+and <code>Final_Frame=40</code> then the clock would vary from 0.0 to 1.0 from
+frames 30 through 40 rather than 0.30 through 0.40 as it should. Therefore
+you should leave <code> Initial_Frame=1</code> and <code>Final_Frame=100</code>
+and use <code>Subset_Start_Frame=30</code> and <code>Subset_End_Frame=40</code>
+to selectively render part of the scene. POV-Ray will then properly compute the
+clock values.</p>
+<p>Similarly, if you only want to render a tenth of the frames, you can use <code>Frame_Step=10</code> to jump over the nine non-rendered frames between the rendered frames. This option was inspired from megapov, but with two restrictions: only positive step value are supported (forward, no backward rendering) and the value is not available in the SDL</p>  
+<p>
+Usually you will specify the subset using the actual integer frame numbers
+however an alternate form of the subset commands takes a float value in the
+range <em>0.0 &lt;=n.nnn &lt;=1.0</em> which is interpreted as a fraction of
+the whole animation. For example, <code> Subset_Start_Frame=0.333</code> and
+<code>Subset_End_Frame=0.667</code> would render the middle 1/3rd of a
+sequence regardless of the number of frames.</p>
+
+</div>
+<a name="r3_2_1_4"></a>
+<div class="content-level-h4" contains="Cyclic Animation" id="r3_2_1_4">
+<h4>3.2.1.4 Cyclic Animation</h4>
+<table width="100%" class="option-list">
+<tr>
+<td width="30%"><code>Cyclic_Animation=</code>bool</td>
+
+<td width="70%">Turn cyclic animation on/off</td>
+</tr>
+
+<tr>
+<td><code>+KC</code></td>
+
+<td>Turn cyclic animation on</td>
+</tr>
+
+<tr>
+<td><code>-KC</code></td>
+
+<td>Turn cyclic animation off</td>
+</tr>
+</table>
+
+<p>Many computer animation sequences are designed to be run in a continuous
+loop. Suppose you have an object that rotates exactly 360 degrees over the
+course of your animation and you did <code>rotate 360*clock*y</code> to do
+so. Both the first and last frames would be identical. Upon playback there
+would be a brief one frame jerkiness. To eliminate this problem you need to
+adjust the clock so that the last frame does not match the first. For example
+a ten frame cyclic animation should not use clock 0.0 to 1.0. It should run
+from 0.0 to 0.9 in 0.1 increments. However if you change to 20 frames it
+should run from 0.0 to 0.95 in 0.05 increments. This complicates things
+because you would have to change the final clock value every time you changed
+<code>Final_Frame</code>. Setting <code>Cyclic_Animation=on</code> or using
+<code>+KC</code> will cause POV-Ray to automatically adjust the final clock
+value for cyclic animation regardless of how many total frames. The default
+value for this setting is off.</p>
+
+</div>
+<a name="r3_2_1_5"></a>
+<div class="content-level-h4" contains="Field Rendering" id="r3_2_1_5">
+<h4>3.2.1.5 Field Rendering</h4>
+<table width="100%" class="option-list">
+<tr>
+<td width="30%"><code>Field_Render=</code>bool</td>
+
+<td width="70%">Turn field rendering on/off</td>
+</tr>
+
+<tr>
+<td><code>Odd_Field=</code>bool</td>
+
+<td>Set odd field flag</td>
+</tr>
+
+<tr>
+<td><code>+UF</code></td>
+
+<td>Turn field rendering on</td>
+</tr>
+
+<tr>
+<td><code>-UF</code></td>
+
+<td>Turn field rendering off</td>
+</tr>
+
+<tr>
+<td><code>+UO</code></td>
+
+<td>Set odd field flag on</td>
+</tr>
+
+<tr>
+<td><code>-UO</code></td>
+
+<td>Set odd field flag off</td>
+</tr>
+</table>
+
+<p>Field rendering is sometimes used for animations when the animation is
+being output for television. TVs only display alternate scan lines on each
+vertical refresh. When each frame is being displayed the fields are
+interlaced to give the impression of a higher resolution image. The even scan
+lines make up the even field, and are drawn first (i.e. scan lines 0, 2, 4,
+etc.), followed by the odd field, made up of the odd numbered scan lines are
+drawn afterwards. If objects in an animation are moving quickly, their
+position can change noticeably from one field to the next. As a result, it
+may be desirable in these cases to have POV-Ray render alternate fields at
+the actual field rate (which is twice the frame rate), rather than rendering
+full frames at the normal frame rate. This would save a great deal of time
+compared to rendering the entire animation at twice the frame rate, and then
+only using half of each frame.</p>
+<p>
+By default, field rendering is not used. Setting <code>
+Field_Render=on</code> or using <code> +UF</code> will cause alternate frames
+in an animation to be only the even or odd fields of an animation. By
+default, the first frame is the even field, followed by the odd field. You
+can have POV-Ray render the odd field first by specifying <code>
+Odd_Field=on</code>, or by using the <code> +UO</code> switch.</p></div>
+
+<a name="r3_2_2"></a>
+<div class="content-level-h3" contains="General Output Options" id="r3_2_2">
+<h3>3.2.2 General Output Options</h3>
+
+</div>
+<a name="r3_2_2_1"></a>
+<div class="content-level-h4" contains="Height and Width of Output" id="r3_2_2_1">
+<h4>3.2.2.1 Height and Width of Output</h4>
+
+<table width="100%" class="option-list">
+<tr>
+<td width="30%"><code>Height=</code>n</td>
+
+<td width="70%">Sets screen height to n pixels</td>
+</tr>
+
+<tr>
+<td><code>Width=</code>n</td>
+
+<td>Sets screen width to n pixels</td>
+</tr>
+
+<tr>
+<td><code>+H</code>n</td>
+
+<td>Same as <code>Height=</code>n</td>
+</tr>
+
+<tr>
+<td><code>+W</code>n</td>
+
+<td>Same as <code>Width=</code>n</td>
+</tr>
+</table>
+
+<p>These switches set the height and width of the image in pixels. This
+specifies the image size for file output. The preview display, if on, will
+generally attempt to pick a video mode to accommodate this size but the
+display settings do not in any way affect the resulting file output.</p>
+
+</div>
+<a name="r3_2_2_2"></a>
+<div class="content-level-h4" contains="Max Image Buffer Memory" id="r3_2_2_2">
+<h4>3.2.2.2 Max Image Buffer Memory</h4>
+<table width="100%" class="option-list">
+<tr>
+<td width="30%"><code>Max_Image_Buffer_Memory=</code>n</td>
+
+<td width="70%">Sets the allowable size of the output image cache</td>
+</tr>
+
+<tr>
+<td><code>+MI</code>n</td>
+
+<td>Same as <code>Max_Image_Buffer_Memory=</code>n</td>
+</tr>
+</table>
+
+<p>This INI parameter sets the number of megabytes of RAM to allow for output image caching. If the output image happens to use more than this, a file backed temporary image is used instead. If using this option you <em>must</em> specify a value. This option is on by default and its value is 128.</p>
+
+</div>
+<a name="r3_2_2_3"></a>
+<div class="content-level-h4" contains="Partial Output Options" id="r3_2_2_3">
+<h4>3.2.2.3 Partial Output Options</h4>
+<table width="100%" class="option-list">
+<tr>
+<td width="30%"><code>Start_Column=</code>n</td>
+
+<td width="70%">Set first column to n pixels</td>
+</tr>
+
+<tr>
+<td><code>Start_Column=</code>0.n</td>
+
+<td>Set first column to n percent of width</td>
+</tr>
+
+<tr>
+<td><code>+SC</code>n</td>
+
+<td>Same as <code>Start_Column=</code>n</td>
+</tr>
+
+<tr>
+<td><code>+SC</code>0.n</td>
+
+<td>Same as <code>Start_Column=</code>0.n</td>
+</tr>
+
+<tr>
+<td><code>Start_Row=</code>n</td>
+
+<td>Set first row to n pixels</td>
+</tr>
+
+<tr>
+<td><code>Start_Row=</code>0.n</td>
+
+<td>Set first row to n percent of height</td>
+</tr>
+
+<tr>
+<td><code>+SR</code>n</td>
+
+<td>Same as <code>Start_Row=</code>n</td>
+</tr>
+
+<tr>
+<td><code>+SR</code>0.n</td>
+
+<td>Same as <code>Start_Row=</code>0.n</td>
+</tr>
+
+<tr>
+<td><code>End_Column=</code>n</td>
+
+<td>Set last column to n pixels</td>
+</tr>
+
+<tr>
+<td><code>End_Column=</code>0.n</td>
+
+<td>Set last column to n percent of width</td>
+</tr>
+
+<tr>
+<td><code>+EC</code>n</td>
+
+<td>Same as <code>End_Column=</code>n</td>
+</tr>
+
+<tr>
+<td><code>+EC</code>0.n</td>
+
+<td>Same as <code>End_Column=</code>0.n</td>
+</tr>
+
+<tr>
+<td><code>End_Row=</code>n</td>
+
+<td>Set last row to n pixels</td>
+</tr>
+
+<tr>
+<td><code>End_Row=</code>0.n</td>
+
+<td>Set last row to n percent of height</td>
+</tr>
+
+<tr>
+<td><code>+ER</code>n</td>
+
+<td>Same as <code>End_Row=</code>n</td>
+</tr>
+
+<tr>
+<td><code>+ER</code>0.n</td>
+
+<td>Same as <code>End_Row=</code>0.n</td>
+</tr>
+</table>
+
+<p>When doing test rendering it is often convenient to define a small, rectangular sub-section of the whole screen so you can quickly check out one area of the image. The <code>Start_Row</code>, <code>End_Row</code>, <code>Start_Column</code> and <code>End_Column</code> options allow you to define the subset area to be rendered. The default values are the full size of the
+image from (1,1) which is the upper left to (w,h) on the lower right where w and h are the <code>Width=</code><em>n</em> and <code>Height=</code><em>n</em> values you have set.</p>
+
+<p class="Note"><strong>Note:</strong> If the number specified is greater than 1 then it is interpreted as an absolute row or column number in pixels. If it is a decimal value between 0.0 and 1.0 then it is interpreted as a percent of the total width or height of the image.</p>
+
+<p> For example: <code> Start_Row=0.75</code> and <code>Start_Column=0.75</code> starts on a row 75% down from the top at a column 75% from the left. Thus it renders only the lower-right 25% of the image regardless of the specified width and height.</p>
+
+<p>The <code>+SR</code>, <code>+ER</code>, <code> +SC</code> and <code>+EC</code> switches work in the same way as the corresponding INI-style settings for both absolute settings or percentages.</p>
+
+<p class="Note"><strong>Note:</strong> Early versions of POV-Ray allowed only start and end rows to be specified with <code>+S</code><em>n</em> and <code>+E</code><em>n</em>. In version 3.7 support for those variants has been dropped.</p>
+
+<p>When rendering a subset of <em>columns</em> (<code>+sc/+ec</code>) and/or <em>rows</em> (<code>+sr/+er</code>), POV-Ray generates a full width image and fills the not rendered columns with black pixels. This should not be a problem for any image reading program no matter what file format is used. Earlier versions of POV-Ray had problems when a subset of <em>rows</em> (<code>+sr/+er</code>) was rendered.  The full height information was written into the image file header but it only wrote image data for those lines that were actually rendered. This made output files that were incompatible with various image processing tools. In version 3.7 this is no longer the case.</p>
+
+</div>
+<a name="r3_2_2_4"></a>
+<div class="content-level-h4" contains="Interrupting Options" id="r3_2_2_4">
+<h4>3.2.2.4 Interrupting Options</h4>
+
+<table width="100%" class="option-list">
+<tr>
+<td width="30%"><code>Test_Abort=</code>bool</td>
+
+<td width="70%">Turn test for user abort on/off</td>
+</tr>
+
+<tr>
+<td><code>+X</code></td>
+
+<td>Turn test abort on</td>
+</tr>
+
+<tr>
+<td><code>-X</code></td>
+
+<td>Turn test abort off</td>
+</tr>
+
+<tr>
+<td><code>Test_Abort_Count=</code>n</td>
+
+<td>Set to test for abort every n pixels</td>
+</tr>
+
+<tr>
+<td><code>+X</code>n</td>
+
+<td>Set to test for abort every n pixels on</td>
+</tr>
+
+<tr>
+<td><code>-X</code>n</td>
+
+<td>Set to test for abort off (in future test every n pixels)</td>
+</tr>
+</table>
+
+<p>On some operating systems once you start a rendering you must let it
+finish. The <code>Test_Abort=on</code> option or <code>+X</code> switch
+causes POV-Ray to test the keyboard for keypress. If you have pressed a key,
+it will generate a controlled user abort. Files will be flushed and closed
+but only data through the last full row of pixels is saved. POV-Ray exits
+with an error code 2 (normally POV-Ray returns 0 for a successful run or 1
+for a fatal error).</p>
+<p>
+When this option is on, the keyboard is polled on every line while parsing
+the scene file and on every pixel while rendering. Because polling the
+keyboard can slow down a rendering, the <code>
+Test_Abort_Count=</code><em>n</em> option or <code>+X</code><em>n</em> switch
+causes the test to be performed only every <em>n</em> pixels rendered or
+scene lines parsed.</p>
+
+</div>
+<a name="r3_2_2_5"></a>
+<div class="content-level-h4" contains="Resuming Options" id="r3_2_2_5">
+<h4>3.2.2.5 Resuming Options</h4>
+<table width="100%" class="option-list">
+<tr>
+<td width="30%"><code>Continue_Trace=</code>bool</td>
+<td width="70%">Sets continued trace on/off</td>
+</tr>
+
+<tr>
+<td><code>+C</code></td>
+<td>Sets continued trace on</td>
+</tr>
+
+<tr>
+<td><code>-C</code></td>
+<td>Sets continued trace off</td>
+</tr>
+
+<tr>
+<td><code>Create_Ini=</code>file</td>
+<td>Generate an INI file to file</td>
+</tr>
+
+<tr>
+<td><code>Create_Ini=</code>true</td>
+<td>Generate file.ini where file is scene name.</td>
+</tr>
+
+<tr>
+<td><code>Create_Ini=</code>false</td>
+<td>Turn off generation of previously set file.ini</td>
+</tr>
+
+<tr>
+<td><code>+GI</code>file</td>
+<td>Same as <code>Create_Ini=</code>file</td>
+</tr>
+</table>
+
+<p>If you abort a render while it is in progress or if you used the <code><a href="r3_2.html#r3_2_2_3">End_Row</a></code> option to end the render prematurely, you can use <code>Continue_Trace=on</code> or <code>+C</code> option to continue the render later at the point where you left off. This option reads in the previously generated output file, displays the partial image rendered so far, then
+proceeds with the ray-tracing. This option cannot be used if file output is disabled with <code><a href="r3_2.html#r3_2_4">Output_to_file</a>=off</code> or <code>-F</code>.</p>
+
+<p>The <code>Continue_Trace</code> option may not work if the <code>Start_Row</code> option has been set to anything but the top of the file, depending on the output format being used. Also POV-Ray cannot continue the file once it has been opened and saved again by any program.</p>
+
+<p>POV-Ray tries to figure out where to resume an interrupted trace by reading any previously generated data in the specified output file. All file formats contain the image size, so this will override any image size settings
+specified. Some file formats (namely TGA and PNG) also store information about where the file started (i. e. <code> +SC</code><em>n</em> and <code>+SR</code><em>n</em> options), alpha output <code>+UA</code>, and bit-depth
+<code>+FN</code><em>n</em>, which will override these settings. It is up to the user to make sure that all other options are set the same as the original render.</p>
+
+<p>The <code>Create_Ini</code> option or <code>+GI</code> switch provides an easy way to create an INI file with all of the rendering options, so you can re-run files with the same options, or ensure you have all the same options when resuming. This option creates an INI file with every option set at the value used for that rendering. This includes default values which you have not specified. For example if you run POV-Ray with...</p>
+
+<pre>
+POVRAY +Isimple.pov MYOPTS +GIrerun.ini MOREOPTS
+</pre>
+
+<p>POV-Ray will create a file called <code>rerun.ini</code> with all of the options used to generate this scene. The file is not written until all options have been processed. This means that in the above example, the file
+will include options from both <code>myopts.ini</code> and <code>moreopts.ini</code> despite the fact that the <code>+GI</code> switch is specified between them. You may now re-run the scene with...</p>
+
+<pre>
+POVRAY RERUN
+</pre>
+
+<p>or resume an interrupted trace with</p>
+
+<pre>
+POVRAY RERUN +C
+</pre>
+
+<p>If you add other switches with the <code>rerun.ini</code> reference, they will be included in future re-runs because the file is re-written every time you use it.</p>
+
+<p>The <code>Create_Ini</code> option is also useful for documenting how a scene was rendered. If you render <code> waycool.pov</code> with <code>Create_Ini=on</code> then it will create a file <code>waycool.ini</code> that
+you could distribute along with your scene file so other users can exactly re-create your image.</p></div>
+
+<a name="r3_2_3"></a>
+<div class="content-level-h3" contains="Display Output Options" id="r3_2_3">
+<h3>3.2.3 Display Output Options</h3>
+
+</div>
+<a name="r3_2_3_1"></a>
+<div class="content-level-h4" contains="Display Hardware Settings" id="r3_2_3_1">
+<h4>3.2.3.1 Display Hardware Settings</h4>
+<table width="100%" class="option-list">
+<tr>
+<td width="30%"><code>Display=</code>bool</td>
+
+<td width="70%">Turns graphic display on/off</td>
+</tr>
+
+<tr>
+<td><code>+D</code></td>
+
+<td>Turns graphic display on</td>
+</tr>
+
+<tr>
+<td><code>-D</code></td>
+
+<td>Turns graphic display off</td>
+</tr>
+
+<tr>
+<td><code>Video_Mode=</code>x</td>
+
+<td>Set video mode to x; does not affect on/off</td>
+</tr>
+
+<tr>
+<td><code>+D</code>x</td>
+
+<td>Set display on; Set mode to x</td>
+</tr>
+
+<tr>
+<td><code>-D</code>x</td>
+
+<td>Set display off; but for future use mode x</td>
+</tr>
+
+<tr>
+<td><code>Palette=</code>y</td>
+
+<td>Set display palette to y; does not affect on/off</td>
+</tr>
+
+<tr>
+<td><code>+D</code>xy</td>
+
+<td>Set display on; Set mode x; Set palette y</td>
+</tr>
+
+<tr>
+<td><code>-D</code>xy</td>
+
+<td>Set display off; use mode x, palette y in future</td>
+</tr>
+
+<tr>
+<td><code>Display_Gamma=</code>n.n</td>
+
+<td>Sets the display gamma to n.n</td>
+</tr>
+
+<tr>
+<td><code>Display_Gamma=sRGB</code></td>
+
+<td>Sets the display gamma to match the sRGB standard (approximately corresponding to a gamma of 2.2)</td>
+</tr>
+</table>
+
+<p>The <code>Display=on</code> or <code>+D</code> switch will turn on the
+graphics display of the image while it is being rendered. Even on some
+non-graphics systems, POV-Ray may display an 80 by 24 character <em>
+ASCII-Art</em> version of your image. Where available, the
+display may be full, 24-bit true color. Setting <code>Display=off</code> or
+using the <code>-D</code> switch will turn off the graphics display which is
+the default.</p>
+<p>On the Windows platform, the default is <code>Display=on</code>. Turning
+display off does not, of course, turn off the actual video display. Instead,
+POV-Ray will not open the output window that it normally shows a render in.</p>
+<p>The <code>Video_Mode=</code><em>x</em> option sets the display mode or
+hardware type chosen where <em>x</em> is a single digit or letter that is
+machine dependent. Generally <code>Video_Mode=0</code> means the default or
+an auto-detected setting should be used. When using switches, this character
+immediately follows the switch. For example the <code>+D0</code> switch will
+turn on the graphics display in the default mode.</p>
+<p>
+The <code> Palette=</code><em>y</em> option selects the palette to be used.
+Typically the single character parameter <em>y</em> is a digit which selects
+one of several fixed palettes or a letter such <code>G</code> for gray scale,
+<code> H</code> for 15-bit or 16-bit high color or <code> T</code> for 24-bit
+true color. When using switches, this character is the 2nd character after
+the switch. For example the <code>+D0T</code> switch will turn on the
+graphics display in the default mode with a true color palette.</p>
+<p>
+The <code> Display_Gamma</code> setting overcomes the problem of images
+(whether ray-traced or not) having different brightness when being displayed
+on different monitors, different video cards, and under different operating
+systems. The <code>Display_Gamma=</code><em>n.n</em> setting is not
+available as a command-line switch.</p>
+<p class="Note"><strong>Note:</strong> The <code>Display_Gamma</code> is a setting based on your
+computer's display hardware, and should be set correctly once and not
+changed.</p>
+<p>
+While the <code> Display_Gamma</code> can be different for each system,
+there are a few general rules that can be used for setting <code>
+Display_Gamma</code> if you do not know it exactly. If the <code>
+Display_Gamma</code> keyword does not appear in the INI file, POV-Ray assumes
+that the display gamma is approximately 2.2 (to precise, that it matches the sRGB standard). This is because most PC monitors have a gamma
+value in the range 1.6 to 2.6 (newer models seem to have a lower gamma
+value). Mac has the ability to do gamma correction inside the system software
+(based on a user setting in the gamma control panel). If the gamma control
+panel is turned off, or is not available, the default Macintosh system gamma
+is 1.8. Many newer PC graphics cards can do hardware gamma correction and
+should use the current Display_Gamma setting, usually <code>sRGB</code> (being approximately equivalent to a gamma of 2.2).</p>
+
+</div>
+<a name="r3_2_3_2"></a>
+<div class="content-level-h4" contains="Setting your Display Gamma" id="r3_2_3_2">
+<h4>3.2.3.2 Setting your Display Gamma</h4>
+<p>The following gamma test image can be used to help you set your <code>Display_Gamma</code>
+accurately.</p>
+
+<p>Before viewing the gamma image darken the room and set the monitor
+brightness and contrast to maximum.  While viewing a black screen,
+lower the brightness gradually until the <em>background</em> is no longer
+noticeable (ie when it just fades from view).  This may be difficult
+on monitors that use overscanning, unless you change the viewable
+area settings.</p>
+
+<table class="centered" width="660px" cellpadding="0" cellspacing="10">
+<tr>
+  <td>
+    <img class="centered" width="640px" src="images/9/94/RefImgGamma.gif">
+  </td>
+</tr>
+<tr>
+  <td>
+    <p class="caption">Display gamma test image.</p>
+  </td>
+</tr>
+</table>
+
+<p>Now, lower the contrast until the alternating white and black bars
+on the left edge of each column are equal in width.  This is trying
+to get a 50% gray by using half white and half black.  If this is
+not possible, choose a contrast setting which is about in the middle.
+While viewing the image from a distance, or with squinted eyes, one
+of the numbered <em>swatches</em> will best match the gray value approximated
+by the white and black bars.  The number in this <em>swatch</em> is your
+display's actual gamma value.</p>
+
+<p>Normal display gamma values are in the range 2.0 to 2.6.  If your
+monitor is usually used in a dim environment, we often use a gamma
+value that is 15% - 25% lower than the actual display gamma to give
+the images more contrast.  Some systems, such as Macs and SGIs, already
+do gamma correction, so they may have display gammas of 1.0 or 1.8.</p>
+
+<p>See the <a href="t2_3.html#t2_3_4">Gamma Handling</a> tutorial for additional information about setting up your display and why gamma handling is so important.</p>
+
+</div>
+<a name="r3_2_3_3"></a>
+<div class="content-level-h4" contains="Display Related Settings" id="r3_2_3_3">
+<h4>3.2.3.3 Display Related Settings</h4>
+<table width="100%" class="option-list">
+<tr>
+<td width="30%"><code>Pause_When_Done=</code>bool</td>
+
+<td width="70%">Sets pause when done on/off</td>
+</tr>
+
+<tr>
+<td><code>+P</code></td>
+
+<td>Sets pause when done on</td>
+</tr>
+
+<tr>
+<td><code>-P</code></td>
+
+<td>Sets pause when done off</td>
+</tr>
+
+<tr>
+<td><code>Verbose=</code>bool</td>
+
+<td>Set verbose messages on/off</td>
+</tr>
+
+<tr>
+<td><code>+V</code></td>
+
+<td>Set verbose messages on</td>
+</tr>
+
+<tr>
+<td><code>-V</code></td>
+
+<td>Set verbose messages off</td>
+</tr>
+
+<tr>
+<td><code>Draw_Vistas=</code>bool</td>
+
+<td>Turn draw vistas on/off</td>
+</tr>
+
+<tr>
+<td><code>+UD</code></td>
+
+<td>Turn draw vistas on</td>
+</tr>
+
+<tr>
+<td><code>-UD</code></td>
+
+<td>Turn draw vistas off</td>
+</tr>
+</table>
+
+<p>On some systems, when the image is complete, the graphics display is
+cleared and POV-Ray switches back into text mode to print the final
+statistics and to exit. Normally when the graphics display is on, you want to
+look at the image awhile before continuing. Using <code>Pause_When_Done=on</code>
+or <code>+P</code> causes POV-Ray to pause in  graphics mode until you press a key
+to continue. The default is not to pause (<code>-P</code>).</p>
+<p>
+When the graphics display is not used, it is often desirable to monitor
+progress of the rendering. Using <code> Verbose=on</code> or <code>+V</code>
+turns on verbose reporting of your rendering progress. This reports the
+number of the line currently being rendered, the elapsed time for the current
+frame and other information. On some systems, this textual information can
+conflict with the graphics display. You may need to turn this off when the
+display is on. The default setting is off (<code>-V</code>).</p>
+<p class="Note"><strong>Note:</strong>
+Starting with version 3.7 the <code>Draw_Vistas</code> option has been deprecated. See
+the section <a href="r3_2.html#r3_2_8_4">Automatic Bounding Control</a> for more details.</p>
+
+</div>
+<a name="r3_2_3_4"></a>
+<div class="content-level-h4" contains="Mosaic Preview" id="r3_2_3_4">
+<h4>3.2.3.4 Mosaic Preview</h4>
+<table width="100%" class="option-list">
+<tr>
+<td width="30%"><code>Preview_Start_Size=</code>n</td>
+
+<td width="70%">Set mosaic preview start size to n</td>
+</tr>
+
+<tr>
+<td><code>+SP</code>n</td>
+
+<td>Same as Preview_Start_Size=n</td>
+</tr>
+
+<tr>
+<td><code>Preview_End_Size=</code>n</td>
+
+<td>Set mosaic preview end size to n</td>
+</tr>
+
+<tr>
+<td><code>+EP</code>n</td>
+
+<td>Same as Preview_End_Size=n</td>
+</tr>
+</table>
+
+<p>Typically, while you are developing a scene, you will do many low
+resolution test renders to see if objects are placed properly. Often this low
+resolution version does not give you sufficient detail and you have to
+render the scene again at a higher resolution. A feature called <em>
+mosaic preview</em> solves this problem by automatically
+rendering your image in several passes.</p>
+<p>
+The early passes paint a rough overview of the entire image using large
+blocks of pixels that look like mosaic tiles. The image is then refined using
+higher resolutions on subsequent passes. This display method very quickly
+displays the entire image at a low resolution, letting you look for any major
+problems with the scene. As it refines the image, you can concentrate on more
+details, like shadows and textures. You do not have to wait for a full
+resolution render to find problems, since you can interrupt the rendering
+early and fix the scene, or if things look good, you can let it continue and
+render the scene at high quality and resolution.</p>
+<p>
+To use this feature you should first select a <code> Width</code> and <code>
+Height</code> value that is the highest resolution you will need. Mosaic
+preview is enabled by specifying how big the mosaic blocks will be on the
+first pass using <code> Preview_Start_Size=</code><em>n</em> or <code>
++SP</code><em>n</em>. The value n should be a number greater than zero that
+is a power of two (1, 2, 4, 8, 16, 32, etc.) If it is not a power of two, the
+nearest power of two less than n is substituted. This sets the size of the
+squares, measured in pixels. A value of 16 will draw every 16th pixel as a
+16*16 pixel square on the first pass. Subsequent passes will use half the
+previous value (such as 8*8, 4*4 and so on.)</p>
+<p>
+The process continues until it reaches 1*1 pixels or until it reaches the
+size you set with <code>Preview_End_Size=</code><em>n</em> or <code>
++EP</code><em>n</em>. Again the value n should be a number greater than zero
+that is a power of two and less than or equal to <code>Preview_Start_Size</code>. If it is not a power of two, the nearest power of
+two less than n is substituted. The default ending value is 1. If you set
+<code>Preview_End_Size</code> to a value greater than 1 the mosaic passes
+will end before reaching 1*1, but POV-Ray will always finish with a 1*1. For
+example, if you want a single 8*8 mosaic pass before rendering the final
+image, set <code> Preview_Start_Size=8</code> and <code>
+Preview_End_Size=8</code>.</p>
+<p>
+No file output is performed until the final 1*1 pass is reached. Although
+the preliminary passes render only as many pixels as needed, the 1*1 pass
+re-renders every pixel so that anti-aliasing and file output streams work
+properly. This makes the scene take up to 25% longer than the regular 1*1
+pass to render, so it is suggested that mosaic preview not be used for final
+rendering. Also, the lack of file output until the final pass means that
+renderings which are interrupted before the 1*1 pass can not be resumed
+without starting over from the beginning.</p>
+
+<p class="Note"><strong>Note:</strong> For performance reasons using a <code>Preview_End_Size</code> value thats <em>less than 8</em> is not recommended.  If you don't specify an end preview size the default <code>+ep2</code> will be used.</p></div>
+
+<a name="r3_2_4"></a>
+<div class="content-level-h3" contains="File Output Options" id="r3_2_4">
+<h3>3.2.4 File Output Options</h3>
+
+<table width="100%" class="option-list">
+<tr>
+<td width="30%"><code>Output_to_File=</code>bool</td>
+
+<td width="70%">Sets file output on/off</td>
+</tr>
+
+<tr>
+<td><code>+F</code></td>
+
+<td>Sets file output on (use default type)</td>
+</tr>
+
+<tr>
+<td><code>-F</code></td>
+
+<td>Sets file output off</td>
+</tr>
+</table>
+
+<p>By default, POV-Ray writes an image file to disk. When you are developing
+a scene and doing test renders, the graphic preview may be sufficient. To
+save time and disk activity you may turn file output off with <code>
+Output_to_File=off</code> or <code>-F</code>.</p>
+
+</div>
+<a name="r3_2_4_1"></a>
+<div class="content-level-h4" contains="Output File Type" id="r3_2_4_1">
+<h4>3.2.4.1 Output File Type</h4>
+<table width="100%" class="option-list">
+<tr>
+<td width="30%"><code>Output_File_Type=</code>x</td>
+<td width="70%">Sets file output format to x</td>
+</tr>
+
+<tr>
+<td><code>+F</code>xn</td>
+<td>Sets file output on; sets format x, depth n</td>
+</tr>
+
+<tr>
+<td><code>-F</code>xn</td>
+<td>Sets file output off; but in future use format x, depth n</td>
+</tr>
+
+<tr>
+<td><code>Output_Alpha=</code>bool</td>
+<td>Sets alpha output on/off</td>
+</tr>
+
+<tr>
+<td><code>+UA</code></td>
+<td>Sets alpha output on</td>
+</tr>
+
+<tr>
+<td><code>-UA</code></td>
+<td>Sets alpha output off</td>
+</tr>
+
+<tr>
+<td><code>Bits_Per_Color=</code>n</td>
+<td>Sets file output bits/color to n</td>
+</tr>
+</table>
+
+<p class="Note"><strong>Note:</strong> As of version 3.7 the default output file type for all supported platforms is PNG. You may select one of several different file types by using <code>Output_File_Type=</code><em>x</em> or <code>+F</code><em>x</em> where <em>x</em> is one of the following:</p>
+<table width="100%" class="option-list">
+<tr>
+<td width="30%"><code>.. B</code></td>
+<td width="70%">Universal <strong>B</strong>itmap image file format</td>
+</tr>
+<tr>
+<td width="30%"><code>.. C</code></td>
+<td width="70%"><strong>C</strong>ompressed Targa-24 format (RLE, run length
+encoded)</td>
+</tr>
+
+<tr>
+<td width="30%"><code>.. E</code></td>
+<td width="70%">Open<strong>E</strong>XR High Dynamic-Range format</td>
+</tr>
+
+<tr>
+<td width="30%"><code>.. H</code></td>
+
+<td width="70%">Radiance <strong>H</strong>igh Dynamic-Range format</td>
+</tr>
+
+<tr>
+<td width="30%"><code>.. J</code></td>
+<td width="70%"><strong>J</strong>PEG format (Note: This format is not loss-free and will generate compression artifacts)</td>
+</tr>
+
+<tr>
+<td><code>.. N</code></td>
+<td>P<strong>N</strong>G (portable network graphics) format</td>
+</tr>
+
+<tr>
+<td><code>.. P</code></td>
+<td>Unix <strong>P</strong>PM format</td>
+</tr>
+
+<tr>
+<td><code>.. S</code></td>
+<td><strong>S</strong>ystem-specific format: See the notation at the end of this section.</td>
+</tr>
+
+<tr>
+<td><code>.. T</code></td>
+<td>Uncompressed <strong>T</strong>arga-24 format</td>
+</tr>
+</table>
+<p>
+PNG is an image format designed not only to replace GIF, but to improve on its shortcomings. PNG offers the highest compression available without loss for high quality applications, such as ray-tracing. The system specific format depends on the platform used and is covered in the appropriate system specific documentation.
+</p>
+<p>
+JPEG is particularly good at achieving high compression rates with photographic or photorealistic images, making it one of the most frequently used formats on the Internet. However, it is not loss-free. Images generated with this option will always contain compression artifacts (image defects). If you need to keep a high-quality image you should render using one of the loss-free formats. 
+</p>
+<p class="Note"><strong>Note:</strong> Chroma sub-sampling has been disabled in JPEG output, and there has been a reduction in the default quality setting.</p>
+<p>
+The JPEG compression quality can be controlled using the 'Compression' ini file option which, if set, needs to be an integer between 0 and 100. If values of 0 or 1 are specified then the default compression quality setting of 85% is used. Otherwise the value specified (2-100) is used as the compression quality setting. A value of 2 produces the smallest file (maximum compression), but looks terrible. A value of 100 produces the largest file (least compression) but can still contain some compression artifacts. Values lower than 0 are clipped to 0. Values greater than 100 are clipped to 100.
+</p>
+<p>
+Most of these formats output 24 bits per pixel with 8 bits for each of red,
+green and blue data. PNG and PPM allow you to optionally specify the output bit
+depth from 5 to 16 bits for each of the red, green, and blue colors, giving
+from 15 to 48 bits of color information per pixel. The default output depth
+for all formats is 8 bits/color (16 million possible colors), but this may be
+changed for PNG and PPM format files by setting <code>Bits_Per_Color=</code><em>n</em>
+or by specifying <code>+FN</code><em>n</em> or <code>+FP</code><em>n</em>, 
+where n is the desired bit depth.</p>
+<p>
+Specifying a smaller color depth like 5 bits/color (32768 colors) may be
+enough for people with 8- or 16-bit (256 or 65536 color) displays, and will
+improve compression of the PNG file. Higher bit depths like 10 or 12 may be
+useful for video or publishing applications, and 16 bits/color is good for
+grayscale height field output (See section <a href="r3_4.html#r3_4_5_1_5">Height Field</a> for
+details on height fields).</p>
+<p>
+Targa format also allows 8 bits of alpha transparency data to be output,
+while PNG format allows 5 to 16 bits of alpha transparency data, depending on
+the color bit depth as specified above. You may turn this option on with
+<code> Output_Alpha=on</code> or <code>+UA</code>. The default is off or
+<code> -UA</code>. </p>
+<p>The alpha channel stores a transparency value for each pixel, just like
+there is also stored a value for red green and blue light for each pixel. In
+POV-Ray, when the alpha channel is turned on, all areas of the image
+where the background is partly or fully visible will be partly or fully
+transparent. Refractions of the background will also be transparent, but not
+reflections. Also anti-aliasing is taken into account</p>
+<p>The philosophy of the alpha channel feature in POV-Ray is that the
+background color should not be present in the color of the image when the
+alpha channel is used. Instead, the amount of visible background is kept in
+the alpha and *only* in the alpha channel. That ensures that images look
+correct when viewed with the alpha channel.</p>
+<p>See section <a href="r3_4.html#r3_4_7_6_4">Using the Alpha Channel</a> for
+further details on using transparency in imagemaps in your scene.</p>
+
+<p class="Note"><strong>Note:</strong> In version 3.7 alpha handling for image file output has changed. Effectively, the background <em>now requires</em> a <code>filter</code> or <code>transmit</code> value in order for alpha transparency to work properly.</p>
+
+<p>Previous versions of POV-Ray always wrote associated alpha for output, this has been changed on a per-file-format basis as follows:</p>
+<ul>
+<li> PNG will use straight alpha as per specification.</li>
+<li> OpenEXR and TIFF will use associated alpha as per specifications.</li>
+<li> TGA and BMP 32-bit RGBA will use straight alpha, retaining file input compatibility for now, until a final decision has been made on these formats.</li>
+</ul>
+<p>
+In addition to support for variable bit-depths, alpha channel, and grayscale
+formats, PNG files also store the <code>File_Gamma</code> value so the
+image displays properly on all systems.
+The <code>hf_gray_16</code> global setting, as described in section 
+<a href="r3_4.html#r3_4_1_4">HF_Gray_16</a> will also affect the 
+type of data written to the output file.</p>
+<p>The <a href="http://radsite.lbl.gov/radiance/HOME.html">Radiance</a> Synthetic Imaging System or <em>.hdr</em> image format was originally developed to aid lighting designers and architects by predicting the light levels and appearance of a space prior to construction. <a href="http://www.openexr.com/index.html">OpenEXR</a> or <em>.exr</em> image file format developed by Industrial Light & Magic&trade; for use in computer imaging applications.</p>
+<p>Most image formats now include metadata (BMP is a notable exception). This metadata contains the POV-Ray version, render date/time (GMT), platform (e.g. x86_64-pc-win), and compiler used to build the POV-Ray executable.</p>
+<p class="Note"><strong>Note:</strong> System-specific or  type &quot;s&quot; output file format is being retained for legacy support reasons. Windows and Unix mapping remains the same,  BMP and TGA respectively, however on Macintosh it has been changed to PNG, and a warning is issued when type &quot;s&quot; is used.</p>
+
+</div>
+<a name="r3_2_4_2"></a>
+<div class="content-level-h4" contains="Output File Name" id="r3_2_4_2">
+<h4>3.2.4.2 Output File Name</h4>
+<table width="100%" class="option-list">
+<tr>
+<td width="30%"><code>Output_File_Name=</code>file</td>
+
+<td width="70%">Sets output file to file</td>
+</tr>
+
+<tr>
+<td><code>+O</code>file</td>
+
+<td>Same as <code>Output_File_Name=</code>file</td>
+</tr>
+</table>
+
+<p>The default output filename is created from the scene name and need not be
+specified. The scene name is the input name with all drive, path, and
+extension information stripped. For example if the input file name is <code>
+c:\povray3\mystuff\myfile.pov</code> the scene name is <code> myfile</code>.
+The proper extension is appended to the scene name based on the file type.
+For example <code>myfile.tga</code> or <code> myfile.png</code> might be
+used.</p>
+<p>
+You may override the default output name using <code>
+Output_File_Name=</code><em>file</em> or <code> +O</code><em>file</em>. For
+example:</p>
+<pre>
+Input_File_Name=myinput.pov
+Output_File_Name=myoutput.tga
+</pre>
+
+<p>If an output file name of &quot;-&quot; is specified (a single minus
+sign), then the image will be written to standard output, usually the screen.
+The output can then be piped into another program or to a GUI if desired.</p>
+<p>
+
+If the file specified is actually a path or directory or folder name and not
+a file name, then the default output name is used but it is written to the
+specified directory. For example:</p>
+<pre>
+Input_File_Name=myscene.pov
+Output_File_Name=c:\povray3\myimages\
+</pre>
+
+<p>This will create <code>c:\povray3\myimages\myscene.tga</code> as the
+output file.</p>
+
+</div>
+<a name="r3_2_4_3"></a>
+<div class="content-level-h4" contains="Output File Buffer" id="r3_2_4_3">
+<h4>3.2.4.3 Output File Buffer</h4>
+<p>The output-file buffer options <code>Buffer_Output</code> and <code>Buffer_Size</code> are removed per POV-Ray 3.6</p>
+<p class="Note"><strong>Note:</strong> The options are still accepted, but ignored, in order to be backward compatible with old INI files.</p>
+
+</div>
+<a name="r3_2_4_4"></a>
+<div class="content-level-h4" contains="Output File Dithering" id="r3_2_4_4">
+<h4>3.2.4.4 Output File Dithering</h4>
+<table width="100%" class="option-list">
+<tr>
+<td width="30%"><code>Dither=</code>bool</td>
+<td width="70%">Turns output file dithering on/off</td>
+</tr>
+
+<tr>
+<td width="30%"><code>Dither_Method=</code>xx</td>
+<td width="70%">Selects the output file dithering method, where <em>xx</em> is listed below:</td>
+</tr>
+<tr>
+<td><code>+/-TH</code>xx</td>
+<td>Command line equivalent</td>
+</tr>
+</table>
+
+<ul>
+<li><code>B2</code>..<code>B4</code>: Bayer pattern dithering using 2x2, 3x3 or 4x4 patterns, respectively</li>
+<li><code>D1</code>: Simple 1-dimensional error diffusion dithering</li>
+<li><code>D2</code>: Simple 2-dimensional error diffusion dithering (needs extra memory for 2 pixel rows)</li>
+<li><code>FS</code>: Floyd-Steinberg error diffusion dithering (needs extra memory for 2 pixel rows)</li>
+</ul>
+
+<p>The default is <code>-THfs</code> i.e: dithering is off, with Floyd-Steinberg being the default if only  <code>+TH</code> is specified.</p>
+
+<p>Dithering works for all file formats except JPEG (where dithering would be counter-productive) and OpenEXR (which provides sufficient precision to make dithering obsolete). These file formats simply ignore the setting.</p>
+
+<p class="Note"><strong>Note:</strong> While dithering does help to reduce color banding, it may instead lead to artifacts in prints, due to interference with the printing device's own dithering algorithms; in that case, choosing a different dither method may help.</p>
+
+</div>
+<a name="r3_2_4_5"></a>
+<div class="content-level-h4" contains="Output File Gamma" id="r3_2_4_5">
+<h4>3.2.4.5 Output File Gamma</h4>
+<table width="100%" class="option-list">
+<tr>
+<td width="30%"><code>File_Gamma=</code>x.x</td>
+<td width="70%">Sets output file gamma to n.n</td>
+</tr>
+<tr>
+<td width="30%"><code>File_Gamma=sRGB</code></td>
+<td width="70%">Selects the <em>sRGB transfer function</em> instead of a power-law output file gamma</td>
+</tr>
+</table>
+
+Many file formats traditionally have no clearly specified <em>gamma handling</em> policy, and require images to be <em>gamma pre-corrected</em> for whatever target system they are to be displayed on. For such file formats (currently all except PNG, OpenEXR and Radiance HDR), the <code>File_Gamma</code> setting specifies the target display gamma for which to pre-correct (typically a value in the range from 1.6 to around 2.5, with 2.2 being the most commonly used), and will have an influence on the brightness and saturation of the image when displayed.
+
+Some other file formats do have a clearly specified gamma handling policy, but allow for <em>gamma encoding</em> with an arbitrary gamma value (currently only PNG). For such formats, <code>File_Gamma</code> specifies the <em>decoding gamma</em> or, in other words, the <em>inverse</em> of the <em>encoding gamma</em> to use, and will have no effect on the brightness and saturation of the image when displayed with contemporary software; the setting will however affect the likelihood of banding artifacts.
+
+The parameter has no effect on file formats mandating linear storage of color values (currently OpenEXR and Radiance HDR).
+
+Alternatively to a numeric value, <code>sRGB</code> can be specified, instructing POV-Ray to employ the <em>sRGB transfer function</em>, which is similar but not quite identical to a power-law gamma curve with a gamma of 2.2. <code>sRGB</code> is also the default on all platforms currently supported.
+
+See section <a href="t2_3.html#t2_3_4">Gamma Handling</a> for more information on gamma.
+
+</div>
+<a name="r3_2_4_6"></a>
+<div class="content-level-h4" contains="CPU Utilization Histogram" id="r3_2_4_6">
+<h4>3.2.4.6 CPU Utilization Histogram</h4>
+<p>The CPU Utilization Histogram feature has been removed as of POV-Ray v3.7.</p></div>
+
+<a name="r3_2_5"></a>
+<div class="content-level-h3" contains="Scene Parsing Options" id="r3_2_5">
+<h3>3.2.5 Scene Parsing Options</h3>
+
+<p>POV-Ray reads in your scene file and processes it to create an internal
+model of your scene. The process is called <code>parsing</code>. As your file
+is parsed other files may be read along the way. This section covers options
+concerning what to parse, where to find it and what version specific
+assumptions it should make while parsing it.</p>
+
+</div>
+<a name="r3_2_5_1"></a>
+<div class="content-level-h4" contains="Constant" id="r3_2_5_1">
+<h4>3.2.5.1 Constant</h4>
+<table width="100%" class="option-list">
+<tr>
+<td width="30%"><code>Declare=IDENTIFIER=FLOAT</code></td>
+
+<td width="70%"> Declares an identifier with a float value</td>
+</tr>
+</table>
+
+<p>You can now declare a constant in an INI file, and that
+constant will be available to the scene. Since INI file statements may also be
+laced on the command-line, you can therefore also declare on the command-line
+(though there is no switch for it).</p>
+
+<pre>  Declare=MyValue=24 </pre>
+
+<p>This would be the same as a <code>#declare MyValue=24;</code> in a scene file. The value on the
+right-hand side must be a constant float value.</p>
+
+<p>A possible use could be switching off radiosity or photons from command-line:</p>
+<pre>
+--in INI-file / on command-line
+
+Declare=RAD=0
+
+--in scenefile
+
+global_settings {
+  #if (RAD)
+    radiosity {
+    ...
+    }
+#end
+}
+</pre>
+
+</div>
+<a name="r3_2_5_2"></a>
+<div class="content-level-h4" contains="Input File Name" id="r3_2_5_2">
+<h4>3.2.5.2 Input File Name</h4>
+<table width="100%" class="option-list">
+<tr>
+<td width="30%"><code>Input_File_Name=</code>file</td>
+
+<td width="70%">Sets input file name to file</td>
+</tr>
+
+<tr>
+<td><code>+I</code>file</td>
+
+<td>Same as <code>Input_File_Name=</code>file</td>
+</tr>
+</table>
+<p class="Note"><strong>Note:</strong> There may be no space between <code>+I</code> and <code>file</code>.</p>
+<p>You will probably always set this option but if you do not the default
+input filename is <code>object.pov</code>. If you do not have an extension
+then <code>.pov</code> is assumed. On case-sensitive operating systems both
+<code>.pov</code> and <code>.POV</code> are tried. A full path specification
+may be used (on MS-DOS systems <code> +Ic:\povray3\mystuff\myfile.pov</code>
+is allowed for example). In addition to specifying the input file name this
+also establishes the <em>scene name</em>.</p>
+<p>
+The scene name is the input name with drive, path and extension stripped. In
+the above example the scene name is <code>myfile</code>. This name is used to
+create a default output file name and it is referenced other places.</p>
+<p class="Note"><strong>Note:</strong> As of version 3.5 you can now specify a POV file on the command-line
+without the use of the +i switch (i.e. it works the same way as specifying an INI
+file without a switch), the POV file then should be the last on the command-line.</p>
+<p>
+If you use &quot;-&quot; as the input file name the input will be read from
+standard input. Thus you can pipe a scene created by a program to POV-Ray and
+render it without having a scene file.</p>
+<p>
+Under MS-DOS you can try this feature by typing.</p>
+<pre>
+type ANYSCENE.POV | povray +I-
+</pre>
+</div>
+<a name="r3_2_5_3"></a>
+<div class="content-level-h4" contains="Include File Name" id="r3_2_5_3">
+<h4>3.2.5.3 Include File Name</h4>
+<table width="100%" class="option-list">
+<tr>
+<td width="30%"><code>Include_Header=</code>file</td>
+
+<td width="70%">Sets primary include file name to file</td>
+</tr>
+
+<tr>
+<td><code>+HI</code>file</td>
+
+<td>Same as <code>Include_Header=</code>file</td>
+</tr>
+</table>
+
+<p>This option allows you to include a file as the first include file of a 
+scene file. You can for example use this option to always include a specific
+set of default include files used by all your scenes.</p>
+</div>
+<a name="r3_2_5_4"></a>
+<div class="content-level-h4" contains="Library Paths" id="r3_2_5_4">
+<h4>3.2.5.4 Library Paths</h4>
+<table width="100%" class="option-list">
+<tr>
+<td width="30%"><code>Library_Path=</code>path</td>
+
+<td width="70%">Add path to list of library paths</td>
+</tr>
+
+<tr>
+<td><code>+L</code>path</td>
+
+<td>Same as <code>Library_Path=</code>path</td>
+</tr>
+</table>
+
+<p>POV-Ray looks for files in the current directory. If it does not find a
+file it needs it looks in various other library directories which you
+specify. POV-Ray does not search your operating system path. It only searches
+the current directory and directories which you specify with this option. For
+example the standard include files are usually kept in one special directory.
+You tell POV-Ray to look there with...</p>
+<pre>
+Library_Path=c:\povray3\include
+</pre>
+
+<p>You must not specify any final path separators (&quot;\&quot; or
+&quot;/&quot;) at the end.</p>
+<p>
+Multiple uses of this option switch do not override previous settings. If you specify the exact same path twice it is only counted once. The current directory will be searched first followed by the indicated library directories in the order in which you specified them.</p>
+
+</div>
+<a name="r3_2_5_5"></a>
+<div class="content-level-h4" contains="Language Version" id="r3_2_5_5">
+<h4>3.2.5.5 Language Version</h4>
+<table width="100%" class="option-list">
+<tr>
+<td width="30%"><code>Version=</code>n.n</td>
+
+<td width="70%">Set initial language compatibility to version n.n</td>
+</tr>
+
+<tr>
+<td><code>+MV</code>n.n</td>
+
+<td>Same as <code>Version=</code>n.n</td>
+</tr>
+</table>
+
+<p>As POV-Ray has evolved from version 1.0 through to today we have made every
+effort to maintain some amount of backwards compatibility with earlier
+versions. Some old or obsolete features can be handled directly without any
+special consideration by the user. Some old or obsolete features can no
+longer be handled at all. However <em>some</em> old features can still be
+used if you warn POV-Ray that this is an older scene. In the POV-Ray scene
+language you can use the <code>#version</code> directive to switch version
+compatibility to different settings. See section <a href="r3_3.html#r3_3_2_5">The #version Directive</a>
+for more details about the language version directive.
+Additionally you may use the <code>Version=</code><em>n.n</em> option or the
+<code>+MV</code><em>n.n</em> switch to establish the <em>initial</em>
+setting. For example one feature introduced in 2.0 that was incompatible with
+any 1.0 scene files is the parsing of float expressions. Setting <code>
+Version=1.0</code> or using <code>+MV1.0</code> turns off expression parsing
+as well as many warning messages so that nearly all 1.0 files will still
+work. Naturally the default setting for this option is the current version number.</p>
+
+<p class="Warning">The version directive and command-line setting no longer provide compatibility with most rendering bugs in versions prior to POV-Ray 3.5. However, compatibility with the scene language is provided for scenes as old as POV-Ray 1.0 just as in all previous versions of POV-Ray. Nevertheless, we strongly recommend you update scenes at least to POV-Ray 3.5 syntax if you plan to use them in future versions of POV-Ray.</p></div>
+
+<a name="r3_2_6"></a>
+<div class="content-level-h3" contains="Shell Command Options" id="r3_2_6">
+<h3>3.2.6 Shell Command Options</h3>
+
+<table width="100%" class="option-list">
+<tr>
+<td width="30%"><code>Pre_Scene_Command=</code>s</td>
+
+<td width="70%">Set command before entire scene</td>
+</tr>
+
+<tr>
+<td><code>Pre_Frame_Command=</code>s</td>
+
+<td>Set command before each frame</td>
+</tr>
+
+<tr>
+<td><code>Post_Scene_Command=</code>s</td>
+
+<td>Set command after entire scene</td>
+</tr>
+
+<tr>
+<td><code>Post_Frame_Command=</code>s</td>
+
+<td>Set command after each frame</td>
+</tr>
+
+<tr>
+<td><code>User_Abort_Command=</code>s</td>
+
+<td>Set command when user aborts POV-Ray</td>
+</tr>
+
+<tr>
+<td><code>Fatal_Error_Command=</code>s</td>
+
+<td>Set command when POV-Ray has fatal error</td>
+</tr>
+</table>
+
+<p class="Note"><strong>Note:</strong> No <code>+</code> or <code>-</code> switches are available for
+these options. They cannot be used from the command line. They may only be
+used from INI files.</p>
+<p>
+POV-Ray offers you the opportunity to shell-out to the operating system at
+several key points to execute another program or batch file. Usually this is
+used to manage files created by the internal animation loop however the shell
+commands are available for any scene. The string <em>s</em> is a single line
+of text which is passed to the operating system to execute a program. For
+example</p>
+<pre>
+Post_Scene_Command=tga2gif -d -m myfile
+</pre>
+
+<p>would use the utility <code>tga2gif</code> with the <code>-D</code> and
+<code>-M</code> parameters to convert <code>myfile.tga</code> to <code>
+myfile.gif</code> after the scene had finished rendering.</p>
+
+<p class="Note"><strong>Note:</strong> Individual platforms may provide means of preventing shell-outs
+from occurring. For example, the Windows version provides a menu command to
+turn shell-outs off (which is the default setting for that platform). The
+reason for this (along with file I/O restrictions) is to attempt to prevent
+untrusted INI files from doing harm to your system.</p>
+</div>
+<a name="r3_2_6_1"></a>
+<div class="content-level-h4" contains="String Substitution in Shell Commands" id="r3_2_6_1">
+<h4>3.2.6.1 String Substitution in Shell Commands</h4>
+<p>It could get cumbersome to change the <code>Post_Scene_Command</code>
+every time you changed scene names. POV-Ray can substitute various values
+into a command string for you. For example:</p>
+<pre>
+Post_Scene_Command=tga2gif -d -m %s
+</pre>
+
+<p>POV-Ray will substitute the <code>%s</code> with the scene name in the
+command. The <em>scene name</em> is the <code>Input_File_Name</code> or
+<code>+I</code> setting with any drive, directory and extension removed. For
+example:</p>
+<pre>
+Input_File_Name=c:\povray3\scenes\waycool.pov
+</pre>
+
+<p>is stripped down to the scene name <code>waycool</code> which results
+in...</p>
+<pre>
+Post_Scene_Command=tga2gif -d -m waycool
+</pre>
+
+<p>In an animation it may be necessary to have the exact output file name
+with the frame number included. The string <code>%o</code> will substitute
+the output file name. Suppose you want to save your output files in a zip
+archive using the utility program <code>pkzip</code>. You could do...</p>
+<pre>
+Post_Frame_Command=pkzip -m %s %o
+</pre>
+
+<p>After rendering frame 12 of <code>myscene.pov</code> POV-Ray would shell
+to the operating system with</p>
+<pre>
+pkzip -m myscene mysce012.tga
+</pre>
+
+<p>The <code>-M</code> switch in <code>pkzip</code> moves <code>
+mysce012.tga</code> to <code>myscene.zip</code> and removes it from the
+directory. Note that <code>%o</code> includes frame numbers only when in an
+animation loop. During the <code>Pre_Scene_Command</code> and <code>
+Post_Scene_Command</code> there is no frame number so the original,
+unnumbered <code>Output_File_Name</code> is used. Any <code>
+User_Abort_Command</code> or <code>Fatal_Error_Command</code> not inside the
+loop will similarly give an unnumbered <code>%o</code> substitution.</p>
+<p>
+Here is the complete list of substitutions available for a command
+string.</p>
+
+<table width="100%" class="option-list">
+<tr>
+<td width="30%"><code>%o</code></td>
+
+<td width="70%">Output file name with extension and embedded frame number if any</td>
+</tr>
+
+<tr>
+<td><code>%s</code></td>
+
+<td>Scene name derived by stripping path and ext from input name</td>
+</tr>
+
+<tr>
+<td><code>%n</code></td>
+
+<td>Frame number of this frame</td>
+</tr>
+
+<tr>
+<td><code>%k</code></td>
+
+<td>Clock value of this frame</td>
+</tr>
+
+<tr>
+<td><code>%h</code></td>
+
+<td>Height of image in pixels</td>
+</tr>
+
+<tr>
+<td><code>%w</code></td>
+
+<td>Width of image in pixels</td>
+</tr>
+
+<tr>
+<td><code>%%</code></td>
+
+<td>A single % sign.</td>
+</tr>
+</table>
+
+</div>
+<a name="r3_2_6_2"></a>
+<div class="content-level-h4" contains="Shell Command Sequencing" id="r3_2_6_2">
+<h4>3.2.6.2 Shell Command Sequencing</h4>
+<p>Here is the sequence of events in an animation loop. Non-animated scenes
+work the exact same way except there is no loop.</p>
+<ol>
+<li>Process all INI file keywords and command line switches just once.</li>
+<li>Open any text output streams and do Create_INI if any.</li>
+<li>Execute Pre_Scene_Command if any.</li>
+<li>Loop through frames (or just do once on non-animation).
+<ol type="a">
+<li>Execute Pre_Frame_Command if any.</li>
+<li>Parse entire scene file, open output file and read settings, turn on
+  display, render the frame, destroy all objects, textures etc., close output
+  file, close display.</li>
+<li>Execute Post_Frame_Command if any.</li>
+<li>Repeat above steps until all frames are done.</li>
+</ol></li>
+<li>Execute Post_Scene_Command if any.</li>
+<li>Finish</li>
+</ol>
+
+<p>If the user interrupts processing the <code>User_Abort_Command</code>, if
+any, is executed. User aborts can only occur during the parsing and rendering
+parts of step (4b) above. If a fatal error occurs that POV-Ray notices the
+<code>Fatal_Error_Command</code>, if any, is executed. Sometimes an
+unforeseen bug or memory error could cause a total crash of the program in
+which case there is no chance to shell out. Fatal errors can occur just about
+anywhere including during the processing of switches or INI files. If a fatal
+error occurs before POV-Ray has read the <code> Fatal_Error_Command</code>
+string then obviously no shell can occur.</p>
+<p class="Note"><strong>Note:</strong> The entire scene is re-parsed for every frame. Future versions of
+POV-Ray may allow you to hold over parts of a scene from one frame to the
+next but for now it starts from scratch every time.</p>
+<p class="Note"><strong>Note:</strong> The <code>Pre_Frame_Command</code> occurs before the
+scene is parsed. You might use this to call some custom scene generation utility 
+before each frame. This utility could rewrite your <code> .pov</code>
+or <code>.inc</code> files if needed. Perhaps you will want to generate new
+<code>.gif</code> or <code>.tga</code> files for image maps or height fields on each frame.</p>
+
+</div>
+<a name="r3_2_6_3"></a>
+<div class="content-level-h4" contains="Shell Command Return Actions" id="r3_2_6_3">
+<h4>3.2.6.3 Shell Command Return Actions</h4>
+<table width="100%" class="option-list">
+<tr>
+<td width="30%"><code>Pre_Scene_Return=</code>s</td>
+
+<td width="70%">Set pre scene return actions</td>
+</tr>
+
+<tr>
+<td><code>Pre_Frame_Return=</code>s</td>
+
+<td>Set pre frame return actions</td>
+</tr>
+
+<tr>
+<td><code>Post_Scene_Return=</code>s</td>
+
+<td>Set post scene return actions</td>
+</tr>
+
+<tr>
+<td><code>Post_Frame_Return=</code>s</td>
+
+<td>Set post frame return actions</td>
+</tr>
+
+<tr>
+<td><code>User_Abort_Return=</code>s</td>
+
+<td>Set user abort return actions</td>
+</tr>
+
+<tr>
+<td><code>Fatal_Error_Return=</code>s</td>
+
+<td>Set fatal return actions</td>
+</tr>
+</table>
+
+<p class="Note"><strong>Note:</strong> No <code>+</code> or <code>-</code> switches are available for
+these options. They cannot be used from the command line. They may only be
+used from INI files.</p>
+<p>
+Most operating systems allow application programs to return an error code if
+something goes wrong. When POV-Ray executes a shell command it can make use
+of this error code returned from the shell process and take some appropriate
+action if the code is zero or non-zero. POV-Ray itself returns such codes. It
+returns 0 for success, 1 for fatal error and 2 for user abort.</p>
+<p>
+The actions are designated by a single letter in the different <code>
+..._Return</code>=s options. The possible actions are:</p>
+
+<table width="100%" class="option-list">
+<tr>
+<td width="30%"><code>I</code></td>
+
+<td width="70%">ignore the code</td>
+</tr>
+
+<tr>
+<td><code>S</code></td>
+
+<td>skip one step</td>
+</tr>
+
+<tr>
+<td><code>A</code></td>
+
+<td>all steps skipped</td>
+</tr>
+
+<tr>
+<td><code>Q</code></td>
+
+<td>quit POV-Ray immediately</td>
+</tr>
+
+<tr>
+<td><code>U</code></td>
+
+<td>generate a user abort in POV-Ray</td>
+</tr>
+
+<tr>
+<td><code>F</code></td>
+
+<td>generate a fatal error in POV-Ray</td>
+</tr>
+</table>
+
+<p>For example if your <code>Pre_Frame_Command</code> calls a program which
+generates your height field data and that utility fails then it will return a
+non-zero code. We would probably want POV-Ray to abort as well. The option
+<code>Pre_Frame_Return=F</code> will cause POV-Ray to do a fatal abort if the
+<code>Pre_Frame_Command</code> returns a non-zero code.</p>
+<p>
+Sometimes a non-zero code from the external process is a good thing. Suppose
+you want to test if a frame has already been rendered. You could use the
+<code>S</code> action to skip this frame if the file is already rendered.
+Most utilities report an error if the file is not found. For example the
+command...</p>
+<pre>
+pkzip -V myscene mysce012.tga
+</pre>
+
+<p>tells pkzip you want to view the catalog of <code>myscene.zip</code> for
+the file <code>mysce012.tga</code>. If the file is not in the archive
+<code>pkzip</code> returns a non-zero code.</p>
+<p>
+However we want to skip if the file is found. Therefore we need to reverse
+the action so it skips on zero and does not skip on non-zero. To reverse
+the zero vs. non-zero triggering of an action precede it with a
+&quot;<code>-</code>&quot; sign (note a &quot;<code>!</code>&quot; will also
+work since it is used in many programming languages as a negate
+operator).</p>
+<p>
+<code>Pre_Frame_Return=S</code> will skip if the code shows error
+(non-zero) and will proceed normally on no error (zero). <code>
+Pre_Frame_Return=-S</code> will skip if there is no error (zero) and will
+proceed normally if there is an error (non-zero).</p>
+<p>
+The default for all shells is <code>I</code> which means that the return
+action is ignored no matter what. POV-Ray simply proceeds with whatever it
+was doing before the shell command. The other actions depend upon the
+context. You may want to refer back to the animation loop sequence chart in
+the previous section <a href="r3_2.html#r3_2_6_2">Shell Command Sequencing</a>. The action for
+each shell is as follows.</p>
+
+<p>On return from any <code>User_Abort_Command</code>:</p>
+<p>If there is an action triggered...</p>
+
+<table width="100%" class="option-list">
+<tr>
+<td width="30%"><strong>Specified Action:</strong></td>
+<td width="70%"><strong>Results:</strong></td>
+</tr>
+
+<tr>
+<td><code>F</code></td>
+
+<td>
+<p>Turn this user abort into a fatal error.<br>
+Do the <code>Fatal_Error_Command</code>, if any.<br>
+Exit POV-Ray with error code 1.</p>
+</td>
+</tr>
+
+<tr>
+<td><code>S</code>, <code>A</code>, <code>Q</code>, or <code>U</code></td>
+
+<td>
+<p>Proceed with the user abort.<br>
+Exit POV-Ray with error code 2.</p>
+</td>
+</tr>
+</table>
+
+<p>On return from any <code>Fatal_Error_Command</code>:</p>
+<p>POV-Ray will proceed with the fatal error no matter what. It will exit POV-Ray with error code 1.</p>
+<p>On return from any <code>Pre_Scene_Command</code>, <code>Pre_Frame_Command</code>, <code>Post_Frame_Command</code> or <code>Post_Scene_Commands</code>:</p>
+<p>If there is an action triggered...</p>
+
+<table width="100%" class="option-list">
+<tr>
+<td width="30%"><strong>Specified Action:</strong></td>
+<td width="70%"><strong>Results:</strong></td>
+</tr>
+
+<tr>
+<td><code>F</code></td>
+
+<td>
+<p>Turn this user abort into a fatal error.<br>
+Do the <code>Fatal_Error_Command</code>, if any.<br>
+Exit POV-Ray with error code 1.</p>
+</td>
+</tr>
+
+<tr>
+<td><code>U</code></td>
+
+<td>
+<p>Generate a user abort.<br>
+Do the <code>User_Abort_Command</code>, if any.<br>
+Exit POV-Ray with an error code 2.</p>
+</td>
+</tr>
+
+<tr>
+<td><code>Q</code></td>
+
+<td>
+<p>Quit POV-Ray immediately. Acts as though POV-Ray never really ran.<br>
+Do no further shells, not even a <code>Post_Scene_Command</code>.<br>
+Exit POV-Ray with an error code 0.</p>
+</td>
+</tr>
+</table>
+
+<p>On return from a <code>Pre_Scene_Command</code>:</p>
+<p>If there is an action triggered...</p>
+
+<table width="100%" class="option-list">
+<tr>
+<td width="30%"><strong>Specified Action:</strong></td>
+<td width="70%"><strong>Results:</strong></td>
+</tr>
+
+<tr>
+<td><code>S</code></td>
+
+<td>
+<p>Skip rendering all frames. Acts as though the scene completed all frames normally.<br>
+Do not do any <code>Pre_Frame_Command</code> or <code>Post_Frame_Commands</code>.<br>
+Do the <code>Post_Scene_Command</code>, if any.<br>
+Exit POV-Ray with error code 0.</p>
+<p class="Note"><strong>Note:</strong> See the <a href="r3_2.html#r3_2_6_2">chart</a>, this means skip #4</p>
+</td>
+</tr>
+
+<tr>
+<td><code>A</code></td>
+
+<td>
+<p>Skip all scene activity. Works exactly like <code>Q</code> quit. Acts as though POV-Ray never really ran.</p>
+<p>Do no further shells, not even a <code>Post_Scene_Command</code><br>
+Exit POV-Ray with an error code 0.</p>
+<p class="Note"><strong>Note:</strong> See the <a href="r3_2.html#r3_2_6_2">chart</a>, this means skip #6</p>
+</td>
+</tr>
+</table>
+
+<p>On return from a <code>Pre_Frame_Command</code>:</p>
+<p>If there is an action triggered...</p>
+
+<table width="100%" class="option-list">
+<tr>
+<td width="30%"><strong>Specified Action:</strong></td>
+<td width="70%"><strong>Results:</strong></td>
+</tr>
+
+<tr>
+<td><code>S</code></td>
+
+<td>
+<p>Skip only this frame. Acts as though this frame never existed.<br>
+Do not do the <code>Post_Frame_Command</code>.<br>
+Proceed with the next frame.</p>
+<p class="Note"><strong>Note:</strong> See the <a href="r3_2.html#r3_2_6_2">chart</a>, this means skip #4b, #4c but loop back as needed in #4d</p>
+</td>
+</tr>
+
+<tr>
+<td><code>A</code></td>
+
+<td>
+<p>Skip rendering this frame and all remaining frames. Acts as though the scene completed all frames normally.<br>
+Do not do any further <code>Post_Frame_Commands</code>.<br>
+Do the <code>Post_Scene_Command</code>, if any.<br>
+Exit POV-Ray with error code 0.</p>
+<p class="Note"><strong>Note:</strong> See the <a href="r3_2.html#r3_2_6_2">chart</a>, this means skip the rest of #4 and proceed at #5</p>
+</td>
+</tr>
+</table>
+
+<p>On return from a <code>Post_Frame_Command</code>:</p>
+<p>If there is an action triggered...</p>
+
+<table width="100%" class="option-list">
+<tr>
+<td width="30%"><strong>Specified Action:</strong></td>
+<td width="70%"><strong>Results:</strong></td>
+</tr>
+
+<tr>
+<td><code>S</code> or <code>A</code></td>
+
+<td>
+<p>Skip all remaining frames. Acts as though the scene completed all frames normally.<br>
+Do not do any further <code>Post_Frame_Commands</code>.<br>
+Do the <code>Post_Scene_Command</code>, if any.<br>
+Exit POV-Ray with error code 0.</p>
+<p class="Note"><strong>Note:</strong> See the <a href="r3_2.html#r3_2_6_2">chart</a>, this means skip the rest of #4 and proceed at #5</p>
+</td>
+</tr>
+</table>
+
+<p>On return from any <code>Post_Scene_Command</code>:</p>
+<p>If there is an action triggered and you have specified <code>S</code> or <code>A</code> then no special action occurs. This is the same as <code>I</code> for this shell command.</p></div>
+
+<a name="r3_2_7"></a>
+<div class="content-level-h3" contains="Text Output Options" id="r3_2_7">
+<h3>3.2.7 Text Output Options</h3>
+
+<p>Text output is an important way that POV-Ray keeps you informed about what
+it is going to do, what it is doing and what it did. The
+program splits its text messages into 7 separate streams. Some versions of
+POV-Ray color-codes the various types of text. Some versions allow you to
+scroll back several pages of messages. All versions allow you to turn some of
+these text streams off/on or to direct a copy of the text output to one or
+several files. This section details the options which give you control over
+text output.</p>
+</div>
+<a name="r3_2_7_1"></a>
+<div class="content-level-h4" contains="Text Streams" id="r3_2_7_1">
+<h4>3.2.7.1 Text Streams</h4>
+<p>There are seven distinct text streams that POV-Ray uses for output. On
+some versions each stream is designated by a particular color. Text from
+these streams are displayed whenever it is appropriate so there is often an
+intermixing of the text. The distinction is only important if you choose to
+turn some of the streams off or to direct some of the streams to text files.
+On some systems you may be able to review the streams separately in their own
+scroll-back buffer.</p>
+<p>
+Here is a description of each stream.</p>
+<p>
+<strong> Banner:</strong> This stream displays the program's sign-on
+banner, copyright, contributor's list, and some help screens. It cannot
+be turned off or directed to a file because most of this text is displayed
+before any options or switches are read. Therefore you cannot use an option
+or switch to control it. There are switches which display the help screens.
+They are covered in section <a href="r3_2.html#r3_2_7_5">Help Screen Switches</a>.</p>
+<p>
+<strong> Debug:</strong> This stream displays debugging messages. It was
+primarily designed for developers but this and other streams may also be used
+by the user to display messages from within their scene files. See section
+Text Message Streams for details on this feature. This stream may
+be turned off and/or directed to a text file.</p>
+<p>
+<strong>Fatal:</strong> This stream displays fatal error messages. After
+displaying this text, POV-Ray will terminate. When the error is a scene
+parsing error, you may be shown several lines of scene text that leads up to
+the error. This stream may be turned off and/or directed to a text file.</p>
+<p>
+<strong>Render:</strong> This stream displays information about what options
+you have specified to render the scene. It includes feedback on all of the
+major options such as scene name, resolution, animation settings,
+anti-aliasing and others. This stream may be turned off and/or directed to a
+text file.</p>
+<p>
+<strong> Statistics:</strong> This stream displays statistics after a frame
+is rendered. It includes information about the number of rays traced, the
+length of time of the processing and other information. This stream may be
+turned off and/or directed to a text file.</p>
+<p>
+<strong>Status:</strong> This stream displays one-line status messages that
+explain what POV-Ray is doing at the moment. On some systems this stream is
+displayed on a status line at the bottom of the screen. This stream cannot be
+directed to a file because there is generally no need to. The text displayed
+by the <code> Verbose</code> option or <code>+V</code> switch is output to
+this stream so that part of the status stream may be turned off.</p>
+<p>
+<strong> Warning:</strong> This stream displays warning messages during the
+parsing of scene files and other warnings. Despite the warning, POV-Ray can
+continue to render the scene. You will be informed if POV-Ray has made any
+assumptions about your scene so that it can proceed. In general any time you
+see a warning, you should also assume that this means that future versions of
+POV-Ray will not allow the warned action. Therefore you should attempt to
+eliminate warning messages so your scene will be able to run in future
+versions of POV-Ray. This stream may be turned off and/or directed to a text
+file.</p>
+
+</div>
+<a name="r3_2_7_2"></a>
+<div class="content-level-h4" contains="Console Text Output" id="r3_2_7_2">
+<h4>3.2.7.2 Console Text Output</h4>
+<table width="100%" class="option-list">
+<tr>
+<td width="30%"><code>Debug_Console=</code>bool</td>
+
+<td width="70%">Turn console display of debug info text on/off</td>
+</tr>
+
+<tr>
+<td><code>+GD</code></td>
+
+<td>Same as <code>Debug_Console=On</code></td>
+</tr>
+
+<tr>
+<td><code>-GD</code></td>
+
+<td>Same as <code>Debug_Console=Off</code></td>
+</tr>
+
+<tr>
+<td><code>Fatal_Console=</code>bool</td>
+
+<td>Turn console display of fatal error text on/off</td>
+</tr>
+
+<tr>
+<td><code>+GF</code></td>
+
+<td>Same as <code>Fatal_Console=On</code></td>
+</tr>
+
+<tr>
+<td><code>-GF</code></td>
+
+<td>Same as <code>Fatal_Console=Off</code></td>
+</tr>
+
+<tr>
+<td><code>Render_Console=</code>bool</td>
+
+<td>Turn console display of render info text on/off</td>
+</tr>
+
+<tr>
+<td><code>+GR</code></td>
+
+<td>Same as <code>Render_Console=On</code></td>
+</tr>
+
+<tr>
+<td><code>-GR</code></td>
+
+<td>Same as <code>Render_Console=Off</code></td>
+</tr>
+
+<tr>
+<td><code>Statistic_Console=</code>bool</td>
+
+<td>Turn console display of statistic text on/off</td>
+</tr>
+
+<tr>
+<td><code>+GS</code></td>
+
+<td>Same as <code>Statistic_Console=On</code></td>
+</tr>
+
+<tr>
+<td><code>-GS</code></td>
+
+<td>Same as <code>Statistic_Console=Off</code></td>
+</tr>
+
+<tr>
+<td><code>Warning_Console=</code>bool</td>
+
+<td>Turn console display of warning text on/off</td>
+</tr>
+
+<tr>
+<td><code>+GW</code></td>
+
+<td>Same as <code>Warning_Console=On</code></td>
+</tr>
+
+<tr>
+<td><code>-GW</code></td>
+
+<td>Same as <code>Warning_Console=Off</code></td>
+</tr>
+
+<tr>
+<td><code>All_Console=</code>bool</td>
+
+<td>Turn on/off all debug, fatal, render, statistic and warning text to
+console.</td>
+</tr>
+
+<tr>
+<td><code>+GA</code></td>
+
+<td>Same as <code>All_Console=On</code></td>
+</tr>
+
+<tr>
+<td><code>-GA</code></td>
+
+<td>Same as <code>All_Console=Off</code></td>
+</tr>
+</table>
+
+<p>You may suppress the output to the console of the debug, fatal, render,
+statistic or warning text streams. For example the <code>
+Statistic_Console=off</code> option or the <code>-GS</code> switch can turn
+off the statistic stream. Using <code>on</code> or <code>+GS</code> you may
+turn it on again. You may also turn all five of these streams on or off at
+once using the <code>All_Console</code> option or <code>+GA</code>
+switch.</p>
+<p class="Note"><strong>Note:</strong> These options only take effect after the INI file has been read. An error in the INI file causes other options <em>not</em> to take effect because reading of the INI file is aborted prematurely.</p>
+
+</div>
+<a name="r3_2_7_3"></a>
+<div class="content-level-h4" contains="Directing Text Streams to Files" id="r3_2_7_3">
+<h4>3.2.7.3 Directing Text Streams to Files</h4>
+<table width="100%" class="option-list">
+<tr>
+<td width="30%"><code>Debug_File=true</code></td>
+
+<td width="70%">Echo debug info text to DEBUG.OUT</td>
+</tr>
+
+<tr>
+<td><code>Debug_File=false</code></td>
+
+<td>Turn off file output of debug info</td>
+</tr>
+
+<tr>
+<td><code>Debug_File=file</code></td>
+
+<td>Echo debug info text to file</td>
+</tr>
+
+<tr>
+<td><code>+GDfile</code></td>
+
+<td>Both <code>Debug_Console=On, Debug_File=file</code></td>
+</tr>
+
+<tr>
+<td><code>-GDfile</code></td>
+
+<td>Both <code>Debug_Console=Off, Debug_File=file</code></td>
+</tr>
+
+<tr>
+<td><code>Fatal_File=true</code></td>
+
+<td>Echo fatal text to FATAL.OUT</td>
+</tr>
+
+<tr>
+<td><code>Fatal_File=false</code></td>
+
+<td>Turn off file output of fatal</td>
+</tr>
+
+<tr>
+<td><code>Fatal_File=file</code></td>
+
+<td>Echo fatal info text to file</td>
+</tr>
+
+<tr>
+<td><code>+GFfile</code></td>
+
+<td>Both <code>Fatal_Console=On, Fatal_File=file</code></td>
+</tr>
+
+<tr>
+<td><code>-GFfile</code></td>
+
+<td>Both <code>Fatal_Console=Off, Fatal_File=file</code></td>
+</tr>
+
+<tr>
+<td><code>Render_File=true</code></td>
+
+<td>Echo render info text to RENDER.OUT</td>
+</tr>
+
+<tr>
+<td><code>Render_File=false</code></td>
+
+<td>Turn off file output of render info</td>
+</tr>
+
+<tr>
+<td><code>Render_File=file</code></td>
+
+<td>Echo render info text to file</td>
+</tr>
+
+<tr>
+<td><code>+GRfile</code></td>
+
+<td>Both <code>Render_Console=On, Render_File=file</code></td>
+</tr>
+
+<tr>
+<td><code>-GRfile</code></td>
+
+<td>Both <code>Render_Console=Off, Render_File=file</code></td>
+</tr>
+
+<tr>
+<td><code>Statistic_File=true</code></td>
+
+<td>Echo statistic text to STATS.OUT</td>
+</tr>
+
+<tr>
+<td><code>Statistic_File=false</code></td>
+
+<td>Turn off file output of statistics</td>
+</tr>
+
+<tr>
+<td><code>Statistic_File=file</code></td>
+
+<td>Echo statistic text to file</td>
+</tr>
+
+<tr>
+<td><code>+GSfile</code></td>
+
+<td>Both <code>Statistic_Console=On, Statistic_File=file</code></td>
+</tr>
+
+<tr>
+<td><code>-GSfile</code></td>
+
+<td>Both <code>Statistic_Console=Off, Statistic_File=file</code></td>
+</tr>
+
+<tr>
+<td><code>Warning_File=true</code></td>
+
+<td>Echo warning info text to WARNING.OUT</td>
+</tr>
+
+<tr>
+<td><code>Warning_File=false</code></td>
+
+<td>Turn off file output of warning info</td>
+</tr>
+
+<tr>
+<td><code>Warning_File=file</code></td>
+
+<td>Echo warning info text to file</td>
+</tr>
+
+<tr>
+<td><code>+GWfile</code></td>
+
+<td>Both <code>Warning_Console=On, Warning_File=file</code></td>
+</tr>
+
+<tr>
+<td><code>-GWfile</code></td>
+
+<td>Both <code>Warning_Console=Off, Warning_File=file</code></td>
+</tr>
+
+<tr>
+<td><code>All_File=true</code></td>
+
+<td>Echo all debug, fatal, render, statistic, and warning text to
+ALLTEXT.OUT</td>
+</tr>
+
+<tr>
+<td><code>All_File=false</code></td>
+
+<td>Turn off file output of all debug, fatal, render, statistic, and
+warning text.</td>
+</tr>
+
+<tr>
+<td><code>All_File=file</code></td>
+
+<td>Echo all debug, fatal, render, statistic, and warning text to file</td>
+</tr>
+
+<tr>
+<td><code>+GAfile</code></td>
+
+<td>Both <code>All_Console=On, All_File=file</code></td>
+</tr>
+
+<tr>
+<td><code>-GAfile</code></td>
+
+<td>Both <code>All_Console=Off, All_File=file</code></td>
+</tr>
+
+<tr>
+<td><code>Append_File=true</code></td>
+<td>Enable appending to any files that the above streams are being directed to.</td>
+</tr>
+
+<tr>
+<td><code>Append_File=false</code></td>
+<td>Turn off appending to streams.</td>
+</tr>
+
+<tr>
+<td><code>+GP</code></td>
+<td>Same as <code>Append_File=true</code></td>
+</tr>
+
+<tr>
+<td><code>-GP</code></td>
+<td>Same as <code>Append_File=false</code></td>
+</tr>
+</table>
+
+<p>You may direct a copy of the text streams to a text file for the debug,
+fatal, render, statistic, or warning text streams. For example the <code>
+Statistic_File</code>=<em>s</em> option or the <code>+GS</code><em>s</em>
+switch. If the string <em>s</em> is <code>true</code> or any of the other
+valid <code>true</code> strings then that stream is redirected to a file with
+a default name. Valid <code>true</code> values are <code>true</code>, <code>
+yes</code>, <code>on</code> or <code>1</code>. If the value is <code>
+false</code> the direction to a text file is turned off. Valid <code>
+false</code> values are <code>false</code>, <code>no</code>, <code>
+off</code> or <code>0</code>. Any other string specified turns on file output
+and the string is interpreted as the output file name.</p>
+<p>
+Similarly you may specify such a true, false or file name string after a
+switch such as <code> +GS</code><em>file</em>. You may also direct all five
+streams to the same file using the <code>All_File</code> option or <code>
++GA</code> switch. You may not specify the same file for two or more streams
+because POV-Ray will fail when it tries to open or close the same file
+twice.</p>
+
+<p>
+The <code>Append_File</code> option controls whether files to which streams are
+being directed are overwritten or appended to. If <code>Append_File</code> is true,
+then the files are appended to, otherwise the default action is to overwrite the
+files, thus erasing their previous content. The only exception to this is for the
+second and later frames of an animation. Animations act as if <code>Append_File=true</code>
+was specified if the frame is not the first one; for the first frame, the actual value of
+<code>Append_File</code> is used.
+</p>
+
+<p>
+In either case, if a stream output file other than <code>#debug</code> is being appended
+to, a header will be written to make it clear where within the file the new render is
+starting. To achieve the same with <code>#debug</code>, you should add the appropriate
+header manually to your scene file.
+</p>
+
+<p class="Note"><strong>Note:</strong> These options only take effect after the INI file has been read. An error in the INI file causes other options <em>not</em> to take effect because reading of the INI file is aborted prematurely. Additionally, specifying <code>Append_File=false</code> is only useful if it was previously turned
+on in another INI file, as the <code>Append_File</code> setting is not applied until
+the streams are opened on render startup (i.e. after all INI files and command-line
+options have been parsed). Using the command-line to turn <code>Append_File</code> on,
+then redirecting a stream to a file, and finally turning append off will not do
+anything useful</p>
+
+</div>
+<a name="r3_2_7_4"></a>
+<div class="content-level-h4" contains="Warning Level" id="r3_2_7_4">
+<h4>3.2.7.4 Warning Level</h4>
+<table width="100%" class="option-list">
+<tr>
+<td width="30%"><code>Warning_Level=n</code></td>
+
+<td width="70%">Allows you to turn off classes of warnings.</td>
+</tr>
+
+<tr>
+<td><code>+WLn</code></td>
+
+<td>Same as <code>Warning_Level=n</code></td>
+</tr>
+</table>
+
+<p>Level 0 turns off all warnings. Level 5 turns off all language version 
+related warnings. The default is level 10 and it enables all warnings. All 
+other levels are reserved and should not be specified.</p>
+
+</div>
+<a name="r3_2_7_5"></a>
+<div class="content-level-h4" contains="Help Screen Switches" id="r3_2_7_5">
+<h4>3.2.7.5 Help Screen Switches</h4>
+<table width="100%" class="option-list">
+<tr>
+<td width="30%"><code>-?</code></td>
+
+<td width="70%">Show help screen 0 if this is the only switch</td>
+</tr>
+</table>
+
+<p class="Note"><strong>Note:</strong> There are no INI style equivalents to these options.</p>
+<p>
+After displaying the help screens, POV-Ray terminates. Because
+some operating systems do not permit a question mark as a command line switch
+you may also use the <code>+H</code> switch.</p>
+<p class="Note"><strong>Note:</strong> This switch is also used to specify the height of the image in pixels. Therefore the <code>
++H</code> switch is only interpreted as a help switch if it is the only switch on the command line.</p>
+<p> Graphical interface versions of POV-Ray
+such as Mac or Windows have extensive online help.</p></div>
+
+<a name="r3_2_8"></a>
+<div class="content-level-h3" contains="Tracing Options" id="r3_2_8">
+<h3>3.2.8 Tracing Options</h3>
+
+<p>There is more than one way to trace a ray. Sometimes there is a trade-off
+between quality and speed. Sometimes options designed to make tracing faster
+can slow things down. This section covers options that tell POV-Ray how to
+trace rays with the appropriate speed and quality settings.</p>
+
+</div>
+<a name="r3_2_8_1"></a>
+<div class="content-level-h4" contains="Symmetric MultiProcessing" id="r3_2_8_1">
+<h4>3.2.8.1 Symmetric MultiProcessing</h4>
+<p>Central to the many feature enhancements offered with version 3.7, POV-Ray now supports Symmetric MultiProcessing or SMP. The command line option <code>Work_Threads=</code><em>n</em> or the <code>+WT</code><em>n</em> switch allows you to specify the number of <em>work threads</em> to be used while rendering a scene. On Windows systems, the default is the number of detected cores. On Linux/Unix and OSX based systems, the default is first based on the number of detected cores, otherwise, the number of configured cores. If detection is not possible the default is set to 4. In <em>all</em> cases the maximum value is 512.</p>
+
+</div>
+<a name="r3_2_8_2"></a>
+<div class="content-level-h4" contains="Render Block Size" id="r3_2_8_2">
+<h4>3.2.8.2 Render Block Size</h4>
+<p>POV-Ray provides a mechanism to specify the render block size via either an INI-style option <code>Render_Block_Size=n</code> or on the command-line <code>+BS</code><em>n</em>, where <em>n</em> is an integer larger than or equal to 4. This represents the edge size of the square used to distribute work to the render threads, and thus the number of pixels in each block will be n squared. The default value is 32. If you specify a value that is greater than the larger of the width or height of the image being rendered, it is clipped to that value. Using render block sizes of less than eight can impact performance, particularly on large images that render quickly, as it significantly increases the amount of message traffic between the render back-end and the graphical front-end, which communicate using a shared-memory queue.</p>
+
+</div>
+<a name="r3_2_8_2_1"></a>
+<div class="content-level-h5" contains="Render Pattern" id="r3_2_8_2_1">
+<h5>3.2.8.2.1 Render Pattern</h5>
+<p>POV-Ray provides a mechanism to specify the order of render block via either an INI-style option <code>Render_Pattern</code>=<em>n</em> or on the command-line <code>+RP</code><em>n</em>, where <em>n</em> is an integer between 0 and 5. This represents the various orders for the distribution of the blocks to the render threads. The default value is 0.</p>
+
+<p>If you specify a value that is greater than the maximum number of patterns, it will revert to the default. Using a different <code>Render_Pattern</code> has only an effect on the preview of the rendered image, as the first blocks might be placed differently, but does not change the final image once the render has been completed.</p>
+
+<table class="centered" width="660px" cellpadding="0" cellspacing="10">
+<tr>
+  <td>
+    <img class="left" width="320px" src="images/1/14/RefImgRenderPatternRo0.png">
+  </td>
+  <td>
+    <p><em>Pattern 0:</em> is the classical order. The first block is in the top left corner, and it progress from left to right, and then it continues on the next row of blocks. Just like reading text.</p>
+  </td>
+</tr>
+<tr>
+  <td>
+    <p class="caption">Pattern 0</p>
+  </td>
+  <td></td>
+</tr>
+</table>
+
+<table class="centered" width="660px" cellpadding="0" cellspacing="10">
+<tr>
+  <td>
+    <p><em>Pattern 1:</em> is the same as pattern 0, but the rows and columns are swapped. It starts at the top left corner and it progress from top to bottom.</p> 
+  </td>
+    <td>
+      <img class="right" width="320px" src="images/5/52/RefImgRenderPatternRo1.png">
+  </td>
+</tr>
+<tr>
+  <td></td>
+  <td>
+    <p class="caption">Pattern 1</p>
+  </td>
+</tr>
+</table>
+
+<table class="centered" width="660px" cellpadding="0" cellspacing="10">
+<tr>
+  <td>
+    <img class="left" width="320px" src="images/e/e1/RefImgRenderPatternRo2.png">
+  </td>
+  <td>
+    <p><em>Pattern 2:</em> The top row is processed first, starting at each corner and meeting at the center of the row, then the bottom row is processed the same way. The last block is at the very center of the image.</p>
+  </td>
+</tr>
+<tr>
+  <td>
+    <p class="caption">Pattern 2</p>
+  </td>
+  <td></td>
+</tr>
+</table>
+
+<table class="centered" width="660px" cellpadding="0" cellspacing="10">
+<tr>
+  <td>
+    <p><em>Pattern 3:</em> Is the opposite order of pattern 2, the first block is at the center of the image, the expansion being firstly horizontal.</p> 
+  </td>
+    <td>
+      <img class="right" width="320px" src="images/1/18/RefImgRenderPatternRo3.png">
+  </td>
+</tr>
+<tr>
+  <td></td>
+  <td>
+    <p class="caption">Pattern 3</p>
+  </td>
+</tr>
+</table>
+
+<table class="centered" width="660px" cellpadding="0" cellspacing="10">
+<tr>
+  <td>
+    <img class="left" width="320px" src="images/e/e3/RefImgRenderPatternRo4.png">
+  </td>
+  <td>
+    <p><em>Pattern 4:</em> Is the same as pattern 2, except that the rows and columns have been swapped.</p>
+  </td>
+</tr>
+<tr>
+  <td>
+    <p class="caption">Pattern 4</p>
+  </td>
+  <td></td>
+</tr>
+</table>
+
+<table class="centered" width="660px" cellpadding="0" cellspacing="10">
+<tr>
+  <td>
+    <p><em>Pattern 5:</em> Is the same as pattern 3, but the rows and columns are swapped, however the expansion from the center of the image is firstly vertical.</p>
+  </td>
+    <td>
+      <img class="right" width="320px" src="images/1/19/RefImgRenderPatternRo5.png">
+  </td>
+</tr>
+<tr>
+  <td></td>
+  <td>
+    <p class="caption">Pattern 5</p>
+  </td>
+</tr>
+</table>
+
+</div>
+<a name="r3_2_8_2_2"></a>
+<div class="content-level-h5" contains="Render Block Step" id="r3_2_8_2_2">
+<h5>3.2.8.2.2 Render Block Step</h5>
+<p>Whatever the chosen pattern (with <code>+RP</code>), the number of the next processed block can be incremented by more than 1, to jump over blocks, via either an INI-style option <code>Render_Block_Step</code>=<em>n</em> or on the command-line <code>+RS</code><em>n</em>, where <em>n</em> is a positive non zero integer. The provided value of <em>n</em> gets reduced automatically to a smaller value if the provided value would lead to a situation where the some blocks would not get rendered.</p>
+
+<p>Assuming an image made of 40 blocks, with <code>+RS9</code>, the order of block numbers would be:</p>
+<p>0, 9, 18, 27, 36, 5, 14, 23, 32, 1, 10, 19, 28, 37, 6, 15, 24, 33, 2, 11, 20, 29, 38, 7, 16, 25, 34, 3, 12, 21, 30, 39, 8, 17, 26, 35, 4, 13, 22, 31.</p>
+<p>The same 40 blocks with <code>+RS8</code> would in fact use <code>+RS7</code> instead. As would a <code>+RS2</code> in fact be reduced to <code>+RS1</code> the <em>default</em>.</p>
+
+</div>
+<a name="r3_2_8_3"></a>
+<div class="content-level-h4" contains="Quality Settings" id="r3_2_8_3">
+<h4>3.2.8.3 Quality Settings</h4>
+<table width="100%" class="option-list">
+<tr>
+<td width="30%"><code>Quality=</code>n</td>
+
+<td width="70%">Set quality value to n (0 &lt;= n &lt;= 11)</td>
+</tr>
+
+<tr>
+<td><code>+Q</code>n</td>
+
+<td>Same as <code>Quality=</code>n</td>
+</tr>
+</table>
+
+<p>The <code>Quality=</code><em>n</em> option or <code>+Q</code><em>n</em>
+switch allows you to specify the image rendering quality. You may choose to
+lower the quality for test rendering and raise it for final renders. The
+quality adjustments are made by eliminating some of the calculations that are
+normally performed. For example settings below 4 do not render shadows.
+Settings below 8 do not use reflection or refraction. The duplicate values
+allow for future expansion. The values correspond to the following quality
+levels:</p>
+
+<table width="100%" class="option-list">
+<tr>
+<td width="30%"><code>0, 1</code></td>
+
+<td width="70%">Just show quick colors. Use full ambient lighting only. Quick colors
+are used only at 5 or below.</td>
+</tr>
+
+<tr>
+<td><code>2, 3</code></td>
+
+<td>Show specified diffuse and ambient light.</td>
+</tr>
+
+<tr>
+<td><code>4</code></td>
+
+<td>Render shadows, but no extended lights.</td>
+</tr>
+
+<tr>
+<td><code>5</code></td>
+
+<td>Render shadows, including extended lights.</td>
+</tr>
+
+<tr>
+<td><code>6, 7</code></td>
+
+<td>Compute texture patterns, compute photons</td>
+</tr>
+
+<tr>
+<td><code>8</code></td>
+
+<td>Compute reflected, refracted, and transmitted rays.</td>
+</tr>
+
+<tr>
+<td><code>9, 10, 11</code></td>
+
+<td>Compute media, radiosity and subsurface light transport.</td>
+</tr>
+</table>
+
+<p>The default is 9 if not specified.</p>
+
+</div>
+<a name="r3_2_8_4"></a>
+<div class="content-level-h4" contains="Automatic Bounding Control" id="r3_2_8_4">
+<h4>3.2.8.4 Automatic Bounding Control</h4>
+<table width="100%" class="option-list">
+<tr>
+<td width="30%"><code>Bounding=</code>bool</td>
+
+<td width="70%">Turn bounding on/off</td>
+</tr>
+
+<tr>
+<td><code>+MB</code></td>
+
+<td>Turn bounding on; Set threshold to 25 or previous amount</td>
+</tr>
+
+<tr>
+<td><code>-MB</code></td>
+
+<td>Turn bounding off</td>
+</tr>
+
+<tr>
+<td><code>Bounding_Threshold=</code>n</td>
+
+<td>Set bound threshold to n</td>
+</tr>
+
+<tr>
+<td><code>+MB</code>n</td>
+
+<td>Turn bounding on; bound threshold to n</td>
+</tr>
+
+<tr>
+<td><code>-MB</code>n</td>
+
+<td>Turn bounding off; set future threshold to n</td>
+</tr>
+
+<tr>
+<td><code>Light_Buffer=</code>bool</td>
+
+<td>Turn light buffer on/off</td>
+</tr>
+
+<tr>
+<td><code>+UL</code></td>
+
+<td>Turn light buffer on</td>
+</tr>
+
+<tr>
+<td><code>-UL</code></td>
+
+<td>Turn light buffer off</td>
+</tr>
+
+<tr>
+<td><code>Vista_Buffer=</code>bool</td>
+
+<td>Turn vista buffer on/off</td>
+</tr>
+
+<tr>
+<td><code>+UV</code></td>
+
+<td>Turn vista buffer on</td>
+</tr>
+
+<tr>
+<td><code>-UV</code></td>
+
+<td>Turn vista buffer off</td>
+</tr>
+</table>
+
+<p>POV-Ray uses a variety of spatial sub-division systems to speed up
+ray-object intersection tests. The primary system uses a hierarchy of nested
+bounding boxes. This system compartmentalizes all finite objects in a scene
+into invisible rectangular boxes that are arranged in a tree-like hierarchy.
+Before testing the objects within the bounding boxes the tree is descended
+and only those objects are tested whose bounds are hit by a ray. This can
+greatly improve rendering speed. However for scenes with only a few objects
+the overhead of using a bounding system is not worth the effort. The <code>
+Bounding=off</code> option or <code>-MB</code> switch allows you to force
+bounding off. The default value is on.</p>
+<p>
+The <code> Bounding_Threshold=</code><em>n</em> or <code>
++MB</code><em>n</em> switch allows you to set the minimum number of objects
+necessary before bounding is used. The default is <code>+MB25</code> which
+means that if your scene has fewer than 25 objects POV-Ray will automatically
+turn bounding off because the overhead is not worth it. Generally it is
+a good idea to use a much lower threshold like <code>+MB5</code>.</p>
+<p>
+In general, any finite object and many types of CSG of finite objects will
+properly respond to this bounding system. In addition blobs and meshes use an
+additional internal bounding system. These systems are not affected by the
+above switch. They can be switched off using the appropriate syntax in the
+scene file (see <a href="r3_4.html#r3_4_5_1_1">Blob</a> and <a href="r3_4.html#r3_4_5_2_3">Mesh</a> for details).</p>
+<p>
+Text objects are split into individual letters that are bounded using the
+bounding box hierarchy. Some CSG combinations of finite and infinite objects
+are also automatically bound. The end result is that you will rarely need to
+add manual bounding objects as was necessary in earlier versions of POV-Ray
+unless you use many infinite objects.</p>
+<p class="Note"><strong>Note:</strong>
+As of version 3.7 the <code>Vista_Buffer</code> and <code>Light_Buffer</code> options have been deprecated.</p>
+</div>
+<a name="r3_2_8_5"></a>
+<div class="content-level-h4" contains="Removing User Bounding" id="r3_2_8_5">
+<h4>3.2.8.5 Removing User Bounding</h4>
+<table width="100%" class="option-list">
+<tr>
+<td width="30%"><code>Remove_Bounds=</code>bool</td>
+
+<td width="70%">Turn unnecessary bounds removal on/off</td>
+</tr>
+
+<tr>
+<td><code>+UR</code></td>
+
+<td>Turn unnecessary bounds removal on</td>
+</tr>
+
+<tr>
+<td><code>-UR</code></td>
+
+<td>Turn unnecessary bounds removal off</td>
+</tr>
+
+<tr>
+<td><code>Split_Unions=</code>bool</td>
+
+<td>Turn split bounded unions on/off</td>
+</tr>
+
+<tr>
+<td><code>+SU</code></td>
+
+<td>Turn split bounded unions on</td>
+</tr>
+
+<tr>
+<td><code>-SU</code></td>
+
+<td>Turn split bounded unions off</td>
+</tr>
+</table>
+
+<p>Early versions of POV-Ray had no system of automatic bounding or spatial
+sub-division to speed up ray-object intersection tests. Users had to manually
+create bounding boxes to speed up the rendering. Since version 3.0, POV-Ray
+has had more sophisticated automatic bounding than any previous version. In
+many cases the manual bounding on older scenes is slower than the new
+automatic systems. Therefore POV-Ray removes manual bounding when it knows it
+will help. In rare instances you may want to keep manual bounding. Some older
+scenes incorrectly used bounding when they should have used clipping. If
+POV-Ray removes the bounds in these scenes the image will not look right. To
+turn off the automatic removal of manual bounds you should specify <code>
+Remove_Bounds=off</code> or use <code> -UR</code>. The default is <code>
+Remove_Bounds=on</code>.</p>
+<p>
+One area where the jury is still out is the splitting of manually bounded
+unions. Unbounded unions are always split into their component parts so that
+automatic bounding works better. Most users do not bound unions because they
+know that doing so is usually slower. If you do manually bound a union we
+presume you really want it bound. For safety sake we do not presume to remove
+such bounds. If you want to remove manual bounds from unions you should
+specify <code>Split_Unions=on</code> or use <code> +SU</code>. The default is
+<code>Split_Unions=off</code>.</p>
+
+</div>
+<a name="r3_2_8_6"></a>
+<div class="content-level-h4" contains="BSP Bounding" id="r3_2_8_6">
+<h4>3.2.8.6 BSP Bounding</h4>
+<p>BSP (Binary Space Partitioning) tree bounding is now available. To turn it on use <code>+BM2</code> or <code>Bounding_Method=2</code> in the INI file or on the command-line. When it is in use you will get some additional statistics in the output pane regarding the built tree.</p>
+<p>Please keep in mind that this implementation of BSP is highly beta and will not speed up scenes in many cases (and in fact may slow some down). In particular the building of the tree can take a long time and lots of memory in severe cases. Using the BSP tree rather than our traditional BVH (Bounding Volume Hierarchy) system (default or <code>+BM1</code>) is a choice best made for specific scenes that will benefit from the way the BSP operates, and in particular if the render is long enough to offset the build time. The BSP tree build time will be constant for a given scene and set of BSP parameters, regardless of the output resolution. A 30-second BSP build may not be a good choice on a 60-second test render but may be acceptable for a 60-minute final render if the use of BSP adds a few pixels per second.</p>
+<p>On some scenes the difference however will be dramatic, with short build times and radically increased render speed.</p>
+<p>We have provided some BSP-related options via the INI file and encourage you to experiment with them to see if you can get better results than the default values built in to POV-Ray. We will listen to feedback from this and if necessary tweak the defaults.</p>
+<p class="Note"><strong>Note:</strong> We do not guarantee that all of the following INI file settings will remain in the final release of 3.7</p>
+<pre>
+  BSP_MaxDepth=128
+  BSP_BaseAccessCost=1.0
+  BSP_ChildAccessCost=1.5
+  BSP_IsectCost=150.0
+  BSP_MissChance=0.2
+</pre>
+<p>The values shown above are the default. You can also get the defaults if you use a value of 0 for any of the above, or of course just by not specifying the option at all. For an explanation of what the values mean you may refer to Ray Tracing News <a href="http://tog.acm.org/resources/RTNews/html/rtnv17n1.html#art8">article</a> by Eric Haines.</p>
+<p>See the distribution file <code>~scenes/bsp/Tango.pov</code> for a good example of a scene that benefits from the BSP bounding.</p>
+<p>Tango.pov rendered at 800x600, no AA</p>
+<ul>
+<li>With +BM1 : 70 seconds total</li>
+<li>With +BM2 : 48 seconds total</li>
+</ul>
+
+</div>
+<a name="r3_2_8_7"></a>
+<div class="content-level-h4" contains="Anti-Aliasing Options" id="r3_2_8_7">
+<h4>3.2.8.7 Anti-Aliasing Options</h4>
+<table width="100%" class="option-list">
+<tr>
+<td width="30%"><code>Antialias=</code>bool</td>
+<td width="70%">Turns anti-aliasing on/off</td>
+</tr>
+
+<tr>
+<td><code>+A</code></td>
+<td>Turns aa on with threshold 0.3 or previous amount</td>
+</tr>
+
+<tr>
+<td><code>-A</code></td>
+<td>Turns anti-aliasing off</td>
+</tr>
+
+<tr>
+<td><code>Sampling_Method=</code>n</td>
+<td>Sets aa-sampling method (only <code>1</code> or <code>2</code> are
+valid)</td>
+</tr>
+
+<tr>
+<td><code>+AM</code>n</td>
+<td>Same as <code>Sampling_Method=</code>n</td>
+</tr>
+
+<tr>
+<td><code>Antialias_Threshold=</code>n.n</td>
+<td>Sets anti-aliasing threshold</td>
+</tr>
+
+<tr>
+<td><code>+A</code>n.n</td>
+<td>Sets aa on with aa-threshold at n.n</td>
+</tr>
+
+<tr>
+<td><code>-A</code>n.n</td>
+<td>Sets aa off (aa-threshold n.n in future)</td>
+</tr>
+
+<tr>
+<td><code>Jitter=</code>bool</td>
+<td>Sets aa-jitter on/off</td>
+</tr>
+
+<tr>
+<td><code>+J</code></td>
+<td>Sets aa-jitter on with 1.0 or previous amount</td>
+</tr>
+
+<tr>
+<td><code>-J</code></td>
+<td>Sets aa-jitter off</td>
+</tr>
+
+<tr>
+<td><code>Jitter_Amount=</code>n.n</td>
+<td>Sets aa-jitter amount to n.n. If n.n &lt;= 0 aa-jitter is set off</td>
+</tr>
+
+<tr>
+<td><code>+J</code>n.n</td>
+<td>Sets aa-jitter on; jitter amount to n.n. If n.n &lt;= 0 aa-jitter is
+set off</td>
+</tr>
+
+<tr>
+<td><code>-J</code>n.n</td>
+<td>Sets aa-jitter off (jitter amount n.n in future)</td>
+</tr>
+
+<tr>
+<td><code>Antialias_Depth=</code>n</td>
+<td>Sets aa-depth (1 &lt;= n &lt;= 9)</td>
+</tr>
+
+<tr>
+<td><code>+R</code>n</td>
+<td>Same as <code>Antialias_Depth=</code>n</td>
+</tr>
+
+<tr>
+<td><code>Antialias_Gamma=</code>n.n</td>
+<td>Sets the anti-aliasing gamma to <em>n.n</em></td>
+</tr>
+
+<tr>
+<td><code>+AG</code>n.n</td>
+<td>Same as <code>Antialias_Gamma=</code>n.n</td>
+</tr>
+</table>
+
+<p>The ray-tracing process is in effect a discrete, digital sampling of the image with typically one sample per pixel. Such sampling can introduce a variety of errors. This includes a jagged, stair-step appearance in sloping or curved lines, a broken look for thin lines, moir&eacute; patterns of interference and lost detail or missing objects, which are so small they reside between adjacent pixels. The effect that is responsible for those errors is called <em>aliasing</em>.</p>
+<p>Anti-aliasing is any technique used to help eliminate such errors or to reduce the negative impact they have on the image. In general, anti-aliasing makes the ray-traced image look <em> smoother</em>. The <code>Antialias=on</code> option or <code>+A</code> switch turns on POV-Ray's anti-aliasing system.</p>
+<p>When anti-aliasing is turned on, POV-Ray attempts to reduce the errors by shooting more than one viewing ray into each pixel and averaging the results to determine the pixel's apparent color. This technique is called super-sampling and can improve the appearance of the final image but it drastically increases the time required to render a scene since many more calculations have to be done.</p>
+<p>POV-Ray gives you the option to use one of two alternate super-sampling methods. The <code> Sampling_Method=</code><em>n</em> option or <code>+AM</code><em>n</em> switch selects either type <code>1</code> or type <code>2</code>. Selecting one of those methods does not turn anti-aliasing on. This has to be done by using the <code>+A</code> command line switch or <code>Antialias=on</code> option.</p>
+<p>Type 1 is an adaptive, non-recursive, super-sampling method. It is <em>adaptive</em> because not every pixel is super-sampled. Type 2 is an adaptive and recursive super-sampling method. It is <em>recursive</em> because the pixel is sub-divided and sub-sub-divided recursively. The <em>adaptive</em> nature of type 2 is the variable depth of recursion.</p>
+<p>In the default, non-recursive method (<code>+AM1</code>), POV-Ray initially traces one ray per pixel. If the color of a pixel differs from its neighbors (to the left or above) by at least the set threshold value then the pixel is super-sampled by shooting a given, fixed number of additional rays. The default threshold is 0.3 but it may be changed using the <code>Antialias_Threshold=</code><em>n.n</em> option. When the switches are used, the threshold may optionally follow the <code>+A</code>. For example <code>+A0.1</code> turns anti-aliasing on and sets the threshold to 0.1.</p>
+<p>The threshold comparison is computed as follows. If r1, g1, b1 and r2, g2, b2 are the rgb components of two pixels then the difference between pixels is computed by</p>
+<pre>
+diff = abs(r1-r2) + abs(g1-g2) + abs(b1-b2)
+</pre>
+<p>If this difference is greater than the threshold then both pixels are super-sampled. The rgb values are in the range from 0.0 to 1.0 thus the most two pixels can differ is 3.0. If the anti-aliasing threshold is 0.0 then every pixel is super-sampled. If the threshold is 3.0 then no anti-aliasing is done. Lower threshold means more anti-aliasing and less speed. Use anti-aliasing for your final version of a picture, not the rough draft. The lower the contrast, the lower the threshold should be. Higher contrast pictures can get away with higher tolerance values. Good values seem to be around 0.2 to 0.4.</p>
+<p>When using the non-recursive method, the default number of super-samples is nine per pixel, located on a 3*3 grid. The <code>
+Antialias_Depth=</code><em>n</em> option or <code> +R</code><em>n</em> switch controls the number of rows and columns of samples taken for a super-sampled pixel. For example <code>+R4</code> would give 4*4=16 samples per pixel.</p>
+<p>The second, adaptive, recursive super-sampling method starts by tracing four rays at the corners of each pixel. If the resulting colors differ more than the threshold amount additional samples will be taken. This is done recursively, i.e. the pixel is divided into four sub-pixels that are separately traced and tested for further subdivision. The advantage of this method is the reduced number of rays that have to be traced. Samples that are common among adjacent pixels and sub-pixels are stored and reused to avoid re-tracing of rays. The recursive character of this method makes the super-sampling concentrate on those parts of the pixel that are more likely to need super-sampling (see figure below).</p>
+
+<table class="centered" width="622px" cellpadding="0" cellspacing="10">
+  <tr>
+    <td><img class="center" width="602px" src="images/1/17/RefImgRecsuper.gif"></td>
+  </tr>
+  <tr>
+    <td>
+      <p class="caption">Example of how the recursive super-sampling works.</p>
+    </td>
+  </tr>
+</table>
+
+<p>The maximum number of subdivisions is specified by the <code>Antialias_Depth=</code><em>n</em> option or <code>+R</code><em>n</em> switch. This is different from the adaptive, non-recursive method where the total number of super-samples is specified. A maximum number of <em>n</em> subdivisions results in a maximum number of samples per pixel that is given by the following table. Where the first column represents anti-alias depth or <code>+R</code><em>n</em> option. The second column is the number of additional samples per super-sampled pixel for the non-recursive method <code>+AM1</code>. Lastly the third column is the maximum number of samples per super-sampled pixel for the recursive method <code>+AM2</code>.</p>
+
+<table width="50%">
+<tr>
+<td width="33%"><code>1</code></td>
+<td width="33%">1</td>
+<td width="34%">9</td>
+</tr>
+
+<tr>
+<td><code>2</code></td>
+<td>4</td>
+<td>25</td>
+</tr>
+
+<tr>
+<td><code>3</code></td>
+<td>9</td>
+<td>81</td>
+</tr>
+
+<tr>
+<td><code>4</code></td>
+<td>16</td>
+<td>289</td>
+</tr>
+
+<tr>
+<td><code>5</code></td>
+<td>25</td>
+<td>1089</td>
+</tr>
+
+<tr>
+<td><code>6</code></td>
+<td>36</td>
+<td>4225</td>
+</tr>
+
+<tr>
+<td><code>7</code></td>
+<td>49</td>
+<td>16641</td>
+</tr>
+
+<tr>
+<td><code>8</code></td>
+<td>64</td>
+<td>66049</td>
+</tr>
+
+<tr>
+<td><code>9</code></td>
+<td>81</td>
+<td>263169</td>
+</tr>
+</table>
+
+<p class="Note"><strong>Note:</strong> The maximum number of samples in the recursive case is hardly ever reached for a given pixel. If the recursive method is used with no anti-aliasing each pixel will be the average of the rays traced at its corners. In most cases a recursion level of three is sufficient.</p>
+<p>Another way to reduce aliasing artifacts is to introduce noise into the sampling process. This is called <em>jittering</em> and works because the human visual system is much more forgiving to noise than it is to regular patterns. The location of the super-samples is jittered or wiggled a tiny amount when anti-aliasing is used. Jittering is used by default but it may be turned off with the <code>Jitter=off</code> option or <code>-J</code> switch. The amount of jittering can be set with the <code>Jitter_Amount=</code><em>n.n</em> option. When using switches the jitter scale may be specified after the <code>+J</code><em>n.n</em> switch. For example <code>+J0.5</code> uses half the normal jitter. The default amount of 1.0 is the maximum jitter which will insure that all super-samples remain inside the original pixel. </p>
+<p class="Note"><strong>Note:</strong> The jittering noise is random and non-repeatable so you should avoid using jitter in animation sequences as the anti-aliased pixels will vary and flicker annoyingly from frame to frame.</p>
+<p>If anti-aliasing is not used one sample per pixel is taken regardless of the super-sampling method specified.</p>
+<p>As the human eye is more sensitive to absolute brightness differences at a low overall brigtness than at higher ones, super-sampling based on linear light intensity differences would yield either poor anti-aliasing in darker regions, or unnecessary super-sampling in brighter regions of the image. To avoid this, POV-Ray compares ''gamma-adjusted'' values instead. (Note that this only affects the comparison operation; the averaging of the super-samples is done in whatever <em>working color space</em> is specified in the scene file via the <code>assumed_gamma</code> keyword.) The <code>Antialias_Gamma=</code><em>n.n</em> command line option or <code>+AG</code><em>n.n</em> sets the gamma to apply before comparison, defaulting to 2.5. Note that the value is actually the inverse of the gamma applied, in order to use the same value range as the display and file gamma settings. Neutral behavior can be achieved using <code>Antialias_Gamma=1.0</code></p>
+<p class="Note"><strong>Note:</strong> The <code><a href="r3_4.html#r3_4_2_2_3">mesh_camera</a></code> feature added in version 3.7 also makes extreme super-sampling possible.  See the distribution file <code>~scenes/camera/mesh_camera/ess/README.txt</code> for additional information.</p>
+
+</div>
+<a name="r3_2_8_8"></a>
+<div class="content-level-h4" contains="Radiosity Options" id="r3_2_8_8">
+<h4>3.2.8.8 Radiosity Options</h4>
+</div>
+<a name="r3_2_8_8_1"></a>
+<div class="content-level-h5" contains="Radiosity High Reproducibility" id="r3_2_8_8_1">
+<h5>3.2.8.8.1 Radiosity High Reproducibility</h5>
+<p>As of version 3.7 a new radiosity mode has been introduced. When specifying <code>High_Reproducibility</code> or <code>+HR</code> on the command line, POV-Ray will spend extra effort to make sure renders are deterministic despite SMP. Currently radiosity is the only code to use this flag; in <code>+HR</code> mode, radiosity pretrace starts out with fewer threads, and some extra rules are imposed on sample re-use that may cause surplus samples to be gathered.</p>
+<p class="Note"><strong>Note:</strong> The <em>high reproducibility</em> mode is not intended for use with radiosity alone, and it will need more work to guarantee the same improved reproducibility in other features. Even though it works well with radiosity, this addition is still <em>experimental</em>.</p>
+
+</div>
+<a name="r3_2_8_8_2"></a>
+<div class="content-level-h5" contains="Radiosity Load and Save" id="r3_2_8_8_2">
+<h5>3.2.8.8.2 Radiosity Load and Save</h5>
+<p>The following .ini / command line parameters are recognized:</p>
+<pre>
+Radiosity_File_Name=&quot;&lt;name&gt;&quot;	or +RF&quot;&lt;name&gt;&quot;	to set the cache file name
+Radiosity_From_File=&lt;on/off&gt;	or +RFI	to enable reading the radiosity file at startup
+Radiosity_To_File=&lt;on/off&gt;	or +RFO	to enable writing new samples to the radiosity file
+</pre>
+<p class="Note"><strong>Note:</strong> The parameter names are preliminary, and may still be subject to change; there is a potential conflict between the shorthand forms.</p>
+<p>If both <code>+RFI</code> and <code>+RFO</code> are specified, new samples gathered are appended; otherwise, <code>+RFO</code> causes the file to be overwritten if it exists.</p>
+<p>New samples gathered are written whenever an SMP block is completed. Tests indicate that this is almost neutral regarding performance, compared to operation with radiosity file output disabled.</p>
+
+</div>
+<a name="r3_2_8_8_3"></a>
+<div class="content-level-h5" contains="Radiosity Vain Pretrace" id="r3_2_8_8_3">
+<h5>3.2.8.8.3 Radiosity Vain Pretrace</h5>
+<p>Also new as of version 3.7 an option has been added speed up radiosity pretrace:</p>
+<p>As some computations don't contribute to the generation of radiosity samples, they can safely be skipped during radiosity pretrace to gain some speed if the pretrace's other role as a coarse preview is not required.</p>
+<p>The following .ini file/command line options control whether pretrace performs all computations so it can double-feature as a coarse preview  (vain pretrace):</p>
+<pre>
+Radiosity_Vain_Pretrace=bool	turns vain pretrace on/off
++RVP				turns vain pretrace on (default)
+-RVP				turns vain pretrace off
+</pre>
+<p class="Note"><strong>Note:</strong> With vain pretrace off, preview will look remarkably odd during the radiosity pretrace phase; this is normal, and no reason to be alarmed.</p>
+<p>At the moment, turning vain pretrace off will affect only classic lighting computations (diffuse lighting, highlights and iridescence); other features expendable during pretrace may follow in future versions.</p></div>
+
+</div>
+
+</div>
+</body>
+</html>

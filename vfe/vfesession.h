@@ -1,42 +1,48 @@
-/*******************************************************************************
- * vfesession.h
- *
- * This file contains declarations relating to the vfe session management class.
- *
- * Author: Christopher J. Cason
- *
- * ---------------------------------------------------------------------------
- * Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
- * Copyright 1991-2013 Persistence of Vision Raytracer Pty. Ltd.
- *
- * POV-Ray is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * POV-Ray is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------------
- * POV-Ray is based on the popular DKB raytracer version 2.12.
- * DKBTrace was originally written by David K. Buck.
- * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
- * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/vfe/vfesession.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
- *******************************************************************************/
+//******************************************************************************
+///
+/// @file vfe/vfesession.h
+///
+/// This file contains declarations relating to the vfe session management
+/// class.
+///
+/// @author: Christopher J. Cason
+///
+/// @copyright
+/// @parblock
+///
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+///
+/// POV-Ray is free software: you can redistribute it and/or modify
+/// it under the terms of the GNU Affero General Public License as
+/// published by the Free Software Foundation, either version 3 of the
+/// License, or (at your option) any later version.
+///
+/// POV-Ray is distributed in the hope that it will be useful,
+/// but WITHOUT ANY WARRANTY; without even the implied warranty of
+/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+/// GNU Affero General Public License for more details.
+///
+/// You should have received a copy of the GNU Affero General Public License
+/// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+///
+/// ----------------------------------------------------------------------------
+///
+/// POV-Ray is based on the popular DKB raytracer version 2.12.
+/// DKBTrace was originally written by David K. Buck.
+/// DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
+///
+/// @endparblock
+///
+//******************************************************************************
 
 #ifndef __VFESESSION_H__
 #define __VFESESSION_H__
 
 #include <queue>
+
+#include <boost/thread.hpp>
+#include <boost/thread/condition.hpp>
 
 #include "base/image/colourspace.h"
 
@@ -417,16 +423,17 @@ namespace vfe
       {
         public:
           StatusMessage(const vfeSession& session) :
-            MessageBase(session), m_Delay(0), m_Frame(0), m_TotalFrames(0) {}
+            MessageBase(session), m_Delay(0), m_Frame(0), m_TotalFrames(0), m_FrameId(0) {}
           StatusMessage(const vfeSession& session, string msg, int m_Delay) :
-            MessageBase(session, mGenericStatus, msg), m_Delay(m_Delay), m_Frame(0), m_TotalFrames(0) {}
-          StatusMessage(const vfeSession& session, const UCS2String& file, int frame, int totalframes) :
-            MessageBase(session, mAnimationStatus), m_Delay(0), m_Filename(file), m_Frame(frame), m_TotalFrames(totalframes) {}
+            MessageBase(session, mGenericStatus, msg), m_Delay(m_Delay), m_Frame(0), m_TotalFrames(0), m_FrameId(0) {}
+          StatusMessage(const vfeSession& session, const UCS2String& file, int frame, int totalframes, int frameId) :
+            MessageBase(session, mAnimationStatus), m_Delay(0), m_Filename(file), m_Frame(frame), m_TotalFrames(totalframes), m_FrameId(frameId) {}
           virtual ~StatusMessage() {}
 
           int m_Delay;
           int m_Frame;
           int m_TotalFrames;
+          int m_FrameId;
           UCS2String m_Filename;
       } ;
 
@@ -516,7 +523,7 @@ namespace vfe
       // Returns a copy of the shared pointer containing the current instance
       // of a pov_frontend::Display-derived render preview instance, which may
       // be NULL.
-      virtual boost::shared_ptr<Display> GetDisplay() const;
+      virtual shared_ptr<Display> GetDisplay() const;
 
       // If a VFE implementation has provided a display creator functor via
       // vfeSession::SetDisplayCreator(), this method will call it with the
@@ -535,7 +542,7 @@ namespace vfe
       // wants a preview window. The passed parameter is a DisplayCreator (see the
       // typedef earlier on in vfeSession and the example in CreateFrontend() and
       // WinDisplayCreator() of source/windows/pvfrontend.cpp).
-      // 
+      //
       // If this method is not called, the display creator defaults to
       // vfeSession::DefaultDisplayCreator().
       virtual void SetDisplayCreator(DisplayCreator creator) { m_DisplayCreator = creator; }
@@ -667,6 +674,11 @@ namespace vfe
       // be considered valid if the render has actually been started.
       virtual bool RenderingAnimation() const { return m_RenderingAnimation; }
 
+      // Returns the current nominal frame number. Valid once the internal
+      // state has reached kStatring. The typical way of reading this is to wait
+      // for a stAnimationStatus flag and then call GetCurrentFrameId().
+      virtual int GetCurrentFrameId() const { return m_CurrentFrameId; }
+
       // Returns the current frame of an animation. Only valid once the internal
       // state has reached kStarting (see the stBackendStateChanged status flag).
       // The typical way of reading this is to wait for a stAnimationStatus event
@@ -725,7 +737,7 @@ namespace vfe
       // clock changes by caching the last value your implementation returns
       // and adding an appropriate offset if you calculate a lower value later
       // in the session.
-      // 
+      //
       // NB this method is pure virtual.
       virtual POV_LONG GetTimestamp(void) const = 0;
 
@@ -1112,7 +1124,7 @@ namespace vfe
       virtual void AppendStreamMessage (MessageType type, const boost::format& fmt, bool chompLF = false);
       virtual void AppendErrorMessage (const string& Msg, const UCS2String& File, int Line = 0, int Col = 0);
       virtual void AppendWarningMessage (const string& Msg, const UCS2String& File, int Line = 0, int Col = 0);
-      virtual void AppendAnimationStatus (int Frame, int Total, const UCS2String& Filename);
+      virtual void AppendAnimationStatus (int FrameId, int SubsetFrame, int SubsetTotal, const UCS2String& Filename);
 
       virtual void SetUsingAlpha() { m_UsingAlpha = true ; }
       virtual void SetClocklessAnimation() { m_ClocklessAnimation = true ; }
@@ -1192,7 +1204,7 @@ namespace vfe
 
       // Create an instance of the frontend ShelloutProcessing class. this handles creating and
       // managing render shellout commands, and typically will need platform-specific implementation.
-      virtual ShelloutProcessing *CreateShelloutProcessing(POVMS_Object& opts, const string& scene, uint width, uint height) { return new ShelloutProcessing(opts, scene, width, height); }
+      virtual ShelloutProcessing *CreateShelloutProcessing(POVMS_Object& opts, const string& scene, unsigned int width, unsigned int height) { return new ShelloutProcessing(opts, scene, width, height); }
 
       struct vfeSessionWorker
       {
@@ -1211,6 +1223,7 @@ namespace vfe
       int m_PercentComplete;
       int m_PixelsRendered;
       int m_TotalPixels;
+      int m_CurrentFrameId;
       int m_CurrentFrame;
       int m_TotalFrames;
       bool m_Failed;

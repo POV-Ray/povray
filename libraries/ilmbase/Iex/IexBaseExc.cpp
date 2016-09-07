@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////
 //
-// Copyright (c) 2002, Industrial Light & Magic, a division of Lucas
+// Copyright (c) 2002-2012, Industrial Light & Magic, a division of Lucas
 // Digital Ltd. LLC
 // 
 // All rights reserved.
@@ -40,14 +40,22 @@
 //
 //---------------------------------------------------------------------
 
+#include "IexExport.h"
 #include "IexBaseExc.h"
+#include "IexMacros.h"
 
-namespace Iex {
+#ifdef PLATFORM_WINDOWS
+#include <windows.h>
+#endif
+
+#include <stdlib.h>
+
+IEX_INTERNAL_NAMESPACE_SOURCE_ENTER
+
+
 namespace {
 
-
 StackTracer currentStackTracer = 0;
-
 
 } // namespace
 
@@ -125,5 +133,24 @@ BaseExc::append (std::stringstream &s)
     return *this;
 }
 
+IEX_INTERNAL_NAMESPACE_SOURCE_EXIT
 
-} // namespace Iex
+
+#ifdef PLATFORM_WINDOWS
+
+#pragma optimize("", off)
+void
+iex_debugTrap()
+{
+    if (0 != getenv("IEXDEBUGTHROW"))
+        ::DebugBreak();
+}
+#else
+void
+iex_debugTrap()
+{
+    // how to in Linux?
+    if (0 != ::getenv("IEXDEBUGTHROW"))
+        __builtin_trap();
+}
+#endif

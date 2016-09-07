@@ -1,0 +1,3 @@
+libraries/*             linguist-vendored
+distribution/**/*.inc   linguist-language=POV-Ray
+**/*.pov                linguist-language=POV-Ray

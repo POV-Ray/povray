@@ -42,14 +42,19 @@
 //
 //-----------------------------------------------------------------------------
 
-#include <ImfHeader.h>
-#include <ImfFrameBuffer.h>
-#include <ImfThreading.h>
+#include "ImfHeader.h"
+#include "ImfFrameBuffer.h"
+#include "ImfThreading.h"
+#include "ImfInputStreamMutex.h"
+#include "ImfInputPartData.h"
+#include "ImfGenericInputFile.h"
+#include "ImfExport.h"
+#include "ImfNamespace.h"
 
-namespace Imf {
+OPENEXR_IMF_INTERNAL_NAMESPACE_HEADER_ENTER
 
 
-class ScanLineInputFile
+class IMF_EXPORT ScanLineInputFile : public GenericInputFile
 {
   public:
 
@@ -57,7 +62,7 @@ class ScanLineInputFile
     // Constructor
     //------------
 
-    ScanLineInputFile (const Header &header, IStream *is,
+    ScanLineInputFile (const Header &header, OPENEXR_IMF_INTERNAL_NAMESPACE::IStream *is,
                        int numThreads = globalThreadCount());
 
 
@@ -122,6 +127,26 @@ class ScanLineInputFile
 
     bool		isComplete () const;
 
+    
+    
+    //---------------------------------------------------------------
+    // Check if SSE optimisation is enabled
+    //
+    // Call after setFrameBuffer() to query whether optimised file decoding
+    // is available - decode times will be faster if returns true
+    //
+    // Optimisation depends on the framebuffer channels and channel types
+    // as well as the file/part channels and channel types, as well as
+    // whether SSE2 instruction support was detected at compile time
+    //
+    // Calling before setFrameBuffer will throw an exception
+    //
+    //---------------------------------------------------------------
+    
+    bool                isOptimizationEnabled () const;
+    
+    
+    
 
     //---------------------------------------------------------------
     // Read pixel data:
@@ -164,9 +189,22 @@ class ScanLineInputFile
   private:
 
     Data *		_data;
+
+    InputStreamMutex*   _streamData;
+
+    ScanLineInputFile   (InputPartData* part);
+
+    void                initialize(const Header& header);
+
+    friend class MultiPartInputFile;
+    friend class InputFile;
 };
 
 
-} // namespace Imf
+OPENEXR_IMF_INTERNAL_NAMESPACE_HEADER_EXIT
+
+
+
+
 
 #endif

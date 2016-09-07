@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="POVMS Headers">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="POVMS Source">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\source\povms\povmscpp.cpp">
+      <Filter>POVMS Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\povms\povmsutil.cpp">
+      <Filter>POVMS Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\povms\povms.cpp">
+      <Filter>POVMS Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\povms\precomp.cpp">
+      <Filter>POVMS Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\povms\povms.c">
+      <Filter>POVMS Source</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\source\povms\configpovms.h">
+      <Filter>POVMS Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\povms\povms.h">
+      <Filter>POVMS Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\povms\povmsutil.h">
+      <Filter>POVMS Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\povms\povmscpp.h">
+      <Filter>POVMS Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\povms\povmsid.h">
+      <Filter>POVMS Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\povconfig\syspovconfigpovms.h">
+      <Filter>POVMS Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\povms\precomp.h">
+      <Filter>POVMS Headers</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

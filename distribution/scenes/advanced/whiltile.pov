@@ -8,13 +8,14 @@
 // Desc: A tile floor, using the 'while' loop and 'if' statements
 //       to create a unique pattern automatically.
 
-// Enable this next line to use a simpler test shape for debugging
-// #declare DO_SIMPLE_SHAPE = 1;
-//
 // -w320 -h240
 // -w800 -h600 +a0.3
 
 #version 3.7;
+
+// Enable this next line to use a simpler test shape for debugging
+// #declare DO_SIMPLE_SHAPE = 1;
+
 global_settings { assumed_gamma 1.0  max_trace_level 5}
 
 #include "colors.inc"

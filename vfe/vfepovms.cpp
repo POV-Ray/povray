@@ -1,39 +1,43 @@
-/*******************************************************************************
- * vfepovms.cpp
- *
- * This module implements POVMS message handling functionality
- *
- * Author: Christopher J. Cason
- *
- * ---------------------------------------------------------------------------
- * Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
- * Copyright 1991-2013 Persistence of Vision Raytracer Pty. Ltd.
- *
- * POV-Ray is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * POV-Ray is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------------
- * POV-Ray is based on the popular DKB raytracer version 2.12.
- * DKBTrace was originally written by David K. Buck.
- * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
- * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/vfe/vfepovms.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
- *******************************************************************************/
+//******************************************************************************
+///
+/// @file vfe/vfepovms.cpp
+///
+/// This module implements POVMS message handling functionality
+///
+/// @author Christopher J. Cason
+///
+/// @copyright
+/// @parblock
+///
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+///
+/// POV-Ray is free software: you can redistribute it and/or modify
+/// it under the terms of the GNU Affero General Public License as
+/// published by the Free Software Foundation, either version 3 of the
+/// License, or (at your option) any later version.
+///
+/// POV-Ray is distributed in the hope that it will be useful,
+/// but WITHOUT ANY WARRANTY; without even the implied warranty of
+/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+/// GNU Affero General Public License for more details.
+///
+/// You should have received a copy of the GNU Affero General Public License
+/// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+///
+/// ----------------------------------------------------------------------------
+///
+/// POV-Ray is based on the popular DKB raytracer version 2.12.
+/// DKBTrace was originally written by David K. Buck.
+/// DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
+///
+/// @endparblock
+///
+//******************************************************************************
 
 #include "vfe.h"
+
+#include "povms/povmscpp.h"
 
 // this must be the last file included
 #include "syspovdebug.h"
@@ -41,7 +45,6 @@
 namespace vfe
 {
 
-using namespace pov;
 using namespace pov_base;
 
 class SysQNode
@@ -79,30 +82,6 @@ class SysQNode
 unsigned int SysQNode::QueueID ;
 
 extern volatile POVMSContext POVMS_Render_Context ;
-
-////////////////////////////////////////////////////////////////////
-// memory allocation for POVMS (need to move this to its own heap).
-////////////////////////////////////////////////////////////////////
-
-void *vfe_POVMS_Sys_Malloc(size_t size, const char *func, const char *file, int line)
-{
-  return malloc (size) ;
-}
-
-void *vfe_POVMS_Sys_Calloc(size_t nitems, size_t size, const char *func, const char *file, int line)
-{
-  return calloc (nitems, size) ;
-}
-
-void *vfe_POVMS_Sys_Realloc(void *ptr, size_t size, const char *func, const char *file, int line)
-{
-  return realloc (ptr, size) ;
-}
-
-void vfe_POVMS_Sys_Free(void *ptr, const char *func, const char *file, int line)
-{
-  free (ptr) ;
-}
 
 ////////////////////////////////////////////////////////////////////
 // error handling
@@ -150,7 +129,7 @@ int SysQNode::Send (void *pData, int Len)
   assert (m_Sanity == 0xEDFEEFBE) ;
   if (m_Sanity == 0xEDFEEFBE)
   {
-    DataNode *dNode = (DataNode *) POVMS_Sys_Malloc (sizeof (DataNode)) ;
+    DataNode *dNode = reinterpret_cast<DataNode *>(POVMS_Sys_Malloc (sizeof (DataNode))) ;
     if (dNode == NULL)
       return (-3) ;
 
@@ -188,6 +167,7 @@ void *SysQNode::Receive (int *pLen, bool Blocking)
       return (NULL);
 
     // TODO: have a shorter wait but loop, and check for system shutdown
+    // TODO FIXME - boost::xtime has been deprecated since boost 1.34.
     boost::xtime t;
     boost::xtime_get (&t, POV_TIME_UTC);
     t.nsec += 50000000 ;
@@ -233,7 +213,7 @@ POVMSAddress vfe_POVMS_Sys_QueueToAddress (SysQNode *Node)
 
 SysQNode *vfe_POVMS_Sys_AddressToQueue (POVMSAddress Addr)
 {
-  return ((SysQNode *) Addr) ;
+  return (reinterpret_cast<SysQNode *>(Addr)) ;
 }
 
 SysQNode *vfe_POVMS_Sys_QueueOpen (void)

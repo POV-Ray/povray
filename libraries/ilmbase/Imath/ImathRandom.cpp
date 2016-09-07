@@ -1,7 +1,6 @@
-
 ///////////////////////////////////////////////////////////////////////////
 //
-// Copyright (c) 2002, Industrial Light & Magic, a division of Lucas
+// Copyright (c) 2002-2012, Industrial Light & Magic, a division of Lucas
 // Digital Ltd. LLC
 // 
 // All rights reserved.
@@ -43,7 +42,7 @@
 #include "ImathRandom.h"
 #include "ImathInt64.h"
 
-namespace Imath {
+IMATH_INTERNAL_NAMESPACE_SOURCE_ENTER
 namespace {
 
 //
@@ -91,9 +90,9 @@ rand48Next (unsigned short state[3])
     // We assume that sizeof (unsigned short) == 2.
     //
 
-    state[2] = x >> 32;
-    state[1] = x >> 16;
-    state[0] = x;
+    state[2] = (unsigned short)(x >> 32);
+    state[1] = (unsigned short)(x >> 16);
+    state[0] = (unsigned short)(x);
 }
 
 } // namespace
@@ -134,7 +133,7 @@ erand48 (unsigned short state[3])
 double
 drand48 ()
 {
-    return Imath::erand48 (staticState);
+    return IMATH_INTERNAL_NAMESPACE::erand48 (staticState);
 }
 
 
@@ -155,15 +154,15 @@ nrand48 (unsigned short state[3])
 long int
 lrand48 ()
 {
-    return Imath::nrand48 (staticState);
+    return IMATH_INTERNAL_NAMESPACE::nrand48 (staticState);
 }
 
 
 void
 srand48 (long int seed)
 {
-    staticState[2] = seed >> 16;
-    staticState[1] = seed;
+    staticState[2] = (unsigned short)(seed >> 16);
+    staticState[1] = (unsigned short)(seed);
     staticState[0] = 0x330e;
 }
 
@@ -192,4 +191,4 @@ Rand32::nextf ()
     return u.f - 1;
 }
 
-} // namespace Imath
+IMATH_INTERNAL_NAMESPACE_SOURCE_EXIT

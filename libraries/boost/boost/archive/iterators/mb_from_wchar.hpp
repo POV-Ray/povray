@@ -2,7 +2,7 @@
 #define BOOST_ARCHIVE_ITERATORS_MB_FROM_WCHAR_HPP
 
 // MS compatible compilers support #pragma once
-#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+#if defined(_MSC_VER)
 # pragma once
 #endif
 
@@ -16,11 +16,11 @@
 
 //  See http://www.boost.org for updates, documentation, and revision history.
 
-#include <cassert>
+#include <boost/assert.hpp>
 #include <cstddef> // size_t
 #include <cstdlib> // for wctomb()
 
-#include <boost/config.hpp> // for BOOST_DEDUCED_TYPENAME
+#include <boost/config.hpp>
 #if defined(BOOST_NO_STDC_NAMESPACE)
 namespace std{ 
     using ::size_t; 
@@ -28,7 +28,6 @@ namespace std{
 } // namespace std
 #endif
 
-#include <boost/serialization/pfto.hpp>
 #include <boost/iterator/iterator_adaptor.hpp>
 
 namespace boost { 
@@ -50,7 +49,7 @@ class mb_from_wchar
 {
     friend class boost::iterator_core_access;
 
-    typedef BOOST_DEDUCED_TYPENAME boost::iterator_adaptor<
+    typedef typename boost::iterator_adaptor<
         mb_from_wchar<Base>, 
         Base, 
         wchar_t,
@@ -86,13 +85,13 @@ class mb_from_wchar
         wchar_t value = * this->base_reference();
         #if (defined(__MINGW32__) && ((__MINGW32_MAJOR_VERSION > 3) \
         || ((__MINGW32_MAJOR_VERSION == 3) && (__MINGW32_MINOR_VERSION >= 8))))
-        m_bend = std::wcrtomb(m_buffer, value, 0);
+        m_bend = std::wcrtomb(m_buffer, value,0);
         #else
         m_bend = std::wctomb(m_buffer, value);
         #endif
-        assert(-1 != m_bend);
-        assert((std::size_t)m_bend <= sizeof(m_buffer));
-        assert(m_bend > 0);
+        BOOST_ASSERT(-1 != m_bend);
+        BOOST_ASSERT((std::size_t)m_bend <= sizeof(m_buffer));
+        BOOST_ASSERT(m_bend > 0);
         m_bnext = 0;
     }
 
@@ -114,8 +113,8 @@ class mb_from_wchar
 public:
     // make composible buy using templated constructor
     template<class T>
-    mb_from_wchar(BOOST_PFTO_WRAPPER(T) start) :
-        super_t(Base(BOOST_MAKE_PFTO_WRAPPER(static_cast< T >(start)))),
+    mb_from_wchar(T start) :
+        super_t(Base(static_cast< T >(start))),
         m_bend(0),
         m_bnext(0),
         m_full(false)

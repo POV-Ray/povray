@@ -36,15 +36,6 @@
     <ClCompile Include="..\..\source\base\pov_err.cpp">
       <Filter>Base source</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\base\povms.cpp">
-      <Filter>Base source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\base\povmscpp.cpp">
-      <Filter>Base source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\base\processoptions.cpp">
-      <Filter>Base source</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\base\stringutilities.cpp">
       <Filter>Base source</Filter>
     </ClCompile>
@@ -108,7 +99,6 @@
     <ClCompile Include="..\..\source\base\animation\moov.cpp">
       <Filter>Base source\Animation</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\precomp.cpp" />
     <ClCompile Include="..\..\source\base\font\crystal.cpp">
       <Filter>Base source\Font</Filter>
     </ClCompile>
@@ -120,6 +110,27 @@
     </ClCompile>
     <ClCompile Include="..\..\source\base\font\timrom.cpp">
       <Filter>Base source\Font</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\base\colour.cpp">
+      <Filter>Base source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\base\fileutil.cpp">
+      <Filter>Base source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\base\precomp.cpp">
+      <Filter>Base source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\base\mathutil.cpp">
+      <Filter>Base source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\base\image\metadata.cpp">
+      <Filter>Base source\Image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\base\messenger.cpp">
+      <Filter>Base source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\base\platformbase.cpp">
+      <Filter>Base source\Image</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -135,25 +146,10 @@
     <ClInclude Include="..\..\source\base\platformbase.h">
       <Filter>Base Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\base\pointer.h">
-      <Filter>Base Headers</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\base\pov_err.h">
       <Filter>Base Headers</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\base\povdebug.h">
-      <Filter>Base Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\base\povms.h">
-      <Filter>Base Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\base\povmscpp.h">
-      <Filter>Base Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\base\povmsgid.h">
-      <Filter>Base Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\base\processoptions.h">
       <Filter>Base Headers</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\base\stringutilities.h">
@@ -222,7 +218,6 @@
     <ClInclude Include="..\..\source\base\animation\moov.h">
       <Filter>Base Headers\Animation</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\precomp.h" />
     <ClInclude Include="..\..\source\base\safemath.h">
       <Filter>Base Headers</Filter>
     </ClInclude>
@@ -237,6 +232,36 @@
     </ClInclude>
     <ClInclude Include="..\..\source\base\font\timrom.h">
       <Filter>Base Headers\Font</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\base\colour.h">
+      <Filter>Base Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\base\build.h">
+      <Filter>Base Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\base\version.h">
+      <Filter>Base Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\base\fileutil.h">
+      <Filter>Base Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\povconfig\syspovconfigbase.h">
+      <Filter>Base Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\povconfig\syspovconfig.h">
+      <Filter>Base Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\povconfig\syspovconfig_msvc.h">
+      <Filter>Base Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\base\precomp.h">
+      <Filter>Base Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\base\mathutil.h">
+      <Filter>Base Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\base\messenger.h">
+      <Filter>Base Headers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -1,0 +1,223 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+
+<!--  This file copyright Persistence of Vision Raytracer Pty. Ltd. 2009-2011  -->
+
+<html lang="en">
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=windows-1252">
+<title>Unix Section 4</title>
+<link rel="StyleSheet" href="povray37.css" type="text/css">
+<link rel="shortcut icon" href="favicon.ico">
+
+<!--  NOTE: In order to help users find information about POV-Ray using web      -->
+<!--  search engines, we ask that you *not* let them index documentation         -->
+<!--  mirrors because effectively, when searching, users will get hundreds of    -->
+<!--  results containing the same information! For this reason, these meta tags  -->
+<!--  below disable archiving of this page by search engines.                    -->
+
+<meta name="robots" content="noarchive">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="expires" content="0">
+</head>
+<body>
+
+<div class="Page">
+
+<!-- NavPanel Begin -->
+<div class="NavPanel">
+<table class="NavTable">
+<tr>
+  <td class="FixedPanelHeading"><a title="1.4" href="#u1_4">I/O Restrictions</a></td>
+</tr>
+<tr>
+  <td><div class="divh2"><strong><a title="1.4.1" href="#u1_4_1">Configuration file format</a></strong></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><strong><a title="1.4.2" href="#u1_4_2">File I/O Security</a></strong></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><strong><a title="1.4.3" href="#u1_4_3">Shellout Security</a></strong></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><strong><a title="1.4.4" href="#u1_4_4">Permitted Paths</a></strong></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a title="1.4.4.1" href="#u1_4_4_1">Examples for path settings</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><strong><a title="1.4.5" href="#u1_4_5">Example configuration file</a></strong></div></td>
+</tr>
+<tr>
+  <td><div class="divh1">&nbsp;</div></td>
+</tr>
+<tr>
+  <td><div class="divh1">&nbsp;</div></td>
+</tr>
+</table>
+</div>
+<!-- NavPanel End -->
+
+<div class="Content">
+<table class="HeaderFooter" width="100%">
+<tr>
+  <td colspan=5 align="left" class="HeaderFooter">
+    POV-Ray for Unix <strong class="HeaderFooter">version 3.7</strong>
+  </td>
+</tr>
+<tr >
+  <td colspan=5>
+    <hr align="right" width="70%">
+  </td>
+</tr>
+<tr>
+  <td width="30%"></td>
+  <td class="NavBar"><a href="index.html" title="The Front Door">Home</a></td>
+  <td class="NavBar"><a href="u1_0.html" title="Unix Table of Contents">POV-Ray for Unix</a></td>
+  <td class="NavBar"><a href="t2_0.html" title="Tutorial Table of Contents">POV-Ray Tutorial</a></td>
+  <td class="NavBar"><a href="r3_0.html" title="Reference Table of Contents">POV-Ray Reference</a></td>
+</tr>
+</table>
+
+<a name="u1_4"></a>
+<div class="content-level-h2" contains="I/O Restrictions" id="u1_4">
+<h2>1.4 I/O Restrictions</h2>
+<p>I/O Restrictions is a feature that was introduced in POV-Ray for Unix 3.5. The purpose of this feature is to attempt to at least partially protect a machine running POV-Ray from having files read or written outside of a given set of directories.</p>
+
+<p>The need for this is related to the fact that the POV-Ray scene language has, over the years, become something more akin to a scripting language combined with a scene-description model. It is now possible to write obfuscated POV-Ray code, and to open, create, read and write arbitrary files anywhere on the target system's hard disk, subject to operating system permission.</p>
+
+<p>The basic idea of I/O Restrictions is to attempt to protect the user from a script that may have been downloaded from an untrusted source, and which may attempt to create or modify files that it should not.</p>
+
+<p>The I/O Restriction facility hooks the file open and creation functions in the core POV-Ray renderer code, and allows the Unix version to allow or deny any particular file operation.</p>
+
+<p class="Note"><strong>Note:</strong> We do not guarantee that the I/O Restriction facility will actually stop anything from happening. There is always the chance that, like almost all software, it could have a bug in it that causes it to malfunction. Therefore, the onus is on the person who chooses to load an INI or scene file into POV-Ray to ensure that it does not do anything that it should not do. Please consider I/O Restrictions just a sometimes-helpful backup for manual checks.</p>
+
+<p>Please read this section in full so that you understand the caveats and conditions of the facility, as some directories are allowed by default.</p>
+
+</div>
+<a name="u1_4_1"></a>
+<div class="content-level-h3" contains="Configuration file format" id="u1_4_1">
+<h3>1.4.1 Configuration file format</h3>
+
+<p>The I/O Restrictions are configured by two separate configuration files. This can be a system-wide configuration, or a user configuration file located in the following places, on most systems <code>$PREFIX</code> is <code>/usr/local</code>.</p>
+<ul>
+  <li><code>$PREFIX/etc/povray/3.7/povray.conf</code></li>
+  <li><code>$HOME/.povray/3.7/povray.conf</code></li>
+</ul>
+
+<p>POV-Ray will always use the most strict version of what is specified; user settings can only make security more strict.</p>
+
+<p>The general syntax of these files is:</p>
+
+<pre>
+;Comment
+
+[Section]
+setting
+</pre>
+
+<p class="Warning"><strong>Warning:</strong> If neither of these files exists I/O Restrictions are deactivated!</p>
+
+</div>
+<a name="u1_4_2"></a>
+<div class="content-level-h3" contains="File I/O Security" id="u1_4_2">
+<h3>1.4.2 File I/O Security</h3>
+<p>The <code>[File I/O Security]</code> section only contains a single setting which is either <code>none</code>, <code>read-only</code> or <code>restricted</code>.</p>
+
+<ul>
+  <li><code>none</code> means that there are no restrictions other than those enforced by the file system.</li>
+  <li><code>read-only</code> means that files may be read without restriction.</li>
+  <li><code>restricted</code> means that files access is subject to restrictions as specified in the rest of this file.  See below for details.</li>
+</ul>
+
+</div>
+<a name="u1_4_3"></a>
+<div class="content-level-h3" contains="Shellout Security" id="u1_4_3">
+<h3>1.4.3 Shellout Security</h3>
+<p>The <code>[Shellout Security]</code> section determines whether POV-Ray will be allowed to call scripts.</p>
+
+<p>This section contains a single setting which is either <code>allowed</code> or <code>forbidden</code>.</p>
+
+<ul>
+  <li><code>allowed</code> means that shellout will work as specified in the documentation.</li>
+  <li><code>forbidden</code> means that shellout will be disabled.
+</ul>
+
+<p>See the section <a href="r3_2.html#r3_2_6">Shell-out to Operating System</a> for more details.</p>
+
+</div>
+<a name="u1_4_4"></a>
+<div class="content-level-h3" contains="Permitted Paths" id="u1_4_4">
+<h3>1.4.4 Permitted Paths</h3>
+<p>The <code>[Permitted Paths]</code> section contains a list of directories which are specifically allowed for either reading or reading and writing. These paths are only used when the setting for <code>[File I/O Security]</code> is either <code>read-only</code> or <code>restricted</code>.</p>
+
+<ul>
+  <li>Directories that are only allowed for reading are added with <code>read=directory</code>.</li>
+  <li>For allowing reading and writing use <code>read+write=directory</code>.</li>
+ <li>If <code>[File I/O Security]</code> is set to <code>read-only</code>, any directory can be used to read in a file, and <code>read+write</code> entries must specify which directories are allowed for writing.</li>
+ <li>If <code>[File I/O Security]</code> is set to <code>restricted</code>, reading and writing is allowed <em>only</em> in the directories given by the <code>read</code> and <code>read+write</code> entries.</li>
+</ul>
+
+<p>If the directory name contains spaces it has to be quoted or doubly-quoted. There can be spaces before and after the equal sign. Read-only and read/write entries can be specified in any order.</p>
+
+<p>If you want the permissions for a specified directory to also extend to all of its subdirectories wildcards are permitted.</p>
+
+<p>For example:</p>
+<pre>
+read*=directory
+read+write*=directory
+</pre>
+
+<p>Both relative and absolute paths are permitted, so <em>the dot</em> character can be especially useful.  The install directory, typically <code>/usr/local/share/povray-3.7</code> or <code>/usr/share/povray-3.7</code>, can be specified with <code>%INSTALLDIR%</code>, the user home directory with <code>%HOME%</code>.  The install directory and its
+descendents are typically only writable by root; therefore it does not make sense to have <code>%INSTALLDIR%</code> in read/write directory paths.</p>
+
+<p class="Note"><strong>Note:</strong> Since user-level permissions are at least as strict as system-level restrictions, any paths specified in the system-wide <code>povray.conf</code> will also need to be specified in <code>~/.povray/3.7/povray.conf</code> if this file exists.</p>
+
+</div>
+<a name="u1_4_4_1"></a>
+<div class="content-level-h4" contains="Examples for path settings" id="u1_4_4_1">
+<h4>1.4.4.1 Examples for path settings</h4>
+<pre>[Permitted Paths]
+read=%INSTALLDIR%
+</pre>
+
+<p>Would permit reading from the directory where the POV-Ray supplementary files are installed.</p>
+
+<p>Note that the installdir location does not relate to where the binary is run from - it relates to the information defined at compile-time. Relative paths are legal as well, and will be resolved only once at load time (but relative to the current directory, not the installdir). For example, a relative path like the following ...</p>
+
+<pre>[Permitted Paths]
+read+write=../output
+</pre>
+
+<p>Would be resolved with relation to the <em>current directory at the time POV-Ray for Unix was started</em>, so if you started povray while in the directory <code>~/myscenes/newscene</code>, then the above path would be resolved as <code>~/myscenes/output</code>. Please note that the actual location of the povray binary is not relevent here - it is the current directory that matters, which is typically not that of the program.</p>
+
+</div>
+<a name="u1_4_5"></a>
+<div class="content-level-h3" contains="Example configuration file" id="u1_4_5">
+<h3>1.4.5 Example configuration file</h3>
+<p>Here is a complete example for a <code>povray.conf</code> file:</p>
+
+<pre>[File I/O Security]
+; none
+; read-only
+restricted
+
+[Shellout Security]
+allowed
+; forbidden
+
+[Permitted Paths]
+read*=%INSTALLDIR%/include
+read*=%INSTALLDIR%/scenes
+read=%INSTALLDIR%/../../etc
+read+write=.
+read+write*=/tmp
+</pre>
+
+
+</div>
+
+</div>
+
+</div>
+</body>
+</html>

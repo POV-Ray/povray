@@ -2,7 +2,7 @@
 #define BOOST_SERIALIZATION_SHARED_PTR_132_HPP
 
 // MS compatible compilers support #pragma once
-#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+#if defined(_MSC_VER)
 # pragma once
 #endif
 
@@ -78,7 +78,7 @@ inline void save_construct_data(
     Archive & ar,
     const 
     boost_132::detail::sp_counted_base_impl<P, D> *t, 
-    const BOOST_PFTO unsigned int /* file_version */
+    const unsigned int /* file_version */
 ){
     // variables used for construction
     ar << boost::serialization::make_nvp("ptr", t->ptr);

@@ -43,16 +43,17 @@
 //
 //-----------------------------------------------------------------------------
 
-#include <ImfCompressor.h>
+#include "ImfCompressor.h"
+#include "ImfNamespace.h"
 
-namespace Imf {
+OPENEXR_IMF_INTERNAL_NAMESPACE_HEADER_ENTER
 
 
-class RleCompressor: public Compressor
+class IMF_EXPORT RleCompressor: public Compressor
 {
   public:
 
-    RleCompressor (const Header &hdr, int maxScanLineSize);
+    RleCompressor (const Header &hdr, size_t maxScanLineSize);
     virtual ~RleCompressor ();
 
     virtual int numScanLines () const;
@@ -74,6 +75,6 @@ class RleCompressor: public Compressor
 };
 
 
-} // namespace Imf
+OPENEXR_IMF_INTERNAL_NAMESPACE_HEADER_EXIT
 
 #endif

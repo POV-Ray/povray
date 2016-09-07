@@ -1,45 +1,47 @@
-/*******************************************************************************
- * vfe.cpp
- *
- * This module contains the C++ implementation for the virtual frontend.
- *
- * Author: Christopher J. Cason
- *
- * ---------------------------------------------------------------------------
- * Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
- * Copyright 1991-2013 Persistence of Vision Raytracer Pty. Ltd.
- *
- * POV-Ray is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * POV-Ray is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------------
- * POV-Ray is based on the popular DKB raytracer version 2.12.
- * DKBTrace was originally written by David K. Buck.
- * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
- * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/vfe/vfe.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
- *******************************************************************************/
+//******************************************************************************
+///
+/// @file vfe/vfe.cpp
+///
+/// This module contains the C++ implementation for the virtual frontend.
+///
+/// @author Christopher J. Cason
+///
+/// @copyright
+/// @parblock
+///
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+///
+/// POV-Ray is free software: you can redistribute it and/or modify
+/// it under the terms of the GNU Affero General Public License as
+/// published by the Free Software Foundation, either version 3 of the
+/// License, or (at your option) any later version.
+///
+/// POV-Ray is distributed in the hope that it will be useful,
+/// but WITHOUT ANY WARRANTY; without even the implied warranty of
+/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+/// GNU Affero General Public License for more details.
+///
+/// You should have received a copy of the GNU Affero General Public License
+/// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+///
+/// ----------------------------------------------------------------------------
+///
+/// POV-Ray is based on the popular DKB raytracer version 2.12.
+/// DKBTrace was originally written by David K. Buck.
+/// DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
+///
+/// @endparblock
+///
+//******************************************************************************
 
 #ifdef _MSC_VER
 #pragma warning(disable : 4244)
 #pragma warning(disable : 4267)
 #endif
 
-#include "frame.h"
-#include "povray.h"
+#include "backend/frame.h"
+#include "backend/povray.h"
 #include "vfe.h"
 
 // this must be the last file included
@@ -227,16 +229,6 @@ vfePlatformBase::~vfePlatformBase()
 {
 }
 
-IStream *vfePlatformBase::CreateIStream(const unsigned int stype)
-{
-  return (new IStream (stype)) ;
-}
-
-OStream *vfePlatformBase::CreateOStream(const unsigned int stype)
-{
-  return (new OStream (stype)) ;
-}
-
 UCS2String vfePlatformBase::GetTemporaryPath(void)
 {
   return m_Session->GetTemporaryPath();
@@ -255,6 +247,24 @@ void vfePlatformBase::DeleteTemporaryFile(const UCS2String& filename)
 bool vfePlatformBase::ReadFileFromURL(OStream *file, const UCS2String& url, const UCS2String& referrer)
 {
   return false;
+}
+
+FILE* vfePlatformBase::OpenLocalFile (const UCS2String& name, const char *mode)
+{
+  return vfeFOpen (name, mode);
+}
+
+void vfePlatformBase::DeleteLocalFile (const UCS2String& name)
+{
+  vfeRemove (name);
+}
+
+bool vfePlatformBase::AllowLocalFileAccess (const UCS2String& name, const unsigned int fileType, bool write)
+{
+    if (write)
+        return Allow_File_Write (name.c_str(), fileType);
+    else
+        return Allow_File_Read (name.c_str(), fileType);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -514,11 +524,6 @@ int vfeProcessRenderOptions::WriteSpecialOptionHandler(INI_Parser_Table *Table, 
   return ProcessRenderOptions::WriteSpecialOptionHandler (Table, Obj, S);
 }
 
-bool vfeProcessRenderOptions::WriteOptionFilter(INI_Parser_Table *Table)
-{
-  return ProcessRenderOptions::WriteOptionFilter (Table);
-}
-
 int vfeProcessRenderOptions::ProcessUnknownString(char *String, POVMSObjectPtr Obj)
 {
   return ProcessRenderOptions::ProcessUnknownString (String, Obj);
@@ -682,7 +687,7 @@ bool VirtualFrontEnd::Start(POVMS_Object& opts)
     // the same).
     imageProcessing.reset();
 
-    // TODO: update ImageProcessing with the means of accepting and caching 
+    // TODO: update ImageProcessing with the means of accepting and caching
     // blocks of pixels as opposed to individual ones, with a back-end that
     // can serialize completed rows to the final image output file.
     options = opts;
@@ -918,22 +923,23 @@ State VirtualFrontEnd::Process()
         m_Session->SetSucceeded (false);
         if (animationProcessing != NULL)
         {
-          shelloutProcessing->SetFrameClock(animationProcessing->GetFrameNumber(), animationProcessing->GetClockValue());
+          shelloutProcessing->SetFrameClock(animationProcessing->GetNominalFrameNumber(), animationProcessing->GetClockValue());
           if (shelloutProcessing->SkipNextFrame() == false)
           {
             UCS2String filename;
-            int frame = animationProcessing->GetFrameNumber() - animationProcessing->GetStartFrame() ;
+            int frameId = animationProcessing->GetNominalFrameNumber();
+            int frame = animationProcessing->GetRunningFrameNumber();
             options = animationProcessing->GetFrameRenderOptions ();
             if (m_Session->OutputToFileSet())
             {
-              filename = imageProcessing->GetOutputFilename (options, animationProcessing->GetFrameNumber(), animationProcessing->GetFrameNumberDigits());
+              filename = imageProcessing->GetOutputFilename (options, frameId, animationProcessing->GetFrameNumberDigits());
               options.SetUCS2String (kPOVAttrib_OutputFile, filename.c_str());
 
               // test access permission now to avoid surprise later after waiting for
               // the render to complete.
               if (m_Session->TestAccessAllowed(filename, true) == false)
               {
-                string str ("IO Restrictions prohibit write access to '") ;
+                string str ("IO Restrictions prohibit write access to '");
                 str += UCS2toASCIIString(filename);
                 str += "'";
                 throw POV_EXCEPTION(kCannotOpenFileErr, str);
@@ -941,7 +947,7 @@ State VirtualFrontEnd::Process()
               shelloutProcessing->SetOutputFile(UCS2toASCIIString(filename));
               m_Session->AdviseOutputFilename (filename);
             }
-            m_Session->AppendAnimationStatus (frame + 1, animationProcessing->GetTotalFrames(), filename) ;
+            m_Session->AppendAnimationStatus (frameId, frame, animationProcessing->GetTotalFramesToRender(), filename);
           }
         }
 
@@ -1097,7 +1103,7 @@ State VirtualFrontEnd::Process()
 
               /* [JG] the block here is a duplicate of actions done after
                * the post frame shellout (that won't be reached because
-               * the image was already there). 
+               * the image was already there).
                */
               try { renderFrontend.CloseView(viewId); }
               catch (pov_base::Exception&) { /* Ignore any error here! */ }
@@ -1161,7 +1167,7 @@ State VirtualFrontEnd::Process()
             if (animationProcessing != NULL)
             {
               if (m_Session->OutputToFileSet())
-                m_Session->AdviseOutputFilename (imageProcessing->WriteImage(options, animationProcessing->GetFrameNumber(), animationProcessing->GetFrameNumberDigits()));
+                m_Session->AdviseOutputFilename (imageProcessing->WriteImage(options, animationProcessing->GetNominalFrameNumber(), animationProcessing->GetFrameNumberDigits()));
               m_Session->AdviseFrameCompleted();
             }
             else
@@ -1232,7 +1238,7 @@ State VirtualFrontEnd::Process()
         }
         return state = kStopped;
       }
-      /* [JG] the actions hereafter should be also done 
+      /* [JG] the actions hereafter should be also done
        * when the image already existed: tidy up the data before next frame or stop
        */
       try { renderFrontend.CloseView(viewId); }
@@ -1365,23 +1371,11 @@ bool VirtualFrontEnd::Paused (void)
 //
 ////////////////////////////////////////////////////////////////////////////////////////
 
-int Allow_File_Write (const char *Filename, const unsigned int FileType)
-{
-  if (strcmp(Filename, "stdout") == 0 || strcmp(Filename, "stderr") == 0)
-    return true;
-  return (vfeSession::GetSessionFromThreadID()->TestAccessAllowed(Filename, true));
-}
-
 int Allow_File_Write (const unsigned short *Filename, const unsigned int FileType)
 {
   if (strcmp(UCS2toASCIIString(Filename).c_str(), "stdout") == 0 || strcmp(UCS2toASCIIString(Filename).c_str(), "stderr") == 0)
     return true;
   return (vfeSession::GetSessionFromThreadID()->TestAccessAllowed(Filename, true));
-}
-
-int Allow_File_Read (const char *Filename, const unsigned int FileType)
-{
-  return (vfeSession::GetSessionFromThreadID()->TestAccessAllowed(Filename, false));
 }
 
 int Allow_File_Read (const unsigned short *Filename, const unsigned int FileType)

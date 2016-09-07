@@ -26,11 +26,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/vfe/win/vfeplatform.cpp $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/vfe/win/vfeplatform.cpp $
+ * $Revision: #28 $
+ * $Change: 6130 $
+ * $DateTime: 2013/11/25 11:36:19 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #include <windows.h>
@@ -216,7 +216,7 @@ namespace vfePlatform
     SYSTEMTIME        systemTime ;
 
     GetSystemTime (&systemTime) ;
-    SystemTimeToFileTime (&systemTime, (FILETIME *) &fileTime) ;
+    SystemTimeToFileTime (&systemTime, reinterpret_cast<FILETIME *>(&fileTime)) ;
     fileTime /= 10000;
     fileTime += m_TimestampOffset;
     if (fileTime < m_LastTimestamp)
@@ -422,7 +422,7 @@ namespace vfePlatform
   /////////////////////////////////////////////////////////////////////////
   /////////////////////////////////////////////////////////////////////////
 
-  WinShelloutProcessing::WinShelloutProcessing(POVMS_Object& opts, const string& scene, uint width, uint height): ShelloutProcessing(opts, scene, width, height)
+  WinShelloutProcessing::WinShelloutProcessing(POVMS_Object& opts, const string& scene, unsigned int width, unsigned int height): ShelloutProcessing(opts, scene, width, height)
   {
     m_ProcessRunning = false;
     m_ProcessId = m_LastError = m_ExitCode = 0;
@@ -570,7 +570,7 @@ namespace vfePlatform
                      NULL,
                      m_LastError,
                      MAKELANGID (LANG_ENGLISH, SUBLANG_ENGLISH_US),
-                     (char *) &buffer,
+                     reinterpret_cast<char *>(&buffer),
                      0,
                      NULL);
       output += buffer;

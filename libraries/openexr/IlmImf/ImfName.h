@@ -45,8 +45,9 @@
 //-----------------------------------------------------------------------------
 
 #include <string.h>
+#include "ImfNamespace.h"
 
-namespace Imf {
+OPENEXR_IMF_INTERNAL_NAMESPACE_HEADER_ENTER
 
 
 class Name
@@ -79,7 +80,7 @@ class Name
     // Maximum length
     //---------------
 
-    static const int	SIZE = 32;
+    static const int	SIZE = 256;
     static const int	MAX_LENGTH = SIZE - 1;
 
   private:
@@ -141,6 +142,9 @@ operator < (const Name &x, const Name &y)
 }
 
 
-} // namespace IMF
+OPENEXR_IMF_INTERNAL_NAMESPACE_HEADER_EXIT
+
+
+
 
 #endif

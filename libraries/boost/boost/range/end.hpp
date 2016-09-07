@@ -11,7 +11,7 @@
 #ifndef BOOST_RANGE_END_HPP
 #define BOOST_RANGE_END_HPP
 
-#if defined(_MSC_VER) && (_MSC_VER >= 1200)
+#if defined(_MSC_VER)
 # pragma once
 #endif
 
@@ -28,9 +28,7 @@
 namespace boost
 {
 
-#if !BOOST_WORKAROUND(__BORLANDC__, BOOST_TESTED_AT(0x564)) && \
-    !BOOST_WORKAROUND(__GNUC__, < 3) \
-    /**/
+#if !BOOST_WORKAROUND(__BORLANDC__, BOOST_TESTED_AT(0x564))
 namespace range_detail
 {
 #endif
@@ -82,18 +80,17 @@ namespace range_detail
             return range_detail::array_end<T,sz>( a );
         }
 
-#if !BOOST_WORKAROUND(__BORLANDC__, BOOST_TESTED_AT(0x564)) && \
-    !BOOST_WORKAROUND(__GNUC__, < 3) \
-    /**/
+#if !BOOST_WORKAROUND(__BORLANDC__, BOOST_TESTED_AT(0x564))
 } // namespace 'range_detail'
 #endif
+
+namespace range_adl_barrier
+{
 
 template< class T >
 inline BOOST_DEDUCED_TYPENAME range_iterator<T>::type end( T& r )
 {
-#if !BOOST_WORKAROUND(__BORLANDC__, BOOST_TESTED_AT(0x564)) && \
-    !BOOST_WORKAROUND(__GNUC__, < 3) \
-    /**/
+#if !BOOST_WORKAROUND(__BORLANDC__, BOOST_TESTED_AT(0x564))
     using namespace range_detail;
 #endif
     return range_end( r );
@@ -102,30 +99,30 @@ inline BOOST_DEDUCED_TYPENAME range_iterator<T>::type end( T& r )
 template< class T >
 inline BOOST_DEDUCED_TYPENAME range_iterator<const T>::type end( const T& r )
 {
-#if !BOOST_WORKAROUND(__BORLANDC__, BOOST_TESTED_AT(0x564)) && \
-    !BOOST_WORKAROUND(__GNUC__, < 3) \
-    /**/
+#if !BOOST_WORKAROUND(__BORLANDC__, BOOST_TESTED_AT(0x564))
     using namespace range_detail;
 #endif
     return range_end( r );
 }
 
+    } // namespace range_adl_barrier
 } // namespace 'boost'
-
-
 
 #endif // BOOST_NO_FUNCTION_TEMPLATE_ORDERING
 
-
 namespace boost
 {
-    template< class T >
-    inline BOOST_DEDUCED_TYPENAME range_iterator<const T>::type
-    const_end( const T& r )
+    namespace range_adl_barrier
     {
-        return boost::end( r );
-    }
-}
+        template< class T >
+        inline BOOST_DEDUCED_TYPENAME range_iterator<const T>::type
+        const_end( const T& r )
+        {
+            return boost::range_adl_barrier::end( r );
+        }
+    } // namespace range_adl_barrier
+    using namespace range_adl_barrier;
+} // namespace boost
 
 #endif
 

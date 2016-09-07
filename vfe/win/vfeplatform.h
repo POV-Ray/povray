@@ -1,49 +1,54 @@
-/*******************************************************************************
- * vfeplatform.h
- *
- * Defines a platform-specific session class derived from vfeSession.
- *
- * Author: Christopher J. Cason
- *
- * ---------------------------------------------------------------------------
- * Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
- * Copyright 1991-2013 Persistence of Vision Raytracer Pty. Ltd.
- *
- * POV-Ray is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * POV-Ray is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------------
- * POV-Ray is based on the popular DKB raytracer version 2.12.
- * DKBTrace was originally written by David K. Buck.
- * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
- * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/vfe/win/vfeplatform.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
- *******************************************************************************/
+//******************************************************************************
+///
+/// @file vfe/win/vfeplatform.h
+///
+/// Defines a platform-specific session class derived from vfeSession.
+///
+/// @author Christopher J. Cason
+///
+/// @copyright
+/// @parblock
+///
+/// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
+/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+///
+/// POV-Ray is free software: you can redistribute it and/or modify
+/// it under the terms of the GNU Affero General Public License as
+/// published by the Free Software Foundation, either version 3 of the
+/// License, or (at your option) any later version.
+///
+/// POV-Ray is distributed in the hope that it will be useful,
+/// but WITHOUT ANY WARRANTY; without even the implied warranty of
+/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+/// GNU Affero General Public License for more details.
+///
+/// You should have received a copy of the GNU Affero General Public License
+/// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+///
+/// ----------------------------------------------------------------------------
+///
+/// POV-Ray is based on the popular DKB raytracer version 2.12.
+/// DKBTrace was originally written by David K. Buck.
+/// DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
+///
+/// @endparblock
+///
+//******************************************************************************
 
 #ifndef __VFEPLATFORM_H__
 #define __VFEPLATFORM_H__
+
+#include "frontend/shelloutprocessing.h"
+#include "vfesession.h"
 
 namespace vfePlatform
 {
   using namespace vfe;
 
-  class WinShelloutProcessing: public ShelloutProcessing
+  class WinShelloutProcessing: public pov_frontend::ShelloutProcessing
   {
   public:
-    WinShelloutProcessing(POVMS_Object& opts, const string& scene, uint width, uint height);
+    WinShelloutProcessing(POVMS_Object& opts, const string& scene, unsigned int width, unsigned int height);
     ~WinShelloutProcessing();
 
     virtual int ProcessID(void);
@@ -77,6 +82,9 @@ namespace vfePlatform
   class vfeWinSession : public vfeSession
   {
     public:
+
+      typedef std::set<string> FilenameSet;
+
       vfeWinSession(int id = 0);
       virtual ~vfeWinSession();
 
@@ -88,12 +96,12 @@ namespace vfePlatform
       virtual int RequestNewOutputPath(int CallCount, const string& Reason, const UCS2String& OldPath, UCS2String& NewPath);
       virtual bool TestAccessAllowed(const Path& file, bool isWrite) const;
       virtual bool ImageOutputToStdoutSupported(void) const { return m_OptimizeForConsoleOutput; }
-      virtual ShelloutProcessing *CreateShelloutProcessing(POVMS_Object& opts, const string& scene, uint width, uint height) { return new WinShelloutProcessing(opts, scene, width, height); }
+      virtual ShelloutProcessing *CreateShelloutProcessing(POVMS_Object& opts, const string& scene, unsigned int width, unsigned int height) { return new WinShelloutProcessing(opts, scene, width, height); }
 
       virtual void Clear(bool Notify = true);
 
-      const set<string>& GetReadFiles(void) const { return m_ReadFiles; }
-      const set<string>& GetWriteFiles(void) const { return m_WriteFiles; }
+      const FilenameSet& GetReadFiles(void) const { return m_ReadFiles; }
+      const FilenameSet& GetWriteFiles(void) const { return m_WriteFiles; }
 
     protected:
       virtual void WorkerThreadStartup();
@@ -124,8 +132,8 @@ namespace vfePlatform
       Path m_TempPath;
       string m_TempPathString;
       mutable vector<string> m_TempFilenames;
-      mutable set<string> m_ReadFiles;
-      mutable set<string> m_WriteFiles;
+      mutable FilenameSet m_ReadFiles;
+      mutable FilenameSet m_WriteFiles;
   } ;
 
   ///////////////////////////////////////////////////////////////////////

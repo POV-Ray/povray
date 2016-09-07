@@ -6,6 +6,8 @@
 // file:   shapes3.inc
 // author: Friedrich A. Lohmueller, March-2013
 // 
+// Update: Dec-2013 - Corrected wrong rotation in 'Round_Pyramid_N_in'. 
+//
 // Description: This file contains macros for working with object shapes,
 // as well as macros for creating shapes of special geometric objects.
 //    
@@ -664,7 +666,10 @@ object{ Round_Pyramid_N_out ( // used radius of the circumcircle
             Fill_On,     //  1 = filled, 0 = wireframe,
             Merge_On     //  1 = use merge, 0 = use union
           ) // -------------------------------------------------   
-rotate<0,Half_Angle,0>
+  //
+translate -Point_A
+Axis_Rotate_Trans(  Point_B-  Point_A ,Half_Angle) 
+translate  Point_A
 } // end of object
 #end// -----------------------------------------------<<<  end of macro Round_Pyramid_N_in()
 // -----------------------------------------------------------------------------------------

@@ -43,9 +43,6 @@
     <ClCompile Include="..\..\libraries\jpeg\jcparam.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\libraries\jpeg\jcphuff.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\libraries\jpeg\jcprepct.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -94,9 +91,6 @@
     <ClCompile Include="..\..\libraries\jpeg\jdmerge.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\libraries\jpeg\jdphuff.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\libraries\jpeg\jdpostct.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -127,9 +121,6 @@
     <ClCompile Include="..\..\libraries\jpeg\jidctint.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\libraries\jpeg\jidctred.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\libraries\jpeg\jmemmgr.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -145,18 +136,21 @@
     <ClCompile Include="..\..\libraries\jpeg\jutils.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\libraries\jpeg\jaricom.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libraries\jpeg\jcarith.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libraries\jpeg\jdarith.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\libraries\jpeg\jchuff.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\libraries\jpeg\jconfig.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\libraries\jpeg\jdct.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\libraries\jpeg\jdhuff.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\libraries\jpeg\jerror.h">

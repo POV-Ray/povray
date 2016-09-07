@@ -42,9 +42,9 @@
 //	enum Compression
 //
 //-----------------------------------------------------------------------------
+#include "ImfNamespace.h"
 
-namespace Imf {
-
+OPENEXR_IMF_INTERNAL_NAMESPACE_HEADER_ENTER
 
 enum Compression
 {
@@ -66,10 +66,19 @@ enum Compression
     B44A_COMPRESSION = 7,	// lossy 4-by-4 pixel block compression,
     				// flat fields are compressed more
 
+    DWAA_COMPRESSION = 8,       // lossy DCT based compression, in blocks
+                                // of 32 scanlines. More efficient for partial
+                                // buffer access.
+
+    DWAB_COMPRESSION = 9,       // lossy DCT based compression, in blocks
+                                // of 256 scanlines. More efficient space
+                                // wise and faster to decode full frames
+                                // than DWAA_COMPRESSION.
+
     NUM_COMPRESSION_METHODS	// number of different compression methods
 };
 
+OPENEXR_IMF_INTERNAL_NAMESPACE_HEADER_EXIT
 
-} // namespace Imf
 
 #endif

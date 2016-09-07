@@ -40,11 +40,11 @@
 #
 # Note that the 'clean' and 'doc(s)(clean)' options are mutually exclusive.
 #
-# $File: //depot/public/povray/3.x/unix/prebuild.sh $
-# $Revision: #1 $
-# $Change: 6069 $
-# $DateTime: 2013/11/06 11:59:40 $
-# $Author: chrisc $
+# $File: //depot/povray/smp/unix/prebuild.sh $
+# $Revision: #31 $
+# $Change: 6136 $
+# $DateTime: 2013/11/25 16:36:15 $
+# $Author: clipka $
 # $Log$
 ###############################################################################
 
@@ -136,6 +136,11 @@ echo "make maintainer-clean" 1>&2  &&  make maintainer-clean 1>&2 ; \
     povray.ini.in scenes/ scripts/ VERSION
   do
     rm -r ../$file 2> /dev/null  &&  echo "Cleanup ../$file"
+  done
+  # cleanup stuff added by automake
+  for file in config.guess config.sub depcomp install-sh missing
+  do
+    rm config/$file 2> /dev/null  &&  echo "Cleanup config/$file"
   done
   ;;
 
@@ -426,20 +431,22 @@ povray_SOURCES = \\
 
 # Include paths for headers.
 AM_CPPFLAGS = \\
+  -I\$(top_srcdir)/unix/povconfig \\
   -I\$(top_srcdir) \\
   -I\$(top_srcdir)/source \\
   -I\$(top_builddir)/source \\
-  -I\$(top_srcdir)/source/backend \\
-  -I\$(top_srcdir)/source/base \\
-  -I\$(top_srcdir)/source/frontend \\
+  -I\$(top_srcdir)/platform/unix \\
   -I\$(top_srcdir)/vfe \\
   -I\$(top_srcdir)/vfe/unix
 
 # Libraries to link with.
 # Beware: order does matter!
+# TODO - Having vfe/libvfe.a twice in this list is a bit of a hackish way to cope with cyclic dependencies.
 LDADD = \\
   \$(top_builddir)/vfe/libvfe.a \\
-  \$(top_builddir)/source/libpovray.a
+  \$(top_builddir)/source/libpovray.a \\
+  \$(top_builddir)/vfe/libvfe.a \\
+  \$(top_builddir)/platform/libplatform.a
 pbEOF
   ;;
 esac
@@ -571,7 +578,7 @@ povowner = @povowner@
 povgroup = @povgroup@
 
 # Directories to build.
-SUBDIRS = source vfe unix
+SUBDIRS = source vfe platform unix
 
 # Additional files to distribute.
 EXTRA_DIST = \\
@@ -790,10 +797,9 @@ libpovray_a_SOURCES = \\
 
 # Include paths for headers.
 AM_CPPFLAGS = \\
+  -I\$(top_srcdir)/unix/povconfig \\
   -I\$(top_srcdir) \\
-  -I\$(top_srcdir)/source/backend \\
-  -I\$(top_srcdir)/source/base \\
-  -I\$(top_srcdir)/source/frontend \\
+  -I\$(top_srcdir)/platform/unix \\
   -I\$(top_srcdir)/unix \\
   -I\$(top_srcdir)/vfe \\
   -I\$(top_srcdir)/vfe/unix
@@ -1323,11 +1329,70 @@ libvfe_a_SOURCES = \\
 
 # Include paths for headers.
 AM_CPPFLAGS = \\
+  -I\$(top_srcdir)/unix/povconfig \\
+  -I\$(top_srcdir)/platform/unix \\
   -I\$(top_srcdir)/vfe/unix \\
   -I\$(top_srcdir)/unix \\
-  -I\$(top_srcdir)/source \\
-  -I\$(top_srcdir)/source/base \\
-  -I\$(top_srcdir)/source/backend
+  -I\$(top_srcdir)/source
+
+# Extra definitions for compiling.
+# They cannot be placed in config.h since they indirectly rely on \$prefix.
+DEFS = \\
+  @DEFS@ \\
+  -DPOVLIBDIR=\"@datadir@/@PACKAGE@-@VERSION_BASE@\" \\
+  -DPOVCONFDIR=\"@sysconfdir@/@PACKAGE@/@VERSION_BASE@\" \\
+  -DPOVCONFDIR_BACKWARD=\"@sysconfdir@\"
+pbEOF
+  ;;
+esac
+
+
+
+
+##### Platform ################################################################
+
+###
+### ../platform/Makefile.am
+###
+
+dir="../platform"
+makefile="$dir/Makefile"
+
+case "$1" in
+  clean)
+  for file in $makefile.am $makefile.in; do
+    rm $file 2> /dev/null  &&  echo "Cleanup $file"
+  done
+  ;;
+
+  doc*)
+  ;;
+
+  *)
+  files=`find $dir/unix -name "*.cpp" -or -name "*.h" | sed s,"$dir/",,g`
+
+  echo "Create $makefile.am"
+  cat Makefile.header > $makefile.am
+  cat << pbEOF >> $makefile.am
+
+# Makefile.am for the source distribution of POV-Ray $pov_version_base for UNIX
+# Written by $pov_config_bugreport
+
+# Libraries to build.
+noinst_LIBRARIES = libplatform.a
+
+# Source files.
+libplatform_a_SOURCES = \\
+`echo $files`
+
+# Include paths for headers.
+AM_CPPFLAGS = \\
+  -I\$(top_srcdir)/unix/povconfig \\
+  -I\$(top_srcdir)/platform/unix \\
+  -I\$(top_srcdir)/vfe \\
+  -I\$(top_srcdir)/vfe/unix \\
+  -I\$(top_srcdir)/unix \\
+  -I\$(top_srcdir)/source
 
 # Extra definitions for compiling.
 # They cannot be placed in config.h since they indirectly rely on \$prefix.

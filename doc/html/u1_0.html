@@ -1,0 +1,356 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+
+<!--  This file copyright Persistence of Vision Raytracer Pty. Ltd. 2009-2011  -->
+
+<html lang="en">
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=windows-1252">
+<title>Unix Table of Contents</title>
+<link rel="StyleSheet" href="povray37.css" type="text/css">
+<link rel="shortcut icon" href="favicon.ico">
+
+<!--  NOTE: In order to help users find information about POV-Ray using web      -->
+<!--  search engines, we ask that you *not* let them index documentation         -->
+<!--  mirrors because effectively, when searching, users will get hundreds of    -->
+<!--  results containing the same information! For this reason, these meta tags  -->
+<!--  below disable archiving of this page by search engines.                    -->
+
+<meta name="robots" content="noarchive">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="expires" content="0">
+</head>
+<body>
+
+<div class="Page">
+<!-- NavPanel Begin -->
+<div class="NavPanel">
+<table class="NavTable">
+<tr>
+  <td class="FixedPanelHeading"><a title="1.1" href="#u1_1">Introduction</a></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="1.1.1" href="#u1_1_1">What is POV-Ray?</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="1.1.2" href="#u1_1_2">What is POV-Ray for Unix?</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="1.1.3" href="#u1_1_3">... And What Is It Not?</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="1.1.4" href="#u1_1_4">Who Can Use POV-Ray for Unix?</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="1.1.5" href="#u1_1_5">Spelling</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="1.1.6" href="#u1_1_6">Reporting Bugs</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="1.1.7" href="#u1_1_7">Trademarks</a></div></td>
+</tr>
+<tr>
+  <td class="FixedPanelHeading"><a title="1.2" href="#u1_2">Features</a></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="1.2.1" href="#u1_2_1">New Features</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="1.2.2" href="#u1_2_2">Display Options</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="1.2.3" href="#u1_2_3">Benchmark Mode</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="1.2.4" href="#u1_2_4">Sample scene render scripts</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="1.2.5" href="#u1_2_5">KDE Integration</a></div></td>
+</tr>
+<tr>
+  <td class="FixedPanelHeading"><a title="1.3" href="#u1_3">Getting Started</a></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="1.3.1" href="#u1_3_1">Available distributions</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="1.3.2" href="#u1_3_2">Configuration</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="1.3.3" href="#u1_3_3">Starting a Render Job</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="1.3.4" href="#u1_3_4">Interrupting POV-Ray</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="1.3.5" href="#u1_3_5">Tutorials</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="1.3.6" href="#u1_3_6">Rendering the Sample Scenes</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="1.3.7" href="#u1_3_7">POV-Ray for Unix Tips</a></div></td>
+</tr>
+<tr>
+  <td class="FixedPanelHeading"><a title="1.4" href="#u1_4">I/O Restrictions</a></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="1.4.1" href="#u1_4_1">Configuration file format</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="1.4.2" href="#u1_4_2">File I/O Security</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="1.4.3" href="#u1_4_3">Shellout Security</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="1.4.4" href="#u1_4_4">Permitted Paths</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="1.4.5" href="#u1_4_5">Example configuration file</a></div></td>
+</tr>
+<tr>
+  <td class="FixedPanelHeading"><a title="1.5" href="#u1_5">Understanding File Types</a></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="1.5.1" href="#u1_5_1">POV Files</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="1.5.2" href="#u1_5_2">INI Files</a></div></td>
+</tr>
+<tr>
+  <td class="FixedPanelHeading"><a title="1.6" href="#u1_6">Understanding POV-Ray Options</a></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="1.6.1" href="#u1_6_1">Special Command-Line Options</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="1.6.2" href="#u1_6_2">Benchmark Rendering Mode</a></div></td>
+</tr>
+<tr>
+  <td class="FixedPanelHeading"><a title="1.7" href="#u1_7">Bug Reports</a></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="1.7.1" href="#u1_7_1">Known Bugs</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="1.7.2" href="#u1_7_2">Bug Reporting via Email</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="1.7.3" href="#u1_7_3">Bug Reporting via our Bug Tracking System</a></div></td>
+</tr>
+<tr>
+  <td class="FixedPanelHeading"><a title="1.8" href="#u1_8">Speed Considerations</a></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="1.8.1" href="#u1_8_1">Render Priority</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="1.8.2" href="#u1_8_2">Render Window</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="1.8.3" href="#u1_8_3">Memory</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="1.8.4" href="#u1_8_4">Scene Features</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a title="1.8.5" href="#u1_8_5">Render Quality</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh1">&nbsp;</div></td>
+</tr>
+<tr>
+  <td><div class="divh1">&nbsp;</div></td>
+</tr>
+</table>
+</div>
+<!-- NavPanel End -->
+
+<div class="Content">
+<table class="HeaderFooter" width="100%">
+<tr>
+  <td colspan=5 align="left" class="HeaderFooter">
+    POV-Ray for Unix <strong class="HeaderFooter">version 3.7</strong>
+  </td>
+</tr>
+<tr >
+  <td colspan=5>
+    <hr align="right" width="70%">
+  </td>
+</tr>
+<tr>
+  <td width="30%"></td>
+  <td class="NavBar"><a href="index.html" title="The Front Door">Home</a></td>
+  <td class="NavBar"><a href="u1_0.html" title="You're already here!">POV-Ray for Unix</a></td>
+  <td class="NavBar"><a href="t2_0.html" title="Tutorial Table of Contents">POV-Ray Tutorial</a></td>
+  <td class="NavBar"><a href="r3_0.html" title="Reference Table of Contents">POV-Ray Reference</a></td>
+</tr>
+</table>
+
+<table>
+<tr>
+  <td class="ContentsHeading"><div class="divh1"><a name="u1_1"></a><a title="1.1" href="u1_1.html#u1_1">Introduction</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="u1_1_1"></a><a title="1.1.1" href="u1_1.html#u1_1_1">What is POV-Ray?</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="u1_1_2"></a><a title="1.1.2" href="u1_1.html#u1_1_2">What is POV-Ray for Unix?</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="u1_1_3"></a><a title="1.1.3" href="u1_1.html#u1_1_3">... And What Is It Not?</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="u1_1_4"></a><a title="1.1.4" href="u1_1.html#u1_1_4">Who Can Use POV-Ray for Unix?</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="u1_1_5"></a><a title="1.1.5" href="u1_1.html#u1_1_5">Spelling</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="u1_1_6"></a><a title="1.1.6" href="u1_1.html#u1_1_6">Reporting Bugs</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="u1_1_7"></a><a title="1.1.7" href="u1_1.html#u1_1_7">Trademarks</a></div></td>
+</tr>
+<tr>
+  <td class="ContentsHeading"><div class="divh1"><a name="u1_2"></a><a title="1.2" href="u1_2.html#u1_2">Features</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="u1_2_1"></a><a title="1.2.1" href="u1_2.html#u1_2_1">New Features</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="u1_2_2"></a><a title="1.2.2" href="u1_2.html#u1_2_2">Display Options</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="u1_2_3"></a><a title="1.2.3" href="u1_2.html#u1_2_3">Benchmark Mode</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="u1_2_4"></a><a title="1.2.4" href="u1_2.html#u1_2_4">Sample scene render scripts</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="u1_2_5"></a><a title="1.2.5" href="u1_2.html#u1_2_5">KDE Integration</a></div></td>
+</tr>
+<tr>
+  <td class="ContentsHeading"><div class="divh1"><a name="u1_3"></a><a title="1.3" href="u1_3.html#u1_3">Getting Started</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="u1_3_1"></a><a title="1.3.1" href="u1_3.html#u1_3_1">Available distributions</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="u1_3_2"></a><a title="1.3.2" href="u1_3.html#u1_3_2">Configuration</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="u1_3_2_1"></a><a title="1.3.2.1" href="u1_3.html#u1_3_2_1">The I/O Restrictions configuration file</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="u1_3_2_2"></a><a title="1.3.2.2" href="u1_3.html#u1_3_2_2">The main POV-Ray INI file</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="u1_3_3"></a><a title="1.3.3" href="u1_3.html#u1_3_3">Starting a Render Job</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="u1_3_3_1"></a><a title="1.3.3.1" href="u1_3.html#u1_3_3_1">X Window display</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="u1_3_3_2"></a><a title="1.3.3.2" href="u1_3.html#u1_3_3_2">SVGAlib display</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="u1_3_3_3"></a><a title="1.3.3.3" href="u1_3.html#u1_3_3_3">Output file formats</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="u1_3_4"></a><a title="1.3.4" href="u1_3.html#u1_3_4">Interrupting POV-Ray</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="u1_3_5"></a><a title="1.3.5" href="u1_3.html#u1_3_5">Tutorials</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="u1_3_6"></a><a title="1.3.6" href="u1_3.html#u1_3_6">Rendering the Sample Scenes</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="u1_3_7"></a><a title="1.3.7" href="u1_3.html#u1_3_7">POV-Ray for Unix Tips</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="u1_3_7_1"></a><a title="1.3.7.1" href="u1_3.html#u1_3_7_1">Automated execution</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="u1_3_7_2"></a><a title="1.3.7.2" href="u1_3.html#u1_3_7_2">Post-processing Images</a></div></td>
+</tr>
+<tr>
+  <td class="ContentsHeading"><div class="divh1"><a name="u1_4"></a><a title="1.4" href="u1_4.html#u1_4">I/O Restrictions</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="u1_4_1"></a><a title="1.4.1" href="u1_4.html#u1_4_1">Configuration file format</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="u1_4_2"></a><a title="1.4.2" href="u1_4.html#u1_4_2">File I/O Security</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="u1_4_3"></a><a title="1.4.3" href="u1_4.html#u1_4_3">Shellout Security</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="u1_4_4"></a><a title="1.4.4" href="u1_4.html#u1_4_4">Permitted Paths</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="u1_4_4_1"></a><a title="1.4.4.1" href="u1_4.html#u1_4_4_1">Examples for path settings</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="u1_4_5"></a><a title="1.4.5" href="u1_4.html#u1_4_5">Example configuration file</a></div></td>
+</tr>
+<tr>
+  <td class="ContentsHeading"><div class="divh1"><a name="u1_5"></a><a title="1.5" href="u1_5.html#u1_5">Understanding File Types</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="u1_5_1"></a><a title="1.5.1" href="u1_5.html#u1_5_1">POV Files</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="u1_5_2"></a><a title="1.5.2" href="u1_5.html#u1_5_2">INI Files</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh3"><a name="u1_5_2_1"></a><a title="1.5.2.1" href="u1_5.html#u1_5_2_1">INI File Sections</a></div></td>
+</tr>
+<tr>
+  <td class="ContentsHeading"><div class="divh1"><a name="u1_6"></a><a title="1.6" href="u1_6.html#u1_6">Understanding POV-Ray Options</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="u1_6_1"></a><a title="1.6.1" href="u1_6.html#u1_6_1">Special Command-Line Options</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="u1_6_2"></a><a title="1.6.2" href="u1_6.html#u1_6_2">Benchmark Rendering Mode</a></div></td>
+</tr>
+<tr>
+  <td class="ContentsHeading"><div class="divh1"><a name="u1_7"></a><a title="1.7" href="u1_7.html#u1_7">Bug Reports</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="u1_7_1"></a><a title="1.7.1" href="u1_7.html#u1_7_1">Known Bugs</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="u1_7_2"></a><a title="1.7.2" href="u1_7.html#u1_7_2">Bug Reporting via Email</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="u1_7_3"></a><a title="1.7.3" href="u1_7.html#u1_7_3">Bug Reporting via our Bug Tracking System</a></div></td>
+</tr>
+<tr>
+  <td class="ContentsHeading"><div class="divh1"><a name="u1_8"></a><a title="1.8" href="u1_8.html#u1_8">Speed Considerations</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="u1_8_1"></a><a title="1.8.1" href="u1_8.html#u1_8_1">Render Priority</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="u1_8_2"></a><a title="1.8.2" href="u1_8.html#u1_8_2">Render Window</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="u1_8_3"></a><a title="1.8.3" href="u1_8.html#u1_8_3">Memory</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="u1_8_4"></a><a title="1.8.4" href="u1_8.html#u1_8_4">Scene Features</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh2"><a name="u1_8_5"></a><a title="1.8.5" href="u1_8.html#u1_8_5">Render Quality</a></div></td>
+</tr>
+</table>
+</div>
+
+</div>
+</body>
+</html>
