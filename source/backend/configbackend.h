@@ -86,14 +86,6 @@
     #define SCANF_EOF EOF
 #endif
 
-#ifndef POV_SYS_THREAD_STARTUP
-    #define POV_SYS_THREAD_STARTUP
-#endif
-
-#ifndef POV_SYS_THREAD_CLEANUP
-    #define POV_SYS_THREAD_CLEANUP
-#endif
-
 #ifndef NEW_LINE_STRING
     // NEW_LINE_STRING remains undefined, optimizing the code for "\n" as used internally
 #endif
@@ -103,24 +95,12 @@
     #define COMPILER_VER ".u"
 #endif
 
-#ifndef POV_PARSE_PATH_STRING
-    #error "A valid POV_PARSE_PATH_STRING macro is required!"
-#endif
-
 
 /*
  * Font related macros [trf]
  */
 #ifndef POV_CONVERT_TEXT_TO_UCS2
     #define POV_CONVERT_TEXT_TO_UCS2(ts, tsl, as) (NULL)
-#endif
-
-#ifndef POV_ALLOW_FILE_READ
-    #define POV_ALLOW_FILE_READ(f,t) (1)
-#endif
-
-#ifndef POV_ALLOW_FILE_WRITE
-    #define POV_ALLOW_FILE_WRITE(f,t) (1)
 #endif
 
 //******************************************************************************
@@ -191,7 +171,5 @@
 /// @}
 ///
 //******************************************************************************
-
-#include "syspovprotobackend.h"
 
 #endif // POVRAY_BACKEND_CONFIGBACKEND_H

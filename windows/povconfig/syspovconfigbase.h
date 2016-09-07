@@ -47,7 +47,13 @@
     #define POV_DEBUG 0
 #endif
 
-#define POV_USE_DEFAULT_DELAY 0 // Windows provides a platform-specific mechanism to let a task wait for a specified time.
-#define POV_USE_DEFAULT_TIMER 0 // Windows provides platform-specific mechanisms to measure both wall-clock and CPU time.
+// Windows provides a platform-specific mechanism to let a task wait for a specified time.
+#define POV_USE_DEFAULT_DELAY 0
+
+// Windows provides platform-specific mechanisms to measure both wall-clock and CPU time.
+#define POV_USE_DEFAULT_TIMER 0
+
+// Windows requires platform-specific parsing of path name strings.
+#define POV_USE_DEFAULT_PATH_PARSER 0
 
 #endif // POVRAY_WINDOWS_SYSPOVCONFIGBASE_H

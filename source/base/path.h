@@ -108,11 +108,52 @@ class Path
 
         bool Empty() const;
     private:
+
         UCS2String volume;
         vector<UCS2String> folders;
         UCS2String file;
 
+        /// Analyze a path string.
+        ///
+        /// This method interprets the supplied string as a path and/or file name, analyzes it for its components
+        /// according to platform-specific conventions, and sets the object's data accordingly, or throws an exception
+        /// if the string does not match the platform-specific conventions.
+        ///
+        /// @note
+        ///     This method calls @ref ParsePathString(UCS2String&,vector<UCS2String>,UCS2String&,const UCS2String&)
+        ///     to do the actual work.
+        ///
         void ParsePathString(const UCS2String& p);
+
+        /// Analyze a path string.
+        ///
+        /// This method interprets the supplied input string as a path and/or file name, analyzes it for its components
+        /// according to platform-specific conventions, and sets the output parameters accordingly.
+        ///
+        /// @note
+        ///     If the method returns `false`, the output parameters shall be empty.
+        ///
+        /// @note
+        ///     If according to the platform-specific conventions the structure of the path string clearly identifies it
+        ///     as a directory name (e.g. a trailing path separator character on Unix systems), the file name element
+        ///     shall be set to an empty string. Otherwise, the last element of the path shall invariably be interpreted
+        ///     as a regular file name.
+        ///
+        /// @note
+        ///     The portable implementation of this method supports only local files on a single anonymous volume,
+        ///     using @ref POV_PATH_SEPARATOR as the only allowed path separator character. To override this behaviour,
+        ///     set the @ref POV_USE_DEFAULT_PATH_PARSER compile-time configuration macro to non-zero and provide
+        ///     a modified implementation of this method in a platform-specific source file.
+        ///
+        /// @param[out] v   The volume element of the path, including a trailing @ref POV_PATH_SEPARATOR if, and _only_
+        ///                 if, the input string represents an absolute path.
+        /// @param[out] d   The list of directory elements comprising the path, each _without_ any separator characters.
+        /// @param[out] f   The file name element of the path, _without_ any separator character.
+        /// @param[in]  p   The path string to analyze.
+        /// @return         Whether the string constitutes a valid path and/or file name according to the
+        ///                 platform-specific conventions.
+        ///
+        static bool ParsePathString (UCS2String& v, vector<UCS2String>& d, UCS2String& f, const UCS2String& p);
 
         UCS2String URLToUCS2String(const char *p) const;
         UCS2String URLToUCS2String(const string& p) const;

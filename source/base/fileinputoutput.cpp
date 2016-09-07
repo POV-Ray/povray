@@ -90,7 +90,7 @@ IFileStream::IFileStream(const UCS2String& name) : IStream(name), f(NULL)
     }
     else
     {
-        f = POV_UCS2_FOPEN(name, "rb");
+        f = PlatformBase::GetInstance().OpenLocalFile (name, "rb");
     }
     fail = (f == NULL);
 }
@@ -227,7 +227,7 @@ OStream::OStream(const UCS2String& name, unsigned int Flags) : IOBase(name), f(N
     }
     else
     {
-        f = POV_UCS2_FOPEN(name, mode);
+        f = PlatformBase::GetInstance().OpenLocalFile (name, mode);
         if (f == NULL)
         {
             if((Flags & append) == 0)
@@ -238,7 +238,7 @@ OStream::OStream(const UCS2String& name, unsigned int Flags) : IOBase(name), f(N
                 // the open for append of an existing file fails, we allow a new file
                 // to be created.
                 mode = "wb";
-                f = POV_UCS2_FOPEN(name, mode);
+                f = PlatformBase::GetInstance().OpenLocalFile (name, mode);
             }
         }
 
@@ -307,7 +307,7 @@ void OStream::printf(const char *format, ...)
 
 IStream *NewIStream(const Path& p, unsigned int stype)
 {
-    if (POV_ALLOW_FILE_READ(p().c_str(), stype) == false) // TODO FIXME - this is handled by the frontend, but that code isn't completely there yet [trf]
+    if (!PlatformBase::GetInstance().AllowLocalFileAccess(p(), stype, false))
     {
         string str ("IO Restrictions prohibit read access to '") ;
         str += UCS2toASCIIString(p());
@@ -325,7 +325,7 @@ OStream *NewOStream(const Path& p, unsigned int stype, bool sappend)
     if(sappend)
         Flags |= IOBase::append;
 
-    if (POV_ALLOW_FILE_WRITE(p().c_str(), stype) == false) // TODO FIXME - this is handled by the frontend, but that code isn't completely there yet [trf]
+    if (!PlatformBase::GetInstance().AllowLocalFileAccess(p(), stype, true))
     {
         string str ("IO Restrictions prohibit write access to '") ;
         str += UCS2toASCIIString(p());
@@ -358,7 +358,7 @@ UCS2String GetFileName(const Path& p)
 
 bool CheckIfFileExists(const Path& p)
 {
-    FILE *tempf = POV_UCS2_FOPEN(p().c_str(), "r");
+    FILE *tempf = PlatformBase::GetInstance().OpenLocalFile (p().c_str(), "r");
 
     if(tempf != NULL)
         fclose(tempf);
@@ -370,7 +370,7 @@ bool CheckIfFileExists(const Path& p)
 
 POV_LONG GetFileLength(const Path& p)
 {
-    FILE *tempf = POV_UCS2_FOPEN(p().c_str(), "rb");
+    FILE *tempf = PlatformBase::GetInstance().OpenLocalFile (p().c_str(), "rb");
     POV_LONG result = -1;
 
     if(tempf != NULL)

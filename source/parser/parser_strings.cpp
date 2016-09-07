@@ -817,7 +817,7 @@ UCS2 *Parser::String_Literal_To_UCS2(const char *str, bool pathname)
             // Historically, escape sequences were ignored when parsing for a filename.
             // As of POV-Ray 3.71, this has been changed.
 
-#if (FILENAME_SEPARATOR == '\\')
+#if POV_BACKSLASH_IS_PATH_SEPARATOR
             if (pathname)
             {
                 Warning("Backslash encountered while parsing for a filename."
@@ -888,7 +888,7 @@ UCS2 *Parser::String_Literal_To_UCS2(const char *str, bool pathname)
                 // Historically, escape sequences were ignored when parsing for a filename.
                 // As of POV-Ray 3.71, this has been changed.
 
-#if (FILENAME_SEPARATOR == '\\')
+#if POV_BACKSLASH_IS_PATH_SEPARATOR
                 Warning("Backslash encountered while parsing for a filename."
                         " In legacy (pre-3.71) scenes, this is NOT interpreted as the start of an escape sequence."
                         " However, for future compatibility it is recommended to use a forward slash as path separator instead.");

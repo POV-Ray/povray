@@ -112,9 +112,6 @@
     #define POV_VALIDATE_FRONTEND(msg) true
 #endif
 
-/// Platform specific function interface self reference pointer
-pov_base::PlatformBase *pov_base::PlatformBase::self = NULL;
-
 namespace
 {
 

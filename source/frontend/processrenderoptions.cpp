@@ -44,6 +44,7 @@
 
 #include "base/fileinputoutput.h"
 #include "base/fileutil.h"
+#include "base/platformbase.h"
 #include "base/pov_err.h"
 #include "base/stringutilities.h"
 #include "base/textstream.h"
@@ -854,10 +855,10 @@ int ProcessRenderOptions::ProcessUnknownString(char *str, POVMSObjectPtr obj)
     {
         if(strlen(str) > 0)
         {
-            if(str[strlen(str) - 1] == POV_FILE_SEPARATOR)
+            if(str[strlen(str) - 1] == POV_PATH_SEPARATOR)
                 state = 2; // library path
-#ifdef POV_FILE_SEPARATOR_2
-            else if(str[strlen(str) - 1] == POV_FILE_SEPARATOR_2)
+#ifdef POV_PATH_SEPARATOR_2
+            else if(str[strlen(str) - 1] == POV_PATH_SEPARATOR_2)
                 state = 2; // library path
 #endif
         }
@@ -953,7 +954,9 @@ ITextStream *ProcessRenderOptions::OpenINIFileStream(const char *filename, unsig
     const char *xstr = strrchr(filename, '.');
     bool hasextension = ((xstr != NULL) && (strlen(xstr) <= 4)); // TODO FIXME - we shouldn't rely on extensions being at most 1+3 chars long
 
-    if(POV_ALLOW_FILE_READ(ASCIItoUCS2String(filename).c_str(),stype) == 0) // TODO FIXME - Remove dependency on this macro!!! [trf]
+    // TODO - the following statement may need reviewing; before it was changed from a macro to a PlatformBase call,
+    //        it carried a comment "TODO FIXME - Remove dependency on this macro!!! [trf]".
+    if (!PlatformBase::GetInstance().AllowLocalFileAccess (ASCIItoUCS2String(filename),stype, false))
         return NULL;
 
     for(i = 0; i < POV_FILE_EXTENSIONS_PER_TYPE; i++)
@@ -1016,7 +1019,7 @@ ITextStream *ProcessRenderOptions::OpenINIFileStream(const char *filename, unsig
         (void)POVMSAttr_Delete(&item);
 
         file[strlen(file)+1] = '\0';
-        file[strlen(file)] = POV_FILE_SEPARATOR;
+        file[strlen(file)] = POV_PATH_SEPARATOR;
 
         strcpy(pathname, file);
         strcat(pathname, filename);

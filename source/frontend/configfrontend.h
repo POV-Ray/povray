@@ -73,6 +73,4 @@
     #define POVMSLongToCDouble(x) double(x)
 #endif
 
-#include "syspovprotofrontend.h"
-
 #endif

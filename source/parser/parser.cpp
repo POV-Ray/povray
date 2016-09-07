@@ -161,7 +161,7 @@ void Parser::Run()
 {
     int         error_line = -1;
     int         error_col = -1;
-    UCS2String  error_filename(MAX_PATH, 0);
+    UCS2String  error_filename(MAX_PATH, 0); // Pre-claim some memory, so we can handle an out-of-memory error.
     POV_LONG    error_pos = -1;
 
     try

@@ -354,6 +354,7 @@
     <ClCompile Include="..\..\source\base\mathutil.cpp" />
     <ClCompile Include="..\..\source\base\messenger.cpp" />
     <ClCompile Include="..\..\source\base\path.cpp" />
+    <ClCompile Include="..\..\source\base\platformbase.cpp" />
     <ClCompile Include="..\..\source\base\pov_err.cpp" />
     <ClCompile Include="..\..\source\base\stringutilities.cpp" />
     <ClCompile Include="..\..\source\base\textstream.cpp" />

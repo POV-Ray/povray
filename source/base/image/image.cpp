@@ -60,10 +60,6 @@
 #include "base/image/targa.h"
 #include "base/image/tiff_pov.h"
 
-#ifdef USE_SYSPROTO
-#include "syspovprotobase.h"
-#endif
-
 // this must be the last file included
 #include "base/povdebug.h"
 
@@ -3058,7 +3054,7 @@ class FileBackedPixelContainer
         };
 
         FileBackedPixelContainer(size_type width, size_type height, size_type bs):
-            m_File(-1), m_Width(width), m_Height(height), m_xPos(0), m_yPos(0), m_Dirty(false), m_Path(POV_PLATFORM_BASE.CreateTemporaryFile())
+            m_File(-1), m_Width(width), m_Height(height), m_xPos(0), m_yPos(0), m_Dirty(false), m_Path(PlatformBase::GetInstance().CreateTemporaryFile())
         {
             if ((m_File = open(UCS2toASCIIString(m_Path).c_str(), O_CREAT | O_RDWR | O_TRUNC, S_IRUSR | S_IWUSR)) == -1)
                 throw POV_EXCEPTION(kCannotOpenFileErr, "Cannot open backing file for intermediate image storage.");
@@ -3100,7 +3096,7 @@ class FileBackedPixelContainer
                 // if shutdown has been delayed, by the time we reach here, the platform base
                 // may no longer be valid (see crashdump #77 for an example of this). we need
                 // to take the address of the reference to see if it's now NULL before we use it.
-                PlatformBase *pb(&POV_PLATFORM_BASE);
+                PlatformBase *pb(&PlatformBase::GetInstance());
                 if (pb != NULL)
                     pb->DeleteTemporaryFile(m_Path);
             }

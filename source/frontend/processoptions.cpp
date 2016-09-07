@@ -43,6 +43,7 @@
 #include "povms/povmscpp.h"
 #include "povms/povmsid.h"
 
+#include "base/platformbase.h"
 #include "base/pov_err.h"
 #include "base/stringutilities.h"
 
@@ -142,10 +143,10 @@ int ProcessOptions::ParseFile(const char *filespec, POVMSObjectPtr obj)
                     // POV-Ray-style INI file with command-line switch
                     case '+':
                     case '-':
-                    // POV-Ray-style INI file with system specific command-line switch on some systems (i.e. Windos)
-                    #if(FILENAME_SEPARATOR != '/')
+#if (POV_SLASH_IS_SWITCH_CHARACTER)
+                    // POV-Ray-style INI file with system specific command-line switch on some systems (e.g. Windos)
                     case '/':
-                    #endif
+#endif
                         err = Parse_INI_Switch(file, token, section);
                         break;
                     // INI file comment
@@ -263,10 +264,10 @@ int ProcessOptions::ParseString(const char *commandline, POVMSObjectPtr obj, boo
             // switch
             case '+':
             case '-':
-            // system specific switch on some systems (i.e. Windos)
-            #if(FILENAME_SEPARATOR != '/')
+#if (POV_SLASH_IS_SWITCH_CHARACTER)
+            // POV-Ray-style INI file with system specific command-line switch on some systems (e.g. Windos)
             case '/':
-            #endif
+#endif
                 commandline++;
                 err = Parse_CL_Switch(commandline, *(commandline - 1), obj, singleswitch);
                 break;
@@ -365,7 +366,7 @@ int ProcessOptions::WriteFile(const char *filename, POVMSObjectPtr obj)
     OTextStream *ini_file;
     int err = kNoErr;
 
-    if(!POV_ALLOW_FILE_WRITE(filename, POV_File_Text_INI))
+    if(!pov_base::PlatformBase::GetInstance().AllowLocalFileAccess (ASCIItoUCS2String(filename), POV_File_Text_INI, true))
         return kCannotOpenFileErr;
 
     ini_file = OpenFileForWrite(filename, obj);
@@ -1186,10 +1187,10 @@ bool ProcessOptions::Parse_INI_String_Smartmode(ITextStream *file)
         // POV-Ray-style INI file with command-line switch
         case '+':
         case '-':
-        // POV-Ray-style INI file with system specific command-line switch on some systems (i.e. Windos)
-        #if(FILENAME_SEPARATOR != '/')
+#if (POV_SLASH_IS_SWITCH_CHARACTER)
+        // POV-Ray-style INI file with system specific command-line switch on some systems (e.g. Windos)
         case '/':
-        #endif
+#endif
             if(isalpha(file->getchar()))
                 break; // return false, this is most likely a command-line
             else

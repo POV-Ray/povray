@@ -40,9 +40,6 @@ possibly remote -- _front-end_ instance via the _POVMS_ protocol.
 
 The back-end module depends on the _base_, _core_, _parser_, _povms_ and _vm_ modules.
 
-@todo
-    At present, the back-end module also depends on the _vfe_ module.
-
 
 Base Module
 -----------
@@ -54,9 +51,6 @@ _core_ and _front-end_.
 The base module is intended to be mostly unaware of multithreading, except that it makes provisions for sharing a few of
 its data structures -- mostly related to performance optimizations -- among multiple threads.
 
-@todo
-    At present, the base module depends on the _vfe_ module.
-
 
 Core Module
 -----------
@@ -65,7 +59,8 @@ The _core_ module, residing in the @ref source/core source sub-tree, is designat
 code, the job of which is to take an internal representation of the scene and camera, and trace individual rays for
 given pixel coordinates.
 
-@todo The exact line between the core module and the _back-end_ module has not been finalized yet.
+@todo
+    The exact line between the core module and the _back-end_ module has not been finalized yet.
 
 The core module is intended to be mostly unaware of multithreading, except that it makes provisions for sharing a few of
 its data structures -- mostly related to performance optimizations -- among multiple core threads.
@@ -86,9 +81,6 @@ providing high-level control of the rendering process as well as assembling the 
 result image file.
 
 The front-end module depends on the _base_ and _povms_ modules.
-
-@todo
-    At present, the front-end module also depends on the _vfe_ module.
 
 
 Parser Module

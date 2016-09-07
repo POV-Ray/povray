@@ -129,6 +129,9 @@
     <ClCompile Include="..\..\source\base\messenger.cpp">
       <Filter>Base source</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\base\platformbase.cpp">
+      <Filter>Base source\Image</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\base\configbase.h">

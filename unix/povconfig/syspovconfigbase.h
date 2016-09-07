@@ -41,7 +41,7 @@
 
 #include "syspovconfig.h"
 
-#define FILENAME_SEPARATOR '/'
+#define POV_PATH_SEPARATOR '/'
 #define IFF_SWITCH_CAST (long)
 
 // Our Unix-specific implementation of the Delay() function currently relies on the presence of
@@ -64,5 +64,8 @@
 #else
     #define POV_USE_DEFAULT_TIMER 1
 #endif
+
+// The default Path::ParsePathString() suits our needs perfectly.
+#define POV_USE_DEFAULT_PATH_PARSER 1
 
 #endif // POVRAY_UNIX_SYSPOVCONFIGBASE_H

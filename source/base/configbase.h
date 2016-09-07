@@ -464,16 +464,30 @@
     #define POV_SYS_FILE_EXTENSION ".tga"
 #endif
 
-#ifndef POV_FILE_SEPARATOR
-    #define POV_FILE_SEPARATOR '/'
+/// @def POV_PATH_SEPARATOR
+/// The system's path separator character.
+///
+/// @note
+///     If the operating system supports multiple different separator characters, set this to the canonical one.
+///
+#ifndef POV_PATH_SEPARATOR
+    #define POV_PATH_SEPARATOR '/'
 #endif
 
-#ifndef POV_UCS2_FOPEN
-    #define POV_UCS2_FOPEN(name, mode) fopen(UCS2toASCIIString(UCS2String(name)).c_str(), mode)
+/// @def POV_PATH_SEPARATOR_2
+/// The system's alternative path separator character.
+///
+/// If the operating system does not support an alternative path separator character, leave this undefined.
+///
+#ifndef POV_PATH_SEPARATOR_2
+    // Leave undefined.
 #endif
 
-#ifndef POV_UCS2_REMOVE
-    #define POV_UCS2_REMOVE(name) unlink(UCS2toASCIIString(UCS2String(name)).c_str())
+/// @def POV_SLASH_IS_SWITCH_CHARACTER
+/// Whether the forward slash character should be recognized as the start of a command-line switch.
+///
+#ifndef POV_SLASH_IS_SWITCH_CHARACTER
+    #define POV_SLASH_IS_SWITCH_CHARACTER 0
 #endif
 
 #ifndef EXIST_FONT_FILE
@@ -482,14 +496,6 @@
 
 #ifndef DEFAULT_ITEXTSTREAM_BUFFER_SIZE
     #define DEFAULT_ITEXTSTREAM_BUFFER_SIZE 512
-#endif
-
-#ifndef POV_ALLOW_FILE_READ
-    #define POV_ALLOW_FILE_READ(f,t) (1)
-#endif
-
-#ifndef POV_ALLOW_FILE_WRITE
-    #define POV_ALLOW_FILE_WRITE(f,t) (1)
 #endif
 
 #ifndef POV_TRACE_THREAD_PREINIT
@@ -553,6 +559,19 @@
 ///
 #ifndef POV_USE_DEFAULT_TIMER
     #define POV_USE_DEFAULT_TIMER 1
+#endif
+
+/// @def POV_USE_DEFAULT_PATH_PARSER
+/// Whether to use a default implementation for the path string parser.
+///
+/// Define as non-zero to use a default implementation for the @ref Path::ParsePathString() method, or zero if the
+/// platform provides its own implementation.
+///
+/// @note
+///     The default implementation supports only local files on a single anonymous volume.
+///
+#ifndef POV_USE_DEFAULT_PATH_PARSER
+    #define POV_USE_DEFAULT_PATH_PARSER 1
 #endif
 
 /// @}
@@ -648,6 +667,15 @@
     #else
         #define POV_TIME_UTC boost::TIME_UTC
     #endif
+#endif
+
+/// @def POV_BACKSLASH_IS_PATH_SEPARATOR
+/// Whether the system supports the backslash as a separator character.
+///
+#if (POV_PATH_SEPARATOR == '\\') || (defined(POV_PATH_SEPARATOR_2) &&  (POV_PATH_SEPARATOR_2 == '\\'))
+    #define POV_BACKSLASH_IS_PATH_SEPARATOR 1
+#else
+    #define POV_BACKSLASH_IS_PATH_SEPARATOR 0
 #endif
 
 #if POV_DEBUG
