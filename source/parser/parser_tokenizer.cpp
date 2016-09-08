@@ -2259,17 +2259,19 @@ void Parser::Parse_Directive(int After_Hash)
 
                             sceneData->languageVersion = (int)(Parse_Float() * 100 + 0.5);
 
-                            if ((sceneData->languageVersionLate) && sceneData->languageVersion >= 370)
+                            if ((sceneData->languageVersionLate) && sceneData->languageVersion >= 371)
                             {
                                 // As of POV-Ray 3.7, all scene files are supposed to begin with a `#version` directive.
-                                // We no longer tolerate violation of that rule if the main scene file claims to be
-                                // compatible with POV-Ray 3.7 anywhere further down the road.
-                                // (We need to be more lax with include files though, as it may just as well be a
-                                // standard include file that happens to have been updated since the scene was
+                                // As of POV-Ray 3.71, We no longer tolerate violation of that rule if the main scene
+                                // file claims to be compatible with POV-Ray 3.71 anywhere further down the road.
+                                // (We need to be more lax with include files though, as they may just as well be
+                                // standard include files that happens to have been updated since the scene was
                                 // originally designed.)
+
                                 if (Include_File_Index == 0)
                                     Error("As of POV-Ray 3.7, the '#version' directive must be the first non-comment "
-                                          "statement in the scene file.");
+                                          "statement in the scene file. If your scene will adapt to whatever version "
+                                          "is un use dynamically, start your scene with '#version version'.");
                             }
 
                             // NB: This must be set _after_ parsing the value, in order for the `#version version`
