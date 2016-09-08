@@ -33,6 +33,9 @@
 ///
 //******************************************************************************
 
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
+#include "parser/parser.h"
+
 #include <cctype>
 #include <cmath>
 #include <cstdlib>
@@ -40,10 +43,6 @@
 
 #include <boost/bind.hpp>
 #include <boost/scoped_ptr.hpp>
-
-// configparser.h must always be the first POV file included in the parser (pulls in platform config)
-#include "parser/configparser.h"
-#include "parser/parser.h"
 
 #include "base/fileutil.h"
 

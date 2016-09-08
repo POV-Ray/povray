@@ -33,7 +33,7 @@
 ///
 //******************************************************************************
 
-// Module config header file must be the first file included within POV-Ray unit header files
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "parser/parser.h"
 
 #include <cctype>

@@ -39,13 +39,12 @@
 ///
 //******************************************************************************
 
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
+#include "parser/parser.h"
+
 #include <cctype>
 
 #include <limits>
-
-// configparser.h must always be the first POV file included in the parser (pulls in platform config)
-#include "parser/configparser.h"
-#include "parser/parser.h"
 
 #include "base/version.h"
 #include "base/stringutilities.h"
@@ -185,6 +184,8 @@ void Parser::pre_init_tokenizer ()
     Input_File = &Include_Files[0];
     Include_Files[0].In_File = NULL;
 
+    // TODO - on modern machines it may be faster to do the comparisons for each token
+    //        than to access the conversion table.
     for(i = 0; i < LAST_TOKEN; i++)
     {
         Conversion_Util_Table[i] = i;
@@ -1462,7 +1463,7 @@ const char *Parser::Get_Token_String (TOKEN Token_Id)
 {
     register int i;
 
-    for (i = 0; i < LAST_TOKEN; i++)
+    for (i = 0; Reserved_Words[i].Token_Name != NULL; i++)
         if (Reserved_Words[i].Token_Number == Token_Id)
             return (Reserved_Words[i].Token_Name);
     return ("");
@@ -1499,7 +1500,9 @@ char *Parser::Get_Reserved_Words (const char *additional_words)
     int length = 0;
     int i;
 
-    for (i = 0; i < LAST_TOKEN; i++)
+    // Compute the length required for the buffer.
+
+    for (i = 0; Reserved_Words[i].Token_Name != NULL; i++)
     {
         if (!isalpha (Reserved_Words [i].Token_Name [0]))
             continue;
@@ -1507,14 +1510,20 @@ char *Parser::Get_Reserved_Words (const char *additional_words)
             continue;
         length += (int)strlen (Reserved_Words[i].Token_Name) + 1;
     }
-
     length += (int)strlen (additional_words);
 
+    // Create the buffer.
+
     char *result = reinterpret_cast<char *>(POV_MALLOC (++length, "Keyword List"));
+
+    // Copy the caller-supplied additional words into the buffer.
+
     strcpy (result, additional_words);
     char *s = result + strlen (additional_words);
 
-    for (i = 0; i < LAST_TOKEN; i++)
+    // Copy our own keywords into the buffer.
+
+    for (i = 0; Reserved_Words[i].Token_Name != NULL; i++)
     {
         if (!isalpha (Reserved_Words [i].Token_Name [0]))
             continue;
@@ -2788,7 +2797,7 @@ void Parser::init_sym_tables()
 
     Add_Sym_Table();
 
-    for (i = 0; i < LAST_TOKEN; i++)
+    for (i = 0; Reserved_Words[i].Token_Name != NULL; i++)
     {
         Add_Symbol(0,Reserved_Words[i].Token_Name,Reserved_Words[i].Token_Number);
     }
