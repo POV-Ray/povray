@@ -4,6 +4,7 @@ pull_requests:
 branches:
   except:
   - /v[0-9]/
+  - coverity_scan
 skip_tags: true
 
 image: Visual Studio 2015
@@ -16,9 +17,9 @@ matrix:
 environment:
   matrix:
   - configuration: Release
-    platform: Win32
-    bin_dir: bin32
-    artifact_suffix: -Win32
+    platform: x64
+    bin_dir: bin64
+    artifact_suffix: -Win64
     PlatformToolset: v140
   - configuration: Release-SSE2
     platform: Win32
@@ -26,9 +27,9 @@ environment:
     artifact_suffix: -Win32-sse2
     PlatformToolset: v140
   - configuration: Release
-    platform: x64
-    bin_dir: bin64
-    artifact_suffix: -Win64
+    platform: Win32
+    bin_dir: bin32
+    artifact_suffix: -Win32
     PlatformToolset: v140
 
 before_build:

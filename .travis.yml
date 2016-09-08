@@ -7,7 +7,8 @@ env:
    - COMPILED_BY="Travis CI for Coverity Scan"
    # In Coverity Scan builds, the assembler gags on FMA3 instructions (e.g. VFMADD321SS) for some reason, so we must
    # forbid the compiler to emit them.
-   - CXXFLAGS="-mno-fma"
+   # We also set a preprocessor macro to know we're building for Coverity.
+   - CXXFLAGS="-mno-fma -DSTATIC_CODE_ANALYSIS"
 
 before_install:
       # Required(?) for Coverity Scan
