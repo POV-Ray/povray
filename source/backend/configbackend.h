@@ -170,13 +170,13 @@
 #if POV_RTR_DEBUG
     #define POV_RTR_ASSERT(expr) POV_ASSERT_HARD(expr)
 #else
-    #define POV_RTR_ASSERT(expr) NO_OP
+    #define POV_RTR_ASSERT(expr) POV_ASSERT_DISABLE(expr)
 #endif
 
 #if POV_TASK_DEBUG
     #define POV_TASK_ASSERT(expr) POV_ASSERT_HARD(expr)
 #else
-    #define POV_TASK_ASSERT(expr) NO_OP
+    #define POV_TASK_ASSERT(expr) POV_ASSERT_DISABLE(expr)
 #endif
 
 /// @def HAVE_BOOST_THREAD_ATTRIBUTES

@@ -681,31 +681,31 @@
 #if POV_DEBUG
     #define POV_ASSERT(expr) POV_ASSERT_HARD(expr)
 #else
-    #define POV_ASSERT(expr) NO_OP
+    #define POV_ASSERT(expr) POV_ASSERT_DISABLE(expr)
 #endif
 
 #if POV_COLOURSPACE_DEBUG
     #define POV_COLOURSPACE_ASSERT(expr) POV_ASSERT_HARD(expr)
 #else
-    #define POV_COLOURSPACE_ASSERT(expr) NO_OP
+    #define POV_COLOURSPACE_ASSERT(expr) POV_ASSERT_DISABLE(expr)
 #endif
 
 #if POV_IMAGE_DEBUG
     #define POV_IMAGE_ASSERT(expr) POV_ASSERT_HARD(expr)
 #else
-    #define POV_IMAGE_ASSERT(expr) NO_OP
+    #define POV_IMAGE_ASSERT(expr) POV_ASSERT_DISABLE(expr)
 #endif
 
 #if POV_MATHUTIL_DEBUG
     #define POV_MATHUTIL_ASSERT(expr) POV_ASSERT_HARD(expr)
 #else
-    #define POV_MATHUTIL_ASSERT(expr) NO_OP
+    #define POV_MATHUTIL_ASSERT(expr) POV_ASSERT_DISABLE(expr)
 #endif
 
 #if POV_SAFEMATH_DEBUG
     #define POV_SAFEMATH_ASSERT(expr) POV_ASSERT_HARD(expr)
 #else
-    #define POV_SAFEMATH_ASSERT(expr) NO_OP
+    #define POV_SAFEMATH_ASSERT(expr) POV_ASSERT_DISABLE(expr)
 #endif
 
 #define M_TAU TWO_M_PI
