@@ -353,7 +353,7 @@ int ProcessOptions::WriteFile(OTextStream *ini_file, POVMSObjectPtr obj)
     // find the keyword
     while(table->keyword != NULL)
     {
-        if((table->flags | kINIOptFlag_SuppressWrite) == 0)
+        if((table->flags & kINIOptFlag_SuppressWrite) == 0)
             Output_INI_Option(table, obj, ini_file);
         table++;
     }
