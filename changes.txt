@@ -176,14 +176,35 @@ Miscellaneous Improvements
 - Colour maps, pigment maps and the like are no longer limited to 256 entries.
 - The number of components ber blob is no longer artificially limited.
 
-Fixed or Mitigated Bugs Reported by Static Code Analysis
---------------------------------------------------------
+Fixed or Mitigated Issues Reported by Static Code Analysis
+----------------------------------------------------------
 
+- CID  967377: Uninitialized pointer field
+- CID  967399: Uninitialized pointer field
+- CID  967400: Uninitialized pointer field
+- CID 1129016: Uninitialized pointer read
+- CID 1129017: Uninitialized scalar variable
 - CID 1372548: Non-virtual destructor
+- CID 1372552: Unchecked return value
 - CID 1372555: Operands don't affect result
 - CID 1372556: Wrong operator used
 - CID 1372557: Wrong operator used
 - CID 1372562: Non-array delete for scalars
+- CID 1372608: Sizeof not portable
+- CID 1372626: Uninitialized scalar variable
+- CID 1372636: Uninitialized pointer field
+- CID 1372639: Uninitialized scalar field
+- CID 1372641: Uninitialized pointer field
+- CID 1372642: Uninitialized pointer field
+- CID 1372643: Uninitialized scalar field
+- CID 1372644: Uninitialized pointer field
+- CID 1372646: Uninitialized pointer field
+- CID 1372647: Uninitialized pointer field
+- CID 1372648: Uninitialized scalar field
+- CID 1372650: Uninitialized pointer field
+- CID 1372651: Uninitialized pointer field
+- CID 1372653: Uninitialized pointer field
+- CID 1372654: Structurally dead code
 - CID 1372655: Structurally dead code
 - CID 1372656: Structurally dead code
 - CID 1372657: Unused value

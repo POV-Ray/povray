@@ -233,43 +233,43 @@ namespace pov
 #if POV_BLEND_MAP_DEBUG
     #define POV_BLEND_MAP_ASSERT(expr) POV_ASSERT_HARD(expr)
 #else
-    #define POV_BLEND_MAP_ASSERT(expr) NO_OP
+    #define POV_BLEND_MAP_ASSERT(expr) POV_ASSERT_DISABLE(expr)
 #endif
 
 #if POV_SHAPE_DEBUG
     #define POV_SHAPE_ASSERT(expr) POV_ASSERT_HARD(expr)
 #else
-    #define POV_SHAPE_ASSERT(expr) NO_OP
+    #define POV_SHAPE_ASSERT(expr) POV_ASSERT_DISABLE(expr)
 #endif
 
 #if POV_PATTERN_DEBUG
     #define POV_PATTERN_ASSERT(expr) POV_ASSERT_HARD(expr)
 #else
-    #define POV_PATTERN_ASSERT(expr) NO_OP
+    #define POV_PATTERN_ASSERT(expr) POV_ASSERT_DISABLE(expr)
 #endif
 
 #if POV_RADIOSITY_DEBUG
     #define POV_RADIOSITY_ASSERT(expr) POV_ASSERT_HARD(expr)
 #else
-    #define POV_RADIOSITY_ASSERT(expr) NO_OP
+    #define POV_RADIOSITY_ASSERT(expr) POV_ASSERT_DISABLE(expr)
 #endif
 
 #if POV_RANDOMSEQUENCE_DEBUG
     #define POV_RANDOMSEQUENCE_ASSERT(expr) POV_ASSERT_HARD(expr)
 #else
-    #define POV_RANDOMSEQUENCE_ASSERT(expr) NO_OP
+    #define POV_RANDOMSEQUENCE_ASSERT(expr) POV_ASSERT_DISABLE(expr)
 #endif
 
 #if POV_REFPOOL_DEBUG
     #define POV_REFPOOL_ASSERT(expr) POV_ASSERT_HARD(expr)
 #else
-    #define POV_REFPOOL_ASSERT(expr) NO_OP
+    #define POV_REFPOOL_ASSERT(expr) POV_ASSERT_DISABLE(expr)
 #endif
 
 #if POV_SUBSURFACE_DEBUG
     #define POV_SUBSURFACE_ASSERT(expr) POV_ASSERT_HARD(expr)
 #else
-    #define POV_SUBSURFACE_ASSERT(expr) NO_OP
+    #define POV_SUBSURFACE_ASSERT(expr) POV_ASSERT_DISABLE(expr)
 #endif
 
 /// @}
