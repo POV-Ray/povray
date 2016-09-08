@@ -41,6 +41,7 @@ addons:
     project:
       name: "POV-Ray/povray"
       description: "Linux build submitted via Travis CI"
+    notification_email: coverity-scan@lipka-koeln.de
     build_command_prepend: "cd unix ; ./prebuild.sh ; cd .. ; ./configure"
     build_command: "make"
     branch_pattern: coverity_scan
