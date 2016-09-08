@@ -151,16 +151,16 @@ FUNCTION_PTR Parser::Parse_FunctionContent(void)
 
 FUNCTION_PTR Parser::Parse_FunctionOrContent(void)
 {
-    EXPECT
+    FUNCTION_PTR result;
+    EXPECT_ONE
         CASE(FUNCTION_TOKEN)
-            return Parse_Function();
-            EXIT
+            result = Parse_Function();
         END_CASE
         OTHERWISE
-            return Parse_FunctionContent();
-            EXIT
+            result = Parse_FunctionContent();
         END_CASE
     END_EXPECT
+    return result;
 }
 
 

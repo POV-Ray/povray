@@ -179,7 +179,14 @@ Miscellaneous Improvements
 Fixed or Mitigated Bugs Reported by Static Code Analysis
 --------------------------------------------------------
 
-(none at present)
+- CID 1372548: Non-virtual destructor
+- CID 1372555: Operands don't affect result
+- CID 1372556: Wrong operator used
+- CID 1372557: Wrong operator used
+- CID 1372562: Non-array delete for scalars
+- CID 1372655: Structurally dead code
+- CID 1372656: Structurally dead code
+- CID 1372657: Unused value
 
 Fixed or Mitigated Bugs
 -----------------------
