@@ -174,13 +174,13 @@ bool IFileStream::getline(char *s, size_t buflen)
 }
 
 IMemStream::IMemStream(const unsigned char* data, size_t size, const char* formalName, POV_LONG formalStart) :
-    IStream(ASCIItoUCS2String(formalName)), size(size), pos(0), start(data), formalStart(formalStart)
+    IStream(ASCIItoUCS2String(formalName)), size(size), pos(0), formalStart(formalStart), start(data), mUngetBuffer(EOF)
 {
     fail = false;
 }
 
 IMemStream::IMemStream(const unsigned char* data, size_t size, const UCS2String& formalName, POV_LONG formalStart) :
-    IStream(formalName), size(size), pos(0), start(data), formalStart(formalStart)
+    IStream(formalName), size(size), pos(0), formalStart(formalStart), start(data), mUngetBuffer(EOF)
 {
     fail = false;
 }
@@ -432,7 +432,10 @@ int IMemStream::Read_Byte()
         if (pos < size)
             v = start[pos++];
         else
+        {
             fail = true;
+            v = EOF;
+        }
     }
     return v;
 }
@@ -450,7 +453,7 @@ bool IMemStream::UnRead_Byte(int c)
 bool IMemStream::getline(char *s,size_t buflen)
 {
     // Not needed for inbuilt fonts or scene file caching
-    throw POV_EXCEPTION_CODE(kParamErr);
+    POV_FILE_ASSERT(false);
     return !fail;
 }
 

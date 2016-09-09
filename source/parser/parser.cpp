@@ -8618,7 +8618,8 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
 
         EXPECT_ONE
             CASE (IDENTIFIER_TOKEN)
-                allow_redefine = !Token.is_array_elem;
+                POV_PARSER_ASSERT(!Token.is_array_elem);
+                allow_redefine = true; // should actually be irrelevant downstream, thanks to Previous==IDENTIFIER_TOKEN
                 Temp_Entry = Add_Symbol (Local_Index,Token.Token_String,IDENTIFIER_TOKEN);
                 numberPtr = &(Temp_Entry->Token_Number);
                 dataPtr = &(Temp_Entry->Data);
@@ -8644,9 +8645,10 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
             END_CASE
 
             CASE2 (FUNCT_ID_TOKEN, VECTFUNCT_ID_TOKEN)
+                // Issue an error, _except_ when assigning to a still-empty element of a function array.
                 if((!Token.is_array_elem) || (*(Token.DataPtr) != NULL))
                     Error("Redeclaring functions is not allowed - #undef the function first!");
-                // fall through
+                // FALLTHROUGH
 
             // These are also used in Parse_Directive UNDEF_TOKEN section, Parse_Macro, and and Parse_For_Param_Start,
             // and all these functions should accept exactly the same identifiers! [trf]
@@ -8657,9 +8659,11 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
             CASE4 (DENSITY_MAP_ID_TOKEN, ARRAY_ID_TOKEN, DENSITY_ID_TOKEN, UV_ID_TOKEN)
             CASE4 (VECTOR_4D_ID_TOKEN, RAINBOW_ID_TOKEN, FOG_ID_TOKEN, SKYSPHERE_ID_TOKEN)
             CASE2 (MATERIAL_ID_TOKEN, SPLINE_ID_TOKEN )
-                allow_redefine  = !Token.is_array_elem;
                 if (is_local && (Token.Table_Index != Table_Index))
                 {
+                    if (Token.is_array_elem)
+                        Error("Cannot use '#local' to assign a non-local array element.");
+                    allow_redefine = true; // should actually be irrelevant downstream, thanks to Previous==IDENTIFIER_TOKEN
                     Temp_Entry = Add_Symbol (Local_Index,Token.Token_String,IDENTIFIER_TOKEN);
                     numberPtr = &(Temp_Entry->Token_Number);
                     dataPtr   = &(Temp_Entry->Data);
@@ -8667,6 +8671,7 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
                 }
                 else
                 {
+                    allow_redefine = !Token.is_array_elem;
                     numberPtr = Token.NumberPtr;
                     dataPtr   = Token.DataPtr;
                     Previous  = Token.Token_Id;
@@ -8674,30 +8679,35 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
             END_CASE
 
             CASE (EMPTY_ARRAY_TOKEN)
-                allow_redefine  = !Token.is_array_elem;
+                POV_PARSER_ASSERT(Token.is_array_elem);
+                allow_redefine = true; // should actually be irrelevant downstream, thanks to Previous==EMPTY_ARRAY_TOKEN
                 numberPtr = Token.NumberPtr;
                 dataPtr   = Token.DataPtr;
                 Previous  = Token.Token_Id;
             END_CASE
 
             CASE2 (VECTOR_FUNCT_TOKEN, FLOAT_FUNCT_TOKEN)
-                allow_redefine  = !Token.is_array_elem;
                 switch(Token.Function_Id)
                 {
                     case VECTOR_ID_TOKEN:
                     case FLOAT_ID_TOKEN:
                         if (is_local && (Token.Table_Index != Table_Index))
                         {
+                            if (Token.is_array_elem)
+                                Error("Cannot use '#local' to assign a non-local array element.");
+                            allow_redefine = true; // should actually be irrelevant downstream, thanks to Previous==IDENTIFIER_TOKEN
                             Temp_Entry = Add_Symbol (Local_Index,Token.Token_String,IDENTIFIER_TOKEN);
                             numberPtr = &(Temp_Entry->Token_Number);
                             dataPtr   = &(Temp_Entry->Data);
+                            Previous  = IDENTIFIER_TOKEN;
                         }
                         else
                         {
+                            allow_redefine  = !Token.is_array_elem;
                             numberPtr = Token.NumberPtr;
                             dataPtr   = Token.DataPtr;
+                            Previous  = Token.Function_Id;
                         }
-                        Previous  = Token.Function_Id;
                         break;
 
                     default:
@@ -8713,7 +8723,7 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
                     // in which case we evaluate the corresponding expression element but ignore
                     // the resulting value.
                     // We do this by assigning the resulting value to a dummy symbol entry.
-                    allow_redefine  = true;
+                    allow_redefine = true; // should actually be irrelevant downstream, thanks to Previous=IDENTIFIER_TOKEN
                     Temp_Entry = Create_Entry (0, "", DUMMY_SYMBOL_TOKEN);
                     numberPtr = &(Temp_Entry->Token_Number);
                     dataPtr = &(Temp_Entry->Data);

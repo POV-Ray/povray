@@ -138,15 +138,6 @@
 ///
 /// @{
 
-/// @def POV_RTR_DEBUG
-/// Enable run-time sanity checks for real-time rendering.
-///
-/// Define as non-zero integer to enable, or zero to disable.
-///
-#ifndef POV_RTR_DEBUG
-    #define POV_RTR_DEBUG POV_DEBUG
-#endif
-
 /// @def POV_TASK_DEBUG
 /// Enable run-time sanity checks for task handling.
 ///
@@ -166,12 +157,6 @@
 /// system-specific configuration.
 ///
 /// @{
-
-#if POV_RTR_DEBUG
-    #define POV_RTR_ASSERT(expr) POV_ASSERT_HARD(expr)
-#else
-    #define POV_RTR_ASSERT(expr) POV_ASSERT_DISABLE(expr)
-#endif
 
 #if POV_TASK_DEBUG
     #define POV_TASK_ASSERT(expr) POV_ASSERT_HARD(expr)

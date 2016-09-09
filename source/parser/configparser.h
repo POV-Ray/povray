@@ -86,7 +86,7 @@
 #if POV_PARSER_DEBUG
     #define POV_PARSER_ASSERT(expr) POV_ASSERT_HARD(expr)
 #else
-    #define POV_PARSER_ASSERT(expr) NO_OP
+    #define POV_PARSER_ASSERT(expr) POV_ASSERT_DISABLE(expr)
 #endif
 
 /// @}

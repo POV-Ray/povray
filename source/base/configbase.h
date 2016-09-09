@@ -613,6 +613,15 @@
     #define POV_COLOURSPACE_DEBUG POV_DEBUG
 #endif
 
+/// @def POV_FILE_DEBUG
+/// Enable run-time sanity checks for file handling.
+///
+/// Define as non-zero integer to enable, or zero to disable.
+///
+#ifndef POV_FILE_DEBUG
+    #define POV_FILE_DEBUG POV_DEBUG
+#endif
+
 /// @def POV_IMAGE_DEBUG
 /// Enable run-time sanity checks for image handling.
 ///
@@ -629,6 +638,15 @@
 ///
 #ifndef POV_MATHUTIL_DEBUG
     #define POV_MATHUTIL_DEBUG POV_DEBUG
+#endif
+
+/// @def POV_RTR_DEBUG
+/// Enable run-time sanity checks for real-time rendering.
+///
+/// Define as non-zero integer to enable, or zero to disable.
+///
+#ifndef POV_RTR_DEBUG
+    #define POV_RTR_DEBUG POV_DEBUG
 #endif
 
 /// @def POV_SAFEMATH_DEBUG
@@ -690,6 +708,12 @@
     #define POV_COLOURSPACE_ASSERT(expr) POV_ASSERT_DISABLE(expr)
 #endif
 
+#if POV_FILE_DEBUG
+    #define POV_FILE_ASSERT(expr) POV_ASSERT_HARD(expr)
+#else
+    #define POV_FILE_ASSERT(expr) POV_ASSERT_DISABLE(expr)
+#endif
+
 #if POV_IMAGE_DEBUG
     #define POV_IMAGE_ASSERT(expr) POV_ASSERT_HARD(expr)
 #else
@@ -700,6 +724,12 @@
     #define POV_MATHUTIL_ASSERT(expr) POV_ASSERT_HARD(expr)
 #else
     #define POV_MATHUTIL_ASSERT(expr) POV_ASSERT_DISABLE(expr)
+#endif
+
+#if POV_RTR_DEBUG
+    #define POV_RTR_ASSERT(expr) POV_ASSERT_HARD(expr)
+#else
+    #define POV_RTR_ASSERT(expr) POV_ASSERT_DISABLE(expr)
 #endif
 
 #if POV_SAFEMATH_DEBUG
