@@ -266,7 +266,8 @@ bool IsoSurface::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
     if(!container->Inside(New_Point))
         return (Test_Flag(this, INVERTED_FLAG));
 
-    if (!IsInside (GenericScalarFunctionInstance(Function, Thread), New_Point))
+    GenericScalarFunctionInstance fn(Function, Thread);
+    if (!IsInside (fn, New_Point))
         return (Test_Flag(this, INVERTED_FLAG));
 
     /* Inside the box. */
