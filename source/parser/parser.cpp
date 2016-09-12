@@ -2646,7 +2646,7 @@ ObjectPtr Parser::Parse_Isosurface()
         END_CASE
 
         CASE(MAX_TRACE_TOKEN)
-            Object->max_trace = (short)Parse_Float();
+            Object->max_trace = Parse_Int_With_Range (1, ISOSURFACE_MAXTRACE, "isosurface max_trace");
         END_CASE
 
         CASE(EVALUATE_TOKEN)
@@ -2666,6 +2666,10 @@ ObjectPtr Parser::Parse_Isosurface()
             Object->max_trace = ISOSURFACE_MAXTRACE;
         END_CASE
 
+        CASE (POLARITY_TOKEN)
+            Object->positivePolarity = (Parse_Float() > 0);
+        END_CASE
+
         OTHERWISE
             UNGET
             EXIT
@@ -2681,16 +2685,6 @@ ObjectPtr Parser::Parse_Isosurface()
     {
         Warning("Isosurface 'max_gradient' is not positive. Using 1.1 (default).");
         Object->max_gradient = 1.1;
-    }
-    if (Object->max_trace > ISOSURFACE_MAXTRACE)
-    {
-        Warning("Isosurface 'max_trace' exceeds maximum of %d. Using maximum.", (int)ISOSURFACE_MAXTRACE);
-        Object->max_trace = ISOSURFACE_MAXTRACE;
-    }
-    if (Object->max_trace < 1)
-    {
-        Warning("Isosurface 'max_trace' is not positive. Using 1 (default).");
-        Object->max_trace = 1;
     }
 
     Parse_Object_Mods (reinterpret_cast<ObjectPtr>(Object));
@@ -8246,7 +8240,7 @@ void Parser::Parse_Bound_Clip(vector<ObjectPtr>& dest, bool notexture)
     while((Current = Parse_Object()) != NULL)
     {
         if((notexture == true) && (Current->Type & (TEXTURED_OBJECT+PATCH_OBJECT)))
-            Error ("Illegal texture or patch in clip, bound or object pattern.");
+            Error ("Illegal texture or patch in clip, bound, object or potential pattern.");
         objects.push_back(Current);
     }
 

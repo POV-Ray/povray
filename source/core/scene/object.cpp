@@ -826,9 +826,15 @@ void Destroy_Object(ObjectPtr Object)
 
 ObjectBase::~ObjectBase()
 {
-	Destroy_Transform(Trans);
+    Destroy_Transform(Trans);
 }
 
+
+double ObjectBase::GetPotential (const Vector3d& p, bool subtractThreshold, TraceThreadData *threaddata) const
+{
+    POV_ASSERT (false);
+    return 0.0;
+}
 
 /*****************************************************************************
 *

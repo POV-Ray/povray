@@ -416,6 +416,12 @@ class Parser : public SceneTask
         /// Parses a FLOAT as an integer value with a given minimum.
         int Parse_Int_With_Minimum(int minValue, const char* parameterName = NULL);
 
+        /// Parses a FLOAT as an integer value with a given range.
+        int Parse_Int_With_Range(int minValue, int maxValue, const char* parameterName = NULL);
+
+        /// Parses a FLOAT as a boolean value.
+        bool Parse_Bool(const char* parameterName = NULL);
+
         int Allow_Vector (Vector3d& Vect);
         void Parse_UV_Vect (Vector2d& UV_Vect);
         void Parse_Vector (Vector3d& Vector);

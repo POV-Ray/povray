@@ -49,7 +49,7 @@ namespace pov
 * Global preprocessor defines
 ******************************************************************************/
 
-#define BLOB_OBJECT (STURM_OK_OBJECT+HIERARCHY_OK_OBJECT)
+#define BLOB_OBJECT (STURM_OK_OBJECT+HIERARCHY_OK_OBJECT+POTENTIAL_OBJECT)
 
 // TODO - the following values probably don't have to be all discrete bits, except for BLOB_ENTER_EXIT_FLAG
 #define BLOB_ENTER_EXIT_FLAG      1 // internal use only
@@ -136,6 +136,7 @@ class Blob : public ObjectBase
 
         virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *);
         virtual bool Inside(const Vector3d&, TraceThreadData *) const;
+        virtual double GetPotential (const Vector3d&, bool subtractThreshold, TraceThreadData *) const;
         virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const;
         virtual void Translate(const Vector3d&, const TRANSFORM *);
         virtual void Rotate(const Vector3d&, const TRANSFORM *);

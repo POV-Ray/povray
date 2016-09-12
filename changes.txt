@@ -49,6 +49,12 @@ Prior to the release of 3.7.1, the following items still need urgent attention:
 New Features
 ------------
 
+- A new pattern, `potential`, has been added to define a pattern based on the
+  potential field of a blob or isosurface object.
+
+- A new parameter, `polarity`, has been added to isosurfaces to choose whether
+  function values above the threshold should indicate the inside or outside.
+
 - The `map_type` keyword now supports the Angular Map projection for light
   probes, popularized by Paul Devebec, as type 7.
 
