@@ -826,13 +826,16 @@ void Mesh::Compute_BBox()
 *
 ******************************************************************************/
 
-bool Mesh::Compute_Mesh_Triangle(MESH_TRIANGLE *Triangle, bool Smooth, Vector3d& P1, Vector3d& P2, Vector3d& P3, Vector3d& S_Normal)
+bool Mesh::Compute_Mesh_Triangle(MESH_TRIANGLE *Triangle, bool Smooth, const Vector3d& P1, const Vector3d& P2, const Vector3d& P3, Vector3d& S_Normal) const
 {
     MeshIndex temp;
     bool swap;
     DBL x, y, z;
-    Vector3d V1, V2, T1;
+    Vector3d V1, V2;
     DBL Length;
+
+    const Vector3d *pP1;
+    const Vector3d *pP2;
 
     V1 = P2 - P1;
     V2 = P3 - P1;
@@ -914,9 +917,8 @@ bool Mesh::Compute_Mesh_Triangle(MESH_TRIANGLE *Triangle, bool Smooth, Vector3d&
             Triangle->Texture = temp;
         }
 
-        T1 = P1;
-        P1 = P2;
-        P2 = T1;
+        pP1 = &P2;
+        pP2 = &P1;
 
         if (Smooth)
         {
@@ -925,14 +927,19 @@ bool Mesh::Compute_Mesh_Triangle(MESH_TRIANGLE *Triangle, bool Smooth, Vector3d&
             Triangle->N1 = temp;
         }
     }
+    else
+    {
+        pP1 = &P1;
+        pP2 = &P2;
+    }
 
     if (Smooth)
     {
-    //  compute_smooth_triangle(Triangle, P1, P2, P3);
+    //  compute_smooth_triangle(Triangle, *pP1, *pP2, P3);
         Triangle->Smooth = true;
     }
 
-    compute_smooth_triangle(Triangle, P1, P2, P3);
+    compute_smooth_triangle(Triangle, *pP1, *pP2, P3);
 
     return(true);
 }
@@ -965,7 +972,7 @@ bool Mesh::Compute_Mesh_Triangle(MESH_TRIANGLE *Triangle, bool Smooth, Vector3d&
 *
 ******************************************************************************/
 
-void Mesh::compute_smooth_triangle(MESH_TRIANGLE *Triangle, const Vector3d& P1, const Vector3d& P2, const Vector3d& P3)
+void Mesh::compute_smooth_triangle(MESH_TRIANGLE *Triangle, const Vector3d& P1, const Vector3d& P2, const Vector3d& P3) const
 {
     Vector3d P3MinusP2, VTemp1, VTemp2;
     DBL x, y, z, uDenominator, Proj;

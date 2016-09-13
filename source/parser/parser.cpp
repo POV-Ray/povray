@@ -3692,6 +3692,54 @@ ObjectPtr Parser::Parse_Light_Source ()
 
 ObjectPtr Parser::Parse_Mesh()
 {
+    Mesh *Object;
+
+    Parse_Begin();
+
+    if ((Object = reinterpret_cast<Mesh *>(Parse_Object_Id())) != NULL)
+        return (reinterpret_cast<ObjectPtr>(Object));
+
+    /* Create object. */
+
+    Object = new Mesh();
+
+    EXPECT_ONE
+
+        CASE4 (VERTEX_VECTORS_TOKEN, NORMAL_VECTORS_TOKEN, UV_VECTORS_TOKEN, TEXTURE_LIST_TOKEN)
+        // the following are currently not expected by mesh2 right away, but that may change in the future
+        CASE3 (FACE_INDICES_TOKEN, UV_INDICES_TOKEN, NORMAL_INDICES_TOKEN)
+            UNGET
+            Parse_Mesh2 (Object);
+        END_CASE
+
+        CASE (OBJ_TOKEN)
+            Parse_Obj (Object);
+        END_CASE
+
+        OTHERWISE
+            UNGET
+            Parse_Mesh1 (Object);
+        END_CASE
+
+    END_EXPECT
+
+    // Create bounding box.
+
+    Object->Compute_BBox();
+
+    // Parse object modifiers.
+
+    Parse_Object_Mods (reinterpret_cast<ObjectPtr>(Object));
+
+    // Create bounding box tree.
+
+    Object->Build_Mesh_BBox_Tree();
+
+    return Object;
+}
+
+void Parser::Parse_Mesh1 (Mesh* Object)
+{
     /* NK 1998 - added all sorts of uv variables*/
     int i;
     int number_of_normals, number_of_textures, number_of_triangles, number_of_vertices, number_of_uvcoords;
@@ -3702,7 +3750,6 @@ ObjectPtr Parser::Parse_Mesh()
     MeshVector *Normals, *Vertices;
     TEXTURE **Textures;
     MeshUVVector *UVCoords;
-    Mesh *Object;
     MESH_TRIANGLE *Triangles;
     bool fully_textured=true;
     /* NK 1998 */
@@ -3711,15 +3758,6 @@ ObjectPtr Parser::Parse_Mesh()
     bool foundZeroNormal=false;
 
     Inside_Vect = Vector3d(0.0, 0.0, 0.0);
-
-    Parse_Begin();
-
-    if ((Object = reinterpret_cast<Mesh *>(Parse_Object_Id())) != NULL)
-        return (reinterpret_cast<ObjectPtr>(Object));
-
-    /* Create object. */
-
-    Object = new Mesh();
 
     /* Allocate temporary normals, textures, triangles and vertices. */
 
@@ -4091,20 +4129,6 @@ ObjectPtr Parser::Parse_Mesh()
         Object->Data->Number_Of_Triangles,
         Object->Data->Number_Of_UVCoords);
 */
-
-    /* Create bounding box. */
-
-    Object->Compute_BBox();
-
-    /* Parse object modifiers. */
-
-    Parse_Object_Mods(reinterpret_cast<ObjectPtr>(Object));
-
-    /* Create bounding box tree. */
-
-    Object->Build_Mesh_BBox_Tree();
-
-    return (reinterpret_cast<ObjectPtr>(Object));
 }
 
 /*****************************************************************************
@@ -4134,7 +4158,38 @@ ObjectPtr Parser::Parse_Mesh()
 *   Feb 1998 : Creation.
 *
 ******************************************************************************/
+
 ObjectPtr Parser::Parse_Mesh2()
+{
+    Mesh *Object;
+
+    Parse_Begin();
+
+    if ((Object = reinterpret_cast<Mesh *>(Parse_Object_Id())) != NULL)
+        return (reinterpret_cast<ObjectPtr>(Object));
+
+    /* Create object. */
+
+    Object = new Mesh();
+
+    Parse_Mesh2 (Object);
+
+    // Create bounding box.
+
+    Object->Compute_BBox();
+
+    // Parse object modifiers.
+
+    Parse_Object_Mods (reinterpret_cast<ObjectPtr>(Object));
+
+    // Create bounding box tree.
+
+    Object->Build_Mesh_BBox_Tree();
+
+    return Object;
+}
+
+void Parser::Parse_Mesh2 (Mesh* Object)
 {
     int i;
     int number_of_normals, number_of_textures, number_of_triangles, number_of_vertices, number_of_uvcoords;
@@ -4155,18 +4210,9 @@ ObjectPtr Parser::Parse_Mesh2()
     MeshVector *Vertices = NULL;
     TEXTURE **Textures = NULL;
     MeshUVVector *UVCoords = NULL;
-    Mesh *Object;
     MESH_TRIANGLE *Triangles;
 
     Inside_Vect = Vector3d(0.0, 0.0, 0.0);
-
-    Parse_Begin();
-
-    if ((Object = reinterpret_cast<Mesh *>(Parse_Object_Id())) != NULL)
-        return(reinterpret_cast<ObjectPtr>(Object));
-
-    /* Create object. */
-    Object = new Mesh();
 
     /* normals, uvcoords, and textures are optional */
     number_of_vertices = 0;
@@ -4688,15 +4734,6 @@ ObjectPtr Parser::Parse_Mesh2()
         Set_Flag(Object, MULTITEXTURE_FLAG);
     }
 
-    /* Create bounding box. */
-    Object->Compute_BBox();
-
-    /* Parse object modifiers. */
-    Parse_Object_Mods(reinterpret_cast<ObjectPtr>(Object));
-
-    /* Create bounding box tree. */
-    Object->Build_Mesh_BBox_Tree();
-
 /*
     Render_Info("Mesh2: %ld bytes: %ld vertices, %ld normals, %ld textures, %ld triangles, %ld uv-coords\n",
         Object->Data->Number_Of_Normals*sizeof(MeshVector)+
@@ -4710,8 +4747,6 @@ ObjectPtr Parser::Parse_Mesh2()
         Object->Data->Number_Of_Triangles,
         Object->Data->Number_Of_UVCoords);
 */
-
-    return(reinterpret_cast<ObjectPtr>(Object));
 }
 
 

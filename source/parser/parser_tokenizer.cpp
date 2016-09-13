@@ -2954,7 +2954,7 @@ SYM_ENTRY *Parser::Add_Symbol (int Index,const char *Name,TOKEN Number)
 }
 
 
-SYM_ENTRY *Parser::Find_Symbol(int Index,const char *Name)
+SYM_ENTRY *Parser::Find_Symbol (int Index, const char *Name)
 {
     SYM_ENTRY *Entry;
 
@@ -2973,6 +2973,19 @@ SYM_ENTRY *Parser::Find_Symbol(int Index,const char *Name)
     }
 
     return(Entry);
+}
+
+
+SYM_ENTRY *Parser::Find_Symbol (const char *name)
+{
+    SYM_ENTRY *entry;
+    for (int index = Table_Index; index > 0; --index)
+    {
+        entry = Find_Symbol (index, name);
+        if (entry)
+            return entry;
+    }
+    return NULL;
 }
 
 
