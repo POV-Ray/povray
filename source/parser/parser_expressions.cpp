@@ -2463,7 +2463,7 @@ void Parser::Parse_Colour (RGBFTColour& colour, bool expectFT)
 {
     EXPRESS Express;
     int Terms;
-    bool old_allow_id = Allow_Identifier_In_Call;
+    bool old_allow_id = Allow_Identifier_In_Call, sawFloatOrFloatFnct;
     Allow_Identifier_In_Call = false;
 
     /* Initialize expression. [DB 12/94] */
@@ -2717,6 +2717,15 @@ void Parser::Parse_Colour (RGBFTColour& colour, bool expectFT)
             }
             else
             {
+                // Note: Setting up for potential warning on single value float promote to
+                // five value color vector. Under the Parse_Express call there is code which
+                // promotes any single float to the full 'Terms' value on the call. This
+                // usually results in filter and trasmit values >0, which cause shadow artifacts
+                // back to at least version 3.6.1.
+                if ((Token.Token_Id==FLOAT_FUNCT_TOKEN) || (Token.Token_Id==FUNCT_ID_TOKEN))
+                    sawFloatOrFloatFnct = true;
+                else
+                    sawFloatOrFloatFnct = false;
                 if (expectFT)
                     Terms = 5;
                 else
@@ -2727,6 +2736,8 @@ void Parser::Parse_Colour (RGBFTColour& colour, bool expectFT)
                 else if (!expectFT && ((Terms < 3) || Terms > 5))
                     Error("RGB color expression expected but float or vector expression found.");
                 colour.Set(Express, Terms);
+                if (((sawFloatOrFloatFnct) && (Terms==5)) && ((colour.filter() != 0) && (colour.transm() != 0)))
+                    Warning("Float value promoted to full color vector where both filter and transmit >0.0.");
                 if (!expectFT && ((colour.filter() != 0) || (colour.transm() != 0)))
                     Warning("Expected pure RGB color expression, unexpected filter and transmit components will have no effect.");
                 startedParsing = true;
