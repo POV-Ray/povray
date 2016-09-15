@@ -471,7 +471,8 @@ PigmentPattern::~PigmentPattern()
 
 
 PotentialPattern::PotentialPattern() :
-    pObject(NULL)
+    pObject(NULL),
+    subtractThreshold(false)
 {
     waveType = kWaveType_Raw;
 }
@@ -479,7 +480,7 @@ PotentialPattern::PotentialPattern() :
 PotentialPattern::PotentialPattern(const PotentialPattern& obj) :
     ContinuousPattern(obj),
     pObject(NULL),
-    subtractThreshold(false)
+    subtractThreshold(obj.subtractThreshold)
 {
     if (obj.pObject)
         pObject = Copy_Object(obj.pObject);

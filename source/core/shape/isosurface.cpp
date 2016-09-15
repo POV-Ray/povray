@@ -615,6 +615,8 @@ ObjectPtr IsoSurface::Copy()
     // mark it as copy for use by max_gradient warning code
     New->isCopy = true;
 
+    New->positivePolarity = positivePolarity;
+
     New->container = shared_ptr<ContainedByShape>(container->Copy());
 
     return (New);
