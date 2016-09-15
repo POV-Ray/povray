@@ -134,23 +134,24 @@ namespace pov
 
 /* Object types. */
 
-#define BASIC_OBJECT                0
-#define PATCH_OBJECT                1 /* Has no inside, no inverse */
-#define TEXTURED_OBJECT             2 /* Has texture, possibly in children */
-#define IS_COMPOUND_OBJECT          4 /* Has children field */
-#define STURM_OK_OBJECT             8 /* STURM legal */
-//#define WATER_LEVEL_OK_OBJECT      16 /* WATER_LEVEL legal */
-#define LIGHT_SOURCE_OBJECT        32 /* link me in frame.light_sources */
-#define BOUNDING_OBJECT            64 /* This is a holder for bounded object */
-//#define SMOOTH_OK_OBJECT          128 /* SMOOTH legal */
-#define IS_CHILD_OBJECT           256 /* Object is inside a COMPOUND */
+#define BASIC_OBJECT                0x0000u
+#define PATCH_OBJECT                0x0001u // Has no inside, no inverse
+#define TEXTURED_OBJECT             0x0002u // Has texture, possibly in children
+#define IS_COMPOUND_OBJECT          0x0004u // Has children field
+#define STURM_OK_OBJECT             0x0008u /* STURM legal */
+//#define WATER_LEVEL_OK_OBJECT         0x0010u /* WATER_LEVEL legal */
+#define LIGHT_SOURCE_OBJECT         0x0020u /* link me in frame.light_sources */
+#define BOUNDING_OBJECT             0x0040u /* This is a holder for bounded object */
+//#define SMOOTH_OK_OBJECT              0x0080u /* SMOOTH legal */
+#define IS_CHILD_OBJECT             0x0100u /* Object is inside a COMPOUND */
 /* NK 1998 - DOUBLE_ILLUMINATE is not used anymore - use DOUBLE_ILLUMINATE_FLAG */
-#define HIERARCHY_OK_OBJECT       512 /* NO_HIERARCHY legal */
-#define LT_SRC_UNION_OBJECT      1024 /* Union of light_source objects only */
-#define LIGHT_GROUP_OBJECT       2048 /* light_group union object [trf] */
-#define LIGHT_GROUP_LIGHT_OBJECT 4096 /* light in light_group object [trf] */
-#define CSG_DIFFERENCE_OBJECT    8192 /* csg difference object */
-#define IS_CSG_OBJECT           16384 /* object is a csg and not some other compound object */
+#define HIERARCHY_OK_OBJECT         0x0200u /* NO_HIERARCHY legal */
+#define LT_SRC_UNION_OBJECT         0x0400u /* Union of light_source objects only */
+#define LIGHT_GROUP_OBJECT          0x0800u /* light_group union object [trf] */
+#define LIGHT_GROUP_LIGHT_OBJECT    0x1000u /* light in light_group object [trf] */
+#define CSG_DIFFERENCE_OBJECT       0x2000u /* csg difference object */
+#define IS_CSG_OBJECT               0x4000u /* object is a csg and not some other compound object */
+#define POTENTIAL_OBJECT            0x8000u ///< Object has an intrinsic potential field associated.
 #define CHILDREN_FLAGS (PATCH_OBJECT+TEXTURED_OBJECT)  /* Reverse inherited flags */
 
 
@@ -222,6 +223,7 @@ class ObjectBase
         virtual bool Precompute() { return true; };
 
         virtual bool All_Intersections(const Ray&, IStack&, TraceThreadData *) = 0; // could be "const", if it wasn't for isosurface max_gradient estimation stuff
+        virtual double GetPotential (const Vector3d&, bool subtractThreshold, TraceThreadData *) const;
         virtual bool Inside(const Vector3d&, TraceThreadData *) const = 0;
         virtual void Normal(Vector3d&, Intersection *, TraceThreadData *) const = 0;
         virtual void UVCoord(Vector2d&, const Intersection *, TraceThreadData *) const;

@@ -127,6 +127,7 @@ enum PATTERN_IDS
 
 enum WaveType
 {
+    kWaveType_Raw,      ///< Use raw pattern value, allowing it to exceed the [0..1] range.
     kWaveType_Ramp,     ///< Ramps up from 0 to 1, then drops sharply back to 0, and repeats.
     kWaveType_Sine,     ///< Oscillates between 0 and 1 using a sine-based formula.
     kWaveType_Triangle, ///< Ramps up from 0 to 1, then ramps down from 1 to 0, and repeats.
@@ -689,6 +690,22 @@ struct PigmentPattern : public ContinuousPattern
 /// Implements the `planar` pattern.
 struct PlanarPattern : public ContinuousPattern
 {
+    virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
+    virtual DBL EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const;
+};
+
+/// Implements the `potential` pattern.
+///
+/// @todo   The additional member variables should possibly be encapsulated.
+///
+struct PotentialPattern : public ContinuousPattern
+{
+    ObjectPtr   pObject;
+    bool        subtractThreshold;
+
+    PotentialPattern();
+    PotentialPattern(const PotentialPattern& obj);
+    virtual ~PotentialPattern();
     virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
     virtual DBL EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const;
 };

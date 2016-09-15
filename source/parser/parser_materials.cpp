@@ -1621,6 +1621,35 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
             EXIT
         END_CASE
 
+        CASE (POTENTIAL_TOKEN)
+        {
+            Parse_Begin();
+            vector<ObjectPtr> tempObjects;
+            Parse_Bound_Clip(tempObjects, false);
+            if(tempObjects.size() != 1)
+                Error ("object or object identifier expected.");
+            if (!(tempObjects[0]->Type & POTENTIAL_OBJECT))
+                Error ("blob or isosurface object expected.");
+            New->Type = GENERIC_PATTERN;
+            New->pattern = PatternPtr(new PotentialPattern());
+            dynamic_cast<PotentialPattern*>(New->pattern.get())->pObject = tempObjects[0];
+            Parse_End();
+
+            EXPECT
+                CASE (THRESHOLD_TOKEN)
+                    dynamic_cast<PotentialPattern*>(New->pattern.get())->subtractThreshold = Parse_Bool();
+                END_CASE
+
+                OTHERWISE
+                    UNGET
+                    EXIT
+                END_CASE
+            END_EXPECT
+
+            EXIT
+        }
+        END_CASE
+
         OTHERWISE
             UNGET
             EXIT
@@ -5269,6 +5298,23 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
         // TODO VERIFY - PAVEMENT_TOKEN is not accepted, is that ok?
 
         // TODO VERIFY - TILING_TOKEN is not accepted, is that ok?
+
+        CASE (POTENTIAL_TOKEN)
+        {
+            Parse_Begin();
+            vector<ObjectPtr> tempObjects;
+            Parse_Bound_Clip(tempObjects, false);
+            if(tempObjects.size() != 1)
+                Error ("object or object identifier expected.");
+            if (!(tempObjects[0]->Type & POTENTIAL_OBJECT))
+                Error ("blob or isosurface object expected.");
+            New->Type = GENERIC_PATTERN;
+            New->pattern = PatternPtr(new PotentialPattern());
+            dynamic_cast<PotentialPattern*>(New->pattern.get())->pObject = tempObjects[0];
+            Parse_End();
+            EXIT
+        }
+        END_CASE
 
         OTHERWISE
             UNGET

@@ -2094,6 +2094,37 @@ int Parser::Parse_Int_With_Minimum(int minValue, const char* parameterName)
     return value;
 }
 
+int Parser::Parse_Int_With_Range(int minValue, int maxValue, const char* parameterName)
+{
+    int value = Parse_Int(parameterName);
+    if ((value < minValue) || (value > maxValue))
+    {
+        Error("%s%sExpected at %s %i, but found %i instead.",
+              (parameterName != NULL ? parameterName : ""),
+              (parameterName != NULL ? ": " : ""),
+              (value < minValue ? "least" : "most"),
+              minValue,
+              value);
+    }
+    return value;
+}
+
+bool Parser::Parse_Bool(const char* parameterName)
+{
+    DBL rawValue = Parse_Float();
+    int intValue = int(rawValue);
+    bool value = (intValue != 0);
+    if (fabs(intValue - rawValue) >= EPSILON)
+    {
+        Warning("%s%sExpected boolean; interpreting fractional value %lf as '%s'.",
+                (parameterName != NULL ? parameterName : ""),
+                (parameterName != NULL ? ": " : ""),
+                rawValue,
+                (value ? "on" : "off"));
+    }
+    return value;
+}
+
 
 
 /*****************************************************************************

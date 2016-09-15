@@ -1610,6 +1610,25 @@ bool Blob::Inside(const Vector3d& Test_Point, TraceThreadData *Thread) const
 }
 
 
+double Blob::GetPotential (const Vector3d& globalPoint, bool subtractThreshold, TraceThreadData *pThread) const
+{
+    Vector3d localPoint;
+
+    if (Trans != NULL)
+        MInvTransPoint (localPoint, globalPoint, Trans);
+    else
+        localPoint = globalPoint;
+
+    double potential = calculate_field_value (localPoint, pThread);
+    if (subtractThreshold)
+        potential -= Data->Threshold;
+
+    if (Test_Flag (this, INVERTED_FLAG))
+        return -potential;
+    else
+        return  potential;
+}
+
 
 /*****************************************************************************
 *
