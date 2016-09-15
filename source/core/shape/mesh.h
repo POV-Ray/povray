@@ -142,7 +142,10 @@ class Mesh : public ObjectBase
         void Test_Mesh_Opacity();
 
         void Create_Mesh_Hash_Tables();
-        bool Compute_Mesh_Triangle(MESH_TRIANGLE *Triangle, bool Smooth, Vector3d& P1, Vector3d& P2, Vector3d& P3, Vector3d& S_Normal);
+
+        /// @note The method may decide to re-order the vertices without notice.
+        bool Compute_Mesh_Triangle(MESH_TRIANGLE *Triangle, bool Smooth, const Vector3d& P1, const Vector3d& P2, const Vector3d& P3, Vector3d& S_Normal) const;
+
         void Build_Mesh_BBox_Tree();
         bool Degenerate(const Vector3d& P1, const Vector3d& P2, const Vector3d& P3);
         void Init_Mesh_Triangle(MESH_TRIANGLE *Triangle);
@@ -158,7 +161,7 @@ class Mesh : public ObjectBase
         bool Intersect(const BasicRay& ray, IStack& Depth_Stack, TraceThreadData *Thread);
         void Compute_Mesh_BBox();
         void MeshUV(const Vector3d& P, const MESH_TRIANGLE *Triangle, Vector2d& Result) const;
-        void compute_smooth_triangle(MESH_TRIANGLE *Triangle, const Vector3d& P1, const Vector3d& P2, const Vector3d& P3);
+        void compute_smooth_triangle(MESH_TRIANGLE *Triangle, const Vector3d& P1, const Vector3d& P2, const Vector3d& P3) const;
         bool intersect_mesh_triangle(const BasicRay& ray, const MESH_TRIANGLE *Triangle, DBL *Depth) const;
         bool test_hit(const MESH_TRIANGLE *Triangle, const BasicRay& OrigRay, DBL Depth, DBL len, IStack& Depth_Stack, TraceThreadData *Thread);
         void get_triangle_bbox(const MESH_TRIANGLE *Triangle, BoundingBox *BBox) const;

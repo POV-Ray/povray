@@ -283,44 +283,53 @@ void Parser::Run()
     // Check for experimental features
     char str[512] = "";
 
-    if(mExperimentalFlags.backsideIllumination)
-        strcat(str, str [0] ? ", backside illumination" : "backside illumination");
-    if(mExperimentalFlags.functionHf)
-        strcat(str, str [0] ? ", function '.hf'" : "function '.hf'");
-    if(mExperimentalFlags.meshCamera)
-        strcat(str, str [0] ? ", mesh camera" : "mesh camera");
-    if(mExperimentalFlags.slopeAltitude)
-        strcat(str, str [0] ? ", slope pattern altitude" : "slope pattern altitude");
-    if(mExperimentalFlags.spline)
-        strcat(str, str [0] ? ", spline" : "spline");
-    if(mExperimentalFlags.subsurface)
-        strcat(str, str [0] ? ", subsurface light transport" : "subsurface light transport");
-    if(mExperimentalFlags.tiff)
-        strcat(str, str [0] ? ", TIFF image support" : "TIFF image support");
-    if(mExperimentalFlags.userDefinedCamera)
-        strcat(str, str [0] ? ", user-defined camera" : "user-defined camera");
+    vector<std::string> featureList;
+    std::string featureString;
 
-    if (str[0] != '\0')
+    if(mExperimentalFlags.backsideIllumination) featureList.push_back("backside illumination");
+    if(mExperimentalFlags.functionHf)           featureList.push_back("function '.hf'");
+    if(mExperimentalFlags.meshCamera)           featureList.push_back("mesh camera");
+    if(mExperimentalFlags.objImport)            featureList.push_back("wavefront obj import");
+    if(mExperimentalFlags.slopeAltitude)        featureList.push_back("slope pattern altitude");
+    if(mExperimentalFlags.spline)               featureList.push_back("spline");
+    if(mExperimentalFlags.subsurface)           featureList.push_back("subsurface light transport");
+    if(mExperimentalFlags.tiff)                 featureList.push_back("TIFF image support");
+    if(mExperimentalFlags.userDefinedCamera)    featureList.push_back("user-defined camera");
+
+    for (vector<std::string>::iterator i = featureList.begin(); i != featureList.end(); ++i)
+    {
+        if (!featureString.empty())
+            featureString += ", ";
+        featureString += *i;
+    }
+
+    if (!featureString.empty())
         Warning("This rendering uses the following experimental feature(s): %s.\n"
                 "The design and implementation of these features is likely to change in future\n"
                 "versions of POV-Ray. Backward compatibility with the current implementation is\n"
                 "not guaranteed.",
-                str);
+                featureString.c_str());
 
     // Check for beta features
-    str[0] = '\0';
+    featureList.clear();
+    featureString.clear();
 
-    if(mBetaFeatureFlags.videoCapture)
-        strcat(str, str [0] ? ", video capture" : "video capture");
-    if(mBetaFeatureFlags.realTimeRaytracing)
-        strcat(str, str [0] ? ", real-time raytracing render loop" : "real-time raytracing render loop");
+    if(mBetaFeatureFlags.videoCapture)          featureList.push_back("video capture");
+    if(mBetaFeatureFlags.realTimeRaytracing)    featureList.push_back("real-time raytracing render loop");
 
-    if (str[0] != '\0')
+    for (vector<std::string>::iterator i = featureList.begin(); i != featureList.end(); ++i)
+    {
+        if (!featureString.empty())
+            featureString += ", ";
+        featureString += *i;
+    }
+
+    if (!featureString.empty())
         Warning("This rendering uses the following beta-test feature(s): %s.\n"
                 "The implementation of these features is likely to change or be completely\n"
                 "removed in subsequent beta-test versions of POV-Ray. There is no guarantee\n"
                 "that they will be available in the next full release version.\n",
-                str);
+                featureString.c_str());
 
     if ((sceneData->bspMaxDepth != 0) ||
         (sceneData->bspObjectIsectCost != 0.0f) || (sceneData->bspBaseAccessCost != 0.0f) ||
@@ -3692,6 +3701,55 @@ ObjectPtr Parser::Parse_Light_Source ()
 
 ObjectPtr Parser::Parse_Mesh()
 {
+    Mesh *Object;
+
+    Parse_Begin();
+
+    if ((Object = reinterpret_cast<Mesh *>(Parse_Object_Id())) != NULL)
+        return (reinterpret_cast<ObjectPtr>(Object));
+
+    /* Create object. */
+
+    Object = new Mesh();
+
+    EXPECT_ONE
+
+        CASE4 (VERTEX_VECTORS_TOKEN, NORMAL_VECTORS_TOKEN, UV_VECTORS_TOKEN, TEXTURE_LIST_TOKEN)
+        // the following are currently not expected by mesh2 right away, but that may change in the future
+        CASE3 (FACE_INDICES_TOKEN, UV_INDICES_TOKEN, NORMAL_INDICES_TOKEN)
+            UNGET
+            Parse_Mesh2 (Object);
+        END_CASE
+
+        CASE (OBJ_TOKEN)
+            mExperimentalFlags.objImport = true;
+            Parse_Obj (Object);
+        END_CASE
+
+        OTHERWISE
+            UNGET
+            Parse_Mesh1 (Object);
+        END_CASE
+
+    END_EXPECT
+
+    // Create bounding box.
+
+    Object->Compute_BBox();
+
+    // Parse object modifiers.
+
+    Parse_Object_Mods (reinterpret_cast<ObjectPtr>(Object));
+
+    // Create bounding box tree.
+
+    Object->Build_Mesh_BBox_Tree();
+
+    return Object;
+}
+
+void Parser::Parse_Mesh1 (Mesh* Object)
+{
     /* NK 1998 - added all sorts of uv variables*/
     int i;
     int number_of_normals, number_of_textures, number_of_triangles, number_of_vertices, number_of_uvcoords;
@@ -3702,7 +3760,6 @@ ObjectPtr Parser::Parse_Mesh()
     MeshVector *Normals, *Vertices;
     TEXTURE **Textures;
     MeshUVVector *UVCoords;
-    Mesh *Object;
     MESH_TRIANGLE *Triangles;
     bool fully_textured=true;
     /* NK 1998 */
@@ -3711,15 +3768,6 @@ ObjectPtr Parser::Parse_Mesh()
     bool foundZeroNormal=false;
 
     Inside_Vect = Vector3d(0.0, 0.0, 0.0);
-
-    Parse_Begin();
-
-    if ((Object = reinterpret_cast<Mesh *>(Parse_Object_Id())) != NULL)
-        return (reinterpret_cast<ObjectPtr>(Object));
-
-    /* Create object. */
-
-    Object = new Mesh();
 
     /* Allocate temporary normals, textures, triangles and vertices. */
 
@@ -4091,20 +4139,6 @@ ObjectPtr Parser::Parse_Mesh()
         Object->Data->Number_Of_Triangles,
         Object->Data->Number_Of_UVCoords);
 */
-
-    /* Create bounding box. */
-
-    Object->Compute_BBox();
-
-    /* Parse object modifiers. */
-
-    Parse_Object_Mods(reinterpret_cast<ObjectPtr>(Object));
-
-    /* Create bounding box tree. */
-
-    Object->Build_Mesh_BBox_Tree();
-
-    return (reinterpret_cast<ObjectPtr>(Object));
 }
 
 /*****************************************************************************
@@ -4134,7 +4168,38 @@ ObjectPtr Parser::Parse_Mesh()
 *   Feb 1998 : Creation.
 *
 ******************************************************************************/
+
 ObjectPtr Parser::Parse_Mesh2()
+{
+    Mesh *Object;
+
+    Parse_Begin();
+
+    if ((Object = reinterpret_cast<Mesh *>(Parse_Object_Id())) != NULL)
+        return (reinterpret_cast<ObjectPtr>(Object));
+
+    /* Create object. */
+
+    Object = new Mesh();
+
+    Parse_Mesh2 (Object);
+
+    // Create bounding box.
+
+    Object->Compute_BBox();
+
+    // Parse object modifiers.
+
+    Parse_Object_Mods (reinterpret_cast<ObjectPtr>(Object));
+
+    // Create bounding box tree.
+
+    Object->Build_Mesh_BBox_Tree();
+
+    return Object;
+}
+
+void Parser::Parse_Mesh2 (Mesh* Object)
 {
     int i;
     int number_of_normals, number_of_textures, number_of_triangles, number_of_vertices, number_of_uvcoords;
@@ -4155,18 +4220,9 @@ ObjectPtr Parser::Parse_Mesh2()
     MeshVector *Vertices = NULL;
     TEXTURE **Textures = NULL;
     MeshUVVector *UVCoords = NULL;
-    Mesh *Object;
     MESH_TRIANGLE *Triangles;
 
     Inside_Vect = Vector3d(0.0, 0.0, 0.0);
-
-    Parse_Begin();
-
-    if ((Object = reinterpret_cast<Mesh *>(Parse_Object_Id())) != NULL)
-        return(reinterpret_cast<ObjectPtr>(Object));
-
-    /* Create object. */
-    Object = new Mesh();
 
     /* normals, uvcoords, and textures are optional */
     number_of_vertices = 0;
@@ -4688,15 +4744,6 @@ ObjectPtr Parser::Parse_Mesh2()
         Set_Flag(Object, MULTITEXTURE_FLAG);
     }
 
-    /* Create bounding box. */
-    Object->Compute_BBox();
-
-    /* Parse object modifiers. */
-    Parse_Object_Mods(reinterpret_cast<ObjectPtr>(Object));
-
-    /* Create bounding box tree. */
-    Object->Build_Mesh_BBox_Tree();
-
 /*
     Render_Info("Mesh2: %ld bytes: %ld vertices, %ld normals, %ld textures, %ld triangles, %ld uv-coords\n",
         Object->Data->Number_Of_Normals*sizeof(MeshVector)+
@@ -4710,8 +4757,6 @@ ObjectPtr Parser::Parse_Mesh2()
         Object->Data->Number_Of_Triangles,
         Object->Data->Number_Of_UVCoords);
 */
-
-    return(reinterpret_cast<ObjectPtr>(Object));
 }
 
 
@@ -7970,6 +8015,8 @@ ObjectPtr Parser::Parse_Object_Mods (ObjectPtr Object)
 
         /* Get bounding boxes' volumes. */
 
+        // TODO - Area is probably a better measure to decide which box is better.
+        // TODO - Doesn't this mechanism prevent users from reliably overriding broken default boxes?
         BOUNDS_VOLUME(V1, BBox);
         BOUNDS_VOLUME(V2, Object->BBox);
 
@@ -8008,6 +8055,7 @@ ObjectPtr Parser::Parse_Object_Mods (ObjectPtr Object)
 
         /* Get bounding boxes' volumes. */
 
+        // TODO - Area is probably a better measure to decide which box is better.
         BOUNDS_VOLUME(V1, BBox);
         BOUNDS_VOLUME(V2, Object->BBox);
 

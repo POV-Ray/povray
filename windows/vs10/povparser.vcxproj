@@ -349,6 +349,7 @@
     <ClCompile Include="..\..\source\parser\parser_functions.cpp" />
     <ClCompile Include="..\..\source\parser\parser_functions_utilities.cpp" />
     <ClCompile Include="..\..\source\parser\parser_materials.cpp" />
+    <ClCompile Include="..\..\source\parser\parser_obj.cpp" />
     <ClCompile Include="..\..\source\parser\parser_strings.cpp" />
     <ClCompile Include="..\..\source\parser\parser_tokenizer.cpp" />
     <ClCompile Include="..\..\source\parser\reservedwords.cpp" />
