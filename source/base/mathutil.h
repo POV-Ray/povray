@@ -155,4 +155,6 @@ inline bool IsInRange (T1 value, T2 min, T2 max)
     return (min <= value) && (value <= max);
 }
 
+}
+
 #endif // POVRAY_BASE_MATHUTIL_H
