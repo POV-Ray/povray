@@ -55,6 +55,9 @@ New Features
 - A new parameter, `polarity`, has been added to isosurfaces to choose whether
   function values above the threshold should indicate the inside or outside.
 
+- Basic support for importing Wavefront OBJ files has been added as an extension
+  to the `mesh` primitive.
+
 - The `map_type` keyword now supports the Angular Map projection for light
   probes, popularized by Paul Devebec, as type 7.
 
@@ -114,6 +117,12 @@ For more details on the above new features, see the documentation.
 
 Changed Behaviour
 -----------------
+
+- The `mesh2` syntax has been absorbed into that of `mesh` (i.e. you can now
+  replace any occurrences of the `mesh2` keyword with `mesh`), to reflect the
+  fact that they are just two syntax variants for one and the same primitive.
+  The old `mesh2` keyword is retained for backward compatibility and, in
+  acknowledgement of its widespread use, remains non-deprecated.
 
 - The `version` pseudo-variable will now evaluate to the effective language
   version at the time the expression is parsed, _except_ when used in a

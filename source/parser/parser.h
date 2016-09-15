@@ -105,6 +105,7 @@ class ImageData;
 struct GenericSpline;
 struct ClassicTurbulence; // full declaration in core/material/warp.h
 struct BlackHoleWarp; // full declaration in core/material/warp.h
+class Mesh;
 class SceneData;
 
 /*****************************************************************************
@@ -158,6 +159,7 @@ struct ExperimentalFlags
     bool    backsideIllumination    : 1;
     bool    functionHf              : 1;
     bool    meshCamera              : 1;
+    bool    objImport               : 1;
     bool    slopeAltitude           : 1;
     bool    spline                  : 1;
     bool    subsurface              : 1;
@@ -168,6 +170,7 @@ struct ExperimentalFlags
         backsideIllumination(false),
         functionHf(false),
         meshCamera(false),
+        objImport(false),
         slopeAltitude(false),
         spline(false),
         subsurface(false),
@@ -315,7 +318,9 @@ class Parser : public SceneTask
         void Warn_Compat (bool definite, const char *sym);
         void Link_Textures (TEXTURE **Old_Texture, TEXTURE *New_Texture);
 
+        /// @note This method includes an implied `Parse_End()`.
         ObjectPtr Parse_Object_Mods (ObjectPtr Object);
+
         ObjectPtr Parse_Object (void);
         void Parse_Bound_Clip (vector<ObjectPtr>& objects, bool notexture = true);
         void Parse_Default (void);
@@ -605,7 +610,10 @@ class Parser : public SceneTask
         ObjectPtr Parse_Lathe(void);
         ObjectPtr Parse_Lemon();
         ObjectPtr Parse_Light_Source();
+
+        /// @note This method includes an implied `Parse_End()`.
         ObjectPtr Parse_Object_Id();
+
         ObjectPtr Parse_Ovus();
         ObjectPtr Parse_Plane();
         ObjectPtr Parse_Poly(int order);
@@ -621,6 +629,11 @@ class Parser : public SceneTask
         ObjectPtr Parse_Triangle();
         ObjectPtr Parse_Mesh();
         ObjectPtr Parse_Mesh2();
+
+        void Parse_Obj (Mesh*);
+        void Parse_Mesh1 (Mesh*);
+        void Parse_Mesh2 (Mesh*);
+
         TEXTURE *Parse_Mesh_Texture(TEXTURE **t2, TEXTURE **t3);
         ObjectPtr Parse_TrueType(void);
         void Parse_Blob_Element_Mods(Blob_Element *Element);
@@ -665,6 +678,7 @@ class Parser : public SceneTask
         bool Read_Float (void);
         void Read_Symbol (void);
         SYM_ENTRY *Find_Symbol (int Index, const char *s);
+        SYM_ENTRY *Find_Symbol (const char *s);
         void Skip_Tokens (COND_TYPE cond);
         void Break (void);
 
