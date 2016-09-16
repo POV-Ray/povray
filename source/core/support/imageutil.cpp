@@ -752,6 +752,7 @@ static int torus_image_map(const Vector3d& EPoint, const ImageData *image, DBL *
 *
 ******************************************************************************/
 
+/// @author Denis Bodor
 static int angular_image_map(const Vector3d& EPoint, const ImageData *image, DBL *u, DBL  *v)
 {
     DBL len, r;

@@ -194,9 +194,10 @@ Miscellaneous Improvements
 Fixed or Mitigated Issues Reported by Static Code Analysis
 ----------------------------------------------------------
 
-- CID  967377: Uninitialized pointer field
-- CID  967399: Uninitialized pointer field
-- CID  967400: Uninitialized pointer field
+Coverity Scan defects targeted deliberately:
+
+- CID 967377: Uninitialized pointer field
+- CID 967400: Uninitialized pointer field
 - CID 1129016: Uninitialized pointer read
 - CID 1129017: Uninitialized scalar variable
 - CID 1372548: Non-virtual destructor
@@ -223,6 +224,99 @@ Fixed or Mitigated Issues Reported by Static Code Analysis
 - CID 1372655: Structurally dead code
 - CID 1372656: Structurally dead code
 - CID 1372657: Unused value
+
+Coverity Scan defects eliminated in passing:
+
+- CID 967238: Unchecked return value from library
+- CID 967239: Unchecked return value from library
+- CID 967252: Logically dead code
+- CID 967255: Logically dead code
+- CID 967266: Division or modulo by float zero
+- CID 967267: Division or modulo by float zero
+- CID 967272: Dereference after null check
+- CID 967284: Unsigned compared against 0
+- CID 967286: Various
+- CID 967290: Dereference null return value
+- CID 967291: Out-of-bounds write
+- CID 967292: Out-of-bounds access
+- CID 967293: Out-of-bounds access
+- CID 967294: Out-of-bounds access
+- CID 967305: Dereference before null check
+- CID 967306: Dereference before null check
+- CID 967307: Dereference before null check
+- CID 967310: Sizeof not portable
+- CID 967333: Uninitialized scalar variable
+- CID 967334: Uninitialized scalar variable
+- CID 967335: Uninitialized scalar variable
+- CID 967336: Uninitialized scalar variable
+- CID 967337: Uninitialized scalar variable
+- CID 967338: Uninitialized scalar variable
+- CID 967339: Uninitialized scalar variable
+- CID 967340: Uninitialized scalar variable
+- CID 967341: Uninitialized scalar variable
+- CID 967342: Uninitialized scalar variable
+- CID 967343: Uninitialized scalar variable
+- CID 967344: Uninitialized scalar variable
+- CID 967345: Uninitialized scalar variable
+- CID 967346: Uninitialized scalar variable
+- CID 967347: Uninitialized scalar variable
+- CID 967348: Uninitialized scalar variable
+- CID 967349: Uninitialized scalar variable
+- CID 967350: Uninitialized pointer read
+- CID 967351: Uninitialized scalar variable
+- CID 967352: Uninitialized scalar variable
+- CID 967353: Uninitialized scalar variable
+- CID 967354: Uninitialized scalar variable
+- CID 967355: Uninitialized scalar variable
+- CID 967356: Uninitialized scalar variable
+- CID 967357: Uninitialized scalar variable
+- CID 967366: Uninitialized scalar variable
+- CID 967367: Uninitialized scalar variable
+- CID 967368: Uninitialized scalar variable
+- CID 967369: Uninitialized pointer field
+- CID 967370: Uninitialized scalar field
+- CID 967371: Uninitialized pointer field
+- CID 967372: Uninitialized pointer field
+- CID 967373: Uninitialized pointer field
+- CID 967374: Uninitialized pointer field
+- CID 967375: Uninitialized pointer field
+- CID 967376: Uninitialized pointer field
+- CID 967385: Uninitialized pointer field
+- CID 967387: Uninitialized scalar field
+- CID 967392: Uninitialized pointer field
+- CID 967398: Uninitialized pointer field
+- CID 967408: Uninitialized pointer field
+- CID 986459: Logically dead code
+- CID 986460: Dereference before null check
+- CID 986461: Uninitialized scalar variable
+- CID 1129012: Out-of-bounds write
+- CID 1129013: Out-of-bounds read
+- CID 1372531: Calling risky function
+- CID 1372532: Division or modulo by float zero
+- CID 1372534: Out-of-bounds access
+- CID 1372535: Out-of-bounds access
+- CID 1372536: Out-of-bounds access
+- CID 1372537: Out-of-bounds access
+- CID 1372538: Dereference before null check
+- CID 1372539: String not null terminated
+- CID 1372540: Uninitialized pointer field
+- CID 1372545: Unused value
+- CID 1372565: Unchecked dynamic_cast
+- CID 1372575: Unchecked dynamic_cast
+- CID 1372599: Dereference null return value
+- CID 1372613: Uninitialized scalar variable
+- CID 1372614: Uninitialized scalar variable
+- CID 1372615: Uninitialized scalar variable
+- CID 1372616: Uninitialized scalar variable
+- CID 1372617: Uninitialized scalar variable
+- CID 1372619: Uninitialized scalar variable
+- CID 1372620: Uninitialized scalar variable
+- CID 1372621: Uninitialized scalar variable
+- CID 1372622: Uninitialized scalar variable
+- CID 1372623: Uninitialized scalar variable
+- CID 1372624: Uninitialized scalar variable
+- CID 1372625: Uninitialized scalar variable
+- CID 1372627: Uninitialized scalar variable
 
 Fixed or Mitigated Bugs
 -----------------------
