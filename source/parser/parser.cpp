@@ -9425,7 +9425,7 @@ bool Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENT
         END_CASE
 
         CASE (DICTIONARY_TOKEN)
-            Temp_Data  = reinterpret_cast<void *>(Create_Sym_Table (true));
+            Temp_Data  = reinterpret_cast<void *>(Parse_Dictionary_Declare());
             *NumberPtr = DICTIONARY_ID_TOKEN;
             Test_Redefine (Previous,NumberPtr,*DataPtr, allow_redefine);
             *DataPtr   = Temp_Data;

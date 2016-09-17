@@ -377,6 +377,7 @@ class Parser : public SceneTask
         SYM_ENTRY *Add_Symbol (SYM_TABLE *table, const char *Name,TOKEN Number);
         SYM_ENTRY *Add_Symbol (int Index,const char *Name,TOKEN Number);
         POV_ARRAY *Parse_Array_Declare (void);
+        SYM_TABLE *Parse_Dictionary_Declare();
         SYM_ENTRY *Create_Entry (const char *Name, TOKEN Number, bool copyName);
         SYM_ENTRY *Copy_Entry (const SYM_ENTRY *);
         void Acquire_Entry_Reference (SYM_ENTRY *Entry);

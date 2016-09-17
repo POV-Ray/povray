@@ -3579,6 +3579,50 @@ Parser::POV_ARRAY *Parser::Parse_Array_Declare (void)
 
 };
 
+
+Parser::SYM_TABLE *Parser::Parse_Dictionary_Declare()
+{
+    SYM_TABLE *newDictionary;
+    SYM_ENTRY *newEntry;
+    bool oldParseRawIdentifiers;
+
+    newDictionary = Create_Sym_Table (true);
+
+    // TODO REVIEW - maybe we need `Ok_To_Declare = false`?
+
+    if (!Parse_Begin (false))
+        return newDictionary;
+
+    EXPECT
+        CASE (PERIOD_TOKEN)
+            oldParseRawIdentifiers = parseRawIdentifiers;
+            parseRawIdentifiers = true;
+            Get_Token();
+            parseRawIdentifiers = oldParseRawIdentifiers;
+            if (Token.Token_Id != IDENTIFIER_TOKEN)
+                Expectation_Error ("dictionary element identifier");
+            newEntry = Add_Symbol (newDictionary, Token.Token_String, IDENTIFIER_TOKEN);
+
+            GET (EQUALS_TOKEN);
+
+            if (!Parse_RValue (IDENTIFIER_TOKEN, &(newEntry->Token_Number), &(newEntry->Data), newEntry, false, false, true, true, false, MAX_NUMBER_OF_TABLES))
+                Expectation_Error("RValue");
+
+            Parse_Comma();
+        END_CASE
+
+        OTHERWISE
+            UNGET
+            EXIT
+        END_CASE
+    END_EXPECT
+
+    Parse_End();
+
+    return newDictionary;
+
+};
+
 void Parser::Parse_Initalizer (int Sub, int Base, POV_ARRAY *a)
 {
     int i;
