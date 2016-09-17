@@ -49,6 +49,8 @@ Prior to the release of 3.7.1, the following items still need urgent attention:
 New Features
 ------------
 
+- Support for variable-size arrays has been added.
+
 - A new data container, `dictionary`, has been added to support structured
   storage of data.
 

@@ -273,10 +273,11 @@ class Parser : public SceneTask
 
         struct POV_ARRAY
         {
-            int Dims, Type, Total;
+            int Dims, Type;
             int Sizes[5];
             int Mags[5];
-            void **DataPtrs;
+            vector<void*> DataPtrs;
+            bool resizable;
         };
 
         struct POV_PARAM

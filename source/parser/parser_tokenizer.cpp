@@ -1404,7 +1404,14 @@ void Parser::Read_Symbol()
 
                                     if (k >= a->Sizes[i])
                                     {
-                                        Error("Array subscript out of range");
+                                        if (a->resizable)
+                                        {
+                                            POV_PARSER_ASSERT (a->Dims == 0);
+                                            a->DataPtrs.resize (k+1);
+                                            a->Sizes[0] = a->DataPtrs.size();
+                                        }
+                                        else
+                                            Error("Array subscript out of range");
                                     }
                                     j += k * a->Mags[i];
                                     GET(RIGHT_SQUARE_TOKEN)
@@ -1434,6 +1441,12 @@ void Parser::Read_Symbol()
 
                                 if (c =='.')
                                 {
+                                    if (table == NULL)
+                                    {
+                                        POV_PARSER_ASSERT (Token.is_array_elem);
+                                        Error ("Attempt to access uninitialized array element.");
+                                    }
+
                                     GET (PERIOD_TOKEN)
                                     bool oldParseRawIdentifiers = parseRawIdentifiers;
                                     parseRawIdentifiers = true;
@@ -1447,6 +1460,12 @@ void Parser::Read_Symbol()
                                 }
                                 else if (c == '[')
                                 {
+                                    if (table == NULL)
+                                    {
+                                        POV_PARSER_ASSERT (Token.is_array_elem);
+                                        Error ("Attempt to access uninitialized array element.");
+                                    }
+
                                     GET(LEFT_SQUARE_TOKEN)
                                     dictIndex = Parse_C_String();
                                     GET (RIGHT_SQUARE_TOKEN);
@@ -3534,7 +3553,8 @@ Parser::POV_ARRAY *Parser::Parse_Array_Declare (void)
     POV_ARRAY *New;
     int i,j;
 
-    New=reinterpret_cast<POV_ARRAY *>(POV_MALLOC(sizeof(POV_ARRAY),"array"));
+    New = new POV_ARRAY;
+    New->resizable = false;
 
     i=0;
     j=1;
@@ -3562,14 +3582,16 @@ Parser::POV_ARRAY *Parser::Parse_Array_Declare (void)
         END_CASE
     END_EXPECT
 
-    if ( i < 1 ) {
-        Error( "An array declaration must have at least one dimension");
+    if (i == 0) {
+        // new syntax: Dynamically sized one-dimensional array
+        i = 1;
+        New->Sizes[0] = 0;
+        New->resizable = true;
     }
 
     New->Dims     = i-1;
-    New->Total    = j;
     New->Type     = EMPTY_ARRAY_TOKEN;
-    New->DataPtrs = reinterpret_cast<void **>(POV_MALLOC(sizeof(void *)*j,"array"));
+    New->DataPtrs.resize (j);
 
     j = 1;
 
@@ -3579,9 +3601,9 @@ Parser::POV_ARRAY *Parser::Parse_Array_Declare (void)
         j *= New->Sizes[i];
     }
 
-    for (i=0; i<New->Total; i++)
+    for (i=0; i<New->DataPtrs.size(); i++)
     {
-        New->DataPtrs[i] = NULL;
+        POV_PARSER_ASSERT (New->DataPtrs[i] == NULL);
     }
 
     EXPECT
@@ -3672,9 +3694,17 @@ void Parser::Parse_Initalizer (int Sub, int Base, POV_ARRAY *a)
     else
     {
         bool properlyDelimited = true;
-        for(i=0; i < a->Sizes[Sub]; i++)
+        bool finalParameter = (!a->resizable && (a->Sizes[Sub] == 0));
+        for(i=0; !finalParameter; i++)
         {
-            bool finalParameter = (i == a->Sizes[Sub]-1);
+            if (a->resizable)
+            {
+                a->DataPtrs.push_back (NULL);
+                a->Sizes[Sub] = a->DataPtrs.size();
+            }
+            else
+                finalParameter = (i == (a->Sizes[Sub]-1));
+
             if (!Parse_RValue (a->Type, &(a->Type), &(a->DataPtrs[Base+i]), NULL, false, false, true, false, true, MAX_NUMBER_OF_TABLES))
             {
                 EXPECT_ONE
@@ -3685,12 +3715,17 @@ void Parser::Parse_Initalizer (int Sub, int Base, POV_ARRAY *a)
                     END_CASE
 
                     CASE (RIGHT_CURLY_TOKEN)
-                        if (!(finalParameter && properlyDelimited))
-                            // the parameter list was closed prematurely
-                            Error("Expected %d initializers but only %d found.",a->Sizes[Sub],i);
-                        // the parameter was left empty
-                        if(!optional)
-                            Error("Cannot omit elements of non-optional array initializer.");
+                        if (a->resizable)
+                            finalParameter = true;
+                        else
+                        {
+                            if (!(finalParameter && properlyDelimited))
+                                // the parameter list was closed prematurely
+                                Error("Expected %d initializers but only %d found.",a->Sizes[Sub],i);
+                            // the parameter was left empty
+                            if(!optional)
+                                Error("Cannot omit elements of non-optional array initializer.");
+                        }
                         UNGET
                     END_CASE
 

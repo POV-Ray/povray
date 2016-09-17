@@ -8865,9 +8865,9 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
             (rvalue->Token_Number != ARRAY_ID_TOKEN))
             Expectation_Error("array RValue");
         POV_ARRAY *a = reinterpret_cast<POV_ARRAY *>(rvalue->Data);
-        if (lvalues.size() > a->Total)
+        if (lvalues.size() > a->DataPtrs.size())
             Error ("array size mismatch");
-        if (a->DataPtrs == NULL)
+        if (a->DataPtrs.empty())
             Error ("cannot assign from uninitialized array");
 
         for (int i = 0; i < lvalues.size(); ++i)
@@ -9542,15 +9542,12 @@ void Parser::Destroy_Ident_Data(void *Data, int Type)
             break;
         case ARRAY_ID_TOKEN:
             a = reinterpret_cast<POV_ARRAY *>(Data);
-            if(a->DataPtrs != NULL)
+            if(!a->DataPtrs.empty())
             {
-                for(i=0; i<a->Total; i++)
-                {
+                for(i=0; i<a->DataPtrs.size(); i++)
                     Destroy_Ident_Data(a->DataPtrs[i], a->Type);
-                }
-                POV_FREE(a->DataPtrs);
             }
-            POV_FREE(a);
+            delete a;
             break;
         case DICTIONARY_ID_TOKEN:
             Destroy_Sym_Table (reinterpret_cast<SYM_TABLE *>(Data));
@@ -10620,11 +10617,17 @@ void *Parser::Copy_Identifier (void *Data, int Type)
             POV_MEMMOVE(reinterpret_cast<void *>(New), reinterpret_cast<void *>(Data), len * sizeof(UCS2));
             break;
         case ARRAY_ID_TOKEN:
-            a=reinterpret_cast<POV_ARRAY *>(Data);
-            na=reinterpret_cast<POV_ARRAY *>(POV_MALLOC(sizeof(POV_ARRAY),"array"));
-            *na=*a;
-            na->DataPtrs = reinterpret_cast<void **>(POV_MALLOC(sizeof(void *)*(a->Total),"array"));
-            for (i=0; i<a->Total; i++)
+            a = reinterpret_cast<POV_ARRAY *>(Data);
+            na = new POV_ARRAY;
+            na->Dims = a->Dims;
+            na->Type = a->Type;
+            for (i = 0; i < 5; ++i)
+            {
+                na->Sizes[i] = a->Sizes[i];
+                na->Mags[i] = a->Mags[i];
+            }
+            na->DataPtrs.resize(a->DataPtrs.size());
+            for (i=0; i<a->DataPtrs.size(); i++)
             {
                 na->DataPtrs[i] = reinterpret_cast<void *>(Copy_Identifier (a->DataPtrs[i],a->Type));
             }
