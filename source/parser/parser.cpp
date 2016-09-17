@@ -8662,7 +8662,14 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
             CASE (IDENTIFIER_TOKEN)
                 POV_PARSER_ASSERT(!Token.is_array_elem);
                 allow_redefine = true; // should actually be irrelevant downstream, thanks to Previous==IDENTIFIER_TOKEN
-                Temp_Entry = Add_Symbol (Local_Index,Token.Token_String,IDENTIFIER_TOKEN);
+                if (Token.is_dictionary_elem)
+                {
+                    if (is_local && (Token.context != Table_Index))
+                        Error ("Cannot use '#local' to assign a non-local array or dictionary element.");
+                    Temp_Entry = Add_Symbol (Token.table, Token.Token_String, IDENTIFIER_TOKEN);
+                }
+                else
+                    Temp_Entry = Add_Symbol (Local_Index, Token.Token_String, IDENTIFIER_TOKEN);
                 numberPtr = &(Temp_Entry->Token_Number);
                 dataPtr = &(Temp_Entry->Data);
                 Previous = Token.Token_Id;
@@ -8700,11 +8707,11 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
             CASE4 (PIGMENT_MAP_ID_TOKEN, MEDIA_ID_TOKEN, STRING_ID_TOKEN, INTERIOR_ID_TOKEN)
             CASE4 (DENSITY_MAP_ID_TOKEN, ARRAY_ID_TOKEN, DENSITY_ID_TOKEN, UV_ID_TOKEN)
             CASE4 (VECTOR_4D_ID_TOKEN, RAINBOW_ID_TOKEN, FOG_ID_TOKEN, SKYSPHERE_ID_TOKEN)
-            CASE2 (MATERIAL_ID_TOKEN, SPLINE_ID_TOKEN )
-                if (is_local && (Token.Table_Index != Table_Index))
+            CASE3 (MATERIAL_ID_TOKEN, SPLINE_ID_TOKEN, DICTIONARY_ID_TOKEN)
+                if (is_local && (Token.context != Table_Index))
                 {
-                    if (Token.is_array_elem)
-                        Error("Cannot use '#local' to assign a non-local array element.");
+                    if (Token.is_array_elem || Token.is_dictionary_elem)
+                        Error ("Cannot use '#local' to assign a non-local array or dictionary element.");
                     allow_redefine = true; // should actually be irrelevant downstream, thanks to Previous==IDENTIFIER_TOKEN
                     Temp_Entry = Add_Symbol (Local_Index,Token.Token_String,IDENTIFIER_TOKEN);
                     numberPtr = &(Temp_Entry->Token_Number);
@@ -8733,10 +8740,10 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
                 {
                     case VECTOR_ID_TOKEN:
                     case FLOAT_ID_TOKEN:
-                        if (is_local && (Token.Table_Index != Table_Index))
+                        if (is_local && (Token.context != Table_Index))
                         {
-                            if (Token.is_array_elem)
-                                Error("Cannot use '#local' to assign a non-local array element.");
+                            if (Token.is_array_elem || Token.is_dictionary_elem)
+                                Error("Cannot use '#local' to assign a non-local array or dictionary element.");
                             allow_redefine = true; // should actually be irrelevant downstream, thanks to Previous==IDENTIFIER_TOKEN
                             Temp_Entry = Add_Symbol (Local_Index,Token.Token_String,IDENTIFIER_TOKEN);
                             numberPtr = &(Temp_Entry->Token_Number);
@@ -8766,7 +8773,7 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
                     // the resulting value.
                     // We do this by assigning the resulting value to a dummy symbol entry.
                     allow_redefine = true; // should actually be irrelevant downstream, thanks to Previous=IDENTIFIER_TOKEN
-                    Temp_Entry = Create_Entry (0, "", DUMMY_SYMBOL_TOKEN);
+                    Temp_Entry = Create_Entry ("", DUMMY_SYMBOL_TOKEN, false);
                     numberPtr = &(Temp_Entry->Token_Number);
                     dataPtr = &(Temp_Entry->Data);
                     optional = true;
@@ -8853,7 +8860,7 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
     }
     else if (larrayDeclare)
     {
-        SYM_ENTRY *rvalue = Create_Entry (0, "", DUMMY_SYMBOL_TOKEN);
+        SYM_ENTRY *rvalue = Create_Entry ("", DUMMY_SYMBOL_TOKEN, false);
         if (!Parse_RValue (IDENTIFIER_TOKEN, &(rvalue->Token_Number), &(rvalue->Data), NULL, false, false, true, true, false, MAX_NUMBER_OF_TABLES) ||
             (rvalue->Token_Number != ARRAY_ID_TOKEN))
             Expectation_Error("array RValue");
@@ -8879,7 +8886,7 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
             *dataPtr = Copy_Identifier(a->DataPtrs[i], a->Type);
         }
 
-        Destroy_Entry (0, rvalue);
+        Destroy_Entry (rvalue, false);
     }
     else
     {
@@ -8944,7 +8951,7 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
     for (vector<LValue>::iterator i = lvalues.begin(); i != lvalues.end(); ++i)
     {
         if ((i->symEntry != NULL) && (i->symEntry->Token_Number == DUMMY_SYMBOL_TOKEN))
-            Destroy_Entry (0, i->symEntry);
+            Destroy_Entry (i->symEntry, false);
     }
 
     if ( after_hash )
@@ -8952,6 +8959,18 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
         Ok_To_Declare = false;
         ALLOW( SEMI_COLON_TOKEN );
         Ok_To_Declare = true;
+    }
+}
+
+bool Parser::PassParameterByReference (int callingContext)
+{
+    if (Token.is_dictionary_elem)
+    {
+        return true;
+    }
+    else
+    {
+        return (Token.context <= callingContext);
     }
 }
 
@@ -8987,14 +9006,13 @@ bool Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENT
         CASE4 (SLOPE_MAP_ID_TOKEN,NORMAL_MAP_ID_TOKEN,TEXTURE_MAP_ID_TOKEN,ARRAY_ID_TOKEN)
         CASE4 (PIGMENT_MAP_ID_TOKEN, MEDIA_ID_TOKEN,INTERIOR_ID_TOKEN,DENSITY_ID_TOKEN)
         CASE4 (DENSITY_MAP_ID_TOKEN, RAINBOW_ID_TOKEN, FOG_ID_TOKEN, SKYSPHERE_ID_TOKEN)
-        CASE2 (MATERIAL_ID_TOKEN, STRING_ID_TOKEN)
-            if ((ParFlag) && (Token.Table_Index <= old_table_index))
+        CASE3 (MATERIAL_ID_TOKEN, STRING_ID_TOKEN, DICTIONARY_ID_TOKEN)
+            if ((ParFlag) && PassParameterByReference (old_table_index))
             {
                 // pass by reference
                 New_Par            = reinterpret_cast<POV_PARAM *>(POV_MALLOC(sizeof(POV_PARAM),"parameter"));
                 New_Par->NumberPtr = Token.NumberPtr;
                 New_Par->DataPtr   = Token.DataPtr;
-                New_Par->Table_Index = Token.Table_Index;
                 *NumberPtr = PARAMETER_ID_TOKEN;
                 *DataPtr   = reinterpret_cast<void *>(New_Par);
             }
@@ -9078,7 +9096,7 @@ bool Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENT
             if ((Token.Token_Id==FUNCT_ID_TOKEN) || (Token.Token_Id==VECTFUNCT_ID_TOKEN) || (Token.Token_Id==SPLINE_ID_TOKEN) ||
                 (Token.Token_Id==UV_ID_TOKEN) || (Token.Token_Id==VECTOR_4D_ID_TOKEN) || (Token.Token_Id==COLOUR_ID_TOKEN))
             {
-                symbol_entry = Find_Symbol(Token.Table_Index, Token.Token_String);
+                symbol_entry = Find_Symbol (Token.table, Token.Token_String);
                 if (symbol_entry)
                     Acquire_Entry_Reference(symbol_entry);
             }
@@ -9102,7 +9120,7 @@ bool Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENT
                 Error("Identifier expected, incomplete function call or spline call found instead.");
 
             // only one identifier token has been found so pass it by reference
-            if (((Temp_Count==-1) || (Temp_Count==TOKEN_OVERFLOW_RESET_COUNT)) && (Token.Table_Index <= old_table_index))
+            if (((Temp_Count==-1) || (Temp_Count==TOKEN_OVERFLOW_RESET_COUNT)) && PassParameterByReference (old_table_index))
             {
                 // It is important that functions are passed by value and not by reference! [trf]
                 if(!(ParFlag) || (ParFlag && function_identifier))
@@ -9119,7 +9137,6 @@ bool Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENT
                     New_Par            = reinterpret_cast<POV_PARAM *>(POV_MALLOC(sizeof(POV_PARAM),"parameter"));
                     New_Par->NumberPtr = Token.NumberPtr;
                     New_Par->DataPtr   = Token.DataPtr;
-                    New_Par->Table_Index = Token.Table_Index;
 
                     *NumberPtr = PARAMETER_ID_TOKEN;
                     *DataPtr   = reinterpret_cast<void *>(New_Par);
@@ -9164,7 +9181,7 @@ bool Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENT
                 }
             }
             if (symbol_entry)
-                Release_Entry_Reference(Token.Table_Index, symbol_entry);
+                Release_Entry_Reference (Token.table, symbol_entry);
 
             // allow #declares again
             Ok_To_Declare = true;
@@ -9407,6 +9424,14 @@ bool Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENT
             EXIT
         END_CASE
 
+        CASE (DICTIONARY_TOKEN)
+            Temp_Data  = reinterpret_cast<void *>(Create_Sym_Table (true));
+            *NumberPtr = DICTIONARY_ID_TOKEN;
+            Test_Redefine (Previous,NumberPtr,*DataPtr, allow_redefine);
+            *DataPtr   = Temp_Data;
+            EXIT
+        END_CASE
+
         OTHERWISE
             UNGET
             Local_Object = Parse_Object ();
@@ -9526,6 +9551,9 @@ void Parser::Destroy_Ident_Data(void *Data, int Type)
                 POV_FREE(a->DataPtrs);
             }
             POV_FREE(a);
+            break;
+        case DICTIONARY_ID_TOKEN:
+            Destroy_Sym_Table (reinterpret_cast<SYM_TABLE *>(Data));
             break;
         case PARAMETER_ID_TOKEN:
             POV_FREE(Data);
@@ -10601,6 +10629,9 @@ void *Parser::Copy_Identifier (void *Data, int Type)
                 na->DataPtrs[i] = reinterpret_cast<void *>(Copy_Identifier (a->DataPtrs[i],a->Type));
             }
             New = reinterpret_cast<void *>(na);
+            break;
+        case DICTIONARY_ID_TOKEN:
+            New = reinterpret_cast<void *>(Copy_Sym_Table (reinterpret_cast<SYM_TABLE *>(Data)));
             break;
         case FUNCT_ID_TOKEN:
         case VECTFUNCT_ID_TOKEN:

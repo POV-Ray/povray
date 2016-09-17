@@ -178,6 +178,7 @@ void Parser::pre_init_tokenizer ()
     Inside_MacroDef     = false;
     Inside_IdentFn      = kIdentifierModeUndefined;
     Parsing_Directive   = false;
+    parseRawIdentifiers = false;
     Cond_Stack          = NULL;
     Table_Index         = -1;
 
@@ -326,6 +327,7 @@ void Parser::Get_Token ()
 
     Token.Token_Id = END_OF_FILE_TOKEN;
     Token.is_array_elem = false;
+    Token.is_dictionary_elem = false;
 
     while (Token.Token_Id == END_OF_FILE_TOKEN)
     {
@@ -340,6 +342,7 @@ void Parser::Get_Token ()
             {
                 Token.Token_Id = END_OF_FILE_TOKEN;
                 Token.is_array_elem = false;
+                Token.is_dictionary_elem = false;
                 Token.End_Of_File = true;
                 return;
             }
@@ -351,7 +354,7 @@ void Parser::Get_Token ()
 
                 Token.Token_Id = END_OF_FILE_TOKEN;
                 Token.is_array_elem = false;
-
+                Token.is_dictionary_elem = false;
                 Token.End_Of_File = true;
 
                 return;
@@ -1273,6 +1276,7 @@ void Parser::Read_Symbol()
     SYM_ENTRY *Temp_Entry;
     POV_PARAM *Par;
     DBL val;
+    SYM_TABLE *table;
 
     Begin_String_Fast();
 
@@ -1314,7 +1318,7 @@ void Parser::Read_Symbol()
         }
     }
 
-    if (!Skipping)
+    if (!Skipping && !parseRawIdentifiers)
     {
         /* Search tables from newest to oldest */
         int firstIndex = Table_Index;
@@ -1347,89 +1351,151 @@ void Parser::Read_Symbol()
                     {
                         Token.Token_Id=MACRO_ID_TOKEN;
                         Token.is_array_elem = false;
+                        Token.is_dictionary_elem = false;
                         Token.NumberPtr = &(Temp_Entry->Token_Number);
                         Token.DataPtr   = &(Temp_Entry->Data);
-                        Write_Token (Token.Token_Id, Token.Token_Col_No);
+                        Write_Token (Token.Token_Id, Token.Token_Col_No, Tables[Local_Index]);
 
-                        Token.Table_Index = Local_Index;
+                        Token.context = Local_Index;
                     }
                     return;
                 }
 
                 Token.Token_Id  =   Temp_Entry->Token_Number;
                 Token.is_array_elem = false;
+                Token.is_dictionary_elem = false;
                 Token.NumberPtr = &(Temp_Entry->Token_Number);
                 Token.DataPtr   = &(Temp_Entry->Data);
 
-                while ((Token.Token_Id==PARAMETER_ID_TOKEN) ||
-                       (Token.Token_Id==ARRAY_ID_TOKEN))
+                table = Tables[Local_Index];
+
+                bool breakLoop = false;
+                while (!breakLoop)
                 {
-                    if (Token.Token_Id==ARRAY_ID_TOKEN)
+                    switch (Token.Token_Id)
                     {
-                        Skip_Spaces();
-                        c = Echo_getc();
-                        Echo_ungetc(c);
+                        case ARRAY_ID_TOKEN:
+                            {
+                                Skip_Spaces();
+                                c = Echo_getc();
+                                Echo_ungetc(c);
 
-                        if (c!='[')
-                        {
+                                if (c!='[')
+                                {
+                                    breakLoop = true;
+                                    break;
+                                }
+
+                                a = reinterpret_cast<POV_ARRAY *>(*(Token.DataPtr));
+                                j = 0;
+
+                                for (i=0; i <= a->Dims; i++)
+                                {
+                                    GET(LEFT_SQUARE_TOKEN)
+                                    val=Parse_Float();
+                                    k=(int)(val + EPSILON);
+
+                                    if ((k < 0) || (val < -EPSILON))
+                                    {
+                                        Error("Negative subscript");
+                                    }
+
+                                    if (k >= a->Sizes[i])
+                                    {
+                                        Error("Array subscript out of range");
+                                    }
+                                    j += k * a->Mags[i];
+                                    GET(RIGHT_SQUARE_TOKEN)
+                                }
+
+                                Token.DataPtr   = &(a->DataPtrs[j]);
+                                Token.NumberPtr = &(a->Type);
+                                Token.Token_Id = a->Type;
+                                Token.is_array_elem = true;
+                                Token.is_dictionary_elem = false;
+                                if (!LValue_Ok && !Inside_Ifdef)
+                                {
+                                    if (*Token.DataPtr == NULL)
+                                        Error("Attempt to access uninitialized array element.");
+                                }
+                            }
                             break;
-                        }
 
-                        a = reinterpret_cast<POV_ARRAY *>(*(Token.DataPtr));
-                        j = 0;
-
-                        for (i=0; i <= a->Dims; i++)
-                        {
-                            GET(LEFT_SQUARE_TOKEN)
-                            val=Parse_Float();
-                            k=(int)(val + EPSILON);
-
-                            if ((k < 0) || (val < -EPSILON))
+                        case DICTIONARY_ID_TOKEN:
                             {
-                                Error("Negative subscript");
-                            }
+                                Skip_Spaces();
+                                c = Echo_getc();
+                                Echo_ungetc(c);
 
-                            if (k >= a->Sizes[i])
+                                if (c!='.')
+                                {
+                                    breakLoop = true;
+                                    break;
+                                }
+
+                                table = reinterpret_cast<SYM_TABLE *>(*(Token.DataPtr));
+
+                                GET (PERIOD_TOKEN)
+                                bool oldParseRawIdentifiers = parseRawIdentifiers;
+                                parseRawIdentifiers = true;
+                                Get_Token ();
+                                parseRawIdentifiers = oldParseRawIdentifiers;
+
+                                if (Token.Token_Id != IDENTIFIER_TOKEN)
+                                    Expectation_Error ("dictionary element identifier");
+
+                                Temp_Entry = Find_Symbol (table, Token.Token_String);
+
+                                if (Temp_Entry)
+                                {
+                                    Token.Token_Id      = Temp_Entry->Token_Number;
+                                    Token.NumberPtr     = &(Temp_Entry->Token_Number);
+                                    Token.DataPtr       = &(Temp_Entry->Data);
+                                }
+                                else
+                                {
+                                    if (!LValue_Ok && !Inside_Ifdef)
+                                        Error ("Attempt to access uninitialized dictionary element.");
+                                    Token.Token_Id  = IDENTIFIER_TOKEN;
+                                    Token.DataPtr   = NULL;
+                                    Token.NumberPtr = NULL;
+                                }
+                                Token.is_array_elem = false;
+                                Token.is_dictionary_elem = true;
+                            }
+                            break;
+
+                        case PARAMETER_ID_TOKEN:
                             {
-                                Error("Array subscript out of range");
+                                Par             = reinterpret_cast<POV_PARAM *>(Temp_Entry->Data);
+                                Token.Token_Id  = *(Par->NumberPtr);
+                                Token.is_array_elem = false;
+                                Token.is_dictionary_elem = false;
+                                Token.NumberPtr = Par->NumberPtr;
+                                Token.DataPtr   = Par->DataPtr;
                             }
-                            j += k * a->Mags[i];
-                            GET(RIGHT_SQUARE_TOKEN)
-                        }
+                            break;
 
-                        Token.DataPtr   = &(a->DataPtrs[j]);
-                        Token.NumberPtr = &(a->Type);
-                        Token.Token_Id = a->Type;
-                        Token.is_array_elem = true;
-                        if (!LValue_Ok && !Inside_Ifdef)
-                        {
-                            if (*Token.DataPtr == NULL)
-                                Error("Attempt to access uninitialized array element.");
-                        }
-                    }
-                    else
-                    {
-                        Par             = reinterpret_cast<POV_PARAM *>(Temp_Entry->Data);
-                        Token.Token_Id  = *(Par->NumberPtr);
-                        Token.is_array_elem = false;
-                        Token.NumberPtr = Par->NumberPtr;
-                        Token.DataPtr   = Par->DataPtr;
+                        default:
+                            breakLoop = true;
+                            break;
                     }
                 }
 
-                Write_Token (Token.Token_Id, Token.Token_Col_No);
+                Write_Token (Token.Token_Id, Token.Token_Col_No, table);
 
-                Token.Data        = *(Token.DataPtr);
-                Token.Table_Index = Local_Index;
+                if (Token.DataPtr != NULL)
+                    Token.Data = *(Token.DataPtr);
+                Token.context = Local_Index;
                 return;
             }
         }
     }
 
-    Write_Token(IDENTIFIER_TOKEN, Token.Token_Col_No);
+    Write_Token (IDENTIFIER_TOKEN, Token.Token_Col_No);
 }
 
-inline void Parser::Write_Token (TOKEN Token_Id, int col)
+inline void Parser::Write_Token (TOKEN Token_Id, int col, SYM_TABLE *table)
 {
     Token.Token_File_Pos = Input_File->In_File->tellg();
     Token.Token_Col_No   = col;
@@ -1438,6 +1504,7 @@ inline void Parser::Write_Token (TOKEN Token_Id, int col)
     Token.Data           = NULL;
     Token.Token_Id       = Conversion_Util_Table[Token_Id];
     Token.Function_Id    = Token_Id;
+    Token.table          = table;
 }
 
 
@@ -1712,6 +1779,7 @@ void Parser::Parse_Directive(int After_Hash)
             }
             Token.Token_Id = END_OF_FILE_TOKEN;
             Token.is_array_elem = false;
+            Token.is_dictionary_elem = false;
 
             return;
         }
@@ -1723,6 +1791,7 @@ void Parser::Parse_Directive(int After_Hash)
         {
             Token.Token_Id=HASH_TOKEN;
             Token.is_array_elem = false;
+            Token.is_dictionary_elem = false;
         }
         Token.Unget_Token = false;
 
@@ -1881,6 +1950,7 @@ void Parser::Parse_Directive(int After_Hash)
                     Cond_Stack[CS_Index].Cond_Type = ELSE_COND;
                     Token.Token_Id=HASH_TOKEN; /*insures Skip_Token takes notice*/
                     Token.is_array_elem = false;
+                    Token.is_dictionary_elem = false;
                     UNGET
                     break;
 
@@ -1894,6 +1964,7 @@ void Parser::Parse_Directive(int After_Hash)
                     {
                         Token.Token_Id=HASH_TOKEN; /*insures Skip_Token takes notice*/
                         Token.is_array_elem = false;
+                        Token.is_dictionary_elem = false;
                         UNGET
                     }
                     break;
@@ -1920,6 +1991,7 @@ void Parser::Parse_Directive(int After_Hash)
                         Cond_Stack[CS_Index].Cond_Type=IF_TRUE_COND;
                         Token.Token_Id=HASH_TOKEN; /*insures Skip_Token takes notice*/
                         Token.is_array_elem = false;
+                        Token.is_dictionary_elem = false;
                         UNGET
                     }
                     else
@@ -2024,6 +2096,7 @@ void Parser::Parse_Directive(int After_Hash)
                         {
                             Token.Token_Id=HASH_TOKEN; /*insures Skip_Token takes notice*/
                             Token.is_array_elem = false;
+                            Token.is_dictionary_elem = false;
                             UNGET
                         }
                     }
@@ -2059,6 +2132,7 @@ void Parser::Parse_Directive(int After_Hash)
                 case IF_FALSE_COND:
                     Token.Token_Id=HASH_TOKEN; /*insures Skip_Token takes notice*/
                     Token.is_array_elem = false;
+                    Token.is_dictionary_elem = false;
                     UNGET
                     // FALLTHROUGH
                 case IF_TRUE_COND:
@@ -2099,6 +2173,7 @@ void Parser::Parse_Directive(int After_Hash)
                     {
                         Token.Token_Id=HASH_TOKEN; /*insures Skip_Token takes notice*/
                         Token.is_array_elem = false;
+                        Token.is_dictionary_elem = false;
                         UNGET
                     }
                     break;
@@ -2474,8 +2549,8 @@ void Parser::Parse_Directive(int After_Hash)
                     CASE4 (PIGMENT_MAP_ID_TOKEN, MEDIA_ID_TOKEN, STRING_ID_TOKEN, INTERIOR_ID_TOKEN)
                     CASE4 (DENSITY_ID_TOKEN, ARRAY_ID_TOKEN, DENSITY_MAP_ID_TOKEN, UV_ID_TOKEN)
                     CASE4 (VECTOR_4D_ID_TOKEN, RAINBOW_ID_TOKEN, FOG_ID_TOKEN, SKYSPHERE_ID_TOKEN)
-                    CASE2 (MATERIAL_ID_TOKEN, SPLINE_ID_TOKEN)
-                        Remove_Symbol (Token.Table_Index, Token.Token_String, Token.is_array_elem, Token.DataPtr, Token.Token_Id);
+                    CASE3 (MATERIAL_ID_TOKEN, SPLINE_ID_TOKEN, DICTIONARY_ID_TOKEN)
+                        Remove_Symbol (Token.table, Token.Token_String, Token.is_array_elem, Token.DataPtr, Token.Token_Id);
                         EXIT
                     END_CASE
 
@@ -2484,7 +2559,7 @@ void Parser::Parse_Directive(int After_Hash)
                         {
                             case VECTOR_ID_TOKEN:
                             case FLOAT_ID_TOKEN:
-                                Remove_Symbol (Token.Table_Index, Token.Token_String, Token.is_array_elem, Token.DataPtr, Token.Token_Id);
+                                Remove_Symbol (Token.table, Token.Token_String, Token.is_array_elem, Token.DataPtr, Token.Token_Id);
                                 break;
 
                             default:
@@ -2552,6 +2627,7 @@ void Parser::Parse_Directive(int After_Hash)
     {
         Token.Token_Id = END_OF_FILE_TOKEN;
         Token.is_array_elem = false;
+        Token.is_dictionary_elem = false;
     }
 }
 
@@ -2619,7 +2695,7 @@ void Parser::Open_Include()
 
     Token.Token_Id = END_OF_FILE_TOKEN;
     Token.is_array_elem = false;
-
+    Token.is_dictionary_elem = false;
 }
 
 
@@ -2660,6 +2736,7 @@ void Parser::Skip_Tokens(COND_TYPE cond)
     {
         Token.Token_Id=END_OF_FILE_TOKEN;
         Token.is_array_elem = false;
+        Token.is_dictionary_elem = false;
         Token.Unget_Token=false;
     }
     else
@@ -2722,6 +2799,7 @@ void Parser::Break()
     {
         Token.Token_Id=END_OF_FILE_TOKEN;
         Token.is_array_elem = false;
+        Token.is_dictionary_elem = false;
         Token.Unget_Token=false;
     }
     else
@@ -2807,40 +2885,41 @@ void Parser::init_sym_tables()
     Add_Sym_Table();
 }
 
+Parser::SYM_TABLE *Parser::Create_Sym_Table (bool copyNames)
+{
+    SYM_TABLE *New = reinterpret_cast<SYM_TABLE *>(POV_MALLOC(sizeof(SYM_TABLE),"symbol table"));
+    New->namesAreCopies = copyNames;
+
+    for (int i = 0; i < SYM_TABLE_SIZE; i++)
+    {
+        New->Table[i] = NULL;
+    }
+
+    return New;
+}
+
 void Parser::Add_Sym_Table()
 {
-    int i;
-
-    SYM_TABLE *New;
-
     if ((++Table_Index)==MAX_NUMBER_OF_TABLES)
     {
         Table_Index--;
         Error("Too many nested symbol tables");
     }
 
-    Tables[Table_Index]=New=reinterpret_cast<SYM_TABLE *>(POV_MALLOC(sizeof(SYM_TABLE),"symbol table"));
-
-    for (i = 0; i < SYM_TABLE_SIZE; i++)
-    {
-        New->Table[i] = NULL;
-    }
-
+    Tables[Table_Index] = Create_Sym_Table (Table_Index != 0);
 }
 
-void Parser::Destroy_Table(int index)
+void Parser::Destroy_Sym_Table (Parser::SYM_TABLE *Table)
 {
-    int i;
-    SYM_TABLE *Table = Tables[index];
     SYM_ENTRY *Entry;
 
-    for(i = SYM_TABLE_SIZE - 1; i >= 0; i--)
+    for(int i = SYM_TABLE_SIZE - 1; i >= 0; i--)
     {
         Entry = Table->Table[i];
 
         while(Entry)
         {
-            Entry = Destroy_Entry(index, Entry);
+            Entry = Destroy_Entry (Entry, Table->namesAreCopies);
         }
 
         Table->Table[i] = NULL;
@@ -2850,7 +2929,33 @@ void Parser::Destroy_Table(int index)
 
 }
 
-SYM_ENTRY *Parser::Create_Entry (int Index,const char *Name,TOKEN Number)
+void Parser::Destroy_Table(int index)
+{
+    Destroy_Sym_Table (Tables[index]);
+}
+
+Parser::SYM_TABLE *Parser::Copy_Sym_Table (const Parser::SYM_TABLE *table)
+{
+    SYM_TABLE *newTable = Create_Sym_Table (true);
+    SYM_ENTRY *Entry, *newEntry;
+
+    for(int i = SYM_TABLE_SIZE - 1; i >= 0; i--)
+    {
+        Entry = table->Table[i];
+
+        while(Entry)
+        {
+            newEntry = Copy_Entry (Entry);
+            newEntry->next = newTable->Table[i];
+            newTable->Table[i] = newEntry;
+            Entry = Entry->next;
+        }
+    }
+
+    return newTable;
+}
+
+SYM_ENTRY *Parser::Create_Entry (const char *Name, TOKEN Number, bool copyName)
 {
     SYM_ENTRY *New;
 
@@ -2863,12 +2968,30 @@ SYM_ENTRY *Parser::Create_Entry (int Index,const char *Name,TOKEN Number)
     New->deprecatedShown     = false;
     New->Deprecation_Message = NULL;
     New->ref_count           = 1;
-    if (Index != 0)
+    if (copyName)
         New->Token_Name = POV_STRDUP(Name);
     else
         New->Token_Name = const_cast<char*>(Name);
 
     return(New);
+}
+
+SYM_ENTRY *Parser::Copy_Entry (const SYM_ENTRY *oldEntry)
+{
+    SYM_ENTRY *newEntry;
+
+    newEntry = reinterpret_cast<SYM_ENTRY *>(POV_MALLOC(sizeof(SYM_ENTRY), "symbol table entry"));
+
+    newEntry->Token_Number        = oldEntry->Token_Number;
+    newEntry->Data                = Copy_Identifier (oldEntry->Data, oldEntry->Token_Number);
+    newEntry->deprecated          = false;
+    newEntry->deprecatedOnce      = false;
+    newEntry->deprecatedShown     = false;
+    newEntry->Deprecation_Message = NULL;
+    newEntry->ref_count           = 1;
+    newEntry->Token_Name          = POV_STRDUP (oldEntry->Token_Name);
+
+    return newEntry;
 }
 
 void Parser::Acquire_Entry_Reference (SYM_ENTRY *Entry)
@@ -2880,7 +3003,7 @@ void Parser::Acquire_Entry_Reference (SYM_ENTRY *Entry)
     Entry->ref_count ++;
 }
 
-void Parser::Release_Entry_Reference (int Index, SYM_ENTRY *Entry)
+void Parser::Release_Entry_Reference (SYM_TABLE *table, SYM_ENTRY *Entry)
 {
     if (Entry == NULL)
         return;
@@ -2890,7 +3013,7 @@ void Parser::Release_Entry_Reference (int Index, SYM_ENTRY *Entry)
 
     if (Entry->ref_count == 0)
     {
-        if(Index != 0) // NB reserved words reference hard-coded token names in code segment, rather than allocated on heap
+        if (table->namesAreCopies) // NB reserved words reference hard-coded token names in code segment, rather than allocated on heap
         {
             POV_FREE(Entry->Token_Name);
             Destroy_Ident_Data (Entry->Data, Entry->Token_Number); // TODO - shouldn't this be outside the if() block?
@@ -2902,7 +3025,7 @@ void Parser::Release_Entry_Reference (int Index, SYM_ENTRY *Entry)
     }
 }
 
-SYM_ENTRY *Parser::Destroy_Entry (int Index, SYM_ENTRY *Entry)
+SYM_ENTRY *Parser::Destroy_Entry (SYM_ENTRY *Entry, bool destroyName)
 {
     SYM_ENTRY *Next;
 
@@ -2919,7 +3042,7 @@ SYM_ENTRY *Parser::Destroy_Entry (int Index, SYM_ENTRY *Entry)
 
     if (Entry->ref_count == 0)
     {
-        if(Index != 0) // NB reserved words reference hard-coded token names in code segment, rather than allocated on heap
+        if (destroyName) // NB reserved words reference hard-coded token names in code segment, rather than allocated on heap
         {
             POV_FREE(Entry->Token_Name);
             Destroy_Ident_Data (Entry->Data, Entry->Token_Number); // TODO - shouldn't this be outside the if() block?
@@ -2934,33 +3057,46 @@ SYM_ENTRY *Parser::Destroy_Entry (int Index, SYM_ENTRY *Entry)
 }
 
 
-void Parser::Add_Entry (int Index,SYM_ENTRY *Table_Entry)
+void Parser::Add_Entry (SYM_TABLE *table, SYM_ENTRY *Table_Entry)
 {
     int i = get_hash_value(Table_Entry->Token_Name);
 
-    Table_Entry->next       = Tables[Index]->Table[i];
-    Tables[Index]->Table[i] = Table_Entry;
+    Table_Entry->next       = table->Table[i];
+    table->Table[i] = Table_Entry;
 }
 
+void Parser::Add_Entry (int Index,SYM_ENTRY *Table_Entry)
+{
+    Add_Entry (Tables[Index], Table_Entry);
+}
+
+
+SYM_ENTRY *Parser::Add_Symbol (SYM_TABLE *table, const char *Name, TOKEN Number)
+{
+    SYM_ENTRY *New;
+
+    New = Create_Entry (Name, Number, table->namesAreCopies);
+    Add_Entry (table, New);
+
+    return(New);
+}
 
 SYM_ENTRY *Parser::Add_Symbol (int Index,const char *Name,TOKEN Number)
 {
     SYM_ENTRY *New;
 
-    New = Create_Entry (Index,Name,Number);
+    New = Create_Entry (Name, Number, (Index != 0));
     Add_Entry(Index,New);
 
     return(New);
 }
 
 
-SYM_ENTRY *Parser::Find_Symbol (int Index, const char *Name)
+SYM_ENTRY *Parser::Find_Symbol (const SYM_TABLE *table, const char *Name, int hash)
 {
     SYM_ENTRY *Entry;
 
-    int i = get_hash_value(Name);
-
-    Entry = Tables[Index]->Table[i];
+    Entry = table->Table[hash];
 
     while (Entry)
     {
@@ -2975,13 +3111,23 @@ SYM_ENTRY *Parser::Find_Symbol (int Index, const char *Name)
     return(Entry);
 }
 
+SYM_ENTRY *Parser::Find_Symbol (const SYM_TABLE *table, const char *name)
+{
+    return Find_Symbol (table, name, get_hash_value (name));
+}
+
+SYM_ENTRY *Parser::Find_Symbol (int index, const char *name)
+{
+    return Find_Symbol (Tables[index], name, get_hash_value(name));
+}
 
 SYM_ENTRY *Parser::Find_Symbol (const char *name)
 {
     SYM_ENTRY *entry;
+    int hash = get_hash_value (name);
     for (int index = Table_Index; index > 0; --index)
     {
-        entry = Find_Symbol (index, name);
+        entry = Find_Symbol (Tables[index], name, hash);
         if (entry)
             return entry;
     }
@@ -2989,7 +3135,7 @@ SYM_ENTRY *Parser::Find_Symbol (const char *name)
 }
 
 
-void Parser::Remove_Symbol (int Index, const char *Name, bool is_array_elem, void **DataPtr, int ttype)
+void Parser::Remove_Symbol (SYM_TABLE *table, const char *Name, bool is_array_elem, void **DataPtr, int ttype)
 {
     if(is_array_elem == true)
     {
@@ -3013,7 +3159,7 @@ void Parser::Remove_Symbol (int Index, const char *Name, bool is_array_elem, voi
 
         int i = get_hash_value(Name);
 
-        EntryPtr = &(Tables[Index]->Table[i]);
+        EntryPtr = &(table->Table[i]);
         Entry    = *EntryPtr;
 
         while (Entry)
@@ -3021,7 +3167,7 @@ void Parser::Remove_Symbol (int Index, const char *Name, bool is_array_elem, voi
             if (strcmp(Name, Entry->Token_Name) == 0)
             {
                 *EntryPtr = Entry->next;
-                Destroy_Entry(Index, Entry);
+                Destroy_Entry (Entry, table->namesAreCopies);
                 return;
             }
 
@@ -3031,6 +3177,11 @@ void Parser::Remove_Symbol (int Index, const char *Name, bool is_array_elem, voi
 
         Error("Tried to free undefined symbol");
     }
+}
+
+void Parser::Remove_Symbol (int Index, const char *Name, bool is_array_elem, void **DataPtr, int ttype)
+{
+    return Remove_Symbol (Tables[Index], Name, is_array_elem, DataPtr, ttype);
 }
 
 void Parser::Check_Macro_Vers(void)
@@ -3104,7 +3255,7 @@ Parser::Macro *Parser::Parse_Macro()
         CASE4 (PIGMENT_MAP_ID_TOKEN, MEDIA_ID_TOKEN, STRING_ID_TOKEN, INTERIOR_ID_TOKEN)
         CASE4 (DENSITY_ID_TOKEN, ARRAY_ID_TOKEN, DENSITY_MAP_ID_TOKEN, UV_ID_TOKEN)
         CASE4 (VECTOR_4D_ID_TOKEN, RAINBOW_ID_TOKEN, FOG_ID_TOKEN, SKYSPHERE_ID_TOKEN)
-        CASE2 (MATERIAL_ID_TOKEN, SPLINE_ID_TOKEN)
+        CASE3 (MATERIAL_ID_TOKEN, SPLINE_ID_TOKEN, DICTIONARY_ID_TOKEN)
             newParameter.name = POV_STRDUP(Token.Token_String);
             New->parameters.push_back(newParameter);
             Parse_Comma();
@@ -3194,7 +3345,7 @@ void Parser::Invoke_Macro()
         for (i=0; i<PMac->parameters.size(); i++)
         {
             bool finalParameter = (i == PMac->parameters.size()-1);
-            Table_Entries[i]=Create_Entry(1,PMac->parameters[i].name,IDENTIFIER_TOKEN);
+            Table_Entries[i] = Create_Entry (PMac->parameters[i].name, IDENTIFIER_TOKEN, true);
             if (!Parse_RValue(IDENTIFIER_TOKEN, &(Table_Entries[i]->Token_Number), &(Table_Entries[i]->Data), NULL, true, false, true, true, true, Local_Index))
             {
                 EXPECT_ONE
@@ -3226,7 +3377,7 @@ void Parser::Invoke_Macro()
                     END_CASE
                 END_EXPECT
 
-                Destroy_Entry(1,Table_Entries[i]);
+                Destroy_Entry (Table_Entries[i], true);
                 Table_Entries[i] = NULL;
             }
             properlyDelimited = Parse_Comma();
@@ -3296,6 +3447,7 @@ void Parser::Invoke_Macro()
 
     Token.Token_Id = END_OF_FILE_TOKEN;
     Token.is_array_elem = false;
+    Token.is_dictionary_elem = false;
 
     Check_Macro_Vers();
 
@@ -3612,6 +3764,7 @@ void Parser::Parse_Read()
                 Temp_Entry = Add_Symbol (1,Token.Token_String,IDENTIFIER_TOKEN);
                 End_File=Parse_Read_Value (User_File,Token.Token_Id, &(Temp_Entry->Token_Number), &(Temp_Entry->Data));
                 Token.is_array_elem = false;
+                Token.is_dictionary_elem = false;
                 Parse_Comma(); /* Scene file comma between 2 idents */
             }
         END_CASE
@@ -3621,6 +3774,7 @@ void Parser::Parse_Read()
             {
                 End_File=Parse_Read_Value (User_File,Token.Token_Id,Token.NumberPtr,Token.DataPtr);
                 Token.is_array_elem = false;
+                Token.is_dictionary_elem = false;
                 Parse_Comma(); /* Scene file comma between 2 idents */
             }
         END_CASE
@@ -4010,6 +4164,8 @@ int Parser::Parse_For_Param (char** IdentifierPtr, DBL* EndPtr, DBL* StepPtr)
     EXPECT_ONE
         CASE (IDENTIFIER_TOKEN)
             POV_PARSER_ASSERT(!Token.is_array_elem);
+            if (Token.is_dictionary_elem)
+                Error("#for loop variable must not be an array or dictionary element");
             Temp_Entry = Add_Symbol (Table_Index,Token.Token_String,IDENTIFIER_TOKEN);
             Token.NumberPtr = &(Temp_Entry->Token_Number);
             Token.DataPtr = &(Temp_Entry->Data);
@@ -4017,8 +4173,8 @@ int Parser::Parse_For_Param (char** IdentifierPtr, DBL* EndPtr, DBL* StepPtr)
         END_CASE
 
         CASE2 (FUNCT_ID_TOKEN, VECTFUNCT_ID_TOKEN)
-            if (Token.is_array_elem)
-                Error("#for loop variable must not be an array element");
+            if (Token.is_array_elem || Token.is_dictionary_elem)
+                Error("#for loop variable must not be an array or dictionary element");
             Error("Redeclaring functions is not allowed - #undef the function first!");
         END_CASE
 
@@ -4029,10 +4185,10 @@ int Parser::Parse_For_Param (char** IdentifierPtr, DBL* EndPtr, DBL* StepPtr)
         CASE4 (PIGMENT_MAP_ID_TOKEN, MEDIA_ID_TOKEN, STRING_ID_TOKEN, INTERIOR_ID_TOKEN)
         CASE4 (DENSITY_ID_TOKEN, ARRAY_ID_TOKEN, DENSITY_MAP_ID_TOKEN, UV_ID_TOKEN)
         CASE4 (VECTOR_4D_ID_TOKEN, RAINBOW_ID_TOKEN, FOG_ID_TOKEN, SKYSPHERE_ID_TOKEN)
-        CASE2 (MATERIAL_ID_TOKEN, SPLINE_ID_TOKEN)
-            if (Token.is_array_elem)
-                Error("#for loop variable must not be an array element");
-            if (Token.Table_Index != Table_Index)
+        CASE3 (MATERIAL_ID_TOKEN, SPLINE_ID_TOKEN, DICTIONARY_ID_TOKEN)
+            if (Token.is_array_elem || Token.is_dictionary_elem)
+                Error("#for loop variable must not be an array or dictionary element");
+            if (Token.context != Table_Index)
             {
                 Temp_Entry = Add_Symbol (Table_Index,Token.Token_String,IDENTIFIER_TOKEN);
                 Token.NumberPtr = &(Temp_Entry->Token_Number);
@@ -4052,13 +4208,13 @@ int Parser::Parse_For_Param (char** IdentifierPtr, DBL* EndPtr, DBL* StepPtr)
         END_CASE
 
         CASE2 (VECTOR_FUNCT_TOKEN, FLOAT_FUNCT_TOKEN)
-            if (Token.is_array_elem)
-                Error("#for loop variable must not be an array element");
+            if (Token.is_array_elem || Token.is_dictionary_elem)
+                Error("#for loop variable must not be an array or dictionary element");
             switch(Token.Function_Id)
             {
                 case VECTOR_ID_TOKEN:
                 case FLOAT_ID_TOKEN:
-                    if (Token.Table_Index != Table_Index)
+                    if (Token.context != Table_Index)
                     {
                         Temp_Entry = Add_Symbol (Table_Index,Token.Token_String,IDENTIFIER_TOKEN);
                         Token.NumberPtr = &(Temp_Entry->Token_Number);
@@ -4078,8 +4234,8 @@ int Parser::Parse_For_Param (char** IdentifierPtr, DBL* EndPtr, DBL* StepPtr)
         END_CASE
 
         OTHERWISE
-            if (Token.is_array_elem)
-                Error("#for loop variable must not be an array element");
+            if (Token.is_array_elem || Token.is_dictionary_elem)
+                Error("#for loop variable must not be an array or dictionary element");
             Parse_Error(IDENTIFIER_TOKEN);
         END_CASE
     END_EXPECT
@@ -4161,6 +4317,7 @@ void Parser::IncludeHeader(const UCS2String& formalFileName)
 
     Token.Token_Id = END_OF_FILE_TOKEN;
     Token.is_array_elem = false;
+    Token.is_dictionary_elem = false;
 }
 
 }
