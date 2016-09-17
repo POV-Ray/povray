@@ -236,6 +236,7 @@ class Parser : public SceneTask
             SYM_TABLE *table;                               ///< table or dictionary the token references an element of
             bool is_array_elem      : 1;                    ///< true if token is actually an array element reference
             bool is_dictionary_elem : 1;                    ///< true if token is actually a dictionary element reference
+            bool freeString         : 1;                    ///< true if Token_String must be freed before being assigned a new value
         };
 
         struct LValue

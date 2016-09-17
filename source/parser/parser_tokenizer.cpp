@@ -157,6 +157,7 @@ void Parser::pre_init_tokenizer ()
     Token.Token_File_Pos.offset = 0;
     Token.Token_Col_No = 0;
     Token.Token_String  = NULL;
+    Token.freeString    = false;
     Token.Unget_Token   = false;
     Token.End_Of_File   = false;
     Token.Data = NULL;
@@ -1053,8 +1054,6 @@ void Parser::Read_String_Literal()
     End_String();
 
     Write_Token(STRING_LITERAL_TOKEN, col);
-
-    Token.Token_String = String;
 }
 
 
@@ -1277,6 +1276,7 @@ void Parser::Read_Symbol()
     POV_PARAM *Par;
     DBL val;
     SYM_TABLE *table;
+    char *dictIndex = NULL;
 
     Begin_String_Fast();
 
@@ -1372,6 +1372,8 @@ void Parser::Read_Symbol()
                 bool breakLoop = false;
                 while (!breakLoop)
                 {
+                    dictIndex = NULL;
+
                     switch (Token.Token_Id)
                     {
                         case ARRAY_ID_TOKEN:
@@ -1427,24 +1429,35 @@ void Parser::Read_Symbol()
                                 c = Echo_getc();
                                 Echo_ungetc(c);
 
-                                if (c!='.')
+                                dictIndex = NULL;
+                                table = reinterpret_cast<SYM_TABLE *>(*(Token.DataPtr));
+
+                                if (c =='.')
+                                {
+                                    GET (PERIOD_TOKEN)
+                                    bool oldParseRawIdentifiers = parseRawIdentifiers;
+                                    parseRawIdentifiers = true;
+                                    Get_Token ();
+                                    parseRawIdentifiers = oldParseRawIdentifiers;
+
+                                    if (Token.Token_Id != IDENTIFIER_TOKEN)
+                                        Expectation_Error ("dictionary element identifier");
+
+                                    Temp_Entry = Find_Symbol (table, Token.Token_String);
+                                }
+                                else if (c == '[')
+                                {
+                                    GET(LEFT_SQUARE_TOKEN)
+                                    dictIndex = Parse_C_String();
+                                    GET (RIGHT_SQUARE_TOKEN);
+
+                                    Temp_Entry = Find_Symbol (table, dictIndex);
+                                }
+                                else
                                 {
                                     breakLoop = true;
                                     break;
                                 }
-
-                                table = reinterpret_cast<SYM_TABLE *>(*(Token.DataPtr));
-
-                                GET (PERIOD_TOKEN)
-                                bool oldParseRawIdentifiers = parseRawIdentifiers;
-                                parseRawIdentifiers = true;
-                                Get_Token ();
-                                parseRawIdentifiers = oldParseRawIdentifiers;
-
-                                if (Token.Token_Id != IDENTIFIER_TOKEN)
-                                    Expectation_Error ("dictionary element identifier");
-
-                                Temp_Entry = Find_Symbol (table, Token.Token_String);
 
                                 if (Temp_Entry)
                                 {
@@ -1493,10 +1506,20 @@ void Parser::Read_Symbol()
     }
 
     Write_Token (IDENTIFIER_TOKEN, Token.Token_Col_No);
+    if (dictIndex != NULL)
+    {
+        Token.Token_String = dictIndex;
+        Token.freeString = true;
+    }
 }
 
 inline void Parser::Write_Token (TOKEN Token_Id, int col, SYM_TABLE *table)
 {
+    if (Token.freeString)
+    {
+        POV_FREE (Token.Token_String);
+        Token.freeString = false;
+    }
     Token.Token_File_Pos = Input_File->In_File->tellg();
     Token.Token_Col_No   = col;
     Token.FileHandle     = Input_File->In_File;
