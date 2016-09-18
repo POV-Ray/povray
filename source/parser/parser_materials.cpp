@@ -2304,6 +2304,9 @@ void Parser::Parse_Tnormal (TNORMAL **Tnormal_Ptr)
         }
     }
     Parse_Pattern<GenericNormalBlendMap>(*Tnormal_Ptr,kBlendMapType_Normal);
+
+    if ((*Tnormal_Ptr)->Type == NO_PATTERN)
+        Error ("No normal type given.");
 }
 
 
