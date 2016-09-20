@@ -138,7 +138,7 @@ echo "make maintainer-clean" 1>&2  &&  make maintainer-clean 1>&2 ; \
     rm -r ../$file 2> /dev/null  &&  echo "Cleanup ../$file"
   done
   # cleanup stuff added by automake
-  for file in config.guess config.sub depcomp install-sh missing
+  for file in config.guess config.sub compile depcomp install-sh missing
   do
     rm config/$file 2> /dev/null  &&  echo "Cleanup config/$file"
   done
