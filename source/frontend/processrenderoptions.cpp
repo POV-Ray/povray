@@ -241,12 +241,18 @@ struct ProcessOptions::INI_Parser_Table RenderOptions_INI_Table[] =
    if the +/- switch is used as boolean parameter if an attribute key is
    provided.
 */
+
+/// @attention
+///     In this table, options **must** be sorted long strings first; e.g., `AM` must be placed
+///     before `A`.
+///
 struct ProcessOptions::Cmd_Parser_Table RenderOptions_Cmd_Table[] =
 {
+    //       Parameter setting              Parameter type          Boolean setting
+
     { "AG",  kPOVAttrib_AntialiasGamma,     kPOVMSType_Float,       kNoParameter },
     { "AM",  kPOVAttrib_SamplingMethod,     kPOVMSType_Int,         kNoParameter },
-    { "A0",  kPOVAttrib_AntialiasThreshold, kPOVMSType_Float,       kPOVAttrib_Antialias },
-    { "A",   kNoParameter,                  kNoParameter,           kPOVAttrib_Antialias },
+    { "A",   kPOVAttrib_AntialiasThreshold, kPOVMSType_Float,       kPOVAttrib_Antialias,           kCmdOptFlag_Optional },
 
     { "BM",  kPOVAttrib_BoundingMethod,     kPOVMSType_Int,         kNoParameter },
     { "BS",  kPOVAttrib_RenderBlockSize,    kPOVMSType_Int,         kNoParameter },
@@ -255,8 +261,7 @@ struct ProcessOptions::Cmd_Parser_Table RenderOptions_Cmd_Table[] =
     { "CC",  kNoParameter,                  kNoParameter,           kPOVAttrib_BackupTrace },
     { "C",   kNoParameter,                  kNoParameter,           kPOVAttrib_ContinueTrace },
 
-    { "D",   kPOVAttrib_Display,            kUseSpecialHandler,     kPOVAttrib_Display },
-    { "D",   kNoParameter,                  kNoParameter,           kPOVAttrib_Display },
+    { "D",   kPOVAttrib_Display,            kUseSpecialHandler,     kPOVAttrib_Display,             kCmdOptFlag_Optional },
 
     { "EC",  kPOVAttrib_Right,              kPOVMSType_Float,       kNoParameter },
     { "EF0", kPOVAttrib_SubsetEndFrame,     kPOVMSType_Float,       kNoParameter },
@@ -264,23 +269,16 @@ struct ProcessOptions::Cmd_Parser_Table RenderOptions_Cmd_Table[] =
     { "EP",  kPOVAttrib_PreviewEndSize,     kPOVMSType_Int,         kNoParameter },
     { "ER",  kPOVAttrib_Bottom,             kPOVMSType_Float,       kNoParameter },
 
-    { "F",   kPOVAttrib_OutputFileType,     kUseSpecialHandler,     kPOVAttrib_OutputToFile },
-    { "F",   kNoParameter,                  kNoParameter,           kPOVAttrib_OutputToFile },
+    { "F",   kPOVAttrib_OutputFileType,     kUseSpecialHandler,     kPOVAttrib_OutputToFile,        kCmdOptFlag_Optional },
 
-    { "GA",  kPOVAttrib_AllFile,            kPOVMSType_UCS2String,  kPOVAttrib_AllConsole },
-    { "GA",  kNoParameter,                  kNoParameter,           kPOVAttrib_AllConsole },
-    { "GD",  kPOVAttrib_DebugFile,          kPOVMSType_UCS2String,  kPOVAttrib_DebugConsole },
-    { "GD",  kNoParameter,                  kNoParameter,           kPOVAttrib_DebugConsole },
-    { "GF",  kPOVAttrib_FatalFile,          kPOVMSType_UCS2String,  kPOVAttrib_FatalConsole },
-    { "GF",  kNoParameter,                  kNoParameter,           kPOVAttrib_FatalConsole },
+    { "GA",  kPOVAttrib_AllFile,            kPOVMSType_UCS2String,  kPOVAttrib_AllConsole,          kCmdOptFlag_Optional },
+    { "GD",  kPOVAttrib_DebugFile,          kPOVMSType_UCS2String,  kPOVAttrib_DebugConsole,        kCmdOptFlag_Optional },
+    { "GF",  kPOVAttrib_FatalFile,          kPOVMSType_UCS2String,  kPOVAttrib_FatalConsole,        kCmdOptFlag_Optional },
     { "GI",  kPOVAttrib_CreateIni,          kPOVMSType_UCS2String,  kNoParameter },
     { "GP",  kNoParameter,                  kNoParameter,           kPOVAttrib_AppendConsoleFiles },
-    { "GR",  kPOVAttrib_RenderFile,         kPOVMSType_UCS2String,  kPOVAttrib_RenderConsole },
-    { "GR",  kNoParameter,                  kNoParameter,           kPOVAttrib_RenderConsole },
-    { "GS",  kPOVAttrib_StatisticsFile,     kPOVMSType_UCS2String,  kPOVAttrib_StatisticsConsole },
-    { "GS",  kNoParameter,                  kNoParameter,           kPOVAttrib_StatisticsConsole },
-    { "GW",  kPOVAttrib_WarningFile,        kPOVMSType_UCS2String,  kPOVAttrib_WarningConsole },
-    { "GW",  kNoParameter,                  kNoParameter,           kPOVAttrib_WarningConsole },
+    { "GR",  kPOVAttrib_RenderFile,         kPOVMSType_UCS2String,  kPOVAttrib_RenderConsole,       kCmdOptFlag_Optional },
+    { "GS",  kPOVAttrib_StatisticsFile,     kPOVMSType_UCS2String,  kPOVAttrib_StatisticsConsole,   kCmdOptFlag_Optional },
+    { "GW",  kPOVAttrib_WarningFile,        kPOVMSType_UCS2String,  kPOVAttrib_WarningConsole,      kCmdOptFlag_Optional },
 
     { "HI",  kPOVAttrib_IncludeHeader,      kPOVMSType_UCS2String,  kNoParameter },
     { "HR",  kNoParameter,                  kNoParameter,           kPOVAttrib_HighReproducibility },
@@ -288,8 +286,7 @@ struct ProcessOptions::Cmd_Parser_Table RenderOptions_Cmd_Table[] =
 
     { "I",   kPOVAttrib_InputFile,          kPOVMSType_UCS2String,  kNoParameter },
 
-    { "J",   kPOVAttrib_JitterAmount,       kPOVMSType_Float,       kPOVAttrib_Jitter },
-    { "J",   kNoParameter,                  kNoParameter,           kPOVAttrib_Jitter },
+    { "J",   kPOVAttrib_JitterAmount,       kPOVMSType_Float,       kPOVAttrib_Jitter,              kCmdOptFlag_Optional },
 
     { "KC",  kNoParameter,                  kNoParameter,           kPOVAttrib_CyclicAnimation },
     { "KI",  kPOVAttrib_InitialClock,       kPOVMSType_Float,       kNoParameter },
@@ -301,8 +298,7 @@ struct ProcessOptions::Cmd_Parser_Table RenderOptions_Cmd_Table[] =
 
     { "L",   kPOVAttrib_LibraryPath,        kUseSpecialHandler,     kNoParameter },
 
-    { "MB",  kPOVAttrib_BoundingThreshold,  kPOVMSType_Int,         kPOVAttrib_Bounding },
-    { "MB",  kNoParameter,                  kNoParameter,           kPOVAttrib_Bounding },
+    { "MB",  kPOVAttrib_BoundingThreshold,  kPOVMSType_Int,         kPOVAttrib_Bounding,            kCmdOptFlag_Optional },
     { "MI",  kPOVAttrib_MaxImageBufferMem,  kPOVMSType_Int,         kNoParameter },
     { "MV",  kPOVAttrib_Version,            kPOVMSType_Float,       kNoParameter },
 
@@ -329,8 +325,7 @@ struct ProcessOptions::Cmd_Parser_Table RenderOptions_Cmd_Table[] =
     { "STP", kPOVAttrib_FrameStep,          kPOVMSType_Int,         kNoParameter },
     { "SU",  kNoParameter,                  kNoParameter,           kPOVAttrib_SplitUnions },
 
-    { "TH",  kPOVAttrib_DitherMethod,       kUseSpecialHandler,     kPOVAttrib_Dither },
-    { "TH",  kNoParameter,                  kNoParameter,           kPOVAttrib_Dither },
+    { "TH",  kPOVAttrib_DitherMethod,       kUseSpecialHandler,     kPOVAttrib_Dither,              kCmdOptFlag_Optional },
 
     { "UA",  kNoParameter,                  kNoParameter,           kPOVAttrib_OutputAlpha },
     { "UD",  kNoParameter,                  kNoParameter,           kPOVAttrib_DrawVistas },
@@ -346,10 +341,9 @@ struct ProcessOptions::Cmd_Parser_Table RenderOptions_Cmd_Table[] =
     { "WT",  kPOVAttrib_MaxRenderThreads,   kPOVMSType_Int,         kNoParameter },
     { "W",   kPOVAttrib_Width,              kPOVMSType_Int,         kNoParameter },
 
-    { "X",   kPOVAttrib_TestAbortCount,     kUseSpecialHandler,     kPOVAttrib_TestAbort },
-    { "X",   kNoParameter,                  kNoParameter,           kPOVAttrib_TestAbort },
+    { "X",   kPOVAttrib_TestAbortCount,     kUseSpecialHandler,     kPOVAttrib_TestAbort,           kCmdOptFlag_Optional },
 
-    { NULL, 0, 0, 0 }
+    { NULL }
 };
 
 // TODO FIXME - The following are hacks of some sort, no idea what they are good for. They certainly use wrong types and probably contain other mistakes [trf]
