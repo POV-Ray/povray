@@ -5330,6 +5330,18 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
             New->pattern = PatternPtr(new PotentialPattern());
             dynamic_cast<PotentialPattern*>(New->pattern.get())->pObject = tempObjects[0];
             Parse_End();
+
+            EXPECT
+                CASE (THRESHOLD_TOKEN)
+                    dynamic_cast<PotentialPattern*>(New->pattern.get())->subtractThreshold = Parse_Bool();
+                END_CASE
+
+                OTHERWISE
+                    UNGET
+                    EXIT
+                END_CASE
+            END_EXPECT
+
             EXIT
         }
         END_CASE
