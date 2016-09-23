@@ -5310,7 +5310,12 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
             EXIT
         END_CASE
 
-        // TODO VERIFY - TILING_TOKEN is not accepted, is that ok?
+        CASE (TILING_TOKEN)
+            New->Type = TILING_PATTERN;
+            New->pattern = PatternPtr(new TilingPattern());
+            dynamic_cast<TilingPattern*>(New->pattern.get())->tilingType = (unsigned char)Parse_Float();
+            EXIT
+        END_CASE
 
         CASE (POTENTIAL_TOKEN)
         {
