@@ -1301,11 +1301,16 @@ int ProcessOptions::Parse_CL_Switch(const char *&commandline, int token, POVMSOb
                     srcptr = value;
 
                 // only if a paremeter is expected allow it, and vice versa
-                if(((*srcptr > ' ') && (table->type != kPOVMSType_Null)) || ((*srcptr <= ' ') && (table->type == kPOVMSType_Null)))
+                if ((table->flags & kCmdOptFlag_Optional) ||
+                    ((*srcptr >  ' ') && (table->type != kPOVMSType_Null)) ||
+                    ((*srcptr <= ' ') && (table->type == kPOVMSType_Null)))
                 {
                     err = Process_Switch(table, srcptr, obj, (token != '-'));
-                    break;
                 }
+
+                // We're aborting the search now either way, because due how the table is supposed to be sorted,
+                // if the switch would match another entry we should have encountered that one earlier.
+                break;
             }
             table++;
         }
@@ -1492,6 +1497,10 @@ int ProcessOptions::Process_Switch(Cmd_Parser_Table *option, char *param, POVMSO
         if(err != kNoErr)
             return err;
     }
+
+    // If parameter is optional and none is specified by the user, we're done.
+    if ((option->flags & kCmdOptFlag_Optional) && (*param < ' '))
+        return err;
 
     switch(option->type)
     {

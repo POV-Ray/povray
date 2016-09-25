@@ -308,7 +308,7 @@ ImageData *Parser::Parse_Image(int Legal, bool GammaCorrect)
         END_CASE
 
         CASE5 (STRING_LITERAL_TOKEN,CHR_TOKEN,SUBSTR_TOKEN,STR_TOKEN,VSTR_TOKEN)
-        CASE4 (CONCAT_TOKEN,STRUPR_TOKEN,STRLWR_TOKEN,DATETIME_TOKEN)
+        CASE5 (CONCAT_TOKEN,STRUPR_TOKEN,STRLWR_TOKEN,DATETIME_TOKEN,STRING_ID_TOKEN)
             {
                 UNGET
                 Name = Parse_C_String(true);
@@ -2304,6 +2304,9 @@ void Parser::Parse_Tnormal (TNORMAL **Tnormal_Ptr)
         }
     }
     Parse_Pattern<GenericNormalBlendMap>(*Tnormal_Ptr,kBlendMapType_Normal);
+
+    if ((*Tnormal_Ptr)->Type == NO_PATTERN)
+        Error ("No normal type given.");
 }
 
 

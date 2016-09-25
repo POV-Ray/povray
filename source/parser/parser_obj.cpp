@@ -201,7 +201,7 @@ void Parser::Parse_Obj (Mesh* mesh)
             Parse_Begin();
             EXPECT
                 CASE5 (STRING_LITERAL_TOKEN,CHR_TOKEN,SUBSTR_TOKEN,STR_TOKEN,VSTR_TOKEN)
-                CASE4 (CONCAT_TOKEN,STRUPR_TOKEN,STRLWR_TOKEN,DATETIME_TOKEN)
+                CASE5 (CONCAT_TOKEN,STRUPR_TOKEN,STRLWR_TOKEN,DATETIME_TOKEN,STRING_ID_TOKEN)
                     UNGET
                     s = Parse_C_String();
                     material.mtlName = s;
