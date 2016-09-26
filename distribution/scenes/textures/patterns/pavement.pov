@@ -20,6 +20,11 @@ global_settings { assumed_gamma 1 }
 #declare VarPatternScale = 1/2;
 #declare VarCalkSize = 0.10;
 
+//--- To scale the repeated pavement pattern to a unit square.
+// #declare PavementTri_NrmScale  <1,1,2/sqrt(3)>   // (3 sides)
+// #declare PavementQuad_NrmScale <1,1,1>           // (4 sides)
+// #declare PavementHex_NrmScale  <1/3,1,1/sqrt(3)> // (6 sides)
+
 //---
 #declare White = srgbft <1,1,1,0,0>;
 background { color White }
