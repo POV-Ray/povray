@@ -1256,8 +1256,7 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                I haven't yet figured out what to do if it was expecting
                a COLOUR value with Terms>3
             */
-            if(*Terms < 3)
-                *Terms = 3;
+            *Terms = 3;
 
             for(i = 0; i < 3; i++)
                 Express[i] = Vect[i];
