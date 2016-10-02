@@ -51,7 +51,7 @@
 umask 022
 
 pov_version_base=`cat ./VERSION | sed 's,\([0-9]*.[0-9]*\).*,\1,g'`
-pov_config_bugreport="POV-Ray Bugtracker http://bugs.povray.org/"
+pov_config_bugreport="POV-Ray. Issue tracker at https://github.com/POV-Ray/povray/issues"
 
 # documentation
 timestamp=`date +%Y-%m-%d`
@@ -124,7 +124,7 @@ case "$1" in
   if test -f ../Makefile; then
     makeclean=`\
 cd .. ; \
-echo "make clean" 1>&2  &&  make clean 1>&2 ; \
+echo "make clean" 1>&2	&&  make clean 1>&2 ; \
 echo "make maintainer-clean" 1>&2  &&  make maintainer-clean 1>&2 ; \
 ` 2>&1
   fi
@@ -205,9 +205,9 @@ echo "make maintainer-clean" 1>&2  &&  make maintainer-clean 1>&2 ; \
   esac
   test -d ./output/final/tex/  ||  mkdir -p ./output/final/tex/
   skipt=`echo "$docopts" | grep 'skip.*t'`
-  test x"$skipt" != x""  &&  test -d ./output/final/tex/images  ||  ln -s ../machelp/images ./output/final/tex/images
+  test x"$skipt" != x""  &&  test -d ./output/final/tex/images	||  ln -s ../machelp/images ./output/final/tex/images
   sh makedocs.script $docopts | tee -a $rootdir/$log_file
-  test x"$skipt" != x""  &&  test -d ./output/final/tex/images  &&  rm -f ./output/final/tex/images
+  test x"$skipt" != x""  &&  test -d ./output/final/tex/images	&&  rm -f ./output/final/tex/images
   cd $rootdir
 
   # post-process HTML files in several steps.
@@ -296,7 +296,7 @@ echo "make maintainer-clean" 1>&2  &&  make maintainer-clean 1>&2 ; \
   # improve navigation from the keyword index by placing all link targets
   # directly in the heading section on the previous line
   for htmlfile in $files ; do
-    mv -f $htmlfile $htmlfile.temp 
+    mv -f $htmlfile $htmlfile.temp
     cat $htmlfile.temp | sed \
       '/<h[1-5]><a/ { N; s,\(<h[1-5]><a.*</a>\)\(.*\)\(</h[1-5]>\)\n\(<a id=.* name=.*></a>\)*,<!-- \2 -->\n\1\4\2\3,g }' \
       > $htmlfile
@@ -324,11 +324,11 @@ echo "make maintainer-clean" 1>&2  &&  make maintainer-clean 1>&2 ; \
   rm -f    $builddoc/output/final/unixhelp/unix_frame.html
 
   echo "Copy documentation in ../doc/" | tee -a $log_file
-  $cp_u -f -R   $builddoc/output/final/unixhelp/* ../doc/html/
+  $cp_u -f -R	$builddoc/output/final/unixhelp/* ../doc/html/
   chmod -R u+rw ../doc/html/
-  mv -f         ../doc/html/*.txt ../doc/
-  mv -f         ../doc/html/*.doc ../doc/
-  $cp_u -f      README.unix ../doc/
+  mv -f 	../doc/html/*.txt ../doc/
+  mv -f 	../doc/html/*.doc ../doc/
+  $cp_u -f	README.unix ../doc/
   chmod -R u+rw ../doc/
 
   # [C.H.]
@@ -385,7 +385,7 @@ echo "make maintainer-clean" 1>&2  &&  make maintainer-clean 1>&2 ; \
   done
 
   echo "Create ../doc/html"
-  mkdir -p ../doc/html  # required to build without existing docs
+  mkdir -p ../doc/html	# required to build without existing docs
   ;;
 
 esac
@@ -535,7 +535,7 @@ Library_Path="__POVLIBDIR__/include"
 ;;     Nc   PNG ('c' bit per colour RGB where 5 <= c <= 16)
 
 Output_to_File=true
-Output_File_Type=N8             ;; (+/-Ftype)
+Output_File_Type=N8		;; (+/-Ftype)
 pbEOF
   ;;
 esac
@@ -617,10 +617,10 @@ dist_man_MANS = povray.1
 dist-hook:
 	chmod -R u+rw \$(distdir)
 	chmod 755 \$(distdir)/scripts/*
-	rm -f    \`find \$(distdir) -name "*.h.in~"\`
+	rm -f	 \`find \$(distdir) -name "*.h.in~"\`
 	rm -f -r \`find \$(distdir) -name autom4te.cache\`
 	rm -f -r \`find \$(distdir) -name .libs\`
-	rm -f    \$(distdir)/source/jversion.h
+	rm -f	 \$(distdir)/source/jversion.h
 
 # Manage various data files for 'make install'.
 # Creates an install.log file to record created folders and files.
@@ -1064,7 +1064,7 @@ rm -f $dir/mkinstalldirs
 case "$1" in
   clean)
   for file in config.guess config.sub install-sh missing ; do
-    rm $dir/$file 2> /dev/null  &&  echo "Cleanup $dir/$file"
+    rm $dir/$file 2> /dev/null	&&  echo "Cleanup $dir/$file"
   done
   ;;
 
@@ -1184,7 +1184,7 @@ dir="../libraries/tiff/libtiff"
 case "$1" in
   clean)
   for file in config.guess config.sub install-sh missing ; do
-    rm $dir/$file 2> /dev/null  &&  echo "Cleanup $dir/$file"
+    rm $dir/$file 2> /dev/null	&&  echo "Cleanup $dir/$file"
   done
   ;;
 
@@ -1275,9 +1275,9 @@ dir="../libraries/boost"
 case "$1" in
   clean)
   for file in config.guess config.sub install-sh missing configure ; do
-    rm $dir/$file 2> /dev/null  &&  echo "Cleanup $dir/$file"
+    rm $dir/$file 2> /dev/null	&&  echo "Cleanup $dir/$file"
   done
-  test -d $dir  &&  rm -rf $dir  &&  echo "Cleanup $dir"
+  test -d $dir	&&  rm -rf $dir  &&  echo "Cleanup $dir"
   ;;
 
   doc*)

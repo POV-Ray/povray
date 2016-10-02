@@ -3,8 +3,9 @@ POV-Ray 3.7 for UNIX/Linux - INSTALL file
 
 Compiling and installing POV-Ray for Unix from sources.
 
-Please report bugs via our bugtracker at http://bugs.povray.org/ or to our forum
-at news://news.povray.org/povray.unix/ or http://news.povray.org/povray.unix/
+Please report bugs via github at https://github.com/POV-Ray/povray/issues or
+to our forum at news://news.povray.org/povray.unix/ or
+http://news.povray.org/povray.unix/
 ===============================================================================
 
 +----------------------------------------------------------------------------+
@@ -24,7 +25,7 @@ Table of contents
 
 
 ==============
-1. Quick start 
+1. Quick start
 ==============
 
 This document gives basic and detailed instructions on how to compile and
@@ -361,7 +362,7 @@ Additional POV-Ray specific options are:
     requests to find the JPEG library in the DIR directory.  Further details
     are given in the related --with-zlib option above.
 
---with-libtiff=DIR or --without-libtiff 
+--with-libtiff=DIR or --without-libtiff
     requests to find the TIFF library in the DIR directory.  Further details
     are given in the related --with-zlib option above.
 
