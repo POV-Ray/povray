@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -83,7 +83,6 @@
 #include "pvedit.h"
 #include "backend/control/benchmark.h"
 #include "pvdisplay.h"
-#include "syspovprotofrontend.h"
 #include "backend/povray.h"
 
 #ifdef RTR_SUPPORT
@@ -1709,7 +1708,7 @@ LONG WINAPI ExceptionHandler(struct _EXCEPTION_POINTERS* ExceptionInfo)
   c = ExceptionInfo->ContextRecord ;
   const char *desc = GetExceptionDescription(ExceptionInfo->ExceptionRecord->ExceptionCode);
   if (desc == NULL)
-    desc = "an" ;
+    desc = "an unrecognized exception" ;
   sprintf (str,
            "Unfortunately, it appears that %s at address 0x%p has caused this unofficial POV-Ray build to crash. "
            "This dialog will allow you to choose whether or not a dump file (useful for diagnostics) is written.\n\n"

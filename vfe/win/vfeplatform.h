@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -49,7 +49,7 @@ namespace vfePlatform
   {
   public:
     WinShelloutProcessing(POVMS_Object& opts, const string& scene, unsigned int width, unsigned int height);
-    ~WinShelloutProcessing();
+    virtual ~WinShelloutProcessing();
 
     virtual int ProcessID(void);
     virtual bool ShelloutsSupported(void) { return true; }

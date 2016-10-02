@@ -308,7 +308,7 @@ ImageData *Parser::Parse_Image(int Legal, bool GammaCorrect)
         END_CASE
 
         CASE5 (STRING_LITERAL_TOKEN,CHR_TOKEN,SUBSTR_TOKEN,STR_TOKEN,VSTR_TOKEN)
-        CASE4 (CONCAT_TOKEN,STRUPR_TOKEN,STRLWR_TOKEN,DATETIME_TOKEN)
+        CASE5 (CONCAT_TOKEN,STRUPR_TOKEN,STRLWR_TOKEN,DATETIME_TOKEN,STRING_ID_TOKEN)
             {
                 UNGET
                 Name = Parse_C_String(true);
@@ -1615,6 +1615,35 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
             EXIT
         END_CASE
 
+        CASE (POTENTIAL_TOKEN)
+        {
+            Parse_Begin();
+            vector<ObjectPtr> tempObjects;
+            Parse_Bound_Clip(tempObjects, false);
+            if(tempObjects.size() != 1)
+                Error ("object or object identifier expected.");
+            if (!(tempObjects[0]->Type & POTENTIAL_OBJECT))
+                Error ("blob or isosurface object expected.");
+            New->Type = GENERIC_PATTERN;
+            New->pattern = PatternPtr(new PotentialPattern());
+            dynamic_cast<PotentialPattern*>(New->pattern.get())->pObject = tempObjects[0];
+            Parse_End();
+
+            EXPECT
+                CASE (THRESHOLD_TOKEN)
+                    dynamic_cast<PotentialPattern*>(New->pattern.get())->subtractThreshold = Parse_Bool();
+                END_CASE
+
+                OTHERWISE
+                    UNGET
+                    EXIT
+                END_CASE
+            END_EXPECT
+
+            EXIT
+        }
+        END_CASE
+
         OTHERWISE
             UNGET
             EXIT
@@ -2249,6 +2278,9 @@ void Parser::Parse_Tnormal (TNORMAL **Tnormal_Ptr)
         }
     }
     Parse_Pattern<GenericNormalBlendMap>(*Tnormal_Ptr,kBlendMapType_Normal);
+
+    if ((*Tnormal_Ptr)->Type == NO_PATTERN)
+        Error ("No normal type given.");
 }
 
 
@@ -5231,9 +5263,53 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
 
         // AOI_TOKEN is not accepted, as it requires normal vector information, which can't be passed to a function
 
-        // TODO VERIFY - PAVEMENT_TOKEN is not accepted, is that ok?
+        CASE (PAVEMENT_TOKEN)
+            New->Type = PAVEMENT_PATTERN;
+            New->pattern = PatternPtr(new PavementPattern());
+            dynamic_cast<PavementPattern*>(New->pattern.get())->Side = 3;
+            dynamic_cast<PavementPattern*>(New->pattern.get())->Tile = 1;
+            dynamic_cast<PavementPattern*>(New->pattern.get())->Number = 1;
+            dynamic_cast<PavementPattern*>(New->pattern.get())->Exterior = 0;
+            dynamic_cast<PavementPattern*>(New->pattern.get())->Interior = 0;
+            dynamic_cast<PavementPattern*>(New->pattern.get())->Form = 0;
+            EXIT
+        END_CASE
 
-        // TODO VERIFY - TILING_TOKEN is not accepted, is that ok?
+        CASE (TILING_TOKEN)
+            New->Type = TILING_PATTERN;
+            New->pattern = PatternPtr(new TilingPattern());
+            dynamic_cast<TilingPattern*>(New->pattern.get())->tilingType = (unsigned char)Parse_Float();
+            EXIT
+        END_CASE
+
+        CASE (POTENTIAL_TOKEN)
+        {
+            Parse_Begin();
+            vector<ObjectPtr> tempObjects;
+            Parse_Bound_Clip(tempObjects, false);
+            if(tempObjects.size() != 1)
+                Error ("object or object identifier expected.");
+            if (!(tempObjects[0]->Type & POTENTIAL_OBJECT))
+                Error ("blob or isosurface object expected.");
+            New->Type = GENERIC_PATTERN;
+            New->pattern = PatternPtr(new PotentialPattern());
+            dynamic_cast<PotentialPattern*>(New->pattern.get())->pObject = tempObjects[0];
+            Parse_End();
+
+            EXPECT
+                CASE (THRESHOLD_TOKEN)
+                    dynamic_cast<PotentialPattern*>(New->pattern.get())->subtractThreshold = Parse_Bool();
+                END_CASE
+
+                OTHERWISE
+                    UNGET
+                    EXIT
+                END_CASE
+            END_EXPECT
+
+            EXIT
+        }
+        END_CASE
 
         OTHERWISE
             UNGET
@@ -5251,33 +5327,47 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
         END_CASE
 
         CASE (EXTERIOR_TOKEN)
-            // TODO VERIFY - this differs from regular pattern parsing (PAVEMENT_PATTERN), is that ok?
             if(!((New->Type == MANDEL_PATTERN) ||
                  (New->Type == JULIA_PATTERN) ||
-                 (New->Type == MAGNET_PATTERN)))
+                 (New->Type == MAGNET_PATTERN) ||
+                 (New->Type == PAVEMENT_PATTERN)))
             {
-                Only_In("exterior", "mandel, julia or magnet");
+                Only_In("exterior", "mandel, julia, magnet or pavement");
             }
-            dynamic_cast<FractalPattern*>(New->pattern.get())->exteriorType = (int)Parse_Float();
-            if((dynamic_cast<FractalPattern*>(New->pattern.get())->exteriorType < 0) || (dynamic_cast<FractalPattern*>(New->pattern.get())->exteriorType > 6))
-                Error("Invalid fractal pattern exterior type. Valid types are 0 to 6.");
-            Parse_Comma();
-            dynamic_cast<FractalPattern*>(New->pattern.get())->exteriorFactor = Parse_Float();
+            else if (New->Type == PAVEMENT_PATTERN)
+            {
+                dynamic_cast<PavementPattern*>(New->pattern.get())->Exterior = (unsigned char)Parse_Float();
+            }
+            else
+            {
+                dynamic_cast<FractalPattern*>(New->pattern.get())->exteriorType = (int)Parse_Float();
+                if((dynamic_cast<FractalPattern*>(New->pattern.get())->exteriorType < 0) || (dynamic_cast<FractalPattern*>(New->pattern.get())->exteriorType > 6))
+                    Error("Invalid fractal pattern exterior type. Valid types are 0 to 6.");
+                Parse_Comma();
+                dynamic_cast<FractalPattern*>(New->pattern.get())->exteriorFactor = Parse_Float();
+            }
         END_CASE
 
         CASE (INTERIOR_TOKEN)
-            // TODO VERIFY - this differs from regular pattern parsing (PAVEMENT_PATTERN), is that ok?
             if(!((New->Type == MANDEL_PATTERN) ||
                  (New->Type == JULIA_PATTERN) ||
-                 (New->Type == MAGNET_PATTERN)))
+                 (New->Type == MAGNET_PATTERN) ||
+                 (New->Type == PAVEMENT_PATTERN)))
             {
-                Only_In("exterior", "mandel, julia or magnet");
+                Only_In("exterior", "mandel, julia, magnet or pavement");
             }
-            dynamic_cast<FractalPattern*>(New->pattern.get())->interiorType = (int)Parse_Float();
-            if((dynamic_cast<FractalPattern*>(New->pattern.get())->interiorType < 0) || (dynamic_cast<FractalPattern*>(New->pattern.get())->interiorType > 6))
-                Error("Invalid fractal pattern interior type. Valid types are 0 to 6.");
-            Parse_Comma();
-            dynamic_cast<FractalPattern*>(New->pattern.get())->interiorFactor = Parse_Float();
+            else if (New->Type == PAVEMENT_PATTERN)
+            {
+                dynamic_cast<PavementPattern*>(New->pattern.get())->Interior = (unsigned char)Parse_Float();
+            }
+            else
+            {
+                dynamic_cast<FractalPattern*>(New->pattern.get())->interiorType = (int)Parse_Float();
+                if((dynamic_cast<FractalPattern*>(New->pattern.get())->interiorType < 0) || (dynamic_cast<FractalPattern*>(New->pattern.get())->interiorType > 6))
+                    Error("Invalid fractal pattern interior type. Valid types are 0 to 6.");
+                Parse_Comma();
+                dynamic_cast<FractalPattern*>(New->pattern.get())->interiorFactor = Parse_Float();
+            }
         END_CASE
 
         CASE (EXPONENT_TOKEN)
@@ -5377,10 +5467,12 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
         END_CASE
 
         CASE (FORM_TOKEN)
-            // TODO VERIFY - this differs from regular pattern parsing (PAVEMENT_PATTERN), is that ok?
-            if (New->Type != CRACKLE_PATTERN )
-                Only_In("form", "crackle");
-            Parse_Vector( dynamic_cast<CracklePattern*>(New->pattern.get())->crackleForm );
+            if (New->Type == CRACKLE_PATTERN)
+                Parse_Vector( dynamic_cast<CracklePattern*>(New->pattern.get())->crackleForm );
+            else if (New->Type == PAVEMENT_PATTERN)
+                dynamic_cast<PavementPattern*>(New->pattern.get())->Form = ((unsigned char)Parse_Float());
+            else
+                Only_In("form", "crackle or pavement");
         END_CASE
 
         CASE (OFFSET_TOKEN)
@@ -5550,11 +5642,23 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
             dynamic_cast<DensityFilePattern*>(New->pattern.get())->densityFile->Interpolation = (int)Parse_Float();
         END_CASE
 
-        // TODO VERIFY - NUMBER_OF_SIDES is not accepted, is that ok?
+        CASE (NUMBER_OF_SIDES_TOKEN)
+            if (New->Type != PAVEMENT_PATTERN)
+                Only_In("number_of_sides","pavement");
+            dynamic_cast<PavementPattern*>(New->pattern.get())->Side=(unsigned char)Parse_Float();
+        END_CASE
 
-        // TODO VERIFY - NUMBER_OF_TILES is not accepted, is that ok?
+        CASE (NUMBER_OF_TILES_TOKEN)
+            if (New->Type != PAVEMENT_PATTERN)
+                Only_In("number_of_tiles","pavement");
+            dynamic_cast<PavementPattern*>(New->pattern.get())->Tile=(unsigned char)Parse_Float();
+        END_CASE
 
-        // TODO VERIFY - PATTERN (PAVEMENT) is not accepted, is that ok?
+        CASE (PATTERN_TOKEN)
+            if (New->Type != PAVEMENT_PATTERN)
+                Only_In("pattern","pavement");
+            dynamic_cast<PavementPattern*>(New->pattern.get())->Number=(unsigned char)Parse_Float();
+        END_CASE
 
         CASE (WARP_TOKEN)
             Parse_Warp(New->pattern->warps);

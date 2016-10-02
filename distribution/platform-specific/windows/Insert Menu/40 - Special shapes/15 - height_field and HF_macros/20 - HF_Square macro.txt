@@ -1,4 +1,6 @@
- // ----------------- HF_Square macro ------------------
+//-----------------------------------------------------
+#include "shapes.inc"
+// ----------------- HF_Square macro ------------------
 #declare Fn_1 =
  function(x, y, z)
   {1-(-f_snoise3d(x*2,y*2,z*2)*0.25)}
@@ -11,7 +13,7 @@ object{ HF_Square( Fn_1, //Function,
                      "",// FileName, ""=no file,
            <-1,0,-1>*2, //MnExt,
            <1,1,1>*2    //MxExt
-                      ) //------------------------------ 
+                      ) //------------------------------
   texture{ pigment{ checker
                     color rgb<1,0.6,0>
                     color rgb<1,1,1>*0.9
@@ -21,4 +23,4 @@ object{ HF_Square( Fn_1, //Function,
   scale<1,1,1>*1
   rotate<0,0,0>
   translate<0,-1.5,0>
-} // end of HF_Square ---------------------------------- 
+} // end of HF_Square ----------------------------------

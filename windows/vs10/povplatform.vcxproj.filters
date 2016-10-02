@@ -37,6 +37,12 @@
     <ClCompile Include="..\..\platform\windows\osversioninfo.cpp">
       <Filter>Platform Source\Windows</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\platform\windows\syspovtask.cpp">
+      <Filter>Platform Source\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\platform\windows\syspovpath.cpp">
+      <Filter>Platform Source\Windows</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\platform\x86\avxfma4noise.h">
@@ -49,6 +55,15 @@
       <Filter>Platform Headers\Windows</Filter>
     </ClInclude>
     <ClInclude Include="..\..\platform\windows\osversioninfo.h">
+      <Filter>Platform Headers\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\platform\windows\syspovpath.h">
+      <Filter>Platform Headers\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\platform\windows\syspovtask.h">
+      <Filter>Platform Headers\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\platform\windows\syspovdebug.h">
       <Filter>Platform Headers\Windows</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,3 +1,7 @@
+env:
+  global:
+   # Required for clang.
+   - CXXFLAGS="-fno-fast-math"
 branches:
   except:
   - /^v[0-9]/
@@ -15,7 +19,6 @@ compiler:
 matrix:
   allow_failures:
   - os: osx
-  - compiler: clang
 
 sudo: false
 

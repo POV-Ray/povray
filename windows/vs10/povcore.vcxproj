@@ -388,6 +388,7 @@
     <ClCompile Include="..\..\source\core\shape\heightfield.cpp" />
     <ClCompile Include="..\..\source\core\shape\isosurface.cpp" />
     <ClCompile Include="..\..\source\core\shape\lathe.cpp" />
+    <ClCompile Include="..\..\source\core\shape\lemon.cpp" />
     <ClCompile Include="..\..\source\core\shape\mesh.cpp" />
     <ClCompile Include="..\..\source\core\shape\ovus.cpp" />
     <ClCompile Include="..\..\source\core\shape\plane.cpp" />
@@ -464,6 +465,7 @@
     <ClInclude Include="..\..\source\core\shape\heightfield.h" />
     <ClInclude Include="..\..\source\core\shape\isosurface.h" />
     <ClInclude Include="..\..\source\core\shape\lathe.h" />
+    <ClInclude Include="..\..\source\core\shape\lemon.h" />
     <ClInclude Include="..\..\source\core\shape\mesh.h" />
     <ClInclude Include="..\..\source\core\shape\ovus.h" />
     <ClInclude Include="..\..\source\core\shape\plane.h" />

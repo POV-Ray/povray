@@ -170,7 +170,24 @@ class Task
         /// not available
         Task& operator=(const Task&);
 
+        /// Execute the thread.
         void TaskThread(const boost::function0<void>& completion);
+
+        /// Called by @ref TaskThread() before Run() is invoked.
+        ///
+        /// This method is intended as a hook to inject platform-specific thread initialization code, to be run by every
+        /// task at thread startup. To make use of this mechanism, set @ref POV_USE_DEFAULT_TASK_INITIALIZE to zero to
+        /// knock out the default implementation and provide a platform-specific implementation somewhere else.
+        ///
+        void Initialize();
+
+        /// Called by @ref TaskThread() after Run() returns.
+        ///
+        /// This method is intended as a hook to inject platform-specific thread cleanup code, to be run by every
+        /// task at thread shutdown. To make use of this mechanism, set @ref POV_USE_DEFAULT_TASK_CLEANUP to zero to
+        /// knock out the default implementation and provide a platform-specific implementation somewhere else.
+        ///
+        void Cleanup();
 };
 
 

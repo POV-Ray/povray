@@ -52,7 +52,7 @@ namespace pov
 * Global preprocessor defines
 ******************************************************************************/
 
-#define ISOSURFACE_OBJECT      (BASIC_OBJECT)
+#define ISOSURFACE_OBJECT      (BASIC_OBJECT+POTENTIAL_OBJECT)
 #define ISOSURFACE_MAXTRACE    10
 
 
@@ -64,6 +64,8 @@ class IsoSurface;
 class FPUContext;
 
 class FunctionVM;
+
+typedef unsigned char IsosurfaceMaxTrace;
 
 struct ISO_Pair { DBL t,f; };
 
@@ -97,10 +99,11 @@ class IsoSurface : public ObjectBase
         DBL threshold;
         DBL accuracy;
         DBL eval_param[3];
-        int max_trace;
-        bool closed;
-        bool eval;
-        bool isCopy;
+        IsosurfaceMaxTrace max_trace;
+        bool closed             : 1;
+        bool eval               : 1;
+        bool isCopy             : 1;
+        bool positivePolarity   : 1; ///< `true` if values above threshold are considered inside, `false` if considered outside.
 
         shared_ptr<ContainedByShape> container;
 
@@ -111,6 +114,7 @@ class IsoSurface : public ObjectBase
 
         virtual bool All_Intersections (const Ray&, IStack&, TraceThreadData *) const;
         virtual bool Inside(const Vector3d&, TraceThreadData *) const;
+        virtual double GetPotential (const Vector3d&, bool subtractThreshold, TraceThreadData *) const;
         virtual void Normal (Vector3d&, Vector3d&, Intersection *, TraceThreadData *) const;
         virtual void Translate(const Vector3d&, const TRANSFORM *);
         virtual void Rotate(const Vector3d&, const TRANSFORM *);
@@ -131,6 +135,9 @@ class IsoSurface : public ObjectBase
                                    TraceThreadData* pThreadData) const;
 
         inline DBL Float_Function(ISO_ThreadData& itd, DBL t) const;
+        inline DBL EvaluateAbs (GenericScalarFunctionInstance& fn, Vector3d& p) const;
+        inline DBL EvaluatePolarized (GenericScalarFunctionInstance& fn, Vector3d& p) const;
+        inline bool IsInside (GenericScalarFunctionInstance& fn, Vector3d& p) const;
 
         inline void UpdateGradient (volatile DBL& v, DBL g) const;
 

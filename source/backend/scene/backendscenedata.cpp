@@ -170,21 +170,21 @@ IStream *BackendSceneData::ReadFile(POVMSContext ctx, const UCS2String& origname
     if(fileurl.length() > 0)
     {
         // create a temporary file
-        UCS2String tempname = POV_PLATFORM_BASE.CreateTemporaryFile();
+        UCS2String tempname = PlatformBase::GetInstance().CreateTemporaryFile();
         OStream *tempfile = NewOStream(tempname.c_str(), stype, false);
 
         if(tempfile == NULL)
         {
-            POV_PLATFORM_BASE.DeleteTemporaryFile(tempname);
+            PlatformBase::GetInstance().DeleteTemporaryFile(tempname);
             throw POV_EXCEPTION_CODE(kCannotOpenFileErr);
         }
 
         // download the file from the URL
         // TODO - handle referrer
-        if(POV_PLATFORM_BASE.ReadFileFromURL(tempfile, fileurl) == false)
+        if(PlatformBase::GetInstance().ReadFileFromURL(tempfile, fileurl) == false)
         {
             delete tempfile;
-            POV_PLATFORM_BASE.DeleteTemporaryFile(tempname);
+            PlatformBase::GetInstance().DeleteTemporaryFile(tempname);
             throw POV_EXCEPTION_CODE(kNetworkConnectionErr);
         }
 
@@ -241,21 +241,21 @@ IStream *BackendSceneData::ReadFile(POVMSContext ctx, const UCS2String& filename
     if(fileurl.length() > 0)
     {
         // create a temporary file
-        UCS2String tempname = POV_PLATFORM_BASE.CreateTemporaryFile();
+        UCS2String tempname = PlatformBase::GetInstance().CreateTemporaryFile();
         OStream *tempfile = NewOStream(tempname.c_str(), stype, false);
 
         if(tempfile == NULL)
         {
-            POV_PLATFORM_BASE.DeleteTemporaryFile(tempname);
+            PlatformBase::GetInstance().DeleteTemporaryFile(tempname);
             throw POV_EXCEPTION_CODE(kCannotOpenFileErr);
         }
 
         // download the file from the URL
         // TODO - handle referrer
-        if(POV_PLATFORM_BASE.ReadFileFromURL(tempfile, fileurl) == false)
+        if(PlatformBase::GetInstance().ReadFileFromURL(tempfile, fileurl) == false)
         {
             delete tempfile;
-            POV_PLATFORM_BASE.DeleteTemporaryFile(tempname);
+            PlatformBase::GetInstance().DeleteTemporaryFile(tempname);
             throw POV_EXCEPTION_CODE(kNetworkConnectionErr);
         }
 
@@ -285,7 +285,7 @@ OStream *BackendSceneData::CreateFile(POVMSContext ctx, const UCS2String& filena
         return NewOStream(itempfile->second.c_str(), stype, append);
 
     // otherwise, create a temporary file ...
-    UCS2String tempname = POV_PLATFORM_BASE.CreateTemporaryFile();
+    UCS2String tempname = PlatformBase::GetInstance().CreateTemporaryFile();
     OStream *tempfile = NewOStream(tempname.c_str(), stype, append);
 
     // failed to open file

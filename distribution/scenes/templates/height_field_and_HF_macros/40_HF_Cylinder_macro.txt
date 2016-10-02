@@ -1,7 +1,9 @@
-// -------------- HF_Cylinder macro
+//-----------------------------------------------------
+#include "shapes.inc"
+// -------------- HF_Cylinder macro -------------------
 #declare Fn_1 =
  function(x, y, z)
-  {1-(-f_snoise3d(x*3,y*3 ,  z*3)*0.8)}
+  {1-(-f_snoise3d(x*3,y*3,z*3)*0.8)}
 
 object{ //---------------------------
 HF_Cylinder( Fn_1, //Function,
@@ -24,4 +26,4 @@ HF_Cylinder( Fn_1, //Function,
  scale<1,1,1>*1
  rotate<0,0,0>
  translate<0,0.00,0>
-}  // end of HF_Cylinder -------------- 
+}  // end of HF_Cylinder ------------------------------

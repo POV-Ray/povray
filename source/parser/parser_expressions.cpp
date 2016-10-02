@@ -33,7 +33,7 @@
 ///
 //******************************************************************************
 
-// Module config header file must be the first file included within POV-Ray unit header files
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "parser/parser.h"
 
 #include <cctype>
@@ -1254,14 +1254,7 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                     break;
             }
 
-
-            /* If it was expecting a DBL, promote it to a VECTOR.
-               I haven't yet figured out what to do if it was expecting
-               a COLOUR value with Terms>3
-            */
-            if(*Terms < 3)
-                *Terms = 3;
-
+            *Terms = 3;
             for(i = 0; i < 3; i++)
                 Express[i] = Vect[i];
             EXIT
@@ -2093,6 +2086,37 @@ int Parser::Parse_Int_With_Minimum(int minValue, const char* parameterName)
               (parameterName != NULL ? ": " : ""),
               minValue,
               value);
+    }
+    return value;
+}
+
+int Parser::Parse_Int_With_Range(int minValue, int maxValue, const char* parameterName)
+{
+    int value = Parse_Int(parameterName);
+    if ((value < minValue) || (value > maxValue))
+    {
+        Error("%s%sExpected at %s %i, but found %i instead.",
+              (parameterName != NULL ? parameterName : ""),
+              (parameterName != NULL ? ": " : ""),
+              (value < minValue ? "least" : "most"),
+              minValue,
+              value);
+    }
+    return value;
+}
+
+bool Parser::Parse_Bool(const char* parameterName)
+{
+    DBL rawValue = Parse_Float();
+    int intValue = int(rawValue);
+    bool value = (intValue != 0);
+    if (fabs(intValue - rawValue) >= EPSILON)
+    {
+        Warning("%s%sExpected boolean; interpreting fractional value %lf as '%s'.",
+                (parameterName != NULL ? parameterName : ""),
+                (parameterName != NULL ? ": " : ""),
+                rawValue,
+                (value ? "on" : "off"));
     }
     return value;
 }

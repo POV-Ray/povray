@@ -1,21 +1,14 @@
 //******************************************************************************
 ///
-/// @file vfe/syspovdebug.h
+/// @file base/platformbase.cpp
 ///
-/// This header file is included by povdebug.h, which is in turn included by
-/// all C++ files in POV-Ray. povdebug.h is the last header file included
-/// (with the possible exception of files that do not declare anything that
-/// could clash with declarations in povdebug.h or this file).
-///
-/// As a rule, system header files are not safe to include after this file.
-///
-/// @author Christopher J. Cason
+/// Implementations related to the @ref PlatformBase class.
 ///
 /// @copyright
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -40,7 +33,19 @@
 ///
 //******************************************************************************
 
-#ifndef __SYSPOVDEBUG_H__
-#define __SYSPOVDEBUG_H__
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
+#include "base/platformbase.h"
 
-#endif // __SYSPOVDEBUG_H__
+// POV-Ray base header files
+#include "base/types.h"
+
+// this must be the last file included
+#include "base/povdebug.h"
+
+namespace pov_base
+{
+
+/// Platform specific function interface self reference pointer
+PlatformBase *PlatformBase::self = NULL;
+
+}

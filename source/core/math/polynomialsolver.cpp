@@ -1706,6 +1706,8 @@ int Solve_Polynomial(int n, const DBL *c0, DBL *r, int sturm, DBL epsilon, Rende
 
                     roots = polysolve(n-1, c, r);
                 }
+
+                break;
             }
 
             /* Solve n-th order polynomial. */

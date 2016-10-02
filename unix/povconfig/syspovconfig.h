@@ -68,9 +68,6 @@
 #include "stdint.h"
 #endif
 
-// from directory "vfe"
-#include "vfeconf.h"
-
 using std::max;
 using std::min;
 

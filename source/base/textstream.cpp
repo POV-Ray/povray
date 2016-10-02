@@ -271,8 +271,7 @@ void IBufferedTextStream::RefillBuffer()
     maxbufferoffset = min((POV_ULONG)ITEXTSTREAM_BUFFER_SIZE, filelength - curpos);
     bufferoffset = 0;
 
-    stream->read(buffer, maxbufferoffset);
-    if (*stream)
+    if (stream->read(buffer, maxbufferoffset))
         curpos += maxbufferoffset ;
     else
         curpos = stream->tellg() ;

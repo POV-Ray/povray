@@ -11,7 +11,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -45,5 +45,9 @@
 #define ALTMAIN
 // NEW_LINE_STRING remains undefined, optimizing the code for "\n" as used internally
 #define SYS_DEF_EXT     ""
+
+// On Unix platforms, we don't do anything special at thread startup.
+#define POV_USE_DEFAULT_TASK_INITIALIZE 1
+#define POV_USE_DEFAULT_TASK_CLEANUP    1
 
 #endif // POVRAY_UNIX_SYSPOVCONFIGBACKEND_H

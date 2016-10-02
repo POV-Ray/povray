@@ -89,3 +89,66 @@ plane{y,0
   #write (MapFile, "    }\n  }\n}\n")
   #fclose MapFile
 #end
+
+//----------------------- Reference code --------------------------
+// Useful scalings if using the tiling pattern in combination with
+// other functions, patterns or warps. Usually the scale required
+// to fit core repeated tile into one unit square size.
+#switch (TilingPattern)
+  #case (1)
+    #declare TileScale = <1,1,1>;
+  #break
+  #case (2) #case (5)
+    #declare TileScale = <2/3,1,1/sqrt(3)>;
+  #break
+  #case (3) #case (4)
+    #declare TileScale = <2/3,1,1/sqrt(3)>;
+  #break
+  #case (6) #case (18)
+    #declare TileScale = <1/4,1,1/4>;
+  #break
+  #case (7)
+    #declare TileScale = <1/(sqrt(2)+1),1,1/(sqrt(2)+1)>;
+  #break
+  #case (8)
+    #declare TileScale = <1,1,1/(sqrt(3)+2)>;
+  #break
+  #case (9)
+    #declare TileScale = <1/2,1,1/(2*sqrt(3))>;
+  #break
+  #case (10)
+    #declare TileScale = <1,1,1/2>;
+  #break
+  #case (11) #case (12)
+    #declare TileScale = <1/3,1,1/3>;
+  #break
+  #case (13) #case (14)
+    #declare TileScale = <1/(sqrt(3)+1),1,1/(sqrt(3)+1)>;
+  #break
+  #case (15)
+    #declare TileScale = <1/5,1,1/5>;
+  #break
+  #case (16) #case (17)
+    #declare TileScale = <1/(sqrt(3)+3),1,1/((sqrt(3)+1.0)*2.0)>;
+  #break
+  #case (19) #case (20)
+    #declare TileScale = <1/2,1,1/((sqrt(3)/2)*3)>;
+  #break
+  #case (21)
+    #declare TileScale = <1/(1+sqrt(3)),1,1/(1+sqrt(3))>;
+  #break
+  #case (22)
+    #declare TileScale = <1/(2+sqrt(3)),1,1/(3+(2*sqrt(3)))>;
+  #break
+  #case (23) #case (24)
+    #declare TileScale = <1/(3+sqrt(3)),1,1/(3+(3*sqrt(3)))>;
+  #break
+  // Unit square scaling not possible with Penrose tiling.
+  // Scaling given useful to see all tiles in a way symmetrical in z
+  #case (25) #case (26) #case (27)
+    #declare TileScale = <1/(4*sqrt(2)),1,1/(4*sqrt(2))>;
+  #break
+  #else
+    #declare TileScale = <1,1,1>;
+#end
+

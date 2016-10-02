@@ -308,12 +308,12 @@ RenderFrontendBase::SceneId RenderFrontendBase::CreateScene(SceneData& shd, POVM
                 UCS2String str = lp.GetUCS2String();
                 if (str.empty() == true)
                     continue;
-#ifndef POV_FILE_SEPARATOR_2
-                if (*str.rbegin() != POV_FILE_SEPARATOR)
-                    str += POV_FILE_SEPARATOR;
+#ifndef POV_PATH_SEPARATOR_2
+                if (*str.rbegin() != POV_PATH_SEPARATOR)
+                    str += POV_PATH_SEPARATOR;
 #else
-                if (*str.rbegin() != POV_FILE_SEPARATOR && *str.rbegin() != POV_FILE_SEPARATOR_2)
-                    str += POV_FILE_SEPARATOR;
+                if (*str.rbegin() != POV_PATH_SEPARATOR && *str.rbegin() != POV_PATH_SEPARATOR_2)
+                    str += POV_PATH_SEPARATOR;
 #endif
                 shd.searchpaths.push_back(Path(str));
             }
@@ -607,7 +607,7 @@ void RenderFrontendBase::NewBackup(POVMS_Object& ropts, ViewData& vd, const Path
     vd.imageBackup.reset();
 
     MakeBackupPath(ropts, vd, outputpath);
-    if(POV_ALLOW_FILE_WRITE(vd.imageBackupFile().c_str(), POV_File_Data_Backup) == false)
+    if (!pov_base::PlatformBase::GetInstance().AllowLocalFileAccess (vd.imageBackupFile(), POV_File_Data_Backup, true))
         throw POV_EXCEPTION(kCannotOpenFileErr, "Permission denied to create render state output file.");
     vd.imageBackup = shared_ptr<OStream>(new OStream(vd.imageBackupFile().c_str()));
     if(vd.imageBackup != NULL)
@@ -630,7 +630,7 @@ void RenderFrontendBase::NewBackup(POVMS_Object& ropts, ViewData& vd, const Path
             // we do this test even if the file doesn't exist as we need to write there
             // eventually anyhow. might as well test if before the render starts ...
             if(CheckIfFileExists(filename.c_str()))
-                POV_UCS2_REMOVE(filename.c_str());
+                PlatformBase::GetInstance().DeleteLocalFile (filename.c_str());
         }
     }
     else

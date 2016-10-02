@@ -212,7 +212,15 @@ namespace pov_base
 /// A macro that tests an expression and, if it evaluates false, causes a hard crash to generate a
 /// core dump or break to a debugger.
 ///
-#define POV_ASSERT_HARD(expr) assert( expr )
+#define POV_ASSERT_HARD(expr) assert(expr)
+
+/// A macro that does nothing, but is mapped to standard `assert()` during static code analysis.
+///
+#ifdef STATIC_CODE_ANALYSIS
+    #define POV_ASSERT_DISABLE(expr) assert(expr)
+#else
+    #define POV_ASSERT_DISABLE(expr) NO_OP
+#endif
 
 // from <algorithm>; we don't want to always type the namespace for these.
 using std::min;

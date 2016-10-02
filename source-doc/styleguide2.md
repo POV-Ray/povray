@@ -1,4 +1,5 @@
-# Nitpicker's Coding Styleguide {#styleguide2}
+@page styleguide2  Nitpicker's Coding Styleguide
+
 
 To avoid boring you to death with coding rules, we decided to not include the following in our main coding styleguide
 for one or more of the following reasons:
@@ -16,10 +17,12 @@ documentation page, be aware that the HTML comments citing individual MISRA rule
 that our rules may differ substantially.)
 
 
-@note   Entries in parentheses are placeholders for concerns we haven't addressed yet. Most of these
-        correspond to rules from the MISRA C++ 2008 guidelines.
+@note
+    Entries in parentheses are placeholders for concerns we haven't addressed yet. Most of these
+    correspond to rules from the MISRA C++ 2008 guidelines.
 
-@todo   Flesh out the placeholders.
+@todo
+    Flesh out the placeholders.
 
   - **Unused or useless code**: There should generally be no unreachable, orphaned, dead or
     pointless code, nor any unused variables or types. The following are valid exceptions:

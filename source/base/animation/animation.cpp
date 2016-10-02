@@ -67,12 +67,17 @@ Animation::Animation(FileType aftype, IStream *file, const ReadOptions& options)
     {
         case AVI:
         //  state = Avi::ReadFileHeader(inFile, seconds, totalFrames, codec, width, height, readOptions, warnings);
+            POV_RTR_ASSERT(false);
             break;
         case MOV:
             state = Moov::ReadFileHeader(inFile, seconds, totalFrames, codec, width, height, readOptions, warnings);
             break;
         case MPEG:
         //  state = Mpeg::ReadFileHeader(inFile, seconds, totalFrames, codec, width, height, readOptions, warnings);
+            POV_RTR_ASSERT(false);
+            break;
+        default:
+            POV_RTR_ASSERT(false);
             break;
     }
 
@@ -100,12 +105,17 @@ Animation::Animation(FileType aftype, CodecType c, OStream *file, unsigned int w
     {
         case AVI:
         //  state = Avi::WriteFileHeader(outFile, codec, width, height, writeOptions, warnings);
+            POV_RTR_ASSERT(false);
             break;
         case MOV:
             state = Moov::WriteFileHeader(outFile, codec, width, height, writeOptions, warnings);
             break;
         case MPEG:
         //  state = Mpeg::WriteFileHeader(outFile, codec, width, height, writeOptions, warnings);
+            POV_RTR_ASSERT(false);
+            break;
+        default:
+            POV_RTR_ASSERT(false);
             break;
     }
 
@@ -129,12 +139,17 @@ Animation::~Animation()
         {
             case AVI:
             //  Avi::FinishWriteFile(outFile, writeOptions, warnings, state);
+                POV_RTR_ASSERT(false);
                 break;
             case MOV:
                 Moov::FinishWriteFile(outFile, writeOptions, warnings, state);
                 break;
             case MPEG:
             //  Mpeg::FinishWriteFile(outFile, writeOptions, warnings, state);
+                POV_RTR_ASSERT(false);
+                break;
+            default:
+                POV_RTR_ASSERT(false);
                 break;
         }
     }
@@ -144,12 +159,17 @@ Animation::~Animation()
         {
             case AVI:
             //  Avi::FinishReadFile(inFile, warnings, state);
+                POV_RTR_ASSERT(false);
                 break;
             case MOV:
                 Moov::FinishReadFile(inFile, warnings, state);
                 break;
             case MPEG:
             //  Mpeg::FinishReadFile(inFile, warnings, state);
+                POV_RTR_ASSERT(false);
+                break;
+            default:
+                POV_RTR_ASSERT(false);
                 break;
         }
     }
@@ -249,9 +269,13 @@ Image *Animation::ReadFrame(IStream *file)
     {
         case AVI:
         //  Avi::PreReadFrame(file, currentFrame, bytes, codec, readOptions, warnings, state);
+            POV_RTR_ASSERT(false);
             break;
         case MOV:
             Moov::PreReadFrame(file, currentFrame, bytes, codec, readOptions, warnings, state);
+            break;
+        default:
+            POV_RTR_ASSERT(false);
             break;
     }
 
@@ -271,6 +295,10 @@ Image *Animation::ReadFrame(IStream *file)
         case MPEG1Codec:
         case MPEG2Codec:
         //  image = Mpeg::ReadFrame(file, currentFrame, codec, readOptions, warnings, state);
+            POV_RTR_ASSERT(false);
+            break;
+        default:
+            POV_RTR_ASSERT(false);
             break;
     }
 
@@ -285,9 +313,13 @@ Image *Animation::ReadFrame(IStream *file)
     {
         case AVI:
         //  Avi::PostReadFrame(file, currentFrame, bytes, codec, readOptions, warnings, state);
+            POV_RTR_ASSERT(false);
             break;
         case MOV:
             Moov::PostReadFrame(file, currentFrame, bytes, codec, readOptions, warnings, state);
+            break;
+        default:
+            POV_RTR_ASSERT(false);
             break;
     }
 
@@ -308,9 +340,13 @@ POV_LONG Animation::WriteFrame(OStream *file, const Image *image)
     {
         case AVI:
         //  Avi::PreWriteFrame(file, writeOptions, warnings, state);
+            POV_RTR_ASSERT(false);
             break;
         case MOV:
             Moov::PreWriteFrame(file, writeOptions, warnings, state);
+            break;
+        default:
+            POV_RTR_ASSERT(false);
             break;
     }
 
@@ -326,10 +362,15 @@ POV_LONG Animation::WriteFrame(OStream *file, const Image *image)
             break;
         case JPEGCodec:
             // TODO FIXME Jpeg::Write(file, image, options);
+            POV_RTR_ASSERT(false);
             break;
         case MPEG1Codec:
         case MPEG2Codec:
         //  Mpeg::WriteFrame(file, image, codec, writeOptions, warnings, state);
+            POV_RTR_ASSERT(false);
+            break;
+        default:
+            POV_RTR_ASSERT(false);
             break;
     }
 
@@ -339,9 +380,13 @@ POV_LONG Animation::WriteFrame(OStream *file, const Image *image)
     {
         case AVI:
         //  Avi::PostWriteFrame(file, bytes, writeOptions, warnings, state);
+            POV_RTR_ASSERT(false);
             break;
         case MOV:
             Moov::PostWriteFrame(file, bytes, writeOptions, warnings, state);
+            break;
+        default:
+            POV_RTR_ASSERT(false);
             break;
     }
 

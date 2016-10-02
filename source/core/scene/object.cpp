@@ -830,6 +830,12 @@ ObjectBase::~ObjectBase()
 }
 
 
+double ObjectBase::GetPotential (const Vector3d& p, bool subtractThreshold, TraceThreadData *threaddata) const
+{
+    POV_ASSERT (false);
+    return 0.0;
+}
+
 /*****************************************************************************
 *
 * FUNCTION

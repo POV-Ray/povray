@@ -37,6 +37,7 @@
 #include "base/pov_err.h"
 
 // C++ variants of standard C header files
+#include <cstdio>
 #include <cstring>
 
 // this must be the last file included

@@ -112,8 +112,6 @@ using std::tr1::const_pointer_cast;
 
 #define ReturnAddress()           NULL
 
-#include "../vfeconf.h"
-
 #if defined(__MINGW32__)                    /* MinGW GCC */
   #error Currently not supported.
   #include "syspovconfig_mingw32.h"
@@ -142,14 +140,6 @@ using std::tr1::const_pointer_cast;
 #endif
 #ifndef MIN
   #define MIN(a,b) ((a>b)?b:a)
-#endif
-
-#ifndef HEAPSHRINK
-  #define HEAPSHRINK
-#endif
-
-#ifndef NAN
-  #define NAN (10E100)
 #endif
 
 #ifndef __GENDEFS
@@ -217,9 +207,9 @@ namespace pov_base
 
 #define ALTMAIN
 #define LITTLE_ENDIAN
-#define FILENAME_SEPARATOR                  '\\'
-#define POV_FILE_SEPARATOR                  '\\'
-#define POV_FILE_SEPARATOR_2                '/'
+#define POV_PATH_SEPARATOR                  '\\'
+#define POV_PATH_SEPARATOR_2                '/'
+#define POV_SLASH_IS_SWITCH_CHARACTER       1 // allow forward slash as a switch character (even despite its use as a path separator!)
 #define DEFAULT_OUTPUT_FORMAT               kPOVList_FileType_PNG
 #define POV_IS1                             ".bmp"
 #define POV_IS2                             ".BMP"

@@ -49,10 +49,6 @@
 #include "backend/control/messagefactory.h"
 #include "backend/scene/backendscenedata.h"
 
-#ifdef USE_SYSPROTO
-#include "syspovprotobase.h"
-#endif
-
 // this must be the last file included
 #include "base/povdebug.h"
 
@@ -161,7 +157,7 @@ void Task::TaskThread(const boost::function0<void>& completion)
         return;
     }
 
-    POV_SYS_THREAD_STARTUP
+    Initialize();
 
     Timer tasktime;
 
@@ -247,12 +243,31 @@ void Task::TaskThread(const boost::function0<void>& completion)
     timer = NULL;
     done = true;
 
-    POV_SYS_THREAD_CLEANUP
+    Cleanup();
 
     (void)POVMS_CloseContext(povmsContext);
 
     completion();
 }
+
+
+#if POV_USE_DEFAULT_TASK_INITIALIZE
+
+void Task::Initialize ()
+{
+    // TODO
+}
+
+#endif // POV_USE_DEFAULT_TASK_INITIALIZE
+
+#if POV_USE_DEFAULT_TASK_CLEANUP
+
+void Task::Cleanup ()
+{
+    // TODO
+}
+
+#endif // POV_USE_DEFAULT_TASK_CLEANUP
 
 
 SceneTask::SceneTask(ThreadData *td, const boost::function1<void, Exception&>& f, const char* sn, shared_ptr<BackendSceneData> sd, RenderBackend::ViewId vid) :

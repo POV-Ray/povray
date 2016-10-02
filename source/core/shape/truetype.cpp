@@ -379,7 +379,7 @@ SHORT readSHORT(IStream *infile, int line, const char *file)
 
     // We go on by testing for a set signed bit, which in 2's complement format indicates that
     // the actual value we're looking for is the unsigned interpretation minus 2^N.
-    if (u | INTEGER16_SIGN_MASK)
+    if (u & INTEGER16_SIGN_MASK)
         // To compute that value, we first discard the sign bit (which is equivalent to subtracting
         // 2^(N-1)), then add -2^(N-1). Finally we cram the result into the target type.
         return (SHORT(u ^ INTEGER16_SIGN_MASK)) + SIGNED16_MIN;
@@ -409,7 +409,7 @@ LONG readLONG(IStream *infile, int line, const char *file)
 
     // We go on by testing for a set signed bit, which in 2's complement format indicates that
     // the actual value we're looking for is the unsigned interpretation minus 2^N.
-    if (u | INTEGER32_SIGN_MASK)
+    if (u & INTEGER32_SIGN_MASK)
         // To compute that value, we first discard the sign bit (which is equivalent to subtracting
         // 2^(N-1)), then add -2^(N-1). Finally we cram the result into the target type.
         return (LONG(u ^ INTEGER32_SIGN_MASK)) + SIGNED32_MIN;

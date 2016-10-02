@@ -1,4 +1,5 @@
-# Coding Styleguide {#styleguide}
+@page styleguide  Coding Styleguide
+
 
 C++ code can be written in a lot of different ways, and every code author has their personal preferences. However, in
 a project like POV-Ray with multiple contributors, we feel that a consistent coding style will help a lot to find your
@@ -10,7 +11,7 @@ The following covers the rules we deem sufficiently important for everyone to re
 @subpage styleguide2 for the boring stuff.
 
 
-Role Models {#styleguide_rlm}
+Role Models
 ===========
 
 If, rather than read a prose styleguide for the POV-Ray project, you prefer to see examples, we suggest to look
@@ -20,7 +21,7 @@ primarily at the following files:
   - `source/backend/pattern/pattern.h` and `.../pattern.cpp`
 
 
-Language Standard {#styleguide_lng}
+Language Standard
 =================
 
 POV-Ray is being developed with portability high in mind. In practice and at present, this means:
@@ -35,7 +36,8 @@ POV-Ray is being developed with portability high in mind. In practice and at pre
   - Use of smart pointers compatible with ISO-IEC DTR 19768 (aka TR1) is explicitly encouraged;
     however, instead of directly including the TR1 headers, `<boost/tr1/memory.hpp>` should be
     included for compatibility with environments that do not support TR1 out of the box.
-    @todo   Maybe we only want a subset of the smart pointers.
+    @todo
+        Maybe we only want a subset of the smart pointers.
 
   - While POV-Ray does require boost, we want to keep dependence on it to a minimum. The following are currently
     considered fair game:
@@ -43,10 +45,11 @@ POV-Ray is being developed with portability high in mind. In practice and at pre
       - Threads.
       - Datetime.
       .
-    @todo   Make an inventory of what boost libraries we're actually using.
+    @todo
+        Make an inventory of what boost libraries we're actually using.
 
 
-Code Formatting {#styleguide_fmt}
+Code Formatting
 ===============
 
 Even pure cosmetics can have a significant impact on how easily code can be read and understood.
@@ -122,7 +125,7 @@ transitioning existing code to these coventions:
         }
 
 
-Naming Conventions {#styleguide_nam}
+Naming Conventions
 ==================
 
 Due to the age of the code, its C legacy, and the large number of contributors from early on, naming conventions in the
@@ -156,7 +159,7 @@ Parameter and variable names might carry one or more additional prefixes. These 
   - Name collisions with identifiers in an outer scope ("shadowing") should be avoided.
 
 
-Function and Method Signatures {#styleguide_sig}
+Function and Method Signatures
 ==============================
 
 @note
@@ -207,7 +210,7 @@ Function and Method Signatures {#styleguide_sig}
     indicate success.
 
 
-Data Members {#styleguide_par}
+Data Members
 ============
 
   - Data members should generally be grouped by type, rather than functionality. The main reason for this is to keep the
@@ -248,7 +251,7 @@ Data Members {#styleguide_par}
   - Boolean data should be stored in `bool:1` bit fields.
 
 
-Choice of Data Types {#styleguide_typ}
+Choice of Data Types
 ====================
 
   - `long long int` should be avoided, as it may potentially be of excessive size for the job. Use @ref POV_LONG or
@@ -267,7 +270,7 @@ Choice of Data Types {#styleguide_typ}
     should be chosen to be as straightforward as possible, e.g. use `bool enableFoo`, **not** `bool disableFoo`.
 
 
-Include Files {#styleguide_inc}
+Include Files
 =============
 
   - Header files should generally be included in the following order:
@@ -295,7 +298,7 @@ Include Files {#styleguide_inc}
     file.
 
 
-Miscellaneous Coding Rules {#styleguide_msc}
+Miscellaneous Coding Rules
 ==========================
 
   - **Unions**: They're evil. Use polymorphism instead, unless you have an exceptionally strong reason for it. Make sure
@@ -331,7 +334,7 @@ Miscellaneous Coding Rules {#styleguide_msc}
   - **Assignments in Conditions**: Avoid assignments in conditional statements.
 
 
-Code Documentation {#styleguide_doc}
+Code Documentation
 ==================
 
 In order to help contributors find their way around the code, all relevant information -- from
@@ -339,7 +342,7 @@ software architecture to interfaces to implementation -- should be documented li
 standardized manner.
 
 
-Implementation Documentation {#styleguide_doc_imp}
+Implementation Documentation
 ----------------------------
 
 The POV-Ray project follows the idea that, as far as implementation goes, the source code itself is
@@ -347,31 +350,33 @@ the most precise -- and therefore best -- documentation. However, wherever it is
 obvious how the code works, or why this particular implementation was chosen, liberally pepper the
 source code with comments.
 
-@note   Known bugs or limitations of an implementation should be placed in the interface
-        documentation.
+@note
+    Known bugs or limitations of an implementation should be placed in the interface
+    documentation.
 
 
-Interface Documentation {#styleguide_doc_int}
+Interface Documentation
 -----------------------
 
 The interface provided by any source file should be documented in the respective header file, using
-a format compatible with Doxygen 1.8.8. For consistency, please use JavaDoc-style comments (`/// ...`
+a format compatible with Doxygen 1.8.12. For consistency, please use JavaDoc-style comments (`/// ...`
 or `/** ... */`; the general rules for comments apply) and JavaDoc-style tags (`@``foo`).
 C++ single-line style comments should be preferred, as block comments may occasionally interfere with
 Doxygen's Markdown support.
 
-@note   Platform-specific modules may mandate a different tag style, such as (hypothetically) DocXML
-        style for the Windows GUI modules.
+@note
+    Platform-specific modules may mandate a different tag style, such as (hypothetically) DocXML
+    style for the Windows GUI modules.
 
 
-Other Documentation {#styleguide_doc_msc}
+Other Documentation
 -------------------
 
 Any other information relevant for developers that is not specific to a particular source file
 should be documented in Doxygen 1.8-compatible markdown files named `source-doc/foo.md`.
 
 
-Notes and Warnings {#styleguide_doc_naw}
+Notes and Warnings
 ------------------
 
 Doxygen provides various tags to draw attention to a particular paragraph. To help you choose between these, use the
@@ -391,7 +396,7 @@ However, always use the following instead if they are appropriate:
     compatibility and should no longer be used in new code.
 
 
-Images {#styleguide_doc_img}
+Images
 ------
 
 Images should be used sparingly, as they are more difficult to keep up to date with source code
@@ -402,7 +407,7 @@ placed in a directory named `source-doc/foo/`. Same goes for images referenced f
 `source-doc/foo.md`.
 
 
-Doxygen Extensions {#styleguide_doc_dox}
+Doxygen Extensions
 ------------------
 
 Some Doxygen syntax features require particular Doxygen configuration settings, or even external
@@ -420,8 +425,8 @@ tools. The following can be freely used:
   - **LaTeX formulae**: Please use doxygen's `@``f$` / `@``f[` / `@``f{` tag format for any non-trivial formulae.
 
 
-Legacy Coding Style {#styleguide_leg}
--------------------
+Legacy Coding Style
+===================
 
 Sometimes you may run across legacy code that violates the above rules. The following should give
 you an idea of how to proceed:

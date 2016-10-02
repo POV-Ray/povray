@@ -1,11 +1,8 @@
 //******************************************************************************
 ///
-/// @file windows/povconfig/syspovconfigbackend.h
+/// @file platform/windows/syspovtask.h
 ///
-/// Windows-specific POV-Ray backend compile-time configuration.
-///
-/// This header file configures aspects of POV-Ray's backend module for running
-/// properly on a Windows platform.
+/// Windows-specific declarations related to the @ref Task class.
 ///
 /// @copyright
 /// @parblock
@@ -36,13 +33,18 @@
 ///
 //******************************************************************************
 
-#ifndef POVRAY_WINDOWS_SYSPOVCONFIGBACKEND_H
-#define POVRAY_WINDOWS_SYSPOVCONFIGBACKEND_H
+#ifndef POVRAY_WINDOWS_SYSPOVTASK_H
+#define POVRAY_WINDOWS_SYSPOVTASK_H
 
-#include "syspovconfig.h"
+#include "backend/configbackend.h"
 
-// On the Windows platform, we're doing some special mojo at thread startup.
-#define POV_USE_DEFAULT_TASK_INITIALIZE 0
-#define POV_USE_DEFAULT_TASK_CLEANUP    0
+#include "backend/support/task.h"
 
-#endif // POVRAY_WINDOWS_SYSPOVCONFIGBACKEND_H
+namespace pov
+{
+
+// Currently there are no Windows-specific declarations.
+
+}
+
+#endif // POVRAY_WINDOWS_SYSPOVTASK_H

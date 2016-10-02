@@ -50,6 +50,7 @@
 #include "povms/povmsid.h"
 
 #include "base/path.h"
+#include "base/platformbase.h"
 #include "base/stringutilities.h"
 #include "base/textstreambuffer.h"
 #include "base/types.h"
@@ -806,7 +807,7 @@ void RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::HandleRenderMessag
             if(vhi->second.data.imageBackup != NULL)
             {
                 vhi->second.data.imageBackup.reset();
-                POV_UCS2_REMOVE(vhi->second.data.imageBackupFile().c_str());
+                PlatformBase::GetInstance().DeleteLocalFile (vhi->second.data.imageBackupFile().c_str());
             }
         }
         else if(ident == kPOVMsgIdent_Failed)

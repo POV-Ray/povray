@@ -1,7 +1,7 @@
-# Compiler Requirements {#compiler}
+@page compiler  Compiler Requirements
 
 
-General Presumptions {#compiler_exot}
+General Presumptions
 ====================
 
 While POV-Ray is being developed with portability high in mind, the C++ standard allows for some degrees of freedom that
@@ -28,7 +28,7 @@ contemporary versions of POV-Ray anyway:
   - **Integer Size**: The `int` data type is presumed to be at least 32 bits wide.
 
 
-POVMS Additional Restrictions {#compiler_povms}
+POVMS Additional Restrictions
 =============================
 
 To support network rendering (a feature not yet implemented but planned) in a heterogenous network, the POVMS interface

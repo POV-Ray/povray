@@ -33,14 +33,13 @@
 ///
 //******************************************************************************
 
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
+#include "parser/parser.h"
+
 #include <cstdlib>
 #include <cctype>
 
 #include <boost/date_time/posix_time/posix_time.hpp>
-
-// configparser.h must always be the first POV file included in the parser (pulls in platform config)
-#include "parser/configparser.h"
-#include "parser/parser.h"
 
 #include "pov_mem.h" // TODO
 
@@ -817,7 +816,7 @@ UCS2 *Parser::String_Literal_To_UCS2(const char *str, bool pathname)
             // Historically, escape sequences were ignored when parsing for a filename.
             // As of POV-Ray 3.71, this has been changed.
 
-#if (FILENAME_SEPARATOR == '\\')
+#if POV_BACKSLASH_IS_PATH_SEPARATOR
             if (pathname)
             {
                 Warning("Backslash encountered while parsing for a filename."
@@ -888,7 +887,7 @@ UCS2 *Parser::String_Literal_To_UCS2(const char *str, bool pathname)
                 // Historically, escape sequences were ignored when parsing for a filename.
                 // As of POV-Ray 3.71, this has been changed.
 
-#if (FILENAME_SEPARATOR == '\\')
+#if POV_BACKSLASH_IS_PATH_SEPARATOR
                 Warning("Backslash encountered while parsing for a filename."
                         " In legacy (pre-3.71) scenes, this is NOT interpreted as the start of an escape sequence."
                         " However, for future compatibility it is recommended to use a forward slash as path separator instead.");

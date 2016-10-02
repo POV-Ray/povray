@@ -739,7 +739,6 @@ void NormalBlendMap::Post(bool dontScaleBumps)
         if (dontScaleBumps)
             i->Vals->Flags |= DONT_SCALE_BUMPS_FLAG;
         Post_Tnormal(i->Vals);
-        break;
     }
 }
 

@@ -362,7 +362,6 @@
     <ClCompile Include="..\..\vfe\vfepovms.cpp" />
     <ClCompile Include="..\..\vfe\vfesession.cpp" />
     <ClCompile Include="..\..\vfe\win\cpuinfo.cpp" />
-    <ClCompile Include="..\..\vfe\win\platformbase.cpp" />
     <ClCompile Include="..\..\vfe\win\vfeplatform.cpp" />
     <ClCompile Include="..\..\vfe\vfeprecomp.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -377,7 +376,6 @@
     <ClInclude Include="..\..\vfe\vfeconf.h" />
     <ClInclude Include="..\..\vfe\vfepovms.h" />
     <ClInclude Include="..\..\vfe\vfesession.h" />
-    <ClInclude Include="..\..\vfe\syspovdebug.h" />
     <ClInclude Include="..\..\vfe\win\syspovimage.h" />
     <ClInclude Include="..\..\vfe\win\vfeplatform.h" />
     <ClInclude Include="..\..\vfe\vfeprecomp.h" />

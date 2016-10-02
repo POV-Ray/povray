@@ -36,8 +36,7 @@
 ///
 //******************************************************************************
 
-// configparser.h must always be the first POV file included in the parser (pulls in platform config)
-#include "parser/configparser.h"
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "parser/parser.h"
 
 #include "core/material/pigment.h"
@@ -151,16 +150,16 @@ FUNCTION_PTR Parser::Parse_FunctionContent(void)
 
 FUNCTION_PTR Parser::Parse_FunctionOrContent(void)
 {
-    EXPECT
+    FUNCTION_PTR result;
+    EXPECT_ONE
         CASE(FUNCTION_TOKEN)
-            return Parse_Function();
-            EXIT
+            result = Parse_Function();
         END_CASE
         OTHERWISE
-            return Parse_FunctionContent();
-            EXIT
+            result = Parse_FunctionContent();
         END_CASE
     END_EXPECT
+    return result;
 }
 
 

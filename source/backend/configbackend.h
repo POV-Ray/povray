@@ -86,14 +86,6 @@
     #define SCANF_EOF EOF
 #endif
 
-#ifndef POV_SYS_THREAD_STARTUP
-    #define POV_SYS_THREAD_STARTUP
-#endif
-
-#ifndef POV_SYS_THREAD_CLEANUP
-    #define POV_SYS_THREAD_CLEANUP
-#endif
-
 #ifndef NEW_LINE_STRING
     // NEW_LINE_STRING remains undefined, optimizing the code for "\n" as used internally
 #endif
@@ -103,8 +95,24 @@
     #define COMPILER_VER ".u"
 #endif
 
-#ifndef POV_PARSE_PATH_STRING
-    #error "A valid POV_PARSE_PATH_STRING macro is required!"
+/// @def POV_USE_DEFAULT_TASK_INITIALIZE
+/// Whether to use a default implementation for task thread initialization.
+///
+/// Define as non-zero to use a default implementation for the @ref Task::Initialize() method, or zero if the
+/// platform provides its own implementation.
+///
+#ifndef POV_USE_DEFAULT_TASK_INITIALIZE
+    #define POV_USE_DEFAULT_TASK_INITIALIZE 1
+#endif
+
+/// @def POV_USE_DEFAULT_TASK_CLEANUP
+/// Whether to use a default implementation for task thread cleanup.
+///
+/// Define as non-zero to use a default implementation for the @ref Task::Cleanup() method, or zero if the
+/// platform provides its own implementation.
+///
+#ifndef POV_USE_DEFAULT_TASK_CLEANUP
+    #define POV_USE_DEFAULT_TASK_CLEANUP 1
 #endif
 
 
@@ -113,14 +121,6 @@
  */
 #ifndef POV_CONVERT_TEXT_TO_UCS2
     #define POV_CONVERT_TEXT_TO_UCS2(ts, tsl, as) (NULL)
-#endif
-
-#ifndef POV_ALLOW_FILE_READ
-    #define POV_ALLOW_FILE_READ(f,t) (1)
-#endif
-
-#ifndef POV_ALLOW_FILE_WRITE
-    #define POV_ALLOW_FILE_WRITE(f,t) (1)
 #endif
 
 //******************************************************************************
@@ -137,15 +137,6 @@
 /// builds, in which case they will default to @ref POV_DEBUG unless noted otherwise.
 ///
 /// @{
-
-/// @def POV_RTR_DEBUG
-/// Enable run-time sanity checks for real-time rendering.
-///
-/// Define as non-zero integer to enable, or zero to disable.
-///
-#ifndef POV_RTR_DEBUG
-    #define POV_RTR_DEBUG POV_DEBUG
-#endif
 
 /// @def POV_TASK_DEBUG
 /// Enable run-time sanity checks for task handling.
@@ -167,16 +158,10 @@
 ///
 /// @{
 
-#if POV_RTR_DEBUG
-    #define POV_RTR_ASSERT(expr) POV_ASSERT_HARD(expr)
-#else
-    #define POV_RTR_ASSERT(expr) NO_OP
-#endif
-
 #if POV_TASK_DEBUG
     #define POV_TASK_ASSERT(expr) POV_ASSERT_HARD(expr)
 #else
-    #define POV_TASK_ASSERT(expr) NO_OP
+    #define POV_TASK_ASSERT(expr) POV_ASSERT_DISABLE(expr)
 #endif
 
 /// @def HAVE_BOOST_THREAD_ATTRIBUTES
@@ -191,7 +176,5 @@
 /// @}
 ///
 //******************************************************************************
-
-#include "syspovprotobackend.h"
 
 #endif // POVRAY_BACKEND_CONFIGBACKEND_H

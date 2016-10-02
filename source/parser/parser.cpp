@@ -33,6 +33,9 @@
 ///
 //******************************************************************************
 
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
+#include "parser/parser.h"
+
 #include <cctype>
 #include <cmath>
 #include <cstdlib>
@@ -40,10 +43,6 @@
 
 #include <boost/bind.hpp>
 #include <boost/scoped_ptr.hpp>
-
-// configparser.h must always be the first POV file included in the parser (pulls in platform config)
-#include "parser/configparser.h"
-#include "parser/parser.h"
 
 #include "base/fileutil.h"
 
@@ -76,6 +75,7 @@
 #include "core/shape/heightfield.h"
 #include "core/shape/isosurface.h"
 #include "core/shape/lathe.h"
+#include "core/shape/lemon.h"
 #include "core/shape/mesh.h"
 #include "core/shape/ovus.h"
 #include "core/shape/parametric.h"
@@ -160,7 +160,7 @@ void Parser::Run()
 {
     int         error_line = -1;
     int         error_col = -1;
-    UCS2String  error_filename(MAX_PATH, 0);
+    UCS2String  error_filename(MAX_PATH, 0); // Pre-claim some memory, so we can handle an out-of-memory error.
     POV_LONG    error_pos = -1;
 
     try
@@ -281,44 +281,53 @@ void Parser::Run()
     // Check for experimental features
     char str[512] = "";
 
-    if(mExperimentalFlags.backsideIllumination)
-        strcat(str, str [0] ? ", backside illumination" : "backside illumination");
-    if(mExperimentalFlags.functionHf)
-        strcat(str, str [0] ? ", function '.hf'" : "function '.hf'");
-    if(mExperimentalFlags.meshCamera)
-        strcat(str, str [0] ? ", mesh camera" : "mesh camera");
-    if(mExperimentalFlags.slopeAltitude)
-        strcat(str, str [0] ? ", slope pattern altitude" : "slope pattern altitude");
-    if(mExperimentalFlags.spline)
-        strcat(str, str [0] ? ", spline" : "spline");
-    if(mExperimentalFlags.subsurface)
-        strcat(str, str [0] ? ", subsurface light transport" : "subsurface light transport");
-    if(mExperimentalFlags.tiff)
-        strcat(str, str [0] ? ", TIFF image support" : "TIFF image support");
-    if(mExperimentalFlags.userDefinedCamera)
-        strcat(str, str [0] ? ", user-defined camera" : "user-defined camera");
+    vector<std::string> featureList;
+    std::string featureString;
 
-    if (str[0] != '\0')
+    if(mExperimentalFlags.backsideIllumination) featureList.push_back("backside illumination");
+    if(mExperimentalFlags.functionHf)           featureList.push_back("function '.hf'");
+    if(mExperimentalFlags.meshCamera)           featureList.push_back("mesh camera");
+    if(mExperimentalFlags.objImport)            featureList.push_back("wavefront obj import");
+    if(mExperimentalFlags.slopeAltitude)        featureList.push_back("slope pattern altitude");
+    if(mExperimentalFlags.spline)               featureList.push_back("spline");
+    if(mExperimentalFlags.subsurface)           featureList.push_back("subsurface light transport");
+    if(mExperimentalFlags.tiff)                 featureList.push_back("TIFF image support");
+    if(mExperimentalFlags.userDefinedCamera)    featureList.push_back("user-defined camera");
+
+    for (vector<std::string>::iterator i = featureList.begin(); i != featureList.end(); ++i)
+    {
+        if (!featureString.empty())
+            featureString += ", ";
+        featureString += *i;
+    }
+
+    if (!featureString.empty())
         Warning("This rendering uses the following experimental feature(s): %s.\n"
                 "The design and implementation of these features is likely to change in future\n"
                 "versions of POV-Ray. Backward compatibility with the current implementation is\n"
                 "not guaranteed.",
-                str);
+                featureString.c_str());
 
     // Check for beta features
-    str[0] = '\0';
+    featureList.clear();
+    featureString.clear();
 
-    if(mBetaFeatureFlags.videoCapture)
-        strcat(str, str [0] ? ", video capture" : "video capture");
-    if(mBetaFeatureFlags.realTimeRaytracing)
-        strcat(str, str [0] ? ", real-time raytracing render loop" : "real-time raytracing render loop");
+    if(mBetaFeatureFlags.videoCapture)          featureList.push_back("video capture");
+    if(mBetaFeatureFlags.realTimeRaytracing)    featureList.push_back("real-time raytracing render loop");
 
-    if (str[0] != '\0')
+    for (vector<std::string>::iterator i = featureList.begin(); i != featureList.end(); ++i)
+    {
+        if (!featureString.empty())
+            featureString += ", ";
+        featureString += *i;
+    }
+
+    if (!featureString.empty())
         Warning("This rendering uses the following beta-test feature(s): %s.\n"
                 "The implementation of these features is likely to change or be completely\n"
                 "removed in subsequent beta-test versions of POV-Ray. There is no guarantee\n"
                 "that they will be available in the next full release version.\n",
-                str);
+                featureString.c_str());
 
     if ((sceneData->bspMaxDepth != 0) ||
         (sceneData->bspObjectIsectCost != 0.0f) || (sceneData->bspBaseAccessCost != 0.0f) ||
@@ -2652,7 +2661,7 @@ ObjectPtr Parser::Parse_Isosurface()
         END_CASE
 
         CASE(MAX_TRACE_TOKEN)
-            Object->max_trace = (short)Parse_Float();
+            Object->max_trace = Parse_Int_With_Range (1, ISOSURFACE_MAXTRACE, "isosurface max_trace");
         END_CASE
 
         CASE(EVALUATE_TOKEN)
@@ -2672,6 +2681,10 @@ ObjectPtr Parser::Parse_Isosurface()
             Object->max_trace = ISOSURFACE_MAXTRACE;
         END_CASE
 
+        CASE (POLARITY_TOKEN)
+            Object->positivePolarity = (Parse_Float() > 0);
+        END_CASE
+
         OTHERWISE
             UNGET
             EXIT
@@ -2687,16 +2700,6 @@ ObjectPtr Parser::Parse_Isosurface()
     {
         Warning("Isosurface 'max_gradient' is not positive. Using 1.1 (default).");
         Object->max_gradient = 1.1;
-    }
-    if (Object->max_trace > ISOSURFACE_MAXTRACE)
-    {
-        Warning("Isosurface 'max_trace' exceeds maximum of %d. Using maximum.", (int)ISOSURFACE_MAXTRACE);
-        Object->max_trace = ISOSURFACE_MAXTRACE;
-    }
-    if (Object->max_trace < 1)
-    {
-        Warning("Isosurface 'max_trace' is not positive. Using 1 (default).");
-        Object->max_trace = 1;
     }
 
     Parse_Object_Mods (reinterpret_cast<ObjectPtr>(Object));
@@ -3083,6 +3086,73 @@ ObjectPtr Parser::Parse_Lathe()
     return (reinterpret_cast<ObjectPtr>(Object));
 }
 
+/*****************************************************************************
+*
+* FUNCTION
+*
+* INPUT
+*
+* OUTPUT
+*
+* RETURNS
+*
+* AUTHOR
+*
+* DESCRIPTION
+*
+* CHANGES
+*
+******************************************************************************/
+
+ObjectPtr Parser::Parse_Lemon ()
+{
+    Lemon *Object;
+    ObjectPtr ptr;
+
+    Parse_Begin ();
+
+    if ( (Object = reinterpret_cast<Lemon *>(Parse_Object_Id())) != NULL)
+        return (reinterpret_cast<ObjectPtr>(Object));
+
+    Object = new Lemon();
+
+    Parse_Vector(Object->apex);  Parse_Comma ();
+    Object->apex_radius = Parse_Float();  Parse_Comma ();
+
+    Parse_Vector(Object->base);  Parse_Comma ();
+    Object->base_radius = Parse_Float();
+
+    Parse_Comma ();
+
+    Object->inner_radius = Parse_Float();
+
+    if ((Object->apex_radius < 0)||(Object->base_radius < 0)||(Object->inner_radius < 0))
+    {
+        Error("All radii must be positive");
+    }
+
+    EXPECT
+        CASE(OPEN_TOKEN)
+            Clear_Flag(Object, CLOSED_FLAG);
+            EXIT
+        END_CASE
+
+        OTHERWISE
+            UNGET
+            EXIT
+        END_CASE
+    END_EXPECT
+
+    /* Compute run-time values for the lemon */
+    Object->Compute_Lemon_Data( messageFactory, Token.FileHandle, Token.Token_File_Pos, Token.Token_Col_No );
+
+    Object->Compute_BBox();
+    ptr = reinterpret_cast<ObjectPtr>(Object);
+
+    Parse_Object_Mods(ptr);
+
+    return (ptr);
+}
 
 
 /*****************************************************************************
@@ -3631,6 +3701,55 @@ ObjectPtr Parser::Parse_Light_Source ()
 
 ObjectPtr Parser::Parse_Mesh()
 {
+    Mesh *Object;
+
+    Parse_Begin();
+
+    if ((Object = reinterpret_cast<Mesh *>(Parse_Object_Id())) != NULL)
+        return (reinterpret_cast<ObjectPtr>(Object));
+
+    /* Create object. */
+
+    Object = new Mesh();
+
+    EXPECT_ONE
+
+        CASE4 (VERTEX_VECTORS_TOKEN, NORMAL_VECTORS_TOKEN, UV_VECTORS_TOKEN, TEXTURE_LIST_TOKEN)
+        // the following are currently not expected by mesh2 right away, but that may change in the future
+        CASE3 (FACE_INDICES_TOKEN, UV_INDICES_TOKEN, NORMAL_INDICES_TOKEN)
+            UNGET
+            Parse_Mesh2 (Object);
+        END_CASE
+
+        CASE (OBJ_TOKEN)
+            mExperimentalFlags.objImport = true;
+            Parse_Obj (Object);
+        END_CASE
+
+        OTHERWISE
+            UNGET
+            Parse_Mesh1 (Object);
+        END_CASE
+
+    END_EXPECT
+
+    // Create bounding box.
+
+    Object->Compute_BBox();
+
+    // Parse object modifiers.
+
+    Parse_Object_Mods (reinterpret_cast<ObjectPtr>(Object));
+
+    // Create bounding box tree.
+
+    Object->Build_Mesh_BBox_Tree();
+
+    return Object;
+}
+
+void Parser::Parse_Mesh1 (Mesh* Object)
+{
     /* NK 1998 - added all sorts of uv variables*/
     int i;
     int number_of_normals, number_of_textures, number_of_triangles, number_of_vertices, number_of_uvcoords;
@@ -3641,7 +3760,6 @@ ObjectPtr Parser::Parse_Mesh()
     MeshVector *Normals, *Vertices;
     TextureData *Textures;
     MeshUVVector *UVCoords;
-    Mesh *Object;
     MESH_TRIANGLE *Triangles;
     bool fully_textured=true;
     /* NK 1998 */
@@ -3650,15 +3768,6 @@ ObjectPtr Parser::Parse_Mesh()
     bool foundZeroNormal=false;
 
     Inside_Vect = Vector3d(0.0, 0.0, 0.0);
-
-    Parse_Begin();
-
-    if ((Object = reinterpret_cast<Mesh *>(Parse_Object_Id())) != NULL)
-        return (reinterpret_cast<ObjectPtr>(Object));
-
-    /* Create object. */
-
-    Object = new Mesh();
 
     /* Allocate temporary normals, textures, triangles and vertices. */
 
@@ -4026,20 +4135,6 @@ ObjectPtr Parser::Parse_Mesh()
         Object->Data->Number_Of_Triangles,
         Object->Data->Number_Of_UVCoords);
 */
-
-    /* Create bounding box. */
-
-    Object->Compute_BBox();
-
-    /* Parse object modifiers. */
-
-    Parse_Object_Mods(reinterpret_cast<ObjectPtr>(Object));
-
-    /* Create bounding box tree. */
-
-    Object->Build_Mesh_BBox_Tree();
-
-    return (reinterpret_cast<ObjectPtr>(Object));
 }
 
 /*****************************************************************************
@@ -4069,7 +4164,38 @@ ObjectPtr Parser::Parse_Mesh()
 *   Feb 1998 : Creation.
 *
 ******************************************************************************/
+
 ObjectPtr Parser::Parse_Mesh2()
+{
+    Mesh *Object;
+
+    Parse_Begin();
+
+    if ((Object = reinterpret_cast<Mesh *>(Parse_Object_Id())) != NULL)
+        return (reinterpret_cast<ObjectPtr>(Object));
+
+    /* Create object. */
+
+    Object = new Mesh();
+
+    Parse_Mesh2 (Object);
+
+    // Create bounding box.
+
+    Object->Compute_BBox();
+
+    // Parse object modifiers.
+
+    Parse_Object_Mods (reinterpret_cast<ObjectPtr>(Object));
+
+    // Create bounding box tree.
+
+    Object->Build_Mesh_BBox_Tree();
+
+    return Object;
+}
+
+void Parser::Parse_Mesh2 (Mesh* Object)
 {
     int i;
     int number_of_normals, number_of_textures, number_of_triangles, number_of_vertices, number_of_uvcoords;
@@ -4090,18 +4216,9 @@ ObjectPtr Parser::Parse_Mesh2()
     MeshVector *Vertices = NULL;
     TextureData *Textures = NULL;
     MeshUVVector *UVCoords = NULL;
-    Mesh *Object;
     MESH_TRIANGLE *Triangles;
 
     Inside_Vect = Vector3d(0.0, 0.0, 0.0);
-
-    Parse_Begin();
-
-    if ((Object = reinterpret_cast<Mesh *>(Parse_Object_Id())) != NULL)
-        return(reinterpret_cast<ObjectPtr>(Object));
-
-    /* Create object. */
-    Object = new Mesh();
 
     /* normals, uvcoords, and textures are optional */
     number_of_vertices = 0;
@@ -4623,15 +4740,6 @@ ObjectPtr Parser::Parse_Mesh2()
         Set_Flag(Object, MULTITEXTURE_FLAG);
     }
 
-    /* Create bounding box. */
-    Object->Compute_BBox();
-
-    /* Parse object modifiers. */
-    Parse_Object_Mods(reinterpret_cast<ObjectPtr>(Object));
-
-    /* Create bounding box tree. */
-    Object->Build_Mesh_BBox_Tree();
-
 /*
     Render_Info("Mesh2: %ld bytes: %ld vertices, %ld normals, %ld textures, %ld triangles, %ld uv-coords\n",
         Object->Data->Number_Of_Normals*sizeof(MeshVector)+
@@ -4645,8 +4753,6 @@ ObjectPtr Parser::Parse_Mesh2()
         Object->Data->Number_Of_Triangles,
         Object->Data->Number_Of_UVCoords);
 */
-
-    return(reinterpret_cast<ObjectPtr>(Object));
 }
 
 
@@ -6545,6 +6651,11 @@ ObjectPtr Parser::Parse_Object ()
             EXIT
         END_CASE
 
+        CASE (LEMON_TOKEN)
+            Object = Parse_Lemon();
+            EXIT
+        END_CASE
+
         /* Parse polygon primitive. [DB 8/94] */
 
         CASE (POLYGON_TOKEN)
@@ -7896,6 +8007,8 @@ ObjectPtr Parser::Parse_Object_Mods (ObjectPtr Object)
 
         /* Get bounding boxes' volumes. */
 
+        // TODO - Area is probably a better measure to decide which box is better.
+        // TODO - Doesn't this mechanism prevent users from reliably overriding broken default boxes?
         BOUNDS_VOLUME(V1, BBox);
         BOUNDS_VOLUME(V2, Object->BBox);
 
@@ -7934,6 +8047,7 @@ ObjectPtr Parser::Parse_Object_Mods (ObjectPtr Object)
 
         /* Get bounding boxes' volumes. */
 
+        // TODO - Area is probably a better measure to decide which box is better.
         BOUNDS_VOLUME(V1, BBox);
         BOUNDS_VOLUME(V2, Object->BBox);
 
@@ -8172,7 +8286,7 @@ void Parser::Parse_Bound_Clip(vector<ObjectPtr>& dest, bool notexture)
     while((Current = Parse_Object()) != NULL)
     {
         if((notexture == true) && (Current->Type & (TEXTURED_OBJECT+PATCH_OBJECT)))
-            Error ("Illegal texture or patch in clip, bound or object pattern.");
+            Error ("Illegal texture or patch in clip, bound, object or potential pattern.");
         objects.push_back(Current);
     }
 
@@ -8544,7 +8658,8 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
 
         EXPECT_ONE
             CASE (IDENTIFIER_TOKEN)
-                allow_redefine = !Token.is_array_elem;
+                POV_PARSER_ASSERT(!Token.is_array_elem);
+                allow_redefine = true; // should actually be irrelevant downstream, thanks to Previous==IDENTIFIER_TOKEN
                 Temp_Entry = Add_Symbol (Local_Index,Token.Token_String,IDENTIFIER_TOKEN);
                 numberPtr = &(Temp_Entry->Token_Number);
                 dataPtr = &(Temp_Entry->Data);
@@ -8570,9 +8685,10 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
             END_CASE
 
             CASE2 (FUNCT_ID_TOKEN, VECTFUNCT_ID_TOKEN)
+                // Issue an error, _except_ when assigning to a still-empty element of a function array.
                 if((!Token.is_array_elem) || (*(Token.DataPtr) != NULL))
                     Error("Redeclaring functions is not allowed - #undef the function first!");
-                // fall through
+                // FALLTHROUGH
 
             // These are also used in Parse_Directive UNDEF_TOKEN section, Parse_Macro, and and Parse_For_Param_Start,
             // and all these functions should accept exactly the same identifiers! [trf]
@@ -8583,9 +8699,11 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
             CASE4 (DENSITY_MAP_ID_TOKEN, ARRAY_ID_TOKEN, DENSITY_ID_TOKEN, UV_ID_TOKEN)
             CASE4 (VECTOR_4D_ID_TOKEN, RAINBOW_ID_TOKEN, FOG_ID_TOKEN, SKYSPHERE_ID_TOKEN)
             CASE2 (MATERIAL_ID_TOKEN, SPLINE_ID_TOKEN )
-                allow_redefine  = !Token.is_array_elem;
                 if (is_local && (Token.Table_Index != Table_Index))
                 {
+                    if (Token.is_array_elem)
+                        Error("Cannot use '#local' to assign a non-local array element.");
+                    allow_redefine = true; // should actually be irrelevant downstream, thanks to Previous==IDENTIFIER_TOKEN
                     Temp_Entry = Add_Symbol (Local_Index,Token.Token_String,IDENTIFIER_TOKEN);
                     numberPtr = &(Temp_Entry->Token_Number);
                     dataPtr   = &(Temp_Entry->Data);
@@ -8593,6 +8711,7 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
                 }
                 else
                 {
+                    allow_redefine = !Token.is_array_elem;
                     numberPtr = Token.NumberPtr;
                     dataPtr   = Token.DataPtr;
                     Previous  = Token.Token_Id;
@@ -8600,30 +8719,35 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
             END_CASE
 
             CASE (EMPTY_ARRAY_TOKEN)
-                allow_redefine  = !Token.is_array_elem;
+                POV_PARSER_ASSERT(Token.is_array_elem);
+                allow_redefine = true; // should actually be irrelevant downstream, thanks to Previous==EMPTY_ARRAY_TOKEN
                 numberPtr = Token.NumberPtr;
                 dataPtr   = Token.DataPtr;
                 Previous  = Token.Token_Id;
             END_CASE
 
             CASE2 (VECTOR_FUNCT_TOKEN, FLOAT_FUNCT_TOKEN)
-                allow_redefine  = !Token.is_array_elem;
                 switch(Token.Function_Id)
                 {
                     case VECTOR_ID_TOKEN:
                     case FLOAT_ID_TOKEN:
                         if (is_local && (Token.Table_Index != Table_Index))
                         {
+                            if (Token.is_array_elem)
+                                Error("Cannot use '#local' to assign a non-local array element.");
+                            allow_redefine = true; // should actually be irrelevant downstream, thanks to Previous==IDENTIFIER_TOKEN
                             Temp_Entry = Add_Symbol (Local_Index,Token.Token_String,IDENTIFIER_TOKEN);
                             numberPtr = &(Temp_Entry->Token_Number);
                             dataPtr   = &(Temp_Entry->Data);
+                            Previous  = IDENTIFIER_TOKEN;
                         }
                         else
                         {
+                            allow_redefine  = !Token.is_array_elem;
                             numberPtr = Token.NumberPtr;
                             dataPtr   = Token.DataPtr;
+                            Previous  = Token.Function_Id;
                         }
-                        Previous  = Token.Function_Id;
                         break;
 
                     default:
@@ -8639,7 +8763,7 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
                     // in which case we evaluate the corresponding expression element but ignore
                     // the resulting value.
                     // We do this by assigning the resulting value to a dummy symbol entry.
-                    allow_redefine  = true;
+                    allow_redefine = true; // should actually be irrelevant downstream, thanks to Previous=IDENTIFIER_TOKEN
                     Temp_Entry = Create_Entry (0, "", DUMMY_SYMBOL_TOKEN);
                     numberPtr = &(Temp_Entry->Token_Number);
                     dataPtr = &(Temp_Entry->Data);
