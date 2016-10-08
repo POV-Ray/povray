@@ -505,6 +505,14 @@ SimpleGammaCurvePtr Parser::Parse_Gamma (void)
             gamma = SRGBGammaCurve::Get();
             EXIT
         END_CASE
+        CASE (BT709_TOKEN)
+            gamma = BT709GammaCurve::Get();
+            EXIT
+        END_CASE
+        CASE (BT2020_TOKEN)
+            gamma = BT2020GammaCurve::Get();
+            EXIT
+        END_CASE
         OTHERWISE
         {
             UNGET
@@ -5310,7 +5318,12 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
             EXIT
         END_CASE
 
-        // TODO VERIFY - TILING_TOKEN is not accepted, is that ok?
+        CASE (TILING_TOKEN)
+            New->Type = TILING_PATTERN;
+            New->pattern = PatternPtr(new TilingPattern());
+            dynamic_cast<TilingPattern*>(New->pattern.get())->tilingType = (unsigned char)Parse_Float();
+            EXIT
+        END_CASE
 
         CASE (POTENTIAL_TOKEN)
         {
@@ -5325,6 +5338,18 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
             New->pattern = PatternPtr(new PotentialPattern());
             dynamic_cast<PotentialPattern*>(New->pattern.get())->pObject = tempObjects[0];
             Parse_End();
+
+            EXPECT
+                CASE (THRESHOLD_TOKEN)
+                    dynamic_cast<PotentialPattern*>(New->pattern.get())->subtractThreshold = Parse_Bool();
+                END_CASE
+
+                OTHERWISE
+                    UNGET
+                    EXIT
+                END_CASE
+            END_EXPECT
+
             EXIT
         }
         END_CASE

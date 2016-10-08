@@ -43,7 +43,7 @@
 #include <boost/thread/xtime.hpp>
 #endif
 
-#if !POV_USE_DEFAULT_TIMER
+#if !POV_USE_DEFAULT_TIMER || (POV_MULTITHREADED && !POV_USE_DEFAULT_DELAY)
 #include "syspovtimer.h"
 #endif
 

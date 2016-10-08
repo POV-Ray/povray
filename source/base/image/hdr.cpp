@@ -132,7 +132,7 @@ void ReadOldLine(unsigned char *scanline, int width, IStream *file)
 
         // NB EOF won't be set at this point even if the last read obtained the
         // final byte in the file (we need to read another byte for that to happen).
-        if(*file == false)
+        if(!*file)
             throw POV_EXCEPTION(kFileDataErr, "Invalid HDR file (unexpected EOF)");
 
         if(!file->Read_Byte(b))

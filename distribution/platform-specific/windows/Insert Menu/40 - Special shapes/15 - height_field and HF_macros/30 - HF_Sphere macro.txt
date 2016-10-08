@@ -1,4 +1,6 @@
- // ----------------- HF_Sphere macro ----------------------
+//----------------------------------------------------------
+#include "shapes.inc"
+// ----------------- HF_Sphere macro -----------------------
 #declare Fn_1 =
  function(x, y, z)
   {1+f_snoise3d(x*7,y*7,z*7)*0.75 }
@@ -23,5 +25,5 @@ object{ HF_Sphere( Fn_1, //Function,
   scale<1,1,1>*1
   rotate<0,0,0>
   translate<0,0.00,0>
-} // end of HF_Sphere -------------------------------------- 
+} // end of HF_Sphere --------------------------------------
 
