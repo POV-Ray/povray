@@ -280,7 +280,7 @@ inline static POV_UINT16 ReadNetpbmRasterValue (IStream *file, NetpbmDataFormat 
     if (lo == EOF)
         throw POV_EXCEPTION(kFileDataErr, "Unexpected end of file in Netpbm (PGM/PPM) file");
 
-    return (POV_UINT16(hi) << 8) + POV_UINT16(lo);
+    return (static_cast<POV_UINT16>(hi) << 8) + static_cast<POV_UINT16>(lo);
 }
 
 /*****************************************************************************/
