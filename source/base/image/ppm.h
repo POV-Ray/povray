@@ -2,7 +2,7 @@
 ///
 /// @file base/image/ppm.h
 ///
-/// Declarations related to NetPBM Portable Pixmap/Graymap (PPM/PGM) image
+/// Declarations related to Netpbm Portable Pixmap/Graymap (PPM/PGM) image
 /// file handling.
 ///
 /// @copyright
@@ -46,8 +46,7 @@
 namespace pov_base
 {
 
-
-namespace Ppm
+namespace Netpbm
 {
 
 void Write(OStream *file, const Image *image, const Image::WriteOptions& options);

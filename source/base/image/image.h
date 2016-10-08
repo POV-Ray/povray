@@ -104,6 +104,22 @@ class Image
             RGBFTColourMap
         };
 
+        enum ImageChannelDataType
+        {
+            kImageChannelDataType_Int8,
+            kImageChannelDataType_Int16,
+            kImageChannelDataType_Gamma8,
+            kImageChannelDataType_Gamma16,
+        };
+
+        enum ImageChannelLayout
+        {
+            kImageChannelLayout_Gray,
+            kImageChannelLayout_GrayA,
+            kImageChannelLayout_RGB,
+            kImageChannelLayout_RGBA,
+        };
+
         enum ImageDataType
         {
             /// Value used to indicate that image decoder is free to pick the most fitting type.
@@ -197,6 +213,8 @@ class Image
         };
 
         virtual ~Image() { }
+
+        static ImageDataType GetImageDataType (ImageChannelDataType channelType, ImageChannelLayout layout);
 
         static Image *Create(unsigned int w, unsigned int h, ImageDataType t, unsigned int maxRAMmbHint, unsigned int pixelsPerBlockHint);
         static Image *Create(unsigned int w, unsigned int h, ImageDataType t, bool allowFileBacking = false);
