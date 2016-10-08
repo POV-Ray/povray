@@ -2,23 +2,20 @@ env:
   global:
    # Required for clang.
    - CXXFLAGS="-fno-fast-math"
+
 branches:
   except:
   - /^v[0-9]/
 
 os:
 - linux
-# - osx
+- osx
 
 language: cpp
 
 compiler:
 - gcc
 - clang
-
-matrix:
-  allow_failures:
-  - os: osx
 
 sudo: false
 
