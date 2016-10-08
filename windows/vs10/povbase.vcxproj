@@ -376,7 +376,6 @@
       <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Release|x64'">SyncCThrow</ExceptionHandling>
     </ClCompile>
     <ClCompile Include="..\..\source\base\image\openexr.cpp" />
-    <ClCompile Include="..\..\source\base\image\pgm.cpp" />
     <ClCompile Include="..\..\source\base\image\png.cpp">
       <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">SyncCThrow</ExceptionHandling>
       <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">SyncCThrow</ExceptionHandling>
@@ -429,7 +428,6 @@
     <ClInclude Include="..\..\source\base\image\jpeg_pov.h" />
     <ClInclude Include="..\..\source\base\image\metadata.h" />
     <ClInclude Include="..\..\source\base\image\openexr.h" />
-    <ClInclude Include="..\..\source\base\image\pgm.h" />
     <ClInclude Include="..\..\source\base\image\png_pov.h" />
     <ClInclude Include="..\..\source\base\image\ppm.h" />
     <ClInclude Include="..\..\source\base\image\targa.h" />
