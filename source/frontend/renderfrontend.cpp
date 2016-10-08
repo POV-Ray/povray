@@ -1147,6 +1147,12 @@ void OutputOptions(POVMS_Object& cppmsg, TextStreamBuffer *tsb)
             case kPOVList_GammaType_SRGB:
                 tsb->printf("  Graphic display......On  (gamma: sRGB)\n");
                 break;
+            case kPOVList_GammaType_BT709:
+                tsb->printf("  Graphic display......On  (gamma: ITU-R BT.709)\n");
+                break;
+            case kPOVList_GammaType_BT2020:
+                tsb->printf("  Graphic display......On  (gamma: ITU-R BT.2020)\n");
+                break;
             default:
                 throw POV_EXCEPTION_STRING("Unknown gamma mode in OutputOptions()");
         }

@@ -505,6 +505,14 @@ SimpleGammaCurvePtr Parser::Parse_Gamma (void)
             gamma = SRGBGammaCurve::Get();
             EXIT
         END_CASE
+        CASE (BT709_TOKEN)
+            gamma = BT709GammaCurve::Get();
+            EXIT
+        END_CASE
+        CASE (BT2020_TOKEN)
+            gamma = BT2020GammaCurve::Get();
+            EXIT
+        END_CASE
         OTHERWISE
         {
             UNGET

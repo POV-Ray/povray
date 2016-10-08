@@ -1086,11 +1086,13 @@ struct ProcessRenderOptions::Output_FileType_Table FileTypeTable[] =
 struct ProcessRenderOptions::Parameter_Code_Table GammaTypeTable[] =
 {
 
-    // code,    internalId,
-    { "SRGB",   kPOVList_GammaType_SRGB },
+    // code,        internalId,
+    { "BT709",      kPOVList_GammaType_BT709 },
+    { "BT2020",     kPOVList_GammaType_BT2020 },
+    { "SRGB",       kPOVList_GammaType_SRGB },
 
     // end-of-list marker
-    { NULL,     0 }
+    { NULL,         0 }
 };
 
 /* Supported dither types */

@@ -122,6 +122,8 @@ const RESERVED_WORD Reserved_Words[] = {
     { BRICK_SIZE_TOKEN,             "brick_size" },
     { BRIGHTNESS_TOKEN,             "brightness" },
     { BRILLIANCE_TOKEN,             "brilliance" },
+    { BT2020_TOKEN,                 "bt2020" },
+    { BT709_TOKEN,                  "bt709" },
     { BUMP_MAP_TOKEN,               "bump_map" },
     { BUMP_SIZE_TOKEN,              "bump_size" },
     { BUMPS_TOKEN,                  "bumps" },
