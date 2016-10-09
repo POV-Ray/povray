@@ -67,6 +67,14 @@
     #endif
     #ifndef LIBJPEG_MISSING
         #include <jpeglib.h>
+        #ifndef JPEG_LIB_VERSION_MAJOR
+            #define JPEG_LIB_VERSION_MAJOR (JPEG_LIB_VERSION / 10)
+        #endif
+        #ifndef JPEG_LIB_VERSION_MINOR
+            // This is known to erroneously identify versions 8a and 8b as version 8,
+            // but we'll live with that.
+            #define JPEG_LIB_VERSION_MINOR (JPEG_LIB_VERSION % 10)
+        #endif
     #endif
     #ifndef LIBTIFF_MISSING
         extern "C"
@@ -400,7 +408,9 @@ void BuildInitInfo(POVMSObjectPtr msg)
         err = POVMSAttr_New(&attr);
         if(err == kNoErr)
         {
-            const char *tempstr = pov_tsprintf("LibJPEG %i.%i, Copyright 1991-2016 Thomas G. Lane, Guido Vollbeding", JPEG_LIB_VERSION_MAJOR, JPEG_LIB_VERSION_MINOR);
+            const char minorStr[2] = { JPEG_LIB_VERSION_MINOR ? 'a'+JPEG_LIB_VERSION_MINOR-1 : '\0', '\0' };
+            const char *tempstr = pov_tsprintf("LibJPEG %i%s, Copyright 1991-2016 Thomas G. Lane, Guido Vollbeding",
+                                               JPEG_LIB_VERSION_MAJOR, minorStr);
 
             err = POVMSAttr_Set(&attr, kPOVMSType_CString, reinterpret_cast<const void *>(tempstr), (int) strlen(tempstr) + 1);
             if(err == kNoErr)
