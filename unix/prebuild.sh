@@ -588,7 +588,7 @@ EXTRA_DIST = \\
 
 # Additional files to clean with 'make distclean'.
 DISTCLEANFILES = \$(top_builddir)/povray.ini
-CONFIG_CLEAN_FILES = \$(top_builddir)/source/jversion.h
+CONFIG_CLEAN_FILES = 
 
 # Render a test scene for 'make check'.
 # This is meant to run before 'make install'.
@@ -620,7 +620,6 @@ dist-hook:
 	rm -f    \`find \$(distdir) -name "*.h.in~"\`
 	rm -f -r \`find \$(distdir) -name autom4te.cache\`
 	rm -f -r \`find \$(distdir) -name .libs\`
-	rm -f    \$(distdir)/source/jversion.h
 
 # Manage various data files for 'make install'.
 # Creates an install.log file to record created folders and files.

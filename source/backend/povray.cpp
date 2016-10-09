@@ -66,7 +66,7 @@
         #include <png.h>
     #endif
     #ifndef LIBJPEG_MISSING
-        #include <jversion.h>
+        #include <jpeglib.h>
     #endif
     #ifndef LIBTIFF_MISSING
         extern "C"
@@ -400,10 +400,7 @@ void BuildInitInfo(POVMSObjectPtr msg)
         err = POVMSAttr_New(&attr);
         if(err == kNoErr)
         {
-            ExtractLibraryVersion(JVERSION, buffer);
-
-            // TODO FIXME - shouldn't we use the JCOPYRIGHT string instead of hard-coding it here?
-            const char *tempstr = pov_tsprintf("LibJPEG %s, Copyright 1991-2013 Thomas G. Lane, Guido Vollbeding", buffer);
+            const char *tempstr = pov_tsprintf("LibJPEG %i.%i, Copyright 1991-2016 Thomas G. Lane, Guido Vollbeding", JPEG_LIB_VERSION_MAJOR, JPEG_LIB_VERSION_MINOR);
 
             err = POVMSAttr_Set(&attr, kPOVMSType_CString, reinterpret_cast<const void *>(tempstr), (int) strlen(tempstr) + 1);
             if(err == kNoErr)
