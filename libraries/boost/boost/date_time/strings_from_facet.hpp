@@ -6,7 +6,7 @@
  * Boost Software License, Version 1.0. (See accompanying
  * file LICENSE_1_0.txt or http://www.boost.org/LICENSE_1_0.txt)
  * Author: Jeff Garland
- * $Date: 2009-02-01 06:29:43 -0500 (Sun, 01 Feb 2009) $
+ * $Date$
  */
 
 #include <sstream>
@@ -35,7 +35,6 @@ gather_month_strings(const std::locale& locale, bool short_strings=true)
 {
   typedef std::basic_string<charT> string_type;
   typedef std::vector<string_type> collection_type;
-  typedef std::basic_ostringstream<charT> ostream_type;
   typedef std::ostreambuf_iterator<charT> ostream_iter_type;
   typedef std::basic_ostringstream<charT> stringstream_type;
   typedef std::time_put<charT>           time_put_facet_type;
@@ -50,8 +49,9 @@ gather_month_strings(const std::locale& locale, bool short_strings=true)
     //grab the needed strings by using the locale to
     //output each month
     const charT* p_outfmt = outfmt.c_str(), *p_outfmt_end = p_outfmt + outfmt.size();
+    tm tm_value;
+    memset(&tm_value, 0, sizeof(tm_value));
     for (int m=0; m < 12; m++) {
-      tm tm_value;
       tm_value.tm_mon = m;
       stringstream_type ss;
       ostream_iter_type oitr(ss);
@@ -85,7 +85,6 @@ gather_weekday_strings(const std::locale& locale, bool short_strings=true)
 {
   typedef std::basic_string<charT> string_type;
   typedef std::vector<string_type> collection_type;
-  typedef std::basic_ostringstream<charT> ostream_type;
   typedef std::ostreambuf_iterator<charT> ostream_iter_type;
   typedef std::basic_ostringstream<charT> stringstream_type;
   typedef std::time_put<charT>           time_put_facet_type;
@@ -103,8 +102,9 @@ gather_weekday_strings(const std::locale& locale, bool short_strings=true)
     //grab the needed strings by using the locale to
     //output each month / weekday
     const charT* p_outfmt = outfmt.c_str(), *p_outfmt_end = p_outfmt + outfmt.size();
+    tm tm_value;
+    memset(&tm_value, 0, sizeof(tm_value));
     for (int i=0; i < 7; i++) {
-      tm tm_value;
       tm_value.tm_wday = i;
       stringstream_type ss;
       ostream_iter_type oitr(ss);

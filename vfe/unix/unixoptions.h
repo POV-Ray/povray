@@ -68,8 +68,6 @@ using boost::to_lower_copy;
 
 namespace vfePlatform
 {
-	using namespace std;
-
 	/**
 		@brief Processing system for options in povray.conf, command line and environment variables.
 

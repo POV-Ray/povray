@@ -108,7 +108,6 @@
     <ClCompile Include="..\..\source\base\animation\moov.cpp">
       <Filter>Base source\Animation</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\precomp.cpp" />
     <ClCompile Include="..\..\source\base\font\crystal.cpp">
       <Filter>Base source\Font</Filter>
     </ClCompile>
@@ -120,6 +119,9 @@
     </ClCompile>
     <ClCompile Include="..\..\source\base\font\timrom.cpp">
       <Filter>Base source\Font</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\base\precomp.cpp">
+      <Filter>Base source</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -222,7 +224,6 @@
     <ClInclude Include="..\..\source\base\animation\moov.h">
       <Filter>Base Headers\Animation</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\precomp.h" />
     <ClInclude Include="..\..\source\base\safemath.h">
       <Filter>Base Headers</Filter>
     </ClInclude>
@@ -237,6 +238,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\base\font\timrom.h">
       <Filter>Base Headers\Font</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\base\precomp.h">
+      <Filter>Base Headers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -192,7 +192,7 @@ void Task::TaskThread(const boost::function0<void>& completion)
 			failed = kUncategorizedError;
 		}
 	}
-	catch(bad_alloc&)
+	catch(std::bad_alloc&)
 	{
 		// can't raise a new exception object here as the alloc will probably fail
 #if 0

@@ -642,8 +642,8 @@ void MediaFunction::ComputeMediaLightInterval(LightSourceEntryVector& lights, Li
 			s0.push_back(i->s0);
 			s1.push_back(i->s1);
 		}
-		sort(s0.begin(), s0.end());
-		sort(s1.begin(), s1.end());
+		std::sort(s0.begin(), s0.end());
+		std::sort(s1.begin(), s1.end());
 
 		if (s0[0] > 0.0)
 			litintervals.push_back(LitInterval(false, 0.0, s0[0], 0, lights.size() - 1));
@@ -671,7 +671,7 @@ void MediaFunction::ComputeMediaLightInterval(LightSourceEntryVector& lights, Li
 		// l[i].s <= l[i + 1].s
 		// Where i is the index and s is the start of the interval
 		// lit by the light source in the array l.
-		sort(lights.begin(), lights.end());
+		std::sort(lights.begin(), lights.end());
 
 		LightSourceIntersectionVector lsie;
 
@@ -681,7 +681,7 @@ void MediaFunction::ComputeMediaLightInterval(LightSourceEntryVector& lights, Li
 			lsie.push_back(LightSourceIntersectionEntry(lights[i].s1, i, false));
 		}
 
-		sort(lsie.begin(), lsie.end());
+		std::sort(lsie.begin(), lsie.end());
 
 		// TODO - Everything below this line can be merged such that no LitIntervals are needed
 		// because ComputeMediaLightInterval just iterates over this LitIntervals with ++ and

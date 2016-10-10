@@ -26,11 +26,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/vfe/unix/vfeplatform.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/vfe/unix/vfeplatform.h $
+ * $Revision: #12 $
+ * $Change: 6132 $
+ * $DateTime: 2013/11/25 14:23:41 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #ifndef __VFEPLATFORM_H__
@@ -91,7 +91,7 @@ namespace vfePlatform
 			virtual ShelloutProcessing *CreateShelloutProcessing(POVMS_Object& opts, const string& scene, uint width, uint height)
 				{ return new UnixShelloutProcessing(opts, scene, width, height); }
 
-			boost::shared_ptr<UnixOptionsProcessor> GetUnixOptions(void) { return m_OptionsProc; }
+			shared_ptr<UnixOptionsProcessor> GetUnixOptions(void) { return m_OptionsProc; }
 
 		protected:
 			virtual void WorkerThreadStartup();
@@ -117,7 +117,7 @@ namespace vfePlatform
 			mutable POV_LONG m_TimestampOffset;
 
 			// platform specific configuration options
-			boost::shared_ptr<UnixOptionsProcessor> m_OptionsProc;
+			shared_ptr<UnixOptionsProcessor> m_OptionsProc;
 	} ;
 
 	///////////////////////////////////////////////////////////////////////

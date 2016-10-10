@@ -120,7 +120,7 @@ bool BSPTree::operator()(const Ray& ray, Intersect& isect, Mailbox& mailbox, dou
 
 			// decide which child to descend into
 			if((rayorigin[axis] > plane) || ((rdist == 0.0f) && (raydir[axis] < 0)))
-				swap(ileft, iright);
+				std::swap(ileft, iright);
 
 			// determine which child is next
 			if((rdist < 0.0f) || (rdist > rexit))

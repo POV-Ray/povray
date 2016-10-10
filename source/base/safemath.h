@@ -46,19 +46,19 @@ template<typename T, typename T1, typename T2, typename T3, typename T4>
 static inline T SafeUnsignedProduct(T1 p1, T2 p2, T3 p3, T4 p4)
 {
 	// the function is intended for use with unisgned integer parameters only
-	// (NB: Instead of testing for (pN >= 0) we could also test for (!numeric_limits<TN>::is_signed),
+	// (NB: Instead of testing for (pN >= 0) we could also test for (!std::numeric_limits<TN>::is_signed),
 	//  but this would make passing constant factors more cumbersome)
-	assert (numeric_limits<T>::is_integer);
-	assert (numeric_limits<T1>::is_integer && (p1 >= 0));
-	assert (numeric_limits<T2>::is_integer && (p2 >= 0));
-	assert (numeric_limits<T3>::is_integer && (p3 >= 0));
-	assert (numeric_limits<T4>::is_integer && (p4 >= 0));
+	assert (std::numeric_limits<T>::is_integer);
+	assert (std::numeric_limits<T1>::is_integer && (p1 >= 0));
+	assert (std::numeric_limits<T2>::is_integer && (p2 >= 0));
+	assert (std::numeric_limits<T3>::is_integer && (p3 >= 0));
+	assert (std::numeric_limits<T4>::is_integer && (p4 >= 0));
 
 	// avoid divide-by-zero issues
 	if ((p1==0) || (p2==0) || (p3==0) || (p4==0))
 		return 0;
 
-	if ( (((numeric_limits<T>::max() / p4) / p3) / p2) < p1 )
+	if ( (((std::numeric_limits<T>::max() / p4) / p3) / p2) < p1 )
 		throw POV_EXCEPTION_CODE(kNumericalLimitErr);
 
 	return T(p1) * T(p2) * T(p3) * T(p4);
@@ -86,41 +86,41 @@ template<typename T>
 static inline T SafeSignedProduct(T p1, T p2, T p3 = 1, T p4 = 1)
 {
 	// the function is intended for use with signed integer types only
-	assert (numeric_limits<T>::is_integer);
-	assert (numeric_limits<T>::is_signed);
+	assert (std::numeric_limits<T>::is_integer);
+	assert (std::numeric_limits<T>::is_signed);
 
 	// avoid divide-by-zero issues
 	if ((p1==0) || (p2==0) || (p3==0) || (p4==0))
 		return 0;
 
-	if (numeric_limits<T>::min() + numeric_limits<T>::max() == 0)
+	if (std::numeric_limits<T>::min() + std::numeric_limits<T>::max() == 0)
 	{
 		// integer representation appears to be sign-and-magnitude or one's complement; at any rate,
 		// abs(pN) is guaranteed to be a safe operation, and so is x/abs(pN) (as we've made sure that
 		// pN are all nonzero), and |::min()|==|::max()| is also guaranteed, i.e. the limits in the positive
 		// and negative domain are equally stringent.
-		if ( (((numeric_limits<T>::max() / abs(p4)) / abs(p3)) / abs(p2)) < abs(p1) )
+		if ( (((std::numeric_limits<T>::max() / abs(p4)) / abs(p3)) / abs(p2)) < abs(p1) )
 			throw POV_EXCEPTION_CODE(kNumericalLimitErr);
 	}
-	else if (numeric_limits<T>::min() + numeric_limits<T>::max() < 0)
+	else if (std::numeric_limits<T>::min() + std::numeric_limits<T>::max() < 0)
 	{
 		// integer representation appears to be two's complement; at any rate, abs(pN) is a potentially
 		// unsafe operation, while -x is a safe operation for positive x; |::max()| > |::min()| is guaranteed,
 		// i.e. the limits in the positive domain are more stringent than those in the negative one.
 
 		// specifically handle situations in which abs(pN) would overflow
-		// NB we're deliberately not testing for pN == numeric_limits<T>::min(), in order to make the test robust
+		// NB we're deliberately not testing for pN == std::numeric_limits<T>::min(), in order to make the test robust
 		// against exotic integer representations
-		if ((p1 < -numeric_limits<T>::max()) ||
-			(p2 < -numeric_limits<T>::max()) ||
-			(p3 < -numeric_limits<T>::max()) ||
-			(p4 < -numeric_limits<T>::max()))
+		if ((p1 < -std::numeric_limits<T>::max()) ||
+			(p2 < -std::numeric_limits<T>::max()) ||
+			(p3 < -std::numeric_limits<T>::max()) ||
+			(p4 < -std::numeric_limits<T>::max()))
 			throw POV_EXCEPTION_CODE(kNumericalLimitErr);
 
 		// we've made sure that abs(pN) is a safe operation, and hence also x/abs(pN) (as we've also made sure that
 		// all pN are nonzero); we also know that whatever is safe in the positive domain is also safe in the
 		// negative domain
-		if ( (((numeric_limits<T>::max() / abs(p4)) / abs(p3)) / abs(p2)) < abs(p1) )
+		if ( (((std::numeric_limits<T>::max() / abs(p4)) / abs(p3)) / abs(p2)) < abs(p1) )
 			throw POV_EXCEPTION_CODE(kNumericalLimitErr);
 	}
 	else
@@ -131,7 +131,7 @@ static inline T SafeSignedProduct(T p1, T p2, T p3 = 1, T p4 = 1)
 		// with abs(pN) a safe operation and having made sure all pN are non-zero, x/abs(pN) is guaranteed to be a safe
 		// operation as well; we also know that whatever is safe in the negative domain is also safe in the
 		// positive domain
-		if ( (((abs(numeric_limits<T>::min()) / abs(p4)) / abs(p3)) / abs(p2)) < abs(p1) )
+		if ( (((abs(std::numeric_limits<T>::min()) / abs(p4)) / abs(p3)) / abs(p2)) < abs(p1) )
 			throw POV_EXCEPTION_CODE(kNumericalLimitErr);
 	}
 

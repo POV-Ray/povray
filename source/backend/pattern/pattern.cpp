@@ -2575,7 +2575,7 @@ static DBL tiling_penrose_halfdart (DBL pX, DBL pZ, int depth, bool rhombs);
 static DBL tiling_penrose_halfkite (DBL pX, DBL pZ, int depth, bool rhombs)
 {
 	DBL x = pX;
-	DBL z = abs(pZ);
+	DBL z = fabs(pZ);
 
 	if (depth > 0)
 	{
@@ -2596,21 +2596,21 @@ static DBL tiling_penrose_halfkite (DBL pX, DBL pZ, int depth, bool rhombs)
 	{
 		if (z < (x - INVPHI) * TAN72)
 		{
-			DBL dist1 = abs( SIN72  * (x-INVPHI) - COS72  * z ) * 5.55; // TODO FIXME - the factor is just an empiric value
-			DBL dist2 = abs( SIN108 * (x-1)      - COS108 * z ) * 5.55;
+			DBL dist1 = fabs( SIN72  * (x-INVPHI) - COS72  * z ) * 5.55; // TODO FIXME - the factor is just an empiric value
+			DBL dist2 = fabs( SIN108 * (x-1)      - COS108 * z ) * 5.55;
 			return max3(1.0-dist1/2,1.0-dist2/2,0.5+TILING_EPSILON);
 		}
 		else
 		{
-			DBL dist1 = abs( z )                              * 5.55; // TODO FIXME - the factor is just an empiric value
-			DBL dist2 = abs( SIN72 * (x-INVPHI) - COS72 * z ) * 5.55;
+			DBL dist1 = fabs( z )                              * 5.55; // TODO FIXME - the factor is just an empiric value
+			DBL dist2 = fabs( SIN72 * (x-INVPHI) - COS72 * z ) * 5.55;
 			return min(max3(0.5-dist1/2,0.5-dist2/2,0.0),0.5-TILING_EPSILON);
 		}
 	}
 	else
 	{
-		DBL dist1 = abs( SIN36  *  x    - COS36  * z ) * 4.46; // TODO FIXME - the factor is just an empiric value
-		DBL dist2 = abs( SIN108 * (x-1) - COS108 * z ) * 4.46;
+		DBL dist1 = fabs( SIN36  *  x    - COS36  * z ) * 4.46; // TODO FIXME - the factor is just an empiric value
+		DBL dist2 = fabs( SIN108 * (x-1) - COS108 * z ) * 4.46;
 		return min(max3(0.5-dist1/2,0.5-dist2/2,0.0),0.5-TILING_EPSILON);
 	}
 }
@@ -2618,7 +2618,7 @@ static DBL tiling_penrose_halfkite (DBL pX, DBL pZ, int depth, bool rhombs)
 static DBL tiling_penrose_halfdart (DBL pX, DBL pZ, int depth, bool rhombs)
 {
 	DBL x = pX;
-	DBL z = abs(pZ);
+	DBL z = fabs(pZ);
 
 	if (depth > 0)
 	{
@@ -2638,14 +2638,14 @@ static DBL tiling_penrose_halfdart (DBL pX, DBL pZ, int depth, bool rhombs)
 	}
 	else if (rhombs)
 	{
-		DBL dist1 = abs( SIN36  *  x    - COS36  * z ) * 5.55; // TODO FIXME - the factor is just an empiric value
-		DBL dist2 = abs( SIN144 * (x-1) - COS144 * z ) * 5.55;
+		DBL dist1 = fabs( SIN36  *  x    - COS36  * z ) * 5.55; // TODO FIXME - the factor is just an empiric value
+		DBL dist2 = fabs( SIN144 * (x-1) - COS144 * z ) * 5.55;
 		return min(max3(0.5-dist1/2,0.5-dist2/2,0.0),0.5-TILING_EPSILON);
 	}
 	else
 	{
-		DBL dist1 = abs( z )                           * 4.46; // TODO FIXME - the factor is just an empiric value
-		DBL dist2 = abs( SIN144 * (x-1) - COS144 * z ) * 4.46;
+		DBL dist1 = fabs( z )                           * 4.46; // TODO FIXME - the factor is just an empiric value
+		DBL dist2 = fabs( SIN144 * (x-1) - COS144 * z ) * 4.46;
 		return max3(1.0-dist1/2,1.0-dist2/2,0.5+TILING_EPSILON);
 	}
 }
@@ -2669,7 +2669,7 @@ static DBL tiling_penrose (const VECTOR EPoint, bool rhombs, bool centerFlag)
 		return 1.0;
 
 	// exploit trivial mirror symmetry
-	z = abs(z);
+	z = fabs(z);
 
 	// exploit rotational & mirror symmetry
 	if (x < r * COS36)
@@ -2689,8 +2689,8 @@ static DBL tiling_penrose (const VECTOR EPoint, bool rhombs, bool centerFlag)
 		DBL rotX = x*rotCos + z*rotSin;
 		DBL rotZ = z*rotCos - x*rotSin;
 
-		x =     rotX;
-		z = abs(rotZ);
+		x =      rotX;
+		z = fabs(rotZ);
 	}
 
 	if (rhombs)
@@ -2699,7 +2699,7 @@ static DBL tiling_penrose (const VECTOR EPoint, bool rhombs, bool centerFlag)
 		z *= INVPHI;
 	}
 
-	DBL dist = abs( SIN108 * x - COS108 * z ) / COS18;
+	DBL dist = fabs( SIN108 * x - COS108 * z ) / COS18;
 
 	int depth = max(0, (int)ceil(log(dist)/log(SQRPHI)));
 
@@ -2711,7 +2711,7 @@ static DBL tiling_penrose (const VECTOR EPoint, bool rhombs, bool centerFlag)
 		DBL rotX = x*COS36 + z*SIN36;
 		DBL rotZ = z*COS36 - x*SIN36;
 		x = rotX;
-		z = abs(rotZ);
+		z = fabs(rotZ);
 	}
 
 	depth *= 2;
@@ -2735,7 +2735,7 @@ static DBL tiling_penrose1_diamond (DBL pX, DBL pZ, int depth, bool sideA);
 
 static void tiling_penrose1_pentagon_symmetry(DBL& x, DBL& z, DBL r)
 {
-	z = abs(z);
+	z = fabs(z);
 
 	if (x < r * COS36)
 	{
@@ -2754,8 +2754,8 @@ static void tiling_penrose1_pentagon_symmetry(DBL& x, DBL& z, DBL r)
 		DBL rotX = x*rotCos + z*rotSin;
 		DBL rotZ = z*rotCos - x*rotSin;
 
-		x =     rotX;
-		z = abs(rotZ);
+		x =      rotX;
+		z = fabs(rotZ);
 	}
 }
 
@@ -2766,13 +2766,13 @@ static void tiling_penrose1_pentagon_symmetry(DBL& x, DBL& z)
 
 static DBL tiling_penrose1_pentagon_dist (DBL pX, DBL pZ)
 {
-	return abs( pX - 0.5/TAN36 ) * 5.55 * INVPHI; // TODO FIXME - the factor is just an empiric value
+	return fabs( pX - 0.5/TAN36 ) * 5.55 * INVPHI; // TODO FIXME - the factor is just an empiric value
 }
 
 static DBL tiling_penrose1_pentagon1 (DBL pX, DBL pZ, int depth)
 {
 	DBL x = pX;
-	DBL z = abs(pZ);
+	DBL z = fabs(pZ);
 
 	tiling_penrose1_pentagon_symmetry (x, z);
 
@@ -2801,7 +2801,7 @@ static DBL tiling_penrose1_pentagon1 (DBL pX, DBL pZ, int depth)
 static DBL tiling_penrose1_pentagon2 (DBL pX, DBL pZ, int depth, bool insideQuad)
 {
 	DBL x = pX;
-	DBL z = abs(pZ);
+	DBL z = fabs(pZ);
 
 	if (depth > 0)
 	{
@@ -2850,7 +2850,7 @@ static DBL tiling_penrose1_pentagon2 (DBL pX, DBL pZ, int depth, bool insideQuad
 static DBL tiling_penrose1_pentagon3 (DBL pX, DBL pZ, int depth, bool insideWedge)
 {
 	DBL x = pX;
-	DBL z = abs(pZ);
+	DBL z = fabs(pZ);
 
 	if (depth > 0)
 	{
@@ -2889,7 +2889,7 @@ static DBL tiling_penrose1_pentagon3 (DBL pX, DBL pZ, int depth, bool insideWedg
 static DBL tiling_penrose1_star (DBL pX, DBL pZ, int depth)
 {
 	DBL x = pX;
-	DBL z = abs(pZ);
+	DBL z = fabs(pZ);
 
 	if (depth > 0)
 	{
@@ -2906,7 +2906,7 @@ static DBL tiling_penrose1_star (DBL pX, DBL pZ, int depth)
 	}
 	else
 	{
-		DBL dist = abs( SIN162 * (x - PHI*0.5/SIN36) - COS162 * z) * 5.55 * INVPHI; // TODO FIXME - the factor is just an empiric value
+		DBL dist = fabs( SIN162 * (x - PHI*0.5/SIN36) - COS162 * z) * 5.55 * INVPHI; // TODO FIXME - the factor is just an empiric value
 		return min(max(4.0/6-dist/6,3.0/6+TILING_EPSILON),4.0/6-TILING_EPSILON);
 	}
 }
@@ -2914,7 +2914,7 @@ static DBL tiling_penrose1_star (DBL pX, DBL pZ, int depth)
 static DBL tiling_penrose1_boat (DBL pX, DBL pZ, int depth, bool insideWedge)
 {
 	DBL x = pX;
-	DBL z = abs(pZ);
+	DBL z = fabs(pZ);
 
 	if (depth > 0)
 	{
@@ -2943,10 +2943,10 @@ static DBL tiling_penrose1_boat (DBL pX, DBL pZ, int depth, bool insideWedge)
 	}
 	else
 	{
-		DBL dist1 = abs( x - INVPHI*0.5*COS72/SIN36) * 5.55 * INVPHI; // TODO FIXME - the factor is just an empiric value
+		DBL dist1 = fabs( x - INVPHI*0.5*COS72/SIN36) * 5.55 * INVPHI; // TODO FIXME - the factor is just an empiric value
 		x = -x;
 		tiling_penrose1_pentagon_symmetry (x, z);
-		DBL dist2 = abs( SIN162 * (x - PHI*0.5/SIN36) - COS162 * z) * 5.55 * INVPHI; // TODO FIXME - the factor is just an empiric value
+		DBL dist2 = fabs( SIN162 * (x - PHI*0.5/SIN36) - COS162 * z) * 5.55 * INVPHI; // TODO FIXME - the factor is just an empiric value
 		return min(max3(5.0/6-dist1/6,5.0/6-dist2/6,4.0/6+TILING_EPSILON),5.0/6-TILING_EPSILON);
 	}
 }
@@ -2954,7 +2954,7 @@ static DBL tiling_penrose1_boat (DBL pX, DBL pZ, int depth, bool insideWedge)
 static DBL tiling_penrose1_diamond (DBL pX, DBL pZ, int depth, bool sideA)
 {
 	DBL x = pX;
-	DBL z = abs(pZ);
+	DBL z = fabs(pZ);
 
 	if (depth > 0)
 	{
@@ -2969,7 +2969,7 @@ static DBL tiling_penrose1_diamond (DBL pX, DBL pZ, int depth, bool sideA)
 	}
 	else
 	{
-		DBL dist = abs( SIN18 * (x + INVPHI*0.5/SIN36) - COS18 * z) * 5.55 * INVPHI; // TODO FIXME - the factor is just an empiric value
+		DBL dist = fabs( SIN18 * (x + INVPHI*0.5/SIN36) - COS18 * z) * 5.55 * INVPHI; // TODO FIXME - the factor is just an empiric value
 		return min(max(6.0/6-dist/6,5.0/6+TILING_EPSILON),6.0/6-TILING_EPSILON);
 	}
 }

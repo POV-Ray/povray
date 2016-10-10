@@ -41,8 +41,9 @@
 //	class TileDescription and enum LevelMode
 //
 //-----------------------------------------------------------------------------
+#include "ImfNamespace.h"
 
-namespace Imf {
+OPENEXR_IMF_INTERNAL_NAMESPACE_HEADER_ENTER
 
 
 enum LevelMode
@@ -68,9 +69,9 @@ class TileDescription
 {
   public:
 
-    unsigned int    xSize;          // size of a tile in the x dimension
-    unsigned int    ySize;          // size of a tile in the y dimension
-    LevelMode       mode;
+    unsigned int	xSize;		// size of a tile in the x dimension
+    unsigned int	ySize;		// size of a tile in the y dimension
+    LevelMode		mode;
     LevelRoundingMode	roundingMode;
     
     TileDescription (unsigned int xs = 32,
@@ -97,6 +98,10 @@ class TileDescription
 };
 
 
-} // namespace Imf
+OPENEXR_IMF_INTERNAL_NAMESPACE_HEADER_EXIT
+
+
+
+
 
 #endif

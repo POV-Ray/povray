@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////
 //
-// Copyright (c) 2002, Industrial Light & Magic, a division of Lucas
+// Copyright (c) 2002-2012, Industrial Light & Magic, a division of Lucas
 // Digital Ltd. LLC
 // 
 // All rights reserved.
@@ -43,10 +43,11 @@
 //
 //---------------------------------------------------------------------
 
-#include <ImathMath.h>
+#include "ImathMath.h"
+#include "ImathNamespace.h"
 #include <complex>
 
-namespace Imath {
+IMATH_INTERNAL_NAMESPACE_HEADER_ENTER
 
 //--------------------------------------------------------------------------
 // Find the real solutions of a linear, quadratic or cubic equation:
@@ -126,9 +127,10 @@ solveQuadratic (T a, T b, T c, T x[2])
 	if (D > 0)
 	{
 	    T s = Math<T>::sqrt (D);
+	    T q = -(b + (b > 0 ? 1 : -1) * s) / T(2);
 
-	    x[0] = (-b + s) / (2 * a);
-	    x[1] = (-b - s) / (2 * a);
+	    x[0] = q / a;
+	    x[1] = c / q;
 	    return 2;
 	}
 	if (D == 0)
@@ -212,7 +214,6 @@ solveCubic (T a, T b, T c, T d, T x[3])
     }
 }
 
+IMATH_INTERNAL_NAMESPACE_HEADER_EXIT
 
-} // namespace Imath
-
-#endif
+#endif // INCLUDED_IMATHROOTS_H

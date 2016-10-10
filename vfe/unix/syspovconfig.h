@@ -24,11 +24,11 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
  * ---------------------------------------------------------------------------
- * $File: //depot/public/povray/3.x/vfe/unix/syspovconfig.h $
- * $Revision: #1 $
- * $Change: 6069 $
- * $DateTime: 2013/11/06 11:59:40 $
- * $Author: chrisc $
+ * $File: //depot/povray/smp/vfe/unix/syspovconfig.h $
+ * $Revision: #17 $
+ * $Change: 6133 $
+ * $DateTime: 2013/11/25 15:28:53 $
+ * $Author: clipka $
  *******************************************************************************/
 
 #ifndef __SYSPOVCONFIG_H__
@@ -66,7 +66,7 @@ using std::min;
 #include <string>
 #include <vector>
 #include <list>
-#include <boost/shared_ptr.hpp>
+#include <boost/tr1/memory.hpp>
 
 // when we say 'string' we mean std::string
 using std::string;
@@ -81,8 +81,9 @@ using std::list;
 // to in a few other places.
 using std::runtime_error;
 
-// C++0x has a shared_ptr, but we currently use the boost one.
-using boost::shared_ptr;
+// these may actually be the boost implementations, depending on what boost/tr1/memory.hpp has pulled in
+using std::tr1::shared_ptr;
+using std::tr1::weak_ptr;
 
 #endif // STD_POV_TYPES_DECLARED
 
@@ -117,5 +118,43 @@ const int NULL=0;
 #define IMPLEMENT_THREAD_LOCAL_PTR(ptrType, ptrName, ignore)      __thread ptrType *ptrName
 #define GET_THREAD_LOCAL_PTR(ptrName)                             (ptrName)
 #define SET_THREAD_LOCAL_PTR(ptrName, ptrValue)                   (ptrName = ptrValue)
+
+#if defined(_AIX)
+    // IBM AIX detected.
+    // Not officially supported yet; comment-out the following line to try with default POSIX settings.
+    #error IBM AIX detected, but not explicitly supported yet; proceed at your own risk.
+#elif defined(__hpux)
+    // Hewlett-Packard HP-UX detected.
+    // Not officially supported yet; comment-out the following line to try with default POSIX settings.
+    #error Hewlett-Packard HP-UX detected, but not explicitly supported yet; proceed at your own risk.
+#elif defined(__linux__)
+    // GNU/Linux detected.
+#elif defined(__APPLE__) && defined(__MACH__)
+    // Apple Mac OS X detected.
+    #include <unistd.h>
+    #define lseek64(handle,offset,whence) lseek(handle,offset,whence)
+#elif defined(__sun) && defined(__SVR4)
+    // Sun/Oracle Solaris detected.
+    // Not officially supported yet; comment-out the following line to try with default POSIX settings.
+    #error Sun/Oracle Solaris detected, but not explicitly supported yet; proceed at your own risk.
+#elif defined(__CYGWIN__)
+    // Cygwin detected.
+    // Not officially supported yet; comment-out the following line to try with default POSIX settings.
+    #error Cygwin detected, but not explicitly supported yet; proceed at your own risk.
+#elif defined(__unix__)
+    // Some Unix other than the above detected.
+    #include <sys/param.h>
+    #if defined(BSD)
+        // BSD-style Unix detected.
+        #error BSD-style Unix detected, but not explicitly supported yet; proceed at your own risk.
+    #else
+        // Not officially supported yet; comment-out the following line to try with default POSIX settings.
+        #error Unix detected, but flavor not identified; proceed at your own risk.
+    #endif
+#else
+    // Doesn't look like a Unix at all.
+    // Comment-out the following line to try with default POSIX settings.
+    #error No Unix detected; proceed at your own risk.
+#endif
 
 #endif

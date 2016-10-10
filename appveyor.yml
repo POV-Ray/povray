@@ -1,0 +1,45 @@
+version: 3.7+av{build}
+pull_requests:
+  do_not_increment_build_number: true
+branches:
+  except:
+  - coverity_scan
+
+image: Visual Studio 2015
+
+shallow_clone: true
+
+matrix:
+  fast_finish: true
+
+environment:
+  matrix:
+  - configuration: Release
+    platform: x64
+    bin_dir: bin64
+    artifact_suffix: -Win64
+    PlatformToolset: v140
+  - configuration: Release-SSE2
+    platform: Win32
+    bin_dir: bin32
+    artifact_suffix: -Win32-sse2
+    PlatformToolset: v140
+  - configuration: Release
+    platform: Win32
+    bin_dir: bin32
+    artifact_suffix: -Win32
+    PlatformToolset: v140
+
+before_build:
+- ps: |
+    $env:devenv = $env:VS140COMNTOOLS + '\..\IDE\devenv'
+    & $env:devenv windows\vs10\povray.sln /upgrade
+    (Get-Content source\backend\povray.h).replace('FILL IN NAME HERE.........................', $env:pov_authorized_by) | Set-Content source\backend\povray.h
+    (Get-Content source\backend\povray.h).replace('#error Please complete the following DISTRIBUTION_MESSAGE_2 definition', '') | Set-Content source\backend\povray.h
+
+build:
+  project: windows/vs10/povray.sln
+  parallel: true
+  verbosity: minimal
+
+test: off

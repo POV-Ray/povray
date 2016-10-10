@@ -370,8 +370,8 @@ CRITICAL_SECTION        critical_section ;
 
 // key is the name of an included file (all lower case).
 // content is the name of the most recent rendered file that caused it to be included.
-map<string, string>     IncludeToSourceMap;
-map<string, bool>       IncludeAlternateDecisionMap;
+std::map<string, string> IncludeToSourceMap;
+std::map<string, bool>  IncludeAlternateDecisionMap;
 
 char                    queued_files [MAX_QUEUE] [_MAX_PATH] ;
 char                    dir [_MAX_PATH] ;
@@ -2475,8 +2475,8 @@ void render_stopped (void)
   }
 
   // update the mapping of included files to source files
-  const set<string>& rf = Session.GetReadFiles();
-  for (set<string>::const_iterator it = rf.begin(); it != rf.end(); it++)
+  const std::set<string>& rf = Session.GetReadFiles();
+  for (std::set<string>::const_iterator it = rf.begin(); it != rf.end(); it++)
   {
     if (_stricmp(it->c_str(), InputFileName.c_str()) == 0)
       continue;
@@ -2485,7 +2485,7 @@ void render_stopped (void)
       FileType ft = get_file_type(it->c_str());
       if (ft < fileFirstImageType || ft > fileLastImageType)
       {
-        pair<map<string, string>::iterator, bool> result = IncludeToSourceMap.insert(pair<string, string> (*it, InputFileName));
+        std::pair<std::map<string, string>::iterator, bool> result = IncludeToSourceMap.insert(std::pair<string, string> (*it, InputFileName));
         if (result.second == false)
           result.first->second = InputFileName;
       }
@@ -3860,12 +3860,12 @@ LRESULT CALLBACK PovMainWndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM 
            _strlwr(fn);
 
            // see if we have a previous decision recorded for this file.
-           map<string, bool>::const_iterator altit = IncludeAlternateDecisionMap.find(fn);
+           std::map<string, bool>::const_iterator altit = IncludeAlternateDecisionMap.find(fn);
            if (altit == IncludeAlternateDecisionMap.end() || altit->second == true)
            {
              // either there is no decision recorded, or the decision was 'yes'
              // in either case we need to find the alternate filename
-             map<string, string>::const_iterator it = IncludeToSourceMap.find(fn);
+             std::map<string, string>::const_iterator it = IncludeToSourceMap.find(fn);
              if (it != IncludeToSourceMap.end())
              {
                // we've found the alternate filename. do we need to ask the user about it?
@@ -3876,7 +3876,7 @@ LRESULT CALLBACK PovMainWndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM 
                  {
                    case IDYES:
                      // record the decision
-                     IncludeAlternateDecisionMap.insert(pair<string, bool>(fn, true));
+                     IncludeAlternateDecisionMap.insert(std::pair<string, bool>(fn, true));
                      strcpy(source_file_name, it->second.c_str());
                      break;
 
@@ -3887,7 +3887,7 @@ LRESULT CALLBACK PovMainWndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM 
 
                    case IDNO:
                      // record the decision
-                     IncludeAlternateDecisionMap.insert(pair<string, bool>(fn, false));
+                     IncludeAlternateDecisionMap.insert(std::pair<string, bool>(fn, false));
                      break;
 
                    case IDCANCEL:
@@ -5341,7 +5341,7 @@ int PASCAL WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
 #endif
 
   GenerateDumpMeta(false);
-  set_new_handler(newhandler) ;
+  std::set_new_handler(newhandler) ;
   SetUnhandledExceptionFilter(ExceptionHandler);
 
   // need this now to set virtual_screen_width etc., in case we display a dialog

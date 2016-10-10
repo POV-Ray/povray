@@ -12,7 +12,7 @@
 #define BOOST_STRING_FIND_FORMAT_STORE_DETAIL_HPP
 
 #include <boost/algorithm/string/config.hpp>
-#include <boost/range/iterator_range.hpp>
+#include <boost/range/iterator_range_core.hpp>
 
 namespace boost {
     namespace algorithm {
@@ -53,7 +53,7 @@ namespace boost {
                 {
                     iterator_range<ForwardIteratorT>::operator=(FindResult);
                     if( !this->empty() ) {
-                    m_FormatResult=m_Formatter(FindResult);
+                        m_FormatResult=m_Formatter(FindResult);
                     }
                     
                     return *this;

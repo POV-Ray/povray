@@ -193,7 +193,7 @@ class ViewData
 		 *  @param  bsl             Block serial numbers to skip.
 		 *  @param  fs              First block to start with checking with serial number.
 		 */
-		void SetNextRectangle(const set<unsigned int>& bsl, unsigned int fs);
+		void SetNextRectangle(const std::set<unsigned int>& bsl, unsigned int fs);
 
 		/**
 		 *  Get width of view in pixels.
@@ -308,11 +308,11 @@ class ViewData
 		/// List of blocks already rendered out-of-order.
 		/// This list holds the serial numbers of all blocks ahead of nextBlock
 		/// that have already been rendered in a previous aborted render now being continued.
-		set<unsigned int> blockSkipList;
+		std::set<unsigned int> blockSkipList;
 		/// list of blocks currently rendering
-		set<unsigned int> blockBusyList;
+		std::set<unsigned int> blockBusyList;
 		/// list of blocks postponed for some reason
-		set<unsigned int> blockPostponedList;
+		std::set<unsigned int> blockPostponedList;
 		/// list of additional block information
 		vector<BlockInfo*> blockInfoList;
 		/// area of view to be rendered
@@ -485,7 +485,7 @@ class View
 		 *  @param  bsl             Block serial numbers to skip.
 		 *  @param  fs              First block to start with checking with serial number.
 		 */
-		void SetNextRectangle(TaskQueue& taskq, shared_ptr<set<unsigned int> > bsl, unsigned int fs);
+		void SetNextRectangle(TaskQueue& taskq, shared_ptr<std::set<unsigned int> > bsl, unsigned int fs);
 
 		/**
 		 *  Thread controlling the render task queue.

@@ -82,9 +82,11 @@
   #pragma inline_depth(255)
 
   #if _MSC_VER >= 1400 && _MSC_VER < 1500 && !defined (_WIN64)
+    // MS Visual C++ 2005 (aka 8.0), compiling for 32 bit target
     #define COMPILER_VER                      ".msvc8"
     #define METADATA_COMPILER_STRING          "msvc 8"
   #elif _MSC_VER >= 1400 && _MSC_VER < 1500 && defined (_WIN64)
+    // MS Visual C++ 2005 (aka 8.0), compiling for 64 bit target
     #define COMPILER_VER                      ".msvc8"
     #define METADATA_COMPILER_STRING          "msvc 8"
     #define ALIGN16                           __declspec(align(16))
@@ -97,11 +99,20 @@
     inline const unsigned long& max(const unsigned long& _X, const unsigned long& _Y) {return (_X < _Y ? _Y : _X); }
     inline const unsigned long& min(const unsigned long& _X, const unsigned long& _Y) {return (_Y < _X ? _Y : _X); }
   #elif _MSC_VER >= 1500 && _MSC_VER < 1600
+    // MS Visual C++ 2008 (aka 9.0)
     #define COMPILER_VER                      ".msvc9"
     #define METADATA_COMPILER_STRING          "msvc 9"
   #elif _MSC_VER >= 1600 && _MSC_VER < 1700
+    // MS Visual C++ 2010 (aka 10.0)
     #define COMPILER_VER                      ".msvc10"
     #define METADATA_COMPILER_STRING          "msvc 10"
+    // msvc10 defines std::hash<> as a class, while boost's flyweight_fwd.hpp may declare it as a struct;
+    // this is valid according to the C++ standard, but causes msvc10 to issue warnings.
+    #pragma warning(disable : 4099)
+  #elif _MSC_VER >= 1900 && _MSC_VER < 2000
+    // MS Visual C++ 2015 (aka 14.0)
+    #define COMPILER_VER                      ".msvc14"
+    #define METADATA_COMPILER_STRING          "msvc 14"
   #else
     #error Please update msvc.h to include this version of MSVC
   #endif

@@ -3,7 +3,7 @@
 
 /////////1/////////2/////////3/////////4/////////5/////////6/////////7/////////8
 // MS compatible compilers support #pragma once
-#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+#if defined(_MSC_VER)
 # pragma once
 #endif
 
@@ -17,7 +17,7 @@
 // http://www.boost.org/LICENSE_1_0.txt)
 
 //  See http://www.boost.org for updates, documentation, and revision history.
-#include <cassert>
+#include <boost/assert.hpp>
 
 #include <boost/config.hpp>
 #include <boost/static_assert.hpp>
@@ -52,16 +52,16 @@ namespace no_rtti_system {
 
 // common base class to share type_info_key.  This is used to 
 // identify the method used to keep track of the extended type
-class BOOST_SERIALIZATION_DECL(BOOST_PP_EMPTY()) extended_type_info_no_rtti_0 : 
+class BOOST_SYMBOL_VISIBLE extended_type_info_no_rtti_0 :
     public extended_type_info
 {
 protected:
-    extended_type_info_no_rtti_0(const char * key);
-    ~extended_type_info_no_rtti_0();
+    BOOST_SERIALIZATION_DECL extended_type_info_no_rtti_0(const char * key);
+    BOOST_SERIALIZATION_DECL ~extended_type_info_no_rtti_0();
 public:
-    virtual bool
+    virtual BOOST_SERIALIZATION_DECL bool
     is_less_than(const boost::serialization::extended_type_info &rhs) const ;
-    virtual bool
+    virtual BOOST_SERIALIZATION_DECL bool
     is_equal(const boost::serialization::extended_type_info &rhs) const ;
 };
 
@@ -89,7 +89,7 @@ class extended_type_info_no_rtti :
         };
         static const char * invoke(){
             typedef 
-                BOOST_DEDUCED_TYPENAME boost::mpl::if_c<
+                typename boost::mpl::if_c<
                     tf,
                     defined,
                     undefined
@@ -115,7 +115,7 @@ public:
         // function. So if the is not a polymporphic type it's likely an error
         BOOST_STATIC_WARNING(boost::is_polymorphic< T >::value);
         const char * derived_key = t.get_key();
-        assert(NULL != derived_key);
+        BOOST_ASSERT(NULL != derived_key);
         return boost::serialization::extended_type_info::find(derived_key);
     }
     const char * get_key() const{
@@ -130,24 +130,24 @@ public:
         va_start(ap, count);
         switch(count){
         case 0:
-            return factory<BOOST_DEDUCED_TYPENAME boost::remove_const< T >::type, 0>(ap);
+            return factory<typename boost::remove_const< T >::type, 0>(ap);
         case 1:
-            return factory<BOOST_DEDUCED_TYPENAME boost::remove_const< T >::type, 1>(ap);
+            return factory<typename boost::remove_const< T >::type, 1>(ap);
         case 2:
-            return factory<BOOST_DEDUCED_TYPENAME boost::remove_const< T >::type, 2>(ap);
+            return factory<typename boost::remove_const< T >::type, 2>(ap);
         case 3:
-            return factory<BOOST_DEDUCED_TYPENAME boost::remove_const< T >::type, 3>(ap);
+            return factory<typename boost::remove_const< T >::type, 3>(ap);
         case 4:
-            return factory<BOOST_DEDUCED_TYPENAME boost::remove_const< T >::type, 4>(ap);
+            return factory<typename boost::remove_const< T >::type, 4>(ap);
         default:
-            assert(false); // too many arguments
+            BOOST_ASSERT(false); // too many arguments
             // throw exception here?
             return NULL;
         }
     }
     virtual void destroy(void const * const p) const{
         boost::serialization::access::destroy(
-            static_cast<T const * const>(p)
+            static_cast<T const *>(p)
         );
         //delete static_cast<T const * const>(p) ;
     }
@@ -167,7 +167,7 @@ public:
     namespace serialization {
     template<class T>
     struct extended_type_info_impl {
-        typedef BOOST_DEDUCED_TYPENAME 
+        typedef typename 
             boost::serialization::extended_type_info_no_rtti< T > type;
     };
     } // namespace serialization

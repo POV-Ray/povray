@@ -175,7 +175,7 @@ void Parser::Run()
 
 		Frame_Init ();
 
-		for(map<string, string>::const_iterator i(sceneData->declaredVariables.begin()); i != sceneData->declaredVariables.end(); i++)
+		for(std::map<string, string>::const_iterator i(sceneData->declaredVariables.begin()); i != sceneData->declaredVariables.end(); i++)
 		{
 			if(i->second.length() > 0)
 			{
@@ -227,7 +227,7 @@ void Parser::Run()
 			sceneData->lightGroupLightSources[i]->lightGroupLight = true;
 		}
 	}
-	catch(bad_alloc&)
+	catch(std::bad_alloc&)
 	{
 		try
 		{

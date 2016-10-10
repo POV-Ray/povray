@@ -68,6 +68,8 @@
 namespace povwin
 {
 
+using std::endl;
+
 extern int                                  alert_sound ;
 extern int                                  message_xchar ;
 extern int                                  message_ychar ;
@@ -663,14 +665,14 @@ void cloneOldIni(string oldPath, string newPath)
   const regex               entry("^([^=\\s]+)\\s*=.*");
   const regex               skipEntries("runcount|itsabouttime|commandline|lastinipath|secondaryinifile|version|backgroundfile|.*sound");
   const regex               copiedSections("general|editor|tipoftheday|toolbar|mainwindow|renderwindow|messages|renderer|lastrender|dontshowagain|sounds");
-  map<string, bool>         hadSection;
+  std::map<string, bool>    hadSection;
 
   line = oldPath + "ini\\pvengine.ini";
   std::ifstream inF(line.c_str());
   if (inF.bad())
     return;
   line = newPath + "ini\\pvengine.ini";
-  ofstream outF(line.c_str());
+  std::ofstream outF(line.c_str());
   if (outF.bad())
     return;
 
@@ -723,7 +725,7 @@ void cloneOldIni(string oldPath, string newPath)
   const string              skipEntries("runcount^itsabouttime^commandline^version^backgroundcolour^textcolour^"
                                         "tilebackground^bigsplash^savesettingsonexit^");
   std::ifstream             inF;
-  map<string, bool>         hadSection;
+  std::map<string, bool>    hadSection;
 
   if (oldPath != "")
   {
@@ -733,7 +735,7 @@ void cloneOldIni(string oldPath, string newPath)
       return;
   }
   line = newPath + "ini\\pvengine.ini";
-  ofstream outF(line.c_str());
+  std::ofstream outF(line.c_str());
   if (outF.bad())
   {
     if (oldPath != "")
