@@ -51,6 +51,7 @@
 // #define _CONSOLE
 
 #include <math.h>
+#include <algorithm>
 
 using std::max;
 using std::min;

@@ -370,8 +370,8 @@ CRITICAL_SECTION        critical_section ;
 
 // key is the name of an included file (all lower case).
 // content is the name of the most recent rendered file that caused it to be included.
-map<string, string>     IncludeToSourceMap;
-map<string, bool>       IncludeAlternateDecisionMap;
+std::map<string, string> IncludeToSourceMap;
+std::map<string, bool>  IncludeAlternateDecisionMap;
 
 char                    queued_files [MAX_QUEUE] [_MAX_PATH] ;
 char                    dir [_MAX_PATH] ;
@@ -2485,7 +2485,7 @@ void render_stopped (void)
       FileType ft = get_file_type(it->c_str());
       if (ft < fileFirstImageType || ft > fileLastImageType)
       {
-        pair<std::map<string, string>::iterator, bool> result = IncludeToSourceMap.insert(pair<string, string> (*it, InputFileName));
+        std::pair<std::map<string, string>::iterator, bool> result = IncludeToSourceMap.insert(std::pair<string, string> (*it, InputFileName));
         if (result.second == false)
           result.first->second = InputFileName;
       }
@@ -3876,7 +3876,7 @@ LRESULT CALLBACK PovMainWndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM 
                  {
                    case IDYES:
                      // record the decision
-                     IncludeAlternateDecisionMap.insert(pair<string, bool>(fn, true));
+                     IncludeAlternateDecisionMap.insert(std::pair<string, bool>(fn, true));
                      strcpy(source_file_name, it->second.c_str());
                      break;
 
@@ -3887,7 +3887,7 @@ LRESULT CALLBACK PovMainWndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM 
 
                    case IDNO:
                      // record the decision
-                     IncludeAlternateDecisionMap.insert(pair<string, bool>(fn, false));
+                     IncludeAlternateDecisionMap.insert(std::pair<string, bool>(fn, false));
                      break;
 
                    case IDCANCEL:
@@ -5341,7 +5341,7 @@ int PASCAL WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
 #endif
 
   GenerateDumpMeta(false);
-  set_new_handler(newhandler) ;
+  std::set_new_handler(newhandler) ;
   SetUnhandledExceptionFilter(ExceptionHandler);
 
   // need this now to set virtual_screen_width etc., in case we display a dialog
