@@ -52,6 +52,9 @@
 
 #include <math.h>
 
+using std::max;
+using std::min;
+
 #ifndef STD_TYPES_DECLARED
 #define STD_TYPES_DECLARED
 
