@@ -41,7 +41,6 @@
 
 namespace pov_frontend
 {
-	using namespace std;
 	using namespace vfe;
 	using namespace vfePlatform;
 

@@ -226,7 +226,7 @@ class RenderFrontendBase : public POVMS_MessageReceiver
 		virtual shared_ptr<Image> GetImage(ViewId) = 0;
 		virtual shared_ptr<Display> GetDisplay(ViewId) = 0;
 	protected:
-		set<POVMSAddress> backendaddresses;
+		std::set<POVMSAddress> backendaddresses;
 		POVMSContext context;
 
 		SceneId CreateScene(SceneData&, POVMSAddress, POVMS_Object&);
@@ -311,11 +311,11 @@ class RenderFrontend : public RenderFrontendBase
 		virtual void HandleImageMessage(ViewId vid, POVMSType ident, POVMS_Object& msg);
 		virtual void OutputFatalError(const string& msg, int err);
 	private:
-		map<SceneId, SceneHandler> scenehandler;
-		map<ViewId, ViewHandler> viewhandler;
+		std::map<SceneId, SceneHandler> scenehandler;
+		std::map<ViewId, ViewHandler> viewhandler;
 
-		map<SceneId, set<ViewId> > scene2views;
-		map<ViewId, SceneId> view2scene;
+		std::map<SceneId, std::set<ViewId> > scene2views;
+		std::map<ViewId, SceneId> view2scene;
 
 		void GetBackwardCompatibilityData(SceneData& sd, POVMS_Object& msg);
 };
@@ -347,7 +347,7 @@ RenderFrontendBase::SceneId RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_
 		sh.data.console = shared_ptr<Console>(fn());
 
 		scenehandler[sid] = sh;
-		scene2views[sid] = set<ViewId>();
+		scene2views[sid] = std::set<ViewId>();
 
 		scenehandler[sid].data.console->Initialise();
 
@@ -369,7 +369,7 @@ RenderFrontendBase::SceneId RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_
 template<class PARSER_MH, class FILE_MH, class RENDER_MH, class IMAGE_MH>
 void RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::CloseScene(SceneId sid)
 {
-	typename map<SceneId, SceneHandler>::iterator shi(scenehandler.find(sid));
+	typename std::map<SceneId, SceneHandler>::iterator shi(scenehandler.find(sid));
 	if(shi != scenehandler.end())
 	{
 		SceneData& data = shi->second.data;
@@ -391,7 +391,7 @@ void RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::CloseScene(SceneId
 template<class PARSER_MH, class FILE_MH, class RENDER_MH, class IMAGE_MH>
 SceneData::SceneState RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::GetSceneState(SceneId sid)
 {
-	typename map<SceneId, SceneHandler>::iterator shi(scenehandler.find(sid));
+	typename std::map<SceneId, SceneHandler>::iterator shi(scenehandler.find(sid));
 	if(shi != scenehandler.end())
 		return shi->second.data.state;
 	else
@@ -401,7 +401,7 @@ SceneData::SceneState RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::G
 template<class PARSER_MH, class FILE_MH, class RENDER_MH, class IMAGE_MH>
 void RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::StartParser(SceneId sid, POVMS_Object& obj)
 {
-	typename map<SceneId, SceneHandler>::iterator shi(scenehandler.find(sid));
+	typename std::map<SceneId, SceneHandler>::iterator shi(scenehandler.find(sid));
 	if(shi != scenehandler.end())
 	{
 		RenderFrontendBase::StartParser(shi->second.data, sid, obj);
@@ -412,7 +412,7 @@ void RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::StartParser(SceneI
 template<class PARSER_MH, class FILE_MH, class RENDER_MH, class IMAGE_MH>
 void RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::PauseParser(SceneId sid)
 {
-	typename map<SceneId, SceneHandler>::iterator shi(scenehandler.find(sid));
+	typename std::map<SceneId, SceneHandler>::iterator shi(scenehandler.find(sid));
 	if(shi != scenehandler.end())
 		RenderFrontendBase::PauseParser(shi->second.data, sid);
 }
@@ -420,7 +420,7 @@ void RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::PauseParser(SceneI
 template<class PARSER_MH, class FILE_MH, class RENDER_MH, class IMAGE_MH>
 void RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::ResumeParser(SceneId sid)
 {
-	typename map<SceneId, SceneHandler>::iterator shi(scenehandler.find(sid));
+	typename std::map<SceneId, SceneHandler>::iterator shi(scenehandler.find(sid));
 	if(shi != scenehandler.end())
 		RenderFrontendBase::ResumeParser(shi->second.data, sid);
 }
@@ -428,7 +428,7 @@ void RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::ResumeParser(Scene
 template<class PARSER_MH, class FILE_MH, class RENDER_MH, class IMAGE_MH>
 void RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::StopParser(SceneId sid)
 {
-	typename map<SceneId, SceneHandler>::iterator shi(scenehandler.find(sid));
+	typename std::map<SceneId, SceneHandler>::iterator shi(scenehandler.find(sid));
 	if(shi != scenehandler.end())
 		RenderFrontendBase::StopParser(shi->second.data, sid);
 }
@@ -436,7 +436,7 @@ void RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::StopParser(SceneId
 template<class PARSER_MH, class FILE_MH, class RENDER_MH, class IMAGE_MH>
 RenderFrontendBase::ViewId RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::CreateView(SceneId sid, POVMS_Object& obj, shared_ptr<ImageProcessing>& imageProcessing, boost::function<Display *(unsigned int,unsigned int,GammaCurvePtr)> fn)
 {
-	typename map<SceneId, SceneHandler>::iterator shi(scenehandler.find(sid));
+	typename std::map<SceneId, SceneHandler>::iterator shi(scenehandler.find(sid));
 
 	if(shi != scenehandler.end())
 	{
@@ -575,7 +575,7 @@ RenderFrontendBase::ViewId RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_M
 template<class PARSER_MH, class FILE_MH, class RENDER_MH, class IMAGE_MH>
 void RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::CloseView(ViewId vid)
 {
-	typename map<ViewId, ViewHandler>::iterator vhi(viewhandler.find(vid));
+	typename std::map<ViewId, ViewHandler>::iterator vhi(viewhandler.find(vid));
 
 	if(vhi != viewhandler.end())
 	{
@@ -588,7 +588,7 @@ void RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::CloseView(ViewId v
 		scene2views[view2scene[vid]].erase(vid);
 		if(scene2views[view2scene[vid]].empty() == true)
 		{
-			typename map<SceneId, SceneHandler>::iterator shi(scenehandler.find(view2scene[vid]));
+			typename std::map<SceneId, SceneHandler>::iterator shi(scenehandler.find(view2scene[vid]));
 			shi->second.data.state = SceneData::Scene_Ready;
 		}
 
@@ -600,7 +600,7 @@ void RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::CloseView(ViewId v
 template<class PARSER_MH, class FILE_MH, class RENDER_MH, class IMAGE_MH>
 ViewData::ViewState RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::GetViewState(ViewId vid)
 {
-	typename map<ViewId, ViewHandler>::iterator vhi(viewhandler.find(vid));
+	typename std::map<ViewId, ViewHandler>::iterator vhi(viewhandler.find(vid));
 	if(vhi != viewhandler.end())
 		return vhi->second.data.state;
 	else
@@ -612,7 +612,7 @@ void RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::StartRender(ViewId
 {
 	bool continueOK = false;
 
-	typename map<ViewId, ViewHandler>::iterator vhi(viewhandler.find(vid));
+	typename std::map<ViewId, ViewHandler>::iterator vhi(viewhandler.find(vid));
 	if(vhi != viewhandler.end())
 	{
 		Path outputpath(obj.TryGetUCS2String(kPOVAttrib_OutputPath, ""));
@@ -695,7 +695,7 @@ void RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::StartRender(ViewId
 template<class PARSER_MH, class FILE_MH, class RENDER_MH, class IMAGE_MH>
 void RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::PauseRender(ViewId vid)
 {
-	typename map<ViewId, ViewHandler>::iterator vhi(viewhandler.find(vid));
+	typename std::map<ViewId, ViewHandler>::iterator vhi(viewhandler.find(vid));
 	if(vhi != viewhandler.end())
 		RenderFrontendBase::PauseRender(vhi->second.data, vid);
 }
@@ -703,7 +703,7 @@ void RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::PauseRender(ViewId
 template<class PARSER_MH, class FILE_MH, class RENDER_MH, class IMAGE_MH>
 void RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::ResumeRender(ViewId vid)
 {
-	typename map<ViewId, ViewHandler>::iterator vhi(viewhandler.find(vid));
+	typename std::map<ViewId, ViewHandler>::iterator vhi(viewhandler.find(vid));
 	if(vhi != viewhandler.end())
 		RenderFrontendBase::ResumeRender(vhi->second.data, vid);
 }
@@ -711,7 +711,7 @@ void RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::ResumeRender(ViewI
 template<class PARSER_MH, class FILE_MH, class RENDER_MH, class IMAGE_MH>
 void RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::StopRender(ViewId vid)
 {
-	typename map<ViewId, ViewHandler>::iterator vhi(viewhandler.find(vid));
+	typename std::map<ViewId, ViewHandler>::iterator vhi(viewhandler.find(vid));
 	if(vhi != viewhandler.end())
 		RenderFrontendBase::StopRender(vhi->second.data, vid);
 }
@@ -719,7 +719,7 @@ void RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::StopRender(ViewId 
 template<class PARSER_MH, class FILE_MH, class RENDER_MH, class IMAGE_MH>
 shared_ptr<Console> RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::GetConsole(SceneId sid)
 {
-	typename map<SceneId, SceneHandler>::iterator shi(scenehandler.find(sid));
+	typename std::map<SceneId, SceneHandler>::iterator shi(scenehandler.find(sid));
 	if(shi != scenehandler.end())
 		return shi->second.data.console;
 	else
@@ -729,7 +729,7 @@ shared_ptr<Console> RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::Get
 template<class PARSER_MH, class FILE_MH, class RENDER_MH, class IMAGE_MH>
 shared_ptr<Image> RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::GetImage(ViewId vid)
 {
-	typename map<ViewId, ViewHandler>::iterator vhi(viewhandler.find(vid));
+	typename std::map<ViewId, ViewHandler>::iterator vhi(viewhandler.find(vid));
 	if(vhi != viewhandler.end())
 		return vhi->second.data.image;
 	else
@@ -739,7 +739,7 @@ shared_ptr<Image> RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::GetIm
 template<class PARSER_MH, class FILE_MH, class RENDER_MH, class IMAGE_MH>
 shared_ptr<Display> RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::GetDisplay(ViewId vid)
 {
-	typename map<ViewId, ViewHandler>::iterator vhi(viewhandler.find(vid));
+	typename std::map<ViewId, ViewHandler>::iterator vhi(viewhandler.find(vid));
 	if(vhi != viewhandler.end())
 		return vhi->second.data.display;
 	else
@@ -749,7 +749,7 @@ shared_ptr<Display> RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::Get
 template<class PARSER_MH, class FILE_MH, class RENDER_MH, class IMAGE_MH>
 void RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::HandleParserMessage(SceneId sid, POVMSType ident, POVMS_Object& msg)
 {
-	typename map<SceneId, SceneHandler>::iterator shi(scenehandler.find(sid));
+	typename std::map<SceneId, SceneHandler>::iterator shi(scenehandler.find(sid));
 	if(shi != scenehandler.end())
 	{
 		if(ident == kPOVMsgIdent_Done)
@@ -772,7 +772,7 @@ void RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::HandleParserMessag
 template<class PARSER_MH, class FILE_MH, class RENDER_MH, class IMAGE_MH>
 void RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::HandleFileMessage(SceneId sid, POVMSType ident, POVMS_Object& msg, POVMS_Object& result)
 {
-	typename map<SceneId, SceneHandler>::iterator shi(scenehandler.find(sid));
+	typename std::map<SceneId, SceneHandler>::iterator shi(scenehandler.find(sid));
 	if(shi != scenehandler.end())
 		shi->second.file.HandleMessage(shi->second.data, ident, msg, result);
 }
@@ -780,7 +780,7 @@ void RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::HandleFileMessage(
 template<class PARSER_MH, class FILE_MH, class RENDER_MH, class IMAGE_MH>
 void RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::HandleRenderMessage(ViewId vid, POVMSType ident, POVMS_Object& msg)
 {
-	typename map<ViewId, ViewHandler>::iterator vhi(viewhandler.find(vid));
+	typename std::map<ViewId, ViewHandler>::iterator vhi(viewhandler.find(vid));
 	if(vhi != viewhandler.end())
 	{
 		SceneData& sceneData(scenehandler[view2scene[vid]].data);
@@ -815,7 +815,7 @@ void RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::HandleRenderMessag
 template<class PARSER_MH, class FILE_MH, class RENDER_MH, class IMAGE_MH>
 void RenderFrontend<PARSER_MH, FILE_MH, RENDER_MH, IMAGE_MH>::HandleImageMessage(ViewId vid, POVMSType ident, POVMS_Object& msg)
 {
-	typename map<ViewId, ViewHandler>::iterator vhi(viewhandler.find(vid));
+	typename std::map<ViewId, ViewHandler>::iterator vhi(viewhandler.find(vid));
 	if(vhi != viewhandler.end())
 		vhi->second.image.HandleMessage(scenehandler[view2scene[vid]].data, vhi->second.data, ident, msg);
 }

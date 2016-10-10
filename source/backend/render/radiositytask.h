@@ -71,7 +71,7 @@ class RadiosityTask : public RenderTask
 				unsigned short pass;
 				unsigned short subBlockCountX;
 				unsigned short subBlockCountY;
-				deque<RadiositySubBlockInfo> incompleteSubBlocks;
+				std::deque<RadiositySubBlockInfo> incompleteSubBlocks;
 				float completion;
 		};
 

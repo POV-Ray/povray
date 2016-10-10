@@ -92,8 +92,8 @@ namespace vfePlatform
 
       virtual void Clear(bool Notify = true);
 
-      const set<string>& GetReadFiles(void) const { return m_ReadFiles; }
-      const set<string>& GetWriteFiles(void) const { return m_WriteFiles; }
+      const std::set<string>& GetReadFiles(void) const { return m_ReadFiles; }
+      const std::set<string>& GetWriteFiles(void) const { return m_WriteFiles; }
 
     protected:
       virtual void WorkerThreadStartup();
@@ -124,8 +124,8 @@ namespace vfePlatform
       Path m_TempPath;
       string m_TempPathString;
       mutable vector<string> m_TempFilenames;
-      mutable set<string> m_ReadFiles;
-      mutable set<string> m_WriteFiles;
+      mutable std::set<string> m_ReadFiles;
+      mutable std::set<string> m_WriteFiles;
   } ;
 
   ///////////////////////////////////////////////////////////////////////

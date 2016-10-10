@@ -241,7 +241,7 @@ class FunctionVM
 	private:
 		vector<FunctionEntry> functions;
 		FUNCTION nextUnreferenced;
-		set<FPUContext *> contexts;
+		std::set<FPUContext *> contexts;
 		vector<DBL> globals;
 		vector<DBL> consts;
 		boost::recursive_mutex contextMutex;

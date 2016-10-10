@@ -72,7 +72,7 @@ SubsurfaceInterior::PrecomputedReducedAlbedo::PrecomputedReducedAlbedo(double io
 		double diffuseReflectance = double(i)/ReducedAlbedoSamples;
 		double alphaPrime0 = 0.0;
 		double alphaPrime1 = alphaPrime;
-		while(abs(Rd-diffuseReflectance) >= EPSILON)
+		while(fabs(Rd-diffuseReflectance) >= EPSILON)
 		{
 			double p = (diffuseReflectance-Rd0)/(Rd1-Rd0);
 			alphaPrime = alphaPrime0 + p*(alphaPrime1-alphaPrime0);

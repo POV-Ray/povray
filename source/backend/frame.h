@@ -1298,7 +1298,7 @@ class Ref
 		Ref& operator=(Ref&);
 };
 
-typedef stack<Intersection, vector<Intersection> > IStackData;
+typedef std::stack<Intersection, vector<Intersection> > IStackData;
 typedef RefPool<IStackData> IStackPool;
 typedef Ref<IStackData> IStack;
 

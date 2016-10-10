@@ -209,7 +209,7 @@ class SceneData
 		int defaultFileType;
 
 		FrameSettings frameSettings; // TODO - move ???
-		map<string, string> declaredVariables; // TODO - move to parser
+		std::map<string, string> declaredVariables; // TODO - move to parser
 		Camera parsedCamera; // TODO - handle differently or move to parser
 		bool clocklessAnimation; // TODO - this is support for an experimental feature and may be changed or removed
 		vector<Camera> cameras; // TODO - this is support for an experimental feature and may be changed or removed
@@ -314,13 +314,13 @@ class SceneData
 	private:
 #ifdef USE_SCENE_FILE_MAPPING
 		/// maps scene file names to local file names
-		map<UCS2String, UCS2String> scene2LocalFiles;
+		std::map<UCS2String, UCS2String> scene2LocalFiles;
 		/// maps local file names to scene file names
-		map<UCS2String, UCS2String> local2SceneFiles;
+		std::map<UCS2String, UCS2String> local2SceneFiles;
 		/// maps scene file names to temporary file names
-		map<UCS2String, UCS2String> scene2TempFiles;
+		std::map<UCS2String, UCS2String> scene2TempFiles;
 		/// maps temporary file names to scene file names
-		map<UCS2String, UCS2String> temp2SceneFiles;
+		std::map<UCS2String, UCS2String> temp2SceneFiles;
 #endif
 
 		/**

@@ -130,7 +130,7 @@ void RenderMessageHandler::Statistics(Console *console, POVMS_Object& obj, bool 
 
 void RenderMessageHandler::Progress(Console *console, POVMS_Object& obj, bool verbose)
 {
-	ostringstream sstr;
+	std::ostringstream sstr;
 
 	switch(obj.GetType(kPOVMSObjectClassID))
 	{

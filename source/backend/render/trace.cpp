@@ -719,7 +719,7 @@ void Trace::ComputeLightedTexture(Colour& resultcolour, const TEXTURE *texture, 
 	RGBColour ambBackCol;
 	bool one_colour_found, colour_found;
 	bool tir_occured;
-	auto_ptr<PhotonGatherer> surfacePhotonGatherer(NULL); // TODO FIXME - auto_ptr why?  [CLi] why, to auto-destruct it of course! (e.g. in case of exception)
+	std::auto_ptr<PhotonGatherer> surfacePhotonGatherer(NULL); // TODO FIXME - auto_ptr why?  [CLi] why, to auto-destruct it of course! (e.g. in case of exception)
 
 	WNRXVector listWNRX(wnrxPool); // "Weight, Normal, Reflectivity, eXponent"
 	assert(listWNRX->empty()); // verify that the WNRXVector pulled from the pool is in a cleaned-up condition
@@ -2809,7 +2809,7 @@ void Trace::ComputeSky(const Ray& ray, Colour& colour, TraceTicket& ticket)
 		colour.green()  = col.green();
 		colour.blue()   = col.blue();
 		colour.filter() = 0.0;
-		colour.transm() = min(1.0f, fabs(filCol.greyscale()));
+		colour.transm() = min(1.0f, std::fabs(filCol.greyscale()));
 	}
 }
 

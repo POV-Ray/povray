@@ -44,8 +44,6 @@
 namespace pov_base
 {
 
-using namespace std;
-
 void vfeSysThreadStartup();
 void vfeSysThreadCleanup();
 bool vfeParsePathString (const POVMSUCS2String& path, POVMSUCS2String& volume, vector<POVMSUCS2String>& components, POVMSUCS2String& filename);

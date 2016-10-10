@@ -43,7 +43,6 @@
 
 namespace pov_frontend
 {
-	using namespace std;
 	using namespace vfe;
 
 	extern shared_ptr<Display> gDisplay;

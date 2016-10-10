@@ -309,7 +309,7 @@ void RenderBackend::CreateScene(POVMS_Message& msg, POVMS_Message& result, int)
 		scenes[scenecounter] = scene;
 		try
 		{
-			scene2views[scenecounter] = set<ViewId>();
+			scene2views[scenecounter] = std::set<ViewId>();
 		}
 		catch(std::exception&)
 		{
@@ -340,7 +340,7 @@ void RenderBackend::CloseScene(POVMS_Message& msg, POVMS_Message& result, int)
 	{
 		SceneId sid = msg.GetInt(kPOVAttrib_SceneId);
 
-		map<SceneId, shared_ptr<Scene> >::iterator i(scenes.find(sid));
+		std::map<SceneId, shared_ptr<Scene> >::iterator i(scenes.find(sid));
 
 		if(i == scenes.end())
 			throw POV_EXCEPTION_CODE(kInvalidIdentifierErr);
@@ -376,7 +376,7 @@ void RenderBackend::CreateView(POVMS_Message& msg, POVMS_Message& result, int)
 	{
 		SceneId sid = msg.GetInt(kPOVAttrib_SceneId);
 
-		map<SceneId, shared_ptr<Scene> >::iterator i(scenes.find(sid));
+		std::map<SceneId, shared_ptr<Scene> >::iterator i(scenes.find(sid));
 
 		if(i == scenes.end())
 			throw POV_EXCEPTION_CODE(kInvalidIdentifierErr);
@@ -416,7 +416,7 @@ void RenderBackend::CloseView(POVMS_Message& msg, POVMS_Message& result, int)
 	{
 		ViewId vid = msg.GetInt(kPOVAttrib_ViewId);
 
-		map<ViewId, shared_ptr<View> >::iterator i(views.find(vid));
+		std::map<ViewId, shared_ptr<View> >::iterator i(views.find(vid));
 
 		if(i == views.end())
 			throw POV_EXCEPTION_CODE(kInvalidIdentifierErr);
@@ -452,7 +452,7 @@ void RenderBackend::StartParser(POVMS_Message& msg, POVMS_Message&, int)
 			if(validateFrontendAddress(msg.GetSourceAddress()) == false)
 				throw POV_EXCEPTION_CODE(kAuthorisationErr);
 
-			map<SceneId, shared_ptr<Scene> >::iterator i(scenes.find(sid));
+			std::map<SceneId, shared_ptr<Scene> >::iterator i(scenes.find(sid));
 
 			if(i == scenes.end())
 				throw POV_EXCEPTION_CODE(kInvalidIdentifierErr);
@@ -487,7 +487,7 @@ void RenderBackend::StopParser(POVMS_Message& msg, POVMS_Message& result, int)
 	{
 		SceneId sid = msg.GetInt(kPOVAttrib_SceneId);
 
-		map<SceneId, shared_ptr<Scene> >::iterator i(scenes.find(sid));
+		std::map<SceneId, shared_ptr<Scene> >::iterator i(scenes.find(sid));
 
 		if(i == scenes.end())
 			throw POV_EXCEPTION_CODE(kInvalidIdentifierErr);
@@ -522,7 +522,7 @@ void RenderBackend::PauseParser(POVMS_Message& msg, POVMS_Message& result, int)
 	{
 		SceneId sid = msg.GetInt(kPOVAttrib_SceneId);
 
-		map<SceneId, shared_ptr<Scene> >::iterator i(scenes.find(sid));
+		std::map<SceneId, shared_ptr<Scene> >::iterator i(scenes.find(sid));
 
 		if(i == scenes.end())
 			throw POV_EXCEPTION_CODE(kInvalidIdentifierErr);
@@ -557,7 +557,7 @@ void RenderBackend::ResumeParser(POVMS_Message& msg, POVMS_Message& result, int)
 	{
 		SceneId sid = msg.GetInt(kPOVAttrib_SceneId);
 
-		map<SceneId, shared_ptr<Scene> >::iterator i(scenes.find(sid));
+		std::map<SceneId, shared_ptr<Scene> >::iterator i(scenes.find(sid));
 
 		if(i == scenes.end())
 			throw POV_EXCEPTION_CODE(kInvalidIdentifierErr);
@@ -594,7 +594,7 @@ void RenderBackend::StartRender(POVMS_Message& msg, POVMS_Message&, int)
 			if(validateFrontendAddress(msg.GetSourceAddress()) == false)
 				throw POV_EXCEPTION_CODE(kAuthorisationErr);
 
-			map<ViewId, shared_ptr<View> >::iterator i(views.find(vid));
+			std::map<ViewId, shared_ptr<View> >::iterator i(views.find(vid));
 
 			if(i == views.end())
 				throw POV_EXCEPTION_CODE(kInvalidIdentifierErr);
@@ -632,7 +632,7 @@ void RenderBackend::StopRender(POVMS_Message& msg, POVMS_Message& result, int)
 	{
 		ViewId vid = msg.GetInt(kPOVAttrib_ViewId);
 
-		map<ViewId, shared_ptr<View> >::iterator i(views.find(vid));
+		std::map<ViewId, shared_ptr<View> >::iterator i(views.find(vid));
 
 		if(i == views.end())
 			throw POV_EXCEPTION_CODE(kInvalidIdentifierErr);
@@ -667,7 +667,7 @@ void RenderBackend::PauseRender(POVMS_Message& msg, POVMS_Message& result, int)
 	{
 		ViewId vid = msg.GetInt(kPOVAttrib_ViewId);
 
-		map<ViewId, shared_ptr<View> >::iterator i(views.find(vid));
+		std::map<ViewId, shared_ptr<View> >::iterator i(views.find(vid));
 
 		if(i == views.end())
 			throw POV_EXCEPTION_CODE(kInvalidIdentifierErr);
@@ -702,7 +702,7 @@ void RenderBackend::ResumeRender(POVMS_Message& msg, POVMS_Message& result, int)
 	{
 		ViewId vid = msg.GetInt(kPOVAttrib_ViewId);
 
-		map<ViewId, shared_ptr<View> >::iterator i(views.find(vid));
+		std::map<ViewId, shared_ptr<View> >::iterator i(views.find(vid));
 
 		if(i == views.end())
 			throw POV_EXCEPTION_CODE(kInvalidIdentifierErr);

@@ -79,7 +79,7 @@
 namespace pov_base
 {
 
-template<class Allocator = allocator<bool> >
+template<class Allocator = std::allocator<bool> >
 class BitMapImage : public Image
 {
 	public:
@@ -278,7 +278,7 @@ class BitMapImage : public Image
 
 typedef BitMapImage<> MemoryBitMapImage;
 
-template<class Allocator = allocator<unsigned char> >
+template<class Allocator = std::allocator<unsigned char> >
 class ColourMapImage : public Image
 {
 	public:
@@ -737,7 +737,7 @@ class ColourMapImage : public Image
 
 typedef ColourMapImage<> MemoryColourMapImage;
 
-template<typename T, unsigned int TMAX, int IDT, class Allocator = allocator<T> >
+template<typename T, unsigned int TMAX, int IDT, class Allocator = std::allocator<T> >
 class GrayImage : public Image
 {
 	public:
@@ -935,7 +935,7 @@ typedef GrayImage<unsigned char, 255, Image::Gray_Int8> MemoryGray8Image;
 
 typedef GrayImage<unsigned short, 65535, Image::Gray_Int16> MemoryGray16Image;
 
-template<typename T, unsigned int TMAX, int IDT, class Allocator = allocator<T> >
+template<typename T, unsigned int TMAX, int IDT, class Allocator = std::allocator<T> >
 class GrayAImage : public Image
 {
 	public:
@@ -1151,7 +1151,7 @@ typedef GrayAImage<unsigned char, 255, Image::GrayA_Int8> MemoryGrayA8Image;
 
 typedef GrayAImage<unsigned short, 65535, Image::GrayA_Int16> MemoryGrayA16Image;
 
-template<typename T, unsigned int TMAX, int IDT, class Allocator = allocator<T> >
+template<typename T, unsigned int TMAX, int IDT, class Allocator = std::allocator<T> >
 class RGBImage : public Image
 {
 	public:
@@ -1375,7 +1375,7 @@ typedef RGBImage<unsigned char, 255, Image::RGB_Int8> MemoryRGB8Image;
 
 typedef RGBImage<unsigned short, 65535, Image::RGB_Int16> MemoryRGB16Image;
 
-template<typename T, unsigned int TMAX, int IDT, class Allocator = allocator<T> >
+template<typename T, unsigned int TMAX, int IDT, class Allocator = std::allocator<T> >
 class RGBAImage : public Image
 {
 	public:
@@ -1610,7 +1610,7 @@ typedef RGBAImage<unsigned char, 255, Image::RGBA_Int8> MemoryRGBA8Image;
 
 typedef RGBAImage<unsigned short, 65535, Image::RGBA_Int16> MemoryRGBA16Image;
 
-template<class PixelContainer = vector<float, allocator<float> > >
+template<class PixelContainer = vector<float, std::allocator<float> > >
 class RGBFTImage : public Image
 {
 	public:
@@ -1848,7 +1848,7 @@ class RGBFTImage : public Image
 
 typedef RGBFTImage<> MemoryRGBFTImage;
 
-template<typename T, unsigned int TMAX, int IDT, class Allocator = allocator<T> >
+template<typename T, unsigned int TMAX, int IDT, class Allocator = std::allocator<T> >
 class NonlinearGrayImage : public Image
 {
 	public:
@@ -2052,7 +2052,7 @@ typedef NonlinearGrayImage<unsigned char, 255, Image::Gray_Gamma8> MemoryNonline
 
 typedef NonlinearGrayImage<unsigned short, 65535, Image::Gray_Gamma16> MemoryNonlinearGray16Image;
 
-template<typename T, unsigned int TMAX, int IDT, class Allocator = allocator<T> >
+template<typename T, unsigned int TMAX, int IDT, class Allocator = std::allocator<T> >
 class NonlinearGrayAImage : public Image
 {
 	public:
@@ -2278,7 +2278,7 @@ typedef NonlinearGrayAImage<unsigned char, 255, Image::GrayA_Gamma8> MemoryNonli
 
 typedef NonlinearGrayAImage<unsigned short, 65535, Image::GrayA_Gamma16> MemoryNonlinearGrayA16Image;
 
-template<typename T, unsigned int TMAX, int IDT, class Allocator = allocator<T> >
+template<typename T, unsigned int TMAX, int IDT, class Allocator = std::allocator<T> >
 class NonlinearRGBImage : public Image
 {
 	public:
@@ -2508,7 +2508,7 @@ typedef NonlinearRGBImage<unsigned char, 255, Image::RGB_Gamma8> MemoryNonlinear
 
 typedef NonlinearRGBImage<unsigned short, 65535, Image::RGB_Gamma16> MemoryNonlinearRGB16Image;
 
-template<typename T, unsigned int TMAX, int IDT, class Allocator = allocator<T> >
+template<typename T, unsigned int TMAX, int IDT, class Allocator = std::allocator<T> >
 class NonlinearRGBAImage : public Image
 {
 	public:

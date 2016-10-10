@@ -43,7 +43,8 @@
 
 namespace vfePlatform
 {
-	using namespace std;
+	using std::cerr;
+	using std::endl;
 
 	extern bool gShelloutsPermittedFixThis;
 

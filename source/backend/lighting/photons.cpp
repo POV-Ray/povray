@@ -467,7 +467,7 @@ void PhotonTrace::ComputeLightedTexture(Colour& LightCol, const TEXTURE *Texture
 		}
 
 		// Get new remaining translucency.
-		Trans = min(1.0f, fabs(FilCol.greyscale()));
+		Trans = min(1.0f, std::fabs(FilCol.greyscale()));
 	}
 
 	//******************
@@ -486,14 +486,14 @@ void PhotonTrace::ComputeLightedTexture(Colour& LightCol, const TEXTURE *Texture
 	else
 	{
 		// if photon is for global map, then decide which we want to do
-		diffuseWeight = max(0.0f, fabs(ResCol.greyscale()));
+		diffuseWeight = max(0.0f, std::fabs(ResCol.greyscale()));
 		// use top-layer finish only
 		if(Texture->Finish)
 			diffuseWeight*=Texture->Finish->Diffuse;
 		refractionWeight = Trans;
 		// reflection only for top layer!!!!!!
 		// TODO is "rend()" the top layer or the bottom layer???
-		reflectionWeight = max(0.0f, fabs(listWNRX->rend()->reflec.greyscale()));
+		reflectionWeight = max(0.0f, std::fabs(listWNRX->rend()->reflec.greyscale()));
 		dieWeight = max(0.0,(1.0-diffuseWeight));
 
 		// normalize weights: make sum be 1.0
