@@ -68,6 +68,8 @@
 namespace povwin
 {
 
+using std::endl;
+
 extern int                                  alert_sound ;
 extern int                                  message_xchar ;
 extern int                                  message_ychar ;
@@ -670,7 +672,7 @@ void cloneOldIni(string oldPath, string newPath)
   if (inF.bad())
     return;
   line = newPath + "ini\\pvengine.ini";
-  ofstream outF(line.c_str());
+  std::ofstream outF(line.c_str());
   if (outF.bad())
     return;
 
@@ -733,7 +735,7 @@ void cloneOldIni(string oldPath, string newPath)
       return;
   }
   line = newPath + "ini\\pvengine.ini";
-  ofstream outF(line.c_str());
+  std::ofstream outF(line.c_str());
   if (outF.bad())
   {
     if (oldPath != "")
