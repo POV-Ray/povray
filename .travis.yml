@@ -17,10 +17,6 @@ compiler:
 - gcc
 - clang
 
-matrix:
-  allow_failures:
-  - os: osx
-
 sudo: false
 
 addons:
