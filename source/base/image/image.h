@@ -206,8 +206,8 @@ class Image
             bool premultiplyOverride;           // whether to override file-format default for alpha premultiplication
             bool premultiply;                   // whether to output premultiplied ("associated") alpha or not ("straight alpha")
             DitherHandlerPtr dither;
-            unsigned int offset_x;
-            unsigned int offset_y;
+            unsigned int offset_x;              ///< Currently not actively set.
+            unsigned int offset_y;              ///< Currently not actively set.
 
             WriteOptions() : bpcc(8), alphachannel(false), grayscale(false), compress(0) /*, gamma(1.0f) */, premultiplyOverride(false), premultiply(false), offset_x(0), offset_y(0) { }
         };
