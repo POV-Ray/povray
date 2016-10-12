@@ -8,7 +8,21 @@ This document is still a work in progress. While the POV-Ray project itself
 has existed for more than 20 years, this is the first time we have done a
 release on github, so please bear with us - it's a little bare at the moment.
 
-Last edit: 2016-09-30
+Last edit: 2016-10-09
+
+Build Status
+--------------------------------------
+
+We're constantly monitoring the code quality of (almost) all branches and pull requests,
+to make sure the code builds ok on our major target platforms. The current status of
+our _master branch_ is reported as follows:
+
+  - [![Build status](https://ci.appveyor.com/api/projects/status/5953wf13f9soyw23/branch/master?svg=true)](https://ci.appveyor.com/project/c-lipka/povray-exwy4)
+    (AppVeyor: Windows Server 2012 with Visual Studio 2015)
+  - [![Build Status](https://semaphoreci.com/api/v1/pov-ray/povray/branches/master/shields_badge.svg)](https://semaphoreci.com/pov-ray/povray)
+    (Semaphore: Ubuntu 14.04 LTE 64-bit with gcc 4.8)
+  - [![Build Status](https://travis-ci.org/POV-Ray/povray.svg?branch=master)](https://travis-ci.org/POV-Ray/povray)
+    (Travis CI: Ubuntu 12.04 LTE 64-bit with gcc 4.6 and with clang 4.2; OS X 10.11 with gcc 4.2 and with clang 4.2)
 
 License
 --------------------------------------

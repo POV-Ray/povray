@@ -220,6 +220,9 @@ Miscellaneous Coding Rules
   - **Output Parameters**: When declaring a function that is to modify any of its parameters, prefer references over
     pointers.
 
+  - **Locale**: Do not tamper with the C locale (i.e. do not call `setlocale` or any other function doing the same job),
+    as plenty of code in POV-Ray relies on it remaining set to the default.
+
 
 Code Documentation
 ==================

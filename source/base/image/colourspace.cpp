@@ -441,7 +441,7 @@ SimpleGammaCurvePtr GetGammaCurve(GammaTypeId type, float param)
         case kPOVList_GammaType_BT709:      return BT709GammaCurve::Get();
         case kPOVList_GammaType_BT1361:     return BT1361GammaCurve::Get();
         case kPOVList_GammaType_BT2020:     return BT2020GammaCurve::Get();
-        default:                            return PowerLawGammaCurve::GetByDecodingGamma(DEFAULT_FILE_GAMMA);
+        default:                            POV_ASSERT (false);
     }
 }
 

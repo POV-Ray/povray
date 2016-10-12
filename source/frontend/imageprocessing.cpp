@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -157,9 +157,19 @@ UCS2String ImageProcessing::WriteImage(POVMS_Object& ropts, POVMSInt frame, int 
                 throw POV_EXCEPTION_STRING("Invalid file type for output");
         }
 
-        GammaTypeId gammaType = (GammaTypeId)ropts.TryGetInt(kPOVAttrib_FileGammaType, DEFAULT_FILE_GAMMA_TYPE);
-        float gamma = ropts.TryGetFloat(kPOVAttrib_FileGamma, DEFAULT_FILE_GAMMA);
-        wopts.encodingGamma = GetGammaCurve(gammaType, gamma);
+        GammaTypeId gammaType;
+        float gamma;
+        if (ropts.Exist(kPOVAttrib_FileGammaType))
+        {
+            gammaType = (GammaTypeId)ropts.GetInt(kPOVAttrib_FileGammaType);
+            gamma = ropts.GetFloat(kPOVAttrib_FileGamma);
+            wopts.encodingGamma = GetGammaCurve(gammaType, gamma);
+        }
+        else
+        {
+            // if user didn't explicitly specify File_Gamma, use the file format specific default.
+            wopts.encodingGamma.reset();
+        }
         // NB: RenderFrontend<...>::CreateView should have dealt with kPOVAttrib_LegacyGammaMode already and updated kPOVAttrib_WorkingGammaType and kPOVAttrib_WorkingGamma to fit.
         gammaType = (GammaTypeId)ropts.TryGetInt(kPOVAttrib_WorkingGammaType, DEFAULT_WORKING_GAMMA_TYPE);
         gamma = ropts.TryGetFloat(kPOVAttrib_WorkingGamma, DEFAULT_WORKING_GAMMA);

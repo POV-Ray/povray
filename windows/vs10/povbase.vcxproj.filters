@@ -78,9 +78,6 @@
     <ClCompile Include="..\..\source\base\image\openexr.cpp">
       <Filter>Base source\Image</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\base\image\pgm.cpp">
-      <Filter>Base source\Image</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\base\image\png.cpp">
       <Filter>Base source\Image</Filter>
     </ClCompile>
@@ -195,9 +192,6 @@
       <Filter>Base Headers\Image</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\base\image\openexr.h">
-      <Filter>Base Headers\Image</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\base\image\pgm.h">
       <Filter>Base Headers\Image</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\base\image\png_pov.h">

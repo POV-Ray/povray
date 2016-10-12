@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -202,7 +202,7 @@ bool ShelloutProcessing::ExtractCommand(const string& src, string& command, stri
     command.clear();
     parameters.clear();
     string str = boost::trim_copy(src);
-    for (s = str.c_str(); *s; *s++)
+    for (s = str.c_str(); *s != '\0'; s++)
     {
         if (hadEscape)
         {

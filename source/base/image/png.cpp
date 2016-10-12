@@ -764,7 +764,8 @@ void Write (OStream *file, const Image *image, const Image::WriteOptions& option
 #endif // PNG_WRITE_gAMA_SUPPORTED
 
 #if defined(PNG_WRITE_oFFs_SUPPORTED)
-    png_set_oFFs(png_ptr, info_ptr, options.offset_x, options.offset_y, PNG_OFFSET_PIXEL);
+    if ((options.offset_x != 0) || (options.offset_y != 0))
+        png_set_oFFs(png_ptr, info_ptr, options.offset_x, options.offset_y, PNG_OFFSET_PIXEL);
 #endif // PNG_WRITE_oFFs_SUPPORTED
 
 #if defined(PNG_WRITE_tIME_SUPPORTED)

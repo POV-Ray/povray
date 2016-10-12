@@ -215,8 +215,6 @@ namespace pov_base
 #define POV_IS2                             ".BMP"
 #define DEFAULT_DISPLAY_GAMMA_TYPE          kPOVList_GammaType_SRGB
 #define DEFAULT_DISPLAY_GAMMA               2.2
-#define DEFAULT_FILE_GAMMA_TYPE             kPOVList_GammaType_SRGB
-#define DEFAULT_FILE_GAMMA                  2.2
 #define RENAME_FILE(orig,new)               rename(orig,new)
 #define DELETE_FILE(name)                   _unlink(name)
 #define NEW_LINE_STRING                     "\r\n"

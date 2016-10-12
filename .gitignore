@@ -208,7 +208,6 @@ $RECYCLE.BIN/
 /stamp-h1
 # Files created by configure script in specific subdirectories
 /platform/Makefile
-/source/jversion.h
 /source/Makefile
 /unix/Makefile
 /vfe/Makefile
