@@ -168,7 +168,7 @@ UCS2String ImageProcessing::WriteImage(POVMS_Object& ropts, POVMSInt frame, int 
         else
         {
             // if user didn't explicitly specify File_Gamma, use the file format specific default.
-            wopts.encodingGamma = NULL;
+            wopts.encodingGamma.reset();
         }
         // NB: RenderFrontend<...>::CreateView should have dealt with kPOVAttrib_LegacyGammaMode already and updated kPOVAttrib_WorkingGammaType and kPOVAttrib_WorkingGamma to fit.
         gammaType = (GammaTypeId)ropts.TryGetInt(kPOVAttrib_WorkingGammaType, DEFAULT_WORKING_GAMMA_TYPE);
