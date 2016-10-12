@@ -128,7 +128,7 @@ bool IsoSurface::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
         if(closed != false)
         {
             VTmp = Plocal + Depth1 * Dlocal;
-            tmp = fn.Evaluate(VTmp) - threshold;
+            tmp = EvaluatePolarized (fn, VTmp);
             if(Depth1 > accuracy)
             {
                 if(tmp < 0.0)                   /* The ray hits the bounding shape */
@@ -149,12 +149,12 @@ bool IsoSurface::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
                 {
                     Depth1 = accuracy * 5.0;
                     VTmp = Plocal + Depth1 * Dlocal;
-                    if(fn.Evaluate(VTmp) < threshold)
+                    if (IsInside (fn, VTmp))
                         Thread->isosurfaceData->Inv3 = -1;
                     /* Change the sign of the function (IPoint is in the bounding shpae.)*/
                 }
                 VTmp = Plocal + Depth2 * Dlocal;
-                if(fn.Evaluate(VTmp) < threshold)
+                if (IsInside (fn, VTmp))
                 {
                     IPoint = ray.Evaluate(Depth2);
                     if(Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
@@ -180,11 +180,11 @@ bool IsoSurface::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
         {
             /* IPoint is on the isosurface */
             VTmp = Plocal + tmin * Dlocal;
-            if(fabs(fn.Evaluate(VTmp) - threshold) < (maxg * accuracy * 4.0))
+            if (EvaluateAbs (fn, VTmp) < (maxg * accuracy * 4.0))
             {
                 tmin = accuracy * 5.0;
                 VTmp = Plocal + tmin * Dlocal;
-                if(fn.Evaluate(VTmp) < threshold)
+                if (IsInside (fn, VTmp))
                     Thread->isosurfaceData->Inv3 = -1;
                 /* change the sign and go into the isosurface */
             }
@@ -213,6 +213,8 @@ bool IsoSurface::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThr
 
         if(IFound)
             Thread->Stats()[Ray_IsoSurface_Tests_Succeeded]++;
+
+        Thread->isosurfaceData->pFn = NULL;
     }
 
     if(eval == true)
@@ -264,13 +266,33 @@ bool IsoSurface::Inside(const Vector3d& IPoint, TraceThreadData *Thread) const
     if(!container->Inside(New_Point))
         return (Test_Flag(this, INVERTED_FLAG));
 
-    if(GenericScalarFunctionInstance(Function, Thread).Evaluate(New_Point) > threshold)
+    GenericScalarFunctionInstance fn(Function, Thread);
+    if (!IsInside (fn, New_Point))
         return (Test_Flag(this, INVERTED_FLAG));
 
     /* Inside the box. */
     return (!Test_Flag(this, INVERTED_FLAG));
 }
 
+
+double IsoSurface::GetPotential (const Vector3d& globalPoint, bool subtractThreshold, TraceThreadData *pThread) const
+{
+    Vector3d localPoint;
+
+    if (Trans != NULL)
+        MInvTransPoint (localPoint, globalPoint, Trans);
+    else
+        localPoint = globalPoint;
+
+    double potential = GenericScalarFunctionInstance(Function, pThread).Evaluate (localPoint);
+    if (subtractThreshold)
+        potential -= threshold;
+
+    if (Test_Flag (this, INVERTED_FLAG))
+        return -potential;
+    else
+        return  potential;
+}
 
 
 /*****************************************************************************
@@ -345,6 +367,9 @@ void IsoSurface::Normal(Vector3d& Result, Intersection *Inter, TraceThreadData *
 
             Result.normalize();
         }
+
+        if (positivePolarity)
+            Result.invert();
     }
 }
 
@@ -513,7 +538,9 @@ void IsoSurface::Transform(const TRANSFORM* tr)
 *
 ******************************************************************************/
 
-IsoSurface::IsoSurface() : ObjectBase(ISOSURFACE_OBJECT)
+IsoSurface::IsoSurface() :
+    ObjectBase(ISOSURFACE_OBJECT),
+    positivePolarity(false)
 {
     container = shared_ptr<ContainedByShape>(new ContainedByBox());
 
@@ -587,6 +614,8 @@ ObjectPtr IsoSurface::Copy()
 
     // mark it as copy for use by max_gradient warning code
     New->isCopy = true;
+
+    New->positivePolarity = positivePolarity;
 
     New->container = shared_ptr<ContainedByShape>(container->Copy());
 
@@ -964,7 +993,31 @@ DBL IsoSurface::Float_Function(ISO_ThreadData& itd, DBL t) const
 
     VTmp = itd.Pglobal + t * itd.Dglobal;
 
-    return ((DBL)itd.Inv3 * (itd.pFn->Evaluate(VTmp) - threshold));
+    return ((DBL)itd.Inv3 * EvaluatePolarized (*itd.pFn, VTmp));
+}
+
+
+/*****************************************************************************/
+
+DBL IsoSurface::EvaluateAbs (GenericScalarFunctionInstance& fn, Vector3d& p) const
+{
+    return fabs (threshold - fn.Evaluate (p));
+}
+
+DBL IsoSurface::EvaluatePolarized (GenericScalarFunctionInstance& fn, Vector3d& p) const
+{
+    if (positivePolarity)
+        return threshold - fn.Evaluate (p);
+    else
+        return fn.Evaluate (p) - threshold;
+}
+
+bool IsoSurface::IsInside (GenericScalarFunctionInstance& fn, Vector3d& p) const
+{
+    if (positivePolarity)
+        return threshold < fn.Evaluate (p);
+    else
+        return fn.Evaluate (p) < threshold;
 }
 
 }

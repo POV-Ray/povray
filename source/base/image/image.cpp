@@ -54,7 +54,6 @@
 #include "base/image/iff.h"
 #include "base/image/jpeg_pov.h"
 #include "base/image/openexr.h"
-#include "base/image/pgm.h"
 #include "base/image/png_pov.h"
 #include "base/image/ppm.h"
 #include "base/image/targa.h"
@@ -3555,6 +3554,70 @@ void RGBFTMap2RGBAMap(const vector<Image::RGBFTMapEntry>& m, vector<Image::RGBAM
         n.push_back(Image::RGBAMapEntry(i->red, i->green, i->blue, RGBFTColour::FTtoA(i->filter, i->transm)));
 }
 
+Image::ImageDataType Image::GetImageDataType (ImageChannelDataType channelType, ImageChannelLayout layout)
+{
+    switch (layout)
+    {
+    case kImageChannelLayout_Gray:
+        switch (channelType)
+        {
+        case kImageChannelDataType_Int8:    return Image::Gray_Int8;
+        case kImageChannelDataType_Int16:   return Image::Gray_Int16;
+        case kImageChannelDataType_Gamma8:  return Image::Gray_Gamma8;
+        case kImageChannelDataType_Gamma16: return Image::Gray_Gamma16;
+        default:
+            POV_IMAGE_ASSERT(false);
+            break;
+        }
+        break;
+
+    case kImageChannelLayout_GrayA:
+        switch (channelType)
+        {
+        case kImageChannelDataType_Int8:    return Image::GrayA_Int8;
+        case kImageChannelDataType_Int16:   return Image::GrayA_Int16;
+        case kImageChannelDataType_Gamma8:  return Image::GrayA_Gamma8;
+        case kImageChannelDataType_Gamma16: return Image::GrayA_Gamma16;
+        default:
+            POV_IMAGE_ASSERT(false);
+            break;
+        }
+        break;
+
+    case kImageChannelLayout_RGB:
+        switch (channelType)
+        {
+        case kImageChannelDataType_Int8:    return Image::RGB_Int8;
+        case kImageChannelDataType_Int16:   return Image::RGB_Int16;
+        case kImageChannelDataType_Gamma8:  return Image::RGB_Gamma8;
+        case kImageChannelDataType_Gamma16: return Image::RGB_Gamma16;
+        default:
+            POV_IMAGE_ASSERT(false);
+            break;
+        }
+        break;
+
+    case kImageChannelLayout_RGBA:
+        switch (channelType)
+        {
+        case kImageChannelDataType_Int8:    return Image::RGBA_Int8;
+        case kImageChannelDataType_Int16:   return Image::RGBA_Int16;
+        case kImageChannelDataType_Gamma8:  return Image::RGBA_Gamma8;
+        case kImageChannelDataType_Gamma16: return Image::RGBA_Gamma16;
+        default:
+            POV_IMAGE_ASSERT(false);
+            break;
+        }
+        break;
+
+    default:
+        POV_IMAGE_ASSERT(false);
+        break;
+    }
+
+    return Image::Undefined;
+}
+
 Image *Image::Create(unsigned int w, unsigned int h, ImageDataType t, unsigned int maxRAMmbHint, unsigned int pixelsPerBlockHint)
 {
     try
@@ -3904,10 +3967,10 @@ following built-in formats: GIF, TGA, IFF, PGM, PPM, BMP.");
             return (Iff::Read(file, options));
 
         case PGM:
-            return (Pgm::Read(file, options));
+            return (Netpbm::Read(file, options));
 
         case PPM:
-            return (Ppm::Read(file, options));
+            return (Netpbm::Read(file, options));
 
         case BMP:
             return (Bmp::Read(file, options));
@@ -3997,7 +4060,7 @@ following built-in formats: TGA, PPM, BMP.");
             break;
 
         case PPM:
-            Ppm::Write(file, image, options);
+            Netpbm::Write(file, image, options);
             break;
 
         case BMP:

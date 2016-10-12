@@ -301,6 +301,9 @@ DBL ContinuousPattern::Evaluate(const Vector3d& EPoint, const Intersection *pIse
 {
     DBL value = EvaluateRaw(EPoint, pIsection, pRay, pThread);
 
+    if (waveType == kWaveType_Raw)
+        return value;
+
     if(waveFrequency != 0.0)
         value = fmod(value * waveFrequency + wavePhase, 1.00001); // TODO FIXME - magic number! Should be 1.0+SOME_EPSILON (or maybe actually 1.0?)
 
@@ -464,6 +467,29 @@ PigmentPattern::~PigmentPattern()
 {
     if (pPigment)
         Destroy_Pigment(pPigment);
+}
+
+
+PotentialPattern::PotentialPattern() :
+    pObject(NULL),
+    subtractThreshold(false)
+{
+    waveType = kWaveType_Raw;
+}
+
+PotentialPattern::PotentialPattern(const PotentialPattern& obj) :
+    ContinuousPattern(obj),
+    pObject(NULL),
+    subtractThreshold(obj.subtractThreshold)
+{
+    if (obj.pObject)
+        pObject = Copy_Object(obj.pObject);
+}
+
+PotentialPattern::~PotentialPattern()
+{
+    if (pObject)
+        Destroy_Object(pObject);
 }
 
 
@@ -7799,6 +7825,17 @@ DBL PlanarPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsec
     CLIP_DENSITY(value);
 
     return value;
+}
+
+
+/*****************************************************************************/
+
+DBL PotentialPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
+{
+    if (pObject != NULL)
+        return pObject->GetPotential (EPoint, subtractThreshold, pThread);
+
+    return 0.0;
 }
 
 

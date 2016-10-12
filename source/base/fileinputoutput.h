@@ -72,6 +72,7 @@ enum
     POV_File_Text_Macro = POV_File_Text_INC,
     POV_File_Text_INI,
     POV_File_Text_CSV,
+    POV_File_Text_OBJ,
     POV_File_Text_Stream,
     POV_File_Text_User,
     POV_File_Data_DF3,

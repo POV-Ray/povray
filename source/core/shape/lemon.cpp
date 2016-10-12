@@ -811,7 +811,7 @@ void Lemon::CalcUV(const Vector3d& IPoint, Vector2d& Result) const
     DBL phi, theta;
     Vector3d P;
 
-    // Transform the ray into the ovus space.
+    // Transform the ray into the lemon space.
     MInvTransPoint(P, IPoint, Trans);
 
     // the center of UV coordinate is <0, 0, 1/2>

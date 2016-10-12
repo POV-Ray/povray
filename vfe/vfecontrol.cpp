@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -372,9 +372,12 @@ int vfeSession::SetOptions (vfeRenderOptions& opts)
   if ((ropts.TryGetInt(kPOVAttrib_DisplayGammaType, DEFAULT_DISPLAY_GAMMA_TYPE) == kPOVList_GammaType_PowerLaw) &&
       (ropts.TryGetFloat(kPOVAttrib_DisplayGamma, DEFAULT_DISPLAY_GAMMA) < 0.001f))
     return (m_LastError = vfeDisplayGammaTooSmall);
-  if ((ropts.TryGetInt(kPOVAttrib_FileGammaType, DEFAULT_FILE_GAMMA_TYPE) == kPOVList_GammaType_PowerLaw) &&
-      (ropts.TryGetFloat(kPOVAttrib_FileGamma, DEFAULT_FILE_GAMMA) < 0.001f))
-    return (m_LastError = vfeFileGammaTooSmall);
+  if (ropts.Exist(kPOVAttrib_FileGammaType))
+  {
+    if ((ropts.GetInt(kPOVAttrib_FileGammaType) == kPOVList_GammaType_PowerLaw) &&
+        (ropts.GetFloat(kPOVAttrib_FileGamma) < 0.001f))
+      return (m_LastError = vfeFileGammaTooSmall);
+  }
 
   n = sizeof (str) ;
   if ((err = POVMSUtil_GetUCS2String (&obj, kPOVAttrib_CreateIni, str, &n)) == kNoErr && str [0] != 0)

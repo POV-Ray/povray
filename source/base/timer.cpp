@@ -66,28 +66,27 @@ void Delay(unsigned int msec)
 
 #if POV_USE_DEFAULT_TIMER
 
-TimerDefault::TimerDefault(bool tctime) :
-    threadCPUTimeOnly(tctime)
+Timer::Timer()
 {
     Reset();
 }
 
-TimerDefault::~TimerDefault()
+Timer::~Timer()
 {
 }
 
-POV_LONG TimerDefault::ElapsedRealTime() const
+POV_LONG Timer::ElapsedRealTime() const
 {
     boost::xtime t;
     boost::xtime_get(&t, POV_TIME_UTC);
     POV_LONG tt = (POV_LONG)(t.sec) * (POV_LONG)(1000000000) + (POV_LONG)(t.nsec);
-    POV_LONG st = (POV_LONG)(realTimeStart.sec) * (POV_LONG)(1000000000) + (POV_LONG)(realTimeStart.nsec);
+    POV_LONG st = (POV_LONG)(mRealTimeStart.sec) * (POV_LONG)(1000000000) + (POV_LONG)(mRealTimeStart.nsec);
     return ((tt - st) / (POV_LONG)(1000000));
 }
 
-void TimerDefault::Reset()
+void Timer::Reset()
 {
-    boost::xtime_get(&realTimeStart, POV_TIME_UTC);
+    boost::xtime_get(&mRealTimeStart, POV_TIME_UTC);
 }
 
 #endif // POV_USE_DEFAULT_TIMER

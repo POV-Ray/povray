@@ -1251,14 +1251,7 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                     break;
             }
 
-
-            /* If it was expecting a DBL, promote it to a VECTOR.
-               I haven't yet figured out what to do if it was expecting
-               a COLOUR value with Terms>3
-            */
-            if(*Terms < 3)
-                *Terms = 3;
-
+            *Terms = 3;
             for(i = 0; i < 3; i++)
                 Express[i] = Vect[i];
             EXIT
@@ -2094,6 +2087,37 @@ int Parser::Parse_Int_With_Minimum(int minValue, const char* parameterName)
     return value;
 }
 
+int Parser::Parse_Int_With_Range(int minValue, int maxValue, const char* parameterName)
+{
+    int value = Parse_Int(parameterName);
+    if ((value < minValue) || (value > maxValue))
+    {
+        Error("%s%sExpected at %s %i, but found %i instead.",
+              (parameterName != NULL ? parameterName : ""),
+              (parameterName != NULL ? ": " : ""),
+              (value < minValue ? "least" : "most"),
+              minValue,
+              value);
+    }
+    return value;
+}
+
+bool Parser::Parse_Bool(const char* parameterName)
+{
+    DBL rawValue = Parse_Float();
+    int intValue = int(rawValue);
+    bool value = (intValue != 0);
+    if (fabs(intValue - rawValue) >= EPSILON)
+    {
+        Warning("%s%sExpected boolean; interpreting fractional value %lf as '%s'.",
+                (parameterName != NULL ? parameterName : ""),
+                (parameterName != NULL ? ": " : ""),
+                rawValue,
+                (value ? "on" : "off"));
+    }
+    return value;
+}
+
 
 
 /*****************************************************************************
@@ -2439,7 +2463,7 @@ void Parser::Parse_Colour (RGBFTColour& colour, bool expectFT)
 {
     EXPRESS Express;
     int Terms;
-    bool old_allow_id = Allow_Identifier_In_Call;
+    bool old_allow_id = Allow_Identifier_In_Call, sawFloatOrFloatFnct;
     Allow_Identifier_In_Call = false;
 
     /* Initialize expression. [DB 12/94] */
@@ -2693,6 +2717,15 @@ void Parser::Parse_Colour (RGBFTColour& colour, bool expectFT)
             }
             else
             {
+                // Note: Setting up for potential warning on single value float promote to
+                // five value color vector. Under the Parse_Express call there is code which
+                // promotes any single float to the full 'Terms' value on the call. This
+                // usually results in filter and trasmit values >0, which cause shadow artifacts
+                // back to at least version 3.6.1.
+                if ((Token.Token_Id==FLOAT_FUNCT_TOKEN) || (Token.Token_Id==FUNCT_ID_TOKEN))
+                    sawFloatOrFloatFnct = true;
+                else
+                    sawFloatOrFloatFnct = false;
                 if (expectFT)
                     Terms = 5;
                 else
@@ -2703,6 +2736,8 @@ void Parser::Parse_Colour (RGBFTColour& colour, bool expectFT)
                 else if (!expectFT && ((Terms < 3) || Terms > 5))
                     Error("RGB color expression expected but float or vector expression found.");
                 colour.Set(Express, Terms);
+                if (((sawFloatOrFloatFnct) && (Terms==5)) && ((colour.filter() != 0) && (colour.transm() != 0)))
+                    Warning("Float value promoted to full color vector where both filter and transmit >0.0.");
                 if (!expectFT && ((colour.filter() != 0) || (colour.transm() != 0)))
                     Warning("Expected pure RGB color expression, unexpected filter and transmit components will have no effect.");
                 startedParsing = true;

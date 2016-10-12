@@ -3,9 +3,7 @@ pull_requests:
   do_not_increment_build_number: true
 branches:
   except:
-  - /v[0-9]/
   - coverity_scan
-skip_tags: true
 
 image: Visual Studio 2015
 
@@ -54,15 +52,28 @@ build:
 
 after_build:
 - ps: |
-    $env:pov_exe_version = (Get-Content unix\VERSION)
+    $version_h = 'source/base/version.h'
+    $regexp = '^\s*#define\s+OFFICIAL_VERSION_STRING\s*"[^"]+"\s*$'
+    $line = ( select-string -Path $version_h -Pattern $regexp | % { $_.Matches } | % { $_.Value } )
+    $string = ( select-string -InputObject $line -Pattern '"[^"]+"' | % { $_.Matches } | % { $_.Value } )
+    $official_version = ( select-string -InputObject $string -Pattern '[^"]+' | % { $_.Matches } | % { $_.Value } )
+    $regexp = '^\s*#define\s+POV_RAY_PRERELEASE\s*"[^"]+"\s*$'
+    $line = ( select-string -Path $version_h -Pattern $regexp | % { $_.Matches } | % { $_.Value } )
+    $string = ( select-string -InputObject $line -Pattern '"[^"]+"' | % { $_.Matches } | % { $_.Value } )
+    $prerelease = ( select-string -InputObject $string -Pattern '[^"]+' | % { $_.Matches } | % { $_.Value } )
+    if ($prerelease) {
+      $env:pov_exe_version = $official_version + '-' + $prerelease
+    } else {
+      $env:pov_exe_version = $official_version
+    }
     $env:pov_tag_version = 'v' + $env:pov_exe_version
     $env:pov_build_version = $env:pov_tag_version + '+av' + $env:APPVEYOR_BUILD_NUMBER
     $env:pov_build_message = ''
-    if ($env:pov_exe_version -match '^[0-9.]*-x') {
+    if ($prerelease -match '^x') {
       $env:pov_build_type = 'Experimental'
       $env:pov_build_message += '**EXPERIMENTAL: This version of POV-Ray is not part of the official development branch!**'
       $env:pov_build_message += "`n`n"
-    } elseif ($env:pov_exe_version -match '^[0-9.]*-') {
+    } elseif ($prerelease) {
       $env:pov_build_type = 'Development'
     } else {
       $env:pov_build_type = 'Automated'
@@ -99,3 +110,5 @@ deploy:
     secure: WkcFPXyr/SJ9TXixTQyivhfoR9FzlryIbc4deHeQ0eA6YRXL0wQopMYJ6XL1/FJK
   draft: true
   prerelease: true
+  on:
+    appveyor_repo_tag: true
