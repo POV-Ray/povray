@@ -409,9 +409,6 @@ else
   if test x"$ax_check_libjpeg" != x"ok"; then
     AC_MSG_ERROR([cannot find a suitable JPEG library])
   else
-    # create jversion.h in builddir
-    test -d "./source" || mkdir ./source
-    echo "#define JVERSION \"${ax_check_libjpeg_version}\"" > ./source/jversion.h
     pov_libjpeg=ok
   fi
 fi

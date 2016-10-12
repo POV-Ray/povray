@@ -186,6 +186,7 @@ $RECYCLE.BIN/
 /source/Makefile.in
 /unix/Makefile.am
 /unix/Makefile.in
+/unix/config/compile
 /unix/config/config.guess
 /unix/config/config.sub
 /unix/config/depcomp
@@ -207,7 +208,6 @@ $RECYCLE.BIN/
 /stamp-h1
 # Files created by configure script in specific subdirectories
 /platform/Makefile
-/source/jversion.h
 /source/Makefile
 /unix/Makefile
 /vfe/Makefile

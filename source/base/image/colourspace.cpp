@@ -58,8 +58,9 @@ boost::mutex GammaCurve::cacheMutex;
 // definitions of static GammaCurve-derivatives' member variables to satisfy the linker
 SimpleGammaCurvePtr NeutralGammaCurve::instance;
 SimpleGammaCurvePtr SRGBGammaCurve::instance;
-GammaCurvePtr ITURBT709GammaCurve::instance;
-GammaCurvePtr Rec1361GammaCurve::instance;
+SimpleGammaCurvePtr BT709GammaCurve::instance;
+SimpleGammaCurvePtr BT1361GammaCurve::instance;
+SimpleGammaCurvePtr BT2020GammaCurve::instance;
 
 /*******************************************************************************/
 
@@ -200,52 +201,95 @@ int SRGBGammaCurve::GetTypeId() const
 
 /*******************************************************************************/
 
-ITURBT709GammaCurve::ITURBT709GammaCurve() {}
-GammaCurvePtr ITURBT709GammaCurve::Get()
+BT709GammaCurve::BT709GammaCurve() {}
+SimpleGammaCurvePtr BT709GammaCurve::Get()
 {
     if (!instance)
-        instance.reset(new ITURBT709GammaCurve());
-    return GammaCurvePtr(instance);
+        instance.reset(new BT709GammaCurve());
+    return SimpleGammaCurvePtr(instance);
 }
-float ITURBT709GammaCurve::Encode(float x) const
+float BT709GammaCurve::Encode(float x) const
 {
     if (x < 0.018f) return x * 4.5f;
     else            return 1.099f * pow(x, 0.45f) - 0.099f;
 }
-float ITURBT709GammaCurve::Decode(float x) const
+float BT709GammaCurve::Decode(float x) const
 {
+    // NB: ITU-R BT.709 does not officially specify a decoding transfer function. The following is the actual inverse
+    //     of the implemented transfer function.
     if (x < 0.081f) return x / 4.5f;
     else            return pow((x + 0.099f) / 1.099f, 1.0f/0.45f);
 }
-float ITURBT709GammaCurve::ApproximateDecodingGamma() const
+float BT709GammaCurve::ApproximateDecodingGamma() const
 {
     return 1.9f; // very rough approximation
+}
+int BT709GammaCurve::GetTypeId() const
+{
+    return kPOVList_GammaType_BT709;
 }
 
 /*******************************************************************************/
 
-Rec1361GammaCurve::Rec1361GammaCurve() {}
-GammaCurvePtr Rec1361GammaCurve::Get()
+BT1361GammaCurve::BT1361GammaCurve() {}
+SimpleGammaCurvePtr BT1361GammaCurve::Get()
 {
     if (!instance)
-        instance.reset(new Rec1361GammaCurve());
-    return GammaCurvePtr(instance);
+        instance.reset(new BT1361GammaCurve());
+    return SimpleGammaCurvePtr(instance);
 }
-float Rec1361GammaCurve::Encode(float x) const
+float BT1361GammaCurve::Encode(float x) const
 {
     if      (x < -0.0045f) return (1.099f * pow(-4*x, 0.45f) - 0.099f) / 4;
     else if (x <  0.018f)  return x * 4.5f;
     else                   return 1.099f * pow(x,0.45f) - 0.099f;
 }
-float Rec1361GammaCurve::Decode(float x) const
+float BT1361GammaCurve::Decode(float x) const
 {
     if      (x < -0.02025f) return pow((4*x + 0.099f) / 1.099f, 1.0f/0.45f) / -4;
     else if (x <  0.081f)   return x / 4.5f;
     else                    return pow((x + 0.099f) / 1.099f, 1.0f/0.45f);
 }
-float Rec1361GammaCurve::ApproximateDecodingGamma() const
+float BT1361GammaCurve::ApproximateDecodingGamma() const
 {
     return 1.9f; // very rough approximation of the x>0 section
+}
+int BT1361GammaCurve::GetTypeId() const
+{
+    return kPOVList_GammaType_BT1361;
+}
+
+/*******************************************************************************/
+
+BT2020GammaCurve::BT2020GammaCurve() {}
+SimpleGammaCurvePtr BT2020GammaCurve::Get()
+{
+    if (!instance)
+        instance.reset(new BT2020GammaCurve());
+    return SimpleGammaCurvePtr(instance);
+}
+float BT2020GammaCurve::Encode(float x) const
+{
+    // NB: We're using higher-precision coefficients than given in ITU-R BT.2020; note that this is perfectly in
+    //     accordance with the specification, as the numerical values given there are just approximations, and the
+    //     coefficients are instead defined as "the solutions to [a certain set of] simultaneous equations".
+    if (x < 0.01805396851080780734f) return x * 4.5f;
+    else                             return 1.09929682680944294035f * pow(x, 0.45f) - 0.09929682680944294035f;
+}
+float BT2020GammaCurve::Decode(float x) const
+{
+    // NB: ITU-R BT.2020 does not officially specify a decoding transfer function. The following is the actual inverse
+    //     of the implemented transfer function.
+    if (x < 0.08124285829863513301f) return x / 4.5f;
+    else                             return pow((x + 0.09929682680944294035f) / 1.09929682680944294035f, 1.0f/0.45f);
+}
+float BT2020GammaCurve::ApproximateDecodingGamma() const
+{
+    return 1.9f; // very rough approximation
+}
+int BT2020GammaCurve::GetTypeId() const
+{
+    return kPOVList_GammaType_BT2020;
 }
 
 /*******************************************************************************/
@@ -394,7 +438,10 @@ SimpleGammaCurvePtr GetGammaCurve(GammaTypeId type, float param)
         case kPOVList_GammaType_Neutral:    return NeutralGammaCurve::Get();
         case kPOVList_GammaType_PowerLaw:   return PowerLawGammaCurve::GetByDecodingGamma(param);
         case kPOVList_GammaType_SRGB:       return SRGBGammaCurve::Get();
-        default:                            return PowerLawGammaCurve::GetByDecodingGamma(DEFAULT_FILE_GAMMA);
+        case kPOVList_GammaType_BT709:      return BT709GammaCurve::Get();
+        case kPOVList_GammaType_BT1361:     return BT1361GammaCurve::Get();
+        case kPOVList_GammaType_BT2020:     return BT2020GammaCurve::Get();
+        default:                            POV_ASSERT (false);
     }
 }
 

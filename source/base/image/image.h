@@ -104,6 +104,22 @@ class Image
             RGBFTColourMap
         };
 
+        enum ImageChannelDataType
+        {
+            kImageChannelDataType_Int8,
+            kImageChannelDataType_Int16,
+            kImageChannelDataType_Gamma8,
+            kImageChannelDataType_Gamma16,
+        };
+
+        enum ImageChannelLayout
+        {
+            kImageChannelLayout_Gray,
+            kImageChannelLayout_GrayA,
+            kImageChannelLayout_RGB,
+            kImageChannelLayout_RGBA,
+        };
+
         enum ImageDataType
         {
             /// Value used to indicate that image decoder is free to pick the most fitting type.
@@ -190,13 +206,15 @@ class Image
             bool premultiplyOverride;           // whether to override file-format default for alpha premultiplication
             bool premultiply;                   // whether to output premultiplied ("associated") alpha or not ("straight alpha")
             DitherHandlerPtr dither;
-            unsigned int offset_x;
-            unsigned int offset_y;
+            unsigned int offset_x;              ///< Currently not actively set.
+            unsigned int offset_y;              ///< Currently not actively set.
 
             WriteOptions() : bpcc(8), alphachannel(false), grayscale(false), compress(0) /*, gamma(1.0f) */, premultiplyOverride(false), premultiply(false), offset_x(0), offset_y(0) { }
         };
 
         virtual ~Image() { }
+
+        static ImageDataType GetImageDataType (ImageChannelDataType channelType, ImageChannelLayout layout);
 
         static Image *Create(unsigned int w, unsigned int h, ImageDataType t, unsigned int maxRAMmbHint, unsigned int pixelsPerBlockHint);
         static Image *Create(unsigned int w, unsigned int h, ImageDataType t, bool allowFileBacking = false);
