@@ -444,11 +444,30 @@ ImageData *Parser::Parse_Image(int Legal, bool GammaCorrect)
                           "details.");
         }
 
+        if (GammaCorrect && !options.gammaOverride && ((filetype == PGM_FILE) || (filetype == PPM_FILE)))
+        {
+            // As of POV-Ray 3.7.1, our default gamma handling for Netpbm (PGM/PPM) input images adheres to the
+            // official standard, which mandates data to be gamma-encoded using the ITU-R BT.709 transfer function.
+
+            if (sceneData->EffectiveLanguageVersion() < 371)
+            {
+                // For legacy scenes we simulate the old behaviour, which was to perform no gamma correction at all.
+                options.gammacorrect = false;
+            }
+            else
+            {
+                Warning("Input image gamma not specified for Netpbm (PGM/PPM) file; POV-Ray will default to the\n"
+                        "official standard, but competing de-facto standards exist. To get rid of this warning,\n"
+                        "explicitly specify \"gamma bt709\". If the results do not match your expectations, try\n"
+                        "\"gamma srgb\" or \"gamma 1.0\".");
+            }
+        }
+
         if (!GammaCorrect)
         {
             // context typically implies that gamma correction is not desired (e.g. height_field)
             if (options.gammacorrect && !options.gammaOverride)
-                Warning("input image gamma not specified for height_field, bump_map or image_pattern;\n"
+                Warning("Input image gamma not specified for height_field, bump_map or image_pattern;\n"
                         "no gamma adjustment performed on input image; results may differ from intention\n"
                         "in rare cases. See the documentation for details.\n"
                         "To get rid of this warning, explicitly specify \"gamma 1.0\".");

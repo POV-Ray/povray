@@ -114,9 +114,9 @@ void Write (OStream *file, const Image *image, const Image::WriteOptions& option
         if (options.encodingGamma)
             gamma = TranscodingGammaCurve::Get(options.workingGamma, options.encodingGamma);
         else
-            // PPM files may or may not be gamma-encoded; besides the sRGB transfer function, the ITU-R-BT.709 transfer function is said to be common as well.
-            // If no encoding gamma is specified, we're defaulting to working gamma space at present, i.e. no gamma correction.
-            gamma = NeutralGammaCurve::Get();
+            // The official Netpbm standard mandates the use of the ITU-R-BT.709 transfer function, although it
+            // acknowledges the use of linear encoding or the sRGB transfer function as alternative de-facto standards.
+            gamma = TranscodingGammaCurve::Get(options.workingGamma, BT709GammaCurve::Get());
 #ifndef ASCII_PPM_OUTPUT
         file->printf("P6\n");
 #else
@@ -339,7 +339,7 @@ Image *Read (IStream *file, const Image::ReadOptions& options)
         case '4': // "raw" (binary) Portable Bit Map (PBM)
         case '7': // Portable Arbitrary Map (PAM)
         default:
-            throw POV_EXCEPTION(kFileDataErr, "File is not a supported Netbpm (PGM/PPM) file");
+            throw POV_EXCEPTION(kFileDataErr, "File is not a supported Netpbm (PGM/PPM) file");
             break;
     }
 
