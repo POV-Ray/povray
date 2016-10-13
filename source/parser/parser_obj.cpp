@@ -326,7 +326,7 @@ void Parser::Parse_Obj (Mesh* mesh)
                         else
                             ++vertex;
                     }
-                    if ((haveVertices > 3) && (havePolygonFaces))
+                    if ((haveVertices > 3) && !havePolygonFaces)
                     {
                         Warning ("Non-triangular faces found in obj file %s. Faces will only import properly if they are convex and planar.", UCS2toASCIIString(fileName).c_str());
                         havePolygonFaces = true;
@@ -436,9 +436,7 @@ void Parser::Parse_Obj (Mesh* mesh)
     }
 
     // close obj file
-
-    if (textStream)
-        delete textStream;
+    delete textStream;
 
     size_t smoothFaces = faceList.size();
     faceList.insert (faceList.end(), flatFaceList.begin(), flatFaceList.end());

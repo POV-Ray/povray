@@ -289,11 +289,7 @@ DBL chdtri(DBL df, DBL  y)
     DBL x;
 
     if ((y < 0.0) || (y > 1.0) || (df < 1.0))
-    {
         throw POV_EXCEPTION_STRING("Illegal values in chdtri().");
-
-        return (0.0);
-    }
 
     x = igami(0.5 * df, y);
 

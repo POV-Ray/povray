@@ -121,7 +121,11 @@ class FNCode
 
         void Parameter();
         void Compile(ExprNode *);
+
+#if (DEBUG_FLOATFUNCTION == 1)
         void SetFlag(unsigned int, char *);
+#endif
+
     private:
         FunctionCode *function;
         Parser *parser;

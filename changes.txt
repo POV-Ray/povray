@@ -196,8 +196,18 @@ Fixed or Mitigated Issues Reported by Static Code Analysis
 
 Coverity Scan defects targeted deliberately:
 
+- CID 967251: 'Constant' variable guards dead code
+- CID 967254: 'Constant' variable guards dead code
+- CID 967261: Logically dead code
+- CID 967262: Logically dead code
+- CID 967273: Explicit null dereferenced
+- CID 967296: Parse Warning
+- CID 967297: Parse Warning
 - CID 967377: Uninitialized pointer field
 - CID 967400: Uninitialized pointer field
+- CID 967410: Structurally dead code
+- CID 967412: Structurally dead code
+- CID 1129008: Division or modulo by zero
 - CID 1129016: Uninitialized pointer read
 - CID 1129017: Uninitialized scalar variable
 - CID 1372548: Non-virtual destructor
@@ -205,7 +215,16 @@ Coverity Scan defects targeted deliberately:
 - CID 1372555: Operands don't affect result
 - CID 1372556: Wrong operator used
 - CID 1372557: Wrong operator used
+- CID 1372558: Resource leak in object
+- CID 1372560: Logically dead code
 - CID 1372562: Non-array delete for scalars
+- CID 1372566: Unchecked dynamic_cast
+- CID 1372567: Unchecked dynamic_cast
+- CID 1372603: Resource leak
+- CID 1372604: Dereference before null check
+- CID 1372605: Dereference before null check
+- CID 1372606: Dereference before null check
+- CID 1372607: Dereference before null check
 - CID 1372608: Sizeof not portable
 - CID 1372626: Uninitialized scalar variable
 - CID 1372636: Uninitialized pointer field
@@ -224,6 +243,11 @@ Coverity Scan defects targeted deliberately:
 - CID 1372655: Structurally dead code
 - CID 1372656: Structurally dead code
 - CID 1372657: Unused value
+- CID 1373648: Out-of-bounds access
+- CID 1373649: Free of address-of expression
+- CID 1373651: Logically dead code
+- CID 1373652: Dereference before null check
+- CID 1373653: Write to pointer after free
 
 Coverity Scan defects eliminated in passing:
 

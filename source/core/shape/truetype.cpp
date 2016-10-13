@@ -1672,6 +1672,7 @@ GlyphPtr ExtractGlyphInfo(TrueTypeFont *ffile, unsigned int glyph_index, unsigne
     GlyphPtr glyph;
 
     ttglyph = ExtractGlyphOutline(ffile, glyph_index, c);
+    POV_SHAPE_ASSERT (ttglyph);
 
     /*
      * Convert the glyph outline information from TrueType layout into a more
@@ -1684,8 +1685,7 @@ GlyphPtr ExtractGlyphInfo(TrueTypeFont *ffile, unsigned int glyph_index, unsigne
 
     /* Free up outline information */
 
-    if (ttglyph)
-        delete ttglyph;
+    delete ttglyph;
 
 #ifdef TTF_DEBUG3
     int i, j;
