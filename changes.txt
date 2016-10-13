@@ -248,6 +248,7 @@ Coverity Scan defects targeted deliberately:
 - CID 1373651: Logically dead code
 - CID 1373652: Dereference before null check
 - CID 1373653: Write to pointer after free
+- CID 1373654: Use after free
 
 Coverity Scan defects eliminated in passing:
 
