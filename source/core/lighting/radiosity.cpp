@@ -919,7 +919,6 @@ bool RadiosityCache::Load(const Path& inputFile)
         double nearest;
         int goodreads = 0;
         int count;
-        bool goodparse = true;
         DBL brightness;
         char normal_string[30], to_nearest_string[30];
         char line[101];
@@ -927,7 +926,7 @@ bool RadiosityCache::Load(const Path& inputFile)
         //info->Gather_Total.clear();
         //info->Gather_Total_Count = 0;
 
-        while (!(got_eof = !fd->getline (line, 99)) && goodparse)
+        while (!(got_eof = !fd->getline (line, 99)))
         {
             switch ( line[0] )
             {
@@ -993,19 +992,11 @@ bool RadiosityCache::Load(const Path& inputFile)
             } // end switch
         } // end while-reading loop
 
-        if ( !got_eof  || !goodparse )
-        {
-            ;// TODO MESSAGE      PossibleError("Cannot process radiosity cache file at line %d.", (int)line_num);
-            ok = false;
-        }
+        if ( goodreads > 0 )
+            ;// TODO MESSAGE         Debug_Info("Reloaded %d values from radiosity cache file.\n", goodreads);
         else
-        {
-            if ( goodreads > 0 )
-                ;// TODO MESSAGE         Debug_Info("Reloaded %d values from radiosity cache file.\n", goodreads);
-            else
-                ;// TODO MESSAGE         PossibleError("Unable to read any values from the radiosity cache file.");
-            ok = true;
-        }
+            ;// TODO MESSAGE         PossibleError("Unable to read any values from the radiosity cache file.");
+        ok = true;
 
         ReleaseBlockPool(pool);
 

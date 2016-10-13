@@ -296,6 +296,8 @@ class Parser : public SceneTask
         // constructor
         Parser(shared_ptr<BackendSceneData> sd, bool useclock, DBL clock);
 
+        ~Parser();
+
         void Run();
         void Stopped();
         void Finish();

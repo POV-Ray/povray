@@ -873,8 +873,7 @@ UCS2 *Parser::String_Literal_To_UCS2(const char *str, bool pathname)
                     break;
                 default:
                     char_string[index_out] = char_array[index_in];
-                    if ( char_array )
-                        POV_FREE(char_array);
+                    POV_FREE(char_array);
                     char_array = NULL;
                     Error( "Illegal escape sequence in string." );
                     break;

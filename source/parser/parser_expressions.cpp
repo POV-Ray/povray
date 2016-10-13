@@ -3647,6 +3647,8 @@ GenericSpline *Parser::Parse_Spline()
     /* Determine kind of spline */
     EXPECT
         CASE(LINEAR_SPLINE_TOKEN)
+            if (New)
+                delete New;
             if (Old)
                 New = new LinearSpline(*Old);
             else
@@ -3655,6 +3657,8 @@ GenericSpline *Parser::Parse_Spline()
         END_CASE
 
         CASE(QUADRATIC_SPLINE_TOKEN)
+            if (New)
+                delete New;
             if (Old)
                 New = new QuadraticSpline(*Old);
             else
@@ -3663,6 +3667,8 @@ GenericSpline *Parser::Parse_Spline()
         END_CASE
 
         CASE(CUBIC_SPLINE_TOKEN)
+            if (New)
+                delete New;
             if (Old)
                 New = new CatmullRomSpline(*Old);
             else
@@ -3671,6 +3677,8 @@ GenericSpline *Parser::Parse_Spline()
         END_CASE
 
         CASE(NATURAL_SPLINE_TOKEN)
+            if (New)
+                delete New;
             if (Old)
                 New = new NaturalSpline(*Old);
             else
