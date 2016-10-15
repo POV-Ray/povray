@@ -2614,6 +2614,10 @@ void Parser::Parse_Finish (FINISH **Finish_Ptr)
         END_CASE
 
         CASE (SUBSURFACE_TOKEN)
+            if (sceneData->useSubsurface != true)
+            {
+                Error("Finish subsurface block seen before subsurface block set in global_settings.");
+            }
             mExperimentalFlags.subsurface = true;
             New->UseSubsurface = true;
             Parse_Begin();
