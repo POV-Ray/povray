@@ -1118,7 +1118,7 @@ void Torus::CalcUV(const Vector3d& IPoint, Vector2d& Result) const
     z = P[Z];
 
     // Determine its angle from the y-axis.
-    u = (1.0 - (atan2(z, x) + M_PI) / TWO_M_PI);
+    u = (atan2(-z,-x) + M_PI) / TWO_M_PI;
 
     len = sqrt(x * x + z * z);
 
