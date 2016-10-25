@@ -75,6 +75,12 @@ vfeSession::vfeSession(int id)
   m_MaxConsoleMessages = -1;
   m_OptimizeForConsoleOutput = true;
   m_ConsoleWidth = 80;
+  if (const char* env_p = std::getenv("POVRAY_CONSOLE_COLUMNS"))
+  {
+      m_ConsoleWidth = std::max((long)m_ConsoleWidth,std::strtol(env_p,NULL,10));
+      m_ConsoleWidth = std::min(m_ConsoleWidth,999);
+    //std::cout << "Console column width by POVRAY_CONSOLE_COLUMNS: " << m_ConsoleWidth << '\n';
+  }
   m_RequestFlag = rqNoRequest;
   m_RequestResult = 0;
   m_StartTime = 0;

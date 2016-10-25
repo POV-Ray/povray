@@ -38,6 +38,7 @@
 
 // C++ variants of standard C header files
 #include <cstring>
+#include <cstdlib>
 
 // Standard C++ header files
 #include <algorithm>
@@ -58,6 +59,12 @@ TextStreamBuffer::TextStreamBuffer(size_t buffersize, unsigned int wrapwidth)
     boffset = 0;
     bsize = buffersize;
     wrap = wrapwidth;
+    if (const char* env_p = std::getenv("POVRAY_TEXTSTREAM_COLUMNS"))
+    {
+        if (wrap==80U)
+            wrap = std::max((long)wrap,std::strtol(env_p,NULL,10));
+        wrap = std::min(wrap,999U);
+    }
     curline = 0;
     buffer = new char[bsize];
     if(buffer == NULL)
