@@ -148,11 +148,12 @@ static void ProcessSignal (void)
                 gSession->SetConsoleWidth(GetTerminalWidth());
             break;
 #endif
+#ifdef SIGCHLD
         case SIGCHLD:
             // for now, ignore this (side-effect of the shell-out code).
             // once properly implemented, the shell-out code would want to know this has happened, though.
             break;
-
+#endif
         default:
             // fprintf(stderr, "\n%s: received signal %d\n", PACKAGE, gSignalNumber);
             break;
