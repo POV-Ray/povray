@@ -207,28 +207,20 @@ static void PrintStatus (vfeSession *session)
 
 static void PrintStatusChanged (vfeSession *session, State force = kUnknown)
 {
-    int printed;
-
     if (force == kUnknown)
         force = session->GetBackendState();
     switch (force)
     {
         case kParsing:
-            printed = fprintf (stderr, "==== [Parsing...] =============================================================");
+            fprintf (stderr, "==== [Parsing...] ==========================================================\n");
             break;
         case kRendering:
-            printed = fprintf (stderr, "==== [Rendering...] ===========================================================");
+            fprintf (stderr, "==== [Rendering...] ========================================================\n");
             break;
         case kPausedRendering:
-            printed = fprintf (stderr, "==== [Paused] =================================================================");
+            fprintf (stderr, "==== [Paused] ==============================================================\n");
             break;
     }
-    while (printed < session->GetConsoleWidth()-1)
-    {
-        fprintf (stderr, "=");
-        printed++;
-    }
-    fprintf (stderr, "\n");
 }
 
 static void PrintVersion(void)
