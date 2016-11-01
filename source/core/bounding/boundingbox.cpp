@@ -62,8 +62,8 @@ BBOX_TREE *create_bbox_node(int size);
 
 int find_axis(BBOX_TREE **Finite, ptrdiff_t first, ptrdiff_t last);
 void calc_bbox(BoundingBox *BBox, BBOX_TREE **Finite, ptrdiff_t first, ptrdiff_t last);
-void build_area_table(BBOX_TREE **Finite, ptrdiff_t a, ptrdiff_t b, DBL *areas);
-int sort_and_split(BBOX_TREE **Root, BBOX_TREE **&Finite, size_t *numOfFiniteObjects, ptrdiff_t first, ptrdiff_t last, size_t& maxfinitecount);
+void build_area_table(BBOX_TREE **Finite, ptrdiff_t a, ptrdiff_t b, BBoxScalar *areas);
+bool sort_and_split(BBOX_TREE **Root, BBOX_TREE **&Finite, size_t *numOfFiniteObjects, ptrdiff_t first, ptrdiff_t last, size_t& maxfinitecount, BBoxScalar **areaCache);
 
 BBoxPriorityQueue::BBoxPriorityQueue()
 {
@@ -263,11 +263,15 @@ void Build_BBox_Tree(BBOX_TREE **Root, size_t numOfFiniteObjects, BBOX_TREE **&F
         low = 0;
         high = numOfFiniteObjects;
 
-        while(sort_and_split(Root, Finite, &numOfFiniteObjects, low, high, maxfinitecount) == 0)
+        BBoxScalar *areaCache = new BBoxScalar[numOfFiniteObjects*2];
+
+        while (sort_and_split(Root, Finite, &numOfFiniteObjects, low, high, maxfinitecount, &areaCache))
         {
             low = high;
             high = numOfFiniteObjects;
         }
+
+        delete[] areaCache;
 
         // Move infinite objects in the first leaf of Root.
         if(numOfInfiniteObjects > 0)
@@ -524,142 +528,103 @@ bool Intersect_BBox_Tree(BBoxPriorityQueue& pqueue, const BBOX_TREE *Root, const
 
 void Check_And_Enqueue(BBoxPriorityQueue& Queue, const BBOX_TREE *Node, const BoundingBox *BBox, const Rayinfo *rayinfo, RenderStatistics& Stats)
 {
-    DBL tmin, tmax;
     DBL dmin, dmax;
 
     if(Node->Infinite == false)
     {
         Stats[nChecked]++;
 
-        if(rayinfo->nonzero[X])
+        // Test whether the bounding box is being hit.
+
+        // The bounding box can be thought of as an intersection of three "slabs", by which we mean slices of 3D space
+        // bounded by parallel axis-aligned planes; we have an "X slab" bounding the box in the X dimension, an
+        // "Y slab", and a "Z slab".
+
+        // With a few exceptions that we need to test for, any ray will intersect all three slabs, defining an interval
+        // along the ray in which the ray is inside the slab.
+
+        // Where the intervals for the individual slabs overlap, the ray is inside bounding box.
+
+        // We proceed one dimension at a time.
+
+        // These will keep track of the overlap between the intervals.
+        dmin = -BOUND_HUGE;
+        dmax =  BOUND_HUGE;
+
+        for (int dim = X; dim <= Z; ++dim)
         {
-            if (rayinfo->positive[X])
+            if(rayinfo->nonzero[dim])
             {
-                dmin = (BBox->lowerLeft[X] - rayinfo->slab_num[X]) *  rayinfo->slab_den[X];
-                dmax = dmin + (BBox->size[X]  * rayinfo->slab_den[X]);
-                if(dmax < EPSILON)
-                    return;
-            }
-            else
-            {
-                dmax = (BBox->lowerLeft[X] - rayinfo->slab_num[X]) * rayinfo->slab_den[X];
+                // These will hold the distance to the near and far plane, respectively, for this slab.
+                DBL tmin, tmax;
 
-                if(dmax < EPSILON)
-                    return;
-
-                dmin = dmax + (BBox->size[X]  * rayinfo->slab_den[X]);
-            }
-
-            if(dmin > dmax)
-                return;
-        }
-        else
-        {
-            if((rayinfo->slab_num[X] < BBox->lowerLeft[X]) ||
-               (rayinfo->slab_num[X] > BBox->size[X] + BBox->lowerLeft[X]))
-                return;
-
-            dmin = -BOUND_HUGE;
-            dmax = BOUND_HUGE;
-        }
-
-        if(rayinfo->nonzero[Y])
-        {
-            if(rayinfo->positive[Y])
-            {
-                tmin = (BBox->lowerLeft[Y] - rayinfo->slab_num[Y]) * rayinfo->slab_den[Y];
-                tmax = tmin + (BBox->size[Y]  * rayinfo->slab_den[Y]);
-            }
-            else
-            {
-                tmax = (BBox->lowerLeft[Y] - rayinfo->slab_num[Y]) * rayinfo->slab_den[Y];
-                tmin = tmax + (BBox->size[Y]  * rayinfo->slab_den[Y]);
-            }
-
-            // Unwrap the logic - do the dmin and dmax checks only when tmin and
-            // tmax actually affect anything, also try to escape ASAP. Better
-            // yet, fold the logic below into the two branches above so as to
-            //  compute only what is needed.
-
-            // You might even try tmax < EPSILON first (instead of second) for an
-            // early quick out.
-
-            if(tmax < dmax)
-            {
-                if(tmax < EPSILON)
-                    return;
-
-                // check bbox only if tmax changes dmax
-
-                if(tmin > dmin)
+                if (rayinfo->positive[dim])
                 {
-                    if(tmin > tmax)
+                    // Far plane is "upper" plane, near plane is the "lower" one.
+                    tmax = (BBox->lowerLeft[dim] + BBox->size[dim] - rayinfo->origin[dim]) * rayinfo->invDirection[dim];
+                    if(tmax < EPSILON)
+                        // The far plane is (at least almost) behind the observer,
+                        // so the ray is heading away from the box and can't possibly intersect it.
                         return;
-
-                    // do this last in case it's not needed!
-                    dmin = tmin;
+                    tmin = (BBox->lowerLeft[dim] - rayinfo->origin[dim]) * rayinfo->invDirection[dim];
                 }
-                else if(dmin > tmax)
-                    return;
+                else
+                {
+                    // Far plane is "lower" plane, near plane is the "upper" one.
+                    tmax = (BBox->lowerLeft[dim] - rayinfo->origin[dim]) * rayinfo->invDirection[dim];
+                    if(tmax < EPSILON)
+                        // The far plane is (at least almost) behind the observer,
+                        // so the ray is heading away from the box and can't possibly intersect it.
+                        return;
+                    tmin = (BBox->lowerLeft[dim] + BBox->size[dim] - rayinfo->origin[dim]) * rayinfo->invDirection[dim];
+                }
 
-                // do this last in case it's not needed!
-                dmax = tmax;
-            }
-            else if(tmin > dmin)
-            {
-                if(tmin > dmax)
-                    return;
+                // The next portion of code is essentially the same as the following
+                // (presuming dmin <= dmax initially), with a lot of shortcuts to bail out early:
+                //
+                //  if (tmax < dmax) dmax = tmax;   // update the overlap lower bound
+                //  if (tmin > dmin) dmin = tmin;   // update the overlap upper bound
+                //  if (dmin > dmax) return;        // detect whether there is no overlap
 
-                // do this last in case it's not needed!
-                dmin = tmin;
-            }
-        }
-        else if((rayinfo->slab_num[Y] < BBox->lowerLeft[Y]) ||
-                (rayinfo->slab_num[Y] > BBox->size[Y] + BBox->lowerLeft[Y]))
-            return;
-
-        if(rayinfo->nonzero[Z])
-        {
-            if(rayinfo->positive[Z])
-            {
-                tmin = (BBox->lowerLeft[Z] - rayinfo->slab_num[Z]) * rayinfo->slab_den[Z];
-                tmax = tmin + (BBox->size[Z]  * rayinfo->slab_den[Z]);
+                if (tmax < dmax)
+                {
+                    if (tmin > dmin)
+                    {
+                        if(tmin > tmax)
+                            return;
+                        dmin = tmin;
+                    }
+                    else
+                    {
+                        if(dmin > tmax)
+                            return;
+                    }
+                    dmax = tmax;
+                }
+                else
+                {
+                    if(tmin > dmin)
+                    {
+                        if(tmin > dmax)
+                            return;
+                        dmin = tmin;
+                    }
+                }
             }
             else
             {
-                tmax = (BBox->lowerLeft[Z] - rayinfo->slab_num[Z]) * rayinfo->slab_den[Z];
-                tmin = tmax + (BBox->size[Z]  * rayinfo->slab_den[Z]);
-            }
+                // Special case: The ray runs parallel to this slab; there ray is either entirely inside the slab,
+                // or it is entirely outside; we can easily check this by testing the ray origin.
 
-            if(tmax < dmax)
-            {
-                if(tmax < EPSILON)
+                if (!IsInRange (rayinfo->origin[dim], BBox->lowerLeft[dim], BBox->lowerLeft[dim] + BBox->size[dim]))
+                    // The ray is entirely outside the slab, so it can't possibly hit the bounding box.
                     return;
 
-                // check bbox only if tmax changes dmax
-                if(tmin > dmin)
-                {
-                    if(tmin > tmax)
-                        return;
-
-                    // do this last in case it's not needed!
-                    dmin = tmin;
-                }
-                else if(dmin > tmax)
-                    return;
-            }
-            else if(tmin > dmin)
-            {
-                if(tmin > dmax)
-                    return;
-
-                // do this last in case it's not needed!
-                dmin = tmin;
+                // The ray is entirely inside the slab, so this slab has no effect on the end result.
             }
         }
-        else
-            if((rayinfo->slab_num[Z] < BBox->lowerLeft[Z]) || (rayinfo->slab_num[Z] > BBox->size[Z] + BBox->lowerLeft[Z]))
-                return;
+
+        // If we've made it through to here, the ray does hit the box.
 
         Stats[nEnqueued]++;
     }
@@ -667,7 +632,7 @@ void Check_And_Enqueue(BBoxPriorityQueue& Queue, const BBOX_TREE *Node, const Bo
         // Set intersection depth to -Max_Distance.
         dmin = -MAX_DISTANCE;
 
-    Queue.Insert(dmin, Node);
+    Queue.Insert (dmin, Node);
 }
 
 BBOX_TREE *create_bbox_node(int size)
@@ -717,12 +682,12 @@ int find_axis(BBOX_TREE **Finite, ptrdiff_t first, ptrdiff_t last)
 {
     int which = X;
     ptrdiff_t i;
-    DBL e, d = -BOUND_HUGE;
-    Vector3d mins, maxs;
+    SNGL e, d = -BOUND_HUGE;
+    BBoxVector3d mins, maxs;
     BoundingBox *bbox;
 
-    mins = Vector3d(BOUND_HUGE);
-    maxs = Vector3d(-BOUND_HUGE);
+    mins = BBoxVector3d(BOUND_HUGE);
+    maxs = BBoxVector3d(-BOUND_HUGE);
 
     for(i = first; i < last; i++)
     {
@@ -732,19 +697,19 @@ int find_axis(BBOX_TREE **Finite, ptrdiff_t first, ptrdiff_t last)
             mins[X] = bbox->lowerLeft[X];
 
         if(bbox->lowerLeft[X] + bbox->size[X] > maxs[X])
-            maxs[X] = bbox->lowerLeft[X];
+            maxs[X] = bbox->lowerLeft[X] + bbox->size[X];
 
         if(bbox->lowerLeft[Y] < mins[Y])
             mins[Y] = bbox->lowerLeft[Y];
 
         if(bbox->lowerLeft[Y] + bbox->size[Y] > maxs[Y])
-            maxs[Y] = bbox->lowerLeft[Y];
+            maxs[Y] = bbox->lowerLeft[Y] + bbox->size[Y];
 
         if(bbox->lowerLeft[Z] < mins[Z])
             mins[Z] = bbox->lowerLeft[Z];
 
         if(bbox->lowerLeft[Z] + bbox->size[Z] > maxs[Z])
-            maxs[Z] = bbox->lowerLeft[Z];
+            maxs[Z] = bbox->lowerLeft[Z] + bbox->size[Z];
     }
 
     e = maxs[X] - mins[X];
@@ -807,11 +772,11 @@ void calc_bbox(BoundingBox *BBox, BBOX_TREE **Finite, ptrdiff_t first, ptrdiff_t
     Make_BBox_from_min_max(*BBox, bmin, bmax);
 }
 
-void build_area_table(BBOX_TREE **Finite, ptrdiff_t a, ptrdiff_t b, DBL *areas)
+void build_area_table(BBOX_TREE **Finite, ptrdiff_t a, ptrdiff_t b, BBoxScalar *areas)
 {
     ptrdiff_t i, imin, dir;
-    DBL tmin, tmax;
-    Vector3d bmin, bmax, len;
+    BBoxScalar tmin, tmax;
+    BBoxVector3d bmin, bmax, len;
     BoundingBox *bbox;
 
     if (a < b)
@@ -823,8 +788,8 @@ void build_area_table(BBOX_TREE **Finite, ptrdiff_t a, ptrdiff_t b, DBL *areas)
         imin = b;  dir = -1;
     }
 
-    bmin = Vector3d(BOUND_HUGE);
-    bmax = Vector3d(-BOUND_HUGE);
+    bmin = BBoxVector3d(BOUND_HUGE);
+    bmax = BBoxVector3d(-BOUND_HUGE);
 
     for(i = a; i != (b + dir); i += dir)
     {
@@ -854,74 +819,69 @@ void build_area_table(BBOX_TREE **Finite, ptrdiff_t a, ptrdiff_t b, DBL *areas)
     }
 }
 
-int sort_and_split(BBOX_TREE **Root, BBOX_TREE **&Finite, size_t *numOfFiniteObjects, ptrdiff_t first, ptrdiff_t last, size_t& maxfinitecount)
+bool sort_and_split(BBOX_TREE **Root, BBOX_TREE **&Finite, size_t *numOfFiniteObjects, ptrdiff_t first, ptrdiff_t last, size_t& maxfinitecount, BBoxScalar **areaCache)
 {
-    BBOX_TREE *cd;
-    ptrdiff_t size, i, best_loc;
-    DBL *area_left, *area_right;
-    DBL best_index, new_index;
+    ptrdiff_t i, best_loc = -1;
+    ptrdiff_t size = last - first;
 
-    int Axis = find_axis(Finite, first, last);
-    size = last - first;
     if(size <= 0)
-        return (1);
+        return false;
 
-    // Actually, we could do this faster in several ways. We could use a
-    // logn algorithm to find the median along the given axis, and then a
-    // linear algorithm to partition along the axis. Oh well.
-
-    switch(Axis)
+    // Don't bother to do any further examinations if the BUNCHING_FACTOR is reached.
+    if (size > BUNCHING_FACTOR)
     {
-        case X:
-            QSORT(reinterpret_cast<void *>(&Finite[first]), size, sizeof(BBOX_TREE *), compboxes<X>);
-            break;
-        case Y:
-            QSORT(reinterpret_cast<void *>(&Finite[first]), size, sizeof(BBOX_TREE *), compboxes<Y>);
-            break;
-        case Z:
-            QSORT(reinterpret_cast<void *>(&Finite[first]), size, sizeof(BBOX_TREE *), compboxes<Z>);
-            break;
-    }
+        BBoxScalar *area_left, *area_right;
+        BBoxScalar best_index, new_index;
 
-    // area_left[] and area_right[] hold the surface areas of the bounding
-    // boxes to the left and right of any given point. E.g. area_left[i] holds
-    // the surface area of the bounding box containing Finite 0 through i and
-    // area_right[i] holds the surface area of the box containing Finite
-    // i through size-1.
+        int Axis = find_axis(Finite, first, last);
 
-    area_left  = new DBL[size];
-    area_right = new DBL[size];
+        // Actually, we could do this faster in several ways. We could use a
+        // logn algorithm to find the median along the given axis, and then a
+        // linear algorithm to partition along the axis. Oh well.
 
-    // Precalculate the areas for speed.
-    build_area_table(Finite, first, last - 1, area_left);
-    build_area_table(Finite, last - 1, first, area_right);
-    best_index = area_right[0] * (size - 3.0);
-    best_loc = -1;
-
-    // Find the most effective point to split. The best location will be
-    // the one that minimizes the function N1*A1 + N2*A2 where N1 and N2
-    // are the number of objects in the two groups and A1 and A2 are the
-    // surface areas of the bounding boxes of the two groups.
-
-    for(i = 0; i < size - 1; i++)
-    {
-        new_index = (i + 1) * area_left[i] + (size - 1 - i) * area_right[i + 1];
-
-        if(new_index < best_index)
+        switch(Axis)
         {
-            best_index = new_index;
-            best_loc = i + first;
+            case X:
+                QSORT(reinterpret_cast<void *>(&Finite[first]), size, sizeof(BBOX_TREE *), compboxes<X>);
+                break;
+            case Y:
+                QSORT(reinterpret_cast<void *>(&Finite[first]), size, sizeof(BBOX_TREE *), compboxes<Y>);
+                break;
+            case Z:
+                QSORT(reinterpret_cast<void *>(&Finite[first]), size, sizeof(BBOX_TREE *), compboxes<Z>);
+                break;
+        }
+
+        // area_left[] and area_right[] hold the surface areas of the bounding
+        // boxes to the left and right of any given point. E.g. area_left[i] holds
+        // the surface area of the bounding box containing Finite 0 through i and
+        // area_right[i] holds the surface area of the box containing Finite
+        // i through size-1.
+
+        area_left  = *areaCache;
+        area_right = area_left + size;
+
+        // Precalculate the areas for speed.
+        build_area_table(Finite, first, last - 1, area_left);
+        build_area_table(Finite, last - 1, first, area_right);
+        best_index = area_right[0] * float(size-3); // estimated cost of _not_ subdividing
+
+        for(i = 1; i < size; i++)
+        {
+            new_index = float(i) * area_left[i-1] + float(size-i) * area_right[i];
+
+            if(new_index < best_index)
+            {
+                best_index = new_index;
+                best_loc = i + first;
+            }
         }
     }
 
-    delete[] area_left;
-    delete[] area_right;
-
-    // Stop splitting if the BUNCHING_FACTOR is reached or
-    // if splitting stops being effective.
-    if((size <= BUNCHING_FACTOR) || (best_loc < 0))
+    // Stop splitting if splitting stops being effective.
+    if(best_loc < 0)
     {
-        cd = create_bbox_node(size);
+        BBOX_TREE *cd = create_bbox_node(size);
 
         for(i = 0; i < size; i++)
             cd->Node[i] = Finite[first+i];
@@ -936,18 +896,22 @@ int sort_and_split(BBOX_TREE **Root, BBOX_TREE **&Finite, size_t *numOfFiniteObj
             // For debugging only.
             // TODO MESSAGE      Debug_Info("Reallocing Finite to %d\n", maxfinitecount);
             Finite = reinterpret_cast<BBOX_TREE **>(POV_REALLOC(Finite, maxfinitecount * sizeof(BBOX_TREE *), "bounding boxes"));
+            delete[] *areaCache;
+            *areaCache = new BBoxScalar[maxfinitecount];
         }
 
         Finite[*numOfFiniteObjects] = cd;
         (*numOfFiniteObjects)++;
 
-        return (1);
+        return false;
     }
+    else
+    {
+        sort_and_split(Root, Finite, numOfFiniteObjects, first, best_loc, maxfinitecount, areaCache);
+        sort_and_split(Root, Finite, numOfFiniteObjects, best_loc, last, maxfinitecount, areaCache);
 
-    sort_and_split(Root, Finite, numOfFiniteObjects, first, best_loc + 1, maxfinitecount);
-    sort_and_split(Root, Finite, numOfFiniteObjects, best_loc + 1, last, maxfinitecount);
-
-    return (0);
+        return true;
+    }
 }
 
 }

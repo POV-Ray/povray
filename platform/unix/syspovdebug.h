@@ -1,14 +1,21 @@
 //******************************************************************************
 ///
-/// @file vfe/syspovprotofrontend.h
+/// @file platform/unix/syspovdebug.h
 ///
-/// @todo   What's in here?
+/// This header file is included by povdebug.h, which is in turn included by
+/// all C++ files in POV-Ray. povdebug.h is the last header file included
+/// (with the possible exception of files that do not declare anything that
+/// could clash with declarations in povdebug.h or this file).
+///
+/// As a rule, system header files are not safe to include after this file.
+///
+/// @author Christopher J. Cason
 ///
 /// @copyright
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -33,9 +40,7 @@
 ///
 //******************************************************************************
 
-#ifndef __SYSPOVPROTOFRONTEND_H__
-#define __SYSPOVPROTOFRONTEND_H__
+#ifndef POVRAY_UNIX_SYSPOVDEBUG_H
+#define POVRAY_UNIX_SYSPOVDEBUG_H
 
-#include "syspovprotobase.h"
-
-#endif
+#endif // POVRAY_UNIX_SYSPOVDEBUG_H

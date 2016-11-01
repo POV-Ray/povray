@@ -53,21 +53,58 @@ namespace pov_base
 #define POV_PLATFORM_BASE PlatformBase::GetPlatformBaseReference()
 
 /// Abstract class defining an interface to platform-specific services.
+///
+/// @note
+///     Only one instance of this class shall ever exist in any process.
+///
 class PlatformBase
 {
-    public:
-        PlatformBase() { self = this; };
-        virtual ~PlatformBase() { self = NULL; };
+public:
 
-        virtual UCS2String GetTemporaryPath() = 0;
-        virtual UCS2String CreateTemporaryFile() = 0;
-        virtual void DeleteTemporaryFile(const UCS2String& filename) = 0;
+    PlatformBase() { POV_ASSERT(!self); self = this; };
+    virtual ~PlatformBase() { self = NULL; };
 
-        virtual bool ReadFileFromURL(OStream *file, const UCS2String& url, const UCS2String& referrer = UCS2String()) = 0;
+    virtual UCS2String GetTemporaryPath() = 0;
+    virtual UCS2String CreateTemporaryFile() = 0;
+    virtual void DeleteTemporaryFile(const UCS2String& filename) = 0;
 
-        static PlatformBase& GetPlatformBaseReference() { return *self; };
-    private:
-        static PlatformBase *self;
+    virtual bool ReadFileFromURL(OStream *file, const UCS2String& url, const UCS2String& referrer = UCS2String()) = 0;
+
+    /// Open a file for reading.
+    ///
+    /// This method opens a file on the local file system, returning a `FILE*`. The parameters correspond to `fopen()`,
+    /// except that the file name may be a Unicode string.
+    ///
+    virtual FILE* OpenLocalFile (const UCS2String& name, const char *mode) = 0;
+
+    /// Delete a file.
+    ///
+    /// This method removes a file from the local file system.
+    ///
+    virtual void DeleteLocalFile (const UCS2String& name) = 0;
+
+    /// Check whether a file is allowed to be accessed.
+    ///
+    /// This method shall determine whether a file on the local file system may be accessed for reading, or created
+    /// and/or accessed for writing, as configured by the user via a proprietary mechanism provided by the POV-Ray
+    /// user interface.
+    ///
+    /// @note
+    ///     This method does _not_ test whether the user has the required access rights at file system level.
+    ///
+    /// @param[in]  name        Name of the file to be accessed.
+    /// @param[in]  fileType    Type of the file to be accessed (one of `POV_File_*` as defined in
+    ///                         @ref fileinputoutput.h)
+    /// @param[in]  write       `true` to check for full (read and write) access, `false` to check for read access only.
+    /// @return                 `true` if access is granted, `false` otherwise.
+    ///
+    virtual bool AllowLocalFileAccess (const UCS2String& name, const unsigned int fileType, bool write) = 0;
+
+    static PlatformBase& GetInstance() { return *self; };
+
+private:
+
+    static PlatformBase *self;
 };
 
 }

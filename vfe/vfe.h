@@ -125,6 +125,9 @@ namespace vfe
       virtual UCS2String CreateTemporaryFile(void);
       virtual void DeleteTemporaryFile(const UCS2String& filename);
       virtual bool ReadFileFromURL(OStream *file, const UCS2String& url, const UCS2String& referrer = UCS2String());
+      virtual FILE* OpenLocalFile (const UCS2String& name, const char *mode);
+      virtual void DeleteLocalFile (const UCS2String& name);
+      virtual bool AllowLocalFileAccess (const UCS2String& name, const unsigned int fileType, bool write);
 
     protected:
       vfeSession* m_Session;

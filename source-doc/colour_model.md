@@ -99,9 +99,9 @@ To convert from an external colour model to the internal one, the (linear) colou
 
 @subsection int3_t          Transparency
 
-Internally, transparency is represented as a full-fledged colour, using the same four-band colour model described above,
-in _associated_ mode. To convert this four-channel transparency to a single channel for output, a simple greyscale
-conversion is applied.
+Internally, transparency is represented as a full-fledged colour, using the same three-band colour model described
+above, in _associated_ mode. To convert this four-channel transparency to a single channel for output, a simple
+greyscale conversion is applied.
 
 @section int4           Internal Colours -- 4-Channel Variant
 
@@ -138,7 +138,7 @@ To convert from the internal model to RGB colour space for output, straightforwa
 No clipping is performed unless mandated by the output file format.
 
 To convert from an external colour model to the internal one, the (linear) colour is converted as follows:
- -# Transform the colour into the intrnal model using a canonical linear transformation.
+ -# Transform the colour into the internal model using a canonical linear transformation.
  -# Apply metameric power redistribuion by adding a minimal (by magnitude) multiple of a metamerically neutral term to
     bring all channels into the range from 0 to the corresponding coefficient of a canonical D65 representation. If this
     is not possible, bring all channels into the non-negative domain while minimizing the sum-of-squares of the

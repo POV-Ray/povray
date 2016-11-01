@@ -371,25 +371,20 @@ GlyphPtr ConvertOutlineToGlyph(TrueTypeFont *ffile, const GlyphOutline *ttglyph)
 
 SHORT readSHORT(IStream *infile, int line, const char *file)
 {
-    /// @impl
-    /// @parblock
-
-    /// On platforms using non-2's-complement representation for negative numbers, any approach
-    /// starting with a signed interpretation of the data is doomed to fail over those
-    /// representations' property of having two representations for zero, and none for -2^(N-1).
-    /// We therefore must start off with an unsigned representation of the data.
+    // On platforms using non-2's-complement representation for negative numbers, any approach
+    // starting with a signed interpretation of the data is doomed to fail over those
+    // representations' property of having two representations for zero, and none for -2^(N-1).
+    // We therefore must start off with an unsigned representation of the data.
     USHORT u = readUSHORT(infile, line, file);
 
-    /// We go on by testing for a set signed bit, which in 2's complement format indicates that
-    /// the actual value we're looking for is the unsigned interpretation minus 2^N.
-    if (u | INTEGER16_SIGN_MASK)
-        /// To compute that value, we first discard the sign bit (which is equivalent to subtracting
-        /// 2^(N-1)), then add -2^(N-1). Finally we cram the result into the target type.
+    // We go on by testing for a set signed bit, which in 2's complement format indicates that
+    // the actual value we're looking for is the unsigned interpretation minus 2^N.
+    if (u & INTEGER16_SIGN_MASK)
+        // To compute that value, we first discard the sign bit (which is equivalent to subtracting
+        // 2^(N-1)), then add -2^(N-1). Finally we cram the result into the target type.
         return (SHORT(u ^ INTEGER16_SIGN_MASK)) + SIGNED16_MIN;
     else
         return SHORT(u);
-
-    /// @endparblock
 }
 
 USHORT readUSHORT(IStream *infile, int line, const char *file)
@@ -406,25 +401,20 @@ USHORT readUSHORT(IStream *infile, int line, const char *file)
 
 LONG readLONG(IStream *infile, int line, const char *file)
 {
-    /// @impl
-    /// @parblock
-
-    /// On platforms using non-2's-complement representation for negative numbers, any approach
-    /// starting with a signed interpretation of the data is doomed to fail over those
-    /// representations' property of having two representations for zero, and none for -2^(N-1).
-    /// We therefore must start off with an unsigned representation of the data.
+    // On platforms using non-2's-complement representation for negative numbers, any approach
+    // starting with a signed interpretation of the data is doomed to fail over those
+    // representations' property of having two representations for zero, and none for -2^(N-1).
+    // We therefore must start off with an unsigned representation of the data.
     ULONG u = readULONG(infile, line, file);
 
-    /// We go on by testing for a set signed bit, which in 2's complement format indicates that
-    /// the actual value we're looking for is the unsigned interpretation minus 2^N.
-    if (u | INTEGER32_SIGN_MASK)
-        /// To compute that value, we first discard the sign bit (which is equivalent to subtracting
-        /// 2^(N-1)), then add -2^(N-1). Finally we cram the result into the target type.
+    // We go on by testing for a set signed bit, which in 2's complement format indicates that
+    // the actual value we're looking for is the unsigned interpretation minus 2^N.
+    if (u & INTEGER32_SIGN_MASK)
+        // To compute that value, we first discard the sign bit (which is equivalent to subtracting
+        // 2^(N-1)), then add -2^(N-1). Finally we cram the result into the target type.
         return (LONG(u ^ INTEGER32_SIGN_MASK)) + SIGNED32_MIN;
     else
         return LONG(u);
-
-    /// @endparblock
 }
 
 ULONG readULONG(IStream *infile, int line, const char *file)
@@ -1682,6 +1672,7 @@ GlyphPtr ExtractGlyphInfo(TrueTypeFont *ffile, unsigned int glyph_index, unsigne
     GlyphPtr glyph;
 
     ttglyph = ExtractGlyphOutline(ffile, glyph_index, c);
+    POV_SHAPE_ASSERT (ttglyph);
 
     /*
      * Convert the glyph outline information from TrueType layout into a more
@@ -1694,8 +1685,7 @@ GlyphPtr ExtractGlyphInfo(TrueTypeFont *ffile, unsigned int glyph_index, unsigne
 
     /* Free up outline information */
 
-    if (ttglyph)
-        delete ttglyph;
+    delete ttglyph;
 
 #ifdef TTF_DEBUG3
     int i, j;

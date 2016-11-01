@@ -36,17 +36,15 @@
 ///
 //******************************************************************************
 
-// configparser.h must always be the first POV file included in the parser (pulls in platform config)
-#include "parser/configparser.h"
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "parser/parser.h"
 
 #include "core/material/pigment.h"
 #include "core/math/matrix.h"
 #include "core/math/spline.h"
+#include "core/scene/scenedata.h"
 
 #include "vm/fnpovfpu.h"
-
-#include "backend/scene/backendscenedata.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -152,16 +150,16 @@ FUNCTION_PTR Parser::Parse_FunctionContent(void)
 
 FUNCTION_PTR Parser::Parse_FunctionOrContent(void)
 {
-    EXPECT
+    FUNCTION_PTR result;
+    EXPECT_ONE
         CASE(FUNCTION_TOKEN)
-            return Parse_Function();
-            EXIT
+            result = Parse_Function();
         END_CASE
         OTHERWISE
-            return Parse_FunctionContent();
-            EXIT
+            result = Parse_FunctionContent();
         END_CASE
     END_EXPECT
+    return result;
 }
 
 
@@ -310,14 +308,18 @@ FUNCTION_PTR Parser::Parse_DeclareFunction(int *token_id, const char *fn_name, b
     }
     else if(Token.Token_Id == STRING_LITERAL_TOKEN)
     {
+#if (DEBUG_FLOATFUNCTION == 1)
         f.SetFlag(2, Token.Token_String);
+#endif
         Get_Token();
         if(Token.Token_Id == COMMA_TOKEN)
         {
             Get_Token();
             if(Token.Token_Id != STRING_LITERAL_TOKEN)
                 Expectation_Error("valid function expression");
+#if (DEBUG_FLOATFUNCTION == 1)
             f.SetFlag(1, Token.Token_String);
+#endif
         }
         else
         {

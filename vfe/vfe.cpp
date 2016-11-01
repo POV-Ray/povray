@@ -249,6 +249,24 @@ bool vfePlatformBase::ReadFileFromURL(OStream *file, const UCS2String& url, cons
   return false;
 }
 
+FILE* vfePlatformBase::OpenLocalFile (const UCS2String& name, const char *mode)
+{
+  return vfeFOpen (name, mode);
+}
+
+void vfePlatformBase::DeleteLocalFile (const UCS2String& name)
+{
+  vfeRemove (name);
+}
+
+bool vfePlatformBase::AllowLocalFileAccess (const UCS2String& name, const unsigned int fileType, bool write)
+{
+    if (write)
+        return Allow_File_Write (name.c_str(), fileType);
+    else
+        return Allow_File_Read (name.c_str(), fileType);
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////
 //
 // class vfeParserMessageHandler
@@ -1353,23 +1371,11 @@ bool VirtualFrontEnd::Paused (void)
 //
 ////////////////////////////////////////////////////////////////////////////////////////
 
-int Allow_File_Write (const char *Filename, const unsigned int FileType)
-{
-  if (strcmp(Filename, "stdout") == 0 || strcmp(Filename, "stderr") == 0)
-    return true;
-  return (vfeSession::GetSessionFromThreadID()->TestAccessAllowed(Filename, true));
-}
-
 int Allow_File_Write (const unsigned short *Filename, const unsigned int FileType)
 {
   if (strcmp(UCS2toASCIIString(Filename).c_str(), "stdout") == 0 || strcmp(UCS2toASCIIString(Filename).c_str(), "stderr") == 0)
     return true;
   return (vfeSession::GetSessionFromThreadID()->TestAccessAllowed(Filename, true));
-}
-
-int Allow_File_Read (const char *Filename, const unsigned int FileType)
-{
-  return (vfeSession::GetSessionFromThreadID()->TestAccessAllowed(Filename, false));
 }
 
 int Allow_File_Read (const unsigned short *Filename, const unsigned int FileType)

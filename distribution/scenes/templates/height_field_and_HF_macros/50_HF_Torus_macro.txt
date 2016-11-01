@@ -1,4 +1,6 @@
-// ----------------- HF_Torus macro
+//-----------------------------------------------------
+#include "shapes.inc"
+// ----------------- HF_Torus macro -------------------
 #declare Fn_1 =
  function(x, y, z)
   {1-(-f_snoise3d(x*3,y*3,z*3)*0.8)}
@@ -24,4 +26,4 @@ HF_Torus( Fn_1, //Function,
  scale<1,1,1>*1
  rotate<0,0,0>
  translate<0,0.00,0>
-}  // end of HF_Torus ----------------- 
+}  // end of HF_Torus ---------------------------------

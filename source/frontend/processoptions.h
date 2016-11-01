@@ -47,7 +47,11 @@ namespace pov_base
 {
 
 enum {
-    kINIOptFlag_SuppressWrite = 0x0001,     ///< Suppress when writing complete list of options
+    kINIOptFlag_SuppressWrite   = 0x0001,   ///< Suppress when writing complete list of options
+};
+
+enum {
+    kCmdOptFlag_Optional        = 0x0001,   ///< Parameter is optional
 };
 
 class ProcessOptions
@@ -63,10 +67,11 @@ class ProcessOptions
 
         struct Cmd_Parser_Table
         {
-            const char *command;
-            POVMSType key;
-            POVMSType type;
-            POVMSType is_switch;
+            const char  *command;
+            POVMSType   key;
+            POVMSType   type;
+            POVMSType   is_switch;
+            int         flags;
         };
 
         ProcessOptions(INI_Parser_Table *, Cmd_Parser_Table *);

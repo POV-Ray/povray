@@ -36,15 +36,14 @@
 ///
 //******************************************************************************
 
-// configparser.h must always be the first POV file included in the parser (pulls in platform config)
-#include "parser/configparser.h"
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "parser/parser.h"
 
 #include "base/mathutil.h"
 
-#include "vm/fnpovfpu.h"
+#include "core/scene/scenedata.h"
 
-#include "backend/scene/backendscenedata.h"
+#include "vm/fnpovfpu.h"
 
 // this must be the last file included
 #include "base/povdebug.h"

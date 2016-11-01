@@ -1,8 +1,13 @@
 //******************************************************************************
 ///
-/// @file vfe/syspovprotobase.h
+/// @file platform/windows/syspovdebug.h
 ///
-/// Provides definitions that are used by both the windows and core code.
+/// This header file is included by povdebug.h, which is in turn included by
+/// all C++ files in POV-Ray. povdebug.h is the last header file included
+/// (with the possible exception of files that do not declare anything that
+/// could clash with declarations in povdebug.h or this file).
+///
+/// As a rule, system header files are not safe to include after this file.
 ///
 /// @author Christopher J. Cason
 ///
@@ -10,7 +15,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -35,44 +40,7 @@
 ///
 //******************************************************************************
 
-#ifndef __SYSPROTO_H__
-#define __SYSPROTO_H__
+#ifndef POVRAY_WINDOWS_SYSPOVDEBUG_H
+#define POVRAY_WINDOWS_SYSPOVDEBUG_H
 
-#include <cstddef>
-#include <vector>
-// FIXME #include <xmemory>
-
-#include "povms/povmscpp.h"
-
-namespace pov_base
-{
-
-void vfeSysThreadStartup();
-void vfeSysThreadCleanup();
-bool vfeParsePathString (const POVMSUCS2String& path, POVMSUCS2String& volume, vector<POVMSUCS2String>& components, POVMSUCS2String& filename);
-
-class vfeTimer
-{
-    public:
-        vfeTimer(bool CPUTimeIsThreadOnly = false);
-        ~vfeTimer();
-
-        POV_LONG ElapsedRealTime(void) const ;
-        POV_LONG ElapsedCPUTime(void) const;
-        void Reset(void);
-        bool HasValidCPUTime() const;
-
-    private:
-        POV_ULONG GetWallTime (void) const ;
-        POV_ULONG GetCPUTime (void) const ;
-
-        POV_ULONG m_WallTimeStart ;
-        POV_ULONG m_CPUTimeStart ;
-        bool m_ThreadTimeOnly ;
-        void *m_ThreadHandle ;
-        bool m_IsNT ;
-};
-
-}
-
-#endif // __SYSPROTO_H__
+#endif // POVRAY_WINDOWS_SYSPOVDEBUG_H

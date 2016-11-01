@@ -1,8 +1,8 @@
 //******************************************************************************
 ///
-/// @file base/image/pgm.h
+/// @file platform/windows/syspovtimer.h
 ///
-/// Declarations related to NetPBM Portable Graymap (PGM) image file reading.
+/// Declaration of the Windows-specific implementation of the @ref Timer class.
 ///
 /// @copyright
 /// @parblock
@@ -33,26 +33,44 @@
 ///
 //******************************************************************************
 
-#ifndef POVRAY_BASE_PGM_H
-#define POVRAY_BASE_PGM_H
+#ifndef POVRAY_WINDOWS_SYSPOVTIMER_H
+#define POVRAY_WINDOWS_SYSPOVTIMER_H
 
-// Module config header file must be the first file included within POV-Ray unit header files
 #include "base/configbase.h"
-
-// POV-Ray base header files
-#include "base/image/image.h"
 
 namespace pov_base
 {
 
-namespace Pgm
+void Delay(unsigned int msec);
+
+class Timer
 {
+    public:
+        Timer();
+        ~Timer();
 
-Image *Read(IStream *file, const Image::ReadOptions& options);
-int Read_ASCII_File_Number(IStream *file);
+        POV_LONG ElapsedRealTime() const;
+        POV_LONG ElapsedThreadCPUTime() const;
+        POV_LONG ElapsedProcessCPUTime() const;
+
+        void Reset();
+
+        bool HasValidThreadCPUTime() const;
+        bool HasValidProcessCPUTime() const;
+
+    private:
+
+        POV_ULONG   mWallTimeStart;
+        POV_ULONG   mThreadTimeStart;
+        POV_ULONG   mProcessTimeStart;
+        void*       mThreadHandle;
+        bool        mCPUTimeSupported   : 1;
+
+        POV_ULONG GetWallTime () const;
+        POV_ULONG GetThreadTime () const;
+        POV_ULONG GetProcessTime () const;
+};
 
 }
 
-}
-
-#endif // POVRAY_BASE_PGM_H
+#endif // POVRAY_WINDOWS_SYSPOVTIMER_H

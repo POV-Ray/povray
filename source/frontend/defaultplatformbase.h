@@ -54,6 +54,18 @@ class DefaultPlatformBase : public PlatformBase
         virtual void DeleteTemporaryFile(const UCS2String& filename);
 
         virtual bool ReadFileFromURL(OStream *file, const UCS2String& url, const UCS2String& referrer = UCS2String());
+
+        /// @note
+        ///     This implementation only supports ASCII filenames.
+        virtual FILE* OpenLocalFile (const UCS2String& name, const char *mode);
+
+        /// @note
+        ///     This implementation only supports ASCII filenames.
+        virtual void DeleteLocalFile (const UCS2String& name);
+
+        /// @note
+        ///     This implementation grants unrestricted access to any file.
+        virtual bool AllowLocalFileAccess (const UCS2String& name, const unsigned int fileType, bool write);
 };
 
 }

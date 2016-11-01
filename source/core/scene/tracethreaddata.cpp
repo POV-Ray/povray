@@ -43,8 +43,6 @@
 #include "core/shape/fractal.h"
 #include "core/shape/isosurface.h"
 
-#include "vm/fnpovfpu.h"
-
 // this must be the last file included
 #include "base/povdebug.h"
 
@@ -59,7 +57,7 @@ TraceThreadData::TraceThreadData(shared_ptr<SceneData> sd): sceneData(sd), quali
     Max_Blob_Queue_Size = 1;
     Blob_Coefficient_Count = sceneData->Max_Blob_Components * 5;
     Blob_Interval_Count = sceneData->Max_Blob_Components * 2;
-    Blob_Queue = reinterpret_cast<void **>(POV_MALLOC(sizeof(void **), "Blob Queue"));
+    Blob_Queue = reinterpret_cast<void **>(POV_MALLOC(sizeof(void *), "Blob Queue"));
     Blob_Coefficients = reinterpret_cast<DBL *>(POV_MALLOC(sizeof(DBL) * Blob_Coefficient_Count, "Blob Coefficients"));
     Blob_Intervals = new Blob_Interval_Struct [Blob_Interval_Count];
     isosurfaceData = reinterpret_cast<ISO_ThreadData *>(POV_MALLOC(sizeof(ISO_ThreadData), "Isosurface Data"));
@@ -115,7 +113,7 @@ TraceThreadData::TraceThreadData(shared_ptr<SceneData> sd): sceneData(sd), quali
 
 TraceThreadData::~TraceThreadData()
 {
-    for(vector<FPUContext*>::iterator i = fpuContextPool.begin(); i != fpuContextPool.end(); ++i)
+    for(vector<GenericFunctionContext*>::iterator i = functionContextPool.begin(); i != functionContextPool.end(); ++i)
         delete *i;
 
     POV_FREE(Blob_Coefficients);

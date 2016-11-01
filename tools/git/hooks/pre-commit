@@ -92,13 +92,15 @@ then
   fi
 fi
 
-echo "unix/VERSION identifies this as version:"
-echo "  $ver_VERSION"
-
-if [ x"$ver_VERSION" != x"$ver_povray_h-$prerelease_povray_h" ]
+if [ x"$ver_VERSION" != x"" ]
 then
-  echo "MISMATCH."
-  exit 1
+  echo "unix/VERSION identifies this as version:"
+  echo "  $ver_VERSION"
+  if [ x"$ver_VERSION" != x"$ver_povray_h-$prerelease_povray_h" ]
+  then
+    echo "MISMATCH."
+    exit 1
+  fi
 fi
 
 ########################################################################################################################
@@ -130,15 +132,19 @@ then
       -e 's/\(#define [ ]*POV_RAY_PRERELEASE [ ]*".*[^0-9]\)[0-9][0-9]*"/\1'"$revision"'"/g' \
       -e "$sed_newline_fix" \
       "$versionfile" >/dev/null 2>/dev/null
-    sed -i \
-      -e 's/\([^0-9]\)[0-9][0-9]*$/\1'"$revision"'/g' \
-      -e "$sed_newline_fix" \
-      unix/VERSION >/dev/null 2>/dev/null
-
-    sed_i_fix "$versionfile" unix/VERSION
-
-    # stage updates
-    git add "$versionfile" unix/VERSION >/dev/null 2>/dev/null
+    sed_i_fix "$versionfile"
+    # stage update
+    git add "$versionfile" >/dev/null 2>/dev/null
+    if [ -f unix/VERSION ]
+    then
+      sed -i \
+        -e 's/\([^0-9]\)[0-9][0-9]*$/\1'"$revision"'/g' \
+        -e "$sed_newline_fix" \
+        unix/VERSION >/dev/null 2>/dev/null
+      sed_i_fix unix/VERSION
+      # stage update
+      git add unix/VERSION >/dev/null 2>/dev/null
+    fi
   fi
 else
   echo "changes are limited to accompanying files, no need to update POV_RAY_PRERELEASE."

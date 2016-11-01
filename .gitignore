@@ -160,7 +160,7 @@ $RECYCLE.BIN/
 # POV-Ray Unix build artefacts
 # ============================
 
-# Created by unix/prebuild.sh script
+# Files created by unix/prebuild.sh script in main directory
 /AUTHORS
 /COPYING
 /ChangeLog
@@ -179,15 +179,14 @@ $RECYCLE.BIN/
 /povray.1
 /povray.conf
 /povray.ini.in
-/icons/
-/include/
-/ini/
-/scenes/
-/scripts/
+# Files created by unix/prebuild.sh script in specific subdirectories
+/platform/Makefile.am
+/platform/Makefile.in
 /source/Makefile.am
 /source/Makefile.in
 /unix/Makefile.am
 /unix/Makefile.in
+/unix/config/compile
 /unix/config/config.guess
 /unix/config/config.sub
 /unix/config/depcomp
@@ -195,21 +194,31 @@ $RECYCLE.BIN/
 /unix/config/missing
 /vfe/Makefile.am
 /vfe/Makefile.in
+# Subdirectories created by unix/prebuild.sh script
+/icons/
+/include/
+/ini/
+/scenes/
+/scripts/
 
-# Created by configure script
+# Files created by configure script in main directory
 /Makefile
 /config.h
 /config.status
 /stamp-h1
-/source/jversion.h
+# Files created by configure script in specific subdirectories
+/platform/Makefile
 /source/Makefile
 /unix/Makefile
 /vfe/Makefile
+# Directories created by configure script
 .deps/
 
-# Created by make
+# Files created by make in main directory
 /povray.ini
+# Files created by make in specific subdirectories
 /unix/povray
+# Files created by make in various subdirectories
 .dirstamp
 
 # =========================
@@ -217,6 +226,4 @@ $RECYCLE.BIN/
 # =========================
 
 /tools/doxygen-warnings.log
-/tools/doxygen/html/
-/tools/doxygen/latex/
-/tools/doxygen/pdf/
+/tools/doxygen/source-doc/

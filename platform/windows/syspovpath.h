@@ -1,14 +1,14 @@
 //******************************************************************************
 ///
-/// @file vfe/syspovprotobackend.h
+/// @file platform/windows/syspovpath.h
 ///
-/// @todo   What's in here?
+/// Windows-specific declarations related to the @ref Path class.
 ///
 /// @copyright
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -33,10 +33,18 @@
 ///
 //******************************************************************************
 
-#ifndef __SYSPOVPROTOBACKEND_H__
-#define __SYSPOVPROTOBACKEND_H__
+#ifndef POVRAY_WINDOWS_SYSPOVPATH_H
+#define POVRAY_WINDOWS_SYSPOVPATH_H
 
-#include "syspovconfig.h"
+#include "base/configbase.h"
 
-#endif
+#include "base/path.h"
 
+namespace pov_base
+{
+
+// Currently there are no Windows-specific declarations.
+
+}
+
+#endif // POVRAY_WINDOWS_SYSPOVPATH_H

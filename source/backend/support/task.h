@@ -60,17 +60,7 @@ class Task
 {
     public:
 
-        class TaskData
-        {
-                friend class Task;
-            public:
-                TaskData() { }
-                virtual ~TaskData() { }
-            private:
-                Task *task;
-        };
-
-        Task(TaskData *td, const boost::function1<void, Exception&>& f);
+        Task(ThreadData *td, const boost::function1<void, Exception&>& f);
         virtual ~Task();
 
         inline bool IsPaused() { return !done && paused; }
@@ -105,7 +95,7 @@ class Task
             }
         }
 
-        inline TaskData *GetDataPtr() { return taskData; }
+        inline ThreadData *GetDataPtr() { return taskData; }
 
         inline POVMSContext GetPOVMSContext() { return povmsContext; }
 
@@ -136,12 +126,12 @@ class Task
         virtual void Finish() = 0;
 
         POV_LONG ElapsedRealTime() const;
-        POV_LONG ElapsedCPUTime() const;
+        POV_LONG ElapsedThreadCPUTime() const;
 
     private:
 
         /// task data pointer
-        TaskData *taskData;
+        ThreadData *taskData;
         /// task fatal error handler
         boost::function1<void, Exception&> fatalErrorHandler;
         /// stop request flag
@@ -180,14 +170,31 @@ class Task
         /// not available
         Task& operator=(const Task&);
 
+        /// Execute the thread.
         void TaskThread(const boost::function0<void>& completion);
+
+        /// Called by @ref TaskThread() before Run() is invoked.
+        ///
+        /// This method is intended as a hook to inject platform-specific thread initialization code, to be run by every
+        /// task at thread startup. To make use of this mechanism, set @ref POV_USE_DEFAULT_TASK_INITIALIZE to zero to
+        /// knock out the default implementation and provide a platform-specific implementation somewhere else.
+        ///
+        void Initialize();
+
+        /// Called by @ref TaskThread() after Run() returns.
+        ///
+        /// This method is intended as a hook to inject platform-specific thread cleanup code, to be run by every
+        /// task at thread shutdown. To make use of this mechanism, set @ref POV_USE_DEFAULT_TASK_CLEANUP to zero to
+        /// knock out the default implementation and provide a platform-specific implementation somewhere else.
+        ///
+        void Cleanup();
 };
 
 
 class SceneTask : public Task
 {
     public:
-        SceneTask(TaskData *td, const boost::function1<void, Exception&>& f, const char* sn, shared_ptr<BackendSceneData> sd, RenderBackend::ViewId vid = 0);
+        SceneTask(ThreadData *td, const boost::function1<void, Exception&>& f, const char* sn, shared_ptr<BackendSceneData> sd, RenderBackend::ViewId vid = 0);
 
     protected:
         MessageFactory messageFactory;

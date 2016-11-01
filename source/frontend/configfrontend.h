@@ -58,13 +58,6 @@
     #define DEFAULT_DISPLAY_GAMMA 2.2
 #endif
 
-#ifndef DEFAULT_FILE_GAMMA_TYPE
-    #define DEFAULT_FILE_GAMMA_TYPE kPOVList_GammaType_SRGB
-#endif
-#ifndef DEFAULT_FILE_GAMMA
-    #define DEFAULT_FILE_GAMMA 2.2
-#endif
-
 /// @def POVMSLongToCDouble
 /// Macro to convert values of type @ref POVMSLong to `double`.
 /// This macro converts a `POVMSLong` 64 bit value to a double precision floating point value, to allow further
@@ -72,7 +65,5 @@
 #ifndef POVMSLongToCDouble
     #define POVMSLongToCDouble(x) double(x)
 #endif
-
-#include "syspovprotofrontend.h"
 
 #endif

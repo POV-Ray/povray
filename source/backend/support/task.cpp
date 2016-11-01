@@ -57,7 +57,7 @@ namespace pov
 
 using namespace pov_base;
 
-Task::Task(TaskData *td, const boost::function1<void, Exception&>& f) :
+Task::Task(ThreadData *td, const boost::function1<void, Exception&>& f) :
     taskData(td),
     fatalErrorHandler(f),
     stopRequested(false),
@@ -72,7 +72,6 @@ Task::Task(TaskData *td, const boost::function1<void, Exception&>& f) :
 {
     if (td == NULL)
         throw POV_EXCEPTION_STRING("Internal error: TaskData is NULL in Task constructor");
-    td->task = this;
 }
 
 Task::~Task()
@@ -140,10 +139,10 @@ POV_LONG Task::ElapsedRealTime() const
     return timer->ElapsedRealTime();
 }
 
-POV_LONG Task::ElapsedCPUTime() const
+POV_LONG Task::ElapsedThreadCPUTime() const
 {
     POV_TASK_ASSERT(timer != NULL);
-    return timer->ElapsedCPUTime();
+    return timer->ElapsedThreadCPUTime();
 }
 
 void Task::TaskThread(const boost::function0<void>& completion)
@@ -158,9 +157,9 @@ void Task::TaskThread(const boost::function0<void>& completion)
         return;
     }
 
-    POV_SYS_THREAD_STARTUP
+    Initialize();
 
-    Timer tasktime(true); // only keep CPU time of this thread (if supported)
+    Timer tasktime;
 
     timer = &tasktime;
 
@@ -219,8 +218,8 @@ void Task::TaskThread(const boost::function0<void>& completion)
     }
 
     realTime = tasktime.ElapsedRealTime();
-    if(tasktime.HasValidCPUTime() == true)
-        cpuTime = tasktime.ElapsedCPUTime();
+    if(tasktime.HasValidThreadCPUTime() == true)
+        cpuTime = tasktime.ElapsedThreadCPUTime();
     else
         cpuTime = -1;
 
@@ -244,7 +243,7 @@ void Task::TaskThread(const boost::function0<void>& completion)
     timer = NULL;
     done = true;
 
-    POV_SYS_THREAD_CLEANUP
+    Cleanup();
 
     (void)POVMS_CloseContext(povmsContext);
 
@@ -252,7 +251,26 @@ void Task::TaskThread(const boost::function0<void>& completion)
 }
 
 
-SceneTask::SceneTask(TaskData *td, const boost::function1<void, Exception&>& f, const char* sn, shared_ptr<BackendSceneData> sd, RenderBackend::ViewId vid) :
+#if POV_USE_DEFAULT_TASK_INITIALIZE
+
+void Task::Initialize ()
+{
+    // TODO
+}
+
+#endif // POV_USE_DEFAULT_TASK_INITIALIZE
+
+#if POV_USE_DEFAULT_TASK_CLEANUP
+
+void Task::Cleanup ()
+{
+    // TODO
+}
+
+#endif // POV_USE_DEFAULT_TASK_CLEANUP
+
+
+SceneTask::SceneTask(ThreadData *td, const boost::function1<void, Exception&>& f, const char* sn, shared_ptr<BackendSceneData> sd, RenderBackend::ViewId vid) :
     Task(td, f),
     messageFactory(sd->warningLevel, sn, sd->backendAddress, sd->frontendAddress, sd->sceneId, vid)
 {}

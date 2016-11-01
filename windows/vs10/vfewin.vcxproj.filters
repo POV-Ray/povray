@@ -34,9 +34,6 @@
     <ClCompile Include="..\..\vfe\win\cpuinfo.cpp">
       <Filter>Source\win</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\vfe\win\platformbase.cpp">
-      <Filter>Source\win</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\vfe\win\vfeplatform.cpp">
       <Filter>Source\win</Filter>
     </ClCompile>
@@ -54,9 +51,6 @@
     </ClInclude>
     <ClInclude Include="..\..\vfe\vfesession.h">
       <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\vfe\syspovdebug.h">
-      <Filter>Headers\win</Filter>
     </ClInclude>
     <ClInclude Include="..\..\vfe\win\syspovimage.h">
       <Filter>Headers\win</Filter>

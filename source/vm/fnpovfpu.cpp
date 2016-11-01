@@ -1576,12 +1576,13 @@ FunctionVM::CustomFunction::~CustomFunction()
 GenericFunctionContextPtr FunctionVM::CustomFunction::AcquireContext(TraceThreadData* pThreadData)
 {
     FPUContext* pContext = NULL;
-    if (pThreadData->fpuContextPool.empty())
+    if (pThreadData->functionContextPool.empty())
         pContext = new FPUContext(mpVm, pThreadData);
     else
     {
-        pContext = pThreadData->fpuContextPool.back();
-        pThreadData->fpuContextPool.pop_back();
+        pContext = dynamic_cast<FPUContext*>(pThreadData->functionContextPool.back());
+        POV_VM_ASSERT (pContext != NULL);
+        pThreadData->functionContextPool.pop_back();
     }
     return pContext;
 }
@@ -1589,24 +1590,30 @@ GenericFunctionContextPtr FunctionVM::CustomFunction::AcquireContext(TraceThread
 void FunctionVM::CustomFunction::ReleaseContext(GenericFunctionContextPtr pGenericContext)
 {
     FPUContext* pContext = dynamic_cast<FPUContext*>(pGenericContext);
-    POV_ASSERT(pContext != NULL);
-    POV_ASSERT(pContext->threaddata != NULL);
-    pContext->threaddata->fpuContextPool.push_back(pContext);
+    POV_VM_ASSERT (pContext != NULL);
+    POV_VM_ASSERT (pContext->threaddata != NULL);
+    pContext->threaddata->functionContextPool.push_back (pContext);
 }
 
-void FunctionVM::CustomFunction::InitArguments(GenericFunctionContextPtr pContext)
+void FunctionVM::CustomFunction::InitArguments(GenericFunctionContextPtr pGenericContext)
 {
-    (dynamic_cast<FPUContext*>(pContext))->nextArgument = 0;
+    FPUContext* pContext = dynamic_cast<FPUContext*>(pGenericContext);
+    POV_VM_ASSERT (pContext != NULL);
+    pContext->nextArgument = 0;
 }
 
-void FunctionVM::CustomFunction::PushArgument(GenericFunctionContextPtr pContext, DBL arg)
+void FunctionVM::CustomFunction::PushArgument(GenericFunctionContextPtr pGenericContext, DBL arg)
 {
-    (dynamic_cast<FPUContext*>(pContext))->SetLocal((dynamic_cast<FPUContext*>(pContext))->nextArgument++, arg);
+    FPUContext* pContext = dynamic_cast<FPUContext*>(pGenericContext);
+    POV_VM_ASSERT (pContext != NULL);
+    pContext->SetLocal (pContext->nextArgument++, arg);
 }
 
-DBL FunctionVM::CustomFunction::Execute(GenericFunctionContextPtr pContext)
+DBL FunctionVM::CustomFunction::Execute(GenericFunctionContextPtr pGenericContext)
 {
-    return POVFPU_Run(dynamic_cast<FPUContext*>(pContext), *mpFn);
+    FPUContext* pContext = dynamic_cast<FPUContext*>(pGenericContext);
+    POV_VM_ASSERT (pContext != NULL);
+    return POVFPU_Run (pContext, *mpFn);
 }
 
 GenericScalarFunctionPtr FunctionVM::CustomFunction::Clone() const

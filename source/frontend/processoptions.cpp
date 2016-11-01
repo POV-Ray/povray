@@ -43,6 +43,7 @@
 #include "povms/povmscpp.h"
 #include "povms/povmsid.h"
 
+#include "base/platformbase.h"
 #include "base/pov_err.h"
 #include "base/stringutilities.h"
 
@@ -142,10 +143,10 @@ int ProcessOptions::ParseFile(const char *filespec, POVMSObjectPtr obj)
                     // POV-Ray-style INI file with command-line switch
                     case '+':
                     case '-':
-                    // POV-Ray-style INI file with system specific command-line switch on some systems (i.e. Windos)
-                    #if(FILENAME_SEPARATOR != '/')
+#if (POV_SLASH_IS_SWITCH_CHARACTER)
+                    // POV-Ray-style INI file with system specific command-line switch on some systems (e.g. Windos)
                     case '/':
-                    #endif
+#endif
                         err = Parse_INI_Switch(file, token, section);
                         break;
                     // INI file comment
@@ -263,10 +264,10 @@ int ProcessOptions::ParseString(const char *commandline, POVMSObjectPtr obj, boo
             // switch
             case '+':
             case '-':
-            // system specific switch on some systems (i.e. Windos)
-            #if(FILENAME_SEPARATOR != '/')
+#if (POV_SLASH_IS_SWITCH_CHARACTER)
+            // POV-Ray-style INI file with system specific command-line switch on some systems (e.g. Windos)
             case '/':
-            #endif
+#endif
                 commandline++;
                 err = Parse_CL_Switch(commandline, *(commandline - 1), obj, singleswitch);
                 break;
@@ -352,7 +353,7 @@ int ProcessOptions::WriteFile(OTextStream *ini_file, POVMSObjectPtr obj)
     // find the keyword
     while(table->keyword != NULL)
     {
-        if((table->flags | kINIOptFlag_SuppressWrite) == 0)
+        if((table->flags & kINIOptFlag_SuppressWrite) == 0)
             Output_INI_Option(table, obj, ini_file);
         table++;
     }
@@ -365,7 +366,7 @@ int ProcessOptions::WriteFile(const char *filename, POVMSObjectPtr obj)
     OTextStream *ini_file;
     int err = kNoErr;
 
-    if(!POV_ALLOW_FILE_WRITE(filename, POV_File_Text_INI))
+    if(!pov_base::PlatformBase::GetInstance().AllowLocalFileAccess (ASCIItoUCS2String(filename), POV_File_Text_INI, true))
         return kCannotOpenFileErr;
 
     ini_file = OpenFileForWrite(filename, obj);
@@ -1186,10 +1187,10 @@ bool ProcessOptions::Parse_INI_String_Smartmode(ITextStream *file)
         // POV-Ray-style INI file with command-line switch
         case '+':
         case '-':
-        // POV-Ray-style INI file with system specific command-line switch on some systems (i.e. Windos)
-        #if(FILENAME_SEPARATOR != '/')
+#if (POV_SLASH_IS_SWITCH_CHARACTER)
+        // POV-Ray-style INI file with system specific command-line switch on some systems (e.g. Windos)
         case '/':
-        #endif
+#endif
             if(isalpha(file->getchar()))
                 break; // return false, this is most likely a command-line
             else
@@ -1300,11 +1301,16 @@ int ProcessOptions::Parse_CL_Switch(const char *&commandline, int token, POVMSOb
                     srcptr = value;
 
                 // only if a paremeter is expected allow it, and vice versa
-                if(((*srcptr > ' ') && (table->type != kPOVMSType_Null)) || ((*srcptr <= ' ') && (table->type == kPOVMSType_Null)))
+                if ((table->flags & kCmdOptFlag_Optional) ||
+                    ((*srcptr >  ' ') && (table->type != kPOVMSType_Null)) ||
+                    ((*srcptr <= ' ') && (table->type == kPOVMSType_Null)))
                 {
                     err = Process_Switch(table, srcptr, obj, (token != '-'));
-                    break;
                 }
+
+                // We're aborting the search now either way, because due how the table is supposed to be sorted,
+                // if the switch would match another entry we should have encountered that one earlier.
+                break;
             }
             table++;
         }
@@ -1491,6 +1497,10 @@ int ProcessOptions::Process_Switch(Cmd_Parser_Table *option, char *param, POVMSO
         if(err != kNoErr)
             return err;
     }
+
+    // If parameter is optional and none is specified by the user, we're done.
+    if ((option->flags & kCmdOptFlag_Optional) && (*param < ' '))
+        return err;
 
     switch(option->type)
     {

@@ -1,7 +1,7 @@
-# Compiler Requirements {#compiler}
+@page compiler  Compiler Requirements
 
 
-General Presumptions {#compiler_exot}
+General Presumptions
 ====================
 
 While POV-Ray is being developed with portability high in mind, the C++ standard allows for some degrees of freedom that
@@ -22,7 +22,7 @@ following additional restrictions:
     computed by the modulus operator `%`) is negative (or zero) if the dividend and divisor have different sign.
 
 
-POVMS Additional Restrictions {#compiler_povms}
+POVMS Additional Restrictions
 =============================
 
 To support network rendering (a feature not yet implemented but planned) in a heterogenous network, the POVMS interface

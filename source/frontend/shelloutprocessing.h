@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -108,7 +108,7 @@ public:
     ShelloutProcessing(POVMS_Object& opts, const string& scene, unsigned int width, unsigned int height);
 
     // you should reap any processes here as needed, and forcefully terminate ones still running.
-    ~ShelloutProcessing();
+    virtual ~ShelloutProcessing();
 
     // true if a shellout command was specified for the given phase
     bool IsSet(shelloutEvent which) const { return shellouts[which]->IsSet(); }

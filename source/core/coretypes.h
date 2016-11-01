@@ -80,28 +80,6 @@ using std::sqrt;
 using std::tan;
 using std::tanh;
 
-/// @relates CoreMessenger
-enum CoreMessageClass
-{
-    kCoreMessageClass_Debug,    ///< Diagnostic information to help in POV-Ray development.
-    kCoreMessageClass_Info,     ///< Information that is no reason for alarm.
-    kCoreMessageClass_Warning,  ///< Information about a potentially undesired and/or unexpected situation.
-    // we don't have a value for errors, because those are signalled via exceptions.
-};
-
-/// Abstract class representing an object that can pass on messages from the core to the user.
-///
-/// @note
-///     Existing implementations are currently not necessarily thread-safe.
-///
-class CoreMessenger
-{
-public:
-    virtual ~CoreMessenger() {}
-    virtual void CoreMessage(CoreMessageClass mc, const char *format,...) = 0;
-    virtual void CoreMessageAt(CoreMessageClass mc, const UCS2 *filename, POV_LONG line, POV_LONG column, POV_LONG offset, const char *format, ...) = 0;
-};
-
 class ObjectBase;
 typedef ObjectBase * ObjectPtr;
 typedef const ObjectBase * ConstObjectPtr;
@@ -311,6 +289,8 @@ class Intersection
         Vector2d Iuv;
         /// Intersected object.
         ObjectPtr Object;
+        /// Root-level parent CSG object for cutaway textures.
+        ObjectPtr Csg;
 
         /// @name Object-Specific Auxiliary Data
         /// These members hold information specific to particular object types, typically generated during
@@ -321,6 +301,14 @@ class Intersection
         /// Point of the intersection in local coordinate space (used by Blob and SpindleTorus)
         /// @note This value is invalid in Blob if haveLocalIPoint is false.
         Vector3d LocalIPoint;
+        /// Generic auxiliary float data #1 (used by Prism, Lathe)
+        DBL d1;
+        /// Generic auxiliary pointer data (used by Mesh)
+        const void *Pointer;
+        /// Generic auxiliary integer data #1 (used by Sor, Prism, Isosurface, Lathe, Cones, Boxes)
+        int i1;
+        /// Generic auxiliary integer data #2 (used by Sor, Prism, Isosurface)
+        int i2;
         /// Flag to indicate whether INormal was computed during intersection testing (used by HField)
         /// @note Objects either always or never computing INormal during intersection testing don't use this flag.
         bool haveNormal : 1;
@@ -328,70 +316,78 @@ class Intersection
         bool haveLocalIPoint : 1;
         /// Generic auxiliary boolean data #1 (used by SpindleTorus)
         bool b1 : 1;
-        /// Generic auxiliary integer data #1 (used by Sor, Prism, Isosurface, Lathe, Cones, Boxes)
-        int i1;
-        /// Generic auxiliary integer data #2 (used by Sor, Prism, Isosurface)
-        int i2;
-        /// Generic auxiliary float data #1 (used by Prism, Lathe)
-        DBL d1;
-        /// Generic auxiliary pointer data (used by Mesh)
-        const void *Pointer;
 
         /// @}
 
-        /// Root-level parent CSG object for cutaway textures.
-        ObjectPtr Csg;
-
         Intersection() :
-            Depth(BOUND_HUGE), Object(NULL), Csg(NULL)
+            Depth(BOUND_HUGE), Object(NULL), Csg(NULL),
+            d1(0.0), Pointer(NULL), i1(0), i2(0), haveNormal(false), haveLocalIPoint(false), b1(false)
         {}
 
         Intersection(DBL d, const Vector3d& v, ObjectPtr o) :
-            Depth(d), Object(o), IPoint(v), Iuv(v), haveNormal(false), haveLocalIPoint(false), Csg(NULL)
+            Depth(d), IPoint(v), Iuv(v), Object(o), Csg(NULL),
+            d1(0.0), Pointer(NULL), i1(0), i2(0), haveNormal(false), haveLocalIPoint(false), b1(false)
         {}
 
         Intersection(DBL d, const Vector3d& v, const Vector3d& n, ObjectPtr o) :
-            Depth(d), Object(o), IPoint(v), Iuv(v), INormal(n), haveNormal(true), haveLocalIPoint(false), Csg(NULL)
+            Depth(d), IPoint(v), INormal(n), Iuv(v), Object(o), Csg(NULL),
+            d1(0.0), Pointer(NULL), i1(0), i2(0), haveNormal(true), haveLocalIPoint(false), b1(false)
         {}
 
         Intersection(DBL d, const Vector3d& v, const Vector2d& uv, ObjectPtr o) :
-            Depth(d), Object(o), IPoint(v), Iuv(uv), haveNormal(false), haveLocalIPoint(false), Csg(NULL)
+            Depth(d), IPoint(v), Iuv(uv), Object(o), Csg(NULL),
+            d1(0.0), Pointer(NULL), i1(0), i2(0), haveNormal(false), haveLocalIPoint(false), b1(false)
         {}
 
         Intersection(DBL d, const Vector3d& v, const Vector3d& n, const Vector2d& uv, ObjectPtr o) :
-            Depth(d), Object(o), IPoint(v), INormal(n), Iuv(uv), haveNormal(true), haveLocalIPoint(false), Csg(NULL)
+            Depth(d), IPoint(v), INormal(n), Iuv(uv), Object(o), Csg(NULL),
+            d1(0.0), Pointer(NULL), i1(0), i2(0), haveNormal(true), haveLocalIPoint(false), b1(false)
         {}
 
         Intersection(DBL d, const Vector3d& v, ObjectPtr o, const void *a) :
-            Depth(d), Object(o), Pointer(a), IPoint(v), Iuv(v), haveNormal(false), haveLocalIPoint(false), Csg(NULL)
+            Depth(d), IPoint(v), Iuv(v), Object(o), Csg(NULL),
+            d1(0.0), Pointer(a), i1(0), i2(0), haveNormal(false), haveLocalIPoint(false), b1(false)
         {}
 
         Intersection(DBL d, const Vector3d& v, const Vector2d& uv, ObjectPtr o, const void *a) :
-            Depth(d), Object(o), Pointer(a), IPoint(v), Iuv(uv), haveNormal(false), haveLocalIPoint(false), Csg(NULL)
+            Depth(d), IPoint(v), Iuv(uv), Object(o), Csg(NULL),
+            d1(0.0), Pointer(a), i1(0), i2(0), haveNormal(false), haveLocalIPoint(false), b1(false)
         {}
 
+        /// @todo Why does this not set Iuv=IPoint, as other constructors do?
         Intersection(DBL d, const Vector3d& v, ObjectPtr o, int a) :
-            Depth(d), Object(o), i1(a), IPoint(v), haveNormal(false), haveLocalIPoint(false), Csg(NULL)
+            Depth(d), IPoint(v), Object(o), Csg(NULL),
+            d1(0.0), Pointer(NULL), i1(a), i2(0), haveNormal(false), haveLocalIPoint(false), b1(false)
         {}
 
+        /// @todo Why does this not set Iuv=IPoint, as other constructors do?
         Intersection(DBL d, const Vector3d& v, ObjectPtr o, DBL a) :
-            Depth(d), Object(o), d1(a), IPoint(v), haveNormal(false), haveLocalIPoint(false), Csg(NULL)
+            Depth(d), IPoint(v), Object(o), Csg(NULL),
+            d1(a), Pointer(NULL), i1(0), i2(0), haveNormal(false), haveLocalIPoint(false), b1(false)
         {}
 
+        /// @todo Why does this not set Iuv=IPoint, as other constructors do?
         Intersection(DBL d, const Vector3d& v, ObjectPtr o, int a, int b) :
-            Depth(d), Object(o), i1(a), i2(b), IPoint(v), haveNormal(false), haveLocalIPoint(false), Csg(NULL)
+            Depth(d), IPoint(v), Object(o), Csg(NULL),
+            d1(0.0), Pointer(NULL), i1(a), i2(b), haveNormal(false), haveLocalIPoint(false), b1(false)
         {}
 
+        /// @todo Why does this not set Iuv=IPoint, as other constructors do?
         Intersection(DBL d, const Vector3d& v, ObjectPtr o, int a, DBL b) :
-            Depth(d), Object(o), i1(a), d1(b), IPoint(v), haveNormal(false), haveLocalIPoint(false), Csg(NULL)
+            Depth(d), IPoint(v), Object(o), Csg(NULL),
+            d1(b), Pointer(NULL), i1(a), i2(0), haveNormal(false), haveLocalIPoint(false), b1(false)
         {}
 
+        /// @todo Why does this not set Iuv=IPoint, as other constructors do?
         Intersection(DBL d, const Vector3d& v, ObjectPtr o, int a, int b, DBL c) :
-            Depth(d), Object(o), i1(a), i2(b), d1(c), IPoint(v), haveNormal(false), haveLocalIPoint(false), Csg(NULL)
+            Depth(d), IPoint(v), Object(o), Csg(NULL),
+            d1(c), Pointer(NULL), i1(a), i2(b), haveNormal(false), haveLocalIPoint(false), b1(false)
         {}
 
+        /// @todo Why does this not set Iuv=IPoint, as other constructors do?
         Intersection(DBL d, const Vector3d& v, ObjectPtr o, const Vector3d& lv, bool a) :
-            Depth(d), Object(o), b1(a), IPoint(v), LocalIPoint(lv), haveNormal(false), haveLocalIPoint(true), Csg(NULL)
+            Depth(d), IPoint(v), Object(o), Csg(NULL),
+            LocalIPoint(lv), d1(0.0), Pointer(NULL), i1(0), i2(0), haveNormal(false), haveLocalIPoint(true), b1(a)
         {}
 
         ~Intersection() { }

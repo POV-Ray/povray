@@ -70,7 +70,7 @@
     #define POVMS_ASSERT_OUTPUT(s,f,l) fprintf(stderr, "POVMS_ASSERT failed in %s line %d: %s\n", f, (int)l, s)
 #endif
 
-/// @def POVMS_ASSERT_OUTPUT(s)
+/// @def POVMS_LOG_OUTPUT(s)
 /// Log file output.
 ///
 /// This macro is invoked whenever a POVMS function is called, to allow for some basic debugging. By default it does

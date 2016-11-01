@@ -33,7 +33,7 @@
 ///
 //******************************************************************************
 
-// Module config header file must be the first file included within POV-Ray unit header files
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "parser/parser.h"
 
 #include <cctype>
@@ -54,15 +54,14 @@
 #include "core/math/matrix.h"
 #include "core/math/spline.h"
 #include "core/math/vector.h"
+#include "core/render/trace.h"
 #include "core/render/ray.h"
 #include "core/scene/object.h"
+#include "core/scene/scenedata.h"
 #include "core/shape/heightfield.h"
 #include "core/support/imageutil.h"
 
 #include "vm/fnpovfpu.h"
-
-#include "backend/frame.h"
-#include "backend/scene/backendscenedata.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -798,7 +797,7 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
 
                     Local_C_String=Parse_C_String();
 
-                    Val = ((f=Locate_File(sceneData, UCS2String(ASCIItoUCS2String(Local_C_String)),POV_File_Text_User,ign,false))==NULL) ? 0.0 : 1.0;
+                    Val = ((f=Locate_File(UCS2String(ASCIItoUCS2String(Local_C_String)),POV_File_Text_User,ign,false))==NULL) ? 0.0 : 1.0;
                     if (f != NULL)
                         delete f;
 
@@ -1252,14 +1251,7 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                     break;
             }
 
-
-            /* If it was expecting a DBL, promote it to a VECTOR.
-               I haven't yet figured out what to do if it was expecting
-               a COLOUR value with Terms>3
-            */
-            if(*Terms < 3)
-                *Terms = 3;
-
+            *Terms = 3;
             for(i = 0; i < 3; i++)
                 Express[i] = Vect[i];
             EXIT
@@ -2095,6 +2087,37 @@ int Parser::Parse_Int_With_Minimum(int minValue, const char* parameterName)
     return value;
 }
 
+int Parser::Parse_Int_With_Range(int minValue, int maxValue, const char* parameterName)
+{
+    int value = Parse_Int(parameterName);
+    if ((value < minValue) || (value > maxValue))
+    {
+        Error("%s%sExpected at %s %i, but found %i instead.",
+              (parameterName != NULL ? parameterName : ""),
+              (parameterName != NULL ? ": " : ""),
+              (value < minValue ? "least" : "most"),
+              minValue,
+              value);
+    }
+    return value;
+}
+
+bool Parser::Parse_Bool(const char* parameterName)
+{
+    DBL rawValue = Parse_Float();
+    int intValue = int(rawValue);
+    bool value = (intValue != 0);
+    if (fabs(intValue - rawValue) >= EPSILON)
+    {
+        Warning("%s%sExpected boolean; interpreting fractional value %lf as '%s'.",
+                (parameterName != NULL ? parameterName : ""),
+                (parameterName != NULL ? ": " : ""),
+                rawValue,
+                (value ? "on" : "off"));
+    }
+    return value;
+}
+
 
 
 /*****************************************************************************
@@ -2440,6 +2463,7 @@ void Parser::Parse_RGBFT_Colour (RGBFTColour& colour, bool expectFT)
 {
     EXPRESS Express;
     int Terms;
+    bool sawFloatOrFloatFnct;
 
     /* Initialize expression. [DB 12/94] */
 
@@ -2690,6 +2714,15 @@ void Parser::Parse_RGBFT_Colour (RGBFTColour& colour, bool expectFT)
             }
             else
             {
+                // Note: Setting up for potential warning on single value float promote to
+                // five value color vector. Under the Parse_Express call there is code which
+                // promotes any single float to the full 'Terms' value on the call. This
+                // usually results in filter and trasmit values >0, which cause shadow artifacts
+                // back to at least version 3.6.1.
+                if ((Token.Token_Id==FLOAT_FUNCT_TOKEN) || (Token.Token_Id==FUNCT_ID_TOKEN))
+                    sawFloatOrFloatFnct = true;
+                else
+                    sawFloatOrFloatFnct = false;
                 if (expectFT)
                     Terms = 5;
                 else
@@ -2700,6 +2733,8 @@ void Parser::Parse_RGBFT_Colour (RGBFTColour& colour, bool expectFT)
                 else if (!expectFT && ((Terms < 3) || Terms > 5))
                     Error("RGB color expression expected but float or vector expression found.");
                 colour.Set(Express, Terms);
+                if (((sawFloatOrFloatFnct) && (Terms==5)) && ((colour.filter() != 0) && (colour.transm() != 0)))
+                    Warning("Float value promoted to full color vector where both filter and transmit >0.0.");
                 if (!expectFT && ((colour.filter() != 0) || (colour.transm() != 0)))
                     Warning("Expected pure RGB color expression, unexpected filter and transmit components will have no effect.");
                 startedParsing = true;
@@ -3662,6 +3697,7 @@ GenericSpline *Parser::Parse_Spline()
 {
     GenericSpline * Old = NULL;
     GenericSpline * New = NULL;
+    bool keepOld = false;
     int i = 0;
     EXPRESS Express;
     int Terms, MaxTerms;
@@ -3677,6 +3713,7 @@ GenericSpline *Parser::Parse_Spline()
             Old = reinterpret_cast<GenericSpline *>(Token.Data);
             i = Old->SplineEntries.size();
             MaxTerms = Old->Terms;
+            keepOld = true;
             EXIT
         END_CASE
 
@@ -3693,7 +3730,10 @@ GenericSpline *Parser::Parse_Spline()
                 New = new LinearSpline(*Old);
             else
                 New = new LinearSpline();
+            if (Old && !keepOld)
+                delete Old;
             Old = New;
+            keepOld = false;
         END_CASE
 
         CASE(QUADRATIC_SPLINE_TOKEN)
@@ -3701,7 +3741,10 @@ GenericSpline *Parser::Parse_Spline()
                 New = new QuadraticSpline(*Old);
             else
                 New = new QuadraticSpline();
+            if (Old && !keepOld)
+                delete Old;
             Old = New;
+            keepOld = false;
         END_CASE
 
         CASE(CUBIC_SPLINE_TOKEN)
@@ -3709,7 +3752,10 @@ GenericSpline *Parser::Parse_Spline()
                 New = new CatmullRomSpline(*Old);
             else
                 New = new CatmullRomSpline();
+            if (Old && !keepOld)
+                delete Old;
             Old = New;
+            keepOld = false;
         END_CASE
 
         CASE(NATURAL_SPLINE_TOKEN)
@@ -3717,7 +3763,10 @@ GenericSpline *Parser::Parse_Spline()
                 New = new NaturalSpline(*Old);
             else
                 New = new NaturalSpline();
+            if (Old && !keepOld)
+                delete Old;
             Old = New;
+            keepOld = false;
         END_CASE
 
         OTHERWISE

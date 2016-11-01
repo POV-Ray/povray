@@ -78,9 +78,6 @@
     <ClCompile Include="..\..\source\base\image\openexr.cpp">
       <Filter>Base source\Image</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\base\image\pgm.cpp">
-      <Filter>Base source\Image</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\base\image\png.cpp">
       <Filter>Base source\Image</Filter>
     </ClCompile>
@@ -124,6 +121,12 @@
       <Filter>Base source</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\base\image\metadata.cpp">
+      <Filter>Base source\Image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\base\messenger.cpp">
+      <Filter>Base source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\base\platformbase.cpp">
       <Filter>Base source\Image</Filter>
     </ClCompile>
   </ItemGroup>
@@ -191,9 +194,6 @@
     <ClInclude Include="..\..\source\base\image\openexr.h">
       <Filter>Base Headers\Image</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\base\image\pgm.h">
-      <Filter>Base Headers\Image</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\base\image\png_pov.h">
       <Filter>Base Headers\Image</Filter>
     </ClInclude>
@@ -252,6 +252,9 @@
       <Filter>Base Headers</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\base\mathutil.h">
+      <Filter>Base Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\base\messenger.h">
       <Filter>Base Headers</Filter>
     </ClInclude>
   </ItemGroup>

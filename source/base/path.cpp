@@ -36,10 +36,6 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "base/path.h"
 
-#ifdef USE_SYSPROTO
-#include "syspovprotobase.h" // TODO FIXME - need to resolve structural dependencies between config.h, configbase.h, frame.h and sysproto.h
-#endif
-
 // POV-Ray base header files
 #include "base/pov_err.h"
 
@@ -53,6 +49,9 @@ Path::Path()
 {
 }
 
+/// @todo
+///     Indicate absolute vs. relative paths separately, rather than co-opting the volume field for this purpose.
+///
 Path::Path(const char *p, Encoding e)
 {
     if(e == ASCII)
@@ -133,7 +132,7 @@ UCS2String Path::operator()() const
     for(vector<UCS2String>::const_iterator i(folders.begin()); i != folders.end(); i++)
     {
         p += *i;
-        p += POV_FILE_SEPARATOR;
+        p += POV_PATH_SEPARATOR;
     }
 
     p += file;
@@ -253,9 +252,73 @@ bool Path::Empty() const
 
 void Path::ParsePathString(const UCS2String& p)
 {
-    if(POV_PARSE_PATH_STRING(p, volume, folders, file) == false)
+    if (!ParsePathString (volume, folders, file, p))
         throw POV_EXCEPTION_STRING("Invalid path."); // TODO FIXME - properly report path string [trf]
 }
+
+
+#if POV_USE_DEFAULT_PATH_PARSER
+// Platforms may replace this method with a custom implementation.
+// Such an implementation should reside in `platform/foo/syspovpath.cpp`.
+
+#ifdef POV_PATH_SEPARATOR_2
+#error The portable implementation of ParsePathString does not support alternative path separator characters.
+#endif
+
+bool Path::ParsePathString (UCS2String& volume, vector<UCS2String>& dirnames, UCS2String& filename, const UCS2String& path)
+{
+    UCS2String stash;
+
+    // Unless noted otherwise, all components are considered empty.
+    volume.clear();
+    dirnames.clear();
+    filename.clear();
+
+    // Empty strings are considered valid path names, too.
+    if (path.empty() == true)
+        return true;
+
+    // Paths beginning with the path separator character are considered absolute path names.
+    // Currently, we indicate those by appending a separator character to the volume (which in
+    // this implementation is always empty otherwise).
+    if(path[0] == POV_PATH_SEPARATOR)
+        volume = POV_PATH_SEPARATOR;
+
+    // Walk through the path string, stashing any non-separator characters. Whenever we hit a separator
+    // character, emit the stashed characters (if any) as a directory name and clear the stash.
+
+    // NB since we do not emit "empty" directory names, any sequence of consecutive separator
+    // characters is effectively treated as a single separator character.
+    // NB in case of an absolute path name we're parsing the leading path separator again.
+    // This does not hurt the algorithm, since in that case the buffer is still empty and
+    // therefore no directory name will be emitted at that point.
+
+    for(UCS2String::const_iterator i = path.begin(); i != path.end(); ++i)
+    {
+        if (*i == POV_PATH_SEPARATOR)
+        {
+            if (!stash.empty())
+            {
+                dirnames.push_back(stash);
+                stash.clear();
+            }
+        }
+        else
+            stash += *i;
+    }
+
+    // Whatever is left in the stash is presumably the actual file name.
+
+    // NB as a consequence of the algorithm chosen, any path name ending in a path separator
+    // character will be emitted as a list of directories only, with the file name left empty.
+
+    filename = stash;
+
+    return true;
+}
+
+#endif // POV_USE_DEFAULT_PATH_PARSER
+
 
 UCS2String Path::URLToUCS2String(const char *p) const
 {

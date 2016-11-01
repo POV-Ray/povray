@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -257,12 +257,13 @@ bool LoadEditorDLL (char *path, bool errorOK)
   return (true) ;
 }
 
+// TODO FIXME - This is almost identical to Parser::Get_Reserved_Words() in parser/parser_tokenizer.cpp.
 char *Get_Reserved_Words (const char *additional_words)
 {
   int length = 0 ;
   int i ;
 
-  for (i = 0; i < LAST_TOKEN; i++)
+  for (i = 0; Reserved_Words[i].Token_Number != LAST_TOKEN; i++)
   {
     if (!isalpha (Reserved_Words [i].Token_Name [0]))
       continue ;
@@ -278,7 +279,7 @@ char *Get_Reserved_Words (const char *additional_words)
   strcat (result, "#\n");
   char *s = result + strlen (additional_words) + 2;
 
-  for (i = 0 ; i < LAST_TOKEN ; i++)
+  for (i = 0; Reserved_Words[i].Token_Number != LAST_TOKEN; i++)
   {
     if (!isalpha (Reserved_Words [i].Token_Name [0]))
       continue ;

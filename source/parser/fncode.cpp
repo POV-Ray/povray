@@ -43,12 +43,12 @@
 #include <cstring>
 #include <algorithm>
 
+#include "core/scene/scenedata.h"
+
 #include "vm/fnintern.h"
 #include "vm/fnpovfpu.h"
 
 #include "parser/parser.h"
-
-#include "backend/scene/backendscenedata.h"
 
 // this must be the last header file included
 #include "base/povdebug.h"
@@ -447,9 +447,9 @@ void FNCode_Copy(FunctionCode *f, FunctionCode *fnew)
 *
 ******************************************************************************/
 
+#if (DEBUG_FLOATFUNCTION == 1)
 void FNCode::SetFlag(unsigned int flag, char *str)
 {
-#if (DEBUG_FLOATFUNCTION == 1)
     if(flag == 1)
     {
         if(asm_input != NULL)
@@ -462,12 +462,8 @@ void FNCode::SetFlag(unsigned int flag, char *str)
             POV_FREE(asm_output);
         asm_output = POV_STRDUP(str);
     }
-#else
-    // silence compiler warnings
-    flag = 0;
-    str = NULL;
-#endif
 }
+#endif
 
 
 /*****************************************************************************

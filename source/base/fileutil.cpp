@@ -83,6 +83,7 @@ POV_File_Restrictions gPOV_File_Restrictions[POV_File_Count] =
     { true,  false, false, false }, // POV_File_Text_INC
     { true,  false, false, false }, // POV_File_Text_INI
     { true,  true,  false, false }, // POV_File_Text_CSV
+    { true,  true,  false, false }, // POV_File_Text_OBJ
     { true,  false, false, false }, // POV_File_Text_Stream
     { true,  true,  false, false }, // POV_File_Text_User
     { true,  true,  true,  false }, // POV_File_Data_DF3
@@ -128,6 +129,7 @@ POV_File_Extensions gPOV_File_Extensions[POV_File_Count] =
     {{ ".inc",  ".INC",  "",      ""      }}, // POV_File_Text_INC
     {{ ".ini",  ".INI",  "",      ""      }}, // POV_File_Text_INI
     {{ ".csv",  ".CSV",  "",      ""      }}, // POV_File_Text_CSV
+    {{ ".obj",  ".OBJ",  "",      ""      }}, // POV_File_Text_OBJ
     {{ ".txt",  ".TXT",  "",      ""      }}, // POV_File_Text_Stream
     {{ "",      "",      "",      ""      }}, // POV_File_Text_User
     {{ ".df3",  ".DF3",  "",      ""      }}, // POV_File_Data_DF3
@@ -157,6 +159,7 @@ const int gFile_Type_To_Mask [POV_File_Count] =
     NO_FILE,   // POV_File_Text_INC
     NO_FILE,   // POV_File_Text_INI
     NO_FILE,   // POV_File_Text_CSV
+    NO_FILE,   // POV_File_Text_OBJ
     NO_FILE,   // POV_File_Text_Stream
     NO_FILE,   // POV_File_Text_User
     NO_FILE,   // POV_File_Data_DF3
@@ -233,5 +236,7 @@ IMemStream *Internal_Font_File(int font_id)
         default:    return new IMemStream(&font_povlogo[0],  sizeof(font_povlogo),  "povlogo.ttf");
     }
 }
+
+//******************************************************************************
 
 }

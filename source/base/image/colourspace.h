@@ -495,35 +495,60 @@ class SRGBGammaCurve : public UniqueGammaCurve
 
 /// Class representing the ITU-R BT.709 transfer function.
 ///
+/// @remark The ITU-R BT.709 transfer function is identical to that defined in ITU-R BT.601.
+///
 /// @note   This class does _not_ account for the "black digital count" and "white digital count" being defined
 ///         as 16/255 and 235/255, respectively.
 ///
-class ITURBT709GammaCurve : public GammaCurve // TODO we could make this a UniqueGammaCurve if we assign it a type ID
+class BT709GammaCurve : public UniqueGammaCurve
 {
     public:
-        static GammaCurvePtr Get();
+        static SimpleGammaCurvePtr Get();
         virtual float Encode(float x) const;
         virtual float Decode(float x) const;
         virtual float ApproximateDecodingGamma() const;
+        virtual int GetTypeId() const;
     private:
-        static GammaCurvePtr instance;
-        ITURBT709GammaCurve();
+        static SimpleGammaCurvePtr instance;
+        BT709GammaCurve();
 };
 
-/// Class representing the Rec1361 transfer function.
+/// Class representing the ITU-R BT.1361 transfer function.
 ///
 /// This transfer function is a wide-gamut extension to that specified in ITU-R BT.709.
 ///
-class Rec1361GammaCurve : public GammaCurve // TODO we could make this a UniqueGammaCurve if we assign it a type ID
+class BT1361GammaCurve : public UniqueGammaCurve
 {
     public:
-        static GammaCurvePtr Get();
+        static SimpleGammaCurvePtr Get();
         virtual float Encode(float x) const;
         virtual float Decode(float x) const;
         virtual float ApproximateDecodingGamma() const;
+        virtual int GetTypeId() const;
     private:
-        static GammaCurvePtr instance;
-        Rec1361GammaCurve();
+        static SimpleGammaCurvePtr instance;
+        BT1361GammaCurve();
+};
+
+/// Class representing the ITU-R BT.2020 transfer function.
+///
+/// @remark The ITU-R BT.2020 transfer function is essentially identical to that defined in ITU-R BT.601 and BT.709,
+///         albeit using more precise constants.
+///
+/// @note   This class does _not_ account for the "black digital count" and "white digital count" being defined
+///         as 16/255 and 235/255, respectively.
+///
+class BT2020GammaCurve : public UniqueGammaCurve
+{
+    public:
+        static SimpleGammaCurvePtr Get();
+        virtual float Encode(float x) const;
+        virtual float Decode(float x) const;
+        virtual float ApproximateDecodingGamma() const;
+        virtual int GetTypeId() const;
+    private:
+        static SimpleGammaCurvePtr instance;
+        BT2020GammaCurve();
 };
 
 /// Class representing a classic constant-gamma (power-law) gamma encoding curve.
@@ -585,7 +610,10 @@ enum GammaTypeId
     kPOVList_GammaType_Unknown,
     kPOVList_GammaType_Neutral,
     kPOVList_GammaType_PowerLaw,
-    kPOVList_GammaType_SRGB
+    kPOVList_GammaType_SRGB,
+    kPOVList_GammaType_BT709,
+    kPOVList_GammaType_BT1361,  ///< Currently not exposed to the user.
+    kPOVList_GammaType_BT2020
 };
 
 /// Generic transfer function factory.

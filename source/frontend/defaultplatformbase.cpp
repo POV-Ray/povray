@@ -85,5 +85,19 @@ bool DefaultPlatformBase::ReadFileFromURL(OStream *, const UCS2String&, const UC
     return false;
 }
 
+FILE* DefaultPlatformBase::OpenLocalFile (const UCS2String& name, const char *mode)
+{
+    return fopen(UCS2toASCIIString(UCS2String(name)).c_str(), mode);
+}
+
+void DefaultPlatformBase::DeleteLocalFile (const UCS2String& name)
+{
+    DELETE_FILE (UCS2toASCIIString(UCS2String(name)).c_str());
+}
+
+bool DefaultPlatformBase::AllowLocalFileAccess (const UCS2String& name, const unsigned int fileType, bool write)
+{
+    return true;
+}
 
 }

@@ -42,6 +42,7 @@
 #include "parser/configparser.h"
 
 #include "base/image/image.h"
+#include "base/messenger.h"
 #include "base/stringutilities.h"
 #include "base/textstream.h"
 #include "base/textstreambuffer.h"
@@ -58,7 +59,6 @@
 #include "parser/fncode.h"
 #include "parser/reservedwords.h"
 
-#include "backend/control/messagefactory.h"
 #include "backend/support/task.h"
 
 namespace pov
@@ -105,6 +105,8 @@ class ImageData;
 struct GenericSpline;
 struct ClassicTurbulence; // full declaration in core/material/warp.h
 struct BlackHoleWarp; // full declaration in core/material/warp.h
+class Mesh;
+class SceneData;
 
 /*****************************************************************************
 * Global preprocessor defines
@@ -157,6 +159,7 @@ struct ExperimentalFlags
     bool    backsideIllumination    : 1;
     bool    functionHf              : 1;
     bool    meshCamera              : 1;
+    bool    objImport               : 1;
     bool    slopeAltitude           : 1;
     bool    spline                  : 1;
     bool    subsurface              : 1;
@@ -167,6 +170,7 @@ struct ExperimentalFlags
         backsideIllumination(false),
         functionHf(false),
         meshCamera(false),
+        objImport(false),
         slopeAltitude(false),
         spline(false),
         subsurface(false),
@@ -193,18 +197,17 @@ struct BetaFlags
 class Parser : public SceneTask
 {
     public:
+
         class DebugTextStreamBuffer : public TextStreamBuffer
         {
             public:
-                DebugTextStreamBuffer(POVMSAddress ba, POVMSAddress fa, RenderBackend::SceneId sid);
+                DebugTextStreamBuffer(GenericMessenger& m);
                 ~DebugTextStreamBuffer();
             protected:
                 virtual void lineoutput(const char *str, unsigned int chars);
                 virtual void directoutput(const char *str, unsigned int chars);
 
-                POVMSAddress backendAddress;
-                POVMSAddress frontendAddress;
-                RenderBackend::SceneId sceneId;
+                GenericMessenger& mMessenger;
         };
 
         DebugTextStreamBuffer Debug_Message_Buffer;
@@ -293,6 +296,8 @@ class Parser : public SceneTask
         // constructor
         Parser(shared_ptr<BackendSceneData> sd, bool useclock, DBL clock);
 
+        ~Parser();
+
         void Run();
         void Stopped();
         void Finish();
@@ -315,7 +320,9 @@ class Parser : public SceneTask
         void Warn_Compat (bool definite, const char *sym);
         void Link_Textures (TEXTURE **Old_Texture, TEXTURE *New_Texture);
 
+        /// @note This method includes an implied `Parse_End()`.
         ObjectPtr Parse_Object_Mods (ObjectPtr Object);
+
         ObjectPtr Parse_Object (void);
         void Parse_Bound_Clip (vector<ObjectPtr>& objects, bool notexture = true);
         void Parse_Default (void);
@@ -346,9 +353,10 @@ class Parser : public SceneTask
 
         /// @param[in]  formalFileName  Name by which the file is known to the user.
         /// @param[out] actualFileName  Name by which the file is known to the parsing computer.
-        IStream *Locate_File(shared_ptr<BackendSceneData>& sd, const UCS2String& formalFileName, unsigned int stype, UCS2String& actualFileName, bool err_flag = false);
+        IStream *Locate_File(const UCS2String& formalFileName, unsigned int stype, UCS2String& actualFileName, bool err_flag = false);
 
-        Image *Read_Image(shared_ptr<BackendSceneData>& sd, int filetype, const UCS2 *filename, const Image::ReadOptions& options);
+        OStream *CreateFile(const UCS2String& filename, unsigned int stype, bool append);
+        Image *Read_Image(int filetype, const UCS2 *filename, const Image::ReadOptions& options);
 
         // tokenize.h/tokenize.cpp
         void Get_Token (void);
@@ -434,6 +442,12 @@ class Parser : public SceneTask
         /// Parses a FLOAT as an integer value with a given minimum.
         int Parse_Int_With_Minimum(int minValue, const char* parameterName = NULL);
 
+        /// Parses a FLOAT as an integer value with a given range.
+        int Parse_Int_With_Range(int minValue, int maxValue, const char* parameterName = NULL);
+
+        /// Parses a FLOAT as a boolean value.
+        bool Parse_Bool(const char* parameterName = NULL);
+
         int Allow_Vector (Vector3d& Vect);
         void Parse_UV_Vect (Vector2d& UV_Vect);
         void Parse_Vector (Vector3d& Vector);
@@ -479,7 +493,8 @@ class Parser : public SceneTask
         bool expr_ret(ExprNode *&current, int stage, int op);
         bool expr_err(ExprNode *&current, int stage, int op);
 
-        shared_ptr<BackendSceneData> sceneData; // TODO FIXME HACK - make private again once Locate_Filename is fixed [trf]
+        shared_ptr<BackendSceneData> backendSceneData; // TODO FIXME HACK - make private again once Locate_Filename is fixed [trf]
+        shared_ptr<SceneData> sceneData;
     private:
         FPUContext *fnVMContext;
 
@@ -497,7 +512,7 @@ class Parser : public SceneTask
         short Ok_To_Declare;
         short LValue_Ok;
 
-        /// true if a #version statement is been parsed
+        /// true if a #version statement is being parsed
         bool parsingVersionDirective;
 
         TOKEN *Brace_Stack;
@@ -614,8 +629,12 @@ class Parser : public SceneTask
         ObjectPtr Parse_Julia_Fractal(void);
         ObjectPtr Parse_HField(void);
         ObjectPtr Parse_Lathe(void);
+        ObjectPtr Parse_Lemon();
         ObjectPtr Parse_Light_Source();
+
+        /// @note This method includes an implied `Parse_End()`.
         ObjectPtr Parse_Object_Id();
+
         ObjectPtr Parse_Ovus();
         ObjectPtr Parse_Plane();
         ObjectPtr Parse_Poly(int order);
@@ -631,6 +650,11 @@ class Parser : public SceneTask
         ObjectPtr Parse_Triangle();
         ObjectPtr Parse_Mesh();
         ObjectPtr Parse_Mesh2();
+
+        void Parse_Obj (Mesh*);
+        void Parse_Mesh1 (Mesh*);
+        void Parse_Mesh2 (Mesh*);
+
         TEXTURE *Parse_Mesh_Texture(TEXTURE **t2, TEXTURE **t3);
         ObjectPtr Parse_TrueType(void);
         void Parse_Blob_Element_Mods(Blob_Element *Element);
@@ -659,6 +683,8 @@ class Parser : public SceneTask
         ObjectPtr Parse_Sphere_Sweep(void);
         int Parse_Three_UVCoords(Vector2d& UV1, Vector2d& UV2, Vector2d& UV3);
 
+        void SignalProgress(POV_LONG elapsedTime, POV_LONG tokenCount);
+
         // tokenize.h/tokenize.cpp
         void Echo_ungetc (int c);
         int Echo_getc (void);
@@ -673,6 +699,7 @@ class Parser : public SceneTask
         bool Read_Float (void);
         void Read_Symbol (void);
         SYM_ENTRY *Find_Symbol (int Index, const char *s);
+        SYM_ENTRY *Find_Symbol (const char *s);
         void Skip_Tokens (COND_TYPE cond);
         void Break (void);
 

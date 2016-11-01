@@ -1,6 +1,7 @@
-# Version Numbering {#versioning}
+@page versioning  Version Numbering
 
-Numbering Scheme {#versioning_schm}
+
+Numbering Scheme
 ================
 
 The current POV-Ray version numbering scheme is designed to comply with the format and precedence rules of
@@ -45,7 +46,7 @@ POV-Ray **build** version numbers have the form `X.Y.Z`[-`PREB`][`+BUILD`], wher
     behalf of the POV-Ray team carry build identifiers of the form `avN`, where `N` is a running numeric value.
 
 
-What To Change {#versioning_chng}
+What To Change
 ==============
 
 When updating a version number, the following files need to be changed accordingly:
@@ -57,15 +58,14 @@ When updating a version number, the following files need to be changed according
     When updating the minor or major version number, a host of other files need to be changed as well.
 
 
-Automatic Version Numbering {#versioning_auto}
+Automatic Version Numbering
 ===========================
 
-The directory `tools/git/hooks` contains scripts intended to help with version numbering when using Git; to benefit from
-them, copy them to the `.git/hooks` directory in your local Git workspace. Whenever you perform a commit, they will
-automatically take care of the following:
+The directory `tools/git/hooks` contains scripts intended to (among other things) help with version numbering when using
+Git; to benefit from them, copy them to the `.git/hooks` directory in your local Git workspace. Whenever you perform a
+commit, they will automatically take care of the following:
 
   - Verify that `unix/VERSION` and the various version number variants in `source/base/version.h` match.
   - Update the `ID` portion of pre-release versions whenever any files in one of the following directory sub-trees have
     been staged for commit: `source`, `vfe`, `platform`, `mac`, `unix`, `windows` or `libraries`. The new value of the
     `ID` portion will be the number of minutes elapsed since 2000-01-01 00:00 UTC.
-

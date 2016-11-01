@@ -68,9 +68,6 @@
 #include "stdint.h"
 #endif
 
-// from directory "vfe"
-#include "vfeconf.h"
-
 using std::max;
 using std::min;
 
@@ -121,8 +118,6 @@ const int NULL=0;
 #define DEFAULT_OUTPUT_FORMAT       kPOVList_FileType_PNG
 #define DEFAULT_DISPLAY_GAMMA_TYPE  kPOVList_GammaType_SRGB
 #define DEFAULT_DISPLAY_GAMMA       2.2
-#define DEFAULT_FILE_GAMMA_TYPE     kPOVList_GammaType_SRGB
-#define DEFAULT_FILE_GAMMA          2.2
 
 #define METADATA_PLATFORM_STRING BUILD_ARCH
 #define METADATA_COMPILER_STRING COMPILER_VERSION

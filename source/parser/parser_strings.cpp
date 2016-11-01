@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -33,18 +33,17 @@
 ///
 //******************************************************************************
 
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
+#include "parser/parser.h"
+
 #include <cstdlib>
 #include <cctype>
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 
-// configparser.h must always be the first POV file included in the parser (pulls in platform config)
-#include "parser/configparser.h"
-#include "parser/parser.h"
-
 #include "pov_mem.h" // TODO
 
-#include "backend/scene/backendscenedata.h"
+#include "core/scene/scenedata.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -817,7 +816,7 @@ UCS2 *Parser::String_Literal_To_UCS2(const char *str, bool pathname)
             // Historically, escape sequences were ignored when parsing for a filename.
             // As of POV-Ray 3.71, this has been changed.
 
-#if (FILENAME_SEPARATOR == '\\')
+#if POV_BACKSLASH_IS_PATH_SEPARATOR
             if (pathname)
             {
                 Warning("Backslash encountered while parsing for a filename."
@@ -874,8 +873,7 @@ UCS2 *Parser::String_Literal_To_UCS2(const char *str, bool pathname)
                     break;
                 default:
                     char_string[index_out] = char_array[index_in];
-                    if ( char_array )
-                        POV_FREE(char_array);
+                    POV_FREE(char_array);
                     char_array = NULL;
                     Error( "Illegal escape sequence in string." );
                     break;
@@ -888,7 +886,7 @@ UCS2 *Parser::String_Literal_To_UCS2(const char *str, bool pathname)
                 // Historically, escape sequences were ignored when parsing for a filename.
                 // As of POV-Ray 3.71, this has been changed.
 
-#if (FILENAME_SEPARATOR == '\\')
+#if POV_BACKSLASH_IS_PATH_SEPARATOR
                 Warning("Backslash encountered while parsing for a filename."
                         " In legacy (pre-3.71) scenes, this is NOT interpreted as the start of an escape sequence."
                         " However, for future compatibility it is recommended to use a forward slash as path separator instead.");

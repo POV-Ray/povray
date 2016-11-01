@@ -49,7 +49,6 @@
 
 namespace vfe
 {
-  typedef struct SysQDataNode POVMS_Sys_QueueDataNode ;
   typedef class SysQNode POVMS_Sys_QueueNode ;
   void* /*POVMSAddress*/ vfe_POVMS_Sys_QueueToAddress (POVMS_Sys_QueueNode *q) ;
   POVMS_Sys_QueueNode *vfe_POVMS_Sys_AddressToQueue (void* /*POVMSAddress*/ a) ;
@@ -57,8 +56,6 @@ namespace vfe
   void vfe_POVMS_Sys_QueueClose (POVMS_Sys_QueueNode *q) ;
   void *vfe_POVMS_Sys_QueueReceive (POVMS_Sys_QueueNode *q, int *l, bool, bool) ;
   int vfe_POVMS_Sys_QueueSend(POVMS_Sys_QueueNode *q, void *p, int l) ;
-  int Allow_File_Write (const char *Filename, const unsigned int FileType);
-  int Allow_File_Read (const char *Filename, const unsigned int FileType);
   int Allow_File_Read (const unsigned short *Filename, const unsigned int FileType);
   int Allow_File_Write (const unsigned short *Filename, const unsigned int FileType);
   POVMS_Sys_Thread_Type POVMS_GetCurrentThread();
@@ -66,13 +63,6 @@ namespace vfe
   FILE *vfeFOpen (const std::basic_string<unsigned short>& name, const char *mode);
   bool vfeRemove (const std::basic_string<unsigned short>& name);
 }
-
-#define USE_SYSPROTO                          1
-#define POV_DELAY_IMPLEMENTED                 1
-#define POV_TIMER                             pov_base::vfeTimer
-#define POV_SYS_THREAD_STARTUP                pov_base::vfeSysThreadStartup();
-#define POV_SYS_THREAD_CLEANUP                pov_base::vfeSysThreadCleanup();
-#define POV_PARSE_PATH_STRING(p,v,c,f)        pov_base::vfeParsePathString(p,v,c,f)
 
 #define POVMS_ASSERT_OUTPUT                   vfe::vfeAssert
 #define POVMS_Sys_Queue_Type                  vfe::POVMS_Sys_QueueNode *
@@ -84,9 +74,5 @@ namespace vfe
 #define POVMS_Sys_QueueReceive                vfe::vfe_POVMS_Sys_QueueReceive
 #define POVMS_Sys_QueueSend                   vfe::vfe_POVMS_Sys_QueueSend
 #define POVMS_Sys_GetCurrentThread            vfe::POVMS_GetCurrentThread
-#define POV_ALLOW_FILE_READ(f,t)              vfe::Allow_File_Read(f,t)
-#define POV_ALLOW_FILE_WRITE(f,t)             vfe::Allow_File_Write(f,t)
-#define POV_UCS2_FOPEN(n,m)                   vfe::vfeFOpen(n,m)
-#define POV_UCS2_REMOVE(n)                    vfe::vfeRemove(n)
 
 #endif // __VFECONF_H__

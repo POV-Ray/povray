@@ -128,7 +128,7 @@ Media& Media::operator=(const Media& source)
         AA_Level = source.AA_Level;
 
         if(Sample_Threshold != NULL)
-            delete Sample_Threshold;
+            delete[] Sample_Threshold;
         Sample_Threshold = NULL;
 
         for (vector<PIGMENT*>::iterator i = Density.begin(); i != Density.end(); ++ i)
@@ -177,7 +177,7 @@ void Media::PostProcess()
 
     // Init sample threshold array.
     if(Sample_Threshold != NULL)
-        delete Sample_Threshold;
+        delete[] Sample_Threshold;
 
     // Create list of thresholds for confidence test.
     Sample_Threshold = new DBL[Max_Samples];

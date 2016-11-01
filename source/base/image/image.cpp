@@ -54,15 +54,10 @@
 #include "base/image/iff.h"
 #include "base/image/jpeg_pov.h"
 #include "base/image/openexr.h"
-#include "base/image/pgm.h"
 #include "base/image/png_pov.h"
 #include "base/image/ppm.h"
 #include "base/image/targa.h"
 #include "base/image/tiff_pov.h"
-
-#ifdef USE_SYSPROTO
-#include "syspovprotobase.h"
-#endif
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -3058,7 +3053,7 @@ class FileBackedPixelContainer
         };
 
         FileBackedPixelContainer(size_type width, size_type height, size_type bs):
-            m_File(-1), m_Width(width), m_Height(height), m_xPos(0), m_yPos(0), m_Dirty(false), m_Path(POV_PLATFORM_BASE.CreateTemporaryFile())
+            m_File(-1), m_Width(width), m_Height(height), m_xPos(0), m_yPos(0), m_Dirty(false), m_Path(PlatformBase::GetInstance().CreateTemporaryFile())
         {
             if ((m_File = open(UCS2toASCIIString(m_Path).c_str(), O_CREAT | O_RDWR | O_TRUNC, S_IRUSR | S_IWUSR)) == -1)
                 throw POV_EXCEPTION(kCannotOpenFileErr, "Cannot open backing file for intermediate image storage.");
@@ -3100,7 +3095,7 @@ class FileBackedPixelContainer
                 // if shutdown has been delayed, by the time we reach here, the platform base
                 // may no longer be valid (see crashdump #77 for an example of this). we need
                 // to take the address of the reference to see if it's now NULL before we use it.
-                PlatformBase *pb(&POV_PLATFORM_BASE);
+                PlatformBase *pb(&PlatformBase::GetInstance());
                 if (pb != NULL)
                     pb->DeleteTemporaryFile(m_Path);
             }
@@ -3259,6 +3254,7 @@ class FileBackedPixelContainer
                     throw POV_EXCEPTION(kFileDataErr, "Intermediate image storage backing file read failed.");
                 m_CurrentBlock = block;
             }
+            POV_IMAGE_ASSERT (m_Blocksize != 0);
             memcpy(&pixel, m_Buffer[(y * (POV_LONG)(m_Width) + x) % m_Blocksize], sizeof(pixel));
         }
 #if 0
@@ -3557,6 +3553,70 @@ void RGBFTMap2RGBAMap(const vector<Image::RGBFTMapEntry>& m, vector<Image::RGBAM
 
     for(vector<Image::RGBFTMapEntry>::const_iterator i(m.begin()); i != m.end(); i++)
         n.push_back(Image::RGBAMapEntry(i->red, i->green, i->blue, RGBFTColour::FTtoA(i->filter, i->transm)));
+}
+
+Image::ImageDataType Image::GetImageDataType (ImageChannelDataType channelType, ImageChannelLayout layout)
+{
+    switch (layout)
+    {
+    case kImageChannelLayout_Gray:
+        switch (channelType)
+        {
+        case kImageChannelDataType_Int8:    return Image::Gray_Int8;
+        case kImageChannelDataType_Int16:   return Image::Gray_Int16;
+        case kImageChannelDataType_Gamma8:  return Image::Gray_Gamma8;
+        case kImageChannelDataType_Gamma16: return Image::Gray_Gamma16;
+        default:
+            POV_IMAGE_ASSERT(false);
+            break;
+        }
+        break;
+
+    case kImageChannelLayout_GrayA:
+        switch (channelType)
+        {
+        case kImageChannelDataType_Int8:    return Image::GrayA_Int8;
+        case kImageChannelDataType_Int16:   return Image::GrayA_Int16;
+        case kImageChannelDataType_Gamma8:  return Image::GrayA_Gamma8;
+        case kImageChannelDataType_Gamma16: return Image::GrayA_Gamma16;
+        default:
+            POV_IMAGE_ASSERT(false);
+            break;
+        }
+        break;
+
+    case kImageChannelLayout_RGB:
+        switch (channelType)
+        {
+        case kImageChannelDataType_Int8:    return Image::RGB_Int8;
+        case kImageChannelDataType_Int16:   return Image::RGB_Int16;
+        case kImageChannelDataType_Gamma8:  return Image::RGB_Gamma8;
+        case kImageChannelDataType_Gamma16: return Image::RGB_Gamma16;
+        default:
+            POV_IMAGE_ASSERT(false);
+            break;
+        }
+        break;
+
+    case kImageChannelLayout_RGBA:
+        switch (channelType)
+        {
+        case kImageChannelDataType_Int8:    return Image::RGBA_Int8;
+        case kImageChannelDataType_Int16:   return Image::RGBA_Int16;
+        case kImageChannelDataType_Gamma8:  return Image::RGBA_Gamma8;
+        case kImageChannelDataType_Gamma16: return Image::RGBA_Gamma16;
+        default:
+            POV_IMAGE_ASSERT(false);
+            break;
+        }
+        break;
+
+    default:
+        POV_IMAGE_ASSERT(false);
+        break;
+    }
+
+    return Image::Undefined;
 }
 
 Image *Image::Create(unsigned int w, unsigned int h, ImageDataType t, unsigned int maxRAMmbHint, unsigned int pixelsPerBlockHint)
@@ -3908,10 +3968,10 @@ following built-in formats: GIF, TGA, IFF, PGM, PPM, BMP.");
             return (Iff::Read(file, options));
 
         case PGM:
-            return (Pgm::Read(file, options));
+            return (Netpbm::Read(file, options));
 
         case PPM:
-            return (Ppm::Read(file, options));
+            return (Netpbm::Read(file, options));
 
         case BMP:
             return (Bmp::Read(file, options));
@@ -4001,7 +4061,7 @@ following built-in formats: TGA, PPM, BMP.");
             break;
 
         case PPM:
-            Ppm::Write(file, image, options);
+            Netpbm::Write(file, image, options);
             break;
 
         case BMP:
