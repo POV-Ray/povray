@@ -6,7 +6,7 @@ General Presumptions
 
 While POV-Ray is being developed with portability high in mind, the C++ standard allows for some degrees of freedom that
 we consider too exotic to cater to. We therefore presume all compilers and runtime environments to adhere to the
-following additional restrictions:
+following restrictions:
 
   - **Char Size**: The `char` data type is currently presumed to be exactly 8 bits wide.
 
@@ -19,7 +19,11 @@ following additional restrictions:
     separator, in include directives.
 
   - **Integer Division**: Integer division is presumed to round towards zero. This also implies that the remainder (as
-    computed by the modulus operator `%`) is negative (or zero) if the dividend and divisor have different sign.
+    computed by the modulus operator `%`) is negative (or zero) if the dividend and divisor have different signs.
+
+Failure to meet the above restrictions will cause in undefined behaviour.
+
+Further restrictions may apply, but shall prompt a compile-time error if not satisfied.
 
 
 POVMS Additional Restrictions

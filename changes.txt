@@ -379,6 +379,7 @@ Reported via FlySpray:
 - FS#316 ("inverse keyword does not work properly with fractals")
 - FS#317 ("problem with +D option at specific output file dimensions")
 - FS#318 ("method 3 (default) scattering media is too bright & causes artifacts when nested")
+- FS#336 ("#fopen w/o OPEN_TYPE crash povray (segfault)")
 
 Reported via the Newsgroups:
 

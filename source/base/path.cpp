@@ -262,7 +262,7 @@ void Path::ParsePathString(const UCS2String& p)
 // Such an implementation should reside in `platform/foo/syspovpath.cpp`.
 
 #ifdef POV_PATH_SEPARATOR_2
-#error The portable implementation of ParsePathString does not support alternative path separator characters.
+#error "The portable implementation of ParsePathString does not support alternative path separator characters."
 #endif
 
 bool Path::ParsePathString (UCS2String& volume, vector<UCS2String>& dirnames, UCS2String& filename, const UCS2String& path)

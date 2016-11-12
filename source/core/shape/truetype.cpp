@@ -667,7 +667,7 @@ void TrueType::ProcessNewTTF(CSG *Object, TrueTypeFont *ffile, const UCS2 *text_
 
 #ifdef TTF_DEBUG
     // TODO - text_string is an UCS2 strings, while Debug_Info will expect char strings.
-    #error broken code
+    #error "broken code"
     if (filename)
     {
         Debug_Info("TTF parsing of \"%s\" from %s complete\n", text_string, filename);

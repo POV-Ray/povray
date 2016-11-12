@@ -55,7 +55,7 @@
 /// Specifies the person or organization responsible for this build.
 /// @attention Please set this to your real name, and/or include a working email or website address to contact you.
 #define BUILT_BY "YOUR NAME (YOUR EMAIL)"
-#error Please fill in BUILT_BY, then remove this line
+#error "Please fill in BUILT_BY, then remove this line"
 #endif
 
 #endif // POVRAY_BASE_BUILD_H

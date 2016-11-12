@@ -107,24 +107,24 @@ namespace pov
 // (note that these don't necessarily catch all possible quirks; they should be quite reliable though)
 #if(C99_COMPATIBLE_RADIOSITY == 0)
     #if( (INT_MAX != SIGNED32_MAX) || (INT_MIN + SIGNED32_MAX != -1) )
-        #error 'int' is not 32 bit or does not use two's complement encoding; try a different C99_COMPATIBLE_RADIOSITY setting in config.h
+        #error "'int' is not 32 bit or does not use two's complement encoding; try a different C99_COMPATIBLE_RADIOSITY setting in config.h"
     #endif
     #if(FLT_RADIX != 2)
-        #error 'float' does not conform to IEEE 754 single-precision format; try a different C99_COMPATIBLE_RADIOSITY setting in config.h
+        #error "'float' does not conform to IEEE 754 single-precision format; try a different C99_COMPATIBLE_RADIOSITY setting in config.h"
     #endif
     #if(FLT_MANT_DIG != 24)
-        #error 'float' does not conform to IEEE 754 single-precision format; try a different C99_COMPATIBLE_RADIOSITY setting in config.h
+        #error "'float' does not conform to IEEE 754 single-precision format; try a different C99_COMPATIBLE_RADIOSITY setting in config.h"
     #endif
     #if(FLT_MAX_EXP != 128)
-        #error 'float' does not conform to IEEE 754 single-precision format; try a different C99_COMPATIBLE_RADIOSITY setting in config.h
+        #error "'float' does not conform to IEEE 754 single-precision format; try a different C99_COMPATIBLE_RADIOSITY setting in config.h"
     #endif
     #if(FLT_MIN_EXP != -125)
-        #error 'float' does not conform to IEEE 754 single-precision format; try a different C99_COMPATIBLE_RADIOSITY setting in config.h
+        #error "'float' does not conform to IEEE 754 single-precision format; try a different C99_COMPATIBLE_RADIOSITY setting in config.h"
     #endif
 #else
     #if(FLT_RADIX != 2)
         // logb family of functions will not work as expected
-        #error floating point arithmetic uses an uncommon radix; this file will not compile on your machine
+        #error "floating point arithmetic uses an uncommon radix; this file will not compile on your machine"
     #endif
 #endif
 
@@ -1138,7 +1138,7 @@ bool ot_write_block(OT_BLOCK *bl, void *fd) // must be passed as void * for comp
         // TODO - write Quality and Brilliance
     );
 #else
-    #error TODO!
+    #error "TODO!"
 #endif
     return true;
 }
@@ -1328,7 +1328,7 @@ bool ot_read_file(OT_NODE **root, IStream *fd, const OT_READ_PARAM* param, OT_RE
                                    &bl.Nearest_Distance, to_nearest_string );
                     bl.Illuminance = LightColour(illuminance);
 #else
-                    #error TODO!
+                    #error "TODO!"
 #endif
 
                     // TODO FIXME - read Quality and Brilliance

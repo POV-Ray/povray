@@ -97,7 +97,7 @@ class SpectralBand
 #if ((POV_COLOUR_MODEL == 0) || (POV_COLOUR_MODEL == 3))
             return (GetHueIntegral(wavelength+bandwidth/2) - GetHueIntegral(wavelength-bandwidth/2)) * (SPECTRAL_BANDWIDTH/bandwidth);
 #else
-            #error TODO!
+            #error "TODO!"
 #endif
         }
 

@@ -184,7 +184,7 @@ struct ColourModelInternal4
 #elif (POV_COLOUR_MODEL == 4)
     typedef ColourModelInternal4 ColourModelInternal;
 #else
-    #error Colour model not implemented.
+    #error "Colour model not implemented."
 #endif
 
 extern const ColourChannel kaColourConversionMatrixRGBfromXYZ[ColourModelRGB::kChannels * ColourModelXYZ::kChannels];
@@ -1480,7 +1480,7 @@ class GenericLightColour : public GenericLinearColour<ColourModelInternal,CHANNE
             Model::MetamericNormalize<Channel, ColourModelRGB>(mColour);
         }
 #else
-        #error Colour model not implemented.
+        #error "Colour model not implemented."
 #endif
 
         template<typename BIAS_T2, typename CHANNEL_T2>
