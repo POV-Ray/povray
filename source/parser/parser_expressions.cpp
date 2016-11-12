@@ -2781,7 +2781,7 @@ void Parser::Parse_Wavelengths (MathColour& colour)
     Parse_Colour (tempColour, false);
     colour = ToMathColour(tempColour.rgb());
 #else
-    #error TODO!
+    #error "TODO!"
 #endif
 }
 

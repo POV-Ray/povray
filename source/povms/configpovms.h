@@ -41,7 +41,7 @@
 #if !defined(__cplusplus)
     // When compiling as part of the POV-Ray project, povms.c must be compiled as a C++ file,
     // due to potential C++-isms in the base/configbase.h header included via this file.
-    #error povms.c must be compiled as a C++ file when used as part of the POV-Ray project.
+    #error "povms.c must be compiled as a C++ file when used as part of the POV-Ray project."
 #endif
 
 #include "base/configbase.h"

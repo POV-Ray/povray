@@ -957,7 +957,7 @@ bool RadiosityCache::Load(const Path& inputFile)
                     );
                     illuminance = ToMathColour(tempCol);
 #else
-                    #error TODO!
+                    #error "TODO!"
 #endif
                     if ( count == 11 )
                     {
