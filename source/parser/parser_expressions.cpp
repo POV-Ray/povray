@@ -1723,12 +1723,10 @@ void Parser::Parse_Rel_Factor (EXPRESS& Express,int *Terms)
 *
 ******************************************************************************/
 
-void Parser::Parse_Rel_String_Term (const UCS2 *lhs, EXPRESS& Express, int *Terms)
+DBL Parser::Parse_Rel_String_Term (const UCS2 *lhs)
 {
     int Val;
     UCS2 *rhs = NULL;
-
-    *Terms = 1;
 
     EXPECT_ONE
         CASE (LEFT_ANGLE_TOKEN)
@@ -1736,7 +1734,7 @@ void Parser::Parse_Rel_String_Term (const UCS2 *lhs, EXPRESS& Express, int *Term
             Val = UCS2_strcmp(lhs, rhs);
             POV_FREE(rhs);
 
-            Express[0] = (DBL)(Val < 0);
+            return (DBL)(Val < 0);
         END_CASE
 
         CASE (REL_LE_TOKEN)
@@ -1744,7 +1742,7 @@ void Parser::Parse_Rel_String_Term (const UCS2 *lhs, EXPRESS& Express, int *Term
             Val = UCS2_strcmp(lhs, rhs);
             POV_FREE(rhs);
 
-            Express[0] = (DBL)(Val <= 0);
+            return (DBL)(Val <= 0);
         END_CASE
 
         CASE (EQUALS_TOKEN)
@@ -1752,7 +1750,7 @@ void Parser::Parse_Rel_String_Term (const UCS2 *lhs, EXPRESS& Express, int *Term
             Val = UCS2_strcmp(lhs, rhs);
             POV_FREE(rhs);
 
-            Express[0] = (DBL)(Val == 0);
+            return (DBL)(Val == 0);
         END_CASE
 
         CASE (REL_NE_TOKEN)
@@ -1760,7 +1758,7 @@ void Parser::Parse_Rel_String_Term (const UCS2 *lhs, EXPRESS& Express, int *Term
             Val = UCS2_strcmp(lhs, rhs);
             POV_FREE(rhs);
 
-            Express[0] = (DBL)(Val != 0);
+            return (DBL)(Val != 0);
         END_CASE
 
         CASE (REL_GE_TOKEN)
@@ -1768,7 +1766,7 @@ void Parser::Parse_Rel_String_Term (const UCS2 *lhs, EXPRESS& Express, int *Term
             Val = UCS2_strcmp(lhs, rhs);
             POV_FREE(rhs);
 
-            Express[0] = (DBL)(Val >= 0);
+            return (DBL)(Val >= 0);
         END_CASE
 
         CASE (RIGHT_ANGLE_TOKEN)
@@ -1776,7 +1774,7 @@ void Parser::Parse_Rel_String_Term (const UCS2 *lhs, EXPRESS& Express, int *Term
             Val = UCS2_strcmp(lhs, rhs);
             POV_FREE(rhs);
 
-            Express[0] = (DBL)(Val > 0);
+            return (DBL)(Val > 0);
         END_CASE
 
         OTHERWISE
@@ -1816,7 +1814,8 @@ void Parser::Parse_Rel_Term (EXPRESS& Express,int *Terms)
     UCS2 *Local_String = Parse_String(false, false);
     if(Local_String != NULL)
     {
-            Parse_Rel_String_Term(Local_String, Express, Terms);
+            *Terms = 1;
+            Express[0] = Parse_Rel_String_Term(Local_String);
             POV_FREE(Local_String);
             Ok_To_Declare = old_Ok_To_Declare;
             return;
