@@ -328,6 +328,7 @@ void Parser::Get_Token ()
 
     Token.Token_Id = END_OF_FILE_TOKEN;
     Token.is_array_elem = false;
+    Token.is_mixed_array_elem = false;
     Token.is_dictionary_elem = false;
 
     while (Token.Token_Id == END_OF_FILE_TOKEN)
@@ -343,6 +344,7 @@ void Parser::Get_Token ()
             {
                 Token.Token_Id = END_OF_FILE_TOKEN;
                 Token.is_array_elem = false;
+                Token.is_mixed_array_elem = false;
                 Token.is_dictionary_elem = false;
                 Token.End_Of_File = true;
                 return;
@@ -355,6 +357,7 @@ void Parser::Get_Token ()
 
                 Token.Token_Id = END_OF_FILE_TOKEN;
                 Token.is_array_elem = false;
+                Token.is_mixed_array_elem = false;
                 Token.is_dictionary_elem = false;
                 Token.End_Of_File = true;
 
@@ -1351,6 +1354,7 @@ void Parser::Read_Symbol()
                     {
                         Token.Token_Id=MACRO_ID_TOKEN;
                         Token.is_array_elem = false;
+                        Token.is_mixed_array_elem = false;
                         Token.is_dictionary_elem = false;
                         Token.NumberPtr = &(Temp_Entry->Token_Number);
                         Token.DataPtr   = &(Temp_Entry->Data);
@@ -1363,6 +1367,7 @@ void Parser::Read_Symbol()
 
                 Token.Token_Id  =   Temp_Entry->Token_Number;
                 Token.is_array_elem = false;
+                Token.is_mixed_array_elem = false;
                 Token.is_dictionary_elem = false;
                 Token.NumberPtr = &(Temp_Entry->Token_Number);
                 Token.DataPtr   = &(Temp_Entry->Data);
@@ -1372,12 +1377,12 @@ void Parser::Read_Symbol()
                 bool breakLoop = false;
                 while (!breakLoop)
                 {
-                    dictIndex = NULL;
-
                     switch (Token.Token_Id)
                     {
                         case ARRAY_ID_TOKEN:
                             {
+                                dictIndex = NULL;
+
                                 Skip_Spaces();
                                 c = Echo_getc();
                                 Echo_ungetc(c);
@@ -1417,26 +1422,32 @@ void Parser::Read_Symbol()
                                     GET(RIGHT_SQUARE_TOKEN)
                                 }
 
-                                Token.DataPtr   = &(a->DataPtrs[j]);
-                                Token.NumberPtr = &(a->Type);
-                                Token.Token_Id = a->Type;
-                                Token.is_array_elem = true;
-                                Token.is_dictionary_elem = false;
                                 if (!LValue_Ok && !Inside_Ifdef)
                                 {
-                                    if (*Token.DataPtr == NULL)
+                                    if (a->DataPtrs[j] == NULL)
                                         Error("Attempt to access uninitialized array element.");
                                 }
+
+                                Token.DataPtr = &(a->DataPtrs[j]);
+                                Token.is_mixed_array_elem = !a->Types.empty();
+                                if (Token.is_mixed_array_elem)
+                                    Token.NumberPtr = &(a->Types[j]);
+                                else
+                                    Token.NumberPtr = &(a->Type);
+                                Token.Token_Id = *Token.NumberPtr;
+                                Token.is_array_elem = true;
+                                Token.is_dictionary_elem = false;
                             }
                             break;
 
                         case DICTIONARY_ID_TOKEN:
                             {
+                                dictIndex = NULL;
+
                                 Skip_Spaces();
                                 c = Echo_getc();
                                 Echo_ungetc(c);
 
-                                dictIndex = NULL;
                                 table = reinterpret_cast<SYM_TABLE *>(*(Token.DataPtr));
 
                                 if (c =='.')
@@ -1493,15 +1504,19 @@ void Parser::Read_Symbol()
                                     Token.NumberPtr = NULL;
                                 }
                                 Token.is_array_elem = false;
+                                Token.is_mixed_array_elem = false;
                                 Token.is_dictionary_elem = true;
                             }
                             break;
 
                         case PARAMETER_ID_TOKEN:
                             {
+                                dictIndex = NULL;
+
                                 Par             = reinterpret_cast<POV_PARAM *>(Temp_Entry->Data);
                                 Token.Token_Id  = *(Par->NumberPtr);
                                 Token.is_array_elem = false;
+                                Token.is_mixed_array_elem = false;
                                 Token.is_dictionary_elem = false;
                                 Token.NumberPtr = Par->NumberPtr;
                                 Token.DataPtr   = Par->DataPtr;
@@ -1519,17 +1534,17 @@ void Parser::Read_Symbol()
                 if (Token.DataPtr != NULL)
                     Token.Data = *(Token.DataPtr);
                 Token.context = Local_Index;
+                if (dictIndex != NULL)
+                {
+                    Token.Token_String = dictIndex;
+                    Token.freeString = true;
+                }
                 return;
             }
         }
     }
 
     Write_Token (IDENTIFIER_TOKEN, Token.Token_Col_No);
-    if (dictIndex != NULL)
-    {
-        Token.Token_String = dictIndex;
-        Token.freeString = true;
-    }
 }
 
 inline void Parser::Write_Token (TOKEN Token_Id, int col, SYM_TABLE *table)
@@ -1821,6 +1836,7 @@ void Parser::Parse_Directive(int After_Hash)
             }
             Token.Token_Id = END_OF_FILE_TOKEN;
             Token.is_array_elem = false;
+            Token.is_mixed_array_elem = false;
             Token.is_dictionary_elem = false;
 
             return;
@@ -1833,6 +1849,7 @@ void Parser::Parse_Directive(int After_Hash)
         {
             Token.Token_Id=HASH_TOKEN;
             Token.is_array_elem = false;
+            Token.is_mixed_array_elem = false;
             Token.is_dictionary_elem = false;
         }
         Token.Unget_Token = false;
@@ -1992,6 +2009,7 @@ void Parser::Parse_Directive(int After_Hash)
                     Cond_Stack[CS_Index].Cond_Type = ELSE_COND;
                     Token.Token_Id=HASH_TOKEN; /*insures Skip_Token takes notice*/
                     Token.is_array_elem = false;
+                    Token.is_mixed_array_elem = false;
                     Token.is_dictionary_elem = false;
                     UNGET
                     break;
@@ -2006,6 +2024,7 @@ void Parser::Parse_Directive(int After_Hash)
                     {
                         Token.Token_Id=HASH_TOKEN; /*insures Skip_Token takes notice*/
                         Token.is_array_elem = false;
+                        Token.is_mixed_array_elem = false;
                         Token.is_dictionary_elem = false;
                         UNGET
                     }
@@ -2033,6 +2052,7 @@ void Parser::Parse_Directive(int After_Hash)
                         Cond_Stack[CS_Index].Cond_Type=IF_TRUE_COND;
                         Token.Token_Id=HASH_TOKEN; /*insures Skip_Token takes notice*/
                         Token.is_array_elem = false;
+                        Token.is_mixed_array_elem = false;
                         Token.is_dictionary_elem = false;
                         UNGET
                     }
@@ -2138,6 +2158,7 @@ void Parser::Parse_Directive(int After_Hash)
                         {
                             Token.Token_Id=HASH_TOKEN; /*insures Skip_Token takes notice*/
                             Token.is_array_elem = false;
+                            Token.is_mixed_array_elem = false;
                             Token.is_dictionary_elem = false;
                             UNGET
                         }
@@ -2174,6 +2195,7 @@ void Parser::Parse_Directive(int After_Hash)
                 case IF_FALSE_COND:
                     Token.Token_Id=HASH_TOKEN; /*insures Skip_Token takes notice*/
                     Token.is_array_elem = false;
+                    Token.is_mixed_array_elem = false;
                     Token.is_dictionary_elem = false;
                     UNGET
                     // FALLTHROUGH
@@ -2215,6 +2237,7 @@ void Parser::Parse_Directive(int After_Hash)
                     {
                         Token.Token_Id=HASH_TOKEN; /*insures Skip_Token takes notice*/
                         Token.is_array_elem = false;
+                        Token.is_mixed_array_elem = false;
                         Token.is_dictionary_elem = false;
                         UNGET
                     }
@@ -2593,6 +2616,8 @@ void Parser::Parse_Directive(int After_Hash)
                     CASE4 (VECTOR_4D_ID_TOKEN, RAINBOW_ID_TOKEN, FOG_ID_TOKEN, SKYSPHERE_ID_TOKEN)
                     CASE3 (MATERIAL_ID_TOKEN, SPLINE_ID_TOKEN, DICTIONARY_ID_TOKEN)
                         Remove_Symbol (Token.table, Token.Token_String, Token.is_array_elem, Token.DataPtr, Token.Token_Id);
+                        if (Token.is_mixed_array_elem)
+                            *Token.NumberPtr = IDENTIFIER_TOKEN;
                         EXIT
                     END_CASE
 
@@ -2602,6 +2627,8 @@ void Parser::Parse_Directive(int After_Hash)
                             case VECTOR_ID_TOKEN:
                             case FLOAT_ID_TOKEN:
                                 Remove_Symbol (Token.table, Token.Token_String, Token.is_array_elem, Token.DataPtr, Token.Token_Id);
+                                if (Token.is_mixed_array_elem)
+                                    *Token.NumberPtr = IDENTIFIER_TOKEN;
                                 break;
 
                             default:
@@ -2669,6 +2696,7 @@ void Parser::Parse_Directive(int After_Hash)
     {
         Token.Token_Id = END_OF_FILE_TOKEN;
         Token.is_array_elem = false;
+        Token.is_mixed_array_elem = false;
         Token.is_dictionary_elem = false;
     }
 }
@@ -2737,6 +2765,7 @@ void Parser::Open_Include()
 
     Token.Token_Id = END_OF_FILE_TOKEN;
     Token.is_array_elem = false;
+    Token.is_mixed_array_elem = false;
     Token.is_dictionary_elem = false;
 }
 
@@ -2778,6 +2807,7 @@ void Parser::Skip_Tokens(COND_TYPE cond)
     {
         Token.Token_Id=END_OF_FILE_TOKEN;
         Token.is_array_elem = false;
+        Token.is_mixed_array_elem = false;
         Token.is_dictionary_elem = false;
         Token.Unget_Token=false;
     }
@@ -2841,6 +2871,7 @@ void Parser::Break()
     {
         Token.Token_Id=END_OF_FILE_TOKEN;
         Token.is_array_elem = false;
+        Token.is_mixed_array_elem = false;
         Token.is_dictionary_elem = false;
         Token.Unget_Token=false;
     }
@@ -3489,6 +3520,7 @@ void Parser::Invoke_Macro()
 
     Token.Token_Id = END_OF_FILE_TOKEN;
     Token.is_array_elem = false;
+    Token.is_mixed_array_elem = false;
     Token.is_dictionary_elem = false;
 
     Check_Macro_Vers();
@@ -3587,11 +3619,14 @@ Parser::POV_ARRAY *Parser::Parse_Array_Declare (void)
         i = 1;
         New->Sizes[0] = 0;
         New->resizable = true;
+        New->Dims     = 0;
     }
-
-    New->Dims     = i-1;
-    New->Type     = EMPTY_ARRAY_TOKEN;
-    New->DataPtrs.resize (j);
+    else
+    {
+        New->Dims     = i-1;
+        New->DataPtrs.resize (j);
+    }
+    New->Type = EMPTY_ARRAY_TOKEN;
 
     j = 1;
 
@@ -3621,7 +3656,6 @@ Parser::POV_ARRAY *Parser::Parse_Array_Declare (void)
 
     Ok_To_Declare = true;
     return(New);
-
 };
 
 
@@ -3716,7 +3750,12 @@ void Parser::Parse_Initalizer (int Sub, int Base, POV_ARRAY *a)
 
                     CASE (RIGHT_CURLY_TOKEN)
                         if (a->resizable)
+                        {
                             finalParameter = true;
+                            POV_PARSER_ASSERT (a->DataPtrs.back() == NULL);
+                            a->DataPtrs.pop_back();
+                            a->Sizes[Sub] = a->DataPtrs.size();
+                        }
                         else
                         {
                             if (!(finalParameter && properlyDelimited))
@@ -3866,6 +3905,7 @@ void Parser::Parse_Read()
                 Temp_Entry = Add_Symbol (1,Token.Token_String,IDENTIFIER_TOKEN);
                 End_File=Parse_Read_Value (User_File,Token.Token_Id, &(Temp_Entry->Token_Number), &(Temp_Entry->Data));
                 Token.is_array_elem = false;
+                Token.is_mixed_array_elem = false;
                 Token.is_dictionary_elem = false;
                 Parse_Comma(); /* Scene file comma between 2 idents */
             }
@@ -3876,6 +3916,7 @@ void Parser::Parse_Read()
             {
                 End_File=Parse_Read_Value (User_File,Token.Token_Id,Token.NumberPtr,Token.DataPtr);
                 Token.is_array_elem = false;
+                Token.is_mixed_array_elem = false;
                 Token.is_dictionary_elem = false;
                 Parse_Comma(); /* Scene file comma between 2 idents */
             }
@@ -4304,7 +4345,7 @@ int Parser::Parse_For_Param (char** IdentifierPtr, DBL* EndPtr, DBL* StepPtr)
         END_CASE
 
         CASE (EMPTY_ARRAY_TOKEN)
-            POV_PARSER_ASSERT(Token.is_array_elem);
+            POV_PARSER_ASSERT (Token.is_array_elem && !Token.is_mixed_array_elem);
             Error("#for loop variable must not be an array element");
             Previous = Token.Token_Id;
         END_CASE
@@ -4419,6 +4460,7 @@ void Parser::IncludeHeader(const UCS2String& formalFileName)
 
     Token.Token_Id = END_OF_FILE_TOKEN;
     Token.is_array_elem = false;
+    Token.is_mixed_array_elem = false;
     Token.is_dictionary_elem = false;
 }
 

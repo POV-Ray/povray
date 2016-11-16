@@ -8660,9 +8660,9 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
 
         EXPECT_ONE
             CASE (IDENTIFIER_TOKEN)
-                POV_PARSER_ASSERT(!Token.is_array_elem);
+                POV_PARSER_ASSERT(!Token.is_array_elem || Token.is_mixed_array_elem);
                 allow_redefine = true; // should actually be irrelevant downstream, thanks to Previous==IDENTIFIER_TOKEN
-                if (Token.is_dictionary_elem)
+                if (Token.is_array_elem || Token.is_dictionary_elem)
                 {
                     if (is_local && (Token.context != Table_Index))
                         Error ("Cannot use '#local' to assign a non-local array or dictionary element.");
@@ -8720,7 +8720,7 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
                 }
                 else
                 {
-                    allow_redefine = !Token.is_array_elem;
+                    allow_redefine = !Token.is_array_elem || Token.is_mixed_array_elem;
                     numberPtr = Token.NumberPtr;
                     dataPtr   = Token.DataPtr;
                     Previous  = Token.Token_Id;
@@ -8752,7 +8752,7 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
                         }
                         else
                         {
-                            allow_redefine  = !Token.is_array_elem;
+                            allow_redefine  = !Token.is_array_elem || Token.is_mixed_array_elem;
                             numberPtr = Token.NumberPtr;
                             dataPtr   = Token.DataPtr;
                             Previous  = Token.Function_Id;
@@ -8999,6 +8999,7 @@ bool Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENT
     bool callable_identifier;
     bool had_callable_identifier;
     SYM_ENTRY* symbol_entry;
+    SYM_TABLE* symbol_entry_table;
 
     EXPECT
         CASE4 (TNORMAL_ID_TOKEN, FINISH_ID_TOKEN, TEXTURE_ID_TOKEN, OBJECT_ID_TOKEN)
@@ -9098,7 +9099,10 @@ bool Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENT
             {
                 symbol_entry = Find_Symbol (Token.table, Token.Token_String);
                 if (symbol_entry)
+                {
+                    symbol_entry_table = Token.table;
                     Acquire_Entry_Reference(symbol_entry);
+                }
             }
             else
             {
@@ -9181,7 +9185,7 @@ bool Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENT
                 }
             }
             if (symbol_entry)
-                Release_Entry_Reference (Token.table, symbol_entry);
+                Release_Entry_Reference (symbol_entry_table, symbol_entry);
 
             // allow #declares again
             Ok_To_Declare = true;
@@ -9545,7 +9549,12 @@ void Parser::Destroy_Ident_Data(void *Data, int Type)
             if(!a->DataPtrs.empty())
             {
                 for(i=0; i<a->DataPtrs.size(); i++)
-                    Destroy_Ident_Data(a->DataPtrs[i], a->Type);
+                {
+                    if (a->Types.empty())
+                        Destroy_Ident_Data (a->DataPtrs[i], a->Type);
+                    else
+                        Destroy_Ident_Data (a->DataPtrs[i], a->Types[i]);
+                }
             }
             delete a;
             break;
@@ -10621,15 +10630,20 @@ void *Parser::Copy_Identifier (void *Data, int Type)
             na = new POV_ARRAY;
             na->Dims = a->Dims;
             na->Type = a->Type;
+            na->resizable = a->resizable;
             for (i = 0; i < 5; ++i)
             {
                 na->Sizes[i] = a->Sizes[i];
                 na->Mags[i] = a->Mags[i];
             }
             na->DataPtrs.resize(a->DataPtrs.size());
+            na->Types = a->Types;
             for (i=0; i<a->DataPtrs.size(); i++)
             {
-                na->DataPtrs[i] = reinterpret_cast<void *>(Copy_Identifier (a->DataPtrs[i],a->Type));
+                if (a->Types.empty())
+                    na->DataPtrs[i] = reinterpret_cast<void *>(Copy_Identifier (a->DataPtrs[i],a->Type));
+                else
+                    na->DataPtrs[i] = reinterpret_cast<void *>(Copy_Identifier (a->DataPtrs[i], a->Types[i]));
             }
             New = reinterpret_cast<void *>(na);
             break;

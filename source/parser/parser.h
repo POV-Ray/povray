@@ -234,9 +234,10 @@ class Parser : public SceneTask
             int *NumberPtr;
             void **DataPtr;
             SYM_TABLE *table;                               ///< table or dictionary the token references an element of
-            bool is_array_elem      : 1;                    ///< true if token is actually an array element reference
-            bool is_dictionary_elem : 1;                    ///< true if token is actually a dictionary element reference
-            bool freeString         : 1;                    ///< true if Token_String must be freed before being assigned a new value
+            bool is_array_elem          : 1;                ///< true if token is actually an array element reference
+            bool is_mixed_array_elem    : 1;                ///< true if token is actually a mixed-type array element reference
+            bool is_dictionary_elem     : 1;                ///< true if token is actually a dictionary element reference
+            bool freeString             : 1;                ///< true if Token_String must be freed before being assigned a new value
         };
 
         struct LValue
@@ -277,6 +278,7 @@ class Parser : public SceneTask
             int Sizes[5];
             int Mags[5];
             vector<void*> DataPtrs;
+            vector<int> Types;
             bool resizable;
         };
 
