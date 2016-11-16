@@ -1381,7 +1381,8 @@ void Parser::Read_Symbol()
                     {
                         case ARRAY_ID_TOKEN:
                             {
-                                dictIndex = NULL;
+                                if (dictIndex)
+                                    POV_FREE (dictIndex);
 
                                 Skip_Spaces();
                                 c = Echo_getc();
@@ -1442,7 +1443,8 @@ void Parser::Read_Symbol()
 
                         case DICTIONARY_ID_TOKEN:
                             {
-                                dictIndex = NULL;
+                                if (dictIndex)
+                                    POV_FREE (dictIndex);
 
                                 Skip_Spaces();
                                 c = Echo_getc();
@@ -3664,6 +3666,7 @@ Parser::SYM_TABLE *Parser::Parse_Dictionary_Declare()
     SYM_TABLE *newDictionary;
     SYM_ENTRY *newEntry;
     bool oldParseRawIdentifiers;
+    char *dictIndex;
 
     newDictionary = Create_Sym_Table (true);
 
@@ -3682,7 +3685,22 @@ Parser::SYM_TABLE *Parser::Parse_Dictionary_Declare()
                 Expectation_Error ("dictionary element identifier");
             newEntry = Add_Symbol (newDictionary, Token.Token_String, IDENTIFIER_TOKEN);
 
-            GET (EQUALS_TOKEN);
+            GET (COLON_TOKEN);
+
+            if (!Parse_RValue (IDENTIFIER_TOKEN, &(newEntry->Token_Number), &(newEntry->Data), newEntry, false, false, true, true, false, MAX_NUMBER_OF_TABLES))
+                Expectation_Error("RValue");
+
+            Parse_Comma();
+        END_CASE
+
+        CASE (LEFT_SQUARE_TOKEN)
+            dictIndex = Parse_C_String();
+            newEntry = Add_Symbol (newDictionary, dictIndex, IDENTIFIER_TOKEN);
+            POV_PARSER_ASSERT (newDictionary->namesAreCopies);
+            POV_FREE (dictIndex);
+
+            GET (RIGHT_SQUARE_TOKEN);
+            GET (COLON_TOKEN);
 
             if (!Parse_RValue (IDENTIFIER_TOKEN, &(newEntry->Token_Number), &(newEntry->Data), newEntry, false, false, true, true, false, MAX_NUMBER_OF_TABLES))
                 Expectation_Error("RValue");
