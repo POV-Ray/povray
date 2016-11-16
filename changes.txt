@@ -367,6 +367,7 @@ Reported via GitHub:
 - #49 ("Latest version from Git won't build with MS Visual Studio 2015")
 - #50 ("Make error in Ubuntu 14.04")
 - #53 ("Standard include files may mess up the language version")
+- #129 ("Port of FS331 - Intersection causes quadric to disappear")
 
 Reported via FlySpray:
 
@@ -379,6 +380,7 @@ Reported via FlySpray:
 - FS#316 ("inverse keyword does not work properly with fractals")
 - FS#317 ("problem with +D option at specific output file dimensions")
 - FS#318 ("method 3 (default) scattering media is too bright & causes artifacts when nested")
+- FS#331 ("Intersection causes quadric to disappear")
 - FS#336 ("#fopen w/o OPEN_TYPE crash povray (segfault)")
 
 Reported via the Newsgroups:
@@ -439,6 +441,10 @@ Reported via the Newsgroups:
 - <web.57b4b6c879df8923b488d9aa0@news.povray.org>
   (2016-08-17, povray.binaries.scene-files, "Wrong normal direction on triangle{ }s")
   Bug in flat trianges that could cause interior_texture to show on the wrong side.
+
+- <58090935$1@news.povray.org>
+  (2016-10-20, povray.programming, "Re: solving polynomials")
+  Misplaced `break` in polynomial solving code.
 
 Reported via Windows Crash Reports:
 
