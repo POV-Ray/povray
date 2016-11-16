@@ -1705,9 +1705,9 @@ int Solve_Polynomial(int n, const DBL *c0, DBL *r, int sturm, DBL epsilon, Rende
                     stats[Roots_Eliminated]++;
 
                     roots = polysolve(n-1, c, r);
-                }
 
-                break;
+                    break;
+                }
             }
 
             /* Solve n-th order polynomial. */

@@ -223,6 +223,10 @@ Miscellaneous Coding Rules
   - **Locale**: Do not tamper with the C locale (i.e. do not call `setlocale` or any other function doing the same job),
     as plenty of code in POV-Ray relies on it remaining set to the default.
 
+  - **Optimization**: Do not over-optimize your code. While we do want POV-Ray to be fast, we also want it to be
+    reasonably maintainable, and modern compilers generally do a good enough job at automatic optimization that you can
+    focus on keeping your code robust and easy to understand.
+
 
 Code Documentation
 ==================

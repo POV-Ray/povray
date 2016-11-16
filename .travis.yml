@@ -7,15 +7,15 @@ branches:
   except:
   - /^v[0-9]/
 
-os:
-- linux
-- osx
 
 language: cpp
 
-compiler:
-- gcc
-- clang
+matrix:
+  include:
+  - os: linux
+    compiler: gcc
+  - os: osx
+    compiler: clang
 
 sudo: false
 

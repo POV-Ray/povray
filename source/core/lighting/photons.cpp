@@ -298,10 +298,10 @@ void PhotonTrace::ComputeLightedTexture(MathColour& LightCol, ColourChannel&, co
 
     // Get distance based attenuation.
     interior = isect.Object->interior.get();
-    AttCol = MathColour(interior->Old_Refract);
 
     if (interior != NULL)
     {
+        AttCol = MathColour(interior->Old_Refract);
         if (ray.IsInterior(interior) == true)
         {
             if ((interior->Fade_Power > 0.0) && (fabs(interior->Fade_Distance) > EPSILON))
@@ -318,8 +318,8 @@ void PhotonTrace::ComputeLightedTexture(MathColour& LightCol, ColourChannel&, co
                 }
             }
         }
+        LightCol *= AttCol;
     }
-    LightCol *= AttCol;
 
     // set size here
     threadData->photonDepth += isect.Depth;

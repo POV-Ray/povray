@@ -47,11 +47,11 @@
 #elif defined(_POSIX_V6_ILP32_OFF32)
     // off_t is 32 bits
     // Comment-out the following line to proceed anyway.
-    #error Image size will be limited to approx. 100 Megapixels. Proceed at your own risk.
+    #error "Image size will be limited to approx. 100 Megapixels. Proceed at your own risk."
     #define lseek64(handle,offset,whence) lseek(handle,offset,whence)
 #else
     // Unable to detect off_t size at compile-time; comment-out the following line to proceed anyway.
-    #error Image size may be limited to approx. 100 Megapixels. Proceed at your own risk.
+    #error "Image size may be limited to approx. 100 Megapixels. Proceed at your own risk."
     #define lseek64(handle,offset,whence) lseek(handle,offset,whence)
 #endif
 

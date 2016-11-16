@@ -667,7 +667,7 @@ void TrueType::ProcessNewTTF(CSG *Object, TrueTypeFont *ffile, const UCS2 *text_
 
 #ifdef TTF_DEBUG
     // TODO - text_string is an UCS2 strings, while Debug_Info will expect char strings.
-    #error broken code
+    #error "broken code"
     if (filename)
     {
         Debug_Info("TTF parsing of \"%s\" from %s complete\n", text_string, filename);
@@ -1672,6 +1672,7 @@ GlyphPtr ExtractGlyphInfo(TrueTypeFont *ffile, unsigned int glyph_index, unsigne
     GlyphPtr glyph;
 
     ttglyph = ExtractGlyphOutline(ffile, glyph_index, c);
+    POV_SHAPE_ASSERT (ttglyph);
 
     /*
      * Convert the glyph outline information from TrueType layout into a more
@@ -1684,8 +1685,7 @@ GlyphPtr ExtractGlyphInfo(TrueTypeFont *ffile, unsigned int glyph_index, unsigne
 
     /* Free up outline information */
 
-    if (ttglyph)
-        delete ttglyph;
+    delete ttglyph;
 
 #ifdef TTF_DEBUG3
     int i, j;

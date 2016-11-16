@@ -292,7 +292,8 @@ class Parser : public SceneTask
         {
             pov_base::ITextStream *In_File;
             pov_base::OTextStream *Out_File;
-            bool R_Flag;
+            bool fopenCompleted : 1; ///< `false` if still busy parsing `#fopen', `true` otherwise.
+            bool R_Flag         : 1;
         };
 
         enum IdentifierMode
@@ -304,6 +305,8 @@ class Parser : public SceneTask
 
         // constructor
         Parser(shared_ptr<BackendSceneData> sd, bool useclock, DBL clock);
+
+        ~Parser();
 
         void Run();
         void Stopped();

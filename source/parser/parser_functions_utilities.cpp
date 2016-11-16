@@ -308,14 +308,18 @@ FUNCTION_PTR Parser::Parse_DeclareFunction(int *token_id, const char *fn_name, b
     }
     else if(Token.Token_Id == STRING_LITERAL_TOKEN)
     {
+#if (DEBUG_FLOATFUNCTION == 1)
         f.SetFlag(2, Token.Token_String);
+#endif
         Get_Token();
         if(Token.Token_Id == COMMA_TOKEN)
         {
             Get_Token();
             if(Token.Token_Id != STRING_LITERAL_TOKEN)
                 Expectation_Error("valid function expression");
+#if (DEBUG_FLOATFUNCTION == 1)
             f.SetFlag(1, Token.Token_String);
+#endif
         }
         else
         {

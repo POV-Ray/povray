@@ -120,12 +120,12 @@ inline T wrap(T val, T upperLimit)
 
 // wrap signed integer value into the range [0..upperLimit);
 // (this is equivalent to the modulus operator for positive values, but not for negative ones)
-template<typename T>
-inline T wrapInt(T val, T upperLimit)
+template<typename T1, typename T2>
+inline T2 wrapInt(T1 val, T2 upperLimit)
 {
-    T tempVal = val % upperLimit;
+    T1 tempVal = val % upperLimit;
 
-    if (tempVal < T(0))
+    if (tempVal < T1(0))
     {
         // For negative values, the modulus operator may return a value in the range [1-upperLimit..-1];
         // transpose such results into the range [1..upperLimit-1].
@@ -135,7 +135,25 @@ inline T wrapInt(T val, T upperLimit)
     // sanity check; this should never kick in, unless wrapInt() has an implementation error.
     POV_MATHUTIL_ASSERT((tempVal >= 0) && (tempVal < upperLimit));
 
-    return tempVal;
+    return (T2)tempVal;
+}
+
+// wrap signed integer value into the range [0..upperLimit);
+// (this is equivalent to the modulus assignment operator for positive values, but not for negative ones)
+template<typename T1, typename T2>
+inline void setWrapInt(T1 val, T2 upperLimit)
+{
+    val %= upperLimit;
+
+    if (val < T1(0))
+    {
+        // For negative values, the modulus operator may return a value in the range [1-upperLimit..-1];
+        // transpose such results into the range [1..upperLimit-1].
+        val += upperLimit;
+    }
+
+    // sanity check; this should never kick in, unless wrapInt() has an implementation error.
+    POV_MATHUTIL_ASSERT((val >= 0) && (val < upperLimit));
 }
 
 // round up/down to a multiple of some value

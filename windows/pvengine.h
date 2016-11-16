@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -40,16 +40,16 @@
 
 #ifdef BUILDING_AMD64
   #if !defined(_M_AMD64) && !defined(_M_X64)
-    #error you are compiling the x64 project using a 32-bit compiler
+    #error "you are compiling the x64 project using a 32-bit compiler"
   #endif
 #else
   #if defined(_M_AMD64) || defined(_M_X64)
-    #error you are compiling the 32-bit project using a 64-bit compiler
+    #error "you are compiling the 32-bit project using a 64-bit compiler"
   #endif
 #endif
 
 #ifdef _CONSOLE
-#error You are building the GUI platform with _CONSOLE defined (check vfe\win\syspovconfig.h).
+#error "You are building the GUI platform with _CONSOLE defined (check vfe\win\syspovconfig.h)."
 #endif
 
 #include <string.h>
