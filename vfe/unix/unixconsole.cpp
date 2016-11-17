@@ -43,7 +43,6 @@
 #include <termios.h>
 #include <unistd.h>
 #include <sys/select.h>
-#include <sys/ioctl.h>
 
 // from directory "vfe"
 #include "vfe.h"
@@ -56,6 +55,10 @@
 // from directory "source"
 #include "backend/povray.h"
 #include "backend/control/benchmark.h"
+
+#if defined(GWINSZ_IN_SYS_IOCTL) && defined(HAVE_SYS_IOCTL_H)
+#include <sys/ioctl.h>
+#endif
 
 namespace pov_frontend
 {
@@ -90,9 +93,13 @@ static vfeUnixSession *gSession;
 
 int GetTerminalWidth()
 {
+#if defined(TIOCGWINSZ) && defined(HAVE_IOCTL)
     struct winsize w;
     ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
     return (int)w.ws_col;
+#else
+    return 80;
+#endif
 }
 
 static void SignalHandler (void)
