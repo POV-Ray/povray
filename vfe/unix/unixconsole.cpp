@@ -56,7 +56,7 @@
 #include "backend/povray.h"
 #include "backend/control/benchmark.h"
 
-#if defined(GWINSZ_IN_SYS_IOCTL) && defined(HAVE_SYS_IOCTL_H)
+#if defined(HAVE_SYS_IOCTL_H)
 #include <sys/ioctl.h>
 #endif
 
