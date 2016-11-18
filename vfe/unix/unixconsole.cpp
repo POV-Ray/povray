@@ -400,6 +400,7 @@ int main (int argc, char **argv)
     char **           argv_copy=argv; /* because argv is updated later */
     int               argc_copy=argc; /* because it might also be updated */
 
+    gSession = NULL;
     /*fprintf(stderr, "%s: This is a RELEASE CANDIDATE version of POV-Ray. General distribution is discouraged.\n", PACKAGE);*/
 
     // block some signals for this thread as well as those created afterwards
