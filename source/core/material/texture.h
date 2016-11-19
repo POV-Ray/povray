@@ -132,6 +132,7 @@ struct Finish_Struct
     SNGL Reflect_Metallic; // MBP
     int Conserve_Energy;  // added by NK Dec 19 1999
     bool UseSubsurface;   // whether to use subsurface light transport
+    bool AlphaKnockout;   // whether pigment alpha knocks out finish effects
 };
 
 

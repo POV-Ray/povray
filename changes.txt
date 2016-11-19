@@ -49,6 +49,10 @@ Prior to the release of 3.7.1, the following items still need urgent attention:
 New Features
 ------------
 
+- A new finish parameter, `use_alpha BOOL`, has been added. If set to `on`,
+  pigment transparency suppresses highlights and reflections. The default
+  setting is `off`.
+
 - A new pattern, `potential`, has been added to define a pattern based on the
   potential field of a blob or isosurface object.
 

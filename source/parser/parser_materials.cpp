@@ -2632,6 +2632,10 @@ void Parser::Parse_Finish (FINISH **Finish_Ptr)
             Parse_End();
         END_CASE
 
+        CASE (USE_ALPHA_TOKEN)
+            New->AlphaKnockout = ((int) Allow_Float(1.0) != 0);
+        END_CASE
+
         OTHERWISE
             UNGET
             EXIT

@@ -1187,6 +1187,8 @@ FINISH *Create_Finish()
     New->SubsurfaceTranslucency.Clear();
     New->SubsurfaceAnisotropy.Clear();
 
+    New->AlphaKnockout = false;
+
     return(New);
 }
 
