@@ -310,7 +310,7 @@ fi
 AC_MSG_CHECKING([whether the boost thread library is usable])
 SAVED_LIBS=$LIBS
 boost_thread_links=0
-for extralib in '' '-lboost_system'
+for extralib in '' '-lboost_system -lboost_date_time'
 do
   LIBS=$SAVED_LIBS
   LIBS="$LIBS $extralib"
