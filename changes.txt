@@ -368,6 +368,7 @@ Reported via GitHub:
 - #50 ("Make error in Ubuntu 14.04")
 - #53 ("Standard include files may mess up the language version")
 - #129 ("Port of FS331 - Intersection causes quadric to disappear")
+- #153 ("vector list trailing comma error sor lathe sphere_sweep")
 
 Reported via FlySpray:
 
@@ -384,6 +385,10 @@ Reported via FlySpray:
 - FS#336 ("#fopen w/o OPEN_TYPE crash povray (segfault)")
 
 Reported via the Newsgroups:
+
+- <3c4bb31d$1@news.povray.org>
+  (2002-01-21, povray.beta-test, "<1, 0, 0> + 1*t")
+  Inconsistency in automatic scalar-to-vector promotion.
 
 - <53ea2dae@news.povray.org>
   (2014-08-12, povray.binaries.images, "unexplained")
