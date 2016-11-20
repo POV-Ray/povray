@@ -758,7 +758,7 @@ class Parser : public SceneTask
         void Parse_Rel_Term (EXPRESS& Express, int *Terms);
 
         /// Parses a REL_TERM comparing two strings.
-        void Parse_Rel_String_Term (const UCS2 *lhs, EXPRESS& Express, int Terms);
+        DBL Parse_Rel_String_Term (const UCS2 *lhs);
 
         /// Parses a LOGICAL_EXPRESSION (including FLOAT) or VECTOR.
         void Parse_Logical (EXPRESS& Express, int *Terms);
