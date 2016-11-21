@@ -1257,7 +1257,7 @@ void Parser::Read_Symbol()
     SYM_ENTRY *Temp_Entry;
     POV_PARAM *Par;
     DBL val;
-    SYM_TABLE *table;
+    SYM_TABLE *table = NULL;
     char *dictIndex = NULL;
     int pseudoDictionary = -1;
 
@@ -1326,7 +1326,6 @@ void Parser::Read_Symbol()
             /* Search tables from newest to oldest */
             int firstIndex = Table_Index;
             int lastIndex  = SYM_TABLE_RESERVED+1; // index SYM_TABLE_RESERVED is reserved for reserved words, not identifiers
-            Temp_Entry = NULL;
             for (Local_Index = firstIndex; Local_Index >= lastIndex; Local_Index--)
             {
                 /* See if it's a previously declared identifier. */
