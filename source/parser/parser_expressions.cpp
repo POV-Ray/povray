@@ -2765,6 +2765,10 @@ void Parser::Parse_Colour (RGBFTColour& colour, bool expectFT)
 
         // TODO - other ways of specifying a colour should go here.
 
+        OTHERWISE
+            UNGET
+            EXIT
+        END_CASE
     END_EXPECT
     Allow_Identifier_In_Call = old_allow_id;
 }
@@ -2791,6 +2795,10 @@ void Parser::Parse_Colour (LightColour& colour, LightColour* whitepoint, FilterT
 
         // TODO - other ways of specifying a colour should go here.
 
+        OTHERWISE
+            UNGET
+            EXIT
+        END_CASE
     END_EXPECT
     Allow_Identifier_In_Call = old_allow_id;
 }
@@ -2813,6 +2821,10 @@ void Parser::Parse_Colour_Coefficients (PseudoColour& colour)
 
         // TODO - other ways of specifying a (pseudo-) colour should go here.
 
+        OTHERWISE
+            UNGET
+            EXIT
+        END_CASE
     END_EXPECT
     Allow_Identifier_In_Call = old_allow_id;
 }
