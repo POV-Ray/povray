@@ -56,6 +56,9 @@ New Features
 - A new data container, `dictionary`, has been added to support structured
   storage of data.
 
+- Pseudo-dictionaries `local` and `global` have been added, allowing to
+  specifically access local or global identifiers, respectively.
+
 - A new pattern, `potential`, has been added to define a pattern based on the
   potential field of a blob or isosurface object.
 
@@ -92,9 +95,6 @@ New Features
 - The `#declare` and `#local` syntax has been extended to support tuple-style
   assignments. The main purpose is to allow macros to return a set of values
   rather than just a single one.
-
-- `local()` and `global()` pseudo-functions have been added to specifically
-  refer to a local or global identifier, respectively.
 
 - The macro syntax has been extended to allow for optional parameters.
 

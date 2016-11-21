@@ -86,6 +86,12 @@ const int SYM_TABLE_SIZE = 257;
 typedef struct Sym_Table_Entry SYM_ENTRY;
 typedef unsigned short SymTableEntryRefCount;
 
+// Special symbol tables
+enum {
+    SYM_TABLE_RESERVED = 0,        // reserved words
+    SYM_TABLE_GLOBAL,              // identifiers declared using #declare (or #local in top-level file), #function, #macro, etc.
+};
+
 /// Structure holding information about a symbol
 struct Sym_Table_Entry
 {
@@ -294,13 +300,6 @@ class Parser : public SceneTask
             pov_base::OTextStream *Out_File;
             bool fopenCompleted : 1; ///< `false` if still busy parsing `#fopen', `true` otherwise.
             bool R_Flag         : 1;
-        };
-
-        enum IdentifierMode
-        {
-            kIdentifierModeUndefined,
-            kIdentifierModeLocal,
-            kIdentifierModeGlobal,
         };
 
         // constructor
@@ -592,7 +591,6 @@ class Parser : public SceneTask
         CS_ENTRY *Cond_Stack;
         int CS_Index;
         bool Skipping, Inside_Ifdef, Inside_MacroDef, Parsing_Directive, parseRawIdentifiers;
-        IdentifierMode Inside_IdentFn;
 
         int Got_EOF; // WARNING: Changes to the use of this variable are very dangerous as it is used in many places assuming certain non-obvious side effects! [trf]
 

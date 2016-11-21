@@ -177,7 +177,6 @@ void Parser::pre_init_tokenizer ()
     Skipping            = false;
     Inside_Ifdef        = false;
     Inside_MacroDef     = false;
-    Inside_IdentFn      = kIdentifierModeUndefined;
     Parsing_Directive   = false;
     parseRawIdentifiers = false;
     Cond_Stack          = NULL;
@@ -634,26 +633,6 @@ void Parser::Get_Token ()
             case '_':
                 Echo_ungetc(c);
                 Read_Symbol ();
-                if (!Parsing_Directive && (Inside_IdentFn == kIdentifierModeUndefined) && ((Token.Token_Id == LOCAL_TOKEN) || (Token.Token_Id == GLOBAL_TOKEN)))
-                {
-                    if (!Skip_Spaces())
-                        Error("Expected '(', end of file reached instead", c2);
-                    c2 = Echo_getc();
-                    if (c2 != '(')
-                        Error("Expected '(', found '%c' instead", c2);
-                    if (!Skip_Spaces())
-                        Error("Expected 'identifier', end of file reached instead", c2);
-
-                    Inside_IdentFn = (Token.Token_Id == LOCAL_TOKEN) ? kIdentifierModeLocal : kIdentifierModeGlobal;
-                    Read_Symbol();
-                    Inside_IdentFn = kIdentifierModeUndefined;
-
-                    if (!Skip_Spaces())
-                        Error("Expected ')', end of file reached instead", c2);
-                    c2 = Echo_getc();
-                    if (c2 != ')')
-                        Error("Expected ')', found '%c' instead", c2);
-                }
                 break;
             case '\t':
             case '\r':
@@ -1280,6 +1259,7 @@ void Parser::Read_Symbol()
     DBL val;
     SYM_TABLE *table;
     char *dictIndex = NULL;
+    int pseudoDictionary = -1;
 
     Begin_String_Fast();
 
@@ -1307,242 +1287,269 @@ void Parser::Read_Symbol()
     End_String_Fast();
 
     /* If its a reserved keyword, write it and return */
-    if ( (Temp_Entry = Find_Symbol(0,String)) != NULL)
+    if ( (Temp_Entry = Find_Symbol(SYM_TABLE_RESERVED,String)) != NULL)
     {
-        if (!Inside_Ifdef || ((sceneData->EffectiveLanguageVersion() >= 3.71) &&
-                              ((Temp_Entry->Token_Number == LOCAL_TOKEN) || (Temp_Entry->Token_Number == GLOBAL_TOKEN))))
+        if (!Parsing_Directive && (Temp_Entry->Token_Number == LOCAL_TOKEN))
         {
-            Write_Token (Temp_Entry->Token_Number, Token.Token_Col_No);
-            return;
+            pseudoDictionary = Table_Index;
+        }
+        else if (!Parsing_Directive && (Temp_Entry->Token_Number == GLOBAL_TOKEN))
+        {
+            pseudoDictionary = SYM_TABLE_GLOBAL;
+        }
+        else if (Inside_Ifdef)
+        {
+            Warning("Tried to test whether a reserved keyword is defined. Test result may not be what you expect.");
         }
         else
         {
-            Warning("Tried to test whether a reserved keyword is defined. Test result may not be what you expect.");
+            Write_Token (Temp_Entry->Token_Number, Token.Token_Col_No);
+            return;
         }
     }
 
     if (!Skipping && !parseRawIdentifiers)
     {
-        /* Search tables from newest to oldest */
-        int firstIndex = Table_Index;
-        int lastIndex  = 1; // index 0 is reserved for reserved words, not identifiers
-        if (Inside_IdentFn == kIdentifierModeGlobal)
-            // if inside "global()" pseudo-function, just test the global table
-            firstIndex = 1;
-        else if (Inside_IdentFn == kIdentifierModeLocal)
-            // if inside "local()" pseudo-function, just test the most local table
-            lastIndex = Table_Index;
-        for (Local_Index = firstIndex; Local_Index >= lastIndex; Local_Index--)
+        if (pseudoDictionary >= 0)
         {
-            /* See if it's a previously declared identifier. */
-            if ((Temp_Entry = Find_Symbol(Local_Index,String)) != NULL)
+            Token.Token_Id = DICTIONARY_ID_TOKEN;
+            Token.is_array_elem = false;
+            Token.is_mixed_array_elem = false;
+            Token.is_dictionary_elem = false;
+            Token.NumberPtr = &(Temp_Entry->Token_Number);
+            Token.DataPtr   = &(Temp_Entry->Data);
+
+            table = NULL;
+        }
+        else
+        {
+            /* Search tables from newest to oldest */
+            int firstIndex = Table_Index;
+            int lastIndex  = SYM_TABLE_RESERVED+1; // index SYM_TABLE_RESERVED is reserved for reserved words, not identifiers
+            Temp_Entry = NULL;
+            for (Local_Index = firstIndex; Local_Index >= lastIndex; Local_Index--)
             {
-                if (Temp_Entry->deprecated && !Temp_Entry->deprecatedShown)
+                /* See if it's a previously declared identifier. */
+                if ((Temp_Entry = Find_Symbol(Local_Index,String)) != NULL)
                 {
-                    Temp_Entry->deprecatedShown = Temp_Entry->deprecatedOnce;
-                    Warning("%s", Temp_Entry->Deprecation_Message);
-                }
-
-                if ((Temp_Entry->Token_Number==MACRO_ID_TOKEN) && (!Inside_Ifdef))
-                {
-                    Token.Data = Temp_Entry->Data;
-                    if (Ok_To_Declare)
+                    if (Temp_Entry->deprecated && !Temp_Entry->deprecatedShown)
                     {
-                        Invoke_Macro();
+                        Temp_Entry->deprecatedShown = Temp_Entry->deprecatedOnce;
+                        Warning("%s", Temp_Entry->Deprecation_Message);
                     }
-                    else
-                    {
-                        Token.Token_Id=MACRO_ID_TOKEN;
-                        Token.is_array_elem = false;
-                        Token.is_mixed_array_elem = false;
-                        Token.is_dictionary_elem = false;
-                        Token.NumberPtr = &(Temp_Entry->Token_Number);
-                        Token.DataPtr   = &(Temp_Entry->Data);
-                        Write_Token (Token.Token_Id, Token.Token_Col_No, Tables[Local_Index]);
 
-                        Token.context = Local_Index;
+                    if ((Temp_Entry->Token_Number==MACRO_ID_TOKEN) && (!Inside_Ifdef))
+                    {
+                        Token.Data = Temp_Entry->Data;
+                        if (Ok_To_Declare)
+                        {
+                            Invoke_Macro();
+                        }
+                        else
+                        {
+                            Token.Token_Id=MACRO_ID_TOKEN;
+                            Token.is_array_elem = false;
+                            Token.is_mixed_array_elem = false;
+                            Token.is_dictionary_elem = false;
+                            Token.NumberPtr = &(Temp_Entry->Token_Number);
+                            Token.DataPtr   = &(Temp_Entry->Data);
+                            Write_Token (Token.Token_Id, Token.Token_Col_No, Tables[Local_Index]);
+
+                            Token.context = Local_Index;
+                        }
+                        return;
                     }
-                    return;
+
+                    Token.Token_Id  =   Temp_Entry->Token_Number;
+                    Token.is_array_elem = false;
+                    Token.is_mixed_array_elem = false;
+                    Token.is_dictionary_elem = false;
+                    Token.NumberPtr = &(Temp_Entry->Token_Number);
+                    Token.DataPtr   = &(Temp_Entry->Data);
+
+                    table = Tables[Local_Index];
+
+                    break;
                 }
+            }
+        }
 
-                Token.Token_Id  =   Temp_Entry->Token_Number;
-                Token.is_array_elem = false;
-                Token.is_mixed_array_elem = false;
-                Token.is_dictionary_elem = false;
-                Token.NumberPtr = &(Temp_Entry->Token_Number);
-                Token.DataPtr   = &(Temp_Entry->Data);
-
-                table = Tables[Local_Index];
-
-                bool breakLoop = false;
-                while (!breakLoop)
+        if (table || (pseudoDictionary >= 0))
+        {
+            bool breakLoop = false;
+            while (!breakLoop)
+            {
+                switch (Token.Token_Id)
                 {
-                    switch (Token.Token_Id)
-                    {
-                        case ARRAY_ID_TOKEN:
+                    case ARRAY_ID_TOKEN:
+                        {
+                            if (dictIndex)
+                                POV_FREE (dictIndex);
+
+                            Skip_Spaces();
+                            c = Echo_getc();
+                            Echo_ungetc(c);
+
+                            if (c!='[')
                             {
-                                if (dictIndex)
-                                    POV_FREE (dictIndex);
-
-                                Skip_Spaces();
-                                c = Echo_getc();
-                                Echo_ungetc(c);
-
-                                if (c!='[')
-                                {
-                                    breakLoop = true;
-                                    break;
-                                }
-
-                                a = reinterpret_cast<POV_ARRAY *>(*(Token.DataPtr));
-                                j = 0;
-
-                                for (i=0; i <= a->Dims; i++)
-                                {
-                                    GET(LEFT_SQUARE_TOKEN)
-                                    val=Parse_Float();
-                                    k=(int)(val + EPSILON);
-
-                                    if ((k < 0) || (val < -EPSILON))
-                                    {
-                                        Error("Negative subscript");
-                                    }
-
-                                    if (k >= a->Sizes[i])
-                                    {
-                                        if (a->resizable)
-                                        {
-                                            POV_PARSER_ASSERT (a->Dims == 0);
-                                            a->DataPtrs.resize (k+1);
-                                            a->Sizes[0] = a->DataPtrs.size();
-                                        }
-                                        else
-                                            Error("Array subscript out of range");
-                                    }
-                                    j += k * a->Mags[i];
-                                    GET(RIGHT_SQUARE_TOKEN)
-                                }
-
-                                if (!LValue_Ok && !Inside_Ifdef)
-                                {
-                                    if (a->DataPtrs[j] == NULL)
-                                        Error("Attempt to access uninitialized array element.");
-                                }
-
-                                Token.DataPtr = &(a->DataPtrs[j]);
-                                Token.is_mixed_array_elem = !a->Types.empty();
-                                if (Token.is_mixed_array_elem)
-                                    Token.NumberPtr = &(a->Types[j]);
-                                else
-                                    Token.NumberPtr = &(a->Type);
-                                Token.Token_Id = *Token.NumberPtr;
-                                Token.is_array_elem = true;
-                                Token.is_dictionary_elem = false;
+                                breakLoop = true;
+                                break;
                             }
-                            break;
 
-                        case DICTIONARY_ID_TOKEN:
+                            a = reinterpret_cast<POV_ARRAY *>(*(Token.DataPtr));
+                            j = 0;
+
+                            for (i=0; i <= a->Dims; i++)
                             {
-                                if (dictIndex)
-                                    POV_FREE (dictIndex);
+                                GET(LEFT_SQUARE_TOKEN)
+                                val=Parse_Float();
+                                k=(int)(val + EPSILON);
 
-                                Skip_Spaces();
-                                c = Echo_getc();
-                                Echo_ungetc(c);
+                                if ((k < 0) || (val < -EPSILON))
+                                {
+                                    Error("Negative subscript");
+                                }
 
+                                if (k >= a->Sizes[i])
+                                {
+                                    if (a->resizable)
+                                    {
+                                        POV_PARSER_ASSERT (a->Dims == 0);
+                                        a->DataPtrs.resize (k+1);
+                                        a->Sizes[0] = a->DataPtrs.size();
+                                    }
+                                    else
+                                        Error("Array subscript out of range");
+                                }
+                                j += k * a->Mags[i];
+                                GET(RIGHT_SQUARE_TOKEN)
+                            }
+
+                            if (!LValue_Ok && !Inside_Ifdef)
+                            {
+                                if (a->DataPtrs[j] == NULL)
+                                    Error("Attempt to access uninitialized array element.");
+                            }
+
+                            Token.DataPtr = &(a->DataPtrs[j]);
+                            Token.is_mixed_array_elem = !a->Types.empty();
+                            if (Token.is_mixed_array_elem)
+                                Token.NumberPtr = &(a->Types[j]);
+                            else
+                                Token.NumberPtr = &(a->Type);
+                            Token.Token_Id = *Token.NumberPtr;
+                            Token.is_array_elem = true;
+                            Token.is_dictionary_elem = false;
+                        }
+                        break;
+
+                    case DICTIONARY_ID_TOKEN:
+                        {
+                            if (dictIndex)
+                                POV_FREE (dictIndex);
+
+                            Skip_Spaces();
+                            c = Echo_getc();
+                            Echo_ungetc(c);
+
+                            if (pseudoDictionary >= 0)
+                            {
+                                table = Tables [pseudoDictionary];
+                                pseudoDictionary = -1;
+                            }
+                            else
                                 table = reinterpret_cast<SYM_TABLE *>(*(Token.DataPtr));
 
-                                if (c =='.')
-                                {
-                                    if (table == NULL)
-                                    {
-                                        POV_PARSER_ASSERT (Token.is_array_elem);
-                                        Error ("Attempt to access uninitialized array element.");
-                                    }
-
-                                    GET (PERIOD_TOKEN)
-                                    bool oldParseRawIdentifiers = parseRawIdentifiers;
-                                    parseRawIdentifiers = true;
-                                    Get_Token ();
-                                    parseRawIdentifiers = oldParseRawIdentifiers;
-
-                                    if (Token.Token_Id != IDENTIFIER_TOKEN)
-                                        Expectation_Error ("dictionary element identifier");
-
-                                    Temp_Entry = Find_Symbol (table, Token.Token_String);
-                                }
-                                else if (c == '[')
-                                {
-                                    if (table == NULL)
-                                    {
-                                        POV_PARSER_ASSERT (Token.is_array_elem);
-                                        Error ("Attempt to access uninitialized array element.");
-                                    }
-
-                                    GET(LEFT_SQUARE_TOKEN)
-                                    dictIndex = Parse_C_String();
-                                    GET (RIGHT_SQUARE_TOKEN);
-
-                                    Temp_Entry = Find_Symbol (table, dictIndex);
-                                }
-                                else
-                                {
-                                    breakLoop = true;
-                                    break;
-                                }
-
-                                if (Temp_Entry)
-                                {
-                                    Token.Token_Id      = Temp_Entry->Token_Number;
-                                    Token.NumberPtr     = &(Temp_Entry->Token_Number);
-                                    Token.DataPtr       = &(Temp_Entry->Data);
-                                }
-                                else
-                                {
-                                    if (!LValue_Ok && !Inside_Ifdef)
-                                        Error ("Attempt to access uninitialized dictionary element.");
-                                    Token.Token_Id  = IDENTIFIER_TOKEN;
-                                    Token.DataPtr   = NULL;
-                                    Token.NumberPtr = NULL;
-                                }
-                                Token.is_array_elem = false;
-                                Token.is_mixed_array_elem = false;
-                                Token.is_dictionary_elem = true;
-                            }
-                            break;
-
-                        case PARAMETER_ID_TOKEN:
+                            if (c =='.')
                             {
-                                dictIndex = NULL;
+                                if (table == NULL)
+                                {
+                                    POV_PARSER_ASSERT (Token.is_array_elem);
+                                    Error ("Attempt to access uninitialized array element.");
+                                }
 
-                                Par             = reinterpret_cast<POV_PARAM *>(Temp_Entry->Data);
-                                Token.Token_Id  = *(Par->NumberPtr);
-                                Token.is_array_elem = false;
-                                Token.is_mixed_array_elem = false;
-                                Token.is_dictionary_elem = false;
-                                Token.NumberPtr = Par->NumberPtr;
-                                Token.DataPtr   = Par->DataPtr;
+                                GET (PERIOD_TOKEN)
+                                bool oldParseRawIdentifiers = parseRawIdentifiers;
+                                parseRawIdentifiers = true;
+                                Get_Token ();
+                                parseRawIdentifiers = oldParseRawIdentifiers;
+
+                                if (Token.Token_Id != IDENTIFIER_TOKEN)
+                                    Expectation_Error ("dictionary element identifier");
+
+                                Temp_Entry = Find_Symbol (table, Token.Token_String);
                             }
-                            break;
+                            else if (c == '[')
+                            {
+                                if (table == NULL)
+                                {
+                                    POV_PARSER_ASSERT (Token.is_array_elem);
+                                    Error ("Attempt to access uninitialized array element.");
+                                }
 
-                        default:
-                            breakLoop = true;
-                            break;
-                    }
+                                GET(LEFT_SQUARE_TOKEN)
+                                dictIndex = Parse_C_String();
+                                GET (RIGHT_SQUARE_TOKEN);
+
+                                Temp_Entry = Find_Symbol (table, dictIndex);
+                            }
+                            else
+                            {
+                                breakLoop = true;
+                                break;
+                            }
+
+                            if (Temp_Entry)
+                            {
+                                Token.Token_Id      = Temp_Entry->Token_Number;
+                                Token.NumberPtr     = &(Temp_Entry->Token_Number);
+                                Token.DataPtr       = &(Temp_Entry->Data);
+                            }
+                            else
+                            {
+                                if (!LValue_Ok && !Inside_Ifdef)
+                                    Error ("Attempt to access uninitialized dictionary element.");
+                                Token.Token_Id  = IDENTIFIER_TOKEN;
+                                Token.DataPtr   = NULL;
+                                Token.NumberPtr = NULL;
+                            }
+                            Token.is_array_elem = false;
+                            Token.is_mixed_array_elem = false;
+                            Token.is_dictionary_elem = true;
+                        }
+                        break;
+
+                    case PARAMETER_ID_TOKEN:
+                        {
+                            dictIndex = NULL;
+
+                            Par             = reinterpret_cast<POV_PARAM *>(Temp_Entry->Data);
+                            Token.Token_Id  = *(Par->NumberPtr);
+                            Token.is_array_elem = false;
+                            Token.is_mixed_array_elem = false;
+                            Token.is_dictionary_elem = false;
+                            Token.NumberPtr = Par->NumberPtr;
+                            Token.DataPtr   = Par->DataPtr;
+                        }
+                        break;
+
+                    default:
+                        breakLoop = true;
+                        break;
                 }
-
-                Write_Token (Token.Token_Id, Token.Token_Col_No, table);
-
-                if (Token.DataPtr != NULL)
-                    Token.Data = *(Token.DataPtr);
-                Token.context = Local_Index;
-                if (dictIndex != NULL)
-                {
-                    Token.Token_String = dictIndex;
-                    Token.freeString = true;
-                }
-                return;
             }
+
+            Write_Token (Token.Token_Id, Token.Token_Col_No, table);
+
+            if (Token.DataPtr != NULL)
+                Token.Data = *(Token.DataPtr);
+            Token.context = Local_Index;
+            if (dictIndex != NULL)
+            {
+                Token.Token_String = dictIndex;
+                Token.freeString = true;
+            }
+            return;
         }
     }
 
@@ -2954,7 +2961,7 @@ void Parser::init_sym_tables()
 
     for (i = 0; Reserved_Words[i].Token_Name != NULL; i++)
     {
-        Add_Symbol(0,Reserved_Words[i].Token_Name,Reserved_Words[i].Token_Number);
+        Add_Symbol(SYM_TABLE_RESERVED,Reserved_Words[i].Token_Name,Reserved_Words[i].Token_Number);
     }
 
     Add_Sym_Table();
@@ -3160,7 +3167,7 @@ SYM_ENTRY *Parser::Add_Symbol (int Index,const char *Name,TOKEN Number)
 {
     SYM_ENTRY *New;
 
-    New = Create_Entry (Name, Number, (Index != 0));
+    New = Create_Entry (Name, Number, (Index != SYM_TABLE_RESERVED));
     Add_Entry(Index,New);
 
     return(New);
@@ -3281,13 +3288,13 @@ Parser::Macro *Parser::Parse_Macro()
 
     EXPECT
         CASE (IDENTIFIER_TOKEN)
-            Table_Entry = Add_Symbol (1,Token.Token_String,TEMPORARY_MACRO_ID_TOKEN);
+            Table_Entry = Add_Symbol (SYM_TABLE_GLOBAL,Token.Token_String,TEMPORARY_MACRO_ID_TOKEN);
             EXIT
         END_CASE
 
         CASE (MACRO_ID_TOKEN)
-            Remove_Symbol(1,Token.Token_String,false,NULL,0);
-            Table_Entry = Add_Symbol (1,Token.Token_String,TEMPORARY_MACRO_ID_TOKEN);
+            Remove_Symbol(SYM_TABLE_GLOBAL,Token.Token_String,false,NULL,0);
+            Table_Entry = Add_Symbol (SYM_TABLE_GLOBAL,Token.Token_String,TEMPORARY_MACRO_ID_TOKEN);
             EXIT
         END_CASE
 
@@ -3821,7 +3828,7 @@ void Parser::Parse_Fopen(void)
     New->fopenCompleted = false;
 
     GET(IDENTIFIER_TOKEN)
-    Entry = Add_Symbol (1,Token.Token_String,FILE_ID_TOKEN);
+    Entry = Add_Symbol (SYM_TABLE_GLOBAL,Token.Token_String,FILE_ID_TOKEN);
     Entry->Data=reinterpret_cast<void *>(New);
 
     asciiFileName = Parse_C_String(true);
@@ -3892,7 +3899,7 @@ void Parser::Parse_Fclose(void)
             Got_EOF=false;
             Data->In_File = NULL;
             Data->Out_File = NULL;
-            Remove_Symbol (1,Token.Token_String,false,NULL,0);
+            Remove_Symbol (SYM_TABLE_GLOBAL,Token.Token_String,false,NULL,0);
             EXIT
         END_CASE
 
@@ -3927,7 +3934,7 @@ void Parser::Parse_Read()
         CASE (IDENTIFIER_TOKEN)
             if (!End_File)
             {
-                Temp_Entry = Add_Symbol (1,Token.Token_String,IDENTIFIER_TOKEN);
+                Temp_Entry = Add_Symbol (SYM_TABLE_GLOBAL,Token.Token_String,IDENTIFIER_TOKEN);
                 End_File=Parse_Read_Value (User_File,Token.Token_Id, &(Temp_Entry->Token_Number), &(Temp_Entry->Data));
                 Token.is_array_elem = false;
                 Token.is_mixed_array_elem = false;
@@ -3988,7 +3995,7 @@ void Parser::Parse_Read()
         delete User_File->In_File;
         Got_EOF=false;
         User_File->In_File = NULL;
-        Remove_Symbol (1,File_Id,false,NULL,0);
+        Remove_Symbol (SYM_TABLE_GLOBAL,File_Id,false,NULL,0);
     }
     POV_FREE(File_Id);
 }

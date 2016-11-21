@@ -198,12 +198,12 @@ void Parser::Run()
                 if(i->second[0] == '\"')
                 {
                     string tmp(i->second, 1, i->second.length() - 2);
-                    Temp_Entry = Add_Symbol(1, const_cast<char *>(i->first.c_str()), STRING_ID_TOKEN);
+                    Temp_Entry = Add_Symbol(SYM_TABLE_GLOBAL, const_cast<char *>(i->first.c_str()), STRING_ID_TOKEN);
                     Temp_Entry->Data = String_Literal_To_UCS2(const_cast<char *>(tmp.c_str()), false);
                 }
                 else
                 {
-                    Temp_Entry = Add_Symbol(1, const_cast<char *>(i->first.c_str()), FLOAT_ID_TOKEN);
+                    Temp_Entry = Add_Symbol(SYM_TABLE_GLOBAL, const_cast<char *>(i->first.c_str()), FLOAT_ID_TOKEN);
                     Temp_Entry->Data = Create_Float();
                     *(reinterpret_cast<DBL *>(Temp_Entry->Data)) = atof(i->second.c_str());
                 }
@@ -8611,7 +8611,7 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
     }
     else
     {
-        Local_Index=1;
+        Local_Index = SYM_TABLE_GLOBAL;
     }
 
     LValue_Ok = true;
