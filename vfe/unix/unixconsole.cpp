@@ -95,8 +95,10 @@ int GetTerminalWidth()
 {
 #if defined(TIOCGWINSZ) && defined(HAVE_IOCTL)
     struct winsize w;
-    ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
-    return (int)w.ws_col;
+    if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &w) == 0)
+        return (int)w.ws_col;
+    else
+        return 80;
 #else
     return 80;
 #endif
