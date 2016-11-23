@@ -185,7 +185,7 @@ void TextStreamBuffer::printfile(FILE *file, POV_LONG lines)
             if((stopposset == true) && (stoppos == ((POV_LONG)(ftell(file)) - 1))) // only if walking backwards stop at initial position
                 break;
 
-            // count newlines in file and replace newlines with system specific newline charcater
+            // count newlines in file and replace newlines with system specific newline character
             if((chr == 10) || (chr == 13))
             {
                 chr = fgetc(file);

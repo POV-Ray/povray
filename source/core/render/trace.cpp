@@ -150,10 +150,8 @@ double Trace::TraceRay(Ray& ray, MathColour& colour, ColourChannel& transm, COLC
     // Check if we're busy shooting too many radiosity sample rays at an unimportant object
     if (ray.GetTicket().radiosityImportanceQueried >= 0.0)
     {
-        if (found)
-        {
-            ray.GetTicket().radiosityImportanceFound = bestisect.Object->RadiosityImportance(sceneData->radiositySettings.defaultImportance);
-        }
+        if (found && bestisect.Object->RadiosityImportanceSet)
+            ray.GetTicket().radiosityImportanceFound = bestisect.Object->RadiosityImportance;
         else
             ray.GetTicket().radiosityImportanceFound = sceneData->radiositySettings.defaultImportance;
 

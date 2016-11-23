@@ -582,7 +582,7 @@ class Parser : public SceneTask
 
         int Got_EOF; // WARNING: Changes to the use of this variable are very dangerous as it is used in many places assuming certain non-obvious side effects! [trf]
 
-        TOKEN Conversion_Util_Table[LAST_TOKEN];
+        TOKEN Conversion_Util_Table[TOKEN_COUNT];
 
         // parstxtr.h/parstxtr.cpp
         TEXTURE *Default_Texture;

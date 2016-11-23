@@ -263,7 +263,7 @@ char *Get_Reserved_Words (const char *additional_words)
   int length = 0 ;
   int i ;
 
-  for (i = 0; Reserved_Words[i].Token_Number != LAST_TOKEN; i++)
+  for (i = 0; Reserved_Words[i].Token_Number != TOKEN_COUNT; i++)
   {
     if (!isalpha (Reserved_Words [i].Token_Name [0]))
       continue ;
@@ -279,7 +279,7 @@ char *Get_Reserved_Words (const char *additional_words)
   strcat (result, "#\n");
   char *s = result + strlen (additional_words) + 2;
 
-  for (i = 0; Reserved_Words[i].Token_Number != LAST_TOKEN; i++)
+  for (i = 0; Reserved_Words[i].Token_Number != TOKEN_COUNT; i++)
   {
     if (!isalpha (Reserved_Words [i].Token_Name [0]))
       continue ;

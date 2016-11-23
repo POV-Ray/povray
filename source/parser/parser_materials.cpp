@@ -212,7 +212,7 @@ ImageData *Parser::Parse_Image(int Legal, bool GammaCorrect)
         END_EXPECT
     }
 
-    EXPECT
+    EXPECT_ONE
         CASE (FUNCTION_TOKEN)
             image->width = (SNGL)int(Parse_Float() + 0.5);
             Parse_Comma();
@@ -225,86 +225,72 @@ ImageData *Parser::Parse_Image(int Legal, bool GammaCorrect)
 
             fnPtr = Parse_DeclareFunction(&token_id, NULL, false);
             Make_Pattern_Image(image, fnPtr, token_id);
-            EXIT
         END_CASE
 
         CASE (IFF_TOKEN)
             filetype = IFF_FILE;
             Name = Parse_C_String(true);
-            EXIT
         END_CASE
 
         CASE (GIF_TOKEN)
             filetype = GIF_FILE;
             Name = Parse_C_String(true);
-            EXIT
         END_CASE
 
         CASE (POT_TOKEN)
             filetype = POT_FILE;
             Name = Parse_C_String(true);
-            EXIT
         END_CASE
 
         CASE (SYS_TOKEN)
             filetype = SYS_FILE;
             Name = Parse_C_String(true);
-            EXIT
         END_CASE
 
         CASE (TGA_TOKEN)
             filetype = TGA_FILE;
             Name = Parse_C_String(true);
-            EXIT
         END_CASE
 
         CASE (PNG_TOKEN)
             filetype = PNG_FILE;
             Name = Parse_C_String(true);
-            EXIT
         END_CASE
 
         CASE (PGM_TOKEN)
             filetype = PGM_FILE;
             Name = Parse_C_String(true);
-            EXIT
         END_CASE
 
         CASE (PPM_TOKEN)
             filetype = PPM_FILE;
             Name = Parse_C_String(true);
-            EXIT
         END_CASE
 
         CASE (JPEG_TOKEN)
             filetype = JPEG_FILE;
             Name = Parse_C_String(true);
-            EXIT
         END_CASE
 
         CASE (TIFF_TOKEN)
             mExperimentalFlags.tiff = true;
             filetype = TIFF_FILE;
             Name = Parse_C_String(true);
-            EXIT
         END_CASE
 
         CASE (BMP_TOKEN)
             filetype = BMP_FILE;
             Name = Parse_C_String(true);
-            EXIT
         END_CASE
 
         CASE (EXR_TOKEN)
             filetype = EXR_FILE;
             Name = Parse_C_String(true);
-            EXIT
         END_CASE
 
         CASE (HDR_TOKEN)
             filetype = HDR_FILE;
             Name = Parse_C_String(true);
-            EXIT
         END_CASE
 
         CASE5 (STRING_LITERAL_TOKEN,CHR_TOKEN,SUBSTR_TOKEN,STR_TOKEN,VSTR_TOKEN)
@@ -359,7 +345,6 @@ ImageData *Parser::Parse_Image(int Legal, bool GammaCorrect)
                     }
                 }
             }
-            EXIT
         END_CASE
 
         OTHERWISE
@@ -513,24 +498,20 @@ ImageData *Parser::Parse_Image(int Legal, bool GammaCorrect)
 SimpleGammaCurvePtr Parser::Parse_Gamma (void)
 {
     SimpleGammaCurvePtr gamma;
-    EXPECT
+    EXPECT_ONE
         CASE (COLOUR_KEY_TOKEN)
             if (Token.Function_Id != SRGB_TOKEN)
             {
                 UNGET
-                EXIT
                 END_CASE
             }
             gamma = SRGBGammaCurve::Get();
-            EXIT
         END_CASE
         CASE (BT709_TOKEN)
             gamma = BT709GammaCurve::Get();
-            EXIT
         END_CASE
         CASE (BT2020_TOKEN)
             gamma = BT2020GammaCurve::Get();
-            EXIT
         END_CASE
         OTHERWISE
         {
@@ -542,7 +523,6 @@ SimpleGammaCurvePtr Parser::Parse_Gamma (void)
                 // (we're not warning about below-1.0-values in non-gamma-corrected scenes, as it is likely to make sense there)
                 PossibleError("Suspicious value %g specified for gamma. Did you mean %g?\n", value, 1.0/value);
             gamma = PowerLawGammaCurve::GetByDecodingGamma(value);
-            EXIT
         }
         END_CASE
     END_EXPECT
@@ -649,7 +629,7 @@ void Parser::Parse_Image_Map (PIGMENT *Pigment)
             switch(Token.Function_Id)
             {
                 case FILTER_TOKEN:
-                    EXPECT
+                    EXPECT_ONE
                         CASE (ALL_TOKEN)
                             {
                                 DBL filter;
@@ -672,7 +652,6 @@ void Parser::Parse_Image_Map (PIGMENT *Pigment)
                                     }
                                 }
                             }
-                            EXIT
                         END_CASE
 
                         OTHERWISE
@@ -696,7 +675,6 @@ void Parser::Parse_Image_Map (PIGMENT *Pigment)
                                 image->data->GetRGBFTIndexedValue(reg, r, g, b, f, t);
                                 image->data->SetRGBFTIndexedValue(reg, r, g, b, Parse_Float(), t);
                             }
-                            EXIT
                         END_CASE
 
                     END_EXPECT
@@ -704,7 +682,7 @@ void Parser::Parse_Image_Map (PIGMENT *Pigment)
                     break;
 
                 case TRANSMIT_TOKEN:
-                    EXPECT
+                    EXPECT_ONE
                         CASE (ALL_TOKEN)
                             {
                                 DBL transmit;
@@ -727,7 +705,6 @@ void Parser::Parse_Image_Map (PIGMENT *Pigment)
                                     }
                                 }
                             }
-                            EXIT
                         END_CASE
 
                         OTHERWISE
@@ -751,7 +728,6 @@ void Parser::Parse_Image_Map (PIGMENT *Pigment)
                                 image->data->GetRGBFTIndexedValue(reg, r, g, b, f, t);
                                 image->data->SetRGBFTIndexedValue(reg, r, g, b, f, Parse_Float());
                             }
-                            EXIT
                         END_CASE
 
                     END_EXPECT
@@ -962,16 +938,14 @@ void Parser::Parse_Image_Pattern (TPATTERN *TPattern)
 
 void Parser::Parse_Pigment (PIGMENT **Pigment_Ptr)
 {
-    EXPECT            /* Look for [pigment_id] */
+    EXPECT_ONE            /* Look for [pigment_id] */
         CASE (PIGMENT_ID_TOKEN)
             Destroy_Pigment(*Pigment_Ptr);
             *Pigment_Ptr = Copy_Pigment (reinterpret_cast<PIGMENT *>(Token.Data));
-            EXIT
         END_CASE
 
         OTHERWISE
             UNGET
-            EXIT
         END_CASE
     END_EXPECT    /* End pigment_id */
 
@@ -1032,19 +1006,17 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
         Old_Density_File = dynamic_cast<DensityFilePattern*>(New->pattern.get())->densityFile;
     }
 
-    EXPECT
+    EXPECT_ONE
         CASE (AGATE_TOKEN)
             New->Type = AGATE_PATTERN;
             New->pattern = PatternPtr(new AgatePattern());
             Check_Turb(New->pattern->warps, New->pattern->HasSpecialTurbulenceHandling());
             dynamic_cast<AgatePattern*>(New->pattern.get())->agateTurbScale = 1.0; // TODO this is a job for a constructor
-            EXIT
         END_CASE
 
         CASE (BOZO_TOKEN)
             New->Type = GENERIC_PATTERN;
             New->pattern = PatternPtr(new BozoPattern());
-            EXIT
         END_CASE
 
         CASE (FUNCTION_TOKEN)
@@ -1052,7 +1024,6 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
             New->pattern = PatternPtr(new FunctionPattern());
             dynamic_cast<FunctionPattern*>(New->pattern.get())->pFn = new FunctionVM::CustomFunction(
                 dynamic_cast<FunctionVM*>(sceneData->functionContextFactory), Parse_Function());
-            EXIT
         END_CASE
 
         CASE(PIGMENT_PATTERN_TOKEN)
@@ -1063,26 +1034,22 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
             Parse_Pigment(&(dynamic_cast<PigmentPattern*>(New->pattern.get())->pPigment));
             Post_Pigment(dynamic_cast<PigmentPattern*>(New->pattern.get())->pPigment);
             Parse_End();
-            EXIT
         END_CASE
 
         CASE (GRANITE_TOKEN)
             New->Type = GENERIC_PATTERN;
             New->pattern = PatternPtr(new GranitePattern());
-            EXIT
         END_CASE
 
         CASE (LEOPARD_TOKEN)
             New->Type = GENERIC_PATTERN;
             New->pattern = PatternPtr(new LeopardPattern());
-            EXIT
         END_CASE
 
         CASE (MARBLE_TOKEN)
             New->Type = MARBLE_PATTERN;
             New->pattern = PatternPtr(new MarblePattern());
             dynamic_cast<MarblePattern*>(New->pattern.get())->waveType = kWaveType_Triangle;
-            EXIT
         END_CASE
 
         CASE (MANDEL_TOKEN)
@@ -1093,7 +1060,6 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
             dynamic_cast<MandelPattern*>(New->pattern.get())->exteriorType = DEFAULT_FRACTAL_EXTERIOR_TYPE;
             dynamic_cast<MandelPattern*>(New->pattern.get())->exteriorFactor = DEFAULT_FRACTAL_EXTERIOR_FACTOR;
             dynamic_cast<MandelPattern*>(New->pattern.get())->interiorFactor = DEFAULT_FRACTAL_INTERIOR_FACTOR;
-            EXIT
         END_CASE
 
         CASE (JULIA_TOKEN)
@@ -1106,13 +1072,12 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
             dynamic_cast<JuliaPattern*>(New->pattern.get())->exteriorType = DEFAULT_FRACTAL_EXTERIOR_TYPE;
             dynamic_cast<JuliaPattern*>(New->pattern.get())->exteriorFactor = DEFAULT_FRACTAL_EXTERIOR_FACTOR;
             dynamic_cast<JuliaPattern*>(New->pattern.get())->interiorFactor = DEFAULT_FRACTAL_INTERIOR_FACTOR;
-            EXIT
         END_CASE
 
         CASE (MAGNET_TOKEN)
             New->Type = NO_PATTERN;
             i = (int)Parse_Float();
-            EXPECT
+            EXPECT_ONE
                 CASE (MANDEL_TOKEN)
                     switch(i)
                     {
@@ -1128,7 +1093,6 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
                             Error("Invalid magnet-mandel pattern type found. Valid types are 1 and 2.");
                             break;
                     }
-                    EXIT
                 END_CASE
                 CASE (JULIA_TOKEN)
                     switch(i)
@@ -1147,7 +1111,6 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
                     }
                     Parse_UV_Vect(dynamic_cast<JuliaPattern*>(New->pattern.get())->juliaCoord);
                     Parse_Comma();
-                    EXIT
                 END_CASE
                 OTHERWISE
                     Error("Invalid magnet pattern found. Valid types are 'mandel' and 'julia'.");
@@ -1160,13 +1123,11 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
             dynamic_cast<FractalPattern*>(New->pattern.get())->exteriorFactor = DEFAULT_FRACTAL_EXTERIOR_FACTOR;
             dynamic_cast<FractalPattern*>(New->pattern.get())->interiorFactor = DEFAULT_FRACTAL_INTERIOR_FACTOR;
             dynamic_cast<FractalPattern*>(New->pattern.get())->maxIterations = Parse_Int_With_Minimum(1, "fractal iterations limit");
-            EXIT
         END_CASE
 
         CASE (ONION_TOKEN)
             New->Type = GENERIC_PATTERN;
             New->pattern = PatternPtr(new OnionPattern());
-            EXIT
         END_CASE
 
         CASE (SPIRAL1_TOKEN)
@@ -1174,7 +1135,6 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
             New->pattern = PatternPtr(new Spiral1Pattern());
             dynamic_cast<SpiralPattern*>(New->pattern.get())->arms = (short)Parse_Float ();
             dynamic_cast<SpiralPattern*>(New->pattern.get())->waveType = kWaveType_Triangle;
-            EXIT
         END_CASE
 
         CASE (SPIRAL2_TOKEN)
@@ -1182,20 +1142,17 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
             New->pattern = PatternPtr(new Spiral2Pattern());
             dynamic_cast<SpiralPattern*>(New->pattern.get())->arms = (short)Parse_Float ();
             dynamic_cast<SpiralPattern*>(New->pattern.get())->waveType = kWaveType_Triangle;
-            EXIT
         END_CASE
 
         CASE (SPOTTED_TOKEN)
             New->Type = GENERIC_PATTERN;
             New->pattern = PatternPtr(new SpottedPattern());
-            EXIT
         END_CASE
 
         CASE (WOOD_TOKEN)
             New->Type = WOOD_PATTERN;
             New->pattern = PatternPtr(new WoodPattern());
             dynamic_cast<WoodPattern*>(New->pattern.get())->waveType = kWaveType_Triangle;
-            EXIT
         END_CASE
 
         CASE (GRADIENT_TOKEN)
@@ -1204,13 +1161,11 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
             Parse_Vector (Local_Vector);
             Local_Vector.normalize();
             dynamic_cast<GradientPattern*>(New->pattern.get())->gradient = Local_Vector;
-            EXIT
         END_CASE
 
         CASE (RADIAL_TOKEN)
             New->Type = GENERIC_PATTERN;
             New->pattern = PatternPtr(new RadialPattern());
-            EXIT
         END_CASE
 
         CASE (CRACKLE_TOKEN)
@@ -1222,7 +1177,6 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
             dynamic_cast<CracklePattern*>(New->pattern.get())->crackleForm[Z] = 0;
             dynamic_cast<CracklePattern*>(New->pattern.get())->crackleMetric = 2;
             dynamic_cast<CracklePattern*>(New->pattern.get())->crackleOffset = 0;
-            EXIT
         END_CASE
 
         CASE_COLOUR
@@ -1233,14 +1187,12 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
             New->Type = PLAIN_PATTERN;
             New->pattern = PatternPtr(new PlainPattern());
             Parse_Colour ((reinterpret_cast<PIGMENT *>(New))->colour);
-            EXIT
         END_CASE
 
         CASE (UV_MAPPING_TOKEN)
             New->Type = UV_MAP_PATTERN;
             New->pattern = PatternPtr(new PlainPattern());
             New->Blend_Map = Parse_Item_Into_Blend_List<MAP_T>(TPat_Type);
-            EXIT
         END_CASE
 
         CASE (CHECKER_TOKEN)
@@ -1249,7 +1201,6 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
             New->Blend_Map = Parse_Blend_List<MAP_T>(2,New->pattern->GetDefaultBlendMap(),TPat_Type);
             if (TPat_Type == kBlendMapType_Normal)
                 (reinterpret_cast<TNORMAL *>(New))->Delta = 0.02;
-            EXIT
         END_CASE
 
         CASE (OBJECT_TOKEN)
@@ -1264,14 +1215,12 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
             dynamic_cast<ObjectPattern*>(New->pattern.get())->pObject = tempObjects[0];
             New->Blend_Map = Parse_Blend_List<MAP_T>(2,New->pattern->GetDefaultBlendMap(),TPat_Type);
             Parse_End();
-            EXIT
         }
         END_CASE
 
         CASE (CELLS_TOKEN)
             New->Type = GENERIC_PATTERN;
             New->pattern = PatternPtr(new CellsPattern());
-            EXIT
         END_CASE
 
         CASE (BRICK_TOKEN)
@@ -1285,7 +1234,6 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
             New->Blend_Map = Parse_Blend_List<MAP_T>(2,New->pattern->GetDefaultBlendMap(),TPat_Type);
             if (TPat_Type == kBlendMapType_Normal)
                 (reinterpret_cast<TNORMAL *>(New))->Delta = 0.02;
-            EXIT
         END_CASE
 
         CASE (HEXAGON_TOKEN)
@@ -1294,7 +1242,6 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
             New->Blend_Map = Parse_Blend_List<MAP_T>(3,New->pattern->GetDefaultBlendMap(),TPat_Type);
             if (TPat_Type == kBlendMapType_Normal)
                 (reinterpret_cast<TNORMAL *>(New))->Delta = 0.02;
-            EXIT
         END_CASE
 
         CASE (SQUARE_TOKEN)
@@ -1303,7 +1250,6 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
             New->Blend_Map = Parse_Blend_List<MAP_T>(4,New->pattern->GetDefaultBlendMap(),TPat_Type);
             if (TPat_Type == kBlendMapType_Normal)
                 (reinterpret_cast<TNORMAL *>(New))->Delta = 0.02;
-            EXIT
         END_CASE
 
         CASE (TRIANGULAR_TOKEN)
@@ -1312,7 +1258,6 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
             New->Blend_Map = Parse_Blend_List<MAP_T>(6,New->pattern->GetDefaultBlendMap(),TPat_Type);
             if (TPat_Type == kBlendMapType_Normal)
                 (reinterpret_cast<TNORMAL *>(New))->Delta = 0.02;
-            EXIT
         END_CASE
 
         // JN2007: Cubic pattern
@@ -1322,7 +1267,6 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
             New->Blend_Map = Parse_Blend_List<MAP_T>(6,New->pattern->GetDefaultBlendMap(),TPat_Type);
             if (TPat_Type == kBlendMapType_Normal)
                 (reinterpret_cast<TNORMAL *>(New))->Delta = 0.02;
-            EXIT
         END_CASE
 
         CASE (IMAGE_MAP_TOKEN)
@@ -1340,7 +1284,6 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
             New->pattern = PatternPtr(new ImagePattern());
             dynamic_cast<ImagePattern*>(New->pattern.get())->waveFrequency = 0.0;
             Parse_Image_Map (reinterpret_cast<PIGMENT *>(New));
-            EXIT
         END_CASE
 
         CASE (BUMP_MAP_TOKEN)
@@ -1358,37 +1301,31 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
             New->pattern = PatternPtr(new ImagePattern());
             dynamic_cast<ImagePattern*>(New->pattern.get())->waveFrequency = 0.0;
             Parse_Bump_Map (reinterpret_cast<TNORMAL *>(New));
-            EXIT
         END_CASE
 
         CASE (WAVES_TOKEN)
             New->Type = WAVES_PATTERN;
             New->pattern = PatternPtr(new WavesPattern());
-            EXIT
         END_CASE
 
         CASE (RIPPLES_TOKEN)
             New->Type = RIPPLES_PATTERN;
             New->pattern = PatternPtr(new RipplesPattern());
-            EXIT
         END_CASE
 
         CASE (WRINKLES_TOKEN)
             New->Type = WRINKLES_PATTERN;
             New->pattern = PatternPtr(new WrinklesPattern());
-            EXIT
         END_CASE
 
         CASE (BUMPS_TOKEN)
             New->Type = BUMPS_PATTERN;
             New->pattern = PatternPtr(new BumpsPattern());
-            EXIT
         END_CASE
 
         CASE (DENTS_TOKEN)
             New->Type = DENTS_PATTERN;
             New->pattern = PatternPtr(new DentsPattern());
-            EXIT
         END_CASE
 
         CASE (QUILTED_TOKEN)
@@ -1397,7 +1334,6 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
             dynamic_cast<QuiltedPattern*>(New->pattern.get())->Control0 = 1.0;
             dynamic_cast<QuiltedPattern*>(New->pattern.get())->Control1 = 1.0;
             dynamic_cast<QuiltedPattern*>(New->pattern.get())->waveFrequency = 0.0;
-            EXIT
         END_CASE
 
         CASE (FACETS_TOKEN)
@@ -1410,13 +1346,11 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
             dynamic_cast<FacetsPattern*>(New->pattern.get())->facetsSize = 0.1;
             dynamic_cast<FacetsPattern*>(New->pattern.get())->facetsCoords = 0;
             dynamic_cast<FacetsPattern*>(New->pattern.get())->facetsMetric = 2;
-            EXIT
         END_CASE
 
         CASE (AVERAGE_TOKEN)
             New->Type = AVERAGE_PATTERN;
             New->pattern = PatternPtr(new PlainPattern());
-            EXIT
         END_CASE
 
         CASE (IMAGE_PATTERN_TOKEN)
@@ -1429,31 +1363,26 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
             New->pattern = PatternPtr(new ImagePattern());
             dynamic_cast<ImagePattern*>(New->pattern.get())->waveFrequency = 0.0;
             Parse_Image_Pattern (New);
-            EXIT
         END_CASE
 
         CASE (PLANAR_TOKEN)
             New->Type = GENERIC_PATTERN;
             New->pattern = PatternPtr(new PlanarPattern());
-            EXIT
         END_CASE
 
         CASE (BOXED_TOKEN)
             New->Type = GENERIC_PATTERN;
             New->pattern = PatternPtr(new BoxedPattern());
-            EXIT
         END_CASE
 
         CASE (SPHERICAL_TOKEN)
             New->Type = GENERIC_PATTERN;
             New->pattern = PatternPtr(new SphericalPattern());
-            EXIT
         END_CASE
 
         CASE (CYLINDRICAL_TOKEN)
             New->Type = GENERIC_PATTERN;
             New->pattern = PatternPtr(new CylindricalPattern());
-            EXIT
         END_CASE
 
         CASE (DENSITY_FILE_TOKEN)
@@ -1472,7 +1401,6 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
                     Error("Cannot read media density file.");
                 Read_Density_File(dfile, dynamic_cast<DensityFilePattern*>(New->pattern.get())->densityFile);
             }
-            EXIT
         END_CASE
 
         CASE (SLOPE_TOKEN)
@@ -1487,11 +1415,10 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
             dynamic_cast<SlopePattern*>(New->pattern.get())->altitudeModWidth     = 0.0;
             dynamic_cast<SlopePattern*>(New->pattern.get())->pointAt              = false;
 
-            EXPECT
+            EXPECT_ONE
                 /* simple syntax */
                 CASE_EXPRESS
                     Parse_Vector (dynamic_cast<SlopePattern*>(New->pattern.get())->slopeDirection);
-                    EXIT
                 END_CASE
 
                 /* new syntax */
@@ -1502,11 +1429,9 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
                     EXPECT_ONE
                         CASE(POINT_AT_TOKEN)
                             dynamic_cast<SlopePattern*>(New->pattern.get())->pointAt = true;
-                            EXIT
                         END_CASE
                         OTHERWISE
                             UNGET
-                            EXIT
                         END_CASE
                     END_EXPECT
 
@@ -1570,12 +1495,10 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
 
 
                     Parse_End();
-                    EXIT
                 END_CASE
 
                 OTHERWISE
                     UNGET
-                    EXIT
                 END_CASE
             END_EXPECT
 
@@ -1620,13 +1543,11 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
                     else if (dynamic_cast<SlopePattern*>(New->pattern.get())->altitudeDirection[i] == -1.0) { dynamic_cast<SlopePattern*>(New->pattern.get())->altitudeAxis = -(i+1); break; }
                 }
             }
-            EXIT
         END_CASE
 
         CASE (AOI_TOKEN)
             New->Type = GENERIC_PATTERN;
             New->pattern = PatternPtr(new AOIPattern());
-            EXIT
         END_CASE
 
         CASE (PAVEMENT_TOKEN)
@@ -1638,14 +1559,12 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
             dynamic_cast<PavementPattern*>(New->pattern.get())->Exterior = 0;
             dynamic_cast<PavementPattern*>(New->pattern.get())->Interior = 0;
             dynamic_cast<PavementPattern*>(New->pattern.get())->Form = 0;
-            EXIT
         END_CASE
 
         CASE (TILING_TOKEN)
             New->Type = TILING_PATTERN;
             New->pattern = PatternPtr(new TilingPattern());
             dynamic_cast<TilingPattern*>(New->pattern.get())->tilingType = (unsigned char)Parse_Float();
-            EXIT
         END_CASE
 
         CASE (POTENTIAL_TOKEN)
@@ -1672,14 +1591,11 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
                     EXIT
                 END_CASE
             END_EXPECT
-
-            EXIT
         }
         END_CASE
 
         OTHERWISE
             UNGET
-            EXIT
         END_CASE
     END_EXPECT     /* Concludes pattern_body */
 
@@ -2306,16 +2222,14 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
 
 void Parser::Parse_Tnormal (TNORMAL **Tnormal_Ptr)
 {
-    EXPECT            /* Look for [tnormal_id] */
-        CASE (TNORMAL_ID_TOKEN)
+    EXPECT_ONE            /* Look for [tnormal_id] */
+        CASE (NORMAL_ID_TOKEN)
             Destroy_Tnormal(*Tnormal_Ptr);
             *Tnormal_Ptr = Copy_Tnormal (reinterpret_cast<TNORMAL *>(Token.Data));
-            EXIT
         END_CASE
 
         OTHERWISE
             UNGET
-            EXIT
         END_CASE
     END_EXPECT    /* End [tnormal_id] */
 
@@ -2371,17 +2285,15 @@ void Parser::Parse_Finish (FINISH **Finish_Ptr)
 
     Parse_Begin ();
 
-    EXPECT        /* Look for zero or one finish_id */
+    EXPECT_ONE        /* Look for zero or one finish_id */
         CASE (FINISH_ID_TOKEN)
             if (*Finish_Ptr)
                 delete *Finish_Ptr;
             *Finish_Ptr = Copy_Finish (reinterpret_cast<FINISH *>(Token.Data));
-            EXIT
         END_CASE
 
         OTHERWISE
             UNGET
-            EXIT
         END_CASE
     END_EXPECT    /* End finish_id */
 
@@ -2429,14 +2341,13 @@ void Parser::Parse_Finish (FINISH **Finish_Ptr)
         CASE (REFLECTION_TOKEN)
         {
             bool found_second_color = false;
-            EXPECT
+            EXPECT_ONE
                 /* old syntax */
                 CASE_EXPRESS
                     Parse_Colour(New->Reflection_Max);
                     New->Reflection_Min = New->Reflection_Max;
                     New->Reflection_Falloff = 1;
                     New->Reflection_Fresnel = false;
-                    EXIT
                 END_CASE
 
                 /* new syntax */
@@ -2449,18 +2360,16 @@ void Parser::Parse_Finish (FINISH **Finish_Ptr)
                     Parse_Comma();
 
                     /* look for a second color */
-                    EXPECT
+                    EXPECT_ONE
                         CASE_EXPRESS
                             Parse_Colour(New->Reflection_Max);
                             found_second_color = true;
-                            EXIT
                         END_CASE
 
                         OTHERWISE
                             UNGET
                             /* by default, use reflection min = reflection max */
                             New->Reflection_Max = New->Reflection_Min;
-                            EXIT
                         END_CASE
                     END_EXPECT
 
@@ -2497,12 +2406,10 @@ void Parser::Parse_Finish (FINISH **Finish_Ptr)
                     END_EXPECT
 
                     Parse_End();
-                    EXIT
                 END_CASE
 
                 OTHERWISE
                     UNGET
-                    EXIT
                 END_CASE
 
             END_EXPECT
@@ -2555,15 +2462,13 @@ void Parser::Parse_Finish (FINISH **Finish_Ptr)
 
         CASE (METALLIC_TOKEN)
             New->Metallic = 1.0;
-            EXPECT
+            EXPECT_ONE
                 CASE_FLOAT
                     New->Metallic = Parse_Float();
-                    EXIT
                 END_CASE
 
                 OTHERWISE
                     UNGET
-                    EXIT
                 END_CASE
             END_EXPECT
         END_CASE
@@ -2733,17 +2638,15 @@ TEXTURE *Parser::Parse_Texture ()
 
     Modified_Pnf = false;
 
-    EXPECT               /* First allow a texture identifier */
+    EXPECT_ONE               /* First allow a texture identifier */
         CASE (TEXTURE_ID_TOKEN)
             Texture = Copy_Textures(reinterpret_cast<TEXTURE *>(Token.Data));
             Modified_Pnf = true;
-            EXIT
         END_CASE
 
         OTHERWISE
             UNGET
             Texture = Copy_Textures (Default_Texture);
-            EXIT
         END_CASE
     END_EXPECT
 
@@ -2766,8 +2669,8 @@ TEXTURE *Parser::Parse_Texture ()
                 Modified_Pnf = true;
             END_CASE
 
-            CASE (TNORMAL_ID_TOKEN)
-                Warn_State(Token.Token_Id, TNORMAL_TOKEN);
+            CASE (NORMAL_ID_TOKEN)
+                Warn_State(Token.Token_Id, NORMAL_TOKEN);
                 Destroy_Tnormal(Texture->Tnormal);
                 Texture->Tnormal = Copy_Tnormal (reinterpret_cast<TNORMAL *>(Token.Data));
                 Modified_Pnf = true;
@@ -2800,7 +2703,7 @@ TEXTURE *Parser::Parse_Texture ()
                 Modified_Pnf = true;
             END_CASE
 
-            CASE (TNORMAL_TOKEN)
+            CASE (NORMAL_TOKEN)
                 Parse_Begin ();
                 Parse_Tnormal ( &(Texture->Tnormal) );
                 Parse_End ();
@@ -2876,21 +2779,19 @@ TEXTURE *Parser::Parse_Texture ()
                no p, n or f.  Nor any texture identifier.  Its probably
                a patterned texture_map texture. */
 
-            EXPECT
+            EXPECT_ONE
                 CASE (TILES_TOKEN)
                     Destroy_Textures (Texture);
                     Texture = Parse_Tiles();
                     if (Texture->Blend_Map->Blend_Map_Entries[1].Vals == NULL)
                         Error("First texture missing from tiles");
                     Parse_Texture_Transform(Texture);
-                    EXIT
                 END_CASE
 
                 CASE (MATERIAL_MAP_TOKEN)
                     Destroy_Textures (Texture);
                     Texture = Parse_Material_Map ();
                     Parse_Texture_Transform(Texture);
-                    EXIT
                 END_CASE
 
                 OTHERWISE
@@ -2911,7 +2812,6 @@ TEXTURE *Parser::Parse_Texture ()
                         Destroy_Textures(Texture);
                         Texture = Copy_Textures (Default_Texture);
                     }
-                    EXIT
                 END_CASE
             END_EXPECT
         }
@@ -3135,28 +3035,24 @@ TEXTURE *Parser::Parse_Vers1_Texture ()
     FINISH *Finish;
     ContinuousPattern* pContinuousPattern;
 
-    EXPECT                      /* Look for texture_body */
+    EXPECT_ONE                      /* Look for texture_body */
         CASE (TILES_TOKEN)
             Texture = Parse_Tiles();
             if (Texture->Blend_Map->Blend_Map_Entries[1].Vals == NULL)
                 Error("First texture missing from tiles");
-            EXIT
         END_CASE
 
         CASE (MATERIAL_MAP_TOKEN)
             Texture = Parse_Material_Map ();
-            EXIT
         END_CASE
 
         CASE (TEXTURE_ID_TOKEN)
             Texture = Copy_Textures(reinterpret_cast<TEXTURE *>(Token.Data));
-            EXIT
         END_CASE
 
         OTHERWISE
             UNGET
             Texture = Copy_Textures (Default_Texture);
-            EXIT
         END_CASE
     END_EXPECT
 
@@ -3169,7 +3065,7 @@ TEXTURE *Parser::Parse_Vers1_Texture ()
                     Texture->Pigment = Copy_Pigment (reinterpret_cast<PIGMENT *>(Token.Data));
                 END_CASE
 
-                CASE (TNORMAL_ID_TOKEN)
+                CASE (NORMAL_ID_TOKEN)
                     Destroy_Tnormal(Texture->Tnormal);
                     Texture->Tnormal = Copy_Tnormal (reinterpret_cast<TNORMAL *>(Token.Data));
                 END_CASE
@@ -3197,7 +3093,7 @@ TEXTURE *Parser::Parse_Vers1_Texture ()
                     Parse_End ();
                 END_CASE
 
-                CASE (TNORMAL_TOKEN)
+                CASE (NORMAL_TOKEN)
                     Parse_Begin ();
                     Parse_Tnormal ( &(Texture->Tnormal) );
                     Parse_End ();
@@ -3363,7 +3259,7 @@ TNORMAL STUFF OUTSIDE NORMAL{}
 NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
 ***********************************************************************/
                 CASE (BUMPS_TOKEN)
-                    Warn_State(Token.Token_Id, TNORMAL_TOKEN);
+                    Warn_State(Token.Token_Id, NORMAL_TOKEN);
                     ADD_TNORMAL
                     Tnormal->Type = BUMPS_PATTERN;
                     Tnormal->pattern = PatternPtr(new BumpsPattern());
@@ -3371,7 +3267,7 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
                 END_CASE
 
                 CASE (DENTS_TOKEN)
-                    Warn_State(Token.Token_Id, TNORMAL_TOKEN);
+                    Warn_State(Token.Token_Id, NORMAL_TOKEN);
                     ADD_TNORMAL
                     Tnormal->Type = DENTS_PATTERN;
                     Tnormal->pattern = PatternPtr(new DentsPattern());
@@ -3379,7 +3275,7 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
                 END_CASE
 
                 CASE (RIPPLES_TOKEN)
-                    Warn_State(Token.Token_Id, TNORMAL_TOKEN);
+                    Warn_State(Token.Token_Id, NORMAL_TOKEN);
                     ADD_TNORMAL
                     Tnormal->Type = RIPPLES_PATTERN;
                     Tnormal->pattern = PatternPtr(new RipplesPattern());
@@ -3387,7 +3283,7 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
                 END_CASE
 
                 CASE (WAVES_TOKEN)
-                    Warn_State(Token.Token_Id, TNORMAL_TOKEN);
+                    Warn_State(Token.Token_Id, NORMAL_TOKEN);
                     ADD_TNORMAL
                     Tnormal->Type = WAVES_PATTERN;
                     Tnormal->pattern = PatternPtr(new WavesPattern());
@@ -3395,7 +3291,7 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
                 END_CASE
 
                 CASE (WRINKLES_TOKEN)
-                    Warn_State(Token.Token_Id, TNORMAL_TOKEN);
+                    Warn_State(Token.Token_Id, NORMAL_TOKEN);
                     ADD_TNORMAL
                     Tnormal->Type = WRINKLES_PATTERN;
                     Tnormal->pattern = PatternPtr(new WrinklesPattern());
@@ -3403,7 +3299,7 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
                 END_CASE
 
                 CASE (BUMP_MAP_TOKEN)
-                    Warn_State(Token.Token_Id, TNORMAL_TOKEN);
+                    Warn_State(Token.Token_Id, NORMAL_TOKEN);
                     ADD_TNORMAL
                     Tnormal->Type = BITMAP_PATTERN;
                     Tnormal->pattern = PatternPtr(new ImagePattern());
@@ -3412,7 +3308,7 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
                 END_CASE
 
                 CASE (FREQUENCY_TOKEN)
-                    Warn_State(Token.Token_Id, TNORMAL_TOKEN);
+                    Warn_State(Token.Token_Id, NORMAL_TOKEN);
                     ADD_TNORMAL
                     if (!(Tnormal->Type == RIPPLES_PATTERN || Tnormal->Type == WAVES_PATTERN))
                         if (sceneData->EffectiveLanguageVersion() >= 150)
@@ -3422,7 +3318,7 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
                 END_CASE
 
                 CASE (PHASE_TOKEN)
-                    Warn_State(Token.Token_Id, TNORMAL_TOKEN);
+                    Warn_State(Token.Token_Id, NORMAL_TOKEN);
                     ADD_TNORMAL
                     if (!(Tnormal->Type == RIPPLES_PATTERN || Tnormal->Type == WAVES_PATTERN))
                         if (sceneData->EffectiveLanguageVersion() >= 150)
@@ -3671,10 +3567,9 @@ void Parser::Parse_Media(vector<Media>& medialist)
 
     Parse_Begin();
 
-    EXPECT
+    EXPECT_ONE
         CASE(MEDIA_ID_TOKEN)
             IMediaObj = *(reinterpret_cast<Media *>(Token.Data));
-            EXIT
         END_CASE
 
         OTHERWISE
@@ -3687,7 +3582,6 @@ void Parser::Parse_Media(vector<Media>& medialist)
                 IMedia->Max_Samples = 10;
                 IMedia->Sample_Method = 3;
             }
-            EXIT
         END_CASE
     END_EXPECT
 
@@ -3877,18 +3771,16 @@ void Parser::Parse_Interior(InteriorPtr& interior)
 {
     Parse_Begin();
 
-    EXPECT
+    EXPECT_ONE
         CASE(INTERIOR_ID_TOKEN)
             if(Token.Data != NULL)
                 interior = InteriorPtr(new Interior(**reinterpret_cast<InteriorPtr *>(Token.Data)));
             else
                 interior = InteriorPtr(new Interior());
-            EXIT
         END_CASE
 
         OTHERWISE
             UNGET
-            EXIT
         END_CASE
     END_EXPECT
 
@@ -3972,16 +3864,14 @@ void Parser::Parse_Interior(InteriorPtr& interior)
 
 void Parser::Parse_Media_Density_Pattern(PIGMENT** Density)
 {
-    EXPECT
+    EXPECT_ONE
         CASE (DENSITY_ID_TOKEN)
             *Density = Copy_Pigment (reinterpret_cast<PIGMENT *>(Token.Data));
-            EXIT
         END_CASE
 
         OTHERWISE
             *Density = Create_Pigment();
             UNGET
-            EXIT
         END_CASE
     END_EXPECT
 
@@ -4032,16 +3922,14 @@ FOG *Parser::Parse_Fog()
 
     Parse_Begin();
 
-    EXPECT
+    EXPECT_ONE
         CASE(FOG_ID_TOKEN)
             Fog = Copy_Fog (reinterpret_cast<FOG *>(Token.Data));
-            EXIT
         END_CASE
 
         OTHERWISE
             UNGET
             Fog = Create_Fog();
-            EXIT
         END_CASE
     END_EXPECT
 
@@ -4199,16 +4087,14 @@ RAINBOW *Parser::Parse_Rainbow()
 
     Parse_Begin();
 
-    EXPECT
+    EXPECT_ONE
         CASE(RAINBOW_ID_TOKEN)
             Rainbow = Copy_Rainbow (reinterpret_cast<RAINBOW *>(Token.Data));
-            EXIT
         END_CASE
 
         OTHERWISE
             UNGET
             Rainbow = Create_Rainbow();
-            EXIT
         END_CASE
     END_EXPECT
 
@@ -4376,16 +4262,14 @@ SKYSPHERE *Parser::Parse_Skysphere()
 
     Parse_Begin();
 
-    EXPECT
+    EXPECT_ONE
         CASE(SKYSPHERE_ID_TOKEN)
             Skysphere = Copy_Skysphere(reinterpret_cast<SKYSPHERE *>(Token.Data));
-            EXIT
         END_CASE
 
         OTHERWISE
             UNGET
             Skysphere = Create_Skysphere();
-            EXIT
         END_CASE
     END_EXPECT
 
@@ -4597,7 +4481,7 @@ void Parser::Parse_Warp (WarpList& warps)
 
     Parse_Begin();
 
-    EXPECT
+    EXPECT_ONE
         CASE(TURBULENCE_TOKEN)
             New = Turb = new TurbulenceWarp();
             Parse_Vector(Turb->Turbulence);
@@ -4623,7 +4507,6 @@ void Parser::Parse_Warp (WarpList& warps)
                     EXIT
                 END_CASE
             END_EXPECT
-            EXIT
         END_CASE
 
         CASE(REPEAT_TOKEN)
@@ -4679,7 +4562,6 @@ void Parser::Parse_Warp (WarpList& warps)
                     EXIT
                 END_CASE
             END_EXPECT
-            EXIT
         END_CASE
 
         CASE(BLACK_HOLE_TOKEN)
@@ -4729,7 +4611,6 @@ void Parser::Parse_Warp (WarpList& warps)
                     EXIT
                 END_CASE
             END_EXPECT
-            EXIT
         END_CASE
 
         CASE(CYLINDRICAL_TOKEN)
@@ -4750,7 +4631,6 @@ void Parser::Parse_Warp (WarpList& warps)
                     EXIT
                 END_CASE
             END_EXPECT
-            EXIT
         END_CASE
 
         CASE(SPHERICAL_TOKEN)
@@ -4771,7 +4651,6 @@ void Parser::Parse_Warp (WarpList& warps)
                     EXIT
                 END_CASE
             END_EXPECT
-            EXIT
         END_CASE
 
         CASE(PLANAR_TOKEN)
@@ -4783,7 +4662,6 @@ void Parser::Parse_Warp (WarpList& warps)
                 Parse_Comma();
                 PlanarW->OffSet=Parse_Float();
             }
-            EXIT
         END_CASE
 
         CASE(TOROIDAL_TOKEN)
@@ -4808,13 +4686,11 @@ void Parser::Parse_Warp (WarpList& warps)
                     EXIT
                 END_CASE
             END_EXPECT
-            EXIT
         END_CASE
 
         // JN2007: Cubic warp
         CASE(CUBIC_TOKEN)
             New = new CubicWarp();
-            EXIT
         END_CASE
 
         OTHERWISE
@@ -4844,7 +4720,7 @@ void Parser::Parse_Material(MATERIAL *Material)
 
     Parse_Begin();
 
-    EXPECT
+    EXPECT_ONE
         CASE(MATERIAL_ID_TOKEN)
             Temp = reinterpret_cast<MATERIAL *>(Token.Data);
             Texture = Copy_Textures(Temp->Texture);
@@ -4855,12 +4731,10 @@ void Parser::Parse_Material(MATERIAL *Material)
                 Material->interior = InteriorPtr(new Interior(*(Temp->interior)));
             else
                 Material->interior.reset();
-            EXIT
         END_CASE
 
         OTHERWISE
             UNGET
-            EXIT
         END_CASE
     END_EXPECT
 
@@ -4970,26 +4844,23 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
     UCS2String ign;
     ContinuousPattern* pContinuousPattern;
 
-    EXPECT
+    EXPECT_ONE
         CASE (AGATE_TOKEN)
             New->Type = AGATE_PATTERN;
             New->pattern = PatternPtr(new AgatePattern());
             Check_Turb(New->pattern->warps, New->pattern->HasSpecialTurbulenceHandling());
             dynamic_cast<AgatePattern*>(New->pattern.get())->agateTurbScale = 1.0; // TODO this is a job for a constructor
-            EXIT
         END_CASE
 
         CASE (BOZO_TOKEN)
             New->Type = GENERIC_PATTERN;
             New->pattern = PatternPtr(new BozoPattern());
-            EXIT
         END_CASE
 
         CASE (FUNCTION_TOKEN)
             New->Type = GENERIC_PATTERN;
             New->pattern = PatternPtr(new FunctionPattern());
             dynamic_cast<FunctionPattern*>(New->pattern.get())->pFn = new FunctionVM::CustomFunction(dynamic_cast<FunctionVM*>(sceneData->functionContextFactory), Parse_Function());
-            EXIT
         END_CASE
 
         CASE(PIGMENT_PATTERN_TOKEN)
@@ -5000,26 +4871,22 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
             Parse_Pigment(&(dynamic_cast<PigmentPattern*>(New->pattern.get())->pPigment));
             Post_Pigment(dynamic_cast<PigmentPattern*>(New->pattern.get())->pPigment);
             Parse_End();
-            EXIT
         END_CASE
 
         CASE (GRANITE_TOKEN)
             New->Type = GENERIC_PATTERN;
             New->pattern = PatternPtr(new GranitePattern());
-            EXIT
         END_CASE
 
         CASE (LEOPARD_TOKEN)
             New->Type = GENERIC_PATTERN;
             New->pattern = PatternPtr(new LeopardPattern());
-            EXIT
         END_CASE
 
         CASE (MARBLE_TOKEN)
             New->Type = MARBLE_PATTERN;
             New->pattern = PatternPtr(new MarblePattern());
             dynamic_cast<MarblePattern*>(New->pattern.get())->waveType = kWaveType_Triangle;
-            EXIT
         END_CASE
 
         CASE (MANDEL_TOKEN)
@@ -5030,7 +4897,6 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
             dynamic_cast<MandelPattern*>(New->pattern.get())->exteriorType = DEFAULT_FRACTAL_EXTERIOR_TYPE;
             dynamic_cast<MandelPattern*>(New->pattern.get())->exteriorFactor = DEFAULT_FRACTAL_EXTERIOR_FACTOR;
             dynamic_cast<MandelPattern*>(New->pattern.get())->interiorFactor = DEFAULT_FRACTAL_INTERIOR_FACTOR;
-            EXIT
         END_CASE
 
         CASE (JULIA_TOKEN)
@@ -5043,13 +4909,12 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
             dynamic_cast<JuliaPattern*>(New->pattern.get())->exteriorType = DEFAULT_FRACTAL_EXTERIOR_TYPE;
             dynamic_cast<JuliaPattern*>(New->pattern.get())->exteriorFactor = DEFAULT_FRACTAL_EXTERIOR_FACTOR;
             dynamic_cast<JuliaPattern*>(New->pattern.get())->interiorFactor = DEFAULT_FRACTAL_INTERIOR_FACTOR;
-            EXIT
         END_CASE
 
         CASE (MAGNET_TOKEN)
             New->Type = NO_PATTERN;
             i = (int)Parse_Float();
-            EXPECT
+            EXPECT_ONE
                 CASE (MANDEL_TOKEN)
                     switch(i)
                     {
@@ -5065,7 +4930,6 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
                             Error("Invalid magnet-mandel pattern type found. Valid types are 1 and 2.");
                             break;
                     }
-                    EXIT
                 END_CASE
                 CASE (JULIA_TOKEN)
                     switch(i)
@@ -5084,7 +4948,6 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
                     }
                     Parse_UV_Vect(dynamic_cast<JuliaPattern*>(New->pattern.get())->juliaCoord);
                     Parse_Comma();
-                    EXIT
                 END_CASE
                 OTHERWISE
                     Error("Invalid magnet pattern found. Valid types are 'mandel' and 'julia'.");
@@ -5097,13 +4960,11 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
             dynamic_cast<FractalPattern*>(New->pattern.get())->exteriorFactor = DEFAULT_FRACTAL_EXTERIOR_FACTOR;
             dynamic_cast<FractalPattern*>(New->pattern.get())->interiorFactor = DEFAULT_FRACTAL_INTERIOR_FACTOR;
             dynamic_cast<FractalPattern*>(New->pattern.get())->maxIterations = Parse_Int_With_Minimum(1, "fractal iterations limit");
-            EXIT
         END_CASE
 
         CASE (ONION_TOKEN)
             New->Type = GENERIC_PATTERN;
             New->pattern = PatternPtr(new OnionPattern());
-            EXIT
         END_CASE
 
         CASE (SPIRAL1_TOKEN)
@@ -5111,7 +4972,6 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
             New->pattern = PatternPtr(new Spiral1Pattern());
             dynamic_cast<SpiralPattern*>(New->pattern.get())->arms = (short)Parse_Float ();
             dynamic_cast<SpiralPattern*>(New->pattern.get())->waveType = kWaveType_Triangle;
-            EXIT
         END_CASE
 
         CASE (SPIRAL2_TOKEN)
@@ -5119,20 +4979,17 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
             New->pattern = PatternPtr(new Spiral2Pattern());
             dynamic_cast<SpiralPattern*>(New->pattern.get())->arms = (short)Parse_Float ();
             dynamic_cast<SpiralPattern*>(New->pattern.get())->waveType = kWaveType_Triangle;
-            EXIT
         END_CASE
 
         CASE (SPOTTED_TOKEN)
             New->Type = GENERIC_PATTERN;
             New->pattern = PatternPtr(new SpottedPattern());
-            EXIT
         END_CASE
 
         CASE (WOOD_TOKEN)
             New->Type = WOOD_PATTERN;
             New->pattern = PatternPtr(new WoodPattern());
             dynamic_cast<WoodPattern*>(New->pattern.get())->waveType = kWaveType_Triangle;
-            EXIT
         END_CASE
 
         CASE (GRADIENT_TOKEN)
@@ -5141,13 +4998,11 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
             Parse_Vector (Local_Vector);
             Local_Vector.normalize();
             dynamic_cast<GradientPattern*>(New->pattern.get())->gradient = Local_Vector;
-            EXIT
         END_CASE
 
         CASE (RADIAL_TOKEN)
             New->Type = GENERIC_PATTERN;
             New->pattern = PatternPtr(new RadialPattern());
-            EXIT
         END_CASE
 
         CASE (CRACKLE_TOKEN)
@@ -5159,7 +5014,6 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
             dynamic_cast<CracklePattern*>(New->pattern.get())->crackleForm[Z] = 0;
             dynamic_cast<CracklePattern*>(New->pattern.get())->crackleMetric = 2;
             dynamic_cast<CracklePattern*>(New->pattern.get())->crackleOffset = 0;
-            EXIT
         END_CASE
 
         // TODO VERIFY - COLOUR is not accepted, is that ok?
@@ -5184,14 +5038,12 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
             dynamic_cast<ObjectPattern*>(New->pattern.get())->pObject = tempObjects[0];
             // TODO VERIFY - this differs from regular pattern parsing (Blend Map), is that ok?
             Parse_End();
-            EXIT
         }
         END_CASE
 
         CASE (CELLS_TOKEN)
             New->Type = GENERIC_PATTERN;
             New->pattern = PatternPtr(new CellsPattern());
-            EXIT
         END_CASE
 
         CASE (BRICK_TOKEN)
@@ -5203,14 +5055,12 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
                 dynamic_cast<BrickPattern*>(New->pattern.get())->mortar=0.5-EPSILON*2.0;
             }
             // TODO VERIFY - this differs from regular pattern parsing (Blend Map), is that ok?
-            EXIT
         END_CASE
 
         CASE (HEXAGON_TOKEN)
             New->Type = GENERIC_INTEGER_PATTERN;
             New->pattern = PatternPtr(new HexagonPattern());
             // TODO VERIFY - this differs from regular pattern parsing (Blend Map), is that ok?
-            EXIT
         END_CASE
 
         // TODO VERIFY - SQUARE_TOKEN is not accepted, is that ok?
@@ -5222,7 +5072,6 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
             New->Type = GENERIC_INTEGER_PATTERN;
             New->pattern = PatternPtr(new CubicPattern());
             // TODO VERIFY - this differs from regular pattern parsing (Blend Map), is that ok?
-            EXIT
         END_CASE
 
         // TODO VERIFY - IMAGE_MAP_TOKEN is not accepted, is that ok?
@@ -5232,31 +5081,26 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
         CASE (WAVES_TOKEN)
             New->Type = WAVES_PATTERN;
             New->pattern = PatternPtr(new WavesPattern());
-            EXIT
         END_CASE
 
         CASE (RIPPLES_TOKEN)
             New->Type = RIPPLES_PATTERN;
             New->pattern = PatternPtr(new RipplesPattern());
-            EXIT
         END_CASE
 
         CASE (WRINKLES_TOKEN)
             New->Type = WRINKLES_PATTERN;
             New->pattern = PatternPtr(new WrinklesPattern());
-            EXIT
         END_CASE
 
         CASE (BUMPS_TOKEN)
             New->Type = BUMPS_PATTERN;
             New->pattern = PatternPtr(new BumpsPattern());
-            EXIT
         END_CASE
 
         CASE (DENTS_TOKEN)
             New->Type = DENTS_PATTERN;
             New->pattern = PatternPtr(new DentsPattern());
-            EXIT
         END_CASE
 
         CASE (QUILTED_TOKEN)
@@ -5265,7 +5109,6 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
             dynamic_cast<QuiltedPattern*>(New->pattern.get())->Control0 = 1.0;
             dynamic_cast<QuiltedPattern*>(New->pattern.get())->Control1 = 1.0;
             dynamic_cast<QuiltedPattern*>(New->pattern.get())->waveFrequency = 0.0;
-            EXIT
         END_CASE
 
         // FACETS_TOKEN is not accepted, as it requires normal vector information, which can't be passed to a function
@@ -5278,31 +5121,26 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
             New->pattern = PatternPtr(new ImagePattern());
             dynamic_cast<ImagePattern*>(New->pattern.get())->waveFrequency = 0.0;
             Parse_Image_Pattern (New);
-            EXIT
         END_CASE
 
         CASE (PLANAR_TOKEN)
             New->Type = GENERIC_PATTERN;
             New->pattern = PatternPtr(new PlanarPattern());
-            EXIT
         END_CASE
 
         CASE (BOXED_TOKEN)
             New->Type = GENERIC_PATTERN;
             New->pattern = PatternPtr(new BoxedPattern());
-            EXIT
         END_CASE
 
         CASE (SPHERICAL_TOKEN)
             New->Type = GENERIC_PATTERN;
             New->pattern = PatternPtr(new SphericalPattern());
-            EXIT
         END_CASE
 
         CASE (CYLINDRICAL_TOKEN)
             New->Type = GENERIC_PATTERN;
             New->pattern = PatternPtr(new CylindricalPattern());
-            EXIT
         END_CASE
 
         CASE (DENSITY_FILE_TOKEN)
@@ -5318,7 +5156,6 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
                     Error("Cannot read media density file.");
                 Read_Density_File(dfile, dynamic_cast<DensityFilePattern*>(New->pattern.get())->densityFile);
             }
-            EXIT
         END_CASE
 
         // SLOPE_TOKEN is not accepted, as it requires normal vector information, which can't be passed to a function
@@ -5334,14 +5171,12 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
             dynamic_cast<PavementPattern*>(New->pattern.get())->Exterior = 0;
             dynamic_cast<PavementPattern*>(New->pattern.get())->Interior = 0;
             dynamic_cast<PavementPattern*>(New->pattern.get())->Form = 0;
-            EXIT
         END_CASE
 
         CASE (TILING_TOKEN)
             New->Type = TILING_PATTERN;
             New->pattern = PatternPtr(new TilingPattern());
             dynamic_cast<TilingPattern*>(New->pattern.get())->tilingType = (unsigned char)Parse_Float();
-            EXIT
         END_CASE
 
         CASE (POTENTIAL_TOKEN)
@@ -5369,13 +5204,11 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
                 END_CASE
             END_EXPECT
 
-            EXIT
         }
         END_CASE
 
         OTHERWISE
             UNGET
-            EXIT
         END_CASE
     END_EXPECT
 

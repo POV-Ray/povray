@@ -484,12 +484,11 @@ UCS2 *Parser::Parse_Datetime(bool pathname)
     GET(LEFT_PAREN_TOKEN);
     std::time_t timestamp = floor((Parse_Float() + (365*30+7)) * 24*60*60 + 0.5);
     Parse_Comma();
-    EXPECT
+    EXPECT_ONE
         CASE(RIGHT_PAREN_TOKEN)
             CallFree = false;
             // we use GMT as some platforms (e.g. windows) have different ideas of what to print when handling '%z'.
             FormatStr = (char *)"%Y-%m-%d %H:%M:%SZ";
-            EXIT
         END_CASE
 
         OTHERWISE
@@ -507,7 +506,6 @@ UCS2 *Parser::Parse_Datetime(bool pathname)
                 Error("Format string too long.");
             }
             GET(RIGHT_PAREN_TOKEN);
-            EXIT
         END_CASE
     END_EXPECT
 
@@ -1266,7 +1264,7 @@ void Parser::UCS2_strupr(UCS2 *str)
     }
 
     if(err == true)
-        Warning("Non-ASCII charcater in string, strupr may not work as expected.");
+        Warning("Non-ASCII character in string, strupr may not work as expected.");
 }
 
 
@@ -1304,7 +1302,7 @@ void Parser::UCS2_strlwr(UCS2 *str)
     }
 
     if(err == true)
-        Warning("Non-ASCII charcater in string, strlwr may not work as expected.");
+        Warning("Non-ASCII character in string, strlwr may not work as expected.");
 }
 
 UCS2 *Parser::UCS2_strdup(const UCS2 *s)
