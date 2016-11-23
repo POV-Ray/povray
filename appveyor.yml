@@ -43,7 +43,7 @@ before_build:
     (Get-Content source\base\build.h).replace('//{POV_AUTOBUILD_2}', $env:pov_autobuild_2) | Set-Content source\base\build.h
     (Get-Content source\base\build.h).replace('//{POV_AUTOBUILD_3}', $env:pov_autobuild_3) | Set-Content source\base\build.h
     (Get-Content source\base\build.h).replace('YOUR NAME (YOUR EMAIL)', $env:pov_authorized_by) | Set-Content source\base\build.h
-    (Get-Content source\base\build.h).replace('#error Please fill in BUILT_BY, then remove this line', '') | Set-Content source\base\build.h
+    (Get-Content source\base\build.h).replace('#error "Please fill in BUILT_BY, then remove this line"', '') | Set-Content source\base\build.h
 
 build:
   project: windows/vs10/povray.sln

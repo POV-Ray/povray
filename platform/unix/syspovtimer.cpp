@@ -80,7 +80,7 @@ void Delay(unsigned int msec)
     POV_ASSERT(msec < 1000); // On some systems, usleep() does not support sleeping for 1 second or more.
     usleep (msec * (useconds_t)1000);
 #else
-#error Bad compile-time configuration.
+#error "Bad compile-time configuration."
 #endif
 }
 
