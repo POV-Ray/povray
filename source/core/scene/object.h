@@ -173,7 +173,8 @@ class ObjectBase
         BoundingBox BBox;
         TRANSFORM *Trans;
         SNGL Ph_Density;
-        FloatSetting RadiosityImportance;
+        double RadiosityImportance;
+        bool RadiosityImportanceSet;
         unsigned int Flags;
 
 #ifdef OBJECT_DEBUG_HELPER
@@ -184,7 +185,7 @@ class ObjectBase
         ObjectBase(int t) :
             Type(t),
             Texture(NULL), Interior_Texture(NULL), interior(), Trans(NULL),
-            Ph_Density(0), RadiosityImportance(0.0), Flags(0)
+            Ph_Density(0), RadiosityImportance(0.0), RadiosityImportanceSet(false), Flags(0)
         {
             Make_BBox(BBox, -BOUND_HUGE/2.0, -BOUND_HUGE/2.0, -BOUND_HUGE/2.0, BOUND_HUGE, BOUND_HUGE, BOUND_HUGE);
         }
@@ -198,7 +199,8 @@ class ObjectBase
         ObjectBase(int t, ObjectBase& o, bool transplant) :
             Type(t),
             Texture(o.Texture), Interior_Texture(o.Interior_Texture), interior(o.interior), Trans(o.Trans),
-            Ph_Density(o.Ph_Density), RadiosityImportance(o.RadiosityImportance), Flags(o.Flags),
+            Ph_Density(o.Ph_Density), RadiosityImportance(o.RadiosityImportance),
+            RadiosityImportanceSet(o.RadiosityImportanceSet), Flags(o.Flags),
             Bound(o.Bound), Clip(o.Clip), LLights(o.LLights), BBox(o.BBox)
         {
             if (transplant)

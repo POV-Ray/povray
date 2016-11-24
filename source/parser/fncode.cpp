@@ -496,7 +496,7 @@ void FNCode::SetFlag(unsigned int flag, char *str)
 
 void FNCode::compile_recursive(ExprNode *expr)
 {
-    POV_ASSERT(expr != NULL);
+    POV_PARSER_ASSERT(expr != NULL);
 
     unsigned int local_k = 0;
 

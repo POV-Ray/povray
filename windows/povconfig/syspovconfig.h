@@ -43,11 +43,11 @@
 
 #ifdef BUILDING_AMD64
   #if !defined(_M_AMD64) && !defined(_M_X64)
-    #error you are compiling the x64 project using a 32-bit compiler
+    #error "you are compiling the x64 project using a 32-bit compiler"
   #endif
 #else
   #if defined(_M_AMD64) || defined(_M_X64)
-    #error you are compiling the 32-bit project using a 64-bit compiler
+    #error "you are compiling the 32-bit project using a 64-bit compiler"
   #endif
 #endif
 
@@ -113,18 +113,18 @@ using std::tr1::const_pointer_cast;
 #define ReturnAddress()           NULL
 
 #if defined(__MINGW32__)                    /* MinGW GCC */
-  #error Currently not supported.
+  #error "Currently not supported."
   #include "syspovconfig_mingw32.h"
 #elif defined(__WATCOMC__)                  /* Watcom C/C++ C32 */
-  #error Currently not supported.
+  #error "Currently not supported."
   #include "syspovconfig_watcom.h"
 #elif defined(__BORLANDC__)                 /* Borland C/C++ */
-  #error Currently not supported.
+  #error "Currently not supported."
   #include "syspovconfig_borland.h"
 #elif defined(_MSC_VER)                     /* Microsoft and Intel C++ */
   #include "syspovconfig_msvc.h"
 #else
-  #error unknown compiler configuration
+  #error "unknown compiler configuration"
 #endif
 
 #ifdef BUILD_SSE2

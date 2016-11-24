@@ -186,7 +186,7 @@ void Parser::pre_init_tokenizer ()
 
     // TODO - on modern machines it may be faster to do the comparisons for each token
     //        than to access the conversion table.
-    for(i = 0; i < LAST_TOKEN; i++)
+    for(i = 0; i < TOKEN_COUNT; i++)
     {
         Conversion_Util_Table[i] = i;
         if(i < FLOAT_FUNCT_TOKEN)
@@ -1731,7 +1731,8 @@ void Parser::Parse_Directive(int After_Hash)
 
     Parsing_Directive = true;
 
-    EXPECT
+    EXPECT  // we're normally running this loop only once, but a few directives cause it to be looped
+
         CASE(IFDEF_TOKEN)
             Parsing_Directive = false;
             Inc_CS_Index();
@@ -1951,7 +1952,7 @@ void Parser::Parse_Directive(int After_Hash)
                 Cond_Stack[CS_Index].Switch_Value=Parse_Cond_Param();
                 Cond_Stack[CS_Index].Cond_Type=SWITCH_COND;
                 Cond_Stack[CS_Index].Switch_Case_Ok_Flag=false;
-                EXPECT
+                EXPECT_ONE
                     // NOTE: We actually expect a "#case" or "#range" here; however, this will trigger a nested call
                     // to Parse_Directive, so we'll encounter that CASE_TOKEN or RANGE_TOKEN here only by courtesy of the
                     // respective handler, which will UNGET the token and inform us via the Switch_Case_Ok_Flag
@@ -1981,7 +1982,6 @@ void Parser::Parse_Directive(int After_Hash)
                             Cond_Stack[CS_Index].Cond_Type=CASE_FALSE_COND;
                             Skip_Tokens(CASE_FALSE_COND);
                         }
-                        EXIT
                     END_CASE
 
                     OTHERWISE
@@ -2459,16 +2459,15 @@ void Parser::Parse_Directive(int After_Hash)
             else
             {
                 Ok_To_Declare = false;
-                EXPECT
+                EXPECT_ONE
                     CASE (IDENTIFIER_TOKEN)
                         Warning("Attempt to undef unknown identifier");
-                        EXIT
                     END_CASE
 
                     CASE2 (MACRO_ID_TOKEN, PARAMETER_ID_TOKEN)
                     CASE3 (FILE_ID_TOKEN,  FUNCT_ID_TOKEN, VECTFUNCT_ID_TOKEN)
                     // These have to match Parse_Declare in parse.cpp! [trf]
-                    CASE4 (TNORMAL_ID_TOKEN, FINISH_ID_TOKEN, TEXTURE_ID_TOKEN, OBJECT_ID_TOKEN)
+                    CASE4 (NORMAL_ID_TOKEN, FINISH_ID_TOKEN, TEXTURE_ID_TOKEN, OBJECT_ID_TOKEN)
                     CASE4 (COLOUR_MAP_ID_TOKEN, TRANSFORM_ID_TOKEN, CAMERA_ID_TOKEN, PIGMENT_ID_TOKEN)
                     CASE4 (SLOPE_MAP_ID_TOKEN, NORMAL_MAP_ID_TOKEN, TEXTURE_MAP_ID_TOKEN, COLOUR_ID_TOKEN)
                     CASE4 (PIGMENT_MAP_ID_TOKEN, MEDIA_ID_TOKEN, STRING_ID_TOKEN, INTERIOR_ID_TOKEN)
@@ -2476,7 +2475,6 @@ void Parser::Parse_Directive(int After_Hash)
                     CASE4 (VECTOR_4D_ID_TOKEN, RAINBOW_ID_TOKEN, FOG_ID_TOKEN, SKYSPHERE_ID_TOKEN)
                     CASE2 (MATERIAL_ID_TOKEN, SPLINE_ID_TOKEN)
                         Remove_Symbol (Token.Table_Index, Token.Token_String, Token.is_array_elem, Token.DataPtr, Token.Token_Id);
-                        EXIT
                     END_CASE
 
                     CASE2 (VECTOR_FUNCT_TOKEN, FLOAT_FUNCT_TOKEN)
@@ -2491,7 +2489,6 @@ void Parser::Parse_Directive(int After_Hash)
                                 Parse_Error(IDENTIFIER_TOKEN);
                                 break;
                         }
-                        EXIT
                     END_CASE
 
                     OTHERWISE
@@ -3053,16 +3050,14 @@ Parser::Macro *Parser::Parse_Macro()
 
     Ok_To_Declare = false;
 
-    EXPECT
+    EXPECT_ONE
         CASE (IDENTIFIER_TOKEN)
             Table_Entry = Add_Symbol (1,Token.Token_String,TEMPORARY_MACRO_ID_TOKEN);
-            EXIT
         END_CASE
 
         CASE (MACRO_ID_TOKEN)
             Remove_Symbol(1,Token.Token_String,false,NULL,0);
             Table_Entry = Add_Symbol (1,Token.Token_String,TEMPORARY_MACRO_ID_TOKEN);
-            EXIT
         END_CASE
 
         OTHERWISE
@@ -3076,14 +3071,12 @@ Parser::Macro *Parser::Parse_Macro()
 
     New->Macro_Filename = NULL;
 
-    EXPECT
+    EXPECT_ONE
         CASE (LEFT_PAREN_TOKEN )
-            EXIT
         END_CASE
         CASE (TEMPORARY_MACRO_ID_TOKEN)
             Error( "Can't invoke a macro while declaring its parameters");
         END_CASE
-
         OTHERWISE
             Expectation_Error ("identifier");
         END_CASE
@@ -3098,7 +3091,7 @@ Parser::Macro *Parser::Parse_Macro()
         CASE3 (MACRO_ID_TOKEN, IDENTIFIER_TOKEN, PARAMETER_ID_TOKEN)
         CASE3 (FILE_ID_TOKEN,  FUNCT_ID_TOKEN, VECTFUNCT_ID_TOKEN)
         // These have to match Parse_Declare in parse.cpp! [trf]
-        CASE4 (TNORMAL_ID_TOKEN, FINISH_ID_TOKEN, TEXTURE_ID_TOKEN, OBJECT_ID_TOKEN)
+        CASE4 (NORMAL_ID_TOKEN, FINISH_ID_TOKEN, TEXTURE_ID_TOKEN, OBJECT_ID_TOKEN)
         CASE4 (COLOUR_MAP_ID_TOKEN, TRANSFORM_ID_TOKEN, CAMERA_ID_TOKEN, PIGMENT_ID_TOKEN)
         CASE4 (SLOPE_MAP_ID_TOKEN, NORMAL_MAP_ID_TOKEN, TEXTURE_MAP_ID_TOKEN, COLOUR_ID_TOKEN)
         CASE4 (PIGMENT_MAP_ID_TOKEN, MEDIA_ID_TOKEN, STRING_ID_TOKEN, INTERIOR_ID_TOKEN)
@@ -3409,16 +3402,14 @@ Parser::POV_ARRAY *Parser::Parse_Array_Declare (void)
         New->DataPtrs[i] = NULL;
     }
 
-    EXPECT
+    EXPECT_ONE
         CASE2(LEFT_CURLY_TOKEN, OPTIONAL_TOKEN)
             UNGET
                 Parse_Initalizer(0,0,New);
-            EXIT
         END_CASE
 
         OTHERWISE
             UNGET
-            EXIT
         END_CASE
     END_EXPECT
 
@@ -3507,6 +3498,7 @@ void Parser::Parse_Fopen(void)
     New=reinterpret_cast<DATA_FILE *>(POV_MALLOC(sizeof(DATA_FILE),"user file"));
     New->In_File=NULL;
     New->Out_File=NULL;
+    New->fopenCompleted = false;
 
     GET(IDENTIFIER_TOKEN)
     Entry = Add_Symbol (1,Token.Token_String,FILE_ID_TOKEN);
@@ -3516,7 +3508,7 @@ void Parser::Parse_Fopen(void)
     fileName = ASCIItoUCS2String(asciiFileName);
     POV_FREE(asciiFileName);
 
-    EXPECT
+    EXPECT_ONE
         CASE(READ_TOKEN)
             New->R_Flag = true;
             rfile = Locate_File(fileName.c_str(), POV_File_Text_User, ign, true);
@@ -3527,7 +3519,6 @@ void Parser::Parse_Fopen(void)
 
             if(New->In_File == NULL)
                 Error ("Cannot open user file %s (read).", UCS2toASCIIString(fileName).c_str());
-            EXIT
         END_CASE
 
         CASE(WRITE_TOKEN)
@@ -3540,7 +3531,6 @@ void Parser::Parse_Fopen(void)
 
             if(New->Out_File == NULL)
                 Error ("Cannot open user file %s (write).", UCS2toASCIIString(fileName).c_str());
-            EXIT
         END_CASE
 
         CASE(APPEND_TOKEN)
@@ -3553,22 +3543,25 @@ void Parser::Parse_Fopen(void)
 
             if(New->Out_File == NULL)
                 Error ("Cannot open user file %s (append).", UCS2toASCIIString(fileName).c_str());
-            EXIT
         END_CASE
 
         OTHERWISE
             Expectation_Error("read or write");
         END_CASE
     END_EXPECT
+
+    New->fopenCompleted = true;
 }
 
 void Parser::Parse_Fclose(void)
 {
     DATA_FILE *Data;
 
-    EXPECT
+    EXPECT_ONE
         CASE(FILE_ID_TOKEN)
             Data=reinterpret_cast<DATA_FILE *>(Token.Data);
+            if (!Data->fopenCompleted)
+                Error ("#fopen statement incomplete.");
             if(Data->In_File != NULL)
                 delete Data->In_File;
             if(Data->Out_File != NULL)
@@ -3577,11 +3570,13 @@ void Parser::Parse_Fclose(void)
             Data->In_File = NULL;
             Data->Out_File = NULL;
             Remove_Symbol (1,Token.Token_String,false,NULL,0);
-            EXIT
         END_CASE
 
         OTHERWISE
-            EXIT
+            // To allow `#fclose` to be invoked on an already-closed file,
+            // we need to accept IDENTIFIER_TOKEN, but also any *_ID_TOKEN
+            // since it may be used at a less local level.
+            // (Caveat: This allows to accidentally close a file at a less local level.)
         END_CASE
     END_EXPECT
 }
@@ -3598,6 +3593,8 @@ void Parser::Parse_Read()
     GET(FILE_ID_TOKEN)
     User_File=reinterpret_cast<DATA_FILE *>(Token.Data);
     File_Id=POV_STRDUP(Token.Token_String);
+    if (!User_File->fopenCompleted)
+        Error ("#fopen statement incomplete.");
     if(User_File->In_File == NULL)
         Error("Cannot read from file %s because the file is open for writing only.", UCS2toASCIIString(UCS2String(User_File->Out_File->name())).c_str());
 
@@ -3690,7 +3687,7 @@ int Parser::Parse_Read_Value(DATA_FILE *User_File,int Previous,int *NumberPtr,vo
 
     try
     {
-        EXPECT
+        EXPECT_ONE
             CASE3 (PLUS_TOKEN,DASH_TOKEN,FLOAT_FUNCT_TOKEN)
                 UNGET
                 Val=Parse_Signed_Float();
@@ -3699,7 +3696,6 @@ int Parser::Parse_Read_Value(DATA_FILE *User_File,int Previous,int *NumberPtr,vo
                 *DataPtr   = reinterpret_cast<void *>(Create_Float());
                 *(reinterpret_cast<DBL *>(*DataPtr)) = Val;
                 Parse_Comma(); /* data file comma between 2 data items  */
-                EXIT
             END_CASE
 
             CASE (LEFT_ANGLE_TOKEN)
@@ -3756,7 +3752,6 @@ int Parser::Parse_Read_Value(DATA_FILE *User_File,int Previous,int *NumberPtr,vo
                 }
 
                 Parse_Comma(); // data file comma between 2 data items
-                EXIT
             END_CASE
 
             CASE(STRING_LITERAL_TOKEN)
@@ -3764,11 +3759,9 @@ int Parser::Parse_Read_Value(DATA_FILE *User_File,int Previous,int *NumberPtr,vo
                 Test_Redefine(Previous,NumberPtr,*DataPtr);
                 *DataPtr   = String_Literal_To_UCS2(Token.Token_String, false);
                 Parse_Comma(); // data file comma between 2 data items
-                EXIT
             END_CASE
 
             CASE (END_OF_FILE_TOKEN)
-                EXIT
             END_CASE
 
             OTHERWISE
@@ -3809,6 +3802,8 @@ void Parser::Parse_Write(void)
     GET(FILE_ID_TOKEN)
 
     User_File=reinterpret_cast<DATA_FILE *>(Token.Data);
+    if (!User_File->fopenCompleted)
+        Error ("#fopen statement incomplete.");
     if(User_File->Out_File == NULL)
         Error("Cannot write to file %s because the file is open for reading only.", UCS2toASCIIString(UCS2String(User_File->In_File->name())).c_str());
 
@@ -3818,20 +3813,20 @@ void Parser::Parse_Write(void)
         CASE5 (SINT8_TOKEN,SINT16BE_TOKEN,SINT16LE_TOKEN,SINT32BE_TOKEN,SINT32LE_TOKEN)
         CASE3 (UINT8_TOKEN,UINT16BE_TOKEN,UINT16LE_TOKEN)
             {
-                signed long val_min;
-                signed long val_max;
+                POV_INT32 val_min;
+                POV_INT32 val_max;
                 int  num_bytes;
                 bool big_endian = false;
                 switch (Token.Token_Id)
                 {
-                    case SINT8_TOKEN:                                        val_min =            -128; val_max =        127; num_bytes = 1; break; // -2^7  to 2^7-1
-                    case UINT8_TOKEN:                                        val_min =               0; val_max =        255; num_bytes = 1; break; //  0    to 2^8-1
-                    case SINT16BE_TOKEN: big_endian = true; // FALLTHROUGH
-                    case SINT16LE_TOKEN:                                     val_min =          -32768; val_max =      32767; num_bytes = 2; break; // -2^15 to 2^15-1
-                    case UINT16BE_TOKEN: big_endian = true; // FALLTHROUGH
-                    case UINT16LE_TOKEN:                                     val_min =               0; val_max =      65535; num_bytes = 2; break; //  0    to 2^16-1
-                    case SINT32BE_TOKEN: big_endian = true; // FALLTHROUGH
-                    case SINT32LE_TOKEN:                                     val_min = (-2147483647-1); val_max = 2147483647; num_bytes = 4; break; // -2^31 to 2^31-1 (using unconventional notation to avoid a warning with some compiler)
+                    case SINT8_TOKEN:    val_min = SIGNED8_MIN;  val_max = SIGNED8_MAX;    num_bytes = 1; break;
+                    case UINT8_TOKEN:    val_min = 0;            val_max = UNSIGNED8_MAX;  num_bytes = 1; break;
+                    case SINT16BE_TOKEN: val_min = SIGNED16_MIN; val_max = SIGNED16_MAX;   num_bytes = 2; big_endian = true;  break;
+                    case SINT16LE_TOKEN: val_min = SIGNED16_MIN; val_max = SIGNED16_MAX;   num_bytes = 2; big_endian = false; break;
+                    case UINT16BE_TOKEN: val_min = 0;            val_max = UNSIGNED16_MAX; num_bytes = 2; big_endian = true;  break;
+                    case UINT16LE_TOKEN: val_min = 0;            val_max = UNSIGNED16_MAX; num_bytes = 2; big_endian = false; break;
+                    case SINT32BE_TOKEN: val_min = SIGNED32_MIN; val_max = SIGNED32_MAX;   num_bytes = 4; big_endian = true;  break;
+                    case SINT32LE_TOKEN: val_min = SIGNED32_MIN; val_max = SIGNED32_MAX;   num_bytes = 4; big_endian = false; break;
                 }
                 EXPECT
                     CASE_VECTOR
@@ -4023,7 +4018,7 @@ int Parser::Parse_For_Param (char** IdentifierPtr, DBL* EndPtr, DBL* StepPtr)
         END_CASE
 
         // These have to match Parse_Declare in parse.cpp!
-        CASE4 (TNORMAL_ID_TOKEN, FINISH_ID_TOKEN, TEXTURE_ID_TOKEN, OBJECT_ID_TOKEN)
+        CASE4 (NORMAL_ID_TOKEN, FINISH_ID_TOKEN, TEXTURE_ID_TOKEN, OBJECT_ID_TOKEN)
         CASE4 (COLOUR_MAP_ID_TOKEN, TRANSFORM_ID_TOKEN, CAMERA_ID_TOKEN, PIGMENT_ID_TOKEN)
         CASE4 (SLOPE_MAP_ID_TOKEN, NORMAL_MAP_ID_TOKEN, TEXTURE_MAP_ID_TOKEN, COLOUR_ID_TOKEN)
         CASE4 (PIGMENT_MAP_ID_TOKEN, MEDIA_ID_TOKEN, STRING_ID_TOKEN, INTERIOR_ID_TOKEN)

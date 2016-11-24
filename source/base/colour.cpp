@@ -54,7 +54,7 @@ namespace pov_base
 
 #else
 
-    #error TODO!
+    #error "TODO!"
 
 #endif
 

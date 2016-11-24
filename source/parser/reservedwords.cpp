@@ -46,7 +46,7 @@ namespace pov
 
 /*
  * Here are the reserved words.  If you need to add new words,
- * be sure to declare them in reswords.h
+ * be sure to declare them in reservedwords.h
  */
 
 const RESERVED_WORD Reserved_Words[] = {
@@ -259,9 +259,9 @@ const RESERVED_WORD Reserved_Words[] = {
     { HOLLOW_TOKEN,                 "hollow" },
     { HYPERCOMPLEX_TOKEN,           "hypercomplex" },
 
+    { IF_TOKEN,                     "if" },
     { IFDEF_TOKEN,                  "ifdef" },
     { IFF_TOKEN,                    "iff" },
-    { IF_TOKEN,                     "if" },
     { IFNDEF_TOKEN,                 "ifndef" },
     { IMAGE_MAP_TOKEN,              "image_map" },
     { IMAGE_PATTERN_TOKEN,          "image_pattern" },
@@ -341,13 +341,14 @@ const RESERVED_WORD Reserved_Words[] = {
 
     { NATURAL_SPLINE_TOKEN,         "natural_spline" },
     { NEAREST_COUNT_TOKEN,          "nearest_count" },
-    { NOISE_GENERATOR_TOKEN,        "noise_generator" },
     { NO_TOKEN,                     "no" },
     { NO_BUMP_SCALE_TOKEN,          "no_bump_scale" },
     { NO_IMAGE_TOKEN,               "no_image" },
     { NO_RADIOSITY_TOKEN,           "no_radiosity" },
     { NO_REFLECTION_TOKEN,          "no_reflection" },
     { NO_SHADOW_TOKEN,              "no_shadow" },
+    { NOISE_GENERATOR_TOKEN,        "noise_generator" },
+    { NORMAL_TOKEN,                 "normal" },
     { NORMAL_INDICES_TOKEN,         "normal_indices" },
     { NORMAL_MAP_TOKEN,             "normal_map" },
     { NORMAL_VECTORS_TOKEN,         "normal_vectors" },
@@ -397,7 +398,7 @@ const RESERVED_WORD Reserved_Words[] = {
     { POLY_TOKEN,                   "poly" },
     { POLY_WAVE_TOKEN,              "poly_wave" },
     { POLYGON_TOKEN,                "polygon" },
-    { POLYNOM_TOKEN,                "polynomial" },
+    { POLYNOMIAL_TOKEN,             "polynomial" },
     { POT_TOKEN,                    "pot" },
     { POTENTIAL_TOKEN,              "potential" },
     { POW_TOKEN,                    "pow" },
@@ -460,6 +461,7 @@ const RESERVED_WORD Reserved_Words[] = {
 #if 0 // sred, sgreen and sblue tokens not enabled at present
     { SGREEN_TOKEN,                 "sgreen" },
 #endif
+    { SHADOWLESS_TOKEN,             "shadowless" },
     { SINE_WAVE_TOKEN,              "sine_wave" },
     { SIN_TOKEN,                    "sin" },
     { SINH_TOKEN,                   "sinh" },
@@ -516,12 +518,11 @@ const RESERVED_WORD Reserved_Words[] = {
     { SWITCH_TOKEN,                 "switch" },
     { SYS_TOKEN,                    "sys" },
 
-    { TANH_TOKEN,                   "tanh" },
+    { T_TOKEN,                      "t" },
     { TAN_TOKEN,                    "tan" },
+    { TANH_TOKEN,                   "tanh" },
     { TARGET_TOKEN,                 "target" },
     { TAU_TOKEN,                    "tau" },
-
-    { T_TOKEN,                      "t" },
     { TEXT_TOKEN,                   "text" },
     { TEXTURE_TOKEN,                "texture" },
     { TEXTURE_LIST_TOKEN,           "texture_list" },
@@ -616,12 +617,6 @@ const RESERVED_WORD Reserved_Words[] = {
     { USE_COLOUR_TOKEN,             "use_color" },
 
     //------------------------------------------------------------------------------
-    // Misnomers.
-
-    { TNORMAL_TOKEN,                "normal" },
-    { FILL_LIGHT_TOKEN,             "shadowless" },
-
-    //------------------------------------------------------------------------------
     // Operators.
 
     // Please keep this section neatly sorted by the token identifier name,
@@ -633,7 +628,7 @@ const RESERVED_WORD Reserved_Words[] = {
     { BACK_SLASH_TOKEN,             "\\" },
     { BAR_TOKEN,                    "|" },
     { COLON_TOKEN,                  ":" },
-    { COMMA_TOKEN,                  ", " }, // TODO REVIEW - is a reason for the trailing blank?
+    { COMMA_TOKEN,                  ", " }, // TODO REVIEW - is there a reason for the trailing blank?
     { DASH_TOKEN,                   "-" },
     { DOLLAR_TOKEN,                 "$" },
     { EQUALS_TOKEN,                 "=" },
@@ -645,14 +640,14 @@ const RESERVED_WORD Reserved_Words[] = {
     { LEFT_PAREN_TOKEN,             "(" },
     { LEFT_SQUARE_TOKEN,            "[" },
     { PERCENT_TOKEN,                "%" },
-    { PERIOD_TOKEN,                 ". (period)" }, // TODO REVIEW - is a reason for the plaintext?
+    { PERIOD_TOKEN,                 ". (period)" }, // TODO REVIEW - is there a reason for the plaintext?
     { PLUS_TOKEN,                   "+" },
     { QUESTION_TOKEN,               "?" },
     { REL_GE_TOKEN,                 ">=" },
     { REL_LE_TOKEN,                 "<=" },
     { REL_NE_TOKEN,                 "!=" },
     { RIGHT_ANGLE_TOKEN,            ">" },
-    { RIGHT_CURLY_TOKEN,            " }" }, // TODO REVIEW - is a reason for the leading blank?
+    { RIGHT_CURLY_TOKEN,            "}" },
     { RIGHT_PAREN_TOKEN,            ")" },
     { RIGHT_SQUARE_TOKEN,           "]" },
     { SEMI_COLON_TOKEN,             ";" },
@@ -689,6 +684,7 @@ const RESERVED_WORD Reserved_Words[] = {
     { MACRO_ID_TOKEN,               "macro identifier" },
     { MATERIAL_ID_TOKEN,            "material identifier" },
     { MEDIA_ID_TOKEN,               "media identifier" },
+    { NORMAL_ID_TOKEN,              "normal identifier" },
     { NORMAL_MAP_ID_TOKEN,          "normal_map identifier" },
     { OBJECT_ID_TOKEN,              "object identifier" },
     { PARAMETER_ID_TOKEN,           "parameter identifier" },
@@ -708,8 +704,6 @@ const RESERVED_WORD Reserved_Words[] = {
     { VECTOR_4D_ID_TOKEN,           "4d-vector identifier" },
     { VECTOR_ID_TOKEN,              "vector identifier" },
 
-    { TNORMAL_ID_TOKEN,             "normal identifier" },
-
     { EMPTY_ARRAY_TOKEN,            "empty array" },
     { IDENTIFIER_TOKEN,             "undeclared identifier" },
 
@@ -724,7 +718,7 @@ const RESERVED_WORD Reserved_Words[] = {
     //------------------------------------------------------------------------------
     // End of list, marked by NULL token string.
 
-    { LAST_TOKEN,                   NULL }
+    { TOKEN_COUNT,                  NULL }
 };
 
 } // end of pov namespace

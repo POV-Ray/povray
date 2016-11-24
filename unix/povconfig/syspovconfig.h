@@ -132,7 +132,7 @@ const int NULL=0;
         inline bool pov_isnan(T x) { volatile T v = x; return (v != x); }
         #define POV_ISNAN(x) pov_isnan(x)
     #else
-        #error Someone must have found an alternative way of identifying NaNs but failed to implement it here.
+        #error "Someone must have found an alternative way of identifying NaNs but failed to implement it here."
     #endif
 #endif
 
@@ -146,7 +146,7 @@ const int NULL=0;
         inline bool pov_isinf(T x) { volatile T v = std::numeric_limits<T>::max(); return std::fabs(x) > v; }
         #define POV_ISINF(x) pov_isinf(x)
     #else
-        #error Someone must have found an alternative way of identifying infinities but failed to implement it here.
+        #error "Someone must have found an alternative way of identifying infinities but failed to implement it here."
     #endif
 #endif
 
@@ -203,12 +203,12 @@ const int NULL=0;
 #if defined(_AIX)
     // IBM AIX detected.
     // Not officially supported yet; comment-out the following line to try with default POSIX settings.
-    #error IBM AIX detected, but not explicitly supported yet; proceed at your own risk.
+    #error "IBM AIX detected, but not explicitly supported yet; proceed at your own risk."
     #include "syspovconfig_posix.h"
 #elif defined(__hpux)
     // Hewlett-Packard HP-UX detected.
     // Not officially supported yet; comment-out the following line to try with default POSIX settings.
-    #error Hewlett-Packard HP-UX detected, but not explicitly supported yet; proceed at your own risk.
+    #error "Hewlett-Packard HP-UX detected, but not explicitly supported yet; proceed at your own risk."
     #include "syspovconfig_posix.h"
 #elif defined(__linux__)
     // GNU/Linux detected.
@@ -219,12 +219,12 @@ const int NULL=0;
 #elif defined(__sun) && defined(__SVR4)
     // Sun/Oracle Solaris detected.
     // Not officially supported yet; comment-out the following line to try with default POSIX settings.
-    #error Sun/Oracle Solaris detected, but not explicitly supported yet; proceed at your own risk.
+    #error "Sun/Oracle Solaris detected, but not explicitly supported yet; proceed at your own risk."
     #include "syspovconfig_posix.h"
 #elif defined(__CYGWIN__)
     // Cygwin detected.
     // Not officially supported yet; comment-out the following line to try with default POSIX settings.
-    #error Cygwin detected, but not explicitly supported yet; proceed at your own risk.
+    #error "Cygwin detected, but not explicitly supported yet; proceed at your own risk."
     #include "syspovconfig_posix.h"
 #elif defined(__unix__)
     // Some Unix other than the above detected.
@@ -234,13 +234,13 @@ const int NULL=0;
         #include "syspovconfig_bsd.h"
     #else
         // Not officially supported yet; comment-out the following line to try with default POSIX settings.
-        #error Unix detected, but flavor not identified; proceed at your own risk.
+        #error "Unix detected, but flavor not identified; proceed at your own risk."
         #include "syspovconfig_posix.h"
     #endif
 #else
     // Doesn't look like a Unix at all.
     // Comment-out the following line to try with default POSIX settings.
-    #error No Unix detected; proceed at your own risk.
+    #error "No Unix detected; proceed at your own risk."
     #include "syspovconfig_posix.h"
 #endif
 

@@ -826,24 +826,24 @@ void Lemon::CalcUV(const Vector3d& IPoint, Vector2d& Result) const
     if ((P[Z]>EPSILON)&&(P[Z]<(1.0-EPSILON)))
     {
     // when not on a face, the range 0.25 to 0.75 is used (just plain magic 25% for face, no other reason, but it makes C-Lipka happy)
-        phi = 0.25+0.5*P[Z];
+        phi = 0.75-0.5*P[Z];
     }
     else if (P[Z]>EPSILON)
     {
-    // aka P[Z] is 1, use the apex_radius, from 75% to 100% (at the very center)
-        phi = 1.0;
+    // aka P[Z] is 0, use the apex_radius, from 75% to 100% (at the very center)
+        phi = 0.0;
         if (apex_radius)
         {
-            phi = 1.0-(sqrt(len)/(apex_radius*4));
+            phi = sqrt(len)/(apex_radius*4);
         }
     }
     else
     {
-    // aka P[Z] is 0, use the base_radius, from 0% (at the very center) to 25%
-       phi = 0;
+    // aka P[Z] is 1, use the base_radius, from 0% (at the very center) to 25%
+       phi = 1.0;
        if (base_radius)
        {
-           phi = sqrt(len)/(base_radius*4);
+           phi = 1.0-(sqrt(len)/(base_radius*4));
        }
     }
 

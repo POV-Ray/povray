@@ -97,7 +97,7 @@ class SpectralBand
 #if (NUM_COLOUR_CHANNELS == 3)
             return (GetHueIntegral(wavelength+bandwidth/2) - GetHueIntegral(wavelength-bandwidth/2)) * (SPECTRAL_BANDWIDTH/bandwidth);
 #else
-            #error TODO!
+            #error "TODO!"
 #endif
         }
 

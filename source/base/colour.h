@@ -578,7 +578,7 @@ class GenericRGBColour
             mColour[BLUE]  = col.mColour[2];
         }
 #else
-        #error TODO!
+        #error "TODO!"
 #endif
 };
 
@@ -1736,7 +1736,7 @@ class GenericColour
             mColour[2] = col.blue();
         }
 #else
-        #error TODO!
+        #error "TODO!"
 #endif
 };
 
