@@ -5983,7 +5983,7 @@ DBL DensityFilePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *
                         f222 = (DBL)Data->Density8[z2 * Data->Sy * Data->Sx + y2 * Data->Sx + x2] / (DBL)UNSIGNED8_MAX;
                     }
                     else
-                        POV_ASSERT(false);
+                        POV_PATTERN_ASSERT (false);
 
                     density = ((f111 * xi + f112 * xx) * yi + (f121 * xi + f122 * xx) * yy) * (1.0 - zz) +
                               ((f211 * xi + f212 * xx) * yi + (f221 * xi + f222 * xx) * yy) * zz;
@@ -6638,7 +6638,7 @@ DBL TriangularPattern::Evaluate(const Vector3d& EPoint, const Intersection *pIse
                 answer = 3.0;
                 break;
             default:
-                POV_ASSERT(false);
+                POV_PATTERN_ASSERT (false);
                 break;
         }
     }
@@ -6701,7 +6701,7 @@ DBL JuliaPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsect
     mindist2 = a2+b2;
 
     it_max = maxIterations;
-    POV_ASSERT(it_max > 0);
+    POV_PATTERN_ASSERT (it_max > 0);
 
     for (col = 0; col < it_max; col++)
     {
@@ -6769,7 +6769,7 @@ DBL Julia3Pattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsec
     mindist2 = a2+b2;
 
     it_max = maxIterations;
-    POV_ASSERT(it_max > 0);
+    POV_PATTERN_ASSERT (it_max > 0);
 
     for (col = 0; col < it_max; col++)
     {
@@ -6837,7 +6837,7 @@ DBL Julia4Pattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsec
     mindist2 = a2+b2;
 
     it_max = maxIterations;
-    POV_ASSERT(it_max > 0);
+    POV_PATTERN_ASSERT (it_max > 0);
 
     for (col = 0; col < it_max; col++)
     {
@@ -6906,7 +6906,7 @@ DBL JuliaXPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsec
     mindist2 = a*a+b*b;
 
     it_max = maxIterations;
-    POV_ASSERT(it_max > 0);
+    POV_PATTERN_ASSERT (it_max > 0);
 
     binomial_coeff = &(gaBinomialCoefficients[(fractalExponent+1)*fractalExponent/2]);
 
@@ -7035,7 +7035,7 @@ DBL Magnet1MPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIs
     mindist2 = 10000;
 
     it_max = maxIterations;
-    POV_ASSERT(it_max > 0);
+    POV_PATTERN_ASSERT (it_max > 0);
 
     for (col = 0; col < it_max; col++)
     {
@@ -7112,7 +7112,7 @@ DBL Magnet1JPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIs
     mindist2 = a2+b2;
 
     it_max = maxIterations;
-    POV_ASSERT(it_max > 0);
+    POV_PATTERN_ASSERT (it_max > 0);
 
     for (col = 0; col < it_max; col++)
     {
@@ -7195,7 +7195,7 @@ DBL Magnet2MPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIs
     c1c2i = (c1r+c2r)*y;
 
     it_max = maxIterations;
-    POV_ASSERT(it_max > 0);
+    POV_PATTERN_ASSERT (it_max > 0);
 
     for (col = 0; col < it_max; col++)
     {
@@ -7277,7 +7277,7 @@ DBL Magnet2JPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIs
     c1c2i = (c1r+c2r)*ci;
 
     it_max = maxIterations;
-    POV_ASSERT(it_max > 0);
+    POV_PATTERN_ASSERT (it_max > 0);
 
     for (col = 0; col < it_max; col++)
     {
@@ -7356,7 +7356,7 @@ DBL Mandel2Pattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIse
     mindist2 = a2+b2;
 
     it_max = maxIterations;
-    POV_ASSERT(it_max > 0);
+    POV_PATTERN_ASSERT (it_max > 0);
 
     for (col = 0; col < it_max; col++)
     {
@@ -7423,7 +7423,7 @@ DBL Mandel3Pattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIse
     mindist2 = a2+b2;
 
     it_max = maxIterations;
-    POV_ASSERT(it_max > 0);
+    POV_PATTERN_ASSERT (it_max > 0);
 
     for (col = 0; col < it_max; col++)
     {
@@ -7490,7 +7490,7 @@ DBL Mandel4Pattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIse
     mindist2 = a2+b2;
 
     it_max = maxIterations;
-    POV_ASSERT(it_max > 0);
+    POV_PATTERN_ASSERT (it_max > 0);
 
     for (col = 0; col < it_max; col++)
     {
@@ -7558,7 +7558,7 @@ DBL MandelXPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIse
     mindist2 = a*a+b*b;
 
     it_max = maxIterations;
-    POV_ASSERT(it_max > 0);
+    POV_PATTERN_ASSERT (it_max > 0);
 
     binomial_coeff = &(gaBinomialCoefficients[(fractalExponent+1)*fractalExponent/2]);
 
@@ -8787,7 +8787,7 @@ DBL FractalPattern::ExteriorColour(int iters, DBL a, DBL b) const
         case 0:
             return exteriorFactor;
         case 1:
-            POV_ASSERT(maxIterations > 0);
+            POV_PATTERN_ASSERT (maxIterations > 0);
             return (DBL)iters / (DBL)maxIterations;
         case 2:
             return a * exteriorFactor;
