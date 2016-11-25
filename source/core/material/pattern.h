@@ -455,6 +455,22 @@ struct CheckerPattern : public DiscretePattern
     virtual unsigned int NumDiscreteBlendMapEntries() const;
 };
 
+/// Implements the `user_defined` pattern.
+///
+/// @todo   The additional member variables should possibly be encapsulated.
+///
+struct ColourFunctionPattern : public ColourPattern
+{
+    GenericScalarFunctionPtr pFn[5];
+
+    ColourFunctionPattern();
+    ColourFunctionPattern(const ColourFunctionPattern& obj);
+    virtual ~ColourFunctionPattern();
+    virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
+    virtual bool Evaluate(TransColour& result, const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const;
+    virtual bool HasTransparency() const;
+};
+
 /// Implements the `image_map` pattern.
 struct ColourImagePattern : public ColourPattern, public ImagePatternImpl
 {

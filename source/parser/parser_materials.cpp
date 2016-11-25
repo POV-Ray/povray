@@ -1022,6 +1022,16 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
                 dynamic_cast<FunctionVM*>(sceneData->functionContextFactory), Parse_Function());
         END_CASE
 
+        CASE (USER_DEFINED_TOKEN)
+            if ((TPat_Type != kBlendMapType_Pigment) || (TPat_Type != kBlendMapType_Density))
+                Only_In("user_defined", "pigment or density");
+            New->Type = COLOUR_PATTERN;
+            New->pattern = PatternPtr(new ColourFunctionPattern());
+            Parse_Begin();
+            Parse_FunctionOrContentList (dynamic_cast<ColourFunctionPattern*>(New->pattern.get())->pFn, 5, false);
+            Parse_End();
+        END_CASE
+
         CASE(PIGMENT_PATTERN_TOKEN)
             Parse_Begin();
             New->Type = GENERIC_PATTERN;
@@ -4796,6 +4806,10 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
             New->Type = GENERIC_PATTERN;
             New->pattern = PatternPtr(new FunctionPattern());
             dynamic_cast<FunctionPattern*>(New->pattern.get())->pFn = new FunctionVM::CustomFunction(dynamic_cast<FunctionVM*>(sceneData->functionContextFactory), Parse_Function());
+        END_CASE
+
+        CASE (USER_DEFINED_TOKEN)
+            Not_With("user_defined", "function pattern");
         END_CASE
 
         CASE(PIGMENT_PATTERN_TOKEN)

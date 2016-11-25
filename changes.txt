@@ -49,6 +49,9 @@ Prior to the release of 3.7.1, the following items still need urgent attention:
 New Features
 ------------
 
+- A new special pigment pattern, `user_defined`, has been added to define the
+  pigment colour directly in terms of a set of functions.
+
 - A new pattern, `potential`, has been added to define a pattern based on the
   potential field of a blob or isosurface object.
 

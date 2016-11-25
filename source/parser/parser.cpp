@@ -8377,6 +8377,16 @@ bool Parser::Parse_Comma (void)
         return true;
 }
 
+//******************************************************************************
+
+bool Parser::Peek_Token (TOKEN tokenId)
+{
+    Get_Token();
+    bool tokenMatches = ((Token.Token_Id    == tokenId) ||
+                         (Token.Function_Id == tokenId));
+    Unget_Token();
+    return tokenMatches;
+}
 
 
 /*****************************************************************************

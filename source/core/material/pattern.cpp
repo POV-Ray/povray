@@ -400,6 +400,65 @@ ColourBlendMapConstPtr CubicPattern::GetDefaultBlendMap() const { return gpDefau
 unsigned int CubicPattern::NumDiscreteBlendMapEntries() const { return 6; }
 
 
+ColourFunctionPattern::ColourFunctionPattern()
+{
+    for (int iChannel = 0; iChannel < 5; ++iChannel)
+    {
+        pFn[iChannel] = NULL;
+    }
+}
+
+ColourFunctionPattern::ColourFunctionPattern(const ColourFunctionPattern& obj) :
+    ColourPattern(obj)
+{
+    for (int iChannel = 0; iChannel < 5; ++iChannel)
+    {
+        if (obj.pFn[iChannel])
+            pFn[iChannel] = obj.pFn[iChannel]->Clone();
+        else
+            pFn[iChannel] = NULL;
+    }
+}
+
+ColourFunctionPattern::~ColourFunctionPattern()
+{
+    for (int iChannel = 0; iChannel < 5; ++iChannel)
+    {
+        if (pFn[iChannel])
+            delete pFn[iChannel];
+    }
+}
+
+bool ColourFunctionPattern::Evaluate(TransColour& result, const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
+{
+    for (int iChannel = 0; iChannel < 5; ++iChannel)
+    {
+        ColourChannel channelValue = 0.0;
+        if (pFn[iChannel])
+        {
+            GenericFunctionContextPtr pCtx = pFn[iChannel]->AcquireContext(pThread);
+            pFn[iChannel]->InitArguments(pCtx);
+            for (int iDimension = 0; iDimension < 3; ++iDimension)
+                pFn[iChannel]->PushArgument(pCtx, EPoint[iDimension]);
+            channelValue = pFn[iChannel]->Execute(pCtx);
+            pFn[iChannel]->ReleaseContext(pCtx);
+        }
+        switch (iChannel)
+        {
+        case 3:  result.filter()           = channelValue; break;
+        case 4:  result.transm()           = channelValue; break;
+        default: result.colour()[iChannel] = channelValue; break;
+        }
+    }
+    return true;
+}
+
+bool ColourFunctionPattern::HasTransparency() const
+{
+    return (pFn[3] || pFn[4]);
+}
+
+
 bool ColourImagePattern::Evaluate(TransColour& result, const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
     // TODO ALPHA - the caller does expect non-premultiplied data, but maybe he could profit from premultiplied data?

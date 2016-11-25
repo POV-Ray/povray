@@ -312,6 +312,7 @@ class Parser : public SceneTask
         bool Parse_Begin (bool mandatory = true);
         void Parse_End (void);
         bool Parse_Comma (void);
+        bool Peek_Token (TOKEN tokenId);
         void Parse_Semi_Colon (bool force_semicolon);
         void Destroy_Frame (void);
         void MAError (const char *str, long size);
@@ -446,7 +447,7 @@ class Parser : public SceneTask
         FUNCTION_PTR Parse_Function(void);
         FUNCTION_PTR Parse_FunctionContent(void);
         FUNCTION_PTR Parse_FunctionOrContent(void);
-        void Parse_FunctionOrContentList(GenericScalarFunctionPtr* apFn, unsigned int count);
+        void Parse_FunctionOrContentList(GenericScalarFunctionPtr* apFn, unsigned int count, bool mandatory = true);
         FUNCTION_PTR Parse_DeclareFunction(int *token_id, const char *fn_name, bool is_local);
 
         // parsestr.h/parsestr.cpp
