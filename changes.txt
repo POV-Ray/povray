@@ -49,6 +49,9 @@ Prior to the release of 3.7.1, the following items still need urgent attention:
 New Features
 ------------
 
+- A new finish parameter, `use_alpha`, has been added to suppress highlights
+  and reflections depending on pigment transparency.
+
 - Array elements no longer have to be of the same type.
 
 - Support for variable-size arrays has been added.
