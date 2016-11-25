@@ -1023,7 +1023,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
         END_CASE
 
         CASE (USER_DEFINED_TOKEN)
-            if ((TPat_Type != kBlendMapType_Pigment) || (TPat_Type != kBlendMapType_Density))
+            if ((TPat_Type != kBlendMapType_Pigment) && (TPat_Type != kBlendMapType_Density))
                 Only_In("user_defined", "pigment or density");
             New->Type = COLOUR_PATTERN;
             New->pattern = PatternPtr(new ColourFunctionPattern());
