@@ -49,6 +49,16 @@ Prior to the release of 3.7.1, the following items still need urgent attention:
 New Features
 ------------
 
+- Array elements no longer have to be of the same type.
+
+- Support for variable-size arrays has been added.
+
+- A new data container, `dictionary`, has been added to support structured
+  storage of data.
+
+- Pseudo-dictionaries `local` and `global` have been added, allowing to
+  specifically access local or global identifiers, respectively.
+
 - A new special pigment pattern, `user_defined`, has been added to define the
   pigment colour directly in terms of a set of functions.
 
@@ -88,9 +98,6 @@ New Features
 - The `#declare` and `#local` syntax has been extended to support tuple-style
   assignments. The main purpose is to allow macros to return a set of values
   rather than just a single one.
-
-- `local()` and `global()` pseudo-functions have been added to specifically
-  refer to a local or global identifier, respectively.
 
 - The macro syntax has been extended to allow for optional parameters.
 

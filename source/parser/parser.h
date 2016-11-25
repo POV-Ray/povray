@@ -86,6 +86,12 @@ const int SYM_TABLE_SIZE = 257;
 typedef struct Sym_Table_Entry SYM_ENTRY;
 typedef unsigned short SymTableEntryRefCount;
 
+// Special symbol tables
+enum {
+    SYM_TABLE_RESERVED = 0,        // reserved words
+    SYM_TABLE_GLOBAL,              // identifiers declared using #declare (or #local in top-level file), #function, #macro, etc.
+};
+
 /// Structure holding information about a symbol
 struct Sym_Table_Entry
 {
@@ -196,6 +202,10 @@ struct BetaFlags
 
 class Parser : public SceneTask
 {
+    private:
+
+        struct SYM_TABLE;
+
     public:
 
         class DebugTextStreamBuffer : public TextStreamBuffer
@@ -221,7 +231,7 @@ class Parser : public SceneTask
             TOKEN Function_Id;                              ///< token type ID, in case Token_Id is an identifier ID
             pov_base::ITextStream::FilePos Token_File_Pos;  ///< location of this token in the scene or include file (line number & file position)
             int Token_Col_No;                               ///< location of this token in the scene or include file (column)
-            int Table_Index;
+            int context;                                    ///< context the token is local to (i.e., table index)
             char *Token_String;                             ///< reference to token value (if it is a string literal) or character sequence comprising the token
             DBL Token_Float;                                ///< token value (if it is a float literal)
             int Unget_Token, End_Of_File;
@@ -229,7 +239,11 @@ class Parser : public SceneTask
             void *Data;                                     ///< reference to token value (if it is a non-float identifier)
             int *NumberPtr;
             void **DataPtr;
-            bool is_array_elem;                             ///< true if token is actually an array element reference
+            SYM_TABLE *table;                               ///< table or dictionary the token references an element of
+            bool is_array_elem          : 1;                ///< true if token is actually an array element reference
+            bool is_mixed_array_elem    : 1;                ///< true if token is actually a mixed-type array element reference
+            bool is_dictionary_elem     : 1;                ///< true if token is actually a dictionary element reference
+            bool freeString             : 1;                ///< true if Token_String must be freed before being assigned a new value
         };
 
         struct LValue
@@ -266,17 +280,18 @@ class Parser : public SceneTask
 
         struct POV_ARRAY
         {
-            int Dims, Type, Total;
+            int Dims, Type;
             int Sizes[5];
             int Mags[5];
-            void **DataPtrs;
+            vector<void*> DataPtrs;
+            vector<int> Types;
+            bool resizable;
         };
 
         struct POV_PARAM
         {
             int *NumberPtr;
             void **DataPtr;
-            int Table_Index;
         };
 
         struct DATA_FILE
@@ -285,13 +300,6 @@ class Parser : public SceneTask
             pov_base::OTextStream *Out_File;
             bool fopenCompleted : 1; ///< `false` if still busy parsing `#fopen', `true` otherwise.
             bool R_Flag         : 1;
-        };
-
-        enum IdentifierMode
-        {
-            kIdentifierModeUndefined,
-            kIdentifierModeLocal,
-            kIdentifierModeGlobal,
         };
 
         // constructor
@@ -331,6 +339,7 @@ class Parser : public SceneTask
         void Parse_Declare (bool is_local, bool after_hash);
         void Parse_Matrix (MATRIX Matrix);
         void Destroy_Ident_Data (void *Data, int Type);
+        bool PassParameterByReference (int oldTableIndex);
         bool Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENTRY *sym, bool ParFlag, bool SemiFlag, bool is_local, bool allow_redefine, bool allowUndefined, int old_table_index);
         const char *Get_Token_String (TOKEN Token_Id);
         void Test_Redefine(TOKEN Previous, TOKEN *NumberPtr, void *Data, bool allow_redefine = true);
@@ -372,12 +381,15 @@ class Parser : public SceneTask
         void pre_init_tokenizer (void);
         void Initialize_Tokenizer (void);
         void Terminate_Tokenizer (void);
+        SYM_ENTRY *Add_Symbol (SYM_TABLE *table, const char *Name,TOKEN Number);
         SYM_ENTRY *Add_Symbol (int Index,const char *Name,TOKEN Number);
         POV_ARRAY *Parse_Array_Declare (void);
-        SYM_ENTRY *Create_Entry (int Index,const char *Name,TOKEN Number);
+        SYM_TABLE *Parse_Dictionary_Declare();
+        SYM_ENTRY *Create_Entry (const char *Name, TOKEN Number, bool copyName);
+        SYM_ENTRY *Copy_Entry (const SYM_ENTRY *);
         void Acquire_Entry_Reference (SYM_ENTRY *Entry);
-        void Release_Entry_Reference (int Index, SYM_ENTRY *Entry);
-        SYM_ENTRY *Destroy_Entry (int Index,SYM_ENTRY *Entry);
+        void Release_Entry_Reference (SYM_TABLE *table, SYM_ENTRY *Entry);
+        SYM_ENTRY *Destroy_Entry (SYM_ENTRY *Entry, bool destroyName);
         bool Parse_Ifdef_Param ();
         int Parse_For_Param (char**, DBL*, DBL*);
 
@@ -525,6 +537,7 @@ class Parser : public SceneTask
         struct SYM_TABLE
         {
             SYM_ENTRY *Table[SYM_TABLE_SIZE];
+            bool namesAreCopies;
         };
 
         SYM_TABLE *Tables[MAX_NUMBER_OF_TABLES];
@@ -578,8 +591,7 @@ class Parser : public SceneTask
 
         CS_ENTRY *Cond_Stack;
         int CS_Index;
-        bool Skipping, Inside_Ifdef, Inside_MacroDef, Parsing_Directive;
-        IdentifierMode Inside_IdentFn;
+        bool Skipping, Inside_Ifdef, Inside_MacroDef, Parsing_Directive, parseRawIdentifiers;
 
         int Got_EOF; // WARNING: Changes to the use of this variable are very dangerous as it is used in many places assuming certain non-obvious side effects! [trf]
 
@@ -681,20 +693,27 @@ class Parser : public SceneTask
         inline void End_String_Fast (void);
         bool Read_Float (void);
         void Read_Symbol (void);
-        SYM_ENTRY *Find_Symbol (int Index, const char *s);
+        SYM_ENTRY *Find_Symbol (const SYM_TABLE *table, const char *s, int hash);
+        SYM_ENTRY *Find_Symbol (const SYM_TABLE *table, const char *s);
+        SYM_ENTRY *Find_Symbol (int index, const char *s);
         SYM_ENTRY *Find_Symbol (const char *s);
         void Skip_Tokens (COND_TYPE cond);
         void Break (void);
 
         int get_hash_value (const char *s);
-        inline void Write_Token (TOKEN Token_Id, int col);
+        inline void Write_Token (TOKEN Token_Id, int col, SYM_TABLE *table = NULL);
         void Destroy_Table (int index);
         void init_sym_tables (void);
         void Add_Sym_Table ();
+        SYM_TABLE *Create_Sym_Table (bool copyNames);
+        void Destroy_Sym_Table (SYM_TABLE *);
+        SYM_TABLE *Copy_Sym_Table (const SYM_TABLE *);
+        void Remove_Symbol (SYM_TABLE *table, const char *Name, bool is_array_elem, void **DataPtr, int ttype);
         void Remove_Symbol (int Index, const char *Name, bool is_array_elem, void **DataPtr, int ttype);
         Macro *Parse_Macro(void);
         void Invoke_Macro(void);
         void Return_From_Macro(void);
+        void Add_Entry (SYM_TABLE *table, SYM_ENTRY *Table_Entry);
         void Add_Entry (int Index,SYM_ENTRY *Table_Entry);
         void Parse_Initalizer (int Sub, int Base, POV_ARRAY *a);
 
