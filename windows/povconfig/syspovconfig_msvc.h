@@ -40,7 +40,7 @@
 #define POVRAY_WINDOWS_SYSPOVCONFIG_MSVC_H
 
 #if _MSC_VER < 1400
-  #error minimum Visual C++ version supported is 14.0 (supplied with VS 2005)
+  #error "minimum Visual C++ version supported is 14.0 (supplied with VS 2005)"
 #endif
 
 #undef TRY_OPTIMIZED_NOISE
@@ -63,7 +63,7 @@
 
 #ifdef __INTEL_COMPILER
 
-  #error Intel C++ compiler currently not supported.
+  #error "Intel C++ compiler currently not supported."
   // Compiling POV-Ray for Windows using the Intel C++ compiler has not been tested for a long time, and the following
   // settings are probably outdated. You may proceed at your own risk by removing the above line, but be prepared to run
   // into problems further down the road.
@@ -71,7 +71,7 @@
   #pragma warning(disable : 1899) /* multicharacter character literal */
 
   #if __INTEL_COMPILER < 1010
-    #error minimum Intel C++ version supported is 10.1
+    #error "minimum Intel C++ version supported is 10.1"
   #endif
 
   #if __INTEL_COMPILER >= 1000 && __INTEL_COMPILER < 1100
@@ -81,7 +81,7 @@
     #define COMPILER_VER                      ".icl11"
     #define METADATA_COMPILER_STRING          "icl 11"
   #else
-    #error Please update syspovconfig_msvc.h to include this version of ICL
+    #error "Please update syspovconfig_msvc.h to include this version of ICL"
   #endif
   #define COMPILER_NAME                       "Intel C++ Compiler"
   #define COMPILER_VERSION                    __INTEL_COMPILER
@@ -133,14 +133,14 @@
     // MS Visual C++ 2012 (aka 11.0)
     #define COMPILER_VER                      ".msvc11"
     #define METADATA_COMPILER_STRING          "msvc 11"
-    #error Please update syspovconfig_msvc.h to include this version of MSVC
+    #error "Please update syspovconfig_msvc.h to include this version of MSVC"
     // The following settings are just guesswork, and have never been tested:
     #define NEED_INVHYP
   #elif _MSC_VER >= 1800 && _MSC_VER < 1900
     // MS Visual C++ 2013 (aka 12.0)
     #define COMPILER_VER                      ".msvc12"
     #define METADATA_COMPILER_STRING          "msvc 12"
-    #error Please update syspovconfig_msvc.h to include this version of MSVC
+    #error "Please update syspovconfig_msvc.h to include this version of MSVC"
     // The following settings are just guesswork, and have never been tested:
     // (no special settings)
   // NB: The Microsoft Visual Studio developers seem to have skipped internal version number 13 entirely.
@@ -149,7 +149,7 @@
     #define COMPILER_VER                      ".msvc14"
     #define METADATA_COMPILER_STRING          "msvc 14"
   #else
-    #error Please update syspovconfig_msvc.h to include this version of MSVC
+    #error "Please update syspovconfig_msvc.h to include this version of MSVC"
   #endif
   #define COMPILER_NAME                       "Microsoft Visual C++"
   #define COMPILER_VERSION                    _MSC_VER
@@ -160,7 +160,7 @@
   #if defined(_M_X64)
     #define METADATA_PLATFORM_STRING        "x86_64-pc-win"
   #else
-    #error Please update msvc.h to include this 64-bit architecture
+    #error "Please update msvc.h to include this 64-bit architecture"
   #endif
 #elif defined _WIN32
   #if !defined(METADATA_X86_FPU_STRING)
@@ -172,10 +172,10 @@
       #elif (_M_IX86_FP == 2)
         #define METADATA_X86_FPU_STRING     "-sse2"
       #else
-        #error Please update msvc.h to include this x86 FPU generation
+        #error "Please update msvc.h to include this x86 FPU generation"
       #endif
     #else
-      #error Please update msvc.h to detect x86 FPU generation for your compiler
+      #error "Please update msvc.h to detect x86 FPU generation for your compiler"
     #endif
   #endif
   #if defined(_M_IX86)
@@ -190,10 +190,10 @@
     #elif (_M_IX86 == 700)
       #define METADATA_PLATFORM_STRING      "i786-pc-win" METADATA_X86_FPU_STRING
     #else
-      #error Please update msvc.h to include this x86 CPU generation
+      #error "Please update msvc.h to include this x86 CPU generation"
     #endif
   #else
-    #error Please update msvc.h to include this 32-bit architecture
+    #error "Please update msvc.h to include this 32-bit architecture"
   #endif
 #endif
 

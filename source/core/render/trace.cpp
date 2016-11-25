@@ -150,10 +150,8 @@ double Trace::TraceRay(Ray& ray, MathColour& colour, ColourChannel& transm, COLC
     // Check if we're busy shooting too many radiosity sample rays at an unimportant object
     if (ray.GetTicket().radiosityImportanceQueried >= 0.0)
     {
-        if (found)
-        {
-            ray.GetTicket().radiosityImportanceFound = bestisect.Object->RadiosityImportance(sceneData->radiositySettings.defaultImportance);
-        }
+        if (found && bestisect.Object->RadiosityImportanceSet)
+            ray.GetTicket().radiosityImportanceFound = bestisect.Object->RadiosityImportance;
         else
             ray.GetTicket().radiosityImportanceFound = sceneData->radiositySettings.defaultImportance;
 
@@ -860,6 +858,9 @@ void Trace::ComputeLightedTexture(MathColour& resultColour, ColourChannel& resul
             else
                 att = layCol.Opacity();
 
+            if (layer->Finish->AlphaKnockout)
+                listWNRX->back().reflec *= att;
+
             // now compute the BRDF or BSSRDF contribution
             tmpCol.Clear();
 
@@ -964,7 +965,12 @@ void Trace::ComputeLightedTexture(MathColour& resultColour, ColourChannel& resul
             // (We don't need to do this for (non-radiosity) rays during pretrace, as it does not affect radiosity sampling)
             if(!ray.IsPretraceRay())
             {
-                if((layer->Finish->Diffuse != 0.0) || (layer->Finish->DiffuseBack != 0.0) || (layer->Finish->Specular != 0.0) || (layer->Finish->Phong != 0.0))
+                if (((layer->Finish->Diffuse     != 0.0) ||
+                     (layer->Finish->DiffuseBack != 0.0) ||
+                     (layer->Finish->Specular    != 0.0) ||
+                     (layer->Finish->Phong       != 0.0)) &&
+                    ((!layer->Finish->AlphaKnockout) ||
+                     (att != 0.0)))
                 {
                     MathColour classicContribution;
 
@@ -1643,6 +1649,8 @@ void Trace::ComputeOneDiffuseLight(const LightSource &lightsource, const Vector3
             // surface-only diffuse term, they should use layered textures.
             ComputeDiffuseColour(finish, lightsourceray.Direction, eye.Direction, layer_normal, tmpCol, lightcolour, layer_pigment_colour, relativeIor, attenuation, backside);
 
+        MathColour tempLightColour = (finish->AlphaKnockout ? lightcolour * attenuation : lightcolour);
+
         // NK rad - don't compute highlights for radiosity gather rays, since this causes
         // problems with colors being far too bright
         // don't compute highlights for diffuse backside illumination
@@ -1650,11 +1658,13 @@ void Trace::ComputeOneDiffuseLight(const LightSource &lightsource, const Vector3
         {
             if(finish->Phong > 0.0)
             {
-                ComputePhongColour(finish, lightsourceray.Direction, eye.Direction, layer_normal, tmpCol, lightcolour, layer_pigment_colour, relativeIor);
+                ComputePhongColour (finish, lightsourceray.Direction, eye.Direction, layer_normal, tmpCol,
+                                    tempLightColour, layer_pigment_colour, relativeIor);
             }
 
             if(finish->Specular > 0.0)
-                ComputeSpecularColour(finish, lightsourceray.Direction, -eye.Direction, layer_normal, tmpCol, lightcolour, layer_pigment_colour, relativeIor);
+                ComputeSpecularColour (finish, lightsourceray.Direction, -eye.Direction, layer_normal, tmpCol,
+                                       tempLightColour, layer_pigment_colour, relativeIor);
         }
 
         if(finish->Irid > 0.0)

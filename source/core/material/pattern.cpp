@@ -281,6 +281,42 @@ ColourBlendMapConstPtr BasicPattern::GetDefaultBlendMap() const { return gpDefau
 bool BasicPattern::HasSpecialTurbulenceHandling() const { return false; }
 
 
+ImagePatternImpl::ImagePatternImpl() :
+    pImage(NULL)
+{}
+
+ImagePatternImpl::ImagePatternImpl(const ImagePatternImpl& obj) :
+    pImage(obj.pImage ? Copy_Image(obj.pImage) : NULL)
+{}
+
+ImagePatternImpl::~ImagePatternImpl()
+{
+    if (pImage)
+        Destroy_Image(pImage);
+}
+
+
+ColourPattern::ColourPattern() :
+    BasicPattern()
+{}
+
+ColourPattern::ColourPattern(const ColourPattern& obj) :
+    BasicPattern(obj)
+{}
+
+DBL ColourPattern::Evaluate(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
+{
+    TransColour colour;
+    if (Evaluate(colour, EPoint, pIsection, pRay, pThread))
+        return colour.Greyscale();
+    else
+        return 0.0;
+}
+
+unsigned int ColourPattern::NumDiscreteBlendMapEntries() const { return 0; }
+bool ColourPattern::CanMap() const { return false; }
+
+
 ContinuousPattern::ContinuousPattern() :
     BasicPattern(),
     waveType(kWaveType_Ramp),
@@ -338,9 +374,16 @@ DBL ContinuousPattern::Evaluate(const Vector3d& EPoint, const Intersection *pIse
 }
 
 unsigned int ContinuousPattern::NumDiscreteBlendMapEntries() const { return 0; }
+bool ContinuousPattern::CanMap() const { return true; }
 
+bool DiscretePattern::CanMap() const { return false; }
 
 unsigned int PlainPattern::NumDiscreteBlendMapEntries() const { return 1; }
+
+unsigned int AveragePattern::NumDiscreteBlendMapEntries() const { return 0; }
+bool AveragePattern::CanMap() const { return true; }
+DBL AveragePattern::Evaluate(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const { return 0.0; }
+bool AveragePattern::HasSpecialTurbulenceHandling() const { return false; }
 
 
 ColourBlendMapConstPtr AgatePattern::GetDefaultBlendMap() const { return gpDefaultBlendMap_Agate; }
@@ -355,6 +398,94 @@ unsigned int CheckerPattern::NumDiscreteBlendMapEntries() const { return 2; }
 
 ColourBlendMapConstPtr CubicPattern::GetDefaultBlendMap() const { return gpDefaultBlendMap_Cubic; }
 unsigned int CubicPattern::NumDiscreteBlendMapEntries() const { return 6; }
+
+
+ColourFunctionPattern::ColourFunctionPattern()
+{
+    for (int iChannel = 0; iChannel < 5; ++iChannel)
+    {
+        pFn[iChannel] = NULL;
+    }
+}
+
+ColourFunctionPattern::ColourFunctionPattern(const ColourFunctionPattern& obj) :
+    ColourPattern(obj)
+{
+    for (int iChannel = 0; iChannel < 5; ++iChannel)
+    {
+        if (obj.pFn[iChannel])
+            pFn[iChannel] = obj.pFn[iChannel]->Clone();
+        else
+            pFn[iChannel] = NULL;
+    }
+}
+
+ColourFunctionPattern::~ColourFunctionPattern()
+{
+    for (int iChannel = 0; iChannel < 5; ++iChannel)
+    {
+        if (pFn[iChannel])
+            delete pFn[iChannel];
+    }
+}
+
+bool ColourFunctionPattern::Evaluate(TransColour& result, const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
+{
+    for (int iChannel = 0; iChannel < 5; ++iChannel)
+    {
+        ColourChannel channelValue = 0.0;
+        if (pFn[iChannel])
+        {
+            GenericFunctionContextPtr pCtx = pFn[iChannel]->AcquireContext(pThread);
+            pFn[iChannel]->InitArguments(pCtx);
+            for (int iDimension = 0; iDimension < 3; ++iDimension)
+                pFn[iChannel]->PushArgument(pCtx, EPoint[iDimension]);
+            channelValue = pFn[iChannel]->Execute(pCtx);
+            pFn[iChannel]->ReleaseContext(pCtx);
+        }
+        switch (iChannel)
+        {
+        case 3:  result.filter()           = channelValue; break;
+        case 4:  result.transm()           = channelValue; break;
+        default: result.colour()[iChannel] = channelValue; break;
+        }
+    }
+    return true;
+}
+
+bool ColourFunctionPattern::HasTransparency() const
+{
+    return (pFn[3] || pFn[4]);
+}
+
+
+bool ColourImagePattern::Evaluate(TransColour& result, const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
+{
+    // TODO ALPHA - the caller does expect non-premultiplied data, but maybe he could profit from premultiplied data?
+
+    int reg_number;
+    DBL xcoor = 0.0, ycoor = 0.0;
+
+    // If outside map coverage area, return clear
+
+    if (map_pos(EPoint, this, &xcoor, &ycoor))
+    {
+        result = ToTransColour(RGBFTColour(1.0, 1.0, 1.0, 0.0, 1.0));
+        return false;
+    }
+    else
+    {
+        RGBFTColour rgbft;
+        image_colour_at(pImage, xcoor, ycoor, rgbft, &reg_number, false);
+        result = ToTransColour(rgbft);
+        return true;
+    }
+}
+
+bool ColourImagePattern::HasTransparency() const
+{
+    return (!pImage || pImage->Once_Flag || !is_image_opaque(pImage));
+}
 
 
 DensityFilePattern::DensityFilePattern() :
@@ -401,24 +532,6 @@ FunctionPattern::~FunctionPattern()
 ColourBlendMapConstPtr HexagonPattern::GetDefaultBlendMap() const { return gpDefaultBlendMap_Hexagon; }
 unsigned int HexagonPattern::NumDiscreteBlendMapEntries() const { return 3; }
 
-
-ImagePattern::ImagePattern() :
-    pImage(NULL)
-{}
-
-ImagePattern::ImagePattern(const ImagePattern& obj) :
-    ContinuousPattern(obj),
-    pImage(NULL)
-{
-    if (obj.pImage)
-        pImage = Copy_Image(obj.pImage);
-}
-
-ImagePattern::~ImagePattern()
-{
-    if (pImage)
-        Destroy_Image(pImage);
-}
 
 DBL ImagePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
@@ -3303,8 +3416,8 @@ DBL PavementPattern::tetragonal (const Vector3d& EPoint) const
                 case 6:
                 case 8:
                 case 9:
-                    xv %= 6; if (xv < 0) { xv += 6; }
-                    zv &= 0x01;
+                    setWrapInt (xv, 6);
+                    setWrapInt (zv, 2);
                     lng = 6;
                     break;
                 case 4:
@@ -3312,17 +3425,17 @@ DBL PavementPattern::tetragonal (const Vector3d& EPoint) const
                 case 19:
                 case 20:
                     lng = 0;
-                    zv %= 6; if (zv <0) { zv += 6; }
+                    setWrapInt (zv, 6);
                     xv += 5*zv;
-                    xv %= 6; if (xv <0) { xv += 6; }
+                    setWrapInt (xv, 6);
                     break;
                 case 11:
                 case 18:
                 case 27:
                     lng = 0;
-                    zv %= 6; if (zv <0) { zv += 6; }
+                    setWrapInt (zv, 6);
                     xv += zv;
-                    xv %= 6; if (xv <0) { xv += 6; }
+                    setWrapInt (xv, 6);
                     break;
                 case 10:
                 case 12:
@@ -3332,71 +3445,71 @@ DBL PavementPattern::tetragonal (const Vector3d& EPoint) const
                 case 25:
                 case 26:
                     lng = 4;
-                    xv &= 0x03;
-                    zv %= 3; if (zv<0) { zv += 3; }
+                    setWrapInt (xv, 4);
+                    setWrapInt (zv, 3);
                     break;
                 case 13:
                 case 32:
                     lng = 3;
-                    zv &= 0x03;
-                    xv %= 3; if (xv < 0) { xv += 3; }
+                    setWrapInt (zv, 4);
+                    setWrapInt (xv, 3);
                     break;
                 case 14:
                     lng = 3;
-                    zv %= 6; if (zv < 0) { zv += 6; }
+                    setWrapInt (zv, 6);
                     xv += 2 * (zv/2);
-                    zv &= 0x01;
-                    xv %= 3; if (xv < 0) { xv += 3; }
+                    setWrapInt (zv, 2);
+                    setWrapInt (xv, 3);
                     break;
                 case 15:
                     lng = 2;
-                    xv %= 6; if (xv < 0) { xv+= 6; }
+                    setWrapInt (xv, 6);
                     zv += (xv/2);
-                    xv &= 0x01;
-                    zv %= 3; if (zv<0) { zv += 3; }
+                    setWrapInt (xv, 2);
+                    setWrapInt (zv, 3);
                     break;
                 case 16:
                 case 17:
                     lng = 6;
-                    zv %= 12; if (zv <0) { zv += 12; }
+                    setWrapInt (zv, 12);
                     xv += zv/2;
-                    zv &= 0x01;
-                    xv %= 6; if (xv < 0) { xv += 6; }
+                    setWrapInt (zv, 2);
+                    setWrapInt (xv, 6);
                     break;
                 case 23:
                 case 28:
                     lng = 6;
-                    zv %= 12; if (zv <0) { zv += 12; }
+                    setWrapInt (zv, 12);
                     xv += 4* (zv/2);
-                    zv &= 0x01;
-                    xv %= 6; if (xv < 0) { xv += 6; }
+                    setWrapInt (zv, 2);
+                    setWrapInt (xv, 6);
                     break;
                 case 29:
                 case 30:
                     lng = 6;
-                    zv &= 0x03;
+                    setWrapInt (zv, 4);
                     xv += 3* (zv/2);
-                    zv &= 0x01;
-                    xv %= 6; if (xv < 0) { xv += 6; }
+                    setWrapInt (zv, 2);
+                    setWrapInt (xv, 6);
                     break;
                 case 31:
                     lng = 0;
-                    zv %= 3; if (zv <0) { zv += 3; }
+                    setWrapInt (zv, 3);
                     xv += 4* zv;
-                    xv %= 6; if (xv < 0) { xv += 6; }
+                    setWrapInt (xv, 6);
                     break;
                 case 33:
                     lng = 0;
-                    zv %= 12; if (zv < 0) { zv += 12; }
+                    setWrapInt (zv, 12);
                     xv += 7*zv;
-                    xv %= 12; if (xv < 0) { xv += 12; }
+                    setWrapInt (xv, 12);
                     break;
                 case 34:
                     lng = 4;
-                    zv %= 6; if (zv<0) { zv += 6;}
+                    setWrapInt (zv, 6);
                     xv += 2 * (zv/3);
-                    xv &= 0x03;
-                    zv %= 3; if (zv<0) { zv += 3;}
+                    setWrapInt (xv, 4);
+                    setWrapInt (zv, 3);
                     break;
             }
             how = hexagon[Number-1][xv+zv*lng];
@@ -3406,69 +3519,69 @@ DBL PavementPattern::tetragonal (const Vector3d& EPoint) const
             {
                 case 0:
                 case 1:
-                    xv %= 5; if (xv <0) { xv += 5; }
-                    zv &= 0x01;
+                    setWrapInt (xv, 5);
+                    setWrapInt (zv, 2);
                     break;
                 case 2:
                 case 9:
-                    zv %= 10; if (zv <0) { zv += 10; }
+                    setWrapInt (zv, 10);
                     xv += 3 * (zv/2);
-                    xv %= 5; if (xv <0) { xv += 5; }
-                    zv &= 0x01;
+                    setWrapInt (xv, 5);
+                    setWrapInt (zv, 2);
                     break;
                 case 10:
-                    zv %= 10; if (zv <0) { zv += 10; }
+                    setWrapInt (zv, 10);
                     xv += 4*(zv/2);
-                    xv %= 5; if (xv <0) { xv += 5; }
-                    zv &= 0x01;
+                    setWrapInt (xv, 5);
+                    setWrapInt (zv, 2);
                     break;
                 case 3:
-                    zv %= 5; if (zv <0) { zv += 5; }
+                    setWrapInt (zv, 5);
                     xv += 2*zv;
-                    xv %= 5; if (xv <0) { xv += 5; }
-                    zv = 0x0;
+                    setWrapInt (xv, 5);
+                    zv = 0;
                     break;
                 case 4:
-                    zv %= 5; if (zv <0) { zv += 5; }
+                    setWrapInt (zv, 5);
                     xv += 2 * zv;
-                    xv %= 5; if (xv <0) { xv += 5; }
-                    zv = 0x00;
+                    setWrapInt (xv, 5);
+                    zv = 0;
                     break;
                 case 5:
                 case 6:
                 case 8:
-                    zv %= 10; if (zv <0) { zv += 10; }
+                    setWrapInt (zv, 10);
                     xv += zv;
-                    xv %= 10; if (xv <0) { xv += 10; }
-                    zv = 0x00;
+                    setWrapInt (xv, 10);
+                    zv = 0;
                     break;
                 case 11:
-                    zv %= 10; if (zv <0) { zv += 10; }
+                    setWrapInt (zv, 10);
                     xv += 8* zv;
-                    xv %= 10; if (xv <0) { xv += 10; }
-                    zv = 0x00;
+                    setWrapInt (xv, 10);
+                    zv = 0;
                     break;
                 case 7:
-                    zv %= 10; if (zv <0) { zv += 10; }
+                    setWrapInt (zv, 10);
                     xv += 3*zv;
-                    xv %= 10; if (xv <0) { xv += 10; }
-                    zv = 0x00;
+                    setWrapInt (xv, 10);
+                    zv = 0;
                     break;
             }
             how = pentagon[Number-1][xv+zv*5];
             break;
         case 4:
-            xv &= 0x03;
-            zv &= 0x03;
+            setWrapInt (xv, 4);
+            setWrapInt (zv, 4);
             how = tetragon[Number-1][xv+zv*4];
             break;
         case 3:
-            xv %= 3; if (xv < 0) { xv += 3; }
-            zv &= 0x01;
+            setWrapInt (xv, 3);
+            setWrapInt (zv, 2);
             how = trigon[Number-1][xv+zv*3];
             break;
         case 2:
-            zv &= 0x01;
+            setWrapInt (zv, 2);
             how = digon[zv];
             break;
         case 1:
@@ -3874,41 +3987,41 @@ DBL PavementPattern::trigonal (const Vector3d& EPoint) const
                 case 9:
                     xv += 5*zv;
                     zv = 0;
-                    xv %= 6; if (xv <0) { xv += 6;}
+                    setWrapInt (xv, 6);
                     lng = 0;
                     break;
                 case 2:
                 case 10:
                 case 11:
-                    zv &= 0x01;
+                    setWrapInt (zv, 2);
                     xv += 3*zv;
-                    xv %= 6; if (xv <0) { xv += 6;}
+                    setWrapInt (xv, 6);
                     lng = 0;
                     break;
                 case 3:
-                    xv += 14*((zv%6+((zv%6)<0?6:0))/2);
-                    xv %= 6; if (xv <0) { xv += 6;}
+                    xv += 14*(wrapInt (zv, 6)/2);
+                    setWrapInt (xv, 6);
                     lng = 6;
-                    zv &= 0x01;
+                    setWrapInt (zv, 2);
                     break;
                 case 4:
                 case 8:
-                    xv += 8*((zv%6+((zv%6)<0?6:0))/2);
-                    xv %= 6; if (xv <0) { xv += 6;}
+                    xv += 8*(wrapInt (zv, 6)/2);
+                    setWrapInt (xv, 6);
                     lng = 6;
-                    zv &= 0x01;
+                    setWrapInt (zv, 2);
                     break;
                 case 5:
-                    xv %= 6; if (xv <0) { xv += 6;}
+                    setWrapInt (xv, 6);
                     lng = 6;
-                    zv &= 0x01;
+                    setWrapInt (zv, 2);
                     break;
                 case 6:
                 case 7:
-                    xv -= ((zv%12+((zv%12)<0?12:0))/3);
-                    xv &= 3;
+                    xv -= wrapInt (zv, 12)/3;
+                    setWrapInt (xv, 4);
                     lng = 4;
-                    zv %= 3; if (zv <0) { zv +=3;}
+                    setWrapInt (zv, 3);
                     break;
             }
             how = trihexagon[Number-1][xv+zv*lng];
@@ -3919,32 +4032,32 @@ DBL PavementPattern::trigonal (const Vector3d& EPoint) const
                 case 0:
                 case 1:
                 case 2:
-                    zv &= 0x01;
+                    setWrapInt (zv, 2);
                     xv += 5*zv;
-                    xv %= 10; if (xv <0) { xv += 10; }
-                    zv = 0x00;
+                    setWrapInt (xv, 10);
+                    zv = 0;
                     break;
                 case 3:
-                    zv %= 10; if (zv <0) { zv += 10; }
+                    setWrapInt (zv, 10);
                     xv += 3*zv;
-                    xv %= 10; if (xv <0) { xv += 10; }
-                    zv = 0x00;
+                    setWrapInt (xv, 10);
+                    zv = 0;
                     break;
             }
             how = tripentagon[Number-1][xv];
             break;
         case 4:
-            zv &= 0x03;
+            setWrapInt (zv, 4);
             xv += zv;
-            xv &= 0x03;
-            zv &= 0x01;
+            setWrapInt (xv, 4);
+            setWrapInt (zv, 2);
             how = tritetragon[Number-1][xv+zv*4];
             break;
         case 3:
-            zv &= 0x01;
+            setWrapInt (zv, 2);
             xv += 3*zv;
-            xv %= 6; if (xv < 0) { xv += 6; }
-            zv = 0x00;
+            setWrapInt (xv, 6);
+            zv = 0;
             how = tritrigon[Number-1][xv];
             break;
         case 2:
@@ -4693,24 +4806,24 @@ DBL PavementPattern::hexagonal (const Vector3d& EPoint) const
                 case 5:
                 case 6:
                 case 19:
-                    zv %= 10; if (zv < 0) { zv += 10; }
-                    xv %= 6; if (xv < 0) { xv += 6; }
+                    setWrapInt (zv, 10);
+                    setWrapInt (xv, 6);
                     xv += 6*zv; /* 60 */
                     zv = 0;
                     break;
                 case 1:
                 case 4:
                 case 9:
-                    zv -= 2*(((xv%30+(xv%30<0?30:0))/6));
-                    zv %= 10; if (zv < 0) { zv += 10; }
-                    xv %= 6; if (xv < 0) { xv += 6; }
+                    zv -= 2*(wrapInt (xv, 30)/6);
+                    setWrapInt (zv, 10);
+                    setWrapInt (xv, 6);
                     xv += 6*zv; /* 60 */
                     zv = 0;
                     break;
                 case 7:
-                    zv -= 7*(((xv%60+(xv%60<0?60:0))/3));
-                    zv %= 20; if (zv < 0) { zv += 20; }
-                    xv %= 3; if (xv < 0) { xv += 3; }
+                    zv -= 7*(wrapInt (xv, 60)/3);
+                    setWrapInt (zv, 20);
+                    setWrapInt (xv, 3);
                     xv += 3*zv; /* 60 */
                     zv = 0;
                     break;
@@ -4722,25 +4835,25 @@ DBL PavementPattern::hexagonal (const Vector3d& EPoint) const
                 case 17:
                 case 20:
                 case 21:
-                    zv += 2*(((xv%30+(xv%30<0?30:0))/6));
-                    zv %= 10; if (zv < 0) { zv += 10; }
-                    xv %= 6; if (xv < 0) { xv += 6; }
+                    zv += 2*(wrapInt (xv, 30)/6);
+                    setWrapInt (zv, 10);
+                    setWrapInt (xv, 6);
                     xv += 6*zv; /* 60 */
                     zv = 0;
                     break;
                 case 11:
                 case 16:
-                    zv -= 6*(((xv%30+(xv%30<0?30:0))/6));
-                    zv %= 10; if (zv < 0) { zv += 10; }
-                    xv %= 6; if (xv < 0) { xv += 6; }
+                    zv -= 6*(wrapInt (xv, 30)/6);
+                    setWrapInt (zv, 10);
+                    setWrapInt (xv, 6);
                     xv += 6*zv; /* 60 */
                     zv = 0;
                     break;
                 case 12:
                 case 18:
-                    zv += 6*(((xv%30+(xv%30<0?30:0))/6));
-                    zv %= 10; if (zv < 0) { zv += 10; }
-                    xv %= 6; if (xv < 0) { xv += 6; }
+                    zv += 6*(wrapInt (xv, 30)/6);
+                    setWrapInt (zv, 10);
+                    setWrapInt (xv, 6);
                     xv += 6*zv; /* 60 */
                     zv = 0;
                     break;
@@ -4751,42 +4864,42 @@ DBL PavementPattern::hexagonal (const Vector3d& EPoint) const
             switch(Number-1)
             {
                 case 0:
-                    zv &= 0x07;
-                    xv %= 6; if(xv <0) { xv += 6; }
+                    setWrapInt (zv, 8);
+                    setWrapInt (xv, 6);
                     xv += 6*zv; /* 48 */
                     zv = 0;
                     break;
                 case 3:
-                    zv -= 2*(((xv%24+(xv%24<0?24:0))/6));
-                    zv %= 8; if (zv < 0) { zv += 8; }
-                    xv %= 6; if (xv < 0) { xv += 6; }
+                    zv -= 2*(wrapInt (xv, 24)/6);
+                    setWrapInt (zv, 8);
+                    setWrapInt (xv, 6);
                     xv += 6*zv; /* 48 */
                     zv = 0;
                     break;
                 case 2:
-                    zv &= 0x01;
-                    xv %= 12; if (xv < 0) { xv += 12; }
+                    setWrapInt (zv, 2);
+                    setWrapInt (xv, 12);
                     xv += 12*zv; /* 24 */
                     zv = 0;
                     break;
                 case 5:
                 case 4:
-                    zv -= 2*(((xv%24+(xv%24<0?24:0))/6));
-                    zv %= 8; if (zv < 0) { zv += 8; }
-                    xv %= 6; if (xv < 0) { xv += 6; }
+                    zv -= 2*(wrapInt (xv, 24)/6);
+                    setWrapInt (zv, 8);
+                    setWrapInt (xv, 6);
                     xv += 6*zv; /* 48 */
                     zv = 0;
                     break;
                 case 1:
-                    zv += 2*(((xv%12+(xv%12<0?12:0))/6));
-                    zv %= 8; if (zv < 0) { zv += 8; }
-                    xv %= 6; if (xv < 0) { xv += 6; }
+                    zv += 2*(wrapInt (xv, 12)/6);
+                    setWrapInt (zv, 8);
+                    setWrapInt (xv, 6);
                     xv += 6*zv; /* 48 */
                     zv = 0;
                     break;
                 case 6:
-                    zv %= 4; if (zv < 0) { zv += 4; }
-                    xv %= 12; if (xv < 0) { xv += 12; }
+                    setWrapInt (zv, 4);
+                    setWrapInt (xv, 12);
                     xv += 12*zv; /* 48 */
                     zv = 0;
                     break;
@@ -4797,37 +4910,37 @@ DBL PavementPattern::hexagonal (const Vector3d& EPoint) const
             switch(Number-1)
             {
                 case 0:
-                    zv %= 6; if(zv <0) { zv += 6; }
-                    xv %= 6; if(xv <0) { xv += 6; }
+                    setWrapInt (zv, 6);
+                    setWrapInt (xv, 6);
                     xv += 6*zv;
                     zv = 0;
                     break;
                 case 1:
-                    zv += 2*(((xv%18+(xv%18<0?18:0))/6));
-                    zv %= 6; if(zv <0) { zv += 6; }
-                    xv %= 6; if(xv <0) { xv += 6; }
+                    zv += 2*(wrapInt (xv, 18)/6);
+                    setWrapInt (zv, 6);
+                    setWrapInt (xv, 6);
                     xv += 6*zv;
                     zv = 0;
                     break;
                 case 2:
-                    zv &= 0x01;
-                    xv %= 18; if (xv < 0) { xv += 18; }
+                    setWrapInt (zv, 2);
+                    setWrapInt (xv, 18);
                     xv += 18*zv;
-                    zv = 0x00;
+                    zv = 0;
                     break;
             }
             how = hextrigon[Number-1][xv];
             break;
         case 2:
-            zv &= 0x01;
-            xv %= 6; if (xv < 0) { xv += 6; }
+            setWrapInt (zv, 2);
+            setWrapInt (xv, 6);
             how = hexdigon[Number-1][xv+6*zv];
             break;
         case 1:
         default:
-            zv &= 0x01;
+            setWrapInt (zv, 2);
             xv += 3*zv;
-            xv %= 6; if (xv <0) { xv += 6;}
+            setWrapInt (xv, 6);
             lng = 0;
             how = hexmonogon[Number-1][xv];
             break;
@@ -5983,7 +6096,7 @@ DBL DensityFilePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *
                         f222 = (DBL)Data->Density8[z2 * Data->Sy * Data->Sx + y2 * Data->Sx + x2] / (DBL)UNSIGNED8_MAX;
                     }
                     else
-                        POV_ASSERT(false);
+                        POV_PATTERN_ASSERT (false);
 
                     density = ((f111 * xi + f112 * xx) * yi + (f121 * xi + f122 * xx) * yy) * (1.0 - zz) +
                               ((f211 * xi + f212 * xx) * yi + (f221 * xi + f222 * xx) * yy) * zz;
@@ -6638,7 +6751,7 @@ DBL TriangularPattern::Evaluate(const Vector3d& EPoint, const Intersection *pIse
                 answer = 3.0;
                 break;
             default:
-                POV_ASSERT(false);
+                POV_PATTERN_ASSERT (false);
                 break;
         }
     }
@@ -6701,7 +6814,7 @@ DBL JuliaPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsect
     mindist2 = a2+b2;
 
     it_max = maxIterations;
-    POV_ASSERT(it_max > 0);
+    POV_PATTERN_ASSERT (it_max > 0);
 
     for (col = 0; col < it_max; col++)
     {
@@ -6769,7 +6882,7 @@ DBL Julia3Pattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsec
     mindist2 = a2+b2;
 
     it_max = maxIterations;
-    POV_ASSERT(it_max > 0);
+    POV_PATTERN_ASSERT (it_max > 0);
 
     for (col = 0; col < it_max; col++)
     {
@@ -6837,7 +6950,7 @@ DBL Julia4Pattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsec
     mindist2 = a2+b2;
 
     it_max = maxIterations;
-    POV_ASSERT(it_max > 0);
+    POV_PATTERN_ASSERT (it_max > 0);
 
     for (col = 0; col < it_max; col++)
     {
@@ -6906,7 +7019,7 @@ DBL JuliaXPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsec
     mindist2 = a*a+b*b;
 
     it_max = maxIterations;
-    POV_ASSERT(it_max > 0);
+    POV_PATTERN_ASSERT (it_max > 0);
 
     binomial_coeff = &(gaBinomialCoefficients[(fractalExponent+1)*fractalExponent/2]);
 
@@ -7035,7 +7148,7 @@ DBL Magnet1MPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIs
     mindist2 = 10000;
 
     it_max = maxIterations;
-    POV_ASSERT(it_max > 0);
+    POV_PATTERN_ASSERT (it_max > 0);
 
     for (col = 0; col < it_max; col++)
     {
@@ -7112,7 +7225,7 @@ DBL Magnet1JPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIs
     mindist2 = a2+b2;
 
     it_max = maxIterations;
-    POV_ASSERT(it_max > 0);
+    POV_PATTERN_ASSERT (it_max > 0);
 
     for (col = 0; col < it_max; col++)
     {
@@ -7195,7 +7308,7 @@ DBL Magnet2MPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIs
     c1c2i = (c1r+c2r)*y;
 
     it_max = maxIterations;
-    POV_ASSERT(it_max > 0);
+    POV_PATTERN_ASSERT (it_max > 0);
 
     for (col = 0; col < it_max; col++)
     {
@@ -7277,7 +7390,7 @@ DBL Magnet2JPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIs
     c1c2i = (c1r+c2r)*ci;
 
     it_max = maxIterations;
-    POV_ASSERT(it_max > 0);
+    POV_PATTERN_ASSERT (it_max > 0);
 
     for (col = 0; col < it_max; col++)
     {
@@ -7356,7 +7469,7 @@ DBL Mandel2Pattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIse
     mindist2 = a2+b2;
 
     it_max = maxIterations;
-    POV_ASSERT(it_max > 0);
+    POV_PATTERN_ASSERT (it_max > 0);
 
     for (col = 0; col < it_max; col++)
     {
@@ -7423,7 +7536,7 @@ DBL Mandel3Pattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIse
     mindist2 = a2+b2;
 
     it_max = maxIterations;
-    POV_ASSERT(it_max > 0);
+    POV_PATTERN_ASSERT (it_max > 0);
 
     for (col = 0; col < it_max; col++)
     {
@@ -7490,7 +7603,7 @@ DBL Mandel4Pattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIse
     mindist2 = a2+b2;
 
     it_max = maxIterations;
-    POV_ASSERT(it_max > 0);
+    POV_PATTERN_ASSERT (it_max > 0);
 
     for (col = 0; col < it_max; col++)
     {
@@ -7558,7 +7671,7 @@ DBL MandelXPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIse
     mindist2 = a*a+b*b;
 
     it_max = maxIterations;
-    POV_ASSERT(it_max > 0);
+    POV_PATTERN_ASSERT (it_max > 0);
 
     binomial_coeff = &(gaBinomialCoefficients[(fractalExponent+1)*fractalExponent/2]);
 
@@ -8787,7 +8900,7 @@ DBL FractalPattern::ExteriorColour(int iters, DBL a, DBL b) const
         case 0:
             return exteriorFactor;
         case 1:
-            POV_ASSERT(maxIterations > 0);
+            POV_PATTERN_ASSERT (maxIterations > 0);
             return (DBL)iters / (DBL)maxIterations;
         case 2:
             return a * exteriorFactor;
@@ -9006,6 +9119,8 @@ void Destroy_Density_File(DENSITY_FILE *Density_File)
 
 void Read_Density_File(IStream *file, DENSITY_FILE *df)
 {
+    POV_PATTERN_ASSERT (file);
+
     size_t x, y, z, sx, sy, sz, len;
 
     if (df == NULL)
@@ -9075,10 +9190,7 @@ void Read_Density_File(IStream *file, DENSITY_FILE *df)
         else
             throw POV_EXCEPTION_STRING("Invalid density file size");
 
-        if (file != NULL)
-        {
-            delete file;
-        }
+        delete file;
     }
 }
 

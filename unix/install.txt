@@ -139,8 +139,18 @@ recommanded to generate a fully-featured POV-Ray executable.
 2.3 Compatibility issues
     ====================
 
-- Boost version 1.46 has been reported to be unstable on the Raspberry Pi 2. We recommend using Boost version 1.50 on
-  this platform.
+- Boost version 1.46 has been reported to be unstable on the Raspberry Pi 2.
+  We recommend using Boost version 1.50 on this platform.
+
+- Clang 3.4 using standard headers from gcc 4.6 is known to fail when using the
+  default configure settings, reporting errors in a gcc header file named
+  "math-finite.h" related to an identifier named "__extern_always_inline". Other
+  version combinations may be affected as well. To work around this issue, use
+  the configure option "CXXFLAGS=-fno-fast-math".
+
+- When configured with "--disable-optimiz", linkage may fail in some cases,
+  reporting undefined references related to "boost::gregorian::greg_month". To
+  work around this issue, use the configure option "LDFLAGS=-lboost_date_time".
 
 
 ====================================================

@@ -837,7 +837,7 @@ void Quadric::Compute_BBox(Vector3d& ClipMin, Vector3d& ClipMax)
         {
             if (D != 0.0)
             {
-             T1[X] = J / (2.0 * D);
+             T1[X] = -J / (2.0 * D);
             }
             else
             {
@@ -853,7 +853,7 @@ void Quadric::Compute_BBox(Vector3d& ClipMin, Vector3d& ClipMax)
         {
             if (G != 0.0)
             {
-                T1[Y] = J / (2.0 * G);
+                T1[Y] = -J / (2.0 * G);
             }
             else
             {
@@ -869,7 +869,7 @@ void Quadric::Compute_BBox(Vector3d& ClipMin, Vector3d& ClipMax)
         {
             if (I != 0.0)
             {
-                T1[Z] = J / (2.0 * I);
+                T1[Z] = -J / (2.0 * I);
             }
             else
             {
@@ -882,7 +882,7 @@ void Quadric::Compute_BBox(Vector3d& ClipMin, Vector3d& ClipMax)
         D += A * T1[X];
         G += E * T1[Y];
         I += H * T1[Z];
-        J -= T1[X]*(A*T1[X] + 2.0*D) + T1[Y]*(E*T1[Y] + 2.0*G) + T1[Z]*(H*T1[Z] + 2.0*I);
+        J -= T1[X]*(A*T1[X] - 2.0*D) + T1[Y]*(E*T1[Y] - 2.0*G) + T1[Z]*(H*T1[Z] - 2.0*I);
     }
     else
     {

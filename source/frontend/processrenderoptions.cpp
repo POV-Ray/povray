@@ -360,6 +360,10 @@ ProcessRenderOptions::~ProcessRenderOptions()
 int ProcessRenderOptions::ReadSpecialOptionHandler(INI_Parser_Table *option, char *param, POVMSObjectPtr obj)
 {
     POVMSAttributeList list;
+    POVMSAttribute attr;
+    POVMSObject decobj;
+    POVMSObject cmdobj;
+    POVMSType typeKey;
     double floatval = 0.0;
     int intval = 0;
     int intval2 = 0;
@@ -369,11 +373,14 @@ int ProcessRenderOptions::ReadSpecialOptionHandler(INI_Parser_Table *option, cha
     {
         case kPOVAttrib_Palette:
         case kPOVAttrib_VideoMode:
+
             while(isspace(*param))
                 param++;
             err = POVMSUtil_SetInt(obj, option->key, tolower(*param));
             break;
+
         case kPOVAttrib_DitherMethod:
+
             while(isspace(*param))
                 param++;
             err = ParseParameterCode(DitherMethodTable, param, &intval);
@@ -382,38 +389,32 @@ int ProcessRenderOptions::ReadSpecialOptionHandler(INI_Parser_Table *option, cha
             else
                 ParseError("Unrecognized dither method '%s'.", param);
             break;
+
         case kPOVAttrib_OutputFileType:
+
             while(isspace(*param))
                 param++;
             err = ParseFileType(*param, option->key, &intval);
             if (err == kNoErr)
                 err = POVMSUtil_SetInt(obj, option->key, intval);
             break;
+
         case kPOVAttrib_IncludeIni:
         case kPOVAttrib_LibraryPath:
-            POVMSAttribute attr;
 
+            // parse INI file (recursive)
+            if(option->key == kPOVAttrib_IncludeIni)
+                err = ParseFile(param, obj);
+
+            // create list if it isn't there
             if(err == kNoErr)
             {
-                // parse INI file (recursive)
-                if(option->key == kPOVAttrib_IncludeIni)
-                    err = ParseFile(param, obj);
-
-                // create list if it isn't there
-                if(err == kNoErr)
-                {
-                    if(POVMSObject_Exist(obj, option->key) == kFalseErr)
-                        err = POVMSAttrList_New(&list);
-                    else if(POVMSObject_Exist(obj, option->key) != kNoErr)
-                        err = kObjectAccessErr;
-                    else
-                        err = POVMSObject_Get(obj, &list, option->key);
-                }
-            }
-            else
-            {
-                ParseError("File name or path parameter expected for option '%s', found '%s'.", option->keyword, param);
-                err = kParamErr;
+                if(POVMSObject_Exist(obj, option->key) == kFalseErr)
+                    err = POVMSAttrList_New(&list);
+                else if(POVMSObject_Exist(obj, option->key) != kNoErr)
+                    err = kObjectAccessErr;
+                else
+                    err = POVMSObject_Get(obj, &list, option->key);
             }
 
             // add path or file to list
@@ -430,8 +431,8 @@ int ProcessRenderOptions::ReadSpecialOptionHandler(INI_Parser_Table *option, cha
             if(err == kNoErr)
                 err = POVMSObject_Set(obj, &list, option->key);
             break;
+
         case kPOVAttrib_Declare:
-            POVMSObject decobj;
 
             // create list if it isn't there
             if(POVMSObject_Exist(obj, option->key) == kFalseErr)
@@ -474,13 +475,13 @@ int ProcessRenderOptions::ReadSpecialOptionHandler(INI_Parser_Table *option, cha
             if(err == kNoErr)
                 err = POVMSObject_Set(obj, &list, option->key);
             break;
+
         case kPOVAttrib_FatalErrorCommand:
         case kPOVAttrib_PostFrameCommand:
         case kPOVAttrib_PostSceneCommand:
         case kPOVAttrib_PreFrameCommand:
         case kPOVAttrib_PreSceneCommand:
         case kPOVAttrib_UserAbortCommand:
-            POVMSObject cmdobj;
 
             if(POVMSObject_Exist(obj, option->key) == kNoErr)
                 err = POVMSObject_Get(obj, &cmdobj, option->key);
@@ -507,10 +508,11 @@ int ProcessRenderOptions::ReadSpecialOptionHandler(INI_Parser_Table *option, cha
             if(err == kNoErr)
                 err = POVMSObject_Set(obj, &cmdobj, option->key);
             break;
+
         case kPOVAttrib_AntialiasGamma:
         case kPOVAttrib_DisplayGamma:
         case kPOVAttrib_FileGamma:
-            POVMSType typeKey;
+
             switch (option->key)
             {
                 case kPOVAttrib_AntialiasGamma:  typeKey = kPOVAttrib_AntialiasGammaType;    break;
@@ -537,6 +539,8 @@ int ProcessRenderOptions::ReadSpecialOptionHandler(INI_Parser_Table *option, cha
 
 int ProcessRenderOptions::ReadSpecialSwitchHandler(Cmd_Parser_Table *option, char *param, POVMSObjectPtr obj, bool)
 {
+    POVMSAttributeList list;
+    POVMSAttribute attr;
     int intval = 0;
     int intval2 = 0;
     int err = 0;
@@ -547,6 +551,7 @@ int ProcessRenderOptions::ReadSpecialSwitchHandler(Cmd_Parser_Table *option, cha
     switch(option->key)
     {
         case kPOVAttrib_Display:
+
             if(param[0] != '\0')
             {
                 err = POVMSUtil_SetInt(obj, kPOVAttrib_VideoMode, (int)toupper(param[0]));
@@ -554,14 +559,18 @@ int ProcessRenderOptions::ReadSpecialSwitchHandler(Cmd_Parser_Table *option, cha
                     err = POVMSUtil_SetInt(obj, kPOVAttrib_Palette, (int)toupper(param[1]));
             }
             break;
+
         case kPOVAttrib_DitherMethod:
+
             err = ParseParameterCode(DitherMethodTable, param, &intval);
             if (err == kNoErr)
                 err = POVMSUtil_SetInt(obj, option->key, intval);
             else
                 ParseError("Unrecognized dither method '%s'.", param);
             break;
+
         case kPOVAttrib_OutputFileType:
+
             err = ParseFileType(*param, option->key, &intval, &has16BitGrayscale);
             if (err == kNoErr)
             {
@@ -613,25 +622,16 @@ int ProcessRenderOptions::ReadSpecialSwitchHandler(Cmd_Parser_Table *option, cha
                 }
             }
             break;
-        case kPOVAttrib_LibraryPath:
-            POVMSAttributeList list;
-            POVMSAttribute attr;
 
-            if(err == kNoErr)
-            {
-                // create list if it isn't there
-                if(POVMSObject_Exist(obj, option->key) == kFalseErr)
-                    err = POVMSAttrList_New(&list);
-                else if(POVMSObject_Exist(obj, option->key) != kNoErr)
-                    err = kObjectAccessErr;
-                else
-                    err = POVMSObject_Get(obj, &list, option->key);
-            }
+        case kPOVAttrib_LibraryPath:
+
+            // create list if it isn't there
+            if(POVMSObject_Exist(obj, option->key) == kFalseErr)
+                err = POVMSAttrList_New(&list);
+            else if(POVMSObject_Exist(obj, option->key) != kNoErr)
+                err = kObjectAccessErr;
             else
-            {
-                ParseError("File name or path parameter expected for switch '%s', found '%s'.", option->command, param);
-                err = kParamErr;
-            }
+                err = POVMSObject_Get(obj, &list, option->key);
 
             // add path or file to list
             if(err == kNoErr)
@@ -647,7 +647,9 @@ int ProcessRenderOptions::ReadSpecialSwitchHandler(Cmd_Parser_Table *option, cha
             if(err == kNoErr)
                 err = POVMSObject_Set(obj, &list, option->key);
             break;
+
         case kPOVAttrib_TestAbortCount:
+
             if((*param) == 0)
                 break;
             if(sscanf(param, "%d", &intval) == 1)
@@ -666,6 +668,8 @@ int ProcessRenderOptions::ReadSpecialSwitchHandler(Cmd_Parser_Table *option, cha
 int ProcessRenderOptions::WriteSpecialOptionHandler(INI_Parser_Table *option, POVMSObjectPtr obj, OTextStream *file)
 {
     POVMSAttributeList list;
+    POVMSObject decobj;
+    POVMSObject cmdobj;
     POVMSFloat floatval;
     POVMSInt intval;
     int err = 0;
@@ -679,6 +683,7 @@ int ProcessRenderOptions::WriteSpecialOptionHandler(INI_Parser_Table *option, PO
     {
         case kPOVAttrib_Palette:
         case kPOVAttrib_VideoMode:
+
             if(POVMSUtil_GetInt(obj, option->key, &intval) == 0)
             {
                 chr = intval;
@@ -686,7 +691,9 @@ int ProcessRenderOptions::WriteSpecialOptionHandler(INI_Parser_Table *option, PO
                     file->printf("%s=%c\n", option->keyword, chr);
             }
             break;
+
         case kPOVAttrib_OutputFileType:
+
             if(POVMSUtil_GetInt(obj, option->key, &intval) == 0)
             {
                 chr = UnparseFileType(intval);
@@ -694,10 +701,12 @@ int ProcessRenderOptions::WriteSpecialOptionHandler(INI_Parser_Table *option, PO
                     file->printf("%s=%c\n", option->keyword, chr);
             }
             break;
+
         case kPOVAttrib_IncludeIni:
+
             break;
+
         case kPOVAttrib_Declare:
-            POVMSObject decobj;
 
             err = POVMSObject_Get(obj, &list, option->key);
             if(err != 0)
@@ -733,7 +742,9 @@ int ProcessRenderOptions::WriteSpecialOptionHandler(INI_Parser_Table *option, PO
                 }
             }
             break;
+
         case kPOVAttrib_LibraryPath:
+
             err = POVMSObject_Get(obj, &list, option->key);
             if(err != 0)
                 break;
@@ -765,13 +776,13 @@ int ProcessRenderOptions::WriteSpecialOptionHandler(INI_Parser_Table *option, PO
                 }
             }
             break;
+
         case kPOVAttrib_FatalErrorCommand:
         case kPOVAttrib_PostFrameCommand:
         case kPOVAttrib_PostSceneCommand:
         case kPOVAttrib_PreFrameCommand:
         case kPOVAttrib_PreSceneCommand:
         case kPOVAttrib_UserAbortCommand:
-            POVMSObject cmdobj;
 
             err = POVMSObject_Get(obj, &cmdobj, option->key);
             if(err != 0)

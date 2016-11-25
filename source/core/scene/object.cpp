@@ -713,6 +713,7 @@ ObjectPtr Copy_Object (ObjectPtr Old)
 
     New->Ph_Density             = Old->Ph_Density;
     New->RadiosityImportance    = Old->RadiosityImportance;
+    New->RadiosityImportanceSet = Old->RadiosityImportanceSet;
 
     // TODO FIXME - An explanation WHY this is important would be nice [CLi]
     New->LLights.clear(); // important
@@ -832,7 +833,7 @@ ObjectBase::~ObjectBase()
 
 double ObjectBase::GetPotential (const Vector3d& p, bool subtractThreshold, TraceThreadData *threaddata) const
 {
-    POV_ASSERT (false);
+    POV_SHAPE_ASSERT (false);
     return 0.0;
 }
 

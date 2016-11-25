@@ -896,7 +896,7 @@ bool sort_and_split(BBOX_TREE **Root, BBOX_TREE **&Finite, size_t *numOfFiniteOb
             // For debugging only.
             // TODO MESSAGE      Debug_Info("Reallocing Finite to %d\n", maxfinitecount);
             Finite = reinterpret_cast<BBOX_TREE **>(POV_REALLOC(Finite, maxfinitecount * sizeof(BBOX_TREE *), "bounding boxes"));
-            delete[] areaCache;
+            delete[] *areaCache;
             *areaCache = new BBoxScalar[maxfinitecount];
         }
 

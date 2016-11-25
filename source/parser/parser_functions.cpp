@@ -110,10 +110,10 @@ const ExprParserTableEntry expr_parser_table[] =
     { 35, RIGHT_PAREN_TOKEN, &Parser::expr_ret,  -1, OP_NONE     }, // 12
     { 35, RIGHT_CURLY_TOKEN, &Parser::expr_ret,  -1, OP_NONE     }, // 13
     { 35, COMMA_TOKEN,       &Parser::expr_ret,  -1, OP_NONE     }, // 14
-    { 35, LAST_TOKEN,        &Parser::expr_err,  -1, OP_NONE     }, // 15
+    { 35, TOKEN_COUNT,       &Parser::expr_err,  -1, OP_NONE     }, // 15
     // vector/color member access
     { 45, PERIOD_TOKEN,      &Parser::expr_grow, 60, OP_DOT      }, // 16
-    { 45, LAST_TOKEN,        &Parser::expr_err,  -1, OP_NONE     }, // 17
+    { 45, TOKEN_COUNT,       &Parser::expr_err,  -1, OP_NONE     }, // 17
     // unary plus, unary minus, (logical not - disabled)
     { 40, PLUS_TOKEN,        &Parser::expr_noop, 50, OP_NONE     }, // 18
     { 40, DASH_TOKEN,        &Parser::expr_grow, 50, OP_NEG      }, // 19
@@ -124,10 +124,10 @@ const ExprParserTableEntry expr_parser_table[] =
     { 50, FUNCT_ID_TOKEN,    &Parser::expr_call,  5, OP_CALL     }, // 23
     { 50, VECTFUNCT_ID_TOKEN,&Parser::expr_call, 45, OP_CALL     }, // 24
     { 50, LEFT_PAREN_TOKEN,  &Parser::expr_new,  55, OP_FIRST    }, // 25
-    { 50, LAST_TOKEN,        &Parser::expr_err,  -1, OP_NONE     }, // 26
+    { 50, TOKEN_COUNT,       &Parser::expr_err,  -1, OP_NONE     }, // 26
     // (expression)
     { 55, RIGHT_PAREN_TOKEN, &Parser::expr_noop,  5, OP_NONE     }, // 27
-    { 55, LAST_TOKEN,        &Parser::expr_err,  -1, OP_NONE     }, // 28
+    { 55, TOKEN_COUNT,       &Parser::expr_err,  -1, OP_NONE     }, // 28
     // vector/color members
     { 60, FLOAT_ID_TOKEN,    &Parser::expr_put,   5, OP_MEMBER   }, // 29
     { 60, T_TOKEN,           &Parser::expr_put,   5, OP_MEMBER   }, // 30
@@ -137,7 +137,7 @@ const ExprParserTableEntry expr_parser_table[] =
     { 60, FILTER_TOKEN,      &Parser::expr_put,   5, OP_MEMBER   }, // 34
     { 60, TRANSMIT_TOKEN,    &Parser::expr_put,   5, OP_MEMBER   }, // 35
     { 60, GRAY_TOKEN,        &Parser::expr_put,   5, OP_MEMBER   }, // 36
-    { 60, LAST_TOKEN,        &Parser::expr_err,  -1, OP_NONE     }  // 37
+    { 60, TOKEN_COUNT,       &Parser::expr_err,  -1, OP_NONE     }  // 37
 };
 
 // parse_expr has to start with first unary operator [trf]
@@ -332,7 +332,7 @@ ExprNode *Parser::parse_expr()
         for(i = start_index; ; i++)
         {
             if((expr_parser_table[i].token == token) ||
-               (expr_parser_table[i].token == LAST_TOKEN))
+               (expr_parser_table[i].token == TOKEN_COUNT))
                 break;
         }
 

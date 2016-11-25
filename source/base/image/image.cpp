@@ -3254,6 +3254,7 @@ class FileBackedPixelContainer
                     throw POV_EXCEPTION(kFileDataErr, "Intermediate image storage backing file read failed.");
                 m_CurrentBlock = block;
             }
+            POV_IMAGE_ASSERT (m_Blocksize != 0);
             memcpy(&pixel, m_Buffer[(y * (POV_LONG)(m_Width) + x) % m_Blocksize], sizeof(pixel));
         }
 #if 0

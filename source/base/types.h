@@ -271,27 +271,6 @@ struct POVRect
     unsigned int GetHeight() const { return (bottom - top + 1); }
 };
 
-class GenericSetting
-{
-    public:
-        explicit GenericSetting(bool set = false): set(set) {}
-        void Unset() { set = false; }
-        bool isSet() const { return set; }
-    protected:
-        bool set;
-};
-
-class FloatSetting : public GenericSetting
-{
-    public:
-        explicit FloatSetting(double data = 0.0, bool set = false): data(data), GenericSetting(set) {}
-        double operator=(double b)          { data = b; set = true; return data; }
-        operator double() const             { return data; }
-        double operator()(double def) const { if (set) return data; else return def; }
-    private:
-        double  data;
-};
-
 enum StringEncoding
 {
     kStringEncoding_ASCII  = 0,

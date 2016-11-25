@@ -315,6 +315,8 @@ enum TOKEN_IDS
     DENTS_TOKEN,
     DEPRECATED_TOKEN,
     DF3_TOKEN,
+    DICTIONARY_TOKEN,
+    DICTIONARY_ID_TOKEN,
     DIFFERENCE_TOKEN,
     DIFFUSE_TOKEN,
     DIRECTION_TOKEN,
@@ -354,7 +356,6 @@ enum TOKEN_IDS
     FALLOFF_ANGLE_TOKEN,
     FCLOSE_TOKEN,
     FILE_ID_TOKEN,
-    FILL_LIGHT_TOKEN,
     FINISH_TOKEN,
     FINISH_ID_TOKEN,
     FISHEYE_TOKEN,
@@ -482,6 +483,8 @@ enum TOKEN_IDS
     NO_REFLECTION_TOKEN,
     NO_SHADOW_TOKEN,
     NOISE_GENERATOR_TOKEN,
+    NORMAL_TOKEN,
+    NORMAL_ID_TOKEN,
     NORMAL_INDICES_TOKEN,
     NORMAL_MAP_TOKEN,
     NORMAL_MAP_ID_TOKEN,
@@ -535,7 +538,7 @@ enum TOKEN_IDS
     POLY_TOKEN,
     POLY_WAVE_TOKEN,
     POLYGON_TOKEN,
-    POLYNOM_TOKEN,
+    POLYNOMIAL_TOKEN,
     POT_TOKEN,
     POTENTIAL_TOKEN,
     PPM_TOKEN,
@@ -591,6 +594,7 @@ enum TOKEN_IDS
     SCALLOP_WAVE_TOKEN,
     SCATTERING_TOKEN,
     SEMI_COLON_TOKEN,
+    SHADOWLESS_TOKEN,
     SINE_WAVE_TOKEN,
     SINGLE_QUOTE_TOKEN,
     SINT16BE_TOKEN,
@@ -660,8 +664,6 @@ enum TOKEN_IDS
     TILE2_TOKEN,
     TILES_TOKEN,
     TILING_TOKEN,
-    TNORMAL_TOKEN,
-    TNORMAL_ID_TOKEN,
     TOLERANCE_TOKEN,
     TOROIDAL_TOKEN,
     TORUS_TOKEN,
@@ -720,7 +722,7 @@ enum TOKEN_IDS
     //------------------------------------------------------------------------------
     // End of list.
 
-    LAST_TOKEN // Pseudo-Token to count the number of token identifiers.
+    TOKEN_COUNT // Pseudo-Token to count the number of token identifiers.
 };
 
 extern const RESERVED_WORD Reserved_Words[];

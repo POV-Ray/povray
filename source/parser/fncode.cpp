@@ -447,9 +447,9 @@ void FNCode_Copy(FunctionCode *f, FunctionCode *fnew)
 *
 ******************************************************************************/
 
+#if (DEBUG_FLOATFUNCTION == 1)
 void FNCode::SetFlag(unsigned int flag, char *str)
 {
-#if (DEBUG_FLOATFUNCTION == 1)
     if(flag == 1)
     {
         if(asm_input != NULL)
@@ -462,12 +462,8 @@ void FNCode::SetFlag(unsigned int flag, char *str)
             POV_FREE(asm_output);
         asm_output = POV_STRDUP(str);
     }
-#else
-    // silence compiler warnings
-    flag = 0;
-    str = NULL;
-#endif
 }
+#endif
 
 
 /*****************************************************************************
@@ -500,7 +496,7 @@ void FNCode::SetFlag(unsigned int flag, char *str)
 
 void FNCode::compile_recursive(ExprNode *expr)
 {
-    POV_ASSERT(expr != NULL);
+    POV_PARSER_ASSERT(expr != NULL);
 
     unsigned int local_k = 0;
 

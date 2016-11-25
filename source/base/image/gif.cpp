@@ -125,8 +125,7 @@ Image *Read (IStream *file, const Image::ReadOptions& options, bool IsPOTFile)
         {
             case EOF:
                 throw POV_EXCEPTION(kFileDataErr, "Unexpected EOF reading GIF file");
-                finished = true;
-                break ;
+                break;
 
             case ';': /* End of the GIF dataset. */
                 finished = true;

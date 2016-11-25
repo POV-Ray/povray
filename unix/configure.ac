@@ -646,7 +646,7 @@ AC_CHECK_FUNCS([clock_gettime])
 AC_CHECK_DECLS([CLOCK_MONOTONIC, CLOCK_REALTIME, CLOCK_PROCESS_CPUTIME_ID, CLOCK_THREAD_CPUTIME_ID],
   [], [], [[#include <time.h>]]
 )
-AC_CHECK_TYPES([clockid_t])
+AC_CHECK_TYPES([clockid_t], [], [], [[#include <time.h>]])
 
 # getrusage and related <sys/resource.h>
 AC_CHECK_FUNCS([getrusage])

@@ -598,7 +598,7 @@ int SphereSweep::Intersect_Segment(const BasicRay &ray, const SPHSWEEP_SEG *Segm
             break;
 
         default:
-            POV_ASSERT(false);
+            POV_SHAPE_ASSERT(false);
             break;
     }
 
@@ -1521,6 +1521,10 @@ void SphereSweep::Compute()
                     }
                 }
             }
+            break;
+
+        default:
+            POV_SHAPE_ASSERT (false);
             break;
     }
 
