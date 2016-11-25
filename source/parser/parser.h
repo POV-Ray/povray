@@ -113,6 +113,8 @@ struct ClassicTurbulence; // full declaration in core/material/warp.h
 struct BlackHoleWarp; // full declaration in core/material/warp.h
 class Mesh;
 class SceneData;
+struct PavementPattern;
+struct TilingPattern;
 
 /*****************************************************************************
 * Global preprocessor defines
@@ -672,8 +674,9 @@ class Parser : public SceneTask
         void Set_CSG_Children_Flag(ObjectPtr, unsigned int, unsigned int, unsigned int);
         void Set_CSG_Tree_Flag(ObjectPtr, unsigned int, int);
 
-        ObjectPtr Parse_Isosurface(void);
-        ObjectPtr Parse_Parametric(void);
+        ObjectPtr Parse_Isosurface();
+        ObjectPtr Parse_Parametric();
+        void ParseContainedBy(shared_ptr<ContainedByShape>& container, ObjectPtr obj);
 
         ObjectPtr Parse_Sphere_Sweep(void);
         int Parse_Three_UVCoords(Vector2d& UV1, Vector2d& UV2, Vector2d& UV3);
@@ -730,7 +733,17 @@ class Parser : public SceneTask
         // parstxtr.h/parstxtr.cpp
         void Make_Pattern_Image(ImageData *image, FUNCTION_PTR fn, int token);
 
-        void Parse_Image_Pattern (TPATTERN *TPattern);
+        PatternPtr ParseDensityFilePattern();
+        PatternPtr ParseImagePattern();
+        PatternPtr ParseJuliaPattern();
+        PatternPtr ParseMagnetPattern();
+        PatternPtr ParseMandelPattern();
+        PatternPtr ParsePotentialPattern();
+        PatternPtr ParseSlopePattern();
+        template<typename PATTERN_T> PatternPtr ParseSpiralPattern();
+        void VerifyPavementPattern(shared_ptr<PavementPattern> pattern);
+        void VerifyTilingPattern(shared_ptr<TilingPattern> pattern);
+        void VerifyPattern(PatternPtr pattern);
         void Parse_Bump_Map (TNORMAL *Tnormal);
         void Parse_Image_Map (PIGMENT *Pigment);
         template<typename MAP_T, typename PATTERN_T> void Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type);

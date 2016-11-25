@@ -137,7 +137,7 @@ class ImageData;
 
 //******************************************************************************
 
-/// Generic abstract class providing the interface and commonly-used data fields for all pattern implementations.
+/// Abstract class providing the interface and commonly-used data fields for all pattern implementations.
 ///
 /// @note   This class is currently implemented as a struct, i.e. with publicly accessible members; this was done to
 ///         avoid excessive changes to the parser and render engine during the refactoring process, and was deemed
@@ -270,7 +270,7 @@ protected:
     static PatternPtr Clone(const T& obj) { return PatternPtr(new T(obj)); }
 };
 
-/// Generic abstract class providing additions to the basic pattern interface, as well as common code, for all patterns
+/// Abstract class providing additions to the basic pattern interface, as well as common code, for all patterns
 /// returning colours.
 ///
 struct ColourPattern : public BasicPattern
@@ -303,7 +303,7 @@ struct ColourPattern : public BasicPattern
     virtual bool HasTransparency() const = 0;
 };
 
-/// Generic abstract class providing additions to the basic pattern interface, as well as common code, for all
+/// Abstract class providing additions to the basic pattern interface, as well as common code, for all
 /// continuous pattern implementations.
 ///
 /// @todo   We could move the `waveSomething` members into a dedicated class, possibly using polymorphism to avoid
@@ -359,7 +359,7 @@ struct ContinuousPattern : public BasicPattern
     virtual bool CanMap() const;
 };
 
-/// Generic abstract class providing additions to the basic pattern interface, as well as common code, for all
+/// Abstract class providing additions to the basic pattern interface, as well as common code, for all
 /// discrete pattern implementations.
 struct DiscretePattern : public BasicPattern
 {
@@ -405,6 +405,7 @@ struct AgatePattern : public ContinuousPattern
     /// `agate_turb` parameter.
     SNGL agateTurbScale;
 
+    AgatePattern();
     virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
     virtual DBL EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const;
     virtual ColourBlendMapConstPtr GetDefaultBlendMap() const;
@@ -427,12 +428,13 @@ struct BoxedPattern : public ContinuousPattern
 /// Implements the `brick` pattern.
 struct BrickPattern : public DiscretePattern
 {
-    /// `mortar` parameter.
-    SNGL mortar;
-
     /// `brick_size` parameter.
     Vector3d brickSize;
 
+    /// `mortar` parameter.
+    SNGL mortar;
+
+    BrickPattern();
     virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
     virtual DBL Evaluate(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const;
     virtual ColourBlendMapConstPtr GetDefaultBlendMap() const;
@@ -485,9 +487,10 @@ struct CracklePattern : public ContinuousPattern
     Vector3d crackleForm;
     DBL crackleMetric;
     DBL crackleOffset;
-    short crackleIsSolid;
     IntVector3d repeat;
+    bool crackleIsSolid;
 
+    CracklePattern();
     virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
     virtual DBL EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const;
 };
@@ -558,6 +561,7 @@ struct FacetsPattern : public ContinuousPattern
 {
     DBL facetsSize, facetsCoords, facetsMetric;
 
+    FacetsPattern();
     virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
 
     /// @attention  As the `facets` pattern is only available for normals, this function is not supposed to be ever
@@ -584,6 +588,7 @@ struct FractalPattern : public ContinuousPattern
     /// Determines the algorithm to colour the interior of the fractal.
     unsigned char interiorType;
 
+    FractalPattern();
     virtual PatternPtr Clone() const = 0;
     virtual DBL EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const = 0;
 
@@ -666,6 +671,7 @@ struct LeopardPattern : public ContinuousPattern
 /// Implements the `marble` pattern.
 struct MarblePattern : public ContinuousPattern
 {
+    MarblePattern();
     virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
     virtual DBL EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const;
     virtual ColourBlendMapConstPtr GetDefaultBlendMap() const;
@@ -717,6 +723,7 @@ struct PavementPattern : public ContinuousPattern
     unsigned char Interior;
     unsigned char Form;
 
+    PavementPattern();
     virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
     virtual DBL EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const;
     DBL hexagonal (const Vector3d& EPoint) const;
@@ -767,6 +774,7 @@ struct QuiltedPattern : public ContinuousPattern
 {
     SNGL Control0, Control1;
 
+    QuiltedPattern();
     virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
     virtual DBL EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const;
 };
@@ -792,18 +800,19 @@ struct RipplesPattern : public ContinuousPattern
 ///
 struct SlopePattern : public ContinuousPattern
 {
-    Vector3d slopeDirection;
-    Vector3d altitudeDirection;
-    signed char slopeAxis;    ///< one of 0 (non-axis-aligned), +/-1 (X axis), +/-2 (Y axis) or +/-3 (Z axis)
-    signed char altitudeAxis; ///< one of 0 (non-axis-aligned), +/-1 (X axis), +/-2 (Y axis) or +/-3 (Z axis)
-    DBL slopeLen;
-    DBL altitudeLen;
-    DBL slopeModLow;
-    DBL slopeModWidth;
-    DBL altitudeModLow;
-    DBL altitudeModWidth;
-    bool pointAt;
+    Vector3d    altitudeDirection;
+    Vector3d    slopeDirection;
+    DBL         altitudeLen;
+    DBL         altitudeModLow;
+    DBL         altitudeModWidth;
+    DBL         slopeLen;
+    DBL         slopeModLow;
+    DBL         slopeModWidth;
+    signed char altitudeAxis    : 3; ///< one of 0 (non-axis-aligned), +/-1 (X axis), +/-2 (Y axis) or +/-3 (Z axis)
+    signed char slopeAxis       : 3; ///< one of 0 (non-axis-aligned), +/-1 (X axis), +/-2 (Y axis) or +/-3 (Z axis)
+    bool        pointAt         : 1;
 
+    SlopePattern();
     virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
     virtual DBL EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const;
 };
@@ -820,6 +829,7 @@ struct SpiralPattern : public ContinuousPattern
 {
     short arms;
 
+    SpiralPattern();
     virtual PatternPtr Clone() const = 0;
     virtual DBL EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const = 0;
 };
@@ -865,6 +875,7 @@ struct WavesPattern : public ContinuousPattern
 /// Implements the `wood` pattern.
 struct WoodPattern : public ContinuousPattern
 {
+    WoodPattern();
     virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
     virtual DBL EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const;
     virtual ColourBlendMapConstPtr GetDefaultBlendMap() const;

@@ -371,7 +371,10 @@ static void quilted (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& n
 
     t = value.length();
 
-    t = quilt_cubic(t, dynamic_cast<QuiltedPattern*>(Tnormal->pattern.get())->Control0, dynamic_cast<QuiltedPattern*>(Tnormal->pattern.get())->Control1);
+    const QuiltedPattern *pattern = dynamic_cast<QuiltedPattern*>(Tnormal->pattern.get());
+    POV_PATTERN_ASSERT(pattern);
+
+    t = quilt_cubic(t, pattern->Control0, pattern->Control1);
 
     value *= t;
 
@@ -414,15 +417,18 @@ static void facets (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& no
     int      UseUnity;
     DBL      Metric;
 
+    const FacetsPattern *pattern = dynamic_cast<FacetsPattern*>(Tnormal->pattern.get());
+    POV_PATTERN_ASSERT(pattern);
+
     Vector3d *cv = Thread->Facets_Cube;
-    Metric = dynamic_cast<FacetsPattern*>(Tnormal->pattern.get())->facetsMetric;
+    Metric = pattern->facetsMetric;
 
     UseSquare = (Metric == 2 );
     UseUnity  = (Metric == 1 );
 
     normal.normalize();
 
-    if ( dynamic_cast<FacetsPattern*>(Tnormal->pattern.get())->facetsCoords )
+    if (pattern->facetsCoords)
     {
         tv = EPoint;
     }
@@ -431,13 +437,13 @@ static void facets (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& no
         tv = normal;
     }
 
-    if ( dynamic_cast<FacetsPattern*>(Tnormal->pattern.get())->facetsSize < 1e-6 )
+    if (pattern->facetsSize < 1e-6)
     {
         scale = 1e6;
     }
     else
     {
-        scale = 1. / dynamic_cast<FacetsPattern*>(Tnormal->pattern.get())->facetsSize;
+        scale = 1. / pattern->facetsSize;
     }
 
     tv *= scale;
@@ -545,13 +551,13 @@ static void facets (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& no
         }
     }
 
-    if ( dynamic_cast<FacetsPattern*>(Tnormal->pattern.get())->facetsCoords )
+    if (pattern->facetsCoords)
     {
         DNoise( pert, newnormal );
         sum = dot(pert, normal);
         newnormal = normal * sum;
         pert -= newnormal;
-        normal += dynamic_cast<FacetsPattern*>(Tnormal->pattern.get())->facetsCoords * pert;
+        normal += pattern->facetsCoords * pert;
     }
     else
     {

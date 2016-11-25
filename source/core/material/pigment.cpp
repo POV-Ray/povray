@@ -306,9 +306,9 @@ void Post_Pigment(PIGMENT *Pigment, bool* pHasFilter)
         hasFilter = true;
     }
 
-    if (dynamic_cast<ColourPattern*>(Pigment->pattern.get()))
+    if (const ColourPattern* pattern = dynamic_cast<ColourPattern*>(Pigment->pattern.get()))
     {
-        if (dynamic_cast<ColourPattern*>(Pigment->pattern.get())->HasTransparency())
+        if (pattern->HasTransparency())
             hasFilter = true;
     }
 
@@ -438,8 +438,10 @@ bool Compute_Pigment (TransColour& colour, const PIGMENT *Pigment, const Vector3
 
                 colour.Clear();
 
-                POV_ASSERT(dynamic_cast<ColourPattern*>(Pigment->pattern.get()));
-                Colour_Found = dynamic_cast<ColourPattern*>(Pigment->pattern.get())->Evaluate(colour, TPoint, Intersect, ray, Thread);
+                if (const ColourPattern* pattern = dynamic_cast<ColourPattern*>(Pigment->pattern.get()))
+                    Colour_Found = pattern->Evaluate(colour, TPoint, Intersect, ray, Thread);
+                else
+                    POV_PATTERN_ASSERT(false);
 
                 break;
 
