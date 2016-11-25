@@ -838,7 +838,7 @@ void Perturb_Normal(Vector3d& Layer_Normal, const TNORMAL *Tnormal, const Vector
 
     /* No normal_map. */
 
-    if (Tnormal->Type <= LAST_NORM_ONLY_PATTERN)
+    if (Tnormal->Type <= LAST_SPECIAL_NORM_PATTERN)
     {
         Warp_Normal(Layer_Normal,Layer_Normal, Tnormal,
                     Test_Flag(Tnormal,DONT_SCALE_BUMPS_FLAG));
@@ -886,7 +886,6 @@ void Perturb_Normal(Vector3d& Layer_Normal, const TNORMAL *Tnormal, const Vector
 
         UnWarp_Normal(Layer_Normal,Layer_Normal,Tnormal,
                       Test_Flag(Tnormal,DONT_SCALE_BUMPS_FLAG));
-
     }
 
     if ( Intersection )
@@ -983,7 +982,7 @@ static DBL Hermite_Cubic(DBL T1, const Vector2d& UV1, const Vector2d& UV2)
 * DESCRIPTION
 *
 * CHANGES
-*    Added intersectin parameter for UV mapping - NK 1998
+*    Added intersection parameter for UV mapping - NK 1998
 *
 ******************************************************************************/
 

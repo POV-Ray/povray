@@ -747,7 +747,7 @@ void Parser::Parse_Image_Map (PIGMENT *Pigment)
         END_CASE
     END_EXPECT
 
-    dynamic_cast<ImagePattern*>(Pigment->pattern.get())->pImage=image;
+    dynamic_cast<ImagePatternImpl*>(Pigment->pattern.get())->pImage=image;
     Parse_End();
 }
 
@@ -829,7 +829,7 @@ void Parser::Parse_Bump_Map (TNORMAL *Tnormal)
         END_CASE
     END_EXPECT
 
-    dynamic_cast<ImagePattern*>(Tnormal->pattern.get())->pImage = image;
+    dynamic_cast<ImagePatternImpl*>(Tnormal->pattern.get())->pImage = image;
 
     Parse_End();
 }
@@ -911,7 +911,7 @@ void Parser::Parse_Image_Pattern (TPATTERN *TPattern)
         END_CASE
     END_EXPECT
 
-    dynamic_cast<ImagePattern*>(TPattern->pattern.get())->pImage = image;
+    dynamic_cast<ImagePatternImpl*>(TPattern->pattern.get())->pImage = image;
 
     Parse_End();
 }
@@ -996,19 +996,15 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
     ContinuousPattern* pContinuousPattern;
     DBL low, high;
 
-    if (Old_Type==BITMAP_PATTERN)
-    {
-        Old_Image = dynamic_cast<ImagePattern*>(New->pattern.get())->pImage;
-    }
+    if (dynamic_cast<ImagePatternImpl*>(New->pattern.get()))
+        Old_Image = dynamic_cast<ImagePatternImpl*>(New->pattern.get())->pImage;
 
-    if (Old_Type==DENSITY_FILE_PATTERN)
-    {
+    if (dynamic_cast<DensityFilePattern*>(New->pattern.get()))
         Old_Density_File = dynamic_cast<DensityFilePattern*>(New->pattern.get())->densityFile;
-    }
 
     EXPECT_ONE
         CASE (AGATE_TOKEN)
-            New->Type = AGATE_PATTERN;
+            New->Type = GENERIC_PATTERN;
             New->pattern = PatternPtr(new AgatePattern());
             Check_Turb(New->pattern->warps, New->pattern->HasSpecialTurbulenceHandling());
             dynamic_cast<AgatePattern*>(New->pattern.get())->agateTurbScale = 1.0; // TODO this is a job for a constructor
@@ -1047,13 +1043,13 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
         END_CASE
 
         CASE (MARBLE_TOKEN)
-            New->Type = MARBLE_PATTERN;
+            New->Type = GENERIC_PATTERN;
             New->pattern = PatternPtr(new MarblePattern());
             dynamic_cast<MarblePattern*>(New->pattern.get())->waveType = kWaveType_Triangle;
         END_CASE
 
         CASE (MANDEL_TOKEN)
-            New->Type = MANDEL_PATTERN;
+            New->Type = GENERIC_PATTERN;
             New->pattern = PatternPtr(new Mandel2Pattern());
             dynamic_cast<MandelPattern*>(New->pattern.get())->maxIterations = Parse_Int_With_Minimum(1, "fractal iterations limit");
             dynamic_cast<MandelPattern*>(New->pattern.get())->interiorType = DEFAULT_FRACTAL_INTERIOR_TYPE;
@@ -1063,7 +1059,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
         END_CASE
 
         CASE (JULIA_TOKEN)
-            New->Type = JULIA_PATTERN;
+            New->Type = GENERIC_PATTERN;
             New->pattern = PatternPtr(new JuliaPattern());
             Parse_UV_Vect(dynamic_cast<JuliaPattern*>(New->pattern.get())->juliaCoord);
             Parse_Comma();
@@ -1075,18 +1071,16 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
         END_CASE
 
         CASE (MAGNET_TOKEN)
-            New->Type = NO_PATTERN;
+            New->Type = GENERIC_PATTERN;
             i = (int)Parse_Float();
             EXPECT_ONE
                 CASE (MANDEL_TOKEN)
                     switch(i)
                     {
                         case 1:
-                            New->Type = MAGNET1M_PATTERN;
                             New->pattern = PatternPtr(new Magnet1MPattern());
                             break;
                         case 2:
-                            New->Type = MAGNET2M_PATTERN;
                             New->pattern = PatternPtr(new Magnet2MPattern());
                             break;
                         default:
@@ -1098,11 +1092,9 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
                     switch(i)
                     {
                         case 1:
-                            New->Type = MAGNET1J_PATTERN;
                             New->pattern = PatternPtr(new Magnet1JPattern());
                             break;
                         case 2:
-                            New->Type = MAGNET2J_PATTERN;
                             New->pattern = PatternPtr(new Magnet2JPattern());
                             break;
                         default:
@@ -1150,7 +1142,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
         END_CASE
 
         CASE (WOOD_TOKEN)
-            New->Type = WOOD_PATTERN;
+            New->Type = GENERIC_PATTERN;
             New->pattern = PatternPtr(new WoodPattern());
             dynamic_cast<WoodPattern*>(New->pattern.get())->waveType = kWaveType_Triangle;
         END_CASE
@@ -1169,7 +1161,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
         END_CASE
 
         CASE (CRACKLE_TOKEN)
-            New->Type = CRACKLE_PATTERN;
+            New->Type = GENERIC_PATTERN;
             New->pattern = PatternPtr(new CracklePattern());
             dynamic_cast<CracklePattern*>(New->pattern.get())->crackleIsSolid = 0;
             dynamic_cast<CracklePattern*>(New->pattern.get())->crackleForm[X] = -1;
@@ -1196,7 +1188,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
         END_CASE
 
         CASE (CHECKER_TOKEN)
-            New->Type = GENERIC_INTEGER_PATTERN;
+            New->Type = GENERIC_PATTERN;
             New->pattern = PatternPtr(new CheckerPattern());
             New->Blend_Map = Parse_Blend_List<MAP_T>(2,New->pattern->GetDefaultBlendMap(),TPat_Type);
             if (TPat_Type == kBlendMapType_Normal)
@@ -1210,7 +1202,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
             Parse_Bound_Clip(tempObjects, false);
             if(tempObjects.size() != 1)
                 Error ("object or object identifier expected.");
-            New->Type = OBJECT_PATTERN;
+            New->Type = GENERIC_PATTERN;
             New->pattern = PatternPtr(new ObjectPattern());
             dynamic_cast<ObjectPattern*>(New->pattern.get())->pObject = tempObjects[0];
             New->Blend_Map = Parse_Blend_List<MAP_T>(2,New->pattern->GetDefaultBlendMap(),TPat_Type);
@@ -1224,9 +1216,9 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
         END_CASE
 
         CASE (BRICK_TOKEN)
-            if (New->Type!=BRICK_PATTERN)
+            if (!dynamic_cast<BrickPattern*>(New->pattern.get()))
             {
-                New->Type = BRICK_PATTERN;
+                New->Type = GENERIC_PATTERN;
                 New->pattern = PatternPtr(new BrickPattern());
                 dynamic_cast<BrickPattern*>(New->pattern.get())->brickSize = Vector3d(8.0,3.0,4.5);
                 dynamic_cast<BrickPattern*>(New->pattern.get())->mortar=0.5-EPSILON*2.0;
@@ -1237,7 +1229,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
         END_CASE
 
         CASE (HEXAGON_TOKEN)
-            New->Type = GENERIC_INTEGER_PATTERN;
+            New->Type = GENERIC_PATTERN;
             New->pattern = PatternPtr(new HexagonPattern());
             New->Blend_Map = Parse_Blend_List<MAP_T>(3,New->pattern->GetDefaultBlendMap(),TPat_Type);
             if (TPat_Type == kBlendMapType_Normal)
@@ -1245,7 +1237,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
         END_CASE
 
         CASE (SQUARE_TOKEN)
-            New->Type = GENERIC_INTEGER_PATTERN;
+            New->Type = GENERIC_PATTERN;
             New->pattern = PatternPtr(new SquarePattern());
             New->Blend_Map = Parse_Blend_List<MAP_T>(4,New->pattern->GetDefaultBlendMap(),TPat_Type);
             if (TPat_Type == kBlendMapType_Normal)
@@ -1253,7 +1245,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
         END_CASE
 
         CASE (TRIANGULAR_TOKEN)
-            New->Type = GENERIC_INTEGER_PATTERN;
+            New->Type = GENERIC_PATTERN;
             New->pattern = PatternPtr(new TriangularPattern());
             New->Blend_Map = Parse_Blend_List<MAP_T>(6,New->pattern->GetDefaultBlendMap(),TPat_Type);
             if (TPat_Type == kBlendMapType_Normal)
@@ -1262,7 +1254,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
 
         // JN2007: Cubic pattern
         CASE (CUBIC_TOKEN)
-            New->Type = GENERIC_INTEGER_PATTERN;
+            New->Type = GENERIC_PATTERN;
             New->pattern = PatternPtr(new CubicPattern());
             New->Blend_Map = Parse_Blend_List<MAP_T>(6,New->pattern->GetDefaultBlendMap(),TPat_Type);
             if (TPat_Type == kBlendMapType_Normal)
@@ -1275,14 +1267,11 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
                 Only_In("image_map","pigment");
             }
 
-            if (Old_Type==BITMAP_PATTERN)
-            {
+            if (Old_Image)
                 Destroy_Image(Old_Image);
-            }
 
-            New->Type = BITMAP_PATTERN;
-            New->pattern = PatternPtr(new ImagePattern());
-            dynamic_cast<ImagePattern*>(New->pattern.get())->waveFrequency = 0.0;
+            New->Type = IMAGE_MAP_PATTERN;
+            New->pattern = PatternPtr(new ColourImagePattern());
             Parse_Image_Map (reinterpret_cast<PIGMENT *>(New));
         END_CASE
 
@@ -1292,10 +1281,8 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
                 Only_In("bump_map","normal");
             }
 
-            if (Old_Type==BITMAP_PATTERN)
-            {
+            if (Old_Image)
                 Destroy_Image(Old_Image);
-            }
 
             New->Type = BITMAP_PATTERN;
             New->pattern = PatternPtr(new ImagePattern());
@@ -1350,16 +1337,14 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
 
         CASE (AVERAGE_TOKEN)
             New->Type = AVERAGE_PATTERN;
-            New->pattern = PatternPtr(new PlainPattern());
+            New->pattern = PatternPtr(new AveragePattern());
         END_CASE
 
         CASE (IMAGE_PATTERN_TOKEN)
-            if ((Old_Type==BITMAP_PATTERN) || (Old_Type==IMAGE_PATTERN))
-            {
+            if (Old_Image)
                 Destroy_Image(Old_Image);
-            }
 
-            New->Type = IMAGE_PATTERN;
+            New->Type = GENERIC_PATTERN;
             New->pattern = PatternPtr(new ImagePattern());
             dynamic_cast<ImagePattern*>(New->pattern.get())->waveFrequency = 0.0;
             Parse_Image_Pattern (New);
@@ -1386,11 +1371,9 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
         END_CASE
 
         CASE (DENSITY_FILE_TOKEN)
-            if (Old_Type==DENSITY_FILE_PATTERN)
-            {
+            if (Old_Density_File)
                 Destroy_Density_File(Old_Density_File);
-            }
-            New->Type = DENSITY_FILE_PATTERN;
+            New->Type = GENERIC_PATTERN;
             New->pattern = PatternPtr(new DensityFilePattern());
             dynamic_cast<DensityFilePattern*>(New->pattern.get())->densityFile = Create_Density_File();
             GET(DF3_TOKEN);
@@ -1551,7 +1534,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
         END_CASE
 
         CASE (PAVEMENT_TOKEN)
-            New->Type = PAVEMENT_PATTERN;
+            New->Type = GENERIC_PATTERN;
             New->pattern = PatternPtr(new PavementPattern());
             dynamic_cast<PavementPattern*>(New->pattern.get())->Side = 3;
             dynamic_cast<PavementPattern*>(New->pattern.get())->Tile = 1;
@@ -1562,7 +1545,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
         END_CASE
 
         CASE (TILING_TOKEN)
-            New->Type = TILING_PATTERN;
+            New->Type = GENERIC_PATTERN;
             New->pattern = PatternPtr(new TilingPattern());
             dynamic_cast<TilingPattern*>(New->pattern.get())->tilingType = (unsigned char)Parse_Float();
         END_CASE
@@ -1599,15 +1582,11 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
         END_CASE
     END_EXPECT     /* Concludes pattern_body */
 
-    if ((Old_Type==BITMAP_PATTERN) && (New->Type!=BITMAP_PATTERN))
-    {
+    if (Old_Image && !dynamic_cast<ImagePatternImpl*>(New->pattern.get()))
         Destroy_Image(Old_Image);
-    }
 
-    if ((Old_Type==DENSITY_FILE_PATTERN) && (New->Type!=DENSITY_FILE_PATTERN))
-    {
+    if (Old_Density_File && !dynamic_cast<DensityFilePattern*>(New->pattern.get()))
         Destroy_Density_File(Old_Density_File);
-    }
 
     if (TPat_Type == kBlendMapType_Normal)
     {
@@ -1625,29 +1604,18 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
         END_CASE
 
         CASE (SOLID_TOKEN)
-            if (New->Type != CRACKLE_PATTERN )
-            {
+            if (dynamic_cast<CracklePattern*>(New->pattern.get()))
+                dynamic_cast<CracklePattern*>(New->pattern.get())->crackleIsSolid = 1;
+            else
                 Only_In("solid", "crackle");
-            }
-            dynamic_cast<CracklePattern*>(New->pattern.get())->crackleIsSolid = 1;
         END_CASE
 
         CASE (EXTERIOR_TOKEN)
-            if(!((New->Type == MANDEL_PATTERN) || (New->Type == MANDEL3_PATTERN) ||
-                 (New->Type == MANDEL4_PATTERN) || (New->Type == MANDELX_PATTERN) ||
-                 (New->Type == JULIA_PATTERN) || (New->Type == JULIA3_PATTERN) ||
-                 (New->Type == JULIA4_PATTERN) || (New->Type == JULIAX_PATTERN) ||
-                 (New->Type == MAGNET1M_PATTERN) || (New->Type == MAGNET2M_PATTERN) ||
-                 (New->Type == MAGNET1J_PATTERN) || (New->Type == MAGNET2J_PATTERN) ||
-                 (New->Type == PAVEMENT_PATTERN)))
-            {
-                Only_In("exterior", "mandel, julia, magnet or pavement");
-            }
-            else if (New->Type == PAVEMENT_PATTERN)
+            if (dynamic_cast<PavementPattern*>(New->pattern.get()))
             {
                 dynamic_cast<PavementPattern*>(New->pattern.get())->Exterior = (unsigned char)Parse_Float();
             }
-            else
+            else if (dynamic_cast<FractalPattern*>(New->pattern.get()))
             {
                 dynamic_cast<FractalPattern*>(New->pattern.get())->exteriorType = (int)Parse_Float();
                 if((dynamic_cast<FractalPattern*>(New->pattern.get())->exteriorType < 0) || (dynamic_cast<FractalPattern*>(New->pattern.get())->exteriorType > 8))
@@ -1655,24 +1623,18 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
                 Parse_Comma();
                 dynamic_cast<FractalPattern*>(New->pattern.get())->exteriorFactor = Parse_Float();
             }
-        END_CASE
-
-        CASE (INTERIOR_TOKEN)
-            if(!((New->Type == MANDEL_PATTERN) || (New->Type == MANDEL3_PATTERN) ||
-                 (New->Type == MANDEL4_PATTERN) || (New->Type == MANDELX_PATTERN) ||
-                 (New->Type == JULIA_PATTERN) || (New->Type == JULIA3_PATTERN) ||
-                 (New->Type == JULIA4_PATTERN) || (New->Type == JULIAX_PATTERN) ||
-                 (New->Type == MAGNET1M_PATTERN) || (New->Type == MAGNET2M_PATTERN) ||
-                 (New->Type == MAGNET1J_PATTERN) || (New->Type == MAGNET2J_PATTERN) ||
-                 (New->Type == PAVEMENT_PATTERN)))
+            else
             {
                 Only_In("exterior", "mandel, julia, magnet or pavement");
             }
-            else if (New->Type == PAVEMENT_PATTERN)
+        END_CASE
+
+        CASE (INTERIOR_TOKEN)
+            if (dynamic_cast<PavementPattern*>(New->pattern.get()))
             {
                 dynamic_cast<PavementPattern*>(New->pattern.get())->Interior = (unsigned char)Parse_Float();
             }
-            else
+            else if (dynamic_cast<FractalPattern*>(New->pattern.get()))
             {
                 dynamic_cast<FractalPattern*>(New->pattern.get())->interiorType = (int)Parse_Float();
                 if((dynamic_cast<FractalPattern*>(New->pattern.get())->interiorType < 0) || (dynamic_cast<FractalPattern*>(New->pattern.get())->interiorType > 6))
@@ -1680,45 +1642,35 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
                 Parse_Comma();
                 dynamic_cast<FractalPattern*>(New->pattern.get())->interiorFactor = Parse_Float();
             }
+            else
+            {
+                Only_In("exterior", "mandel, julia, magnet or pavement");
+            }
         END_CASE
 
         CASE (EXPONENT_TOKEN)
-            if(!((New->Type == MANDEL_PATTERN) || (New->Type == MANDEL3_PATTERN) ||
-                 (New->Type == MANDEL4_PATTERN) || (New->Type == MANDELX_PATTERN) ||
-                 (New->Type == JULIA_PATTERN) || (New->Type == JULIA3_PATTERN) ||
-                 (New->Type == JULIA4_PATTERN) || (New->Type == JULIAX_PATTERN)))
-            {
-                Only_In("exponent", "mandel or julia");
-            }
-
-            if((New->Type == JULIA_PATTERN) || (New->Type == JULIA3_PATTERN) ||
-               (New->Type == JULIA4_PATTERN) || (New->Type == JULIAX_PATTERN))
+            if (dynamic_cast<JuliaPattern*>(New->pattern.get()))
             {
                 i = (int)Parse_Float();
                 switch(i)
                 {
                     case 2:
-                        New->Type = JULIA_PATTERN;
                         New->pattern = PatternPtr(new JuliaPattern(*dynamic_cast<JuliaPattern*>(New->pattern.get())));
                         break;
                     case 3:
-                        New->Type = JULIA3_PATTERN;
                         New->pattern = PatternPtr(new Julia3Pattern(*dynamic_cast<JuliaPattern*>(New->pattern.get())));
                         break;
                     case 4:
-                        New->Type = JULIA4_PATTERN;
                         New->pattern = PatternPtr(new Julia4Pattern(*dynamic_cast<JuliaPattern*>(New->pattern.get())));
                         break;
                     default:
                         if((i > 4) && (i <= kFractalMaxExponent))
                         {
-                            New->Type = JULIAX_PATTERN;
                             New->pattern = PatternPtr(new JuliaXPattern(*dynamic_cast<JuliaPattern*>(New->pattern.get())));
                             dynamic_cast<JuliaXPattern*>(New->pattern.get())->fractalExponent = i;
                         }
                         else
                         {
-                            New->Type = JULIA_PATTERN;
                             New->pattern = PatternPtr(new JuliaPattern(*dynamic_cast<JuliaPattern*>(New->pattern.get())));
                             Warning("Invalid julia pattern exponent found. Supported exponents are 2 to %i.\n"
                                     "Using default exponent 2.", kFractalMaxExponent);
@@ -1726,34 +1678,28 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
                         break;
                 }
             }
-            else if((New->Type == MANDEL_PATTERN) || (New->Type == MANDEL3_PATTERN) ||
-                    (New->Type == MANDEL4_PATTERN) || (New->Type == MANDELX_PATTERN))
+            else if (dynamic_cast<MandelPattern*>(New->pattern.get()))
             {
                 i = (int)Parse_Float();
                 switch(i)
                 {
                     case 2:
-                        New->Type = MANDEL_PATTERN;
                         New->pattern = PatternPtr(new Mandel2Pattern(*dynamic_cast<MandelPattern*>(New->pattern.get())));
                         break;
                     case 3:
-                        New->Type = MANDEL3_PATTERN;
                         New->pattern = PatternPtr(new Mandel3Pattern(*dynamic_cast<MandelPattern*>(New->pattern.get())));
                         break;
                     case 4:
-                        New->Type = MANDEL4_PATTERN;
                         New->pattern = PatternPtr(new Mandel4Pattern(*dynamic_cast<MandelPattern*>(New->pattern.get())));
                         break;
                     default:
                         if((i > 4) && (i <= kFractalMaxExponent))
                         {
-                            New->Type = MANDELX_PATTERN;
                             New->pattern = PatternPtr(new MandelXPattern(*dynamic_cast<MandelPattern*>(New->pattern.get())));
                             dynamic_cast<MandelXPattern*>(New->pattern.get())->fractalExponent = i;
                         }
                         else
                         {
-                            New->Type = MANDEL_PATTERN;
                             New->pattern = PatternPtr(new Mandel2Pattern(*dynamic_cast<MandelPattern*>(New->pattern.get())));
                             Warning("Invalid mandel pattern exponent found. Supported exponents are 2 to %i.\n"
                                     "Using default exponent 2.", kFractalMaxExponent);
@@ -1761,29 +1707,33 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
                         break;
                 }
             }
+            else
+            {
+                Only_In("exponent", "mandel or julia");
+            }
         END_CASE
 
         CASE (COORDS_TOKEN)
-            if (New->Type == FACETS_PATTERN )
+            if (dynamic_cast<FacetsPattern*>(New->pattern.get()))
                 dynamic_cast<FacetsPattern*>(New->pattern.get())->facetsCoords = Parse_Float();
             else
                 Only_In("coords", "facets");
         END_CASE
 
         CASE (SIZE_TOKEN)
-            if (New->Type == FACETS_PATTERN )
+            if (dynamic_cast<FacetsPattern*>(New->pattern.get()))
                 dynamic_cast<FacetsPattern*>(New->pattern.get())->facetsSize = Parse_Float();
             else
                 Only_In("size", "facets");
         END_CASE
 
         CASE (METRIC_TOKEN)
-            if (New->Type == FACETS_PATTERN )
+            if (dynamic_cast<FacetsPattern*>(New->pattern.get()))
             {
                 Parse_Vector(Local_Vector);
                 dynamic_cast<FacetsPattern*>(New->pattern.get())->facetsMetric = Local_Vector[X];
             }
-            else if ( New->Type == CRACKLE_PATTERN )
+            else if (dynamic_cast<CracklePattern*>(New->pattern.get()))
             {
                 // Vector for backwards compatibility
                 // the only component used was always X.
@@ -1795,16 +1745,16 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
         END_CASE
 
         CASE (FORM_TOKEN)
-            if (New->Type == CRACKLE_PATTERN)
-                Parse_Vector( dynamic_cast<CracklePattern*>(New->pattern.get())->crackleForm );
-            else if (New->Type == PAVEMENT_PATTERN)
+            if (dynamic_cast<CracklePattern*>(New->pattern.get()))
+                Parse_Vector(dynamic_cast<CracklePattern*>(New->pattern.get())->crackleForm);
+            else if (dynamic_cast<PavementPattern*>(New->pattern.get()))
                 dynamic_cast<PavementPattern*>(New->pattern.get())->Form = ((unsigned char)Parse_Float());
             else
                 Only_In("form", "crackle or pavement");
         END_CASE
 
         CASE (OFFSET_TOKEN)
-            if (New->Type == CRACKLE_PATTERN )
+            if (dynamic_cast<CracklePattern*>(New->pattern.get()))
                 dynamic_cast<CracklePattern*>(New->pattern.get())->crackleOffset = Parse_Float();
             else
                 Only_In("offset", "crackle");
@@ -1820,15 +1770,8 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
             {
                 Only_In("color_map","pigment");
             }
-            if (New->Type == BRICK_PATTERN ||
-                New->Type == GENERIC_INTEGER_PATTERN ||
-                New->Type == PLAIN_PATTERN ||
-                New->Type == AVERAGE_PATTERN ||
-                New->Type == OBJECT_PATTERN ||
-                New->Type == BITMAP_PATTERN)
-            {
+            if (New->Type == AVERAGE_PATTERN || !New->pattern->CanMap())
                 Error("Cannot use color_map with this pattern type.");
-            }
             New->Blend_Map = Parse_Colour_Map<MAP_T> ();
         END_CASE
 
@@ -1837,11 +1780,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
             {
                 Only_In("pigment_map","pigment");
             }
-            if (New->Type == BRICK_PATTERN ||
-                New->Type == GENERIC_INTEGER_PATTERN ||
-                New->Type == PLAIN_PATTERN ||
-                New->Type == OBJECT_PATTERN ||
-                New->Type == BITMAP_PATTERN)
+            if (!New->pattern->CanMap())
                 Not_With ("pigment_map","this pigment type");
             New->Blend_Map = Parse_Blend_Map<MAP_T> (kBlendMapType_Pigment,New->Type);
         END_CASE
@@ -1851,11 +1790,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
             {
                 Only_In("density_map","density");
             }
-            if (New->Type == BRICK_PATTERN ||
-                New->Type == GENERIC_INTEGER_PATTERN ||
-                New->Type == PLAIN_PATTERN ||
-                New->Type == OBJECT_PATTERN ||
-                New->Type == BITMAP_PATTERN)
+            if (!New->pattern->CanMap())
                 Not_With ("density_map","this density type");
             New->Blend_Map = Parse_Blend_Map<MAP_T> (kBlendMapType_Density,New->Type);
         END_CASE
@@ -1865,12 +1800,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
             {
                 Only_In("slope_map","normal");
             }
-            if (New->Type == BRICK_PATTERN ||
-                New->Type == GENERIC_INTEGER_PATTERN ||
-                New->Type == PLAIN_PATTERN ||
-                New->Type == AVERAGE_PATTERN ||
-                New->Type == OBJECT_PATTERN ||
-                New->Type == BITMAP_PATTERN)
+            if (New->Type == AVERAGE_PATTERN || !New->pattern->CanMap())
                 Not_With ("slope_map","this normal type");
             New->Blend_Map = Parse_Blend_Map<MAP_T> (kBlendMapType_Slope,New->Type);
         END_CASE
@@ -1880,12 +1810,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
             {
                 Only_In("normal_map","normal");
             }
-            if (New->Type == BRICK_PATTERN ||
-                New->Type == FACETS_PATTERN ||
-                New->Type == GENERIC_INTEGER_PATTERN ||
-                New->Type == PLAIN_PATTERN ||
-                New->Type == OBJECT_PATTERN ||
-                New->Type == BITMAP_PATTERN)
+            if (New->Type == FACETS_PATTERN || !New->pattern->CanMap())
                 Not_With ("normal_map","this normal type");
             New->Blend_Map = Parse_Blend_Map<MAP_T> (kBlendMapType_Normal,New->Type);
         END_CASE
@@ -1895,11 +1820,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
             {
                 Only_In("texture_map","texture");
             }
-            if (New->Type == BRICK_PATTERN ||
-                New->Type == GENERIC_INTEGER_PATTERN ||
-                New->Type == PLAIN_PATTERN ||
-                New->Type == OBJECT_PATTERN ||
-                New->Type == BITMAP_PATTERN)
+            if (!New->pattern->CanMap())
                 Not_With ("texture_map","this pattern type");
             New->Blend_Map = Parse_Blend_Map<MAP_T> (kBlendMapType_Texture,New->Type);
         END_CASE
@@ -1913,14 +1834,14 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
         END_CASE
 
         CASE (CONTROL0_TOKEN)
-            if (New->Type == QUILTED_PATTERN)
+            if (dynamic_cast<QuiltedPattern*>(New->pattern.get()))
                 dynamic_cast<QuiltedPattern*>(New->pattern.get())->Control0 = Parse_Float ();
             else
                 Not_With ("control0","this pattern");
         END_CASE
 
         CASE (CONTROL1_TOKEN)
-            if (New->Type == QUILTED_PATTERN)
+            if (dynamic_cast<QuiltedPattern*>(New->pattern.get()))
                 dynamic_cast<QuiltedPattern*>(New->pattern.get())->Control1 = Parse_Float ();
             else
                 Not_With ("control1","this pattern");
@@ -1951,7 +1872,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
                 pContinuousPattern->waveFrequency = Parse_Float();
             else
             {
-                Warning("frequrency has no effect on discrete patterns");
+                Warning("frequency has no effect on discrete patterns");
                 Parse_Float();
             }
         END_CASE
@@ -2038,46 +1959,53 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
         END_CASE
 
         CASE (AGATE_TURB_TOKEN)
-            if (New->Type != AGATE_PATTERN)
+            if (dynamic_cast<AgatePattern*>(New->pattern.get()))
+            {
+                dynamic_cast<AgatePattern*>(New->pattern.get())->agateTurbScale = Parse_Float();
+                Check_Turb(New->pattern->warps, New->pattern->HasSpecialTurbulenceHandling());   /* agate needs Octaves, Lambda etc. */
+            }
+            else
                 Not_With ("agate_turb","non-agate");
-            dynamic_cast<AgatePattern*>(New->pattern.get())->agateTurbScale = Parse_Float();
-            Check_Turb(New->pattern->warps, New->pattern->HasSpecialTurbulenceHandling());   /* agate needs Octaves, Lambda etc. */
         END_CASE
 
         CASE (BRICK_SIZE_TOKEN)
-            if (New->Type != BRICK_PATTERN)
+            if (!dynamic_cast<BrickPattern*>(New->pattern.get()))
                 Not_With ("brick_size","non-brick");
             Parse_Vector(dynamic_cast<BrickPattern*>(New->pattern.get())->brickSize);
         END_CASE
 
         CASE (MORTAR_TOKEN)
-            if (New->Type != BRICK_PATTERN)
+            if (!dynamic_cast<BrickPattern*>(New->pattern.get()))
                 Not_With ("mortar","non-brick");
             dynamic_cast<BrickPattern*>(New->pattern.get())->mortar = Parse_Float()-EPSILON*2.0;
         END_CASE
 
         CASE (INTERPOLATE_TOKEN)
-            if (New->Type != DENSITY_FILE_PATTERN)
+            if (dynamic_cast<DensityFilePattern*>(New->pattern.get()))
+                dynamic_cast<DensityFilePattern*>(New->pattern.get())->densityFile->Interpolation = (int)Parse_Float();
+            else
                 Not_With ("interpolate","non-density_file");
-            dynamic_cast<DensityFilePattern*>(New->pattern.get())->densityFile->Interpolation = (int)Parse_Float();
         END_CASE
 
         CASE (NUMBER_OF_SIDES_TOKEN)
-            if (New->Type != PAVEMENT_PATTERN)
+            if (dynamic_cast<PavementPattern*>(New->pattern.get()))
+                dynamic_cast<PavementPattern*>(New->pattern.get())->Side=(unsigned char)Parse_Float();
+            else
                 Only_In("number_of_sides","pavement");
-            dynamic_cast<PavementPattern*>(New->pattern.get())->Side=(unsigned char)Parse_Float();
         END_CASE
 
         CASE (NUMBER_OF_TILES_TOKEN)
-            if (New->Type != PAVEMENT_PATTERN)
+            if (dynamic_cast<PavementPattern*>(New->pattern.get()))
+                dynamic_cast<PavementPattern*>(New->pattern.get())->Tile=(unsigned char)Parse_Float();
+            else
                 Only_In("number_of_tiles","pavement");
-            dynamic_cast<PavementPattern*>(New->pattern.get())->Tile=(unsigned char)Parse_Float();
         END_CASE
 
         CASE (PATTERN_TOKEN)
-            if (New->Type != PAVEMENT_PATTERN)
+            if (dynamic_cast<PavementPattern*>(New->pattern.get()))
+                dynamic_cast<PavementPattern*>(New->pattern.get())->Number=(unsigned char)Parse_Float();
+            else
                 Only_In("pattern","pavement");
-            dynamic_cast<PavementPattern*>(New->pattern.get())->Number=(unsigned char)Parse_Float();
         END_CASE
 
         CASE (WARP_TOKEN)
@@ -2141,7 +2069,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
         Error("Patterned texture must have texture_map.");
     }
 
-    if (New->Type == PAVEMENT_PATTERN)
+    if (dynamic_cast<PavementPattern*>(New->pattern.get()))
     {
         const int valid6[]={1,1,3,7,22};
         const int valid4[]={1,1,2,5,12,35};
@@ -2191,10 +2119,10 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
         }
 
     }
-
-    if ((New->Type==TILING_PATTERN) && ((dynamic_cast<TilingPattern*>(New->pattern.get())->tilingType < 1) || (dynamic_cast<TilingPattern*>(New->pattern.get())->tilingType > 27)))
+    else if (dynamic_cast<TilingPattern*>(New->pattern.get()))
     {
-        Error("Tiling number must be between 1 and 27.");
+        if ((dynamic_cast<TilingPattern*>(New->pattern.get())->tilingType < 1) || (dynamic_cast<TilingPattern*>(New->pattern.get())->tilingType > 27))
+            Error("Tiling number must be between 1 and 27.");
     }
 }
 
@@ -2855,7 +2783,7 @@ TEXTURE *Parser::Parse_Tiles()
     Texture->Pigment = NULL;
     Texture->Tnormal = NULL;
     Texture->Finish  = NULL;
-    Texture->Type = GENERIC_INTEGER_PATTERN;
+    Texture->Type = GENERIC_PATTERN;
     Texture->pattern = PatternPtr(new CheckerPattern());
 
     Texture->Blend_Map = Create_Blend_Map<TextureBlendMap> (kBlendMapType_Texture);
@@ -2942,34 +2870,36 @@ TEXTURE *Parser::Parse_Material_Map()
     Texture->Type = BITMAP_PATTERN;
     Texture->pattern = PatternPtr(new ImagePattern());
 
-    dynamic_cast<ImagePattern*>(Texture->pattern.get())->pImage = Parse_Image(MATERIAL_FILE);
-    dynamic_cast<ImagePattern*>(Texture->pattern.get())->pImage->Use = USE_NONE; // was false [trf]
+    ImageDataPtr& pImage = dynamic_cast<ImagePattern*>(Texture->pattern.get())->pImage;
+
+    pImage = Parse_Image(MATERIAL_FILE);
+    pImage->Use = USE_NONE; // was false [trf]
 
     EXPECT
         CASE (ONCE_TOKEN)
-            dynamic_cast<ImagePattern*>(Texture->pattern.get())->pImage->Once_Flag=true;
+            pImage->Once_Flag=true;
         END_CASE
 
         CASE (INTERPOLATE_TOKEN)
-            dynamic_cast<ImagePattern*>(Texture->pattern.get())->pImage->Interpolation_Type=(int)Parse_Float();
+            pImage->Interpolation_Type=(int)Parse_Float();
         END_CASE
 
         CASE (MAP_TYPE_TOKEN)
-            dynamic_cast<ImagePattern*>(Texture->pattern.get())->pImage->Map_Type = (int) Parse_Float ();
+            pImage->Map_Type = (int) Parse_Float ();
         END_CASE
 
         CASE (REPEAT_TOKEN)
             Parse_UV_Vect (Repeat);
             if ((Repeat[0]<=0.0) || (Repeat[1]<=0.0))
                 Error("Zero or Negative Image Repeat Vector.");
-            dynamic_cast<ImagePattern*>(Texture->pattern.get())->pImage->width  =  (DBL)dynamic_cast<ImagePattern*>(Texture->pattern.get())->pImage->iwidth  * Repeat[0];
-            dynamic_cast<ImagePattern*>(Texture->pattern.get())->pImage->height =  (DBL)dynamic_cast<ImagePattern*>(Texture->pattern.get())->pImage->iheight * Repeat[1];
+            pImage->width  =  (DBL)pImage->iwidth  * Repeat[0];
+            pImage->height =  (DBL)pImage->iheight * Repeat[1];
         END_CASE
 
         CASE (OFFSET_TOKEN)
-            Parse_UV_Vect (dynamic_cast<ImagePattern*>(Texture->pattern.get())->pImage->Offset);
-            dynamic_cast<ImagePattern*>(Texture->pattern.get())->pImage->Offset[U] *= (DBL)-dynamic_cast<ImagePattern*>(Texture->pattern.get())->pImage->iwidth;
-            dynamic_cast<ImagePattern*>(Texture->pattern.get())->pImage->Offset[V] *= (DBL)-dynamic_cast<ImagePattern*>(Texture->pattern.get())->pImage->iheight;
+            Parse_UV_Vect (pImage->Offset);
+            pImage->Offset[U] *= -(DBL)pImage->iwidth;
+            pImage->Offset[V] *= -(DBL)pImage->iheight;
         END_CASE
 
         OTHERWISE
@@ -3109,7 +3039,7 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
 ***********************************************************************/
                 CASE (AGATE_TOKEN)
                     Warn_State(Token.Token_Id, PIGMENT_TOKEN);
-                    Pigment->Type = AGATE_PATTERN;
+                    Pigment->Type = GENERIC_PATTERN;
                     Pigment->pattern = PatternPtr(new AgatePattern());
                     dynamic_cast<AgatePattern*>(Pigment->pattern.get())->agateTurbScale = 1.0;
                     Check_Turb(Pigment->pattern->warps, Pigment->pattern->HasSpecialTurbulenceHandling()); // agate needs Octaves, Lambda etc., and handles the pattern itself
@@ -3135,13 +3065,13 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
 
                 CASE (MARBLE_TOKEN)
                     Warn_State(Token.Token_Id, PIGMENT_TOKEN);
-                    Pigment->Type = MARBLE_PATTERN;
+                    Pigment->Type = GENERIC_PATTERN;
                     Pigment->pattern = PatternPtr(new MarblePattern());
                 END_CASE
 
                 CASE (MANDEL_TOKEN)
                     Warn_State(Token.Token_Id, PIGMENT_TOKEN);
-                    Pigment->Type = MANDEL_PATTERN;
+                    Pigment->Type = GENERIC_PATTERN;
                     Pigment->pattern = PatternPtr(new Mandel2Pattern());
                     dynamic_cast<FractalPattern*>(Pigment->pattern.get())->maxIterations = Parse_Int_With_Minimum(1, "fractal iterations limit");
                 END_CASE
@@ -3160,7 +3090,7 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
 
                 CASE (WOOD_TOKEN)
                     Warn_State(Token.Token_Id, PIGMENT_TOKEN);
-                    Pigment->Type = WOOD_PATTERN;
+                    Pigment->Type = GENERIC_PATTERN;
                     Pigment->pattern = PatternPtr(new WoodPattern());
                 END_CASE
 
@@ -3182,37 +3112,36 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
 
                 CASE (CHECKER_TOKEN)
                     Warn_State(Token.Token_Id, PIGMENT_TOKEN);
-                    Pigment->Type = GENERIC_INTEGER_PATTERN;
+                    Pigment->Type = GENERIC_PATTERN;
                     Pigment->pattern = PatternPtr(new CheckerPattern());
                     Pigment->Blend_Map = Parse_Blend_List<ColourBlendMap>(2,Pigment->pattern->GetDefaultBlendMap(),kBlendMapType_Colour);
                 END_CASE
 
                 CASE (HEXAGON_TOKEN)
                     Warn_State(Token.Token_Id, PIGMENT_TOKEN);
-                    Pigment->Type = GENERIC_INTEGER_PATTERN;
+                    Pigment->Type = GENERIC_PATTERN;
                     Pigment->pattern = PatternPtr(new HexagonPattern());
                     Pigment->Blend_Map = Parse_Blend_List<ColourBlendMap>(3,Pigment->pattern->GetDefaultBlendMap(),kBlendMapType_Colour);
                 END_CASE
 
                 CASE (SQUARE_TOKEN)
                     Warn_State(Token.Token_Id, PIGMENT_TOKEN);
-                    Pigment->Type = GENERIC_INTEGER_PATTERN;
+                    Pigment->Type = GENERIC_PATTERN;
                     Pigment->pattern = PatternPtr(new SquarePattern());
                     Pigment->Blend_Map = Parse_Blend_List<ColourBlendMap>(4,Pigment->pattern->GetDefaultBlendMap(),kBlendMapType_Colour);
                 END_CASE
 
                 CASE (TRIANGULAR_TOKEN)
                     Warn_State(Token.Token_Id, PIGMENT_TOKEN);
-                    Pigment->Type = GENERIC_INTEGER_PATTERN;
+                    Pigment->Type = GENERIC_PATTERN;
                     Pigment->pattern = PatternPtr(new TriangularPattern());
                     Pigment->Blend_Map = Parse_Blend_List<ColourBlendMap>(6,Pigment->pattern->GetDefaultBlendMap(),kBlendMapType_Colour);
                 END_CASE
 
                 CASE (IMAGE_MAP_TOKEN)
                     Warn_State(Token.Token_Id, PIGMENT_TOKEN);
-                    Pigment->Type = BITMAP_PATTERN;
-                    Pigment->pattern = PatternPtr(new ImagePattern());
-                    dynamic_cast<ImagePattern*>(Pigment->pattern.get())->waveFrequency = 0.0;
+                    Pigment->Type = IMAGE_MAP_PATTERN;
+                    Pigment->pattern = PatternPtr(new ColourImagePattern());
                     Parse_Image_Map (Pigment);
                 END_CASE
 
@@ -3223,9 +3152,7 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
 
                 CASE (COLOUR_MAP_TOKEN)
                     Warn_State(Token.Token_Id, PIGMENT_TOKEN);
-                    if (Pigment->Type == GENERIC_INTEGER_PATTERN ||
-                        Pigment->Type == PLAIN_PATTERN ||
-                        Pigment->Type == BITMAP_PATTERN)
+                    if (!Pigment->pattern->CanMap())
                         VersionWarning(150, "Cannot use color map with this pigment type.");
                     Pigment->Blend_Map = Parse_Colour_Map<ColourBlendMap> ();
                 END_CASE
@@ -3310,21 +3237,29 @@ NOTE: Do not add new keywords to this section.  Use 1.0 syntax only.
                 CASE (FREQUENCY_TOKEN)
                     Warn_State(Token.Token_Id, NORMAL_TOKEN);
                     ADD_TNORMAL
-                    if (!(Tnormal->Type == RIPPLES_PATTERN || Tnormal->Type == WAVES_PATTERN))
+                    pContinuousPattern = dynamic_cast<ContinuousPattern*>(Tnormal->pattern.get());
+                    if (pContinuousPattern != NULL)
+                        pContinuousPattern->waveFrequency = Parse_Float();
+                    else
+                    {
                         if (sceneData->EffectiveLanguageVersion() >= 150)
                             VersionWarning(150, "Cannot use frequency with this normal.");
-                    pContinuousPattern = dynamic_cast<ContinuousPattern*>(Tnormal->pattern.get());
-                    pContinuousPattern->waveFrequency = Parse_Float();
+                        Parse_Float();
+                    }
                 END_CASE
 
                 CASE (PHASE_TOKEN)
                     Warn_State(Token.Token_Id, NORMAL_TOKEN);
                     ADD_TNORMAL
-                    if (!(Tnormal->Type == RIPPLES_PATTERN || Tnormal->Type == WAVES_PATTERN))
+                    pContinuousPattern = dynamic_cast<ContinuousPattern*>(Tnormal->pattern.get());
+                    if (pContinuousPattern != NULL)
+                        pContinuousPattern->wavePhase = Parse_Float();
+                    else
+                    {
                         if (sceneData->EffectiveLanguageVersion() >= 150)
                             VersionWarning(150, "Cannot use phase with this normal.");
-                    pContinuousPattern = dynamic_cast<ContinuousPattern*>(Tnormal->pattern.get());
-                    pContinuousPattern->wavePhase = Parse_Float();
+                        Parse_Float();
+                    }
                 END_CASE
 
 
@@ -4846,7 +4781,7 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
 
     EXPECT_ONE
         CASE (AGATE_TOKEN)
-            New->Type = AGATE_PATTERN;
+            New->Type = GENERIC_PATTERN;
             New->pattern = PatternPtr(new AgatePattern());
             Check_Turb(New->pattern->warps, New->pattern->HasSpecialTurbulenceHandling());
             dynamic_cast<AgatePattern*>(New->pattern.get())->agateTurbScale = 1.0; // TODO this is a job for a constructor
@@ -4884,13 +4819,13 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
         END_CASE
 
         CASE (MARBLE_TOKEN)
-            New->Type = MARBLE_PATTERN;
+            New->Type = GENERIC_PATTERN;
             New->pattern = PatternPtr(new MarblePattern());
             dynamic_cast<MarblePattern*>(New->pattern.get())->waveType = kWaveType_Triangle;
         END_CASE
 
         CASE (MANDEL_TOKEN)
-            New->Type = MANDEL_PATTERN;
+            New->Type = GENERIC_PATTERN;
             New->pattern = PatternPtr(new Mandel2Pattern());
             dynamic_cast<MandelPattern*>(New->pattern.get())->maxIterations = Parse_Int_With_Minimum(1, "fractal iterations limit");
             dynamic_cast<MandelPattern*>(New->pattern.get())->interiorType = DEFAULT_FRACTAL_INTERIOR_TYPE;
@@ -4900,7 +4835,7 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
         END_CASE
 
         CASE (JULIA_TOKEN)
-            New->Type = JULIA_PATTERN;
+            New->Type = GENERIC_PATTERN;
             New->pattern = PatternPtr(new JuliaPattern());
             Parse_UV_Vect(dynamic_cast<JuliaPattern*>(New->pattern.get())->juliaCoord);
             Parse_Comma();
@@ -4912,18 +4847,16 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
         END_CASE
 
         CASE (MAGNET_TOKEN)
-            New->Type = NO_PATTERN;
+            New->Type = GENERIC_PATTERN;
             i = (int)Parse_Float();
             EXPECT_ONE
                 CASE (MANDEL_TOKEN)
                     switch(i)
                     {
                         case 1:
-                            New->Type = MAGNET1M_PATTERN;
                             New->pattern = PatternPtr(new Magnet1MPattern());
                             break;
                         case 2:
-                            New->Type = MAGNET2M_PATTERN;
                             New->pattern = PatternPtr(new Magnet2MPattern());
                             break;
                         default:
@@ -4935,11 +4868,9 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
                     switch(i)
                     {
                         case 1:
-                            New->Type = MAGNET1J_PATTERN;
                             New->pattern = PatternPtr(new Magnet1JPattern());
                             break;
                         case 2:
-                            New->Type = MAGNET2J_PATTERN;
                             New->pattern = PatternPtr(new Magnet2JPattern());
                             break;
                         default:
@@ -4987,7 +4918,7 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
         END_CASE
 
         CASE (WOOD_TOKEN)
-            New->Type = WOOD_PATTERN;
+            New->Type = GENERIC_PATTERN;
             New->pattern = PatternPtr(new WoodPattern());
             dynamic_cast<WoodPattern*>(New->pattern.get())->waveType = kWaveType_Triangle;
         END_CASE
@@ -5006,7 +4937,7 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
         END_CASE
 
         CASE (CRACKLE_TOKEN)
-            New->Type = CRACKLE_PATTERN;
+            New->Type = GENERIC_PATTERN;
             New->pattern = PatternPtr(new CracklePattern());
             dynamic_cast<CracklePattern*>(New->pattern.get())->crackleIsSolid = 0;
             dynamic_cast<CracklePattern*>(New->pattern.get())->crackleForm[X] = -1;
@@ -5021,7 +4952,7 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
         // UV_MAPPING_TOKEN is not accepted, as it requires UV mapping information, which can't be passed to a function
 
         CASE (CHECKER_TOKEN)
-            New->Type = GENERIC_INTEGER_PATTERN;
+            New->Type = GENERIC_PATTERN;
             New->pattern = PatternPtr(new CheckerPattern());
             // TODO VERIFY - this differs from regular pattern parsing (Blend Map), is that ok?
         END_CASE
@@ -5033,7 +4964,7 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
             Parse_Bound_Clip(tempObjects, false);
             if(tempObjects.size() != 1)
                 Error ("object or object identifier expected.");
-            New->Type = OBJECT_PATTERN;
+            New->Type = GENERIC_PATTERN;
             New->pattern = PatternPtr(new ObjectPattern());
             dynamic_cast<ObjectPattern*>(New->pattern.get())->pObject = tempObjects[0];
             // TODO VERIFY - this differs from regular pattern parsing (Blend Map), is that ok?
@@ -5047,9 +4978,9 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
         END_CASE
 
         CASE (BRICK_TOKEN)
-            if (New->Type!=BRICK_PATTERN)
+            if (!dynamic_cast<BrickPattern*>(New->pattern.get()))
             {
-                New->Type = BRICK_PATTERN;
+                New->Type = GENERIC_PATTERN;
                 New->pattern = PatternPtr(new BrickPattern());
                 dynamic_cast<BrickPattern*>(New->pattern.get())->brickSize = Vector3d(8.0,3.0,4.5);
                 dynamic_cast<BrickPattern*>(New->pattern.get())->mortar=0.5-EPSILON*2.0;
@@ -5058,7 +4989,7 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
         END_CASE
 
         CASE (HEXAGON_TOKEN)
-            New->Type = GENERIC_INTEGER_PATTERN;
+            New->Type = GENERIC_PATTERN;
             New->pattern = PatternPtr(new HexagonPattern());
             // TODO VERIFY - this differs from regular pattern parsing (Blend Map), is that ok?
         END_CASE
@@ -5069,7 +5000,7 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
 
         // JN2007: Cubic pattern
         CASE (CUBIC_TOKEN)
-            New->Type = GENERIC_INTEGER_PATTERN;
+            New->Type = GENERIC_PATTERN;
             New->pattern = PatternPtr(new CubicPattern());
             // TODO VERIFY - this differs from regular pattern parsing (Blend Map), is that ok?
         END_CASE
@@ -5117,7 +5048,7 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
 
         CASE (IMAGE_PATTERN_TOKEN)
             // TODO VERIFY - this differs from regular pattern parsing (destruction of old image), is that ok?
-            New->Type = IMAGE_PATTERN;
+            New->Type = GENERIC_PATTERN;
             New->pattern = PatternPtr(new ImagePattern());
             dynamic_cast<ImagePattern*>(New->pattern.get())->waveFrequency = 0.0;
             Parse_Image_Pattern (New);
@@ -5145,7 +5076,7 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
 
         CASE (DENSITY_FILE_TOKEN)
             // TODO VERIFY - this differs from regular pattern parsing (destruction of old density file), is that ok?
-            New->Type = DENSITY_FILE_PATTERN;
+            New->Type = GENERIC_PATTERN;
             New->pattern = PatternPtr(new DensityFilePattern());
             dynamic_cast<DensityFilePattern*>(New->pattern.get())->densityFile = Create_Density_File();
             GET(DF3_TOKEN);
@@ -5163,7 +5094,7 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
         // AOI_TOKEN is not accepted, as it requires normal vector information, which can't be passed to a function
 
         CASE (PAVEMENT_TOKEN)
-            New->Type = PAVEMENT_PATTERN;
+            New->Type = GENERIC_PATTERN;
             New->pattern = PatternPtr(new PavementPattern());
             dynamic_cast<PavementPattern*>(New->pattern.get())->Side = 3;
             dynamic_cast<PavementPattern*>(New->pattern.get())->Tile = 1;
@@ -5174,7 +5105,7 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
         END_CASE
 
         CASE (TILING_TOKEN)
-            New->Type = TILING_PATTERN;
+            New->Type = GENERIC_PATTERN;
             New->pattern = PatternPtr(new TilingPattern());
             dynamic_cast<TilingPattern*>(New->pattern.get())->tilingType = (unsigned char)Parse_Float();
         END_CASE
@@ -5216,27 +5147,18 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
         // ACCURACY_TOKEN is not accepted, as it is only useful for normal perturbations
 
         CASE (SOLID_TOKEN)
-            if (New->Type != CRACKLE_PATTERN )
+            if (dynamic_cast<CracklePattern*>(New->pattern.get()))
+                dynamic_cast<CracklePattern*>(New->pattern.get())->crackleIsSolid = 1;
+            else
                 Only_In("solid", "crackle");
-            dynamic_cast<CracklePattern*>(New->pattern.get())->crackleIsSolid = 1;
         END_CASE
 
         CASE (EXTERIOR_TOKEN)
-            if(!((New->Type == MANDEL_PATTERN) || (New->Type == MANDEL3_PATTERN) ||
-                 (New->Type == MANDEL4_PATTERN) || (New->Type == MANDELX_PATTERN) ||
-                 (New->Type == JULIA_PATTERN) || (New->Type == JULIA3_PATTERN) ||
-                 (New->Type == JULIA4_PATTERN) || (New->Type == JULIAX_PATTERN) ||
-                 (New->Type == MAGNET1M_PATTERN) || (New->Type == MAGNET2M_PATTERN) ||
-                 (New->Type == MAGNET1J_PATTERN) || (New->Type == MAGNET2J_PATTERN) ||
-                 (New->Type == PAVEMENT_PATTERN)))
-            {
-                Only_In("exterior", "mandel, julia, magnet or pavement");
-            }
-            else if (New->Type == PAVEMENT_PATTERN)
+            if (dynamic_cast<PavementPattern*>(New->pattern.get()))
             {
                 dynamic_cast<PavementPattern*>(New->pattern.get())->Exterior = (unsigned char)Parse_Float();
             }
-            else
+            else if (dynamic_cast<FractalPattern*>(New->pattern.get()))
             {
                 dynamic_cast<FractalPattern*>(New->pattern.get())->exteriorType = (int)Parse_Float();
                 if((dynamic_cast<FractalPattern*>(New->pattern.get())->exteriorType < 0) || (dynamic_cast<FractalPattern*>(New->pattern.get())->exteriorType > 6))
@@ -5244,24 +5166,18 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
                 Parse_Comma();
                 dynamic_cast<FractalPattern*>(New->pattern.get())->exteriorFactor = Parse_Float();
             }
-        END_CASE
-
-        CASE (INTERIOR_TOKEN)
-            if(!((New->Type == MANDEL_PATTERN) || (New->Type == MANDEL3_PATTERN) ||
-                 (New->Type == MANDEL4_PATTERN) || (New->Type == MANDELX_PATTERN) ||
-                 (New->Type == JULIA_PATTERN) || (New->Type == JULIA3_PATTERN) ||
-                 (New->Type == JULIA4_PATTERN) || (New->Type == JULIAX_PATTERN) ||
-                 (New->Type == MAGNET1M_PATTERN) || (New->Type == MAGNET2M_PATTERN) ||
-                 (New->Type == MAGNET1J_PATTERN) || (New->Type == MAGNET2J_PATTERN) ||
-                 (New->Type == PAVEMENT_PATTERN)))
+            else
             {
                 Only_In("exterior", "mandel, julia, magnet or pavement");
             }
-            else if (New->Type == PAVEMENT_PATTERN)
+        END_CASE
+
+        CASE (INTERIOR_TOKEN)
+            if (dynamic_cast<PavementPattern*>(New->pattern.get()))
             {
                 dynamic_cast<PavementPattern*>(New->pattern.get())->Interior = (unsigned char)Parse_Float();
             }
-            else
+            else if (dynamic_cast<FractalPattern*>(New->pattern.get()))
             {
                 dynamic_cast<FractalPattern*>(New->pattern.get())->interiorType = (int)Parse_Float();
                 if((dynamic_cast<FractalPattern*>(New->pattern.get())->interiorType < 0) || (dynamic_cast<FractalPattern*>(New->pattern.get())->interiorType > 6))
@@ -5269,45 +5185,35 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
                 Parse_Comma();
                 dynamic_cast<FractalPattern*>(New->pattern.get())->interiorFactor = Parse_Float();
             }
+            else
+            {
+                Only_In("exterior", "mandel, julia, magnet or pavement");
+            }
         END_CASE
 
         CASE (EXPONENT_TOKEN)
-            if(!((New->Type == MANDEL_PATTERN) || (New->Type == MANDEL3_PATTERN) ||
-                 (New->Type == MANDEL4_PATTERN) || (New->Type == MANDELX_PATTERN) ||
-                 (New->Type == JULIA_PATTERN) || (New->Type == JULIA3_PATTERN) ||
-                 (New->Type == JULIA4_PATTERN) || (New->Type == JULIAX_PATTERN)))
-            {
-                Only_In("exponent", "mandel or julia");
-            }
-
-            if((New->Type == JULIA_PATTERN) || (New->Type == JULIA3_PATTERN) ||
-               (New->Type == JULIA4_PATTERN) || (New->Type == JULIAX_PATTERN))
+            if (dynamic_cast<JuliaPattern*>(New->pattern.get()))
             {
                 i = (int)Parse_Float();
                 switch(i)
                 {
                     case 2:
-                        New->Type = JULIA_PATTERN;
                         New->pattern = PatternPtr(new JuliaPattern(*dynamic_cast<JuliaPattern*>(New->pattern.get())));
                         break;
                     case 3:
-                        New->Type = JULIA3_PATTERN;
                         New->pattern = PatternPtr(new Julia3Pattern(*dynamic_cast<JuliaPattern*>(New->pattern.get())));
                         break;
                     case 4:
-                        New->Type = JULIA4_PATTERN;
                         New->pattern = PatternPtr(new Julia4Pattern(*dynamic_cast<JuliaPattern*>(New->pattern.get())));
                         break;
                     default:
                         if((i > 4) && (i <= kFractalMaxExponent))
                         {
-                            New->Type = JULIAX_PATTERN;
                             New->pattern = PatternPtr(new JuliaXPattern(*dynamic_cast<JuliaPattern*>(New->pattern.get())));
                             dynamic_cast<JuliaXPattern*>(New->pattern.get())->fractalExponent = i;
                         }
                         else
                         {
-                            New->Type = JULIA_PATTERN;
                             New->pattern = PatternPtr(new JuliaPattern(*dynamic_cast<JuliaPattern*>(New->pattern.get())));
                             Warning("Invalid julia pattern exponent found. Supported exponents are 2 to %i.\n"
                                     "Using default exponent 2.", kFractalMaxExponent);
@@ -5315,34 +5221,28 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
                         break;
                 }
             }
-            else if((New->Type == MANDEL_PATTERN) || (New->Type == MANDEL3_PATTERN) ||
-                    (New->Type == MANDEL4_PATTERN) || (New->Type == MANDELX_PATTERN))
+            else if (dynamic_cast<MandelPattern*>(New->pattern.get()))
             {
                 i = (int)Parse_Float();
                 switch(i)
                 {
                     case 2:
-                        New->Type = MANDEL_PATTERN;
                         New->pattern = PatternPtr(new Mandel2Pattern(*dynamic_cast<MandelPattern*>(New->pattern.get())));
                         break;
                     case 3:
-                        New->Type = MANDEL3_PATTERN;
                         New->pattern = PatternPtr(new Mandel3Pattern(*dynamic_cast<MandelPattern*>(New->pattern.get())));
                         break;
                     case 4:
-                        New->Type = MANDEL4_PATTERN;
                         New->pattern = PatternPtr(new Mandel4Pattern(*dynamic_cast<MandelPattern*>(New->pattern.get())));
                         break;
                     default:
                         if((i > 4) && (i <= kFractalMaxExponent))
                         {
-                            New->Type = MANDELX_PATTERN;
                             New->pattern = PatternPtr(new MandelXPattern(*dynamic_cast<MandelPattern*>(New->pattern.get())));
                             dynamic_cast<MandelXPattern*>(New->pattern.get())->fractalExponent = i;
                         }
                         else
                         {
-                            New->Type = MANDEL_PATTERN;
                             New->pattern = PatternPtr(new Mandel2Pattern(*dynamic_cast<MandelPattern*>(New->pattern.get())));
                             Warning("Invalid mandel pattern exponent found. Supported exponents are 2 to %i.\n"
                                     "Using default exponent 2.", kFractalMaxExponent);
@@ -5350,27 +5250,31 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
                         break;
                 }
             }
+            else
+                Only_In("exponent", "mandel or julia");
         END_CASE
 
         CASE (COORDS_TOKEN)
-            if (New->Type != FACETS_PATTERN )
+            if (dynamic_cast<FacetsPattern*>(New->pattern.get()))
+                dynamic_cast<FacetsPattern*>(New->pattern.get())->facetsCoords = Parse_Float();
+            else
                 Only_In("coords", "facets");
-            dynamic_cast<FacetsPattern*>(New->pattern.get())->facetsCoords = Parse_Float();
         END_CASE
 
         CASE (SIZE_TOKEN)
-            if (New->Type != FACETS_PATTERN )
+            if (dynamic_cast<FacetsPattern*>(New->pattern.get()))
+                dynamic_cast<FacetsPattern*>(New->pattern.get())->facetsSize = Parse_Float();
+            else
                 Only_In("size", "facets");
-            dynamic_cast<FacetsPattern*>(New->pattern.get())->facetsSize = Parse_Float();
         END_CASE
 
         CASE (METRIC_TOKEN)
-            if (New->Type == FACETS_PATTERN )
+            if (dynamic_cast<FacetsPattern*>(New->pattern.get()))
             {
                 Parse_Vector(Local_Vector);
                 dynamic_cast<FacetsPattern*>(New->pattern.get())->facetsMetric = Local_Vector[X];
             }
-            else if ( New->Type == CRACKLE_PATTERN )
+            else if (dynamic_cast<CracklePattern*>(New->pattern.get()))
             {
                 // Vector for backwards compatibility
                 // the only component used was always X.
@@ -5382,18 +5286,19 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
         END_CASE
 
         CASE (FORM_TOKEN)
-            if (New->Type == CRACKLE_PATTERN)
+            if (dynamic_cast<CracklePattern*>(New->pattern.get()))
                 Parse_Vector( dynamic_cast<CracklePattern*>(New->pattern.get())->crackleForm );
-            else if (New->Type == PAVEMENT_PATTERN)
+            else if (dynamic_cast<PavementPattern*>(New->pattern.get()))
                 dynamic_cast<PavementPattern*>(New->pattern.get())->Form = ((unsigned char)Parse_Float());
             else
                 Only_In("form", "crackle or pavement");
         END_CASE
 
         CASE (OFFSET_TOKEN)
-            if (New->Type != CRACKLE_PATTERN )
+            if (dynamic_cast<CracklePattern*>(New->pattern.get()))
+                dynamic_cast<CracklePattern*>(New->pattern.get())->crackleOffset = Parse_Float();
+            else
                 Only_In("offset", "crackle");
-            dynamic_cast<CracklePattern*>(New->pattern.get())->crackleOffset = Parse_Float();
         END_CASE
 
         CASE (TURBULENCE_TOKEN)
@@ -5414,15 +5319,17 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
         // TODO VERIFY - QUICK_COLOUR is not accepted, is that ok?
 
         CASE (CONTROL0_TOKEN)
-            if (New->Type != QUILTED_PATTERN)
+            if (dynamic_cast<QuiltedPattern*>(New->pattern.get()))
+                dynamic_cast<QuiltedPattern*>(New->pattern.get())->Control0 = Parse_Float ();
+            else
                 Not_With ("control0","this pattern");
-            dynamic_cast<QuiltedPattern*>(New->pattern.get())->Control0 = Parse_Float ();
         END_CASE
 
         CASE (CONTROL1_TOKEN)
-            if (New->Type != QUILTED_PATTERN)
+            if (dynamic_cast<QuiltedPattern*>(New->pattern.get()))
+                dynamic_cast<QuiltedPattern*>(New->pattern.get())->Control1 = Parse_Float ();
+            else
                 Not_With ("control1","this pattern");
-            dynamic_cast<QuiltedPattern*>(New->pattern.get())->Control1 = Parse_Float ();
         END_CASE
 
         CASE (OCTAVES_TOKEN)
@@ -5450,7 +5357,7 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
                 pContinuousPattern->waveFrequency = Parse_Float();
             else
             {
-                Warning("frequrency has no effect on discrete patterns");
+                Warning("frequency has no effect on discrete patterns");
                 Parse_Float();
             }
         END_CASE
@@ -5533,46 +5440,53 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
         END_CASE
 
         CASE (AGATE_TURB_TOKEN)
-            if (New->Type != AGATE_PATTERN)
+            if (dynamic_cast<AgatePattern*>(New->pattern.get()))
+            {
+                dynamic_cast<AgatePattern*>(New->pattern.get())->agateTurbScale = Parse_Float();
+                Check_Turb(New->pattern->warps, New->pattern->HasSpecialTurbulenceHandling());   // agate needs Octaves, Lambda etc.
+            }
+            else
                 Not_With ("agate_turb","non-agate");
-            dynamic_cast<AgatePattern*>(New->pattern.get())->agateTurbScale = Parse_Float();
-            Check_Turb(New->pattern->warps, New->pattern->HasSpecialTurbulenceHandling());   /* agate needs Octaves, Lambda etc. */
         END_CASE
 
         CASE (BRICK_SIZE_TOKEN)
-            if (New->Type != BRICK_PATTERN)
+            if (!dynamic_cast<BrickPattern*>(New->pattern.get()))
                 Not_With ("brick_size","non-brick");
             Parse_Vector(dynamic_cast<BrickPattern*>(New->pattern.get())->brickSize);
         END_CASE
 
         CASE (MORTAR_TOKEN)
-            if (New->Type != BRICK_PATTERN)
+            if (!dynamic_cast<BrickPattern*>(New->pattern.get()))
                 Not_With ("mortar","non-brick");
             dynamic_cast<BrickPattern*>(New->pattern.get())->mortar = Parse_Float()-EPSILON*2.0;
         END_CASE
 
         CASE (INTERPOLATE_TOKEN)
-            if (New->Type != DENSITY_FILE_PATTERN)
+            if (dynamic_cast<DensityFilePattern*>(New->pattern.get()))
+                dynamic_cast<DensityFilePattern*>(New->pattern.get())->densityFile->Interpolation = (int)Parse_Float();
+            else
                 Not_With ("interpolate","non-density_file");
-            dynamic_cast<DensityFilePattern*>(New->pattern.get())->densityFile->Interpolation = (int)Parse_Float();
         END_CASE
 
         CASE (NUMBER_OF_SIDES_TOKEN)
-            if (New->Type != PAVEMENT_PATTERN)
+            if (dynamic_cast<PavementPattern*>(New->pattern.get()))
+                dynamic_cast<PavementPattern*>(New->pattern.get())->Side = (unsigned char)Parse_Float();
+            else
                 Only_In("number_of_sides","pavement");
-            dynamic_cast<PavementPattern*>(New->pattern.get())->Side=(unsigned char)Parse_Float();
         END_CASE
 
         CASE (NUMBER_OF_TILES_TOKEN)
-            if (New->Type != PAVEMENT_PATTERN)
+            if (dynamic_cast<PavementPattern*>(New->pattern.get()))
+                dynamic_cast<PavementPattern*>(New->pattern.get())->Tile = (unsigned char)Parse_Float();
+            else
                 Only_In("number_of_tiles","pavement");
-            dynamic_cast<PavementPattern*>(New->pattern.get())->Tile=(unsigned char)Parse_Float();
         END_CASE
 
         CASE (PATTERN_TOKEN)
-            if (New->Type != PAVEMENT_PATTERN)
+            if (dynamic_cast<PavementPattern*>(New->pattern.get()))
+                dynamic_cast<PavementPattern*>(New->pattern.get())->Number = (unsigned char)Parse_Float();
+            else
                 Only_In("pattern","pavement");
-            dynamic_cast<PavementPattern*>(New->pattern.get())->Number=(unsigned char)Parse_Float();
         END_CASE
 
         CASE (WARP_TOKEN)

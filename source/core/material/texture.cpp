@@ -1582,9 +1582,9 @@ int Test_Opacity(const TEXTURE *Texture)
 
                 /* Layer is not opaque if the image map is used just once. */
 
-                if (dynamic_cast<ImagePattern*>(Layer->pattern.get())->pImage != NULL)
+                if (dynamic_cast<ImagePatternImpl*>(Layer->pattern.get())->pImage)
                 {
-                    if (dynamic_cast<ImagePattern*>(Layer->pattern.get())->pImage->Once_Flag)
+                    if (dynamic_cast<ImagePatternImpl*>(Layer->pattern.get())->pImage->Once_Flag)
                     {
                         break;
                     }

@@ -165,15 +165,6 @@ namespace pov
     #define POV_BLEND_MAP_DEBUG POV_DEBUG
 #endif
 
-/// @def POV_SHAPE_DEBUG
-/// Enable run-time sanity checks for geometric shapes.
-///
-/// Define as non-zero integer to enable, or zero to disable.
-///
-#ifndef POV_SHAPE_DEBUG
-    #define POV_SHAPE_DEBUG POV_DEBUG
-#endif
-
 /// @def POV_PATTERN_DEBUG
 /// Enable run-time sanity checks for pattern handling.
 ///
@@ -181,6 +172,15 @@ namespace pov
 ///
 #ifndef POV_PATTERN_DEBUG
     #define POV_PATTERN_DEBUG POV_DEBUG
+#endif
+
+/// @def POV_PIGMENT_DEBUG
+/// Enable run-time sanity checks for pigment handling.
+///
+/// Define as non-zero integer to enable, or zero to disable.
+///
+#ifndef POV_PIGMENT_DEBUG
+    #define POV_PIGMENT_DEBUG POV_DEBUG
 #endif
 
 /// @def POV_RADIOSITY_DEBUG
@@ -210,6 +210,15 @@ namespace pov
     #define POV_REFPOOL_DEBUG POV_DEBUG
 #endif
 
+/// @def POV_SHAPE_DEBUG
+/// Enable run-time sanity checks for geometric shapes.
+///
+/// Define as non-zero integer to enable, or zero to disable.
+///
+#ifndef POV_SHAPE_DEBUG
+    #define POV_SHAPE_DEBUG POV_DEBUG
+#endif
+
 /// @def POV_SUBSURFACE_DEBUG
 /// Enable run-time sanity checks for subsurface light transport.
 ///
@@ -236,16 +245,16 @@ namespace pov
     #define POV_BLEND_MAP_ASSERT(expr) POV_ASSERT_DISABLE(expr)
 #endif
 
-#if POV_SHAPE_DEBUG
-    #define POV_SHAPE_ASSERT(expr) POV_ASSERT_HARD(expr)
-#else
-    #define POV_SHAPE_ASSERT(expr) POV_ASSERT_DISABLE(expr)
-#endif
-
 #if POV_PATTERN_DEBUG
     #define POV_PATTERN_ASSERT(expr) POV_ASSERT_HARD(expr)
 #else
     #define POV_PATTERN_ASSERT(expr) POV_ASSERT_DISABLE(expr)
+#endif
+
+#if POV_PIGMENT_DEBUG
+    #define POV_PIGMENT_ASSERT(expr) POV_ASSERT_HARD(expr)
+#else
+    #define POV_PIGMENT_ASSERT(expr) POV_ASSERT_DISABLE(expr)
 #endif
 
 #if POV_RADIOSITY_DEBUG
@@ -264,6 +273,12 @@ namespace pov
     #define POV_REFPOOL_ASSERT(expr) POV_ASSERT_HARD(expr)
 #else
     #define POV_REFPOOL_ASSERT(expr) POV_ASSERT_DISABLE(expr)
+#endif
+
+#if POV_SHAPE_DEBUG
+    #define POV_SHAPE_ASSERT(expr) POV_ASSERT_HARD(expr)
+#else
+    #define POV_SHAPE_ASSERT(expr) POV_ASSERT_DISABLE(expr)
 #endif
 
 #if POV_SUBSURFACE_DEBUG

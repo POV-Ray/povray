@@ -112,7 +112,7 @@ struct Texture_Struct : public Pattern_Struct
     PIGMENT *Pigment;
     TNORMAL *Tnormal;
     FINISH *Finish;
-    vector<TEXTURE*> Materials; // used for BITMAP_PATTERN (and only there)
+    vector<TEXTURE*> Materials; // used for `material_map` (and only there)
 };
 
 struct Finish_Struct
