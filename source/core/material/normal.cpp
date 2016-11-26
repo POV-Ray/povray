@@ -371,7 +371,10 @@ static void quilted (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& n
 
     t = value.length();
 
-    t = quilt_cubic(t, dynamic_cast<QuiltedPattern*>(Tnormal->pattern.get())->Control0, dynamic_cast<QuiltedPattern*>(Tnormal->pattern.get())->Control1);
+    const QuiltedPattern *pattern = dynamic_cast<QuiltedPattern*>(Tnormal->pattern.get());
+    POV_PATTERN_ASSERT(pattern);
+
+    t = quilt_cubic(t, pattern->Control0, pattern->Control1);
 
     value *= t;
 
@@ -414,15 +417,18 @@ static void facets (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& no
     int      UseUnity;
     DBL      Metric;
 
+    const FacetsPattern *pattern = dynamic_cast<FacetsPattern*>(Tnormal->pattern.get());
+    POV_PATTERN_ASSERT(pattern);
+
     Vector3d *cv = Thread->Facets_Cube;
-    Metric = dynamic_cast<FacetsPattern*>(Tnormal->pattern.get())->facetsMetric;
+    Metric = pattern->facetsMetric;
 
     UseSquare = (Metric == 2 );
     UseUnity  = (Metric == 1 );
 
     normal.normalize();
 
-    if ( dynamic_cast<FacetsPattern*>(Tnormal->pattern.get())->facetsCoords )
+    if (pattern->facetsCoords)
     {
         tv = EPoint;
     }
@@ -431,13 +437,13 @@ static void facets (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& no
         tv = normal;
     }
 
-    if ( dynamic_cast<FacetsPattern*>(Tnormal->pattern.get())->facetsSize < 1e-6 )
+    if (pattern->facetsSize < 1e-6)
     {
         scale = 1e6;
     }
     else
     {
-        scale = 1. / dynamic_cast<FacetsPattern*>(Tnormal->pattern.get())->facetsSize;
+        scale = 1. / pattern->facetsSize;
     }
 
     tv *= scale;
@@ -545,13 +551,13 @@ static void facets (const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& no
         }
     }
 
-    if ( dynamic_cast<FacetsPattern*>(Tnormal->pattern.get())->facetsCoords )
+    if (pattern->facetsCoords)
     {
         DNoise( pert, newnormal );
         sum = dot(pert, normal);
         newnormal = normal * sum;
         pert -= newnormal;
-        normal += dynamic_cast<FacetsPattern*>(Tnormal->pattern.get())->facetsCoords * pert;
+        normal += pattern->facetsCoords * pert;
     }
     else
     {
@@ -838,7 +844,7 @@ void Perturb_Normal(Vector3d& Layer_Normal, const TNORMAL *Tnormal, const Vector
 
     /* No normal_map. */
 
-    if (Tnormal->Type <= LAST_NORM_ONLY_PATTERN)
+    if (Tnormal->Type <= LAST_SPECIAL_NORM_PATTERN)
     {
         Warp_Normal(Layer_Normal,Layer_Normal, Tnormal,
                     Test_Flag(Tnormal,DONT_SCALE_BUMPS_FLAG));
@@ -886,7 +892,6 @@ void Perturb_Normal(Vector3d& Layer_Normal, const TNORMAL *Tnormal, const Vector
 
         UnWarp_Normal(Layer_Normal,Layer_Normal,Tnormal,
                       Test_Flag(Tnormal,DONT_SCALE_BUMPS_FLAG));
-
     }
 
     if ( Intersection )
@@ -983,7 +988,7 @@ static DBL Hermite_Cubic(DBL T1, const Vector2d& UV1, const Vector2d& UV2)
 * DESCRIPTION
 *
 * CHANGES
-*    Added intersectin parameter for UV mapping - NK 1998
+*    Added intersection parameter for UV mapping - NK 1998
 *
 ******************************************************************************/
 

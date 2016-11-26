@@ -1218,19 +1218,19 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                         END_CASE
 
                         // JN2007: Image map dimensions:
-                        CASE3 (DENSITY_ID_TOKEN,PIGMENT_ID_TOKEN,NORMAL_ID_TOKEN)
+                        CASE4 (DENSITY_ID_TOKEN,NORMAL_ID_TOKEN,PIGMENT_ID_TOKEN,TEXTURE_ID_TOKEN)
                             Pigment = reinterpret_cast<PIGMENT *>(Token.Data);
-                            if(Pigment->Type == BITMAP_PATTERN)
+                            if (const ImagePatternImpl *pattern = dynamic_cast<ImagePatternImpl*>(Pigment->pattern.get()))
                             {
-                                Vect[X] = dynamic_cast<ImagePattern*>(Pigment->pattern.get())->pImage->iwidth;
-                                Vect[Y] = dynamic_cast<ImagePattern*>(Pigment->pattern.get())->pImage->iheight;
+                                Vect[X] = pattern->pImage->iwidth;
+                                Vect[Y] = pattern->pImage->iheight;
                                 Vect[Z] = 0;
                             }
-                            else if(Pigment->Type == DENSITY_FILE_PATTERN)
+                            else if (const DensityFilePattern *pattern = dynamic_cast<DensityFilePattern*>(Pigment->pattern.get()))
                             {
-                                Vect[X] = dynamic_cast<DensityFilePattern*>(Pigment->pattern.get())->densityFile->Data->Sx;
-                                Vect[Y] = dynamic_cast<DensityFilePattern*>(Pigment->pattern.get())->densityFile->Data->Sy;
-                                Vect[Z] = dynamic_cast<DensityFilePattern*>(Pigment->pattern.get())->densityFile->Data->Sz;
+                                Vect[X] = pattern->densityFile->Data->Sx;
+                                Vect[Y] = pattern->densityFile->Data->Sy;
+                                Vect[Z] = pattern->densityFile->Data->Sz;
                             }
                             else
                             {

@@ -163,13 +163,18 @@ FUNCTION_PTR Parser::Parse_FunctionOrContent(void)
 }
 
 
-void Parser::Parse_FunctionOrContentList(GenericScalarFunctionPtr* apFn, unsigned int count)
+void Parser::Parse_FunctionOrContentList(GenericScalarFunctionPtr* apFn, unsigned int count, bool mandatory)
 {
     for (unsigned int i = 0; i < count; ++i)
     {
-        if (i > 0)
-            Parse_Comma();
+        if (!mandatory && (Peek_Token(RIGHT_CURLY_TOKEN) || Parse_Comma()))
+        {
+            apFn[i] = NULL;
+            continue;
+        }
         apFn[i] = new FunctionVM::CustomFunction(fnVMContext->functionvm, Parse_FunctionOrContent());
+        if (i < count-1)
+            Parse_Comma();
     }
 }
 

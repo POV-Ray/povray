@@ -22,7 +22,7 @@ our _master branch_ is reported as follows:
   - [![Build Status](https://semaphoreci.com/api/v1/pov-ray/povray/branches/master/shields_badge.svg)](https://semaphoreci.com/pov-ray/povray)
     (Semaphore: Ubuntu 14.04 LTE 64-bit with gcc 4.8)
   - [![Build Status](https://travis-ci.org/POV-Ray/povray.svg?branch=master)](https://travis-ci.org/POV-Ray/povray)
-    (Travis CI: Ubuntu 12.04 LTE 64-bit with gcc 4.6 and with clang 4.2; OS X 10.11 with gcc 4.2 and with clang 4.2)
+    (Travis CI: Ubuntu 12.04 LTE 64-bit with gcc 4.6; OS X 10.11 with clang 4.2)
 
 License
 --------------------------------------

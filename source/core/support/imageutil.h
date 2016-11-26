@@ -116,12 +116,17 @@ class ImageData
         ~ImageData();
 };
 
+typedef ImageData *ImageDataPtr;
+
 DBL image_pattern(const Vector3d& EPoint, const BasicPattern* pPattern);
 bool image_map(const Vector3d& EPoint, const PIGMENT *Pigment, TransColour& colour);
 TEXTURE *material_map(const Vector3d& IPoint, const TEXTURE *Texture);
 void bump_map(const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& normal);
+void image_colour_at(const ImageData *image, DBL xcoor, DBL ycoor, RGBFTColour& colour, int *index); // TODO ALPHA - caller should decide whether to prefer premultiplied or non-premultiplied alpha
+void image_colour_at(const ImageData *image, DBL xcoor, DBL ycoor, RGBFTColour& colour, int *index, bool premul);
 HF_VAL image_height_at(const ImageData *image, int x, int y);
 bool is_image_opaque(const ImageData *image);
+int map_pos(const Vector3d& EPoint, const BasicPattern* pPattern, DBL *xcoor, DBL *ycoor);
 ImageData *Copy_Image(ImageData *old);
 ImageData *Create_Image(void);
 void Destroy_Image(ImageData *image);

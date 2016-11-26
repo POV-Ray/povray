@@ -49,6 +49,22 @@ Prior to the release of 3.7.1, the following items still need urgent attention:
 New Features
 ------------
 
+- A new finish parameter, `use_alpha`, has been added to suppress highlights
+  and reflections depending on pigment transparency.
+
+- Array elements no longer have to be of the same type.
+
+- Support for variable-size arrays has been added.
+
+- A new data container, `dictionary`, has been added to support structured
+  storage of data.
+
+- Pseudo-dictionaries `local` and `global` have been added, allowing to
+  specifically access local or global identifiers, respectively.
+
+- A new special pigment pattern, `user_defined`, has been added to define the
+  pigment colour directly in terms of a set of functions.
+
 - A new pattern, `potential`, has been added to define a pattern based on the
   potential field of a blob or isosurface object.
 
@@ -85,9 +101,6 @@ New Features
 - The `#declare` and `#local` syntax has been extended to support tuple-style
   assignments. The main purpose is to allow macros to return a set of values
   rather than just a single one.
-
-- `local()` and `global()` pseudo-functions have been added to specifically
-  refer to a local or global identifier, respectively.
 
 - The macro syntax has been extended to allow for optional parameters.
 
@@ -190,158 +203,6 @@ Miscellaneous Improvements
 - POV-Ray for Windows now reports file names and line numbers of warnings.
 - Colour maps, pigment maps and the like are no longer limited to 256 entries.
 - The number of components ber blob is no longer artificially limited.
-
-Fixed or Mitigated Issues Reported by Static Code Analysis
-----------------------------------------------------------
-
-Coverity Scan defects targeted deliberately:
-
-- CID 967251: 'Constant' variable guards dead code
-- CID 967254: 'Constant' variable guards dead code
-- CID 967261: Logically dead code
-- CID 967262: Logically dead code
-- CID 967273: Explicit null dereferenced
-- CID 967296: Parse Warning
-- CID 967297: Parse Warning
-- CID 967377: Uninitialized pointer field
-- CID 967400: Uninitialized pointer field
-- CID 967410: Structurally dead code
-- CID 967412: Structurally dead code
-- CID 1129008: Division or modulo by zero
-- CID 1129016: Uninitialized pointer read
-- CID 1129017: Uninitialized scalar variable
-- CID 1372548: Non-virtual destructor
-- CID 1372552: Unchecked return value
-- CID 1372555: Operands don't affect result
-- CID 1372556: Wrong operator used
-- CID 1372557: Wrong operator used
-- CID 1372558: Resource leak in object
-- CID 1372560: Logically dead code
-- CID 1372562: Non-array delete for scalars
-- CID 1372566: Unchecked dynamic_cast
-- CID 1372567: Unchecked dynamic_cast
-- CID 1372603: Resource leak
-- CID 1372604: Dereference before null check
-- CID 1372605: Dereference before null check
-- CID 1372606: Dereference before null check
-- CID 1372607: Dereference before null check
-- CID 1372608: Sizeof not portable
-- CID 1372626: Uninitialized scalar variable
-- CID 1372636: Uninitialized pointer field
-- CID 1372639: Uninitialized scalar field
-- CID 1372641: Uninitialized pointer field
-- CID 1372642: Uninitialized pointer field
-- CID 1372643: Uninitialized scalar field
-- CID 1372644: Uninitialized pointer field
-- CID 1372646: Uninitialized pointer field
-- CID 1372647: Uninitialized pointer field
-- CID 1372648: Uninitialized scalar field
-- CID 1372650: Uninitialized pointer field
-- CID 1372651: Uninitialized pointer field
-- CID 1372653: Uninitialized pointer field
-- CID 1372654: Structurally dead code
-- CID 1372655: Structurally dead code
-- CID 1372656: Structurally dead code
-- CID 1372657: Unused value
-- CID 1373648: Out-of-bounds access
-- CID 1373649: Free of address-of expression
-- CID 1373651: Logically dead code
-- CID 1373652: Dereference before null check
-- CID 1373653: Write to pointer after free
-- CID 1373654: Use after free
-
-Coverity Scan defects eliminated in passing:
-
-- CID 967238: Unchecked return value from library
-- CID 967239: Unchecked return value from library
-- CID 967252: Logically dead code
-- CID 967255: Logically dead code
-- CID 967266: Division or modulo by float zero
-- CID 967267: Division or modulo by float zero
-- CID 967272: Dereference after null check
-- CID 967284: Unsigned compared against 0
-- CID 967286: Various
-- CID 967290: Dereference null return value
-- CID 967291: Out-of-bounds write
-- CID 967292: Out-of-bounds access
-- CID 967293: Out-of-bounds access
-- CID 967294: Out-of-bounds access
-- CID 967305: Dereference before null check
-- CID 967306: Dereference before null check
-- CID 967307: Dereference before null check
-- CID 967310: Sizeof not portable
-- CID 967333: Uninitialized scalar variable
-- CID 967334: Uninitialized scalar variable
-- CID 967335: Uninitialized scalar variable
-- CID 967336: Uninitialized scalar variable
-- CID 967337: Uninitialized scalar variable
-- CID 967338: Uninitialized scalar variable
-- CID 967339: Uninitialized scalar variable
-- CID 967340: Uninitialized scalar variable
-- CID 967341: Uninitialized scalar variable
-- CID 967342: Uninitialized scalar variable
-- CID 967343: Uninitialized scalar variable
-- CID 967344: Uninitialized scalar variable
-- CID 967345: Uninitialized scalar variable
-- CID 967346: Uninitialized scalar variable
-- CID 967347: Uninitialized scalar variable
-- CID 967348: Uninitialized scalar variable
-- CID 967349: Uninitialized scalar variable
-- CID 967350: Uninitialized pointer read
-- CID 967351: Uninitialized scalar variable
-- CID 967352: Uninitialized scalar variable
-- CID 967353: Uninitialized scalar variable
-- CID 967354: Uninitialized scalar variable
-- CID 967355: Uninitialized scalar variable
-- CID 967356: Uninitialized scalar variable
-- CID 967357: Uninitialized scalar variable
-- CID 967366: Uninitialized scalar variable
-- CID 967367: Uninitialized scalar variable
-- CID 967368: Uninitialized scalar variable
-- CID 967369: Uninitialized pointer field
-- CID 967370: Uninitialized scalar field
-- CID 967371: Uninitialized pointer field
-- CID 967372: Uninitialized pointer field
-- CID 967373: Uninitialized pointer field
-- CID 967374: Uninitialized pointer field
-- CID 967375: Uninitialized pointer field
-- CID 967376: Uninitialized pointer field
-- CID 967385: Uninitialized pointer field
-- CID 967387: Uninitialized scalar field
-- CID 967392: Uninitialized pointer field
-- CID 967398: Uninitialized pointer field
-- CID 967408: Uninitialized pointer field
-- CID 986459: Logically dead code
-- CID 986460: Dereference before null check
-- CID 986461: Uninitialized scalar variable
-- CID 1129012: Out-of-bounds write
-- CID 1129013: Out-of-bounds read
-- CID 1372531: Calling risky function
-- CID 1372532: Division or modulo by float zero
-- CID 1372534: Out-of-bounds access
-- CID 1372535: Out-of-bounds access
-- CID 1372536: Out-of-bounds access
-- CID 1372537: Out-of-bounds access
-- CID 1372538: Dereference before null check
-- CID 1372539: String not null terminated
-- CID 1372540: Uninitialized pointer field
-- CID 1372545: Unused value
-- CID 1372565: Unchecked dynamic_cast
-- CID 1372575: Unchecked dynamic_cast
-- CID 1372599: Dereference null return value
-- CID 1372613: Uninitialized scalar variable
-- CID 1372614: Uninitialized scalar variable
-- CID 1372615: Uninitialized scalar variable
-- CID 1372616: Uninitialized scalar variable
-- CID 1372617: Uninitialized scalar variable
-- CID 1372619: Uninitialized scalar variable
-- CID 1372620: Uninitialized scalar variable
-- CID 1372621: Uninitialized scalar variable
-- CID 1372622: Uninitialized scalar variable
-- CID 1372623: Uninitialized scalar variable
-- CID 1372624: Uninitialized scalar variable
-- CID 1372625: Uninitialized scalar variable
-- CID 1372627: Uninitialized scalar variable
 
 Fixed or Mitigated Bugs
 -----------------------

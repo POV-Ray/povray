@@ -281,6 +281,42 @@ ColourBlendMapConstPtr BasicPattern::GetDefaultBlendMap() const { return gpDefau
 bool BasicPattern::HasSpecialTurbulenceHandling() const { return false; }
 
 
+ImagePatternImpl::ImagePatternImpl() :
+    pImage(NULL)
+{}
+
+ImagePatternImpl::ImagePatternImpl(const ImagePatternImpl& obj) :
+    pImage(obj.pImage ? Copy_Image(obj.pImage) : NULL)
+{}
+
+ImagePatternImpl::~ImagePatternImpl()
+{
+    if (pImage)
+        Destroy_Image(pImage);
+}
+
+
+ColourPattern::ColourPattern() :
+    BasicPattern()
+{}
+
+ColourPattern::ColourPattern(const ColourPattern& obj) :
+    BasicPattern(obj)
+{}
+
+DBL ColourPattern::Evaluate(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
+{
+    TransColour colour;
+    if (Evaluate(colour, EPoint, pIsection, pRay, pThread))
+        return colour.Greyscale();
+    else
+        return 0.0;
+}
+
+unsigned int ColourPattern::NumDiscreteBlendMapEntries() const { return 0; }
+bool ColourPattern::CanMap() const { return false; }
+
+
 ContinuousPattern::ContinuousPattern() :
     BasicPattern(),
     waveType(kWaveType_Ramp),
@@ -338,14 +374,24 @@ DBL ContinuousPattern::Evaluate(const Vector3d& EPoint, const Intersection *pIse
 }
 
 unsigned int ContinuousPattern::NumDiscreteBlendMapEntries() const { return 0; }
+bool ContinuousPattern::CanMap() const { return true; }
 
+bool DiscretePattern::CanMap() const { return false; }
 
 unsigned int PlainPattern::NumDiscreteBlendMapEntries() const { return 1; }
 
+unsigned int AveragePattern::NumDiscreteBlendMapEntries() const { return 0; }
+bool AveragePattern::CanMap() const { return true; }
+DBL AveragePattern::Evaluate(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const { return 0.0; }
+bool AveragePattern::HasSpecialTurbulenceHandling() const { return false; }
 
+
+AgatePattern::AgatePattern() : agateTurbScale(1.0) {}
 ColourBlendMapConstPtr AgatePattern::GetDefaultBlendMap() const { return gpDefaultBlendMap_Agate; }
 
 ColourBlendMapConstPtr BozoPattern::GetDefaultBlendMap() const { return gpDefaultBlendMap_Bozo; }
+
+BrickPattern::BrickPattern() : brickSize(8.0,3.0,4.5), mortar(0.5-EPSILON*2.0) {}
 
 ColourBlendMapConstPtr BrickPattern::GetDefaultBlendMap() const { return gpDefaultBlendMap_Brick; }
 unsigned int BrickPattern::NumDiscreteBlendMapEntries() const { return 2; }
@@ -353,8 +399,106 @@ unsigned int BrickPattern::NumDiscreteBlendMapEntries() const { return 2; }
 ColourBlendMapConstPtr CheckerPattern::GetDefaultBlendMap() const { return gpDefaultBlendMap_Checker; }
 unsigned int CheckerPattern::NumDiscreteBlendMapEntries() const { return 2; }
 
+
+CracklePattern::CracklePattern() :
+    crackleForm(-1,1,0),
+    crackleMetric(2),
+    crackleOffset(0),
+    repeat(0,0,0),
+    crackleIsSolid(false)
+{}
+
+
 ColourBlendMapConstPtr CubicPattern::GetDefaultBlendMap() const { return gpDefaultBlendMap_Cubic; }
 unsigned int CubicPattern::NumDiscreteBlendMapEntries() const { return 6; }
+
+
+ColourFunctionPattern::ColourFunctionPattern()
+{
+    for (int iChannel = 0; iChannel < 5; ++iChannel)
+    {
+        pFn[iChannel] = NULL;
+    }
+}
+
+ColourFunctionPattern::ColourFunctionPattern(const ColourFunctionPattern& obj) :
+    ColourPattern(obj)
+{
+    for (int iChannel = 0; iChannel < 5; ++iChannel)
+    {
+        if (obj.pFn[iChannel])
+            pFn[iChannel] = obj.pFn[iChannel]->Clone();
+        else
+            pFn[iChannel] = NULL;
+    }
+}
+
+ColourFunctionPattern::~ColourFunctionPattern()
+{
+    for (int iChannel = 0; iChannel < 5; ++iChannel)
+    {
+        if (pFn[iChannel])
+            delete pFn[iChannel];
+    }
+}
+
+bool ColourFunctionPattern::Evaluate(TransColour& result, const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
+{
+    for (int iChannel = 0; iChannel < 5; ++iChannel)
+    {
+        ColourChannel channelValue = 0.0;
+        if (pFn[iChannel])
+        {
+            GenericFunctionContextPtr pCtx = pFn[iChannel]->AcquireContext(pThread);
+            pFn[iChannel]->InitArguments(pCtx);
+            for (int iDimension = 0; iDimension < 3; ++iDimension)
+                pFn[iChannel]->PushArgument(pCtx, EPoint[iDimension]);
+            channelValue = pFn[iChannel]->Execute(pCtx);
+            pFn[iChannel]->ReleaseContext(pCtx);
+        }
+        switch (iChannel)
+        {
+        case 3:  result.filter()           = channelValue; break;
+        case 4:  result.transm()           = channelValue; break;
+        default: result.colour()[iChannel] = channelValue; break;
+        }
+    }
+    return true;
+}
+
+bool ColourFunctionPattern::HasTransparency() const
+{
+    return (pFn[3] || pFn[4]);
+}
+
+
+bool ColourImagePattern::Evaluate(TransColour& result, const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
+{
+    // TODO ALPHA - the caller does expect non-premultiplied data, but maybe he could profit from premultiplied data?
+
+    int reg_number;
+    DBL xcoor = 0.0, ycoor = 0.0;
+
+    // If outside map coverage area, return clear
+
+    if (map_pos(EPoint, this, &xcoor, &ycoor))
+    {
+        result = ToTransColour(RGBFTColour(1.0, 1.0, 1.0, 0.0, 1.0));
+        return false;
+    }
+    else
+    {
+        RGBFTColour rgbft;
+        image_colour_at(pImage, xcoor, ycoor, rgbft, &reg_number, false);
+        result = ToTransColour(rgbft);
+        return true;
+    }
+}
+
+bool ColourImagePattern::HasTransparency() const
+{
+    return (!pImage || pImage->Once_Flag || !is_image_opaque(pImage));
+}
 
 
 DensityFilePattern::DensityFilePattern() :
@@ -374,6 +518,11 @@ DensityFilePattern::~DensityFilePattern()
     if (densityFile)
         Destroy_Density_File(densityFile);
 }
+
+
+FacetsPattern::FacetsPattern() : facetsSize(0.1), facetsCoords(0), facetsMetric(2) {}
+
+FractalPattern::FractalPattern() : interiorType(0), exteriorType(1), exteriorFactor(1), interiorFactor(1) {}
 
 
 DBL FacetsPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
@@ -402,30 +551,13 @@ ColourBlendMapConstPtr HexagonPattern::GetDefaultBlendMap() const { return gpDef
 unsigned int HexagonPattern::NumDiscreteBlendMapEntries() const { return 3; }
 
 
-ImagePattern::ImagePattern() :
-    pImage(NULL)
-{}
-
-ImagePattern::ImagePattern(const ImagePattern& obj) :
-    ContinuousPattern(obj),
-    pImage(NULL)
-{
-    if (obj.pImage)
-        pImage = Copy_Image(obj.pImage);
-}
-
-ImagePattern::~ImagePattern()
-{
-    if (pImage)
-        Destroy_Image(pImage);
-}
-
 DBL ImagePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
     return image_pattern(EPoint, this);
 }
 
 
+MarblePattern::MarblePattern() { waveType = kWaveType_Triangle; }
 ColourBlendMapConstPtr MarblePattern::GetDefaultBlendMap() const { return gpDefaultBlendMap_Marble; }
 
 
@@ -449,6 +581,9 @@ ObjectPattern::~ObjectPattern()
 
 ColourBlendMapConstPtr ObjectPattern::GetDefaultBlendMap() const { return gpDefaultBlendMap_Checker; } // sic!
 unsigned int ObjectPattern::NumDiscreteBlendMapEntries() const { return 2; }
+
+
+PavementPattern::PavementPattern() : Side(3), Tile(1), Number(1), Exterior(0), Interior(0), Form(0) {}
 
 
 PigmentPattern::PigmentPattern() :
@@ -493,7 +628,25 @@ PotentialPattern::~PotentialPattern()
 }
 
 
+QuiltedPattern::QuiltedPattern() : Control0(1.0), Control1(1.0) { waveFrequency = 0.0; }
+
 ColourBlendMapConstPtr RadialPattern::GetDefaultBlendMap() const { return gpDefaultBlendMap_Radial; }
+
+
+SlopePattern::SlopePattern() :
+    altitudeDirection(0.0, 0.0, 0.0),
+    // altitudeSlope and altitudeLen do not have explicit defaults
+    altitudeModLow(0.0),
+    altitudeModWidth(0.0),
+    // slopeLen does not have an explicit default
+    slopeModLow(0.0),
+    slopeModWidth(0.0),
+    // altitudeAxis and slopeAxis do not have explicit defaults
+    pointAt(false)
+{}
+
+
+SpiralPattern::SpiralPattern() { waveType = kWaveType_Triangle; }
 
 ColourBlendMapConstPtr SquarePattern::GetDefaultBlendMap() const { return gpDefaultBlendMap_Square; }
 unsigned int SquarePattern::NumDiscreteBlendMapEntries() const { return 4; }
@@ -501,6 +654,7 @@ unsigned int SquarePattern::NumDiscreteBlendMapEntries() const { return 4; }
 ColourBlendMapConstPtr TriangularPattern::GetDefaultBlendMap() const { return gpDefaultBlendMap_Triangular; }
 unsigned int TriangularPattern::NumDiscreteBlendMapEntries() const { return 6; }
 
+WoodPattern::WoodPattern() { waveType = kWaveType_Triangle; }
 ColourBlendMapConstPtr WoodPattern::GetDefaultBlendMap() const { return gpDefaultBlendMap_Wood; }
 
 
