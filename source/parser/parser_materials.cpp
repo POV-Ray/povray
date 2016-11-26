@@ -1255,11 +1255,11 @@ void Parser::VerifyTilingPattern(shared_ptr<TilingPattern> pattern)
 
 //******************************************************************************
 
-void Parser::VerifyPattern(PatternPtr pattern)
+void Parser::VerifyPattern(PatternPtr basicPattern)
 {
-    if (shared_ptr<PavementPattern> pattern = dynamic_pointer_cast<PavementPattern>(pattern))
+    if (shared_ptr<PavementPattern> pattern = dynamic_pointer_cast<PavementPattern>(basicPattern))
         VerifyPavementPattern(pattern);
-    else if (shared_ptr<TilingPattern> pattern = dynamic_pointer_cast<TilingPattern>(pattern))
+    else if (shared_ptr<TilingPattern> pattern = dynamic_pointer_cast<TilingPattern>(basicPattern))
         VerifyTilingPattern(pattern);
 }
 
