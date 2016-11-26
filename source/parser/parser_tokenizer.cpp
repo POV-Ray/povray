@@ -1455,6 +1455,11 @@ void Parser::Read_Symbol()
                             {
                                 table = Tables [pseudoDictionary];
                                 pseudoDictionary = -1;
+                                if ((c != '[') && (c != '.'))
+                                {
+                                    Get_Token(); // ensures the error is reported at the right token
+                                    Expectation_Error ("'[' or '.'");
+                                }
                             }
                             else
                                 table = reinterpret_cast<SYM_TABLE *>(*(Token.DataPtr));
@@ -3617,7 +3622,6 @@ Parser::POV_ARRAY *Parser::Parse_Array_Declare (void)
 
     if (i == 0) {
         // new syntax: Dynamically sized one-dimensional array
-        i = 1;
         New->Sizes[0] = 0;
         New->resizable = true;
         New->Dims     = 0;

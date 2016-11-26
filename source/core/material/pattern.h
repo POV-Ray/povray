@@ -573,14 +573,14 @@ struct FacetsPattern : public ContinuousPattern
 /// Abstract class providing additions to the basic pattern interface, as well as common code, for all fractal patterns.
 struct FractalPattern : public ContinuousPattern
 {
-    /// Maximum number of iterations.
-    unsigned int maxIterations;
-
     /// A parameter to the algorithm for colouring the exterior of the fractal.
     DBL exteriorFactor;
 
     /// A parameter to the algorithm for colouring the interior of the fractal.
     DBL interiorFactor;
+
+    /// Maximum number of iterations.
+    unsigned int maxIterations;
 
     /// Determines the algorithm to colour the exterior of the fractal.
     unsigned char exteriorType;
