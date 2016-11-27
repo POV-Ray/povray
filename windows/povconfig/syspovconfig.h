@@ -5,7 +5,7 @@
 /// Windows-specific general POV-Ray compile-time configuration.
 ///
 /// This header file configures module-independent aspects of POV-Ray for
-/// running properly on a Unix platform.
+/// running properly on a Windows platform.
 ///
 /// @author Christopher J. Cason
 ///
@@ -135,13 +135,6 @@ using std::tr1::const_pointer_cast;
 
 /////////////////////////////////////////////////////////////
 
-#ifndef MAX
-  #define MAX(a,b) ((a>b)?a:b)
-#endif
-#ifndef MIN
-  #define MIN(a,b) ((a>b)?b:a)
-#endif
-
 #ifndef __GENDEFS
   #define __GENDEFS
   typedef unsigned char     uchar;
@@ -208,7 +201,7 @@ namespace pov_base
 #define ALTMAIN
 #define LITTLE_ENDIAN
 #define POV_PATH_SEPARATOR                  '\\'
-#define POV_PATH_SEPARATOR_2                '/'
+#define POV_IS_PATH_SEPARATOR(c)            (((c) == POV_PATH_SEPARATOR) || ((c) == '/'))
 #define POV_SLASH_IS_SWITCH_CHARACTER       1 // allow forward slash as a switch character (even despite its use as a path separator!)
 #define DEFAULT_OUTPUT_FORMAT               kPOVList_FileType_PNG
 #define POV_IS1                             ".bmp"

@@ -261,10 +261,6 @@ void Path::ParsePathString(const UCS2String& p)
 // Platforms may replace this method with a custom implementation.
 // Such an implementation should reside in `platform/foo/syspovpath.cpp`.
 
-#ifdef POV_PATH_SEPARATOR_2
-#error "The portable implementation of ParsePathString does not support alternative path separator characters."
-#endif
-
 bool Path::ParsePathString (UCS2String& volume, vector<UCS2String>& dirnames, UCS2String& filename, const UCS2String& path)
 {
     UCS2String stash;
@@ -281,7 +277,7 @@ bool Path::ParsePathString (UCS2String& volume, vector<UCS2String>& dirnames, UC
     // Paths beginning with the path separator character are considered absolute path names.
     // Currently, we indicate those by appending a separator character to the volume (which in
     // this implementation is always empty otherwise).
-    if(path[0] == POV_PATH_SEPARATOR)
+    if(POV_IS_PATH_SEPARATOR(path[0]))
         volume = POV_PATH_SEPARATOR;
 
     // Walk through the path string, stashing any non-separator characters. Whenever we hit a separator
@@ -295,7 +291,7 @@ bool Path::ParsePathString (UCS2String& volume, vector<UCS2String>& dirnames, UC
 
     for(UCS2String::const_iterator i = path.begin(); i != path.end(); ++i)
     {
-        if (*i == POV_PATH_SEPARATOR)
+        if (POV_IS_PATH_SEPARATOR(*i))
         {
             if (!stash.empty())
             {

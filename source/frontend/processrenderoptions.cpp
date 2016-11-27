@@ -860,12 +860,8 @@ int ProcessRenderOptions::ProcessUnknownString(char *str, POVMSObjectPtr obj)
     {
         if(strlen(str) > 0)
         {
-            if(str[strlen(str) - 1] == POV_PATH_SEPARATOR)
+            if(POV_IS_PATH_SEPARATOR(str[strlen(str) - 1]))
                 state = 2; // library path
-#ifdef POV_PATH_SEPARATOR_2
-            else if(str[strlen(str) - 1] == POV_PATH_SEPARATOR_2)
-                state = 2; // library path
-#endif
         }
     }
 

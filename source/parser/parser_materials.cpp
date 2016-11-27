@@ -102,7 +102,7 @@ void Parser::Make_Pattern_Image(ImageData *image, FUNCTION_PTR fn, int token)
     int i = 0;
     int j = 0;
     DBL val = 0;
-    FunctionCode *f = dynamic_cast<FunctionVM*>(sceneData->functionContextFactory)->GetFunction(*fn);
+    FunctionCode *f = mpFunctionVM->GetFunction(*fn);
     Vector3d point;
 
     image->iwidth  = image->width;
@@ -162,7 +162,7 @@ void Parser::Make_Pattern_Image(ImageData *image, FUNCTION_PTR fn, int token)
     else
         Error("Unsupported function type in function image.");
 
-    dynamic_cast<FunctionVM*>(sceneData->functionContextFactory)->DestroyFunction(fn);
+    mpFunctionVM->DestroyFunction(fn);
 }
 
 /*****************************************************************************
@@ -1353,8 +1353,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
             {
                 New->Type = GENERIC_PATTERN;
                 shared_ptr<FunctionPattern> pattern(new FunctionPattern());
-                pattern->pFn = new FunctionVM::CustomFunction(
-                    dynamic_cast<FunctionVM*>(sceneData->functionContextFactory), Parse_Function());
+                pattern->pFn = new FunctionVM::CustomFunction(mpFunctionVM.get(), Parse_Function());
                 New->pattern = pattern;
             }
         END_CASE
@@ -4844,8 +4843,7 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
             {
                 New->Type = GENERIC_PATTERN;
                 shared_ptr<FunctionPattern> pattern(new FunctionPattern());
-                pattern->pFn = new FunctionVM::CustomFunction(
-                    dynamic_cast<FunctionVM*>(sceneData->functionContextFactory), Parse_Function());
+                pattern->pFn = new FunctionVM::CustomFunction(mpFunctionVM.get(), Parse_Function());
                 New->pattern = pattern;
             }
         END_CASE

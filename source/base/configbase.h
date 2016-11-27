@@ -465,22 +465,26 @@
 #endif
 
 /// @def POV_PATH_SEPARATOR
-/// The system's path separator character.
-///
-/// @note
-///     If the operating system supports multiple different separator characters, set this to the canonical one.
+/// The system's canonical path separator character.
 ///
 #ifndef POV_PATH_SEPARATOR
     #define POV_PATH_SEPARATOR '/'
 #endif
 
-/// @def POV_PATH_SEPARATOR_2
-/// The system's alternative path separator character.
+/// @def POV_IS_PATH_SEPARATOR(c)
+/// Test whether `c` is any of the system's supported path separator characters.
 ///
-/// If the operating system does not support an alternative path separator character, leave this undefined.
+/// If the operating system does not support alternative path separator characters, leave this undefined, in which
+/// case it will evaluate to a test for @ref POV_PATH_SEPARATOR.
 ///
-#ifndef POV_PATH_SEPARATOR_2
-    // Leave undefined.
+/// @note
+///     This macro must also test for the canonical path separator.
+/// @note
+///     When the macro parameter is a character constant, this macro must expand to a _constant expression_, i.e. it
+///     must be usable in preprocessor directives.
+///
+#ifndef POV_IS_PATH_SEPARATOR
+    #define POV_IS_PATH_SEPARATOR(c) ((c) == POV_PATH_SEPARATOR)
 #endif
 
 /// @def POV_SLASH_IS_SWITCH_CHARACTER
@@ -536,7 +540,7 @@
 /// @def POV_USE_DEFAULT_DELAY
 /// Whether to use a default implementation for the millisecond-precision delay function.
 ///
-/// Define as non-zero to use a default implementation for the @ref Delay() function, or zero if
+/// Define as non-zero to use a default implementation for the @ref pov_base::Delay() function, or zero if
 /// the platform provides its own implementation.
 ///
 /// @note
@@ -550,7 +554,7 @@
 /// @def POV_USE_DEFAULT_TIMER
 /// Whether to use a default implementation for the millisecond-precision timer.
 ///
-/// Define as non-zero to use a default implementation for the @ref Timer class, or zero if the
+/// Define as non-zero to use a default implementation for the @ref pov_base::Timer class, or zero if the
 /// platform provides its own implementation.
 ///
 /// @note
@@ -564,8 +568,8 @@
 /// @def POV_USE_DEFAULT_PATH_PARSER
 /// Whether to use a default implementation for the path string parser.
 ///
-/// Define as non-zero to use a default implementation for the @ref Path::ParsePathString() method, or zero if the
-/// platform provides its own implementation.
+/// Define as non-zero to use a default implementation for the @ref pov_base::Path::ParsePathString() method,
+/// or zero if the platform provides its own implementation.
 ///
 /// @note
 ///     The default implementation supports only local files on a single anonymous volume.
@@ -690,7 +694,7 @@
 /// @def POV_BACKSLASH_IS_PATH_SEPARATOR
 /// Whether the system supports the backslash as a separator character.
 ///
-#if (POV_PATH_SEPARATOR == '\\') || (defined(POV_PATH_SEPARATOR_2) &&  (POV_PATH_SEPARATOR_2 == '\\'))
+#if POV_IS_PATH_SEPARATOR('\\')
     #define POV_BACKSLASH_IS_PATH_SEPARATOR 1
 #else
     #define POV_BACKSLASH_IS_PATH_SEPARATOR 0

@@ -436,7 +436,7 @@ DBL Parser::Parse_Function_Call()
     // in which case *fp will be destroyed, and an attempt made to drop the function. Therefore we copy *fp, and claim dibs on the function.
     // TODO - use smart pointers for this
     FUNCTION fn = *fp;
-    FunctionCode *f = dynamic_cast<FunctionVM*>(sceneData->functionContextFactory)->GetFunctionAndReference(fn);
+    FunctionCode *f = mpFunctionVM->GetFunctionAndReference(fn);
 
     unsigned int pmax = f->parameter_cnt - 1;
     unsigned int param = 0;
@@ -445,7 +445,7 @@ DBL Parser::Parse_Function_Call()
     if(Parse_Call() == false)
     {
         // we claimed dibs on the function, so before we exit we must release it
-        dynamic_cast<FunctionVM*>(sceneData->functionContextFactory)->RemoveFunction(fn);
+        mpFunctionVM->RemoveFunction(fn);
         return 0.0;
     }
 
@@ -467,7 +467,7 @@ DBL Parser::Parse_Function_Call()
     DBL result = POVFPU_Run(fnVMContext, fn);
 
     // we claimed dibs on the function, so now that we're done with it we must say so
-    dynamic_cast<FunctionVM*>(sceneData->functionContextFactory)->RemoveFunction(fn);
+    mpFunctionVM->RemoveFunction(fn);
 
     return result;
 }
@@ -505,7 +505,7 @@ void Parser::Parse_Vector_Function_Call(EXPRESS& Express, int *Terms)
     // in which case *fp will be destroyed, and an attempt made to drop the function. Therefore we copy *fp, and claim dibs on the function.
     // TODO - use smart pointers for this
     FUNCTION fn = *fp;
-    FunctionCode *f = dynamic_cast<FunctionVM*>(sceneData->functionContextFactory)->GetFunctionAndReference(fn);
+    FunctionCode *f = mpFunctionVM->GetFunctionAndReference(fn);
 
     unsigned int pmax = f->parameter_cnt - 1;
     unsigned int param = 0;
@@ -514,7 +514,7 @@ void Parser::Parse_Vector_Function_Call(EXPRESS& Express, int *Terms)
     if(Parse_Call() == false)
     {
         // we claimed dibs on the function, so before we exit we must release it
-        dynamic_cast<FunctionVM*>(sceneData->functionContextFactory)->RemoveFunction(fn);
+        mpFunctionVM->RemoveFunction(fn);
         return;
     }
 
@@ -536,7 +536,7 @@ void Parser::Parse_Vector_Function_Call(EXPRESS& Express, int *Terms)
     (void)POVFPU_Run(fnVMContext, fn);
 
     // we claimed dibs on the function, so now that we're done with it we must say so
-    dynamic_cast<FunctionVM*>(sceneData->functionContextFactory)->RemoveFunction(fn);
+    mpFunctionVM->RemoveFunction(fn);
 
     for(param = 0; param < f->return_size; param++)
         Express[param] = fnVMContext->GetLocal(param);

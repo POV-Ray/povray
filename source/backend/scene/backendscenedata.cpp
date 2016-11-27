@@ -44,8 +44,6 @@
 
 #include "base/fileutil.h"
 
-#include "vm/fnpovfpu.h"
-
 #include "povms/povmsid.h"
 
 // this must be the last file included
@@ -55,7 +53,7 @@ namespace pov
 {
 
 BackendSceneData::BackendSceneData() :
-    SceneData(new FunctionVM())
+    SceneData()
 {}
 
 UCS2String BackendSceneData::FindFile(POVMSContext ctx, const UCS2String& filename, unsigned int stype)

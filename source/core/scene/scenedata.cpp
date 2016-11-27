@@ -51,11 +51,11 @@
 namespace pov
 {
 
-SceneData::SceneData(GenericFunctionContextFactory* fcf) :
+SceneData::SceneData() :
     fog(NULL),
     rainbow(NULL),
     skysphere(NULL),
-    functionContextFactory(fcf)
+    functionContextFactory()
 {
     atmosphereIOR = 1.0;
     atmosphereDispersion = 0.0;
@@ -124,7 +124,6 @@ SceneData::~SceneData()
     // TODO: perhaps ObjectBase::~ObjectBase would be a better place
     //       to handle cleanup of individual objects ?
     Destroy_Object(objects);
-    delete functionContextFactory;
 
     if(tree != NULL)
         delete tree;

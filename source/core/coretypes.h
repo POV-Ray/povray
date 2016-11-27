@@ -98,10 +98,6 @@ typedef struct Transform_Struct TRANSFORM;
 /// @name Blend Map Stuff
 /// @{
 
-#if 0
-#pragma mark * Blend Map
-#endif
-
 typedef struct Pattern_Struct TPATTERN;
 typedef struct Texture_Struct TEXTURE;
 typedef struct Pigment_Struct PIGMENT;

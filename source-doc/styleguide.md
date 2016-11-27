@@ -29,6 +29,12 @@ POV-Ray is being developed with portability high in mind. In practice and at pre
   - Source code should adhere to the ISO-IEC 14882-2003 standard (aka C++03), as we currently do _not_ expect C++11
     (let alone C++14) to be readily available everywhere yet. Also, source code shold not rely on any compiler- or
     platform-specific behaviour except some essentials described in @ref compiler.
+    @note
+        Despite being standard-compliant, the following language constructs should _not_ be used, due to known
+        limitations of popular build environments:
+          - _Boolean Preprocessor Constants_: The expressions in `#``if` or `#``elif` preprocessor statements _must not_
+            contain boolean constants (`true` or `false`) after macro expansion. The integer constants `0` and `1`,
+            respectively, should be used instead. [MS Visual Studio 2013 and earlier]
 
   - Source code should avoid potential conflicts with later standard extensions to the C++ language, most notably
     ISO-IEC DTR 19768 (aka TR1) and ISO-IEC 14882-2011 (aka C++11).
@@ -164,9 +170,9 @@ Include Files
 
   - Header files should generally be included in the following order:
       - POV-Ray module configuration header file, if applicable (mandatory in any unit header file, i.e. any header
-        file with a `.cpp` of the same name; e.g. @ref core/configcore.h in @ref core/colourspace.h).
-      - POV-Ray unit header file, if applicable (mandatory in any `.cpp` file; e.g. @ref core/colourspace.h in
-        @ref core/colourspace.cpp).
+        file with a `.cpp` of the same name; e.g. `core/configbase.h` in `core/shape/sphere.h`).
+      - POV-Ray unit header file, if applicable (mandatory in any `.cpp` file; e.g. `core/shape/sphere.h` in
+        `core/shape/sphere.cpp`).
       - C++ variants of standard C header files.
       - Standard C++ header files.
       - Boost header files.

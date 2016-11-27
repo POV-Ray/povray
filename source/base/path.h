@@ -141,9 +141,9 @@ class Path
         ///
         /// @note
         ///     The portable implementation of this method supports only local files on a single anonymous volume,
-        ///     using @ref POV_PATH_SEPARATOR as the only allowed path separator character. To override this behaviour,
-        ///     set the @ref POV_USE_DEFAULT_PATH_PARSER compile-time configuration macro to non-zero and provide
-        ///     a modified implementation of this method in a platform-specific source file.
+        ///     using the characters identified by @ref POV_IS_PATH_SEPARATOR as path separator characters.
+        ///     To override this behaviour, set the @ref POV_USE_DEFAULT_PATH_PARSER compile-time configuration macro
+        ///     to non-zero and provide a modified implementation of this method in a platform-specific source file.
         ///
         /// @param[out] v   The volume element of the path, including a trailing @ref POV_PATH_SEPARATOR if, and _only_
         ///                 if, the input string represents an absolute path.

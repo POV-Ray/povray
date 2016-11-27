@@ -86,7 +86,7 @@ class SceneData
         /// list of all lights that are part of light groups
         vector<LightSource *> lightGroupLightSources;
         /// factory generating contexts for legacy VM-based functions in scene
-        GenericFunctionContextFactory* functionContextFactory;
+        shared_ptr<GenericFunctionContextFactory> functionContextFactory;
         /// atmosphere index of refraction
         DBL atmosphereIOR;
         /// atmosphere dispersion
@@ -245,7 +245,7 @@ class SceneData
         /**
          *  Create new scene specific data.
          */
-        SceneData(GenericFunctionContextFactory* fcf);
+        SceneData();
 
         /// not available
         SceneData(const SceneData&);

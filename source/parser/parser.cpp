@@ -137,7 +137,8 @@ Parser::Parser(shared_ptr<BackendSceneData> sd, bool useclk, DBL clk) :
     sceneData(sd),
     clockValue(clk),
     useClock(useclk),
-    fnVMContext(new FPUContext(dynamic_cast<FunctionVM*>(sd->functionContextFactory), GetParserDataPtr())),
+    mpFunctionVM(new FunctionVM),
+    fnVMContext(new FPUContext(mpFunctionVM.get(), GetParserDataPtr())),
     Destroying_Frame(false),
     String_Index(0),
     String_Buffer_Free(0),
@@ -153,6 +154,8 @@ Parser::Parser(shared_ptr<BackendSceneData> sd, bool useclk, DBL clk) :
     pre_init_tokenizer();
     if (sceneData->realTimeRaytracing)
         mBetaFeatureFlags.realTimeRaytracing = true;
+
+    sceneData->functionContextFactory = mpFunctionVM;
 }
 
 Parser::~Parser()
@@ -276,15 +279,7 @@ void Parser::Run()
     if(sceneData->objects.empty())
         Warning("No objects in scene.");
 
-    Terminate_Tokenizer();
-    Destroy_Textures(Default_Texture);
-
-    POV_FREE (Brace_Stack);
-
-    Destroy_Random_Generators();
-
-    Default_Texture = NULL;
-    Brace_Stack = NULL;
+    Cleanup();
 
     // Check for experimental features
     char str[512] = "";

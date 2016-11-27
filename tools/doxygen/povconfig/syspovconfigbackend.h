@@ -1,8 +1,11 @@
 //******************************************************************************
 ///
-/// @file base/platformbase.cpp
+/// @file tools/doxygen/povconfig/syspovconfigbackend.h
 ///
-/// Implementations related to the @ref pov_base::PlatformBase class.
+/// Doxygen-specific POV-Ray backend compile-time configuration.
+///
+/// This header file configures aspects of POV-Ray's backend module for
+/// generation of source documentation using Doxygen.
 ///
 /// @copyright
 /// @parblock
@@ -33,19 +36,9 @@
 ///
 //******************************************************************************
 
-// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
-#include "base/platformbase.h"
+#ifndef POVRAY_DOXYGEN_SYSPOVCONFIGBACKEND_H
+#define POVRAY_DOXYGEN_SYSPOVCONFIGBACKEND_H
 
-// POV-Ray base header files
-#include "base/types.h"
+#include "syspovconfig.h"
 
-// this must be the last file included
-#include "base/povdebug.h"
-
-namespace pov_base
-{
-
-/// Platform specific function interface self reference pointer
-PlatformBase *PlatformBase::self = NULL;
-
-}
+#endif // POVRAY_DOXYGEN_SYSPOVCONFIGBACKEND_H

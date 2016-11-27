@@ -61,7 +61,7 @@ namespace pov_base
 ///     cannot provide a better implementation.
 ///
 /// @todo
-///     The current implementation is baded on boost::xtime, which has been deprecated since
+///     The current implementation is based on boost::xtime, which has been deprecated since
 ///     boost 1.34.
 ///
 /// @attention

@@ -61,9 +61,6 @@ namespace pov
 ******************************************************************************/
 
 class IsoSurface;
-class FPUContext;
-
-class FunctionVM;
 
 typedef unsigned char IsosurfaceMaxTrace;
 

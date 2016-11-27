@@ -278,13 +278,25 @@ struct ColourPattern : public BasicPattern
     ColourPattern();
     ColourPattern(const ColourPattern& obj);
 
+    /// Evaluates the pattern at a given point in space.
+    ///
+    /// @note   Derived classes should _not_ override this, but
+    ///         @ref Evaluate(TransColour&, const Vector3d&, const Intersection*, const Ray*,TraceThreadData*) const
+    ///         instead.
+    ///
+    /// @param[in]      EPoint      The point of interest in 3D space.
+    /// @param[in]      pIsection   Additional information about the intersection. Evaluated by some patterns.
+    /// @param[in]      pRay        Additional information about the ray. Evaluated by some patterns.
+    /// @param[in,out]  pThread     Additional thread-local data. Evaluated by some patterns. Some patterns, such as the
+    ///                             crackle pattern, store cached data here.
+    /// @return                     The pattern's value at the given point in space.
+    ///
     virtual DBL Evaluate(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const;
+
     virtual unsigned int NumDiscreteBlendMapEntries() const;
     virtual bool CanMap() const;
 
     /// Evaluates the pattern at a given point in space.
-    ///
-    /// @note   Derived classes should _not_ override this, but @ref EvaluateRaw() instead.
     ///
     /// @param[out]     result      The pattern's colour at the given point in space.
     /// @param[in]      EPoint      The point of interest in 3D space.

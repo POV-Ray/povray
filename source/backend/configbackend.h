@@ -98,7 +98,7 @@
 /// @def POV_USE_DEFAULT_TASK_INITIALIZE
 /// Whether to use a default implementation for task thread initialization.
 ///
-/// Define as non-zero to use a default implementation for the @ref Task::Initialize() method, or zero if the
+/// Define as non-zero to use a default implementation for the @ref pov::Task::Initialize() method, or zero if the
 /// platform provides its own implementation.
 ///
 #ifndef POV_USE_DEFAULT_TASK_INITIALIZE
@@ -108,7 +108,7 @@
 /// @def POV_USE_DEFAULT_TASK_CLEANUP
 /// Whether to use a default implementation for task thread cleanup.
 ///
-/// Define as non-zero to use a default implementation for the @ref Task::Cleanup() method, or zero if the
+/// Define as non-zero to use a default implementation for the @ref pov::Task::Cleanup() method, or zero if the
 /// platform provides its own implementation.
 ///
 #ifndef POV_USE_DEFAULT_TASK_CLEANUP

@@ -463,6 +463,7 @@ class Parser : public SceneTask
         FUNCTION_PTR Parse_FunctionOrContent(void);
         void Parse_FunctionOrContentList(GenericScalarFunctionPtr* apFn, unsigned int count, bool mandatory = true);
         FUNCTION_PTR Parse_DeclareFunction(int *token_id, const char *fn_name, bool is_local);
+        const shared_ptr<FunctionVM>& GetFunctionVM() const;
 
         // parsestr.h/parsestr.cpp
         char *Parse_C_String(bool pathname = false);
@@ -493,6 +494,8 @@ class Parser : public SceneTask
         shared_ptr<BackendSceneData> backendSceneData; // TODO FIXME HACK - make private again once Locate_Filename is fixed [trf]
         shared_ptr<SceneData> sceneData;
     private:
+
+        shared_ptr<FunctionVM> mpFunctionVM;
         FPUContext *fnVMContext;
 
         bool Had_Max_Trace_Level;

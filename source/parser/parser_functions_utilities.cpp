@@ -96,7 +96,7 @@ FUNCTION_PTR Parser::Parse_Function(void)
 
     Parse_End();
 
-    *ptr = dynamic_cast<FunctionVM*>(sceneData->functionContextFactory)->AddFunction(&function);
+    *ptr = mpFunctionVM->AddFunction(&function);
 
     return ptr;
 }
@@ -142,7 +142,7 @@ FUNCTION_PTR Parser::Parse_FunctionContent(void)
     f.Compile(expression);
     FNSyntax_DeleteExpression(expression);
 
-    *ptr = dynamic_cast<FunctionVM*>(sceneData->functionContextFactory)->AddFunction(&function);
+    *ptr = mpFunctionVM->AddFunction(&function);
 
     return ptr;
 }
@@ -343,9 +343,14 @@ FUNCTION_PTR Parser::Parse_DeclareFunction(int *token_id, const char *fn_name, b
 
     Parse_End();
 
-    *ptr = dynamic_cast<FunctionVM*>(sceneData->functionContextFactory)->AddFunction(&function);
+    *ptr = mpFunctionVM->AddFunction(&function);
 
     return ptr;
+}
+
+const shared_ptr<FunctionVM>& Parser::GetFunctionVM() const
+{
+    return mpFunctionVM;
 }
 
 }
