@@ -41,6 +41,14 @@
 #include "core/configcore.h"
 #include "syspovconfigparser.h"
 
+//##############################################################################
+///
+/// @defgroup PovParserConfig Parser Compile-Time Configuration
+/// @ingroup PovParser
+/// @ingroup PovConfig
+///
+/// @{
+
 /// @def POV_PARSER_MAX_CACHED_MACRO_SIZE
 /// Default size limit for macros to be cached in memory.
 ///
@@ -64,7 +72,7 @@
 /// @{
 
 /// @def POV_PARSER_DEBUG
-/// Enable run-time sanity checks for the parser.
+/// Enable run-time sanity checks for the @ref PovParser.
 ///
 /// Define as non-zero integer to enable, or zero to disable.
 ///
@@ -92,5 +100,9 @@
 /// @}
 ///
 //******************************************************************************
+
+/// @}
+///
+//##############################################################################
 
 #endif // POVRAY_PARSER_CONFIGPARSER_H

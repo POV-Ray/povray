@@ -448,14 +448,7 @@ bool ColourFunctionPattern::Evaluate(TransColour& result, const Vector3d& EPoint
     {
         ColourChannel channelValue = 0.0;
         if (pFn[iChannel])
-        {
-            GenericFunctionContextPtr pCtx = pFn[iChannel]->AcquireContext(pThread);
-            pFn[iChannel]->InitArguments(pCtx);
-            for (int iDimension = 0; iDimension < 3; ++iDimension)
-                pFn[iChannel]->PushArgument(pCtx, EPoint[iDimension]);
-            channelValue = pFn[iChannel]->Execute(pCtx);
-            pFn[iChannel]->ReleaseContext(pCtx);
-        }
+            channelValue = GenericScalarFunctionInstance(pFn[iChannel], pThread).Evaluate(EPoint);
         switch (iChannel)
         {
         case 3:  result.filter()           = channelValue; break;

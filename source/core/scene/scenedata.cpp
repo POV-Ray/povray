@@ -71,6 +71,7 @@ SceneData::SceneData() :
     stringEncoding = kStringEncoding_ASCII;
     noiseGenerator = kNoiseGen_RangeCorrected;
     explicitNoiseGenerator = false; // scene has not set the noise generator explicitly
+    boundingMethod = 0;
     numberOfWaves = 10;
     parsedMaxTraceLevel = MAX_TRACE_LEVEL_DEFAULT;
     parsedAdcBailout = 1.0 / 255.0; // adc bailout sufficient for displays

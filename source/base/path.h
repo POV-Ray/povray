@@ -50,9 +50,17 @@
 namespace pov_base
 {
 
+//##############################################################################
+///
+/// @defgroup PovBasePath File Path Handling
+/// @ingroup PovBase
+///
+/// @{
+
 class Path
 {
     public:
+
         enum Encoding
         {
             ASCII,
@@ -107,6 +115,7 @@ class Path
         void Clear();
 
         bool Empty() const;
+
     private:
 
         UCS2String volume;
@@ -158,6 +167,10 @@ class Path
         UCS2String URLToUCS2String(const char *p) const;
         UCS2String URLToUCS2String(const string& p) const;
 };
+
+/// @}
+///
+//##############################################################################
 
 }
 

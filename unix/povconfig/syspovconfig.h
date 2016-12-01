@@ -55,6 +55,7 @@
 #include <vector>
 
 // boost headers
+#include <boost/intrusive_ptr.hpp>
 #include <boost/tr1/memory.hpp>
 
 #ifdef HAVE_CONFIG_H
@@ -96,6 +97,8 @@ using std::tr1::weak_ptr;
 using std::tr1::dynamic_pointer_cast;
 using std::tr1::static_pointer_cast;
 using std::tr1::const_pointer_cast;
+
+using boost::intrusive_ptr;
 
 #endif // STD_POV_TYPES_DECLARED
 

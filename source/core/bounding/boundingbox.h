@@ -45,6 +45,13 @@
 namespace pov
 {
 
+//##############################################################################
+///
+/// @defgroup PovCoreBoundingBox Bounding Boxes
+/// @ingroup PovCore
+///
+/// @{
+
 class Intersection;
 class Ray;
 struct RayObjectCondition;
@@ -216,10 +223,6 @@ enum BBoxDirection
 };
 
 
-/*****************************************************************************
-* Global functions
-******************************************************************************/
-
 /// Container for BBox subtrees prioritized by depth (distance to ray origin).
 ///
 /// The current implementation is based on a so-called _min heap_ stored in a
@@ -261,6 +264,11 @@ class BBoxPriorityQueue
         vector<Qelem> mQueue;
 };
 
+
+/*****************************************************************************
+* Global functions
+******************************************************************************/
+
 void Build_BBox_Tree(BBOX_TREE **Root, size_t numOfFiniteObjects, BBOX_TREE **&Finite, size_t numOfInfiniteObjects, BBOX_TREE **Infinite, size_t& maxfinitecount);
 void Build_Bounding_Slabs(BBOX_TREE **Root, vector<ObjectPtr>& objects, unsigned int& numberOfFiniteObjects, unsigned int& numberOfInfiniteObjects, unsigned int& numberOfLightSources);
 
@@ -280,6 +288,10 @@ inline void BOUNDS_VOLUME(DBL& a, const BoundingBox& b)
 {
     a = b.size[X] * b.size[Y] * b.size[Z];
 }
+
+/// @}
+///
+//##############################################################################
 
 }
 

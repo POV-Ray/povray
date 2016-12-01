@@ -172,7 +172,7 @@ void Parser::Parse_FunctionOrContentList(GenericScalarFunctionPtr* apFn, unsigne
             apFn[i] = NULL;
             continue;
         }
-        apFn[i] = new FunctionVM::CustomFunction(fnVMContext->functionvm, Parse_FunctionOrContent());
+        apFn[i] = new FunctionVM::CustomFunction(fnVMContext->functionvm.get(), Parse_FunctionOrContent());
         if (i < count-1)
             Parse_Comma();
     }
@@ -348,7 +348,7 @@ FUNCTION_PTR Parser::Parse_DeclareFunction(int *token_id, const char *fn_name, b
     return ptr;
 }
 
-const shared_ptr<FunctionVM>& Parser::GetFunctionVM() const
+intrusive_ptr<FunctionVM> Parser::GetFunctionVM() const
 {
     return mpFunctionVM;
 }

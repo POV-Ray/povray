@@ -46,6 +46,13 @@
 namespace pov
 {
 
+//##############################################################################
+///
+/// @defgroup PovCoreMaterialNormal Surface Normal Perturbation
+/// @ingroup PovCore
+///
+/// @{
+
 class Intersection;
 class Ray;
 class TraceThreadData;
@@ -114,6 +121,10 @@ TNORMAL *Copy_Tnormal (TNORMAL *Old);
 void Destroy_Tnormal (TNORMAL *Tnormal);
 void Post_Tnormal (TNORMAL *Tnormal);
 void Perturb_Normal (Vector3d& Layer_Normal, const TNORMAL *Tnormal, const Vector3d& IPoint, Intersection *Intersection, const Ray *ray, TraceThreadData *Thread);
+
+/// @}
+///
+//##############################################################################
 
 }
 

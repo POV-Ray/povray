@@ -33,14 +33,21 @@
 ///
 //******************************************************************************
 
-#ifndef POVRAY_POLYNOMIALSOLVER_H
-#define POVRAY_POLYNOMIALSOLVER_H
+#ifndef POVRAY_CORE_POLYNOMIALSOLVER_H
+#define POVRAY_CORE_POLYNOMIALSOLVER_H
 
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "core/configcore.h"
 
 namespace pov
 {
+
+//##############################################################################
+///
+/// @defgroup PovCoreMathPolynomialsolver Polynomial Solver
+/// @ingroup PovCoreMath
+///
+/// @{
 
 class RenderStatistics;
 
@@ -52,24 +59,15 @@ class RenderStatistics;
 
 
 /*****************************************************************************
-* Global typedefs
-******************************************************************************/
-
-
-
-
-/*****************************************************************************
-* Global variables
-******************************************************************************/
-
-
-
-/*****************************************************************************
 * Global functions
 ******************************************************************************/
 
 int Solve_Polynomial (int n, const DBL *c, DBL *r, int sturm, DBL epsilon, RenderStatistics& stats);
 
+/// @}
+///
+//##############################################################################
+
 }
 
-#endif // POVRAY_POLYNOMIALSOLVER_H
+#endif // POVRAY_CORE_POLYNOMIALSOLVER_H

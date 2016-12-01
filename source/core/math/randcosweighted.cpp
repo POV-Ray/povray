@@ -1,8 +1,11 @@
 //******************************************************************************
 ///
-/// @file backend/lighting/rad_data.cpp
+/// @file core/math/randcosweighted.cpp
 ///
-/// This module contains a lookup table of sampling directions for radiosity.
+/// Lookup table of cosine-weighted hemispherical random directions.
+///
+/// This table was originally designed for radiosity, but is also used by photon
+/// mapping now.
 ///
 /// @author Jim McElhiney
 ///
@@ -10,7 +13,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -42,10 +45,8 @@
 *  All standard POV distribution rights granted.  All other rights reserved.
 *************************************************************************/
 
-// frame.h must always be the first POV file included (pulls in platform config)
-#include "backend/frame.h"
-
-#include "core/support/octree.h"
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
+#include "core/math/randcosweighted.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -53,7 +54,7 @@
 namespace pov
 {
 
-BYTE_XYZ rad_samples[1600] = {
+BYTE_XYZ kaRandCosWeighted[kRandCosWeightedCount] = {
     { 250, 71, 127 },
     { 116, 251, 109 },
     { 146, 191, 45 },

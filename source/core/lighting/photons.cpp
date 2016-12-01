@@ -2539,7 +2539,7 @@ DBL PhotonGatherer::gatherPhotonsAdaptive(const Vector3d* pt, const Vector3d* no
 stuff grabbed from radiosit.h & radiosit.c
 ******************************************************************/
 
-extern BYTE_XYZ rad_samples[];
+extern BYTE_XYZ kaRandCosWeighted[];
 
 /******************************************************************
 ******************************************************************/
@@ -2584,12 +2584,11 @@ void ChooseRay(BasicRay &NewRay, const Vector3d& Normal, const Vector3d& Raw_Nor
     n2 = cross(NewRay.Direction, up).normalized();
     n3 = cross(NewRay.Direction, n2).normalized();
 
-    // TODO FIXME - Magic Numbers
-    //i = (int)(FRAND()*1600);
+    //i = (int)(FRAND()*kRandCosWeightedCount);
     i = WhichRay;
-    WhichRay = (WhichRay + 1) % 1600;
+    WhichRay = (WhichRay + 1) % kRandCosWeightedCount;
 
-    VUnpack(random_vec, &rad_samples[i]);
+    VUnpack(random_vec, &kaRandCosWeighted[i]);
 
     if ( fabs(NewRay.Direction[Y] - 1.) < .001 )         // pretty well straight Y, folks
     {

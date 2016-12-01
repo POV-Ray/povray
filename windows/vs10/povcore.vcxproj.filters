@@ -260,6 +260,9 @@
     <ClCompile Include="..\..\source\core\precomp.cpp">
       <Filter>Core Source</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\core\math\randcosweighted.cpp">
+      <Filter>Core Source\Math</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\core\configcore.h">
@@ -471,6 +474,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\core\precomp.h">
       <Filter>Core Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\math\randcosweighted.h">
+      <Filter>Core Headers\Math</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

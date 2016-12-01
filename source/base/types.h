@@ -47,6 +47,12 @@
 namespace pov_base
 {
 
+//##############################################################################
+///
+/// @addtogroup PovBase
+///
+/// @{
+
 /// A macro wrapping a sequence of statements into a single one.
 ///
 /// This macro is intended to be used in the definition of other macros that should behave
@@ -326,6 +332,10 @@ class ThreadData
     public:
         virtual ~ThreadData() { }
 };
+
+/// @}
+///
+//##############################################################################
 
 }
 

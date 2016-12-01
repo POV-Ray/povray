@@ -46,6 +46,13 @@
 namespace pov
 {
 
+//##############################################################################
+///
+/// @defgroup PovCoreMaterialTexture Textures
+/// @ingroup PovCore
+///
+/// @{
+
 typedef struct Turb_Struct TURB;
 struct GenericTurbulenceWarp;
 
@@ -179,6 +186,10 @@ TEXTURE *Copy_Texture_Pointer (TEXTURE *Texture);
 TEXTURE *Copy_Textures (TEXTURE *Textures);
 TEXTURE *Create_Texture (void);
 int Test_Opacity (const TEXTURE *Texture);
+
+/// @}
+///
+//##############################################################################
 
 }
 

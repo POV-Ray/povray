@@ -44,13 +44,23 @@
 namespace pov
 {
 
-/*****************************************************************************
-* Global preprocessor defines
-******************************************************************************/
+//##############################################################################
+///
+/// @addtogroup PovCoreShape
+///
+/// @{
+
+//******************************************************************************
+///
+/// @name Object Types
+///
+/// @{
 
 #define HFIELD_OBJECT (BASIC_OBJECT+HIERARCHY_OK_OBJECT)
 
-/* Generate additional height field statistics. */
+/// @}
+///
+//******************************************************************************
 
 #define HFIELD_EXTRA_STATS 1
 
@@ -124,6 +134,10 @@ class HField : public ObjectBase
         bool block_traversal(const BasicRay &ray, const Vector3d& Start, IStack &HField_Stack, const BasicRay &RRay, DBL mindist, DBL maxdist, TraceThreadData *Thread);
         void build_hfield_blocks();
 };
+
+/// @}
+///
+//##############################################################################
 
 }
 

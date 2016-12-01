@@ -45,6 +45,13 @@
 namespace pov
 {
 
+//##############################################################################
+///
+/// @defgroup PovCoreSupportStatistics Render Statistics
+/// @ingroup PovCore
+///
+/// @{
+
 // Add new stats ONLY at the end!!!
 enum
 {
@@ -344,6 +351,10 @@ typedef struct intersection_stats_info
 } INTERSECTION_STATS_INFO;
 
 extern const INTERSECTION_STATS_INFO intersection_stats[];
+
+/// @}
+///
+//##############################################################################
 
 }
 

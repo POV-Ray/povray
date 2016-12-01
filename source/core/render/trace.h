@@ -48,6 +48,13 @@
 namespace pov
 {
 
+//##############################################################################
+///
+/// @defgroup PovCoreRender Ray Tracing
+/// @ingroup PovCore
+///
+/// @{
+
 typedef struct Fog_Struct FOG;
 class PhotonGatherer;
 class SceneData;
@@ -175,6 +182,8 @@ class Trace
 {
     public:
 
+        /// @todo This interface might also come in hand at other places,
+        /// so we should pull it out of the @ref Trace class.
         class CooperateFunctor
         {
             public:
@@ -196,6 +205,7 @@ class Trace
                 virtual bool CheckRadiosityTraceLevel(const TraceTicket& ticket) { return false; }
         };
 
+        /// @todo TraceThreadData already holds a reference to SceneData.
         Trace(shared_ptr<SceneData> sd, TraceThreadData *td, const QualityFlags& qf,
               CooperateFunctor& cf, MediaFunctor& mf, RadiosityFunctor& af);
 
@@ -796,6 +806,10 @@ class Trace
     ///
 
 };
+
+/// @}
+///
+//##############################################################################
 
 }
 

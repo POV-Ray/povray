@@ -44,6 +44,13 @@
 namespace pov
 {
 
+//##############################################################################
+///
+/// @defgroup PovCoreMaterialMedia Media
+/// @ingroup PovCore
+///
+/// @{
+
 // Scattering types.
 enum
 {
@@ -96,6 +103,10 @@ class MediaFunction : public Trace::MediaFunctor
         void ComputeMediaPhotons(MediaVector& medias, MathColour& Te, const MathColour& Sc, const BasicRay& ray, const Vector3d& H);
         void ComputeMediaScatteringAttenuation(MediaVector& medias, MathColour& OutputColor, const MathColour& Sc, const MathColour& Light_Colour, const BasicRay &ray, const BasicRay &Light_Ray);
 };
+
+/// @}
+///
+//##############################################################################
 
 }
 

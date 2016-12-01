@@ -47,6 +47,7 @@
 
 #include "core/lighting/photons.h" // TODO FIXME - make PhotonGatherer class visible only as a pointer
 #include "core/material/media.h"   // TODO FIXME - make MediaFunction class visible only as a pointer
+#include "core/math/randcosweighted.h"
 #include "core/render/trace.h"     // TODO FIXME - make Trace class visible only as a pointer
 #include "core/support/octree.h"   // TODO FIXME - this should only be included in radiosity.cpp
 #include "core/support/statistics.h"
@@ -59,6 +60,13 @@ class Path;
 namespace pov
 {
 
+//##############################################################################
+///
+/// @defgroup PovCoreLightingRadiosity Radiosity
+/// @ingroup PovCore
+///
+/// @{
+
 class ViewData;
 
 struct ot_block_struct;
@@ -67,14 +75,16 @@ struct ot_id_struct;
 
 #define RADIOSITY_CACHE_EXTENSION ".rca"
 
-static const unsigned int RADIOSITY_MAX_SAMPLE_DIRECTIONS    = 1600;
+static const unsigned int RADIOSITY_MAX_SAMPLE_DIRECTIONS    = kRandCosWeightedCount;
 // to get some more pseudo-randomness and make use of the full range of all the precomputed sample directions,
-// we start each sample direction sequence at a different index than the previous one; 663 has some nice properties for this:
+// we start each sample direction sequence at a different index than the previous one; 663 has some nice properties
+// for this:
 // - it is fairly large stride, only giving "overlap" of consecutive samples at high sample counts
-// - it has no divisors in common with 1600, so that any consecutive 1600 samples will start at a different index
+// - it has no divisors in common with 1600 (kRandCosWeightedCount), so that any consecutive 1600 samples will start at
+//   a different index
 // - it gives the highest possible number of "secondary strides", those being -274, 115, -44, -17, -7 and 3
 
-// settings as effective for a particular bounce depth during a particuar trace step
+// settings as effective for a particular bounce depth during a particular trace step
 struct RadiosityRecursionSettings
 {
     // true "tweakables"
@@ -352,6 +362,10 @@ class RadiosityFunction : public Trace::RadiosityFunctor
 
         double GatherLight(const Vector3d& IPoint, const Vector3d& Raw_Normal, const Vector3d& LayNormal, DBL brilliance, MathColour& Illuminance, TraceTicket& ticket);
 };
+
+/// @}
+///
+//##############################################################################
 
 } // end of namespace
 

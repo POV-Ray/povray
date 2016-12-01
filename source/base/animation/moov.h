@@ -46,6 +46,12 @@
 namespace pov_base
 {
 
+//##############################################################################
+///
+/// @addtogroup PovBaseAnimation
+///
+/// @{
+
 namespace Moov
 {
 
@@ -60,6 +66,10 @@ void PostWriteFrame(OStream *file, POV_LONG bytes, const Animation::WriteOptions
 void FinishWriteFile(OStream *file, const Animation::WriteOptions& options, vector<string>& warnings, void *state);
 
 }
+
+/// @}
+///
+//##############################################################################
 
 }
 

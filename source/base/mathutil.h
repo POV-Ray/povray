@@ -46,6 +46,13 @@
 namespace pov_base
 {
 
+//##############################################################################
+///
+/// @defgroup PovBaseMathutil Mathematical Utilities
+/// @ingroup PovBase
+///
+/// @{
+
 #ifdef NEED_INVHYP
 DBL asinh(DBL x);
 DBL acosh(DBL x);
@@ -172,6 +179,10 @@ inline bool IsInRange (T1 value, T2 min, T2 max)
 {
     return (min <= value) && (value <= max);
 }
+
+/// @}
+///
+//##############################################################################
 
 }
 

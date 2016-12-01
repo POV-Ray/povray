@@ -55,16 +55,20 @@
 // failure to do so will lead to link errors.
 // #define _CONSOLE
 
+// C++ variants of C standard headers
 #include <cmath>
 #include <cstdarg>
 #include <cstdlib>
 
+// C++ standard headers
 #include <exception>
 #include <list>
 #include <stdexcept>
 #include <string>
 #include <vector>
 
+// boost headers
+#include <boost/intrusive_ptr.hpp>
 #include <boost/tr1/memory.hpp>
 
 #include <io.h>
@@ -95,6 +99,8 @@ using std::tr1::weak_ptr;
 using std::tr1::dynamic_pointer_cast;
 using std::tr1::static_pointer_cast;
 using std::tr1::const_pointer_cast;
+
+using boost::intrusive_ptr;
 
 #endif // STD_POV_TYPES_DECLARED
 
@@ -210,9 +216,9 @@ namespace pov_base
 #define DEFAULT_DISPLAY_GAMMA               2.2
 #define RENAME_FILE(orig,new)               rename(orig,new)
 #define DELETE_FILE(name)                   _unlink(name)
-#define NEW_LINE_STRING                     "\r\n"
-#define POV_SYS_FILE_EXTENSION              ".bmp"
-#define SYS_TO_STANDARD                     BMP
+#define POV_NEW_LINE_STRING                 "\r\n"
+#define POV_SYS_IMAGE_EXTENSION             ".bmp"
+#define POV_SYS_IMAGE_TYPE                  BMP
 #define vsnprintf                           _vsnprintf
 #define snprintf                            _snprintf
 #define FILE_NAME_LENGTH                    _MAX_PATH

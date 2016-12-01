@@ -43,7 +43,7 @@
 
 #define POVRAY_PLATFORM_NAME "Unix"
 #define ALTMAIN
-// NEW_LINE_STRING remains undefined, optimizing the code for "\n" as used internally
+// POV_NEW_LINE_STRING remains undefined, optimizing the code for "\n" as used internally
 #define SYS_DEF_EXT     ""
 
 // On Unix platforms, we don't do anything special at thread startup.

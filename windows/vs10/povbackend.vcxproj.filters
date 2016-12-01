@@ -104,9 +104,6 @@
     <ClCompile Include="..\..\source\backend\lighting\photonstrategytask.cpp">
       <Filter>Backend Source\Lighting</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\backend\lighting\rad_data.cpp">
-      <Filter>Backend Source\Lighting</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\backend\bounding\boundingtask.cpp">
       <Filter>Backend Source\Bounding</Filter>
     </ClCompile>

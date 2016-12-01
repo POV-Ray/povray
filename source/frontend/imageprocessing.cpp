@@ -264,10 +264,10 @@ UCS2String ImageProcessing::GetOutputFilename(POVMS_Object& ropts, POVMSInt fram
             imagetype = Image::HDR;
             break;
 
-#ifdef SYS_TO_STANDARD
+#ifdef POV_SYS_IMAGE_TYPE
         case kPOVList_FileType_System:
-            ext = ASCIItoUCS2String(POV_SYS_FILE_EXTENSION);
-            imagetype = Image::SYS_TO_STANDARD;
+            ext = ASCIItoUCS2String(POV_SYS_IMAGE_EXTENSION);
+            imagetype = Image::POV_SYS_IMAGE_TYPE;
             break;
 #endif
 

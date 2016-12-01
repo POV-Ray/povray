@@ -67,6 +67,13 @@
 namespace pov
 {
 
+//##############################################################################
+///
+/// @defgroup PovCoreSupportSimplevector Fast Data Containers
+/// @ingroup PovCore
+///
+/// @{
+
 ////////////////////////////////////////////////////////////////////////////
 // Works like std::vector in some ways, but very limited and not at all as
 // flexible. Does not implement all the methods of std::vector (just what
@@ -565,6 +572,10 @@ private:
     const pointer m_End;
     pointer m_Last;
 };
+
+/// @}
+///
+//##############################################################################
 
 }
 

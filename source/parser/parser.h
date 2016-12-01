@@ -362,7 +362,9 @@ class Parser : public SceneTask
         int Debug_Info(const char *format,...);
         void FlushDebugMessageBuffer();
 
-        static void Convert_Filter_To_Transmit(PIGMENT *Pigment); // NK layers - 1999 July 10 - for backwards compatiblity with layered textures
+        // NK layers - 1999 July 10 - for backwards compatibility with layered textures
+        static void Convert_Filter_To_Transmit(PIGMENT *Pigment);
+        static void Convert_Filter_To_Transmit(GenericPigmentBlendMap *pBlendMap);
 
         /// @param[in]  formalFileName  Name by which the file is known to the user.
         /// @param[out] actualFileName  Name by which the file is known to the parsing computer.
@@ -463,7 +465,7 @@ class Parser : public SceneTask
         FUNCTION_PTR Parse_FunctionOrContent(void);
         void Parse_FunctionOrContentList(GenericScalarFunctionPtr* apFn, unsigned int count, bool mandatory = true);
         FUNCTION_PTR Parse_DeclareFunction(int *token_id, const char *fn_name, bool is_local);
-        const shared_ptr<FunctionVM>& GetFunctionVM() const;
+        intrusive_ptr<FunctionVM> GetFunctionVM() const;
 
         // parsestr.h/parsestr.cpp
         char *Parse_C_String(bool pathname = false);
@@ -495,7 +497,7 @@ class Parser : public SceneTask
         shared_ptr<SceneData> sceneData;
     private:
 
-        shared_ptr<FunctionVM> mpFunctionVM;
+        intrusive_ptr<FunctionVM> mpFunctionVM;
         FPUContext *fnVMContext;
 
         bool Had_Max_Trace_Level;

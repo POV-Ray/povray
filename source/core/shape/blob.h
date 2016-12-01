@@ -45,11 +45,23 @@
 namespace pov
 {
 
-/*****************************************************************************
-* Global preprocessor defines
-******************************************************************************/
+//##############################################################################
+///
+/// @addtogroup PovCoreShape
+///
+/// @{
+
+//******************************************************************************
+///
+/// @name Object Types
+///
+/// @{
 
 #define BLOB_OBJECT (STURM_OK_OBJECT+HIERARCHY_OK_OBJECT+POTENTIAL_OBJECT)
+
+/// @}
+///
+//******************************************************************************
 
 // TODO - the following values probably don't have to be all discrete bits, except for BLOB_ENTER_EXIT_FLAG
 #define BLOB_ENTER_EXIT_FLAG      1 // internal use only
@@ -179,6 +191,10 @@ class Blob : public ObjectBase
 
         void getLocalIPoint(Vector3d& lip, Intersection *isect) const;
 };
+
+/// @}
+///
+//##############################################################################
 
 }
 

@@ -50,6 +50,13 @@
 namespace pov_base
 {
 
+//##############################################################################
+///
+/// @defgroup PovBaseTimer Time Handling
+/// @ingroup PovBase
+///
+/// @{
+
 #if POV_MULTITHREADED && POV_USE_DEFAULT_DELAY
 
 /// Wait for the specified time.
@@ -180,6 +187,10 @@ class Timer
 };
 
 #endif // POV_USE_DEFAULT_TIMER
+
+/// @}
+///
+//##############################################################################
 
 }
 

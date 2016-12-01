@@ -1,2 +1,7 @@
-/// @dir
-/// Source code files for the render back-end.
+/**
+
+@dir
+@ingroup PovBackend
+Source code files for the render back-end.
+
+*/

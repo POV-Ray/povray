@@ -42,6 +42,13 @@
 namespace pov_base
 {
 
+//##############################################################################
+///
+/// @defgroup PovBaseStringutilities String Utilities
+/// @ingroup PovBase
+///
+/// @{
+
 /// Type holding an UCS2-encoded string of characters.
 ///
 /// @todo   UCS2 is a poor choice for internal string representation, as it cannot encode the full UCS/Unicode character
@@ -56,6 +63,10 @@ std::string UCS2toASCIIString(const UCS2String& s);
 
 int pov_stricmp(const char *, const char *);
 const char *pov_tsprintf(const char *, ...);
+
+/// @}
+///
+//##############################################################################
 
 }
 

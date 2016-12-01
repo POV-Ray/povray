@@ -362,7 +362,6 @@
     <ClCompile Include="..\..\source\backend\lighting\photonshootingtask.cpp" />
     <ClCompile Include="..\..\source\backend\lighting\photonsortingtask.cpp" />
     <ClCompile Include="..\..\source\backend\lighting\photonstrategytask.cpp" />
-    <ClCompile Include="..\..\source\backend\lighting\rad_data.cpp" />
     <ClCompile Include="..\..\source\backend\precomp.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

@@ -48,6 +48,13 @@
 namespace pov_base
 {
 
+//##############################################################################
+///
+/// @defgroup PovBaseImageEncoding Basic Colour Encoding and Decoding
+/// @ingroup PovBaseImage
+///
+/// @{
+
 class Image;
 
 enum DitherMethodId
@@ -371,6 +378,10 @@ void GetEncodedRGBValue(const Image* img, unsigned int x, unsigned int y, const 
 ///
 /// @}
 ///
+
+/// @}
+///
+//##############################################################################
 
 }
 

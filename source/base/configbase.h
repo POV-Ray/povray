@@ -42,6 +42,62 @@
 
 #include <boost/version.hpp>
 
+//##############################################################################
+///
+/// @defgroup PovBaseConfig Base Compile-Time Configuration
+/// @ingroup PovBase
+/// @ingroup PovConfig
+///
+/// In addition to the configuration settings listed below, platform-specific compile-time
+/// configuration needs to define various symbols to have the same semantics as those of the same
+/// name from the namespaces of common standard libraries. Typically this will be done by including
+/// the corresponding header files and specifying `using NAMESPACE::SYMBOL`. However, alternative
+/// implementations may also be provided unless noted otherwise.
+///
+/// The following symbols must have the same semantics as those from C++03's `std::` namespace:
+///
+///   - `list`
+///   - `runtime_error` (should be identical to `std::runtime_error`)
+///   - `string`
+///   - `vector`
+///
+/// The following symbols must have the same semantics as those from either Boost's `boost::`
+/// namespace, TR1's `std::tr1::` namespace, or C++11's `std::` namespace:
+///
+///   - `const_pointer_cast`
+///   - `dynamic_pointer_cast`
+///   - `shared_ptr`
+///   - `static_pointer_cast`
+///   - `weak_ptr`
+///
+/// The following symbols must have the same semantics as those from Boost's `boost::` namespace:
+///
+///   - `intrusive_ptr`
+///
+/// @todo
+///     The following POSIX features also need to be present or emulated:
+///       - `O_CREAT`, `O_RDWR`, `O_TRUNC`
+///       - `S_IRUSR`, `S_IWUSR`
+///       - `int open(const char*, int, int)`
+///       - `int close(int)`
+///       - `ssize_t write(int, const void*, size_t)`
+///       - `ssize_t read(int, void*, size_t)`
+///       - `off64_t lseek64(int, off64_t, int)
+///
+/// @todo
+///     The following somewhat obscure macros also need to be defined:
+///       - `IFF_SWITCH_CAST`
+///
+/// @todo
+///     The following macros currently default to unexpected values; also, the implementations
+///     they default to are currently not part of the base module:
+///       - `POV_MALLOC`
+///       - `POV_REALLOC`
+///       - `POV_FREE`
+///       - `POV_MEMMOVE`
+///
+/// @{
+
 //******************************************************************************
 ///
 /// @name Fundamental Data Types
@@ -51,13 +107,13 @@
 /// which type fits the requirements, the algorithm may fail on some exotic systems.
 ///
 /// @compat
-///     The automatic type detection is almost certain fail on systems that employ padding bits
+///     The automatic type detection is almost certain to fail on systems that employ padding bits
 ///     and/or do not use two's complement format for negative values.
 ///
 /// @{
 
 /// @def POV_INT8
-/// The smallest integer data type that can handle values in the range from -2^7 to 2^7-1.
+/// The smallest integer data type that can handle values in the range from @f$ -2^7 @f$ to @f$ 2^7-1 @f$.
 ///
 /// @attention
 ///     Some legacy portions of the code may rely on this type to be _exactly_ 8 bits wide,
@@ -77,7 +133,7 @@
 #endif
 
 /// @def POV_UINT8
-/// The smallest integer data type that can handle values in the range from 0 to 2^8-1.
+/// The smallest integer data type that can handle values in the range from @f$ 0 @f$ to @f$ 2^8-1 @f$.
 ///
 /// @attention
 ///     Some legacy portions of the code may rely on this type to be _exactly_ 8 bits wide,
@@ -97,7 +153,7 @@
 #endif
 
 /// @def POV_INT16
-/// The smallest integer data type that can handle values in the range from -2^15 to 2^15-1.
+/// The smallest integer data type that can handle values in the range from @f$ -2^{15} @f$ to @f$ 2^{15}-1 @f$.
 ///
 /// @attention
 ///     Some legacy portions of the code may rely on this type to be _exactly_ 16 bits wide,
@@ -117,7 +173,7 @@
 #endif
 
 /// @def POV_UINT16
-/// The smallest integer data type that can handle values in the range from 0 to 2^16-1.
+/// The smallest integer data type that can handle values in the range from @f$ 0 @f$ to @f$ 2^{16}-1 @f$.
 ///
 /// @attention
 ///     Some legacy portions of the code may rely on this type to be _exactly_ 16 bits wide,
@@ -137,7 +193,7 @@
 #endif
 
 /// @def POV_INT32
-/// The smallest integer data type that can handle values in the range from -2^31 to 2^31-1.
+/// The smallest integer data type that can handle values in the range from @f$ -2^{31} @f$ to @f$ 2^{31}-1 @f$.
 ///
 /// @attention
 ///     Some legacy portions of the code may rely on this type to be _exactly_ 32 bits wide,
@@ -157,7 +213,7 @@
 #endif
 
 /// @def POV_UINT32
-/// The smallest integer data type that can handle values in the range from 0 to 2^32-1.
+/// The smallest integer data type that can handle values in the range from @f$ 0 @f$ to @f$ 2^{32}-1 @f$.
 ///
 /// @attention
 ///     Some legacy portions of the code may rely on this type to be _exactly_ 32 bits wide,
@@ -177,7 +233,7 @@
 #endif
 
 /// @def POV_INT64
-/// The smallest integer data type that can handle values in the range from -2^63 to 2^63-1.
+/// The smallest integer data type that can handle values in the range from @f$ -2^{63} @f$ to @f$ 2^{63}-1 @f$.
 ///
 /// @attention
 ///     Some legacy portions of the code may rely on this type to be _exactly_ 64 bits wide,
@@ -197,7 +253,7 @@
 #endif
 
 /// @def POV_UINT64
-/// The smallest integer data type that can handle values in the range from 0 to 2^64-1.
+/// The smallest integer data type that can handle values in the range from @f$ 0 @f$ to @f$ 2^{64}-1 @f$.
 ///
 /// @attention
 ///     Some legacy portions of the code may rely on this type to be _exactly_ 64 bits wide,
@@ -222,6 +278,9 @@
 /// It is recommended to use a data type providing at least the same range and precision as the
 /// IEEE 754 "double" type (15 decimal digits in the range from 1e-308 to 1e+308) and supporting
 /// both infinities and quiet NaN values.
+///
+/// @note
+///     When overriding this macro, make sure to also override @ref POV_DBL_FORMAT_STRING.
 ///
 /// @attention
 ///     Many portions of the code currently presume this type to be an alias for `double`.
@@ -292,7 +351,7 @@
 ///
 /// @attention
 ///     Some legacy portions of the code may improperly use this type where they should use
-///     @ref UCS2 instead.
+///     @ref UTF16 instead.
 ///
 #ifndef UCS2
     #define UCS2 POV_UINT16
@@ -460,8 +519,34 @@
 ///
 /// @{
 
-#ifndef POV_SYS_FILE_EXTENSION
-    #define POV_SYS_FILE_EXTENSION ".tga"
+/// @def POV_SYS_IMAGE_TYPE
+/// The system's canonical image file format.
+///
+/// Set this to the file type, as defined in @ref pov_base::Image::ImageFileType, corresponding to the
+/// input image file format selected by the `sys` keyword.
+///
+/// @note
+///     When overriding this setting, make sure to also override @ref POV_SYS_IMAGE_EXTENSION.
+///
+#ifndef POV_SYS_IMAGE_TYPE
+    // leave undefined by default
+    #ifdef DOXYGEN
+        // doxygen cannot document undefined macros
+        #define POV_SYS_IMAGE_TYPE SYS
+    #endif
+#endif
+
+/// @def POV_SYS_IMAGE_EXTENSION
+/// The system's canonical image file format extension.
+///
+/// Set this to the file extension string (including leading dot) corresponding to the
+/// input image file format selected by the `sys` keyword.
+///
+/// @note
+///     When overriding this setting, make sure to also override @ref POV_SYS_IMAGE_TYPE.
+///
+#ifndef POV_SYS_IMAGE_EXTENSION
+    #define POV_SYS_IMAGE_EXTENSION ".tga"
 #endif
 
 /// @def POV_PATH_SEPARATOR
@@ -492,6 +577,24 @@
 ///
 #ifndef POV_SLASH_IS_SWITCH_CHARACTER
     #define POV_SLASH_IS_SWITCH_CHARACTER 0
+#endif
+
+/// @def POV_DBL_FORMAT_STRING
+/// `scanf` format string to read a value of type @ref DBL.
+///
+#ifndef POV_DBL_FORMAT_STRING
+    #define POV_DBL_FORMAT_STRING "%lf"
+#endif
+
+/// @def POV_NEW_LINE_STRING
+/// The system's canonical end-of-line string.
+///
+#ifndef POV_NEW_LINE_STRING
+    // leave undefined, optimizing the code for "\n" as used internally
+    #ifdef DOXYGEN
+        // doxygen cannot document undefined macros
+        #define POV_NEW_LINE_STRING "\n"
+    #endif
 #endif
 
 #ifndef EXIST_FONT_FILE
@@ -747,5 +850,9 @@
 /// @}
 ///
 //******************************************************************************
+
+/// @}
+///
+//##############################################################################
 
 #endif // POVRAY_BASE_CONFIGBASE_H

@@ -1215,7 +1215,7 @@ bool Parser::Read_Float()
 
     Write_Token (FLOAT_TOKEN, col);
 
-    if (sscanf (String, DBL_FORMAT_STRING, &Token.Token_Float) == 0)
+    if (sscanf (String, POV_DBL_FORMAT_STRING, &Token.Token_Float) == 0)
     {
         return (false);
     }

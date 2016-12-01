@@ -50,6 +50,14 @@
 namespace pov_base
 {
 
+//##############################################################################
+///
+/// @defgroup PovBasePlatformbase Platform-Specific Services Interface
+/// @ingroup PovPlatform
+/// @ingroup PovBase
+///
+/// @{
+
 #define POV_PLATFORM_BASE PlatformBase::GetPlatformBaseReference()
 
 /// Abstract class defining an interface to platform-specific services.
@@ -106,6 +114,10 @@ private:
 
     static PlatformBase *self;
 };
+
+/// @}
+///
+//##############################################################################
 
 }
 

@@ -53,6 +53,12 @@
 namespace pov
 {
 
+//##############################################################################
+///
+/// @addtogroup PovCore
+///
+/// @{
+
 using namespace pov_base;
 
 class SceneData;
@@ -61,25 +67,24 @@ struct ISO_ThreadData;
 class PhotonMap;
 struct Blob_Interval_Struct;
 
-/**
- *  Class holding parser thread specific data.
- */
+/// Class holding parser thread specific data.
 class TraceThreadData : public ThreadData
 {
         friend class Scene;
         friend class Trace;
         friend class View; // TODO FIXME - needed only to access TraceThreadData for CheckCameraHollowObject()
+
     public:
-        /**
-         *  Create thread local data.
-         *  @param  sd              Scene data defining scene attributes.
-         */
+
+        /// Create thread local data.
+        /// @param  sd  Scene data defining scene attributes.
         TraceThreadData(shared_ptr<SceneData> sd);
 
-        /**
-         *  Get the statistics.
-         *  @return                 Reference to statistic counters.
-         */
+        /// Destructor.
+        ~TraceThreadData();
+
+        /// Get the statistics.
+        /// @return     Reference to statistic counters.
         RenderStatistics& Stats(void) { return renderStats; }
 
         DBL *Fractal_IStack[4];
@@ -95,7 +100,7 @@ class TraceThreadData : public ThreadData
         vector<BCYL_INT> BCyl_RInt;
         vector<BCYL_INT> BCyl_HInt;
         IStackPool stackPool;
-        vector<GenericFunctionContext*> functionContextPool;
+        vector<GenericFunctionContextPtr> functionContextPool;
         int Facets_Last_Seed;
         int Facets_CVC;
         Vector3d Facets_Cube[81];
@@ -129,16 +134,12 @@ class TraceThreadData : public ThreadData
         vector<double> waveFrequencies;
         vector<Vector3d> waveSources;
 
-        /**
-         * called after a rectangle is finished
-         * used for crackle cache expiry
-         */
+        /// Called after a rectangle is finished.
+        /// Used for crackle cache expiry.
         void AfterTile();
 
-        /**
-         * used by the crackle pattern to indicate age of cache entries
-         * @return  the index of the current rectangle rendered
-         */
+        /// Used by the crackle pattern to indicate age of cache entries.
+        /// @return     The index of the current rectangle rendered.
         inline size_t ProgressIndex() const { return progress_index; }
 
         enum TimeType
@@ -179,14 +180,11 @@ class TraceThreadData : public ThreadData
         size_t CrCache_MaxAge;
         /// current tile index (for crackle cache expiry)
         size_t progress_index;
-
-    public: // TODO FIXME - temporary workaround [trf]
-
-        /**
-         *  Destructor.
-         */
-        ~TraceThreadData();
 };
+
+/// @}
+///
+//##############################################################################
 
 }
 

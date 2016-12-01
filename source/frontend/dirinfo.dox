@@ -1,2 +1,7 @@
-/// @dir
-/// Source code files for the render front-end.
+/**
+
+@dir
+@ingroup PovFrontend
+Source code files for the render front-end.
+
+*/

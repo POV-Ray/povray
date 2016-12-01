@@ -37,6 +37,7 @@
 #include "base/textstreambuffer.h"
 
 // C++ variants of standard C header files
+#include <cstdarg>
 #include <cstring>
 
 // Standard C++ header files

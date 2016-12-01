@@ -46,6 +46,11 @@
 namespace pov_base
 {
 
+//##############################################################################
+///
+/// @addtogroup PovBaseImage
+///
+/// @{
 
 namespace Gif
 {
@@ -54,6 +59,10 @@ Image *Read(IStream *file, const Image::ReadOptions& options, bool IsPOTFile);
 void Decode(IStream *file, Image *image);
 
 }
+
+/// @}
+///
+//##############################################################################
 
 }
 

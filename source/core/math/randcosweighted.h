@@ -1,9 +1,14 @@
 //******************************************************************************
 ///
-/// @file base/image/iff.h
+/// @file core/math/randcosweighted.h
 ///
-/// Declarations related to Electronic Arts Interleaved Bitmap (IFF-ILBM) image
-/// file handling.
+/// Declaration of lookup table of cosine-weighted hemispherical random
+/// directions.
+///
+/// This table was originally designed for radiosity, but is also used by photon
+/// mapping now.
+///
+/// @author Jim McElhiney
 ///
 /// @copyright
 /// @parblock
@@ -34,28 +39,53 @@
 ///
 //******************************************************************************
 
-#ifndef POVRAY_BASE_IFF_H
-#define POVRAY_BASE_IFF_H
+#ifndef POVRAY_CORE_RANDCOSWEIGHTED_H
+#define POVRAY_CORE_RANDCOSWEIGHTED_H
 
 // Module config header file must be the first file included within POV-Ray unit header files
-#include "base/configbase.h"
+#include "core/configcore.h"
 
-// POV-Ray base header files
-#include "base/image/image.h"
+#include "core/coretypes.h"
 
-namespace pov_base
-{
-
-namespace Iff
+namespace pov
 {
 
 //##############################################################################
 ///
-/// @addtogroup PovBaseImage
+/// @defgroup PovCoreMathRandomsequence Random Number Sequences
+/// @ingroup PovCoreMath
 ///
 /// @{
 
-Image *Read(IStream *file, const Image::ReadOptions& options);
+//******************************************************************************
+///
+/// @name Legacy Sub-Random Number Source
+///
+/// The following provide a table of 1600 sub-random (low discrepancy) vectors
+/// on the unit sphere.
+///
+/// @{
+
+struct BYTE_XYZ
+{
+    unsigned char x, y, z;
+};
+
+const int kRandCosWeightedCount = 1600;
+extern BYTE_XYZ kaRandCosWeighted[kRandCosWeightedCount];
+
+inline void VUnpack(Vector3d& dest_vec, const BYTE_XYZ * pack_vec)
+{
+    dest_vec[X] = ((double)pack_vec->x * (1.0 / 255.0)) * 2.0 - 1.0;
+    dest_vec[Y] = ((double)pack_vec->y * (1.0 / 255.0));
+    dest_vec[Z] = ((double)pack_vec->z * (1.0 / 255.0)) * 2.0 - 1.0;
+
+    dest_vec.normalize(); // already good to about 1%, but we can do better
+}
+
+/// @}
+///
+//******************************************************************************
 
 /// @}
 ///
@@ -63,6 +93,4 @@ Image *Read(IStream *file, const Image::ReadOptions& options);
 
 }
 
-}
-
-#endif // POVRAY_BASE_IFF_H
+#endif // POVRAY_CORE_RANDCOSWEIGHTED_H

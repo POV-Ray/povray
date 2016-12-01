@@ -33,14 +33,21 @@
 ///
 //******************************************************************************
 
-#ifndef POV_ERR_H
-#define POV_ERR_H
+#ifndef POVRAY_BASE_POV_ERR_H
+#define POVRAY_BASE_POV_ERR_H
 
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "base/configbase.h"
 
 namespace pov_base
 {
+
+//##############################################################################
+///
+/// @defgroup PovBasePovErr Error Handling
+/// @ingroup PovBase
+///
+/// @{
 
 // fatal errors
 enum
@@ -246,6 +253,10 @@ class Exception : public runtime_error
         bool xfrontendnotified;
 };
 
+/// @}
+///
+//##############################################################################
+
 }
 
-#endif
+#endif // POVRAY_BASE_POV_ERR_H

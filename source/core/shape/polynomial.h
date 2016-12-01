@@ -44,13 +44,25 @@
 namespace pov
 {
 
-/*****************************************************************************
-* Global preprocessor defines
-******************************************************************************/
+//##############################################################################
+///
+/// @addtogroup PovCoreShape
+///
+/// @{
+
+//******************************************************************************
+///
+/// @name Object Types
+///
+/// @{
 
 #define POLY_OBJECT    (STURM_OK_OBJECT)
 #define CUBIC_OBJECT   (STURM_OK_OBJECT)
 #define QUARTIC_OBJECT (STURM_OK_OBJECT)
+
+/// @}
+///
+//******************************************************************************
 
 /* Number of coefficients of a three variable polynomial of order x */
 
@@ -95,6 +107,10 @@ class Poly : public ObjectBase
         //static int binomial(int n, int r);
         //static void factor1(int n, int *c, int *s);
 };
+
+/// @}
+///
+//##############################################################################
 
 }
 

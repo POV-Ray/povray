@@ -2,7 +2,7 @@
 ///
 /// @file windows/pvdisplay.cpp
 ///
-/// @todo What's in here?
+/// @todo   What's in here?
 ///
 /// @copyright
 /// @parblock

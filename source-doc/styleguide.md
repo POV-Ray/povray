@@ -50,6 +50,7 @@ POV-Ray is being developed with portability high in mind. In practice and at pre
       - Flyweights.
       - Threads.
       - Datetime.
+      - Intrusive Pointers.
       .
     @todo
         Make an inventory of what boost libraries we're actually using.
@@ -140,7 +141,7 @@ scheme:
 
   - Macro names should use `UPPER_CASE_WITH_UNDERSCORES`.
   - Class and struct names should use `MixedCase`.
-  - Type names should use `MixedCase`. Pointer types should have a `Ptr` suffix, i.e. `MixedCasePtr`. pointers to
+  - Type names should use `MixedCase`. Pointer types should have a `Ptr` suffix, i.e. `MixedCasePtr`. Pointers to
     immutable data should have a `Const` prefix and `Ptr` suffix, i.e. `ConstMixedCasePtr`.
   - Method names (both public and protected) should generally use `MixedCase` as well. However, methods that simply
     return a reference to a member variable may be named with `camelCase` instead.
@@ -191,6 +192,53 @@ Include Files
     include footprint should be kept to a minimum to simplify include hierarchy; most notably, if all you need from
     another include file are type declarations, use forward declarations where possible instead of including the other
     file.
+
+
+Smart Pointers
+==============
+
+Where ownership, i.e. responsibility for releasing dynamically allocated memory, is non-trivial, smart pointers should
+be used. The choice of type depends on the context:
+
+  - Regular pointers (`T*`) may be used where performance requirements are high and ownership is obvious. Examples might
+    be temporary objects handled exclusively within one function, or private member data handled exclusively by the
+    containing object.
+  - Shared pointers (`shared_ptr<T>`) should be used where ownership is non-trivial, and code clarity is of higher
+    importance than performance or memory consumption.
+  - Intrusive pointers (`intrusive_ptr<T>`) should be used where ownership is complex, and performance or memory
+    footprint are of higher importance than clarity of the referenced type's implementation.
+  - Intrusive pointers should also be used to manage objects that need to create additional permanent references to
+    themselves.
+
+@note
+    When judging complexity of ownership, do not forget the possibility of code terminating prematurely due to
+    exceptions.
+
+When smart pointers are used, some care still needs to be employed in passing around and storing references:
+
+  - When using smart pointers in general, permanent references (e.g. in object data members or global variables) and
+    return values should always be of shared pointer type; however, temporary references should use regular pointer
+    type.
+  - When using shared pointers, function or method parameters _must_ be of shared pointer type if the function or
+    method in question may cause additional permanent references to be created, but _should_ be of regular pointer type
+    otherwise.
+  - When using intrusive pointers, function or method parameters _should always_ be of regular pointer type.
+
+@note
+    When object ownership is shared between threads, additional considerations may apply. Such cases should be
+    adequately documented.
+
+When using smart pointers, instead of the type suffix `Ptr` the following suffixes should be used for clarity:
+
+  - `SPtr` to denote a shared pointer type
+  - `IPtr` to denote an intrusive pointer type
+  - `TPtr` to denote a regular pointer type used as a temporary reference
+
+@note
+    When using `shared_ptr<>` or `intrusive_ptr<>`, do _not_ specify a namespace, and do _not_ include the header files
+    you think these templates are defined in. It is entirely up to compile-time configuration header files to include
+    the necessary headers and pull in the definitions to the global namespace, so that the code works equally well with
+    e.g. the `shared_ptr` implementations from either Boost, TR1 or C++11.
 
 
 Miscellaneous Coding Rules

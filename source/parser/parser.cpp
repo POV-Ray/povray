@@ -771,7 +771,7 @@ ObjectPtr Parser::Parse_Bicubic_Patch ()
         Warning("Patch type no longer supported. Using type 1.");
     }
 
-    if ((Object->Patch_Type < 0) || (Object->Patch_Type > MAX_PATCH_TYPE))
+    if (Object->Patch_Type < 0)
     {
         Error("Undefined bicubic patch type.");
     }
@@ -2547,7 +2547,7 @@ ObjectPtr Parser::Parse_Isosurface()
     if(Token.Token_Id != FUNCTION_TOKEN)
         Parse_Error(FUNCTION_TOKEN);
 
-    Object->Function = new FunctionVM::CustomFunction(fnVMContext->functionvm, Parse_Function());
+    Object->Function = new FunctionVM::CustomFunction(fnVMContext->functionvm.get(), Parse_Function());
 
     EXPECT
         CASE(CONTAINED_BY_TOKEN)
@@ -3240,6 +3240,7 @@ ObjectPtr Parser::Parse_Light_Group()
 
         CASE (GLOBAL_LIGHTS_TOKEN)
             Bool_Flag (Object, NO_GLOBAL_LIGHTS_FLAG, !(Allow_Float(1.0) > 0.5));
+            // TODO FIXME -- shouldn't we set NO_GLOBAL_LIGHTS_SET_FLAG here?
         END_CASE
 
         CASE(PHOTONS_TOKEN)
@@ -10528,10 +10529,11 @@ void *Parser::Copy_Identifier (void *Data, int Type)
 *
 ******************************************************************************/
 
-/* NK layers - 1999 June 10 - for backwards compatiblity with layered textures */
+/* NK layers - 1999 June 10 - for backwards compatibility with layered textures */
 void Parser::Convert_Filter_To_Transmit(PIGMENT *Pigment)
 {
-    if (Pigment==NULL) return;
+    if (!Pigment)
+        return;
 
     switch (Pigment->Type)
     {
@@ -10540,29 +10542,36 @@ void Parser::Convert_Filter_To_Transmit(PIGMENT *Pigment)
             break;
 
         default:
-            if (Pigment->Blend_Map != NULL)
-                Pigment->Blend_Map->ConvertFilterToTransmit();
+            Convert_Filter_To_Transmit(Pigment->Blend_Map.get());
             break;
     }
 }
 
-void PigmentBlendMap::ConvertFilterToTransmit()
+// NK layers - 1999 July 10 - for backwards compatibility with layered textures
+void Parser::Convert_Filter_To_Transmit(GenericPigmentBlendMap *pBlendMap)
 {
-    POV_BLEND_MAP_ASSERT((Type == kBlendMapType_Pigment) || (Type == kBlendMapType_Density));
-    for (Vector::iterator i = Blend_Map_Entries.begin(); i != Blend_Map_Entries.end(); i++)
-    {
-        Parser::Convert_Filter_To_Transmit(i->Vals);
-    }
-}
+    if (!pBlendMap)
+        return;
 
-void ColourBlendMap::ConvertFilterToTransmit()
-{
-    for (Vector::iterator i = Blend_Map_Entries.begin(); i != Blend_Map_Entries.end(); i++)
+    if (PigmentBlendMap* pPBlendMap = dynamic_cast<PigmentBlendMap*>(pBlendMap))
     {
-        i->Vals.SetFT(0.0, 1.0 - i->Vals.Opacity());
+        POV_BLEND_MAP_ASSERT((pPBlendMap->Type == kBlendMapType_Pigment) ||
+                             (pPBlendMap->Type == kBlendMapType_Density));
+        for (PigmentBlendMap::Vector::iterator i = pPBlendMap->Blend_Map_Entries.begin(); i != pPBlendMap->Blend_Map_Entries.end(); i++)
+        {
+            Convert_Filter_To_Transmit(i->Vals);
+        }
     }
+    else if (ColourBlendMap* pCBlendMap = dynamic_cast<ColourBlendMap*>(pCBlendMap))
+    {
+        for (ColourBlendMap::Vector::iterator i = pCBlendMap->Blend_Map_Entries.begin(); i != pCBlendMap->Blend_Map_Entries.end(); i++)
+        {
+            i->Vals.SetFT(0.0, 1.0 - i->Vals.Opacity());
+        }
+    }
+    else
+        POV_BLEND_MAP_ASSERT(false);
 }
-
 
 
 /*****************************************************************************

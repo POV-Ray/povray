@@ -48,6 +48,13 @@
 namespace pov_base
 {
 
+//##############################################################################
+///
+/// @defgroup PovBaseImage Image Handling
+/// @ingroup PovBase
+///
+/// @{
+
 /**
  *  Generic image data container.
  *
@@ -164,6 +171,7 @@ class Image
             GrayA_Gamma16
         };
 
+        /// Image file type identifier.
         enum ImageFileType
         {
             GIF,
@@ -395,6 +403,10 @@ class Image
         /// not available
         Image& operator=(Image&);
 };
+
+/// @}
+///
+//##############################################################################
 
 }
 

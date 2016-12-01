@@ -46,6 +46,13 @@
 namespace pov_base
 {
 
+//##############################################################################
+///
+/// @defgroup PovBaseFileutil File-Related Utilities
+/// @ingroup PovBase
+///
+/// @{
+
 class IMemStream;
 class IStream;
 
@@ -79,6 +86,10 @@ extern const int gFile_Type_To_Mask[];
 
 int InferFileTypeFromExt(const pov_base::UCS2String& ext);
 IMemStream *Internal_Font_File(int font_id);
+
+/// @}
+///
+//##############################################################################
 
 }
 

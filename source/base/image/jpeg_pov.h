@@ -46,12 +46,21 @@
 namespace pov_base
 {
 
-
 namespace Jpeg
 {
 
+//##############################################################################
+///
+/// @addtogroup PovBaseImage
+///
+/// @{
+
 Image *Read(IStream *file, const Image::ReadOptions& options);
 void Write (OStream *file, const Image *image, const Image::WriteOptions& options);
+
+/// @}
+///
+//##############################################################################
 
 }
 

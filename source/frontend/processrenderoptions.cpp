@@ -1074,9 +1074,9 @@ struct ProcessRenderOptions::Output_FileType_Table FileTypeTable[] =
     { 'B',  0,                              kPOVList_FileType_BMP,              false,              false /*[1]*/ },
     { 'E',  0,                              kPOVList_FileType_OpenEXR,          false /*[2]*/,      true },
     { 'H',  0,                              kPOVList_FileType_RadianceHDR,      false,              false },
-#ifdef SYS_TO_STANDARD
+#ifdef POV_SYS_IMAGE_TYPE
     { 'S',  0,                              kPOVList_FileType_System,           SYS_GRAYSCALE_FLAG, SYS_ALPHA_FLAG },
-#endif // SYS_TO_STANDARD
+#endif // POV_SYS_IMAGE_TYPE
 
     //  [1] Alpha support for BMP uses an inofficial extension to the BMP file format, which is not recognized by
     //      most image pocessing software.
