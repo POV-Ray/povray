@@ -7,7 +7,7 @@
 #  define BOOST_MATH_TUPLE_HPP_INCLUDED
 #  include <boost/config.hpp>
 
-#ifndef BOOST_NO_CXX11_HDR_TUPLE
+#if !defined(BOOST_NO_CXX11_HDR_TUPLE) && !BOOST_WORKAROUND(BOOST_GCC_VERSION, < 40500)
 
 #include <tuple>
 

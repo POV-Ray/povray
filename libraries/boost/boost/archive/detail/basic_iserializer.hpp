@@ -51,11 +51,7 @@ protected:
     explicit BOOST_ARCHIVE_DECL basic_iserializer(
         const boost::serialization::extended_type_info & type
     );
-    // account for bogus gcc warning
-    #if defined(__GNUC__)
-    virtual
-    #endif
-    BOOST_ARCHIVE_DECL ~basic_iserializer();
+    virtual BOOST_ARCHIVE_DECL ~basic_iserializer();
 public:
     bool serialized_as_pointer() const {
         return m_bpis != NULL;

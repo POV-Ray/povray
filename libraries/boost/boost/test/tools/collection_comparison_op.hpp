@@ -1,4 +1,4 @@
-//  (C) Copyright Gennadiy Rozental 2014-2015.
+//  (C) Copyright Gennadiy Rozental 2001.
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
@@ -50,7 +50,7 @@ struct specialized_compare<Col> : public mpl::true_ {};         \
 
 namespace op {
 
-template <typename OP, bool can_be_equal, bool prefer_shorter, 
+template <typename OP, bool can_be_equal, bool prefer_shorter,
           typename Lhs, typename Rhs>
 inline assertion_result
 lexicographic_compare( Lhs const& lhs, Rhs const& rhs )
@@ -69,13 +69,13 @@ lexicographic_compare( Lhs const& lhs, Rhs const& rhs )
             return ar; // a < b
 
         assertion_result const& reverse_ar = OP::eval(*first2, *first1);
-        if( element_ar && !reverse_ar )                     
+        if( element_ar && !reverse_ar )
             return ar; // a<=b and !(b<=a) => a < b => return true
-        
-        if( element_ar || !reverse_ar ) 
-            continue; // (a<=b and b<=a) or (!(a<b) and !(b<a)) => a == b => keep looking                   
 
-        // !(a<=b) and b<=a => b < a => return false            
+        if( element_ar || !reverse_ar )
+            continue; // (a<=b and b<=a) or (!(a<b) and !(b<a)) => a == b => keep looking
+
+        // !(a<=b) and b<=a => b < a => return false
         ar = false;
         ar.message() << "\nFailure at position " << pos << ": "
                      << tt_detail::print_helper(*first1)
@@ -85,7 +85,7 @@ lexicographic_compare( Lhs const& lhs, Rhs const& rhs )
         return ar;
     }
 
-    
+
     if( first1 != last1 ) {
         if( prefer_shorter ) {
             ar = false;
@@ -278,7 +278,7 @@ lexicographic_compare( Lhs const& lhs, Rhs const& rhs )
 
 template <typename Lhs, typename Rhs, typename OP>
 inline assertion_result
-compare_collections( Lhs const& lhs, Rhs const& rhs, boost::type<OP>* tp, mpl::true_ )
+compare_collections( Lhs const& lhs, Rhs const& rhs, boost::type<OP>*, mpl::true_ )
 {
     return lexicographic_compare<OP>( lhs, rhs );
 }
@@ -287,7 +287,7 @@ compare_collections( Lhs const& lhs, Rhs const& rhs, boost::type<OP>* tp, mpl::t
 
 template <typename Lhs, typename Rhs, typename L, typename R>
 inline assertion_result
-compare_collections( Lhs const& lhs, Rhs const& rhs, boost::type<op::LT<L, R> >* tp, mpl::false_ )
+compare_collections( Lhs const& lhs, Rhs const& rhs, boost::type<op::LT<L, R> >*, mpl::false_ )
 {
     return lhs < rhs;
 }
@@ -296,7 +296,7 @@ compare_collections( Lhs const& lhs, Rhs const& rhs, boost::type<op::LT<L, R> >*
 
 template <typename Lhs, typename Rhs, typename L, typename R>
 inline assertion_result
-compare_collections( Lhs const& lhs, Rhs const& rhs, boost::type<op::LE<L, R> >* tp, mpl::false_ )
+compare_collections( Lhs const& lhs, Rhs const& rhs, boost::type<op::LE<L, R> >*, mpl::false_ )
 {
     return lhs <= rhs;
 }
@@ -305,7 +305,7 @@ compare_collections( Lhs const& lhs, Rhs const& rhs, boost::type<op::LE<L, R> >*
 
 template <typename Lhs, typename Rhs, typename L, typename R>
 inline assertion_result
-compare_collections( Lhs const& lhs, Rhs const& rhs, boost::type<op::GT<L, R> >* tp, mpl::false_ )
+compare_collections( Lhs const& lhs, Rhs const& rhs, boost::type<op::GT<L, R> >*, mpl::false_ )
 {
     return lhs > rhs;
 }
@@ -314,7 +314,7 @@ compare_collections( Lhs const& lhs, Rhs const& rhs, boost::type<op::GT<L, R> >*
 
 template <typename Lhs, typename Rhs, typename L, typename R>
 inline assertion_result
-compare_collections( Lhs const& lhs, Rhs const& rhs, boost::type<op::GE<L, R> >* tp, mpl::false_ )
+compare_collections( Lhs const& lhs, Rhs const& rhs, boost::type<op::GE<L, R> >*, mpl::false_ )
 {
     return lhs >= rhs;
 }
@@ -325,7 +325,7 @@ compare_collections( Lhs const& lhs, Rhs const& rhs, boost::type<op::GE<L, R> >*
 // ********* specialization of comparison operators for collections ********* //
 // ************************************************************************** //
 
-#define DEFINE_COLLECTION_COMPARISON( oper, name, _ )               \
+#define DEFINE_COLLECTION_COMPARISON( oper, name, rev )             \
 template<typename Lhs,typename Rhs>                                 \
 struct name<Lhs,Rhs,typename boost::enable_if_c<                    \
     unit_test::is_forward_iterable<Lhs>::value &&                   \
@@ -356,6 +356,10 @@ public:                                                             \
     report( std::ostream&,                                          \
             PrevExprType const&,                                    \
             Rhs const& ) {}                                         \
+                                                                    \
+    static char const* revert()                                     \
+    { return " " #rev " "; }                                        \
+                                                                    \
 };                                                                  \
 /**/
 
@@ -372,4 +376,3 @@ BOOST_TEST_FOR_EACH_COMP_OP( DEFINE_COLLECTION_COMPARISON )
 #include <boost/test/detail/enable_warnings.hpp>
 
 #endif // BOOST_TEST_TOOLS_COLLECTION_COMPARISON_OP_HPP_050815GER
-

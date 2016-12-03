@@ -1,4 +1,4 @@
-//  (C) Copyright Gennadiy Rozental 2001-2014.
+//  (C) Copyright Gennadiy Rozental 2001.
 //  (C) Copyright Beman Dawes and Ullrich Koethe 1995-2001.
 //  Use, modification, and distribution are subject to the
 //  Boost Software License, Version 1.0. (See accompanying file
@@ -68,6 +68,7 @@ using std::va_list;
 // to use vsnprintf
 #if defined(__QNXNTO__)
 #  include <stdio.h>
+using std::va_list;
 #endif
 
 #ifdef BOOST_SEH_BASED_SIGNAL_HANDLING
@@ -155,8 +156,10 @@ namespace { void _set_se_translator( void* ) {} }
 #    include <android/api-level.h>
 #  endif
 
+// documentation of BOOST_TEST_DISABLE_ALT_STACK in execution_monitor.hpp
 #  if !defined(__CYGWIN__) && !defined(__QNXNTO__) && !defined(__bgq__) && \
-   (!defined(__ANDROID__) || __ANDROID_API__ >= 8)
+   (!defined(__ANDROID__) || __ANDROID_API__ >= 8) && \
+   !defined(BOOST_TEST_DISABLE_ALT_STACK)
 #    define BOOST_TEST_USE_ALT_STACK
 #  endif
 
@@ -182,8 +185,8 @@ namespace { void _set_se_translator( void* ) {} }
 #include <errno.h>
 #endif
 
-#if defined(__GNUC__) && !defined(BOOST_NO_TYPEID)
-#  include <cxxabi.h>
+#if !defined(BOOST_NO_TYPEID) && !defined(BOOST_NO_RTTI)
+#  include <boost/core/demangle.hpp>
 #endif
 
 #include <boost/test/detail/suppress_warnings.hpp>
@@ -243,9 +246,9 @@ report_error( execution_exception::error_code ec, boost::exception const* be, ch
 
     va_end( *args );
 
-    throw execution_exception( ec, buf, execution_exception::location( extract<throw_file>( be ),
-                                                                       (size_t)extract<throw_line>( be ),
-                                                                       extract<throw_function>( be ) ) );
+    BOOST_TEST_I_THROW(execution_exception( ec, buf, execution_exception::location( extract<throw_file>( be ),
+                                                                                    (size_t)extract<throw_line>( be ),
+                                                                                    extract<throw_function>( be ) ) ));
 }
 
 //____________________________________________________________________________//
@@ -304,23 +307,17 @@ struct fpe_except_guard {
     unsigned m_previosly_enabled;
 };
 
-#ifndef BOOST_NO_TYPEID
 
 // ************************************************************************** //
 // **************                  typeid_name                 ************** //
 // ************************************************************************** //
 
+#if !defined(BOOST_NO_TYPEID) && !defined(BOOST_NO_RTTI)
 template<typename T>
-char const*
+std::string
 typeid_name( T const& t )
 {
-#ifdef __GNUC__
-    int status;
-
-    return abi::__cxa_demangle( typeid(t).name(), 0, 0, &status );
-#else
-    return typeid(t).name();
-#endif
+    return boost::core::demangle(typeid(t).name());
 }
 #endif
 
@@ -605,7 +602,7 @@ system_signal_exception::report() const
         break;
 
     default:
-        report_error( execution_exception::system_error, 
+        report_error( execution_exception::system_error,
                       "unrecognized signal %d", m_sig_info->si_signo );
     }
 }
@@ -869,7 +866,7 @@ execution_monitor::catch_signals( boost::function<int ()> const& F )
     if( !sigsetjmp( signal_handler::jump_buffer(), 1 ) )
         return detail::do_invoke( m_custom_translators , F );
     else
-        return BOOST_TEST_IMPL_THROW( local_signal_handler.sys_sig() );
+        BOOST_TEST_I_THROW( local_signal_handler.sys_sig() );
 }
 
 //____________________________________________________________________________//
@@ -1137,6 +1134,8 @@ execution_monitor::catch_signals( boost::function<int ()> const& F )
     detail::system_signal_exception SSE( this );
 
     int ret_val = 0;
+    // clang windows workaround: this not available in __finally scope
+    bool l_catch_system_errors = p_catch_system_errors;
 
     __try {
         __try {
@@ -1147,7 +1146,7 @@ execution_monitor::catch_signals( boost::function<int ()> const& F )
         }
     }
     __finally {
-        if( p_catch_system_errors ) {
+        if( l_catch_system_errors ) {
             BOOST_TEST_CRT_SET_HOOK( old_crt_hook );
 
            _set_invalid_parameter_handler( old_iph );
@@ -1200,14 +1199,14 @@ execution_monitor::execute( boost::function<int ()> const& F )
     if( debug::under_debugger() )
         p_catch_system_errors.value = false;
 
-    BOOST_TEST_IMPL_TRY {
+    BOOST_TEST_I_TRY {
         detail::fpe_except_guard G( p_detect_fp_exceptions );
         unit_test::ut_detail::ignore_unused_variable_warning( G );
 
         return catch_signals( F );
     }
 
-#ifndef BOOST_NO_EXCEPTION
+#ifndef BOOST_NO_EXCEPTIONS
 
     //  Catch-clause reference arguments are a bit different from function
     //  arguments (ISO 15.3 paragraphs 18 & 19).  Apparently const isn't
@@ -1222,7 +1221,7 @@ execution_monitor::execute( boost::function<int ()> const& F )
                               "std::string: %s", ex.c_str() ); }
 
     //  std:: exceptions
-#ifdef BOOST_NO_TYPEID
+#if defined(BOOST_NO_TYPEID) || defined(BOOST_NO_RTTI)
 #define CATCH_AND_REPORT_STD_EXCEPTION( ex_name )                           \
     catch( ex_name const& ex )                                              \
        { detail::report_error( execution_exception::cpp_exception_error,    \
@@ -1234,7 +1233,7 @@ execution_monitor::execute( boost::function<int ()> const& F )
     catch( ex_name const& ex )                                              \
         { detail::report_error( execution_exception::cpp_exception_error,   \
                           current_exception_cast<boost::exception const>(), \
-                          "%s: %s", detail::typeid_name(ex), ex.what() ); } \
+                          "%s: %s", detail::typeid_name(ex).c_str(), ex.what() ); } \
 /**/
 #endif
 
@@ -1264,7 +1263,7 @@ execution_monitor::execute( boost::function<int ()> const& F )
     catch( boost::exception const& ex )
       { detail::report_error( execution_exception::cpp_exception_error,
                               &ex,
-#ifdef BOOST_NO_TYPEID
+#if defined(BOOST_NO_TYPEID) || defined(BOOST_NO_RTTI)
                               "unknown boost::exception" ); }
 #else
                               typeid(ex).name()          ); }
@@ -1273,7 +1272,7 @@ execution_monitor::execute( boost::function<int ()> const& F )
     // system errors
     catch( system_error const& ex )
       { detail::report_error( execution_exception::cpp_exception_error,
-                              "system_error produced by: %s: %s", ex.p_failed_exp.get(), std::strerror( ex.p_errno ) ); }
+                              "system_error produced by: %s: %s", ex.p_failed_exp, std::strerror( ex.p_errno ) ); }
     catch( detail::system_signal_exception const& ex )
       { ex.report(); }
 
@@ -1380,8 +1379,8 @@ enable( unsigned mask )
 
     return ~old_cw & BOOST_FPE_ALL;
 #elif defined(__GLIBC__) && defined(__USE_GNU) && !defined(BOOST_CLANG) && !defined(BOOST_NO_FENV_H)
-    ::feclearexcept(BOOST_FPE_ALL);
-    int res = ::feenableexcept( mask );
+    feclearexcept(BOOST_FPE_ALL);
+    int res = feenableexcept( mask );
     return res == -1 ? (unsigned)BOOST_FPE_INV : (unsigned)res;
 #else
     /* Not Implemented  */
@@ -1417,8 +1416,8 @@ disable( unsigned mask )
 
     return ~old_cw & BOOST_FPE_ALL;
 #elif defined(__GLIBC__) && defined(__USE_GNU) && !defined(BOOST_CLANG) && !defined(BOOST_NO_FENV_H)
-    ::feclearexcept(BOOST_FPE_ALL);
-    int res = ::fedisableexcept( mask );
+    feclearexcept(BOOST_FPE_ALL);
+    int res = fedisableexcept( mask );
     return res == -1 ? (unsigned)BOOST_FPE_INV : (unsigned)res;
 #else
     /* Not Implemented */
@@ -1435,4 +1434,3 @@ disable( unsigned mask )
 #include <boost/test/detail/enable_warnings.hpp>
 
 #endif // BOOST_TEST_EXECUTION_MONITOR_IPP_012205GER
-
