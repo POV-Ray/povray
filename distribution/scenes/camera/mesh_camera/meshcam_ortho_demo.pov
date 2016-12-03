@@ -44,8 +44,8 @@
 // create a mesh simulating an orthographic camera, with optional load/save mechanism
 #if (meshcam_file>0)
   // get the file name
-  #declare prefix="meshcam-ortho_"; 
-  #declare mesh_file=concat(concat(concat(concat(prefix,str(image_width,0,0)),"x"),str(image_height,0,0)),".inc");
+  #declare Prefix="meshcam-ortho_"; 
+  #declare mesh_file=concat(concat(concat(concat(Prefix,str(image_width,0,0)),"x"),str(image_height,0,0)),".inc");
 #else
   // ..wich should be empty to turn the mesh file off
   #declare mesh_file="";

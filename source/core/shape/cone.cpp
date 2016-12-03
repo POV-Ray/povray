@@ -1004,24 +1004,20 @@ void Cone::CalcUV(const Vector3d& IPoint, Vector2d& Result) const
     if ((P[Z]>(dist+EPSILON))&&(P[Z]<(1.0-EPSILON)))
     {
         // when not on a face, the range 0.25 to 0.75 is used (just plain magic 25% for face, no other reason, but it makes C-Lipka happy)
-     // phi = 0.25+0.5*(P[Z]-dist)/(1.0-dist); // <-- hgpovray was upside down to norm. Delete line if flip below holds.
         phi = 0.75-0.5*(P[Z]-dist)/(1.0-dist);
     }
     else if (P[Z]>(dist+EPSILON))
     {
         // the radii are changed (apex_radius is 1.0 for len)
         // aka P[Z] is 1, use the apex_radius, from 75% to 100% (at the very center)
-     // phi = 1.0-(sqrt(len)/4.0);             // <-- hgpovray was upside down to norm. Delete line if flip below holds.
         phi = (sqrt(len)/4.0);
     }
     else
     {
         // aka P[Z] is dist, use the base_radius, from 0% (at the very center) to 25%
-     // phi = 0;
-        phi = 1.0;   // <-- hgpovray was upside down to norm. Delete line if flip below holds.
+        phi = 1.0;
         if (base_radius)
         {
-         // phi = sqrt(len)*apex_radius/(base_radius*4.0);        // <-- hgpovray was upside down to norm. Delete line if flip below holds.
             phi = 1.0-(sqrt(len)*apex_radius/(base_radius*4.0));
         }
     }

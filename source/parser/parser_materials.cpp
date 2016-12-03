@@ -4821,7 +4821,6 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
     MATRIX Local_Matrix;
     TRANSFORM Local_Trans;
     ClassicTurbulence *Local_Turb;
-    ImageData *Old_Image = NULL;
     int i;
     TraceThreadData *Thread = GetParserDataPtr();
     UCS2String ign;
