@@ -1,2 +1,7 @@
-/// @dir
-/// Source code files shared between back-end and front-end.
+/**
+
+@dir
+@ingroup PovBase
+Source code files shared between back-end and front-end.
+
+*/

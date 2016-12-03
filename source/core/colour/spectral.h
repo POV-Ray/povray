@@ -44,6 +44,13 @@
 namespace pov
 {
 
+//##############################################################################
+///
+/// @defgroup PovCoreColourSpectral Spectral Colours
+/// @ingroup PovCore
+///
+/// @{
+
 using namespace pov_base;
 
 #define SPECTRAL_VIOLET         380.0   // extreme violet
@@ -145,6 +152,10 @@ RGBColour ToRGB(const MathColour& col);
 RGBColour FromRGB(const MathColour& col);
 
 #endif
+
+/// @}
+///
+//##############################################################################
 
 }
 

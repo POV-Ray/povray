@@ -54,6 +54,12 @@
 namespace pov_base
 {
 
+//##############################################################################
+///
+/// @addtogroup PovBaseTextstream
+///
+/// @{
+
 class TextStreamBuffer
 {
     public:
@@ -81,6 +87,10 @@ class TextStreamBuffer
         void lineflush();
         void directflush(const char *str, unsigned int chars);
 };
+
+/// @}
+///
+//##############################################################################
 
 }
 

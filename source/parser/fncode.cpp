@@ -101,7 +101,7 @@ FNCode::FNCode(Parser *pa, FunctionCode *f, bool is_local, const char *n)
     parameter_stack_pointer = 0;
 
     parser = pa;
-    functionVM = dynamic_cast<FunctionVM*>(parser->sceneData->functionContextFactory);
+    functionVM = parser->GetFunctionVM();
 
     function = f;
 

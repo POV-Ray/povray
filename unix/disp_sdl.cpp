@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -213,7 +213,7 @@ namespace pov_frontend
 
             if ( m_display == NULL )
             {
-                fprintf(stderr, "Couldn't convert bar surface: %s\n", SDL_GetError());
+                fprintf(stderr, "Couldn't convert to optimized surface for repeated blitting: %s\n", SDL_GetError());
                 return;
             }
 
@@ -545,7 +545,7 @@ namespace pov_frontend
     {
         if (!m_valid)
             return;
-        fprintf(stderr, "Press a key or click the display to continue...");
+        fprintf(stderr, "Press p, q, enter or click the display to continue...");
         SetCaption(true);
     }
 
@@ -570,7 +570,8 @@ namespace pov_frontend
             switch (event.type)
             {
                 case SDL_KEYDOWN:
-                    if ( event.key.keysym.sym == SDLK_q || event.key.keysym.sym == SDLK_RETURN || event.key.keysym.sym == SDLK_KP_ENTER )
+                    if ( event.key.keysym.sym == SDLK_p || event.key.keysym.sym == SDLK_q ||
+                         event.key.keysym.sym == SDLK_RETURN || event.key.keysym.sym == SDLK_KP_ENTER )
                         do_quit = true;
                     break;
                 case SDL_MOUSEBUTTONDOWN:

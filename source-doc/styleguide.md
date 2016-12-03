@@ -29,6 +29,12 @@ POV-Ray is being developed with portability high in mind. In practice and at pre
   - Source code should adhere to the ISO-IEC 14882-2003 standard (aka C++03), as we currently do _not_ expect C++11
     (let alone C++14) to be readily available everywhere yet. Also, source code shold not rely on any compiler- or
     platform-specific behaviour except some essentials described in @ref compiler.
+    @note
+        Despite being standard-compliant, the following language constructs should _not_ be used, due to known
+        limitations of popular build environments:
+          - _Boolean Preprocessor Constants_: The expressions in `#``if` or `#``elif` preprocessor statements _must not_
+            contain boolean constants (`true` or `false`) after macro expansion. The integer constants `0` and `1`,
+            respectively, should be used instead. [MS Visual Studio 2013 and earlier]
 
   - Source code should avoid potential conflicts with later standard extensions to the C++ language, most notably
     ISO-IEC DTR 19768 (aka TR1) and ISO-IEC 14882-2011 (aka C++11).
@@ -44,6 +50,7 @@ POV-Ray is being developed with portability high in mind. In practice and at pre
       - Flyweights.
       - Threads.
       - Datetime.
+      - Intrusive Pointers.
       .
     @todo
         Make an inventory of what boost libraries we're actually using.
@@ -134,7 +141,7 @@ scheme:
 
   - Macro names should use `UPPER_CASE_WITH_UNDERSCORES`.
   - Class and struct names should use `MixedCase`.
-  - Type names should use `MixedCase`. Pointer types should have a `Ptr` suffix, i.e. `MixedCasePtr`. pointers to
+  - Type names should use `MixedCase`. Pointer types should have a `Ptr` suffix, i.e. `MixedCasePtr`. Pointers to
     immutable data should have a `Const` prefix and `Ptr` suffix, i.e. `ConstMixedCasePtr`.
   - Method names (both public and protected) should generally use `MixedCase` as well. However, methods that simply
     return a reference to a member variable may be named with `camelCase` instead.
@@ -164,9 +171,9 @@ Include Files
 
   - Header files should generally be included in the following order:
       - POV-Ray module configuration header file, if applicable (mandatory in any unit header file, i.e. any header
-        file with a `.cpp` of the same name; e.g. @ref core/configcore.h in @ref core/colourspace.h).
-      - POV-Ray unit header file, if applicable (mandatory in any `.cpp` file; e.g. @ref core/colourspace.h in
-        @ref core/colourspace.cpp).
+        file with a `.cpp` of the same name; e.g. `core/configbase.h` in `core/shape/sphere.h`).
+      - POV-Ray unit header file, if applicable (mandatory in any `.cpp` file; e.g. `core/shape/sphere.h` in
+        `core/shape/sphere.cpp`).
       - C++ variants of standard C header files.
       - Standard C++ header files.
       - Boost header files.
@@ -185,6 +192,53 @@ Include Files
     include footprint should be kept to a minimum to simplify include hierarchy; most notably, if all you need from
     another include file are type declarations, use forward declarations where possible instead of including the other
     file.
+
+
+Smart Pointers
+==============
+
+Where ownership, i.e. responsibility for releasing dynamically allocated memory, is non-trivial, smart pointers should
+be used. The choice of type depends on the context:
+
+  - Regular pointers (`T*`) may be used where performance requirements are high and ownership is obvious. Examples might
+    be temporary objects handled exclusively within one function, or private member data handled exclusively by the
+    containing object.
+  - Shared pointers (`shared_ptr<T>`) should be used where ownership is non-trivial, and code clarity is of higher
+    importance than performance or memory consumption.
+  - Intrusive pointers (`intrusive_ptr<T>`) should be used where ownership is complex, and performance or memory
+    footprint are of higher importance than clarity of the referenced type's implementation.
+  - Intrusive pointers should also be used to manage objects that need to create additional permanent references to
+    themselves.
+
+@note
+    When judging complexity of ownership, do not forget the possibility of code terminating prematurely due to
+    exceptions.
+
+When smart pointers are used, some care still needs to be employed in passing around and storing references:
+
+  - Return values and permanent references (e.g. object data members or global variables) _must_ be of the respective
+    _smart_ pointer type.
+  - Parameters or local variables of functions or methods that are guaranteed to _not_ cause additional permanent
+    references to be created should use regular _reference_ type wherever possible, or _regular_ pointer type otherwise.
+  - Parameters or local variables of Functions or methods that _can_ cause additional permanent references to be created
+    _must_ use _smart_ pointer type when employing shared pointers, but _should_ use _regular_ pointer type when
+    employing intrusive pointers.
+
+@note
+    When object ownership is shared between threads, additional considerations may apply. Such cases should be
+    adequately documented.
+
+When using smart pointers, instead of the type suffix `Ptr` the following suffixes should be used for clarity:
+
+  - `SPtr` to denote a shared pointer type
+  - `IPtr` to denote an intrusive pointer type
+  - `TPtr` to denote a regular pointer type used as a temporary reference
+
+@note
+    When using `shared_ptr<>` or `intrusive_ptr<>`, do _not_ specify a namespace, and do _not_ include the header files
+    you think these templates are defined in. It is entirely up to compile-time configuration header files to include
+    the necessary headers and pull in the definitions to the global namespace, so that the code works equally well with
+    e.g. the `shared_ptr` implementations from either Boost, TR1 or C++11.
 
 
 Miscellaneous Coding Rules

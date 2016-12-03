@@ -50,12 +50,20 @@
 namespace pov_base
 {
 
+//##############################################################################
+///
+/// @defgroup PovBasePlatformbase Platform-Specific Services Interface
+/// @ingroup PovPlatform
+/// @ingroup PovBase
+///
+/// @{
+
 #define POV_PLATFORM_BASE PlatformBase::GetPlatformBaseReference()
 
 /// Abstract class defining an interface to platform-specific services.
 ///
 /// @note
-///     Only one instance of this class shall ever exist in any process.
+///     Only one instance of this class (or any subclass thereof) shall ever exist in any process.
 ///
 class PlatformBase
 {
@@ -106,6 +114,37 @@ private:
 
     static PlatformBase *self;
 };
+
+/// Default implementation of @ref PlatformBase.
+///
+class DefaultPlatformBase : public PlatformBase
+{
+public:
+    DefaultPlatformBase();
+    ~DefaultPlatformBase();
+
+    virtual UCS2String GetTemporaryPath();
+    virtual UCS2String CreateTemporaryFile();
+    virtual void DeleteTemporaryFile(const UCS2String& filename);
+
+    virtual bool ReadFileFromURL(OStream *file, const UCS2String& url, const UCS2String& referrer = UCS2String());
+
+    /// @note
+    ///     This implementation only supports ASCII filenames.
+    virtual FILE* OpenLocalFile(const UCS2String& name, const char *mode);
+
+    /// @note
+    ///     This implementation only supports ASCII filenames.
+    virtual void DeleteLocalFile(const UCS2String& name);
+
+    /// @note
+    ///     This implementation grants unrestricted access to any file.
+    virtual bool AllowLocalFileAccess(const UCS2String& name, const unsigned int fileType, bool write);
+};
+
+/// @}
+///
+//##############################################################################
 
 }
 

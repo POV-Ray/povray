@@ -366,6 +366,7 @@
     <ClCompile Include="..\..\source\core\math\matrix.cpp" />
     <ClCompile Include="..\..\source\core\math\polynomialsolver.cpp" />
     <ClCompile Include="..\..\source\core\math\quaternion.cpp" />
+    <ClCompile Include="..\..\source\core\math\randcosweighted.cpp" />
     <ClCompile Include="..\..\source\core\math\randomsequence.cpp" />
     <ClCompile Include="..\..\source\core\math\spline.cpp" />
     <ClCompile Include="..\..\source\core\render\ray.cpp" />
@@ -441,6 +442,7 @@
     <ClInclude Include="..\..\source\core\math\matrix.h" />
     <ClInclude Include="..\..\source\core\math\polynomialsolver.h" />
     <ClInclude Include="..\..\source\core\math\quaternion.h" />
+    <ClInclude Include="..\..\source\core\math\randcosweighted.h" />
     <ClInclude Include="..\..\source\core\math\randomsequence.h" />
     <ClInclude Include="..\..\source\core\math\spline.h" />
     <ClInclude Include="..\..\source\core\math\vector.h" />

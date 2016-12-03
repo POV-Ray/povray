@@ -46,6 +46,13 @@
 namespace pov
 {
 
+//##############################################################################
+///
+/// @defgroup PovCoreSupportStatistics Render Statistics
+/// @ingroup PovCore
+///
+/// @{
+
 using namespace pov_base;
 
 template <typename T>
@@ -110,6 +117,10 @@ protected:
     IntStatistics intStats;
     FPStatistics fpStats;
 };
+
+/// @}
+///
+//##############################################################################
 
 }
 

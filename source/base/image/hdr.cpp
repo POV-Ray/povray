@@ -82,17 +82,17 @@ struct Messages
 
 typedef unsigned char RGBE[4]; // red, green, blue, exponent
 
-void GetRGBE(RGBE rgbe, const Image *image, int col, int row, const GammaCurvePtr& gamma, DitherHandler* dither);
+void GetRGBE(RGBE rgbe, const Image *image, int col, int row, const GammaCurvePtr& gamma, DitherStrategy& dither);
 void SetRGBE(const unsigned char *scanline, Image *image, int row, int width, const GammaCurvePtr& gamma);
 void ReadOldLine(unsigned char *scanline, int width, IStream *file);
 
 /*****************************************************************************
 * Code
 ******************************************************************************/
-void GetRGBE(RGBE rgbe, const Image *image, int col, int row, const GammaCurvePtr& gamma, DitherHandler* dh)
+void GetRGBE(RGBE rgbe, const Image *image, int col, int row, const GammaCurvePtr& gamma, DitherStrategy& dh)
 {
-    DitherHandler::OffsetInfo linOff, encOff;
-    dh->getOffset(col,row,linOff,encOff);
+    DitherStrategy::ColourOffset linOff, encOff;
+    dh.GetOffset(col,row,linOff,encOff);
 
     RGBColour rgbColour;
     GetEncodedRGBValue(image, col, row, gamma, rgbColour);
@@ -104,7 +104,7 @@ void GetRGBE(RGBE rgbe, const Image *image, int col, int row, const GammaCurvePt
 
     rgbColour -= RGBColour(rgbeColour);
     linOff.setRGB(rgbColour);
-    dh->setError(col,row,linOff);
+    dh.SetError(col,row,linOff);
 }
 
 void SetRGBE(const unsigned char *scanline, Image *image, int row, int width, const GammaCurvePtr& gamma)
@@ -296,8 +296,10 @@ void Write(OStream *file, const Image *image, const Image::WriteOptions& options
     int cnt = 1;
     int c2;
     RGBE rgbe;
+
+    // Radiance HDR format mandates that colours are encoded linearly.
     GammaCurvePtr gamma = TranscodingGammaCurve::Get(options.workingGamma, NeutralGammaCurve::Get());
-    DitherHandler* dither = options.dither.get();
+    DitherStrategy& dither = *options.ditherStrategy;
 
     Metadata meta;
     file->printf("#?RADIANCE\n");

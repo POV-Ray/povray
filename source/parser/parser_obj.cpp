@@ -111,7 +111,7 @@ inline static bool ReadFloat (DBL& result, char *buffer, pov_base::ITextStream *
 {
     if (!ReadWord (buffer, file))
         return false;
-    if (sscanf (buffer, DBL_FORMAT_STRING, &result) == 0)
+    if (sscanf (buffer, POV_DBL_FORMAT_STRING, &result) == 0)
         return false;
     return true;
 }

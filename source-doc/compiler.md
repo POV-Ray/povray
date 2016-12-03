@@ -21,7 +21,7 @@ following restrictions:
   - **Integer Division**: Integer division is presumed to round towards zero. This also implies that the remainder (as
     computed by the modulus operator `%`) is negative (or zero) if the dividend and divisor have different signs.
 
-Failure to meet the above restrictions will cause in undefined behaviour.
+Failure to meet the above restrictions will result in undefined behaviour.
 
 Further restrictions may apply, but shall prompt a compile-time error if not satisfied.
 

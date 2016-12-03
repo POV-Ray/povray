@@ -49,8 +49,18 @@ namespace pov_base
 namespace HDR
 {
 
+//##############################################################################
+///
+/// @addtogroup PovBaseImage
+///
+/// @{
+
 void Write(OStream *file, const Image *image, const Image::WriteOptions& options);
 Image *Read(IStream *file, const Image::ReadOptions& options);
+
+/// @}
+///
+//##############################################################################
 
 }
 

@@ -162,8 +162,8 @@ void HypercomplexFunctionFractalRules::HFunc(DBL *xr, DBL  *yr, DBL  *zr, DBL  *
     b.y = y - z;
 
     /* apply function to each part */
-    Complex_Function(&ra, &a, f);
-    Complex_Function(&rb, &b, f);
+    ComplexFunction(&ra, &a, &(f->exponent));
+    ComplexFunction(&rb, &b, &(f->exponent));
 
     /* convert back */
     *xr = .5 * (ra.x + rb.x);

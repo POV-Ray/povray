@@ -41,17 +41,24 @@
 #include "base/configbase.h"
 #include "syspovconfigcore.h"
 
-namespace pov
-{
+//##############################################################################
+///
+/// @defgroup PovCoreConfig Core Compile-Time Configuration
+/// @ingroup PovCore
+/// @ingroup PovConfig
+///
+/// @{
 
 //******************************************************************************
 ///
 /// @name FixedSimpleVector Sizes
-/// @{
 ///
 /// These defines affect the maximum size of some types based on @ref pov::FixedSimpleVector.
 ///
-/// @todo these sizes will need tweaking.
+/// @todo
+///     These sizes will need tweaking.
+///
+/// @{
 
 #ifndef MEDIA_VECTOR_SIZE
 #define MEDIA_VECTOR_SIZE               256
@@ -85,49 +92,100 @@ namespace pov
 ///
 //******************************************************************************
 
-// Default for Max_Trace_Level
+/// @def MAX_TRACE_LEVEL_DEFAULT
+/// Default for Max_Trace_Level.
+///
 #ifndef MAX_TRACE_LEVEL_DEFAULT
     #define MAX_TRACE_LEVEL_DEFAULT 5
 #endif
 
-// Upper bound for max_trace_level specified by the user
+/// @def MAX_TRACE_LEVEL_LIMIT
+/// Upper bound for max_trace_level specified by the user.
+///
 #ifndef MAX_TRACE_LEVEL_LIMIT
     #define MAX_TRACE_LEVEL_LIMIT 256
 #endif
 
-// Various numerical constants that are used in the calculations
-#ifndef EPSILON     // A small value used to see if a value is nearly zero
+//******************************************************************************
+///
+/// @name Various Numerical Constants
+///
+/// Various numerical constants that are used in the calculations.
+///
+/// @note
+///     The ideal values for these constants depend on the numerical precision
+///     of floating-point maths. The default values were chosen under the
+///     presumption that double-precision IEEE format is used.
+///
+/// @todo
+///     The algorithms using these constants need thorough reviewing. Ideally,
+///     adaptive comparisons should be used that take into account the absolute
+///     magnitude of the scene dimensions.
+///
+/// @{
+
+/// @def EPSILON
+/// A small value used to see if a value is nearly zero.
+///
+#ifndef EPSILON
     #define EPSILON 1.0e-10
 #endif
 
-#ifndef HUGE_VAL    // A very large value, can be considered infinity
+/// @def HUGE_VAL
+/// A very large value, can be considered infinity.
+///
+/// @deprecated
+///     New code portions should use proper infinities or the corresponding
+///     data types' `std::numeric_limits<>::max()` instead.
+///
+#ifndef HUGE_VAL
     #define HUGE_VAL 1.0e+17
 #endif
 
-/*
- * If the width of a bounding box in one dimension is greater than
- * the critical length, the bounding box should be set to infinite.
- */
-
+/// @def CRITICAL_LENGTH
+/// Bounding box critical length.
+///
+/// If the width of a bounding box in one dimension is greater than
+/// the critical length, the bounding box should be set to infinite.
+///
 #ifndef CRITICAL_LENGTH
     #define CRITICAL_LENGTH 1.0e+6
 #endif
 
+/// @def BOUND_HUGE
+/// Maximum lengths of a bounding box.
+///
+/// If the width of a bounding box in one dimension is greater than
+/// the critical length, the bounding box should be set to infinite.
+///
 #ifndef BOUND_HUGE  // Maximum lengths of a bounding box.
     #define BOUND_HUGE 2.0e+10
 #endif
 
-/*
- * These values determine the minimum and maximum distances
- * that qualify as ray-object intersections.
- */
-
-//#define SMALL_TOLERANCE 1.0e-6 // TODO FIXME #define SMALL_TOLERANCE 0.001
-//#define MAX_DISTANCE 1.0e+10 // TODO FIXME #define MAX_DISTANCE 1.0e7
+/// @def SMALL_TOLERANCE
+/// Minimum distance that qualifies as ray-object intersection.
+///
+/// @note
+///     Some algorithms use @ref MIN_ISECT_DEPTH instead.
+///
 #define SMALL_TOLERANCE 0.001
+
+/// @def MAX_DISTANCE
+/// Maximum distance that qualifies as ray-object intersection.
+///
 #define MAX_DISTANCE 1.0e7
 
+/// @def MIN_ISECT_DEPTH
+/// Minimum distance that qualifies as ray-object intersection.
+///
+/// @note
+///     Some algorithms use @ref SMALL_TOLERANCE instead.
+///
 #define MIN_ISECT_DEPTH 1.0e-4
+
+/// @}
+///
+//******************************************************************************
 
 #ifndef INLINE_NOISE
     #define INLINE_NOISE
@@ -152,9 +210,21 @@ namespace pov
 /// zero value will disable them.
 ///
 /// It is recommended that system-specific configurations leave these settings undefined in release
-/// builds, in which case they will default to @ref POV_DEBUG unless noted otherwise.
+/// builds, in which case they will default to @ref POV_CORE_DEBUG unless noted otherwise.
 ///
 /// @{
+
+/// @def POV_CORE_DEBUG
+/// Default setting for enabling or disabling @ref PovCore debugging aids.
+///
+/// This setting specifies the default for all debugging switches throughout the entire module
+/// that are not explicitly enabled or disabled by system-specific configurations.
+///
+/// If left undefined by system-specific configurations, this setting defaults to @ref POV_DEBUG.
+///
+#ifndef POV_CORE_DEBUG
+    #define POV_CORE_DEBUG POV_DEBUG
+#endif
 
 /// @def POV_BLEND_MAP_DEBUG
 /// Enable run-time sanity checks for blend maps.
@@ -162,7 +232,7 @@ namespace pov
 /// Define as non-zero integer to enable, or zero to disable.
 ///
 #ifndef POV_BLEND_MAP_DEBUG
-    #define POV_BLEND_MAP_DEBUG POV_DEBUG
+    #define POV_BLEND_MAP_DEBUG POV_CORE_DEBUG
 #endif
 
 /// @def POV_PATTERN_DEBUG
@@ -171,7 +241,7 @@ namespace pov
 /// Define as non-zero integer to enable, or zero to disable.
 ///
 #ifndef POV_PATTERN_DEBUG
-    #define POV_PATTERN_DEBUG POV_DEBUG
+    #define POV_PATTERN_DEBUG POV_CORE_DEBUG
 #endif
 
 /// @def POV_PIGMENT_DEBUG
@@ -180,7 +250,7 @@ namespace pov
 /// Define as non-zero integer to enable, or zero to disable.
 ///
 #ifndef POV_PIGMENT_DEBUG
-    #define POV_PIGMENT_DEBUG POV_DEBUG
+    #define POV_PIGMENT_DEBUG POV_CORE_DEBUG
 #endif
 
 /// @def POV_RADIOSITY_DEBUG
@@ -189,7 +259,7 @@ namespace pov
 /// Define as non-zero integer to enable, or zero to disable.
 ///
 #ifndef POV_RADIOSITY_DEBUG
-    #define POV_RADIOSITY_DEBUG POV_DEBUG
+    #define POV_RADIOSITY_DEBUG POV_CORE_DEBUG
 #endif
 
 /// @def POV_RANDOMSEQUENCE_DEBUG
@@ -198,7 +268,7 @@ namespace pov
 /// Define as non-zero integer to enable, or zero to disable.
 ///
 #ifndef POV_RANDOMSEQUENCE_DEBUG
-    #define POV_RANDOMSEQUENCE_DEBUG POV_DEBUG
+    #define POV_RANDOMSEQUENCE_DEBUG POV_CORE_DEBUG
 #endif
 
 /// @def POV_REFPOOL_DEBUG
@@ -207,7 +277,7 @@ namespace pov
 /// Define as non-zero integer to enable, or zero to disable.
 ///
 #ifndef POV_REFPOOL_DEBUG
-    #define POV_REFPOOL_DEBUG POV_DEBUG
+    #define POV_REFPOOL_DEBUG POV_CORE_DEBUG
 #endif
 
 /// @def POV_SHAPE_DEBUG
@@ -216,7 +286,7 @@ namespace pov
 /// Define as non-zero integer to enable, or zero to disable.
 ///
 #ifndef POV_SHAPE_DEBUG
-    #define POV_SHAPE_DEBUG POV_DEBUG
+    #define POV_SHAPE_DEBUG POV_CORE_DEBUG
 #endif
 
 /// @def POV_SUBSURFACE_DEBUG
@@ -225,7 +295,7 @@ namespace pov
 /// Define as non-zero integer to enable, or zero to disable.
 ///
 #ifndef POV_SUBSURFACE_DEBUG
-    #define POV_SUBSURFACE_DEBUG POV_DEBUG
+    #define POV_SUBSURFACE_DEBUG POV_CORE_DEBUG
 #endif
 
 /// @}
@@ -238,6 +308,12 @@ namespace pov
 /// system-specific configuration.
 ///
 /// @{
+
+#if POV_CORE_DEBUG
+    #define POV_CORE_ASSERT(expr) POV_ASSERT_HARD(expr)
+#else
+    #define POV_CORE_ASSERT(expr) POV_ASSERT_DISABLE(expr)
+#endif
 
 #if POV_BLEND_MAP_DEBUG
     #define POV_BLEND_MAP_ASSERT(expr) POV_ASSERT_HARD(expr)
@@ -291,6 +367,8 @@ namespace pov
 ///
 //******************************************************************************
 
-}
+/// @}
+///
+//##############################################################################
 
 #endif // POVRAY_CORE_CONFIGCORE_H

@@ -84,7 +84,7 @@ bool Path::ParsePathString (UCS2String& volume, vector<UCS2String>& dirnames, UC
     // - In any other case, we presume the string to be a relative path, and set the volume identifier to an empty
     //   string.
 
-    if ((*i == POV_PATH_SEPARATOR) || (*i == POV_PATH_SEPARATOR_2))
+    if (POV_IS_PATH_SEPARATOR(*i))
     {
         // String starts with a path separator; may be an absolute path on the current drive or a UNC path.
 
@@ -101,7 +101,7 @@ bool Path::ParsePathString (UCS2String& volume, vector<UCS2String>& dirnames, UC
             ++i;
 
             // Stash everything that follows, up to the next path separator.
-            for (; (i != path.end()) && (*i != POV_PATH_SEPARATOR) && (*i != POV_PATH_SEPARATOR_2); ++i)
+            for (; (i != path.end()) && !POV_IS_PATH_SEPARATOR(*i); ++i)
                 stash += *i;
 
             // Currently, we don't support bare UNC share names without trailing separator character,
@@ -136,7 +136,7 @@ bool Path::ParsePathString (UCS2String& volume, vector<UCS2String>& dirnames, UC
             ++i;
 
             // Currently, we don't support relative paths if a volume is specified.
-            if ((i == path.end()) || ((*i != POV_PATH_SEPARATOR) && (*i != POV_PATH_SEPARATOR_2)))
+            if ((i == path.end()) || !POV_IS_PATH_SEPARATOR(*i))
                 return false;
 
             // Stash another path separator (use the canonical one, not the one actually used)
@@ -161,7 +161,7 @@ bool Path::ParsePathString (UCS2String& volume, vector<UCS2String>& dirnames, UC
 
     for(; i != path.end(); ++i)
     {
-        if ((*i == POV_PATH_SEPARATOR) || (*i == POV_PATH_SEPARATOR_2))
+        if (POV_IS_PATH_SEPARATOR(*i))
         {
             if (!stash.empty() && !IsCurrentDir(stash))
             {

@@ -46,6 +46,13 @@
 namespace pov
 {
 
+//##############################################################################
+///
+/// @defgroup PovCoreMathRandomsequence Random Number Sequences
+/// @ingroup PovCoreMath
+///
+/// @{
+
 using namespace pov_base;
 
 vector<int> RandomInts(int minval, int maxval, size_t count);
@@ -105,13 +112,11 @@ class RandomDoubleSequence
 };
 
 
-/**
- ***************************************************************************************************************
- *
- *  @name Number Generator Classes
- *
- *  @{
- */
+//******************************************************************************
+///
+/// @name Number Generator Classes
+///
+/// @{
 
 /// Abstract class representing a generator for numbers that can be accessed sequentially.
 template<class Type>
@@ -164,17 +169,16 @@ class IndexedNumberGenerator
         virtual size_t MaxIndex() const = 0;
 };
 
-/**
- *  @}
- *
- ***************************************************************************************************************
- *
- *  @name Number Generator Pointers
- *
- *  The following types hold shared references to number generators.
- *
- *  @{
- */
+
+/// @}
+///
+//******************************************************************************
+///
+/// @name Number Generator Pointers
+///
+/// The following types hold shared references to number generators.
+///
+/// @{
 
 typedef shared_ptr<SequentialNumberGenerator<int> >         SequentialIntGeneratorPtr;
 typedef shared_ptr<SequentialNumberGenerator<double> >      SequentialDoubleGeneratorPtr;
@@ -191,139 +195,128 @@ typedef shared_ptr<IndexedNumberGenerator<double> const>    IndexedDoubleGenerat
 typedef shared_ptr<IndexedNumberGenerator<Vector3d> const>  IndexedVectorGeneratorPtr;
 typedef shared_ptr<IndexedNumberGenerator<Vector2d> const>  IndexedVector2dGeneratorPtr;
 
-/**
- *  @}
- *
- ***************************************************************************************************************
- *
- *  @name Pseudo-Random Number Generator Factories
- *
- *  The following global functions provide sources for pseudo-random number sequences, that is, reproducible
- *  sequences of numbers that are intended to appear non-correlated and... well, pretty random.
- *
- *  @note       For some purposes, sub-random number generators may be better suited.
- *
- *  @{
- */
+/// @}
+///
+//******************************************************************************
+///
+/// @name Pseudo-Random Number Generator Factories
+///
+/// The following global functions provide sources for pseudo-random number sequences, that is, reproducible
+/// sequences of numbers that are intended to appear non-correlated and... well, pretty random.
+///
+/// @note       For some purposes, sub-random number generators may be better suited.
+///
+/// @{
 
-/**
- *  Gets a source for integer pseudo-random numbers satisfying the given properties.
- *  The object returned is intended for sequential access.
- *
- *  @param[in]  minval          Lower bound of value interval (inclusive).
- *  @param[in]  maxval          Upper bound of value interval (inclusive).
- *  @param[in]  count           Number of values to provide.
- *  @return                     A shared pointer to a corresponding number generator.
- */
+/// Gets a source for integer pseudo-random numbers satisfying the given properties.
+/// The object returned is intended for sequential access.
+///
+/// @param[in]  minval          Lower bound of value interval (inclusive).
+/// @param[in]  maxval          Upper bound of value interval (inclusive).
+/// @param[in]  count           Number of values to provide.
+/// @return                     A shared pointer to a corresponding number generator.
+///
 SeedableIntGeneratorPtr GetRandomIntGenerator(int minval, int maxval, size_t count);
 
-/**
- *  Gets a source for floating-point pseudo-random numbers satisfying the given properties.
- *  The object returned is intended for sequential access.
- *
- *  @param[in]  minval          Lower bound of value interval (inclusive).
- *  @param[in]  maxval          Upper bound of value interval (inclusive).
- *  @param[in]  count           Number of values to provide.
- *  @return                     A shared pointer to a corresponding number generator.
- */
+/// Gets a source for floating-point pseudo-random numbers satisfying the given properties.
+/// The object returned is intended for sequential access.
+///
+/// @param[in]  minval          Lower bound of value interval (inclusive).
+/// @param[in]  maxval          Upper bound of value interval (inclusive).
+/// @param[in]  count           Number of values to provide.
+/// @return                     A shared pointer to a corresponding number generator.
+///
 SeedableDoubleGeneratorPtr GetRandomDoubleGenerator(double minval, double maxval, size_t count);
 
-/**
- *  Gets a source for floating-point pseudo-random numbers satisfying the given properties.
- *  The object returned is intended for sequential access.
- *
- *  @param[in]  minval          Lower bound of value interval (inclusive).
- *  @param[in]  maxval          Upper bound of value interval (inclusive).
- *  @param[in]  count           Number of values to provide.
- *  @return                     A shared pointer to a corresponding number generator.
- */
+/// Gets a source for floating-point pseudo-random numbers satisfying the given properties.
+/// The object returned is intended for sequential access.
+///
+/// @param[in]  minval          Lower bound of value interval (inclusive).
+/// @param[in]  maxval          Upper bound of value interval (inclusive).
+/// @param[in]  count           Number of values to provide.
+/// @return                     A shared pointer to a corresponding number generator.
+///
 SequentialDoubleGeneratorPtr GetRandomDoubleGenerator(double minval, double maxval);
 
-/**
- *  Gets a source for floating-point pseudo-random numbers satisfying the given properties.
- *  The object returned is intended for access by index.
- *
- *  @param[in]  minval          Lower bound of value interval (inclusive).
- *  @param[in]  maxval          Upper bound of value interval (inclusive).
- *  @param[in]  count           Number of values to provide.
- *  @return                     A shared pointer to a corresponding number generator.
- */
+/// Gets a source for floating-point pseudo-random numbers satisfying the given properties.
+/// The object returned is intended for access by index.
+///
+/// @param[in]  minval          Lower bound of value interval (inclusive).
+/// @param[in]  maxval          Upper bound of value interval (inclusive).
+/// @param[in]  count           Number of values to provide.
+/// @return                     A shared pointer to a corresponding number generator.
+///
 IndexedDoubleGeneratorPtr GetIndexedRandomDoubleGenerator(double minval, double maxval, size_t count);
 
-/**
- *  @}
- *
- ***************************************************************************************************************
- *
- *  @name Sub-Random Number Generator Factories
- *
- *  The following global functions provide sources for low-discrepancy sequences (aka sub-random or quasi-random
- *  number sequences - not to be confused with pseudo-random number sequences), that is, reproducible sequences
- *  of values that cover an interval (or N-dimensional space) pretty uniformly, regardless how many consecutive
- *  values are used from the sequence.
- *
- *  @{
- */
+/// @}
+///
+//******************************************************************************
+///
+/// @name Sub-Random Number Generator Factories
+///
+/// The following global functions provide sources for low-discrepancy sequences (aka sub-random or quasi-random
+/// number sequences - not to be confused with pseudo-random number sequences), that is, reproducible sequences
+/// of values that cover an interval (or N-dimensional space) pretty uniformly, regardless how many consecutive
+/// values are used from the sequence.
+///
+/// @{
 
-/**
- *  Gets a source for sub-random (low discrepancy) floating-point numbers in the specified interval.
- *
- *  @param[in]  id              Selects one of multiple sources.
- *  @param[in]  count           Number of values to provide.
- *  @return                     A shared pointer to a corresponding number generator.
- */
+/// Gets a source for sub-random (low discrepancy) floating-point numbers in the specified interval.
+///
+/// @param[in]  id              Selects one of multiple sources.
+/// @param[in]  count           Number of values to provide.
+/// @return                     A shared pointer to a corresponding number generator.
+///
 SequentialDoubleGeneratorPtr GetSubRandomDoubleGenerator(unsigned int id, double minval, double maxval, size_t count = 0);
 
-/**
- *  Gets a source for cosine-weighted sub-random (low discrepancy) vectors on the unit hemisphere centered around +Y.
- *
- *  @note       If count is smaller than 1600, this function will return a generator for the hard-coded
- *              radiosity sampling direction sequence used in POV-Ray 3.6.
- *
- *  @param[in]  id              Selects one of multiple sources.
- *  @param[in]  count           Number of values to provide.
- *  @return                     A shared pointer to a corresponding number generator.
- */
+/// Gets a source for cosine-weighted sub-random (low discrepancy) vectors on the unit hemisphere centered around +Y.
+///
+/// @note       If count is smaller than 1600, this function will return a generator for the hard-coded
+///             radiosity sampling direction sequence used in POV-Ray 3.6.
+///
+/// @param[in]  id              Selects one of multiple sources.
+/// @param[in]  count           Number of values to provide.
+/// @return                     A shared pointer to a corresponding number generator.
+///
 SequentialVectorGeneratorPtr GetSubRandomCosWeightedDirectionGenerator(unsigned int id, size_t count = 0);
 
-/**
- *  Gets a source for sub-random (low discrepancy) vectors on the unit sphere.
- *
- *  @param[in]  id              Selects one of multiple sources.
- *  @param[in]  count           Number of values to provide.
- *  @return                     A shared pointer to a corresponding number generator.
- */
+/// Gets a source for sub-random (low discrepancy) vectors on the unit sphere.
+///
+/// @param[in]  id              Selects one of multiple sources.
+/// @param[in]  count           Number of values to provide.
+/// @return                     A shared pointer to a corresponding number generator.
+///
 SequentialVectorGeneratorPtr GetSubRandomDirectionGenerator(unsigned int id, size_t count = 0);
 
-/**
- *  Gets a source for sub-random (low discrepancy) 2D vectors on a disc.
- *
- *  @param[in]  id              Selects one of multiple sources.
- *  @param[in]  radius          Radius of the disc.
- *  @param[in]  count           Number of values to provide.
- *  @return                     A shared pointer to a corresponding number generator.
- */
+/// Gets a source for sub-random (low discrepancy) 2D vectors on a disc.
+///
+/// @param[in]  id              Selects one of multiple sources.
+/// @param[in]  radius          Radius of the disc.
+/// @param[in]  count           Number of values to provide.
+/// @return                     A shared pointer to a corresponding number generator.
+///
 SequentialVector2dGeneratorPtr GetSubRandomOnDiscGenerator(unsigned int id, double radius, size_t count = 0);
 
-/**
- *  Gets a source for sub-random (low discrepancy) 2D vectors within a square.
- *
- *  @param[in]  id              Selects one of multiple sources.
- *  @param[in]  minX            Lower bound of X coordinate.
- *  @param[in]  maxX            Upper bound of X coordinate.
- *  @param[in]  minY            Lower bound of Y coordinate.
- *  @param[in]  maxY            Upper bound of Y coordinate.
- *  @param[in]  count           Number of values to provide.
- *  @return                     A shared pointer to a corresponding number generator.
- */
+/// Gets a source for sub-random (low discrepancy) 2D vectors within a square.
+///
+/// @param[in]  id              Selects one of multiple sources.
+/// @param[in]  minX            Lower bound of X coordinate.
+/// @param[in]  maxX            Upper bound of X coordinate.
+/// @param[in]  minY            Lower bound of Y coordinate.
+/// @param[in]  maxY            Upper bound of Y coordinate.
+/// @param[in]  count           Number of values to provide.
+/// @return                     A shared pointer to a corresponding number generator.
+///
 SequentialVector2dGeneratorPtr GetSubRandom2dGenerator(unsigned int id, double minX, double maxX, double minY, double maxY, size_t count = 0);
 
-/**
- *  @}
- *
- ***************************************************************************************************************
- */
+/// @}
+///
+//******************************************************************************
 
-} // end of namespace
+/// @}
+///
+//##############################################################################
+
+}
 
 #endif // POVRAY_CORE_RANDOMSEQUENCE_H

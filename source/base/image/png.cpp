@@ -673,8 +673,8 @@ void Write (OStream *file, const Image *image, const Image::WriteOptions& option
     int             width = image->GetWidth() ;
     int             height = image->GetHeight() ;
     int             j;
-    int             bpcc = options.bpcc;
-    bool            use_alpha = image->HasTransparency() && options.alphachannel;
+    int             bpcc = options.bitsPerChannel;
+    bool            use_alpha = image->HasTransparency() && options.AlphaIsEnabled();
     unsigned int    color;
     unsigned int    alpha;
     unsigned int    r;
@@ -688,19 +688,14 @@ void Write (OStream *file, const Image *image, const Image::WriteOptions& option
     Messages        messages;
     GammaCurvePtr   gamma;
     Metadata        meta;
-    DitherHandler*  dither = options.dither.get();
+    DitherStrategy& dither = *options.ditherStrategy;
 
-    if (options.encodingGamma)
-        gamma = TranscodingGammaCurve::Get(options.workingGamma, options.encodingGamma);
-    else
-        // PNG/W3C recommends to use sRGB color space
-        gamma = TranscodingGammaCurve::Get(options.workingGamma, SRGBGammaCurve::Get());
+    // PNG/W3C recommends to use sRGB color space
+    gamma = options.GetTranscodingGammaCurve(SRGBGammaCurve::Get());
 
     // PNG is specified to use non-premultiplied alpha, so that's the way we do it unless the user overrides
     // (e.g. to handle a non-compliant file).
-    bool premul = false;
-    if (options.premultiplyOverride)
-        premul = options.premultiply;
+    bool premul = options.AlphaIsPremultiplied(false);
 
     if (bpcc == 0)
         bpcc = image->GetMaxIntValue() == 65535 ? 16 : 8 ;
@@ -833,12 +828,12 @@ void Write (OStream *file, const Image *image, const Image::WriteOptions& option
                     {
                         if (use_alpha)
                         {
-                            GetEncodedRGBAValue (image, col, row, gamma, maxValue, r, g, b, alpha, *dither, premul);
+                            GetEncodedRGBAValue (image, col, row, gamma, maxValue, r, g, b, alpha, dither, premul);
                             row_ptr[j + 3] = alpha << hiShift;
                             row_ptr[j + 3] |= alpha >> loShift;
                         }
                         else
-                            GetEncodedRGBValue (image, col, row, gamma, maxValue, r, g, b, *dither);
+                            GetEncodedRGBValue (image, col, row, gamma, maxValue, r, g, b, dither);
 
                         row_ptr[j] = r << hiShift;
                         row_ptr[j] |= r >> loShift;
@@ -856,12 +851,12 @@ void Write (OStream *file, const Image *image, const Image::WriteOptions& option
                     {
                         if (use_alpha)
                         {
-                            GetEncodedGrayAValue (image, col, row, gamma, maxValue, color, alpha, *dither, premul);
+                            GetEncodedGrayAValue (image, col, row, gamma, maxValue, color, alpha, dither, premul);
                             row_ptr[j + 1] = alpha << hiShift;
                             row_ptr[j + 1] |= alpha >> loShift;
                         }
                         else
-                            color = GetEncodedGrayValue (image, col, row, gamma, maxValue, *dither) ;
+                            color = GetEncodedGrayValue (image, col, row, gamma, maxValue, dither) ;
 
                         // Use left-bit replication (LBR) for bit depths < 8
                         row_ptr[j] = color << hiShift;
@@ -877,11 +872,11 @@ void Write (OStream *file, const Image *image, const Image::WriteOptions& option
                     {
                         if (use_alpha)
                         {
-                            GetEncodedRGBAValue (image, col, row, gamma, maxValue, r, g, b, alpha, *dither, premul);
+                            GetEncodedRGBAValue (image, col, row, gamma, maxValue, r, g, b, alpha, dither, premul);
                             row_ptr[j + 3] = alpha;
                         }
                         else
-                            GetEncodedRGBValue (image, col, row, gamma, maxValue, r, g, b, *dither) ;
+                            GetEncodedRGBValue (image, col, row, gamma, maxValue, r, g, b, dither) ;
                         row_ptr[j] = r;
                         row_ptr[j + 1] = g;
                         row_ptr[j + 2] = b;
@@ -893,11 +888,11 @@ void Write (OStream *file, const Image *image, const Image::WriteOptions& option
                     {
                         if (use_alpha)
                         {
-                            GetEncodedGrayAValue (image, col, row, gamma, maxValue, color, alpha, *dither, premul);
+                            GetEncodedGrayAValue (image, col, row, gamma, maxValue, color, alpha, dither, premul);
                             row_ptr[j + 1] = alpha;
                         }
                         else
-                            color = GetEncodedGrayValue (image, col, row, gamma, maxValue, *dither) ;
+                            color = GetEncodedGrayValue (image, col, row, gamma, maxValue, dither) ;
                         row_ptr[j] = color;
                     }
                 }
@@ -910,12 +905,12 @@ void Write (OStream *file, const Image *image, const Image::WriteOptions& option
                     {
                         if (use_alpha)
                         {
-                            GetEncodedRGBAValue (image, col, row, gamma, maxValue, r, g, b, alpha, *dither, premul);
+                            GetEncodedRGBAValue (image, col, row, gamma, maxValue, r, g, b, alpha, dither, premul);
                             row_ptr[j+6] = alpha >> 8;
                             row_ptr[j+7] = alpha & 0xff;
                         }
                         else
-                            GetEncodedRGBValue (image, col, row, gamma, maxValue, r, g, b, *dither) ;
+                            GetEncodedRGBValue (image, col, row, gamma, maxValue, r, g, b, dither) ;
 
                         row_ptr[j] = r >> 8;
                         row_ptr[j + 1] = r & 0xFF;
@@ -933,12 +928,12 @@ void Write (OStream *file, const Image *image, const Image::WriteOptions& option
                     {
                         if (use_alpha)
                         {
-                            GetEncodedGrayAValue (image, col, row, gamma, maxValue, color, alpha, *dither, premul);
+                            GetEncodedGrayAValue (image, col, row, gamma, maxValue, color, alpha, dither, premul);
                             row_ptr[j+2] = alpha >> 8;
                             row_ptr[j+3] = alpha & 0xff;
                         }
                         else
-                            color = GetEncodedGrayValue (image, col, row, gamma, maxValue, *dither) ;
+                            color = GetEncodedGrayValue (image, col, row, gamma, maxValue, dither) ;
                         row_ptr[j] = color >> 8;
                         row_ptr[j+1] = color & 0xff;
                     }
@@ -956,13 +951,13 @@ void Write (OStream *file, const Image *image, const Image::WriteOptions& option
                     {
                         if (use_alpha)
                         {
-                            GetEncodedRGBAValue (image, col, row, gamma, maxValue, r, g, b, alpha, *dither, premul);
+                            GetEncodedRGBAValue (image, col, row, gamma, maxValue, r, g, b, alpha, dither, premul);
                             row_ptr[j + 6] = alpha >> (8 - hiShift);
                             row_ptr[j + 7] = alpha << hiShift;
                             row_ptr[j + 7] |= alpha >> loShift;
                         }
                         else
-                            GetEncodedRGBValue (image, col, row, gamma, maxValue, r, g, b, *dither) ;
+                            GetEncodedRGBValue (image, col, row, gamma, maxValue, r, g, b, dither) ;
 
                         row_ptr[j] = r >> (8 - hiShift);
                         row_ptr[j + 1] = r << hiShift;
@@ -983,13 +978,13 @@ void Write (OStream *file, const Image *image, const Image::WriteOptions& option
                     {
                         if (use_alpha)
                         {
-                            GetEncodedGrayAValue (image, col, row, gamma, maxValue, color, alpha, *dither, premul);
+                            GetEncodedGrayAValue (image, col, row, gamma, maxValue, color, alpha, dither, premul);
                             row_ptr[j + 2] = alpha >> (8 - hiShift);
                             row_ptr[j + 3] = alpha << hiShift;
                             row_ptr[j + 3] |= alpha >> loShift;
                         }
                         else
-                            color = GetEncodedGrayValue (image, col, row, gamma, maxValue, *dither) ;
+                            color = GetEncodedGrayValue (image, col, row, gamma, maxValue, dither) ;
 
                         row_ptr[j] = color >> (8 - hiShift);
                         row_ptr[j + 1] = color << hiShift;

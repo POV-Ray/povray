@@ -44,6 +44,13 @@
 namespace pov
 {
 
+//##############################################################################
+///
+/// @defgroup PovCoreSceneAtmosphere Atmospheric Effects and Sky Spheres
+/// @ingroup PovCore
+///
+/// @{
+
 /*****************************************************************************
 * Global preprocessor defines
 ******************************************************************************/
@@ -121,6 +128,10 @@ void Scale_Skysphere (SKYSPHERE *Skysphere, const Vector3d& Vector);
 void Rotate_Skysphere (SKYSPHERE *Skysphere, const Vector3d& Vector);
 void Translate_Skysphere (SKYSPHERE *Skysphere, const Vector3d& Vector);
 void Transform_Skysphere (SKYSPHERE *Skysphere, const TRANSFORM *Trans);
+
+/// @}
+///
+//##############################################################################
 
 }
 

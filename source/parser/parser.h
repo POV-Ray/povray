@@ -113,6 +113,8 @@ struct ClassicTurbulence; // full declaration in core/material/warp.h
 struct BlackHoleWarp; // full declaration in core/material/warp.h
 class Mesh;
 class SceneData;
+struct PavementPattern;
+struct TilingPattern;
 
 /*****************************************************************************
 * Global preprocessor defines
@@ -360,7 +362,9 @@ class Parser : public SceneTask
         int Debug_Info(const char *format,...);
         void FlushDebugMessageBuffer();
 
-        static void Convert_Filter_To_Transmit(PIGMENT *Pigment); // NK layers - 1999 July 10 - for backwards compatiblity with layered textures
+        // NK layers - 1999 July 10 - for backwards compatibility with layered textures
+        static void Convert_Filter_To_Transmit(PIGMENT *Pigment);
+        static void Convert_Filter_To_Transmit(GenericPigmentBlendMap *pBlendMap);
 
         /// @param[in]  formalFileName  Name by which the file is known to the user.
         /// @param[out] actualFileName  Name by which the file is known to the parsing computer.
@@ -461,6 +465,7 @@ class Parser : public SceneTask
         FUNCTION_PTR Parse_FunctionOrContent(void);
         void Parse_FunctionOrContentList(GenericScalarFunctionPtr* apFn, unsigned int count, bool mandatory = true);
         FUNCTION_PTR Parse_DeclareFunction(int *token_id, const char *fn_name, bool is_local);
+        intrusive_ptr<FunctionVM> GetFunctionVM() const;
 
         // parsestr.h/parsestr.cpp
         char *Parse_C_String(bool pathname = false);
@@ -491,6 +496,8 @@ class Parser : public SceneTask
         shared_ptr<BackendSceneData> backendSceneData; // TODO FIXME HACK - make private again once Locate_Filename is fixed [trf]
         shared_ptr<SceneData> sceneData;
     private:
+
+        intrusive_ptr<FunctionVM> mpFunctionVM;
         FPUContext *fnVMContext;
 
         bool Had_Max_Trace_Level;
@@ -672,8 +679,9 @@ class Parser : public SceneTask
         void Set_CSG_Children_Flag(ObjectPtr, unsigned int, unsigned int, unsigned int);
         void Set_CSG_Tree_Flag(ObjectPtr, unsigned int, int);
 
-        ObjectPtr Parse_Isosurface(void);
-        ObjectPtr Parse_Parametric(void);
+        ObjectPtr Parse_Isosurface();
+        ObjectPtr Parse_Parametric();
+        void ParseContainedBy(shared_ptr<ContainedByShape>& container, ObjectPtr obj);
 
         ObjectPtr Parse_Sphere_Sweep(void);
         int Parse_Three_UVCoords(Vector2d& UV1, Vector2d& UV2, Vector2d& UV3);
@@ -730,7 +738,17 @@ class Parser : public SceneTask
         // parstxtr.h/parstxtr.cpp
         void Make_Pattern_Image(ImageData *image, FUNCTION_PTR fn, int token);
 
-        void Parse_Image_Pattern (TPATTERN *TPattern);
+        PatternPtr ParseDensityFilePattern();
+        PatternPtr ParseImagePattern();
+        PatternPtr ParseJuliaPattern();
+        PatternPtr ParseMagnetPattern();
+        PatternPtr ParseMandelPattern();
+        PatternPtr ParsePotentialPattern();
+        PatternPtr ParseSlopePattern();
+        template<typename PATTERN_T> PatternPtr ParseSpiralPattern();
+        void VerifyPavementPattern(shared_ptr<PavementPattern> pattern);
+        void VerifyTilingPattern(shared_ptr<TilingPattern> pattern);
+        void VerifyPattern(PatternPtr pattern);
         void Parse_Bump_Map (TNORMAL *Tnormal);
         void Parse_Image_Map (PIGMENT *Pigment);
         template<typename MAP_T, typename PATTERN_T> void Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type);

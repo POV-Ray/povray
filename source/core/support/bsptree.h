@@ -48,9 +48,17 @@
 namespace pov
 {
 
+//##############################################################################
+///
+/// @defgroup PovCoreSupportBSPTree Binary Space Partition Tree
+/// @ingroup PovCore
+///
+/// @{
+
 class BSPTree
 {
     public:
+
         class Mailbox
         {
                 friend class BSPTree;
@@ -131,7 +139,9 @@ class BSPTree
                    unsigned int& aborts, float& averageAborts, float& averageAbortObjects, const UCS2String& inputFile);
 
         void clear();
+
     private:
+
         struct Node
         {
             enum NodeType
@@ -257,11 +267,13 @@ class BSPTree
 class BSPIntersectFunctor : public BSPTree::Intersect
 {
     public:
+
         BSPIntersectFunctor(Intersection& bi, const Ray& r, vector<ObjectPtr>& objs, TraceThreadData *t);
         virtual bool operator()(unsigned int index, double& maxdist);
         virtual bool operator()() const;
 
     private:
+
         bool found;
         vector<ObjectPtr>& objects;
         Intersection& bestisect;
@@ -275,12 +287,14 @@ class BSPIntersectFunctor : public BSPTree::Intersect
 class BSPIntersectCondFunctor : public BSPTree::Intersect
 {
     public:
+
         BSPIntersectCondFunctor(Intersection& bi, const Ray& r, vector<ObjectPtr>& objs, TraceThreadData *t,
                                 const RayObjectCondition& prec, const RayObjectCondition& postc);
         virtual bool operator()(unsigned int index, double& maxdist);
         virtual bool operator()() const;
 
     private:
+
         bool found;
         vector<ObjectPtr>& objects;
         Intersection& bestisect;
@@ -296,12 +310,14 @@ class BSPIntersectCondFunctor : public BSPTree::Intersect
 class BSPInsideCondFunctor : public BSPTree::Inside
 {
     public:
+
         BSPInsideCondFunctor(Vector3d o, vector<ObjectPtr>& objs, TraceThreadData *t,
                              const PointObjectCondition& prec, const PointObjectCondition& postc);
         virtual bool operator()(unsigned int index);
         virtual bool operator()() const;
 
     private:
+
         bool found;
         vector<ObjectPtr>& objects;
         Vector3d origin;
@@ -310,6 +326,9 @@ class BSPInsideCondFunctor : public BSPTree::Inside
         TraceThreadData *threadData;
 };
 
+/// @}
+///
+//##############################################################################
 
 }
 

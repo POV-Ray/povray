@@ -20,6 +20,8 @@
 
 #include <boost/config.hpp>
 
+#include <boost/archive/basic_archive.hpp>
+
 #include <boost/serialization/collections_save_imp.hpp>
 #include <boost/serialization/collections_load_imp.hpp>
 #include <boost/serialization/detail/stack_constructor.hpp>

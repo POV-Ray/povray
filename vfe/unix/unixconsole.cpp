@@ -201,10 +201,32 @@ static void PrintStatusChanged (vfeSession *session, State force = kUnknown)
             fprintf (stderr, "==== [Parsing...] ==========================================================\n");
             break;
         case kRendering:
+#ifdef HAVE_LIBSDL
+            if ((gDisplay != NULL) && (gDisplayMode == DISP_MODE_SDL))
+            {
+                fprintf (stderr, "==== [Rendering... Press p to pause, q to quit] ============================\n");
+            }
+            else
+            {
+                fprintf (stderr, "==== [Rendering...] ========================================================\n");
+            }
+#else
             fprintf (stderr, "==== [Rendering...] ========================================================\n");
+#endif
             break;
         case kPausedRendering:
-            fprintf (stderr, "==== [Paused] ==============================================================\n");
+#ifdef HAVE_LIBSDL
+            if ((gDisplay != NULL) && (gDisplayMode == DISP_MODE_SDL))
+            {
+                fprintf (stderr, "==== [Paused... Press p to resume] =========================================\n");
+            }
+            else
+            {
+                fprintf (stderr, "==== [Paused...] ===========================================================\n");
+            }
+#else
+            fprintf (stderr, "==== [Paused...] ===========================================================\n");
+#endif
             break;
     }
 }

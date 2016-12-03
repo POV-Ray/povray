@@ -46,11 +46,24 @@
 namespace pov
 {
 
-/*****************************************************************************
-* Global preprocessor defines
-******************************************************************************/
+//##############################################################################
+///
+/// @addtogroup PovCoreShape
+///
+/// @{
+
+//******************************************************************************
+///
+/// @name Object Types
+///
+/// @{
 
 #define SPHERE_SWEEP_OBJECT     (BASIC_OBJECT)
+
+/// @}
+///
+//******************************************************************************
+
 
 /* Sphere sweep interpolated by a piecewise linear function */
 #define LINEAR_SPHERE_SWEEP             0
@@ -135,6 +148,10 @@ class SphereSweep : public ObjectBase
         static int Comp_Isects(const void *Intersection_1, const void *Intersection_2);
         static int bezier_01(int degree, const DBL* Coef, DBL* Roots, bool sturm, DBL tolerance, TraceThreadData *Thread);
 };
+
+/// @}
+///
+//##############################################################################
 
 }
 

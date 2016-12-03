@@ -5,7 +5,7 @@
 /// Windows-specific general POV-Ray compile-time configuration.
 ///
 /// This header file configures module-independent aspects of POV-Ray for
-/// running properly on a Unix platform.
+/// running properly on a Windows platform.
 ///
 /// @author Christopher J. Cason
 ///
@@ -55,16 +55,20 @@
 // failure to do so will lead to link errors.
 // #define _CONSOLE
 
+// C++ variants of C standard headers
 #include <cmath>
 #include <cstdarg>
 #include <cstdlib>
 
+// C++ standard headers
 #include <exception>
 #include <list>
 #include <stdexcept>
 #include <string>
 #include <vector>
 
+// boost headers
+#include <boost/intrusive_ptr.hpp>
 #include <boost/tr1/memory.hpp>
 
 #include <io.h>
@@ -95,6 +99,8 @@ using std::tr1::weak_ptr;
 using std::tr1::dynamic_pointer_cast;
 using std::tr1::static_pointer_cast;
 using std::tr1::const_pointer_cast;
+
+using boost::intrusive_ptr;
 
 #endif // STD_POV_TYPES_DECLARED
 
@@ -134,13 +140,6 @@ using std::tr1::const_pointer_cast;
 #endif
 
 /////////////////////////////////////////////////////////////
-
-#ifndef MAX
-  #define MAX(a,b) ((a>b)?a:b)
-#endif
-#ifndef MIN
-  #define MIN(a,b) ((a>b)?b:a)
-#endif
 
 #ifndef __GENDEFS
   #define __GENDEFS
@@ -208,7 +207,7 @@ namespace pov_base
 #define ALTMAIN
 #define LITTLE_ENDIAN
 #define POV_PATH_SEPARATOR                  '\\'
-#define POV_PATH_SEPARATOR_2                '/'
+#define POV_IS_PATH_SEPARATOR(c)            (((c) == POV_PATH_SEPARATOR) || ((c) == '/'))
 #define POV_SLASH_IS_SWITCH_CHARACTER       1 // allow forward slash as a switch character (even despite its use as a path separator!)
 #define DEFAULT_OUTPUT_FORMAT               kPOVList_FileType_PNG
 #define POV_IS1                             ".bmp"
@@ -216,10 +215,10 @@ namespace pov_base
 #define DEFAULT_DISPLAY_GAMMA_TYPE          kPOVList_GammaType_SRGB
 #define DEFAULT_DISPLAY_GAMMA               2.2
 #define RENAME_FILE(orig,new)               rename(orig,new)
-#define DELETE_FILE(name)                   _unlink(name)
-#define NEW_LINE_STRING                     "\r\n"
-#define POV_SYS_FILE_EXTENSION              ".bmp"
-#define SYS_TO_STANDARD                     BMP
+#define POV_DELETE_FILE(name)               _unlink(name)
+#define POV_NEW_LINE_STRING                 "\r\n"
+#define POV_SYS_IMAGE_EXTENSION             ".bmp"
+#define POV_SYS_IMAGE_TYPE                  BMP
 #define vsnprintf                           _vsnprintf
 #define snprintf                            _snprintf
 #define FILE_NAME_LENGTH                    _MAX_PATH

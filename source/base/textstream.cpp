@@ -450,10 +450,10 @@ OTextStream::~OTextStream()
 
 void OTextStream::putchar(int chr)
 {
-#ifdef NEW_LINE_STRING
+#ifdef POV_NEW_LINE_STRING
     if (chr == '\n')
     {
-        for (char* c = NEW_LINE_STRING; c != '\0'; ++c)
+        for (char* c = POV_NEW_LINE_STRING; c != '\0'; ++c)
             stream->Write_Byte(*c);
     }
 #endif
@@ -475,14 +475,14 @@ void OTextStream::printf(const char *format, ...)
     vsnprintf(buffer, 1023, format, marker);
     va_end(marker);
 
-#ifdef NEW_LINE_STRING
+#ifdef POV_NEW_LINE_STRING
     char *s1 = buffer ;
     char *s2 ;
 
     while ((s2 = strchr (s1, '\n')) != NULL)
     {
         *s2++ = '\0' ;
-        stream->printf("%s" NEW_LINE_STRING, s1);
+        stream->printf("%s" POV_NEW_LINE_STRING, s1);
         s1 = s2 ;
     }
     if (*s1)

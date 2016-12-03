@@ -55,6 +55,7 @@
 #include <vector>
 
 // boost headers
+#include <boost/intrusive_ptr.hpp>
 #include <boost/tr1/memory.hpp>
 
 #ifdef HAVE_CONFIG_H
@@ -97,6 +98,8 @@ using std::tr1::dynamic_pointer_cast;
 using std::tr1::static_pointer_cast;
 using std::tr1::const_pointer_cast;
 
+using boost::intrusive_ptr;
+
 #endif // STD_POV_TYPES_DECLARED
 
 // After Stroustrop in _The C++ Programming Language, 3rd Ed_ p. 88
@@ -104,7 +107,7 @@ using std::tr1::const_pointer_cast;
 const int NULL=0;
 #endif
 
-#define DELETE_FILE(name)  unlink(name)
+#define POV_DELETE_FILE(name)  unlink(name)
 
 #if defined (PATH_MAX)
 # define FILE_NAME_LENGTH   PATH_MAX

@@ -308,13 +308,8 @@ RenderFrontendBase::SceneId RenderFrontendBase::CreateScene(SceneData& shd, POVM
                 UCS2String str = lp.GetUCS2String();
                 if (str.empty() == true)
                     continue;
-#ifndef POV_PATH_SEPARATOR_2
-                if (*str.rbegin() != POV_PATH_SEPARATOR)
+                if (!POV_IS_PATH_SEPARATOR(*str.rbegin()))
                     str += POV_PATH_SEPARATOR;
-#else
-                if (*str.rbegin() != POV_PATH_SEPARATOR && *str.rbegin() != POV_PATH_SEPARATOR_2)
-                    str += POV_PATH_SEPARATOR;
-#endif
                 shd.searchpaths.push_back(Path(str));
             }
         }

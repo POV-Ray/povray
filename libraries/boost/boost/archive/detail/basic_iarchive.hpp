@@ -65,11 +65,7 @@ protected:
 public:
     // some msvc versions require that the following function be public
     // otherwise it should really protected.
-    // account for bogus gcc warning
-    #if defined(__GNUC__)
-    virtual
-    #endif
-    BOOST_ARCHIVE_DECL ~basic_iarchive();
+    virtual BOOST_ARCHIVE_DECL ~basic_iarchive();
     // note: NOT part of the public API.
     BOOST_ARCHIVE_DECL void next_object_pointer(void *t);
     BOOST_ARCHIVE_DECL void register_basic_serializer(

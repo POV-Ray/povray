@@ -35,8 +35,8 @@
 ///
 //******************************************************************************
 
-#ifndef POVMS_CONFIGPOVMS_H
-#define POVMS_CONFIGPOVMS_H
+#ifndef POVRAY_POVMS_CONFIGPOVMS_H
+#define POVRAY_POVMS_CONFIGPOVMS_H
 
 #if !defined(__cplusplus)
     // When compiling as part of the POV-Ray project, povms.c must be compiled as a C++ file,
@@ -46,6 +46,14 @@
 
 #include "base/configbase.h"
 #include "syspovconfigpovms.h"
+
+//##############################################################################
+///
+/// @defgroup PovMSConfig POVMS Compile-Time Configuration
+/// @ingroup PovMS
+/// @ingroup PovConfig
+///
+/// @{
 
 //******************************************************************************
 // The following override the defaults in povms.h and povms.c, as those are
@@ -79,4 +87,8 @@
 
 //******************************************************************************
 
-#endif // POVMS_CONFIGPOVMS_H
+/// @}
+///
+//##############################################################################
+
+#endif // POVRAY_POVMS_CONFIGPOVMS_H

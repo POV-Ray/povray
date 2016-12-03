@@ -44,10 +44,21 @@
 namespace pov
 {
 
+//##############################################################################
+///
+/// @defgroup PovCoreLighting Light Groups
+/// @ingroup PovCore
+///
+/// @{
+
 class CSG;
 
 void Promote_Local_Lights(CSG *Object);
 bool Check_Photon_Light_Group(ConstObjectPtr Object);
+
+/// @}
+///
+//##############################################################################
 
 }
 

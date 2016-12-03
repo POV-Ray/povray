@@ -137,7 +137,8 @@ Parser::Parser(shared_ptr<BackendSceneData> sd, bool useclk, DBL clk) :
     sceneData(sd),
     clockValue(clk),
     useClock(useclk),
-    fnVMContext(new FPUContext(dynamic_cast<FunctionVM*>(sd->functionContextFactory), GetParserDataPtr())),
+    mpFunctionVM(new FunctionVM),
+    fnVMContext(new FPUContext(mpFunctionVM.get(), GetParserDataPtr())),
     Destroying_Frame(false),
     String_Index(0),
     String_Buffer_Free(0),
@@ -153,6 +154,8 @@ Parser::Parser(shared_ptr<BackendSceneData> sd, bool useclk, DBL clk) :
     pre_init_tokenizer();
     if (sceneData->realTimeRaytracing)
         mBetaFeatureFlags.realTimeRaytracing = true;
+
+    sceneData->functionContextFactory = mpFunctionVM;
 }
 
 Parser::~Parser()
@@ -276,15 +279,7 @@ void Parser::Run()
     if(sceneData->objects.empty())
         Warning("No objects in scene.");
 
-    Terminate_Tokenizer();
-    Destroy_Textures(Default_Texture);
-
-    POV_FREE (Brace_Stack);
-
-    Destroy_Random_Generators();
-
-    Default_Texture = NULL;
-    Brace_Stack = NULL;
+    Cleanup();
 
     // Check for experimental features
     char str[512] = "";
@@ -776,7 +771,7 @@ ObjectPtr Parser::Parse_Bicubic_Patch ()
         Warning("Patch type no longer supported. Using type 1.");
     }
 
-    if ((Object->Patch_Type < 0) || (Object->Patch_Type > MAX_PATCH_TYPE))
+    if (Object->Patch_Type < 0)
     {
         Error("Undefined bicubic patch type.");
     }
@@ -2540,7 +2535,6 @@ ObjectPtr Parser::Parse_HField ()
 ObjectPtr Parser::Parse_Isosurface()
 {
     IsoSurface *Object;
-    DBL temp;
 
     Parse_Begin();
 
@@ -2553,89 +2547,11 @@ ObjectPtr Parser::Parse_Isosurface()
     if(Token.Token_Id != FUNCTION_TOKEN)
         Parse_Error(FUNCTION_TOKEN);
 
-    Object->Function = new FunctionVM::CustomFunction(fnVMContext->functionvm, Parse_Function());
+    Object->Function = new FunctionVM::CustomFunction(fnVMContext->functionvm.get(), Parse_Function());
 
     EXPECT
         CASE(CONTAINED_BY_TOKEN)
-            // TODO - same code as for parametric
-            Parse_Begin();
-            {
-                int Exit_Flag2 = false;
-
-                while (!Exit_Flag2)
-                {
-                    Get_Token();
-                    switch(Token.Token_Id)
-                    {
-                        CASE(BOX_TOKEN)
-                            Object->container = shared_ptr<ContainedByShape>(new ContainedByBox());
-
-                            Parse_Begin();
-
-                            Parse_Vector(dynamic_cast<ContainedByBox*>(Object->container.get())->corner1);
-                            Parse_Comma();
-                            Parse_Vector(dynamic_cast<ContainedByBox*>(Object->container.get())->corner2);
-
-                            Parse_End();
-
-                            if (dynamic_cast<ContainedByBox*>(Object->container.get())->corner1.x() > dynamic_cast<ContainedByBox*>(Object->container.get())->corner2.x())
-                            {
-                                temp = dynamic_cast<ContainedByBox*>(Object->container.get())->corner1.x();
-                                dynamic_cast<ContainedByBox*>(Object->container.get())->corner1.x() = dynamic_cast<ContainedByBox*>(Object->container.get())->corner2.x();
-                                dynamic_cast<ContainedByBox*>(Object->container.get())->corner2.x() = temp;
-                            }
-                            if (dynamic_cast<ContainedByBox*>(Object->container.get())->corner1.y() > dynamic_cast<ContainedByBox*>(Object->container.get())->corner2.y())
-                            {
-                                temp = dynamic_cast<ContainedByBox*>(Object->container.get())->corner1.y();
-                                dynamic_cast<ContainedByBox*>(Object->container.get())->corner1.y() = dynamic_cast<ContainedByBox*>(Object->container.get())->corner2.y();
-                                dynamic_cast<ContainedByBox*>(Object->container.get())->corner2.y() = temp;
-                            }
-                            if (dynamic_cast<ContainedByBox*>(Object->container.get())->corner1.z() > dynamic_cast<ContainedByBox*>(Object->container.get())->corner2.z())
-                            {
-                                temp = dynamic_cast<ContainedByBox*>(Object->container.get())->corner1.z();
-                                dynamic_cast<ContainedByBox*>(Object->container.get())->corner1.z() = dynamic_cast<ContainedByBox*>(Object->container.get())->corner2.z();
-                                dynamic_cast<ContainedByBox*>(Object->container.get())->corner2.z() = temp;
-                            }
-
-                            if (Object->Trans != NULL)
-                                Object->Compute_BBox();
-
-                            Exit_Flag2 = true;
-                        END_CASE
-
-                        CASE(SPHERE_TOKEN)
-                            Object->container = shared_ptr<ContainedByShape>(new ContainedBySphere());
-
-                            Parse_Begin();
-
-                            Parse_Vector(dynamic_cast<ContainedBySphere*>(Object->container.get())->center);
-                            Parse_Comma();
-                            dynamic_cast<ContainedBySphere*>(Object->container.get())->radius = Parse_Float();
-
-                            Parse_End();
-
-                            Make_BBox(Object->BBox,
-                                      dynamic_cast<ContainedBySphere*>(Object->container.get())->center.x() - dynamic_cast<ContainedBySphere*>(Object->container.get())->radius,
-                                      dynamic_cast<ContainedBySphere*>(Object->container.get())->center.y() - dynamic_cast<ContainedBySphere*>(Object->container.get())->radius,
-                                      dynamic_cast<ContainedBySphere*>(Object->container.get())->center.z() - dynamic_cast<ContainedBySphere*>(Object->container.get())->radius,
-                                      2.0 * dynamic_cast<ContainedBySphere*>(Object->container.get())->radius,
-                                      2.0 * dynamic_cast<ContainedBySphere*>(Object->container.get())->radius,
-                                      2.0 * dynamic_cast<ContainedBySphere*>(Object->container.get())->radius);
-
-                            if (Object->Trans != NULL)
-                                Object->Compute_BBox();
-
-                            Exit_Flag2 = true;
-                        END_CASE
-
-                        OTHERWISE
-                            UNGET
-                            Exit_Flag2 = true;
-                        END_CASE
-                    }
-                }
-            }
-            Parse_End();
+            ParseContainedBy(Object->container, Object);
         END_CASE
 
         CASE(THRESHOLD_TOKEN)
@@ -2697,6 +2613,87 @@ ObjectPtr Parser::Parse_Isosurface()
     return (reinterpret_cast<ObjectPtr>(Object));
 }
 
+//******************************************************************************
+
+void Parser::ParseContainedBy(shared_ptr<pov::ContainedByShape>& container, ObjectPtr obj)
+{
+    DBL temp;
+
+    Parse_Begin();
+
+    EXPECT_ONE
+        CASE(BOX_TOKEN)
+            {
+                shared_ptr<ContainedByBox> box(new ContainedByBox());
+
+                Parse_Begin();
+
+                Parse_Vector(box->corner1);
+                Parse_Comma();
+                Parse_Vector(box->corner2);
+
+                Parse_End();
+
+                if (box->corner1.x() > box->corner2.x())
+                {
+                    temp = box->corner1.x();
+                    box->corner1.x() = box->corner2.x();
+                    box->corner2.x() = temp;
+                }
+                if (box->corner1.y() > box->corner2.y())
+                {
+                    temp = box->corner1.y();
+                    box->corner1.y() = box->corner2.y();
+                    box->corner2.y() = temp;
+                }
+                if (box->corner1.z() > box->corner2.z())
+                {
+                    temp = box->corner1.z();
+                    box->corner1.z() = box->corner2.z();
+                    box->corner2.z() = temp;
+                }
+
+                container = box;
+
+                // TODO REVIEW - where is the bounding box computed when obj->Trans is NULL?
+                if (obj->Trans != NULL)
+                    obj->Compute_BBox();
+            }
+        END_CASE
+
+        CASE(SPHERE_TOKEN)
+            {
+                shared_ptr<ContainedBySphere> sphere(new ContainedBySphere());
+
+                Parse_Begin();
+
+                Parse_Vector(sphere->center);
+                Parse_Comma();
+                sphere->radius = Parse_Float();
+
+                Parse_End();
+
+                Make_BBox(obj->BBox,
+                          sphere->center.x() - sphere->radius,
+                          sphere->center.y() - sphere->radius,
+                          sphere->center.z() - sphere->radius,
+                          2.0 * sphere->radius,
+                          2.0 * sphere->radius,
+                          2.0 * sphere->radius);
+
+                container = sphere;
+
+                if (obj->Trans != NULL)
+                    obj->Compute_BBox();
+            }
+        END_CASE
+
+        OTHERWISE
+            UNGET
+        END_CASE
+    END_EXPECT
+    Parse_End();
+}
 
 /*****************************************************************************
 *
@@ -2706,7 +2703,7 @@ ObjectPtr Parser::Parse_Isosurface()
 *
 * INPUT None
 *
-* OUTPUT Fractal Objecstructure filledt
+* OUTPUT Fractal Object structure filled
 *
 * RETURNS
 *
@@ -3243,6 +3240,7 @@ ObjectPtr Parser::Parse_Light_Group()
 
         CASE (GLOBAL_LIGHTS_TOKEN)
             Bool_Flag (Object, NO_GLOBAL_LIGHTS_FLAG, !(Allow_Float(1.0) > 0.5));
+            // TODO FIXME -- shouldn't we set NO_GLOBAL_LIGHTS_SET_FLAG here?
         END_CASE
 
         CASE(PHOTONS_TOKEN)
@@ -5038,85 +5036,7 @@ ObjectPtr Parser::Parse_Parametric(void)
         END_CASE
 
         CASE(CONTAINED_BY_TOKEN)
-            // TODO - same code as for isosurface
-            Parse_Begin();
-            {
-                int Exit_Flag2 = false;
-
-                while (!Exit_Flag2)
-                {
-                    Get_Token();
-                    switch(Token.Token_Id)
-                    {
-                        CASE(BOX_TOKEN)
-                            Object->container = shared_ptr<ContainedByShape>(new ContainedByBox());
-
-                            Parse_Begin();
-
-                            Parse_Vector(dynamic_cast<ContainedByBox*>(Object->container.get())->corner1);
-                            Parse_Comma();
-                            Parse_Vector(dynamic_cast<ContainedByBox*>(Object->container.get())->corner2);
-
-                            Parse_End();
-
-                            if (dynamic_cast<ContainedByBox*>(Object->container.get())->corner1.x() > dynamic_cast<ContainedByBox*>(Object->container.get())->corner2.x())
-                            {
-                                temp = dynamic_cast<ContainedByBox*>(Object->container.get())->corner1.x();
-                                dynamic_cast<ContainedByBox*>(Object->container.get())->corner1.x() = dynamic_cast<ContainedByBox*>(Object->container.get())->corner2.x();
-                                dynamic_cast<ContainedByBox*>(Object->container.get())->corner2.x() = temp;
-                            }
-                            if (dynamic_cast<ContainedByBox*>(Object->container.get())->corner1.y() > dynamic_cast<ContainedByBox*>(Object->container.get())->corner2.y())
-                            {
-                                temp = dynamic_cast<ContainedByBox*>(Object->container.get())->corner1.y();
-                                dynamic_cast<ContainedByBox*>(Object->container.get())->corner1.y() = dynamic_cast<ContainedByBox*>(Object->container.get())->corner2.y();
-                                dynamic_cast<ContainedByBox*>(Object->container.get())->corner2.y() = temp;
-                            }
-                            if (dynamic_cast<ContainedByBox*>(Object->container.get())->corner1.z() > dynamic_cast<ContainedByBox*>(Object->container.get())->corner2.z())
-                            {
-                                temp = dynamic_cast<ContainedByBox*>(Object->container.get())->corner1.z();
-                                dynamic_cast<ContainedByBox*>(Object->container.get())->corner1.z() = dynamic_cast<ContainedByBox*>(Object->container.get())->corner2.z();
-                                dynamic_cast<ContainedByBox*>(Object->container.get())->corner2.z() = temp;
-                            }
-
-                            if (Object->Trans != NULL)
-                                Object->Compute_BBox();
-
-                            Exit_Flag2 = true;
-                        END_CASE
-
-                        CASE(SPHERE_TOKEN)
-                            Object->container = shared_ptr<ContainedByShape>(new ContainedBySphere());
-
-                            Parse_Begin();
-
-                            Parse_Vector(dynamic_cast<ContainedBySphere*>(Object->container.get())->center);
-                            Parse_Comma();
-                            dynamic_cast<ContainedBySphere*>(Object->container.get())->radius = Parse_Float();
-
-                            Parse_End();
-
-                            Make_BBox(Object->BBox,
-                                      dynamic_cast<ContainedBySphere*>(Object->container.get())->center.x() - dynamic_cast<ContainedBySphere*>(Object->container.get())->radius,
-                                      dynamic_cast<ContainedBySphere*>(Object->container.get())->center.y() - dynamic_cast<ContainedBySphere*>(Object->container.get())->radius,
-                                      dynamic_cast<ContainedBySphere*>(Object->container.get())->center.z() - dynamic_cast<ContainedBySphere*>(Object->container.get())->radius,
-                                      2.0 * dynamic_cast<ContainedBySphere*>(Object->container.get())->radius,
-                                      2.0 * dynamic_cast<ContainedBySphere*>(Object->container.get())->radius,
-                                      2.0 * dynamic_cast<ContainedBySphere*>(Object->container.get())->radius);
-
-                            if (Object->Trans != NULL)
-                                Object->Compute_BBox();
-
-                            Exit_Flag2 = true;
-                        END_CASE
-
-                        OTHERWISE
-                            UNGET
-                            Exit_Flag2 = true;
-                        END_CASE
-                    }
-                }
-            }
-            Parse_End();
+            ParseContainedBy(Object->container, Object);
         END_CASE
 
         OTHERWISE
@@ -10609,10 +10529,11 @@ void *Parser::Copy_Identifier (void *Data, int Type)
 *
 ******************************************************************************/
 
-/* NK layers - 1999 June 10 - for backwards compatiblity with layered textures */
+/* NK layers - 1999 June 10 - for backwards compatibility with layered textures */
 void Parser::Convert_Filter_To_Transmit(PIGMENT *Pigment)
 {
-    if (Pigment==NULL) return;
+    if (!Pigment)
+        return;
 
     switch (Pigment->Type)
     {
@@ -10621,29 +10542,36 @@ void Parser::Convert_Filter_To_Transmit(PIGMENT *Pigment)
             break;
 
         default:
-            if (Pigment->Blend_Map != NULL)
-                Pigment->Blend_Map->ConvertFilterToTransmit();
+            Convert_Filter_To_Transmit(Pigment->Blend_Map.get());
             break;
     }
 }
 
-void PigmentBlendMap::ConvertFilterToTransmit()
+// NK layers - 1999 July 10 - for backwards compatibility with layered textures
+void Parser::Convert_Filter_To_Transmit(GenericPigmentBlendMap *pBlendMap)
 {
-    POV_BLEND_MAP_ASSERT((Type == kBlendMapType_Pigment) || (Type == kBlendMapType_Density));
-    for (Vector::iterator i = Blend_Map_Entries.begin(); i != Blend_Map_Entries.end(); i++)
-    {
-        Parser::Convert_Filter_To_Transmit(i->Vals);
-    }
-}
+    if (!pBlendMap)
+        return;
 
-void ColourBlendMap::ConvertFilterToTransmit()
-{
-    for (Vector::iterator i = Blend_Map_Entries.begin(); i != Blend_Map_Entries.end(); i++)
+    if (PigmentBlendMap* pPBlendMap = dynamic_cast<PigmentBlendMap*>(pBlendMap))
     {
-        i->Vals.SetFT(0.0, 1.0 - i->Vals.Opacity());
+        POV_BLEND_MAP_ASSERT((pPBlendMap->Type == kBlendMapType_Pigment) ||
+                             (pPBlendMap->Type == kBlendMapType_Density));
+        for (PigmentBlendMap::Vector::iterator i = pPBlendMap->Blend_Map_Entries.begin(); i != pPBlendMap->Blend_Map_Entries.end(); i++)
+        {
+            Convert_Filter_To_Transmit(i->Vals);
+        }
     }
+    else if (ColourBlendMap* pCBlendMap = dynamic_cast<ColourBlendMap*>(pCBlendMap))
+    {
+        for (ColourBlendMap::Vector::iterator i = pCBlendMap->Blend_Map_Entries.begin(); i != pCBlendMap->Blend_Map_Entries.end(); i++)
+        {
+            i->Vals.SetFT(0.0, 1.0 - i->Vals.Opacity());
+        }
+    }
+    else
+        POV_BLEND_MAP_ASSERT(false);
 }
-
 
 
 /*****************************************************************************

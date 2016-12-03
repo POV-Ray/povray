@@ -45,6 +45,13 @@
 namespace pov
 {
 
+//##############################################################################
+///
+/// @defgroup PovCoreMaterialWarp Texture Warps
+/// @ingroup PovCore
+///
+/// @{
+
 /*****************************************************************************
 * Global typedefs
 ******************************************************************************/
@@ -276,16 +283,6 @@ struct ClassicTurbulence : public GenericTurbulenceWarp
 
 
 /*****************************************************************************
-* Global variables
-******************************************************************************/
-
-
-/*****************************************************************************
-* Global constants
-******************************************************************************/
-
-
-/*****************************************************************************
 * Global functions
 ******************************************************************************/
 
@@ -294,6 +291,10 @@ void Destroy_Warps (WarpList& rWarps);
 void Copy_Warps (WarpList& rNew, const WarpList& old);
 void Warp_Normal (Vector3d& TNorm, const Vector3d& ENorm, const TPATTERN *TPat, bool DontScaleBumps);
 void UnWarp_Normal (Vector3d& TNorm, const Vector3d& ENorm, const TPATTERN *TPat, bool DontScaleBumps);
+
+/// @}
+///
+//##############################################################################
 
 }
 

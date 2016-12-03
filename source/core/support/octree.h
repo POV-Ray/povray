@@ -59,6 +59,14 @@ class OStream;
 
 namespace pov
 {
+
+//##############################################################################
+///
+/// @defgroup PovCoreSupportOctree Octree
+/// @ingroup PovCore
+///
+/// @{
+
 using namespace pov_base;
 
 /*****************************************************************************
@@ -160,6 +168,10 @@ bool ot_free_tree (OT_NODE **root_ptr);
 bool ot_read_file (OT_NODE **root, IStream * fd, const OT_READ_PARAM* param, OT_READ_INFO* info);
 void ot_newroot (OT_NODE **root_ptr);
 void ot_parent (OT_ID *dad, OT_ID *kid);
+
+/// @}
+///
+//##############################################################################
 
 }
 

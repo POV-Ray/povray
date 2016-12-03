@@ -386,15 +386,28 @@ DBL AveragePattern::Evaluate(const Vector3d& EPoint, const Intersection *pIsecti
 bool AveragePattern::HasSpecialTurbulenceHandling() const { return false; }
 
 
+AgatePattern::AgatePattern() : agateTurbScale(1.0) {}
 ColourBlendMapConstPtr AgatePattern::GetDefaultBlendMap() const { return gpDefaultBlendMap_Agate; }
 
 ColourBlendMapConstPtr BozoPattern::GetDefaultBlendMap() const { return gpDefaultBlendMap_Bozo; }
+
+BrickPattern::BrickPattern() : brickSize(8.0,3.0,4.5), mortar(0.5-EPSILON*2.0) {}
 
 ColourBlendMapConstPtr BrickPattern::GetDefaultBlendMap() const { return gpDefaultBlendMap_Brick; }
 unsigned int BrickPattern::NumDiscreteBlendMapEntries() const { return 2; }
 
 ColourBlendMapConstPtr CheckerPattern::GetDefaultBlendMap() const { return gpDefaultBlendMap_Checker; }
 unsigned int CheckerPattern::NumDiscreteBlendMapEntries() const { return 2; }
+
+
+CracklePattern::CracklePattern() :
+    crackleForm(-1,1,0),
+    crackleMetric(2),
+    crackleOffset(0),
+    repeat(0,0,0),
+    crackleIsSolid(false)
+{}
+
 
 ColourBlendMapConstPtr CubicPattern::GetDefaultBlendMap() const { return gpDefaultBlendMap_Cubic; }
 unsigned int CubicPattern::NumDiscreteBlendMapEntries() const { return 6; }
@@ -435,14 +448,7 @@ bool ColourFunctionPattern::Evaluate(TransColour& result, const Vector3d& EPoint
     {
         ColourChannel channelValue = 0.0;
         if (pFn[iChannel])
-        {
-            GenericFunctionContextPtr pCtx = pFn[iChannel]->AcquireContext(pThread);
-            pFn[iChannel]->InitArguments(pCtx);
-            for (int iDimension = 0; iDimension < 3; ++iDimension)
-                pFn[iChannel]->PushArgument(pCtx, EPoint[iDimension]);
-            channelValue = pFn[iChannel]->Execute(pCtx);
-            pFn[iChannel]->ReleaseContext(pCtx);
-        }
+            channelValue = GenericScalarFunctionInstance(pFn[iChannel], pThread).Evaluate(EPoint);
         switch (iChannel)
         {
         case 3:  result.filter()           = channelValue; break;
@@ -507,6 +513,18 @@ DensityFilePattern::~DensityFilePattern()
 }
 
 
+FacetsPattern::FacetsPattern() : facetsSize(0.1), facetsCoords(0), facetsMetric(2) {}
+
+
+FractalPattern::FractalPattern() :
+    interiorType(0),
+    exteriorType(1),
+    maxIterations(),        // no explicit default; must be set by caller
+    exteriorFactor(1),
+    interiorFactor(1)
+{}
+
+
 DBL FacetsPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
 {
     throw POV_EXCEPTION_STRING("Internal Error: FacetsPattern::EvaluateRaw() called.");
@@ -539,6 +557,7 @@ DBL ImagePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsect
 }
 
 
+MarblePattern::MarblePattern() { waveType = kWaveType_Triangle; }
 ColourBlendMapConstPtr MarblePattern::GetDefaultBlendMap() const { return gpDefaultBlendMap_Marble; }
 
 
@@ -562,6 +581,9 @@ ObjectPattern::~ObjectPattern()
 
 ColourBlendMapConstPtr ObjectPattern::GetDefaultBlendMap() const { return gpDefaultBlendMap_Checker; } // sic!
 unsigned int ObjectPattern::NumDiscreteBlendMapEntries() const { return 2; }
+
+
+PavementPattern::PavementPattern() : Side(3), Tile(1), Number(1), Exterior(0), Interior(0), Form(0) {}
 
 
 PigmentPattern::PigmentPattern() :
@@ -606,7 +628,31 @@ PotentialPattern::~PotentialPattern()
 }
 
 
+QuiltedPattern::QuiltedPattern() : Control0(1.0), Control1(1.0) { waveFrequency = 0.0; }
+
 ColourBlendMapConstPtr RadialPattern::GetDefaultBlendMap() const { return gpDefaultBlendMap_Radial; }
+
+
+SlopePattern::SlopePattern() :
+    altitudeDirection(0.0, 0.0, 0.0),
+    slopeDirection(),       // no explicit default; must be set by caller
+    altitudeLen(),          // no explicit default; must be set by caller
+    altitudeModLow(0.0),
+    altitudeModWidth(0.0),
+    slopeLen(),             // no explicit default; must be set by caller
+    slopeModLow(0.0),
+    slopeModWidth(0.0),
+    altitudeAxis(),         // no explicit default; must be set by caller
+    slopeAxis(),            // no explicit default; must be set by caller
+    pointAt(false)
+{}
+
+
+SpiralPattern::SpiralPattern() :
+    arms()                  // no explicit default; must be set by caller
+{
+    waveType = kWaveType_Triangle;
+}
 
 ColourBlendMapConstPtr SquarePattern::GetDefaultBlendMap() const { return gpDefaultBlendMap_Square; }
 unsigned int SquarePattern::NumDiscreteBlendMapEntries() const { return 4; }
@@ -614,6 +660,7 @@ unsigned int SquarePattern::NumDiscreteBlendMapEntries() const { return 4; }
 ColourBlendMapConstPtr TriangularPattern::GetDefaultBlendMap() const { return gpDefaultBlendMap_Triangular; }
 unsigned int TriangularPattern::NumDiscreteBlendMapEntries() const { return 6; }
 
+WoodPattern::WoodPattern() { waveType = kWaveType_Triangle; }
 ColourBlendMapConstPtr WoodPattern::GetDefaultBlendMap() const { return gpDefaultBlendMap_Wood; }
 
 

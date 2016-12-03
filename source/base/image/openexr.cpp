@@ -227,18 +227,18 @@ void Write(OStream *file, const Image *image, const Image::WriteOptions& options
 {
     int width = image->GetWidth();
     int height = image->GetHeight();
-    bool use_alpha = image->HasTransparency() && options.alphachannel;
+    bool use_alpha = image->HasTransparency() && options.AlphaIsEnabled();
     float pixelAspect = 1.0;
     Header hdr(width, height, pixelAspect, Imath::V2f(0, 0), 1.0, INCREASING_Y, ZIP_COMPRESSION);
     boost::scoped_array<Rgba> pixels(new Rgba[width * height]);
     Rgba *p = pixels.get();
+
+    // OpenEXR format mandates that colours are encoded linearly.
     GammaCurvePtr gamma = TranscodingGammaCurve::Get(options.workingGamma, NeutralGammaCurve::Get());
 
     // OpenEXR officially uses premultiplied alpha, so that's the way we do it unless the user overrides
     // (e.g. to handle a non-compliant file).
-    bool premul = true;
-    if (options.premultiplyOverride)
-        premul = options.premultiply;
+    bool premul = options.AlphaIsPremultiplied(true);
 
     for(int row = 0; row < height; row++)
     {

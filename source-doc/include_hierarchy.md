@@ -12,7 +12,7 @@ General Rules
   - **Small Include Footprint**: Each file's include footprint should be kept small to simplify the include hierarchy:
       - Forward type declarations shall be used wherever this avoids having to include a header file.
       - Files already included in a unit header file shall _not_ be included again in the respective `.cpp` file (e.g. a
-        file included in @ref core/colourspace.h shall not be included in @ref core/colourspace.cpp).
+        file included in `core/colourspace.h` shall not be included in `core/colourspace.cpp`).
 
 
 Pulling In Special Headers

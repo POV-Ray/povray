@@ -41,6 +41,12 @@
 namespace pov_base
 {
 
+//##############################################################################
+///
+/// @addtogroup PovBase
+///
+/// @{
+
 class Exception;
 
 /// @relates GenericMessenger
@@ -107,6 +113,10 @@ class GenericMessenger
         std::string SendError(const char *format, va_list arglist,
                               const UCS2 *filename = NULL, POV_LONG line = -1, POV_LONG column = -1, POV_LONG offset = -1);
 };
+
+/// @}
+///
+//##############################################################################
 
 }
 

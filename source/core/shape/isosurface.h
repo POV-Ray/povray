@@ -48,11 +48,24 @@
 namespace pov
 {
 
-/*****************************************************************************
-* Global preprocessor defines
-******************************************************************************/
+//##############################################################################
+///
+/// @addtogroup PovCoreShape
+///
+/// @{
+
+//******************************************************************************
+///
+/// @name Object Types
+///
+/// @{
 
 #define ISOSURFACE_OBJECT      (BASIC_OBJECT+POTENTIAL_OBJECT)
+
+/// @}
+///
+//******************************************************************************
+
 #define ISOSURFACE_MAXTRACE    10
 
 
@@ -61,9 +74,6 @@ namespace pov
 ******************************************************************************/
 
 class IsoSurface;
-class FPUContext;
-
-class FunctionVM;
 
 typedef unsigned char IsosurfaceMaxTrace;
 
@@ -136,6 +146,10 @@ class IsoSurface : public ObjectBase
     private:
         ISO_Max_Gradient *mginfo; // global, but just a statistic (read: not thread safe but we don't care) [trf]
 };
+
+/// @}
+///
+//##############################################################################
 
 }
 

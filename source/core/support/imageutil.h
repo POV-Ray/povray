@@ -48,6 +48,13 @@
 namespace pov
 {
 
+//##############################################################################
+///
+/// @defgroup PovCoreSupportImageUtil Image Handling Utilities
+/// @ingroup PovCore
+///
+/// @{
+
 using namespace pov_base;
 
 /*****************************************************************************
@@ -130,6 +137,10 @@ int map_pos(const Vector3d& EPoint, const BasicPattern* pPattern, DBL *xcoor, DB
 ImageData *Copy_Image(ImageData *old);
 ImageData *Create_Image(void);
 void Destroy_Image(ImageData *image);
+
+/// @}
+///
+//##############################################################################
 
 }
 

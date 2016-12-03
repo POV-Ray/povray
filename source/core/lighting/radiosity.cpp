@@ -82,8 +82,6 @@ namespace pov
 
 using namespace pov_base;
 
-extern BYTE_XYZ rad_samples[];
-
 // #define RAD_GRADIENT 1 // [CLi] gradient seems to provide no gain at best, and may actually cause artifacts
 // #define SAW_METHOD 1
 // #define SAW_METHOD_ROOT 2

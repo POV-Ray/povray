@@ -58,6 +58,13 @@
 namespace pov_base
 {
 
+//##############################################################################
+///
+/// @defgroup PovBaseTextstream Text File In- and Output
+/// @ingroup PovBase
+///
+/// @{
+
 const int ITEXTSTREAM_BUFFER_SIZE = DEFAULT_ITEXTSTREAM_BUFFER_SIZE;
 
 class ITextStream
@@ -180,6 +187,10 @@ class OTextStream
         OStream *stream;
         UCS2String filename;
 };
+
+/// @}
+///
+//##############################################################################
 
 }
 

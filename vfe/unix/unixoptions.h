@@ -12,7 +12,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -263,7 +263,7 @@ namespace vfePlatform
              Finds the value of a certain option via
              section and option name and returns it as
              a float  If the options value is not convertible
-             to float dflt is returned instead..
+             to float dflt is returned instead.
         */
         float QueryOptionFloat(const string &section, const string &name, const float dflt = 0.0);
 

@@ -601,7 +601,7 @@ enum
     // bounding progress
     kPOVAttrib_CurrentNodeCount      = 'CNCo',
 
-    /// photon progress
+    // photon progress
     kPOVAttrib_CurrentPhotonCount    = 'CPCo',
 
     // render progress

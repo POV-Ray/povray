@@ -168,7 +168,7 @@ class FPUContext : public GenericFunctionContext
         StackFrame *pstackbase;
         DBL *dblstackbase;
         unsigned int maxdblstacksize;
-        FunctionVM *functionvm;
+        intrusive_ptr<FunctionVM> functionvm;
         TraceThreadData *threaddata;
         #if (SYS_FUNCTIONS == 1)
         DBL *dblstack;
@@ -258,6 +258,7 @@ class FunctionVM : public GenericFunctionContextFactory
 {
         friend void POVFPU_Exception(FPUContext *, FUNCTION, const char *);
         friend DBL POVFPU_RunDefault(FPUContext *, FUNCTION);
+
     public:
 
         class CustomFunction : public GenericScalarFunction
@@ -273,7 +274,7 @@ class FunctionVM : public GenericFunctionContextFactory
                 virtual GenericScalarFunctionPtr Clone() const;
                 virtual const FunctionSourceInfo* GetSourceInfo() const;
             protected:
-                FunctionVM *mpVm;
+                intrusive_ptr<FunctionVM> mpVm;
                 FUNCTION_PTR mpFn;
         };
 

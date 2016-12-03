@@ -154,7 +154,10 @@ bool image_map(const Vector3d& EPoint, const PIGMENT *Pigment, TransColour& colo
     else
     {
         RGBFTColour rgbft;
-        image_colour_at(dynamic_cast<ImagePatternImpl*>(Pigment->pattern.get())->pImage, xcoor, ycoor, rgbft, &reg_number, false);
+        if (const ImagePatternImpl *pattern = dynamic_cast<ImagePatternImpl*>(Pigment->pattern.get()))
+            image_colour_at(pattern->pImage, xcoor, ycoor, rgbft, &reg_number, false);
+        else
+            POV_PATTERN_ASSERT(false);
         colour = ToTransColour(rgbft);
         return true;
     }
@@ -200,7 +203,10 @@ TEXTURE *material_map(const Vector3d& EPoint, const TEXTURE *Texture)
         Material_Number = 0;
     else
     {
-        image_colour_at(dynamic_cast<ImagePatternImpl*>(Texture->pattern.get())->pImage, xcoor, ycoor, colour, &reg_number); // TODO ALPHA - we should decide whether we prefer premultiplied or non-premultiplied alpha
+        if (const ImagePatternImpl *pattern = dynamic_cast<ImagePatternImpl*>(Texture->pattern.get()))
+            image_colour_at(pattern->pImage, xcoor, ycoor, colour, &reg_number); // TODO ALPHA - we should decide whether we prefer premultiplied or non-premultiplied alpha
+        else
+            POV_PATTERN_ASSERT(false);
 
         if(reg_number == -1)
             Material_Number = (int)(colour.red() * 255.0);
@@ -244,7 +250,12 @@ void bump_map(const Vector3d& EPoint, const TNORMAL *Tnormal, Vector3d& normal)
     Vector3d xprime, yprime, zprime;
     DBL Length;
     DBL Amount = Tnormal->Amount;
-    const ImageData *image = dynamic_cast<ImagePatternImpl*>(Tnormal->pattern.get())->pImage;
+    const ImageData *image;
+
+    if (const ImagePatternImpl *pattern = dynamic_cast<ImagePatternImpl*>(Tnormal->pattern.get()))
+        image = pattern->pImage;
+    else
+        POV_PATTERN_ASSERT(false);
 
     // going to have to change this
     // need to know if bump point is off of image for all 3 points

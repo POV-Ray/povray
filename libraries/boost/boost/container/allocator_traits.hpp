@@ -77,6 +77,9 @@ namespace container {
 
 #ifndef BOOST_CONTAINER_DOXYGEN_INVOKED
 
+template<class Allocator>
+class small_vector_allocator;
+
 namespace allocator_traits_detail {
 
 BOOST_INTRUSIVE_HAS_STATIC_MEMBER_FUNC_SIGNATURE(has_max_size, max_size)
@@ -94,6 +97,10 @@ struct is_std_allocator
 
 template<class T>
 struct is_std_allocator< std::allocator<T> >
+{  static const bool value = true; };
+
+template<class T>
+struct is_std_allocator< small_vector_allocator< std::allocator<T> > >
 {  static const bool value = true; };
 
 template<class Allocator>
@@ -445,7 +452,7 @@ struct allocator_traits
 
    template<class T>
    static void priv_construct(container_detail::false_type, Allocator &, T *p, const ::boost::container::default_init_t&)
-   {  ::new((void*)p) T; }
+   {  ::new((void*)p, boost_container_new_t()) T; }
 
    static bool priv_storage_is_unpropagable(container_detail::true_type, const Allocator &a, pointer p)
    {  return a.storage_is_unpropagable(p);  }

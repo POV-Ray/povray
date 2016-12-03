@@ -51,6 +51,18 @@
 namespace pov_base
 {
 
+//##############################################################################
+///
+/// @defgroup PovBaseAnimation Animations
+/// @ingroup PovBase
+///
+/// @todo
+///     Is this related to real-time rendering, or just output to video file formats?
+/// @todo
+///     This module is currently unused and presumably out of sync with the rest of the codebase.
+///
+/// @{
+
 class Animation
 {
     public:
@@ -158,6 +170,10 @@ class Animation
         /// not available
         Animation& operator=(Animation&);
 };
+
+/// @}
+///
+//##############################################################################
 
 }
 
