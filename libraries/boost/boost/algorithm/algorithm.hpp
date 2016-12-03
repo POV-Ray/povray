@@ -17,6 +17,8 @@
 #ifndef BOOST_ALGORITHM_HPP
 #define BOOST_ALGORITHM_HPP
 
+#include <functional> // for plus and multiplies
+
 #include <boost/utility/enable_if.hpp> // for boost::disable_if
 #include <boost/type_traits/is_integral.hpp>
 
@@ -56,7 +58,7 @@ power (T x, Integer n) {
 
 /// \fn power ( T x, Integer n, Operation op )
 /// \return the value "x" raised to the power "n"
-/// using the operaton "op".
+/// using the operation "op".
 /// 
 /// \param x     The value to be exponentiated
 /// \param n     The exponent (must be >= 0)
