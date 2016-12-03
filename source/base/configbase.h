@@ -681,6 +681,25 @@
     #define POV_USE_DEFAULT_PATH_PARSER 1
 #endif
 
+/// @def POV_DELETE_FILE
+/// Delete a given file.
+///
+/// Define as a single command that erases the specified file from the file system.
+///
+/// @note
+///     There is no default implementation for this macro.
+///
+/// @param[in]  name    UTF-8 encoded file name in system-specific format.
+///
+#ifndef POV_DELETE_FILE
+    #ifdef DOXYGEN
+        // doxygen cannot document undefined macros
+        #define POV_DELETE_FILE(name) do{;}while(0)
+    #else
+        #error "No default implementation for POV_DELETE_FILE."
+    #endif
+#endif
+
 /// @}
 ///
 //******************************************************************************

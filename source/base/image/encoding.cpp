@@ -76,66 +76,66 @@ static const BayerMatrix BayerMatrices[MaxBayerMatrixSize+1] =
 /*******************************************************************************/
 
 /// Class representing "no-op" dithering rules.
-class NoDither : public DitherHandler
+class NoDither : public DitherStrategy
 {
     public:
-        virtual void getOffset(unsigned int x, unsigned int y, OffsetInfo& offLin, OffsetInfo& offQnt);
+        virtual void GetOffset(unsigned int x, unsigned int y, ColourOffset& offLin, ColourOffset& offQnt);
 };
 
 /// Class representing bayer dithering rules, generating a regular pattern.
-class BayerDither : public DitherHandler
+class BayerDither : public DitherStrategy
 {
     public:
         BayerDither(unsigned int mxSize);
-        virtual void getOffset(unsigned int x, unsigned int y, OffsetInfo& offLin, OffsetInfo& offQnt);
-        static inline float getOffset(unsigned int x, unsigned int y, unsigned int ms) { return BayerMatrices[ms][x%ms][y%ms]; }
+        virtual void GetOffset(unsigned int x, unsigned int y, ColourOffset& offLin, ColourOffset& offQnt);
+        static inline float GetOffset(unsigned int x, unsigned int y, unsigned int ms) { return BayerMatrices[ms][x%ms][y%ms]; }
     protected:
         unsigned int matrixSize;
 };
 
 /// Class representing simple 1D error diffusion dithering rules, carrying over the error from one pixel to the next.
-class DiffusionDither1D : public DitherHandler
+class DiffusionDither1D : public DitherStrategy
 {
     public:
-        virtual void getOffset(unsigned int x, unsigned int y, OffsetInfo& offLin, OffsetInfo& offQnt);
-        virtual void setError(unsigned int x, unsigned int y, const OffsetInfo& err);
+        virtual void GetOffset(unsigned int x, unsigned int y, ColourOffset& offLin, ColourOffset& offQnt);
+        virtual void SetError(unsigned int x, unsigned int y, const ColourOffset& err);
     protected:
-        OffsetInfo lastErr;
+        ColourOffset lastErr;
 };
 
 /// Class representing simple 2D error diffusion dithering rules, carrying over the error from one pixel to the right, as well as the two pixels below.
 /// @note   This implementation uses an additional 2-line pixel buffer to avoid manipulating the original image.
-class DiffusionDither2D : public DitherHandler
+class DiffusionDither2D : public DitherStrategy
 {
     public:
         DiffusionDither2D(unsigned int width);
         virtual ~DiffusionDither2D();
-        virtual void getOffset(unsigned int x, unsigned int y, OffsetInfo& offLin, OffsetInfo& offQnt);
-        virtual void setError(unsigned int x, unsigned int y, const OffsetInfo& err);
+        virtual void GetOffset(unsigned int x, unsigned int y, ColourOffset& offLin, ColourOffset& offQnt);
+        virtual void SetError(unsigned int x, unsigned int y, const ColourOffset& err);
     protected:
         unsigned int imageWidth;
-        OffsetInfo* nextRowOffset;
-        OffsetInfo* thisRowOffset;
+        ColourOffset* nextRowOffset;
+        ColourOffset* thisRowOffset;
 };
 
 /// Class representing Floyd-Steinberg dithering rules, carrying over the error from one pixel to the right, as well as the three pixels below.
 /// @note   This implementation uses an additional 2-line pixel buffer to avoid manipulating the original image.
-class FloydSteinbergDither : public DitherHandler
+class FloydSteinbergDither : public DitherStrategy
 {
     public:
         FloydSteinbergDither(unsigned int width);
         virtual ~FloydSteinbergDither();
-        virtual void getOffset(unsigned int x, unsigned int y, OffsetInfo& offLin, OffsetInfo& offQnt);
-        virtual void setError(unsigned int x, unsigned int y, const OffsetInfo& err);
+        virtual void GetOffset(unsigned int x, unsigned int y, ColourOffset& offLin, ColourOffset& offQnt);
+        virtual void SetError(unsigned int x, unsigned int y, const ColourOffset& err);
     protected:
         unsigned int imageWidth;
-        OffsetInfo* nextRowOffset;
-        OffsetInfo* thisRowOffset;
+        ColourOffset* nextRowOffset;
+        ColourOffset* thisRowOffset;
 };
 
 /*******************************************************************************/
 
-void NoDither::getOffset(unsigned int x, unsigned int y, OffsetInfo& offLin, OffsetInfo& offQnt)
+void NoDither::GetOffset(unsigned int x, unsigned int y, ColourOffset& offLin, ColourOffset& offQnt)
 {
     offLin.clear();
     offQnt.clear();
@@ -149,20 +149,20 @@ BayerDither::BayerDither(unsigned int mxSize) :
     ;
 }
 
-void BayerDither::getOffset(unsigned int x, unsigned int y, OffsetInfo& offLin, OffsetInfo& offQnt)
+void BayerDither::GetOffset(unsigned int x, unsigned int y, ColourOffset& offLin, ColourOffset& offQnt)
 {
     offLin.clear();
-    offQnt.setAll(getOffset(x, y, matrixSize));
+    offQnt.setAll(GetOffset(x, y, matrixSize));
 }
 
 /*******************************************************************************/
 
-void DiffusionDither1D::getOffset(unsigned int x, unsigned int y, OffsetInfo& offLin, OffsetInfo& offQnt)
+void DiffusionDither1D::GetOffset(unsigned int x, unsigned int y, ColourOffset& offLin, ColourOffset& offQnt)
 {
     offLin = lastErr; lastErr.clear(); offQnt.clear();
 }
 
-void DiffusionDither1D::setError(unsigned int x, unsigned int y, const OffsetInfo& err)
+void DiffusionDither1D::SetError(unsigned int x, unsigned int y, const ColourOffset& err)
 {
     lastErr = err;
 }
@@ -171,8 +171,8 @@ void DiffusionDither1D::setError(unsigned int x, unsigned int y, const OffsetInf
 
 DiffusionDither2D::DiffusionDither2D(unsigned int width) :
     imageWidth(width),
-    thisRowOffset(new OffsetInfo[width+1]),
-    nextRowOffset(new OffsetInfo[width+1])
+    thisRowOffset(new ColourOffset[width+1]),
+    nextRowOffset(new ColourOffset[width+1])
 {
     ;
 }
@@ -183,17 +183,17 @@ DiffusionDither2D::~DiffusionDither2D()
     delete[] nextRowOffset;
 }
 
-void DiffusionDither2D::getOffset(unsigned int x, unsigned int y, OffsetInfo& offLin, OffsetInfo& offQnt)
+void DiffusionDither2D::GetOffset(unsigned int x, unsigned int y, ColourOffset& offLin, ColourOffset& offQnt)
 {
     offLin = thisRowOffset[x];
     offQnt.clear();
 }
 
-void DiffusionDither2D::setError(unsigned int x, unsigned int y, const OffsetInfo& err)
+void DiffusionDither2D::SetError(unsigned int x, unsigned int y, const ColourOffset& err)
 {
     if (x == 0)
     {
-        OffsetInfo* tmp = nextRowOffset;
+        ColourOffset* tmp = nextRowOffset;
         nextRowOffset = thisRowOffset;
         thisRowOffset = tmp;
         for (unsigned int i = 0; i < imageWidth+1; i ++)
@@ -208,8 +208,8 @@ void DiffusionDither2D::setError(unsigned int x, unsigned int y, const OffsetInf
 
 FloydSteinbergDither::FloydSteinbergDither(unsigned int width) :
     imageWidth(width),
-    thisRowOffset(new OffsetInfo[width+2]),
-    nextRowOffset(new OffsetInfo[width+2])
+    thisRowOffset(new ColourOffset[width+2]),
+    nextRowOffset(new ColourOffset[width+2])
 {
     ;
 }
@@ -220,17 +220,17 @@ FloydSteinbergDither::~FloydSteinbergDither()
     delete[] nextRowOffset;
 }
 
-void FloydSteinbergDither::getOffset(unsigned int x, unsigned int y, OffsetInfo& offLin, OffsetInfo& offQnt)
+void FloydSteinbergDither::GetOffset(unsigned int x, unsigned int y, ColourOffset& offLin, ColourOffset& offQnt)
 {
     offLin = thisRowOffset[x+1];
     offQnt.clear();
 }
 
-void FloydSteinbergDither::setError(unsigned int x, unsigned int y, const OffsetInfo& err)
+void FloydSteinbergDither::SetError(unsigned int x, unsigned int y, const ColourOffset& err)
 {
     if (x == 0)
     {
-        OffsetInfo* tmp = nextRowOffset;
+        ColourOffset* tmp = nextRowOffset;
         nextRowOffset = thisRowOffset;
         thisRowOffset = tmp;
         for (unsigned int i = 0; i < imageWidth+2; i ++)
@@ -244,31 +244,31 @@ void FloydSteinbergDither::setError(unsigned int x, unsigned int y, const Offset
 
 /*******************************************************************************/
 
-DitherHandlerPtr GetDitherHandler(DitherMethodId method, unsigned int imageWidth)
+DitherStrategySPtr GetDitherStrategy(DitherMethodId method, unsigned int imageWidth)
 {
     switch (method)
     {
-        case kPOVList_DitherMethod_None:            return DitherHandlerPtr(new NoDither());
-        case kPOVList_DitherMethod_Diffusion1D:     return DitherHandlerPtr(new DiffusionDither1D());
-        case kPOVList_DitherMethod_Diffusion2D:     return DitherHandlerPtr(new DiffusionDither2D(imageWidth));
-        case kPOVList_DitherMethod_FloydSteinberg:  return DitherHandlerPtr(new FloydSteinbergDither(imageWidth));
-        case kPOVList_DitherMethod_Bayer2x2:        return DitherHandlerPtr(new BayerDither(2));
-        case kPOVList_DitherMethod_Bayer3x3:        return DitherHandlerPtr(new BayerDither(3));
-        case kPOVList_DitherMethod_Bayer4x4:        return DitherHandlerPtr(new BayerDither(4));
+        case kPOVList_DitherMethod_None:            return DitherStrategySPtr(new NoDither());
+        case kPOVList_DitherMethod_Diffusion1D:     return DitherStrategySPtr(new DiffusionDither1D());
+        case kPOVList_DitherMethod_Diffusion2D:     return DitherStrategySPtr(new DiffusionDither2D(imageWidth));
+        case kPOVList_DitherMethod_FloydSteinberg:  return DitherStrategySPtr(new FloydSteinbergDither(imageWidth));
+        case kPOVList_DitherMethod_Bayer2x2:        return DitherStrategySPtr(new BayerDither(2));
+        case kPOVList_DitherMethod_Bayer3x3:        return DitherStrategySPtr(new BayerDither(3));
+        case kPOVList_DitherMethod_Bayer4x4:        return DitherStrategySPtr(new BayerDither(4));
         default:                                    throw POV_EXCEPTION_STRING("Invalid dither method for output");
     }
 }
 
-DitherHandlerPtr GetNoOpDitherHandler()
+DitherStrategySPtr GetNoOpDitherStrategy()
 {
-    return DitherHandlerPtr(new NoDither());
+    return DitherStrategySPtr(new NoDither());
 }
 
 /*******************************************************************************/
 
 float GetDitherOffset(unsigned int x, unsigned int y)
 {
-    return BayerDither::getOffset(x,y,4);
+    return BayerDither::GetOffset(x,y,4);
 }
 
 /*******************************************************************************/
@@ -426,7 +426,7 @@ void SetEncodedRGBValue(Image* img, unsigned int x, unsigned int y, const GammaC
     img->SetRGBValue(x, y, GammaCurve::Decode(g,col.red()), GammaCurve::Decode(g,col.green()), GammaCurve::Decode(g,col.blue()));
 }
 
-unsigned int GetEncodedGrayValue(const Image* img, unsigned int x, unsigned int y, const GammaCurvePtr& g, unsigned int max, DitherHandler& dh)
+unsigned int GetEncodedGrayValue(const Image* img, unsigned int x, unsigned int y, const GammaCurvePtr& g, unsigned int max, DitherStrategy& dh)
 {
     float fGray;
     if (!img->IsPremultiplied() && img->HasTransparency())
@@ -441,13 +441,13 @@ unsigned int GetEncodedGrayValue(const Image* img, unsigned int x, unsigned int 
         // no need to worry about premultiplication
         fGray = img->GetGrayValue(x, y);
     }
-    DitherHandler::OffsetInfo linOff, encOff;
-    dh.getOffset(x,y,linOff,encOff);
+    DitherStrategy::ColourOffset linOff, encOff;
+    dh.GetOffset(x,y,linOff,encOff);
     unsigned int iGray = IntEncode(g,fGray+linOff.gray,max,encOff.gray,linOff.gray);
-    dh.setError(x,y,linOff);
+    dh.SetError(x,y,linOff);
     return iGray;
 }
-void GetEncodedGrayAValue(const Image* img, unsigned int x, unsigned int y, const GammaCurvePtr& g, unsigned int max, unsigned int& gray, unsigned int& alpha, DitherHandler& dh, bool premul)
+void GetEncodedGrayAValue(const Image* img, unsigned int x, unsigned int y, const GammaCurvePtr& g, unsigned int max, unsigned int& gray, unsigned int& alpha, DitherStrategy& dh, bool premul)
 {
     bool doPremultiply   = premul && !img->IsPremultiplied() && img->HasTransparency(); // need to apply premultiplication if encoded data should be premul'ed but container content isn't
     bool doUnPremultiply = !premul && img->IsPremultiplied() && img->HasTransparency(); // need to undo premultiplication if other way round
@@ -486,13 +486,13 @@ void GetEncodedGrayAValue(const Image* img, unsigned int x, unsigned int y, cons
         // No need for converting between premultiplied and un-premultiplied encoding.
     }
     // else no need to worry about premultiplication
-    DitherHandler::OffsetInfo linOff, encOff;
-    dh.getOffset(x,y,linOff,encOff);
+    DitherStrategy::ColourOffset linOff, encOff;
+    dh.GetOffset(x,y,linOff,encOff);
     gray  = IntEncode(g, fGray + linOff.gray,  max, encOff.gray,  linOff.gray);
     alpha = IntEncode(fAlpha   + linOff.alpha, max, encOff.alpha, linOff.alpha);
-    dh.setError(x,y,linOff);
+    dh.SetError(x,y,linOff);
 }
-void GetEncodedRGBValue(const Image* img, unsigned int x, unsigned int y, const GammaCurvePtr& g, unsigned int max, unsigned int& red, unsigned int& green, unsigned int& blue, DitherHandler& dh)
+void GetEncodedRGBValue(const Image* img, unsigned int x, unsigned int y, const GammaCurvePtr& g, unsigned int max, unsigned int& red, unsigned int& green, unsigned int& blue, DitherStrategy& dh)
 {
     float fRed, fGreen, fBlue;
     if (!img->IsPremultiplied() && img->HasTransparency())
@@ -507,14 +507,14 @@ void GetEncodedRGBValue(const Image* img, unsigned int x, unsigned int y, const 
         // no need to worry about premultiplication
         img->GetRGBValue(x, y, fRed, fGreen, fBlue);
     }
-    DitherHandler::OffsetInfo linOff, encOff;
-    dh.getOffset(x,y,linOff,encOff);
+    DitherStrategy::ColourOffset linOff, encOff;
+    dh.GetOffset(x,y,linOff,encOff);
     red   = IntEncode(g,fRed   + linOff.red,   max, encOff.red,   linOff.red);
     green = IntEncode(g,fGreen + linOff.green, max, encOff.green, linOff.green);
     blue  = IntEncode(g,fBlue  + linOff.blue,  max, encOff.blue,  linOff.blue);
-    dh.setError(x,y,linOff);
+    dh.SetError(x,y,linOff);
 }
-void GetEncodedRGBAValue(const Image* img, unsigned int x, unsigned int y, const GammaCurvePtr& g, unsigned int max, unsigned int& red, unsigned int& green, unsigned int& blue, unsigned int& alpha, DitherHandler& dh, bool premul)
+void GetEncodedRGBAValue(const Image* img, unsigned int x, unsigned int y, const GammaCurvePtr& g, unsigned int max, unsigned int& red, unsigned int& green, unsigned int& blue, unsigned int& alpha, DitherStrategy& dh, bool premul)
 {
     bool doPremultiply   = premul && !img->IsPremultiplied() && img->HasTransparency(); // need to apply premultiplication if encoded data should be premul'ed but container content isn't
     bool doUnPremultiply = !premul && img->IsPremultiplied() && img->HasTransparency(); // need to undo premultiplication if other way round
@@ -560,13 +560,13 @@ void GetEncodedRGBAValue(const Image* img, unsigned int x, unsigned int y, const
         // No need for converting between premultiplied and un-premultiplied encoding.
     }
     // else no need to worry about premultiplication
-    DitherHandler::OffsetInfo linOff, encOff;
-    dh.getOffset(x,y,linOff,encOff);
+    DitherStrategy::ColourOffset linOff, encOff;
+    dh.GetOffset(x,y,linOff,encOff);
     red   = IntEncode(g,fRed   + linOff.red,   max, encOff.red,   linOff.red);
     green = IntEncode(g,fGreen + linOff.green, max, encOff.green, linOff.green);
     blue  = IntEncode(g,fBlue  + linOff.blue,  max, encOff.blue,  linOff.blue);
     alpha = IntEncode(fAlpha   + linOff.alpha, max, encOff.alpha, linOff.alpha);
-    dh.setError(x,y,linOff);
+    dh.SetError(x,y,linOff);
 }
 
 float GetEncodedGrayValue(const Image* img, unsigned int x, unsigned int y, const GammaCurvePtr& g)

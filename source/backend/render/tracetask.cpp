@@ -325,7 +325,7 @@ void TraceTask::Finish()
         {
             SNGL scale = 1.0 / (gMaxVal - gMinVal);
             Image::WriteOptions opts;
-            opts.bpcc = 16;
+            opts.bitsPerChannel = 16;
             Image *img = Image::Create(width, height, Image::Gray_Int16, false);
             for (int y = 0 ; y < height ; y++)
                 for (int x = 0 ; x < width ; x++)

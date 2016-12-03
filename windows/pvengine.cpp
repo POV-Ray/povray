@@ -4225,6 +4225,8 @@ LRESULT CALLBACK PovMainWndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM 
            if (seconds % 10 == 0)
            {
              if (PreventSleep && !rendersleep)
+               // TODO FIXME - According to Microsoft's API documentation,
+               // ES_AWAYMODE_REQUIRED has no effect if used without ES_CONTINUOUS.
                SetThreadExecutionState(ES_AWAYMODE_REQUIRED | ES_SYSTEM_REQUIRED);
              if (rendersleep)
                FlashWindow (main_window, true) ;

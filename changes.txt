@@ -163,6 +163,12 @@ Changed Behaviour
   referred to as "IFF-ILBM") is now associated with the `.lbm` file extension,
   in addition to the `.iff` extension.
 
+- The "Compression" setting now affects more file types: Specifying
+  "Compression=1" with file type "T" (Targa) will now generate compressed Targa
+  (same as file type "C"), and explicitly specifying "Compression=0" with file
+  type "P"(Netpbm PPM/PGM) will generate "plain" (ASCII) Netpbm rather than
+  "raw" (binary).
+
 - A long-standing undocumented inconsistency in the treatment of backslashes
   in string literals, in which backslashes were essentially _not_ interpreted
   as escape characters _if_ the parser expected a filename, has been cleaned

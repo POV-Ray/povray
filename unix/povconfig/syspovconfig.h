@@ -107,7 +107,7 @@ using boost::intrusive_ptr;
 const int NULL=0;
 #endif
 
-#define DELETE_FILE(name)  unlink(name)
+#define POV_DELETE_FILE(name)  unlink(name)
 
 #if defined (PATH_MAX)
 # define FILE_NAME_LENGTH   PATH_MAX

@@ -330,9 +330,9 @@ POV_LONG Animation::WriteFrame(OStream *file, const Image *image)
 {
     Image::WriteOptions options;
 
-    options.bpcc = writeOptions.bpcc;
-    options.alphachannel = writeOptions.alphachannel;
-    options.compress = writeOptions.compress;
+    options.bitsPerChannel = writeOptions.bpcc;
+    options.alphaMode = (writeOptions.alphachannel ? Image::kAlphaMode_Default : Image::kAlphaMode_None);
+    options.compression = writeOptions.compress;
     // options.gamma = writeOptions.gamma;
     options.encodingGamma = PowerLawGammaCurve::GetByEncodingGamma(writeOptions.gamma);
 

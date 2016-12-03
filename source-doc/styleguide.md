@@ -216,13 +216,13 @@ be used. The choice of type depends on the context:
 
 When smart pointers are used, some care still needs to be employed in passing around and storing references:
 
-  - When using smart pointers in general, permanent references (e.g. in object data members or global variables) and
-    return values should always be of shared pointer type; however, temporary references should use regular pointer
-    type.
-  - When using shared pointers, function or method parameters _must_ be of shared pointer type if the function or
-    method in question may cause additional permanent references to be created, but _should_ be of regular pointer type
-    otherwise.
-  - When using intrusive pointers, function or method parameters _should always_ be of regular pointer type.
+  - Return values and permanent references (e.g. object data members or global variables) _must_ be of the respective
+    _smart_ pointer type.
+  - Parameters or local variables of functions or methods that are guaranteed to _not_ cause additional permanent
+    references to be created should use regular _reference_ type wherever possible, or _regular_ pointer type otherwise.
+  - Parameters or local variables of Functions or methods that _can_ cause additional permanent references to be created
+    _must_ use _smart_ pointer type when employing shared pointers, but _should_ use _regular_ pointer type when
+    employing intrusive pointers.
 
 @note
     When object ownership is shared between threads, additional considerations may apply. Such cases should be

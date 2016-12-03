@@ -1390,7 +1390,7 @@ FILE *vfeFOpen (const std::basic_string<unsigned short>& name, const char *mode)
 
 bool vfeRemove(const UCS2String& Filename)
 {
-  return (DELETE_FILE (UCS2toASCIIString (Filename).c_str()) == 0);
+  return (POV_DELETE_FILE (UCS2toASCIIString (Filename).c_str()) == 0);
 }
 
 }

@@ -403,18 +403,15 @@ void Write (OStream *file, const Image *image, const Image::WriteOptions& option
 {
     int                         width = image->GetWidth() ;
     int                         height = image->GetHeight() ;
-    int                         quality = options.compress;
+    int                         quality;
     int                         grayscale = image->IsGrayscale();
     POV_JPEG_Write_Buffer       writebuf;
     GammaCurvePtr               gamma;
-    DitherHandlerPtr            dither = GetNoOpDitherHandler(); // dithering doesn't make much sense with JPEG
+    DitherStrategySPtr          dither = GetNoOpDitherStrategy(); // dithering doesn't make much sense with JPEG
 
-    if (options.encodingGamma)
-        gamma = TranscodingGammaCurve::Get(options.workingGamma, options.encodingGamma);
-    else
-        // JPEG files used to have no clearly defined gamma by default, but a W3C recommendation exists for them to use sRGB
-        // unless an ICC profile is present (which we presently don't support).
-        gamma = TranscodingGammaCurve::Get(options.workingGamma, SRGBGammaCurve::Get());
+    // JPEG files used to have no clearly defined gamma by default, but a W3C recommendation exists for them to use sRGB
+    // unless an ICC profile is present (which we presently don't support).
+    gamma = options.GetTranscodingGammaCurve(SRGBGammaCurve::Get());
 
     writebuf.file = file;
 
@@ -464,10 +461,15 @@ void Write (OStream *file, const Image *image, const Image::WriteOptions& option
     // if quality is not specified, we wind the output quality waaaay up (usually needed for raytracing)
     // (This used to be 95% when we still did chroma sub-sampling; without chroma sub-sampling,
     // about the same visual quality and file size is achieved at 85%. - [CLi])
-    if (quality == 0)
+    if (options.compression <= 1)
+        // Negative values indicate default quality; `0` means no compression, but since JPEG is
+        // always lossy we interpret this as "use a reasonably high quality"; and we interpret `1`
+        // as "enable compression", which is the default anyway.
         quality = 85;
-    else if (quality == 1) // this is to catch cases where users use '1' to turn on compression
-        quality = 85;
+    else
+        // Valid values for the JPEG quality setting range from 0 to 100 (though we provide no way
+        // to choose either 0 or 1).
+        quality = clip(int(options.compression), 0, 100);
     jpeg_set_quality(&writebuf.cinfo, quality, TRUE); // quality (range 2 to 100)
 
     if (!grayscale)
