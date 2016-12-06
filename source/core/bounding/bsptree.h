@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file core/support/bsptree.h
+/// @file core/bounding/bsptree.h
 ///
 /// @todo   What's in here?
 ///

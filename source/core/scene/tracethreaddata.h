@@ -46,6 +46,7 @@
 
 #include "core/coretypes.h"
 #include "core/bounding/boundingcylinder.h"
+#include "core/bounding/bsptree.h"
 #include "core/material/pattern.h"
 #include "core/shape/mesh.h"
 #include "core/support/statistics.h"
