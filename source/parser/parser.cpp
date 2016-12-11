@@ -10562,7 +10562,7 @@ void Parser::Convert_Filter_To_Transmit(GenericPigmentBlendMap *pBlendMap)
             Convert_Filter_To_Transmit(i->Vals);
         }
     }
-    else if (ColourBlendMap* pCBlendMap = dynamic_cast<ColourBlendMap*>(pCBlendMap))
+    else if (ColourBlendMap* pCBlendMap = dynamic_cast<ColourBlendMap*>(pBlendMap))
     {
         for (ColourBlendMap::Vector::iterator i = pCBlendMap->Blend_Map_Entries.begin(); i != pCBlendMap->Blend_Map_Entries.end(); i++)
         {
