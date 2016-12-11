@@ -62,7 +62,7 @@
 
 /// Prerelease identifier.
 /// Leave undefined for official releases.
-#define POV_RAY_PRERELEASE "alpha.8901709"
+#define POV_RAY_PRERELEASE "alpha.8913469"
 
 /// @def POV_RAY_VERSION
 /// Full version string.

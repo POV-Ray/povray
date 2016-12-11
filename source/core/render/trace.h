@@ -41,9 +41,9 @@
 
 #include <vector>
 
+#include "core/bounding/bsptree.h"
 #include "core/math/randomsequence.h"
 #include "core/render/ray.h"
-#include "core/support/bsptree.h"
 
 namespace pov
 {

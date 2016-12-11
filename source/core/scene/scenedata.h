@@ -39,6 +39,8 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "core/configcore.h"
 
+#include <map>
+
 #include "base/image/colourspace.h"
 
 #include "core/lighting/radiosity.h"

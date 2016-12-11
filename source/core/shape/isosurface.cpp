@@ -57,6 +57,33 @@ namespace pov
 * Local preprocessor defines
 ******************************************************************************/
 
+struct ISO_Max_Gradient
+{
+    DBL max_gradient, gradient;
+    DBL eval_max, eval_cnt, eval_gradient_sum, eval_var;
+    bool reported;
+
+    ISO_Max_Gradient() :
+        max_gradient(0.0),
+        gradient(0.0),
+        eval_max(0.0),
+        eval_cnt(0.0),
+        eval_gradient_sum(0.0),
+        reported(false),
+        mRefCounter(0)
+    {}
+
+    bool IsShared() const { return mRefCounter > 1; }
+
+private:
+    mutable size_t mRefCounter;
+    friend void intrusive_ptr_add_ref(ISO_Max_Gradient* f);
+    friend void intrusive_ptr_release(ISO_Max_Gradient* f);
+};
+
+inline void intrusive_ptr_add_ref(ISO_Max_Gradient* f) { ++f->mRefCounter; }
+inline void intrusive_ptr_release(ISO_Max_Gradient* f) { if (!(--f->mRefCounter)) delete f; }
+
 
 /*****************************************************************************
 *
@@ -557,19 +584,12 @@ IsoSurface::IsoSurface() :
     eval_param[2] = 0.0; // 0.99; // not necessary
     eval = false;
     closed = true;
-    isCopy = false;
 
     max_gradient = 1.1;
     gradient = 0.0;
     threshold = 0.0;
 
-    mginfo = reinterpret_cast<ISO_Max_Gradient *>(POV_MALLOC(sizeof(ISO_Max_Gradient), "isosurface max_gradient info"));
-    mginfo->refcnt = 1;
-    mginfo->max_gradient = 0.0;
-    mginfo->gradient = 0.0; // not really necessary yet [trf]
-    mginfo->eval_max = 0.0;
-    mginfo->eval_cnt = 0.0;
-    mginfo->eval_gradient_sum = 0.0;
+    mginfo = intrusive_ptr<ISO_Max_Gradient>(new ISO_Max_Gradient());
 }
 
 
@@ -610,10 +630,6 @@ ObjectPtr IsoSurface::Copy()
     New->Trans = Copy_Transform(Trans);
 
     New->mginfo = mginfo;
-    New->mginfo->refcnt++;
-
-    // mark it as copy for use by max_gradient warning code
-    New->isCopy = true;
 
     New->positivePolarity = positivePolarity;
 
@@ -651,8 +667,6 @@ ObjectPtr IsoSurface::Copy()
 
 IsoSurface::~IsoSurface()
 {
-    if(--mginfo->refcnt == 0)
-        POV_FREE(mginfo);
     delete Function;
 }
 
@@ -692,60 +706,63 @@ void IsoSurface::DispatchShutdownMessages(GenericMessenger& messenger)
     mginfo->gradient = max(gradient, mginfo->gradient);
     mginfo->max_gradient = max((DBL)temp_max_gradient, mginfo->max_gradient);
 
-    if (isCopy == false)
+    if (mginfo->IsShared())
     {
-        const FunctionSourceInfo* fnInfo = Function->GetSourceInfo();
+        // Other instances shall take care of reporting the max gradient.
+        mginfo.reset();
+        return;
+    }
 
-        if (fnInfo != NULL)
+    const FunctionSourceInfo* fnInfo = Function->GetSourceInfo();
+
+    if (fnInfo != NULL)
+    {
+        if (eval == false)
         {
-            if (eval == false)
+            // Only show the warning if necessary!
+            // BTW, not being too picky here is a feature and not a bug ;-)  [trf]
+            if ((mginfo->gradient > EPSILON) && (mginfo->max_gradient > EPSILON))
             {
-                // Only show the warning if necessary!
-                // BTW, not being too picky here is a feature and not a bug ;-)  [trf]
-                if ((mginfo->gradient > EPSILON) && (mginfo->max_gradient > EPSILON))
-                {
-                    DBL diff = mginfo->max_gradient - mginfo->gradient;
-                    DBL prop = fabs(mginfo->max_gradient / mginfo->gradient);
+                DBL diff = mginfo->max_gradient - mginfo->gradient;
+                DBL prop = fabs(mginfo->max_gradient / mginfo->gradient);
 
-                    if (((prop <= 0.9) && (diff <= -0.5)) || (((prop <= 0.95) || (diff <= -0.1)) && (mginfo->max_gradient < 10.0)))
-                    {
-                        messenger.WarningAt(kWarningGeneral, fnInfo->filename, fnInfo->filepos.lineno, 0, fnInfo->filepos.offset,
-                                            "The maximum gradient found was %0.3f, but max_gradient of the\n"
-                                            "isosurface was set to %0.3f. The isosurface may contain holes!\n"
-                                            "Adjust max_gradient to get a proper rendering of the isosurface.",
-                                            (float)(mginfo->gradient),
-                                            (float)(mginfo->max_gradient));
-                    }
-                    else if ((diff >= 10.0) || ((prop >= 1.1) && (diff >= 0.5)))
-                    {
-                        messenger.WarningAt(kWarningGeneral, fnInfo->filename, fnInfo->filepos.lineno, 0, fnInfo->filepos.offset,
-                                            "The maximum gradient found was %0.3f, but max_gradient of\n"
-                                            "the isosurface was set to %0.3f. Adjust max_gradient to\n"
-                                            "get a faster rendering of the isosurface.",
-                                            (float)(mginfo->gradient),
-                                            (float)(mginfo->max_gradient));
-                    }
+                if (((prop <= 0.9) && (diff <= -0.5)) || (((prop <= 0.95) || (diff <= -0.1)) && (mginfo->max_gradient < 10.0)))
+                {
+                    messenger.WarningAt(kWarningGeneral, fnInfo->filename, fnInfo->filepos.lineno, 0, fnInfo->filepos.offset,
+                                        "The maximum gradient found was %0.3f, but max_gradient of the\n"
+                                        "isosurface was set to %0.3f. The isosurface may contain holes!\n"
+                                        "Adjust max_gradient to get a proper rendering of the isosurface.",
+                                        (float)(mginfo->gradient),
+                                        (float)(mginfo->max_gradient));
                 }
-            }
-            else
-            {
-                DBL diff = (mginfo->eval_max / max(mginfo->eval_max - mginfo->eval_var, EPSILON));
-
-                if ((eval_param[0] > mginfo->eval_max) || (eval_param[1] > diff))
+                else if ((diff >= 10.0) || ((prop >= 1.1) && (diff >= 0.5)))
                 {
-                    mginfo->eval_cnt = max(mginfo->eval_cnt, 1.0); // make sure it won't be zero
-
-                    messenger.InfoAt(fnInfo->filename, fnInfo->filepos.lineno, 0, fnInfo->filepos.offset,
-                                     "Evaluate found a maximum gradient of %0.3f and an average\n"
-                                     "gradient of %0.3f. The maximum gradient variation was %0.3f.\n",
-                                     (float)(mginfo->eval_max),
-                                     (float)(mginfo->eval_gradient_sum / mginfo->eval_cnt),
-                                     (float)(mginfo->eval_var));
+                    messenger.WarningAt(kWarningGeneral, fnInfo->filename, fnInfo->filepos.lineno, 0, fnInfo->filepos.offset,
+                                        "The maximum gradient found was %0.3f, but max_gradient of\n"
+                                        "the isosurface was set to %0.3f. Adjust max_gradient to\n"
+                                        "get a faster rendering of the isosurface.",
+                                        (float)(mginfo->gradient),
+                                        (float)(mginfo->max_gradient));
                 }
             }
         }
-    }
+        else
+        {
+            DBL diff = (mginfo->eval_max / max(mginfo->eval_max - mginfo->eval_var, EPSILON));
 
+            if ((eval_param[0] > mginfo->eval_max) || (eval_param[1] > diff))
+            {
+                mginfo->eval_cnt = max(mginfo->eval_cnt, 1.0); // make sure it won't be zero
+
+                messenger.InfoAt(fnInfo->filename, fnInfo->filepos.lineno, 0, fnInfo->filepos.offset,
+                                    "Evaluate found a maximum gradient of %0.3f and an average\n"
+                                    "gradient of %0.3f. The maximum gradient variation was %0.3f.\n",
+                                    (float)(mginfo->eval_max),
+                                    (float)(mginfo->eval_gradient_sum / mginfo->eval_cnt),
+                                    (float)(mginfo->eval_var));
+            }
+        }
+    }
 }
 
 /*****************************************************************************

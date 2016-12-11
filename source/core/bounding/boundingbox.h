@@ -48,7 +48,7 @@ namespace pov
 //##############################################################################
 ///
 /// @defgroup PovCoreBoundingBox Bounding Boxes
-/// @ingroup PovCore
+/// @ingroup PovCoreBounding
 ///
 /// @{
 

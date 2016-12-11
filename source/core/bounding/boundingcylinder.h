@@ -47,7 +47,7 @@ namespace pov
 //##############################################################################
 ///
 /// @defgroup PovCoreBoundingCylinder Bounding Cylinders
-/// @ingroup PovCore
+/// @ingroup PovCoreBounding
 ///
 /// @{
 

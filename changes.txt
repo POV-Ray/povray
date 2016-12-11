@@ -234,6 +234,7 @@ Reported via GitHub:
 - #49 ("Latest version from Git won't build with MS Visual Studio 2015")
 - #50 ("Make error in Ubuntu 14.04")
 - #53 ("Standard include files may mess up the language version")
+- #114 ("Port of FS298 - The warning for isosurface does not appears as often as with 3.6.1")
 - #129 ("Port of FS331 - Intersection causes quadric to disappear")
 - #153 ("vector list trailing comma error sor lathe sphere_sweep")
 
@@ -242,6 +243,7 @@ Reported via FlySpray:
 - FS#254 ("Mesh_camera type 0 output seems to be incorrect")
 - FS#261 ("mesh_camera distribution type 3 output image is placed 0.5 pixels to wrong")
 - FS#270 ("render abort-continue (+C) sometimes skips blocks")
+  FS#298 ("the warning for isosurface does not appears as often as with 3.6.1")
 - FS#313 ("radiosity.cpp pov::RadiosityFunction::BeforeTile assertion failed")
 - FS#314 ("reading Gif is bugged in 3.7")
 - FS#315 ("inverse keyword does not work properly with quadrics")

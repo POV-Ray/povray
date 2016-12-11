@@ -664,10 +664,11 @@ void Lemon::Compute_Lemon_Data(GenericMessenger& messenger, pov_base::ITextStrea
     DBL low = sqrt(base_radius*base_radius*base_radius*base_radius - 2*base_radius*base_radius*(apex_radius*apex_radius-1.0)+(apex_radius*apex_radius+1.0)*(apex_radius*apex_radius+1.0))/2.0;
     if (inner_radius < low )
     {
-        std::stringstream o;
         inner_radius = low;
-        o << "Inner (last) radius of lemon is too small. Minimal would be "<< (inner_radius*len) << ". Value has been adjusted.";
-        messenger.WarningAt(kWarningGeneral, FileHandle->name(), Token_File_Pos.lineno, Token_Col_No, FileHandle->tellg().offset,"%s",o.str().c_str());
+        messenger.WarningAt(kWarningGeneral, FileHandle->name(), Token_File_Pos.lineno,
+                            Token_Col_No, FileHandle->tellg().offset,
+                            "Inner (last) radius of lemon is too small. Minimal would be %g. Value has been adjusted.",
+                            inner_radius * len);
     }
 
     DBL f = sqrt(-(base_radius*base_radius-2.0*base_radius*apex_radius+apex_radius*apex_radius-4.0*inner_radius*inner_radius+1.0)/(base_radius*base_radius-2.0*base_radius*apex_radius+apex_radius*apex_radius+1.0));

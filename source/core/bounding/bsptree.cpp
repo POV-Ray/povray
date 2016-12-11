@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file core/support/bsptree.cpp
+/// @file core/bounding/bsptree.cpp
 ///
 /// @todo   What's in here?
 ///
@@ -34,7 +34,7 @@
 //******************************************************************************
 
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
-#include "core/support/bsptree.h"
+#include "core/bounding/bsptree.h"
 
 #include <vector>
 #include <list>

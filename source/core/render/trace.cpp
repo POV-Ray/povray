@@ -40,6 +40,7 @@
 
 #include <boost/bind.hpp>
 
+#include "core/bounding/bsptree.h"
 #include "core/lighting/lightsource.h"
 #include "core/lighting/radiosity.h"
 #include "core/lighting/subsurface.h"
@@ -57,7 +58,6 @@
 #include "core/scene/tracethreaddata.h"
 #include "core/shape/box.h"
 #include "core/shape/csg.h"
-#include "core/support/bsptree.h"
 #include "core/support/imageutil.h"
 
 // this must be the last file included

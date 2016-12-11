@@ -200,9 +200,6 @@
     <ClCompile Include="..\..\source\core\colour\spectral.cpp">
       <Filter>Core Source\Colour</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\core\support\bsptree.cpp">
-      <Filter>Core Source\Support</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\core\math\chi2.cpp">
       <Filter>Core Source\Math</Filter>
     </ClCompile>
@@ -262,6 +259,12 @@
     </ClCompile>
     <ClCompile Include="..\..\source\core\math\randcosweighted.cpp">
       <Filter>Core Source\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\bounding\bounding.cpp">
+      <Filter>Core Source\Bounding</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\bounding\bsptree.cpp">
+      <Filter>Core Source\Bounding</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -415,9 +418,6 @@
     <ClInclude Include="..\..\source\core\colour\spectral.h">
       <Filter>Core Headers\Colour</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\core\support\bsptree.h">
-      <Filter>Core Headers\Support</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\core\math\chi2.h">
       <Filter>Core Headers\Math</Filter>
     </ClInclude>
@@ -477,6 +477,12 @@
     </ClInclude>
     <ClInclude Include="..\..\source\core\math\randcosweighted.h">
       <Filter>Core Headers\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\bounding\bounding.h">
+      <Filter>Core Headers\Bounding</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\bounding\bsptree.h">
+      <Filter>Core Headers\Bounding</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

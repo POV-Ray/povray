@@ -1,8 +1,8 @@
 //******************************************************************************
 ///
-/// @file core/bounding/boundingsphere.h
+/// @file core/bounding/bounding.h
 ///
-/// Declarations related to bounding spheres (used by blob).
+/// Declarations related to bounding mechanisms.
 ///
 /// @copyright
 /// @parblock
@@ -33,45 +33,23 @@
 ///
 //******************************************************************************
 
-#ifndef POVRAY_CORE_BOUNDINGSPHERE_H
-#define POVRAY_CORE_BOUNDINGSPHERE_H
+#ifndef POVRAY_CORE_BOUNDING_H
+#define POVRAY_CORE_BOUNDING_H
 
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "core/configcore.h"
-
-#include "core/math/vector.h"
 
 namespace pov
 {
 
 //##############################################################################
 ///
-/// @defgroup PovCoreBoundingSphere Bounding Spheres
-/// @ingroup PovCoreBounding
+/// @defgroup PovCoreBounding Bounding
+/// @ingroup PovCore
 ///
 /// @{
 
-/*****************************************************************************
-* Global typedefs
-******************************************************************************/
-
-typedef struct BSphere_Tree_Struct BSPHERE_TREE;
-
-struct BSphere_Tree_Struct
-{
-    short Entries;       /* Number of components (node if 0)    */
-    Vector3d C;          /* Center of bounding sphere           */
-    DBL r2;              /* Radius^2 of bounding sphere         */
-    BSPHERE_TREE **Node; /* if node: children; if leaf: element */
-};
-
-
-/*****************************************************************************
-* Global functions
-******************************************************************************/
-
-void Build_Bounding_Sphere_Hierarchy (BSPHERE_TREE **Root, int nElem, BSPHERE_TREE ***Elements);
-void Destroy_Bounding_Sphere_Hierarchy (BSPHERE_TREE *Node);
+// nothing in here yet.
 
 /// @}
 ///
@@ -79,4 +57,4 @@ void Destroy_Bounding_Sphere_Hierarchy (BSPHERE_TREE *Node);
 
 }
 
-#endif // POVRAY_CORE_BOUNDINGSPHERE_H
+#endif // POVRAY_CORE_BOUNDING_H

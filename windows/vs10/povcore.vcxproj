@@ -343,9 +343,11 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\source\core\bounding\bounding.cpp" />
     <ClCompile Include="..\..\source\core\bounding\boundingbox.cpp" />
     <ClCompile Include="..\..\source\core\bounding\boundingcylinder.cpp" />
     <ClCompile Include="..\..\source\core\bounding\boundingsphere.cpp" />
+    <ClCompile Include="..\..\source\core\bounding\bsptree.cpp" />
     <ClCompile Include="..\..\source\core\colour\spectral.cpp" />
     <ClCompile Include="..\..\source\core\lighting\lightgroup.cpp" />
     <ClCompile Include="..\..\source\core\lighting\lightsource.cpp" />
@@ -403,7 +405,6 @@
     <ClCompile Include="..\..\source\core\shape\torus.cpp" />
     <ClCompile Include="..\..\source\core\shape\triangle.cpp" />
     <ClCompile Include="..\..\source\core\shape\truetype.cpp" />
-    <ClCompile Include="..\..\source\core\support\bsptree.cpp" />
     <ClCompile Include="..\..\source\core\support\imageutil.cpp" />
     <ClCompile Include="..\..\source\core\support\octree.cpp" />
     <ClCompile Include="..\..\source\core\support\statisticids.cpp" />
@@ -417,9 +418,11 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\source\core\bounding\bounding.h" />
     <ClInclude Include="..\..\source\core\bounding\boundingbox.h" />
     <ClInclude Include="..\..\source\core\bounding\boundingcylinder.h" />
     <ClInclude Include="..\..\source\core\bounding\boundingsphere.h" />
+    <ClInclude Include="..\..\source\core\bounding\bsptree.h" />
     <ClInclude Include="..\..\source\core\colour\spectral.h" />
     <ClInclude Include="..\..\source\core\configcore.h" />
     <ClInclude Include="..\..\source\core\coretypes.h" />
@@ -480,7 +483,6 @@
     <ClInclude Include="..\..\source\core\shape\torus.h" />
     <ClInclude Include="..\..\source\core\shape\triangle.h" />
     <ClInclude Include="..\..\source\core\shape\truetype.h" />
-    <ClInclude Include="..\..\source\core\support\bsptree.h" />
     <ClInclude Include="..\..\source\core\support\imageutil.h" />
     <ClInclude Include="..\..\source\core\support\octree.h" />
     <ClInclude Include="..\..\source\core\support\simplevector.h" />
