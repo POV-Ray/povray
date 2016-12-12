@@ -36,6 +36,14 @@ POV-Ray is being developed with portability high in mind. In practice and at pre
             contain boolean constants (`true` or `false`) after macro expansion. The integer constants `0` and `1`,
             respectively, should be used instead. [MS Visual Studio 2013 and earlier]
 
+  - As an exception to the above, the following C++11 constructs are fair game, as they has been supported by all major
+    compiler brands for quite a while now and are thought to provide significant benefit:
+      - `decltype(v)`, with `v` being a simple variable or class member (as opposed to a more complex expression)
+    @note
+        Other C++11 features may be added to the above list upon request if a reasonable case can be made in their
+        favour. Note however that at present we will only consider features that have been supported by GCC as early as
+        version 4.6, by Clang as early as version 4.2, and by MSVC as early as version 10 (Visual Studio 2010).
+
   - Source code should avoid potential conflicts with later standard extensions to the C++ language, most notably
     ISO-IEC DTR 19768 (aka TR1) and ISO-IEC 14882-2011 (aka C++11).
 

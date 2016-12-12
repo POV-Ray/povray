@@ -1,12 +1,25 @@
 @page compiler  Compiler Requirements
 
 
-General Presumptions
-====================
+Compiling POV-Ray requires a compiler compatible with the C++03 language standard as defined by
+ISO-IEC 14882-2003. However, the following additional requirements apply.
 
-While POV-Ray is being developed with portability high in mind, the C++ standard allows for some degrees of freedom that
-we consider too exotic to cater to. We therefore presume all compilers and runtime environments to adhere to the
-following restrictions:
+
+Language Extensions
+===================
+
+Compiling POV-Ray will require support for the following language extensions beyond C++03:
+
+  - `decltype(v)`, as introduced with the C++11 language standard, must be supported at least for
+    cases where `v` is a simple variable or class member.
+
+
+Exotic Environments
+===================
+
+The following properties are categorized as "implementation-defined" (meaning that they may vary
+across compilers), but we currently consider any deviations from the most common behaviour too
+exotic to cater to:
 
   - **Char Size**: The `char` data type is currently presumed to be exactly 8 bits wide.
 
@@ -26,6 +39,20 @@ Failure to meet the above restrictions will result in undefined behaviour.
 Further restrictions may apply, but shall prompt a compile-time error if not satisfied.
 
 
+Incompatibility Creep
+=====================
+
+The following limitations have also crept in over time, due to contemporary implementations rarely
+deviating from them. New code is strongly discouraged from relying on them, but some legacy code may
+still rely on them:
+
+  - **Int Size**: Some existing code may currently presume the `int` data type to be exactly
+    32 bits wide.
+
+  - **Signed Integers**: Some existing code may currently presume signed integers to be stored
+    in two's complement format.
+
+
 POVMS Additional Restrictions
 =============================
 
@@ -35,3 +62,6 @@ imposes the following additional restriction on the compiler:
   - **Multicharacter Literals**: The internal representation of a 4-character _multicharacter literal_ is presumed to
     be identical to the first 4 bytes of a corresponding string literal (e.g. `'abcd'` is presumed to have the same
     binary representation as `"abcd"` would have without the terminating _null_ character).
+    @todo
+        Verify that this restriction does indeed exist, or whether mechanisms are already in place
+        to detect and work around differing behaviour.
