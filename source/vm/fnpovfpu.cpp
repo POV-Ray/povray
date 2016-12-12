@@ -1621,7 +1621,7 @@ GenericScalarFunctionPtr FunctionVM::CustomFunction::Clone() const
     return new CustomFunction(mpVm.get(), mpVm->CopyFunction(mpFn));
 }
 
-const FunctionSourceInfo* FunctionVM::CustomFunction::GetSourceInfo() const
+const SourceInfo* FunctionVM::CustomFunction::GetSourceInfo() const
 {
     return &(mpVm->GetFunction(*mpFn)->sourceInfo);
 }

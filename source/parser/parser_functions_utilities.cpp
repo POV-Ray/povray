@@ -225,7 +225,7 @@ FUNCTION_PTR Parser::Parse_DeclareFunction(int *token_id, const char *fn_name, b
     Get_Token();
     if(Token.Token_Id == INTERNAL_TOKEN)
     {
-        GET(LEFT_PAREN_TOKEN);
+        Parse_Paren_Begin();
 
         Get_Token();
         if(Token.Function_Id != FLOAT_TOKEN)
@@ -234,7 +234,7 @@ FUNCTION_PTR Parser::Parse_DeclareFunction(int *token_id, const char *fn_name, b
 
         function.flags = FN_INLINE_FLAG;
 
-        GET(RIGHT_PAREN_TOKEN);
+        Parse_Paren_End();
     }
     else if(Token.Token_Id == TRANSFORM_TOKEN)
     {

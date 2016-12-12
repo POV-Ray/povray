@@ -104,7 +104,8 @@ DBL Parser::Parse_Float_Param()
     bool old_allow_id = Allow_Identifier_In_Call;
     Allow_Identifier_In_Call = false;
 
-    GET(LEFT_PAREN_TOKEN);
+    Parse_Paren_Begin();
+
     Parse_Express(Express,&Terms);
 
     if (Terms>1)
@@ -114,7 +115,7 @@ DBL Parser::Parse_Float_Param()
 
     Local = Express[0];
 
-    GET(RIGHT_PAREN_TOKEN);
+    Parse_Paren_End();
 
     Allow_Identifier_In_Call = old_allow_id;
 
@@ -146,11 +147,11 @@ void Parser::Parse_Float_Param2(DBL *Val1,DBL *Val2)
     bool old_allow_id = Allow_Identifier_In_Call;
     Allow_Identifier_In_Call = false;
 
-    GET (LEFT_PAREN_TOKEN);
+    Parse_Paren_Begin();
     *Val1 = Parse_Float();
     Parse_Comma();
     *Val2 = Parse_Float();
-    GET (RIGHT_PAREN_TOKEN);
+    Parse_Paren_End();
 
     Allow_Identifier_In_Call = old_allow_id;
 }
@@ -177,9 +178,9 @@ void Parser::Parse_Float_Param2(DBL *Val1,DBL *Val2)
 
 void Parser::Parse_Vector_Param(Vector3d& Vector)
 {
-    GET(LEFT_PAREN_TOKEN);
+    Parse_Paren_Begin();
     Parse_Vector(Vector);
-    GET(RIGHT_PAREN_TOKEN);
+    Parse_Paren_End();
 }
 
 
@@ -204,11 +205,11 @@ void Parser::Parse_Vector_Param(Vector3d& Vector)
 
 void Parser::Parse_Vector_Param2(Vector3d& Val1, Vector3d& Val2)
 {
-    GET (LEFT_PAREN_TOKEN);
+    Parse_Paren_Begin();
     Parse_Vector(Val1);
     Parse_Comma();
     Parse_Vector(Val2);
-    GET (RIGHT_PAREN_TOKEN);
+    Parse_Paren_End();
 }
 
 /*****************************************************************************
@@ -237,7 +238,7 @@ void Parser::Parse_Trace(Vector3d& Res)
     Ray ray(ticket);
     Vector3d Local_Normal;
 
-    GET (LEFT_PAREN_TOKEN);
+    Parse_Paren_Begin();
 
     EXPECT_ONE
         CASE (OBJECT_ID_TOKEN)
@@ -295,8 +296,7 @@ void Parser::Parse_Trace(Vector3d& Res)
         END_CASE
     END_EXPECT
 
-    GET (RIGHT_PAREN_TOKEN);
-
+    Parse_Paren_End();
 }
 
 /*****************************************************************************
@@ -323,7 +323,7 @@ int Parser::Parse_Inside()
     Vector3d Local_Vector;
     int Result = 0;
 
-    GET (LEFT_PAREN_TOKEN);
+    Parse_Paren_Begin();
 
     EXPECT_ONE
         CASE (OBJECT_ID_TOKEN)
@@ -350,7 +350,7 @@ int Parser::Parse_Inside()
     else
         Result = 0;
 
-    GET (RIGHT_PAREN_TOKEN);
+    Parse_Paren_End();
 
     return Result;
 }
@@ -383,21 +383,20 @@ bool Parser::Parse_Call()
 {
     if(Allow_Identifier_In_Call)
     {
-        EXPECT_ONE
-            CASE(LEFT_PAREN_TOKEN)
-                Identifier_In_Call = false;
-                return true;
-            END_CASE
-        END_EXPECT
-
-        UNGET
-
-        Identifier_In_Call = true;
-        return false;
+        if (Parse_Paren_Begin(false))
+        {
+            Identifier_In_Call = false;
+            return true;
+        }
+        else
+        {
+            Identifier_In_Call = true;
+            return false;
+        }
     }
     else
     {
-        GET(LEFT_PAREN_TOKEN)
+        Parse_Paren_Begin();
     }
 
     return true;
@@ -459,7 +458,7 @@ DBL Parser::Parse_Function_Call()
     }
     params[param] = Parse_Float();
 
-    GET (RIGHT_PAREN_TOKEN);
+    Parse_Paren_End();
 
     for(param = 0; param < f->parameter_cnt; param++)
         fnVMContext->SetLocal(param, params[param]);
@@ -528,7 +527,7 @@ void Parser::Parse_Vector_Function_Call(EXPRESS& Express, int *Terms)
     }
     params[param] = Parse_Float();
 
-    GET (RIGHT_PAREN_TOKEN);
+    Parse_Paren_End();
 
     for(param = 0; param < f->parameter_cnt; param++)
         fnVMContext->SetLocal(param + f->return_size, params[param]);
@@ -613,7 +612,7 @@ void Parser::Parse_Spline_Call(EXPRESS& Express, int *Terms)
                 break;
         }
 
-        GET(RIGHT_PAREN_TOKEN);
+        Parse_Paren_End();
         Get_Spline_Val(spline, Val, Express, Terms);
         Destroy_Spline(spline);
         spline = NULL;
@@ -621,7 +620,7 @@ void Parser::Parse_Spline_Call(EXPRESS& Express, int *Terms)
     else
     {
         UNGET
-        GET(RIGHT_PAREN_TOKEN);
+        Parse_Paren_End();
         Get_Spline_Val(spline, Val, Express, Terms);
 
         // we claimed dibs on the spline, so now that we're done with it we must say so
@@ -703,19 +702,19 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                     break;
 
                 case VAL_TOKEN:
-                    GET (LEFT_PAREN_TOKEN);
+                    Parse_Paren_Begin();
                     Local_C_String=Parse_C_String();
                     Val = atof(Local_C_String);
                     POV_FREE(Local_C_String);
-                    GET (RIGHT_PAREN_TOKEN);
+                    Parse_Paren_End();
                     break;
 
                 case ASC_TOKEN:
-                    GET (LEFT_PAREN_TOKEN);
+                    Parse_Paren_Begin();
                     Local_String=Parse_String();
                     Val = (DBL)Local_String[0];
                     POV_FREE(Local_String);
-                    GET (RIGHT_PAREN_TOKEN);
+                    Parse_Paren_End();
                     break;
 
                 case ASIN_TOKEN:
@@ -797,7 +796,7 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                     break;
 
                 case FILE_EXISTS_TOKEN:
-                    GET (LEFT_PAREN_TOKEN);
+                    Parse_Paren_Begin();
 
                     Local_C_String=Parse_C_String();
 
@@ -807,7 +806,7 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
 
                     POV_FREE(Local_C_String);
 
-                    GET (RIGHT_PAREN_TOKEN);
+                    Parse_Paren_End();
                     break;
 
                 case FLOAT_ID_TOKEN:
@@ -847,7 +846,7 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                     break;
 
                 case BITWISE_AND_TOKEN:
-                    GET (LEFT_PAREN_TOKEN);
+                    Parse_Paren_Begin();
                     l1 = (int)Parse_Float();
                     EXPECT
                         CASE(COMMA_TOKEN)
@@ -857,15 +856,15 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
 
                         OTHERWISE
                             UNGET
-                            GET (RIGHT_PAREN_TOKEN);
                             EXIT
                         END_CASE
                     END_EXPECT
+                    Parse_Paren_End();
                     Val = (DBL)l1;
                     break;
 
                 case BITWISE_XOR_TOKEN:
-                    GET (LEFT_PAREN_TOKEN);
+                    Parse_Paren_Begin();
                     l1 = (int)Parse_Float();
                     EXPECT
                         CASE(COMMA_TOKEN)
@@ -875,15 +874,15 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
 
                         OTHERWISE
                             UNGET
-                            GET (RIGHT_PAREN_TOKEN);
                             EXIT
                         END_CASE
                     END_EXPECT
+                    Parse_Paren_End();
                     Val = (DBL)l1;
                     break;
 
                 case BITWISE_OR_TOKEN:
-                    GET (LEFT_PAREN_TOKEN);
+                    Parse_Paren_Begin();
                     l1 = (int)Parse_Float();
                     EXPECT
                         CASE(COMMA_TOKEN)
@@ -893,15 +892,15 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
 
                         OTHERWISE
                             UNGET
-                            GET (RIGHT_PAREN_TOKEN);
                             EXIT
                         END_CASE
                     END_EXPECT
+                    Parse_Paren_End();
                     Val = (DBL)l1;
                     break;
 
                 case MAX_TOKEN:
-                    GET (LEFT_PAREN_TOKEN);
+                    Parse_Paren_Begin();
                     Val = Parse_Float();
                     EXPECT
                         CASE(COMMA_TOKEN)
@@ -911,14 +910,14 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
 
                         OTHERWISE
                             UNGET
-                            GET (RIGHT_PAREN_TOKEN);
                             EXIT
                         END_CASE
                     END_EXPECT
+                    Parse_Paren_End();
                     break;
 
                 case MIN_TOKEN:
-                    GET (LEFT_PAREN_TOKEN);
+                    Parse_Paren_Begin();
                     Val = Parse_Float();
                     EXPECT
                         CASE(COMMA_TOKEN)
@@ -928,14 +927,14 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
 
                         OTHERWISE
                             UNGET
-                            GET (RIGHT_PAREN_TOKEN);
                             EXIT
                         END_CASE
                     END_EXPECT
+                    Parse_Paren_End();
                     break;
 
                 case SELECT_TOKEN:
-                    GET (LEFT_PAREN_TOKEN);
+                    Parse_Paren_Begin();
                     Val = Parse_Float();
                     Parse_Comma();
                     less_val = Parse_Float();
@@ -944,7 +943,6 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                     EXPECT_ONE
                         CASE(COMMA_TOKEN)
                             greater_val = Parse_Float();
-                            GET (RIGHT_PAREN_TOKEN);
                             if(Val < 0.0)
                                 Val = less_val;
                             else if(Val == 0.0)
@@ -955,13 +953,13 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
 
                         OTHERWISE
                             UNGET
-                            GET (RIGHT_PAREN_TOKEN);
                             if(Val < 0.0)
                                 Val = less_val;
                             else
                                 Val = equal_val;
                         END_CASE
                     END_EXPECT
+                    Parse_Paren_End();
                     break;
 
                 case MOD_TOKEN:
@@ -1006,22 +1004,22 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                     break;
 
                 case STRCMP_TOKEN:
-                    GET (LEFT_PAREN_TOKEN);
+                    Parse_Paren_Begin();
                     Local_String=Parse_String();
                     Parse_Comma();
                     Local_String2=Parse_String();
                     Val = (DBL)UCS2_strcmp(Local_String, Local_String2);
                     POV_FREE(Local_String);
                     POV_FREE(Local_String2);
-                    GET (RIGHT_PAREN_TOKEN);
+                    Parse_Paren_End();
                     break;
 
                 case STRLEN_TOKEN:
-                    GET (LEFT_PAREN_TOKEN);
+                    Parse_Paren_Begin();
                     Local_String=Parse_String();
                     Val = (DBL)UCS2_strlen(Local_String);
                     POV_FREE(Local_String);
-                    GET (RIGHT_PAREN_TOKEN);
+                    Parse_Paren_End();
                     break;
 
                 case TAN_TOKEN:
@@ -1079,15 +1077,15 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                     break;
 
                 case DIMENSIONS_TOKEN:
-                    GET(LEFT_PAREN_TOKEN)
+                    Parse_Paren_Begin();
                     GET(ARRAY_ID_TOKEN)
                     a = reinterpret_cast<POV_ARRAY *>(*(Token.DataPtr));
                     Val = a->Dims+1;
-                    GET(RIGHT_PAREN_TOKEN)
+                    Parse_Paren_End();
                     break;
 
                 case DIMENSION_SIZE_TOKEN:
-                    GET(LEFT_PAREN_TOKEN)
+                    Parse_Paren_Begin();
                     GET(ARRAY_ID_TOKEN)
                     Parse_Comma();
                     a = reinterpret_cast<POV_ARRAY *>(*(Token.DataPtr));
@@ -1096,7 +1094,7 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                         Val = 0.0;
                     else
                         Val = a->Sizes[i];
-                    GET(RIGHT_PAREN_TOKEN)
+                    Parse_Paren_End();
                     break;
 
                 case NOW_TOKEN:
@@ -1117,13 +1115,13 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
             switch(Token.Function_Id)
             {
                 case VAXIS_ROTATE_TOKEN:
-                    GET (LEFT_PAREN_TOKEN);
+                    Parse_Paren_Begin();
                     Parse_Vector(Vect2);
                     Parse_Comma();
                     Parse_Vector(Vect3);
                     Parse_Comma();
                     Val=Parse_Float()*M_PI_180;
-                    GET (RIGHT_PAREN_TOKEN);
+                    Parse_Paren_End();
                     Compute_Axis_Rotation_Transform(&Trans,Vect3,Val);
                     MTransPoint(Vect, Vect2, &Trans);
                     break;
@@ -1156,7 +1154,7 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                     break;
 
                 case VTURBULENCE_TOKEN:
-                    GET (LEFT_PAREN_TOKEN);
+                    Parse_Paren_Begin();
                     Turb.Lambda = Parse_Float();
                     Parse_Comma();
                     Turb.Omega = Parse_Float();
@@ -1169,7 +1167,7 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                     Parse_Comma();
                     Parse_Vector(Vect2); // input vector
                     Parse_Comma();
-                    GET (RIGHT_PAREN_TOKEN);
+                    Parse_Paren_End();
                     DTurbulence(Vect, Vect2, &Turb);
                     break;
 
@@ -1190,7 +1188,7 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                     break;
 
                 case MIN_EXTENT_TOKEN:
-                    GET (LEFT_PAREN_TOKEN);
+                    Parse_Paren_Begin();
                     EXPECT_ONE
                         CASE (OBJECT_ID_TOKEN)
                             Object = reinterpret_cast<ObjectPtr>(Token.Data);
@@ -1204,12 +1202,11 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                             UNGET
                         END_CASE
                     END_EXPECT
-
-                    GET (RIGHT_PAREN_TOKEN);
+                    Parse_Paren_End();
                     break;
 
                 case MAX_EXTENT_TOKEN:
-                    GET (LEFT_PAREN_TOKEN);
+                    Parse_Paren_Begin();
                     EXPECT_ONE
                         CASE (OBJECT_ID_TOKEN)
                             Object = reinterpret_cast<ObjectPtr>(Token.Data);
@@ -1244,7 +1241,7 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                             UNGET
                         END_CASE
                     END_EXPECT
-                    GET (RIGHT_PAREN_TOKEN);
+                    Parse_Paren_End();
                     break;
             }
 
@@ -1329,8 +1326,10 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
         END_CASE
 
         CASE (LEFT_PAREN_TOKEN)
+            UNGET
+            Parse_Paren_Begin();
             Parse_Express(Express,Terms);
-            GET(RIGHT_PAREN_TOKEN);
+            Parse_Paren_End();
         END_CASE
 
 /* This case parses a 2, 3, 4, or 5 term vector.  First parse 2 terms.
@@ -1338,6 +1337,10 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
  */
 
         CASE (LEFT_ANGLE_TOKEN)
+            UNGET
+
+            Parse_Angle_Begin();
+
             Express[X] = Parse_Float();   Parse_Comma();
             Express[Y] = Parse_Float();   Parse_Comma();
             *Terms=2;
@@ -1379,7 +1382,8 @@ void Parser::Parse_Num_Factor (EXPRESS& Express,int *Terms)
                 END_CASE
             END_EXPECT
 
-            GET (RIGHT_ANGLE_TOKEN)
+            Parse_Angle_End();
+
         END_CASE
 
         OTHERWISE
@@ -1745,7 +1749,8 @@ DBL Parser::Parse_Rel_String_Term (const UCS2 *lhs)
 
         OTHERWISE
             Expectation_Error("string comparison operator");
-            EXIT
+
+            return 0.0;
         END_CASE
     END_EXPECT
 }
@@ -2859,6 +2864,9 @@ shared_ptr<MAP_T> Parser::Parse_Blend_Map (BlendMapTypeId Blend_Type,int Pat_Typ
 
             EXPECT
                 CASE (LEFT_SQUARE_TOKEN)
+                    UNGET
+                    Parse_Square_Begin();
+
                     switch (Pat_Type)
                     {
                         case AVERAGE_PATTERN:
@@ -2875,7 +2883,7 @@ shared_ptr<MAP_T> Parser::Parse_Blend_Map (BlendMapTypeId Blend_Type,int Pat_Typ
                     Parse_BlendMapData<typename MAP_T::Data> (Blend_Type, Temp_Ent.Vals);
                     tempList.push_back(Temp_Ent);
 
-                    GET (RIGHT_SQUARE_TOKEN);
+                    Parse_Square_End();
                 END_CASE
 
                 OTHERWISE
@@ -3389,6 +3397,9 @@ ColourBlendMapPtr Parser::Parse_Colour_Map<ColourBlendMap> ()
 
             EXPECT
                 CASE (LEFT_SQUARE_TOKEN)
+                    UNGET
+                    Parse_Square_Begin();
+
                     Temp_Ent.value = Parse_Float();  Parse_Comma();
 
                     EXPECT_ONE
@@ -3431,7 +3442,7 @@ ColourBlendMapPtr Parser::Parse_Colour_Map<ColourBlendMap> ()
 
                     END_EXPECT
 
-                    GET (RIGHT_SQUARE_TOKEN);
+                    Parse_Square_End();
                 END_CASE
 
                 OTHERWISE
