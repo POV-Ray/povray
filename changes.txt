@@ -72,9 +72,6 @@ Materials:
   - Colour and pigment maps now support non-linear interpolation to achieve more
     pleasing gradients.
 
-  - The `brilliance` effect can now be applied not only to incoming light, but
-    also to outgoing light, making the effect phyiscally more realistic.
-
   - Fresnel angle-dependent attenuation can now also be applied to highlights
     and the diffuse component for more physical realism.
 

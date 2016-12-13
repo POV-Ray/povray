@@ -1158,7 +1158,9 @@ FINISH *Create_Finish()
     New->Diffuse                = 0.6;
     New->DiffuseBack            = 0.0;
     New->Brilliance             = 1.0;
+#if POV_PARSER_EXPERIMENTAL_BRILLIANCE_OUT
     New->BrillianceOut          = 1.0;
+#endif
     New->BrillianceAdjust       = 1.0;
     New->BrillianceAdjustRad    = 1.0;
     New->Phong                  = 0.0;

@@ -2280,8 +2280,10 @@ void Parser::Parse_Finish (FINISH **Finish_Ptr)
 
         CASE (BRILLIANCE_TOKEN)
             New->Brilliance = Parse_Float ();
+#if POV_PARSER_EXPERIMENTAL_BRILLIANCE_OUT
             Parse_Comma();
             New->BrillianceOut = Allow_Float(1.0);
+#endif
         END_CASE
 
         CASE (DIFFUSE_TOKEN)
