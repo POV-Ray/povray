@@ -30,6 +30,826 @@ Notes:
 POV-Ray v???
 ------------------------------------------------------------------------------
 
+Commit 2e6787a on 2016-12-12 by Christoph Lipka
+
+    Address GitHub issue #160 by including round, square and angle brackets
+    in the brace nesting limit.
+
+Commit f618086 on 2016-12-12 by Christoph Lipka
+
+    [ci skip] Update source docs to allow the C++11 `decltype()` feature
+    in well-defined cases.
+
+------------------------------------------------------------------------------
+POV-Ray v3.7.1-alpha.8913469
+------------------------------------------------------------------------------
+
+Commit 3f1de0d on 2016-12-11 by Christoph Lipka
+
+    Fix GitHub issue #114 (FlySpray 298).
+
+Commit 7d9671d on 2016-12-11 by Christoph Lipka
+
+    Fix a bug related to colour blend maps in v3.1 (and earlier) legacy
+    scenes.
+
+Commit d58bc85 on 2016-12-06 by Christoph Lipka
+
+    Moved and added some bounding-related source files.
+
+------------------------------------------------------------------------------
+POV-Ray v3.7.1-alpha.8901709
+------------------------------------------------------------------------------
+
+Commit 015e45b on 2016-12-03 by William F. Pokorny (wfpokorny)
+
+    Improving unix console messages with SDL display use. (#109)
+
+    The end render message:  Press a key or click the display to continue...
+    for unix versions has long been inaccurate because you cannot click any
+    key, but rather only a few specific ones.  Pauses with 'p' also gave no
+    clue in the paused message to use 'p' to continue.  Update somewhat
+    complicated for being only text message changes due no-display runs or
+    compiles without SDL installed - and so no-display - not picking up
+    general key press events.
+
+Commit 469a87c on 2016-12-03 by William F. Pokorny (wfpokorny)
+
+    Cleaning up some recent commits. Jim's fix for #149. (#166)
+
+    Following up on the deletion of comments from cone uv_mapping.
+    Picking up missed removal of Old_Image pointer from parser_materials.cpp.
+    Picking up Jim's prefix to Prefix var name patch for mesh camaera scenes.
+
+Commit 766e1bd on 2016-12-03 by Christoph Lipka
+
+    Update boost version to 1.62.
+
+Commit bd73d0e on 2016-12-03 by Christoph Lipka
+
+    Miscellaneous refactoring, mostly related to file output.
+
+    Also added support for "Compression=1" to Targa format and "Compression=0"
+    to Netpbm PPM/PGM format.
+
+Commit 13aa062 on 2016-12-02 by Christoph Lipka
+
+    Some refactoring and Doxygen documentation work.
+
+Commit c5cade4 on 2016-11-27 by Christoph Lipka
+
+    Miscellaneous refactoring.
+
+Commit 10f089d on 2016-11-26 by Christoph Lipka
+
+    Fix some issues discovered by static code analysis.
+
+Commit 446f066 on 2016-11-26 by Christoph Lipka
+
+    Fix error in previous commit.
+
+Commit 55eec19 on 2016-11-26 by Christoph Lipka
+
+    Pattern-related parser refactoring and fixing of old age-old unreported
+    bugs.
+
+------------------------------------------------------------------------------
+POV-Ray v3.7.1-alpha.8889454
+------------------------------------------------------------------------------
+
+Commit 38a45ef on 2016-11-25 by Christoph Lipka
+
+    Fix bug in full-colour function-based pigment.
+
+Commit e692c16 on 2016-11-25 by Christoph Lipka
+
+    Merge branch 'feature/specular_knockout'
+
+Commit e205d77 on 2016-11-19 by Christoph Lipka
+
+    Add feature to knock out highlights and reflections depending on pigment
+    transparency.
+
+Commit fd19745 on 2016-11-25 by Christoph Lipka
+
+    Merge branch 'feature/dictionary'
+
+Commit e592aaf on 2016-11-21 by Christoph Lipka
+
+    Fix bug introduced with previous commit.
+
+Commit 2b12beb on 2016-11-21 by Christoph Lipka
+
+    Replaced `local()`/`global()` pseudo-functions with `local`/`global`
+    pseudo-dictionaries.
+
+Commit 03b9654 on 2016-11-16 by Christoph Lipka
+
+    Update dictionary initializer syntax and fix a memory leak.
+
+Commit d1a61d6 on 2016-11-16 by Christoph Lipka
+
+    Merge branch 'master' into feature/dictionary
+
+Commit 5bc4f0b on 2016-11-16 by Christoph Lipka
+
+    Add support for mixed-type arrays.
+
+Commit a2bee50 on 2016-10-12 by Christoph Lipka
+
+    Merge branch 'master' into feature/dictionary
+
+Commit 351d888 on 2016-09-26 by Christoph Lipka
+
+    Merge branch 'master' into feature/dictionary
+
+Commit 093def7 on 2016-09-18 by Christoph Lipka
+
+    Implement dynamically-sized arrays.
+
+Commit 0b5ac83 on 2016-09-17 by Christoph Lipka
+
+    Implement array-style dictionary access.
+
+Commit 535bac5 on 2016-09-17 by Christoph Lipka
+
+    Implement dictionary initializers.
+
+Commit 5039065 on 2016-09-17 by Christoph Lipka
+
+    Add support for `dictionary` data container.
+
+Commit 4171d08 on 2016-11-25 by Christoph Lipka
+
+    Add full-colour function-based pigment pattern.
+
+Commit da27569 on 2016-11-25 by Christoph Lipka
+
+    Some pattern-related refactoring.
+
+Commit 4d21059 on 2016-11-24 by Christoph Lipka
+
+    Minor changes to debug sanity checks.
+
+Commit 68fa749 on 2016-11-24 by Christoph Lipka
+
+    Minor parser code fixes and refactoring.
+
+Commit 02f7e25 on 2016-11-21 by Christoph Lipka
+
+    Update Unix installation instructions.
+
+Commit 2775c4f on 2016-11-20 by Christoph Lipka
+
+    Fix GitHub issue #153.
+
+Commit fa4a158 on 2016-11-20 by Ben Small (BentSm)
+
+    Fix promotion bug (#130)
+
+    This fixes the bug reported in
+    [newsgroup post <3c4bb31d$1@news.povray.org>].
+
+Commit 79ed353 on 2016-11-16 by Christoph Lipka
+
+    [ci skip] Update changes.txt.
+
+Commit 4be08d8 on 2016-11-15 by William F. Pokorny (wfpokorny)
+
+    Port of JG diff for github issue #128 and FS331 (#129)
+
+Commit 1319df5 on 2016-11-15 by William F. Pokorny (wfpokorny)
+
+    Flipping uv_mapping of lemon in V to usual orientation. (#133)
+
+    The UV mapping orientation for the originally implemented lemon
+    was upside down to the usual mapping.
+
+Commit df90a3a on 2016-11-15 by William F. Pokorny (wfpokorny)
+
+    Port of JG uv_mapping for cylinder and cone. (#131)
+
+    Note I flipped the UV mapping in V as it looked upside down to the usual
+    POV-Ray UV mapping. Related comments in the code.
+
+Commit 2ec18ab on 2016-11-15 by William F. Pokorny (wfpokorny)
+
+    Fix placement of break statement in Solve_Polynomial. (#143)
+
+    See:
+    [newsgroup post <web.580874a6f9e539ccf4af9d600@news.povray.org>]
+
+Commit b458018 on 2016-11-15 by Christoph Lipka
+
+    [ci skip] Trim down Travis CI build matrix.
+
+Commit 220b3a5 on 2016-11-12 by Christoph Lipka
+
+    Fixed ill-formed `#error` preprocessor statements.
+
+    `source/core/support/octree.cpp` had some `#error` statements not fully
+    compliant with standard C++ due to the use of single quote characters
+    as apostrophes in the message. To fix these messages, they are now
+    enclosed in double quotes. For consistency, double quotes have also
+    been added to other `#error` statements.
+
+Commit d62de5c on 2016-11-06 by Christoph Lipka
+
+    Fix FlySpray task 336 (http://bugs.povray.org/task/336).
+
+Commit 8c8a18f on 2016-10-19 by Christoph Lipka
+
+    Fix GitHub issue #124.
+
+Commit 3cd6b6c on 2016-10-13 by Christoph Lipka
+
+    Fix an issue with the previous commit.
+
+Commit bbb4643 on 2016-10-13 by Christoph Lipka
+
+    Fix a couple of issues discovered by static code analysis.
+
+------------------------------------------------------------------------------
+POV-Ray v3.7.1-alpha.8826150
+------------------------------------------------------------------------------
+
+Commit b24c6c7 on 2016-10-12 by Christoph Lipka
+
+    Fix unix build error introduced with previous commit.
+
+Commit 269cc8e on 2016-10-12 by Christoph Lipka
+
+    Overhauled mechanism for output file gamma default.
+
+    - Eliminated the `DEFAULT_FILE_GAMMA_TYPE` and `DEFAULT_FILE_GAMMA`
+      compile-time config settings; instead of having the `File_Gamma` INI
+      setting default to a common value, file type specific defaults are now
+      allowed to kick in. Previously, file type specific defaults had already
+      been implemented but didn't take effect (except for file types that
+      entirely ignored `File_Gamma` anyway).
+    - The Netpbm (PPM) output file gamma handling now defaults to using the
+      ITU-R BT.709 transfer function. Previously, the implemented file type
+      specific default would have been to not apply gamma correction at all,
+      but in practice this was overridden by the now-eliminated `File_Gamma`
+      default.
+
+Commit 6838c28 on 2016-10-11 by Christoph Lipka
+
+    Suppress PNG file oFFs chunk creation if offset is zero.
+
+Commit cc2d946 on 2016-10-09 by Christoph Lipka
+
+    [ci skip] Minor update to build status section in `README.md`.
+
+Commit a1d372e on 2016-10-09 by Christoph Lipka
+
+    Add master branch build status to `README.md`.
+
+Commit 29d5251 on 2016-10-09 by Christoph Lipka
+
+    Fix compatibility with libjpeg 8b and earlier.
+
+    Also fixing the format in which we're reporting the libjpeg version
+    number to the user.
+
+Commit 8e619b3 on 2016-10-09 by Christoph Lipka
+
+    Eliminate use of `jversion.h`.
+
+    We're now determining the LibJPEG version from the contents of `jpeglib.h`
+    rather than `jversion.h`, as the latter does not constitute part of
+    the official library interface as distributed in libjpeg-dev. As a side
+    effect we can now stop creating a fake `jversion.h` as part of the Unix
+    build process.
+
+Commit a70069e on 2016-10-09 by Christoph Lipka
+
+    Enable automated Mac OS X build testing.
+
+Commit d451fc5 on 2016-10-09 by Christoph Lipka
+
+    Fixed a few coding flaws discovered by clang.
+
+Commit c470dae on 2016-10-09 by Christoph Lipka
+
+    Hopefully fix Unix build error introduced with commit be34de4.
+
+Commit 261f57f on 2016-10-09 by Christoph Lipka
+
+    Forgot to include some changes in previous commit; fixed.
+
+Commit be34de4 on 2016-10-09 by Christoph Lipka
+
+    Major overhaul of Netpbm (PGM/PPM) input, fixing GitHub issue #111.
+
+------------------------------------------------------------------------------
+POV-Ray v3.7.1-alpha.8820458
+------------------------------------------------------------------------------
+
+Commit 66cef4e on 2016-10-08 by Christoph Lipka
+
+    Partially fix GitHub issue #110.
+
+    To allow for reading and creating fully standard-compliant PGM/PPM files,
+    the ITU-R BT.709 transfer function can now be explicitly chosen as input
+    and/or output gamma by specifying `gamma bt709` for input images or the
+    `File_Gamma=bt709` INI setting for output images, respectively. (Note
+    however that at present PGM/PPM files still default to linear encoding,
+    in spite of the standard.) Support for the very similar but slightly
+    superior ITU-R BT.2020 transfer function has also been added along the
+    way using corresponding syntax. In addition, both `bt709` and `bt2020`
+    are now valid parameters for the `assumed_gamma` global setting and the
+    `Display_Gamma` INI setting.
+
+Commit 598f29a on 2016-10-06 by William F. Pokorny (wfpokorny)
+
+    Adding parser warning on float promote to full color vector. (#91)
+
+    These promotions create colors with filter and transmit values >0 which
+    cause shadow artifacts back to at least version 3.6.1.
+
+Commit 089a77c on 2016-10-06 by Ben Small (BentSm)
+
+    Added unix/config/compile to .gitignore and unix/prebuild.sh cleanup,
+    (#108)
+
+Commit 7e6a9c7 on 2016-10-02 by William F. Pokorny (wfpokorny)
+
+    Fixing potential pattern threshold keyword use in function. (#94)
+
+    When used in a pattern function, the `potential` pattern erroneously
+    failed to support the `threshold` keyword.
+
+Commit 3f48996 on 2016-10-02 by Ben Small (BentSm)
+
+    Replaced broken comparison in hdr.cpp (#106)
+
+    Replaced invalid comparison of IStream to bool.
+
+Commit 606fd2e on 2016-10-02 by Ben Small (BentSm)
+
+    Fixed file append bug (#105)
+
+    Fixed silent failure when attempting to append to files.
+
+Commit ffc1b74 on 2016-10-01 by William F. Pokorny (wfpokorny)
+
+    Fixing tiling pattern use in functions. (#96)
+
+Commit 4821b7d on 2016-10-01 by William F. Pokorny (wfpokorny)
+
+    Adding shapes.inc include to all HF_ macro templates. (#103)
+
+Commit 6e2d27b on 2016-10-01 by Christoph Lipka
+
+    Fixed issues with default Timer class and Delay function.
+
+Commit 308dbdf on 2016-10-01 by Ben Small (BentSm)
+
+    Fix 4D vector parsing anomaly (#102)
+
+    Parse_Num_Factor would fail to update *Terms to 3 when parsing a 3D vector
+    function and expecting more than 3 terms (i.e., *Terms>3 on entry).
+    This would result in the parsed result erroneously gaining extra
+    (possibly non-zero) terms.  E.g.: julia_fractal{2/9*x} would parse as
+    if one had written julia_fractal{<2/9,2/9,2/9,2/9>*<1,0,0,9>}.
+
+------------------------------------------------------------------------------
+POV-Ray v3.7.1-alpha.8809617
+------------------------------------------------------------------------------
+
+Commit d410909 on 2016-09-30 by Christoph Lipka
+
+    Ditching the idea of having unique version numbers for every commit.
+
+Commit a6d5591 on 2016-09-30 by Christoph Lipka
+
+    Update to Git pre-commit hook. Also fixed Travis CI clang builds.
+
+Commit 6e73117 on 2016-09-30 by William F. Pokorny (wfpokorny)
+
+    Correcting small typo in lemon.cpp comment. (#95)
+
+Commit ceafcc0 on 2016-09-30 by William F. Pokorny (wfpokorny)
+
+    Adding missing close paren in 30_HF_Sphere_macro.txt (#101)
+
+    Reported by omniverse on povray.documentation.inbuilt.
+
+Commit e70a6f0 on 2016-09-30 by William F. Pokorny (wfpokorny)
+
+    Adding switch code to tiling.pov with scaling information. (#100)
+
+Commit a77e827 on 2016-09-30 by William F. Pokorny (wfpokorny)
+
+    Fixing pavement pattern use in functions. (#99)
+
+Commit 5c706d7 on 2016-09-30 by William F. Pokorny (wfpokorny)
+
+    Adding pavement pattern demo scene file to distribution. (#97)
+
+Commit b4e5a7d on 2016-09-26 by Christoph Lipka
+
+    Fix error in previous commit.
+
+Commit a68a23e on 2016-09-26 by Christoph Lipka
+
+    Fix GitHub issue #98, plus a similar problem in the new OBJ import.
+
+Commit 2c3b3d6 on 2016-09-22 by Christoph Lipka
+
+    Fix `+A.n` command line option.
+
+Commit 01febac on 2016-09-18 by Christoph Lipka
+
+    Fail more gracefully when encountering an empty `normal{}` statement.
+
+Commit ba30980 on 2016-09-17 by Christoph Lipka
+
+    A bit more housekeeping.
+
+------------------------------------------------------------------------------
+POV-Ray v3.7.1-alpha.8789352
+------------------------------------------------------------------------------
+
+Commit 08262ab on 2016-09-16 by Christoph Lipka
+
+    Miscellaneous housekeeping.
+
+Commit 23f936a on 2016-09-15 by Christoph Lipka
+
+    Implemented `potential` pattern and isosurface `polarity` keyword. (#88)
+
+Commit c52c176 on 2016-09-15 by Christoph Lipka
+
+    Implemented basic Wavefront OBJ import. (#90)
+
+Commit 7d06e7f on 2016-09-09 by Christoph Lipka
+
+    Fixed some parser flaws related to the re-defining of variables.
+
+Commit f1b394a on 2016-09-08 by Christoph Lipka
+
+    Address some issues in base and core modules found by static code
+    analysis.
+
+    Should address issues CID 967377, CID 967399-967400, CID 1129016-1129017,
+    CID 1372552, CID 1372608, CID 1372626, CID 1372636, CID 1372639,
+    CID 1372641-1372644, CID 1372646-1372648, CID 1372650-1372651,
+    CID 1372653-1372654, plus various issues related to Coverity not
+    understanding some of our `POV_*_ASSERT()` macros.
+
+Commit 0147678 on 2016-09-08 by Christoph Lipka
+
+    Help static code analysis tools better understand our code.
+
+Commit 3220eb6 on 2016-09-08 by Christoph Lipka
+
+    Relaxed our enforcement of an initial `#version` directive.
+
+    Failing to start the scene with a `#version` directive, but demanding
+    version 3.7 or higher later in the main scene file, is tolerated again
+    if the version demanded is 3.7.0. (It still causes an error if the
+    version demanded is 3.7.1 or higher.)
+
+Commit 486a48f on 2016-09-08 by Christoph Lipka
+
+    Overhauled list of reserved words.
+
+    Sorted the lists in `reservedwords.h` and `reservedwords.cpp`. Also
+    slightly modified the way in which reserved word strings are stored,
+    so that `reservedwords.h` no longer needs placeholders for tokens with
+    alternative spelling (e.g. `color` and `colour`).
+
+Commit 5988aec on 2016-09-08 by Christoph Lipka
+
+    [ci skip] Update to AppVeyor config.
+
+Commit ff0fbcd on 2016-09-08 by Christoph Lipka
+
+    [ci skip] Reverted order of automated builds, to build 64-bit version
+    first.
+
+Commit f547721 on 2016-09-08 by Christoph Lipka
+
+    Fixed a few bugs found by static code analysis.
+
+    Addressed Coverity Scan issues CID 1372548, CID 1372555-1372557, CID
+    1372562, CID 1372655-1372657.
+
+Commit 8442344 on 2016-09-07 by Christoph Lipka
+
+    Fixed minor flaw in Visual Studio project for the VFE module.
+
+------------------------------------------------------------------------------
+POV-Ray v3.7.1-alpha.8776412
+------------------------------------------------------------------------------
+
+Commit 04fb97e on 2016-09-07 by Christoph Lipka
+
+    FIx Windows build error.
+
+Commit 6b6b1b3 on 2016-09-07 by Christoph Lipka
+
+    Fix unix build errors introduced with the previous commit.
+
+Commit e50d5b4 on 2016-09-07 by Christoph Lipka
+
+    Removed all remaining dependencies on the `vfe` module from the `backend`,
+    `base` and `frontend` modules.
+
+Commit f53e52a on 2016-09-05 by Christoph Lipka
+
+    [ci skip] Source documentation housekeeping; we're now relying on
+    Doxygen 1.8.12.
+
+Commit 8673205 on 2016-09-05 by William F. Pokorny (wfpokorny)
+
+    Porting Jerome Grimbert's lemon object to master. (#84)
+
+Commit a92639e on 2016-09-05 by Christoph Lipka
+
+    [ci skip] Some git housekeeping.
+
+Commit 3e59e15 on 2016-09-05 by William F. Pokorny (wfpokorny)
+
+    [ci skip] Adding new platform/Makefile variants to .gitignore (#85)
+
+------------------------------------------------------------------------------
+POV-Ray v3.7.1-alpha.8772883
+------------------------------------------------------------------------------
+
+Commit e600a5f on 2016-09-05 by Christoph Lipka
+
+    Fixed typo in `configure.ac`.
+
+Commit e4ce574 on 2016-09-05 by Christoph Lipka
+
+    This should fix the Unix build at last.
+
+Commit e921ef4 on 2016-09-04 by Christoph Lipka
+
+    Further work on Unix build, adding makefile for `platform/unix`.
+
+Commit ecd0799 on 2016-09-04 by Christoph Lipka
+
+    Fix a fourth unix build error.
+
+Commit 41ed63c on 2016-09-04 by Christoph Lipka
+
+    Fix a third unix build error (hopefully).
+
+Commit 448f5bb on 2016-09-04 by Christoph Lipka
+
+    Fix another Unix build error.
+
+Commit 08fc136 on 2016-09-04 by Christoph Lipka
+
+    Fix unix build error.
+
+Commit b404e9f on 2016-09-04 by Christoph Lipka
+
+    Changed Angular Map to map type 7 to match MegaPOV.
+
+Commit 09a4582 on 2016-09-04 by Christoph Lipka
+
+    Merge remote-tracking branch 'origin/master'
+
+Commit 46e227f on 2016-09-04 by Denis Bodor
+
+    [ci skip] Added support for Angular Map projection for input images. (#41)
+
+    Using `map_type 8` for input images will now select the so-called
+    "Angular Map" light probe projection popularized by Paul Devebec
+    (corresponding to MegaPOV map type 7).
+
+Commit 619e0f7 on 2016-09-04 by Christoph Lipka
+
+    [ci skip] Giving up on our attempts to set up automated XP-compatible
+    builds for now.
+
+Commit bc3ebd2 on 2016-09-02 by Christoph Lipka
+
+    [ci skip] Updates to the source code documentation.
+
+Commit 8ce6457 on 2016-08-31 by Christoph Lipka
+
+    Refactored and overhauled timer handling.
+
+Commit 47d2603 on 2016-08-31 by Christoph Lipka
+
+    Improved separation of modules.
+
+    - Eliminated all remaining references of "backend" and "vm" modules from
+      "core" module.
+    - Eliminated all remaining references of "povms" module, and some
+      references of "backend" module, from "parser" module.
+
+------------------------------------------------------------------------------
+POV-Ray v3.7.1-alpha.8764097
+------------------------------------------------------------------------------
+
+Commit 8afb143 on 2016-08-30 by Christoph Lipka
+
+    Trying to make automated 64-bit Windows builds compatible with Windows
+    XP again. (#83)
+
+Commit 46c9ecb on 2016-08-24 by Christoph Lipka
+
+    Clean up error message for pigment/normal/density variant of
+    `max_extent()` function.
+
+Commit f162f53 on 2016-08-22 by William F. Pokorny (wfpokorny)
+
+    Adding df3, density_file query range support to max_extent. (#80)
+
+    * Adding df3, density_file query range support to max_extent.
+
+      Enables users to determine the x,y,z ranges, returned as a vector, for
+      density_file based pigments matching a similar function for image maps.
+
+    * Adding normal, density support to max_extent range feature.
+
+      Adding normal and density support to the existing pigment support
+      for image and density_file range determination with max_extent. Also
+      re-worked the conditionals as requested.
+
+Commit 79f6c9b on 2016-08-18 by Christoph Lipka
+
+    Fixed bug in flat trianges that could cause interior_texture to show
+    on the wrong side.
+
+Commit 4d52c26 on 2016-08-12 by Christoph Lipka
+
+    Fixed a bug causing radiosity to ignore refracted `no_image` objects.
+
+------------------------------------------------------------------------------
+POV-Ray v3.7.1-alpha.8737777
+------------------------------------------------------------------------------
+
+Commit 50f20db on 2016-08-11 by Christoph Lipka
+
+    Fixed bug in transformed spheres introduced with commit 53f0ebd.
+
+Commit 6418cd0 on 2016-08-10 by Christoph Lipka
+
+    Fix `repeat` in crackle pattern not allowing further object modifiers.
+
+Commit 6997488 on 2016-08-07 by Christoph Lipka
+
+    Fixed memory leak in textured `projected_through` objects.
+
+------------------------------------------------------------------------------
+POV-Ray v3.7.1-alpha.8730959
+------------------------------------------------------------------------------
+
+Commit 53f0ebd on 2016-08-07 by Christoph Lipka
+
+    Reduced memory footprint of sphere primitive.
+
+    Until now, spheres subject to transformation (translation, rotation,
+    scaling etc.) required an extra data block of 256 bytes. This data
+    block has been eliminated, along with a corresponding pointer in the
+    sphere's basic data block.
+
+------------------------------------------------------------------------------
+POV-Ray v3.7.1-alpha.8704732
+------------------------------------------------------------------------------
+
+Commit 8e965a9 on 2016-07-20 by Christoph Lipka
+
+    Improved cached macro performance.
+
+Commit fa3a1dc on 2016-07-18 by Christoph Lipka
+
+    Fixed a code flaw in macro caching.
+
+Commit 39a6c9f on 2016-07-17 by Christoph Lipka
+
+    [ci skip] Minor changes to comments and dev documentation.
+
+Commit edfae26 on 2016-07-15 by Christoph Lipka
+
+    Fixed a bug in cleanup of fog with turbulence.
+
+Commit 3b5b4eb on 2016-07-15 by gryken2014
+
+    added missing file pavement_s3_t6_p12.txt / issue #37 (#77)
+
+------------------------------------------------------------------------------
+POV-Ray v3.7.1-alpha.8697421
+------------------------------------------------------------------------------
+
+Commit 051b674 on 2016-07-15 by Christoph Lipka
+
+    Implemented macro caching.
+
+    Macros up to a certain size (currently hard-coded to 65536 characters per
+    macro) are now cached in memory, improving parsing speed of invocations,
+    especially when the macro in question is defined in a different file.
+
+Commit 2d0a42c on 2016-07-14 by gryken2014
+
+    fix filenames / issue #36 (#76)
+
+Commit 4e714f1 on 2016-07-14 by Christoph Lipka
+
+    Fix flaws in `randomsequence.cpp` and `randomsequence.h`.
+
+    - Eliminate SIZE_MAX hack.
+    - Eliminate obsolete include.
+
+Commit d3c3fd5 on 2016-07-14 by gryken2014
+
+    fix filename / issue #38 (#75)
+
+------------------------------------------------------------------------------
+POV-Ray v3.7.1-alpha.8696519
+------------------------------------------------------------------------------
+
+Commit 2dc0dad on 2016-07-14 by Christoph Lipka
+
+    Added support for Diffusion and Floyd-Steinberg dithering in HDR output.
+
+Commit 550e602 on 2016-07-13 by Christoph Lipka
+
+    Fixed broken error message when expecting opening curly brace.
+
+Commit 6e54a1f on 2016-07-10 by Christoph Lipka
+
+    All instances of `gray` in keywords or INI file options can now
+    alternatively be spelt `grey`.
+
+Commit df5fc7a on 2016-07-10 by William F. Pokorny (wfpokorny)
+
+    Adding user_defined camera example scene (#72)
+
+Commit 57077c3 on 2016-07-10 by William F. Pokorny (wfpokorny)
+
+    Fixing a typo in scenes file incdemo.htm (#71)
+
+Commit 0889275 on 2016-06-16 by Christoph Lipka
+
+    Fix isosurface bug introduced with commit a10629b.
+
+Commit 05ca335 on 2016-06-11 by Christoph Lipka
+
+    Minor fixes to the `GenericRGBColour` and `GenericColour` classes.
+
+Commit 1f7fdef on 2016-06-03 by Christoph Lipka
+
+    Fixed the designated default implementation for the `POV_TIMER`
+    platform-specific millisecond timer.
+
+Commit 6576907 on 2016-06-03 by Christoph Lipka
+
+    Fix an issue in the user-defined function cleanup.
+
+    Due to a missing `#include`, the destructor of `TraceThreadData` was
+    unable to call the destructors of the `FPUContext` objects pointed to
+    via the `fpuContextPool` member.
+
+------------------------------------------------------------------------------
+POV-Ray v3.7.1-alpha.8615129
+------------------------------------------------------------------------------
+
+Commit 3c07635 on 2016-05-18 by Christoph Lipka
+
+    Fix GitHub issue #63.
+
+Commit 2ec4a4e on 2016-05-18 by Christoph Lipka
+
+    Merge pull request #62 from wfpokorny/master
+
+    Lathe parser updates related to github issue #60
+
+Commit 0e72828 on 2016-05-18 by William F Pokorny
+
+    Updated warning control variable to bool per Christoph. Issue #60
+
+Commit b17450c on 2016-05-14 by William F Pokorny
+
+    Lathe parser updates related to github issue #60
+
+Commit c51505d on 2016-05-12 by William F. Pokorny (wfpokorny)
+
+    Merge pull request #1 from POV-Ray/master
+
+    Attempt pull request from POV-Ray master into my personal fork.
+
+------------------------------------------------------------------------------
+POV-Ray v3.7.1-alpha.8600570
+------------------------------------------------------------------------------
+
+Commit 5c8fb1d on 2016-05-08 by Christoph Lipka
+
+    Fixed memory leak in pattern cleanup.
+
+Commit a666f07 on 2016-05-05 by Christoph Lipka
+
+    [ci skip] Updated `revision.txt` and cleaned up whitespace in
+    `changes.txt`.
+
 Commit fad8dda on 2016-05-05 by Christoph Lipka
 
     Forgot to include changes to `reservedwords.cpp` in previous
@@ -125,7 +945,7 @@ Commit 0a062cc on 2016-03-12 by Christoph Lipka
 
     Update vector.h
 
-Commit 06268c3 on 2016-03-11 by wfpokorny
+Commit 06268c3 on 2016-03-11 by William F. Pokorny (wfpokorny)
 
     Update vector.h
 
@@ -747,21 +1567,13 @@ Commit 1b5aab6 on 2015-06-27 by Christoph Lipka
       platform specific code.
     - Moved around some code to improve the separation between the components.
     - Improved consistency in the use of directory names in include
-      statements, eliminating the need to add any sub-directory of the
-      "source" directory tree to the compiler's list of include directories.
+      statements, eliminating the need to add any sub-directory of the "source"
+      directory tree to the compiler's list of include directories.
     - Some other minor improvements to the code.
 
 ------------------------------------------------------------------------------
 POV-Ray v3.7.1-alpha.8141620
 ------------------------------------------------------------------------------
-
-Commit 174aa28 on 2015-06-25 by Christoph Lipka
-
-    development build v3.7.1-alpha.8141620
-
-Commit 15eedc7 on 2015-06-25 by Christoph Lipka
-
-    Merge remote-tracking branch 'official/master'
 
 Commit aaff0bb on 2015-06-25 by Christoph Lipka
 
@@ -838,14 +1650,6 @@ Commit dc0fc6d on 2015-03-30 by Christoph Lipka
 POV-Ray v3.7.1-alpha.8004333
 ------------------------------------------------------------------------------
 
-Commit 8550718 on 2015-03-21 by Christoph Lipka
-
-    development build v3.7.1-alpha.8004333
-
-Commit 9a56b0d on 2015-03-21 by Christoph Lipka
-
-    Merge remote-tracking branch 'official/master'
-
 Commit 25af702 on 2015-03-21 by Christoph Lipka
 
     Updated Unix build instructions with known compatibility issues.
@@ -857,14 +1661,6 @@ Commit 29f573e on 2015-03-21 by Christoph Lipka
 ------------------------------------------------------------------------------
 POV-Ray v3.7.1-alpha.7981337
 ------------------------------------------------------------------------------
-
-Commit 733ec23 on 2015-03-16 by Christoph Lipka
-
-    development build 3.7.1-alpha.7981337
-
-Commit 14e4e23 on 2015-03-16 by Christoph Lipka
-
-    Merge remote-tracking branch 'official/master'
 
 Commit 6ed60ad on 2015-03-05 by Christoph Lipka
 
@@ -1080,14 +1876,6 @@ Commit fd2e0dd on 2015-01-30 by Christoph Lipka
 POV-Ray v3.7.1-alpha.7930357
 ------------------------------------------------------------------------------
 
-Commit 04cbeb3 on 2015-01-29 by Christoph Lipka
-
-    development build 3.7.1-alpha.7930357
-
-Commit 1708954 on 2015-01-29 by Christoph Lipka
-
-    Merge remote-tracking branch 'official/master'
-
 Commit e24c93e on 2015-01-29 by Christoph Lipka
 
     Fixed unwarranted "Rainbow's up and direction vector are co-linear"
@@ -1106,21 +1894,9 @@ Commit c4deb40 on 2015-01-24 by Christoph Lipka
 POV-Ray v3.7.1-alpha.7918791
 ------------------------------------------------------------------------------
 
-Commit 2e7b6d6 on 2015-01-21 by Christoph Lipka
-
-    development build 3.7.1-alpha.7918791
-
-Commit 6434340 on 2015-01-21 by Christoph Lipka (c-lipka)
-
-    Merge pull request #2 from POV-Ray/master
-
-    Sync with POV-Ray/master
-
 Commit 4f3a8be on 2015-01-21 by Christoph Lipka (c-lipka)
 
-    Merge pull request #40 from c-lipka/master
-
-    Sync with official POV-Ray repo
+    [accidental empty merge]
 
 Commit c48e776 on 2015-01-21 by Christoph Lipka
 
@@ -1477,20 +2253,6 @@ Commit 2a41f04 on 2014-06-14 by Christoph Lipka
 POV-Ray v3.7.0.20140613
 ------------------------------------------------------------------------------
 
-Commit 2782377 on 2014-06-13 by Christoph Lipka
-
-    update version number
-
-Commit b76717f on 2014-06-13 by Christoph Lipka
-
-    Merge branch 'master' into devbuild
-
-Commit 22fefb5 on 2014-06-13 by Christoph Lipka (c-lipka)
-
-    Merge pull request #1 from POV-Ray/master
-
-    Sync with official POV-Ray repo
-
 Commit 2c4e9f2 on 2014-06-13 by Christoph Lipka
 
     Merge branch 'refactor'
@@ -1702,10 +2464,6 @@ Commit a21c6e8 on 2013-12-20 by Jérôme Grimbert
 ------------------------------------------------------------------------------
 POV-Ray v3.7.0.20131220
 ------------------------------------------------------------------------------
-
-Commit 7c47afa on 2013-12-20 by Christoph Lipka
-
-    development build 3.7.0.20131220
 
 Commit 5a081e9 on 2013-12-20 by Christoph Lipka
 
