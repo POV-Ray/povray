@@ -277,6 +277,7 @@ Reported via GitHub:
   - #128 ("Port of FS331 - Intersection causes quadric to disappear")
   - #153 ("vector list trailing comma error sor lathe sphere_sweep")
   - #160 ("Port of FS259 - Stack Overflow with the write-directive with missing closing bracket.")
+  - #161 ("Missing parenthesis on write directive causes crash.")
 
 Reported via FlySpray:
 
@@ -286,7 +287,7 @@ Reported via FlySpray:
   - FS#270 ("render abort-continue (+C) sometimes skips blocks")
   - FS#298 ("the warning for isosurface does not appears as often as with 3.6.1")
   - FS#307 ("netpbm, ppm, read bug where first data byte CR char")
-  - FS#313 ("radiosity.cpp pov::RadiosityFunction::BeforeTile assertion failed")
+  - FS#313 ("radiosity.cpp pov::RadiosityFunction::BeforeTile assertion failed") [preliminary fix]
   - FS#314 ("reading Gif is bugged in 3.7")
   - FS#315 ("inverse keyword does not work properly with quadrics")
   - FS#316 ("inverse keyword does not work properly with fractals")

@@ -2615,8 +2615,14 @@ void Parser::Parse_Directive(int After_Hash)
                         Warning("Attempt to undef unknown identifier");
                     END_CASE
 
+                    CASE (FILE_ID_TOKEN)
+                        if (reinterpret_cast<DATA_FILE *>(Token.Data)->busyParsing)
+                            Error("Can't undefine a file identifier inside a file directive that accesses it.");
+                        else
+                            PossibleError("Undefining an open file identifier. Use '#fclose' instead.");
+                        // FALLTHROUGH
                     CASE2 (MACRO_ID_TOKEN, PARAMETER_ID_TOKEN)
-                    CASE3 (FILE_ID_TOKEN,  FUNCT_ID_TOKEN, VECTFUNCT_ID_TOKEN)
+                    CASE2 (FUNCT_ID_TOKEN, VECTFUNCT_ID_TOKEN)
                     // These have to match Parse_Declare in parse.cpp! [trf]
                     CASE4 (NORMAL_ID_TOKEN, FINISH_ID_TOKEN, TEXTURE_ID_TOKEN, OBJECT_ID_TOKEN)
                     CASE4 (COLOUR_MAP_ID_TOKEN, TRANSFORM_ID_TOKEN, CAMERA_ID_TOKEN, PIGMENT_ID_TOKEN)
@@ -3818,7 +3824,10 @@ void Parser::Parse_Fopen(void)
     New=reinterpret_cast<DATA_FILE *>(POV_MALLOC(sizeof(DATA_FILE),"user file"));
     New->In_File=NULL;
     New->Out_File=NULL;
-    New->fopenCompleted = false;
+
+    // Safeguard against accidental nesting of other file access directives inside the `#fopen`
+    // directive (or the user forgetting portions of the directive).
+    New->busyParsing = true;
 
     GET(IDENTIFIER_TOKEN)
     Entry = Add_Symbol (SYM_TABLE_GLOBAL,Token.Token_String,FILE_ID_TOKEN);
@@ -3870,7 +3879,7 @@ void Parser::Parse_Fopen(void)
         END_CASE
     END_EXPECT
 
-    New->fopenCompleted = true;
+    New->busyParsing = false;
 }
 
 void Parser::Parse_Fclose(void)
@@ -3880,8 +3889,10 @@ void Parser::Parse_Fclose(void)
     EXPECT_ONE
         CASE(FILE_ID_TOKEN)
             Data=reinterpret_cast<DATA_FILE *>(Token.Data);
-            if (!Data->fopenCompleted)
-                Error ("#fopen statement incomplete.");
+            if (Data->busyParsing)
+                Error ("Can't nest directives accessing the same file.");
+            // NB no need to set Data->busyParsing, as we're not reading any tokens where the
+            // tokenizer might stumble upon nested file access directives
             if(Data->In_File != NULL)
                 delete Data->In_File;
             if(Data->Out_File != NULL)
@@ -3912,11 +3923,15 @@ void Parser::Parse_Read()
 
     GET(FILE_ID_TOKEN)
     User_File=reinterpret_cast<DATA_FILE *>(Token.Data);
+    if (User_File->busyParsing)
+        Error ("Can't nest directives accessing the same file.");
     File_Id=POV_STRDUP(Token.Token_String);
-    if (!User_File->fopenCompleted)
-        Error ("#fopen statement incomplete.");
     if(User_File->In_File == NULL)
         Error("Cannot read from file %s because the file is open for writing only.", UCS2toASCIIString(UCS2String(User_File->Out_File->name())).c_str());
+
+    // Safeguard against accidental nesting of other file access directives inside the `#fopen`
+    // directive (or the user forgetting portions of the directive).
+    User_File->busyParsing = true;
 
     Parse_Comma(); /* Scene file comma between File_Id and 1st data ident */
 
@@ -3983,6 +3998,7 @@ void Parser::Parse_Read()
 
     Parse_Paren_End();
 
+    User_File->busyParsing = false;
     LValue_Ok = false;
 
     if (End_File)
@@ -4136,10 +4152,14 @@ void Parser::Parse_Write(void)
     GET(FILE_ID_TOKEN)
 
     User_File=reinterpret_cast<DATA_FILE *>(Token.Data);
-    if (!User_File->fopenCompleted)
-        Error ("#fopen statement incomplete.");
+    if (User_File->busyParsing)
+        Error ("Can't nest directives accessing the same file.");
     if(User_File->Out_File == NULL)
         Error("Cannot write to file %s because the file is open for reading only.", UCS2toASCIIString(UCS2String(User_File->In_File->name())).c_str());
+
+    // Safeguard against accidental nesting of other file access directives inside the `#fopen`
+    // directive (or the user forgetting portions of the directive).
+    User_File->busyParsing = true;
 
     Parse_Comma();
 
@@ -4260,6 +4280,8 @@ void Parser::Parse_Write(void)
     END_EXPECT
 
     Parse_Paren_End();
+
+    User_File->busyParsing = false;
 }
 
 DBL Parser::Parse_Cond_Param(void)
@@ -4349,6 +4371,13 @@ int Parser::Parse_For_Param (char** IdentifierPtr, DBL* EndPtr, DBL* StepPtr)
             Token.NumberPtr = &(Temp_Entry->Token_Number);
             Token.DataPtr = &(Temp_Entry->Data);
             Previous = Token.Token_Id;
+        END_CASE
+
+        CASE3 (FILE_ID_TOKEN, MACRO_ID_TOKEN, PARAMETER_ID_TOKEN)
+            // TODO - We should allow assignment if the identifier is non-local.
+            if (Token.is_array_elem || Token.is_dictionary_elem)
+                Error("#for loop variable must not be an array or dictionary element");
+            Parse_Error(IDENTIFIER_TOKEN);
         END_CASE
 
         CASE2 (FUNCT_ID_TOKEN, VECTFUNCT_ID_TOKEN)

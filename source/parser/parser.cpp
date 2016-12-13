@@ -8564,13 +8564,19 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
                 }
             END_CASE
 
+            CASE3 (FILE_ID_TOKEN, MACRO_ID_TOKEN, PARAMETER_ID_TOKEN)
+                // TODO - We should allow assignment if `is_local` is set and the identifier is non-local.
+                Parse_Error(IDENTIFIER_TOKEN);
+            END_CASE
+
             CASE2 (FUNCT_ID_TOKEN, VECTFUNCT_ID_TOKEN)
                 // Issue an error, _except_ when assigning to a still-empty element of a function array.
+                // TODO - We should allow assignment if `is_local` is set and the identifier is non-local.
                 if((!Token.is_array_elem) || (*(Token.DataPtr) != NULL))
                     Error("Redeclaring functions is not allowed - #undef the function first!");
                 // FALLTHROUGH
 
-            // These are also used in Parse_Directive UNDEF_TOKEN section, Parse_Macro, and and Parse_For_Param_Start,
+            // These are also used in Parse_Directive UNDEF_TOKEN section, Parse_Macro, and and Parse_For_Param,
             // and all these functions should accept exactly the same identifiers! [trf]
             CASE4 (NORMAL_ID_TOKEN, FINISH_ID_TOKEN, TEXTURE_ID_TOKEN, OBJECT_ID_TOKEN)
             CASE4 (COLOUR_MAP_ID_TOKEN, TRANSFORM_ID_TOKEN, CAMERA_ID_TOKEN, PIGMENT_ID_TOKEN)
