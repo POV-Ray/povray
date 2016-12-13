@@ -3699,6 +3699,8 @@ ObjectPtr Parser::Parse_Mesh()
 
     Object = new Mesh();
 
+#if POV_PARSER_EXPERIMENTAL_OBJ_IMPORT
+
     EXPECT_ONE
 
         CASE4 (VERTEX_VECTORS_TOKEN, NORMAL_VECTORS_TOKEN, UV_VECTORS_TOKEN, TEXTURE_LIST_TOKEN)
@@ -3719,6 +3721,12 @@ ObjectPtr Parser::Parse_Mesh()
         END_CASE
 
     END_EXPECT
+
+#else
+
+    Parse_Mesh1 (Object);
+
+#endif
 
     // Create bounding box.
 

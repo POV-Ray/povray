@@ -668,7 +668,9 @@ class Parser : public SceneTask
         ObjectPtr Parse_Mesh();
         ObjectPtr Parse_Mesh2();
 
+#if POV_PARSER_EXPERIMENTAL_OBJ_IMPORT
         void Parse_Obj (Mesh*);
+#endif
         void Parse_Mesh1 (Mesh*);
         void Parse_Mesh2 (Mesh*);
 

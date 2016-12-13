@@ -358,7 +358,9 @@ const RESERVED_WORD Reserved_Words[] = {
     { NUMBER_OF_TILES_TOKEN,        "number_of_tiles" },
     { NUMBER_OF_WAVES_TOKEN,        "number_of_waves" },
 
+#if POV_PARSER_EXPERIMENTAL_OBJ_IMPORT
     { OBJ_TOKEN,                    "obj" },
+#endif
     { OBJECT_TOKEN,                 "object" },
     { OCTAVES_TOKEN,                "octaves" },
     { OFF_TOKEN,                    "off" },
@@ -406,7 +408,9 @@ const RESERVED_WORD Reserved_Words[] = {
     { PPM_TOKEN,                    "ppm" },
     { PRECISION_TOKEN,              "precision" },
     { PRECOMPUTE_TOKEN,             "precompute" },
+#if POV_PARSER_EXPERIMENTAL_OBJ_IMPORT
     { PREFIX_TOKEN,                 "prefix" },
+#endif
     { PREMULTIPLIED_TOKEN,          "premultiplied" },
     { PRETRACE_END_TOKEN,           "pretrace_end" },
     { PRETRACE_START_TOKEN,         "pretrace_start" },
@@ -513,7 +517,9 @@ const RESERVED_WORD Reserved_Words[] = {
     { STURM_TOKEN,                  "sturm" },
     { SUBSTR_TOKEN,                 "substr" },
     { SUBSURFACE_TOKEN,             "subsurface" },
+#if POV_PARSER_EXPERIMENTAL_OBJ_IMPORT
     { SUFFIX_TOKEN,                 "suffix" },
+#endif
     { SUM_TOKEN,                    "sum" },
     { SUPERELLIPSOID_TOKEN,         "superellipsoid" },
     { SWITCH_TOKEN,                 "switch" },

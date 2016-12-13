@@ -85,9 +85,6 @@ Geometric Primitives:
   - A new parameter, `polarity`, has been added to isosurfaces to choose whether
     function values above the threshold should indicate the inside or outside.
 
-  - Basic support for importing Wavefront OBJ files has been added as an extension
-    to the `mesh` primitive.
-
   - A new geometric primitive, `lemon`, has been added.
 
 Scene Description Language, Options and INI settings:
@@ -176,12 +173,6 @@ Miscellaneous:
 
   - On Unix with Simple DirectMedia Layer (SDL) enabled, the "p" key can now be
     used to pause and un-pause a render.
-
-  - The `mesh2` syntax has been absorbed into that of `mesh` (i.e. you can now
-    replace any occurrences of the `mesh2` keyword with `mesh`), to reflect the
-    fact that they are just two syntax variants for one and the same primitive.
-    The old `mesh2` keyword is retained for backward compatibility and, in
-    acknowledgement of its widespread use, remains non-deprecated.
 
   - The `version` pseudo-variable will now evaluate to the effective language
     version at the time the expression is parsed, _except_ when used in a
@@ -275,6 +266,7 @@ Reported via GitHub:
   - #114 ("Port of FS298 - The warning for isosurface does not appears as often as with 3.6.1")
   - #124 ("Compiling on os Sierra - Compiler Error - typedef redefinition with different types ('int' vs 'enum')")
   - #128 ("Port of FS331 - Intersection causes quadric to disappear")
+  - #149 (""prefix" keyword conflict in distribution scene files")
   - #153 ("vector list trailing comma error sor lathe sphere_sweep")
   - #160 ("Port of FS259 - Stack Overflow with the write-directive with missing closing bracket.")
   - #161 ("Missing parenthesis on write directive causes crash.")

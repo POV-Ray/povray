@@ -56,6 +56,13 @@
     #define POV_PARSER_MAX_CACHED_MACRO_SIZE 65536
 #endif
 
+/// @def POV_PARSER_EXPERIMENTAL_OBJ_IMPORT
+/// Whether experimental Wavefront OBJ import should be enabled.
+///
+#ifndef POV_PARSER_EXPERIMENTAL_OBJ_IMPORT
+    #define POV_PARSER_EXPERIMENTAL_OBJ_IMPORT 0
+#endif
+
 //******************************************************************************
 ///
 /// @name Debug Settings.
