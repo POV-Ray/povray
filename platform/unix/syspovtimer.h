@@ -2,7 +2,8 @@
 ///
 /// @file platform/unix/syspovtimer.h
 ///
-/// Declaration of the Unix-specific implementation of the @ref Timer class.
+/// Unix-specific declaration of the @ref pov_base::Delay() function and
+/// @ref pov_base::Timer class.
 ///
 /// @copyright
 /// @parblock

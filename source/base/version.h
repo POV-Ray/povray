@@ -39,14 +39,33 @@
 #include "base/configbase.h"
 #include "base/build.h"
 
-// POV-Ray version and copyright message macros
+//##############################################################################
+///
+/// @addtogroup PovBase
+///
+/// @{
 
+//******************************************************************************
+///
+/// @name Version and Copyright Information
+///
+/// @{
+
+/// Copyright string.
 #define POV_RAY_COPYRIGHT "Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd."
+
+/// Official version number string.
 #define OFFICIAL_VERSION_STRING "3.7.1"
+
+/// Official version number integer.
 #define OFFICIAL_VERSION_NUMBER 371
 
+/// Prerelease identifier.
+/// Leave undefined for official releases.
 #define POV_RAY_PRERELEASE "alpha"
 
+/// @def POV_RAY_VERSION
+/// Full version string.
 #if (POV_RAY_IS_AUTOBUILD == 1) && ((POV_RAY_IS_OFFICIAL == 1) || (POV_RAY_IS_SEMI_OFFICIAL == 1))
 #ifdef POV_RAY_PRERELEASE
 #define POV_RAY_VERSION OFFICIAL_VERSION_STRING "-" POV_RAY_PRERELEASE "+" POV_RAY_AUTOBUILD_ID
@@ -66,5 +85,13 @@
 #define POV_RAY_VERSION OFFICIAL_VERSION_STRING "-unofficial"
 #endif
 #endif
+
+/// @}
+///
+//******************************************************************************
+
+/// @}
+///
+//##############################################################################
 
 #endif // POVRAY_BASE_VERSION_H

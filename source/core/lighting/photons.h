@@ -45,6 +45,13 @@
 namespace pov
 {
 
+//##############################################################################
+///
+/// @defgroup PovCoreLightingPhotons Photon Mapping
+/// @ingroup PovCore
+///
+/// @{
+
 using namespace pov_base;
 
 #define MEDIA_INTERACTION 1
@@ -398,6 +405,10 @@ extern SinCosOptimizations sinCosData;
 /* for documentation of these functions, see photons.c */
 /* ------------------------------------------------------ */
 void ChooseRay(BasicRay &NewRay, const Vector3d& Normal, const Vector3d& Raw_Normal, int WhichRay);
+
+/// @}
+///
+//##############################################################################
 
 }
 

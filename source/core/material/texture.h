@@ -46,6 +46,13 @@
 namespace pov
 {
 
+//##############################################################################
+///
+/// @defgroup PovCoreMaterialTexture Textures
+/// @ingroup PovCore
+///
+/// @{
+
 typedef struct Turb_Struct TURB;
 struct GenericTurbulenceWarp;
 
@@ -117,7 +124,11 @@ struct Texture_Struct : public Pattern_Struct
 
 struct Finish_Struct
 {
-    SNGL Diffuse, DiffuseBack, Brilliance, BrillianceOut, BrillianceAdjust, BrillianceAdjustRad;
+    SNGL Diffuse, DiffuseBack, Brilliance;
+#if POV_PARSER_EXPERIMENTAL_BRILLIANCE_OUT
+    SNGL BrillianceOut;
+#endif
+    SNGL BrillianceAdjust, BrillianceAdjustRad;
     SNGL Specular, Roughness;
     SNGL Phong, Phong_Size;
     SNGL Irid, Irid_Film_Thickness, Irid_Turb;
@@ -179,6 +190,10 @@ TEXTURE *Copy_Texture_Pointer (TEXTURE *Texture);
 TEXTURE *Copy_Textures (TEXTURE *Textures);
 TEXTURE *Create_Texture (void);
 int Test_Opacity (const TEXTURE *Texture);
+
+/// @}
+///
+//##############################################################################
 
 }
 

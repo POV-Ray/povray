@@ -81,7 +81,7 @@ void Write (OStream *file, const Image *image, const Image::WriteOptions& option
     int                 file_type = POV_File_Image_PPM;
     int                 width = image->GetWidth() ;
     int                 height = image->GetHeight() ;
-    int                 bpcc = options.bpcc;
+    int                 bpcc = options.bitsPerChannel;
     bool                grayscale = false;
     unsigned int        rval;
     unsigned int        gval;
@@ -89,7 +89,20 @@ void Write (OStream *file, const Image *image, const Image::WriteOptions& option
     unsigned int        gray;
     unsigned int        mask;
     GammaCurvePtr       gamma;
-    DitherHandler*      dither = options.dither.get();
+    DitherStrategy&     dither = *options.ditherStrategy;
+    bool                plainFormat;
+
+#ifdef ASCII_PPM_OUTPUT
+    // When compiled with ASCII_PPM_OUTPUT, we used to write the more verbose "plain" (ASCII)
+    // format, so that's what we'll still generate in case the setting is negative (indicating we
+    // should do our default thing).
+    plainFormat = (options.compression < 1);
+#else
+    // When compiled without ASCII_PPM_OUTPUT, we used to write the more compact "raw" (binary)
+    // format, so that's what we'll still generate in case the setting is negative (indicating we
+    // should do our default thing).
+    plainFormat = (options.compression == 0);
+#endif
 
     if (bpcc == 0)
         bpcc = image->GetMaxIntValue() == 65535 ? 16 : 8 ;
@@ -107,21 +120,20 @@ void Write (OStream *file, const Image *image, const Image::WriteOptions& option
         grayscale   = true;
         bpcc        = 16;
         gamma.reset(); // TODO - this is here to mimick old code, which never did gamma correction for greyscale output; do we want to change that?
-        file->printf("P5\n");
+        if (plainFormat)
+            file->printf("P2\n");
+        else
+            file->printf("P5\n");
     }
     else
     {
-        if (options.encodingGamma)
-            gamma = TranscodingGammaCurve::Get(options.workingGamma, options.encodingGamma);
+        // The official Netpbm standard mandates the use of the ITU-R-BT.709 transfer function, although it
+        // acknowledges the use of linear encoding or the sRGB transfer function as alternative de-facto standards.
+        gamma = options.GetTranscodingGammaCurve(BT709GammaCurve::Get());
+        if (plainFormat)
+            file->printf("P3\n");
         else
-            // The official Netpbm standard mandates the use of the ITU-R-BT.709 transfer function, although it
-            // acknowledges the use of linear encoding or the sRGB transfer function as alternative de-facto standards.
-            gamma = TranscodingGammaCurve::Get(options.workingGamma, BT709GammaCurve::Get());
-#ifndef ASCII_PPM_OUTPUT
-        file->printf("P6\n");
-#else
-        file->printf("P3\n");
-#endif
+            file->printf("P6\n");
     }
 
     // Prepare metadata, as comment in the header
@@ -144,60 +156,53 @@ void Write (OStream *file, const Image *image, const Image::WriteOptions& option
         {
             if (grayscale)
             {
-                gray = GetEncodedGrayValue (image, x, y, gamma, mask, *dither) ;
+                gray = GetEncodedGrayValue (image, x, y, gamma, mask, dither) ;
 
-                if (bpcc > 8)
+                if (plainFormat)
                 {
-                    if (!file->Write_Byte((gray >> 8) & 0xFF))
-                        throw POV_EXCEPTION(kFileDataErr, "Cannot write PGM output data");
-                    if (!file->Write_Byte(gray & 0xFF))
-                        throw POV_EXCEPTION(kFileDataErr, "Cannot write PGM output data");
+                    file->printf("%u\n", gray);
+                }
+                else if (bpcc > 8)
+                {
+                    file->Write_Byte((gray >> 8) & 0xFF);
+                    file->Write_Byte(gray & 0xFF);
                 }
                 else
                 {
-                    if (!file->Write_Byte(gray & 0xFF))
-                        throw POV_EXCEPTION(kFileDataErr, "Cannot write PGM output data");
+                    file->Write_Byte(gray);
                 }
+                if (!file)
+                    throw POV_EXCEPTION(kFileDataErr, "Cannot write PGM output data");
             }
             else
             {
-                GetEncodedRGBValue (image, x, y, gamma, mask, rval, gval, bval, *dither) ;
+                GetEncodedRGBValue(image, x, y, gamma, mask, rval, gval, bval, dither);
 
-                if (bpcc > 8)
+                if (plainFormat)
                 {
-                    // 16 bit per value
-#ifndef ASCII_PPM_OUTPUT
-                    file->Write_Byte(rval >> 8) ;
-                    file->Write_Byte(rval & 0xFF) ;
-                    file->Write_Byte(gval >> 8) ;
-                    file->Write_Byte(gval & 0xFF) ;
-                    file->Write_Byte(bval >> 8) ;
-                    if (!file->Write_Byte(bval & 0xFF))
-                        throw POV_EXCEPTION(kFileDataErr, "Cannot write PPM output data");
-#else
                     file->printf("%u ", rval);
                     file->printf("%u ", gval);
                     file->printf("%u\n", bval);
-                    if (!file)
-                        throw POV_EXCEPTION(kFileDataErr, "Cannot write PPM output data");
-#endif
+                }
+                else if (bpcc > 8)
+                {
+                    // 16 bit per value
+                    file->Write_Byte(rval >> 8);
+                    file->Write_Byte(rval & 0xFF);
+                    file->Write_Byte(gval >> 8);
+                    file->Write_Byte(gval & 0xFF);
+                    file->Write_Byte(bval >> 8);
+                    file->Write_Byte(bval & 0xFF);
                 }
                 else
                 {
                     // 8 bit per value
-#ifndef ASCII_PPM_OUTPUT
-                    file->Write_Byte(rval & 0xFF) ;
-                    file->Write_Byte(gval & 0xFF) ;
-                    if (!file->Write_Byte(bval & 0xFF))
-                        throw POV_EXCEPTION(kFileDataErr, "Cannot write PPM output data");
-#else
-                    file->printf("%u ", rval & 0xff);
-                    file->printf("%u ", gval & 0xff);
-                    file->printf("%u\n", bval & 0xff);
-                    if (!file)
-                        throw POV_EXCEPTION(kFileDataErr, "Cannot write PPM output data");
-#endif
+                    file->Write_Byte(rval);
+                    file->Write_Byte(gval);
+                    file->Write_Byte(bval);
                 }
+                if (!file)
+                    throw POV_EXCEPTION(kFileDataErr, "Cannot write PPM output data");
             }
         }
     }

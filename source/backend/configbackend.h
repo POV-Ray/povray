@@ -41,56 +41,24 @@
 #include "base/configbase.h"
 #include "syspovconfigbackend.h"
 
-/*
- * Platform name default.
- */
+//##############################################################################
+///
+/// @defgroup PovBackendConfig Back-End Compile-Time Configuration
+/// @ingroup PovBackend
+/// @ingroup PovConfig
+///
+/// @{
+
+/// @def POVRAY_PLATFORM_NAME
+/// Platform name string.
+///
 #ifndef POVRAY_PLATFORM_NAME
     #define POVRAY_PLATFORM_NAME "Unknown Platform"
 #endif
 
-/*
- * To allow GUI platforms like the Mac to access a command line and provide
- * a command line only interface (for debugging) a different call to an
- * internal function of the standard library is required. This macro takes
- * both argc and argv and is expected to return argc.
- */
-#ifndef GETCOMMANDLINE
-    #define GETCOMMANDLINE(ac,av) ac
-#endif
-
-#ifndef CONFIG_MATH       // Macro for setting up any special FP options
-    #define CONFIG_MATH
-#endif
-
-/* Specify number of source file lines printed before error line, their maximum length and
- * the error marker text that is appended to mark the error
- */
-#ifndef POV_NUM_ECHO_LINES
-    #define POV_NUM_ECHO_LINES 5
-#endif
-
-#ifndef POV_ERROR_MARKER_TEXT
-    #define POV_ERROR_MARKER_TEXT " <----ERROR\n"
-#endif
-
-#ifndef POV_WHERE_ERROR
-    #define POV_WHERE_ERROR(fn,ln,cl,ts)
-#endif
-
-#ifndef DBL_FORMAT_STRING
-    #define DBL_FORMAT_STRING "%lf"
-#endif
-
-// Some implementations of scanf return 0 on failure rather than EOF
-#ifndef SCANF_EOF
-    #define SCANF_EOF EOF
-#endif
-
-#ifndef NEW_LINE_STRING
-    // NEW_LINE_STRING remains undefined, optimizing the code for "\n" as used internally
-#endif
-
-// If compiler version is undefined, then make it 'u' for unknown
+/// @def COMPILER_VER
+/// Compiler moniker string.
+///
 #ifndef COMPILER_VER
     #define COMPILER_VER ".u"
 #endif
@@ -98,7 +66,7 @@
 /// @def POV_USE_DEFAULT_TASK_INITIALIZE
 /// Whether to use a default implementation for task thread initialization.
 ///
-/// Define as non-zero to use a default implementation for the @ref Task::Initialize() method, or zero if the
+/// Define as non-zero to use a default implementation for the @ref pov::Task::Initialize() method, or zero if the
 /// platform provides its own implementation.
 ///
 #ifndef POV_USE_DEFAULT_TASK_INITIALIZE
@@ -108,17 +76,30 @@
 /// @def POV_USE_DEFAULT_TASK_CLEANUP
 /// Whether to use a default implementation for task thread cleanup.
 ///
-/// Define as non-zero to use a default implementation for the @ref Task::Cleanup() method, or zero if the
+/// Define as non-zero to use a default implementation for the @ref pov::Task::Cleanup() method, or zero if the
 /// platform provides its own implementation.
 ///
 #ifndef POV_USE_DEFAULT_TASK_CLEANUP
     #define POV_USE_DEFAULT_TASK_CLEANUP 1
 #endif
 
-
-/*
- * Font related macros [trf]
- */
+/// @def POV_CONVERT_TEXT_TO_UCS2
+/// Convert text from system-specific format to UCS2.
+///
+/// @note
+///     The macro is responsible for creating a sufficiently large result buffer, using @ref POV_MALLOC().
+/// @note
+///     The result must be a genuine UCS2 string. UCS4/Unicode characters outside the Base Multilingual Plane
+///     are not supported.
+/// @note
+///     It is unspecified whether the input byte sequence is null-terminated or not, and may in fact contain
+///     a sequence of null-separated strings. The result string should be null-separated accordingly.
+///
+/// @param[in]  ts  Byte sequence to convert.
+/// @param[in]  tsl Byte sequence length.
+/// @param[out] as  Number of UCS2 characters in result.
+/// @return         Converted UCS2 character sequence, or `NULL` if conversion is not supported.
+///
 #ifndef POV_CONVERT_TEXT_TO_UCS2
     #define POV_CONVERT_TEXT_TO_UCS2(ts, tsl, as) (NULL)
 #endif
@@ -134,9 +115,21 @@
 /// zero value will disable them.
 ///
 /// It is recommended that system-specific configurations leave these settings undefined in release
-/// builds, in which case they will default to @ref POV_DEBUG unless noted otherwise.
+/// builds, in which case they will default to @ref POV_BACKEND_DEBUG unless noted otherwise.
 ///
 /// @{
+
+/// @def POV_BACKEND_DEBUG
+/// Default setting for enabling or disabling @ref PovBackend debugging aids.
+///
+/// This setting specifies the default for all debugging switches throughout the entire module
+/// that are not explicitly enabled or disabled by system-specific configurations.
+///
+/// If left undefined by system-specific configurations, this setting defaults to @ref POV_DEBUG.
+///
+#ifndef POV_BACKEND_DEBUG
+    #define POV_BACKEND_DEBUG POV_DEBUG
+#endif
 
 /// @def POV_TASK_DEBUG
 /// Enable run-time sanity checks for task handling.
@@ -144,7 +137,7 @@
 /// Define as non-zero integer to enable, or zero to disable.
 ///
 #ifndef POV_TASK_DEBUG
-    #define POV_TASK_DEBUG POV_DEBUG
+    #define POV_TASK_DEBUG POV_BACKEND_DEBUG
 #endif
 
 /// @}
@@ -157,6 +150,12 @@
 /// system-specific configuration.
 ///
 /// @{
+
+#if POV_BACKEND_DEBUG
+    #define POV_BACKEND_ASSERT(expr) POV_ASSERT_HARD(expr)
+#else
+    #define POV_BACKEND_ASSERT(expr) POV_ASSERT_DISABLE(expr)
+#endif
 
 #if POV_TASK_DEBUG
     #define POV_TASK_ASSERT(expr) POV_ASSERT_HARD(expr)
@@ -176,5 +175,9 @@
 /// @}
 ///
 //******************************************************************************
+
+/// @}
+///
+//##############################################################################
 
 #endif // POVRAY_BACKEND_CONFIGBACKEND_H

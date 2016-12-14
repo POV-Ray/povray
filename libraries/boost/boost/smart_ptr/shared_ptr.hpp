@@ -29,6 +29,7 @@
 #include <boost/detail/workaround.hpp>
 #include <boost/smart_ptr/detail/sp_convertible.hpp>
 #include <boost/smart_ptr/detail/sp_nullptr_t.hpp>
+#include <boost/smart_ptr/detail/sp_disable_deprecated.hpp>
 
 #if !defined(BOOST_SP_NO_ATOMIC_ACCESS)
 #include <boost/smart_ptr/detail/spinlock_pool.hpp>
@@ -45,6 +46,11 @@
 #else
 #include <ostream>
 #endif
+#endif
+
+#if defined( BOOST_SP_DISABLE_DEPRECATED )
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
 
 namespace boost
@@ -636,6 +642,14 @@ public:
         return *this;
     }
 
+    // aliasing move
+    template<class Y>
+    shared_ptr( shared_ptr<Y> && r, element_type * p ) BOOST_NOEXCEPT : px( p ), pn()
+    {
+        pn.swap( r.pn );
+        r.px = 0;
+    }
+
 #endif
 
 #if !defined( BOOST_NO_CXX11_NULLPTR )
@@ -673,7 +687,16 @@ public:
     {
         this_type( r, p ).swap( *this );
     }
-    
+
+#if !defined( BOOST_NO_CXX11_RVALUE_REFERENCES )
+
+    template<class Y> void reset( shared_ptr<Y> && r, element_type * p )
+    {
+        this_type( static_cast< shared_ptr<Y> && >( r ), p ).swap( *this );
+    }
+
+#endif
+
     // never throws (but has a BOOST_ASSERT in it, so not marked with BOOST_NOEXCEPT)
     typename boost::detail::sp_dereference< T >::type operator* () const
     {
@@ -1059,9 +1082,13 @@ template< class T > struct hash;
 
 template< class T > std::size_t hash_value( boost::shared_ptr<T> const & p ) BOOST_NOEXCEPT
 {
-    return boost::hash< T* >()( p.get() );
+    return boost::hash< typename boost::shared_ptr<T>::element_type* >()( p.get() );
 }
 
 } // namespace boost
+
+#if defined( BOOST_SP_DISABLE_DEPRECATED )
+#pragma GCC diagnostic pop
+#endif
 
 #endif  // #ifndef BOOST_SMART_PTR_SHARED_PTR_HPP_INCLUDED

@@ -360,6 +360,16 @@ int vfeSession::SetOptions (vfeRenderOptions& opts)
       AppendErrorMessage ("Grayscale output not currently supported with selected output file type.") ;
       return (m_LastError = vfeUnsupportedOptionCombination);
     }
+    if (oft == kPOVList_FileType_PPM)
+    {
+        if (!ropts.Exist(kPOVAttrib_FileGammaType))
+        {
+            AppendWarningMessage ("Warning: Output image gamma not specified for Netpbm (PGM/PPM) file; POV-Ray will default to the\n"
+                                  "official standard, but competing de-facto standards exist. To get rid of this warning,\n"
+                                  "explicitly specify \"File_Gamma=bt709\". If the results do not match your expectations, try\n"
+                                  "\"File_Gamma=srgb\" or \"File_Gamma=1.0\".");
+        }
+    }
     if (ropts.TryGetBool(kPOVAttrib_OutputAlpha, false) && !hasAlpha)
     {
       AppendWarningMessage ("Warning: Alpha channel output currently not (or not officially) supported with selected output file type.") ;

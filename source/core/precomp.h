@@ -71,6 +71,7 @@
 #include <boost/format.hpp>
 #include <boost/function.hpp>
 #include <boost/functional/hash/hash.hpp>
+#include <boost/intrusive_ptr.hpp>
 #include <boost/scoped_array.hpp>
 #include <boost/scoped_ptr.hpp>
 #if POV_MULTITHREADED

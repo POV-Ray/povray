@@ -44,11 +44,23 @@
 namespace pov
 {
 
-/*****************************************************************************
-* Global preprocessor definitions
-******************************************************************************/
+//##############################################################################
+///
+/// @addtogroup PovCoreShape
+///
+/// @{
+
+//******************************************************************************
+///
+/// @name Object Types
+///
+/// @{
 
 #define LATHE_OBJECT (STURM_OK_OBJECT)
+
+/// @}
+///
+//******************************************************************************
 
 #define LINEAR_SPLINE    1
 #define QUADRATIC_SPLINE 2
@@ -112,6 +124,10 @@ class Lathe : public ObjectBase
         bool Intersect(const BasicRay& ray, IStack& Depth_Stack, TraceThreadData *Thread);
         bool test_hit(const BasicRay&, IStack&, DBL, DBL, int, TraceThreadData *Thread);
 };
+
+/// @}
+///
+//##############################################################################
 
 }
 

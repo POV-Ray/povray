@@ -64,6 +64,12 @@
 namespace pov_base
 {
 
+//##############################################################################
+///
+/// @addtogroup PovBaseMathutil
+///
+/// @{
+
 /// Multiply four (unsigned integer) factors, throwing an exception in case of numerical overflow.
 template<typename T, typename T1, typename T2, typename T3, typename T4>
 static inline T SafeUnsignedProduct(T1 p1, T2 p2, T3 p3, T4 p4)
@@ -163,6 +169,10 @@ static inline T SafeSignedProduct(T p1, T p2, T p3 = 1, T p4 = 1)
 }
 
 #endif
+
+/// @}
+///
+//##############################################################################
 
 }
 

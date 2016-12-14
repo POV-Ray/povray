@@ -49,6 +49,12 @@
 namespace pov_base
 {
 
+//##############################################################################
+///
+/// @addtogroup PovBaseImage
+///
+/// @{
+
 /// Generates metadata to write into output images.
 class Metadata
 {
@@ -116,6 +122,10 @@ class Metadata
         boost::gregorian::date              date;
         boost::posix_time::time_duration    time;
 };
+
+/// @}
+///
+//##############################################################################
 
 }
 #endif

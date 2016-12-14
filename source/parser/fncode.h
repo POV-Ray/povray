@@ -129,7 +129,7 @@ class FNCode
     private:
         FunctionCode *function;
         Parser *parser;
-        FunctionVM *functionVM;
+        intrusive_ptr<FunctionVM> functionVM;
 
         unsigned int max_program_size;
         unsigned int max_stack_size;

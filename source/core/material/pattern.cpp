@@ -448,14 +448,7 @@ bool ColourFunctionPattern::Evaluate(TransColour& result, const Vector3d& EPoint
     {
         ColourChannel channelValue = 0.0;
         if (pFn[iChannel])
-        {
-            GenericFunctionContextPtr pCtx = pFn[iChannel]->AcquireContext(pThread);
-            pFn[iChannel]->InitArguments(pCtx);
-            for (int iDimension = 0; iDimension < 3; ++iDimension)
-                pFn[iChannel]->PushArgument(pCtx, EPoint[iDimension]);
-            channelValue = pFn[iChannel]->Execute(pCtx);
-            pFn[iChannel]->ReleaseContext(pCtx);
-        }
+            channelValue = GenericScalarFunctionInstance(pFn[iChannel], pThread).Evaluate(EPoint);
         switch (iChannel)
         {
         case 3:  result.filter()           = channelValue; break;
@@ -522,7 +515,14 @@ DensityFilePattern::~DensityFilePattern()
 
 FacetsPattern::FacetsPattern() : facetsSize(0.1), facetsCoords(0), facetsMetric(2) {}
 
-FractalPattern::FractalPattern() : interiorType(0), exteriorType(1), exteriorFactor(1), interiorFactor(1) {}
+
+FractalPattern::FractalPattern() :
+    interiorType(0),
+    exteriorType(1),
+    maxIterations(),        // no explicit default; must be set by caller
+    exteriorFactor(1),
+    interiorFactor(1)
+{}
 
 
 DBL FacetsPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const
@@ -635,18 +635,24 @@ ColourBlendMapConstPtr RadialPattern::GetDefaultBlendMap() const { return gpDefa
 
 SlopePattern::SlopePattern() :
     altitudeDirection(0.0, 0.0, 0.0),
-    // altitudeSlope and altitudeLen do not have explicit defaults
+    slopeDirection(),       // no explicit default; must be set by caller
+    altitudeLen(),          // no explicit default; must be set by caller
     altitudeModLow(0.0),
     altitudeModWidth(0.0),
-    // slopeLen does not have an explicit default
+    slopeLen(),             // no explicit default; must be set by caller
     slopeModLow(0.0),
     slopeModWidth(0.0),
-    // altitudeAxis and slopeAxis do not have explicit defaults
+    altitudeAxis(),         // no explicit default; must be set by caller
+    slopeAxis(),            // no explicit default; must be set by caller
     pointAt(false)
 {}
 
 
-SpiralPattern::SpiralPattern() { waveType = kWaveType_Triangle; }
+SpiralPattern::SpiralPattern() :
+    arms()                  // no explicit default; must be set by caller
+{
+    waveType = kWaveType_Triangle;
+}
 
 ColourBlendMapConstPtr SquarePattern::GetDefaultBlendMap() const { return gpDefaultBlendMap_Square; }
 unsigned int SquarePattern::NumDiscreteBlendMapEntries() const { return 4; }

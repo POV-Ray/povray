@@ -39,8 +39,6 @@
 #include "backend/frame.h"
 #include "backend/scene/viewthreaddata.h"
 
-#include "vm/fnpovfpu.h"
-
 #include "backend/scene/backendscenedata.h"
 #include "backend/scene/view.h"
 

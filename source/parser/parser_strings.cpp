@@ -232,13 +232,13 @@ UCS2 *Parser::Parse_Str(bool pathname)
     DBL val;
     int l, d;
 
-    GET(LEFT_PAREN_TOKEN);
+    Parse_Paren_Begin();
     val = Parse_Float();
     Parse_Comma();
     l = (int)Parse_Float();
     Parse_Comma();
     d = (int)Parse_Float();
-    GET(RIGHT_PAREN_TOKEN);
+    Parse_Paren_End();
 
     p = temp3;
     *p++ = '%';
@@ -305,7 +305,7 @@ UCS2 *Parser::Parse_VStr(bool pathname)
     UCS2 *str2;
     UCS2 *New;
 
-    GET(LEFT_PAREN_TOKEN);
+    Parse_Paren_Begin();
 
     vl = (int)Parse_Float();
     Parse_Comma();
@@ -325,7 +325,7 @@ UCS2 *Parser::Parse_VStr(bool pathname)
     Parse_Comma();
     d = (int)Parse_Float();
 
-    GET(RIGHT_PAREN_TOKEN);
+    Parse_Paren_End();
 
     p = temp3;
     *(p++) = '%';
@@ -396,12 +396,13 @@ UCS2 *Parser::Parse_Concat(bool pathname)
     UCS2 *str;
     UCS2 *New;
 
-    GET(LEFT_PAREN_TOKEN);
+    Parse_Paren_Begin();
 
     New = Parse_String();
 
     EXPECT
         CASE(RIGHT_PAREN_TOKEN)
+            UNGET
             EXIT
         END_CASE
 
@@ -413,6 +414,8 @@ UCS2 *Parser::Parse_Concat(bool pathname)
             POV_FREE(str);
         END_CASE
     END_EXPECT
+
+    Parse_Paren_End();
 
     return New;
 }
@@ -481,11 +484,13 @@ UCS2 *Parser::Parse_Datetime(bool pathname)
     int vlen = 0;
     char val[PARSE_NOW_VAL_LENGTH + 1]; // Arbitrary size, usually a date format string is far less
 
-    GET(LEFT_PAREN_TOKEN);
+    Parse_Paren_Begin();
+
     std::time_t timestamp = floor((Parse_Float() + (365*30+7)) * 24*60*60 + 0.5);
     Parse_Comma();
     EXPECT_ONE
         CASE(RIGHT_PAREN_TOKEN)
+            UNGET
             CallFree = false;
             // we use GMT as some platforms (e.g. windows) have different ideas of what to print when handling '%z'.
             FormatStr = (char *)"%Y-%m-%d %H:%M:%SZ";
@@ -505,9 +510,10 @@ UCS2 *Parser::Parse_Datetime(bool pathname)
                 POV_FREE(FormatStr);
                 Error("Format string too long.");
             }
-            GET(RIGHT_PAREN_TOKEN);
         END_CASE
     END_EXPECT
+
+    Parse_Paren_End();
 
     // NB don't wrap only the call to strftime() in the try, because visual C++ will, in release mode,
     // optimize the try/catch away since it doesn't believe that the RTL can throw exceptions. since
@@ -570,7 +576,7 @@ UCS2 *Parser::Parse_Substr(bool pathname)
     UCS2 *New;
     int l, d;
 
-    GET(LEFT_PAREN_TOKEN);
+    Parse_Paren_Begin();
 
     str = Parse_String(pathname);
     Parse_Comma();
@@ -578,7 +584,7 @@ UCS2 *Parser::Parse_Substr(bool pathname)
     Parse_Comma();
     d = (int)Parse_Float();
 
-    GET(RIGHT_PAREN_TOKEN);
+    Parse_Paren_End();
 
     if(((l + d - 1) > UCS2_strlen(str)) || (l < 0) || (d < 0))
         Error("Illegal parameters in substr.");
@@ -615,12 +621,12 @@ UCS2 *Parser::Parse_Strupr(bool pathname)
 {
     UCS2 *New;
 
-    GET(LEFT_PAREN_TOKEN);
+    Parse_Paren_Begin();
 
     New = Parse_String(pathname);
     UCS2_strupr(New);
 
-    GET(RIGHT_PAREN_TOKEN);
+    Parse_Paren_End();
 
     return New;
 }
@@ -648,12 +654,12 @@ UCS2 *Parser::Parse_Strlwr(bool pathname)
 {
     UCS2 *New;
 
-    GET(LEFT_PAREN_TOKEN);
+    Parse_Paren_Begin();
 
     New = Parse_String(pathname);
     UCS2_strlwr(New);
 
-    GET(RIGHT_PAREN_TOKEN);
+    Parse_Paren_End();
 
     return New;
 }

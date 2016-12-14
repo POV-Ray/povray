@@ -127,7 +127,7 @@ struct FunctionCode
     unsigned int localvar_pos[MAX_FUNCTION_PARAMETER_LIST];
     char *localvar[MAX_FUNCTION_PARAMETER_LIST];
     char *parameter[MAX_FUNCTION_PARAMETER_LIST];
-    FunctionSourceInfo sourceInfo;
+    SourceInfo sourceInfo;
     unsigned int flags;
     FNCODE_PRIVATE_COPY_METHOD private_copy_method;
     FNCODE_PRIVATE_DESTROY_METHOD private_destroy_method;
@@ -168,7 +168,7 @@ class FPUContext : public GenericFunctionContext
         StackFrame *pstackbase;
         DBL *dblstackbase;
         unsigned int maxdblstacksize;
-        FunctionVM *functionvm;
+        intrusive_ptr<FunctionVM> functionvm;
         TraceThreadData *threaddata;
         #if (SYS_FUNCTIONS == 1)
         DBL *dblstack;
@@ -258,6 +258,7 @@ class FunctionVM : public GenericFunctionContextFactory
 {
         friend void POVFPU_Exception(FPUContext *, FUNCTION, const char *);
         friend DBL POVFPU_RunDefault(FPUContext *, FUNCTION);
+
     public:
 
         class CustomFunction : public GenericScalarFunction
@@ -271,9 +272,9 @@ class FunctionVM : public GenericFunctionContextFactory
                 virtual void PushArgument(GenericFunctionContextPtr pContext, DBL arg);
                 virtual DBL Execute(GenericFunctionContextPtr pContext);
                 virtual GenericScalarFunctionPtr Clone() const;
-                virtual const FunctionSourceInfo* GetSourceInfo() const;
+                virtual const SourceInfo* GetSourceInfo() const;
             protected:
-                FunctionVM *mpVm;
+                intrusive_ptr<FunctionVM> mpVm;
                 FUNCTION_PTR mpFn;
         };
 

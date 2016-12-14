@@ -50,6 +50,13 @@
 namespace pov
 {
 
+//##############################################################################
+///
+/// @defgroup PovCoreMathSpline Splines
+/// @ingroup PovCoreMath
+///
+/// @{
+
 typedef DBL EXPRESS[5];
 
 struct SplineEntry
@@ -120,6 +127,10 @@ void Release_Spline_Reference(GenericSpline* sp);
 void Destroy_Spline(GenericSpline* sp);
 void Insert_Spline_Entry(GenericSpline* sp, DBL p, const EXPRESS& v);
 DBL Get_Spline_Val(GenericSpline* sp, DBL p, EXPRESS& v, int *Terms);
+
+/// @}
+///
+//##############################################################################
 
 }
 

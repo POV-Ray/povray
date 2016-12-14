@@ -60,6 +60,11 @@ namespace pov
 
 const DBL Fractal_Tolerance = 1e-7;
 
+#define Iteration(V,F,IS) ( (F)->Rules->Iterate(V,F,IS) )
+#define Normal_Calc(F,V,IS) ( (F)->Rules->CalcNormal(V,(F)->Num_Iterations,F,IS) )
+#define F_Bound(R,F,dm,dM) ( (F)->Rules->Bound(R,F,dm,dM) )
+#define D_Iteration(V,F,I,D,IS) ( (F)->Rules->Iterate(V,F,I,D,IS) )
+
 /*****************************************************************************
 * Local variables
 ******************************************************************************/
@@ -776,10 +781,14 @@ int Fractal::SetUp_Fractal(void)
                     Rules = FractalRulesPtr(new HypercomplexZ3FractalRules());
                     break;
 
-                default:  /* SQR_STYPE or else... */
+                case SQR_STYPE:
 
                     Rules = FractalRulesPtr(new HypercomplexFractalRules());
                     break;
+
+                default:
+
+                    throw POV_EXCEPTION_STRING("Subtype unknown in fractal.");
             }
 
             break;

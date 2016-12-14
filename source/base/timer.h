@@ -50,6 +50,13 @@
 namespace pov_base
 {
 
+//##############################################################################
+///
+/// @defgroup PovBaseTimer Time Handling
+/// @ingroup PovBase
+///
+/// @{
+
 #if POV_MULTITHREADED && POV_USE_DEFAULT_DELAY
 
 /// Wait for the specified time.
@@ -61,7 +68,7 @@ namespace pov_base
 ///     cannot provide a better implementation.
 ///
 /// @todo
-///     The current implementation is baded on boost::xtime, which has been deprecated since
+///     The current implementation is based on boost::xtime, which has been deprecated since
 ///     boost 1.34.
 ///
 /// @attention
@@ -180,6 +187,10 @@ class Timer
 };
 
 #endif // POV_USE_DEFAULT_TIMER
+
+/// @}
+///
+//##############################################################################
 
 }
 

@@ -51,6 +51,7 @@
 #endif
 
 #include "core/coretypes.h"
+#include "core/math/randcosweighted.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -317,7 +318,7 @@ class LegacyCosWeightedDirectionGenerator : public HybridNumberGenerator<Vector3
 {
     public:
 
-        static const int NumEntries = 1600;
+        static const int NumEntries = kRandCosWeightedCount;
 
         struct ParameterStruct
         {
@@ -785,8 +786,6 @@ shared_ptr<NumberSequenceFactory<ValueType> > NumberSequenceMetaFactory<ValueTyp
  *  LegacyCosWeightedDirectionGenerator implementation
  *********************************************************************************/
 
-extern BYTE_XYZ rad_samples[]; // defined in rad_data.cpp
-
 bool LegacyCosWeightedDirectionGenerator::ParameterStruct::operator< (const ParameterStruct& other) const
 {
     return false; // all instances are equal
@@ -798,7 +797,7 @@ LegacyCosWeightedDirectionGenerator::LegacyCosWeightedDirectionGenerator(const P
 Vector3d LegacyCosWeightedDirectionGenerator::operator[](size_t i) const
 {
     Vector3d result;
-    VUnpack(result, &(rad_samples[i % NumEntries]));
+    VUnpack(result, &(kaRandCosWeighted[i % NumEntries]));
     return result;
 }
 

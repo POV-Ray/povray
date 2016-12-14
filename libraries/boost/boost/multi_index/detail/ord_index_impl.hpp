@@ -1556,7 +1556,7 @@ template<
 inline boost::mpl::true_* boost_foreach_is_noncopyable(
   boost::multi_index::detail::ordered_index<
     KeyFromValue,Compare,SuperMeta,TagList,Category,AugmentPolicy>*&,
-  boost::foreach::tag)
+  boost_foreach_argument_dependent_lookup_hack)
 {
   return 0;
 }

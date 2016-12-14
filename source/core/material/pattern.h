@@ -51,12 +51,14 @@
 namespace pov
 {
 
-/*****************************************************************************
-* Global preprocessor defines
-******************************************************************************/
+//##############################################################################
+///
+/// @defgroup PovCoreMaterialPattern Patterns
+/// @ingroup PovCore
+///
+/// @{
 
-#define LAST_SPECIAL_PATTERN        COLOUR_PATTERN
-#define LAST_SPECIAL_NORM_PATTERN   GENERIC_SPECIAL_NORM_PATTERN
+//******************************************************************************
 
 /// Legacy Identifier IDs for the various patterns.
 ///
@@ -87,6 +89,9 @@ enum PATTERN_IDS
 
     GENERIC_PATTERN                 ///< Pattern does not need any legacy special handling anywhere
 };
+
+#define LAST_SPECIAL_PATTERN        COLOUR_PATTERN
+#define LAST_SPECIAL_NORM_PATTERN   GENERIC_SPECIAL_NORM_PATTERN
 
 /* flags for patterned stuff */
 
@@ -135,7 +140,9 @@ const int kFractalMaxExponent = 33;
 // required by ImagePatternImpl (defined in support/imageutil.h)
 class ImageData;
 
+
 //******************************************************************************
+// Base Classes and Special Patterns
 
 /// Abstract class providing the interface and commonly-used data fields for all pattern implementations.
 ///
@@ -270,39 +277,6 @@ protected:
     static PatternPtr Clone(const T& obj) { return PatternPtr(new T(obj)); }
 };
 
-/// Abstract class providing additions to the basic pattern interface, as well as common code, for all patterns
-/// returning colours.
-///
-struct ColourPattern : public BasicPattern
-{
-    ColourPattern();
-    ColourPattern(const ColourPattern& obj);
-
-    virtual DBL Evaluate(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const;
-    virtual unsigned int NumDiscreteBlendMapEntries() const;
-    virtual bool CanMap() const;
-
-    /// Evaluates the pattern at a given point in space.
-    ///
-    /// @note   Derived classes should _not_ override this, but @ref EvaluateRaw() instead.
-    ///
-    /// @param[out]     result      The pattern's colour at the given point in space.
-    /// @param[in]      EPoint      The point of interest in 3D space.
-    /// @param[in]      pIsection   Additional information about the intersection. Evaluated by some patterns.
-    /// @param[in]      pRay        Additional information about the ray. Evaluated by some patterns.
-    /// @param[in,out]  pThread     Additional thread-local data. Evaluated by some patterns. Some patterns, such as the
-    ///                             crackle pattern, store cached data here.
-    /// @return                     `false` if the pattern is undefined at the given point in space.
-    ///
-    virtual bool Evaluate(TransColour& result, const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const = 0;
-
-    /// Whether the pattern has transparency.
-    ///
-    /// @return     `true` if the pattern has transparency.
-    ///
-    virtual bool HasTransparency() const = 0;
-};
-
 /// Abstract class providing additions to the basic pattern interface, as well as common code, for all
 /// continuous pattern implementations.
 ///
@@ -399,6 +373,9 @@ struct ImagePatternImpl
 };
 
 
+//******************************************************************************
+// Miscellaneous Patterns
+
 /// Implements the `agate` pattern.
 struct AgatePattern : public ContinuousPattern
 {
@@ -455,30 +432,6 @@ struct CheckerPattern : public DiscretePattern
     virtual DBL Evaluate(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const;
     virtual ColourBlendMapConstPtr GetDefaultBlendMap() const;
     virtual unsigned int NumDiscreteBlendMapEntries() const;
-};
-
-/// Implements the `user_defined` pattern.
-///
-/// @todo   The additional member variables should possibly be encapsulated.
-///
-struct ColourFunctionPattern : public ColourPattern
-{
-    GenericScalarFunctionPtr pFn[5];
-
-    ColourFunctionPattern();
-    ColourFunctionPattern(const ColourFunctionPattern& obj);
-    virtual ~ColourFunctionPattern();
-    virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
-    virtual bool Evaluate(TransColour& result, const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const;
-    virtual bool HasTransparency() const;
-};
-
-/// Implements the `image_map` pattern.
-struct ColourImagePattern : public ColourPattern, public ImagePatternImpl
-{
-    virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
-    virtual bool Evaluate(TransColour& result, const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const;
-    virtual bool HasTransparency() const;
 };
 
 /// Implements the `crackle` pattern.
@@ -568,49 +521,6 @@ struct FacetsPattern : public ContinuousPattern
     ///             called, and will throw an exception.
     ///
     virtual DBL EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const;
-};
-
-/// Abstract class providing additions to the basic pattern interface, as well as common code, for all fractal patterns.
-struct FractalPattern : public ContinuousPattern
-{
-    /// Maximum number of iterations.
-    unsigned int maxIterations;
-
-    /// A parameter to the algorithm for colouring the exterior of the fractal.
-    DBL exteriorFactor;
-
-    /// A parameter to the algorithm for colouring the interior of the fractal.
-    DBL interiorFactor;
-
-    /// Determines the algorithm to colour the exterior of the fractal.
-    unsigned char exteriorType;
-
-    /// Determines the algorithm to colour the interior of the fractal.
-    unsigned char interiorType;
-
-    FractalPattern();
-    virtual PatternPtr Clone() const = 0;
-    virtual DBL EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const = 0;
-
-protected:
-
-    /// Computes the exterior shade depending on the results of the fractal computation.
-    ///
-    /// @param  iters       The number of iterations after which bailout occurred.
-    /// @param  a           Final iteration "a" value.
-    /// @param  b           Final iteration "b" value.
-    /// @return             The exterior shade.
-    ///
-    DBL ExteriorColour(int iters, DBL a, DBL b) const;
-
-    /// Computes the interior shade depending on the results of the fractal computation.
-    ///
-    /// @param  a           Final iteration "a" value.
-    /// @param  b           Final iteration "b" value.
-    /// @param  mindist2    Square of the smallest distance to the origin thoughout all iterations.
-    /// @return             The interior shade.
-    ///
-    DBL InteriorColour(DBL a, DBL b, DBL mindist2) const;
 };
 
 /// Implements the `function` pattern.
@@ -824,16 +734,6 @@ struct SphericalPattern : public ContinuousPattern
     virtual DBL EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const;
 };
 
-/// Defines the common additional interface of the `spiral` and `spiral2` patterns.
-struct SpiralPattern : public ContinuousPattern
-{
-    short arms;
-
-    SpiralPattern();
-    virtual PatternPtr Clone() const = 0;
-    virtual DBL EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const = 0;
-};
-
 /// Implements the `square` pattern.
 struct SquarePattern : public DiscretePattern
 {
@@ -890,6 +790,55 @@ struct WrinklesPattern : public ContinuousPattern
 };
 
 
+//******************************************************************************
+// Fractal Patterns
+
+/// Abstract class providing additions to the basic pattern interface, as well as common code, for all fractal patterns.
+struct FractalPattern : public ContinuousPattern
+{
+    /// A parameter to the algorithm for colouring the exterior of the fractal.
+    DBL exteriorFactor;
+
+    /// A parameter to the algorithm for colouring the interior of the fractal.
+    DBL interiorFactor;
+
+    /// Maximum number of iterations.
+    unsigned int maxIterations;
+
+    /// Determines the algorithm to colour the exterior of the fractal.
+    unsigned char exteriorType;
+
+    /// Determines the algorithm to colour the interior of the fractal.
+    unsigned char interiorType;
+
+    FractalPattern();
+    virtual PatternPtr Clone() const = 0;
+    virtual DBL EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const = 0;
+
+protected:
+
+    /// Computes the exterior shade depending on the results of the fractal computation.
+    ///
+    /// @param  iters       The number of iterations after which bailout occurred.
+    /// @param  a           Final iteration "a" value.
+    /// @param  b           Final iteration "b" value.
+    /// @return             The exterior shade.
+    ///
+    DBL ExteriorColour(int iters, DBL a, DBL b) const;
+
+    /// Computes the interior shade depending on the results of the fractal computation.
+    ///
+    /// @param  a           Final iteration "a" value.
+    /// @param  b           Final iteration "b" value.
+    /// @param  mindist2    Square of the smallest distance to the origin thoughout all iterations.
+    /// @return             The interior shade.
+    ///
+    DBL InteriorColour(DBL a, DBL b, DBL mindist2) const;
+};
+
+//------------------------------------------------------------------------------
+// Julia Patterns
+
 /// Defines the common interface for all implementations of the julia pattern.
 /// Also provides an implementation of the `julia` pattern optimized for `exponent 2` (default).
 ///
@@ -935,6 +884,8 @@ struct JuliaXPattern : public JuliaPattern
     virtual DBL EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const;
 };
 
+//------------------------------------------------------------------------------
+// Mandelbrot Patterns
 
 /// Defines the common interface for all implementations of the `mandel` pattern.
 struct MandelPattern : public FractalPattern
@@ -981,6 +932,8 @@ struct MandelXPattern : public MandelPattern
     virtual DBL EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const;
 };
 
+//------------------------------------------------------------------------------
+// Magnet Patterns
 
 /// Implements the `magnet 1 mandel` pattern.
 struct Magnet1MPattern : public MandelPattern
@@ -1011,6 +964,9 @@ struct Magnet2JPattern : public JuliaPattern
 };
 
 
+//******************************************************************************
+// Noise-Based Patterns
+
 /// Implements the `bozo` pattern.
 struct BozoPattern : public NoisePattern
 {
@@ -1031,6 +987,19 @@ struct SpottedPattern : public NoisePattern
 };
 
 
+//******************************************************************************
+// Spiral Patterns
+
+/// Defines the common additional interface of the `spiral` and `spiral2` patterns.
+struct SpiralPattern : public ContinuousPattern
+{
+    short arms;
+
+    SpiralPattern();
+    virtual PatternPtr Clone() const = 0;
+    virtual DBL EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const = 0;
+};
+
 /// Implements the `spiral1` pattern.
 struct Spiral1Pattern : public SpiralPattern
 {
@@ -1044,6 +1013,83 @@ struct Spiral2Pattern : public SpiralPattern
     virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
     virtual DBL EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const;
 };
+
+
+//******************************************************************************
+// Coloured Patterns
+
+/// Abstract class providing additions to the basic pattern interface, as well as common code, for all patterns
+/// returning colours.
+///
+struct ColourPattern : public BasicPattern
+{
+    ColourPattern();
+    ColourPattern(const ColourPattern& obj);
+
+    /// Evaluates the pattern at a given point in space.
+    ///
+    /// @note   Derived classes should _not_ override this, but
+    ///         @ref Evaluate(TransColour&, const Vector3d&, const Intersection*, const Ray*,TraceThreadData*) const
+    ///         instead.
+    ///
+    /// @param[in]      EPoint      The point of interest in 3D space.
+    /// @param[in]      pIsection   Additional information about the intersection. Evaluated by some patterns.
+    /// @param[in]      pRay        Additional information about the ray. Evaluated by some patterns.
+    /// @param[in,out]  pThread     Additional thread-local data. Evaluated by some patterns. Some patterns, such as the
+    ///                             crackle pattern, store cached data here.
+    /// @return                     The pattern's value at the given point in space.
+    ///
+    virtual DBL Evaluate(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const;
+
+    virtual unsigned int NumDiscreteBlendMapEntries() const;
+    virtual bool CanMap() const;
+
+    /// Evaluates the pattern at a given point in space.
+    ///
+    /// @param[out]     result      The pattern's colour at the given point in space.
+    /// @param[in]      EPoint      The point of interest in 3D space.
+    /// @param[in]      pIsection   Additional information about the intersection. Evaluated by some patterns.
+    /// @param[in]      pRay        Additional information about the ray. Evaluated by some patterns.
+    /// @param[in,out]  pThread     Additional thread-local data. Evaluated by some patterns. Some patterns, such as the
+    ///                             crackle pattern, store cached data here.
+    /// @return                     `false` if the pattern is undefined at the given point in space.
+    ///
+    virtual bool Evaluate(TransColour& result, const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const = 0;
+
+    /// Whether the pattern has transparency.
+    ///
+    /// @return     `true` if the pattern has transparency.
+    ///
+    virtual bool HasTransparency() const = 0;
+};
+
+/// Implements the `user_defined` pattern.
+///
+/// @todo   The additional member variables should possibly be encapsulated.
+///
+struct ColourFunctionPattern : public ColourPattern
+{
+    GenericScalarFunctionPtr pFn[5];
+
+    ColourFunctionPattern();
+    ColourFunctionPattern(const ColourFunctionPattern& obj);
+    virtual ~ColourFunctionPattern();
+    virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
+    virtual bool Evaluate(TransColour& result, const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const;
+    virtual bool HasTransparency() const;
+};
+
+/// Implements the `image_map` pattern.
+struct ColourImagePattern : public ColourPattern, public ImagePatternImpl
+{
+    virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
+    virtual bool Evaluate(TransColour& result, const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const;
+    virtual bool HasTransparency() const;
+};
+
+
+//******************************************************************************
+// Crackle Pattern Support Types
 
 /// Helper class to implement the crackle cache.
 class CrackleCellCoord
@@ -1112,19 +1158,9 @@ struct CrackleCacheEntry
 
 typedef boost::unordered_map<CrackleCellCoord, CrackleCacheEntry, boost::hash<CrackleCellCoord> > CrackleCache;
 
-/*****************************************************************************
-* Global variables
-******************************************************************************/
 
-
-/*****************************************************************************
-* Global constants
-******************************************************************************/
-
-
-/*****************************************************************************
-* Global functions
-******************************************************************************/
+//******************************************************************************
+// Legacy Global Functions
 
 DBL Evaluate_TPat (const TPATTERN *TPat, const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread);
 void Init_TPat_Fields (TPATTERN *Tpat);
@@ -1143,6 +1179,10 @@ void Read_Density_File (IStream *dfile, DENSITY_FILE *df);
 int PickInCube (const Vector3d& tv, Vector3d& p1);
 
 void InitializePatternGenerators(void);
+
+/// @}
+///
+//##############################################################################
 
 }
 

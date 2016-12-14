@@ -11,7 +11,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2014 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -62,7 +62,7 @@ namespace pov_frontend
             virtual bool TakeOver(UnixDisplay *display) = 0;
 
             /**
-                 To read all pending events in an interfactive display system
+                 To read all pending events in an interactive display system
                  and interpret them.
 
                  @returns true if an abort request has been made, false otherwise

@@ -48,6 +48,13 @@
 namespace pov_base
 {
 
+//##############################################################################
+///
+/// @defgroup PovBaseImageEncoding Basic Colour Encoding and Decoding
+/// @ingroup PovBaseImage
+///
+/// @{
+
 class Image;
 
 enum DitherMethodId
@@ -61,56 +68,64 @@ enum DitherMethodId
     kPOVList_DitherMethod_Bayer4x4,
 };
 
-/// Abstract class representing generic dithering rules and respective state information.
+/// Abstract class representing a dithering algorithm and state.
 ///
-/// The interface is designed to be used in quantization of a single complete image, with the image processed line by
-/// line and pixel by pixel, starting at (x=0,y=0).
+/// @note
+///     The interface is designed to be used in quantization of a single complete image, with the
+///     image processed line by line and pixel by pixel, starting at (x=0,y=0). Failure to adhere
+///     to this processing order may lead to undefined behaviour in stateful dithering algorithms.
 ///
-class DitherHandler
+class DitherStrategy
 {
     public:
 
-        struct OffsetInfo
+        /// Represents an offset to a colour.
+        struct ColourOffset
         {
             union { float red, gray; };  float green, blue, alpha;
-            OffsetInfo() : red(0.0f), green(0.0f), blue(0.0f), alpha(0.0f) { }
-            OffsetInfo(float r, float g, float b, float a) : red(r), green(g), blue(b), alpha(a) { }
+            ColourOffset() : red(0.0f), green(0.0f), blue(0.0f), alpha(0.0f) { }
+            ColourOffset(float r, float g, float b, float a) : red(r), green(g), blue(b), alpha(a) { }
             void clear() { red = 0.0f; green = 0.0f; blue = 0.0f; alpha = 0.0f; }
             void setAll(float v) { red = v; green = v; blue = v; alpha = v; }
             void setRGB(RGBColour& v) { red = v.red(); green = v.green(); blue = v.blue(); alpha = 0.0; }
             RGBColour getRGB() { return RGBColour(red, green, blue); }
-            OffsetInfo operator*(float b) const { return OffsetInfo(red*b, green*b, blue*b, alpha*b); }
-            OffsetInfo operator+(const OffsetInfo& b) const { return OffsetInfo(red+b.red, green+b.green, blue+b.blue, alpha+b.alpha); }
-            void operator+=(const OffsetInfo& b) { red+=b.red; green+=b.green; blue+=b.blue; alpha+=b.alpha; }
+            ColourOffset operator*(float b) const { return ColourOffset(red*b, green*b, blue*b, alpha*b); }
+            ColourOffset operator+(const ColourOffset& b) const { return ColourOffset(red+b.red, green+b.green, blue+b.blue, alpha+b.alpha); }
+            void operator+=(const ColourOffset& b) { red+=b.red; green+=b.green; blue+=b.blue; alpha+=b.alpha; }
         };
 
-        virtual ~DitherHandler() {}
+        virtual ~DitherStrategy() {}
 
-        /// Computes an offset to be added to the pixel value.
+        /// Queries a colour offset from the algorithm.
         ///
-        /// @param[in]  x       X coordinate of the pixel (may or may not be relevant to the handler).
-        /// @param[in]  y       Y coordinate of the pixel (may or may not be relevant to the handler).
+        /// This function computes an offset to be added to the colour of a given pixel, based on
+        /// the pixel location and/or the algorithm's state.
+        ///
+        /// @param[in]  x       X coordinate of the pixel (may or may not be relevant to the algorithm).
+        /// @param[in]  y       Y coordinate of the pixel (may or may not be relevant to the algorithm).
         /// @param[out] offLin  Linear offset to add before any encoding steps.
         ///                     This is typically based on carried-over quantization errors from neighboring pixels, as
-        ///                     used in stateful dither handlers.
+        ///                     used in stateful dither algorithms.
         /// @param[out] offQnt  Offset to add right before quantization (even after scaling).
         ///                     This is typically more or less random noise in the range [-0.5, 0.5], as used in
-        ///                     stateless dither handlers.
+        ///                     stateless dither algorithms.
         ///
-        virtual void getOffset(unsigned int x, unsigned int y, OffsetInfo& offLin, OffsetInfo& offQnt) = 0;
+        virtual void GetOffset(unsigned int x, unsigned int y, ColourOffset& offLin, ColourOffset& offQnt) = 0;
 
-        /// Informs the handler about the actual quantization error observed for one particular pixel.
+        /// Reports the actual quantization error to the algorithm.
         ///
-        /// @param[in]  x       X coordinate of the pixel (may or may not be relevant to the handler).
-        /// @param[in]  y       Y coordinate of the pixel (may or may not be relevant to the handler).
-        /// @param[in]  err     Linear quantization error.
+        /// This function feeds back the actual quantization error to the algorithm, allowing a
+        /// stateful algorithm to update its state accordingly.
         ///
-        virtual void setError(unsigned int x, unsigned int y, const OffsetInfo& err) {}
+        /// @param[in]  x       X coordinate of the pixel (may or may not be relevant to the algorithm).
+        /// @param[in]  y       Y coordinate of the pixel (may or may not be relevant to the algorithm).
+        /// @param[in]  err     Linear quantization error (may or may not be relevant to the algorithm).
+        ///
+        virtual void SetError(unsigned int x, unsigned int y, const ColourOffset& err) {}
 };
 
-typedef shared_ptr<DitherHandler> DitherHandlerPtr;
+typedef shared_ptr<DitherStrategy> DitherStrategySPtr;
 
-///
 //*****************************************************************************
 ///
 /// @name Dithering
@@ -118,26 +133,27 @@ typedef shared_ptr<DitherHandler> DitherHandlerPtr;
 /// The following functions provide dithering functionality.
 ///
 /// @{
-///
 
-/// Factory to get a dithering rule and state.
-DitherHandlerPtr GetDitherHandler(DitherMethodId method, unsigned int imageWidth);
+/// Factory function to get a dithering algorithm and state.
+DitherStrategySPtr GetDitherStrategy(DitherMethodId method, unsigned int imageWidth);
 
-/// Factory to get a no-op dithering rule.
-DitherHandlerPtr GetNoOpDitherHandler();
+/// Factory function to get a no-op dithering algorithm.
+DitherStrategySPtr GetNoOpDitherStrategy();
 
 /// Function providing simple stateless dithering.
 ///
-/// This function is provided as a fallback from the `DitherHandler` mechanism to provide basic dithering functionality
-/// in cases where stateful operation is impractical, such as the render preview.
+/// This function is provided as a fallback from the `DitherStrategy` mechanism to provide basic
+/// dithering functionality in cases where stateful operation is impractical, such as the render
+/// preview.
 ///
 /// The current implementation is based on 4x4 Bayer dithering.
 ///
+/// @param[in]  x   Image x coordinate.
+/// @param[in]  y   Image y coordinate.
 /// @return         Offset to add right before quantization (even after scaling).
 ///
 float GetDitherOffset(unsigned int x, unsigned int y);
 
-///
 /// @}
 ///
 //*****************************************************************************
@@ -147,29 +163,35 @@ float GetDitherOffset(unsigned int x, unsigned int y);
 /// The following functions provide single-channel decoding.
 ///
 /// @{
-///
 
 /// Linear decoding function.
 ///
-/// This function maps an integer value in the range 0..max linearly to a floating-point value in the range 0..1.
+/// This function maps an integer value in the range 0..max linearly to a floating-point value
+/// in the range 0..1.
 ///
-/// @param  x       value to decode
-/// @param  max     encoded value representing 1.0
+/// @param[in]  x       Value to decode.
+/// @param[in]  max     Encoded value representing 1.0.
+/// @return             Decoded value.
 ///
-inline float IntDecode(unsigned int x, unsigned int max) { return float(x) / float(max); }
+inline float IntDecode(unsigned int x, unsigned int max)
+{
+    return float(x) / float(max);
+}
 
 /// Generic decoding function.
 ///
-/// This function maps an integer value in the range 0..max to a floating-point value in the range 0..1
-/// using a specific transfer function (gamma curve).
+/// This function maps an integer value in the range 0..max to a floating-point value
+/// in the range 0..1 using a specific transfer function (gamma curve).
 ///
-/// @param  g       transfer function (gamma curve) to use
-/// @param  x       value to decode
-/// @param  max     encoded value representing 1.0
+/// @param[in]  g       Transfer function (gamma curve) to use.
+/// @param[in]  x       Value to decode.
+/// @param      max     Encoded value representing 1.0.
 ///
-inline float IntDecode(const GammaCurvePtr& g, unsigned int x, unsigned int max) { return GammaCurve::Decode(g,IntDecode(x,max)); }
+inline float IntDecode(const GammaCurvePtr& g, unsigned int x, unsigned int max)
+{
+    return GammaCurve::Decode(g, IntDecode(x, max));
+}
 
-///
 /// @}
 ///
 //*****************************************************************************
@@ -179,103 +201,87 @@ inline float IntDecode(const GammaCurvePtr& g, unsigned int x, unsigned int max)
 /// The following functions provide single-channel encoding (quantization).
 ///
 /// @{
-///
 
 /// Linear encoding function.
 ///
-/// This function maps a floating-point value in the range 0..1 linearly to in an integer value in the range 0..max.
+/// This function maps a floating-point value in the range 0..1 linearly to an integer value
+/// in the range 0..max.
 ///
-/// @note           Floating-point values outside the range 0..1 are clipped, mapping them to 0 or max, respectively.
+/// @note
+///     Floating-point values outside the range 0..1 are clipped, mapping them to 0 or max,
+///     respectively.
 ///
-/// @param[in]      x       value to encode
-/// @param[in]      max     encoded value representing 1.0
+/// @param[in]      x       Value to encode.
+/// @param[in]      max     Encoded value representing 1.0.
+/// @param[in]      qOff    Offset to add before quantization.
 ///
-inline unsigned int IntEncode(float x, unsigned int max) { return (unsigned int)floor( clip(x,0.0f,1.0f) * float(max) + 0.5f ); }
-
-/// Linear encoding function.
-///
-/// This function maps a floating-point value in the range 0..1 linearly to in an integer value in the range 0..max.
-///
-/// @note           Floating-point values outside the range 0..1 are clipped, mapping them to 0 or max, respectively.
-///
-/// @param[in]      x       value to encode
-/// @param[in]      max     encoded value representing 1.0
-/// @param[in]      qOff    offset to add before quantization
-///
-inline unsigned int IntEncode(float x, unsigned int max, float qOff)
+inline unsigned int IntEncode(float x, unsigned int max, float qOff = 0.0f)
 {
-    return IntEncode(x+qOff/float(max),max);
+    return (unsigned int)clip(floor(x * float(max) + qOff + 0.5f), 0.0f, float(max));
 }
 
 /// Linear encoding function.
 ///
-/// This function maps a floating-point value in the range 0..1 linearly to in an integer value in the range 0..max.
+/// This function maps a floating-point value in the range 0..1 linearly to an integer value
+/// in the range 0..max.
 ///
-/// @note           Floating-point values outside the range 0..1 are clipped, mapping them to 0 or max, respectively.
+/// @note
+///     Floating-point values outside the range 0..1 are clipped, mapping them to 0 or max,
+///     respectively.
 ///
-/// @param[in]      x       value to encode
-/// @param[in]      max     encoded value representing 1.0
-/// @param[in]      qOff    offset to add before quantization
-/// @param[out]     err     quantization error (including effects due to adding qOff)
+/// @param[in]      x       Value to encode.
+/// @param[in]      max     Encoded value representing 1.0.
+/// @param[in]      qOff    Offset to add before quantization.
+/// @param[out]     err     Quantization error (including effects due to adding qOff).
 ///
 inline unsigned int IntEncode(float x, unsigned int max, float qOff, float& err)
 {
-    unsigned int v = IntEncode(x,max,qOff);
-    err = clip(x,0.0f,1.0f) - IntDecode(v,max);
+    unsigned int v = IntEncode(x, max, qOff);
+    err = clip(x, 0.0f, 1.0f) - IntDecode(v, max);
     return v;
 }
 
 /// Generic encoding function.
 ///
-/// This function maps a floating-point value in the range 0..1 to in an integer value in the range 0..max.
+/// This function maps a floating-point value in the range 0..1 to an integer value
+/// in the range 0..max.
 ///
-/// @note           Floating-point values outside the range 0..1 (after applying the transfer function) are clipped,
-///                 mapping them to 0 or max, respectively.
+/// @note
+///     Floating-point values outside the range 0..1 (after applying the transfer function)
+///     are clipped, mapping them to 0 or max, respectively.
 ///
-/// @param[in]      g       transfer function (gamma curve) to use
-/// @param[in]      x       value to encode
-/// @param[in]      max     encoded value representing 1.0
+/// @param[in]      g       Transfer function (gamma curve) to use.
+/// @param[in]      x       Value to encode.
+/// @param[in]      max     Encoded value representing 1.0.
+/// @param[in]      qOff    Offset to add before quantization.
 ///
-inline unsigned int IntEncode(const GammaCurvePtr& g, float x, unsigned int max) { return IntEncode(GammaCurve::Encode(g,x),max); }
-
-/// Generic encoding function.
-///
-/// This function maps a floating-point value in the range 0..1 to in an integer value in the range 0..max.
-///
-/// @note           Floating-point values outside the range 0..1 (after applying the transfer function) are clipped,
-///                 mapping them to 0 or max, respectively.
-///
-/// @param[in]      g       transfer function (gamma curve) to use
-/// @param[in]      x       value to encode
-/// @param[in]      max     encoded value representing 1.0
-/// @param[in]      qOff    offset to add before quantization
-///
-inline unsigned int IntEncode(const GammaCurvePtr& g, float x, unsigned int max, float qOff)
+inline unsigned int IntEncode(const GammaCurvePtr& g, float x, unsigned int max, float qOff = 0.0f)
 {
-    return IntEncode(GammaCurve::Encode(g,x)+qOff/float(max),max);
+    return IntEncode(GammaCurve::Encode(g, x), max, qOff);
 }
 
 /// Generic encoding function.
 ///
-/// This function maps a floating-point value in the range 0..1 to in an integer value in the range 0..max.
+/// This function maps a floating-point value in the range 0..1 to an integer value
+/// in the range 0..max.
 ///
-/// @note           Floating-point values outside the range 0..1 (after applying the transfer function) are clipped,
-///                 mapping them to 0 or max, respectively.
+/// @note
+///     Floating-point values outside the range 0..1 (after applying the transfer function)
+///     are clipped, mapping them to 0 or max, respectively.
 ///
-/// @param[in]      g       transfer function (gamma curve) to use
-/// @param[in]      x       value to encode
-/// @param[in]      max     encoded value representing 1.0
-/// @param[in]      qOff    offset to add before quantization
-/// @param[out]     err     quantization error (including effects due to adding qOff)
+/// @param[in]      g       Transfer function (gamma curve) to use.
+/// @param[in]      x       Value to encode.
+/// @param[in]      max     Encoded value representing 1.0.
+/// @param[in]      qOff    Offset to add before quantization.
+/// @param[out]     err     Quantization error (including effects due to adding qOff).
 ///
 inline unsigned int IntEncode(const GammaCurvePtr& g, float x, unsigned int max, float qOff, float& err)
 {
-    unsigned int v = IntEncode(g,x,max,qOff);
-    err = clip(x,0.0f,1.0f) - IntDecode(g,v,max);
+    unsigned int v = IntEncode(g, x, max, qOff);
+    err = clip(x, 0.0f, 1.0f) - IntDecode(g, v, max);
     return v;
 }
 
-///
 /// @}
 ///
 //*****************************************************************************
@@ -285,7 +291,6 @@ inline unsigned int IntEncode(const GammaCurvePtr& g, float x, unsigned int max,
 /// The following functions are provided to convert between premultiplied and non-premultiplied alpha.
 ///
 /// @{
-///
 
 /// Function to apply alpha premultiplication.
 ///
@@ -324,7 +329,6 @@ void AlphaUnPremultiply(RGBTColour& colour);
 ///
 void AlphaUnPremultiply(RGBColour& colour, float alpha);
 
-///
 /// @}
 ///
 //*****************************************************************************
@@ -334,7 +338,6 @@ void AlphaUnPremultiply(RGBColour& colour, float alpha);
 /// The following functions are provided as a convenience for image file decoding.
 ///
 /// @{
-///
 
 void SetEncodedGrayValue(Image* img, unsigned int x, unsigned int y, const GammaCurvePtr&, unsigned int max, unsigned int gray);
 void SetEncodedGrayAValue(Image* img, unsigned int x, unsigned int y, const GammaCurvePtr&, unsigned int max, unsigned int gray, unsigned int alpha, bool premul = false);
@@ -346,7 +349,6 @@ void SetEncodedRGBValue(Image* img, unsigned int x, unsigned int y, const GammaC
 void SetEncodedRGBAValue(Image* img, unsigned int x, unsigned int y, const GammaCurvePtr&, float red, float green, float blue, float alpha, bool premul = false);
 void SetEncodedRGBValue(Image* img, unsigned int x, unsigned int y, const GammaCurvePtr&, const RGBColour& rgb);
 
-///
 /// @}
 ///
 //*****************************************************************************
@@ -356,21 +358,24 @@ void SetEncodedRGBValue(Image* img, unsigned int x, unsigned int y, const GammaC
 /// The following functions are provided as a convenience for image file encoding (quantization).
 ///
 /// @{
-///
 
-unsigned int GetEncodedGrayValue(const Image* img, unsigned int x, unsigned int y, const GammaCurvePtr&, unsigned int max, DitherHandler& dh);
-void GetEncodedGrayAValue(const Image* img, unsigned int x, unsigned int y, const GammaCurvePtr&, unsigned int max, unsigned int& gray, unsigned int& alpha, DitherHandler& dh, bool premul = false);
-void GetEncodedRGBValue(const Image* img, unsigned int x, unsigned int y, const GammaCurvePtr&, unsigned int max, unsigned int& red, unsigned int& green, unsigned int& blue, DitherHandler& dh);
-void GetEncodedRGBAValue(const Image* img, unsigned int x, unsigned int y, const GammaCurvePtr&, unsigned int max, unsigned int& red, unsigned int& green, unsigned int& blue, unsigned int& alpha, DitherHandler& dh, bool premul = false);
+unsigned int GetEncodedGrayValue(const Image* img, unsigned int x, unsigned int y, const GammaCurvePtr&, unsigned int max, DitherStrategy& dh);
+void GetEncodedGrayAValue(const Image* img, unsigned int x, unsigned int y, const GammaCurvePtr&, unsigned int max, unsigned int& gray, unsigned int& alpha, DitherStrategy& dh, bool premul = false);
+void GetEncodedRGBValue(const Image* img, unsigned int x, unsigned int y, const GammaCurvePtr&, unsigned int max, unsigned int& red, unsigned int& green, unsigned int& blue, DitherStrategy& dh);
+void GetEncodedRGBAValue(const Image* img, unsigned int x, unsigned int y, const GammaCurvePtr&, unsigned int max, unsigned int& red, unsigned int& green, unsigned int& blue, unsigned int& alpha, DitherStrategy& dh, bool premul = false);
 float GetEncodedGrayValue(const Image* img, unsigned int x, unsigned int y, const GammaCurvePtr&);
 void GetEncodedGrayAValue(const Image* img, unsigned int x, unsigned int y, const GammaCurvePtr&, float& gray, float& alpha, bool premul = false);
 void GetEncodedRGBValue(const Image* img, unsigned int x, unsigned int y, const GammaCurvePtr&, float& red, float& green, float& blue);
 void GetEncodedRGBAValue(const Image* img, unsigned int x, unsigned int y, const GammaCurvePtr&, float& red, float& green, float& blue, float& alpha, bool premul = false);
 void GetEncodedRGBValue(const Image* img, unsigned int x, unsigned int y, const GammaCurvePtr&, RGBColour& rgb);
 
-///
 /// @}
 ///
+//*****************************************************************************
+
+/// @}
+///
+//##############################################################################
 
 }
 

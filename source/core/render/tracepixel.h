@@ -48,6 +48,13 @@
 namespace pov
 {
 
+//##############################################################################
+///
+/// @addtogroup PovCoreRender
+/// @ingroup PovCore
+///
+/// @{
+
 struct HasInteriorPointObjectCondition : public PointObjectCondition
 {
     virtual bool operator()(const Vector3d& point, ConstObjectPtr object) const;
@@ -140,6 +147,10 @@ class TracePixel : public Trace
         void TraceRayWithFocalBlur(RGBTColour& colour, DBL x, DBL y, DBL width, DBL height);
         void JitterCameraRay(Ray& ray, DBL x, DBL y, size_t ray_number);
 };
+
+/// @}
+///
+//##############################################################################
 
 }
 

@@ -49,7 +49,17 @@ namespace pov_base
 namespace Iff
 {
 
+//##############################################################################
+///
+/// @addtogroup PovBaseImage
+///
+/// @{
+
 Image *Read(IStream *file, const Image::ReadOptions& options);
+
+/// @}
+///
+//##############################################################################
 
 }
 

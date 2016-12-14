@@ -1,4 +1,4 @@
-//  (C) Copyright Gennadiy Rozental 2011-2014.
+//  (C) Copyright Gennadiy Rozental 2001.
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at 
 //  http://www.boost.org/LICENSE_1_0.txt)
@@ -36,7 +36,7 @@ namespace data {
 
 namespace {
 nfp::keyword<struct seed_t>         seed;
-nfp::keyword<struct distrbution_t>  distribution;
+nfp::keyword<struct distribution_t> distribution;
 nfp::keyword<struct engine_t>       engine;
 } // local namespace
 
@@ -47,7 +47,7 @@ template<typename SampleType>
 struct default_distribution {
     typedef typename mpl::if_<std::is_integral<SampleType>,
                               std::uniform_int_distribution<SampleType>,
-                              std::uniform_real_distribution<SampleType> >::type type;
+                              std::uniform_real_distribution<SampleType>>::type type;
 };
 
 } // namespace ds_detail
@@ -66,7 +66,7 @@ template<typename SampleType        = double,
          typename EngineType        = std::default_random_engine>
 class random_t {
 public:
-    typedef SampleType          data_type;
+    typedef SampleType          sample;
     typedef DistributionType    distr_type;
     typedef EngineType          engine_type;
 
@@ -127,7 +127,7 @@ private:
 //!
 //! The function returns an object that implements the dataset API.
 //! @note This function is available only for C++11 capable compilers.
-inline monomorphic::generated_by< monomorphic::random_t<> > random()
+inline monomorphic::generated_by< monomorphic::random_t<>> random()
 {
     return monomorphic::generated_by<monomorphic::random_t<>>( monomorphic::random_t<>() );
 }
@@ -136,7 +136,7 @@ inline monomorphic::generated_by< monomorphic::random_t<> > random()
 
 /// @overload boost::unit_test::data::random()
 template<typename SampleType>
-inline monomorphic::generated_by< monomorphic::random_t<SampleType> >
+inline monomorphic::generated_by< monomorphic::random_t<SampleType>>
 random( SampleType begin, SampleType end )
 {
     typedef monomorphic::random_t<SampleType> Gen;

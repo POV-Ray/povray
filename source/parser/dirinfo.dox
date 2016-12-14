@@ -1,2 +1,7 @@
-/// @dir
-/// Source code files for the parser.
+/**
+
+@dir
+@ingroup PovParser
+Source code files for the parser.
+
+*/

@@ -1577,7 +1577,7 @@ GenericFunctionContextPtr FunctionVM::CustomFunction::AcquireContext(TraceThread
 {
     FPUContext* pContext = NULL;
     if (pThreadData->functionContextPool.empty())
-        pContext = new FPUContext(mpVm, pThreadData);
+        pContext = new FPUContext(mpVm.get(), pThreadData);
     else
     {
         pContext = dynamic_cast<FPUContext*>(pThreadData->functionContextPool.back());
@@ -1618,10 +1618,10 @@ DBL FunctionVM::CustomFunction::Execute(GenericFunctionContextPtr pGenericContex
 
 GenericScalarFunctionPtr FunctionVM::CustomFunction::Clone() const
 {
-    return new CustomFunction(mpVm, mpVm->CopyFunction(mpFn));
+    return new CustomFunction(mpVm.get(), mpVm->CopyFunction(mpFn));
 }
 
-const FunctionSourceInfo* FunctionVM::CustomFunction::GetSourceInfo() const
+const SourceInfo* FunctionVM::CustomFunction::GetSourceInfo() const
 {
     return &(mpVm->GetFunction(*mpFn)->sourceInfo);
 }

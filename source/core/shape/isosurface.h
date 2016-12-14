@@ -42,17 +42,32 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "core/configcore.h"
 
+#include <boost/intrusive_ptr.hpp>
+
 #include "core/coretypes.h"
 #include "core/scene/object.h"
 
 namespace pov
 {
 
-/*****************************************************************************
-* Global preprocessor defines
-******************************************************************************/
+//##############################################################################
+///
+/// @addtogroup PovCoreShape
+///
+/// @{
+
+//******************************************************************************
+///
+/// @name Object Types
+///
+/// @{
 
 #define ISOSURFACE_OBJECT      (BASIC_OBJECT+POTENTIAL_OBJECT)
+
+/// @}
+///
+//******************************************************************************
+
 #define ISOSURFACE_MAXTRACE    10
 
 
@@ -61,20 +76,12 @@ namespace pov
 ******************************************************************************/
 
 class IsoSurface;
-class FPUContext;
-
-class FunctionVM;
 
 typedef unsigned char IsosurfaceMaxTrace;
 
 struct ISO_Pair { DBL t,f; };
 
-struct ISO_Max_Gradient
-{
-    unsigned int refcnt;
-    DBL max_gradient, gradient;
-    DBL eval_max, eval_cnt, eval_gradient_sum, eval_var;
-};
+struct ISO_Max_Gradient;
 
 struct ISO_ThreadData
 {
@@ -94,7 +101,7 @@ class IsoSurface : public ObjectBase
     public:
 
         GenericScalarFunctionPtr Function;
-        volatile DBL max_gradient; // global in eval
+        volatile DBL max_gradient; // modified during render if `eval` is set
         DBL gradient;
         DBL threshold;
         DBL accuracy;
@@ -102,7 +109,6 @@ class IsoSurface : public ObjectBase
         IsosurfaceMaxTrace max_trace;
         bool closed             : 1;
         bool eval               : 1;
-        bool isCopy             : 1;
         bool positivePolarity   : 1; ///< `true` if values above threshold are considered inside, `false` if considered outside.
 
         shared_ptr<ContainedByShape> container;
@@ -134,8 +140,13 @@ class IsoSurface : public ObjectBase
         inline bool IsInside (GenericScalarFunctionInstance& fn, Vector3d& p) const;
 
     private:
-        ISO_Max_Gradient *mginfo; // global, but just a statistic (read: not thread safe but we don't care) [trf]
+
+        intrusive_ptr<ISO_Max_Gradient> mginfo; // global, but just a statistic (read: not thread safe but we don't care) [trf]
 };
+
+/// @}
+///
+//##############################################################################
 
 }
 

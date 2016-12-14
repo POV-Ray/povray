@@ -300,7 +300,7 @@ class Parser : public SceneTask
         {
             pov_base::ITextStream *In_File;
             pov_base::OTextStream *Out_File;
-            bool fopenCompleted : 1; ///< `false` if still busy parsing `#fopen', `true` otherwise.
+            bool busyParsing    : 1; ///< `true` if parsing a statement related to the file, `false` otherwise.
             bool R_Flag         : 1;
         };
 
@@ -319,8 +319,16 @@ class Parser : public SceneTask
         // parse.h/parse.cpp
         void Parse_Error (TOKEN Token_Id);
         void Found_Instead_Error (const char *exstr, const char *extokstr);
-        bool Parse_Begin (bool mandatory = true);
-        void Parse_End (void);
+        bool Parse_Begin (TOKEN tokenId, bool mandatory);
+        void Parse_End (TOKEN tokenId);
+        inline bool Parse_Begin (bool mandatory = true) { return Parse_Begin(LEFT_CURLY_TOKEN, mandatory); }
+        inline void Parse_End (void) { Parse_End(RIGHT_CURLY_TOKEN); }
+        inline bool Parse_Paren_Begin (bool mandatory = true) { return Parse_Begin(LEFT_PAREN_TOKEN, mandatory); }
+        inline void Parse_Paren_End (void) { Parse_End(RIGHT_PAREN_TOKEN); }
+        inline bool Parse_Angle_Begin (bool mandatory = true) { return Parse_Begin(LEFT_ANGLE_TOKEN, mandatory); }
+        inline void Parse_Angle_End (void) { Parse_End(RIGHT_ANGLE_TOKEN); }
+        inline bool Parse_Square_Begin (bool mandatory = true) { return Parse_Begin(LEFT_SQUARE_TOKEN, mandatory); }
+        inline void Parse_Square_End (void) { Parse_End(RIGHT_SQUARE_TOKEN); }
         bool Parse_Comma (void);
         bool Peek_Token (TOKEN tokenId);
         void Parse_Semi_Colon (bool force_semicolon);
@@ -358,11 +366,14 @@ class Parser : public SceneTask
         void VersionWarning(unsigned int sinceVersion, const char *format,...);
         void PossibleError(const char *format,...);
         void Error(const char *format,...);
+        void ErrorInfo(const SourceInfo& loc, const char *format,...);
 
         int Debug_Info(const char *format,...);
         void FlushDebugMessageBuffer();
 
-        static void Convert_Filter_To_Transmit(PIGMENT *Pigment); // NK layers - 1999 July 10 - for backwards compatiblity with layered textures
+        // NK layers - 1999 July 10 - for backwards compatibility with layered textures
+        static void Convert_Filter_To_Transmit(PIGMENT *Pigment);
+        static void Convert_Filter_To_Transmit(GenericPigmentBlendMap *pBlendMap);
 
         /// @param[in]  formalFileName  Name by which the file is known to the user.
         /// @param[out] actualFileName  Name by which the file is known to the parsing computer.
@@ -463,6 +474,7 @@ class Parser : public SceneTask
         FUNCTION_PTR Parse_FunctionOrContent(void);
         void Parse_FunctionOrContentList(GenericScalarFunctionPtr* apFn, unsigned int count, bool mandatory = true);
         FUNCTION_PTR Parse_DeclareFunction(int *token_id, const char *fn_name, bool is_local);
+        intrusive_ptr<FunctionVM> GetFunctionVM() const;
 
         // parsestr.h/parsestr.cpp
         char *Parse_C_String(bool pathname = false);
@@ -492,7 +504,16 @@ class Parser : public SceneTask
 
         shared_ptr<BackendSceneData> backendSceneData; // TODO FIXME HACK - make private again once Locate_Filename is fixed [trf]
         shared_ptr<SceneData> sceneData;
+
     private:
+
+        struct BraceStackEntry
+        {
+            TOKEN       openToken;
+            SourceInfo  sourceInfo;
+        };
+
+        intrusive_ptr<FunctionVM> mpFunctionVM;
         FPUContext *fnVMContext;
 
         bool Had_Max_Trace_Level;
@@ -512,8 +533,7 @@ class Parser : public SceneTask
         /// true if a #version statement is being parsed
         bool parsingVersionDirective;
 
-        TOKEN *Brace_Stack;
-        int Brace_Index;
+        vector<BraceStackEntry> maBraceStack;
         bool Destroying_Frame;
 
         Camera Default_Camera;
@@ -648,7 +668,9 @@ class Parser : public SceneTask
         ObjectPtr Parse_Mesh();
         ObjectPtr Parse_Mesh2();
 
+#if POV_PARSER_EXPERIMENTAL_OBJ_IMPORT
         void Parse_Obj (Mesh*);
+#endif
         void Parse_Mesh1 (Mesh*);
         void Parse_Mesh2 (Mesh*);
 

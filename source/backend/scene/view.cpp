@@ -49,8 +49,6 @@
 #include "core/math/matrix.h"
 #include "core/support/octree.h"
 
-#include "vm/fnpovfpu.h"
-
 #include "povms/povmscpp.h"
 #include "povms/povmsid.h"
 

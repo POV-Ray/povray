@@ -105,7 +105,7 @@ typedef char Targa_extension[495];
 #define EXT_GAMMA_OFF 478
 #define EXT_PIXRATIO_OFF 474
 
-static Pixel *GetPix (const Image *image, int x, int y, Pixel *pixel, const GammaCurvePtr& gamma, DitherHandler& dither, bool premul)
+static Pixel *GetPix (const Image *image, int x, int y, Pixel *pixel, const GammaCurvePtr& gamma, DitherStrategy& dither, bool premul)
 {
     GetEncodedRGBAValue (image, x, y, gamma, 255, pixel->r, pixel->g, pixel->b, pixel->a, dither, premul);
     return (pixel);
@@ -124,32 +124,28 @@ void Write (OStream *file, const Image *image, const Image::WriteOptions& option
 {
     pix                     current;
     pix                     next;
-    bool                    opaque = !options.alphachannel;
-    bool                    compress = options.compress > 0 ;
+    bool                    opaque = options.AlphaIsEnabled();
+    bool                    compress = (options.compression > 0);
     vector<unsigned char>   header;
     vector<unsigned char>   line;
     GammaCurvePtr           gamma;
     Metadata                meta;
-    DitherHandler*          dither = options.dither.get();
+    DitherStrategy&         dither = *options.ditherStrategy;
 
-    if (options.encodingGamma)
-        gamma = TranscodingGammaCurve::Get(options.workingGamma, options.encodingGamma);
-    else
-        gamma = TranscodingGammaCurve::Get(options.workingGamma, SRGBGammaCurve::Get());
+    // If the user does not specify gamma, we're defaulting to sRGB.
+    gamma = options.GetTranscodingGammaCurve(SRGBGammaCurve::Get());
 
     // TODO ALPHA - check if TGA should really keep presuming non-premultiplied alpha
     // We presume non-premultiplied alpha, unless the user overrides
     // (e.g. to handle a non-compliant file).
-    bool premul = false;
-    if (options.premultiplyOverride)
-        premul = options.premultiply;
+    bool premul = options.AlphaIsPremultiplied(false);
 
     header.reserve (18);
     header.push_back (0);
     header.push_back (0);
 
     // byte 2 - targa file type (compressed/uncompressed)
-    header.push_back (options.compress ? 10 : 2);
+    header.push_back (compress ? 10 : 2);
 
     // Byte 3 - Index of first color map entry LSB
     // Byte 4 - Index of first color map entry MSB
@@ -184,19 +180,7 @@ void Write (OStream *file, const Image *image, const Image::WriteOptions& option
         throw POV_EXCEPTION(kFileDataErr, "header write failed for targa file") ;
 
     line.reserve (w * 4);
-    if (options.compress == 0)
-    {
-        Pixel pixel;
-        for (int row = 0; row  < h; row++)
-        {
-            line.clear ();
-            for (int col = 0; col < w; col++)
-                PutPix (line, GetPix (image, col, row, &pixel, gamma, *dither, premul), opaque);
-            if (!file->write (&line[0], line.size()))
-                throw POV_EXCEPTION(kFileDataErr, "row write failed for targa file") ;
-        }
-    }
-    else
+    if (compress)
     {
         // RLE compressed data
 
@@ -210,11 +194,11 @@ void Write (OStream *file, const Image *image, const Image::WriteOptions& option
             int ptype = 0;
             bool writenow = false;
 
-            GetPix (image, 0, row, &current, gamma, *dither, premul);
+            GetPix(image, 0, row, &current, gamma, dither, premul);
             while (true)
             {
                 if (startx + cnt < llen)
-                    GetPix (image, startx + cnt, row, &next, gamma, *dither, premul);
+                    GetPix(image, startx + cnt, row, &next, gamma, dither, premul);
                 else
                     next = current;
                 if (memcmp (&current, &next, sizeof (pix)) == 0)
@@ -261,7 +245,7 @@ void Write (OStream *file, const Image *image, const Image::WriteOptions& option
                     {
                         line.push_back ((unsigned char) cnt - 1);
                         for (int x = 0; x < cnt; x++)
-                            PutPix (line, GetPix (image, startx + x, row, &pixel, gamma, *dither, premul), opaque);
+                            PutPix(line, GetPix(image, startx + x, row, &pixel, gamma, dither, premul), opaque);
                     }
                     startx += cnt;
                     writenow = false;
@@ -274,6 +258,20 @@ void Write (OStream *file, const Image *image, const Image::WriteOptions& option
                     line.clear ();
                 }
             }
+        }
+    }
+    else
+    {
+        // uncompressed data
+
+        Pixel pixel;
+        for (int row = 0; row < h; ++row)
+        {
+            line.clear ();
+            for (int col = 0; col < w; ++col)
+                PutPix(line, GetPix(image, col, row, &pixel, gamma, dither, premul), opaque);
+            if (!file->write(&line[0], line.size()))
+                throw POV_EXCEPTION(kFileDataErr, "row write failed for targa file") ;
         }
     }
 

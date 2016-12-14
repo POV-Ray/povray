@@ -48,7 +48,17 @@ namespace pov_base
 namespace Tiff
 {
 
+//##############################################################################
+///
+/// @addtogroup PovBaseImage
+///
+/// @{
+
 Image *Read(IStream *file, const Image::ReadOptions& options);
+
+/// @}
+///
+//##############################################################################
 
 }
 

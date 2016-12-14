@@ -3906,9 +3906,9 @@ Image *Image::Create(unsigned int w, unsigned int h, ImageDataType t, const vect
 
 Image *Image::Read(ImageFileType type, IStream *file, const ReadOptions& options)
 {
-    #ifdef SYS_TO_STANDARD
+    #ifdef POV_SYS_IMAGE_TYPE
         if (type == SYS)
-            type = SYS_TO_STANDARD ;
+            type = POV_SYS_IMAGE_TYPE;
     #endif
 
     switch (type)
@@ -4007,9 +4007,9 @@ void Image::Write(ImageFileType type, OStream *file, const Image *image, const W
     if (file == NULL)
         throw POV_EXCEPTION(kCannotOpenFileErr, "Invalid image file");
 
-#ifdef SYS_TO_STANDARD
+#ifdef POV_SYS_IMAGE_TYPE
     if (type == SYS)
-        type = SYS_TO_STANDARD ;
+        type = POV_SYS_IMAGE_TYPE;
 #endif
 
     switch (type)

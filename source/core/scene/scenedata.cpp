@@ -51,11 +51,11 @@
 namespace pov
 {
 
-SceneData::SceneData(GenericFunctionContextFactory* fcf) :
+SceneData::SceneData() :
     fog(NULL),
     rainbow(NULL),
     skysphere(NULL),
-    functionContextFactory(fcf)
+    functionContextFactory()
 {
     atmosphereIOR = 1.0;
     atmosphereDispersion = 0.0;
@@ -71,6 +71,7 @@ SceneData::SceneData(GenericFunctionContextFactory* fcf) :
     stringEncoding = kStringEncoding_ASCII;
     noiseGenerator = kNoiseGen_RangeCorrected;
     explicitNoiseGenerator = false; // scene has not set the noise generator explicitly
+    boundingMethod = 0;
     numberOfWaves = 10;
     parsedMaxTraceLevel = MAX_TRACE_LEVEL_DEFAULT;
     parsedAdcBailout = 1.0 / 255.0; // adc bailout sufficient for displays
@@ -124,7 +125,6 @@ SceneData::~SceneData()
     // TODO: perhaps ObjectBase::~ObjectBase would be a better place
     //       to handle cleanup of individual objects ?
     Destroy_Object(objects);
-    delete functionContextFactory;
 
     if(tree != NULL)
         delete tree;
