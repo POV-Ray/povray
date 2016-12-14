@@ -49,6 +49,20 @@
 ///
 /// @{
 
+/// @def POV_PARSER_EXPERIMENTAL_BRILLIANCE_OUT
+/// Whether experimental second brilliance parameter should be enabled.
+///
+#ifndef POV_PARSER_EXPERIMENTAL_BRILLIANCE_OUT
+    #define POV_PARSER_EXPERIMENTAL_BRILLIANCE_OUT 0
+#endif
+
+/// @def POV_PARSER_EXPERIMENTAL_OBJ_IMPORT
+/// Whether experimental Wavefront OBJ import should be enabled.
+///
+#ifndef POV_PARSER_EXPERIMENTAL_OBJ_IMPORT
+    #define POV_PARSER_EXPERIMENTAL_OBJ_IMPORT 0
+#endif
+
 /// @def POV_PARSER_MAX_CACHED_MACRO_SIZE
 /// Default size limit for macros to be cached in memory.
 ///

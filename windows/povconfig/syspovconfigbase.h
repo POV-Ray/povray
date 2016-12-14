@@ -43,6 +43,7 @@
 
 #ifdef _DEBUG
     #define POV_DEBUG 1
+    #define POV_BOMB_ON_ERROR 0
 #else
     #define POV_DEBUG 0
 #endif

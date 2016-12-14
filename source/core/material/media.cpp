@@ -457,7 +457,18 @@ void MediaFunction::ComputeMediaAdaptiveSampling(MediaVector& medias, LightSourc
             // keep a sum of the results
             // do some attenuation, too, since we are doing samples in order
             // TODO - we could do even better if we handled attenuation on a per-sample basis
-            i->te += Result * Exp(-(i->od + ODResult * 0.5) * dd);
+
+            // Compute attenuation due to earlier sub-intervals.
+            Result *= Exp(-(i->od) * dd);
+            // Compute attenuation due to the sub-interval itself.
+            // NB: This formula is mathematically precise under the presumption that the ratio of emission to absorbtion
+            // remains constant throughout the entire sub-interval.
+            for (int iChannel = 0; iChannel < Result.channels; ++iChannel)
+            {
+                if (ODResult[iChannel] != 0.0)
+                    Result[iChannel] *= (1.0 - exp(-ODResult[iChannel] * dd)) / (ODResult[iChannel] * dd);
+            }
+            i->te += Result;
 
             // move c1 to c0 to go on to next sample/interval
             C0 = C1;

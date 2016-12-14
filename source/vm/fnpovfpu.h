@@ -127,7 +127,7 @@ struct FunctionCode
     unsigned int localvar_pos[MAX_FUNCTION_PARAMETER_LIST];
     char *localvar[MAX_FUNCTION_PARAMETER_LIST];
     char *parameter[MAX_FUNCTION_PARAMETER_LIST];
-    FunctionSourceInfo sourceInfo;
+    SourceInfo sourceInfo;
     unsigned int flags;
     FNCODE_PRIVATE_COPY_METHOD private_copy_method;
     FNCODE_PRIVATE_DESTROY_METHOD private_destroy_method;
@@ -272,7 +272,7 @@ class FunctionVM : public GenericFunctionContextFactory
                 virtual void PushArgument(GenericFunctionContextPtr pContext, DBL arg);
                 virtual DBL Execute(GenericFunctionContextPtr pContext);
                 virtual GenericScalarFunctionPtr Clone() const;
-                virtual const FunctionSourceInfo* GetSourceInfo() const;
+                virtual const SourceInfo* GetSourceInfo() const;
             protected:
                 intrusive_ptr<FunctionVM> mpVm;
                 FUNCTION_PTR mpFn;

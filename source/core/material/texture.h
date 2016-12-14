@@ -124,7 +124,11 @@ struct Texture_Struct : public Pattern_Struct
 
 struct Finish_Struct
 {
-    SNGL Diffuse, DiffuseBack, Brilliance, BrillianceOut, BrillianceAdjust, BrillianceAdjustRad;
+    SNGL Diffuse, DiffuseBack, Brilliance;
+#if POV_PARSER_EXPERIMENTAL_BRILLIANCE_OUT
+    SNGL BrillianceOut;
+#endif
+    SNGL BrillianceAdjust, BrillianceAdjustRad;
     SNGL Specular, Roughness;
     SNGL Phong, Phong_Size;
     SNGL Irid, Irid_Film_Thickness, Irid_Turb;

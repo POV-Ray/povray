@@ -121,7 +121,7 @@ FNCode::FNCode(Parser *pa, FunctionCode *f, bool is_local, const char *n)
         function->sourceInfo.name = POV_STRDUP(n);
     else
         function->sourceInfo.name = POV_STRDUP("");
-    function->sourceInfo.filename = pa->UCS2_strdup(parser->Token.FileHandle->name());
+    function->sourceInfo.filename = parser->UCS2_strdup(parser->Token.FileHandle->name());
     if(parser->Token.FileHandle != NULL)
         function->sourceInfo.filepos = parser->Token.FileHandle->tellg();
     else
@@ -129,6 +129,7 @@ FNCode::FNCode(Parser *pa, FunctionCode *f, bool is_local, const char *n)
         function->sourceInfo.filepos.lineno = 0;
         function->sourceInfo.filepos.offset = 0;
     }
+    function->sourceInfo.col = parser->Token.Token_Col_No;
     function->flags = 0;
     function->private_copy_method = NULL;
     function->private_destroy_method = NULL;
@@ -404,6 +405,7 @@ void FNCode_Copy(FunctionCode *f, FunctionCode *fnew)
         fnew->localvar[i] = POV_STRDUP(f->localvar[i]);
     fnew->filepos.lineno = f->filepos.lineno;
     fnew->filepos.offset = f->filepos.offset;
+    fnew->col = f->col;
     fnew->flags = f->flags;
 
     fnew->private_copy_method = f->private_copy_method;

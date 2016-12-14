@@ -936,8 +936,10 @@ void Trace::ComputeLightedTexture(MathColour& resultColour, ColourChannel& resul
                     radiosityContribution += (layCol.colour() * ambBackCol) * (att * diffuse);
                 }
 
+#if POV_PARSER_EXPERIMENTAL_BRILLIANCE_OUT
                 if((sceneData->radiositySettings.brilliance) && (layer->Finish->BrillianceOut != 1.0))
                     radiosityContribution *= pow(fabs(cos_Angle_Incidence), layer->Finish->BrillianceOut-1.0) * (layer->Finish->BrillianceOut+7.0)/8.0;
+#endif
 
                 if(layer->Finish->Fresnel)
                 {
@@ -976,11 +978,13 @@ void Trace::ComputeLightedTexture(MathColour& resultColour, ColourChannel& resul
 
                     ComputeDiffuseLight(layer->Finish, isect.IPoint, ray, layNormal, layCol.colour(), classicContribution, att, isect.Object, relativeIor);
 
+#if POV_PARSER_EXPERIMENTAL_BRILLIANCE_OUT
                     if(layer->Finish->BrillianceOut != 1.0)
                     {
                         double cos_angle_of_incidence = dot(ray.Direction, layNormal);
                         classicContribution *= pow(fabs(cos_angle_of_incidence), layer->Finish->BrillianceOut-1.0)* (layer->Finish->BrillianceOut+7.0)/8.0;
                     }
+#endif
 
                     tmpCol += classicContribution;
                 }
@@ -995,11 +999,13 @@ void Trace::ComputeLightedTexture(MathColour& resultColour, ColourChannel& resul
 
                     ComputePhotonDiffuseLight(layer->Finish, isect.IPoint, ray, layNormal, rawnormal, layCol.colour(), photonsContribution, att, isect.Object, relativeIor, *surfacePhotonGatherer);
 
+#if POV_PARSER_EXPERIMENTAL_BRILLIANCE_OUT
                     if(layer->Finish->BrillianceOut != 1.0)
                     {
                         double cos_angle_of_incidence = dot(ray.Direction, layNormal);
                         photonsContribution *= pow(fabs(cos_angle_of_incidence), layer->Finish->BrillianceOut-1.0) * (layer->Finish->BrillianceOut+7.0)/8.0;
                     }
+#endif
 
                     tmpCol += photonsContribution;
                 }

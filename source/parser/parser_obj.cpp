@@ -36,6 +36,8 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "parser/parser.h"
 
+#if POV_PARSER_EXPERIMENTAL_OBJ_IMPORT
+
 #include <cctype>
 
 #include "core/material/interior.h"
@@ -47,7 +49,7 @@
 namespace pov
 {
 
-static const int kMaxObjBufferSize = 1014;
+static const int kMaxObjBufferSize = 1024;
 
 #define PAIR(c1,c2)         ( ((int)(c1)) + (((int)(c2))<<8) )
 #define TRIPLET(c1,c2,c3)   ( ((int)(c1)) + (((int)(c2))<<8) + (((int)(c3))<<16) )
@@ -574,3 +576,5 @@ void Parser::Parse_Obj (Mesh* mesh)
 }
 
 }
+
+#endif // POV_PARSER_EXPERIMENTAL_OBJ_IMPORT

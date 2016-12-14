@@ -42,323 +42,369 @@ To Do
 
 Prior to the release of 3.7.1, the following items still need urgent attention:
 
-- The new features need to be properly documented.
+  - The new features need to be properly documented.
 
-- The Windows version's inbuilt help index needs to be fixed.
+  - The Windows version's inbuilt help index needs to be fixed.
 
 New Features
 ------------
 
-- A new finish parameter, `use_alpha`, has been added to suppress highlights
-  and reflections depending on pigment transparency.
+Materials:
 
-- Array elements no longer have to be of the same type.
+  - A new finish parameter, `use_alpha`, has been added to suppress highlights
+    and reflections depending on pigment transparency.
 
-- Support for variable-size arrays has been added.
+  - A new special pigment pattern, `user_defined`, has been added to define the
+    pigment colour directly in terms of a set of functions.
 
-- A new data container, `dictionary`, has been added to support structured
-  storage of data.
+  - A new pattern, `potential`, has been added to define a pattern based on the
+    potential field of a blob or isosurface object.
 
-- Pseudo-dictionaries `local` and `global` have been added, allowing to
-  specifically access local or global identifiers, respectively.
+  - The `map_type` keyword now supports the Angular Map projection for light
+    probes, popularized by Paul Devebec, as type 7.
 
-- A new special pigment pattern, `user_defined`, has been added to define the
-  pigment colour directly in terms of a set of functions.
+  - Native support for repetition has been added to the `crackle` pattern to
+    avoid the discontinuities in the pattern caused by repeat warps.
 
-- A new pattern, `potential`, has been added to define a pattern based on the
-  potential field of a blob or isosurface object.
+  - The torus syntax has been extended to give more control over the spindle in
+    a self-intersecting torus.
 
-- A new parameter, `polarity`, has been added to isosurfaces to choose whether
-  function values above the threshold should indicate the inside or outside.
+  - Colour and pigment maps now support non-linear interpolation to achieve more
+    pleasing gradients.
 
-- Basic support for importing Wavefront OBJ files has been added as an extension
-  to the `mesh` primitive.
+  - Fresnel angle-dependent attenuation can now also be applied to highlights
+    and the diffuse component for more physical realism.
 
-- The `map_type` keyword now supports the Angular Map projection for light
-  probes, popularized by Paul Devebec, as type 7.
+Geometric Primitives:
 
-- Macros up to a certain size (currently hard-coded to 65536 characters per
-  macro) are now cached in memory, improving parsing speed of invocations,
-  especially when the macro in question is defined in a different file.
+  - UV mapping support has been added to cones and cylinders.
 
-- All instances of `gray` in keywords or INI file options can now alternatively
-  be spelt `grey`. Previously this was only the case inside function
-  definitions (where it applied only to the `.gray` colour pseudo-component).
+  - A new parameter, `polarity`, has been added to isosurfaces to choose whether
+    function values above the threshold should indicate the inside or outside.
 
-- A new inbuilt constant, `tau`, has been added as shorthand for `2*pi`, in
-  support of the world-wide initiative to obsolete pi in favour of the new,
-  more intuitive constant.
+  - A new geometric primitive, `lemon`, has been added.
 
-- Native support for repetition has been added to the `crackle` pattern to
-  avoid the discontinuities in the pattern caused by repeat warps.
+Scene Description Language, Options and INI settings:
 
-- A new function-based user-defined camera type, `user_defined`, has been
-  added.
+  - Support for variable-size arrays has been added.
 
-- The torus syntax has been extended to give more control over the spindle in
-  a self-intersecting torus.
+  - A new data container, `dictionary`, has been added to support structured
+    storage of data.
 
-- The `#declare` and `#local` syntax has been extended to support tuple-style
-  assignments. The main purpose is to allow macros to return a set of values
-  rather than just a single one.
+  - Pseudo-dictionaries `local` and `global` have been added, allowing to
+    specifically access local or global identifiers, respectively.
 
-- The macro syntax has been extended to allow for optional parameters.
+  - The `max_extent()` function as used to determine the size of an image map
+    in pixels can now also be used on normal maps and density files.
 
-- Light sources' distance-based fading can now be set to obey an inverse-power
-  law at all distances.
+  - Macros up to a certain size (currently hard-coded to 65536 characters per
+    macro) are now cached in memory, improving parsing speed of invocations,
+    especially when the macro in question is defined in a different file.
 
-- Colour and pigment maps now support non-linear interpolation to achieve more
-  pleasing gradients.
+  - All instances of `gray` in keywords or INI file options can now alternatively
+    be spelt `grey`. Previously this was only the case inside function
+    definitions (where it applied only to the `.gray` colour pseudo-component).
 
-- CIE L*a*b* conversion macros have been added to `colors.inc`.
+  - A new inbuilt constant, `tau`, has been added as shorthand for `2*pi`, in
+    support of the world-wide initiative to obsolete pi in favour of the new,
+    more intuitive constant.
 
-- A new include file, `colors_ral.inc`, has been added, containing predefined
-  colours according to the RAL Classic standard.
+  - The `#declare` and `#local` syntax has been extended to support tuple-style
+    assignments. The main purpose is to allow macros to return a set of values
+    rather than just a single one.
 
-- Radiosity can now honor the `brilliance` setting of a surface.
+  - The macro syntax has been extended to allow for optional parameters.
 
-- The `brilliance` effect can now be applied not only to incoming light, but
-  also to outgoing light, making the effect phyiscally more realistic.
+  - The creation of a log for the `+C` render abort-continue feature can now be
+    suppressed using `-CC` to save disk space.
 
-- Fresnel angle-dependent attenuation can now also be applied to highlights
-  and the diffuse component for more physical realism.
+Miscellaneous:
 
-- The creation of a log for the `+C` render abort-continue feature can now be
-  suppressed using `-CC` to save disk space.
+  - Support for the ITU-R BT.709 and BT.2020 transfer functions has been added
+    to POV-Ray's gamma handling portfolio.
+
+  - A new function-based user-defined camera type, `user_defined`, has been
+    added.
+
+  - Light sources' distance-based fading can now be set to obey an inverse-power
+    law at all distances.
+
+  - CIE L*a*b* conversion macros have been added to `colors.inc`.
+
+  - A new include file, `colors_ral.inc`, has been added, containing predefined
+    colours according to the RAL Classic standard.
 
 For more details on the above new features, see the documentation.
 
 Changed Behaviour
 -----------------
 
-- The `mesh2` syntax has been absorbed into that of `mesh` (i.e. you can now
-  replace any occurrences of the `mesh2` keyword with `mesh`), to reflect the
-  fact that they are just two syntax variants for one and the same primitive.
-  The old `mesh2` keyword is retained for backward compatibility and, in
-  acknowledgement of its widespread use, remains non-deprecated.
+Image Files:
 
-- The `version` pseudo-variable will now evaluate to the effective language
-  version at the time the expression is parsed, _except_ when used in a
-  `#version` directive, in which case the behaviour remains unchanged.
+  - By default, gamma handling of NetPBM (PPM/PGM) in- and output files now
+    follows the official NetBPM standard, which mandates gamma-encoding using the
+    ITU-R BT.709 transfer function. As usual this can be overridden by the
+    `gamma` input file parameter or `File_Gamma` INI setting, respectively.
 
-- The requirement to start each scene with a `#version` statement is now more
-  strongly enforced for POV-Ray 3.7 scenes, by reporting a parse error if the
-  scene file does not begin with a `#version` directive but does have a
-  `#version 3.7` (or later) directive anywhere in the main scene file.
+  - The "Compression" setting now affects more file types: Specifying
+    "Compression=1" with file type "T" (Targa) will now generate compressed Targa
+    (same as file type "C"), and explicitly specifying "Compression=0" with file
+    type "P"(Netpbm PPM/PGM) will generate "plain" (ASCII) Netpbm rather than
+    "raw" (binary).
 
-- Using `ambient` with a suspiciously high value in a non-legacy scene will
-  now prompt a warning, unless `emission` is also specified.
+  - POV-Ray will now try to auto-detect whether an input TIFF file with alpha
+    channel uses premultiplied or non-premultiplied alpha mode, rather than
+    blindly presuming premultiplied alpha.
 
-- POV-Ray will now try to auto-detect whether an input TIFF file with alpha
-  channel uses premultiplied or non-premultiplied alpha mode, rather than
-  blindly presuming premultiplied alpha.
+  - The interaction of `transmit all` and `filter all` with an image's alpha
+    channel has been changed to be more intuitive: rather than adding the
+    image's transparency to the user-specified transparency, the image's opacity
+    is now effectively multiplied with the user-specified opacity. (requires
+    `#version 3.71` or later)
 
-- The interaction of `transmit all` and `filter all` with an image's alpha
-  channel has been changed to be more intuitive: rather than adding the
-  image's transparency to the user-specified transparency, the image's opacity
-  is now effectively multiplied with the user-specified opacity. (requires
-  `#version 3.71` or later)
+  - The image file format previously referred to as "IFF" (now more precisely
+    referred to as "IFF-ILBM") is now associated with the `.lbm` file extension,
+    in addition to the `.iff` extension.
 
-- The image file format previously referred to as "IFF" (now more precisely
-  referred to as "IFF-ILBM") is now associated with the `.lbm` file extension,
-  in addition to the `.iff` extension.
+Miscellaneous:
 
-- The "Compression" setting now affects more file types: Specifying
-  "Compression=1" with file type "T" (Targa) will now generate compressed Targa
-  (same as file type "C"), and explicitly specifying "Compression=0" with file
-  type "P"(Netpbm PPM/PGM) will generate "plain" (ASCII) Netpbm rather than
-  "raw" (binary).
+  - On Unix with Simple DirectMedia Layer (SDL) enabled, the "p" key can now be
+    used to pause and un-pause a render.
 
-- A long-standing undocumented inconsistency in the treatment of backslashes
-  in string literals, in which backslashes were essentially _not_ interpreted
-  as escape characters _if_ the parser expected a filename, has been cleaned
-  up, so that backslashes are now treated as escape characters in all string
-  literals. (requires `#version 3.71` or later)
+  - The `version` pseudo-variable will now evaluate to the effective language
+    version at the time the expression is parsed, _except_ when used in a
+    `#version` directive, in which case the behaviour remains unchanged.
 
-- Boost version 1.38 or later is now required.
+  - The requirement to start each scene with a `#version` statement is now more
+    strongly enforced for POV-Ray 3.7 scenes, by reporting a parse error if the
+    scene file does not begin with a `#version` directive but does have a
+    `#version 3.71` (or later) directive anywhere in the main scene file.
+
+  - Using `ambient` with a suspiciously high value in a non-legacy scene will
+    now prompt a warning, unless `emission` is also specified.
+
+  - A long-standing undocumented inconsistency in the treatment of backslashes
+    in string literals, in which backslashes were essentially _not_ interpreted
+    as escape characters _if_ the parser expected a filename, has been cleaned
+    up, so that backslashes are now treated as escape characters in all string
+    literals. (requires `#version 3.71` or later)
+
+  - Boost version 1.38 or later is now required.
 
 Compatibility Improvements
 --------------------------
 
-- Compatibility with modern compilers in general has been greatly improved.
-  Rather than trying to disable the compiler's C++11 support and work around
-  any resulting fallout, the code has been overhauled to eliminate any
-  conflicts with the C++11 standard in the first place, and should now compile
-  fine on any compiler conforming to either C++03, C++03 TR1, or C++11
-  (notwithstanding platform-specific issues).
+  - Compatibility with modern compilers in general has been greatly improved.
+    Rather than trying to disable the compiler's C++11 support and work around
+    any resulting fallout, the code has been overhauled to eliminate any
+    conflicts with the C++11 standard in the first place, and should now compile
+    fine on any compiler conforming to either C++03, C++03 TR1, or C++11
+    (notwithstanding platform-specific issues).
 
-- Compatibility of the Unix build process with modern versions of the boost
-  libraries and automake tools has been improved, avoiding the need for
-  additional configure parameters or extra build steps on modern Linux
-  systems.
+  - Compatibility of the Unix build process with modern versions of the boost
+    libraries and automake tools has been improved, avoiding the need for
+    additional configure parameters or extra build steps on modern Linux
+    systems.
 
-- Compatibility with Visual Studio 2015 has been improved by streamlining the
-  Visual Studio 2010 project files and a few pieces of source, packing new
-  versions of the boost and openEXR libraries, and sorting out the generic
-  C++11-related issues. As a result, the Visual Studio 2010 projects now build
-  "out of the box" on Visual Studio 2015.
+  - Compatibility with Visual Studio 2015 has been improved by streamlining the
+    Visual Studio 2010 project files and a few pieces of source, packing new
+    versions of the boost and openEXR libraries, and sorting out the generic
+    C++11-related issues. As a result, the Visual Studio 2010 projects now build
+    "out of the box" on Visual Studio 2015.
 
-- Thread stack size has been increased to avoid problems on some platforms.
-  (requires boost 1.50 or later)
+  - Thread stack size has been increased to avoid problems on some platforms.
+    (requires boost 1.50 or later)
 
 Miscellaneous Improvements
 --------------------------
 
-- Trailing whitespace in INI files no longer causes a warning.
-- Animation status messages now include the nominal frame number.
-- POV-Ray for Windows now reports file names and line numbers of warnings.
-- Colour maps, pigment maps and the like are no longer limited to 256 entries.
-- The number of components ber blob is no longer artificially limited.
+  - Array elements no longer have to be of the same type.
+  - Dithering is now fully supported for Radiance HDR output files as well.
+  - Trailing whitespace in INI files no longer causes a warning.
+  - Animation status messages now include the nominal frame number.
+  - POV-Ray for Windows now reports file names and line numbers of warnings.
+  - Radiosity can now honor the `brilliance` setting of a surface.
+  - Colour maps, pigment maps and the like are no longer limited to 256 entries.
+  - The number of components per blob is no longer artificially limited.
 
 Fixed or Mitigated Bugs
 -----------------------
 
-(Note: This list includes some bugs introduced after POV-Ray 3.7.0.)
+(Note: Bugs first introduced in a POV-Ray 3.7.1-alpha version may or may not be
+included in these lists.)
 
 Reported via GitHub:
 
-- #5 ("prebuild.sh chmod errors: No such file or directory")
-- #6 ("Makefile.in does not get created")
-- #7 ("stat: illegal option -- c")
-- #8 ("reference to 'shared_ptr' is ambiguous")
-- #9 ("lseek64 is not present on all platforms")
-- #10 ("Possibly missng sys/types.h include?")
-- #21 ("configure attempts to link boost_system library even with boost 1.49 or earlier")
-- #24 ("Compile on debian jessie")
-- #29 ("master branch, failing to compile on linux on 28th June 2014")
-- #30 ("gcc-compiled povray of current master (2014-07-02) produces wrong output for benchmark")
-- #31 ("unknown type name 'shared_ptr'")
-- #32 ("need to include <sys/wait.h>")
-- #43 ("cannot build latest trunk")
-- #44 ("master branch has problem to compile with boost 1.55+")
-- #49 ("Latest version from Git won't build with MS Visual Studio 2015")
-- #50 ("Make error in Ubuntu 14.04")
-- #53 ("Standard include files may mess up the language version")
-- #114 ("Port of FS298 - The warning for isosurface does not appears as often as with 3.6.1")
-- #129 ("Port of FS331 - Intersection causes quadric to disappear")
-- #153 ("vector list trailing comma error sor lathe sphere_sweep")
+  - #5 ("prebuild.sh chmod errors: No such file or directory")
+  - #6 ("Makefile.in does not get created")
+  - #7 ("stat: illegal option -- c")
+  - #8 ("reference to 'shared_ptr' is ambiguous")
+  - #9 ("lseek64 is not present on all platforms")
+  - #10 ("Possibly missng sys/types.h include?")
+  - #21 ("configure attempts to link boost_system library even with boost 1.49 or earlier")
+  - #24 ("Compile on debian jessie")
+  - #29 ("master branch, failing to compile on linux on 28th June 2014")
+  - #30 ("gcc-compiled povray of current master (2014-07-02) produces wrong output for benchmark")
+  - #31 ("unknown type name 'shared_ptr'")
+  - #32 ("need to include <sys/wait.h>")
+  - #36 ("Bad naming in Insert Menu / 10 - Ready made scenes")
+  - #37 ("Missing txt file in /E6 - Patterns 2/03 - pavement_sides_3")
+  - #38 ("Bad naming in /A0 - Include files/")
+  - #43 ("cannot build latest trunk")
+  - #44 ("master branch has problem to compile with boost 1.55+")
+  - #49 ("Latest version from Git won't build with MS Visual Studio 2015")
+  - #50 ("Make error in Ubuntu 14.04")
+  - #53 ("Standard include files may mess up the language version")
+  - #60 ("Not the right behaviour for Bezier splines")
+  - #63 ("Mar 05, 2016 commit appears to have broken AA. Ubuntu 14.04.")
+  - #98 ("String variables not always accepted.")
+  - #110 ("POV-Ray does not honor official PGM and PPM specifications with respect to gamma.")
+  - #111 ("Port of FS307 - netpbm, ppm, read bug where first data byte CR char.")
+  - #114 ("Port of FS298 - The warning for isosurface does not appears as often as with 3.6.1")
+  - #124 ("Compiling on os Sierra - Compiler Error - typedef redefinition with different types ('int' vs 'enum')")
+  - #128 ("Port of FS331 - Intersection causes quadric to disappear")
+  - #149 (""prefix" keyword conflict in distribution scene files")
+  - #153 ("vector list trailing comma error sor lathe sphere_sweep")
+  - #160 ("Port of FS259 - Stack Overflow with the write-directive with missing closing bracket.")
+  - #161 ("Missing parenthesis on write directive causes crash.")
 
 Reported via FlySpray:
 
-- FS#254 ("Mesh_camera type 0 output seems to be incorrect")
-- FS#261 ("mesh_camera distribution type 3 output image is placed 0.5 pixels to wrong")
-- FS#270 ("render abort-continue (+C) sometimes skips blocks")
-  FS#298 ("the warning for isosurface does not appears as often as with 3.6.1")
-- FS#313 ("radiosity.cpp pov::RadiosityFunction::BeforeTile assertion failed")
-- FS#314 ("reading Gif is bugged in 3.7")
-- FS#315 ("inverse keyword does not work properly with quadrics")
-- FS#316 ("inverse keyword does not work properly with fractals")
-- FS#317 ("problem with +D option at specific output file dimensions")
-- FS#318 ("method 3 (default) scattering media is too bright & causes artifacts when nested")
-- FS#331 ("Intersection causes quadric to disappear")
-- FS#336 ("#fopen w/o OPEN_TYPE crash povray (segfault)")
+  - FS#254 ("Mesh_camera type 0 output seems to be incorrect")
+  - FS#259 ("Stack Overflow with the write-directive with missing closing bracket")
+  - FS#261 ("mesh_camera distribution type 3 output image is placed 0.5 pixels to wrong")
+  - FS#270 ("render abort-continue (+C) sometimes skips blocks")
+  - FS#298 ("the warning for isosurface does not appears as often as with 3.6.1")
+  - FS#307 ("netpbm, ppm, read bug where first data byte CR char")
+  - FS#313 ("radiosity.cpp pov::RadiosityFunction::BeforeTile assertion failed") [preliminary fix]
+  - FS#314 ("reading Gif is bugged in 3.7")
+  - FS#315 ("inverse keyword does not work properly with quadrics")
+  - FS#316 ("inverse keyword does not work properly with fractals")
+  - FS#317 ("problem with +D option at specific output file dimensions")
+  - FS#318 ("method 3 (default) scattering media is too bright & causes artifacts when nested")
+  - FS#331 ("Intersection causes quadric to disappear")
+  - FS#336 ("#fopen w/o OPEN_TYPE crash povray (segfault)")
 
 Reported via the Newsgroups:
 
-- <3c4bb31d$1@news.povray.org>
-  (2002-01-21, povray.beta-test, "<1, 0, 0> + 1*t")
-  Inconsistency in automatic scalar-to-vector promotion.
+  - <3c4bb31d$1@news.povray.org>
+    (2002-01-21, povray.beta-test, "<1, 0, 0> + 1*t")
+    Inconsistency in automatic scalar-to-vector promotion.
 
-- <53ea2dae@news.povray.org>
-  (2014-08-12, povray.binaries.images, "unexplained")
-  Precision issue led to `<1,1,1>.grey` not evaluating to 1 on sone systems.
+  - <53ea2dae@news.povray.org>
+    (2014-08-12, povray.binaries.images, "unexplained")
+    Precision issue led to `<1,1,1>.grey` not evaluating to 1 on sone systems.
 
-- <web.551e92b74514bfb213709ea20@news.povray.org>
-  (2015-04-03, povray.binaries.images, "An artifact when rendering torus(negative major_r)")
-  Spindle torus shading issues resulting from bogus surface normal
-  computations for points on the spindle.
+  - <web.551e92b74514bfb213709ea20@news.povray.org>
+    (2015-04-03, povray.binaries.images, "An artifact when rendering torus(negative major_r)")
+    Spindle torus shading issues resulting from bogus surface normal
+    computations for points on the spindle.
 
-- <web.55aac094763dc3187a3e03fe0@news.povray.org>
-  (2015-07-18, povray.binaries.scene-files, "Where my background? Help me, please!")
-  Bug in meshmaker.inc that would scramble the SDL language version to use for
-  a scene.
+  - <web.55aac094763dc3187a3e03fe0@news.povray.org>
+    (2015-07-18, povray.binaries.scene-files, "Where my background? Help me, please!")
+    Bug in meshmaker.inc that would scramble the SDL language version to use for
+    a scene.
 
-- <56cc274d$1@news.povray.org>
-  (2016-02-23, povray.beta-test, "double free or corruption")
-  Bug in the copying of multi-textured blobs.
+  - <56cc274d$1@news.povray.org>
+    (2016-02-23, povray.beta-test, "double free or corruption")
+    Bug in the copying of multi-textured blobs.
 
-- <56cdaee5@news.povray.org>
-  (2016-02-24, povray.beta-test.binaries, "optics.pov 3.7.0 vs 3.7.1")
-  Bug in media photons.
+  - <56cdaee5@news.povray.org>
+    (2016-02-24, povray.beta-test.binaries, "optics.pov 3.7.0 vs 3.7.1")
+    Bug in media photons.
 
-- <56d16f44$1@news.povray.org>
-  (2016-02-27, povray.beta-test, "splinefollow")
-  Bug in splines.
+  - <56d16f44$1@news.povray.org>
+    (2016-02-27, povray.beta-test, "splinefollow")
+    Bug in splines.
 
-- <56d15fb0$1@news.povray.org>
-  (2016-02-27, povray.beta-test.binaries, "reflection.ini")
-  Bug in `animations/reflection` sample scene INI file.
+  - <56d15fb0$1@news.povray.org>
+    (2016-02-27, povray.beta-test.binaries, "reflection.ini")
+    Bug in `animations/reflection` sample scene INI file.
 
-- <web.56d342e38bb35b79fd6b6fe10@news.povray.org>
-  (2016-02-28, povray.bugreports, "#write")
-  Under certain circumstances, a missing closing parenthesis in the condition
-  of an `#if`, `#while` or similar statement would lead to a crash instead of
-  a parse error.
+  - <web.56d342e38bb35b79fd6b6fe10@news.povray.org>
+    (2016-02-28, povray.bugreports, "#write")
+    Under certain circumstances, a missing closing parenthesis in the condition
+    of an `#if`, `#while` or similar statement would lead to a crash instead of
+    a parse error.
 
-- <56d48747$1@news.povray.org>
-  (2016-02-29, povray.beta-test, "cliche.pov")
-  Missing input image filename extension in `advanced/cliche`.
+  - <56d48747$1@news.povray.org>
+    (2016-02-29, povray.beta-test, "cliche.pov")
+    Missing input image filename extension in `advanced/cliche`.
 
-- <56d5d924$1@news.povray.org>
-  (2016-03-01, povray.beta-test, "whiltile.pov")
-  Enabling a commented-out statement in the `advanced/whiltile.pov` scene
-  would result in the `#version` directive not being the first statement.
+  - <56d5d924$1@news.povray.org>
+    (2016-03-01, povray.beta-test, "whiltile.pov")
+    Enabling a commented-out statement in the `advanced/whiltile.pov` scene
+    would result in the `#version` directive not being the first statement.
 
-- <5762b6bf$1@news.povray.org>
-  (2016-06-16, povray.bugreports, "Function bug with POV-Ray 3.7.1-alpha.8638272 Ubuntu 14.04")
-  Bug in isosurfaces with non-zero threshold.
+  - <5762b6bf$1@news.povray.org>
+    (2016-06-16, povray.bugreports, "Function bug with POV-Ray 3.7.1-alpha.8638272 Ubuntu 14.04")
+    Bug in isosurfaces with non-zero threshold.
 
-- <web.57ad048990f06e6231fe18be0@news.povray.org>
-  (2016-08-11, povray.general, "Caustics not working with transparent background")
-  Bug causing radiosity to ignore refracted `no_image` objects.
+  - <web.57ad048990f06e6231fe18be0@news.povray.org>
+    (2016-08-11, povray.general, "Caustics not working with transparent background")
+    Bug causing radiosity to ignore refracted `no_image` objects.
 
-- <web.57b4b6c879df8923b488d9aa0@news.povray.org>
-  (2016-08-17, povray.binaries.scene-files, "Wrong normal direction on triangle{ }s")
-  Bug in flat trianges that could cause interior_texture to show on the wrong side.
+  - <web.57b4b6c879df8923b488d9aa0@news.povray.org>
+    (2016-08-17, povray.binaries.scene-files, "Wrong normal direction on triangle{ }s")
+    Bug in flat trianges that could cause interior_texture to show on the wrong side.
 
-- <58090935$1@news.povray.org>
-  (2016-10-20, povray.programming, "Re: solving polynomials")
-  Misplaced `break` in polynomial solving code.
+  - <57e2cfe4$1@news.povray.org>
+    (2016-09-21, povray.general, "POV-Ray 3.7 doesn't render anymore")
+    Bug causing `+a.3` command-line option to be rejected.
+
+  - <web.57ede719b90612ffb1933f770@news.povray.org>
+    (2016-09-30, povray.documentation.inbuilt, "how are dist. doc mistakes handled?")
+    Missing closing parenthesis in HF_Sphere macro snippet.
+
+  - <web.57fbb6f31fca49e37a3e03fe0@news.povray.org>
+    (2016-10-10, povray.binaries.images, "PNG image as Povray render result: bug or not?")
+    Unnecessary creation of PNG oFFs chunk, causing GIMP to pop up a confusing dialog.
+
+  - <58090935$1@news.povray.org>
+    (2016-10-20, povray.programming, "Re: solving polynomials")
+    Misplaced `break` in polynomial solving code.
 
 Reported via Windows Crash Reports:
 
-- crash report #???, dump file #988
-  Under certain circumstances, a missing closing parenthesis in the condition
-  of an `#if`, `#while` or similar statement would lead to a crash instead of
-  a parse error.
+  - crash report #???, dump file #988
+    Under certain circumstances, a missing closing parenthesis in the condition
+    of an `#if`, `#while` or similar statement would lead to a crash instead of
+    a parse error.
 
 Miscellaneous:
 
-- Animation status messages now consistently display a running frame count and
-  the total number of frames actually to be rendered, properly taking into
-  account the Frame_Step setting.
-- Fixed mesh_camera-related flaws in the parser.
-- Fixed a family of bugs that could cause problems when using focal blur with
-  some camera types if the camera is very close to the surface of a media
-  container.
-- Fixed bug that could cause strange parse errors when including a file from
-  within macro.
-- Added a sanity check to the maximum interations parameter in fractals.
-- Fixed a hard crash when sum() was called with only three parameters.
-- Fixed bezier patch not honouring clipped_by statement.
-- Fixed crash when using turbulence parameters (lambda, omega etc.) without
-  specifying a pattern type.
-- Fixed bug in parser causing an error when no file type is specified and the
-  file name is specified using a variable.
-- Fixed unwarranted "Rainbow's up and direction vector are co-linear"
-  error message.
-- Fixed another bug in mesh_camera with distribution 3.
-- Fixed wrong rotation in `Round_Pyramid_N_in` in shapes3.inc.
-- Fixed some more bogosities related to media sampling method 3.
-- Minor robustness improvement in IFF image reading code.
-- Iridescence did not properly honor full area diffuse lighting.
-- Subsurface scattering did not play nice with non-default brilliance values.
+  - Fixed media cutting out or fading to black above the horizon (sample method
+    3 only; other methods remain problematic).
+  - Animation status messages now consistently display a running frame count and
+    the total number of frames actually to be rendered, properly taking into
+    account the Frame_Step setting.
+  - Fixed mesh_camera-related flaws in the parser.
+  - Fixed a family of bugs that could cause problems when using focal blur with
+    some camera types if the camera is very close to the surface of a media
+    container.
+  - Fixed bug that could cause strange parse errors when including a file from
+    within macro.
+  - Added a sanity check to the maximum interations parameter in fractals.
+  - Fixed a hard crash when sum() was called with only three parameters.
+  - Fixed bezier patch not honouring clipped_by statement.
+  - Fixed crash when using turbulence parameters (lambda, omega etc.) without
+    specifying a pattern type.
+  - Fixed bug in parser causing an error when no file type is specified and the
+    file name is specified using a variable.
+  - Fixed unwarranted "Rainbow's up and direction vector are co-linear"
+    error message.
+  - Fixed another bug in mesh_camera with distribution 3.
+  - Fixed wrong rotation in `Round_Pyramid_N_in` in shapes3.inc.
+  - Fixed some more bogosities related to media sampling method 3.
+  - Minor robustness improvement in IFF image reading code.
+  - Iridescence did not properly honor full area diffuse lighting.
+  - Subsurface scattering did not play nice with non-default brilliance values.
 
 Other Noteworthy
 ----------------
 
-- The Visual Studio 2010 project for a console-only Windows version has been
-  revived.
+  - The Visual Studio 2010 project for a console-only Windows version has been
+    revived.
 
 
 ---------------------------------

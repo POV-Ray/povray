@@ -609,11 +609,12 @@ inline void intrusive_ptr_release(GenericFunctionContextFactory* f) { if (!(--f-
 typedef intrusive_ptr<GenericFunctionContextFactory>    GenericFunctionContextFactoryIPtr;
 typedef GenericFunctionContextFactory*                  GenericFunctionContextFactoryTPtr;
 
-struct FunctionSourceInfo
+struct SourceInfo
 {
-    char* name;
-    UCS2* filename;
-    pov_base::ITextStream::FilePos filepos;
+    char*                           name;
+    UCS2*                           filename;
+    pov_base::ITextStream::FilePos  filepos;
+    int                             col;
 };
 
 template<typename RETURN_T, typename ARG_T>
@@ -627,7 +628,7 @@ public:
     virtual void PushArgument(GenericFunctionContextPtr pContext, ARG_T arg) = 0;
     virtual RETURN_T Execute(GenericFunctionContextPtr pContext) = 0;
     virtual GenericCustomFunction* Clone() const = 0;
-    virtual const FunctionSourceInfo* GetSourceInfo() const { return NULL; }
+    virtual const SourceInfo* GetSourceInfo() const { return NULL; }
 };
 
 typedef GenericCustomFunction<double, double> GenericScalarFunction;

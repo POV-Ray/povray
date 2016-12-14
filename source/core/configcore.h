@@ -214,6 +214,24 @@
 ///
 /// @{
 
+/// @def POV_BOMB_ON_ERROR
+/// Fail hard on all errors, allowing a debugger to kick in.
+///
+/// Define as non-zero integer to enable, or zero to disable.
+///
+/// If left undefined by system-specific configurations, this setting defaults to `0`.
+///
+/// @attention
+///     This setting is _strictly_ for debugging purposes only, and should _never ever_ be enabled
+///     in a release build!
+///
+/// @note
+///     At present, this is not yet supported by all error conditions.
+///
+#ifndef POV_BOMB_ON_ERROR
+    #define POV_BOMB_ON_ERROR 0
+#endif
+
 /// @def POV_CORE_DEBUG
 /// Default setting for enabling or disabling @ref PovCore debugging aids.
 ///

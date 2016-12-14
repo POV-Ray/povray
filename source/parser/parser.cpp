@@ -177,8 +177,6 @@ void Parser::Run()
         Init_Random_Generators();
 
         Initialize_Tokenizer();
-        Brace_Stack = reinterpret_cast<TOKEN *>(POV_MALLOC(MAX_BRACES*sizeof (TOKEN), "brace stack"));
-        Brace_Index = 0;
 
         Default_Texture = Create_Texture ();
         Default_Texture->Pigment = Create_Pigment();
@@ -253,8 +251,6 @@ void Parser::Run()
             Terminate_Tokenizer();
             Destroy_Textures(Default_Texture);
             Default_Texture = NULL;
-            POV_FREE (Brace_Stack);
-            Brace_Stack = NULL;
             Destroy_Random_Generators();
 
             if (error_line != -1)
@@ -455,10 +451,6 @@ void Parser::Cleanup()
     Destroy_Textures(Default_Texture);
     Default_Texture = NULL;
 
-    if (Brace_Stack != NULL)
-        POV_FREE (Brace_Stack);
-    Brace_Stack = NULL;
-
     Destroy_Random_Generators();
 }
 
@@ -612,27 +604,34 @@ void Parser::Destroy_Frame()
 *
 ******************************************************************************/
 
-bool Parser::Parse_Begin (bool mandatory)
+bool Parser::Parse_Begin (TOKEN tokenId, bool mandatory)
 {
-    TOKEN tokenId = Token.Token_Id;
-
     Get_Token();
 
-    if(Token.Token_Id == LEFT_CURLY_TOKEN)
+    if(Token.Token_Id == tokenId)
     {
-        if(++Brace_Index >= MAX_BRACES)
-            Error("Too many nested '{' braces.");
-        Brace_Stack[Brace_Index] = tokenId;
+        if(maBraceStack.size() >= MAX_BRACES)
+            Error("Too many nested braces, parentheses etc.");
 
+        BraceStackEntry stackEntry;
+        stackEntry.openToken = tokenId;
+        stackEntry.sourceInfo.filename = UCS2_strdup(Token.FileHandle->name());
+        if(Token.FileHandle != NULL)
+            stackEntry.sourceInfo.filepos = Token.FileHandle->tellg();
+        else
+        {
+            stackEntry.sourceInfo.filepos.lineno = 0;
+            stackEntry.sourceInfo.filepos.offset = 0;
+        }
+        stackEntry.sourceInfo.col = Token.Token_Col_No;
+
+        maBraceStack.push_back(stackEntry);
         return true;
     }
     else
     {
         if (mandatory)
-        {
-            const char *front = Get_Token_String(tokenId);
-            Found_Instead_Error("Missing { after", front);
-        }
+            Expectation_Error(Get_Token_String(tokenId));
         else
             Unget_Token();
 
@@ -659,24 +658,22 @@ bool Parser::Parse_Begin (bool mandatory)
 *
 ******************************************************************************/
 
-void Parser::Parse_End ()
+void Parser::Parse_End (TOKEN tokenId)
 {
-    const char *front;
-
     Get_Token();
 
-    if(Token.Token_Id == RIGHT_CURLY_TOKEN)
+    if(Token.Token_Id == tokenId)
     {
-        if(--Brace_Index < 0)
-        {
-            Warning("Possible '}' brace missmatch.");
-            Brace_Index = 0;
-        }
+        if(maBraceStack.empty())
+            // TODO - this should never happen, and we should encourage the user to report the issue
+            Warning("Possible '%s' mismatch.", Get_Token_String(tokenId));
+        else
+            maBraceStack.pop_back();
         return;
     }
 
-    front = Get_Token_String (Brace_Stack[Brace_Index]);
-    Found_Instead_Error("No matching } in", front);
+    ErrorInfo(maBraceStack.back().sourceInfo, "Unmatched %s", Get_Token_String(maBraceStack.back().openToken));
+    Error("No matching %s, %s found instead", Get_Token_String(tokenId), Get_Token_String(Token.Token_Id));
 }
 
 /*****************************************************************************
@@ -3702,6 +3699,8 @@ ObjectPtr Parser::Parse_Mesh()
 
     Object = new Mesh();
 
+#if POV_PARSER_EXPERIMENTAL_OBJ_IMPORT
+
     EXPECT_ONE
 
         CASE4 (VERTEX_VECTORS_TOKEN, NORMAL_VECTORS_TOKEN, UV_VECTORS_TOKEN, TEXTURE_LIST_TOKEN)
@@ -3722,6 +3721,12 @@ ObjectPtr Parser::Parse_Mesh()
         END_CASE
 
     END_EXPECT
+
+#else
+
+    Parse_Mesh1 (Object);
+
+#endif
 
     // Create bounding box.
 
@@ -5187,14 +5192,13 @@ ObjectPtr Parser::Parse_Polynom ()
 
     EXPECT
         CASE (XYZ_TOKEN)
-            GET (LEFT_PAREN_TOKEN);
+            Parse_Paren_Begin();
             x = (unsigned int)Parse_Float();
             Parse_Comma();
             y = (unsigned int)Parse_Float();
             Parse_Comma();
             z = (unsigned int)Parse_Float();
-
-            GET (RIGHT_PAREN_TOKEN);
+            Parse_Paren_End();
             GET (COLON_TOKEN);
             value = Parse_Float();
             if (!Object->Set_Coeff(x,y,z,value))
@@ -6980,6 +6984,7 @@ void Parser::Parse_Global_Settings()
         CASE (IRID_WAVELENGTH_TOKEN)
             Parse_Wavelengths (sceneData->iridWavelengths);
         END_CASE
+
         CASE (CHARSET_TOKEN)
             EXPECT_ONE
                 CASE (ASCII_TOKEN)
@@ -7955,38 +7960,33 @@ void Parser::Parse_Matrix(MATRIX Matrix)
 {
     int i, j;
 
-    EXPECT_ONE
-        CASE (LEFT_ANGLE_TOKEN)
-            Matrix[0][0] = Parse_Float();
-            for (i = 0; i < 4; i++)
-            {
-                for (j = !i ? 1 : 0; j < 3; j++)
-                {
-                    Parse_Comma();
+    Parse_Angle_Begin();
 
-                    Matrix[i][j] = Parse_Float();
-                }
+    Matrix[0][0] = Parse_Float();
+    for (i = 0; i < 4; i++)
+    {
+        for (j = !i ? 1 : 0; j < 3; j++)
+        {
+            Parse_Comma();
 
-                Matrix[i][3] = (i != 3 ? 0.0 : 1.0);
-            }
-            GET (RIGHT_ANGLE_TOKEN);
+            Matrix[i][j] = Parse_Float();
+        }
 
-            /* Check to see that we aren't scaling any dimension by zero */
-            for (i = 0; i < 3; i++)
-            {
-                if (fabs(Matrix[0][i]) < EPSILON && fabs(Matrix[1][i]) < EPSILON &&
-                    fabs(Matrix[2][i]) < EPSILON)
-                {
-                    Warning("Illegal matrix column: Scale by 0.0. Changed to 1.0.");
-                    Matrix[i][i] = 1.0;
-                }
-            }
-        END_CASE
+        Matrix[i][3] = (i != 3 ? 0.0 : 1.0);
+    }
 
-        OTHERWISE
-            Parse_Error (LEFT_ANGLE_TOKEN);
-        END_CASE
-    END_EXPECT
+    Parse_Angle_End();
+
+    /* Check to see that we aren't scaling any dimension by zero */
+    for (i = 0; i < 3; i++)
+    {
+        if (fabs(Matrix[0][i]) < EPSILON && fabs(Matrix[1][i]) < EPSILON &&
+            fabs(Matrix[2][i]) < EPSILON)
+        {
+            Warning("Illegal matrix column: Scale by 0.0. Changed to 1.0.");
+            Matrix[i][i] = 1.0;
+        }
+    }
 }
 
 
@@ -8370,21 +8370,16 @@ void Parser::Parse_Coeffs(int order, DBL *Coeffs)
 {
     int i;
 
-    EXPECT_ONE
-        CASE (LEFT_ANGLE_TOKEN)
-            Coeffs[0] = Parse_Float();
-            for (i = 1; i < term_counts(order); i++)
-            {
-                Parse_Comma();
-                Coeffs[i] = Parse_Float();
-            }
-            GET (RIGHT_ANGLE_TOKEN);
-        END_CASE
+    Parse_Angle_Begin();
 
-        OTHERWISE
-            Parse_Error (LEFT_ANGLE_TOKEN);
-        END_CASE
-    END_EXPECT
+    Coeffs[0] = Parse_Float();
+    for (i = 1; i < term_counts(order); i++)
+    {
+        Parse_Comma();
+        Coeffs[i] = Parse_Float();
+    }
+
+    Parse_Angle_End();
 }
 
 
@@ -8483,18 +8478,34 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
 
     EXPECT_ONE
         CASE (LEFT_PAREN_TOKEN)
+            UNGET
             tupleDeclare = true;
         END_CASE
         CASE (LEFT_ANGLE_TOKEN)
+            UNGET
             lvectorDeclare = true;
         END_CASE
         CASE (LEFT_CURLY_TOKEN)
+            UNGET
             larrayDeclare = true;
         END_CASE
         OTHERWISE
             UNGET
         END_CASE
     END_EXPECT
+
+    if (tupleDeclare)
+    {
+        Parse_Paren_Begin();
+    }
+    else if (lvectorDeclare)
+    {
+        Parse_Angle_Begin();
+    }
+    else if (larrayDeclare)
+    {
+        Parse_Begin();
+    }
 
     for (bool more = true; more; /* body-controlled loop */)
     {
@@ -8561,13 +8572,19 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
                 }
             END_CASE
 
+            CASE3 (FILE_ID_TOKEN, MACRO_ID_TOKEN, PARAMETER_ID_TOKEN)
+                // TODO - We should allow assignment if `is_local` is set and the identifier is non-local.
+                Parse_Error(IDENTIFIER_TOKEN);
+            END_CASE
+
             CASE2 (FUNCT_ID_TOKEN, VECTFUNCT_ID_TOKEN)
                 // Issue an error, _except_ when assigning to a still-empty element of a function array.
+                // TODO - We should allow assignment if `is_local` is set and the identifier is non-local.
                 if((!Token.is_array_elem) || (*(Token.DataPtr) != NULL))
                     Error("Redeclaring functions is not allowed - #undef the function first!");
                 // FALLTHROUGH
 
-            // These are also used in Parse_Directive UNDEF_TOKEN section, Parse_Macro, and and Parse_For_Param_Start,
+            // These are also used in Parse_Directive UNDEF_TOKEN section, Parse_Macro, and and Parse_For_Param,
             // and all these functions should accept exactly the same identifiers! [trf]
             CASE4 (NORMAL_ID_TOKEN, FINISH_ID_TOKEN, TEXTURE_ID_TOKEN, OBJECT_ID_TOKEN)
             CASE4 (COLOUR_MAP_ID_TOKEN, TRANSFORM_ID_TOKEN, CAMERA_ID_TOKEN, PIGMENT_ID_TOKEN)
@@ -8690,15 +8707,15 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
 
     if (tupleDeclare)
     {
-        GET (RIGHT_PAREN_TOKEN)
+        Parse_Paren_End();
     }
     else if (lvectorDeclare)
     {
-        GET (RIGHT_ANGLE_TOKEN)
+        Parse_Angle_End();
     }
     else if (larrayDeclare)
     {
-        GET (RIGHT_CURLY_TOKEN)
+        Parse_End();
     }
 
     LValue_Ok = false;
@@ -8760,7 +8777,7 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
     {
         if (tupleDeclare)
         {
-            GET (LEFT_PAREN_TOKEN)
+            Parse_Paren_Begin();
         }
         for (int i = 0; i < lvalues.size(); ++i)
         {
@@ -8810,7 +8827,7 @@ void Parser::Parse_Declare(bool is_local, bool after_hash)
         }
         if (tupleDeclare)
         {
-            GET (RIGHT_PAREN_TOKEN)
+            Parse_Paren_End();
         }
     }
 
@@ -10667,6 +10684,10 @@ void Parser::PossibleError(const char *format,...)
 
 void Parser::Error(const char *format,...)
 {
+#if POV_BOMB_ON_ERROR
+    POV_ASSERT_HARD(false);
+#endif
+
     va_list marker;
     char localvsbuffer[1024];
 
@@ -10678,6 +10699,18 @@ void Parser::Error(const char *format,...)
         messageFactory.ErrorAt(POV_EXCEPTION(kParseErr, localvsbuffer), Token.FileHandle->name(), Token.Token_File_Pos.lineno, Token.Token_Col_No, Token.FileHandle->tellg().offset, "%s", localvsbuffer);
     else
         messageFactory.Error(POV_EXCEPTION(kParseErr, localvsbuffer), "%s", localvsbuffer);
+}
+
+void Parser::ErrorInfo(const SourceInfo& loc, const char *format,...)
+{
+    va_list marker;
+    char localvsbuffer[1024];
+
+    va_start(marker, format);
+    vsnprintf(localvsbuffer, 1023, format, marker);
+    va_end(marker);
+
+    messageFactory.PossibleErrorAt(loc.filename, loc.filepos.lineno, loc.col, loc.filepos.offset, "%s", localvsbuffer);
 }
 
 int Parser::Debug_Info(const char *format,...)
