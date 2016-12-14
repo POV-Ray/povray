@@ -373,6 +373,8 @@ Reported via Windows Crash Reports:
 
 Miscellaneous:
 
+  - Fixed media cutting out or fading to black above the horizon (sample method
+    3 only; other methods remain problematic).
   - Animation status messages now consistently display a running frame count and
     the total number of frames actually to be rendered, properly taking into
     account the Frame_Step setting.
