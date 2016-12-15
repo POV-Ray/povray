@@ -61,15 +61,15 @@
 
 /// Official source code version string.
 /// @note For pre-releases this should be _equal to_ the planned final version.
-#define OFFICIAL_VERSION_STRING "3.7.1"
+#define OFFICIAL_VERSION_STRING "3.7.2"
 
 /// Official source code version as integer.
 /// @note For pre-releases this should be _equal to_ the planned final version.
-#define OFFICIAL_VERSION_NUMBER 371
+#define OFFICIAL_VERSION_NUMBER 372
 
 /// Official source code version formatted for Windows resource files.
 /// @note For pre-releases this should be _marginally less_ than the planned final version.
-#define OFFICIAL_VERSION_WINRC  3,7,0,9999
+#define OFFICIAL_VERSION_WINRC  3,7,1,9999
 
 /// @def POV_RAY_PRERELEASE
 /// Pre-release identifier.

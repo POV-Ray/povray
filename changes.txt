@@ -24,10 +24,22 @@ should be located in the same directory as this file is.
 ------------------------------------------------------------------------------
 
 
-Changes between 3.7.0 and 3.7.1-TBD
+Changes between 3.7.1 and 3.7.2-TBD
 ===================================
 
 This version is still under active development, and not finalized yet.
+
+TBD
+
+
+Changes between 3.7.1-TBD and 3.7.1
+===================================
+
+TBD
+
+
+Changes between 3.7.0 and 3.7.1-beta.1
+======================================
 
 The primary focus of this version has been on code refactoring in order to
 modularize the underlying architecture, but various new features as well as
