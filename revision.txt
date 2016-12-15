@@ -30,6 +30,47 @@ Notes:
 POV-Ray v???
 ------------------------------------------------------------------------------
 
+Commit b4d0b88 on 2016-12-15 by Christoph Lipka
+
+    Fix two recently introduced parser bugs, one of which tripped the Unix
+    build tests.
+
+Commit a04d241 on 2016-12-15 by Christoph Lipka
+
+    Update to the Git pre-commit hook.
+
+Commit 983ab18 on 2016-12-15 by Christoph Lipka
+
+    Fix some issues discovered by static code analysis.
+
+Commit f814383 on 2016-12-14 by Christoph Lipka
+
+    Improved behaviour of media with respect to large distances or high
+    densities (method 3 only).
+
+Commit 1968b7d on 2016-12-13 by Christoph Lipka
+
+    Disable bidirectional brilliance for now, due to it probably becoming
+    obsolete soon anyway.
+
+Commit e47718e on 2016-12-13 by Christoph Lipka
+
+    Canonicalize file paths in insert menu snippets and sample scenes to
+    use forward slashes.
+
+Commit 30dac78 on 2016-12-13 by Christoph Lipka
+
+    Disable Wavefront OBJ import for now, due to the syntax definitely not
+    being final.
+
+Commit e51eec7 on 2016-12-13 by Christoph Lipka
+
+    Fix GitHub issue #161 and closely related potential trouble.
+
+Commit 6671b3e on 2016-12-13 by Christoph Lipka
+
+    Update change log.
+
 Commit 2e6787a on 2016-12-12 by Christoph Lipka
 
     Address GitHub issue #160 by including round, square and angle brackets
