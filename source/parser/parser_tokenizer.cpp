@@ -1523,7 +1523,8 @@ void Parser::Read_Symbol()
 
                     case PARAMETER_ID_TOKEN:
                         {
-                            dictIndex = NULL;
+                            if(dictIndex);
+                                POV_FREE (dictIndex);
 
                             Par             = reinterpret_cast<POV_PARAM *>(Temp_Entry->Data);
                             Token.Token_Id  = *(Par->NumberPtr);
@@ -2000,9 +2001,11 @@ void Parser::Parse_Directive(int After_Hash)
                 }
                 else
                 {
-                    // terminate loop
+                    // terminate loop before it has even started
                     Cond_Stack[CS_Index].Cond_Type = SKIP_TIL_END_COND;
                     Skip_Tokens(SKIP_TIL_END_COND);
+                    // need to do some cleanup otherwise deferred via the Cond_Stack
+                    POV_FREE(Identifier);
                 }
             }
             EXIT

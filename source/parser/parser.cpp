@@ -615,11 +615,14 @@ bool Parser::Parse_Begin (TOKEN tokenId, bool mandatory)
 
         BraceStackEntry stackEntry;
         stackEntry.openToken = tokenId;
-        stackEntry.sourceInfo.filename = UCS2_strdup(Token.FileHandle->name());
         if(Token.FileHandle != NULL)
+        {
+            stackEntry.sourceInfo.filename = UCS2_strdup(Token.FileHandle->name());
             stackEntry.sourceInfo.filepos = Token.FileHandle->tellg();
+        }
         else
         {
+            stackEntry.sourceInfo.filename = NULL;
             stackEntry.sourceInfo.filepos.lineno = 0;
             stackEntry.sourceInfo.filepos.offset = 0;
         }
