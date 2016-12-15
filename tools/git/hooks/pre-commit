@@ -114,36 +114,46 @@ then
   then
     echo "this does not seem intended to be a prerelease"
   else
-    y2k=`date -u -d"2000-01-01" +"%s"`
-    timestamp=`date -u +"%s"`
-    revision=`expr \( "$timestamp" - "$y2k" \) / 60`
-    echo "changes to the POV-Ray code detected, updating prerelease id to $revision."
-    if git diff --name-only "$versionfile" | grep "$versionfile" >/dev/null
+    revision=`echo "$prerelease_povray_h" | sed 's/^.*[^0-9]\([0-9]*\)$/\1/g'`
+    echo "prerelease id is $revision"
+    if [ x"$revision" = x"" ]
     then
-      echo "ERROR: Unstaged changes to source/backend/povray.h detected, can't safely update prerelease id."
-      exit 1
-    fi
-    if git diff --name-only "unix/VERSION" | grep "unix/VERSION" >/dev/null
+      echo "no trailing number to auto-increment"
+    elif [ "$revision" -le "999999" ]
     then
-      echo "ERROR: Unstaged changes to unix/VERSION detected, can't safely update prerelease id."
-      exit 1
-    fi
-    sed -i \
-      -e 's/\(#define [ ]*POV_RAY_PRERELEASE [ ]*".*[^0-9]\)[0-9][0-9]*"/\1'"$revision"'"/g' \
-      -e "$sed_newline_fix" \
-      "$versionfile" >/dev/null 2>/dev/null
-    sed_i_fix "$versionfile"
-    # stage update
-    git add "$versionfile" >/dev/null 2>/dev/null
-    if [ -f unix/VERSION ]
-    then
+      echo "trailing number does not seem to be intended for auto-increment"
+    else
+      y2k=`date -u -d"2000-01-01" +"%s"`
+      timestamp=`date -u +"%s"`
+      revision=`expr \( "$timestamp" - "$y2k" \) / 60`
+      echo "changes to the POV-Ray code detected, updating prerelease id to $revision."
+      if git diff --name-only "$versionfile" | grep "$versionfile" >/dev/null
+      then
+        echo "ERROR: Unstaged changes to source/backend/povray.h detected, can't safely update prerelease id."
+        exit 1
+      fi
+      if git diff --name-only "unix/VERSION" | grep "unix/VERSION" >/dev/null
+      then
+        echo "ERROR: Unstaged changes to unix/VERSION detected, can't safely update prerelease id."
+        exit 1
+      fi
       sed -i \
-        -e 's/\([^0-9]\)[0-9][0-9]*$/\1'"$revision"'/g' \
+        -e 's/\(#define [ ]*POV_RAY_PRERELEASE [ ]*".*[^0-9]\)[0-9][0-9]*"/\1'"$revision"'"/g' \
         -e "$sed_newline_fix" \
-        unix/VERSION >/dev/null 2>/dev/null
-      sed_i_fix unix/VERSION
+        "$versionfile" >/dev/null 2>/dev/null
+      sed_i_fix "$versionfile"
       # stage update
-      git add unix/VERSION >/dev/null 2>/dev/null
+      git add "$versionfile" >/dev/null 2>/dev/null
+      if [ -f unix/VERSION ]
+      then
+        sed -i \
+          -e 's/\([^0-9]\)[0-9][0-9]*$/\1'"$revision"'/g' \
+          -e "$sed_newline_fix" \
+          unix/VERSION >/dev/null 2>/dev/null
+        sed_i_fix unix/VERSION
+        # stage update
+        git add unix/VERSION >/dev/null 2>/dev/null
+      fi
     fi
   fi
 else
