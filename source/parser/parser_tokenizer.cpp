@@ -1523,8 +1523,8 @@ void Parser::Read_Symbol()
 
                     case PARAMETER_ID_TOKEN:
                         {
-                            if(dictIndex);
-                                POV_FREE (dictIndex);
+                            if (dictIndex)
+                                POV_FREE(dictIndex);
 
                             Par             = reinterpret_cast<POV_PARAM *>(Temp_Entry->Data);
                             Token.Token_Id  = *(Par->NumberPtr);

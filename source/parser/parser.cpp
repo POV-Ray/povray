@@ -671,7 +671,11 @@ void Parser::Parse_End (TOKEN tokenId)
             // TODO - this should never happen, and we should encourage the user to report the issue
             Warning("Possible '%s' mismatch.", Get_Token_String(tokenId));
         else
+        {
+            if (maBraceStack.back().sourceInfo.filename)
+                POV_FREE(maBraceStack.back().sourceInfo.filename);
             maBraceStack.pop_back();
+        }
         return;
     }
 
