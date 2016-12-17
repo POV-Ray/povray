@@ -42,7 +42,7 @@
 #include <limits>
 #include <vector>
 
-#include "pov_mem.h"
+#include "base/pov_mem.h"
 
 namespace pov_base
 {

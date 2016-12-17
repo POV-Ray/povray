@@ -41,8 +41,6 @@
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 
-#include "pov_mem.h" // TODO
-
 #include "core/scene/scenedata.h"
 
 // this must be the last file included

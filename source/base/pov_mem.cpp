@@ -1,15 +1,22 @@
 //******************************************************************************
 ///
-/// @file pov_mem.cpp
+/// @file base/pov_mem.cpp
 ///
-/// This module contains the code for our own memory allocation/deallocation,
+/// Implementations for memory handling.
+///
+/// This unit contains the code for our own memory allocation/deallocation,
 /// providing memory tracing, statistics, and garbage collection options.
+///
+/// @deprecated
+///     Since new code should use C++-style memory management using the `new`
+///     and `delete` operators, and legacy code should be overhauled accordingly,
+///     this unit will eventually be removed.
 ///
 /// @copyright
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -34,16 +41,15 @@
 ///
 //******************************************************************************
 
-// frame.h must always be the first POV file included (pulls in platform config)
-#include "backend/frame.h"
-#include "pov_mem.h"
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
+#include "base/pov_mem.h"
 
 #include "base/pov_err.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
 
-namespace pov
+namespace pov_base
 {
 
 /************************************************************************

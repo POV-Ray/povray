@@ -129,6 +129,9 @@
     <ClCompile Include="..\..\source\base\platformbase.cpp">
       <Filter>Base source\Image</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\base\pov_mem.cpp">
+      <Filter>Base source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\base\configbase.h">
@@ -255,6 +258,9 @@
       <Filter>Base Headers</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\base\messenger.h">
+      <Filter>Base Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\base\pov_mem.h">
       <Filter>Base Headers</Filter>
     </ClInclude>
   </ItemGroup>

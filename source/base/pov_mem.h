@@ -1,15 +1,19 @@
 //******************************************************************************
 ///
-/// @file pov_mem.h
+/// @file base/pov_mem.h
 ///
-/// This module contains all defines, typedefs, and prototypes for
-/// `pov_mem.cpp`.
+/// Declarations for memory handling.
+///
+/// @deprecated
+///     Since new code should use C++-style memory management using the `new`
+///     and `delete` operators, and legacy code should be overhauled accordingly,
+///     this unit will eventually be removed.
 ///
 /// @copyright
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -34,33 +38,19 @@
 ///
 //******************************************************************************
 
-#ifndef POV_MEM_H
-#define POV_MEM_H
+#ifndef POVRAY_BASE_POV_MEM_H
+#define POVRAY_BASE_POV_MEM_H
 
-namespace pov
+#include "base/configbase.h"
+
+namespace pov_base
 {
 
-/*****************************************************************************
-* Global preprocessor defines
-******************************************************************************/
-
-
-
-/*****************************************************************************
-* Global typedefs
-******************************************************************************/
-
-
-
-/*****************************************************************************
-* Global variables
-******************************************************************************/
-
-
-
-/*****************************************************************************
-* Global functions
-******************************************************************************/
+//##############################################################################
+///
+/// @addtogroup PovBase
+///
+/// @{
 
 void mem_init (void);
 void mem_mark (void);
@@ -89,6 +79,10 @@ long int mem_stats_total_frees (void);
 #endif
 #endif
 
+/// @}
+///
+//##############################################################################
+
 }
 
-#endif /* MEM_H */
+#endif // POVRAY_BASE_POV_MEM_H
