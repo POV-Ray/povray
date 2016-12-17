@@ -499,7 +499,7 @@
 #endif
 
 #ifndef POV_MEMCPY
-    #define POV_MEMCPY(dst,src,len)     memcpy((dst),(src),(len))
+    #define POV_MEMCPY(dst,src,len)     std::memcpy((dst),(src),(len))
 #endif
 
 #ifndef POV_MEM_STATS

@@ -226,8 +226,8 @@ namespace pov_base
 #define IFF_SWITCH_CAST                     (long)
 #define USE_OFFICIAL_BOOST                  1
 
-#define POV_MEMMOVE(dst,src,len)            memmove((dst),(src),(len))
-#define POV_MEMCPY(dst,src,len)             memcpy((dst),(src),(len))
+#define POV_MEMMOVE(dst,src,len)            std::memmove((dst),(src),(len))
+#define POV_MEMCPY(dst,src,len)             std::memcpy((dst),(src),(len))
 
 #ifdef _CONSOLE
 

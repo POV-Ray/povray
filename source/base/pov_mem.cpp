@@ -44,6 +44,8 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "base/pov_mem.h"
 
+#include <cstring>
+
 #include "base/pov_err.h"
 
 // this must be the last file included
@@ -274,11 +276,11 @@ void mem_init()
     memlist = NULL;
 #endif
 #if defined(MEM_GUARD)
-    mem_guard_string_len = strlen(mem_guard_string);
+    mem_guard_string_len = std::strlen(mem_guard_string);
 #endif
 #if defined(MEM_PREFILL)
-    mem_prefill_string_len = strlen(mem_prefill_string);
-    mem_clear_string_len = strlen(mem_clear_string);
+    mem_prefill_string_len = std::strlen(mem_prefill_string);
+    mem_clear_string_len = std::strlen(mem_clear_string);
 #endif
     leak_msg = false;
 }
@@ -709,8 +711,8 @@ char *pov_strdup(const char *s)
 {
     char *New;
 
-    New=reinterpret_cast<char *>(POV_MALLOC(strlen(s)+1,s));
-    strcpy(New,s);
+    New=reinterpret_cast<char *>(POV_MALLOC(std::strlen(s)+1,s));
+    std::strcpy(New,s);
     return (New);
 }
 
