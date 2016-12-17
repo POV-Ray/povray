@@ -53,31 +53,12 @@ namespace pov_base
 /// @{
 
 void mem_init (void);
-void mem_mark (void);
-void mem_release (void);
 void mem_release_all (void);
 void *pov_malloc (size_t size, const char *file, int line, const char *msg);
 void *pov_realloc (void *ptr, size_t size, const char *file, int line, const char *msg);
 void pov_free (void *ptr, const char *file, int line);
 char *pov_strdup (const char *s);
 void *pov_memmove (void *dest, void *src, size_t length);
-
-#if defined(MEM_STATS)
-/* These are level 1 routines */
-size_t mem_stats_current_mem_usage (void);
-size_t mem_stats_largest_mem_usage (void);
-size_t mem_stats_smallest_alloc (void);
-size_t mem_stats_largest_alloc (void);
-/* These are level 2 routines */
-#if (MEM_STATS>=2)
-const char* mem_stats_smallest_file (void);
-int mem_stats_smallest_line (void);
-const char* mem_stats_largest_file (void);
-int mem_stats_largest_line (void);
-long int mem_stats_total_allocs (void);
-long int mem_stats_total_frees (void);
-#endif
-#endif
 
 /// @}
 ///
