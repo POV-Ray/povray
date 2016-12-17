@@ -1682,7 +1682,7 @@ char *GetExceptionDescription (DWORD code)
   }
 }
 
-#if POV_RAY_HAS_CRASHDUMP_UPLOAD
+#if POV_RAY_HAS_CRASHDUMP_UPLOAD || POV_RAY_HAS_UPDATE_CHECK
 // this pulls in the code for update checks and crash dump submission.
 // it is only used in official releases made by the POV-Ray developers,
 // so the source is not included in the public distribution.

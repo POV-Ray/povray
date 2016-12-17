@@ -108,13 +108,16 @@ bool povray_terminated();
 #define DISCLAIMER_MESSAGE_2 "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE."
 
 #if POV_RAY_IS_OFFICIAL && !POV_RAY_IS_AUTOBUILD
-// manual official builds do have these fancy features
-#define POV_RAY_HAS_CRASHDUMP_UPLOAD 1
-#define POV_RAY_HAS_UPDATE_CHECK 1
+    #ifndef POV_RAY_HAS_CRASHDUMP_UPLOAD
+        #define POV_RAY_HAS_CRASHDUMP_UPLOAD 0
+    #endif
+    #ifndef POV_RAY_HAS_UPDATE_CHECK
+        #define POV_RAY_HAS_UPDATE_CHECK 0
+    #endif
 #else
-// auto-builds or manual unofficial builds never have these fancy features
-#define POV_RAY_HAS_CRASHDUMP_UPLOAD 0
-#define POV_RAY_HAS_UPDATE_CHECK 0
+    // auto-builds or manual unofficial builds never have these fancy features
+    #define POV_RAY_HAS_CRASHDUMP_UPLOAD 0
+    #define POV_RAY_HAS_UPDATE_CHECK 0
 #endif
 
 #endif // POVRAY_BACKEND_POVRAY_H
