@@ -23,66 +23,6 @@
     <None Include="..\icons\renderwindow-xp.ico">
       <Filter>Resources</Filter>
     </None>
-    <None Include="..\bitmaps\toolbar\4cmdline.bmp">
-      <Filter>Resources\Bitmaps</Filter>
-    </None>
-    <None Include="..\bitmaps\toolbar\4fileclose.bmp">
-      <Filter>Resources\Bitmaps</Filter>
-    </None>
-    <None Include="..\bitmaps\toolbar\4filenew.bmp">
-      <Filter>Resources\Bitmaps</Filter>
-    </None>
-    <None Include="..\bitmaps\toolbar\4fileopen.bmp">
-      <Filter>Resources\Bitmaps</Filter>
-    </None>
-    <None Include="..\bitmaps\toolbar\4filequeue.bmp">
-      <Filter>Resources\Bitmaps</Filter>
-    </None>
-    <None Include="..\bitmaps\toolbar\4filerender.bmp">
-      <Filter>Resources\Bitmaps</Filter>
-    </None>
-    <None Include="..\bitmaps\toolbar\4filesave.bmp">
-      <Filter>Resources\Bitmaps</Filter>
-    </None>
-    <None Include="..\bitmaps\toolbar\4goirtc.bmp">
-      <Filter>Resources\Bitmaps</Filter>
-    </None>
-    <None Include="..\bitmaps\toolbar\4gopovray.bmp">
-      <Filter>Resources\Bitmaps</Filter>
-    </None>
-    <None Include="..\bitmaps\toolbar\4helpcont.bmp">
-      <Filter>Resources\Bitmaps</Filter>
-    </None>
-    <None Include="..\bitmaps\toolbar\4helpirtccd.bmp">
-      <Filter>Resources\Bitmaps</Filter>
-    </None>
-    <None Include="..\bitmaps\toolbar\4helppovcd.bmp">
-      <Filter>Resources\Bitmaps</Filter>
-    </None>
-    <None Include="..\bitmaps\toolbar\4helppovray.bmp">
-      <Filter>Resources\Bitmaps</Filter>
-    </None>
-    <None Include="..\bitmaps\toolbar\4renderclose.bmp">
-      <Filter>Resources\Bitmaps</Filter>
-    </None>
-    <None Include="..\bitmaps\toolbar\4rendershow.bmp">
-      <Filter>Resources\Bitmaps</Filter>
-    </None>
-    <None Include="..\bitmaps\toolbar\4renderstop.bmp">
-      <Filter>Resources\Bitmaps</Filter>
-    </None>
-    <None Include="..\bitmaps\toolbar\4rerun.bmp">
-      <Filter>Resources\Bitmaps</Filter>
-    </None>
-    <None Include="..\bitmaps\toolbar\4sleep.bmp">
-      <Filter>Resources\Bitmaps</Filter>
-    </None>
-    <None Include="..\bitmaps\toolbar\4sourcefile.bmp">
-      <Filter>Resources\Bitmaps</Filter>
-    </None>
-    <None Include="..\bitmaps\toolbar\4systray.bmp">
-      <Filter>Resources\Bitmaps</Filter>
-    </None>
     <None Include="..\bitmaps\about.bmp">
       <Filter>Resources\Bitmaps</Filter>
     </None>
@@ -168,9 +108,6 @@
       <Filter>Resources\Bitmaps</Filter>
     </None>
     <None Include="..\bitmaps\toolbar\sourcefile.bmp">
-      <Filter>Resources\Bitmaps</Filter>
-    </None>
-    <None Include="..\bitmaps\splash-3.5.bmp">
       <Filter>Resources\Bitmaps</Filter>
     </None>
     <None Include="..\bitmaps\StretchDIBits.bmp">

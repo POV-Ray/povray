@@ -91,7 +91,7 @@
 
 #define CRASH_REPORTER_EXECUTABLE "SubmitMinidump.exe"
 
-#if POV_RAY_IS_OFFICIAL == 1
+#if POV_RAY_IS_OFFICIAL
   #ifdef _WIN64
     #define CLASSNAMEPREFIX "Pov37-Win64-"
   #else

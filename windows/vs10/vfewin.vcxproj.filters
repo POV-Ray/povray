@@ -31,9 +31,6 @@
     <ClCompile Include="..\..\vfe\vfesession.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\vfe\win\cpuinfo.cpp">
-      <Filter>Source\win</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\vfe\win\vfeplatform.cpp">
       <Filter>Source\win</Filter>
     </ClCompile>

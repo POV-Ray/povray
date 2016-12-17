@@ -2398,7 +2398,7 @@ void Parser::Parse_Directive(int After_Hash)
                             parsingVersionDirective = true;
                             EXPECT_ONE
                                 CASE (UNOFFICIAL_TOKEN)
-#if POV_RAY_IS_OFFICIAL == 1
+#if POV_RAY_IS_OFFICIAL
                                     Get_Token();
                                     Error("This file was created for an unofficial version and\ncannot work as-is with this official version.");
 #else

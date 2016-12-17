@@ -127,11 +127,6 @@ namespace pov_frontend
   extern shared_ptr<Display> gDisplay;
 }
 
-namespace vfePlatform
-{
-  extern bool GetCPUCount(unsigned int *TotAvailLogical, unsigned int *TotAvailCore, unsigned int *PhysicalNum);
-}
-
 using namespace pov;
 using namespace pov_frontend;
 
@@ -354,9 +349,6 @@ unsigned                on_completion = CM_COMPLETION_NOTHING ;
 unsigned                window_count = 0 ;
 unsigned                ThreadCount = 2 ;
 unsigned                NumberOfCPUs ;
-unsigned                NumLogicalCPUs ;
-unsigned                NumCPUCores ;
-unsigned                NumPhysicalCPUs ;
 HPALETTE                hPalApp ;
 HPALETTE                hPalBitmap ;
 COLORREF                background_colour ;
@@ -1690,7 +1682,7 @@ char *GetExceptionDescription (DWORD code)
   }
 }
 
-#if POV_RAY_HAS_OFFICIAL_FEATURES == 1
+#if POV_RAY_HAS_CRASHDUMP_UPLOAD
 // this pulls in the code for update checks and crash dump submission.
 // it is only used in official releases made by the POV-Ray developers,
 // so the source is not included in the public distribution.
@@ -1739,7 +1731,7 @@ LONG WINAPI ExceptionHandler(struct _EXCEPTION_POINTERS* ExceptionInfo)
   ExitProcess (1) ;
   return (EXCEPTION_CONTINUE_SEARCH) ; // make compiler happy
 }
-#endif // POV_RAY_HAS_OFFICIAL_FEATURES
+#endif // POV_RAY_HAS_CRASHDUMP_UPLOAD
 
 int execute_tool (char *s)
 {
@@ -2715,7 +2707,7 @@ void WIN_Debug_Log (unsigned int from, const char *msg)
     OutputDebugString (msg) ;
 }
 
-#if POV_RAY_IS_OFFICIAL != 1
+#if !POV_RAY_IS_OFFICIAL
 void WIN_PrintOtherCredits (void)
 {
   char        *s = DISTRIBUTION_MESSAGE_2 ;
@@ -3713,7 +3705,7 @@ bool handle_main_command (WPARAM wParam, LPARAM lParam)
          return (true) ;
 
     case CM_CHECKUPDATENOW:
-#if POV_RAY_HAS_OFFICIAL_FEATURES == 1
+#if POV_RAY_HAS_UPDATE_CHECK
          ManualUpdateCheck();
 #endif
          return true;
@@ -4182,7 +4174,7 @@ LRESULT CALLBACK PovMainWndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM 
            break ;
          seconds++ ;
 
-#if POV_RAY_HAS_OFFICIAL_FEATURES == 1
+#if POV_RAY_HAS_UPDATE_CHECK
          if (seconds % 600 == 0)
            DoUpdateCheck () ;
 #endif
@@ -5318,7 +5310,6 @@ int PASCAL WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
   char                  str [_MAX_PATH * 2] ;
   char                  *s = szCmdLine ;
   bool                  exit_loop = false ;
-  bool                  have_cpu_info = false;
   unsigned              n ;
   MSG                   msg ;
   HDC                   hDC ;
@@ -5368,13 +5359,6 @@ int PASCAL WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
   GetSystemInfo (&sysinfo) ;
   ThreadCount = sysinfo.dwNumberOfProcessors ;
   NumberOfCPUs = sysinfo.dwNumberOfProcessors ;
-
-  if (GetCPUCount(&NumLogicalCPUs, &NumCPUCores, &NumPhysicalCPUs) && NumLogicalCPUs > 1)
-  {
-    have_cpu_info = true;
-    ThreadCount = NumLogicalCPUs ;
-    NumberOfCPUs = NumCPUCores ;
-  }
 
   while (*s == ' ' || *s == '\t')
     s++ ;
@@ -6111,7 +6095,7 @@ int PASCAL WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
   buffer_message (mIDE, "\n") ;
   strcpy (tool_commands [0], "notepad.exe \"%ipovray.ini\"") ;
 
-#if POV_RAY_IS_OFFICIAL != 1
+#if !POV_RAY_IS_OFFICIAL
   WIN_PrintOtherCredits () ;
   buffer_message (mIDE, "This unofficial build is derived from the POV-Ray for Windows source code.\n") ;
 #endif
@@ -6142,12 +6126,6 @@ int PASCAL WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
       message_printf ("Loaded %d entr%s into file queue\n", queued_file_count, queued_file_count == 1 ? "y" : "ies") ;
     update_queue_status (false) ;
   }
-
-  if (have_cpu_info)
-    message_printf("Detected %u CPU%s providing %u physical core%s and %u logical one%s.\n",
-                   NumPhysicalCPUs, NumPhysicalCPUs > 1 ? "'s" : "",
-                   NumCPUCores, NumCPUCores > 1 ? "s" : "",
-                   NumLogicalCPUs, NumLogicalCPUs > 1 ? "s" : "");
 
   buffer_message (mDivider, "\n") ;
 
@@ -6248,7 +6226,7 @@ int PASCAL WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
     }
   }
 
-#if POV_RAY_HAS_OFFICIAL_FEATURES == 1
+#if POV_RAY_HAS_UPDATE_CHECK
   DoUpdateCheck () ;
 #endif
 
