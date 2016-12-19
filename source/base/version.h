@@ -60,30 +60,32 @@
 /// Official version number integer.
 #define OFFICIAL_VERSION_NUMBER 371
 
-/// Prerelease identifier.
-/// Leave undefined for official releases.
+/// Pre-release identifier.
+/// Leave undefined for final releases.
 #define POV_RAY_PRERELEASE "alpha"
+
+/// @def POV_RAY_SOURCE_VERSION
+/// Source code version string.
+#if POV_RAY_IS_OFFICIAL
+    #ifdef POV_RAY_PRERELEASE
+        #define POV_RAY_SOURCE_VERSION OFFICIAL_VERSION_STRING "-" POV_RAY_PRERELEASE
+    #else
+        #define POV_RAY_SOURCE_VERSION OFFICIAL_VERSION_STRING
+    #endif
+#else
+    #ifdef POV_RAY_PRERELEASE
+        #define POV_RAY_SOURCE_VERSION OFFICIAL_VERSION_STRING "-" POV_RAY_PRERELEASE ".unofficial"
+    #else
+        #define POV_RAY_SOURCE_VERSION OFFICIAL_VERSION_STRING "-unofficial"
+    #endif
+#endif
 
 /// @def POV_RAY_VERSION
 /// Full version string.
-#if POV_RAY_IS_AUTOBUILD && (POV_RAY_IS_OFFICIAL || POV_RAY_IS_SEMI_OFFICIAL)
-#ifdef POV_RAY_PRERELEASE
-#define POV_RAY_VERSION OFFICIAL_VERSION_STRING "-" POV_RAY_PRERELEASE "+" POV_RAY_AUTOBUILD_ID
+#ifdef POV_RAY_BUILD_ID
+    #define POV_RAY_VERSION POV_RAY_SOURCE_VERSION "+" POV_RAY_BUILD_ID
 #else
-#define POV_RAY_VERSION OFFICIAL_VERSION_STRING "+" POV_RAY_AUTOBUILD_ID
-#endif
-#elif POV_RAY_IS_OFFICIAL
-#ifdef POV_RAY_PRERELEASE
-#define POV_RAY_VERSION OFFICIAL_VERSION_STRING "-" POV_RAY_PRERELEASE
-#else
-#define POV_RAY_VERSION OFFICIAL_VERSION_STRING
-#endif
-#else
-#ifdef POV_RAY_PRERELEASE
-#define POV_RAY_VERSION OFFICIAL_VERSION_STRING "-" POV_RAY_PRERELEASE ".unofficial"
-#else
-#define POV_RAY_VERSION OFFICIAL_VERSION_STRING "-unofficial"
-#endif
+    #define POV_RAY_VERSION POV_RAY_SOURCE_VERSION
 #endif
 
 /// @}
