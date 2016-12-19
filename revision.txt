@@ -27,8 +27,59 @@ Notes:
 ------------------------------------------------------------------------------
 
 ------------------------------------------------------------------------------
-POV-Ray v???
+POV-Ray v3.7.1-???
 ------------------------------------------------------------------------------
+
+Commit a61c792 on 2016-12-19 by Christoph Lipka
+
+    More version string related changes.
+
+Commit 1514773 on 2016-12-19 by Christoph Lipka
+
+    Update to Windows help file stylesheet.
+
+Commit 1896f8d on 2016-12-19 by Christoph Lipka
+
+    Update `version.h` to allow for build IDs in manual builds.
+
+Commit 5e09f10 on 2016-12-17 by Christoph Lipka
+
+    Add new mechanism for automated builds to inject additional defines
+    into Windows builds.
+
+Commit fbab8ad on 2016-12-17 by Christoph Lipka
+
+    Addendum to latest two commits.
+
+Commit 6b4cf74 on 2016-12-17 by Christoph Lipka
+
+    Trim down `pov_mem.*` to what's actually still used.
+
+Commit 64ff308 on 2016-12-17 by Christoph Lipka
+
+    More changes to simplify official builds, including movement of the
+    `pov_mem.*` source files.
+
+Commit c84a990 on 2016-12-17 by Christoph Lipka
+
+    Minor changes to Visual Studio projects for easier official release
+    builds.
+
+Commit f233f60 on 2016-12-17 by Christoph Lipka
+
+    Amendment to previous commit.
+
+Commit d96b54f on 2016-12-17 by Christoph Lipka
+
+    Amputated remnants of some legacy features.
+
+Commit a535aaf on 2016-12-16 by Christoph Lipka
+
+    [ci skip] Add tools for generating the Windows help file to the repo.
+
+Commit 5f89d41 on 2016-12-15 by Christoph Lipka
+
+    Update revision.txt.
 
 Commit b4d0b88 on 2016-12-15 by Christoph Lipka
 
