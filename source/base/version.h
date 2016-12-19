@@ -81,6 +81,16 @@
 /// Leave undefined for pre-beta, release candidate or final releases.
 #define POVRAY_IS_BETA
 
+//------------------------------------------------------------------------------
+
+/// @def OFFICIAL_VERSION_WINRC_STRING
+/// Official source code version string for Windows resource file.
+#ifdef POV_RAY_PRERELEASE
+    #define OFFICIAL_VERSION_WINRC_STRING OFFICIAL_VERSION_STRING "-" POV_RAY_PRERELEASE
+#else
+    #define OFFICIAL_VERSION_WINRC_STRING OFFICIAL_VERSION_STRING
+#endif
+
 /// @}
 ///
 //******************************************************************************
