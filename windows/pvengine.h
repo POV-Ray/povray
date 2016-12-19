@@ -67,8 +67,6 @@
 #include "backend/frame.h"
 #include "backend/povray.h"
 
-#define PVENGINE_VER              POVRAY_PLATFORM_NAME
-
 #include <time.h>
 
 #define __USECTL3D__

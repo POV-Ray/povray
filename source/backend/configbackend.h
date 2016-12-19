@@ -56,13 +56,6 @@
     #define POVRAY_PLATFORM_NAME "Unknown Platform"
 #endif
 
-/// @def COMPILER_VER
-/// Compiler moniker string.
-///
-#ifndef COMPILER_VER
-    #define COMPILER_VER ".u"
-#endif
-
 /// @def POV_USE_DEFAULT_TASK_INITIALIZE
 /// Whether to use a default implementation for task thread initialization.
 ///

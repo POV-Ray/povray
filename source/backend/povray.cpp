@@ -283,7 +283,7 @@ void BuildInitInfo(POVMSObjectPtr msg)
         err = POVMSUtil_SetString(msg, kPOVAttrib_PlatformName, POVRAY_PLATFORM_NAME);
     if(err == kNoErr)
         err = POVMSUtil_SetFormatString(msg, kPOVAttrib_CoreVersion,
-                                        "Persistence of Vision(tm) Ray Tracer Version %s%s", POV_RAY_VERSION, COMPILER_VER);
+                                        "Persistence of Vision(tm) Ray Tracer Version %s", POV_RAY_VERSION_INFO);
     if(err == kNoErr)
         err = POVMSUtil_SetString(msg, kPOVAttrib_EnglishText,
                                   DISTRIBUTION_MESSAGE_1 "\n" DISTRIBUTION_MESSAGE_2 "\n" DISTRIBUTION_MESSAGE_3

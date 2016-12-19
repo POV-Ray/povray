@@ -217,7 +217,7 @@ pov_built_for="$host"  # default
 AC_DEFINE_UNQUOTED([BUILD_ARCH], ["$build"], [Build architecture.])
 AC_DEFINE_UNQUOTED([COMPILER_VENDOR], ["$pov_compiler_vendor"], [Compiler vendor.])
 AC_DEFINE_UNQUOTED([COMPILER_VERSION], ["$pov_compiler_version"], [Compiler version.])
-AC_DEFINE_UNQUOTED([COMPILER_VER], [" ($pov_compiler_version @ $build)"], [Compiler version (processed).])
+AC_DEFINE_UNQUOTED([POV_COMPILER_INFO], ["$pov_compiler_version @ $build"], [Compiler version (processed).])
 
 
 

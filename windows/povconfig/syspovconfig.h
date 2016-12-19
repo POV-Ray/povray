@@ -133,10 +133,14 @@ using boost::intrusive_ptr;
   #error "unknown compiler configuration"
 #endif
 
+#ifndef POV_COMPILER_VER
+  #define POV_COMPILER_VER "u"
+#endif
+
 #ifdef BUILD_SSE2
-  #define SSE2_INCLUDED "-sse2"
+  #define POV_BUILD_INFO POV_COMPILER_VER ".sse2." POVRAY_PLATFORM_NAME
 #else
-  #define SSE2_INCLUDED ""
+  #define POV_BUILD_INFO POV_COMPILER_VER "." POVRAY_PLATFORM_NAME
 #endif
 
 /////////////////////////////////////////////////////////////

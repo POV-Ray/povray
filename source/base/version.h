@@ -64,6 +64,8 @@
 /// Leave undefined for final releases.
 #define POV_RAY_PRERELEASE "alpha"
 
+//------------------------------------------------------------------------------
+
 /// @def POV_RAY_SOURCE_VERSION
 /// Source code version string.
 #if POV_RAY_IS_OFFICIAL
@@ -80,12 +82,32 @@
     #endif
 #endif
 
+/// @def POV_BUILD_IDENTIFIER
+/// Full build identifier.
+#if defined(POV_RAY_BUILD_ID) && defined(POV_BUILD_INFO)
+    #define POV_BUILD_IDENTIFIER POV_RAY_BUILD_ID "." POV_BUILD_INFO
+#elif defined(POV_RAY_BUILD_ID)
+    #define POV_BUILD_IDENTIFIER POV_RAY_BUILD_ID
+#elif defined(POV_BUILD_INFO)
+    #define POV_BUILD_IDENTIFIER POV_BUILD_INFO
+#else
+    // leave POV_BUILD_IDENTIFIER undefined
+#endif
+
 /// @def POV_RAY_VERSION
 /// Full version string.
-#ifdef POV_RAY_BUILD_ID
-    #define POV_RAY_VERSION POV_RAY_SOURCE_VERSION "+" POV_RAY_BUILD_ID
+#ifdef POV_BUILD_IDENTIFIER
+    #define POV_RAY_VERSION POV_RAY_SOURCE_VERSION "+" POV_BUILD_IDENTIFIER
 #else
     #define POV_RAY_VERSION POV_RAY_SOURCE_VERSION
+#endif
+
+/// @def POV_RAY_VERSION_INFO
+/// Verbose version information.
+#ifdef POV_COMPILER_INFO
+    #define POV_RAY_VERSION_INFO POV_RAY_VERSION " (" POV_COMPILER_INFO ")"
+#else
+    #define POV_RAY_VERSION_INFO POV_RAY_VERSION
 #endif
 
 /// @}
