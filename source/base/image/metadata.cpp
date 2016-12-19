@@ -37,7 +37,7 @@
 #include "base/image/metadata.h"
 
 // POV-Ray base header files
-#include "base/version.h"
+#include "base/version_info.h"
 
 // this must be the last file included
 #include "base/povdebug.h"

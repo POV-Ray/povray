@@ -517,6 +517,43 @@
 ///
 /// @{
 
+/// @def POV_BUILD_INFO
+/// Additional build information.
+///
+/// An ASCII string containing only alphanumeric and/or hyphen characters (`A`-`Z`, `a`-`z`,
+/// `0`-`9`, `-`), intended to differentiate builds created from the same source code but using
+/// different build tools or settings.
+///
+#ifndef POV_BUILD_INFO
+    // leave undefined
+#endif
+
+/// @def POV_RAY_BUILD_ID
+/// Unique build identifier.
+///
+/// An ASCII string containing only alphanumeric and/or hyphen characters (`A`-`Z`, `a`-`z`,
+/// `0`-`9`, `-`), intended to further differentiate different builds created from the same source
+/// code in cases where @ref POV_BUILD_INFO would be the same.
+///
+/// @note
+///     This macro is _not_ intended to be set via hard-coded compile-time configuration files,
+///     but rather injected during the actual build via compiler parameters.
+///
+#ifndef POV_RAY_BUILD_ID
+    // leave undefined
+#endif
+
+/// @def POV_COMPILER_INFO
+/// Verbose compiler name.
+///
+/// @note
+///     If the compiler information is already encoded in @ref POV_BUILD_INFO, this macro should be
+///     left undefined.
+///
+#ifndef POV_COMPILER_INFO
+    // leave undefined
+#endif
+
 /// @def POV_SYS_IMAGE_TYPE
 /// The system's canonical image file format.
 ///

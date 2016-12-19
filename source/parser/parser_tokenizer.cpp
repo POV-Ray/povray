@@ -46,8 +46,8 @@
 
 #include <limits>
 
-#include "base/version.h"
 #include "base/stringutilities.h"
+#include "base/version_info.h"
 
 #include "core/material/blendmap.h"
 #include "core/material/pattern.h"

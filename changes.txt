@@ -40,11 +40,9 @@ rests on a 3rd party OS X front-end that we strive to adopt.
 To Do
 -----
 
-Prior to the release of 3.7.1, the following items still need urgent attention:
+Prior to the release of 3.7.1, the following items still need some attention:
 
-  - The new features need to be properly documented.
-
-  - The Windows version's inbuilt help index needs to be fixed.
+  - Some of the new features still need to be properly documented.
 
 New Features
 ------------

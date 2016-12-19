@@ -263,5 +263,8 @@
     <ClInclude Include="..\..\source\base\pov_mem.h">
       <Filter>Base Headers</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\base\version_info.h">
+      <Filter>Base Headers</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

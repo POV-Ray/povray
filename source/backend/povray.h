@@ -45,9 +45,9 @@
 #include <boost/thread.hpp>
 #include <boost/function.hpp>
 
-#include "povms/povmscpp.h"
+#include "base/version_info.h"
 
-#include "base/version.h"
+#include "povms/povmscpp.h"
 
 /**
  *  This function does essential initialisation that is required before
