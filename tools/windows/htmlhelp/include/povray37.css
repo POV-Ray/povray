@@ -16,8 +16,7 @@ body {
 	color: #000000;
 	text-align: justify;
 	background-color: white;
-/*	margin-top: 8 px; */
-	margin-top: 2px;
+	margin-top: 8px;
 }
 
 div.Page {
@@ -25,17 +24,10 @@ div.Page {
 
 div.Content {
 	background-color: #ffffff;
-/*	margin-left: 320px !important; */
+	margin-left: inherit !important;
 	padding-left: 10px;
 	padding-right: 10px;
 	padding-bottom: 10px;
-/*
-	border: 1px solid #c0c0c0;
-	border-collapse: separate;
-	-moz-border-radius: 6px;
-	-webkit-border-radius: 6px;
-	border-radius: 6px;
-*/
 	border: none;
 }
 
@@ -311,8 +303,7 @@ table.HeaderFooter {
 	border: 1px solid #b0b0b0;
 	background-color: #FBFBF1;
 	padding: 5pt;
-/*	margin-top: 8px; */
-	margin-top: 3px;
+	margin-top: 8px;
 	border-collapse: separate;
 	-moz-border-radius: 6px;
 	-webkit-border-radius: 6px;
