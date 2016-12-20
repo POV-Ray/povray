@@ -1,15 +1,19 @@
 //******************************************************************************
 ///
-/// @file pov_mem.h
+/// @file base/pov_mem.h
 ///
-/// This module contains all defines, typedefs, and prototypes for
-/// `pov_mem.cpp`.
+/// Declarations for memory handling.
+///
+/// @deprecated
+///     Since new code should use C++-style memory management using the `new`
+///     and `delete` operators, and legacy code should be overhauled accordingly,
+///     this unit will eventually be removed.
 ///
 /// @copyright
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -34,37 +38,21 @@
 ///
 //******************************************************************************
 
-#ifndef POV_MEM_H
-#define POV_MEM_H
+#ifndef POVRAY_BASE_POV_MEM_H
+#define POVRAY_BASE_POV_MEM_H
 
-namespace pov
+#include "base/configbase.h"
+
+namespace pov_base
 {
 
-/*****************************************************************************
-* Global preprocessor defines
-******************************************************************************/
-
-
-
-/*****************************************************************************
-* Global typedefs
-******************************************************************************/
-
-
-
-/*****************************************************************************
-* Global variables
-******************************************************************************/
-
-
-
-/*****************************************************************************
-* Global functions
-******************************************************************************/
+//##############################################################################
+///
+/// @addtogroup PovBase
+///
+/// @{
 
 void mem_init (void);
-void mem_mark (void);
-void mem_release (void);
 void mem_release_all (void);
 void *pov_malloc (size_t size, const char *file, int line, const char *msg);
 void *pov_realloc (void *ptr, size_t size, const char *file, int line, const char *msg);
@@ -72,23 +60,10 @@ void pov_free (void *ptr, const char *file, int line);
 char *pov_strdup (const char *s);
 void *pov_memmove (void *dest, void *src, size_t length);
 
-#if defined(MEM_STATS)
-/* These are level 1 routines */
-size_t mem_stats_current_mem_usage (void);
-size_t mem_stats_largest_mem_usage (void);
-size_t mem_stats_smallest_alloc (void);
-size_t mem_stats_largest_alloc (void);
-/* These are level 2 routines */
-#if (MEM_STATS>=2)
-const char* mem_stats_smallest_file (void);
-int mem_stats_smallest_line (void);
-const char* mem_stats_largest_file (void);
-int mem_stats_largest_line (void);
-long int mem_stats_total_allocs (void);
-long int mem_stats_total_frees (void);
-#endif
-#endif
+/// @}
+///
+//##############################################################################
 
 }
 
-#endif /* MEM_H */
+#endif // POVRAY_BASE_POV_MEM_H

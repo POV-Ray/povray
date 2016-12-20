@@ -9140,24 +9140,31 @@ void Destroy_Density_File(DENSITY_FILE *Density_File)
 {
     if(Density_File != NULL)
     {
-        if((--(Density_File->Data->References)) == 0)
+        if (Density_File->Data)
         {
-            POV_FREE(Density_File->Data->Name);
+            if((--(Density_File->Data->References)) == 0)
+            {
+                if (Density_File->Data->Name)
+                    POV_FREE(Density_File->Data->Name);
 
-            if(Density_File->Data->Type == 4)
-            {
-                delete[] Density_File->Data->Density32;
-            }
-            else if(Density_File->Data->Type == 2)
-            {
-                delete[] Density_File->Data->Density16;
-            }
-            else if(Density_File->Data->Type == 1)
-            {
-                delete[] Density_File->Data->Density8;
-            }
+                if(Density_File->Data->Type == 4)
+                {
+                    if (Density_File->Data->Density32)
+                        delete[] Density_File->Data->Density32;
+                }
+                else if(Density_File->Data->Type == 2)
+                {
+                    if (Density_File->Data->Density16)
+                        delete[] Density_File->Data->Density16;
+                }
+                else if(Density_File->Data->Type == 1)
+                {
+                    if (Density_File->Data->Density8)
+                        delete[] Density_File->Data->Density8;
+                }
 
-            delete Density_File->Data;
+                delete Density_File->Data;
+            }
         }
 
         delete Density_File;

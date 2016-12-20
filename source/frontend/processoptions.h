@@ -87,11 +87,11 @@ class ProcessOptions
         static bool IsTrue(const char *);
         static bool IsFalse(const char *);
 
-        static int POVMSAttr_GetUTF8String(POVMSAttributePtr, POVMSType, char *, int *);
+        static int POVMSAttr_GetUTF8String(POVMSAttributePtr attr, POVMSType type, UTF8String& s);
         static int POVMSAttr_SetUTF8String(POVMSAttributePtr, POVMSType, const char *);
         static int POVMSUtil_SetUTF8String(POVMSObjectPtr, POVMSType, const char *);
-        static size_t ConvertUTF8ToUCS2(const char *, UCS2 *);
-        static size_t ConvertUCS2ToUTF8(const UCS2 *, char *);
+        static size_t ConvertUTF16ToUTF8(const UTF16 *source, UTF8String& dest);
+        static size_t ConvertUCS2ToUTF8(const UCS2 *source, UTF8String& dest);
     protected:
         virtual int ReadSpecialOptionHandler(INI_Parser_Table *, char *, POVMSObjectPtr);
         virtual int ReadSpecialSwitchHandler(Cmd_Parser_Table *, char *, POVMSObjectPtr, bool);

@@ -69,6 +69,7 @@ struct ISO_Max_Gradient
         eval_max(0.0),
         eval_cnt(0.0),
         eval_gradient_sum(0.0),
+        eval_var(0.0),
         reported(false),
         mRefCounter(0)
     {}

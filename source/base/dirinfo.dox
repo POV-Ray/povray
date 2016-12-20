@@ -4,4 +4,8 @@
 @ingroup PovBase
 Source code files shared between back-end and front-end.
 
+@attention
+    Do **not** place any header files in this directory itself! Any such files that cannot be
+    assigned to a particular module need to go into @ref source/base instead.
+
 */

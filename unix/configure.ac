@@ -42,7 +42,7 @@ AC_PREREQ(2.59)
 
 # Inits.
 
-# The file VERSION must contain only the version string MAJOR.MINOR(.PATCHLEVEL)
+# The file VERSION must contain only the version string MAJOR.MINOR(.PATCHLEVEL)(-PRERELEASE)
 AC_INIT([POV-Ray], m4_normalize(m4_include([VERSION])), [unix-bugreports-2011@povray.org], [povray])
 
 # VERSION_BASE is then defined as MAJOR.MINOR
@@ -217,7 +217,7 @@ pov_built_for="$host"  # default
 AC_DEFINE_UNQUOTED([BUILD_ARCH], ["$build"], [Build architecture.])
 AC_DEFINE_UNQUOTED([COMPILER_VENDOR], ["$pov_compiler_vendor"], [Compiler vendor.])
 AC_DEFINE_UNQUOTED([COMPILER_VERSION], ["$pov_compiler_version"], [Compiler version.])
-AC_DEFINE_UNQUOTED([COMPILER_VER], [" ($pov_compiler_version @ $build)"], [Compiler version (processed).])
+AC_DEFINE_UNQUOTED([POV_COMPILER_INFO], ["$pov_compiler_version @ $build"], [Compiler version (processed).])
 
 
 

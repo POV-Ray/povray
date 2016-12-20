@@ -37,7 +37,7 @@
 #include "base/image/metadata.h"
 
 // POV-Ray base header files
-#include "base/version.h"
+#include "base/version_info.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -57,7 +57,7 @@ Metadata::~Metadata()
 
 string Metadata::getSoftware() const
 {
-    return "POV-Ray " POV_RAY_VERSION;
+    return "POV-Ray " POV_RAY_SOURCE_VERSION;
 }
 
 string Metadata::getComment1() const

@@ -319,7 +319,7 @@ static ReturnValue PrepareBenchmark(vfeSession *session, vfeRenderOptions& opts,
 
     int benchversion = pov::Get_Benchmark_Version();
     fprintf(stderr, "\
-%s %s%s\n\n\
+%s %s\n\n\
 Entering the standard POV-Ray %s benchmark version %x.%02x.\n\n\
 This built-in benchmark requires POV-Ray to be installed on your system\n\
 before running it.  There will be neither display nor file output, and\n\
@@ -330,7 +330,7 @@ with the Unix 'time' command (e.g. 'time povray -benchmark').\n\n\
 The benchmark will run using %d render thread(s).\n\
 Press <Enter> to continue or <Ctrl-C> to abort.\n\
 ",
-        PACKAGE_NAME, POV_RAY_VERSION, COMPILER_VER,
+        PACKAGE_NAME, POV_RAY_VERSION_INFO,
         VERSION_BASE, benchversion / 256, benchversion % 256,
         opts.GetThreadCount()
     );

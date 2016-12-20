@@ -67,8 +67,6 @@
 #include "backend/frame.h"
 #include "backend/povray.h"
 
-#define PVENGINE_VER              POVRAY_PLATFORM_NAME
-
 #include <time.h>
 
 #define __USECTL3D__
@@ -91,7 +89,7 @@
 
 #define CRASH_REPORTER_EXECUTABLE "SubmitMinidump.exe"
 
-#if POV_RAY_IS_OFFICIAL == 1
+#if POV_RAY_IS_OFFICIAL
   #ifdef _WIN64
     #define CLASSNAMEPREFIX "Pov37-Win64-"
   #else

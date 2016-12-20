@@ -171,7 +171,7 @@ void Write (OStream *file, const Image *image, const Image::WriteOptions& option
                 {
                     file->Write_Byte(gray);
                 }
-                if (!file)
+                if (!*file)
                     throw POV_EXCEPTION(kFileDataErr, "Cannot write PGM output data");
             }
             else
@@ -201,7 +201,7 @@ void Write (OStream *file, const Image *image, const Image::WriteOptions& option
                     file->Write_Byte(gval);
                     file->Write_Byte(bval);
                 }
-                if (!file)
+                if (!*file)
                     throw POV_EXCEPTION(kFileDataErr, "Cannot write PPM output data");
             }
         }

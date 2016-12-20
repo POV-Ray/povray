@@ -199,7 +199,7 @@ bool LoadEditorDLL (char *path, bool errorOK)
 #else
       if (MessageBox (main_window,
                       "POV-Ray could not load its internal editor. This is to be expected "
-                      "if you installed the AGPL-licenced distribution, as the editor DLL "
+                      "if you installed the AGPL-licensed distribution, as the editor DLL "
                       "is not included. If you do not wish to use the editor you can turn "
                       "it off (and stop this message appearing) by unchecking 'Use Editor' "
                       "under the 'Other Settings' sub-menu of the Options menu.\n\n"
@@ -207,7 +207,8 @@ bool LoadEditorDLL (char *path, bool errorOK)
                       "you to its download page.",
                       "Could not load internal editor - download it?",
                       MB_ICONQUESTION | MB_YESNO) == IDYES)
-                        ShellExecute (NULL, NULL, "http://www.povray.org/download/wineditdll/" OFFICIAL_VERSION_STRING COMPILER_VER "." PVENGINE_VER, NULL, NULL, SW_SHOWNORMAL) ;
+                        ShellExecute (NULL, NULL, "http://www.povray.org/download/wineditdll/" POV_RAY_VERSION,
+                                      NULL, NULL, SW_SHOWNORMAL) ;
 #endif
     }
     return (false) ;

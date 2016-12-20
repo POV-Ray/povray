@@ -349,6 +349,9 @@
 ///     For clarity, this data type should _not_ be used as the base type for UTF-16 encoded
 ///     full-fledged Unicode strings. Use @ref UTF16 instead.
 ///
+/// @note
+///     Currently, the actual type must be identical to that of @ref UTF16.
+///
 /// @attention
 ///     Some legacy portions of the code may improperly use this type where they should use
 ///     @ref UTF16 instead.
@@ -374,6 +377,9 @@
 ///     For clarity, this data type should _not_ be used to store regular UCS2 characters
 ///     (16-bit Base Multilingual Plane subset of Unicode). For that purpose, use @ref UCS2
 ///     instead.
+///
+/// @note
+///     Currently, the actual type must be identical to that of @ref UTF16.
 ///
 /// @attention
 ///     Some legacy portions of the code may improperly use @ref UCS2 where they should use this
@@ -470,45 +476,43 @@
 /// @{
 
 #ifndef POV_MALLOC
-    #define POV_MALLOC(size,msg)        pov_malloc ((size), __FILE__, __LINE__, (msg))
+    #define POV_MALLOC(size,msg)        pov_base::pov_malloc ((size), __FILE__, __LINE__, (msg))
 #endif
 
 #ifndef POV_REALLOC
-    #define POV_REALLOC(ptr,size,msg)   pov_realloc ((ptr), (size), __FILE__, __LINE__, (msg))
+    #define POV_REALLOC(ptr,size,msg)   pov_base::pov_realloc ((ptr), (size), __FILE__, __LINE__, (msg))
 #endif
 
 #ifndef POV_FREE
-    #define POV_FREE(ptr)               do { pov_free (static_cast<void *>(ptr), __FILE__, __LINE__); (ptr) = NULL; } while(false)
+    #define POV_FREE(ptr)               do { pov_base::pov_free (static_cast<void *>(ptr), __FILE__, __LINE__); (ptr) = NULL; } while(false)
 #endif
 
 #ifndef POV_MEM_INIT
-    #define POV_MEM_INIT()              mem_init()
+    #define POV_MEM_INIT()              pov_base::mem_init()
 #endif
 
 #ifndef POV_MEM_RELEASE_ALL
-    #define POV_MEM_RELEASE_ALL()       mem_release_all()
+    #define POV_MEM_RELEASE_ALL()       pov_base::mem_release_all()
 #endif
 
 #ifndef POV_STRDUP
-    #define POV_STRDUP(str)             pov_strdup(str)
+    #define POV_STRDUP(str)             pov_base::pov_strdup(str)
 #endif
 
 // For those systems that don't have memmove, this can also be pov_memmove
 #ifndef POV_MEMMOVE
-    #define POV_MEMMOVE(dst,src,len)    pov_memmove((dst),(src),(len))
+    #define POV_MEMMOVE(dst,src,len)    pov_base::pov_memmove((dst),(src),(len))
 #endif
 
 #ifndef POV_MEMCPY
-    #define POV_MEMCPY(dst,src,len)     memcpy((dst),(src),(len))
+    #define POV_MEMCPY(dst,src,len)     std::memcpy((dst),(src),(len))
 #endif
 
 #ifndef POV_MEM_STATS
     #define POV_MEM_STATS                       0
     #define POV_GLOBAL_MEM_STATS(a,f,c,p,s,l)   (false)
-    #define POV_THREAD_MEM_STATS(a,f,c,p,s,l)   (false)
     #define POV_MEM_STATS_RENDER_BEGIN()
     #define POV_MEM_STATS_RENDER_END()
-    #define POV_MEM_STATS_COOKIE                void *
 #endif
 
 /// @}
@@ -518,6 +522,43 @@
 /// @name Miscellaneous
 ///
 /// @{
+
+/// @def POV_BUILD_INFO
+/// Additional build information.
+///
+/// An ASCII string containing only alphanumeric and/or hyphen characters (`A`-`Z`, `a`-`z`,
+/// `0`-`9`, `-`), intended to differentiate builds created from the same source code but using
+/// different build tools or settings.
+///
+#ifndef POV_BUILD_INFO
+    // leave undefined
+#endif
+
+/// @def POV_RAY_BUILD_ID
+/// Unique build identifier.
+///
+/// An ASCII string containing only alphanumeric and/or hyphen characters (`A`-`Z`, `a`-`z`,
+/// `0`-`9`, `-`), intended to further differentiate different builds created from the same source
+/// code in cases where @ref POV_BUILD_INFO would be the same.
+///
+/// @note
+///     This macro is _not_ intended to be set via hard-coded compile-time configuration files,
+///     but rather injected during the actual build via compiler parameters.
+///
+#ifndef POV_RAY_BUILD_ID
+    // leave undefined
+#endif
+
+/// @def POV_COMPILER_INFO
+/// Verbose compiler name.
+///
+/// @note
+///     If the compiler information is already encoded in @ref POV_BUILD_INFO, this macro should be
+///     left undefined.
+///
+#ifndef POV_COMPILER_INFO
+    // leave undefined
+#endif
 
 /// @def POV_SYS_IMAGE_TYPE
 /// The system's canonical image file format.

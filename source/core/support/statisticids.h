@@ -247,16 +247,6 @@ typedef enum INTSTATS
     Polynomials_Tested,
     Roots_Eliminated,
 
-#if defined(MEM_STATS)
-    MemStat_Smallest_Alloc,
-    MemStat_Largest_Alloc,
-    MemStat_Largest_Mem_Usage,
-#if (MEM_STATS>=2)
-    MemStat_Total_Allocs,
-    MemStat_Total_Frees,
-#endif
-#endif
-
     /* NK phmap */
     Number_Of_Photons_Shot,
     Number_Of_Photons_Stored,
