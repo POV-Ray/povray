@@ -84,17 +84,13 @@
 /// @note
 ///     The result must be a genuine UCS2 string. UCS4/Unicode characters outside the Base Multilingual Plane
 ///     are not supported.
-/// @note
-///     It is unspecified whether the input byte sequence is null-terminated or not, and may in fact contain
-///     a sequence of null-separated strings. The result string should be null-separated accordingly.
 ///
-/// @param[in]  ts  Byte sequence to convert.
-/// @param[in]  tsl Byte sequence length.
+/// @param[in]  ts  Null-terminated byte sequence to convert.
 /// @param[out] as  Number of UCS2 characters in result.
-/// @return         Converted UCS2 character sequence, or `NULL` if conversion is not supported.
+/// @return         Converted null-terminated UCS2 character sequence, or `NULL` if conversion is not supported.
 ///
 #ifndef POV_CONVERT_TEXT_TO_UCS2
-    #define POV_CONVERT_TEXT_TO_UCS2(ts, tsl, as) (NULL)
+    #define POV_CONVERT_TEXT_TO_UCS2(ts, as) (NULL)
 #endif
 
 //******************************************************************************

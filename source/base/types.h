@@ -40,6 +40,7 @@
 
 #include <algorithm>
 #include <limits>
+#include <string>
 #include <vector>
 
 #include "base/pov_mem.h"
@@ -283,6 +284,8 @@ enum StringEncoding
     kStringEncoding_UTF8   = 1,
     kStringEncoding_System = 2
 };
+
+typedef std::string UTF8String;
 
 enum GammaMode
 {

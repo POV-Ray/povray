@@ -81,6 +81,157 @@ std::string UCS2toASCIIString(const UCS2String& s)
     return r;
 }
 
+/// Mask of payload bits in an UTF-8 start byte.
+/// This lookup table gives the payload bit mask for any code unit byte.
+/// It also acts as a table to identify invalid start bytes (`0`).
+const unsigned char kaUTF8StartByteMask[256] =
+{
+    0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F,
+    0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F,
+    0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F,
+    0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F,
+    0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F,
+    0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F,
+    0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F,
+    0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F,
+    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
+    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
+    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
+    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
+    0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F,
+    0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F,
+    0x0F, 0x0F, 0x0F, 0x0F, 0x0F, 0x0F, 0x0F, 0x0F, 0x0F, 0x0F, 0x0F, 0x0F, 0x0F, 0x0F, 0x0F, 0x0F,
+    0x07, 0x07, 0x07, 0x07, 0x07, 0x07, 0x07, 0x07, 0x03, 0x03, 0x03, 0x03, 0x01, 0x01, 0,    0,
+};
+
+/// Expected number of UTF-8 continuation bytes.
+/// This lookup table gives the number of continuation bytes to expect after a given byte.
+const unsigned char kaUTF8ContinuationBytes[256] =
+{
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+    3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 0, 0
+};
+
+const UCS4 kUCS4ReplacementCharacter = 0xFFFDu;
+
+/// Implementation of the essential UTF-8 decoding algorithm.
+///
+/// This function decodes one single character-ish unit from an UTF-8-ish byte sequence, gracefully
+/// accepting any quirks thrown at it, such as overlong encodings, code points outside the Unicode
+/// range, or code points reserved for surrogate characters, except for fundamentally broken
+/// sequences which will be converted to a benign replacement character.
+///
+UCS4 DecodeUTF8CharacterRaw(UTF8String::const_iterator& i)
+{
+    unsigned char b = static_cast<const unsigned char>(*(i++));
+    // Read start byte.
+    char mask = kaUTF8StartByteMask[b];
+    if (mask == 0)
+    {
+        // Not a valid start byte; replace this individual byte with a replacement character.
+        return kUCS4ReplacementCharacter;
+    }
+
+    UCS4 c = b & mask;
+
+    // Read continuation bytes.
+    int moreBytes = kaUTF8ContinuationBytes[b];
+    while (moreBytes--)
+    {
+        b = static_cast<const unsigned char>(*(i++));
+        if ((b & 0xC0) != 0x80)
+        {
+            // Not a valid continuation byte; replace the broken sequence with a replacement
+            // character, and make sure parsing of the next character resumes at the very byte
+            // we just stumped our toes on.
+            --i;
+            return kUCS4ReplacementCharacter;
+        }
+        c = (c << 6) | (b & 0x3F);
+    }
+
+    return c;
+}
+
+/// Decodes a single UCS4 character from a UTF-8-ish source.
+///
+/// This function decodes one single UCS4 character from a UTF-8 byte sequence, gracefully
+/// accepting various quirks. Sequences that decode to code points outside the valid UTF4 range
+/// will be replaced by a benign replacement character, except for surrogate pairs which will
+/// be decoded further.
+///
+UCS4 DecodeUTF8Character(UTF8String::const_iterator& i)
+{
+    UCS4 c = DecodeUTF8CharacterRaw(i);
+
+    if ((c >= 0xD800u) && (c <= 0xDBFFu))
+    {
+        // High surrogate; may be the start of a surrogate pair.
+        UTF8String::const_iterator mark = i;
+        UCS4 c2 = DecodeUTF8CharacterRaw(i);
+        if ((c2 >= 0xDC00u) && (c2 <= 0xDFFFu))
+        {
+            // Low surrogate; it's indeed a pair. Decode it.
+            c = (((c & 0x3FF) << 10) | (c2 & 0x3FF)) + 0x10000;
+        }
+        else
+        {
+            // Not a low surrogate. Forget that we even dared to ask.
+            i = mark;
+        }
+    }
+
+    if (((c >= 0xD800u) && (c <= 0xDFFFu)) || (c > 0x10FFFFu))
+        // Isolated surrogate, or outside range of valid UCS4 code points.
+        return kUCS4ReplacementCharacter;
+
+    // Perfectly good UCS4.
+    return c;
+}
+
+UCS2String UTF8toUCS2String(const UTF8String& s)
+{
+    UCS2String result;
+    UCS4 c;
+    int len = 0;
+
+    // Compute the encoded length by simply counting all non-continuation bytes.
+    // In case of malformed sequences we might get the number wrong, but this is just an estimate
+    // used to pre-allocate memory.
+    for (UTF8String::const_iterator i = s.begin(); i != s.end(); ++i)
+        if (((*i) & 0xC0) != 0x80)
+            ++len;
+
+    result.reserve(len);
+
+    for(UTF8String::const_iterator i = s.begin(); i != s.end(); )
+    {
+        c = DecodeUTF8Character(i);
+
+        if ((c > 0xFFFFu) || (c == 0x0000u))
+            // Not valid in UCS2, or we can't deal with it; substitute with a replacement character.
+            c = 0xFFFDu;
+
+        result.push_back(c);
+    }
+
+    return result;
+}
+
 /*****************************************************************************
 *
 * FUNCTION

@@ -766,11 +766,9 @@ int ProcessRenderOptions::WriteSpecialOptionHandler(INI_Parser_Table *option, PO
                     err = POVMSAttr_Size(&item, &l);
                     if(l > 0)
                     {
-                        bufptr = new char[l * 3];
-                        bufptr[0] = 0;
-                        if(POVMSAttr_GetUTF8String(&item, kPOVMSType_UCS2String, bufptr, &l) == 0)
-                            file->printf("%s=\"%s\"\n", option->keyword, bufptr);
-                        delete[] bufptr;
+                        UTF8String buf;
+                        if(POVMSAttr_GetUTF8String(&item, kPOVMSType_UCS2String, buf) == 0)
+                            file->printf("%s=\"%s\"\n", option->keyword, buf.c_str());
                     }
                     (void)POVMSAttr_Delete(&item);
                 }
@@ -946,9 +944,9 @@ ITextStream *ProcessRenderOptions::OpenINIFileStream(const char *filename, unsig
     // TODO FIXME - use proper C++ strings instead of C character arrays
 
     int i,ii,l[POV_FILE_EXTENSIONS_PER_TYPE];
-    char pathname[1024];
-    char file[1024];
-    char file_x[POV_FILE_EXTENSIONS_PER_TYPE][1024];
+    UTF8String filepath;
+    UTF8String libpath;
+    UTF8String file_x[POV_FILE_EXTENSIONS_PER_TYPE];
     int cnt = 0;
     int ll;
     POVMSAttribute attr, item;
@@ -964,8 +962,8 @@ ITextStream *ProcessRenderOptions::OpenINIFileStream(const char *filename, unsig
     {
         if((l[i] = strlen(pov_base::gPOV_File_Extensions[stype].ext[i])) > 0)
         {
-            strcpy(file_x[i], filename);
-            strcat(file_x[i], pov_base::gPOV_File_Extensions[stype].ext[i]);
+            file_x[i] = filename;
+            file_x[i] += pov_base::gPOV_File_Extensions[stype].ext[i];
         }
     }
 
@@ -982,7 +980,7 @@ ITextStream *ProcessRenderOptions::OpenINIFileStream(const char *filename, unsig
         {
             if(CheckIfFileExists(file_x[i]) == true)
             {
-                return new IBufferedTextStream(ASCIItoUCS2String(file_x[i]).c_str(), stype);
+                return new IBufferedTextStream(UTF8toUCS2String(file_x[i]).c_str(), stype);
             }
         }
     }
@@ -1012,34 +1010,33 @@ ITextStream *ProcessRenderOptions::OpenINIFileStream(const char *filename, unsig
             (void)POVMSAttr_Delete(&item);
             continue;
         }
-        if(POVMSAttr_GetUTF8String(&item, kPOVMSType_UCS2String, file, &ll) != 0) // TODO FIXME!!!
+        if(POVMSAttr_GetUTF8String(&item, kPOVMSType_UCS2String, libpath) != 0)
         {
             (void)POVMSAttr_Delete(&item);
             continue;
         }
         (void)POVMSAttr_Delete(&item);
 
-        file[strlen(file)+1] = '\0';
-        file[strlen(file)] = POV_PATH_SEPARATOR;
+        libpath.push_back(POV_PATH_SEPARATOR);
 
-        strcpy(pathname, file);
-        strcat(pathname, filename);
-        if((hasextension == true) && (CheckIfFileExists(pathname) == true))
+        filepath = libpath;
+        filepath += filename;
+        if((hasextension == true) && (CheckIfFileExists(filepath) == true))
         {
             (void)POVMSAttrList_Delete(&attr);
-            return new IBufferedTextStream(ASCIItoUCS2String(pathname).c_str(), stype);
+            return new IBufferedTextStream(UTF8toUCS2String(filepath).c_str(), stype);
         }
 
         for(ii = 0; ii < POV_FILE_EXTENSIONS_PER_TYPE; ii++)
         {
             if(l[ii])
             {
-                strcpy(pathname, file);
-                strcat(pathname, file_x[ii]);
-                if(CheckIfFileExists(pathname) == true)
+                filepath = libpath;
+                filepath += file_x[ii];
+                if(CheckIfFileExists(filepath.c_str()) == true)
                 {
                     (void)POVMSAttrList_Delete(&attr);
-                    return new IBufferedTextStream(ASCIItoUCS2String(pathname).c_str(), stype);
+                    return new IBufferedTextStream(UTF8toUCS2String(filepath).c_str(), stype);
                 }
             }
         }

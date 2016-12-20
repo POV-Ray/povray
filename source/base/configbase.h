@@ -349,6 +349,9 @@
 ///     For clarity, this data type should _not_ be used as the base type for UTF-16 encoded
 ///     full-fledged Unicode strings. Use @ref UTF16 instead.
 ///
+/// @note
+///     Currently, the actual type must be identical to that of @ref UTF16.
+///
 /// @attention
 ///     Some legacy portions of the code may improperly use this type where they should use
 ///     @ref UTF16 instead.
@@ -374,6 +377,9 @@
 ///     For clarity, this data type should _not_ be used to store regular UCS2 characters
 ///     (16-bit Base Multilingual Plane subset of Unicode). For that purpose, use @ref UCS2
 ///     instead.
+///
+/// @note
+///     Currently, the actual type must be identical to that of @ref UTF16.
 ///
 /// @attention
 ///     Some legacy portions of the code may improperly use @ref UCS2 where they should use this
