@@ -1,28 +1,11 @@
 [POV-Ray](http://www.povray.org/) - The Persistence of Vision Raytracer
 =======================================================================
 
-This document is a WIP
---------------------------------------
-
-This document is still a work in progress. While the POV-Ray project itself
-has existed for more than 20 years, this is the first time we have done a
-release on github, so please bear with us - it's a little bare at the moment.
-
-Last edit: 2016-10-09
-
-Build Status
---------------------------------------
-
-We're constantly monitoring the code quality of (almost) all branches and pull requests,
-to make sure the code builds ok on our major target platforms. The current status of
-our _master branch_ is reported as follows:
-
-  - [![Build status](https://ci.appveyor.com/api/projects/status/5953wf13f9soyw23/branch/master?svg=true)](https://ci.appveyor.com/project/c-lipka/povray-exwy4)
-    (AppVeyor: Windows Server 2012 with Visual Studio 2015)
-  - [![Build Status](https://semaphoreci.com/api/v1/pov-ray/povray/branches/master/shields_badge.svg)](https://semaphoreci.com/pov-ray/povray)
-    (Semaphore: Ubuntu 14.04 LTE 64-bit with gcc 4.8)
-  - [![Build Status](https://travis-ci.org/POV-Ray/povray.svg?branch=master)](https://travis-ci.org/POV-Ray/povray)
-    (Travis CI: Ubuntu 12.04 LTE 64-bit with gcc 4.6; OS X 10.11 with clang 4.2)
+[![Semaphore Build Status](https://semaphoreci.com/api/v1/pov-ray/povray/branches/master/shields_badge.svg?label=Semaphore)](https://semaphoreci.com/pov-ray/povray  "Semaphore: Ubuntu 14.04 LTE 64-bit with gcc 4.8")
+[![AppVeyor Build status](https://img.shields.io/appveyor/ci/c-lipka/povray-exwy4.svg?label=appveyor)](https://ci.appveyor.com/project/c-lipka/povray-exwy4 "AppVeyor: Windows Server 2012 with Visual Studio 2015")
+[![Travis CI Build Status](https://img.shields.io/travis/POV-Ray/povray.svg?label=travis ci)](https://travis-ci.org/POV-Ray/povray "Travis CI: Ubuntu 12.04 LTE 64-bit with gcc 4.6; OS X 10.11 with clang 4.2")
+[![Coverity Code Analysis](https://scan.coverity.com/projects/269/badge.svg)]( "Coverity: Static Code Analysis")
+[![Maintenance Status](https://img.shields.io/maintenance/yes/2016.svg)]( "Last edited 2016-12-20")
 
 License
 --------------------------------------
@@ -58,6 +41,9 @@ At this point in time, the only platform for which the project distributes pre-b
 'official' (i.e. supported) binaries is Microsoft Windows. These may be
 obtained via http://www.povray.org/download/. We do intend to provide Mac OS X
 binaries shortly, but these will be console-mode only (based on the unix build).
+
+Official Windows binaries of selected development versions are made availabe at
+https://github.com/POV-Ray/povray/projects on a semi-irregular basis.
 
 Building POV-Ray
 --------------------------------------
@@ -118,9 +104,9 @@ of POV-Ray come with documentation. For the Unix build, this is in the form of a
 manpage giving basic usage, and full HTML-based documentation. For the Windows
 version, there is a HtmlHelp (.CHM) file provided.
 
-The official location for the online documentation is http://www.povray.org/documentation/,
-however please be aware that at the time of writing this still has the version 3.6 docs.
-This will be updated shortly.
+The official location for the online documentation is http://www.povray.org/documentation/.
+Further information, as well as online documentation for the current development
+version, can be found at http://wiki.povray.org.
 
 Contacting Us
 --------------------------------------
