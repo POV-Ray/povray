@@ -265,6 +265,7 @@ Reported via GitHub:
   - #153 ("vector list trailing comma error sor lathe sphere_sweep")
   - #160 ("Port of FS259 - Stack Overflow with the write-directive with missing closing bracket.")
   - #161 ("Missing parenthesis on write directive causes crash.")
+  - #175 ("Coredump due recent 3.7.1 parser updates. ")
 
 Reported via FlySpray:
 
