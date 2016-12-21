@@ -1171,7 +1171,7 @@ FINISH *Create_Finish()
     New->Crand = 0.0;
 
     New->Metallic = 0.0;
-    New->Fresnel  = false;
+    New->Fresnel  = 0.0;
 
     New->Irid                = 0.0;
     New->Irid_Film_Thickness = 0.0;

@@ -139,7 +139,7 @@ struct Finish_Struct
     //MathColour SigmaPrimeS, SigmaA;
     SNGL Reflection_Falloff;  // Added by MBP 8/27/98
     bool Reflection_Fresnel;
-    bool Fresnel;
+    SNGL Fresnel;
     SNGL Reflect_Metallic; // MBP
     int Conserve_Energy;  // added by NK Dec 19 1999
     bool UseSubsurface;   // whether to use subsurface light transport

@@ -70,8 +70,8 @@ Materials:
   - Colour and pigment maps now support non-linear interpolation to achieve more
     pleasing gradients.
 
-  - Fresnel angle-dependent attenuation can now also be applied to highlights
-    and the diffuse component for more physical realism.
+  - Fresnel angle-dependent attenuation can now also be applied to highlights as
+    well as diffuse and emission components for more physical realism.
 
 Geometric Primitives:
 
