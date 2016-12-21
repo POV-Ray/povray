@@ -787,8 +787,7 @@ class Parser : public SceneTask
         UCS2 *Parse_Strupr(bool pathname);
         UCS2 *Parse_Strlwr(bool pathname);
 
-        UCS4 *Convert_UTF8_To_UCS4(const unsigned char *text_array, int text_array_size, int *char_array_size);
-        UCS2 *Convert_UTF8_To_UCS2(const unsigned char *text_array, int text_array_size, int *char_array_size);
+        UCS2 *Convert_UTF8_To_UCS2(const unsigned char *text_array, int *char_array_size);
 
         // express.h/express.cpp
         void Parse_Vector_Param (Vector3d& Vector);

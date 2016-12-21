@@ -615,11 +615,14 @@ bool Parser::Parse_Begin (TOKEN tokenId, bool mandatory)
 
         BraceStackEntry stackEntry;
         stackEntry.openToken = tokenId;
-        stackEntry.sourceInfo.filename = UCS2_strdup(Token.FileHandle->name());
         if(Token.FileHandle != NULL)
+        {
+            stackEntry.sourceInfo.filename = UCS2_strdup(Token.FileHandle->name());
             stackEntry.sourceInfo.filepos = Token.FileHandle->tellg();
+        }
         else
         {
+            stackEntry.sourceInfo.filename = NULL;
             stackEntry.sourceInfo.filepos.lineno = 0;
             stackEntry.sourceInfo.filepos.offset = 0;
         }
@@ -668,7 +671,11 @@ void Parser::Parse_End (TOKEN tokenId)
             // TODO - this should never happen, and we should encourage the user to report the issue
             Warning("Possible '%s' mismatch.", Get_Token_String(tokenId));
         else
+        {
+            if (maBraceStack.back().sourceInfo.filename)
+                POV_FREE(maBraceStack.back().sourceInfo.filename);
             maBraceStack.pop_back();
+        }
         return;
     }
 

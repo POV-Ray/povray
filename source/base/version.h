@@ -2,7 +2,11 @@
 ///
 /// @file base/version.h
 ///
-/// Version information.
+/// Primary version information.
+///
+/// This file serves as the primary source for version information pertaining to
+/// the source code. It also defines a few macros providing this information in
+/// alternative formats.
 ///
 /// @copyright
 /// @parblock
@@ -36,8 +40,9 @@
 #ifndef POVRAY_BASE_VERSION_H
 #define POVRAY_BASE_VERSION_H
 
-#include "base/configbase.h"
-#include "base/build.h"
+/// @file
+/// @note
+///     This file _must not_ pull in any POV-Ray header whatsoever.
 
 //##############################################################################
 ///
@@ -47,43 +52,43 @@
 
 //******************************************************************************
 ///
-/// @name Version and Copyright Information
+/// @name Primary Version and Copyright Information
 ///
 /// @{
 
 /// Copyright string.
 #define POV_RAY_COPYRIGHT "Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd."
 
-/// Official version number string.
+/// Official source code version string.
+/// @note For pre-releases this should be _equal to_ the planned final version.
 #define OFFICIAL_VERSION_STRING "3.7.1"
 
-/// Official version number integer.
+/// Official source code version as integer.
+/// @note For pre-releases this should be _equal to_ the planned final version.
 #define OFFICIAL_VERSION_NUMBER 371
 
-/// Prerelease identifier.
-/// Leave undefined for official releases.
-#define POV_RAY_PRERELEASE "alpha.8917471"
+/// Official source code version formatted for Windows resource files.
+/// @note For pre-releases this should be _marginally less_ than the planned final version.
+#define OFFICIAL_VERSION_WINRC  3,7,0,9999
 
-/// @def POV_RAY_VERSION
-/// Full version string.
-#if (POV_RAY_IS_AUTOBUILD == 1) && ((POV_RAY_IS_OFFICIAL == 1) || (POV_RAY_IS_SEMI_OFFICIAL == 1))
+/// @def POV_RAY_PRERELEASE
+/// Pre-release identifier.
+/// Leave undefined for final releases.
+#define POV_RAY_PRERELEASE "alpha.8927145"
+
+/// @def POVRAY_IS_BETA
+/// Whether this version is a beta.
+/// Leave undefined for pre-beta, release candidate or final releases.
+//#define POVRAY_IS_BETA
+
+//------------------------------------------------------------------------------
+
+/// @def OFFICIAL_VERSION_WINRC_STRING
+/// Official source code version string for Windows resource file.
 #ifdef POV_RAY_PRERELEASE
-#define POV_RAY_VERSION OFFICIAL_VERSION_STRING "-" POV_RAY_PRERELEASE "+" POV_RAY_AUTOBUILD_ID
+    #define OFFICIAL_VERSION_WINRC_STRING OFFICIAL_VERSION_STRING "-" POV_RAY_PRERELEASE
 #else
-#define POV_RAY_VERSION OFFICIAL_VERSION_STRING "+" POV_RAY_AUTOBUILD_ID
-#endif
-#elif (POV_RAY_IS_OFFICIAL == 1)
-#ifdef POV_RAY_PRERELEASE
-#define POV_RAY_VERSION OFFICIAL_VERSION_STRING "-" POV_RAY_PRERELEASE
-#else
-#define POV_RAY_VERSION OFFICIAL_VERSION_STRING
-#endif
-#else
-#ifdef POV_RAY_PRERELEASE
-#define POV_RAY_VERSION OFFICIAL_VERSION_STRING "-" POV_RAY_PRERELEASE ".unofficial"
-#else
-#define POV_RAY_VERSION OFFICIAL_VERSION_STRING "-unofficial"
-#endif
+    #define OFFICIAL_VERSION_WINRC_STRING OFFICIAL_VERSION_STRING
 #endif
 
 /// @}

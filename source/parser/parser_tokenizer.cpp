@@ -46,8 +46,8 @@
 
 #include <limits>
 
-#include "base/version.h"
 #include "base/stringutilities.h"
+#include "base/version_info.h"
 
 #include "core/material/blendmap.h"
 #include "core/material/pattern.h"
@@ -1523,7 +1523,8 @@ void Parser::Read_Symbol()
 
                     case PARAMETER_ID_TOKEN:
                         {
-                            dictIndex = NULL;
+                            if (dictIndex)
+                                POV_FREE(dictIndex);
 
                             Par             = reinterpret_cast<POV_PARAM *>(Temp_Entry->Data);
                             Token.Token_Id  = *(Par->NumberPtr);
@@ -2000,9 +2001,11 @@ void Parser::Parse_Directive(int After_Hash)
                 }
                 else
                 {
-                    // terminate loop
+                    // terminate loop before it has even started
                     Cond_Stack[CS_Index].Cond_Type = SKIP_TIL_END_COND;
                     Skip_Tokens(SKIP_TIL_END_COND);
+                    // need to do some cleanup otherwise deferred via the Cond_Stack
+                    POV_FREE(Identifier);
                 }
             }
             EXIT
@@ -2395,7 +2398,7 @@ void Parser::Parse_Directive(int After_Hash)
                             parsingVersionDirective = true;
                             EXPECT_ONE
                                 CASE (UNOFFICIAL_TOKEN)
-#if POV_RAY_IS_OFFICIAL == 1
+#if POV_RAY_IS_OFFICIAL
                                     Get_Token();
                                     Error("This file was created for an unofficial version and\ncannot work as-is with this official version.");
 #else

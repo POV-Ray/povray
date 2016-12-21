@@ -3209,7 +3209,6 @@ static DBL tiling_penrose1_pentagon3 (DBL pX, DBL pZ, int depth, bool insideWedg
             DBL rotX = -(x - INVSQRPHI*0.5*COS72/SIN36 - INVPHI*0.5/TAN36);
             DBL rotZ =   z;
             return tiling_penrose1_pentagon2 (rotX*PHI, rotZ*PHI, depth-1, true);
-            return 1.0/6 + TILING_EPSILON;
         }
         else if (!insideWedge && (x < 0.5*COS108/SIN36))
         {
@@ -9140,24 +9139,31 @@ void Destroy_Density_File(DENSITY_FILE *Density_File)
 {
     if(Density_File != NULL)
     {
-        if((--(Density_File->Data->References)) == 0)
+        if (Density_File->Data)
         {
-            POV_FREE(Density_File->Data->Name);
+            if((--(Density_File->Data->References)) == 0)
+            {
+                if (Density_File->Data->Name)
+                    POV_FREE(Density_File->Data->Name);
 
-            if(Density_File->Data->Type == 4)
-            {
-                delete[] Density_File->Data->Density32;
-            }
-            else if(Density_File->Data->Type == 2)
-            {
-                delete[] Density_File->Data->Density16;
-            }
-            else if(Density_File->Data->Type == 1)
-            {
-                delete[] Density_File->Data->Density8;
-            }
+                if(Density_File->Data->Type == 4)
+                {
+                    if (Density_File->Data->Density32)
+                        delete[] Density_File->Data->Density32;
+                }
+                else if(Density_File->Data->Type == 2)
+                {
+                    if (Density_File->Data->Density16)
+                        delete[] Density_File->Data->Density16;
+                }
+                else if(Density_File->Data->Type == 1)
+                {
+                    if (Density_File->Data->Density8)
+                        delete[] Density_File->Data->Density8;
+                }
 
-            delete Density_File->Data;
+                delete Density_File->Data;
+            }
         }
 
         delete Density_File;

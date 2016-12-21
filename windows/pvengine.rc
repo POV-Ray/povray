@@ -1,6 +1,7 @@
 // Microsoft Visual C++ generated resource script.
 //
 #include "resource.h"
+#include "base/version.h"
 
 #define APSTUDIO_READONLY_SYMBOLS
 /////////////////////////////////////////////////////////////////////////////
@@ -206,8 +207,8 @@ END
 //
 
 1 VERSIONINFO
- FILEVERSION 3,7,0,0
- PRODUCTVERSION 3,7,0,0
+ FILEVERSION OFFICIAL_VERSION_WINRC
+ PRODUCTVERSION OFFICIAL_VERSION_WINRC
  FILEFLAGSMASK 0x0L
 #ifdef _DEBUG
  FILEFLAGS 0x3L
@@ -225,13 +226,13 @@ BEGIN
             VALUE "Comments", "This software is licensed under the terms of the GNU Affero General Public License."
             VALUE "CompanyName", "Persistence of Vision Raytracer Pty. Ltd."
             VALUE "FileDescription", "POV-Ray for Windows v3.7"
-            VALUE "FileVersion", "3.7"
+            VALUE "FileVersion", OFFICIAL_VERSION_WINRC_STRING
             VALUE "InternalName", "PVEngine"
-            VALUE "LegalCopyright", "Copyright (c) 1991-2013 Persistence of Vision Raytracer Pty. Ltd. All Rights Reserved."
+            VALUE "LegalCopyright", "Copyright (c) 1991-2016 Persistence of Vision Raytracer Pty. Ltd. All Rights Reserved."
             VALUE "LegalTrademarks", "POV-Ray(tm) is a trademark of Persistence of Vision Raytracer Pty. Ltd."
             VALUE "OriginalFilename", "PVEngine.EXE"
             VALUE "ProductName", "POV-Ray"
-            VALUE "ProductVersion", "3.7"
+            VALUE "ProductVersion", OFFICIAL_VERSION_WINRC_STRING
         END
     END
     BLOCK "VarFileInfo"

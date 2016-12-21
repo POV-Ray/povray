@@ -1,14 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Core source">
-      <UniqueIdentifier>{3eaf32fb-a3d5-430c-8e3b-c85e687cb593}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Core Headers">
-      <UniqueIdentifier>{a90a16a1-de23-4452-8391-ad80d58f9134}</UniqueIdentifier>
-      <Extensions>
-      </Extensions>
-    </Filter>
     <Filter Include="Backend Source">
       <UniqueIdentifier>{37dcbdbc-965f-456a-88ef-94e719c9e899}</UniqueIdentifier>
     </Filter>
@@ -53,9 +45,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\source\pov_mem.cpp">
-      <Filter>Core source</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\backend\povray.cpp">
       <Filter>Backend Source</Filter>
     </ClCompile>
@@ -118,9 +107,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\source\pov_mem.h">
-      <Filter>Core Headers</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\backend\configbackend.h">
       <Filter>Backend Headers</Filter>
     </ClInclude>

@@ -40,7 +40,7 @@
 
 #include <boost/bind.hpp>
 
-#include "base/version.h"
+#include "base/version_info.h"
 
 #include "core/material/pattern.h"
 #include "core/scene/atmosphere.h"

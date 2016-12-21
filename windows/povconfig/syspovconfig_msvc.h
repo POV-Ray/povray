@@ -75,10 +75,10 @@
   #endif
 
   #if __INTEL_COMPILER >= 1000 && __INTEL_COMPILER < 1100
-    #define COMPILER_VER                      ".icl10"
+    #define POV_COMPILER_VER                  "icl10"
     #define METADATA_COMPILER_STRING          "icl 10"
   #elif __INTEL_COMPILER >= 1100 && __INTEL_COMPILER < 1200
-    #define COMPILER_VER                      ".icl11"
+    #define POV_COMPILER_VER                  "icl11"
     #define METADATA_COMPILER_STRING          "icl 11"
   #else
     #error "Please update syspovconfig_msvc.h to include this version of ICL"
@@ -99,12 +99,12 @@
 
   #if _MSC_VER >= 1400 && _MSC_VER < 1500 && !defined (_WIN64)
     // MS Visual C++ 2005 (aka 8.0), compiling for 32 bit target
-    #define COMPILER_VER                      ".msvc8"
+    #define POV_COMPILER_VER                  "msvc8"
     #define METADATA_COMPILER_STRING          "msvc 8"
     #define NEED_INVHYP
   #elif _MSC_VER >= 1400 && _MSC_VER < 1500 && defined (_WIN64)
     // MS Visual C++ 2005 (aka 8.0), compiling for 64 bit target
-    #define COMPILER_VER                      ".msvc8"
+    #define POV_COMPILER_VER                  "msvc8"
     #define METADATA_COMPILER_STRING          "msvc 8"
     #define ALIGN16                           __declspec(align(16))
     inline const int& max(const int& _X, const int& _Y) {return (_X < _Y ? _Y : _X); }
@@ -118,12 +118,12 @@
     #define NEED_INVHYP
   #elif _MSC_VER >= 1500 && _MSC_VER < 1600
     // MS Visual C++ 2008 (aka 9.0)
-    #define COMPILER_VER                      ".msvc9"
+    #define POV_COMPILER_VER                  "msvc9"
     #define METADATA_COMPILER_STRING          "msvc 9"
     #define NEED_INVHYP
   #elif _MSC_VER >= 1600 && _MSC_VER < 1700
     // MS Visual C++ 2010 (aka 10.0)
-    #define COMPILER_VER                      ".msvc10"
+    #define POV_COMPILER_VER                  "msvc10"
     #define METADATA_COMPILER_STRING          "msvc 10"
     // msvc10 defines std::hash<> as a class, while boost's flyweight_fwd.hpp may forward-declare it as a struct;
     // this is valid according to the C++ standard, but causes msvc10 to issue warnings.
@@ -131,14 +131,14 @@
     #define NEED_INVHYP
   #elif _MSC_VER >= 1700 && _MSC_VER < 1800
     // MS Visual C++ 2012 (aka 11.0)
-    #define COMPILER_VER                      ".msvc11"
+    #define POV_COMPILER_VER                  "msvc11"
     #define METADATA_COMPILER_STRING          "msvc 11"
     #error "Please update syspovconfig_msvc.h to include this version of MSVC"
     // The following settings are just guesswork, and have never been tested:
     #define NEED_INVHYP
   #elif _MSC_VER >= 1800 && _MSC_VER < 1900
     // MS Visual C++ 2013 (aka 12.0)
-    #define COMPILER_VER                      ".msvc12"
+    #define POV_COMPILER_VER                  "msvc12"
     #define METADATA_COMPILER_STRING          "msvc 12"
     #error "Please update syspovconfig_msvc.h to include this version of MSVC"
     // The following settings are just guesswork, and have never been tested:
@@ -146,7 +146,7 @@
   // NB: The Microsoft Visual Studio developers seem to have skipped internal version number 13 entirely.
   #elif _MSC_VER >= 1900 && _MSC_VER < 2000
     // MS Visual C++ 2015 (aka 14.0)
-    #define COMPILER_VER                      ".msvc14"
+    #define POV_COMPILER_VER                  "msvc14"
     #define METADATA_COMPILER_STRING          "msvc 14"
   #else
     #error "Please update syspovconfig_msvc.h to include this version of MSVC"

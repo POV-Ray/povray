@@ -221,9 +221,25 @@ $RECYCLE.BIN/
 # Files created by make in various subdirectories
 .dirstamp
 
+# =====================
+# POV-Ray Miscellaneous
+# =====================
+
+/internal/
+/legacy-license/
+
 # =========================
 # POV-Ray Doxygen artefacts
 # =========================
 
 /tools/doxygen-warnings.log
 /tools/doxygen/source-doc/
+
+# ==========================
+# POV-Ray HTMLHelp artefacts
+# ==========================
+
+/tools/windows/htmlhelp/input
+/tools/windows/htmlhelp/output
+/tools/windows/htmlhelp/debug.txt
+/tools/windows/htmlhelp/flielist.txt

@@ -133,10 +133,14 @@ using boost::intrusive_ptr;
   #error "unknown compiler configuration"
 #endif
 
+#ifndef POV_COMPILER_VER
+  #define POV_COMPILER_VER "u"
+#endif
+
 #ifdef BUILD_SSE2
-  #define SSE2_INCLUDED "-sse2"
+  #define POV_BUILD_INFO POV_COMPILER_VER ".sse2." POVRAY_PLATFORM_NAME
 #else
-  #define SSE2_INCLUDED ""
+  #define POV_BUILD_INFO POV_COMPILER_VER "." POVRAY_PLATFORM_NAME
 #endif
 
 /////////////////////////////////////////////////////////////
@@ -226,8 +230,8 @@ namespace pov_base
 #define IFF_SWITCH_CAST                     (long)
 #define USE_OFFICIAL_BOOST                  1
 
-#define POV_MEMMOVE(dst,src,len)            memmove((dst),(src),(len))
-#define POV_MEMCPY(dst,src,len)             memcpy((dst),(src),(len))
+#define POV_MEMMOVE(dst,src,len)            std::memmove((dst),(src),(len))
+#define POV_MEMCPY(dst,src,len)             std::memcpy((dst),(src),(len))
 
 #ifdef _CONSOLE
 
@@ -258,10 +262,8 @@ namespace pov_base
 #endif
 
 #define POV_GLOBAL_MEM_STATS(a,f,c,p,s,l)   povwin::WinMemReport(true, a, f, c, p, s, l)
-#define POV_THREAD_MEM_STATS(a,f,c,p,s,l)   povwin::WinMemReport(false, a, f, c, p, s, l)
 #define POV_MEM_STATS_RENDER_BEGIN()        povwin::WinMemStage(true)
 #define POV_MEM_STATS_RENDER_END()          povwin::WinMemStage(false)
-#define POV_MEM_STATS_COOKIE                void *
 
 #define POV_IMPLEMENT_RTR                   1
 

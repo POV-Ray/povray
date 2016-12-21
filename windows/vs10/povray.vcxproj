@@ -124,8 +124,8 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>..\..\platform\x86;..\..\platform\windows;..\..\windows\povconfig;..\..\libraries\boost;..\rtrsupport;..\..\vfe\win;..\..\vfe;..\;..\..\source;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>BOOST_ALL_NO_LIB;_DEBUG;WIN32;WIN32_LEAN_AND_MEAN;_WINDOWS;WINVER=0x0501;_WIN32_WINNT=0x0501;COMMONCTRL_VERSION=0x500;CLASSLIB_DEFS_H;NOMINMAX;ISOLATION_AWARE_ENABLED;_CRT_SECURE_NO_DEPRECATE;_HAS_ITERATOR_DEBUGGING=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\internal\windows;..\..\platform\x86;..\..\platform\windows;..\..\windows\povconfig;..\..\libraries\boost;..\rtrsupport;..\..\vfe\win;..\..\vfe;..\;..\..\source;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>$(PovBuildDefs)BOOST_ALL_NO_LIB;_DEBUG;WIN32;WIN32_LEAN_AND_MEAN;_WINDOWS;WINVER=0x0501;_WIN32_WINNT=0x0501;COMMONCTRL_VERSION=0x500;CLASSLIB_DEFS_H;NOMINMAX;ISOLATION_AWARE_ENABLED;_CRT_SECURE_NO_DEPRECATE;_HAS_ITERATOR_DEBUGGING=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>Sync</ExceptionHandling>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
@@ -191,8 +191,8 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>..\..\platform\x86;..\..\platform\windows;..\..\windows\povconfig;..\..\libraries\boost;..\rtrsupport;..\..\vfe\win;..\..\vfe;..\;..\..\source;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>BOOST_ALL_NO_LIB;_DEBUG;WIN32;WIN32_LEAN_AND_MEAN;_WINDOWS;CLASSLIB_DEFS_H;NOMINMAX;ISOLATION_AWARE_ENABLED;_CRT_SECURE_NO_DEPRECATE;_HAS_ITERATOR_DEBUGGING=0;BUILDING_AMD64=1;COMMONCTRL_VERSION=0x500;_WIN32_WINNT=0x0501;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\internal\windows;..\..\platform\x86;..\..\platform\windows;..\..\windows\povconfig;..\..\libraries\boost;..\rtrsupport;..\..\vfe\win;..\..\vfe;..\;..\..\source;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>$(PovBuildDefs)BOOST_ALL_NO_LIB;_DEBUG;WIN32;WIN32_LEAN_AND_MEAN;_WINDOWS;CLASSLIB_DEFS_H;NOMINMAX;ISOLATION_AWARE_ENABLED;_CRT_SECURE_NO_DEPRECATE;_HAS_ITERATOR_DEBUGGING=0;BUILDING_AMD64=1;COMMONCTRL_VERSION=0x500;_WIN32_WINNT=0x0501;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>Sync</ExceptionHandling>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -261,8 +261,8 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>..\..\platform\x86;..\..\platform\windows;..\..\windows\povconfig;..\..\libraries\boost;..\rtrsupport;..\..\vfe\win;..\..\vfe;..\;..\..\source;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>BOOST_ALL_NO_LIB;NDEBUG;WIN32;WIN32_LEAN_AND_MEAN;_WINDOWS;COMMONCTRL_VERSION=0x500;CLASSLIB_DEFS_H;WINVER=0x0501;_WIN32_WINNT=0x0501;NOMINMAX;ISOLATION_AWARE_ENABLED;_CRT_SECURE_NO_DEPRECATE;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\internal\windows;..\..\platform\x86;..\..\platform\windows;..\..\windows\povconfig;..\..\libraries\boost;..\rtrsupport;..\..\vfe\win;..\..\vfe;..\;..\..\source;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>$(PovBuildDefs)BOOST_ALL_NO_LIB;NDEBUG;WIN32;WIN32_LEAN_AND_MEAN;_WINDOWS;COMMONCTRL_VERSION=0x500;CLASSLIB_DEFS_H;WINVER=0x0501;_WIN32_WINNT=0x0501;NOMINMAX;ISOLATION_AWARE_ENABLED;_CRT_SECURE_NO_DEPRECATE;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>Sync</ExceptionHandling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -328,8 +328,8 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>..\..\platform\x86;..\..\platform\windows;..\..\windows\povconfig;..\..\libraries\boost;..\rtrsupport;..\..\vfe\win;..\..\vfe;..\;..\..\source;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>BOOST_ALL_NO_LIB;NDEBUG;WIN32;WIN32_LEAN_AND_MEAN;_WINDOWS;CLASSLIB_DEFS_H;NOMINMAX;ISOLATION_AWARE_ENABLED;_CRT_SECURE_NO_DEPRECATE;_SECURE_SCL=0;BUILDING_AMD64=1;COMMONCTRL_VERSION=0x500;_WIN32_WINNT=0x0501;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\internal\windows;..\..\platform\x86;..\..\platform\windows;..\..\windows\povconfig;..\..\libraries\boost;..\rtrsupport;..\..\vfe\win;..\..\vfe;..\;..\..\source;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>$(PovBuildDefs)BOOST_ALL_NO_LIB;NDEBUG;WIN32;WIN32_LEAN_AND_MEAN;_WINDOWS;CLASSLIB_DEFS_H;NOMINMAX;ISOLATION_AWARE_ENABLED;_CRT_SECURE_NO_DEPRECATE;_SECURE_SCL=0;BUILDING_AMD64=1;COMMONCTRL_VERSION=0x500;_WIN32_WINNT=0x0501;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>Sync</ExceptionHandling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -395,8 +395,8 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>..\..\platform\x86;..\..\platform\windows;..\..\windows\povconfig;..\..\libraries\boost;..\rtrsupport;..\..\vfe\win;..\..\vfe;..\;..\..\source;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>BOOST_ALL_NO_LIB;NDEBUG;WIN32;WIN32_LEAN_AND_MEAN;_WINDOWS;COMMONCTRL_VERSION=0x500;CLASSLIB_DEFS_H;WINVER=0x0501;_WIN32_WINNT=0x0501;NOMINMAX;ISOLATION_AWARE_ENABLED;_CRT_SECURE_NO_DEPRECATE;_SECURE_SCL=0;BUILD_SSE2=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\internal\windows;..\..\platform\x86;..\..\platform\windows;..\..\windows\povconfig;..\..\libraries\boost;..\rtrsupport;..\..\vfe\win;..\..\vfe;..\;..\..\source;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>$(PovBuildDefs)BOOST_ALL_NO_LIB;NDEBUG;WIN32;WIN32_LEAN_AND_MEAN;_WINDOWS;COMMONCTRL_VERSION=0x500;CLASSLIB_DEFS_H;WINVER=0x0501;_WIN32_WINNT=0x0501;NOMINMAX;ISOLATION_AWARE_ENABLED;_CRT_SECURE_NO_DEPRECATE;_SECURE_SCL=0;BUILD_SSE2=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>Sync</ExceptionHandling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -450,26 +450,6 @@
   <ItemGroup>
     <None Include="..\icons\pvengine-xp.ico" />
     <None Include="..\icons\renderwindow-xp.ico" />
-    <None Include="..\bitmaps\toolbar\4cmdline.bmp" />
-    <None Include="..\bitmaps\toolbar\4fileclose.bmp" />
-    <None Include="..\bitmaps\toolbar\4filenew.bmp" />
-    <None Include="..\bitmaps\toolbar\4fileopen.bmp" />
-    <None Include="..\bitmaps\toolbar\4filequeue.bmp" />
-    <None Include="..\bitmaps\toolbar\4filerender.bmp" />
-    <None Include="..\bitmaps\toolbar\4filesave.bmp" />
-    <None Include="..\bitmaps\toolbar\4goirtc.bmp" />
-    <None Include="..\bitmaps\toolbar\4gopovray.bmp" />
-    <None Include="..\bitmaps\toolbar\4helpcont.bmp" />
-    <None Include="..\bitmaps\toolbar\4helpirtccd.bmp" />
-    <None Include="..\bitmaps\toolbar\4helppovcd.bmp" />
-    <None Include="..\bitmaps\toolbar\4helppovray.bmp" />
-    <None Include="..\bitmaps\toolbar\4renderclose.bmp" />
-    <None Include="..\bitmaps\toolbar\4rendershow.bmp" />
-    <None Include="..\bitmaps\toolbar\4renderstop.bmp" />
-    <None Include="..\bitmaps\toolbar\4rerun.bmp" />
-    <None Include="..\bitmaps\toolbar\4sleep.bmp" />
-    <None Include="..\bitmaps\toolbar\4sourcefile.bmp" />
-    <None Include="..\bitmaps\toolbar\4systray.bmp" />
     <None Include="..\bitmaps\about.bmp" />
     <None Include="..\bitmaps\BACKGND1.BMP" />
     <None Include="..\bitmaps\BACKGND2.BMP" />
@@ -499,13 +479,18 @@
     <None Include="..\bitmaps\toolbar\rerun.bmp" />
     <None Include="..\bitmaps\toolbar\sleep.bmp" />
     <None Include="..\bitmaps\toolbar\sourcefile.bmp" />
-    <None Include="..\bitmaps\splash-3.5.bmp" />
     <None Include="..\bitmaps\StretchDIBits.bmp" />
     <None Include="..\bitmaps\toolbar\SysTray.bmp" />
     <None Include="..\readme.html" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="..\pvengine.rc" />
+    <ResourceCompile Include="..\pvengine.rc">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\..\source</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\..\source</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\..\source</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\..\source</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release-SSE2|Win32'">..\..\source</AdditionalIncludeDirectories>
+    </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\pvbitmap.h" />

@@ -35,7 +35,7 @@
 ///
 //******************************************************************************
 
-#include "base/version.h"
+#include "base/version_info.h"
 
 #include "backend/povray.h"
 
@@ -99,7 +99,7 @@ int main (int argc, char **argv)
 
   fprintf(stderr,
           "This is an example of a minimal console build of POV-Ray under Windows.\n\n"
-          "Persistence of Vision(tm) Ray Tracer Version " POV_RAY_VERSION COMPILER_VER SSE2_INCLUDED "." POVRAY_PLATFORM_NAME ".\n"
+          "Persistence of Vision(tm) Ray Tracer Version " POV_RAY_VERSION_INFO ".\n"
           DISTRIBUTION_MESSAGE_1 "\n"
           DISTRIBUTION_MESSAGE_2 "\n"
           DISTRIBUTION_MESSAGE_3 "\n"

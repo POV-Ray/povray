@@ -941,11 +941,22 @@ void Trace::ComputeLightedTexture(MathColour& resultColour, ColourChannel& resul
                     radiosityContribution *= pow(fabs(cos_Angle_Incidence), layer->Finish->BrillianceOut-1.0) * (layer->Finish->BrillianceOut+7.0)/8.0;
 #endif
 
-                if(layer->Finish->Fresnel)
+                if (layer->Finish->Fresnel != 0.0)
                 {
-                    MathColour cs;
-                    ComputeFresnel(cs, MathColour(0.0), MathColour(1.0), cos_Angle_Incidence, relativeIor);
-                    radiosityContribution *= cs;
+                    // In diffuse reflections (which includes radiosity), the Fresnel effect is
+                    // that we _lose_ the reflected component as the light enters the material
+                    // (where it changes direction randomly), and then _again lose_ another
+                    // reflected component as the light leaves the material. However, taking into
+                    // account the former of these losses requires knowledge of the incoming light
+                    // direction, which must be accounted for in radiosity sampling (TODO - not implemented yet),
+                    // so we only do the latter here.
+                    // NB: One might think that to properly compute the outgoing loss we would have
+                    // to compute the Fresnel term for the _internal_ angle of incidence and the
+                    // _inverse_ of the relative refractive index; however, the Fresnel formula
+                    // is such that we can just as well plug in the external angle of incidence
+                    // and straight relative refractive index.
+                    double f = layer->Finish->Fresnel * FresnelR(cos_Angle_Incidence, relativeIor);
+                    radiosityContribution *= (1.0 - f);
                 }
 
                 tmpCol += radiosityContribution;
@@ -953,10 +964,29 @@ void Trace::ComputeLightedTexture(MathColour& resultColour, ColourChannel& resul
 
             // Add emissive ("classic" ambient) contribution.
             // [CLi] moved multiplication with filCol to further below
+            MathColour emission = layer->Finish->Emission;
             if (!sceneData->radiositySettings.radiosityEnabled || (sceneData->EffectiveLanguageVersion() < 370))
                 // only use "ambient" setting when radiosity is disabled (or in legacy scenes)
-                tmpCol += (layCol.colour() * layer->Finish->Ambient * sceneData->ambientLight * att);
-            tmpCol += (layCol.colour() * layer->Finish->Emission * att);
+                emission += layer->Finish->Ambient * sceneData->ambientLight;
+            if (layer->Finish->Fresnel != 0.0)
+            {
+                // Light emitted from the material itself is subject to the Fresnel effect as it
+                // leaves the material _losing_ light reflected at the interface.
+                // In diffuse reflections (which includes ambient), the Fresnel effect is
+                // that we _lose_ the reflected component as the light enters the material
+                // (where it changes direction randomly), and then _again lose_ another
+                // reflected component as the light leaves the material. The former of these
+                // losses needs to be accounted for when choosing the `ambient` setting,
+                // so we only do the latter here.
+                // NB: One might think that to properly compute the outgoing loss we would have
+                // to compute the Fresnel term for the _internal_ angle of incidence and the
+                // _inverse_ of the relative refractive index; however, the Fresnel formula
+                // is such that we can just as well plug in the external angle of incidence
+                // and straight relative refractive index.
+                double f = layer->Finish->Fresnel * FresnelR(cos_Angle_Incidence, relativeIor);
+                emission *= (1.0 - f);
+            }
+            tmpCol += (layCol.colour() * emission * att);
 
             // set up the "litObjectIgnoresPhotons" flag (thread variable) so that
             // ComputeShadowColour will know whether or not this lit object is
@@ -2408,13 +2438,24 @@ void Trace::ComputeDiffuseColour(const FINISH *finish, const Vector3d& lightDire
     if(finish->Crand > 0.0)
         intensity -= POV_rand(crandRandomNumberGenerator) * finish->Crand;
 
-    if (finish->Fresnel)
+    if (finish->Fresnel != 0.0)
     {
-        MathColour cs1, cs2;
-        ComputeFresnel(cs1, MathColour(0.0), MathColour(1.0), cos_angle_of_incidence, relativeIor);
+        // In diffuse reflections, the Fresnel effect is that we _lose_ the reflected component
+        // as the light enters the material (where it changes direction randomly), and then
+        // _again lose_ another reflected component as the light leaves the material.
+        // ComputeFresnel() gives us the reflected component.
+
+        double f1 = finish->Fresnel * FresnelR(cos_angle_of_incidence, relativeIor);
+
+        // NB: One might think that to properly compute the outgoing loss we would have
+        // to compute the Fresnel term for the _internal_ angle of incidence and the
+        // _inverse_ of the relative refractive index; however, the Fresnel formula
+        // is such that we can just as well plug in the external angle of incidence
+        // and straight relative refractive index.
         cos_angle_of_incidence = -dot(layer_normal, eyeDirection);
-        ComputeFresnel(cs2, MathColour(0.0), MathColour(1.0), cos_angle_of_incidence, relativeIor);
-        colour += intensity * layer_pigment_colour * light_colour * cs1 * cs2;
+        double f2 = finish->Fresnel * FresnelR(cos_angle_of_incidence, relativeIor);
+
+        colour += intensity * layer_pigment_colour * light_colour * (1.0 - f1) * (1.0 - f2);
     }
     else
         colour += intensity * layer_pigment_colour * light_colour;
@@ -2472,12 +2513,19 @@ void Trace::ComputePhongColour(const FINISH *finish, const Vector3d& lightDirect
         {
             intensity = finish->Phong * pow(cos_angle_of_incidence, (double)finish->Phong_Size);
 
-            if (finish->Fresnel || (finish->Metallic != 0.0))
+            if ((finish->Fresnel != 0.0) || (finish->Metallic != 0.0))
             {
                 MathColour cs(1.0);
+                // NB: The following dot product should technically be done with the vector halfway
+                // between the in- and outgoing direction, rather than, the surface normal.
+                // But since the Phong model specifically takes shortcuts to not compute that
+                // vector, we'll take the surface normal as an approximation. Also, the choice to
+                // compute the dot with the light rather than viewing direction is arbitrary.
                 double ndotl = dot(layer_normal, lightDirection);
-                if (finish->Fresnel)
-                    ComputeFresnel(cs, MathColour(1.0), MathColour(0.0), ndotl, relativeIor);
+                if (finish->Fresnel != 0.0)
+                    // In specular reflections (which includes highlights), the Fresnel effect is
+                    // that we only get the reflected component.
+                    cs *= finish->Fresnel * FresnelR(ndotl, relativeIor);
                 ComputeMetallic(cs, finish->Metallic, layer_pigment_colour, ndotl);
                 colour += intensity * light_colour * cs;
             }
@@ -2505,12 +2553,14 @@ void Trace::ComputeSpecularColour(const FINISH *finish, const Vector3d& lightDir
         {
             intensity = finish->Specular * pow(cos_angle_of_incidence, (double)finish->Roughness);
 
-            if (finish->Fresnel || (finish->Metallic != 0.0))
+            if ((finish->Fresnel != 0.0) || (finish->Metallic != 0.0))
             {
                 MathColour cs(1.0);
                 double ndotl = dot(halfway, lightDirection) / halfway_length;
-                if (finish->Fresnel)
-                    ComputeFresnel(cs, MathColour(1.0), MathColour(0.0), ndotl, relativeIor);
+                if (finish->Fresnel != 0.0)
+                    // In specular reflections (which includes highlights), the Fresnel effect is
+                    // that we only get the reflected component.
+                    cs *= finish->Fresnel * FresnelR(ndotl, relativeIor);
                 ComputeMetallic(cs, finish->Metallic, layer_pigment_colour, ndotl);
                 colour += intensity * light_colour * cs;
             }
@@ -2600,35 +2650,39 @@ void Trace::ComputeMetallic(MathColour& colour, double metallic, const MathColou
 
 void Trace::ComputeFresnel(MathColour& reflectivity, const MathColour& rMax, const MathColour& rMin, double cos_angle, double ior)
 {
-    double g, f;
+    double f = FresnelR(cos_angle, ior);
+    reflectivity = f * rMax + (1.0 - f) * rMin;
+}
 
+double Trace::FresnelR(double cosTi, double n)
+{
     // NB: This is a special case of the Fresnel formula, presuming that incident light is unpolarized.
     //
     // The implemented formula is as follows:
     //
-    //      1     ( g - cos Ti )^2           ( cos Ti (g + cos Ti) - 1 )^2
-    // R = --- * ------------------ * ( 1 + ------------------------------- )
-    //      2     ( g + cos Ti )^2           ( cos Ti (g - cos Ti) + 1 )^2
+    //      1     / g - cos Ti \ 2    /     / cos Ti (g + cos Ti) - 1 \ 2 \
+    // R = --- * ( ------------ )  * ( 1 + ( ------------------------- )   )
+    //      2     \ g + cos Ti /      \     \ cos Ti (g - cos Ti) + 1 /   /
     //
     // where
     //
     //        /---------------------------
     // g = -\/ (n1/n2)^2 + (cos Ti)^2 - 1
 
-    // Christoph's tweak to work around possible negative argument in sqrt
-    double sqx = Sqr(ior) + Sqr(cos_angle) - 1.0;
+    double sqrg = Sqr(n) + Sqr(cosTi) - 1.0;
 
-    if(sqx > 0.0)
-    {
-        g = sqrt(sqx);
-        f = 0.5 * (Sqr(g - cos_angle) / Sqr(g + cos_angle));
-        f = f * (1.0 + Sqr(cos_angle * (g + cos_angle) - 1.0) / Sqr(cos_angle * (g - cos_angle) + 1.0));
+    if(sqrg <= 0.0)
+        // Total reflection.
+        return 1.0;
 
-        f = min(1.0, max(0.0, f));
-        reflectivity = f * rMax + (1.0 - f) * rMin;
-    }
-    else
-        reflectivity = rMax;
+    double g = sqrt(sqrg);
+
+    double quot1 = (g - cosTi) / (g + cosTi);
+    double quot2 = (cosTi * (g + cosTi) - 1.0) / (cosTi * (g - cosTi) + 1.0);
+
+    double f = 0.5 * Sqr(quot1) * (1.0 + Sqr(quot2));
+
+    return clip(f, 0.0, 1.0);
 }
 
 void Trace::ComputeOneWhiteLightRay(const LightSource &lightsource, double& lightsourcedepth, Ray& lightsourceray, const Vector3d& ipoint, const Vector3d& jitter)

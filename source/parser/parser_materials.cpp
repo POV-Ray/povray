@@ -2313,7 +2313,7 @@ void Parser::Parse_Finish (FINISH **Finish_Ptr)
                     Parse_Colour(New->Reflection_Max);
                     New->Reflection_Min = New->Reflection_Max;
                     New->Reflection_Falloff = 1;
-                    New->Reflection_Fresnel = false;
+                    New->Reflection_Fresnel = (New->Fresnel != 0.0);
                 END_CASE
 
                 /* new syntax */
@@ -2343,14 +2343,6 @@ void Parser::Parse_Finish (FINISH **Finish_Ptr)
                     EXPECT
                         CASE(FRESNEL_TOKEN)
                             New->Reflection_Fresnel = ((int) Allow_Float(1.0) != 0);
-
-                            /* for fresnel reflectivity, if the user didn't specify a min & max,
-                               then we will set the min to zero - otherwise, this setting would
-                               have no effect */
-                            if(!found_second_color && New->Reflection_Fresnel)
-                            {
-                                New->Reflection_Min.Clear();
-                            }
                         END_CASE
 
                         CASE (FALLOFF_TOKEN)
@@ -2440,7 +2432,8 @@ void Parser::Parse_Finish (FINISH **Finish_Ptr)
         END_CASE
 
         CASE(FRESNEL_TOKEN)
-            New->Fresnel = ((int) Allow_Float(1.0) != 0);
+            New->Fresnel = Allow_Float(1.0);
+            New->Reflection_Fresnel = (New->Fresnel != 0.0);
         END_CASE
 
         CASE (CRAND_TOKEN)
@@ -2567,6 +2560,12 @@ void Parser::Parse_Finish (FINISH **Finish_Ptr)
         New->Phong *= (New->Phong_Size + 1.0) / 2.0;
     if (specularAdjust)
         New->Specular *= (New->Roughness + 2.0) / (4.0 * ( 2.0 - pow( 2.0, -New->Roughness / 2.0 ) ) );
+
+    // For Fresnel reflectivity, if the user didn't specify a min & max,
+    // then we will set the min to zero - otherwise, this setting would
+    // have no effect.
+    if ((New->Reflection_Fresnel) && (New->Reflection_Max - New->Reflection_Min).IsZero())
+        New->Reflection_Min.Clear();
 
     Parse_End ();
 }

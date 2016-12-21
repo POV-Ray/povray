@@ -40,9 +40,10 @@
 
 #include <algorithm>
 #include <limits>
+#include <string>
 #include <vector>
 
-#include "pov_mem.h"
+#include "base/pov_mem.h"
 
 namespace pov_base
 {
@@ -283,6 +284,8 @@ enum StringEncoding
     kStringEncoding_UTF8   = 1,
     kStringEncoding_System = 2
 };
+
+typedef std::string UTF8String;
 
 enum GammaMode
 {
