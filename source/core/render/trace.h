@@ -745,7 +745,7 @@ class Trace
         /// @param[in]      cosTi           Cosine of angle between incident ray and surface normal.
         /// @param[in]      n               Relative refractive index of the material entered.
         ///
-        static double Trace::FresnelR(double cosTi, double n);
+        static double FresnelR(double cosTi, double n);
 
         /// Compute Sky & Background Colour.
         ///
