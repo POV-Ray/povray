@@ -79,7 +79,7 @@
 /// @def POVRAY_IS_BETA
 /// Whether this version is a beta.
 /// Leave undefined for pre-beta, release candidate or final releases.
-#define POVRAY_IS_BETA
+//#define POVRAY_IS_BETA
 
 //------------------------------------------------------------------------------
 
