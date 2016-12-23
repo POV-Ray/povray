@@ -3,8 +3,9 @@ POV-Ray 3.7 for UNIX/Linux - INSTALL file
 
 Compiling and installing POV-Ray for Unix from sources.
 
-Please report bugs via our bugtracker at http://bugs.povray.org/ or to our forum
-at news://news.povray.org/povray.unix/ or http://news.povray.org/povray.unix/
+Please report bugs via our GitHub issue tracker at
+https://github.com/POV-Ray/povray/issues or to our forum at
+news://news.povray.org/povray.unix/ or http://news.povray.org/povray.unix/
 ===============================================================================
 
 +----------------------------------------------------------------------------+
