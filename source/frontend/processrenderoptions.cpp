@@ -1075,7 +1075,7 @@ struct ProcessRenderOptions::Output_FileType_Table FileTypeTable[] =
     { 'S',  0,                              kPOVList_FileType_System,           SYS_GRAYSCALE_FLAG, SYS_ALPHA_FLAG },
 #endif // POV_SYS_IMAGE_TYPE
 
-    //  [1] Alpha support for BMP uses an inofficial extension to the BMP file format, which is not recognized by
+    //  [1] Alpha support for BMP uses an unofficial extension to the BMP file format, which is not recognized by
     //      most image pocessing software.
 
     //  [2] While OpenEXR does support greyscale output at >8 bits, the variants currently supported by POV-Ray
