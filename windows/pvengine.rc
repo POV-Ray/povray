@@ -228,7 +228,7 @@ BEGIN
             VALUE "FileDescription", "POV-Ray for Windows v3.7"
             VALUE "FileVersion", OFFICIAL_VERSION_WINRC_STRING
             VALUE "InternalName", "PVEngine"
-            VALUE "LegalCopyright", "Copyright (c) 1991-2016 Persistence of Vision Raytracer Pty. Ltd. All Rights Reserved."
+            VALUE "LegalCopyright", "Copyright (c) 1991-2017 Persistence of Vision Raytracer Pty. Ltd. All Rights Reserved."
             VALUE "LegalTrademarks", "POV-Ray(tm) is a trademark of Persistence of Vision Raytracer Pty. Ltd."
             VALUE "OriginalFilename", "PVEngine.EXE"
             VALUE "ProductName", "POV-Ray"

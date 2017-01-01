@@ -30,6 +30,85 @@ Notes:
 POV-Ray v3.7.1-???
 ------------------------------------------------------------------------------
 
+Commit 605359b on 2017-01-01 by Christoph Lipka
+
+    Update POV-Ray for Windows inbuilt help.
+
+Commit 873a63c on 2016-12-30 by Christoph Lipka
+
+    Add `boost/atomic` package to our subset of the boost library.
+
+Commit 6ba9ec7 on 2016-12-24 by Christoph Lipka
+
+    Update colors.pov.
+
+Commit 938caae on 2016-12-24 by Christoph Lipka
+
+    Fix colors_ral.inc.
+
+Commit 6dda7c3 on 2016-12-23 by Christoph Lipka
+
+    Update our preferred bug reporting channel in some files. (issue #119)
+
+Commit 9e20adb on 2016-12-23 by Christoph Lipka
+
+    Update copyright notices.
+
+Commit 63e8f73 on 2016-12-23 by William F. Pokorny (wfpokorny)
+
+    [ci skip] Updating the unix man page. Small typo. (#169)
+
+    Updating our unix man page to be current with recent 3.7.1 master
+    version. Also small typo in processrenderoptions.cpp.
+
+Commit 0174c03 on 2016-12-22 by Christoph Lipka
+
+    Update colors_ral.inc.
+
+------------------------------------------------------------------------------
+POV-Ray v3.7.1-alpha.8927145
+------------------------------------------------------------------------------
+
+Commit f24d656 on 2016-12-21 by Christoph Lipka
+
+    Fix `version.h` erroneously flagging this as a beta version.
+
+Commit 8cce165 on 2016-12-21 by Christoph Lipka
+
+    Fix bug in previous commit.
+
+Commit 56c574a on 2016-12-21 by Christoph Lipka
+
+    Modified the way the finish-level `fresnel` parameter works.
+
+Commit f0fdc36 on 2016-12-20 by Christoph Lipka
+
+    Fix some issues discovered by static code analysis.
+
+Commit 243e9ad on 2016-12-20 by Christoph Lipka
+
+    Partial overhaul of string utilities to fix some unsafe string handling.
+
+Commit c6a6e98 on 2016-12-20 by Christoph Lipka
+
+    Fix GitHub issue #175 ("Coredump due recent 3.7.1 parser updates.")
+
+Commit 24b7f9f on 2016-12-20 by Christoph Lipka
+
+    Update README.md
+
+Commit 2ebea6c on 2016-12-19 by Christoph Lipka
+
+    Final(?) update of version number stuff.
+
+Commit 0b9d345 on 2016-12-19 by Christoph Lipka
+
+    Yet more version numbering related changes.
+
+Commit cc91a26 on 2016-12-19 by Christoph Lipka
+
+    Update revision.txt.
+
 Commit a61c792 on 2016-12-19 by Christoph Lipka
 
     More version string related changes.
@@ -93,6 +172,10 @@ Commit a04d241 on 2016-12-15 by Christoph Lipka
 Commit 983ab18 on 2016-12-15 by Christoph Lipka
 
     Fix some issues discovered by static code analysis.
+
+------------------------------------------------------------------------------
+POV-Ray v3.7.1-alpha.8917471
+------------------------------------------------------------------------------
 
 Commit f814383 on 2016-12-14 by Christoph Lipka
 
