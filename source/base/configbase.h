@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -658,6 +658,19 @@
 #define DEFAULT_WORKING_GAMMA_TYPE  kPOVList_GammaType_Neutral
 #define DEFAULT_WORKING_GAMMA       1.0
 #define DEFAULT_WORKING_GAMMA_TEXT  "1.0"
+
+/// @def DEFAULT_AUTO_BOUNDINGTHRESHOLD
+/// Define the default auto-bounding threshold used and reported.
+///
+/// The shipped povray.ini file defines this with:
+/// Bounding_Threshold=3
+/// and the definition here should be aligned so when users run
+/// without the bounding threshold setting by ini file or command
+/// line option the default is still the documented value of 3.
+///
+#ifndef DEFAULT_AUTO_BOUNDINGTHRESHOLD
+    #define DEFAULT_AUTO_BOUNDINGTHRESHOLD 3
+#endif
 
 #ifndef CDECL
     #define CDECL

@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -943,7 +943,8 @@ void RenderOptions(POVMS_Object& obj, TextStreamBuffer *tsb)
     tsb->printf("  Quality: %2d\n", clip(obj.TryGetInt(kPOVAttrib_Quality, 9), 0, 9));
 
     if(obj.TryGetBool (kPOVAttrib_Bounding, true))
-        tsb->printf("  Bounding boxes.......On   Bounding threshold: %d\n", obj.TryGetInt (kPOVAttrib_BoundingThreshold, 3));
+        tsb->printf("  Bounding boxes.......On   Bounding threshold: %d\n",
+        clip<int>(obj.TryGetInt(kPOVAttrib_BoundingThreshold,DEFAULT_AUTO_BOUNDINGTHRESHOLD),1,SIGNED16_MAX));
     else
         tsb->printf("  Bounding boxes.......Off\n");
 
