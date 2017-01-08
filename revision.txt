@@ -27,8 +27,29 @@ Notes:
 ------------------------------------------------------------------------------
 
 ------------------------------------------------------------------------------
-POV-Ray v3.7.1-???
+POV-Ray v3.7.1-beta.2
 ------------------------------------------------------------------------------
+
+Commit 3410c23 on 2017-01-08 by Christoph Lipka
+
+    Make betas live happily alongside the previous release, by using a
+    different registry key and directory name.
+
+Commit 6aa8ee7 on 2017-01-08 by Christoph Lipka
+
+    [ci skip] Disable automated generation of GitHub release draft.
+
+------------------------------------------------------------------------------
+POV-Ray v3.7.1-beta.1  (not officially released)
+------------------------------------------------------------------------------
+
+Commit 978ca52 on 2017-01-01 by Christoph Lipka
+
+    Prepare for 3.7.1 beta phase.
+
+Commit c3ad8b2 on 2017-01-01 by Christoph Lipka
+
+    Update copyright notices and change logs.
 
 Commit 605359b on 2017-01-01 by Christoph Lipka
 
