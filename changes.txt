@@ -24,8 +24,21 @@ should be located in the same directory as this file is.
 ------------------------------------------------------------------------------
 
 
+Changes between 3.7.1-beta.1 and 3.7.1-beta.2
+=============================================
+
+Changes have been made to allow POV-Ray for Windows v3.7.1 betas to live
+happily alongside an existing v3.7.0 installation.
+
+NOTE: This provision is made for the beta phase only. The final release of
+POV-Ray for Windows v3.7.1 will be designed to supersede any existing v3.7.0
+installation.
+
+
 Changes between 3.7.0 and 3.7.1-beta.1
 ======================================
+
+(Note: 3.7.1-beta.1 has never been officially released in binary form.)
 
 The primary focus of this version has been on code refactoring in order to
 modularize the underlying architecture, but various new features as well as
