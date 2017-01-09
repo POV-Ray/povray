@@ -38,6 +38,8 @@
 #ifndef PVEDIT_H_INCLUDED
 #define PVEDIT_H_INCLUDED
 
+#include "base/version.h"
+
 #define EDITDLLVERSION            0x0302
 
 #define MAX_EDITORS               32

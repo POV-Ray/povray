@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -1416,6 +1416,46 @@ bool copy36EditSettings(void)
   return (result == ERROR_SUCCESS) ;
 }
 
+#ifdef POVRAY_IS_BETA
+bool copy37NoBetaEditSettings(void)
+{
+  HKEY        hKeySrc ;
+  HKEY        hKeyDst ;
+  DWORD       result ;
+  HINSTANCE   hLib ;
+  shCopyType  *shCopyKey ;
+
+  if ((hLib = LoadLibrary ("shlwapi.dll")) == NULL)
+    return (false) ;
+  shCopyKey = (shCopyType *) GetProcAddress (hLib, "SHCopyKeyA") ;
+  if (shCopyKey == NULL)
+  {
+    FreeLibrary (hLib) ;
+    return (false) ;
+  }
+
+  if (RegOpenKeyEx (HKEY_CURRENT_USER, "Software\\" REGKEY "\\" REGVER, 0, KEY_READ, &hKeySrc) != ERROR_SUCCESS)
+  {
+    FreeLibrary (hLib) ;
+    return (false) ;
+  }
+
+  if (RegCreateKeyEx (HKEY_CURRENT_USER, "Software\\" REGKEY "\\" REGVERKEY "\\POV-Edit", 0, "", REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hKeyDst, NULL) != ERROR_SUCCESS)
+  {
+    RegCloseKey (hKeySrc) ;
+    FreeLibrary (hLib) ;
+    return (false) ;
+  }
+
+  result = shCopyKey (hKeySrc, "POV-Edit", hKeyDst, NULL) ;
+  RegCloseKey (hKeySrc) ;
+  RegCloseKey (hKeyDst) ;
+  FreeLibrary (hLib) ;
+
+  return (result == ERROR_SUCCESS) ;
+}
+#endif
+
 bool checkEditKey36 (void)
 {
   HKEY        key ;
@@ -1427,6 +1467,20 @@ bool checkEditKey36 (void)
   }
   return (false) ;
 }
+
+#ifdef POVRAY_IS_BETA
+bool checkEditKey37NoBeta (void)
+{
+  HKEY        key ;
+
+  if (RegOpenKeyEx (HKEY_CURRENT_USER, "Software\\" REGKEY "\\" REGVER "\\POV-Edit", 0, KEY_READ, &key) == ERROR_SUCCESS)
+  {
+    RegCloseKey (key) ;
+    return (true) ;
+  }
+  return (false) ;
+}
+#endif
 
 bool checkEditKey37 (void)
 {
@@ -5421,8 +5475,18 @@ int PASCAL WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
   sprintf(ToolIniFileName, "%sini\\pvtools.ini", DocumentsPath);
   sprintf(EngineIniFileName, "%sini\\pvengine.ini", DocumentsPath);
 
-  if (checkEditKey37() == false && checkEditKey36() == true)
-    copy36EditSettings();
+  if (!checkEditKey37())
+  {
+#ifdef POVRAY_IS_BETA
+    if (checkEditKey37NoBeta())
+      copy37NoBetaEditSettings();
+    else if (checkEditKey36())
+      copy36EditSettings();
+#else
+    if (checkEditKey36())
+      copy36EditSettings();
+#endif
+  }
 
   if (checkRegKey () == false || FreshInstall == true)
     if (!CloneOptions())
