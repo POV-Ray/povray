@@ -30,6 +30,14 @@ Notes:
 POV-Ray v3.7.1-beta.2
 ------------------------------------------------------------------------------
 
+Commit e2fe17d on 2017-01-09 by Christoph Lipka
+
+    Update some strings in the Windows binary headers.
+
+Commit 90d12db on 2017-01-08 by Christoph Lipka
+
+    Update change logs.
+
 Commit 3410c23 on 2017-01-08 by Christoph Lipka
 
     Make betas live happily alongside the previous release, by using a
