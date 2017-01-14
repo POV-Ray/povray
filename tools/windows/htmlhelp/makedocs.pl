@@ -420,7 +420,7 @@ foreach $file (@files)
     }
     die "$file:$lineno - Orphaned indexentry '$line'" if $line =~ /indexentry/i ;
     $newline = "" ;
-    while ($line =~ /(.*)(<a ([^>]+)>)(.*)/i)
+    while ($line =~ /(.*?)(<a ([^>]+)>)(.*)/i)
     {
       my $left = $1 ;
       my $attributes = $3 ;
@@ -432,7 +432,7 @@ foreach $file (@files)
       {
         # we have an <a href="...">, now see if it's an external link
         $destination = $1 ;
-        if ($destination =~ /^http:\/\//i)
+        if ($destination =~ /^[a-z]*:\/\//i)
         {
           if ($attributes !~ /target\s*=\s*"([^"]+)"/i)
           {
