@@ -13,7 +13,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -297,7 +297,8 @@ namespace pov
 
 #define HAVE_NAN
 #define HAVE_INF
-#define POV_ISNAN(x) _isnan(x)
-#define POV_ISINF(x) _isinf(x)
+#define POV_ISNAN(x)    (_isnan(x) != 0)
+#define POV_ISFINITE(x) (_finite(x) != 0)
+#define POV_ISINF(x)    (!POV_ISFINITE(x) && !POV_ISNAN(x))
 
 #endif // POVRAY_WINDOWS_SYSPOVCONFIG_H

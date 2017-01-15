@@ -13,7 +13,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -883,8 +883,12 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
             {
                 if (camera.Location_Fn[i] != NULL)
                     cameraLocation[i] = mpCameraLocationFn[i]->Evaluate(x0, y0);
+                if (!IsFinite(cameraLocation[i]))
+                    return false;
                 if (camera.Direction_Fn[i] != NULL)
                     cameraDirection[i] = mpCameraDirectionFn[i]->Evaluate(x0, y0);
+                if (!IsFinite(cameraDirection[i]))
+                    return false;
             }
             if (cameraDirection.IsNearNull(EPSILON))
                 return false;
