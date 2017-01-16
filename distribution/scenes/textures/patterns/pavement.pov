@@ -1,18 +1,20 @@
-//------------------------- pavement.pov ---------------------------
 // This work is licensed under the Creative Commons Attribution 3.0 Unported License.
 // To view a copy of this license, visit http://creativecommons.org/licenses/by/3.0/
 // or send a letter to Creative Commons, 444 Castro Street, Suite 900, Mountain View,
 // California, 94041, USA.
 //
-//------------------------------------------------------------------
+// Persistence Of Vision Ray Tracer ('POV-Ray') sample file.
+//
+// Pavement pattern example pavement.pov.
 //
 // Renders all 112 pavement patterns with the exterior, interior and form
 // settings specified.
 //
-// +A0.3 +H950 +W600
+// +W600 +H950 +A0.3
 
 #version 3.7;
 global_settings { assumed_gamma 1 }
+#default { finish { ambient 0.006 diffuse 0.456 } }
 
 #declare VarExterior = 0;    // 0,1,2   Exterior corner blunting/rounding.
 #declare VarInterior = 0;    // 0,1,2   Interior corner blunting/rounding.
@@ -28,6 +30,7 @@ global_settings { assumed_gamma 1 }
 //---
 #declare White = srgbft <1,1,1,0,0>;
 background { color White }
+
 #declare Camera01y = camera {
     orthographic
     location <0,2,0>

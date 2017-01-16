@@ -2,28 +2,50 @@
 // To view a copy of this license, visit http://creativecommons.org/licenses/by/3.0/
 // or send a letter to Creative Commons, 444 Castro Street, Suite 900, Mountain View,
 // California, 94041, USA.
-
-// Persistence Of Vision Raytracer sample file.
-// A tiling pattern demo scene by Samuel Benge
-
-/******************************************************************************
- * $File: //depot/povray/smp/distribution/scenes/textures/patterns/tiling.pov $
- * $Revision: #2 $
- * $Change: 5430 $
- * $DateTime: 2011/03/21 10:42:00 $
- * $Author: jholsenback $
- *****************************************************************************/
+//
+// Persistence Of Vision Ray Tracer ('POV-Ray') sample file.
+//
+// Tiling pattern example tiling.pov.
+//
+// Original scene by Samuel Benge.
+// Modified by Jim Holsenback 2011/03/21.
+//
+// -w800 -h600 +a0.3
 
 #version 3.7;
+global_settings { assumed_gamma 1.0 }
+#default { finish { ambient 0.006 diffuse 0.456 } }
 
-global_settings {assumed_gamma 1.0}
-background {rgb 1}
+background {rgb 1} // White
 
-camera {location <0,10,-10> look_at <0,0,0> right  x*image_width/image_height}
-light_source {<0, 30, -30> color rgb 1}
+camera {
+    location <0,10,-10>
+    look_at  <0,0,0>
+    right    x*image_width/image_height
+}
 
-#include "colors.inc"
-#include "math.inc"
+light_source {<0,30,-30> color rgb 1} // White
+
+#declare SVG_blue         = srgb <0,0,1>;
+#declare SVG_plum         = srgb <0.8667,0.6275,0.8667>;
+#declare SVG_cyan         = srgb <0,1,1>;
+#declare SVG_darkseagreen = srgb <0.5608,0.7373,0.5608>;
+#declare SVG_lime         = srgb <0,1,0>;
+#declare SVG_rosybrown    = srgb <0.7373,0.5608,0.5608>;
+#declare SVG_thistle      = srgb <0.8471,0.749,0.8471>;
+#declare SVG_red          = srgb <1,0,0>;
+#declare SVG_lightcyan    = srgb <0.8784,1,1>;
+#declare SVG_violet       = srgb <0.9333,0.5098,0.9333>;
+#declare SVG_white        = srgb <1,1,1>;
+#declare SVG_yellow       = srgb <1,1,0>;
+#declare ColorArray = array[12] {
+    SVG_red,          SVG_white,
+    SVG_lime,         SVG_yellow,
+    SVG_blue,         SVG_cyan,
+    SVG_rosybrown,    SVG_thistle,
+    SVG_darkseagreen, SVG_lightcyan,
+    SVG_violet,       SVG_plum
+};
 
 // see the documentaion for possible patterns and types
 #declare TilingPattern = 5;
@@ -37,23 +59,14 @@ light_source {<0, 30, -30> color rgb 1}
 // TileTypes = caulk at n TileTypes
 #declare CaulkAt    = 1;
 #declare CaulkSize  = 0.2;
-#declare CaulkColor = White;
-
-#declare ColorArray =
-  array[12]{
-    Red,        White,
-    Green,      Yellow,
-    Blue,       Cyan,
-    IndianRed,  Pink,
-    DarkGreen,  Turquoise
-    Violet,     BlueViolet
-  };
+#declare CaulkColor = SVG_white;
 
 #if (WriteMap)
   #fopen MapFile "tilemap.txt" write
   #write (MapFile, "texture {\n  pigment {\n   tiling ",TilingPattern, "\n   color_map {\n")
 #end
 
+#include "math.inc"
 plane{y,0
   texture{
     pigment{
