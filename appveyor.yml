@@ -13,6 +13,7 @@ matrix:
   fast_finish: true
 
 environment:
+  PovBuildDefs: POV_RAY_IS_AUTOBUILD=1;POV_RAY_BUILD_ID="av$(APPVEYOR_BUILD_NUMBER)";BUILT_BY="AppVeyor";
   matrix:
   - configuration: Release
     platform: x64

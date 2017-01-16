@@ -38,6 +38,19 @@ Changes between 3.7.1-TBD and 3.7.1
 TBD
 
 
+Changes between 3.7.1-beta.2 and 3.7.1-TBD
+==========================================
+
+The focus of this version has been on fixing bugs.
+
+Fixed or Mitigated Bugs
+-----------------------
+
+Reported via GitHub:
+
+  - #184 ("User defined camera may cause crash during render")
+
+
 Changes between 3.7.1-beta.1 and 3.7.1-beta.2
 =============================================
 

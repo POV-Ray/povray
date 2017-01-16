@@ -223,15 +223,14 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "Comments", "This software is licensed under the terms of the GNU Affero General Public License."
             VALUE "CompanyName", "Persistence of Vision Raytracer Pty. Ltd."
             VALUE "FileDescription", "POV-Ray for Windows v3.7"
             VALUE "FileVersion", OFFICIAL_VERSION_WINRC_STRING
             VALUE "InternalName", "PVEngine"
-            VALUE "LegalCopyright", "Copyright (c) 1991-2017 Persistence of Vision Raytracer Pty. Ltd. All Rights Reserved."
+            VALUE "LegalCopyright", "Copyright (c) 1991-2017 Persistence of Vision Raytracer Pty. Ltd. All Rights Reserved. This software is licensed under the terms of the GNU Affero General Public License."
             VALUE "LegalTrademarks", "POV-Ray(tm) is a trademark of Persistence of Vision Raytracer Pty. Ltd."
-            VALUE "OriginalFilename", "PVEngine.EXE"
-            VALUE "ProductName", "POV-Ray"
+            VALUE "OriginalFilename", "pvengine.exe"
+            VALUE "ProductName", "POV-Ray for Windows"
             VALUE "ProductVersion", OFFICIAL_VERSION_WINRC_STRING
         END
     END
