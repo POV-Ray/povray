@@ -1,15 +1,26 @@
-// PoVRay 3.7.1 Scene File "torus2.pov"
-// author: Christoph Lipka
-// date:   2016-05-05
+// This work is licensed under the Creative Commons Attribution 3.0 Unported License.
+// To view a copy of this license, visit http://creativecommons.org/licenses/by/3.0/
+// or send a letter to Creative Commons, 444 Castro Street, Suite 900, Mountain View,
+// California, 94041, USA.
+//
+// Persistence Of Vision Ray Tracer ('POV-Ray') sample file.
+//
+// Torus object example torus2.pov.
+//
+// Author: Christoph Lipka
+// Date:   2016-05-05
 //
 // Demonstrates the use and effect of the torus spindle modes for
 // self-intersecting torus primitives, as introduced with POV-Ray 3.7.1
 //
 // +w200 +h200 +kfi1 +kff4 +ua
-//------------------------------------------------------------------------
 
 #version 3.71;
 global_settings{ assumed_gamma 1.0 }
+
+default {
+  finish { ambient 0.1 diffuse albedo 1.0 specular albedo 0.0 }
+}
 
 camera {
   angle 15
@@ -20,10 +31,6 @@ camera {
 
 light_source { <0,500,-1000> colour rgb 1 }
 background{ colour rgbt 1 }
-
-default {
-  finish { ambient 0.1 diffuse albedo 1.0 specular albedo 0.0 }
-}
 
 #declare HintTexture      = texture { pigment { colour rgb 0.8 transmit 0.8 } }
 #declare OutsideTexture   = texture { pigment { colour green 1 } }
