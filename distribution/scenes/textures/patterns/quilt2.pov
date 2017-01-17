@@ -13,7 +13,7 @@
 global_settings { assumed_gamma 1.0 }
 #default { finish { ambient 0.006 diffuse 0.456 } }
 
-#declare White = srgbft <1.00,1.00,1.00,0,0>;
+#declare White = srgb <1,1,1>;
 #default {
     pigment { White }
     finish {
@@ -28,8 +28,8 @@ camera {
     direction 3*z
 }
 
-#declare Gray45 = srgbft <0.45,0.45,0.45,0,0>;
-#declare Gray65 = srgbft <0.65,0.65,0.65,0,0>;
+#declare Gray45 = srgb <0.45,0.45,0.45>;
+#declare Gray65 = srgb <0.65,0.65,0.65>;
 light_source { <300, 500, -500> color Gray65}
 light_source { <-50,  10, -500> color Gray45}
 

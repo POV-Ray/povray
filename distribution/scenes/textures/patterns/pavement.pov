@@ -28,7 +28,7 @@ global_settings { assumed_gamma 1 }
 // #declare PavementHex_NrmScale  <1/3,1,1/sqrt(3)> // (6 sides)
 
 //---
-#declare White = srgbft <1,1,1,0,0>;
+#declare White = srgb <1,1,1>;
 background { color White }
 
 #declare Camera01y = camera {
@@ -40,13 +40,13 @@ background { color White }
 }
 #declare Light00 = light_source { <50,150,-250>, White }
 #declare Box00 = box { <-1,-0.01,-1>,<1,0.01,1> }
-#declare Red = srgbft <1,0,0,0,0>;
-#declare Green = srgbft <0,1,0,0,0>;
-#declare Azure = rgb <0,0.498,1>;
-#declare Black = rgb <0,0,0>;
-#declare Chartreuse_Green = rgb <0.5,1,0>;
-#declare Spring_Green = rgb <0,1,0.5>;
-#declare Yellow = rgb <1,1,0>;
+#declare Red = srgb <1,0,0>;
+#declare Green = srgb <0,1,0>;
+#declare Azure = srgb <0,0.5,1>;
+#declare Black = srgb <0,0,0>;
+#declare Chartreuse_Green = srgb <0.5,1,0>;
+#declare Spring_Green = srgb <0,1,0.5>;
+#declare Yellow = srgb <1,1,0>;
 #declare ColorMap6 = color_map {
     [ 0/6 Azure ]
     [ (1-VarCalkSize)/6 Azure ]

@@ -12,7 +12,7 @@
 #version 3.71;
 global_settings { assumed_gamma 1 }
 #default { finish { ambient 0.006 diffuse 0.456 } }
-#declare Black = srgbft <0,0,0,0,0>;
+#declare Black = srgb <0,0,0>;
 background { color Black }
 
 // orthographic so camera rays parallel +y toward x,z plane.
@@ -27,7 +27,7 @@ background { color Black }
 #declare Sphere00 = sphere { <0,0,0>, 0.5
 }
 #declare Red = srgb <1,0,0>;
-#declare Azure = srgb <0,0.498,1>;
+#declare Azure = srgb <0,0.5,1>;
 #declare ColorMap00 = color_map {
     // blend_mode 2 blend_gamma 0.5 // Uncomment one of these
     // blend_mode 2 blend_gamma 2.5 // for fun with blend

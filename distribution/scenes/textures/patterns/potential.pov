@@ -13,7 +13,7 @@
 global_settings { assumed_gamma 1 }
 #default { finish { ambient 0.006 diffuse 0.456 } }
 
-#declare Grey50 = srgbft <0.5,0.5,0.5,0,0>;
+#declare Grey50 = srgb <0.5,0.5,0.5>;
 background { color Grey50 }
 
 #declare Camera00 = camera {
@@ -24,21 +24,21 @@ background { color Grey50 }
     right x*(image_width/image_height)
     look_at <0,0,0>
 }
-#declare White = srgbft <1,1,1,0,0>;
+#declare White = srgb <1,1,1>;
 #declare Light00 = light_source {
     <50,150,-250>, White
 }
-#declare Orange = srgbft <1,0.5,0,0,0>;
+#declare Orange = srgb <1,0.5,0>;
 #declare CylinderX = cylinder {
     <-2,0,0>, <2,0,0>, 0.01
     pigment { color Orange }
 }
-#declare Cyan = srgbft <0,1,1,0,0>;
+#declare Cyan = srgb <0,1,1>;
 #declare CylinderY = cylinder {
     <0,-2,0>, <0,2,0>, 0.01
     pigment { color Cyan }
 }
-#declare Blue = srgbft <0,0,1,0,0>;
+#declare Blue = srgb <0,0,1>;
 #declare CylinderZ = cylinder {
     <0,0,-2>, <0,0,2>, 0.01
     pigment { color Blue }
@@ -47,7 +47,7 @@ background { color Grey50 }
     <-0.707,-0.707,-0.707>,<0.707,0.707,-0.407>
     rotate y*-45
 }
-#declare Rose = srgbft <1,0,0.5,0,0>;
+#declare Rose = srgb <1,0,0.5>;
 #declare BlobLeft = blob {
     threshold 0.5
     cylinder { <-0.5,-0.5,-0.5>, <-0.5,0.5,-0.5>, 0.2, 1 }
@@ -74,7 +74,7 @@ background { color Grey50 }
 }
 #declare Red = srgb <1,0,0>;
 #declare Green = srgb <0,1,0>;
-#declare Azure = srgb <0,0.498,1>;
+#declare Azure = srgb <0,0.5,1>;
 // Color map must align with potential pattern 'threshold on'.
 #declare ColorMap00 = color_map {
     [ 0 Red ]
@@ -98,7 +98,7 @@ background { color Grey50 }
 #declare FnBlobRightPotential = function {
     pattern { potential { BlobRight } threshold on }
 }
-#declare Brown = srgbft <0.5882,0.2941,0,0,0>;
+#declare Brown = srgb <0.5882,0.2941,0>;
 #declare IsoOfBlobRightPotential = isosurface {
     function { FnBlobRightPotential(x,y,z) }
     contained_by { box { <0,-1.1,0>,<1.1,1.1,1.1> } }
