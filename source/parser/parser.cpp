@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -45,6 +45,7 @@
 #include <boost/scoped_ptr.hpp>
 
 #include "base/fileutil.h"
+#include "base/types.h"
 
 #include "core/bounding/boundingcylinder.h"
 #include "core/bounding/boundingsphere.h"
@@ -8885,13 +8886,15 @@ bool Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENT
     POV_PARAM *New_Par;
     bool Found=true;
     int Temp_Count=3000000;
-    int Old_Ok=Ok_To_Declare;
+    bool Old_Ok=Ok_To_Declare;
     int Terms;
     bool function_identifier;
     bool callable_identifier;
     bool had_callable_identifier;
     SYM_ENTRY* symbol_entry;
     SYM_TABLE* symbol_entry_table;
+
+    SCOPED_OVERRIDE(oldParseOptionalRVaue, parseOptionalRValue, allowUndefined);
 
     EXPECT_ONE
         CASE4 (NORMAL_ID_TOKEN, FINISH_ID_TOKEN, TEXTURE_ID_TOKEN, OBJECT_ID_TOKEN)

@@ -30,6 +30,16 @@ Notes:
 POV-Ray v3.7.1-TBD
 ------------------------------------------------------------------------------
 
+Commit 1cceb44 on 2017-01-25 by William F. Pokorny (wfpokorny)
+
+    [ci skip] Adding aoi.pov demo scene to the distribution. (#219)
+
+    Note. The scene makes use of 3.71's blend_mode and blend_gamma as well.
+
+Commit eef5c26 on 2017-01-25 by Christoph Lipka
+
+    Fix GitHub issue #212 (plus a few trivial changes).
+
 Commit b367ec1 on 2017-01-17 by William F. Pokorny (wfpokorny)
 
     Fixing issues with bounding threshold option. (#186)

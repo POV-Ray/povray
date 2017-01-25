@@ -45,7 +45,16 @@ Reported via FlySpray:
 
 Miscellaneous:
 
+  - Optional fields in macro parameters or tuple assignments now accept
+    uninitialized directory entries.
   - Some minor fixes to the Windows inbuilt help.
+
+Other Noteworthy
+----------------
+
+New Sample Scenes:
+
+  - A new sample scene has been added to demonstrate the `aoi` pattern.
 
 
 Changes between 3.7.1-beta.1 and 3.7.1-beta.2
