@@ -944,7 +944,7 @@ void RenderOptions(POVMS_Object& obj, TextStreamBuffer *tsb)
 
     if(obj.TryGetBool (kPOVAttrib_Bounding, true))
         tsb->printf("  Bounding boxes.......On   Bounding threshold: %d\n",
-        clip<int>(obj.TryGetInt(kPOVAttrib_BoundingThreshold,DEFAULT_AUTO_BOUNDINGTHRESHOLD),1,SIGNED16_MAX));
+                    clip<int>(obj.TryGetInt(kPOVAttrib_BoundingThreshold,DEFAULT_AUTO_BOUNDINGTHRESHOLD),1,SIGNED16_MAX));
     else
         tsb->printf("  Bounding boxes.......Off\n");
 
@@ -998,8 +998,10 @@ void OutputOptions(POVMS_Object& cppmsg, TextStreamBuffer *tsb)
 
     tsb->printf("Image Output Options\n");
 
-    (void)POVMSUtil_GetInt(msg, kPOVAttrib_Width, &i);
-    (void)POVMSUtil_GetInt(msg, kPOVAttrib_Height, &i2);
+    if (POVMSUtil_GetInt(msg, kPOVAttrib_Width, &i) != kNoErr)
+        i = 160;
+    if (POVMSUtil_GetInt(msg, kPOVAttrib_Height, &i2) != kNoErr)
+        i2 = 120;
     if (POVMSUtil_GetFloat(msg, kPOVAttrib_StartRow, &f) != kNoErr)
         f = 0.0;
     if (POVMSUtil_GetFloat(msg, kPOVAttrib_EndRow, &f2) != kNoErr)
