@@ -8894,7 +8894,8 @@ bool Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENT
     SYM_ENTRY* symbol_entry;
     SYM_TABLE* symbol_entry_table;
 
-    SCOPED_OVERRIDE(oldParseOptionalRVaue, parseOptionalRValue, allowUndefined);
+    bool oldParseOptionalRVaue = parseOptionalRValue;
+    parseOptionalRValue = allowUndefined;
 
     EXPECT_ONE
         CASE4 (NORMAL_ID_TOKEN, FINISH_ID_TOKEN, TEXTURE_ID_TOKEN, OBJECT_ID_TOKEN)
@@ -9319,6 +9320,7 @@ bool Parser::Parse_RValue (int Previous, int *NumberPtr, void **DataPtr, SYM_ENT
     END_EXPECT
 
     Ok_To_Declare=Old_Ok;
+    parseOptionalRValue = oldParseOptionalRVaue;
     return(Found);
 }
 

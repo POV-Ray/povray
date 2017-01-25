@@ -30,6 +30,13 @@ Notes:
 POV-Ray v3.7.1-TBD
 ------------------------------------------------------------------------------
 
+Commit 050584a on 2017-01-25 by Christoph Lipka
+
+    Make optional fields in macro parameters and tuple assignments accept
+    uninitialized directory entries.
+
+    Also includes some code beautification.
+
 Commit 1cceb44 on 2017-01-25 by William F. Pokorny (wfpokorny)
 
     [ci skip] Adding aoi.pov demo scene to the distribution. (#219)

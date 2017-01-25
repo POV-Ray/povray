@@ -336,26 +336,6 @@ class ThreadData
         virtual ~ThreadData() { }
 };
 
-/// Helper class to temporarily override a variable's value.
-///
-/// Use this class to back up a variable's current value to override it with a different one, and
-/// automatically restore the original value when leaving scope.
-///
-template<typename T>
-class ScopedStash
-{
-public:
-    const T stashed;
-    inline ScopedStash(T& source) : mSource(source), stashed(source) {}
-    inline ScopedStash(T& source, const T& newValue) : mSource(source), stashed(source) { mSource = newValue; }
-    inline ~ScopedStash() { mSource = stashed; }
-protected:
-    T& mSource;
-    ScopedStash();
-};
-
-#define SCOPED_OVERRIDE(name,var,val) ScopedStash<decltype(var)> name(var,val)
-
 /// @}
 ///
 //##############################################################################
