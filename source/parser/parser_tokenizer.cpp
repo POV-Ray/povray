@@ -14,7 +14,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -178,6 +178,7 @@ void Parser::pre_init_tokenizer ()
     Inside_MacroDef     = false;
     Parsing_Directive   = false;
     parseRawIdentifiers = false;
+    parseOptionalRValue = false;
     Cond_Stack          = NULL;
     Table_Index         = -1;
 
@@ -1509,7 +1510,7 @@ void Parser::Read_Symbol()
                             }
                             else
                             {
-                                if (!LValue_Ok && !Inside_Ifdef)
+                                if (!LValue_Ok && !Inside_Ifdef && !parseOptionalRValue)
                                     Error ("Attempt to access uninitialized dictionary element.");
                                 Token.Token_Id  = IDENTIFIER_TOKEN;
                                 Token.DataPtr   = NULL;
@@ -3287,7 +3288,7 @@ Parser::Macro *Parser::Parse_Macro()
 {
     Macro *New;
     SYM_ENTRY *Table_Entry=NULL;
-    int Old_Ok = Ok_To_Declare;
+    bool Old_Ok = Ok_To_Declare;
     MacroParameter newParameter;
 
     Check_Macro_Vers();
@@ -4289,8 +4290,8 @@ void Parser::Parse_Write(void)
 
 DBL Parser::Parse_Cond_Param(void)
 {
-    int Old_Ok = Ok_To_Declare;
-    int Old_Sk = Skipping;
+    bool Old_Ok = Ok_To_Declare;
+    bool Old_Sk = Skipping;
     DBL Val;
 
     Ok_To_Declare = false;
@@ -4306,8 +4307,8 @@ DBL Parser::Parse_Cond_Param(void)
 
 void Parser::Parse_Cond_Param2(DBL *V1,DBL *V2)
 {
-    int Old_Ok = Ok_To_Declare;
-    int Old_Sk = Skipping;
+    bool Old_Ok = Ok_To_Declare;
+    bool Old_Sk = Skipping;
 
     Ok_To_Declare = false;
     Skipping      = false;

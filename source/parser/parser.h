@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -526,9 +526,9 @@ class Parser : public SceneTask
         bool useClock;
 
         // parse.h/parse.cpp
-        short Not_In_Default;
-        short Ok_To_Declare;
-        short LValue_Ok;
+        bool Not_In_Default;
+        bool Ok_To_Declare;
+        bool LValue_Ok;
 
         /// true if a #version statement is being parsed
         bool parsingVersionDirective;
@@ -613,9 +613,9 @@ class Parser : public SceneTask
 
         CS_ENTRY *Cond_Stack;
         int CS_Index;
-        bool Skipping, Inside_Ifdef, Inside_MacroDef, Parsing_Directive, parseRawIdentifiers;
+        bool Skipping, Inside_Ifdef, Inside_MacroDef, Parsing_Directive, parseRawIdentifiers, parseOptionalRValue;
 
-        int Got_EOF; // WARNING: Changes to the use of this variable are very dangerous as it is used in many places assuming certain non-obvious side effects! [trf]
+        bool Got_EOF; // WARNING: Changes to the use of this variable are very dangerous as it is used in many places assuming certain non-obvious side effects! [trf]
 
         TOKEN Conversion_Util_Table[TOKEN_COUNT];
 
