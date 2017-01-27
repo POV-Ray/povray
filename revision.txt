@@ -27,8 +27,201 @@ Notes:
 ------------------------------------------------------------------------------
 
 ------------------------------------------------------------------------------
-POV-Ray v3.7.1-???
+POV-Ray v3.7.1-TBD
 ------------------------------------------------------------------------------
+
+Commit 75f497c on 2017-01-26 by William F. Pokorny (wfpokorny)
+
+    [ci skip] Adding potential.pov demo scene to the distribution. (#220)
+
+    Also corrects small typo in unix/povray.1 manpage.
+
+Commit de52f67 on 2017-01-25 by Christoph Lipka
+
+    Fix unix build error introduced with previous commit.
+
+Commit 050584a on 2017-01-25 by Christoph Lipka
+
+    Make optional fields in macro parameters and tuple assignments accept
+    uninitialized directory entries.
+
+    Also includes some code beautification.
+
+Commit 1cceb44 on 2017-01-25 by William F. Pokorny (wfpokorny)
+
+    [ci skip] Adding aoi.pov demo scene to the distribution. (#219)
+
+    Note. The scene makes use of 3.71's blend_mode and blend_gamma as well.
+
+Commit eef5c26 on 2017-01-25 by Christoph Lipka
+
+    Fix GitHub issue #212 (plus a few trivial changes).
+
+Commit b367ec1 on 2017-01-17 by William F. Pokorny (wfpokorny)
+
+    Fixing issues with bounding threshold option. (#186)
+
+    Related to ussues #59 and #180. When no bounding threshold is specified
+    centralizes the setting and reporting of the bounding threshold to 3.
+    Further, restores the clamping of values to 1+ which existed in 3.6.
+
+Commit 72e18d9 on 2017-01-16 by Christoph Lipka
+
+    Try to fix broken pull request build testing.
+
+Commit ae99108 on 2017-01-15 by Christoph Lipka
+
+    Remove unused variable in cone primitive code.
+
+Commit 5ddf12c on 2017-01-15 by Christoph Lipka
+
+    Fix GitHub issue #184.
+
+    When using the `user_defined` camera projection, if any of the
+    user-defined functions evaluates to an invalid value (such as 1/0, 0/0
+    or sqrt(-1)) the corresponding pixel will now be rendered as black (or
+    transparent), instead of propagating such values to the render engine
+    where it might lead to undefined behaviour.
+
+Commit 6b88d76 on 2017-01-15 by Christoph Lipka
+
+    Make heightfield code more robust (partially addresses GitHub issue #184).
+
+Commit 7f15133 on 2017-01-14 by Christoph Lipka
+
+    [ci skip] Bump version to next beta.
+
+Commit 6ebc927 on 2017-01-14 by Christoph Lipka
+
+    [ci skip] Fix some external links in the POV-Ray for Windows inbuilt help.
+
+------------------------------------------------------------------------------
+POV-Ray v3.7.1-beta.2
+------------------------------------------------------------------------------
+
+Commit 144b856 on 2017-01-09 by Christoph Lipka
+
+    Update change log.
+
+Commit 481db07 on 2017-01-09 by Christoph Lipka
+
+    Fix some more beta registry key issues.
+
+    - Beta now _does_ use the "v3.7-beta" registry key instead of "v3.7".
+    - Beta now only copies v3.6 registry data if no existing v3.7 proper
+    installation is found.
+
+Commit b6532d0 on 2017-01-09 by Christoph Lipka
+
+    Update change logs.
+
+Commit e2fe17d on 2017-01-09 by Christoph Lipka
+
+    Update some strings in the Windows binary headers.
+
+Commit 90d12db on 2017-01-08 by Christoph Lipka
+
+    Update change logs.
+
+Commit 3410c23 on 2017-01-08 by Christoph Lipka
+
+    Make betas live happily alongside the previous release, by using a
+    different registry key and directory name.
+
+Commit 6aa8ee7 on 2017-01-08 by Christoph Lipka
+
+    [ci skip] Disable automated generation of GitHub release draft.
+
+------------------------------------------------------------------------------
+POV-Ray v3.7.1-beta.1  (not officially released)
+------------------------------------------------------------------------------
+
+Commit 978ca52 on 2017-01-01 by Christoph Lipka
+
+    Prepare for 3.7.1 beta phase.
+
+Commit c3ad8b2 on 2017-01-01 by Christoph Lipka
+
+    Update copyright notices and change logs.
+
+Commit 605359b on 2017-01-01 by Christoph Lipka
+
+    Update POV-Ray for Windows inbuilt help.
+
+Commit 873a63c on 2016-12-30 by Christoph Lipka
+
+    Add `boost/atomic` package to our subset of the boost library.
+
+Commit 6ba9ec7 on 2016-12-24 by Christoph Lipka
+
+    Update colors.pov.
+
+Commit 938caae on 2016-12-24 by Christoph Lipka
+
+    Fix colors_ral.inc.
+
+Commit 6dda7c3 on 2016-12-23 by Christoph Lipka
+
+    Update our preferred bug reporting channel in some files. (issue #119)
+
+Commit 9e20adb on 2016-12-23 by Christoph Lipka
+
+    Update copyright notices.
+
+Commit 63e8f73 on 2016-12-23 by William F. Pokorny (wfpokorny)
+
+    [ci skip] Updating the unix man page. Small typo. (#169)
+
+    Updating our unix man page to be current with recent 3.7.1 master
+    version. Also small typo in processrenderoptions.cpp.
+
+Commit 0174c03 on 2016-12-22 by Christoph Lipka
+
+    Update colors_ral.inc.
+
+------------------------------------------------------------------------------
+POV-Ray v3.7.1-alpha.8927145
+------------------------------------------------------------------------------
+
+Commit f24d656 on 2016-12-21 by Christoph Lipka
+
+    Fix `version.h` erroneously flagging this as a beta version.
+
+Commit 8cce165 on 2016-12-21 by Christoph Lipka
+
+    Fix bug in previous commit.
+
+Commit 56c574a on 2016-12-21 by Christoph Lipka
+
+    Modified the way the finish-level `fresnel` parameter works.
+
+Commit f0fdc36 on 2016-12-20 by Christoph Lipka
+
+    Fix some issues discovered by static code analysis.
+
+Commit 243e9ad on 2016-12-20 by Christoph Lipka
+
+    Partial overhaul of string utilities to fix some unsafe string handling.
+
+Commit c6a6e98 on 2016-12-20 by Christoph Lipka
+
+    Fix GitHub issue #175 ("Coredump due recent 3.7.1 parser updates.")
+
+Commit 24b7f9f on 2016-12-20 by Christoph Lipka
+
+    Update README.md
+
+Commit 2ebea6c on 2016-12-19 by Christoph Lipka
+
+    Final(?) update of version number stuff.
+
+Commit 0b9d345 on 2016-12-19 by Christoph Lipka
+
+    Yet more version numbering related changes.
+
+Commit cc91a26 on 2016-12-19 by Christoph Lipka
+
+    Update revision.txt.
 
 Commit a61c792 on 2016-12-19 by Christoph Lipka
 
@@ -93,6 +286,10 @@ Commit a04d241 on 2016-12-15 by Christoph Lipka
 Commit 983ab18 on 2016-12-15 by Christoph Lipka
 
     Fix some issues discovered by static code analysis.
+
+------------------------------------------------------------------------------
+POV-Ray v3.7.1-alpha.8917471
+------------------------------------------------------------------------------
 
 Commit f814383 on 2016-12-14 by Christoph Lipka
 

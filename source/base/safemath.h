@@ -74,14 +74,13 @@ namespace pov_base
 template<typename T, typename T1, typename T2, typename T3, typename T4>
 static inline T SafeUnsignedProduct(T1 p1, T2 p2, T3 p3, T4 p4)
 {
-    // the function is intended for use with unsigned integer parameters only
-    // (NB: Instead of testing for (pN >= 0) we could also test for (!std::numeric_limits<TN>::is_signed),
-    //  but this would make passing constant factors more cumbersome)
+    // The function is intended for use with unsigned integer parameters only; we allow for signed
+    // types though, to avoid having to explicitly specify constant parameters as unsigned.
     POV_SAFEMATH_ASSERT(std::numeric_limits<T>::is_integer);
-    POV_SAFEMATH_ASSERT(std::numeric_limits<T1>::is_integer && (p1 >= 0));
-    POV_SAFEMATH_ASSERT(std::numeric_limits<T2>::is_integer && (p2 >= 0));
-    POV_SAFEMATH_ASSERT(std::numeric_limits<T3>::is_integer && (p3 >= 0));
-    POV_SAFEMATH_ASSERT(std::numeric_limits<T4>::is_integer && (p4 >= 0));
+    POV_SAFEMATH_ASSERT(std::numeric_limits<T1>::is_integer && (!std::numeric_limits<T1>::is_signed || (p1 >= 0)));
+    POV_SAFEMATH_ASSERT(std::numeric_limits<T2>::is_integer && (!std::numeric_limits<T2>::is_signed || (p2 >= 0)));
+    POV_SAFEMATH_ASSERT(std::numeric_limits<T3>::is_integer && (!std::numeric_limits<T3>::is_signed || (p3 >= 0)));
+    POV_SAFEMATH_ASSERT(std::numeric_limits<T4>::is_integer && (!std::numeric_limits<T4>::is_signed || (p4 >= 0)));
 
     // avoid divide-by-zero issues
     if ((p1==0) || (p2==0) || (p3==0) || (p4==0))

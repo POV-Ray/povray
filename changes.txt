@@ -24,10 +24,74 @@ should be located in the same directory as this file is.
 ------------------------------------------------------------------------------
 
 
-Changes between 3.7.0 and 3.7.1-TBD
+Changes between 3.7.1 and 3.7.2-TBD
 ===================================
 
 This version is still under active development, and not finalized yet.
+
+TBD
+
+
+Changes between 3.7.1-TBD and 3.7.1
+===================================
+
+TBD
+
+
+Changes between 3.7.1-beta.2 and 3.7.1-TBD
+==========================================
+
+The focus of this version has been on fixing bugs.
+
+Fixed or Mitigated Bugs
+-----------------------
+
+Reported via GitHub:
+
+  - #180 ("Port of FS321 - Bounding threshold option handling.")
+  - #184 ("User defined camera may cause crash during render")
+  - #212 ("Port of FS301 - Fallback to default image size causes wrong values to be printed in message output")
+
+Reported via FlySpray:
+
+  - FS#301 ("Fallback to default image size causes wrong values to be printed in message output")
+  - FS#321 ("FS#321 - bounding threshold inconsistency")
+
+Reported via the Newsgroups:
+
+  - <3c4bb31d$1@news.povray.org>
+    (2017-01-27, povray.beta-test, "utf8")
+    Crash when using `charset utf8`.
+
+Miscellaneous:
+
+  - Optional fields in macro parameters or tuple assignments now accept
+    uninitialized directory entries.
+  - Some minor fixes to the Windows inbuilt help.
+
+Other Noteworthy
+----------------
+
+New Sample Scenes:
+
+  - A new sample scene has been added to demonstrate the `aoi` pattern.
+
+
+Changes between 3.7.1-beta.1 and 3.7.1-beta.2
+=============================================
+
+Changes have been made to allow POV-Ray for Windows v3.7.1 betas to live
+happily alongside an existing v3.7.0 installation.
+
+NOTE: This provision is made for the beta phase only. The final release of
+POV-Ray for Windows v3.7.1 will be designed to supersede any existing v3.7.0
+installation.
+
+
+Changes between 3.7.0 and 3.7.1-beta.1
+======================================
+
+(Note: 3.7.1-beta.1 has never been officially released in binary form.)
 
 The primary focus of this version has been on code refactoring in order to
 modularize the underlying architecture, but various new features as well as
@@ -36,13 +100,6 @@ bugfixes have also been included.
 Work on our own Macintosh graphical user interface has been put on hold, and
 it may eventually end up on the scrapyard; our current hope for our Mac users
 rests on a 3rd party OS X front-end that we strive to adopt.
-
-To Do
------
-
-Prior to the release of 3.7.1, the following items still need some attention:
-
-  - Some of the new features still need to be properly documented.
 
 New Features
 ------------
@@ -70,8 +127,8 @@ Materials:
   - Colour and pigment maps now support non-linear interpolation to achieve more
     pleasing gradients.
 
-  - Fresnel angle-dependent attenuation can now also be applied to highlights
-    and the diffuse component for more physical realism.
+  - Fresnel angle-dependent attenuation can now also be applied to highlights as
+    well as diffuse and emission components for more physical realism.
 
 Geometric Primitives:
 
@@ -265,13 +322,14 @@ Reported via GitHub:
   - #153 ("vector list trailing comma error sor lathe sphere_sweep")
   - #160 ("Port of FS259 - Stack Overflow with the write-directive with missing closing bracket.")
   - #161 ("Missing parenthesis on write directive causes crash.")
-  - #175 ("Coredump due recent 3.7.1 parser updates. ")
+  - #175 ("Coredump due recent 3.7.1 parser updates.")
 
 Reported via FlySpray:
 
   - FS#254 ("Mesh_camera type 0 output seems to be incorrect")
   - FS#259 ("Stack Overflow with the write-directive with missing closing bracket")
   - FS#261 ("mesh_camera distribution type 3 output image is placed 0.5 pixels to wrong")
+  - FS#268 (""naked" pigment statement does not properly override previous pigment")
   - FS#270 ("render abort-continue (+C) sometimes skips blocks")
   - FS#298 ("the warning for isosurface does not appears as often as with 3.6.1")
   - FS#307 ("netpbm, ppm, read bug where first data byte CR char")
@@ -289,6 +347,10 @@ Reported via the Newsgroups:
   - <3c4bb31d$1@news.povray.org>
     (2002-01-21, povray.beta-test, "<1, 0, 0> + 1*t")
     Inconsistency in automatic scalar-to-vector promotion.
+
+  - <web.52e768e03066f6369a9ee9f50@news.povray.org>
+    (2014-01-28, povray.bugreports, "Help file")
+    Lots of broken indices in the POV-Ray for Windows inbuilt documentation.
 
   - <53ea2dae@news.povray.org>
     (2014-08-12, povray.binaries.images, "unexplained")

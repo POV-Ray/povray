@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -163,7 +163,10 @@ void Scene::StartParser(POVMS_Object& parseOptions)
 
     // do bounding - we always call this even if the bounding is turned off
     // because it also generates object statistics
-    sceneThreadData.push_back(dynamic_cast<TraceThreadData *>(parserTasks.AppendTask(new BoundingTask(sceneData, parseOptions.TryGetInt(kPOVAttrib_BoundingThreshold, 1)))));
+    sceneThreadData.push_back(dynamic_cast<TraceThreadData *>(parserTasks.AppendTask(new BoundingTask(
+        sceneData,
+        clip<int>(parseOptions.TryGetInt(kPOVAttrib_BoundingThreshold, DEFAULT_AUTO_BOUNDINGTHRESHOLD),1,SIGNED16_MAX))
+        )));
 
     // wait for bounding
     parserTasks.AppendSync();

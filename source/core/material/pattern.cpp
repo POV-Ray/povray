@@ -3209,7 +3209,6 @@ static DBL tiling_penrose1_pentagon3 (DBL pX, DBL pZ, int depth, bool insideWedg
             DBL rotX = -(x - INVSQRPHI*0.5*COS72/SIN36 - INVPHI*0.5/TAN36);
             DBL rotZ =   z;
             return tiling_penrose1_pentagon2 (rotX*PHI, rotZ*PHI, depth-1, true);
-            return 1.0/6 + TILING_EPSILON;
         }
         else if (!insideWedge && (x < 0.5*COS108/SIN36))
         {

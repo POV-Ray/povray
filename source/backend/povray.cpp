@@ -126,7 +126,7 @@ namespace
 using namespace pov;
 using namespace pov_base;
 
-/// Primary Developers
+/// Primary Developers.
 const char *PrimaryDevelopers[] =
 {
     "Chris Cason",
@@ -135,7 +135,7 @@ const char *PrimaryDevelopers[] =
     NULL
 };
 
-/// Assisting Developers
+/// Assisting Developers.
 const char *AssistingDevelopers[] =
 {
     "Nicolas Calimet",
@@ -148,7 +148,8 @@ const char *AssistingDevelopers[] =
     NULL
 };
 
-/// Past Contributing Developers
+/// Past Contributing Developers.
+/// By convention, current developers are also already included here.
 const char *ContributingDevelopers[] =
 {
     "Steve Anger",
@@ -165,6 +166,7 @@ const char *ContributingDevelopers[] =
     "Dan Farmer",
     "Thorsten Froehlich",
     "Mark Gordon",
+    "Jerome Grimbert",
     "James Holsenback",
     "Christoph Hormann",
     "Mike Hough",
@@ -179,6 +181,7 @@ const char *ContributingDevelopers[] =
     "Douglas Muir",
     "Juha Nieminen",
     "Ron Parker",
+    "William F. Pokorny",
     "Bill Pulver",
     "Eduard Schwan",
     "Wlodzimierz Skiba",

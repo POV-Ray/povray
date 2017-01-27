@@ -13,6 +13,7 @@ matrix:
   fast_finish: true
 
 environment:
+  PovBuildDefs: POV_RAY_IS_AUTOBUILD=1;POV_RAY_BUILD_ID="av$(APPVEYOR_BUILD_NUMBER)";BUILT_BY="AppVeyor";
   matrix:
   - configuration: Release
     platform: x64
@@ -40,65 +41,4 @@ build:
   parallel: true
   verbosity: minimal
 
-after_build:
-- ps: |
-    $version_h = 'source/base/version.h'
-    $regexp = '^\s*#define\s+OFFICIAL_VERSION_STRING\s*"[^"]+"\s*$'
-    $line = ( select-string -Path $version_h -Pattern $regexp | % { $_.Matches } | % { $_.Value } )
-    $string = ( select-string -InputObject $line -Pattern '"[^"]+"' | % { $_.Matches } | % { $_.Value } )
-    $official_version = ( select-string -InputObject $string -Pattern '[^"]+' | % { $_.Matches } | % { $_.Value } )
-    $regexp = '^\s*#define\s+POV_RAY_PRERELEASE\s*"[^"]+"\s*$'
-    $line = ( select-string -Path $version_h -Pattern $regexp | % { $_.Matches } | % { $_.Value } )
-    $string = ( select-string -InputObject $line -Pattern '"[^"]+"' | % { $_.Matches } | % { $_.Value } )
-    $prerelease = ( select-string -InputObject $string -Pattern '[^"]+' | % { $_.Matches } | % { $_.Value } )
-    if ($prerelease) {
-      $env:pov_exe_version = $official_version + '-' + $prerelease
-    } else {
-      $env:pov_exe_version = $official_version
-    }
-    $env:pov_tag_version = 'v' + $env:pov_exe_version
-    $env:pov_build_version = $env:pov_tag_version + '+av' + $env:APPVEYOR_BUILD_NUMBER
-    $env:pov_build_message = ''
-    if ($prerelease -match '^x') {
-      $env:pov_build_type = 'Experimental'
-      $env:pov_build_message += '**EXPERIMENTAL: This version of POV-Ray is not part of the official development branch!**'
-      $env:pov_build_message += "`n`n"
-    } elseif ($prerelease) {
-      $env:pov_build_type = 'Development'
-    } else {
-      $env:pov_build_type = 'Automated'
-    }
-    $env:pov_release_type = ($env:pov_build_type).ToLower() + ' release'
-    $env:pov_build_title = $env:pov_build_type + ' build'
-    $env:pov_build_message += '**Note:** This is a binary-only ' + $env:pov_release_type + '; to install, copy the '
-    $env:pov_build_message += 'binary into an existing POV-Ray 3.7 installation. (Make sure to backup the original '
-    $env:pov_build_message += 'binary first.)'
-    $env:pov_build_message += "`n`n"
-    $env:pov_build_message += 'These binaries require Windows Vista or higher, due to limitations of our automated '
-    $env:pov_build_message += 'build system. Please contact us on http://news.povray.org/povray.beta-test if you need '
-    $env:pov_build_message += 'Windows XP-compatible binaries of this particular version.'
-    $env:pov_zipdir = "povray-" + $env:pov_exe_version + '-av' + $env:APPVEYOR_BUILD_NUMBER + $env:artifact_suffix
-    $env:pov_binary = "Windows\vs10\" + $env:bin_dir + "\pvengine*.exe"
-    $env:pov_zip = "artifacts\" + $env:pov_zipdir + ".7z"
-    New-Item -ItemType directory -Path $env:pov_zipdir | Out-Null
-    New-Item -ItemType directory -Path "artifacts" | Out-Null
-    Copy-Item $env:pov_binary $env:pov_zipdir
-    & "7z" "a" "-r" $env:pov_zip $env:pov_zipdir
-
 test: off
-
-artifacts:
-- path: artifacts/*.7z
-  name: binaryOnly7z
-
-deploy:
-- provider: GitHub
-  tag: $(pov_tag_version)
-  release: $(pov_build_title) $(pov_build_version)
-  description: $(pov_build_message)
-  auth_token:
-    secure: WkcFPXyr/SJ9TXixTQyivhfoR9FzlryIbc4deHeQ0eA6YRXL0wQopMYJ6XL1/FJK
-  draft: true
-  prerelease: true
-  on:
-    appveyor_repo_tag: true

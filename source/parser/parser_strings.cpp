@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -955,6 +955,7 @@ UCS2 *Parser::Convert_UTF8_To_UCS2(const unsigned char *text_array, int *char_ar
 
     UCS2String s = UTF8toUCS2String(UTF8String(reinterpret_cast<const char*>(text_array)));
     UCS2String::size_type len = s.length();
+    *char_array_size = len;
 
     if (len == 0)
         return NULL;
@@ -965,7 +966,7 @@ UCS2 *Parser::Convert_UTF8_To_UCS2(const unsigned char *text_array, int *char_ar
     if(char_array == NULL)
         throw POV_EXCEPTION_CODE(kOutOfMemoryErr);
 
-    memcpy(char_array, s.c_str(), size*sizeof(UCS2));
+    memcpy(char_array, s.c_str(), size);
 
     return char_array;
 }

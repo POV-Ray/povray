@@ -736,6 +736,17 @@ class Trace
         /// Compute fresnel-based reflectivity.
         void ComputeFresnel(MathColour& colour, const MathColour& rMax, const MathColour& rMin, double cos_angle, double relativeIor);
 
+        /// Compute Fresnel reflectance term.
+        ///
+        /// This function computes the reflectance term _R_ of the Fresnel equations for the special
+        /// case of a dielectric material and unpolarized light. The transmittance term _T_ can
+        /// trivially be computed as _T=1-R_.
+        ///
+        /// @param[in]      cosTi           Cosine of angle between incident ray and surface normal.
+        /// @param[in]      n               Relative refractive index of the material entered.
+        ///
+        static double FresnelR(double cosTi, double n);
+
         /// Compute Sky & Background Colour.
         ///
         /// @remark         The computed colour _overwrites_ any value passed in `colour` and `transm`.
