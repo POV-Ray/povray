@@ -30,6 +30,16 @@ Notes:
 POV-Ray v3.7.1-TBD
 ------------------------------------------------------------------------------
 
+Commit 75f497c on 2017-01-26 by William F. Pokorny (wfpokorny)
+
+    [ci skip] Adding potential.pov demo scene to the distribution. (#220)
+
+    Also corrects small typo in unix/povray.1 manpage.
+
+Commit de52f67 on 2017-01-25 by Christoph Lipka
+
+    Fix unix build error introduced with previous commit.
+
 Commit 050584a on 2017-01-25 by Christoph Lipka
 
     Make optional fields in macro parameters and tuple assignments accept

@@ -43,6 +43,12 @@ Reported via FlySpray:
   - FS#301 ("Fallback to default image size causes wrong values to be printed in message output")
   - FS#321 ("FS#321 - bounding threshold inconsistency")
 
+Reported via the Newsgroups:
+
+  - <3c4bb31d$1@news.povray.org>
+    (2017-01-27, povray.beta-test, "utf8")
+    Crash when using `charset utf8`.
+
 Miscellaneous:
 
   - Optional fields in macro parameters or tuple assignments now accept
