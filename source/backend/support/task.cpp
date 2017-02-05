@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -103,7 +103,7 @@ POV_LONG Task::ConsumedCPUTime() const
 void Task::Start(const boost::function0<void>& completion)
 {
     if((done == false) && (taskThread == NULL))
-        taskThread = NewBoostThread(boost::bind(&Task::TaskThread, this, completion), 1024 * 1024 * 2); // TODO - make stack size definable
+        taskThread = NewBoostThread(boost::bind(&Task::TaskThread, this, completion), POV_THREAD_STACK_SIZE);
 }
 
 void Task::RequestStop()
