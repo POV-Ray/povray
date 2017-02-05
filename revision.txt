@@ -30,6 +30,14 @@ Notes:
 POV-Ray v3.7.1-TBD
 ------------------------------------------------------------------------------
 
+Commit cfaa14d on 2017-02-05 by Christoph Lipka
+
+    [ci skip] Update POV-Ray for Windows "about" box.
+
+Commit 07646c1 on 2017-01-27 by Christoph Lipka
+
+    Fix a crash and another bug related to `charset utf8`.
+
 Commit 75f497c on 2017-01-26 by William F. Pokorny (wfpokorny)
 
     [ci skip] Adding potential.pov demo scene to the distribution. (#220)
