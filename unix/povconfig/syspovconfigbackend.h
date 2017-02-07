@@ -50,11 +50,8 @@
 #define POV_USE_DEFAULT_TASK_INITIALIZE 1
 #define POV_USE_DEFAULT_TASK_CLEANUP    1
 
-/// @note
-///     In regression testing an old scene for the 3.7.1 release found
-///     linux machines needed more stack storage than windows.
-///     See too @ref POV_THREAD_STACK_SIZE
-///
+// In regression testing an old scene for the 3.7.1 release found
+// linux machines needed more stack storage than windows.
 #ifndef POV_THREAD_STACK_SIZE
     #define POV_THREAD_STACK_SIZE (1024 * 1024 * 4)
 #else
