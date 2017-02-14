@@ -2,13 +2,14 @@
 ///
 /// @file base/timer.h
 ///
-/// @todo   What's in here?
+/// Contains declarations of the @ref pov_base::Delay() function and the
+/// @ref pov_base::Timer class.
 ///
 /// @copyright
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -39,8 +40,10 @@
 // Module config header file must be the first file included within POV-Ray unit header files
 #include "base/configbase.h"
 
-#if POV_USE_DEFAULT_TIMER
-#include <boost/thread/xtime.hpp>
+#if POV_USE_DEFAULT_TIMER || (POV_MULTITHREADED && POV_USE_DEFAULT_DELAY)
+#include <boost/chrono.hpp>
+#include <boost/chrono/process_cpu_clocks.hpp>
+#include <boost/chrono/thread_clock.hpp>
 #endif
 
 #if !POV_USE_DEFAULT_TIMER || (POV_MULTITHREADED && !POV_USE_DEFAULT_DELAY)
@@ -64,12 +67,8 @@ namespace pov_base
 /// This function puts the current thread into idle mode for the specified time.
 ///
 /// @note
-///     This is a default implementation, provided only as a last-ditch resort for platforms that
-///     cannot provide a better implementation.
-///
-/// @todo
-///     The current implementation is based on boost::xtime, which has been deprecated since
-///     boost 1.34.
+///     This is a general implementation based on boost::thread + boost::chrono.  It should probably
+///     be fine for most platforms.
 ///
 /// @attention
 ///     Due to possible limitations of platform-specific implementations, this function may only be
@@ -91,19 +90,8 @@ void Delay(unsigned int msec);
 /// Millisecond-precision timer.
 ///
 /// @note
-///     This is a default implementation, provided only as a last-ditch resort for platforms that
-///     cannot provide a better implementation. It can neither guarantee millisecond precision, nor
-///     does it support measurement of CPU time.
-///
-/// @todo
-///     This implementation is based on boost::xtime, which has been deprecated since 1.34.
-///
-/// @impl
-///     Note that to measure per-process CPU time we're not resorting to `clock()` as a default
-///     implementation, as depending on the platform it may incorrectly report elapsed wall-clock
-///     time (sources on the internet report this for Solaris, and it is a well-documented fact for
-///     Windows), and/or may be limited to timespans in the order of an hour (any system with a
-///     32-bit `clock_t` and a standard `CLOCKS_PER_SEC` of 1,000,000).
+///     This is a general implementation based on boost::chrono.  It should probably be fine for
+///     most platforms.
 ///
 class Timer
 {
@@ -137,7 +125,7 @@ class Timer
         ///
         /// @return     Elapsed CPU time in milliseconds.
         ///
-        inline POV_LONG ElapsedProcessCPUTime() const { return ElapsedRealTime(); }
+        POV_LONG ElapsedProcessCPUTime() const;
 
         /// Report CPU time consumed by current thread.
         ///
@@ -154,7 +142,7 @@ class Timer
         ///
         /// @return     Elapsed CPU time in milliseconds.
         ///
-        inline POV_LONG ElapsedThreadCPUTime() const { return ElapsedProcessCPUTime(); }
+        POV_LONG ElapsedThreadCPUTime() const;
 
         /// Reset the timer.
         ///
@@ -168,7 +156,7 @@ class Timer
         /// @return     `true` if @ref ElapsedProcessCPUTime() does indeed report per-thread CPU time
         ///             consumption.
         ///
-        inline bool HasValidProcessCPUTime() const { return false; }
+        bool HasValidProcessCPUTime() const;
 
         /// Report whether per-thread measurement of CPU time is supported.
         ///
@@ -178,12 +166,27 @@ class Timer
         /// @return     `true` if @ref ElapsedThreadCPUTime() does indeed report per-thread CPU time
         ///             consumption.
         ///
-        inline bool HasValidThreadCPUTime() const { return false; }
+        bool HasValidThreadCPUTime() const;
 
     private:
 
         /// real time at last reset
-        boost::xtime mRealTimeStart;
+#ifdef BOOST_CHRONO_HAS_CLOCK_STEADY
+        boost::chrono::steady_clock::time_point mRealTimeStart;
+#else
+        boost::chrono::system_clock::time_point mRealTimeStart;
+#endif
+
+#ifdef BOOST_CHRONO_HAS_PROCESS_CLOCKS
+        /// process CPU time at last reset
+        boost::chrono::process_real_cpu_clock::time_point mProcessTimeStart;
+#endif
+
+#ifdef BOOST_CHRONO_HAS_THREAD_CLOCK
+        /// thread time at last reset
+        boost::chrono::thread_clock::time_point mThreadTimeStart;
+#endif
+
 };
 
 #endif // POV_USE_DEFAULT_TIMER

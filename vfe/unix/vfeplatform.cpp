@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -41,15 +41,10 @@
 // C++ variants of C standard headers
 #include <cstdlib>
 #include <cstring>
-#ifdef HAVE_TIME_H
-# include <ctime>
-#endif
 
 // other library headers
+#include <boost/chrono.hpp>
 #include <pthread.h>
-#ifdef HAVE_SYS_TIME_H
-# include <sys/time.h>
-#endif
 #ifdef HAVE_SYS_WAIT_H
 # include <sys/wait.h>
 #endif
@@ -202,21 +197,8 @@ namespace vfePlatform
     // in the session.
     POV_LONG vfeUnixSession::GetTimestamp(void) const
     {
-        POV_LONG timestamp = 0;  // in milliseconds
-#ifdef HAVE_CLOCK_GETTIME
-        struct timespec ts;
-        if (clock_gettime(CLOCK_REALTIME, &ts) == 0)
-            timestamp = (POV_LONG) (1000)*ts.tv_sec + ts.tv_nsec/1000000;
-        else
-#endif
-#ifdef HAVE_GETTIMEOFDAY
-        {
-            struct timeval tv;  // seconds + microseconds since the Epoch (1970-01-01)
-            if (gettimeofday(&tv, NULL) == 0)
-                timestamp = (POV_LONG) (1000)*tv.tv_sec + tv.tv_usec/1000;
-        }
-#endif
-// FIXME: add fallback using boost::xtime()
+        POV_LONG timestamp = static_cast<POV_LONG>(boost::chrono::duration_cast<boost::chrono::milliseconds>
+                                                   (boost::chrono::system_clock::now().time_since_epoch()).count());  // in milliseconds
         timestamp += m_TimestampOffset;
         if (timestamp < m_LastTimestamp)
         {

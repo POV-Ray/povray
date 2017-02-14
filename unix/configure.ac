@@ -5,7 +5,7 @@
 #
 # ---------------------------------------------------------------------------
 # Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-# Copyright 1991-2013 Persistence of Vision Raytracer Pty. Ltd.
+# Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 #
 # POV-Ray is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -58,6 +58,7 @@ m4_include([unix/config/acx_pthread.m4])
 m4_include([unix/config/ax_arg_enable.m4])
 m4_include([unix/config/ax_arg_with.m4])
 m4_include([unix/config/ax_boost_base.m4])
+m4_include([unix/config/ax_boost_chrono.m4])
 m4_include([unix/config/ax_boost_thread.m4])
 m4_include([unix/config/ax_test_compiler_flags.m4])
 m4_include([unix/config/ax_check_lib.m4])
@@ -335,6 +336,15 @@ if test $boost_thread_links != '1'; then
   AC_MSG_FAILURE([cannot link with the boost thread library])
 fi
 
+AX_BOOST_CHRONO
+
+# FIXME: Boost::Chrono can be used header-only...  Do we want to try that?
+if test x"$ax_cv_boost_thread" = x"yes"; then
+   LIBS="$BOOST_CHRONO_LIB $LIBS"
+else
+   AC_MSG_ERROR([cannot find a suitable boost::chrono library])
+fi
+
 AC_DEFINE([USE_OFFICIAL_BOOST], [], [Use the official Boost libraries.])
 
 # Intel Math Kernel library
@@ -345,9 +355,6 @@ test x"$ac_cv_lib_mkl_sin" = x"no" && LDFLAGS="$pov_save_ldflags"
 
 # libm
 AC_CHECK_LIB([m], [sin])
-
-# real-time clock
-AC_CHECK_LIB([rt], [clock_gettime])
 
 # libz; required library for distributable builds
 AC_MSG_CHECKING([whether to use the ZLIB library])
@@ -633,29 +640,6 @@ if test x"$enable_io_restrictions" != x"no"; then
     ]
   )
 fi
-
-# nanosleep <time.h>
-AC_CHECK_FUNCS([nanosleep])
-
-# usleep and related <unistd.h>
-AC_CHECK_FUNCS([usleep])
-AC_CHECK_TYPES([useconds_t])
-
-# clock_gettime and related <time.h>
-AC_CHECK_FUNCS([clock_gettime])
-AC_CHECK_DECLS([CLOCK_MONOTONIC, CLOCK_REALTIME, CLOCK_PROCESS_CPUTIME_ID, CLOCK_THREAD_CPUTIME_ID],
-  [], [], [[#include <time.h>]]
-)
-AC_CHECK_TYPES([clockid_t], [], [], [[#include <time.h>]])
-
-# getrusage and related <sys/resource.h>
-AC_CHECK_FUNCS([getrusage])
-AC_CHECK_DECLS([RUSAGE_SELF, RUSAGE_THREAD, RUSAGE_LWP],
-  [], [], [[#include <sys/resource.h>]]
-)
-
-# gettimeofday <sys/time.h>
-AC_CHECK_FUNCS([gettimeofday])
 
 # asinh and friends (requires libm)
 AC_CHECK_FUNCS([asinh],
