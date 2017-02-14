@@ -2,13 +2,14 @@
 ///
 /// @file base/timer.cpp
 ///
-/// @todo   What's in here?
+/// Contains implementations of the @ref pov_base::Delay() function and the
+/// @ref pov_base::Timer class.
 ///
 /// @copyright
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -54,12 +55,7 @@ namespace pov_base
 
 void Delay(unsigned int msec)
 {
-    boost::xtime t;
-    boost::xtime_get(&t, POV_TIME_UTC);
-    POV_ULONG ns = (POV_ULONG)(t.sec) * (POV_ULONG)(1000000000) + (POV_ULONG)(t.nsec) + (POV_ULONG)(msec) * (POV_ULONG)(1000000);
-    t.sec = (boost::xtime::xtime_sec_t)(ns / (POV_ULONG)(1000000000));
-    t.nsec = (boost::xtime::xtime_nsec_t)(ns % (POV_ULONG)(1000000000));
-    boost::thread::sleep(t);
+    boost::this_thread::sleep_for(boost::chrono::milliseconds(msec));
 }
 
 #endif // POV_MULTITHREADED && POV_USE_DEFAULT_DELAY
@@ -77,16 +73,69 @@ Timer::~Timer()
 
 POV_LONG Timer::ElapsedRealTime() const
 {
-    boost::xtime t;
-    boost::xtime_get(&t, POV_TIME_UTC);
-    POV_LONG tt = (POV_LONG)(t.sec) * (POV_LONG)(1000000000) + (POV_LONG)(t.nsec);
-    POV_LONG st = (POV_LONG)(mRealTimeStart.sec) * (POV_LONG)(1000000000) + (POV_LONG)(mRealTimeStart.nsec);
-    return ((tt - st) / (POV_LONG)(1000000));
+#ifdef BOOST_CHRONO_HAS_CLOCK_STEADY
+    return static_cast<POV_LONG>(boost::chrono::duration_cast<boost::chrono::milliseconds>
+                                 (boost::chrono::steady_clock::now() - mRealTimeStart).count());
+#else
+    return static_cast<POV_LONG>(boost::chrono::duration_cast<boost::chrono::milliseconds>
+                                 (boost::chrono::system_clock::now() - mRealTimeStart).count());
+#endif
+}
+
+POV_LONG Timer::ElapsedProcessCPUTime() const
+{
+#ifdef BOOST_CHRONO_HAS_PROCESS_CLOCKS
+    return static_cast<POV_LONG>(boost::chrono::duration_cast<boost::chrono::milliseconds>
+                                 (boost::chrono::process_real_cpu_clock::now() - mProcessTimeStart).count());
+#else
+    return ElapsedRealTime();
+#endif
+}
+
+POV_LONG Timer::ElapsedThreadCPUTime() const
+{
+#ifdef BOOST_CHRONO_HAS_THREAD_CLOCK
+    return static_cast<POV_LONG>(boost::chrono::duration_cast<boost::chrono::milliseconds>
+                                 (boost::chrono::thread_clock::now() - mThreadTimeStart).count());
+#else
+    return ElapsedProcessCPUTime();
+#endif
+}
+
+
+bool Timer::HasValidProcessCPUTime() const
+{
+#ifdef BOOST_CHRONO_HAS_PROCESS_CLOCKS
+    return true;
+#else
+    return false;
+#endif
+}
+
+bool Timer::HasValidThreadCPUTime() const
+{
+#ifdef BOOST_CHRONO_HAS_THREAD_CLOCK
+    return true;
+#else
+    return false;
+#endif
 }
 
 void Timer::Reset()
 {
-    boost::xtime_get(&mRealTimeStart, POV_TIME_UTC);
+#ifdef BOOST_CHRONO_HAS_CLOCK_STEADY
+    mRealTimeStart = boost::chrono::steady_clock::now();
+#else
+    mRealTimeStart = boost::chrono::system_clock::now();
+#endif
+
+#ifdef BOOST_CHRONO_HAS_PROCESS_CLOCKS
+    mProcessTimeStart = boost::chrono::process_real_cpu_clock::now();
+#endif
+
+#ifdef BOOST_CHRONO_HAS_THREAD_CLOCK
+    mThreadTimeStart = boost::chrono::thread_clock::now();
+#endif
 }
 
 #endif // POV_USE_DEFAULT_TIMER
