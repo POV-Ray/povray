@@ -49,11 +49,16 @@ Reported via the Newsgroups:
     (2017-01-27, povray.beta-test, "utf8")
     Crash when using `charset utf8`.
 
+  - <58a5472b$1@news.povray.org>
+    (2017-02-16, povray.beta-test, "Windows beta.2-QA09T.msvc10.win64 does not accept "./" as a path")
+    Special directory name `.` not handled properly in POV-Ray for Windows.
+
 Miscellaneous:
 
   - Optional fields in macro parameters or tuple assignments now accept
     uninitialized directory entries.
   - Some minor fixes to the Windows inbuilt help.
+  - Increased thread stack size on Linux machines.
 
 Other Noteworthy
 ----------------

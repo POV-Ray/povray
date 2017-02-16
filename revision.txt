@@ -30,6 +30,26 @@ Notes:
 POV-Ray v3.7.1-TBD
 ------------------------------------------------------------------------------
 
+Commit b4605a5 on 2017-02-14 by William F. Pokorny (wfpokorny)
+
+    Fixing thread stack size overrun crash. (#235)
+
+    Fixes Dick Balaska's seg fault as report in beta-test newsgroup on
+    February 12, 2017. In particular we are extending the
+    POV_THREAD_STACK_SIZE macro mechanism to all NewBoostThread
+    calls.
+
+Commit 0e8dbe8 on 2017-02-08 by William F. Pokorny (wfpokorny)
+
+    Adding POV_THREAD_STACK_SIZE macro. (#231)
+
+    Unix default is 4MB due regression, otherise 2MB. Checks added for a min
+    size of 64KB.
+
+Commit 060464b on 2017-02-05 by Christoph Lipka
+
+    [ci skip] Minor update to `README.md`.
+
 Commit cfaa14d on 2017-02-05 by Christoph Lipka
 
     [ci skip] Update POV-Ray for Windows "about" box.
