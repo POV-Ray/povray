@@ -24,10 +24,11 @@ should be located in the same directory as this file is.
 ------------------------------------------------------------------------------
 
 
-Changes between 3.7.1-beta.2 and 3.7.1-TBD
-==========================================
+Changes between 3.7.1-beta.2 and 3.7.1-beta.3
+=============================================
 
-The focus of this version has been on fixing bugs.
+The focus of this version has been on fixing bugs, as well as adding
+hardware-specific performance optiomizations.
 
 Fixed or Mitigated Bugs
 -----------------------
@@ -63,9 +64,9 @@ Miscellaneous:
 Other Noteworthy
 ----------------
 
-New Sample Scenes:
-
-  - A new sample scene has been added to demonstrate the `aoi` pattern.
+  - Added a new sample scene to demonstrate the `aoi` pattern.
+  - Added Intel optimizations for noise (courtesy of Intel; requires
+    AVX2/FMA3-capable CPU).
 
 
 Changes between 3.7.1-beta.1 and 3.7.1-beta.2

@@ -27,8 +27,19 @@ Notes:
 ------------------------------------------------------------------------------
 
 ------------------------------------------------------------------------------
-POV-Ray v3.7.1-TBD
+POV-Ray v3.7.1-beta.3
 ------------------------------------------------------------------------------
+
+Commit 7f41d96 on 2017-02-19 by Christoph Lipka
+
+    Add optimized noise implementation from Intel for AVX2/FMA3-capable CPUs.
+
+    Also overhauled optimized noise for AVX/FMA4-capable CPUs, as well as
+    CPU type identification code.
+
+Commit 9cf8a79 on 2017-02-16 by Christoph Lipka
+
+    Fix handling of special directory name `.` in POV-Ray for Windows.
 
 Commit b4605a5 on 2017-02-14 by William F. Pokorny (wfpokorny)
 
