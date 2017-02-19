@@ -119,6 +119,7 @@
   #ifdef _DEBUG
     #define EDITDLLNAME         "cmedit64d.dll"
   #else
+    // NB: We're using the standard editor DLLs regardless of architecture optimization (e.g. AVX)
     #define EDITDLLNAME         "cmedit64.dll"
   #endif
   #if !defined POVRAY_IS_BETA
@@ -138,6 +139,7 @@
   #ifdef _DEBUG
     #define EDITDLLNAME         "cmedit32d.dll"
   #else
+    // TODO - use the standard editor DLLs regardless of architecture optimization (e.g. SSE2)
     #ifdef BUILD_SSE2
         #define EDITDLLNAME     "cmedit32-sse2.dll"
     #else

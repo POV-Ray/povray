@@ -168,14 +168,14 @@ void Free_Noise_Tables (void);
 
 DBL SolidNoise(const Vector3d& P);
 
-#if defined(TRY_OPTIMIZED_NOISE)
+#ifdef TRY_OPTIMIZED_NOISE
 extern DBL (*Noise) (const Vector3d& EPoint, int noise_generator);
 extern void (*DNoise) (Vector3d& result, const Vector3d& EPoint);
 void Initialise_NoiseDispatch();
-#else
+#else // TRY_OPTIMIZED_NOISE
 INLINE_NOISE DBL Noise (const Vector3d& EPoint, int noise_generator);
 INLINE_NOISE void DNoise (Vector3d& result, const Vector3d& EPoint);
-#endif
+#endif // TRY_OPTIMIZED_NOISE
 
 DBL Turbulence (const Vector3d& EPoint, const GenericTurbulenceWarp* Turb, int noise_generator);
 void DTurbulence (Vector3d& result, const Vector3d& EPoint, const GenericTurbulenceWarp* Turb);

@@ -43,6 +43,12 @@
     <ClCompile Include="..\..\platform\windows\syspovpath.cpp">
       <Filter>Platform Source\Windows</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\platform\x86\avx2fma3noise.cpp">
+      <Filter>Platform Source\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\platform\x86\avxnoise.cpp">
+      <Filter>Platform Source\x86</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\platform\x86\avxfma4noise.h">
@@ -65,6 +71,15 @@
     </ClInclude>
     <ClInclude Include="..\..\platform\windows\syspovdebug.h">
       <Filter>Platform Headers\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\platform\x86\avx2fma3noise.h">
+      <Filter>Platform Headers\x86</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\platform\x86\optimizednoise.h">
+      <Filter>Platform Headers\x86</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\platform\x86\avxnoise.h">
+      <Filter>Platform Headers\x86</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

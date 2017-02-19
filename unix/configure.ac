@@ -83,6 +83,7 @@ required_libsdl_version="1.2"
 required_openexr_version="1.2"
 
 # Supported options.
+AX_ARG_ENABLE([--enable-avx2],             [enable AVX2 features and compiler optmization])
 AX_ARG_ENABLE([--enable-watch-cursor],     [enable a watch cursor over the display while rendering (X Window only)])
 AX_ARG_ENABLE([--enable-debug],            [enable compiler debugging mode])
 AX_ARG_ENABLE([--enable-profile],          [enable program execution profiling])
@@ -506,6 +507,16 @@ else
     else
       AC_MSG_RESULT([no])
     fi
+  fi
+
+  AM_CONDITIONAL([BUILD_AVX2], [test x$enable_avx2 = xyes])
+  if test x"$enable_avx2" = x"yes"; then
+    AC_MSG_RESULT([yes])
+    AC_DEFINE([ENABLE_AVX2], [],[Enable AVX2 features and compiler optimization])
+
+    CXXFLAGS="$CXXFLAGS -mavx2 -mfma"  # append
+  else
+    AC_MSG_RESULT([no])
   fi
 
   ### Note from Warp <warp@tag.povray.org> :

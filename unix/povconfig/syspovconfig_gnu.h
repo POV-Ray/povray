@@ -56,4 +56,7 @@
 
 #define POV_ULONG unsigned POV_LONG
 
+#define MACHINE_INTRINSICS_H <x86intrin.h>
+#define ALIGN32 __attribute__ ((aligned(32)))
+
 #endif // POVRAY_UNIX_SYSPOVCONFIG_GNU_H
