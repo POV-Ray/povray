@@ -46,8 +46,6 @@
 
 #include "base/image/colourspace.h"
 
-int GetTerminalWidth();
-
 namespace vfe
 {
   using namespace pov_frontend;

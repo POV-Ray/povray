@@ -80,7 +80,6 @@ namespace vfePlatform
         m_LastTimestamp(0), m_TimestampOffset(0), vfeSession(id)
     {
         m_OptionsProc = shared_ptr<UnixOptionsProcessor>(new UnixOptionsProcessor(this));
-        m_ConsoleWidth = GetTerminalWidth();
     }
 
     /////////////////////////////////////////////////////////////////////////

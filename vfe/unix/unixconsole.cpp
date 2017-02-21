@@ -97,11 +97,8 @@ int GetTerminalWidth()
     struct winsize w;
     if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &w) == 0)
         return (int)w.ws_col;
-    else
-        return 80;
-#else
-    return 80;
 #endif
+    return 80;
 }
 
 static void SignalHandler (void)
@@ -436,6 +433,8 @@ int main (int argc, char **argv)
     if (gSession->Initialize(NULL, NULL) != vfeNoError)
         ErrorExit(gSession);
 
+    // get current console horizontal size
+    gSession->SetConsoleWidth(GetTerminalWidth());
     // display mode registration
 #ifdef HAVE_LIBSDL
     if (UnixSDLDisplay::Register(gSession))
