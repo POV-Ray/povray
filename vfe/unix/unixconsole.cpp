@@ -433,8 +433,6 @@ int main (int argc, char **argv)
     if (gSession->Initialize(NULL, NULL) != vfeNoError)
         ErrorExit(gSession);
 
-    // get current console horizontal size
-    gSession->SetConsoleWidth(GetTerminalWidth());
     // display mode registration
 #ifdef HAVE_LIBSDL
     if (UnixSDLDisplay::Register(gSession))

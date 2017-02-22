@@ -234,6 +234,7 @@ namespace vfePlatform
     // thread priority here.
     void vfeUnixSession::WorkerThreadStartup()
     {
+        m_ConsoleWidth = GetTerminalWidth();
     }
 
     /////////////////////////////////////////////////////////////////////////
