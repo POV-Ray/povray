@@ -167,7 +167,7 @@ bool Path::ParsePathString (UCS2String& volume, vector<UCS2String>& dirnames, UC
             {
                 if (!IsCurrentDir(stash))
                 {
-                    if (!dirnames.empty() && IsParentDir(stash))
+                    if (!dirnames.empty() && IsParentDir(stash) && !IsParentDir(dirnames.back()))
                         dirnames.pop_back();
                     else
                         dirnames.push_back (stash);

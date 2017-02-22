@@ -34,7 +34,11 @@ Fixed or Mitigated Bugs
 
 Reported via the Newsgroups:
 
-  - <3c4bb31d$1@news.povray.org>
+  - <58aa4755$1@news.povray.org>
+    (2017-02-19, povray.beta-test, "beta.3 and ./ and ../ weirdness")
+    Paths starting with "../../" not handled properly in POV-Ray for Windows
+
+  - <58aca5fc@news.povray.org>
     (2017-02-22, povray.beta-test, "ior.inc fails in 3.7.1 beta 3")
     Parse Error when including "ior.inc".
 
