@@ -30,6 +30,10 @@ Notes:
 POV-Ray v3.7.1-beta.3
 ------------------------------------------------------------------------------
 
+Commit 5ed6025 on 2017-02-19 by Christoph Lipka
+
+    Update change log as well as some comments and build instructions.
+
 Commit 7f41d96 on 2017-02-19 by Christoph Lipka
 
     Add optimized noise implementation from Intel for AVX2/FMA3-capable CPUs.
