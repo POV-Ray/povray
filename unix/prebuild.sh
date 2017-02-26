@@ -429,11 +429,11 @@ povray_SOURCES = \\
   disp_sdl.cpp disp_sdl.h \\
   disp_text.cpp disp_text.h
 
-cppflags_platformcpu = 
-
 if BUILD_X86
 cppflags_platformcpu = -I\$(top_srcdir)/platform/x86
-endif
+else !BUILD_X86
+cppflags_platformcpu = 
+endif !BUILD_X86
 
 # Include paths for headers.
 AM_CPPFLAGS = \\
@@ -801,11 +801,11 @@ noinst_LIBRARIES = libpovray.a
 libpovray_a_SOURCES = \\
 `echo $files`
 
-cppflags_platformcpu = 
-
 if BUILD_X86
 cppflags_platformcpu = -I\$(top_srcdir)/platform/x86
-endif
+else !BUILD_X86
+cppflags_platformcpu = 
+endif !BUILD_X86
 
 # Include paths for headers.
 AM_CPPFLAGS = \\
@@ -1340,11 +1340,11 @@ noinst_LIBRARIES = libvfe.a
 libvfe_a_SOURCES = \\
 `echo $files`
 
-cppflags_platformcpu = 
-
 if BUILD_X86
 cppflags_platformcpu = -I\$(top_srcdir)/platform/x86
-endif
+else !BUILD_X86
+cppflags_platformcpu = 
+endif !BUILD_X86
 
 # Include paths for headers.
 AM_CPPFLAGS = \\
@@ -1402,15 +1402,14 @@ case "$1" in
 # Libraries to build.
 noinst_LIBRARIES = libplatform.a
 
-cppflags_platformcpu =
-sources_platformcpu =
-
 if BUILD_X86
 cppflags_platformcpu = -I\$(top_srcdir)/platform/x86
 sources_platformcpu = \\
 `echo $files_x86`
-endif
-cppflags_platformcpu = 
+else !BUILD_X86
+cppflags_platformcpu =
+sources_platformcpu =
+endif !BUILD_X86
 
 # Source files.
 libplatform_a_SOURCES = \\
