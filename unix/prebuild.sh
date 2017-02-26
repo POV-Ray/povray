@@ -429,6 +429,12 @@ povray_SOURCES = \\
   disp_sdl.cpp disp_sdl.h \\
   disp_text.cpp disp_text.h
 
+cppflags_platformcpu = 
+
+if BUILD_X86
+cppflags_platformcpu = -I\$(top_srcdir)/platform/x86
+endif
+
 # Include paths for headers.
 AM_CPPFLAGS = \\
   -I\$(top_srcdir)/unix/povconfig \\
@@ -436,6 +442,7 @@ AM_CPPFLAGS = \\
   -I\$(top_srcdir)/source \\
   -I\$(top_builddir)/source \\
   -I\$(top_srcdir)/platform/unix \\
+  \$(cppflags_platformcpu) \\
   -I\$(top_srcdir)/vfe \\
   -I\$(top_srcdir)/vfe/unix
 
@@ -794,11 +801,18 @@ noinst_LIBRARIES = libpovray.a
 libpovray_a_SOURCES = \\
 `echo $files`
 
+cppflags_platformcpu = 
+
+if BUILD_X86
+cppflags_platformcpu = -I\$(top_srcdir)/platform/x86
+endif
+
 # Include paths for headers.
 AM_CPPFLAGS = \\
   -I\$(top_srcdir)/unix/povconfig \\
   -I\$(top_srcdir) \\
   -I\$(top_srcdir)/platform/unix \\
+  \$(cppflags_platformcpu) \\
   -I\$(top_srcdir)/unix \\
   -I\$(top_srcdir)/vfe \\
   -I\$(top_srcdir)/vfe/unix
@@ -1326,10 +1340,17 @@ noinst_LIBRARIES = libvfe.a
 libvfe_a_SOURCES = \\
 `echo $files`
 
+cppflags_platformcpu = 
+
+if BUILD_X86
+cppflags_platformcpu = -I\$(top_srcdir)/platform/x86
+endif
+
 # Include paths for headers.
 AM_CPPFLAGS = \\
   -I\$(top_srcdir)/unix/povconfig \\
   -I\$(top_srcdir)/platform/unix \\
+  \$(cppflags_platformcpu) \\
   -I\$(top_srcdir)/vfe/unix \\
   -I\$(top_srcdir)/unix \\
   -I\$(top_srcdir)/source
@@ -1369,6 +1390,7 @@ case "$1" in
 
   *)
   files=`find $dir/unix -name "*.cpp" -or -name "*.h" | sed s,"$dir/",,g`
+  files_x86=`find $dir/x86 -name "*.cpp" -or -name "*.h" | sed s,"$dir/",,g`
 
   echo "Create $makefile.am"
   cat Makefile.header > $makefile.am
@@ -1380,18 +1402,26 @@ case "$1" in
 # Libraries to build.
 noinst_LIBRARIES = libplatform.a
 
+cppflags_platformcpu =
+sources_platformcpu =
+
+if BUILD_X86
+cppflags_platformcpu = -I\$(top_srcdir)/platform/x86
+sources_platformcpu = \\
+`echo $files_x86`
+endif
+cppflags_platformcpu = 
+
 # Source files.
 libplatform_a_SOURCES = \\
-`echo $files`
-
-# if BUILD_AVX2
-# libplatform_a_SOURCES += x86/avx2fma3noise.cpp x86/avx2fma3noise.h x86/cpuid.cpp x86/cpuid.h
-# endif
+`echo $files` \\
+\$(sources_platformcpu)
 
 # Include paths for headers.
 AM_CPPFLAGS = \\
   -I\$(top_srcdir)/unix/povconfig \\
   -I\$(top_srcdir)/platform/unix \\
+  \$(cppflags_platformcpu) \\
   -I\$(top_srcdir)/vfe \\
   -I\$(top_srcdir)/vfe/unix \\
   -I\$(top_srcdir)/unix \\
