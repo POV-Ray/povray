@@ -127,15 +127,51 @@ const int NULL=0;
 
 #ifdef BUILD_X86
 
-#if defined(__AVX__)
+#if defined(__INTEL_COMPILER)
+    // Intel compiler
+    #if (__INTEL_COMPILER >= 1110) // 11.1
+        #define HAVE_ASM_AVX
+    #endif
+    #if (__INTEL_COMPILER >= 1400) // 14.0
+        #define HAVE_ASM_AVX2
+        #define HAVE_ASM_FMA3
+    #endif
+#elif defined(__GNUC__)
+    // GCC compiler (or yet another compiler imitating GCC)
+    #define GCC_VERSION_NUMBER (__GNUC__ * 100 + __GNUC_MINOR__)
+    #if (__GNUC__ == 4) // 4.x
+        #if (__GNUC_MINOR__ >= 5) // 4.5 or later
+            #define HAVE_ASM_FMA4
+        #endif
+        #if (__GNUC_MINOR__ >= 6) // 4.6 or later
+            #define HAVE_ASM_AVX
+        #endif
+        #if (__GNUC_MINOR__ >= 7) // 4.7 or later
+            #define HAVE_ASM_AVX2
+            #define HAVE_ASM_FMA3
+        #endif
+    #elif (__GNUC__ >= 5) // 5.x or later
+        #define HAVE_ASM_AVX
+        #define HAVE_ASM_AVX2
+        #define HAVE_ASM_FMA3
+        #define HAVE_ASM_FMA4
+    #endif
+#else
+// Doesn't look like a Unix at all.
+// Comment-out the following line to try with default POSIX settings.
+#error "No Unix detected; proceed at your own risk."
+#include "syspovconfig_posix.h"
+#endif
+
+#if defined(HAVE_ASM_AVX)
 #define TRY_OPTIMIZED_NOISE_AVX
 #endif
 
-#if defined(__AVX__) && defined(__FMA4__)
+#if defined(HAVE_ASM_AVX) && defined(HAVE_ASM_FMA4)
 #define TRY_OPTIMIZED_NOISE_AVXFMA4
 #endif
 
-#if defined(__AVX2__) && defined(__FMA__)
+#if defined(HAVE_ASM_AVX2) && defined(HAVE_ASM_FMA3)
 #define TRY_OPTIMIZED_NOISE_AVX2FMA3
 #endif
 
