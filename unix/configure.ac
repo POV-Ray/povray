@@ -976,8 +976,13 @@ fi
 AC_DEFINE_UNQUOTED([BUILT_FOR], ["$pov_built_for"], [Host platform.])
 
 case "$pov_built_for" in
-  i?86-* | x86_64-*) pov_cpu='x86' ;;
-  *)                 pov_cpu='' ;;
+  i?86-* | x86_64-*)
+    pov_cpu='x86'
+    AC_DEFINE([BUILD_X86], [], [Build for x86 or x86-64 architecture])
+    ;;
+  *)
+    pov_cpu=''
+    ;;
 esac
 AM_CONDITIONAL([BUILD_X86], [test x"$pov_cpu" = x"x86"])
 

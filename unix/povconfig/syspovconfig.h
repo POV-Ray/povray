@@ -138,7 +138,6 @@ const int NULL=0;
     #endif
 #elif defined(__GNUC__)
     // GCC compiler (or yet another compiler imitating GCC)
-    #define GCC_VERSION_NUMBER (__GNUC__ * 100 + __GNUC_MINOR__)
     #if (__GNUC__ == 4) // 4.x
         #if (__GNUC_MINOR__ >= 5) // 4.5 or later
             #define HAVE_ASM_FMA4
@@ -156,11 +155,6 @@ const int NULL=0;
         #define HAVE_ASM_FMA3
         #define HAVE_ASM_FMA4
     #endif
-#else
-// Doesn't look like a Unix at all.
-// Comment-out the following line to try with default POSIX settings.
-#error "No Unix detected; proceed at your own risk."
-#include "syspovconfig_posix.h"
 #endif
 
 #if defined(HAVE_ASM_AVX)
