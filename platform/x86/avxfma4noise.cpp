@@ -36,7 +36,7 @@
 ///
 //******************************************************************************
 
-#include "syspovconfigbase.h"
+#include "syspovconfigcore.h"
 #include "avxfma4noise.h"
 
 #ifdef MACHINE_INTRINSICS_H
@@ -59,12 +59,25 @@
 namespace pov
 {
 
-extern DBL RTable[];
-
-bool AVXFMA4NoiseSupported()
+class OptimizedNoiseAVXFMA4 : public OptimizedNoiseBase
 {
-    return HaveAVXFMA4();
+public:
+    virtual DBL Noise(const Vector3d& EPoint, int noise_generator) const;
+    virtual void DNoise(Vector3d& result, const Vector3d& EPoint) const;
+    virtual const char* Name() const { return "AVX/FMA4 Noise"; }
+private:
+    static bool initialized;
+};
+
+OptimizedNoiseBase* GetOptimizedNoiseAVXFMA4()
+{
+    if (HaveAVXFMA4())
+        return new OptimizedNoiseAVXFMA4();
+    else
+        return NULL;
 }
+
+extern DBL RTable[];
 
 /*****************************************************************************
 *
@@ -100,7 +113,7 @@ bool AVXFMA4NoiseSupported()
 *
 ******************************************************************************/
 
-DBL AVXFMA4Noise(const Vector3d& EPoint, int noise_generator)
+DBL OptimizedNoiseAVXFMA4::Noise(const Vector3d& EPoint, int noise_generator) const
 {
     DBL x, y, z;
     DBL *mp;
@@ -327,7 +340,7 @@ DBL AVXFMA4Noise(const Vector3d& EPoint, int noise_generator)
 *
 ******************************************************************************/
 
-void AVXFMA4DNoise(Vector3d& result, const Vector3d& EPoint)
+void OptimizedNoiseAVXFMA4::DNoise(Vector3d& result, const Vector3d& EPoint) const
 {
     DBL x, y, z;
     int ix, iy, iz;

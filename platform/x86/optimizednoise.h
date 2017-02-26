@@ -38,59 +38,35 @@
 #define POVRAY_OPTIMIZEDNOISE_H
 
 #include "syspovconfigbase.h"
-#include "backend/frame.h"
 
-#ifdef TRY_OPTIMIZED_NOISE_AVX2FMA3
 #include "avx2fma3noise.h"
-#endif
-
-#ifdef TRY_OPTIMIZED_NOISE_AVXFMA4
 #include "avxfma4noise.h"
-#endif
-
-#ifdef TRY_OPTIMIZED_NOISE_AVX
 #include "avxnoise.h"
-#endif
+
+#include "core/material/texture.h"
 
 #ifdef TRY_OPTIMIZED_NOISE
 
 namespace pov
 {
 
-typedef DBL (*NoiseFunction) (const Vector3d& EPoint, int noise_generator);
-typedef void (*DNoiseFunction) (Vector3d& result, const Vector3d& EPoint);
-
-inline bool TryOptimizedNoise(NoiseFunction* pFnNoise, DNoiseFunction* pFnDNoise)
+inline OptimizedNoiseBase* GetOptimizedNoise()
 {
+    OptimizedNoiseBase* noise = NULL;
     // TODO - review priority
-    // NOTE - Any change to the priorization should also be reflected in `pvengine.cpp`.
 #ifdef TRY_OPTIMIZED_NOISE_AVX2FMA3
-    if (AVX2FMA3NoiseSupported())
-    {
-        AVX2FMA3NoiseInit();
-        *pFnNoise  = AVX2FMA3Noise;
-        *pFnDNoise = AVX2FMA3DNoise;
-        return true;
-    }
+    if (!noise)
+        noise = GetOptimizedNoiseAVX2FMA3();
 #endif
 #ifdef TRY_OPTIMIZED_NOISE_AVXFMA4
-    if (AVXFMA4NoiseSupported())
-    {
-        *pFnNoise  = AVXFMA4Noise;
-        *pFnDNoise = AVXFMA4DNoise;
-        return true;
-    }
+    if (!noise)
+        noise = GetOptimizedNoiseAVXFMA4();
 #endif
 #ifdef TRY_OPTIMIZED_NOISE_AVX
-    if (AVXNoiseSupported())
-    {
-        AVXNoiseInit();
-        *pFnNoise  = AVXNoise;
-        *pFnDNoise = AVXDNoise;
-        return true;
-    }
+    if (!noise)
+        noise = GetOptimizedNoiseAVX();
 #endif
-    return false;
+    return noise;
 }
 
 }

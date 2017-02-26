@@ -226,7 +226,7 @@
 #endif
 
 #if defined(TRY_OPTIMIZED_NOISE_AVX) || defined(TRY_OPTIMIZED_NOISE_AVXFMA4) || defined(TRY_OPTIMIZED_NOISE_AVX2FMA3)
-#define TRY_OPTIMIZED_NOISE(Noise,DNoise)   TryOptimizedNoise(Noise,DNoise)
+#define TRY_OPTIMIZED_NOISE
 #define OPTIMIZED_NOISE_H                   "optimizednoise.h"
 #endif
 

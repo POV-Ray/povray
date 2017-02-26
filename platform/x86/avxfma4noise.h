@@ -37,23 +37,17 @@
 #ifndef POVRAY_AVXFMA4NOISE_H
 #define POVRAY_AVXFMA4NOISE_H
 
-#include "syspovconfigbase.h"
-#include "backend/frame.h"
+#include "syspovconfigcore.h"
+#include "core/material/texture.h"
 
 #ifdef TRY_OPTIMIZED_NOISE_AVXFMA4
 
 namespace pov
 {
 
-bool AVXFMA4NoiseSupported();
-
-/// Optimized Noise function using AVX and FMA4 instructions.
+/// Get optimized noise functions using AVX and FMA4 instructions.
 /// @author Optimized by AMD
-DBL AVXFMA4Noise(const Vector3d& EPoint, int noise_generator);
-
-/// Optimized DNoise function using AVX and FMA4 instructions.
-/// @author Optimized by AMD
-void AVXFMA4DNoise(Vector3d& result, const Vector3d& EPoint);
+OptimizedNoiseBase* GetOptimizedNoiseAVXFMA4();
 
 }
 

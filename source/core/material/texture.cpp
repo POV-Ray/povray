@@ -22,7 +22,7 @@
 /// ----------------------------------------------------------------------------
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -61,7 +61,7 @@
 #include "core/material/warp.h"
 #include "core/support/imageutil.h"
 
-#ifdef OPTIMIZED_NOISE_H
+#ifdef TRY_OPTIMIZED_NOISE
 #include OPTIMIZED_NOISE_H
 #endif
 
@@ -102,7 +102,13 @@ const int SINTABSIZE = 1000;
 * Local typedefs
 ******************************************************************************/
 
-
+class PortableNoise : public OptimizedNoiseBase
+{
+    virtual bool Supported() const { return true; }
+    virtual DBL Noise(const Vector3d& EPoint, int noise_generator) const;
+    virtual void DNoise(Vector3d& result, const Vector3d& EPoint) const;
+    virtual const char* Name() const { return "Portable Noise"; }
+};
 
 /*****************************************************************************
 * Local variables
@@ -186,8 +192,8 @@ namespace pov
     #endif
 #else // USE_FASTER_NOISE
 #ifndef TRY_OPTIMIZED_NOISE
-    #define PortableNoise Noise
-    #define PortableDNoise DNoise
+    #define PortableNoiseImpl Noise
+    #define PortableDNoiseImpl DNoise
 #endif
 
     #define FASTER_NOISE_INIT()
@@ -376,7 +382,7 @@ void Free_Noise_Tables()
 *
 ******************************************************************************/
 
-DBL PortableNoise(const Vector3d& EPoint, int noise_generator)
+inline DBL PortableNoiseImpl(const Vector3d& EPoint, int noise_generator)
 {
     DBL x, y, z;
     DBL *mp;
@@ -500,6 +506,10 @@ DBL PortableNoise(const Vector3d& EPoint, int noise_generator)
     return (sum);
 }
 
+DBL PortableNoise::Noise(const Vector3d& EPoint, int noise_generator) const
+{
+    return PortableNoiseImpl(EPoint, noise_generator);
+}
 
 
 /*****************************************************************************
@@ -534,7 +544,7 @@ DBL PortableNoise(const Vector3d& EPoint, int noise_generator)
 *
 ******************************************************************************/
 
-void PortableDNoise(Vector3d& result, const Vector3d& EPoint)
+inline void PortableDNoiseImpl(Vector3d& result, const Vector3d& EPoint)
 {
     DBL x, y, z;
     DBL *mp;
@@ -651,6 +661,11 @@ void PortableDNoise(Vector3d& result, const Vector3d& EPoint)
     result[Y] += INCRSUMP(mp, s, x_ix, y_iy, z_jz);
     mp += 8;
     result[Z] += INCRSUMP(mp, s, x_ix, y_iy, z_jz);
+}
+
+void PortableNoise::DNoise(Vector3d& result, const Vector3d& EPoint) const
+{
+    PortableDNoiseImpl(result, EPoint);
 }
 
 // Note that the value of NoiseEntries must be a power of 2.  This
@@ -1626,8 +1641,7 @@ int Test_Opacity(const TEXTURE *Texture)
 
 #ifdef TRY_OPTIMIZED_NOISE
 
-DBL (*Noise) (const Vector3d& EPoint, int noise_generator);
-void (*DNoise) (Vector3d& result, const Vector3d& EPoint);
+OptimizedNoiseBase* gpOptimizedNoise = NULL;
 
 /*****************************************************************************
 *
@@ -1664,11 +1678,10 @@ void Initialise_NoiseDispatch()
 
     if(!cpu_detected)
     {
-        if (!TRY_OPTIMIZED_NOISE(&Noise, &DNoise))
-        {
-            Noise  = PortableNoise;
-            DNoise = PortableDNoise;
-        }
+        gpOptimizedNoise = GetOptimizedNoise();
+        if (!gpOptimizedNoise)
+            gpOptimizedNoise = new PortableNoise();
+
         cpu_detected = true;
     }
 }

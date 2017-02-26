@@ -37,25 +37,17 @@
 #ifndef POVRAY_AVX2FMA3NOISE_H
 #define POVRAY_AVX2FMA3NOISE_H
 
-#include "syspovconfigbase.h"
-#include "backend/frame.h"
+#include "syspovconfigcore.h"
+#include "core/material/texture.h"
 
 #ifdef TRY_OPTIMIZED_NOISE_AVX2FMA3
 
 namespace pov
 {
 
-bool AVX2FMA3NoiseSupported();
-
-void AVX2FMA3NoiseInit();
-
-/// Optimized Noise function using AVX2 and FMA3 instructions.
+/// Get optimized noise functions using AVX2 and FMA3 instructions.
 /// @author Optimized by Intel
-DBL AVX2FMA3Noise(const Vector3d& EPoint, int noise_generator);
-
-/// Optimized DNoise function using AVX2 and FMA3 instructions.
-/// @author Optimized by Intel
-void AVX2FMA3DNoise(Vector3d& result, const Vector3d& EPoint);
+OptimizedNoiseBase* GetOptimizedNoiseAVX2FMA3();
 
 }
 

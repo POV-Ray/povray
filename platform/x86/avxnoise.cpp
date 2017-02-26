@@ -41,7 +41,7 @@
 ///
 //******************************************************************************
 
-#include "syspovconfigbase.h"
+#include "syspovconfigcore.h"
 #include "avxnoise.h"
 
 #ifdef MACHINE_INTRINSICS_H
@@ -119,7 +119,26 @@ static inline __m256d permute4x64_functional(const __m256d& x, int i)
 namespace pov
 {
 
+class OptimizedNoiseAVX : public OptimizedNoiseBase
+{
+public:
+    OptimizedNoiseAVX();
+    virtual DBL Noise(const Vector3d& EPoint, int noise_generator) const;
+    virtual void DNoise(Vector3d& result, const Vector3d& EPoint) const;
+    virtual const char* Name() const { return "AVX Noise"; }
+private:
+    static bool initialized;
+};
 
+bool OptimizedNoiseAVX::initialized = false;
+
+OptimizedNoiseBase* GetOptimizedNoiseAVX()
+{
+    if (HaveAVX())
+        return new OptimizedNoiseAVX();
+    else
+        return NULL;
+}
 
 
 extern DBL RTable[];
@@ -143,10 +162,13 @@ void AVXNoiseInit()
     }
 }
 
-
-bool AVXNoiseSupported()
+OptimizedNoiseAVX::OptimizedNoiseAVX()
 {
-    return HaveAVX();
+    if (!initialized)
+    {
+        AVXNoiseInit();
+        initialized = true;
+    }
 }
 
 /*****************************************************************************
@@ -181,7 +203,7 @@ bool AVXNoiseSupported()
 *
 ******************************************************************************/
 
-DBL AVXNoise(const Vector3d& EPoint, int noise_generator)
+DBL OptimizedNoiseAVX::Noise(const Vector3d& EPoint, int noise_generator) const
 {
     AVXTABLETYPE *mp;
     DBL sum = 0.0;
@@ -318,8 +340,8 @@ DBL AVXNoise(const Vector3d& EPoint, int noise_generator)
 
 #if CHECK_FUNCTIONAL
     {
-        extern DBL PortableNoise(const Vector3d& EPoint, int noise_generator);
-        DBL orig_sum = PortableNoise(EPoint, noise_generator);
+        extern DBL PortableNoiseImpl(const Vector3d& EPoint, int noise_generator);
+        DBL orig_sum = PortableNoiseImpl(EPoint, noise_generator);
         if (fabs(orig_sum - sum) >= EPSILON)
         {
             throw POV_EXCEPTION_STRING("Noise error");
@@ -367,7 +389,7 @@ DBL AVXNoise(const Vector3d& EPoint, int noise_generator)
 *
 ******************************************************************************/
 
-void AVXDNoise(Vector3d& result, const Vector3d& EPoint)
+void OptimizedNoiseAVX::DNoise(Vector3d& result, const Vector3d& EPoint) const
 {
 
 #if CHECK_FUNCTIONAL
@@ -492,9 +514,9 @@ void AVXDNoise(Vector3d& result, const Vector3d& EPoint)
 
 #if CHECK_FUNCTIONAL
     {
-        extern void PortableDNoise(Vector3d& result, const Vector3d& EPoint);
+        extern void PortableDNoiseImpl(Vector3d& result, const Vector3d& EPoint);
         Vector3d portable_res;
-        PortableDNoise(portable_res , param);
+        PortableDNoiseImpl(portable_res , param);
         if (fabs(portable_res[X] - result[X]) >= EPSILON)
         {
             throw POV_EXCEPTION_STRING("DNoise X error");

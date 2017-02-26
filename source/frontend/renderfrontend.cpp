@@ -849,7 +849,6 @@ void InitInfo(POVMS_Object& cppmsg, TextStreamBuffer *tsb)
     tsb->printf("\n");
     tsb->printf("Other contributors are listed in the documentation.\n");
 
-    tsb->printf("\n");
     if(POVMSObject_Get(msg, &attrlist, kPOVAttrib_ImageLibVersions) == kNoErr)
     {
         cnt = 0;
@@ -858,6 +857,7 @@ void InitInfo(POVMS_Object& cppmsg, TextStreamBuffer *tsb)
         {
             if(cnt > 0)
             {
+                tsb->printf("\n");
                 tsb->printf("Support libraries used by POV-Ray:\n");
 
                 for(i = 1; i <= cnt; i++)
@@ -867,6 +867,35 @@ void InitInfo(POVMS_Object& cppmsg, TextStreamBuffer *tsb)
                         l = 1023;
                         charbuf[0] = 0;
                         if(POVMSAttr_Get(&item, kPOVMSType_CString, charbuf, &l) == kNoErr)
+                            tsb->printf("  %s\n", charbuf);
+
+                        (void)POVMSAttr_Delete(&item);
+                    }
+                }
+            }
+        }
+
+        (void)POVMSAttrList_Delete(&attrlist);
+    }
+
+    if (POVMSObject_Get(msg, &attrlist, kPOVAttrib_Optimizations) == kNoErr)
+    {
+        cnt = 0;
+
+        if (POVMSAttrList_Count(&attrlist, &cnt) == kNoErr)
+        {
+            if (cnt > 0)
+            {
+                tsb->printf("\n");
+                tsb->printf("Dynamic optimizations active:\n");
+
+                for (i = 1; i <= cnt; i++)
+                {
+                    if (POVMSAttrList_GetNth(&attrlist, i, &item) == kNoErr)
+                    {
+                        l = 1023;
+                        charbuf[0] = 0;
+                        if (POVMSAttr_Get(&item, kPOVMSType_CString, charbuf, &l) == kNoErr)
                             tsb->printf("  %s\n", charbuf);
 
                         (void)POVMSAttr_Delete(&item);
