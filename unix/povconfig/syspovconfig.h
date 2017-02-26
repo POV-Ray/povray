@@ -127,15 +127,15 @@ const int NULL=0;
 
 #ifdef BUILD_X86
 
-if defined(__AVX__)
+#if defined(__AVX__)
 #define TRY_OPTIMIZED_NOISE_AVX
 #endif
 
-if defined(__AVX__) && defined(__FMA4__)
+#if defined(__AVX__) && defined(__FMA4__)
 #define TRY_OPTIMIZED_NOISE_AVXFMA4
 #endif
 
-if defined(__AVX2__) && defined(__FMA__)
+#if defined(__AVX2__) && defined(__FMA__)
 #define TRY_OPTIMIZED_NOISE_AVX2FMA3
 #endif
 
