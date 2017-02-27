@@ -524,7 +524,7 @@
     <None Include="..\bitmaps\toolbar\sourcefile.bmp" />
     <None Include="..\bitmaps\StretchDIBits.bmp" />
     <None Include="..\bitmaps\toolbar\SysTray.bmp" />
-    <None Include="..\readme.html" />
+    <None Include="..\README.md" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\pvengine.rc">

@@ -116,7 +116,7 @@
     <None Include="..\bitmaps\toolbar\SysTray.bmp">
       <Filter>Resources\Bitmaps</Filter>
     </None>
-    <None Include="..\readme.html" />
+    <None Include="..\README.md" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\pvengine.rc">
