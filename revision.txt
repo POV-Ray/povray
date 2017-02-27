@@ -30,6 +30,15 @@ Notes:
 POV-Ray v3.7.1-TBD
 ------------------------------------------------------------------------------
 
+Commit a32a20b on 2017-02-27 by William F. Pokorny (wfpokorny)
+
+    Fix parse errors in two demo scenes. (#242)
+
+Commit 63e9b8a on 2017-02-22 by Christoph Lipka
+
+    Fix handling of directory names starting with `../../` in POV-Ray
+    for Windows.
+
 Commit 7c74478 on 2017-02-22 by Christoph Lipka
 
     Fix `ior.inc`.

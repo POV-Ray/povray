@@ -146,9 +146,9 @@ Build Steps
 
  2. Open |windows\vs10\povray.sln| in Visual Studio 2010/2012. Set
     'Windows Targets > GUI' as the start-up project if it is not already
-    selected. Then, select the 'Generic POV-Ray > povbackend' project
-    and expand 'Backend Headers', then open the file |'povray.h'| listed
-    within it. Please set |DISTRIBUTION_MESSAGE_2| to your real name to
+    selected. Then, select the 'Generic POV-Ray > povbase' project
+    and expand 'Backend Headers', then open the file |'build.h'| listed
+    within it. Please set |BUILT_BY| to your real name (and contact info) to
     make unofficial versions distinguishable from each other. Remove the
     |#error| directive afterwards to proceed with the build. Note that
     if you do not do this you will get compile errors.
@@ -156,8 +156,8 @@ Build Steps
     By default, the GUI project is built, and the Console project is
     excluded. If you wish to generate a simple console version of
     POV-Ray, please modify the configuration as needed, edit
-    vfe\win\syspovconfig.h to enable the definition of _CONSOLE as noted
-    therein, and build.
+    windows/povconfig/syspovconfig.h to enable the definition of _CONSOLE
+    as noted therein, and build.
 
     *Note:* The windows console project is intended to be a simple
     example of how to use the VFE library to make a console version of

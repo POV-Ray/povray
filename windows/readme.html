@@ -188,20 +188,20 @@ probably not work on your machine.
 <a name="build">
 <li>
 <p>
-Open <code>windows\vs10\povray.sln</code> in Visual Studio 2010/2012. Set 'Windows
-Targets &gt; GUI' as the start-up project if it is not already selected.
-Then,  select the 'Generic POV-Ray &gt; povbackend' project and expand
-'Backend Headers', then open the file <code>'povray.h'</code> listed within it. Please
-set <code>DISTRIBUTION_MESSAGE_2</code> to your real name to make
-unofficial versions distinguishable from each other. Remove the <code>#error</code>
-directive afterwards to proceed with the build. Note that if you do not 
-do this you will get compile errors.
+Open <code>windows\vs10\povray.sln</code> in Visual Studio 2010/2012. Set
+'Windows Targets &gt; GUI' as the start-up project if it is not already
+selected. Then,  select the 'Generic POV-Ray &gt; povbase' project
+and expand 'Backend Headers', then open the file <code>'build.h'</code> listed
+within it. Please set <code>BUILT_BY</code> to your real name (and contact info) to
+make unofficial versions distinguishable from each other. Remove the
+<code>#error</code> directive afterwards to proceed with the build. Note that
+if you do not  do this you will get compile errors.
 </p>
 
 <p>
 By default, the GUI project is built, and the Console project is excluded. If you
 wish to generate a simple console version of POV-Ray, please modify the configuration
-as needed, edit vfe\win\syspovconfig.h to enable the definition of _CONSOLE as noted
+as needed, edit windows/povconfig/syspovconfig.h to enable the definition of _CONSOLE as noted
 therein, and build.
 </p>
 

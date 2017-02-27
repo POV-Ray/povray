@@ -32,6 +32,10 @@ The focus of this version has been on fixing bugs.
 Fixed or Mitigated Bugs
 -----------------------
 
+Reported via GitHub:
+
+  - #241 ("Windows Build Instructions Misleading")
+
 Reported via the Newsgroups:
 
   - <58aa4755$1@news.povray.org>
@@ -41,6 +45,14 @@ Reported via the Newsgroups:
   - <58aca5fc@news.povray.org>
     (2017-02-22, povray.beta-test, "ior.inc fails in 3.7.1 beta 3")
     Parse Error when including "ior.inc".
+
+  - <58ae4809$1@news.povray.org>
+    (2017-02-22, povray.beta-test, "Wrong error message building Windows console version")
+    Wrong file location specified for `syspovconfig.h`.
+
+Miscellaneous:
+
+  - Fixed two demo scenes (`incdemo/sort.pov` and `textures/normals/normmap.pov`).
 
 
 Changes between 3.7.1-beta.2 and 3.7.1-beta.3
