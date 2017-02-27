@@ -39,6 +39,19 @@
 #include "syspovconfigcore.h"
 #include "avxfma4noise.h"
 
+#ifdef TRY_OPTIMIZED_NOISE_AVXFMA4
+
+#ifdef __GNUC__
+// GCC normally provides only intrinsics for instruction set extensions that it is given free reign to optimize for;
+// to gain access to other intrinsics we need to cheat a bit.
+#ifndef __AVX__
+#define __AVX__
+#endif
+#ifndef __FMA4__
+#define __FMA4__
+#endif
+#endif
+
 #ifdef MACHINE_INTRINSICS_H
 #include MACHINE_INTRINSICS_H
 #endif
@@ -46,10 +59,6 @@
 #include "core/material/pattern.h"
 #include "core/material/texture.h"
 #include "cpuid.h"
-
-/*****************************************************************************/
-
-#ifdef TRY_OPTIMIZED_NOISE_AVXFMA4
 
 /********************************************************************************************/
 /* AMD Specific optimizations: Its found that more than 50% of the time is spent in         */

@@ -44,6 +44,16 @@
 #include "syspovconfigcore.h"
 #include "avxnoise.h"
 
+#ifdef TRY_OPTIMIZED_NOISE_AVX
+
+#ifdef __GNUC__
+// GCC normally provides only intrinsics for instruction set extensions that it is given free reign to optimize for;
+// to gain access to other intrinsics we need to cheat a bit.
+#ifndef __AVX_
+#define __AVX__
+#endif
+#endif
+
 #ifdef MACHINE_INTRINSICS_H
 #include MACHINE_INTRINSICS_H
 #endif
@@ -53,10 +63,6 @@
 #include "cpuid.h"
 
 /*****************************************************************************/
-
-
-#ifdef TRY_OPTIMIZED_NOISE_AVX
-
 
 #define FMA_PD(a,b,c) _mm256_add_pd(_mm256_mul_pd((a),(b)),(c))
 
