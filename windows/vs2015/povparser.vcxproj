@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -35,36 +35,51 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{C6D9B754-11EB-4FC3-8683-593BFD58C904}</ProjectGuid>
+    <ProjectGuid>{F0304A28-E1C7-4F4F-BE1F-DF57936C9664}</ProjectGuid>
+    <RootNamespace>pov_parser</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.10586.0</WindowsTargetPlatformVersion>
+    <TargetUniversalCRTVersion>10.0.10586.0</TargetUniversalCRTVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
+    <PlatformToolset>v140_xp</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
+    <PlatformToolset>v140_xp</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v140_xp</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v140_xp</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-SSE2|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v140_xp</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-AVX|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v140_xp</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Release-AVX|Win32'">
+    <PlatformToolset>v140_xp</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Release-SSE2|x64'">
+    <PlatformToolset>v140_xp</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -92,27 +107,27 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>bin32\lib\</OutDir>
     <IntDir>build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
-    <TargetName>povfrontend32d</TargetName>
+    <TargetName>povparser32d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>bin64\lib\</OutDir>
     <IntDir>build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
-    <TargetName>povfrontend64d</TargetName>
+    <TargetName>povparser64d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>bin32\lib\</OutDir>
     <IntDir>build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
-    <TargetName>povfrontend32</TargetName>
+    <TargetName>povparser32</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>bin64\lib\</OutDir>
     <IntDir>build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
-    <TargetName>povfrontend64</TargetName>
+    <TargetName>povparser64</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-SSE2|Win32'">
     <OutDir>bin32\lib\</OutDir>
     <IntDir>build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
-    <TargetName>povfrontend32-sse2</TargetName>
+    <TargetName>povparser32-sse2</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-AVX|x64'">
     <OutDir>bin64\lib\</OutDir>
@@ -160,6 +175,7 @@
     </ResourceCompile>
     <Lib>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -244,6 +260,9 @@
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture>0x0409</Culture>
     </ResourceCompile>
+    <Lib>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Midl>
@@ -286,6 +305,9 @@
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture>0x0409</Culture>
     </ResourceCompile>
+    <Lib>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release-SSE2|Win32'">
     <Midl>
@@ -329,6 +351,9 @@
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture>0x0409</Culture>
     </ResourceCompile>
+    <Lib>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release-AVX|x64'">
     <Midl>
@@ -371,23 +396,22 @@
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture>0x0409</Culture>
     </ResourceCompile>
+    <Lib>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\source\frontend\animationprocessing.cpp" />
-    <ClCompile Include="..\..\source\frontend\console.cpp" />
-    <ClCompile Include="..\..\source\frontend\defaultplatformbase.cpp" />
-    <ClCompile Include="..\..\source\frontend\display.cpp" />
-    <ClCompile Include="..\..\source\frontend\filemessagehandler.cpp" />
-    <ClCompile Include="..\..\source\frontend\imagemessagehandler.cpp" />
-    <ClCompile Include="..\..\source\frontend\imageprocessing.cpp" />
-    <ClCompile Include="..\..\source\frontend\parsermessagehandler.cpp" />
-    <ClCompile Include="..\..\source\frontend\processoptions.cpp" />
-    <ClCompile Include="..\..\source\frontend\processrenderoptions.cpp" />
-    <ClCompile Include="..\..\source\frontend\renderfrontend.cpp" />
-    <ClCompile Include="..\..\source\frontend\rendermessagehandler.cpp" />
-    <ClCompile Include="..\..\source\frontend\shelloutprocessing.cpp" />
-    <ClCompile Include="..\..\source\povmain.cpp" />
-    <ClCompile Include="..\..\source\frontend\precomp.cpp">
+    <ClCompile Include="..\..\source\parser\fncode.cpp" />
+    <ClCompile Include="..\..\source\parser\parser.cpp" />
+    <ClCompile Include="..\..\source\parser\parser_expressions.cpp" />
+    <ClCompile Include="..\..\source\parser\parser_functions.cpp" />
+    <ClCompile Include="..\..\source\parser\parser_functions_utilities.cpp" />
+    <ClCompile Include="..\..\source\parser\parser_materials.cpp" />
+    <ClCompile Include="..\..\source\parser\parser_obj.cpp" />
+    <ClCompile Include="..\..\source\parser\parser_strings.cpp" />
+    <ClCompile Include="..\..\source\parser\parser_tokenizer.cpp" />
+    <ClCompile Include="..\..\source\parser\reservedwords.cpp" />
+    <ClCompile Include="..\..\source\parser\precomp.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -397,23 +421,12 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\source\frontend\animationprocessing.h" />
-    <ClInclude Include="..\..\source\frontend\configfrontend.h" />
-    <ClInclude Include="..\..\source\frontend\console.h" />
-    <ClInclude Include="..\..\source\frontend\defaultplatformbase.h" />
-    <ClInclude Include="..\..\source\frontend\display.h" />
-    <ClInclude Include="..\..\source\frontend\filemessagehandler.h" />
-    <ClInclude Include="..\..\source\frontend\imagemessagehandler.h" />
-    <ClInclude Include="..\..\source\frontend\imageprocessing.h" />
-    <ClInclude Include="..\..\source\frontend\parsermessagehandler.h" />
-    <ClInclude Include="..\..\source\frontend\processoptions.h" />
-    <ClInclude Include="..\..\source\frontend\processrenderoptions.h" />
-    <ClInclude Include="..\..\source\frontend\renderfrontend.h" />
-    <ClInclude Include="..\..\source\frontend\rendermessagehandler.h" />
-    <ClInclude Include="..\..\source\frontend\shelloutprocessing.h" />
-    <ClInclude Include="..\..\source\frontend\simplefrontend.h" />
-    <ClInclude Include="..\..\source\frontend\precomp.h" />
-    <ClInclude Include="..\povconfig\syspovconfigfrontend.h" />
+    <ClInclude Include="..\..\source\parser\fncode.h" />
+    <ClInclude Include="..\..\source\parser\parser.h" />
+    <ClInclude Include="..\..\source\parser\reservedwords.h" />
+    <ClInclude Include="..\..\source\parser\configparser.h" />
+    <ClInclude Include="..\..\source\parser\precomp.h" />
+    <ClInclude Include="..\povconfig\syspovconfigparser.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

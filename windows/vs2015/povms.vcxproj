@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -35,37 +35,50 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{7F9DA615-40A3-43A0-B8BB-528698DDE6E5}</ProjectGuid>
-    <RootNamespace>pov_core</RootNamespace>
+    <ProjectGuid>{B1E68128-84D7-4525-A3C1-E6C1077F2239}</ProjectGuid>
+    <WindowsTargetPlatformVersion>10.0.10586.0</WindowsTargetPlatformVersion>
+    <TargetUniversalCRTVersion>10.0.10586.0</TargetUniversalCRTVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
+    <PlatformToolset>v140_xp</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
+    <PlatformToolset>v140_xp</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v140_xp</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v140_xp</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-SSE2|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v140_xp</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-AVX|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v140_xp</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Release-AVX|Win32'">
+    <PlatformToolset>v140_xp</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Release-SSE2|x64'">
+    <PlatformToolset>v140_xp</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -93,27 +106,27 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>bin32\lib\</OutDir>
     <IntDir>build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
-    <TargetName>povcore32d</TargetName>
+    <TargetName>povms32d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>bin64\lib\</OutDir>
     <IntDir>build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
-    <TargetName>povcore64d</TargetName>
+    <TargetName>povms64d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>bin32\lib\</OutDir>
     <IntDir>build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
-    <TargetName>povcore32</TargetName>
+    <TargetName>povms32</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>bin64\lib\</OutDir>
     <IntDir>build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
-    <TargetName>povcore64</TargetName>
+    <TargetName>povms64</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-SSE2|Win32'">
     <OutDir>bin32\lib\</OutDir>
     <IntDir>build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
-    <TargetName>povcore32-sse2</TargetName>
+    <TargetName>povms32-sse2</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-AVX|x64'">
     <OutDir>bin64\lib\</OutDir>
@@ -133,8 +146,8 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>..\..\internal\windows;..\..\platform\x86;..\..\platform\windows;..\..\windows\povconfig;..\..\libraries\boost;..\..\vfe\win\;..\..\vfe\;..\..\source;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>$(PovBuildDefs)BOOST_ALL_NO_LIB;_DEBUG;WIN32;WIN32_LEAN_AND_MEAN;_WINDOWS;WINVER=0x0500;_WIN32_WINNT=0x0500;COMMONCTRL_VERSION=0x500;CLASSLIB_DEFS_H;NOMINMAX;ISOLATION_AWARE_ENABLED;_CRT_SECURE_NO_DEPRECATE;_HAS_ITERATOR_DEBUGGING=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\internal\windows;..\..\platform\x86;..\..\platform\windows;..\..\windows\povconfig;..\..\libraries\openexr\IlmImf;..\..\libraries\ilmbase\Half;..\..\libraries\ilmbase\Imath;..\..\libraries\ilmbase\Iex;..\..\libraries\boost;..\..\vfe\win;..\..\vfe;..\..\source;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>$(PovBuildDefs)BOOST_ALL_NO_LIB;NON_UNIX_OPENEXR_HEADERS;_DEBUG;WIN32;WIN32_LEAN_AND_MEAN;_WINDOWS;WINVER=0x0500;_WIN32_WINNT=0x0500;COMMONCTRL_VERSION=0x500;CLASSLIB_DEFS_H;NOMINMAX;ISOLATION_AWARE_ENABLED;_CRT_SECURE_NO_DEPRECATE;_HAS_ITERATOR_DEBUGGING=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>Sync</ExceptionHandling>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
@@ -161,7 +174,6 @@
     </ResourceCompile>
     <Lib>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -174,8 +186,8 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>..\..\internal\windows;..\..\platform\x86;..\..\platform\windows;..\..\windows\povconfig;..\..\libraries\boost;..\..\vfe\win\;..\..\vfe\;..\..\source;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>$(PovBuildDefs)BOOST_ALL_NO_LIB;_DEBUG;WIN32;WIN32_LEAN_AND_MEAN;_WINDOWS;CLASSLIB_DEFS_H;NOMINMAX;ISOLATION_AWARE_ENABLED;_CRT_SECURE_NO_DEPRECATE;_HAS_ITERATOR_DEBUGGING=0;BUILDING_AMD64=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\internal\windows;..\..\platform\x86;..\..\platform\windows;..\..\windows\povconfig;..\..\libraries\openexr\IlmImf;..\..\libraries\ilmbase\Half;..\..\libraries\ilmbase\Imath;..\..\libraries\ilmbase\Iex;..\..\libraries\boost;..\..\vfe\win;..\..\vfe;..\..\source;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>$(PovBuildDefs)BOOST_ALL_NO_LIB;NON_UNIX_OPENEXR_HEADERS;_DEBUG;WIN32;WIN32_LEAN_AND_MEAN;_WINDOWS;CLASSLIB_DEFS_H;NOMINMAX;ISOLATION_AWARE_ENABLED;_CRT_SECURE_NO_DEPRECATE;_HAS_ITERATOR_DEBUGGING=0;BUILDING_AMD64=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>Sync</ExceptionHandling>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
@@ -219,8 +231,8 @@
       <OmitFramePointers>false</OmitFramePointers>
       <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>..\..\internal\windows;..\..\platform\x86;..\..\platform\windows;..\..\windows\povconfig;..\..\libraries\boost;..\..\vfe\win\;..\..\vfe\;..\..\source;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>$(PovBuildDefs)BOOST_ALL_NO_LIB;NDEBUG;WIN32;WIN32_LEAN_AND_MEAN;_WINDOWS;COMMONCTRL_VERSION=0x500;CLASSLIB_DEFS_H;WINVER=0x0500;_WIN32_WINNT=0x0500;NOMINMAX;ISOLATION_AWARE_ENABLED;_CRT_SECURE_NO_DEPRECATE;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\internal\windows;..\..\platform\x86;..\..\platform\windows;..\..\windows\povconfig;..\..\libraries\openexr\IlmImf;..\..\libraries\ilmbase\Half;..\..\libraries\ilmbase\Imath;..\..\libraries\ilmbase\Iex;..\..\libraries\boost;..\..\vfe\win;..\..\vfe;..\..\source;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>$(PovBuildDefs)BOOST_ALL_NO_LIB;NON_UNIX_OPENEXR_HEADERS;NDEBUG;WIN32;WIN32_LEAN_AND_MEAN;_WINDOWS;COMMONCTRL_VERSION=0x500;CLASSLIB_DEFS_H;WINVER=0x0500;_WIN32_WINNT=0x0500;NOMINMAX;ISOLATION_AWARE_ENABLED;_CRT_SECURE_NO_DEPRECATE;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>Sync</ExceptionHandling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -246,9 +258,6 @@
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture>0x0409</Culture>
     </ResourceCompile>
-    <Lib>
-      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Midl>
@@ -264,8 +273,8 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>false</OmitFramePointers>
       <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
-      <AdditionalIncludeDirectories>..\..\internal\windows;..\..\platform\x86;..\..\platform\windows;..\..\windows\povconfig;..\..\libraries\boost;..\..\vfe\win\;..\..\vfe\;..\..\source;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>$(PovBuildDefs)BOOST_ALL_NO_LIB;NDEBUG;WIN32;WIN32_LEAN_AND_MEAN;_WINDOWS;CLASSLIB_DEFS_H;NOMINMAX;ISOLATION_AWARE_ENABLED;_CRT_SECURE_NO_DEPRECATE;_SECURE_SCL=0;BUILDING_AMD64=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\internal\windows;..\..\platform\x86;..\..\platform\windows;..\..\windows\povconfig;..\..\libraries\openexr\IlmImf;..\..\libraries\ilmbase\Half;..\..\libraries\ilmbase\Imath;..\..\libraries\ilmbase\Iex;..\..\libraries\boost;..\..\vfe\win;..\..\vfe;..\..\source;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>$(PovBuildDefs)BOOST_ALL_NO_LIB;NON_UNIX_OPENEXR_HEADERS;NDEBUG;WIN32;WIN32_LEAN_AND_MEAN;_WINDOWS;CLASSLIB_DEFS_H;NOMINMAX;ISOLATION_AWARE_ENABLED;_CRT_SECURE_NO_DEPRECATE;_SECURE_SCL=0;BUILDING_AMD64=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>Sync</ExceptionHandling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -291,9 +300,6 @@
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture>0x0409</Culture>
     </ResourceCompile>
-    <Lib>
-      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release-SSE2|Win32'">
     <Midl>
@@ -310,8 +316,8 @@
       <OmitFramePointers>false</OmitFramePointers>
       <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>..\..\internal\windows;..\..\platform\x86;..\..\platform\windows;..\..\windows\povconfig;..\..\libraries\boost;..\..\vfe\win\;..\..\vfe\;..\..\source;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>$(PovBuildDefs)BOOST_ALL_NO_LIB;NDEBUG;WIN32;WIN32_LEAN_AND_MEAN;_WINDOWS;COMMONCTRL_VERSION=0x500;CLASSLIB_DEFS_H;WINVER=0x0500;_WIN32_WINNT=0x0500;NOMINMAX;ISOLATION_AWARE_ENABLED;_CRT_SECURE_NO_DEPRECATE;_SECURE_SCL=0;BUILD_SSE2=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\internal\windows;..\..\platform\x86;..\..\platform\windows;..\..\windows\povconfig;..\..\libraries\openexr\IlmImf;..\..\libraries\ilmbase\Half;..\..\libraries\ilmbase\Imath;..\..\libraries\ilmbase\Iex;..\..\libraries\boost;..\..\vfe\win;..\..\vfe;..\..\source;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>$(PovBuildDefs)BOOST_ALL_NO_LIB;NON_UNIX_OPENEXR_HEADERS;NDEBUG;WIN32;WIN32_LEAN_AND_MEAN;_WINDOWS;COMMONCTRL_VERSION=0x500;CLASSLIB_DEFS_H;WINVER=0x0500;_WIN32_WINNT=0x0500;NOMINMAX;ISOLATION_AWARE_ENABLED;_CRT_SECURE_NO_DEPRECATE;_SECURE_SCL=0;BUILD_SSE2=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>Sync</ExceptionHandling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -337,9 +343,6 @@
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture>0x0409</Culture>
     </ResourceCompile>
-    <Lib>
-      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release-AVX|x64'">
     <Midl>
@@ -355,8 +358,8 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>false</OmitFramePointers>
       <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
-      <AdditionalIncludeDirectories>..\..\internal\windows;..\..\platform\x86;..\..\platform\windows;..\..\windows\povconfig;..\..\libraries\boost;..\..\vfe\win\;..\..\vfe\;..\..\source;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>$(PovBuildDefs)BOOST_ALL_NO_LIB;NDEBUG;WIN32;WIN32_LEAN_AND_MEAN;_WINDOWS;CLASSLIB_DEFS_H;NOMINMAX;ISOLATION_AWARE_ENABLED;_CRT_SECURE_NO_DEPRECATE;_SECURE_SCL=0;BUILDING_AMD64=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\internal\windows;..\..\platform\x86;..\..\platform\windows;..\..\windows\povconfig;..\..\libraries\openexr\IlmImf;..\..\libraries\ilmbase\Half;..\..\libraries\ilmbase\Imath;..\..\libraries\ilmbase\Iex;..\..\libraries\boost;..\..\vfe\win;..\..\vfe;..\..\source;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>$(PovBuildDefs)BOOST_ALL_NO_LIB;NON_UNIX_OPENEXR_HEADERS;NDEBUG;WIN32;WIN32_LEAN_AND_MEAN;_WINDOWS;CLASSLIB_DEFS_H;NOMINMAX;ISOLATION_AWARE_ENABLED;_CRT_SECURE_NO_DEPRECATE;_SECURE_SCL=0;BUILDING_AMD64=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>Sync</ExceptionHandling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -382,78 +385,20 @@
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture>0x0409</Culture>
     </ResourceCompile>
-    <Lib>
-      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-    </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\source\core\bounding\bounding.cpp" />
-    <ClCompile Include="..\..\source\core\bounding\boundingbox.cpp" />
-    <ClCompile Include="..\..\source\core\bounding\boundingcylinder.cpp" />
-    <ClCompile Include="..\..\source\core\bounding\boundingsphere.cpp" />
-    <ClCompile Include="..\..\source\core\bounding\bsptree.cpp" />
-    <ClCompile Include="..\..\source\core\colour\spectral.cpp" />
-    <ClCompile Include="..\..\source\core\lighting\lightgroup.cpp" />
-    <ClCompile Include="..\..\source\core\lighting\lightsource.cpp" />
-    <ClCompile Include="..\..\source\core\lighting\photons.cpp" />
-    <ClCompile Include="..\..\source\core\lighting\radiosity.cpp" />
-    <ClCompile Include="..\..\source\core\lighting\subsurface.cpp" />
-    <ClCompile Include="..\..\source\core\material\blendmap.cpp" />
-    <ClCompile Include="..\..\source\core\material\interior.cpp" />
-    <ClCompile Include="..\..\source\core\material\media.cpp" />
-    <ClCompile Include="..\..\source\core\material\pattern.cpp" />
-    <ClCompile Include="..\..\source\core\material\warp.cpp" />
-    <ClCompile Include="..\..\source\core\material\normal.cpp" />
-    <ClCompile Include="..\..\source\core\material\pigment.cpp" />
-    <ClCompile Include="..\..\source\core\material\texture.cpp" />
-    <ClCompile Include="..\..\source\core\math\chi2.cpp" />
-    <ClCompile Include="..\..\source\core\math\hypercomplex.cpp" />
-    <ClCompile Include="..\..\source\core\math\jitter.cpp" />
-    <ClCompile Include="..\..\source\core\math\matrix.cpp" />
-    <ClCompile Include="..\..\source\core\math\polynomialsolver.cpp" />
-    <ClCompile Include="..\..\source\core\math\quaternion.cpp" />
-    <ClCompile Include="..\..\source\core\math\randcosweighted.cpp" />
-    <ClCompile Include="..\..\source\core\math\randomsequence.cpp" />
-    <ClCompile Include="..\..\source\core\math\spline.cpp" />
-    <ClCompile Include="..\..\source\core\render\ray.cpp" />
-    <ClCompile Include="..\..\source\core\render\trace.cpp" />
-    <ClCompile Include="..\..\source\core\render\tracepixel.cpp" />
-    <ClCompile Include="..\..\source\core\scene\atmosphere.cpp" />
-    <ClCompile Include="..\..\source\core\scene\camera.cpp" />
-    <ClCompile Include="..\..\source\core\scene\object.cpp" />
-    <ClCompile Include="..\..\source\core\scene\scenedata.cpp" />
-    <ClCompile Include="..\..\source\core\scene\tracethreaddata.cpp" />
-    <ClCompile Include="..\..\source\core\shape\bezier.cpp" />
-    <ClCompile Include="..\..\source\core\shape\blob.cpp" />
-    <ClCompile Include="..\..\source\core\shape\box.cpp" />
-    <ClCompile Include="..\..\source\core\shape\cone.cpp" />
-    <ClCompile Include="..\..\source\core\shape\csg.cpp" />
-    <ClCompile Include="..\..\source\core\shape\disc.cpp" />
-    <ClCompile Include="..\..\source\core\shape\parametric.cpp" />
-    <ClCompile Include="..\..\source\core\shape\fractal.cpp" />
-    <ClCompile Include="..\..\source\core\shape\heightfield.cpp" />
-    <ClCompile Include="..\..\source\core\shape\isosurface.cpp" />
-    <ClCompile Include="..\..\source\core\shape\lathe.cpp" />
-    <ClCompile Include="..\..\source\core\shape\lemon.cpp" />
-    <ClCompile Include="..\..\source\core\shape\mesh.cpp" />
-    <ClCompile Include="..\..\source\core\shape\ovus.cpp" />
-    <ClCompile Include="..\..\source\core\shape\plane.cpp" />
-    <ClCompile Include="..\..\source\core\shape\polynomial.cpp" />
-    <ClCompile Include="..\..\source\core\shape\polygon.cpp" />
-    <ClCompile Include="..\..\source\core\shape\prism.cpp" />
-    <ClCompile Include="..\..\source\core\shape\quadric.cpp" />
-    <ClCompile Include="..\..\source\core\shape\sor.cpp" />
-    <ClCompile Include="..\..\source\core\shape\sphere.cpp" />
-    <ClCompile Include="..\..\source\core\shape\spheresweep.cpp" />
-    <ClCompile Include="..\..\source\core\shape\superellipsoid.cpp" />
-    <ClCompile Include="..\..\source\core\shape\torus.cpp" />
-    <ClCompile Include="..\..\source\core\shape\triangle.cpp" />
-    <ClCompile Include="..\..\source\core\shape\truetype.cpp" />
-    <ClCompile Include="..\..\source\core\support\imageutil.cpp" />
-    <ClCompile Include="..\..\source\core\support\octree.cpp" />
-    <ClCompile Include="..\..\source\core\support\statisticids.cpp" />
-    <ClCompile Include="..\..\source\core\support\statistics.cpp" />
-    <ClCompile Include="..\..\source\core\precomp.cpp">
+    <ClCompile Include="..\..\source\povms\povms.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release-SSE2|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release-AVX|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\source\povms\povms.cpp" />
+    <ClCompile Include="..\..\source\povms\povmscpp.cpp" />
+    <ClCompile Include="..\..\source\povms\povmsutil.cpp" />
+    <ClCompile Include="..\..\source\povms\precomp.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -463,78 +408,13 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\source\core\bounding\bounding.h" />
-    <ClInclude Include="..\..\source\core\bounding\boundingbox.h" />
-    <ClInclude Include="..\..\source\core\bounding\boundingcylinder.h" />
-    <ClInclude Include="..\..\source\core\bounding\boundingsphere.h" />
-    <ClInclude Include="..\..\source\core\bounding\bsptree.h" />
-    <ClInclude Include="..\..\source\core\colour\spectral.h" />
-    <ClInclude Include="..\..\source\core\configcore.h" />
-    <ClInclude Include="..\..\source\core\coretypes.h" />
-    <ClInclude Include="..\..\source\core\lighting\lightgroup.h" />
-    <ClInclude Include="..\..\source\core\lighting\lightsource.h" />
-    <ClInclude Include="..\..\source\core\lighting\photons.h" />
-    <ClInclude Include="..\..\source\core\lighting\radiosity.h" />
-    <ClInclude Include="..\..\source\core\lighting\subsurface.h" />
-    <ClInclude Include="..\..\source\core\material\blendmap.h" />
-    <ClInclude Include="..\..\source\core\material\interior.h" />
-    <ClInclude Include="..\..\source\core\material\media.h" />
-    <ClInclude Include="..\..\source\core\material\pattern.h" />
-    <ClInclude Include="..\..\source\core\material\warp.h" />
-    <ClInclude Include="..\..\source\core\material\normal.h" />
-    <ClInclude Include="..\..\source\core\material\pigment.h" />
-    <ClInclude Include="..\..\source\core\material\texture.h" />
-    <ClInclude Include="..\..\source\core\math\chi2.h" />
-    <ClInclude Include="..\..\source\core\math\hypercomplex.h" />
-    <ClInclude Include="..\..\source\core\math\jitter.h" />
-    <ClInclude Include="..\..\source\core\math\matrix.h" />
-    <ClInclude Include="..\..\source\core\math\polynomialsolver.h" />
-    <ClInclude Include="..\..\source\core\math\quaternion.h" />
-    <ClInclude Include="..\..\source\core\math\randcosweighted.h" />
-    <ClInclude Include="..\..\source\core\math\randomsequence.h" />
-    <ClInclude Include="..\..\source\core\math\spline.h" />
-    <ClInclude Include="..\..\source\core\math\vector.h" />
-    <ClInclude Include="..\..\source\core\render\ray.h" />
-    <ClInclude Include="..\..\source\core\render\trace.h" />
-    <ClInclude Include="..\..\source\core\render\tracepixel.h" />
-    <ClInclude Include="..\..\source\core\scene\atmosphere.h" />
-    <ClInclude Include="..\..\source\core\scene\camera.h" />
-    <ClInclude Include="..\..\source\core\scene\object.h" />
-    <ClInclude Include="..\..\source\core\scene\scenedata.h" />
-    <ClInclude Include="..\..\source\core\scene\tracethreaddata.h" />
-    <ClInclude Include="..\..\source\core\shape\bezier.h" />
-    <ClInclude Include="..\..\source\core\shape\blob.h" />
-    <ClInclude Include="..\..\source\core\shape\box.h" />
-    <ClInclude Include="..\..\source\core\shape\cone.h" />
-    <ClInclude Include="..\..\source\core\shape\csg.h" />
-    <ClInclude Include="..\..\source\core\shape\disc.h" />
-    <ClInclude Include="..\..\source\core\shape\parametric.h" />
-    <ClInclude Include="..\..\source\core\shape\fractal.h" />
-    <ClInclude Include="..\..\source\core\shape\heightfield.h" />
-    <ClInclude Include="..\..\source\core\shape\isosurface.h" />
-    <ClInclude Include="..\..\source\core\shape\lathe.h" />
-    <ClInclude Include="..\..\source\core\shape\lemon.h" />
-    <ClInclude Include="..\..\source\core\shape\mesh.h" />
-    <ClInclude Include="..\..\source\core\shape\ovus.h" />
-    <ClInclude Include="..\..\source\core\shape\plane.h" />
-    <ClInclude Include="..\..\source\core\shape\polynomial.h" />
-    <ClInclude Include="..\..\source\core\shape\polygon.h" />
-    <ClInclude Include="..\..\source\core\shape\prism.h" />
-    <ClInclude Include="..\..\source\core\shape\quadric.h" />
-    <ClInclude Include="..\..\source\core\shape\sor.h" />
-    <ClInclude Include="..\..\source\core\shape\sphere.h" />
-    <ClInclude Include="..\..\source\core\shape\spheresweep.h" />
-    <ClInclude Include="..\..\source\core\shape\superellipsoid.h" />
-    <ClInclude Include="..\..\source\core\shape\torus.h" />
-    <ClInclude Include="..\..\source\core\shape\triangle.h" />
-    <ClInclude Include="..\..\source\core\shape\truetype.h" />
-    <ClInclude Include="..\..\source\core\support\imageutil.h" />
-    <ClInclude Include="..\..\source\core\support\octree.h" />
-    <ClInclude Include="..\..\source\core\support\simplevector.h" />
-    <ClInclude Include="..\..\source\core\support\statisticids.h" />
-    <ClInclude Include="..\..\source\core\support\statistics.h" />
-    <ClInclude Include="..\..\source\core\precomp.h" />
-    <ClInclude Include="..\povconfig\syspovconfigcore.h" />
+    <ClInclude Include="..\..\source\povms\configpovms.h" />
+    <ClInclude Include="..\..\source\povms\povms.h" />
+    <ClInclude Include="..\..\source\povms\povmscpp.h" />
+    <ClInclude Include="..\..\source\povms\povmsid.h" />
+    <ClInclude Include="..\..\source\povms\povmsutil.h" />
+    <ClInclude Include="..\..\source\povms\precomp.h" />
+    <ClInclude Include="..\povconfig\syspovconfigpovms.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

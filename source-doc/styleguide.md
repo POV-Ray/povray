@@ -42,7 +42,7 @@ POV-Ray is being developed with portability high in mind. In practice and at pre
     @note
         Other C++11 features may be added to the above list upon request if a reasonable case can be made in their
         favour. Note however that at present we will only consider features that have been supported by GCC as early as
-        version 4.6, by Clang as early as version 4.2, and by MSVC as early as version 10 (Visual Studio 2010).
+        version 4.6, by Clang as early as version 4.2, and by MSVC as early as version 14 (Visual Studio 2015).
 
   - Source code should avoid potential conflicts with later standard extensions to the C++ language, most notably
     ISO-IEC DTR 19768 (aka TR1) and ISO-IEC 14882-2011 (aka C++11).

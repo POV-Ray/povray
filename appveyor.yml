@@ -19,25 +19,19 @@ environment:
     platform: x64
     bin_dir: bin64
     artifact_suffix: -Win64
-    PlatformToolset: v140
   - configuration: Release-SSE2
     platform: Win32
     bin_dir: bin32
     artifact_suffix: -Win32-sse2
-    PlatformToolset: v140
   - configuration: Release
     platform: Win32
     bin_dir: bin32
     artifact_suffix: -Win32
-    PlatformToolset: v140
 
 before_build:
-- ps: |
-    $env:devenv = $env:VS140COMNTOOLS + '\..\IDE\devenv'
-    & $env:devenv windows\vs10\povray.sln /upgrade
 
 build:
-  project: windows/vs10/povray.sln
+  project: windows/vs2015/povray.sln
   parallel: true
   verbosity: minimal
 

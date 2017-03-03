@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Release|Win32">
       <Configuration>Release</Configuration>
@@ -11,19 +11,23 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{39C65232-04FB-4622-8283-34829739887C}</ProjectGuid>
+    <ProjectGuid>{9801D5FF-C1E0-46C5-A73E-47DEECE99DDB}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>eLut</RootNamespace>
-    <ProjectName>OpenEXR IlmBase Half eLut</ProjectName>
+    <RootNamespace>toFloat</RootNamespace>
+    <ProjectName>OpenEXR IlmBase Half toFloat</ProjectName>
+    <WindowsTargetPlatformVersion>10.0.10586.0</WindowsTargetPlatformVersion>
+    <TargetUniversalCRTVersion>10.0.10586.0</TargetUniversalCRTVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140_xp</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140_xp</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -38,14 +42,14 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>build\$(ProjectName)\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
-    <TargetName>eLut</TargetName>
+    <TargetName>toFloat</TargetName>
     <TargetExt>.exe</TargetExt>
     <CustomBuildAfterTargets>Link</CustomBuildAfterTargets>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>build\$(ProjectName)\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
-    <TargetName>eLut</TargetName>
+    <TargetName>toFloat</TargetName>
     <TargetExt>.exe</TargetExt>
     <CustomBuildAfterTargets>Link</CustomBuildAfterTargets>
   </PropertyGroup>
@@ -57,11 +61,11 @@
       <SubSystem>Console</SubSystem>
     </Link>
     <CustomBuildStep>
-      <Command>"$(TargetPath)" &gt; ..\..\libraries\ilmbase\Half\eLut.h</Command>
+      <Command>"$(TargetPath)" &gt; ..\..\libraries\ilmbase\Half\toFloat.h</Command>
     </CustomBuildStep>
     <CustomBuildStep>
-      <Outputs>..\..\libraries\ilmbase\Half\eLut.h</Outputs>
-      <Message>Generating eLut.h...</Message>
+      <Outputs>..\..\libraries\ilmbase\Half\toFloat.h</Outputs>
+      <Message>Generating toFloat.h...</Message>
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -72,15 +76,15 @@
       <SubSystem>Console</SubSystem>
     </Link>
     <CustomBuildStep>
-      <Command>"$(TargetPath)" &gt; ..\..\libraries\ilmbase\Half\eLut.h</Command>
+      <Command>"$(TargetPath)" &gt; ..\..\libraries\ilmbase\Half\toFloat.h</Command>
     </CustomBuildStep>
     <CustomBuildStep>
-      <Outputs>..\..\libraries\ilmbase\Half\eLut.h</Outputs>
-      <Message>Generating eLut.h...</Message>
+      <Outputs>..\..\libraries\ilmbase\Half\toFloat.h</Outputs>
+      <Message>Generating toFloat.h...</Message>
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\libraries\ilmbase\Half\eLut.cpp" />
+    <ClCompile Include="..\..\libraries\ilmbase\Half\toFloat.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
