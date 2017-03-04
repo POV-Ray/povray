@@ -30,6 +30,14 @@ Notes:
 POV-Ray v3.7.1-TBD
 ------------------------------------------------------------------------------
 
+Commit 5e34fd0 on 2017-03-04 by Christoph Lipka
+
+    Upgrade Visual Studio project files from VS 2010 to VS 2015.
+
+Commit 9cc7117 on 2017-02-27 by Christoph Lipka
+
+    Replace Windows plaintext and HTML "readme" files with a Markdown file.
+
 Commit d4cea4d on 2017-02-27 by Christoph Lipka
 
     Fix GitHub issue #241, as well as Windows console version related error
