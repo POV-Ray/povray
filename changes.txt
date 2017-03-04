@@ -24,7 +24,7 @@ should be located in the same directory as this file is.
 ------------------------------------------------------------------------------
 
 
-Changes between 3.7.1-beta.3 and 3.7.1-TBD
+Changes between 3.7.1-beta.3 and 3.7.1-beta.4
 =============================================
 
 The focus of this version has been on fixing bugs.
