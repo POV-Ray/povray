@@ -30,6 +30,10 @@ Notes:
 POV-Ray v3.7.1-beta.4
 ------------------------------------------------------------------------------
 
+Commit dc1a27c on 2017-03-04 by Christoph Lipka
+
+    Bump version number.
+
 Commit 6eb1d94 on 2017-03-04 by Christoph Lipka
 
     Fix SSE2 support detection on Windows XP.

@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -1580,8 +1580,7 @@ GenericFunctionContextPtr FunctionVM::CustomFunction::AcquireContext(TraceThread
         pContext = new FPUContext(mpVm.get(), pThreadData);
     else
     {
-        pContext = dynamic_cast<FPUContext*>(pThreadData->functionContextPool.back());
-        POV_VM_ASSERT (pContext != NULL);
+        pContext = GetFPUContextPtr(pThreadData->functionContextPool.back());
         pThreadData->functionContextPool.pop_back();
     }
     return pContext;
@@ -1589,30 +1588,26 @@ GenericFunctionContextPtr FunctionVM::CustomFunction::AcquireContext(TraceThread
 
 void FunctionVM::CustomFunction::ReleaseContext(GenericFunctionContextPtr pGenericContext)
 {
-    FPUContext* pContext = dynamic_cast<FPUContext*>(pGenericContext);
-    POV_VM_ASSERT (pContext != NULL);
+    FPUContext* pContext = GetFPUContextPtr(pGenericContext);
     POV_VM_ASSERT (pContext->threaddata != NULL);
     pContext->threaddata->functionContextPool.push_back (pContext);
 }
 
 void FunctionVM::CustomFunction::InitArguments(GenericFunctionContextPtr pGenericContext)
 {
-    FPUContext* pContext = dynamic_cast<FPUContext*>(pGenericContext);
-    POV_VM_ASSERT (pContext != NULL);
+    FPUContext* pContext = GetFPUContextPtr(pGenericContext);
     pContext->nextArgument = 0;
 }
 
 void FunctionVM::CustomFunction::PushArgument(GenericFunctionContextPtr pGenericContext, DBL arg)
 {
-    FPUContext* pContext = dynamic_cast<FPUContext*>(pGenericContext);
-    POV_VM_ASSERT (pContext != NULL);
+    FPUContext* pContext = GetFPUContextPtr(pGenericContext);
     pContext->SetLocal (pContext->nextArgument++, arg);
 }
 
 DBL FunctionVM::CustomFunction::Execute(GenericFunctionContextPtr pGenericContext)
 {
-    FPUContext* pContext = dynamic_cast<FPUContext*>(pGenericContext);
-    POV_VM_ASSERT (pContext != NULL);
+    FPUContext* pContext = GetFPUContextPtr(pGenericContext);
     return POVFPU_Run (pContext, *mpFn);
 }
 
@@ -1624,6 +1619,17 @@ GenericScalarFunctionPtr FunctionVM::CustomFunction::Clone() const
 const SourceInfo* FunctionVM::CustomFunction::GetSourceInfo() const
 {
     return &(mpVm->GetFunction(*mpFn)->sourceInfo);
+}
+
+inline FPUContext* FunctionVM::CustomFunction::GetFPUContextPtr(GenericFunctionContextPtr pGenericContext)
+{
+#if POV_VM_DEBUG
+    FPUContext* pContext = dynamic_cast<FPUContext*>(pGenericContext);
+    POV_VM_ASSERT(pContext != NULL);
+    return pContext;
+#else
+    return static_cast<FPUContext*>(pGenericContext);
+#endif
 }
 
 GenericFunctionContextPtr FunctionVM::CreateFunctionContext(TraceThreadData* pTd)

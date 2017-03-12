@@ -24,10 +24,19 @@ should be located in the same directory as this file is.
 ------------------------------------------------------------------------------
 
 
+Changes between 3.7.1-beta.4 and 3.7.1-beta.5
+=============================================
+
+Miscellaneous:
+
+  - Restored user-defined function VM performance roughly back to levels of
+    3.7.0.
+
+
 Changes between 3.7.1-beta.3 and 3.7.1-beta.4
 =============================================
 
-The focus of this version has been on fixing bugs.
+The focus of this version's source code changes has been on fixing bugs.
 
 Fixed or Mitigated Bugs
 -----------------------
