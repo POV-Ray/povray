@@ -1,7 +1,7 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25420.1
-MinimumVisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 14.0.23107.0
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Image Libraries", "Image Libraries", "{4178148C-8A0C-4EB0-ACD9-0E09676F2700}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Generic POV-Ray", "Generic POV-Ray", "{5319B36D-2906-4EAF-B623-B7C04F3CC2AD}"

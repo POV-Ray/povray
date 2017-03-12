@@ -52,8 +52,7 @@ Visual Studio 2015
 Currently the only officially supported means of building the Windows
 version of POV-Ray is via the provided Visual Studio 2015 solution.
 
-You will need at least Visual Studio 2015 Update 1 (Community Edition
-will suffice), and have the "Windows XP Support for C++" feature installed.
+You will need Visual Studio 2015 (Community Edition will suffice) or later.
 
 Earlier Versions of Visual Studio
 ---------------------------------
@@ -159,6 +158,50 @@ how hard we try to get rid of them.
 Please read the rest of this document while you're waiting for your
 compile to finish, particularly the 'other things you may want to keep
 in mind' at the end.
+
+
+Building for Legacy Windows Versions
+------------------------------------
+
+By default, binaries generated with Visual Studio 2015 will only run on
+Windows Vista or later. Visual Studio 2015 can be used to generate binaries
+compatible with Windows versions as early as Windows XP (SP3 required),
+but the procedure is a bit tricky, and the following description is therefore
+aimed at people with in-depth knowledge of Visual Studio and its toolchain.
+
+You will need Visual Studio 2015 (again Community Edition will suffice)
+_Update 1_ or later, with the following optional features installed:
+
+-   Programming Languages / Visual C++ / Windows XP Support for C++
+-   Windows and Web Development / Universal Windows App Development Tools /
+    Windows 10 SDK (10.0.10586)
+
+(Later Windows 10 SDKs may also work, but will require you to modify the
+settings shown below accordingly.)
+
+To enable XP compatibility, you will have to either edit or override the
+following properties in _all_ Visual Studio project files:
+
+-   `PlatformToolset` must be set to `v140_xp`.
+-   `TargetUniversalCRTVersion` must be set to `10.0.10568.0`.
+
+The latter is the tricky part, as the property cannot be accessed via
+the IDE, and while there are multiple approaches to achieve this (e.g.
+via a user property file, or by manually editing the default in
+`%ProgramFiles(x86)%\MSBuild\Microsoft.Cpp\v4.0\V140\Microsoft.Cpp.Common.props`)
+we highly recommend running the build from the command line using the
+`msbuild.exe` command-line tool, making use of its `/p:` command-line
+option to override the properties in question.
+
+For details on the use of the command-line build tool, please consult
+Microsoft's official documentation.
+
+**Attention:** Failure to override the `TargetUniversalCRTVersion` property
+will result in binaries that _appear_ to be XP-compatible at first glance,
+but exhibit erroneous behaviour due to a bug in the UCRT library used
+by default (10.0.10240.0). Telltale symptoms will be POV-Ray resetting the
+master `povray.ini` back to its defaults, and complaining that it can't find
+`colors.inc`, each time it is started.
 
 
 About the Editor DLL's
