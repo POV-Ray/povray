@@ -221,6 +221,12 @@ AC_DEFINE_UNQUOTED([COMPILER_VERSION], ["$pov_compiler_version"], [Compiler vers
 AC_DEFINE_UNQUOTED([POV_COMPILER_INFO], ["$pov_compiler_version @ $build"], [Compiler version (processed).])
 
 
+# Not necessary when AM_MAINTAINER_MODE is called above.
+###AC_PROG_MAKE_SET
+
+AC_PROG_RANLIB
+
+
 AC_MSG_CHECKING([for stat format option])
 echo "trying stat --format='%u,%g' ." >>config.log
 if stat --format='%u,%g' . >>config.log 2>>config.log && test x`stat --format=Foo .` = x"Foo"; then
@@ -234,12 +240,6 @@ else
   fi
 fi
 AC_MSG_RESULT([$stat_format])
-
-
-# Not necessary when AM_MAINTAINER_MODE is called above.
-###AC_PROG_MAKE_SET
-
-AC_PROG_RANLIB
 
 
 ###############################################################################
