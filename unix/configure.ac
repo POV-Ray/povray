@@ -224,11 +224,11 @@ AC_DEFINE_UNQUOTED([POV_COMPILER_INFO], ["$pov_compiler_version @ $build"], [Com
 AC_MSG_CHECKING([for stat format option])
 echo "trying stat --format='%u,%g' ." >>config.log
 if stat --format='%u,%g' . >>config.log 2>>config.log && test x`stat --format=Foo .` = x"Foo"; then
-  $stat_format="--format="
+  stat_format="--format="
 else
   echo "trying stat --f '%u,%g' ." >>config.log
   if stat -f '%u,%g' . >>config.log 2>>config.log && test x`stat -f Foo .` = x"Foo"; then
-    $stat_format="-f "
+    stat_format="-f "
   else
     AC_MSG_FAILURE([stat command does not behave as required])
   fi
