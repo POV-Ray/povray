@@ -221,6 +221,20 @@ AC_DEFINE_UNQUOTED([COMPILER_VERSION], ["$pov_compiler_version"], [Compiler vers
 AC_DEFINE_UNQUOTED([POV_COMPILER_INFO], ["$pov_compiler_version @ $build"], [Compiler version (processed).])
 
 
+AC_MSG_CHECKING([for stat format option])
+echo "trying stat --format='%u,%g' ." >>config.log
+if stat --format='%u,%g' . >>config.log 2>>config.log && test x`stat --format=Foo .` = x"Foo"; then
+  $stat_format="--format="
+else
+  echo "trying stat --f '%u,%g' ." >>config.log
+  if stat -f '%u,%g' . >>config.log 2>>config.log && test x`stat -f Foo .` = x"Foo"; then
+    $stat_format="-f "
+  else
+    AC_MSG_FAILURE([stat command does not behave as required])
+  fi
+fi
+AC_MSG_RESULT([$stat_format])
+
 
 # Not necessary when AM_MAINTAINER_MODE is called above.
 ###AC_PROG_MAKE_SET
@@ -1266,8 +1280,8 @@ AC_DEFINE_UNQUOTED([BUILTIN_XWIN_DISPLAY], ["$pov_xwin_msg"], [X Window display.
 AC_DEFINE_UNQUOTED([BUILTIN_IMG_FORMATS], ["$pov_img_fmt_builtin $pov_img_fmt_enabled"], [Supported image formats.])
 AC_DEFINE_UNQUOTED([MISSING_IMG_FORMATS], ["$pov_img_fmt_disabled"], [Unsupported image formats.])
 
-povowner=`stat --format=%u ${HOME} || stat -f %u ${HOME}`
-povgroup=`stat --format=%g ${HOME} || stat -f %g ${HOME}`
+povowner=`stat ${stat_format}%u ${HOME}`
+povgroup=`stat ${stat_format}%g ${HOME}`
 AC_SUBST([povowner])
 AC_SUBST([povgroup])
 
