@@ -119,26 +119,7 @@ static inline __m256d permute4x64_functional(const __m256d& x, int i)
 namespace pov
 {
 
-class OptimizedNoiseAVX : public OptimizedNoiseBase
-{
-public:
-    OptimizedNoiseAVX();
-    virtual DBL Noise(const Vector3d& EPoint, int noise_generator) const;
-    virtual void DNoise(Vector3d& result, const Vector3d& EPoint) const;
-    virtual const char* Name() const { return "AVX Noise"; }
-private:
-    static bool initialized;
-};
 
-bool OptimizedNoiseAVX::initialized = false;
-
-OptimizedNoiseBase* GetOptimizedNoiseAVX()
-{
-    if (HaveAVX())
-        return new OptimizedNoiseAVX();
-    else
-        return NULL;
-}
 
 
 extern DBL RTable[];
@@ -159,15 +140,6 @@ void AVXNoiseInit()
         avxtable[(4 * i) + 2] = RTable[2 * i + 4];
         avxtable[(4 * i) + 3] = RTable[2 * i + 6];
 #endif
-    }
-}
-
-OptimizedNoiseAVX::OptimizedNoiseAVX()
-{
-    if (!initialized)
-    {
-        AVXNoiseInit();
-        initialized = true;
     }
 }
 

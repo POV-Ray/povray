@@ -46,23 +46,66 @@
 namespace pov
 {
 
+//******************************************************************************
+
+#ifdef TRY_OPTIMIZED_NOISE_AVX2FMA3
+
+bool OptimizedNoiseAVX2FMA3::initialized = false;
+
+OptimizedNoiseAVX2FMA3::OptimizedNoiseAVX2FMA3()
+{
+    if (!initialized)
+    {
+        AVX2FMA3NoiseInit();
+        initialized = true;
+    }
+}
+
+#endif
+
+//******************************************************************************
+
+#ifdef TRY_OPTIMIZED_NOISE_AVXFMA4
+
+// no special code
+
+#endif
+
+//******************************************************************************
+
+#ifdef TRY_OPTIMIZED_NOISE_AVX
+
+bool OptimizedNoiseAVX::initialized = false;
+
+OptimizedNoiseAVX::OptimizedNoiseAVX()
+{
+    if (!initialized)
+    {
+        AVXNoiseInit();
+        initialized = true;
+    }
+}
+
+#endif
+
+//******************************************************************************
+
 OptimizedNoiseBase* GetOptimizedNoise()
 {
-    OptimizedNoiseBase* noise = NULL;
     // TODO - review priority
 #ifdef TRY_OPTIMIZED_NOISE_AVX2FMA3
-    if (!noise)
-        noise = GetOptimizedNoiseAVX2FMA3();
+    if (HaveAVX2FMA3())
+        return new OptimizedNoiseAVX2FMA3();
 #endif
 #ifdef TRY_OPTIMIZED_NOISE_AVXFMA4
-    if (!noise)
-        noise = GetOptimizedNoiseAVXFMA4();
+    if (HaveAVXFMA4())
+        return new OptimizedNoiseAVXFMA4();
 #endif
 #ifdef TRY_OPTIMIZED_NOISE_AVX
-    if (!noise)
-        noise = GetOptimizedNoiseAVX();
+    if (HaveAVX())
+        return new OptimizedNoiseAVX();
 #endif
-    return noise;
+    return NULL;
 }
 
 }

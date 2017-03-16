@@ -45,9 +45,9 @@
 namespace pov
 {
 
-/// Get optimized noise functions using AVX instructions.
+/// Initialize optimized noise generator using AVX instructions.
 /// @author Optimized by Intel
-OptimizedNoiseBase* GetOptimizedNoiseAVX();
+void AVXNoiseInit();
 
 }
 

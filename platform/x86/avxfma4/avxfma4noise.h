@@ -45,9 +45,7 @@
 namespace pov
 {
 
-/// Get optimized noise functions using AVX and FMA4 instructions.
-/// @author Optimized by AMD
-OptimizedNoiseBase* GetOptimizedNoiseAVXFMA4();
+// no declarations here
 
 }
 

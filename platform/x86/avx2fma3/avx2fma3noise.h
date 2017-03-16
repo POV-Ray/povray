@@ -45,9 +45,9 @@
 namespace pov
 {
 
-/// Get optimized noise functions using AVX2 and FMA3 instructions.
+/// Initialize optimized noise generator using AVX2 and FMA3 instructions.
 /// @author Optimized by Intel
-OptimizedNoiseBase* GetOptimizedNoiseAVX2FMA3();
+void AVX2FMA3NoiseInit();
 
 }
 

@@ -59,24 +59,6 @@
 namespace pov
 {
 
-class OptimizedNoiseAVXFMA4 : public OptimizedNoiseBase
-{
-public:
-    virtual DBL Noise(const Vector3d& EPoint, int noise_generator) const;
-    virtual void DNoise(Vector3d& result, const Vector3d& EPoint) const;
-    virtual const char* Name() const { return "AVX/FMA4 Noise"; }
-private:
-    static bool initialized;
-};
-
-OptimizedNoiseBase* GetOptimizedNoiseAVXFMA4()
-{
-    if (HaveAVXFMA4())
-        return new OptimizedNoiseAVXFMA4();
-    else
-        return NULL;
-}
-
 extern DBL RTable[];
 
 /*****************************************************************************
