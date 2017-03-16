@@ -1,9 +1,9 @@
 //******************************************************************************
 ///
-/// @file platform/x86/optimizednoise.h
+/// @file platform/x86/avx/avxnoise.h
 ///
-/// This file dispatches to declarations related to implementations of the noise
-/// generator optimized for various specific extended x86 instruction set.
+/// This file contains declarations related to implementations of the noise
+/// generator optimized for the AVX instruction set.
 ///
 /// @copyright
 /// @parblock
@@ -34,22 +34,23 @@
 ///
 //******************************************************************************
 
-#ifndef POVRAY_OPTIMIZEDNOISE_H
-#define POVRAY_OPTIMIZEDNOISE_H
+#ifndef POVRAY_AVXNOISE_H
+#define POVRAY_AVXNOISE_H
 
 #include "syspovconfigcore.h"
-
 #include "core/material/texture.h"
 
-#ifdef TRY_OPTIMIZED_NOISE
+#ifdef TRY_OPTIMIZED_NOISE_AVX
 
 namespace pov
 {
 
-OptimizedNoiseBase* GetOptimizedNoise();
+/// Get optimized noise functions using AVX instructions.
+/// @author Optimized by Intel
+OptimizedNoiseBase* GetOptimizedNoiseAVX();
 
 }
 
-#endif // TRY_OPTIMIZED_NOISE
+#endif // TRY_OPTIMIZED_NOISE_AVX
 
-#endif // POVRAY_OPTIMIZEDNOISE_H
+#endif // POVRAY_AVXNOISE_H

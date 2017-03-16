@@ -429,11 +429,16 @@ povray_SOURCES = \\
   disp_sdl.cpp disp_sdl.h \\
   disp_text.cpp disp_text.h
 
-if BUILD_X86
-cppflags_platformcpu = -I\$(top_srcdir)/platform/x86
-else !BUILD_X86
-cppflags_platformcpu = 
-endif !BUILD_X86
+cppflags_platformcpu =
+ldadd_platformcpu =
+if BUILD_x86
+cppflags_platformcpu += -I\$(top_srcdir)/platform/x86
+ldadd_platformcpu += \\
+  \$(top_builddir)/platform/libx86.a \\
+  \$(top_builddir)/platform/libx86avx.a \\
+  \$(top_builddir)/platform/libx86avxfma4.a \\
+  \$(top_builddir)/platform/libx86avx2fma3.a
+endif
 
 # Include paths for headers.
 AM_CPPFLAGS = \\
@@ -453,7 +458,8 @@ LDADD = \\
   \$(top_builddir)/vfe/libvfe.a \\
   \$(top_builddir)/source/libpovray.a \\
   \$(top_builddir)/vfe/libvfe.a \\
-  \$(top_builddir)/platform/libplatform.a
+  \$(top_builddir)/platform/libplatform.a \\
+  \$(ldadd_platformcpu)
 pbEOF
   ;;
 esac
@@ -801,11 +807,10 @@ noinst_LIBRARIES = libpovray.a
 libpovray_a_SOURCES = \\
 `echo $files`
 
-if BUILD_X86
-cppflags_platformcpu = -I\$(top_srcdir)/platform/x86
-else !BUILD_X86
 cppflags_platformcpu = 
-endif !BUILD_X86
+if BUILD_x86
+cppflags_platformcpu += -I\$(top_srcdir)/platform/x86
+endif
 
 # Include paths for headers.
 AM_CPPFLAGS = \\
@@ -1340,11 +1345,10 @@ noinst_LIBRARIES = libvfe.a
 libvfe_a_SOURCES = \\
 `echo $files`
 
-if BUILD_X86
-cppflags_platformcpu = -I\$(top_srcdir)/platform/x86
-else !BUILD_X86
 cppflags_platformcpu = 
-endif !BUILD_X86
+if BUILD_x86
+cppflags_platformcpu += -I\$(top_srcdir)/platform/x86
+endif
 
 # Include paths for headers.
 AM_CPPFLAGS = \\
@@ -1390,7 +1394,10 @@ case "$1" in
 
   *)
   files=`find $dir/unix -name "*.cpp" -or -name "*.h" | sed s,"$dir/",,g`
-  files_x86=`find $dir/x86 -name "*.cpp" -or -name "*.h" | sed s,"$dir/",,g`
+  files_x86=`find $dir/x86 -maxdepth 1 -name "*.cpp" -or -name "*.h" | sed s,"$dir/",,g`
+  for ext in avx avxfma4 avx2fma3; do
+    files_x86$ext=`find $dir/x86/$ext -name "*.cpp" -or -name "*.h" | sed s,"$dir/",,g`
+  done
 
   echo "Create $makefile.am"
   cat Makefile.header > $makefile.am
@@ -1399,22 +1406,30 @@ case "$1" in
 # Makefile.am for the source distribution of POV-Ray $pov_version_base for UNIX
 # Please report bugs to $pov_config_bugreport
 
-# Libraries to build.
-noinst_LIBRARIES = libplatform.a
-
-if BUILD_X86
-cppflags_platformcpu = -I\$(top_srcdir)/platform/x86
-sources_platformcpu = \\
-`echo $files_x86`
-else !BUILD_X86
+# Platform-specifics.
 cppflags_platformcpu =
-sources_platformcpu =
-endif !BUILD_X86
+libraries_platformcpu =
+if BUILD_x86
+cppflags_platformcpu += -I\$(top_srcdir)/platform/x86
+libraries_platformcpu += libx86.a libx86avx.a libx86avxfma4.a libx86avx2fma3.a
+libx86_a_SOURCES = `echo $files_x86`
+libx86_a_CXXFLAGS = \$(CXXFLAGS)
+libx86avx_a_SOURCES = `echo $files_x86avx`
+libx86avx_a_CXXFLAGS = \$(CXXFLAGS) -mavx
+libx86avxfma4_a_SOURCES = `echo $files_x86avxfma4`
+libx86avxfma4_a_CXXFLAGS = \$(CXXFLAGS) -mavx -mfma4
+libx86avx2fma3_a_SOURCES =  `echo $files_x86avx2fma3`
+libx86avx2fma3_a_CXXFLAGS = \$(CXXFLAGS) -mavx2 -mfma3
+endif
 
 # Source files.
 libplatform_a_SOURCES = \\
-`echo $files` \\
-\$(sources_platformcpu)
+`echo $files`
+
+# Libraries to build.
+noinst_LIBRARIES = \\
+  libplatform.a \\
+  \$(libraries_platformcpu)
 
 # Include paths for headers.
 AM_CPPFLAGS = \\

@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file platform/x86/avxfma4noise.cpp
+/// @file platform/x86/avxfma4/avxfma4noise.cpp
 ///
 /// This file contains implementations of the noise generator optimized for the
 /// AVX and FMA4 instruction set.
@@ -39,12 +39,6 @@
 #include "syspovconfigcore.h"
 #include "avxfma4noise.h"
 
-#ifdef TRY_OPTIMIZED_NOISE_AVXFMA4
-
-#ifdef __GNUC__
-#pragma GCC target ("avx,fma4")
-#endif
-
 #ifdef MACHINE_INTRINSICS_H
 #include MACHINE_INTRINSICS_H
 #endif
@@ -52,6 +46,10 @@
 #include "core/material/pattern.h"
 #include "core/material/texture.h"
 #include "cpuid.h"
+
+/*****************************************************************************/
+
+#ifdef TRY_OPTIMIZED_NOISE_AVXFMA4
 
 /********************************************************************************************/
 /* AMD Specific optimizations: Its found that more than 50% of the time is spent in         */

@@ -998,7 +998,7 @@ case "$pov_built_for" in
     pov_cpu=''
     ;;
 esac
-AM_CONDITIONAL([BUILD_X86], [test x"$pov_cpu" = x"x86"])
+AM_CONDITIONAL([BUILD_x86], [test x"$pov_cpu" = x"x86"])
 
 
 # Add flags specified at the command line.

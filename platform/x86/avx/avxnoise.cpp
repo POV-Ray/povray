@@ -1,12 +1,12 @@
 //******************************************************************************
 ///
-/// @file platform/x86/avx2fma3noise.cpp
+/// @file platform/x86/avx/avxnoise.cpp
 ///
 /// This file contains implementations of the noise generator optimized for the
-/// AVX2 and FMA3 instruction set.
+/// AVX instruction set.
 ///
 /// @note
-///     This file shares lots of code with @ref platform/x86/avxnoise.cpp,
+///     This file shares lots of code with @ref platform/x86/avx2fma3noise.cpp,
 ///     essentially differing only in a few macro definitions and some
 //      identifier names.
 ///
@@ -42,13 +42,7 @@
 //******************************************************************************
 
 #include "syspovconfigcore.h"
-#include "avx2fma3noise.h"
-
-#ifdef TRY_OPTIMIZED_NOISE_AVX2FMA3
-
-#ifdef __GNUC__
-#pragma GCC target ("avx2,fma3")
-#endif
+#include "avxnoise.h"
 
 #ifdef MACHINE_INTRINSICS_H
 #include MACHINE_INTRINSICS_H
@@ -61,16 +55,32 @@
 /*****************************************************************************/
 
 
-/******************************************************/
-/* Use avx2 intrinsics for vpermpd and native fma3    */
-/******************************************************/
+#ifdef TRY_OPTIMIZED_NOISE_AVX
 
-#define FMA_PD(a,b,c) _mm256_fmadd_pd((a),(b),(c))
-#define PERMUTE4x64(a,i) _mm256_permute4x64_pd((a),(i))
+
+#define FMA_PD(a,b,c) _mm256_add_pd(_mm256_mul_pd((a),(b)),(c))
+
+static inline __m256d permute4x64_functional(const __m256d& x, int i)
+{
+    const int idx0 = ((i >> 0) & 0x3);
+    const int idx1 = ((i >> 2) & 0x3);
+    const int idx2 = ((i >> 4) & 0x3);
+    const int idx3 = ((i >> 6) & 0x3);
+    ALIGN32 double p[4];
+    _mm256_store_pd(p,x);
+
+    if (idx0 == idx1 && idx1 == idx2 && idx2 == idx3)
+    {
+        return _mm256_broadcast_sd(&p[idx0]);
+    }
+    return _mm256_set_pd(p[idx3],p[idx2],p[idx1],p[idx0]);
+}
+
+#define PERMUTE4x64(a,i) permute4x64_functional((a),(i))
 
 
 #ifdef NO_SPLITS
-#define AVX2TABLETYPE __m256d
+#define AVXTABLETYPE __m256d
 
 #define Hash1dRTableIndexAVX(a,b)   \
     (((unsigned char)hashTable[(int)(a) ^ (b)]) * 4)
@@ -80,7 +90,7 @@
 
 #else
 
-#define AVX2TABLETYPE DBL
+#define AVXTABLETYPE DBL
 
 #define Hash1dRTableIndexAVX(a,b)   \
     (((unsigned char)hashTable[(int)(a) ^ (b)]))
@@ -102,30 +112,30 @@
 
 
 /********************************************************************************************/
-/* AVX2+FMA3 Specific optimizations: Its found that more than 50% of the time is spent in   */
-/* Noise and DNoise. These functions have been optimized using AVX2 and FMA3 instructions   */
+/* AVX Specific optimizations: Its found that more than 50% of the time is spent in         */
+/* Noise and DNoise. These functions have been optimized using AVX instructions             */
 /********************************************************************************************/
 
 namespace pov
 {
 
-class OptimizedNoiseAVX2FMA3 : public OptimizedNoiseBase
+class OptimizedNoiseAVX : public OptimizedNoiseBase
 {
 public:
-    OptimizedNoiseAVX2FMA3();
+    OptimizedNoiseAVX();
     virtual DBL Noise(const Vector3d& EPoint, int noise_generator) const;
     virtual void DNoise(Vector3d& result, const Vector3d& EPoint) const;
-    virtual const char* Name() const { return "AVX2/FMA3 Noise"; }
+    virtual const char* Name() const { return "AVX Noise"; }
 private:
     static bool initialized;
 };
 
-bool OptimizedNoiseAVX2FMA3::initialized = false;
+bool OptimizedNoiseAVX::initialized = false;
 
-OptimizedNoiseBase* GetOptimizedNoiseAVX2FMA3()
+OptimizedNoiseBase* GetOptimizedNoiseAVX()
 {
-    if (HaveAVX2FMA3())
-        return new OptimizedNoiseAVX2FMA3();
+    if (HaveAVX())
+        return new OptimizedNoiseAVX();
     else
         return NULL;
 }
@@ -133,30 +143,30 @@ OptimizedNoiseBase* GetOptimizedNoiseAVX2FMA3()
 
 extern DBL RTable[];
 
-ALIGN32 static AVX2TABLETYPE AVX2RTable[267];
+ALIGN32 static AVXTABLETYPE AVXRTable[267];
 
-void AVX2FMA3NoiseInit()
+void AVXNoiseInit()
 {
     int i;
-    DBL *avx2table = (DBL *)AVX2RTable;
+    DBL *avxtable = (DBL *)AVXRTable;
     for (i = 0; i < 267; i++)
     {
 #ifndef NO_SPLITS
-        avx2table[i] = RTable[2 * i];
+        avxtable[i] = RTable[2 * i];
 #else
-        avx2table[(4 * i) + 0] = RTable[2 * i + 0];
-        avx2table[(4 * i) + 1] = RTable[2 * i + 2];
-        avx2table[(4 * i) + 2] = RTable[2 * i + 4];
-        avx2table[(4 * i) + 3] = RTable[2 * i + 6];
+        avxtable[(4 * i) + 0] = RTable[2 * i + 0];
+        avxtable[(4 * i) + 1] = RTable[2 * i + 2];
+        avxtable[(4 * i) + 2] = RTable[2 * i + 4];
+        avxtable[(4 * i) + 3] = RTable[2 * i + 6];
 #endif
     }
 }
 
-OptimizedNoiseAVX2FMA3::OptimizedNoiseAVX2FMA3()
+OptimizedNoiseAVX::OptimizedNoiseAVX()
 {
     if (!initialized)
     {
-        AVX2FMA3NoiseInit();
+        AVXNoiseInit();
         initialized = true;
     }
 }
@@ -165,7 +175,7 @@ OptimizedNoiseAVX2FMA3::OptimizedNoiseAVX2FMA3()
 *
 * FUNCTION
 *
-*   AVX2FMA3Noise
+*   AVXNoise
 *
 * INPUT
 *
@@ -193,9 +203,9 @@ OptimizedNoiseAVX2FMA3::OptimizedNoiseAVX2FMA3()
 *
 ******************************************************************************/
 
-DBL OptimizedNoiseAVX2FMA3::Noise(const Vector3d& EPoint, int noise_generator) const
+DBL OptimizedNoiseAVX::Noise(const Vector3d& EPoint, int noise_generator) const
 {
-    AVX2TABLETYPE *mp;
+    AVXTABLETYPE *mp;
     DBL sum = 0.0;
 
     // TODO FIXME - global statistics reference
@@ -265,28 +275,28 @@ DBL OptimizedNoiseAVX2FMA3::Noise(const Vector3d& EPoint, int noise_generator) c
     __m256d sumr1 = _mm256_setzero_pd();
 
 
-    mp = &AVX2RTable[Hash1dRTableIndexAVX(ixiy_hash, iz)];
+    mp = &AVXRTable[Hash1dRTableIndexAVX(ixiy_hash, iz)];
     INCSUMAVX_NOBLEND(sumr, mp, PERMUTE4x64(incrsump_s1, _MM_SHUFFLE(0, 0, 0, 0)), iii);
 
-    mp = &AVX2RTable[Hash1dRTableIndexAVX(jxiy_hash, iz)];
+    mp = &AVXRTable[Hash1dRTableIndexAVX(jxiy_hash, iz)];
     INCSUMAVX(sumr1, mp, PERMUTE4x64(incrsump_s1, _MM_SHUFFLE(1, 1, 1, 1)), iii, jjj, 2);
 
-    mp = &AVX2RTable[Hash1dRTableIndexAVX(ixjy_hash, iz)];
+    mp = &AVXRTable[Hash1dRTableIndexAVX(ixjy_hash, iz)];
     INCSUMAVX(sumr, mp, PERMUTE4x64(incrsump_s1, _MM_SHUFFLE(2, 2, 2, 2)), iii, jjj, 4);
 
-    mp = &AVX2RTable[Hash1dRTableIndexAVX(jxjy_hash, iz)];
+    mp = &AVXRTable[Hash1dRTableIndexAVX(jxjy_hash, iz)];
     INCSUMAVX(sumr1, mp, PERMUTE4x64(incrsump_s1, _MM_SHUFFLE(3, 3, 3, 3)), iii, jjj, 6);
 
-    mp = &AVX2RTable[Hash1dRTableIndexAVX(ixiy_hash, iz + 1)];
+    mp = &AVXRTable[Hash1dRTableIndexAVX(ixiy_hash, iz + 1)];
     INCSUMAVX(sumr, mp, PERMUTE4x64(incrsump_s2, _MM_SHUFFLE(0, 0, 0, 0)), iii, jjj, 8);
 
-    mp = &AVX2RTable[Hash1dRTableIndexAVX(jxiy_hash, iz + 1)];
+    mp = &AVXRTable[Hash1dRTableIndexAVX(jxiy_hash, iz + 1)];
     INCSUMAVX(sumr1, mp, PERMUTE4x64(incrsump_s2, _MM_SHUFFLE(1, 1, 1, 1)), iii, jjj, 10);
 
-    mp = &AVX2RTable[Hash1dRTableIndexAVX(ixjy_hash, iz + 1)];
+    mp = &AVXRTable[Hash1dRTableIndexAVX(ixjy_hash, iz + 1)];
     INCSUMAVX(sumr, mp, PERMUTE4x64(incrsump_s2, _MM_SHUFFLE(2, 2, 2, 2)), iii, jjj, 12);
 
-    mp = &AVX2RTable[Hash1dRTableIndexAVX(jxjy_hash, iz + 1)];
+    mp = &AVXRTable[Hash1dRTableIndexAVX(jxjy_hash, iz + 1)];
     INCSUMAVX_NOBLEND(sumr1, mp, PERMUTE4x64(incrsump_s2, _MM_SHUFFLE(3, 3, 3, 3)), jjj);
 
     {
@@ -350,7 +360,7 @@ DBL OptimizedNoiseAVX2FMA3::Noise(const Vector3d& EPoint, int noise_generator) c
 *
 * FUNCTION
 *
-*   AVX2FMA3DNoise
+*   AVXDNoise
 *
 * INPUT
 *
@@ -379,14 +389,14 @@ DBL OptimizedNoiseAVX2FMA3::Noise(const Vector3d& EPoint, int noise_generator) c
 *
 ******************************************************************************/
 
-void OptimizedNoiseAVX2FMA3::DNoise(Vector3d& result, const Vector3d& EPoint) const
+void OptimizedNoiseAVX::DNoise(Vector3d& result, const Vector3d& EPoint) const
 {
 
 #if CHECK_FUNCTIONAL
     Vector3d param(EPoint);
 #endif
 
-    AVX2TABLETYPE *mp;
+    AVXTABLETYPE *mp;
 
     // TODO FIXME - global statistics reference
     // Stats[Calls_To_DNoise]++;
@@ -442,49 +452,49 @@ void OptimizedNoiseAVX2FMA3::DNoise(Vector3d& result, const Vector3d& EPoint) co
     __m256d x = _mm256_setzero_pd(), y = _mm256_setzero_pd(), z = _mm256_setzero_pd();
 
 
-    mp = &AVX2RTable[Hash1dRTableIndexAVX(ixiy_hash, iz)];
+    mp = &AVXRTable[Hash1dRTableIndexAVX(ixiy_hash, iz)];
     ss = PERMUTE4x64(incrsump_s1, _MM_SHUFFLE(0, 0, 0, 0));
     //     blend = _mm256_blend_pd(iii, jjj, 0);
 
     INCSUMAVX_VECTOR(mp, ss, iii);
 
-    mp = &AVX2RTable[Hash1dRTableIndexAVX(jxiy_hash, iz)];
+    mp = &AVXRTable[Hash1dRTableIndexAVX(jxiy_hash, iz)];
     ss = PERMUTE4x64(incrsump_s1, _MM_SHUFFLE(1, 1, 1, 1));
     blend = _mm256_blend_pd(iii, jjj, 2);
 
     INCSUMAVX_VECTOR(mp, ss, blend);
 
-    mp = &AVX2RTable[Hash1dRTableIndexAVX(jxjy_hash, iz)];
+    mp = &AVXRTable[Hash1dRTableIndexAVX(jxjy_hash, iz)];
     ss = PERMUTE4x64(incrsump_s1, _MM_SHUFFLE(3, 3, 3, 3));
     blend = _mm256_blend_pd(iii, jjj, 6);
 
     INCSUMAVX_VECTOR(mp, ss, blend);
 
-    mp = &AVX2RTable[Hash1dRTableIndexAVX(ixjy_hash, iz)];
+    mp = &AVXRTable[Hash1dRTableIndexAVX(ixjy_hash, iz)];
     ss = PERMUTE4x64(incrsump_s1, _MM_SHUFFLE(2, 2, 2, 2));
     blend = _mm256_blend_pd(iii, jjj, 4);
 
     INCSUMAVX_VECTOR(mp, ss, blend);
 
-    mp = &AVX2RTable[Hash1dRTableIndexAVX(ixjy_hash, iz + 1)];
+    mp = &AVXRTable[Hash1dRTableIndexAVX(ixjy_hash, iz + 1)];
     ss = PERMUTE4x64(incrsump_s2, _MM_SHUFFLE(2, 2, 2, 2));
     blend = _mm256_blend_pd(iii, jjj, 12);
 
     INCSUMAVX_VECTOR(mp, ss, blend);
 
-    mp = &AVX2RTable[Hash1dRTableIndexAVX(jxjy_hash, iz + 1)];
+    mp = &AVXRTable[Hash1dRTableIndexAVX(jxjy_hash, iz + 1)];
     ss = PERMUTE4x64(incrsump_s2, _MM_SHUFFLE(3, 3, 3, 3));
     //     blend = _mm256_blend_pd(iii, jjj, 14);
 
     INCSUMAVX_VECTOR(mp, ss, jjj);
 
-    mp = &AVX2RTable[Hash1dRTableIndexAVX(jxiy_hash, iz + 1)];
+    mp = &AVXRTable[Hash1dRTableIndexAVX(jxiy_hash, iz + 1)];
     ss = PERMUTE4x64(incrsump_s2, _MM_SHUFFLE(1, 1, 1, 1));
     blend = _mm256_blend_pd(iii, jjj, 10);
 
     INCSUMAVX_VECTOR(mp, ss, blend);
 
-    mp = &AVX2RTable[Hash1dRTableIndexAVX(ixiy_hash, iz + 1)];
+    mp = &AVXRTable[Hash1dRTableIndexAVX(ixiy_hash, iz + 1)];
     ss = PERMUTE4x64(incrsump_s2, _MM_SHUFFLE(0, 0, 0, 0));
     blend = _mm256_blend_pd(iii, jjj, 8);
 
@@ -533,5 +543,5 @@ void OptimizedNoiseAVX2FMA3::DNoise(Vector3d& result, const Vector3d& EPoint) co
 
 }
 
-#endif // TRY_OPTIMIZED_NOISE_AVX2FMA3
+#endif // TRY_OPTIMIZED_NOISE_AVX
 

@@ -1,9 +1,9 @@
 //******************************************************************************
 ///
-/// @file platform/x86/avx2fma3noise.h
+/// @file platform/x86/avxfma4/avxfma4noise.h
 ///
 /// This file contains declarations related to implementations of the noise
-/// generator optimized for the AVX2 and FMA3 instruction set.
+/// generator optimized for the AVX and FMA4 instruction set.
 ///
 /// @copyright
 /// @parblock
@@ -34,23 +34,23 @@
 ///
 //******************************************************************************
 
-#ifndef POVRAY_AVX2FMA3NOISE_H
-#define POVRAY_AVX2FMA3NOISE_H
+#ifndef POVRAY_AVXFMA4NOISE_H
+#define POVRAY_AVXFMA4NOISE_H
 
 #include "syspovconfigcore.h"
 #include "core/material/texture.h"
 
-#ifdef TRY_OPTIMIZED_NOISE_AVX2FMA3
+#ifdef TRY_OPTIMIZED_NOISE_AVXFMA4
 
 namespace pov
 {
 
-/// Get optimized noise functions using AVX2 and FMA3 instructions.
-/// @author Optimized by Intel
-OptimizedNoiseBase* GetOptimizedNoiseAVX2FMA3();
+/// Get optimized noise functions using AVX and FMA4 instructions.
+/// @author Optimized by AMD
+OptimizedNoiseBase* GetOptimizedNoiseAVXFMA4();
 
 }
 
-#endif // TRY_OPTIMIZED_NOISE_AVX2FMA3
+#endif // TRY_OPTIMIZED_NOISE_AVXFMA4
 
-#endif // POVRAY_AVX2FMA3NOISE_H
+#endif // POVRAY_AVXFMA4NOISE_H
