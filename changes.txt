@@ -24,13 +24,26 @@ should be located in the same directory as this file is.
 ------------------------------------------------------------------------------
 
 
-Changes between 3.7.1-beta.3 and 3.7.1-TBD
+Changes between 3.7.1-beta.4 and 3.7.1-beta.5
 =============================================
 
-The focus of this version has been on fixing bugs.
+Miscellaneous:
+
+  - Restored user-defined function VM performance roughly back to levels of
+    3.7.0.
+
+
+Changes between 3.7.1-beta.3 and 3.7.1-beta.4
+=============================================
+
+The focus of this version's source code changes has been on fixing bugs.
 
 Fixed or Mitigated Bugs
 -----------------------
+
+Reported via GitHub:
+
+  - #241 ("Windows Build Instructions Misleading")
 
 Reported via the Newsgroups:
 
@@ -41,6 +54,24 @@ Reported via the Newsgroups:
   - <58aca5fc@news.povray.org>
     (2017-02-22, povray.beta-test, "ior.inc fails in 3.7.1 beta 3")
     Parse Error when including "ior.inc".
+
+  - <58ab1921$1@news.povray.org>
+    (2017-02-20, povray.beta-test, "Re: POV-Ray v3.7.1-beta.3 Released")
+    SSE2 support not properly detected on Windows XP
+
+  - <58ae4809$1@news.povray.org>
+    (2017-02-22, povray.beta-test, "Wrong error message building Windows console version")
+    Wrong file location specified for `syspovconfig.h`.
+
+Miscellaneous:
+
+  - Fixed two demo scenes (`incdemo/sort.pov` and `textures/normals/normmap.pov`).
+
+Other Noteworthy
+----------------
+
+  - Migrated to Visual Studio 2015 as the designated official build tool.
+    As of this beta, Visual Studio 2010 is no longer supported.
 
 
 Changes between 3.7.1-beta.2 and 3.7.1-beta.3

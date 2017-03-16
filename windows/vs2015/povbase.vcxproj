@@ -1,0 +1,512 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release-SSE2|Win32">
+      <Configuration>Release-SSE2</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release-SSE2|x64">
+      <Configuration>Release-SSE2</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release-AVX|Win32">
+      <Configuration>Release-AVX</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release-AVX|x64">
+      <Configuration>Release-AVX</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{C6D9B754-11EB-4FC3-8683-593B2377D043}</ProjectGuid>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-SSE2|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-AVX|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Release-AVX|Win32'">
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Release-SSE2|x64'">
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release-SSE2|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release-AVX|x64'" Label="PropertySheets">
+    <Import Project="povray64-avx.props" />
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>bin32\lib\</OutDir>
+    <IntDir>build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <TargetName>povbase32d</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>bin64\lib\</OutDir>
+    <IntDir>build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <TargetName>povbase64d</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>bin32\lib\</OutDir>
+    <IntDir>build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <TargetName>povbase32</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>bin64\lib\</OutDir>
+    <IntDir>build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <TargetName>povbase64</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-SSE2|Win32'">
+    <OutDir>bin32\lib\</OutDir>
+    <IntDir>build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <TargetName>povbase32-sse2</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-AVX|x64'">
+    <OutDir>bin64\lib\</OutDir>
+    <IntDir>build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <TargetName>$(ProjectName)$(ConfigTag)</TargetName>
+  </PropertyGroup>
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>..\..\internal\windows;..\..\platform\x86;..\..\platform\windows;..\..\windows\povconfig;..\..\libraries\ilmbase\config.windows;..\..\libraries\openexr\config.windows;..\..\libraries\openexr\IlmImf;..\..\libraries\ilmbase\Half;..\..\libraries\ilmbase\Imath;..\..\libraries\ilmbase\Iex;..\..\libraries\boost;..\..\vfe\win;..\..\vfe;..\..\source;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>$(PovBuildDefs)BOOST_ALL_NO_LIB;NON_UNIX_OPENEXR_HEADERS;_DEBUG;WIN32;WIN32_LEAN_AND_MEAN;_WINDOWS;WINVER=0x0500;_WIN32_WINNT=0x0500;COMMONCTRL_VERSION=0x500;CLASSLIB_DEFS_H;NOMINMAX;ISOLATION_AWARE_ENABLED;_CRT_SECURE_NO_DEPRECATE;_HAS_ITERATOR_DEBUGGING=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>precomp.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)precomp.pch</PrecompiledHeaderOutputFile>
+      <BrowseInformation>true</BrowseInformation>
+      <BrowseInformationFile>$(IntDir)</BrowseInformationFile>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+      <DisableSpecificWarnings>4800;4355;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <ForcedIncludeFiles>precomp.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Lib>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Midl>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>..\..\internal\windows;..\..\platform\x86;..\..\platform\windows;..\..\windows\povconfig;..\..\libraries\ilmbase\config.windows;..\..\libraries\openexr\config.windows;..\..\libraries\openexr\IlmImf;..\..\libraries\ilmbase\Half;..\..\libraries\ilmbase\Imath;..\..\libraries\ilmbase\Iex;..\..\libraries\boost;..\..\vfe\win;..\..\vfe;..\..\source;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>$(PovBuildDefs)BOOST_ALL_NO_LIB;NON_UNIX_OPENEXR_HEADERS;_DEBUG;WIN32;WIN32_LEAN_AND_MEAN;_WINDOWS;CLASSLIB_DEFS_H;NOMINMAX;ISOLATION_AWARE_ENABLED;_CRT_SECURE_NO_DEPRECATE;_HAS_ITERATOR_DEBUGGING=0;BUILDING_AMD64=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>precomp.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)precomp.pch</PrecompiledHeaderOutputFile>
+      <BrowseInformation>true</BrowseInformation>
+      <BrowseInformationFile>$(IntDir)</BrowseInformationFile>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+      <DisableSpecificWarnings>4800;4355;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <ForcedIncludeFiles>precomp.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Lib>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <Optimization>Full</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>false</OmitFramePointers>
+      <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <AdditionalIncludeDirectories>..\..\internal\windows;..\..\platform\x86;..\..\platform\windows;..\..\windows\povconfig;..\..\libraries\ilmbase\config.windows;..\..\libraries\openexr\config.windows;..\..\libraries\openexr\IlmImf;..\..\libraries\ilmbase\Half;..\..\libraries\ilmbase\Imath;..\..\libraries\ilmbase\Iex;..\..\libraries\boost;..\..\vfe\win;..\..\vfe;..\..\source;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>$(PovBuildDefs)BOOST_ALL_NO_LIB;NON_UNIX_OPENEXR_HEADERS;NDEBUG;WIN32;WIN32_LEAN_AND_MEAN;_WINDOWS;COMMONCTRL_VERSION=0x500;CLASSLIB_DEFS_H;WINVER=0x0500;_WIN32_WINNT=0x0500;NOMINMAX;ISOLATION_AWARE_ENABLED;_CRT_SECURE_NO_DEPRECATE;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Precise</FloatingPointModel>
+      <FloatingPointExceptions>false</FloatingPointExceptions>
+      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>precomp.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)precomp.pch</PrecompiledHeaderOutputFile>
+      <BrowseInformation>true</BrowseInformation>
+      <BrowseInformationFile>$(IntDir)</BrowseInformationFile>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+      <DisableSpecificWarnings>4800;4355;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <ForcedIncludeFiles>precomp.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <Optimization>Full</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>false</OmitFramePointers>
+      <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
+      <AdditionalIncludeDirectories>..\..\internal\windows;..\..\platform\x86;..\..\platform\windows;..\..\windows\povconfig;..\..\libraries\ilmbase\config.windows;..\..\libraries\openexr\config.windows;..\..\libraries\openexr\IlmImf;..\..\libraries\ilmbase\Half;..\..\libraries\ilmbase\Imath;..\..\libraries\ilmbase\Iex;..\..\libraries\boost;..\..\vfe\win;..\..\vfe;..\..\source;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>$(PovBuildDefs)BOOST_ALL_NO_LIB;NON_UNIX_OPENEXR_HEADERS;NDEBUG;WIN32;WIN32_LEAN_AND_MEAN;_WINDOWS;CLASSLIB_DEFS_H;NOMINMAX;ISOLATION_AWARE_ENABLED;_CRT_SECURE_NO_DEPRECATE;_SECURE_SCL=0;BUILDING_AMD64=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Precise</FloatingPointModel>
+      <FloatingPointExceptions>false</FloatingPointExceptions>
+      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>precomp.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)precomp.pch</PrecompiledHeaderOutputFile>
+      <BrowseInformation>true</BrowseInformation>
+      <BrowseInformationFile>$(IntDir)</BrowseInformationFile>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+      <DisableSpecificWarnings>4800;4355;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <ForcedIncludeFiles>precomp.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release-SSE2|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <Optimization>Full</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>false</OmitFramePointers>
+      <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <AdditionalIncludeDirectories>..\..\internal\windows;..\..\platform\x86;..\..\platform\windows;..\..\windows\povconfig;..\..\libraries\ilmbase\config.windows;..\..\libraries\openexr\config.windows;..\..\libraries\openexr\IlmImf;..\..\libraries\ilmbase\Half;..\..\libraries\ilmbase\Imath;..\..\libraries\ilmbase\Iex;..\..\libraries\boost;..\..\vfe\win;..\..\vfe;..\..\source;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>$(PovBuildDefs)BOOST_ALL_NO_LIB;NON_UNIX_OPENEXR_HEADERS;NDEBUG;WIN32;WIN32_LEAN_AND_MEAN;_WINDOWS;COMMONCTRL_VERSION=0x500;CLASSLIB_DEFS_H;WINVER=0x0500;_WIN32_WINNT=0x0500;NOMINMAX;ISOLATION_AWARE_ENABLED;_CRT_SECURE_NO_DEPRECATE;_SECURE_SCL=0;BUILD_SSE2=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Precise</FloatingPointModel>
+      <FloatingPointExceptions>false</FloatingPointExceptions>
+      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>precomp.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)precomp.pch</PrecompiledHeaderOutputFile>
+      <BrowseInformation>true</BrowseInformation>
+      <BrowseInformationFile>$(IntDir)</BrowseInformationFile>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+      <DisableSpecificWarnings>4800;4355;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <ForcedIncludeFiles>precomp.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release-AVX|x64'">
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <Optimization>Full</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>false</OmitFramePointers>
+      <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
+      <AdditionalIncludeDirectories>..\..\internal\windows;..\..\platform\x86;..\..\platform\windows;..\..\windows\povconfig;..\..\libraries\ilmbase\config.windows;..\..\libraries\openexr\config.windows;..\..\libraries\openexr\IlmImf;..\..\libraries\ilmbase\Half;..\..\libraries\ilmbase\Imath;..\..\libraries\ilmbase\Iex;..\..\libraries\boost;..\..\vfe\win;..\..\vfe;..\..\source;..\..\libraries\jpeg;..\..\libraries\zlib;..\..\libraries\png;..\..\libraries\tiff\libtiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>$(PovBuildDefs)BOOST_ALL_NO_LIB;NON_UNIX_OPENEXR_HEADERS;NDEBUG;WIN32;WIN32_LEAN_AND_MEAN;_WINDOWS;CLASSLIB_DEFS_H;NOMINMAX;ISOLATION_AWARE_ENABLED;_CRT_SECURE_NO_DEPRECATE;_SECURE_SCL=0;BUILDING_AMD64=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Precise</FloatingPointModel>
+      <FloatingPointExceptions>false</FloatingPointExceptions>
+      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>precomp.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)precomp.pch</PrecompiledHeaderOutputFile>
+      <BrowseInformation>true</BrowseInformation>
+      <BrowseInformationFile>$(IntDir)</BrowseInformationFile>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+      <DisableSpecificWarnings>4800;4355;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <ForcedIncludeFiles>precomp.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\source\base\colour.cpp" />
+    <ClCompile Include="..\..\source\base\fileinputoutput.cpp" />
+    <ClCompile Include="..\..\source\base\fileutil.cpp" />
+    <ClCompile Include="..\..\source\base\font\crystal.cpp" />
+    <ClCompile Include="..\..\source\base\font\cyrvetic.cpp" />
+    <ClCompile Include="..\..\source\base\font\povlogo.cpp" />
+    <ClCompile Include="..\..\source\base\font\timrom.cpp" />
+    <ClCompile Include="..\..\source\base\image\metadata.cpp" />
+    <ClCompile Include="..\..\source\base\mathutil.cpp" />
+    <ClCompile Include="..\..\source\base\messenger.cpp" />
+    <ClCompile Include="..\..\source\base\path.cpp" />
+    <ClCompile Include="..\..\source\base\platformbase.cpp" />
+    <ClCompile Include="..\..\source\base\pov_err.cpp" />
+    <ClCompile Include="..\..\source\base\pov_mem.cpp" />
+    <ClCompile Include="..\..\source\base\stringutilities.cpp" />
+    <ClCompile Include="..\..\source\base\textstream.cpp" />
+    <ClCompile Include="..\..\source\base\textstreambuffer.cpp" />
+    <ClCompile Include="..\..\source\base\timer.cpp" />
+    <ClCompile Include="..\..\source\base\image\bmp.cpp" />
+    <ClCompile Include="..\..\source\base\image\colourspace.cpp" />
+    <ClCompile Include="..\..\source\base\image\encoding.cpp" />
+    <ClCompile Include="..\..\source\base\image\gif.cpp" />
+    <ClCompile Include="..\..\source\base\image\gifdecod.cpp" />
+    <ClCompile Include="..\..\source\base\image\hdr.cpp" />
+    <ClCompile Include="..\..\source\base\image\iff.cpp" />
+    <ClCompile Include="..\..\source\base\image\image.cpp" />
+    <ClCompile Include="..\..\source\base\image\jpeg.cpp">
+      <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">SyncCThrow</ExceptionHandling>
+      <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">SyncCThrow</ExceptionHandling>
+      <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">SyncCThrow</ExceptionHandling>
+      <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Release|x64'">SyncCThrow</ExceptionHandling>
+      <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Release-SSE2|Win32'">SyncCThrow</ExceptionHandling>
+      <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Release-AVX|x64'">SyncCThrow</ExceptionHandling>
+    </ClCompile>
+    <ClCompile Include="..\..\source\base\image\openexr.cpp" />
+    <ClCompile Include="..\..\source\base\image\png.cpp">
+      <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">SyncCThrow</ExceptionHandling>
+      <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">SyncCThrow</ExceptionHandling>
+      <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">SyncCThrow</ExceptionHandling>
+      <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Release|x64'">SyncCThrow</ExceptionHandling>
+      <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Release-SSE2|Win32'">SyncCThrow</ExceptionHandling>
+      <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Release-AVX|x64'">SyncCThrow</ExceptionHandling>
+    </ClCompile>
+    <ClCompile Include="..\..\source\base\image\ppm.cpp" />
+    <ClCompile Include="..\..\source\base\image\targa.cpp" />
+    <ClCompile Include="..\..\source\base\image\tiff.cpp" />
+    <ClCompile Include="..\..\source\base\animation\animation.cpp" />
+    <ClCompile Include="..\..\source\base\animation\moov.cpp" />
+    <ClCompile Include="..\..\source\base\precomp.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release-SSE2|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release-AVX|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\source\base\build.h" />
+    <ClInclude Include="..\..\source\base\colour.h" />
+    <ClInclude Include="..\..\source\base\configbase.h" />
+    <ClInclude Include="..\..\source\base\fileinputoutput.h" />
+    <ClInclude Include="..\..\source\base\fileutil.h" />
+    <ClInclude Include="..\..\source\base\font\crystal.h" />
+    <ClInclude Include="..\..\source\base\font\cyrvetic.h" />
+    <ClInclude Include="..\..\source\base\font\povlogo.h" />
+    <ClInclude Include="..\..\source\base\font\timrom.h" />
+    <ClInclude Include="..\..\source\base\mathutil.h" />
+    <ClInclude Include="..\..\source\base\messenger.h" />
+    <ClInclude Include="..\..\source\base\path.h" />
+    <ClInclude Include="..\..\source\base\platformbase.h" />
+    <ClInclude Include="..\..\source\base\pov_err.h" />
+    <ClInclude Include="..\..\source\base\povdebug.h" />
+    <ClInclude Include="..\..\source\base\pov_mem.h" />
+    <ClInclude Include="..\..\source\base\safemath.h" />
+    <ClInclude Include="..\..\source\base\stringutilities.h" />
+    <ClInclude Include="..\..\source\base\textstream.h" />
+    <ClInclude Include="..\..\source\base\textstreambuffer.h" />
+    <ClInclude Include="..\..\source\base\timer.h" />
+    <ClInclude Include="..\..\source\base\types.h" />
+    <ClInclude Include="..\..\source\base\image\bmp.h" />
+    <ClInclude Include="..\..\source\base\image\colourspace.h" />
+    <ClInclude Include="..\..\source\base\image\encoding.h" />
+    <ClInclude Include="..\..\source\base\image\gif.h" />
+    <ClInclude Include="..\..\source\base\image\hdr.h" />
+    <ClInclude Include="..\..\source\base\image\iff.h" />
+    <ClInclude Include="..\..\source\base\image\image.h" />
+    <ClInclude Include="..\..\source\base\image\jpeg_pov.h" />
+    <ClInclude Include="..\..\source\base\image\metadata.h" />
+    <ClInclude Include="..\..\source\base\image\openexr.h" />
+    <ClInclude Include="..\..\source\base\image\png_pov.h" />
+    <ClInclude Include="..\..\source\base\image\ppm.h" />
+    <ClInclude Include="..\..\source\base\image\targa.h" />
+    <ClInclude Include="..\..\source\base\image\tiff_pov.h" />
+    <ClInclude Include="..\..\source\base\animation\animation.h" />
+    <ClInclude Include="..\..\source\base\animation\moov.h" />
+    <ClInclude Include="..\..\source\base\version.h" />
+    <ClInclude Include="..\..\source\base\precomp.h" />
+    <ClInclude Include="..\..\source\base\version_info.h" />
+    <ClInclude Include="..\povconfig\syspovconfig.h" />
+    <ClInclude Include="..\povconfig\syspovconfigbase.h" />
+    <ClInclude Include="..\povconfig\syspovconfig_msvc.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="libpng.vcxproj">
+      <Project>{e1ea88af-6b44-4225-b97b-b485fc9db23e}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="openexr_eLut.vcxproj">
+      <Project>{39c65232-04fb-4622-8283-34829739887c}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="openexr_toFloat.vcxproj">
+      <Project>{9801d5ff-c1e0-46c5-a73e-47deece99ddb}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="tiff.vcxproj">
+      <Project>{186baef6-cf24-42c1-8ce3-25590cb9f6e7}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

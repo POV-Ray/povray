@@ -5341,7 +5341,7 @@ inline void TestAVX2 (void)
   if (!HaveAVX2())
     NoAVX2();
 }
-#endif
+#endif // BUILD_AVX2
 
 #ifdef BUILD_AVX
 void NoAVX (void)
@@ -5359,7 +5359,7 @@ inline void TestAVX (void)
   if (!HaveAVX())
     NoAVX();
 }
-#endif
+#endif // BUILD_AVX
 
 #ifdef BUILD_SSE2
 void NoSSE2 (void)
@@ -5374,20 +5374,28 @@ void NoSSE2 (void)
 
 inline void TestSSE2 (void)
 {
-#if 0
-  __try
+  if (HaveVistaOrLater())
   {
-    __asm { movapd xmm0,xmm1 }
+    // Use the canonical test.
+    if (!HaveSSE2())
+      NoSSE2();
   }
-  __except(NoSSE2(),1)
+  else
   {
+    // On Windows XP (and presumably also Windows Server 2003), the canonical test does not seem
+    // to work properly for yet unknown reasons, so we test for support the dirty way by trying to
+    // actually execute an SSE2 instruction.
+    __try
+    {
+      __asm { movapd xmm0, xmm1 }
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+      NoSSE2();
+    }
   }
-#else
-  if (!HaveSSE2())
-    NoSSE2();
-#endif
 }
-#endif
+#endif // BUILD_SSE2
 
 void InvalidParameterHandler(const wchar_t* expression, const wchar_t* function, const wchar_t* file, unsigned int line, uintptr_t pReserved)
 {

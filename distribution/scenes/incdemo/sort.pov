@@ -14,7 +14,7 @@
 global_settings {assumed_gamma 1.0}
 
 camera { orthographic
-         location -z*10 
+         location -z*10
          look_at 0
        }
 #default { finish { phong 1 phong_size 5 } }
@@ -77,8 +77,8 @@ Sort_Array(Numbers)
 #end
 
 text{
-//ttf "timrom.ttf", "Colors before sorting:", .1, 0
-  ttf "arial.ttf", "Colors before sorting:", .1, 0
+  ttf "timrom.ttf", "Colors before sorting:", .1, 0
+//ttf "arial.ttf", "Colors before sorting:", .1, 0
   pigment { rgb 1 }
   scale .8
   translate <-6, 3.9>
@@ -86,9 +86,9 @@ text{
 
 CreateBoxes(1)
 
-text{ 
-// ttf "timrom.ttf", "Colors after sorting (by brightness):", .1, 0
-  ttf "arial.ttf", "Colors after sorting (by brightness):", .1, 0
+text{
+  ttf "timrom.ttf", "Colors after sorting (by brightness):", .1, 0
+//ttf "arial.ttf", "Colors after sorting (by brightness):", .1, 0
   pigment { rgb 1 }
   scale .8
   translate <-6, -1.1>
