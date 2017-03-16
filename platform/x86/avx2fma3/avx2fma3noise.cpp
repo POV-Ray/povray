@@ -130,6 +130,17 @@ void AVX2FMA3NoiseInit()
     }
 }
 
+bool OptimizedNoiseAVX2FMA3::initialized = false;
+
+OptimizedNoiseAVX2FMA3::OptimizedNoiseAVX2FMA3()
+{
+    if (!initialized)
+    {
+        AVX2FMA3NoiseInit();
+        initialized = true;
+    }
+}
+
 /*****************************************************************************
 *
 * FUNCTION

@@ -143,6 +143,17 @@ void AVXNoiseInit()
     }
 }
 
+bool OptimizedNoiseAVX::initialized = false;
+
+OptimizedNoiseAVX::OptimizedNoiseAVX()
+{
+    if (!initialized)
+    {
+        AVXNoiseInit();
+        initialized = true;
+    }
+}
+
 /*****************************************************************************
 *
 * FUNCTION

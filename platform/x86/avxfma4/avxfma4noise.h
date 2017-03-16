@@ -45,7 +45,17 @@
 namespace pov
 {
 
-// no declarations here
+/// Optimized Noise generator using AVX and FMA4 instructions.
+/// @author Optimized by AMD
+class OptimizedNoiseAVXFMA4 : public OptimizedNoiseBase
+{
+public:
+    virtual DBL Noise(const Vector3d& EPoint, int noise_generator) const;
+    virtual void DNoise(Vector3d& result, const Vector3d& EPoint) const;
+    virtual const char* Name() const { return "AVX/FMA4 Noise"; }
+private:
+    static bool initialized;
+};
 
 }
 

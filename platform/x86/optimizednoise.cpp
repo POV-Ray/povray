@@ -46,50 +46,6 @@
 namespace pov
 {
 
-//******************************************************************************
-
-#ifdef TRY_OPTIMIZED_NOISE_AVX2FMA3
-
-bool OptimizedNoiseAVX2FMA3::initialized = false;
-
-OptimizedNoiseAVX2FMA3::OptimizedNoiseAVX2FMA3()
-{
-    if (!initialized)
-    {
-        AVX2FMA3NoiseInit();
-        initialized = true;
-    }
-}
-
-#endif
-
-//******************************************************************************
-
-#ifdef TRY_OPTIMIZED_NOISE_AVXFMA4
-
-// no special code
-
-#endif
-
-//******************************************************************************
-
-#ifdef TRY_OPTIMIZED_NOISE_AVX
-
-bool OptimizedNoiseAVX::initialized = false;
-
-OptimizedNoiseAVX::OptimizedNoiseAVX()
-{
-    if (!initialized)
-    {
-        AVXNoiseInit();
-        initialized = true;
-    }
-}
-
-#endif
-
-//******************************************************************************
-
 OptimizedNoiseBase* GetOptimizedNoise()
 {
     // TODO - review priority

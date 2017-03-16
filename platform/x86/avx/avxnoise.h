@@ -45,9 +45,18 @@
 namespace pov
 {
 
-/// Initialize optimized noise generator using AVX instructions.
+/// Optimized Noise generator using AVX instructions.
 /// @author Optimized by Intel
-void AVXNoiseInit();
+class OptimizedNoiseAVX : public OptimizedNoiseBase
+{
+public:
+    OptimizedNoiseAVX();
+    virtual DBL Noise(const Vector3d& EPoint, int noise_generator) const;
+    virtual void DNoise(Vector3d& result, const Vector3d& EPoint) const;
+    virtual const char* Name() const { return "AVX Noise"; }
+private:
+    static bool initialized;
+};
 
 }
 

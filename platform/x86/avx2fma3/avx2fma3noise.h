@@ -45,9 +45,18 @@
 namespace pov
 {
 
-/// Initialize optimized noise generator using AVX2 and FMA3 instructions.
+/// Optimized Noise generator using AVX2 and FMA3 instructions.
 /// @author Optimized by Intel
-void AVX2FMA3NoiseInit();
+class OptimizedNoiseAVX2FMA3 : public OptimizedNoiseBase
+{
+public:
+    OptimizedNoiseAVX2FMA3();
+    virtual DBL Noise(const Vector3d& EPoint, int noise_generator) const;
+    virtual void DNoise(Vector3d& result, const Vector3d& EPoint) const;
+    virtual const char* Name() const { return "AVX2/FMA3 Noise"; }
+private:
+    static bool initialized;
+};
 
 }
 

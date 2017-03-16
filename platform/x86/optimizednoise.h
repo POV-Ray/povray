@@ -47,41 +47,12 @@ namespace pov
 {
 
 #ifdef TRY_OPTIMIZED_NOISE_AVX2FMA3
-class OptimizedNoiseAVX2FMA3 : public OptimizedNoiseBase
-{
-public:
-    OptimizedNoiseAVX2FMA3();
-    virtual DBL Noise(const Vector3d& EPoint, int noise_generator) const;
-    virtual void DNoise(Vector3d& result, const Vector3d& EPoint) const;
-    virtual const char* Name() const { return "AVX2/FMA3 Noise"; }
-private:
-    static bool initialized;
-};
 #endif
 
 #ifdef TRY_OPTIMIZED_NOISE_AVXFMA4
-class OptimizedNoiseAVXFMA4 : public OptimizedNoiseBase
-{
-public:
-    virtual DBL Noise(const Vector3d& EPoint, int noise_generator) const;
-    virtual void DNoise(Vector3d& result, const Vector3d& EPoint) const;
-    virtual const char* Name() const { return "AVX/FMA4 Noise"; }
-private:
-    static bool initialized;
-};
 #endif
 
 #ifdef TRY_OPTIMIZED_NOISE_AVX
-class OptimizedNoiseAVX : public OptimizedNoiseBase
-{
-public:
-    OptimizedNoiseAVX();
-    virtual DBL Noise(const Vector3d& EPoint, int noise_generator) const;
-    virtual void DNoise(Vector3d& result, const Vector3d& EPoint) const;
-    virtual const char* Name() const { return "AVX Noise"; }
-private:
-    static bool initialized;
-};
 #endif
 
 OptimizedNoiseBase* GetOptimizedNoise();
