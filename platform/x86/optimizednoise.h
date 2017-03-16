@@ -37,7 +37,7 @@
 #ifndef POVRAY_OPTIMIZEDNOISE_H
 #define POVRAY_OPTIMIZEDNOISE_H
 
-#include "syspovconfigbase.h"
+#include "syspovconfigcore.h"
 
 #include "avx2fma3noise.h"
 #include "avxfma4noise.h"

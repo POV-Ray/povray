@@ -47,14 +47,7 @@
 #ifdef TRY_OPTIMIZED_NOISE_AVX2FMA3
 
 #ifdef __GNUC__
-// GCC normally provides only intrinsics for instruction set extensions that it is given free reign to optimize for;
-// to gain access to other intrinsics we need to cheat a bit.
-#ifndef __AVX2__
-#define __AVX2__
-#endif
-#ifndef __FMA3__
-#define __FMA3__
-#endif
+#pragma GCC target ("avx2,fma3")
 #endif
 
 #ifdef MACHINE_INTRINSICS_H
