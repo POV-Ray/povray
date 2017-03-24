@@ -27,16 +27,36 @@ should be located in the same directory as this file is.
 Changes between 3.7.1-beta.4 and 3.7.1-beta.5
 =============================================
 
+The focus of this version has been on improving the Visual Studio 2015-based
+Windows build process.
+
+Fixed or Mitigated Bugs
+-----------------------
+
+Reported via GitHub:
+
+  - #226 ("Fix use of stat in unix/configure.ac")
+  - #257 ("Text in Windows "Open with" file menu")
+
 Miscellaneous:
 
   - Restored user-defined function VM performance roughly back to levels of
     3.7.0.
 
+Other Noteworthy
+----------------
+
+  - To avoid overly stringent software requirements for building custom
+    Windows binaries, the VS2015 project files are now set up to generate
+    non-XP-compatible binaries by default; XP-compatible binaries can still
+    be generated through a more complex alternative build process.
+
 
 Changes between 3.7.1-beta.3 and 3.7.1-beta.4
 =============================================
 
-The focus of this version's source code changes has been on fixing bugs.
+The focus of this version has been on fixing bugs, as well getting
+working XP-comatible binaries out of Visual Studio 2015.
 
 Fixed or Mitigated Bugs
 -----------------------

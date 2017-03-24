@@ -158,6 +158,9 @@
       <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="..\winprecomp.h" />
+    <ClInclude Include="..\povwin_version.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\pvbitmap.cpp">

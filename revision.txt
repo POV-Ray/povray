@@ -27,6 +27,31 @@ Notes:
 ------------------------------------------------------------------------------
 
 ------------------------------------------------------------------------------
+POV-Ray v3.7.1-beta.5
+------------------------------------------------------------------------------
+
+Commit ea95aa9 on 2017-03-14 by Christoph Lipka
+
+    Update Unix build process to address GitHub issue #226 (#252)
+
+Commit 6f6ac48 on 2017-03-13 by Christoph Lipka
+
+    Update VS2015 project files to avoid requiring a specific Windows SDK.
+
+    As a caveat, the default build process again sacrifices XP compatibility;
+    instead, build instructions now contain a section dedicated to building
+    XP-compatible binaries.
+
+Commit d0ca075 on 2017-03-13 by William F. Pokorny (wfpokorny)
+
+    [ci skip] Updating devutils.md per current behavior. (#251)
+
+Commit 8a8b503 on 2017-03-12 by Christoph Lipka
+
+    Restore user-defined function VM performance as discussed in GitHub
+    issue #48.
+
+------------------------------------------------------------------------------
 POV-Ray v3.7.1-beta.4
 ------------------------------------------------------------------------------
 
