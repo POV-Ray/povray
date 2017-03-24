@@ -14,7 +14,7 @@
 /// ----------------------------------------------------------------------------
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -978,8 +978,11 @@ void Transform_Tpattern(TPATTERN *Tpattern, const TRANSFORM *Trans)
     if ((Tpattern != NULL) && (Tpattern->pattern != NULL))
     {
         TransformWarp* temp = NULL;
-        if (!Tpattern->pattern->warps.empty())
-            temp = dynamic_cast<TransformWarp*>(Tpattern->pattern->warps.back());
+        if (!Tpattern->pattern->warps.empty() &&
+            (Tpattern->pattern->warps.back()->getWarpType() == kWarpType_Transform))
+        {
+            temp = static_cast<TransformWarp*>(Tpattern->pattern->warps.back());
+        }
         if (!temp)
         {
             temp = new TransformWarp();
@@ -1081,7 +1084,14 @@ static const ClassicTurbulence *SearchForTurb(const WarpList warps)
     if(warps.empty())
         return NULL;
     else
-        return dynamic_cast<const ClassicTurbulence*>(*warps.begin());
+    {
+        WarpList::const_iterator iWarp = warps.begin();
+        WarpPtr warp = *iWarp;
+        if(warp->getWarpType() == kWarpType_ClassicTurbulence)
+            return static_cast<const ClassicTurbulence*>(*warps.begin());
+        else
+            return NULL;
+    }
 }
 
 
