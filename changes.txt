@@ -28,7 +28,8 @@ Changes between 3.7.1-beta.4 and 3.7.1-beta.5
 =============================================
 
 The focus of this version has been on improving the Visual Studio 2015-based
-Windows build process.
+Windows build process, as well as reclaiming some performance lost earlier
+during the development of 3.7.1.
 
 Fixed or Mitigated Bugs
 -----------------------
@@ -40,8 +41,9 @@ Reported via GitHub:
 
 Miscellaneous:
 
-  - Restored user-defined function VM performance roughly back to levels of
-    3.7.0.
+  - Restored performance of user-defined functions (e.g. in isosurfaces) as
+    well as patterns with special turbulence handling (agate, marble, wood,
+    spiral1, spiral2).
 
 Other Noteworthy
 ----------------
