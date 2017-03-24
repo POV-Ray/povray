@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -56,13 +56,38 @@ namespace pov
 * Global typedefs
 ******************************************************************************/
 
+// Note. Setting up warp types in constructors to enable downstream static_cast over much
+// more expensive dynamic_cast at run time.
+enum WarpType
+{
+    kWarpType_None              =  0,
+    kWarpType_GenericTurbulence =  1,
+    kWarpType_ClassicTurbulence =  2,
+    kWarpType_Turbulence        =  3,
+    kWarpType_BlackHole         =  4,
+    kWarpType_Cubic             =  5,
+    kWarpType_Cylindrical       =  6,
+    kWarpType_Identity          =  7,
+    kWarpType_Planar            =  8,
+    kWarpType_Repeat            =  9,
+    kWarpType_Spherical         = 10,
+    kWarpType_Toroidal          = 11,
+    kWarpType_Transform         = 12
+};
+
 struct GenericWarp
 {
+    short mWarpType;
+
+    GenericWarp() { setWarpType(kWarpType_None); }
     virtual ~GenericWarp() {}
     virtual GenericWarp* Clone() const = 0;
     virtual bool WarpPoint(Vector3d& rP) const = 0;
     virtual bool WarpNormal(Vector3d& rN) const = 0;
     virtual bool UnwarpNormal(Vector3d& rN) const = 0;
+    void setWarpType(const short& warpType) { mWarpType = warpType; };
+    short getWarpType() const { return mWarpType; }
+
 };
 
 typedef GenericWarp* WarpPtr;
@@ -75,7 +100,7 @@ struct BlackHoleWarp : public GenericWarp
     BlackHoleWarp() :
         GenericWarp(), Center(0.0), Repeat_Vector(0.0), Uncertainty_Vector(0.0), Strength(1.0), Radius(1.0),
         Radius_Squared(1.0), Inverse_Radius(1.0), Power(2.0), Type(0), Inverted(false), Repeat(false), Uncertain(false)
-    {}
+    { setWarpType(kWarpType_BlackHole); }
     BlackHoleWarp(const BlackHoleWarp& old) :
         GenericWarp(old), Center(old.Center), Repeat_Vector(old.Repeat_Vector),
         Uncertainty_Vector(old.Uncertainty_Vector), Strength(old.Strength), Radius(old.Radius),
@@ -104,7 +129,7 @@ struct BlackHoleWarp : public GenericWarp
 
 struct CubicWarp : public GenericWarp
 {
-    CubicWarp() : GenericWarp() {}
+    CubicWarp() : GenericWarp() { setWarpType(kWarpType_Cubic); }
     CubicWarp(const CubicWarp& old) : GenericWarp(old) {}
 
     virtual GenericWarp* Clone() const { return new CubicWarp(*this); }
@@ -117,7 +142,7 @@ struct CylindricalWarp : public GenericWarp
 {
     CylindricalWarp() :
         GenericWarp(), Orientation_Vector(0.0, 0.0, 1.0), DistExp(0.0)
-    {}
+    { setWarpType(kWarpType_Cylindrical); }
     CylindricalWarp(const CylindricalWarp& old) :
         GenericWarp(old), Orientation_Vector(old.Orientation_Vector), DistExp(old.DistExp)
     {}
@@ -133,7 +158,7 @@ struct CylindricalWarp : public GenericWarp
 
 struct IdentityWarp : public GenericWarp
 {
-    IdentityWarp() : GenericWarp() {}
+    IdentityWarp() : GenericWarp() { setWarpType(kWarpType_Identity); }
     IdentityWarp(const IdentityWarp& old) : GenericWarp(old) {}
 
     virtual GenericWarp* Clone() const { return new IdentityWarp(*this); }
@@ -146,7 +171,7 @@ struct PlanarWarp : public GenericWarp
 {
     PlanarWarp() :
         GenericWarp(), Orientation_Vector(0.0, 0.0, 1.0), OffSet(0.0)
-    {}
+    { setWarpType(kWarpType_Planar); }
     PlanarWarp(const PlanarWarp& old) :
         GenericWarp(old), Orientation_Vector(old.Orientation_Vector), OffSet(old.OffSet)
     {}
@@ -164,7 +189,7 @@ struct RepeatWarp : public GenericWarp
 {
     RepeatWarp() :
         GenericWarp(), Axis(-1), Width(0.0), Flip(1.0), Offset(0.0)
-    {}
+    { setWarpType(kWarpType_Repeat); }
     RepeatWarp(const RepeatWarp& old) :
         GenericWarp(old), Axis(old.Axis), Width(old.Width), Flip(old.Flip), Offset(old.Offset)
     {}
@@ -183,10 +208,10 @@ struct SphericalWarp : public GenericWarp
 {
     SphericalWarp() :
         GenericWarp(), Orientation_Vector(0.0, 0.0, 1.0), DistExp(0.0)
-    {}
+    { setWarpType(kWarpType_Spherical); }
     SphericalWarp(const SphericalWarp& old) :
         GenericWarp(old), Orientation_Vector(old.Orientation_Vector), DistExp(old.DistExp)
-     {}
+    {}
 
     virtual GenericWarp* Clone() const { return new SphericalWarp(*this); }
     virtual bool WarpPoint(Vector3d& rP) const;
@@ -201,7 +226,7 @@ struct ToroidalWarp : public GenericWarp
 {
     ToroidalWarp() :
         GenericWarp(), Orientation_Vector(0.0, 0.0, 1.0), DistExp(0.0), MajorRadius(1.0)
-    {}
+    { setWarpType(kWarpType_Toroidal); }
     ToroidalWarp(const ToroidalWarp& old) :
         GenericWarp(old), Orientation_Vector(old.Orientation_Vector), DistExp(old.DistExp),
         MajorRadius(old.MajorRadius)
@@ -224,6 +249,7 @@ struct TransformWarp : public GenericWarp
     {
         MIdentity(Trans.matrix);
         MIdentity(Trans.inverse);
+        setWarpType(kWarpType_Transform);
     }
     TransformWarp(const TransformWarp& old) :
         GenericWarp(old), Trans(old.Trans)
@@ -242,7 +268,7 @@ struct GenericTurbulenceWarp : public GenericWarp
 {
     GenericTurbulenceWarp() :
         GenericWarp(), Turbulence(0.0), Octaves(6), Omega(0.5), Lambda(2.0)
-    {}
+    { setWarpType(kWarpType_GenericTurbulence); }
     GenericTurbulenceWarp(const GenericTurbulenceWarp& old) :
         GenericWarp(old), Turbulence(old.Turbulence), Octaves(old.Octaves), Lambda(old.Lambda), Omega(old.Omega)
     {}
@@ -260,7 +286,7 @@ struct GenericTurbulenceWarp : public GenericWarp
 /// Genuine turbulence warp.
 struct TurbulenceWarp : public GenericTurbulenceWarp
 {
-    TurbulenceWarp() : GenericTurbulenceWarp() {}
+    TurbulenceWarp() : GenericTurbulenceWarp() { setWarpType(kWarpType_Turbulence); }
     TurbulenceWarp(const TurbulenceWarp& old) : GenericTurbulenceWarp(old) {}
 
     virtual GenericWarp* Clone() const { return new TurbulenceWarp(*this); }
@@ -271,7 +297,7 @@ struct ClassicTurbulence : public GenericTurbulenceWarp
 {
     ClassicTurbulence(bool hbp) :
         GenericTurbulenceWarp(), handledByPattern(hbp)
-    {}
+    { setWarpType(kWarpType_ClassicTurbulence); }
     ClassicTurbulence(const ClassicTurbulence& old) :
         GenericTurbulenceWarp(old), handledByPattern(old.handledByPattern)
     {}
