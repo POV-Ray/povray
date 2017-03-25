@@ -486,7 +486,7 @@ bool ColourImagePattern::Evaluate(TransColour& result, const Vector3d& EPoint, c
 
     // If outside map coverage area, return clear
 
-    if (map_pos(EPoint, this, &xcoor, &ycoor))
+    if (map_pos(EPoint, pImage, &xcoor, &ycoor))
     {
         result = ToTransColour(RGBFTColour(1.0, 1.0, 1.0, 0.0, 1.0));
         return false;
