@@ -30,6 +30,22 @@ Notes:
 POV-Ray v3.7.1-beta.5
 ------------------------------------------------------------------------------
 
+Commit 6db6b87 on 2017-03-25 by Christoph Lipka
+
+    Eliminate or clean up a few more instances of `dynamic_cast`.
+
+Commit 32f1606 on 2017-03-25 by Christoph Lipka
+
+    Minor update to README.md
+
+Commit 7ffe150 on 2017-03-24 by Christoph Lipka
+
+    Restore turbulent pattern performance as discussed in GitHub issue #48.
+
+Commit 741fae5 on 2017-03-24 by Christoph Lipka
+
+    Overhaul version information, addressing GitHub issue #257.
+
 Commit ea95aa9 on 2017-03-14 by Christoph Lipka
 
     Update Unix build process to address GitHub issue #226 (#252)
