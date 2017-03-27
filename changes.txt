@@ -24,6 +24,17 @@ should be located in the same directory as this file is.
 ------------------------------------------------------------------------------
 
 
+Changes between 3.7.1-beta.5 and 3.7.1-TBD
+=============================================
+
+Fixed or Mitigated Bugs
+-----------------------
+
+Reported via GitHub:
+
+  - #260 ("Pavement pattern broken")
+
+
 Changes between 3.7.1-beta.4 and 3.7.1-beta.5
 =============================================
 
