@@ -38,7 +38,7 @@
 #ifndef PVEDIT_H_INCLUDED
 #define PVEDIT_H_INCLUDED
 
-#include "base/version.h"
+#include "povwin_version.h"
 
 #define EDITDLLVERSION            0x0302
 
@@ -72,12 +72,8 @@
 // documents directory if it is not found in the registry, hence must be valid
 // path components as well as valid registry keys.
 #define REGKEY                    "POV-Ray"
-#define REGVER                    "v3.7"
-#ifdef POVRAY_IS_BETA
-  #define REGVERKEY                 REGVER "-beta"
-#else
-  #define REGVERKEY                 REGVER
-#endif
+#define REGVER                    "v" OFFICIAL_GENERATION_STRING
+#define REGVERKEY                 "v" POVWIN_GENERATION_STRING
 
 namespace povwin
 {

@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -202,6 +202,12 @@ struct BasicPattern
     ///
     virtual PatternPtr Clone() const = 0;
 
+    /// Test the pattern parameters and precompute derived values.
+    ///
+    /// @return True if pattern parameters are within reasonable limits.
+    ///
+    virtual bool Precompute();
+
     /// Evaluates the pattern at a given point in space.
     ///
     /// This method implements the actual pattern computation code, and for obvious reasons any derived class must
@@ -384,6 +390,7 @@ struct AgatePattern : public ContinuousPattern
 
     AgatePattern();
     virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
+    virtual bool Precompute();
     virtual DBL EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const;
     virtual ColourBlendMapConstPtr GetDefaultBlendMap() const;
 };
@@ -583,9 +590,14 @@ struct MarblePattern : public ContinuousPattern
 {
     MarblePattern();
     virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
+    virtual bool Precompute();
     virtual DBL EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const;
     virtual ColourBlendMapConstPtr GetDefaultBlendMap() const;
     virtual bool HasSpecialTurbulenceHandling() const;
+
+protected:
+
+    bool hasTurbulence : 1;
 };
 
 /// Base class for the noise-based patterns.
@@ -777,9 +789,14 @@ struct WoodPattern : public ContinuousPattern
 {
     WoodPattern();
     virtual PatternPtr Clone() const { return BasicPattern::Clone(*this); }
+    virtual bool Precompute();
     virtual DBL EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const;
     virtual ColourBlendMapConstPtr GetDefaultBlendMap() const;
     virtual bool HasSpecialTurbulenceHandling() const;
+
+protected:
+
+    bool hasTurbulence : 1;
 };
 
 /// Implements the `wrinkles` pattern.
@@ -997,7 +1014,12 @@ struct SpiralPattern : public ContinuousPattern
 
     SpiralPattern();
     virtual PatternPtr Clone() const = 0;
+    virtual bool Precompute();
     virtual DBL EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsection, const Ray *pRay, TraceThreadData *pThread) const = 0;
+
+protected:
+
+    bool hasTurbulence : 1;
 };
 
 /// Implements the `spiral1` pattern.

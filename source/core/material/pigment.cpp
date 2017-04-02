@@ -14,7 +14,7 @@
 /// ----------------------------------------------------------------------------
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -438,10 +438,8 @@ bool Compute_Pigment (TransColour& colour, const PIGMENT *Pigment, const Vector3
 
                 colour.Clear();
 
-                if (const ColourPattern* pattern = dynamic_cast<ColourPattern*>(Pigment->pattern.get()))
-                    Colour_Found = pattern->Evaluate(colour, TPoint, Intersect, ray, Thread);
-                else
-                    POV_PATTERN_ASSERT(false);
+                POV_PATTERN_ASSERT(dynamic_pointer_cast<ColourPattern>(Pigment->pattern));
+                Colour_Found = static_pointer_cast<ColourPattern>(Pigment->pattern)->Evaluate(colour, TPoint, Intersect, ray, Thread);
 
                 break;
 

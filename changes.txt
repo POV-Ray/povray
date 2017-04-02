@@ -38,10 +38,98 @@ Changes between 3.7.1-TBD and 3.7.1
 TBD
 
 
-Changes between 3.7.1-beta.2 and 3.7.1-TBD
-==========================================
+Changes between 3.7.1-beta.5 and 3.7.1-TBD
+=============================================
 
-The focus of this version has been on fixing bugs.
+Fixed or Mitigated Bugs
+-----------------------
+
+Reported via GitHub:
+
+  - #260 ("Pavement pattern broken")
+
+Miscellaneous:
+
+  - Minor updates to the documentation.
+
+
+Changes between 3.7.1-beta.4 and 3.7.1-beta.5
+=============================================
+
+The focus of this version has been on improving the Visual Studio 2015-based
+Windows build process, as well as reclaiming some performance lost earlier
+during the development of 3.7.1.
+
+Fixed or Mitigated Bugs
+-----------------------
+
+Reported via GitHub:
+
+  - #226 ("Fix use of stat in unix/configure.ac")
+  - #257 ("Text in Windows "Open with" file menu")
+
+Miscellaneous:
+
+  - Restored performance of user-defined functions (e.g. in isosurfaces) as
+    well as patterns with special turbulence handling (agate, marble, wood,
+    spiral1, spiral2).
+
+Other Noteworthy
+----------------
+
+  - To avoid overly stringent software requirements for building custom
+    Windows binaries, the VS2015 project files are now set up to generate
+    non-XP-compatible binaries by default; XP-compatible binaries can still
+    be generated through a more complex alternative build process.
+
+
+Changes between 3.7.1-beta.3 and 3.7.1-beta.4
+=============================================
+
+The focus of this version has been on fixing bugs, as well getting
+working XP-comatible binaries out of Visual Studio 2015.
+
+Fixed or Mitigated Bugs
+-----------------------
+
+Reported via GitHub:
+
+  - #241 ("Windows Build Instructions Misleading")
+
+Reported via the Newsgroups:
+
+  - <58aa4755$1@news.povray.org>
+    (2017-02-19, povray.beta-test, "beta.3 and ./ and ../ weirdness")
+    Paths starting with "../../" not handled properly in POV-Ray for Windows
+
+  - <58aca5fc@news.povray.org>
+    (2017-02-22, povray.beta-test, "ior.inc fails in 3.7.1 beta 3")
+    Parse Error when including "ior.inc".
+
+  - <58ab1921$1@news.povray.org>
+    (2017-02-20, povray.beta-test, "Re: POV-Ray v3.7.1-beta.3 Released")
+    SSE2 support not properly detected on Windows XP
+
+  - <58ae4809$1@news.povray.org>
+    (2017-02-22, povray.beta-test, "Wrong error message building Windows console version")
+    Wrong file location specified for `syspovconfig.h`.
+
+Miscellaneous:
+
+  - Fixed two demo scenes (`incdemo/sort.pov` and `textures/normals/normmap.pov`).
+
+Other Noteworthy
+----------------
+
+  - Migrated to Visual Studio 2015 as the designated official build tool.
+    As of this beta, Visual Studio 2010 is no longer supported.
+
+
+Changes between 3.7.1-beta.2 and 3.7.1-beta.3
+=============================================
+
+The focus of this version has been on fixing bugs, as well as adding
+hardware-specific performance optiomizations.
 
 Fixed or Mitigated Bugs
 -----------------------
@@ -63,18 +151,23 @@ Reported via the Newsgroups:
     (2017-01-27, povray.beta-test, "utf8")
     Crash when using `charset utf8`.
 
+  - <58a5472b$1@news.povray.org>
+    (2017-02-16, povray.beta-test, "Windows beta.2-QA09T.msvc10.win64 does not accept "./" as a path")
+    Special directory name `.` not handled properly in POV-Ray for Windows.
+
 Miscellaneous:
 
   - Optional fields in macro parameters or tuple assignments now accept
     uninitialized directory entries.
   - Some minor fixes to the Windows inbuilt help.
+  - Increased thread stack size on Linux machines.
 
 Other Noteworthy
 ----------------
 
-New Sample Scenes:
-
-  - A new sample scene has been added to demonstrate the `aoi` pattern.
+  - Added a new sample scene to demonstrate the `aoi` pattern.
+  - Added Intel optimizations for noise (courtesy of Intel; requires
+    AVX2/FMA3-capable CPU).
 
 
 Changes between 3.7.1-beta.1 and 3.7.1-beta.2

@@ -86,12 +86,15 @@
 #include "backend/povray.h"
 
 #ifdef RTR_SUPPORT
-  #include "rtrsupport.h"
+#include "rtrsupport.h"
 #endif
 
-#if defined(TRY_OPTIMIZED_NOISE)
-  #include OPTIMIZED_NOISE_H
+#include "cpuid.h"
+
+#ifdef OPTIMIZED_NOISE_H
+#include OPTIMIZED_NOISE_H
 #endif
+
 
 // this must be the last file included
 #include "syspovdebug.h"
@@ -5322,6 +5325,42 @@ char *WriteDump(struct _EXCEPTION_POINTERS *pExceptionInfo, bool full, long time
   return NULL;
 }
 
+#ifdef BUILD_AVX2
+void NoAVX2 (void)
+{
+  MessageBox (NULL,
+              "This build of POV-Ray requires that your processor provides AVX2 support.\n"
+              "Please use the standard non-AVX2 version of POV-Ray on this computer.",
+              "POV-Ray for Windows",
+              MB_ICONSTOP | MB_OK) ;
+  exit (-1) ;
+}
+
+inline void TestAVX2 (void)
+{
+  if (!HaveAVX2())
+    NoAVX2();
+}
+#endif // BUILD_AVX2
+
+#ifdef BUILD_AVX
+void NoAVX (void)
+{
+  MessageBox (NULL,
+              "This build of POV-Ray requires that your processor provides AVX support.\n"
+              "Please use the standard non-AVX version of POV-Ray on this computer.",
+              "POV-Ray for Windows",
+              MB_ICONSTOP | MB_OK) ;
+  exit (-1) ;
+}
+
+inline void TestAVX (void)
+{
+  if (!HaveAVX())
+    NoAVX();
+}
+#endif // BUILD_AVX
+
 #ifdef BUILD_SSE2
 void NoSSE2 (void)
 {
@@ -5333,18 +5372,30 @@ void NoSSE2 (void)
   exit (-1) ;
 }
 
-inline int TestSSE2 (void)
+inline void TestSSE2 (void)
 {
-  __try
+  if (HaveVistaOrLater())
   {
-    __asm { movapd xmm0,xmm1 }
+    // Use the canonical test.
+    if (!HaveSSE2())
+      NoSSE2();
   }
-  __except(NoSSE2(),1)
+  else
   {
+    // On Windows XP (and presumably also Windows Server 2003), the canonical test does not seem
+    // to work properly for yet unknown reasons, so we test for support the dirty way by trying to
+    // actually execute an SSE2 instruction.
+    __try
+    {
+      __asm { movapd xmm0, xmm1 }
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+      NoSSE2();
+    }
   }
-  return (0) ;
 }
-#endif
+#endif // BUILD_SSE2
 
 void InvalidParameterHandler(const wchar_t* expression, const wchar_t* function, const wchar_t* file, unsigned int line, uintptr_t pReserved)
 {
@@ -5354,7 +5405,13 @@ void InvalidParameterHandler(const wchar_t* expression, const wchar_t* function,
 int PASCAL WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
 {
 #ifdef BUILD_SSE2
-  TestSSE2 () ;
+  TestSSE2();
+#endif
+#ifdef BUILD_AVX
+  TestAVX();
+#endif
+#ifdef BUILD_AVX2
+  TestAVX2();
 #endif
 
   int                   show_state ;
@@ -6155,15 +6212,37 @@ int PASCAL WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
 #endif
   buffer_message (mDivider, "\n") ;
 
-#if defined(TRY_OPTIMIZED_NOISE)
+#ifdef TRY_OPTIMIZED_NOISE
+  // TODO FIXME
   // technically we should ask the backend what it's using, but given this is not a remoted version
   // of POVWIN, we just call the test here.
-  if (OPTIMIZED_NOISE_SUPPORTED)
+  // NOTE - The priorization should reflect `optimizednoise.h`.
+#ifdef TRY_OPTIMIZED_NOISE_AVX2FMA3
+  if (AVX2FMA3NoiseSupported())
   {
-    buffer_message (mIDE, "FMA4 instruction support detected: using FMA4-optimized noise functions.\n") ;
-    buffer_message (mDivider, "\n") ;
+    buffer_message (mIDE, "AVX2/FMA3 instruction support detected: using AVX2/FMA3-optimized noise functions.\n") ;
   }
+  else
 #endif
+#ifdef TRY_OPTIMIZED_NOISE_AVXFMA4
+  if (AVXFMA4NoiseSupported())
+  {
+    buffer_message (mIDE, "AVX/FMA4 instruction support detected: using AVX/FMA4-optimized noise functions.\n") ;
+  }
+  else
+#endif
+#ifdef TRY_OPTIMIZED_NOISE_AVX
+  if (AVXNoiseSupported())
+  {
+    buffer_message (mIDE, "AVX instruction support detected: using AVX-optimized noise functions.\n") ;
+  }
+  else
+#endif
+  {
+    buffer_message (mIDE, "No enhanced instruction support detected: using compatible noise functions.\n") ;
+  }
+  buffer_message (mDivider, "\n") ;
+#endif // TRY_OPTIMIZED_NOISE
 
   load_tool_menu (ToolIniFileName) ;
   if (GetHKCU("FileQueue", "ReloadOnStartup", 0))

@@ -1384,6 +1384,10 @@ noinst_LIBRARIES = libplatform.a
 libplatform_a_SOURCES = \\
 `echo $files`
 
+# if BUILD_AVX2
+# libplatform_a_SOURCES += x86/avx2fma3noise.cpp x86/avx2fma3noise.h x86/cpuid.cpp x86/cpuid.h
+# endif
+
 # Include paths for headers.
 AM_CPPFLAGS = \\
   -I\$(top_srcdir)/unix/povconfig \\

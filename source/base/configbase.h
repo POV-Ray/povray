@@ -742,6 +742,14 @@
     #define ALIGN16
 #endif
 
+#ifndef ALIGN32
+    // leave undefined, allowing code to detect that forced 32-bit alignment isn't supported
+    #ifdef DOXYGEN
+        // doxygen cannot document undefined macros
+        #define ALIGN32
+    #endif
+#endif
+
 #ifndef FORCEINLINE
     #define FORCEINLINE inline
 #endif

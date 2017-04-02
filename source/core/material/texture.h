@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -168,14 +168,14 @@ void Free_Noise_Tables (void);
 
 DBL SolidNoise(const Vector3d& P);
 
-#if defined(TRY_OPTIMIZED_NOISE)
+#ifdef TRY_OPTIMIZED_NOISE
 extern DBL (*Noise) (const Vector3d& EPoint, int noise_generator);
 extern void (*DNoise) (Vector3d& result, const Vector3d& EPoint);
 void Initialise_NoiseDispatch();
-#else
+#else // TRY_OPTIMIZED_NOISE
 INLINE_NOISE DBL Noise (const Vector3d& EPoint, int noise_generator);
 INLINE_NOISE void DNoise (Vector3d& result, const Vector3d& EPoint);
-#endif
+#endif // TRY_OPTIMIZED_NOISE
 
 DBL Turbulence (const Vector3d& EPoint, const GenericTurbulenceWarp* Turb, int noise_generator);
 void DTurbulence (Vector3d& result, const Vector3d& EPoint, const GenericTurbulenceWarp* Turb);

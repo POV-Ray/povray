@@ -30,6 +30,128 @@ Notes:
 POV-Ray v3.7.1-TBD
 ------------------------------------------------------------------------------
 
+------------------------------------------------------------------------------
+POV-Ray v3.7.1-beta.5
+------------------------------------------------------------------------------
+
+Commit 8da24d1 on 2017-03-25 by Christoph Lipka
+
+    Bump version number. Also add a doc on our use of GitHub issues.
+
+Commit 6db6b87 on 2017-03-25 by Christoph Lipka
+
+    Eliminate or clean up a few more instances of `dynamic_cast`.
+
+Commit 32f1606 on 2017-03-25 by Christoph Lipka
+
+    Minor update to README.md
+
+Commit 7ffe150 on 2017-03-24 by Christoph Lipka
+
+    Restore turbulent pattern performance as discussed in GitHub issue #48.
+
+Commit 741fae5 on 2017-03-24 by Christoph Lipka
+
+    Overhaul version information, addressing GitHub issue #257.
+
+Commit ea95aa9 on 2017-03-14 by Christoph Lipka
+
+    Update Unix build process to address GitHub issue #226 (#252)
+
+Commit 6f6ac48 on 2017-03-13 by Christoph Lipka
+
+    Update VS2015 project files to avoid requiring a specific Windows SDK.
+
+    As a caveat, the default build process again sacrifices XP compatibility;
+    instead, build instructions now contain a section dedicated to building
+    XP-compatible binaries.
+
+Commit d0ca075 on 2017-03-13 by William F. Pokorny (wfpokorny)
+
+    [ci skip] Updating devutils.md per current behavior. (#251)
+
+Commit 8a8b503 on 2017-03-12 by Christoph Lipka
+
+    Restore user-defined function VM performance as discussed in GitHub
+    issue #48.
+
+------------------------------------------------------------------------------
+POV-Ray v3.7.1-beta.4
+------------------------------------------------------------------------------
+
+Commit dc1a27c on 2017-03-04 by Christoph Lipka
+
+    Bump version number.
+
+Commit 6eb1d94 on 2017-03-04 by Christoph Lipka
+
+    Fix SSE2 support detection on Windows XP.
+
+Commit 5e34fd0 on 2017-03-04 by Christoph Lipka
+
+    Upgrade Visual Studio project files from VS 2010 to VS 2015.
+
+Commit 9cc7117 on 2017-02-27 by Christoph Lipka
+
+    Replace Windows plaintext and HTML "readme" files with a Markdown file.
+
+Commit d4cea4d on 2017-02-27 by Christoph Lipka
+
+    Fix GitHub issue #241, as well as Windows console version related error
+    messages and doc files.
+
+Commit a32a20b on 2017-02-27 by William F. Pokorny (wfpokorny)
+
+    Fix parse errors in two demo scenes. (#242)
+
+Commit 63e9b8a on 2017-02-22 by Christoph Lipka
+
+    Fix handling of directory names starting with `../../` in POV-Ray
+    for Windows.
+
+Commit 7c74478 on 2017-02-22 by Christoph Lipka
+
+    Fix `ior.inc`.
+
+------------------------------------------------------------------------------
+POV-Ray v3.7.1-beta.3
+------------------------------------------------------------------------------
+
+Commit 5ed6025 on 2017-02-19 by Christoph Lipka
+
+    Update change log as well as some comments and build instructions.
+
+Commit 7f41d96 on 2017-02-19 by Christoph Lipka
+
+    Add optimized noise implementation from Intel for AVX2/FMA3-capable CPUs.
+
+    Also overhauled optimized noise for AVX/FMA4-capable CPUs, as well as
+    CPU type identification code.
+
+Commit 9cf8a79 on 2017-02-16 by Christoph Lipka
+
+    Fix handling of special directory name `.` in POV-Ray for Windows.
+
+Commit b4605a5 on 2017-02-14 by William F. Pokorny (wfpokorny)
+
+    Fixing thread stack size overrun crash. (#235)
+
+    Fixes Dick Balaska's seg fault as report in beta-test newsgroup on
+    February 12, 2017. In particular we are extending the
+    POV_THREAD_STACK_SIZE macro mechanism to all NewBoostThread
+    calls.
+
+Commit 0e8dbe8 on 2017-02-08 by William F. Pokorny (wfpokorny)
+
+    Adding POV_THREAD_STACK_SIZE macro. (#231)
+
+    Unix default is 4MB due regression, otherise 2MB. Checks added for a min
+    size of 64KB.
+
+Commit 060464b on 2017-02-05 by Christoph Lipka
+
+    [ci skip] Minor update to `README.md`.
+
 Commit cfaa14d on 2017-02-05 by Christoph Lipka
 
     [ci skip] Update POV-Ray for Windows "about" box.

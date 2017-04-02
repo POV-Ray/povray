@@ -59,6 +59,9 @@
 /// Copyright string.
 #define POV_RAY_COPYRIGHT "Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd."
 
+/// First two components of official source code version string.
+#define OFFICIAL_GENERATION_STRING "3.7"
+
 /// Official source code version string.
 /// @note For pre-releases this should be _equal to_ the planned final version.
 #define OFFICIAL_VERSION_STRING "3.7.2"
@@ -80,16 +83,6 @@
 /// Whether this version is a beta.
 /// Leave undefined for pre-beta, release candidate or final releases.
 //#define POVRAY_IS_BETA
-
-//------------------------------------------------------------------------------
-
-/// @def OFFICIAL_VERSION_WINRC_STRING
-/// Official source code version string for Windows resource file.
-#ifdef POV_RAY_PRERELEASE
-    #define OFFICIAL_VERSION_WINRC_STRING OFFICIAL_VERSION_STRING "-" POV_RAY_PRERELEASE
-#else
-    #define OFFICIAL_VERSION_WINRC_STRING OFFICIAL_VERSION_STRING
-#endif
 
 /// @}
 ///
