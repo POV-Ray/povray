@@ -511,7 +511,7 @@
 <table class="HeaderFooter" width="100%">
 <tr>
   <td colspan=5 align="left" class="HeaderFooter">
-    POV-Ray for Unix <strong class="HeaderFooter">version 3.7</strong>
+    POV-Ray for Unix <strong class="HeaderFooter">version 3.7.1</strong>
   </td>
 </tr>
 <tr >
@@ -551,7 +551,7 @@ before proceeding with these advanced shapes.</p>
 <a name="t2_3_1_1"></a>
 <div class="content-level-h4" contains="Lathe Object" id="t2_3_1_1">
 <h4>2.3.1.1 Lathe Object</h4>
-<p>In the real world, <code><a href="r3_4.html#r3_4_5_1_8">lathe</a></code> refers to a process of making patterned rounded shapes by spinning the source material in place and carving pieces out as it turns. The results can be elaborate, smoothly rounded, elegant looking artefacts such as table legs, pottery, etc. In POV-Ray, a lathe object is used for creating much the same kind of items, although we are referring to the object itself rather than the means of production.</p>
+<p>In the real world, <code><a href="r3_5.html#r3_5_1_1_8">lathe</a></code> refers to a process of making patterned rounded shapes by spinning the source material in place and carving pieces out as it turns. The results can be elaborate, smoothly rounded, elegant looking artefacts such as table legs, pottery, etc. In POV-Ray, a lathe object is used for creating much the same kind of items, although we are referring to the object itself rather than the means of production.</p>
 <p>
 Here is some source for a really basic lathe.</p>
 <pre>
@@ -605,10 +605,9 @@ between a lathe and a surface of revolution object (SOR). The SOR object,
 described in a separate tutorial, may seem terribly similar to the lathe at
 first glance. It too declares a series of points and connects them with
 curving lines and then rotates them around the y-axis. The lathe has certain
-advantages, such as different kinds of splines, linear, quadratic and cubic,
-and one more thing:</p>
+advantages, such as linear, quadratic, cubic and bezier spline support.</p>
 <p>
-The simpler mathematics used by a SOR does not allow the curve to double
+Plus, the simpler mathematics used by a SOR does not allow the curve to double
 back over the same y-coordinates, thus, if using a SOR, any sudden twist
 which cuts back down over the same heights that the curve previously covered
 will trigger an error. For example, suppose we wanted a lathe to arc up from
@@ -622,6 +621,7 @@ Still, the SOR has one powerful strong point: because it uses simpler order
 mathematics, it generally tends to render faster than an equivalent lathe. So
 in the end, it is a matter of: we use a SOR if its limitations will allow, but
 when we need a more flexible shape, we go with the lathe instead.</p>
+
 </div>
 <a name="t2_3_1_1_1"></a>
 <div class="content-level-h5" contains="Understanding The Concept of Splines" id="t2_3_1_1_1">
@@ -937,7 +937,7 @@ object. If such a program is available we should take advantage of it.</p>
 </table>
 
 <p>We will use the point configuration shown in the figure above. There are eight points describing the curve that will be rotated about the y-axis to get our cup. The curve was calculated using the method described in the
-reference section (see <a href="r3_4.html#r3_4_5_1_15">Surface of Revolution</a>).</p>
+reference section (see <a href="r3_5.html#r3_5_1_1_16">Surface of Revolution</a>).</p>
 <p>
 Now it is time to come up with a scene that uses the above SOR object. We
 create a file called <code>sordemo.pov</code> and enter the following text.</p>
@@ -1395,7 +1395,7 @@ of surfaces using only a few control points. The control points serve to determi
 of the patch. Instead of defining the vertices of triangles, we simply give the coordinates
 of the control points. A single patch has 16 control points, one at each corner, and the rest
 positioned to divide the patch into smaller sections. POV-Ray does not ray trace the patches
-directly, they are approximated using triangles as described in the <a href="r3_4.html#r3_4_5_2_1">Scene Description Language</a> section.
+directly, they are approximated using triangles as described in the <a href="r3_5.html#r3_5_1_2_1">Scene Description Language</a> section.
 </p>
 <p>
 Bicubic patches are almost always created by using a third party modeler, but for this tutorial
@@ -1914,7 +1914,7 @@ in the mesh.</p>
 Now let's begin. We will create a simple box with differently colored
 sides. We create an empty file called <code>meshdemo.pov</code> and add the
 following lines. Note that a mesh is - not surprisingly - declared using the
-keyword <code><a href="r3_4.html#r3_4_5_2_3">mesh</a></code>.</p>
+keyword <code><a href="r3_5.html#r3_5_1_2_3">mesh</a></code>.</p>
 <pre>
   camera {
     location &lt;20, 20, -50&gt;
@@ -2363,7 +2363,7 @@ will get their texture from a general <code>texture</code> statement in the
 <a name="t2_3_2_3"></a>
 <div class="content-level-h4" contains="Polygon Object" id="t2_3_2_3">
 <h4>2.3.2.3 Polygon Object</h4>
-<p>The <code><a href="r3_4.html#r3_4_5_2_5">polygon</a></code> object can be used to create any planar, n-sided shapes like squares, rectangles, pentagons, hexagons, octagons, etc.</p>
+<p>The <code><a href="r3_5.html#r3_5_1_2_5">polygon</a></code> object can be used to create any planar, n-sided shapes like squares, rectangles, pentagons, hexagons, octagons, etc.</p>
 <p>
 A polygon is defined by a number of points that describe its shape. Since
 polygons have to be closed the first point has to be repeated at the end of
@@ -2503,7 +2503,7 @@ Finally, we get the complete word POV.</p>
 <a name="t2_3_3_1"></a>
 <div class="content-level-h4" contains="Blob Object" id="t2_3_3_1">
 <h4>2.3.3.1 Blob Object</h4>
-<p>Blobs are described as spheres and cylinders covered with <em>goo</em> which stretches to smoothly join them (see section <a href="r3_4.html#r3_4_5_1_1">Blob</a>).</p>
+<p>Blobs are described as spheres and cylinders covered with <em>goo</em> which stretches to smoothly join them (see section <a href="r3_5.html#r3_5_1_1_1">Blob</a>).</p>
 <p>
 Ideal for modeling atoms and molecules, blobs are also powerful tools for
 creating many smooth flowing <em>organic</em> shapes.</p>
@@ -2678,6 +2678,7 @@ of course, is the strength of the component. Just as with spherical
 components, the strength will determine the nature and degree of this
 component's interaction with its fellow components. In fact, next let us
 give this fellow something to interact with, shall we?</p>
+
 </div>
 <a name="t2_3_3_1_2"></a>
 <div class="content-level-h5" contains="Complex Blob Constructs and Negative Strength" id="t2_3_3_1_2">
@@ -2774,6 +2775,7 @@ more realistic hand with a couple dozen additional components, what we get
 this time is a considerable improvement. Any by now, we have enough basic
 knowledge of blob mechanics to make a wide array of smooth, flowing organic
 shapes!</p>
+
 </div>
 <a name="t2_3_3_2"></a>
 <div class="content-level-h4" contains="Height Field Object" id="t2_3_3_2">
@@ -2879,7 +2881,9 @@ higher resolution with anti-aliasing.</p>
 
 <p>Wow! The Himalayas have come to our computer screen!</p>
 
+
 </div>
+
 <a name="t2_3_3_3"></a>
 <div class="content-level-h4" contains="Isosurface Object" id="t2_3_3_3">
 <h4>2.3.3.3 Isosurface Object</h4>
@@ -2891,10 +2895,7 @@ difficult to handle. However, they offer many interesting possibilities, like re
 
 <p>Some knowledge about mathematical functions and geometry is useful,
 but not necessarily required to work with isosurfaces.</p>
-
 </div>
-
-
 <a name="t2_3_3_3_1"></a>
 <div class="content-level-h5" contains="Simple functions" id="t2_3_3_3_1">
 <h5>2.3.3.3.1 Simple functions</h5>
@@ -3153,7 +3154,7 @@ isosurface {
 <div class="content-level-h5" contains="Internal functions" id="t2_3_3_3_5">
 <h5>2.3.3.3.5 Internal functions</h5>
 <p>There are a lot of internal functions available in POV-Ray. For example a sphere could also be generated with <code>function&nbsp;{&nbsp;f_sphere(x,&nbsp;y,&nbsp;z,&nbsp;2)&nbsp;}</code>, for these and other functions, see the <code>functions.inc</code> include file. Most of them are more complicated and it is usually faster to use them instead of a hand coded equivalent.</p>
-<p>See the <a href="r3_4.html#r3_4_9_1_7">complete list</a> for details.</p>
+<p>See the <a href="r3_8.html#r3_8_1_1_8">complete list</a> for details.</p>
 
 <p>The following makes a torus just like POV-Ray's torus object:</p>
 
@@ -3188,7 +3189,7 @@ isosurface {
 <a name="t2_3_3_3_6"></a>
 <div class="content-level-h5" contains="Combining isosurface functions" id="t2_3_3_3_6">
 <h5>2.3.3.3.6 Combining isosurface functions</h5>
-<p>We can also simulate some Constructive Solid Geometry with isosurface functions.  If you do not know about CSG we suggest you have a look at <em><a href="t2_2.html#t2_2_3_1">What is CSG?</a></em> or the corresponding part of the <a href="r3_4.html#r3_4_5_4">reference section</a> first.</p>
+<p>We can also simulate some Constructive Solid Geometry with isosurface functions.  If you do not know about CSG we suggest you have a look at <em><a href="t2_2.html#t2_2_3_1">What is CSG?</a></em> or the corresponding part of the <a href="r3_5.html#r3_5_1_4">reference section</a> first.</p>
 
 <p>For this next group of images, consider the two functions for a cylinder and a rotated box:</p>
 
@@ -3275,13 +3276,13 @@ function{fn_A(x,y,z) + pow(Blob_Threshold,(fn_B(x,y,z) + Strength))}
 <h5>2.3.3.3.7 Noise and pigment functions</h5>
 <p>Some of the <a href="r3_3.html#r3_3_1_8_6">internal functions</a> have a random or noise-like structure</p>
 
-<p>Together with the pigment functions they are one of the most powerful tools for designing isosurfaces. We can add real surface displacement to the objects rather than only normal perturbation known from the <a href="r3_4.html#r3_4_6_2">normal</a> statement.</p>
+<p>Together with the pigment functions they are one of the most powerful tools for designing isosurfaces. We can add real surface displacement to the objects rather than only normal perturbation known from the <a href="r3_6.html#r3_6_1_2">normal</a> statement.</p>
 
 <p>The relevant internal functions are:</p>
 
 <ul>
 <li><code>f_noise3d(x,y,z)</code><br>
-uses the <a href="r3_4.html#r3_4_7_5_4">noise generator</a> specified in <code>global_settings</code> and generates structures like the bozo pattern.</li>
+uses the <a href="r3_6.html#r3_6_2_5_4">noise generator</a> specified in <code>global_settings</code> and generates structures like the bozo pattern.</li>
 <li><code>f_noise_generator(x, y, z, noise_generator)</code><br>
 generates noise with a specified noise generator.</li>
 <li><code>f_ridged_mf(x, y, z, H, Lacunarity, Octaves, Offset, Gain, noise_generator)</code><br>
@@ -3569,7 +3570,7 @@ function {
 
 <p>If the real maximum gradient differs too much from the specified value POV-Ray issues a warning together with the found maximum gradient. It is usually sufficient to use this number for the <code>max_gradient</code> parameter to get fast and correct results.</p>
 
-<p>POV-Ray can also dynamically change the <code>max_gradient</code> when you specify <code>evaluate</code> with 3 parameters in the isosurface definition. Concerning the details on this and other things see the <a href="r3_4.html#r3_4_5_1_6">evaluate</a> keyword in the reference section.</p>
+<p>POV-Ray can also dynamically change the <code>max_gradient</code> when you specify <code>evaluate</code> with 3 parameters in the isosurface definition. Concerning the details on this and other things see the <a href="r3_5.html#r3_5_1_1_6">evaluate</a> keyword in the reference section.</p>
 
 <p><strong><code>contained_by</code>:</strong></p>
 
@@ -3579,7 +3580,7 @@ function {
 <a name="t2_3_3_4"></a>
 <div class="content-level-h4" contains="Poly Object" id="t2_3_3_4">
 <h4>2.3.3.4 Poly Object</h4>
-<p>The polynomial object (and its <em>shortcut</em> versions: <code><a href="r3_4.html#r3_4_5_3_3">cubic</a></code>, <code><a href="r3_4.html#r3_4_5_3_4">quartic</a></code> and <code><a href="r3_4.html#r3_4_5_3_6">quadric</a></code>)
+<p>The polynomial object (and its <em>shortcut</em> versions: <code><a href="r3_5.html#r3_5_1_3_3">cubic</a></code>, <code><a href="r3_5.html#r3_5_1_3_4">quartic</a></code> and <code><a href="r3_5.html#r3_5_1_3_6">quadric</a></code>)
 of POV-Ray is one of the most complex and mathematical primitives of the program. One could think that it is seldom
 used and more or less obsolete, but we have to remember that for example the torus primitive is just a shortcut for the equivalent <code>quartic</code>, which is just a shortcut for the equivalent <code>poly</code> object. Polys are, however, seldom used in scenes due to the fact that they are so difficult to define and it is far from trivial to get the desired shape with just a polynomial equation. It is mostly used by the most mathematically oriented POV-Ray users.</p>
 
@@ -3717,7 +3718,7 @@ certain functions. Some mathematical programs are very helpful in this matter.</
 <div class="content-level-h5" contains="Writing the polynomial vector" id="t2_3_3_4_2">
 <h5>2.3.3.4.2 Writing the polynomial vector</h5>
 <p>Now that we have the function in polynomial form, we have to write it
-in POV-Ray syntax. The syntax is specified in the sections on <a href="r3_4.html#r3_4_5_3_5">polynomial</a> and <a href="r3_4.html#r3_4_5_3_6">quadric</a> of the reference section. There is also a table in this chapter which we will be using to make the polynomial vector. It is easier to have this table printed on paper.</p>
+in POV-Ray syntax. The syntax is specified in the sections on <a href="r3_5.html#r3_5_1_3_5">polynomial</a> and <a href="r3_5.html#r3_5_1_3_6">quadric</a> of the reference section. There is also a table in this chapter which we will be using to make the polynomial vector. It is easier to have this table printed on paper.</p>
 
 <p class="Note"><strong>Note:</strong> It is also possible to make a little program with your favorite
 programming language which will print the poly vector from the polynomial
@@ -3726,7 +3727,7 @@ function, but making a program like this is up to you.</p>
 <p><strong>1)</strong> Let's start with the easy one, ie. the sphere.</p>
 
 <p>Since the sphere can be represented with a polynomial of 2nd degree, we
-look at the column titled <em>2nd</em> in the <a href="r3_4.html#r3_4_5_3_5">table</a>. We see that it has 10 items,
+look at the column titled <em>2nd</em> in the <a href="r3_5.html#r3_5_1_3_5">table</a>. We see that it has 10 items,
 ie. we need a vector of size 10. Each item of the vector will be the factor of the term listed in the table.</p>
 
 <p>The polynomial was:</p>
@@ -3793,7 +3794,7 @@ poly
 </table>
 
 <p></p>
-<p class="Note"><strong>Note:</strong> There is a shortcut for 2nd degree polynomials: The <code><a href="r3_4.html#r3_4_5_3_6">quadric</a></code> primitive. Using a shortcut version, whenever possible, can lead to faster
+<p class="Note"><strong>Note:</strong> There is a shortcut for 2nd degree polynomials: The <code><a href="r3_5.html#r3_5_1_3_6">quadric</a></code> primitive. Using a shortcut version, whenever possible, can lead to faster
 renderings. We can write the sphere code described above in the following way:</p>
 
 <pre>
@@ -3932,7 +3933,7 @@ poly
 </table>
 
 
-<p>There is a shortcut for 4th order polynomials: The <code><a href="r3_4.html#r3_4_5_3_4">quartic</a></code> primitive. We can write the torus like this:</p>
+<p>There is a shortcut for 4th order polynomials: The <code><a href="r3_5.html#r3_5_1_3_4">quartic</a></code> primitive. We can write the torus like this:</p>
 
 <pre>
 quartic
@@ -3951,7 +3952,7 @@ quartic
 <a name="t2_3_3_4_3"></a>
 <div class="content-level-h5" contains="Polynomial made easy" id="t2_3_3_4_3">
 <h5>2.3.3.4.3 Polynomial made easy</h5>
-<p>Since consulting the table in the section <a href="r3_4.html#r3_4_5_3_5">Polynomial</a> or writing a program to get the right poly vector can be a bit cumbersome, especially when the poly vector is not a write-once-only expression and that you want to get it back, so let's examine how those equations would be rewritten using the <em>simplified</em> syntax.</p>
+<p>Since consulting the table in the section <a href="r3_5.html#r3_5_1_3_5">Polynomial</a> or writing a program to get the right poly vector can be a bit cumbersome, especially when the poly vector is not a write-once-only expression and that you want to get it back, so let's examine how those equations would be rewritten using the <em>simplified</em> syntax.</p>
 <p>You should refer to the images in the previous section, as these examples produce <em>exactly</em> the same results.</p>
 
 <p><strong>1)</strong> The sphere example can be rewritten as:</p>
@@ -4222,14 +4223,14 @@ happy with that, we do a final trace at 640x480 <code>+A0.2</code>.</p>
 <a name="t2_3_4"></a>
 <div class="content-level-h3" contains="Gamma Handling" id="t2_3_4">
 <h3>2.3.4 Gamma Handling</h3>
-<p>In this section, we will explain how to use the <em>experimental</em> gamma handling framework introduced with POV-Ray version 3.7. However, first we may need to introduce the term <em>gamma</em>, and why it needs handling anyway:</p>
+<p>In this section, we will explain how to use the gamma handling framework introduced with POV-Ray version 3.7. However, first we may need to introduce the term <em>gamma</em>, and why it needs handling anyway:</p>
 
 <p class="Note"><strong>Note:</strong> In a nutshell, <em>gamma handling</em> is the compensation for <em>non-linearities</em> in the <em>representation</em> of color values.</p>
 
 <table class="centered" width="700px" cellpadding="0" cellspacing="10">
 <tr>
   <td width="320px">
-    <p class="tabletext">As a raytracing engine, POV-Ray internally needs to represent colors using <em>linear</em> brightness values to produce physically accurate results. However, the majority of contemporary digital image processing tools and file formats do <em>not</em>. This comes as a surprise to most people, probably because the human visual perception is non-linear as well, as can be demonstrated in the render to the right, generated with POV-Ray using physically realistic settings:</p>
+    <p class="tabletext">As a raytracing engine, POV-Ray internally needs to represent colors using <em>linear</em> light intensity values to produce physically accurate results. However, the majority of contemporary digital image processing tools and file formats do <em>not</em>. This comes as a surprise to most people, probably because the human visual perception is non-linear as well, as can be demonstrated in the render to the right, generated with POV-Ray using physically realistic settings:</p>
   </td>
     <td width="320px">
     <img class="rightpanel" width="320px" src="images/3/3c/TutImgGammaShowcase_ref0.png">
@@ -4243,7 +4244,7 @@ happy with that, we do a final trace at 640x480 <code>+A0.2</code>.</p>
 </tr>
 </table>
 
-<p>Both front and second row show spheres with pigments increasing from <code>rgb 0.0</code> to <code>rgb 1.0</code>. When asked which of them increases linearly, with a <em>medium grey</em> at the center, most people will go for the front row without too much hesitation. And in fact the pigment of the front center sphere <em>does</em> correspond to what Photoshop or similar image processing software would normally call <em>50% grey</em>, but the pigment is a mere 21.8% as bright as the rightmost one. The true 50% brightness sphere sits right behind it.</p>
+<p>Both front and second row show spheres with pigments increasing from <code>rgb 0.0</code> to <code>rgb 1.0</code>. When asked which of them increases linearly, with a <em>medium grey</em> at the center, most people will go for the front row without too much hesitation. And in fact the pigment of the front center sphere <em>does</em> correspond to what Photoshop or similar image processing software would normally call <em>50% grey</em>, but as a matter of fact it reflects only 21.8% as much light as the rightmost one. The sphere truly reflecting 50% as much light sits right behind it.</p>
 
 <p>A corresponding nonlinearity can be found in the traditional internal representation of colors in digital image processing, as implemented in file formats, graphics cards frame buffers, display APIs and so forth. Using one byte per colour component, and black and white represented by (0;0;0) and (255;255;255) respectively, a value of (128;128;128) will typically be used to encode a light intensity of just about 20%. To make matters a bit more complicated, the actual light intensity seen on the computer display may vary from one computer to the next, not only due to a historical lack of standardization in the PC display and graphics hardware market, but also due to factors such as electrical tolerances and even aging of the display. In professional environments, displays are therefore <em>calibrated</em> at regular intervals.</p>
 
@@ -4256,7 +4257,7 @@ happy with that, we do a final trace at 640x480 <code>+A0.2</code>.</p>
 
 <p>where <span class="formula">x</span> is the internal representation normalized to the range [0...1], <span class="formula">f(x)</span> is the actual output light intensity, and <span class="formula">&#947;</span> is a value typically somewhere between 2.0 to 2.4, though in the professional image processing world a value of 1.8 is also common.</p>
 
-<p>Another formula becoming more and more popular is the so-called <em>sRGB transfer function</em> as defined in the sRGB color space standard, which has been adopted as the official standard on the World Wide Web. This function roughly corresponds to a power-law gamma of 2.2.</p>
+<p>Another formula becoming more and more popular is the so-called <em>sRGB transfer function</em> as defined in the sRGB color space standard, which has been adopted as the official standard on the World Wide Web. This function roughly corresponds to a power-law gamma of 2.2. Other standard transfer functions worth mentioning are those defined by the TV broadcasting standards ITU-R BT.709 and ITU-R BT.2020.</p>
 
 </div>
 <a name="t2_3_4_1"></a>
@@ -4283,7 +4284,7 @@ happy with that, we do a final trace at 640x480 <code>+A0.2</code>.</p>
 
 <p>If however the image appears like shown below, then your system display gamma is either higher (left) or lower (right) than what your image viewing software expects. Note that in the PC world, most contemporary software will expect the display to either have a gamma of 2.2 or comply with the sRGB transfer function, unless there's a way to tell the software otherwise.</p>
 
-<p class="Note"><strong>Note:</strong> LCD owners should make sure their display resolution is set to match the maximum resolution of the LCD, as interpolation might mess up the intended effect. Furthermore, it is not uncommon for LCDs to exhibit variations of gamma depending on viewing angle and, as a result, also across the display area. In that case, we recommend to adjust your display so that you get the desired gamma at the center of the screen when sitting as you usually do.</p>
+<p class="Note"><strong>Note:</strong> Make sure to set your desktop resolution to match the native resolution of your display, as interpolation might mess up the intended effect. Also, some types of displays exhibit variations of gamma depending on viewing angle and, as a result, also across the display area; in that case, we recommend to adjust your display so that you get the desired gamma at the center of the screen when sitting as you usually do.</p>
 
 <table class="centered" width="660px" cellpadding="0" cellspacing="10">
 <tr>
@@ -4332,7 +4333,7 @@ happy with that, we do a final trace at 640x480 <code>+A0.2</code>.</p>
   Display_Gamma=1.8
 </pre>
 
-<p>Instead of a numerical value, you can also specify <code>Display_Gamma=sRGB</code> to explicitly tell POV-Ray that your system is calibrated to match the sRGB standard (which, as already mentioned, is actually the default setting).</p>
+<p>Instead of a numerical value, you can also specify <code>Display_Gamma=sRGB</code> to explicitly tell POV-Ray that your system is calibrated to match the sRGB standard (which, as already mentioned, is actually the default setting). <font class="New">New</font> in version 3.7.1, you can also specify <code>Display_Gamma=BT709</code> or <code>Display_Gamma=BT2020</code> to explicitly tell POV-Ray that your system is calibrated to match the transfer functions specified in ITU-R BT.709 or BT.2020, respectively, but you shouldn't use these unless you absolutely know what you are doing.</p>
 
 <p>Again, the gamma showcase scene can be used as a sanity check; use the following parameters:</p>
 
@@ -4347,7 +4348,7 @@ happy with that, we do a final trace at 640x480 <code>+A0.2</code>.</p>
 <div class="content-level-h4" contains="Gamma in Output Images" id="t2_3_4_3">
 <h4>2.3.4.3 Gamma in Output Images</h4>
 
-<p>Besides being used internally in most contemporary digital image processing software, non-linear color representations are also used in most conventional image file formats. This is often called <em>gamma pre-correction</em>, in the sense that the original linear brightness information has already been transformed by a gamma function to compensate for display non-linearity. Unfortunately, due to the large variety of display gamma in the world of computing, the gamma value used for pre-correction traditionally followed no set standard either.</p>
+<p>Besides being used internally in most contemporary digital image processing software, non-linear color representations are also used in most conventional image file formats. This is often called <em>gamma pre-correction</em>, in the sense that the original linear light intensity information has already been transformed by a gamma function to compensate for display non-linearity. Unfortunately, due to the large variety of display gamma in the world of computing, the gamma value used for pre-correction traditionally followed no set standard either.</p>
 
 <p>In recent years the situation has changed, partly due to the adoption of the sRGB standard as the official recommendation for the World Wide Web, with major file format specifications following suit, and partly due to the advent of new file formats like PNG designed right from the start for a standardized way of gamma handling. (For such file formats, it is customary to speak of non-linear color representation not as <em>gamma pre-correction</em>, but rather as <em>gamma encoding</em>.) By now, for virtually all contemporary file formats there exists either a clear specification of how to handle gamma, or an official recommendation to adhere to the sRGB standard.</p>
 
@@ -4357,30 +4358,30 @@ happy with that, we do a final trace at 640x480 <code>+A0.2</code>.</p>
   File_Gamma=1.8
 </pre>
 
-<p>Again, <code>sRGB</code> is a valid value, specifying that POV-Ray should apply the sRGB transfer function.</p>
+<p>Again, <code>sRGB</code> as well as, <font class="New">New</font> in version 3.7.1, <code>BT709</code> or <code>BT2020</code>, are valid values, specifying that POV-Ray should apply the sRGB, ITU-R BT.709 or BT.2020 transfer function, respectively.</p>
 
 <p class="Note"><strong>Note:</strong> Some of the file formats supported by POV-Ray are explicitly specified to never use gamma pre-correction or gamma encoding. For such file types (currently OpenEXR and Radiance HDR), <code>File_Gamma</code> has no effect whatsoever. For certain other file types (currently PNG), <code>File_Gamma</code> does have an effect on the encoding of the image, but not on the general visual appearance.</p>
 
 <p>For output files, POV-Ray handles gamma according to the following rules:</p>
 
 <ul>
-  <li>For OpenEXR and Radiance HDR, which are officially specified to store linear brightness values, POV-Ray <em>always</em> stores linear values, ignoring the <code>File_Gamma</code> setting.</li>
-  <li>For PNG, which explicitly allows different encoding gamma values, POV-Ray will interpret the <code>File_Gamma</code> setting as the decoding gamma to encode for, and <em>always</em> write corresponding meta information into the header; as a result, the image will always look virtually identical irregardless of the <code>File_Gamma</code> setting; however, to minimize visible encoding artifacts like color banding, it is strongly recommended to use a setting of around 2.2, or <code>sRGB</code>.</li>
-  <li>For all other file formats, POV-Ray will interpret the <code>File_Gamma</code> setting as the display gamma to pre-correct for; as a result, the image will look different depending on the value used. It will also look different than the preview if you use a value other than your system's display gamma.</li>
+  <li>For OpenEXR and Radiance HDR, which are officially specified to store linear light intensity values, POV-Ray <em>always</em> stores linear values, ignoring the <code>File_Gamma</code> setting.</li>
+  <li>For PNG, which explicitly allows different encoding gamma values, POV-Ray will interpret the <code>File_Gamma</code> setting as the decoding gamma to encode for, and <em>always</em> write corresponding metadata into the header; as a result, the image will always look virtually identical irregardless of the <code>File_Gamma</code> setting; however, to minimize visible encoding artifacts like color banding, it is strongly recommended to use a setting of around 2.2, or <code>sRGB</code>. If <code>File_Gamma</code> is not specified, PNG output defaults to <code>sRGB</code>. <font class="New">New</font> in version 3.7.1, note that a setting of <code>BT709</code> or <code>BT2020</code> is possible, but cannot be conveyed correctly via PNG metadata and is therefore strongly discouraged for this file format.</li>
+  <li><font class="New">New</font> in version 3.7.1, for Netpbm PPM, which is officially specified to store gamma-encoded values using the ITU-R BT.709 transfer function, POV-Ray adheres to the Netpbm standard by default. However, if the <code>File_Gamma</code> setting is specified, POV-Ray will interpret it as a display gamma to pre-correct for, to account for the widespread use of competing de-facto standards, most notably the use of linear encoding (corresponding to a setting of <code>File_Gamma=1.0</code>) or sRGB gamma pre-correction (corresponding to a setting of <code>File_Gamma=sRGB</code>).</li>
+  <li>For all other file formats, POV-Ray will interpret the <code>File_Gamma</code> setting as the display gamma to pre-correct for; as a result, the image will look different depending on the value used. It will also look different than the preview if you use a value other than your system's display gamma. If <code>File_Gamma</code> is not specified, these output file formats default to sRGB pre-correction.
 </ul>
 
 </div>
 <a name="t2_3_4_4"></a>
 <div class="content-level-h4" contains="Setting Up Your Scene" id="t2_3_4_4">
 <h4>2.3.4.4 Setting Up Your Scene</h4>
-
 <p>As stated above, POV-Ray needs to work with linear colors to produce the most physically accurate output. However, if you prefer you <em>can</em> coax POV-Ray to work directly with non-linear color values. This is controlled via the <code>assumed_gamma</code> statement in the scene file's global settings, e.g.:</p>
 
 <pre>
   global_settings { assumed_gamma 1.8 }
 </pre>
 
-<p>This enables the <em>experimental</em> gamma handling feature, and instructs POV-Ray to work with colors pre-corrected for a display gamma of whatever value you specify (in this example obviously a gamma of 1.8). You can also specify <code>srgb</code> instead of a numerical value, instructing POV-Ray to work with colors pre-corrected according to the sRGB standard.</p>
+<p>This instructs POV-Ray to work with colors pre-corrected for a display gamma of whatever value you specify (in this example obviously a gamma of 1.8). You can also specify <code>srgb</code> instead of a numerical value, instructing POV-Ray to work with colors pre-corrected according to the sRGB standard. <font class="New">New</font> in version 3.7.1, you can also specify <code>bt709</code> or <code>bt2020</code>, but both are strongly discouraged.</p>
 
 <p class="Note"><strong>Note:</strong> It is highly recommended to either set <code>assumed_gamma</code> to your system's display gamma for convenience, or set it to <code>1.0</code> for maximum realism. Using it for purely artistic purposes is strongly discouraged.</p>
 
@@ -4418,14 +4419,15 @@ The following is also valid and gives the expected results:
 <a name="t2_3_4_6"></a>
 <div class="content-level-h4" contains="Gamma in Input Images" id="t2_3_4_6">
 <h4>2.3.4.6 Gamma in Input Images</h4>
-
 <p>Normally, gamma handling of input image files will work fine without intervention, but in some cases it may fail. To resolve such problems, the default handling can be overridden using the <code>gamma</code> SDL keyword, e.g:</p>
 
 <pre>
   image_map { jpeg "foo.jpg" gamma 1.8 }
 </pre>
 
-<p>Instead of a numerical value, you can also use the <code>srgb</code> keyword to inform POV-Ray that the file conforms to the sRGB standard.</p>
+<p>Instead of a numerical value, you can also use the <code>srgb</code> keyword to inform POV-Ray that the file conforms to the sRGB standard. <font class="New">New</font> in version 3.7.1, you can also specify <code>bt709</code> or <code>bt2020</code> to inform POV-Ray that the file is gamma-encoded using the ITU-R BT.709 or BT.2020 transfer functions, respectively</p>
+
+<p class="Note"><strong>Note:</strong> Specifying <code>gamma bt709</code> or <code>gamma bt2020</code> only affects the <em>transfer function</em> used. Specifically, it does <em>not</em> affect the digital representation of nominal black and white, which remain at 0 and 255 (presuming 8-bit encoding), respectively, as opposed to 16 and 235 for full-fledged ITU-R BT-709 encoding.</p>
 
 <p>For input files in general, the following rules apply:</p>
 
@@ -4439,7 +4441,7 @@ The following is also valid and gives the expected results:
 <ul>
   <li>For OpenEXR and Radiance HDR, POV-Ray will presume the data to be linear, as per official file format specification.</li>
   <li>For PNG, POV-Ray will presume the image data to be encoded according to file header information (currently sRGB or gAMA chunks); in the absence of such information, POV-Ray will presume sRGB-compliant encoding as per official recommendation.</li>
-  <li>For PPM and PGM. POV-Ray will currently presume the image data to match the <code>assumed_gamma</code> (in other words, no gamma adjustment will be performed by default).</li>
+  <li>For PPM and PGM, POV-Ray will currently presume the image data to match the <code>assumed_gamma</code> (in other words, no gamma adjustment will be performed by default). <font class="New">New</font> in version 3.7.1, POV-Ray will presume the image data to comply with the Netpbm specification, i.e. being gamma-encoded using the ITU-R BT.709 transfer function.</li>
   <li>For any other file formats, POV-Ray will presume sRGB-compliant encoding, to match either official recommendations or common practice.</li>
 </ul>
 
@@ -4493,13 +4495,13 @@ creating beautiful textures of our own.</p>
 <p class="Note"><strong>Note:</strong> Early versions of POV-Ray made a distinction between pigment and
 normal patterns, i. e. patterns that could be used inside a <code>
 normal</code> or <code>pigment</code> statement. Since POV-Ray 3.0 this
-restriction was removed so that all patterns listed in section <a href="r3_4.html#r3_4_7">Pattern</a> can be used as a pigment or normal pattern.</p>
+restriction was removed so that all patterns listed in section <a href="r3_6.html#r3_6_2">Pattern</a> can be used as a pigment or normal pattern.</p>
 
 </div>
 <a name="t2_3_5_1"></a>
 <div class="content-level-h4" contains="Pigments" id="t2_3_5_1">
 <h4>2.3.5.1 Pigments</h4>
-<p>Every surface must have a color. In POV-Ray this color is called a <code><a href="r3_4.html#r3_4_6_1">pigment</a></code>.
+<p>Every surface must have a color. In POV-Ray this color is called a <code><a href="r3_6.html#r3_6_1_1">pigment</a></code>.
 It does not have to be a single color. It can be a color pattern, a color
 list or even an image map. Pigments can also be layered one on top of the next
 so long as the uppermost layers are at least partially transparent so the ones
@@ -4537,8 +4539,8 @@ will be using the sphere for our textures.</p>
 <p>Before we begin we should note that we have already made one kind of
 pigment, the color list pigment. In the previous example we have used a
 checkered pattern on our plane. There are three other kinds of color list
-pigments, <code><a href="r3_4.html#r3_4_7_1_4">brick</a></code>, <code><a href="r3_4.html#r3_4_7_2_4">hexagon</a></code> and the
-<code><a href="r3_4.html#r3_4_7_2_5">object</a></code> pattern.
+pigments, <code><a href="r3_6.html#r3_6_2_1_4">brick</a></code>, <code><a href="r3_6.html#r3_6_2_2_4">hexagon</a></code> and the
+<code><a href="r3_6.html#r3_6_2_2_5">object</a></code> pattern.
 Let's quickly try each of these. First, we change the plane's
 pigment as follows:</p>
 <pre>
@@ -4576,7 +4578,7 @@ following.</p>
     }
   }
 </pre>
-<p>Rendering this we see that the <code><a href="r3_4.html#r3_4_7_1_13">gradient</a></code> pattern gives us an
+<p>Rendering this we see that the <code><a href="r3_6.html#r3_6_2_1_13">gradient</a></code> pattern gives us an
 interesting pattern of vertical stripes. We change the gradient direction to
 y. The stripes are horizontal now. We change the gradient direction to z. The
 stripes are now more like concentric rings. This is because the gradient
@@ -4597,10 +4599,10 @@ and add the following to the pigment block.</p>
 <p>The vertical bars are now slanted at a 45 degree angle. All patterns can
 be rotated, scaled and translated in this manner. Let's now try some
 different types of patterns. One at a time, we substitute the following
-keywords for <code>gradient x</code> and render to see the result: <code><a href="r3_4.html#r3_4_7_1_3">bozo</a></code>,
-<code><a href="r3_4.html#r3_4_7_1_16">marble</a></code>, <code><a href="r3_4.html#r3_4_7_1_1">agate</a></code>, <code><a href="r3_4.html#r3_4_7_1_14">granite</a></code>,
-<code><a href="r3_4.html#r3_4_7_1_15">leopard</a></code>, <code><a href="r3_4.html#r3_4_7_1_27">spotted</a></code> and <code><a href="r3_4.html#r3_4_7_1_30">wood</a></code>
-(if we like  we can test all patterns listed in section <a href="r3_4.html#r3_4_7">Pattern</a>).</p>
+keywords for <code>gradient x</code> and render to see the result: <code><a href="r3_6.html#r3_6_2_1_3">bozo</a></code>,
+<code><a href="r3_6.html#r3_6_2_1_16">marble</a></code>, <code><a href="r3_6.html#r3_6_2_1_1">agate</a></code>, <code><a href="r3_6.html#r3_6_2_1_14">granite</a></code>,
+<code><a href="r3_6.html#r3_6_2_1_15">leopard</a></code>, <code><a href="r3_6.html#r3_6_2_1_27">spotted</a></code> and <code><a href="r3_6.html#r3_6_2_1_30">wood</a></code>
+(if we like  we can test all patterns listed in section <a href="r3_6.html#r3_6_2">Pattern</a>).</p>
 <p>
 Rendering these we see that each results in a slightly different pattern.
 But to get really good results each type of pattern requires the use of some
@@ -4632,13 +4634,13 @@ the pattern type to <code>marble</code>. When we rendered this earlier, we
 saw a banded pattern similar to <code>gradient y</code> that really did not
 look much like marble at all. This is because marble really is a kind of
 gradient and it needs another pattern modifier to look like marble. This
-modifier is called <code><a href="r3_4.html#r3_4_7_5_5_9">turbulence</a></code>. We change the line <code>
+modifier is called <code><a href="r3_6.html#r3_6_2_5_5_9">turbulence</a></code>. We change the line <code>
 frequency 3</code> to <code>turbulence 1</code> and render again. That's
 better! Now let's put <code>frequency 3</code> back in right after the
 turbulence and take another look. Even more interesting!</p>
 <p>
 But wait, it gets better! Turbulence itself has some modifiers of its own. We can adjust the turbulence several ways. First, the float that follows the <code>turbulence</code> keyword can be any value with higher values giving
-us more turbulence. Second, we can use the keywords <code><a href="r3_4.html#r3_4_7_5_5_6">omega</a></code>, <code><a href="r3_4.html#r3_4_7_5_5_5">lambda</a></code> and <code><a href="r3_4.html#r3_4_7_5_5_4">octaves</a></code> to change the turbulence parameters.</p>
+us more turbulence. Second, we can use the keywords <code><a href="r3_6.html#r3_6_2_5_5_6">omega</a></code>, <code><a href="r3_6.html#r3_6_2_5_5_5">lambda</a></code> and <code><a href="r3_6.html#r3_6_2_5_5_4">octaves</a></code> to change the turbulence parameters.</p>
 <p>
 Let's try this now:</p>
 <pre>
@@ -4856,10 +4858,10 @@ file, create a new sphere with a simple, single color texture.</p>
 pigment</code> block (note that these do not have to be included in a <code>
 texture</code> block unless they need to be transformed together or need to
 be part of a layered texture). We render this to see what it looks like. Now,
-one at a time, we substitute for the keyword <code><a href="r3_4.html#r3_4_7_1_5">bumps</a></code> the following
-keywords: <code><a href="r3_4.html#r3_4_7_1_9">dents</a></code>, <code><a href="r3_4.html#r3_4_7_1_31">wrinkles</a></code>,
-<code><a href="r3_4.html#r3_4_7_1_23">ripples</a></code> and <code><a href="r3_4.html#r3_4_7_1_29">waves</a></code>
-(we can also use any of the patterns listed in <a href="r3_4.html#r3_4_7">Pattern</a>).
+one at a time, we substitute for the keyword <code><a href="r3_6.html#r3_6_2_1_5">bumps</a></code> the following
+keywords: <code><a href="r3_6.html#r3_6_2_1_9">dents</a></code>, <code><a href="r3_6.html#r3_6_2_1_31">wrinkles</a></code>,
+<code><a href="r3_6.html#r3_6_2_1_23">ripples</a></code> and <code><a href="r3_6.html#r3_6_2_1_29">waves</a></code>
+(we can also use any of the patterns listed in <a href="r3_6.html#r3_6_2">Pattern</a>).
 We render each to see what they look like. We play around with the float value that follows the
 keyword. We also experiment with the scale value.</p>
 <p>
@@ -5289,16 +5291,16 @@ plane
 <a name="t2_3_5_3"></a>
 <div class="content-level-h4" contains="Finishes" id="t2_3_5_3">
 <h4>2.3.5.3 Finishes</h4>
-<p>The final part of a POV-Ray texture is the <code><a href="r3_4.html#r3_4_6_3">finish</a></code>. It
+<p>The final part of a POV-Ray texture is the <code><a href="r3_6.html#r3_6_1_3">finish</a></code>. It
 controls the properties of the surface of an object. It can make it shiny and
 reflective, or dull and flat. It can also specify what happens to light that
 passes through transparent pigments, what happens to light that is scattered
 by less-than-perfectly-smooth surfaces and what happens to light that is
 reflected by surfaces with thin-film interference properties. There are
 twelve different properties available in POV-Ray to specify the finish of a
-given object. These are controlled by the following keywords: <code><a href="r3_4.html#r3_4_6_3_1">ambient</a></code>,
-<code><a href="r3_4.html#r3_4_6_3_3_1">diffuse</a></code>, <code><a href="r3_4.html#r3_4_6_3_3_2">brilliance</a></code>,
-<code><a href="r3_4.html#r3_4_6_3_4_1">phong</a></code>, <code><a href="r3_4.html#r3_4_6_3_4_2">specular</a></code>, <code><a href="r3_4.html#r3_4_6_3_4_3">metallic</a></code>, <code><a href="r3_4.html#r3_4_6_3_5">reflection</a></code>, <code><a href="r3_4.html#r3_4_6_3_3_3">crand</a></code> and <code><a href="r3_4.html#r3_4_6_3_7">iridescence</a></code>. Let's design a couple of textures that make use of these parameters.</p>
+given object. These are controlled by the following keywords: <code><a href="r3_6.html#r3_6_1_3_1">ambient</a></code>,
+<code><a href="r3_6.html#r3_6_1_3_3_1">diffuse</a></code>, <code><a href="r3_6.html#r3_6_1_3_3_2">brilliance</a></code>,
+<code><a href="r3_6.html#r3_6_1_3_4_1">phong</a></code>, <code><a href="r3_6.html#r3_6_1_3_4_2">specular</a></code>, <code><a href="r3_6.html#r3_6_1_3_4_3">metallic</a></code>, <code><a href="r3_6.html#r3_6_1_3_5">reflection</a></code>, <code><a href="r3_6.html#r3_6_1_3_3_3">crand</a></code> and <code><a href="r3_6.html#r3_6_1_3_7">iridescence</a></code>. Let's design a couple of textures that make use of these parameters.</p>
 
 </div>
 <a name="t2_3_5_3_1"></a>
@@ -5306,8 +5308,8 @@ given object. These are controlled by the following keywords: <code><a href="r3_
 <h5>2.3.5.3.1 Using Ambient</h5>
 <p>Since objects in POV-Ray are illuminated by light sources, the portions of
 those objects that are in shadow would be completely black were it not for
-the first two finish properties, <code><a href="r3_4.html#r3_4_6_3_1">ambient</a></code> and
-<code>><a href="r3_4.html#r3_4_6_3_3_1">diffuse</a></code>. Ambient is used to simulate the light that is scattered
+the first two finish properties, <code><a href="r3_6.html#r3_6_1_3_1">ambient</a></code> and
+<code>><a href="r3_6.html#r3_6_1_3_3_1">diffuse</a></code>. Ambient is used to simulate the light that is scattered
 around the scene that does not come directly from a light source. Diffuse
 determines how much of the light that is seen comes directly from a light
 source. These two keywords work together to control the simulation of ambient
@@ -5417,8 +5419,8 @@ or shaded parts. It would make a pretty good street light.</p>
 hotspots</em> on the surface. This gave the sphere a hard, shiny appearance.
 POV-Ray gives us two ways to specify surface specular highlights. The first
 is called <em>phong highlighting.</em> Usually, phong highlights are
-described using two keywords: <code><a href="r3_4.html#r3_4_6_3_4_1">phong</a></code> and <code>
-<a href="r3_4.html#r3_4_6_3_4_1">phong_size</a></code>. The float that follows <code>phong</code> determines the brightness of the highlight while the float following <code>phong_size</code> determines its size. Let's try this.</p>
+described using two keywords: <code><a href="r3_6.html#r3_6_1_3_4_1">phong</a></code> and <code>
+<a href="r3_6.html#r3_6_1_3_4_1">phong_size</a></code>. The float that follows <code>phong</code> determines the brightness of the highlight while the float following <code>phong_size</code> determines its size. Let's try this.</p>
 <pre>
   sphere {
     &lt;0,0,0&gt;, 1
@@ -5439,8 +5441,8 @@ appearance of being much harder and shinier.</p>
 <p>
 There is another kind of highlight that is calculated by a different means
 called <em>specular highlighting</em>. It is specified using the keyword
-<code><a href="r3_4.html#r3_4_6_3_4_2">specular</a></code> and operates in conjunction with another keyword
-called <code><a href="r3_4.html#r3_4_6_3_4_2">roughness</a></code>. These two keywords work together in much the
+<code><a href="r3_6.html#r3_6_1_3_4_2">specular</a></code> and operates in conjunction with another keyword
+called <code><a href="r3_6.html#r3_6_1_3_4_2">roughness</a></code>. These two keywords work together in much the
 same way as <code>phong</code> and <code>phong_size</code> to create
 highlights that alter the apparent shininess of the surface. Let's try
 using specular in our sphere.</p>
@@ -5470,7 +5472,7 @@ both phong and specular may be used on a finish.</p>
 <div class="content-level-h5" contains="Using Reflection, Metallic and Metallic" id="t2_3_5_3_4">
 <h5>2.3.5.3.4 Using Reflection, Metallic and Metallic</h5>
 <p>There is another surface parameter that goes hand in hand with highlights,
-<code><a href="r3_4.html#r3_4_6_3_5">reflection</a></code>. Surfaces that are very shiny usually have a degree
+<code><a href="r3_6.html#r3_6_1_3_5">reflection</a></code>. Surfaces that are very shiny usually have a degree
 of reflection to them. Let's take a look at an example.</p>
 <pre>
   sphere {
@@ -5512,7 +5514,7 @@ gold ball bearing.</p>
 </pre>
 
 <p>That is close but there is something wrong, the colour of the reflection and the highlight. To
-make the surface appear more like metal the keyword <code><a href="r3_4.html#r3_4_6_3_4_3">metallic</a></code>
+make the surface appear more like metal the keyword <code><a href="r3_6.html#r3_6_1_3_4_3">metallic</a></code>
 is used. We add it now to see the difference.</p>
 <pre>
   sphere {
@@ -5559,9 +5561,9 @@ than the light source. This gives the surface a more metallic appearance.</p>
 <h5>2.3.5.3.5 Using Iridescence</h5>
 <p><em>Iridescence</em> is what we see on the surface of an oil slick when
 the sun shines on it. The rainbow effect is created by something called
-<em>thin-film interference</em> (read section <a href="r3_4.html#r3_4_6_3_7">Iridescence</a> for
+<em>thin-film interference</em> (read section <a href="r3_6.html#r3_6_1_3_7">Iridescence</a> for
 details). For now let's just try using it. Iridescence is specified by
-the <code><a href="r3_4.html#r3_4_6_3_7">irid</a></code> statement and three values: amount,
+the <code><a href="r3_6.html#r3_6_1_3_7">irid</a></code> statement and three values: amount,
 <code>thickness</code> and <code>turbulence</code>. The amount is the contribution
 to the overall surface color. Usually 0.1 to 0.5 is sufficient here.
 The thickness affects the <em>busyness</em> of the effect. Keep this between
@@ -5855,7 +5857,7 @@ checker pattern instead.</p>
 <p>Now things get interesting. Above, we began to see how pigments and
 normals can fade from one to the other when we used them in maps. But how
 about if we want a smooth blend of patterns all the way through? That is
-where a new feature called <code><a href="r3_4.html#r3_4_7_4_1">average</a></code> can come in very handy.
+where a new feature called <code><a href="r3_6.html#r3_6_2_4_1">average</a></code> can come in very handy.
 Average works with pigment, normal, and texture maps, although the syntax is
 a little bit different, and when we are not expecting it, the change can be
 confusing. Here is a simple example. We use our standard includes, camera and
@@ -6289,7 +6291,7 @@ light source, we enter the following object.</p>
 reflected do not show these textures off to their best advantage. But at
 least we can see how the process works. The textures have simply been placed
 according to the location of pixels of a particular palette index. By using
-the <code><a href="r3_4.html#r3_4_7_7_1">once</a></code> keyword (to keep it from tiling), and translating and scaling our map to match the camera we have been using, we get to see the
+the <code><a href="r3_6.html#r3_6_2_7_1">once</a></code> keyword (to keep it from tiling), and translating and scaling our map to match the camera we have been using, we get to see the
 whole thing laid out for us.</p>
 <p>
 Of course, that is just with palette mapped image formats, such as GIF and
@@ -6458,7 +6460,7 @@ Last but not least you can add a rainbow to your scene.</p>
 <a name="t2_3_6_1"></a>
 <div class="content-level-h4" contains="The Background" id="t2_3_6_1">
 <h4>2.3.6.1 The Background</h4>
-<p>The <code><a href="r3_4.html#r3_4_3_2">background</a></code> feature is used to assign a color to all rays
+<p>The <code><a href="r3_7.html#r3_7_1_2">background</a></code> feature is used to assign a color to all rays
 that do not hit any object. This is done in the following way.</p>
 <pre>
   camera {
@@ -6479,7 +6481,7 @@ translucency remains after all sky sphere pigment layers are processed.</p>
 <a name="t2_3_6_2"></a>
 <div class="content-level-h4" contains="The Sky Sphere" id="t2_3_6_2">
 <h4>2.3.6.2 The Sky Sphere</h4>
-<p>The <code><a href="r3_4.html#r3_4_3_4">sky_sphere</a></code> can be used to easily create a cloud covered
+<p>The <code><a href="r3_7.html#r3_7_1_4">sky_sphere</a></code> can be used to easily create a cloud covered
 sky, a nightly star sky or whatever sky you have in mind.</p>
 <p>
 In the following examples we will start with a very simple sky sphere that
@@ -6648,6 +6650,7 @@ would be at 0 degrees, i.e. right below us.</p>
 
 <p>Looking at the resulting image you will see what impressive effects you
 can achieve with the sky sphere.</p>
+
 </div>
 <a name="t2_3_6_2_3"></a>
 <div class="content-level-h5" contains="Adding Some Clouds" id="t2_3_6_2_3">
@@ -6707,11 +6710,12 @@ final image (<code>skysph3.pov</code>). The sun does not emit any light
 and the clouds will not cast any shadows. If you want to have clouds that
 cast shadows you will have to use a real, large sphere with an appropriate
 texture and a light source somewhere outside the sphere.</p>
+
 </div>
 <a name="t2_3_6_3"></a>
 <div class="content-level-h4" contains="The Fog" id="t2_3_6_3">
 <h4>2.3.6.3 The Fog</h4>
-<p>You can use the <code><a href="r3_4.html#r3_4_3_3">fog</a></code> feature to add fog of two different types
+<p>You can use the <code><a href="r3_7.html#r3_7_1_3">fog</a></code> feature to add fog of two different types
 to your scene: constant fog and ground fog. The constant fog has a constant
 density everywhere while the ground fog's density decreases as you move
 upwards.</p>
@@ -6725,11 +6729,11 @@ detail.</p>
 <h5>2.3.6.3.1 A Constant Fog</h5>
 <p>The simplest fog type is the constant fog that has a constant density in
 all locations. It is specified by a <code>distance</code> keyword which
-actually describes the fog's density and a fog <code><a href="r3_4.html#r3_4_3_3">color</a></code>.</p>
+actually describes the fog's density and a fog <code><a href="r3_7.html#r3_7_1_3">color</a></code>.</p>
 <p>
 The distance value determines the distance at which 36.8% of the background
 is still visible (for a more detailed explanation of how the fog is
-calculated read the reference section <a href="r3_4.html#r3_4_3_3">Fog</a>).</p>
+calculated read the reference section <a href="r3_7.html#r3_7_1_3">Fog</a>).</p>
 <p>
 The fog color can be used to create anything from a pure white to a red,
 blood-colored fog. You can also use a black fog to simulate the effect of a
@@ -6857,6 +6861,7 @@ would have been filtered. The remaining 30% would have passed unfiltered.</p>
 diminished due to the fog's color but that the colors are actually
 influenced by the fog. The red and especially the blue sphere got a green
 hue.</p>
+
 </div>
 <a name="t2_3_6_3_4"></a>
 <div class="content-level-h5" contains="Adding Some Turbulence to the Fog" id="t2_3_6_3_4">
@@ -6905,9 +6910,9 @@ turbulence value at a point along the viewing ray.</p>
 <div class="content-level-h5" contains="Using Ground Fog" id="t2_3_6_3_5">
 <h5>2.3.6.3.5 Using Ground Fog</h5>
 <p>The much more interesting and flexible fog type is the ground fog, which
-is selected with the <code><a href="r3_4.html#r3_4_3_3">fog_type</a></code> statement.
-Its appearance is described with the <code><a href="r3_4.html#r3_4_3_3">fog_offset</a></code>
-and <code><a href="r3_4.html#r3_4_3_3">fog_alt</a></code> keywords.
+is selected with the <code><a href="r3_7.html#r3_7_1_3">fog_type</a></code> statement.
+Its appearance is described with the <code><a href="r3_7.html#r3_7_1_3">fog_offset</a></code>
+and <code><a href="r3_7.html#r3_7_1_3">fog_alt</a></code> keywords.
 The <code>fog_offset</code> specifies the height, i. e. y value, below which
 the fog has a constant density of one. The <code>fog_alt</code> keyword
 determines how fast the density of the fog will approach zero as one moves
@@ -7003,17 +7008,17 @@ non-filtering fogs, fogs with a translucency threshold, etc.</p>
 <h5>2.3.6.3.7 Fog and Hollow Objects</h5>
 <p>Whenever you use the fog feature and the camera is inside a non-hollow
 object you will not get any fog effects. For a detailed explanation why this
-happens see <a href="r3_4.html#r3_4_8_1_2">Empty and Solid Objects</a>.</p>
+happens see <a href="r3_7.html#r3_7_2_1_2">Empty and Solid Objects</a>.</p>
 <p>
 In order to avoid this problem you have to make all those objects hollow by
-either making sure the camera is outside these objects (using the <code><a href="r3_4.html#r3_4_5_5_5">inverse</a></code>
-keyword) or by adding the <code><a href="r3_4.html#r3_4_5_5_4">hollow</a></code> to them (which is much easier).</p>
+either making sure the camera is outside these objects (using the <code><a href="r3_5.html#r3_5_1_5_5">inverse</a></code>
+keyword) or by adding the <code><a href="r3_5.html#r3_5_1_5_4">hollow</a></code> to them (which is much easier).</p>
 
 </div>
 <a name="t2_3_6_4"></a>
 <div class="content-level-h4" contains="The Rainbow" id="t2_3_6_4">
 <h4>2.3.6.4 The Rainbow</h4>
-<p>The <code><a href="r3_4.html#r3_4_3_5">rainbow</a></code> feature can be used
+<p>The <code><a href="r3_7.html#r3_7_1_5">rainbow</a></code> feature can be used
 to create rainbows and maybe other more strange effects. The rainbow is a fog
 like effect that is restricted to a cone-like volume.</p>
 
@@ -7026,8 +7031,8 @@ it is visible, the width of the color band, the direction of the incoming
 light, the fog-like distance based particle density and last but not least
 the color map to be used.</p>
 <p>
-The size and shape of the rainbow are determined by the <code><a href="r3_4.html#r3_4_3_5">angle</a></code>
-and <code><a href="r3_4.html#r3_4_3_5">width</a></code> keywords. The <code><a href="r3_4.html#r3_4_3_5">width</a></code>
+The size and shape of the rainbow are determined by the <code><a href="r3_7.html#r3_7_1_5">angle</a></code>
+and <code><a href="r3_7.html#r3_7_1_5">width</a></code> keywords. The <code><a href="r3_7.html#r3_7_1_5">width</a></code>
 keyword is used to set the direction of the incoming light, thus setting the
 rainbow's position. The rainbow is visible when the angle between the direction
 vector and the incident light direction is larger than angle-width/2 and smaller
@@ -7174,14 +7179,14 @@ make it softly blend into the background.</p>
 <h5>2.3.6.4.3 Using a Rainbow Arc</h5>
 <p>Currently our rainbow has a circular shape, even though most of it is
 hidden below the ground plane. You can easily create a rainbow arc by using
-the <code><a href="r3_4.html#r3_4_3_5">arc_angle</a></code> keyword with an angle below 360 degrees.</p>
+the <code><a href="r3_7.html#r3_7_1_5">arc_angle</a></code> keyword with an angle below 360 degrees.</p>
 <p>
 If you use <code>arc_angle 120</code> for example you will get a rainbow
 arc that abruptly vanishes at the arc's ends. This does not look good. To
-avoid this the <code><a href="r3_4.html#r3_4_3_5">falloff_angle</a></code> keyword can be used to specify a
+avoid this the <code><a href="r3_7.html#r3_7_1_5">falloff_angle</a></code> keyword can be used to specify a
 region where the arc smoothly blends into the background.</p>
 <p>
-As explained in the rainbow's reference section (see <a href="r3_4.html#r3_4_3_5">Rainbow</a>) the arc extends from -arc_angle/2 to arc_angle/2 while
+As explained in the rainbow's reference section (see <a href="r3_7.html#r3_7_1_5">Rainbow</a>) the arc extends from -arc_angle/2 to arc_angle/2 while
 the blending takes place from -arc_angle/2 to -falloff_angle/2 and
 falloff_angle/2 to arc_angle/2. This is the reason why the <code>falloff_angle</code>
 has to be smaller or equal to the <code>arc_angle</code>.</p>
@@ -7460,7 +7465,7 @@ is done to better visualize what is happening.) </p>
 <p>The <code>scattering</code> keyword takes more parameters than the other two. 
 The first number inside the curly brackets is the scattering media type. In this 
 example we used scattering media type 1. A full list of scattering media types 
-is given in the section <a href="r3_4.html#r3_4_8_2_3">scattering</a> of the Media reference.</p> 
+is given in the section <a href="r3_7.html#r3_7_2_2_3">scattering</a> of the Media reference.</p> 
 
 <p>The second parameter is the overall color of the media, similar to the 
 parameter of the other two media types.</p> 
@@ -7726,7 +7731,7 @@ radiation between the objects of a scene.  With a raytracer like POV-Ray,
 normally only the direct influence of light sources on the objects can be
 calculated, all shadowed parts look totally flat.  Radiosity can help to
 overcome this limitation.  More details on the technical aspects can be
-found in the <a href="r3_4.html#r3_4_4_3">reference</a> section.</p>
+found in the <a href="r3_4.html#r3_4_3_3">reference</a> section.</p>
 
 <p>To enable radiosity, you have to add a radiosity block to the
 global_settings in your POV-Ray scene file. Radiosity is more accurate than
@@ -7783,7 +7788,7 @@ or an <a href="r3_2.html#r3_2_5_1">INI-file constant</a> and an <code>#if</code>
 
 <p>Finally, a few more things about the scene setup. All objects except the sky have <code>diffuse 0.65</code> and <code>emission 0</code> in their finish block. The sky sphere has a bright blue pigment (what a surprise) with <code>diffuse 0</code> and <code>emission 1.0</code> as finish attributes.</p>
 
-<p class="Note"><strong>Note:</strong> If using the <code><a href="r3_4.html#r3_4_3_4">sky_sphere</a></code> object, which does not support the <code>finish</code> keyword, instead of a <code><a href="r3_4.html#r3_4_5_1_12">sphere</a></code> object that does, you will need define a <code><a href="r3_3.html#r3_3_2_4">#default</a></code> finish in order to affect it's finish properties.</p>
+<p class="Note"><strong>Note:</strong> If using the <code><a href="r3_7.html#r3_7_1_4">sky_sphere</a></code> object, which does not support the <code>finish</code> keyword, instead of a <code><a href="r3_5.html#r3_5_1_1_13">sphere</a></code> object that does, you will need define a <code><a href="r3_3.html#r3_3_2_4">#default</a></code> finish in order to affect it's finish properties.</p>
 
 <p>For example:</p>
 
@@ -8312,7 +8317,7 @@ or an <a href="r3_2.html#r3_2_5_1">INI-file constant</a> and an <code>#if</code>
 </tr>
 </table>
 
-<p>You can strongly affect things with an object's <a href="r3_4.html#r3_4_6_3">finish</a> attributes. In fact that is the most important thing about radiosity. Normal objects should have an <code>emission 0</code> (the default) finish. Objects with an emission setting greater than zero actually act as light sources in radiosity scenes. Remember that the default finish values used until now were <code>diffuse 0.65</code> and <code>emission 0</code>.</p>
+<p>You can strongly affect things with an object's <a href="r3_6.html#r3_6_1_3">finish</a> attributes. In fact that is the most important thing about radiosity. Normal objects should have an <code>emission 0</code> (the default) finish. Objects with an emission setting greater than zero actually act as light sources in radiosity scenes. Remember that the default finish values used until now were <code>diffuse 0.65</code> and <code>emission 0</code>.</p>
 
 <table class="matte" width="700px" cellpadding="0" cellspacing="10px">
 <tr>
@@ -8895,9 +8900,9 @@ or an <a href="r3_2.html#r3_2_5_1">INI-file constant</a> and an <code>#if</code>
 <a name="t2_3_8_4"></a>
 <div class="content-level-h4" contains="Normals and Radiosity" id="t2_3_8_4">
 <h4>2.3.8.4 Normals and Radiosity</h4>
-<p>When using a <a href="r3_4.html#r3_4_4_3_4_4">normal</a>  statement in combination with radiosity lighting, you will see that the shadowed parts of the objects are totally smooth, no matter how strong the normals are made. The reason is that POV-Ray by default does not take the normal into account when calculating radiosity. You can easily change this by adding <code>normal on</code> to the radiosity block. Be aware that this can slow things down quite a bit and will require more memory, however it usually leads to more realistic results.</p>
+<p>When using a <a href="r3_4.html#r3_4_3_3_4_4">normal</a>  statement in combination with radiosity lighting, you will see that the shadowed parts of the objects are totally smooth, no matter how strong the normals are made. The reason is that POV-Ray by default does not take the normal into account when calculating radiosity. You can easily change this by adding <code>normal on</code> to the radiosity block. Be aware that this can slow things down quite a bit and will require more memory, however it usually leads to more realistic results.</p>
 
-<p>When using normals you should also remember that they are only faked irregularities and do not generate real geometric disturbances of the surface. A more realistic approach is using an <a href="r3_4.html#r3_4_5_1_6">isosurface</a> with a pigment function, but this can quickly lead to increased render times.</p>
+<p>When using normals you should also remember that they are only faked irregularities and do not generate real geometric disturbances of the surface. A more realistic approach is using an <a href="r3_5.html#r3_5_1_1_6">isosurface</a> with a pigment function, but this can quickly lead to increased render times.</p>
 <p>As you can see with this next series of images, the isosurface version does not have the same smooth-like appearance to it's circumference, as compared to the first two images. Notice that it also has a more realistic shadow-line.</p>
 
 <table class="matte" width="700px" cellpadding="0" cellspacing="10px">
@@ -8935,7 +8940,7 @@ or an <a href="r3_2.html#r3_2_5_1">INI-file constant</a> and an <code>#if</code>
 
 <p>With high quality settings, radiosity data can take quite a lot of memory. Apart from that the other scene data is also used much more intensively than in a conventional scene. Therefore insufficient memory and swapping can slow down things even more. Here's a few <a href="r3_2.html#r3_2_8_8">radiosity options</a> that might help.</p>
 
-<p>Finally the scene geometry and textures are important too. Objects not visible in the camera usually only increase parsing time and memory use, but in a radiosity scene, also objects behind the camera can slow down the rendering process. See the section <a href="r3_4.html#r3_4_4_3_4">Configuring Radiosity</a> for some helpful hints.</p>
+<p>Finally the scene geometry and textures are important too. Objects not visible in the camera usually only increase parsing time and memory use, but in a radiosity scene, also objects behind the camera can slow down the rendering process. See the section <a href="r3_4.html#r3_4_3_3_4">Configuring Radiosity</a> for some helpful hints.</p>
 
 </div>
 <a name="t2_3_9"></a>
@@ -9148,7 +9153,7 @@ other motions.</p>
 <div class="content-level-h4" contains="The Phase Keyword" id="t2_3_9_3">
 <h4>2.3.9.3 The Phase Keyword</h4>
 <p>There is another keyword we should know for purposes of animations: the
-<code><a href="r3_4.html#r3_4_7_5_2">phase</a></code> keyword. The phase keyword can be used on many texture
+<code><a href="r3_6.html#r3_6_2_5_2">phase</a></code> keyword. The phase keyword can be used on many texture
 elements, especially those that can take a color, pigment, normal or texture
 map. Remember the form that these maps take. For example:</p>
 <pre>
@@ -9232,7 +9237,7 @@ under the INI file settings section, but there are also forms of
 anti-aliasing used in area lights, and the new atmospheric effects of
 POV-Ray, so now is as good a time as any.</p>
 <p>
-<a href="r3_4.html#r3_4_4_1_5">Jitter</a> is a very small amount of random ray perturbation designed to diffuse
+<a href="r3_4.html#r3_4_3_1_5">Jitter</a> is a very small amount of random ray perturbation designed to diffuse
 tiny aliasing errors that might not otherwise totally disappear, even with
 intense anti-aliasing. By randomizing the placement of erroneous pixels, the
 error becomes less noticeable to the human eye, because the eye and mind are
@@ -9251,7 +9256,7 @@ For this reason, we should always set jitter to <code>off</code> in area
 lights and anti-aliasing options when preparing a scene for an animation. The
 (relatively) small extra measure quality due to the use of jitter will be
 offset by the ocean of jumpies that results. This general rule also applies
-to any truly random texture elements, such as <code><a href="r3_4.html#r3_4_6_3_3_3">crand</a></code>.</p>
+to any truly random texture elements, such as <code><a href="r3_6.html#r3_6_1_3_3_3">crand</a></code>.</p>
 
 </div>
 <a name="t2_3_9_5"></a>

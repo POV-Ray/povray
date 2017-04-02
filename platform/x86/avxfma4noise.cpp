@@ -5,11 +5,13 @@
 /// This file contains implementations of the noise generator optimized for the
 /// AVX and FMA4 instruction set.
 ///
+/// @author Original optimizations by AMD
+///
 /// @copyright
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -37,13 +39,17 @@
 #include "syspovconfigbase.h"
 #include "avxfma4noise.h"
 
+#ifdef MACHINE_INTRINSICS_H
+#include MACHINE_INTRINSICS_H
+#endif
+
 #include "core/material/pattern.h"
 #include "core/material/texture.h"
 #include "cpuid.h"
 
 /*****************************************************************************/
 
-#ifdef TRY_OPTIMIZED_NOISE
+#ifdef TRY_OPTIMIZED_NOISE_AVXFMA4
 
 /********************************************************************************************/
 /* AMD Specific optimizations: Its found that more than 50% of the time is spent in         */
@@ -321,8 +327,6 @@ DBL AVXFMA4Noise(const Vector3d& EPoint, int noise_generator)
 *
 ******************************************************************************/
 
-/// Optimized DNoise function using AVX and FMA4 instructions.
-/// @author Optimized by AMD
 void AVXFMA4DNoise(Vector3d& result, const Vector3d& EPoint)
 {
     DBL x, y, z;
@@ -688,5 +692,5 @@ void AVXFMA4DNoise(Vector3d& result, const Vector3d& EPoint)
 
 }
 
-#endif
+#endif // TRY_OPTIMIZED_NOISE_AVXFMA4
 

@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -49,7 +49,7 @@
 #endif
 
 #ifdef _CONSOLE
-#error "You are building the GUI platform with _CONSOLE defined (check vfe\win\syspovconfig.h)."
+#error "You are building the GUI platform with _CONSOLE defined (check windows/povconfig/syspovconfig.h)."
 #endif
 
 #include <string.h>
@@ -119,6 +119,7 @@
   #ifdef _DEBUG
     #define EDITDLLNAME         "cmedit64d.dll"
   #else
+    // NB: We're using the standard editor DLLs regardless of architecture optimization (e.g. AVX)
     #define EDITDLLNAME         "cmedit64.dll"
   #endif
   #if !defined POVRAY_IS_BETA
@@ -138,6 +139,7 @@
   #ifdef _DEBUG
     #define EDITDLLNAME         "cmedit32d.dll"
   #else
+    // TODO - use the standard editor DLLs regardless of architecture optimization (e.g. SSE2)
     #ifdef BUILD_SSE2
         #define EDITDLLNAME     "cmedit32-sse2.dll"
     #else

@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -163,12 +163,15 @@ bool Path::ParsePathString (UCS2String& volume, vector<UCS2String>& dirnames, UC
     {
         if (POV_IS_PATH_SEPARATOR(*i))
         {
-            if (!stash.empty() && !IsCurrentDir(stash))
+            if (!stash.empty())
             {
-                if (!dirnames.empty() && IsParentDir(stash))
-                    dirnames.pop_back();
-                else
-                    dirnames.push_back (stash);
+                if (!IsCurrentDir(stash))
+                {
+                    if (!dirnames.empty() && IsParentDir(stash) && !IsParentDir(dirnames.back()))
+                        dirnames.pop_back();
+                    else
+                        dirnames.push_back (stash);
+                }
                 stash.clear();
             }
         }

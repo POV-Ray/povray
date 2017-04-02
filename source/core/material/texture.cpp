@@ -22,7 +22,7 @@
 /// ----------------------------------------------------------------------------
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -61,8 +61,8 @@
 #include "core/material/warp.h"
 #include "core/support/imageutil.h"
 
-#if defined(TRY_OPTIMIZED_NOISE)
-    #include OPTIMIZED_NOISE_H
+#ifdef OPTIMIZED_NOISE_H
+#include OPTIMIZED_NOISE_H
 #endif
 
 // this must be the last file included
@@ -184,14 +184,14 @@ namespace pov
     #ifndef FASTER_NOISE_INIT
         #define FASTER_NOISE_INIT()
     #endif
-#else
-#if !defined(TRY_OPTIMIZED_NOISE)
+#else // USE_FASTER_NOISE
+#ifndef TRY_OPTIMIZED_NOISE
     #define PortableNoise Noise
     #define PortableDNoise DNoise
 #endif
 
     #define FASTER_NOISE_INIT()
-#endif
+#endif // USE_FASTER_NOISE
 
 /*****************************************************************************
 *
@@ -217,7 +217,7 @@ namespace pov
 
 void Initialize_Noise()
 {
-#if defined(TRY_OPTIMIZED_NOISE)
+#ifdef TRY_OPTIMIZED_NOISE
     Initialise_NoiseDispatch();
 #endif
     InitTextureTable();
@@ -1624,7 +1624,7 @@ int Test_Opacity(const TEXTURE *Texture)
 }
 
 
-#if defined(TRY_OPTIMIZED_NOISE)
+#ifdef TRY_OPTIMIZED_NOISE
 
 DBL (*Noise) (const Vector3d& EPoint, int noise_generator);
 void (*DNoise) (Vector3d& result, const Vector3d& EPoint);
@@ -1664,22 +1664,16 @@ void Initialise_NoiseDispatch()
 
     if(!cpu_detected)
     {
-            if(OPTIMIZED_NOISE_SUPPORTED)
-            {
-                Noise = OPTIMIZED_NOISE;
-                DNoise = OPTIMIZED_DNOISE;
-            }
-            else
-            {
-                Noise = PortableNoise;
-                DNoise = PortableDNoise;
-            }
-
-            cpu_detected = true;
+        if (!TRY_OPTIMIZED_NOISE(&Noise, &DNoise))
+        {
+            Noise  = PortableNoise;
+            DNoise = PortableDNoise;
+        }
+        cpu_detected = true;
     }
 }
 
-#endif
+#endif // TRY_OPTIMIZED_NOISE
 
 
 //******************************************************************************

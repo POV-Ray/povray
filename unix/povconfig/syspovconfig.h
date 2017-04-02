@@ -125,6 +125,20 @@ const int NULL=0;
 #define METADATA_PLATFORM_STRING BUILD_ARCH
 #define METADATA_COMPILER_STRING COMPILER_VERSION
 
+#if 0 // TODO - more work needed before we can enable this
+
+#ifdef ENABLE_AVX2
+#define TRY_OPTIMIZED_NOISE
+#define TRY_OPTIMIZED_NOISE_AVX2FMA3
+#endif
+
+#ifdef TRY_OPTIMIZED_NOISE
+#define OPTIMIZED_NOISE_H "optimizednoise.h"
+#endif
+
+#endif
+
+
 #ifdef HAVE_NAN
     #if defined(HAVE_STD_ISNAN)
         #define POV_ISNAN(x) std::isnan(x)

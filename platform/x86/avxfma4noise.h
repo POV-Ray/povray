@@ -9,7 +9,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -40,14 +40,13 @@
 #include "syspovconfigbase.h"
 #include "backend/frame.h"
 
-#ifdef TRY_OPTIMIZED_NOISE
+#ifdef TRY_OPTIMIZED_NOISE_AVXFMA4
 
 namespace pov
 {
 
 bool AVXFMA4NoiseSupported();
 
-/// FMA4 version of the Noise function.
 /// Optimized Noise function using AVX and FMA4 instructions.
 /// @author Optimized by AMD
 DBL AVXFMA4Noise(const Vector3d& EPoint, int noise_generator);
@@ -58,6 +57,6 @@ void AVXFMA4DNoise(Vector3d& result, const Vector3d& EPoint);
 
 }
 
-#endif // TRY_OPTIMIZED_NOISE
+#endif // TRY_OPTIMIZED_NOISE_AVXFMA4
 
 #endif // POVRAY_AVXFMA4NOISE_H

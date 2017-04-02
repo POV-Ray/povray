@@ -11,7 +11,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -43,18 +43,8 @@
   #error "minimum Visual C++ version supported is 14.0 (supplied with VS 2005)"
 #endif
 
-#undef TRY_OPTIMIZED_NOISE
-#if _MSC_VER >= 1600
-  #define TRY_OPTIMIZED_NOISE
-  #define OPTIMIZED_NOISE_SUPPORTED (AVXFMA4NoiseSupported())
-  #define OPTIMIZED_NOISE           AVXFMA4Noise
-  #define OPTIMIZED_DNOISE          AVXFMA4DNoise
-  #define OPTIMIZED_NOISE_H         "avxfma4noise.h"
-#endif
-
 #include <cstdio>
 #include <direct.h>
-#include <intrin.h>
 
 #pragma auto_inline(on)
 #pragma warning(disable : 4018) /* signed/unsigned mismatch */
@@ -213,5 +203,31 @@
 
 #undef ReturnAddress
 #define ReturnAddress()                     _ReturnAddress()
+
+#define ALIGN32                             __declspec(align(32))
+#define MACHINE_INTRINSICS_H                <intrin.h>
+
+// AVX-only optimized noise (Intel).
+#if (_MSC_VER >= 1900) || ((_MSC_VER >= 1600) && (defined(BUILD_AVX) || defined(BUILD_AVX2)))
+    // MSVC 2010 is known to give poor performance without `/arch:AVX`; MSVC 2015 is known to be fine.
+    #define TRY_OPTIMIZED_NOISE_AVX
+#endif
+
+// AVX/FMA4 optimized noise (AMD).
+#if _MSC_VER >= 1600
+    // TODO - review performance results of MSVC 2010 versions without `/arch:AVX`.
+    #define TRY_OPTIMIZED_NOISE_AVXFMA4
+#endif
+
+// AVX2/FMA3 optimized noise (Intel).
+#if _MSC_VER >= 1900
+    // MSVC 2010 does not support AVX2 at all, so no need to worry about `/arch` setting.
+    #define TRY_OPTIMIZED_NOISE_AVX2FMA3
+#endif
+
+#if defined(TRY_OPTIMIZED_NOISE_AVX) || defined(TRY_OPTIMIZED_NOISE_AVXFMA4) || defined(TRY_OPTIMIZED_NOISE_AVX2FMA3)
+#define TRY_OPTIMIZED_NOISE(Noise,DNoise)   TryOptimizedNoise(Noise,DNoise)
+#define OPTIMIZED_NOISE_H                   "optimizednoise.h"
+#endif
 
 #endif // POVRAY_WINDOWS_SYSPOVCONFIG_MSVC_H

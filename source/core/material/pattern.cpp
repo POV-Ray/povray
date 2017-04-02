@@ -14,7 +14,7 @@
 /// ----------------------------------------------------------------------------
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -202,7 +202,7 @@ static ColourBlendMapConstPtr gpDefaultBlendMap_Wood (new ColourBlendMap(2, gaDe
 * Static functions
 ******************************************************************************/
 
-static const ClassicTurbulence* SearchForTurb(const WarpList warps);
+static inline const ClassicTurbulence* GetTurb(const WarpList warps);
 static unsigned short ReadUShort(IStream *pInFile);
 static unsigned int ReadUInt(IStream *pInFile);
 
@@ -266,6 +266,11 @@ BasicPattern::BasicPattern(const BasicPattern& obj) :
 BasicPattern::~BasicPattern()
 {
     Destroy_Warps(warps);
+}
+
+bool BasicPattern::Precompute()
+{
+    return true;
 }
 
 int BasicPattern::GetNoiseGen(const TraceThreadData *pThread) const
@@ -387,7 +392,14 @@ bool AveragePattern::HasSpecialTurbulenceHandling() const { return false; }
 
 
 AgatePattern::AgatePattern() : agateTurbScale(1.0) {}
+
+bool AgatePattern::Precompute()
+{
+    return (!warps.empty() && dynamic_cast<ClassicTurbulence*>(*warps.begin()));
+}
+
 ColourBlendMapConstPtr AgatePattern::GetDefaultBlendMap() const { return gpDefaultBlendMap_Agate; }
+
 
 ColourBlendMapConstPtr BozoPattern::GetDefaultBlendMap() const { return gpDefaultBlendMap_Bozo; }
 
@@ -474,7 +486,7 @@ bool ColourImagePattern::Evaluate(TransColour& result, const Vector3d& EPoint, c
 
     // If outside map coverage area, return clear
 
-    if (map_pos(EPoint, this, &xcoor, &ycoor))
+    if (map_pos(EPoint, pImage, &xcoor, &ycoor))
     {
         result = ToTransColour(RGBFTColour(1.0, 1.0, 1.0, 0.0, 1.0));
         return false;
@@ -557,7 +569,18 @@ DBL ImagePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsect
 }
 
 
-MarblePattern::MarblePattern() { waveType = kWaveType_Triangle; }
+MarblePattern::MarblePattern() :
+    hasTurbulence()         // no explicit default; set by Precompute()
+{
+    waveType = kWaveType_Triangle;
+}
+
+bool MarblePattern::Precompute()
+{
+    hasTurbulence = (!warps.empty() && dynamic_cast<ClassicTurbulence*>(*warps.begin()));
+    return true;
+}
+
 ColourBlendMapConstPtr MarblePattern::GetDefaultBlendMap() const { return gpDefaultBlendMap_Marble; }
 
 
@@ -649,10 +672,18 @@ SlopePattern::SlopePattern() :
 
 
 SpiralPattern::SpiralPattern() :
-    arms()                  // no explicit default; must be set by caller
+    arms(),                 // no explicit default; must be set by caller
+    hasTurbulence()         // no explicit default; set by Precompute()
 {
     waveType = kWaveType_Triangle;
 }
+
+bool SpiralPattern::Precompute()
+{
+    hasTurbulence = (!warps.empty() && dynamic_cast<ClassicTurbulence*>(*warps.begin()));
+    return true;
+}
+
 
 ColourBlendMapConstPtr SquarePattern::GetDefaultBlendMap() const { return gpDefaultBlendMap_Square; }
 unsigned int SquarePattern::NumDiscreteBlendMapEntries() const { return 4; }
@@ -660,7 +691,19 @@ unsigned int SquarePattern::NumDiscreteBlendMapEntries() const { return 4; }
 ColourBlendMapConstPtr TriangularPattern::GetDefaultBlendMap() const { return gpDefaultBlendMap_Triangular; }
 unsigned int TriangularPattern::NumDiscreteBlendMapEntries() const { return 6; }
 
-WoodPattern::WoodPattern() { waveType = kWaveType_Triangle; }
+
+WoodPattern::WoodPattern() :
+    hasTurbulence()         // no explicit default; set by Precompute()
+{
+    waveType = kWaveType_Triangle;
+}
+
+bool WoodPattern::Precompute()
+{
+    hasTurbulence = (!warps.empty() && dynamic_cast<ClassicTurbulence*>(*warps.begin()));
+    return true;
+}
+
 ColourBlendMapConstPtr WoodPattern::GetDefaultBlendMap() const { return gpDefaultBlendMap_Wood; }
 
 
@@ -1076,12 +1119,11 @@ template void BlendMap<TexturePtr>  ::Search (DBL value, EntryConstPtr& rpPrev, 
 *
 ******************************************************************************/
 
-static const ClassicTurbulence *SearchForTurb(const WarpList warps)
+static inline const ClassicTurbulence *GetTurb(const WarpList warps)
 {
-    if(warps.empty())
-        return NULL;
-    else
-        return dynamic_cast<const ClassicTurbulence*>(*warps.begin());
+    POV_PATTERN_ASSERT(!warps.empty());
+    POV_PATTERN_ASSERT(dynamic_cast<const ClassicTurbulence*>(*warps.begin()));
+    return static_cast<const ClassicTurbulence*>(*warps.begin());
 }
 
 
@@ -5345,8 +5387,7 @@ DBL AgatePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsect
     register DBL noise, turb_val;
     const ClassicTurbulence* Turb;
 
-    Turb=SearchForTurb(warps);
-    POV_PATTERN_ASSERT(Turb != NULL); // Parser must make sure that a pattern-associated classic turbulence warp exists.
+    Turb = GetTurb(warps);
 
     turb_val = agateTurbScale * Turbulence(EPoint,Turb,noise_generator);
 
@@ -7790,8 +7831,9 @@ DBL MarblePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsec
     register DBL turb_val;
     const ClassicTurbulence *Turb;
 
-    if ((Turb=SearchForTurb(warps)) != NULL)
+    if (hasTurbulence)
     {
+        Turb = GetTurb(warps);
         turb_val = Turb->Turbulence[X] * Turbulence(EPoint,Turb,GetNoiseGen(pThread));
     }
     else
@@ -8357,8 +8399,9 @@ DBL Spiral1Pattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIse
     DBL z = EPoint[Z];
     const ClassicTurbulence *Turb;
 
-    if ((Turb=SearchForTurb(warps)) != NULL)
+    if (hasTurbulence)
     {
+        Turb = GetTurb(warps);
         turb_val = Turb->Turbulence[X] * Turbulence(EPoint,Turb,GetNoiseGen(pThread));
     }
     else
@@ -8433,8 +8476,9 @@ DBL Spiral2Pattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIse
     DBL z = EPoint[Z];
     const ClassicTurbulence *Turb;
 
-    if ((Turb=SearchForTurb(warps)) != NULL)
+    if (hasTurbulence)
     {
+        Turb = GetTurb(warps);
         turb_val = Turb->Turbulence[X] * Turbulence(EPoint,Turb,GetNoiseGen(pThread));
     }
     else
@@ -8611,8 +8655,9 @@ DBL WoodPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *pIsecti
     DBL y=EPoint[Y];
     const ClassicTurbulence *Turb;
 
-    if ((Turb=SearchForTurb(warps)) != NULL)
+    if (hasTurbulence)
     {
+        Turb = GetTurb(warps);
         DTurbulence (WoodTurbulence, EPoint, Turb);
         point[X] = cycloidal((x + WoodTurbulence[X]) * Turb->Turbulence[X]);
         point[Y] = cycloidal((y + WoodTurbulence[Y]) * Turb->Turbulence[Y]);

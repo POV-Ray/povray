@@ -9,7 +9,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2015 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -39,17 +39,19 @@
 
 #include "syspovconfigbase.h"
 
-#if defined(LINUX)
-#define CPUID cpuid
-#else
-#define CPUID __cpuid // TODO it's a bit naive to presume this intrinsic to exist on any non-Linux platform
-#endif
+/// Test whether SSE2 is supported by both CPU and OS.
+bool HaveSSE2();
 
-#define CPUID_00000001_OSXSAVE_MASK    (0x1 << 27)
-#define CPUID_00000001_AVX_MASK        (0x1 << 28)
-#define CPUID_80000001_FMA4_MASK       (0x1 << 16)
+/// Test whether AVX is supported by both CPU and OS.
+bool HaveAVX();
 
-/// Tests whether AVX and FMA4 are supported.
+/// Test whether AVX2 is supported by both CPU and OS.
+bool HaveAVX2();
+
+/// Test whether AVX and FMA4 are supported by both CPU and OS.
 bool HaveAVXFMA4();
+
+/// Test whether AVX2 and FMA3 are supported by both CPU and OS.
+bool HaveAVX2FMA3();
 
 #endif // POVRAY_CPUID_H

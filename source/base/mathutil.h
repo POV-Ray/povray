@@ -148,7 +148,7 @@ inline T2 wrapInt(T1 val, T2 upperLimit)
 // wrap signed integer value into the range [0..upperLimit);
 // (this is equivalent to the modulus assignment operator for positive values, but not for negative ones)
 template<typename T1, typename T2>
-inline void setWrapInt(T1 val, T2 upperLimit)
+inline void setWrapInt(T1& val, T2 upperLimit)
 {
     val %= upperLimit;
 

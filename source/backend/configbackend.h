@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -74,6 +74,20 @@
 ///
 #ifndef POV_USE_DEFAULT_TASK_CLEANUP
     #define POV_USE_DEFAULT_TASK_CLEANUP 1
+#endif
+
+/// @def POV_THREAD_STACK_SIZE
+///     Internally defaulted thread stack size which the user can override.
+///
+/// @note
+///     The defaulted minimum is 2MB, but later defaulted to 4MB for unix due user regression.
+///
+#ifndef POV_THREAD_STACK_SIZE
+    #define POV_THREAD_STACK_SIZE (1024 * 1024 * 2)
+#else
+    #if POV_THREAD_STACK_SIZE < (1024 * 64)
+        #error "POV_THREAD_STACK_SIZE set less than 65KB or not a byte count."
+    #endif
 #endif
 
 /// @def POV_CONVERT_TEXT_TO_UCS2

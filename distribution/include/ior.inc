@@ -81,27 +81,27 @@
 // from refractive index n (nD) and nominal dispersion disp (nG-nB)
 #macro IorData_n_disp (n, optional disp)
   #local iorResult = n;
-  #ifdef(local(disp))
+  #ifdef(local.disp)
     #local dispResult = 1+disp/(n-disp/2);
   #end
-  ( iorResult , local(dispResult) )
+  ( iorResult , local.dispResult )
 #end
 
 // from typical refractive index range n1 to n2 (nD) and typical nominal dispersion disp1 to disp2 (nG-nB)
 #macro IorData_n_disp_Range (n1, optional n2, optional disp1, optional disp2)
-  #ifdef(local(n2))
+  #ifdef(local.n2)
     #local n = Average(n1,n2);
   #else
     #local n = n1;
   #end
-  #ifdef(local(disp1))
-    #ifdef(local(disp2))
+  #ifdef(local.disp1)
+    #ifdef(local.disp2)
       #local disp = Average(disp1,disp2);
     #else
       #local disp = disp1;
     #end
   #end
-  IorData_n_disp(n, local(disp))
+  IorData_n_disp(n, local.disp)
 #end
 
 // from refractive indices at Fraunhofer lines G, D and B
