@@ -108,16 +108,13 @@
   <td><div class="divh3"><a title="3.2.5.1" href="#r3_2_5_1">Constant</a></div></td>
 </tr>
 <tr>
-  <td><div class="divh3"><a title="3.2.5.2" href="#r3_2_5_2">Input File Name</a></div></td>
+  <td><div class="divh3"><a title="3.2.5.2" href="#r3_2_5_2">Include File Name</a></div></td>
 </tr>
 <tr>
-  <td><div class="divh3"><a title="3.2.5.3" href="#r3_2_5_3">Include File Name</a></div></td>
+  <td><div class="divh3"><a title="3.2.5.3" href="#r3_2_5_3">Library Paths</a></div></td>
 </tr>
 <tr>
-  <td><div class="divh3"><a title="3.2.5.4" href="#r3_2_5_4">Library Paths</a></div></td>
-</tr>
-<tr>
-  <td><div class="divh3"><a title="3.2.5.5" href="#r3_2_5_5">Language Version</a></div></td>
+  <td><div class="divh3"><a title="3.2.5.4" href="#r3_2_5_4">Language Version</a></div></td>
 </tr>
 <tr>
   <td><div class="divh2"><strong><a title="3.2.6" href="#r3_2_6">Shell Command Options</a></strong></div></td>
@@ -205,7 +202,7 @@
 <table class="HeaderFooter" width="100%">
 <tr>
   <td colspan=5 align="left" class="HeaderFooter">
-    POV-Ray for Unix <strong class="HeaderFooter">version 3.7</strong>
+    POV-Ray for Unix <strong class="HeaderFooter">version 3.7.1</strong>
   </td>
 </tr>
 <tr >
@@ -233,14 +230,9 @@ explanations on how scenes are written or how POV-Ray is used. It just
 explains all features, their syntax, applications, limits, drawbacks,
 etc.</p>
 
-<p>Options may be specified by switches
-or INI-style options. Almost all INI-style options have equivalent <code>
-+</code>/ <code>-</code> switches and most switches have equivalent INI-style
-option. The following sections give a detailed description of each POV-Ray
-option. It includes both the INI-style settings and the <code> +</code>/
-<code>-</code> switches.</p>
-<p>
-The notation and terminology used is described in the tables below.</p>
+<p>Options may be specified by switches or INI-style options. Almost all INI-style options have equivalent <code>+</code> / <code>-</code> switches and most switches have equivalent INI-style option. The following sections give a detailed description of each POV-Ray option. It includes both the INI-style settings and the <code>+</code> / <code>-</code> switches.</p>
+
+<p>The notation and terminology used is described in the tables below.</p>
 
 <table width="100%" class="option-list">
 <tr>
@@ -569,6 +561,7 @@ value for this setting is off.</p>
 <a name="r3_2_1_5"></a>
 <div class="content-level-h4" contains="Field Rendering" id="r3_2_1_5">
 <h4>3.2.1.5 Field Rendering</h4>
+<p class="Note"><strong>Note:</strong> <font class="Change">Change</font> these items are <em>deprecated</em> as of version 3.7</p>
 <table width="100%" class="option-list">
 <tr>
 <td width="30%"><code>Field_Render=</code>bool</td>
@@ -636,7 +629,6 @@ Odd_Field=on</code>, or by using the <code> +UO</code> switch.</p></div>
 <a name="r3_2_2_1"></a>
 <div class="content-level-h4" contains="Height and Width of Output" id="r3_2_2_1">
 <h4>3.2.2.1 Height and Width of Output</h4>
-
 <table width="100%" class="option-list">
 <tr>
 <td width="30%"><code>Height=</code>n</td>
@@ -807,7 +799,7 @@ image from (1,1) which is the upper left to (w,h) on the lower right where w and
 <a name="r3_2_2_4"></a>
 <div class="content-level-h4" contains="Interrupting Options" id="r3_2_2_4">
 <h4>3.2.2.4 Interrupting Options</h4>
-
+<p class="Note"><strong>Note:</strong> <font class="Change">Change</font> these items are <em>deprecated</em> as of version 3.7</p>
 <table width="100%" class="option-list">
 <tr>
 <td width="30%"><code>Test_Abort=</code>bool</td>
@@ -882,6 +874,21 @@ scene lines parsed.</p>
 </tr>
 
 <tr>
+<td width="30%"><code>Create_Continue_Trace_Log=</code>bool</td>
+<td width="70%">Save state information in file on/off</td>
+</tr>
+
+<tr>
+<td><code>+CC</code></td>
+<td>Save state information in file on</td>
+</tr>
+
+<tr>
+<td><code>-CC</code></td>
+<td>Save state information in file off</td>
+</tr>
+
+<tr>
 <td><code>Create_Ini=</code>file</td>
 <td>Generate an INI file to file</td>
 </tr>
@@ -902,14 +909,15 @@ scene lines parsed.</p>
 </tr>
 </table>
 
-<p>If you abort a render while it is in progress or if you used the <code><a href="r3_2.html#r3_2_2_3">End_Row</a></code> option to end the render prematurely, you can use <code>Continue_Trace=on</code> or <code>+C</code> option to continue the render later at the point where you left off. This option reads in the previously generated output file, displays the partial image rendered so far, then
-proceeds with the ray-tracing. This option cannot be used if file output is disabled with <code><a href="r3_2.html#r3_2_4">Output_to_file</a>=off</code> or <code>-F</code>.</p>
+<p>If you abort a render while it is in progress or if you used the <code><a href="r3_2.html#r3_2_2_3">End_Row</a></code> option to end the render prematurely, you can use <code>Continue_Trace=on</code> or <code>+C</code> option to continue the render later at the point where you left off. This option reads in the previously generated output file, displays the partial image rendered so far, then proceeds with the ray-tracing. The state or continue trace information file must exist for the <code>Continue_Trace=true</code> / <code>+C</code> option to work.</p>
 
 <p>The <code>Continue_Trace</code> option may not work if the <code>Start_Row</code> option has been set to anything but the top of the file, depending on the output format being used. Also POV-Ray cannot continue the file once it has been opened and saved again by any program.</p>
 
 <p>POV-Ray tries to figure out where to resume an interrupted trace by reading any previously generated data in the specified output file. All file formats contain the image size, so this will override any image size settings
 specified. Some file formats (namely TGA and PNG) also store information about where the file started (i. e. <code> +SC</code><em>n</em> and <code>+SR</code><em>n</em> options), alpha output <code>+UA</code>, and bit-depth
 <code>+FN</code><em>n</em>, which will override these settings. It is up to the user to make sure that all other options are set the same as the original render.</p>
+
+<p><font class="New">New</font> as of version 3.7.1 the <code>Create_Continue_Trace_Log</code> option was added to offer greater resource control. The user can suppress the creation of this file by simply setting the <em>ini-option</em> <code>Create_Continue_Trace_Log=false</code> or using the <code>-CC</code> command line option.</p> 
 
 <p>The <code>Create_Ini</code> option or <code>+GI</code> switch provides an easy way to create an INI file with all of the rendering options, so you can re-run files with the same options, or ensure you have all the same options when resuming. This option creates an INI file with every option set at the value used for that rendering. This includes default values which you have not specified. For example if you run POV-Ray with...</p>
 
@@ -965,37 +973,37 @@ you could distribute along with your scene file so other users can exactly re-cr
 <tr>
 <td><code>Video_Mode=</code>x</td>
 
-<td>Set video mode to x; does not affect on/off</td>
+<td>Set video mode to x; does not affect on/off. <font class="Change">Change</font> <em>deprecated</em> as of version 3.7</td>
 </tr>
 
 <tr>
 <td><code>+D</code>x</td>
 
-<td>Set display on; Set mode to x</td>
+<td>Set display on; Set mode to x. <font class="Change">Change</font> <em>deprecated</em> as of version 3.7</td>
 </tr>
 
 <tr>
 <td><code>-D</code>x</td>
 
-<td>Set display off; but for future use mode x</td>
+<td>Set display off; but for future use mode x. <font class="Change">Change</font> <em>deprecated</em> as of version 3.7</td>
 </tr>
 
 <tr>
 <td><code>Palette=</code>y</td>
 
-<td>Set display palette to y; does not affect on/off</td>
+<td>Set display palette to y; does not affect on/off. <font class="Change">Change</font> <em>deprecated</em> as of version 3.7</td>
 </tr>
 
 <tr>
 <td><code>+D</code>xy</td>
 
-<td>Set display on; Set mode x; Set palette y</td>
+<td>Set display on; Set mode x; Set palette y. <font class="Change">Change</font> <em>deprecated</em> as of version 3.7</td>
 </tr>
 
 <tr>
 <td><code>-D</code>xy</td>
 
-<td>Set display off; use mode x, palette y in future</td>
+<td>Set display off; use mode x, palette y in future. <font class="Change">Change</font> <em>deprecated</em> as of version 3.7</td>
 </tr>
 
 <tr>
@@ -1009,53 +1017,35 @@ you could distribute along with your scene file so other users can exactly re-cr
 
 <td>Sets the display gamma to match the sRGB standard (approximately corresponding to a gamma of 2.2)</td>
 </tr>
+<tr>
+<td><code>Display_Gamma=BT709</code></td>
+<td>Sets the display gamma to match the <em>ITU-R BT.709 transfer function</em>. <font class="New">New</font> in version 3.7.1</td>
+</tr>
+<tr>
+<td><code>Display_Gamma=BT2020</code></td>
+<td>Sets the display gamma to match the <em>ITU-R BT.2020 transfer function</em>. <font class="New">New</font> in version 3.7.1</td>
+</tr>
 </table>
 
-<p>The <code>Display=on</code> or <code>+D</code> switch will turn on the
-graphics display of the image while it is being rendered. Even on some
-non-graphics systems, POV-Ray may display an 80 by 24 character <em>
-ASCII-Art</em> version of your image. Where available, the
-display may be full, 24-bit true color. Setting <code>Display=off</code> or
-using the <code>-D</code> switch will turn off the graphics display which is
-the default.</p>
-<p>On the Windows platform, the default is <code>Display=on</code>. Turning
-display off does not, of course, turn off the actual video display. Instead,
-POV-Ray will not open the output window that it normally shows a render in.</p>
-<p>The <code>Video_Mode=</code><em>x</em> option sets the display mode or
-hardware type chosen where <em>x</em> is a single digit or letter that is
-machine dependent. Generally <code>Video_Mode=0</code> means the default or
-an auto-detected setting should be used. When using switches, this character
-immediately follows the switch. For example the <code>+D0</code> switch will
-turn on the graphics display in the default mode.</p>
-<p>
-The <code> Palette=</code><em>y</em> option selects the palette to be used.
-Typically the single character parameter <em>y</em> is a digit which selects
-one of several fixed palettes or a letter such <code>G</code> for gray scale,
-<code> H</code> for 15-bit or 16-bit high color or <code> T</code> for 24-bit
-true color. When using switches, this character is the 2nd character after
-the switch. For example the <code>+D0T</code> switch will turn on the
-graphics display in the default mode with a true color palette.</p>
-<p>
-The <code> Display_Gamma</code> setting overcomes the problem of images
-(whether ray-traced or not) having different brightness when being displayed
-on different monitors, different video cards, and under different operating
-systems. The <code>Display_Gamma=</code><em>n.n</em> setting is not
-available as a command-line switch.</p>
-<p class="Note"><strong>Note:</strong> The <code>Display_Gamma</code> is a setting based on your
-computer's display hardware, and should be set correctly once and not
-changed.</p>
-<p>
-While the <code> Display_Gamma</code> can be different for each system,
-there are a few general rules that can be used for setting <code>
-Display_Gamma</code> if you do not know it exactly. If the <code>
-Display_Gamma</code> keyword does not appear in the INI file, POV-Ray assumes
-that the display gamma is approximately 2.2 (to precise, that it matches the sRGB standard). This is because most PC monitors have a gamma
-value in the range 1.6 to 2.6 (newer models seem to have a lower gamma
-value). Mac has the ability to do gamma correction inside the system software
-(based on a user setting in the gamma control panel). If the gamma control
-panel is turned off, or is not available, the default Macintosh system gamma
-is 1.8. Many newer PC graphics cards can do hardware gamma correction and
-should use the current Display_Gamma setting, usually <code>sRGB</code> (being approximately equivalent to a gamma of 2.2).</p>
+<p>The <code>Display=on</code> or <code>+D</code> switch will turn on the graphics display of the image while it is being rendered. Even on some non-graphics systems, POV-Ray may display an 80 by 24 character <em>ASCII-Art</em> version of your image. Where available, the display may be full, 24-bit true color. Setting <code>Display=off</code> or using the <code>-D</code> switch will turn off the graphics display which is the default.</p>
+
+<p>On the Windows platform, the default is <code>Display=on</code>. Turning display off does not, of course, turn off the actual video display. Instead, POV-Ray will not open the output window that it normally shows the render.</p>
+
+<p class="Note"><strong>Note:</strong> <font class="Change">Change</font> the following two items are <em>deprecated</em> as of version 3.7</p>
+
+<p>The <code>Video_Mode=x</code> option sets the display mode or hardware type chosen where x is a single digit or letter that is machine dependent. Generally <code>Video_Mode=0</code> means the default or an auto-detected setting should be used. When using switches, this character immediately follows the switch. For example the <code>+D0</code> switch will turn on the graphics display in the default mode.</p>
+
+<p>The <code>Palette=y</code> option selects the palette to be used. Typically the single character parameter y is a digit which selects one of several fixed palettes or a letter such <code>G</code> for gray scale, <code>H</code> for 15-bit or 16-bit high color or <code>T</code> for 24-bit true color. When using switches, this character is the 2nd character after the switch. For example the <code>+D0T</code> switch will turn on the graphics display in the default mode with a true color palette.</p>
+
+<p class="Note"><strong>Note:</strong> <font class="Change">Change</font> the previous two items are <em>deprecated</em> as of version 3.7</p>
+
+<p>The <code> Display_Gamma</code> setting overcomes the problem of images (whether ray-traced or not) having different brightness when being displayed on different monitors, different video cards, and under different operating systems. The <code>Display_Gamma=</code><em>n.n</em> setting is not available as a command-line switch.</p>
+
+<p class="Note"><strong>Note:</strong> The <code>Display_Gamma</code> is a setting based on your computer's display hardware, and should be set correctly once and not changed.</p>
+
+<p>While the <code>Display_Gamma</code> can be different for each system, there are a few general rules that can be used for setting <code>Display_Gamma</code> if you do not know it exactly. If the <code>Display_Gamma</code> keyword does not appear in the INI file, POV-Ray assumes that the display gamma is approximately 2.2, a value that matches the sRGB standard. This is because most PC monitors have a gamma value in the range 1.6 to 2.6, however, newer models seem to have a lower gamma value. Mac has the ability to do gamma correction inside the system software, based on a user setting in the gamma control panel. If the gamma control panel is turned off, or is not available, the default Macintosh system gamma is 1.8. Many newer PC graphics cards can do hardware gamma correction and should use the current <code>Display_Gamma</code> setting, usually <code>sRGB</code> being the approximate equivalent to a gamma of 2.2.</p>
+
+<p class="Note"><strong>Note:</strong> <code>Display_Gamma=BT709</code> and <code>Display_Gamma=BT2020</code> are provided more for the sake of completeness than anything else. If you think one of these values is right for you, chances are you're doing something fundamentally wrong.</p>
 
 </div>
 <a name="r3_2_3_2"></a>
@@ -1265,7 +1255,7 @@ without starting over from the beginning.</p>
 
 <table width="100%" class="option-list">
 <tr>
-<td width="30%"><code>Output_to_File=</code>bool</td>
+<td width="30%"><code>Output_to_File=</code>bool<!--BEGIN DO NOT alter or move---><!--END DO NOT alter or move---></td>
 
 <td width="70%">Sets file output on/off</td>
 </tr>
@@ -1327,6 +1317,11 @@ Output_to_File=off</code> or <code>-F</code>.</p>
 <td><code>Bits_Per_Color=</code>n</td>
 <td>Sets file output bits/color to n</td>
 </tr>
+
+<tr>
+<td><code>Compression=</code>n</td>
+<td>Sets compression parameter for file types that support it.</td>
+</tr>
 </table>
 
 <p class="Note"><strong>Note:</strong> As of version 3.7 the default output file type for all supported platforms is PNG. You may select one of several different file types by using <code>Output_File_Type=</code><em>x</em> or <code>+F</code><em>x</em> where <em>x</em> is one of the following:</p>
@@ -1378,14 +1373,23 @@ encoded)</td>
 </tr>
 </table>
 <p>
-PNG is an image format designed not only to replace GIF, but to improve on its shortcomings. PNG offers the highest compression available without loss for high quality applications, such as ray-tracing. The system specific format depends on the platform used and is covered in the appropriate system specific documentation.
+<font class="New">New</font> as of version 3.7.1, instead of <code>Output_File_Type=C</code> you can also use <code>Output_File_Type=T Compression=1</code> to choose RLE-encoded Targa format.
+</p>
+<p>
+PNG is an image format designed not only to replace GIF, but to improve on its shortcomings. PNG offers the highest compression available without loss for high quality applications, such as ray-tracing.
+</p>
+<p>
+<font class="New">New</font> Prior to version 3.7.1, PPM output always created the compact <em>raw</em> (binary) format. The <code>Compression=0</code> ini setting can now be used to select the <em>plain</em> (ASCII) format instead.
+</p>
+<p>
+The system specific format depends on the platform used and is covered in the appropriate system specific documentation.
 </p>
 <p>
 JPEG is particularly good at achieving high compression rates with photographic or photorealistic images, making it one of the most frequently used formats on the Internet. However, it is not loss-free. Images generated with this option will always contain compression artifacts (image defects). If you need to keep a high-quality image you should render using one of the loss-free formats. 
 </p>
 <p class="Note"><strong>Note:</strong> Chroma sub-sampling has been disabled in JPEG output, and there has been a reduction in the default quality setting.</p>
 <p>
-The JPEG compression quality can be controlled using the 'Compression' ini file option which, if set, needs to be an integer between 0 and 100. If values of 0 or 1 are specified then the default compression quality setting of 85% is used. Otherwise the value specified (2-100) is used as the compression quality setting. A value of 2 produces the smallest file (maximum compression), but looks terrible. A value of 100 produces the largest file (least compression) but can still contain some compression artifacts. Values lower than 0 are clipped to 0. Values greater than 100 are clipped to 100.
+The JPEG compression quality can be controlled using the <code>Compression</code> ini file option which, if set, needs to be an integer between 0 and 100. If values of 0 or 1 are specified then the default compression quality setting of 85% is used. Otherwise the value specified (2-100) is used as the compression quality setting. A value of 2 produces the smallest file (maximum compression), but looks terrible. A value of 100 produces the largest file (least compression) but can still contain some compression artifacts. Values lower than 0 are clipped to 0. Values greater than 100 are clipped to 100.
 </p>
 <p>
 Most of these formats output 24 bits per pixel with 8 bits for each of red,
@@ -1401,7 +1405,7 @@ Specifying a smaller color depth like 5 bits/color (32768 colors) may be
 enough for people with 8- or 16-bit (256 or 65536 color) displays, and will
 improve compression of the PNG file. Higher bit depths like 10 or 12 may be
 useful for video or publishing applications, and 16 bits/color is good for
-grayscale height field output (See section <a href="r3_4.html#r3_4_5_1_5">Height Field</a> for
+grayscale height field output (See section <a href="r3_5.html#r3_5_1_1_5">Height Field</a> for
 details on height fields).</p>
 <p>
 Targa format also allows 8 bits of alpha transparency data to be output,
@@ -1420,7 +1424,7 @@ background color should not be present in the color of the image when the
 alpha channel is used. Instead, the amount of visible background is kept in
 the alpha and *only* in the alpha channel. That ensures that images look
 correct when viewed with the alpha channel.</p>
-<p>See section <a href="r3_4.html#r3_4_7_6_4">Using the Alpha Channel</a> for
+<p>See section <a href="r3_6.html#r3_6_2_6_4">Using the Alpha Channel</a> for
 further details on using transparency in imagemaps in your scene.</p>
 
 <p class="Note"><strong>Note:</strong> In version 3.7 alpha handling for image file output has changed. Effectively, the background <em>now requires</em> a <code>filter</code> or <code>transmit</code> value in order for alpha transparency to work properly.</p>
@@ -1428,7 +1432,7 @@ further details on using transparency in imagemaps in your scene.</p>
 <p>Previous versions of POV-Ray always wrote associated alpha for output, this has been changed on a per-file-format basis as follows:</p>
 <ul>
 <li> PNG will use straight alpha as per specification.</li>
-<li> OpenEXR and TIFF will use associated alpha as per specifications.</li>
+<li> OpenEXR will use associated alpha as per specifications.</li>
 <li> TGA and BMP 32-bit RGBA will use straight alpha, retaining file input compatibility for now, until a final decision has been made on these formats.</li>
 </ul>
 <p>
@@ -1438,7 +1442,7 @@ image displays properly on all systems.
 The <code>hf_gray_16</code> global setting, as described in section 
 <a href="r3_4.html#r3_4_1_4">HF_Gray_16</a> will also affect the 
 type of data written to the output file.</p>
-<p>The <a href="http://radsite.lbl.gov/radiance/HOME.html">Radiance</a> Synthetic Imaging System or <em>.hdr</em> image format was originally developed to aid lighting designers and architects by predicting the light levels and appearance of a space prior to construction. <a href="http://www.openexr.com/index.html">OpenEXR</a> or <em>.exr</em> image file format developed by Industrial Light & Magic&trade; for use in computer imaging applications.</p>
+<p>The <a href="http://radsite.lbl.gov/radiance/HOME.html">Radiance</a> Synthetic Imaging System or <em>.hdr</em> image format was originally developed to aid lighting designers and architects by predicting the light levels and appearance of a space prior to construction. The <a href="http://www.openexr.com/index.html">OpenEXR</a> or <em>.exr</em> image file format was developed by Industrial Light & Magic&trade; for use in computer imaging applications.</p>
 <p>Most image formats now include metadata (BMP is a notable exception). This metadata contains the POV-Ray version, render date/time (GMT), platform (e.g. x86_64-pc-win), and compiler used to build the POV-Ray executable.</p>
 <p class="Note"><strong>Note:</strong> System-specific or  type &quot;s&quot; output file format is being retained for legacy support reasons. Windows and Unix mapping remains the same,  BMP and TGA respectively, however on Macintosh it has been changed to PNG, and a warning is issued when type &quot;s&quot; is used.</p>
 
@@ -1489,7 +1493,7 @@ Input_File_Name=myscene.pov
 Output_File_Name=c:\povray3\myimages\
 </pre>
 
-<p>This will create <code>c:\povray3\myimages\myscene.tga</code> as the
+<p>This will create <code>c:\povray3\myimages\myscene.png</code> as the
 output file.</p>
 
 </div>
@@ -1545,6 +1549,14 @@ output file.</p>
 <td width="30%"><code>File_Gamma=sRGB</code></td>
 <td width="70%">Selects the <em>sRGB transfer function</em> instead of a power-law output file gamma</td>
 </tr>
+<tr>
+<td width="30%"><code>File_Gamma=BT709</code></td>
+<td width="70%"><font class="New">New</font> in version 3.7.1, selects the <em>ITU-R BT.709 transfer function</em> instead of a power-law output file gamma</td>
+</tr>
+<tr>
+<td width="30%"><code>File_Gamma=BT2020</code></td>
+<td width="70%"><font class="New">New</font> in version 3.7.1, selects the <em>ITU-R BT.2020 transfer function</em> instead of a power-law output file gamma</td>
+</tr>
 </table>
 
 Many file formats traditionally have no clearly specified <em>gamma handling</em> policy, and require images to be <em>gamma pre-corrected</em> for whatever target system they are to be displayed on. For such file formats (currently all except PNG, OpenEXR and Radiance HDR), the <code>File_Gamma</code> setting specifies the target display gamma for which to pre-correct (typically a value in the range from 1.6 to around 2.5, with 2.2 being the most commonly used), and will have an influence on the brightness and saturation of the image when displayed.
@@ -1553,9 +1565,11 @@ Some other file formats do have a clearly specified gamma handling policy, but a
 
 The parameter has no effect on file formats mandating linear storage of color values (currently OpenEXR and Radiance HDR).
 
-Alternatively to a numeric value, <code>sRGB</code> can be specified, instructing POV-Ray to employ the <em>sRGB transfer function</em>, which is similar but not quite identical to a power-law gamma curve with a gamma of 2.2. <code>sRGB</code> is also the default on all platforms currently supported.
+Alternatively to a numeric value, <code>sRGB</code> can be specified, instructing POV-Ray to employ the <em>sRGB transfer function</em>, which is similar but not quite identical to a power-law gamma curve with a gamma of 2.2. <code>sRGB</code> is also the default on all platforms currently supported. <font class="New">New</font> in version 3.7.1, <code>BT709</code> or <code>BT2020</code> can also be specified, instructing POV-Ray to employ the <em>transfer function</em> specified in <em>ITU-R BT.709</em> or <em>ITU-R BT.2020</em>, respectively, which are similar but not quite identical to a power-law gamma curve with a gamma of roughly 1.9. When generating Netpbm PPM output, <code>BT709</code> is the effective default.
 
-See section <a href="t2_3.html#t2_3_4">Gamma Handling</a> for more information on gamma.
+<p class="Note"><strong>Note:</strong> Specifying <code>File_Gamma=BT709</code> or <code>File_Gamma=BT2020</code> only affects the <em>transfer function</em> used. Specifically, it does <em>not</em> affect the digital representation of nominal black and white, which remain at 0 and 255 (presuming 8-bit encoding), respectively, as opposed to 16 and 235 for full-fledged ITU-R BT-709 encoding.</p>
+
+<p>See also: <a href="t2_3.html#t2_3_4_3">Gamma in Output Images</a> for additional information.</p>
 
 </div>
 <a name="r3_2_4_6"></a>
@@ -1611,52 +1625,10 @@ global_settings {
 #end
 }
 </pre>
-
 </div>
 <a name="r3_2_5_2"></a>
-<div class="content-level-h4" contains="Input File Name" id="r3_2_5_2">
-<h4>3.2.5.2 Input File Name</h4>
-<table width="100%" class="option-list">
-<tr>
-<td width="30%"><code>Input_File_Name=</code>file</td>
-
-<td width="70%">Sets input file name to file</td>
-</tr>
-
-<tr>
-<td><code>+I</code>file</td>
-
-<td>Same as <code>Input_File_Name=</code>file</td>
-</tr>
-</table>
-<p class="Note"><strong>Note:</strong> There may be no space between <code>+I</code> and <code>file</code>.</p>
-<p>You will probably always set this option but if you do not the default
-input filename is <code>object.pov</code>. If you do not have an extension
-then <code>.pov</code> is assumed. On case-sensitive operating systems both
-<code>.pov</code> and <code>.POV</code> are tried. A full path specification
-may be used (on MS-DOS systems <code> +Ic:\povray3\mystuff\myfile.pov</code>
-is allowed for example). In addition to specifying the input file name this
-also establishes the <em>scene name</em>.</p>
-<p>
-The scene name is the input name with drive, path and extension stripped. In
-the above example the scene name is <code>myfile</code>. This name is used to
-create a default output file name and it is referenced other places.</p>
-<p class="Note"><strong>Note:</strong> As of version 3.5 you can now specify a POV file on the command-line
-without the use of the +i switch (i.e. it works the same way as specifying an INI
-file without a switch), the POV file then should be the last on the command-line.</p>
-<p>
-If you use &quot;-&quot; as the input file name the input will be read from
-standard input. Thus you can pipe a scene created by a program to POV-Ray and
-render it without having a scene file.</p>
-<p>
-Under MS-DOS you can try this feature by typing.</p>
-<pre>
-type ANYSCENE.POV | povray +I-
-</pre>
-</div>
-<a name="r3_2_5_3"></a>
-<div class="content-level-h4" contains="Include File Name" id="r3_2_5_3">
-<h4>3.2.5.3 Include File Name</h4>
+<div class="content-level-h4" contains="Include File Name" id="r3_2_5_2">
+<h4>3.2.5.2 Include File Name</h4>
 <table width="100%" class="option-list">
 <tr>
 <td width="30%"><code>Include_Header=</code>file</td>
@@ -1674,10 +1646,11 @@ type ANYSCENE.POV | povray +I-
 <p>This option allows you to include a file as the first include file of a 
 scene file. You can for example use this option to always include a specific
 set of default include files used by all your scenes.</p>
+
 </div>
-<a name="r3_2_5_4"></a>
-<div class="content-level-h4" contains="Library Paths" id="r3_2_5_4">
-<h4>3.2.5.4 Library Paths</h4>
+<a name="r3_2_5_3"></a>
+<div class="content-level-h4" contains="Library Paths" id="r3_2_5_3">
+<h4>3.2.5.3 Library Paths</h4>
 <table width="100%" class="option-list">
 <tr>
 <td width="30%"><code>Library_Path=</code>path</td>
@@ -1708,9 +1681,9 @@ Library_Path=c:\povray3\include
 Multiple uses of this option switch do not override previous settings. If you specify the exact same path twice it is only counted once. The current directory will be searched first followed by the indicated library directories in the order in which you specified them.</p>
 
 </div>
-<a name="r3_2_5_5"></a>
-<div class="content-level-h4" contains="Language Version" id="r3_2_5_5">
-<h4>3.2.5.5 Language Version</h4>
+<a name="r3_2_5_4"></a>
+<div class="content-level-h4" contains="Language Version" id="r3_2_5_4">
+<h4>3.2.5.4 Language Version</h4>
 <table width="100%" class="option-list">
 <tr>
 <td width="30%"><code>Version=</code>n.n</td>
@@ -2250,10 +2223,13 @@ scroll back several pages of messages. All versions allow you to turn some of
 these text streams off/on or to direct a copy of the text output to one or
 several files. This section details the options which give you control over
 text output.</p>
+
 </div>
 <a name="r3_2_7_1"></a>
 <div class="content-level-h4" contains="Text Streams" id="r3_2_7_1">
 <h4>3.2.7.1 Text Streams</h4>
+<!--BEGIN DO NOT alter or move--->
+<!--END DO NOT alter or move--->
 <p>There are seven distinct text streams that POV-Ray uses for output. On
 some versions each stream is designated by a particular color. Text from
 these streams are displayed whenever it is appropriate so there is often an
@@ -2958,7 +2934,7 @@ are used only at 5 or below.</td>
 <tr>
 <td><code>+MB</code></td>
 
-<td>Turn bounding on; Set threshold to 25 or previous amount</td>
+<td>Turn bounding on; Set threshold to 3 or previous amount</td>
 </tr>
 
 <tr>
@@ -3035,16 +3011,15 @@ bounding off. The default value is on.</p>
 <p>
 The <code> Bounding_Threshold=</code><em>n</em> or <code>
 +MB</code><em>n</em> switch allows you to set the minimum number of objects
-necessary before bounding is used. The default is <code>+MB25</code> which
-means that if your scene has fewer than 25 objects POV-Ray will automatically
-turn bounding off because the overhead is not worth it. Generally it is
-a good idea to use a much lower threshold like <code>+MB5</code>.</p>
+necessary before bounding is used. The default is <code>+MB3</code> which
+means that if your scene has fewer than 3 objects POV-Ray will automatically
+turn bounding off because the overhead is not worth it.</p>
 <p>
 In general, any finite object and many types of CSG of finite objects will
 properly respond to this bounding system. In addition blobs and meshes use an
 additional internal bounding system. These systems are not affected by the
 above switch. They can be switched off using the appropriate syntax in the
-scene file (see <a href="r3_4.html#r3_4_5_1_1">Blob</a> and <a href="r3_4.html#r3_4_5_2_3">Mesh</a> for details).</p>
+scene file (see <a href="r3_5.html#r3_5_1_1_1">Blob</a> and <a href="r3_5.html#r3_5_1_2_3">Mesh</a> for details).</p>
 <p>
 Text objects are split into individual letters that are bounded using the
 bounding box hierarchy. Some CSG combinations of finite and infinite objects
@@ -3053,6 +3028,7 @@ add manual bounding objects as was necessary in earlier versions of POV-Ray
 unless you use many infinite objects.</p>
 <p class="Note"><strong>Note:</strong>
 As of version 3.7 the <code>Vista_Buffer</code> and <code>Light_Buffer</code> options have been deprecated.</p>
+
 </div>
 <a name="r3_2_8_5"></a>
 <div class="content-level-h4" contains="Removing User Bounding" id="r3_2_8_5">

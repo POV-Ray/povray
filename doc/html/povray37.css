@@ -486,6 +486,20 @@ td p.Explain {
 	margin-top: 7pt;
 }
 
+font.New {
+	color: #3300cc;
+	font-weight: bold;
+	font-style: oblique;
+	font-size: 1.05em;
+}
+
+font.Change {
+	color: #cc0033;
+	font-weight: bold;
+	font-style: oblique;
+	font-size: 1.05em;
+}
+
 /* remove the following statement to restore the specified left margin on the note and related messages */
 .Note, .Hint, .Warning, .BeAware {
 	margin-left: 0pt;

@@ -34,6 +34,10 @@ Reported via GitHub:
 
   - #260 ("Pavement pattern broken")
 
+Miscellaneous:
+
+  - Minor updates to the documentation.
+
 
 Changes between 3.7.1-beta.4 and 3.7.1-beta.5
 =============================================

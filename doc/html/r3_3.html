@@ -87,6 +87,9 @@
   <td><div class="divh4"><a title="3.3.1.6.6" href="#r3_3_1_6_6">Built-in Constants</a></div></td>
 </tr>
 <tr>
+  <td><div class="divh4"><a title="3.3.1.6.7" href="#r3_3_1_6_7">Dot Item Access for Vectors</a></div></td>
+</tr>
+<tr>
   <td><div class="divh3"><a title="3.3.1.7" href="#r3_3_1_7">Color Expressions</a></div></td>
 </tr>
 <tr>
@@ -105,7 +108,10 @@
   <td><div class="divh4"><a title="3.3.1.7.5" href="#r3_3_1_7_5">Color Operators</a></div></td>
 </tr>
 <tr>
-  <td><div class="divh4"><a title="3.3.1.7.6" href="#r3_3_1_7_6">Common Color Pitfalls</a></div></td>
+  <td><div class="divh4"><a title="3.3.1.7.6" href="#r3_3_1_7_6">Dot Item Access for Colors</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a title="3.3.1.7.7" href="#r3_3_1_7_7">Common Color Pitfalls</a></div></td>
 </tr>
 <tr>
   <td><div class="divh3"><a title="3.3.1.8" href="#r3_3_1_8">Function</a></div></td>
@@ -267,6 +273,12 @@
   <td><div class="divh4"><a title="3.3.2.8.5" href="#r3_3_2_8_5">Returning Values Via Parameters</a></div></td>
 </tr>
 <tr>
+  <td><div class="divh4"><a title="3.3.2.8.6" href="#r3_3_2_8_6">Optional Parameters</a></div></td>
+</tr>
+<tr>
+  <td><div class="divh4"><a title="3.3.2.8.7" href="#r3_3_2_8_7">Macro Caching</a></div></td>
+</tr>
+<tr>
   <td><div class="divh1">&nbsp;</div></td>
 </tr>
 <tr>
@@ -280,7 +292,7 @@
 <table class="HeaderFooter" width="100%">
 <tr>
   <td colspan=5 align="left" class="HeaderFooter">
-    POV-Ray for Unix <strong class="HeaderFooter">version 3.7</strong>
+    POV-Ray for Unix <strong class="HeaderFooter">version 3.7.1</strong>
   </td>
 </tr>
 <tr >
@@ -335,7 +347,7 @@ depicted above, a <em>LANGUAGE_DIRECTIVE</em> may also appear anywhere
 embedded in other statements between any two tokens. There are some
 restrictions on nesting directives also.</p>
 <p>
-For details on those five items see section <a href="r3_3.html#r3_3_2">Language Directives</a>, section <a href="r3_4.html#r3_4_5">Objects</a>, section <a href="r3_4.html#r3_4_2">Camera</a>, section <a href="r3_4.html#r3_4_3">Atomospheric Effects</a> and section <a href="r3_4.html#r3_4_1">Global Settings</a> for details.</p></div>
+For details on those five items see section <a href="r3_3.html#r3_3_2">Language Directives</a>, section <a href="r3_5.html#r3_5_1">Objects</a>, section <a href="r3_4.html#r3_4_2">Camera</a>, section <a href="r3_7.html#r3_7_1">Atomospheric Effects</a> and section <a href="r3_4.html#r3_4_1">Global Settings</a> for details.</p></div>
 
 <a name="r3_3_1"></a>
 <div class="content-level-h3" contains="Language Basics" id="r3_3_1">
@@ -421,39 +433,39 @@ For details on those five items see section <a href="r3_3.html#r3_3_2">Language 
 </tr>
 <tr valign="top">
 <td width="33%">
-<code><a href="r3_4.html#r3_4_8_3">aa_level</a></code><br>
-<code><a href="r3_4.html#r3_4_8_3">aa_threshold</a></code><br>
+<code><a href="r3_7.html#r3_7_2_3">aa_level</a></code><br>
+<code><a href="r3_7.html#r3_7_2_3">aa_threshold</a></code><br>
 <code><a href="r3_3.html#r3_3_1_5_4">abs</a></code><br>
-<code><a href="r3_4.html#r3_4_8_2_1">absorption</a></code><br>
-<code><a href="r3_4.html#r3_4_5_1_6">accuracy</a></code><br>
+<code><a href="r3_7.html#r3_7_2_2_1">absorption</a></code><br>
+<code><a href="r3_5.html#r3_5_1_1_6">accuracy</a></code><br>
 <code><a href="r3_3.html#r3_3_1_5_4">acos</a></code><br>
 <code><a href="r3_3.html#r3_3_1_5_4">acosh</a></code><br>
-<code><a href="r3_4.html#r3_4_4_1_5">adaptive</a></code><br>
+<code><a href="r3_4.html#r3_4_3_1_5">adaptive</a></code><br>
 <code><a href="r3_4.html#r3_4_1_1">adc_bailout</a></code> <em>global setting</em><br>
-<code><a href="r3_4.html#r3_4_4_3_3_1">adc_bailout</a></code> <em>radiosity</em><br>
-<code><a href="r3_4.html#r3_4_7_1_1">agate</a></code><br>
-<code><a href="r3_4.html#r3_4_7_1_1">agate_turb</a></code><br>
-<code><a href="r3_4.html#r3_4_6_3_3_1">albedo</a></code> <em>diffuse</em><br>
-<code><a href="r3_4.html#r3_4_6_3_4_1">albedo</a></code> <em>phong</em><br>
+<code><a href="r3_4.html#r3_4_3_3_3_1">adc_bailout</a></code> <em>radiosity</em><br>
+<code><a href="r3_6.html#r3_6_2_1_1">agate</a></code><br>
+<code><a href="r3_6.html#r3_6_2_1_1">agate_turb</a></code><br>
+<code><a href="r3_6.html#r3_6_1_3_3_1">albedo</a></code> <em>diffuse</em><br>
+<code><a href="r3_6.html#r3_6_1_3_4_1">albedo</a></code> <em>phong</em><br>
 </td>
 <td width="33%">
-<code><a href="r3_4.html#r3_4_6_3_4_2">albedo</a></code> <em>specular</em><br>
-<code><a href="r3_4.html#r3_4_7_6_3">all</a></code><br>
-<code><a href="r3_4.html#r3_4_5_1_6">all_intersections</a></code><br>
-<code><a href="r3_4.html#r3_4_7_6_3">alpha</a></code><br>
-<code><a href="r3_4.html#r3_4_7_3_2">altitude</a></code><br>
-<code><a href="r3_4.html#r3_4_4_3_3_2">always_sample</a></code><br>
-<code><a href="r3_4.html#r3_4_6_3_1">ambient</a></code><br>
+<code><a href="r3_6.html#r3_6_1_3_4_2">albedo</a></code> <em>specular</em><br>
+<code><a href="r3_6.html#r3_6_2_6_3">all</a></code><br>
+<code><a href="r3_5.html#r3_5_1_1_6">all_intersections</a></code><br>
+<code><a href="r3_6.html#r3_6_2_6_3">alpha</a></code><br>
+<code><a href="r3_6.html#r3_6_2_3_2">altitude</a></code><br>
+<code><a href="r3_4.html#r3_4_3_3_3_2">always_sample</a></code><br>
+<code><a href="r3_6.html#r3_6_1_3_1">ambient</a></code><br>
 <code><a href="r3_4.html#r3_4_1_2">ambient_light</a></code><br>
 <code><a href="r3_4.html#r3_4_2_1">angle</a></code><br>
-<code><a href="r3_4.html#r3_4_7_3_1">aoi</a></code><br>
+<code><a href="r3_6.html#r3_6_2_3_1">aoi</a></code><br>
 <code><a href="r3_4.html#r3_4_2_3">aperture</a></code><br>
 <code><a href="r3_3.html#r3_3_2_3_1">append</a></code><br>
-<code><a href="r3_4.html#r3_4_3_5">arc_angle</a></code><br>
-<code><a href="r3_4.html#r3_4_4_1_5">area_illumination</a></code><br>
+<code><a href="r3_7.html#r3_7_1_5">arc_angle</a></code><br>
+<code><a href="r3_4.html#r3_4_3_1_5">area_illumination</a></code><br>
 </td>
 <td width="33%">
-<code><a href="r3_4.html#r3_4_4_1_5">area_light</a></code><br>
+<code><a href="r3_4.html#r3_4_3_1_5">area_light</a></code><br>
 <code><a href="r3_3.html#r3_3_1_10">array</a></code><br>
 <code><a href="r3_3.html#r3_3_1_5_4">asc</a></code><br>
 <code><a href="r3_4.html#r3_4_1_6">ascii</a></code><br>
@@ -464,8 +476,8 @@ For details on those five items see section <a href="r3_3.html#r3_3_2">Language 
 <code><a href="r3_3.html#r3_3_1_5_4">atan2</a></code><br>
 <code><a href="r3_3.html#r3_3_1_5_4">atand</a></code><br>
 <code><a href="r3_3.html#r3_3_1_5_4">atanh</a></code><br>
-<code><a href="r3_4.html#r3_4_4_4_9_1">autostop</a></code><br>
-<code><a href="r3_4.html#r3_4_7_4_1">average</a></code><br>
+<code><a href="r3_4.html#r3_4_3_4_9_1">autostop</a></code><br>
+<code><a href="r3_6.html#r3_6_2_4_1">average</a></code><br>
 </td>
 </tr>
 </table>
@@ -475,34 +487,46 @@ For details on those five items see section <a href="r3_3.html#r3_3_2">Language 
 </tr>
 <tr valign="top">
 <td width="33%">
-<code><a href="r3_4.html#r3_4_5_1_13">b_spline</a></code><br>
-<code><a href="r3_4.html#r3_4_3_2">background</a></code><br>
-<code><a href="r3_4.html#r3_4_5_1_8">bezier_spline</a></code><br>
-<code><a href="r3_4.html#r3_4_5_2_1">bicubic_patch</a></code><br>
+<code><a href="r3_5.html#r3_5_1_1_14">b_spline</a></code><br>
+<code><a href="r3_7.html#r3_7_1_2">background</a></code><br>
+<code><a href="r3_5.html#r3_5_1_1_8">bezier_spline</a></code><br>
+<code><a href="r3_5.html#r3_5_1_2_1">bicubic_patch</a></code><br>
 <code><a href="r3_3.html#r3_3_1_5_4">bitwise_and</a></code><br>
 <code><a href="r3_3.html#r3_3_1_5_4">bitwise_or</a></code><br>
 <code><a href="r3_3.html#r3_3_1_5_4">bitwise_xor</a></code><br>
-<code><a href="r3_4.html#r3_4_7_5_5_1">black_hole</a></code><br>
+<code><a href="r3_6.html#r3_6_2_5_5_1">black_hole</a></code><br>
+<code><a href="r3_6.html#r3_6_1_1_2">blend_gamma</a></code> <em>color map</em><br>
+<code><a href="r3_6.html#r3_6_1_1_3">blend_gamma</a></code> <em>pigment map</em><br>
+<code><a href="r3_6.html#r3_6_1_1_2">blend_mode</a></code> <em>color map</em><br>
+<code><a href="r3_6.html#r3_6_1_1_3">blend_mode</a></code> <em>pigment map</em><br>
 </td>
 <td width="33%">
-<code><a href="r3_4.html#r3_4_5_1_1">blob</a></code><br>
+<code><a href="r3_5.html#r3_5_1_1_1">blob</a></code><br>
 <code><a href="r3_3.html#r3_3_1_7_3">blue</a></code><br>
 <code><a href="r3_4.html#r3_4_2_3">blur_samples</a></code><br>
 <code><a href="r3_4.html#r3_4_2_3">bokeh</a></code><br>
-<code><a href="r3_4.html#r3_4_5_5_2">bounded_by</a></code><br>
-<code><a href="r3_4.html#r3_4_5_1_2">box</a></code><br>
-<code><a href="r3_4.html#r3_4_7_1_2">boxed</a></code><br>
-<code><a href="r3_4.html#r3_4_7_1_3">bozo</a></code><br>
+<code><a href="r3_5.html#r3_5_1_5_2">bounded_by</a></code><br>
+<code><a href="r3_5.html#r3_5_1_1_2">box</a></code><br>
+<code><a href="r3_6.html#r3_6_2_1_2">boxed</a></code><br>
+<code><a href="r3_6.html#r3_6_2_1_3">bozo</a></code><br>
+<code><a href="r3_3.html#r3_3_2_6_4">break</a></code><br>
+<code><a href="r3_6.html#r3_6_2_1_4">brick</a></code><br>
+<code><a href="r3_6.html#r3_6_2_1_4">brick_size</a></code><br>
+<code><a href="r3_4.html#r3_4_3_3_3_3">brightness</a></code><br>
 </td>
 <td width="33%">
-<code><a href="r3_3.html#r3_3_2_6_4">break</a></code><br>
-<code><a href="r3_4.html#r3_4_7_1_4">brick</a></code><br>
-<code><a href="r3_4.html#r3_4_7_1_4">brick_size</a></code><br>
-<code><a href="r3_4.html#r3_4_4_3_3_3">brightness</a></code><br>
-<code><a href="r3_4.html#r3_4_6_3_3_2">brilliance</a></code><br>
-<code><a href="r3_4.html#r3_4_6_2_3">bump_map</a></code><br>
-<code><a href="r3_4.html#r3_4_6_2_3_2">bump_size</a></code><br>
-<code><a href="r3_4.html#r3_4_7_1_5">bumps</a></code><br>
+<code><a href="r3_6.html#r3_6_1_3_3_2">brilliance</a></code><br>
+<code><a href="r3_6.html#r3_6_1_2_3">bump_map</a></code><br>
+<code><a href="r3_6.html#r3_6_1_2_3_2">bump_size</a></code><br>
+<code><a href="r3_6.html#r3_6_2_1_5">bumps</a></code><br>
+<code><a href="r3_6.html#r3_6_1_2_3_1">bt709</a></code> <em>bump map</em><br>
+<code><a href="r3_5.html#r3_5_1_1_5">bt709</a></code> <em>height field</em><br>
+<code><a href="r3_6.html#r3_6_2_6_2">bt709</a></code> <em>image map</em><br>
+<code><a href="r3_6.html#r3_6_2_4_2">bt709</a></code> <em>image pattern</em><br>
+<code><a href="r3_6.html#r3_6_1_2_3_1">bt2020</a></code> <em>bump map</em><br>
+<code><a href="r3_5.html#r3_5_1_1_5">bt2020</a></code> <em>height field</em><br>
+<code><a href="r3_6.html#r3_6_2_6_2">bt2020</a></code> <em>image map</em><br>
+<code><a href="r3_6.html#r3_6_2_4_2">bt2020</a></code> <em>image pattern</em><br>
 </td>
 </tr>
 </table>
@@ -514,51 +538,51 @@ For details on those five items see section <a href="r3_3.html#r3_3_2">Language 
 <td width="33%">
 <code><a href="r3_4.html#r3_4_2">camera</a></code><br>
 <code><a href="r3_3.html#r3_3_2_6_4">case</a></code><br>
-<code><a href="r3_4.html#r3_4_8_1_7">caustics</a></code><br>
+<code><a href="r3_7.html#r3_7_2_1_7">caustics</a></code><br>
 <code><a href="r3_3.html#r3_3_1_5_4">ceil</a></code><br>
-<code><a href="r3_4.html#r3_4_7_2_1">cells</a></code><br>
+<code><a href="r3_6.html#r3_6_2_2_1">cells</a></code><br>
 <code><a href="r3_4.html#r3_4_1_6">charset</a></code><br>
-<code><a href="r3_4.html#r3_4_7_2_2">checker</a></code><br>
+<code><a href="r3_6.html#r3_6_2_2_2">checker</a></code><br>
 <code><a href="r3_3.html#r3_3_1_9_4">chr</a></code><br>
-<code><a href="r3_4.html#r3_4_4_1_5">circular</a></code><br>
-<code><a href="r3_4.html#r3_4_5_5_1">clipped_by</a></code><br>
+<code><a href="r3_4.html#r3_4_3_1_5">circular</a></code><br>
+<code><a href="r3_5.html#r3_5_1_5_1">clipped_by</a></code><br>
 <code><a href="r3_3.html#r3_3_1_5_6">clock</a></code><br>
 <code><a href="r3_3.html#r3_3_1_5_6">clock_delta</a></code><br>
 <code><a href="r3_3.html#r3_3_1_5_6">clock_on</a></code><br>
-<code><a href="r3_4.html#r3_4_4_4_4">collect</a></code><br>
+<code><a href="r3_4.html#r3_4_3_4_4">collect</a></code><br>
 <code><a href="r3_3.html#r3_3_1_7">color</a></code><br>
 </td>
 <td width="33%">
-<code><a href="r3_4.html#r3_4_6_1_2">color_map</a></code><br>
+<code><a href="r3_6.html#r3_6_1_1_2">color_map</a></code><br>
 <code><a href="r3_3.html#r3_3_1_7">colour</a></code><br>
-<code><a href="r3_4.html#r3_4_6_1_2">colour_map</a></code><br>
-<code><a href="r3_4.html#r3_4_5_1_1">component</a></code><br>
-<code><a href="r3_4.html#r3_4_5_4_2">composite</a></code><br>
+<code><a href="r3_6.html#r3_6_1_1_2">colour_map</a></code><br>
+<code><a href="r3_5.html#r3_5_1_1_1">component</a></code><br>
+<code><a href="r3_5.html#r3_5_1_4_2">composite</a></code><br>
 <code><a href="r3_3.html#r3_3_1_9_4">concat</a></code><br>
-<code><a href="r3_4.html#r3_4_5_1_3">cone</a></code><br>
+<code><a href="r3_5.html#r3_5_1_1_3">cone</a></code><br>
 <code><a href="r3_4.html#r3_4_2_3">confidence</a></code><br>
-<code><a href="r3_4.html#r3_4_5_1_11">conic_sweep</a></code><br>
-<code><a href="r3_4.html#r3_4_6_3_6">conserve_energy</a></code><br>
-<code><a href="r3_4.html#r3_4_5_1_6">contained_by</a></code><br>
-<code><a href="r3_4.html#r3_4_7_5">control0</a></code><br>
-<code><a href="r3_4.html#r3_4_7_5">control1</a></code><br>
-<code><a href="r3_4.html#r3_4_7_1_10">coords</a></code><br>
+<code><a href="r3_5.html#r3_5_1_1_12">conic_sweep</a></code><br>
+<code><a href="r3_6.html#r3_6_1_3_6">conserve_energy</a></code><br>
+<code><a href="r3_5.html#r3_5_1_1_6">contained_by</a></code><br>
+<code><a href="r3_6.html#r3_6_2_5">control0</a></code><br>
+<code><a href="r3_6.html#r3_6_2_5">control1</a></code><br>
+<code><a href="r3_6.html#r3_6_2_1_10">coords</a></code><br>
 <code><a href="r3_3.html#r3_3_1_5_4">cos</a></code><br>
 </td>
 <td width="33%">
 <code><a href="r3_3.html#r3_3_1_5_4">cosh</a></code><br>
-<code><a href="r3_4.html#r3_4_4_3_3_4">count</a></code><br>
-<code><a href="r3_4.html#r3_4_7_2_3">crackle</a></code><br>
-<code><a href="r3_4.html#r3_4_6_3_3_3">crand</a></code><br>
-<code><a href="r3_4.html#r3_4_5_1_7">cube</a></code><br>
-<code><a href="r3_4.html#r3_4_5_3_3">cubic</a></code> <em>object</em><br>
-<code><a href="r3_4.html#r3_4_7_1_6">cubic</a></code> <em>pattern</em><br>
-<code><a href="r3_4.html#r3_4_7_5_5_7">cubic</a></code> <em>warp</em><br>
-<code><a href="r3_4.html#r3_4_5_1_8">cubic_spline</a></code><br>
-<code><a href="r3_4.html#r3_4_7_5_3">cubic_wave</a></code><br>
-<code><a href="r3_4.html#r3_4_6_10">cutaway_textures</a></code><br>
-<code><a href="r3_4.html#r3_4_5_1_4">cylinder</a></code><br>
-<code><a href="r3_4.html#r3_4_7_1_7">cylindrical</a></code><br>
+<code><a href="r3_4.html#r3_4_3_3_3_4">count</a></code><br>
+<code><a href="r3_6.html#r3_6_2_2_3">crackle</a></code><br>
+<code><a href="r3_6.html#r3_6_1_3_3_3">crand</a></code><br>
+<code><a href="r3_5.html#r3_5_1_1_7">cube</a></code><br>
+<code><a href="r3_5.html#r3_5_1_3_3">cubic</a></code> <em>object</em><br>
+<code><a href="r3_6.html#r3_6_2_1_6">cubic</a></code> <em>pattern</em><br>
+<code><a href="r3_6.html#r3_6_2_5_5_7">cubic</a></code> <em>warp</em><br>
+<code><a href="r3_5.html#r3_5_1_1_8">cubic_spline</a></code><br>
+<code><a href="r3_6.html#r3_6_2_5_3">cubic_wave</a></code><br>
+<code><a href="r3_6.html#r3_6_1_10">cutaway_textures</a></code><br>
+<code><a href="r3_5.html#r3_5_1_1_4">cylinder</a></code><br>
+<code><a href="r3_6.html#r3_6_2_1_7">cylindrical</a></code><br>
 </td>
 </tr>
 </table>
@@ -574,28 +598,30 @@ For details on those five items see section <a href="r3_3.html#r3_3_2">Language 
 <code><a href="r3_3.html#r3_3_2_4">default</a></code><br>
 <code><a href="r3_3.html#r3_3_1_5_4">defined</a></code><br>
 <code><a href="r3_3.html#r3_3_1_5_4">degrees</a></code><br>
-<code><a href="r3_4.html#r3_4_8_4">density</a></code><br>
-<code><a href="r3_4.html#r3_4_7_1_8">density_file</a></code><br>
+<code><a href="r3_7.html#r3_7_2_4">density</a></code><br>
+<code><a href="r3_6.html#r3_6_2_1_8">density_file</a></code><br>
+<code><a href="r3_7.html#r3_7_2_4_3">density_map</a></code><br>
 </td>
 <td width="33%">
-<code><a href="r3_4.html#r3_4_8_4_3">density_map</a></code><br>
-<code><a href="r3_4.html#r3_4_7_1_9">dents</a></code><br>
+<code><a href="r3_6.html#r3_6_2_1_9">dents</a></code><br>
 <code><a href="r3_3.html#r3_3_2_2_5">deprecated</a></code> <br>
-<code><a href="r3_4.html#r3_4_7_1_8">df3</a></code><br>
-<code><a href="r3_4.html#r3_4_5_4_4">difference</a></code><br>
-<code><a href="r3_4.html#r3_4_6_3_3">diffuse</a></code><br>
+<code><a href="r3_6.html#r3_6_2_1_8">df3</a></code><br>
+<code><a href="r3_3.html#r3_3_1_10">dictionary</a></code><br>
+<code><a href="r3_5.html#r3_5_1_4_4">difference</a></code> <em>csg</em><br>
+<code><a href="r3_5.html#r3_5_1_1_18">difference</a></code> <em>torus</em><br>
+<code><a href="r3_6.html#r3_6_1_3_3">diffuse</a></code><br>
 <code><a href="r3_3.html#r3_3_1_5_4">dimension_size</a></code><br>
 <code><a href="r3_3.html#r3_3_1_5_4">dimensions</a></code><br>
 </td>
 <td width="33%">
 <code><a href="r3_4.html#r3_4_2_1_4">direction</a></code><br>
-<code><a href="r3_4.html#r3_4_5_2_2">disc</a></code><br>
-<code><a href="r3_4.html#r3_4_8_1_5">dispersion</a></code><br>
-<code><a href="r3_4.html#r3_4_8_1_5">dispersion_samples</a></code><br>
-<code><a href="r3_4.html#r3_4_7_5_5_7">dist_exp</a></code><br>
-<code><a href="r3_4.html#r3_4_3_3">distance</a></code><br>
+<code><a href="r3_5.html#r3_5_1_2_2">disc</a></code><br>
+<code><a href="r3_7.html#r3_7_2_1_5">dispersion</a></code><br>
+<code><a href="r3_7.html#r3_7_2_1_5">dispersion_samples</a></code><br>
+<code><a href="r3_6.html#r3_6_2_5_5_7">dist_exp</a></code><br>
+<code><a href="r3_7.html#r3_7_1_3">distance</a></code><br>
 <code><a href="r3_3.html#r3_3_1_5_4">div</a></code><br>
-<code><a href="r3_4.html#r3_4_5_5_9">double_illuminate</a></code><br>
+<code><a href="r3_5.html#r3_5_1_5_9">double_illuminate</a></code><br>
 </td>
 </tr>
 </table>
@@ -605,24 +631,24 @@ For details on those five items see section <a href="r3_3.html#r3_3_2">Language 
 </tr>
 <tr valign="top">
 <td width="33%">
-<code><a href="r3_4.html#r3_4_8_2_3">eccentricity</a></code><br>
+<code><a href="r3_7.html#r3_7_2_2_3">eccentricity</a></code><br>
 <code><a href="r3_3.html#r3_3_2_6_1">else</a></code><br>
 <code><a href="r3_3.html#r3_3_2_6_1">elseif</a></code><br>
-<code><a href="r3_4.html#r3_4_6_3_2">emission</a></code> <em>finish</em><br>
-<code><a href="r3_4.html#r3_4_8_2_2">emission</a></code> <em>media</em><br>
+<code><a href="r3_6.html#r3_6_1_3_2">emission</a></code> <em>finish</em><br>
+<code><a href="r3_7.html#r3_7_2_2_2">emission</a></code> <em>media</em><br>
 </td>
 <td width="33%">
 <code><a href="r3_3.html#r3_3_2_6_1">end</a></code><br>
 <code><a href="r3_3.html#r3_3_2_7">error</a></code><br>
-<code><a href="r3_4.html#r3_4_4_3_3_5">error_bound</a></code><br>
-<code><a href="r3_4.html#r3_4_5_1_6">evaluate</a></code><br>
+<code><a href="r3_4.html#r3_4_3_3_3_5">error_bound</a></code><br>
+<code><a href="r3_5.html#r3_5_1_1_6">evaluate</a></code><br>
 <code><a href="r3_3.html#r3_3_1_5_4">exp</a></code><br>
 </td>
 <td width="33%">
-<code><a href="r3_4.html#r3_4_4_4_9_2">expand_thresholds</a></code><br>
-<code><a href="r3_4.html#r3_4_6_3_5">exponent</a></code><br>
-<code><a href="r3_4.html#r3_4_7_1_11">exterior</a></code><br>
-<code><a href="r3_4.html#r3_4_8_2_3">extinction</a></code><br>
+<code><a href="r3_4.html#r3_4_3_4_9_2">expand_thresholds</a></code><br>
+<code><a href="r3_6.html#r3_6_1_3_5">exponent</a></code><br>
+<code><a href="r3_6.html#r3_6_2_1_11">exterior</a></code><br>
+<code><a href="r3_7.html#r3_7_2_2_3">extinction</a></code><br>
 </td>
 </tr>
 </table>
@@ -632,14 +658,14 @@ For details on those five items see section <a href="r3_3.html#r3_3_2">Language 
 </tr>
 <tr valign="top">
 <td width="33%">
-<code><a href="r3_4.html#r3_4_5_2_4">face_indices</a></code><br>
-<code><a href="r3_4.html#r3_4_7_1_10">facets</a></code><br>
-<code><a href="r3_4.html#r3_4_8_1_6">fade_color</a></code><br>
-<code><a href="r3_4.html#r3_4_8_1_6">fade_colour</a></code><br>
-<code><a href="r3_4.html#r3_4_4_1_9">fade_distance</a></code><br>
-<code><a href="r3_4.html#r3_4_4_1_9">fade_power</a></code><br>
-<code><a href="r3_4.html#r3_4_4_1_2">falloff</a></code><br>
-<code><a href="r3_4.html#r3_4_3_5">falloff_angle</a></code><br>
+<code><a href="r3_5.html#r3_5_1_2_4">face_indices</a></code><br>
+<code><a href="r3_6.html#r3_6_2_1_10">facets</a></code><br>
+<code><a href="r3_7.html#r3_7_2_1_6">fade_color</a></code><br>
+<code><a href="r3_7.html#r3_7_2_1_6">fade_colour</a></code><br>
+<code><a href="r3_4.html#r3_4_3_1_9">fade_distance</a></code><br>
+<code><a href="r3_4.html#r3_4_3_1_9">fade_power</a></code><br>
+<code><a href="r3_4.html#r3_4_3_1_2">falloff</a></code><br>
+<code><a href="r3_7.html#r3_7_1_5">falloff_angle</a></code><br>
 <code><a href="r3_3.html#r3_3_1_5_5">false</a></code><br>
 <code><a href="r3_3.html#r3_3_2_3">fclose</a></code><br>
 <code><a href="r3_3.html#r3_3_1_5_4">file_exists</a></code><br>
@@ -648,24 +674,24 @@ For details on those five items see section <a href="r3_3.html#r3_3_2">Language 
 <code><a href="r3_3.html#r3_3_1_7_3">filter</a></code><br>
 <code><a href="r3_3.html#r3_3_1_5_6">final_clock</a></code><br>
 <code><a href="r3_3.html#r3_3_1_5_6">final_frame</a></code><br>
-<code><a href="r3_4.html#r3_4_6_3">finish</a></code><br>
+<code><a href="r3_6.html#r3_6_1_3">finish</a></code><br>
 <code><a href="r3_4.html#r3_4_2_2_4">fisheye</a></code><br>
-<code><a href="r3_4.html#r3_4_5_2_1">flatness</a></code><br>
-<code><a href="r3_4.html#r3_4_7_5_5_2">flip</a></code><br>
+<code><a href="r3_5.html#r3_5_1_2_1">flatness</a></code><br>
+<code><a href="r3_6.html#r3_6_2_5_5_2">flip</a></code><br>
 <code><a href="r3_3.html#r3_3_1_5_4">floor</a></code><br>
 <code><a href="r3_4.html#r3_4_2_3">focal_point</a></code><br>
-<code><a href="r3_4.html#r3_4_3_3">fog</a></code><br>
-<code><a href="r3_4.html#r3_4_3_3">fog_alt</a></code><br>
+<code><a href="r3_7.html#r3_7_1_3">fog</a></code><br>
+<code><a href="r3_7.html#r3_7_1_3">fog_alt</a></code><br>
 </td>
 <td width="33%">
-<code><a href="r3_4.html#r3_4_3_3">fog_offset</a></code><br>
-<code><a href="r3_4.html#r3_4_3_3">fog_type</a></code><br>
+<code><a href="r3_7.html#r3_7_1_3">fog_offset</a></code><br>
+<code><a href="r3_7.html#r3_7_1_3">fog_type</a></code><br>
 <code><a href="r3_3.html#r3_3_2_3_1">fopen</a></code><br>
 <code><a href="r3_3.html#r3_3_2_6_3">for</a></code><br>
-<code><a href="r3_4.html#r3_4_7_2_3">form</a></code><br>
+<code><a href="r3_6.html#r3_6_2_2_3">form</a></code><br>
 <code><a href="r3_3.html#r3_3_1_5_6">frame_number</a></code><br>
-<code><a href="r3_4.html#r3_4_7_5_2">frequency</a></code><br>
-<code><a href="r3_4.html#r3_4_6_3_5">fresnel</a></code><br>
+<code><a href="r3_6.html#r3_6_2_5_2">frequency</a></code><br>
+<code><a href="r3_6.html#r3_6_1_3_5">fresnel</a></code><br>
 <code><a href="r3_3.html#r3_3_1_5_4">function</a></code><br>
 </td>
 </tr>
@@ -676,22 +702,23 @@ For details on those five items see section <a href="r3_3.html#r3_3_2">Language 
 </tr>
 <tr valign="top">
 <td width="33%">
-<code><a href="r3_4.html#r3_4_6_2_3">gamma</a></code>  <em>bump maps</em><br>
-<code><a href="r3_4.html#r3_4_5_1_5">gamma</a></code>  <em>heightfield</em><br>
-<code><a href="r3_4.html#r3_4_7_6_2">gamma</a></code>  <em>image map</em><br>
-<code><a href="r3_4.html#r3_4_7_4_2">gamma</a></code>  <em>image pattern</em><br>
-<code><a href="r3_4.html#r3_4_4_4_3">gather</a></code><br>
+<code><a href="r3_6.html#r3_6_1_2_3">gamma</a></code>  <em>bump maps</em><br>
+<code><a href="r3_5.html#r3_5_1_1_5">gamma</a></code>  <em>heightfield</em><br>
+<code><a href="r3_6.html#r3_6_2_6_2">gamma</a></code>  <em>image map</em><br>
+<code><a href="r3_6.html#r3_6_2_4_2">gamma</a></code>  <em>image pattern</em><br>
+<code><a href="r3_4.html#r3_4_3_4_3">gather</a></code><br>
 </td>
 <td width="33%">
-<code><a href="r3_4.html#r3_4_7_6_1">gif</a></code><br>
-<code><a href="r3_4.html#r3_4_4_2">global_lights</a></code><br>
+<code><a href="r3_6.html#r3_6_2_6_1">gif</a></code><br>
+<code><a href="r3_3.html#r3_3_1_10">global</a></code><br>
+<code><a href="r3_4.html#r3_4_3_2">global_lights</a></code><br>
 <code><a href="r3_4.html#r3_4_1">global_settings</a></code><br>
-<code><a href="r3_4.html#r3_4_7_1_13">gradient</a></code><br>
-<code><a href="r3_4.html#r3_4_7_1_14">granite</a></code><br>
+<code><a href="r3_6.html#r3_6_2_1_13">gradient</a></code><br>
 </td>
 <td width="33%">
+<code><a href="r3_6.html#r3_6_2_1_14">granite</a></code><br>
 <code><a href="r3_3.html#r3_3_1_7_5">gray</a></code><br>
-<code><a href="r3_4.html#r3_4_4_3_3_6">gray_threshold</a></code><br>
+<code><a href="r3_4.html#r3_4_3_3_3_6">gray_threshold</a></code><br>
 <code><a href="r3_3.html#r3_3_1_7_3">green</a></code><br>
 </td>
 </tr>
@@ -702,17 +729,17 @@ For details on those five items see section <a href="r3_3.html#r3_3_2">Language 
 </tr>
 <tr valign="top">
 <td width="33%">
-<code><a href="r3_4.html#r3_4_5_1_5">height_field</a></code><br>
-<code><a href="r3_4.html#r3_4_7_2_4">hexagon</a></code><br>
+<code><a href="r3_5.html#r3_5_1_1_5">height_field</a></code><br>
+<code><a href="r3_6.html#r3_6_2_2_4">hexagon</a></code><br>
 </td>
 <td width="33%">
 <code><a href="r3_4.html#r3_4_1_4">hf_gray_16</a></code><br>
-<code><a href="r3_4.html#r3_4_5_1_1">hierarchy</a></code><br>
+<code><a href="r3_5.html#r3_5_1_1_1">hierarchy</a></code><br>
 
 </td>
 <td width="33%">
-<code><a href="r3_4.html#r3_4_5_1_7">hypercomplex</a></code><br>
-<code><a href="r3_4.html#r3_4_5_5_4">hollow</a></code><br>
+<code><a href="r3_5.html#r3_5_1_1_7">hypercomplex</a></code><br>
+<code><a href="r3_5.html#r3_5_1_5_4">hollow</a></code><br>
 </td>
 </tr>
 </table>
@@ -724,13 +751,13 @@ For details on those five items see section <a href="r3_3.html#r3_3_2">Language 
 <td width="33%">
 <code><a href="r3_3.html#r3_3_2_6_1">if</a></code><br>
 <code><a href="r3_3.html#r3_3_2_6_2">ifdef</a></code><br>
-<code><a href="r3_4.html#r3_4_7_6_1">iff</a></code><br>
+<code><a href="r3_6.html#r3_6_2_6_1">iff</a></code><br>
 <code><a href="r3_3.html#r3_3_2_6_2">ifndef</a></code><br>
 <code><a href="r3_3.html#r3_3_1_5_6">image_height</a></code><br>
-<code><a href="r3_4.html#r3_4_7_6">image_map</a></code><br>
-<code><a href="r3_4.html#r3_4_7_4_2">image_pattern</a></code><br>
+<code><a href="r3_6.html#r3_6_2_6">image_map</a></code><br>
+<code><a href="r3_6.html#r3_6_2_4_2">image_pattern</a></code><br>
 <code><a href="r3_3.html#r3_3_1_5_6">image_width</a></code><br>
-<code><a href="r3_4.html#r3_4_4_3_4_1">importance</a></code><br>
+<code><a href="r3_4.html#r3_4_3_3_4_1">importance</a></code><br>
 </td>
 <td width="33%">
 <code><a href="r3_3.html#r3_3_2_1">include</a></code><br>
@@ -738,21 +765,22 @@ For details on those five items see section <a href="r3_3.html#r3_3_2">Language 
 <code><a href="r3_3.html#r3_3_1_5_6">initial_frame</a></code><br>
 <code><a href="r3_3.html#r3_3_1_5_6">input_file_name</a></code><br>
 <code><a href="r3_3.html#r3_3_1_5_4">inside</a></code><br>
-<code><a href="r3_4.html#r3_4_5_2_3_1">inside_vector</a></code><br>
+<code><a href="r3_5.html#r3_5_1_2_3_1">inside_vector</a></code><br>
 <code><a href="r3_3.html#r3_3_1_5_4">int</a></code><br>
-<code><a href="r3_4.html#r3_4_8_1">interior</a></code><br>
-<code><a href="r3_4.html#r3_4_6_9">interior_texture</a></code><br>
+<code><a href="r3_7.html#r3_7_2_1">interior</a></code><br>
+<code><a href="r3_6.html#r3_6_1_9">interior_texture</a></code><br>
 </td>
 <td width="33%">
-<code><a href="r3_4.html#r3_4_9_1_7_9">internal</a></code><br>
-<code><a href="r3_4.html#r3_4_7_7_3">interpolate</a></code><br>
-<code><a href="r3_4.html#r3_4_5_4_3">intersection</a></code><br>
-<code><a href="r3_4.html#r3_4_8_3">intervals</a></code><br>
-<code><a href="r3_4.html#r3_4_5_5_5">inverse</a></code><br>
-<code><a href="r3_4.html#r3_4_8_1_4">ior</a></code><br>
-<code><a href="r3_4.html#r3_4_6_3_7">irid</a></code><br>
+<code><a href="r3_8.html#r3_8_1_1_8_9">internal</a></code><br>
+<code><a href="r3_6.html#r3_6_2_7_3">interpolate</a></code><br>
+<code><a href="r3_5.html#r3_5_1_4_3">intersection</a></code> <em>csg</em><br>
+<code><a href="r3_5.html#r3_5_1_1_18">intersection</a></code> <em>torus</em><br>
+<code><a href="r3_7.html#r3_7_2_3">intervals</a></code><br>
+<code><a href="r3_5.html#r3_5_1_5_5">inverse</a></code><br>
+<code><a href="r3_7.html#r3_7_2_1_4">ior</a></code><br>
+<code><a href="r3_6.html#r3_6_1_3_7">irid</a></code><br>
 <code><a href="r3_4.html#r3_4_1_5">irid_wavelength</a></code><br>
-<code><a href="r3_4.html#r3_4_5_1_6">isosurface</a></code><br>
+<code><a href="r3_5.html#r3_5_1_1_6">isosurface</a></code><br>
 </td>
 </tr>
 </table>
@@ -762,12 +790,12 @@ For details on those five items see section <a href="r3_3.html#r3_3_2">Language 
 </tr>
 <tr valign="top">
 <td width="33%">
-<code><a href="r3_4.html#r3_4_4_1_5">jitter</a></code><br>
-<code><a href="r3_4.html#r3_4_7_6_1">jpeg</a></code><br>
+<code><a href="r3_4.html#r3_4_3_1_5">jitter</a></code><br>
+<code><a href="r3_6.html#r3_6_2_6_1">jpeg</a></code><br>
 </td>
 <td width="33%">
-<code><a href="r3_4.html#r3_4_7_1_11">julia</a></code><br>
-<code><a href="r3_4.html#r3_4_5_1_7">julia_fractal</a></code><br>
+<code><a href="r3_6.html#r3_6_2_1_11">julia</a></code><br>
+<code><a href="r3_5.html#r3_5_1_1_7">julia_fractal</a></code><br>
 </td>
 <td width="33%">
 </td>
@@ -779,25 +807,27 @@ For details on those five items see section <a href="r3_3.html#r3_3_2">Language 
 </tr>
 <tr valign="top">
 <td width="33%">
-<code><a href="r3_4.html#r3_4_7_5_5_5">lambda</a></code><br>
-<code><a href="r3_4.html#r3_4_5_1_8">lathe</a></code><br>
-<code><a href="r3_4.html#r3_4_7_1_15">leopard</a></code><br>
-<code><a href="r3_4.html#r3_4_4_2">light_group</a></code><br>
-<code><a href="r3_4.html#r3_4_4_1">light_source</a></code><br>
+<code><a href="r3_6.html#r3_6_2_5_5_5">lambda</a></code><br>
+<code><a href="r3_5.html#r3_5_1_1_8">lathe</a></code><br>
+<code><a href="r3_5.html#r3_5_1_1_9">lemon</a></code><br>
+<code><a href="r3_6.html#r3_6_2_1_15">leopard</a></code><br>
+<code><a href="r3_4.html#r3_4_3_2">light_group</a></code><br>
+<code><a href="r3_4.html#r3_4_3_1">light_source</a></code><br>
 </td>
 <td width="33%">
-<code><a href="r3_4.html#r3_4_5_1_8">linear_spline</a></code><br>
-<code><a href="r3_4.html#r3_4_5_1_11">linear_sweep</a></code><br>
+<code><a href="r3_5.html#r3_5_1_1_8">linear_spline</a></code><br>
+<code><a href="r3_5.html#r3_5_1_1_12">linear_sweep</a></code><br>
 <code><a href="r3_3.html#r3_3_1_5_4">ln</a></code><br>
-<code><a href="r3_4.html#r3_4_4_3_4_5">load_file</a></code><br>
-<code><a href="r3_3.html#r3_3_2_2">local</a></code><br>
+<code><a href="r3_4.html#r3_4_3_3_4_5">load_file</a></code><br>
+<code><a href="r3_3.html#r3_3_2_2_2">local</a></code>  <em>directive</em><br>
+<code><a href="r3_3.html#r3_3_1_10">local</a></code>  <em>dictionary</em><br>
 </td>
 <td width="33%">
 <code><a href="r3_4.html#r3_4_2_1_1">location</a></code><br>
 <code><a href="r3_3.html#r3_3_1_5_4">log</a></code><br>
 <code><a href="r3_4.html#r3_4_2_1_1">look_at</a></code><br>
-<code><a href="r3_4.html#r3_4_4_1_7">looks_like</a></code><br>
-<code><a href="r3_4.html#r3_4_4_3_3_7">low_error_factor</a></code><br>
+<code><a href="r3_4.html#r3_4_3_1_7">looks_like</a></code><br>
+<code><a href="r3_4.html#r3_4_3_3_3_7">low_error_factor</a></code><br>
 </td>
 </tr>
 </table>
@@ -808,42 +838,43 @@ For details on those five items see section <a href="r3_3.html#r3_3_2">Language 
 <tr valign="top">
 <td width="33%">
 <code><a href="r3_3.html#r3_3_2_8_1">macro</a></code><br>
-<code><a href="r3_4.html#r3_4_7_1_11">magnet</a></code><br>
-<code><a href="r3_4.html#r3_4_7_5">major_radius</a></code><br>
-<code><a href="r3_4.html#r3_4_7_1_11">mandel</a></code><br>
-<code><a href="r3_4.html#r3_4_7_7_2">map_type</a></code><br>
-<code><a href="r3_4.html#r3_4_7_1_16">marble</a></code><br>
-<code><a href="r3_4.html#r3_4_5_5_3">material</a></code><br>
-<code><a href="r3_4.html#r3_4_6_5_3">material_map</a></code><br>
+<code><a href="r3_6.html#r3_6_2_1_11">magnet</a></code><br>
+<code><a href="r3_6.html#r3_6_2_5">major_radius</a></code><br>
+<code><a href="r3_6.html#r3_6_2_1_11">mandel</a></code><br>
+<code><a href="r3_6.html#r3_6_2_7_2">map_type</a></code><br>
+<code><a href="r3_6.html#r3_6_2_1_16">marble</a></code><br>
+<code><a href="r3_5.html#r3_5_1_5_3">material</a></code><br>
+<code><a href="r3_6.html#r3_6_1_5_3">material_map</a></code><br>
 <code><a href="r3_3.html#r3_3_1_12_4">matrix</a></code><br>
 <code><a href="r3_3.html#r3_3_1_5_4">max</a></code><br>
-<code><a href="r3_4.html#r3_4_4_3_3_9">maximum_reuse</a></code><br>
+<code><a href="r3_4.html#r3_4_3_3_3_9">maximum_reuse</a></code><br>
 </td>
 <td width="33%">
 <code><a href="r3_3.html#r3_3_1_6_5">max_extent</a></code><br>
-<code><a href="r3_4.html#r3_4_5_1_6">max_gradient</a></code><br>
+<code><a href="r3_5.html#r3_5_1_1_6">max_gradient</a></code><br>
 <code><a href="r3_4.html#r3_4_1_8">max_intersections</a></code><br>
-<code><a href="r3_4.html#r3_4_5_1_7">max_iteration</a></code><br>
-<code><a href="r3_4.html#r3_4_4_3_3_8">max_sample</a></code><br>
-<code><a href="r3_4.html#r3_4_5_1_6">max_trace</a></code><br>
+<code><a href="r3_5.html#r3_5_1_1_7">max_iteration</a></code><br>
+<code><a href="r3_4.html#r3_4_3_3_3_8">max_sample</a></code><br>
+<code><a href="r3_5.html#r3_5_1_1_6">max_trace</a></code><br>
 <code><a href="r3_4.html#r3_4_1_7">max_trace_level</a></code><br>
-<code><a href="r3_4.html#r3_4_8">media</a></code><br>
-<code><a href="r3_4.html#r3_4_4_1_11">media_attenuation</a></code><br>
-<code><a href="r3_4.html#r3_4_4_1_10">media_interaction</a></code><br>
-<code><a href="r3_4.html#r3_4_5_4_5">merge</a></code><br>
+<code><a href="r3_7.html#r3_7_2">media</a></code><br>
+<code><a href="r3_4.html#r3_4_3_1_11">media_attenuation</a></code><br>
+<code><a href="r3_4.html#r3_4_3_1_10">media_interaction</a></code><br>
+<code><a href="r3_5.html#r3_5_1_4_5">merge</a></code> <em>csg</em><br>
+<code><a href="r3_5.html#r3_5_1_1_18">merge</a></code> <em>torus</em><br>
 </td>
 <td width="33%">
-<code><a href="r3_4.html#r3_4_5_2_3">mesh</a></code><br>
-<code><a href="r3_4.html#r3_4_5_2_4">mesh2</a></code><br>
-<code><a href="r3_4.html#r3_4_6_3_4_3">metallic</a></code><br>
-<code><a href="r3_4.html#r3_4_8_3">method</a></code><br>
-<code><a href="r3_4.html#r3_4_7_2_3">metric</a></code><br>
+<code><a href="r3_5.html#r3_5_1_2_3">mesh</a></code><br>
+<code><a href="r3_5.html#r3_5_1_2_4">mesh2</a></code><br>
+<code><a href="r3_6.html#r3_6_1_3_4_3">metallic</a></code><br>
+<code><a href="r3_7.html#r3_7_2_3">method</a></code><br>
+<code><a href="r3_6.html#r3_6_2_2_3">metric</a></code><br>
 <code><a href="r3_3.html#r3_3_1_5_4">min</a></code><br>
 <code><a href="r3_3.html#r3_3_1_6_5">min_extent</a></code><br>
-<code><a href="r3_4.html#r3_4_4_3_3_10">minimum_reuse</a></code><br>
-<code><a href="r3_4.html#r3_4_6_3_3_4">mm_per_unit</a></code><br>
+<code><a href="r3_4.html#r3_4_3_3_3_10">minimum_reuse</a></code><br>
+<code><a href="r3_6.html#r3_6_1_3_3_4">mm_per_unit</a></code><br>
 <code><a href="r3_3.html#r3_3_1_5_4">mod</a></code><br>
-<code><a href="r3_4.html#r3_4_7_5">mortar</a></code><br>
+<code><a href="r3_6.html#r3_6_2_5">mortar</a></code><br>
 </td>
 </tr>
 </table>
@@ -854,22 +885,22 @@ For details on those five items see section <a href="r3_3.html#r3_3_2">Language 
 <tr valign="top">
 <td width="33%">
 <code><a href="r3_3.html#r3_3_1_11">natural_spline</a></code><br>
-<code><a href="r3_4.html#r3_4_4_3_3_11">nearest_count</a></code><br>
+<code><a href="r3_4.html#r3_4_3_3_3_11">nearest_count</a></code><br>
 <code><a href="r3_3.html#r3_3_1_5_5">no</a></code><br>
-<code><a href="r3_4.html#r3_4_6_2_4">no_bump_scale</a></code><br>
-<code><a href="r3_4.html#r3_4_5_5_7">no_image</a></code><br>
+<code><a href="r3_6.html#r3_6_1_2_4">no_bump_scale</a></code><br>
+<code><a href="r3_5.html#r3_5_1_5_7">no_image</a></code><br>
 </td>
 <td width="33%">
-<code><a href="r3_4.html#r3_4_5_5_10">no_radiosity</a></code><br>
-<code><a href="r3_4.html#r3_4_5_5_8">no_reflection</a></code><br>
-<code><a href="r3_4.html#r3_4_5_5_6">no_shadow</a></code><br>
-<code><a href="r3_4.html#r3_4_7_5_4">noise_generator</a></code><br>
-<code><a href="r3_4.html#r3_4_6_2">normal</a></code><br>
+<code><a href="r3_5.html#r3_5_1_5_10">no_radiosity</a></code><br>
+<code><a href="r3_5.html#r3_5_1_5_8">no_reflection</a></code><br>
+<code><a href="r3_5.html#r3_5_1_5_6">no_shadow</a></code><br>
+<code><a href="r3_6.html#r3_6_2_5_4">noise_generator</a></code><br>
+<code><a href="r3_6.html#r3_6_1_2">normal</a></code><br>
 </td>
 <td width="33%">
-<code><a href="r3_4.html#r3_4_5_2_4">normal_indices</a></code><br>
-<code><a href="r3_4.html#r3_4_6_2_1">normal_map</a></code><br>
-<code><a href="r3_4.html#r3_4_5_2_4">normal_vectors</a></code><br>
+<code><a href="r3_5.html#r3_5_1_2_4">normal_indices</a></code><br>
+<code><a href="r3_6.html#r3_6_1_2_1">normal_map</a></code><br>
+<code><a href="r3_5.html#r3_5_1_2_4">normal_vectors</a></code><br>
 <code><a href="r3_3.html#r3_3_1_9_4">now</a></code><br>
 <code><a href="r3_4.html#r3_4_1_10">number_of_waves</a></code><br>
 </td>
@@ -881,24 +912,25 @@ For details on those five items see section <a href="r3_3.html#r3_3_2">Language 
 </tr>
 <tr valign="top">
 <td width="33%">
-<code><a href="r3_4.html#r3_4_5">object</a></code><br>
-<code><a href="r3_4.html#r3_4_7_5_5_4">octaves</a></code><br>
+<code><a href="r3_5.html#r3_5_1">object</a></code><br>
+<code><a href="r3_6.html#r3_6_2_5_5_4">octaves</a></code><br>
 <code><a href="r3_3.html#r3_3_1_5_5">off</a></code><br>
-<code><a href="r3_4.html#r3_4_7_5_5_2">offset</a></code><br>
-<code><a href="r3_4.html#r3_4_7_5_5_6">omega</a></code><br>
-</td>
-<td width="33%">
+<code><a href="r3_6.html#r3_6_2_5_5_2">offset</a></code><br>
+<code><a href="r3_6.html#r3_6_2_5_5_6">omega</a></code><br>
 <code><a href="r3_4.html#r3_4_2_2_6">omnimax</a></code><br>
-<code><a href="r3_3.html#r3_3_1_5_5">on</a></code><br>
-<code><a href="r3_4.html#r3_4_7_7_1">once</a></code><br>
-<code><a href="r3_4.html#r3_4_7_1_17">onion</a></code><br>
-<code><a href="r3_4.html#r3_4_8_1">open</a></code><br>
 </td>
 <td width="33%">
-<code><a href="r3_4.html#r3_4_4_1_5">orient</a></code><br>
-<code><a href="r3_4.html#r3_4_7_5_5_7">orientation</a></code><br>
+<code><a href="r3_3.html#r3_3_1_5_5">on</a></code><br>
+<code><a href="r3_6.html#r3_6_2_7_1">once</a></code><br>
+<code><a href="r3_6.html#r3_6_2_1_17">onion</a></code><br>
+<code><a href="r3_7.html#r3_7_2_1">open</a></code><br>
+<code><a href="r3_3.html#r3_3_2_8_6">optional</a></code><br>
+<code><a href="r3_4.html#r3_4_3_1_5">orient</a></code><br>
+</td>
+<td width="33%">
+<code><a href="r3_6.html#r3_6_2_5_5_7">orientation</a></code><br>
 <code><a href="r3_4.html#r3_4_2_2_2">orthographic</a></code><br>
-<code><a href="r3_4.html#r3_4_5_1_9">ovus</a></code><br>
+<code><a href="r3_5.html#r3_5_1_1_10">ovus</a></code><br>
 </td>
 </tr>
 </table>
@@ -909,45 +941,47 @@ For details on those five items see section <a href="r3_3.html#r3_3_2">Language 
 <tr valign="top">
 <td width="33%">
 <code><a href="r3_4.html#r3_4_2_2_7">panoramic</a></code><br>
-<code><a href="r3_4.html#r3_4_4_1_4">parallel</a></code><br>
-<code><a href="r3_4.html#r3_4_5_1_10">parametric</a></code><br>
-<code><a href="r3_4.html#r3_4_4_4_4">pass_through</a></code><br>
-<code><a href="r3_4.html#r3_4_7">pattern</a></code><br>
-<code><a href="r3_4.html#r3_4_7_1_18">pavement</a></code><br>
+<code><a href="r3_4.html#r3_4_3_1_4">parallel</a></code><br>
+<code><a href="r3_5.html#r3_5_1_1_11">parametric</a></code><br>
+<code><a href="r3_4.html#r3_4_3_4_4">pass_through</a></code><br>
+<code><a href="r3_6.html#r3_6_2">pattern</a></code><br>
+<code><a href="r3_6.html#r3_6_2_1_18">pavement</a></code><br>
 <code><a href="r3_4.html#r3_4_2_2_1">perspective</a></code><br>
-<code><a href="r3_4.html#r3_4_7_6_1">pgm</a></code><br>
-<code><a href="r3_4.html#r3_4_7_5_2">phase</a></code><br>
-<code><a href="r3_4.html#r3_4_6_3_4_1">phong</a></code><br>
-<code><a href="r3_4.html#r3_4_6_3_4_1">phong_size</a></code><br>
-<code><a href="r3_4.html#r3_4_4_4">photons</a></code><br>
-</td>
-<td width="33%">
+<code><a href="r3_6.html#r3_6_2_6_1">pgm</a></code><br>
+<code><a href="r3_6.html#r3_6_2_5_2">phase</a></code><br>
+<code><a href="r3_6.html#r3_6_1_3_4_1">phong</a></code><br>
+<code><a href="r3_6.html#r3_6_1_3_4_1">phong_size</a></code><br>
+<code><a href="r3_4.html#r3_4_3_4">photons</a></code><br>
 <code><a href="r3_3.html#r3_3_1_5_5">pi</a></code><br>
-<code><a href="r3_4.html#r3_4_6_1">pigment</a></code><br>
-<code><a href="r3_4.html#r3_4_6_1_3">pigment_map</a></code><br>
-<code><a href="r3_4.html#r3_4_7_1_19">pigment_pattern</a></code><br>
-<code><a href="r3_4.html#r3_4_7_1_20">planar</a></code><br>
-<code><a href="r3_4.html#r3_4_5_3_1">plane</a></code><br>
-<code><a href="r3_4.html#r3_4_7_6_1">png</a></code><br>
-<code><a href="r3_4.html#r3_4_4_1_2">point_at</a></code><br>
-<code><a href="r3_4.html#r3_4_5_3_2">poly</a></code><br>
-<code><a href="r3_4.html#r3_4_5_3_5">polynomial</a></code><br>
-<code><a href="r3_4.html#r3_4_7_5_3">poly_wave</a></code><br>
-<code><a href="r3_4.html#r3_4_5_2_5">polygon</a></code><br>
 </td>
 <td width="33%">
-<code><a href="r3_4.html#r3_4_5_1_5">pot</a></code><br>
+<code><a href="r3_6.html#r3_6_1_1">pigment</a></code><br>
+<code><a href="r3_6.html#r3_6_1_1_3">pigment_map</a></code><br>
+<code><a href="r3_6.html#r3_6_2_1_19">pigment_pattern</a></code><br>
+<code><a href="r3_6.html#r3_6_2_1_20">planar</a></code><br>
+<code><a href="r3_5.html#r3_5_1_3_1">plane</a></code><br>
+<code><a href="r3_6.html#r3_6_2_6_1">png</a></code><br>
+<code><a href="r3_4.html#r3_4_3_1_2">point_at</a></code><br>
+<code><a href="r3_5.html#r3_5_1_1_6">polarity</a></code><br>
+<code><a href="r3_5.html#r3_5_1_3_2">poly</a></code><br>
+<code><a href="r3_5.html#r3_5_1_3_5">polynomial</a></code><br>
+<code><a href="r3_6.html#r3_6_2_5_3">poly_wave</a></code><br>
+<code><a href="r3_5.html#r3_5_1_2_5">polygon</a></code><br>
+<code><a href="r3_5.html#r3_5_1_1_5">pot</a></code><br>
+</td>
+<td width="33%">
+<code><a href="r3_6.html#r3_6_2_4_3">potential</a></code><br>
 <code><a href="r3_3.html#r3_3_1_5_4">pow</a></code><br>
-<code><a href="r3_4.html#r3_4_7_6_1">ppm</a></code><br>
-<code><a href="r3_4.html#r3_4_5_1_7">precision</a></code><br>
-<code><a href="r3_4.html#r3_4_5_1_10">precompute</a></code><br>
-<code><a href="r3_4.html#r3_4_7_6_4">premultiplied</a></code><br>
-<code><a href="r3_4.html#r3_4_4_3_3_12">pretrace_end</a></code><br>
-<code><a href="r3_4.html#r3_4_4_3_3_12">pretrace_start</a></code><br>
-<code><a href="r3_4.html#r3_4_5_1_11">prism</a></code><br>
+<code><a href="r3_6.html#r3_6_2_6_1">ppm</a></code><br>
+<code><a href="r3_5.html#r3_5_1_1_7">precision</a></code><br>
+<code><a href="r3_5.html#r3_5_1_1_11">precompute</a></code><br>
+<code><a href="r3_6.html#r3_6_2_6_4">premultiplied</a></code><br>
+<code><a href="r3_4.html#r3_4_3_3_3_12">pretrace_end</a></code><br>
+<code><a href="r3_4.html#r3_4_3_3_3_12">pretrace_start</a></code><br>
+<code><a href="r3_5.html#r3_5_1_1_12">prism</a></code><br>
 <code><a href="r3_3.html#r3_3_1_8_1">prod</a></code><br>
-<code><a href="r3_4.html#r3_4_4_1_8">projected_through</a></code><br>
-<code><a href="r3_4.html#r3_4_5_1_7">pwr</a></code><br>
+<code><a href="r3_4.html#r3_4_3_1_8">projected_through</a></code><br>
+<code><a href="r3_5.html#r3_5_1_1_7">pwr</a></code><br>
 </td>
 </tr>
 </table>
@@ -957,17 +991,17 @@ For details on those five items see section <a href="r3_3.html#r3_3_2">Language 
 </tr>
 <tr valign="top">
 <td width="33%">
-<code><a href="r3_4.html#r3_4_5_1_8">quadratic_spline</a></code><br>
-<code><a href="r3_4.html#r3_4_5_3_6">quadric</a></code><br>
-<code><a href="r3_4.html#r3_4_5_3_4">quartic</a></code><br>
+<code><a href="r3_5.html#r3_5_1_1_8">quadratic_spline</a></code><br>
+<code><a href="r3_5.html#r3_5_1_3_6">quadric</a></code><br>
+<code><a href="r3_5.html#r3_5_1_3_4">quartic</a></code><br>
 </td>
 <td width="33%">
-<code><a href="r3_4.html#r3_4_5_1_7">quaternion</a></code><br>
-<code><a href="r3_4.html#r3_4_6_1_5">quick_color</a></code><br>
-<code><a href="r3_4.html#r3_4_6_1_5">quick_colour</a></code><br>
+<code><a href="r3_5.html#r3_5_1_1_7">quaternion</a></code><br>
+<code><a href="r3_6.html#r3_6_1_1_5">quick_color</a></code><br>
+<code><a href="r3_6.html#r3_6_1_1_5">quick_colour</a></code><br>
 </td>
 <td width="33%">
-<code><a href="r3_4.html#r3_4_7_1_21">quilted</a></code><br>
+<code><a href="r3_6.html#r3_6_2_1_21">quilted</a></code><br>
 </td>
 </tr>
 </table>
@@ -977,26 +1011,27 @@ For details on those five items see section <a href="r3_3.html#r3_3_2">Language 
 </tr>
 <tr valign="top">
 <td width="33%">
-<code><a href="r3_4.html#r3_4_7_1_22">radial</a></code><br>
+<code><a href="r3_6.html#r3_6_2_1_22">radial</a></code><br>
 <code><a href="r3_3.html#r3_3_1_5_4">radians</a></code><br>
-<code><a href="r3_4.html#r3_4_4_3">radiosity</a></code><br>
-<code><a href="r3_4.html#r3_4_4_1_2">radius</a></code><br>
-<code><a href="r3_4.html#r3_4_3_5">rainbow</a></code><br>
-<code><a href="r3_4.html#r3_4_7_5_3">ramp_wave</a></code><br>
+<code><a href="r3_4.html#r3_4_3_3">radiosity</a></code><br>
+<code><a href="r3_4.html#r3_4_3_1_2">radius</a></code><br>
+<code><a href="r3_7.html#r3_7_1_5">rainbow</a></code><br>
+<code><a href="r3_6.html#r3_6_2_5_3">ramp_wave</a></code><br>
 <code><a href="r3_3.html#r3_3_1_5_4">rand</a></code><br>
 <code><a href="r3_3.html#r3_3_2_6_4">range</a></code><br>
-<code><a href="r3_4.html#r3_4_8_3">ratio</a></code><br>
+<code><a href="r3_7.html#r3_7_2_3">ratio</a></code><br>
 </td>
 <td width="33%">
 <code><a href="r3_3.html#r3_3_2_3">read</a></code><br>
-<code><a href="r3_4.html#r3_4_5_1_7">reciprocal</a></code><br>
-<code><a href="r3_4.html#r3_4_4_3_3_13">recursion_limit</a></code><br>
+<code><a href="r3_5.html#r3_5_1_1_7">reciprocal</a></code><br>
+<code><a href="r3_4.html#r3_4_3_3_3_13">recursion_limit</a></code><br>
 <code><a href="r3_3.html#r3_3_1_7_3">red</a></code><br>
-<code><a href="r3_4.html#r3_4_6_3_5">reflection</a></code><br>
-<code><a href="r3_4.html#r3_4_6_3_5">reflection_exponent</a></code><br>
-<code><a href="r3_4.html#r3_4_8_1_4">refraction</a></code><br>
+<code><a href="r3_6.html#r3_6_1_3_5">reflection</a></code><br>
+<code><a href="r3_6.html#r3_6_1_3_5">reflection_exponent</a></code><br>
+<code><a href="r3_7.html#r3_7_2_1_4">refraction</a></code><br>
 <code><a href="r3_3.html#r3_3_2_7_1">render</a></code><br>
-<code><a href="r3_4.html#r3_4_7_5_5_2">repeat</a></code><br>
+<code><a href="r3_6.html#r3_6_2_2_3">repeat</a></code> <em>crackle pattern</em><br>
+<code><a href="r3_6.html#r3_6_2_5_5_2">repeat</a></code> <em>warp</em><br>
 </td>
 <td width="33%">
 <code><a href="r3_3.html#r3_3_1_7_1">rgb</a></code><br>
@@ -1004,9 +1039,9 @@ For details on those five items see section <a href="r3_3.html#r3_3_2">Language 
 <code><a href="r3_3.html#r3_3_1_7_1">rgbft</a></code><br>
 <code><a href="r3_3.html#r3_3_1_7_1">rgbt</a></code><br>
 <code><a href="r3_4.html#r3_4_2_1_5">right</a></code><br>
-<code><a href="r3_4.html#r3_4_7_1_23">ripples</a></code><br>
+<code><a href="r3_6.html#r3_6_2_1_23">ripples</a></code><br>
 <code><a href="r3_3.html#r3_3_1_12_3">rotate</a></code><br>
-<code><a href="r3_4.html#r3_4_6_3_4_2">roughness</a></code><br>
+<code><a href="r3_6.html#r3_6_1_3_4_2">roughness</a></code><br>
 </td>
 </tr>
 </table>
@@ -1016,72 +1051,74 @@ For details on those five items see section <a href="r3_3.html#r3_3_2">Language 
 </tr>
 <tr valign="top">
 <td width="33%">
-<code><a href="r3_4.html#r3_4_8_3">samples</a></code><br>
-<code><a href="r3_4.html#r3_4_4_3_4_5">save_file</a></code><br>
+
+<code><a href="r3_7.html#r3_7_2_3">samples</a></code> <em>media</em><br>
+<code><a href="r3_6.html#r3_6_1_3_3_4">samples</a></code> <em>subsurface</em><br>
+<code><a href="r3_4.html#r3_4_3_3_4_5">save_file</a></code><br>
 <code><a href="r3_3.html#r3_3_1_12_2">scale</a></code><br>
-<code><a href="r3_4.html#r3_4_7_5_3">scallop_wave</a></code><br>
-<code><a href="r3_4.html#r3_4_8_2_3">scattering</a></code><br>
+<code><a href="r3_6.html#r3_6_2_5_3">scallop_wave</a></code><br>
+<code><a href="r3_7.html#r3_7_2_2_3">scattering</a></code><br>
 <code><a href="r3_3.html#r3_3_1_5_4">seed</a></code><br>
 <code><a href="r3_3.html#r3_3_1_5_4">select</a></code><br>
-<code><a href="r3_4.html#r3_4_4_1_6">shadowless</a></code><br>
+<code><a href="r3_4.html#r3_4_3_1_6">shadowless</a></code><br>
 <code><a href="r3_3.html#r3_3_1_5_4">sin</a></code><br>
-<code><a href="r3_4.html#r3_4_7_5_3">sine_wave</a></code><br>
+<code><a href="r3_6.html#r3_6_2_5_3">sine_wave</a></code><br>
 <code><a href="r3_3.html#r3_3_1_5_4">sinh</a></code><br>
 <code><a href="r3_3.html#r3_3_2_3_4">sint8</a></code><br>
 <code><a href="r3_3.html#r3_3_2_3_4">sint16be</a></code><br>
 <code><a href="r3_3.html#r3_3_2_3_4">sint16le</a></code><br>
 <code><a href="r3_3.html#r3_3_2_3_4">sint32be</a></code><br>
 <code><a href="r3_3.html#r3_3_2_3_4">sint32le</a></code><br>
-<code><a href="r3_4.html#r3_4_7_1_10">size</a></code><br>
+<code><a href="r3_6.html#r3_6_2_1_10">size</a></code><br>
 <code><a href="r3_4.html#r3_4_2_1_2">sky</a></code><br>
-<code><a href="r3_4.html#r3_4_3_4">sky_sphere</a></code><br>
-<code><a href="r3_4.html#r3_4_5_1_7">slice</a></code><br>
-<code><a href="r3_4.html#r3_4_7_3_2">slope</a></code><br>
-<code><a href="r3_4.html#r3_4_6_2_2">slope_map</a></code><br>
+<code><a href="r3_7.html#r3_7_1_4">sky_sphere</a></code><br>
+<code><a href="r3_5.html#r3_5_1_1_7">slice</a></code><br>
+<code><a href="r3_6.html#r3_6_2_3_2">slope</a></code><br>
 </td>
 <td width="33%">
-<code><a href="r3_4.html#r3_4_5_1_5">smooth</a></code><br>
-<code><a href="r3_4.html#r3_4_5_2_7">smooth_triangle</a></code><br>
-<code><a href="r3_4.html#r3_4_7_2_3">solid</a></code><br>
-<code><a href="r3_4.html#r3_4_5_1_15">sor</a></code><br>
-<code><a href="r3_4.html#r3_4_4_4_3">spacing</a></code><br>
-<code><a href="r3_4.html#r3_4_6_3_4_2">specular</a></code><br>
-<code><a href="r3_4.html#r3_4_5_1_12">sphere</a></code><br>
-<code><a href="r3_4.html#r3_4_5_1_13">sphere_sweep</a></code><br>
-<code><a href="r3_4.html#r3_4_7_1_24">spherical</a></code><br>
-<code><a href="r3_4.html#r3_4_7_1_25">spiral1</a></code><br>
-<code><a href="r3_4.html#r3_4_7_1_26">spiral2</a></code><br>
+<code><a href="r3_6.html#r3_6_1_2_2">slope_map</a></code><br>
+<code><a href="r3_5.html#r3_5_1_1_5">smooth</a></code><br>
+<code><a href="r3_5.html#r3_5_1_2_7">smooth_triangle</a></code><br>
+<code><a href="r3_6.html#r3_6_2_2_3">solid</a></code><br>
+<code><a href="r3_5.html#r3_5_1_1_16">sor</a></code><br>
+<code><a href="r3_4.html#r3_4_3_4_3">spacing</a></code><br>
+<code><a href="r3_6.html#r3_6_1_3_4_2">specular</a></code><br>
+<code><a href="r3_5.html#r3_5_1_1_13">sphere</a></code><br>
+<code><a href="r3_5.html#r3_5_1_1_14">sphere_sweep</a></code><br>
+<code><a href="r3_6.html#r3_6_2_1_24">spherical</a></code><br>
+<code><a href="r3_6.html#r3_6_2_1_25">spiral1</a></code><br>
+<code><a href="r3_6.html#r3_6_2_1_26">spiral2</a></code><br>
 <code><a href="r3_3.html#r3_3_1_11">spline</a></code><br>
-<code><a href="r3_4.html#r3_4_5_4_2_1">split_union</a></code><br>
-<code><a href="r3_4.html#r3_4_4_1_2">spotlight</a></code><br>
-<code><a href="r3_4.html#r3_4_7_1_27">spotted</a></code><br>
-<code><a href="r3_4.html#r3_4_5_1_7">sqr</a></code><br>
+<code><a href="r3_5.html#r3_5_1_4_2_1">split_union</a></code><br>
+<code><a href="r3_4.html#r3_4_3_1_2">spotlight</a></code><br>
+<code><a href="r3_6.html#r3_6_2_1_27">spotted</a></code><br>
+<code><a href="r3_5.html#r3_5_1_1_7">sqr</a></code><br>
 <code><a href="r3_3.html#r3_3_1_5_4">sqrt</a></code><br>
-<code><a href="r3_4.html#r3_4_7_2_6">square</a></code><br>
-<code><a href="r3_4.html#r3_4_6_2_3">srgb</a></code> <em>bump maps</em><br>
+<code><a href="r3_6.html#r3_6_2_2_6">square</a></code><br>
+<code><a href="r3_6.html#r3_6_1_2_3">srgb</a></code> <em>bump maps</em><br>
 <code><a href="r3_3.html#r3_3_1_7_2">srgb</a></code> <em>color literals</em><br>
-<code><a href="r3_4.html#r3_4_5_1_5">srgb</a></code> <em>heightfield</em><br>
+<code><a href="r3_5.html#r3_5_1_1_5">srgb</a></code> <em>heightfield</em><br>
 </td>
 <td width="33%">
-<code><a href="r3_4.html#r3_4_7_6_2">srgb</a></code> <em>image maps</em><br>
-<code><a href="r3_4.html#r3_4_7_4_2">srgb</a></code> <em>image pattern</em><br>
+<code><a href="r3_6.html#r3_6_2_6_2">srgb</a></code> <em>image maps</em><br>
+<code><a href="r3_6.html#r3_6_2_4_2">srgb</a></code> <em>image pattern</em><br>
 <code><a href="r3_3.html#r3_3_1_7_2">srgbf</a></code><br>
 <code><a href="r3_3.html#r3_3_1_7_2">srgbt</a></code><br>
 <code><a href="r3_3.html#r3_3_1_7_2">srgbft</a></code><br>
 <code><a href="r3_3.html#r3_3_2_7_1">statistics</a></code><br>
 <code><a href="r3_3.html#r3_3_1_9_4">str</a></code><br>
 <code><a href="r3_3.html#r3_3_1_5_4">strcmp</a></code><br>
-<code><a href="r3_4.html#r3_4_5_1_1">strength</a></code><br>
+<code><a href="r3_5.html#r3_5_1_1_1">strength</a></code><br>
 <code><a href="r3_3.html#r3_3_1_5_4">strlen</a></code><br>
 <code><a href="r3_3.html#r3_3_1_9_4">strlwr</a></code><br>
 <code><a href="r3_3.html#r3_3_1_9_4">strupr</a></code><br>
-<code><a href="r3_4.html#r3_4_5_5_11">sturm</a></code><br>
+<code><a href="r3_5.html#r3_5_1_5_11">sturm</a></code><br>
 <code><a href="r3_3.html#r3_3_1_9_4">substr</a></code><br>
-<code><a href="r3_4.html#r3_4_6_3_3_4">subsurface</a></code><br>
+<code><a href="r3_6.html#r3_6_1_3_3_4">subsurface</a></code><br>
 <code><a href="r3_3.html#r3_3_1_8_1">sum</a></code><br>
-<code><a href="r3_4.html#r3_4_5_1_14">superellipsoid</a></code><br>
+<code><a href="r3_5.html#r3_5_1_1_15">superellipsoid</a></code><br>
 <code><a href="r3_3.html#r3_3_2_6_4">switch</a></code><br>
-<code><a href="r3_4.html#r3_4_7_6_1">sys</a></code><br>
+<code><a href="r3_6.html#r3_6_2_6_1">sys</a></code><br>
 </td>
 </tr>
 </table>
@@ -1094,39 +1131,42 @@ For details on those five items see section <a href="r3_3.html#r3_3_2">Language 
 <code><a href="r3_3.html#r3_3_1_6_6">t</a></code><br>
 <code><a href="r3_3.html#r3_3_1_5_4">tan</a></code><br>
 <code><a href="r3_3.html#r3_3_1_5_4">tanh</a></code><br>
-<code><a href="r3_4.html#r3_4_4_4_4">target</a></code><br>
-<code><a href="r3_4.html#r3_4_5_1_16">text</a></code><br>
-<code><a href="r3_4.html#r3_4_6">texture</a></code><br>
-<code><a href="r3_4.html#r3_4_6_5">texture_list</a></code><br>
-<code><a href="r3_4.html#r3_4_6_5_1">texture_map</a></code><br>
-<code><a href="r3_4.html#r3_4_7_6_1">tga</a></code><br>
-<code><a href="r3_4.html#r3_4_6_3_7">thickness</a></code><br>
-<code><a href="r3_4.html#r3_4_5_1_1">threshold</a></code><br>
+<code><a href="r3_4.html#r3_4_3_4_4">target</a></code><br>
+<code><a href="r3_3.html#r3_3_1_5_5">tau</a></code><br>
+<code><a href="r3_5.html#r3_5_1_1_17">text</a></code><br>
+<code><a href="r3_6.html#r3_6_1">texture</a></code><br>
+<code><a href="r3_6.html#r3_6_1_5">texture_list</a></code><br>
+<code><a href="r3_6.html#r3_6_1_5_1">texture_map</a></code><br>
+<code><a href="r3_6.html#r3_6_2_6_1">tga</a></code><br>
+<code><a href="r3_6.html#r3_6_1_3_7">thickness</a></code><br>
+<code><a href="r3_5.html#r3_5_1_1_1">threshold</a></code> <em>blob</em><br>
 </td>
 <td width="33%">
-<code><a href="r3_4.html#r3_4_7_6_1">tiff</a></code><br>
-<code><a href="r3_4.html#r3_4_4_1_2">tightness</a></code><br>
-<code><a href="r3_4.html#r3_4_6_5_2">tile2</a></code><br>
-<code><a href="r3_4.html#r3_4_6_5_2">tiles</a></code><br>
-<code><a href="r3_4.html#r3_4_7_1_28">tiling</a></code><br>
-<code><a href="r3_4.html#r3_4_5_1_13">tolerance</a></code><br>
-<code><a href="r3_4.html#r3_4_7_5_5_7">toroidal</a></code><br>
-<code><a href="r3_4.html#r3_4_5_1_17">torus</a></code><br>
+<code><a href="r3_5.html#r3_5_1_1_6">threshold</a></code> <em>isosurface</em><br>
+<code><a href="r3_6.html#r3_6_2_4_3">threshold</a></code> <em>potential pattern</em><br>
+<code><a href="r3_6.html#r3_6_2_6_1">tiff</a></code><br>
+<code><a href="r3_4.html#r3_4_3_1_2">tightness</a></code><br>
+<code><a href="r3_6.html#r3_6_1_5_2">tile2</a></code><br>
+<code><a href="r3_6.html#r3_6_1_5_2">tiles</a></code><br>
+<code><a href="r3_6.html#r3_6_2_1_28">tiling</a></code><br>
+<code><a href="r3_5.html#r3_5_1_1_14">tolerance</a></code><br>
+<code><a href="r3_6.html#r3_6_2_5_5_7">toroidal</a></code><br>
+<code><a href="r3_5.html#r3_5_1_1_18">torus</a></code><br>
 <code><a href="r3_3.html#r3_3_1_6_5">trace</a></code><br>
 <code><a href="r3_3.html#r3_3_1_12">transform</a></code><br>
-<code><a href="r3_3.html#r3_3_1_12_1">translate</a></code><br>
 </td>
 <td width="33%">
-<code><a href="r3_4.html#r3_4_6_3_3_4">translucency</a></code><br>
+<code><a href="r3_3.html#r3_3_1_12_1">translate</a></code><br>
+<code><a href="r3_6.html#r3_6_1_3_3_4">translucency</a></code><br>
 <code><a href="r3_3.html#r3_3_1_7_3">transmit</a></code><br>
-<code><a href="r3_4.html#r3_4_5_2_6">triangle</a></code><br>
-<code><a href="r3_4.html#r3_4_7_5_3">triangle_wave</a></code><br>
-<code><a href="r3_4.html#r3_4_7_2_7">triangular</a></code><br>
+<code><a href="r3_5.html#r3_5_1_2_6">triangle</a></code><br>
+<code><a href="r3_6.html#r3_6_2_5_3">triangle_wave</a></code><br>
+<code><a href="r3_6.html#r3_6_2_2_7">triangular</a></code><br>
 <code><a href="r3_3.html#r3_3_1_5_5">true</a></code><br>
-<code><a href="r3_4.html#r3_4_5_1_16">ttf</a></code><br>
-<code><a href="r3_4.html#r3_4_3_3">turb_depth</a></code><br>
-<code><a href="r3_4.html#r3_4_7_5_5_9">turbulence</a></code><br>
-<code><a href="r3_4.html#r3_4_5_2_1">type</a></code><br>
+<code><a href="r3_5.html#r3_5_1_1_17">ttf</a></code><br>
+<code><a href="r3_7.html#r3_7_1_3">turb_depth</a></code><br>
+<code><a href="r3_6.html#r3_6_2_5_5_9">turbulence</a></code><br>
+<code><a href="r3_5.html#r3_5_1_2_1">type</a></code><br>
 </td>
 </tr>
 </table>
@@ -1140,23 +1180,27 @@ For details on those five items see section <a href="r3_3.html#r3_3_2">Language 
 <code><a href="r3_3.html#r3_3_2_3_4">uint8</a></code><br>
 <code><a href="r3_3.html#r3_3_2_3_4">uint16be</a></code><br>
 <code><a href="r3_3.html#r3_3_2_3_4">uint16le</a></code><br>
-<code><a href="r3_4.html#r3_4_5_2_1">u_steps</a></code><br>
+<code><a href="r3_5.html#r3_5_1_2_1">u_steps</a></code><br>
 <code><a href="r3_4.html#r3_4_2_2_5">ultra_wide_angle</a></code><br>
-</td>
-<td width="33%">
 <code><a href="r3_3.html#r3_3_2_2_4">undef</a></code><br>
-<code><a href="r3_4.html#r3_4_5_4_2">union</a></code><br>
-<code><a href="r3_4.html#r3_4_2_1_5">up</a></code><br>
-<code><a href="r3_4.html#r3_4_7_4_2">use_alpha</a></code><br>
-<code><a href="r3_4.html#r3_4_6_2_3_3">use_color</a></code><br>
-<code><a href="r3_4.html#r3_4_6_2_3_3">use_colour</a></code><br>
 </td>
 <td width="33%">
-<code><a href="r3_4.html#r3_4_6_2_3_3">use_index</a></code><br>
+<code><a href="r3_5.html#r3_5_1_4_2">union</a></code> <em>csg</em><br>
+<code><a href="r3_5.html#r3_5_1_1_18">union</a></code> <em>torus</em><br>
+<code><a href="r3_4.html#r3_4_2_1_5">up</a></code><br>
+<code><a href="r3_6.html#r3_6_2_4_2">use_alpha</a></code> <em>image pattern</em><br>
+<code><a href="r3_6.html#r3_6_1_3">use_alpha</a></code> <em>finish</em><br>
+<code><a href="r3_6.html#r3_6_1_2_3_3">use_color</a></code><br>
+<code><a href="r3_6.html#r3_6_1_2_3_3">use_colour</a></code><br>
+</td>
+<td width="33%">
+<code><a href="r3_6.html#r3_6_1_2_3_3">use_index</a></code><br>
+<code><a href="r3_4.html#r3_4_2_2_10">user_defined</a></code> <em>projection</em><br>
+<code><a href="r3_6.html#r3_6_2_4_4">user_defined</a></code> <em>pattern</em><br>
 <code><a href="r3_4.html#r3_4_1_6">utf8</a></code><br>
-<code><a href="r3_4.html#r3_4_5_2_4">uv_indices</a></code><br>
-<code><a href="r3_4.html#r3_4_6_7">uv_mapping</a></code><br>
-<code><a href="r3_4.html#r3_4_6_7_2">uv_vectors</a></code><br>
+<code><a href="r3_5.html#r3_5_1_2_4">uv_indices</a></code><br>
+<code><a href="r3_6.html#r3_6_1_7">uv_mapping</a></code><br>
+<code><a href="r3_6.html#r3_6_1_7_2">uv_vectors</a></code><br>
 </td>
 </tr>
 </table>
@@ -1167,7 +1211,7 @@ For details on those five items see section <a href="r3_3.html#r3_3_2">Language 
 <tr valign="top">
 <td width="33%">
 <code><a href="r3_3.html#r3_3_1_6_6">v</a></code><br>
-<code><a href="r3_4.html#r3_4_5_2_1">v_steps</a></code><br>
+<code><a href="r3_5.html#r3_5_1_2_1">v_steps</a></code><br>
 <code><a href="r3_3.html#r3_3_1_5_4">val</a></code><br>
 <code><a href="r3_4.html#r3_4_2_3">variance</a></code><br>
 <code><a href="r3_3.html#r3_3_1_6_5">vaxis_rotate</a></code><br>
@@ -1176,7 +1220,7 @@ For details on those five items see section <a href="r3_3.html#r3_3_2">Language 
 <code><a href="r3_3.html#r3_3_1_6_5">vcross</a></code><br>
 <code><a href="r3_3.html#r3_3_1_5_4">vdot</a></code><br>
 <code><a href="r3_3.html#r3_3_1_5_6">version</a></code><br>
-<code><a href="r3_4.html#r3_4_5_2_4">vertex_vectors</a></code><br>
+<code><a href="r3_5.html#r3_5_1_2_4">vertex_vectors</a></code><br>
 <code><a href="r3_3.html#r3_3_1_5_4">vlength</a></code><br>
 </td>
 <td width="33%">
@@ -1194,17 +1238,17 @@ For details on those five items see section <a href="r3_3.html#r3_3_2">Language 
 <tr valign="top">
 <td width="33%">
 <code><a href="r3_3.html#r3_3_2_7_1">warning</a></code><br>
-<code><a href="r3_4.html#r3_4_7_5_5">warp</a></code><br>
-<code><a href="r3_4.html#r3_4_5_1_5">water_level</a></code><br>
+<code><a href="r3_6.html#r3_6_2_5_5">warp</a></code><br>
+<code><a href="r3_5.html#r3_5_1_1_5">water_level</a></code><br>
 </td>
 <td width="33%">
-<code><a href="r3_4.html#r3_4_7_1_29">waves</a></code><br>
+<code><a href="r3_6.html#r3_6_2_1_29">waves</a></code><br>
 <code><a href="r3_3.html#r3_3_2_6_5">while</a></code><br>
-<code><a href="r3_4.html#r3_4_3_5">width</a></code><br>
+<code><a href="r3_7.html#r3_7_1_5">width</a></code><br>
 </td>
 <td width="33%">
-<code><a href="r3_4.html#r3_4_7_1_30">wood</a></code><br>
-<code><a href="r3_4.html#r3_4_7_1_31">wrinkles</a></code><br>
+<code><a href="r3_6.html#r3_6_2_1_30">wood</a></code><br>
+<code><a href="r3_6.html#r3_6_2_1_31">wrinkles</a></code><br>
 <code><a href="r3_3.html#r3_3_2_3_4">write</a></code><br>
 </td>
 </tr>
@@ -1256,11 +1300,9 @@ For details on those five items see section <a href="r3_3.html#r3_3_2">Language 
 <a name="r3_3_1_3"></a>
 <div class="content-level-h4" contains="Identifiers" id="r3_3_1_3">
 <h4>3.3.1.3 Identifiers</h4>
-<p>POV-Ray allows you to define identifiers for later use in the scene file.
-An identifier may be 1 to 40 characters long. It may consist of upper and
-lower case letters, the digits 0 through 9 or an underscore character
-(&quot;_&quot;). The first character must be an alphabetic character. The
-declaration of identifiers is covered later.</p>
+<p>POV-Ray allows you to define identifiers for later use in the scene file. An identifier must be at least one characters long. It may consist of upper and lower case letters, the digits 0 through 9 or an underscore character (&quot;_&quot;). The first character must be an alphabetic character. See also: <a href="r3_3.html#r3_3_2_2_1">Declaring Identifiers</a></p>
+
+<p class="Note"><strong>Note:</strong> In previous versions identifier names <em>were</em> limited to 40 characters. There has been a <font class="Change">Change</font> removing that restriction.</p>
 
 <p>All <a href="r3_3.html#r3_3_1_2">keywords</a> (reserved words) are fully lower case. Therefore it is recommended that
 your identifiers contain at least one upper case character so it is sure to
@@ -1385,7 +1427,7 @@ FLOAT_FUNCTION:
 FLOAT_BUILT_IN_IDENT:
   clock | clock_delta | clock_on | false | final_clock |
   final_frame | frame_number | image_height | image_width |
-  initial_clock | initial_frame | no | off | on | pi | true |
+  initial_clock | initial_frame | no | now | off | on | pi | true |
   version | yes
 FULL_EXPRESSION:
   FLOAT |
@@ -1647,7 +1689,7 @@ expressions.<code>O</code> is an object identifier to a pre-declared object.</p>
 
 <p><code>exp(A)</code><br>Exponential of <code>A</code>. Returns the value of <em> e</em> raised to the power <code>A</code> where <em>e</em> is the base of the natural logarithm, i.e. the non-repeating value approximately equal to 2.71828182846.</p>
 
-<p><code>file_exists(S)</code><br>Attempts to open the file specified by the string <code>S</code>. The current directory and all library directories specified by the <code>Library_Path</code> or <code>+L</code> options are also searched. See <a href="r3_2.html#r3_2_5_4">Library Paths</a> for details. Returns <code>1</code> if successful and <code>0</code> if unsuccessful.</p>
+<p><code>file_exists(S)</code><br>Attempts to open the file specified by the string <code>S</code>. The current directory and all library directories specified by the <code>Library_Path</code> or <code>+L</code> options are also searched. See <a href="r3_2.html#r3_2_5_3">Library Paths</a> for details. Returns <code>1</code> if successful and <code>0</code> if unsuccessful.</p>
 
 <p><code>floor(A)</code><br>Floor of <code>A</code>. Returns the largest integer less than <code>A</code>. Rounds down to the next lower integer.</p>
 
@@ -1728,12 +1770,13 @@ select (A, -1, 1)        //returns  -1 -1 1 1 1
 <p>Constants are:</p>
 <pre>
 FLOAT_BUILT_IN_IDENT:
-  false | no | off | on | pi | true | yes
+  false | no | off | on | pi | tau | true | yes
 </pre>
 <p>The built-in constants never change value. They are defined as though
 the following lines were at the start of every scene.</p>
 <pre>
 #declare pi = 3.1415926535897932384626;
+#declare tau = 6.2831853071795864769253;
 #declare true = 1;
 #declare yes = 1;
 #declare on = 1;
@@ -1748,7 +1791,11 @@ on</code>, <code>off</code>, <code>yes</code>, <code>no</code>, <code>
 true</code>, and <code>false</code> are designed for use as boolean
 constants.</p>
 
-<p>The built-in float constants <code>on</code>, <code>off</code>, <code>yes</code>, <code>no</code>, <code>true</code>, and <code>false</code> are most often used as boolean values with object modifiers or parameters such as <code><a href="r3_4.html#r3_4_5_5_11">sturm</a></code>, <code><a href="r3_4.html#r3_4_5_5_4">hollow</a></code>, <code><a href="r3_4.html#r3_4_5_1_1">hierarchy</a></code>, <code><a href="r3_4.html#r3_4_5_1_5">smooth</a></code>, <code><a href="r3_4.html#r3_4_4_1_11">media_attenuation</a></code>, and <code><a href="r3_4.html#r3_4_4_1_10">media_interaction</a></code>. Whenever you see syntax of the form <code>keyword</code> <em><code>[Bool]</code></em>, if you simply specify the keyword without the optional boolean then it assumes <code>keyword on</code>. You need not use the boolean but for readability it is a good idea. You must use one of the false booleans or an expression which evaluates to zero to turn it off.</p>
+<p><font class="New">New</font> in version 3.7.1 the <code><a href="http://en.wikipedia.org/wiki/Turn_%28geometry%29#Tau_proposal">tau</a></code>
+constant can be used as a more convenient and intuitive alternative to <code>2*pi</code>
+to express a full (360 degrees) turn in radians.</p>
+
+<p>The built-in float constants <code>on</code>, <code>off</code>, <code>yes</code>, <code>no</code>, <code>true</code>, and <code>false</code> are most often used as boolean values with object modifiers or parameters such as <code><a href="r3_5.html#r3_5_1_5_11">sturm</a></code>, <code><a href="r3_5.html#r3_5_1_5_4">hollow</a></code>, <code><a href="r3_5.html#r3_5_1_1_1">hierarchy</a></code>, <code><a href="r3_5.html#r3_5_1_1_5">smooth</a></code>, <code><a href="r3_4.html#r3_4_3_1_11">media_attenuation</a></code>, and <code><a href="r3_4.html#r3_4_3_1_10">media_interaction</a></code>. Whenever you see syntax of the form <code>keyword</code> <em><code>[Bool]</code></em>, if you simply specify the keyword without the optional boolean then it assumes <code>keyword on</code>. You need not use the boolean but for readability it is a good idea. You must use one of the false booleans or an expression which evaluates to zero to turn it off.</p>
 <p class="Note"><strong>Note:</strong> Some of these keywords are <code>on</code> by default, if no keyword is specified.</p>
 <p>For example:</p>
 <pre>
@@ -1890,11 +1937,24 @@ image_map {
   }
 </pre>
 
-<p><code>version</code></p>
+<p>Miscellaneous are:</p>
 <pre>
 FLOAT_BUILT-IN_IDENT:
-  version
+  now | version
 </pre>
+
+<p>The built-in float variable <code>now</code> returns a value specifying
+the current date and time, given in days since 2000-01-01 00:00:00 GMT, at
+a precision of seconds or better.
+<p>
+Among other things, this variable is primarily intended to be used in the following constructs:</p>
+<pre>
+#local CurrentTime = datetime(now); // current date and time as a string
+#local Random = seed(now*24*60*60); // get a different random sequence for each render
+</pre>
+
+<p class="Note"><strong>Note:</strong> The value of this variable changes over time
+as parsing progresses.</p>
 
 <p>The built-in float variable <code>version</code> contains the current
 setting of the version compatibility option. Although this value defaults to
@@ -1906,17 +1966,29 @@ from an earlier version of POV-Ray.</p>
 <p>
 The INI option or switch only affects the initial setting. Unlike other built-in identifiers, you may change the value of <code>version</code> throughout a scene file. You do not use <code>#declare</code> to change it though. The <code><a href="r3_3.html#r3_3_2_5">#version</a></code> language directive is used to change modes. Such changes may occur several times within scene files.</p>
 <p>
-Together with the built-in <code>version</code> identifier the <code>#version</code> directive allows you to save and restore the previous values of this compatibility setting. The new <code>#local</code> identifier option is especially useful here. For example suppose <code>mystuff.inc</code> is in <em>version 1</em> format. At the top of the file you could put:</p>
+Together with the built-in <code>version</code> identifier the <code>#version</code> directive allows you to save and restore the previous values of this compatibility setting. The new <code>#local</code> identifier option is especially useful here. For example suppose <code>mystuff.inc</code> is in <em>version 3.5</em> format. At the top of the file you could put:</p>
 <pre>
 #local Temp_Vers = version;  // Save previous value
-#version 1.0;                // Change to 1.0 mode
-...                          // Version 1.0 stuff goes here...
+#version 3.5;                // Change to 3.5 mode
+...                          // Version 3.5 stuff goes here...
 #version Temp_Vers;          // Restore previous version
 </pre>
 
 <p class="Note"><strong>Note:</strong> There should be a semi-colon after the
 float expression in a <code>#version</code> directive. If omitted, it generates
-a warning and some macros may not work properly.</p></div>
+a warning and some macros may not work properly.</p>
+
+<p class="Note"><strong>Note:</strong> As of POV-Ray 3.7, the version compatibility option
+defaults to 3.62 rather than the actual software version. However, in POV-Ray 3.7.0,
+<code>version</code> defaults to the actual software version. This is a <font class="Change">Change</font> in
+POV-Ray 3.7.1 so that <code>version</code> generally reflects the version compatibility option
+even in the default case, except when used inside the very first <code>#version</code>
+statement where it still defaults to the actual software version. Therefore, to identify
+POV-Ray version 3.7.1 or higher, you will need to start your scene file with the following
+construct:</p>
+<pre>
+#version version;
+</pre></div>
 
 <a name="r3_3_1_6"></a>
 <div class="content-level-h4" contains="Vector Expressions" id="r3_3_1_6">
@@ -1943,9 +2015,7 @@ The syntax for combining vector literals into vector expressions is almost
 identical to the rules for float expressions. In the syntax for vector
 expressions below, some of the syntax items are defined in the section for
 float expressions. See <a href="r3_3.html#r3_3_1_5">Float Expressions</a> for those definitions.
-Detailed explanations of vector-specific issues are given in the following
-
-sub-sections.</p>
+Detailed explanations of vector-specific issues are given in the following sub-sections.</p>
 <pre>
 VECTOR:
     NUMERIC_TERM [SIGN NUMERIC_TERM]
@@ -2089,7 +2159,7 @@ vector in various limited places such as <code>scale</code> and <code>
 turbulence</code>. However you may now use this trick anywhere. For
 example...</p>
 <pre>
-box{0,1}     // Same as box{&lt;0,0,0&gt;,&lt;1,1,1&gt;}
+box{0,1}    // Same as box{&lt;0,0,0&gt;,&lt;1,1,1&gt;}
 sphere{0,1} // Same as sphere{&lt;0,0,0&gt;,1}
 </pre>
 
@@ -2120,7 +2190,7 @@ vector; and <code>F</code> is any float expression.</p>
 
 <p><code>min_extent(OBJECT_IDENTIFIER), max_extent(OBJECT_IDENTIFIER)</code>.
 The <code>min_extent</code> and <code>max_extent</code> return the
-minimum and maximum coordinates of a #declared object's bounding box (Corner1
+minimum and maximum coordinates of a <em>declared</em> object's bounding box (Corner1
 and Corner2), in effect allowing you to find the dimensions and location of the object.</p>
 
 <p class="Note"><strong>Note:</strong> This is not perfect, in some cases (such as CSG intersections and
@@ -2145,26 +2215,42 @@ box {
 </pre>
 
 <p>As of version 3.7 experimental support for reading the pixel resolution of an image map was added. This is done by giving an image map pigment identifier to <code>max_extent()</code>, which will then return the resolution of the image map as the x and y values of the returned vector.</p>
+
 <p>One usage of this feature would be when using an image as a background matte.</p>
+
 <p>Example:</p>
 <pre>
 #declare MatteImage =
 pigment {
   image_map {
     jpeg "YourImage.jpg"
-    once
     }
-  };
+  }
 
 #declare Resolution = max_extent ( MatteImage );
 
-box { 0, Resolution
-  pigment { MatteImage  }
-  // avoid the scale by warning (z direction)
-  #declare Resolution = Resolution + &lt;0, 0, 1&gt;;
-  // some scale factor to fit your needs
-  scale Resolution*ScaleFactor
+#declare MatteNormalizationScale =
+<min(1,Resolution.x/Resolution.y),
+ min(1,Resolution.y/Resolution.x),1>;
+
+box { 0, <1,1,0.001
+  pigment { MatteImage }
+  scale MatteNormalizationScale // Fit matte to unit square
+  scale MatteSceneScale // Size matte for scene
   }
+</pre>
+
+<p><font class="New">New</font> in version 3.7.1 this functionality has been extended to support <strong><em>both</em></strong> normal maps and density files.</p>
+
+<p>To fit a df3 with unequal x,y,z ranges inside unit cube without distortion, the set up for the scaling variable is as follows:</p>
+
+<pre>
+#declare Density0 = density { density_file df3 "A20x30x40.df3" interpolate 0 }
+#declare Df3MapRange = max_extent(Density0);
+#declare Df3NormalizationScale =
+<min(1,Df3MapRange.x/max(Df3MapRange.y,Df3MapRange.z)),
+ min(1,Df3MapRange.y/max(Df3MapRange.x,Df3MapRange.z)),
+ min(1,Df3MapRange.z/max(Df3MapRange.x,Df3MapRange.y))>;
 </pre> 
 <p><code>trace(OBJECT_IDENTIFIER, A, B, [VECTOR_IDENTIFIER])</code>.
 <code>trace</code> helps you finding the exact location of a ray intersecting
@@ -2292,7 +2378,30 @@ translate &lt;5,0,0&gt;   // This is less obvious.
 Similarly <code>u</code> and <code>v</code> may be used in 2D vectors. When
 using 4D vectors you should use <code>x</code>, <code>y</code>, <code>
 z</code>, and <code>t</code> and POV-Ray will promote <code>x</code>, <code>
-y</code>, and <code>z</code> to 4D when used where 4D is required.</p></div>
+y</code>, and <code>z</code> to 4D when used where 4D is required.</p>
+
+</div>
+<a name="r3_3_1_6_7"></a>
+<div class="content-level-h5" contains="Dot Item Access for Vectors" id="r3_3_1_6_7">
+<h5>3.3.1.6.7 Dot Item Access for Vectors</h5>
+<p>POV-Ray provides an easy method to access the individual components of different types of <em>vector</em> expressions, as illustrated in the following code examples:</p>
+<pre>
+#declare Vector = &lt;1, 2&gt;;
+#declare First_Component = Vector.u;
+#declare Second_Component = Vector.v;
+
+#declare Vector = &lt;1, 2, 3&gt;;
+#declare First_Component = Vector.x;
+#declare Second_Component = Vector.y;
+#declare Third_Component = Vector.z;
+
+#declare Vector = &lt;1, 2, 3, 4&gt;;
+#declare First_Component = Vector.x;
+#declare Second_Component = Vector.y;
+#declare Third_Component = Vector.z;
+#declare Fourth_Component = Vector.t;
+</pre>
+<p>See also: <a href="r3_3.html#r3_3_1_7_6">Dot Item Access for Colors</a>.</p></div>
 
 <a name="r3_3_1_7"></a>
 <div class="content-level-h4" contains="Color Expressions" id="r3_3_1_7">
@@ -2531,7 +2640,7 @@ the blue, filter and transmit components are not explicitly specified, they
 exist and are set to their default values of 0. The component keywords may be
 given in any order and if any component is unspecified its value defaults to
 zero. A <em>COLOR_IDENTIFIER</em> can also be specified but it should always
-be first in the group. See <a href="r3_3.html#r3_3_1_7_6">Common Color Pitfalls</a> for details.</p>
+be first in the group. See <a href="r3_3.html#r3_3_1_7_7">Common Color Pitfalls</a> for details.</p>
 
 </div>
 <a name="r3_3_1_7_4"></a>
@@ -2591,8 +2700,31 @@ color vector.</p>
 
 </div>
 <a name="r3_3_1_7_6"></a>
-<div class="content-level-h5" contains="Common Color Pitfalls" id="r3_3_1_7_6">
-<h5>3.3.1.7.6 Common Color Pitfalls</h5>
+<div class="content-level-h5" contains="Dot Item Access for Colors" id="r3_3_1_7_6">
+<h5>3.3.1.7.6 Dot Item Access for Colors</h5>
+<p>POV-Ray provides an easy method to access the individual components of different types of <em>color</em> expressions, as illustrated in the following code examples:</p>
+<pre>
+#declare Color = &lt;1, 2, 3&gt;;
+#declare First_Component = Color.red;
+#declare Second_Component = Color.green;
+#declare Third_Component = Color.blue;
+
+#declare Color = &lt;1, 2, 3, 4, 5&gt;;
+#declare First_Component = Color.red;
+#declare Second_Component = Color.green;
+#declare Third_Component = Color.blue;
+#declare Fourth_Component = Color.filter;
+#declare Fifth_Component = Color.transmit;
+
+#declare Color = &lt;0.89, 0.47, 0.2&gt;;
+#declare Gray_Value = Color.gray;
+</pre>
+<p>See also: <a href="r3_3.html#r3_3_1_6_7">Dot Item Access for Vectors</a>.</p>
+
+</div>
+<a name="r3_3_1_7_7"></a>
+<div class="content-level-h5" contains="Common Color Pitfalls" id="r3_3_1_7_7">
+<h5>3.3.1.7.7 Common Color Pitfalls</h5>
 <p>The variety and complexity of color specification methods can lead to some
 common mistakes. Here are some things to consider when specifying a
 color.</p>
@@ -2658,7 +2790,7 @@ a float where a color is needed. For example:</p>
 finish { ambient 1 }
 </pre>
 
-<p>The <a href="r3_4.html#r3_4_6_3_1">ambient</a> keyword expects a color so the value <code>1</code> is
+<p>The <a href="r3_6.html#r3_6_1_3_1">ambient</a> keyword expects a color so the value <code>1</code> is
 promoted to <code>&lt;1,1,1,1,1&gt;</code> which is no problem. However</p>
 <pre>
 pigment { color 0.4 }
@@ -2853,9 +2985,9 @@ cannot pass function variables to the macros.</p>
 Foo(FUNC, 1)
 
 #debug str(Y,5,5)
-#debug &quot;n&quot;
+#debug &quot;\n&quot;
 #debug str(Z,5,5)
-#debug &quot;n&quot;
+#debug &quot;\n&quot;
 </pre>
 
 </div>
@@ -2994,13 +3126,14 @@ You may use every valid <code>pigment</code>. This is a very simple example:</p>
 
 <p class="Note"><strong>Note:</strong> The number of parameters of special function types is determined
 automatically, so you do not need to specify parameter names.</p>
+
 </div>
 <a name="r3_3_1_8_6"></a>
 <div class="content-level-h5" contains="Internal Pre-Defined Functions" id="r3_3_1_8_6">
 <h5>3.3.1.8.6 Internal Pre-Defined Functions</h5>
 <p>Several functions are pre-defined. These internal functions can be accessed through
 the <code>functions.inc</code>, so it should be included in your scene. The number of required parameters and what they control are also given in the include
-file. See the <a href="r3_4.html#r3_4_9_1_7">functions.inc</a> chapter in the Standard Include File section gives more information.</p></div>
+file. See the <a href="r3_8.html#r3_8_1_1_8">functions.inc</a> chapter in the Standard Include File section gives more information.</p></div>
 
 <a name="r3_3_1_9"></a>
 <div class="content-level-h4" contains="Strings" id="r3_3_1_9">
@@ -3077,9 +3210,19 @@ that it cannot find the font file <em>c:windowsontslucon.ttf</em>.</p>
   text { ttf DisplayFont &quot;Hello&quot;, 2,0 translate y*1.50 }
 </pre>
 
+However, as POV-Ray for Windows also supports forward slashes as path separator,
+it is recommended to use the following form:
+
+<pre>
+#declare DisplayFont = &quot;c:/windows/fonts/lucon.ttf&quot;
+  text { ttf DisplayFont &quot;Hello&quot;, 2,0 translate y*1.50 }
+</pre>
+
 <p>The escaping of backslashes occurs in all POV-Ray string literals. There are also
 other formatting codes such as <code>\n</code> for new line.
 See <a href="r3_3.html#r3_3_2_7_2">Text Formatting</a> for details.</p>
+
+<p class="Note"><strong>Note:</strong> Up to (and including) version 3.7.0, contrary to the documentation (and on all platforms) backslashes lost their special meaning where a file name is expected, except when preceding a double quote. For backward compatibility, this behaviour is still retained for scenes specifying a <code>#version</code> of 3.70 or lower, but a warning will be issued.</p>
 
 </div>
 <a name="r3_3_1_9_2"></a>
@@ -3203,13 +3346,13 @@ concat(&quot;Value is &quot;, str(A,3,1), &quot; inches&quot;)
 <p>If the float value <code>A</code> was <code>12.34321</code> the result is
 &quot;<code>Value is 12.3 inches</code>&quot;, which is a string.</p>
 
-<p><code>datetime()</code> Can be used to return the date and time. It's syntax is:</p>
+<p><code>datetime()</code> Can be used to return the string representation of a date and time. It's syntax is:</p>
 
 <pre>
 datetime(FLOAT [,STRING])
 </pre>
 
-<p>when FLOAT uses the keyword <code>now</code> it will return a string which evaluates to the time elapsed since 2000-01-01, 00:00:00 GMT in days, with a precision of seconds or better. For example:</p>
+<p>where FLOAT is the time elapsed since 2000-01-01, 00:00:00 GMT in days. Note that this fits with the <code>now</code> keyword, so the following example will give you a string representation of the current date and time:</p>
 
 <pre>
 datetime(now)
@@ -3315,14 +3458,14 @@ STRING_BUILT-IN_IDENT:
 <a name="r3_3_1_10"></a>
 <div class="content-level-h4" contains="Array" id="r3_3_1_10">
 <h4>3.3.1.10 Array</h4>
-<p>You may declare arrays of identifiers of up to five dimensions. Any
-item that can be declared as an identifier can be declared in an array.</p>
+<p>You may declare arrays of identifiers with up to five dimensions. Any item that can be declared as an identifier can be declared in an array. Consequential to the improvements with the classic <code>array</code> container topology, a <font class="New">New</font> feature in version 3.7.1 extended functionality to allow the creation of <code>dictionary</code> container types. Dictionaries can be used for mapping string keys to arbitrary-type values.</p>
 
 </div>
 <a name="r3_3_1_10_1"></a>
 <div class="content-level-h5" contains="Declaring Arrays" id="r3_3_1_10_1">
 <h5>3.3.1.10.1 Declaring Arrays</h5>
-<p>The syntax for declaring an array is as follows:</p>
+<p>The syntax is as follows:</p>
+
 <pre>
 ARRAY_DECLARATION:
   #declare IDENTIFIER = array[ INT ][[ INT ]]..[ARRAY_INITIALIZER] |
@@ -3331,23 +3474,32 @@ ARRAY_INITIALIZER:
   {ARRAY_ITEM, [ARRAY_ITEM, ]... }
 ARRAY_ITEM:
   RVALUE | ARRAY_INITIALIZER
+DICTIONARY_DECLARATION:
+  #declare IDENTIFIER = dictionary; | #local IDENTIFIER = dictionary;
+  #declare IDENTIFIER = dictionary DICTIONARY_INITIALIZER |
+  #local IDENTIFIER = dictionary DICTIONARY_INITIALIZER
+DICTIONARY_INITIALIZER:
+  {DICTIONARY_ITEM, [DICTIONARY_ITEM, ]... }
+DICTIONARY_ITEM:
+  ["STRING"]: DICTIONARY_ENTRY | .STRING_IDENTIFIER: DICTIONARY_ENTRY
+DICTIONARY_ENTRY:
+  Any valid array entry
 </pre>
 
-<p>Where IDENTIFIER is the name of the identifier up to 40 characters long
-and INT is a valid float expression which is internally truncated to an
-integer which specifies the size of the array. The optional <em>
-ARRAY_INITIALIZER</em> is discussed in the next section <a href="r3_3.html#r3_3_1_10_2">Array Initializers</a>.
-Here is an example of a one-dimensional, uninitialized array.</p>
+<p>Where IDENTIFIER is the name of the identifier and INT is a valid float expression, internally truncated to an integer, and used to specify the size of the array.</p>
+
+<p class="Note"><strong>Note:</strong> In previous versions IDENTIFIER names <em>were</em> limited to 40 characters. There has been a <font class="Change">Change</font> removing that restriction.</p>
+
+<p>See <a href="r3_3.html#r3_3_1_10_2">Array Initializers</a> for more about the optional <em>ARRAY_INITIALIZER</em> parameter.</p>
+
+<p>Consider the following example of a one-dimensional, uninitialized array:</p>
+
 <pre>
 #declare MyArray = array[10]
 </pre>
 
-<p>This declares an uninitialized array of ten elements. The elements are
-referenced as <code>MyArray[0]</code> through <code>MyArray[9]</code>. As
-yet, the type of the elements are undetermined. Once you have initialized any
-element of the array, all other elements can only be defined as that type. An
-attempt to reference an uninitialized element results in an error. For
-example:</p>
+<p>It declares an uninitialized array of ten elements. The elements are referenced as <code>MyArray[0]</code> through <code>MyArray[9]</code>. As yet, the type of the elements are undetermined. Once you have initialized any element of the array, all other elements can only be defined as that type. Any attempt to reference an uninitialized element results in an error. More below:</p>
+
 <pre>
 #declare MyArray = array[10]
 #declare MyArray[5] = pigment{White}     //all other elements must 
@@ -3356,17 +3508,14 @@ example:</p>
 #declare Thing = MyArray[4]              //error: uninitialized array element
 </pre>
 
-<p>Multi-dimensional arrays up to five dimensions may be declared. For
-example:</p>
+<p>Multi-dimensional arrays up to five dimensions may be declared. This example ... </p>
+
 <pre>
 #declare MyGrid = array[4][5]
 </pre>
 
-<p>declares a 20 element array of 4 rows and 5 columns. Elements are
-referenced from <code>MyGrid[0][0]</code> to <code>MyGrid[3][4]</code>.
-Although it is permissible to reference an entire array as a whole, you may
-not reference just one dimension of a multi-dimensional array. For
-example:</p>
+<p>... declares a 20 element array of 4 rows and 5 columns. Elements are referenced from <code>MyGrid[0][0]</code> to <code>MyGrid[3][4]</code>. Although it is permissible to reference an entire array as a whole, you may not reference just one dimension of a multi-dimensional array.</p>
+
 <pre>
 #declare MyArray = array[10]
 #declare MyGrid = array[4][5]
@@ -3374,34 +3523,82 @@ example:</p>
 #declare YourGrid = MyGrid    //so is this
 #declare OneRow  = MyGrid[2]  //this is illegal
 </pre>
-<p>The <code><a href="r3_3.html#r3_3_2_6_2">#ifdef</a></code> and <code><a href="r3_3.html#r3_3_2_6_2">#ifndef</a></code> directives can be used to check whether a specific element of an array has been declared. For methods to determine the size of an array look in the float section for <code><a href="r3_3.html#r3_3_1_5_4">dimensions</a></code> and
-<code><a href="r3_3.html#r3_3_1_5_4">dimension_size</a></code>.</p>
 
-<p>Large uninitialized arrays do not take much memory. Internally they are
-arrays of pointers so they probably use just 4 bytes per element. Once
-initialized with values, they consume memory depending on what you put in
-them.</p>
-<p>
-The rules for local vs. global arrays are the same as any other identifier.</p>
+<p>The <code><a href="r3_3.html#r3_3_2_6_2">#ifdef</a></code> and <code><a href="r3_3.html#r3_3_2_6_2">#ifndef</a></code> directives can be used to check whether a specific element of an array has been declared. See also: <code><a href="r3_3.html#r3_3_1_5_4">dimensions</a></code> and <code><a href="r3_3.html#r3_3_1_5_4">dimension_size</a></code> for additional information about the methods used to determine the size of arrays.</p>
+
+<p>Large uninitialized arrays do not take much memory. Internally they are arrays of pointers so they probably use just 8 bytes per element. Once initialized with values, they consume memory depending on what they contain.</p>
+
+<p>The rules for <em>local</em> vs <em>global</em> arrays are the same as any other identifier.</p>
+
 <p class="Note"><strong>Note:</strong> This applies to the entire array. You cannot mix local and global
-elements in the same array. See <a href="r3_3.html#r3_3_2_2_2">#declare vs. #local</a> for
-information on identifier scope.</p>
+elements in the same array. See <a href="r3_3.html#r3_3_2_2_2">#declare vs. #local</a> for information on identifier scope.</p>
+
 <p>Any legitimate use of the <code>#declare</code> directive can also be put into an array. In other words, you can also create multidimensional arrays by making an array of arrays.</p>
+
+<p><font class="New">New</font> to version 3.7.1 points to also consider:</p>
+<ul>
+  <li>Array elements no longer have to be all of the same type. However, be aware that mixing elements of different types will increase memory consumption. That increased memory footprint will not revert even if the array is later set to elements all of the same type.</li>
+  <li>An array can be declared without specifying any dimensions; in this case the array will be one-dimensional and be able to grow in size dynamically.</li>
+  <li>Accessing an element beyond the nominal size of such an array will automatically increase the nominal size just enough to include that element.</li>
+  <li>The memory footprint may be <em>twice</em> as high than required for the current nominal size.</li>
+  <li>Growth of such an array is triggered by <em>any</em> access to an element beyond the nominal size, this includes tests such as <code>#ifdef(ARRAY[INDEX])</code>.</li>
+  <li>The following applies to <code>dictionary</code> containers <em>only</em>:</li>
+    <ul>
+      <li>When using <em>square bracket notation</em> the keys do not necessarily have to be string literals, they can also be arbitrary string expressions.</li>
+      <li>If using <em>dot notation</em> the indices must follow the generic rules for identifiers.</li>
+      <li>Included are the two <em>pseudo-dictionaries</em> <code>local</code> and <code>global</code> they represent the <em>most local</em> and the <em>least local</em> or global identifiers respectively.</li>
+    </ul>
+</ul>
+
+<p>Additional usage examples are as follows:</p>
+
+<pre>
+// create an empty dictionary
+#declare Fnord = dictionary;
+
+// create a dictionary with elements
+#declare Fnord = dictionary {
+  ["Foo"]: 42,
+  ["Bar"]: sphere { &lt;0,0,0&gt;, 1 }
+}
+
+// alternative
+#declare Fnord = dictionary {
+  .Foo: 42,
+  .Bar: sphere { &lt;0,0,0&gt;, 1 }
+}
+
+// access a dictionary element
+#declare Fnord["Foo"] = 42;
+#declare Answer = Fnord["Foo"];
+
+// alternative
+#declare Fnord.Foo = 42;
+#declare Answer = Fnord.Foo;
+
+// test whether a dictionary contains a particular key
+#ifdef (Fnord["Foo"]) ... #end
+#declare FooKeyExists = defined(Fnord.Foo);
+
+// remove a key from a dictionary
+#undef Fnord["Foo"];
+
+// declare a local and un-define any global variable of same name
+#declare local.Foo = 4711;
+#undef global.Foo;
+</pre>
 
 </div>
 <a name="r3_3_1_10_2"></a>
 <div class="content-level-h5" contains="Array Initializers" id="r3_3_1_10_2">
 <h5>3.3.1.10.2 Array Initializers</h5>
-<p>Because it is cumbersome to individually initialize the elements of an
-array, you may initialize it as it is created using array initializer syntax.
-For example:</p>
+<p>Because it can be cumbersome to individually initialize the elements of an array, you may initialize it as it is created using <code>array</code> initializer syntax.</p>
 <pre>
 #include &quot;colors.inc&quot;
 #declare FlagColors = array[3] {Red,White,Blue}
 </pre>
 
-<p>Multi-dimensional arrays may also be initialized this way. For
-example:</p>
+<p>Multi-dimensional arrays may also be initialized this way.</p>
 <pre>
 #declare Digits =
 array[4][10] {
@@ -3412,8 +3609,7 @@ array[4][10] {
   }
 </pre>
 
-<p>The commas are required between elements and between dimensions as shown
-in the example.</p></div>
+<p>The commas are required between elements and between dimensions as shown in the example.</p></div>
 
 <a name="r3_3_1_11"></a>
 <div class="content-level-h4" contains="Spline" id="r3_3_1_11">
@@ -3741,7 +3937,7 @@ exception was the <code> #include</code> which could appear anywhere. Now that a
 <p class="Note"><strong>Note:</strong> If you ever intend to distribute any source files you make for POV-Ray, remember that some operating systems have case-sensitive file names).</p>
 
 <p>It is typical to put standard include files in a special sub-directory. POV-Ray can only read files in the current directory or one referenced by the <code>Library_Path</code> option or <code>+L</code> switch. See the section
-<a href="r3_2.html#r3_2_5_4">Library Paths</a>.</p>
+<a href="r3_2.html#r3_2_5_3">Library Paths</a>.</p>
 
 <p>You may use the <code><a href="r3_3.html#r3_3_2_2">#local</a></code> directive to declare identifiers which are temporary in duration and local to the include file in scope. For details see <a href="r3_3.html#r3_3_2_2_2">#declare vs. #local</a>.</p></div>
 
@@ -3753,6 +3949,7 @@ exception was the <code> #include</code> which could appear anywhere. Now that a
 readable and to parameterize scenes so that changing a single declaration
 changes many values. There are several built-in identifiers which POV-Ray
 declares for you. See the sections: <a href="r3_3.html#r3_3_1_5_6">Built-in Variables</a> and <a href="r3_3.html#r3_3_1_5_5">Built-in Vector Identifiers</a> for details.</p>
+
 </div>
 <a name="r3_3_2_2_1"></a>
 <div class="content-level-h5" contains="Declaring identifiers" id="r3_3_2_2_1">
@@ -3770,11 +3967,10 @@ RVALUE:
   SKY_SPHERE | TRANSFORM
 </pre>
 <p class="Note"><strong>Note:</strong> See the section on <a href="r3_3.html#r3_3_2_2_5">Deprecation Support</a> for more information</p>
-<p>Where <em>IDENTIFIER</em> is the name of the identifier up to 40
-characters long and <em>RVALUE</em> is any of the listed items. They are
-called that because they are values that can appear to the <em>right</em> of
-the equals sign. The syntax for each is in the corresponding section of this
-language reference. Here are some examples.</p>
+<p>Where <em>IDENTIFIER</em> is the name of the identifier that is at least one character long and <em>RVALUE</em> is any of the listed items.</p>
+<p>The syntax for each is in the corresponding section of this language reference.</p>
+<p class="Note"><strong>Note:</strong> In previous versions identifier names <em>were</em> limited to 40 characters. There has been a <font class="Change">Change</font> removing that restriction.</p>
+<p>Here are some examples.</p>
 <pre>
 #declare Rows = 5;
 #declare Count = Count+1;
@@ -3794,13 +3990,8 @@ object {
   }
 </pre>
 
-<p class="Note"><strong>Note:</strong> There should be a semi-colon after the expression in all float,
-vector and color identifier declarations. This semi-colon is introduced in POV-Ray
-version 3.1. If omitted, it generates a warning and some macros may not work
-properly. Semicolons after other declarations are optional.</p>
-<p>
-Declarations, like most language directives, can appear almost anywhere in the file
-- even within other statements. For example:</p>
+<p class="Note"><strong>Note:</strong> There should be a semi-colon after the expression in all float,vector and color identifier declarations. This semi-colon is introduced in POV-Ray version 3.1. If omitted, it generates a warning and some macros may not work properly. Semicolons after other declarations are optional.</p>
+<p>Declarations, like most language directives, can appear almost anywhere in the file, even within other statements. For example:</p>
 <pre>
 #declare Here=&lt;1,2,3&gt;;
 #declare Count=0;               // initialize Count
@@ -3813,23 +4004,66 @@ Declarations, like most language directives, can appear almost anywhere in the f
     }
 </pre>
 
-<p>As this example shows, you can re-declare an identifier and may use
-previously declared values in that re-declaration.</p>
-<p class="Note"><strong>Note:</strong> Object identifiers use the generic wrapper statement <code>
-object{</code> ... <code>}</code>. You do not need to know what kind of
-object it is.</p>
-<p>
-Declarations may be nested inside each other within limits. In the example
-in the previous section you could declare the entire union as a object.
-However for technical reasons there are instances where you may not use any
-language directive inside the declaration of floats, vectors or color
-expressions. Although these limits have been loosened somewhat since POV-Ray
+<p>As this example shows, you can re-declare an identifier and may use previously declared values in that re-declaration.</p>
+<p class="Note"><strong>Note:</strong> Object identifiers use the generic wrapper statement <code>object{</code> ... <code>}</code>. You do not need to know what kind of object it is.</p>
+<p>Declarations may be nested inside each other within limits. In the example in the previous section you could declare the entire union as a object. However for technical reasons there are instances where you may not use any language directive inside the declaration of floats, vectors or color expressions. Although these limits have been loosened somewhat since POV-Ray
 3.1, they still exist.</p>
-<p>
-Identifiers declared within <code><a href="r3_3.html#r3_3_2_8_1">#macro</a></code> ...
-<code><a href="r3_3.html#r3_3_2_6_1">#end</a></code> blocks are not created at the time the macro is defined. They are only created at the time the macro is 
-actually invoked. Like all other items inside such a #macro definition, 
-they are ignored when the macro is defined.</p>
+<p>Identifiers declared within <code><a href="r3_3.html#r3_3_2_8_1">#macro</a></code> ...
+<code><a href="r3_3.html#r3_3_2_6_1">#end</a></code> blocks are not created at the time the macro is defined. They are only created at the time the macro is actually invoked. Like all other items inside such a <code>#macro</code> definition, they are ignored when the macro is defined.</p>
+
+<p>To help simplify passing multiple values out of a macro <font class="New">New</font> tuple-style syntax extensions have been added to the <code>#declare</code> and <code>#local</code> directives:</p>
+
+<pre>
+#declare ( ID1, ID2, ...) = ( EXPR1, EXPR2, ... );
+
+//This statement is fully equivalent to:
+#declare ID1 = EXPR1;
+#declare ID1 = EXPR2;
+</pre>
+
+<p class="Note"><strong>Note:</strong> This equivalence holds true even for constructs like <code>#declare (A,B) = (B,A);</code> which does <em>not</em> swap the contents of A and B as you might expect. The terminating semicolon is <strong><em>optional</em></strong>.</p>
+
+<p>In addition, a similar syntax extension has been added for easier assignment of vector components to individual variables:</p>
+
+<pre>
+// Is this valid? ie: &lt; and &gt; if so just remove this line
+#declare &lt; ID1, ID2, ... &gt; = VECTOR_EXPR;
+
+//This statement is fully equivalent to:
+#local TEMP = VECTOR_EXPR;
+#declare ID1 = TEMP.x;
+#declare IDY = TEMP.y;
+</pre>
+
+<p class="Note"><strong>Note:</strong> The new syntax does <em>not</em> actually define the local variable <em>TEMP</em>. The terminating semicolon is <strong><em>mandatory</em></strong>.</p>
+
+<p>The <code>#local</code> statement syntax has also been extended accordingly. The <code>deprecated</code> keyword can be used with these new syntax variants by placing it right before the respective identifier:</p>
+
+<pre>
+#declare (A, deprecated B) = (47, 11);
+</pre>
+
+<p>Extended <code>#declare</code> and <code>#local</code> tuple syntax to also support assignment from arrays, and to support assignment to mismatching number of identifiers. Using ...</p>
+
+<pre>
+#declare { IDENTIFIER_LIST } = ARRAY_EXPRESSION
+</pre>
+
+<p>... will assign the first elements of the array expression (either an array identifier or an array declaration <em>with</em> initializer) to the given identifiers. The IDENTIFIER_LIST may now contain empty elements, in which case the corresponding element from the right-hand side will be skipped accordingly.</p>
+
+<p>Extended tuple assignment syntax to allow for omission of right-hand side elements; extend array initializer syntax to allow for omission of elements.</p>
+
+<p>Left-hand side elements in tuple assignments can now be prepended with the <code>optional</code> keyword. If an element is flagged this way, or left empty, the corresponding right-hand side element may be an uninitialized identifier or left empty. In this case, the respective left-hand side element remains unchanged (it is NOT undefined).</p>
+
+<p>An array initializer may now be prepended with the <code>optional</code> keyword ...</p>
+
+<pre>
+#declare A = array[10] optional { ... }
+</pre>
+
+<p>... in this case, each individual element of the initializer may be an uninitialized identifier or left empty.</p>
+
+<p class="Note"><strong>Note:</strong> Due to parser limitations, <em>uninitialized identifiers</em> do <em>not</em> encompass uninitialized array elements. This limitation also applies to optional macro parameters.</p>
 
 </div>
 <a name="r3_3_2_2_2"></a>
@@ -3913,7 +4147,7 @@ Now suppose inside <code>myinc.inc</code> you do...</p>
 
 <p>The main version of <code>A</code> is hidden and a new <code>A</code> is
 created. This new <code>A</code> is also available inside <code>
-MyMacro</code> because <code>MyMacro</code> is nested inside <code>
+MyMacro</code> because <code>MyMacro</code> is called from inside <code>
 myinc.inc</code>. Once you exit <code>myinc.inc</code>, the local <code>
 A</code> is destroyed and the original <code>A</code> with its value of
 <code>123</code> is now in effect. Once you have created the local <code>
@@ -3981,6 +4215,8 @@ it assigns it to the most recent, most local version at the time.</li>
 <p>In summary, <code>#local</code> always means &quot;the current
 level&quot;, and <code>#declare</code> means &quot;global&quot; for new
 identifiers and &quot;most recent&quot; for existing identifiers.</p>
+
+<p><font class="New">New</font> in version 3.7.1: To circumvent the pitfalls of identifier name collisions, two <em>pseudo-dictionaries</em> are provided to specifically refer to identifiers at either the global or the most local scope. See also the <a href="r3_3.html#r3_3_1_10">Array</a> section for more information.</p>
 
 </div>
 <a name="r3_3_2_2_4"></a>
@@ -4092,7 +4328,7 @@ DATA_IDENTIFIER:
 </pre>
 <p class="Note"><strong>Note:</strong> Currently, <em>unsigned</em> 32-bit words are not supported.</p>
 <p>Keywords ending in &quot;be&quot; will cause the values to be written most significant byte first (<em>big endian</em>, aka network byte order) while those ending in &quot;le&quot; will instead write the least significant byte first (<em>little endian</em>, Intel format).</p>
-<p class="Note"><strong>Note:</strong> See the sample macro <code>ARRAYS_WriteDF3</code> in <a href="r3_4.html#r3_4_9_1_1">arrays.inc</a>  to see how this feature may be used.</p> 
+<p class="Note"><strong>Note:</strong> See the sample macro <code>ARRAYS_WriteDF3</code> in <a href="r3_8.html#r3_8_1_1_1">arrays.inc</a>  to see how this feature may be used.</p> 
 <p>As always, the file must first be opened in either <code>write</code> or <code>append</code> mode using the <code>#fopen</code> directive. The syntax for the <code>#write</code> directive is as follows:</p>
 <pre>
 WRITE_DIRECTIVE:
@@ -4125,7 +4361,7 @@ delimiters between values and quotes around string data but the <code>#write</co
 <div class="content-level-h4" contains="Default Directive" id="r3_3_2_4">
 <h4>3.3.2.4 Default Directive</h4>
 
-<p>POV-Ray creates a default texture when it begins processing. You may change those defaults as described below. Every time you specify a <code><a href="r3_4.html#r3_4_6">texture</a></code> statement, POV-Ray creates a copy of the default texture. Anything you put in the texture statement overrides the default settings. If you attach a <code>pigment</code>, <code>normal</code>, or <code>finish</code> to an object without any texture statement then POV-Ray checks to see if a texture has already been attached. If it has a texture then the pigment, normal or finish will modify the existing texture. If no texture has yet been attached to the object then the default texture is copied and the pigment, normal or finish will modify that texture.</p>
+<p>POV-Ray creates a default texture when it begins processing. You may change those defaults as described below. Every time you specify a <code><a href="r3_6.html#r3_6_1">texture</a></code> statement, POV-Ray creates a copy of the default texture. Anything you put in the texture statement overrides the default settings. If you attach a <code>pigment</code>, <code>normal</code>, or <code>finish</code> to an object without any texture statement then POV-Ray checks to see if a texture has already been attached. If it has a texture then the pigment, normal or finish will modify the existing texture. If no texture has yet been attached to the object then the default texture is copied and the pigment, normal or finish will modify that texture.</p>
 <p>
 You may change the default texture, pigment, normal or finish using the language directive <code>#default</code> as follows:</p>
 <pre>
@@ -4180,7 +4416,7 @@ sphere { &lt;0,0,0&gt;, 1 texture {} } // Default texture applied
 <div class="content-level-h4" contains="Version Directive" id="r3_3_2_5">
 <h4>3.3.2.5 Version Directive</h4>
 
-<p>As POV-Ray has evolved from version 1.0 through 3.6 we have made every effort to maintain some amount of backwards compatibility with earlier versions. Some old or obsolete features can be handled directly without any special consideration by the user. Some old or obsolete features can no longer be handled at all. However <em>some</em> old features can still be
+<p>As POV-Ray has evolved from version 1.0 through 3.7 we have made every effort to maintain some amount of backwards compatibility with earlier versions. Some old or obsolete features can be handled directly without any special consideration by the user. Some old or obsolete features can no longer be handled at all. However <em>some</em> old features can still be
 used if you warn POV-Ray that this is an older scene. The <code>#version</code> directive can be used to switch version compatibility to different setting several times throughout a scene file. The syntax is:</p>
 <pre>
 VERSION_DIRECTIVE: 
@@ -4188,19 +4424,33 @@ VERSION_DIRECTIVE:
 </pre>
 <p class="Note"><strong>Note:</strong> There should be a semi-colon after the float expression in a <code>#version</code> directive. This semi-colon is introduced in POV-Ray version 3.1. If omitted, it generates a warning and some macros may not work
 properly.</p>
-<p>Additionally you may use the <code>Version=</code><em>n.n</em> option or the <code>+MV</code><em>n.n</em> switch to establish the <em>initial</em> setting. See <a href="r3_2.html#r3_2_5_5">Language Version</a> for details. For example, one feature introduced in 2.0 that was incompatible with any 1.0 scene files is the parsing of float expressions. Using <code>#version 1.0</code> turns off expression parsing as well as many warning messages so that nearly all 1.0 files will still work. Naturally the default setting for this option is <code>#version 3.5</code>.</p>
+<p>Additionally you may use the <code>Version=</code><em>n.n</em> option or the <code>+MV</code><em>n.n</em> switch to establish the <em>initial</em> setting. See <a href="r3_2.html#r3_2_5_4">Language Version</a> for details. For example, one feature introduced in 2.0 that was incompatible with any 1.0 scene files is the parsing of float expressions. Using <code>#version 1.0</code> turns off expression parsing as well as many warning messages so that nearly all 1.0 files will still work.</p>
 <p class="Note"><strong>Note:</strong> Some obsolete or re-designed features <em>are totally unavailable in the current version of POV-Ray REGARDLESS OF THE VERSION SETTING.</em> Details on these features are noted throughout this documentation.</p>
 <p>The built-in float identifier <code>version</code> contains the current setting of the version compatibility option. See
-Float Expressions: <a href="r3_3.html#r3_3_1_5_6">Built-in Variables</a>. Together with the built-in <code>version</code> identifier the <code>#version</code> directive allows you to save and restore the previous values of this compatibility setting. The new <code>#local</code> identifier option is especially useful here. For example, suppose <code>mystuff.inc</code> is in version 1 format. At the top of the file you could put:</p>
+Float Expressions: <a href="r3_3.html#r3_3_1_5_6">Built-in Variables</a>. Together with the built-in <code>version</code> identifier the <code>#version</code> directive allows you to save and restore the previous values of this compatibility setting. The new <code>#local</code> identifier option is especially useful here. For example, suppose <code>mystuff.inc</code> is in version 3.5 format. At the top of the file you could put:</p>
 <pre>
-#local Temp_Vers = version;  // Save previous value
-  #version 1.0;              // Change to 1.0 mode
-    ... // Version 1.0 stuff goes here...
-  #version Temp_Vers;        // Restore previous version
+  #local Temp_Vers = version;  // Save previous value
+  #version 3.5;                // Change to 3.5 mode
+    ...                        // Version 3.5 stuff goes here...
+  #version Temp_Vers;          // Restore previous version
 </pre>
 
 <p>As of version 3.7, there has been a <em>requirement</em> implemented. In order to obtain full version 3.7
-  functionality, you <em>MUST</em> specify the <code>#version 3.7</code> directive in your scene file. Prior to a <code>#version</code> directive appearing, the version defaults to 3.62. Additionally, if the first <code>#version</code> appears after any other declaration, or a <code>#version</code> directive does not appear at all, a post-parse warning is issued.</p>
+functionality, you <em>MUST</em> specify the <code>#version 3.7</code> directive in your scene file. Prior to a
+<code>#version</code> directive appearing, the version defaults to 3.62. Additionally, if the first <code>#version</code>
+appears after any other declaration, or a <code>#version</code> directive does not appear at all,
+a post-parse warning is issued, and a <font class="Change">Change</font> as of POV-Ray 3.7.1 or later it is now considered an outright error to use
+<code>#version 3.71</code> or higher in a main scene file that does not start with a <code>#version</code> directive.</p>
+
+<p>If you do need to do some processing before you decide on a version compatibility option, start your scene with the following
+construct:</p>
+<pre>
+  #version version;
+</pre>
+Note that unless the version compatibility option has explicitly been set by the INI file option <code>Version=</code><em>n.n</em>
+or by the <code>+MV</code><em>n.n</em> command-line switch, <code>version</code> evaluates to the actual POV-Ray software version
+when used inside the first <code>#version</code> statement, even in version 3.7.1 or later where it evaluates to the effective
+version compatibility option anywhere else.
 
 <p class="Warning"><strong>Warning:</strong> The version directive and command-line setting no longer provide compatibility with most rendering bugs in versions prior to POV-Ray 3.5. However, compatibility with the scene language is provided for scenes as old as POV-Ray 1.0 just as in all previous versions of POV-Ray. Nevertheless, we strongly recommend you update scenes at least to POV-Ray 3.5 syntax if you plan to use them in future versions of POV-Ray.</p></div>
 
@@ -4403,6 +4653,7 @@ WHILE_DIRECTIVE:
 
 <p>With the addition of conditional and loop directives, the POV-Ray language has the potential to be more like an actual programming language. This means that it will be necessary to have some way to see what is going on when trying to debug loops and conditionals. To fulfill this need we have added the ability to print text messages to the screen. You have a choice of five
 different text streams to use including the ability to generate a fatal error if you find it necessary. Limited formatting is available for strings output by this method.</p>
+
 </div>
 <a name="r3_3_2_7_1"></a>
 <div class="content-level-h5" contains="Text Message Streams" id="r3_3_2_7_1">
@@ -4593,11 +4844,18 @@ that previously required external utilities.</p>
 <pre>
 MACRO_DEFINITION:
   #macro IDENTIFIER ([PARAM_IDENT] [, PARAM_IDENT]... ) TOKENS... #end
+PARAM_IDENT:
+  [optional] GENERIC_IDENTIFIER
 </pre>
-<p>Where <em>IDENTIFIER</em> is the name of the macro and <em>PARAM_IDENT</em> is a list of zero or more formal parameter identifiers separated by commas and enclosed by parentheses. The parentheses are required even if no parameters are specified.</p>
+<p>Where <em>IDENTIFIER</em> is the name of the macro and <em>PARAM_IDENT</em> is a list of zero or more formal parameter identifiers separated by commas and enclosed by parentheses. The parentheses are required even if no parameters are specified. <font class="New">New</font> in version 3.7.1 see also: <a href="r3_3.html#r3_3_2_8_6">Optional Parameters</a>.</p>
 <p>The <em>TOKENS</em> are any number of POV-Ray keyword, identifiers, or punctuation marks which are the <em> body</em> of the macro. The body of the macro may contain almost any POV-Ray syntax items you desire. It is terminated by the <code>#end</code> directive.</p>
 <p class="Note"><strong>Note:</strong> Any conditional directives such as <code>#if</code>...<code>#end</code>, <code>#while</code>...<code>#end</code>, etc. must be fully nested inside or outside the macro so that the corresponding <code>#end</code> directives pair-up properly.</p>
-<p>A macro must be declared before it is invoked. All macro names are global in scope and permanent in duration. You may redefine a macro by another <code>#macro</code> directive with the same name. The previous definition is lost. Macro names respond to <code>#ifdef</code>, <code>#ifndef</code>, and <code>#undef</code> directives. See <a href="r3_3.html#r3_3_2_6_2">The #ifdef and #ifndef Directives</a> and <a href="r3_3.html#r3_3_2_2_4">Destroying Identifiers with #undef</a>.</p>
+<p>A macro must be declared before it is invoked. All macro names are global in scope and permanent in duration. You may redefine a macro by another <code>#macro</code> directive with the same name. The previous definition is lost. Macro names respond to <code>#ifdef</code>, <code>#ifndef</code>, and <code>#undef</code> directives.</p>
+<p>See also:</p>
+<ul>
+  <li><a href="r3_3.html#r3_3_2_6_2">The ifdef and ifndef Directives</a></li>
+  <li><a href="r3_3.html#r3_3_2_2_4">Destroying Identifiers with undef</a></li>
+</ul>
 
 </div>
 <a name="r3_3_2_8_2"></a>
@@ -4834,7 +5092,57 @@ MyMacro(Value*1.0) // which cannot be changed.
 </pre>
 
 <p>Although all four invocations of <code>MyMacro</code> are passed the value
-5.0, only the first may modify the value of the identifier.</p></div>
+5.0, only the first may modify the value of the identifier.</p>
+
+</div>
+<a name="r3_3_2_8_6"></a>
+<div class="content-level-h5" contains="Optional Parameters" id="r3_3_2_8_6">
+<h5>3.3.2.8.6 Optional Parameters</h5>
+<p><font class="New">New</font> in version 3.7.1 macro parameters can be declared as optional by preceding the
+parameter identifier with the keyword <code>optional</code>; when calling
+a macro, you can pass undeclared identifiers to such optional parameters,
+or even omit them entirely:</p>
+<pre>
+MACRO_DEFINITION:
+  #macro IDENTIFIER ([PARAM_IDENT] [, PARAM_IDENT]... ) TOKENS... #end
+PARAM_IDENT:
+  [optional] GENERIC_IDENTIFIER
+MACRO_INVOCATION:
+  MACRO_IDENTIFIER ( [ACTUAL_PARAM] [, ACTUAL_PARAM]... )
+ACTUAL_PARAM:
+  [ IDENTIFIER | RVALUE ]
+</pre>
+<p>Passing an undeclared identifier to a macro, or omitting a macro parameter
+entirely, will literally leave the corresponding parameter identifier undeclared
+as if it wasn't part of the macro's parameter declaration.</p>
+<p class="Note"><strong>Note:</strong> If a macro parameter identifier remains
+undeclared in this manner, any variables of the same name declared outside the
+macro will become visible instead. To reliably test whether an optional
+parameter has been supplied, you therefore need to make use of the
+<code>local</code> <em>pseudo-dictionary</em>, as in the following example.</p>
+<p>See also the <code><a href="r3_3.html#r3_3_1_10">Array</a></code> section for more about <em>pseudo-dictionaries</em>.</p>
+<pre>
+#macro Foo(P1, optional P2)
+#ifndef(local.P2) #local P2 = 0; #end // provide default for P2
+...
+#end
+
+#declare X=1;
+#declare Y=2;
+Foo(X,Y);
+#undef Y;
+Foo(X,Y);
+Foo(X,);
+</pre>
+<p class="Note"><strong>Note:</strong> The optional parameters mechanism can
+<em>not</em> be used to return a value via a parameter to a previously
+undeclared identifier.</p>
+
+</div>
+<a name="r3_3_2_8_7"></a>
+<div class="content-level-h5" contains="Macro Caching" id="r3_3_2_8_7">
+<h5>3.3.2.8.7 Macro Caching</h5>
+<p>Until now, each and every invocation of a macro from a file other than the one it was declared in, inevitably caused the latter file to be opened again for the macro code to be re-read. This process seriously impacts parser performance. To that end in version 3.7.1 a <font class="New">New</font> cached macro mechanism has been implemented. It keeps a copy of each and every macro's code in memory (except for macros more than 65536 characters in size), greatly increasing the execution speed of macros in such scenarios.</p></div>
 
 </div>
 

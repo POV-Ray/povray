@@ -17,3 +17,6 @@ To build the POV-Ray for Windows help files, proceed as follows:
 
 The generated HTML Help file will be placed in `distribution/platform-specific/windows/Help/`
 as `povray37.chm`, ready for inclusion in the installer package.
+
+(**Note:** Don't forget to also update the Unix HTML help files residing in
+`doc/html`.)

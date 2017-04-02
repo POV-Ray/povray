@@ -291,6 +291,7 @@ foreach $file (@files)
     $result .= $line;
   }
 
+  $result .= "<meta http-equiv=\"X-UA-Compatible\" content=\"IE=9\"/>\n";
   $result .= "<object classid=\"clsid:adb880a6-d8ff-11cf-9377-00aa003b7a11\" id=\"htmlhelp\" type=\"application/x-oleobject\"></object>\n";
   $result .= "<script language=\"javascript\" src=\"povray37.js\"></script>\n";
   $result .= $line;
