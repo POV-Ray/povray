@@ -34,6 +34,13 @@ Reported via GitHub:
 
   - #260 ("Pavement pattern broken")
 
+Reported via the Newsgroups:
+
+  - <web.58e39b3f29046ace8464b730@news.povray.org>
+    (2017-04-04, povray.beta-test, "Re-Render of Editor-Bitmaps failed with Beta 5 ?")
+    Command-line-style switches with optional parameters (e.g. `-jN`) are not
+    accepted in INI files if the parameter is omitted (e.g. `-j`).
+
 Miscellaneous:
 
   - Minor updates to the documentation.
