@@ -3011,7 +3011,7 @@ ObjectPtr Parser::Parse_Lathe()
               if (Points[i][X] < 0.0)
               {
                  if ((sceneData->EffectiveLanguageVersion() < 371) && ((i == 0) || (i == Object->Number - 1)))
-                     Warning("Lathe with linear spline has a first or last point with an x value < 0.0\n"
+                     Warning("Lathe with linear spline has a first or last point with an x value < 0.0.\n"
                              "Leads to artifacts and an error in #version 3.71 onward.");
                  else
                      Error("Lathe with linear spline has a point with an x value < 0.0.");
