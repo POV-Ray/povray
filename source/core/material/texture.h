@@ -61,10 +61,6 @@ struct GenericTurbulenceWarp;
 * Global preprocessor defines
 ******************************************************************************/
 
-/*
- * Macro to create random number in the [0; 1] range.
- */
-
 #define FLOOR(x)  ((x) >= 0.0 ? floor(x) : (0.0 - floor(0.0 - (x)) - 1.0))
 
 // Hash1dRTableIndex assumed values in the range 0..8191
