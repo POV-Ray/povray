@@ -69,7 +69,7 @@ inline bool TryOptimizedNoise(NoiseFunction* pFnNoise, DNoiseFunction* pFnDNoise
     // TODO - review priority
     // NOTE - Any change to the priorization should also be reflected in `pvengine.cpp`.
 #ifdef TRY_OPTIMIZED_NOISE_AVX2FMA3
-    if (AVX2FMA3NoiseSupported())
+    if (AVX2FMA3NoiseSupported() && isIntelCPU())
     {
         AVX2FMA3NoiseInit();
         *pFnNoise  = AVX2FMA3Noise;
@@ -86,7 +86,7 @@ inline bool TryOptimizedNoise(NoiseFunction* pFnNoise, DNoiseFunction* pFnDNoise
     }
 #endif
 #ifdef TRY_OPTIMIZED_NOISE_AVX
-    if (AVXNoiseSupported())
+    if (AVXNoiseSupported() && isIntelCPU())
     {
         AVXNoiseInit();
         *pFnNoise  = AVXNoise;

@@ -6218,7 +6218,7 @@ int PASCAL WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
   // of POVWIN, we just call the test here.
   // NOTE - The priorization should reflect `optimizednoise.h`.
 #ifdef TRY_OPTIMIZED_NOISE_AVX2FMA3
-  if (AVX2FMA3NoiseSupported())
+  if (AVX2FMA3NoiseSupported() && isIntelCPU())
   {
     buffer_message (mIDE, "AVX2/FMA3 instruction support detected: using AVX2/FMA3-optimized noise functions.\n") ;
   }
@@ -6232,7 +6232,7 @@ int PASCAL WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
   else
 #endif
 #ifdef TRY_OPTIMIZED_NOISE_AVX
-  if (AVXNoiseSupported())
+  if (AVXNoiseSupported() && isIntelCPU())
   {
     buffer_message (mIDE, "AVX instruction support detected: using AVX-optimized noise functions.\n") ;
   }

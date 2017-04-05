@@ -54,4 +54,7 @@ bool HaveAVXFMA4();
 /// Test whether AVX2 and FMA3 are supported by both CPU and OS.
 bool HaveAVX2FMA3();
 
+/// Test whether it is an Intel CPU
+bool isIntelCPU();
+
 #endif // POVRAY_CPUID_H
