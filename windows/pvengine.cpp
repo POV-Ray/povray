@@ -456,6 +456,8 @@ extern HINSTANCE        hLibPovEdit ;
 
 #define MAX_INSERT_MENU_SECTIONS  8192
 
+char* selectedNoiseFunc;
+
 typedef std::vector<int> InsMenuSecList;
 
 int                     InsertMenuSection;
@@ -777,6 +779,7 @@ void PrintRenderTimes (int Finished, int NormalCompletion)
             fprintf(f, "povversion=%s\n", POV_RAY_SOURCE_VERSION) ;
             fprintf(f, "compilerversion=%s\n", POV_COMPILER_VER) ;
             fprintf(f, "platformversion=%s\n", POVRAY_PLATFORM_NAME) ;
+            fprintf(f, "noisefunctions=%s\n", selectedNoiseFunc) ;
             fclose(f);
           }
         }
@@ -6220,6 +6223,7 @@ int PASCAL WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
 #ifdef TRY_OPTIMIZED_NOISE_AVX2FMA3
   if (AVX2FMA3NoiseSupported() && isIntelCPU())
   {
+    selectedNoiseFunc = "AVX2/FMA3-Intel";
     buffer_message (mIDE, "AVX2/FMA3 instruction support detected: using AVX2/FMA3-optimized noise functions.\n") ;
   }
   else
@@ -6227,6 +6231,7 @@ int PASCAL WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
 #ifdef TRY_OPTIMIZED_NOISE_AVXFMA4
   if (AVXFMA4NoiseSupported())
   {
+    selectedNoiseFunc = "AVX/FMA4-AMD";
     buffer_message (mIDE, "AVX/FMA4 instruction support detected: using AVX/FMA4-optimized noise functions.\n") ;
   }
   else
@@ -6234,6 +6239,7 @@ int PASCAL WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
 #ifdef TRY_OPTIMIZED_NOISE_AVX
   if (AVXNoiseSupported() && isIntelCPU())
   {
+    selectedNoiseFunc = "AVX-Intel";
     buffer_message (mIDE, "AVX instruction support detected: using AVX-optimized noise functions.\n") ;
   }
   else
@@ -6241,11 +6247,13 @@ int PASCAL WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
 #ifdef TRY_OPTIMIZED_NOISE_AVX_PORTABLE
   if (AVXPORTABLENoiseSupported())
   {
+    selectedNoiseFunc = "AVX-Portable";
     buffer_message(mIDE, "AVX instruction support detected: using AVX Portable noise functions.\n");
   }
   else
 #endif
   {
+    selectedNoiseFunc = "Portable";
     buffer_message (mIDE, "No enhanced instruction support detected: using compatible noise functions.\n") ;
   }
   buffer_message (mDivider, "\n") ;
