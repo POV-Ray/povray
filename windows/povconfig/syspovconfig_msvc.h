@@ -223,9 +223,10 @@
 #if _MSC_VER >= 1900
     // MSVC 2010 does not support AVX2 at all, so no need to worry about `/arch` setting.
     #define TRY_OPTIMIZED_NOISE_AVX2FMA3
+    #define TRY_OPTIMIZED_NOISE_AVX_PORTABLE
 #endif
 
-#if defined(TRY_OPTIMIZED_NOISE_AVX) || defined(TRY_OPTIMIZED_NOISE_AVXFMA4) || defined(TRY_OPTIMIZED_NOISE_AVX2FMA3)
+#if defined(TRY_OPTIMIZED_NOISE_AVX) || defined(TRY_OPTIMIZED_NOISE_AVXFMA4) || defined(TRY_OPTIMIZED_NOISE_AVX2FMA3) || defined(TRY_OPTIMIZED_NOISE_AVX_PORTABLE)
 #define TRY_OPTIMIZED_NOISE(Noise,DNoise)   TryOptimizedNoise(Noise,DNoise)
 #define OPTIMIZED_NOISE_H                   "optimizednoise.h"
 #endif

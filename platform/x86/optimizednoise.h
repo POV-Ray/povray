@@ -52,6 +52,10 @@
 #include "avxnoise.h"
 #endif
 
+#ifdef TRY_OPTIMIZED_NOISE_AVX_PORTABLE
+#include "avxportable.h"
+#endif
+
 #ifdef TRY_OPTIMIZED_NOISE
 
 namespace pov
@@ -87,6 +91,14 @@ inline bool TryOptimizedNoise(NoiseFunction* pFnNoise, DNoiseFunction* pFnDNoise
         AVXNoiseInit();
         *pFnNoise  = AVXNoise;
         *pFnDNoise = AVXDNoise;
+        return true;
+    }
+#endif
+#ifdef TRY_OPTIMIZED_NOISE_AVX_PORTABLE
+    if (AVXPORTABLENoiseSupported())
+    {
+        *pFnNoise = AVXPortableNoise;
+        *pFnDNoise = AVXPortableDNoise;
         return true;
     }
 #endif

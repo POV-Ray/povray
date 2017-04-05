@@ -382,6 +382,9 @@
     <ClCompile Include="..\..\platform\x86\avx2fma3noise.cpp" />
     <ClCompile Include="..\..\platform\x86\avxfma4noise.cpp" />
     <ClCompile Include="..\..\platform\x86\avxnoise.cpp" />
+    <ClCompile Include="..\..\platform\x86\avxportable.cpp">
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release|x64'">AdvancedVectorExtensions</EnableEnhancedInstructionSet>
+    </ClCompile>
     <ClCompile Include="..\..\platform\x86\cpuid.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -393,6 +396,7 @@
     <ClInclude Include="..\..\platform\x86\avx2fma3noise.h" />
     <ClInclude Include="..\..\platform\x86\avxfma4noise.h" />
     <ClInclude Include="..\..\platform\x86\avxnoise.h" />
+    <ClInclude Include="..\..\platform\x86\avxportable.h" />
     <ClInclude Include="..\..\platform\x86\cpuid.h" />
     <ClInclude Include="..\..\platform\x86\optimizednoise.h" />
   </ItemGroup>

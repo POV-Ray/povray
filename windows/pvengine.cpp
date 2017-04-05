@@ -6238,6 +6238,13 @@ int PASCAL WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
   }
   else
 #endif
+#ifdef TRY_OPTIMIZED_NOISE_AVX_PORTABLE
+  if (AVXPORTABLENoiseSupported())
+  {
+    buffer_message(mIDE, "AVX instruction support detected: using AVX Portable noise functions.\n");
+  }
+  else
+#endif
   {
     buffer_message (mIDE, "No enhanced instruction support detected: using compatible noise functions.\n") ;
   }
