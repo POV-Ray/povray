@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -466,7 +466,8 @@ static int compare_tag4(const BYTE *ttf_tag, const BYTE *known_tag)
 *   (triggered when filename is null) - Oct 2012 [JG]
 *
 ******************************************************************************/
-void TrueType::ProcessNewTTF(CSG *Object, TrueTypeFont *ffile, const UCS2 *text_string, DBL depth, const Vector3d& offset, Parser *parser)
+void TrueType::ProcessNewTTF(CSG *Object, TrueTypeFont *ffile, const UCS2 *text_string,
+                             DBL depth, const Vector3d& offset, Parser *parser)
 {
     Vector3d local_offset, total_offset;
     TrueType *ttf;
@@ -2300,172 +2301,149 @@ GlyphPtr ConvertOutlineToGlyph(TrueTypeFont *ffile, const GlyphOutline *ttglyph)
 }
 
 /* Test to see if "point" is inside the splined polygon "points". */
-bool TrueType::Inside_Glyph(double x, double y, const GlyphStruct* glyph) const
+bool TrueType::Inside_Glyph(DBL x, DBL y, const GlyphStruct* glyph) const
 {
-    int i, j, k, n, n1, crossings;
-    int qi, ri, qj, rj;
-    Contour *contour;
-    double xt[3], yt[3], roots[2];
+    int i, j, k, ri;
+    int crossings = 0;
+    DBL xl, yl, xh, yh;
+    DBL xt[3], yt[3], roots[2];
     DBL *xv, *yv;
-    double x0, x1, x2, t;
-    double y0, y1, y2;
-    double m, b, xc;
+    DBL x0, x2;
+    DBL y0, y2;
+    DBL m, b, xc;
     BYTE *fv;
 
-    crossings = 0;
-
-    n = glyph->header.numContours;
-
-    contour = glyph->contours;
-
-    for (i = 0; i < n; i++)
+    for (i = 0; i < glyph->header.numContours; i++)
     {
-        xv = contour[i].x;
-        yv = contour[i].y;
-        fv = contour[i].flags;
+
+        xv = glyph->contours[i].x;
+        yv = glyph->contours[i].y;
+
+        // Attempt an early exit for each contour of glyph.
+        // Note: Depends of fonts and actual characters but, roughly, this
+        // range loop adds 15% for 1 character text objects. Thereafter
+        // always faster saving 25% at two characters and 50% (2x faster)
+        // at 5 charcters.
+        //
+        xl = yl =  HUGE_VAL;
+        xh = yh = -HUGE_VAL;
+        for (j=0; j<=glyph->contours[i].count; j++)
+        {
+            if (xv[j] < xl) xl = xv[j];
+            if (xv[j] > xh) xh = xv[j];
+            if (yv[j] < yl) yl = yv[j];
+            if (yv[j] > yh) yh = yv[j];
+        }
+        if ( (x < xl) || (x > xh) || (y < yl) || (y > yh) )
+            continue;
+
+        // Quick test above shows contour range overlap with x, y so more to do.
+        fv = glyph->contours[i].flags;
         x0 = xv[0];
         y0 = yv[0];
-        n1 = contour[i].count;
 
-        for (j = 1; j <= n1; j++)
+        for (j = 1; j <= glyph->contours[i].count; j++)
         {
-            x1 = xv[j];
-            y1 = yv[j];
+            DBL& x1 = xv[j]; // Only used as ref & c++ ref much faster than new var and copy.
+            DBL& y1 = yv[j];
 
             if (fv[j] & ONCURVE)
             {
-                /* Straight line - first set up for the next */
-                /* Now do the crossing test */
-
-                qi = ri = qj = rj = 0;
-
-                if (y0 == y1)
-                    goto end_line_test;
-
-                /* if (fabs((y - y0) / (y1 - y0)) < EPSILON) goto end_line_test; */
-
-                if (y0 < y)
-                    qi = 1;
-
-                if (y1 < y)
-                    qj = 1;
-
-                if (qi == qj)
-                    goto end_line_test;
-
-                if (x0 > x)
-                    ri = 1;
-
-                if (x1 > x)
-                    rj = 1;
-
-                if (ri & rj)
+                // Straight line
+                if ( ((y0 >= y) || (y1 >= y)) && ((y0 < y) || (y1 < y)) )
                 {
-                    crossings++;
-                    goto end_line_test;
+                    if ((x0 > x) && (x1 > x))
+                        crossings++;
+                    else if ((x0 > x) || (x1 > x))
+                        {
+                            m = (y1 - y0) / (x1 - x0);
+                            b = (y1 - y) - m * (x1 - x);
+
+                            if ((b / m) < EPSILON)
+                                crossings++;
+                        }
                 }
 
-                if ((ri | rj) == 0)
-                    goto end_line_test;
-
-                m = (y1 - y0) / (x1 - x0);
-                b = (y1 - y) - m * (x1 - x);
-
-                if ((b / m) < EPSILON)
-                {
-                    crossings++;
-                }
-
-            end_line_test:
                 x0 = x1;
                 y0 = y1;
             }
             else
             {
-                if (j == n1)
+                if (j == glyph->contours[i].count)
                 {
                     x2 = xv[0];
                     y2 = yv[0];
                 }
                 else
                 {
-                    x2 = xv[j + 1];
-                    y2 = yv[j + 1];
-
                     if (!(fv[j + 1] & ONCURVE))
                     {
-                        /*
-                         * Parabola with far end floating - readjust the far end so that it
-                         * is on the curve.
-                         */
-
-                        x2 = 0.5 * (x1 + x2);
-                        y2 = 0.5 * (y1 + y2);
+                        // Parabola with far end floating. Re-adjust the far end so that it is on the curve.
+                        x2 = 0.5 * (x1 + xv[j + 1]);   // x2 = 0.5 * (x1 + x2);
+                        y2 = 0.5 * (y1 + yv[j + 1]);   // y2 = 0.5 * (y1 + y2);
                     }
-                }
-
-                /* only test crossing when y is in the range */
-                /* this should also help saving some computations */
-                if (((y0 < y) && (y1 < y) && (y2 < y)) ||
-                    ((y0 > y) && (y1 > y) && (y2 > y)))
-                    goto end_curve_test;
-
-                yt[0] = y0 - 2.0 * y1 + y2;
-                yt[1] = 2.0 * (y1 - y0);
-                yt[2] = y0 - y;
-
-                k = solve_quad(yt, roots, 0.0, 1.0);
-
-                for (ri = 0; ri < k;) {
-                    if (roots[ri] <= EPSILON) {
-                        /* if y actually is not in range, discard the root */
-                        if (((y <= y0) && (y < y1)) || ((y >= y0) && (y > y1))) {
-                            k--;
-                            if (k > ri)
-                                roots[ri] = roots[ri+1];
-                            continue;
-                        }
-                    }
-                    else if (roots[ri] >= (1.0 - EPSILON)) {
-                        /* if y actually is not in range, discard the root */
-                        if (((y < y2) && (y < y1)) || ((y > y2) && (y > y1))) {
-                            k--;
-                            if (k > ri)
-                                roots[ri] = roots[ri+1];
-                            continue;
-                        }
-                    }
-
-                    ri++;
-                }
-
-                if (k > 0)
-                {
-                    xt[0] = x0 - 2.0 * x1 + x2;
-                    xt[1] = 2.0 * (x1 - x0);
-                    xt[2] = x0;
-
-                    t = roots[0];
-
-                    xc = (xt[0] * t + xt[1]) * t + xt[2];
-
-                    if (xc > x)
-                        crossings++;
-
-                    if (k > 1)
+                    else
                     {
-                        t = roots[1];
+                        x2 = xv[j + 1];
+                        y2 = yv[j + 1];
+                    }
+                }
+
+                // Only test crossing when y is in the range to save computations
+                if ( ((y0 <= y) || (y1 <= y) || (y2 <= y)) && ((y0 >= y) || (y1 >= y) || (y2 >= y)) )
+                {
+                    yt[0] = y0 - 2.0 * y1 + y2;
+                    yt[1] = 2.0 * (y1 - y0);
+                    yt[2] = y0 - y;
+
+                    k = solve_quad(yt, roots, 0.0, 1.0);
+
+                    for (ri = 0; ri < k; ri++) {
+                        if (roots[ri] <= EPSILON) {
+                            // if y actually is not in range, discard the root
+                            if (((y <= y0) && (y < y1)) || ((y >= y0) && (y > y1))) {
+                                k--;
+                                if (k > ri)
+                                    roots[ri] = roots[ri+1];
+                                continue;
+                            }
+                        }
+                        else if (roots[ri] >= (1.0 - EPSILON)) {
+                            // if y actually is not in range, discard the root
+                            if (((y < y2) && (y < y1)) || ((y > y2) && (y > y1))) {
+                                k--;
+                                if (k > ri)
+                                    roots[ri] = roots[ri+1];
+                                continue;
+                            }
+                        }
+                    }
+
+                    if (k > 0)
+                    {
+                        xt[0] = x0 - 2.0 * x1 + x2;
+                        xt[1] = 2.0 * (x1 - x0);
+                        xt[2] = x0;
+
+                        DBL& t = roots[0];
+
                         xc = (xt[0] * t + xt[1]) * t + xt[2];
 
                         if (xc > x)
                             crossings++;
+
+                        if (k > 1)
+                        {
+                            DBL& t = roots[1];
+                            xc = (xt[0] * t + xt[1]) * t + xt[2];
+
+                            if (xc > x)
+                                crossings++;
+                        }
                     }
                 }
 
-end_curve_test:
-
                 x0 = x2;
-
                 y0 = y2;
             }
         }
@@ -2475,9 +2453,9 @@ end_curve_test:
 }
 
 
-int TrueType::solve_quad(double *x, double *y, double mindist, DBL maxdist) const
+int TrueType::solve_quad(DBL *x, DBL *y, DBL mindist, DBL maxdist) const
 {
-    double d, t, a, b, c, q;
+    DBL d, t, a, b, c, q;
 
     a = x[0];
     b = -x[1];
@@ -2538,9 +2516,10 @@ int TrueType::solve_quad(double *x, double *y, double mindist, DBL maxdist) cons
  * These distances are to the the bottom and top surfaces of the glyph.
  * The distances are set to -1 if there is no hit.
  */
-void TrueType::GetZeroOneHits(const GlyphStruct* glyph, const Vector3d& P, const Vector3d& D, DBL glyph_depth, double *t0, double *t1) const
+void TrueType::GetZeroOneHits(const GlyphStruct* glyph, const Vector3d& P, const Vector3d& D,
+                              DBL glyph_depth, DBL *t0, DBL *t1) const
 {
-    double x0, y0, t;
+    DBL x0, y0, t;
 
     *t0 = -1.0;
     *t1 = -1.0;
@@ -2614,16 +2593,17 @@ void TrueType::GetZeroOneHits(const GlyphStruct* glyph, const Vector3d& P, const
  * This is then solved using the quadratic formula.  Any solutions of s that are
  * between 0 and 1 (inclusive) are valid solutions.
  */
-bool TrueType::GlyphIntersect(const Vector3d& P, const Vector3d& D, const GlyphStruct* glyph, DBL glyph_depth, const BasicRay& ray, IStack& Depth_Stack, TraceThreadData *Thread)
+bool TrueType::GlyphIntersect(const Vector3d& P, const Vector3d& D, const GlyphStruct* glyph, DBL glyph_depth,
+                              const BasicRay& ray, IStack& Depth_Stack, TraceThreadData *Thread)
 {
     Contour *contour;
     int i, j, k, l, n, m;
     bool Flag = false;
     Vector3d N, IPoint;
     DBL Depth;
-    double x0, x1, y0, y1, x2, y2, t, t0, t1, z;
-    double xt0, xt1, xt2, yt0, yt1, yt2;
-    double a, b, c, d0, d1, C[3], S[2];
+    DBL x0, x1, y0, y1, x2, y2, t, t0, t1, z;
+    DBL xt0, xt1, xt2, yt0, yt1, yt2;
+    DBL a, b, c, d0, d1, C[3], S[2];
     DBL *xv, *yv;
     BYTE *fv;
     int dirflag = 0;
@@ -2720,38 +2700,39 @@ bool TrueType::GlyphIntersect(const Vector3d& P, const Vector3d& D, const GlyphS
 
                 t0 = d1 * D[X] - d0 * D[Y];
 
-                if (fabs(t0) < EPSILON)
-                    /* No possible intersection */
-                    goto end_line_test;
+                if (fabs(t0) >= EPSILON)
+                {   // Possible intersection
+                    t = (D[X] * (P[Y] - y0) - D[Y] * (P[X] - x0)) / t0;
 
-                t = (D[X] * (P[Y] - y0) - D[Y] * (P[X] - x0)) / t0;
-
-                if (t < 0.0 || t > 1.0)
-                    goto end_line_test;
-
-                if (dirflag)
-                    t = ((x0 + t * d0) - P[X]) / D[X];
-                else
-                    t = ((y0 + t * d1) - P[Y]) / D[Y];
-
-                z = P[Z] + t * D[Z];
-
-                Depth = t /* / len */;
-
-                if (z >= 0 && z <= glyph_depth && Depth > TTF_Tolerance)
-                {
-                    IPoint = ray.Evaluate(Depth);
-
-                    if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
+                    if (t >= 0.0 && t <= 1.0)
                     {
-                        N = Vector3d(d1, -d0, 0.0);
-                        MTransNormal(N, N, Trans);
-                        N.normalize();
-                        Depth_Stack->push(Intersection(Depth, IPoint, N, this));
-                        Flag = true;
+                        if (dirflag)
+                            t = ((x0 + t * d0) - P[X]) / D[X];
+                        else
+                            t = ((y0 + t * d1) - P[Y]) / D[Y];
+
+                        z = P[Z] + t * D[Z];
+
+                        Depth = t /* / len */;
+
+                        if (z >= 0 && z <= glyph_depth && Depth > TTF_Tolerance)
+                        {
+                            IPoint = ray.Evaluate(Depth);
+
+                            if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
+                            {
+                                N = Vector3d(-d1, d0, 0.0); // Sides inside out prior to 3.72
+                                MTransNormal(N, N, Trans);
+                                N.normalize();
+                                Depth_Stack->push(Intersection(Depth, IPoint, N, this));
+                                Flag = true;
+                            }
+                        }
                     }
+
+
                 }
-            end_line_test:
+
                 x0 = x1;
                 y0 = y1;
             }
@@ -2764,19 +2745,16 @@ bool TrueType::GlyphIntersect(const Vector3d& P, const Vector3d& D, const GlyphS
                 }
                 else
                 {
-                    x2 = xv[j + 1];
-                    y2 = yv[j + 1];
-
                     if (!(fv[j + 1] & ONCURVE))
                     {
-
-                        /*
-                         * Parabola with far end DBLing - readjust the far end so that it
-                         * is on the curve.  (In the correct place too.)
-                         */
-
-                        x2 = 0.5 * (x1 + x2);
-                        y2 = 0.5 * (y1 + y2);
+                        // Parabola with far end floating. Re-adjust the far end so that it is on the curve.
+                        x2 = 0.5 * (x1 + xv[j + 1]);   // x2 = 0.5 * (x1 + x2);
+                        y2 = 0.5 * (y1 + yv[j + 1]);   // y2 = 0.5 * (y1 + y2);
+                    }
+                    else
+                    {
+                        x2 = xv[j + 1];
+                        y2 = yv[j + 1];
                     }
                 }
 
@@ -2818,7 +2796,7 @@ bool TrueType::GlyphIntersect(const Vector3d& P, const Vector3d& D, const GlyphS
                         if (Clip.empty() || Point_In_Clip(IPoint, Clip, Thread))
                         {
                             N = Vector3d(2.0 * yt2 * S[l] + yt1, -2.0 * xt2 * S[l] - xt1, 0.0);
-                            MTransNormal(N, N, Trans);
+                            MTransNormal(N, -N, Trans); // Sides inside out prior to 3.72
                             N.normalize();
                             Depth_Stack->push(Intersection(Depth, IPoint, N, this));
                             Flag = true;
