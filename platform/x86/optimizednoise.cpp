@@ -1,9 +1,9 @@
 //******************************************************************************
 ///
-/// @file platform/x86/avxfma4noise.h
+/// @file platform/x86/optimizednoise.cpp
 ///
-/// This file contains declarations related to implementations of the noise
-/// generator optimized for the AVX and FMA4 instruction set.
+/// This file contains implementations related to the optimized versions of the
+/// noise generator.
 ///
 /// @copyright
 /// @parblock
@@ -34,29 +34,36 @@
 ///
 //******************************************************************************
 
-#ifndef POVRAY_AVXFMA4NOISE_H
-#define POVRAY_AVXFMA4NOISE_H
+#include "optimizednoise.h"
 
-#include "syspovconfigbase.h"
-#include "backend/frame.h"
+#include "cpuid.h"
+#include "avx2fma3/avx2fma3noise.h"
+#include "avxfma4/avxfma4noise.h"
+#include "avx/avxnoise.h"
 
-#ifdef TRY_OPTIMIZED_NOISE_AVXFMA4
+#ifdef TRY_OPTIMIZED_NOISE
 
 namespace pov
 {
 
-bool AVXFMA4NoiseSupported();
-
-/// Optimized Noise function using AVX and FMA4 instructions.
-/// @author Optimized by AMD
-DBL AVXFMA4Noise(const Vector3d& EPoint, int noise_generator);
-
-/// Optimized DNoise function using AVX and FMA4 instructions.
-/// @author Optimized by AMD
-void AVXFMA4DNoise(Vector3d& result, const Vector3d& EPoint);
+OptimizedNoiseBase* GetOptimizedNoise()
+{
+    // TODO - review priority
+#ifdef TRY_OPTIMIZED_NOISE_AVX2FMA3
+    if (HaveAVX2FMA3())
+        return new OptimizedNoiseAVX2FMA3();
+#endif
+#ifdef TRY_OPTIMIZED_NOISE_AVXFMA4
+    if (HaveAVXFMA4())
+        return new OptimizedNoiseAVXFMA4();
+#endif
+#ifdef TRY_OPTIMIZED_NOISE_AVX
+    if (HaveAVX())
+        return new OptimizedNoiseAVX();
+#endif
+    return NULL;
+}
 
 }
 
-#endif // TRY_OPTIMIZED_NOISE_AVXFMA4
-
-#endif // POVRAY_AVXFMA4NOISE_H
+#endif // TRY_OPTIMIZED_NOISE

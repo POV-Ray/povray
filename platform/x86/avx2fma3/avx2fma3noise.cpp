@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file platform/x86/avx2fma3noise.cpp
+/// @file platform/x86/avx2fma3/avx2fma3noise.cpp
 ///
 /// This file contains implementations of the noise generator optimized for the
 /// AVX2 and FMA3 instruction set.
@@ -41,7 +41,7 @@
 ///
 //******************************************************************************
 
-#include "syspovconfigbase.h"
+#include "syspovconfigcore.h"
 #include "avx2fma3noise.h"
 
 #ifdef MACHINE_INTRINSICS_H
@@ -130,10 +130,15 @@ void AVX2FMA3NoiseInit()
     }
 }
 
+bool OptimizedNoiseAVX2FMA3::initialized = false;
 
-bool AVX2FMA3NoiseSupported()
+OptimizedNoiseAVX2FMA3::OptimizedNoiseAVX2FMA3()
 {
-    return HaveAVX2FMA3();
+    if (!initialized)
+    {
+        AVX2FMA3NoiseInit();
+        initialized = true;
+    }
 }
 
 /*****************************************************************************
@@ -168,7 +173,7 @@ bool AVX2FMA3NoiseSupported()
 *
 ******************************************************************************/
 
-DBL AVX2FMA3Noise(const Vector3d& EPoint, int noise_generator)
+DBL OptimizedNoiseAVX2FMA3::Noise(const Vector3d& EPoint, int noise_generator) const
 {
     AVX2TABLETYPE *mp;
     DBL sum = 0.0;
@@ -305,8 +310,8 @@ DBL AVX2FMA3Noise(const Vector3d& EPoint, int noise_generator)
 
 #if CHECK_FUNCTIONAL
     {
-        extern DBL PortableNoise(const Vector3d& EPoint, int noise_generator);
-        DBL orig_sum = PortableNoise(EPoint, noise_generator);
+        extern DBL PortableNoiseImpl(const Vector3d& EPoint, int noise_generator);
+        DBL orig_sum = PortableNoiseImpl(EPoint, noise_generator);
         if (fabs(orig_sum - sum) >= EPSILON)
         {
             throw POV_EXCEPTION_STRING("Noise error");
@@ -354,7 +359,7 @@ DBL AVX2FMA3Noise(const Vector3d& EPoint, int noise_generator)
 *
 ******************************************************************************/
 
-void AVX2FMA3DNoise(Vector3d& result, const Vector3d& EPoint)
+void OptimizedNoiseAVX2FMA3::DNoise(Vector3d& result, const Vector3d& EPoint) const
 {
 
 #if CHECK_FUNCTIONAL
@@ -479,9 +484,9 @@ void AVX2FMA3DNoise(Vector3d& result, const Vector3d& EPoint)
 
 #if CHECK_FUNCTIONAL
     {
-        extern void PortableDNoise(Vector3d& result, const Vector3d& EPoint);
+        extern void PortableDNoiseImpl(Vector3d& result, const Vector3d& EPoint);
         Vector3d portable_res;
-        PortableDNoise(portable_res , param);
+        PortableDNoiseImpl(portable_res , param);
         if (fabs(portable_res[X] - result[X]) >= EPSILON)
         {
             throw POV_EXCEPTION_STRING("DNoise X error");

@@ -483,6 +483,29 @@ void BuildInitInfo(POVMSObjectPtr msg)
 #endif  // DONT_SHOW_IMAGE_LIB_VERSIONS
     if(err == kNoErr)
         err = POVMSObject_Set(msg, &attrlist, kPOVAttrib_ImageLibVersions);
+
+    if (err == kNoErr)
+        err = POVMSAttrList_New(&attrlist);
+#ifdef TRY_OPTIMIZED_NOISE
+    if (err == kNoErr)
+    {
+        const char *tempstr = gpOptimizedNoise->Name();
+        if (tempstr)
+        {
+            err = POVMSAttr_New(&attr);
+            if (err == kNoErr)
+            {
+                err = POVMSAttr_Set(&attr, kPOVMSType_CString, reinterpret_cast<const void *>(tempstr), (int)strlen(tempstr) + 1);
+                if (err == kNoErr)
+                    err = POVMSAttrList_Append(&attrlist, &attr);
+                else
+                    err = POVMSAttr_Delete(&attr);
+            }
+        }
+    }
+#endif // TRY_OPTIMIZED_NOISE
+    if (err == kNoErr)
+        err = POVMSObject_Set(msg, &attrlist, kPOVAttrib_Optimizations);
 }
 
 void ExtractLibraryVersion(const char *str, char *buffer)

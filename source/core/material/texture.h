@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -146,6 +146,15 @@ struct Finish_Struct
     bool AlphaKnockout;   // whether pigment alpha knocks out finish effects
 };
 
+class OptimizedNoiseBase
+{
+public:
+    virtual ~OptimizedNoiseBase() {}
+    virtual DBL Noise(const Vector3d& EPoint, int noise_generator) const = 0;
+    virtual void DNoise(Vector3d& result, const Vector3d& EPoint) const = 0;
+    virtual const char* Name() const = 0;
+};
+
 
 /*****************************************************************************
 * Global variables
@@ -169,8 +178,9 @@ void Free_Noise_Tables (void);
 DBL SolidNoise(const Vector3d& P);
 
 #ifdef TRY_OPTIMIZED_NOISE
-extern DBL (*Noise) (const Vector3d& EPoint, int noise_generator);
-extern void (*DNoise) (Vector3d& result, const Vector3d& EPoint);
+extern OptimizedNoiseBase* gpOptimizedNoise;
+inline DBL Noise(const Vector3d& EPoint, int noise_generator) { return gpOptimizedNoise->Noise(EPoint, noise_generator); }
+inline void DNoise(Vector3d& result, const Vector3d& EPoint) { gpOptimizedNoise->DNoise(result, EPoint); }
 void Initialise_NoiseDispatch();
 #else // TRY_OPTIMIZED_NOISE
 INLINE_NOISE DBL Noise (const Vector3d& EPoint, int noise_generator);

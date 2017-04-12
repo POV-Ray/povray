@@ -6212,38 +6212,6 @@ int PASCAL WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
 #endif
   buffer_message (mDivider, "\n") ;
 
-#ifdef TRY_OPTIMIZED_NOISE
-  // TODO FIXME
-  // technically we should ask the backend what it's using, but given this is not a remoted version
-  // of POVWIN, we just call the test here.
-  // NOTE - The priorization should reflect `optimizednoise.h`.
-#ifdef TRY_OPTIMIZED_NOISE_AVX2FMA3
-  if (AVX2FMA3NoiseSupported())
-  {
-    buffer_message (mIDE, "AVX2/FMA3 instruction support detected: using AVX2/FMA3-optimized noise functions.\n") ;
-  }
-  else
-#endif
-#ifdef TRY_OPTIMIZED_NOISE_AVXFMA4
-  if (AVXFMA4NoiseSupported())
-  {
-    buffer_message (mIDE, "AVX/FMA4 instruction support detected: using AVX/FMA4-optimized noise functions.\n") ;
-  }
-  else
-#endif
-#ifdef TRY_OPTIMIZED_NOISE_AVX
-  if (AVXNoiseSupported())
-  {
-    buffer_message (mIDE, "AVX instruction support detected: using AVX-optimized noise functions.\n") ;
-  }
-  else
-#endif
-  {
-    buffer_message (mIDE, "No enhanced instruction support detected: using compatible noise functions.\n") ;
-  }
-  buffer_message (mDivider, "\n") ;
-#endif // TRY_OPTIMIZED_NOISE
-
   load_tool_menu (ToolIniFileName) ;
   if (GetHKCU("FileQueue", "ReloadOnStartup", 0))
   {
