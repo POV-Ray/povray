@@ -214,3 +214,16 @@ bool HaveAVX2FMA3()
     // Aggregate the information
     return osxsave && avx && fma3 && avx2 && OSSavesAVXRegisters();
 }
+
+bool isIntelCPU()
+{
+    int info[4];
+    char vendor[12];
+
+    CPUID(info, 0x0);
+    memcpy(vendor, &info[CPUID_EBX], 4);
+    memcpy(vendor + 4, &info[CPUID_EDX], 4);
+    memcpy(vendor + 8, &info[CPUID_ECX], 4);
+
+    return strncmp("GenuineIntel", vendor, 12) == 0;
+}
