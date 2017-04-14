@@ -1,9 +1,9 @@
 //******************************************************************************
 ///
-/// @file platform/x86/avx2fma3noise.h
+/// @file platform/x86/avx/avxportablenoise.cpp
 ///
-/// This file contains declarations related to implementations of the noise
-/// generator optimized for the AVX2 and FMA3 instruction set.
+/// This file serves as a stub to compile an alternative AVX-optimized version
+/// of the default portable noise implementation.
 ///
 /// @copyright
 /// @parblock
@@ -34,31 +34,25 @@
 ///
 //******************************************************************************
 
-#ifndef POVRAY_AVX2FMA3NOISE_H
-#define POVRAY_AVX2FMA3NOISE_H
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
+#include "avxportablenoise.h"
 
-#include "syspovconfigbase.h"
-#include "backend/frame.h"
+#include "core/material/pattern.h"
+#include "core/material/texture.h"
 
-#ifdef TRY_OPTIMIZED_NOISE_AVX2FMA3
+/// @file
+/// @attention
+///     This file **must not** contain any code that might get called before CPU
+///     support for this optimized implementation has been confirmed. Most
+///     notably, the function to detect support itself must not reside in this
+///     file.
 
-namespace pov
-{
+#ifdef TRY_OPTIMIZED_NOISE_AVX_PORTABLE
 
-bool AVX2FMA3NoiseSupported();
+#define PORTABLE_OPTIMIZED_NOISE
+#define PortableNoise  AVXPortableNoise
+#define PortableDNoise AVXPortableDNoise
+#include "core/material/portablenoise.cpp" // pulls in the actual code
 
-void AVX2FMA3NoiseInit();
+#endif // TRY_OPTIMIZED_NOISE_AVX_PORTABLE
 
-/// Optimized Noise function using AVX2 and FMA3 instructions.
-/// @author Optimized by Intel
-DBL AVX2FMA3Noise(const Vector3d& EPoint, int noise_generator);
-
-/// Optimized DNoise function using AVX2 and FMA3 instructions.
-/// @author Optimized by Intel
-void AVX2FMA3DNoise(Vector3d& result, const Vector3d& EPoint);
-
-}
-
-#endif // TRY_OPTIMIZED_NOISE_AVX2FMA3
-
-#endif // POVRAY_AVX2FMA3NOISE_H

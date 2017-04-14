@@ -1,9 +1,9 @@
 //******************************************************************************
 ///
-/// @file platform/x86/avxfma4noise.h
+/// @file platform/x86/avx2fma3/avx2fma3noise.h
 ///
 /// This file contains declarations related to implementations of the noise
-/// generator optimized for the AVX and FMA4 instruction set.
+/// generator optimized for the AVX2 and FMA3 instruction set.
 ///
 /// @copyright
 /// @parblock
@@ -34,29 +34,29 @@
 ///
 //******************************************************************************
 
-#ifndef POVRAY_AVXFMA4NOISE_H
-#define POVRAY_AVXFMA4NOISE_H
+#ifndef POVRAY_AVX2FMA3NOISE_H
+#define POVRAY_AVX2FMA3NOISE_H
 
-#include "syspovconfigbase.h"
-#include "backend/frame.h"
+#include "core/configcore.h"
+#include "core/math/vector.h"
 
-#ifdef TRY_OPTIMIZED_NOISE_AVXFMA4
+#ifdef TRY_OPTIMIZED_NOISE_AVX2FMA3
 
 namespace pov
 {
 
-bool AVXFMA4NoiseSupported();
+void AVX2FMA3NoiseInit();
 
-/// Optimized Noise function using AVX and FMA4 instructions.
-/// @author Optimized by AMD
-DBL AVXFMA4Noise(const Vector3d& EPoint, int noise_generator);
+/// Optimized Noise function using AVX2 and FMA3 instructions.
+/// @author Optimized by Intel
+DBL AVX2FMA3Noise(const Vector3d& EPoint, int noise_generator);
 
-/// Optimized DNoise function using AVX and FMA4 instructions.
-/// @author Optimized by AMD
-void AVXFMA4DNoise(Vector3d& result, const Vector3d& EPoint);
+/// Optimized DNoise function using AVX2 and FMA3 instructions.
+/// @author Optimized by Intel
+void AVX2FMA3DNoise(Vector3d& result, const Vector3d& EPoint);
 
 }
 
-#endif // TRY_OPTIMIZED_NOISE_AVXFMA4
+#endif // TRY_OPTIMIZED_NOISE_AVX2FMA3
 
-#endif // POVRAY_AVXFMA4NOISE_H
+#endif // POVRAY_AVX2FMA3NOISE_H

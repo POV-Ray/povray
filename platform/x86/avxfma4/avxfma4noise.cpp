@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file platform/x86/avxfma4noise.cpp
+/// @file platform/x86/avxfma4/avxfma4noise.cpp
 ///
 /// This file contains implementations of the noise generator optimized for the
 /// AVX and FMA4 instruction set.
@@ -36,7 +36,7 @@
 ///
 //******************************************************************************
 
-#include "syspovconfigbase.h"
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "avxfma4noise.h"
 
 #ifdef MACHINE_INTRINSICS_H
@@ -45,7 +45,13 @@
 
 #include "core/material/pattern.h"
 #include "core/material/texture.h"
-#include "cpuid.h"
+
+/// @file
+/// @attention
+///     This file **must not** contain any code that might get called before CPU
+///     support for this optimized implementation has been confirmed. Most
+///     notably, the function to detect support itself must not reside in this
+///     file.
 
 /*****************************************************************************/
 
@@ -60,11 +66,6 @@ namespace pov
 {
 
 extern DBL RTable[];
-
-bool AVXFMA4NoiseSupported()
-{
-    return HaveAVXFMA4();
-}
 
 #define INCRSUMP2(mpA, mpB, s, x, y, z, sum)  \
     mp_t1 = _mm_loadu_pd(mpA + 1); \

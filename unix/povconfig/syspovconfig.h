@@ -132,10 +132,6 @@ const int NULL=0;
 #define TRY_OPTIMIZED_NOISE_AVX2FMA3
 #endif
 
-#ifdef TRY_OPTIMIZED_NOISE
-#define OPTIMIZED_NOISE_H "optimizednoise.h"
-#endif
-
 #endif
 
 
