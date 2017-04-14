@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26403.3
 MinimumVisualStudioVersion = 14.0.23107.0
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Image Libraries", "Image Libraries", "{4178148C-8A0C-4EB0-ACD9-0E09676F2700}"
 EndProject
@@ -24,7 +24,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vfewin", "vfewin.vcxproj", 
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "rtrsupport", "rtrsupport.vcxproj", "{851C772C-D7C2-4EE3-A90C-23386F0E9897}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "console", "console.vcxproj", "{3B6BB403-FC72-45FF-A431-9295A1AEB7A3}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CUI", "console.vcxproj", "{3B6BB403-FC72-45FF-A431-9295A1AEB7A3}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "povbackend", "povbackend.vcxproj", "{C6D9B754-11EB-4FC3-8683-593B53E9AD1F}"
 EndProject

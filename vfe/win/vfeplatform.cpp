@@ -14,7 +14,7 @@
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
-/// published by the Free Software Foundation, either version 3 of the
+/// published by the Free Software Foundation, either version 3 of the 
 /// License, or (at your option) any later version.
 ///
 /// POV-Ray is distributed in the hope that it will be useful,
@@ -35,10 +35,13 @@
 ///
 //******************************************************************************
 
+// must come first, will pull in "config.h" for HAVE_* macros
+#include "syspovconfig.h"
+
 #include <windows.h>
 
 #include "vfe.h"
-
+#include "win/console/winoptions.h"
 #include <boost/algorithm/string.hpp>
 
 namespace pov_frontend
@@ -59,12 +62,17 @@ namespace vfePlatform
     return (GetCurrentThreadId ());
   }
 
+  //////////////////////////////////////////////////////////////
+  // User-interface functions
+  //////////////////////////////////////////////////////////////
+
   vfeWinSession::vfeWinSession(int id) :
     m_LastTimestamp(0),
     m_TimestampOffset(0),
     vfeSession(id)
   {
-    char str [MAX_PATH];
+/*
+	  char str [MAX_PATH];
 
     if (GetTempPath (sizeof (str) - 7, str) == 0)
       throw vfeException("Could not get temp dir from Windows API");
@@ -74,6 +82,10 @@ namespace vfePlatform
       GetTempPath (sizeof (str), str);
     m_TempPath = Path(str);
     m_TempPathString = str;
+*/
+	  m_OptionsProc = shared_ptr<WinConOptionsProcessor>(new WinConOptionsProcessor(this));
+	  m_TempPath = Path(m_OptionsProc->GetTemporaryPath().c_str());
+	  m_TempPathString = m_OptionsProc->GetTemporaryPath().c_str();
   }
 
   vfeWinSession::~vfeWinSession()
@@ -88,10 +100,6 @@ namespace vfePlatform
     m_WriteFiles.clear();
     vfeSession::Clear(Notify);
   }
-
-  //////////////////////////////////////////////////////////////
-  // User-interface functions
-  //////////////////////////////////////////////////////////////
 
   /////////////////////////////////////////////////////////////////////////
   // this method will get called when a render completes and the image writing
@@ -195,7 +203,7 @@ namespace vfePlatform
   // you would probably display the message immediately.
   void vfeWinSession::NotifyCriticalError (const char *message, const char *filename, int line)
   {
-    MessageBox (NULL, message, "POV-Ray Critical Error", MB_ICONERROR | MB_OK) ;
+	fprintf(stderr, "POV-Ray Critical Error: %s", message);
   }
 
   ////////////////////////////////////////////////////////////////////////

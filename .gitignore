@@ -146,6 +146,15 @@ $RECYCLE.BIN/
 # Mac crap
 .DS_Store
 
+# ========================================
+# POV-Ray Library auto-generated artefacts
+# ========================================
+/libraries/ilmbase/Half/eLut.h
+/libraries/ilmbase/Half/toFloat.h 
+/libraries/png/pnglibconf.h 
+/libraries/tiff/libtiff/tif_config.h 
+/libraries/tiff/libtiff/tiffconf.h 
+
 # ===============================
 # POV-Ray Windows build artefacts
 # ===============================
@@ -155,6 +164,8 @@ $RECYCLE.BIN/
 /windows/vs*/bin64/
 /windows/vs*/build/
 /windows/vs*/ipch/
+/windows/vs*/povray.VC.VC.opendb
+/windows/vs*/povray.VC.db
 
 # ============================
 # POV-Ray Unix build artefacts

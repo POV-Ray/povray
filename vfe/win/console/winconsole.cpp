@@ -2,9 +2,11 @@
 ///
 /// @file vfe/win/console/winconsole.cpp
 ///
-/// This file contains a basic proof-of-concept POV implementation using VFE.
-///
-/// @author Christopher J. Cason
+/// This file contains a POV implementation using VFE. 
+/// 
+/// @author Trevor SANDY<trevor.sandy@gmial.com>
+/// @author Based on VFE proof-of-concept by Christopher J. Cason 
+/// and extensions adapted from vfe/unix/unixconsole.cpp 
 ///
 /// @copyright
 /// @parblock
@@ -35,11 +37,27 @@
 ///
 //******************************************************************************
 
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+
+#include <windows.h>
+#include <stdio.h>
+
 #include "base/version_info.h"
 
 #include "backend/povray.h"
+#include "backend/control/benchmark.h"
 
+// boost headers
+#include <boost/shared_ptr.hpp>
+#include <boost/algorithm/string.hpp>
+
+// from directory "vfe"
 #include "vfe.h"
+
+// from directory "vfe/win/console"
+#include "winoptions.h"
 
 #ifndef _CONSOLE
 #error "You must define _CONSOLE in windows/povconfig/syspovconfig.h prior to building the console version, otherwise you will get link errors."
@@ -50,13 +68,57 @@ using namespace vfePlatform;
 
 namespace pov_frontend
 {
-    ////////////////////////////////
-    // Called from the shellout code
-    ////////////////////////////////
-    bool MinimizeShellouts(void) { return false; } // TODO
-    bool ShelloutsPermitted(void) { return false; } // TODO
+  ////////////////////////////////
+  // Called from the shellout code
+  ////////////////////////////////
+  bool MinimizeShellouts(void) { return false; } // TODO
+  bool ShelloutsPermitted(void) { return false; } // TODO
 }
 
+enum ReturnValue
+{
+  RETURN_OK=0,
+  RETURN_ERROR,
+  RETURN_USER_ABORT
+};
+
+// for handling console events
+BOOL WINAPI ConsoleHandler(DWORD);
+HANDLE hStdin;
+DWORD fdwSaveOldMode;
+
+static bool gCancelRender = false;
+
+BOOL WINAPI ConsoleHandler(DWORD CEvent)
+{
+    switch(CEvent)
+    {
+    case CTRL_C_EVENT:
+        fprintf(stderr, "\n%s: received CTRL_C_EVENT: CTRL+C; requested render cancel\n", PACKAGE);
+        gCancelRender = true;
+        break;
+    case CTRL_BREAK_EVENT:
+        fprintf(stderr, "\n%s: received CTRL_BREAK_EVENT: CTRL+BREAK; requested render cancel\n", PACKAGE);
+        gCancelRender = true;
+        break;
+    case CTRL_CLOSE_EVENT:
+        fprintf(stderr, "\n%s: received CTRL_CLOSE_EVENT: Program being closed; requested render cancel\n", PACKAGE);
+        gCancelRender = true;
+        break;
+    case CTRL_LOGOFF_EVENT:
+        fprintf(stderr, "\n%s: received CTRL_LOGOFF_EVENT: User is logging off; requested render cancel\n", PACKAGE);
+        gCancelRender = true;
+        break;
+    case CTRL_SHUTDOWN_EVENT:
+        fprintf(stderr, "\n%s: received CTRL_SHUTDOWN_EVENT: User shutting down; requested render cancel\n", PACKAGE);
+        gCancelRender = true;
+        break;
+    default:
+        fprintf(stderr, "\n%s: received UNKNOWN EVENT: Unknown interrupt; requested render cancel\n", PACKAGE);	
+        gCancelRender = true;
+    }
+    return TRUE;
+}
 
 void PrintStatus (vfeSession *session)
 {
@@ -78,6 +140,51 @@ void PrintStatus (vfeSession *session)
   }
 }
 
+static void PrintStatusChanged (vfeSession *session, State force = kUnknown)
+{
+  if (force == kUnknown)
+      force = session->GetBackendState();
+  switch (force)
+  {
+      case kParsing:
+          fprintf (stderr, "==== [Parsing...] ==========================================================\n");
+          break;
+      case kRendering:
+          fprintf (stderr, "==== [Rendering...] ========================================================\n");
+          break;
+      case kPausedRendering:
+          fprintf (stderr, "==== [Paused...] ===========================================================\n");
+          break;
+  }
+}
+
+static void PrintVersion(void)
+{
+  fprintf(stderr,
+      "%s %s\n\n"
+      "%s\n%s\n%s\n"
+      "%s\n%s\n%s\n\n",
+      PACKAGE_NAME, POV_RAY_VERSION,
+      DISTRIBUTION_MESSAGE_1, DISTRIBUTION_MESSAGE_2, DISTRIBUTION_MESSAGE_3,
+      POV_RAY_COPYRIGHT, DISCLAIMER_MESSAGE_1, DISCLAIMER_MESSAGE_2
+  );
+  fprintf(stderr,
+      "Built-in features:\n"
+      "  I/O restrictions:          %s\n"
+      "  Supported image formats:   %s\n"
+      "  Unsupported image formats: %s\n\n",
+      BUILTIN_IO_RESTRICTIONS, BUILTIN_IMG_FORMATS, MISSING_IMG_FORMATS
+  );
+  fprintf(stderr,
+      "Compilation settings:\n"
+      "  Build architecture:  %s\n"
+      "  Built/Optimized for: %s\n"
+      "  Compiler vendor:     %s\n"
+      "  Compiler version:    %d\n",
+      BUILD_ARCH, BUILT_FOR, COMPILER_VENDOR, COMPILER_VERSION
+  );
+}
+
 void ErrorExit(vfeSession *session)
 {
   fprintf (stderr, "%s\n", session->GetErrorString());
@@ -86,20 +193,172 @@ void ErrorExit(vfeSession *session)
   exit (1);
 }
 
-// this is an example of a minimal console version of POV-Ray using the VFE
-// (virtual front-end) library. it is NOT INTENDED TO BE A FULLY-FEATURED
-// CONSOLE IMPLEMENTATION OF POV-RAY and is not officially supported. see
-// the unix version for a example of a more comprehensive console build.
+void BenchMarkErrorExit(LPSTR lpszMessage)
+{
+	fprintf(stderr, "%s\n", lpszMessage);
+	// Restore input mode on exit.
+	SetConsoleMode(hStdin, fdwSaveOldMode);
+	ExitProcess(0);
+}
+
+static void CancelRender(vfeSession *session)
+{
+  session->CancelRender();  // request the backend to cancel
+  PrintStatus (session);
+  while (session->GetBackendState() != kReady)  // wait for the render to effectively shut down
+      Delay(10);
+  PrintStatus (session);
+}
+
+static void PauseWhenDone(vfeSession *session)
+{
+	if (session->GetBoolOption("Pause_When_Done", false))
+	{
+		fprintf(stderr, "Press enter to continue ... ");
+		fflush(stderr);
+		getchar();
+	}
+}
+
+static ReturnValue PrepareBenchmark(vfeSession *session, vfeRenderOptions& opts, string& ini, string& pov, int argc, char **argv)
+{
+ 
+  // parse command-line options
+  while (*++argv)
+  {
+      string s = string(*argv);
+      boost::algorithm::to_lower(s);
+      // set number of threads to run the benchmark
+      if (boost::starts_with(s, "+wt") || boost::starts_with(s, "-wt"))
+      {
+          s.erase(0, 3);
+          int n = atoi(s.c_str());
+          if (n)
+              opts.SetThreadCount(n);
+          else
+              fprintf(stderr, "%s: ignoring malformed '%s' command-line option\n", PACKAGE, *argv);
+      }
+      // add library path
+      else if (boost::starts_with(s, "+l") || boost::starts_with(s, "-l"))
+      {
+          s.erase(0, 2);
+          opts.AddLibraryPath(s);
+      }
+  }
+
+  int benchversion = pov::Get_Benchmark_Version();
+  fprintf(stderr, "\
+%s %s\n\n\
+Entering the standard POV-Ray %s benchmark version %x.%02x.\n\n\
+This built-in benchmark requires POV-Ray to be installed on your system\n\
+before running it.  There will be neither display nor file output, and\n\
+any additional command-line option except setting the number of render\n\
+threads (+wtN for N threads) and library paths (+Lpath) will be ignored.\n\
+To get an accurate benchmark result you might consider running POV-Ray\n\
+with the Win 'time' command (e.g. 'time povray -benchmark').\n\n\
+The benchmark will run using %d render thread(s).\n\
+Press <Enter> to continue or <Ctrl-C> to abort.\n\
+",
+      PACKAGE_NAME, POV_RAY_VERSION_INFO,
+      VERSION_BASE, benchversion / 256, benchversion % 256,
+      opts.GetThreadCount()
+  );
+
+  DWORD cNumRead, fdwMode, i;
+  INPUT_RECORD irInBuf[128];
+  int counter = 0;
+
+  // Get the standard input handle. 
+  hStdin = GetStdHandle(STD_INPUT_HANDLE);
+  if (hStdin == INVALID_HANDLE_VALUE)
+	  BenchMarkErrorExit("Invalid standard input handle.");
+
+  // Save the current input mode, to be restored on exit. 
+
+  if (!GetConsoleMode(hStdin, &fdwSaveOldMode))
+	  BenchMarkErrorExit("Unable to get current console mode.");
+
+  // Enable the window and mouse input events. 
+
+  fdwMode = ENABLE_WINDOW_INPUT | ENABLE_MOUSE_INPUT;
+  if (!SetConsoleMode(hStdin, fdwMode))
+	  BenchMarkErrorExit("Unable to set console mode with window and mouse input.");
+
+  // wait for user input from stdin (including abort signals)
+  while (true)
+  {
+
+	  if (gCancelRender)
+	  {
+		  fprintf(stderr, "Render cancelled by user\n");
+		  return RETURN_USER_ABORT;
+	  }
+
+	  // Wait for user input events. 
+	  if (!ReadConsoleInput(
+		  hStdin,      // input buffer handle 
+		  irInBuf,     // buffer to read into 
+		  128,         // size of read buffer 
+		  &cNumRead))  // number of records read 
+		  BenchMarkErrorExit("ReadConsoleInput");
+
+	  if (cNumRead > 0)  // user input is available 
+	  {				
+		  for (i = 0; i < cNumRead; i++)     // read till <ENTER> is hit
+		  {
+			  if (irInBuf[i].EventType == KEY_EVENT && irInBuf[i].Event.KeyEvent.wVirtualKeyCode == VK_RETURN)
+				  break;
+		  }
+	  }
+	  Delay(20);
+  }
+
+  string basename = UCS2toASCIIString(session->CreateTemporaryFile());
+  ini = basename + ".ini";
+  pov = basename + ".pov";
+  if (pov::Write_Benchmark_File(pov.c_str(), ini.c_str()))
+  {
+      fprintf(stderr, "%s: creating %s\n", PACKAGE, ini.c_str());
+      fprintf(stderr, "%s: creating %s\n", PACKAGE, pov.c_str());
+      fprintf(stderr, "Running standard POV-Ray benchmark version %x.%02x\n", benchversion / 256, benchversion % 256);
+  }
+  else
+  {
+      fprintf(stderr, "%s: failed to write temporary files for benchmark\n", PACKAGE);
+      return RETURN_ERROR;
+  }
+
+  // Restore input mode on exit.
+  SetConsoleMode(hStdin, fdwSaveOldMode);
+
+  return RETURN_OK;
+}
+
+static void CleanupBenchmark(vfeWinSession *session, string& ini, string& pov)
+{
+    fprintf(stderr, "%s: removing %s\n", PACKAGE, ini.c_str());
+    session->DeleteTemporaryFile(ASCIItoUCS2String(ini.c_str()));
+    fprintf(stderr, "%s: removing %s\n", PACKAGE, pov.c_str());
+    session->DeleteTemporaryFile(ASCIItoUCS2String(pov.c_str()));
+}
+
+
 int main (int argc, char **argv)
 {
   char              *s;
-  vfeWinSession     *session = new vfeWinSession() ;
+  vfeWinSession     *session;
   vfeStatusFlags    flags;
   vfeRenderOptions  opts;
-
+  ReturnValue       retval = RETURN_OK;
+  bool              running_benchmark = false;
+  string            bench_ini_name;
+  string            bench_pov_name;
+  char **           argv_copy=argv; /* because argv is updated later */
+  int               argc_copy=argc; /* because it might also be updated */
+	
   fprintf(stderr,
-          "This is an example of a minimal console build of POV-Ray under Windows.\n\n"
-          "Persistence of Vision(tm) Ray Tracer Version " POV_RAY_VERSION_INFO ".\n"
+          "\nThis is an example of a minimal console build of POV-Ray under Windows.\n\n"
+          "Persistence of Vision(tm) Ray Tracer Version " POV_RAY_VERSION_INFO ".\n\n"
           DISTRIBUTION_MESSAGE_1 "\n"
           DISTRIBUTION_MESSAGE_2 "\n"
           DISTRIBUTION_MESSAGE_3 "\n"
@@ -107,33 +366,129 @@ int main (int argc, char **argv)
           DISCLAIMER_MESSAGE_1 "\n"
           DISCLAIMER_MESSAGE_2 "\n\n");
 
+  session = new vfeWinSession();
   if (session->Initialize(NULL, NULL) != vfeNoError)
     ErrorExit(session);
 
-  if ((s = getenv ("POVINC")) != NULL)
-    opts.AddLibraryPath (s);
-  while (*++argv)
-    opts.AddCommand (*argv);
+  if (!SetConsoleCtrlHandler((PHANDLER_ROUTINE)ConsoleHandler,TRUE)) 
+  {
+     fprintf(stderr, "Unable to install console control handler!\n");
+     return RETURN_ERROR;
+  }
 
+  // process command-line options
+  session->GetWinConOptions()->ProcessOptions(&argc, &argv);
+  if (session->GetWinConOptions()->isOptionSet("general", "help"))
+  {
+    session->Shutdown() ;
+    PrintStatus (session) ;
+    // TODO: general usage display (not yet in core code)
+    session->GetWinConOptions()->PrintOptions();
+    delete session;
+    return RETURN_OK;
+  }
+  else if (session->GetWinConOptions()->isOptionSet("general", "version"))
+  {
+    session->Shutdown() ;
+    PrintVersion();
+    delete session;
+    return RETURN_OK;
+  }
+  else if (session->GetWinConOptions()->isOptionSet("general", "benchmark"))
+  {
+    retval = PrepareBenchmark(session, opts, bench_ini_name, bench_pov_name, argc, argv);
+    if (retval == RETURN_OK)
+      running_benchmark = true;
+    else
+    {
+      session->Shutdown();
+      delete session;
+      return retval;
+    }
+  }
+
+  // process INI settings
+  if (running_benchmark)
+  {
+    // read only the provided INI file and set minimal lib paths
+    opts.AddLibraryPath(string(POVLIBDIR "\\include"));
+    opts.AddINI(bench_ini_name.c_str());
+    opts.SetSourceFile(bench_pov_name.c_str());
+  }
+  else
+  {
+    s = getenv ("POVINC");
+    session->GetWinConOptions()->Process_povray_ini(opts);
+    if (s != NULL)
+      opts.AddLibraryPath (s);
+    while (*++argv)
+      opts.AddCommand (*argv);
+  }
+
+  // set all options and start rendering
   if (session->SetOptions(opts) != vfeNoError)
+  {
+    fprintf(stderr,"\nProblem with option setting\n");
+    for(int loony=0;loony<argc_copy;loony++)
+    {
+        fprintf(stderr,"%s%c",argv_copy[loony],loony+1<argc_copy?' ':'\n');
+    }
     ErrorExit(session);
+  }
   if (session->StartRender() != vfeNoError)
     ErrorExit(session);
 
-  bool pauseWhenDone = session->GetBoolOption("Pause_When_Done", false);
-  while (((flags = session->GetStatus(true, 1000)) & stRenderShutdown) == 0)
-    PrintStatus (session) ;
-  session->Shutdown() ;
-  PrintStatus (session) ;
-  delete session;
+  // set inter-frame pause for animation
+  if (session->RenderingAnimation() && session->GetBoolOption("Pause_When_Done", false))
+    session->PauseWhenDone(true);
 
-  if (pauseWhenDone)
+  // main render loop
+  session->SetEventMask(stBackendStateChanged);  // immediately notify this event 
+
+  while (((flags = session->GetStatus(true, 200)) & stRenderShutdown) == 0)
   {
-    fprintf (stderr, "Press enter to continue ... ");
-    fflush(stderr);
-    getchar();
+	  if (gCancelRender)
+	  {
+		  CancelRender(session);
+		  break;
+	  }
+
+	  if (flags & stAnimationStatus)
+		  fprintf(stderr, "\nRendering frame %d of %d (#%d)\n", session->GetCurrentFrame(), session->GetTotalFrames(), session->GetCurrentFrameId());
+	  if (flags & stAnyMessage)
+		  PrintStatus(session);
+	  if (flags & stBackendStateChanged)
+		  PrintStatusChanged(session);
+
+	  // inter-frame pause
+	  if (session->GetCurrentFrame() < session->GetTotalFrames()
+		  && session->GetPauseWhenDone()
+		  && (flags & stAnimationFrameCompleted) != 0
+		  && session->Failed() == false)
+	  {
+		  PauseWhenDone(session);
+		  if (!gCancelRender)
+			  session->Resume();
+	  }
   }
 
-  return 0;
+  // pause when done for single or last frame of an animation
+  if (session->Failed() == false && session->GetBoolOption("Pause_When_Done", false))
+  {
+	PrintStatusChanged(session, kPausedRendering);
+    PauseWhenDone(session);
+    gCancelRender = false;
+  }
+
+  if (running_benchmark)
+    CleanupBenchmark(session, bench_ini_name, bench_pov_name);
+
+  if (session->Succeeded() == false)
+    retval = gCancelRender ? RETURN_USER_ABORT : RETURN_ERROR;
+  session->Shutdown();
+  PrintStatus (session);
+  delete session;
+
+  return retval;
 }
 

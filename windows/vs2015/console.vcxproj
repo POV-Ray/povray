@@ -38,6 +38,7 @@
     <ProjectGuid>{3B6BB403-FC72-45FF-A431-9295A1AEB7A3}</ProjectGuid>
     <RootNamespace>console</RootNamespace>
     <Keyword>Win32Proj</Keyword>
+    <ProjectName>CUI</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -351,6 +352,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\vfe\win\console\winconsole.cpp" />
+    <ClCompile Include="..\..\vfe\win\console\winoptions.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="boost_system.vcxproj">
@@ -429,6 +431,9 @@
       <Project>{8bb067c4-7135-4643-863c-49c520beea01}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\vfe\win\console\winoptions.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -53,7 +53,7 @@
 
 // _CONSOLE must be defined when building the console version of POVWIN.
 // failure to do so will lead to link errors.
-// #define _CONSOLE
+// #define _CONSOLE 
 
 // C++ variants of C standard headers
 #include <cmath>
@@ -61,6 +61,9 @@
 #include <cstdlib>
 
 // C++ standard headers
+#include <algorithm>
+#include <limits>
+
 #include <exception>
 #include <list>
 #include <stdexcept>
@@ -73,6 +76,9 @@
 
 #include <io.h>
 #include <fcntl.h>
+
+// use this to verbose debug tracing
+//#define WIN_DEBUG
 
 #ifndef STD_TYPES_DECLARED
 #define STD_TYPES_DECLARED
@@ -112,30 +118,45 @@ using boost::intrusive_ptr;
 
 #ifdef _WIN64
   #define POVRAY_PLATFORM_NAME "win64"
+  #define BUILD_ARCH "Intel-based x86_64"
+  #define BUILT_FOR "Microsoft Windows 64bit"
 #else
   #define POVRAY_PLATFORM_NAME "win32"
+  #define BUILD_ARCH "Intel-based x86"
+  #define BUILT_FOR "Microsoft Windows 32bit"
 #endif
 
 #define ReturnAddress()           NULL
 
+// Pull in additional settings depending on development platform
+
 #if defined(__MINGW32__)                    /* MinGW GCC */
   #error "Currently not supported."
   #include "syspovconfig_mingw32.h"
+  #define COMPILER_VENDOR "MinGW GCC"
 #elif defined(__WATCOMC__)                  /* Watcom C/C++ C32 */
   #error "Currently not supported."
   #include "syspovconfig_watcom.h"
+  #define COMPILER_VENDOR "Watcom C/C++"
 #elif defined(__BORLANDC__)                 /* Borland C/C++ */
   #error "Currently not supported."
   #include "syspovconfig_borland.h"
+  #define COMPILER_VENDOR "Borland C/C++"
 #elif defined(_MSC_VER)                     /* Microsoft and Intel C++ */
   #include "syspovconfig_msvc.h"
+  #define COMPILER_VENDOR "Microsoft Visual C++"
 #else
   #error "unknown compiler configuration"
+  #define COMPILER_VENDOR "Unknown"
 #endif
+
+// Compiler version
 
 #ifndef POV_COMPILER_VER
   #define POV_COMPILER_VER "u"
 #endif
+
+// Define the platform name
 
 #if defined(BUILD_AVX2)
   #define POV_BUILD_INFO POV_COMPILER_VER ".avx2." POVRAY_PLATFORM_NAME
@@ -238,6 +259,21 @@ namespace pov_base
 #define POV_MEMCPY(dst,src,len)             std::memcpy((dst),(src),(len))
 
 #ifdef _CONSOLE
+
+/* Name of package */
+#define PACKAGE "POV-Ray"
+/* Define to the full name of this package. */
+#define PACKAGE_NAME PACKAGE " Console User Interface"
+/* Supported image formats. */
+#define BUILTIN_IMG_FORMATS "gif tga iff ppm pgm hdr png jpeg tiff"
+/* Unsupported image formats. */
+#define MISSING_IMG_FORMATS "none"
+/* I/O restrictions. */
+#define BUILTIN_IO_RESTRICTIONS "enabled"
+/* I/O restrictions. */
+#define IO_RESTRICTIONS_DISABLED 0
+/* Base version number of package. */
+#define VERSION_BASE "3.7"
 
 #define POV_MALLOC(size,msg)                malloc (size)
 #define POV_REALLOC(ptr,size,msg)           realloc ((ptr), (size))

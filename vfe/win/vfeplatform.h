@@ -38,12 +38,21 @@
 #ifndef __VFEPLATFORM_H__
 #define __VFEPLATFORM_H__
 
+#include <boost/shared_ptr.hpp>
+
+#include "base/path.h"
+#include "base/stringutilities.h"
+
 #include "frontend/shelloutprocessing.h"
+
 #include "vfesession.h"
 
 namespace vfePlatform
 {
   using namespace vfe;
+  using namespace pov_base;  
+  
+  class WinConOptionsProcessor;
 
   class WinShelloutProcessing: public pov_frontend::ShelloutProcessing
   {
@@ -98,6 +107,8 @@ namespace vfePlatform
       virtual bool ImageOutputToStdoutSupported(void) const { return m_OptimizeForConsoleOutput; }
       virtual ShelloutProcessing *CreateShelloutProcessing(POVMS_Object& opts, const string& scene, unsigned int width, unsigned int height) { return new WinShelloutProcessing(opts, scene, width, height); }
 
+	  shared_ptr<WinConOptionsProcessor> GetWinConOptions(void) { return m_OptionsProc; }
+		
       virtual void Clear(bool Notify = true);
 
       const FilenameSet& GetReadFiles(void) const { return m_ReadFiles; }
@@ -126,6 +137,10 @@ namespace vfePlatform
       mutable __int64 m_LastTimestamp;
       mutable __int64 m_TimestampOffset;
 
+	  ///////////////////////////////////////////////////////////////////////
+	  // platform specific configuration options
+	  shared_ptr<WinConOptionsProcessor> m_OptionsProc;
+	  
       ////////////////////////////////////////////////////////////////////
       // used to store the location of the temp path. this is used by both
       // GetTemporaryPath() and TestAccessAllowed().
@@ -134,7 +149,7 @@ namespace vfePlatform
       mutable vector<string> m_TempFilenames;
       mutable FilenameSet m_ReadFiles;
       mutable FilenameSet m_WriteFiles;
-  } ;
+  };
 
   ///////////////////////////////////////////////////////////////////////
   // return a number that uniquely identifies the calling thread amongst
