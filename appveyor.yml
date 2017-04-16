@@ -15,23 +15,43 @@ matrix:
 environment:
   PovBuildDefs: POV_RAY_IS_AUTOBUILD=1;POV_RAY_BUILD_ID="av$(APPVEYOR_BUILD_NUMBER)";BUILT_BY="AppVeyor";
   matrix:
-  - configuration: Release
-    platform: x64
+  # Graphic User Interface (GUI) build matrix
+  - project_name: windows/vs2015/povray.sln
+    configuration: Release 
+    platform: x64  
     bin_dir: bin64
     artifact_suffix: -Win64
-  - configuration: Release-SSE2
+  - project_name: windows/vs2015/povray.sln
+    configuration: Release-SSE2
     platform: Win32
     bin_dir: bin32
     artifact_suffix: -Win32-sse2
-  - configuration: Release
+  - project_name: windows/vs2015/povray.sln
+    configuration: Release
     platform: Win32
     bin_dir: bin32
-    artifact_suffix: -Win32
+    artifact_suffix: -Win32	
+  # Console User Interface (CUI) build matrix
+  - project_name: windows/vs2015/console.vcxproj
+    configuration: Release 
+    platform: x64  
+    bin_dir: bin64
+    artifact_suffix: -Win64
+  - project_name: windows/vs2015/console.vcxproj
+    configuration: Release-SSE2
+    platform: Win32
+    bin_dir: bin32
+    artifact_suffix: -Win32-sse2
+  - project_name: windows/vs2015/console.vcxproj
+    configuration: Release
+    platform: Win32
+    bin_dir: bin32
+    artifact_suffix: -Win32	
 
 before_build:
 
 build:
-  project: windows/vs2015/povray.sln
+  project: $(project_name)
   parallel: true
   verbosity: minimal
 

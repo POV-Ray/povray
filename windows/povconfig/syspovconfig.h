@@ -53,7 +53,7 @@
 
 // _CONSOLE must be defined when building the console version of POVWIN.
 // failure to do so will lead to link errors.
-// #define _CONSOLE 
+//#define _CONSOLE 
 
 // C++ variants of C standard headers
 #include <cmath>
@@ -273,7 +273,8 @@ namespace pov_base
 /* I/O restrictions. */
 #define IO_RESTRICTIONS_DISABLED 0
 /* Base version number of package. */
-#define VERSION_BASE "3.7"
+#include "..\..\source\base\version.h"
+#define VERSION_BASE OFFICIAL_GENERATION_STRING
 
 #define POV_MALLOC(size,msg)                malloc (size)
 #define POV_REALLOC(ptr,size,msg)           realloc ((ptr), (size))

@@ -929,7 +929,7 @@ namespace vfePlatform
             }
             else
             {
-                fprintf(stderr, "%s: cannot open the user configuration file ", PACKAGE);
+                fprintf(stderr, "%s: cannot open the user configuration file\n", PACKAGE);
                 perror(m_userconf.c_str());
             }
         }

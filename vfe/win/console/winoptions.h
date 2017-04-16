@@ -56,17 +56,16 @@ using boost::to_lower_copy;
  * These constants don't have to be in config.h .
  */
 #ifndef POVLIBDIR
-# define POVLIBDIR  "C:\\Users\\Public\\Documents\\" PACKAGE "\\" VERSION_BASE
+# define POVLIBDIR  "C:\\ProgramData\\" PACKAGE "\\" VERSION_BASE
+#endif
+
+#ifndef POVCONFDIR_BACKWARD
+# define POVCONFDIR_BACKWARD  "C:\\ProgramData"
 #endif
 
 #ifndef POVCONFDIR
 # define POVCONFDIR  "C:\\Users\\Public\\Documents\\" PACKAGE "\\" VERSION_BASE
 #endif
-
-#ifndef POVCONFDIR_BACKWARD
-# define POVCONFDIR_BACKWARD  "C:\\Users\\Public\\Documents"
-#endif
-
 
 namespace vfePlatform
 {

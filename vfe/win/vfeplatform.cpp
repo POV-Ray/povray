@@ -41,7 +41,10 @@
 #include <windows.h>
 
 #include "vfe.h"
+#ifdef _CONSOLE
 #include "win/console/winoptions.h"
+#endif
+
 #include <boost/algorithm/string.hpp>
 
 namespace pov_frontend
@@ -71,21 +74,23 @@ namespace vfePlatform
     m_TimestampOffset(0),
     vfeSession(id)
   {
-/*
-	  char str [MAX_PATH];
-
-    if (GetTempPath (sizeof (str) - 7, str) == 0)
-      throw vfeException("Could not get temp dir from Windows API");
-    strcat (str, "povwin\\");
-    // if we fail to creat our temp dir, just use the default one
-    if (CreateDirectory(str, NULL) == 0 && GetLastError() != ERROR_ALREADY_EXISTS)
-      GetTempPath (sizeof (str), str);
-    m_TempPath = Path(str);
-    m_TempPathString = str;
-*/
+#ifdef _CONSOLE
 	  m_OptionsProc = shared_ptr<WinConOptionsProcessor>(new WinConOptionsProcessor(this));
 	  m_TempPath = Path(m_OptionsProc->GetTemporaryPath().c_str());
 	  m_TempPathString = m_OptionsProc->GetTemporaryPath().c_str();
+#else
+	  char str[MAX_PATH];
+
+	  if (GetTempPath(sizeof(str) - 7, str) == 0)
+		  throw vfeException("Could not get temp dir from Windows API");
+	  strcat(str, "povwin\\");
+	  // if we fail to creat our temp dir, just use the default one
+	  if (CreateDirectory(str, NULL) == 0 && GetLastError() != ERROR_ALREADY_EXISTS)
+		  GetTempPath(sizeof(str), str);
+	  m_TempPath = Path(str);
+	  m_TempPathString = str;
+#endif
+
   }
 
   vfeWinSession::~vfeWinSession()

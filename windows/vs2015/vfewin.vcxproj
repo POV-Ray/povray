@@ -390,7 +390,6 @@
     <ClCompile Include="..\..\vfe\vfedisplay.cpp" />
     <ClCompile Include="..\..\vfe\vfepovms.cpp" />
     <ClCompile Include="..\..\vfe\vfesession.cpp" />
-    <ClCompile Include="..\..\vfe\win\vfeplatform.cpp" />
     <ClCompile Include="..\..\vfe\vfeprecomp.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -399,6 +398,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release-SSE2|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release-AVX|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="..\..\vfe\win\vfeplatform.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\vfe\vfe.h" />
@@ -406,8 +406,8 @@
     <ClInclude Include="..\..\vfe\vfepovms.h" />
     <ClInclude Include="..\..\vfe\vfesession.h" />
     <ClInclude Include="..\..\vfe\win\syspovimage.h" />
-    <ClInclude Include="..\..\vfe\win\vfeplatform.h" />
     <ClInclude Include="..\..\vfe\vfeprecomp.h" />
+    <ClInclude Include="..\..\vfe\win\vfeplatform.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

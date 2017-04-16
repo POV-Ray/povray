@@ -11,7 +11,7 @@
 	- Console signal management
 	- Additional features...
 	
-	/// Building the Console User Interface
+	/// Building the Console User Interface (VS2017 GUI)
 	//////////////////////////////////////////////////////
 	1. Open `windows\vs2015\povray.sln` in Visual Studio
 	
@@ -36,9 +36,9 @@
 	3.  console.vcxproj.filters /windows/vs2015 
 	4.  povray.sln				/windows/vs2015 
 	5.  syspovconfig.h			/windows/povconfig 
-	6.  vfeplatform.cpp			/vfe/win 
-	7.  vfeplatform.h 			/vfe/win 
+	6.  vfeplatform.cpp			/vfe/win
+	7.  vfeplatform.h 			/vfe/win
 	8.  winconsole.cpp			/vfe/win/console 
-	9.  winoptions.cpp			/vfe/win/console (New)
-	10. winoptions.h`			/vfe/win/console (New)
+	9.  winoptions.cpp			/vfe/win/console   (New)
+	10. winoptions.h`			/vfe/win/console   (New)
 	11. CUI_README.txt			/windows
