@@ -1,22 +1,27 @@
 @ECHO OFF
-Title POV-Ray Windows project auto build script
-::
-:: This script uses MSBuild to configure and build POV-Ray from the command line
+Title POV-Ray on Windows auto build script
+
+:: This script uses MSBuild to configure and build POV-Ray from the command line.
 :: The primary benefit is not having to modify source files before building
 :: as described in the official POV-Ray build documentation.
 :: It is possible to build either the GUI or CUI project - see usage below.
+
+:: This script is requires autobuild_defs.cmd
 :: --
 ::  Trevor SANDY <trevor.sandy@gmail.com>
-::  Last Update: April 16, 2017
-::  Copyright (c) 2017 by Trevor Sandy
+::  Last Update: April 17, 2017
+::  Copyright (c) 2017 by Trevor SANDY
 :: --
 :: This script is distributed in the hope that it will be useful,
 :: but WITHOUT ANY WARRANTY; without even the implied warranty of
 :: MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
 
+:: It is expected that this script will reside in .\windows\vs2015
+
+:: Variables
+SET PLATFORM=unknown
 
 :: Parse platform input flag
-SET PLATFORM=unknown
 IF "%1"=="x86" (
 	SET PLATFORM=Win32
 	GOTO :BUILD
@@ -71,6 +76,7 @@ ECHO To run this scrip as is, you must have the following components:
 ECHO     - Visual Studio 2017 (I'm using Community Edition here)
 ECHO     - Git
 ECHO     - Local POV-Ray git repository
+ECHO However, you are free to reconfigue this script to use different components.
 ECHO.
 ECHO Use:
 ECHO autobuild [x86 ^| x86_64] [-cui]

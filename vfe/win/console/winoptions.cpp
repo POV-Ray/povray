@@ -116,8 +116,8 @@ namespace vfePlatform
         cerr << "  SYSINI_OLD  = " << m_sysini_old << endl;
         cerr << "  USERINI     = " << m_userini << endl;
         cerr << "  USERINI_OLD = " << m_userini_old << endl;
-//#endif
-//#if 0
+#endif
+#if 0
         cerr << "--- tests ---" << endl;
         cerr << "## win_getcwd: " << win_getcwd() << endl;
         cerr << "## basename(SYSCONF): " << basename(m_sysconf) << endl;

@@ -1,20 +1,21 @@
 @ECHO OFF
-Title POV-Ray auto build defines
-::
+Title POV-Ray on Windows auto build script
+
 :: This script sets the POV-Ray preprocessor defines
 :: needed to build the solution/project.
-::
+
 :: This script is intended to be called from autobuild.cmd
 :: --
 ::  Trevor SANDY <trevor.sandy@gmail.com>
-::  Last Update: April 15, 2017
-::  Copyright (c) 2017 by Trevor Sandy
+::  Last Update: April 17, 2017
+::  Copyright (c) 2017 by Trevor SANDY
 :: --
 :: This script is distributed in the hope that it will be useful,
 :: but WITHOUT ANY WARRANTY; without even the implied warranty of
 :: MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
 
 :: It is expected that this script will reside in .\windows\vs2015
+
 :: Variables
 SET DEV_ENV=unknown
 SET GIT_SHA=unknown
@@ -22,6 +23,8 @@ SET VERSION=unknown
 SET RELEASE=unknown
 SET CONSOLE=unknown
 SET VERFILE="..\..\source\base\version.h"
+:: Populate to build with trace output - e.g. SET TRACE=Yes (useful for debugging)
+SET TRACE=
 
 :: Check if CUI build flag passed in
 IF /I "%1"=="-c" GOTO :CUI ELSE GOTO :GUI
@@ -59,8 +62,10 @@ SET BUILD_ID="%VERSION%(Rev: %GIT_SHA%)"
 
 :: Set project build defines - configured to build GUI project at this stage 
 SET PovBuildDefs=POV_RAY_IS_AUTOBUILD=1;POV_RAY_BUILD_ID=%BUILD_ID%;BUILT_BY=%BUILT_BY%;
-:: Check if console variable is not empty and if not, append console define to project build defines
+:: If console variable is not empty append console define to project build defines
 IF NOT [%CONSOLE%]==[] SET PovBuildDefs=%PovBuildDefs%_CONSOLE=1;
+:: If trace variable is not empty append tracing define to project build defines
+IF NOT [%TRACE%]==[] SET PovBuildDefs=%PovBuildDefs%WIN_DEBUG=1;
 
 :: Display the define attributes to visually confirm all is well.
 ECHO.

@@ -342,7 +342,10 @@ static void CleanupBenchmark(vfeWinSession *session, string& ini, string& pov)
     session->DeleteTemporaryFile(ASCIItoUCS2String(pov.c_str()));
 }
 
-
+// This is the console user interface build of POV-Ray under Windows 
+// using the VFE (virtual front-end) library. This implementation 
+// includes the same capabiliteis as the Unix console build. 
+// It is not officially supported.
 int main (int argc, char **argv)
 {
   char              *s;
@@ -357,7 +360,7 @@ int main (int argc, char **argv)
   int               argc_copy=argc; /* because it might also be updated */
 	
   fprintf(stderr,
-          "\nThis is an example of a minimal console build of POV-Ray under Windows.\n\n"
+          "\nThis is the console user interface build of POV-Ray under Windows.\n\n"
           "Persistence of Vision(tm) Ray Tracer Version " POV_RAY_VERSION_INFO ".\n\n"
           DISTRIBUTION_MESSAGE_1 "\n"
           DISTRIBUTION_MESSAGE_2 "\n"

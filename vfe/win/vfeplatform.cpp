@@ -35,12 +35,15 @@
 ///
 //******************************************************************************
 
-// must come first, will pull in "config.h" for HAVE_* macros
+#ifdef _CONSOLE
+// must come first, will pull in configuration macros
 #include "syspovconfig.h"
+#endif
 
 #include <windows.h>
 
 #include "vfe.h"
+
 #ifdef _CONSOLE
 #include "win/console/winoptions.h"
 #endif
@@ -208,7 +211,11 @@ namespace vfePlatform
   // you would probably display the message immediately.
   void vfeWinSession::NotifyCriticalError (const char *message, const char *filename, int line)
   {
+#ifdef _CONSOLE
 	fprintf(stderr, "POV-Ray Critical Error: %s", message);
+#else
+	MessageBox(NULL, message, "POV-Ray Critical Error", MB_ICONERROR | MB_OK);
+#endif
   }
 
   ////////////////////////////////////////////////////////////////////////

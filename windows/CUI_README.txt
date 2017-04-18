@@ -1,10 +1,10 @@
-    /// POV-Ray Windows Console User Interface (CUI) build
+	/// POV-Ray Windows Console User Interface (CUI) build
 	/// Trevor SANDY <trevor.sandy@gmail.com>
-	/// April 16, 2017
+	/// April 17, 2017
 	//////////////////////////////////////////////////////
 	
 	Updated Windows Console User Interface (CUI) POV-Ray build, including:
-	- Port Unix CUI functionality to Windows project
+	- Port Unix CUI functionality to Windows project (except image display during rendering)
 	- Options processor class
 	- Benchmark, help and version options
 	- Detailed console output_iterator 
@@ -16,6 +16,8 @@
 	
 	/// Building the Console User Interface (VS2017 GUI)
 	//////////////////////////////////////////////////////
+	See README.md for comprehensive details on building POV-Ray. 
+	
 	1. Open `windows\vs2015\povray.sln` in Visual Studio
 	
 	2. Set 'Windows Targets > CUI' as the start-up project
@@ -29,32 +31,174 @@
 	
 		3c. Remove the `#error` directive after `BUILT_BY`
 	
-	4. Select the CUI branch and launch 'Build CUI' (Build Solution
+	4. Select the CUI branch and launch 'Build CUI' (Using 'Build Solution'
 	   will abend because Visual Studio will attempt to build the GUI branch also.)
-
+	
 	/// Building POV-Ray from the command line (VS2017 MSBuild)
 	//////////////////////////////////////////////////////
-	1. Launch `windows\vs2015\autobuild.cmd --info` from command prompt
+	See README.md for comprehensive details on building POV-Ray.
+	
+	This autobuild.cmd script uses MSBuild to configure and build POV-Ray from the command line.
+	The primary benefit is not having to modify source files before building
+	as described in the official POV-Ray build documentation when building from Visual Studio GUI.
+	Additionally, it is possible to build either the CUI or GUI project.
+	
+	1. Launch `windows\vs2015\autobuild.cmd -info` from command prompt to see usage info.
 	
 	2. Execute autobuild.cmd with appropriate flags as desired.
 	
-	/// Updated files:
+	/// Build success (VS2017 GUI and MSBuild)
+	//////////////////////////////////////////////////////
+    If all goes well, you should end up with the POV-Ray for Windows
+    executable. All 32-bit binaries should end up in
+    `windows\vs2015\bin32`, and the 64-bit ones are in
+    `windows\vs2015\bin64`. 
+	
+	/// File locations
     /////////////////////////////////////////////////////
-	1.  .gitignore				/
-	2.  console.vcxproj			/windows/vs2015
-	3.  console.vcxproj.filters	/windows/vs2015
-	4.  openexr_eLut.vcxproj	/windows/vs2015
-	5.  openexr_toFloat.vcxproj	/windows/vs2015
-	6.  povray.sln				/windows/vs2015
-	7.  syspovconfig.h			/windows/povconfig
-	8.  vfeplatform.cpp			/vfe/win
-	9.  vfeplatform.h 			/vfe/win
-	10. winconsole.cpp			/vfe/win/console
-	11. winoptions.cpp			/vfe/win/console   (New)
-	12. winoptions.h`			/vfe/win/console   (New)
-	13. CUI_README.txt			/windows           (New)
-	14. autobuild.cmd           /windows/vs2015    (New)
-	15. autobuild_defs.cmd      /windows/vs2015    (New)
+	All Files
+	
+    The Windows Console User Interface build uses a file location 
+	architecture similar to that of the Unix build. The default 
+	locations for the povray conf, INI, scene, and include files are:
+	
+	- System Location:  C:\ProgramData\POV-Ray\Version[-release]\
+	- User Location:    %USERPROFILE%\POV-Ray\Version[-release]\
+	
+	There is no default location for the povray binary itself. 
+	At this moment, the default	locations are fixed (hard-coded) only.
+	However all locations, except that for povray.conf, can be defined
+	in the povray.conf file and; therefore, can be placed wherever
+	you like as long as their path is defined in povray.conf
+	
+	INI Files
 
+	POV-Ray allows the use of INI files to store common configuration
+	settings, such as the output format, image size, and library paths.
+	Upon startup, POV-Ray Console User Interface will use the environment
+	variable POVINI to determine custom configuration information if
+	that environment variable is set.  Otherwise, it will look for the 
+	file "povray.ini" in the current directory.  If neither of these are
+	set, POV-Ray will try to read the user "povray.ini" file (located under
+	{User Location}\ini) or, otherwise, the system-level "povray.ini" (by 
+	default in {User Location}\ini).	
+
+	CONF File
+	
+	POV-Ray CUI build include the I/O Restriction feature as an attempt
+	to at least partially protect a machine running the program to perform
+	forbidden file operation and/or run external programs.  I/O Restriction
+	settings are specified in a "povray.conf" configuration file.  There are
+	two configuration levels within POV-Ray CUI: a system and a user-
+	level configuration.  The system-level povray.conf file (by default in
+	{System Location}) is intended for system administrators to set up minimal
+	restrictions for the system on which POV-Ray will run. The user povray.conf
+	file (under {User Location}) allows further restrictions to be set. For
+	obvious security reasons, the user's settings can only be more (or equally)
+	restrictive than the system-level settings. The administrator must take
+	responsibility to secure the system location as appropriate.
+	
+	Here are the conf file options (cut and paste to create your povray.conf file):
+
+	;                     PERSISTENCE OF VISION RAY TRACER
+	;
+	;                           POV-Ray VERSION 3.7
+	;                            POVRAY.CONF FILE
+	;                      FOR I/O RESTRICTIONS SETTINGS
+	;	
+	; The general form of the conf file option is:
+	;
+	; [Section]
+	; setting
+	;
+	; Note: characters after a semi-colon are treated as a comment.
+	;	
+	; [File I/O Security] determines whether POV-Ray will be allowed to perform
+	; read-write operations on files.  Specify one of the 3 following values:
+	; - "none" means that there are no restrictions other than those enforced
+	;   by the file system, i.e. normal file and directory permissions.
+	; - "read-only" means that files may be read without restriction.
+	; - "restricted" means that files access is subject to restrictions as
+	;   specified in the rest of this file. See the other variables for details.
+
+	[File I/O Security]
+	;none       ; all read and write operations on files are allowed.
+	;read-only  ; uses the "read+write" directories for writing (see below).
+	restricted  ; uses _only_ "read" and "read+write" directories for file I/O.
+	
+	; [Shellout Security] determines whether POV-Ray will be allowed to call
+	; scripts (e.g. Post_Frame_Command) as specified in the documentation.
+	; Specify one of the 2 following values:
+	; - "allowed" means that shellout will work as specified in the documentation.
+	; - "forbidden" means that shellout will be disabled.
+
+	[Shellout Security]
+	;allowed
+	forbidden
+	
+	; [Permitted Paths] specifies a list of directories for which reading or
+	; reading + writing is permitted (in those directories and optionally
+	; in their descendants).  Any entry of the directory list is specified on
+	; a single line.  These paths are only used when the file I/O security
+	; is enabled (i.e. "read-only" or "restricted").
+	;
+	; The list entries must be formatted as following:
+	;   read = directory	     ; read-only directory
+	;   read* = directory        ; read-only directory including its descendants
+	;   read+write = directory   ; read/write directory
+	;   read+write* = directory  ; read/write directory including its descendants
+	; where directory is a string (to be quoted or doubly-quoted if it contains
+	; space caracters; see the commented example below).  Any number of spaces
+	; can be placed before and after the equal sign.  Read-only and read/write
+	; entries can be specified in any order.
+	;
+	; Both relative and absolute paths are possible (which makes "." particularly
+	; useful for defining the current working directory).  The POV-Ray install
+	; directory is designated as the {System Location}) and 
+	; can be specified with "%INSTALLDIR%".  You should not specify
+	; "%INSTALLDIR%" in read/write directory paths.  The user home (%USERPROFILE%)
+	; directory can be specified with "%HOME%".
+	;
+	; Note that since user-level restrictions are at least as strict as system-
+	; level restrictions, any paths specified in the system-wide povray.conf
+	; will also need to be specified in the user povray.conf file.
+	
+	[Permitted Paths]
+	;read = "C:\this\directory\contains space characters"
+	;read* = %INSTALLDIR%\include
+	;read* = %INSTALLDIR%\scenes
+	;read* = %INSTALLDIR%\ini
+	;read* = %HOME%\Documents\POV-Ray\v3.7
+	;read* = %HOME%\POV-Ray\3.7
+	;read* = %HOME%
+	;read+write* = "%HOME%..\..\tmp"
+	;read+write* = .
+	
+	; End povray conf file
+	
+	/// Updated files
+    /////////////////////////////////////////////////////
+	1.  .gitignore.............../
+	2.  appveyor.yml............./
+	3.  console.vcxproj........../windows/vs2015
+	4.  console.vcxproj.filters../windows/vs2015
+	5.  vfewin.vcxproj.........../windows/vs2015
+	6.  vfewin.vcxproj.filters.../windows/vs2015
+	7.  openexr_eLut.vcxproj...../windows/vs2015
+	8.  openexr_toFloat.vcxproj../windows/vs2015
+	9.  povray.sln.............../windows/vs2015
+	10. syspovconfig.h.........../windows/povconfig
+	11. vfeplatform.cpp........../vfe/win
+	12. vfeplatform.h............/vfe/win
+	13. winconsole.cpp.........../vfe/win/console
+	14. winoptions.cpp.........../vfe/win/console...(New)
+	15. winoptions.h............./vfe/win/console...(New)
+	16. CUI_README.txt.........../windows...........(New)
+	17. autobuild.cmd............/windows/vs2015....(New)
+	18. autobuild_defs.cmd......./windows/vs2015....(New)
+	
 	Note: Although I used VS2017 to develop the components described here.
-	I do not believe there is any material difference between VS2017 and VS2015.
+	I do not believe there is any material difference between VS2017 and VS2015
+	so you can substitute VS2017 for 2015.
+	
+	Please send any comments or corrections to Trevor SANDY <trevor.sandy@gmail.com>

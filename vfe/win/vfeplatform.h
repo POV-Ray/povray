@@ -38,9 +38,8 @@
 #ifndef __VFEPLATFORM_H__
 #define __VFEPLATFORM_H__
 
-#include <boost/shared_ptr.hpp>
-
 #ifdef _CONSOLE
+#include <boost/shared_ptr.hpp>
 #include "base/path.h"
 #include "base/stringutilities.h"
 #endif
@@ -51,10 +50,10 @@
 
 namespace vfePlatform
 {
-  using namespace pov_base;
   using namespace vfe;  
  
 #ifdef _CONSOLE
+  using namespace pov_base;
   class WinConOptionsProcessor;
 #endif
 

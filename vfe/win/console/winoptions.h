@@ -64,7 +64,7 @@ using boost::to_lower_copy;
 #endif
 
 #ifndef POVCONFDIR
-# define POVCONFDIR  "C:\\Users\\Public\\Documents\\" PACKAGE "\\" VERSION_BASE
+# define POVCONFDIR  "C:\\ProgramData\\" PACKAGE "\\" VERSION_BASE
 #endif
 
 namespace vfePlatform
