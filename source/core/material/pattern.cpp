@@ -342,13 +342,19 @@ DBL ContinuousPattern::Evaluate(const Vector3d& EPoint, const Intersection *pIse
 {
     DBL value = EvaluateRaw(EPoint, pIsection, pRay, pThread);
 
+    // Note - Christoph implemented a fast path return here where I'd rambled about similar.
+    //   - Users can make pattterns faster using 0.0 for frequency as a technique going back a ways if they know what they are doing.
+    //   - Todo. Is the kWaveType_Raw available as a wave type modifier from the SDL. If so even faster than frequency 0.0 & need to update doc.
+
     if (waveType == kWaveType_Raw)
         return value;
 
     if(waveFrequency != 0.0)
-        value = fmod(value * waveFrequency + wavePhase, 1.00001); // TODO FIXME - magic number! Should be 1.0+SOME_EPSILON (or maybe actually 1.0?)
+        value = fmod(value * waveFrequency + wavePhase, 1+EPSILON); // Note - Old fmod() to magic val 1.00001. In tests which failed at 1.0, EPSILON OK.
+                                                                    // Effective epsilon change is 1e-5 to 1e-10.
+                                                                    // 1.0 did NOT work. When pattern is used in maps the 1.0 value wraps to 0.0.
 
-    /* allow negative frequency */
+    /* allow negative frequency. As a by product flips any incoming negative value in 0-1 range (-0.3 becomes 0.7.) */
     if(value < 0.0)
         value -= floor(value);
 
@@ -6055,6 +6061,45 @@ DBL CylindricalPattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *
 *
 ******************************************************************************/
 
+inline DBL fblob(DBL v, DBL s)
+{
+  //-------- exp expensive in this DF3 interp usage so experimented some
+  //         with the following fast exp() method from:
+  // http://www.schraudolph.org/pubs/Schraudolph99.pdf
+  // https://gist.github.com/andersx/8057b2a6fd3d715d35eb <- less accurate, faster still
+  //         Below +-17.8% in iso usage, small inaccuracies visible.
+  //         Suppose inaccuracy might be OK for media applications.
+  // exp(x)=2^(x*log2(e))=2^(xi-xf) look up tables often used for xi,xf
+  // IEEE-745 (+-1)(1+m)2^(x-x0) where x0 is 1023, m=11bits, x=52bits.
+  // int(32bit)=A*x+B-C; A=S/ln(s); B=S*1023; C=60801; S=2^20;
+  // Pad 32bit int with another 32bit int to form 64bit set.
+  // Cast the 64bits to a double.
+  //
+  // double tmpDBL=(v*s);
+  // double S=pow(2,20);
+  // double A=S/log(2);
+  // double B=S*1023.0;
+  // long int tmpLInt = (long int) (A*tmpDBL+B-60801)*pow(2,32);
+  // return 1.0/reinterpret_cast<double&>(tmpLInt);
+  //
+  //         Perhaps with vectorization something like 2015 IBM paper would work & be faster.
+  // https://www.researchgate.net/profile/A_Cristiano_I_Malossi/publication/272178514_Fast_Exponential_Computation_on_SIMD_Architectures/links/54de344f0cf22a26721fbdc9.pdf
+  //         Also, glibc is to get a vectorized exp as part of fastmath optimization.
+  //
+  return 1.0/exp(v*s);
+}
+
+inline void calcAllDiffsSqrd(double *aryd, double this_d, size_t *ary)
+{  //---- Do all our dist calculations for axis at this point
+   size_t n;
+   DBL tmpVal;
+   for(n = 0; n<8; n++)
+   {
+       tmpVal=(DBL)ary[n]-this_d;
+       aryd[n]=tmpVal*tmpVal;
+   }
+}
+
 inline float intp3(float t, float fa, float fb, float fc, float fd)
 {
     float b,d,e,f;
@@ -6086,53 +6131,54 @@ DBL DensityFilePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *
     size_t x1, y1, z1;
     size_t x2, y2, z2;
     DBL Ex, Ey, Ez;
+    DBL this_x, this_y, this_z;
     DBL xx, yy, zz;
     DBL xi, yi;
     DBL f111, f112, f121, f122, f211, f212, f221, f222;
     float intpd2[4][4];
     DBL density = 0.0;
-    DENSITY_FILE_DATA *Data;
-    size_t k0, k1, k2, k3, i,j,ii,jj;
+    DensityFilePattern::DensityFileDataStruct *Data;
+    size_t k0, k1, k2, k3, i, j, k, ii, jj, kk;
+    size_t rx[8],ry[8],rz[8];
+    DBL    rxd[8],ryd[8],rzd[8];
+    size_t startidx, stopidx;
+    DBL    runningval,strengthBias;
+    unsigned short tmpUshort;
+    unsigned int   tmpUint;
+    unsigned long  tmpUlong;
 
-    Ex=EPoint[X];
-    Ey=EPoint[Y];
-    Ez=EPoint[Z];
-
-    if((densityFile != NULL) && ((Data = densityFile->Data) != NULL) &&
-       (Data->Sx) && (Data->Sy) && (Data->Sz))
+    if((densityFile != NULL) && ((Data = densityFile->Data) != NULL))
     {
-/*      if(Data->Cyclic == true)
-        {
-            Ex -= floor(Ex);
-            Ey -= floor(Ey);
-            Ez -= floor(Ez);
-        }
-*/
+        Ex=EPoint[X];
+        Ey=EPoint[Y];
+        Ez=EPoint[Z];
+
         if((Ex >= 0.0) && (Ex < 1.0) && (Ey >= 0.0) && (Ey < 1.0) && (Ez >= 0.0) && (Ez < 1.0))
         {
-            switch (densityFile->Interpolation % 10) // TODO - why the modulus operation??
+            switch (densityFile->Interpolation)
             {
                 case kDensityFileInterpolation_None:
                     x = (size_t)(Ex * (DBL)Data->Sx);
                     y = (size_t)(Ey * (DBL)Data->Sy);
                     z = (size_t)(Ez * (DBL)Data->Sz);
 
-                    if ((x < 0) || (x >= Data->Sx) || (y < 0) || (y >= Data->Sy) || (z < 0) || (z >= Data->Sz))
-                        density = 0.0;
-                    else
-                    {
-                        if(Data->Type == 4)
-                            density = (DBL)Data->Density32[z * Data->Sy * Data->Sx + y * Data->Sx + x] / (DBL)UNSIGNED32_MAX;
-                        else if(Data->Type==2)
-                            density = (DBL)Data->Density16[z * Data->Sy * Data->Sx + y * Data->Sx + x] / (DBL)UNSIGNED16_MAX;
-                        else if(Data->Type == 1)
-                            density = (DBL)Data->Density8[z * Data->Sy * Data->Sx + y * Data->Sx + x] / (DBL)UNSIGNED8_MAX;
-                    }
+                    density = 0.0;
+                    if(Data->Type == 4)
+                        density = (DBL)Data->Density32[z * Data->Sy * Data->Sx + y * Data->Sx + x] / (DBL)UNSIGNED32_MAX;
+                    else if(Data->Type==2)
+                        density = (DBL)Data->Density16[z * Data->Sy * Data->Sx + y * Data->Sx + x] / (DBL)UNSIGNED16_MAX;
+                    else if(Data->Type == 1)
+                        density = (DBL)Data->Density8[z * Data->Sy * Data->Sx + y * Data->Sx + x] / (DBL)UNSIGNED8_MAX;
                     break;
                 case kDensityFileInterpolation_Trilinear:
-                    xx = Ex * (DBL)(Data->Sx );
-                    yy = Ey * (DBL)(Data->Sy );
-                    zz = Ez * (DBL)(Data->Sz );
+                    Ex = max(0.0,Ex-(1.0/(DBL)Data->Sx/2.0)); // Adjustment to voxel center
+                    Ey = max(0.0,Ey-(1.0/(DBL)Data->Sy/2.0));
+                    Ez = max(0.0,Ez-(1.0/(DBL)Data->Sz/2.0));
+                    // FALLTHROUGH
+                case kDensityFileInterpolation_Trilinear_Shftd: // (11 vs 1) As means to provide backward shift left-forward-down compatibility
+                    xx = Ex * (DBL)(Data->Sx);
+                    yy = Ey * (DBL)(Data->Sy);
+                    zz = Ez * (DBL)(Data->Sz);
 
                     x1 = (size_t)xx;
                     y1 = (size_t)yy;
@@ -6187,9 +6233,15 @@ DBL DensityFilePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *
 
                     density = ((f111 * xi + f112 * xx) * yi + (f121 * xi + f122 * xx) * yy) * (1.0 - zz) +
                               ((f211 * xi + f212 * xx) * yi + (f221 * xi + f222 * xx) * yy) * zz;
+                    if (density < 0.0) density = 0.0; // Note - Clamp for >1.0 in pattern wave modification code.
                     break;
                 case kDensityFileInterpolation_Tricubic:
                 default:
+                    Ex = max(0.0,Ex-(1.0/(DBL)Data->Sx/2.0)); // Adjustment to voxel center
+                    Ey = max(0.0,Ey-(1.0/(DBL)Data->Sy/2.0));
+                    Ez = max(0.0,Ez-(1.0/(DBL)Data->Sz/2.0));
+                    // FALLTHROUGH
+                case kDensityFileInterpolation_Tricubic_Shftd: // (12 vs 2) As means to provide backward shift left-forward-down compatibility
                     xx = Ex * (DBL)(Data->Sx);
                     yy = Ey * (DBL)(Data->Sy);
                     zz = Ez * (DBL)(Data->Sz);
@@ -6202,10 +6254,10 @@ DBL DensityFilePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *
                     yy -= floor(yy);
                     zz -= floor(zz);
 
-                    k0 = zmax(-1+z1, Data->Sz );
-                    k1 = zmax(   z1, Data->Sz );
-                    k2 = zmax( 1+z1, Data->Sz );
-                    k3 = zmax( 2+z1, Data->Sz );
+                    k0 = zmax(-1+z1, Data->Sz);
+                    k1 = zmax(   z1, Data->Sz);
+                    k2 = zmax( 1+z1, Data->Sz);
+                    k3 = zmax( 2+z1, Data->Sz);
 
                     if(Data->Type == 4)
                     {
@@ -6260,15 +6312,119 @@ DBL DensityFilePattern::EvaluateRaw(const Vector3d& EPoint, const Intersection *
                         intpd2[0][i] = intp3(yy, intpd2[i][0], intpd2[i][1],  intpd2[i][2], intpd2[i][3]);
 
                     density = intp3(xx, intpd2[0][0], intpd2[0][1], intpd2[0][2], intpd2[0][3]);
+                    if (density < 0.0) density = 0.0;
                     break;
+                case kDensityFileInterpolation_BlobFour:
+                case kDensityFileInterpolation_BlobSix:
+                case kDensityFileInterpolation_BlobEight:
+                    Ex -= 1.0/(DBL)Data->Sx/2.0; // Adjustment to voxel center
+                    Ey -= 1.0/(DBL)Data->Sy/2.0;
+                    Ez -= 1.0/(DBL)Data->Sz/2.0;
+
+                    this_x = Ex * (DBL)(Data->Sx);
+                    this_y = Ey * (DBL)(Data->Sy);
+                    this_z = Ez * (DBL)(Data->Sz);
+
+                    x1 = (size_t)this_x;
+                    y1 = (size_t)this_y;
+                    z1 = (size_t)this_z;
+
+                    rx[3]=max(0,(int)x1);   ry[3]=max(0,(int)y1);   rz[3]=max(0,(int)z1);
+                    rx[2]=max(0,(int)x1-1); ry[2]=max(0,(int)y1-1); rz[2]=max(0,(int)z1-1);
+                    rx[1]=max(0,(int)x1-2); ry[1]=max(0,(int)y1-2); rz[1]=max(0,(int)z1-2);
+                    rx[0]=max(0,(int)x1-3); ry[0]=max(0,(int)y1-3); rz[0]=max(0,(int)z1-3);
+                    //---
+                    rx[4]=min(Data->Sx-1,x1+1); ry[4]=min(Data->Sy-1,y1+1); rz[4]=min(Data->Sz-1,z1+1);
+                    rx[5]=min(Data->Sx-1,x1+2); ry[5]=min(Data->Sy-1,y1+2); rz[5]=min(Data->Sz-1,z1+2);
+                    rx[6]=min(Data->Sx-1,x1+3); ry[6]=min(Data->Sy-1,y1+3); rz[6]=min(Data->Sz-1,z1+3);
+                    rx[7]=min(Data->Sx-1,x1+4); ry[7]=min(Data->Sy-1,y1+4); rz[7]=min(Data->Sz-1,z1+4);
+
+                    calcAllDiffsSqrd(rxd,this_x,rx);
+                    calcAllDiffsSqrd(ryd,this_y,ry);
+                    calcAllDiffsSqrd(rzd,this_z,rz);
+
+                    switch (densityFile->Interpolation)
+                    {
+                        case kDensityFileInterpolation_BlobFour:
+                            startidx     = 2;
+                            stopidx      = 5;
+                            strengthBias = 2.4748737341529163; // Via manual tuning. Inexact due exp() & potential uses.
+                            break;
+                        case kDensityFileInterpolation_BlobSix:
+                            startidx     = 1;
+                            stopidx      = 6;
+                            strengthBias = 1.2374368670764582;
+                            break;
+                        case kDensityFileInterpolation_BlobEight:
+                        default:
+                            startidx     = 0;
+                            stopidx      = 7;
+                            strengthBias = 0.6187184335382291;
+                            break;
+                    }
+                    runningval=0.0;
+                    if(Data->Type == 4)
+                    {
+                        for(i = startidx; i <= stopidx; i++)
+                        {
+                            for(j = startidx; j <= stopidx; j++)
+                            {
+                                for(k = startidx; k <= stopidx; k++)
+                                {
+                                    tmpUlong=Data->Density32[rz[i] * Data->Sy * Data->Sx + ry[j] * Data->Sx + rx[k]];
+                                    if (tmpUlong)
+                                    {
+                                        f111 = strengthBias/((DBL)tmpUlong/(DBL)UNSIGNED32_MAX);
+                                        runningval+=fblob(rzd[i]+ryd[j]+rxd[k],f111);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    else if(Data->Type == 2)
+                    {
+                        for(i = startidx; i <= stopidx; i++)
+                        {
+                            for(j = startidx; j <= stopidx; j++)
+                            {
+                                for(k = startidx; k <= stopidx; k++)
+                                {
+                                    tmpUint=Data->Density16[rz[i] * Data->Sy * Data->Sx + ry[j] * Data->Sx + rx[k]];
+                                    if (tmpUint)
+                                    {
+                                        f111 = strengthBias/((DBL)tmpUint/(DBL)UNSIGNED16_MAX);
+                                        runningval+=fblob(rzd[i]+ryd[j]+rxd[k],f111);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    else if(Data->Type == 1)
+                    {
+                        for(i = startidx; i <= stopidx; i++)
+                        {
+                            for(j = startidx; j <= stopidx; j++)
+                            {
+                                for(k = startidx; k <= stopidx; k++)
+                                {
+                                    tmpUshort=Data->Density8[rz[i] * Data->Sy * Data->Sx + ry[j] * Data->Sx + rx[k]];
+                                    if (tmpUshort)
+                                    {
+                                        f111 = strengthBias/((DBL)tmpUshort/(DBL)UNSIGNED8_MAX);
+                                        runningval+=fblob(rzd[i]+ryd[j]+rxd[k],f111);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    density = min(1.0,runningval);
+                    break;  // Break for last case in blob switch
             }
         }
         else
             density = 0.0;
     }
 
-    if (density < 0.0)
-        density = 0.0;
     return density;
 }
 
@@ -9087,7 +9243,7 @@ DENSITY_FILE *Create_Density_File()
 
     New->Interpolation = kDensityFileInterpolation_None;
 
-    New->Data = new DENSITY_FILE_DATA;
+    New->Data = new DensityFilePattern::DensityFileDataStruct;
 
     New->Data->References = 1;
 
@@ -9221,9 +9377,6 @@ void Read_Density_File(IStream *file, DENSITY_FILE *df)
 
     size_t x, y, z, sx, sy, sz, len;
 
-    if (df == NULL)
-        return;
-
     /* Allocate and read density file. */
 
     if((df != NULL) && (df->Data->Name != NULL))
@@ -9231,6 +9384,10 @@ void Read_Density_File(IStream *file, DENSITY_FILE *df)
         sx = df->Data->Sx = ReadUShort(file);
         sy = df->Data->Sy = ReadUShort(file);
         sz = df->Data->Sz = ReadUShort(file);
+
+        // All could be zero and render clean. Check formally per point evaluation in density_pattern.
+        if (sx==0 || sy==0 || sz==0)
+            throw POV_EXCEPTION_STRING("Invalid density file. One or more dimensions is 0.");
 
         file->seekg(0, IOBase::seek_end);
         len = file->tellg() - 6;
@@ -9290,6 +9447,8 @@ void Read_Density_File(IStream *file, DENSITY_FILE *df)
 
         delete file;
     }
+    else
+        throw POV_EXCEPTION_STRING("Null density file data structure or file name");
 }
 
 static unsigned short ReadUShort(IStream *pInFile)

@@ -2069,7 +2069,25 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
 
         CASE (INTERPOLATE_TOKEN)
             if (DensityFilePattern* pattern = dynamic_cast<DensityFilePattern*>(New->pattern.get()))
+            {
                 pattern->densityFile->Interpolation = (int)Parse_Float();
+                switch (pattern->densityFile->Interpolation)
+                {
+                    case kDensityFileInterpolation_None:
+                    case kDensityFileInterpolation_Trilinear:
+                    case kDensityFileInterpolation_Tricubic:
+                    case kDensityFileInterpolation_BlobFour:
+                    case kDensityFileInterpolation_BlobSix:
+                    case kDensityFileInterpolation_BlobEight:
+                    case kDensityFileInterpolation_Trilinear_Shftd:
+                    case kDensityFileInterpolation_Tricubic_Shftd:
+                        break;
+                    default:
+                        pattern->densityFile->Interpolation = kDensityFileInterpolation_Tricubic;
+                        Warning("Invalid density_file interpolate value. Mapped to tri-cublic.");
+                        break;
+                }
+            }
             else
                 Not_With ("interpolate","non-density_file");
         END_CASE
@@ -5419,7 +5437,25 @@ void Parser::Parse_PatternFunction(TPATTERN *New)
 
         CASE (INTERPOLATE_TOKEN)
             if (DensityFilePattern* pattern = dynamic_cast<DensityFilePattern*>(New->pattern.get()))
+            {
                 pattern->densityFile->Interpolation = (int)Parse_Float();
+                switch (pattern->densityFile->Interpolation)
+                {
+                    case kDensityFileInterpolation_None:
+                    case kDensityFileInterpolation_Trilinear:
+                    case kDensityFileInterpolation_Tricubic:
+                    case kDensityFileInterpolation_BlobFour:
+                    case kDensityFileInterpolation_BlobSix:
+                    case kDensityFileInterpolation_BlobEight:
+                    case kDensityFileInterpolation_Trilinear_Shftd:
+                    case kDensityFileInterpolation_Tricubic_Shftd:
+                        break;
+                    default:
+                        pattern->densityFile->Interpolation = kDensityFileInterpolation_Tricubic;
+                        Warning("Invalid density_file interpolate value. Mapped to tri-cublic.");
+                        break;
+                }
+            }
             else
                 Not_With ("interpolate","non-density_file");
         END_CASE
