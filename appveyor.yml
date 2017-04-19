@@ -13,41 +13,45 @@ matrix:
   fast_finish: true
 
 environment:
+  GUIProj: windows/vs2015/povray.sln
+  GUIDefs: POV_RAY_IS_AUTOBUILD=1;POV_RAY_BUILD_ID="av$(APPVEYOR_BUILD_NUMBER)";BUILT_BY="AppVeyor";
+  CUIProj: windows/vs2015/console.vcxproj
+  CUIDefs: $(GUIDefs)_CONSOLE;
   matrix:
   # Graphic User Interface (GUI) build matrix
-  - project_name: windows/vs2015/povray.sln
-    PovBuildDefs: POV_RAY_IS_AUTOBUILD=1;POV_RAY_BUILD_ID="av$(APPVEYOR_BUILD_NUMBER)";BUILT_BY="AppVeyor";
+  - PovBuildProj: $(GUIProj)
+    PovBuildDefs: $(GUIDefs)
     configuration: Release
     platform: x64  
     bin_dir: bin64
     artifact_suffix: -Win64
-  - project_name: windows/vs2015/povray.sln
-    PovBuildDefs: POV_RAY_IS_AUTOBUILD=1;POV_RAY_BUILD_ID="av$(APPVEYOR_BUILD_NUMBER)";BUILT_BY="AppVeyor";
+  - PovBuildProj: $(GUIProj)
+    PovBuildDefs: $(GUIDefs)
     configuration: Release-SSE2
     platform: Win32
     bin_dir: bin32
     artifact_suffix: -Win32-sse2
-  - project_name: windows/vs2015/povray.sln
-    PovBuildDefs: POV_RAY_IS_AUTOBUILD=1;POV_RAY_BUILD_ID="av$(APPVEYOR_BUILD_NUMBER)";BUILT_BY="AppVeyor";
+  - PovBuildProj: $(GUIProj)
+    PovBuildDefs: $(GUIDefs)
     configuration: Release
     platform: Win32
     bin_dir: bin32
     artifact_suffix: -Win32	
   # Console User Interface (CUI) build matrix
-  - project_name: windows/vs2015/console.vcxproj
-    PovBuildDefs: POV_RAY_IS_AUTOBUILD=1;POV_RAY_BUILD_ID="av$(APPVEYOR_BUILD_NUMBER)";BUILT_BY="AppVeyor";_CONSOLE=1;
+  - PovBuildProj: $(CUIProj)
+    PovBuildDefs: $(CUIDefs)
     configuration: Release
     platform: x64  
     bin_dir: bin64
     artifact_suffix: -Win64
-  - project_name: windows/vs2015/console.vcxproj
-    PovBuildDefs: POV_RAY_IS_AUTOBUILD=1;POV_RAY_BUILD_ID="av$(APPVEYOR_BUILD_NUMBER)";BUILT_BY="AppVeyor";_CONSOLE=1;
+  - PovBuildProj: $(CUIProj)
+    PovBuildDefs: $(CUIDefs)
     configuration: Release-SSE2
     platform: Win32
     bin_dir: bin32
     artifact_suffix: -Win32-sse2
-  - project_name: windows/vs2015/console.vcxproj
-    PovBuildDefs: POV_RAY_IS_AUTOBUILD=1;POV_RAY_BUILD_ID="av$(APPVEYOR_BUILD_NUMBER)";BUILT_BY="AppVeyor";_CONSOLE=1;
+  - PovBuildProj: $(CUIProj)
+    PovBuildDefs: $(CUIDefs)
     configuration: Release
     platform: Win32
     bin_dir: bin32
@@ -56,7 +60,7 @@ environment:
 before_build:
 
 build:
-  project: $(project_name)
+  project: $(PovBuildProj)
   parallel: true
   verbosity: minimal
 
