@@ -1548,8 +1548,10 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
         END_CASE
 
         CASE (IMAGE_MAP_TOKEN)
-            if (TPat_Type != kBlendMapType_Pigment)
-                Only_In("image_map","pigment");
+            if ((TPat_Type != kBlendMapType_Pigment) && (TPat_Type != kBlendMapType_Density))
+            {
+                Only_In("image_map","pigment or density");
+            }
             New->Type = IMAGE_MAP_PATTERN;
             New->pattern = PatternPtr(new ColourImagePattern());
             Parse_Image_Map (reinterpret_cast<PIGMENT *>(New));
@@ -1853,7 +1855,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
         CASE (COLOUR_MAP_TOKEN)
             if ((TPat_Type != kBlendMapType_Pigment) && (TPat_Type != kBlendMapType_Density))
             {
-                Only_In("color_map","pigment");
+                Only_In("color_map","pigment or density");
             }
             if (New->Type == AVERAGE_PATTERN || !New->pattern->CanMap())
                 Error("Cannot use color_map with this pattern type.");
