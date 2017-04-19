@@ -1853,7 +1853,7 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
         CASE (COLOUR_MAP_TOKEN)
             if ((TPat_Type != kBlendMapType_Pigment) && (TPat_Type != kBlendMapType_Density))
             {
-                Only_In("color_map","pigment");
+                Only_In("color_map","pigment or density");
             }
             if (New->Type == AVERAGE_PATTERN || !New->pattern->CanMap())
                 Error("Cannot use color_map with this pattern type.");
@@ -1861,9 +1861,9 @@ void Parser::Parse_Pattern (PATTERN_T *New, BlendMapTypeId TPat_Type)
         END_CASE
 
         CASE (PIGMENT_MAP_TOKEN)
-            if (TPat_Type != kBlendMapType_Pigment)
+            if ((TPat_Type != kBlendMapType_Pigment) && (TPat_Type != kBlendMapType_Density))
             {
-                Only_In("pigment_map","pigment");
+                Only_In("pigment_map","pigment or density");
             }
             if (!New->pattern->CanMap())
                 Not_With ("pigment_map","this pigment type");
