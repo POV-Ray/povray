@@ -57,6 +57,10 @@ environment:
     bin_dir: bin32
     artifact_suffix: -Win32
 
+install:
+  - ECHO Check PovBuildProj=%PovBuildProj%
+  - ECHO Check PovBuildDefs=%PovBuildDefs%
+
 before_build:
 
 build:
