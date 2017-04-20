@@ -309,6 +309,8 @@ void OStream::printf(const char *format, ...)
 
 IStream *NewIStream(const Path& p, unsigned int stype)
 {
+    IFileStream *stream;
+
     if (!PlatformBase::GetInstance().AllowLocalFileAccess(p(), stype, false))
     {
         string str ("IO Restrictions prohibit read access to '") ;
@@ -317,12 +319,19 @@ IStream *NewIStream(const Path& p, unsigned int stype)
         throw POV_EXCEPTION(kCannotOpenFileErr, str);
     }
 
-    return new IFileStream(p().c_str());
+    stream = new IFileStream(p().c_str());
+    if (!(*stream))
+    {
+        delete stream;
+        return NULL;
+    }
+    return stream;
 }
 
 OStream *NewOStream(const Path& p, unsigned int stype, bool sappend)
 {
     unsigned int Flags = IOBase::none;
+    OStream *stream;
 
     if(sappend)
         Flags |= IOBase::append;
@@ -335,7 +344,13 @@ OStream *NewOStream(const Path& p, unsigned int stype, bool sappend)
         throw POV_EXCEPTION(kCannotOpenFileErr, str);
     }
 
-    return new OStream(p().c_str(), Flags);
+    stream = new OStream(p().c_str(), Flags);
+    if (!(*stream))
+    {
+        delete stream;
+        return NULL;
+    }
+    return stream;
 }
 
 UCS2String GetFileExtension(const Path& p)
