@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -2057,12 +2057,12 @@ void PhotonMap::setGatherOptions(ScenePhotonSettings &photonSettings, int mediaM
 
   Preconditions:
 
-  static DBL size_sq_s;   - maximum radius given squared
-  static DBL Size_s;      - radius
-  static DBL dmax_s;      - square of radius used so far
-  static int TargetNum_s; - target number
-  static DBL *pt_s;       - center point
-  static numfound_s;      - number of photons in priority queue
+  DBL size_sq_s;   - maximum radius given squared
+  DBL Size_s;      - radius
+  DBL dmax_s;      - square of radius used so far
+  int TargetNum_s; - target number
+  Vector3d *pt_s;  - center point
+  numfound_s;      - number of photons in priority queue
 
   these must be allocated:
     renderer->sceneData->photonSettings.photonGatherList - array of photons in priority queue
@@ -2280,18 +2280,21 @@ void PhotonGatherer::gatherPhotonsRec(int start, int end)
 
     // check this photon
 
-    // find distance from pt
-    ptToPhoton = - (*pt_s) + Vector3d(photon->Loc);
-    // all distances are squared
-    dx = ptToPhoton[X]*ptToPhoton[X];
-    dy = ptToPhoton[Y]*ptToPhoton[Y];
-    dz = ptToPhoton[Z]*ptToPhoton[Z];
+    // find distance in DimToUse from pt
+    d = photon->Loc[DimToUse] - (*pt_s)[DimToUse];
+    d *= d;
 
-    if (!(  ((dx>dmax_s) && ((DimToUse)==X)) ||
-            ((dy>dmax_s) && ((DimToUse)==Y)) ||
-            ((dz>dmax_s) && ((DimToUse)==Z)) ))
+    if (d<dmax_s)
     {
-        // it fits manhatten distance - maybe we can use this photon
+        // it fits manhatten, DimToUse distance - maybe we can use this photon
+
+        dx = photon->Loc[X] - (*pt_s)[X];
+        dy = photon->Loc[Y] - (*pt_s)[Y];
+        dz = photon->Loc[Z] - (*pt_s)[Z];
+        ptToPhoton = Vector3d(dx,dy,dz);
+        dx *= dx;
+        dy *= dy;
+        dz *= dz;
 
         // find euclidian distance (squared)
         d = dx + dy + dz;
