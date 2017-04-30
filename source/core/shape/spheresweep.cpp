@@ -13,7 +13,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -1149,7 +1149,7 @@ void SphereSweep::Scale(const Vector3d& Vector, const TRANSFORM *tr)
         for(int i = 0; i < Num_Modeling_Spheres; i++)
         {
             Modeling_Sphere[i].Center *= Vector[X];
-            Modeling_Sphere[i].Radius *= Vector[X];
+            Modeling_Sphere[i].Radius *= fabs(Vector[X]);
         }
         Compute();
         Compute_BBox();
