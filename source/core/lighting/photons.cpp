@@ -2266,7 +2266,7 @@ void PhotonGatherer::gatherPhotonsRec(int start, int end)
 {
     DBL delta;
     int DimToUse;
-    DBL d,dx,dy,dz;
+    DBL dx,dy,dz,dSqr;
     int mid;
     Photon *photon;
     Vector3d ptToPhoton;
@@ -2281,23 +2281,17 @@ void PhotonGatherer::gatherPhotonsRec(int start, int end)
     // check this photon
 
     // find distance in DimToUse from pt
-    d = photon->Loc[DimToUse] - (*pt_s)[DimToUse];
-    d *= d;
+    delta=(*pt_s)[DimToUse]-photon->Loc[DimToUse];
+    dSqr = Sqr(delta);
 
-    if (d<dmax_s)
+    if (dSqr<dmax_s)
     {
         // it fits manhatten, DimToUse distance - maybe we can use this photon
 
-        dx = photon->Loc[X] - (*pt_s)[X];
-        dy = photon->Loc[Y] - (*pt_s)[Y];
-        dz = photon->Loc[Z] - (*pt_s)[Z];
-        ptToPhoton = Vector3d(dx,dy,dz);
-        dx *= dx;
-        dy *= dy;
-        dz *= dz;
+        ptToPhoton = Vector3d(photon->Loc) - *pt_s;
 
         // find euclidian distance (squared)
-        d = dx + dy + dz;
+        dSqr = ptToPhoton.lengthSqr();
 
         // now fix this distance so that we gather using an ellipsoid
         // alligned with the surface normal instead of a sphere.  This
@@ -2314,27 +2308,26 @@ void PhotonGatherer::gatherPhotonsRec(int start, int end)
         {
             discFix = dot(*norm_s,ptToPhoton);
             discFix = fabs(discFix);
-            d += flattenFactor*(discFix)*d*16;
+            dSqr += flattenFactor*(discFix)*dSqr*16;
         }
         // this will add zero if on the plane, and will double distance from
-        // point to photon if it is ptToPhoton is perpendicular to the surface
+        // point to photon if it is ptToPhoton perpendicular to the surface
 
-        if(d < dmax_s)
+        if(dSqr < dmax_s)
         {
             if (gatheredPhotons.numFound+1>TargetNum_s)
             {
-                FullPQInsert(photon, d);
+                FullPQInsert(photon, dSqr);
                 sqrt_dmax_s = sqrt(dmax_s);
             }
             else
-                PQInsert(photon, d);
+                PQInsert(photon, dSqr);
         }
     }
 
     // now go left & right if appropriate - if going left or right goes out
     // the current range, then don't go that way.
     /*
-    delta=(*pt_s)[DimToUse]-photon->Loc[DimToUse];
     if(delta<0)
     {
         if (end>=mid+1) gatherPhotonsRec(start, mid - 1);
@@ -2348,7 +2341,6 @@ void PhotonGatherer::gatherPhotonsRec(int start, int end)
             if (end>=mid+1) gatherPhotonsRec(start, mid - 1);
     }
     */
-    delta=(*pt_s)[DimToUse]-photon->Loc[DimToUse];
     if(delta<0)
     {
         // on left - go left first
