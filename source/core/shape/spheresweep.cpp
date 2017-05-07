@@ -13,7 +13,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -404,6 +404,10 @@ bool SphereSweep::Intersect_Sphere(const BasicRay &ray, const SPHSWEEP_SPH *Sphe
 *
 ******************************************************************************/
 
+/// @bug
+///     The current implementation exhibits numeric instabilities for 3rd order polynomial splines.
+///     (See GitHub issue #147.)
+///
 int SphereSweep::Intersect_Segment(const BasicRay &ray, const SPHSWEEP_SEG *Segment, SPHSWEEP_INT *Isect, TraceThreadData *Thread)
 {
     int             Isect_Count;
@@ -679,7 +683,6 @@ int SphereSweep::Intersect_Segment(const BasicRay &ray, const SPHSWEEP_SEG *Segm
                     + 2.0 * c * Root[m]
                     + d;
 
-#if 0 // [CLi] preliminary workaround for FS#81
                 if(fabs(fp1) > ZERO_TOLERANCE)
                 {
                     t = -fp0 / fp1;
@@ -703,7 +706,6 @@ int SphereSweep::Intersect_Segment(const BasicRay &ray, const SPHSWEEP_SEG *Segm
                     }
                 }
                 else
-#endif
                 {
                     // Calculate center of single sphere
                     Temp_Sphere.Center = Segment->Center_Coef[3] * (Root[m] * Root[m] * Root[m])
