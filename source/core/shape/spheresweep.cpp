@@ -1257,18 +1257,41 @@ void SphereSweep::Compute_BBox()
     mins[X] = mins[Y] = mins[Z] = BOUND_HUGE;
     maxs[X] = maxs[Y] = maxs[Z] = -BOUND_HUGE;
 
-    for(i = 0; i < Num_Modeling_Spheres; i++)
+    if (Interpolation == CATMULL_ROM_SPLINE_SPHERE_SWEEP)
     {
-        if(Interpolation == CATMULL_ROM_SPLINE_SPHERE_SWEEP)
+        // With Catmull-Rom splines, the spline may overshoot the space defined by the control spheres.
+        // For now, we solve this by translating each segment of the sphere sweep into (temporary) corresponding
+        // Bezier-style control spheres, and computing the bounding box from those.
+
+        for (i = 1; i < Num_Modeling_Spheres-2; i++)
         {
-            // Make box a bit larger for Catmull-Rom-Spline sphere sweeps
-            mins = min(mins, Modeling_Sphere[i].Center - Vector3d(2.0 * Modeling_Sphere[i].Radius));
-            maxs = max(maxs, Modeling_Sphere[i].Center + Vector3d(2.0 * Modeling_Sphere[i].Radius));
+            // Compute temporary Bezier-style control spheres for the segment.
+
+            SPHSWEEP_SPH tempSphere[4];
+            tempSphere[0]        = Modeling_Sphere[i];
+            tempSphere[1].Center = Modeling_Sphere[i].Center + (Modeling_Sphere[i+1].Center - Modeling_Sphere[i-1].Center) / 6;
+            tempSphere[1].Radius = Modeling_Sphere[i].Radius + (Modeling_Sphere[i+1].Radius - Modeling_Sphere[i-1].Radius) / 6;
+            tempSphere[2].Center = Modeling_Sphere[i+1].Center + (Modeling_Sphere[i].Center - Modeling_Sphere[i+1].Center) / 6;
+            tempSphere[2].Radius = Modeling_Sphere[i+1].Radius + (Modeling_Sphere[i].Radius - Modeling_Sphere[i+1].Radius) / 6;
+            tempSphere[3]        = Modeling_Sphere[i+1];
+
+            // From the Bezier-style control spheres, compute the bounding box.
+
+            for (int j = 0; j < 4; ++j)
+            {
+                mins = min(mins, tempSphere[i].Center - Vector3d(fabs(tempSphere[i].Radius)));
+                maxs = max(maxs, tempSphere[i].Center + Vector3d(fabs(tempSphere[i].Radius)));
+            }
         }
-        else
+    }
+    else
+    {
+        for (i = 0; i < Num_Modeling_Spheres; i++)
         {
-            mins = min(mins, Modeling_Sphere[i].Center - Vector3d(Modeling_Sphere[i].Radius));
-            maxs = max(maxs, Modeling_Sphere[i].Center + Vector3d(Modeling_Sphere[i].Radius));
+            {
+                mins = min(mins, Modeling_Sphere[i].Center - Vector3d(fabs(Modeling_Sphere[i].Radius)));
+                maxs = max(maxs, Modeling_Sphere[i].Center + Vector3d(fabs(Modeling_Sphere[i].Radius)));
+            }
         }
     }
 
