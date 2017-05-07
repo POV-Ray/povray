@@ -37,7 +37,7 @@
 #ifndef POVRAY_CPUID_H
 #define POVRAY_CPUID_H
 
-#include "syspovconfigbase.h"
+#include "base/configbase.h"
 
 /// Test whether SSE2 is supported by both CPU and OS.
 bool HaveSSE2();
@@ -53,5 +53,8 @@ bool HaveAVXFMA4();
 
 /// Test whether AVX2 and FMA3 are supported by both CPU and OS.
 bool HaveAVX2FMA3();
+
+/// Test whether CPU is an intel product
+bool IsIntelCPU();
 
 #endif // POVRAY_CPUID_H

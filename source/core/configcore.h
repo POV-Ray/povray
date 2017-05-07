@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -187,16 +187,27 @@
 ///
 //******************************************************************************
 
-#ifndef INLINE_NOISE
-    #define INLINE_NOISE
-#endif
-
-#ifndef USE_FASTER_NOISE
-    #define USE_FASTER_NOISE 0
-#endif
-
 #ifndef QSORT
     #define QSORT(a,b,c,d) qsort((a),(b),(c),(d))
+#endif
+
+/// @def TRY_OPTIMIZED_NOISE
+/// Whether the platform provides dynamic optimized noise.
+///
+/// Define if the platform provides one or more alternative optimized implementations of the noise
+/// generator, to be dispatched dynamically at run-time. Leave undefined otherwise.
+///
+/// @note
+///     If this macro is defined, the platform must implement the function
+///     @ref pov::TryOptimizedNoise() as declared in @ref core/material/texture.h.
+///
+#ifndef TRY_OPTIMIZED_NOISE
+    // leave undefined
+    #ifdef DOXYGEN
+        // doxygen cannot document undefined macros; also, we want to force declaration of the
+        // TryOptimizedNoise() function.
+        #define TRY_OPTIMIZED_NOISE
+    #endif
 #endif
 
 //******************************************************************************

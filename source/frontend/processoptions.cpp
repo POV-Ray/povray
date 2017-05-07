@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -912,7 +912,7 @@ int ProcessOptions::Parse_INI_Switch(ITextStream *file, int token, POVMSObjectPt
     }
     else
     {
-        // if there is a quoted string directory following the switch, parse it matching quotes
+        // if there is a quoted string directly following the switch, parse it, matching quotes
         chr = file->getchar();
         if((chr == '\"') || (chr == '\''))
         {
@@ -950,16 +950,21 @@ int ProcessOptions::Parse_INI_Switch(ITextStream *file, int token, POVMSObjectPt
                     srcptr = value;
 
                 // only if a paremeter is expected allow it, and vice versa
-                if(((*srcptr > ' ') && (table->type != kPOVMSType_Null)) || ((*srcptr <= ' ') && (table->type == kPOVMSType_Null)))
+                if ((table->flags & kCmdOptFlag_Optional) ||
+                    ((*srcptr >  ' ') && (table->type != kPOVMSType_Null)) ||
+                    ((*srcptr <= ' ') && (table->type == kPOVMSType_Null)))
                 {
                     err = Process_Switch(table, srcptr, obj, (token != '-'));
-                    break;
                 }
+
+                // We're aborting the search now either way, because due how the table is supposed to be sorted,
+                // if the switch would match another entry we should have encountered that one earlier.
+                break;
             }
             table++;
         }
 
-        // if there was no sucessful match so far, see if it is a system specific switch
+        // if there was no successful match so far, see if it is a system specific switch
         if((table == NULL) || (table->command == NULL))
         {
             if(ProcessUnknownSwitch(key, value, obj) == false)
@@ -1215,7 +1220,7 @@ int ProcessOptions::Parse_CL_Switch(const char *&commandline, int token, POVMSOb
     }
     else
     {
-        // if there is a quoted string directly following the switch, parse its matching quotes
+        // if there is a quoted string directly following the switch, parse it, matching quotes
         chr = *commandline;
         commandline++;
         if((chr == '\"') || (chr == '\''))

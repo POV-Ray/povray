@@ -1,6 +1,6 @@
 //******************************************************************************
 ///
-/// @file platform/x86/avxnoise.cpp
+/// @file platform/x86/avx/avxnoise.cpp
 ///
 /// This file contains implementations of the noise generator optimized for the
 /// AVX instruction set.
@@ -41,7 +41,7 @@
 ///
 //******************************************************************************
 
-#include "syspovconfigbase.h"
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "avxnoise.h"
 
 #ifdef MACHINE_INTRINSICS_H
@@ -50,7 +50,13 @@
 
 #include "core/material/pattern.h"
 #include "core/material/texture.h"
-#include "cpuid.h"
+
+/// @file
+/// @attention
+///     This file **must not** contain any code that might get called before CPU
+///     support for this optimized implementation has been confirmed. Most
+///     notably, the function to detect support itself must not reside in this
+///     file.
 
 /*****************************************************************************/
 
@@ -66,7 +72,7 @@ static inline __m256d permute4x64_functional(const __m256d& x, int i)
     const int idx1 = ((i >> 2) & 0x3);
     const int idx2 = ((i >> 4) & 0x3);
     const int idx3 = ((i >> 6) & 0x3);
-    __declspec(align(32)) double p[4];
+    ALIGN32 double p[4];
     _mm256_store_pd(p,x);
 
     if (idx0 == idx1 && idx1 == idx2 && idx2 == idx3)
@@ -141,12 +147,6 @@ void AVXNoiseInit()
         avxtable[(4 * i) + 3] = RTable[2 * i + 6];
 #endif
     }
-}
-
-
-bool AVXNoiseSupported()
-{
-    return HaveAVX();
 }
 
 /*****************************************************************************

@@ -57,13 +57,10 @@
 #include "core/material/blendmap.h"
 #include "core/material/pattern.h"
 #include "core/material/pigment.h"
+#include "core/material/portablenoise.h"
 #include "core/material/normal.h"
 #include "core/material/warp.h"
 #include "core/support/imageutil.h"
-
-#ifdef OPTIMIZED_NOISE_H
-#include OPTIMIZED_NOISE_H
-#endif
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -88,14 +85,6 @@ static void InitSolidNoise(void);
 /* Ridiculously large scaling values */
 
 const int SINTABSIZE = 1000;
-
-#define SCURVE(a) ((a)*(a)*(3.0-2.0*(a)))
-
-#define INCRSUM(m,s,x,y,z)  \
-    ((s)*(RTable[m+1] + RTable[m+2]*(x) + RTable[m+4]*(y) + RTable[m+6]*(z)))
-
-#define INCRSUMP(mp,s,x,y,z) \
-    ((s)*((mp[1]) + (mp[2])*(x) + (mp[4])*(y) + (mp[6])*(z)))
 
 
 /*****************************************************************************
@@ -168,30 +157,6 @@ ALIGN16 DBL RTable[267*2] =
       0.659449, 0.0,   -0.027512, 0.0,    0.821897, 0.0,   -0.226215, 0.0,   0.0181735, 0.0,    0.500481, 0.0,
      -0.420127, 0.0,   -0.427878, 0.0,    0.566186, 0.0
 };
-
-/*****************************************************************************/
-/* Platform specific faster noise functions support                          */
-/* (Profiling revealed that the noise functions can take up to 50% of        */
-/*  all the time required when rendering and current compilers cannot        */
-/*  easily optimise them efficiently without some help from programmers!)    */
-/*****************************************************************************/
-
-#if USE_FASTER_NOISE
-}
-#include "fasternoise.h"
-namespace pov
-{
-    #ifndef FASTER_NOISE_INIT
-        #define FASTER_NOISE_INIT()
-    #endif
-#else // USE_FASTER_NOISE
-#ifndef TRY_OPTIMIZED_NOISE
-    #define PortableNoise Noise
-    #define PortableDNoise DNoise
-#endif
-
-    #define FASTER_NOISE_INIT()
-#endif // USE_FASTER_NOISE
 
 /*****************************************************************************
 *
@@ -301,8 +266,6 @@ static void InitTextureTable()
 
     for(i = 0; i < 4096; i++)
         hashTable[4096 + i] = hashTable[i];
-
-    FASTER_NOISE_INIT();
 }
 
 
@@ -344,314 +307,6 @@ void Free_Noise_Tables()
 }
 
 
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-*   Noise
-*
-* INPUT
-*
-*   EPoint -- 3-D point at which noise is evaluated
-*
-* OUTPUT
-*
-* RETURNS
-*
-*   DBL noise value
-*
-* AUTHOR
-*
-*   Robert Skinner based on Ken Perlin
-*
-* DESCRIPTION
-*
-* CHANGES
-*   Modified by AAC to ensure uniformly distributed clamped values
-*   between 0 and 1.0...
-*
-*   Feb 8, 2001: modified function based on MegaPov 0.7 to remove
-*                bugs that showed up when noise was translated.
-*
-******************************************************************************/
-
-DBL PortableNoise(const Vector3d& EPoint, int noise_generator)
-{
-    DBL x, y, z;
-    DBL *mp;
-    int tmp;
-    int ix, iy, iz;
-    int ixiy_hash, ixjy_hash, jxiy_hash, jxjy_hash;
-
-    DBL sx, sy, sz, tx, ty, tz;
-    DBL sum = 0.0;
-
-    DBL x_ix, x_jx, y_iy, y_jy, z_iz, z_jz, txty, sxty, txsy, sxsy;
-
-    // TODO FIXME - global statistics reference
-    // Stats[Calls_To_Noise]++;
-
-    if (noise_generator==kNoiseGen_Perlin)
-    {
-        // The 1.59 and 0.985 are to correct for some biasing problems with
-        // the random # generator used to create the noise tables.  Final
-        // range of values is about 5.0e-4 below 0.0 and above 1.0.  Mean
-        // value is 0.49 (ideally it would be 0.5).
-        sum = 0.5 * (1.59 * SolidNoise(EPoint) + 0.985);
-
-        // Clamp final value to 0-1 range
-            if (sum < 0.0) sum = 0.0;
-            if (sum > 1.0) sum = 1.0;
-
-        return sum;
-    }
-
-    x = EPoint[X];
-    y = EPoint[Y];
-    z = EPoint[Z];
-
-    /* its equivalent integer lattice point. */
-    /* ix = (int)x; iy = (int)y; iz = (long)z; */
-    /* JB fix for the range problem */
-    tmp = (x>=0)?(int)x:(int)(x-(1-EPSILON));
-    ix = (int)((tmp-NOISE_MINX)&0xFFF);
-    x_ix = x-tmp;
-
-    tmp = (y>=0)?(int)y:(int)(y-(1-EPSILON));
-    iy = (int)((tmp-NOISE_MINY)&0xFFF);
-    y_iy = y-tmp;
-
-    tmp = (z>=0)?(int)z:(int)(z-(1-EPSILON));
-    iz = (int)((tmp-NOISE_MINZ)&0xFFF);
-    z_iz = z-tmp;
-
-    x_jx = x_ix-1; y_jy = y_iy-1; z_jz = z_iz-1;
-
-    sx = SCURVE(x_ix); sy = SCURVE(y_iy); sz = SCURVE(z_iz);
-
-    /* the complement values of sx,sy,sz */
-    tx = 1 - sx; ty = 1 - sy; tz = 1 - sz;
-
-    /*
-     *  interpolate!
-     */
-    txty = tx * ty;
-    sxty = sx * ty;
-    txsy = tx * sy;
-    sxsy = sx * sy;
-    ixiy_hash = Hash2d(ix,     iy);
-    jxiy_hash = Hash2d(ix + 1, iy);
-    ixjy_hash = Hash2d(ix,     iy + 1);
-    jxjy_hash = Hash2d(ix + 1, iy + 1);
-
-    mp = &RTable[Hash1dRTableIndex(ixiy_hash, iz)];
-    sum = INCRSUMP(mp, (txty*tz), x_ix, y_iy, z_iz);
-
-    mp = &RTable[Hash1dRTableIndex(jxiy_hash, iz)];
-    sum += INCRSUMP(mp, (sxty*tz), x_jx, y_iy, z_iz);
-
-    mp = &RTable[Hash1dRTableIndex(ixjy_hash, iz)];
-    sum += INCRSUMP(mp, (txsy*tz), x_ix, y_jy, z_iz);
-
-    mp = &RTable[Hash1dRTableIndex(jxjy_hash, iz)];
-    sum += INCRSUMP(mp, (sxsy*tz), x_jx, y_jy, z_iz);
-
-    mp = &RTable[Hash1dRTableIndex(ixiy_hash, iz + 1)];
-    sum += INCRSUMP(mp, (txty*sz), x_ix, y_iy, z_jz);
-
-    mp = &RTable[Hash1dRTableIndex(jxiy_hash, iz + 1)];
-    sum += INCRSUMP(mp, (sxty*sz), x_jx, y_iy, z_jz);
-
-    mp = &RTable[Hash1dRTableIndex(ixjy_hash, iz + 1)];
-    sum += INCRSUMP(mp, (txsy*sz), x_ix, y_jy, z_jz);
-
-    mp = &RTable[Hash1dRTableIndex(jxjy_hash, iz + 1)];
-    sum += INCRSUMP(mp, (sxsy*sz), x_jx, y_jy, z_jz);
-
-    if(noise_generator==kNoiseGen_RangeCorrected)
-    {
-        /* details of range here:
-        Min, max: -1.05242, 0.988997
-        Mean: -0.0191481, Median: -0.535493, Std Dev: 0.256828
-
-        We want to change it to as close to [0,1] as possible.
-        */
-        sum += 1.05242;
-        sum *= 0.48985582;
-        /*sum *= 0.5;
-            sum += 0.5;*/
-
-        if (sum < 0.0)
-            sum = 0.0;
-        if (sum > 1.0)
-            sum = 1.0;
-    }
-    else
-    {
-        sum = sum + 0.5;                     /* range at this point -0.5 - 0.5... */
-
-        if (sum < 0.0)
-            sum = 0.0;
-        if (sum > 1.0)
-            sum = 1.0;
-    }
-
-    return (sum);
-}
-
-
-
-/*****************************************************************************
-*
-* FUNCTION
-*
-*   DNoise
-*
-* INPUT
-*
-*   EPoint -- 3-D point at which noise is evaluated
-*
-* OUTPUT
-*
-*   Vector3d& result
-*
-* RETURNS
-*
-* AUTHOR
-*
-*   Robert Skinner based on Ken Perlin
-*
-* DESCRIPTION
-*   Vector-valued version of "Noise"
-*
-* CHANGES
-*   Modified by AAC to ensure uniformly distributed clamped values
-*   between 0 and 1.0...
-*
-*   Feb 8, 2001: modified function based on MegaPov 0.7 to remove
-*                bugs that showed up when noise was translated.
-*
-******************************************************************************/
-
-void PortableDNoise(Vector3d& result, const Vector3d& EPoint)
-{
-    DBL x, y, z;
-    DBL *mp;
-    int tmp;
-    int ix, iy, iz;
-    int ixiy_hash, ixjy_hash, jxiy_hash, jxjy_hash;
-    DBL x_ix, x_jx, y_iy, y_jy, z_iz, z_jz;
-    DBL s;
-    DBL sx, sy, sz, tx, ty, tz;
-    DBL txty, sxty, txsy, sxsy;
-
-    // TODO FIXME - global statistics reference
-    // Stats[Calls_To_DNoise]++;
-
-    x = EPoint[X];
-    y = EPoint[Y];
-    z = EPoint[Z];
-
-    /* its equivalent integer lattice point. */
-    /*ix = (int)x; iy = (int)y; iz = (int)z;
-    x_ix = x - ix; y_iy = y - iy; z_iz = z - iz;*/
-                /* JB fix for the range problem */
-    tmp = (x>=0)?(int)x:(int)(x-(1-EPSILON));
-    ix = (int)((tmp-NOISE_MINX)&0xFFF);
-    x_ix = x-tmp;
-
-    tmp = (y>=0)?(int)y:(int)(y-(1-EPSILON));
-    iy = (int)((tmp-NOISE_MINY)&0xFFF);
-    y_iy = y-tmp;
-
-    tmp = (z>=0)?(int)z:(int)(z-(1-EPSILON));
-    iz = (int)((tmp-NOISE_MINZ)&0xFFF);
-    z_iz = z-tmp;
-
-    x_jx = x_ix-1; y_jy = y_iy-1; z_jz = z_iz-1;
-
-    sx = SCURVE(x_ix); sy = SCURVE(y_iy); sz = SCURVE(z_iz);
-
-    /* the complement values of sx,sy,sz */
-    tx = 1 - sx; ty = 1 - sy; tz = 1 - sz;
-
-    /*
-     *  interpolate!
-     */
-    txty = tx * ty;
-    sxty = sx * ty;
-    txsy = tx * sy;
-    sxsy = sx * sy;
-    ixiy_hash = Hash2d(ix,     iy);
-    jxiy_hash = Hash2d(ix + 1, iy);
-    ixjy_hash = Hash2d(ix,     iy + 1);
-    jxjy_hash = Hash2d(ix + 1, iy + 1);
-
-    mp = &RTable[Hash1dRTableIndex(ixiy_hash, iz)];
-    s = txty*tz;
-    result[X] = INCRSUMP(mp, s, x_ix, y_iy, z_iz);
-    mp += 8;
-    result[Y] = INCRSUMP(mp, s, x_ix, y_iy, z_iz);
-    mp += 8;
-    result[Z] = INCRSUMP(mp, s, x_ix, y_iy, z_iz);
-
-    mp = &RTable[Hash1dRTableIndex(jxiy_hash, iz)];
-    s = sxty*tz;
-    result[X] += INCRSUMP(mp, s, x_jx, y_iy, z_iz);
-    mp += 8;
-    result[Y] += INCRSUMP(mp, s, x_jx, y_iy, z_iz);
-    mp += 8;
-    result[Z] += INCRSUMP(mp, s, x_jx, y_iy, z_iz);
-
-    mp = &RTable[Hash1dRTableIndex(jxjy_hash, iz)];
-    s = sxsy*tz;
-    result[X] += INCRSUMP(mp, s, x_jx, y_jy, z_iz);
-    mp += 8;
-    result[Y] += INCRSUMP(mp, s, x_jx, y_jy, z_iz);
-    mp += 8;
-    result[Z] += INCRSUMP(mp, s, x_jx, y_jy, z_iz);
-
-    mp = &RTable[Hash1dRTableIndex(ixjy_hash, iz)];
-    s = txsy*tz;
-    result[X] += INCRSUMP(mp, s, x_ix, y_jy, z_iz);
-    mp += 8;
-    result[Y] += INCRSUMP(mp, s, x_ix, y_jy, z_iz);
-    mp += 8;
-    result[Z] += INCRSUMP(mp, s, x_ix, y_jy, z_iz);
-
-    mp = &RTable[Hash1dRTableIndex(ixjy_hash, iz + 1)];
-    s = txsy*sz;
-    result[X] += INCRSUMP(mp, s, x_ix, y_jy, z_jz);
-    mp += 8;
-    result[Y] += INCRSUMP(mp, s, x_ix, y_jy, z_jz);
-    mp += 8;
-    result[Z] += INCRSUMP(mp, s, x_ix, y_jy, z_jz);
-
-    mp = &RTable[Hash1dRTableIndex(jxjy_hash, iz + 1)];
-    s = sxsy*sz;
-    result[X] += INCRSUMP(mp, s, x_jx, y_jy, z_jz);
-    mp += 8;
-    result[Y] += INCRSUMP(mp, s, x_jx, y_jy, z_jz);
-    mp += 8;
-    result[Z] += INCRSUMP(mp, s, x_jx, y_jy, z_jz);
-
-    mp = &RTable[Hash1dRTableIndex(jxiy_hash, iz + 1)];
-    s = sxty*sz;
-    result[X] += INCRSUMP(mp, s, x_jx, y_iy, z_jz);
-    mp += 8;
-    result[Y] += INCRSUMP(mp, s, x_jx, y_iy, z_jz);
-    mp += 8;
-    result[Z] += INCRSUMP(mp, s, x_jx, y_iy, z_jz);
-
-    mp = &RTable[Hash1dRTableIndex(ixiy_hash, iz + 1)];
-    s = txty*sz;
-    result[X] += INCRSUMP(mp, s, x_ix, y_iy, z_jz);
-    mp += 8;
-    result[Y] += INCRSUMP(mp, s, x_ix, y_iy, z_jz);
-    mp += 8;
-    result[Z] += INCRSUMP(mp, s, x_ix, y_iy, z_jz);
-}
 
 // Note that the value of NoiseEntries must be a power of 2.  This
 // is because bit masking using (NoiseEntries-1) is used to rescale
@@ -1626,8 +1281,8 @@ int Test_Opacity(const TEXTURE *Texture)
 
 #ifdef TRY_OPTIMIZED_NOISE
 
-DBL (*Noise) (const Vector3d& EPoint, int noise_generator);
-void (*DNoise) (Vector3d& result, const Vector3d& EPoint);
+NoiseFunction Noise;
+DNoiseFunction DNoise;
 
 /*****************************************************************************
 *
@@ -1664,7 +1319,7 @@ void Initialise_NoiseDispatch()
 
     if(!cpu_detected)
     {
-        if (!TRY_OPTIMIZED_NOISE(&Noise, &DNoise))
+        if (!TryOptimizedNoise(&Noise, &DNoise))
         {
             Noise  = PortableNoise;
             DNoise = PortableDNoise;
