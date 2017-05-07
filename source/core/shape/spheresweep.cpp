@@ -1279,8 +1279,8 @@ void SphereSweep::Compute_BBox()
 
             for (int j = 0; j < 4; ++j)
             {
-                mins = min(mins, tempSphere[i].Center - Vector3d(fabs(tempSphere[i].Radius)));
-                maxs = max(maxs, tempSphere[i].Center + Vector3d(fabs(tempSphere[i].Radius)));
+                mins = min(mins, tempSphere[j].Center - Vector3d(fabs(tempSphere[j].Radius)));
+                maxs = max(maxs, tempSphere[j].Center + Vector3d(fabs(tempSphere[j].Radius)));
             }
         }
     }
