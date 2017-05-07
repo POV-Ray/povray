@@ -2062,7 +2062,6 @@ void PhotonMap::setGatherOptions(ScenePhotonSettings &photonSettings, int mediaM
   DBL dmax_s;      - square of radius used so far
   int TargetNum_s; - target number
   Vector3d *pt_s;  - center point
-  numfound_s;      - number of photons in priority queue
 
   these must be allocated:
     renderer->sceneData->photonSettings.photonGatherList - array of photons in priority queue
@@ -2077,7 +2076,7 @@ void PhotonMap::setGatherOptions(ScenePhotonSettings &photonSettings, int mediaM
 
   void PQDelMax()
 
-    Removes the photon with the greates distance (highest priority)
+    Removes the photon with the greatest distance (highest priority)
     from the queue.
 
 ********************************************************************/
@@ -2280,13 +2279,13 @@ void PhotonGatherer::gatherPhotonsRec(int start, int end)
 
     // check this photon
 
-    // find distance in DimToUse from pt
+    // find distance in DimToUse (largest of the photon's dimensions) from pt
     delta=(*pt_s)[DimToUse]-photon->Loc[DimToUse];
     dSqr = Sqr(delta);
 
     if (dSqr<dmax_s)
     {
-        // it fits manhatten, DimToUse distance - maybe we can use this photon
+        // it fits DimToUse distance - maybe we can use this photon
 
         ptToPhoton = Vector3d(photon->Loc) - *pt_s;
 
@@ -2310,8 +2309,8 @@ void PhotonGatherer::gatherPhotonsRec(int start, int end)
             discFix = fabs(discFix);
             dSqr += flattenFactor*(discFix)*dSqr*16;
         }
-        // this will add zero if on the plane, and will double distance from
-        // point to photon if it is ptToPhoton perpendicular to the surface
+        // this [the above? - CLi] will add zero if on the plane, and will double distance from
+        // point to photon if ptToPhoton is perpendicular to the surface
 
         if(dSqr < dmax_s)
         {
