@@ -13,7 +13,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -102,9 +102,7 @@ namespace pov
 const DBL DEPTH_TOLERANCE       = 1.0e-6;
 const DBL ZERO_TOLERANCE        = 1.0e-4;
 
-/* Just to be sure use twice as much plus old maximum.  However,
-   from looking at the code this may still not always be enough!
-   It seems this depends on Num_Poly_Roots... [trf] */
+// TODO - Technically this should be `(Num_Spheres + Num_Segments * order) * 2` [CLi]
 #define SPHSWEEP_MAX_ISECT  ((Num_Spheres + Num_Segments) * 2 + 64)
 
 
@@ -165,7 +163,8 @@ const MATRIX B_Matrix =
 
 bool SphereSweep::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceThreadData *Thread)
 {
-    SPHSWEEP_INT    *Isect = reinterpret_cast<SPHSWEEP_INT *>(POV_MALLOC((sizeof(SPHSWEEP_INT) * SPHSWEEP_MAX_ISECT), "sphere sweep intersections"));
+    // TODO - To improve performance, we might use thread-local buffers for all sphere sweeps.
+    SPHSWEEP_INT    *Isect = reinterpret_cast<SPHSWEEP_INT *>(POV_MALLOC(sizeof(SPHSWEEP_INT) * SPHSWEEP_MAX_ISECT, "sphere sweep intersections"));
     SPHSWEEP_INT    *Sphere_Isect = reinterpret_cast<SPHSWEEP_INT *>(POV_MALLOC(sizeof(SPHSWEEP_INT) * 2 * Num_Spheres, "Sphere sweep sphere intersections"));
     SPHSWEEP_INT    *Segment_Isect = reinterpret_cast<SPHSWEEP_INT *>(POV_MALLOC(sizeof(SPHSWEEP_INT) * 12 * Num_Segments, "Sphere sweep segment intersections"));
     BasicRay        New_Ray;
@@ -404,15 +403,14 @@ bool SphereSweep::Intersect_Sphere(const BasicRay &ray, const SPHSWEEP_SPH *Sphe
 *
 ******************************************************************************/
 
+/// @bug
+///     The current implementation exhibits numeric instabilities for 3rd order polynomial splines.
+///     (See GitHub issue #147.)
+///
 int SphereSweep::Intersect_Segment(const BasicRay &ray, const SPHSWEEP_SEG *Segment, SPHSWEEP_INT *Isect, TraceThreadData *Thread)
 {
     int             Isect_Count;
-    DBL             Dot1, Dot2;
-    DBL             t1, t2;
     Vector3d        Vector;
-    Vector3d        IPoint;
-    Vector3d        DCenter;
-    DBL             DCenterDot;
     DBL             temp;
     DBL             b, c, d, e, f, g, h, i, j, k, l;
     DBL             Coef[11];
@@ -421,72 +419,9 @@ int SphereSweep::Intersect_Segment(const BasicRay &ray, const SPHSWEEP_SEG *Segm
     DBL             fp0, fp1;
     DBL             t;
     SPHSWEEP_SPH    Temp_Sphere;
-    SPHSWEEP_INT    Temp_Isect[2];
     Vector3d        Center;
 
     Isect_Count = 0;
-
-    // Calculate intersections with closing surface for u = 0
-    Dot1 = dot(ray.Direction, Segment->Center_Deriv[0]);
-    if(fabs(Dot1) > EPSILON)
-    {
-        Vector = ray.Origin - Segment->Closing_Sphere[0].Center;
-        Dot2 = dot(Vector, Segment->Center_Deriv[0]);
-        t1 = -(Dot2 + Segment->Closing_Sphere[0].Radius * Segment->Radius_Deriv[0]) / Dot1;
-        if ((t1 > -MAX_DISTANCE) && (t1 < MAX_DISTANCE))
-        {
-            // Calculate point
-            IPoint = ray.Evaluate(t1);
-
-            // Is the point inside the closing sphere?
-            DCenter = IPoint - Segment->Closing_Sphere[0].Center;
-            DCenterDot = DCenter.lengthSqr();
-            if(DCenterDot < Sqr(Segment->Closing_Sphere[0].Radius))
-            {
-                // Add intersection
-                Isect[Isect_Count].t = t1;
-
-                // Copy point
-                Isect[Isect_Count].Point = IPoint;
-
-                // Calculate normal
-                Isect[Isect_Count].Normal = -Segment->Center_Deriv[0].normalized();
-
-                Isect_Count++;
-            }
-        }
-    }
-
-    // Calculate intersections with closing surface for u = 1
-    Dot1 = dot(ray.Direction, Segment->Center_Deriv[1]);
-    if(fabs(Dot1) > EPSILON)
-    {
-        Vector = ray.Origin - Segment->Closing_Sphere[1].Center;
-        Dot2 = dot(Vector, Segment->Center_Deriv[1]);
-        t2 = -(Dot2 + Segment->Closing_Sphere[1].Radius * Segment->Radius_Deriv[1]) / Dot1;
-        if((t2 > -MAX_DISTANCE) && (t2 < MAX_DISTANCE))
-        {
-            // Calculate point
-            IPoint = ray.Evaluate(t2);
-
-            // Is the point inside the closing sphere?
-            DCenter = IPoint - Segment->Closing_Sphere[1].Center;
-            DCenterDot = DCenter.lengthSqr();
-            if(DCenterDot < Sqr(Segment->Closing_Sphere[1].Radius))
-            {
-                // Add intersection
-                Isect[Isect_Count].t = t2;
-
-                // Copy point
-                Isect[Isect_Count].Point = IPoint;
-
-                // Calculate normal
-                Isect[Isect_Count].Normal = Segment->Center_Deriv[1].normalized();
-
-                Isect_Count++;
-            }
-        }
-    }
 
     // Calculate intersections with sides of the segment
 
@@ -654,15 +589,8 @@ int SphereSweep::Intersect_Segment(const BasicRay &ray, const SPHSWEEP_SEG *Segm
                     Temp_Sphere.Radius = Segment->Radius_Coef[1] * Root[m] + Segment->Radius_Coef[0];
 
                     // Calculate intersections
-                    if(Intersect_Sphere(ray, &Temp_Sphere, Temp_Isect))
-                    {
-                        // Add intersections
-                        Isect[Isect_Count] = Temp_Isect[0];
-                        Isect_Count++;
-
-                        Isect[Isect_Count] = Temp_Isect[1];
-                        Isect_Count++;
-                    }
+                    if(Intersect_Sphere(ray, &Temp_Sphere, Isect + Isect_Count))
+                        Isect_Count += 2;
                 }
             }
             break;
@@ -679,7 +607,6 @@ int SphereSweep::Intersect_Segment(const BasicRay &ray, const SPHSWEEP_SEG *Segm
                     + 2.0 * c * Root[m]
                     + d;
 
-#if 0 // [CLi] preliminary workaround for FS#81
                 if(fabs(fp1) > ZERO_TOLERANCE)
                 {
                     t = -fp0 / fp1;
@@ -703,7 +630,6 @@ int SphereSweep::Intersect_Segment(const BasicRay &ray, const SPHSWEEP_SEG *Segm
                     }
                 }
                 else
-#endif
                 {
                     // Calculate center of single sphere
                     Temp_Sphere.Center = Segment->Center_Coef[3] * (Root[m] * Root[m] * Root[m])
@@ -718,15 +644,8 @@ int SphereSweep::Intersect_Segment(const BasicRay &ray, const SPHSWEEP_SEG *Segm
                                        + Segment->Radius_Coef[0];
 
                     // Calculate intersections
-                    if(Intersect_Sphere(ray, &Temp_Sphere, Temp_Isect))
-                    {
-                        // Add intersections
-                        Isect[Isect_Count] = Temp_Isect[0];
-                        Isect_Count++;
-
-                        Isect[Isect_Count] = Temp_Isect[1];
-                        Isect_Count++;
-                    }
+                    if (Intersect_Sphere(ray, &Temp_Sphere, Isect + Isect_Count))
+                        Isect_Count += 2;
                 }
             }
             break;
@@ -1338,18 +1257,41 @@ void SphereSweep::Compute_BBox()
     mins[X] = mins[Y] = mins[Z] = BOUND_HUGE;
     maxs[X] = maxs[Y] = maxs[Z] = -BOUND_HUGE;
 
-    for(i = 0; i < Num_Modeling_Spheres; i++)
+    if (Interpolation == CATMULL_ROM_SPLINE_SPHERE_SWEEP)
     {
-        if(Interpolation == CATMULL_ROM_SPLINE_SPHERE_SWEEP)
+        // With Catmull-Rom splines, the spline may overshoot the space defined by the control spheres.
+        // For now, we solve this by translating each segment of the sphere sweep into (temporary) corresponding
+        // Bezier-style control spheres, and computing the bounding box from those.
+
+        for (i = 1; i < Num_Modeling_Spheres-2; i++)
         {
-            // Make box a bit larger for Catmull-Rom-Spline sphere sweeps
-            mins = min(mins, Modeling_Sphere[i].Center - Vector3d(2.0 * Modeling_Sphere[i].Radius));
-            maxs = max(maxs, Modeling_Sphere[i].Center + Vector3d(2.0 * Modeling_Sphere[i].Radius));
+            // Compute temporary Bezier-style control spheres for the segment.
+
+            SPHSWEEP_SPH tempSphere[4];
+            tempSphere[0]        = Modeling_Sphere[i];
+            tempSphere[1].Center = Modeling_Sphere[i].Center + (Modeling_Sphere[i+1].Center - Modeling_Sphere[i-1].Center) / 6;
+            tempSphere[1].Radius = Modeling_Sphere[i].Radius + (Modeling_Sphere[i+1].Radius - Modeling_Sphere[i-1].Radius) / 6;
+            tempSphere[2].Center = Modeling_Sphere[i+1].Center + (Modeling_Sphere[i].Center - Modeling_Sphere[i+1].Center) / 6;
+            tempSphere[2].Radius = Modeling_Sphere[i+1].Radius + (Modeling_Sphere[i].Radius - Modeling_Sphere[i+1].Radius) / 6;
+            tempSphere[3]        = Modeling_Sphere[i+1];
+
+            // From the Bezier-style control spheres, compute the bounding box.
+
+            for (int j = 0; j < 4; ++j)
+            {
+                mins = min(mins, tempSphere[j].Center - Vector3d(fabs(tempSphere[j].Radius)));
+                maxs = max(maxs, tempSphere[j].Center + Vector3d(fabs(tempSphere[j].Radius)));
+            }
         }
-        else
+    }
+    else
+    {
+        for (i = 0; i < Num_Modeling_Spheres; i++)
         {
-            mins = min(mins, Modeling_Sphere[i].Center - Vector3d(Modeling_Sphere[i].Radius));
-            maxs = max(maxs, Modeling_Sphere[i].Center + Vector3d(Modeling_Sphere[i].Radius));
+            {
+                mins = min(mins, Modeling_Sphere[i].Center - Vector3d(fabs(Modeling_Sphere[i].Radius)));
+                maxs = max(maxs, Modeling_Sphere[i].Center + Vector3d(fabs(Modeling_Sphere[i].Radius)));
+            }
         }
     }
 
@@ -1405,7 +1347,7 @@ void SphereSweep::Compute()
     switch(Interpolation)
     {
         case LINEAR_SPHERE_SWEEP:
-            // Allocate memory if neccessary
+            // Allocate memory if necessary
             if(Segment == NULL)
             {
                 Num_Segments = Num_Modeling_Spheres - 1;
@@ -1437,7 +1379,7 @@ void SphereSweep::Compute()
             }
             break;
         case CATMULL_ROM_SPLINE_SPHERE_SWEEP:
-            // Allocate memory if neccessary
+            // Allocate memory if necessary
             if(Segment == NULL)
             {
                 Num_Segments = Num_Modeling_Spheres - 3;
@@ -1480,7 +1422,7 @@ void SphereSweep::Compute()
             }
             break;
         case B_SPLINE_SPHERE_SWEEP:
-            // Allocate memory if neccessary
+            // Allocate memory if necessary
             if(Segment == NULL)
             {
                 Num_Segments = Num_Modeling_Spheres - 3;
@@ -1532,16 +1474,6 @@ void SphereSweep::Compute()
 
     for(i = 0; i < Num_Segments; i++)
     {
-        // Calculate closing sphere for u = 0
-
-        // Center
-        Segment[i].Closing_Sphere[0].Center =
-                      Segment[i].Center_Coef[0];
-
-        // Radius
-        Segment[i].Closing_Sphere[0].Radius =
-                      Segment[i].Radius_Coef[0];
-
         // Calculate derivatives for u = 0
 
         // Center
@@ -1551,27 +1483,6 @@ void SphereSweep::Compute()
         // Radius
         Segment[i].Radius_Deriv[0] =
                       Segment[i].Radius_Coef[1];
-
-        // Calculate closing sphere for u = 1
-
-        // Center
-        Segment[i].Closing_Sphere[1].Center =
-                      Segment[i].Center_Coef[0];
-
-        // Radius
-        Segment[i].Closing_Sphere[1].Radius =
-                      Segment[i].Radius_Coef[0];
-
-        for(coef = 1; coef < Segment[i].Num_Coefs; coef++)
-        {
-            // Center
-            Segment[i].Closing_Sphere[1].Center +=
-                   Segment[i].Center_Coef[coef];
-
-            // Radius
-            Segment[i].Closing_Sphere[1].Radius +=
-                   Segment[i].Radius_Coef[coef];
-        }
 
         // Calculate derivatives for u = 1
 
@@ -1597,7 +1508,7 @@ void SphereSweep::Compute()
 
     // Calculate single spheres
 
-    // Allocate memory if neccessary
+    // Allocate memory if necessary
     if(Sphere == NULL)
     {
         Num_Spheres = Num_Segments + 1;

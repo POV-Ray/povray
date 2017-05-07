@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -97,7 +97,6 @@ struct Sphere_Sweep_Sphere_Struct
 /* One segment of the sphere sweep */
 struct Sphere_Sweep_Segment_Struct
 {
-    SPHSWEEP_SPH  Closing_Sphere[2];              /* Spheres closing the segment   */
     Vector3d      Center_Deriv[2];                /* Derivatives of center funcs for 0 and 1   */
     DBL           Radius_Deriv[2];                /* Derivatives of radius funcs for 0 and 1   */
     int           Num_Coefs;                      /* Number of coefficients        */
