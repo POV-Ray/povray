@@ -1271,8 +1271,8 @@ void SphereSweep::Compute_BBox()
             tempSphere[0]        = Modeling_Sphere[i];
             tempSphere[1].Center = Modeling_Sphere[i].Center + (Modeling_Sphere[i+1].Center - Modeling_Sphere[i-1].Center) / 6;
             tempSphere[1].Radius = Modeling_Sphere[i].Radius + (Modeling_Sphere[i+1].Radius - Modeling_Sphere[i-1].Radius) / 6;
-            tempSphere[2].Center = Modeling_Sphere[i+1].Center + (Modeling_Sphere[i].Center - Modeling_Sphere[i+1].Center) / 6;
-            tempSphere[2].Radius = Modeling_Sphere[i+1].Radius + (Modeling_Sphere[i].Radius - Modeling_Sphere[i+1].Radius) / 6;
+            tempSphere[2].Center = Modeling_Sphere[i+1].Center + (Modeling_Sphere[i].Center - Modeling_Sphere[i+2].Center) / 6;
+            tempSphere[2].Radius = Modeling_Sphere[i+1].Radius + (Modeling_Sphere[i].Radius - Modeling_Sphere[i+2].Radius) / 6;
             tempSphere[3]        = Modeling_Sphere[i+1];
 
             // From the Bezier-style control spheres, compute the bounding box.

@@ -24,6 +24,19 @@ should be located in the same directory as this file is.
 ------------------------------------------------------------------------------
 
 
+Changes between 3.7.1-beta.6 and 3.7.1-beta.7
+=============================================
+
+This version is essentially a hotfix for some issues with beta.6.
+
+Fixed or Mitigated Bugs
+-----------------------
+
+Miscellaneous:
+
+  - Fixed a bug in the new `cubic_spline` sphere sweep bounding code.
+
+
 Changes between 3.7.1-beta.5 and 3.7.1-beta.6
 =============================================
 
