@@ -35,6 +35,10 @@ Fixed or Mitigated Bugs
 Miscellaneous:
 
   - Fixed a bug in the new `cubic_spline` sphere sweep bounding code.
+  - Reverted most of the sphere sweep performance and memory footprint
+    improvements introduced in the previous beta, as they caused artifacts.
+  - Fixed some sphere sweep inside texture inconsistencies when using
+    control points with negative radius.
 
 
 Changes between 3.7.1-beta.5 and 3.7.1-beta.6

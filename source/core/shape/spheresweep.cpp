@@ -192,28 +192,12 @@ bool SphereSweep::All_Intersections(const Ray& ray, IStack& Depth_Stack, TraceTh
     // Intersections with single spheres
     for(i = 0; i < Num_Spheres; i++)
     {
-        // Are there intersections with this sphere?
-        if(Intersect_Sphere(New_Ray, &Sphere[i], Sphere_Isect))
+        // Test for end of vector
+        if (Num_Isect + 2 <= SPHSWEEP_MAX_ISECT)
         {
-            // Test for end of vector
-            if(Num_Isect + 2 <= SPHSWEEP_MAX_ISECT)
-            {
-                // Valid intersection at Sphere_Isect[0]?
-                if((Sphere_Isect[0].t > -MAX_DISTANCE) && (Sphere_Isect[0].t < MAX_DISTANCE))
-                {
-                    // Add intersection
-                    Isect[Num_Isect] = Sphere_Isect[0];
-                    Num_Isect++;
-                }
-
-                // Valid intersection at Sphere_Isect[1]?
-                if((Sphere_Isect[1].t > -MAX_DISTANCE) && (Sphere_Isect[1].t < MAX_DISTANCE))
-                {
-                    // Add intersection
-                    Isect[Num_Isect] = Sphere_Isect[1];
-                    Num_Isect++;
-                }
-            }
+            // Are there intersections with this sphere?
+            if (Intersect_Sphere(New_Ray, &Sphere[i], Isect + Num_Isect))
+                Num_Isect += 2;
         }
     }
 
@@ -349,7 +333,7 @@ bool SphereSweep::Intersect_Sphere(const BasicRay &ray, const SPHSWEEP_SPH *Sphe
         Inter[0].Point = ray.Evaluate(Inter[0].t);
 
         // Calculate normal
-        Inter[0].Normal = (Inter[0].Point - Sphere->Center) / Sphere->Radius;
+        Inter[0].Normal = (Inter[0].Point - Sphere->Center) / fabs(Sphere->Radius);
 
         // Calculate bigger depth
         Inter[1].t = t_Closest_Approach + Half_Chord;
@@ -358,7 +342,7 @@ bool SphereSweep::Intersect_Sphere(const BasicRay &ray, const SPHSWEEP_SPH *Sphe
         Inter[1].Point = ray.Evaluate(Inter[1].t);
 
         // Calculate normal
-        Inter[1].Normal = (Inter[1].Point - Sphere->Center) / Sphere->Radius;
+        Inter[1].Normal = (Inter[1].Point - Sphere->Center) / fabs(Sphere->Radius);
 
         return true;
     }
@@ -410,7 +394,12 @@ bool SphereSweep::Intersect_Sphere(const BasicRay &ray, const SPHSWEEP_SPH *Sphe
 int SphereSweep::Intersect_Segment(const BasicRay &ray, const SPHSWEEP_SEG *Segment, SPHSWEEP_INT *Isect, TraceThreadData *Thread)
 {
     int             Isect_Count;
+    DBL             Dot1, Dot2;
+    DBL             t1, t2;
     Vector3d        Vector;
+    Vector3d        IPoint;
+    Vector3d        DCenter;
+    DBL             DCenterDot;
     DBL             temp;
     DBL             b, c, d, e, f, g, h, i, j, k, l;
     DBL             Coef[11];
@@ -422,6 +411,79 @@ int SphereSweep::Intersect_Segment(const BasicRay &ray, const SPHSWEEP_SEG *Segm
     Vector3d        Center;
 
     Isect_Count = 0;
+
+    // Calculate intersections with closing discs near the ends of the spline segment.
+    // Note that the positions of the closing discs account for the rate of change in radius
+    // at the respective end of the spline segment.
+
+    // We need to compute these intersections even though we will inevitably discard them later,
+    // because the algorithm downstream expects intersections to always come in pairs, one entering
+    // the segment and the other one exiting it. The intersections with the closing discs will
+    // take the place of any intersections we discard because they fall outside the interval [0,1].
+    // (Also, if the spline happens to be parallel to the ray direction, we will get no roots
+    // at all but still need to have these intersections.)
+
+    // Closing disk near u=1.
+    Dot1 = dot(ray.Direction, Segment->Center_Deriv[0]);
+    if(fabs(Dot1) > EPSILON)
+    {
+        Vector = ray.Origin - Segment->Closing_Sphere[0].Center;
+        Dot2 = dot(Vector, Segment->Center_Deriv[0]);
+        t1 = -(Dot2 + Segment->Closing_Sphere[0].Radius * Segment->Radius_Deriv[0]) / Dot1;
+        if ((t1 > -MAX_DISTANCE) && (t1 < MAX_DISTANCE))
+        {
+            // Calculate point
+            IPoint = ray.Evaluate(t1);
+
+            // Is the point inside the closing sphere?
+            DCenter = IPoint - Segment->Closing_Sphere[0].Center;
+            DCenterDot = DCenter.lengthSqr();
+            if(DCenterDot < Sqr(Segment->Closing_Sphere[0].Radius))
+            {
+                // Add intersection
+                Isect[Isect_Count].t = t1;
+
+                // Copy point
+                Isect[Isect_Count].Point = IPoint;
+
+                // Calculate normal
+                Isect[Isect_Count].Normal = -Segment->Center_Deriv[0].normalized();
+
+                Isect_Count++;
+            }
+        }
+    }
+
+    // Closing disk near u=1.
+    Dot1 = dot(ray.Direction, Segment->Center_Deriv[1]);
+    if(fabs(Dot1) > EPSILON)
+    {
+        Vector = ray.Origin - Segment->Closing_Sphere[1].Center;
+        Dot2 = dot(Vector, Segment->Center_Deriv[1]);
+        t2 = -(Dot2 + Segment->Closing_Sphere[1].Radius * Segment->Radius_Deriv[1]) / Dot1;
+        if((t2 > -MAX_DISTANCE) && (t2 < MAX_DISTANCE))
+        {
+            // Calculate point
+            IPoint = ray.Evaluate(t2);
+
+            // Is the point inside the closing sphere?
+            DCenter = IPoint - Segment->Closing_Sphere[1].Center;
+            DCenterDot = DCenter.lengthSqr();
+            if(DCenterDot < Sqr(Segment->Closing_Sphere[1].Radius))
+            {
+                // Add intersection
+                Isect[Isect_Count].t = t2;
+
+                // Copy point
+                Isect[Isect_Count].Point = IPoint;
+
+                // Calculate normal
+                Isect[Isect_Count].Normal = Segment->Center_Deriv[1].normalized();
+
+                Isect_Count++;
+            }
+        }
+    }
 
     // Calculate intersections with sides of the segment
 
@@ -537,7 +599,10 @@ int SphereSweep::Intersect_Segment(const BasicRay &ray, const SPHSWEEP_SEG *Segm
             break;
     }
 
-    // Remove roots not in interval [0, 1]
+    // Remove roots not in interval [0, 1].
+
+    // Note that the corresponding intersections are either removed in balanced pairs, or are
+    // balanced by intersections with the closing discs.
 
     m = 0;
     while(m < Num_Poly_Roots)
@@ -1474,6 +1539,16 @@ void SphereSweep::Compute()
 
     for(i = 0; i < Num_Segments; i++)
     {
+        // Calculate closing sphere for u = 0
+
+        // Center
+        Segment[i].Closing_Sphere[0].Center =
+                      Segment[i].Center_Coef[0];
+
+        // Radius
+        Segment[i].Closing_Sphere[0].Radius =
+                      Segment[i].Radius_Coef[0];
+
         // Calculate derivatives for u = 0
 
         // Center
@@ -1483,6 +1558,27 @@ void SphereSweep::Compute()
         // Radius
         Segment[i].Radius_Deriv[0] =
                       Segment[i].Radius_Coef[1];
+
+        // Calculate closing sphere for u = 1
+
+        // Center
+        Segment[i].Closing_Sphere[1].Center =
+                      Segment[i].Center_Coef[0];
+
+        // Radius
+        Segment[i].Closing_Sphere[1].Radius =
+                      Segment[i].Radius_Coef[0];
+
+        for(coef = 1; coef < Segment[i].Num_Coefs; coef++)
+        {
+            // Center
+            Segment[i].Closing_Sphere[1].Center +=
+                   Segment[i].Center_Coef[coef];
+
+            // Radius
+            Segment[i].Closing_Sphere[1].Radius +=
+                   Segment[i].Radius_Coef[coef];
+        }
 
         // Calculate derivatives for u = 1
 
@@ -1592,8 +1688,10 @@ int SphereSweep::Find_Valid_Points(SPHSWEEP_INT *Inter, int Num_Inter, const Bas
     int     i;
     int     j;
     int     Inside;
-    int     Keep;
+    bool    Keep;
     DBL     NormalDotDirection;
+
+    // NB: First intersection point always enters, last one always leaves, so we're not explicitly testing them.
 
     Inside = 1;
     i = 1;
