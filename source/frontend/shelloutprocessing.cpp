@@ -198,7 +198,7 @@ bool ShelloutProcessing::ExtractCommand(const string& src, string& command, stri
 	command.clear();
 	parameters.clear();
 	string str = boost::trim_copy(src);
-	for (s = str.c_str(); *s; *s++)
+	for (s = str.c_str(); *s; s++)
 	{
 		if (hadEscape)
 		{

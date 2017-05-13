@@ -8436,7 +8436,7 @@ unsigned long int NewHash(long int tvx, long int tvy, long int tvz)
 	tvz *= 83492791L;
 
 	r = tvx ^ tvy ^ tvz;
-	seed = abs(r);
+	seed = std::abs(r);
 	if (tvx<0) seed += LONG_MAX/2;
 	if (tvy<0) seed += LONG_MAX/4;
 	if (tvz<0) seed += LONG_MAX/8;

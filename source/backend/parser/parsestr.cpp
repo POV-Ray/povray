@@ -529,7 +529,7 @@ UCS2 *Parser::Parse_Datetime(bool pathname)
 			throw;
 		vlen = 0;
 	}
-	if ((vlen == PARSE_NOW_VAL_LENGTH)) // on error: max for libc 4.4.1 & before
+	if (vlen == PARSE_NOW_VAL_LENGTH) // on error: max for libc 4.4.1 & before
 		vlen = 0; // return an empty string on error (content of val[] is undefined)
 	val[vlen]='\0'; // whatever, that operation is now safe (and superflous except for error)
 
