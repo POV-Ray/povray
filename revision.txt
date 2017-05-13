@@ -1,13 +1,132 @@
-#----------------------------------------------------------------------------
-# Note: To view an original flyspray bug report (FS#xxx), replace the leading
-# FS# of the bug ID with the URL http://bugs.povray.org/.
-# For example, to read FS#270, visit http://bugs.povray.org/270.
-# To view a referenced newsgroup posting (<xxxxx@news.povray.org>), prefix
-# the message ID with the URL http://news.povray.org/.
-# For example, to read <42765ef3$1@news.povray.org>, visit:
-# http://news.povray.org/<42765ef3$1@news.povray.org>.
-# The '<' and '>' are optional (if using a shell you may want to omit them).
-#----------------------------------------------------------------------------
+------------------------------------------------------------------------------
+POV-Ray Revision History
+------------------------------------------------------------------------------
+Notes:
+
+- POV-Ray's actual revision history after version 3.7.0 is non-linear. This
+  digest presents this history from the perspective of the `release/v3.7.0`
+  branch, ignoring version numbers associated with side branches, and listing
+  changes in the order they were included in the branch rather than
+  chronologically.
+
+- As of commit 39ce8a2 (2013-11-16), this branch (`release/v3.7.0`) has been
+  detached from the main POV-Ray 3.7 development, and no longer shares updates
+  with it. Development of this branch is now generally limited to maintaining
+  compatibility of the 3.7.0 source code with contemporary build environments.
+
+- To view a referenced GitHub issue (#xxx), replace the leading # of the
+  issue ID with the URL https://github.com/POV-Ray/povray/issues/.
+  For example, to read GitHub issue #58, visit:
+  https://github.com/POV-Ray/povray/issues/58
+
+- To view a referenced flyspray bug report (FS#xxx), replace the leading
+  FS# of the flyspray bug ID with the URL http://bugs.povray.org/.
+  For example, to read FS#270, visit:
+  http://bugs.povray.org/270
+
+- To view a referenced newsgroup posting (<xxxxx@news.povray.org>), prefix
+  the message ID with the URL http://news.povray.org/.
+  The '<' and '>' are optional (if using a shell you may want to omit them).
+  For example, to read <42765ef3$1@news.povray.org>, visit:
+  http://news.povray.org/42765ef3$1@news.povray.org
+------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------
+POV-Ray v3.7.0.TBD
+------------------------------------------------------------------------------
+
+Commit bd856d6 on 2016-12-03 by Christoph Lipka
+
+    Update boost version to 1.62.
+
+------------------------------------------------------------------------------
+POV-Ray v3.7.0.1
+------------------------------------------------------------------------------
+
+Commit 4f3f49e on 2016-10-10 by Christoph Lipka
+
+    Improve compatibility with diverse build environments. (#112)
+
+    This commit bundles cherry-picked changes from the master branch
+    to improve compatibility of the stable branch with C++11 compilers,
+    as well as additional changes (presumably duplicating changes to the
+    master branch) to make the Unix version compatible with Mac OS X.
+
+Commit 3e668f9 on 2016-09-10 by Christoph Lipka
+
+    Cherry-picked changes from master branch to make Unix build process
+    compatible with contemporary versions of Automake and boost.
+
+Commit 942ca94 on 2015-11-20 by Christoph Lipka (c-lipka)
+
+    Merge pull request #45 from selvik/patch-1
+
+    Trivial update to README.md
+
+Commit af8fcee on 2015-10-12 by Selvi K
+
+    Minor update to README.md
+
+    It helps having the dependencies listed before the actual install
+    instructions, so that one doesn't have to have the configure step fail
+    multiple times before hitting each dependency.
+
+Commit 39ce8a2 on 2013-11-16 by Chris Cason (chris20)
+
+    Merge pull request #3 from POV-Ray/master
+
+    Merge documentation into stable branch
+
+Commit fbc04c9 on 2013-11-16 by Chris Cason (chris20)
+
+    Merge pull request #2 from POV-Ray/3.7-stable
+
+    3.7 stable
+
+Commit cfbd0c1 on 2013-11-16 by Chris Cason (chris20)
+
+    Update README.md
+
+Commit 16c80a3 on 2013-11-16 by Chris Cason (chris20)
+
+    Update README.md
+
+Commit b775d60 on 2013-11-16 by Chris Cason (chris20)
+
+    Update README.md
+
+Commit 0bbe2b7 on 2013-11-16 by Chris Cason (chris20)
+
+    Create README.md
+
+Commit 373631e on 2013-11-16 by Chris Cason (chris20)
+
+    Add docs
+
+------------------------------------------------------------------------------
+POV-Ray v3.7.0.0
+------------------------------------------------------------------------------
+
+Commit 392510a on 2013-11-06 by Chris Cason (chris20)
+
+    Fix typo
+
+Commit b0fd27d on 2013-11-06 by Chris Cason (chris20)
+
+    Add .gitignore
+
+Commit c7442df on 2013-11-06 by Chris Cason (chris20)
+
+    Update README.md
+
+Commit 5378182 on 2013-11-06 by Chris Cason (chris20)
+
+    Add README.md
+
+Commit 86f4639 on 2013-11-06 by Chris Cason (chris20)
+
+    Initial import
+    [to GitHub]
 
 ---------------------------------
 Changes between 3.7.RC7 and 3.7.0
