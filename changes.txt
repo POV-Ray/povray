@@ -24,6 +24,14 @@ should be located in the same directory as this file is.
 ------------------------------------------------------------------------------
 
 
+Changes between 3.7.1-beta.7 and 3.7.1-TBD
+==========================================
+
+Miscellaneous:
+
+  - Minor updates to the documentation.
+
+
 Changes between 3.7.1-beta.6 and 3.7.1-beta.7
 =============================================
 
