@@ -7,7 +7,6 @@ branches:
   except:
   - /^v[0-9]/
 
-
 language: cpp
 
 matrix:
