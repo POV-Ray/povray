@@ -39,6 +39,8 @@ Miscellaneous:
     improvements introduced in the previous beta, as they caused artifacts.
   - Fixed some sphere sweep inside texture inconsistencies when using
     control points with negative radius.
+  - Fixed crash of Windows version on machines without AVX support.
+  - Fixed performance loss of Windows version observed with previous beta.
 
 
 Changes between 3.7.1-beta.5 and 3.7.1-beta.6
