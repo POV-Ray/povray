@@ -332,6 +332,20 @@ bool Trace::FindIntersection(Intersection& bestisect, const Ray& ray, const RayO
     return false;
 }
 
+
+// The following Trace::FindIntersection functions are never called on
+// bounding hierarchy leaves; rather only called when not traversing the
+// bounding hierarchy:  Either to compute the intersections with infinite
+// objects if they're not already accounted for by the bounding hierarchy
+// chosen, or because bounding is disabled entirely, or because only the
+// intersections with one particular object are of interest (e.g.  the
+// projected_through object of a light source, but also the shadow caching
+// mechanism).
+//
+// In the former two cases it wouldn't be necessary to perform the bounding
+// box test, but in the latter case it is indispensable for good
+// performance. Hence, the initial bounding test.
+
 bool Trace::FindIntersection(ObjectPtr object, Intersection& isect, const Ray& ray, double closest)
 {
     if(object != NULL)
@@ -340,12 +354,12 @@ bool Trace::FindIntersection(ObjectPtr object, Intersection& isect, const Ray& r
         BBoxVector3d invdir;
         BBoxDirection variant;
 
-        Vector3d tmp(1.0 / ray.GetDirection()[X], 1.0 / ray.GetDirection()[Y], 1.0 /ray.GetDirection()[Z]);
+        Vector3d tmp(1.0 / ray.GetDirection()[X], 1.0 / ray.GetDirection()[Y], 1.0 / ray.GetDirection()[Z]);
         origin = BBoxVector3d(ray.Origin);
         invdir = BBoxVector3d(tmp);
         variant = (BBoxDirection)((int(invdir[X] < 0.0) << 2) | (int(invdir[Y] < 0.0) << 1) | int(invdir[Z] < 0.0));
 
-        if(object->Intersect_BBox(variant, origin, invdir, closest) == false)
+        if((sceneData->boundingMethod != 0) && (object->Intersect_BBox(variant, origin, invdir, closest) == false))
             return false;
 
         if(object->Bound.empty() == false)
@@ -393,12 +407,12 @@ bool Trace::FindIntersection(ObjectPtr object, Intersection& isect, const Ray& r
         BBoxVector3d invdir;
         BBoxDirection variant;
 
-        Vector3d tmp(1.0 / ray.GetDirection()[X], 1.0 / ray.GetDirection()[Y], 1.0 /ray.GetDirection()[Z]);
+        Vector3d tmp(1.0 / ray.GetDirection()[X], 1.0 / ray.GetDirection()[Y], 1.0 / ray.GetDirection()[Z]);
         origin = BBoxVector3d(ray.Origin);
         invdir = BBoxVector3d(tmp);
         variant = (BBoxDirection)((int(invdir[X] < 0.0) << 2) | (int(invdir[Y] < 0.0) << 1) | int(invdir[Z] < 0.0));
 
-        if(object->Intersect_BBox(variant, origin, invdir, closest) == false)
+        if((sceneData->boundingMethod != 0) && (object->Intersect_BBox(variant, origin, invdir, closest) == false))
             return false;
 
         if(object->Bound.empty() == false)
