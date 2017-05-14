@@ -27,8 +27,44 @@ Notes:
 ------------------------------------------------------------------------------
 
 ------------------------------------------------------------------------------
+POV-Ray v3.7.1-beta.7
+------------------------------------------------------------------------------
+
+Commit 5e4653d on 2017-05-14 by Christoph Lipka
+
+    Fix crashes and performance losses related to noise optimizations.
+
+    MS Visual Studio's "Whole Program Optimization" feature ( `/GL`)
+    seems to have caused cross-contamination between code paths designated
+    to be optimized for different enhanced instruction sets (`/arch:AVX`,
+    `/arch:AVX2`, or none), causing crashes on non-AVX-capable CPUs as well
+    as poor performance on others. As a remedy, whole program optimization
+    is now turned off for all source files designated to make use of enhanced
+    instruction sets.
+
+Commit 06469c5 on 2017-05-09 by Christoph Lipka
+
+    More sphere sweep changes.
+
+    - Revert most of commit be3225d, which was based on a misunderstanding
+      of the code.
+    - Eliminate a bit more unnecessary copying around of data along the way.
+    - Fix some inside texture inconsistencies when using control points
+      with negative radii.
+    - Document some of the insight gained into the workings of the sphere
+      sweep code.
+
+Commit 887467e on 2017-05-09 by Christoph Lipka
+
+    Fix bug in new cublic spline sphere sweep bounding box computations.
+
+------------------------------------------------------------------------------
 POV-Ray v3.7.1-beta.6
 ------------------------------------------------------------------------------
+
+Commit 6345350 on 2017-05-07 by Christoph Lipka
+
+    Update change log.
 
 Commit ab22c3e on 2017-05-07 by Christoph Lipka
 
