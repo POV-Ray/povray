@@ -13,6 +13,11 @@ Notes:
   For example, to read FS#270, visit:
   http://bugs.povray.org/270
 
+  (Note: As of 3.7.1-beta.8 our flyspray bug tracker is officially mothballed,
+  and we no longer refer to it in the changelog. Any flyspray reports that
+  were still open at that point have been duplicated as GitHub issues titled
+  "Port of FSxxx - ...")
+
 - To view a referenced newsgroup posting (<xxxxx@news.povray.org>), prefix
   the message ID with the URL http://news.povray.org/.
   The '<' and '>' are optional (if using a shell you may want to omit them).
@@ -27,7 +32,15 @@ should be located in the same directory as this file is.
 Changes between 3.7.1-beta.7 and 3.7.1-TBD
 ==========================================
 
-Miscellaneous:
+Fixed or Mitigated Bugs
+-----------------------
+
+Reported via GitHub:
+
+  - #147 ("Port of FS81 - sphere_sweep generating artifacts")
+
+Other Noteworthy
+----------------
 
   - Minor updates to the documentation.
 

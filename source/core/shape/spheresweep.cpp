@@ -101,6 +101,7 @@ namespace pov
 
 const DBL DEPTH_TOLERANCE       = 1.0e-6;
 const DBL ZERO_TOLERANCE        = 1.0e-4;
+const DBL RADIUS_TOLERANCE      = 1.0e-6;
 
 // TODO - Technically this should be `(Num_Spheres + Num_Segments * order) * 2` [CLi]
 #define SPHSWEEP_MAX_ISECT  ((Num_Spheres + Num_Segments) * 2 + 64)
@@ -408,7 +409,6 @@ int SphereSweep::Intersect_Segment(const BasicRay &ray, const SPHSWEEP_SEG *Segm
     DBL             fp0, fp1;
     DBL             t;
     SPHSWEEP_SPH    Temp_Sphere;
-    Vector3d        Center;
 
     Isect_Count = 0;
 
@@ -617,51 +617,31 @@ int SphereSweep::Intersect_Segment(const BasicRay &ray, const SPHSWEEP_SEG *Segm
             m++;
     }
 
-    switch(Segment->Num_Coefs)
+    for (m = 0; m < Num_Poly_Roots; m++)
     {
-        case 2:
-            for(m = 0; m < Num_Poly_Roots; m++)
-            {
+        // Calculate center and radius of sphere at root
+
+        DBL rootPwr = 1;
+        Temp_Sphere.Center = Segment->Center_Coef[0];
+        Temp_Sphere.Radius = Segment->Radius_Coef[0];
+        for (n = 1; n < Segment->Num_Coefs; ++n)
+        {
+            rootPwr *= Root[m];
+            Temp_Sphere.Center += Segment->Center_Coef[n] * rootPwr;
+            Temp_Sphere.Radius += Segment->Radius_Coef[n] * rootPwr;
+        }
+
+        switch (Segment->Num_Coefs)
+        {
+            case 2:
+
                 fp0 = 2.0 * d * Root[m]
                     + e;
                 fp1 = b;
+                break;
 
-                if(fabs(fp1) > ZERO_TOLERANCE)
-                {
-                    t = -fp0 / fp1;
+            case 4:
 
-                    if((t > -MAX_DISTANCE) && (t < MAX_DISTANCE))
-                    {
-                        // Add intersection
-                        Isect[Isect_Count].t = t;
-
-                        // Calculate point
-                        Isect[Isect_Count].Point = ray.Evaluate(t);
-
-                        // Calculate normal
-                        Center = Segment->Center_Coef[0] + Root[m] * Segment->Center_Coef[1];
-                        Isect[Isect_Count].Normal = (Isect[Isect_Count].Point - Center).normalized();
-
-                        Isect_Count++;
-                    }
-                }
-                else
-                {
-                    // Calculate center of single sphere
-                    Temp_Sphere.Center = Segment->Center_Coef[1] * Root[m] + Segment->Center_Coef[0];
-
-                    // Calculate radius of single sphere
-                    Temp_Sphere.Radius = Segment->Radius_Coef[1] * Root[m] + Segment->Radius_Coef[0];
-
-                    // Calculate intersections
-                    if(Intersect_Sphere(ray, &Temp_Sphere, Isect + Isect_Count))
-                        Isect_Count += 2;
-                }
-            }
-            break;
-        case 4:
-            for (m = 0; m < Num_Poly_Roots; m++)
-            {
                 fp0 = 6.0 * f * Root[m] * Root[m] * Root[m] * Root[m] * Root[m]
                     + 5.0 * g * Root[m] * Root[m] * Root[m] * Root[m]
                     + 4.0 * h * Root[m] * Root[m] * Root[m]
@@ -671,49 +651,49 @@ int SphereSweep::Intersect_Segment(const BasicRay &ray, const SPHSWEEP_SEG *Segm
                 fp1 = 3.0 * b * Root[m] * Root[m]
                     + 2.0 * c * Root[m]
                     + d;
+                break;
 
-                if(fabs(fp1) > ZERO_TOLERANCE)
+            default:
+                POV_SHAPE_ASSERT(false);
+                break;
+        }
+
+        bool doubleIsect = (fabs(fp1) < ZERO_TOLERANCE);
+        if (!doubleIsect)
+        {
+            // Looks like a single-intersection root at first glance
+
+            t = -fp0 / fp1;
+
+            if ((t > -MAX_DISTANCE) && (t < MAX_DISTANCE))
+            {
+                // Calculate intersection point
+                Isect[Isect_Count].Point = ray.Evaluate(t);
+
+                // Calculate normal
+                Isect[Isect_Count].Normal = (Isect[Isect_Count].Point - Temp_Sphere.Center).normalized();
+
+                // Sanity-check intersection point for proper radius
+                DBL rIsect = (Isect[Isect_Count].Point - Temp_Sphere.Center).length();
+                DBL rRoot  = Temp_Sphere.Radius;
+
+                // Check for numeric instability; this may (only?) happen if the root corresponds to two intersections
+                doubleIsect = fabs(rIsect - rRoot) > RADIUS_TOLERANCE;
+                if (!doubleIsect)
                 {
-                    t = -fp0 / fp1;
-
-                    if((t > -MAX_DISTANCE) && (t < MAX_DISTANCE))
-                    {
-                        // Add intersection
-                        Isect[Isect_Count].t = t;
-
-                        // Calculate point
-                        Isect[Isect_Count].Point = ray.Evaluate(t);
-
-                        // Calculate normal
-                        Center = Segment->Center_Coef[3] * (Root[m] * Root[m] * Root[m])
-                               + Segment->Center_Coef[2] * (Root[m] * Root[m])
-                               + Segment->Center_Coef[1] *  Root[m]
-                               + Segment->Center_Coef[0];
-                        Isect[Isect_Count].Normal = (Isect[Isect_Count].Point - Center).normalized();
-
-                        Isect_Count++;
-                    }
-                }
-                else
-                {
-                    // Calculate center of single sphere
-                    Temp_Sphere.Center = Segment->Center_Coef[3] * (Root[m] * Root[m] * Root[m])
-                                       + Segment->Center_Coef[2] * (Root[m] * Root[m])
-                                       + Segment->Center_Coef[1] *  Root[m]
-                                       + Segment->Center_Coef[0];
-
-                    // Calculate radius of single sphere
-                    Temp_Sphere.Radius = Segment->Radius_Coef[3] * Root[m] * Root[m] * Root[m]
-                                       + Segment->Radius_Coef[2] * Root[m] * Root[m]
-                                       + Segment->Radius_Coef[1] * Root[m]
-                                       + Segment->Radius_Coef[0];
-
-                    // Calculate intersections
-                    if (Intersect_Sphere(ray, &Temp_Sphere, Isect + Isect_Count))
-                        Isect_Count += 2;
+                    // Add intersection
+                    Isect[Isect_Count].t = t;
+                    Isect_Count++;
                 }
             }
-            break;
+        }
+
+        if (doubleIsect)
+        {
+            // Calculate intersections
+            if(Intersect_Sphere(ray, &Temp_Sphere, Isect + Isect_Count))
+                Isect_Count += 2;
+        }
     }
 
     return Isect_Count;
@@ -1353,10 +1333,8 @@ void SphereSweep::Compute_BBox()
     {
         for (i = 0; i < Num_Modeling_Spheres; i++)
         {
-            {
-                mins = min(mins, Modeling_Sphere[i].Center - Vector3d(fabs(Modeling_Sphere[i].Radius)));
-                maxs = max(maxs, Modeling_Sphere[i].Center + Vector3d(fabs(Modeling_Sphere[i].Radius)));
-            }
+            mins = min(mins, Modeling_Sphere[i].Center - Vector3d(fabs(Modeling_Sphere[i].Radius)));
+            maxs = max(maxs, Modeling_Sphere[i].Center + Vector3d(fabs(Modeling_Sphere[i].Radius)));
         }
     }
 
