@@ -2437,8 +2437,8 @@ void Trace::ComputeIridColour(const FINISH *finish, const Vector3d& lightsource,
 	bwl = sceneData->iridWavelengths.blue();
 
 	// NOTE: Shouldn't we compute Cos_Angle_Of_Incidence just once?
-	cos_angle_of_incidence_light = abs(dot(layer_normal, lightsource));
-	cos_angle_of_incidence_eye   = abs(dot(layer_normal, eye));
+	cos_angle_of_incidence_light = std::abs(dot(layer_normal, lightsource));
+	cos_angle_of_incidence_eye   = std::abs(dot(layer_normal, eye));
 
 	// Calculate phase offset.
 	interference = 2.0 * M_PI * film_thickness * (cos_angle_of_incidence_light + cos_angle_of_incidence_eye);
@@ -3274,7 +3274,7 @@ void Trace::ComputeDiffuseSamplePoint(const Vector3d& basePoint, Intersection& i
 
 		Vector3d vDelta = Vector3d(in.IPoint) - basePoint;
 		double dist = vDelta.length();
-		double cos_phi = abs(dot(vDelta / dist, Vector3d(in.INormal)));
+		double cos_phi = std::abs(dot(vDelta / dist, Vector3d(in.INormal)));
 		if (cos_phi < 0)
 		{
 			VScaleEq(in.INormal, -1.0);

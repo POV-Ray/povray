@@ -292,11 +292,13 @@ class POVMS_MessageReceiver
 		class HandlerOO
 		{
 			public:
+				virtual ~HandlerOO() {}
 				virtual void Call(POVMS_Message&, POVMS_Message&, int) = 0;
 		};
 		class Handler
 		{
 			public:
+				virtual ~Handler() {}
 				virtual void Call(POVMSObjectPtr, POVMSObjectPtr, int) = 0;
 		};
 	protected:
