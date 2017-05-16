@@ -29,7 +29,7 @@ should be located in the same directory as this file is.
 ------------------------------------------------------------------------------
 
 
-Changes between 3.7.0.1 and 3.7.0.TBD
+Changes between 3.7.0.1 and 3.7.0.2
 ===================================
 
 (Note: This version has not been released in binary form, as it does not
@@ -45,6 +45,8 @@ Fixed or Mitigated Bugs
     with the 3.7.0.1 source code (boost 1.59) turned out to have a bug that
     would have caused POV-Ray for Windows to wake the computer from sleep mode
     even when not currently rendering.
+  - Updated code to be compatible with GNU C++ compiler g++ 6.x (tested with
+    6.3.1).
 
 
 Changes between 3.7.0 and 3.7.0.1

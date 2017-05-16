@@ -32,8 +32,22 @@ Notes:
 ------------------------------------------------------------------------------
 
 ------------------------------------------------------------------------------
-POV-Ray v3.7.0.TBD
+POV-Ray v3.7.0.2
 ------------------------------------------------------------------------------
+
+Commit 4b3282d on 2017-05-16 by Christoph Lipka
+
+    Silence various clang warnings, some of which might cause actual
+    issues. (#290)
+
+    Minor code modifications to eliminate compile errors in base/image/hdr.cpp
+    reported for GNU g++ 6.3.1.
+
+    Also cleaned up some clang (4.2) compiler warnings along the way.
+
+Commit 9863a01 on 2017-05-13 by Christoph Lipka
+
+    Update change log, `.gitignore` file and Travis CI configuration.
 
 Commit bd856d6 on 2016-12-03 by Christoph Lipka
 
