@@ -27,8 +27,153 @@ Notes:
 ------------------------------------------------------------------------------
 
 ------------------------------------------------------------------------------
-POV-Ray v3.7.1-TBD
+POV-Ray v3.7.1-beta.7
 ------------------------------------------------------------------------------
+
+Commit 5e4653d on 2017-05-14 by Christoph Lipka
+
+    Fix crashes and performance losses related to noise optimizations.
+
+    MS Visual Studio's "Whole Program Optimization" feature ( `/GL`)
+    seems to have caused cross-contamination between code paths designated
+    to be optimized for different enhanced instruction sets (`/arch:AVX`,
+    `/arch:AVX2`, or none), causing crashes on non-AVX-capable CPUs as well
+    as poor performance on others. As a remedy, whole program optimization
+    is now turned off for all source files designated to make use of enhanced
+    instruction sets.
+
+Commit 06469c5 on 2017-05-09 by Christoph Lipka
+
+    More sphere sweep changes.
+
+    - Revert most of commit be3225d, which was based on a misunderstanding
+      of the code.
+    - Eliminate a bit more unnecessary copying around of data along the way.
+    - Fix some inside texture inconsistencies when using control points
+      with negative radii.
+    - Document some of the insight gained into the workings of the sphere
+      sweep code.
+
+Commit 887467e on 2017-05-09 by Christoph Lipka
+
+    Fix bug in new cublic spline sphere sweep bounding box computations.
+
+------------------------------------------------------------------------------
+POV-Ray v3.7.1-beta.6
+------------------------------------------------------------------------------
+
+Commit 6345350 on 2017-05-07 by Christoph Lipka
+
+    Update change log.
+
+Commit ab22c3e on 2017-05-07 by Christoph Lipka
+
+    Fix for a bug in recent commit ce8b193.
+
+Commit 329ad8a on 2017-05-07 by Christoph Lipka
+
+    [ci skip] Bump version number and update change log.
+
+Commit ce8b193 on 2017-05-07 by Christoph Lipka
+
+    Fix some sphere sweep issues.
+
+    - Fix GitHub issue #285.
+    - Fix `cubic_spline` sphere sweep bounding (see GitHub issue #147).
+
+Commit 57cdebb on 2017-05-07 by Christoph Lipka
+
+    Remove obsolete constants from the POVMS interface.
+
+Commit be3225d on 2017-05-07 by Christoph Lipka
+
+    Sphere sweep performance improvements.
+
+    - Intersections with the spheres at the ends of the segments were
+      computed thrice(!) between segments, and twice at the ends of the
+      entire spline. These duplicate computations have been eliminated,
+      and the sphere sweep memory footprint reduced along the way.
+    - Minor improvements to avoid some unnecessary copying of information.
+
+Commit b0b6917 on 2017-05-07 by Christoph Lipka
+
+    Fix GitHub issue #287.
+
+    This commit reverts change 4947, made prior to the release of 3.7.1,
+    which was intended to work around artifacts described in FlySpray bug
+    report 81 (now tracked as GitHub issue #147) but has now turned out to
+    cause severe problems when using shpere sweeps in differences or merges.
+
+Commit 3f16f20 on 2017-05-07 by Christoph Lipka
+
+    Minor source comment fixes.
+
+Commit 1f3dc8f on 2017-05-07 by William F. Pokorny (wfpokorny)
+
+    Improving performance of gatherPhotonsRec function. (#280)
+
+Commit d50fe7c on 2017-05-05 by Christoph Lipka
+
+    More updates to optimized noise.
+
+    - The new `AVXPortableNoise` implementation now uses the default
+      portable noise code via `#include` rather than duplication of code. To
+      this end, the default portable noise code has been pulled out of
+      `core/material/texture.cpp` into a separate file.
+    - Other minor beautifications of the new `AVXPortableNoise` and
+      related code.
+    - Ditched obsolete static `USE_FASTER_NOISE` mechanism and `INLINE_NOISE`
+      macro.
+    - To support build environments where machine code intrinsics are
+      only available when optimization for the corresponding instruction set
+      extensions is enabled for the translation unit, and/or where per-file
+      compiler settings are difficult to manage, the optimized implementations
+      have been moved into separate subdirectories according to the instruction
+      set extensions required, and the functions to probe for support have
+      been pulled out of the files.
+
+Commit ea3d549 on 2017-04-13 by Anshu Arya
+
+    Update AVXFMA4 noise implementation (#268)
+
+    Improved performance and code readability. The changes only affect AMD
+    parts with FMA4 support.
+
+Commit 8a8c73e on 2017-04-13 by Anshu Arya
+
+    Add alternative AVX-optimized noise implementation. (#267)
+
+    - Added new noise implementation "AVXPortable" which is essentially a
+      clone of PortableNoise compiled separately with compiler AVX flags.
+
+    - Changed the noise code selection based on CPU vendor because the
+      existing AVX and AVX2FMA3 implementations lower performance on non-Intel
+      CPUs compared to the new AVXPortable or existing portable (non-AVX)
+      noise functions.
+
+    - Added noise function selection to benchmark log.
+
+Commit 3adbf75 on 2017-04-12 by William F. Pokorny (wfpokorny)
+
+    Improve AA performance. (#270)
+
+    Especially helps where agressive AA applied to trivial or sparse scenes.
+
+Commit 2be22dd on 2017-04-06 by William F. Pokorny (wfpokorny)
+
+    Relax Parse_Lathe point checking for versions <=3.7.0 (#263)
+
+Commit 59ab7f2 on 2017-04-04 by Christoph Lipka
+
+    Fix optional parameters of command-line-style switches in INI files.
+
+Commit 5ca45b2 on 2017-04-02 by Christoph Lipka
+
+    [ci skip] Update Windows help file and Unix HTML doc.
+
+Commit 04dc90e on 2017-03-27 by Christoph Lipka
+
+    Fix GitHub issue #260.
 
 ------------------------------------------------------------------------------
 POV-Ray v3.7.1-beta.5

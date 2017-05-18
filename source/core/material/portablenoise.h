@@ -1,9 +1,8 @@
 //******************************************************************************
 ///
-/// @file platform/x86/avxnoise.h
+/// @file core/material/portablenoise.h
 ///
-/// This file contains declarations related to implementations of the noise
-/// generator optimized for the AVX instruction set.
+/// Declarations related to the portable noise generator.
 ///
 /// @copyright
 /// @parblock
@@ -34,32 +33,33 @@
 ///
 //******************************************************************************
 
-#ifndef POVRAY_AVXNOISE_H
-#define POVRAY_AVXNOISE_H
+#ifndef POVRAY_CORE_PORTABLENOISE_H
+#define POVRAY_CORE_PORTABLENOISE_H
 
-#include "syspovconfigbase.h"
-#include "backend/frame.h"
+// Module config header file must be the first file included within POV-Ray unit header files
+#include "core/configcore.h"
 
-#ifdef TRY_OPTIMIZED_NOISE_AVX
+#include "core/coretypes.h"
 
 namespace pov
 {
 
-bool AVXNoiseSupported();
+//##############################################################################
+///
+/// @defgroup PovCoreMaterialTexture Textures
+/// @ingroup PovCore
+///
+/// @{
+
+DBL PortableNoise(const Vector3d& EPoint, int noise_generator);
+
+void PortableDNoise(Vector3d& result, const Vector3d& EPoint);
 
 
-void AVXNoiseInit();
-
-/// Optimized Noise function using AVX instructions.
-/// @author Optimized by Intel
-DBL AVXNoise(const Vector3d& EPoint, int noise_generator);
-
-/// Optimized DNoise function using AVX instructions.
-/// @author Optimized by Intel
-void AVXDNoise(Vector3d& result, const Vector3d& EPoint);
+/// @}
+///
+//##############################################################################
 
 }
 
-#endif // TRY_OPTIMIZED_NOISE_AVX
-
-#endif // POVRAY_AVXNOISE_H
+#endif // POVRAY_CORE_PORTABLENOISE_H

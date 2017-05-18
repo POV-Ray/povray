@@ -91,8 +91,15 @@
 
 #include "cpuid.h"
 
-#ifdef OPTIMIZED_NOISE_H
-#include OPTIMIZED_NOISE_H
+#ifdef TRY_OPTIMIZED_NOISE
+// TODO - This is a hack; we should get the noise generator choice information via POVMS from the back-end.
+namespace pov
+{
+  typedef DBL(*NoiseFunction) (const Vector3d& EPoint, int noise_generator);
+  typedef void(*DNoiseFunction) (Vector3d& result, const Vector3d& EPoint);
+  extern bool TryOptimizedNoise(NoiseFunction* pFnNoise, DNoiseFunction* pFnDNoise,
+                                std::string* pDetected = NULL, std::string* pImpl = NULL);
+}
 #endif
 
 
@@ -456,6 +463,8 @@ extern HINSTANCE        hLibPovEdit ;
 
 #define MAX_INSERT_MENU_SECTIONS  8192
 
+std::string selectedNoiseFunc;
+
 typedef std::vector<int> InsMenuSecList;
 
 int                     InsertMenuSection;
@@ -777,6 +786,9 @@ void PrintRenderTimes (int Finished, int NormalCompletion)
             fprintf(f, "povversion=%s\n", POV_RAY_SOURCE_VERSION) ;
             fprintf(f, "compilerversion=%s\n", POV_COMPILER_VER) ;
             fprintf(f, "platformversion=%s\n", POVRAY_PLATFORM_NAME) ;
+#ifdef TRY_OPTIMIZED_NOISE
+            fprintf(f, "noisefunctions=%s\n", selectedNoiseFunc.c_str()) ;
+#endif // TRY_OPTIMIZED_NOISE
             fclose(f);
           }
         }
@@ -6216,32 +6228,15 @@ int PASCAL WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
   // TODO FIXME
   // technically we should ask the backend what it's using, but given this is not a remoted version
   // of POVWIN, we just call the test here.
-  // NOTE - The priorization should reflect `optimizednoise.h`.
-#ifdef TRY_OPTIMIZED_NOISE_AVX2FMA3
-  if (AVX2FMA3NoiseSupported())
+  std::string instructionSet;
+  if (!TryOptimizedNoise(NULL, NULL, &instructionSet, &selectedNoiseFunc))
   {
-    buffer_message (mIDE, "AVX2/FMA3 instruction support detected: using AVX2/FMA3-optimized noise functions.\n") ;
+    instructionSet = "generic";
+    selectedNoiseFunc = "portable";
   }
-  else
-#endif
-#ifdef TRY_OPTIMIZED_NOISE_AVXFMA4
-  if (AVXFMA4NoiseSupported())
-  {
-    buffer_message (mIDE, "AVX/FMA4 instruction support detected: using AVX/FMA4-optimized noise functions.\n") ;
-  }
-  else
-#endif
-#ifdef TRY_OPTIMIZED_NOISE_AVX
-  if (AVXNoiseSupported())
-  {
-    buffer_message (mIDE, "AVX instruction support detected: using AVX-optimized noise functions.\n") ;
-  }
-  else
-#endif
-  {
-    buffer_message (mIDE, "No enhanced instruction support detected: using compatible noise functions.\n") ;
-  }
-  buffer_message (mDivider, "\n") ;
+  std::string selectedNoiseMessage = "CPU detected: " + instructionSet + "\nNoise generator selected: " + selectedNoiseFunc + "\n";
+  buffer_message(mIDE, selectedNoiseMessage.c_str());
+  buffer_message(mDivider, "\n");
 #endif // TRY_OPTIMIZED_NOISE
 
   load_tool_menu (ToolIniFileName) ;

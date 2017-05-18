@@ -1,9 +1,9 @@
 //******************************************************************************
 ///
-/// @file platform/x86/optimizednoise.h
+/// @file platform/x86/avxfma4/avxfma4noise.h
 ///
-/// Declarations related to the dynamic dispatch of the optimized noise
-/// generator implementations for the x86 family of CPUs.
+/// This file contains declarations related to implementations of the noise
+/// generator optimized for the AVX and FMA4 instruction set.
 ///
 /// @copyright
 /// @parblock
@@ -34,10 +34,27 @@
 ///
 //******************************************************************************
 
-#ifndef POVRAY_OPTIMIZEDNOISE_H
-#define POVRAY_OPTIMIZEDNOISE_H
+#ifndef POVRAY_AVXFMA4NOISE_H
+#define POVRAY_AVXFMA4NOISE_H
 
 #include "core/configcore.h"
-#include "core/material/texture.h"
+#include "core/math/vector.h"
 
-#endif // POVRAY_OPTIMIZEDNOISE_H
+#ifdef TRY_OPTIMIZED_NOISE_AVXFMA4
+
+namespace pov
+{
+
+/// Optimized Noise function using AVX and FMA4 instructions.
+/// @author Optimized by AMD
+DBL AVXFMA4Noise(const Vector3d& EPoint, int noise_generator);
+
+/// Optimized DNoise function using AVX and FMA4 instructions.
+/// @author Optimized by AMD
+void AVXFMA4DNoise(Vector3d& result, const Vector3d& EPoint);
+
+}
+
+#endif // TRY_OPTIMIZED_NOISE_AVXFMA4
+
+#endif // POVRAY_AVXFMA4NOISE_H

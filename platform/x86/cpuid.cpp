@@ -33,6 +33,7 @@
 ///
 //******************************************************************************
 
+// Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "cpuid.h"
 
 #ifdef MACHINE_INTRINSICS_H
@@ -213,4 +214,17 @@ bool HaveAVX2FMA3()
     bool avx2    = ((info[CPUID_EBX] & CPUID_00000007_EBX_AVX2_MASK)    != 0);
     // Aggregate the information
     return osxsave && avx && fma3 && avx2 && OSSavesAVXRegisters();
+}
+
+bool IsIntelCPU()
+{
+    int info[4];
+    char vendor[12];
+
+    CPUID(info, 0x0);
+    memcpy(vendor, &info[CPUID_EBX], 4);
+    memcpy(vendor + 4, &info[CPUID_EDX], 4);
+    memcpy(vendor + 8, &info[CPUID_ECX], 4);
+
+    return strncmp("GenuineIntel", vendor, 12) == 0;
 }

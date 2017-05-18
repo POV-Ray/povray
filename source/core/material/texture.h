@@ -41,6 +41,7 @@
 
 #include "core/coretypes.h"
 #include "core/material/blendmap.h"
+#include "core/material/portablenoise.h"
 #include "core/support/simplevector.h"
 
 namespace pov
@@ -59,10 +60,6 @@ struct GenericTurbulenceWarp;
 /*****************************************************************************
 * Global preprocessor defines
 ******************************************************************************/
-
-/*
- * Macro to create random number in the [0; 1] range.
- */
 
 #define FLOOR(x)  ((x) >= 0.0 ? floor(x) : (0.0 - floor(0.0 - (x)) - 1.0))
 
@@ -169,12 +166,55 @@ void Free_Noise_Tables (void);
 DBL SolidNoise(const Vector3d& P);
 
 #ifdef TRY_OPTIMIZED_NOISE
-extern DBL (*Noise) (const Vector3d& EPoint, int noise_generator);
-extern void (*DNoise) (Vector3d& result, const Vector3d& EPoint);
+
+typedef DBL(*NoiseFunction) (const Vector3d& EPoint, int noise_generator);
+typedef void(*DNoiseFunction) (Vector3d& result, const Vector3d& EPoint);
+
+/// Optimized Noise Dispatch.
+///
+/// This function shall select one of multiple implementations of the noise generator functions
+/// (the portable default implementations being @ref PortableNoise() and @ref PortableDNoise(),
+/// respectively), depending on the runtime environment (typically CPU features).
+///
+/// This function shall also perform any additional initialization required by the selected noise
+/// generator.
+///
+/// @note
+///     This function must be implemented by platform-specific code.
+///
+/// @note
+///     The caller may pass `NULL` for any of the parameters, indicating that it doesn't care about
+///     that particular piece of information.
+///
+/// @note
+///     If both @ref pFnNoise and @ref pFnDNoise are set to NULL by the caller, noise generator
+///     initialization must be skipped, in order to avoid potential multithreading issues.
+///
+/// @note
+///     If the function returns `false`, it shall leave all parameters unchanged. However,
+///     the caller shall not rely on this behaviour, as it may be subject to future change.
+///
+/// @param[out] pFnNoise    Selected implementation of @ref PortableNoise().
+/// @param[out] pFnDNoise   Selected implementation of @ref PortableDNoise().
+/// @param[out] pDetected   String identifying the machine features detected (e.g. "AVX,non-Intel")
+///                         on which the selection was based.
+/// @param[out] pImpl       String unambiguously identifying the implementation selected.
+/// @return                 `true` if an alternative implementation was chosen and the parameters
+///                         set accordingly, `false` otherwise.
+///
+bool TryOptimizedNoise(NoiseFunction* pFnNoise, DNoiseFunction* pFnDNoise,
+                       std::string* pDetected = NULL, std::string* pImpl = NULL);
+
+extern NoiseFunction Noise;
+extern DNoiseFunction DNoise;
+
 void Initialise_NoiseDispatch();
+
 #else // TRY_OPTIMIZED_NOISE
-INLINE_NOISE DBL Noise (const Vector3d& EPoint, int noise_generator);
-INLINE_NOISE void DNoise (Vector3d& result, const Vector3d& EPoint);
+
+inline DBL Noise(const Vector3d& EPoint, int noise_generator) { return PortableNoise(EPoint, noise_generator); }
+inline void DNoise(Vector3d& result, const Vector3d& EPoint) { PortableDNoise(result, EPoint); }
+
 #endif // TRY_OPTIMIZED_NOISE
 
 DBL Turbulence (const Vector3d& EPoint, const GenericTurbulenceWarp* Turb, int noise_generator);

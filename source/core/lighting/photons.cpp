@@ -8,7 +8,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.7.
-/// Copyright 1991-2016 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -2057,12 +2057,11 @@ void PhotonMap::setGatherOptions(ScenePhotonSettings &photonSettings, int mediaM
 
   Preconditions:
 
-  static DBL size_sq_s;   - maximum radius given squared
-  static DBL Size_s;      - radius
-  static DBL dmax_s;      - square of radius used so far
-  static int TargetNum_s; - target number
-  static DBL *pt_s;       - center point
-  static numfound_s;      - number of photons in priority queue
+  DBL size_sq_s;   - maximum radius given squared
+  DBL Size_s;      - radius
+  DBL dmax_s;      - square of radius used so far
+  int TargetNum_s; - target number
+  Vector3d *pt_s;  - center point
 
   these must be allocated:
     renderer->sceneData->photonSettings.photonGatherList - array of photons in priority queue
@@ -2077,7 +2076,7 @@ void PhotonMap::setGatherOptions(ScenePhotonSettings &photonSettings, int mediaM
 
   void PQDelMax()
 
-    Removes the photon with the greates distance (highest priority)
+    Removes the photon with the greatest distance (highest priority)
     from the queue.
 
 ********************************************************************/
@@ -2266,7 +2265,7 @@ void PhotonGatherer::gatherPhotonsRec(int start, int end)
 {
     DBL delta;
     int DimToUse;
-    DBL d,dx,dy,dz;
+    DBL dx,dy,dz,dSqr;
     int mid;
     Photon *photon;
     Vector3d ptToPhoton;
@@ -2280,21 +2279,18 @@ void PhotonGatherer::gatherPhotonsRec(int start, int end)
 
     // check this photon
 
-    // find distance from pt
-    ptToPhoton = - (*pt_s) + Vector3d(photon->Loc);
-    // all distances are squared
-    dx = ptToPhoton[X]*ptToPhoton[X];
-    dy = ptToPhoton[Y]*ptToPhoton[Y];
-    dz = ptToPhoton[Z]*ptToPhoton[Z];
+    // find distance in DimToUse (largest of the photon's dimensions) from pt
+    delta=(*pt_s)[DimToUse]-photon->Loc[DimToUse];
+    dSqr = Sqr(delta);
 
-    if (!(  ((dx>dmax_s) && ((DimToUse)==X)) ||
-            ((dy>dmax_s) && ((DimToUse)==Y)) ||
-            ((dz>dmax_s) && ((DimToUse)==Z)) ))
+    if (dSqr<dmax_s)
     {
-        // it fits manhatten distance - maybe we can use this photon
+        // it fits DimToUse distance - maybe we can use this photon
+
+        ptToPhoton = Vector3d(photon->Loc) - *pt_s;
 
         // find euclidian distance (squared)
-        d = dx + dy + dz;
+        dSqr = ptToPhoton.lengthSqr();
 
         // now fix this distance so that we gather using an ellipsoid
         // alligned with the surface normal instead of a sphere.  This
@@ -2311,27 +2307,26 @@ void PhotonGatherer::gatherPhotonsRec(int start, int end)
         {
             discFix = dot(*norm_s,ptToPhoton);
             discFix = fabs(discFix);
-            d += flattenFactor*(discFix)*d*16;
+            dSqr += flattenFactor*(discFix)*dSqr*16;
         }
-        // this will add zero if on the plane, and will double distance from
-        // point to photon if it is ptToPhoton is perpendicular to the surface
+        // this [the above? - CLi] will add zero if on the plane, and will double distance from
+        // point to photon if ptToPhoton is perpendicular to the surface
 
-        if(d < dmax_s)
+        if(dSqr < dmax_s)
         {
             if (gatheredPhotons.numFound+1>TargetNum_s)
             {
-                FullPQInsert(photon, d);
+                FullPQInsert(photon, dSqr);
                 sqrt_dmax_s = sqrt(dmax_s);
             }
             else
-                PQInsert(photon, d);
+                PQInsert(photon, dSqr);
         }
     }
 
     // now go left & right if appropriate - if going left or right goes out
     // the current range, then don't go that way.
     /*
-    delta=(*pt_s)[DimToUse]-photon->Loc[DimToUse];
     if(delta<0)
     {
         if (end>=mid+1) gatherPhotonsRec(start, mid - 1);
@@ -2345,7 +2340,6 @@ void PhotonGatherer::gatherPhotonsRec(int start, int end)
             if (end>=mid+1) gatherPhotonsRec(start, mid - 1);
     }
     */
-    delta=(*pt_s)[DimToUse]-photon->Loc[DimToUse];
     if(delta<0)
     {
         // on left - go left first

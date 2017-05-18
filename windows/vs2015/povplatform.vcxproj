@@ -379,10 +379,48 @@
     <ClCompile Include="..\..\platform\windows\syspovpath.cpp" />
     <ClCompile Include="..\..\platform\windows\syspovtask.cpp" />
     <ClCompile Include="..\..\platform\windows\syspovtimer.cpp" />
-    <ClCompile Include="..\..\platform\x86\avx2fma3noise.cpp" />
-    <ClCompile Include="..\..\platform\x86\avxfma4noise.cpp" />
-    <ClCompile Include="..\..\platform\x86\avxnoise.cpp" />
+    <ClCompile Include="..\..\platform\x86\avx2fma3\avx2fma3noise.cpp">
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release|x64'">AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release-AVX|x64'">AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release-SSE2|Win32'">AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+      <WholeProgramOptimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</WholeProgramOptimization>
+      <WholeProgramOptimization Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</WholeProgramOptimization>
+      <WholeProgramOptimization Condition="'$(Configuration)|$(Platform)'=='Release-SSE2|Win32'">false</WholeProgramOptimization>
+      <WholeProgramOptimization Condition="'$(Configuration)|$(Platform)'=='Release-AVX|x64'">false</WholeProgramOptimization>
+    </ClCompile>
+    <ClCompile Include="..\..\platform\x86\avxfma4\avxfma4noise.cpp">
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AdvancedVectorExtensions</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release|x64'">AdvancedVectorExtensions</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release-AVX|x64'">AdvancedVectorExtensions</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release-SSE2|Win32'">AdvancedVectorExtensions</EnableEnhancedInstructionSet>
+      <WholeProgramOptimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</WholeProgramOptimization>
+      <WholeProgramOptimization Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</WholeProgramOptimization>
+      <WholeProgramOptimization Condition="'$(Configuration)|$(Platform)'=='Release-SSE2|Win32'">false</WholeProgramOptimization>
+      <WholeProgramOptimization Condition="'$(Configuration)|$(Platform)'=='Release-AVX|x64'">false</WholeProgramOptimization>
+    </ClCompile>
+    <ClCompile Include="..\..\platform\x86\avx\avxnoise.cpp">
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AdvancedVectorExtensions</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release|x64'">AdvancedVectorExtensions</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release-AVX|x64'">AdvancedVectorExtensions</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release-SSE2|Win32'">AdvancedVectorExtensions</EnableEnhancedInstructionSet>
+      <WholeProgramOptimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</WholeProgramOptimization>
+      <WholeProgramOptimization Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</WholeProgramOptimization>
+      <WholeProgramOptimization Condition="'$(Configuration)|$(Platform)'=='Release-SSE2|Win32'">false</WholeProgramOptimization>
+      <WholeProgramOptimization Condition="'$(Configuration)|$(Platform)'=='Release-AVX|x64'">false</WholeProgramOptimization>
+    </ClCompile>
+    <ClCompile Include="..\..\platform\x86\avx\avxportablenoise.cpp">
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AdvancedVectorExtensions</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release|x64'">AdvancedVectorExtensions</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release-SSE2|Win32'">AdvancedVectorExtensions</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release-AVX|x64'">AdvancedVectorExtensions</EnableEnhancedInstructionSet>
+      <WholeProgramOptimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</WholeProgramOptimization>
+      <WholeProgramOptimization Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</WholeProgramOptimization>
+      <WholeProgramOptimization Condition="'$(Configuration)|$(Platform)'=='Release-SSE2|Win32'">false</WholeProgramOptimization>
+      <WholeProgramOptimization Condition="'$(Configuration)|$(Platform)'=='Release-AVX|x64'">false</WholeProgramOptimization>
+    </ClCompile>
     <ClCompile Include="..\..\platform\x86\cpuid.cpp" />
+    <ClCompile Include="..\..\platform\x86\optimizednoise.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\platform\windows\osversioninfo.h" />
@@ -390,9 +428,10 @@
     <ClInclude Include="..\..\platform\windows\syspovpath.h" />
     <ClInclude Include="..\..\platform\windows\syspovtask.h" />
     <ClInclude Include="..\..\platform\windows\syspovtimer.h" />
-    <ClInclude Include="..\..\platform\x86\avx2fma3noise.h" />
-    <ClInclude Include="..\..\platform\x86\avxfma4noise.h" />
-    <ClInclude Include="..\..\platform\x86\avxnoise.h" />
+    <ClInclude Include="..\..\platform\x86\avx2fma3\avx2fma3noise.h" />
+    <ClInclude Include="..\..\platform\x86\avxfma4\avxfma4noise.h" />
+    <ClInclude Include="..\..\platform\x86\avx\avxnoise.h" />
+    <ClInclude Include="..\..\platform\x86\avx\avxportablenoise.h" />
     <ClInclude Include="..\..\platform\x86\cpuid.h" />
     <ClInclude Include="..\..\platform\x86\optimizednoise.h" />
   </ItemGroup>
