@@ -259,6 +259,7 @@ namespace pov_base
 
 #define POV_MEMMOVE(dst,src,len)            std::memmove((dst),(src),(len))
 #define POV_MEMCPY(dst,src,len)             std::memcpy((dst),(src),(len))
+#define MEM_STATS                           0
 
 #ifdef _CONSOLE
 
@@ -281,14 +282,12 @@ namespace pov_base
 #define POV_MALLOC(size,msg)                malloc (size)
 #define POV_REALLOC(ptr,size,msg)           realloc ((ptr), (size))
 #define POV_FREE(ptr)                       do { free (static_cast<void *>(ptr)); (ptr) = NULL; } while(false)
-#define POV_STRDUP(str)                     strdup(str)
+#define POV_STRDUP(str)                     _strdup(str)
 
 #define NO_RTR                              1
-#define MEM_STATS                           0
 
 #else // not _CONSOLE
 
-#define MEM_STATS                           0
 #define POV_MEM_STATS                       0
 #define WIN_MEM_TRACKING                    0
 
