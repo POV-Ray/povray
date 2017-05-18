@@ -2107,7 +2107,7 @@ ObjectPtr BicubicPatch::Copy()
 	/* copy the mapping */
 	for (m = 0; m < 4; m++)
 	{
-		for (h = 0; h < 3; h++)
+		for (h = 0; h < 2; h++)
 		{
 			New->ST[m][h] = ST[m][h];
 		}
